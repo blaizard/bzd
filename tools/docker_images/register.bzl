@@ -25,12 +25,6 @@ IMAGES = {
         repository = "blaizard/xtensa_qemu",
         tag = "latest",
     ),
-    "linux_x86_64_gcc": struct(
-        digest = "sha256:1f693d24fe9727c12343c8d06cb46043c671bed17704f343946a0eb8a3da752a",
-        registry = "index.docker.io",
-        repository = "blaizard/linux_x86_64_gcc",
-        tag = "11.2.0",
-    ),
     "compiler_explorer": struct(
         digest = "sha256:d61369a460589987fa292f7a083720c4057e4b3170cc08e265c6b5cfc6c2eb50",
         registry = "index.docker.io",
