@@ -6,6 +6,7 @@ BINARIES = {
     "cc": "bin/xtensa-esp32-elf-gcc",
     "cpp": "bin/xtensa-esp32-elf-gcc",
     "cov": "bin/xtensa-esp32-elf-gcov",
+    "objcopy": "bin/xtensa-esp32-elf-objcopy",
     "objdump": "bin/xtensa-esp32-elf-objdump",
     "ld": "bin/xtensa-esp32-elf-gcc",
     "strip": "bin/xtensa-esp32-elf-strip",

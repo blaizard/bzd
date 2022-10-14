@@ -7,6 +7,7 @@ BINARIES = {
     "cc": "bin/g++",
     "cpp": "bin/cpp",
     "cov": "bin/gcov",
+    "objcopy": "bin/objcopy",
     "objdump": "bin/objdump",
     "ld": "bin/ld",
     "strip": "bin/strip",
