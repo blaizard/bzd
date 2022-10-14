@@ -1,35 +1,45 @@
 package(default_visibility = ["//visibility:public"])
 
 filegroup(
+    name = "all",
+    srcs = [
+        ":includes",
+        ":bin",
+        ":dynamic_libraries",
+        ":static_libraries",        
+    ],
+)
+
+filegroup(
     name = "includes",
     srcs = glob([
-        "usr/lib/gcc/x86_64-linux-gnu/11/include/**/*",
-        "usr/lib/gcc/x86_64-linux-gnu/11/include-fixed/**/*",
-        "usr/include/x86_64-linux-gnu/c++/11/**/*",
-        "usr/include/c++/11/**/*",
+        "lib/gcc/x86_64-pc-linux-gnu/11.2.0/include/**/*",
+        "lib/gcc/x86_64-pc-linux-gnu/11.2.0/include-fixed/**/*",
+        "include/c++/11.2.0/**/*",
     ]),
 )
 
 filegroup(
     name = "bin",
     srcs = glob([
-        "usr/bin/*",
-        "usr/lib/gcc/x86_64-linux-gnu/11/**/*",
-        "usr/lib/x86_64-linux-gnu/**/*"
+        "bin/*",
+        "libexec/gcc/x86_64-pc-linux-gnu/11.2.0/**/*",
     ]),
 )
 
 filegroup(
     name = "dynamic_libraries",
     srcs = glob([
-        "usr/lib/gcc/x86_64-linux-gnu/11/libstdc++.so",
-        "usr/lib/x86_64-linux-gnu/**/*"
+        "lib64/**/*",
+        "lib/**/*",
+
     ]),
 )
 
 filegroup(
     name = "static_libraries",
     srcs = glob([
-        "usr/lib/**/*.a",
+        "lib64/**/*",
+        "lib/**/*",
     ]),
 )

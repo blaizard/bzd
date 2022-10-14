@@ -1,5 +1,16 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
+BINARIES = {
+    "ar": "bin/xtensa-esp32-elf-ar",
+    "as": "bin/xtensa-esp32-elf-as",
+    "cc": "bin/xtensa-esp32-elf-gcc",
+    "cpp": "bin/xtensa-esp32-elf-gcc",
+    "cov": "bin/xtensa-esp32-elf-gcov",
+    "objdump": "bin/xtensa-esp32-elf-objdump",
+    "ld": "bin/xtensa-esp32-elf-gcc",
+    "strip": "bin/xtensa-esp32-elf-strip",
+}
+
 def toolchain_fragment_esp32_xtensa_lx6_gcc():
     package_name = "esp32_xtensa_lx6_gcc_11.2.0"
 
@@ -51,19 +62,13 @@ def toolchain_fragment_esp32_xtensa_lx6_gcc():
             # Do not link with shared libraries
             "-Wl,-static",
         ],
-        "static_runtime_lib": [
-            "@{}//:static_libraries".format(package_name),
-        ],
-        "filegroup_dependencies": [
-            "@{}//:includes".format(package_name),
-            "@{}//:bin".format(package_name),
-        ],
-        "bin_ar": "external/{}/bin/xtensa-esp32-elf-ar".format(package_name),
-        "bin_as": "external/{}/bin/xtensa-esp32-elf-as".format(package_name),
-        "bin_cc": "external/{}/bin/xtensa-esp32-elf-gcc".format(package_name),
-        "bin_cpp": "external/{}/bin/xtensa-esp32-elf-gcc".format(package_name),
-        "bin_cov": "external/{}/bin/xtensa-esp32-elf-gcov".format(package_name),
-        "bin_objdump": "external/{}/bin/xtensa-esp32-elf-objdump".format(package_name),
-        "bin_ld": "external/{}/bin/xtensa-esp32-elf-gcc".format(package_name),
-        "bin_strip": "external/{}/bin/xtensa-esp32-elf-strip".format(package_name),
+        "ar_files": ["@{}//:all".format(package_name)],
+        "as_files": ["@{}//:all".format(package_name)],
+        "compiler_files": ["@{}//:all".format(package_name)],
+        "linker_files": ["@{}//:all".format(package_name)],
+        "objcopy_files": ["@{}//:all".format(package_name)],
+        "strip_files": ["@{}//:all".format(package_name)],
+        "dynamic_libraries_files": ["@{}//:all".format(package_name)],
+        "static_libraries_files": ["@{}//:all".format(package_name)],
+        "binaries": {k: "external/{}/{}".format(package_name, v) for k, v in BINARIES.items()},
     }

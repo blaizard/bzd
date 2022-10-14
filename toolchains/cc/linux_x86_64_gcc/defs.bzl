@@ -1,13 +1,35 @@
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("//tools/bazel_build/toolchains/cc:defs.bzl", "toolchain_maker")
 
+BINARIES = {
+    "ar": "bin/ar",
+    "as": "bin/as",
+    "cc": "bin/g++",
+    "cpp": "bin/cpp",
+    "cov": "bin/gcov",
+    "objdump": "bin/objdump",
+    "ld": "bin/ld",
+    "strip": "bin/strip",
+}
+
 def _load_linux_x86_64_gcc_11_2_0(name):
+
     # Load dependencies
     package_name = "linux_x86_64_gcc_11_2_0"
+    http_archive(
+        name = package_name,
+        build_file = "//toolchains/cc/linux_x86_64_gcc:{}.BUILD".format(package_name),
+        urls = [
+            "http://data.blaizard.com/file/bzd/toolchains/cc/gcc/linux_x86_64/linux_x86_64_11.2.0.tar.xz",
+        ],
+        strip_prefix = "linux_x86_64_11.2.0",
+        sha256 = "da31552294b5000b9ff94e371227e19681e4e47f43ee6b014476432255f0562e",
+    )
 
     toolchain_definition = {
         "cpu": "linux_x86_64",
         "compiler": "gcc",
-        "docker_image": "docker://bazel/tools/docker_images:linux_x86_64_gcc",
+        "docker_image": "docker://blaizard/linux_x86_64:latest",
         "exec_compatible_with": [
             "@platforms//os:linux",
             "@platforms//cpu:x86_64",
@@ -17,25 +39,19 @@ def _load_linux_x86_64_gcc_11_2_0(name):
             "@platforms//cpu:x86_64",
         ],
         "builtin_include_directories": [
-            "/usr/lib/gcc/x86_64-linux-gnu/11/include",
-            "/usr/include/c++/11",
-            "/usr/include/x86_64-linux-gnu/c++/11",
-            "/usr/lib/gcc/x86_64-linux-gnu/11/include",
-            "/usr/lib/gcc/x86_64-linux-gnu/11/include-fixed",
             "/usr/include/x86_64-linux-gnu",
             "/usr/include",
         ],
         "system_directories": [
-            "/usr/include/c++/11",
-            "/usr/include/x86_64-linux-gnu/c++/11",
-            "/usr/lib/gcc/x86_64-linux-gnu/11/include",
-            "/usr/lib/gcc/x86_64-linux-gnu/11/include-fixed",
+            "external/{}/include/c++/11.2.0".format(package_name),
+            "external/{}/lib/gcc/x86_64-pc-linux-gnu/11.2.0/include".format(package_name),
+            "external/{}/lib/gcc/x86_64-pc-linux-gnu/11.2.0/include-fixed".format(package_name),
             "/usr/include/x86_64-linux-gnu",
             "/usr/include",
         ],
         "linker_dirs": [
-            "/usr/lib/gcc/x86_64-linux-gnu/11",
-            "/usr/lib/x86_64-linux-gnu",
+            "external/{}/lib/gcc/x86_64-pc-linux-gnu/11.2.0".format(package_name),
+            "external/{}/lib64".format(package_name),
         ],
         "compile_flags": [
 
@@ -50,27 +66,20 @@ def _load_linux_x86_64_gcc_11_2_0(name):
             "-Wl,--disable-new-dtags",
             "-rdynamic",
             "-Wl,-z,relro,-z,now",
-            "-lstdc++",
+            # Link statically with the provided libstdc++.
+            # This is to avoid relying on a different libstdc++ at runtime, which improves reproductibility.
+            "-static-libstdc++",
             "-lm",
         ],
-        "dynamic_runtime_lib": [
-            #"@{}//:dynamic_libraries".format(package_name),
-        ],
-        "static_runtime_lib": [
-            #"@{}//:static_libraries".format(package_name),
-        ],
-        "filegroup_dependencies": [
-            #"@{}//:includes".format(package_name),
-            #"@{}//:bin".format(package_name),
-        ],
-        "bin_ar": "/usr/bin/x86_64-linux-gnu-ar",
-        "bin_as": "/usr/bin/x86_64-linux-gnu-as",
-        "bin_cc": "/usr/bin/x86_64-linux-gnu-gcc-11",
-        "bin_cpp": "/usr/bin/x86_64-linux-gnu-cpp-11",
-        "bin_cov": "/usr/bin/x86_64-linux-gnu-gcov-11",
-        "bin_objdump": "/usr/bin/x86_64-linux-gnu-objdump",
-        "bin_ld": "/usr/bin/x86_64-linux-gnu-ld",
-        "bin_strip": "/usr/bin/x86_64-linux-gnu-strip",
+        "ar_files": ["@{}//:all".format(package_name)],
+        "as_files": ["@{}//:all".format(package_name)],
+        "compiler_files": ["@{}//:all".format(package_name)],
+        "linker_files": ["@{}//:all".format(package_name)],
+        "objcopy_files": ["@{}//:all".format(package_name)],
+        "strip_files": ["@{}//:all".format(package_name)],
+        "dynamic_libraries_files": ["@{}//:all".format(package_name)],
+        "static_libraries_files": ["@{}//:all".format(package_name)],
+        "binaries": {k: "external/{}/{}".format(package_name, v) for k, v in BINARIES.items()},
         "app_executors": {
             "@//tools/bazel_build/toolchains/cc:executor_host": "default,host",
         },
