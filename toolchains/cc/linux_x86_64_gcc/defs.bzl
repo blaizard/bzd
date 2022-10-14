@@ -14,7 +14,6 @@ BINARIES = {
 }
 
 def _load_linux_x86_64_gcc_11_2_0(name):
-
     # Load dependencies
     package_name = "linux_x86_64_gcc_11_2_0"
     http_archive(

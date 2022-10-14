@@ -1,78 +1,72 @@
-version: '3'
 services:
-  frontend:
-    image: buildbarn/bb-storage:20220912T104841Z-b7137ec
-    command:
-    - /config/frontend.jsonnet
-    expose:
-    - 9980
-    ports:
-    - 8980:8980
-    volumes:
-    - ./config:/config
-
-  storage-0:
-    image: buildbarn/bb-storage:20220912T104841Z-b7137ec
-    command:
-    - /config/storage.jsonnet
-    expose:
-    - 8981
-    - 9980
-    volumes:
-    - ./config:/config
-    - ./storage-ac-0:/storage-ac
-    - ./storage-cas-0:/storage-cas
-
-  scheduler:
-    image: buildbarn/bb-scheduler:20220912T200427Z-e664853
-    command:
-    - /config/scheduler.jsonnet
-    expose:
-    - 8982
-    - 8983
-    - 9980
-    ports:
-    - 7982:7982
-    volumes:
-    - ./config:/config
-
-  browser:
-    image: buildbarn/bb-browser:20220908T160318Z-f32489a
-    command:
-    - /config/browser.jsonnet
-    expose:
-    - 9980
-    ports:
-    - 7984:7984
-    volumes:
-    - ./config:/config
-
-  worker-linux_x86_64:
-    image: buildbarn/bb-worker:20220912T200427Z-e664853
-    command:
-    - /config/worker-linux_x86_64.jsonnet
-    ports:
-    - 7986:7986
-    volumes:
-    - ./config:/config
-    - ./worker-linux_x86_64:/worker
-
-  runner-linux_x86_64:
-    image: blaizard/linux_x86_64:latest
-    command:
-    - sh
-    - -c
-    - while ! test -f /bb/installed; do sleep 1; done; exec /bb/tini -v -g -- /bb/bb_runner /config/runner-linux_x86_64.jsonnet
-    network_mode: none
-    volumes:
-    - ./worker-linux_x86_64:/worker
-    - ./config:/config
-    - ./bb:/bb
-    depends_on:
-    - runner-installer
-
-  runner-installer:
-    image: buildbarn/bb-runner-installer:20220912T200427Z-e664853
-    volumes:
-    - ./bb:/bb
-  
+    browser:
+        command:
+        - /config/browser.jsonnet
+        expose:
+        - 9980
+        image: buildbarn/bb-browser:20220908T160318Z-f32489a
+        ports:
+        - 7984:7984
+        volumes:
+        - ./config:/config
+    frontend:
+        command:
+        - /config/frontend.jsonnet
+        expose:
+        - 9980
+        image: buildbarn/bb-storage:20220912T104841Z-b7137ec
+        ports:
+        - 8980:8980
+        volumes:
+        - ./config:/config
+    runner-installer:
+        image: buildbarn/bb-runner-installer:20220912T200427Z-e664853
+        volumes:
+        - ./bb:/bb
+    runner-linux_x86_64:
+        command:
+        - sh
+        - -c
+        - while ! test -f /bb/installed; do sleep 1; done; exec /bb/tini -v -g --
+            /bb/bb_runner /config/runner-linux_x86_64.jsonnet
+        depends_on:
+        - runner-installer
+        image: blaizard/linux_x86_64:latest
+        network_mode: none
+        volumes:
+        - ./worker-linux_x86_64:/worker
+        - ./config:/config
+        - ./bb:/bb
+    scheduler:
+        command:
+        - /config/scheduler.jsonnet
+        expose:
+        - 8982
+        - 8983
+        - 9980
+        image: buildbarn/bb-scheduler:20220912T200427Z-e664853
+        ports:
+        - 7982:7982
+        volumes:
+        - ./config:/config
+    storage-0:
+        command:
+        - /config/storage.jsonnet
+        expose:
+        - 8981
+        - 9980
+        image: buildbarn/bb-storage:20220912T104841Z-b7137ec
+        volumes:
+        - ./config:/config
+        - ./storage-ac-0:/storage-ac
+        - ./storage-cas-0:/storage-cas
+    worker-linux_x86_64:
+        command:
+        - /config/worker-linux_x86_64.jsonnet
+        image: buildbarn/bb-worker:20220912T200427Z-e664853
+        ports:
+        - 7986:7986
+        volumes:
+        - ./config:/config
+        - ./worker-linux_x86_64:/worker
+version: '3'
