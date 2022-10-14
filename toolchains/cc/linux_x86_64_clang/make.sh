@@ -9,7 +9,7 @@ PACKAGE=${HOST}_${VERSION}
 rm -rfd llvm-project-${VERSION}.src
 curl -L https://github.com/llvm/llvm-project/releases/download/llvmorg-${VERSION}/llvm-project-${VERSION}.src.tar.xz | tar -xJ
 pushd llvm-project-${VERSION}.src
-cmake -G "Unix Makefiles" -S llvm -B build -DCMAKE_BUILD_TYPE="MinSizeRel" \
+cmake -G "Unix Makefiles" -S llvm -B build -DCMAKE_BUILD_TYPE="Release" \
                                 -DCMAKE_INSTALL_PREFIX="$(pwd)/build/${PACKAGE}" \
                                 -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra;lld" \
                                 -DLLVM_ENABLE_RUNTIMES="compiler-rt;libcxx;libcxxabi;libunwind" \

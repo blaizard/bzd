@@ -10,7 +10,7 @@ mkdir -m 0700 "${worker}/cache"
 mkdir -m 0700 -p storage-{ac,cas}-{0,1}/persistent_state
 
 echo "===================================================="
-echo "Scheduler: http://localhost:7982/"
+echo "Scheduler: http://localhost:7982/                   "
 echo "===================================================="
 
 exec docker-compose up "$@"
