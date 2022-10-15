@@ -93,6 +93,7 @@ coverage:linux_x86_64_gcc --experimental_fetch_all_coverage_outputs
 build:esp32_xtensa_lx6_gcc --platforms="@esp32_xtensa_lx6_gcc//:platform"
 build:esp32_xtensa_lx6_gcc --features=-supports_dynamic_linker
 build:esp32_xtensa_lx6_gcc --platform_suffix=esp32_xtensa_lx6_gcc
+test:esp32_xtensa_lx6_gcc --strategy=TestRunner=sandboxed
 
 # clang_tidy
 build:clang_tidy --aspects=//tools/clang_tidy:defs.bzl%clang_tidy_aspect
