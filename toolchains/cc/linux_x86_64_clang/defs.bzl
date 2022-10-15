@@ -23,7 +23,7 @@ def _load_linux_x86_64_clang_14_0_6(name):
             "http://data.blaizard.com/file/bzd/toolchains/cc/clang/linux_x86_64/linux_x86_64_14.0.6.tar.xz",
         ],
         strip_prefix = "linux_x86_64_14.0.6",
-        sha256 = "23e4e03dec851f43b4052ee547ae4e41a31bce518afce33450f21b400629b4ae",
+        sha256 = "f39ed3fe655eded1c5765ad0a6375dd7aa8aa6613c63c7a233bc0533fc63374e",
     )
 
     toolchain_definition = {

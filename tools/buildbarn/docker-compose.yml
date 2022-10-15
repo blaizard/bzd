@@ -22,7 +22,7 @@ services:
     runner-installer:
         image: buildbarn/bb-runner-installer:20220912T200427Z-e664853
         volumes:
-        - ./bb:/bb
+        - ${WORKER_STORAGE_PATH}/bb:/bb
     runner-linux_x86_64:
         command:
         - sh
@@ -34,7 +34,7 @@ services:
         image: blaizard/linux_x86_64:latest
         network_mode: none
         volumes:
-        - ./worker-linux_x86_64:/worker
+        - ${WORKER_STORAGE_PATH}:/worker
         - ./config:/config
         - ./bb:/bb
     scheduler:
@@ -58,8 +58,8 @@ services:
         image: buildbarn/bb-storage:20220912T104841Z-b7137ec
         volumes:
         - ./config:/config
-        - ./storage-ac-0:/storage-ac
-        - ./storage-cas-0:/storage-cas
+        - ${STORAGE_PATH}/storage-ac-0:/storage-ac
+        - ${STORAGE_PATH}/storage-cas-0:/storage-cas
     worker-linux_x86_64:
         command:
         - /config/worker-linux_x86_64.jsonnet
@@ -68,5 +68,5 @@ services:
         - 7986:7986
         volumes:
         - ./config:/config
-        - ./worker-linux_x86_64:/worker
+        - ${WORKER_STORAGE_PATH}:/worker
 version: '3'
