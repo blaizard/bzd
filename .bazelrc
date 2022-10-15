@@ -42,6 +42,7 @@ build:remote --spawn_strategy=remote,sandboxed
 build:remote --remote_download_minimal
 build:remote --disk_cache=
 build:remote --define=EXECUTOR=remote
+build:remote --strategy=NodejsUpdate=sandboxed
 
 # Select only C++ targets
 build --build_tag_filters=-cc-coverage
