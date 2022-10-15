@@ -1,34 +1,84 @@
+load("@//toolchains/cc/fragments/esp32_xtensa_lx6_gcc_11.2.0:defs.bzl", "BINARIES")
+
 package(default_visibility = ["//visibility:public"])
 
+[alias(
+    name = key,
+    actual = path
+) for key, path in BINARIES.items()]
+
 filegroup(
-    name = "all",
+    name = "ar_files",
     srcs = [
-        ":includes",
-        ":bin",
-        ":static_libraries",
-    ],
+        ":ar",
+    ]
 )
 
 filegroup(
-    name = "includes",
-    srcs = glob([
-        "include/**",
-        "lib/gcc/xtensa-esp32-elf/11.2.0/include/**",
-        "xtensa-esp32-elf/include/**",
-        "**/*",
-    ]),
+    name = "as_files",
+    srcs = [
+        ":as",
+    ]
 )
 
 filegroup(
-    name = "bin",
-    srcs = glob([
-        "bin/*",
-    ]),
+    name = "compiler_files",
+    srcs = [
+        ":cc",
+        ":cpp",
+        ":header_files",
+    ] + glob([
+        "libexec/gcc/xtensa-esp32-elf/11.2.0/*",
+        "xtensa-esp32-elf/bin/*",
+    ])
 )
 
 filegroup(
-    name = "static_libraries",
+    name = "linker_files",
+    srcs = [
+        ":cc",
+        ":ld",
+        ":dynamic_libraries_files",
+        ":static_libraries_files",
+    ] + glob([
+        "libexec/gcc/xtensa-esp32-elf/11.2.0/*",
+        "lib/gcc/xtensa-esp32-elf/11.2.0/*"
+    ])
+)
+
+filegroup(
+    name = "objcopy_files",
+    srcs = [
+        ":objcopy",
+    ]
+)
+
+filegroup(
+    name = "strip_files",
+    srcs = [
+        ":strip",
+    ]
+)
+
+filegroup(
+    name = "dynamic_libraries_files",
+    srcs = [],
+)
+
+filegroup(
+    name = "static_libraries_files",
     srcs = glob([
         "xtensa-esp32-elf/lib/**",
     ]),
+)
+
+filegroup(
+    name = "header_files",
+    srcs = glob([
+        "lib/gcc/xtensa-esp32-elf/11.2.0/include/**",
+        "lib/gcc/xtensa-esp32-elf/11.2.0/include-fixed/**",
+        "xtensa-esp32-elf/include/c++/11.2.0/xtensa-esp32-elf/**",
+        "xtensa-esp32-elf/include/c++/11.2.0/**",
+        "xtensa-esp32-elf/sys-include/**",
+    ])
 )

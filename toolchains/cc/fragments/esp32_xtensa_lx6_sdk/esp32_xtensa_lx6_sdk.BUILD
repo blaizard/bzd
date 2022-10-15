@@ -2,21 +2,23 @@ package(default_visibility = ["//visibility:public"])
 
 filegroup(
     name = "linker_files",
-    srcs = glob([
+    srcs = [
+        ":static_libraries_files",
+    ] + glob([
         "bin/*",
-        "ld/**/*",
+        "ld/*",
     ])
 )
 
 filegroup(
     name = "static_libraries_files",
     srcs = glob([
-        "lib/**/*",
+        "lib/*",
     ]),
 )
 
 filegroup(
-    name = "header_files",
+    name = "compiler_files",
     srcs = glob([
         "include/**/*",
     ])

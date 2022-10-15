@@ -43,8 +43,8 @@ def _load_linux_x86_64_gcc_11_2_0(name):
             "/usr/include",
         ],
         "system_directories": [
-            "external/{}/include/c++/11.2.0".format(package_name),
             "external/{}/include/c++/11.2.0/x86_64-pc-linux-gnu".format(package_name),
+            "external/{}/include/c++/11.2.0".format(package_name),
             "external/{}/lib/gcc/x86_64-pc-linux-gnu/11.2.0/include".format(package_name),
             "external/{}/lib/gcc/x86_64-pc-linux-gnu/11.2.0/include-fixed".format(package_name),
             "/usr/include/x86_64-linux-gnu",
