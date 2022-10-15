@@ -45,17 +45,21 @@ be made available.
 ### Locally
 
 To build everything, just run:
+
 ```bash
 bazel test //...
 ```
+
 This will build locally, it will fetch all tools needed to build on your machine.
 
 ### Remote
 
 Remote execution is also supported and is enabled by first deploying on a server the predefined Buildbarn configuration:
+
 ```bash
 ./tools/buildbarn/run.sh
 ```
+
 Then to build bazel targets simply run bazel appended with `--config=remote`.
 
 For debugging purposes, toolchains can be run locally in a docker sandbox which is very similar to what runs on remote execution.
@@ -88,6 +92,7 @@ formater and linters for YAML, json and markdown are also available.
 ## Naming Convention
 
 The code in this repository follows several principle regarding naming convention. The following rules are applied cross languages.
+
 - Files and directories are named lower case `snake_case` using only the characters matching the regexpr: `[a-z0-9_/.]`. This is enforced by tools/sanitizer/actions/structure.
 - Variables, constants, functions, concepts, namespaces are named in `camelCase`.
 - All types are named in `PascalCase`.

@@ -1,15 +1,15 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 BINARIES = {
-    "ar": "bin/xtensa-esp32-elf-ar",
-    "as": "bin/xtensa-esp32-elf-as",
+    "ar": "xtensa-esp32-elf/bin/ar",
+    "as": "xtensa-esp32-elf/bin/as",
     "cc": "bin/xtensa-esp32-elf-gcc",
     "cpp": "bin/xtensa-esp32-elf-gcc",
     "cov": "bin/xtensa-esp32-elf-gcov",
-    "objcopy": "bin/xtensa-esp32-elf-objcopy",
-    "objdump": "bin/xtensa-esp32-elf-objdump",
-    "ld": "bin/xtensa-esp32-elf-gcc",
-    "strip": "bin/xtensa-esp32-elf-strip",
+    "objcopy": "xtensa-esp32-elf/bin/objcopy",
+    "objdump": "xtensa-esp32-elf/bin/objdump",
+    "ld": "xtensa-esp32-elf/bin/ld",
+    "strip": "xtensa-esp32-elf/bin/strip",
 }
 
 def toolchain_fragment_esp32_xtensa_lx6_gcc():
@@ -19,10 +19,10 @@ def toolchain_fragment_esp32_xtensa_lx6_gcc():
         name = package_name,
         build_file = "//toolchains/cc/fragments/esp32_xtensa_lx6_gcc_11.2.0:{}.BUILD".format(package_name),
         urls = [
-            "https://github.com/espressif/crosstool-NG/releases/download/esp-2022r1-RC1/xtensa-esp32-elf-gcc11_2_0-esp-2022r1-RC1-linux-amd64.tar.xz",
+            "http://data.blaizard.com/file/bzd/toolchains/cc/gcc/esp32_xtensa_lx6/xtensa-esp32-elf-gcc11_2_0-esp-2022r1-linux-amd64.tar.xz",
         ],
         strip_prefix = "xtensa-esp32-elf",
-        sha256 = "5da31dfe66ee97c0e940d81e7fac3fc604bb4cbf75294a29e6d5384ae08102dc",
+        sha256 = "698d8407e18275d18feb7d1afdb68800b97904fbe39080422fb8609afa49df30",
     )
 
     return {
@@ -63,13 +63,13 @@ def toolchain_fragment_esp32_xtensa_lx6_gcc():
             # Do not link with shared libraries
             "-Wl,-static",
         ],
-        "ar_files": ["@{}//:all".format(package_name)],
-        "as_files": ["@{}//:all".format(package_name)],
-        "compiler_files": ["@{}//:all".format(package_name)],
-        "linker_files": ["@{}//:all".format(package_name)],
-        "objcopy_files": ["@{}//:all".format(package_name)],
-        "strip_files": ["@{}//:all".format(package_name)],
-        "dynamic_libraries_files": ["@{}//:all".format(package_name)],
-        "static_libraries_files": ["@{}//:all".format(package_name)],
+        "ar_files": ["@{}//:ar_files".format(package_name)],
+        "as_files": ["@{}//:as_files".format(package_name)],
+        "compiler_files": ["@{}//:compiler_files".format(package_name)],
+        "linker_files": ["@{}//:linker_files".format(package_name)],
+        "objcopy_files": ["@{}//:objcopy_files".format(package_name)],
+        "strip_files": ["@{}//:strip_files".format(package_name)],
+        "dynamic_libraries_files": ["@{}//:dynamic_libraries_files".format(package_name)],
+        "static_libraries_files": ["@{}//:static_libraries_files".format(package_name)],
         "binaries": {k: "external/{}/{}".format(package_name, v) for k, v in BINARIES.items()},
     }
