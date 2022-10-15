@@ -149,6 +149,7 @@ def _bzd_nodejs_install_impl(ctx):
         outputs = [node_modules, yarn_lock_json],
         progress_message = "Updating package(s) for {}".format(ctx.label),
         arguments = manager_args,
+        mnemonic = "NodejsUpdate",
         executable = toolchain_executable.manager.files_to_run,
     )
 
@@ -159,6 +160,7 @@ def _bzd_nodejs_install_impl(ctx):
         inputs = [package_json, yarn_lock_json, node_modules],
         outputs = [metadata],
         progress_message = "Generating manifest for {}".format(ctx.label),
+        mnemonic = "NodejsMetadata",
         arguments = [
             "--package_json",
             package_json.path,

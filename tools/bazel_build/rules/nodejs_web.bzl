@@ -128,6 +128,7 @@ def _bzd_nodejs_web_package_impl(ctx):
         outputs = [package],
         arguments = [package.path],
         progress_message = "Building {}".format(ctx.label),
+        mnemonic = "NodejsPackage",
         executable = ctx.executable.dep,
     )
     return [
