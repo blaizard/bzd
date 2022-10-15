@@ -1,9 +1,9 @@
 #!/bin/bash
 set -eu
 
-SCRIPT_PATH=$(dirname "$(realpath -s "$0")")
 export STORAGE_PATH=$(realpath -s "/tmp/buildbarn")
-export WORKER_STORAGE_PATH=$(realpath -s "/tmp/buildbarn-worker-linux_x86_64")
+export WORKER_STORAGE_PATH=$(realpath -s "/tmp/buildbarn_linux_x86_64")
+SCRIPT_PATH=$(dirname "$(realpath -s "$0")")
 
 echo "===================================================="
 echo "Config: ${SCRIPT_PATH}/config                       "

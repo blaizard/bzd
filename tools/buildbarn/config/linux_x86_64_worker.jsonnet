@@ -26,7 +26,7 @@ local common = import 'common.libsonnet';
         datacenter: 'paris',
         rack: '4',
         slot: '15',
-        hostname: 'linux_x86_64-worker.example.com',
+        hostname: 'linux_x86_64_worker.example.com',
       },
     }],
   }],
