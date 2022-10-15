@@ -201,6 +201,10 @@ def toolchain_maker(name, implementation, definition):
         "@{}//:binary_toolchain".format(name),
     )
 
+    native.register_execution_platforms(
+        "@{}//:execution_platform".format(name),
+    )
+
 def toolchain_merge(data1, data2):
     """Merge 2 toolchain data entries."""
 
