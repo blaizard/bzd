@@ -14,10 +14,6 @@ def _impl(ctx):
         fail("Toolchain is missing executors.")
     binary_kwargs.append("executors = {},".format(ctx.attr.app_executors))
 
-    exec_properties = {}
-    if ctx.attr.docker_image:
-        exec_properties["container-image"] = ctx.attr.docker_image
-
     # Generate the constraint value for the compiler.
     if ctx.attr.default:
         compiler_constraint_value = """alias(name = "compiler", actual = "@//tools/bazel_build/platforms/compiler:default")"""
@@ -54,7 +50,6 @@ def _impl(ctx):
             ["'-L{}',".format(t) for t in ctx.attr.linker_dirs] +
             ["'{}',".format(t) for t in ctx.attr.link_flags],
         ),
-        "%{exec_properties}": "\n".join(['"{}": "{}",'.format(k, v) for k, v in exec_properties.items()]),
         "%{exec_compatible_with}": "\n".join(['"{}",'.format(t) for t in ctx.attr.exec_compatible_with]),
         "%{target_compatible_with}": "\n".join(['"{}",'.format(t) for t in ctx.attr.target_compatible_with]),
         "%{alias}": "\n".join([alias_template.format(k, v) for k, v in ctx.attr.alias.items()]),
@@ -102,8 +97,6 @@ _toolchain_maker_linux = repository_rule(
         "default": attr.bool(default = False, doc = "Make this compiler the default one, it will be automatically selected when no compiler is given."),
         "cpu": attr.string(),
         "compiler": attr.string(),
-        # Docker image
-        "docker_image": attr.string(),
         # Compatibility
         "exec_compatible_with": attr.string_list(),
         "target_compatible_with": attr.string_list(),
@@ -199,10 +192,6 @@ def toolchain_maker(name, implementation, definition):
     native.register_toolchains(
         "@{}//:toolchain".format(name),
         "@{}//:binary_toolchain".format(name),
-    )
-
-    native.register_execution_platforms(
-        "@{}//:execution_platform".format(name),
     )
 
 def toolchain_merge(data1, data2):

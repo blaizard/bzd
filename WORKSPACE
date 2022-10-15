@@ -14,9 +14,11 @@ bazel_rules_post_register()
 
 # Docker
 
-load("//tools/docker_images:register.bzl", "docker_images_register")
+load("//tools/docker_images:register.bzl", "docker_execution_platforms", "docker_images_register")
 
 docker_images_register()
+
+docker_execution_platforms()
 
 # Toolchains
 

@@ -206,17 +206,6 @@ platform(
     ],
 )
 
-platform(
-    name = "execution_platform",
-    constraint_values = [
-        ":compiler",
-        %{exec_compatible_with}
-    ],
-    exec_properties = {
-        %{exec_properties}
-    },
-)
-
 config_setting(
     name = "target",
     constraint_values = [

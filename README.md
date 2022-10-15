@@ -96,6 +96,7 @@ The code in this repository follows several principle regarding naming conventio
 - Files and directories are named lower case `snake_case` using only the characters matching the regexpr: `[a-z0-9_/.]`. This is enforced by tools/sanitizer/actions/structure.
 - Variables, constants, functions, concepts, namespaces are named in `camelCase`.
 - All types are named in `PascalCase`.
+- Non-public members are appended with a `_` character.
 - All namings try to avoid abreviations.
 
 ## Memory Footprint

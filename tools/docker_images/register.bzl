@@ -42,3 +42,8 @@ def docker_images_register():
             repository = data.repository,
             tag = data.tag,
         )
+
+def docker_execution_platforms():
+    native.register_execution_platforms(
+        "@//tools/docker_images/linux_x86_64",
+    )
