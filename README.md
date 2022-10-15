@@ -25,20 +25,41 @@ It features the followings:
 - Lightweight.
 - Usefull set of containers.
 
-## C++ Platforms
+## Platforms
 
-The following c++ target platforms are currently supported:
+The following target platforms are currently supported:
 
 | Name                 | Compiler | Version | Executors   | Debug |
 | -------------------- | -------- | ------- | ----------- | ----- |
-| linux_x86_64_clang\* | clang    | 14.0.0  | host\*      |       |
-| linux_x86_64_gcc     | gcc      | 11.1.0  | host\*      |       |
+| linux_x86_64_clang\* | clang    | 14.0.6  | host\*      |       |
+| linux_x86_64_gcc     | gcc      | 11.2.0  | host\*      |       |
 | esp32_xtensa_lx6_gcc | gcc      | 11.2.0  | sim\*, uart | x     |
 
 \* Default.
 
 When debug is support by the platform, one can run a target with `--config=debug` option and a debug environment will
 be made available.
+
+## Build
+
+### Locally
+
+To build everything, just run:
+```bash
+bazel test //...
+```
+This will build locally, it will fetch all tools needed to build on your machine.
+
+### Remote
+
+Remote execution is also supported and is enabled by first deploying on a server the predefined Buildbarn configuration:
+```bash
+./tools/buildbarn/run.sh
+```
+Then to build bazel targets simply run bazel appended with `--config=remote`.
+
+For debugging purposes, toolchains can be run locally in a docker sandbox which is very similar to what runs on remote execution.
+To enable this configuration, run bazel with `--config=docker`.
 
 ## Code Quality
 
@@ -64,7 +85,15 @@ formater and linters for YAML, json and markdown are also available.
 |Node|prettier|eslint|Yes|Yes||
 |Skylark|buildifier|buildifier|||stardoc|
 
-## Memory footprint
+## Naming Convention
+
+The code in this repository follows several principle regarding naming convention. The following rules are applied cross languages.
+- Files and directories are named lower case `snake_case` using only the characters matching the regexpr: `[a-z0-9_/.]`. This is enforced by tools/sanitizer/actions/structure.
+- Variables, constants, functions, concepts, namespaces are named in `camelCase`.
+- All types are named in `PascalCase`.
+- All namings try to avoid abreviations.
+
+## Memory Footprint
 
 All classes offered by this library have the same objective to have a fixed memory size. Their footprint or maximum size
 is determined at compile time, ensuring no memory allocation at runtime, making this library ideal for any safety-critical application.
