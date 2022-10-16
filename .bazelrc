@@ -9,7 +9,7 @@ common --show_timestamps
 build --verbose_failures
 
 # Set default options used by the default run
-build "--strip=never"
+build --strip=never
 
 # Global test specific options
 test --test_output=errors
