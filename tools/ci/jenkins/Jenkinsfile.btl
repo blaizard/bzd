@@ -53,11 +53,15 @@ pipeline
 						{% if stage.category == "coverage" %}
 						lock("coverage")
 						{
-							sh "{{ stage.command }}"
+							{% for command in stage.commands %}
+							sh "{{ command }}"
+							{% end %}
 						}
 						archiveArtifacts artifacts: "{{ stage.output }}/**/*", onlyIfSuccessful: true
 						{% else %}
-						sh "{{ stage.command }}"
+							{% for command in stage.commands %}
+						sh "{{ command }}"
+							{% end %}
 						{% end %}
 					}
 				}
