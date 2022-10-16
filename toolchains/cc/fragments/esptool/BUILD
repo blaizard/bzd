@@ -54,6 +54,7 @@ py_binary(
     visibility = ["//visibility:public"],
     deps = [
         ":targets",
+        "//python/bzd/utils:docker",
         "//python/bzd/utils:run",
     ],
 )

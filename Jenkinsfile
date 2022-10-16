@@ -37,7 +37,7 @@ pipeline
 			steps
 			{
 				sh "./tools/bazel fetch //..."
-				sh "./tools/bazel run tools/docker_images"
+				sh "./tools/bazel run tools/docker_images:xtensa_qemu"
 			}
 		}
 		// Parallelized tests are done here
