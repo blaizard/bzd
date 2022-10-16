@@ -23,7 +23,7 @@ def _load_linux_x86_64_gcc_11_2_0(name):
             "http://data.blaizard.com/file/bzd/toolchains/cc/gcc/linux_x86_64/linux_x86_64_11.2.0.tar.xz",
         ],
         strip_prefix = "linux_x86_64_11.2.0",
-        sha256 = "da31552294b5000b9ff94e371227e19681e4e47f43ee6b014476432255f0562e",
+        sha256 = "e7322906acb4671afb23e7e8f7cc68528495392a8e640f8e146b572e411897fa",
     )
 
     toolchain_definition = {
@@ -71,6 +71,7 @@ def _load_linux_x86_64_gcc_11_2_0(name):
             "-static-libstdc++",
             "-lm",
         ],
+        "all_files": ["@{}//:{}".format(package_name, k) for k in BINARIES.keys()],
         "ar_files": ["@{}//:ar_files".format(package_name)],
         "as_files": ["@{}//:as_files".format(package_name)],
         "compiler_files": ["@{}//:compiler_files".format(package_name)],

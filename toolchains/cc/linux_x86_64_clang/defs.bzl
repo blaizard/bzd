@@ -23,7 +23,7 @@ def _load_linux_x86_64_clang_14_0_6(name):
             "http://data.blaizard.com/file/bzd/toolchains/cc/clang/linux_x86_64/linux_x86_64_14.0.6.tar.xz",
         ],
         strip_prefix = "linux_x86_64_14.0.6",
-        sha256 = "f39ed3fe655eded1c5765ad0a6375dd7aa8aa6613c63c7a233bc0533fc63374e",
+        sha256 = "3cd808bbd8749cdb7f509ecbf33b3c99b506426d13a8caaf0ff8e2a540bc5513",
     )
 
     toolchain_definition = {
@@ -77,6 +77,7 @@ def _load_linux_x86_64_clang_14_0_6(name):
             "-Wl,--build-id=md5",
             "-Wl,--hash-style=gnu",
         ],
+        "all_files": ["@{}//:{}".format(package_name, k) for k in BINARIES.keys()],
         "ar_files": ["@{}//:ar_files".format(package_name)],
         "as_files": ["@{}//:as_files".format(package_name)],
         "compiler_files": ["@{}//:compiler_files".format(package_name)],

@@ -63,6 +63,7 @@ def toolchain_fragment_esp32_xtensa_lx6_gcc():
             # Do not link with shared libraries
             "-Wl,-static",
         ],
+        "all_files": ["@{}//:{}".format(package_name, k) for k in BINARIES.keys()],
         "ar_files": ["@{}//:ar_files".format(package_name)],
         "as_files": ["@{}//:as_files".format(package_name)],
         "compiler_files": ["@{}//:compiler_files".format(package_name)],

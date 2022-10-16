@@ -80,3 +80,14 @@ filegroup(
         "include/c++/11.2.0/**/*",
     ])
 )
+
+# Create a package with only what is needed
+genrule(
+    name = "package",
+    srcs = ["@linux_x86_64_gcc//:all_files"],
+    outs = ["linux_x86_64_11.2.0.tar.xz"],
+    tags = ["manual"],
+    cmd = """
+    tar -cJf $@ --dereference --transform 's/^\\./linux_x86_64_11.2.0/' -C external/linux_x86_64_gcc_11_2_0 .
+    """
+)
