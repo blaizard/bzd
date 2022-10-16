@@ -23,7 +23,7 @@ jobs:
     - name: "Fetch"
       run: |
         ./tools/bazel fetch //...
-        ./tools/bazel run tools/docker_images
+        ./tools/bazel run tools/docker_images:xtensa_qemu
 
 {% for stage in stages %}
     - name: "[{{ stage.category }}] {{ stage.name }}"

@@ -34,6 +34,8 @@ IMAGES = {
 }
 
 def docker_images_register():
+    """Make all docker images accessible via `@docker_image_<name>//:image`."""
+
     for name, data in IMAGES.items():
         bzd_docker_pull(
             name = "docker_image_{}".format(name),
@@ -42,6 +44,26 @@ def docker_images_register():
             repository = data.repository,
             tag = data.tag,
         )
+
+def _docker_images_config_impl(ctx):
+    config_json = ctx.actions.declare_file(ctx.attr.out.name)
+    ctx.actions.write(
+        output = config_json,
+        content = json.encode(IMAGES),
+    )
+    return [
+        DefaultInfo(files = depset([config_json])),
+    ]
+
+docker_images_config = rule(
+    doc = """Expose the docker images configuration as a json file.""",
+    implementation = _docker_images_config_impl,
+    attrs = {
+        "out": attr.output(
+            doc = "The name of the file created by the rule.",
+        ),
+    },
+)
 
 def docker_execution_platforms():
     native.register_execution_platforms(

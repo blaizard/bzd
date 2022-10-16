@@ -8,7 +8,6 @@ ENV DEBIAN_FRONTEND=noninteractive
 # - python - required to run python files, eventhough a python toolchain is installed,
 #            to run a script using this python toolchain, a startup python script needs
 #            to be executed to discover binaries.
-# - gpgv - needed add the key to apt.
 # - openjdk-11-jdk, unzip, zip are used by bazel
 RUN apt-get update && apt-get install -y git \
 	sudo \
