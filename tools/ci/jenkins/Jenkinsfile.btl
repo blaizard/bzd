@@ -32,14 +32,6 @@ pipeline
 				sh "./info.sh"
 			}
 		}
-		stage("Fetch")
-		{
-			steps
-			{
-				sh "./tools/bazel fetch //..."
-				sh "./tools/bazel run tools/docker_images:xtensa_qemu"
-			}
-		}
 		// Parallelized tests are done here
 		stage("Tests")
 		{

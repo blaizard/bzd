@@ -32,14 +32,6 @@ pipeline
 				sh "./info.sh"
 			}
 		}
-		stage("Fetch")
-		{
-			steps
-			{
-				sh "./tools/bazel fetch //..."
-				sh "./tools/bazel run tools/docker_images:xtensa_qemu"
-			}
-		}
 		// Parallelized tests are done here
 		stage("Tests")
 		{
@@ -70,6 +62,7 @@ pipeline
 				{
 					steps
 					{
+						sh "./tools/bazel run tools/docker_images:xtensa_qemu"
 						sh "./tools/bazel test ... --output_groups=+metadata --config=esp32_xtensa_lx6_gcc --config=prod --config=cc --platform_suffix=esp32_xtensa_lx6_gcc_prod"
 					}
 				}
