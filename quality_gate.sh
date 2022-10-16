@@ -9,7 +9,7 @@ EXTRA_FLAGS="$@"
 echo  "==== [normal] clang-tidy ==============================="
 ./tools/bazel test ... --output_groups=+metadata --config=dev --config=clang_tidy --platform_suffix=clang_tidy $EXTRA_FLAGS
 echo  "==== [normal] linux_x86_64_clang prod ==============================="
-./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=prod --platform_suffix=linux_x86_64_clang_prod $EXTRA_FLAGS
+./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=prod --config=cc --platform_suffix=linux_x86_64_clang_prod $EXTRA_FLAGS
 echo  "==== [normal] linux_x86_64_gcc prod ==============================="
 ./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_gcc --config=prod --config=cc --platform_suffix=linux_x86_64_gcc_prod $EXTRA_FLAGS
 echo  "==== [normal] esp32_xtensa_lx6_gcc prod ==============================="

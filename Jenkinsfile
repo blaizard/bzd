@@ -56,7 +56,7 @@ pipeline
 				{
 					steps
 					{
-						sh "./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=prod --platform_suffix=linux_x86_64_clang_prod"
+						sh "./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=prod --config=cc --platform_suffix=linux_x86_64_clang_prod"
 					}
 				}
 				stage("[normal] linux_x86_64_gcc prod")
