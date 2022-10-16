@@ -20,11 +20,6 @@ jobs:
         export PATH="${PATH}:${GITHUB_WORKSPACE}/bin"
         ./info.sh
 
-    - name: "Fetch"
-      run: |
-        ./tools/bazel fetch //...
-        ./tools/bazel run tools/docker_images:xtensa_qemu
-
     - name: "[normal] clang-tidy"
       run: |
         ./tools/bazel clean --expunge
@@ -43,6 +38,7 @@ jobs:
     - name: "[normal] esp32_xtensa_lx6_gcc prod"
       run: |
         ./tools/bazel clean --expunge
+        ./tools/bazel run tools/docker_images:xtensa_qemu
         ./tools/bazel test ... --output_groups=+metadata --config=esp32_xtensa_lx6_gcc --config=prod --config=cc --platform_suffix=esp32_xtensa_lx6_gcc_prod
 
     - name: "[sanitizer] asan/lsan"
