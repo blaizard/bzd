@@ -27,26 +27,32 @@ jobs:
 
     - name: "[normal] clang-tidy"
       run: |
+        ./tools/bazel clean --expunge
         ./tools/bazel test ... --output_groups=+metadata --config=dev --config=clang_tidy --platform_suffix=clang_tidy
 
     - name: "[normal] linux_x86_64_clang prod"
       run: |
+        ./tools/bazel clean --expunge
         ./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=prod --config=cc --platform_suffix=linux_x86_64_clang_prod
 
     - name: "[normal] linux_x86_64_gcc prod"
       run: |
+        ./tools/bazel clean --expunge
         ./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_gcc --config=prod --config=cc --platform_suffix=linux_x86_64_gcc_prod
 
     - name: "[normal] esp32_xtensa_lx6_gcc prod"
       run: |
+        ./tools/bazel clean --expunge
         ./tools/bazel test ... --output_groups=+metadata --config=esp32_xtensa_lx6_gcc --config=prod --config=cc --platform_suffix=esp32_xtensa_lx6_gcc_prod
 
     - name: "[sanitizer] asan/lsan"
       run: |
+        ./tools/bazel clean --expunge
         ./tools/bazel test ... --config=linux_x86_64_clang --config=cc --config=sanitizer --config=asan --config=lsan --platform_suffix=clang_asan_lsan
 
     - name: "[sanitizer] sanitizer"
       run: |
+        ./tools/bazel clean --expunge
         ./sanitize.sh
 
 

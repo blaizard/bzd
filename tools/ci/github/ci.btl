@@ -28,6 +28,7 @@ jobs:
 {% for stage in stages %}
     - name: "[{{ stage.category }}] {{ stage.name }}"
       run: |
+        ./tools/bazel clean --expunge
         {{ stage.command }}
 
 {% end %}
