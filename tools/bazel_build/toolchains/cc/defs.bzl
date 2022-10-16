@@ -27,6 +27,7 @@ def _impl(ctx):
         "%{compiler_constraint_value}": compiler_constraint_value,
         "%{cpu}": ctx.attr.cpu,
         "%{compiler}": ctx.attr.compiler,
+        "%{all_files}": "\n".join(['"{}",'.format(t) for t in ctx.attr.all_files]),
         "%{ar_files}": "\n".join(['"{}",'.format(t) for t in ctx.attr.ar_files]),
         "%{as_files}": "\n".join(['"{}",'.format(t) for t in ctx.attr.as_files]),
         "%{compiler_files}": "\n".join(['"{}",'.format(t) for t in ctx.attr.compiler_files]),
@@ -101,6 +102,7 @@ _toolchain_maker_linux = repository_rule(
         "exec_compatible_with": attr.string_list(),
         "target_compatible_with": attr.string_list(),
         # Filegroup for the toolchain
+        "all_files": attr.string_list(mandatory = False),
         "ar_files": attr.string_list(mandatory = True),
         "as_files": attr.string_list(mandatory = True),
         "compiler_files": attr.string_list(mandatory = True),

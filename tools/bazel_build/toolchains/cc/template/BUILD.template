@@ -13,8 +13,9 @@ filegroup(
 )
 
 filegroup(
-    name = "all",
+    name = "all_files",
     srcs = [
+        %{all_files}
         ":ar_files",
         ":as_files",
         ":compiler_files",
@@ -143,7 +144,7 @@ cc_toolchain_config(
 
 cc_toolchain(
     name = "cc_toolchain",
-    all_files = ":all",
+    all_files = ":all_files",
     ar_files = ":ar_files",
     as_files = ":as_files",
     compiler_files = ":compiler_files",

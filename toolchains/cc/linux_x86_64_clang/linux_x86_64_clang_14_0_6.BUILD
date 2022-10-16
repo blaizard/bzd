@@ -98,3 +98,19 @@ sh_binary(
         ":header_files"
     ]
 )
+
+# Create a package with only what is needed
+genrule(
+    name = "package",
+    srcs = [
+        "@linux_x86_64_clang//:all_files",
+        ":clang_format",
+        ":clang_tidy",
+        ":llvm_symbolizer",
+    ],
+    outs = ["linux_x86_64_14.0.6.tar.xz"],
+    tags = ["manual"],
+    cmd = """
+    tar -cJf $@ --dereference --transform 's/^\\./linux_x86_64_14.0.6/' -C external/linux_x86_64_clang_14_0_6 .
+    """
+)
