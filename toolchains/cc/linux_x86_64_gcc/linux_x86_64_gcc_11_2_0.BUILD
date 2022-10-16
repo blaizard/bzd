@@ -26,6 +26,7 @@ filegroup(
     srcs = [
         ":cc",
         ":cpp",
+        ":cov",
         ":header_files",
     ] + glob(["libexec/gcc/x86_64-pc-linux-gnu/11.2.0/*",])
 )
