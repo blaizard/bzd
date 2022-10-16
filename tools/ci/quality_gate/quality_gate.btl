@@ -8,5 +8,7 @@ EXTRA_FLAGS="$@"
 
 {% for stage in stages %}
 echo  "==== [{{ stage.category }}] {{ stage.name }} ==============================="
-{{ stage.command }} $EXTRA_FLAGS
+{% for command in stage.commands %}
+{{ command }} $EXTRA_FLAGS
+{% end %}
 {% end %}
