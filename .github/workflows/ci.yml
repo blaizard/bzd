@@ -31,7 +31,7 @@ jobs:
 
     - name: "[normal] linux_x86_64_clang prod"
       run: |
-        ./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=prod --platform_suffix=linux_x86_64_clang_prod
+        ./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=prod --config=cc --platform_suffix=linux_x86_64_clang_prod
 
     - name: "[normal] linux_x86_64_gcc prod"
       run: |

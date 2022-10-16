@@ -9,7 +9,7 @@
             ]
         },
         {
-            "command": "./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=prod --platform_suffix=linux_x86_64_clang_prod",
+            "command": "./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=prod --config=cc --platform_suffix=linux_x86_64_clang_prod",
             "name": "linux_x86_64_clang prod",
             "tags": [
                 "x86_64",
