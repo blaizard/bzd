@@ -30,7 +30,7 @@ class WebServer(socketserver.TCPServer):
 if __name__ == "__main__":
 
 	parser = argparse.ArgumentParser(description="Web server for testing purpose only.")
-	parser.add_argument("-h",
+	parser.add_argument("-u",
 		"--hostname",
 		dest="hostname",
 		default="0.0.0.0",
