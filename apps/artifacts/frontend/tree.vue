@@ -83,7 +83,9 @@
 							const isAList = this.isPermissionList(a);
 							const isBList = this.isPermissionList(b);
 							if (isAList != isBList) {
-								if (isAList) return -1;
+								if (isAList) {
+									return -1;
+								}
 								return 1;
 							}
 							return 0;

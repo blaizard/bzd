@@ -1,0 +1,11 @@
+{
+    "/scenario": {
+        "get": {
+            "documentation": "Get the next element from a scenario.",
+            "request": {},
+            "response": {
+                "type": "json"
+            }
+        }
+    }
+}
