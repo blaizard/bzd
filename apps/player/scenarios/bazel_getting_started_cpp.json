@@ -1,0 +1,29 @@
+{
+    "flow": [
+        {
+            "action": "speech",
+            "args": [
+                "First we create a C++ source file"
+            ]
+        },
+        {
+            "action": "file.create",
+            "args": [
+                "main.cc"
+            ]
+        },
+        {
+            "action": "speech",
+            "args": [
+                "Then we fill it with some content, let's print \"hello world\" for example"
+            ]
+        },
+        {
+            "action": "file.write",
+            "args": [
+                "main.cc",
+                "#include <iostream>\n\nint main()\n{\n\tstd::cout << \"Hello World!\" << std::endl;\n\treturn 0;\n}\n"
+            ]
+        }
+    ]
+}
