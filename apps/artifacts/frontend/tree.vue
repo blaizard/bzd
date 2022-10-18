@@ -2,6 +2,7 @@
 	<div class="container" v-loading="loading">
 		<template v-for="item in list">
 			<div :key="item.name" @click="handleClick(item)" :class="getClass(item)">
+				<i v-if="isPermissionList(item)" class="bzd-icon-folder"></i>
 				{{ item.name }}
 				<span class="actions" @click.stop="">
 					<i
@@ -77,6 +78,16 @@
 				try {
 					await this.handleSubmit(async () => {
 						this.list = await this.$cache.get("list", ...this.path);
+						// Set directories first.
+						this.list.sort((a, b) => {
+							const isAList = this.isPermissionList(a);
+							const isBList = this.isPermissionList(b);
+							if (isAList != isBList) {
+								if (isAList) return -1;
+								return 1;
+							}
+							return 0;
+						});
 						this.updateExpand();
 					}, /*throwOnError*/ true);
 				}
@@ -139,7 +150,7 @@
 
 <style lang="scss">
 	@use "bzd/icons.scss" as icons with (
-		$bzdIconNames: configuration
+		$bzdIconNames: configuration folder
 	);
 </style>
 

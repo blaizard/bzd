@@ -118,7 +118,8 @@
 			overflow: auto;
 		}
 		.tree {
-			width: 400px;
+			width: 25%;
+			max-width: 400px;
 			margin-right: 15px;
 			padding: 10px;
 		}
