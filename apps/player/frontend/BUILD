@@ -16,6 +16,8 @@ bzd_nodejs_web(
     ],
     deps = [
         "//apps/player:api",
+        "//apps/player/lib:filesystem",
+        "//apps/player/lib:scenario",
         "//nodejs:vue",
         "//nodejs/styles/default",
         "//nodejs/vue:api",

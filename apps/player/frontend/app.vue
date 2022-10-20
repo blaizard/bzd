@@ -3,13 +3,15 @@
 		<div class="tree">
 			<Tree :list="tree"></Tree>
 		</div>
-		<div class="content">&nbsp;</div>
+		<div class="content"></div>
 	</div>
 </template>
 
 <script>
 	import Layout from "bzd/vue/components/layout/layout.vue";
 	import Tree from "./tree.vue";
+	import Scenario from "../lib/scenario.mjs";
+	import FileSystem from "../lib/filesystem.mjs";
 
 	export default {
 		components: {
@@ -20,34 +22,27 @@
 			return {
 				start: 0,
 				index: 0,
-				scenario: null,
-				tree: [
-					// {name: "project", type: "folder", children: [
-					// {name: "file.txt", type: "txt"}
-					// ]},
-					// {name: "image.jpg", type: "jpg"}
-				],
+				treeRawData: {},
+				scenario: new Scenario(),
+				files: new FileSystem(),
 			};
 		},
 		computed: {
-			flow() {
-				return this.scenario ? this.scenario.flow : [];
-			},
 			completed() {
-				return this.index >= this.flow.length;
+				return this.index >= this.scenario.size;
 			},
 			action() {
-				return this.flow[this.index].action;
-			},
-			args() {
-				return this.flow[this.index].args || [];
+				return this.scenario.at(this.index);
 			},
 			fastforward() {
 				return this.index < this.start;
 			},
+			tree() {
+				return [{ name: this.scenario.name, expanded: true, children: this.files.makeTree() }];
+			},
 		},
 		async mounted() {
-			this.scenario = await this.$api.request("get", "/scenario");
+			this.scenario = new Scenario(await this.$api.request("get", "/scenario"));
 			this.$routerSet({
 				ref: "view",
 				routes: [
@@ -61,6 +56,7 @@
 					},
 				],
 			});
+			this.treeRawData["t"] = "";
 		},
 		methods: {
 			sleep(ms) {
@@ -78,16 +74,17 @@
 				if (this.completed) {
 					return;
 				}
-
-				switch (this.action) {
+				switch (this.action.type) {
 				case "file.create":
 					{
-						let newFile = {
-							name: "",
-							type: "file",
-						};
-						this.tree.push(newFile);
-						await this.emulateTyping(newFile, "name", this.args[0]);
+						let file = await this.files.createFile(this.action.args[0]);
+						file.name = "";
+						await this.emulateTyping(file, "name", this.action.args[0]);
+					}
+					break;
+				case "file.write":
+					{
+						// Look for the file.
 					}
 					break;
 				}

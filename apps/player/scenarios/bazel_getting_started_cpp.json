@@ -25,5 +25,6 @@
                 "#include <iostream>\n\nint main()\n{\n\tstd::cout << \"Hello World!\" << std::endl;\n\treturn 0;\n}\n"
             ]
         }
-    ]
+    ],
+    "name": "bazel-getting-started-c++"
 }
