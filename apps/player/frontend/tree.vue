@@ -1,12 +1,12 @@
 <template>
 	<div class="container">
-		<template v-for="item in list">
-			<div :key="item.name" :class="getClass(item)">
-				<i v-if="isFolder(item)" class="bzd-icon-folder"></i>
-				{{ item.name }}
+		<template v-for="node in list">
+			<div :key="node.name" :class="getClass(node)">
+				<i v-if="isFolder(node)" class="bzd-icon-folder"></i>
+				{{ node.name }}
 			</div>
-			<div v-if="hasChildren(item)">
-				<TreeDirectory :list="item.children" :depth="depth + 1" class="indent"></TreeDirectory>
+			<div v-if="isExpandedFolder(node)">
+				<TreeDirectory :list="node.children" :depth="depth + 1" class="indent"></TreeDirectory>
 			</div>
 		</template>
 	</div>
@@ -14,6 +14,7 @@
 
 <script>
 	import Component from "bzd/vue/components/layout/component.vue";
+	import FileSystem from "../lib/filesystem.mjs";
 
 	export default {
 		mixins: [Component],
@@ -26,18 +27,19 @@
 			return {};
 		},
 		methods: {
-			getClass(item) {
+			getClass(node) {
 				return {
 					entry: true,
 					child: this.depth > 0,
-					expandable: this.isFolder(item),
+					expandable: this.isFolder(node),
+					expanded: this.isExpandedFolder(node),
 				};
 			},
-			isFolder(item) {
-				return item.type == "folder";
+			isFolder(node) {
+				return FileSystem.isFolder(node);
 			},
-			hasChildren(item) {
-				return item.children && item.children.length > 0;
+			isExpandedFolder(node) {
+				return node.expanded || false;
 			},
 		},
 	};
