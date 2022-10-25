@@ -11,7 +11,7 @@ TEST(ContainerOptional, simpleData)
 
 	EXPECT_TRUE(v);
 	EXPECT_EQ(v.value(), 42);
-	EXPECT_EQ(v.valueOr(10), 42);
+	EXPECT_EQ(v.valueOrAsCopy(10), 42);
 
 	v.valueMutable() = 13;
 	EXPECT_EQ(v.value(), 13);
@@ -102,7 +102,7 @@ TEST(ContainerOptional, simpleNoData)
 	bzd::Optional<int> v;
 
 	EXPECT_FALSE(v);
-	EXPECT_EQ(v.valueOr(10), 10);
+	EXPECT_EQ(v.valueOrAsCopy(10), 10);
 }
 
 TEST_CONSTEXPR_BEGIN(ContainerOptional, Constexpr)
@@ -110,12 +110,12 @@ TEST_CONSTEXPR_BEGIN(ContainerOptional, Constexpr)
 	constexpr bzd::Optional<int> v;
 
 	EXPECT_FALSE(v);
-	EXPECT_EQ(v.valueOr(10), 10);
+	EXPECT_EQ(v.valueOrAsCopy(10), 10);
 
 	constexpr bzd::Optional<int> u{23};
 
 	EXPECT_TRUE(u);
-	EXPECT_EQ(u.valueOr(10), 23);
+	EXPECT_EQ(u.valueOrAsCopy(10), 23);
 
 	constexpr auto vCopy{u};
 	EXPECT_TRUE(vCopy);
@@ -136,7 +136,7 @@ TEST(ContainerOptional, complexData)
 	bzd::Optional<Value> v{Value{45}};
 
 	EXPECT_TRUE(v);
-	EXPECT_EQ(v.valueOr({12}).a, 45);
+	EXPECT_EQ(v.valueOrAsCopy({12}).a, 45);
 	EXPECT_EQ(v->a, 45);
 
 	auto vCopy{v};
@@ -229,7 +229,7 @@ TEST(ContainerOptional, result)
 		bzd::Optional<bzd::Result<int, bool>> v(45);
 
 		EXPECT_TRUE(v);
-		EXPECT_EQ(v.valueOr({12}).value(), 45);
+		EXPECT_EQ(v.valueOrAsCopy({12}).value(), 45);
 
 		auto vCopy{v};
 		EXPECT_TRUE(vCopy);
@@ -244,12 +244,12 @@ TEST(ContainerOptional, result)
 		bzd::Optional<bzd::Result<int, bool>> v{};
 
 		EXPECT_FALSE(v);
-		EXPECT_EQ(v.valueOr({12}).value(), 12);
+		EXPECT_EQ(v.valueOrAsCopy({12}).value(), 12);
 
 		v.emplace(43);
 		EXPECT_TRUE(v);
 		EXPECT_TRUE(v.value());
-		EXPECT_EQ(v.valueOr({12}).value(), 43);
+		EXPECT_EQ(v.valueOrAsCopy({12}).value(), 43);
 
 		v.emplace(bzd::error::make(false));
 		EXPECT_TRUE(v);

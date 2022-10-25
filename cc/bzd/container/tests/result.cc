@@ -107,3 +107,19 @@ TEST(ContainerResult, constructor)
 	bzd::Result<void, bool> resultVoidMoved = bzd::move(resultVoid);
 	EXPECT_TRUE(resultVoidMoved);
 }
+
+TEST(ContainerResult, valueOr)
+{
+	bzd::Result<int, int> resultValue{bzd::error::make(12)};
+	{
+		const int defaultValue{2};
+		const auto& ref = resultValue.valueOr(defaultValue);
+		EXPECT_EQ(ref, 2);
+	}
+
+	// This should use a copy.
+	{
+		const auto& ref = resultValue.valueOrAsCopy(3);
+		EXPECT_EQ(ref, 3);
+	}
+}

@@ -10,6 +10,7 @@ PACKAGE=${HOST}_${GCC_VERSION}
 # --- Compile binutils ----
 
 # https://ftp.gnu.org/gnu/binutils/
+rm -rfd binutils-${BINUTILS_VERSION}
 curl -L https://ftp.gnu.org/gnu/binutils/binutils-${BINUTILS_VERSION}.tar.xz | tar -xJ
 
 mkdir binutils-${BINUTILS_VERSION}-build
@@ -24,6 +25,7 @@ popd
 # --- Compile GCC ----
 
 # https://gcc.gnu.org/mirrors.html
+rm -rfd gcc-${GCC_VERSION}
 curl -L https://ftp.gnu.org/gnu/gcc/gcc-${GCC_VERSION}/gcc-${GCC_VERSION}.tar.xz | tar -xJ
 
 mkdir gcc-${GCC_VERSION}-build
@@ -33,8 +35,8 @@ pushd gcc-${GCC_VERSION}-build
 make -j$(nproc)
 make install
 
+popd
+
 # Create an archive.
 tar -cvJf ${PACKAGE}.tar.xz ${PACKAGE}
 echo "Archive successfully built at $(pwd)/${PACKAGE}.tar.xz"
-
-popd
