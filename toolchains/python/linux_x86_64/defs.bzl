@@ -2,15 +2,14 @@ load("@debian_repository_rules//:debian.bzl", "debian_archive")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 def load_linux_x86_64_python():
-    debian_archive(
+    http_archive(
         name = "python3_linux_x86_64",
         build_file = "//toolchains/python/linux_x86_64:python.BUILD",
-        urls = {
-            "http://security.ubuntu.com/ubuntu/pool/main/p/python3.8/python3.8-minimal_3.8.10-0ubuntu1~20.04.5_amd64.deb": "348bd75383de9bd3324ac90a4c6e8d4466914a9368b72b6dfc508bb617ec1ac7",
-            "http://security.ubuntu.com/ubuntu/pool/main/p/python3.8/libpython3.8-minimal_3.8.10-0ubuntu1~20.04.5_amd64.deb": "199d40e0703d9b307bbbc5a79b24ebf45ce60e0e7e81655fbdfc4448b2654aa9",
-            "http://security.ubuntu.com/ubuntu/pool/main/p/python3.8/libpython3.8-stdlib_3.8.10-0ubuntu1~20.04.5_amd64.deb": "e50798a7dd8dc09e633489d53937e1d603a2c4fa24f76b51b2967b6ece882f30",
-            "http://archive.ubuntu.com/ubuntu/pool/main/p/python3-stdlib-extensions/python3-lib2to3_3.8.10-0ubuntu1~20.04_all.deb": "d25b7a114ab08e6f318d96ae8d71c3c24c3b9eaceb84cb1abf476979875521ab",
-        },
+        urls = [
+            "http://data.blaizard.com/file/bzd/toolchains/python3/linux_x86_64_3.8.15.tar.xz",
+        ],
+        strip_prefix = "linux_x86_64_3.8.15",
+        sha256 = "5dd3935f945e695b237e23ec4c981381fedb422eabb8f16118f46de379233402",
     )
 
     http_archive(

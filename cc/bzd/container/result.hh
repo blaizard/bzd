@@ -8,8 +8,11 @@
 #include "cc/bzd/type_traits/enable_if.hh"
 #include "cc/bzd/type_traits/first_type.hh"
 #include "cc/bzd/type_traits/is_base_of.hh"
+#include "cc/bzd/type_traits/is_lvalue_reference.hh"
 #include "cc/bzd/type_traits/is_reference.hh"
 #include "cc/bzd/type_traits/is_same.hh"
+#include "cc/bzd/type_traits/remove_const.hh"
+#include "cc/bzd/type_traits/remove_volatile.hh"
 #include "cc/bzd/utility/forward.hh"
 #include "cc/bzd/utility/in_place.hh"
 
@@ -61,11 +64,11 @@ class Result
 {
 public: // Traits
 	// The container type for the value.
-	using ValueContainer = bzd::typeTraits::Conditional<typeTraits::isSame<T, void>, void*, T>;
+	using ValueContainer = typeTraits::Conditional<typeTraits::isSame<T, void>, void*, T>;
 	// Value type returned.
-	using Value = bzd::typeTraits::RemoveReference<ValueContainer>;
+	using Value = typeTraits::RemoveVolatile<typeTraits::RemoveReference<ValueContainer>>;
 	// Error type returned.
-	using Error = bzd::typeTraits::RemoveReference<E>;
+	using Error = typeTraits::RemoveVolatile<typeTraits::RemoveReference<E>>;
 	// The container type for the error.
 	using ErrorContainer = ResultError<Error>;
 	// The current type.
@@ -119,11 +122,20 @@ public: // API
 	/// Returns the contained value if the result has a value, otherwise returns defaultValue.
 	///
 	/// \param defaultValue The value to use in case *this is empty.
-	/// \return The current value if *this has a value, or default_value otherwise.
-	[[nodiscard]] constexpr const Value& valueOr(const Value& defaultValue) const noexcept
+	/// \return The current value if *this has a value, or defaultValue otherwise.
+	template <class DefaultValue>
+	[[nodiscard]] constexpr const Value& valueOr(DefaultValue&& defaultValue) const noexcept
 	{
+		static_assert(concepts::lValueReference<DefaultValue> && concepts::sameAs<typeTraits::RemoveConst<DefaultValue>, Value&>,
+					  "The default value will become a dangling reference, you should use 'valueOrAsCopy' instead.");
 		return (hasValue()) ? data_.template get<ValueContainer>() : defaultValue;
 	}
+
+	/// Returns a copy of the contained value if the result has a value, otherwise returns defaultValue.
+	///
+	/// \param defaultValue The value to use in case *this is empty.
+	/// \return The current value if *this has a value, or defaultValue otherwise.
+	[[nodiscard]] constexpr Value valueOrAsCopy(const Value& defaultValue) const noexcept { return valueOr(defaultValue); }
 
 	/// If *this contains a value, returns a const reference to the contained value otherwise, asserts.
 	///

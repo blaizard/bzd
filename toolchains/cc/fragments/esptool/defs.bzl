@@ -7,10 +7,10 @@ def toolchain_fragment_esptool():
         name = tools_package_name,
         build_file = "//toolchains/cc/fragments/esptool:{}.BUILD".format(tools_package_name),
         urls = [
-            "https://github.com/espressif/esptool/archive/refs/tags/v3.2.zip",
+            "http://data.blaizard.com/file/bzd/esptool/esptool-4.3.zip",
         ],
-        strip_prefix = "esptool-3.2",
-        sha256 = "8e3c84b071a205da7232cd320d4ebca5218c1e3d419f510e18db92e3e9928bf5",
+        strip_prefix = "esptool-4.3",
+        sha256 = "b317ce2a532c15eb55a70e290169b9bf25a514fbdb52dce43a3bd5c86fd4a49c",
     )
 
     return {
