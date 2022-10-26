@@ -3,7 +3,9 @@
 		<div class="tree">
 			<Tree :list="tree"></Tree>
 		</div>
-		<div class="content"></div>
+		<div class="content">
+			<code v-if="file" v-html="highlightedContent"></code>
+		</div>
 	</div>
 </template>
 
@@ -12,6 +14,8 @@
 	import Tree from "./tree.vue";
 	import Scenario from "../lib/scenario.mjs";
 	import FileSystem from "../lib/filesystem.mjs";
+	import "highlight.js/styles/github.css";
+	import HighlightJs from "highlight.js/lib/common";
 
 	export default {
 		components: {
@@ -25,7 +29,21 @@
 				treeRawData: {},
 				scenario: new Scenario(),
 				files: new FileSystem(),
+				file: null,
+				highlightedContent: "",
 			};
+		},
+		watch: {
+			file: {
+				handler() {
+					const html = HighlightJs.highlight(this.file.content, { language: "cc" }).value;
+					this.highlightedContent = html
+						.split("\n")
+						.map((line, index) => "<span class=\"line-number\">" + index + "</span>" + line)
+						.join("\n");
+				},
+				deep: true,
+			},
 		},
 		computed: {
 			completed() {
@@ -77,14 +95,18 @@
 				switch (this.action.type) {
 				case "file.create":
 					{
-						let file = await this.files.createFile(this.action.args[0]);
-						file.name = "";
-						await this.emulateTyping(file, "name", this.action.args[0]);
+						this.file = await this.files.createFile(this.action.args[0]);
+						this.file.name = "";
+						await this.emulateTyping(this.file, "name", this.action.args[0]);
 					}
 					break;
 				case "file.write":
 					{
-						// Look for the file.
+						this.file = this.files.get(this.action.args[0]);
+						if (this.file === null) {
+							this.file = await this.files.createFile(this.action.args[0]);
+						}
+						await this.emulateTyping(this.file, "content", this.action.args[1]);
 					}
 					break;
 				}
@@ -113,18 +135,52 @@
 		display: flex;
 		flex-flow: row wrap;
 		> * {
-			border: 1px solid #ddd;
 			height: 100%;
 			overflow: auto;
 		}
 		.tree {
 			width: 25%;
 			max-width: 400px;
-			margin-right: 15px;
+			margin: 0;
 			padding: 10px;
+			padding-right: 25px;
+			border-right: 1px solid #ddd;
 		}
 		.content {
 			flex: 1;
+			padding: 10px;
+			white-space: pre-wrap;
+			margin-left: 15px;
+		}
+	}
+</style>
+
+<style>
+	* {
+		box-sizing: border-box;
+	}
+	html,
+	body {
+		height: 100%;
+		width: 100%;
+		padding: 0;
+		margin: 0;
+	}
+	.content {
+		code {
+			padding-left: 3ch;
+			display: inline-block;
+		}
+
+		.line-number {
+			width: 3ch;
+			display: inline-block;
+			text-align: right;
+			padding: 0;
+			margin: 0;
+			margin-left: -3ch;
+			margin-right: 3ch;
+			color: #999;
 		}
 	}
 </style>

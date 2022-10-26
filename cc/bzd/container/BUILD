@@ -164,9 +164,9 @@ cc_library(
         "//cc/bzd/type_traits:is_reference",
         "//cc/bzd/type_traits:is_same",
         "//cc/bzd/type_traits:is_trivially_destructible",
+        "//cc/bzd/type_traits:remove_volatile",
         "//cc/bzd/utility:forward",
         "//cc/bzd/utility:move",
-        "//cc/bzd/type_traits:remove_volatile",
     ],
 )
 

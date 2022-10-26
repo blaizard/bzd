@@ -11,6 +11,9 @@ bzd_nodejs_web(
     entries = {
         "app.mjs": "index",
     },
+    packages = {
+        "highlight.js": "",
+    },
     visibility = [
         "//apps/player:__pkg__",
     ],
