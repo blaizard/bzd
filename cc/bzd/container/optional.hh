@@ -11,9 +11,9 @@
 #include "cc/bzd/type_traits/is_lvalue_reference.hh"
 #include "cc/bzd/type_traits/is_reference.hh"
 #include "cc/bzd/type_traits/is_same.hh"
+#include "cc/bzd/type_traits/remove_volatile.hh"
 #include "cc/bzd/utility/forward.hh"
 #include "cc/bzd/utility/in_place.hh"
-#include "cc/bzd/type_traits/remove_volatile.hh"
 
 namespace bzd::impl {
 
