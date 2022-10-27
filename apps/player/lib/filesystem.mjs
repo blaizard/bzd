@@ -3,6 +3,35 @@ import Vue from "vue";
 
 const Exception = ExceptionFactory("filesystem");
 
+class Node {
+	constructor(filesystem, node) {
+		this.filesystem = filesystem;
+		this.node = node;
+		this.name = this.node.name;
+		this.content = "";
+	}
+
+	async getChildren() {
+		return this.node.children;
+	}
+
+	async getContent() {
+		Exception.assert(FileSystem.isFile(this.node), "Folder do not have content");
+		return this.node.content || "";
+	}
+
+	async updateContent(process) {
+		this.content = await this.getContent();
+		await process(this);
+		// Save the content.
+	}
+
+	async updateName(process) {
+		await process(this);
+		// Update the file name.
+	}
+}
+
 export default class FileSystem {
 	constructor() {
 		// Internal structure of the file tree, it looks like this:
@@ -12,13 +41,15 @@ export default class FileSystem {
 		//     ...
 		// }
 		this.tree = {};
+		// Selected node if any.
+		this.selected = null;
 	}
 
 	/// Create a renderable tree from the data.
 	makeTree() {
 		const makeNode = (tree) => {
 			return Object.entries(tree).map(([, node]) => {
-				let output = Object.assign({}, node);
+				let output = Object.assign({ selected: this.selected && this.selected.node === node }, node);
 				if (FileSystem.isFolder(node)) {
 					output.children = makeNode(node.children);
 				}
@@ -59,7 +90,7 @@ export default class FileSystem {
 		const current = await this.createFolder(dirname);
 		Exception.assert(!(basename in current), "File {} already exists!", path);
 		Vue.set(current, basename, { name: basename, content: "" });
-		return current[basename];
+		this.selected = this.makeNode_(current[basename]);
 	}
 
 	/// Create a new folder at a given path.
@@ -72,7 +103,8 @@ export default class FileSystem {
 			else {
 				Vue.set(current, name, { name: name, expanded: true, children: {} });
 			}
-			current = current[name].children;
+			this.selected = this.makeNode_(current[name]);
+			current = await this.selected.getChildren();
 		}
 		return current;
 	}
@@ -82,7 +114,7 @@ export default class FileSystem {
 	}
 
 	/// Get a node refered at a specified path.
-	get(path) {
+	select(path) {
 		let current = { children: this.tree };
 		for (const name of this.split_(path)) {
 			if (!FileSystem.isFolder(current)) {
@@ -104,5 +136,9 @@ export default class FileSystem {
 	/// Checks if the node is a file
 	static isFile(node) {
 		return !FileSystem.isFolder(node);
+	}
+
+	makeNode_(node) {
+		return new Node(this, node);
 	}
 }
