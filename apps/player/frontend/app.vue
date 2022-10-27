@@ -4,7 +4,7 @@
 			<Tree :list="tree"></Tree>
 		</div>
 		<div class="content">
-			<code v-if="file" v-html="highlightedContent"></code>
+			<code v-if="files.selected" v-html="contentHTML"></code>
 		</div>
 	</div>
 </template>
@@ -30,19 +30,21 @@
 				scenario: new Scenario(),
 				files: new FileSystem(),
 				file: null,
-				highlightedContent: "",
+				contentHightlighted: "",
+				selection: [0, 0],
 			};
 		},
 		watch: {
-			file: {
+			content: {
 				handler() {
-					const html = HighlightJs.highlight(this.file.content, { language: "cc" }).value;
-					this.highlightedContent = html
-						.split("\n")
-						.map((line, index) => "<span class=\"line-number\">" + index + "</span>" + line)
-						.join("\n");
+					const first = this.content.slice(0, this.selection[0]);
+					const selected = this.content.slice(this.selection[0], this.selection[1]);
+					const last = this.content.slice(this.selection[1]);
+					const hightlightedFirst = HighlightJs.highlight(first, { language: "cc" }).value;
+					const hightlightedLast = HighlightJs.highlight(last, { language: "cc" }).value;
+					this.contentHightlighted =
+						hightlightedFirst + "<span class=\"selection\">" + selected + "</span>" + hightlightedLast;
 				},
-				deep: true,
 			},
 		},
 		computed: {
@@ -57,6 +59,20 @@
 			},
 			tree() {
 				return [{ name: this.scenario.name, expanded: true, children: this.files.makeTree() }];
+			},
+			content() {
+				if (this.files.selected) {
+					return this.files.selected.content;
+				}
+				return "";
+			},
+			contentHTML() {
+				// Replace the selection tags.
+				const content = this.contentHightlighted.replace().replace();
+				return content
+					.split("\n")
+					.map((line, index) => "<span class=\"line-number\">" + index + "</span>" + line)
+					.join("\n");
 			},
 		},
 		async mounted() {
@@ -84,9 +100,24 @@
 			},
 			async emulateTyping(object, keyName, value) {
 				for (const c of value) {
-					await this.sleep(100);
+					await this.sleep(10 + Math.random() * 200);
 					object[keyName] += c;
+					this.selection = [object[keyName].length, object[keyName].length];
 				}
+			},
+			async executeFileCreate(path) {
+				await this.files.createFile(path);
+				const name = this.files.selected.node.name;
+				this.files.selected.node.name = "";
+				await this.emulateTyping(this.files.selected.node, "name", name);
+			},
+			async executeFileWrite(path, content) {
+				if (!this.files.select(path)) {
+					await this.executeFileCreate(path);
+				}
+				await this.files.selected.updateContent(async () => {
+					await this.emulateTyping(this.files.selected, "content", content);
+				});
 			},
 			async execute() {
 				if (this.completed) {
@@ -94,20 +125,10 @@
 				}
 				switch (this.action.type) {
 				case "file.create":
-					{
-						this.file = await this.files.createFile(this.action.args[0]);
-						this.file.name = "";
-						await this.emulateTyping(this.file, "name", this.action.args[0]);
-					}
+					await this.executeFileCreate(...this.action.args);
 					break;
 				case "file.write":
-					{
-						this.file = this.files.get(this.action.args[0]);
-						if (this.file === null) {
-							this.file = await this.files.createFile(this.action.args[0]);
-						}
-						await this.emulateTyping(this.file, "content", this.action.args[1]);
-					}
+					await this.executeFileWrite(...this.action.args);
 					break;
 				}
 
@@ -122,40 +143,6 @@
 </script>
 
 <style lang="scss">
-	.bzd-content {
-		margin: 10px;
-	}
-</style>
-
-<style lang="scss" scoped>
-	.layout {
-		height: 100%;
-		width: 100%;
-		padding: 15px;
-		display: flex;
-		flex-flow: row wrap;
-		> * {
-			height: 100%;
-			overflow: auto;
-		}
-		.tree {
-			width: 25%;
-			max-width: 400px;
-			margin: 0;
-			padding: 10px;
-			padding-right: 25px;
-			border-right: 1px solid #ddd;
-		}
-		.content {
-			flex: 1;
-			padding: 10px;
-			white-space: pre-wrap;
-			margin-left: 15px;
-		}
-	}
-</style>
-
-<style>
 	* {
 		box-sizing: border-box;
 	}
@@ -181,6 +168,49 @@
 			margin-left: -3ch;
 			margin-right: 3ch;
 			color: #999;
+		}
+	}
+
+	@keyframes selection-blink {
+		50% {
+			opacity: 0;
+		}
+	}
+
+	.selection {
+		&:after {
+			content: " ";
+			background: #999;
+			display: inline-block;
+			vertical-align: bottom;
+			animation: selection-blink 1s steps(1) infinite;
+		}
+	}
+</style>
+
+<style lang="scss" scoped>
+	.layout {
+		height: 100%;
+		width: 100%;
+		padding: 15px;
+		display: flex;
+		flex-flow: row wrap;
+		> * {
+			height: 100%;
+			overflow: auto;
+		}
+		.tree {
+			max-width: 50%;
+			margin: 0;
+			padding: 10px;
+			padding-right: 25px;
+			border-right: 1px solid #ddd;
+		}
+		.content {
+			flex: 1;
+			padding: 10px;
+			white-space: pre-wrap;
+			margin-left: 15px;
 		}
 	}
 </style>

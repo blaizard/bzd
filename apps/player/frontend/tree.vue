@@ -33,10 +33,14 @@
 					child: this.depth > 0,
 					expandable: this.isFolder(node),
 					expanded: this.isExpandedFolder(node),
+					selected: this.isSelected(node),
 				};
 			},
 			isFolder(node) {
 				return FileSystem.isFolder(node);
+			},
+			isSelected(node) {
+				return node.selected;
 			},
 			isExpandedFolder(node) {
 				return node.expanded || false;
@@ -78,6 +82,7 @@
 	.container {
 		font-size: #{$fontSize}px;
 		line-height: #{$lineHeight}px;
+		font-family: monospace;
 
 		.error {
 			color: colors.$bzdGraphColorRed;
@@ -131,6 +136,10 @@
 
 			&.expanded:before {
 				transform: rotate(90deg) translateY(#{math.div($arrowSize, 2)}px) translateX(#{math.div($arrowSize, 2)}px);
+			}
+
+			&.selected {
+				font-weight: bold;
 			}
 		}
 	}
