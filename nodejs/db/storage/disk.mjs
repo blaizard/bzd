@@ -11,6 +11,7 @@ import Permissions from "./permissions.mjs";
 
 const Log = LogFactory("db", "storage", "disk");
 const Exception = ExceptionFactory("db", "storage", "disk");
+
 /// File storage module
 export default class StorageDisk extends Storage {
 	constructor(path, options) {
@@ -36,28 +37,28 @@ export default class StorageDisk extends Storage {
 		}
 	}
 
-	_getFullPath(pathList, name = undefined) {
-		return name ? Path.join(this.path, ...pathList, name) : Path.join(this.path, ...pathList);
+	_getFullPath(pathList) {
+		return Path.join(this.path, ...pathList);
 	}
 
-	async _isImpl(pathList, name) {
-		return await FileSystem.exists(this._getFullPath(pathList, name));
+	async _isImpl(pathList) {
+		return await FileSystem.exists(this._getFullPath(pathList));
 	}
 
-	async _readImpl(pathList, name) {
-		return Fs.createReadStream(this._getFullPath(pathList, name));
+	async _readImpl(pathList) {
+		return Fs.createReadStream(this._getFullPath(pathList));
 	}
 
-	async _writeImpl(pathList, name, readStream) {
-		const fullPath = this._getFullPath(pathList, name);
+	async _writeImpl(pathList, readStream) {
+		const fullPath = this._getFullPath(pathList);
 		await FileSystem.mkdir(Path.dirname(fullPath));
 		let writeStream = Fs.createWriteStream(fullPath);
 
 		return copyStream(writeStream, readStream);
 	}
 
-	async _deleteImpl(pathList, name) {
-		await FileSystem.unlink(this._getFullPath(pathList, name));
+	async _deleteImpl(pathList) {
+		await FileSystem.unlink(this._getFullPath(pathList));
 	}
 
 	async _listImpl(pathList, maxOrPaging, includeMetadata) {

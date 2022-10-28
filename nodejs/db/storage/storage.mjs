@@ -14,8 +14,8 @@ export default class Storage extends AsyncInitialize {
 	}
 
 	/// Tell whether a key exists or not
-	async is(path, name) {
-		return this._isImpl(Array.isArray(path) ? path : [path], name);
+	async is(path) {
+		return this._isImpl(Array.isArray(path) ? path : [path]);
 	}
 
 	/// List all files under this bucket
@@ -24,30 +24,30 @@ export default class Storage extends AsyncInitialize {
 	}
 
 	/// Return a file read stream from a specific key
-	async read(path, name) {
-		return this._readImpl(Array.isArray(path) ? path : [path], name);
+	async read(path) {
+		return this._readImpl(Array.isArray(path) ? path : [path]);
 	}
 
 	/// Store a file to a specific key
-	async writeFromFile(path, name, inputFilePath) {
+	async writeFromFile(path, inputFilePath) {
 		Exception.assert(typeof inputFilePath == "string", "Path must be a string, {:j}", inputFilePath);
 		const readStream = Fs.createReadStream(inputFilePath);
-		return this._writeImpl(Array.isArray(path) ? path : [path], name, readStream);
+		return this._writeImpl(Array.isArray(path) ? path : [path], readStream);
 	}
 
 	/// Store a file to a specific key
-	async writeFromChunk(path, name, data) {
+	async writeFromChunk(path, data) {
 		const readStream = fromChunk(data);
-		return this._writeImpl(Array.isArray(path) ? path : [path], name, readStream);
+		return this._writeImpl(Array.isArray(path) ? path : [path], readStream);
 	}
 
 	/// Store a file to a specific key
-	async write(path, name, readStream) {
-		return this._writeImpl(Array.isArray(path) ? path : [path], name, readStream);
+	async write(path, readStream) {
+		return this._writeImpl(Array.isArray(path) ? path : [path], readStream);
 	}
 
 	/// Delete a file from a bucket
-	async delete(path, name) {
-		return this._deleteImpl(Array.isArray(path) ? path : [path], name);
+	async delete(path) {
+		return this._deleteImpl(Array.isArray(path) ? path : [path]);
 	}
 }
