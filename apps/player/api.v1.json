@@ -1,4 +1,42 @@
 {
+    "/file/content": {
+        "get": {
+            "documentation": "Read the content of a file.",
+            "request": {
+                "type": "query",
+                "validation": {
+                    "path": "mandatory"
+                }
+            },
+            "response": {
+                "type": "file"
+            }
+        },
+        "post": {
+            "documentation": "Set the content of a file.",
+            "request": {
+                "type": "query",
+                "validation": {
+                    "content": "",
+                    "path": "mandatory"
+                }
+            }
+        }
+    },
+    "/file/list": {
+        "get": {
+            "documentation": "List the content of a folder at a given path.",
+            "request": {
+                "type": "query",
+                "validation": {
+                    "path": "mandatory"
+                }
+            },
+            "response": {
+                "type": "json"
+            }
+        }
+    },
     "/scenario": {
         "get": {
             "documentation": "Get the next element from a scenario.",

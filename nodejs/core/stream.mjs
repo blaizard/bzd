@@ -12,9 +12,7 @@ export async function toBuffer(data) {
 	});
 }
 
-/**
- * Create a stream from a string, Buffer or Uint8Array
- */
+/// Create a stream from a string, Buffer or Uint8Array
 export function fromChunk(data) {
 	return new Readable({
 		read() {

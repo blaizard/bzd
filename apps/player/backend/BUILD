@@ -23,5 +23,6 @@ bzd_nodejs_binary(
         "//nodejs/core:log",
         "//nodejs/core/api:server",
         "//nodejs/core/http:server",
+        "//nodejs/db/storage:disk",
     ],
 )

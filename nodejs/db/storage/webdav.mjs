@@ -36,9 +36,8 @@ export default class StorageWebdav extends Storage {
 	/// Initialize the storage module.
 	async _initialize() {}
 
-	_getLocalPath(pathList, name = undefined) {
-		const updatedPathList = name === undefined ? pathList : [...pathList, name];
-		return "/" + updatedPathList.map(encodeURIComponent).join("/");
+	_getLocalPath(pathList) {
+		return "/" + pathList.map(encodeURIComponent).join("/");
 	}
 
 	_matchTag(str, tag) {
@@ -58,8 +57,8 @@ export default class StorageWebdav extends Storage {
 		return output;
 	}
 
-	async _isImpl(pathList, name) {
-		const fullPath = this._getLocalPath(pathList, name);
+	async _isImpl(pathList) {
+		const fullPath = this._getLocalPath(pathList);
 		try {
 			await this.fetch.request(fullPath, {
 				method: "propfind",
@@ -76,8 +75,8 @@ export default class StorageWebdav extends Storage {
 		return true;
 	}
 
-	async _readImpl(pathList, name) {
-		const fullPath = this._getLocalPath(pathList, name);
+	async _readImpl(pathList) {
+		const fullPath = this._getLocalPath(pathList);
 		const result = await this.fetch.request(fullPath, {
 			method: "get",
 			expect: "stream",

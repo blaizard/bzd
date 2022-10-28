@@ -24,6 +24,13 @@
                 "main.cc",
                 "#include <iostream>\n\nint main()\n{\n\tstd::cout << \"Hello World!\" << std::endl;\n\treturn 0;\n}\n"
             ]
+        },
+        {
+            "action": "file.write",
+            "args": [
+                "BUILD",
+                "cc_binary(\n\tname = \"main\",\n\tsrcs = [\"main.cc\"],\n)\n"
+            ]
         }
     ],
     "name": "bazel-getting-started-c++"

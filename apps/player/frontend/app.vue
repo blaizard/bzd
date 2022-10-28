@@ -28,7 +28,7 @@
 				index: 0,
 				treeRawData: {},
 				scenario: new Scenario(),
-				files: new FileSystem(),
+				files: new FileSystem(this.$api),
 				file: null,
 				contentHightlighted: "",
 				selection: [0, 0],

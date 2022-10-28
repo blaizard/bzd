@@ -4,9 +4,10 @@ import Vue from "vue";
 const Exception = ExceptionFactory("filesystem");
 
 class Node {
-	constructor(filesystem, node) {
+	constructor(filesystem, node, path) {
 		this.filesystem = filesystem;
 		this.node = node;
+		this.path = path;
 		this.name = this.node.name;
 		this.content = "";
 	}
@@ -15,15 +16,17 @@ class Node {
 		return this.node.children;
 	}
 
-	async getContent() {
+	async fetchContent() {
 		Exception.assert(FileSystem.isFile(this.node), "Folder do not have content");
-		return this.node.content || "";
+		this.content = await this.filesystem.api.request("get", "/file/content", {
+			path: this.path,
+		});
 	}
 
 	async updateContent(process) {
-		this.content = await this.getContent();
+		await this.fetchContent();
 		await process(this);
-		// Save the content.
+		await this.filesystem.api.request("post", "/file/content", { path: this.path, content: this.content });
 	}
 
 	async updateName(process) {
@@ -33,7 +36,8 @@ class Node {
 }
 
 export default class FileSystem {
-	constructor() {
+	constructor(api) {
+		this.api = api;
 		// Internal structure of the file tree, it looks like this:
 		// {
 		//     uid: {name: "diplay name", expanded: true, children: { ... }}, <- for a folder
@@ -90,7 +94,8 @@ export default class FileSystem {
 		const current = await this.createFolder(dirname);
 		Exception.assert(!(basename in current), "File {} already exists!", path);
 		Vue.set(current, basename, { name: basename, content: "" });
-		this.selected = this.makeNode_(current[basename]);
+		await this.api.request("post", "/file/content", { path: path });
+		this.selected = this.makeNode_(current[basename], path);
 	}
 
 	/// Create a new folder at a given path.
@@ -103,7 +108,7 @@ export default class FileSystem {
 			else {
 				Vue.set(current, name, { name: name, expanded: true, children: {} });
 			}
-			this.selected = this.makeNode_(current[name]);
+			this.selected = this.makeNode_(current[name], path);
 			current = await this.selected.getChildren();
 		}
 		return current;
@@ -138,7 +143,7 @@ export default class FileSystem {
 		return !FileSystem.isFolder(node);
 	}
 
-	makeNode_(node) {
-		return new Node(this, node);
+	makeNode_(node, path) {
+		return new Node(this, node, path);
 	}
 }
