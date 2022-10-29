@@ -97,6 +97,12 @@ program
 			"docker.url": "https://docker.blaizard.com",
 		});
 
+		await keyValueStore.set("volume", "webdav", {
+			type: "webdav",
+			"webdav.url": "https://cloud.leviia.com//public.php/webdav",
+			"webdav.username": "YsLRkFLLceXbPrB",
+		});
+
 		// await keyValueStore.set("volume", "docker.gcr", {
 		// type: "docker",
 		// "docker.type": "gcr",
