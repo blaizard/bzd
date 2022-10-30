@@ -1,4 +1,18 @@
 {
+    "/exec": {
+        "post": {
+            "documentation": "Execute a process child.",
+            "request": {
+                "type": "json",
+                "validation": {
+                    "cmds": "mandatory"
+                }
+            },
+            "response": {
+                "type": "stream"
+            }
+        }
+    },
     "/file/content": {
         "get": {
             "documentation": "Read the content of a file.",

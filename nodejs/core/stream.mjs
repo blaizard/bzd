@@ -27,3 +27,17 @@ export async function copy(writeStream, readStream) {
 		readStream.on("error", reject).on("end", resolve).on("finish", resolve).pipe(writeStream);
 	});
 }
+
+export async function* streamChunks(stream) {
+	const reader = stream.getReader();
+	try {
+		while (true) {
+			const { done, value } = await reader.read();
+			if (done) {return;}
+			yield value;
+		}
+	}
+	finally {
+		reader.releaseLock();
+	}
+}
