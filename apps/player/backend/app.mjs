@@ -7,6 +7,8 @@ import HttpServer from "bzd/core/http/server.mjs";
 import LogFactory from "bzd/core/log.mjs";
 import FileSystem from "bzd/core/filesystem.mjs";
 import StorageDisk from "bzd/db/storage/disk.mjs";
+import { spawn } from "child_process";
+import { Readable } from "stream";
 
 const Log = LogFactory("backend");
 
@@ -65,6 +67,28 @@ class Scenario {
 
 	api.handle("post", "/file/content", async (inputs) => {
 		await storage.writeFromChunk(inputs.path.split("/"), inputs.content || "");
+	});
+
+	api.handle("post", "/exec", async (inputs) => {
+		const cmd = inputs.cmds.shift();
+		const args = inputs.cmds;
+		let process = spawn(cmd, args, {
+			cwd: PATH_STORAGE,
+			timeout: 60 * 1000, // 1 min
+		});
+		const stream = new Readable({
+			read() {},
+		});
+		process.stdout.on("data", (data) => {
+			stream.push(data);
+		});
+		process.stderr.on("data", (data) => {
+			stream.push(data);
+		});
+		process.on("close", () => {
+			stream.push(null);
+		});
+		return stream;
 	});
 
 	Log.info("Application started");

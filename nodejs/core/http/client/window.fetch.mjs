@@ -27,7 +27,7 @@ export default async function request(url, options) {
 	}
 
 	return {
-		data: await response.text(),
+		data: options.expect == "stream" ? response.body : await response.text(),
 		headers: [...response.headers].reduce((obj, pair) => {
 			obj[pair[0]] = pair[1];
 			return obj;

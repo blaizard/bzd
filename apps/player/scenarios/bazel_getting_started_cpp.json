@@ -31,6 +31,15 @@
                 "BUILD",
                 "cc_binary(\n\tname = \"main\",\n\tsrcs = [\"main.cc\"],\n)\n"
             ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "bazel",
+                "build",
+                "//...",
+                "-s"
+            ]
         }
     ],
     "name": "bazel-getting-started-c++"

@@ -119,6 +119,19 @@
 					await this.emulateTyping(this.files.selected, "content", content);
 				});
 			},
+			async *streamAsyncIterable(stream) {
+				const reader = stream.getReader();
+				try {
+					while (true) {
+						const { done, value } = await reader.read();
+						if (done) {return;}
+						yield value;
+					}
+				}
+				finally {
+					reader.releaseLock();
+				}
+			},
 			async execute() {
 				if (this.completed) {
 					return;
@@ -129,6 +142,15 @@
 					break;
 				case "file.write":
 					await this.executeFileWrite(...this.action.args);
+					break;
+				case "exec":
+					const stream = await this.$api.request("post", "/exec", {
+						cmds: this.action.args,
+					});
+					for await (const chunk of this.streamAsyncIterable(stream)) {
+						const blob = new Blob([chunk.buffer], { type: "text/plain; charset=utf-8" });
+						blob.text().then((text) => { console.log(text); });
+					}
 					break;
 				}
 

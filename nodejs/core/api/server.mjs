@@ -185,6 +185,7 @@ export default class APIServer extends Base {
 						);
 						response.json(result);
 						break;
+					case "stream":
 					case "file":
 						if (typeof result == "string") {
 							response.sendFile(result);
