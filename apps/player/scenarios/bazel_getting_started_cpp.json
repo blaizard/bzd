@@ -33,12 +33,24 @@
             ]
         },
         {
+            "action": "file.create",
+            "args": [
+                "WORKSPACE"
+            ]
+        },
+        {
+            "action": "file.select",
+            "args": [
+                "main.cc"
+            ]
+        },
+        {
             "action": "exec",
             "args": [
                 "bazel",
                 "build",
                 "//...",
-                "-s"
+                "--color=yes"
             ]
         }
     ],

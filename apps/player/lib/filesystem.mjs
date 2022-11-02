@@ -64,13 +64,13 @@ export default class FileSystem {
 	}
 
 	/// Get the file or folder name from a path.
-	basename(path) {
-		return this.split_(path).at(-1);
+	static basename(path) {
+		return FileSystem.split_(path).at(-1);
 	}
 
 	/// Get the directory name from a path.
-	dirname(path) {
-		const split = this.split_(path);
+	static dirname(path) {
+		const split = FileSystem.split_(path);
 		if (split.length <= 1) {
 			return "";
 		}
@@ -78,7 +78,7 @@ export default class FileSystem {
 	}
 
 	/// Split a path into folders and file.
-	split_(path) {
+	static split_(path) {
 		return path
 			.trim()
 			.split("/")
@@ -88,12 +88,12 @@ export default class FileSystem {
 	/// Create a new file at a given path.
 	///
 	/// \return The node representing the file created.
-	async createFile(path) {
-		const dirname = this.dirname(path);
-		const basename = this.basename(path);
+	async createFile(path, initialName = null) {
+		const dirname = FileSystem.dirname(path);
+		const basename = FileSystem.basename(path);
 		const current = await this.createFolder(dirname);
 		Exception.assert(!(basename in current), "File {} already exists!", path);
-		Vue.set(current, basename, { name: basename, content: "" });
+		Vue.set(current, basename, { name: initialName === null ? basename : initialName, content: "" });
 		await this.api.request("post", "/file/content", { path: path });
 		this.selected = this.makeNode_(current[basename], path);
 	}
@@ -101,7 +101,7 @@ export default class FileSystem {
 	/// Create a new folder at a given path.
 	async createFolder(path) {
 		let current = this.tree;
-		for (const name of this.split_(path)) {
+		for (const name of FileSystem.split_(path)) {
 			if (name in current) {
 				Exception.assert(FileSystem.isFolder(current[name]), "Folder path conflicts with an existing file: {}", path);
 			}
@@ -121,7 +121,7 @@ export default class FileSystem {
 	/// Get a node refered at a specified path.
 	select(path) {
 		let current = { children: this.tree };
-		for (const name of this.split_(path)) {
+		for (const name of FileSystem.split_(path)) {
 			if (!FileSystem.isFolder(current)) {
 				return null;
 			}
@@ -130,6 +130,7 @@ export default class FileSystem {
 			}
 			current = current.children[name];
 		}
+		this.selected = this.makeNode_(current, path);
 		return current;
 	}
 
