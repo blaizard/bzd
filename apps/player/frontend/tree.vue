@@ -82,7 +82,6 @@
 	.container {
 		font-size: #{$fontSize}px;
 		line-height: #{$lineHeight}px;
-		font-family: monospace;
 
 		.error {
 			color: colors.$bzdGraphColorRed;
@@ -139,7 +138,8 @@
 			}
 
 			&.selected {
-				font-weight: bold;
+				background-color: #3498fb;
+				color: #fff;
 			}
 		}
 	}

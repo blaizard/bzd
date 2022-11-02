@@ -60,6 +60,7 @@
             "error",
             "separate-lines"
         ],
+        "no-control-regex": 0,
         "no-mixed-spaces-and-tabs": [
             "off"
         ],

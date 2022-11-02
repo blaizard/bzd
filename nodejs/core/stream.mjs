@@ -33,7 +33,9 @@ export async function* streamChunks(stream) {
 	try {
 		while (true) {
 			const { done, value } = await reader.read();
-			if (done) {return;}
+			if (done) {
+				return;
+			}
 			yield value;
 		}
 	}
