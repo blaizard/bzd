@@ -23,13 +23,10 @@
 		},
 		computed: {
 			lines() {
-				return this.content
-					.reduce((obj, value) => {
-						obj.push(...value.split("\n"));
-						return obj;
-					}, [])
-					.reverse();
-				//return [...this.content].reverse();
+				return this.content.reduce((obj, value) => {
+					obj.unshift(...value.split("\n").reverse());
+					return obj;
+				}, []);
 			},
 		},
 		methods: {
