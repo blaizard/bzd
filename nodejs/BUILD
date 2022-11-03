@@ -40,7 +40,7 @@ bzd_nodejs_library(
         # Babel
         "@babel/core": "",
         "@babel/plugin-transform-runtime": "",
-        "babel-loader": "",
+        "babel-loader": "^8.3.0",
         "babel-plugin-syntax-dynamic-import": "",
         # Webpack
         "webpack": "4.44.2",
@@ -53,11 +53,11 @@ bzd_nodejs_library(
         # CSS/SASS
         "mini-css-extract-plugin": "0.8.0",  # Seems that 0.9.0 has some issue: https://github.com/webpack-contrib/mini-css-extract-plugin/issues/493
         "css-loader": "3.6.0",  # From 4.0.0 the keyword :export seems broken
-        "node-sass": "",
+        "node-sass": "7.0.3",
         "sass-loader": "10.1.1",  # Breaking changes from 11 onward, only support webpack v5+
         "sass": "1.35.1",
-        "file-loader": "",
-        "url-loader": "",
+        "file-loader": "6.2.0",
+        "url-loader": "4.1.1",
     },
     visibility = ["//visibility:public"],
 )

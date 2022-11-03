@@ -151,6 +151,9 @@
 					break;
 				case "exec":
 					{
+						const index = this.terminal.length;
+						this.$set(this.terminal, index, "\x1b[0;34m\x1b[47mblaizard:~/" + this.scenario.name + " $\x1b[0m ");
+						await this.emulateTyping(this.terminal, index, this.action.args.join(" "));
 						const stream = await this.$api.request("post", "/exec", {
 							cmds: this.action.args,
 						});
