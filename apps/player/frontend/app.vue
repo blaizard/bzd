@@ -6,7 +6,7 @@
 		<div class="content">
 			<code v-if="files.selected" v-html="contentHTML"></code>
 		</div>
-		<Terminal class="terminal" :content="terminal"></Terminal>
+		<Terminal class="terminal" :stream="terminal" @processed="handleTerminalProcessed"></Terminal>
 	</div>
 </template>
 
@@ -103,6 +103,12 @@
 					this.setSelectionEnd();
 				}
 			},
+			async emulateTypingTerminal(value) {
+				for (const c of value) {
+					await this.sleep(10 + Math.random() * 200);
+					this.terminal.push(c);
+				}
+			},
 			async executeFileCreate(path) {
 				await this.files.createFile(path, "");
 				await this.emulateTyping(this.files.selected.node, "name", FileSystem.basename(path));
@@ -149,11 +155,14 @@
 				case "file.select":
 					await this.executeFileSelect(...this.action.args);
 					break;
+				case "wait":
+					await this.sleep(parseInt(this.action.args[0]) * 1000);
+					break;
 				case "exec":
 					{
 						const index = this.terminal.length;
-						this.$set(this.terminal, index, "\x1b[0;34m\x1b[47mblaizard:~/" + this.scenario.name + " $\x1b[0m ");
-						await this.emulateTyping(this.terminal, index, this.action.args.join(" "));
+						this.$set(this.terminal, index, "\x1b[0;33mblaizard:~/" + this.scenario.name + "\x1b[0m $ ");
+						await this.emulateTypingTerminal(this.action.args.join(" ") + "\n");
 						const stream = await this.$api.request("post", "/exec", {
 							cmds: this.action.args,
 						});
@@ -171,6 +180,9 @@
 			next() {
 				++this.index;
 				this.$routerDispatch("/" + this.index);
+			},
+			handleTerminalProcessed(count) {
+				this.terminal.splice(0, count);
 			},
 		},
 	};
