@@ -1,6 +1,6 @@
 <template>
 	<div class="terminal">
-		<span v-for="line in lines" v-html="fromANSItoHTML(line)"></span>
+		<span v-for="c in content" :style="styles[c[1]]">{{ c[0] }}</span>
 	</div>
 </template>
 
@@ -8,94 +8,166 @@
 	const colors8 = ["#000000", "#cc0000", "#4e9a06", "#c4a000", "#729fcf", "#75507b", "#06989a", "#d3d7cf"];
 	const colorsBright8 = ["#555753", "#ef2929", "#8ae234", "#fce94f", "#32afff", "#ad7fa8", "#34e2e2", "#ffffff"];
 
+	// Spec: https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
 	export default {
 		data: function () {
 			return {
-				fontWeight: "normal",
-				fontStyle: "normal",
-				textDecoration: "none",
-				colorText: "initial",
-				colorBackground: "transparent",
+				content: [],
+				styles: [],
+				lines: [],
+				current: "",
 			};
 		},
+		created() {
+			this.resetTerminalStyle();
+			this.terminalCursor = 0;
+			this.createStyle();
+		},
 		props: {
-			content: { type: Array, mandatory: false, default: () => [] },
+			stream: { type: Array, mandatory: false, default: () => [] },
 		},
 		computed: {
-			lines() {
-				return this.content.reduce((obj, value) => {
-					obj.unshift(...value.split("\n").reverse());
-					return obj;
-				}, []);
+			currentStyle() {
+				return this.styles.length - 1;
+			},
+		},
+		watch: {
+			stream: {
+				handler() {
+					const count = this.stream.length;
+					const update = this.stream.reduce((obj, value) => obj + value, "");
+					this.process(update);
+					if (count) {
+						this.$emit("processed", count);
+					}
+				},
+				immediate: true,
 			},
 		},
 		methods: {
+			resetTerminalStyle() {
+				this.terminalStyle = {
+					fontWeight: "normal",
+					fontStyle: "normal",
+					textDecoration: "none",
+					colorText: "inherit",
+					colorBackground: "transparent",
+				};
+			},
 			sgr(...args) {
 				for (const arg of args) {
 					if (arg == 0) {
-						this.fontWeight = "normal";
-						this.fontStyle = "normal";
-						this.textDecoration = "none";
-						this.colorText = "initial";
-						this.colorBackground = "transparent";
+						this.resetTerminalStyle();
 					}
 					else if (arg == 1) {
-						this.fontWeight = "bold";
+						this.terminalStyle.fontWeight = "bold";
 					}
 					else if (arg == 3) {
-						this.fontStyle = "italic";
+						this.terminalStyle.fontStyle = "italic";
 					}
 					else if (arg == 4) {
-						this.textDecoration = "underline";
+						this.terminalStyle.textDecoration = "underline";
 					}
 					else if (arg >= 30 && arg <= 37) {
-						this.colorText = colors8[arg - 30];
+						this.terminalStyle.colorText = colors8[arg - 30];
 					}
 					else if (arg >= 40 && arg <= 47) {
-						this.colorBackground = colors8[arg - 40];
+						this.terminalStyle.colorBackground = colors8[arg - 40];
 					}
 					else if (arg >= 90 && arg <= 97) {
-						this.colorText = colorsBright8[arg - 90];
+						this.terminalStyle.colorText = colorsBright8[arg - 90];
 					}
 					else if (arg >= 100 && arg <= 107) {
-						this.colorBackground = colorsBright8[arg - 100];
+						this.terminalStyle.colorBackground = colorsBright8[arg - 100];
+					}
+					else {
+						return false;
 					}
 				}
-				return this.updateStyle();
+				this.createStyle();
+				return true;
 			},
-			updateStyle(isFirst = false) {
-				return (
-					(isFirst ? "" : "</span>") +
-					"<span style=\"color: " +
-					this.colorText +
+			// Write content to the stream at the cursor position.
+			write(content) {
+				for (const c of content) {
+					this.content[this.terminalCursor++] = [c, this.currentStyle];
+				}
+			},
+			moveCursorUp(lines) {
+				const indexOfPreviousLine = (index) => {
+					for (let i = index; i >= 0; --i) {
+						if (this.content[i][0] == "\n") {
+							return i;
+						}
+					}
+					return 0;
+				};
+
+				let index = indexOfPreviousLine(this.terminalCursor - 1);
+				const distance = this.terminalCursor - index - 1;
+				while (lines--) {
+					index = indexOfPreviousLine(index - 1);
+					this.terminalCursor = index + distance;
+				}
+				return true;
+			},
+			eraseLine(arg) {
+				// Erase from cursor to end of line
+				if (!arg) {
+					this.content = this.content.slice(0, this.terminalCursor);
+				}
+				// Erase start of line to the cursor
+				/*else if (arg == 1) {
+				}
+				// Erase the entire line
+				else if (arg == 2) {
+				}*/
+				else {
+					return false;
+				}
+				return true;
+			},
+			createStyle() {
+				const style =
+					"color: " +
+					this.terminalStyle.colorText +
 					"; background-color: " +
-					this.colorBackground +
+					this.terminalStyle.colorBackground +
 					"; font-weight: " +
-					this.fontWeight +
+					this.terminalStyle.fontWeight +
 					"; font-style: " +
-					this.fontStyle +
+					this.terminalStyle.fontStyle +
 					"; text-decoration: " +
-					this.textDecoration +
-					";\">"
-				);
+					this.terminalStyle.textDecoration +
+					";";
+				this.styles.push(style);
 			},
-			fromANSItoHTML(line) {
+			process(stream) {
 				const fctMapping = {
 					m: this.sgr,
+					A: this.moveCursorUp,
+					K: this.eraseLine,
 				};
-				const replacer = (match, params, name) => {
+
+				let start = 0;
+				const replacer = (match, params, name, offset) => {
 					const args = params.split(";").map((i) => parseInt(i));
-					console.log("<" + match + ">", args, "name=", name);
-					return (
-						fctMapping[name] ||
-						(() => {
-							console.error("Unknown function '" + name + "'");
-							return "";
-						})
-					)(...args);
+
+					// Update the content.
+					this.write(stream.substring(start, offset));
+					start = offset + match.length;
+
+					const result = (fctMapping[name] || (() => false))(...args);
+					if (result !== true) {
+						console.error("Unknown function '" + name + "' with params " + args);
+					}
+
+					return match;
 				};
-				const regex = new RegExp("\\x1b\\[([0-9;]+)([a-zA-Z])", "g");
-				return this.updateStyle(true) + line.replace(regex, replacer) + "</span>";
+
+				const regex = new RegExp("\\x1b\\[([0-9;]*)([a-zA-Z])", "g");
+				stream.replace(regex, replacer);
+				this.write(stream.substring(start));
 			},
 		},
 	};
@@ -103,9 +175,11 @@
 
 <style lang="scss" scoped>
 	.terminal {
-		display: flex;
-		flex-direction: column-reverse;
+		//display: flex;
+		//flex-direction: column-reverse;
 		width: 100%;
+		background-color: #222;
+		color: #ddd;
 
 		> * {
 			white-space: pre-wrap;

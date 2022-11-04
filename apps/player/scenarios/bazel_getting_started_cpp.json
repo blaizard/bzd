@@ -1,6 +1,12 @@
 {
     "flow": [
         {
+            "action": "wait",
+            "args": [
+                "5"
+            ]
+        },
+        {
             "action": "speech",
             "args": [
                 "First we create a C++ source file"
@@ -26,10 +32,22 @@
             ]
         },
         {
+            "action": "wait",
+            "args": [
+                "1"
+            ]
+        },
+        {
             "action": "file.write",
             "args": [
                 "BUILD",
                 "cc_binary(\n\tname = \"main\",\n\tsrcs = [\"main.cc\"],\n)\n"
+            ]
+        },
+        {
+            "action": "wait",
+            "args": [
+                "1"
             ]
         },
         {
@@ -39,9 +57,21 @@
             ]
         },
         {
+            "action": "wait",
+            "args": [
+                "1"
+            ]
+        },
+        {
             "action": "file.select",
             "args": [
                 "main.cc"
+            ]
+        },
+        {
+            "action": "wait",
+            "args": [
+                "1"
             ]
         },
         {
@@ -50,7 +80,8 @@
                 "bazel",
                 "build",
                 "//...",
-                "--color=yes"
+                "--color=yes",
+                "--curses=yes"
             ]
         }
     ],
