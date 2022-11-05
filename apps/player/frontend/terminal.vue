@@ -107,6 +107,7 @@
 						const c = content[i++];
 						if (c == "\n") {
 							++this.y;
+							this.x = 0;
 							break;
 						}
 						else if (c == "\r") {
