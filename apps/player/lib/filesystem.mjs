@@ -51,11 +51,11 @@ export default class FileSystem {
 
 	/// Create a renderable tree from the data.
 	makeTree() {
-		const makeNode = (tree) => {
+		const makeNode = (tree, parent = null) => {
 			return Object.entries(tree).map(([, node]) => {
-				let output = Object.assign({ selected: this.selected && this.selected.node === node }, node);
+				let output = Object.assign({ selected: this.selected && this.selected.node === node, parent: parent }, node);
 				if (FileSystem.isFolder(node)) {
-					output.children = makeNode(node.children);
+					output.children = makeNode(node.children, output);
 				}
 				return output;
 			});

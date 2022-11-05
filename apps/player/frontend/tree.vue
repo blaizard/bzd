@@ -1,12 +1,12 @@
 <template>
 	<div class="container">
 		<template v-for="node in list">
-			<div :key="node.name" :class="getClass(node)">
+			<div :key="node.name" :class="getClass(node)" @click="handleClick(node)">
 				<i v-if="isFolder(node)" class="bzd-icon-folder"></i>
 				{{ node.name }}
 			</div>
 			<div v-if="isExpandedFolder(node)">
-				<TreeDirectory :list="node.children" :depth="depth + 1" class="indent"></TreeDirectory>
+				<TreeDirectory :list="node.children" :depth="depth + 1" class="indent" @selected="$emit('selected', $event)"></TreeDirectory>
 			</div>
 		</template>
 	</div>
@@ -34,6 +34,7 @@
 					expandable: this.isFolder(node),
 					expanded: this.isExpandedFolder(node),
 					selected: this.isSelected(node),
+					clickable: this.isClickable(node),
 				};
 			},
 			isFolder(node) {
@@ -45,6 +46,19 @@
 			isExpandedFolder(node) {
 				return node.expanded || false;
 			},
+			isClickable(node) {
+				return "parent" in node;
+			},
+			handleClick(node) {
+				if (this.isClickable(node)) {
+					let pathList = [];
+					do {
+						pathList.unshift(node.name);
+						node = node.parent;
+					} while (node);
+					this.$emit("selected", pathList.join("/"));
+				}
+			}
 		},
 	};
 </script>
@@ -97,13 +111,10 @@
 			position: relative;
 			padding-left: #{$arrowSize * 2}px;
 			white-space: nowrap;
+			user-select: none;
 
-			.actions {
-				float: right;
-				opacity: 0.3;
-				&:hover {
-					opacity: 1;
-				}
+			&.clickable {
+				cursor: pointer;
 			}
 
 			&.child:after {
@@ -116,8 +127,6 @@
 			}
 
 			&.expandable {
-				cursor: pointer;
-
 				&:before {
 					position: absolute;
 					left: #{math.div(-$arrowSize, 2)}px;
