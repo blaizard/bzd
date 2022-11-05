@@ -1,6 +1,8 @@
 <template>
 	<div class="terminal">
-		<span v-for="c in content" :style="styles[c[1]]">{{ c[0] }}</span>
+		<template v-for="row in content">
+			<span v-for="c in row" :style="styles[c[1]]">{{ c[0] }}</span><br />
+		</template>
 	</div>
 </template>
 
@@ -14,8 +16,8 @@
 			return {
 				content: [],
 				styles: [],
-				lines: [],
-				current: "",
+				x: 0,
+				y: 0,
 			};
 		},
 		created() {
@@ -89,39 +91,48 @@
 			},
 			// Write content to the stream at the cursor position.
 			write(content) {
-				for (const c of content) {
-					this.content[this.terminalCursor++] = [c, this.currentStyle];
-				}
+				const size = content.length;
+				let i = 0;
+				do {
+					// If the row does not exists, create it. The loop need to cover this.y, hence the <= sign.
+					for (let y = this.content.length; y <= this.y; ++y) {
+						this.$set(this.content, y, []);
+					}
+					// If the column does not exists, create it. The loop does not need to cover this.x because this will be done when writing.
+					for (let x = this.content[this.y].length; x < this.x; ++x) {
+						this.content[this.y].push([" ", this.currentStyle]);
+					}
+					// Fill the content.
+					while (i < size) {
+						const c = content[i++];
+						if (c == "\n") {
+							++this.y;
+							break;
+						}
+						else if (c == "\r") {
+							this.x = 0;
+							break;
+						}
+						this.$set(this.content[this.y], this.x, [c, this.currentStyle]);
+						++this.x;
+					}
+				} while (i < size);
 			},
 			moveCursorUp(lines) {
-				const indexOfPreviousLine = (index) => {
-					for (let i = index; i >= 0; --i) {
-						if (this.content[i][0] == "\n") {
-							return i;
-						}
-					}
-					return 0;
-				};
-
-				let index = indexOfPreviousLine(this.terminalCursor - 1);
-				const distance = this.terminalCursor - index - 1;
-				while (lines--) {
-					index = indexOfPreviousLine(index - 1);
-					this.terminalCursor = index + distance;
-				}
+				this.y -= lines;
 				return true;
 			},
 			eraseLine(arg) {
 				// Erase from cursor to end of line
 				if (!arg) {
-					this.content = this.content.slice(0, this.terminalCursor);
+					this.content[this.y] = this.content[this.y].slice(0, this.x);
 				}
 				// Erase start of line to the cursor
-				/*else if (arg == 1) {
-				}
-				// Erase the entire line
-				else if (arg == 2) {
-				}*/
+				// else if (arg == 1) {
+				// }
+				// // Erase the entire line
+				// else if (arg == 2) {
+				// }
 				else {
 					return false;
 				}
