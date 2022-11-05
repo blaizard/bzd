@@ -1,27 +1,9 @@
 {
     "flow": [
         {
-            "action": "wait",
-            "args": [
-                "5"
-            ]
-        },
-        {
-            "action": "speech",
-            "args": [
-                "First we create a C++ source file"
-            ]
-        },
-        {
             "action": "file.create",
             "args": [
                 "main.cc"
-            ]
-        },
-        {
-            "action": "speech",
-            "args": [
-                "Then we fill it with some content, let's print \"hello world\" for example"
             ]
         },
         {
@@ -32,12 +14,6 @@
             ]
         },
         {
-            "action": "wait",
-            "args": [
-                "1"
-            ]
-        },
-        {
             "action": "file.write",
             "args": [
                 "BUILD",
@@ -45,33 +21,9 @@
             ]
         },
         {
-            "action": "wait",
-            "args": [
-                "1"
-            ]
-        },
-        {
             "action": "file.create",
             "args": [
                 "WORKSPACE"
-            ]
-        },
-        {
-            "action": "wait",
-            "args": [
-                "1"
-            ]
-        },
-        {
-            "action": "file.select",
-            "args": [
-                "main.cc"
-            ]
-        },
-        {
-            "action": "wait",
-            "args": [
-                "1"
             ]
         },
         {
