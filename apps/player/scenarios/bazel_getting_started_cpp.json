@@ -32,7 +32,14 @@
                 "bazel build //... --color=yes --curses=yes",
                 "bazel build //..."
             ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "ls -ll --color=always bazel-bin/",
+                "ls -ll bazel-bin/"
+            ]
         }
     ],
-    "name": "bazel-getting-started-c++"
+    "name": "bazel-c++-getting-started"
 }

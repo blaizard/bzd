@@ -24,5 +24,6 @@ bzd_nodejs_binary(
         "//nodejs/core/api:server",
         "//nodejs/core/http:server",
         "//nodejs/db/storage:disk",
+        "//apps/player/lib:scenario"
     ],
 )

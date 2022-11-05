@@ -144,7 +144,6 @@
 			waitingKeypress() {
 				return new Promise((resolve) => {
 					const handleKeyDown = (e) => {
-						console.log("KEY!", e);
 						if (e.key == " ") {
 							document.removeEventListener("keydown", handleKeyDown);
 							resolve();
@@ -173,7 +172,7 @@
 				case "exec":
 					{
 						const index = this.terminal.length;
-						this.$set(this.terminal, index, "\x1b[0;33mblaizard:~/" + this.scenario.name + "\x1b[0m $ ");
+						this.$set(this.terminal, index, "\x1b[0;33mbzd@channel\x1b[0m:\x1b[34m~/" + this.scenario.name + "\x1b[0m$ ");
 						await this.emulateTypingTerminal((this.action.args[1] || this.action.args[0]) + "\n");
 						const stream = await this.$api.request("post", "/exec", {
 							cmds: this.action.args[0].split(" "),

@@ -9,6 +9,7 @@ import FileSystem from "bzd/core/filesystem.mjs";
 import StorageDisk from "bzd/db/storage/disk.mjs";
 import { spawn } from "child_process";
 import { Readable } from "stream";
+import Scenario from "../lib/scenario.mjs";
 
 const Log = LogFactory("backend");
 
@@ -25,29 +26,18 @@ program
 	.option("-s, --static <path>", "Directory to static serve.", ".")
 	.parse(process.argv);
 
-class Scenario {
-	constructor(data) {
-		this.data = data;
-		this.index = 0;
-	}
-
-	get() {
-		return this.data;
-	}
-}
-
 (async () => {
 	// Read arguments
 	const PORT = process.env.BZD_PORT || program.opts().port;
 	const PATH_STATIC = program.opts().static;
 	const PATH_SCENARIO = program.args[0];
-	const PATH_STORAGE = Path.join(Path.dirname(PATH_SCENARIO), ".player", "storage");
 	//const PATH_CACHE = Path.join(Path.dirname(PATH_SCENARIO), ".player", "cache");
 
 	const raw = await FileSystem.readFile(PATH_SCENARIO);
 	const scenarioData = JSON.parse(raw);
-
 	const scenario = new Scenario(scenarioData);
+
+	const PATH_STORAGE = Path.join(Path.dirname(PATH_SCENARIO), ".player", scenario.name);
 	const storage = new StorageDisk(PATH_STORAGE);
 
 	// Set-up the web server
@@ -58,7 +48,7 @@ class Scenario {
 	});
 
 	api.handle("get", "/scenario", async () => {
-		return scenario.get();
+		return scenario.data;
 	});
 
 	api.handle("get", "/file/content", async (inputs) => {
