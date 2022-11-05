@@ -141,6 +141,18 @@
 					reader.releaseLock();
 				}
 			},
+			waitingKeypress() {
+				return new Promise((resolve) => {
+					const handleKeyDown = (e) => {
+						console.log("KEY!", e);
+						if (e.key == " ") {
+							document.removeEventListener("keydown", handleKeyDown);
+							resolve();
+						}
+					};
+					document.addEventListener("keydown", handleKeyDown);
+				});
+			},
 			async execute() {
 				if (this.completed) {
 					return;
@@ -175,9 +187,10 @@
 					break;
 				}
 
-				this.next();
-			},
-			next() {
+				if (!this.fastforward) {
+					await this.waitingKeypress();
+				}
+
 				++this.index;
 				this.$routerDispatch("/" + this.index);
 			},

@@ -73,8 +73,14 @@
 					else if (arg >= 30 && arg <= 37) {
 						this.terminalStyle.colorText = colors8[arg - 30];
 					}
+					else if (arg == 39) {
+						this.terminalStyle.colorText = "inherit";
+					}
 					else if (arg >= 40 && arg <= 47) {
 						this.terminalStyle.colorBackground = colors8[arg - 40];
+					}
+					else if (arg == 49) {
+						this.terminalStyle.colorText = "transparent";
 					}
 					else if (arg >= 90 && arg <= 97) {
 						this.terminalStyle.colorText = colorsBright8[arg - 90];
@@ -114,13 +120,49 @@
 							this.x = 0;
 							break;
 						}
-						this.$set(this.content[this.y], this.x, [c, this.currentStyle]);
-						++this.x;
+						else if (c == "\b") {
+							this.x = Math.max(this.x - 1, 0);
+						}
+						else {
+							this.$set(this.content[this.y], this.x, [c, this.currentStyle]);
+							++this.x;
+						}
 					}
 				} while (i < size);
 			},
 			moveCursorUp(lines) {
-				this.y -= lines;
+				this.y = Math.max(this.y - lines, 0);
+				return true;
+			},
+			moveCursorDown(lines) {
+				this.y += lines;
+				return true;
+			},
+			moveCursorRight(columns) {
+				this.x += columns;
+				return true;
+			},
+			moveCursorLeft(columns) {
+				this.x = Math.max(this.x - columns, 0);
+				return true;
+			},
+			moveCursorDownBegining(lines) {
+				this.moveCursorDown(lines);
+				this.x = 0;
+				return true;
+			},
+			moveCursorUpBegining(lines) {
+				this.moveCursorUp(lines);
+				this.x = 0;
+				return true;
+			},
+			moveCursorColumn(column) {
+				this.x = column;
+				return true;
+			},
+			moveCursorLineColumn(line = 0, column = 0) {
+				this.x = column;
+				this.y = line;
 				return true;
 			},
 			eraseLine(arg) {
@@ -129,11 +171,15 @@
 					this.content[this.y] = this.content[this.y].slice(0, this.x);
 				}
 				// Erase start of line to the cursor
-				// else if (arg == 1) {
-				// }
-				// // Erase the entire line
-				// else if (arg == 2) {
-				// }
+				else if (arg == 1) {
+					for (let x = 0; x < this.x; ++x) {
+						this.$set(this.content[this.y], x, [" ", this.currentStyle]);
+					}
+				}
+				// Erase the entire line
+				else if (arg == 2) {
+					this.$set(this.content, this.y, []);
+				}
 				else {
 					return false;
 				}
@@ -158,6 +204,14 @@
 				const fctMapping = {
 					m: this.sgr,
 					A: this.moveCursorUp,
+					B: this.moveCursorDown,
+					C: this.moveCursorRight,
+					D: this.moveCursorLeft,
+					E: this.moveCursorDownBegining,
+					F: this.moveCursorUpBegining,
+					G: this.moveCursorColumn,
+					H: this.moveCursorLineColumn,
+					f: this.moveCursorLineColumn,
 					K: this.eraseLine,
 				};
 
