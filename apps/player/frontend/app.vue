@@ -186,7 +186,7 @@
 			},
 			async handleTreeSelected(path) {
 				await this.executeFileSelect(path);
-			}
+			},
 		},
 	};
 </script>

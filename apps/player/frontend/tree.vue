@@ -6,7 +6,11 @@
 				{{ node.name }}
 			</div>
 			<div v-if="isExpandedFolder(node)">
-				<TreeDirectory :list="node.children" :depth="depth + 1" class="indent" @selected="$emit('selected', $event)"></TreeDirectory>
+				<TreeDirectory
+					:list="node.children"
+					:depth="depth + 1"
+					class="indent"
+					@selected="$emit('selected', $event)"></TreeDirectory>
 			</div>
 		</template>
 	</div>
@@ -58,7 +62,7 @@
 					} while (node);
 					this.$emit("selected", pathList.join("/"));
 				}
-			}
+			},
 		},
 	};
 </script>
