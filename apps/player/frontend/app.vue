@@ -1,7 +1,7 @@
 <template>
 	<div class="layout">
 		<div class="tree">
-			<Tree :list="tree"></Tree>
+			<Tree :list="tree" @selected="handleTreeSelected"></Tree>
 		</div>
 		<div class="content">
 			<code v-if="files.selected" v-html="contentHTML"></code>
@@ -162,9 +162,9 @@
 					{
 						const index = this.terminal.length;
 						this.$set(this.terminal, index, "\x1b[0;33mblaizard:~/" + this.scenario.name + "\x1b[0m $ ");
-						await this.emulateTypingTerminal(this.action.args.join(" ") + "\n");
+						await this.emulateTypingTerminal((this.action.args[1] || this.action.args[0]) + "\n");
 						const stream = await this.$api.request("post", "/exec", {
-							cmds: this.action.args,
+							cmds: this.action.args[0].split(" "),
 						});
 						for await (const chunk of this.streamAsyncIterable(stream)) {
 							const blob = new Blob([chunk.buffer], { type: "text/plain; charset=utf-8" });
@@ -184,6 +184,9 @@
 			handleTerminalProcessed(count) {
 				this.terminal.splice(0, count);
 			},
+			async handleTreeSelected(path) {
+				await this.executeFileSelect(path);
+			}
 		},
 	};
 </script>
@@ -215,6 +218,7 @@
 			margin-left: -3ch;
 			margin-right: 3ch;
 			color: #999;
+			user-select: none;
 		}
 	}
 

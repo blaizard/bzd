@@ -77,11 +77,8 @@
         {
             "action": "exec",
             "args": [
-                "bazel",
-                "build",
-                "//...",
-                "--color=yes",
-                "--curses=yes"
+                "bazel build //... --color=yes --curses=yes",
+                "bazel build //..."
             ]
         }
     ],
