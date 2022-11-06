@@ -135,21 +135,36 @@
 				await this.files.selected.fetchContent();
 				this.setSelectionEnd();
 			},
-			async *streamAsyncIterable(stream) {
-				const reader = stream.getReader();
-				try {
-					while (true) {
-						const { done, value } = await reader.read();
-						if (done) {
-							return;
+			async executeExec(cmdStr, cmdStrDisplay = null) {
+				async function* streamAsyncIterable(stream) {
+					const reader = stream.getReader();
+					try {
+						while (true) {
+							const { done, value } = await reader.read();
+							if (done) {
+								return;
+							}
+							yield value;
 						}
-						yield value;
+					}
+					finally {
+						reader.releaseLock();
 					}
 				}
-				finally {
-					reader.releaseLock();
+
+				const index = this.terminal.length;
+				this.$set(this.terminal, index, "\x1b[0;33mbzd\x1b[0m:\x1b[34m~/" + this.scenario.name + "\x1b[0m$ ");
+				await this.emulateTypingTerminal((cmdStrDisplay || cmdStr) + "\n");
+				const stream = await this.$api.request("post", "/exec", {
+					cmds: cmdStr.split(" "),
+				});
+				for await (const chunk of streamAsyncIterable(stream)) {
+					const blob = new Blob([chunk.buffer], { type: "text/plain; charset=utf-8" });
+					const text = await blob.text();
+					this.terminal.push(text);
 				}
 			},
+
 			waitingKeypress() {
 				return new Promise((resolve) => {
 					const handleKeyDown = (e) => {
@@ -184,20 +199,10 @@
 					await this.sleep(parseInt(this.action.args[0]) * 1000);
 					break;
 				case "exec":
-					{
-						const index = this.terminal.length;
-						this.$set(this.terminal, index, "\x1b[0;33mbzd\x1b[0m:\x1b[34m~/" + this.scenario.name + "\x1b[0m$ ");
-						await this.emulateTypingTerminal((this.action.args[1] || this.action.args[0]) + "\n");
-						const stream = await this.$api.request("post", "/exec", {
-							cmds: this.action.args[0].split(" "),
-						});
-						for await (const chunk of this.streamAsyncIterable(stream)) {
-							const blob = new Blob([chunk.buffer], { type: "text/plain; charset=utf-8" });
-							const text = await blob.text();
-							this.terminal.push(text);
-						}
-					}
+					await this.executeExec(...this.action.args);
 					break;
+				default:
+					console.error("Unsupported command: " + this.action.type);
 				}
 
 				++this.index;
