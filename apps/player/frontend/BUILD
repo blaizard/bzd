@@ -7,6 +7,8 @@ bzd_nodejs_web(
         "**/*.vue",
         "**/*.svg",
         "**/*.mjs",
+        "**/*.mp3",
+        "**/*.wav",
     ]),
     entries = {
         "app.mjs": "index",

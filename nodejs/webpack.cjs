@@ -392,7 +392,7 @@ function getWebpackConfigDefault(isDev, config) {
 					},
 				},
 				{
-					test: /\.(png|gif|jpg|woff|woff2|eot|ttf)$/,
+					test: /\.(png|gif|jpg|woff|woff2|eot|ttf|mp3|ogg|wav)$/,
 					loader: "file-loader",
 					options: {
 						name: "[hash]-" + stamp + ".[ext]",

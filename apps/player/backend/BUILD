@@ -18,12 +18,12 @@ bzd_nodejs_binary(
     ],
     deps = [
         "//apps/player:api",
+        "//apps/player/lib:scenario",
         "//nodejs/core:exception",
         "//nodejs/core:filesystem",
         "//nodejs/core:log",
         "//nodejs/core/api:server",
         "//nodejs/core/http:server",
         "//nodejs/db/storage:disk",
-        "//apps/player/lib:scenario"
     ],
 )
