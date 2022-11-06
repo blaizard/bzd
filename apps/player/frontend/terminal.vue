@@ -54,7 +54,7 @@
 						output.push(["", styleId]);
 					}
 					output.at(-1)[0] += data[0];
-				}				
+				}
 				return output;
 			},
 			resetTerminalStyle() {
