@@ -111,10 +111,12 @@
 				}
 			},
 			async emulateTypingKey(key) {
-				let audio = new Audio(audioSrc);
-				await this.sleep(10 + Math.random() * 200);
-				audio.volume = (key.charCodeAt(0) % 10) / 10 + 0.1;
-				audio.play();
+				if (!this.fastforward) {
+					let audio = new Audio(audioSrc);
+					await this.sleep(10 + Math.random() * 200);
+					audio.volume = (key.charCodeAt(0) % 10) / 10 + 0.1;
+					audio.play();
+				}
 			},
 			async executeFileCreate(path) {
 				await this.files.createFile(path, "");
@@ -163,6 +165,11 @@
 				if (this.completed) {
 					return;
 				}
+
+				if (!this.fastforward) {
+					await this.waitingKeypress();
+				}
+
 				switch (this.action.type) {
 				case "file.create":
 					await this.executeFileCreate(...this.action.args);
@@ -191,10 +198,6 @@
 						}
 					}
 					break;
-				}
-
-				if (!this.fastforward) {
-					await this.waitingKeypress();
 				}
 
 				++this.index;
