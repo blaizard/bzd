@@ -1,7 +1,7 @@
 <template>
 	<div class="terminal">
-		<template v-for="row in content">
-			<span v-for="c in row" :style="styles[c[1]]">{{ c[0] }}</span><br />
+		<template v-for="line in content">
+			<span v-for="data in groupByStyleId(line)" :style="styles[data[1]]">{{ data[0] }}</span><br />
 		</template>
 	</div>
 </template>
@@ -16,6 +16,8 @@
 			return {
 				content: [],
 				styles: [],
+				stylesMap: {},
+				styleId: -1,
 				x: 0,
 				y: 0,
 			};
@@ -27,11 +29,6 @@
 		},
 		props: {
 			stream: { type: Array, mandatory: false, default: () => [] },
-		},
-		computed: {
-			currentStyle() {
-				return this.styles.length - 1;
-			},
 		},
 		watch: {
 			stream: {
@@ -47,6 +44,19 @@
 			},
 		},
 		methods: {
+			/// Group characters by their style identifiers.
+			groupByStyleId(line) {
+				let styleId = -1;
+				let output = [];
+				for (const data of line) {
+					if (data[1] != styleId) {
+						styleId = data[1];
+						output.push(["", styleId]);
+					}
+					output.at(-1)[0] += data[0];
+				}				
+				return output;
+			},
 			resetTerminalStyle() {
 				this.terminalStyle = {
 					fontWeight: "normal",
@@ -106,7 +116,7 @@
 					}
 					// If the column does not exists, create it. The loop does not need to cover this.x because this will be done when writing.
 					for (let x = this.content[this.y].length; x < this.x; ++x) {
-						this.content[this.y].push([" ", this.currentStyle]);
+						this.content[this.y].push([" ", 0]);
 					}
 					// Fill the content.
 					while (i < size) {
@@ -124,7 +134,7 @@
 							this.x = Math.max(this.x - 1, 0);
 						}
 						else {
-							this.$set(this.content[this.y], this.x, [c, this.currentStyle]);
+							this.$set(this.content[this.y], this.x, [c, this.styleId]);
 							++this.x;
 						}
 					}
@@ -173,7 +183,7 @@
 				// Erase start of line to the cursor
 				else if (arg == 1) {
 					for (let x = 0; x < this.x; ++x) {
-						this.$set(this.content[this.y], x, [" ", this.currentStyle]);
+						this.$set(this.content[this.y], x, [" ", 0]);
 					}
 				}
 				// Erase the entire line
@@ -198,6 +208,11 @@
 					"; text-decoration: " +
 					this.terminalStyle.textDecoration +
 					";";
+				if (!(style in this.stylesMap)) {
+					this.styles.push(style);
+					this.stylesMap[style] = this.styles.length - 1;
+				}
+				this.styleId = this.stylesMap[style];
 				this.styles.push(style);
 			},
 			process(stream) {
@@ -241,8 +256,6 @@
 
 <style lang="scss" scoped>
 	.terminal {
-		//display: flex;
-		//flex-direction: column-reverse;
 		width: 100%;
 		background-color: #222;
 		color: #ddd;

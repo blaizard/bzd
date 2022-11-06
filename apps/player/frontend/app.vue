@@ -18,6 +18,7 @@
 	import FileSystem from "../lib/filesystem.mjs";
 	import "highlight.js/styles/github.css";
 	import HighlightJs from "highlight.js/lib/common";
+	import audioSrc from "./assets/typing/click.mp3";
 
 	export default {
 		components: {
@@ -98,16 +99,22 @@
 			},
 			async emulateTyping(object, keyName, value) {
 				for (const c of value) {
-					await this.sleep(10 + Math.random() * 200);
+					await this.emulateTypingKey(c);
 					object[keyName] += c;
 					this.setSelectionEnd();
 				}
 			},
 			async emulateTypingTerminal(value) {
 				for (const c of value) {
-					await this.sleep(10 + Math.random() * 200);
+					await this.emulateTypingKey(c);
 					this.terminal.push(c);
 				}
+			},
+			async emulateTypingKey(key) {
+				let audio = new Audio(audioSrc);
+				await this.sleep(10 + Math.random() * 200);
+				audio.volume = (key.charCodeAt(0) % 10) / 10 + 0.1;
+				audio.play();
 			},
 			async executeFileCreate(path) {
 				await this.files.createFile(path, "");
@@ -172,7 +179,7 @@
 				case "exec":
 					{
 						const index = this.terminal.length;
-						this.$set(this.terminal, index, "\x1b[0;33mbzd@channel\x1b[0m:\x1b[34m~/" + this.scenario.name + "\x1b[0m$ ");
+						this.$set(this.terminal, index, "\x1b[0;33mbzd\x1b[0m:\x1b[34m~/" + this.scenario.name + "\x1b[0m$ ");
 						await this.emulateTypingTerminal((this.action.args[1] || this.action.args[0]) + "\n");
 						const stream = await this.$api.request("post", "/exec", {
 							cmds: this.action.args[0].split(" "),
