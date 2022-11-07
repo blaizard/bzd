@@ -26,6 +26,10 @@ program
 	.option("-s, --static <path>", "Directory to static serve.", ".")
 	.parse(process.argv);
 
+function pathToPathList(path) {
+	return path.split("/").filter(Boolean);
+}
+
 (async () => {
 	// Read arguments
 	const PORT = process.env.BZD_PORT || program.opts().port;
@@ -52,11 +56,23 @@ program
 	});
 
 	api.handle("get", "/file/content", async (inputs) => {
-		return await storage.read(inputs.path.split("/"));
+		return await storage.read(pathToPathList(inputs.path));
 	});
 
 	api.handle("post", "/file/content", async (inputs) => {
-		await storage.writeFromChunk(inputs.path.split("/"), inputs.content || "");
+		await storage.writeFromChunk(pathToPathList(inputs.path), inputs.content || "");
+	});
+
+	api.handle("get", "/file/list", async (inputs) => {
+		const pathList = pathToPathList(inputs.path);
+		const maxOrPaging = "paging" in inputs ? inputs.paging : 50;
+
+		const result = await storage.list(pathList, maxOrPaging, /*includeMetadata*/ true);
+
+		return {
+			data: result.data(),
+			next: result.getNextPaging(),
+		};
 	});
 
 	api.handle("post", "/exec", async (inputs) => {

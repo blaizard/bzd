@@ -4,10 +4,9 @@ import Vue from "vue";
 const Exception = ExceptionFactory("filesystem");
 
 class Node {
-	constructor(filesystem, node, path) {
+	constructor(filesystem, node) {
 		this.filesystem = filesystem;
 		this.node = node;
-		this.path = path;
 		this.name = this.node.name;
 		this.content = "";
 	}
@@ -19,19 +18,19 @@ class Node {
 	async fetchContent() {
 		Exception.assert(FileSystem.isFile(this.node), "Folder do not have content");
 		this.content = await this.filesystem.api.request("get", "/file/content", {
-			path: this.path,
+			path: this.node.path,
 		});
 	}
 
 	async updateContent(process) {
 		await this.fetchContent();
 		await process(this);
-		await this.filesystem.api.request("post", "/file/content", { path: this.path, content: this.content });
+		await this.filesystem.api.request("post", "/file/content", { path: this.node.path, content: this.content });
 	}
 
-	async updateName(process) {
-		await process(this);
-		// Update the file name.
+	async toggleExpand() {
+		Exception.assert(FileSystem.isFolder(this.node), "Only folders can be expanded");
+		this.node.expanded = !this.node.expanded;
 	}
 }
 
@@ -40,37 +39,28 @@ export default class FileSystem {
 		this.api = api;
 		// Internal structure of the file tree, it looks like this:
 		// {
-		//     uid: {name: "diplay name", expanded: true, children: { ... }}, <- for a folder
-		//     uid: {name: "diplay name", content: ""}, <- for a file
+		//     uid: {name: "diplay name", expanded: true, path: "", children: { ... }}, <- for a folder
+		//     uid: {name: "diplay name", path: "", content: ""}, <- for a file
 		//     ...
 		// }
-		this.tree = {};
+		this.tree = { children: {} };
 		// Selected node if any.
 		this.selected = null;
 	}
 
-	/// Create a renderable tree from the data.
-	makeTree() {
-		const makeNode = (tree, parent = null) => {
-			return Object.entries(tree).map(([, node]) => {
-				let output = Object.assign({ selected: this.selected && this.selected.node === node, parent: parent }, node);
-				if (FileSystem.isFolder(node)) {
-					output.children = makeNode(node.children, output);
-				}
-				return output;
-			});
-		};
-		return makeNode(this.tree);
+	/// Create a renderable tree data.
+	get data() {
+		return this.tree.children;
 	}
 
 	/// Get the file or folder name from a path.
 	static basename(path) {
-		return FileSystem.split_(path).at(-1);
+		return FileSystem.toPathList(path).at(-1);
 	}
 
 	/// Get the directory name from a path.
 	static dirname(path) {
-		const split = FileSystem.split_(path);
+		const split = FileSystem.toPathList(path);
 		if (split.length <= 1) {
 			return "";
 		}
@@ -78,11 +68,47 @@ export default class FileSystem {
 	}
 
 	/// Split a path into folders and file.
-	static split_(path) {
+	static toPathList(path) {
 		return path
 			.trim()
 			.split("/")
 			.filter((name) => name.length > 0);
+	}
+
+	/// Update the entries for a certain path.
+	async list(path) {
+		// Select the node
+		let node = this.select(path, /*select*/ false);
+		Exception.assert(FileSystem.isFolder(node), "The file to be listed must be a folder: {}", path);
+
+		let next = 1000;
+		let list = [];
+
+		do {
+			const response = await this.api.request("get", "/file/list", {
+				path: path,
+				paging: next,
+			});
+			next = response.next;
+			list = list.concat(response.data);
+		} while (next);
+
+		const previous = node.children || {};
+		Vue.set(
+			node,
+			"children",
+			list.reduce((obj, item) => {
+				let data = { name: item.name, path: path + "/" + item.name };
+				if (item.type == "directory") {
+					data["expanded"] = (previous[item.name] || { expanded: false }).expanded;
+					data["children"] = async () => {
+						await this.list(data.path);
+					};
+				}
+				Vue.set(obj, item.name, data);
+				return obj;
+			}, {})
+		);
 	}
 
 	/// Create a new file at a given path.
@@ -93,35 +119,33 @@ export default class FileSystem {
 		const basename = FileSystem.basename(path);
 		const current = await this.createFolder(dirname);
 		Exception.assert(!(basename in current), "File {} already exists!", path);
-		Vue.set(current, basename, { name: initialName === null ? basename : initialName, content: "" });
+		Vue.set(current, basename, { name: initialName === null ? basename : initialName, path: path, content: "" });
 		await this.api.request("post", "/file/content", { path: path });
-		this.selected = this.makeNode_(current[basename], path);
+		this.selected = this.makeNode_(current[basename]);
 	}
 
 	/// Create a new folder at a given path.
 	async createFolder(path) {
-		let current = this.tree;
-		for (const name of FileSystem.split_(path)) {
+		let current = this.tree.children;
+		let currentPathList = [];
+		for (const name of FileSystem.toPathList(path)) {
+			currentPathList.push(name);
 			if (name in current) {
 				Exception.assert(FileSystem.isFolder(current[name]), "Folder path conflicts with an existing file: {}", path);
 			}
 			else {
-				Vue.set(current, name, { name: name, expanded: true, children: {} });
+				Vue.set(current, name, { name: name, path: currentPathList.join("/"), expanded: true, children: {} });
 			}
-			this.selected = this.makeNode_(current[name], path);
+			this.selected = this.makeNode_(current[name]);
 			current = await this.selected.getChildren();
 		}
 		return current;
 	}
 
-	exists(path) {
-		return FileSystem.get(path) !== null;
-	}
-
 	/// Get a node refered at a specified path.
-	select(path) {
-		let current = { children: this.tree };
-		for (const name of FileSystem.split_(path)) {
+	select(path, select = true) {
+		let current = this.tree;
+		for (const name of FileSystem.toPathList(path)) {
 			if (!FileSystem.isFolder(current)) {
 				return null;
 			}
@@ -130,21 +154,23 @@ export default class FileSystem {
 			}
 			current = current.children[name];
 		}
-		this.selected = this.makeNode_(current, path);
+		if (select) {
+			this.selected = this.makeNode_(current);
+		}
 		return current;
 	}
 
 	/// Checks if the node is a directory
 	static isFolder(node) {
-		return "children" in node;
+		return node && "children" in node;
 	}
 
 	/// Checks if the node is a file
 	static isFile(node) {
-		return !FileSystem.isFolder(node);
+		return node && !("children" in node);
 	}
 
-	makeNode_(node, path) {
-		return new Node(this, node, path);
+	makeNode_(node) {
+		return new Node(this, node);
 	}
 }

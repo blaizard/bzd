@@ -1,12 +1,16 @@
 <template>
 	<div class="layout">
-		<div class="tree">
-			<Tree :list="tree" @selected="handleTreeSelected"></Tree>
+		<div :class="setComponentClass('tree')">
+			<Tree :tree="tree" :selected="files.selected" @selected="handleTreeSelected"></Tree>
 		</div>
-		<div class="content">
+		<div :class="setComponentClass('content')" @click="selectComponents('content')">
 			<code v-if="files.selected" v-html="contentHTML"></code>
 		</div>
-		<Terminal class="terminal" :stream="terminal" @processed="handleTerminalProcessed"></Terminal>
+		<Terminal
+			:class="setComponentClass('terminal')"
+			:stream="terminal"
+			@processed="handleTerminalProcessed"
+			@click="selectComponents('terminal')"></Terminal>
 	</div>
 </template>
 
@@ -32,6 +36,7 @@
 				index: 0,
 				scenario: new Scenario(),
 				files: new FileSystem(this.$api),
+				selectedComponents: [],
 				selection: [0, 0],
 				terminal: [],
 			};
@@ -47,7 +52,7 @@
 				return this.index < this.start;
 			},
 			tree() {
-				return [{ name: this.scenario.name, expanded: true, children: this.files.makeTree() }];
+				return { [this.scenario.name]: { name: this.scenario.name, expanded: true, children: this.files.data } };
 			},
 			content() {
 				if (this.files.selected) {
@@ -87,8 +92,19 @@
 					},
 				],
 			});
+
+			await this.files.list("/");
 		},
 		methods: {
+			selectComponents(...names) {
+				this.selectedComponents = [...names];
+			},
+			setComponentClass(name) {
+				return {
+					[name]: true,
+					selected: this.selectedComponents.includes(name),
+				};
+			},
 			sleep(ms) {
 				if (!this.fastforward) {
 					return new Promise((resolve) => setTimeout(resolve, ms));
@@ -119,6 +135,7 @@
 				}
 			},
 			async executeFileCreate(path) {
+				this.selectedComponents = ["tree"];
 				await this.files.createFile(path, "");
 				await this.emulateTyping(this.files.selected.node, "name", FileSystem.basename(path));
 			},
@@ -126,14 +143,21 @@
 				if (!this.files.select(path)) {
 					await this.executeFileCreate(path);
 				}
+				this.selectedComponents = ["content"];
 				await this.files.selected.updateContent(async () => {
 					await this.emulateTyping(this.files.selected, "content", content);
 				});
 			},
 			async executeFileSelect(path) {
-				this.files.select(path);
-				await this.files.selected.fetchContent();
-				this.setSelectionEnd();
+				this.selectedComponents = ["tree"];
+				const node = this.files.select(path);
+				if (FileSystem.isFile(node)) {
+					await this.files.selected.fetchContent();
+					this.setSelectionEnd();
+				}
+				else {
+					await this.files.selected.toggleExpand();
+				}
 			},
 			async executeExec(cmdStr, cmdStrDisplay = null) {
 				async function* streamAsyncIterable(stream) {
@@ -152,6 +176,7 @@
 					}
 				}
 
+				this.selectedComponents = ["terminal"];
 				const index = this.terminal.length;
 				this.$set(this.terminal, index, "\x1b[0;33mbzd\x1b[0m:\x1b[34m~/" + this.scenario.name + "\x1b[0m$ ");
 				await this.emulateTypingTerminal((cmdStrDisplay || cmdStr) + "\n");
@@ -263,10 +288,17 @@
 			vertical-align: bottom;
 			animation: selection-blink 1s steps(1) infinite;
 		}
+		display: none;
+	}
+
+	.selected .selection {
+		display: inline;
 	}
 </style>
 
 <style lang="scss" scoped>
+	@use "bzd-style/css/colors.scss" as colors;
+
 	.layout {
 		height: 100%;
 		width: 100%;
@@ -289,11 +321,18 @@
 			overflow: auto;
 		}
 
+		> .selected {
+			border: 2px solid colors.$bzdGraphColorBlue !important;
+		}
+		> :not(.selected) {
+			border: 2px solid transparent;
+		}
+
 		.tree {
 			grid-area: tree;
 
 			padding: 10px 25px;
-			border-right: 1px solid #ddd;
+			outline: 1px solid #ddd;
 		}
 		.content {
 			grid-area: content;
@@ -303,7 +342,6 @@
 		}
 		.terminal {
 			grid-area: terminal;
-			border-top: 1px solid #ddd;
 		}
 	}
 </style>
