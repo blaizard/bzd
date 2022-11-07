@@ -7,8 +7,9 @@
 			</div>
 			<div v-if="isExpandedFolder(node)">
 				<TreeDirectory
-					:list="node.children"
+					:tree="node.children"
 					:depth="depth + 1"
+					:selected="selected"
 					class="indent"
 					@selected="$emit('selected', $event)"></TreeDirectory>
 			</div>
@@ -24,11 +25,19 @@
 		mixins: [Component],
 		name: "TreeDirectory",
 		props: {
-			list: { type: Array, mandatory: false, default: () => [] },
+			tree: { type: Object, mandatory: false, default: () => [] },
+			selected: { type: Object, mandatory: false, default: null },
 			depth: { type: Number, mandatory: false, default: 0 },
 		},
 		data: function () {
 			return {};
+		},
+		computed: {
+			list() {
+				let list = Object.values(this.tree);
+				list.sort((a, b) => Intl.Collator().compare(a.name, b.name));
+				return list;
+			},
 		},
 		methods: {
 			getClass(node) {
@@ -45,22 +54,17 @@
 				return FileSystem.isFolder(node);
 			},
 			isSelected(node) {
-				return node.selected;
+				return this.selected && node === this.selected.node;
 			},
 			isExpandedFolder(node) {
 				return node.expanded || false;
 			},
 			isClickable(node) {
-				return "parent" in node;
+				return "path" in node;
 			},
 			handleClick(node) {
 				if (this.isClickable(node)) {
-					let pathList = [];
-					do {
-						pathList.unshift(node.name);
-						node = node.parent;
-					} while (node);
-					this.$emit("selected", pathList.join("/"));
+					this.$emit("selected", node.path);
 				}
 			},
 		},
@@ -151,7 +155,7 @@
 			}
 
 			&.selected {
-				background-color: #3498fb;
+				background-color: colors.$bzdGraphColorBlue;
 				color: #fff;
 			}
 		}
