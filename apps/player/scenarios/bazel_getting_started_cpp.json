@@ -14,6 +14,12 @@
             ]
         },
         {
+            "action": "file.create",
+            "args": [
+                "BUILD"
+            ]
+        },
+        {
             "action": "file.write",
             "args": [
                 "BUILD",
@@ -36,8 +42,21 @@
         {
             "action": "exec",
             "args": [
+                "bazel run //:main --color=yes --curses=yes",
+                "bazel run //:main"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
                 "ls -ll --color=always bazel-bin/",
                 "ls -ll bazel-bin/"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "clear"
             ]
         }
     ],

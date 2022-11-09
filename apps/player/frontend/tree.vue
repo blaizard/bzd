@@ -1,13 +1,14 @@
 <template>
 	<div class="container">
-		<template v-for="node in list">
+		<div v-if="empty" class="entry child">[empty]</div>
+		<template v-else v-for="node in orderedList">
 			<div :key="node.name" :class="getClass(node)" @click="handleClick(node)">
-				<i v-if="isFolder(node)" class="bzd-icon-folder"></i>
-				{{ node.name }}
+				<i v-if="node.isFolder()" class="bzd-icon-folder"></i>
+				<span class="text">{{ node.name }}</span>
 			</div>
-			<div v-if="isExpandedFolder(node)">
+			<div v-if="node.expanded">
 				<TreeDirectory
-					:tree="node.children"
+					:node="node"
 					:depth="depth + 1"
 					:selected="selected"
 					class="indent"
@@ -19,24 +20,48 @@
 
 <script>
 	import Component from "bzd/vue/components/layout/component.vue";
-	import FileSystem from "../lib/filesystem.mjs";
 
 	export default {
 		mixins: [Component],
 		name: "TreeDirectory",
 		props: {
-			tree: { type: Object, mandatory: false, default: () => [] },
+			node: { type: Object, mandatory: true },
 			selected: { type: Object, mandatory: false, default: null },
 			depth: { type: Number, mandatory: false, default: 0 },
 		},
 		data: function () {
-			return {};
+			return {
+				list: [],
+			};
+		},
+		watch: {
+			node: {
+				async handler() {
+					let list = [];
+					for await (const node of this.node.get()) {
+						list.push(node);
+					}
+					this.list = list;
+				},
+				immediate: true,
+				deep: true,
+			},
 		},
 		computed: {
-			list() {
-				let list = Object.values(this.tree);
-				list.sort((a, b) => Intl.Collator().compare(a.name, b.name));
-				return list;
+			empty() {
+				return this.orderedList.length === 0;
+			},
+			orderedList() {
+				this.list.sort((a, b) => {
+					if (a.isFolder() != b.isFolder()) {
+						if (a.isFolder()) {
+							return -1;
+						}
+						return 1;
+					}
+					return Intl.Collator().compare(a.name, b.name);
+				});
+				return this.list;
 			},
 		},
 		methods: {
@@ -44,27 +69,21 @@
 				return {
 					entry: true,
 					child: this.depth > 0,
-					expandable: this.isFolder(node),
-					expanded: this.isExpandedFolder(node),
+					expandable: node.isFolder(),
+					expanded: node.expanded,
 					selected: this.isSelected(node),
 					clickable: this.isClickable(node),
 				};
 			},
-			isFolder(node) {
-				return FileSystem.isFolder(node);
-			},
 			isSelected(node) {
-				return this.selected && node === this.selected.node;
-			},
-			isExpandedFolder(node) {
-				return node.expanded || false;
+				return this.selected && node.node === this.selected.node;
 			},
 			isClickable(node) {
-				return "path" in node;
+				return "path" in node.node;
 			},
 			handleClick(node) {
 				if (this.isClickable(node)) {
-					this.$emit("selected", node.path);
+					this.$emit("selected", node.node.path);
 				}
 			},
 		},
@@ -154,9 +173,10 @@
 				transform: rotate(90deg) translateY(#{math.div($arrowSize, 2)}px) translateX(#{math.div($arrowSize, 2)}px);
 			}
 
-			&.selected {
+			&.selected > .text {
 				background-color: colors.$bzdGraphColorBlue;
 				color: #fff;
+				padding: 1px 5px;
 			}
 		}
 	}
