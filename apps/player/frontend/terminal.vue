@@ -1,12 +1,17 @@
 <template>
-	<div class="terminal">
-		<template v-for="line in content">
-			<span v-for="data in groupByStyleId(line)" :style="styles[data[1]]">{{ data[0] }}</span><br />
+	<div class="terminal" ref="terminal">
+		<template v-for="line in reverse(content)">
+			<div>
+				<span v-for="data in groupByStyleId(line)" :style="styles[data[1]]">{{ data[0] }}</span>
+			</div>
 		</template>
 	</div>
 </template>
 
 <script>
+	import ExceptionFactory from "bzd/core/exception.mjs";
+
+	const Exception = ExceptionFactory("terminal");
 	const colors8 = ["#000000", "#cc0000", "#4e9a06", "#c4a000", "#729fcf", "#75507b", "#06989a", "#d3d7cf"];
 	const colorsBright8 = ["#555753", "#ef2929", "#8ae234", "#fce94f", "#32afff", "#ad7fa8", "#34e2e2", "#ffffff"];
 
@@ -141,18 +146,22 @@
 				} while (i < size);
 			},
 			moveCursorUp(lines) {
+				Exception.assert(typeof lines == "number", "Must be a number.");
 				this.y = Math.max(this.y - lines, 0);
 				return true;
 			},
 			moveCursorDown(lines) {
+				Exception.assert(typeof lines == "number", "Must be a number.");
 				this.y += lines;
 				return true;
 			},
 			moveCursorRight(columns) {
+				Exception.assert(typeof columns == "number", "Must be a number.");
 				this.x += columns;
 				return true;
 			},
 			moveCursorLeft(columns) {
+				Exception.assert(typeof columns == "number", "Must be a number.");
 				this.x = Math.max(this.x - columns, 0);
 				return true;
 			},
@@ -167,10 +176,13 @@
 				return true;
 			},
 			moveCursorColumn(column) {
+				Exception.assert(typeof column == "number", "Must be a number.");
 				this.x = column;
 				return true;
 			},
 			moveCursorLineColumn(line = 0, column = 0) {
+				Exception.assert(typeof line == "number", "Must be a number.");
+				Exception.assert(typeof column == "number", "Must be a number.");
 				this.x = column;
 				this.y = line;
 				return true;
@@ -189,6 +201,30 @@
 				// Erase the entire line
 				else if (arg == 2) {
 					this.$set(this.content, this.y, []);
+				}
+				else {
+					return false;
+				}
+				return true;
+			},
+			eraseScreen(arg) {
+				// Erase from cursor until end of screen
+				if (!arg) {
+					this.eraseLine(0);
+					this.content.splice(this.y);
+				}
+				// Erase from cursor to beginning of screen
+				else if (arg == 1) {
+					this.eraseLine(1);
+					this.content.splice(0, this.y);
+				}
+				// Erase entire screen
+				else if (arg == 2) {
+					this.content = [];
+				}
+				// Erase saved lines
+				else if (arg == 3) {
+					// Ignore.
 				}
 				else {
 					return false;
@@ -224,15 +260,19 @@
 					D: this.moveCursorLeft,
 					E: this.moveCursorDownBegining,
 					F: this.moveCursorUpBegining,
+					f: this.moveCursorLineColumn,
 					G: this.moveCursorColumn,
 					H: this.moveCursorLineColumn,
-					f: this.moveCursorLineColumn,
+					J: this.eraseScreen,
 					K: this.eraseLine,
 				};
 
 				let start = 0;
 				const replacer = (match, params, name, offset) => {
-					const args = params.split(";").map((i) => parseInt(i));
+					const args = params
+						.split(";")
+						.filter(Boolean)
+						.map((i) => parseInt(i));
 
 					// Update the content.
 					this.write(stream.substring(start, offset));
@@ -250,6 +290,11 @@
 				stream.replace(regex, replacer);
 				this.write(stream.substring(start));
 			},
+			*reverse(content) {
+				for (let i = content.length - 1; i >= 0; --i) {
+					yield content[i];
+				}
+			},
 		},
 	};
 </script>
@@ -257,8 +302,13 @@
 <style lang="scss" scoped>
 	.terminal {
 		width: 100%;
+		height: 100%;
+		padding: 10px;
 		background-color: #222;
 		color: #ddd;
+		overflow: auto;
+		display: flex;
+		flex-direction: column-reverse;
 
 		> * {
 			white-space: pre-wrap;

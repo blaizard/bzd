@@ -1,16 +1,20 @@
 <template>
 	<div class="layout">
 		<div :class="setComponentClass('tree')">
-			<Tree :tree="tree" :selected="files.selected" @selected="handleTreeSelected"></Tree>
+			<Tree :node="root" :selected="files.selected" @selected="handleTreeSelected"></Tree>
 		</div>
 		<div :class="setComponentClass('content')" @click="selectComponents('content')">
-			<code v-if="files.selected" v-html="contentHTML"></code>
+			<Editor
+				v-if="selectedFile"
+				:value="content"
+				@input="handleContentUpdate"
+				:path="selectedFile.path"
+				:caret="cursor"
+				:focus="selectedComponents.includes('content')"></Editor>
 		</div>
-		<Terminal
-			:class="setComponentClass('terminal')"
-			:stream="terminal"
-			@processed="handleTerminalProcessed"
-			@click="selectComponents('terminal')"></Terminal>
+		<div :class="setComponentClass('terminal1')" @click="selectComponents('terminal1')">
+			<Terminal :stream="terminal" @processed="handleTerminalProcessed"></Terminal>
+		</div>
 	</div>
 </template>
 
@@ -18,17 +22,22 @@
 	import Layout from "bzd/vue/components/layout/layout.vue";
 	import Tree from "./tree.vue";
 	import Terminal from "./terminal.vue";
+	import Editor from "./editor.vue";
 	import Scenario from "../lib/scenario.mjs";
 	import FileSystem from "../lib/filesystem.mjs";
-	import "highlight.js/styles/github.css";
-	import HighlightJs from "highlight.js/lib/common";
 	import audioSrc from "./assets/typing/click.mp3";
+	import LogFactory from "bzd/core/log.mjs";
+
+	const Log = LogFactory("app");
+
+	const AUDIO_VOLUME = 0.1;
 
 	export default {
 		components: {
 			Layout,
 			Tree,
 			Terminal,
+			Editor,
 		},
 		data: function () {
 			return {
@@ -37,11 +46,14 @@
 				scenario: new Scenario(),
 				files: new FileSystem(this.$api),
 				selectedComponents: [],
-				selection: [0, 0],
+				cursor: 0,
 				terminal: [],
 			};
 		},
 		computed: {
+			root() {
+				return this.files.makeRootNode(this.scenario.name);
+			},
 			completed() {
 				return this.index >= this.scenario.size;
 			},
@@ -51,34 +63,22 @@
 			fastforward() {
 				return this.index < this.start;
 			},
-			tree() {
-				return { [this.scenario.name]: { name: this.scenario.name, expanded: true, children: this.files.data } };
+			selectedFile() {
+				if (this.files.selected && this.files.selected.isFile()) {
+					return this.files.selected;
+				}
+				return null;
 			},
 			content() {
-				if (this.files.selected) {
-					return this.files.selected.content;
+				if (this.selectedFile) {
+					return this.selectedFile.content;
 				}
 				return "";
-			},
-			contentHTML() {
-				// Replace the selection tags.
-				const content = this.contentHightlighted.replace().replace();
-				return content
-					.split("\n")
-					.map((line, index) => "<span class=\"line-number\">" + index + "</span>" + line)
-					.join("\n");
-			},
-			contentHightlighted() {
-				const first = this.content.slice(0, this.selection[0]);
-				const selected = this.content.slice(this.selection[0], this.selection[1]);
-				const last = this.content.slice(this.selection[1]);
-				const hightlightedFirst = HighlightJs.highlight(first, { language: "cc" }).value;
-				const hightlightedLast = HighlightJs.highlight(last, { language: "cc" }).value;
-				return hightlightedFirst + "<span class=\"selection\">" + selected + "</span>" + hightlightedLast;
 			},
 		},
 		async mounted() {
 			this.scenario = new Scenario(await this.$api.request("get", "/scenario"));
+			this.setPrompt();
 			this.$routerSet({
 				ref: "view",
 				routes: [
@@ -92,8 +92,6 @@
 					},
 				],
 			});
-
-			await this.files.list("/");
 		},
 		methods: {
 			selectComponents(...names) {
@@ -111,7 +109,7 @@
 				}
 			},
 			setSelectionEnd() {
-				this.selection = [this.content.length, this.content.length];
+				this.cursor = this.content.length;
 			},
 			async emulateTyping(object, keyName, value) {
 				for (const c of value) {
@@ -130,7 +128,7 @@
 				if (!this.fastforward) {
 					let audio = new Audio(audioSrc);
 					await this.sleep(10 + Math.random() * 200);
-					audio.volume = (key.charCodeAt(0) % 10) / 10 + 0.1;
+					audio.volume = ((key.charCodeAt(0) % 10) / 10 + 0.1) * AUDIO_VOLUME;
 					audio.play();
 				}
 			},
@@ -140,7 +138,7 @@
 				await this.emulateTyping(this.files.selected.node, "name", FileSystem.basename(path));
 			},
 			async executeFileWrite(path, content) {
-				if (!this.files.select(path)) {
+				if (!(await this.files.select(path))) {
 					await this.executeFileCreate(path);
 				}
 				this.selectedComponents = ["content"];
@@ -150,8 +148,8 @@
 			},
 			async executeFileSelect(path) {
 				this.selectedComponents = ["tree"];
-				const node = this.files.select(path);
-				if (FileSystem.isFile(node)) {
+				const node = await this.files.select(path);
+				if (node.isFile()) {
 					await this.files.selected.fetchContent();
 					this.setSelectionEnd();
 				}
@@ -176,20 +174,36 @@
 					}
 				}
 
-				this.selectedComponents = ["terminal"];
-				const index = this.terminal.length;
-				this.$set(this.terminal, index, "\x1b[0;33mbzd\x1b[0m:\x1b[34m~/" + this.scenario.name + "\x1b[0m$ ");
+				this.selectedComponents = ["terminal1"];
 				await this.emulateTypingTerminal((cmdStrDisplay || cmdStr) + "\n");
 				const stream = await this.$api.request("post", "/exec", {
 					cmds: cmdStr.split(" "),
 				});
-				for await (const chunk of streamAsyncIterable(stream)) {
-					const blob = new Blob([chunk.buffer], { type: "text/plain; charset=utf-8" });
-					const text = await blob.text();
-					this.terminal.push(text);
+				// Refresh the view every 1s.
+				const refresher = setInterval(() => {
+					this.files.refresh();
+				}, 1000);
+				try {
+					for await (const chunk of streamAsyncIterable(stream)) {
+						const blob = new Blob([chunk.buffer], { type: "text/plain; charset=utf-8" });
+						const text = await blob.text();
+						this.terminal.push(text);
+					}
+					this.files.refresh();
+				}
+				finally {
+					clearInterval(refresher);
+					this.setPrompt();
 				}
 			},
-
+			/// Set the prompt of the terminal.
+			setPrompt() {
+				this.$set(
+					this.terminal,
+					this.terminal.length,
+					"\x1b[0;33mbzd\x1b[0m:\x1b[34m~/" + this.scenario.name + "\x1b[0m$ "
+				);
+			},
 			waitingKeypress() {
 				return new Promise((resolve) => {
 					const handleKeyDown = (e) => {
@@ -239,11 +253,21 @@
 			async handleTreeSelected(path) {
 				await this.executeFileSelect(path);
 			},
+			async handleContentUpdate(data) {
+				let file = await this.files.select(data.path, /*select*/ false);
+				await file.saveContent(data.content);
+				if (this.files.selected.path == data.path) {
+					this.files.selected.content = data.content;
+				}
+				Log.info("Auto-saved {}", file.path);
+			},
 		},
 	};
 </script>
 
 <style lang="scss">
+	@use "bzd-style/css/colors.scss" as colors;
+
 	* {
 		box-sizing: border-box;
 	}
@@ -294,6 +318,11 @@
 	.selected .selection {
 		display: inline;
 	}
+
+	::selection {
+		color: #fff;
+		background-color: colors.$bzdGraphColorBlue;
+	}
 </style>
 
 <style lang="scss" scoped>
@@ -304,6 +333,7 @@
 		width: 100%;
 		padding: 0;
 		margin: 0;
+		border: 1px solid #000;
 
 		display: grid;
 		grid-gap: 0;
@@ -311,7 +341,7 @@
 		grid-template-columns: auto 1fr;
 		grid-template-areas:
 			"tree content"
-			"terminal terminal";
+			"terminal1 terminal1";
 
 		> * {
 			min-width: 0;
@@ -322,10 +352,12 @@
 		}
 
 		> .selected {
-			border: 2px solid colors.$bzdGraphColorBlue !important;
+			outline: 2px solid colors.$bzdGraphColorBlue !important;
+			z-index: 1;
 		}
-		> :not(.selected) {
-			border: 2px solid transparent;
+
+		> div {
+			transition: max-height 1s ease-out;
 		}
 
 		.tree {
@@ -340,8 +372,15 @@
 			padding: 10px;
 			white-space: pre-wrap;
 		}
-		.terminal {
-			grid-area: terminal;
+		.terminal1 {
+			grid-area: terminal1;
+			padding: 0;
+			overflow: hidden;
+
+			max-height: 50vh;
+			&.selected {
+				max-height: 80vh;
+			}
 		}
 	}
 </style>
