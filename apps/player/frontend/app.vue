@@ -25,7 +25,6 @@
 	import Editor from "./editor.vue";
 	import Scenario from "../lib/scenario.mjs";
 	import FileSystem from "../lib/filesystem.mjs";
-	import audioSrc from "./assets/typing/click.mp3";
 	import LogFactory from "bzd/core/log.mjs";
 
 	const Log = LogFactory("app");
@@ -122,7 +121,7 @@
 					this.terminal.push(c);
 				}
 			},
-			async emulateTypingKey(key) {
+			async emulateTypingKey() {
 				if (!this.fastforward) {
 					await this.sleep(10 + Math.random() * 200);
 				}

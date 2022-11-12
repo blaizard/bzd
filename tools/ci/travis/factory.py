@@ -22,7 +22,7 @@ class Travis(Factory):
 		return None
 
 	def getConfigSanitizer(self) -> typing.Optional[ConfigSanitizer]:
-		return ConfigSanitizer()
+		return ConfigSanitizer(exclude={"static_analyzer"})
 
 	def build(self) -> None:
 		self.jenkinsFile = self.renderTemplate(pathlib.Path("tools/ci/travis/.travis.btl"))

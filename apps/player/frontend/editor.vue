@@ -59,7 +59,7 @@
 					const html = this.language
 						? HighlightJs.highlight(this.value, { language: this.language }).value
 						: this.textToHTML(this.value);
-					const position = (this.caretPosition === null) ? this.getCaretPosition() : this.caretPosition;
+					const position = this.caretPosition === null ? this.getCaretPosition() : this.caretPosition;
 					this.$refs.editor.innerHTML = html;
 					this.setCaretPosition(position);
 				},
@@ -89,15 +89,15 @@
 		computed: {
 			language() {
 				const ext = this.path.split("/").pop().split(".").pop().toLowerCase();
-                switch (ext) {
+				switch (ext) {
 				case "build":
 				case "workspace":
 				case "bzl":
 					return "py";
-                default:
-                    if (HighlightJs.getLanguage(ext)) {
-                        return ext;
-                    }
+				default:
+					if (HighlightJs.getLanguage(ext)) {
+						return ext;
+					}
 				}
 				return "";
 			},

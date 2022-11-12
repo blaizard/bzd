@@ -10,10 +10,6 @@ addons:
 git:
   submodules: false
 
-cache:
-  directories:
-  - /home/travis/.cache
-
 jobs:
   include:
 
@@ -38,12 +34,6 @@ jobs:
       script:
       - cp tools/ci/travis/.bazelrc.local .bazelrc.local
       - ./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_gcc --config=prod --config=cc --platform_suffix=linux_x86_64_gcc_prod
-
-
-    - name: "[sanitizer] asan/lsan"
-      script:
-      - cp tools/ci/travis/.bazelrc.local .bazelrc.local
-      - ./tools/bazel test ... --config=linux_x86_64_clang --config=cc --config=sanitizer --config=asan --config=lsan --platform_suffix=clang_asan_lsan
 
 
     - name: "[sanitizer] sanitizer"

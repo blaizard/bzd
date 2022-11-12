@@ -10,10 +10,6 @@ addons:
 git:
   submodules: false
 
-cache:
-  directories:
-  - /home/travis/.cache
-
 jobs:
   include:
 
