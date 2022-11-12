@@ -73,7 +73,8 @@
             "name": "asan/lsan",
             "tags": [
                 "x86_64",
-                "clang"
+                "clang",
+                "static_analyzer"
             ]
         },
         {

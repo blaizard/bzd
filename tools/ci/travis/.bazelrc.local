@@ -3,9 +3,5 @@ build --show_progress_rate_limit=60
 build --noshow_loading_progress
 build --show_timestamps
 
-# Enable cache with Travis as build have time execution limits.
-startup --output_user_root=/home/travis/.cache/output
-build --disk_cache=/home/travis/.cache/bazel
-build --sandbox_add_mount_pair=/home/travis/.cache
-build --sandbox_writable_path=/home/travis/.cache
-build --//tools/bazel_build/settings/cache=/home/travis/.cache
+# cache
+build --sandbox_writable_path=/home/travis/.cache/yarn
