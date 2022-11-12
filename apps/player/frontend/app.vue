@@ -30,8 +30,6 @@
 
 	const Log = LogFactory("app");
 
-	const AUDIO_VOLUME = 0.1;
-
 	export default {
 		components: {
 			Layout,
@@ -126,10 +124,7 @@
 			},
 			async emulateTypingKey(key) {
 				if (!this.fastforward) {
-					let audio = new Audio(audioSrc);
 					await this.sleep(10 + Math.random() * 200);
-					audio.volume = ((key.charCodeAt(0) % 10) / 10 + 0.1) * AUDIO_VOLUME;
-					audio.play();
 				}
 			},
 			async executeFileCreate(path) {
@@ -207,7 +202,7 @@
 			waitingKeypress() {
 				return new Promise((resolve) => {
 					const handleKeyDown = (e) => {
-						if (e.key == " ") {
+						if (e.key == "Escape") {
 							document.removeEventListener("keydown", handleKeyDown);
 							resolve();
 						}
@@ -278,6 +273,7 @@
 		padding: 0;
 		margin: 0;
 		font-family: monospace;
+		background-color: black;
 	}
 	.content {
 		code {
@@ -329,11 +325,20 @@
 	@use "bzd-style/css/colors.scss" as colors;
 
 	.layout {
-		height: 100%;
-		width: 100%;
+		max-height: 100%;
+		max-width: 100%;
+		aspect-ratio: 16/9;
 		padding: 0;
-		margin: 0;
 		border: 1px solid #000;
+		background-color: white;
+
+		// Center the layout in the screen.
+		position: fixed;
+		margin: auto;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
 
 		display: grid;
 		grid-gap: 0;
