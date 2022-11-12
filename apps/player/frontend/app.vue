@@ -15,6 +15,7 @@
 		<div :class="setComponentClass('terminal1')" @click="selectComponents('terminal1')">
 			<Terminal :stream="terminal" @processed="handleTerminalProcessed"></Terminal>
 		</div>
+		<Camera class="camera"></Camera>
 	</div>
 </template>
 
@@ -23,6 +24,7 @@
 	import Tree from "./tree.vue";
 	import Terminal from "./terminal.vue";
 	import Editor from "./editor.vue";
+	import Camera from "./camera.vue";
 	import Scenario from "../lib/scenario.mjs";
 	import FileSystem from "../lib/filesystem.mjs";
 	import LogFactory from "bzd/core/log.mjs";
@@ -35,6 +37,7 @@
 			Tree,
 			Terminal,
 			Editor,
+			Camera,
 		},
 		data: function () {
 			return {
@@ -351,7 +354,6 @@
 			min-width: 0;
 			min-height: 0;
 			margin: 0;
-			padding: 15px;
 			overflow: auto;
 		}
 
@@ -385,6 +387,16 @@
 			&.selected {
 				max-height: 80vh;
 			}
+		}
+		.camera {
+			position: absolute;
+			bottom: 20px;
+			right: 20px;
+			width: 14%;
+			aspect-ratio: 1;
+			border-radius: 50%;
+			overflow: hidden;
+			z-index: 2;
 		}
 	}
 </style>
