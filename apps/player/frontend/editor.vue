@@ -1,6 +1,6 @@
 <template>
 	<div class="editor">
-		<code ref="editor" contenteditable="true" spellcheck="false" @keydown="handleKeyDown" @keyup="handleKeyUp"></code>
+		<code ref="editor" contenteditable="true" spellcheck="false" @keydown="handleKeyDown" @input="handleInput"></code>
 	</div>
 </template>
 
@@ -35,7 +35,8 @@
 			return {
 				currentPath: this.path,
 				updateRequested: null,
-				caretPosition: 0,
+				/// If null, it will use the existing position, otherwise, if it is a number, it will use it.
+				caretPosition: null,
 			};
 		},
 		watch: {
@@ -45,17 +46,22 @@
 					await this.$nextTick();
 					// If the path are different and an update is requested.
 					if (this.currentPath != this.path) {
-						this.caretPosition = 0;
+						this.caretPosition = null;
 						if (this.updateRequested) {
 							this.update();
 						}
 					}
+					else if (this.updateRequested) {
+						this.cancelUpdate();
+					}
+
 					this.currentPath = this.path;
 					const html = this.language
 						? HighlightJs.highlight(this.value, { language: this.language }).value
 						: this.textToHTML(this.value);
+					const position = (this.caretPosition === null) ? this.getCaretPosition() : this.caretPosition;
 					this.$refs.editor.innerHTML = html;
-					this.setCaretPosition(this.caretPosition);
+					this.setCaretPosition(position);
 				},
 				immediate: true,
 			},
@@ -74,26 +80,24 @@
 				immediate: true,
 			},
 		},
+		mounted() {
+			document.addEventListener("selectionchange", this.handleSelectionChange);
+		},
+		beforeUnmount() {
+			document.removeEventListener("selectionchange", this.handleSelectionChange);
+		},
 		computed: {
 			language() {
 				const ext = this.path.split("/").pop().split(".").pop().toLowerCase();
-				switch (ext) {
+                switch (ext) {
 				case "build":
 				case "workspace":
 				case "bzl":
 					return "py";
-				case "cc":
-				case "hh":
-					return "cc";
-				case "c":
-				case "h":
-					return "c";
-				case "py":
-					return "py";
-				case "sh":
-					return "sh";
-				case "java":
-					return "java";
+                default:
+                    if (HighlightJs.getLanguage(ext)) {
+                        return ext;
+                    }
 				}
 				return "";
 			},
@@ -137,6 +141,8 @@
 				range.insertNode(node);
 				range.setStartAfter(node);
 				range.setEndAfter(node);
+				// Trigger the input event.
+				this.handleInput();
 			},
 			textToHTML(text) {
 				return text
@@ -146,6 +152,15 @@
 					.replace(/"/g, "&quot;")
 					.replace(/'/g, "&#039;");
 			},
+			cancelUpdate() {
+				clearTimeout(this.updateRequested);
+				this.updateRequested = null;
+			},
+			update() {
+				const value = this.$refs.editor.textContent;
+				this.$emit("input", { path: this.currentPath, content: value });
+				this.cancelUpdate();
+			},
 			handleKeyDown(e) {
 				// tab.
 				if (e.keyCode == 9) {
@@ -153,16 +168,11 @@
 					this.insertText("\u0009");
 				}
 			},
-			update() {
-				const value = this.$refs.editor.textContent;
-				this.$emit("input", { path: this.currentPath, content: value });
-				clearTimeout(this.updateRequested);
-				this.updateRequested = null;
+			handleSelectionChange() {
+				this.caretPosition = null;
 			},
-			handleKeyUp() {
-				clearTimeout(this.updateRequested);
-				// Save the current caret position.
-				this.caretPosition = this.getCaretPosition();
+			handleInput() {
+				this.cancelUpdate();
 				this.updateRequested = setTimeout(this.update, 1000);
 			},
 		},

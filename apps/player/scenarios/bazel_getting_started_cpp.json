@@ -49,14 +49,57 @@
         {
             "action": "exec",
             "args": [
-                "ls -ll --color=always bazel-bin/",
-                "ls -ll bazel-bin/"
+                "bazel run //:main --color=yes --curses=yes",
+                "bazel run //:main"
             ]
         },
         {
             "action": "exec",
             "args": [
-                "clear"
+                "bazel clean --color=yes --curses=yes",
+                "bazel clean"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "bazel build //:main --color=yes --curses=yes -s",
+                "bazel build //:main -s"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "bazel build //:main --color=yes --curses=yes --copt=-O0 -s",
+                "bazel build //:main --copt=-O0 -s"
+            ]
+        },
+        {
+            "action": "file.write",
+            "args": [
+                "mylib.hh",
+                "#pragma once\n\nconst char* getName() noexcept;\n"
+            ]
+        },
+        {
+            "action": "file.write",
+            "args": [
+                "mylib.cc",
+                "#include \"mylib.hh\"\n\nconst char* getName() noexcept\n{\n\treturn \"Bazel\";\n}\n"
+            ]
+        },
+        {
+            "action": "file.write",
+            "args": [
+                "BUILD",
+                "\ncc_library(\n\tname = \"mylib\",\n\thdrs = [\"mylib.hh\"],\n\tsrcs = [\"mylib.cc\"],\n)\n"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "bazel run //:main --color=yes --curses=yes",
+                "bazel run //:main"
             ]
         }
     ],
