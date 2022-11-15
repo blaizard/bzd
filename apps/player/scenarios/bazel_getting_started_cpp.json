@@ -3,14 +3,89 @@
         {
             "action": "file.create",
             "args": [
-                "main.cc"
+                "WORKSPACE"
+            ]
+        },
+        {
+            "action": "file.create",
+            "args": [
+                "select/BUILD"
             ]
         },
         {
             "action": "file.write",
             "args": [
-                "main.cc",
-                "#include <iostream>\n\nint main()\n{\n\tstd::cout << \"Hello World!\" << std::endl;\n\treturn 0;\n}\n"
+                "select/BUILD",
+                "genrule(\n\tname = \"os\",\n\touts = [\"os.txt\"],\n\tcmd = select({\n\t\t\"@platforms//os:linux\": \"echo 'Linux' > $@\",\n\t\t\"@platforms//os:windows\": \"echo 'Windows' > $@\",\n\t})\n)\n"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "bazel build //select:os --color=yes --curses=yes",
+                "bazel build //select:os"
+            ]
+        },
+        {
+            "action": "file.create",
+            "args": [
+                "target_compatible_with/linux.sh",
+                "1"
+            ]
+        },
+        {
+            "action": "file.write",
+            "args": [
+                "target_compatible_with/linux.sh",
+                "ping -c 1 -w 1 \"www.google.com\"\n"
+            ]
+        },
+        {
+            "action": "file.create",
+            "args": [
+                "target_compatible_with/windows.bat",
+                "1"
+            ]
+        },
+        {
+            "action": "file.write",
+            "args": [
+                "target_compatible_with/windows.bat",
+                "Ping \"www.google.com\" -n 1 -w 1\n"
+            ]
+        },
+        {
+            "action": "file.create",
+            "args": [
+                "target_compatible_with/BUILD"
+            ]
+        },
+        {
+            "action": "file.write",
+            "args": [
+                "target_compatible_with/BUILD",
+                "sh_test(\n\tname = \"linux\",\n\tsrcs = [\"linux.sh\"],\n\ttarget_compatible_with = [\n\t\t\"@platforms//os:linux\"\n\t]\n)\n"
+            ]
+        },
+        {
+            "action": "file.write",
+            "args": [
+                "target_compatible_with/BUILD",
+                "\nsh_test(\n\tname = \"windows\",\n\tsrcs = [\"windows.bat\"],\n\ttarget_compatible_with = [\n\t\t\"@platforms//os:windows\"\n\t]\n)\n"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "bazel test //... --color=yes --curses=yes",
+                "bazel test //..."
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "bazel test //target_compatible_with:windows --color=yes --curses=yes",
+                "bazel test //target_compatible_with:windows"
             ]
         },
         {
@@ -23,85 +98,51 @@
             "action": "file.write",
             "args": [
                 "BUILD",
-                "cc_binary(\n\tname = \"main\",\n\tsrcs = [\"main.cc\"],\n)\n"
-            ]
-        },
-        {
-            "action": "file.create",
-            "args": [
-                "WORKSPACE"
+                "platform(\n\tname = \"windows\",\n\tconstraint_values = [\n\t\t\"@platforms//os:windows\",\n\t],\n)\n"
             ]
         },
         {
             "action": "exec",
             "args": [
-                "bazel build //... --color=yes --curses=yes",
-                "bazel build //..."
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
-                "bazel run //:main --color=yes --curses=yes",
-                "bazel run //:main"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
-                "bazel run //:main --color=yes --curses=yes",
-                "bazel run //:main"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
-                "bazel clean --color=yes --curses=yes",
-                "bazel clean"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
-                "bazel build //:main --color=yes --curses=yes -s",
-                "bazel build //:main -s"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
-                "bazel build //:main --color=yes --curses=yes --copt=-O0 -s",
-                "bazel build //:main --copt=-O0 -s"
-            ]
-        },
-        {
-            "action": "file.write",
-            "args": [
-                "mylib.hh",
-                "#pragma once\n\nconst char* getName() noexcept;\n"
-            ]
-        },
-        {
-            "action": "file.write",
-            "args": [
-                "mylib.cc",
-                "#include \"mylib.hh\"\n\nconst char* getName() noexcept\n{\n\treturn \"Bazel\";\n}\n"
+                "bazel test //... --color=yes --curses=yes --platforms=//:windows",
+                "bazel test //... --platforms=//:windows"
             ]
         },
         {
             "action": "file.write",
             "args": [
                 "BUILD",
-                "\ncc_library(\n\tname = \"mylib\",\n\thdrs = [\"mylib.hh\"],\n\tsrcs = [\"mylib.cc\"],\n)\n"
+                "\nconstraint_value(\n\tname = \"myos\",\n\tconstraint_setting = \"@platforms//os:os\",\n)\n"
+            ]
+        },
+        {
+            "action": "file.write",
+            "args": [
+                "BUILD",
+                "\nplatform(\n\tname = \"custom\",\n\tconstraint_values = [\n\t\t\":myos\",\n\t],\n)\n"
             ]
         },
         {
             "action": "exec",
             "args": [
-                "bazel run //:main --color=yes --curses=yes",
-                "bazel run //:main"
+                "bazel test //target_compatible_with/... --color=yes --curses=yes --platforms=//:custom",
+                "bazel test //target_compatible_with/... --platforms=//:custom"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "bazel test //... --color=yes --curses=yes --platforms=//:custom",
+                "bazel test //... --platforms=//:custom"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "bazel test //... --color=yes --curses=yes --platforms=//:custom",
+                "bazel test //... --platforms=//:custom"
             ]
         }
     ],
-    "name": "bazel-c++-getting-started"
+    "name": "bazel-platforms-getting-started"
 }

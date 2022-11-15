@@ -10,6 +10,7 @@ import StorageDisk from "bzd/db/storage/disk.mjs";
 import { spawn } from "child_process";
 import { Readable } from "stream";
 import Scenario from "../lib/scenario.mjs";
+import Permissions from "bzd/db/storage/permissions.mjs";
 
 const Log = LogFactory("backend");
 
@@ -61,6 +62,17 @@ function pathToPathList(path) {
 
 	api.handle("post", "/file/content", async (inputs) => {
 		await storage.writeFromChunk(pathToPathList(inputs.path), inputs.content || "");
+	});
+
+	api.handle("post", "/file/executable", async (inputs) => {
+		await storage.setPermission(
+			pathToPathList(inputs.path),
+			new Permissions({
+				read: true,
+				write: true,
+				executable: true,
+			})
+		);
 	});
 
 	api.handle("get", "/file/list", async (inputs) => {

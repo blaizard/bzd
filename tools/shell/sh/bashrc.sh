@@ -142,6 +142,12 @@ bzd_math() {
     python -c "${py_code}"
 }
 
+# ---- Content from google_chrome.sh
+bzd_google_chrome() {
+    # Start chrome in an isolated sandbox and it will not affect the main chrome profile.
+    google-chrome --disable-site-isolation-trials --disable-web-security --allow-file-access-from-files --user-data-dir=/tmp
+}
+
 # ---- Content from prompt.sh
 # Set the prompt
 _bzd_parse_git_branch()

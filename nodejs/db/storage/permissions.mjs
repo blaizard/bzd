@@ -10,12 +10,11 @@ export default class Permissions {
 			write: permissionsStr.includes("w"),
 			delete: permissionsStr.includes("d"),
 			list: permissionsStr.includes("l"),
+			executable: permissionsStr.includes("x"),
 		});
 	}
 
-	/**
-	 * Helper to add capabilities to entries.
-	 */
+	/// Helper to add capabilities to entries.
 	static makeEntry(entry, permissions) {
 		entry.permissions = new Permissions(permissions).encode();
 		return entry;
@@ -26,7 +25,8 @@ export default class Permissions {
 			(this.permissions.read ? "r" : "") +
 			(this.permissions.write ? "w" : "") +
 			(this.permissions.delete ? "d" : "") +
-			(this.permissions.list ? "l" : "")
+			(this.permissions.list ? "l" : "") +
+			(this.permissions.executable ? "x" : "")
 		);
 	}
 
@@ -44,6 +44,10 @@ export default class Permissions {
 
 	isList() {
 		return this.permissions.list || false;
+	}
+
+	isExecutable() {
+		return this.permissions.executable || false;
 	}
 
 	toString() {

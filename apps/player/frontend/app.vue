@@ -129,10 +129,13 @@
 					await this.sleep(10 + Math.random() * 200);
 				}
 			},
-			async executeFileCreate(path) {
+			async executeFileCreate(path, executable = false) {
 				this.selectedComponents = ["tree"];
 				await this.files.createFile(path, "");
 				await this.emulateTyping(this.files.selected.node, "name", FileSystem.basename(path));
+				if (executable !== false) {
+					await this.files.setExecutable(path);
+				}
 			},
 			async executeFileWrite(path, content) {
 				if (!(await this.files.select(path))) {
@@ -385,7 +388,7 @@
 
 			max-height: 50vh;
 			&.selected {
-				max-height: 80vh;
+				max-height: 50vh;
 			}
 		}
 		.camera {
@@ -396,7 +399,7 @@
 			aspect-ratio: 1;
 			border-radius: 50%;
 			overflow: hidden;
-			z-index: 2;
+			z-index: 3;
 		}
 	}
 </style>

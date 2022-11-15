@@ -37,6 +37,17 @@
             }
         }
     },
+    "/file/executable": {
+        "post": {
+            "documentation": "Make a file executable",
+            "request": {
+                "type": "query",
+                "validation": {
+                    "path": "mandatory"
+                }
+            }
+        }
+    },
     "/file/list": {
         "get": {
             "documentation": "List the content of a folder at a given path.",
