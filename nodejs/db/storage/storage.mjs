@@ -50,4 +50,9 @@ export default class Storage extends AsyncInitialize {
 	async delete(path) {
 		return this._deleteImpl(Array.isArray(path) ? path : [path]);
 	}
+
+	/// Set the permissions of a file
+	async setPermission(path, permissions) {
+		return this._setPermissionImpl(Array.isArray(path) ? path : [path], permissions);
+	}
 }

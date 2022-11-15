@@ -135,4 +135,19 @@ export default class StorageDisk extends Storage {
 		}
 		return new CollectionPaging([]);
 	}
+
+	async _setPermissionImpl(pathList, permissions) {
+		// Create the permission.
+		let mode = 0;
+		if (permissions.isRead()) {
+			mode |= 0o400 | 0o40 | 0o4;
+		}
+		if (permissions.isWrite()) {
+			mode |= 0o200 | 0o20 | 0o2;
+		}
+		if (permissions.isExecutable()) {
+			mode |= 0o100 | 0o10 | 0o1;
+		}
+		return await FileSystem.chmod(this._getFullPath(pathList), mode);
+	}
 }

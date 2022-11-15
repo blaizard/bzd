@@ -1,6 +1,11 @@
 <template>
 	<div class="editor">
-		<code ref="editor" contenteditable="true" spellcheck="false" @keydown="handleKeyDown" @input="handleInput"></code>
+		<code
+			ref="editor"
+			contenteditable="plaintext-only"
+			spellcheck="false"
+			@keydown="handleKeyDown"
+			@input="handleInput"></code>
 	</div>
 </template>
 

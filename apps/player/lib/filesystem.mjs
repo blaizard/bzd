@@ -165,8 +165,6 @@ export default class FileSystem {
 	}
 
 	/// Create a new file at a given path.
-	///
-	/// \return The node representing the file created.
 	async createFile(path, initialName = null) {
 		const dirname = FileSystem.dirname(path);
 		const basename = FileSystem.basename(path);
@@ -194,6 +192,12 @@ export default class FileSystem {
 		}
 		this.selected = current;
 		return current;
+	}
+
+	/// Set file permission.
+	async setExecutable(path) {
+		Exception.assert(await this.select(path), "The file must exists");
+		await this.api.request("post", "/file/executable", { path: path });
 	}
 
 	/// Get a node refered at a specified path.

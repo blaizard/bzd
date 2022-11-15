@@ -89,6 +89,11 @@ export default class FileSystem {
 		await Fs.promises.unlink(path);
 	}
 
+	/// Changes the permissions of a file.
+	static async chmod(path, mode) {
+		await Fs.promises.chmod(path, mode);
+	}
+
 	/// Append data to a file
 	static async appendFile(path, data) {
 		await Fs.promises.appendFile(path, data);
