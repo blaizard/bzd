@@ -25,6 +25,7 @@
 				styleId: -1,
 				x: 0,
 				y: 0,
+				remainder: "",
 			};
 		},
 		created() {
@@ -39,8 +40,8 @@
 			stream: {
 				handler() {
 					const count = this.stream.length;
-					const update = this.stream.reduce((obj, value) => obj + value, "");
-					this.process(update);
+					const update = this.stream.reduce((obj, value) => obj + value, this.remainder);
+					this.remainder = this.process(update);
 					if (count) {
 						this.$emit("processed", count);
 					}
@@ -286,9 +287,18 @@
 					return match;
 				};
 
-				const regex = new RegExp("\\x1b\\[([0-9;]*)([a-zA-Z])", "g");
+				const regex = new RegExp("\\x1b\\[([0-9;]*)([^0-9;])", "g");
 				stream.replace(regex, replacer);
-				this.write(stream.substring(start));
+				const remainder = stream.substring(start);
+				// If a special character is truncated at the end of the string,
+				// keep the remainder and return what is left.
+				const index = remainder.lastIndexOf("\\x1b");
+				if (index >= 0) {
+					this.write(remainder.substring(0, index));
+					return remainder.substring(index);
+				}
+				this.write(remainder);
+				return "";
 			},
 			*reverse(content) {
 				for (let i = content.length - 1; i >= 0; --i) {

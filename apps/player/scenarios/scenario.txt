@@ -1,0 +1,11 @@
+name bazel-platforms-getting-started
+file.create WORKSPACE
+file.create select/BUILD
+file.write select/BUILD """genrule(
+    name = "os",
+    outs = ["os.txt"],
+    cmd = select({
+        "@platforms//os:linux": "echo 'Linux' > $@",
+        "@platforms//os:windows": "echo 'Windows' > $@",
+    })
+)"""
