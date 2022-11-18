@@ -26,22 +26,13 @@ TEST(SubRange, Simple)
 }
 
 template <class T>
-concept hasSize = requires(T& t)
-{
-	t.size();
-};
+concept hasSize = requires(T& t) { t.size(); };
 
 template <class T>
-concept hasData = requires(T& t)
-{
-	t.data();
-};
+concept hasData = requires(T& t) { t.data(); };
 
 template <class T>
-concept hasRandomAccessor = requires(T& t)
-{
-	t[0];
-};
+concept hasRandomAccessor = requires(T& t) { t[0]; };
 
 TEST(SubRange, VariousTypes)
 {

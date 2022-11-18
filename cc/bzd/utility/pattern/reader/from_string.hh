@@ -20,16 +20,11 @@ struct Metadata
 // ---- Formatter ----
 
 template <class Range, class T>
-concept fromStringFormatterWithMetadata = requires(Range& range, T& value)
-{
-	::fromString(range, value, bzd::typeTraits::declval<const Metadata>());
-};
+concept fromStringFormatterWithMetadata =
+	requires(Range& range, T& value) { ::fromString(range, value, bzd::typeTraits::declval<const Metadata>()); };
 
 template <class Range, class T>
-concept fromStringFormatter = requires(Range& range, T& value)
-{
-	::fromString(range, value);
-};
+concept fromStringFormatter = requires(Range& range, T& value) { ::fromString(range, value); };
 
 class StringReader
 {

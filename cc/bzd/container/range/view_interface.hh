@@ -19,27 +19,37 @@ public:
 	constexpr Bool empty() const noexcept { return (child().begin() == child().end()); }
 
 	template <Bool True = true>
-	requires(True&& concepts::forwardRange<CRTP<True>>&&
-				 concepts::sizedSentinelFor<typeTraits::RangeIterator<CRTP<True>>,
-											typeTraits::RangeSentinel<CRTP<True>>>) constexpr auto size() const noexcept
+	requires(True && concepts::forwardRange<CRTP<True>> &&
+			 concepts::sizedSentinelFor<typeTraits::RangeIterator<CRTP<True>>, typeTraits::RangeSentinel<CRTP<True>>>)
+	constexpr auto size() const noexcept
 	{
 		return child().end() - child().begin();
 	}
 
 	template <Bool True = true>
-	requires(True&& concepts::contiguousRange<CRTP<True>>) constexpr const auto* data() const noexcept { return &(*(child().begin())); }
+	requires(True && concepts::contiguousRange<CRTP<True>>)
+	constexpr const auto* data() const noexcept
+	{
+		return &(*(child().begin()));
+	}
 
 	template <Bool True = true>
-	requires(True&& concepts::contiguousRange<CRTP<True>>) constexpr auto* data() noexcept { return &(*(child().begin())); }
+	requires(True && concepts::contiguousRange<CRTP<True>>)
+	constexpr auto* data() noexcept
+	{
+		return &(*(child().begin()));
+	}
 
 	template <Bool True = true>
-	requires(True&& concepts::randomAccessRange<CRTP<True>>) constexpr auto& operator[](const Size index) noexcept
+	requires(True && concepts::randomAccessRange<CRTP<True>>)
+	constexpr auto& operator[](const Size index) noexcept
 	{
 		return *(child().begin() + index);
 	}
 
 	template <Bool True = true>
-	requires(True&& concepts::randomAccessRange<CRTP<True>>) constexpr const auto& operator[](const Size index) const noexcept
+	requires(True && concepts::randomAccessRange<CRTP<True>>)
+	constexpr const auto& operator[](const Size index) const noexcept
 	{
 		return *(child().begin() + index);
 	}

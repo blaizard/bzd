@@ -10,10 +10,8 @@ namespace bzd::format::impl {
 // ---- Formatter ----
 
 template <class Range, class T>
-concept toStreamFormatterWithMetadata = requires(Range& range, const T& value)
-{
-	toStream(range, value, bzd::typeTraits::declval<const Metadata>());
-};
+concept toStreamFormatterWithMetadata =
+	requires(Range& range, const T& value) { toStream(range, value, bzd::typeTraits::declval<const Metadata>()); };
 
 class StreamFormatter
 {
@@ -36,10 +34,8 @@ public:
 // Specialization of toStream for the native types
 
 template <class T>
-requires(concepts::integral<T> || concepts::floatingPoint<T> ||
-		 (concepts::pointer<T> &&
-		  !concepts::constructible<bzd::StringView, T>)) Async<> toStream(bzd::OStream& stream, const T& value, const Metadata& metadata)
-noexcept
+requires(concepts::integral<T> || concepts::floatingPoint<T> || (concepts::pointer<T> && !concepts::constructible<bzd::StringView, T>))
+Async<> toStream(bzd::OStream& stream, const T& value, const Metadata& metadata) noexcept
 {
 	bzd::String<80> str{};
 	toString(str, value, metadata);

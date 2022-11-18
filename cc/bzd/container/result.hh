@@ -88,9 +88,8 @@ public: // Constructors
 
 	// Forwards arguments to construct the value to the storage type.
 	template <class... Args>
-	requires(!IsSelf<typeTraits::FirstType<Args...>>::value &&
-			 !typeTraits::isBaseOf<ResultError<E>, typeTraits::FirstType<Args...>>) constexpr Result(Args&&... args) noexcept :
-		data_{bzd::inPlaceType<ValueContainer>, bzd::forward<Args>(args)...}
+	requires(!IsSelf<typeTraits::FirstType<Args...>>::value && !typeTraits::isBaseOf<ResultError<E>, typeTraits::FirstType<Args...>>)
+	constexpr Result(Args&&... args) noexcept : data_{bzd::inPlaceType<ValueContainer>, bzd::forward<Args>(args)...}
 	{
 	}
 
@@ -103,7 +102,8 @@ public: // Constructors
 	// Value assignment is forbidden on reference type. This is because it is confusing whether the
 	// existing reference updates its value or the reference gets re-assigned.
 	template <class U>
-	requires(!IsSelf<U>::value && concepts::reference<T>) constexpr Self& operator=(U) noexcept = delete;
+	requires(!IsSelf<U>::value && concepts::reference<T>)
+	constexpr Self& operator=(U) noexcept = delete;
 
 public: // API
 	/// Checks whether the result contains a value.

@@ -75,10 +75,14 @@ public: // Modifiers.
 	/// \param value Value to be copied (or moved) to the new element.
 	template <class U>
 	requires concepts::convertible<U, T>
-	constexpr Size append(U&& value) noexcept { return appendInternal(bzd::forward<U>(value)); }
+	constexpr Size append(U&& value) noexcept
+	{
+		return appendInternal(bzd::forward<U>(value));
+	}
 
 	/// Trivially copyable objects of 1 byte size can be directly constructed from bytes.
-	constexpr Size append(const Byte value) noexcept requires(sizeof(T) == 1u && typeTraits::isTriviallyCopyable<T>)
+	constexpr Size append(const Byte value) noexcept
+	requires(sizeof(T) == 1u && typeTraits::isTriviallyCopyable<T>)
 	{
 		return appendInternal(reinterpret_cast<const T&>(value));
 	}
@@ -98,7 +102,10 @@ public: // Modifiers.
 
 	template <class Range>
 	requires concepts::forwardRange<Range>
-	constexpr Size append(Range&& range) { return append(bzd::begin(range), bzd::end(range)); }
+	constexpr Size append(Range&& range)
+	{
+		return append(bzd::begin(range), bzd::end(range));
+	}
 
 	/// Appends a new element to the end of the container.
 	/// The element is constructed through using placement-new in-place.

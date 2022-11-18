@@ -133,8 +133,8 @@ private: // Variables.
 };
 
 template <class T, class Value>
-requires concepts::containerAppendable<T, Value> bzd::Async<T> make(bzd::Generator<Value>&& generator)
-noexcept
+requires concepts::containerAppendable<T, Value>
+bzd::Async<T> make(bzd::Generator<Value>&& generator) noexcept
 {
 	T container;
 	co_await !bzd::async::forEach(bzd::move(generator), [&container](const Value& value) { container.append(value); });
