@@ -31,7 +31,7 @@ curl -L https://ftp.gnu.org/gnu/gcc/gcc-${GCC_VERSION}/gcc-${GCC_VERSION}.tar.xz
 mkdir gcc-${GCC_VERSION}-build
 pushd gcc-${GCC_VERSION}-build
 
-../gcc-${GCC_VERSION}/configure --prefix="$(pwd)/../${PACKAGE}" --disable-multilib --enable-languages=c,c++,lto
+../gcc-${GCC_VERSION}/configure --prefix="$(pwd)/../${PACKAGE}" --disable-multilib --disable-bootstrap --enable-languages=c,c++,lto
 make -j$(nproc)
 make install
 
