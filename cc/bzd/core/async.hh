@@ -292,12 +292,11 @@ public:
 
 namespace bzd::concepts {
 template <class T>
-concept async = requires(T t)
-{
-	{
-		t.type
-		} -> sameAs<const bzd::impl::AsyncType&>;
-};
+concept async = requires(T t) {
+					{
+						t.type
+						} -> sameAs<const bzd::impl::AsyncType&>;
+				};
 template <class T>
 concept asyncTask = sameTemplate<T, bzd::Async>;
 template <class T>
@@ -338,14 +337,18 @@ constexpr auto suspend(Args&&... args) noexcept
 
 /// Executes multiple asynchronous function according to the executor policy and return once all are completed.
 template <concepts::async... Asyncs>
-requires(!concepts::lValueReference<Asyncs> &&
-		 ...) impl::Async<typename bzd::coroutine::impl::EnqueueAll<Asyncs...>::ResultType, impl::AsyncTaskTraits> all(Asyncs&&... asyncs)
-noexcept { co_return (co_await bzd::coroutine::impl::EnqueueAll<Asyncs...>{bzd::forward<Asyncs>(asyncs)...}); }
+requires(!concepts::lValueReference<Asyncs> && ...)
+impl::Async<typename bzd::coroutine::impl::EnqueueAll<Asyncs...>::ResultType, impl::AsyncTaskTraits> all(Asyncs&&... asyncs) noexcept
+{
+	co_return (co_await bzd::coroutine::impl::EnqueueAll<Asyncs...>{bzd::forward<Asyncs>(asyncs)...});
+}
 
 /// Executes multiple asynchronous function according to the executor policy and return once at least one of them is completed.
 template <concepts::async... Asyncs>
-requires(!concepts::lValueReference<Asyncs> &&
-		 ...) impl::Async<typename bzd::coroutine::impl::EnqueueAny<Asyncs...>::ResultType, impl::AsyncTaskTraits> any(Asyncs&&... asyncs)
-noexcept { co_return (co_await bzd::coroutine::impl::EnqueueAny<Asyncs...>{bzd::forward<Asyncs>(asyncs)...}); }
+requires(!concepts::lValueReference<Asyncs> && ...)
+impl::Async<typename bzd::coroutine::impl::EnqueueAny<Asyncs...>::ResultType, impl::AsyncTaskTraits> any(Asyncs&&... asyncs) noexcept
+{
+	co_return (co_await bzd::coroutine::impl::EnqueueAny<Asyncs...>{bzd::forward<Asyncs>(asyncs)...});
+}
 
 } // namespace bzd::async

@@ -7,11 +7,10 @@
 namespace bzd::concepts {
 
 template <class T, class... Args>
-concept predicate = requires(T&& t, Args&&... args)
-{
-	{
-		t(bzd::forward<Args>(args)...)
-		} -> convertible<Bool>;
-};
+concept predicate = requires(T&& t, Args&&... args) {
+						{
+							t(bzd::forward<Args>(args)...)
+							} -> convertible<Bool>;
+					};
 
 } // namespace bzd::concepts

@@ -50,13 +50,22 @@ constexpr NoType tupleChooseN()
 }
 
 template <Size Index, class T, class... Ts>
-requires(Index > sizeof...(Ts)) constexpr NoType tupleChooseN(T&&, Ts&&...) { return NoType{}; }
+requires(Index > sizeof...(Ts))
+constexpr NoType tupleChooseN(T&&, Ts&&...)
+{
+	return NoType{};
+}
 
 template <Size Index, class T, class... Ts>
-requires(Index == 0) constexpr decltype(auto) tupleChooseN(T&& t, Ts&&...) { return bzd::forward<T>(t); }
+requires(Index == 0)
+constexpr decltype(auto) tupleChooseN(T&& t, Ts&&...)
+{
+	return bzd::forward<T>(t);
+}
 
 template <Size Index, class T, class... Ts>
-requires(Index > 0 && Index <= sizeof...(Ts)) constexpr decltype(auto) tupleChooseN(T&&, Ts&&... ts)
+requires(Index > 0 && Index <= sizeof...(Ts))
+constexpr decltype(auto) tupleChooseN(T&&, Ts&&... ts)
 {
 	return tupleChooseN<Index - 1>(bzd::forward<Ts>(ts)...);
 }
@@ -71,9 +80,8 @@ public:
 	constexpr TupleElem(const T& value) noexcept : elem_(value) {}
 	template <class Value>
 	requires(!concepts::sameAs<Value, NoType>)
-		// NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
-		constexpr TupleElem(Value&& value) noexcept :
-		elem_{bzd::forward<Value>(value)}
+	// NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
+	constexpr TupleElem(Value&& value) noexcept : elem_{bzd::forward<Value>(value)}
 	{
 	}
 	constexpr TupleElem(const NoType&) noexcept : elem_{} {}

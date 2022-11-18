@@ -48,10 +48,8 @@ struct Metadata
 // ---- Formatter ----
 
 template <class Range, class T>
-concept toStringFormatterWithMetadata = requires(Range range, T value)
-{
-	toString(range, value, bzd::typeTraits::declval<const Metadata>());
-};
+concept toStringFormatterWithMetadata =
+	requires(Range range, T value) { toString(range, value, bzd::typeTraits::declval<const Metadata>()); };
 
 class StringFormatter
 {
@@ -311,9 +309,8 @@ constexpr void toString(bzd::interface::String& str, const T value, const Metada
 }
 
 template <class T>
-requires(concepts::pointer<T> && !concepts::constructible<bzd::StringView, T>) constexpr void toString(bzd::interface::String& str,
-																									   const T value,
-																									   const Metadata&) noexcept
+requires(concepts::pointer<T> && !concepts::constructible<bzd::StringView, T>)
+constexpr void toString(bzd::interface::String& str, const T value, const Metadata&) noexcept
 {
 	Metadata metadata{};
 	metadata.format = Metadata::Format::HEXADECIMAL_LOWER;

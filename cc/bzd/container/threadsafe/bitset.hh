@@ -29,7 +29,8 @@ public:
 
 	/// Create a bitset from a string filled with '0' and '1's.
 	template <Size dataN>
-	requires(dataN - 1u == n) constexpr Bitset(const char (&data)[dataN]) noexcept
+	requires(dataN - 1u == n)
+	constexpr Bitset(const char (&data)[dataN]) noexcept
 	{
 		for (Size index = 0, unitIndex = 0; index < n; ++unitIndex)
 		{

@@ -169,10 +169,7 @@ public:
 };
 
 template <class Adapter, class Range, class Value, class Metadata>
-concept compatibleProcessor = requires(Range& range, Value& value, Metadata& metadata)
-{
-	Adapter::process(range, value, metadata);
-};
+concept compatibleProcessor = requires(Range& range, Value& value, Metadata& metadata) { Adapter::process(range, value, metadata); };
 
 /// Check the pattern context.
 ///

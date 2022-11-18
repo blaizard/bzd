@@ -59,15 +59,16 @@ public: // Constructors
 
 	// Forward constructor to storage type for all non-self typed
 	template <class... Args>
-	requires(!IsSelf<typeTraits::FirstType<Args...>>::value) constexpr Optional(Args&&... args) noexcept :
-		data_{bzd::inPlaceType<ValueContainer>, bzd::forward<Args>(args)...}
+	requires(!IsSelf<typeTraits::FirstType<Args...>>::value)
+	constexpr Optional(Args&&... args) noexcept : data_{bzd::inPlaceType<ValueContainer>, bzd::forward<Args>(args)...}
 	{
 	}
 
 	// Value assignment is forbidden on reference type. This is because it is confusing whether the
 	// existing reference updates its value or the reference gets re-assigned.
 	template <class U>
-	requires(!IsSelf<U>::value && concepts::reference<T>) constexpr Self& operator=(U) noexcept = delete;
+	requires(!IsSelf<U>::value && concepts::reference<T>)
+	constexpr Self& operator=(U) noexcept = delete;
 
 public: // Comparators.
 	[[nodiscard]] constexpr Bool operator==(const Self& other) const noexcept { return (data_ == other.data_); }

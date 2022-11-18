@@ -9,17 +9,13 @@
 namespace bzd::concepts {
 
 template <class T>
-concept range = requires(T& t)
-{
-	bzd::begin(t);
-	bzd::end(t);
-};
+concept range = requires(T& t) {
+					bzd::begin(t);
+					bzd::end(t);
+				};
 
 template <class T>
-concept sizedRange = range<T> && requires(T& t)
-{
-	bzd::size(t);
-};
+concept sizedRange = range<T> && requires(T& t) { bzd::size(t); };
 
 } // namespace bzd::concepts
 

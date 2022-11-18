@@ -88,14 +88,16 @@ public: // Constructors/assignments.
 	}
 
 	template <Size otherCapacity>
-	requires(otherCapacity < capacity) constexpr Vector(const Vector<T, otherCapacity>& other) noexcept : Vector{}
+	requires(otherCapacity < capacity)
+	constexpr Vector(const Vector<T, otherCapacity>& other) noexcept : Vector{}
 	{
 		this->resize(other.size());
 		algorithm::copy(other, *this);
 	}
 
 	template <Size otherCapacity>
-	requires(otherCapacity < capacity) constexpr Vector(Vector<T, otherCapacity>&& other) noexcept : Vector{}
+	requires(otherCapacity < capacity)
+	constexpr Vector(Vector<T, otherCapacity>&& other) noexcept : Vector{}
 	{
 		this->resize(other.size());
 		algorithm::move(bzd::move(other), *this);

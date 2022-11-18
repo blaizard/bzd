@@ -342,7 +342,8 @@ public:
 	///
 	/// \param element Element to be inserted.
 	/// \return An error in case of failure, void otherwise.
-	[[nodiscard]] constexpr Result<void> popToDiscard(ElementType& element) noexcept requires(ElementType::supportDiscard)
+	[[nodiscard]] constexpr Result<void> popToDiscard(ElementType& element) noexcept
+	requires(ElementType::supportDiscard)
 	{
 		const auto result = pop(element);
 		if (result)
@@ -485,7 +486,8 @@ public:
 
 	/// Pop the current element from the list. This is available only if
 	/// supportMultiContainer is enabled, as it has the knowledge of the parent container.
-	[[nodiscard]] constexpr Result<void> pop() noexcept requires(supportMultiContainer)
+	[[nodiscard]] constexpr Result<void> pop() noexcept
+	requires(supportMultiContainer)
 	{
 		auto* container = static_cast<Container*>(this->parent_.load());
 		if (container)
@@ -497,7 +499,8 @@ public:
 
 	/// Pop the current element from the list. This is available only if
 	/// supportMultiContainer and supportDiscard is enabled, as it has the knowledge of the parent container.
-	[[nodiscard]] constexpr Result<void> popToDiscard() noexcept requires(supportMultiContainer&& supportDiscard)
+	[[nodiscard]] constexpr Result<void> popToDiscard() noexcept
+	requires(supportMultiContainer && supportDiscard)
 	{
 		auto* container = static_cast<Container*>(this->parent_.load());
 		if (container)

@@ -28,8 +28,9 @@ public: // Constructors
 	explicit constexpr NonOwningStorage(T* const data, const bzd::Size size) noexcept : data_{data}, size_{size} {}
 
 	// Ability to construct a const storage from a non-const
-	constexpr NonOwningStorage(const SelfNonConst& storage) noexcept requires(concepts::isConst<T>) :
-		data_{storage.data_}, size_{storage.size_}
+	constexpr NonOwningStorage(const SelfNonConst& storage) noexcept
+	requires(concepts::isConst<T>)
+		: data_{storage.data_}, size_{storage.size_}
 	{
 	}
 

@@ -29,38 +29,39 @@ public:
 	// Value constructor (copy/move)
 	template <class U>
 	requires(!concepts::sameClassAs<T, U>)
-		// NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
-		constexpr UnionTrivial(U&& value) noexcept :
-		next_{bzd::forward<U>(value)}
+	// NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
+	constexpr UnionTrivial(U&& value) noexcept : next_{bzd::forward<U>(value)}
 	{
 	}
 
 	template <class U>
 	requires(concepts::sameClassAs<T, U>)
-		// NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
-		constexpr UnionTrivial(U&& value) noexcept :
-		value_{bzd::forward<U>(value)}
+	// NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
+	constexpr UnionTrivial(U&& value) noexcept : value_{bzd::forward<U>(value)}
 	{
 	}
 
 	template <Size I, class... Args>
-	requires(I != Index) constexpr UnionTrivial(InPlaceIndex<I>, Args&&... args) noexcept :
-		next_{inPlaceIndex<I>, bzd::forward<Args>(args)...}
+	requires(I != Index)
+	constexpr UnionTrivial(InPlaceIndex<I>, Args&&... args) noexcept : next_{inPlaceIndex<I>, bzd::forward<Args>(args)...}
 	{
 	}
 
 	template <Size I, class... Args>
-	requires(I == Index) constexpr UnionTrivial(InPlaceIndex<I>, Args&&... args) noexcept : value_{bzd::forward<Args>(args)...} {}
-
-	template <class U, class... Args>
-	requires(!concepts::sameClassAs<T, U>) constexpr UnionTrivial(InPlaceType<U>, Args&&... args) noexcept :
-		next_{inPlaceType<U>, bzd::forward<Args>(args)...}
+	requires(I == Index)
+	constexpr UnionTrivial(InPlaceIndex<I>, Args&&... args) noexcept : value_{bzd::forward<Args>(args)...}
 	{
 	}
 
 	template <class U, class... Args>
-	requires(concepts::sameClassAs<T, U>) constexpr UnionTrivial(InPlaceType<U>, Args&&... args) noexcept :
-		value_{bzd::forward<Args>(args)...}
+	requires(!concepts::sameClassAs<T, U>)
+	constexpr UnionTrivial(InPlaceType<U>, Args&&... args) noexcept : next_{inPlaceType<U>, bzd::forward<Args>(args)...}
+	{
+	}
+
+	template <class U, class... Args>
+	requires(concepts::sameClassAs<T, U>)
+	constexpr UnionTrivial(InPlaceType<U>, Args&&... args) noexcept : value_{bzd::forward<Args>(args)...}
 	{
 	}
 
@@ -73,22 +74,46 @@ public:
 	}
 
 	template <class U>
-	requires(!concepts::sameClassAs<T, U>) constexpr U& get() noexcept { return next_.template get<U>(); }
+	requires(!concepts::sameClassAs<T, U>)
+	constexpr U& get() noexcept
+	{
+		return next_.template get<U>();
+	}
 
 	template <class U>
-	requires(!concepts::sameClassAs<T, U>) constexpr const U& get() const noexcept { return next_.template get<U>(); }
+	requires(!concepts::sameClassAs<T, U>)
+	constexpr const U& get() const noexcept
+	{
+		return next_.template get<U>();
+	}
 
 	template <class U>
-	requires(concepts::sameClassAs<T, U>) constexpr U& get() noexcept { return value_; }
+	requires(concepts::sameClassAs<T, U>)
+	constexpr U& get() noexcept
+	{
+		return value_;
+	}
 
 	template <class U>
-	requires(concepts::sameClassAs<T, U>) constexpr const U& get() const noexcept { return value_; }
+	requires(concepts::sameClassAs<T, U>)
+	constexpr const U& get() const noexcept
+	{
+		return value_;
+	}
 
 	template <class U, class V>
-	requires(!concepts::sameClassAs<T, U>) constexpr void set(V&& value) noexcept { next_.template set<U>(bzd::forward<V>(value)); }
+	requires(!concepts::sameClassAs<T, U>)
+	constexpr void set(V&& value) noexcept
+	{
+		next_.template set<U>(bzd::forward<V>(value));
+	}
 
 	template <class U, class V>
-	requires(concepts::sameClassAs<T, U>) constexpr void set(V&& value) noexcept { value_ = bzd::forward<V>(value); }
+	requires(concepts::sameClassAs<T, U>)
+	constexpr void set(V&& value) noexcept
+	{
+		value_ = bzd::forward<V>(value);
+	}
 
 protected:
 	T value_;
@@ -112,38 +137,39 @@ public:
 	// Value constructor (copy/move)
 	template <class U>
 	requires(!concepts::sameClassAs<T, U>)
-		// NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
-		constexpr UnionNonTrivial(U&& value) noexcept :
-		next_{bzd::forward<U>(value)}
+	// NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
+	constexpr UnionNonTrivial(U&& value) noexcept : next_{bzd::forward<U>(value)}
 	{
 	}
 
 	template <class U>
 	requires(concepts::sameClassAs<T, U>)
-		// NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
-		constexpr UnionNonTrivial(U&& value) noexcept :
-		value_{bzd::forward<U>(value)}
+	// NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
+	constexpr UnionNonTrivial(U&& value) noexcept : value_{bzd::forward<U>(value)}
 	{
 	}
 
 	template <Size I, class... Args>
-	requires(I != Index) constexpr UnionNonTrivial(InPlaceIndex<I>, Args&&... args) noexcept :
-		next_{inPlaceIndex<I>, bzd::forward<Args>(args)...}
+	requires(I != Index)
+	constexpr UnionNonTrivial(InPlaceIndex<I>, Args&&... args) noexcept : next_{inPlaceIndex<I>, bzd::forward<Args>(args)...}
 	{
 	}
 
 	template <Size I, class... Args>
-	requires(I == Index) constexpr UnionNonTrivial(InPlaceIndex<I>, Args&&... args) noexcept : value_{bzd::forward<Args>(args)...} {}
-
-	template <class U, class... Args>
-	requires(!concepts::sameClassAs<T, U>) constexpr UnionNonTrivial(InPlaceType<U>, Args&&... args) noexcept :
-		next_{inPlaceType<U>, bzd::forward<Args>(args)...}
+	requires(I == Index)
+	constexpr UnionNonTrivial(InPlaceIndex<I>, Args&&... args) noexcept : value_{bzd::forward<Args>(args)...}
 	{
 	}
 
 	template <class U, class... Args>
-	requires(concepts::sameClassAs<T, U>) constexpr UnionNonTrivial(InPlaceType<U>, Args&&... args) noexcept :
-		value_{bzd::forward<Args>(args)...}
+	requires(!concepts::sameClassAs<T, U>)
+	constexpr UnionNonTrivial(InPlaceType<U>, Args&&... args) noexcept : next_{inPlaceType<U>, bzd::forward<Args>(args)...}
+	{
+	}
+
+	template <class U, class... Args>
+	requires(concepts::sameClassAs<T, U>)
+	constexpr UnionNonTrivial(InPlaceType<U>, Args&&... args) noexcept : value_{bzd::forward<Args>(args)...}
 	{
 	}
 
@@ -156,22 +182,46 @@ public:
 	}
 
 	template <class U>
-	requires(!concepts::sameClassAs<T, U>) constexpr U& get() noexcept { return next_.template get<U>(); }
+	requires(!concepts::sameClassAs<T, U>)
+	constexpr U& get() noexcept
+	{
+		return next_.template get<U>();
+	}
 
 	template <class U>
-	requires(!concepts::sameClassAs<T, U>) constexpr const U& get() const noexcept { return next_.template get<U>(); }
+	requires(!concepts::sameClassAs<T, U>)
+	constexpr const U& get() const noexcept
+	{
+		return next_.template get<U>();
+	}
 
 	template <class U>
-	requires(concepts::sameClassAs<T, U>) constexpr U& get() noexcept { return value_; }
+	requires(concepts::sameClassAs<T, U>)
+	constexpr U& get() noexcept
+	{
+		return value_;
+	}
 
 	template <class U>
-	requires(concepts::sameClassAs<T, U>) constexpr const U& get() const noexcept { return value_; }
+	requires(concepts::sameClassAs<T, U>)
+	constexpr const U& get() const noexcept
+	{
+		return value_;
+	}
 
 	template <class U, class V>
-	requires(!concepts::sameClassAs<T, U>) constexpr void set(V&& value) noexcept { next_.template set<U>(bzd::forward<V>(value)); }
+	requires(!concepts::sameClassAs<T, U>)
+	constexpr void set(V&& value) noexcept
+	{
+		next_.template set<U>(bzd::forward<V>(value));
+	}
 
 	template <class U, class V>
-	requires(concepts::sameClassAs<T, U>) constexpr void set(V&& value) noexcept { value_ = bzd::forward<V>(value); }
+	requires(concepts::sameClassAs<T, U>)
+	constexpr void set(V&& value) noexcept
+	{
+		value_ = bzd::forward<V>(value);
+	}
 
 protected:
 	T value_;

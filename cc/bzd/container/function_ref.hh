@@ -29,8 +29,8 @@ public: // Traits.
 public: //  Constructors/Factories.
 	// Lambda (const and mutable).
 	template <class T>
-	requires(!concepts::sameClassAs<T, Self> &&
-			 concepts::invocableR<T, ReturnType, Args...>) constexpr explicit FunctionRef(T& lambda) noexcept
+	requires(!concepts::sameClassAs<T, Self> && concepts::invocableR<T, ReturnType, Args...>)
+	constexpr explicit FunctionRef(T& lambda) noexcept
 	{
 		*this = toMember<T, &T::operator()>(lambda);
 	}

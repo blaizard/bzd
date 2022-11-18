@@ -87,12 +87,11 @@ concept iterator = concepts::derivedFrom<T, typeTraits::IteratorBase> || concept
 /// - ++x : increment
 /// - x++ : increment
 template <class T>
-concept inputOrOutputIterator = iterator<T> && requires(T t)
-{
-	*t;
-	++t;
-	t++;
-};
+concept inputOrOutputIterator = iterator<T> && requires(T t) {
+												   *t;
+												   ++t;
+												   t++;
+											   };
 
 /// One pass iterator. Does not change the value of a container in other word, this is a read-only iterator.
 template <class T>

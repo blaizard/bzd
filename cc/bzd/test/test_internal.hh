@@ -312,14 +312,16 @@ public:
 	constexpr explicit Context(const SeedType seed = 53267) noexcept : generator_{seed} {}
 
 	template <class T, T min = NumericLimits<T>::min(), T max = NumericLimits<T>::max()>
-	requires(concepts::integral<T> && !concepts::sameClassAs<T, Bool>) [[nodiscard]] T random() const noexcept
+	requires(concepts::integral<T> && !concepts::sameClassAs<T, Bool>)
+	[[nodiscard]] T random() const noexcept
 	{
 		UniformIntDistribution<T, min, max> distribution{};
 		return distribution(generator_);
 	}
 
 	template <class T>
-	requires(concepts::sameClassAs<T, Bool>) [[nodiscard]] T random() const noexcept
+	requires(concepts::sameClassAs<T, Bool>)
+	[[nodiscard]] T random() const noexcept
 	{
 		return static_cast<Bool>(random<bzd::UInt32, 0, 1>() == 1);
 	}
