@@ -11,7 +11,7 @@ docker build tools/docker_images/build -t build
 
 ```bash
 # Start the docker instance and run a shell with /bash/bin
-docker run -it --rm --name my_build -v "$(pwd)"/sandbox:/sandbox build
+docker run -it --rm -v "$(pwd)"/sandbox:/sandbox build
 ```
 
 # Stop it

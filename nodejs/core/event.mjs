@@ -1,6 +1,4 @@
-/**
- * Add events functionality
- */
+/// Add events functionality
 export default class Event {
 	constructor(options) {
 		// Loop through event options and adjust them
@@ -8,10 +6,8 @@ export default class Event {
 		for (const id in options || {}) {
 			this.options[id] = Object.assign(
 				{
-					/**
-					 * Set to true if the event once triggered will also
-					 * trigger new one.
-					 */
+					/// Set to true if the event once triggered will also
+					/// trigger new one.
 					proactive: false,
 				},
 				options[id]
@@ -21,13 +17,11 @@ export default class Event {
 		this.clear();
 	}
 
-	/**
-	 * \brief Register an event
-	 *
-	 * \param id The identifier of the event
-	 * \param callback The function to be called when the event is triggered
-	 * \param once If the event is intended to be fired only once
-	 */
+	/// \brief Register an event
+	///
+	/// \param id The identifier of the event
+	/// \param callback The function to be called when the event is triggered
+	/// \param once If the event is intended to be fired only once
 	on(id, callback, once) {
 		let addToList = true;
 
@@ -44,23 +38,19 @@ export default class Event {
 		return this;
 	}
 
-	/**
-	 * \brief Check if an event is active (only for proactive events)
-	 *
-	 * \param id The identifier of the events to be triggered
-	 *
-	 * \return true if the evetn has been triggered, false otherwise.
-	 */
+	/// \brief Check if an event is active (only for proactive events)
+	///
+	/// \param id The identifier of the events to be triggered
+	///
+	/// \return true if the evetn has been triggered, false otherwise.
 	is(id) {
 		return typeof this.proactive[id] !== "undefined";
 	}
 
-	/**
-	 * \brief Trigger all events associated with a specific id
-	 *
-	 * \param id The identifier of the events to be triggered
-	 * \param ... Arguments to be passed to the event callbacks
-	 */
+	/// \brief Trigger all events associated with a specific id
+	///
+	/// \param id The identifier of the events to be triggered
+	/// \param ... Arguments to be passed to the event callbacks
 	trigger(id, ...args) {
 		if (this.list[id]) {
 			this.list[id].forEach((e) => {
@@ -78,12 +68,10 @@ export default class Event {
 		return this;
 	}
 
-	/**
-	 * \brief Clear a specific event or all events.
-	 *
-	 * Clearing events will remove the proactive trigger for example.
-	 * It will also remove all previously attached events.
-	 */
+	/// \brief Clear a specific event or all events.
+	///
+	/// Clearing events will remove the proactive trigger for example.
+	/// It will also remove all previously attached events.
 	clear(id, onlyProactive) {
 		if (typeof id === "undefined") {
 			this.proactive = {};
@@ -98,9 +86,7 @@ export default class Event {
 		return this;
 	}
 
-	/**
-	 * Wait until the specific id is triggered
-	 */
+	/// Wait until the specific id is triggered
 	async waitUntil(id) {
 		return new Promise((resolve) => {
 			this.on(

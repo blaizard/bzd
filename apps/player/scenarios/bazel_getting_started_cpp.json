@@ -1,148 +1,152 @@
 {
     "flow": [
         {
-            "action": "file.create",
+            "action": "config.layout",
             "args": [
-                "WORKSPACE"
+                "terminal:main",
+                "terminal:old"
             ]
         },
         {
-            "action": "file.create",
+            "action": "config.name",
             "args": [
-                "select/BUILD"
+                "main",
+                "Ubuntu 20.04"
             ]
         },
         {
-            "action": "file.write",
+            "action": "config.name",
             "args": [
-                "select/BUILD",
-                "genrule(\n\tname = \"os\",\n\touts = [\"os.txt\"],\n\tcmd = select({\n\t\t\"@platforms//os:linux\": \"echo 'Linux' > $@\",\n\t\t\"@platforms//os:windows\": \"echo 'Windows' > $@\",\n\t})\n)\n"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
-                "bazel build //select:os --color=yes --curses=yes",
-                "bazel build //select:os"
-            ]
-        },
-        {
-            "action": "file.create",
-            "args": [
-                "target_compatible_with/linux.sh",
-                "1"
-            ]
-        },
-        {
-            "action": "file.write",
-            "args": [
-                "target_compatible_with/linux.sh",
-                "ping -c 1 -w 1 \"www.google.com\"\n"
-            ]
-        },
-        {
-            "action": "file.create",
-            "args": [
-                "target_compatible_with/windows.bat",
-                "1"
-            ]
-        },
-        {
-            "action": "file.write",
-            "args": [
-                "target_compatible_with/windows.bat",
-                "Ping \"www.google.com\" -n 1 -w 1\n"
-            ]
-        },
-        {
-            "action": "file.create",
-            "args": [
-                "target_compatible_with/BUILD"
-            ]
-        },
-        {
-            "action": "file.write",
-            "args": [
-                "target_compatible_with/BUILD",
-                "sh_test(\n\tname = \"linux\",\n\tsrcs = [\"linux.sh\"],\n\ttarget_compatible_with = [\n\t\t\"@platforms//os:linux\"\n\t]\n)\n"
-            ]
-        },
-        {
-            "action": "file.write",
-            "args": [
-                "target_compatible_with/BUILD",
-                "\nsh_test(\n\tname = \"windows\",\n\tsrcs = [\"windows.bat\"],\n\ttarget_compatible_with = [\n\t\t\"@platforms//os:windows\"\n\t]\n)\n"
+                "old",
+                "Ubuntu 16.04"
             ]
         },
         {
             "action": "exec",
             "args": [
-                "bazel test //... --color=yes --curses=yes",
-                "bazel test //..."
+                "docker run -it --rm -v $(pwd):/build ubuntu:16.04",
+                "old"
             ]
         },
         {
             "action": "exec",
             "args": [
-                "bazel test //target_compatible_with:windows --color=yes --curses=yes",
-                "bazel test //target_compatible_with:windows"
-            ]
-        },
-        {
-            "action": "file.create",
-            "args": [
-                "BUILD"
-            ]
-        },
-        {
-            "action": "file.write",
-            "args": [
-                "BUILD",
-                "platform(\n\tname = \"windows\",\n\tconstraint_values = [\n\t\t\"@platforms//os:windows\",\n\t],\n)\n"
+                "apt-get install -y gcc",
+                "old"
             ]
         },
         {
             "action": "exec",
             "args": [
-                "bazel test //... --color=yes --curses=yes --platforms=//:windows",
-                "bazel test //... --platforms=//:windows"
-            ]
-        },
-        {
-            "action": "file.write",
-            "args": [
-                "BUILD",
-                "\nconstraint_value(\n\tname = \"myos\",\n\tconstraint_setting = \"@platforms//os:os\",\n)\n"
-            ]
-        },
-        {
-            "action": "file.write",
-            "args": [
-                "BUILD",
-                "\nplatform(\n\tname = \"custom\",\n\tconstraint_values = [\n\t\t\":myos\",\n\t],\n)\n"
+                "gcc --version",
+                "old"
             ]
         },
         {
             "action": "exec",
             "args": [
-                "bazel test //target_compatible_with/... --color=yes --curses=yes --platforms=//:custom",
-                "bazel test //target_compatible_with/... --platforms=//:custom"
+                "cd build",
+                "old"
             ]
         },
         {
             "action": "exec",
             "args": [
-                "bazel test //... --color=yes --curses=yes --platforms=//:custom",
-                "bazel test //... --platforms=//:custom"
+                "clear",
+                "old"
             ]
         },
         {
             "action": "exec",
             "args": [
-                "bazel test //... --color=yes --curses=yes --platforms=//:custom",
-                "bazel test //... --platforms=//:custom"
+                "echo -e \"#include <cstdlib>\nint main() { quick_exit(1); }\" > exit.cc",
+                "main"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "g++ exit.cc -o exit",
+                "main"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "ls -llh",
+                "main"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "./exit",
+                "main"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "ls -llh",
+                "old"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "./exit",
+                "old"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "ldd -v exit",
+                "old"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "ldd -v exit",
+                "main"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "g++ exit.cc -o exit_old",
+                "old"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "./exit_old",
+                "old"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "./exit_old",
+                "main"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "ldd -v exit_old",
+                "old"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "ldd -v exit_old",
+                "main"
             ]
         }
     ],
-    "name": "bazel-platforms-getting-started"
+    "name": "build"
 }
