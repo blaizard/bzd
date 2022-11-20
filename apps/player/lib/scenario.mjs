@@ -12,6 +12,10 @@ class Action {
 	get args() {
 		return this.data.args || [];
 	}
+
+	toString() {
+		return "\x1b[1;33m" + this.type + "\x1b[0;1m\n" + this.args + "\x1b[0m ";
+	}
 }
 
 /// Handle a scenario

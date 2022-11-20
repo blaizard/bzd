@@ -3,6 +3,7 @@
         {
             "action": "config.layout",
             "args": [
+                "config1",
                 "terminal:main",
                 "terminal:old"
             ]
@@ -31,20 +32,6 @@
         {
             "action": "exec",
             "args": [
-                "apt-get install -y gcc",
-                "old"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
-                "gcc --version",
-                "old"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
                 "cd build",
                 "old"
             ]
@@ -57,10 +44,172 @@
             ]
         },
         {
+            "action": "config.select",
+            "args": [
+                "editor"
+            ]
+        },
+        {
+            "action": "file.create",
+            "args": [
+                "check.cc"
+            ]
+        },
+        {
+            "action": "file.write",
+            "args": [
+                "check.cc",
+                "#include <iostream>\n#include <filesystem>\n\nint main(int argc, char** argv)\n{\n\tif (argc != 2) return 1;\n\tstd::cout << std::filesystem::exists(argv[1]) << std::endl;\n\treturn 0;\n}\n"
+            ]
+        },
+        {
+            "action": "config.select",
+            "args": [
+                "config1"
+            ]
+        },
+        {
             "action": "exec",
             "args": [
-                "echo -e \"#include <cstdlib>\nint main() { quick_exit(1); }\" > exit.cc",
+                "g++ check.cc -o check -std=c++17",
                 "main"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "./check",
+                "main"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "./check",
+                "old"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "ldd ./check",
+                "old"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "ldd -v ./check",
+                "old"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "g++ check.cc -o check_static -std=c++17 -static-libstdc++",
+                "main"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "./check_static",
+                "old"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "ldd -v ./check_static",
+                "old"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "ls -lh",
+                "main"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "strip ./check_static",
+                "main"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "ls -lh",
+                "main"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "g++ check.cc -o check_static -std=c++17 -static-libstdc++ -ffunction-sections -fdata-sections -Wl,--gc-sections",
+                "main"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "ls -lh",
+                "main"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "strip ./check_static",
+                "main"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "ls -lh",
+                "main"
+            ]
+        },
+        {
+            "action": "config.select",
+            "args": [
+                "editor"
+            ]
+        },
+        {
+            "action": "file.create",
+            "args": [
+                "exit.cc"
+            ]
+        },
+        {
+            "action": "file.write",
+            "args": [
+                "exit.cc",
+                "#include <cstdlib>\n\nint main()\n{\n\tstd::quick_exit(1);\n}\n"
+            ]
+        },
+        {
+            "action": "config.select",
+            "args": [
+                "config1"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "clear",
+                "main"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "clear",
+                "old"
             ]
         },
         {
@@ -73,22 +222,8 @@
         {
             "action": "exec",
             "args": [
-                "ls -llh",
-                "main"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
                 "./exit",
                 "main"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
-                "ls -llh",
-                "old"
             ]
         },
         {
@@ -113,38 +248,61 @@
             ]
         },
         {
-            "action": "exec",
+            "action": "config.layout",
             "args": [
-                "g++ exit.cc -o exit_old",
-                "old"
+                "config1",
+                "terminal:main",
+                "terminal:old",
+                "terminal:build"
             ]
         },
         {
             "action": "exec",
             "args": [
-                "./exit_old",
-                "old"
+                "docker run -it --rm -v $(pwd):/build debian/eol:wheezy",
+                "build"
+            ]
+        },
+        {
+            "action": "config.name",
+            "args": [
+                "build",
+                "Old Debian Wheezy"
             ]
         },
         {
             "action": "exec",
             "args": [
-                "./exit_old",
+                "apt-get update && apt-get install g++",
+                "build"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "g++ exit.cc -o exit",
+                "build"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "ldd -v exit",
+                "build"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "./exit",
                 "main"
             ]
         },
         {
             "action": "exec",
             "args": [
-                "ldd -v exit_old",
+                "./exit",
                 "old"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
-                "ldd -v exit_old",
-                "main"
             ]
         }
     ],
