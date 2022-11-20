@@ -20,7 +20,8 @@
 		</div>//-->
 		<!--<Camera class="camera"></Camera>//-->
 		<div
-			v-for="(component, id) in layoutComponents"
+			v-for="(component, id) in components"
+			v-show="id in layoutIds"
 			:key="id"
 			:class="setComponentClass(id, component.type)"
 			:style="{ 'grid-area': id }"
@@ -73,15 +74,25 @@
 				files: new FileSystem(this.$api),
 				selectedComponents: [],
 				cursor: 0,
-				layoutComponents: {
+				configs: {
+					"default": {
+						"layout": [
+							["tree-0", "editor-0"],
+							["terminal-0", "terminal-0"],
+						]
+					},
+					"editor": {
+						"layout": [
+							["tree-0", "editor-0"],
+						]
+					}
+				},
+				components: {
 					"tree-0": { type: "tree" },
 					"editor-0": { type: "editor" },
 					"terminal-0": { type: "terminal" },
 				},
-				layout: [
-					["tree-0", "editor-0"],
-					["terminal-0", "terminal-0"],
-				],
+				configId: "default"
 			};
 		},
 		computed: {
@@ -108,6 +119,18 @@
 					return this.selectedFile.content;
 				}
 				return "";
+			},
+			layout() {
+				return this.configs[this.configId].layout || [];
+			},
+			layoutIds() {
+				let ids = {};
+				for (const lines of this.layout) {
+					for (const id of lines) {
+						ids[id] = true;
+					}
+				}
+				return ids;
 			},
 			styleLayout() {
 				const areas = this.layout.map((line) => "\"" + line.join(" ") + "\"").join("\n");
@@ -232,9 +255,8 @@
 					document.addEventListener("keydown", handleKeyDown);
 				});
 			},
-			async executeConfigLayout(...lines) {
+			async executeConfigLayout(configId, ...lines) {
 				let layout = [];
-				let layoutComponents = {};
 				const availableTypes = {
 					terminal: Terminal,
 					editor: Editor,
@@ -255,25 +277,31 @@
 								let counter = 0;
 								while (id === undefined) {
 									id = type + "-" + counter++;
-									if (id in layoutComponents) {
+									if (id in this.components) {
 										id = undefined;
 									}
 								}
 								// Register the component.
-								layoutComponents[id] = {
+								this.$set(this.components, id, this.components[id] || {
 									type: type,
 									name: null,
-								};
+								});
 								return id;
 							})
 					);
 				}
-				this.layout = layout;
-				this.layoutComponents = layoutComponents;
+				this.$set(this.configs, configId, {
+					layout: layout,
+				});
+				this.configId = configId;
 			},
 			async executeConfigName(id, name) {
-				Exception.assert(id in this.layoutComponents, "Id '{}' is not a valid identifier.", id);
-				this.layoutComponents[id].name = name;
+				Exception.assert(id in this.components, "Id '{}' is not a valid identifier.", id);
+				this.components[id].name = name;
+			},
+			async executeConfigSelect(configId) {
+				Exception.assert(configId in this.configs, "The config '{}' does not exists.", configId);
+				this.configId = configId;
 			},
 			async execute() {
 				if (this.completed) {
@@ -281,12 +309,16 @@
 				}
 
 				if (!this.fastforward) {
+					console.log(this.action.toString());
 					await this.waitingKeypress();
 				}
 
 				switch (this.action.type) {
 				case "config.layout":
 					await this.executeConfigLayout(...this.action.args);
+					break;
+				case "config.select":
+					await this.executeConfigSelect(...this.action.args);
 					break;
 				case "config.name":
 					await this.executeConfigName(...this.action.args);
