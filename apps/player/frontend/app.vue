@@ -1,6 +1,6 @@
 <template>
-	<div class="layout">
-		<div :class="setComponentClass('tree')">
+	<div class="layout" :style="styleLayout">
+		<!--<div :class="setComponentClass('tree')">
 			<Tree :node="root" :selected="files.selected" @selected="handleTreeSelected"></Tree>
 		</div>
 		<div :class="setComponentClass('content')" @click="selectComponents('content')">
@@ -13,9 +13,33 @@
 				:focus="selectedComponents.includes('content')"></Editor>
 		</div>
 		<div :class="setComponentClass('terminal1')" @click="selectComponents('terminal1')">
-			<Terminal :stream="terminal" @processed="handleTerminalProcessed"></Terminal>
+			<Terminal ref="terminal1"></Terminal>
 		</div>
-		<Camera class="camera"></Camera>
+		<div :class="setComponentClass('terminal2')" @click="selectComponents('terminal2')">
+			<Terminal ref="terminal2"></Terminal>
+		</div>//-->
+		<!--<Camera class="camera"></Camera>//-->
+		<div
+			v-for="(component, id) in layoutComponents"
+			:key="id"
+			:class="setComponentClass(id, component.type)"
+			:style="{ 'grid-area': id }"
+			@click="selectComponents(id)">
+			<Terminal v-if="component.type == 'terminal'" :ref="id"></Terminal>
+			<Editor
+				v-else-if="component.type == 'editor' && selectedFile"
+				:value="content"
+				@input="handleContentUpdate"
+				:path="selectedFile.path"
+				:caret="cursor"
+				:focus="selectedComponents.includes('content')"></Editor>
+			<Tree
+				v-else-if="component.type == 'tree'"
+				:node="root"
+				:selected="files.selected"
+				@selected="handleTreeSelected"></Tree>
+			<div class="name" v-if="component.name">{{ component.name }}</div>
+		</div>
 	</div>
 </template>
 
@@ -28,8 +52,10 @@
 	import Scenario from "../lib/scenario.mjs";
 	import FileSystem from "../lib/filesystem.mjs";
 	import LogFactory from "bzd/core/log.mjs";
+	import ExceptionFactory from "bzd/core/exception.mjs";
 
 	const Log = LogFactory("app");
+	const Exception = ExceptionFactory("app");
 
 	export default {
 		components: {
@@ -47,7 +73,15 @@
 				files: new FileSystem(this.$api),
 				selectedComponents: [],
 				cursor: 0,
-				terminal: [],
+				layoutComponents: {
+					"tree-0": { type: "tree" },
+					"editor-0": { type: "editor" },
+					"terminal-0": { type: "terminal" },
+				},
+				layout: [
+					["tree-0", "editor-0"],
+					["terminal-0", "terminal-0"],
+				],
 			};
 		},
 		computed: {
@@ -75,10 +109,17 @@
 				}
 				return "";
 			},
+			styleLayout() {
+				const areas = this.layout.map((line) => "\"" + line.join(" ") + "\"").join("\n");
+				return {
+					"grid-template-areas": areas,
+					"grid-template-rows": this.layout.map(() => "1fr").join(" "),
+					"grid-template-columns": this.layout[0].map(() => "1fr").join(" "),
+				};
+			},
 		},
 		async mounted() {
 			this.scenario = new Scenario(await this.$api.request("get", "/scenario"));
-			this.setPrompt();
 			this.$routerSet({
 				ref: "view",
 				routes: [
@@ -97,9 +138,9 @@
 			selectComponents(...names) {
 				this.selectedComponents = [...names];
 			},
-			setComponentClass(name) {
+			setComponentClass(name, type) {
 				return {
-					[name]: true,
+					[type]: true,
 					selected: this.selectedComponents.includes(name),
 				};
 			},
@@ -118,10 +159,10 @@
 					this.setSelectionEnd();
 				}
 			},
-			async emulateTypingTerminal(value) {
+			async emulateTypingTerminal(terminal, value) {
 				for (const c of value) {
 					await this.emulateTypingKey(c);
-					this.terminal.push(c);
+					await this.$refs[terminal][0].setInput(c);
 				}
 			},
 			async emulateTypingKey() {
@@ -157,52 +198,28 @@
 					await this.files.selected.toggleExpand();
 				}
 			},
-			async executeExec(cmdStr, cmdStrDisplay = null) {
-				async function* streamAsyncIterable(stream) {
-					const reader = stream.getReader();
-					try {
-						while (true) {
-							const { done, value } = await reader.read();
-							if (done) {
-								return;
-							}
-							yield value;
-						}
-					}
-					finally {
-						reader.releaseLock();
-					}
-				}
-
-				this.selectedComponents = ["terminal1"];
-				await this.emulateTypingTerminal((cmdStrDisplay || cmdStr) + "\n");
-				const stream = await this.$api.request("post", "/exec", {
-					cmds: cmdStr.split(" "),
-				});
-				// Refresh the view every 1s.
-				const refresher = setInterval(() => {
-					this.files.refresh();
-				}, 1000);
-				try {
-					for await (const chunk of streamAsyncIterable(stream)) {
-						const blob = new Blob([chunk.buffer], { type: "text/plain; charset=utf-8" });
-						const text = await blob.text();
-						this.terminal.push(text);
-					}
-					this.files.refresh();
-				}
-				finally {
-					clearInterval(refresher);
-					this.setPrompt();
-				}
-			},
-			/// Set the prompt of the terminal.
-			setPrompt() {
-				this.$set(
-					this.terminal,
-					this.terminal.length,
-					"\x1b[0;33mbzd\x1b[0m:\x1b[34m~/" + this.scenario.name + "\x1b[0m$ "
-				);
+			async executeExec(cmdStr, terminal = "terminal-0") {
+				this.selectedComponents = [terminal];
+				await this.emulateTypingTerminal(terminal, cmdStr + "\n");
+				// const stream = await this.$api.request("post", "/exec", {
+				// cmds: cmdStr.split(" "),
+				// });
+				// // Refresh the view every 1s.
+				// const refresher = setInterval(() => {
+				// this.files.refresh();
+				// }, 1000);
+				// try {
+				// for await (const chunk of streamAsyncIterable(stream)) {
+				// const blob = new Blob([chunk.buffer], { type: "text/plain; charset=utf-8" });
+				// const text = await blob.text();
+				// this.terminal.push(text);
+				// }
+				// this.files.refresh();
+				// }
+				// finally {
+				// clearInterval(refresher);
+				// this.setPrompt();
+				// }
 			},
 			waitingKeypress() {
 				return new Promise((resolve) => {
@@ -215,6 +232,49 @@
 					document.addEventListener("keydown", handleKeyDown);
 				});
 			},
+			async executeConfigLayout(...lines) {
+				let layout = [];
+				let layoutComponents = {};
+				const availableTypes = {
+					terminal: Terminal,
+					editor: Editor,
+					tree: Tree,
+				};
+				for (const line of lines) {
+					layout.push(
+						line
+							.split(" ")
+							.filter(Boolean)
+							.map((item) => {
+								const data = item.split(":");
+								const type = data[0];
+								Exception.assert(type in availableTypes, "Unsupported type '{}'", data[0]);
+
+								// Generate a unique ID or use the one passed into argument.
+								let id = data[1];
+								let counter = 0;
+								while (id === undefined) {
+									id = type + "-" + counter++;
+									if (id in layoutComponents) {
+										id = undefined;
+									}
+								}
+								// Register the component.
+								layoutComponents[id] = {
+									type: type,
+									name: null,
+								};
+								return id;
+							})
+					);
+				}
+				this.layout = layout;
+				this.layoutComponents = layoutComponents;
+			},
+			async executeConfigName(id, name) {
+				Exception.assert(id in this.layoutComponents, "Id '{}' is not a valid identifier.", id);
+				this.layoutComponents[id].name = name;
+			},
 			async execute() {
 				if (this.completed) {
 					return;
@@ -225,6 +285,12 @@
 				}
 
 				switch (this.action.type) {
+				case "config.layout":
+					await this.executeConfigLayout(...this.action.args);
+					break;
+				case "config.name":
+					await this.executeConfigName(...this.action.args);
+					break;
 				case "file.create":
 					await this.executeFileCreate(...this.action.args);
 					break;
@@ -246,9 +312,6 @@
 
 				++this.index;
 				this.$routerDispatch("/" + this.index);
-			},
-			handleTerminalProcessed(count) {
-				this.terminal.splice(0, count);
 			},
 			async handleTreeSelected(path) {
 				await this.executeFileSelect(path);
@@ -279,24 +342,6 @@
 		margin: 0;
 		font-family: monospace;
 		background-color: black;
-	}
-	.content {
-		code {
-			padding-left: 3ch;
-			display: inline-block;
-		}
-
-		.line-number {
-			width: 3ch;
-			display: inline-block;
-			text-align: right;
-			padding: 0;
-			margin: 0;
-			margin-left: -3ch;
-			margin-right: 3ch;
-			color: #999;
-			user-select: none;
-		}
 	}
 
 	@keyframes selection-blink {
@@ -329,12 +374,14 @@
 <style lang="scss" scoped>
 	@use "bzd-style/css/colors.scss" as colors;
 
+	$selectionWidth: 3;
+
 	.layout {
 		max-height: 100%;
 		max-width: 100%;
 		aspect-ratio: 16/9;
 		padding: 0;
-		border: 1px solid #000;
+		border: #{$selectionWidth}px solid #000;
 		background-color: white;
 
 		// Center the layout in the screen.
@@ -346,50 +393,49 @@
 		right: 0;
 
 		display: grid;
-		grid-gap: 0;
-		grid-template-rows: 1fr auto;
-		grid-template-columns: auto 1fr;
-		grid-template-areas:
-			"tree content"
-			"terminal1 terminal1";
+		grid-gap: #{$selectionWidth}px;
+		//grid-template-rows: 1fr auto;
+		//grid-template-columns: auto 1fr;
+		//grid-template-rows: 1fr;
+		//grid-template-columns: 1fr 1fr;
 
 		> * {
 			min-width: 0;
 			min-height: 0;
 			margin: 0;
 			overflow: auto;
-		}
-
-		> .selected {
-			outline: 2px solid colors.$bzdGraphColorBlue !important;
-			z-index: 1;
-		}
-
-		> div {
+			position: relative;
 			transition: max-height 1s ease-out;
 		}
 
-		.tree {
-			grid-area: tree;
+		> .selected {
+			outline: #{$selectionWidth}px solid colors.$bzdGraphColorBlue !important;
+			z-index: 1;
+		}
 
+		.name {
+			position: absolute;
+			top: 0;
+			right: 0;
+			background: rgba(255, 255, 255, 0.8);
+			padding: 0 5px;
+		}
+		.tree {
 			padding: 10px 25px;
 			outline: 1px solid #ddd;
 		}
-		.content {
-			grid-area: content;
-
+		.editor {
 			padding: 10px;
 			white-space: pre-wrap;
 		}
-		.terminal1 {
-			grid-area: terminal1;
+		.terminal {
 			padding: 0;
 			overflow: hidden;
 
-			max-height: 50vh;
+			/*max-height: 50vh;
 			&.selected {
 				max-height: 50vh;
-			}
+			}*/
 		}
 		.camera {
 			position: absolute;

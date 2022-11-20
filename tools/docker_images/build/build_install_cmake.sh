@@ -6,13 +6,12 @@ VERSION=$1
 
 . ~/.bashrc
 
-sudo apt install -y --no-install-recommends \
+sudo apt-get install -y --no-install-recommends \
     curl \
     xz-utils \
     build-essential \
     libtool \
     autoconf \
-    libssl-dev \
     ca-certificates
 
 curl -L https://github.com/Kitware/CMake/archive/refs/tags/v${VERSION}.tar.gz | tar -xz
@@ -24,4 +23,4 @@ make install
 
 popd
 
-rm -rfd CMake-${VERSION}
+rm -rf CMake-${VERSION}

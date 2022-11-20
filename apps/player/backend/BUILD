@@ -12,6 +12,8 @@ bzd_nodejs_binary(
     main = "app.mjs",
     packages = {
         "commander": "",
+        "ws": "",
+        "node-pty": "",
     },
     visibility = [
         "//apps/player:__pkg__",
@@ -19,6 +21,7 @@ bzd_nodejs_binary(
     deps = [
         "//apps/player:api",
         "//apps/player/lib:scenario",
+        "//nodejs/core:event",
         "//nodejs/core:exception",
         "//nodejs/core:filesystem",
         "//nodejs/core:log",

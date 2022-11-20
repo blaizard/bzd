@@ -11,6 +11,8 @@ import { spawn } from "child_process";
 import { Readable } from "stream";
 import Scenario from "../lib/scenario.mjs";
 import Permissions from "bzd/db/storage/permissions.mjs";
+import { WebSocketServer } from "ws";
+import Terminal from "./terminal.mjs";
 
 const Log = LogFactory("backend");
 
@@ -44,6 +46,38 @@ function pathToPathList(path) {
 
 	const PATH_STORAGE = Path.join(Path.dirname(PATH_SCENARIO), ".player", scenario.name);
 	const storage = new StorageDisk(PATH_STORAGE);
+
+	// Create the empty directory
+	await FileSystem.mkdir(PATH_STORAGE);
+
+	// websocket ----------------
+
+	const wss = new WebSocketServer({ port: 9999 });
+
+	wss.on("connection", (ws) => {
+		let terminal = new Terminal(PATH_STORAGE);
+		terminal.on("data", (data) => {
+			ws.send(data);
+		});
+		terminal.on("exit", () => {
+			ws.close();
+		});
+		ws.on("message", (event) => {
+			const input = JSON.parse(event.toString());
+			switch (input.type) {
+			case "init":
+				terminal.init(input.value);
+				break;
+			case "stream":
+				terminal.write(input.value);
+				break;
+			default:
+				Log.error("Unsupported data type '{}' for terminal.", input.type);
+			}
+		});
+	});
+
+	// -----------------
 
 	// Set-up the web server
 	let web = new HttpServer(PORT);

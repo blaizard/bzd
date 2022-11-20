@@ -11,7 +11,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "vue",
     packages = {
-        "vue": "2.6.14",
+        "vue": "2.7.13",
     },
     visibility = ["//visibility:public"],
     deps = [
