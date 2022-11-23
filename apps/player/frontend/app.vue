@@ -75,24 +75,22 @@
 				selectedComponents: [],
 				cursor: 0,
 				configs: {
-					"default": {
-						"layout": [
+					default: {
+						layout: [
 							["tree-0", "editor-0"],
 							["terminal-0", "terminal-0"],
-						]
+						],
 					},
-					"editor": {
-						"layout": [
-							["tree-0", "editor-0"],
-						]
-					}
+					editor: {
+						layout: [["tree-0", "editor-0"]],
+					},
 				},
 				components: {
 					"tree-0": { type: "tree" },
 					"editor-0": { type: "editor" },
 					"terminal-0": { type: "terminal" },
 				},
-				configId: "default"
+				configId: "default",
 			};
 		},
 		computed: {
@@ -282,10 +280,14 @@
 									}
 								}
 								// Register the component.
-								this.$set(this.components, id, this.components[id] || {
-									type: type,
-									name: null,
-								});
+								this.$set(
+									this.components,
+									id,
+									this.components[id] || {
+										type: type,
+										name: null,
+									}
+								);
 								return id;
 							})
 					);

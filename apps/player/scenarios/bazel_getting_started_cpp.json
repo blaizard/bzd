@@ -182,14 +182,14 @@
         {
             "action": "file.create",
             "args": [
-                "exit.cc"
+                "exit.c"
             ]
         },
         {
             "action": "file.write",
             "args": [
-                "exit.cc",
-                "#include <cstdlib>\n\nint main()\n{\n\tstd::quick_exit(1);\n}\n"
+                "exit.c",
+                "#include <stdlib.h>\n\nint main()\n{\n\tquick_exit(1);\n}\n"
             ]
         },
         {
@@ -215,7 +215,7 @@
         {
             "action": "exec",
             "args": [
-                "g++ exit.cc -o exit",
+                "gcc exit.c -o exit",
                 "main"
             ]
         },
@@ -273,14 +273,21 @@
         {
             "action": "exec",
             "args": [
-                "apt-get update && apt-get install g++",
+                "apt-get update && apt-get install -y g++",
                 "build"
             ]
         },
         {
             "action": "exec",
             "args": [
-                "g++ exit.cc -o exit",
+                "cd /build",
+                "build"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "gcc exit.c -o exit",
                 "build"
             ]
         },

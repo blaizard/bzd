@@ -10,8 +10,10 @@
 
 <script>
 	import ExceptionFactory from "bzd/core/exception.mjs";
+	import LogFactory from "bzd/core/log.mjs";
 
 	const Exception = ExceptionFactory("terminal-vt100");
+	const Log = LogFactory("terminal-vt100");
 	const colors8 = ["#000000", "#cc0000", "#4e9a06", "#c4a000", "#729fcf", "#75507b", "#06989a", "#d3d7cf"];
 	const colorsBright8 = ["#555753", "#ef2929", "#8ae234", "#fce94f", "#32afff", "#ad7fa8", "#34e2e2", "#ffffff"];
 
@@ -50,6 +52,60 @@
 				immediate: true,
 			},
 		},
+		computed: {
+			categoryMapping() {
+				const csiFctMapping = {
+					m: this.sgr,
+					A: this.moveCursorUp,
+					B: this.moveCursorDown,
+					C: this.moveCursorRight,
+					D: this.moveCursorLeft,
+					E: this.moveCursorDownBegining,
+					F: this.moveCursorUpBegining,
+					f: this.moveCursorLineColumn,
+					G: this.moveCursorColumn,
+					H: this.moveCursorLineColumn,
+					J: this.eraseScreen,
+					K: this.eraseLine,
+				};
+				const csiMapping = [
+					new RegExp("([0-9;]*)([^0-9;])", "g"),
+					(_, params, name) => {
+						const args = params
+							.split(";")
+							.filter(Boolean)
+							.map((i) => parseInt(i));
+						return (csiFctMapping[name] || (() => false))(...args);
+					},
+				];
+				const oscFctMapping = {
+					0: this.ignore("Set title"),
+					2: this.ignore("Set title"),
+					4: this.ignore("Set/read color palette"),
+					9: this.ignore("iTerm2 Growl notifications"),
+					10: this.ignore("Set foreground color"),
+					11: this.ignore("Set background color"),
+					50: this.ignore("Set the cursor shape"),
+					52: this.ignore("Clipboard operations"),
+					777: this.ignore("rxvt-unicode (urxvt) modules"),
+				};
+				const oscMapping = [
+					new RegExp("([0-9]+);(.*?)\x07", "g"),
+					(_, name, params) => {
+						return (oscFctMapping[name] || (() => false))(params);
+					},
+				];
+				return {
+					"\x1b[": csiMapping,
+					"\x9b": csiMapping,
+					"\x1b]": oscMapping,
+				};
+			},
+			regexprCategory() {
+				const string = Object.keys(this.categoryMapping).map(this.escapeRegexpr).join("|");
+				return new RegExp("(" + string + ")", "g");
+			},
+		},
 		methods: {
 			/// Group characters by their style identifiers.
 			groupByStyleId(line) {
@@ -71,6 +127,13 @@
 					textDecoration: "none",
 					colorText: "inherit",
 					colorBackground: "transparent",
+					display: "inline",
+				};
+			},
+			ignore(name) {
+				return (...args) => {
+					Log.warning("Ignoring command '{}' with args: {}.", name, [...args].toString());
+					return true;
 				};
 			},
 			sgr(...args) {
@@ -86,6 +149,27 @@
 					}
 					else if (arg == 4) {
 						this.terminalStyle.textDecoration = "underline";
+					}
+					else if (arg == 8) {
+						this.terminalStyle.display = "none";
+					}
+					else if (arg == 9) {
+						this.terminalStyle.textDecoration = "line-through";
+					}
+					else if (arg == 22) {
+						this.terminalStyle.fontWeight = "normal";
+					}
+					else if (arg == 23) {
+						this.terminalStyle.fontStyle = "normal";
+					}
+					else if (arg == 24) {
+						this.terminalStyle.textDecoration = "none";
+					}
+					else if (arg == 28) {
+						this.terminalStyle.display = "inline";
+					}
+					else if (arg == 29) {
+						this.terminalStyle.textDecoration = "none";
 					}
 					else if (arg >= 30 && arg <= 37) {
 						this.terminalStyle.colorText = colors8[arg - 30];
@@ -256,61 +340,51 @@
 				this.styleId = this.stylesMap[style];
 				this.styles.push(style);
 			},
+			escapeRegexpr(string) {
+				return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+			},
+			cloneRegexpr(regexpr, position = 0) {
+				regexpr.lastIndex = position;
+				return regexpr;
+			},
 			process(stream) {
-				const csiFctMapping = {
-					m: this.sgr,
-					A: this.moveCursorUp,
-					B: this.moveCursorDown,
-					C: this.moveCursorRight,
-					D: this.moveCursorLeft,
-					E: this.moveCursorDownBegining,
-					F: this.moveCursorUpBegining,
-					f: this.moveCursorLineColumn,
-					G: this.moveCursorColumn,
-					H: this.moveCursorLineColumn,
-					J: this.eraseScreen,
-					K: this.eraseLine,
-				};
+				let regexprCategory = this.cloneRegexpr(this.regexprCategory);
+				let match;
+				let position = 0;
+				while ((match = regexprCategory.exec(stream)) !== null) {
+					// Write everything that did not match.
+					const matchStr = match[0];
+					const offset = match.index;
+					this.write(stream.substring(position, offset));
+					position = offset + matchStr.length;
 
-				const categoryMapping = {
-					"\x1b[": csiFctMapping,
-					"\x9b": csiFctMapping,
-				};
+					// Associate to its match.
+					Exception.assert(matchStr in this.categoryMapping, "The regular expression must match something.");
+					let [regexpr, handler] = this.categoryMapping[matchStr];
 
-				let start = 0;
-				const replacer = (match, category, params, name, offset) => {
-					const args = params
-						.split(";")
-						.filter(Boolean)
-						.map((i) => parseInt(i));
-
-					// Update the content.
-					this.write(stream.substring(start, offset));
-					start = offset + match.length;
-
-					const map = categoryMapping[category] || (() => () => false);
-					const result = (map[name] || (() => false))(...args);
-					if (result !== true) {
-						console.error("Unknown function '" + category + name + "' with params " + args);
+					regexpr.lastIndex = position;
+					if (!(match = regexpr.exec(stream))) {
+						// Stream unfinished.
+						return stream.substring(offset);
+					}
+					// No matches right after the category.
+					if (match.index !== position) {
+						Log.error(
+							"Command '{}' followed with '{}...' is malformed or not supported.",
+							matchStr,
+							stream.substring(0, 10)
+						);
+						continue;
+					}
+					// Process the function.
+					if (!handler(...match)) {
+						console.error("Command '{}{}' is malformed or not supported.", matchStr, match[0]);
 					}
 
-					return match;
-				};
-
-				// Ignore all OSC
-				stream = stream.replace(/\x1b\].*\x07/g, "");
-
-				const regex = new RegExp("(\\x1b\\[|\\x1b\\]|\\x9b|\\x90|\\x9d)([0-9;]*)([^0-9;])", "g");
-				stream.replace(regex, replacer);
-				const remainder = stream.substring(start);
-				// If a special character is truncated at the end of the string,
-				// keep the remainder and return what is left.
-				const index = remainder.lastIndexOf("\\x1b");
-				if (index >= 0) {
-					this.write(remainder.substring(0, index));
-					return remainder.substring(index);
+					position = regexpr.lastIndex;
+					regexprCategory.lastIndex = position;
 				}
-				this.write(remainder);
+				this.write(stream.substring(position));
 				return "";
 			},
 			*reverse(content) {
