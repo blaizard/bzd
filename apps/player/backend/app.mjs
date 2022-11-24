@@ -47,9 +47,6 @@ function pathToPathList(path) {
 	const PATH_STORAGE = Path.join(Path.dirname(PATH_SCENARIO), ".player", scenario.name);
 	const storage = new StorageDisk(PATH_STORAGE);
 
-	// Create the empty directory
-	await FileSystem.mkdir(PATH_STORAGE);
-
 	// websocket ----------------
 
 	const wss = new WebSocketServer({ port: 9999 });
@@ -62,14 +59,14 @@ function pathToPathList(path) {
 		terminal.on("exit", () => {
 			ws.close();
 		});
-		ws.on("message", (event) => {
+		ws.on("message", async (event) => {
 			const input = JSON.parse(event.toString());
 			switch (input.type) {
 			case "init":
-				terminal.init(input.value);
+				await terminal.init(input.value);
 				break;
 			case "stream":
-				terminal.write(input.value);
+				await terminal.write(input.value);
 				break;
 			default:
 				Log.error("Unsupported data type '{}' for terminal.", input.type);

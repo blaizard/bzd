@@ -18,7 +18,7 @@
 		<div :class="setComponentClass('terminal2')" @click="selectComponents('terminal2')">
 			<Terminal ref="terminal2"></Terminal>
 		</div>//-->
-		<!--<Camera class="camera"></Camera>//-->
+		<Camera class="camera"></Camera>
 		<div
 			v-for="(component, id) in components"
 			v-show="id in layoutIds"

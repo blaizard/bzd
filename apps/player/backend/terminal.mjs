@@ -1,6 +1,7 @@
 import pty from "node-pty";
 import Event from "bzd/core/event.mjs";
 import ExceptionFactory from "bzd/core/exception.mjs";
+import FileSystem from "bzd/core/filesystem.mjs";
 
 const Exception = ExceptionFactory("terminal");
 
@@ -16,7 +17,7 @@ export default class Terminal {
 		this.process = null;
 	}
 
-	init(config) {
+	async init(config) {
 		// Process what needs to be changed.
 		// Check if the dimension changed.
 		let resize = false;
@@ -45,6 +46,9 @@ export default class Terminal {
 			this.process.kill();
 		}
 
+		// Make sure the cwd exists.
+		await FileSystem.mkdir(this.cwd);
+
 		this.process = pty.spawn("/bin/bash", ["--noprofile", "--norc"], {
 			name: "xterm-color",
 			cols: this.config.cols,
@@ -68,7 +72,7 @@ export default class Terminal {
 	}
 
 	/// Write data to the terminal.
-	write(data) {
+	async write(data) {
 		Exception.assert(this.process !== null, "The terminal is not initialized.");
 		this.process.write(data);
 	}
