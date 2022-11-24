@@ -25,7 +25,7 @@
         {
             "action": "exec",
             "args": [
-                "docker run -it --rm -v $(pwd):/build ubuntu:16.04",
+                "docker run -it --rm -v $(pwd):/build ubuntu16",
                 "old"
             ]
         },
@@ -78,14 +78,14 @@
         {
             "action": "exec",
             "args": [
-                "./check",
+                "./check /home",
                 "main"
             ]
         },
         {
             "action": "exec",
             "args": [
-                "./check",
+                "./check /home",
                 "old"
             ]
         },
@@ -106,6 +106,13 @@
         {
             "action": "exec",
             "args": [
+                "objdump -TC ./check | grep GLIBCXX_3.4.26",
+                "old"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
                 "g++ check.cc -o check_static -std=c++17 -static-libstdc++",
                 "main"
             ]
@@ -113,7 +120,7 @@
         {
             "action": "exec",
             "args": [
-                "./check_static",
+                "./check_static /home",
                 "old"
             ]
         },
@@ -248,6 +255,20 @@
             ]
         },
         {
+            "action": "exec",
+            "args": [
+                "objdump -T ./exit | grep GLIBC_2.24",
+                "old"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "objdump -T /lib/x86_64-linux-gnu/libc.so.6 | grep quick_exit",
+                "old"
+            ]
+        },
+        {
             "action": "config.layout",
             "args": [
                 "config1",
@@ -273,7 +294,7 @@
         {
             "action": "exec",
             "args": [
-                "apt-get update && apt-get install -y g++",
+                "apt-get update && apt-get install -y gcc",
                 "build"
             ]
         },

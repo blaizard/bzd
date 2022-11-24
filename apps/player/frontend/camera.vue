@@ -50,6 +50,8 @@
 			width: 100%;
 			height: 100%;
 			object-fit: cover;
+			scale: 1.5;
+			transform: scaleX(-1);
 		}
 	}
 </style>
