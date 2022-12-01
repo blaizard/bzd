@@ -75,6 +75,12 @@ export default class StorageWebdav extends Storage {
 		return true;
 	}
 
+	async _metadataImpl(pathList) {
+		const fullPath = this._getLocalPath(pathList);
+		const data = await this._request(fullPath);
+		return data[0];
+	}
+
 	async _readImpl(pathList) {
 		const fullPath = this._getLocalPath(pathList);
 		const result = await this.fetch.request(fullPath, {
@@ -86,6 +92,11 @@ export default class StorageWebdav extends Storage {
 
 	async _listImpl(pathList, maxOrPaging /*, includeMetadata*/) {
 		const fullPath = this._getLocalPath(pathList);
+		const data = await this._request(fullPath);
+		return await CollectionPaging.makeFromList(data.slice(1), maxOrPaging);
+	}
+
+	async _request(fullPath) {
 		const result = await this.fetch.request(fullPath, {
 			method: "propfind",
 		});
@@ -118,6 +129,6 @@ export default class StorageWebdav extends Storage {
 			}
 		}
 
-		return await CollectionPaging.makeFromList(data.slice(1), maxOrPaging);
+		return data;
 	}
 }
