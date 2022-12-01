@@ -1,338 +1,134 @@
 {
     "flow": [
         {
-            "action": "config.layout",
+            "action": "file.create",
             "args": [
-                "config1",
-                "terminal:main",
-                "terminal:old"
-            ]
-        },
-        {
-            "action": "config.name",
-            "args": [
-                "main",
-                "Ubuntu 20.04"
-            ]
-        },
-        {
-            "action": "config.name",
-            "args": [
-                "old",
-                "Ubuntu 16.04"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
-                "docker run -it --rm -v $(pwd):/build ubuntu16",
-                "old"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
-                "cd build",
-                "old"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
-                "clear",
-                "old"
+                "WORKSPACE"
             ]
         },
         {
             "action": "config.select",
             "args": [
-                "editor"
+                "terminal"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "wget https://github.com/bazelbuild/bazelisk/releases/download/v1.15.0/bazelisk-linux-amd64\n"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "chmod +x bazelisk-linux-amd64\n"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "sudo mv bazelisk-linux-amd64 /usr/bin/bazelisk\n"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "sudo ln -sf /usr/bin/bazelisk /usr/bin/bazel\n"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "bazelisk --version\n"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "bazel --version\n"
+            ]
+        },
+        {
+            "action": "config.select",
+            "args": [
+                "default"
             ]
         },
         {
             "action": "file.create",
             "args": [
-                "check.cc"
+                ".bazelversion"
             ]
         },
         {
             "action": "file.write",
             "args": [
-                "check.cc",
-                "#include <iostream>\n#include <filesystem>\n\nint main(int argc, char** argv)\n{\n\tif (argc != 2) return 1;\n\tstd::cout << std::filesystem::exists(argv[1]) << std::endl;\n\treturn 0;\n}\n"
-            ]
-        },
-        {
-            "action": "config.select",
-            "args": [
-                "config1"
+                ".bazelversion",
+                "5.0.0"
             ]
         },
         {
             "action": "exec",
             "args": [
-                "g++ check.cc -o check -std=c++17",
-                "main"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
-                "./check /home",
-                "main"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
-                "./check /home",
-                "old"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
-                "ldd ./check",
-                "old"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
-                "ldd -v ./check",
-                "old"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
-                "objdump -TC ./check | grep GLIBCXX_3.4.26",
-                "old"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
-                "g++ check.cc -o check_static -std=c++17 -static-libstdc++",
-                "main"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
-                "./check_static /home",
-                "old"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
-                "ldd -v ./check_static",
-                "old"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
-                "ls -lh",
-                "main"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
-                "strip ./check_static",
-                "main"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
-                "ls -lh",
-                "main"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
-                "g++ check.cc -o check_static -std=c++17 -static-libstdc++ -ffunction-sections -fdata-sections -Wl,--gc-sections",
-                "main"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
-                "ls -lh",
-                "main"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
-                "strip ./check_static",
-                "main"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
-                "ls -lh",
-                "main"
-            ]
-        },
-        {
-            "action": "config.select",
-            "args": [
-                "editor"
+                "bazel --version\n"
             ]
         },
         {
             "action": "file.create",
             "args": [
-                "exit.c"
+                "tools/bazel",
+                true
             ]
         },
         {
             "action": "file.write",
             "args": [
-                "exit.c",
-                "#include <stdlib.h>\n\nint main()\n{\n\tquick_exit(1);\n}\n"
+                "tools/bazel",
+                "#!/bin/bash\n\nDIR=\"$(dirname -- ${BASH_SOURCE[0]})\"\n"
             ]
         },
         {
-            "action": "config.select",
+            "action": "file.write",
             "args": [
-                "config1"
+                "tools/bazel",
+                "if [ ! -f \"$DIR/bazelisk\" ]; then\n\twget -O \"$DIR/bazelisk\" https://github.com/bazelbuild/bazelisk/releases/download/v1.15.0/bazelisk-linux-amd64\n\tchmod +x \"$DIR/bazelisk\"\nfi\n"
             ]
         },
         {
-            "action": "exec",
+            "action": "file.write",
             "args": [
-                "clear",
-                "main"
+                "tools/bazel",
+                "\"$DIR/bazelisk\" \"$@\"\n"
             ]
         },
         {
-            "action": "exec",
+            "action": "file.create",
             "args": [
-                "clear",
-                "old"
+                ".gitignore"
             ]
         },
         {
-            "action": "exec",
+            "action": "file.write",
             "args": [
-                "gcc exit.c -o exit",
-                "main"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
-                "./exit",
-                "main"
+                ".gitignore",
+                "tools/bazelisk"
             ]
         },
         {
             "action": "exec",
             "args": [
-                "./exit",
-                "old"
+                "./tools/bazel --version\n"
             ]
+        },
+        {
+            "action": "refresh"
         },
         {
             "action": "exec",
             "args": [
-                "ldd -v exit",
-                "old"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
-                "ldd -v exit",
-                "main"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
-                "objdump -T ./exit | grep GLIBC_2.24",
-                "old"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
-                "objdump -T /lib/x86_64-linux-gnu/libc.so.6 | grep quick_exit",
-                "old"
-            ]
-        },
-        {
-            "action": "config.layout",
-            "args": [
-                "config1",
-                "terminal:main",
-                "terminal:old",
-                "terminal:build"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
-                "docker run -it --rm -v $(pwd):/build debian/eol:wheezy",
-                "build"
-            ]
-        },
-        {
-            "action": "config.name",
-            "args": [
-                "build",
-                "Old Debian Wheezy"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
-                "apt-get update && apt-get install -y gcc",
-                "build"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
-                "cd /build",
-                "build"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
-                "gcc exit.c -o exit",
-                "build"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
-                "ldd -v exit",
-                "build"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
-                "./exit",
-                "main"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
-                "./exit",
-                "old"
+                "./tools/bazel --version\n"
             ]
         }
     ],
-    "name": "build"
+    "name": "bazelisk"
 }

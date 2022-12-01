@@ -126,6 +126,16 @@ export default class FileSystem {
 		return await Fs.promises.realpath(path, options);
 	}
 
+	/// Creates a symbolic link.
+	static async symlink(target, path) {
+		return await Fs.promises.symlink(target, path);
+	}
+
+	/// Creates a hard link.
+	static async hardlink(target, path) {
+		return await Fs.promises.link(target, path);
+	}
+
 	/// Walk through a directory and print all files
 	static async *walk(path) {
 		const dirents = await Fs.promises.readdir(path, { withFileTypes: true });
