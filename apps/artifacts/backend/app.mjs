@@ -176,9 +176,14 @@ program
 		return getInternalPath(path.split("/").map(decodeURIComponent));
 	}
 
-	api.handle("get", "/file", async (inputs) => {
+	api.handle("get", "/file", async function (inputs) {
 		const { volume, pathList } = getInternalPathFromString(inputs.path);
 		const storage = await cache.get("volume", volume);
+		const metadata = await storage.metadata(pathList);
+		if (metadata.size) {
+			this.setHeader("Content-Length", metadata.size);
+		}
+		this.setHeader("Content-Disposition", "attachment; filename=\"" + metadata.name + "\"");
 		return await storage.read(pathList);
 	});
 

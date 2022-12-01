@@ -51,6 +51,17 @@ export default class Storage extends AsyncInitialize {
 		return this._deleteImpl(Array.isArray(path) ? path : [path]);
 	}
 
+	/// Get metadata of a specific file
+	async metadata(path) {
+		const pathList = Array.isArray(path) ? path : [path];
+		if (typeof this._metadataImpl == "function") {
+			return this._metadataImpl(pathList);
+		}
+		return {
+			name: pathList[pathList.length - 1],
+		};
+	}
+
 	/// Set the permissions of a file
 	async setPermission(path, permissions) {
 		return this._setPermissionImpl(Array.isArray(path) ? path : [path], permissions);

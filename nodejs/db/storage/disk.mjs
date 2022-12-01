@@ -12,6 +12,59 @@ import Permissions from "./permissions.mjs";
 const Log = LogFactory("db", "storage", "disk");
 const Exception = ExceptionFactory("db", "storage", "disk");
 
+/// Get the metadata of a file
+async function getMetadata(filePath) {
+	let isRead = true;
+	let isWrite = true;
+	let isDelete = true;
+	let isList = true;
+	let type = "";
+
+	const stat = await FileSystem.stat(filePath);
+
+	if (stat.isFile()) {
+		isList = false;
+		type = Path.extname(filePath).slice(1);
+	}
+	else if (stat.isDirectory()) {
+		isRead = false;
+		isWrite = false;
+		isDelete = false;
+		type = "directory";
+	}
+	else {
+		isRead = false;
+		isWrite = false;
+		isDelete = false;
+		isList = false;
+		if (stat.isBlockDevice() || stat.isCharacterDevice()) {
+			type = "device";
+		}
+		else if (stat.isFIFO()) {
+			type = "pipe";
+		}
+		else if (stat.isSocket()) {
+			type = "socket";
+		}
+	}
+
+	return Permissions.makeEntry(
+		{
+			name: Path.basename(filePath),
+			type: type,
+			size: stat.size,
+			created: stat.ctime,
+			modified: stat.mtime,
+		},
+		{
+			read: isRead,
+			write: isWrite,
+			delete: isDelete,
+			list: isList,
+		}
+	);
+}
+
 /// File storage module
 export default class StorageDisk extends Storage {
 	constructor(path, options) {
@@ -68,72 +121,30 @@ export default class StorageDisk extends Storage {
 			if (includeMetadata) {
 				return await CollectionPaging.makeFromList(data, maxOrPaging, async (dirent) => {
 					let filePath = fullPath + "/" + dirent.name;
-					let isRead = true;
-					let isWrite = true;
-					let isDelete = true;
-					let isList = true;
-					let type = "";
-
 					if (dirent.isSymbolicLink()) {
 						// Try to resolve the actual path.
 						try {
 							filePath = await FileSystem.realpath(filePath);
 						}
 						catch (e) {
-							isRead = false;
-							isWrite = false;
-							isDelete = false;
-							isList = false;
-						}
-					}
-					const stat = await FileSystem.stat(filePath);
-
-					if (stat.isFile()) {
-						isList = false;
-						type = Path.extname(dirent.name).slice(1);
-					}
-					else if (stat.isDirectory()) {
-						isRead = false;
-						isWrite = false;
-						isDelete = false;
-						type = "directory";
-					}
-					else {
-						isRead = false;
-						isWrite = false;
-						isDelete = false;
-						isList = false;
-						if (stat.isBlockDevice() || stat.isCharacterDevice()) {
-							type = "device";
-						}
-						else if (stat.isFIFO()) {
-							type = "pipe";
-						}
-						else if (stat.isSocket()) {
-							type = "socket";
+							// Ignore
 						}
 					}
 
-					return Permissions.makeEntry(
-						{
-							name: dirent.name,
-							type: type,
-							size: stat.size,
-							created: stat.ctime,
-							modified: stat.mtime,
-						},
-						{
-							read: isRead,
-							write: isWrite,
-							delete: isDelete,
-							list: isList,
-						}
-					);
+					let metadata = await getMetadata(filePath);
+					// This might differ in case of symlinks
+					metadata.name = dirent.name;
+					return metadata;
 				});
 			}
 			return await CollectionPaging.makeFromList(data, maxOrPaging);
 		}
 		return new CollectionPaging([]);
+	}
+
+	async _metadataImpl(pathList) {
+		const filePath = this._getFullPath(pathList);
+		return await getMetadata(filePath);
 	}
 
 	async _setPermissionImpl(pathList, permissions) {
