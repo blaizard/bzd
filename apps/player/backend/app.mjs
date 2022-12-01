@@ -1,5 +1,4 @@
 import { Command } from "commander/esm.mjs";
-
 import Path from "path";
 import API from "bzd/core/api/server.mjs";
 import APIv1 from "../api.v1.json";
@@ -38,13 +37,18 @@ function pathToPathList(path) {
 	const PORT = process.env.BZD_PORT || program.opts().port;
 	const PATH_STATIC = program.opts().static;
 	const PATH_SCENARIO = program.args[0];
-	//const PATH_CACHE = Path.join(Path.dirname(PATH_SCENARIO), ".player", "cache");
+	const PATH_DATA = Path.join(Path.dirname(PATH_SCENARIO), ".player");
 
 	const raw = await FileSystem.readFile(PATH_SCENARIO);
 	const scenarioData = JSON.parse(raw);
 	const scenario = new Scenario(scenarioData);
 
-	const PATH_STORAGE = Path.join(Path.dirname(PATH_SCENARIO), ".player", scenario.name);
+	const PATH_STORAGE = Path.join("/tmp", scenario.name);
+	await FileSystem.mkdir(PATH_DATA);
+	if (await FileSystem.exists(Path.join(PATH_DATA, scenario.name))) {
+		await FileSystem.unlink(Path.join(PATH_DATA, scenario.name));
+	}
+	await FileSystem.symlink(PATH_STORAGE, Path.join(PATH_DATA, scenario.name));
 	const storage = new StorageDisk(PATH_STORAGE);
 
 	// websocket ----------------
@@ -52,7 +56,7 @@ function pathToPathList(path) {
 	const wss = new WebSocketServer({ port: 9999 });
 
 	wss.on("connection", (ws) => {
-		let terminal = new Terminal(PATH_STORAGE);
+		let terminal = new Terminal(PATH_STORAGE, Path.join(Path.dirname(PATH_SCENARIO), ".player"));
 		terminal.on("data", (data) => {
 			ws.send(data);
 		});

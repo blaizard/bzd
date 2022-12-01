@@ -2,17 +2,20 @@ import pty from "node-pty";
 import Event from "bzd/core/event.mjs";
 import ExceptionFactory from "bzd/core/exception.mjs";
 import FileSystem from "bzd/core/filesystem.mjs";
+import Path from "path";
 
 const Exception = ExceptionFactory("terminal");
 
 export default class Terminal {
-	constructor(cwd) {
+	constructor(cwd, historyPath) {
+		const dirname = Path.dirname(cwd);
 		this.config = {
-			cols: 200,
+			cols: 1024,
 			rows: 30,
-			prompt: "\x1b[0;33mbzd\x1b[0m:\x1b[34m~/`basename " + cwd + "`\x1b[0m$ ",
+			prompt: "\x1b[0;33mbzd\x1b[0m:\x1b[34m~${PWD:" + dirname.length + "}\x1b[0m$ ",
 		};
 		this.cwd = cwd;
+		this.historyPath = historyPath;
 		this.event = new Event();
 		this.process = null;
 	}
@@ -57,6 +60,7 @@ export default class Terminal {
 			env: {
 				PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
 				PS1: this.config.prompt,
+				HOME: process.env.HOME,
 			},
 		});
 		this.process.on("data", (data) => {
@@ -65,6 +69,14 @@ export default class Terminal {
 		this.process.on("exit", () => {
 			this.event.trigger("exit");
 		});
+
+		//
+		// const path = Path.join(this.historyPath, "terminal-0.txt");
+		// if (await FileSystem.exists(path)) {
+		// const content = await FileSystem.readFile(path);
+		// this.event.trigger("data", content);
+		// }
+		//
 	}
 
 	on(...args) {

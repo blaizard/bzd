@@ -7,14 +7,40 @@ import subprocess
 import urllib.request
 import stat
 import shutil
+import platform
+import struct
 
-"""
-Execute a process and exit if it fails
-"""
 def processRun(args) -> None:
+	"""
+	Execute a process and exit if it fails
+	"""
 	result = subprocess.run(args)
 	if result.returncode != 0:
 		sys.exit(result.returncode)
+
+def getOSAndArchitecture() -> str:
+
+	# Identify the bit width.
+	bitsize = str(8 * struct.calcsize("P"))
+
+	# Identify the architecture.
+	machine = "unknown_"
+	machineStr = platform.machine().lower()
+	if any(x in machineStr for x in ("amd", "x86", "i386", "i486", "i586", "i686")):
+		machine = "x86_"
+	elif any(x in machineStr for x in ("aarch", "arm")):
+		machine = "arm"
+
+	# Identify the operating system.
+	os = "unknown"
+	if sys.platform.startswith("linux"):
+		os = "linux"
+	elif sys.platform.startswith("win") or sys.platform.startswith("cygwin"):
+		os = "windows"
+	elif sys.platform.startswith("darwin"):
+		os = "darwin"
+
+	return "{}_{}{}".format(os, machine, bitsize)
 
 if __name__== "__main__":
 
@@ -22,13 +48,26 @@ if __name__== "__main__":
 	parser.add_argument("command", nargs="?", default=None)
 	args, unknown = parser.parse_known_args()
 
+	# Build the full path of bazelisk
 	bazelDirectory = os.path.dirname(os.path.realpath(__file__))
 	workspaceDirectory = os.path.dirname(bazelDirectory)
 	bazeliskPath = os.path.join(bazelDirectory, "bazelisk")
 
 	# If bazel is not installed / available
 	if not os.path.exists(bazeliskPath):
-		url = "https://github.com/bazelbuild/bazelisk/releases/download/v1.12.0/bazelisk-linux-amd64"
+
+		# Check the bazename of bazelisk
+		OSAndArchitecture = getOSAndArchitecture()
+		OSAndArchitectureToBasename = {
+			"darwin_x86_64": "bazelisk-darwin-amd64",
+			"darwin_arm64": "bazelisk-darwin-arm64",
+			"linux_x86_64": "bazelisk-linux-amd64",
+			"linux_arm64": "bazelisk-linux-arm64",
+			"windows_x86_64": "bazelisk-windows-amd64.exe"
+		}
+		basename = OSAndArchitectureToBasename[OSAndArchitecture]
+
+		url = "https://github.com/bazelbuild/bazelisk/releases/download/v1.15.0/{}".format(basename)
 		print("No bazel binary detected, downloading bazelisk from {}...".format(url))
 		with urllib.request.urlopen(url) as response, open(bazeliskPath, "wb") as f:
 			shutil.copyfileobj(response, f)

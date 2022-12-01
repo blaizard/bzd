@@ -1,23 +1,5 @@
 <template>
 	<div class="layout" :style="styleLayout">
-		<!--<div :class="setComponentClass('tree')">
-			<Tree :node="root" :selected="files.selected" @selected="handleTreeSelected"></Tree>
-		</div>
-		<div :class="setComponentClass('content')" @click="selectComponents('content')">
-			<Editor
-				v-if="selectedFile"
-				:value="content"
-				@input="handleContentUpdate"
-				:path="selectedFile.path"
-				:caret="cursor"
-				:focus="selectedComponents.includes('content')"></Editor>
-		</div>
-		<div :class="setComponentClass('terminal1')" @click="selectComponents('terminal1')">
-			<Terminal ref="terminal1"></Terminal>
-		</div>
-		<div :class="setComponentClass('terminal2')" @click="selectComponents('terminal2')">
-			<Terminal ref="terminal2"></Terminal>
-		</div>//-->
 		<Camera class="camera"></Camera>
 		<div
 			v-for="(component, id) in components"
@@ -33,7 +15,7 @@
 				@input="handleContentUpdate"
 				:path="selectedFile.path"
 				:caret="cursor"
-				:focus="selectedComponents.includes('content')"></Editor>
+				:focus="selectedComponents.includes(id)"></Editor>
 			<Tree
 				v-else-if="component.type == 'tree'"
 				:node="root"
@@ -84,6 +66,9 @@
 					editor: {
 						layout: [["tree-0", "editor-0"]],
 					},
+					terminal: {
+						layout: [["terminal-0"]],
+					},
 				},
 				components: {
 					"tree-0": { type: "tree" },
@@ -114,7 +99,7 @@
 			},
 			content() {
 				if (this.selectedFile) {
-					return this.selectedFile.content;
+					return this.selectedFile.content || "";
 				}
 				return "";
 			},
@@ -173,10 +158,12 @@
 			setSelectionEnd() {
 				this.cursor = this.content.length;
 			},
-			async emulateTyping(object, keyName, value) {
+			async emulateTyping(object, keyName, value, position) {
+				let content = [object[keyName].slice(0, position), "", object[keyName].slice(position)];
 				for (const c of value) {
 					await this.emulateTypingKey(c);
-					object[keyName] += c;
+					content[1] += c;
+					object[keyName] = content.join("");
 					this.setSelectionEnd();
 				}
 			},
@@ -192,7 +179,7 @@
 				}
 			},
 			async executeFileCreate(path, executable = false) {
-				this.selectedComponents = ["tree"];
+				this.selectedComponents = ["tree-0"];
 				await this.files.createFile(path, "");
 				await this.emulateTyping(this.files.selected.node, "name", FileSystem.basename(path));
 				if (executable !== false) {
@@ -203,13 +190,33 @@
 				if (!(await this.files.select(path))) {
 					await this.executeFileCreate(path);
 				}
-				this.selectedComponents = ["content"];
+				this.selectedComponents = ["editor-0"];
 				await this.files.selected.updateContent(async () => {
-					await this.emulateTyping(this.files.selected, "content", content);
+					await this.emulateTyping(this.files.selected, "content", content, this.files.selected.cursor);
+					return this.files.selected.cursor + content.length;
 				});
 			},
+			async executeFileSeek(path, position, arg) {
+				Exception.assert(await this.files.select(path), "The file must exists: '{}'.", path);
+				this.selectedComponents = ["editor-0"];
+				switch (position) {
+				case "begin":
+					this.files.selected.setCursor(0);
+					break;
+				case "after":
+					{
+						await this.files.selected.fetchContent();
+						const position = this.files.selected.content.indexOf(arg);
+						Exception.assert(position != -1, "The file content does not contain: '{}'.", arg);
+						this.files.selected.setCursor(position + arg.length);
+					}
+					break;
+				default:
+					Log.error("Unsupported position '{}'.", position);
+				}
+			},
 			async executeFileSelect(path) {
-				this.selectedComponents = ["tree"];
+				this.selectedComponents = ["tree-0"];
 				const node = await this.files.select(path);
 				if (node.isFile()) {
 					await this.files.selected.fetchContent();
@@ -221,26 +228,10 @@
 			},
 			async executeExec(cmdStr, terminal = "terminal-0") {
 				this.selectedComponents = [terminal];
-				await this.emulateTypingTerminal(terminal, cmdStr + "\n");
-				// const stream = await this.$api.request("post", "/exec", {
-				// cmds: cmdStr.split(" "),
-				// });
-				// // Refresh the view every 1s.
-				// const refresher = setInterval(() => {
-				// this.files.refresh();
-				// }, 1000);
-				// try {
-				// for await (const chunk of streamAsyncIterable(stream)) {
-				// const blob = new Blob([chunk.buffer], { type: "text/plain; charset=utf-8" });
-				// const text = await blob.text();
-				// this.terminal.push(text);
-				// }
-				// this.files.refresh();
-				// }
-				// finally {
-				// clearInterval(refresher);
-				// this.setPrompt();
-				// }
+				await this.emulateTypingTerminal(terminal, cmdStr);
+			},
+			async executeRefresh() {
+				this.files.refresh();
 			},
 			waitingKeypress() {
 				return new Promise((resolve) => {
@@ -331,6 +322,9 @@
 				case "file.write":
 					await this.executeFileWrite(...this.action.args);
 					break;
+				case "file.seek":
+					await this.executeFileSeek(...this.action.args);
+					break;
 				case "file.select":
 					await this.executeFileSelect(...this.action.args);
 					break;
@@ -339,6 +333,9 @@
 					break;
 				case "exec":
 					await this.executeExec(...this.action.args);
+					break;
+				case "refresh":
+					await this.executeRefresh(...this.action.args);
 					break;
 				default:
 					console.error("Unsupported command: " + this.action.type);
@@ -432,6 +429,7 @@
 		//grid-template-columns: auto 1fr;
 		//grid-template-rows: 1fr;
 		//grid-template-columns: 1fr 1fr;
+		//grid-template-columns: 1fr 2fr !important;
 
 		> * {
 			min-width: 0;

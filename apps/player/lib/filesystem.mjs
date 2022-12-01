@@ -7,7 +7,7 @@ class Node {
 	constructor(filesystem, node) {
 		this.filesystem = filesystem;
 		this.node = node;
-		this.content = "";
+		this.content = null;
 	}
 
 	get name() {
@@ -20,6 +20,13 @@ class Node {
 
 	get path() {
 		return this.node.path;
+	}
+
+	get cursor() {
+		if (typeof this.node.cursor == "number") {
+			return this.node.cursor;
+		}
+		return this.content === null ? 0 : this.content.length;
 	}
 
 	/// Refresh the children.
@@ -46,11 +53,13 @@ class Node {
 		return this.node.children;
 	}
 
-	async fetchContent() {
-		Exception.assert(this.isFile(), "Folder do not have content");
-		this.content = await this.filesystem.api.request("get", "/file/content", {
-			path: this.node.path,
-		});
+	async fetchContent(force = false) {
+		if (this.content === null || force) {
+			Exception.assert(this.isFile(), "Folder do not have content");
+			this.content = await this.filesystem.api.request("get", "/file/content", {
+				path: this.node.path,
+			});
+		}
 	}
 
 	async saveContent(content) {
@@ -60,13 +69,21 @@ class Node {
 
 	async updateContent(process) {
 		await this.fetchContent();
-		await process(this);
+		const cursor = await process(this);
+		if (typeof cursor == "number") {
+			this.setCursor(cursor);
+		}
 		await this.filesystem.api.request("post", "/file/content", { path: this.node.path, content: this.content });
 	}
 
 	async toggleExpand() {
 		Exception.assert(this.isFolder(), "Only folders can be expanded");
 		this.node.expanded = !this.node.expanded;
+	}
+
+	/// Set the new position for the cursor
+	setCursor(position) {
+		this.node.cursor = position;
 	}
 
 	/// Checks if the node is a directory
@@ -170,7 +187,7 @@ export default class FileSystem {
 		const basename = FileSystem.basename(path);
 		const current = await this.createFolder(dirname);
 		let children = await current.getChildren();
-		Vue.set(children, basename, { name: initialName === null ? basename : initialName, path: path, content: "" });
+		Vue.set(children, basename, { name: initialName === null ? basename : initialName, path: path });
 		await this.api.request("post", "/file/content", { path: path });
 		this.selected = this.makeNode_(children[basename]);
 	}
@@ -211,7 +228,11 @@ export default class FileSystem {
 			current = this.makeNode_(children[name]);
 		}
 		if (select) {
-			this.selected = current;
+			// Do not re-select the file if it is already.
+			if (!this.selected || this.selected.node !== current.node) {
+				this.selected = current;
+			}
+			current = this.selected;
 		}
 		return current;
 	}

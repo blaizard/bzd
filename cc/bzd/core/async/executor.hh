@@ -215,7 +215,8 @@ public:
 			if (maybeExecutable.hasValue())
 			{
 				auto& executable = maybeExecutable.valueMutable();
-				if (executable.isCanceled())
+				const auto isCanceled = executable.isCanceled();
+				if (isCanceled)
 				{
 					executable.cancel(context);
 				}
@@ -359,6 +360,15 @@ private:
 		return bzd::nullopt;
 	}
 
+	/// Suspend an executable.
+	/// TODO: make it really noexcept.
+	[[nodiscard]] constexpr SuspendedId suspend(Executable& executable) noexcept
+	{
+		const auto maybeSuspendId = suspended_.push(executable);
+		bzd::assert::isTrue(maybeSuspendId.hasValue());
+		return maybeSuspendId.value();
+	}
+
 private:
 	template <class U>
 	friend class bzd::interface::Executable;
@@ -490,9 +500,7 @@ public:
 		}
 
 		assert::isTrue(executor_.hasValue());
-		const auto maybeSuspendId = executor_->suspended_.push(getExecutable());
-		bzd::assert::isTrue(maybeSuspendId.hasValue());
-		suspendId_ = maybeSuspendId.value();
+		suspendId_ = executor_->suspend(getExecutable());
 
 		return {executor_.valueMutable(), suspendId_};
 	}
