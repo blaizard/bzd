@@ -7,126 +7,15 @@
             ]
         },
         {
-            "action": "config.select",
-            "args": [
-                "terminal"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
-                "wget https://github.com/bazelbuild/bazelisk/releases/download/v1.15.0/bazelisk-linux-amd64\n"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
-                "chmod +x bazelisk-linux-amd64\n"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
-                "sudo mv bazelisk-linux-amd64 /usr/bin/bazelisk\n"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
-                "sudo ln -sf /usr/bin/bazelisk /usr/bin/bazel\n"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
-                "bazelisk --version\n"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
-                "bazel --version\n"
-            ]
-        },
-        {
-            "action": "config.select",
-            "args": [
-                "default"
-            ]
-        },
-        {
             "action": "file.create",
             "args": [
-                ".bazelversion"
-            ]
-        },
-        {
-            "action": "file.write",
-            "args": [
-                ".bazelversion",
-                "5.0.0"
+                "BUILD"
             ]
         },
         {
             "action": "exec",
             "args": [
-                "bazel --version\n"
-            ]
-        },
-        {
-            "action": "file.create",
-            "args": [
-                "tools/bazel",
-                true
-            ]
-        },
-        {
-            "action": "file.write",
-            "args": [
-                "tools/bazel",
-                "#!/bin/bash\n\nDIR=\"$(dirname -- ${BASH_SOURCE[0]})\"\n"
-            ]
-        },
-        {
-            "action": "file.write",
-            "args": [
-                "tools/bazel",
-                "if [ ! -f \"$DIR/bazelisk\" ]; then\n\twget -O \"$DIR/bazelisk\" https://github.com/bazelbuild/bazelisk/releases/download/v1.15.0/bazelisk-linux-amd64\n\tchmod +x \"$DIR/bazelisk\"\nfi\n"
-            ]
-        },
-        {
-            "action": "file.write",
-            "args": [
-                "tools/bazel",
-                "\"$DIR/bazelisk\" \"$@\"\n"
-            ]
-        },
-        {
-            "action": "file.create",
-            "args": [
-                ".gitignore"
-            ]
-        },
-        {
-            "action": "file.write",
-            "args": [
-                ".gitignore",
-                "tools/bazelisk"
-            ]
-        },
-        {
-            "action": "exec",
-            "args": [
-                "./tools/bazel --version\n"
-            ]
-        },
-        {
-            "action": "refresh"
-        },
-        {
-            "action": "exec",
-            "args": [
-                "./tools/bazel --version\n"
+                "bazel build ...\n"
             ]
         }
     ],

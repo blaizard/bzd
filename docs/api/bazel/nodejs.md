@@ -5,7 +5,7 @@
 ## bzd_nodejs_install
 
 <pre>
-bzd_nodejs_install(<a href="#bzd_nodejs_install-name">name</a>, <a href="#bzd_nodejs_install-aliases">aliases</a>, <a href="#bzd_nodejs_install-data">data</a>, <a href="#bzd_nodejs_install-deps">deps</a>, <a href="#bzd_nodejs_install-packages">packages</a>, <a href="#bzd_nodejs_install-srcs">srcs</a>)
+bzd_nodejs_install(<a href="#bzd_nodejs_install-name">name</a>, <a href="#bzd_nodejs_install-aliases">aliases</a>, <a href="#bzd_nodejs_install-data">data</a>, <a href="#bzd_nodejs_install-deps">deps</a>, <a href="#bzd_nodejs_install-packages">packages</a>, <a href="#bzd_nodejs_install-srcs">srcs</a>, <a href="#bzd_nodejs_install-tools">tools</a>)
 </pre>
 
 
@@ -21,6 +21,7 @@ bzd_nodejs_install(<a href="#bzd_nodejs_install-name">name</a>, <a href="#bzd_no
 | deps |  Dependencies   | <a href="https://bazel.build/docs/build-ref.html#labels">List of labels</a> | optional | [] |
 | packages |  Package dependencies   | <a href="https://bazel.build/docs/skylark/lib/dict.html">Dictionary: String -> String</a> | optional | {} |
 | srcs |  Source files   | <a href="https://bazel.build/docs/build-ref.html#labels">List of labels</a> | optional | [] |
+| tools |  Additional tools to be added to the runfile   | <a href="https://bazel.build/docs/build-ref.html#labels">List of labels</a> | optional | [] |
 
 
 <a name="#bzd_nodejs_library"></a>
@@ -28,7 +29,7 @@ bzd_nodejs_install(<a href="#bzd_nodejs_install-name">name</a>, <a href="#bzd_no
 ## bzd_nodejs_library
 
 <pre>
-bzd_nodejs_library(<a href="#bzd_nodejs_library-name">name</a>, <a href="#bzd_nodejs_library-aliases">aliases</a>, <a href="#bzd_nodejs_library-data">data</a>, <a href="#bzd_nodejs_library-deps">deps</a>, <a href="#bzd_nodejs_library-packages">packages</a>, <a href="#bzd_nodejs_library-srcs">srcs</a>)
+bzd_nodejs_library(<a href="#bzd_nodejs_library-name">name</a>, <a href="#bzd_nodejs_library-aliases">aliases</a>, <a href="#bzd_nodejs_library-data">data</a>, <a href="#bzd_nodejs_library-deps">deps</a>, <a href="#bzd_nodejs_library-packages">packages</a>, <a href="#bzd_nodejs_library-srcs">srcs</a>, <a href="#bzd_nodejs_library-tools">tools</a>)
 </pre>
 
 
@@ -44,6 +45,7 @@ bzd_nodejs_library(<a href="#bzd_nodejs_library-name">name</a>, <a href="#bzd_no
 | deps |  Dependencies   | <a href="https://bazel.build/docs/build-ref.html#labels">List of labels</a> | optional | [] |
 | packages |  Package dependencies   | <a href="https://bazel.build/docs/skylark/lib/dict.html">Dictionary: String -> String</a> | optional | {} |
 | srcs |  Source files   | <a href="https://bazel.build/docs/build-ref.html#labels">List of labels</a> | optional | [] |
+| tools |  Additional tools to be added to the runfile   | <a href="https://bazel.build/docs/build-ref.html#labels">List of labels</a> | optional | [] |
 
 
 <a name="#BzdNodeJsDepsProvider"></a>

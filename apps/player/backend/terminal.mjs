@@ -1,8 +1,8 @@
-import pty from "node-pty";
 import Event from "bzd/core/event.mjs";
 import ExceptionFactory from "bzd/core/exception.mjs";
 import FileSystem from "bzd/core/filesystem.mjs";
 import Path from "path";
+import { spawn } from "child_process";
 
 const Exception = ExceptionFactory("terminal");
 
@@ -52,21 +52,46 @@ export default class Terminal {
 		// Make sure the cwd exists.
 		await FileSystem.mkdir(this.cwd);
 
-		this.process = pty.spawn("/bin/bash", ["--noprofile", "--norc"], {
-			name: "xterm-color",
-			cols: this.config.cols,
-			rows: this.config.rows,
-			cwd: this.cwd,
-			env: {
-				PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
-				PS1: this.config.prompt,
-				HOME: process.env.HOME,
-			},
+		this.process = spawn(
+			"apps/player/backend/terminal",
+			[
+				"--cwd",
+				this.cwd,
+				"--env",
+				"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+				"--env",
+				"PS1=" + this.config.prompt,
+				"--env",
+				"HOME=" + process.env.HOME,
+				"--",
+				"--noprofile",
+				"--norc",
+			],
+			{
+				stdio: ["pipe", "pipe", "pipe"],
+			}
+		);
+
+		// 
+		// this.process = pty.spawn("/bin/bash", ["--noprofile", "--norc"], {
+		// name: "xterm-color",
+		// cols: this.config.cols,
+		// rows: this.config.rows,
+		// cwd: this.cwd,
+		// env: {
+		// PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+		// PS1: this.config.prompt,
+		// HOME: process.env.HOME,
+		// },
+		// });
+		// 
+		this.process.stdout.on("data", (data) => {
+			this.event.trigger("data", data.toString());
 		});
-		this.process.on("data", (data) => {
-			this.event.trigger("data", data);
+		this.process.stderr.on("data", (data) => {
+			this.event.trigger("data", data.toString());
 		});
-		this.process.on("exit", () => {
+		this.process.on("close", () => {
 			this.event.trigger("exit");
 		});
 
@@ -86,6 +111,6 @@ export default class Terminal {
 	/// Write data to the terminal.
 	async write(data) {
 		Exception.assert(this.process !== null, "The terminal is not initialized.");
-		this.process.write(data);
+		this.process.stdin.write(data);
 	}
 }

@@ -45,6 +45,7 @@ function pathToPathList(path) {
 
 	const PATH_STORAGE = Path.join("/tmp", scenario.name);
 	await FileSystem.mkdir(PATH_DATA);
+	await FileSystem.mkdir(PATH_STORAGE);
 	if (await FileSystem.exists(Path.join(PATH_DATA, scenario.name))) {
 		await FileSystem.unlink(Path.join(PATH_DATA, scenario.name));
 	}

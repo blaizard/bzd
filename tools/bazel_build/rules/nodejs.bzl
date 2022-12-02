@@ -22,8 +22,11 @@ def _bzd_nodejs_deps_provider_merge(deps, ctx = None):
 
     # Merge context information first
     if ctx:
+        tools = []
+        for tool in ctx.attr.tools:
+            tools += tool[DefaultInfo].default_runfiles.files.to_list()
         srcs = depset(srcs.to_list(), transitive = [f.files for f in ctx.attr.srcs])
-        data = depset(data.to_list(), transitive = [f.files for f in ctx.attr.data])
+        data = depset(data.to_list() + tools, transitive = [f.files for f in ctx.attr.data])
         packages = dict(ctx.attr.packages)
         aliases = ctx.attr.aliases
 
@@ -83,6 +86,10 @@ _COMMON_ATTRS = {
     "data": attr.label_list(
         allow_files = True,
         doc = "Data to be added to the runfile list",
+    ),
+    "tools": attr.label_list(
+        doc = "Additional tools to be added to the runfile",
+        cfg = "target",
     ),
     "packages": attr.string_dict(
         allow_empty = True,

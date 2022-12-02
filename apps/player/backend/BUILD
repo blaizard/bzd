@@ -1,4 +1,12 @@
+load("@rules_python//python:defs.bzl", "py_binary")
 load("//tools/bazel_build/rules:nodejs.bzl", "bzd_nodejs_binary")
+
+py_binary(
+    name = "terminal",
+    srcs = [
+        "terminal.py",
+    ],
+)
 
 bzd_nodejs_binary(
     name = "backend",
@@ -13,8 +21,10 @@ bzd_nodejs_binary(
     packages = {
         "commander": "",
         "ws": "",
-        "node-pty": "",
     },
+    tools = [
+        ":terminal",
+    ],
     visibility = [
         "//apps/player:__pkg__",
     ],
