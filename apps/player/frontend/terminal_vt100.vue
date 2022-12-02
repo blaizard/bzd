@@ -378,7 +378,7 @@
 					}
 					// Process the function.
 					if (!handler(...match)) {
-						console.error("Command '{}{}' is malformed or not supported.", matchStr, match[0]);
+						Log.error("Command '{}{}' is malformed or not supported.", matchStr, match[0]);
 					}
 
 					position = regexpr.lastIndex;
