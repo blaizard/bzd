@@ -2,13 +2,13 @@
 
 set -e
 
-VERSION=15.0.5
+VERSION=15.0.6
 HOST=linux_x86_64
 PACKAGE=${HOST}_${VERSION}
 
-sudo apt install -y python3
+sudo apt-get install -y python3
 
-rm -rfd llvm-project-${VERSION}.src
+rm -rf llvm-project-${VERSION}.src
 curl -L https://github.com/llvm/llvm-project/releases/download/llvmorg-${VERSION}/llvm-project-${VERSION}.src.tar.xz | tar -xJ
 pushd llvm-project-${VERSION}.src
 cmake -G "Unix Makefiles" -S llvm -B build -DCMAKE_BUILD_TYPE="Release" \
