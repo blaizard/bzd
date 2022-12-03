@@ -13,17 +13,17 @@ BINARIES = {
     "strip": "bin/llvm-strip",
 }
 
-def _load_linux_x86_64_clang_15_0_5(name):
+def _load_linux_x86_64_clang_15_0_6(name):
     # Load dependencies
-    package_name = "linux_x86_64_clang_15_0_5"
+    package_name = "linux_x86_64_clang_15_0_6"
     http_archive(
         name = package_name,
         build_file = "//toolchains/cc/linux_x86_64_clang:{}.BUILD".format(package_name),
         urls = [
-            "http://data.blaizard.com/file/bzd/toolchains/cc/clang/linux_x86_64/linux_x86_64_15.0.5.tar.xz",
+            "http://data.blaizard.com/file/bzd/toolchains/cc/clang/linux_x86_64/linux_x86_64_15.0.6.tar.xz",
         ],
-        strip_prefix = "linux_x86_64_15.0.5",
-        sha256 = "465953982e8f4321854e0ed179b2328279e7ceceec203e3d298b41a5e8309313",
+        strip_prefix = "linux_x86_64_15.0.6",
+        sha256 = "53e7a89dffc0297a3ca208b49f9448b507d7298b01d53a36e03db0d2b4f4b896",
     )
 
     toolchain_definition = {
@@ -44,7 +44,7 @@ def _load_linux_x86_64_clang_15_0_5(name):
         ],
         "system_directories": [
             "external/{}/include/c++/v1".format(package_name),
-            "external/{}/lib/clang/15.0.5/include".format(package_name),
+            "external/{}/lib/clang/15.0.6/include".format(package_name),
             "external/{}/include/x86_64-unknown-linux-gnu/c++/v1/".format(package_name),
             "/usr/include/x86_64-linux-gnu",
             "/usr/include",
@@ -99,4 +99,4 @@ def _load_linux_x86_64_clang_15_0_5(name):
     )
 
 def load_linux_x86_64_clang():
-    _load_linux_x86_64_clang_15_0_5(name = "linux_x86_64_clang")
+    _load_linux_x86_64_clang_15_0_6(name = "linux_x86_64_clang")

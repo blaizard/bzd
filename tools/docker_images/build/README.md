@@ -4,14 +4,14 @@ It is necessary to use an old distro, in order to rely on an old glibc. This inc
 # Build
 
 ```bash
-docker build tools/docker_images/build -t build
+docker build tools/docker_images/build -t blaizard/build:x86_64
 ```
 
 # Use it
 
 ```bash
 # Start the docker instance and run a shell with /bash/bin
-docker run -it --rm -v "$(pwd)"/sandbox:/sandbox build
+docker run -it --rm -v "$(pwd)"/sandbox:/sandbox blaizard/build:x86_64
 ```
 
 # Stop it

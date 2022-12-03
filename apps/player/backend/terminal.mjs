@@ -72,7 +72,7 @@ export default class Terminal {
 			}
 		);
 
-		// 
+		//
 		// this.process = pty.spawn("/bin/bash", ["--noprofile", "--norc"], {
 		// name: "xterm-color",
 		// cols: this.config.cols,
@@ -84,7 +84,7 @@ export default class Terminal {
 		// HOME: process.env.HOME,
 		// },
 		// });
-		// 
+		//
 		this.process.stdout.on("data", (data) => {
 			this.event.trigger("data", data.toString());
 		});

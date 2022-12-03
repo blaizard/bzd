@@ -12,7 +12,9 @@ sudo apt-get install -y --no-install-recommends \
     build-essential \
     libtool \
     autoconf \
-    ca-certificates
+    ca-certificates \
+    openssl \
+    libssl-dev
 
 curl -L https://github.com/Kitware/CMake/archive/refs/tags/v${VERSION}.tar.gz | tar -xz
 pushd CMake-${VERSION}
