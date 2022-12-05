@@ -11,15 +11,25 @@ namespace bzd {
 template <bzd::concepts::containerToString Container, bzd::concepts::integral T>
 constexpr Size serialize(Container& str, const T& value) noexcept
 {
-	if constexpr (concepts::sameAs<typeTraits::RemoveCVRef<T>, bool> || bzd::concepts::sameAs<typeTraits::RemoveCVRef<T>, Bool>)
+	using Type = typeTraits::RemoveCVRef<T>;
+
+	if constexpr (concepts::sameAs<Type, bool> || bzd::concepts::sameAs<Type, Bool>)
 	{
 		str.append((value) ? bzd::Byte{1u} : bzd::Byte{0u});
 		return 1u;
 	}
+	else if constexpr (concepts::sameAs<Type, Int8> || bzd::concepts::sameAs<Type, UInt8> || concepts::sameAs<Type, Int16> ||
+					   bzd::concepts::sameAs<Type, UInt16> || concepts::sameAs<Type, Int32> || bzd::concepts::sameAs<Type, UInt32> ||
+					   concepts::sameAs<Type, Int64> || bzd::concepts::sameAs<Type, UInt64> || concepts::sameAs<Type, Byte> ||
+					   bzd::concepts::sameAs<Type, char>)
+	{
+		const auto bytes = bzd::Span<const T>{&value, 1u}.asBytes();
+		str.append(bytes | impl::serialization::normalizeByteOrder());
+		return bytes.size();
+	}
 	else
 	{
-        // TODO: to implement.
-		return 0u;
+		static_assert(bzd::meta::alwaysFalse<T>, "This type is not a supported integral type.");
 	}
 }
 

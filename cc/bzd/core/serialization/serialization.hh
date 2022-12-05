@@ -1,10 +1,31 @@
 #pragma once
 
+#include "cc/bzd/container/range/views/all.hh"
+#include "cc/bzd/container/range/views/reverse.hh"
 #include "cc/bzd/meta/always_false.hh"
 #include "cc/bzd/type_traits/container.hh"
+#include "cc/bzd/utility/bit/endian.hh"
 #include "cc/bzd/utility/ignore.hh"
 
 namespace bzd {
+
+namespace impl::serialization {
+
+/// To byte order
+inline constexpr auto normalizeByteOrder() noexcept
+{
+	// The endianness of serialized data are little endian.
+	if constexpr (bzd::Endian::native == bzd::Endian::little)
+	{
+		return bzd::range::all();
+	}
+	else
+	{
+		return bzd::range::reverse();
+	}
+}
+
+} // namespace impl::serialization
 
 /// Serialize the value of a data type into bytes.
 ///

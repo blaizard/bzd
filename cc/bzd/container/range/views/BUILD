@@ -6,6 +6,7 @@ bzd_cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":adaptor",
+        ":all",
         ":drop",
         ":reverse",
         ":transform",
@@ -23,6 +24,18 @@ cc_library(
     deps = [
         "//cc/bzd/type_traits:range",
         "//cc/bzd/utility:forward",
+    ],
+)
+
+cc_library(
+    name = "all",
+    hdrs = [
+        "all.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":adaptor",
+        "//cc/bzd/container/range:view_interface",
     ],
 )
 
