@@ -58,5 +58,6 @@ cc_library(
         ":span",
         "//cc/bzd/type_traits:is_convertible",
         "//cc/bzd/type_traits:is_trivially_copyable",
+        "//cc/bzd/type_traits:sentinel_for",
     ],
 )

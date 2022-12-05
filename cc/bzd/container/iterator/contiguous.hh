@@ -26,6 +26,7 @@ public: // Copy/move constructors/assignments
 	Contiguous& operator=(const Contiguous&) = default;
 	Contiguous(Contiguous&&) = default;
 	Contiguous& operator=(Contiguous&&) = default;
+	~Contiguous() = default;
 };
 
 } // namespace bzd::iterator

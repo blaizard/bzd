@@ -27,6 +27,7 @@ public: // Copy/move constructors/assignments
 	RandomAccess& operator=(const RandomAccess&) = default;
 	RandomAccess(RandomAccess&&) = default;
 	RandomAccess& operator=(RandomAccess&&) = default;
+	~RandomAccess() = default;
 
 public: // API
 	[[nodiscard]] constexpr ActualSelf operator+(const int n) const noexcept

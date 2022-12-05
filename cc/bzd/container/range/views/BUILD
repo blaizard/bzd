@@ -7,6 +7,7 @@ bzd_cc_library(
     deps = [
         ":adaptor",
         ":drop",
+        ":reverse",
         ":transform",
     ],
 )
@@ -35,6 +36,19 @@ cc_library(
         ":adaptor",
         "//cc/bzd/container/range:view_interface",
         "//cc/bzd/utility:advance",
+    ],
+)
+
+cc_library(
+    name = "reverse",
+    hdrs = [
+        "reverse.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":adaptor",
+        "//cc/bzd/container/iterator:reverse",
+        "//cc/bzd/container/range:view_interface",
     ],
 )
 

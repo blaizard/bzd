@@ -27,6 +27,7 @@ public: // Copy/move constructors/assignments
 	Bidirectional& operator=(const Bidirectional&) = default;
 	Bidirectional(Bidirectional&&) = default;
 	Bidirectional& operator=(Bidirectional&&) = default;
+	~Bidirectional() = default;
 
 public: // API
 	constexpr ActualSelf& operator--() noexcept

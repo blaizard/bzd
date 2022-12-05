@@ -20,9 +20,11 @@ bzd_cc_library(
         ":max",
         ":min",
         ":move",
+        ":next",
         ":numeric_limits",
         ":offset_of",
         ":ownership",
+        ":prev",
         ":ratio",
         ":scope_guard",
         ":signal",
@@ -212,6 +214,17 @@ cc_library(
 )
 
 cc_library(
+    name = "next",
+    hdrs = [
+        "next.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":advance",
+    ],
+)
+
+cc_library(
     name = "numeric_limits",
     hdrs = [
         "numeric_limits.hh",
@@ -241,6 +254,17 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/core/assert",
+    ],
+)
+
+cc_library(
+    name = "prev",
+    hdrs = [
+        "prev.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":advance",
     ],
 )
 
