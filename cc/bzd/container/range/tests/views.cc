@@ -35,13 +35,16 @@ TEST(Views, Transform)
 		const auto isEqual = bzd::algorithm::equal(view, expected);
 		EXPECT_TRUE(isEqual);
 	}
-	/*	{
-			const auto isEqual = bzd::algorithm::equal(range | bzd::range::drop(2), expected);
-			EXPECT_TRUE(isEqual);
-		}
-		{
-			const auto expected2 = {3, 4};
-			const auto isEqual = bzd::algorithm::equal(range | bzd::range::drop(2) | bzd::range::drop(1), expected2);
-			EXPECT_TRUE(isEqual);
-		}*/
+}
+
+TEST(Views, Reverse)
+{
+	bzd::test::Range<bzd::typeTraits::BidirectionalTag, int, 5> range{0, 1, 2, 3, 4};
+	bzd::range::Reverse view{range};
+
+	const auto expected = {4, 3, 2, 1, 0};
+	{
+		const auto isEqual = bzd::algorithm::equal(view, expected);
+		EXPECT_TRUE(isEqual);
+	}
 }

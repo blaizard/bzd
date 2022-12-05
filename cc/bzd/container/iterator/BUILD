@@ -13,6 +13,17 @@ cc_library(
 )
 
 cc_library(
+    name = "bidirectional",
+    hdrs = [
+        "bidirectional.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":forward",
+    ],
+)
+
+cc_library(
     name = "container_of_iterables",
     hdrs = [
         "container_of_iterables.hh",
@@ -33,17 +44,6 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":random_access",
-    ],
-)
-
-cc_library(
-    name = "bidirectional",
-    hdrs = [
-        "bidirectional.hh",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":forward",
     ],
 )
 
@@ -69,6 +69,18 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":bidirectional",
+    ],
+)
+
+cc_library(
+    name = "reverse",
+    hdrs = [
+        "reverse.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/type_traits:iterator",
+        "//cc/bzd/utility:prev",
     ],
 )
 

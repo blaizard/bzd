@@ -3,6 +3,7 @@
 #include "cc/bzd/container/impl/span.hh"
 #include "cc/bzd/type_traits/is_convertible.hh"
 #include "cc/bzd/type_traits/is_trivially_copyable.hh"
+#include "cc/bzd/type_traits/sentinel_for.hh"
 
 #include <new> // Required for placement new.
 
@@ -68,13 +69,11 @@ public: // Modifiers.
 		return append(bzd::forward<Args>(args)...);
 	}
 
-	/// Adds a new element at the end of the container, after its current last
-	/// element.
+	/// Adds a new element at the end of the container, after its current last element.
 	/// The content of `value` is copied (or moved) to the new element.
 	///
 	/// \param value Value to be copied (or moved) to the new element.
-	template <class U>
-	requires concepts::convertible<U, T>
+	template <concepts::convertible<T> U>
 	constexpr Size append(U&& value) noexcept
 	{
 		return appendInternal(bzd::forward<U>(value));
@@ -87,9 +86,8 @@ public: // Modifiers.
 		return appendInternal(reinterpret_cast<const T&>(value));
 	}
 
-	template <class Iterator>
-	requires concepts::forwardIterator<Iterator>
-	constexpr Size append(Iterator first, Iterator last) noexcept
+	template <concepts::forwardIterator Iterator, concepts::sentinelFor<Iterator> Sentinel>
+	constexpr Size append(Iterator first, Sentinel last) noexcept
 	{
 		Size count = 0u;
 		while (!(first == last))
@@ -100,8 +98,7 @@ public: // Modifiers.
 		return count;
 	}
 
-	template <class Range>
-	requires concepts::forwardRange<Range>
+	template <concepts::forwardRange Range>
 	constexpr Size append(Range&& range)
 	{
 		return append(bzd::begin(range), bzd::end(range));

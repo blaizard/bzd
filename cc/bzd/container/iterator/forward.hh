@@ -59,6 +59,7 @@ public: // Copy/move constructors/assignments
 	Forward& operator=(const Forward&) = default;
 	Forward(Forward&&) = default;
 	Forward& operator=(Forward&&) = default;
+	~Forward() = default;
 
 public: // API
 	constexpr ActualSelf& operator++() noexcept
@@ -67,7 +68,7 @@ public: // API
 		return static_cast<ActualSelf&>(*this);
 	}
 
-	constexpr ActualSelf operator++(int) noexcept
+	[[nodiscard]] constexpr ActualSelf operator++(int) noexcept
 	{
 		ActualSelf it{static_cast<const ActualSelf&>(*this)};
 		Policies::increment(data_);
