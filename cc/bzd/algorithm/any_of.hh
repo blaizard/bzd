@@ -26,7 +26,7 @@ template <concepts::forwardIterator Iterator,
 template <concepts::forwardRange Range, concepts::predicate<typeTraits::RangeValue<Range>> UnaryPredicate>
 [[nodiscard]] constexpr auto anyOf(Range&& range, UnaryPredicate predicate) noexcept
 {
-	return anyOf(bzd::begin(range), bzd::end(range), predicate);
+	return bzd::algorithm::anyOf(bzd::begin(range), bzd::end(range), predicate);
 }
 
 } // namespace bzd::algorithm

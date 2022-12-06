@@ -9,13 +9,13 @@
 namespace bzd {
 
 template <bzd::concepts::containerToString Container, bzd::concepts::integral T>
-constexpr Size serialize(Container& str, const T& value) noexcept
+constexpr Size serialize(Container& container, const T& value) noexcept
 {
 	using Type = typeTraits::RemoveCVRef<T>;
 
 	if constexpr (concepts::sameAs<Type, bool> || bzd::concepts::sameAs<Type, Bool>)
 	{
-		str.append((value) ? bzd::Byte{1u} : bzd::Byte{0u});
+		container.append((value) ? bzd::Byte{1u} : bzd::Byte{0u});
 		return 1u;
 	}
 	else if constexpr (concepts::sameAs<Type, Int8> || bzd::concepts::sameAs<Type, UInt8> || concepts::sameAs<Type, Int16> ||
@@ -24,7 +24,7 @@ constexpr Size serialize(Container& str, const T& value) noexcept
 					   bzd::concepts::sameAs<Type, char>)
 	{
 		const auto bytes = bzd::Span<const T>{&value, 1u}.asBytes();
-		str.append(bytes | impl::serialization::normalizeByteOrder());
+		container.append(bytes | impl::serialization::normalizeByteOrder());
 		return bytes.size();
 	}
 	else

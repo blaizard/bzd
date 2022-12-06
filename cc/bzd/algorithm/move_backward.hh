@@ -31,7 +31,7 @@ constexpr Iterator2 moveBackward(Iterator1 first, Sentinel1 last, Iterator2 resu
 template <concepts::bidirectionalRange Range1, concepts::bidirectionalRange Range2>
 constexpr auto moveBackward(Range1&& range1, Range2&& range2) noexcept
 {
-	return moveBackward(bzd::begin(range1), bzd::end(range1), bzd::begin(range2));
+	return bzd::algorithm::moveBackward(bzd::begin(range1), bzd::end(range1), bzd::begin(range2));
 }
 
 } // namespace bzd::algorithm

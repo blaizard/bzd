@@ -53,7 +53,7 @@ constexpr Iterator upperBound(Iterator first, Sentinel last, const T& value, Com
 template <concepts::forwardRange Range, class... Args>
 constexpr auto upperBound(Range&& range, Args&&... args)
 {
-	return upperBound(bzd::begin(range), bzd::end(range), bzd::forward<Args>(args)...);
+	return bzd::algorithm::upperBound(bzd::begin(range), bzd::end(range), bzd::forward<Args>(args)...);
 }
 
 } // namespace bzd::algorithm

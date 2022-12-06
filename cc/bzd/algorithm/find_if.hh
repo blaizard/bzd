@@ -33,7 +33,7 @@ template <concepts::forwardIterator Iterator,
 template <concepts::forwardRange Range, class... Args>
 constexpr auto findIf(Range&& range, Args&&... args)
 {
-	return findIf(bzd::begin(range), bzd::end(range), bzd::forward<Args>(args)...);
+	return bzd::algorithm::findIf(bzd::begin(range), bzd::end(range), bzd::forward<Args>(args)...);
 }
 
 } // namespace bzd::algorithm

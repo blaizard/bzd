@@ -92,12 +92,14 @@ constexpr auto Span<T, Storage>::last(const Size count) noexcept
 template <class T, class Storage>
 constexpr auto Span<T, Storage>::asBytes() const noexcept
 {
+	// This is ok, it complies with the type aliasing rules (because bzd::Byte === std::byte)
 	return bzd::Span<const bzd::Byte>{reinterpret_cast<const bzd::Byte*>(data()), sizeBytes()};
 }
 
 template <class T, class Storage>
 constexpr auto Span<T, Storage>::asBytesMutable() noexcept
 {
+	// This is ok, it complies with the type aliasing rules (because bzd::Byte === std::byte)
 	return bzd::Span<bzd::Byte>{reinterpret_cast<bzd::Byte*>(data()), sizeBytes()};
 }
 } // namespace bzd::impl

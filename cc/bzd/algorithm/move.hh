@@ -32,7 +32,7 @@ constexpr Iterator2 move(Iterator1 first, Sentinel1 last, Iterator2 result) noex
 template <concepts::forwardRange Range1, concepts::outputRange Range2>
 constexpr auto move(Range1&& range1, Range2&& range2) noexcept
 {
-	return move(bzd::begin(range1), bzd::end(range1), bzd::begin(range2));
+	return bzd::algorithm::move(bzd::begin(range1), bzd::end(range1), bzd::begin(range2));
 }
 
 } // namespace bzd::algorithm

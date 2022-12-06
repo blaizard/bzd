@@ -40,7 +40,7 @@ constexpr bzd::Tuple<Iterator, Iterator> equalRange(Iterator first, Sentinel las
 template <concepts::forwardRange Range, class... Args>
 constexpr auto equalRange(Range&& range, Args&&... args)
 {
-	return equalRange(bzd::begin(range), bzd::end(range), bzd::forward<Args>(args)...);
+	return bzd::algorithm::equalRange(bzd::begin(range), bzd::end(range), bzd::forward<Args>(args)...);
 }
 
 } // namespace bzd::algorithm

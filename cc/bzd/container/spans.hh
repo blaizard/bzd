@@ -30,7 +30,7 @@ public: // Constructors/assignments.
 	constexpr Self& operator=(Self&&) noexcept = default;
 
 	template <class... Args>
-	constexpr Spans(InPlace, Args&&... args) noexcept : spans_{inPlace, forward<Args>(args)...}
+	constexpr Spans(InPlace, Args&&... args) noexcept : spans_{inPlace, bzd::forward<Args>(args)...}
 	{
 	}
 
