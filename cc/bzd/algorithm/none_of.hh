@@ -27,7 +27,7 @@ template <concepts::forwardIterator Iterator,
 template <concepts::forwardRange Range, class... Args>
 [[nodiscard]] constexpr auto noneOf(Range&& range, Args&&... args) noexcept
 {
-	return noneOf(bzd::begin(range), bzd::end(range), bzd::forward<Args>(args)...);
+	return bzd::algorithm::noneOf(bzd::begin(range), bzd::end(range), bzd::forward<Args>(args)...);
 }
 
 } // namespace bzd::algorithm

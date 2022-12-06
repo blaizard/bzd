@@ -96,7 +96,7 @@ constexpr void sort(Iterator first, Sentinel last, Compare comparison = Compare{
 template <concepts::randomAccessRange Range, class... Args>
 constexpr void sort(Range&& range, Args&&... args) noexcept
 {
-	sort(bzd::begin(range), bzd::end(range), bzd::forward<Args>(args)...);
+	bzd::algorithm::sort(bzd::begin(range), bzd::end(range), bzd::forward<Args>(args)...);
 }
 
 } // namespace bzd::algorithm

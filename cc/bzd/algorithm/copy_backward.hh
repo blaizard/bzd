@@ -30,7 +30,7 @@ constexpr OutputIt copyBackward(InputIt first, InputSentinel last, OutputIt resu
 template <concepts::bidirectionalRange InputRange, concepts::bidirectionalRange OutputRange>
 constexpr auto copyBackward(InputRange&& input, OutputRange&& output) noexcept
 {
-	return copyBackward(bzd::begin(input), bzd::end(input), bzd::end(output));
+	return bzd::algorithm::copyBackward(bzd::begin(input), bzd::end(input), bzd::end(output));
 }
 
 } // namespace bzd::algorithm

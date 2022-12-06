@@ -22,7 +22,7 @@ template <concepts::forwardIterator Iterator, concepts::sentinelFor<Iterator> Se
 template <concepts::forwardRange Range, class... Args>
 constexpr auto find(Range&& range, Args&&... args)
 {
-	return find(bzd::begin(range), bzd::end(range), bzd::forward<Args>(args)...);
+	return bzd::algorithm::find(bzd::begin(range), bzd::end(range), bzd::forward<Args>(args)...);
 }
 
 } // namespace bzd::algorithm

@@ -53,7 +53,7 @@ constexpr Iterator lowerBound(Iterator first, Sentinel last, const T& value, Com
 template <concepts::forwardRange Range, class... Args>
 constexpr auto lowerBound(Range&& range, Args&&... args)
 {
-	return lowerBound(bzd::begin(range), bzd::end(range), bzd::forward<Args>(args)...);
+	return bzd::algorithm::lowerBound(bzd::begin(range), bzd::end(range), bzd::forward<Args>(args)...);
 }
 
 } // namespace bzd::algorithm

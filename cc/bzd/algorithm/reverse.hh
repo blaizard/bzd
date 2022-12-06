@@ -25,7 +25,7 @@ constexpr void reverse(Iterator first, Sentinel last) noexcept
 template <concepts::bidirectionalRange Range>
 constexpr void reverse(Range&& range) noexcept
 {
-	reverse(bzd::begin(range), bzd::end(range));
+	bzd::algorithm::reverse(bzd::begin(range), bzd::end(range));
 }
 
 } // namespace bzd::algorithm

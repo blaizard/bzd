@@ -55,7 +55,7 @@ template <concepts::forwardIterator Iterator1,
 template <concepts::forwardRange Range1, concepts::forwardRange Range2, class... Args>
 constexpr auto search(Range1&& range1, Range2&& range2, Args&&... args)
 {
-	return search(bzd::begin(range1), bzd::end(range1), bzd::begin(range2), bzd::end(range2), bzd::forward<Args>(args)...);
+	return bzd::algorithm::search(bzd::begin(range1), bzd::end(range1), bzd::begin(range2), bzd::end(range2), bzd::forward<Args>(args)...);
 }
 
 } // namespace bzd::algorithm

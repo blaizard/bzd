@@ -39,7 +39,7 @@ template <concepts::forwardIterator Iterator,
 template <concepts::forwardRange Range, class... Args>
 [[nodiscard]] constexpr auto binarySearch(Range&& range, Args&&... args)
 {
-	return binarySearch(bzd::begin(range), bzd::end(range), bzd::forward<Args>(args)...);
+	return bzd::algorithm::binarySearch(bzd::begin(range), bzd::end(range), bzd::forward<Args>(args)...);
 }
 
 } // namespace bzd::algorithm

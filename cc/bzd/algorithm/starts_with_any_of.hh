@@ -66,7 +66,7 @@ auto startsWithAnyOf(Iterator first, Sentinel last, Range range, RangeValueAdapt
 template <concepts::forwardRange Range1, concepts::forwardRange Range2>
 auto startsWithAnyOf(Range1&& range1, Range2&& range2) noexcept
 {
-	return startsWithAnyOf(bzd::begin(range1), bzd::end(range1), bzd::forward<Range2>(range2));
+	return bzd::algorithm::startsWithAnyOf(bzd::begin(range1), bzd::end(range1), bzd::forward<Range2>(range2));
 }
 
 } // namespace bzd::algorithm

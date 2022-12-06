@@ -1,5 +1,6 @@
 #pragma once
 
+#include <bit>
 #include <cstddef>
 #include <cstdint>
 
@@ -51,9 +52,9 @@ using Float32 = float;
 using Float64 = double;
 
 /// Type representing a byte.
-enum class Byte : ::std::uint8_t
-{
-};
+/// \note It is important to use std::byte to avoid UB due to type aliasing rules:
+/// https://en.cppreference.com/w/cpp/language/reinterpret_cast#Type_aliasing
+using Byte = ::std::byte;
 
 /// Constant representing non-position value.
 static constexpr const Size npos = static_cast<Size>(-1);

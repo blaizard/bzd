@@ -29,7 +29,7 @@ constexpr OutputIt copy(InputIt first, InputSentinel last, OutputIt result) noex
 template <concepts::forwardRange InputRange, concepts::outputRange OutputRange>
 constexpr auto copy(InputRange&& input, OutputRange&& output)
 {
-	return copy(bzd::begin(input), bzd::end(input), bzd::begin(output));
+	return bzd::algorithm::copy(bzd::begin(input), bzd::end(input), bzd::begin(output));
 }
 
 } // namespace bzd::algorithm

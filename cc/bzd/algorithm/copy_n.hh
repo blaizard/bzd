@@ -33,7 +33,7 @@ constexpr OutputIt copyN(InputIt first, const Size count, OutputIt result)
 template <concepts::forwardRange InputRange, concepts::outputRange OutputRange>
 constexpr auto copyN(InputRange&& input, const Size count, OutputRange&& output)
 {
-	return copyN(bzd::begin(input), count, bzd::begin(output));
+	return bzd::algorithm::copyN(bzd::begin(input), count, bzd::begin(output));
 }
 
 } // namespace bzd::algorithm

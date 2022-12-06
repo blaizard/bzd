@@ -68,10 +68,10 @@ template <concepts::forwardRange Range1, concepts::forwardRange Range2, class...
 	{
 		if (bzd::size(range1) == bzd::size(range2))
 		{
-			return equal(bzd::begin(range1), bzd::end(range1), bzd::begin(range2), bzd::forward<Args>(args)...);
+			return bzd::algorithm::equal(bzd::begin(range1), bzd::end(range1), bzd::begin(range2), bzd::forward<Args>(args)...);
 		}
 		return false;
 	}
-	return equal(bzd::begin(range1), bzd::end(range1), bzd::begin(range2), bzd::end(range2), bzd::forward<Args>(args)...);
+	return bzd::algorithm::equal(bzd::begin(range1), bzd::end(range1), bzd::begin(range2), bzd::end(range2), bzd::forward<Args>(args)...);
 }
 } // namespace bzd::algorithm

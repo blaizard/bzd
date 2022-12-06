@@ -25,7 +25,7 @@ template <concepts::forwardIterator Iterator,
 template <concepts::forwardRange Range, class... Args>
 constexpr auto findIfNot(Range&& range, Args&&... args)
 {
-	return findIfNot(bzd::begin(range), bzd::end(range), bzd::forward<Args>(args)...);
+	return bzd::algorithm::findIfNot(bzd::begin(range), bzd::end(range), bzd::forward<Args>(args)...);
 }
 
 } // namespace bzd::algorithm

@@ -26,7 +26,7 @@ constexpr void fill(Iterator first, Sentinel last, const T& value)
 template <concepts::forwardRange Range, class... Args>
 constexpr void fill(Range&& range, Args&&... args)
 {
-	fill(bzd::begin(range), bzd::end(range), bzd::forward<Args>(args)...);
+	bzd::algorithm::fill(bzd::begin(range), bzd::end(range), bzd::forward<Args>(args)...);
 }
 
 } // namespace bzd::algorithm
