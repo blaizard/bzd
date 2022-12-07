@@ -15,7 +15,7 @@ namespace {
 static constexpr bzd::Array<const char, 16> digits{inPlace, '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 }
 
-template <Size base = 10, concepts::containerToString Container, class T, class Digits>
+template <Size base = 10, concepts::appendableWithBytes Container, class T, class Digits>
 constexpr void integer(Container& str, const T& n, const Digits& digits = bzd::format::impl::digits) noexcept
 {
 	static_assert(base > 1 && base <= 16, "Invalid base size.");
@@ -46,7 +46,7 @@ constexpr void integer(Container& str, const T& n, const Digits& digits = bzd::f
 	bzd::algorithm::reverse(str.begin() + indexBegin, str.end());
 }
 
-template <concepts::containerToString Container, class T>
+template <concepts::appendableWithBytes Container, class T>
 constexpr void floatingPoint(Container& str, const T& n, const Size maxPrecision) noexcept
 {
 	constexpr const T resolutionList[15] = {1,
@@ -87,19 +87,19 @@ constexpr void floatingPoint(Container& str, const T& n, const Size maxPrecision
 
 namespace bzd::format {
 
-template <concepts::containerToString Container, concepts::integral T>
+template <concepts::appendableWithBytes Container, concepts::integral T>
 constexpr void toStringHex(Container& str, const T& data, const bzd::Array<const char, 16>& digits = bzd::format::impl::digits) noexcept
 {
 	bzd::format::impl::integer<16u>(str, data, digits);
 }
 
-template <concepts::containerToString Container, concepts::integral T>
+template <concepts::appendableWithBytes Container, concepts::integral T>
 constexpr void toStringOct(Container& str, const T& data) noexcept
 {
 	bzd::format::impl::integer<8u>(str, data, bzd::format::impl::digits);
 }
 
-template <concepts::containerToString Container, concepts::integral T>
+template <concepts::appendableWithBytes Container, concepts::integral T>
 constexpr void toStringBin(Container& str, const T& data) noexcept
 {
 	bzd::format::impl::integer<2u>(str, data, bzd::format::impl::digits);
@@ -108,7 +108,7 @@ constexpr void toStringBin(Container& str, const T& data) noexcept
 
 // Integers
 
-template <bzd::concepts::containerToString Container, bzd::concepts::integral T>
+template <bzd::concepts::appendableWithBytes Container, bzd::concepts::integral T>
 constexpr void toString(Container& str, const T data) noexcept
 {
 	bzd::format::impl::integer(str, data, bzd::format::impl::digits);
@@ -116,7 +116,7 @@ constexpr void toString(Container& str, const T data) noexcept
 
 // Floating points
 
-template <bzd::concepts::containerToString Container, bzd::concepts::floatingPoint T>
+template <bzd::concepts::appendableWithBytes Container, bzd::concepts::floatingPoint T>
 constexpr void toString(Container& str, const T data, const bzd::Size maxPrecision = 6) noexcept
 {
 	bzd::format::impl::floatingPoint(str, data, maxPrecision);
@@ -124,7 +124,7 @@ constexpr void toString(Container& str, const T data, const bzd::Size maxPrecisi
 
 // Boolean
 
-template <bzd::concepts::containerToString Container>
+template <bzd::concepts::appendableWithBytes Container>
 constexpr void toString(Container& str, const bzd::Bool value) noexcept
 {
 	str.append((value) ? "true"_sv.asBytes() : "false"_sv.asBytes());
@@ -132,7 +132,7 @@ constexpr void toString(Container& str, const bzd::Bool value) noexcept
 
 // Chars
 
-template <bzd::concepts::containerToString Container>
+template <bzd::concepts::appendableWithBytes Container>
 constexpr void toString(Container& str, const char c) noexcept
 {
 	str.append(c);

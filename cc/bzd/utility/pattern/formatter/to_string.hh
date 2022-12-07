@@ -350,7 +350,7 @@ constexpr void toString(bzd::interface::String& str, const bzd::StringView strin
 /// \param out Output stream where the formating string will be written to.
 /// \param str run-time or compile-time string containing the format.
 /// \param args Arguments to be passed for the format.
-template <bzd::concepts::containerToString Container, bzd::concepts::constexprStringView Pattern, class... Args>
+template <bzd::concepts::appendableWithBytes Container, bzd::concepts::constexprStringView Pattern, class... Args>
 constexpr void toString(Container& str, const Pattern& pattern, const Args&... args) noexcept
 {
 	const auto [parser, processor] =

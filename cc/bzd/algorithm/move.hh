@@ -21,7 +21,9 @@ constexpr Iterator2 move(Iterator1 first, Sentinel1 last, Iterator2 result) noex
 {
 	while (first != last)
 	{
-		*result++ = bzd::move(*first++);
+		*result = bzd::move(*first);
+		++result;
+		++first;
 	}
 	return result;
 }

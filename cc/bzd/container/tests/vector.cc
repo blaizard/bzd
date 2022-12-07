@@ -1,6 +1,5 @@
 #include "cc/bzd/container/vector.hh"
 
-#include "cc/bzd/container/iterator/appender.hh"
 #include "cc/bzd/test/test.hh"
 
 TEST(ContainerVector, Base)
@@ -51,21 +50,4 @@ TEST(ContainerVector, NonStaticConstexpr)
 	constexpr bzd::VectorConstexpr<const int, 3> testDefault{};
 	EXPECT_EQ(testDefault.capacity(), 3U);
 	EXPECT_EQ(testDefault.size(), 0U);
-}
-
-TEST(ContainerVector, AppenderIterator)
-{
-	bzd::Vector<int, 5> vector;
-	bzd::iterator::Appender appender{vector};
-
-	for (const int v : {0, 1, 2, 3, 4, 5, 6, 7})
-	{
-		*appender = v;
-		++appender;
-	}
-	EXPECT_EQ(vector[0], 0);
-	EXPECT_EQ(vector[1], 1);
-	EXPECT_EQ(vector[2], 2);
-	EXPECT_EQ(vector[3], 3);
-	EXPECT_EQ(vector[4], 4);
 }

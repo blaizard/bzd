@@ -5,6 +5,7 @@
 #include <cstdint>
 
 namespace bzd {
+
 /// Memory pointer type.
 using Pointer = void*;
 
@@ -47,9 +48,11 @@ using UInt64 = ::std::uint64_t;
 
 /// 32-bit floating point number.
 using Float32 = float;
+static_assert(sizeof(Float32) == 4, "float must be 32-bit long.");
 
 /// 64-bit floating point number.
 using Float64 = double;
+static_assert(sizeof(Float64) == 8, "float must be 64-bit long.");
 
 /// Type representing a byte.
 /// \note It is important to use std::byte to avoid UB due to type aliasing rules:

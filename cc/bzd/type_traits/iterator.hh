@@ -85,24 +85,24 @@ concept iterator = concepts::derivedFrom<T, typeTraits::IteratorBase> || concept
 /// An input or output iterator must satisfy the following operations:
 /// - *x : retreive the value.
 /// - ++x : increment
-/// - x++ : increment
 template <class T>
 concept inputOrOutputIterator = iterator<T> && requires(T t) {
 												   *t;
 												   ++t;
-												   t++;
 											   };
 
-/// One pass iterator. Does not change the value of a container in other word, this is a read-only iterator.
+/// One-pass iterator. Does not change the value of a container in other word, this is a read-only iterator.
 template <class T>
 concept inputIterator = inputOrOutputIterator<T> && derivedFrom<typeTraits::IteratorCategory<T>, typeTraits::InputTag>;
 
-/// One pass iterator. Can be read from, only written to.
+/// One-pass iterator. Cannot be read from, only written to.
 template <class T>
 concept outputIterator = inputOrOutputIterator<T> && derivedFrom<typeTraits::IteratorCategory<T>, typeTraits::OutputTag>;
 
+/// Multi-pass iterator.
 template <class T>
-concept forwardIterator = inputIterator<T> && derivedFrom<typeTraits::IteratorCategory<T>, typeTraits::ForwardTag>;
+concept forwardIterator =
+	inputIterator<T> && derivedFrom<typeTraits::IteratorCategory<T>, typeTraits::ForwardTag> && requires(T t) { t++; };
 
 template <class T>
 concept bidirectionalIterator = forwardIterator<T> && derivedFrom<typeTraits::IteratorCategory<T>, typeTraits::BidirectionalTag>;

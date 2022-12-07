@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cc/bzd/type_traits/declval.hh"
+#include "cc/bzd/type_traits/is_trivially_copyable.hh"
 #include "cc/bzd/type_traits/iterator.hh"
 #include "cc/bzd/utility/begin.hh"
 #include "cc/bzd/utility/end.hh"
@@ -71,5 +72,8 @@ concept randomAccessRange = range<T> && derivedFrom<typeTraits::RangeCategory<T>
 
 template <class T>
 concept contiguousRange = range<T> && derivedFrom<typeTraits::RangeCategory<T>, typeTraits::ContiguousTag>;
+
+template <class T>
+concept byteCopyableRange = range<T> && sizeof(typeTraits::RangeValue<T>) == 1u && concepts::triviallyCopyable<typeTraits::RangeValue<T>>;
 
 } // namespace bzd::concepts

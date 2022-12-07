@@ -254,8 +254,8 @@ private:
 	constexpr void valueToString(float value) { ::toString(string_, value); }
 	constexpr void valueToString(double value) { ::toString(string_, value); }
 
-	constexpr void valueToString(unsigned char value) { valueToString(static_cast<char>(value)); }
-	constexpr void valueToString(char value) { ::toString(string_, "{} ({:#x})"_csv, charToString(value), value); }
+	constexpr void valueToString(char value) { valueToString(static_cast<unsigned char>(value)); }
+	constexpr void valueToString(unsigned char value) { ::toString(string_, "{} ({:#x})"_csv, charToString(value), value); }
 
 	constexpr void valueToString(bool value) { string_ = (value) ? "true"_sv : "false"_sv; }
 

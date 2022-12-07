@@ -6,6 +6,7 @@ load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_test")
         path,
     ],
     deps = [
+        "//cc/bzd/core/serialization/types:floating_point",
         "//cc/bzd/core/serialization/types:integral",
         "//cc/bzd/test",
     ],

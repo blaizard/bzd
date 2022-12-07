@@ -11,3 +11,10 @@ template <class T>
 inline constexpr bool isTriviallyCopyable = IsTriviallyCopyable<T>::value;
 
 } // namespace bzd::typeTraits
+
+namespace bzd::concepts {
+
+template <class T>
+concept triviallyCopyable = bzd::typeTraits::isTriviallyCopyable<T>;
+
+}
