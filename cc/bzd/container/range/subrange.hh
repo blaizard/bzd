@@ -5,12 +5,12 @@
 
 namespace bzd::range {
 
-/// Create a sub range from a
+/// Create a sub range from a pair of iterator and sentinel.
 template <concepts::inputOrOutputIterator Iterator, concepts::sentinelFor<Iterator> Sentinel>
 class SubRange : public ViewInterface<SubRange<Iterator, Sentinel>>
 {
 public:
-	constexpr SubRange(const Iterator begin, const Sentinel end) noexcept : begin_{begin}, end_{end} {}
+	constexpr SubRange(Iterator begin, Sentinel end) noexcept : begin_{begin}, end_{end} {}
 
 public:
 	constexpr Iterator begin() const noexcept { return begin_; }

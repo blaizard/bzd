@@ -169,6 +169,7 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        ":is_convertible",
         "//cc/bzd/container:span",
     ],
 )
@@ -689,6 +690,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":declval",
+        ":is_trivially_copyable",
         ":iterator",
         "//cc/bzd/utility:begin",
         "//cc/bzd/utility:end",

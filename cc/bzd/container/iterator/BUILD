@@ -1,18 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
-    name = "appender",
-    hdrs = [
-        "appender.hh",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//cc/bzd/type_traits:iterator",
-        "//cc/bzd/utility:move",
-    ],
-)
-
-cc_library(
     name = "bidirectional",
     hdrs = [
         "bidirectional.hh",
@@ -56,6 +44,18 @@ cc_library(
     deps = [
         "//cc/bzd/platform:types",
         "//cc/bzd/type_traits:conditional",
+        "//cc/bzd/type_traits:is_same",
+        "//cc/bzd/type_traits:iterator",
+    ],
+)
+
+cc_library(
+    name = "input_or_output_reference",
+    hdrs = [
+        "input_or_output_reference.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
         "//cc/bzd/type_traits:is_same",
         "//cc/bzd/type_traits:iterator",
     ],

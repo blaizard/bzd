@@ -8,6 +8,7 @@ bzd_cc_library(
         ":all_of",
         ":any_of",
         ":binary_search",
+        ":byte_copy",
         ":copy",
         ":copy_backward",
         ":copy_n",
@@ -81,15 +82,33 @@ cc_library(
 )
 
 cc_library(
+    name = "byte_copy",
+    hdrs = [
+        "byte_copy.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/container/range:subrange",
+        "//cc/bzd/type_traits:is_trivially_copyable",
+        "//cc/bzd/type_traits:iterator",
+        "//cc/bzd/type_traits:range",
+        "//cc/bzd/type_traits:sentinel_for",
+        "//cc/bzd/utility:min",
+    ],
+)
+
+cc_library(
     name = "copy",
     hdrs = [
         "copy.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
+        "//cc/bzd/container/range:subrange",
         "//cc/bzd/type_traits:iterator",
         "//cc/bzd/type_traits:range",
         "//cc/bzd/type_traits:sentinel_for",
+        "//cc/bzd/utility:min",
     ],
 )
 

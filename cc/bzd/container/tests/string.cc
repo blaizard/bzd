@@ -1,6 +1,6 @@
 #include "cc/bzd/container/string.hh"
 
-#include "cc/bzd/container/iterator/appender.hh"
+#include "cc/bzd/algorithm/copy.hh"
 #include "cc/bzd/test/test.hh"
 
 class A
@@ -155,15 +155,39 @@ TEST(ContainerString, Copy)
 	EXPECT_STREQ(copy2.data(), "Hello");
 }
 
-TEST(ContainerVector, AppenderIterator)
+TEST(ContainerVector, AppenderScope)
 {
 	bzd::String<5> string;
-	bzd::iterator::Appender appender{string};
 
-	for (const char v : {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'})
-	{
-		*appender = v;
-		++appender;
-	}
+	bzd::algorithm::copy("abcdefgh"_sv, string.appenderScope());
 	EXPECT_STREQ(string.data(), "abcde");
+
+	string.clear();
+	{
+		auto appender = string.appenderScope();
+		bzd::algorithm::copy("u"_sv, appender);
+		bzd::algorithm::copy("vw"_sv, appender);
+	}
+	EXPECT_STREQ(string.data(), "uvw");
+
+	bzd::algorithm::copy(""_sv, string.appenderScope());
+	EXPECT_STREQ(string.data(), "uvw");
+}
+
+TEST(ContainerVector, AssignerScope)
+{
+	bzd::String<5> string;
+
+	bzd::algorithm::copy("abcdefgh"_sv, string.assignerScope());
+	EXPECT_STREQ(string.data(), "abcde");
+
+	{
+		auto appender = string.assignerScope();
+		bzd::algorithm::copy("u"_sv, appender);
+		bzd::algorithm::copy("vw"_sv, appender);
+	}
+	EXPECT_STREQ(string.data(), "uvw");
+
+	bzd::algorithm::copy(""_sv, string.assignerScope());
+	EXPECT_STREQ(string.data(), "");
 }
