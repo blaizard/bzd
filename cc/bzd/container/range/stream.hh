@@ -3,6 +3,7 @@
 #include "cc/bzd/container/iterator/input_or_output_reference.hh"
 #include "cc/bzd/container/range/view_interface.hh"
 #include "cc/bzd/type_traits/sentinel_for.hh"
+#include "cc/bzd/utility/distance.hh"
 
 namespace bzd::range {
 
