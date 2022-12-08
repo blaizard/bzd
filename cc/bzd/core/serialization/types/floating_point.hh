@@ -11,22 +11,26 @@
 
 namespace bzd {
 
-template <concepts::outputStream Range, concepts::floatingPoint T>
-constexpr auto serialize(Range&& range, const T& value) noexcept
+template <concepts::floatingPoint T>
+struct Serialization<T>
 {
-	using Type = typeTraits::RemoveCVRef<T>;
+	template <concepts::outputStream Range>
+	static constexpr auto serialize(Range&& range, const T& value) noexcept
+	{
+		using Type = typeTraits::RemoveCVRef<T>;
 
-	if constexpr (concepts::sameAs<Type, Float32> || concepts::sameAs<Type, Float64>)
-	{
-		static_assert(NumericLimits<Type>::isIEC559(),
-					  "The floating point representation is not compliant with the IEC 559/IEEE 754 standard.");
-		const auto bytes = Span<const T>{&value, 1u}.asBytes();
-		return algorithm::byteCopy(bytes | impl::serialization::normalizeByteOrder(), range);
+		if constexpr (concepts::sameAs<Type, Float32> || concepts::sameAs<Type, Float64>)
+		{
+			static_assert(NumericLimits<Type>::isIEC559(),
+						  "The floating point representation is not compliant with the IEC 559/IEEE 754 standard.");
+			const auto bytes = Span<const T>{&value, 1u}.asBytes();
+			return algorithm::byteCopy(bytes | impl::serialization::normalizeByteOrder(), range);
+		}
+		else
+		{
+			static_assert(bzd::meta::alwaysFalse<T>, "This type is not a supported floating point type.");
+		}
 	}
-	else
-	{
-		static_assert(bzd::meta::alwaysFalse<T>, "This type is not a supported floating point type.");
-	}
-}
+};
 
 } // namespace bzd

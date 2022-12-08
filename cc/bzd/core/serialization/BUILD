@@ -7,6 +7,7 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        "//cc/bzd/container/range:stream",
         "//cc/bzd/container/range/views:all",
         "//cc/bzd/container/range/views:reverse",
         "//cc/bzd/meta:always_false",
