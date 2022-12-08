@@ -6,7 +6,7 @@
 namespace bzd::test {
 
 /// Create custome range of various types.
-template <class CategoryTag, class T = bzd::Int32, Size capacity = 42u>
+template <typeTraits::IteratorCategory iteratorCategory, class T = bzd::Int32, Size capacity = 42u>
 class Range
 {
 private:
@@ -16,13 +16,13 @@ public:
 	class Iterator : public Container::Iterator
 	{
 	public: // Traits
-		using Category = CategoryTag;
+		static constexpr auto category = iteratorCategory;
 	};
 
 	class ConstIterator : public Container::ConstIterator
 	{
 	public: // Traits
-		using Category = CategoryTag;
+		static constexpr auto category = iteratorCategory;
 	};
 
 public: // Constructor.

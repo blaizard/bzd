@@ -11,7 +11,7 @@
 
 namespace bzd {
 
-template <concepts::outputRange Range, concepts::floatingPoint T>
+template <concepts::outputStream Range, concepts::floatingPoint T>
 constexpr auto serialize(Range&& range, const T& value) noexcept
 {
 	using Type = typeTraits::RemoveCVRef<T>;

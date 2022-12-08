@@ -12,40 +12,43 @@ struct IteratorBase
 {
 };
 
-/// An input iterator is an iterator that can read from the pointed-to element.
-/// Input iterators only guarantee validity for single pass algorithms: once an input iterator i has been incremented,
-/// all copies of its previous value may be invalidated.
-struct InputTag
+/// Categories for the iterator concept.
+///
+/// Add multi dimensions hierarchy to iterator category concept, this is a problem already pointed, see:
+/// https://www.boost.org/doc/libs/1_40_0/libs/iterator/doc/new-iter-concepts.html
+enum class IteratorCategory : bzd::Size
 {
+	/// An input iterator is an iterator that can read from the pointed-to element.
+	/// Input iterators only guarantee validity for single pass algorithms: once an input iterator i has been incremented,
+	/// all copies of its previous value may be invalidated.
+	input = 0x01,
+	/// An output iterator is an iterator that can write to the pointed-to element.
+	output = 0x02,
+	/// A forward iterator is an iterator that can read data from the pointed-to element.
+	/// Unlike an input iterator and output iterator, it can be used in multipass algorithms.
+	forward = 0x04 | input | output,
+	/// A bidirectional iterator is an iterator that can be moved in both directions (i.e. incremented and decremented).
+	bidirectional = 0x08 | forward,
+	/// A random access iterator is an iterator that can be moved to point to any element in constant time.
+	randomAccess = 0x10 | bidirectional,
+	/// A contiguous iterator is a random access iterator that provides a guarantee that its elements are stored contiguously in the memory.
+	contiguous = 0x20 | randomAccess,
+	/// A stream iterator is a single pass iterator that pushes the concept further than input or output,
+	/// by enforcing this onto its associated range. Therefore this concept applies to ranges more than iterators.
+	stream = 0x40
 };
 
-/// An output iterator is an iterator that can write to the pointed-to element.
-struct OutputTag
+/// Bitwise or operator to IteratorCategory.
+constexpr IteratorCategory operator|(const IteratorCategory left, const IteratorCategory right) noexcept
 {
-};
+	return IteratorCategory{static_cast<Size>(left) | static_cast<Size>(right)};
+}
 
-/// A forward iterator is an iterator that can read data from the pointed-to element.
-/// Unlike an input iterator and output iterator, it can be used in multipass algorithms.
-struct ForwardTag
-	: public InputTag
-	, public OutputTag
+/// Bitwise and operator to IteratorCategory.
+constexpr IteratorCategory operator&(const IteratorCategory left, const IteratorCategory right) noexcept
 {
-};
-
-/// A bidirectional iterator is an iterator that can be moved in both directions (i.e. incremented and decremented).
-struct BidirectionalTag : public ForwardTag
-{
-};
-
-/// A random access iterator is an iterator that can be moved to point to any element in constant time.
-struct RandomAccessTag : public BidirectionalTag
-{
-};
-
-/// A contiguous iterator is a random access iterator that provides a guarantee that its elements are stored contiguously in the memory.
-struct ContiguousTag : public RandomAccessTag
-{
-};
+	return IteratorCategory{static_cast<Size>(left) & static_cast<Size>(right)};
+}
 
 template <class>
 struct Iterator;
@@ -53,7 +56,7 @@ struct Iterator;
 template <concepts::derivedFrom<IteratorBase> T>
 struct Iterator<T>
 {
-	using Category = typename T::Category;
+	static constexpr auto category = T::category;
 	using DifferenceType = typename T::DifferenceType;
 	using ValueType = typename T::ValueType;
 };
@@ -61,13 +64,10 @@ struct Iterator<T>
 template <concepts::pointer T>
 struct Iterator<T>
 {
-	using Category = typeTraits::ContiguousTag;
+	static constexpr auto category = typeTraits::IteratorCategory::contiguous;
 	using DifferenceType = decltype(bzd::typeTraits::declval<T>() - bzd::typeTraits::declval<T>());
 	using ValueType = typeTraits::RemovePointer<T>;
 };
-
-template <class T>
-using IteratorCategory = typename Iterator<T>::Category;
 
 template <class T>
 using IteratorValue = typename Iterator<T>::ValueType;
@@ -75,12 +75,19 @@ using IteratorValue = typename Iterator<T>::ValueType;
 template <class T>
 using IteratorDifference = typename Iterator<T>::DifferenceType;
 
+template <class T>
+inline constexpr IteratorCategory iteratorCategory = Iterator<T>::category;
+
 } // namespace bzd::typeTraits
 
 namespace bzd::concepts {
 
 template <class T>
 concept iterator = concepts::derivedFrom<T, typeTraits::IteratorBase> || concepts::pointer<T>;
+
+/// Check that an iterator satisfies a specific iterator category.
+template <class T, typeTraits::IteratorCategory category>
+concept iteratorCategory = ((typeTraits::iteratorCategory<T> & category) == category);
 
 /// An input or output iterator must satisfy the following operations:
 /// - *x : retreive the value.
@@ -93,24 +100,23 @@ concept inputOrOutputIterator = iterator<T> && requires(T t) {
 
 /// One-pass iterator. Does not change the value of a container in other word, this is a read-only iterator.
 template <class T>
-concept inputIterator = inputOrOutputIterator<T> && derivedFrom<typeTraits::IteratorCategory<T>, typeTraits::InputTag>;
+concept inputIterator = inputOrOutputIterator<T> && iteratorCategory<T, typeTraits::IteratorCategory::input>;
 
 /// One-pass iterator. Cannot be read from, only written to.
 template <class T>
-concept outputIterator = inputOrOutputIterator<T> && derivedFrom<typeTraits::IteratorCategory<T>, typeTraits::OutputTag>;
+concept outputIterator = inputOrOutputIterator<T> && iteratorCategory<T, typeTraits::IteratorCategory::output>;
 
 /// Multi-pass iterator.
 template <class T>
-concept forwardIterator =
-	inputIterator<T> && derivedFrom<typeTraits::IteratorCategory<T>, typeTraits::ForwardTag> && requires(T t) { t++; };
+concept forwardIterator = inputIterator<T> && iteratorCategory<T, typeTraits::IteratorCategory::forward> && requires(T t) { t++; };
 
 template <class T>
-concept bidirectionalIterator = forwardIterator<T> && derivedFrom<typeTraits::IteratorCategory<T>, typeTraits::BidirectionalTag>;
+concept bidirectionalIterator = forwardIterator<T> && iteratorCategory<T, typeTraits::IteratorCategory::bidirectional>;
 
 template <class T>
-concept randomAccessIterator = bidirectionalIterator<T> && derivedFrom<typeTraits::IteratorCategory<T>, typeTraits::RandomAccessTag>;
+concept randomAccessIterator = bidirectionalIterator<T> && iteratorCategory<T, typeTraits::IteratorCategory::randomAccess>;
 
 template <class T>
-concept contiguousIterator = randomAccessIterator<T> && derivedFrom<typeTraits::IteratorCategory<T>, typeTraits::ContiguousTag>;
+concept contiguousIterator = randomAccessIterator<T> && iteratorCategory<T, typeTraits::IteratorCategory::contiguous>;
 
 } // namespace bzd::concepts

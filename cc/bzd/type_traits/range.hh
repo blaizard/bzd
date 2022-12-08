@@ -31,9 +31,9 @@ struct Range<T>
 	using Iterator = decltype(bzd::begin(bzd::typeTraits::declval<T&>()));
 	using Sentinel = decltype(bzd::end(bzd::typeTraits::declval<T&>()));
 	// using Size = decltype(bzd::size(bzd::typeTraits::declval<T&>()));
-	using Category = typename typeTraits::Iterator<Iterator>::Category;
 	using ValueType = typename typeTraits::Iterator<Iterator>::ValueType;
 	using DifferenceType = typename typeTraits::Iterator<Iterator>::DifferenceType;
+	static constexpr typeTraits::IteratorCategory category = typeTraits::Iterator<Iterator>::category;
 };
 
 template <class T>
@@ -43,37 +43,48 @@ template <class T>
 using RangeSentinel = typename Range<T>::Sentinel;
 
 template <class T>
-using RangeCategory = typename Range<T>::Category;
-
-template <class T>
 using RangeValue = typename Range<T>::ValueType;
 
 template <class T>
 using RangeDifference = typename Range<T>::DifferenceType;
 
+template <class T>
+inline constexpr IteratorCategory rangeCategory = Range<T>::category;
+
 } // namespace bzd::typeTraits
 
 namespace bzd::concepts {
 
-template <class T>
-concept inputRange = range<T> && derivedFrom<typeTraits::RangeCategory<T>, typeTraits::InputTag>;
+/// Check that a range satisfies a specific iterator category.
+template <class T, typeTraits::IteratorCategory category>
+concept rangeCategory = ((typeTraits::rangeCategory<T> & category) == category);
 
 template <class T>
-concept outputRange = range<T> && derivedFrom<typeTraits::RangeCategory<T>, typeTraits::OutputTag>;
+concept inputRange = range<T> && rangeCategory<T, typeTraits::IteratorCategory::input>;
 
 template <class T>
-concept forwardRange = range<T> && derivedFrom<typeTraits::RangeCategory<T>, typeTraits::ForwardTag>;
+concept outputRange = range<T> && rangeCategory<T, typeTraits::IteratorCategory::output>;
 
 template <class T>
-concept bidirectionalRange = range<T> && derivedFrom<typeTraits::RangeCategory<T>, typeTraits::BidirectionalTag>;
+concept forwardRange = range<T> && rangeCategory<T, typeTraits::IteratorCategory::forward>;
 
 template <class T>
-concept randomAccessRange = range<T> && derivedFrom<typeTraits::RangeCategory<T>, typeTraits::RandomAccessTag>;
+concept bidirectionalRange = range<T> && rangeCategory<T, typeTraits::IteratorCategory::bidirectional>;
 
 template <class T>
-concept contiguousRange = range<T> && derivedFrom<typeTraits::RangeCategory<T>, typeTraits::ContiguousTag>;
+concept randomAccessRange = range<T> && rangeCategory<T, typeTraits::IteratorCategory::randomAccess>;
+
+template <class T>
+concept contiguousRange = range<T> && rangeCategory<T, typeTraits::IteratorCategory::contiguous>;
+
+template <class T>
+concept streamRange = range<T> && rangeCategory<T, typeTraits::IteratorCategory::stream>;
 
 template <class T>
 concept byteCopyableRange = range<T> && sizeof(typeTraits::RangeValue<T>) == 1u && concepts::triviallyCopyable<typeTraits::RangeValue<T>>;
+
+/// Type used for all kind of serialization or formatting.
+template <class T>
+concept byteCopyableOuptutRange = concepts::outputRange<T> && concepts::byteCopyableRange<T>;
 
 } // namespace bzd::concepts

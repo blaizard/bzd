@@ -10,9 +10,9 @@ class Reverse : public typeTraits::IteratorBase
 {
 public: // Traits.
 	using Self = Reverse;
-	using Category = typename typeTraits::IteratorCategory<Iterator>;
 	using ValueType = typename typeTraits::IteratorValue<Iterator>;
 	using DifferenceType = typename typeTraits::IteratorDifference<Iterator>;
+	static constexpr auto category = typeTraits::iteratorCategory<Iterator>;
 
 public: // Constructors.
 	Reverse() = default;

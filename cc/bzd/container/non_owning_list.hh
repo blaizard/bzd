@@ -28,10 +28,10 @@ class NonOwningListIterator
 {
 public: // Traits
 	using Self = NonOwningListIterator<U>;
-	using Category = bzd::typeTraits::ForwardTag;
 	using IndexType = bzd::Size;
 	using DifferenceType = bzd::Int32;
 	using ValueType = U;
+	static constexpr auto category = bzd::typeTraits::IteratorCategory::forward;
 
 private: // Internal Traits.
 	using UnderlyingValuePtrType =

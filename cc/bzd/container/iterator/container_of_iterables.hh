@@ -11,12 +11,12 @@ class ContainerOfIterables : public typeTraits::IteratorBase
 {
 public: // Traits.
 	using Self = ContainerOfIterables<Iterator>;
-	using Category = typeTraits::ForwardTag;
 	using ContainerValueType = typename Iterator::ValueType;
 	using NestedIterator = typename ContainerValueType::Iterator;
 	using IndexType = typename NestedIterator::IndexType;
 	using DifferenceType = typename NestedIterator::DifferenceType;
 	using ValueType = typename NestedIterator::ValueType;
+	static constexpr auto category = typeTraits::IteratorCategory::forward;
 
 public: // Constructors.
 	constexpr ContainerOfIterables(Iterator it, Iterator end) noexcept : it_{it}, end_{end}, nested_{} { ++(*this); }
