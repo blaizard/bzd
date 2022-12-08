@@ -14,10 +14,10 @@ public: // Traits
 	using Self = typename Traits::Self;
 	using ActualSelf = typename Traits::ActualSelf;
 	using Parent = typename Traits::Parent;
-	using Category = typeTraits::RandomAccessTag;
 	using IndexType = typename Policies::IndexType;
 	using DifferenceType = typename Policies::DifferenceType;
 	using ValueType = typename Policies::ValueType;
+	static constexpr auto category = typeTraits::IteratorCategory::randomAccess;
 
 public: // Constructors
 	constexpr RandomAccess(ValueType* data) noexcept : Parent{data} {}

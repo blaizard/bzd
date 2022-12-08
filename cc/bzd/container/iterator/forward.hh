@@ -46,10 +46,10 @@ private:
 public: // Traits
 	using Self = typename Traits::Self;
 	using ActualSelf = typename Traits::ActualSelf;
-	using Category = typeTraits::ForwardTag;
 	using IndexType = typename Policies::IndexType;
 	using DifferenceType = typename Policies::DifferenceType;
 	using ValueType = typename Policies::ValueType;
+	static constexpr auto category = typeTraits::IteratorCategory::forward;
 
 public: // Constructors
 	constexpr Forward(ValueType* data) noexcept : data_{data} {}

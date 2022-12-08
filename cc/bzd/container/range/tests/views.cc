@@ -6,7 +6,7 @@
 
 TEST(Views, Drop)
 {
-	bzd::test::Range<bzd::typeTraits::ForwardTag, int, 5> range{0, 1, 2, 3, 4};
+	bzd::test::Range<bzd::typeTraits::IteratorCategory::forward, int, 5> range{0, 1, 2, 3, 4};
 	bzd::range::Drop view{range, 2};
 
 	const auto expected = {2, 3, 4};
@@ -27,7 +27,7 @@ TEST(Views, Drop)
 
 TEST(Views, Transform)
 {
-	bzd::test::Range<bzd::typeTraits::ForwardTag, int, 5> range{0, 1, 2, 3, 4};
+	bzd::test::Range<bzd::typeTraits::IteratorCategory::forward, int, 5> range{0, 1, 2, 3, 4};
 	bzd::range::Transform view{range, [](const auto value) { return value * value; }};
 
 	const auto expected = {0, 1, 4, 9, 16};
@@ -39,7 +39,7 @@ TEST(Views, Transform)
 
 TEST(Views, Reverse)
 {
-	bzd::test::Range<bzd::typeTraits::BidirectionalTag, int, 5> range{0, 1, 2, 3, 4};
+	bzd::test::Range<bzd::typeTraits::IteratorCategory::bidirectional, int, 5> range{0, 1, 2, 3, 4};
 	bzd::range::Reverse view{range};
 
 	const auto expected = {4, 3, 2, 1, 0};

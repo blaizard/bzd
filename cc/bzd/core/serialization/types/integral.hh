@@ -10,7 +10,7 @@
 
 namespace bzd {
 
-template <concepts::outputRange Range, concepts::integral T>
+template <concepts::outputStream Range, concepts::integral T>
 constexpr auto serialize(Range&& range, const T& value) noexcept
 {
 	using Type = typeTraits::RemoveCVRef<T>;
@@ -18,7 +18,7 @@ constexpr auto serialize(Range&& range, const T& value) noexcept
 	if constexpr (concepts::sameAs<Type, bool> || concepts::sameAs<Type, Bool>)
 	{
 		const auto data = {(value) ? Byte{1u} : Byte{0u}};
-		return bzd::algorithm::byteCopy(data, range);
+		return algorithm::byteCopy(data, range);
 	}
 	else if constexpr (concepts::sameAs<Type, Int8> || concepts::sameAs<Type, UInt8> || concepts::sameAs<Type, Int16> ||
 					   concepts::sameAs<Type, UInt16> || concepts::sameAs<Type, Int32> || concepts::sameAs<Type, UInt32> ||

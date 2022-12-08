@@ -37,7 +37,7 @@ concept hasRandomAccessor = requires(T& t) { t[0]; };
 TEST(SubRange, VariousTypes)
 {
 	{
-		bzd::test::Range<bzd::typeTraits::InputTag> range;
+		bzd::test::Range<bzd::typeTraits::IteratorCategory::input> range;
 		bzd::range::SubRange subView{range.begin(), range.end()};
 		static_assert(!bzd::concepts::sizedRange<decltype(subView)>, "No size member.");
 		static_assert(!hasSize<decltype(subView)>, "No size member.");
@@ -47,7 +47,7 @@ TEST(SubRange, VariousTypes)
 		static_assert(!hasRandomAccessor<const decltype(subView)>, "No const random accessor.");
 	}
 	{
-		bzd::test::Range<bzd::typeTraits::OutputTag> range;
+		bzd::test::Range<bzd::typeTraits::IteratorCategory::output> range;
 		bzd::range::SubRange subView{range.begin(), range.end()};
 		static_assert(!bzd::concepts::sizedRange<decltype(subView)>, "No size member.");
 		static_assert(!hasSize<decltype(subView)>, "No size member.");
@@ -57,7 +57,7 @@ TEST(SubRange, VariousTypes)
 		static_assert(!hasRandomAccessor<const decltype(subView)>, "No const random accessor.");
 	}
 	{
-		bzd::test::Range<bzd::typeTraits::ForwardTag> range;
+		bzd::test::Range<bzd::typeTraits::IteratorCategory::forward> range;
 		bzd::range::SubRange subView{range.begin(), range.end()};
 		static_assert(bzd::concepts::sizedRange<decltype(subView)>, "Size member.");
 		static_assert(hasSize<decltype(subView)>, "Has size member.");
@@ -67,7 +67,7 @@ TEST(SubRange, VariousTypes)
 		static_assert(!hasRandomAccessor<const decltype(subView)>, "No const random accessor.");
 	}
 	{
-		bzd::test::Range<bzd::typeTraits::BidirectionalTag> range;
+		bzd::test::Range<bzd::typeTraits::IteratorCategory::bidirectional> range;
 		bzd::range::SubRange subView{range.begin(), range.end()};
 		static_assert(bzd::concepts::sizedRange<decltype(subView)>, "Size member.");
 		static_assert(hasSize<decltype(subView)>, "Has size member.");
@@ -77,7 +77,7 @@ TEST(SubRange, VariousTypes)
 		static_assert(!hasRandomAccessor<const decltype(subView)>, "No const random accessor.");
 	}
 	{
-		bzd::test::Range<bzd::typeTraits::RandomAccessTag> range;
+		bzd::test::Range<bzd::typeTraits::IteratorCategory::randomAccess> range;
 		bzd::range::SubRange subView{range.begin(), range.end()};
 		static_assert(bzd::concepts::sizedRange<decltype(subView)>, "Size member.");
 		static_assert(hasSize<decltype(subView)>, "Has size member.");
@@ -87,7 +87,7 @@ TEST(SubRange, VariousTypes)
 		static_assert(hasRandomAccessor<const decltype(subView)>, "No const random accessor.");
 	}
 	{
-		bzd::test::Range<bzd::typeTraits::ContiguousTag> range;
+		bzd::test::Range<bzd::typeTraits::IteratorCategory::contiguous> range;
 		bzd::range::SubRange subView{range.begin(), range.end()};
 		static_assert(bzd::concepts::sizedRange<decltype(subView)>, "Size member.");
 		static_assert(hasSize<decltype(subView)>, "Has size member.");

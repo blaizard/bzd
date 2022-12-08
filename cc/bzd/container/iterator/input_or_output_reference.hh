@@ -8,15 +8,14 @@ namespace bzd::iterator {
 /// Reference to an input and/or output iterator.
 ///
 /// This is used to implement single pass range for example.
-template <concepts::inputOrOutputIterator Iterator, class IteratorCategory>
-requires(concepts::sameAs<IteratorCategory, typeTraits::InputTag> || concepts::sameAs<IteratorCategory, typeTraits::OutputTag>)
+template <concepts::inputOrOutputIterator Iterator, typeTraits::IteratorCategory iteratorCategory>
 class InputOrOutputReference : public typeTraits::IteratorBase
 {
 public: // Traits
 	using Self = InputOrOutputReference;
-	using Category = IteratorCategory;
 	using DifferenceType = typename typeTraits::IteratorDifference<Iterator>;
 	using ValueType = typename typeTraits::IteratorValue<Iterator>;
+	static constexpr auto category = iteratorCategory;
 
 public: // Constructors.
 	constexpr explicit InputOrOutputReference(Iterator& it) noexcept : it_{it} {}

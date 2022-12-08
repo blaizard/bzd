@@ -7,9 +7,7 @@
 #include "cc/bzd/utility/bit/endian.hh"
 #include "cc/bzd/utility/ignore.hh"
 
-namespace bzd {
-
-namespace impl::serialization {
+namespace bzd::impl::serialization {
 
 /// To byte order
 inline constexpr auto normalizeByteOrder() noexcept
@@ -25,16 +23,23 @@ inline constexpr auto normalizeByteOrder() noexcept
 	}
 }
 
-} // namespace impl::serialization
+} // namespace bzd::impl::serialization
+
+namespace bzd::concepts {
+
+template <class T>
+concept outputStream = concepts::streamRange<T> && concepts::byteCopyableOuptutRange<T>;
+
+}
+
+namespace bzd {
 
 /// Serialize the value of a data type into bytes.
 ///
 /// \param range The output range to be written to.
 /// \param value The value to be written.
-/// \return The number of bytes written. This number can be checked against
-/// the available size in the container to see if the full serialization was written.
-/// This design is used over a Result<> type for speed concerns.
-template <concepts::outputRange Range, class T>
+/// \return TBD.
+template <concepts::outputStream Range, class T>
 constexpr auto serialize(Range&& range, const T& value) noexcept
 {
 	bzd::ignore = range;
@@ -43,7 +48,7 @@ constexpr auto serialize(Range&& range, const T& value) noexcept
 }
 
 /*
-template <bzd::concepts::containerFromString Container, class T>
+template <concepts::containerFromString Container, class T>
 constexpr bzd::Optional<range::SubRange<Container>> deserialize(const Container& container, T& value) noexcept
 {
 	bzd::ignore = container;

@@ -2,6 +2,7 @@
 
 #include "cc/bzd/container/impl/span.hh"
 #include "cc/bzd/container/iterator/input_or_output_reference.hh"
+#include "cc/bzd/container/range/stream.hh"
 #include "cc/bzd/type_traits/is_convertible.hh"
 #include "cc/bzd/type_traits/is_trivially_copyable.hh"
 #include "cc/bzd/type_traits/sentinel_for.hh"
@@ -36,32 +37,28 @@ protected:
 	/// Appender range to insert back elements to a SpanResizeable object.
 	///
 	/// This construct is using RAII to close the transaction once out of scope.
-	/// This make the appender very efficient as setting the size and post processing
+	/// This makes the appender very efficient as setting the size and post processing
 	/// is done all at once and at the end.
-	class AppenderScope
+	class AppenderScope : public range::Stream<Iterator, Iterator>
 	{
 	public:
-		constexpr explicit AppenderScope(Self& self) noexcept : self_{self}, it_{&self_.data()[self_.size()]} {}
+		constexpr explicit AppenderScope(Self& self) noexcept :
+			range::Stream<Iterator, Iterator>{&self.data()[self.size()], &self.data()[self.capacity()]}, self_{self}
+		{
+		}
 
 		AppenderScope(const AppenderScope&) = delete;
 		AppenderScope& operator=(const AppenderScope&) = delete;
 		AppenderScope(AppenderScope&&) = delete;
 		AppenderScope& operator=(AppenderScope&&) = delete;
-
 		constexpr ~AppenderScope() noexcept
 		{
-			self_.storage_.sizeMutable() = bzd::distance(self_.begin(), it_);
+			self_.storage_.sizeMutable() = bzd::distance(self_.begin(), this->it_);
 			Policies::post(self_);
 		}
 
-	public:
-		constexpr auto begin() noexcept { return iterator::InputOrOutputReference<Iterator, typeTraits::OutputTag>{it_}; }
-		constexpr auto end() const noexcept { return Iterator{&self_.data()[self_.capacity()]}; }
-		constexpr auto size() const noexcept { return bzd::distance(it_, end()); }
-
 	private:
 		Self& self_;
-		Iterator it_{&self_.data()[self_.size()]};
 	};
 
 public: // Constructor/assignment
@@ -107,14 +104,14 @@ public: // Modifiers.
 	///
 	/// \return a range to assign new data to the container. Only uppon destruction
 	/// of this object, the range is validated.
-	constexpr AppenderScope assignerScope() noexcept
+	constexpr AppenderScope assigner() noexcept
 	{
 		clear();
-		return appenderScope();
+		return appender();
 	}
 
 	/// Create an appender range object to append elements to this container.
-	constexpr AppenderScope appenderScope() noexcept { return AppenderScope{*this}; }
+	constexpr AppenderScope appender() noexcept { return AppenderScope{*this}; }
 
 	/// Adds a new element at the end of the container, after its current last element.
 	/// The content of `value` is copied (or moved) to the new element.
