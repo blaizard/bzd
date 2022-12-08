@@ -83,8 +83,4 @@ concept streamRange = range<T> && rangeCategory<T, typeTraits::IteratorCategory:
 template <class T>
 concept byteCopyableRange = range<T> && sizeof(typeTraits::RangeValue<T>) == 1u && concepts::triviallyCopyable<typeTraits::RangeValue<T>>;
 
-/// Type used for all kind of serialization or formatting.
-template <class T>
-concept byteCopyableOuptutRange = concepts::outputRange<T> && concepts::byteCopyableRange<T>;
-
 } // namespace bzd::concepts

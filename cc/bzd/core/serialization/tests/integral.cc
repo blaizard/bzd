@@ -18,6 +18,12 @@ TEST(Integral, Boolean)
 		EXPECT_EQ(string[1u], '\x00');
 		EXPECT_EQ(string.size(), 2u);
 	}
+
+	{
+		bzd::serialize(string, false);
+		EXPECT_EQ(string[0u], '\x00');
+		EXPECT_EQ(string.size(), 2u);
+	}
 }
 
 TEST(Integral, UInt32)
