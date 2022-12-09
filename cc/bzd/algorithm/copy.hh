@@ -1,6 +1,6 @@
 #pragma once
 
-#include "cc/bzd/container/range/subrange.hh"
+#include "cc/bzd/container/range/in_out_result.hh"
 #include "cc/bzd/type_traits/iterator.hh"
 #include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/type_traits/sentinel_for.hh"
@@ -15,7 +15,7 @@ namespace bzd::algorithm {
 /// \param[out] result The beginning of the destination range.
 ///
 /// \return Output iterator to the element in the destination range, one past the last element copied.
-template <concepts::forwardIterator InputIt, concepts::sentinelFor<InputIt> InputSentinel, concepts::outputIterator OutputIt>
+template <concepts::inputIterator InputIt, concepts::sentinelFor<InputIt> InputSentinel, concepts::outputIterator OutputIt>
 constexpr OutputIt copy(InputIt first, const InputSentinel last, OutputIt result) noexcept
 {
 	while (first != last)
@@ -30,7 +30,7 @@ constexpr OutputIt copy(InputIt first, const InputSentinel last, OutputIt result
 /// \copydoc copy
 /// \param[in] input The range of elements to copy from.
 /// \param[out] output The beginning of the destination range.
-template <concepts::forwardRange InputRange, concepts::outputIterator Output>
+template <concepts::inputRange InputRange, concepts::outputIterator Output>
 constexpr auto copy(InputRange&& input, Output output)
 {
 	return bzd::algorithm::copy(bzd::begin(input), bzd::end(input), output);
@@ -41,7 +41,7 @@ constexpr auto copy(InputRange&& input, Output output)
 /// \param[out] output The range of the destination range.
 ///
 /// \return The remain of the output range.
-template <concepts::forwardRange InputRange, concepts::outputRange OutputRange>
+template <concepts::inputRange InputRange, concepts::outputRange OutputRange>
 constexpr auto copy(InputRange&& input, OutputRange&& output)
 {
 	auto inputFirst = bzd::begin(input);
@@ -69,7 +69,7 @@ constexpr auto copy(InputRange&& input, OutputRange&& output)
 		}
 	}
 
-	return range::SubRange(outputFirst, outputLast);
+	return range::InOutResult{inputFirst, outputFirst};
 }
 
 } // namespace bzd::algorithm

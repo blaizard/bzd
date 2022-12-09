@@ -15,6 +15,14 @@ cc_library(
 )
 
 cc_library(
+    name = "in_out_result",
+    hdrs = [
+        "in_out_result.hh",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
     name = "stream",
     hdrs = [
         "stream.hh",

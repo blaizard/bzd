@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cc/bzd/container/optional.hh"
 #include "cc/bzd/container/range/stream.hh"
 #include "cc/bzd/container/range/views/all.hh"
 #include "cc/bzd/container/range/views/reverse.hh"
@@ -53,10 +54,10 @@ namespace bzd {
 /// struct Serialization<T>
 /// {
 ///     template <concepts::outputStream Range>
-///     static constexpr auto serialize(Range&& range, const T& value) noexcept { ... }
+///     static constexpr Size serialize(Range&& range, const T& value) noexcept { ... }
 ///
 ///     template <concepts::inputStream Range>
-///     static constexpr auto deserialize(Range&& range, T& value) noexcept { ... }
+///     static constexpr Optional<Size> deserialize(Range&& range, T& value) noexcept { ... }
 /// };
 /// \endcode
 template <class... Args>
@@ -65,13 +66,13 @@ struct Serialization
 	static_assert(bzd::meta::alwaysFalse<Args...>, "This type has no serialization specialization.");
 };
 
-/// Serialize the value of a data type into bytes.
+/// Serialize the value of a data type into a byte stream.
 ///
 /// \param range The output range to be written to.
 /// \param args The value(s) to be written.
-/// \return TBD.
+/// \return The number of bytes written.
 template <concepts::outputStream Range, class... Args>
-constexpr auto serialize(Range&& range, Args&&... args) noexcept
+constexpr Size serialize(Range&& range, Args&&... args) noexcept
 {
 	return Serialization<Args...>::serialize(bzd::forward<Range>(range), bzd::forward<Args>(args)...);
 }
@@ -80,10 +81,31 @@ constexpr auto serialize(Range&& range, Args&&... args) noexcept
 /// Converts an output range into an output stream.
 template <concepts::outputRange Range, class... Args>
 requires(!concepts::outputStream<Range>)
-constexpr auto serialize(Range&& range, Args&&... args) noexcept
+constexpr Size serialize(Range&& range, Args&&... args) noexcept
 {
 	range::Stream stream{bzd::begin(range), bzd::end(range)};
 	return bzd::serialize(stream, bzd::forward<Args>(args)...);
+}
+
+/// Deserialize the value of a data type from a byte stream.
+///
+/// \param range The input range to be read from.
+/// \param args The value(s) to be read.
+/// \return The number of bytes read in case of success, otherwise an empty result.
+template <concepts::inputStream Range, class... Args>
+constexpr Optional<Size> deserialize(Range&& range, Args&&... args) noexcept
+{
+	return Serialization<Args...>::deserialize(bzd::forward<Range>(range), bzd::forward<Args>(args)...);
+}
+
+/// \copydoc deserialize
+/// Converts an input range into an input stream.
+template <concepts::inputRange Range, class... Args>
+requires(!concepts::inputStream<Range>)
+constexpr Optional<Size> deserialize(Range&& range, Args&&... args) noexcept
+{
+	range::Stream stream{bzd::begin(range), bzd::end(range)};
+	return bzd::deserialize(stream, bzd::forward<Args>(args)...);
 }
 
 } // namespace bzd

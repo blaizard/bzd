@@ -13,28 +13,70 @@ namespace bzd {
 template <concepts::integral T>
 struct Serialization<T>
 {
-	template <concepts::outputStream Range>
-	static constexpr auto serialize(Range&& range, const T& value) noexcept
-	{
-		using Type = typeTraits::RemoveCVRef<T>;
+	using Type = typeTraits::RemoveCVRef<T>;
+	static constexpr Byte boolValueTrue{1u};
+	static constexpr Byte boolValueFalse{0u};
 
-		if constexpr (concepts::sameAs<Type, bool> || concepts::sameAs<Type, Bool>)
+	template <concepts::outputStream Range>
+	static constexpr Size serialize(Range&& range, const Type& value) noexcept
+	requires(concepts::sameAs<Type, bool> || concepts::sameAs<Type, Bool>)
+	{
+		const auto data = {(value) ? boolValueTrue : boolValueFalse};
+		const auto result = algorithm::byteCopy(data, range);
+		return bzd::distance(bzd::begin(data), result.in);
+	}
+
+	template <concepts::outputStream Range>
+	static constexpr Size serialize(Range&& range, const Type& value) noexcept
+	requires(concepts::sameAs<Type, Int8> || concepts::sameAs<Type, UInt8> || concepts::sameAs<Type, Int16> ||
+			 concepts::sameAs<Type, UInt16> || concepts::sameAs<Type, Int32> || concepts::sameAs<Type, UInt32> ||
+			 concepts::sameAs<Type, Int64> || concepts::sameAs<Type, UInt64> || concepts::sameAs<Type, Byte> ||
+			 concepts::sameAs<Type, char>)
+	{
+		const auto bytes = Span<const Type>{&value, 1u}.asBytes();
+		const auto view = bytes | impl::serialization::normalizeByteOrder();
+		const auto result = algorithm::byteCopy(view, range);
+		return bzd::distance(bzd::begin(view), result.in);
+	}
+
+	template <concepts::inputStream Range>
+	static constexpr Optional<Size> deserialize(Range&& range, Type& value) noexcept
+	requires(concepts::sameAs<Type, bool> || concepts::sameAs<Type, Bool>)
+	{
+		Byte bytes[1u];
+		const auto result = algorithm::byteCopy(range, bytes);
+		const Size size = bzd::distance(bzd::begin(bytes), result.out);
+		if (size == 1u)
 		{
-			const auto data = {(value) ? Byte{1u} : Byte{0u}};
-			return algorithm::byteCopy(data, range);
+			if (bytes[0] == boolValueTrue)
+			{
+				value = true;
+				return size;
+			}
+			else if (bytes[0] == boolValueFalse)
+			{
+				value = false;
+				return size;
+			}
 		}
-		else if constexpr (concepts::sameAs<Type, Int8> || concepts::sameAs<Type, UInt8> || concepts::sameAs<Type, Int16> ||
-						   concepts::sameAs<Type, UInt16> || concepts::sameAs<Type, Int32> || concepts::sameAs<Type, UInt32> ||
-						   concepts::sameAs<Type, Int64> || concepts::sameAs<Type, UInt64> || concepts::sameAs<Type, Byte> ||
-						   concepts::sameAs<Type, char>)
+		return bzd::nullopt;
+	}
+
+	template <concepts::inputStream Range>
+	static constexpr Optional<Size> deserialize(Range&& range, Type& value) noexcept
+	requires(concepts::sameAs<Type, Int8> || concepts::sameAs<Type, UInt8> || concepts::sameAs<Type, Int16> ||
+			 concepts::sameAs<Type, UInt16> || concepts::sameAs<Type, Int32> || concepts::sameAs<Type, UInt32> ||
+			 concepts::sameAs<Type, Int64> || concepts::sameAs<Type, UInt64> || concepts::sameAs<Type, Byte> ||
+			 concepts::sameAs<Type, char>)
+	{
+		auto bytes = Span<Type>{&value, 1u}.asBytesMutable();
+		const auto result = algorithm::byteCopy(range | impl::serialization::normalizeByteOrder(), bytes);
+		const Size size = bzd::distance(bzd::begin(bytes), result.out);
+		if (size != bytes.size())
 		{
-			const auto bytes = Span<const T>{&value, 1u}.asBytes();
-			return algorithm::byteCopy(bytes | impl::serialization::normalizeByteOrder(), range);
+			return bzd::nullopt;
 		}
-		else
-		{
-			static_assert(meta::alwaysFalse<T>, "This type is not a supported integral type.");
-		}
+		return size;
 	}
 };
 

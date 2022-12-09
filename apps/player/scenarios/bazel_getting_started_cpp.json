@@ -9,15 +9,216 @@
         {
             "action": "file.create",
             "args": [
-                "BUILD"
+                "toolchain_arm_gcc/BUILD"
+            ]
+        },
+        {
+            "action": "file.create",
+            "args": [
+                "toolchain_arm_gcc/defs.bzl"
+            ]
+        },
+        {
+            "action": "file.write",
+            "args": [
+                "toolchain_arm_gcc/defs.bzl",
+                "load(\"@bazel_tools//tools/build_defs/repo:http.bzl\", \"http_archive\")\n"
+            ]
+        },
+        {
+            "action": "file.write",
+            "args": [
+                "toolchain_arm_gcc/defs.bzl",
+                "\ndef install_toolchain_arm_gcc():\n"
+            ]
+        },
+        {
+            "action": "file.write",
+            "args": [
+                "toolchain_arm_gcc/defs.bzl",
+                "\n   http_archive(\n      name = \"arm_gcc\",\n      urls = [\"https://developer.arm.com/-/media/Files/downloads/gnu/11.2-2022.02/binrel/gcc-arm-11.2-2022.02-x86_64-arm-none-eabi.tar.xz\"],\n      strip_prefix = \"gcc-arm-11.2-2022.02-x86_64-arm-none-eabi\",\n      sha256 = \"8c5acd5ae567c0100245b0556941c237369f210bceb196edfe5a2e7532c60326\",\n      build_file = \"//toolchain_arm_gcc:arm_gcc.BUILD\",\n   )\n"
+            ]
+        },
+        {
+            "action": "file.write",
+            "args": [
+                "WORKSPACE",
+                "load(\"//toolchain_arm_gcc:defs.bzl\", \"install_toolchain_arm_gcc\")\n\ninstall_toolchain_arm_gcc()\n"
             ]
         },
         {
             "action": "exec",
             "args": [
-                "bazel build ...\n"
+                "bazel fetch @arm_gcc//...\n"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "tree -L 2 $(bazel info output_base)/external\n"
+            ]
+        },
+        {
+            "action": "file.create",
+            "args": [
+                "toolchain_arm_gcc/arm_gcc.BUILD"
+            ]
+        },
+        {
+            "action": "file.write",
+            "args": [
+                "toolchain_arm_gcc/arm_gcc.BUILD",
+                "cc_toolchain(\n\tname = \"cc_toolchain\",\n\tall_files = "
+            ]
+        },
+        {
+            "action": "file.seek",
+            "args": [
+                "toolchain_arm_gcc/arm_gcc.BUILD",
+                "begin"
+            ]
+        },
+        {
+            "action": "file.write",
+            "args": [
+                "toolchain_arm_gcc/arm_gcc.BUILD",
+                "\n\n"
+            ]
+        },
+        {
+            "action": "file.seek",
+            "args": [
+                "toolchain_arm_gcc/arm_gcc.BUILD",
+                "begin"
+            ]
+        },
+        {
+            "action": "file.write",
+            "args": [
+                "toolchain_arm_gcc/arm_gcc.BUILD",
+                "filegroup(\n\tname = \"all\",\n\tsrcs = glob([\"**/*\",]),\n)"
+            ]
+        },
+        {
+            "action": "file.seek",
+            "args": [
+                "toolchain_arm_gcc/arm_gcc.BUILD",
+                "after",
+                "all_files = "
+            ]
+        },
+        {
+            "action": "file.write",
+            "args": [
+                "toolchain_arm_gcc/arm_gcc.BUILD",
+                "\":all\",\n\tar_files = \":all\",\n\tas_files = \":all\",\n\tcompiler_files = \":all\",\n\tdwp_files = \":all\",\n\tlinker_files = \":all\",\n\tobjcopy_files = \":all\",\n\tstrip_files = \":all\",\n\tdynamic_runtime_lib = \":all\",\n\tstatic_runtime_lib = \":all\","
+            ]
+        },
+        {
+            "action": "file.write",
+            "args": [
+                "toolchain_arm_gcc/arm_gcc.BUILD",
+                "\n\ttoolchain_config = \":cc_toolchain_config\",\n)\n"
+            ]
+        },
+        {
+            "action": "file.seek",
+            "args": [
+                "toolchain_arm_gcc/arm_gcc.BUILD",
+                "begin"
+            ]
+        },
+        {
+            "action": "file.write",
+            "args": [
+                "toolchain_arm_gcc/arm_gcc.BUILD",
+                "\n\n"
+            ]
+        },
+        {
+            "action": "file.seek",
+            "args": [
+                "toolchain_arm_gcc/arm_gcc.BUILD",
+                "begin"
+            ]
+        },
+        {
+            "action": "file.write",
+            "args": [
+                "toolchain_arm_gcc/arm_gcc.BUILD",
+                "load(\"@bazel_tools//tools/cpp:unix_cc_toolchain_config.bzl\", \"cc_toolchain_config\")\n\n"
+            ]
+        },
+        {
+            "action": "file.write",
+            "args": [
+                "toolchain_arm_gcc/arm_gcc.BUILD",
+                "cc_toolchain_config(\n\tname = \"cc_toolchain_config\","
+            ]
+        },
+        {
+            "action": "file.write",
+            "args": [
+                "toolchain_arm_gcc/arm_gcc.BUILD",
+                "\n\tcpu = \"arm\",\n\tcompiler = \"gcc\",\n\ttoolchain_identifier = \"arm_gcc\",\n\thost_system_name = \"local\",\n\ttarget_system_name = \"local\",\n\ttarget_libc = \"unknown\",\n\tabi_version = \"unknown\",\n\tabi_libc_version = \"unknown\",\n\ttool_paths = {"
+            ]
+        },
+        {
+            "action": "file.write",
+            "args": [
+                "toolchain_arm_gcc/arm_gcc.BUILD",
+                "\n\t\t\"gcc\": \"bin/arm-none-eabi-g++\","
+            ]
+        },
+        {
+            "action": "file.write",
+            "args": [
+                "toolchain_arm_gcc/arm_gcc.BUILD",
+                "\n\t\t\"cpp\": \"bin/arm-none-eabi-cpp\",\n\t\t\"ar\": \"bin/arm-none-eabi-ar\",\n\t\t\"nm\": \"bin/arm-none-eabi-nm\",\n\t\t\"ld\": \"bin/arm-none-eabi-ld\",\n\t\t\"as\": \"bin/arm-none-eabi-as\",\n\t\t\"objcopy\": \"bin/arm-none-eabi-objcopy\",\n\t\t\"objdump\": \"bin/arm-none-eabi-objdump\",\n\t\t\"gcov\": \"bin/arm-none-eabi-gcov\",\n\t\t\"strip\": \"bin/arm-none-eabi-strip\",\n\t\t\"llvm-cov\": \"/bin/false\",\n\t},"
+            ]
+        },
+        {
+            "action": "file.write",
+            "args": [
+                "toolchain_arm_gcc/arm_gcc.BUILD",
+                "\n\tcompile_flags = [\n\t\t\"-isystem\", \"external/arm_gcc/arm-none-eabi/include/c++/11.2.1/arm-none-eabi\",\n\t\t\"-isystem\", \"external/arm_gcc/arm-none-eabi/include/c++/11.2.1\",\n\t\t\"-isystem\", \"external/arm_gcc/arm-none-eabi/include\",\n\t\t\"-isystem\", \"external/arm_gcc/lib/gcc/arm-none-eabi/11.2.1/include\",\n\t],"
+            ]
+        },
+        {
+            "action": "file.write",
+            "args": [
+                "toolchain_arm_gcc/arm_gcc.BUILD",
+                "\n\tlink_flags = []"
+            ]
+        },
+        {
+            "action": "file.write",
+            "args": [
+                "toolchain_arm_gcc/arm_gcc.BUILD",
+                "\n)\n"
+            ]
+        },
+        {
+            "action": "file.write",
+            "args": [
+                "toolchain_arm_gcc/arm_gcc.BUILD",
+                "\ntoolchain(\n\tname = \"toolchain\","
+            ]
+        },
+        {
+            "action": "file.write",
+            "args": [
+                "toolchain_arm_gcc/arm_gcc.BUILD",
+                "\n\texec_compatible_with = [\n\t\t\"@platforms//os:linux\",\n\t\t\"@platforms//cpu:x86_64\",],\n\ttarget_compatible_with = [\n\t\t\"@platforms//os:none\",\n\t\t\"@platforms//cpu:arm\",\n\t],"
+            ]
+        },
+        {
+            "action": "file.write",
+            "args": [
+                "toolchain_arm_gcc/arm_gcc.BUILD",
+                "\n\ttoolchain_type = \"@rules_cc//cc:toolchain_type\",\n\ttoolchain = \":cc_toolchain\",\n)\n"
             ]
         }
     ],
-    "name": "bazelisk"
+    "name": "toolchains"
 }

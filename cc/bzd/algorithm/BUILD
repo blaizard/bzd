@@ -88,7 +88,7 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//cc/bzd/container/range:subrange",
+        "//cc/bzd/container/range:in_out_result",
         "//cc/bzd/type_traits:is_trivially_copyable",
         "//cc/bzd/type_traits:iterator",
         "//cc/bzd/type_traits:range",
@@ -104,7 +104,7 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//cc/bzd/container/range:subrange",
+        "//cc/bzd/container/range:in_out_result",
         "//cc/bzd/type_traits:iterator",
         "//cc/bzd/type_traits:range",
         "//cc/bzd/type_traits:sentinel_for",
