@@ -8,19 +8,30 @@ TEST(Integral, Boolean)
 	bzd::String<20u> string;
 
 	{
-		bzd::serialize(string.appender(), true);
+		const auto result = bzd::serialize(string.appender(), true);
+		EXPECT_EQ(result, 1u);
 		EXPECT_EQ(string[0u], '\x01');
 		EXPECT_EQ(string.size(), 1u);
 	}
 
 	{
-		bzd::serialize(string.appender(), false);
+		bzd::Bool value;
+		const auto result = bzd::deserialize(string, value);
+		EXPECT_TRUE(result);
+		EXPECT_EQ(result.value(), 1u);
+		EXPECT_TRUE(value);
+	}
+
+	{
+		const auto result = bzd::serialize(string.appender(), false);
+		EXPECT_EQ(result, 1u);
 		EXPECT_EQ(string[1u], '\x00');
 		EXPECT_EQ(string.size(), 2u);
 	}
 
 	{
-		bzd::serialize(string, false);
+		const auto result = bzd::serialize(string, false);
+		EXPECT_EQ(result, 1u);
 		EXPECT_EQ(string[0u], '\x00');
 		EXPECT_EQ(string.size(), 2u);
 	}
@@ -31,15 +42,29 @@ TEST(Integral, UInt32)
 	bzd::String<20u> string;
 
 	{
-		bzd::serialize(string.assigner(), bzd::UInt32{0x12345678});
+		const auto result = bzd::serialize(string.assigner(), bzd::UInt32{0x12345678});
+		EXPECT_EQ(result, 4u);
 		EXPECT_EQ(string.size(), 4u);
 		EXPECT_STREQ(string.data(), "\x78\x56\x34\x12");
 	}
 
 	{
+		bzd::UInt32 value;
+		const auto result = bzd::deserialize(string, value);
+		EXPECT_TRUE(result);
+		EXPECT_EQ(result.value(), 4u);
+		EXPECT_EQ(value, bzd::UInt32{0x12345678});
+	}
+
+	{
 		bzd::String<1u> shortString;
-		bzd::serialize(shortString.assigner(), bzd::UInt32{0x12345678});
+		const auto result1 = bzd::serialize(shortString.assigner(), bzd::UInt32{0x12345678});
+		EXPECT_EQ(result1, 1u);
 		EXPECT_EQ(shortString.size(), 1u);
 		EXPECT_STREQ(shortString.data(), "\x78");
+
+		bzd::UInt32 value;
+		const auto result2 = bzd::deserialize(shortString, value);
+		EXPECT_FALSE(result2);
 	}
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "cc/bzd/container/range/subrange.hh"
+#include "cc/bzd/container/range/in_out_result.hh"
 #include "cc/bzd/type_traits/is_trivially_copyable.hh"
 #include "cc/bzd/type_traits/iterator.hh"
 #include "cc/bzd/type_traits/range.hh"
@@ -15,7 +15,7 @@ namespace bzd::algorithm {
 /// \param[out] output The range of the destination range.
 ///
 /// \return The remain of the output range.
-template <concepts::forwardRange InputRange, concepts::outputRange OutputRange>
+template <concepts::inputRange InputRange, concepts::outputRange OutputRange>
 requires(concepts::byteCopyableRange<InputRange> && concepts::byteCopyableRange<OutputRange>)
 constexpr auto byteCopy(InputRange&& input, OutputRange&& output)
 {
@@ -29,7 +29,7 @@ constexpr auto byteCopy(InputRange&& input, OutputRange&& output)
 		auto n = bzd::min(bzd::size(input), bzd::size(output));
 		for (; n > 0; --n)
 		{
-			reinterpret_cast<bzd::Byte&>(*outputFirst) = reinterpret_cast<const bzd::Byte>(*inputFirst);
+			reinterpret_cast<bzd::Byte&>(*outputFirst) = static_cast<const bzd::Byte>(*inputFirst);
 			++outputFirst;
 			++inputFirst;
 		}
@@ -38,13 +38,13 @@ constexpr auto byteCopy(InputRange&& input, OutputRange&& output)
 	{
 		while (inputFirst != inputLast && outputFirst != outputLast)
 		{
-			reinterpret_cast<bzd::Byte&>(*outputFirst) = reinterpret_cast<const bzd::Byte>(*inputFirst);
+			reinterpret_cast<bzd::Byte&>(*outputFirst) = static_cast<const bzd::Byte>(*inputFirst);
 			++outputFirst;
 			++inputFirst;
 		}
 	}
 
-	return range::SubRange(outputFirst, outputLast);
+	return range::InOutResult{inputFirst, outputFirst};
 }
 
 } // namespace bzd::algorithm

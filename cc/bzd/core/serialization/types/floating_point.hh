@@ -14,22 +14,32 @@ namespace bzd {
 template <concepts::floatingPoint T>
 struct Serialization<T>
 {
-	template <concepts::outputStream Range>
-	static constexpr auto serialize(Range&& range, const T& value) noexcept
-	{
-		using Type = typeTraits::RemoveCVRef<T>;
+	using Type = typeTraits::RemoveCVRef<T>;
 
-		if constexpr (concepts::sameAs<Type, Float32> || concepts::sameAs<Type, Float64>)
+	static_assert(concepts::sameAs<Type, Float32> || concepts::sameAs<Type, Float64>, "This type is not a supported floating point type.");
+	static_assert(NumericLimits<Type>::isIEC559(),
+				  "The floating point representation is not compliant with the IEC 559/IEEE 754 standard.");
+
+	template <concepts::outputStream Range>
+	static constexpr Size serialize(Range&& range, const Type& value) noexcept
+	{
+		const auto bytes = Span<const Type>{&value, 1u}.asBytes();
+		const auto view = bytes | impl::serialization::normalizeByteOrder();
+		const auto result = algorithm::byteCopy(view, range);
+		return bzd::distance(bzd::begin(view), result.in);
+	}
+
+	template <concepts::inputStream Range>
+	static constexpr Optional<Size> deserialize(Range&& range, Type& value) noexcept
+	{
+		auto bytes = Span<Type>{&value, 1u}.asBytesMutable();
+		const auto result = algorithm::byteCopy(range | impl::serialization::normalizeByteOrder(), bytes);
+		const Size size = bzd::distance(bzd::begin(bytes), result.out);
+		if (size != bytes.size())
 		{
-			static_assert(NumericLimits<Type>::isIEC559(),
-						  "The floating point representation is not compliant with the IEC 559/IEEE 754 standard.");
-			const auto bytes = Span<const T>{&value, 1u}.asBytes();
-			return algorithm::byteCopy(bytes | impl::serialization::normalizeByteOrder(), range);
+			return bzd::nullopt;
 		}
-		else
-		{
-			static_assert(bzd::meta::alwaysFalse<T>, "This type is not a supported floating point type.");
-		}
+		return size;
 	}
 };
 
