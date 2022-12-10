@@ -1,6 +1,5 @@
 #include "cc/bzd/core/serialization/types/floating_point.hh"
 
-#include "cc/bzd/core/serialization/serialization.hh"
 #include "cc/bzd/test/test.hh"
 
 TEST(FloatingPoint, Float32)
@@ -15,7 +14,7 @@ TEST(FloatingPoint, Float32)
 	}
 
 	{
-		bzd::Float32 value;
+		bzd::Float32 value{};
 		const auto result = bzd::deserialize(string, value);
 		EXPECT_TRUE(result);
 		EXPECT_EQ(result.value(), 4u);
@@ -29,7 +28,7 @@ TEST(FloatingPoint, Float32)
 		EXPECT_EQ(shortString.size(), 1u);
 		EXPECT_STREQ(shortString.data(), "\xc3");
 
-		bzd::Float32 value;
+		bzd::Float32 value{};
 		const auto result2 = bzd::deserialize(shortString, value);
 		EXPECT_FALSE(result2);
 	}
@@ -47,7 +46,7 @@ TEST(FloatingPoint, Float64)
 	}
 
 	{
-		bzd::Float64 value;
+		bzd::Float64 value{};
 		const auto result = bzd::deserialize(string, value);
 		EXPECT_TRUE(result);
 		EXPECT_EQ(result.value(), 8u);
@@ -61,7 +60,7 @@ TEST(FloatingPoint, Float64)
 		EXPECT_EQ(shortString.size(), 1u);
 		EXPECT_STREQ(shortString.data(), "\x1f");
 
-		bzd::Float64 value;
+		bzd::Float64 value{};
 		const auto result2 = bzd::deserialize(shortString, value);
 		EXPECT_FALSE(result2);
 	}

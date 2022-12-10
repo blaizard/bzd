@@ -27,16 +27,6 @@ inline constexpr auto normalizeByteOrder() noexcept
 
 } // namespace bzd::impl::serialization
 
-namespace bzd::concepts {
-
-template <class T>
-concept outputStream = concepts::streamRange<T> && concepts::byteCopyableRange<T> && concepts::outputRange<T>;
-
-template <class T>
-concept inputStream = concepts::streamRange<T> && concepts::byteCopyableRange<T> && concepts::inputRange<T>;
-
-} // namespace bzd::concepts
-
 namespace bzd {
 
 /// This is the serialization base template and is used for partial or full specialization.
@@ -53,10 +43,10 @@ namespace bzd {
 /// template <concepts::??? T>
 /// struct Serialization<T>
 /// {
-///     template <concepts::outputStream Range>
+///     template <concepts::outputStreamRange Range>
 ///     static constexpr Size serialize(Range&& range, const T& value) noexcept { ... }
 ///
-///     template <concepts::inputStream Range>
+///     template <concepts::inputStreamRange Range>
 ///     static constexpr Optional<Size> deserialize(Range&& range, T& value) noexcept { ... }
 /// };
 /// \endcode
@@ -71,7 +61,7 @@ struct Serialization
 /// \param range The output range to be written to.
 /// \param args The value(s) to be written.
 /// \return The number of bytes written.
-template <concepts::outputStream Range, class... Args>
+template <concepts::outputStreamRange Range, class... Args>
 constexpr Size serialize(Range&& range, Args&&... args) noexcept
 {
 	return Serialization<Args...>::serialize(bzd::forward<Range>(range), bzd::forward<Args>(args)...);
@@ -80,7 +70,7 @@ constexpr Size serialize(Range&& range, Args&&... args) noexcept
 /// \copydoc serialize
 /// Converts an output range into an output stream.
 template <concepts::outputRange Range, class... Args>
-requires(!concepts::outputStream<Range>)
+requires(!concepts::outputStreamRange<Range>)
 constexpr Size serialize(Range&& range, Args&&... args) noexcept
 {
 	range::Stream stream{bzd::begin(range), bzd::end(range)};
@@ -92,7 +82,7 @@ constexpr Size serialize(Range&& range, Args&&... args) noexcept
 /// \param range The input range to be read from.
 /// \param args The value(s) to be read.
 /// \return The number of bytes read in case of success, otherwise an empty result.
-template <concepts::inputStream Range, class... Args>
+template <concepts::inputStreamRange Range, class... Args>
 constexpr Optional<Size> deserialize(Range&& range, Args&&... args) noexcept
 {
 	return Serialization<Args...>::deserialize(bzd::forward<Range>(range), bzd::forward<Args>(args)...);
@@ -101,7 +91,7 @@ constexpr Optional<Size> deserialize(Range&& range, Args&&... args) noexcept
 /// \copydoc deserialize
 /// Converts an input range into an input stream.
 template <concepts::inputRange Range, class... Args>
-requires(!concepts::inputStream<Range>)
+requires(!concepts::inputStreamRange<Range>)
 constexpr Optional<Size> deserialize(Range&& range, Args&&... args) noexcept
 {
 	range::Stream stream{bzd::begin(range), bzd::end(range)};

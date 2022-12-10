@@ -1,6 +1,5 @@
 #include "cc/bzd/core/serialization/types/integral.hh"
 
-#include "cc/bzd/core/serialization/serialization.hh"
 #include "cc/bzd/test/test.hh"
 
 TEST(Integral, Boolean)
@@ -15,7 +14,7 @@ TEST(Integral, Boolean)
 	}
 
 	{
-		bzd::Bool value;
+		bzd::Bool value{};
 		const auto result = bzd::deserialize(string, value);
 		EXPECT_TRUE(result);
 		EXPECT_EQ(result.value(), 1u);
@@ -49,7 +48,7 @@ TEST(Integral, UInt32)
 	}
 
 	{
-		bzd::UInt32 value;
+		bzd::UInt32 value{};
 		const auto result = bzd::deserialize(string, value);
 		EXPECT_TRUE(result);
 		EXPECT_EQ(result.value(), 4u);
@@ -63,7 +62,7 @@ TEST(Integral, UInt32)
 		EXPECT_EQ(shortString.size(), 1u);
 		EXPECT_STREQ(shortString.data(), "\x78");
 
-		bzd::UInt32 value;
+		bzd::UInt32 value{};
 		const auto result2 = bzd::deserialize(shortString, value);
 		EXPECT_FALSE(result2);
 	}

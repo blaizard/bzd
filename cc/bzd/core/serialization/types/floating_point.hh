@@ -2,7 +2,7 @@
 
 #include "cc/bzd/algorithm/byte_copy.hh"
 #include "cc/bzd/container/span.hh"
-#include "cc/bzd/core/serialization/serialization.hh"
+#include "cc/bzd/core/serialization/types/base.hh"
 #include "cc/bzd/platform/types.hh"
 #include "cc/bzd/type_traits/is_floating_point.hh"
 #include "cc/bzd/type_traits/is_same.hh"
@@ -20,7 +20,7 @@ struct Serialization<T>
 	static_assert(NumericLimits<Type>::isIEC559(),
 				  "The floating point representation is not compliant with the IEC 559/IEEE 754 standard.");
 
-	template <concepts::outputStream Range>
+	template <concepts::outputStreamRange Range>
 	static constexpr Size serialize(Range&& range, const Type& value) noexcept
 	{
 		const auto bytes = Span<const Type>{&value, 1u}.asBytes();
@@ -29,7 +29,7 @@ struct Serialization<T>
 		return bzd::distance(bzd::begin(view), result.in);
 	}
 
-	template <concepts::inputStream Range>
+	template <concepts::inputStreamRange Range>
 	static constexpr Optional<Size> deserialize(Range&& range, Type& value) noexcept
 	{
 		auto bytes = Span<Type>{&value, 1u}.asBytesMutable();
