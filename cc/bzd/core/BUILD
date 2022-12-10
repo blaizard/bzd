@@ -15,6 +15,7 @@ bzd_cc_library(
         "//cc/bzd/core/async",
         "//cc/bzd/core/logger",
         "//cc/bzd/core/panic",
+        "//cc/bzd/core/serialization",
     ],
 )
 

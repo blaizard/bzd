@@ -83,4 +83,10 @@ concept streamRange = range<T> && rangeCategory<T, typeTraits::IteratorCategory:
 template <class T>
 concept byteCopyableRange = range<T> && sizeof(typeTraits::RangeValue<T>) == 1u && concepts::triviallyCopyable<typeTraits::RangeValue<T>>;
 
+template <class T>
+concept inputStreamRange = streamRange<T> && byteCopyableRange<T> && inputRange<T>;
+
+template <class T>
+concept outputStreamRange = streamRange<T> && byteCopyableRange<T> && outputRange<T>;
+
 } // namespace bzd::concepts

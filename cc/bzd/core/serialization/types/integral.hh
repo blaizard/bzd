@@ -2,7 +2,7 @@
 
 #include "cc/bzd/algorithm/byte_copy.hh"
 #include "cc/bzd/container/span.hh"
-#include "cc/bzd/core/serialization/serialization.hh"
+#include "cc/bzd/core/serialization/types/base.hh"
 #include "cc/bzd/platform/types.hh"
 #include "cc/bzd/type_traits/is_integral.hh"
 #include "cc/bzd/type_traits/is_same.hh"
@@ -17,7 +17,7 @@ struct Serialization<T>
 	static constexpr Byte boolValueTrue{1u};
 	static constexpr Byte boolValueFalse{0u};
 
-	template <concepts::outputStream Range>
+	template <concepts::outputStreamRange Range>
 	static constexpr Size serialize(Range&& range, const Type& value) noexcept
 	requires(concepts::sameAs<Type, bool> || concepts::sameAs<Type, Bool>)
 	{
@@ -26,7 +26,7 @@ struct Serialization<T>
 		return bzd::distance(bzd::begin(data), result.in);
 	}
 
-	template <concepts::outputStream Range>
+	template <concepts::outputStreamRange Range>
 	static constexpr Size serialize(Range&& range, const Type& value) noexcept
 	requires(concepts::sameAs<Type, Int8> || concepts::sameAs<Type, UInt8> || concepts::sameAs<Type, Int16> ||
 			 concepts::sameAs<Type, UInt16> || concepts::sameAs<Type, Int32> || concepts::sameAs<Type, UInt32> ||
@@ -39,7 +39,7 @@ struct Serialization<T>
 		return bzd::distance(bzd::begin(view), result.in);
 	}
 
-	template <concepts::inputStream Range>
+	template <concepts::inputStreamRange Range>
 	static constexpr Optional<Size> deserialize(Range&& range, Type& value) noexcept
 	requires(concepts::sameAs<Type, bool> || concepts::sameAs<Type, Bool>)
 	{
@@ -62,7 +62,7 @@ struct Serialization<T>
 		return bzd::nullopt;
 	}
 
-	template <concepts::inputStream Range>
+	template <concepts::inputStreamRange Range>
 	static constexpr Optional<Size> deserialize(Range&& range, Type& value) noexcept
 	requires(concepts::sameAs<Type, Int8> || concepts::sameAs<Type, UInt8> || concepts::sameAs<Type, Int16> ||
 			 concepts::sameAs<Type, UInt16> || concepts::sameAs<Type, Int32> || concepts::sameAs<Type, UInt32> ||
