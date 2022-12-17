@@ -1,6 +1,7 @@
 import typing
 import json
 import copy
+from functools import cached_property
 
 from bzd.parser.element import Element, ElementBuilder
 from bzd.parser.error import Error
@@ -14,6 +15,7 @@ from tools.bdl.entities.impl.fragment.type import Type
 
 if typing.TYPE_CHECKING:
 	from tools.bdl.entities.impl.expression import Expression
+	from tools.bdl.entities.impl.using import Using
 	from tools.bdl.entities.all import EntityType
 	from tools.bdl.visitors.symbol_map import Resolver
 
@@ -39,6 +41,10 @@ class Entity:
 		self.element = element
 		self.role = role
 
+	@property
+	def category(self) -> str:
+		return self.element.getAttrValue("category")
+
 	def copy(self: U) -> U:
 		"""
 		Make a copy of the current entity.
@@ -47,6 +53,10 @@ class Entity:
 		copySelf.element = self.element.copy()
 		return copySelf
 
+	def toLiteral(self, args: typing.Any) -> typing.Optional[str]:
+		"""Given the input parameters, generate the underlying literal of this object."""
+		return None
+
 	def _getNestedByCategory(self, category: str) -> EntitySequence:
 		sequence = self.element.getNestedSequence(category)
 		if sequence:
@@ -54,7 +64,7 @@ class Entity:
 			return EntitySequence([elementToEntity(element) for element in sequence])
 		return EntitySequence([])
 
-	def _setUnderlyingType(self, fqn: str) -> None:
+	def _setUnderlyingTypeFQN(self, fqn: str) -> None:
 		ElementBuilder.cast(self.element, ElementBuilder).setAttr("fqn_type", fqn)
 
 	@property
@@ -73,7 +83,7 @@ class Entity:
 		"""
 		Get the parents of the underlying type or the current entity if not present.
 		"""
-		if self.underlyingType is None:
+		if self.underlyingTypeFQN is None:
 			return self.getParents()
 		return self.getEntityUnderlyingTypeResolved(resolver=resolver).getParents()
 
@@ -88,23 +98,25 @@ class Entity:
 		ElementBuilder.cast(self.element, ElementBuilder).setAttr("parents", ";".join(updatedParents))
 
 	@property
-	def underlyingType(self) -> typing.Optional[str]:
+	def underlyingTypeFQN(self) -> typing.Optional[str]:
 		"""
 		Get the underlying element FQN if available.
 		"""
 		return self.element.getAttrValue("fqn_type")
 
-	def _setUnderlyingValue(self, entity: "Entity", fqn: typing.Optional[str] = None) -> None:
-		elementBuilder = ElementBuilder.cast(self.element, ElementBuilder)
-		if fqn is not None:
-			elementBuilder.setAttr("fqn_value", fqn)
-		elif entity.underlyingValue is not None:
-			elementBuilder.setAttr("fqn_value", entity.underlyingValue)
-		if entity.literal is not None:
-			elementBuilder.setAttr("literal", entity.literal)
+	def _setUnderlyingValueFQN(self, fqn: str) -> None:
+		ElementBuilder.cast(self.element, ElementBuilder).setAttr("fqn_value", fqn)
+
+	def _setLiteral(self, value: typing.Optional[str]) -> None:
+		"""Set or unset the literal associated with this element."""
+
+		if value is not None:
+			ElementBuilder.cast(self.element, ElementBuilder).setAttr("literal", value)
+		elif self.element.isAttr("literal"):
+			ElementBuilder.cast(self.element, ElementBuilder).removeAttr("literal")
 
 	@property
-	def underlyingValue(self) -> typing.Optional[str]:
+	def underlyingValueFQN(self) -> typing.Optional[str]:
 		"""
 		Get the underlying element FQN that contains the value.
 		"""
@@ -121,12 +133,9 @@ class Entity:
 		"""
 		Get the entity related to type after resolve.
 		"""
-		if self.underlyingType is None:
-			print(self)
-			print(self.element)
-		self.assertTrue(condition=self.underlyingType is not None, message="Underlying type is not available.")
-		assert self.underlyingType is not None
-		entity = resolver.getEntityResolved(fqn=self.underlyingType).assertValue(element=self.element)
+		self.assertTrue(condition=self.underlyingTypeFQN is not None, message="Underlying type is not available.")
+		assert self.underlyingTypeFQN is not None
+		entity = resolver.getEntityResolved(fqn=self.underlyingTypeFQN).assertValue(element=self.element)
 		assert entity.isRoleType, "The role of this entity must be a type."
 		return entity
 
@@ -215,15 +224,13 @@ class Entity:
 		return Type(element=self.element, kind="fqn")
 
 	def getConfigTemplateTypes(self, resolver: typing.Any) -> Parameters:
-		"""
-		Get the list of expressions that forms the template types.
-		"""
+		"""Get the list of expressions that forms the template types."""
 
-		if self.underlyingType:
-			underlyingType = resolver.getEntityResolved(fqn=self.underlyingType).assertValue(element=self.element)
+		if self.underlyingTypeFQN:
+			underlyingType = resolver.getEntityResolved(fqn=self.underlyingTypeFQN).assertValue(element=self.element)
 			return Parameters(element=underlyingType.element,
 				nestedKind=underlyingType.configAttr,
-				filterFct=lambda entity: entity.contracts.has("template") and entity.contracts.has("type"))
+				filterFct=lambda entity: entity.category == "using")
 		return Parameters(element=self.element)
 
 	def getConfigValues(self, resolver: typing.Any) -> Parameters:
@@ -231,11 +238,11 @@ class Entity:
 		Get the list of expressions that forms the values.
 		"""
 
-		if self.underlyingType:
-			underlyingType = resolver.getEntityResolved(fqn=self.underlyingType).assertValue(element=self.element)
-			return Parameters(element=underlyingType.element,
-				nestedKind=underlyingType.configAttr,
-				filterFct=lambda entity: not (entity.contracts.has("template") and entity.contracts.has("type")))
+		if self.underlyingTypeFQN:
+			underlyingTypeFQN = resolver.getEntityResolved(fqn=self.underlyingTypeFQN).assertValue(element=self.element)
+			return Parameters(element=underlyingTypeFQN.element,
+				nestedKind=underlyingTypeFQN.configAttr,
+				filterFct=lambda entity: entity.category == "expression")
 		return Parameters(element=self.element)
 
 	def makeValidation(self, resolver: typing.Any, parameters: Parameters,
@@ -244,10 +251,8 @@ class Entity:
 		Generate the validation object.
 		"""
 		schema = {}
-		for key, expression in parameters.items():
-			if expression.isVarArgs:
-				key = "*"
-
+		for key, expression in parameters.items(includeVarArgs=True):
+			key = "*" if expression.isVarArgs else str(key)
 			maybeContracts = expression.contracts.validationForTemplate if forTemplate else expression.contracts.validationForValue
 			schema[key] = maybeContracts if maybeContracts is not None else ""
 
@@ -304,10 +309,14 @@ class Entity:
 
 		# Resolve the types from a config sequence if any.
 		for entity in self.configRaw:
-			entity.assertTrue(condition=entity.category == "expression",
-				message=f"Configuration can only contain expressions, not '{entity.category}'.")
-			entity = typing.cast("Expression", entity)
-			entity.type.resolve(resolver=resolver)
+			if entity.category == "expression":
+				# Only the type of the expression should be resolved, the value cannot be evaluated
+				# as it might be malformed, this is inherent from config expressions.
+				typing.cast("Expression", entity).type.resolve(resolver=resolver)
+			elif entity.category == "using":
+				typing.cast("Using", entity).resolve(resolver=resolver)
+			else:
+				self.error(f"Configuration can only contain expressions or using statements, not '{entity.category}'.")
 
 	def error(self, message: str, throw: bool = True) -> str:
 		return Error.handleFromElement(element=self.element, message=message, throw=throw)
@@ -324,3 +333,50 @@ class Entity:
 		Human readable string representation of a result.
 		"""
 		return self.toString()
+
+
+class EntityExpression(Entity):
+
+	def __init__(self, element: Element, role: int = Role.Undefined) -> None:
+		self.element = element
+		self.role = role
+
+	@property
+	def const(self) -> bool:
+		return self.type.const
+
+	@property
+	def isName(self) -> bool:
+		return self.element.isAttr("name") and not self.name == "..."
+
+	@property
+	def isVarArgs(self) -> bool:
+		return self.element.isAttr("name") and self.name == "..."
+
+	@property
+	def isType(self) -> bool:
+		return self.element.isAttr("type")
+
+	@cached_property
+	def type(self) -> Type:
+		return Type(element=self.element, kind="type", underlyingTypeFQN="fqn_type", template="template", const="const")
+
+	@property
+	def isValue(self) -> bool:
+		return self.element.isAttr("value")
+
+	@property
+	def value(self) -> str:
+		return self.element.getAttr("value").value
+
+	@cached_property
+	def isParameters(self) -> bool:
+		return self.element.isNestedSequence("argument")
+
+	def __repr__(self) -> str:
+
+		return self.toString({
+			"name": self.name if self.isName else "",
+			"type": str(self.type) if self.isType else None,
+			"value": str(self.value) if self.isValue else None
+		})

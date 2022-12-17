@@ -34,7 +34,7 @@
 			{{- element.type | typeNonConstToStr -}}
 		{%- else -%}
 			{{- element.type | typeToStr -}}
-		{% end %} {{ element.name }}{{ prepend }}{% end %}{% if element.parametersResolved.size() > 0 %} = {{ element.type | typeNonConstToStr }}{ {{- declareParametersResolvedValues(element, false) -}} }{% end %}
+		{% end %} {{ element.name }}{{ prepend }}{% end %}{% if element.parametersResolved.size() > 0 %} = {{ element.type | typeNonConstToStr }}{ {{- declareParametersResolvedRValues(element, false) -}} }{% end %}
 	{%- elif element.isValue -%}
 	{% if element.isName %} {{ element.name }}{{ prepend }} = {% end %}{{ element.value }}
 	{%- end -%}
@@ -69,29 +69,36 @@ Args:
 {#- Print parameters values.
 Args:
 	entity: The expression which parameters should be printed.
-	registry: If the named values are coming from the registry or not.
+	registry: If the registry is available and names should be picked from it.
 -#}
-{%- macro declareParametersResolvedValues(entity, registry) -%}
+{%- macro declareParametersResolvedRValues(entity, registry) -%}
 	{%- for i, expression in entity.parametersResolved %}{% if i %}, {% end -%}
 		{{- expression | commentParametersResolvedToStr -}}
-		{# If the expression has a type associated to it, a type is a method name or variable type. #}
+		{# If the expression has a type associated to it, a type is a method/variable name or a variable type. #}
 		{%- if expression.isType -%}
 			{# If the expression has a name associated to it, something like this: `name = type{...}`
 			This corresponds to an existing variable.
-			Note: On named expression there must be a FQN available.#}
+			Note: named expression does not mean they have a fqn associated to it.#}
 			{%- if expression.isName -%}
 				{# If this named variable must be taken from the registry if it exists. #}
-				{%- if registry -%}
-					{{- parametersValue(expression.fqnToType | typeRegistryToStr, entity.parametersExpectedResolved[i].type) -}}
-				{# Otherwise it will be used directly. #}
+				{%- if expression.isFQN -%}
+					{%- if registry -%}
+						{{- parametersValue(expression.fqnToType | typeRegistryToStr, entity.parametersExpectedResolved[i].type) -}}
+					{# Otherwise it will be used directly. #}
+					{%- else -%}
+						{{- parametersValue(expression.fqn | fqnToNameStr, entity.parametersExpectedResolved[i].type) -}}
+					{%- end -%}
+
+				{# There is no FQN for inline definition of variables. #}
 				{%- else -%}
-					{{- parametersValue(expression.fqn | fqnToNameStr, entity.parametersExpectedResolved[i].type) -}}
+					{{- entity.parametersExpectedResolved[i].type | typeToStr }}{ {{- declareParametersResolvedRValues(expression, registry) -}} }
 				{%- end -%}
+		
 			{# No name associated to it, something like this: `type{...}`
 			This is an inline variable instantiation. #}
 			{%- else -%}
 				{# Object instanciation. #}
-				{{- expression.type | typeToStr }}{ {{- declareParametersResolvedValues(expression, registry) -}} }
+				{{- expression.type | typeToStr }}{ {{- declareParametersResolvedRValues(expression, registry) -}} }
 			{%- end -%}
 		{%- else -%}
 			{# Literal. #}

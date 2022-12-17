@@ -2,7 +2,7 @@
 
 namespace example {
 
-bzd::Async<> run()
+bzd::Async<> Hello::run()
 {
 	co_await !bzd::print("Hello {}"_csv, bzd::Record<"hello">::id);
 

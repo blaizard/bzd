@@ -34,10 +34,6 @@ class Namespace(Entity):
 		Error.assertHasSequence(element=element, sequence="name")
 
 	@property
-	def category(self) -> str:
-		return "namespace"
-
-	@property
 	def typeCategory(self) -> TypeCategory:
 		return TypeCategory.namespace
 

@@ -34,8 +34,8 @@ class Validation(VisitorBase[None]):
 			entity.assertTrue(condition=entity.isName, message="Interfaces must have a valid name.")
 			entity.assertTrue(condition=interfaceCategories.issubset({"method", "expression"}),
 				message="Interfaces can only expose methods and expressions as interface.")
-			entity.assertTrue(condition=configCategories.issubset({"expression"}),
-				message="Interfaces configuration can only contain expressions.")
+			entity.assertTrue(condition=configCategories.issubset({"expression", "using"}),
+				message="Interfaces configuration can only contain expressions and using statements.")
 			entity.assertTrue(condition=len(compositionCategories) == 0,
 				message="Interfaces cannot have nested composition.")
 
@@ -49,8 +49,8 @@ class Validation(VisitorBase[None]):
 
 		elif entity.type == "component":
 			entity.assertTrue(condition=entity.isName, message="Components must have a valid name.")
-			entity.assertTrue(condition=interfaceCategories.issubset({"method"}),
-				message="Components can only expose methods as interface.")
+			entity.assertTrue(condition=interfaceCategories.issubset({"method", "expression"}),
+				message="Components can only expose methods and expressions as interface.")
 			entity.assertTrue(condition=configCategories.issubset({"expression"}),
 				message="Components configuration can only contain expressions.")
 			entity.assertTrue(condition=compositionCategories.issubset({"expression"}),

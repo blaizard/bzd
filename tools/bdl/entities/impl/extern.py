@@ -25,10 +25,6 @@ class Extern(Entity):
 		Error.assertHasAttr(element=element, attr="name")
 
 	@property
-	def category(self) -> str:
-		return "extern"
-
-	@property
 	def typeCategory(self) -> TypeCategory:
 		if self.type == "type":
 			return TypeCategory.struct
@@ -42,7 +38,7 @@ class Extern(Entity):
 		"""
 		Resolve entities.
 		"""
-		self._setUnderlyingType(self.fqn)
+		self._setUnderlyingTypeFQN(self.fqn)
 
 		super().resolve(resolver)
 

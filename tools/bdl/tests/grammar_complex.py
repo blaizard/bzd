@@ -359,8 +359,6 @@ interface MyFy
 			}]
 		}]
 
-		print(result)
-
 		self.assertListEqual(expected, result)
 
 

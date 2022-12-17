@@ -18,7 +18,7 @@ class Type:
 	def __init__(self,
 		element: Element,
 		kind: str,
-		underlyingType: typing.Optional[str] = None,
+		underlyingTypeFQN: typing.Optional[str] = None,
 		template: typing.Optional[str] = None,
 		argumentTemplate: typing.Optional[str] = None,
 		contract: typing.Optional[str] = None,
@@ -27,14 +27,14 @@ class Type:
 		Error.assertHasAttr(element=element, attr=kind)
 		self.element = element
 		self.kindAttr = kind
-		self.underlyingTypeAttr = underlyingType
+		self.underlyingTypeAttr = underlyingTypeFQN
 		self.templateAttr = template
 		self.argumentTemplateAttr = argumentTemplate
 		self.contractAttr = contract
 		self.constAttr = const
 
 	@property
-	def underlyingType(self) -> typing.Optional[str]:
+	def underlyingTypeFQN(self) -> typing.Optional[str]:
 		if self.underlyingTypeAttr is None:
 			return None
 		return self.element.getAttrValue(self.underlyingTypeAttr)
@@ -50,9 +50,11 @@ class Type:
 
 		return dependencies
 
-	def resolve(self, resolver: "Resolver") -> "EntityType":
-		"""
-		Resolve the types and nested templates by updating their symbol to fqn.
+	def resolve(self, resolver: "Resolver", maybeValue: bool = False) -> "EntityType":
+		"""Resolve the types and nested templates by updating their symbol to fqn.
+
+		Args:
+			maybeValue: Set to true if the type might represent a value.
 		"""
 
 		fqns = resolver.resolveFQN(name=self.kind).assertValue(element=self.element, attr=self.kindAttr)
@@ -60,34 +62,35 @@ class Type:
 		ElementBuilder.cast(self.element, ElementBuilder).updateAttr(self.kindAttr, ";".join(fqns))
 
 		# Resolve the templates if available
-		self.templates.resolve(resolver=resolver)
-		templates = self.templates
+		from tools.bdl.entities.impl.using import Using
+		for template in self.templates:
+			Error.assertTrue(condition=template.isType, element=template.element, message="The is not a valid type.")
+			Using(template.element).resolve(resolver=resolver)
 
 		# Get and save the underlying type
 		underlying = self.getEntityResolved(resolver=resolver)
+		self.assertTrue(condition=underlying.isRoleType or maybeValue, message="This is not a valid type.")
 		# Resolve the entity, this is needed only if the entity is defined after the one holding this type.
 		underlying.resolveMemoized(resolver=resolver)
 
 		# Save the category under {kindAttr}_category.
 		ElementBuilder.cast(self.element, ElementBuilder).setAttr(f"{self.kindAttr}_category", underlying.category)
 
-		if self.underlyingTypeAttr is not None and underlying.underlyingType is not None:
+		if self.underlyingTypeAttr is not None and underlying.underlyingTypeFQN is not None:
 			ElementBuilder.cast(self.element, ElementBuilder).setAttr(self.underlyingTypeAttr,
-				underlying.underlyingType)
+				underlying.underlyingTypeFQN)
 
 		# Validate template arguments
 		configTypes = underlying.getConfigTemplateTypes(resolver=resolver)
 		if not configTypes:
-			Error.assertTrue(element=self.element,
-				condition=(not bool(self.templates)),
-				attr=self.kindAttr,
+			self.assertTrue(condition=(not bool(self.templates)),
 				message=f"Type '{self.kind}' does not support template type arguments.")
 		else:
 
-			templates.mergeDefaults(configTypes)
+			self.templates.mergeDefaults(defaults=configTypes)
 
 			# Validate the template arguments
-			values = templates.getValuesOrTypesAsDict(resolver=resolver, varArgs=False)
+			values = self.templates.getValuesOrTypesAsDict(resolver=resolver, varArgs=False)
 			validation = underlying.makeValidationForTemplate(resolver=resolver, parameters=configTypes)
 			assert validation, "Cannot be empty, already checked by the condition."
 			resultValidate = validation.validate(values, output="return")
@@ -97,7 +100,7 @@ class Type:
 				message=str(resultValidate))
 
 			# Save the resolved template only after the validation is completed.
-			sequence = templates.toResolvedSequence(resolver=resolver, varArgs=False, onlyTypes=True)
+			sequence = self.templates.toResolvedSequence(resolver=resolver, varArgs=False, onlyTypes=True)
 			ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence(f"{self.templateAttr}_resolved",
 				sequence)
 
@@ -169,6 +172,12 @@ class Type:
 	def parametersTemplateResolved(self) -> ResolvedParameters:
 		return ResolvedParameters(element=self.element, nestedKind=self.argumentTemplateAttr)
 
+	def error(self, message: str, throw: bool = True) -> str:
+		return Error.handleFromElement(element=self.element, attr=self.kindAttr, message=message, throw=throw)
+
+	def assertTrue(self, condition: bool, message: str, throw: bool = True) -> typing.Optional[str]:
+		return Error.assertTrue(condition=condition, element=self.element, attr=self.kindAttr, message=message, throw=throw)
+
 	def __repr__(self) -> str:
 		return self.name
 
@@ -216,7 +225,7 @@ class Visitor(VisitorDepthFirstBase[typing.List[str], str]):
 
 			entity = Type(element=element,
 				kind="type",
-				underlyingType="fqn_type",
+				underlyingTypeFQN="fqn_type",
 				template="template_resolved" if self.isResolved else "template",
 				argumentTemplate="argument_template_resolved" if self.isResolved else None,
 				const="const")

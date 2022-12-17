@@ -158,6 +158,32 @@ class TestRun(unittest.TestCase):
 			"argument": []
 		}])
 
+		parser = Parser(content="method withArgs(a = Vector<Integer>(12));")
+		self.assertParserEqual(parser, [{
+			"@": {
+			"category": "method",
+			"name": "withArgs"
+			},
+			"argument": [{
+			"@": {
+			"category": "expression",
+			"symbol": None,
+			"name": "a",
+			"type": "Vector"
+			},
+			"template": [{
+			'@': {
+			'type': 'Integer'
+			}
+			}],
+			"argument": [{
+			'@': {
+			'value': '12'
+			}
+			}]
+			}]
+		}])
+
 	def testExpression(self) -> None:
 		parser = Parser(content="var1 = Integer;")
 		self.assertParserEqual(parser, [{
@@ -264,6 +290,27 @@ class TestRun(unittest.TestCase):
 			}]
 		}])
 
+		parser = Parser(content="var1 = Integer(key = Integer(12));")
+		self.assertParserEqual(parser, [{
+			"@": {
+			"category": "expression",
+			"symbol": None,
+			"name": "var1",
+			"type": "Integer",
+			},
+			"argument": [{
+			"@": {
+			"name": "key",
+			"type": "Integer"
+			},
+			"argument": [{
+			'@': {
+			'value': '12'
+			}
+			}]
+			}]
+		}])
+
 		parser = Parser(content="fct(key = 12);")
 		self.assertParserEqual(parser, [{
 			"@": {
@@ -299,6 +346,47 @@ class TestRun(unittest.TestCase):
 			"name": "var1",
 			"type": "Integer",
 			},
+			"argument": []
+		}])
+
+		parser = Parser(content="var1 = Vector<Integer>();")
+		self.assertParserEqual(parser, [{
+			"@": {
+			"category": "expression",
+			"symbol": None,
+			"name": "var1",
+			"type": "Vector",
+			},
+			"template": [{
+			'@': {
+			'type': 'Integer'
+			}
+			}],
+			"argument": []
+		}])
+
+		parser = Parser(content="var1 = Vector<Vector<Integer, 2>>();")
+		self.assertParserEqual(parser, [{
+			"@": {
+			"category": "expression",
+			"symbol": None,
+			"name": "var1",
+			"type": "Vector",
+			},
+			"template": [{
+			'@': {
+			'type': 'Vector'
+			},
+			"template": [{
+			'@': {
+			'type': 'Integer'
+			}
+			}, {
+			'@': {
+			'value': '2'
+			}
+			}]
+			}],
 			"argument": []
 		}])
 

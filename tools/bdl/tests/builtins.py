@@ -89,10 +89,10 @@ class TestRun(unittest.TestCase):
 		Object.fromContent(content="struct temp { var = Result<Integer, Void>; }",
 			objectContext=ObjectContext(resolve=True))
 
-		with self.assertRaisesRegex(Exception, r"not a type"):
+		with self.assertRaisesRegex(Exception, r"not a valid type"):
 			Object.fromContent(content="struct temp { var = Result<12, Void>; }",
 				objectContext=ObjectContext(resolve=True))
-		with self.assertRaisesRegex(Exception, r"not a type"):
+		with self.assertRaisesRegex(Exception, r"not a valid type"):
 			Object.fromContent(content="struct temp { var = Result<Void, 78>; }",
 				objectContext=ObjectContext(resolve=True))
 
@@ -104,6 +104,10 @@ class TestRun(unittest.TestCase):
 		Object.fromContent(content="struct temp { var = Result<Result, Void>; }",
 			objectContext=ObjectContext(resolve=True))
 		Object.fromContent(content="struct temp { var = Result<Result<Void, Void>, Void>; }",
+			objectContext=ObjectContext(resolve=True))
+
+	def testTemp(self):
+		Object.fromContent(content="struct temp { var = Vector<Integer>(12); }",
 			objectContext=ObjectContext(resolve=True))
 
 	def testVector(self) -> None:

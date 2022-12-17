@@ -137,19 +137,29 @@ def makeGrammarExpressionFragment(finalGrammar: Grammar = [GrammarItem(r";", Fra
 	class ArgumentStart(FragmentNestedStart):
 		nestedName = "argument"
 
-	grammarValue = [
-		GrammarItem(_regexprValue, Fragment,
+	grammarValue = []
+	grammarValue.append(GrammarItem(_regexprValue, Fragment,
 		[GrammarItem(r",", FragmentNewElement),
-		GrammarItem(r"\)", FragmentParentElement)]),
-		GrammarItem(_regexprType, Fragment,
+		GrammarItem(r"\)", FragmentParentElement)]))
+	grammarValue.append(makeGrammarType([
+		GrammarItem(r"\(", ArgumentStart, grammarValue),
+		GrammarItem(r",", FragmentNewElement),
+		GrammarItem(r"\)", FragmentParentElement)
+
+	]))
+	
+	"""
+	grammarValue.append(GrammarItem(_regexprType, Fragment,
 		[GrammarItem(r",", FragmentNewElement),
-		GrammarItem(r"\)", FragmentParentElement)])
-	]
+		GrammarItem(r"\)", FragmentParentElement),
+		GrammarItem(r"\(", ArgumentStart, grammarValue)]))
+	"""
 
 	return makeGrammarType([
-		GrammarItem(r"\(", ArgumentStart,
-		[GrammarItem(_regexprName + r"\s*=", Fragment, grammarValue),
-		GrammarItem(r"\)", FragmentParentElement)] + grammarValue),
+		GrammarItem(r"\(", ArgumentStart, [
+			GrammarItem(_regexprName + r"\s*=", Fragment, grammarValue),
+			GrammarItem(r"\)", FragmentParentElement)
+		] + grammarValue),
 		makeGrammarContracts(), finalGrammar
 	])
 

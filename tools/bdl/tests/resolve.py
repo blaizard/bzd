@@ -214,6 +214,12 @@ class TestRun(unittest.TestCase):
 					""",
 			objectContext=ObjectContext(resolve=True, composition=True))
 
+		Object.fromContent(content="""
+					struct Test { var = Integer; }
+					composition { test = Test(var = Integer(32)); }
+					""",
+			objectContext=ObjectContext(resolve=True, composition=True))
+
 	def testValues(self) -> None:
 
 		Object.fromContent(content="""
@@ -359,12 +365,20 @@ class TestRun(unittest.TestCase):
 				""",
 			objectContext=ObjectContext(resolve=True, composition=True))
 
+		Object.fromContent(content="""
+				interface Test { config: value = Integer; }
+				composition MyComposition { val1 = Test(value=Integer(12)); }
+				""",
+			objectContext=ObjectContext(resolve=True, composition=True))
+
 	def testDefaultValues(self) -> None:
 
 		with self.assertRaisesRegex(Exception, r"missing.*mandatory"):
 			Object.fromContent(content="""
 				interface Test { config: value = Integer [mandatory]; }
-				composition MyComposition { val1 = Test; }
+				composition MyComposition {
+					val1 = Test;
+				}
 				""",
 				objectContext=ObjectContext(resolve=True, composition=True))
 
@@ -382,6 +396,15 @@ class TestRun(unittest.TestCase):
 				{
 					val1 = Test(value = 23);
 					hello = val1;
+				}
+				""",
+			objectContext=ObjectContext(resolve=True, composition=True))
+
+		Object.fromContent(content="""
+				interface Test { config: using hello = Integer; }
+				composition MyComposition
+				{
+					val1 = Test<Float>();
 				}
 				""",
 			objectContext=ObjectContext(resolve=True, composition=True))

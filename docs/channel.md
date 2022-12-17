@@ -157,6 +157,8 @@ interface Transport {
 	method getStatus() -> Status;
 
 	// Statistics
+	sent = UInt32;
+	received = UInt32;
 
 	// Data
 	onRead() -> // Optional

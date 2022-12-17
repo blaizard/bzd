@@ -94,10 +94,6 @@ class DependencyMap:
 		assert entity not in self.map, f"The entity '{entity}' is already inserted in the dependency map."
 		dependencies = self.resolveDependencies(entity)
 
-		#print("----------------", entity.fqn)
-		#print(f"component: {str(entity)}")
-		#print(str(dependencies))
-
 		self.map[entity] = dependencies
 
 	def addImplicit(self) -> None:

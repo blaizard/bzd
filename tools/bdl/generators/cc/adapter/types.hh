@@ -11,9 +11,14 @@
 #include "cc/bzd/type_traits/is_same.hh"
 
 namespace bzd {
+
 /// Interfaces accessor.
 template <bzd::meta::StringLiteral fqn>
 struct Interface;
+
+/// Data accessor.
+template <bzd::meta::StringLiteral fqn>
+struct Data;
 
 namespace impl {
 

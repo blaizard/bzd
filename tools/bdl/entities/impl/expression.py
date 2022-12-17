@@ -2,7 +2,7 @@ import typing
 import enum
 from functools import cached_property
 
-from bzd.parser.element import Element, ElementBuilder
+from bzd.parser.element import Element, ElementBuilder, SequenceBuilder
 from bzd.parser.error import Error
 
 from tools.bdl.contracts.validation import Validation, SchemaDict
@@ -11,14 +11,14 @@ from tools.bdl.entities.impl.fragment.type import Type
 from tools.bdl.entities.impl.fragment.contract import Contracts
 from tools.bdl.entities.impl.fragment.parameters import Parameters, ResolvedParameters
 from tools.bdl.entities.impl.fragment.fqn import FQN
-from tools.bdl.entities.impl.entity import Entity, Role
+from tools.bdl.entities.impl.entity import Entity, EntityExpression, Role
 from tools.bdl.entities.impl.types import TypeCategory
 
 if typing.TYPE_CHECKING:
 	from tools.bdl.visitors.symbol_map import Resolver
 
 
-class Expression(Entity):
+class Expression(EntityExpression):
 	"""
 	An expression can be:
 		- a variable declaration.
@@ -30,7 +30,7 @@ class Expression(Entity):
 		- [value]: The value this expression represents.
 		- [name]: The resulting symbol name.
 		- [const]: If the expression is constant.
-		- [underlyingValue]: The actual value discovered after resolution.
+		- [underlyingValueFQN]: The actual value discovered after resolution.
 		- [symbol]: The interface type if any (might not be set).
 	- Sequence:
 		- argument: The list of arguments to pass to the instanciation or method call.
@@ -43,10 +43,6 @@ class Expression(Entity):
 		self.assertTrue(condition=(self.isValue or self.isType), message="Expression must represent a type or a value.")
 
 	@property
-	def category(self) -> str:
-		return "expression"
-
-	@property
 	def executor(self) -> str:
 		maybeContract = self.contracts.get("executor")
 		if maybeContract is not None:
@@ -55,31 +51,11 @@ class Expression(Entity):
 				return maybeExecutor
 		return "executor"
 
-	@property
-	def const(self) -> bool:
-		return self.type.const
-
-	@property
-	def isName(self) -> bool:
-		return self.element.isAttr("name") and not self.name == "..."
-
-	@property
-	def isVarArgs(self) -> bool:
-		return self.element.isAttr("name") and self.name == "..."
-
-	@property
-	def isType(self) -> bool:
-		return self.element.isAttr("type")
-
-	@cached_property
-	def type(self) -> Type:
-		return Type(element=self.element, kind="type", underlyingType="fqn_type", template="template", const="const")
-
 	@cached_property
 	def typeResolved(self) -> Type:
 		return Type(element=self.element,
 			kind="type",
-			underlyingType="fqn_type",
+			underlyingTypeFQN="fqn_type",
 			template="template_resolved",
 			argumentTemplate="argument_template_resolved",
 			const="const")
@@ -90,38 +66,22 @@ class Expression(Entity):
 
 	@cached_property
 	def interfaceType(self) -> Type:
-		return Type(element=self.element, kind="symbol", underlyingType="fqn_interface",
+		return Type(element=self.element, kind="symbol", underlyingTypeFQN="fqn_interface",
 			const="const") if self.isInterfaceType else self.type
 
 	@cached_property
 	def interfaceTypeResolved(self) -> Type:
-		return Type(element=self.element, kind="symbol", underlyingType="fqn_interface",
+		return Type(element=self.element, kind="symbol", underlyingTypeFQN="fqn_interface",
 			const="const") if self.isInterfaceType else self.typeResolved
 
 	@property
-	def isValue(self) -> bool:
-		return self.element.isAttr("value")
-
-	@property
-	def value(self) -> str:
-		return self.element.getAttr("value").value
-
-	@property
-	def raw(self) -> str:
-		return self.value if self.isValue else self.type.kind
-
-	@property
-	def literal(self) -> typing.Optional[str]:
-		"""
-		A literal type is type that can be described as a string.
-		"""
-		if self.isValue:
-			return self.value
-		return super().literal
-
-	@property
 	def isRoleValue(self) -> bool:
-		return self.literal is not None or self.underlyingValue is not None
+		"""An expression is a value, if one the following is true:
+		- It has a literal: `name = 12;`
+		- It has an underlying value FQN: `name = hello; // hello corresponds to a value and not a type.`
+		- It has paramters (even an empty list): `name = hello();`
+		"""
+		return self.literal is not None or self.underlyingValueFQN is not None or self.isParameters
 
 	@property
 	def isRoleType(self) -> bool:
@@ -136,7 +96,6 @@ class Expression(Entity):
 		if self.isType:
 			dependencies.update(self.type.dependencies)
 		if self.isParameters:
-			assert self.parameters is not None
 			dependencies.update(self.parameters.dependencies)
 
 		return dependencies
@@ -145,52 +104,48 @@ class Expression(Entity):
 		"""
 		Resolve entities.
 		"""
-		if self.isValue:
-			return
-
-		entity = self.type.resolve(resolver=resolver)
 
 		# Resolve the interface associated with this expression.
 		if self.isInterfaceType:
 			self.interfaceType.resolve(resolver=resolver)
 			# TODO: Ensure that the interface is part of the parent type.
 
-		# Set the underlying value
-		if self.isParameters:
+		# If it holds a value, it is considered a literal.
+		if self.isValue:
+			self._setLiteral(value=self.value)
 
-			# The type must represent a type (not a value) and have a valid FQN.
-			self.assertTrue(condition=entity.isRoleType, message="Cannot instantiate a value from another value.")
-			self.assertTrue(condition=self.isFQN, message="The value must have a FQN.")
-			# TODO: it is possible that the expression does not have a FQN, in case the expression is resolved through another entity.
-			self._setUnderlyingValue(entity=self, fqn=self.fqn)
+		# If it holds a type.
+		elif self.isType:
 
-		else:
-			self._setUnderlyingValue(entity=entity)
+			# Check if this points to a type or a value.
+			entity = self.type.resolve(resolver=resolver, maybeValue=True)
+	
+			# The type refers to a value.
+			if entity.isRoleValue:
+				self.assertTrue(condition=self.isParameters == False, message="Cannot instantiate a value from another value.")
+				self.assertTrue(condition=entity.underlyingValueFQN, message="A value referenced must have an underlying value FQN.")
+				self._setUnderlyingValueFQN(fqn=entity.underlyingValueFQN)
+				self._setLiteral(value=entity.literal)
 
-		# Get the resolved type and check the kind of role it has.
-		resolvedTypeEntity = resolver.getEntityResolved(fqn=self.typeResolved.fqn).assertValue(element=self.element)
+			# The type refers to an actual type and will be instantiated as part of this expression.
+			elif entity.isRoleType:
 
-		# For instanciation only, we want to resolve and validate the arguments.
-		if resolvedTypeEntity.isRoleType:
+				# If this is a temporary (hence no FQN), no need to set the underlying FQN, this value will never be referenced.
+				# The underlying value FQN is only needed for expressions that can be referenced.
+				if self.isFQN:
+					self._setUnderlyingValueFQN(fqn=self.fqn)
 
-			# Generate the argument list and resolve it.
-			if self.isParameters:
-				parameters = self.parameters
-				assert parameters is not None
-				parameters.resolve(resolver=resolver)
+				# Generate the argument list and resolve it.
+				self.parameters.resolve(resolver=resolver, EntityType=Expression)
+				self._resolveAndValidateParameters(resolver, entity, self.parameters)
+
 			else:
-				parameters = Parameters(element=self.element)
+				self.error(message=f"Cannot create an expression from '{entity.fqn}'.")
 
-			self._resolveAndValidateParameters(resolver, resolvedTypeEntity, parameters)
-
-		# This is a type assignment, nothing to do here.
-		elif resolvedTypeEntity.isRoleValue:
-			pass
+			super().resolve(resolver)
 
 		else:
-			self.error(message=f"Cannot create an expression from this element: {resolvedTypeEntity.fqn}")
-
-		super().resolve(resolver)
+			self.error(message="Unsupported expression.")
 
 	def _resolveAndValidateParameters(self, resolver: "Resolver", resolvedTypeEntity: Entity,
 		parameters: Parameters) -> None:
@@ -198,13 +153,14 @@ class Expression(Entity):
 
 		# Merge its default values
 		argumentConfig = self.getConfigValues(resolver=resolver)
-		parameters.mergeDefaults(argumentConfig)
+		parameters.mergeDefaults(defaults=argumentConfig)
 
 		# Validate the type of arguments.
 		parameterTypeCategories = {*parameters.getUnderlyingTypeCategories(resolver)}
 		if TypeCategory.component in parameterTypeCategories:
 			typeCategory = resolvedTypeEntity.typeCategory  # type: ignore
-			self.assertTrue(condition=typeCategory in [TypeCategory.component, TypeCategory.method],
+			self.assertTrue(condition=typeCategory
+				in [TypeCategory.component, TypeCategory.method, TypeCategory.builtin],
 				message=f"Components are not allowed for this type '{typeCategory}'.")
 
 		# Read the validation for the value. it comes in part from the direct underlying type, contract information
@@ -214,6 +170,10 @@ class Expression(Entity):
 			arguments = parameters.getValuesOrTypesAsDict(resolver=resolver, varArgs=False)
 			result = validation.validate(arguments, output="return")
 			Error.assertTrue(element=self.element, attr="type", condition=bool(result), message=str(result))
+			#maybeValue = resolvedTypeEntity.toLiteral(result.values)
+			#if maybeValue is not None:
+			#	self._setLiteral(maybeValue)
+			#	print("value", maybeValue)
 
 		# Save the resolved parameters (values and templates), only after the validation is completed.
 		argumentValues = parameters.copy(template=False)
@@ -242,9 +202,9 @@ class Expression(Entity):
 		validationValue = contracts.validationForValue
 
 		# Get the configuration value if any.
-		if self.underlyingType is not None:
-			underlyingType = resolver.getEntityResolved(self.underlyingType).assertValue(element=self.element)
-			if underlyingType.isConfig:
+		if self.underlyingTypeFQN is not None:
+			underlyingTypeFQN = resolver.getEntityResolved(self.underlyingTypeFQN).assertValue(element=self.element)
+			if underlyingTypeFQN.isConfig:
 				self.assertTrue(condition=not validationValue,
 					message="This expression has both a global contract and a configuration, this is not allowed.")
 				return self.makeValidationForValues(resolver=resolver, parameters=parameters)
@@ -261,19 +221,14 @@ class Expression(Entity):
 		return Validation(schema={}, args={"resolver": resolver})
 
 	@cached_property
-	def isParameters(self) -> bool:
-		return self.element.isNestedSequence("argument")
-
-	@cached_property
 	def parameters(self) -> typing.Optional[Parameters]:
 		"""
 		Return the Parameters object if there are parameters. In case the expression
-		is declared with empty parenthesis the Parameters object will be empty.
-		In case the expression is defined without parenthesis, it returns None.
+		is declared with empty parenthesis or without the Parameters object will be empty.
 		"""
 		if self.isParameters:
 			return Parameters(element=self.element, nestedKind="argument")
-		return None
+		return Parameters(element=self.element)
 
 	@cached_property
 	def parametersResolved(self) -> ResolvedParameters:
@@ -282,10 +237,3 @@ class Expression(Entity):
 	@cached_property
 	def parametersExpectedResolved(self) -> ResolvedParameters:
 		return ResolvedParameters(element=self.element, nestedKind="argument_expected")
-
-	def __repr__(self) -> str:
-		return self.toString({
-			"name": self.name if self.isName else "",
-			"type": str(self.type) if self.isType else None,
-			"value": str(self.value) if self.isValue else None
-		})

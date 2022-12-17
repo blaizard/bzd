@@ -21,12 +21,8 @@ class Builtin(Entity):
 		Error.assertHasAttr(element=element, attr="name")
 
 	@property
-	def underlyingType(self) -> str:
+	def underlyingTypeFQN(self) -> str:
 		return self.name
-
-	@property
-	def category(self) -> str:
-		return "builtin"
 
 	@property
 	def typeCategory(self) -> TypeCategory:

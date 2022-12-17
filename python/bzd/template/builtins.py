@@ -21,5 +21,23 @@ class BuiltinsBtl:
 
 		assert False, f"The builtin function 'merge' cannot take arguments of type '{type(first)}'."
 
+	@staticmethod
+	def set(*args: typing.Any) -> typing.Set[typing.Any]:
+		"""Create a set from multiple elements."""
+
+		return set(args)
+
+	@staticmethod
+	def any(*args: typing.Any) -> bool:
+		"""Checks if any of the argument evaluates to true."""
+
+		return any(args)
+
+	@staticmethod
+	def all(*args: typing.Any) -> bool:
+		"""Checks if all of the argument evaluates to true."""
+
+		return all(args)
+
 
 Builtins = {"btl": BuiltinsBtl}

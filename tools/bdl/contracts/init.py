@@ -17,9 +17,9 @@ class InitConstraint_(Constraint):
 
 		from tools.bdl.entities.impl.entity import Entity
 		if isinstance(context.value, Entity):
-			underlyingType = context.args["resolver"].getEntityResolved(context.value.underlyingType).value
-			assert underlyingType.category == "method", "'init' constraint applies only to methods."
-			assert underlyingType.parameters.empty(), "'init' methods cannot take arguments."
+			underlyingTypeFQN = context.args["resolver"].getEntityResolved(context.value.underlyingTypeFQN).value
+			assert underlyingTypeFQN.category == "method", "'init' constraint applies only to methods."
+			assert underlyingTypeFQN.parameters.empty(), "'init' methods cannot take arguments."
 
 
 class ContractInit(ContractTraits):
