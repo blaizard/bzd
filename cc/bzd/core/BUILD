@@ -11,6 +11,7 @@ bzd_cc_library(
         ":error",
         ":print",
         ":units",
+        ":value",
         "//cc/bzd/core/assert",
         "//cc/bzd/core/async",
         "//cc/bzd/core/logger",
@@ -55,6 +56,20 @@ cc_library(
         "//cc/bzd/utility:distance",
         "//cc/bzd/utility/synchronization:lock_guard",
         "//cc/bzd/utility/synchronization:mutex",
+    ],
+)
+
+cc_library(
+    name = "clock",
+    hdrs = [
+        "clock.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/container:named_type",
+        "//cc/bzd/core:units",
+        "//cc/bzd/core/async",
+        "//cc/bzd/platform:types",
     ],
 )
 
@@ -121,15 +136,9 @@ cc_library(
 )
 
 cc_library(
-    name = "clock",
+    name = "value",
     hdrs = [
-        "clock.hh",
+        "value.hh",
     ],
     visibility = ["//visibility:public"],
-    deps = [
-        "//cc/bzd/container:named_type",
-        "//cc/bzd/core:units",
-        "//cc/bzd/core/async",
-        "//cc/bzd/platform:types",
-    ],
 )

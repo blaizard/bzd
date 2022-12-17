@@ -13,8 +13,6 @@ interface:
 	
 config:
 	// The cores to be used by this executor.
-	 ... = bzd.platform.Core;
+	cores = Vector<bzd.platform.Core>;
 	
 }
-
-

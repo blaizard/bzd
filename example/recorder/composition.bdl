@@ -2,9 +2,16 @@
 namespace example;
 
 
-method run();
+component Hello {
+interface:
+	method run();
+	input = const Integer;
+	
+}
+
 composition {
-	run();
+	hello = Hello();
+	hello.run();
 	
 }
 

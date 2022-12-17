@@ -16,9 +16,5 @@ class Reference(Entity):
 		super().__init__(element, Role.Meta)
 		Error.assertHasAttr(element=element, attr="name")
 
-	@property
-	def category(self) -> str:
-		return "reference"
-
 	def __repr__(self) -> str:
 		return self.toString({"name": self.name})

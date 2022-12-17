@@ -11,25 +11,43 @@ if typing.TYPE_CHECKING:
 	from tools.bdl.entities.impl.expression import Expression
 	from tools.bdl.visitors.symbol_map import Resolver
 	from tools.bdl.entities.impl.fragment.type import Type
-	from tools.bdl.entities.impl.entity import Entity
+	from tools.bdl.entities.impl.entity import EntityExpression
 
-ResolvedType = typing.Union[str, "Entity", "Type"]
+@dataclass
+class Data:
+	# The name associated with this entry.
+	name: typing.Optional[str]
+	# The entity of this element.
+	entity: "EntityExpression"
+	# If this value is the default value, or one assigned during instanciation.
+	default: bool = False
+	# A number that corresponds to the order in which the parameter appears, given that
+	# the collection is sorted by ascending order.
+	order: int = -1
+	# If this parameter is a parameter argument, denoted with [template] as contract.
+	template: bool = False
 
-T = typing.TypeVar("T")
+@dataclass
+class Key:
+	# The index related to this key.
+	index: int
+	# The name related to this key, if available.
+	name: typing.Optional[str] = None
+	def __str__(self) -> str:
+		return str(self.index) if self.name is None else self.name
 
-
-class ParametersCommon(typing.Generic[T]):
+class ParametersCommon:
 
 	def __init__(self, element: Element) -> None:
 		self.element = element
-		self.list: typing.List[typing.Tuple["Expression", T]] = []
+		self.list: typing.List[Data] = []
 
-	def __iter__(self) -> typing.Iterator["Expression"]:
+	def __iter__(self) -> typing.Iterator["EntityExpression"]:
 		for parameter in self.list:
-			yield parameter[0]
+			yield parameter.entity
 
-	def __getitem__(self, index: int) -> "Expression":
-		return self.list[index][0]
+	def __getitem__(self, index: int) -> "EntityExpression":
+		return self.list[index].entity
 
 	def __len__(self) -> int:
 		return len(self.list)
@@ -43,125 +61,8 @@ class ParametersCommon(typing.Generic[T]):
 	def size(self) -> int:
 		return len(self.list)
 
-	def at(self, index: int) -> "Expression":
-		return self.list[index][0]
-
-	def append(self, entity: "Expression", metadata: T) -> None:
-		self.list.append((entity, metadata))
-
-	def getUnderlyingTypeCategories(self, resolver: "Resolver") -> typing.Iterator[TypeCategory]:
-		"""Get the typeCategory of the resolved type of the parameters."""
-
-		for param in self:
-			if not param.isValue:
-				entityType = param.getEntityUnderlyingTypeResolved(resolver)
-				entityType.assertTrue(condition=entityType.isRoleType, message="This entity must be of role type.")
-				yield entityType.typeCategory  # type: ignore
-
-	@staticmethod
-	def makeKey(entity: "Expression", index: int) -> str:
-		return entity.name if entity.isName else str(index)
-
-	def items(self) -> typing.Iterator[typing.Tuple[str, "Expression"]]:
-		for index, data in enumerate(self.list):
-			name = ParametersCommon.makeKey(data[0], index)
-			yield name, data[0]
-
-	def itemsMetadata(self) -> typing.Iterator[typing.Tuple[str, "Expression", T]]:
-		for index, data in enumerate(self.list):
-			name = ParametersCommon.makeKey(data[0], index)
-			yield name, data[0], data[1]
-
-	def keys(self) -> typing.Iterator[str]:
-		for index, data in enumerate(self.list):
-			yield ParametersCommon.makeKey(data[0], index)
-
-	def contains(self, name: str) -> bool:
-		"""
-		Wether or not a named parameters contains the entry.
-		"""
-		for key, _ in self.items():
-			if key == name:
-				return True
-		return False
-
-	def atKeyMetadata(self, name: str) -> T:
-		"""
-		Return the metadata at a specific key index.
-		"""
-		for key, _, metadata in self.itemsMetadata():
-			if key == name:
-				return metadata
-		raise KeyError("Missing key '{}'.".format(name))
-
-	@property
-	def dependencies(self) -> typing.Set[str]:
-		"""
-		Output the dependency list for this entity.
-		"""
-		dependencies = set()
-		for param in self:
-			dependencies.update(param.dependencies)
-		return dependencies
-
-	def __repr__(self) -> str:
-		content = []
-		for key, expression, metadata in self.itemsMetadata():
-			content.append("{}: {} {}".format(key, str(expression), str(metadata)))
-		return "\n".join(content)
-
-
-@dataclass
-class Metadata:
-	default: bool = False
-	order: int = -1
-	template: bool = False
-
-
-class Parameters(ParametersCommon[Metadata]):
-	"""
-    Describes the parameter list, a collection of expression.
-    """
-
-	def __init__(self,
-		element: Element,
-		nestedKind: typing.Optional[str] = None,
-		filterFct: typing.Optional[typing.Callable[["Expression"], bool]] = None) -> None:
-
-		super().__init__(element=element)
-
-		if nestedKind:
-			sequence = self.element.getNestedSequence(nestedKind)
-			if sequence:
-				from tools.bdl.entities.impl.expression import Expression
-				for index, e in enumerate(sequence):
-					expression = Expression(e)
-					if filterFct is not None and not filterFct(expression):
-						continue
-					self.append(expression, Metadata(order=index, template=expression.contracts.has("template")))
-					expression.assertTrue(condition=self.isNamed == expression.isName,
-						message="Cannot mix named and unnamed parameters: '{}' and '{}'.".format(
-						self.at(0), expression))
-					expression.assertTrue(condition=not expression.isVarArgs or index == len(sequence) - 1,
-						message="Variable arguments can only be present at the end of the parameter list.")
-
-		# Sanity check.
-		if self.isNamed is True:
-			assert not self.isVarArgs, "Cannot have named and varargs."
-
-	def copy(self, template: typing.Optional[bool] = None) -> "Parameters":
-		"""
-		Copy the parameter list and optionally filter it.
-		"""
-		parameters = Parameters(element=self.element)
-
-		# Fill in the list
-		for key, expression, metadata in self.itemsMetadata():
-			if template is not None and template != metadata.template:
-				continue
-			parameters.append(expression, metadata)
-
-		return parameters
+	def at(self, index: int) -> "EntityExpression":
+		return self.list[index].entity
 
 	@property
 	def isNamed(self) -> typing.Optional[bool]:
@@ -182,77 +83,168 @@ class Parameters(ParametersCommon[Metadata]):
 			return self.at(-1).isVarArgs
 		return None
 
-	def mergeDefaults(self, parameters: "Parameters") -> None:
-		"""
-		Merge default parameters with this.
-		"""
-		if not bool(parameters):
-			return
-		if bool(self):
-			if self.isNamed != parameters.isNamed:
-				Error.assertTrue(element=self.element,
-					condition=bool(self.isNamed),
-					message="Requires named parameters.")
-				Error.assertTrue(element=self.element,
-					condition=not bool(self.isNamed),
-					message="Requires unnamed parameters.")
+	def append(self, entity: "EntityExpression", allowMix: bool = False, **kwargs: typing.Any) -> Data:
+		entity.assertTrue(condition=not self.isVarArgs,
+			message="Variable arguments can only be present at the end of the parameter list.")
+		self.list.append(Data(name=entity.name if entity.isName else None, entity=entity, **kwargs))
+		# This is about having only named or only unamed parameters. Either:
+		# (name1 = 0, name2 = 2, ...) or (0, 2, ...)
+		entity.assertTrue(condition=allowMix or self.isNamed == entity.isName,
+			message="Cannot mix named and unnamed parameters: '{}' and '{}'.".format(
+			self.at(0), entity))
+		return self.list[-1]
 
-		# Merge the values
-		order: int = 0
-		for name, expression, metadata in parameters.itemsMetadata():
-			if not self.contains(name):
-				expression.assertTrue(condition=not expression.contracts.has("mandatory"),
-					message="Missing mandatory parameter: '{}'.".format(name))
-				self.append(expression, Metadata(default=True))
-			# Merge the metadata
-			self.atKeyMetadata(name).template = metadata.template
-			self.atKeyMetadata(name).order = order
-			order += 1
+	def getUnderlyingTypeCategories(self, resolver: "Resolver") -> typing.Iterator[TypeCategory]:
+		"""Get the typeCategory of the resolved type of the parameters."""
 
-	def resolve(self, resolver: "Resolver") -> None:
+		for param in self:
+			if param.isType:
+				entityType = param.getEntityUnderlyingTypeResolved(resolver)
+				entityType.assertTrue(condition=entityType.isRoleType, message="This entity must be of role type.")
+				yield entityType.typeCategory  # type: ignore
+			else:
+				# Ignore values
+				pass
+
+	@staticmethod
+	def makeKey(name: typing.Optional[str], index: int) -> Key:
+		return index if name is None else name
+
+	def items(self, includeVarArgs: bool) -> typing.Iterator[typing.Tuple[Key, "EntityExpression"]]:
+		for key, entity, _ in self.itemsMetadata(includeVarArgs=includeVarArgs):
+			yield key, entity
+
+	def itemsMetadata(self, includeVarArgs: bool) -> typing.Iterator[typing.Tuple[Key, "EntityExpression", Data]]:
+		for index, data in enumerate(self.list):
+			if not data.entity.isVarArgs or includeVarArgs:
+				yield Key(index=index, name=data.name), data.entity, data
+
+	def keys(self, includeVarArgs: bool) -> typing.Iterator[Key]:
+		for key, _, _ in self.itemsMetadata(includeVarArgs=includeVarArgs):
+			yield key
+
+	def getMetadata(self, key: Key) -> typing.Optional[Data]:
+		"""Return the metadata at a specific key or None if not available"""
+
+		# Look for a match of the name if any.
+		if key.name is not None:
+			for k, _, metadata in self.itemsMetadata(includeVarArgs=True):
+				if k.name == key.name:
+					return metadata
+		# Else check by index.
+		if key.index < len(self.list):
+			return self.list[key.index]
+		return None
+
+	@property
+	def dependencies(self) -> typing.Set[str]:
 		"""
-        Resolve all parameters.
-        """
+		Output the dependency list for this entity.
+		"""
+		dependencies = set()
+		for param in self:
+			dependencies.update(param.dependencies)
+		return dependencies
+
+	def __repr__(self) -> str:
+		content = []
+		for key, expression, metadata in self.itemsMetadata(includeVarArgs=True):
+			content.append("{}: {} {}".format(str(key), str(expression), str(metadata)))
+		return "\n".join(content)
+
+ResolvedType = typing.Union[str, "Entity", "Type"]
+
+class Parameters(ParametersCommon):
+	"""
+    Describes the parameter list, a collection of expression.
+    """
+
+	def __init__(self,
+		element: Element,
+		nestedKind: typing.Optional[str] = None,
+		filterFct: typing.Optional[typing.Callable[["EntityExpression"], bool]] = None) -> None:
+
+		super().__init__(element=element)
+
+		# Fill the list with expressions from nestedKind.
+		if nestedKind:
+			sequence = self.element.getNestedSequence(nestedKind)
+			if sequence:
+				from tools.bdl.entities.impl.expression import EntityExpression
+				for index, e in enumerate(sequence):
+					expression = EntityExpression(e)
+					if filterFct is not None and not filterFct(expression):
+						continue
+					self.append(expression, order=index, template=expression.contracts.has("template"))
+
+	def copy(self, template: typing.Optional[bool] = None) -> "Parameters":
+		"""
+		Copy the parameter list and optionally filter it.
+		"""
+		parameters = Parameters(element=self.element)
+		parameters.list = self.list.copy()
+		return parameters
+
+	def resolve(self, resolver: "Resolver", EntityType) -> None:
+		"""Resolve all parameters."""
 
 		for parameter in self:
-			parameter.resolveMemoized(resolver=resolver)
+			EntityType(parameter.element).resolveMemoized(resolver=resolver)
+
+	def mergeDefaults(self, defaults: "Parameters") -> None:
+		"""Merge default parameters with the current ones.
+		Default parameters are always named and are ordered correctly.
+		"""
+
+		# Merge the values, do not include var args.
+		for key, default, metadata in defaults.itemsMetadata(includeVarArgs=False):
+			default.assertTrue(condition=default.isName,
+				message=f"Default parameters must be named: '{default}'.")
+			# Check if there is a match with the name first, if not check with the index.
+			# If no match add the default parameter.
+			maybeMetadata = self.getMetadata(key)
+			if maybeMetadata is None:
+				default.assertTrue(condition=not default.contracts.has("mandatory"),
+					message=f"Missing mandatory parameter: '{str(key)}'.")
+				maybeMetadata = self.append(default, allowMix=True, default=True)
+			# Merge the metadata
+			maybeMetadata.name = default.name
+			maybeMetadata.template = metadata.template
+			maybeMetadata.order = key.index
 
 	def itemsValuesOrTypes(self, resolver: "Resolver", varArgs: bool) -> typing.List[typing.Tuple[str, ResolvedType,
-		Metadata]]:
+		Data]]:
 		"""
         Iterate through the list and return values or types.
         """
 
-		values: typing.List[typing.Tuple[str, ResolvedType, Metadata]] = []
+		values: typing.List[typing.Tuple[str, ResolvedType, Data]] = []
 
-		for key, expression, metadata in self.itemsMetadata():
-
-			if expression.isVarArgs and not varArgs:
-				continue
+		for key, expression, metadata in self.itemsMetadata(includeVarArgs=varArgs):
 
 			if expression.literal is not None:
-				values.append((key, expression.literal, metadata))
+				values.append((str(key), expression.literal, metadata))
 
-			elif expression.underlyingValue is not None:
-				value: ResolvedType = resolver.getEntityResolved(fqn=expression.underlyingValue).assertValue(
+			elif expression.underlyingValueFQN is not None:
+				entityValue: ResolvedType = resolver.getEntityResolved(fqn=expression.underlyingValueFQN).assertValue(
 					element=expression.element)
+				entityValue.assertTrue(condition=entityValue.category == "expression", message=f"A value FQN must resolve into an expression, not {expression}")
 
 				# If these are default arguments, use the default value.
-				if metadata.default:
-					from tools.bdl.entities.impl.expression import Expression
-					assert isinstance(value, Expression)
-					if value.literal:
-						# I beleive that this code path is never used.
-						value = value.literal
-					elif value.isName:
-						# Create an unamed value
-						element = ElementBuilder.cast(value.element.copy(), ElementBuilder).removeAttr(key="name").get()
-						value = Expression(element)
+				#if metadata.default and value.isName:
+					# Create an unamed value
+				#	element = ElementBuilder.cast(value.element.copy(), ElementBuilder).removeAttr(key="name").get()
+				#	value = Expression(element)
 
-				values.append((key, value, metadata))
+				values.append((str(key), entityValue, metadata))
 
-			else:
-				values.append((key, expression.type, metadata))
+			# Temporary values, for example: arg1 = Integer(12)
+			elif expression.isParameters:
+				values.append((str(key), expression, metadata))
+
+			# Types or variables, for example: arg1 = core
+			elif expression.isType:
+				values.append((str(key), expression.type, metadata))
 
 		return values
 
@@ -269,35 +261,29 @@ class Parameters(ParametersCommon[Metadata]):
 		Build the resolved sequence of those parameters.
 		Must be called after mergeDefaults.
 		"""
-		sequence = SequenceBuilder()
-
-		entries = self.itemsValuesOrTypes(resolver=resolver, varArgs=varArgs)
+		items = self.itemsValuesOrTypes(resolver=resolver, varArgs=varArgs)
 		if self.isNamed:
-			entries = sorted(entries, key=lambda k: k[2].order)
+			items = sorted(items, key=lambda k: k[2].order)
 
 		# Build the sequence
-		from tools.bdl.entities.impl.fragment.type import Type
-		for key, item, metadata in entries:
-			if onlyTypes:
-				Error.assertTrue(element=self.element,
-					condition=isinstance(item, Type),
-					message="Parameter '{}' is not a type.".format(key))
-			if onlyValues:
-				Error.assertTrue(element=self.element,
-					condition=not isinstance(item, Type),
-					message="Parameter '{}' is not a value.".format(key))
-			if isinstance(item, str):
-				element = ElementBuilder().setAttr(key="value", value=item)
-			else:
-				element = item.element.copy()
-			if self.isNamed:
-				ElementBuilder.cast(element, ElementBuilder).setAttr(key="key", value=key)
-			sequence.pushBackElement(element)
+		def buildSequence(entries) -> Sequence:
+			from tools.bdl.entities.impl.fragment.type import Type
 
-		return sequence
+			sequence = SequenceBuilder()
+			for key, item, metadata in entries:
+				if isinstance(item, str):
+					element = ElementBuilder().setAttr(key="value", value=item)
+				else:
+					element = item.element.copy()
+				if self.isNamed:
+					ElementBuilder.cast(element, ElementBuilder).setAttr(key="key", value=key)
+				sequence.pushBackElement(element)
+			return sequence
+
+		return buildSequence(items)
 
 
-class ResolvedParameters(ParametersCommon[Metadata]):
+class ResolvedParameters(ParametersCommon):
 
 	def __init__(self, element: Element, nestedKind: typing.Optional[str]) -> None:
 
@@ -308,7 +294,7 @@ class ResolvedParameters(ParametersCommon[Metadata]):
 			if sequence:
 				from tools.bdl.entities.impl.expression import Expression
 				for index, e in enumerate(sequence):
-					self.append(Expression(e), Metadata())
+					self.append(Expression(e))
 
 	@property
 	def isNamed(self) -> typing.Optional[bool]:

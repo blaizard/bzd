@@ -7,6 +7,28 @@ from tools.bdl.visitors.composition.visitor import Composition
 
 class TestRun(unittest.TestCase):
 
+	def testTemp(self):
+		interface = Object.fromContent(content="""
+			interface Hello {
+			config:
+				var = Integer [min(10)];
+			}
+			""",
+			objectContext=ObjectContext(resolve=True))
+
+		compositionNormal = Object.fromContent(content="""
+			component Executor { }
+			composition {
+				executor = Executor();
+			}
+			composition Comp {
+				default = Integer(32);
+				test = Hello(var = default);
+			}
+			""",
+			objectContext=ObjectContext(resolve=True))
+		Composition().visit(interface).visit(compositionNormal).process()
+
 	def testCompositionOrder(self) -> None:
 
 		interface = Object.fromContent(content="""

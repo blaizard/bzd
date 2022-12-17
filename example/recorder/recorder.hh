@@ -3,11 +3,38 @@
 #include "cc/bzd.hh"
 #include "cc/bzd/core/serialization/serialization.hh"
 
+template <class T>
+class Object
+{
+public:
+	Object(bzd::Span<T> range) : range_{range} {}
+
+	const T& get() const;
+
+	~Object()
+	{
+		// release.
+	}
+
+private:
+	bzd::Span<T> range_;
+};
+
 namespace example {
 
-bzd::Async<> run();
+class Hello
+{
+public:
+	bzd::Async<> run();
 
-}
+	// Getter for input:
+	// input = const Integer;
+	bzd::Async<Object<bzd::Int32>> input();
+
+	// Object is a RAII object that is kept alive until the value is needed.
+};
+
+} // namespace example
 
 namespace bzd {
 

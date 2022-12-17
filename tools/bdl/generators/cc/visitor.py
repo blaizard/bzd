@@ -97,6 +97,12 @@ class Transform:
 	def isPlatform(self, expression: Expression) -> bool:
 		return expression.fqn.startswith("bzd.platform")
 
+	# Parameter
+	def parametersResolvedToStr(self, expression: Expression) -> str:
+		if expression.element.isAttr("key"):
+			return expression.element.getAttr("key").value
+		return ""
+
 
 def formatCc(bdl: Object, includes: typing.List[Path]) -> str:
 

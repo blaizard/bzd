@@ -49,10 +49,6 @@ class Enum(Entity):
 		Error.assertHasSequence(element=element, sequence="values")
 
 	@property
-	def category(self) -> str:
-		return "enum"
-
-	@property
 	def typeCategory(self) -> TypeCategory:
 		return TypeCategory.enum
 
@@ -61,7 +57,7 @@ class Enum(Entity):
 		Resolve entities.
 		"""
 		# Generate this symbol FQN
-		self._setUnderlyingType(self.fqn)
+		self._setUnderlyingTypeFQN(self.fqn)
 		super().resolve(resolver)
 
 	@cached_property

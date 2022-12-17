@@ -29,7 +29,8 @@ assert(value <= {{ contract.value }});
 // ****
 
 {% if isNamespace %}
-namespace {{ namespace | namespaceToStr }} {
+namespace {{ namespace | namespaceToStr }}
+{
 {% end %}
 
 {{- declareTrivialTypes(sequence) -}}
@@ -68,7 +69,7 @@ public: // Variable accessors.
 	{% end %}
 };
 
-{%- end -%}
+	{%- end -%}
 
 {%- end %}
 
@@ -89,6 +90,18 @@ struct Interface<"{{ data.fqn }}">
 		return ::bzd::impl::getInterface<{{ namespace | namespaceToStr }}::{{ data.name }}>(impl);
 	}
 };
+	{% end %}
+{% end %}
+{% for data in nestedList %}
+	{% if data.type in btl.set("component", "interface") %}
+		{% for var in data.interface.expressionList %}
+template <>
+struct Data<"{{ var.fqn }}">
+{
+	using Type = {{ var.type | typeNonConstToStr }};
+	static UInt32 id;
+};
+		{% end %}
 	{% end %}
 {% end %}
 }

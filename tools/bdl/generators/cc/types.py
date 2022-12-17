@@ -42,7 +42,7 @@ class IntegerType:
 class FloatType:
 
 	constexpr = True
-	transform = "float"
+	transform = "bzd::Float32"
 
 
 class VoidType:
@@ -115,9 +115,9 @@ class VectorType:
 		maybeContractCapacity = entity.contracts.get("capacity")
 		if maybeContractCapacity is None:
 			# Default capacity is always 1
-			nested.append("1U")
+			nested.append("1u")
 		else:
-			nested.append("{:d}U".format(int(maybeContractCapacity.valueNumber)))
+			nested.append("{:d}u".format(int(maybeContractCapacity.valueNumber)))
 		return "bzd::Vector", nested
 
 
@@ -224,7 +224,7 @@ class _VisitorType(Visitor):
 				output += "{{{}}}".format(", ".join([expression.value for expression in entity.parametersResolved]))
 		else:
 			if self.definition:
-				if entity.underlyingType in knownTypes and knownTypes[entity.underlyingType].constexpr:
+				if entity.underlyingTypeFQN in knownTypes and knownTypes[entity.underlyingTypeFQN].constexpr:
 					output = "constexpr " + output
 
 		# Apply the reference if any.

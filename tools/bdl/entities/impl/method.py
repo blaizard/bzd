@@ -32,10 +32,6 @@ class Method(Entity):
 		return "argument"
 
 	@property
-	def category(self) -> str:
-		return "method"
-
-	@property
 	def typeCategory(self) -> TypeCategory:
 		return TypeCategory.method
 
@@ -47,7 +43,7 @@ class Method(Entity):
 	def type(self) -> typing.Optional[Type]:
 		return Type(element=self.element,
 			kind="type",
-			underlyingType="fqn_return_type",
+			underlyingTypeFQN="fqn_return_type",
 			template="template",
 			contract="contract_return",
 			const="const") if self.isType else None
@@ -57,13 +53,13 @@ class Method(Entity):
 		Resolve entities.
 		"""
 		# Generate this symbol FQN
-		self._setUnderlyingType(self.fqn)
+		self._setUnderlyingTypeFQN(self.fqn)
 
 		maybeType = self.type
 		if maybeType is not None:
 			entity = maybeType.resolve(resolver=resolver)
 
-		self.parameters.resolve(resolver=resolver)
+		self.parameters.resolve(resolver=resolver, EntityType=Expression)
 
 		# Validate the type of arguments.
 		parameterTypeCategories = {*self.parameters.getUnderlyingTypeCategories(resolver)}

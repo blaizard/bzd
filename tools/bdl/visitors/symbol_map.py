@@ -96,8 +96,8 @@ class Resolver:
 			entity = self.getEntityResolved(fqn=fqn).value
 			potentialNamespaceFQNs = [fqn]
 			# If it has an underlying type, add it to the list as well as its parents (if any).
-			if entity.underlyingType is not None:
-				potentialNamespaceFQNs += [entity.underlyingType
+			if entity.underlyingTypeFQN is not None:
+				potentialNamespaceFQNs += [entity.underlyingTypeFQN
 											] + entity.getEntityUnderlyingTypeResolved(resolver=self).getParents()
 			# Check if there is any match.
 			fqn = None
@@ -395,8 +395,8 @@ class SymbolMap:
 			result = self.getEntityResolved(fqn=FQN.fromNamespace(namespace=namespace), exclude=exclude)
 			if not result:
 				continue
-			if result.value.underlyingType is not None:
-				namespace = FQN.toNamespace(result.value.underlyingType)
+			if result.value.underlyingTypeFQN is not None:
+				namespace = FQN.toNamespace(result.value.underlyingTypeFQN)
 
 		if not result:
 			return Result.makeError("Could not resolve symbol '{}'.".format(fqn))

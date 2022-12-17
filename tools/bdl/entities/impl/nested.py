@@ -43,10 +43,6 @@ class Nested(Entity):
 		return "interface" if self.type == "struct" else "config"
 
 	@property
-	def category(self) -> str:
-		return "nested"
-
-	@property
 	def typeCategory(self) -> TypeCategory:
 		return TypeCategory(self.type)
 
@@ -72,22 +68,22 @@ class Nested(Entity):
 		"""
 		# Generate this symbol FQN.
 		if self.isName:
-			self._setUnderlyingType(self.fqn)
+			self._setUnderlyingTypeFQN(self.fqn)
 
 		# Resolve and make sure the inheritance is correct.
 		for inheritance in self.inheritanceList:
 
 			# Resolve the inheritance.
 			entity = inheritance.resolve(resolver=resolver)
-			self.addParents(fqn=entity.underlyingType, parents=entity.getUnderlyingTypeParents(resolver=resolver))
+			self.addParents(fqn=entity.underlyingTypeFQN, parents=entity.getUnderlyingTypeParents(resolver=resolver))
 
 			# Validates that the inheritance type is correct.
-			underlyingType = entity.getEntityUnderlyingTypeResolved(resolver=resolver)
-			if underlyingType.category in ["nested", "extern"]:
-				nestedType = underlyingType.type  # type: ignore
+			underlyingTypeFQN = entity.getEntityUnderlyingTypeResolved(resolver=resolver)
+			if underlyingTypeFQN.category in ["nested", "extern"]:
+				nestedType = underlyingTypeFQN.type  # type: ignore
 			else:
 				self.error(message="Inheritance can only be done from a nested class, not '{}', category '{}'.".format(
-					entity.underlyingType, underlyingType.category))
+					entity.underlyingTypeFQN, underlyingTypeFQN.category))
 			if self.type == TYPE_STRUCT:
 				self.assertTrue(condition=nestedType == TYPE_STRUCT,
 					message="A struct can only inherits from another struct, not '{}'.".format(nestedType))

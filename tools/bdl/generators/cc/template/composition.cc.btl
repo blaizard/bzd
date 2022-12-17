@@ -129,6 +129,20 @@ namespace {
 template <>
 class ResourceSpecialization<"{{ fqn }}">
 {
+public:
+	struct Config
+	{
+	{% for i, param in expression.parametersResolved %}
+		{% if param.isType %}
+			{% if param.isName %}
+		{{ param.type | typeToStr }}& {{ param | parametersResolvedToStr }};
+			{% else %}
+		static constexpr {{ param.type | typeToStr }} {{ param | parametersResolvedToStr }}{ {{- declareParametersResolvedRValues(param, false) -}} };
+			{% end %}
+		{% end %}
+	{% end %}
+	};
+
 protected:
 	bzd::Async<> init([[maybe_unused]] auto& registry) noexcept
 	{
@@ -155,7 +169,7 @@ protected:
 {
 	// Definition of all registry entries.
 	{% for fqn, expresssion in registry %}
-	static {{ expresssion.typeResolved | typeDefinitionToStr }} {{ fqn | fqnToNameStr }}{ {{- declareParametersResolvedValues(expresssion, false) -}} };
+	static {{ expresssion.typeResolved | typeDefinitionToStr }} {{ fqn | fqnToNameStr }}{ {{- declareParametersResolvedRValues(expresssion, false) -}} };
 	{% end %}
 
 	// Declaration of the registry.
@@ -219,7 +233,7 @@ bool execute() noexcept
 	// {{ expression.type | typeRegistryToStr }}
 	auto async_{{loop.parent.index}}_{{ loop.index }} = [&]() -> bzd::Async<> {
 		{{ callInitMembers(expression) }}
-		co_await !{{ expression.type | typeRegistryToStr }}( {{- declareParametersResolvedValues(expression, true) -}} );
+		co_await !{{ expression.type | typeRegistryToStr }}( {{- declareParametersResolvedRValues(expression, true) -}} );
 		{{ callShutdownMembers(expression) }}
 		co_return {};
 	};
