@@ -20,7 +20,6 @@ class Type:
 		kind: str,
 		underlyingTypeFQN: typing.Optional[str] = None,
 		template: typing.Optional[str] = None,
-		argumentTemplate: typing.Optional[str] = None,
 		contract: typing.Optional[str] = None,
 		const: typing.Optional[str] = None) -> None:
 
@@ -29,7 +28,6 @@ class Type:
 		self.kindAttr = kind
 		self.underlyingTypeAttr = underlyingTypeFQN
 		self.templateAttr = template
-		self.argumentTemplateAttr = argumentTemplate
 		self.contractAttr = contract
 		self.constAttr = const
 
@@ -135,6 +133,10 @@ class Type:
 		from tools.bdl.entities.impl.using import Using
 		return Parameters(element=self.element, NestedElementType=Using, nestedKind=self.templateAttr)
 
+	@cached_property
+	def templateResolved(self) -> ResolvedParameters:
+		return ResolvedParameters(element=self.element, nestedKind=f"{self.templateAttr}_resolved")
+
 	@property
 	def category(self) -> str:
 		return self.element.getAttr(f"{self.kindAttr}_category").value
@@ -158,14 +160,6 @@ class Type:
 	@cached_property
 	def name(self) -> str:
 		return Visitor(entity=self).result
-
-	@cached_property
-	def parametersResolved(self) -> ResolvedParameters:
-		return ResolvedParameters(element=self.element, nestedKind="argument_resolved")
-
-	@cached_property
-	def parametersTemplateResolved(self) -> ResolvedParameters:
-		return ResolvedParameters(element=self.element, nestedKind=self.argumentTemplateAttr)
 
 	def isConvertible(self, resolver: "Resolver", to: "Type") -> bool:
 		"""Check that the current type is convertible to another type."""
@@ -211,7 +205,7 @@ class Visitor(VisitorDepthFirstBase[typing.List[str], str]):
 		else:
 			template = []
 
-		self.result = self.visitType(entity=entity, nested=template, parameters=entity.parametersTemplateResolved)
+		self.result = self.visitType(entity=entity, nested=template, parameters=entity.templateResolved)
 
 	@property
 	def isResolved(self) -> bool:
@@ -239,11 +233,10 @@ class Visitor(VisitorDepthFirstBase[typing.List[str], str]):
 				kind="type",
 				underlyingTypeFQN="fqn_type",
 				template="template_resolved" if self.isResolved else "template",
-				argumentTemplate="argument_template_resolved" if self.isResolved else None,
 				const="const")
 			output = self.visitType(entity=entity,
 				nested=[] if nested is None else nested,
-				parameters=entity.parametersTemplateResolved)
+				parameters=entity.templateResolved)
 
 		else:
 			Error.assertHasAttr(element=element, attr="value")
