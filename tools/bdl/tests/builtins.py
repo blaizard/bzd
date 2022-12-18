@@ -89,10 +89,10 @@ class TestRun(unittest.TestCase):
 		Object.fromContent(content="struct temp { var = Result<Integer, Void>; }",
 			objectContext=ObjectContext(resolve=True))
 
-		with self.assertRaisesRegex(Exception, r"not a valid type"):
+		with self.assertRaisesRegex(Exception, r"type"):
 			Object.fromContent(content="struct temp { var = Result<12, Void>; }",
 				objectContext=ObjectContext(resolve=True))
-		with self.assertRaisesRegex(Exception, r"not a valid type"):
+		with self.assertRaisesRegex(Exception, r"type"):
 			Object.fromContent(content="struct temp { var = Result<Void, 78>; }",
 				objectContext=ObjectContext(resolve=True))
 
@@ -104,10 +104,6 @@ class TestRun(unittest.TestCase):
 		Object.fromContent(content="struct temp { var = Result<Result, Void>; }",
 			objectContext=ObjectContext(resolve=True))
 		Object.fromContent(content="struct temp { var = Result<Result<Void, Void>, Void>; }",
-			objectContext=ObjectContext(resolve=True))
-
-	def testTemp(self):
-		Object.fromContent(content="struct temp { var = Vector<Integer>(12); }",
 			objectContext=ObjectContext(resolve=True))
 
 	def testVector(self) -> None:
@@ -122,6 +118,10 @@ class TestRun(unittest.TestCase):
 		with self.assertRaisesRegex(Exception, r"not expected"):
 			Object.fromContent(content="struct temp { var = Vector<Integer, Void>; }",
 				objectContext=ObjectContext(resolve=True))
+
+		# Values
+		Object.fromContent(content="struct temp { var = Vector<Integer>(12, 13, 14); }",
+			objectContext=ObjectContext(resolve=True))
 
 	def testSpan(self) -> None:
 

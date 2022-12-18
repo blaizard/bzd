@@ -79,7 +79,7 @@ class Parser:
 		checkpoints: MutableMapping[str, Grammar] = {"root": self.grammar}
 
 		# Keep a reference to the content
-		assert self.context.content
+		assert isinstance(self.context.content, str)
 		content: str = self.context.content
 
 		try:

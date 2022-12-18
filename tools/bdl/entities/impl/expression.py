@@ -113,6 +113,8 @@ class Expression(EntityExpression):
 		# If it holds a value, it is considered a literal.
 		if self.isValue:
 			self._setLiteral(value=self.value)
+			if self.isFQN:
+				self._setUnderlyingValueFQN(fqn=self.fqn)
 
 		# If it holds a type.
 		elif self.isType:
@@ -136,7 +138,7 @@ class Expression(EntityExpression):
 					self._setUnderlyingValueFQN(fqn=self.fqn)
 
 				# Generate the argument list and resolve it.
-				self.parameters.resolve(resolver=resolver, EntityType=Expression)
+				self.parameters.resolve(resolver=resolver)
 				self._resolveAndValidateParameters(resolver, entity, self.parameters)
 
 			else:
@@ -226,8 +228,8 @@ class Expression(EntityExpression):
 		is declared with empty parenthesis or without the Parameters object will be empty.
 		"""
 		if self.isParameters:
-			return Parameters(element=self.element, nestedKind="argument")
-		return Parameters(element=self.element)
+			return Parameters(element=self.element, NestedElementType=Expression, nestedKind="argument")
+		return Parameters(element=self.element, NestedElementType=Expression)
 
 	@cached_property
 	def parametersResolved(self) -> ResolvedParameters:

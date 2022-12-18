@@ -59,7 +59,7 @@ class Method(Entity):
 		if maybeType is not None:
 			entity = maybeType.resolve(resolver=resolver)
 
-		self.parameters.resolve(resolver=resolver, EntityType=Expression)
+		self.parameters.resolve(resolver=resolver)
 
 		# Validate the type of arguments.
 		parameterTypeCategories = {*self.parameters.getUnderlyingTypeCategories(resolver)}
@@ -70,7 +70,7 @@ class Method(Entity):
 
 	@cached_property
 	def parameters(self) -> Parameters:
-		return Parameters(element=self.element, nestedKind="argument")
+		return Parameters(element=self.element, NestedElementType=Expression, nestedKind="argument")
 
 	def __repr__(self) -> str:
 		return self.toString({"name": self.name})

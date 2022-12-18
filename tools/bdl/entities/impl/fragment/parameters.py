@@ -88,21 +88,21 @@ class ParametersCommon:
 		# This is about having only named or only unamed parameters. Either:
 		# (name1 = 0, name2 = 2, ...) or (0, 2, ...)
 		entity.assertTrue(condition=allowMix or self.isNamed == entity.isName,
-			message="Cannot mix named and unnamed parameters: '{}' and '{}'.".format(
-			self.at(0), entity))
+			message=f"Cannot mix named and unnamed parameters: 0:'{self.at(0)}' and {self.size()-1}:'{entity}':\nParameters:\n{str(self)}")
 		return self.list[-1]
 
 	def getUnderlyingTypeCategories(self, resolver: "Resolver") -> typing.Iterator[TypeCategory]:
 		"""Get the typeCategory of the resolved type of the parameters."""
 
 		for param in self:
-			if param.isType:
+			if param.isLiteral or param.isValue:
+				pass
+			elif param.isType:
 				entityType = param.getEntityUnderlyingTypeResolved(resolver)
 				entityType.assertTrue(condition=entityType.isRoleType, message="This entity must be of role type.")
 				yield entityType.typeCategory  # type: ignore
 			else:
-				# Ignore values
-				pass
+				self.error(element=param, message="Unsupported parameter.")
 
 	@staticmethod
 	def makeKey(name: typing.Optional[str], index: int) -> Key:
@@ -154,8 +154,14 @@ class ParametersCommon:
 	def __repr__(self) -> str:
 		content = []
 		for key, expression, metadata in self.itemsMetadata(includeVarArgs=True):
-			content.append("{}: {} {}".format(str(key), str(expression), str(metadata)))
+			content.append("{}: {}".format(str(key), str(metadata)))
 		return "\n".join(content)
+
+	def error(self, message: str, element: typing.Optional[Element] = None, throw: bool = True) -> str:
+		return Error.handleFromElement(element=self.element if element is None else element, message=message, throw=throw)
+
+	def assertTrue(self, condition: bool, message: str, element: typing.Optional[Element] = None, throw: bool = True) -> typing.Optional[str]:
+		return Error.assertTrue(condition=condition, element=self.element if element is None else element, message=message, throw=throw)
 
 ResolvedType = typing.Union[str, "Entity", "Type"]
 
@@ -166,18 +172,19 @@ class Parameters(ParametersCommon):
 
 	def __init__(self,
 		element: Element,
+		NestedElementType: typing.Type["EntityExpression"],
 		nestedKind: typing.Optional[str] = None,
 		filterFct: typing.Optional[typing.Callable[["EntityExpression"], bool]] = None) -> None:
 
 		super().__init__(element=element)
+		self.NestedElementType = NestedElementType
 
 		# Fill the list with expressions from nestedKind.
 		if nestedKind:
 			sequence = self.element.getNestedSequence(nestedKind)
 			if sequence:
-				from tools.bdl.entities.impl.expression import EntityExpression
 				for index, e in enumerate(sequence):
-					expression = EntityExpression(e)
+					expression = self.NestedElementType(e)
 					if filterFct is not None and not filterFct(expression):
 						continue
 					self.append(expression, order=index)
@@ -186,15 +193,15 @@ class Parameters(ParametersCommon):
 		"""
 		Copy the parameter list and optionally filter it.
 		"""
-		parameters = Parameters(element=self.element)
+		parameters = Parameters(element=self.element, NestedElementType=self.NestedElementType)
 		parameters.list = self.list.copy()
 		return parameters
 
-	def resolve(self, resolver: "Resolver", EntityType) -> None:
+	def resolve(self, resolver: "Resolver") -> None:
 		"""Resolve all parameters."""
 
 		for parameter in self:
-			EntityType(parameter.element).resolveMemoized(resolver=resolver)
+			self.NestedElementType(parameter.element).resolveMemoized(resolver=resolver)
 
 	def mergeDefaults(self, defaults: "Parameters") -> None:
 		"""Merge default parameters with the current ones.
@@ -298,11 +305,3 @@ class ResolvedParameters(ParametersCommon):
 				from tools.bdl.entities.impl.expression import Expression
 				for index, e in enumerate(sequence):
 					self.append(Expression(e))
-
-	@property
-	def isNamed(self) -> typing.Optional[bool]:
-		return False
-
-	@property
-	def isVarArgs(self) -> typing.Optional[bool]:
-		return False

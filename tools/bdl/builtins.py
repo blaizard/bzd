@@ -53,6 +53,8 @@ class String(Builtin):
 		super().__init__(ElementBuilder("builtin").setAttr("name", "String").addContract("string"))
 
 	def toLiteral(self, args: typing.Any) -> typing.Optional[str]:
+		if len(args) == 0:
+			return "\"\""
 		return str(args["0"])
 
 class Result(Builtin):

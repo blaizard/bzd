@@ -97,7 +97,7 @@ It contains children which can be either functions or variables.
 
 A component is the implementation of one or multiple interfaces. It can be instantiated and exposes
 the functionality of the interface it inherits from.
-In addition it expose things like configuration details, dependencies... to the description language.
+In addition it exposes things like configuration details, dependencies... to the description language.
 
 For example:
 ```
@@ -106,6 +106,6 @@ namespace bzd.platform.impl;
 component MyModule : bzd.platform.Reader
 {
 config:
-	Integer channel [template];
+	channel = Integer;
 }
 ```
