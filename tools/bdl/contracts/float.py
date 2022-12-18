@@ -28,4 +28,4 @@ class Float_(Float):
 class ContractFloat(ContractTraits):
 
 	def __init__(self) -> None:
-		super().__init__(name="float", role=Role.Value | Role.Template | Role.Public, constraint=Float_)
+		super().__init__(name="float", role=Role.Value | Role.Public, constraint=Float_)

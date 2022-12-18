@@ -22,13 +22,18 @@ class ElementBuilder(Element):
 
 	def addConfigValue(
 			self,
-			kind: str,
+			kind: typing.Optional[str] = None,
+			value: typing.Optional[str] = None,
 			name: typing.Optional[str] = None,
 			contract: typing.Optional[str] = None) -> "ElementBuilder":
 		"""
 		Create a configuration entry
 		"""
-		element = ElementBuilder(category="expression").setAttr("type", kind)
+		element = ElementBuilder(category="expression")
+		if kind is not None:
+			element.setAttr("type", kind)
+		if value is not None:
+			element.setAttr("value", value)
 		if name is not None:
 			element.setAttr("name", name)
 		if contract is not None:

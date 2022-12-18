@@ -28,4 +28,4 @@ class Integer_(Integer):
 class ContractInteger(ContractTraits):
 
 	def __init__(self) -> None:
-		super().__init__(name="integer", role=Role.Value | Role.Template | Role.Public, constraint=Integer_)
+		super().__init__(name="integer", role=Role.Value | Role.Public, constraint=Integer_)

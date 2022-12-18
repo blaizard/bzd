@@ -17,13 +17,17 @@ class Integer(Builtin):
 		super().__init__(ElementBuilder("builtin").setAttr("name", "Integer").addContract("integer"))
 
 	def toLiteral(self, args: typing.Any) -> typing.Optional[str]:
+		if len(args) == 0:
+			return "0"
 		return str(args["0"])
 
 class Float(Builtin):
 	def __init__(self) -> None:
-		super().__init__(ElementBuilder("builtin").setAttr("name", "Float").addContract("float"))
+		super().__init__(ElementBuilder("builtin").setAttr("name", "Float").addContract("float").setAttr("parents", "Integer"))
 
 	def toLiteral(self, args: typing.Any) -> typing.Optional[str]:
+		if len(args) == 0:
+			return "0"
 		return str(args["0"])
 
 class Boolean(Builtin):
@@ -31,6 +35,8 @@ class Boolean(Builtin):
 		super().__init__(ElementBuilder("builtin").setAttr("name", "Boolean").addContract("boolean"))
 
 	def toLiteral(self, args: typing.Any) -> typing.Optional[str]:
+		if len(args) == 0:
+			return "false"
 		return "true" if bool(args["0"]) else "false"
 
 class Byte(Builtin):
@@ -38,6 +44,8 @@ class Byte(Builtin):
 		super().__init__(ElementBuilder("builtin").setAttr("name", "Byte").addContract("integer min(0) max(255)"))
 
 	def toLiteral(self, args: typing.Any) -> typing.Optional[str]:
+		if len(args) == 0:
+			return "0"
 		return str(args["0"])
 
 class String(Builtin):
