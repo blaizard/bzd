@@ -170,23 +170,22 @@ class Expression(EntityExpression):
 			arguments = parameters.getValuesOrTypesAsDict(resolver=resolver, varArgs=False)
 			result = validation.validate(arguments, output="return")
 			Error.assertTrue(element=self.element, attr="type", condition=bool(result), message=str(result))
-			#maybeValue = resolvedTypeEntity.toLiteral(result.values)
-			#if maybeValue is not None:
-			#	self._setLiteral(maybeValue)
-			#	print("value", maybeValue)
+			maybeValue = resolvedTypeEntity.toLiteral(result.values)
+			if maybeValue is not None:
+				self._setLiteral(maybeValue)
 
 		# Save the resolved parameters (values and templates), only after the validation is completed.
-		argumentValues = parameters.copy(template=False)
-		sequenceValues = argumentValues.toResolvedSequence(resolver=resolver, varArgs=False, onlyValues=True)
+		argumentValues = parameters.copy()
+		sequenceValues = argumentValues.toResolvedSequence(resolver=resolver, varArgs=False)
 		ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("argument_resolved", sequenceValues)
 
-		argumentTemplates = parameters.copy(template=True)
-		sequenceTemplates = argumentTemplates.toResolvedSequence(resolver=resolver, varArgs=False, onlyValues=True)
+		argumentTemplates = parameters.copy()
+		sequenceTemplates = argumentTemplates.toResolvedSequence(resolver=resolver, varArgs=False)
 		ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("argument_template_resolved",
 			sequenceTemplates)
 
-		configValues = argumentConfig.copy(template=False)
-		sequence = configValues.toResolvedSequence(resolver=resolver, varArgs=True, onlyValues=False)
+		configValues = argumentConfig.copy()
+		sequence = configValues.toResolvedSequence(resolver=resolver, varArgs=True)
 		sequence += [sequence[-1]] * (len(sequenceValues) - len(sequence)) if configValues.isVarArgs else []
 		ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("argument_expected", sequence)
 
@@ -206,7 +205,7 @@ class Expression(EntityExpression):
 			underlyingTypeFQN = resolver.getEntityResolved(self.underlyingTypeFQN).assertValue(element=self.element)
 			if underlyingTypeFQN.isConfig:
 				self.assertTrue(condition=not validationValue,
-					message="This expression has both a global contract and a configuration, this is not allowed.")
+					message=f"This expression has both a global contract '{validationValue}' and a configuration, this is not allowed.")
 				return self.makeValidationForValues(resolver=resolver, parameters=parameters)
 
 		# If evaluates to true, meaning there is a contract for values,

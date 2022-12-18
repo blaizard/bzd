@@ -255,6 +255,10 @@ class Entity:
 			key = "*" if expression.isVarArgs else str(key)
 			maybeContracts = expression.contracts.validationForTemplate if forTemplate else expression.contracts.validationForValue
 			schema[key] = maybeContracts if maybeContracts is not None else ""
+			# Add that template argument must be part of the given type.
+			if forTemplate:
+				expression.assertTrue(condition=expression.underlyingTypeFQN is not None, message=f"The type '{expression}' was not resolved.")
+				schema[key] += f" convertible({str(expression.underlyingTypeFQN)})"
 
 		if schema:
 			try:
@@ -310,9 +314,10 @@ class Entity:
 		# Resolve the types from a config sequence if any.
 		for entity in self.configRaw:
 			if entity.category == "expression":
-				# Only the type of the expression should be resolved, the value cannot be evaluated
-				# as it might be malformed, this is inherent from config expressions.
-				typing.cast("Expression", entity).type.resolve(resolver=resolver)
+				if entity.isType:
+					# Only the type of the expression should be resolved, the value cannot be evaluated
+					# as it might be malformed, this is inherent from config expressions.
+					typing.cast("Expression", entity).type.resolve(resolver=resolver)
 			elif entity.category == "using":
 				typing.cast("Using", entity).resolve(resolver=resolver)
 			else:

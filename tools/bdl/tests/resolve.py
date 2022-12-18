@@ -194,15 +194,13 @@ class TestRun(unittest.TestCase):
 
 	def testStruct(self) -> None:
 
-		with self.assertRaisesRegex(Exception, r"not validate"):
-			Object.fromContent(content="""
+		Object.fromContent(content="""
 					struct Test { var = Integer; }
 					composition { test = Test(); }
 					""",
 				objectContext=ObjectContext(resolve=True, composition=True))
 
-		with self.assertRaisesRegex(Exception, r"named parameters"):
-			Object.fromContent(content="""
+		Object.fromContent(content="""
 					struct Test { var = Integer; }
 					composition { test = Test(32); }
 					""",
@@ -228,8 +226,7 @@ class TestRun(unittest.TestCase):
 				""",
 			objectContext=ObjectContext(resolve=True, composition=True))
 
-		with self.assertRaisesRegex(Exception, r"named parameters"):
-			Object.fromContent(content="""
+		Object.fromContent(content="""
 					interface Test { config: value = Integer; }
 					composition MyComposition { val1 = Test(12); }
 					""",
@@ -290,47 +287,47 @@ class TestRun(unittest.TestCase):
 		# Mandatory template.
 		with self.assertRaisesRegex(Exception, r"mandatory"):
 			Object.fromContent(content="""
-				interface Test { config: Integer [template mandatory]; }
+				interface Test { config: using Type = Integer [mandatory]; }
 				composition MyComposition { val1 = Test; }
 				""",
 				objectContext=ObjectContext(resolve=True, composition=True))
 
-		with self.assertRaisesRegex(Exception, r"not support template"):
+		with self.assertRaisesRegex(Exception, r"not a valid type"):
 			Object.fromContent(content="""
-				interface Test { config: value = Integer [template]; }
+				interface Test { config: using Value = Integer; }
 				composition MyComposition { val1 = Test<12>; }
 				""",
 				objectContext=ObjectContext(resolve=True, composition=True))
 
 		Object.fromContent(content="""
-			interface Test { config: Void [template type]; }
+			interface Test { config: using Type = Void; }
 			composition MyComposition { val1 = Test<Void>; }
 			""",
 			objectContext=ObjectContext(resolve=True, composition=True))
 
 		with self.assertRaisesRegex(Exception, r"lower than"):
 			Object.fromContent(content="""
-			interface Test { config: Integer [template min(10)]; }
+			interface Test { config: value = Integer [min(10)]; }
 			composition MyComposition { val1 = Test(2); }
 			""",
 				objectContext=ObjectContext(resolve=True, composition=True))
 
 		with self.assertRaisesRegex(Exception, r"higher than"):
 			Object.fromContent(content="""
-			interface Test { config: Integer [template max(10)]; }
+			interface Test { config: value = Integer [max(10)]; }
 			composition MyComposition { val1 = Test(20); }
 			""",
 				objectContext=ObjectContext(resolve=True, composition=True))
 
 		Object.fromContent(content="""
-			interface Test { config: Integer [template min(10) max(32)]; }
+			interface Test { config: value = Integer [min(10) max(32)]; }
 			composition MyComposition { val1 = Test(23); }
 			""",
 			objectContext=ObjectContext(resolve=True, composition=True))
 
 		with self.assertRaisesRegex(Exception, r"mandatory"):
 			Object.fromContent(content="""
-				interface Test { config: Integer [template min(10) max(32)]; Integer [template mandatory]; }
+				interface Test { config: value1 = Integer [min(10) max(32)]; valuw2 = [mandatory]; }
 				composition MyComposition { val1 = Test(23); }
 				""",
 				objectContext=ObjectContext(resolve=True, composition=True))

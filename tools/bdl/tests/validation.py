@@ -25,13 +25,6 @@ class TestRun(unittest.TestCase):
 			Object.fromContent(content="using MyType = Integer [min(2,3)]; struct A { temp = MyType; }",
 				objectContext=ObjectContext(resolve=True))
 
-		# template only in config context
-		with self.assertRaisesRegex(Exception, r"template.*config"):
-			Object.fromContent(content="struct temp { var = Integer [template]; }")
-		with self.assertRaisesRegex(Exception, r"template.*config"):
-			Object.fromContent(content="using MyType = Integer [template];")
-		Object.fromContent(content="interface temp { config: var = Integer [template]; }")
-
 		# Capacity
 		with self.assertRaisesRegex(Exception, r"missing mandatory"):
 			Object.fromContent(content="using MyType = Integer [capacity];", objectContext=ObjectContext(resolve=True))

@@ -94,13 +94,10 @@ class Type:
 			validation = underlying.makeValidationForTemplate(resolver=resolver, parameters=configTypes)
 			assert validation, "Cannot be empty, already checked by the condition."
 			resultValidate = validation.validate(values, output="return")
-			Error.assertTrue(element=self.element,
-				attr=self.kindAttr,
-				condition=bool(resultValidate),
-				message=str(resultValidate))
+			self.assertTrue(condition=bool(resultValidate), message=str(resultValidate))
 
 			# Save the resolved template only after the validation is completed.
-			sequence = self.templates.toResolvedSequence(resolver=resolver, varArgs=False, onlyTypes=True)
+			sequence = self.templates.toResolvedSequence(resolver=resolver, varArgs=False)
 			ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence(f"{self.templateAttr}_resolved",
 				sequence)
 
@@ -171,6 +168,23 @@ class Type:
 	@cached_property
 	def parametersTemplateResolved(self) -> ResolvedParameters:
 		return ResolvedParameters(element=self.element, nestedKind=self.argumentTemplateAttr)
+
+	def isConvertible(self, resolver: "Resolver", to: "Type") -> bool:
+		"""Check that the current type is convertible to another type."""
+
+		typeFrom = self.getEntityUnderlyingTypeResolved(resolver=resolver)
+		typeTo = to.getEntityUnderlyingTypeResolved(resolver=resolver)
+
+		if typeFrom == typeTo:
+			return True
+
+		# Check if it is convertible to any of its parent.
+		for parentFQN in typeFrom.getUnderlyingTypeParents(resolver=resolver):
+			entity = resolver.getEntityResolved(fqn=parentFQN).assertValue(element=typeFrom)
+			if entity == typeTo:
+				return True
+
+		return False
 
 	def error(self, message: str, throw: bool = True) -> str:
 		return Error.handleFromElement(element=self.element, attr=self.kindAttr, message=message, throw=throw)

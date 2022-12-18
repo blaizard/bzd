@@ -24,8 +24,6 @@ class Data:
 	# A number that corresponds to the order in which the parameter appears, given that
 	# the collection is sorted by ascending order.
 	order: int = -1
-	# If this parameter is a parameter argument, denoted with [template] as contract.
-	template: bool = False
 
 @dataclass
 class Key:
@@ -126,14 +124,21 @@ class ParametersCommon:
 	def getMetadata(self, key: Key) -> typing.Optional[Data]:
 		"""Return the metadata at a specific key or None if not available"""
 
+		searchByName = key.name is not None
+
 		# Look for a match of the name if any.
-		if key.name is not None:
+		if searchByName:
 			for k, _, metadata in self.itemsMetadata(includeVarArgs=True):
 				if k.name == key.name:
 					return metadata
+
 		# Else check by index.
 		if key.index < len(self.list):
-			return self.list[key.index]
+			data = self.list[key.index]
+			# Return the metadata only if the search by name was not done or
+			# if the data doesn't have name (hence couldn't be matched in the search by name).
+			if not searchByName or data.name is None:
+				return self.list[key.index]
 		return None
 
 	@property
@@ -175,9 +180,9 @@ class Parameters(ParametersCommon):
 					expression = EntityExpression(e)
 					if filterFct is not None and not filterFct(expression):
 						continue
-					self.append(expression, order=index, template=expression.contracts.has("template"))
+					self.append(expression, order=index)
 
-	def copy(self, template: typing.Optional[bool] = None) -> "Parameters":
+	def copy(self) -> "Parameters":
 		"""
 		Copy the parameter list and optionally filter it.
 		"""
@@ -209,7 +214,6 @@ class Parameters(ParametersCommon):
 				maybeMetadata = self.append(default, allowMix=True, default=True)
 			# Merge the metadata
 			maybeMetadata.name = default.name
-			maybeMetadata.template = metadata.template
 			maybeMetadata.order = key.index
 
 	def itemsValuesOrTypes(self, resolver: "Resolver", varArgs: bool) -> typing.List[typing.Tuple[str, ResolvedType,
@@ -255,8 +259,7 @@ class Parameters(ParametersCommon):
 		values = self.itemsValuesOrTypes(resolver=resolver, varArgs=varArgs)
 		return {entry[0]: entry[1] for entry in values}
 
-	def toResolvedSequence(self, resolver: "Resolver", varArgs: bool, onlyTypes: bool = False,
-		onlyValues: bool = False) -> Sequence:
+	def toResolvedSequence(self, resolver: "Resolver", varArgs: bool) -> Sequence:
 		"""
 		Build the resolved sequence of those parameters.
 		Must be called after mergeDefaults.

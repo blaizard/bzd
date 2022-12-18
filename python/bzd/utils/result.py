@@ -33,3 +33,8 @@ class Result(typing.Generic[V, E]):
 	def error(self) -> E:
 		assert self.error_ is not None, "Cannot access the error of a result containing a value."
 		return self.error_
+
+	def __repr__(self) -> str:
+		if bool(self):
+			return f"<Result value=\"{str(self.value)}\">"
+		return f"<Result error=\"{str(self.error)}\">"

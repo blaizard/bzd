@@ -8,14 +8,6 @@ class Validation(VisitorBase[None]):
 
 		entity.contracts.validate()
 
-		if entity.contracts.get("template"):
-			if self.parent:
-				entity.assertTrue(condition=self.parent.category == "config",
-					message="Contract template can only be used in a config context, not a '{}' context.".format(
-					self.parent.category))
-			else:
-				entity.error(message="Contract template can only be used in a config context, not at top level.")
-
 	def visitExpression(self, entity: Expression, result: None) -> None:
 
 		self.validateContract(entity=entity)
