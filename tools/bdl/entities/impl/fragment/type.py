@@ -62,10 +62,7 @@ class Type:
 		ElementBuilder.cast(self.element, ElementBuilder).updateAttr(self.kindAttr, ";".join(fqns))
 
 		# Resolve the templates if available
-		from tools.bdl.entities.impl.using import Using
-		for template in self.templates:
-			Error.assertTrue(condition=template.isType, element=template.element, message="The is not a valid type.")
-			Using(template.element).resolve(resolver=resolver)
+		self.templates.resolve(resolver=resolver)
 
 		# Get and save the underlying type
 		underlying = self.getEntityResolved(resolver=resolver)
@@ -135,7 +132,8 @@ class Type:
 
 	@cached_property
 	def templates(self) -> "Parameters":
-		return Parameters(element=self.element, nestedKind=self.templateAttr)
+		from tools.bdl.entities.impl.using import Using
+		return Parameters(element=self.element, NestedElementType=Using, nestedKind=self.templateAttr)
 
 	@property
 	def category(self) -> str:

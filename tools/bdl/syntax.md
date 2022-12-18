@@ -25,14 +25,10 @@ ex: `[integer]`
 
 Must be named.
 
-Accepts only `config` nested elements, from which only `expression`(s) are allowed.
-Components define the set of input the constructor takes.
+Accepts only `config` nested elements, from which only `expression`(s) and `using`(s) are allowed.
 
-3 kinds of expressions can be defined:
-
-- Decorated with `[template type]`: Allow only types.
-- Decorated with `[template]`: Allow values only, will be translated into template arguments (in C++).
-- Other: Allow values only, are normal expression arguments.
+`expression`(s) are used to define the list of values the constructor takes.
+`using`(s) are used to define the list of template types the component type takes.
 
 Example:
 
@@ -40,8 +36,8 @@ Example:
 component MyComponent
 {
 config:
-    Any [template type];
-    size = Integer [template min(1)];
+    using T = Any;
+    size = Integer [min(1)];
     value = Float;
 }
 

@@ -31,8 +31,11 @@ class Template:
 	) -> typing.Tuple[ResultType, SubstitutionWrapper]:
 
 		sequence = self.parser.parse()
-		*_, last = sequence
-		if last.getAttrValue("category", None) in ["if", "else", "for", "macro"]:
+		# Get the last element of the sequence, if no element, use None
+		last = None
+		for last in sequence:
+			pass
+		if last and last.getAttrValue("category", None) in ["if", "else", "for", "macro"]:
 			Error.handleFromElement(element=last, message="Unterminated control block.")
 
 		visitor = Visitor(substitutions, *self.args, **self.kwargs)

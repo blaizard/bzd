@@ -9,7 +9,7 @@ interface:
 	
 config:
 	// Stack size for the current core.
-	stackSize = StackSize(16000) [template];
+	stackSize = StackSize(16000);
 	// The name of the core.
 	name = String;
 	// CPU to which this core should be pinned to.
@@ -18,5 +18,3 @@ config:
 	priority = Integer [min(0) max(100)];
 	
 }
-
-

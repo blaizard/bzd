@@ -123,6 +123,11 @@ class Entity:
 		return self.element.getAttrValue("fqn_value")
 
 	@property
+	def isLiteral(self) -> bool:
+		"""Check if a value has a literal underlying value."""
+		return self.element.isAttr("literal")
+
+	@property
 	def literal(self) -> typing.Optional[str]:
 		"""
 		Get the underlying literal value if any.
@@ -226,24 +231,28 @@ class Entity:
 	def getConfigTemplateTypes(self, resolver: typing.Any) -> Parameters:
 		"""Get the list of expressions that forms the template types."""
 
+		from tools.bdl.entities.impl.using import Using
 		if self.underlyingTypeFQN:
 			underlyingType = resolver.getEntityResolved(fqn=self.underlyingTypeFQN).assertValue(element=self.element)
 			return Parameters(element=underlyingType.element,
+				NestedElementType=Using,
 				nestedKind=underlyingType.configAttr,
 				filterFct=lambda entity: entity.category == "using")
-		return Parameters(element=self.element)
+		return Parameters(element=self.element, NestedElementType=Using)
 
 	def getConfigValues(self, resolver: typing.Any) -> Parameters:
 		"""
 		Get the list of expressions that forms the values.
 		"""
 
+		from tools.bdl.entities.impl.expression import Expression
 		if self.underlyingTypeFQN:
 			underlyingTypeFQN = resolver.getEntityResolved(fqn=self.underlyingTypeFQN).assertValue(element=self.element)
 			return Parameters(element=underlyingTypeFQN.element,
+				NestedElementType=Expression,
 				nestedKind=underlyingTypeFQN.configAttr,
 				filterFct=lambda entity: entity.category == "expression")
-		return Parameters(element=self.element)
+		return Parameters(element=self.element, NestedElementType=Expression)
 
 	def makeValidation(self, resolver: typing.Any, parameters: Parameters,
 		forTemplate: bool) -> typing.Optional[Validation[SchemaDict]]:
@@ -323,11 +332,11 @@ class Entity:
 			else:
 				self.error(f"Configuration can only contain expressions or using statements, not '{entity.category}'.")
 
-	def error(self, message: str, throw: bool = True) -> str:
-		return Error.handleFromElement(element=self.element, message=message, throw=throw)
+	def error(self, message: str, element: typing.Optional[Element] = None, throw: bool = True) -> str:
+		return Error.handleFromElement(element=self.element if element is None else element, message=message, throw=throw)
 
-	def assertTrue(self, condition: bool, message: str, throw: bool = True) -> typing.Optional[str]:
-		return Error.assertTrue(condition=condition, element=self.element, message=message, throw=throw)
+	def assertTrue(self, condition: bool, message: str, element: typing.Optional[Element] = None, throw: bool = True) -> typing.Optional[str]:
+		return Error.assertTrue(condition=condition, element=self.element if element is None else element, message=message, throw=throw)
 
 	def toString(self, attrs: typing.MutableMapping[str, typing.Optional[str]] = {}) -> str:
 		entities = ["{}=\"{}\"".format(key, value) for key, value in attrs.items() if value]

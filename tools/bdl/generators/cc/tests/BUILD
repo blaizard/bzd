@@ -18,3 +18,14 @@ bzd_cc_test(
         "//cc/bzd/test",
     ],
 )
+
+py_test(
+    name = "template",
+    srcs = [
+        "template.py",
+    ],
+    deps = [
+        "//tools/bdl:generators",
+        "//tools/bdl:grammar",
+    ],
+)

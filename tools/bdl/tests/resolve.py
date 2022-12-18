@@ -292,7 +292,7 @@ class TestRun(unittest.TestCase):
 				""",
 				objectContext=ObjectContext(resolve=True, composition=True))
 
-		with self.assertRaisesRegex(Exception, r"not a valid type"):
+		with self.assertRaisesRegex(Exception, r"type"):
 			Object.fromContent(content="""
 				interface Test { config: using Value = Integer; }
 				composition MyComposition { val1 = Test<12>; }
@@ -386,6 +386,16 @@ class TestRun(unittest.TestCase):
 				""",
 				objectContext=ObjectContext(resolve=True, composition=True))
 
+		Object.fromContent(content="""
+				interface Test { config: value = Vector<Integer>; }
+				composition MyComposition {
+					value1 = Integer(1);
+					value2 = 2;
+					vector = Test(value = Vector<Integer>(value1, value2, 3, Integer(4)));
+				}
+				""",
+				objectContext=ObjectContext(resolve=True, composition=True))
+
 	def testInstanceWithParameters(self) -> None:
 		Object.fromContent(content="""
 				interface Test { config: value = Integer; }
@@ -402,6 +412,16 @@ class TestRun(unittest.TestCase):
 				composition MyComposition
 				{
 					val1 = Test<Float>();
+				}
+				""",
+			objectContext=ObjectContext(resolve=True, composition=True))
+
+		Object.fromContent(content="""
+				interface Test { config: value = Integer; }
+				component MyComponent : Test { config: hello = Integer; }
+				composition MyComposition
+				{
+					val1 = MyComponent(hello = 2);
 				}
 				""",
 			objectContext=ObjectContext(resolve=True, composition=True))
