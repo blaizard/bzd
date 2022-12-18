@@ -57,7 +57,6 @@ class Expression(EntityExpression):
 			kind="type",
 			underlyingTypeFQN="fqn_type",
 			template="template_resolved",
-			argumentTemplate="argument_template_resolved",
 			const="const")
 
 	@property
@@ -180,11 +179,6 @@ class Expression(EntityExpression):
 		argumentValues = parameters.copy()
 		sequenceValues = argumentValues.toResolvedSequence(resolver=resolver, varArgs=False)
 		ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("argument_resolved", sequenceValues)
-
-		argumentTemplates = parameters.copy()
-		sequenceTemplates = argumentTemplates.toResolvedSequence(resolver=resolver, varArgs=False)
-		ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("argument_template_resolved",
-			sequenceTemplates)
 
 		configValues = argumentConfig.copy()
 		sequence = configValues.toResolvedSequence(resolver=resolver, varArgs=True)

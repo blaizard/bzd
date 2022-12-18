@@ -162,36 +162,10 @@ class _VisitorType(Visitor):
 
 		return value
 
-	@staticmethod
-	def declareParametersResolvedValues(parameters: ResolvedParameters) -> typing.List[str]:
-		"""
-		This is a copy of the one defined in tools/bdl/generators/cc/template/declarations.h.btl
-		"""
-		content: typing.List[str] = []
-		for expression in parameters:
-
-			string = commentParametersResolvedToStr(expression)
-			if expression.isType:
-				if expression.isName:
-					string += fqnToNameStr(expression.fqn)
-				else:
-					string += "{}{{{}}}".format(
-						typeToStr(expression.type),
-						", ".join(_VisitorType.declareParametersResolvedValues(expression.parametersResolved)))
-			else:
-				string += expression.value
-
-			content.append(string)
-
-		return content
-
 	def visitType(self, entity: Type, nested: typing.List[str], parameters: ResolvedParameters) -> str:
 		"""
 		Called when an element needs to be formatted.
 		"""
-
-		# Add arguments template to the nested mix.
-		nested += self.declareParametersResolvedValues(parameters)
 
 		outputList: typing.List[str] = []
 		output: str
@@ -218,11 +192,7 @@ class _VisitorType(Visitor):
 		if nested:
 			output += "<{}>".format(", ".join(nested))
 
-		if not self.isTopLevel:
-			# TODO: support if there is no value.
-			if entity.parametersResolved:
-				output += "{{{}}}".format(", ".join([expression.value for expression in entity.parametersResolved]))
-		else:
+		if self.isTopLevel:
 			if self.definition:
 				if entity.underlyingTypeFQN in knownTypes and knownTypes[entity.underlyingTypeFQN].constexpr:
 					output = "constexpr " + output

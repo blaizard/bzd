@@ -49,6 +49,10 @@ class Composition:
 		entity.assertTrue(entity.executor in self.registry, f"The executor '{entity.executor}' is not declared.")
 		self.executors[entity.executor] = self.registry[entity.executor]
 
+	def entity(self, fqn: str) -> Entity:
+		"""Get the entity refered to the given fqn."""
+		return self.symbols.getEntityResolved(fqn=fqn).value
+
 	def process(self) -> None:
 
 		self.all = {

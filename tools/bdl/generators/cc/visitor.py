@@ -9,6 +9,7 @@ from tools.bdl.entities.all import Namespace, Using, Expression
 from tools.bdl.entities.impl.fragment.type import Type
 
 from tools.bdl.generators.cc.types import typeToStr as typeToStrOriginal
+from tools.bdl.generators.cc.values import valueToStr as valueToStrOriginal
 from tools.bdl.generators.cc.comments import commentBlockToStr as commentBlockToStrOriginal, commentEmbeddedToStr as commentEmbeddedToStrOriginal, commentParametersResolvedToStr as commentParametersResolvedToStrOriginal
 from tools.bdl.generators.cc.fqn import fqnToStr as fqnToStrOriginal, fqnToAdapterStr as fqnToAdapterStrOriginal, fqnToNameStr as fqnToNameStrOriginal
 
@@ -62,6 +63,11 @@ class Transform:
 	def typeRegistryToStr(self, entity: Type) -> str:
 		return typeToStrOriginal(entity=entity,
 			registry=self.composition.registry.keys() if self.composition else None)  # type: ignore
+
+	# Expression related
+
+	def valueToRValue(self, entity: Expression) -> str:
+		return valueToStrOriginal(entity=entity)
 
 	# Comments
 
