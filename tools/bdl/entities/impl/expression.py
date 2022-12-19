@@ -74,19 +74,6 @@ class Expression(EntityExpression):
 			const="const") if self.isInterfaceType else self.typeResolved
 
 	@property
-	def isRoleValue(self) -> bool:
-		"""An expression is a value, if one the following is true:
-		- It has a literal: `name = 12;`
-		- It has an underlying value FQN: `name = hello; // hello corresponds to a value and not a type.`
-		- It has paramters (even an empty list): `name = hello();`
-		"""
-		return self.literal is not None or self.underlyingValueFQN is not None or self.isParameters
-
-	@property
-	def isRoleType(self) -> bool:
-		return not bool(self.isRoleValue)
-
-	@property
 	def dependencies(self) -> typing.Set[str]:
 		"""
 		Output the dependency list for this entity.
@@ -231,4 +218,4 @@ class Expression(EntityExpression):
 
 	@cached_property
 	def parametersExpectedResolved(self) -> ResolvedParameters:
-		return ResolvedParameters(element=self.element, nestedKind="argument_expected")
+		return ResolvedParameters(element=self.element, nestedKind="argument_expected", allowMultiVarArgs=True)

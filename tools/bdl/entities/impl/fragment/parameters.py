@@ -81,9 +81,9 @@ class ParametersCommon:
 			return self.at(-1).isVarArgs
 		return None
 
-	def append(self, entity: "EntityExpression", allowMix: bool = False, **kwargs: typing.Any) -> Data:
-		entity.assertTrue(condition=not self.isVarArgs,
-			message="Variable arguments can only be present at the end of the parameter list.")
+	def append(self, entity: "EntityExpression", allowMix: bool = False, allowMultiVarArgs: bool = False, **kwargs: typing.Any) -> Data:
+		entity.assertTrue(condition=not self.isVarArgs or allowMultiVarArgs,
+			message=f"Variable arguments '{entity}' can only be present at the end of the parameter list.\n{str(self)}")
 		self.list.append(Data(name=entity.name if entity.isName else None, entity=entity, **kwargs))
 		# This is about having only named or only unamed parameters. Either:
 		# (name1 = 0, name2 = 2, ...) or (0, 2, ...)
@@ -282,7 +282,7 @@ class Parameters(ParametersCommon):
 			sequence = SequenceBuilder()
 			for key, item, metadata in entries:
 				if isinstance(item, str):
-					element = ElementBuilder().setAttr(key="value", value=item)
+					element = ElementBuilder().setAttr(key="value", value=item).setAttr(key="literal", value=item)
 				else:
 					element = item.element.copy()
 				if self.isNamed:
@@ -295,7 +295,7 @@ class Parameters(ParametersCommon):
 
 class ResolvedParameters(ParametersCommon):
 
-	def __init__(self, element: Element, nestedKind: typing.Optional[str]) -> None:
+	def __init__(self, element: Element, nestedKind: typing.Optional[str], allowMultiVarArgs: bool = False) -> None:
 
 		super().__init__(element=element)
 
@@ -304,4 +304,4 @@ class ResolvedParameters(ParametersCommon):
 			if sequence:
 				from tools.bdl.entities.impl.expression import Expression
 				for index, e in enumerate(sequence):
-					self.append(Expression(e))
+					self.append(Expression(e), allowMultiVarArgs=allowMultiVarArgs)

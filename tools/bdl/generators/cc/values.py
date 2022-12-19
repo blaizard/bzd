@@ -14,8 +14,13 @@ def valueToStr(entity: Expression,
 
 	entity.assertTrue(condition=entity.isRoleValue, message=f"'valueToStr' only applies to entity with role values, not '{entity}'.")
 
-	value = f"{{{entity.literal}}}" if entity.isLiteral else "{}"
+	value = ""
+	if entity.isLiteral:
+		value = entity.literal
+	elif entity.parametersResolved:
+		value = ", ".join([valueToStr(v) for v in entity.parameters])
+
 	if entity.isType:
-		value = typeToStr(entity=entity.typeResolved) + value
+		value = f"{typeToStr(entity=entity.typeResolved)}{{{value}}}"
 
 	return value

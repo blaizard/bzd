@@ -28,6 +28,7 @@ class TestRun(unittest.TestCase):
 				executor = Void;
 				myVar = const Integer(-2);
 				myVarNotInit = Integer;
+				myVarVarArgs = Vector<Integer>(1, 2, 3, 4);
 				myStruct = MyStruct(2);
 				myComponent = MyComponent<Float>();
 			}
@@ -116,8 +117,11 @@ class TestRun(unittest.TestCase):
 		output = self.render("""{{ entity("myVarNotInit") | valueToRValue }}""")
 		self.assertEqual(output, "bzd::Int32{0}")
 
+		output = self.render("""{{ entity("myVarVarArgs") | valueToRValue }}""")
+		self.assertEqual(output, "bzd::Vector<bzd::Int32, 1u>{1, 2, 3, 4}")
+
 		output = self.render("""{{ entity("myStruct") | valueToRValue }}""")
-		self.assertEqual(output, "MyStruct{}")
+		self.assertEqual(output, "MyStruct{2}")
 
 		output = self.render("""{{ entity("myComponent") | valueToRValue }}""")
 		self.assertEqual(output, "MyComponent<bzd::Float32>{}")
