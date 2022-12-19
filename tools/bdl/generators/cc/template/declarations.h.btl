@@ -22,9 +22,9 @@
 
 	type can be:
 		"reference"
-		"nonConst"
+		"nonConst"	
 -#}
-{%- macro declareExpression(element, prepend, type) -%}
+{%- macro declareExpression(element, type) -%}
 	{{ element.comment | commentEmbeddedToStr }}
 	{%- if element.isType -%}
 	{% if element.isName %}
@@ -34,9 +34,9 @@
 			{{- element.type | typeNonConstToStr -}}
 		{%- else -%}
 			{{- element.type | typeToStr -}}
-		{% end %} {{ element.name }}{{ prepend }}{% end %}{% if element.parametersResolved.size() > 0 %} = {{ element.type | typeNonConstToStr }}{ {{- declareParametersResolvedRValues(element, false) -}} }{% end %}
+		{% end %} {{ element.name }}{% end %}{% if element.parametersResolved.size() > 0 %} = {{ element.type | typeNonConstToStr }}{ {{- declareParametersResolvedRValues(element, false) -}} }{% end %}
 	{%- elif element.isValue -%}
-	{% if element.isName %} {{ element.name }}{{ prepend }} = {% end %}{{ element.value }}
+	{% if element.isName %} {{ element.name }} = {% end %}{{ element.value }}
 	{%- end -%}
 {%- end -%}
 
@@ -109,7 +109,7 @@ Args:
 
 {#- Parameters -#}
 {%- macro declareParameters(parameters, type) -%}
-	{%- for i, expression in parameters %}{% if i %}, {% end %}{{ declareExpression(expression, "", type) }}{% end -%}
+	{%- for i, expression in parameters %}{% if i %}, {% end %}{{ declareExpression(expression, type) }}{% end -%}
 {% end -%}
 
 {#- Parameters for call -#}
@@ -123,7 +123,7 @@ Args:
 {
 	{{ declareTrivialTypes(element.interface.sequence) }}
 	{% for element in element.interface.expressionList %}
-	{{ declareExpression(element, "", "") }};
+	{{ declareExpression(element, "") }};
 	{% end %}
 };
 {% end -%}

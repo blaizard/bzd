@@ -13,6 +13,25 @@ from tools.bdl.generators.cc.values import valueToStr as valueToStrOriginal
 from tools.bdl.generators.cc.comments import commentBlockToStr as commentBlockToStrOriginal, commentEmbeddedToStr as commentEmbeddedToStrOriginal, commentParametersResolvedToStr as commentParametersResolvedToStrOriginal
 from tools.bdl.generators.cc.fqn import fqnToStr as fqnToStrOriginal, fqnToAdapterStr as fqnToAdapterStrOriginal, fqnToNameStr as fqnToNameStrOriginal
 
+"""
+Use cases:
+
+Interfaces: (abstract notion)
+- component name : inteface {}  <- Should be set as a normal type.
+- var = interface&              <- When used it should always be as a reference.
+
+Expressions:
+- Can be defined:
+	- var = Type{1};
+	- var = MyComponent{2};
+- Can be used in config:
+	- var = MyInterface&;
+	- literals are static constexpr.
+	- Anything that reference a variable is reference.
+	- Builtins and struct are copy.
+- Can be used in function parameters (declaration):
+	- 
+"""
 
 # String related
 class Transform:
@@ -52,10 +71,10 @@ class Transform:
 		return typeToStrOriginal(entity=entity)
 
 	def typeReferenceToStr(self, entity: Type) -> str:
-		return typeToStrOriginal(entity=entity, reference=True)
+		return typeToStrOriginal(entity=entity, reference=True, referenceForInterface=True)
 
 	def typeDefinitionToStr(self, entity: Type) -> str:
-		return typeToStrOriginal(entity=entity, definition=True)
+		return typeToStrOriginal(entity=entity, definition=True, referenceForInterface=True)
 
 	def typeNonConstToStr(self, entity: Type) -> str:
 		return typeToStrOriginal(entity=entity, nonConst=True)

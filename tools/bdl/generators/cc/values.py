@@ -14,13 +14,16 @@ def valueToStr(entity: Expression,
 
 	entity.assertTrue(condition=entity.isRoleValue, message=f"'valueToStr' only applies to entity with role values, not '{entity}'.")
 
-	value = ""
+	values = []
 	if entity.isLiteral:
-		value = entity.literal
+		values = [entity.literal]
 	elif entity.parametersResolved:
-		value = ", ".join([valueToStr(v) for v in entity.parameters])
+		values = [valueToStr(v) for v in entity.parameters]
 
 	if entity.isType:
-		value = f"{typeToStr(entity=entity.typeResolved)}{{{value}}}"
-
-	return value
+		typeStr = typeToStr(entity=entity.typeResolved, values=values)
+		return f"{typeStr}{{{', '.join(values)}}}"
+	elif len(values) == 1:
+		return values[0]
+	
+	entity.error(message="Multiple values must have a type.")
