@@ -184,11 +184,6 @@ interface MyFy
 		}, {
 			'@': {
 			'category': {
-			'v': 'nested',
-			'i': 131,
-			'e': 140
-			},
-			'type': {
 			'v': 'interface',
 			'i': 131,
 			'e': 140

@@ -9,8 +9,8 @@ from bzd.parser.element import Element
 
 _regexprBaseName = r"(?!const|interface|struct|component|method|namespace|use|using|config|composition)[0-9a-zA-Z_]+"
 # Match: interface, struct
-_regexprNested = r"(?P<type>(:?interface|struct|component|composition))"
-_regexprNestedTrivial = r"(?P<type>(:?struct))"
+_regexprNested = r"(?P<category>(:?interface|struct|component|composition))"
+_regexprNestedTrivial = r"(?P<category>(:?struct))"
 # Match name
 _regexprName = r"(?P<name>" + _regexprBaseName + r")"
 # Match name or varargs
@@ -71,7 +71,7 @@ def makeGrammarNested(nestedGrammar: Grammar, trivial: bool = False) -> Grammar:
 	] + makeGrammarContracts()
 
 	return [
-		GrammarItem(_regexprNestedTrivial if trivial else _regexprNested, {"category": "nested"},
+		GrammarItem(_regexprNestedTrivial if trivial else _regexprNested, {},
 		[GrammarItem(_regexprName, Fragment, grammarAfterName)] + grammarAfterName)
 	]
 

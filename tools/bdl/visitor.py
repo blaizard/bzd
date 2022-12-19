@@ -70,7 +70,7 @@ class Visitor(VisitorBase[T, T]):
 				return parent.category
 			if parent.isNested:
 				assert isinstance(parent.entity, Nested)
-				if parent.entity.type == "composition":
+				if parent.entity.category == "composition":
 					return CATEGORY_GLOBAL_COMPOSITION
 		return CATEGORY_GLOBAL
 

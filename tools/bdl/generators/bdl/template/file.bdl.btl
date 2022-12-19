@@ -21,10 +21,10 @@
 {% end -%}
 
 {%- macro declareNested(data) %}
-{{ data.comment | normalComment }}{{ data.type }}{% if data.isName %} {{ data.name }}{% end %}{{ declareContract(data.contracts) }}{% if data.hasInheritance %} : {{ data.inheritanceList | inheritanceToStr }}
+{{ data.comment | normalComment }}{{ data.category }}{% if data.isName %} {{ data.name }}{% end %}{{ declareContract(data.contracts) }}{% if data.hasInheritance %} : {{ data.inheritanceList | inheritanceToStr }}
 {%- end %} {
 	{% if data.isInterface %}
-		{% if data.type == "component" %}
+		{% if data.category == "component" %}
 interface:
 		{% end %}
 	{{ declareSymbols(data.interface.sequence) }}
@@ -56,7 +56,13 @@ composition:
 {{ declareEnum(entity) }}
 		{% elif entity.category == "method" %}
 {{ declareMethod(entity) }}
-		{% elif entity.category == "nested" %}
+		{% elif entity.category == "struct" %}
+{{ declareNested(entity) }}
+		{% elif entity.category == "interface" %}
+{{ declareNested(entity) }}
+		{% elif entity.category == "component" %}
+{{ declareNested(entity) }}
+		{% elif entity.category == "composition" %}
 {{ declareNested(entity) }}
 		{% elif entity.category == "expression" %}
 {{ declareExpression(entity) }};

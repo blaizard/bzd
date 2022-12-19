@@ -32,23 +32,26 @@ class EntitySequence:
 	def __repr__(self) -> str:
 		return "\n".join([str(entity.element) for entity in self.sequence])
 
-	def _filteredList(self, category: str) -> typing.List["EntityType"]:
+	def _filteredList(self, *categories: str) -> typing.List["EntityType"]:
 		if not self.processed:
 			self.processed = defaultdict(list)
 			for entity in self.sequence:
 				self.processed[entity.category].append(entity)
-		return self.processed.get(category, [])
+		output = []
+		for category in categories:
+			output +=  self.processed.get(category, [])
+		return output
 
-	def _is(self, category: str) -> bool:
-		return bool(self._filteredList(category))
+	def _is(self, *categories: str) -> bool:
+		return bool(self._filteredList(*categories))
 
 	@property
 	def isNested(self) -> bool:
-		return self._is("nested")
+		return self._is("struct", "interface", "component", "composition")
 
 	@property
 	def nestedList(self) -> typing.List["Nested"]:
-		return typing.cast(typing.List["Nested"], self._filteredList("nested"))
+		return typing.cast(typing.List["Nested"], self._filteredList("struct", "interface", "component", "composition"))
 
 	@property
 	def isExpression(self) -> bool:

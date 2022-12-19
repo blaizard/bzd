@@ -57,7 +57,7 @@ Args:
 	expected: The type expected by the function receiving this value.
 -#}
 {%- macro parametersValue(value, expected) -%}
-	{%- if expected.category == "nested" -%}
+	{%- if expected.category == "interface" -%}
 		bzd::Interface<"{{ expected.fqn }}">::cast({{- value -}})
 	{%- elif expected.category == "extern" -%}
 		bzd::Interface<"{{ expected.fqn }}">::cast({{- value -}})
@@ -135,10 +135,8 @@ Args:
 {{ data.comment | commentBlockToStr }}using {{ data.name }} = {{ data.type | typeToStr }};
 		{% elif data.category == "enum" %}
 {{ declareEnum(data) }}
-		{% elif data.category == "nested" %}
-			{% if data.type == "struct" %} 
+		{% elif data.category == "struct" %}
 {{ declareStruct(data) }}
-			{% end %}
 		{% end %}
 	{% end %}
 {% end -%}

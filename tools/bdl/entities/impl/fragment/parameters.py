@@ -184,10 +184,12 @@ class Parameters(ParametersCommon):
 			sequence = self.element.getNestedSequence(nestedKind)
 			if sequence:
 				for index, e in enumerate(sequence):
-					expression = self.NestedElementType(e)
-					if filterFct is not None and not filterFct(expression):
+					from tools.bdl.entities.impl.entity import EntityExpression
+					if filterFct is not None and not filterFct(EntityExpression(e)):
 						continue
-					self.append(expression, order=index)
+					# We must construct the NestedElementType only after filtering as
+					# some entities are not constructible with any elements.
+					self.append(self.NestedElementType(e), order=index)
 
 	def copy(self) -> "Parameters":
 		"""

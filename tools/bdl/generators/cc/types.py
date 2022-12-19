@@ -74,7 +74,7 @@ class _VisitorType(Visitor):
 					output = "constexpr " + output
 
 		# Apply the reference if any.
-		if self.isReference:
+		if self.isReference: #or entity.category == "interface":
 			output += "&"
 
 		# Apply const if needed.

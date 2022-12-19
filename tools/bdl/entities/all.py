@@ -30,7 +30,10 @@ EntityType = typing.Union[Expression, Nested, Method, Using, Enum, Extern, Names
 SymbolType = typing.Union[Expression, Nested, Method, Using, Enum, Extern]
 
 CATEGORY_TO_ENTITY: typing.Dict[str, typing.Type[EntityType]] = {
-	"nested": Nested,
+	"struct": Nested,
+	"interface": Nested,
+	"component": Nested,
+	"composition": Nested,
 	"builtin": Builtin,
 	"expression": Expression,
 	"method": Method,
