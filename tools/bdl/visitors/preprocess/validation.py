@@ -22,7 +22,7 @@ class Validation(VisitorBase[None]):
 		configCategories = {nested.category for nested in entity.configRaw}
 		compositionCategories = {nested.category for nested in entity.composition}
 
-		if entity.type == "interface":
+		if entity.category == "interface":
 			entity.assertTrue(condition=entity.isName, message="Interfaces must have a valid name.")
 			entity.assertTrue(condition=interfaceCategories.issubset({"method", "expression"}),
 				message="Interfaces can only expose methods and expressions as interface.")
@@ -31,15 +31,15 @@ class Validation(VisitorBase[None]):
 			entity.assertTrue(condition=len(compositionCategories) == 0,
 				message="Interfaces cannot have nested composition.")
 
-		elif entity.type == "struct":
+		elif entity.category == "struct":
 			entity.assertTrue(condition=entity.isName, message="Structures must have a valid name.")
-			entity.assertTrue(condition=interfaceCategories.issubset({"expression", "enum", "nested", "using"}),
+			entity.assertTrue(condition=interfaceCategories.issubset({"expression", "enum", "struct", "using"}),
 				message="Structures only accept expressions, enums, nested structs or using statements.")
 			entity.assertTrue(condition=len(configCategories) == 0, message="Structures cannot have configuration.")
 			entity.assertTrue(condition=len(compositionCategories) == 0,
 				message="Structures cannot have nested composition.")
 
-		elif entity.type == "component":
+		elif entity.category == "component":
 			entity.assertTrue(condition=entity.isName, message="Components must have a valid name.")
 			entity.assertTrue(condition=interfaceCategories.issubset({"method", "expression"}),
 				message="Components can only expose methods and expressions as interface.")
@@ -48,7 +48,7 @@ class Validation(VisitorBase[None]):
 			entity.assertTrue(condition=compositionCategories.issubset({"expression"}),
 				message="Components composition can only contain expressions.")
 
-		elif entity.type == "composition":
+		elif entity.category == "composition":
 			entity.assertTrue(condition=not entity.hasInheritance, message="Compositions cannot have inheritance.")
 			entity.assertTrue(condition=interfaceCategories.issubset({"expression"}),
 				message="Compositions can only contain expressions.")
@@ -57,7 +57,7 @@ class Validation(VisitorBase[None]):
 				message="Compositions cannot have nested composition.")
 
 		else:
-			entity.assertTrue(condition=False, message="Unsupported nested type: '{}'.".format(entity.type))
+			entity.assertTrue(condition=False, message="Unsupported nested category: '{}'.".format(entity.category))
 
 	def visitMethod(self, entity: Method, result: None) -> None:
 

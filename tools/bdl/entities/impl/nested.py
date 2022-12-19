@@ -22,7 +22,7 @@ class Nested(Entity):
 	Defines a nested entity such as a struct, a component or an interface.
 	Nested entities have the following underlying elements:
 	- Attributes:
-		- type: struct, component, interface... see TYPES
+		- category: struct, component, interface... see TYPES
 		- [name]: The name of this entity, for example `struct MyType` would have the name MyType.
 	- Sequences:
 		- [inheritance]: In case the the struct have one or multiple base class.
@@ -34,21 +34,16 @@ class Nested(Entity):
 	def __init__(self, element: Element) -> None:
 
 		super().__init__(element, Role.Type)
-		Error.assertHasAttr(element=element, attr="type")
-		self.assertTrue(condition=self.type in TYPES, message=f"Unsupported nested type: '{self.type}'.")
+		self.assertTrue(condition=self.category in TYPES, message=f"Unsupported nested type: '{self.category}'.")
 
 	@property
 	def configAttr(self) -> str:
 		# TODO: handle inheritance for "struct"
-		return "interface" if self.type == "struct" else "config"
+		return "interface" if self.category == "struct" else "config"
 
 	@property
 	def typeCategory(self) -> TypeCategory:
-		return TypeCategory(self.type)
-
-	@property
-	def type(self) -> str:
-		return self.element.getAttr("type").value
+		return TypeCategory(self.category)
 
 	@property
 	def hasInheritance(self) -> bool:
@@ -79,29 +74,32 @@ class Nested(Entity):
 
 			# Validates that the inheritance type is correct.
 			underlyingTypeFQN = entity.getEntityUnderlyingTypeResolved(resolver=resolver)
-			if underlyingTypeFQN.category in ["nested", "extern"]:
-				nestedType = underlyingTypeFQN.type  # type: ignore
+			if underlyingTypeFQN.category in ["struct", "interface", "component", "composition"]:
+				nestedCategory = underlyingTypeFQN.category  # type: ignore
+			elif underlyingTypeFQN.category == "extern":
+				nestedCategory = underlyingTypeFQN.type  # type: ignore
 			else:
 				self.error(message="Inheritance can only be done from a nested class, not '{}', category '{}'.".format(
 					entity.underlyingTypeFQN, underlyingTypeFQN.category))
-			if self.type == TYPE_STRUCT:
-				self.assertTrue(condition=nestedType == TYPE_STRUCT,
-					message="A struct can only inherits from another struct, not '{}'.".format(nestedType))
-			elif self.type == TYPE_INTERFACE:
-				self.assertTrue(condition=nestedType == TYPE_INTERFACE,
-					message="An interface can only inherits from another interface, not '{}'.".format(nestedType))
-			elif self.type == TYPE_COMPONENT:
-				self.assertTrue(condition=nestedType == TYPE_INTERFACE,
-					message="A component can only inherits from interface(s), not '{}'.".format(nestedType))
+
+			if self.category == TYPE_STRUCT:
+				self.assertTrue(condition=nestedCategory == TYPE_STRUCT,
+					message="A struct can only inherits from another struct, not '{}'.".format(nestedCategory))
+			elif self.category == TYPE_INTERFACE:
+				self.assertTrue(condition=nestedCategory == TYPE_INTERFACE,
+					message="An interface can only inherits from another interface, not '{}'.".format(nestedCategory))
+			elif self.category == TYPE_COMPONENT:
+				self.assertTrue(condition=nestedCategory == TYPE_INTERFACE,
+					message="A component can only inherits from interface(s), not '{}'.".format(nestedCategory))
 			else:
-				self.error(message="Unsupported inheritance for type: '{}'.".format(self.type))
+				self.error(message="Unsupported inheritance for type: '{}'.".format(self.category))
 
 		super().resolve(resolver)
 
 	def __repr__(self) -> str:
 		content = self.toString({
 			"name": self.name if self.isName else "",
-			"type": self.type,
+			"category": self.category,
 			"inheritance": ", ".join([str(t) for t in self.inheritanceList])
 		})
 

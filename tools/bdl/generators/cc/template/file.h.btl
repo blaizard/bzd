@@ -36,7 +36,7 @@ namespace {{ namespace | namespaceToStr }}
 {{- declareTrivialTypes(sequence) -}}
 
 {% for data in nestedList %}
-	{% if data.type == "interface" %}
+	{% if data.category == "interface" %}
 
 // ==== Interface {{ data.name }}
 template <class Impl>
@@ -80,7 +80,7 @@ public: // Variable accessors.
 namespace bzd
 {
 {% for data in btl.merge(nestedList, externList) %}
-	{% if data.type == "interface" %}
+	{% if data.category == "interface" %}
 template <>
 struct Interface<"{{ data.fqn }}">
 {
@@ -93,7 +93,7 @@ struct Interface<"{{ data.fqn }}">
 	{% end %}
 {% end %}
 {% for data in nestedList %}
-	{% if data.type in btl.set("component", "interface") %}
+	{% if data.category in btl.set("component", "interface") %}
 		{% for var in data.interface.expressionList %}
 template <>
 struct Data<"{{ var.fqn }}">
