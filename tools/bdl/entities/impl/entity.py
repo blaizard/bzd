@@ -391,6 +391,8 @@ class EntityExpression(Entity):
 
 		return self.toString({
 			"name": self.name if self.isName else "",
+			"varArgs": True if self.isVarArgs else None,
 			"type": str(self.type) if self.isType else None,
-			"value": str(self.value) if self.isValue else None
+			"value": str(self.value) if self.isValue else None,
+			"parameters": "..." if self.isParameters else None,
 		})
