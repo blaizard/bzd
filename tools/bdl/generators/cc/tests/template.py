@@ -118,7 +118,7 @@ class TestRun(unittest.TestCase):
 		self.assertEqual(output, "bzd::Int32{0}")
 
 		output = self.render("""{{ entity("myVarVarArgs") | valueToRValue }}""")
-		self.assertEqual(output, "bzd::Vector<bzd::Int32, 1u>{1, 2, 3, 4}")
+		self.assertEqual(output, "bzd::Vector<bzd::Int32, 4u>{1, 2, 3, 4}")
 
 		output = self.render("""{{ entity("myStruct") | valueToRValue }}""")
 		self.assertEqual(output, "MyStruct{2}")

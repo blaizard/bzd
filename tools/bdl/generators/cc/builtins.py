@@ -11,7 +11,7 @@ class IntegerType:
 	constexpr: bool = True
 
 	@staticmethod
-	def toType(entity: Type, nested: typing.List[str], reference: bool) -> TypeConversionCallableReturn:
+	def toType(entity: Type, nested: typing.List[str], reference: bool, values: typing.Optional[typing.Sequence[str]]) -> TypeConversionCallableReturn:
 		maybeContractMin = entity.contracts.get("min")
 		isSigned = True if maybeContractMin is None or maybeContractMin.valueNumber < 0 else False
 		maybeContractMax = entity.contracts.get("max")
@@ -56,7 +56,7 @@ class ResultType:
 	constexpr = False
 
 	@staticmethod
-	def toType(entity: Type, nested: typing.List[str], reference: bool) -> TypeConversionCallableReturn:
+	def toType(entity: Type, nested: typing.List[str], reference: bool, values: typing.Optional[typing.Sequence[str]]) -> TypeConversionCallableReturn:
 
 		if len(nested) == 0:
 			nested.append("void")
@@ -70,7 +70,7 @@ class AsyncType:
 	constexpr = False
 
 	@staticmethod
-	def toType(entity: Type, nested: typing.List[str], reference: bool) -> TypeConversionCallableReturn:
+	def toType(entity: Type, nested: typing.List[str], reference: bool, values: typing.Optional[typing.Sequence[str]]) -> TypeConversionCallableReturn:
 
 		if len(nested) == 0:
 			nested.append("void")
@@ -102,14 +102,17 @@ class VectorType:
 	constexpr = False
 
 	@staticmethod
-	def toType(entity: Type, nested: typing.List[str], reference: bool) -> TypeConversionCallableReturn:
+	def toType(entity: Type, nested: typing.List[str], reference: bool, values: typing.Optional[typing.Sequence[str]]) -> TypeConversionCallableReturn:
 
 		if reference:
 			return "bzd::interface::Vector", nested
 		maybeContractCapacity = entity.contracts.get("capacity")
 		if maybeContractCapacity is None:
-			# Default capacity is always 1
-			nested.append("1u")
+			if values is None:
+				# Default capacity is always 1
+				nested.append("1u")
+			else:
+				nested.append(f"{len(values)}u")
 		else:
 			nested.append("{:d}u".format(int(maybeContractCapacity.valueNumber)))
 		return "bzd::Vector", nested
