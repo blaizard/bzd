@@ -40,4 +40,23 @@ class BuiltinsBtl:
 		return all(args)
 
 
+	@staticmethod
+	def assertTrue(condition: typing.Any, message: str) -> None:
+		"""Asserts that condition evaluates to true, otherwise terminates and print a message."""
+
+		if not bool(condition):
+			raise AssertionError(message)
+
+	@staticmethod
+	def error(message: str) -> None:
+		"""Print an unconditional error message and terminates."""
+
+		raise Exception(message)
+
+	@staticmethod
+	def unreachable() -> None:
+		"""Print an unreachable error message and terminates."""
+	
+		BuiltinsBtl.error("This line should never be reached.")
+
 Builtins = {"btl": BuiltinsBtl}

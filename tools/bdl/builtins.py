@@ -71,7 +71,7 @@ class Span(Builtin):
 
 class Vector(Builtin):
 	def __init__(self) -> None:
-		super().__init__(ElementBuilder("builtin").setAttr("name", "Vector").addConfigType(kind="Any", name="Type", contract="mandatory").addConfigValue(name="...", kind="Any"))
+		super().__init__(ElementBuilder("builtin").setAttr("name", "Vector").addConfigType(kind="Any", name="Type", contract="mandatory").addConfigValue(name="values...", kind="Any"))
 
 class Callable(Builtin):
 	def __init__(self) -> None:

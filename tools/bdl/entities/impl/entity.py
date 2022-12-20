@@ -198,7 +198,7 @@ class Entity:
 
 	@property
 	def name(self) -> str:
-		return self.element.getAttr("name").value
+		return self.element.getAttr("name").value.replace("...", "")
 
 	@property
 	def contracts(self) -> Contracts:
@@ -360,12 +360,8 @@ class EntityExpression(Entity):
 		return self.type.const
 
 	@property
-	def isName(self) -> bool:
-		return self.element.isAttr("name") and not self.name == "..."
-
-	@property
 	def isVarArgs(self) -> bool:
-		return self.element.isAttr("name") and self.name == "..."
+		return self.element.isAttr("name") and self.element.getAttrValue("name").endswith("...")
 
 	@property
 	def isType(self) -> bool:
@@ -387,6 +383,20 @@ class EntityExpression(Entity):
 	def isParameters(self) -> bool:
 		return self.element.isNestedSequence("argument")
 
+	@property
+	def isRValue(self) -> bool:
+		"""If the expression represents an RValue, in this context an rvalue is a temporary,
+		but it could be extended to move semantic."""
+
+		return self.isRoleValue and self.underlyingValueFQN is None
+
+	@property
+	def isLValue(self) -> bool:
+		"""If the expression represents an LValue, in this context an lvalue is
+		a reference to another value."""
+
+		return self.isRoleValue and self.underlyingValueFQN is not None
+
 	def __repr__(self) -> str:
 
 		return self.toString({
@@ -394,5 +404,5 @@ class EntityExpression(Entity):
 			"varArgs": True if self.isVarArgs else None,
 			"type": str(self.type) if self.isType else None,
 			"value": str(self.value) if self.isValue else None,
-			"parameters": "..." if self.isParameters else None,
+			"parameters": "[...]" if self.isParameters else None,
 		})

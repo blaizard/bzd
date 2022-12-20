@@ -14,7 +14,7 @@ _regexprNestedTrivial = r"(?P<category>(:?struct))"
 # Match name
 _regexprName = r"(?P<name>" + _regexprBaseName + r")"
 # Match name or varargs
-_regexprNameOrVarArgs = r"(?P<name>" + _regexprBaseName + r"|\.\.\.)"
+_regexprNameOrVarArgs = r"(?P<name>" + _regexprBaseName + r"(?:\.\.\.)?)"
 # Match: any type expect protected types
 _regexprType = r"(?P<type>" + _regexprBaseName + r"(?:\." + _regexprBaseName + ")*)"
 # Match a symbol

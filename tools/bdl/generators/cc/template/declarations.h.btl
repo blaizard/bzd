@@ -75,7 +75,9 @@ Args:
 	{%- for i, expression in entity.parametersResolved %}{% if i %}, {% end -%}
 		{{- expression | commentParametersResolvedToStr -}}
 		{# If the expression has a type associated to it, a type is a method/variable name or a variable type. #}
-		{%- if expression.isType -%}
+		{%- if expression.isLiteral -%}
+			{{- expression.literal -}}
+		{%- elif expression.isType -%}
 			{# If the expression has a name associated to it, something like this: `name = type{...}`
 			This corresponds to an existing variable.
 			Note: named expression does not mean they have a fqn associated to it.#}

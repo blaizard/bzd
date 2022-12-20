@@ -99,8 +99,6 @@ class Expression(EntityExpression):
 		# If it holds a value, it is considered a literal.
 		if self.isValue:
 			self._setLiteral(value=self.value)
-			if self.isFQN:
-				self._setUnderlyingValueFQN(fqn=self.fqn)
 
 		# If it holds a type.
 		elif self.isType:
@@ -111,17 +109,16 @@ class Expression(EntityExpression):
 			# The type refers to a value.
 			if entity.isRoleValue:
 				self.assertTrue(condition=self.isParameters == False, message="Cannot instantiate a value from another value.")
-				self.assertTrue(condition=entity.underlyingValueFQN, message="A value referenced must have an underlying value FQN.")
-				self._setUnderlyingValueFQN(fqn=entity.underlyingValueFQN)
+				# It means it refers directly to the entity, in that case it must have a value FQN
+				if entity.underlyingValueFQN is None:	
+					self.assertTrue(condition=entity.isFQN, message="A value referenced must have an valid FQN.")
+					self._setUnderlyingValueFQN(fqn=entity.fqn)
+				else:
+					self._setUnderlyingValueFQN(fqn=entity.underlyingValueFQN)
 				self._setLiteral(value=entity.literal)
 
 			# The type refers to an actual type and will be instantiated as part of this expression.
 			elif entity.isRoleType:
-
-				# If this is a temporary (hence no FQN), no need to set the underlying FQN, this value will never be referenced.
-				# The underlying value FQN is only needed for expressions that can be referenced.
-				if self.isFQN:
-					self._setUnderlyingValueFQN(fqn=self.fqn)
 
 				# Generate the argument list and resolve it.
 				self.parameters.resolve(resolver=resolver)

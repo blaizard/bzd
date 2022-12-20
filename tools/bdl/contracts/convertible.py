@@ -14,8 +14,8 @@ class Convertible_(Constraint):
 			if base == "Any":
 				return True
 
-			#assert context.value.isType, "The expression is not a type."
-			typeFrom = context.value #.type
+			assert context.value.isType, "The expression is not a type."
+			typeFrom = context.value.type
 
 			# It must be found.
 			entityTo = context.args["resolver"].getEntityResolved(base).value
