@@ -84,6 +84,7 @@ class ParametersCommon:
 	def append(self, entity: "EntityExpression", allowMix: bool = False, allowMultiVarArgs: bool = False, **kwargs: typing.Any) -> Data:
 		entity.assertTrue(condition=not self.isVarArgs or allowMultiVarArgs,
 			message=f"Variable arguments '{entity}' can only be present at the end of the parameter list.\n{str(self)}")
+		# Add the element.
 		self.list.append(Data(name=entity.name if entity.isName else None, entity=entity, **kwargs))
 		# This is about having only named or only unamed parameters. Either:
 		# (name1 = 0, name2 = 2, ...) or (0, 2, ...)
@@ -163,7 +164,7 @@ class ParametersCommon:
 	def assertTrue(self, condition: bool, message: str, element: typing.Optional[Element] = None, throw: bool = True) -> typing.Optional[str]:
 		return Error.assertTrue(condition=condition, element=self.element if element is None else element, message=message, throw=throw)
 
-ResolvedType = typing.Union[str, "Entity", "Type"]
+ResolvedType = typing.Union["Entity", "Type"]
 
 class Parameters(ParametersCommon):
 	"""
@@ -225,74 +226,25 @@ class Parameters(ParametersCommon):
 			maybeMetadata.name = default.name
 			maybeMetadata.order = key.index
 
-	def itemsValuesOrTypes(self, resolver: "Resolver", varArgs: bool) -> typing.List[typing.Tuple[str, ResolvedType,
-		Data]]:
-		"""
-        Iterate through the list and return values or types.
-        """
-
-		values: typing.List[typing.Tuple[str, ResolvedType, Data]] = []
-
-		for key, expression, metadata in self.itemsMetadata(includeVarArgs=varArgs):
-
-			if expression.literal is not None:
-				values.append((str(key), expression.literal, metadata))
-
-			elif expression.underlyingValueFQN is not None:
-				entityValue: ResolvedType = resolver.getEntityResolved(fqn=expression.underlyingValueFQN).assertValue(
-					element=expression.element)
-				entityValue.assertTrue(condition=entityValue.category == "expression", message=f"A value FQN must resolve into an expression, not {expression}")
-
-				# If these are default arguments, use the default value.
-				#if metadata.default and value.isName:
-					# Create an unamed value
-				#	element = ElementBuilder.cast(value.element.copy(), ElementBuilder).removeAttr(key="name").get()
-				#	value = Expression(element)
-
-				values.append((str(key), entityValue, metadata))
-
-			# Temporary values, for example: arg1 = Integer(12)
-			elif expression.isParameters:
-				values.append((str(key), expression, metadata))
-
-			# Types or variables, for example: arg1 = core
-			elif expression.isType:
-				values.append((str(key), expression.type, metadata))
-
-		return values
-
 	def getValuesOrTypesAsDict(self, resolver: "Resolver", varArgs: bool) -> typing.Dict[str, ResolvedType]:
 		"""
         Get the values as a dictionary.
         """
-		values = self.itemsValuesOrTypes(resolver=resolver, varArgs=varArgs)
-		return {entry[0]: entry[1] for entry in values}
+		return {str(key): expression for key, expression, _ in self.itemsMetadata(includeVarArgs=varArgs)}
 
 	def toResolvedSequence(self, resolver: "Resolver", varArgs: bool) -> Sequence:
 		"""
 		Build the resolved sequence of those parameters.
 		Must be called after mergeDefaults.
 		"""
-		items = self.itemsValuesOrTypes(resolver=resolver, varArgs=varArgs)
-		if self.isNamed:
-			items = sorted(items, key=lambda k: k[2].order)
+		items = [metadata for _, _, metadata in self.itemsMetadata(includeVarArgs=varArgs)]
+		items = sorted(items, key=lambda k: k.order)
 
-		# Build the sequence
-		def buildSequence(entries) -> Sequence:
-			from tools.bdl.entities.impl.fragment.type import Type
+		sequence = SequenceBuilder()
+		for metadata in items:
+			sequence.pushBackElement(metadata.entity.element)
 
-			sequence = SequenceBuilder()
-			for key, item, metadata in entries:
-				if isinstance(item, str):
-					element = ElementBuilder().setAttr(key="value", value=item).setAttr(key="literal", value=item)
-				else:
-					element = item.element.copy()
-				if self.isNamed:
-					ElementBuilder.cast(element, ElementBuilder).setAttr(key="key", value=key)
-				sequence.pushBackElement(element)
-			return sequence
-
-		return buildSequence(items)
+		return sequence
 
 
 class ResolvedParameters(ParametersCommon):

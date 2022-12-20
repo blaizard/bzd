@@ -133,12 +133,20 @@ public:
 	struct Config
 	{
 	{% for i, param in expression.parametersResolved %}
-		{% if param.isType %}
+
+		{% if param.isLiteral %}
+		static constexpr auto {{ expression.parametersExpectedResolved[i].name }}{ {{- param.literal -}} };
+		{% elif param.isLValue %}
+		LVALUE {{ param.name }}
+		{% elif param.isRValue %}
+			RVALUE {{ param.name }}
 			{% if param.isName %}
 		{{ param.type | typeToStr }}& {{ param | parametersResolvedToStr }};
 			{% else %}
 		static constexpr {{ param.type | typeToStr }} {{ param | parametersResolvedToStr }}{ {{- declareParametersResolvedRValues(param, false) -}} };
 			{% end %}
+		{% else %}
+			{{ btl.unreachable() }}
 		{% end %}
 	{% end %}
 	};

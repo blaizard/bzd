@@ -5,10 +5,8 @@ from bzd.utils.decorators import cached_classproperty
 from tools.bdl.contracts.traits import ContractTraits
 from tools.bdl.contracts.min import ContractMin
 from tools.bdl.contracts.max import ContractMax
-from tools.bdl.contracts.integer import ContractInteger
-from tools.bdl.contracts.float import ContractFloat
+from tools.bdl.contracts.builtins import ContractInteger, ContractFloat, ContractBoolean
 from tools.bdl.contracts.string import ContractString
-from tools.bdl.contracts.boolean import ContractBoolean
 from tools.bdl.contracts.mandatory import ContractMandatory
 from tools.bdl.contracts.capacity import ContractCapacity
 from tools.bdl.contracts.init import ContractInit

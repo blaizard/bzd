@@ -54,3 +54,5 @@ Piped data can be of arbitrary type but the final substitued value must be eithe
   - btl.set: create a set from inputs passed into arguments, ex: `btl.set(a, b, c)`
   - btl.any: checks that any of the argument evaluates to `true`, ex: `btl.any(a, b, c)`
   - btl.all: checks that all of the argument evaluates to `true`, ex: `btl.all(a, b, c)`
+  - btl.assertTrue: asserts that a condition evaluates to `true` otherwise print an error message and terminates, ex: `btl.assertTrue(a == 1, "'a' is not equal to 1.")`
+  - btl.error: print an unconditional error message and terminates, ex: `btl.error("This path is unreachable.")`

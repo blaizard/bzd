@@ -165,6 +165,14 @@ class Object:
 		parser = Parser(content)
 		return Object._makeObject(parser=parser, objectContext=objectContext if objectContext else ObjectContext())
 
+	def entity(self, fqn: str) -> EntityType:
+		"""Convinience function to lookup for an entity based on its FQN and return it.
+		If the symbol does not exists, this will throw."""
+
+		maybeEntity = self.symbols.getEntityResolved(fqn)
+		assert bool(maybeEntity), maybeEntity.error
+		return maybeEntity.value
+
 	def serialize(self) -> str:
 		"""
 		Serialize the current object.

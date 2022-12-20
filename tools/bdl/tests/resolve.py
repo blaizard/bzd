@@ -41,11 +41,12 @@ class TestRun(unittest.TestCase):
 	def testMandatory(self) -> None:
 
 		# Not mandatory
-		Object.fromContent(content="""
+		bdl = Object.fromContent(content="""
 				using NewType = Integer;
 				struct temp { var = NewType; }
 				""",
 			objectContext=ObjectContext(resolve=True))
+		self.assertTrue(bdl.entity("temp.var").isRValue)
 
 		with self.assertRaisesRegex(Exception, r"mandatory"):
 			Object.fromContent(content="""
@@ -56,20 +57,25 @@ class TestRun(unittest.TestCase):
 
 	def testNestedInheritance(self) -> None:
 
-		Object.fromContent(content="""
+		bdl = Object.fromContent(content="""
 				struct A { a = Integer; }
 				struct B { b = Integer; }
 				struct C : A, B {}
 				""",
 			objectContext=ObjectContext(resolve=True))
+		self.assertTrue(bdl.entity("A.a").isRValue)
+		self.assertTrue(bdl.entity("B.b").isRValue)
 
 		# Overload
-		Object.fromContent(content="""
+		bdl = Object.fromContent(content="""
 				struct A { a = Float; }
 				struct B { a = Integer; }
 				struct C : A, B { a = Float; }
 				""",
 			objectContext=ObjectContext(resolve=True))
+		self.assertTrue(bdl.entity("A.a").isRValue)
+		self.assertTrue(bdl.entity("B.a").isRValue)
+		self.assertTrue(bdl.entity("C.a").isRValue)
 
 		with self.assertRaisesRegex(Exception, r"nested class"):
 			Object.fromContent(content="""
@@ -78,12 +84,13 @@ class TestRun(unittest.TestCase):
 					""",
 				objectContext=ObjectContext(resolve=True))
 
-		Object.fromContent(content="""
+		bdl = Object.fromContent(content="""
 				struct A { a = Integer; }
 				using B = A;
 				struct C : B {}
 				""",
 			objectContext=ObjectContext(resolve=True))
+		self.assertTrue(bdl.entity("A.a").isRValue)
 
 		with self.assertRaisesRegex(Exception, r"nested class"):
 			Object.fromContent(content="""
@@ -131,23 +138,25 @@ class TestRun(unittest.TestCase):
 
 	def testNamespaces(self) -> None:
 
-		Object.fromContent(content="""
+		bdl = Object.fromContent(content="""
 				namespace bzd.test.nested;
 				struct Test { }
 				composition MyComposition { test = bzd.test.nested.Test; }
 				""",
 			objectContext=ObjectContext(resolve=True, composition=True))
+		self.assertTrue(bdl.entity("bzd.test.nested.MyComposition.test").isRValue)
 
-		Object.fromContent(content="""
+		bdl = Object.fromContent(content="""
 				namespace bzd.test.nested;
 				struct Test { a = Integer; }
 				using Other = Test;
 				composition MyComposition { test = bzd.test.nested.Other.a; }
 				""",
 			objectContext=ObjectContext(resolve=True, composition=True))
+		self.assertTrue(bdl.entity("bzd.test.nested.MyComposition.test").isLValue)
 
 		# Inheritance
-		Object.fromContent(content="""
+		bdl = Object.fromContent(content="""
 				namespace bzd.test.nested;
 				struct A { a = Integer; }
 				struct B { b = Integer; }
@@ -155,22 +164,20 @@ class TestRun(unittest.TestCase):
 				composition MyComposition { test = C.a; }
 				""",
 			objectContext=ObjectContext(resolve=True, composition=True))
+		self.assertTrue(bdl.entity("bzd.test.nested.A.a").isRValue)
+		self.assertTrue(bdl.entity("bzd.test.nested.B.b").isRValue)
+		self.assertTrue(bdl.entity("bzd.test.nested.MyComposition.test").isLValue)
 
 	def testMethods(self) -> None:
 
-		# TODO: enable this
 		# Can only refer to methods from an instance.
-		Object.fromContent(content="""
+		bdl = Object.fromContent(content="""
 				interface Test { method hello(); }
 				composition MyComposition { test = Test; hello = Test.hello(); }
 				""",
 			objectContext=ObjectContext(resolve=True, composition=True))
-
-		Object.fromContent(content="""
-				interface Test { method hello(); }
-				composition MyComposition { test = Test; hello = test.hello(); }
-				""",
-			objectContext=ObjectContext(resolve=True, composition=True))
+		self.assertTrue(bdl.entity("MyComposition.test").isRValue)
+		self.assertTrue(bdl.entity("MyComposition.hello").isRValue)
 
 		with self.assertRaisesRegex(Exception, r"not expected"):
 			Object.fromContent(content="""
@@ -186,51 +193,103 @@ class TestRun(unittest.TestCase):
 					""",
 				objectContext=ObjectContext(resolve=True, composition=True))
 
-		Object.fromContent(content="""
+		bdl = Object.fromContent(content="""
 				interface Test { method hello(var = Integer [max(10)]); }
 				composition MyComposition { test = Test; hello = test.hello(var = 3); }
 				""",
 			objectContext=ObjectContext(resolve=True, composition=True))
+		self.assertTrue(bdl.entity("MyComposition.test").isRValue)
+		self.assertTrue(bdl.entity("MyComposition.hello").isRValue)
+
+		bdl = Object.fromContent(content="""
+				interface MyInterface {}
+				component MyComponent : MyInterface {}
+				method hello(var1 = Integer, var2 = MyInterface);
+				composition { ref = MyComponent(), call = hello(var2 = ref, var1 = 1); }
+				""",
+			objectContext=ObjectContext(resolve=True, composition=True))
+		call = bdl.entity("call")
+		self.assertTrue(call.isRValue)
+		self.assertTrue(call.parameters[0].isLValue)
+		self.assertTrue(call.parameters[1].isRValue)
+		self.assertEqual(call.parameters[1].literal, "1")
+		print(call.parametersResolved)
+		#self.assertEqual(call.parameters[0], call.parametersResolved[1])
+		#print(call.parameters)
+		#print(call.parameters[0])
+		#print(call.parametersResolved[1])
+		#sys.exit(1)
+
+	def testABC(self):
+
+		bdl = Object.fromContent(content="""
+				interface MyInterface {}
+				component MyComponent : MyInterface {}
+				method hello(var1 = Integer, var2 = MyInterface);
+				composition { ref = MyComponent(), call = hello(var2 = ref, var1 = 1); }
+				""",
+			objectContext=ObjectContext(resolve=True, composition=True))
+		call = bdl.entity("call")
+		self.assertTrue(call.isRValue)
+		self.assertTrue(call.parameters[0].isLValue)
+		self.assertTrue(call.parameters[1].isRValue)
+		self.assertEqual(call.parameters[1].literal, "1")
+
+		print(call.parameters)
+		print(call.parametersResolved)
+		print(call.parametersExpectedResolved)
+		#self.assertEqual(call.parameters[0], call.parametersResolved[1])
+		#print(call.parameters)
+		#print(call.parameters[0])
+		#print(call.parametersResolved[1])
+		#sys.exit(1)
+
 
 	def testStruct(self) -> None:
 
-		Object.fromContent(content="""
+		bdl = Object.fromContent(content="""
 					struct Test { var = Integer; }
 					composition { test = Test(); }
 					""",
 				objectContext=ObjectContext(resolve=True, composition=True))
+		self.assertTrue(bdl.entity("test").isRValue)
 
-		Object.fromContent(content="""
+		bdl = Object.fromContent(content="""
 					struct Test { var = Integer; }
 					composition { test = Test(32); }
 					""",
 				objectContext=ObjectContext(resolve=True, composition=True))
+		self.assertTrue(bdl.entity("test").isRValue)
 
-		Object.fromContent(content="""
+		bdl = Object.fromContent(content="""
 					struct Test { var = Integer; }
 					composition { test = Test(var = 32); }
 					""",
 			objectContext=ObjectContext(resolve=True, composition=True))
+		self.assertTrue(bdl.entity("test").isRValue)
 
-		Object.fromContent(content="""
+		bdl = Object.fromContent(content="""
 					struct Test { var = Integer; }
 					composition { test = Test(var = Integer(32)); }
 					""",
 			objectContext=ObjectContext(resolve=True, composition=True))
+		self.assertTrue(bdl.entity("test").isRValue)
 
 	def testValues(self) -> None:
 
-		Object.fromContent(content="""
+		bdl = Object.fromContent(content="""
 				interface Test { config: value = Integer; }
 				composition MyComposition { val1 = Test(value=12); }
 				""",
 			objectContext=ObjectContext(resolve=True, composition=True))
+		self.assertTrue(bdl.entity("MyComposition.val1").isRValue)
 
-		Object.fromContent(content="""
+		bdl = Object.fromContent(content="""
 					interface Test { config: value = Integer; }
 					composition MyComposition { val1 = Test(12); }
 					""",
 				objectContext=ObjectContext(resolve=True, composition=True))
+		self.assertTrue(bdl.entity("MyComposition.val1").isRValue)
 
 		# Mispelled value key
 		with self.assertRaisesRegex(Exception, r"not expected"):
@@ -261,26 +320,30 @@ class TestRun(unittest.TestCase):
 				""",
 				objectContext=ObjectContext(resolve=True, composition=True))
 
-		Object.fromContent(content="""
+		bdl = Object.fromContent(content="""
 			interface Test { config: value = Integer; }
 			composition MyComposition { val1 = Integer(32); val2 = Test(value=val1); }
 			""",
 			objectContext=ObjectContext(resolve=True, composition=True))
+		self.assertTrue(bdl.entity("MyComposition.val1").isRValue)
+		self.assertEqual(bdl.entity("MyComposition.val1").literal, "32")
+		self.assertTrue(bdl.entity("MyComposition.val2").isRValue)
 
 		# Variable arguments
 		with self.assertRaisesRegex(Exception, r"Variable arguments.*end"):
 			Object.fromContent(content="""
-					interface Test { config: ... = Integer; i = Integer; }
+					interface Test { config: multi... = Integer; i = Integer; }
 					composition MyComposition { val1 = Test(12); }
 					""",
 				objectContext=ObjectContext(resolve=True, composition=True))
 
 		# Value with no argument
-		Object.fromContent(content="""
+		bdl = Object.fromContent(content="""
 				interface Test { config: a = Vector<Integer>(); }
 				composition { val1 = Test(); }
 				""",
 			objectContext=ObjectContext(resolve=True, composition=True))
+		self.assertTrue(bdl.entity("val1").isRValue)
 
 	def testTemplates(self) -> None:
 
@@ -299,11 +362,12 @@ class TestRun(unittest.TestCase):
 				""",
 				objectContext=ObjectContext(resolve=True, composition=True))
 
-		Object.fromContent(content="""
+		bdl = Object.fromContent(content="""
 			interface Test { config: using Type = Void; }
 			composition MyComposition { val1 = Test<Void>; }
 			""",
 			objectContext=ObjectContext(resolve=True, composition=True))
+		self.assertTrue(bdl.entity("MyComposition.val1").isRValue)
 
 		with self.assertRaisesRegex(Exception, r"lower than"):
 			Object.fromContent(content="""
@@ -319,11 +383,12 @@ class TestRun(unittest.TestCase):
 			""",
 				objectContext=ObjectContext(resolve=True, composition=True))
 
-		Object.fromContent(content="""
+		bdl = Object.fromContent(content="""
 			interface Test { config: value = Integer [min(10) max(32)]; }
 			composition MyComposition { val1 = Test(23); }
 			""",
 			objectContext=ObjectContext(resolve=True, composition=True))
+		self.assertTrue(bdl.entity("MyComposition.val1").isRValue)
 
 		with self.assertRaisesRegex(Exception, r"mandatory"):
 			Object.fromContent(content="""
@@ -347,7 +412,7 @@ class TestRun(unittest.TestCase):
 				""",
 				objectContext=ObjectContext(resolve=True, composition=True))
 
-		Object.fromContent(content="""
+		bdl = Object.fromContent(content="""
 				using MyInteger1 = Integer;
 				using MyInteger2 = MyInteger1;
 				using MyInteger3 = MyInteger2;
@@ -355,18 +420,21 @@ class TestRun(unittest.TestCase):
 				composition MyComposition { val1 = Test(); }
 				""",
 			objectContext=ObjectContext(resolve=True, composition=True))
+		self.assertTrue(bdl.entity("MyComposition.val1").isRValue)
 
-		Object.fromContent(content="""
+		bdl = Object.fromContent(content="""
 				interface Test { config: val1 = Integer(23); val2 = Integer;}
 				composition MyComposition { value = Test(val2 = 3); }
 				""",
 			objectContext=ObjectContext(resolve=True, composition=True))
+		self.assertTrue(bdl.entity("MyComposition.value").isRValue)
 
-		Object.fromContent(content="""
+		bdl = Object.fromContent(content="""
 				interface Test { config: value = Integer; }
 				composition MyComposition { val1 = Test(value=Integer(12)); }
 				""",
 			objectContext=ObjectContext(resolve=True, composition=True))
+		self.assertTrue(bdl.entity("MyComposition.val1").isRValue)
 
 	def testDefaultValues(self) -> None:
 
@@ -386,15 +454,22 @@ class TestRun(unittest.TestCase):
 				""",
 				objectContext=ObjectContext(resolve=True, composition=True))
 
-		Object.fromContent(content="""
+		bdl = Object.fromContent(content="""
 				interface Test { config: value = Vector<Integer>; }
 				composition MyComposition {
 					value1 = Integer(1);
 					value2 = 2;
+					value3 = value2;
 					vector = Test(value = Vector<Integer>(value1, value2, 3, Integer(4)));
 				}
 				""",
 				objectContext=ObjectContext(resolve=True, composition=True))
+		self.assertTrue(bdl.entity("MyComposition.value1").isRValue)
+		self.assertEqual(bdl.entity("MyComposition.value1").literal, "1")
+		self.assertTrue(bdl.entity("MyComposition.value2").isRValue)
+		self.assertEqual(bdl.entity("MyComposition.value2").literal, "2")
+		self.assertTrue(bdl.entity("MyComposition.value3").isLValue)
+		self.assertTrue(bdl.entity("MyComposition.vector").isRValue)
 
 	def testInstanceWithParameters(self) -> None:
 		Object.fromContent(content="""
@@ -407,7 +482,7 @@ class TestRun(unittest.TestCase):
 				""",
 			objectContext=ObjectContext(resolve=True, composition=True))
 
-		Object.fromContent(content="""
+		bdl = Object.fromContent(content="""
 				interface Test { config: using hello = Integer; }
 				composition MyComposition
 				{
@@ -415,8 +490,9 @@ class TestRun(unittest.TestCase):
 				}
 				""",
 			objectContext=ObjectContext(resolve=True, composition=True))
+		self.assertTrue(bdl.entity("MyComposition.val1").isRValue)
 
-		Object.fromContent(content="""
+		bdl = Object.fromContent(content="""
 				interface Test { config: value = Integer; }
 				component MyComponent : Test { config: hello = Integer; }
 				composition MyComposition
@@ -425,6 +501,7 @@ class TestRun(unittest.TestCase):
 				}
 				""",
 			objectContext=ObjectContext(resolve=True, composition=True))
+		self.assertTrue(bdl.entity("MyComposition.val1").isRValue)
 
 
 if __name__ == '__main__':
