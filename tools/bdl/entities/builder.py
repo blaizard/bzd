@@ -23,7 +23,7 @@ class ElementBuilder(Element):
 	def addConfigValue(
 			self,
 			kind: typing.Optional[str] = None,
-			value: typing.Optional[str] = None,
+			literal: typing.Optional[str] = None,
 			name: typing.Optional[str] = None,
 			contract: typing.Optional[str] = None) -> "ElementBuilder":
 		"""
@@ -32,8 +32,9 @@ class ElementBuilder(Element):
 		element = ElementBuilder(category="expression")
 		if kind is not None:
 			element.setAttr("type", kind)
-		if value is not None:
-			element.setAttr("value", value)
+		if literal is not None:
+			element.setAttr("value", literal)
+			element.setAttr("literal", literal)
 		if name is not None:
 			element.setAttr("name", name)
 		if contract is not None:

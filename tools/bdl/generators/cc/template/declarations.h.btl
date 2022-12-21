@@ -72,39 +72,13 @@ Args:
 	registry: If the registry is available and names should be picked from it.
 -#}
 {%- macro declareParametersResolvedRValues(entity, registry) -%}
-	{%- for i, expression in entity.parametersResolved %}{% if i %}, {% end -%}
-		{{- expression | commentParametersResolvedToStr -}}
+	{%- for i, item in entity.parametersResolved %}{% if i %}, {% end -%}
+		{{- item | commentParametersResolvedToStr -}}
 		{# If the expression has a type associated to it, a type is a method/variable name or a variable type. #}
-		{%- if expression.isLiteral -%}
-			{{- expression.literal -}}
-		{%- elif expression.isType -%}
-			{# If the expression has a name associated to it, something like this: `name = type{...}`
-			This corresponds to an existing variable.
-			Note: named expression does not mean they have a fqn associated to it.#}
-			{%- if expression.isName -%}
-				{# If this named variable must be taken from the registry if it exists. #}
-				{%- if expression.isFQN -%}
-					{%- if registry -%}
-						{{- parametersValue(expression.fqnToType | typeRegistryToStr, entity.parametersExpectedResolved[i].type) -}}
-					{# Otherwise it will be used directly. #}
-					{%- else -%}
-						{{- parametersValue(expression.fqn | fqnToNameStr, entity.parametersExpectedResolved[i].type) -}}
-					{%- end -%}
-
-				{# There is no FQN for inline definition of variables. #}
-				{%- else -%}
-					{{- entity.parametersExpectedResolved[i].type | typeToStr }}{ {{- declareParametersResolvedRValues(expression, registry) -}} }
-				{%- end -%}
-		
-			{# No name associated to it, something like this: `type{...}`
-			This is an inline variable instantiation. #}
-			{%- else -%}
-				{# Object instanciation. #}
-				{{- expression.type | typeToStr }}{ {{- declareParametersResolvedRValues(expression, registry) -}} }
-			{%- end -%}
-		{%- else -%}
-			{# Literal. #}
-			{{- expression.value -}}
+		{%- if item.param.isLiteral -%}
+			{{- item.param.literal -}}
+		{%- elif item.isRValue -%}
+			{{- item.expected.type | typeToStr -}}{ {{- declareParametersResolvedRValues(item.param, registry) -}} }
 		{%- end -%}
 	{%- end -%}
 {%- end -%}

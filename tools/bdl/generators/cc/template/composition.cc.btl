@@ -132,19 +132,14 @@ class ResourceSpecialization<"{{ fqn }}">
 public:
 	struct Config
 	{
-	{% for i, param in expression.parametersResolved %}
+	{% for i, item in expression.parametersResolved %}
 
-		{% if param.isLiteral %}
-		static constexpr auto {{ expression.parametersExpectedResolved[i].name }}{ {{- param.literal -}} };
-		{% elif param.isLValue %}
-		LVALUE {{ param.name }}
-		{% elif param.isRValue %}
-			RVALUE {{ param.name }}
-			{% if param.isName %}
-		{{ param.type | typeToStr }}& {{ param | parametersResolvedToStr }};
-			{% else %}
-		static constexpr {{ param.type | typeToStr }} {{ param | parametersResolvedToStr }}{ {{- declareParametersResolvedRValues(param, false) -}} };
-			{% end %}
+		{% if item.param.isLiteral %}
+		static constexpr auto {{ item.name }}{ {{- item.param.literal -}} };
+		{% elif item.isLValue %}
+		LVALUE {{ item.name }}
+		{% elif item.isRValue %}
+			RVALUE {{ item.name }}
 		{% else %}
 			{{ btl.unreachable() }}
 		{% end %}

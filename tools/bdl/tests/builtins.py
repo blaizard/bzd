@@ -123,19 +123,6 @@ class TestRun(unittest.TestCase):
 		Object.fromContent(content="struct temp { var = Vector<Integer>(12, 13, 14); }",
 			objectContext=ObjectContext(resolve=True))
 
-	def testSpan(self) -> None:
-
-		# No template
-		with self.assertRaisesRegex(Exception, r"mandatory"):
-			Object.fromContent(content="struct temp { var = Span; }", objectContext=ObjectContext(resolve=True))
-
-		# Template
-		Object.fromContent(content="struct temp { var = Span<Integer>(12); }",
-			objectContext=ObjectContext(resolve=True))
-		with self.assertRaisesRegex(Exception, r"not expected"):
-			Object.fromContent(content="struct temp { var = Span<Integer, Void>; }",
-				objectContext=ObjectContext(resolve=True))
-
 
 if __name__ == '__main__':
 	unittest.main()

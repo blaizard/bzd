@@ -28,7 +28,16 @@ class TestRun(unittest.TestCase):
 				""",
 				objectContext=ObjectContext(resolve=True))
 
-		with self.assertRaisesRegex(Exception, r"both.*global.*configuration"):
+		Object.fromContent(content="""
+				interface Test { config: value = Integer; }
+				using MyType = Test;
+				struct temp {
+					var = MyType(value=1);
+				}
+				""",
+				objectContext=ObjectContext(resolve=True))
+
+		with self.assertRaisesRegex(Exception, r"expects an integer"):
 			Object.fromContent(content="""
 				interface Test { config: value = Integer; }
 				using MyType = Test [integer];
@@ -50,8 +59,8 @@ class TestRun(unittest.TestCase):
 
 		with self.assertRaisesRegex(Exception, r"mandatory"):
 			Object.fromContent(content="""
-				using NewType = Integer [mandatory];
-				struct temp { var = NewType; }
+				struct First { val = Integer [mandatory]; } 
+				struct Temp { var = First; }
 				""",
 				objectContext=ObjectContext(resolve=True))
 
@@ -201,49 +210,34 @@ class TestRun(unittest.TestCase):
 		self.assertTrue(bdl.entity("MyComposition.test").isRValue)
 		self.assertTrue(bdl.entity("MyComposition.hello").isRValue)
 
-		bdl = Object.fromContent(content="""
-				interface MyInterface {}
-				component MyComponent : MyInterface {}
-				method hello(var1 = Integer, var2 = MyInterface);
-				composition { ref = MyComponent(), call = hello(var2 = ref, var1 = 1); }
-				""",
-			objectContext=ObjectContext(resolve=True, composition=True))
-		call = bdl.entity("call")
-		self.assertTrue(call.isRValue)
-		self.assertTrue(call.parameters[0].isLValue)
-		self.assertTrue(call.parameters[1].isRValue)
-		self.assertEqual(call.parameters[1].literal, "1")
-		print(call.parametersResolved)
-		#self.assertEqual(call.parameters[0], call.parametersResolved[1])
-		#print(call.parameters)
-		#print(call.parameters[0])
-		#print(call.parametersResolved[1])
-		#sys.exit(1)
-
-	def testABC(self):
+	def testParameters(self):
 
 		bdl = Object.fromContent(content="""
 				interface MyInterface {}
 				component MyComponent : MyInterface {}
-				method hello(var1 = Integer, var2 = MyInterface);
-				composition { ref = MyComponent(), call = hello(var2 = ref, var1 = 1); }
+				method hello(var1 = Integer, var2 = Float, var3 = MyInterface);
+				composition { ref = MyComponent(), call = hello(var3 = ref, var1 = 1); }
 				""",
 			objectContext=ObjectContext(resolve=True, composition=True))
 		call = bdl.entity("call")
 		self.assertTrue(call.isRValue)
+		self.assertEqual(len(call.parameters), 2)
 		self.assertTrue(call.parameters[0].isLValue)
 		self.assertTrue(call.parameters[1].isRValue)
 		self.assertEqual(call.parameters[1].literal, "1")
 
-		print(call.parameters)
-		print(call.parametersResolved)
-		print(call.parametersExpectedResolved)
-		#self.assertEqual(call.parameters[0], call.parametersResolved[1])
-		#print(call.parameters)
-		#print(call.parameters[0])
-		#print(call.parametersResolved[1])
-		#sys.exit(1)
-
+		self.assertEqual(len(call.parametersResolved), 3)
+		self.assertEqual(call.parametersResolved[0].name, "var1")
+		self.assertTrue(call.parametersResolved[0].isRValue)
+		self.assertEqual(call.parametersResolved[0].param.literal, "1")
+		self.assertEqual(call.parametersResolved[0].expected.literal, "0")
+		self.assertEqual(call.parametersResolved[1].name, "var2")
+		self.assertTrue(call.parametersResolved[1].isRValue)
+		self.assertEqual(call.parametersResolved[1].param.literal, "0")
+		self.assertEqual(call.parametersResolved[1].expected.literal, "0")
+		self.assertEqual(call.parametersResolved[2].name, "var3")
+		self.assertTrue(call.parametersResolved[2].isLValue)
+		self.assertEqual(str(call.parametersResolved[2].param.type), "ref")
 
 	def testStruct(self) -> None:
 
@@ -345,6 +339,15 @@ class TestRun(unittest.TestCase):
 			objectContext=ObjectContext(resolve=True, composition=True))
 		self.assertTrue(bdl.entity("val1").isRValue)
 
+	def testABC(self):
+		bdl = Object.fromContent(content="""
+				using MyInteger3 = Integer;
+				interface Test { config: value = MyInteger3(20) [min(10) max(32)]; }
+				composition MyComposition { val1 = Test(); }
+				""",
+			objectContext=ObjectContext(resolve=True, composition=True))
+		self.assertTrue(bdl.entity("MyComposition.val1").isRValue)
+
 	def testTemplates(self) -> None:
 
 		# Mandatory template.
@@ -384,7 +387,7 @@ class TestRun(unittest.TestCase):
 				objectContext=ObjectContext(resolve=True, composition=True))
 
 		bdl = Object.fromContent(content="""
-			interface Test { config: value = Integer [min(10) max(32)]; }
+			interface Test { config: value = Integer(15) [min(10) max(32)]; }
 			composition MyComposition { val1 = Test(23); }
 			""",
 			objectContext=ObjectContext(resolve=True, composition=True))
@@ -438,7 +441,7 @@ class TestRun(unittest.TestCase):
 
 	def testDefaultValues(self) -> None:
 
-		with self.assertRaisesRegex(Exception, r"missing.*mandatory"):
+		with self.assertRaisesRegex(Exception, r"Missing.*mandatory"):
 			Object.fromContent(content="""
 				interface Test { config: value = Integer [mandatory]; }
 				composition MyComposition {

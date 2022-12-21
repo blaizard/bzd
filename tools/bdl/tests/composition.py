@@ -11,7 +11,7 @@ class TestRun(unittest.TestCase):
 		interface = Object.fromContent(content="""
 			interface Hello {
 			config:
-				var = Integer [min(10)];
+				var = Integer(10) [min(10)];
 			}
 			""",
 			objectContext=ObjectContext(resolve=True))
@@ -34,7 +34,7 @@ class TestRun(unittest.TestCase):
 		interface = Object.fromContent(content="""
 			interface Hello {
 			config:
-				var = Integer [min(10)];
+				var = Integer(10) [min(10)];
 			}
 			""",
 			objectContext=ObjectContext(resolve=True))
