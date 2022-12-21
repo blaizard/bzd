@@ -10,6 +10,7 @@ from tools.bdl.contracts.contract import Contract
 from tools.bdl.entities.impl.fragment.type import Type
 from tools.bdl.entities.impl.fragment.contract import Contracts
 from tools.bdl.entities.impl.fragment.parameters import Parameters, ResolvedParameters
+from tools.bdl.entities.impl.fragment.parameters_resolved import ParametersResolved
 from tools.bdl.entities.impl.fragment.fqn import FQN
 from tools.bdl.entities.impl.entity import Entity, EntityExpression, Role
 from tools.bdl.entities.impl.types import TypeCategory
@@ -132,6 +133,12 @@ class Expression(EntityExpression):
 		else:
 			self.error(message="Unsupported expression.")
 
+		# Validate the whole expression with the contracts if any.
+		if self.contracts.validationForValue:
+			validation = Validation(schema=[self.contracts.validationForValue], args={"resolver": resolver})
+			result = validation.validate([self], output="return")
+			self.assertTrue(condition=bool(result), message=str(result))
+
 	def _resolveAndValidateParameters(self, resolver: "Resolver", resolvedTypeEntity: Entity,
 		parameters: Parameters) -> None:
 		"""Resolve and validate tthe parameters passed into argument."""
@@ -148,18 +155,8 @@ class Expression(EntityExpression):
 				in [TypeCategory.component, TypeCategory.method, TypeCategory.builtin],
 				message=f"Components are not allowed for this type '{typeCategory}'.")
 
-		# Read the validation for the value. it comes in part from the direct underlying type, contract information
-		# directly associated with this expression do not apply to the current validation.
-		validation = self._makeValueValidation(resolver=resolver, parameters=argumentConfig, contracts=self.contracts)
-		if validation is not None:
-			arguments = parameters.getValuesOrTypesAsDict(resolver=resolver, varArgs=False)
-			result = validation.validate(arguments, output="return")
-			Error.assertTrue(element=self.element, attr="type", condition=bool(result), message=str(result))
-			maybeValue = resolvedTypeEntity.toLiteral(result.values)
-			if maybeValue is not None:
-				self._setLiteral(maybeValue)
-
-		# Save the resolved parameters (values and templates), only after the validation is completed.
+		# Save the resolved parameters before the validation is completed. This is because
+		# itself might use the parametersResolved.
 		argumentValues = parameters.copy()
 		sequenceValues = argumentValues.toResolvedSequence(resolver=resolver, varArgs=False)
 		ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("argument_resolved", sequenceValues)
@@ -169,35 +166,19 @@ class Expression(EntityExpression):
 		sequence += [sequence[-1]] * (len(sequenceValues) - len(sequence)) if configValues.isVarArgs else []
 		ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("argument_expected", sequence)
 
-	def _makeValueValidation(self, resolver: "Resolver", parameters: Parameters,
-		contracts: Contracts) -> typing.Optional[Validation[SchemaDict]]:
-		"""
-		Generate the validation for the value by combining the type validation
-		and the contract validation.
-		"""
-
-		# The validation comes from the direct underlying type, contract information
+		# Read the validation for the value. it comes in part from the direct underlying type, contract information
 		# directly associated with this expression do not apply to the current validation.
-		validationValue = contracts.validationForValue
 
-		# Get the configuration value if any.
-		if self.underlyingTypeFQN is not None:
-			underlyingTypeFQN = resolver.getEntityResolved(self.underlyingTypeFQN).assertValue(element=self.element)
-			if underlyingTypeFQN.isConfig:
-				self.assertTrue(condition=not validationValue,
-					message=f"This expression has both a global contract '{validationValue}' and a configuration, this is not allowed.")
-				return self.makeValidationForValues(resolver=resolver, parameters=parameters)
-
-		# If evaluates to true, meaning there is a contract for values,
-		# it means there must be a single value.
-		if validationValue:
-			try:
-				return Validation(schema={"0": validationValue}, args={"resolver": resolver})
-			except Exception as e:
-				self.error(message=str(e))
-
-		# Validation is empty
-		return Validation(schema={}, args={"resolver": resolver})
+		validation = self.makeValidationForValues(resolver=resolver, parameters=argumentConfig)
+		if validation is None:
+			validation = Validation(schema={}, args={"resolver": resolver})
+		arguments = parameters.getValuesOrTypesAsDict(resolver=resolver, varArgs=False)
+		result = validation.validate(arguments, output="return")
+		Error.assertTrue(element=self.element, attr="type", condition=bool(result), message=str(result))
+		maybeValue = resolvedTypeEntity.toLiteral(result.values)
+		if maybeValue is not None:
+			self.assertTrue(condition=isinstance(maybeValue, str), message=f"The returned value from toLiteral must be a string, not {str(maybeValue)}")
+			self._setLiteral(maybeValue)
 
 	@cached_property
 	def parameters(self) -> typing.Optional[Parameters]:
@@ -210,9 +191,5 @@ class Expression(EntityExpression):
 		return Parameters(element=self.element, NestedElementType=Expression)
 
 	@cached_property
-	def parametersResolved(self) -> ResolvedParameters:
-		return ResolvedParameters(element=self.element, nestedKind="argument_resolved")
-
-	@cached_property
-	def parametersExpectedResolved(self) -> ResolvedParameters:
-		return ResolvedParameters(element=self.element, nestedKind="argument_expected", allowMultiVarArgs=True)
+	def parametersResolved(self) -> ParametersResolved:
+		return ParametersResolved(element=self.element, NestedElementType=Expression, param="argument_resolved", expected="argument_expected")

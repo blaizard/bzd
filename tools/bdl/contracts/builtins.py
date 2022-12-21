@@ -23,7 +23,7 @@ def getValueFromSingleParameter_(resolver, typeFQN: str, value: typing.Any, defa
 			if value.parametersResolved.size() == 0:
 				return defaultValue
 			elif value.parametersResolved.size() == 1:
-				return value.parametersResolved[0].literal
+				return value.parametersResolved[0].param.literal
 			raise Exception(f"There are too many initializers for '{typeFQN}', only 1 is expected:\n{value.parametersResolved}")
 
 	return value

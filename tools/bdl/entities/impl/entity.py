@@ -53,7 +53,7 @@ class Entity:
 		copySelf.element = self.element.copy()
 		return copySelf
 
-	def toLiteral(self, args: typing.Any) -> typing.Optional[str]:
+	def toLiteral(self, args: typing.Dict[str, "EntityExpression"]) -> typing.Optional[str]:
 		"""Given the input parameters, generate the underlying literal of this object."""
 		return None
 

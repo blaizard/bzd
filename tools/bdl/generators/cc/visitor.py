@@ -7,6 +7,7 @@ from tools.bdl.visitors.composition.visitor import Composition, AsyncType
 from tools.bdl.object import Object
 from tools.bdl.entities.all import Namespace, Using, Expression
 from tools.bdl.entities.impl.fragment.type import Type
+from tools.bdl.entities.impl.fragment.parameters_resolved import ParametersResolvedItem
 
 from tools.bdl.generators.cc.types import typeToStr as typeToStrOriginal
 from tools.bdl.generators.cc.values import valueToStr as valueToStrOriginal
@@ -96,8 +97,8 @@ class Transform:
 	def commentEmbeddedToStr(self, comment: str) -> str:
 		return commentEmbeddedToStrOriginal(comment=comment)
 
-	def commentParametersResolvedToStr(self, expression: Expression) -> str:
-		return commentParametersResolvedToStrOriginal(expression=expression)
+	def commentParametersResolvedToStr(self, item: ParametersResolvedItem) -> str:
+		return commentParametersResolvedToStrOriginal(item=item)
 
 	# FQNs
 

@@ -184,8 +184,8 @@ class Parameters(ParametersCommon):
 		if nestedKind:
 			sequence = self.element.getNestedSequence(nestedKind)
 			if sequence:
+				from tools.bdl.entities.impl.entity import EntityExpression
 				for index, e in enumerate(sequence):
-					from tools.bdl.entities.impl.entity import EntityExpression
 					if filterFct is not None and not filterFct(EntityExpression(e)):
 						continue
 					# We must construct the NestedElementType only after filtering as
