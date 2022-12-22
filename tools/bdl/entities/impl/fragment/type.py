@@ -6,7 +6,8 @@ from bzd.parser.visitor import VisitorDepthFirst as VisitorDepthFirstBase
 from bzd.parser.error import Error
 
 from tools.bdl.entities.impl.fragment.contract import Contracts
-from tools.bdl.entities.impl.fragment.parameters import Parameters, ResolvedParameters
+from tools.bdl.entities.impl.fragment.parameters import Parameters
+from tools.bdl.entities.impl.fragment.parameters_resolved import ParametersResolved
 
 if typing.TYPE_CHECKING:
 	from tools.bdl.entities.all import EntityType
@@ -82,7 +83,7 @@ class Type:
 				message=f"Type '{self.kind}' does not support template type arguments.")
 		else:
 
-			self.templates.mergeDefaults(defaults=configTypes)
+			self.templates.makeParametersResolved(name=self.templateAttr, resolver=resolver, expected=configTypes)
 
 			# Validate the template arguments
 			values = self.templates.getValuesOrTypesAsDict(resolver=resolver, varArgs=False)
@@ -90,11 +91,6 @@ class Type:
 			assert validation, "Cannot be empty, already checked by the condition."
 			resultValidate = validation.validate(values, output="return")
 			self.assertTrue(condition=bool(resultValidate), message=str(resultValidate))
-
-			# Save the resolved template only after the validation is completed.
-			sequence = self.templates.toResolvedSequence(resolver=resolver, varArgs=False)
-			ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence(f"{self.templateAttr}_resolved",
-				sequence)
 
 		# Resolve contract
 		self.contracts.resolve(underlying.contracts)
@@ -134,8 +130,9 @@ class Type:
 		return Parameters(element=self.element, NestedElementType=Using, nestedKind=self.templateAttr)
 
 	@cached_property
-	def templateResolved(self) -> ResolvedParameters:
-		return ResolvedParameters(element=self.element, nestedKind=f"{self.templateAttr}_resolved")
+	def templateResolved(self) -> ParametersResolved:
+		from tools.bdl.entities.impl.using import Using
+		return ParametersResolved(element=self.element, NestedElementType=Using, param=f"{self.templateAttr}_resolved", expected=f"{self.templateAttr}_expected")
 
 	@property
 	def category(self) -> str:
@@ -254,7 +251,7 @@ class Visitor(VisitorDepthFirstBase[typing.List[str], str]):
 
 		return value
 
-	def visitType(self, entity: Type, nested: typing.List[str], parameters: ResolvedParameters) -> str:
+	def visitType(self, entity: Type, nested: typing.List[str], parameters: ParametersResolved) -> str:
 		"""
 		Called when an element needs to be formatted.
 		"""

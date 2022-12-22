@@ -4,13 +4,12 @@ from pathlib import Path
 from tools.bdl.object import Object
 from tools.bdl.entities.all import Namespace
 from tools.bdl.entities.impl.fragment.type import Type, Visitor as VisitorType
-from tools.bdl.entities.impl.fragment.parameters import ResolvedParameters
+from tools.bdl.entities.impl.fragment.parameters_resolved import ParametersResolved
 from bzd.template.template import Template
-
 
 class _VisitorType(VisitorType):
 
-	def visitType(self, entity: Type, nested: typing.List[str], parameters: ResolvedParameters) -> str:
+	def visitType(self, entity: Type, nested: typing.List[str], parameters: ParametersResolved) -> str:
 		output = entity.kind
 		if entity.const:
 			output = "const {}".format(output)

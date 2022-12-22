@@ -246,16 +246,17 @@ class Parameters(ParametersCommon):
 
 		return sequence
 
+	def makeParametersResolved(self, name: str, resolver: "Resolver", expected: "Parameters") -> None:
+		"""Create and resolve the parametersResolved given expected parameters."""
 
-class ResolvedParameters(ParametersCommon):
+		# Merge its default values
+		self.mergeDefaults(defaults=expected)
 
-	def __init__(self, element: Element, nestedKind: typing.Optional[str], allowMultiVarArgs: bool = False) -> None:
+		# Save the resolved parameters before the validation is completed. This is because
+		# it might make use of the parametersResolved.
+		sequenceValues = self.toResolvedSequence(resolver=resolver, varArgs=False)
+		ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence(f"{name}_resolved", sequenceValues)
 
-		super().__init__(element=element)
-
-		if nestedKind is not None:
-			sequence = self.element.getNestedSequence(nestedKind)
-			if sequence:
-				from tools.bdl.entities.impl.expression import Expression
-				for index, e in enumerate(sequence):
-					self.append(Expression(e), allowMultiVarArgs=allowMultiVarArgs)
+		sequence = expected.toResolvedSequence(resolver=resolver, varArgs=True)
+		sequence += [sequence[-1]] * (len(sequenceValues) - len(sequence)) if expected.isVarArgs else []
+		ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence(f"{name}_expected", sequence)
