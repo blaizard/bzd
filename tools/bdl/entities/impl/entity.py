@@ -255,7 +255,7 @@ class Entity:
 		return Parameters(element=self.element, NestedElementType=Expression)
 
 	def makeValidation(self, resolver: typing.Any, parameters: Parameters,
-		forTemplate: bool) -> typing.Optional[Validation[SchemaDict]]:
+		forTemplate: bool) -> Validation[SchemaDict]:
 		"""
 		Generate the validation object.
 		"""
@@ -274,17 +274,16 @@ class Entity:
 				return Validation(schema=schema, args={"resolver": resolver})
 			except Exception as e:
 				self.error(message=str(e))
-		return None
 
-	def makeValidationForTemplate(self, resolver: typing.Any, parameters: Parameters) -> typing.Optional[
-		Validation[SchemaDict]]:
+		return Validation(schema={}, args={"resolver": resolver})
+
+	def makeValidationForTemplate(self, resolver: typing.Any, parameters: Parameters) -> Validation[SchemaDict]:
 		"""
 		Generate the validation object for template parameters.
 		"""
 		return self.makeValidation(resolver=resolver, parameters=parameters, forTemplate=True)
 
-	def makeValidationForValues(self, resolver: typing.Any, parameters: Parameters) -> typing.Optional[
-		Validation[SchemaDict]]:
+	def makeValidationForValues(self, resolver: typing.Any, parameters: Parameters) -> Validation[SchemaDict]:
 		"""
 		Generate the validation object for value parameters.
 		"""
