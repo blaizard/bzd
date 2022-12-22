@@ -86,11 +86,10 @@ class Type:
 			self.templates.makeParametersResolved(name=self.templateAttr, resolver=resolver, expected=configTypes)
 
 			# Validate the template arguments
-			values = self.templates.getValuesOrTypesAsDict(resolver=resolver, varArgs=False)
 			validation = underlying.makeValidationForTemplate(resolver=resolver, parameters=configTypes)
-			assert validation, "Cannot be empty, already checked by the condition."
-			resultValidate = validation.validate(values, output="return")
-			self.assertTrue(condition=bool(resultValidate), message=str(resultValidate))
+			arguments = self.templates.getValuesOrTypesAsDict(resolver=resolver, varArgs=False)
+			result = validation.validate(arguments, output="return")
+			self.assertTrue(condition=bool(result), message=str(result))
 
 		# Resolve contract
 		self.contracts.resolve(underlying.contracts)

@@ -158,8 +158,6 @@ class Expression(EntityExpression):
 
 		# Read the validation for the values and evaluate it.
 		validation = self.makeValidationForValues(resolver=resolver, parameters=expectedParameters)
-		if validation is None:
-			validation = Validation(schema={}, args={"resolver": resolver})
 		arguments = parameters.getValuesOrTypesAsDict(resolver=resolver, varArgs=False)
 		result = validation.validate(arguments, output="return")
 		Error.assertTrue(element=self.element, attr="type", condition=bool(result), message=str(result))
