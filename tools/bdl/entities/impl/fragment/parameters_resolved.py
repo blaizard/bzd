@@ -31,7 +31,7 @@ class ParametersResolvedItem:
 class ParametersResolved:
 
 	def __init__(self, element: Element, NestedElementType: typing.Type["EntityExpression"], param: str, expected: str) -> None:
-		"""Construct the ResolvedParameters object.
+		"""Construct the ParametersResolved object.
 		
 		Args:
 			element: The element associated with these resolved parameters.
@@ -41,8 +41,8 @@ class ParametersResolved:
 		self.element = element
 		self.list: typing.List[ParametersResolvedItem] = []
 
-		paramSequence = self.element.getNestedSequence(param)
-		expectedSequence = self.element.getNestedSequence(expected)
+		paramSequence = self.element.getNestedSequenceOrEmpty(param)
+		expectedSequence = self.element.getNestedSequenceOrEmpty(expected)
 		for (paramElement, expectedElement) in zip(paramSequence, expectedSequence):
 			self.list.append(ParametersResolvedItem(NestedElementType(paramElement), NestedElementType(expectedElement)))
 

@@ -9,7 +9,7 @@ from tools.bdl.contracts.validation import Validation, SchemaDict
 from tools.bdl.contracts.contract import Contract
 from tools.bdl.entities.impl.fragment.type import Type
 from tools.bdl.entities.impl.fragment.contract import Contracts
-from tools.bdl.entities.impl.fragment.parameters import Parameters, ResolvedParameters
+from tools.bdl.entities.impl.fragment.parameters import Parameters
 from tools.bdl.entities.impl.fragment.parameters_resolved import ParametersResolved
 from tools.bdl.entities.impl.fragment.fqn import FQN
 from tools.bdl.entities.impl.entity import Entity, EntityExpression, Role
@@ -143,9 +143,10 @@ class Expression(EntityExpression):
 		parameters: Parameters) -> None:
 		"""Resolve and validate tthe parameters passed into argument."""
 
-		# Merge its default values
-		argumentConfig = self.getConfigValues(resolver=resolver)
-		parameters.mergeDefaults(defaults=argumentConfig)
+		# Make the resolved parameters before the validation is completed. This is because
+		# it might make use of the parametersResolved.
+		expectedParameters = self.getConfigValues(resolver=resolver)
+		parameters.makeParametersResolved(name="argument", resolver=resolver, expected=expectedParameters)
 
 		# Validate the type of arguments.
 		parameterTypeCategories = {*parameters.getUnderlyingTypeCategories(resolver)}
@@ -155,26 +156,15 @@ class Expression(EntityExpression):
 				in [TypeCategory.component, TypeCategory.method, TypeCategory.builtin],
 				message=f"Components are not allowed for this type '{typeCategory}'.")
 
-		# Save the resolved parameters before the validation is completed. This is because
-		# itself might use the parametersResolved.
-		argumentValues = parameters.copy()
-		sequenceValues = argumentValues.toResolvedSequence(resolver=resolver, varArgs=False)
-		ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("argument_resolved", sequenceValues)
-
-		configValues = argumentConfig.copy()
-		sequence = configValues.toResolvedSequence(resolver=resolver, varArgs=True)
-		sequence += [sequence[-1]] * (len(sequenceValues) - len(sequence)) if configValues.isVarArgs else []
-		ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("argument_expected", sequence)
-
-		# Read the validation for the value. it comes in part from the direct underlying type, contract information
-		# directly associated with this expression do not apply to the current validation.
-
-		validation = self.makeValidationForValues(resolver=resolver, parameters=argumentConfig)
+		# Read the validation for the values and evaluate it.
+		validation = self.makeValidationForValues(resolver=resolver, parameters=expectedParameters)
 		if validation is None:
 			validation = Validation(schema={}, args={"resolver": resolver})
 		arguments = parameters.getValuesOrTypesAsDict(resolver=resolver, varArgs=False)
 		result = validation.validate(arguments, output="return")
 		Error.assertTrue(element=self.element, attr="type", condition=bool(result), message=str(result))
+
+		# Compute and set the literal value if any.
 		maybeValue = resolvedTypeEntity.toLiteral(result.values)
 		if maybeValue is not None:
 			self.assertTrue(condition=isinstance(maybeValue, str), message=f"The returned value from toLiteral must be a string, not {str(maybeValue)}")
