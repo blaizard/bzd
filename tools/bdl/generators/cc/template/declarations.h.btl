@@ -83,11 +83,6 @@ Args:
 	{%- end -%}
 {%- end -%}
 
-{#- Parameters -#}
-{%- macro declareParameters(parameters, type) -%}
-	{%- for i, expression in parameters %}{% if i %}, {% end %}{{ declareExpression(expression, type) }}{% end -%}
-{% end -%}
-
 {#- Parameters for call -#}
 {%- macro declareParametersCall(parameters) -%}
 	{%- for i, expression in parameters %}{% if i %}, {% end %}{{ expression.name }}{% end -%}
@@ -121,7 +116,11 @@ Args:
 For example:
 ```c++
 void myFunction(bzd::MyType& a, const OtherType& b)
-```-#}
+```
+Note: methods do not have optional parameters, they are feed by the method callee.-#}
 {%- macro declareMethod(method) -%}
-{{ method.type | typeToStr }} {{ method.name }}({{ declareParameters(method.parameters, "reference") }})
+{{ method.type | typeToStr }} {{ method.name }}(
+	{%- for i, item in method.parameters %}{% if i %}, {% end -%}
+		{{- item.type | typeReferenceToStr }} {{ item.name }}
+	{%-end -%})
 {%- end -%}
