@@ -10,10 +10,7 @@ def commentBlockToStr(comment: typing.Optional[str]) -> str:
 
 	if comment is None:
 		return ""
-	commentSplit = comment.split("\n")
-	if len(commentSplit) > 1:
-		return "/*\n{comment}\n */\n".format(comment="\n".join([" * {}".format(line) for line in commentSplit]))
-	return "// {comment}\n".format(comment=comment)
+	return "".join([f"// {c}\n" for c in comment.split("\n")])
 
 
 def commentEmbeddedToStr(comment: typing.Optional[str]) -> str:
@@ -24,7 +21,7 @@ def commentEmbeddedToStr(comment: typing.Optional[str]) -> str:
 	if comment is None:
 		return ""
 	commentSplit = comment.split("\n")
-	return "/* {comment} */".format(comment=" ".join(commentSplit))
+	return f"/* {commentSplit} */"
 
 
 def commentParametersResolvedToStr(item: ParametersResolvedItem) -> str:
@@ -32,4 +29,4 @@ def commentParametersResolvedToStr(item: ParametersResolvedItem) -> str:
 	Create an inline comment from a parameter resolved entry.
 	"""
 
-	return "/*{}*/".format(item.name)
+	return f"/*{item.name}*/"

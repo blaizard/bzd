@@ -133,16 +133,17 @@ public:
 	struct Config
 	{
 	{% for i, item in expression.parametersResolved %}
-
-		{% if item.param.isLiteral %}
-		static constexpr auto {{ item.name }}{ {{- item.param.literal -}} };
-		{% elif item.isLValue %}
-		LVALUE {{ item.name }}
-		{% elif item.isRValue %}
-			RVALUE {{ item.name }}
+		{{ item.comment | commentBlockToStr }}
+		{%- if item.param.isLiteral -%}
+		static constexpr {{item.type | typeToStr}} {{ item.name }}{ {{- item.param.literal -}} };
+		{%- elif item.isLValue -%}
+		{{item.type | typeReferenceToStr}} {{ item.name }};
+		{%- elif item.isRValue -%}
+		{{item.type | typeToStr}} {{ item.name }};
 		{% else %}
 			{{ btl.unreachable() }}
 		{% end %}
+
 	{% end %}
 	};
 

@@ -5,6 +5,7 @@ from bzd.parser.error import Error
 
 if typing.TYPE_CHECKING:
 	from tools.bdl.entities.impl.entity import EntityExpression
+	from tools.bdl.entities.impl.fragment.type import Type
 
 class ParametersResolvedItem:
 	"""Entry contained in the resolved parameters list."""
@@ -19,6 +20,14 @@ class ParametersResolvedItem:
 	@property
 	def name(self) -> str:
 		return self.expected.name
+
+	@property
+	def type(self) -> "Type":
+		return self.expected.type
+
+	@property
+	def comment(self) -> typing.Optional[str]:
+		return self.expected.comment if self.param.comment is None else self.param.comment
 
 	@property
 	def isRValue(self) -> bool:
