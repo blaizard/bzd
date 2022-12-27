@@ -239,8 +239,8 @@ def makeGrammarExtern() -> Grammar:
 	"""
 
 	return [
-		GrammarItem(r"extern", {"category": "extern"}, [
-		GrammarItem(r"(?P<type>(:?interface|type))", Fragment,
+		GrammarItem(r"extern", {"extern": "true"}, [
+		GrammarItem(r"(?P<category>(:?interface|struct))", Fragment,
 		[GrammarItem(_regexprName, Fragment, [GrammarItem(r";", FragmentNewElement)])])
 		])
 	]

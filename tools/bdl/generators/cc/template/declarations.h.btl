@@ -88,7 +88,7 @@ Args:
 	{%- for i, expression in parameters %}{% if i %}, {% end %}{{ expression.name }}{% end -%}
 {% end -%}
 
-{#- Nested structure -#}
+{#- Structure -#}
 {%- macro declareStruct(element) %}
 {{ element.comment | commentBlockToStr }}struct {{ element.name }}{% if element.hasInheritance %} : {{ element.inheritanceList | inheritanceToStr }}{% end %}
 {
@@ -102,12 +102,14 @@ Args:
 {#- Build types -#}
 {%- macro declareTrivialTypes(trivialTypes) %}
 	{% for data in trivialTypes %}
-		{% if data.category == "using" %}
+		{% if not data.isExtern %}
+			{% if data.category == "using" %}
 {{ data.comment | commentBlockToStr }}using {{ data.name }} = {{ data.type | typeToStr }};
-		{% elif data.category == "enum" %}
+			{% elif data.category == "enum" %}
 {{ declareEnum(data) }}
-		{% elif data.category == "struct" %}
+			{% elif data.category == "struct" %}
 {{ declareStruct(data) }}
+			{% end %}
 		{% end %}
 	{% end %}
 {% end -%}
@@ -117,7 +119,8 @@ For example:
 ```c++
 void myFunction(bzd::MyType& a, const OtherType& b)
 ```
-Note: methods do not have optional parameters, they are feed by the method callee.-#}
+Note: methods do not have optional parameters, they are feed by the method callee, this is because
+it gives a restriction to optional parameters to be put only at the end.-#}
 {%- macro declareMethod(method) -%}
 {{ method.type | typeToStr }} {{ method.name }}(
 	{%- for i, item in method.parameters %}{% if i %}, {% end -%}

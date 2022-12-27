@@ -1,18 +1,12 @@
 use "cc/components/posix/proactor/interface.bdl"
+use "cc/bzd/platform/interfaces/stream.bdl"
 
 namespace bzd.platform.posix;
 
-
-interface DummyIn {
-	
-}
-
-component In : DummyIn {
+component In : bzd.IStream {
 interface:
 	
 config:
-	proactor = Void;
+	proactor = Proactor;
 	
 }
-
-

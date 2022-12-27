@@ -14,7 +14,7 @@ class ParametersResolvedItem:
 		self.param =  param
 		self.expected =  expected
 
-		# All expected element must have a name.
+		# All expected element must have a name and a type.
 		Error.assertHasAttr(element=self.expected.element, attr="name")
 
 	@property
@@ -36,6 +36,12 @@ class ParametersResolvedItem:
 	@property
 	def isLValue(self) -> bool:
 		return self.param.isLValue
+
+	def error(self, message: str, element: typing.Optional[Element] = None, throw: bool = True) -> str:
+		return Error.handleFromElement(element=self.param.element if element is None else element, message=message, throw=throw)
+
+	def assertTrue(self, condition: bool, message: str, element: typing.Optional[Element] = None, throw: bool = True) -> typing.Optional[str]:
+		return Error.assertTrue(condition=condition, element=self.param.element if element is None else element, message=message, throw=throw)
 
 class ParametersResolved:
 

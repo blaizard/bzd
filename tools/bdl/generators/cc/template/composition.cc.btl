@@ -104,14 +104,14 @@ protected:
 
 namespace bzd::platform::backend {
 {% for fqn, expression in platform %}
-static ::{{ expression.interfaceTypeResolved | typeDefinitionToStr }}* {{ expression.name }}{nullptr};
+static ::{{ expression.interfaceTypeResolved | typeToStr }}* {{ expression.name }}{nullptr};
 {% end %}
 } // bzd::platform::backend
 
 namespace bzd::platform {
 
 {% for fqn, expression in platform %}
-[[nodiscard]] ::{{ expression.interfaceTypeResolved | typeDefinitionToStr }}& {{ expression.name }}() noexcept
+[[nodiscard]] ::{{ expression.interfaceTypeResolved | typeToStr }}& {{ expression.name }}() noexcept
 {
 	return *::bzd::platform::backend::{{ expression.name }};
 }
@@ -134,16 +134,7 @@ public:
 	{
 	{% for i, item in expression.parametersResolved %}
 		{{ item.comment | commentBlockToStr }}
-		{%- if item.param.isLiteral -%}
-		static constexpr {{item.type | typeToStr}} {{ item.name }}{ {{- item.param.literal -}} };
-		{%- elif item.isLValue -%}
-		{{item.type | typeReferenceToStr}} {{ item.name }};
-		{%- elif item.isRValue -%}
-		{{item.type | typeToStr}} {{ item.name }};
-		{% else %}
-			{{ btl.unreachable() }}
-		{% end %}
-
+		{{- paramToDefinition(item) }}
 	{% end %}
 	};
 
