@@ -104,11 +104,3 @@ class EntitySequence:
 	@property
 	def useList(self) -> typing.List["Use"]:
 		return typing.cast(typing.List["Use"], self._filteredList("use"))
-
-	@property
-	def isExtern(self) -> bool:
-		return self._is("extern")
-
-	@property
-	def externList(self) -> typing.List["Extern"]:
-		return typing.cast(typing.List["Extern"], self._filteredList("extern"))

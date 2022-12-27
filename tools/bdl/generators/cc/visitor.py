@@ -10,7 +10,7 @@ from tools.bdl.entities.impl.fragment.type import Type
 from tools.bdl.entities.impl.fragment.parameters_resolved import ParametersResolvedItem
 
 from tools.bdl.generators.cc.types import typeToStr as typeToStrOriginal
-from tools.bdl.generators.cc.values import valueToStr as valueToStrOriginal
+from tools.bdl.generators.cc.values import valuesToStr as valuesToStrOriginal, valuesToList
 from tools.bdl.generators.cc.comments import commentBlockToStr as commentBlockToStrOriginal, commentEmbeddedToStr as commentEmbeddedToStrOriginal, commentParametersResolvedToStr as commentParametersResolvedToStrOriginal
 from tools.bdl.generators.cc.fqn import fqnToStr as fqnToStrOriginal, fqnToAdapterStr as fqnToAdapterStrOriginal, fqnToNameStr as fqnToNameStrOriginal
 
@@ -84,10 +84,22 @@ class Transform:
 		return typeToStrOriginal(entity=entity,
 			registry=self.composition.registry.keys() if self.composition else None)  # type: ignore
 
+	# ParameterResolvedItem related
+
+	def paramToDefinition(self, item: ParametersResolvedItem) -> str:
+
+		if item.param.isLiteral:
+			return f"static constexpr {typeToStrOriginal(item.type)} {item.name}{{{item.param.literal}}};"
+		elif item.isLValue:
+			return f"{typeToStrOriginal(item.type, reference=True, referenceForInterface=True)} {item.name};"
+		elif item.isRValue:
+			return f"{typeToStrOriginal(item.type, referenceForInterface=True, values=valuesToList(item.param))} {item.name};"
+		item.error(message="Type not supported, should never happen.")
+
 	# Expression related
 
 	def valueToRValue(self, entity: Expression) -> str:
-		return valueToStrOriginal(entity=entity)
+		return valuesToStrOriginal(entity=entity)
 
 	# Comments
 

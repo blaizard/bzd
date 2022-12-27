@@ -36,7 +36,8 @@ namespace {{ namespace | namespaceToStr }}
 {{- declareTrivialTypes(sequence) -}}
 
 {% for data in nestedList %}
-	{% if data.category == "interface" %}
+	{% if not data.isExtern %}
+		{% if data.category == "interface" %}
 
 // ==== Interface {{ data.name }}
 template <class Impl>
@@ -47,17 +48,17 @@ public: // Types
 
 public: // Methods
 
-	{% for method in data.interface.methodList %}
+			{% for method in data.interface.methodList %}
 	{{ method.comment | commentBlockToStr }}{% if method.isType %}[[nodiscard]] {% end %}{{ declareMethod(method) }} noexcept
 	{
 		return ::bzd::impl::getImplementation(this, &{{ data.name }}::{{ method.name }}, &Impl::{{ method.name }})->{{ method.name }}({{ declareParametersCall(method.parameters) }});
 	}
 
-	{% end %}
+			{% end %}
 
 public: // Variable accessors.
 
-	{% for var in data.interface.expressionList %}
+			{% for var in data.interface.expressionList %}
 	// Getter for the variable '{{ var.name }}'.
 	{{ var.comment | commentBlockToStr -}}
 	// \return The value of '{{ var.name }}'.
@@ -66,9 +67,10 @@ public: // Variable accessors.
 		return static_cast<Impl*>(this)->{{ var.name }};
 	}
 
-	{% end %}
+			{% end %}
 };
 
+		{%- end -%}
 	{%- end -%}
 
 {%- end %}
@@ -79,7 +81,7 @@ public: // Variable accessors.
 
 namespace bzd
 {
-{% for data in btl.merge(nestedList, externList) %}
+{% for data in nestedList %}
 	{% if data.category == "interface" %}
 template <>
 struct Interface<"{{ data.fqn }}">
@@ -93,14 +95,16 @@ struct Interface<"{{ data.fqn }}">
 	{% end %}
 {% end %}
 {% for data in nestedList %}
-	{% if data.category in btl.set("component", "interface") %}
-		{% for var in data.interface.expressionList %}
+	{% if not data.isExtern %}
+		{% if data.category in btl.set("component", "interface") %}
+			{% for var in data.interface.expressionList %}
 template <>
 struct Data<"{{ var.fqn }}">
 {
 	using Type = {{ var.type | typeNonConstToStr }};
 	static UInt32 id;
 };
+			{% end %}
 		{% end %}
 	{% end %}
 {% end %}

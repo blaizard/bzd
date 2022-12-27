@@ -149,6 +149,10 @@ class Entity:
 		return set()
 
 	@property
+	def isExtern(self) -> bool:
+		return self.element.isAttr("extern")
+
+	@property
 	def isInterface(self) -> bool:
 		return self.element.isNestedSequence("interface")
 

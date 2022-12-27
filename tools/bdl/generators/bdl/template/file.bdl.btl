@@ -50,22 +50,24 @@ composition:
 
 {%- macro declareSymbols(data) %}
 	{% for entity in data %}
-		{% if entity.category == "using" %}
+		{% if not entity.isExtern %}
+			{% if entity.category == "using" %}
 {{ declareUsing(entity) }}
-		{% elif entity.category == "enum" %}
+			{% elif entity.category == "enum" %}
 {{ declareEnum(entity) }}
-		{% elif entity.category == "method" %}
+			{% elif entity.category == "method" %}
 {{ declareMethod(entity) }}
-		{% elif entity.category == "struct" %}
+			{% elif entity.category == "struct" %}
 {{ declareNested(entity) }}
-		{% elif entity.category == "interface" %}
+			{% elif entity.category == "interface" %}
 {{ declareNested(entity) }}
-		{% elif entity.category == "component" %}
+			{% elif entity.category == "component" %}
 {{ declareNested(entity) }}
-		{% elif entity.category == "composition" %}
+			{% elif entity.category == "composition" %}
 {{ declareNested(entity) }}
-		{% elif entity.category == "expression" %}
+			{% elif entity.category == "expression" %}
 {{ declareExpression(entity) }};
+			{% end %}
 		{% end %}
 	{% end %}
 {% end -%}
@@ -80,8 +82,10 @@ use "{{ use.path }}"
 namespace {{ entity | namespaceToStr }};
 {% end %}
 
-{% for extern in externList %}
-{{ extern.comment | normalComment }}extern {{ extern.type }} {{ extern.name }};
+{% for extern in sequence %}
+	{% if entity.isExtern %}
+{{ extern.comment | normalComment }}extern {{ extern.category }} {{ extern.name }};
+	{% end %}
 {% end %}
 
 {{ declareSymbols(sequence) }}
