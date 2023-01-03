@@ -30,10 +30,10 @@ struct DefaultPolicies
 	using IndexType = bzd::Size;
 	using DifferenceType = bzd::Int32;
 
-	static constexpr void increment(T*& data) noexcept { ++data; }
-	static constexpr void decrement(T*& data) noexcept { --data; }
-	static constexpr void increment(T*& data, const int n) noexcept { data += n; }
-	static constexpr void decrement(T*& data, const int n) noexcept { data -= n; }
+	static constexpr void increment(auto*& data) noexcept { ++data; }
+	static constexpr void decrement(auto*& data) noexcept { --data; }
+	static constexpr void increment(auto*& data, const int n) noexcept { data += n; }
+	static constexpr void decrement(auto*& data, const int n) noexcept { data -= n; }
 	static constexpr auto& at(auto* data, const Size n) noexcept { return data[n]; }
 };
 

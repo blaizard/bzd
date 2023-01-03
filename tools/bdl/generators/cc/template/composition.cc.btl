@@ -136,7 +136,7 @@ public:
 		{{ paramsConstructorDefinition("Config", expression.parametersResolved) }}
 	{% for index, item in expression.parametersResolved %}
 		{{ item.comment | commentBlockToStr }}
-		[[maybe_unused]] {{- paramToDefinition(item, index) }}
+		{{- paramToDefinition(item, index) }}
 	{% end %}
 	};
 
@@ -166,7 +166,7 @@ protected:
 {
 	// Definition of all registry entries.
 	{% for fqn, expresssion in registry %}
-	static ResourceSpecialization<"{{ fqn }}">::Config config_{{ fqn | fqnToNameStr }}{ {{- paramsDeclaration(expresssion.parametersResolved) -}} };
+	static const ResourceSpecialization<"{{ fqn }}">::Config config_{{ fqn | fqnToNameStr }}{ {{- paramsDeclaration(expresssion.parametersResolved) -}} };
 	static {{ expresssion.typeResolved | typeDefinitionToStr }} {{ fqn | fqnToNameStr }}{config_{{ fqn | fqnToNameStr }}};
 	{% end %}
 

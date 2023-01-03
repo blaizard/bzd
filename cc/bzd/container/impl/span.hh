@@ -43,17 +43,9 @@ protected:
 	using IsDataConst = bzd::typeTraits::IsConst<ValueType>;
 
 	template <class V, class S>
-	struct DefaultPolicies //: public bzd::iterator::impl::DefaultPolicies<V>
+	struct DefaultPolicies : public bzd::iterator::impl::DefaultPolicies<V>
 	{
-		using ValueType = V;
 		using StorageValueType = S;
-		using IndexType = bzd::Size;
-		using DifferenceType = bzd::Int32;
-
-		static constexpr void increment(StorageValueType*& data) noexcept { ++data; }
-		static constexpr void decrement(StorageValueType*& data) noexcept { --data; }
-		static constexpr void increment(StorageValueType*& data, const int n) noexcept { data += n; }
-		static constexpr void decrement(StorageValueType*& data, const int n) noexcept { data -= n; }
 		static constexpr auto& at(auto* data, const Size n) noexcept { return StorageType::storageToValue(data[n]); }
 	};
 
@@ -149,7 +141,7 @@ public: // Accessors
 
 public: // Modifiers
 	template <class... Args>
-	constexpr void emplace(iterator::Contiguous<ValueType> position, Args&&... args) noexcept
+	constexpr void emplace(ConstIterator position, Args&&... args) noexcept
 	{
 		position->~ValueType();
 		::new (&(*position)) ValueType{bzd::forward<Args>(args)...};

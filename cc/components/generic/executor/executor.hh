@@ -85,8 +85,10 @@ private:
 			{
 				break;
 			}
-			const auto index = 0; //config_.cores.find(core);
-			bzd::assert::isTrue(index != bzd::npos, "Core must be registered.");
+			// Get the index of the core in the array.
+			const auto it = bzd::algorithm::findIf(config_.cores, [&core](auto& value) { return &core == &value; });
+			bzd::assert::isTrue(it != config_.cores.end(), "Core must be registered.");
+			const auto index = bzd::distance(config_.cores.begin(), it);
 			runCore = idle(index, core);
 		} while (runCore);
 	}
@@ -104,7 +106,6 @@ private:
 
 private:
 	Config& config_;
-	//bzd::Array<bzd::platform::Core*, Config::cores::capacity()> cores_;
 	bzd::coroutine::impl::Executor executor_;
 	bzd::Atomic<bzd::Size> workloadCount_{0};
 };

@@ -27,7 +27,11 @@ private:
 	using Self = Core<Config>;
 
 public:
-	explicit Core(const Config) noexcept : core_id_{0} {}
+	explicit Core(const Config) noexcept : core_id_{0}
+	{
+		bzd::ignore = Config::priority;
+		bzd::ignore = Config::name;
+	}
 
 	~Core() noexcept
 	{
