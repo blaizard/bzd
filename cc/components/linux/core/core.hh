@@ -20,14 +20,14 @@
 
 namespace bzd::platform::linux {
 
-template <Size stackSize>
+template <class Config>
 class Core : public bzd::platform::Core
 {
 private:
-	using Self = Core<stackSize>;
+	using Self = Core<Config>;
 
 public:
-	explicit Core(const CoreId core_id, const float) noexcept : core_id_{core_id} {}
+	explicit Core(const Config) noexcept : core_id_{0} {}
 
 	~Core() noexcept
 	{
@@ -48,7 +48,7 @@ public:
 				return bzd::error::Errno("sysconf");
 			}
 
-			const Size actualSize = bzd::alignUp(stackSize, alignment);
+			const Size actualSize = bzd::alignUp(Config::stackSize, alignment);
 			void* memory = nullptr;
 			if (const auto result = ::posix_memalign(&memory, alignment, actualSize); result != 0)
 			{

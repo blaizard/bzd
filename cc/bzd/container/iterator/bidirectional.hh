@@ -9,6 +9,7 @@ class Bidirectional : public impl::ClassTraits<Bidirectional, T, CRTP, Policies,
 {
 private:
 	using Traits = impl::ClassTraits<Bidirectional, T, CRTP, Policies, Forward>;
+	using StorageValueType = typename Policies::StorageValueType;
 
 public: // Traits
 	using Self = typename Traits::Self;
@@ -20,7 +21,7 @@ public: // Traits
 	static constexpr auto category = typeTraits::IteratorCategory::bidirectional;
 
 public: // Constructors
-	constexpr Bidirectional(ValueType* data) noexcept : Parent{data} {}
+	constexpr Bidirectional(StorageValueType* data) noexcept : Parent{data} {}
 
 public: // Copy/move constructors/assignments
 	Bidirectional(const Bidirectional&) = default;

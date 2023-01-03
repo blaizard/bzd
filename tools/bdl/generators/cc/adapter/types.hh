@@ -12,6 +12,14 @@
 
 namespace bzd {
 
+template <class T, Size capacity>
+class ArrayFactory : public bzd::Array<T, capacity>
+{
+public:
+	template <class... Args>
+	constexpr ArrayFactory(Args&&... args) noexcept : bzd::Array<T, capacity>{bzd::inPlace, bzd::forward<Args>(args)...} {}
+};
+
 /// Interfaces accessor.
 template <bzd::meta::StringLiteral fqn>
 struct Interface;

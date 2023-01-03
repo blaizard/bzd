@@ -8,11 +8,11 @@
 #include <unistd.h>
 
 namespace bzd::platform::posix {
-template <class Proactor>
+template <class Config>
 class In : public bzd::IStream
 {
 public: // Constructors
-	constexpr In(Proactor& proactor) noexcept : proactor_{proactor}
+	constexpr In(Config& config) noexcept : config_{config}
 	{
 		// Check if the terminal is available from this process
 		if (::tcgetpgrp(in_.native()) != ::getpgrp())
@@ -50,11 +50,11 @@ public: // API
 		{
 			co_return bzd::error::Failure("No terminal."_csv);
 		}
-		co_return (co_await proactor_.read(in_, bzd::move(data)));
+		co_return (co_await config_.proactor.read(in_, bzd::move(data)));
 	}
 
 private:
-	Proactor& proactor_;
+	Config& config_;
 	bzd::Bool init_{false};
 	termios old_{};
 	termios current_{};

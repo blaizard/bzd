@@ -9,15 +9,14 @@
 
 namespace bzd::platform::generic {
 
-template <Size n>
-class Executor : public bzd::platform::Executor<Executor<n>>
+template <class Config>
+class Executor : public bzd::platform::Executor<Executor<Config>>
 {
 public:
-	using Self = Executor<n>;
+	using Self = Executor<Config>;
 
 public:
-	template <class... Cores>
-	constexpr Executor(Cores&... cores) noexcept : cores_{inPlace, &cores...}, executor_{}
+	constexpr Executor(Config& config) noexcept : config_{config}, executor_{}
 	{
 	}
 
@@ -38,9 +37,9 @@ public:
 	bzd::Result<void, bzd::Error> start() noexcept
 	{
 		const auto run = bzd::FunctionRef<void(bzd::platform::Core&)>::toMember<Self, &Self::run>(*this);
-		for (auto core : cores_)
+		for (auto& core : config_.cores)
 		{
-			if (auto result = core->start(run); !result)
+			if (auto result = core.start(run); !result)
 			{
 				return bzd::move(result).propagate();
 			}
@@ -51,9 +50,9 @@ public:
 	/// Stop the executor.
 	bzd::Result<void, bzd::Error> stop() noexcept
 	{
-		for (auto core : cores_)
+		for (auto& core : config_.cores)
 		{
-			if (auto result = core->stop(); !result)
+			if (auto result = core.stop(); !result)
 			{
 				return bzd::move(result).propagate();
 			}
@@ -86,7 +85,7 @@ private:
 			{
 				break;
 			}
-			const auto index = cores_.find(&core);
+			const auto index = 0; //config_.cores.find(core);
 			bzd::assert::isTrue(index != bzd::npos, "Core must be registered.");
 			runCore = idle(index, core);
 		} while (runCore);
@@ -104,12 +103,10 @@ private:
 	}
 
 private:
-	bzd::Array<bzd::platform::Core*, n> cores_;
+	Config& config_;
+	//bzd::Array<bzd::platform::Core*, Config::cores::capacity()> cores_;
 	bzd::coroutine::impl::Executor executor_;
 	bzd::Atomic<bzd::Size> workloadCount_{0};
 };
-
-template <class... Cores>
-Executor(Cores&...) -> Executor<sizeof...(Cores)>;
 
 } // namespace bzd::platform::generic

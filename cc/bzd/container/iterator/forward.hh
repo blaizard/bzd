@@ -4,6 +4,7 @@
 #include "cc/bzd/type_traits/conditional.hh"
 #include "cc/bzd/type_traits/is_same.hh"
 #include "cc/bzd/type_traits/iterator.hh"
+#include "cc/bzd/type_traits/remove_reference.hh"
 
 namespace bzd::iterator {
 
@@ -25,6 +26,7 @@ template <class T>
 struct DefaultPolicies
 {
 	using ValueType = T;
+	using StorageValueType = T;
 	using IndexType = bzd::Size;
 	using DifferenceType = bzd::Int32;
 
@@ -42,6 +44,7 @@ class Forward : public typeTraits::IteratorBase
 {
 private:
 	using Traits = impl::ClassTraits<Forward, T, CRTP, Policies>;
+	using StorageValueType = typename Policies::StorageValueType;
 
 public: // Traits
 	using Self = typename Traits::Self;
@@ -52,7 +55,7 @@ public: // Traits
 	static constexpr auto category = typeTraits::IteratorCategory::forward;
 
 public: // Constructors
-	constexpr Forward(ValueType* data) noexcept : data_{data} {}
+	constexpr Forward(StorageValueType* data) noexcept : data_{data} {}
 
 public: // Copy/move constructors/assignments
 	Forward(const Forward&) = default;
@@ -81,9 +84,9 @@ public: // API
 
 	[[nodiscard]] constexpr ValueType& operator*() const noexcept { return Policies::at(data_, 0); }
 
-	[[nodiscard]] constexpr ValueType* operator->() const noexcept { return &Policies::at(data_, 0); }
+	[[nodiscard]] constexpr bzd::typeTraits::RemoveReference<ValueType>* operator->() const noexcept { return &Policies::at(data_, 0); }
 
 protected:
-	ValueType* data_{nullptr};
+	StorageValueType* data_{nullptr};
 };
 } // namespace bzd::iterator

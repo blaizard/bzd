@@ -65,6 +65,10 @@ class Async(Builtin):
 	def __init__(self) -> None:
 		super().__init__(ElementBuilder("builtin").setAttr("name", "Async").addConfigType(name="Value", kind="Any").addConfigType(name="Error", kind="Any"))
 
+class Array(Builtin):
+	def __init__(self) -> None:
+		super().__init__(ElementBuilder("builtin").setAttr("name", "Array").addConfigType(kind="Any", name="Type", contract="mandatory").addConfigValue(name="values...", kind="Any"))
+
 class Vector(Builtin):
 	def __init__(self) -> None:
 		super().__init__(ElementBuilder("builtin").setAttr("name", "Vector").addConfigType(kind="Any", name="Type", contract="mandatory").addConfigValue(name="values...", kind="Any"))
@@ -74,5 +78,5 @@ class Callable(Builtin):
 		super().__init__(ElementBuilder("builtin").setAttr("name", "Callable"))
 
 Builtins = [
-	Void(), Any(), Integer(), Float(), Boolean(), Byte(), String(), Result(), Async(), Vector(), Callable()
+	Void(), Any(), Integer(), Float(), Boolean(), Byte(), String(), Result(), Async(), Array(), Vector(), Callable()
 ]

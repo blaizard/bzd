@@ -12,6 +12,8 @@ public:
 	using Self = ResizeableStorage<T, capacity>;
 	using ValueType = const T;
 	using ValueMutableType = T;
+	using StorageValueType = const T;
+	using StorageValueMutableType = T;
 
 public: // Constructors
 	// Default/copy/move constructor/assignment.
@@ -31,6 +33,7 @@ public: // Accessors
 	constexpr ValueMutableType* dataMutable() noexcept { return data_; }
 	constexpr bzd::Size size() const noexcept { return size_; }
 	constexpr bzd::Size& sizeMutable() noexcept { return size_; }
+	static constexpr auto& storageToValue(auto& data) noexcept { return data; }
 
 private:
 	T data_[(capacity == 0) ? 1 : capacity]{};

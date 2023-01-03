@@ -9,6 +9,7 @@ class Contiguous : public impl::ClassTraits<Contiguous, T, CRTP, Policies, Rando
 {
 private:
 	using Traits = impl::ClassTraits<Contiguous, T, CRTP, Policies, RandomAccess>;
+	using StorageValueType = typename Policies::StorageValueType;
 
 public: // Traits
 	using Self = typename Traits::Self;
@@ -19,7 +20,7 @@ public: // Traits
 	static constexpr auto category = typeTraits::IteratorCategory::contiguous;
 
 public: // Constructors
-	constexpr Contiguous(ValueType* data) noexcept : Parent{data} {}
+	constexpr Contiguous(StorageValueType* data) noexcept : Parent{data} {}
 
 public: // Copy/move constructors/assignments
 	Contiguous(const Contiguous&) = default;

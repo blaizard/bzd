@@ -97,15 +97,16 @@ class StringType:
 	toType = "bzd::StringView"
 
 
-class VectorType:
+class ArrayType:
 
+	name = "ArrayFactory"
 	constexpr = False
 
-	@staticmethod
-	def toType(entity: Type, nested: typing.List[str], reference: bool, values: typing.Optional[typing.Sequence[str]]) -> TypeConversionCallableReturn:
+	@classmethod
+	def toType(cls, entity: Type, nested: typing.List[str], reference: bool, values: typing.Optional[typing.Sequence[str]]) -> TypeConversionCallableReturn:
 
 		if reference:
-			return "bzd::interface::Vector", nested
+			return f"bzd::interface::{cls.name}", nested
 		maybeContractCapacity = entity.contracts.get("capacity")
 		if maybeContractCapacity is None:
 			if values is None:
@@ -115,8 +116,10 @@ class VectorType:
 				nested.append(f"{len(values)}u")
 		else:
 			nested.append("{:d}u".format(int(maybeContractCapacity.valueNumber)))
-		return "bzd::Vector", nested
+		return f"bzd::{cls.name}", nested
 
+class VectorType(ArrayType):
+	name = "Vector"
 
 builtins: typing.Dict[str, typing.Any] = {
 	"Integer": IntegerType,
@@ -125,6 +128,7 @@ builtins: typing.Dict[str, typing.Any] = {
 	"Byte": Byte,
 	"String": StringType,
 	"Span": SpanType,
+	"Array": ArrayType,
 	"Vector": VectorType,
 	"Result": ResultType,
 	"Callable": CallableType
