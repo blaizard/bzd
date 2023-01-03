@@ -22,6 +22,9 @@ public:
 	using posix::sync::Proactor::connect;
 	using posix::sync::Proactor::write;
 
+	template <class Config>
+	constexpr Proactor(Config&) noexcept {}
+
 public:
 	bzd::Async<> init() noexcept;
 

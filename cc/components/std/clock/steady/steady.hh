@@ -7,6 +7,9 @@ namespace bzd::platform::std::clock {
 class Steady : public bzd::Clock
 {
 public:
+	template <class Config>
+	constexpr Steady(Config&) noexcept {}
+
 	ClockTick getTicks() noexcept override;
 
 	ClockTick msToTicks(const bzd::units::Millisecond time) noexcept override;

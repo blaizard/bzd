@@ -34,24 +34,41 @@ template <class T, class Storage>
 class Span
 {
 protected:
-	using ValueType = T;
 	using StorageType = Storage;
-	using Self = Span<ValueType, StorageType>;
+	using ValueType = typename StorageType::ValueType;
+	using ValueMutableType = typename StorageType::ValueMutableType;
+	using StorageValueType = typename StorageType::StorageValueType;
+	using StorageValueMutableType = typename StorageType::StorageValueMutableType;
+	using Self = Span<T, StorageType>;
 	using IsDataConst = bzd::typeTraits::IsConst<ValueType>;
-	using StorageValueType = typename StorageType::ValueType;
-	using StorageValueMutableType = typename StorageType::ValueMutableType;
+
+	template <class V, class S>
+	struct DefaultPolicies //: public bzd::iterator::impl::DefaultPolicies<V>
+	{
+		using ValueType = V;
+		using StorageValueType = S;
+		using IndexType = bzd::Size;
+		using DifferenceType = bzd::Int32;
+
+		static constexpr void increment(StorageValueType*& data) noexcept { ++data; }
+		static constexpr void decrement(StorageValueType*& data) noexcept { --data; }
+		static constexpr void increment(StorageValueType*& data, const int n) noexcept { data += n; }
+		static constexpr void decrement(StorageValueType*& data, const int n) noexcept { data -= n; }
+		static constexpr auto& at(auto* data, const Size n) noexcept { return StorageType::storageToValue(data[n]); }
+	};
 
 public:
-	using ConstIterator = bzd::iterator::Contiguous<StorageValueType>;
-	using Iterator = bzd::iterator::Contiguous<StorageValueMutableType>;
+	using ConstIterator = bzd::iterator::Contiguous<ValueType, void, DefaultPolicies<ValueType, StorageValueType>>;
+	using Iterator = bzd::iterator::Contiguous<ValueMutableType, void, DefaultPolicies<ValueMutableType, StorageValueMutableType>>;
 
 public: // Constructor/assignment
 	// Default/copy/move constructor/assignment.
-	constexpr Span() noexcept = default;
-	constexpr Span(const Self&) noexcept = default;
-	constexpr Self& operator=(const Self&) noexcept = default;
-	constexpr Span(Self&&) noexcept = default;
-	constexpr Self& operator=(Self&&) noexcept = default;
+	Span() = default;
+	Span(const Self&) = default;
+	Self& operator=(const Self&) = default;
+	Span(Self&&) = default;
+	Self& operator=(Self&&) = default;
+	~Span() = default;
 
 	constexpr Span(const Storage& storage) noexcept : storage_{storage} {}
 

@@ -130,11 +130,13 @@ template <>
 class ResourceSpecialization<"{{ fqn }}">
 {
 public:
+	{{ paramsTemplateDefinition(expression.parametersResolved) }}
 	struct Config
 	{
-	{% for i, item in expression.parametersResolved %}
+		{{ paramsConstructorDefinition("Config", expression.parametersResolved) }}
+	{% for index, item in expression.parametersResolved %}
 		{{ item.comment | commentBlockToStr }}
-		{{- paramToDefinition(item) }}
+		[[maybe_unused]] {{- paramToDefinition(item, index) }}
 	{% end %}
 	};
 
@@ -164,7 +166,8 @@ protected:
 {
 	// Definition of all registry entries.
 	{% for fqn, expresssion in registry %}
-	static {{ expresssion.typeResolved | typeDefinitionToStr }} {{ fqn | fqnToNameStr }}{ {{- declareParametersResolvedRValues(expresssion, false) -}} };
+	static ResourceSpecialization<"{{ fqn }}">::Config config_{{ fqn | fqnToNameStr }}{ {{- paramsDeclaration(expresssion.parametersResolved) -}} };
+	static {{ expresssion.typeResolved | typeDefinitionToStr }} {{ fqn | fqnToNameStr }}{config_{{ fqn | fqnToNameStr }}};
 	{% end %}
 
 	// Declaration of the registry.

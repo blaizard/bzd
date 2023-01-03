@@ -9,6 +9,7 @@ class RandomAccess : public impl::ClassTraits<RandomAccess, T, CRTP, Policies, B
 {
 private:
 	using Traits = impl::ClassTraits<RandomAccess, T, CRTP, Policies, Bidirectional>;
+	using StorageValueType = typename Policies::StorageValueType;
 
 public: // Traits
 	using Self = typename Traits::Self;
@@ -20,7 +21,7 @@ public: // Traits
 	static constexpr auto category = typeTraits::IteratorCategory::randomAccess;
 
 public: // Constructors
-	constexpr RandomAccess(ValueType* data) noexcept : Parent{data} {}
+	constexpr RandomAccess(StorageValueType* data) noexcept : Parent{data} {}
 
 public: // Copy/move constructors/assignments
 	RandomAccess(const RandomAccess&) = default;

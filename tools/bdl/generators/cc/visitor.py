@@ -7,7 +7,7 @@ from tools.bdl.visitors.composition.visitor import Composition, AsyncType
 from tools.bdl.object import Object
 from tools.bdl.entities.all import Namespace, Using, Expression
 from tools.bdl.entities.impl.fragment.type import Type
-from tools.bdl.entities.impl.fragment.parameters_resolved import ParametersResolvedItem
+from tools.bdl.entities.impl.fragment.parameters_resolved import ParametersResolved, ParametersResolvedItem
 
 from tools.bdl.generators.cc.types import typeToStr as typeToStrOriginal
 from tools.bdl.generators.cc.values import valuesToStr as valuesToStrOriginal, valuesToList
@@ -86,15 +86,59 @@ class Transform:
 
 	# ParameterResolvedItem related
 
-	def paramToDefinition(self, item: ParametersResolvedItem) -> str:
+	def paramsConstructorDefinition(self, name: str, params: ParametersResolved) -> str:
+		args = []
+		assigns = []
+		for index, item in enumerate(params):
+			if item.param.isLiteral:
+				pass
+			elif item.isLValue:
+				args.append(f"T{index}& {item.name}_")
+				assigns.append(f"{item.name}{{{item.name}_}}")
+			elif item.isRValue:
+				args.append(f"T{index}&& {item.name}_")
+				assigns.append(f"{item.name}{{bzd::move({item.name}_)}}")
+		if not args:
+			return f"{name}() noexcept = default;"
+		return f"constexpr {name}({', '.join(args)}) noexcept : {', '.join(assigns)} {{}}"
+
+	def paramsTemplateDefinition(self, params: ParametersResolved) -> str:
+		args = []
+		for index, item in enumerate(params):
+			if not item.param.isLiteral:
+				args.append(f"class T{index}")
+		if not args:
+			return ""
+		return f"template <{', '.join(args)}>"
+
+	def paramToDefinition(self, item: ParametersResolvedItem, index: int) -> str:
 
 		if item.param.isLiteral:
 			return f"static constexpr {typeToStrOriginal(item.type)} {item.name}{{{item.param.literal}}};"
 		elif item.isLValue:
-			return f"{typeToStrOriginal(item.type, reference=True, referenceForInterface=True)} {item.name};"
+			return f"T{index}& {item.name};"
 		elif item.isRValue:
-			return f"{typeToStrOriginal(item.type, referenceForInterface=True, values=valuesToList(item.param))} {item.name};"
+			return f"T{index} {item.name};"
 		item.error(message="Type not supported, should never happen.")
+
+	def paramToValue(self, item: ParametersResolvedItem) -> str:
+
+		if item.param.isLiteral:
+			return f"{typeToStrOriginal(item.type)}{{{item.param.literal}}}"
+		elif item.isLValue:
+			return f"{item.param.type}"
+		elif item.isRValue:
+			return f"{typeToStrOriginal(item.type, referenceForInterface=True, values=valuesToList(item.param))}{{{self.paramsDeclaration(params=item.param.parametersResolved, excludeLiterals=False)}}}"
+		item.error(message="Type not supported, should never happen.")
+
+	def paramsDeclaration(self, params: ParametersResolved, excludeLiterals: bool = True) -> str:
+		args = []
+		for item in params:
+			if item.param.isLiteral and excludeLiterals:
+				continue
+			args.append(self.paramToValue(item))
+
+		return ", ".join(args)
 
 	# Expression related
 

@@ -16,6 +16,8 @@ public:
 	using SelfNonConst = NonOwningStorage<bzd::typeTraits::RemoveConst<T>>;
 	using ValueType = T;
 	using ValueMutableType = T;
+	using StorageValueType = T;
+	using StorageValueMutableType = T;
 
 public: // Constructors
 	// Default/copy/move constructor/assignment.
@@ -39,6 +41,7 @@ public: // Accessors
 	constexpr ValueMutableType* dataMutable() noexcept { return data_; }
 	constexpr bzd::Size size() const noexcept { return size_; }
 	constexpr bzd::Size& sizeMutable() noexcept { return size_; }
+	static constexpr auto& storageToValue(auto& data) noexcept { return data; }
 
 public: // Modifier
 	constexpr void removePrefix(const Size n) noexcept
