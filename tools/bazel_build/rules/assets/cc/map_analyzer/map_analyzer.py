@@ -32,7 +32,14 @@ def generateBerkeleyConfig(
 	"""
 
 	filterConfig: FilterConfigType = []
-	aggregateConfig: AggregateConfigType = {"text": [], "data": [], "bss": []}
+	aggregateConfig: AggregateConfigType = {
+		# text/code segment.
+		"text": [],
+		# data segment: typically contains initallized variables.
+		"data": [],
+		# block starting symbol: typically contains uninitallized variables.
+		"bss": []
+	}
 
 	FLAG_SHF_WRITE = 0x1
 	FLAG_SHF_ALLOC = 0x2
@@ -116,6 +123,12 @@ if __name__ == '__main__':
 		data = ParserType(args.map)
 		if data.parse():
 			break
+
+	# Remove some of the sections, which are known to be special.
+	# Thread local sections that overlaps other section such as .init_array, see:
+	# https://stackoverflow.com/questions/25501044/gcc-ld-overlapping-sections-tbss-init-array-in-statically-linked-elf-bin
+	data.filter(".tbss")
+	data.filter(".tdata")
 
 	# Analyze the data
 	analyze(data)

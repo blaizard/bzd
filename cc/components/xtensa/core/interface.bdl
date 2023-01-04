@@ -3,7 +3,7 @@ use "cc/bzd/platform/interfaces/core.bdl"
 namespace bzd.platform.esp32;
 
 
-// Core abstraction on Linux operating system.
+// Core abstraction for Xtensa CPU.
 component Core : bzd.platform.Core {
 interface:
 	
