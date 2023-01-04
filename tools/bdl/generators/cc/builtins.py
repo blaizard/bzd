@@ -99,7 +99,7 @@ class StringType:
 
 class ArrayType:
 
-	name = "ArrayFactory"
+	name = "Array"
 	constexpr = False
 
 	@classmethod
@@ -116,6 +116,8 @@ class ArrayType:
 				nested.append(f"{len(values)}u")
 		else:
 			nested.append("{:d}u".format(int(maybeContractCapacity.valueNumber)))
+		if values is not None:
+			values.insert(0, "bzd::inPlace")
 		return f"bzd::{cls.name}", nested
 
 class VectorType(ArrayType):

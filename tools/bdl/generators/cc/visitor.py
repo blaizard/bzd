@@ -10,7 +10,7 @@ from tools.bdl.entities.impl.fragment.type import Type
 from tools.bdl.entities.impl.fragment.parameters_resolved import ParametersResolved, ParametersResolvedItem
 
 from tools.bdl.generators.cc.types import typeToStr as typeToStrOriginal
-from tools.bdl.generators.cc.values import valuesToStr as valuesToStrOriginal, valuesToList
+from tools.bdl.generators.cc.value import valueToStr as valueToStrOriginal
 from tools.bdl.generators.cc.comments import commentBlockToStr as commentBlockToStrOriginal, commentEmbeddedToStr as commentEmbeddedToStrOriginal, commentParametersResolvedToStr as commentParametersResolvedToStrOriginal
 from tools.bdl.generators.cc.fqn import fqnToStr as fqnToStrOriginal, fqnToAdapterStr as fqnToAdapterStrOriginal, fqnToNameStr as fqnToNameStrOriginal
 
@@ -121,29 +121,26 @@ class Transform:
 			return f"T{index} {item.name};"
 		item.error(message="Type not supported, should never happen.")
 
-	def paramToValue(self, item: ParametersResolvedItem) -> str:
+	def paramsDeclaration(self, params: ParametersResolved, isRegistry: bool = False) -> str:
+		"""Declare inline parameters.
+		
+		Args:
+			isRegistry: Use registry variable instead of direct variables.
+		"""
+		registry = self.composition.registry.keys() if self.composition and isRegistry else None
+		symbols = self.composition.symbols if self.composition else None
+		return ", ".join([valueToStrOriginal(item, symbols=symbols, registry=registry) for item in params])
 
-		if item.param.isLiteral:
-			return f"{typeToStrOriginal(item.type)}{{{item.param.literal}}}"
-		elif item.isLValue:
-			return f"{item.param.type}"
-		elif item.isRValue:
-			return f"{typeToStrOriginal(item.type, referenceForInterface=True, values=valuesToList(item.param))}{{{self.paramsDeclaration(params=item.param.parametersResolved, excludeLiterals=False)}}}"
-		item.error(message="Type not supported, should never happen.")
-
-	def paramsDeclaration(self, params: ParametersResolved, excludeLiterals: bool = True) -> str:
-		args = []
+	def paramsFilterOutLiterals(self, params: ParametersResolved) -> typing.Iterator[ParametersResolved]:
 		for item in params:
-			if item.param.isLiteral and excludeLiterals:
+			if item.param.isLiteral:
 				continue
-			args.append(self.paramToValue(item))
-
-		return ", ".join(args)
+			yield item
 
 	# Expression related
 
 	def valueToRValue(self, entity: Expression) -> str:
-		return valuesToStrOriginal(entity=entity)
+		return valueToStrOriginal(entity=entity)
 
 	# Comments
 

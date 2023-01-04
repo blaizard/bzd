@@ -25,6 +25,9 @@ namespace example {
 class Hello
 {
 public:
+	template <class Config>
+	constexpr explicit Hello(Config&) noexcept {}
+
 	bzd::Async<> run();
 
 	// Getter for input:
