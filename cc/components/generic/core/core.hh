@@ -13,7 +13,8 @@ private:
 	using Self = Core;
 
 public:
-	explicit Core() noexcept {}
+	template <class Config>
+	constexpr explicit Core(const Config&) noexcept {}
 
 	void init() {}
 

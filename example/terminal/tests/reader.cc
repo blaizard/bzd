@@ -6,7 +6,8 @@
 
 TEST_ASYNC(Reader, readUntil)
 {
-	bzd::platform::generic::stream::Stub out{};
+	struct Config {};
+	bzd::platform::generic::stream::Stub out{Config{}};
 	bzd::test::IStream<16> mock{};
 	bzd::Reader<16> reader{mock, out};
 

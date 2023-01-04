@@ -8,6 +8,9 @@ namespace bzd::platform::esp32::clock {
 class Xthal : public bzd::Clock
 {
 public:
+	template <class Config>
+	constexpr explicit Xthal(const Config&) noexcept {}
+
 	ClockTick getTicks() noexcept override;
 
 	ClockTick msToTicks(const bzd::units::Millisecond time) noexcept override;

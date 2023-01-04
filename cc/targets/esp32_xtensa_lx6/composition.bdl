@@ -13,7 +13,7 @@ composition {
 	core0 = bzd.platform.esp32.Core(stackSize = 16000, name = "core[0]", cpu = 0, priority = 50);
 	// Core 1 is the "application CPU", hence it should have the highest priority.
 	core1 = bzd.platform.esp32.Core(stackSize = 16000, name = "core[1]", cpu = 1, priority = 100);
-	executor = bzd.platform.generic.Executor(core0, core1);
+	executor = bzd.platform.generic.Executor(cores = list(core0, core1));
 	
 }
 
@@ -24,5 +24,3 @@ composition platform {
 	systemClock: bzd.Clock = bzd.platform.generic.clock.Null();
 	
 }
-
-

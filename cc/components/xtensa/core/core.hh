@@ -13,16 +13,16 @@
 
 namespace bzd::platform::esp32 {
 
-template <Size stackSize>
+template <class Config>
 class Core : public bzd::platform::Core
 {
 private:
-	using Self = Core<stackSize>;
+	using Self = Core<Config>;
 	static constexpr bzd::Byte freertosStackTaintingByte{0xa5};
 
 public:
-	constexpr Core(const bzd::StringView name, const bzd::UInt8 cpu, const bzd::UInt8 priority) noexcept :
-		name_{name}, cpu_{cpu}, priority_{priority}
+	constexpr Core(const Config& config) noexcept :
+		config_{config}
 	{
 	}
 
@@ -39,13 +39,13 @@ public:
 		}
 		// Create the task and make sure the operation is successful. This will immediatly run the task.
 		handle_ = xTaskCreateStaticPinnedToCore(workloadWrapper,
-												name_.data(),
+												Config::name.data(),
 												stack_.size() / sizeof(StackType_t),
 												static_cast<void*>(this),
 												getFreeRTOSPriority(),
 												reinterpret_cast<StackType_t*>(stack_.data()),
 												&tcb_,
-												cpu_);
+												Config::cpu);
 		if (!handle_)
 		{
 			return bzd::error::Failure("xTaskCreateStatic"_csv);
@@ -62,7 +62,7 @@ public:
 		}
 		vSemaphoreDelete(mutex_);
 
-		::std::cout << "Stack usage: " << getStackUsage() << " / " << stackSize << ::std::endl;
+		::std::cout << "Stack usage: " << getStackUsage() << " / " << Config::stackSize << ::std::endl;
 
 		return bzd::nullresult;
 	}
@@ -79,7 +79,7 @@ private:
 		// In freeRTOS context:
 		// - 0 is the lowest priority.
 		// - configMAX_PRIORITIES - 1 is the highest priority.
-		return (configMAX_PRIORITIES - 1) * priority_ / 100;
+		return (configMAX_PRIORITIES - 1) * Config::priority / 100;
 	}
 
 	static void workloadWrapper(void* object)
@@ -95,10 +95,8 @@ private:
 	}
 
 private:
-	const bzd::StringView name_;
-	const bzd::UInt8 cpu_;
-	const bzd::UInt8 priority_;
-	bzd::Stack<stackSize, alignof(StackType_t)> stack_{};
+	const Config& config_;
+	bzd::Stack<Config::stackSize, alignof(StackType_t)> stack_{};
 	bzd::Optional<bzd::FunctionRef<void(bzd::platform::Core&)>> workload_{};
 	TaskHandle_t handle_{};
 	StaticTask_t tcb_{};
