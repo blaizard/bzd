@@ -46,6 +46,7 @@ cc_library(
         "//cc/bzd/type_traits:conditional",
         "//cc/bzd/type_traits:is_same",
         "//cc/bzd/type_traits:iterator",
+        "//cc/bzd/type_traits:remove_reference",
     ],
 )
 

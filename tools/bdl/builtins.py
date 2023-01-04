@@ -77,6 +77,10 @@ class Callable(Builtin):
 	def __init__(self) -> None:
 		super().__init__(ElementBuilder("builtin").setAttr("name", "Callable"))
 
+class List(Builtin):
+	def __init__(self) -> None:
+		super().__init__(ElementBuilder("builtin").setAttr("name", "list").addConfigValue(name="values...", kind="Any"))
+
 Builtins = [
-	Void(), Any(), Integer(), Float(), Boolean(), Byte(), String(), Result(), Async(), Array(), Vector(), Callable()
+	Void(), Any(), Integer(), Float(), Boolean(), Byte(), String(), Result(), Async(), Array(), Vector(), Callable(), List()
 ]

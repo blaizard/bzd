@@ -6,6 +6,7 @@
 #include "cc/bzd/utility/forward.hh"
 #include "cc/bzd/utility/in_place.hh"
 #include "cc/bzd/utility/min.hh"
+#include "cc/bzd/type_traits/conditional.hh"
 #include "cc/bzd/container/reference_wrapper.hh"
 
 namespace bzd::impl {

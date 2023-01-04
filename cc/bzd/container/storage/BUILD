@@ -40,6 +40,7 @@ cc_library(
         "//cc/bzd/utility:forward",
         "//cc/bzd/utility:in_place",
         "//cc/bzd/utility:min",
-        "//cc/bzd/container:reference_wrapper"
+        "//cc/bzd/container:reference_wrapper",
+        "//cc/bzd/type_traits:conditional",
     ],
 )
