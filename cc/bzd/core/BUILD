@@ -11,7 +11,6 @@ bzd_cc_library(
         ":error",
         ":print",
         ":units",
-        ":value",
         "//cc/bzd/core/assert",
         "//cc/bzd/core/async",
         "//cc/bzd/core/logger",
@@ -133,12 +132,4 @@ cc_library(
         "//cc/bzd/container:named_type",
         "//cc/bzd/platform:types",
     ],
-)
-
-cc_library(
-    name = "value",
-    hdrs = [
-        "value.hh",
-    ],
-    visibility = ["//visibility:public"],
 )

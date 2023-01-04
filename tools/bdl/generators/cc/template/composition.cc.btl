@@ -164,9 +164,9 @@ protected:
 
 [[nodiscard]] auto makeRegistry() noexcept
 {
-	// Definition of all registry entries.
+	// Definition of all registry entries and their configuration.
 	{% for fqn, expresssion in registry %}
-	static const ResourceSpecialization<"{{ fqn }}">::Config config_{{ fqn | fqnToNameStr }}{ {{- paramsDeclaration(expresssion.parametersResolved) -}} };
+	static const ResourceSpecialization<"{{ fqn }}">::Config config_{{ fqn | fqnToNameStr }}{ {{- paramsDeclaration(expresssion.parametersResolved | paramsFilterOutLiterals) -}} };
 	static {{ expresssion.typeResolved | typeDefinitionToStr }} {{ fqn | fqnToNameStr }}{config_{{ fqn | fqnToNameStr }}};
 	{% end %}
 
@@ -231,7 +231,7 @@ bool execute() noexcept
 	// {{ expression.type | typeRegistryToStr }}
 	auto async_{{loop.parent.index}}_{{ loop.index }} = [&]() -> bzd::Async<> {
 		{{ callInitMembers(expression) }}
-		co_await !{{ expression.type | typeRegistryToStr }}( {{- declareParametersResolvedRValues(expression, true) -}} );
+		co_await !{{ expression.type | typeRegistryToStr }}( {{- paramsDeclaration(expression.parametersResolved, true) -}} );
 		{{ callShutdownMembers(expression) }}
 		co_return {};
 	};
