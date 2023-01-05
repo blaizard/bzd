@@ -27,6 +27,13 @@ class ParametersResolvedItem:
 		return self.expected.type
 
 	@property
+	def sameType(self) -> bool:
+		"""If the expected and param types are the same."""
+		if self.expected.isType and self.param.isType:
+			return self.expected.type == self.param.type
+		return False
+
+	@property
 	def comment(self) -> typing.Optional[str]:
 		return self.expected.comment if self.param.comment is None else self.param.comment
 

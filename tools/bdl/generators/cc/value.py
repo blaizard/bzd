@@ -5,7 +5,6 @@ from tools.bdl.generators.cc.fqn import fqnToNameStr
 from tools.bdl.generators.cc.comments import commentParametersResolvedToStr
 from tools.bdl.entities.impl.fragment.parameters_resolved import ParametersResolvedItem
 from tools.bdl.visitors.symbol_map import SymbolMap
-from tools.bdl.entities.impl.fragment.type import Type
 
 def valueToStr(item: ParametersResolvedItem, symbols: typing.Optional[SymbolMap] = None, registry: typing.Optional[typing.Sequence[str]] = None, includeComment: bool = True) -> str:
 	"""Convert an item object into a C++ string.
@@ -18,17 +17,21 @@ def valueToStr(item: ParametersResolvedItem, symbols: typing.Optional[SymbolMap]
 
 	item.assertTrue(condition=item.param.isRoleValue, message=f"'valueToStr' only applies to item with role values, not '{item}'.")
 
-	def bindTypeAndValue(type: Type, values: typing.List[str]) -> str:
-		"""Convert a pair type/value into the output value."""
+	def bindTypeAndValue(values: typing.List[str]) -> str:
+		"""Associate a value with its type."""
 
-		typeStr = typeToStr(item.type, referenceForInterface=True, values=values)
-		valuesStr = ", ".join(values)
-		if typeStr == "":
-			return valuesStr
-		return f"{typeStr}{{{valuesStr}}}"
+		paramTypeStr = typeToStr(item.param.type, referenceForInterface=True, values=values) if item.param.isType else ""
+		paramValues = values if paramTypeStr == "" else [f"{paramTypeStr}{{{', '.join(values)}}}"]
+
+		# If the types (param and expected) are the same, return already.
+		if item.sameType:
+			return ", ".join(paramValues)
+
+		expectedTypeStr = typeToStr(item.expected.type, referenceForInterface=True, values=paramValues) if item.expected.isType else ""
+		return ", ".join(paramValues) if expectedTypeStr == "" else f"{expectedTypeStr}{{{', '.join(paramValues)}}}"
 
 	if item.param.isLiteral:
-		value = bindTypeAndValue(item.type, [item.param.literal])
+		value = bindTypeAndValue([item.param.literal])
 	elif item.isLValue:
 		fqn = item.param.underlyingValueFQN
 		value = fqnToNameStr(fqn)
@@ -43,7 +46,7 @@ def valueToStr(item: ParametersResolvedItem, symbols: typing.Optional[SymbolMap]
 				value = f"bzd::Interface<\"{expectedType}\">::cast({value})"
 	elif item.isRValue:
 		values = [valueToStr(item=i, symbols=symbols, registry=registry) for i in item.param.parametersResolved]
-		value = bindTypeAndValue(item.type, values)
+		value = bindTypeAndValue(values)
 	else:
 		item.error(message="Type not supported, should never happen.")
 

@@ -101,6 +101,11 @@ class AnyType:
 	constexpr = True
 	toType = ""
 
+class ListType:
+
+	constexpr = True
+	toType = ""
+
 class ArrayType:
 
 	name = "Array"
@@ -129,6 +134,7 @@ class VectorType(ArrayType):
 
 builtins: typing.Dict[str, typing.Any] = {
 	"Any": AnyType,
+	"list": ListType,
 	"Integer": IntegerType,
 	"Float": FloatType,
 	"Void": VoidType,
