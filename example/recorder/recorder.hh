@@ -44,22 +44,15 @@ public:
 namespace bzd {
 
 template <bzd::meta::StringLiteral name>
-struct Record;
-
-template <>
-struct Record<"hello">
-{
-	using Type = char;
-	static UInt32 id;
-};
+struct Data;
 
 class Recorder
 {
 public:
 	template <bzd::meta::StringLiteral name>
-	void publish(typename Record<name>::Type&& value) noexcept
+	void publish(typename bzd::Data<name>::Type&& value) noexcept
 	{
-		const auto id = Record<name>::id;
+		const auto id = bzd::Data<name>::id;
 		bzd::serialize(string_, id);
 		bzd::serialize(string_, value);
 	}
