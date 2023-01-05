@@ -121,7 +121,7 @@ class Transform:
 			return f"T{index} {item.name};"
 		item.error(message="Type not supported, should never happen.")
 
-	def paramsDeclaration(self, params: ParametersResolved, isRegistry: bool = False) -> str:
+	def paramsDeclarationToList_(self, params: ParametersResolved, isRegistry: bool = False) -> typing.List[str]:
 		"""Declare inline parameters.
 
 		Args:
@@ -130,7 +130,10 @@ class Transform:
 		"""
 		registry = self.composition.registry.keys() if self.composition and isRegistry else None
 		symbols = self.composition.symbols if self.composition else None
-		return ", ".join([valueToStrOriginal(item, symbols=symbols, registry=registry) for item in params])
+		return [valueToStrOriginal(item, symbols=symbols, registry=registry) for item in params]
+
+	def paramsDeclaration(self, params: ParametersResolved, isRegistry: bool = False) -> str:
+		return ", ".join(self.paramsDeclarationToList_(params=params, isRegistry=isRegistry))
 
 	def paramsFilterOutLiterals(self, params: ParametersResolved) -> typing.Iterator[ParametersResolved]:
 		for item in params:
@@ -142,6 +145,24 @@ class Transform:
 
 	def expressionToValue(self, entity: Expression) -> str:
 		return valueToStrOriginal(item=entity.toParametersResolvedItem())
+
+	def expressionToDefinition(self, entity: Expression) -> str:
+		"""
+		normal           -> int myvar{value}
+		no default value -> int myvar
+		unamed           -> int{value}
+		"""
+		output = ""
+		values = self.paramsDeclarationToList_(
+			params=entity.parametersResolved) if entity.parametersResolved.size() else []
+		entity.assertTrue(condition=entity.isType, message="An expression declaration must have a type.")
+		output += f" {typeToStrOriginal(entity.type, referenceForInterface=True, values=values)}"
+		if entity.isName:
+			output += f" {entity.name}"
+		if values:
+			output += f"{{{', '.join(values)}}}"
+
+		return output
 
 	# Comments
 

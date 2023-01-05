@@ -9,80 +9,6 @@
 };
 {% end -%}
 
-{#- Expressions
-	normal           -> /* comment */ int myvar = int{value}
-	no default value -> /* comment */ int myvar
-	unamed           -> /* comment */ int{value}
-	unamed literal   -> /* comment */ 12
-	literal          -> /* comment */ myvar = 12
-
-	Used when:
-	- Define a variable.
-	- Define parameter list of a function.
-
-	type can be:
-		"reference"
-		"nonConst"	
--#}
-{%- macro declareExpression(element, type) -%}
-	{{ element.comment | commentEmbeddedToStr }}
-	{%- if element.isType -%}
-	{% if element.isName %}
-		{%- if type == "reference" -%}
-			{{- element.type | typeReferenceToStr }}
-		{%- elif type == "nonConst" -%}
-			{{- element.type | typeNonConstToStr -}}
-		{%- else -%}
-			{{- element.type | typeToStr -}}
-		{% end %} {{ element.name }}{% end %}{% if element.parametersResolved.size() > 0 %} = {{ element.type | typeNonConstToStr }}{ {{- declareParametersResolvedRValues(element, false) -}} }{% end %}
-	{%- elif element.isValue -%}
-	{% if element.isName %} {{ element.name }} = {% end %}{{ element.value }}
-	{%- end -%}
-{%- end -%}
-
-{#- Parameters types -#}
-{%- macro declareParametersResolvedTypes(parameters) -%}
-	{%- for i, expression in parameters %}{% if i %}, {% end -%}
-		{{- expression | commentParametersResolvedToStr -}}
-		{%- if expression.isType -%}
-			{# Must be a type. #}
-			{{- expression.type | typeToStr }}
-		{%- end -%}
-	{%- end -%}
-{%- end -%}
-
-{#- Print a parameter value.
-Args:
-	value: The value to be printed as a string.
-	expected: The type expected by the function receiving this value.
--#}
-{%- macro parametersValue(value, expected) -%}
-	{%- if expected.category == "interface" -%}
-		bzd::Interface<"{{ expected.fqn }}">::cast({{- value -}})
-	{%- elif expected.category == "extern" -%}
-		bzd::Interface<"{{ expected.fqn }}">::cast({{- value -}})
-	{%- else -%}
-		{{ value }}
-	{%- end -%}
-{%- end -%}
-
-{#- Print parameters values.
-Args:
-	entity: The expression which parameters should be printed.
-	registry: If the registry is available and names should be picked from it.
--#}
-{%- macro declareParametersResolvedRValues(entity, registry) -%}
-	{%- for i, item in entity.parametersResolved %}{% if i %}, {% end -%}
-		{{- item | commentParametersResolvedToStr -}}
-		{# If the expression has a type associated to it, a type is a method/variable name or a variable type. #}
-		{%- if item.param.isLiteral -%}
-			{{- item.param.literal -}}
-		{%- elif item.isRValue -%}
-			{{- item.expected.type | typeToStr -}}{ {{- declareParametersResolvedRValues(item.param, registry) -}} }
-		{%- end -%}
-	{%- end -%}
-{%- end -%}
-
 {#- Parameters for call -#}
 {%- macro declareParametersCall(parameters) -%}
 	{%- for i, expression in parameters %}{% if i %}, {% end %}{{ expression.name }}{% end -%}
@@ -93,8 +19,9 @@ Args:
 {{ element.comment | commentBlockToStr }}struct {{ element.name }}{% if element.hasInheritance %} : {{ element.inheritanceList | inheritanceToStr }}{% end %}
 {
 	{{ declareTrivialTypes(element.interface.sequence) }}
-	{% for element in element.interface.expressionList %}
-	{{ declareExpression(element, "") }};
+	{% for expression in element.interface.expressionList %}
+	{{ expression.comment | commentBlockToStr }}
+	{{- expressionToDefinition(expression) }};
 	{% end %}
 };
 {% end -%}
