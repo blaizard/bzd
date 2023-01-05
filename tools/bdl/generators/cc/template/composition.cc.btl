@@ -244,7 +244,7 @@ bool execute() noexcept
 	bzd::log::info("Composition for '{{ fqn }}'."_csv).sync();
 		{% for expression, asyncType in composition[fqn] %}
 
-	// {{ expression.type | typeRegistryToStr }}
+	// {{ asyncType }}: {{ expression.type | typeToStr }}()
 	auto async_{{loop.parent.index}}_{{ loop.index }} = [&]() -> bzd::Async<> {
 		{{ callInitMembers(expression) }}
 		co_await !{{ expression.type | typeRegistryToStr }}( {{- paramsDeclaration(expression.parametersResolved, true) -}} );
@@ -273,7 +273,7 @@ bool execute() noexcept
 	{% for fqn, executor in executors %}
 		{% for expression, asyncType in composition[fqn] %}
 			{% if asyncType == "workload" %}
-	isSuccess &= verifyReturnedPromise(bzd::move(promise_{{loop.parent.index}}_{{ loop.index }}), "{{ expression.type | typeRegistryToStr }}"_sv);
+	isSuccess &= verifyReturnedPromise(bzd::move(promise_{{loop.parent.index}}_{{ loop.index }}), "{{ expression.type | typeToStr }}()"_sv);
 			{% end %}
 		{% end %}
 	{% end %}

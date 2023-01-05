@@ -59,7 +59,7 @@ class Composition:
 		"""Generate the unique identifiers of the types."""
 
 		counter = 1
-		for fqn, entity in self.symbols.items(categories={CATEGORY_GLOBAL}):
+		for fqn, entity in sorted(self.symbols.items(categories={CATEGORY_GLOBAL})):
 			if entity.category in ["expression", "struct", "enum"]:
 				self.uids[fqn] = counter
 				counter += 1
