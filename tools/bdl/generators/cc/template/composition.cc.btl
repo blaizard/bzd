@@ -203,6 +203,22 @@ template <class Promise>
 
 } // namespace
 
+// ==== Identifiers ===========================================================
+
+namespace bzd {
+
+template <meta::StringLiteral name>
+struct Data
+{
+	static UInt32 id;
+};
+
+{% for fqn, uid in uids %}
+template <> UInt32 Data<"{{ fqn }}">::id = {{ uid }}u;
+{% end %}
+
+} // namespace bzd
+
 // ==== Execution =============================================================
 
 /// Initialize and compose the application.

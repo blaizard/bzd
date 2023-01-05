@@ -4,7 +4,7 @@ import dataclasses
 
 from bzd.parser.error import Error
 
-from tools.bdl.visitor import CATEGORY_GLOBAL_COMPOSITION, CATEGORY_COMPOSITION
+from tools.bdl.visitor import CATEGORY_GLOBAL_COMPOSITION, CATEGORY_COMPOSITION, CATEGORY_GLOBAL
 from tools.bdl.visitors.symbol_map import SymbolMap
 from tools.bdl.visitors.composition.dependency_map import DependencyMap
 from tools.bdl.object import Object
@@ -30,6 +30,8 @@ class Composition:
 		self.dependencies = DependencyMap(symbols=self.symbols)
 		self.registry: typing.Dict[str, Expression] = {}
 		self.platform: typing.Dict[str, Expression] = {}
+		# Unique identifiers
+		self.uids: typing.Dict[str, int] = {}
 		# All top level expressions
 		self.all: typing.Dict[str, Expression] = {}
 		# All executors.
@@ -53,7 +55,18 @@ class Composition:
 		"""Get the entity refered to the given fqn."""
 		return self.symbols.getEntityResolved(fqn=fqn).value
 
+	def generateUids(self) -> None:
+		"""Generate the unique identifiers of the types."""
+
+		counter = 1
+		for fqn, entity in self.symbols.items(categories={CATEGORY_GLOBAL}):
+			if entity.category in ["expression", "struct", "enum"]:
+				self.uids[fqn] = counter
+				counter += 1
+
 	def process(self) -> None:
+
+		self.generateUids()
 
 		self.all = {
 			fqn: entity
@@ -98,6 +111,7 @@ class Composition:
 		content: typing.List[str] = []
 		addContent(content, "Includes", self.includes)
 		addContent(content, "Symbols", str(self.symbols).split("\n"))
+		addContent(content, "Unique Identifiers", [f"{k}: {v}" for k, v in self.uids.items()])
 		addContent(content, "Dependencies", str(self.dependencies).split("\n"))
 		addContent(content, "Registry", self.registry.values())
 		addContent(content, "Platform", self.platform.keys())
