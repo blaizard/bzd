@@ -339,7 +339,6 @@ class TestRun(unittest.TestCase):
 			objectContext=ObjectContext(resolve=True, composition=True))
 		self.assertTrue(bdl.entity("val1").isRValue)
 
-	def testABC(self):
 		bdl = Object.fromContent(content="""
 				using MyInteger3 = Integer;
 				interface Test { config: value = MyInteger3(20) [min(10) max(32)]; }
@@ -438,6 +437,12 @@ class TestRun(unittest.TestCase):
 				""",
 			objectContext=ObjectContext(resolve=True, composition=True))
 		self.assertTrue(bdl.entity("MyComposition.val1").isRValue)
+
+		with self.assertRaisesRegex(Exception, r"cannot have a 'meta' role"):
+			Object.fromContent(content="""
+					composition MyComposition { val1 = Array<Any>(1); }
+					""",
+				objectContext=ObjectContext(resolve=True, composition=True))
 
 	def testDefaultValues(self) -> None:
 

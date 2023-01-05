@@ -123,8 +123,9 @@ class Transform:
 
 	def paramsDeclaration(self, params: ParametersResolved, isRegistry: bool = False) -> str:
 		"""Declare inline parameters.
-		
+
 		Args:
+			params: The parameters to be serialized.
 			isRegistry: Use registry variable instead of direct variables.
 		"""
 		registry = self.composition.registry.keys() if self.composition and isRegistry else None
@@ -139,8 +140,8 @@ class Transform:
 
 	# Expression related
 
-	def valueToRValue(self, entity: Expression) -> str:
-		return valueToStrOriginal(entity=entity)
+	def expressionToValue(self, entity: Expression) -> str:
+		return valueToStrOriginal(item=entity.toParametersResolvedItem())
 
 	# Comments
 

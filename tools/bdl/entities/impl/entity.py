@@ -12,6 +12,7 @@ from tools.bdl.entities.impl.fragment.parameters import Parameters, ResolvedType
 from tools.bdl.entities.impl.fragment.sequence import EntitySequence
 from tools.bdl.entities.impl.fragment.fqn import FQN
 from tools.bdl.entities.impl.fragment.type import Type
+from tools.bdl.entities.impl.fragment.parameters_resolved import ParametersResolvedItem
 
 if typing.TYPE_CHECKING:
 	from tools.bdl.entities.impl.expression import Expression
@@ -66,6 +67,9 @@ class Entity:
 
 	def _setUnderlyingTypeFQN(self, fqn: str) -> None:
 		ElementBuilder.cast(self.element, ElementBuilder).setAttr("fqn_type", fqn)
+
+	def _setMeta(self) -> None:
+		ElementBuilder.cast(self.element, ElementBuilder).setAttr("meta", "1")
 
 	@property
 	def configAttr(self) -> str:
@@ -194,7 +198,7 @@ class Entity:
 
 	@property
 	def isRoleMeta(self) -> bool:
-		return bool(self.role & Role.Meta)
+		return bool(self.role & Role.Meta) or self.element.isAttr("meta")
 
 	@property
 	def isName(self) -> bool:
@@ -399,6 +403,20 @@ class EntityExpression(Entity):
 		a reference to another value."""
 
 		return self.isRoleValue and self.underlyingValueFQN is not None
+
+	def toParametersResolvedItem(self, name: typing.Optional[str] = None) -> ParametersResolvedItem:
+		"""Create an item from this expression.
+
+		Args:
+			name: Expected name.
+		"""
+		element = ElementBuilder.cast(self.element.copy(), ElementBuilder)
+		if name is not None:
+			element.setAttr("name", name)
+		else:
+			element.removeAttr("name")
+		expected = EntityExpression(element=element, role=self.role)
+		return ParametersResolvedItem(param=self, expected=expected)
 
 	def __repr__(self) -> str:
 

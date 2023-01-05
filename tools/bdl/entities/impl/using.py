@@ -32,10 +32,14 @@ class Using(EntityExpression):
 		"""
 		entity = self.type.resolve(resolver=resolver)
 
+		if entity.isRoleMeta:
+			self._setMeta()
+
 		super().resolve(resolver)
 
 	def __repr__(self) -> str:
 		return self.toString({
 			"name": self.name if self.isName else None,
-			"type": self.type.name
+			"type": self.type.name,
+			"meta": "True" if self.isRoleMeta else None
 		})

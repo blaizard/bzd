@@ -67,6 +67,10 @@ class _VisitorType(Visitor):
 			outputList.append(output)
 		output = ".".join(outputList)
 
+		# Special value, which defines an empty type.
+		if output == "":
+			return ""
+
 		# Apply the nested template if any.
 		if nested:
 			output += "<{}>".format(", ".join(nested))

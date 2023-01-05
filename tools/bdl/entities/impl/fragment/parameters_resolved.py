@@ -14,8 +14,9 @@ class ParametersResolvedItem:
 		self.param =  param
 		self.expected =  expected
 
-		# All expected element must have a name and a type.
-		Error.assertHasAttr(element=self.expected.element, attr="name")
+	@property
+	def isName(self) -> bool:
+		return self.expected.isName
 
 	@property
 	def name(self) -> str:

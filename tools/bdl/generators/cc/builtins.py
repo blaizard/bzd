@@ -96,6 +96,10 @@ class StringType:
 	constexpr = True
 	toType = "bzd::StringView"
 
+class AnyType:
+
+	constexpr = True
+	toType = ""
 
 class ArrayType:
 
@@ -124,6 +128,7 @@ class VectorType(ArrayType):
 	name = "Vector"
 
 builtins: typing.Dict[str, typing.Any] = {
+	"Any": AnyType,
 	"Integer": IntegerType,
 	"Float": FloatType,
 	"Void": VoidType,
