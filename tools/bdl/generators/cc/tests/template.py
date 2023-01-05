@@ -30,6 +30,7 @@ class TestRun(unittest.TestCase):
 				myVarNotInit = Integer;
 				myVarVarArgs = Vector<Integer>(1, 2, 3, 4);
 				myStruct = MyStruct(2);
+				myStruct2 = MyStruct(Float(2));
 				myComponent = MyComponent<Float>();
 			}
 			""",
@@ -122,6 +123,9 @@ class TestRun(unittest.TestCase):
 
 		output = self.render("""{{ entity("myStruct") | expressionToValue }}""")
 		self.assertEqual(output, "MyStruct{/*var*/bzd::Int32{2}}")
+
+		output = self.render("""{{ entity("myStruct2") | expressionToValue }}""")
+		self.assertEqual(output, "MyStruct{/*var*/bzd::Int32{bzd::Float32{2}}}")
 
 		output = self.render("""{{ entity("myComponent") | expressionToValue }}""")
 		self.assertEqual(output, "MyComponent<bzd::Float32>{}")

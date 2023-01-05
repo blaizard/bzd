@@ -187,6 +187,8 @@ class Type:
 	def __repr__(self) -> str:
 		return self.name
 
+	def __eq__(self, other: "Type") -> bool:
+		return str(self) == str(other)
 
 class Visitor(VisitorDepthFirstBase[typing.List[str], str]):
 

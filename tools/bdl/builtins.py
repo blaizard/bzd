@@ -14,13 +14,21 @@ def toLiteralSingleValue_(self: Builtin, args: typing.Dict[str, EntityExpression
 		return args["value"].literal
 	return None
 
+# Meta types/functions
+
+class AnyMeta(Builtin):
+	def __init__(self) -> None:
+		super().__init__(ElementBuilder("builtin").setAttr("name", "Any").setAttr("meta", "1"))
+
+class ListMeta(Builtin):
+	def __init__(self) -> None:
+		super().__init__(ElementBuilder("builtin").setAttr("name", "list").addConfigValue(name="values...", kind="Any").setAttr("meta", "1"))
+
+# Concrete types
+
 class Void(Builtin):
 	def __init__(self) -> None:
 		super().__init__(ElementBuilder("builtin").setAttr("name", "Void"))
-
-class Any(Builtin):
-	def __init__(self) -> None:
-		super().__init__(ElementBuilder("builtin").setAttr("name", "Any").setAttr("meta", "1"))
 
 class Integer(Builtin):
 	def __init__(self) -> None:
@@ -77,10 +85,6 @@ class Callable(Builtin):
 	def __init__(self) -> None:
 		super().__init__(ElementBuilder("builtin").setAttr("name", "Callable"))
 
-class List(Builtin):
-	def __init__(self) -> None:
-		super().__init__(ElementBuilder("builtin").setAttr("name", "list").addConfigValue(name="values...", kind="Any").setAttr("meta", "1"))
-
 Builtins = [
-	Void(), Any(), Integer(), Float(), Boolean(), Byte(), String(), Result(), Async(), Array(), Vector(), Callable(), List()
+	AnyMeta(), ListMeta(), Void(), Integer(), Float(), Boolean(), Byte(), String(), Result(), Async(), Array(), Vector(), Callable()
 ]
