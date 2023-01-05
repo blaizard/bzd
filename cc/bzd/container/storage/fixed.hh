@@ -33,16 +33,7 @@ public: // Constructors
 	constexpr Self& operator=(Self&&) noexcept = default;
 
 	template <class... Args>
-	constexpr explicit FixedStorage(InPlace, Args&&... args) noexcept
-	requires(!concepts::reference<T>)
-		: data_{bzd::forward<Args>(args)...}
-	{
-	}
-
-	template <class... Args>
-	constexpr explicit FixedStorage(InPlace, Args&&... args) noexcept
-	requires(concepts::reference<T>)
-		: data_{args...}
+	constexpr explicit FixedStorage(InPlace, Args&&... args) noexcept : data_{bzd::forward<Args>(args)...}
 	{
 	}
 
