@@ -106,12 +106,13 @@ class Expression(EntityExpression):
 
 			# Check if this points to a type or a value.
 			entity = self.type.resolve(resolver=resolver, maybeValue=True)
-	
+
 			# The type refers to a value.
 			if entity.isRoleValue:
-				self.assertTrue(condition=self.isParameters == False, message="Cannot instantiate a value from another value.")
+				self.assertTrue(condition=self.isParameters == False,
+					message="Cannot instantiate a value from another value.")
 				# It means it refers directly to the entity, in that case it must have a value FQN
-				if entity.underlyingValueFQN is None:	
+				if entity.underlyingValueFQN is None:
 					self.assertTrue(condition=entity.isFQN, message="A value referenced must have an valid FQN.")
 					self._setUnderlyingValueFQN(fqn=entity.fqn)
 				else:
@@ -165,7 +166,8 @@ class Expression(EntityExpression):
 		# Compute and set the literal value if any.
 		maybeValue = resolvedTypeEntity.toLiteral(result.values)
 		if maybeValue is not None:
-			self.assertTrue(condition=isinstance(maybeValue, str), message=f"The returned value from toLiteral must be a string, not {str(maybeValue)}")
+			self.assertTrue(condition=isinstance(maybeValue, str),
+				message=f"The returned value from toLiteral must be a string, not {str(maybeValue)}")
 			self._setLiteral(maybeValue)
 
 	@cached_property
@@ -180,4 +182,7 @@ class Expression(EntityExpression):
 
 	@cached_property
 	def parametersResolved(self) -> ParametersResolved:
-		return ParametersResolved(element=self.element, NestedElementType=Expression, param="argument_resolved", expected="argument_expected")
+		return ParametersResolved(element=self.element,
+			NestedElementType=Expression,
+			param="argument_resolved",
+			expected="argument_expected")

@@ -35,7 +35,7 @@ class TestRun(unittest.TestCase):
 					var = MyType(value=1);
 				}
 				""",
-				objectContext=ObjectContext(resolve=True))
+			objectContext=ObjectContext(resolve=True))
 
 		with self.assertRaisesRegex(Exception, r"expects an integer"):
 			Object.fromContent(content="""
@@ -245,14 +245,14 @@ class TestRun(unittest.TestCase):
 					struct Test { var = Integer; }
 					composition { test = Test(); }
 					""",
-				objectContext=ObjectContext(resolve=True, composition=True))
+			objectContext=ObjectContext(resolve=True, composition=True))
 		self.assertTrue(bdl.entity("test").isRValue)
 
 		bdl = Object.fromContent(content="""
 					struct Test { var = Integer; }
 					composition { test = Test(32); }
 					""",
-				objectContext=ObjectContext(resolve=True, composition=True))
+			objectContext=ObjectContext(resolve=True, composition=True))
 		self.assertTrue(bdl.entity("test").isRValue)
 
 		bdl = Object.fromContent(content="""
@@ -282,7 +282,7 @@ class TestRun(unittest.TestCase):
 					interface Test { config: value = Integer; }
 					composition MyComposition { val1 = Test(12); }
 					""",
-				objectContext=ObjectContext(resolve=True, composition=True))
+			objectContext=ObjectContext(resolve=True, composition=True))
 		self.assertTrue(bdl.entity("MyComposition.val1").isRValue)
 
 		# Mispelled value key
@@ -471,7 +471,7 @@ class TestRun(unittest.TestCase):
 					vector = Test(value = Vector<Integer>(value1, value2, 3, Integer(4)));
 				}
 				""",
-				objectContext=ObjectContext(resolve=True, composition=True))
+			objectContext=ObjectContext(resolve=True, composition=True))
 		self.assertTrue(bdl.entity("MyComposition.value1").isRValue)
 		self.assertEqual(bdl.entity("MyComposition.value1").literal, "1")
 		self.assertTrue(bdl.entity("MyComposition.value2").isRValue)

@@ -7,12 +7,13 @@ if typing.TYPE_CHECKING:
 	from tools.bdl.entities.impl.entity import EntityExpression
 	from tools.bdl.entities.impl.fragment.type import Type
 
+
 class ParametersResolvedItem:
 	"""Entry contained in the resolved parameters list."""
 
 	def __init__(self, param: "EntityExpression", expected: "EntityExpression") -> None:
-		self.param =  param
-		self.expected =  expected
+		self.param = param
+		self.expected = expected
 
 	@property
 	def isName(self) -> bool:
@@ -46,14 +47,25 @@ class ParametersResolvedItem:
 		return self.param.isLValue
 
 	def error(self, message: str, element: typing.Optional[Element] = None, throw: bool = True) -> str:
-		return Error.handleFromElement(element=self.param.element if element is None else element, message=message, throw=throw)
+		return Error.handleFromElement(element=self.param.element if element is None else element,
+			message=message,
+			throw=throw)
 
-	def assertTrue(self, condition: bool, message: str, element: typing.Optional[Element] = None, throw: bool = True) -> typing.Optional[str]:
-		return Error.assertTrue(condition=condition, element=self.param.element if element is None else element, message=message, throw=throw)
+	def assertTrue(self,
+		condition: bool,
+		message: str,
+		element: typing.Optional[Element] = None,
+		throw: bool = True) -> typing.Optional[str]:
+		return Error.assertTrue(condition=condition,
+			element=self.param.element if element is None else element,
+			message=message,
+			throw=throw)
+
 
 class ParametersResolved:
 
-	def __init__(self, element: Element, NestedElementType: typing.Type["EntityExpression"], param: str, expected: str) -> None:
+	def __init__(self, element: Element, NestedElementType: typing.Type["EntityExpression"], param: str,
+		expected: str) -> None:
 		"""Construct the ParametersResolved object.
 		
 		Args:
@@ -67,7 +79,8 @@ class ParametersResolved:
 		paramSequence = self.element.getNestedSequenceOrEmpty(param)
 		expectedSequence = self.element.getNestedSequenceOrEmpty(expected)
 		for (paramElement, expectedElement) in zip(paramSequence, expectedSequence):
-			self.list.append(ParametersResolvedItem(NestedElementType(paramElement), NestedElementType(expectedElement)))
+			self.list.append(ParametersResolvedItem(NestedElementType(paramElement),
+				NestedElementType(expectedElement)))
 
 	def __iter__(self) -> typing.Iterator[ParametersResolvedItem]:
 		for parameter in self.list:
@@ -89,10 +102,19 @@ class ParametersResolved:
 		return len(self.list)
 
 	def error(self, message: str, element: typing.Optional[Element] = None, throw: bool = True) -> str:
-		return Error.handleFromElement(element=self.element if element is None else element, message=message, throw=throw)
+		return Error.handleFromElement(element=self.element if element is None else element,
+			message=message,
+			throw=throw)
 
-	def assertTrue(self, condition: bool, message: str, element: typing.Optional[Element] = None, throw: bool = True) -> typing.Optional[str]:
-		return Error.assertTrue(condition=condition, element=self.element if element is None else element, message=message, throw=throw)
+	def assertTrue(self,
+		condition: bool,
+		message: str,
+		element: typing.Optional[Element] = None,
+		throw: bool = True) -> typing.Optional[str]:
+		return Error.assertTrue(condition=condition,
+			element=self.element if element is None else element,
+			message=message,
+			throw=throw)
 
 	def __repr__(self) -> str:
 		content = []

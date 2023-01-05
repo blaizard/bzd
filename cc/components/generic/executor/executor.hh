@@ -16,9 +16,7 @@ public:
 	using Self = Executor<Config>;
 
 public:
-	constexpr Executor(Config& config) noexcept : config_{config}, executor_{}
-	{
-	}
+	constexpr Executor(const Config& config) noexcept : config_{config}, executor_{} {}
 
 	/// Assign a workload to this executor.
 	constexpr void schedule(bzd::concepts::async auto& async, const bzd::async::Type type) noexcept
@@ -105,7 +103,7 @@ private:
 	}
 
 private:
-	Config& config_;
+	const Config& config_;
 	bzd::coroutine::impl::Executor executor_;
 	bzd::Atomic<bzd::Size> workloadCount_{0};
 };

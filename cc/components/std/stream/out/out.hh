@@ -8,7 +8,9 @@ class Out : public bzd::OStream
 {
 public:
 	template <class Config>
-	constexpr explicit Out(const Config&) noexcept {}
+	constexpr explicit Out(const Config&) noexcept
+	{
+	}
 
 	bzd::Async<> write(const bzd::Span<const bzd::Byte> data) noexcept final
 	{

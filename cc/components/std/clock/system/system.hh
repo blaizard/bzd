@@ -8,7 +8,9 @@ class System : public bzd::Clock
 {
 public:
 	template <class Config>
-	constexpr System(Config&) noexcept {}
+	constexpr System(const Config&) noexcept
+	{
+	}
 
 	ClockTick getTicks() noexcept override;
 

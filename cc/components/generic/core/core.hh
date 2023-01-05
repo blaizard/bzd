@@ -14,7 +14,9 @@ private:
 
 public:
 	template <class Config>
-	constexpr explicit Core(const Config&) noexcept {}
+	constexpr explicit Core(const Config&) noexcept
+	{
+	}
 
 	void init() {}
 

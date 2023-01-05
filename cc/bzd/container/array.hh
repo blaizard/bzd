@@ -36,7 +36,11 @@ public: // Constructors/assignments.
 	{
 	}
 
-	constexpr explicit Array(std::initializer_list<T> list) noexcept requires (!concepts::reference<T>) : Parent{StorageType{list.begin(), list.end()}} {}
+	constexpr explicit Array(std::initializer_list<T> list) noexcept
+	requires(!concepts::reference<T>)
+		: Parent{StorageType{list.begin(), list.end()}}
+	{
+	}
 
 public:
 	/// \brief Returns the number of elements that the array can hold.

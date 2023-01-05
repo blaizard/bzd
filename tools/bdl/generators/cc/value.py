@@ -6,7 +6,11 @@ from tools.bdl.generators.cc.comments import commentParametersResolvedToStr
 from tools.bdl.entities.impl.fragment.parameters_resolved import ParametersResolvedItem
 from tools.bdl.visitors.symbol_map import SymbolMap
 
-def valueToStr(item: ParametersResolvedItem, symbols: typing.Optional[SymbolMap] = None, registry: typing.Optional[typing.Sequence[str]] = None, includeComment: bool = True) -> str:
+
+def valueToStr(item: ParametersResolvedItem,
+	symbols: typing.Optional[SymbolMap] = None,
+	registry: typing.Optional[typing.Sequence[str]] = None,
+	includeComment: bool = True) -> str:
 	"""Convert an item object into a C++ string.
 	Args:
 		item: The item to be converted.
@@ -15,19 +19,22 @@ def valueToStr(item: ParametersResolvedItem, symbols: typing.Optional[SymbolMap]
 		includeComment; Whether or not comment should be prepended to the value.
 	"""
 
-	item.assertTrue(condition=item.param.isRoleValue, message=f"'valueToStr' only applies to item with role values, not '{item}'.")
+	item.assertTrue(condition=item.param.isRoleValue,
+		message=f"'valueToStr' only applies to item with role values, not '{item}'.")
 
 	def bindTypeAndValue(values: typing.List[str]) -> str:
 		"""Associate a value with its type."""
 
-		paramTypeStr = typeToStr(item.param.type, referenceForInterface=True, values=values) if item.param.isType else ""
+		paramTypeStr = typeToStr(item.param.type, referenceForInterface=True,
+			values=values) if item.param.isType else ""
 		paramValues = values if paramTypeStr == "" else [f"{paramTypeStr}{{{', '.join(values)}}}"]
 
 		# If the types (param and expected) are the same, return already.
 		if item.sameType:
 			return ", ".join(paramValues)
 
-		expectedTypeStr = typeToStr(item.expected.type, referenceForInterface=True, values=paramValues) if item.expected.isType else ""
+		expectedTypeStr = typeToStr(item.expected.type, referenceForInterface=True,
+			values=paramValues) if item.expected.isType else ""
 		return ", ".join(paramValues) if expectedTypeStr == "" else f"{expectedTypeStr}{{{', '.join(paramValues)}}}"
 
 	if item.param.isLiteral:

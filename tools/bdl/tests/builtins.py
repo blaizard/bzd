@@ -95,8 +95,7 @@ class TestRun(unittest.TestCase):
 				objectContext=ObjectContext(resolve=True))
 
 		with self.assertRaisesRegex(Exception, r"type"):
-			Object.fromContent(content="struct temp { var = Result<12>; }",
-				objectContext=ObjectContext(resolve=True))
+			Object.fromContent(content="struct temp { var = Result<12>; }", objectContext=ObjectContext(resolve=True))
 
 		# Template of template
 		Object.fromContent(content="struct temp { var = Result<Result<Void>>; }",

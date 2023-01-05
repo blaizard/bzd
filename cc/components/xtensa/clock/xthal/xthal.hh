@@ -9,7 +9,9 @@ class Xthal : public bzd::Clock
 {
 public:
 	template <class Config>
-	constexpr explicit Xthal(const Config&) noexcept {}
+	constexpr explicit Xthal(const Config&) noexcept
+	{
+	}
 
 	ClockTick getTicks() noexcept override;
 

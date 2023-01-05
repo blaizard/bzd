@@ -13,6 +13,7 @@ if typing.TYPE_CHECKING:
 	from tools.bdl.entities.impl.fragment.type import Type
 	from tools.bdl.entities.impl.entity import EntityExpression
 
+
 @dataclass
 class Data:
 	# The name associated with this entry.
@@ -25,14 +26,17 @@ class Data:
 	# the collection is sorted by ascending order.
 	order: int = -1
 
+
 @dataclass
 class Key:
 	# The index related to this key.
 	index: int
 	# The name related to this key, if available.
 	name: typing.Optional[str] = None
+
 	def __str__(self) -> str:
 		return str(self.index) if self.name is None else self.name
+
 
 class ParametersCommon:
 
@@ -81,7 +85,11 @@ class ParametersCommon:
 			return self.at(-1).isVarArgs
 		return None
 
-	def append(self, entity: "EntityExpression", allowMix: bool = False, allowMultiVarArgs: bool = False, **kwargs: typing.Any) -> Data:
+	def append(self,
+		entity: "EntityExpression",
+		allowMix: bool = False,
+		allowMultiVarArgs: bool = False,
+		**kwargs: typing.Any) -> Data:
 		entity.assertTrue(condition=not self.isVarArgs or allowMultiVarArgs,
 			message=f"Variable arguments '{entity}' can only be present at the end of the parameter list.\n{str(self)}")
 		# Add the element.
@@ -89,7 +97,9 @@ class ParametersCommon:
 		# This is about having only named or only unamed parameters. Either:
 		# (name1 = 0, name2 = 2, ...) or (0, 2, ...)
 		entity.assertTrue(condition=allowMix or self.isNamed == entity.isName,
-			message=f"Cannot mix named and unnamed parameters: 0:'{self.at(0)}' and {self.size()-1}:'{entity}':\nParameters:\n{str(self)}")
+			message=
+			f"Cannot mix named and unnamed parameters: 0:'{self.at(0)}' and {self.size()-1}:'{entity}':\nParameters:\n{str(self)}"
+							)
 		return self.list[-1]
 
 	def getUnderlyingTypeCategories(self, resolver: "Resolver") -> typing.Iterator[TypeCategory]:
@@ -159,12 +169,23 @@ class ParametersCommon:
 		return "\n".join(content)
 
 	def error(self, message: str, element: typing.Optional[Element] = None, throw: bool = True) -> str:
-		return Error.handleFromElement(element=self.element if element is None else element, message=message, throw=throw)
+		return Error.handleFromElement(element=self.element if element is None else element,
+			message=message,
+			throw=throw)
 
-	def assertTrue(self, condition: bool, message: str, element: typing.Optional[Element] = None, throw: bool = True) -> typing.Optional[str]:
-		return Error.assertTrue(condition=condition, element=self.element if element is None else element, message=message, throw=throw)
+	def assertTrue(self,
+		condition: bool,
+		message: str,
+		element: typing.Optional[Element] = None,
+		throw: bool = True) -> typing.Optional[str]:
+		return Error.assertTrue(condition=condition,
+			element=self.element if element is None else element,
+			message=message,
+			throw=throw)
+
 
 ResolvedType = typing.Union["Entity", "Type"]
+
 
 class Parameters(ParametersCommon):
 	"""
@@ -213,8 +234,7 @@ class Parameters(ParametersCommon):
 
 		# Merge the values, do not include var args.
 		for key, default, metadata in defaults.itemsMetadata(includeVarArgs=False):
-			default.assertTrue(condition=default.isName,
-				message=f"Default parameters must be named: '{default}'.")
+			default.assertTrue(condition=default.isName, message=f"Default parameters must be named: '{default}'.")
 			# Check if there is a match with the name first, if not check with the index.
 			# If no match add the default parameter.
 			maybeMetadata = self.getMetadata(key)

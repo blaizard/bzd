@@ -3,6 +3,7 @@ import typing
 from tools.bdl.entities.all import Expression
 from tools.bdl.entities.impl.fragment.parameters_resolved import ParametersResolvedItem
 
+
 def commentBlockToStr(comment: typing.Optional[str]) -> str:
 	"""
 	Normal block comments.

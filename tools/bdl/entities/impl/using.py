@@ -9,6 +9,7 @@ from tools.bdl.entities.impl.fragment.contract import Contracts
 from tools.bdl.entities.impl.entity import EntityExpression, Role
 from tools.bdl.entities.impl.types import TypeCategory
 
+
 class Using(EntityExpression):
 	"""
 	Using statement are defining a type based on an underlying type.

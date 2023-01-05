@@ -8,7 +8,9 @@ class Null : public bzd::Clock
 {
 public:
 	template <class Config>
-	constexpr explicit Null(const Config&) noexcept {}
+	constexpr explicit Null(const Config&) noexcept
+	{
+	}
 
 	ClockTick getTicks() noexcept override;
 

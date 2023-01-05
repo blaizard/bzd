@@ -39,7 +39,7 @@ class EntitySequence:
 				self.processed[entity.category].append(entity)
 		output = []
 		for category in categories:
-			output +=  self.processed.get(category, [])
+			output += self.processed.get(category, [])
 		return output
 
 	def _is(self, *categories: str) -> bool:
