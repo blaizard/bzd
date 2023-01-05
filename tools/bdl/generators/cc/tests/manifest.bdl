@@ -31,3 +31,5 @@ interface MyInterfaceB : MyInterfaceA {
 	value = Integer;
 	
 }
+
+

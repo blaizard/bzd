@@ -21,10 +21,7 @@ private:
 	static constexpr bzd::Byte freertosStackTaintingByte{0xa5};
 
 public:
-	constexpr Core(const Config& config) noexcept :
-		config_{config}
-	{
-	}
+	constexpr Core(const Config& config) noexcept : config_{config} {}
 
 	Result<void, bzd::Error> start(const bzd::FunctionRef<void(bzd::platform::Core&)> workload) noexcept override
 	{

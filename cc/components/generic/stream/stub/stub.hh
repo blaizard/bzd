@@ -7,7 +7,9 @@ class Stub : public bzd::IOStream
 {
 public:
 	template <class Config>
-	constexpr explicit Stub(const Config&) noexcept {}
+	constexpr explicit Stub(const Config&) noexcept
+	{
+	}
 
 	bzd::Async<> write(const bzd::Span<const bzd::Byte>) noexcept override { co_return {}; }
 

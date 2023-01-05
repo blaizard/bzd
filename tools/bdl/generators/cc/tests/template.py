@@ -7,6 +7,7 @@ from tools.bdl.generators.cc.visitor import Transform
 from bzd.template.template import Template
 from tools.bdl.visitors.composition.visitor import Composition
 
+
 class TestRun(unittest.TestCase):
 
 	@cached_property
@@ -34,14 +35,15 @@ class TestRun(unittest.TestCase):
 				myComponent = MyComponent<Float>();
 			}
 			""",
-				objectContext=ObjectContext(resolve=True))
+			objectContext=ObjectContext(resolve=True))
 		composition = Composition()
 		composition.visit(bdl).process()
 		return composition
 
 	def render(self, template: str) -> str:
 		composition = self.composition
-		return Template("""{%- include "tools/bdl/generators/cc/template/declarations.h.btl" -%}""" + template).render(composition, Transform(composition=composition))
+		return Template("""{%- include "tools/bdl/generators/cc/template/declarations.h.btl" -%}""" + template).render(
+			composition, Transform(composition=composition))
 
 	def testTypeToStr(self) -> None:
 		output = self.render("""{{ entity("MyStruct.var").typeResolved | typeToStr }}""")
@@ -119,7 +121,8 @@ class TestRun(unittest.TestCase):
 		self.assertEqual(output, "bzd::Int32{0}")
 
 		output = self.render("""{{ entity("myVarVarArgs") | expressionToValue }}""")
-		self.assertEqual(output, "bzd::Vector<bzd::Int32, 4u>{bzd::inPlace, /*values*/1, /*values*/2, /*values*/3, /*values*/4}")
+		self.assertEqual(
+			output, "bzd::Vector<bzd::Int32, 4u>{bzd::inPlace, /*values*/1, /*values*/2, /*values*/3, /*values*/4}")
 
 		output = self.render("""{{ entity("myStruct") | expressionToValue }}""")
 		self.assertEqual(output, "MyStruct{/*var*/bzd::Int32{2}}")
@@ -129,6 +132,7 @@ class TestRun(unittest.TestCase):
 
 		output = self.render("""{{ entity("myComponent") | expressionToValue }}""")
 		self.assertEqual(output, "MyComponent<bzd::Float32>{}")
+
 
 if __name__ == '__main__':
 	unittest.main(failfast=True)

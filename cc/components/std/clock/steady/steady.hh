@@ -8,7 +8,9 @@ class Steady : public bzd::Clock
 {
 public:
 	template <class Config>
-	constexpr Steady(Config&) noexcept {}
+	constexpr Steady(const Config&) noexcept
+	{
+	}
 
 	ClockTick getTicks() noexcept override;
 

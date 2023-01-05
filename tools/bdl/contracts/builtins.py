@@ -7,6 +7,7 @@ from bzd.validation.schema import TypeContext
 
 from tools.bdl.contracts.traits import ContractTraits, Role
 
+
 def getValueFromSingleParameter_(resolver, typeFQN: str, value: typing.Any, defaultValue: str) -> typing.Any:
 	"""Extract value of single parameter expressions."""
 
@@ -24,9 +25,11 @@ def getValueFromSingleParameter_(resolver, typeFQN: str, value: typing.Any, defa
 				return defaultValue
 			elif value.parametersResolved.size() == 1:
 				return value.parametersResolved[0].param.literal
-			raise Exception(f"There are too many initializers for '{typeFQN}', only 1 is expected:\n{value.parametersResolved}")
+			raise Exception(
+				f"There are too many initializers for '{typeFQN}', only 1 is expected:\n{value.parametersResolved}")
 
 	return value
+
 
 class Integer_(Integer):
 
@@ -36,6 +39,7 @@ class Integer_(Integer):
 		context.value = getValueFromSingleParameter_(context.args["resolver"], "Integer", context.value, "0")
 		super().check(context)
 
+
 class Float_(Float):
 
 	def check(self, context: TypeContext) -> None:
@@ -43,6 +47,7 @@ class Float_(Float):
 		assert "resolver" in context.args
 		context.value = getValueFromSingleParameter_(context.args["resolver"], "Float", context.value, "0")
 		super().check(context)
+
 
 class Boolean_(Boolean):
 
@@ -52,15 +57,18 @@ class Boolean_(Boolean):
 		context.value = getValueFromSingleParameter_(context.args["resolver"], "Boolean", context.value, "false")
 		super().check(context)
 
+
 class ContractInteger(ContractTraits):
 
 	def __init__(self) -> None:
 		super().__init__(name="integer", role=Role.Value | Role.Public, constraint=Integer_)
 
+
 class ContractFloat(ContractTraits):
 
 	def __init__(self) -> None:
 		super().__init__(name="float", role=Role.Value | Role.Public, constraint=Float_)
+
 
 class ContractBoolean(ContractTraits):
 

@@ -7,6 +7,7 @@ from tools.bdl.entities.impl.fragment.type import Type, Visitor as VisitorType
 from tools.bdl.entities.impl.fragment.parameters_resolved import ParametersResolved
 from bzd.template.template import Template
 
+
 class _VisitorType(VisitorType):
 
 	def visitType(self, entity: Type, nested: typing.List[str], parameters: ParametersResolved) -> str:

@@ -13,8 +13,9 @@ from tools.bdl.generators.cc.builtins import builtins
 class _VisitorType(Visitor):
 	"""Visitor to print a type."""
 
-	def __init__(self, entity: Type, namespaceToFQN: typing.Optional[typing.Callable[[typing.List[str]], str]],
-		reference: bool, definition: bool, nonConst: bool, referenceForInterface: bool, values: typing.Optional[typing.Sequence[str]]) -> None:
+	def __init__(self, entity: Type, namespaceToFQN: typing.Optional[typing.Callable[[typing.List[str]],
+		str]], reference: bool, definition: bool, nonConst: bool, referenceForInterface: bool,
+		values: typing.Optional[typing.Sequence[str]]) -> None:
 		self.namespaceToFQN = namespaceToFQN
 		self.reference = reference
 		self.definition = definition

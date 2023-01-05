@@ -20,12 +20,11 @@ class ElementBuilder(Element):
 			Contract.add(element=self, kind=kind, values=values)
 		return self
 
-	def addConfigValue(
-			self,
-			kind: typing.Optional[str] = None,
-			literal: typing.Optional[str] = None,
-			name: typing.Optional[str] = None,
-			contract: typing.Optional[str] = None) -> "ElementBuilder":
+	def addConfigValue(self,
+		kind: typing.Optional[str] = None,
+		literal: typing.Optional[str] = None,
+		name: typing.Optional[str] = None,
+		contract: typing.Optional[str] = None) -> "ElementBuilder":
 		"""
 		Create a configuration entry
 		"""
@@ -42,11 +41,7 @@ class ElementBuilder(Element):
 		self.pushBackElementToNestedSequence(kind="config", element=element)
 		return self
 
-	def addConfigType(
-			self,
-			kind: str,
-			name: str,
-			contract: typing.Optional[str] = None) -> "ElementBuilder":
+	def addConfigType(self, kind: str, name: str, contract: typing.Optional[str] = None) -> "ElementBuilder":
 		"""
 		Create a configuration entry
 		"""
@@ -55,6 +50,7 @@ class ElementBuilder(Element):
 			element.addContract(contract)
 		self.pushBackElementToNestedSequence(kind="config", element=element)
 		return self
+
 
 class NestedBuilder(ElementBuilder):
 

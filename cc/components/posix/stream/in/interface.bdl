@@ -3,6 +3,7 @@ use "cc/bzd/platform/interfaces/stream.bdl"
 
 namespace bzd.platform.posix;
 
+
 component In : bzd.IStream {
 interface:
 	
@@ -10,3 +11,5 @@ config:
 	proactor = Proactor;
 	
 }
+
+

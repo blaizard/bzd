@@ -262,8 +262,7 @@ class Entity:
 				filterFct=lambda entity: entity.category == "expression")
 		return Parameters(element=self.element, NestedElementType=Expression)
 
-	def makeValidation(self, resolver: typing.Any, parameters: Parameters,
-		forTemplate: bool) -> Validation[SchemaDict]:
+	def makeValidation(self, resolver: typing.Any, parameters: Parameters, forTemplate: bool) -> Validation[SchemaDict]:
 		"""
 		Generate the validation object.
 		"""
@@ -274,7 +273,8 @@ class Entity:
 			schema[key] = maybeContracts if maybeContracts is not None else ""
 			# Add that template argument must be part of the given type.
 			if forTemplate:
-				expression.assertTrue(condition=expression.underlyingTypeFQN is not None, message=f"The type '{expression}' was not resolved.")
+				expression.assertTrue(condition=expression.underlyingTypeFQN is not None,
+					message=f"The type '{expression}' was not resolved.")
 				schema[key] += f" convertible({str(expression.underlyingTypeFQN)})"
 
 		if schema:
@@ -340,10 +340,19 @@ class Entity:
 				self.error(f"Configuration can only contain expressions or using statements, not '{entity.category}'.")
 
 	def error(self, message: str, element: typing.Optional[Element] = None, throw: bool = True) -> str:
-		return Error.handleFromElement(element=self.element if element is None else element, message=message, throw=throw)
+		return Error.handleFromElement(element=self.element if element is None else element,
+			message=message,
+			throw=throw)
 
-	def assertTrue(self, condition: bool, message: str, element: typing.Optional[Element] = None, throw: bool = True) -> typing.Optional[str]:
-		return Error.assertTrue(condition=condition, element=self.element if element is None else element, message=message, throw=throw)
+	def assertTrue(self,
+		condition: bool,
+		message: str,
+		element: typing.Optional[Element] = None,
+		throw: bool = True) -> typing.Optional[str]:
+		return Error.assertTrue(condition=condition,
+			element=self.element if element is None else element,
+			message=message,
+			throw=throw)
 
 	def toString(self, attrs: typing.MutableMapping[str, typing.Optional[str]] = {}) -> str:
 		entities = ["{}=\"{}\"".format(key, value) for key, value in attrs.items() if value]

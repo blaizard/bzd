@@ -11,7 +11,8 @@ class IntegerType:
 	constexpr: bool = True
 
 	@staticmethod
-	def toType(entity: Type, nested: typing.List[str], reference: bool, values: typing.Optional[typing.Sequence[str]]) -> TypeConversionCallableReturn:
+	def toType(entity: Type, nested: typing.List[str], reference: bool,
+		values: typing.Optional[typing.Sequence[str]]) -> TypeConversionCallableReturn:
 		maybeContractMin = entity.contracts.get("min")
 		isSigned = True if maybeContractMin is None or maybeContractMin.valueNumber < 0 else False
 		maybeContractMax = entity.contracts.get("max")
@@ -56,7 +57,8 @@ class ResultType:
 	constexpr = False
 
 	@staticmethod
-	def toType(entity: Type, nested: typing.List[str], reference: bool, values: typing.Optional[typing.Sequence[str]]) -> TypeConversionCallableReturn:
+	def toType(entity: Type, nested: typing.List[str], reference: bool,
+		values: typing.Optional[typing.Sequence[str]]) -> TypeConversionCallableReturn:
 
 		if len(nested) == 0:
 			nested.append("void")
@@ -70,7 +72,8 @@ class AsyncType:
 	constexpr = False
 
 	@staticmethod
-	def toType(entity: Type, nested: typing.List[str], reference: bool, values: typing.Optional[typing.Sequence[str]]) -> TypeConversionCallableReturn:
+	def toType(entity: Type, nested: typing.List[str], reference: bool,
+		values: typing.Optional[typing.Sequence[str]]) -> TypeConversionCallableReturn:
 
 		if len(nested) == 0:
 			nested.append("void")
@@ -96,15 +99,18 @@ class StringType:
 	constexpr = True
 	toType = "bzd::StringView"
 
+
 class AnyType:
 
 	constexpr = True
 	toType = ""
 
+
 class ListType:
 
 	constexpr = True
 	toType = ""
+
 
 class ArrayType:
 
@@ -112,7 +118,8 @@ class ArrayType:
 	constexpr = False
 
 	@classmethod
-	def toType(cls, entity: Type, nested: typing.List[str], reference: bool, values: typing.Optional[typing.Sequence[str]]) -> TypeConversionCallableReturn:
+	def toType(cls, entity: Type, nested: typing.List[str], reference: bool,
+		values: typing.Optional[typing.Sequence[str]]) -> TypeConversionCallableReturn:
 
 		if reference:
 			return f"bzd::interface::{cls.name}", nested
@@ -129,8 +136,10 @@ class ArrayType:
 			values.insert(0, "bzd::inPlace")
 		return f"bzd::{cls.name}", nested
 
+
 class VectorType(ArrayType):
 	name = "Vector"
+
 
 builtins: typing.Dict[str, typing.Any] = {
 	"Any": AnyType,

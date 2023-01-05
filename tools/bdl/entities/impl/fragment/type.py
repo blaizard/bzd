@@ -87,7 +87,8 @@ class Type:
 
 			# Make sure none of the template arguments have a meta role.
 			for item in self.templateResolved:
-				item.assertTrue(condition=not item.param.isRoleMeta, message="Template arguments cannot have a 'meta' role.")
+				item.assertTrue(condition=not item.param.isRoleMeta,
+					message="Template arguments cannot have a 'meta' role.")
 
 			# Validate the template arguments
 			validation = underlying.makeValidationForTemplate(resolver=resolver, parameters=configTypes)
@@ -135,7 +136,10 @@ class Type:
 	@cached_property
 	def templateResolved(self) -> ParametersResolved:
 		from tools.bdl.entities.impl.using import Using
-		return ParametersResolved(element=self.element, NestedElementType=Using, param=f"{self.templateAttr}_resolved", expected=f"{self.templateAttr}_expected")
+		return ParametersResolved(element=self.element,
+			NestedElementType=Using,
+			param=f"{self.templateAttr}_resolved",
+			expected=f"{self.templateAttr}_expected")
 
 	@property
 	def category(self) -> str:
@@ -182,13 +186,18 @@ class Type:
 		return Error.handleFromElement(element=self.element, attr=self.kindAttr, message=message, throw=throw)
 
 	def assertTrue(self, condition: bool, message: str, throw: bool = True) -> typing.Optional[str]:
-		return Error.assertTrue(condition=condition, element=self.element, attr=self.kindAttr, message=message, throw=throw)
+		return Error.assertTrue(condition=condition,
+			element=self.element,
+			attr=self.kindAttr,
+			message=message,
+			throw=throw)
 
 	def __repr__(self) -> str:
 		return self.name
 
 	def __eq__(self, other: "Type") -> bool:
 		return str(self) == str(other)
+
 
 class Visitor(VisitorDepthFirstBase[typing.List[str], str]):
 

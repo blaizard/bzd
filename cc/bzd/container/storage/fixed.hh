@@ -1,13 +1,13 @@
 #pragma once
 
 #include "cc/bzd/algorithm/copy_n.hh"
+#include "cc/bzd/container/reference_wrapper.hh"
 #include "cc/bzd/platform/types.hh"
+#include "cc/bzd/type_traits/conditional.hh"
 #include "cc/bzd/utility/distance.hh"
 #include "cc/bzd/utility/forward.hh"
 #include "cc/bzd/utility/in_place.hh"
 #include "cc/bzd/utility/min.hh"
-#include "cc/bzd/type_traits/conditional.hh"
-#include "cc/bzd/container/reference_wrapper.hh"
 
 namespace bzd::impl {
 /// \brief Fixed storage type.
@@ -33,12 +33,16 @@ public: // Constructors
 	constexpr Self& operator=(Self&&) noexcept = default;
 
 	template <class... Args>
-	constexpr explicit FixedStorage(InPlace, Args&&... args) noexcept requires (!concepts::reference<T>) : data_{bzd::forward<Args>(args)...}
+	constexpr explicit FixedStorage(InPlace, Args&&... args) noexcept
+	requires(!concepts::reference<T>)
+		: data_{bzd::forward<Args>(args)...}
 	{
 	}
 
 	template <class... Args>
-	constexpr explicit FixedStorage(InPlace, Args&&... args) noexcept requires (concepts::reference<T>) : data_{args...}
+	constexpr explicit FixedStorage(InPlace, Args&&... args) noexcept
+	requires(concepts::reference<T>)
+		: data_{args...}
 	{
 	}
 

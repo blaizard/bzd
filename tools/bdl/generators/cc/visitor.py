@@ -13,7 +13,6 @@ from tools.bdl.generators.cc.types import typeToStr as typeToStrOriginal
 from tools.bdl.generators.cc.value import valueToStr as valueToStrOriginal
 from tools.bdl.generators.cc.comments import commentBlockToStr as commentBlockToStrOriginal, commentEmbeddedToStr as commentEmbeddedToStrOriginal, commentParametersResolvedToStr as commentParametersResolvedToStrOriginal
 from tools.bdl.generators.cc.fqn import fqnToStr as fqnToStrOriginal, fqnToAdapterStr as fqnToAdapterStrOriginal, fqnToNameStr as fqnToNameStrOriginal
-
 """
 Use cases:
 
@@ -33,6 +32,7 @@ Expressions:
 - Can be used in function parameters (declaration):
 	- 
 """
+
 
 # String related
 class Transform:
