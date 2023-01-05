@@ -29,4 +29,4 @@ def commentParametersResolvedToStr(item: ParametersResolvedItem) -> str:
 	Create an inline comment from a parameter resolved entry.
 	"""
 
-	return f"/*{item.name}*/"
+	return f"/*{item.name}*/" if item.isName else ""

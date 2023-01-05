@@ -20,7 +20,7 @@ class Void(Builtin):
 
 class Any(Builtin):
 	def __init__(self) -> None:
-		super().__init__(ElementBuilder("builtin").setAttr("name", "Any"))
+		super().__init__(ElementBuilder("builtin").setAttr("name", "Any").setAttr("meta", "1"))
 
 class Integer(Builtin):
 	def __init__(self) -> None:
@@ -59,11 +59,11 @@ class String(Builtin):
 
 class Result(Builtin):
 	def __init__(self) -> None:
-		super().__init__(ElementBuilder("builtin").setAttr("name", "Result").addConfigType(name="Value", kind="Any").addConfigType(name="Error", kind="Any"))
+		super().__init__(ElementBuilder("builtin").setAttr("name", "Result").addConfigType(name="Value", kind="Any"))
 
 class Async(Builtin):
 	def __init__(self) -> None:
-		super().__init__(ElementBuilder("builtin").setAttr("name", "Async").addConfigType(name="Value", kind="Any").addConfigType(name="Error", kind="Any"))
+		super().__init__(ElementBuilder("builtin").setAttr("name", "Async").addConfigType(name="Value", kind="Any"))
 
 class Array(Builtin):
 	def __init__(self) -> None:
@@ -79,7 +79,7 @@ class Callable(Builtin):
 
 class List(Builtin):
 	def __init__(self) -> None:
-		super().__init__(ElementBuilder("builtin").setAttr("name", "list").addConfigValue(name="values...", kind="Any"))
+		super().__init__(ElementBuilder("builtin").setAttr("name", "list").addConfigValue(name="values...", kind="Any").setAttr("meta", "1"))
 
 Builtins = [
 	Void(), Any(), Integer(), Float(), Boolean(), Byte(), String(), Result(), Async(), Array(), Vector(), Callable(), List()

@@ -13,6 +13,7 @@ class Builtin(Entity):
 	Builtin types, cannot be created by the user, but are available implicitly in the language.
 	- Attributes:
 		- name: The name of the buildin type.
+		- meta: Whether this type is a meta type or not.
 	- Sequence:
 		- [config]: Configuration for the type.
 	"""

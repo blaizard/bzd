@@ -80,30 +80,26 @@ class TestRun(unittest.TestCase):
 
 	def testResult(self) -> None:
 
-		# No template
-		Object.fromContent(content="struct temp { var = Result; }", objectContext=ObjectContext(resolve=True))
+		with self.assertRaisesRegex(Exception, r"cannot have a 'meta' role"):
+			Object.fromContent(content="struct temp { var = Result; }", objectContext=ObjectContext(resolve=True))
 
 		# Template
 		Object.fromContent(content="struct temp { var = Result<Integer>; }", objectContext=ObjectContext(resolve=True))
 
-		Object.fromContent(content="struct temp { var = Result<Integer, Void>; }",
-			objectContext=ObjectContext(resolve=True))
-
-		with self.assertRaisesRegex(Exception, r"type"):
-			Object.fromContent(content="struct temp { var = Result<12, Void>; }",
-				objectContext=ObjectContext(resolve=True))
-		with self.assertRaisesRegex(Exception, r"type"):
-			Object.fromContent(content="struct temp { var = Result<Void, 78>; }",
+		with self.assertRaisesRegex(Exception, r"not expected"):
+			Object.fromContent(content="struct temp { var = Result<Integer, Void>; }",
 				objectContext=ObjectContext(resolve=True))
 
 		with self.assertRaisesRegex(Exception, r"not expected"):
 			Object.fromContent(content="struct temp { var = Result<Integer, Void, Float>; }",
 				objectContext=ObjectContext(resolve=True))
 
+		with self.assertRaisesRegex(Exception, r"type"):
+			Object.fromContent(content="struct temp { var = Result<12>; }",
+				objectContext=ObjectContext(resolve=True))
+
 		# Template of template
-		Object.fromContent(content="struct temp { var = Result<Result, Void>; }",
-			objectContext=ObjectContext(resolve=True))
-		Object.fromContent(content="struct temp { var = Result<Result<Void, Void>, Void>; }",
+		Object.fromContent(content="struct temp { var = Result<Result<Void>>; }",
 			objectContext=ObjectContext(resolve=True))
 
 	def testVector(self) -> None:

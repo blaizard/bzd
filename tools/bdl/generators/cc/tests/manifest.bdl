@@ -13,7 +13,7 @@ enum Error
 // Simple structure
 struct MyStruct {
 	a = Integer [min(0) max(12)];
-	b = Result<Float, Error>;
+	b = Result<Float>;
 	
 }
 
@@ -31,5 +31,3 @@ interface MyInterfaceB : MyInterfaceA {
 	value = Integer;
 	
 }
-
-

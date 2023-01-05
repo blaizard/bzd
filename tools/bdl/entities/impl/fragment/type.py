@@ -85,6 +85,10 @@ class Type:
 
 			self.templates.makeParametersResolved(name=self.templateAttr, resolver=resolver, expected=configTypes)
 
+			# Make sure none of the template arguments have a meta role.
+			for item in self.templateResolved:
+				item.assertTrue(condition=not item.param.isRoleMeta, message="Template arguments cannot have a 'meta' role.")
+
 			# Validate the template arguments
 			validation = underlying.makeValidationForTemplate(resolver=resolver, parameters=configTypes)
 			arguments = self.templates.getValuesOrTypesAsDict(resolver=resolver, varArgs=False)

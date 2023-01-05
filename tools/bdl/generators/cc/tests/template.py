@@ -107,23 +107,23 @@ class TestRun(unittest.TestCase):
 		output = self.render("""{{ entity("myComponent").typeResolved | typeRegistryToStr }}""")
 		self.assertEqual(output, "MyComponent<bzd::Float32>")
 
-	def testValueToRValue(self) -> None:
-		output = self.render("""{{ entity("MyStruct.var") | valueToRValue }}""")
+	def testExpressionToValue(self) -> None:
+		output = self.render("""{{ entity("MyStruct.var") | expressionToValue }}""")
 		self.assertEqual(output, "bzd::Int32{1}")
 
-		output = self.render("""{{ entity("myVar") | valueToRValue }}""")
+		output = self.render("""{{ entity("myVar") | expressionToValue }}""")
 		self.assertEqual(output, "const bzd::Int32{-2}")
 
-		output = self.render("""{{ entity("myVarNotInit") | valueToRValue }}""")
+		output = self.render("""{{ entity("myVarNotInit") | expressionToValue }}""")
 		self.assertEqual(output, "bzd::Int32{0}")
 
-		output = self.render("""{{ entity("myVarVarArgs") | valueToRValue }}""")
-		self.assertEqual(output, "bzd::Vector<bzd::Int32, 4u>{1, 2, 3, 4}")
+		output = self.render("""{{ entity("myVarVarArgs") | expressionToValue }}""")
+		self.assertEqual(output, "bzd::Vector<bzd::Int32, 4u>{bzd::inPlace, /*values*/1, /*values*/2, /*values*/3, /*values*/4}")
 
-		output = self.render("""{{ entity("myStruct") | valueToRValue }}""")
-		self.assertEqual(output, "MyStruct{2}")
+		output = self.render("""{{ entity("myStruct") | expressionToValue }}""")
+		self.assertEqual(output, "MyStruct{/*var*/bzd::Int32{2}}")
 
-		output = self.render("""{{ entity("myComponent") | valueToRValue }}""")
+		output = self.render("""{{ entity("myComponent") | expressionToValue }}""")
 		self.assertEqual(output, "MyComponent<bzd::Float32>{}")
 
 if __name__ == '__main__':

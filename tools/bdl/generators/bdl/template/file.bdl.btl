@@ -82,9 +82,9 @@ use "{{ use.path }}"
 namespace {{ entity | namespaceToStr }};
 {% end %}
 
-{% for extern in sequence %}
+{% for entity in sequence %}
 	{% if entity.isExtern %}
-{{ extern.comment | normalComment }}extern {{ extern.category }} {{ extern.name }};
+{{ entity.comment | normalComment }}extern {{ entity.category }} {{ entity.name }};
 	{% end %}
 {% end %}
 
