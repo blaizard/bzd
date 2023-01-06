@@ -5,6 +5,7 @@ from tools.bdl.generators.cc.fqn import fqnToNameStr
 from tools.bdl.generators.cc.comments import commentParametersResolvedToStr
 from tools.bdl.entities.impl.fragment.parameters_resolved import ParametersResolvedItem
 from tools.bdl.visitors.symbol_map import SymbolMap
+from tools.bdl.entities.impl.types import Category
 
 
 def valueToStr(item: ParametersResolvedItem,
@@ -49,7 +50,7 @@ def valueToStr(item: ParametersResolvedItem,
 		if symbols is not None:
 			# Cast values to there underlying interface type.
 			expectedType = item.expected.underlyingTypeFQN
-			if symbols.getEntityResolved(expectedType).value.category == "interface":
+			if symbols.getEntityResolved(expectedType).value.category == Category.interface:
 				value = f"bzd::Interface<\"{expectedType}\">::cast({value})"
 	elif item.isRValue:
 		values = [valueToStr(item=i, symbols=symbols, registry=registry) for i in item.param.parametersResolved]

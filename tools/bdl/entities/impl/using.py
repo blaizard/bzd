@@ -7,7 +7,6 @@ from bzd.parser.error import Error
 from tools.bdl.entities.impl.fragment.type import Type
 from tools.bdl.entities.impl.fragment.contract import Contracts
 from tools.bdl.entities.impl.entity import EntityExpression, Role
-from tools.bdl.entities.impl.types import TypeCategory
 
 
 class Using(EntityExpression):
@@ -22,10 +21,6 @@ class Using(EntityExpression):
 
 		super().__init__(element, Role.Type)
 		Error.assertHasAttr(element=element, attr="type")
-
-	@property
-	def typeCategory(self) -> TypeCategory:
-		return TypeCategory.using
 
 	def resolve(self, resolver: typing.Any) -> None:
 		"""

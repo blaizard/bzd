@@ -8,13 +8,13 @@ from bzd.parser.visitor import Visitor
 from tools.bdl.entities.impl.fragment.type import Type
 from tools.bdl.entities.impl.entity import Entity, Role
 from tools.bdl.entities.impl.fragment.fqn import FQN
-from tools.bdl.entities.impl.types import TypeCategory
+from tools.bdl.entities.impl.types import Category
 
 TYPE_STRUCT = "struct"
 TYPE_COMPONENT = "component"
 TYPE_INTERFACE = "interface"
 TYPE_COMPOSITION = "composition"
-TYPES = [TYPE_STRUCT, TYPE_COMPONENT, TYPE_INTERFACE, TYPE_COMPOSITION]
+TYPES = [Category.struct, Category.component, Category.interface, Category.composition]
 
 
 class Nested(Entity):
@@ -34,16 +34,15 @@ class Nested(Entity):
 	def __init__(self, element: Element) -> None:
 
 		super().__init__(element, Role.Type)
-		self.assertTrue(condition=self.category in TYPES, message=f"Unsupported nested type: '{self.category}'.")
+		self.assertTrue(condition=self.category in TYPES,
+			message=
+			f"Unsupported nested type: '{self.category}', only the following are supported: {', '.join([str(t) for t in TYPES])}"
+						)
 
 	@property
 	def configAttr(self) -> str:
 		# TODO: handle inheritance for "struct"
-		return "interface" if self.category == "struct" else "config"
-
-	@property
-	def typeCategory(self) -> TypeCategory:
-		return TypeCategory(self.category)
+		return "interface" if self.category == Category.struct else "config"
 
 	@property
 	def hasInheritance(self) -> bool:
@@ -74,22 +73,22 @@ class Nested(Entity):
 
 			# Validates that the inheritance type is correct.
 			underlyingTypeFQN = entity.getEntityUnderlyingTypeResolved(resolver=resolver)
-			if underlyingTypeFQN.category in ["struct", "interface", "component", "composition"]:
+			if underlyingTypeFQN.category in TYPES:
 				nestedCategory = underlyingTypeFQN.category  # type: ignore
-			elif underlyingTypeFQN.category == "extern":
+			elif underlyingTypeFQN.category == Category.extern:
 				nestedCategory = underlyingTypeFQN.type  # type: ignore
 			else:
 				self.error(message="Inheritance can only be done from a nested class, not '{}', category '{}'.".format(
 					entity.underlyingTypeFQN, underlyingTypeFQN.category))
 
-			if self.category == TYPE_STRUCT:
-				self.assertTrue(condition=nestedCategory == TYPE_STRUCT,
+			if self.category == Category.struct:
+				self.assertTrue(condition=nestedCategory == Category.struct,
 					message="A struct can only inherits from another struct, not '{}'.".format(nestedCategory))
-			elif self.category == TYPE_INTERFACE:
-				self.assertTrue(condition=nestedCategory == TYPE_INTERFACE,
+			elif self.category == Category.interface:
+				self.assertTrue(condition=nestedCategory == Category.interface,
 					message="An interface can only inherits from another interface, not '{}'.".format(nestedCategory))
-			elif self.category == TYPE_COMPONENT:
-				self.assertTrue(condition=nestedCategory == TYPE_INTERFACE,
+			elif self.category == Category.component:
+				self.assertTrue(condition=nestedCategory == Category.interface,
 					message="A component can only inherits from interface(s), not '{}'.".format(nestedCategory))
 			else:
 				self.error(message="Unsupported inheritance for type: '{}'.".format(self.category))

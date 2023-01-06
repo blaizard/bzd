@@ -2,6 +2,7 @@ import typing
 
 import bzd.validation.validation
 from bzd.validation.schema import Constraint, ProcessedSchema, TypeContext
+from tools.bdl.entities.impl.types import Category
 
 from tools.bdl.contracts.traits import ContractTraits, Role
 
@@ -18,7 +19,7 @@ class InitConstraint_(Constraint):
 		from tools.bdl.entities.impl.entity import Entity
 		if isinstance(context.value, Entity):
 			underlyingTypeFQN = context.args["resolver"].getEntityResolved(context.value.underlyingTypeFQN).value
-			assert underlyingTypeFQN.category == "method", "'init' constraint applies only to methods."
+			assert underlyingTypeFQN.category == Category.method, "'init' constraint applies only to methods."
 			assert underlyingTypeFQN.parameters.empty(), "'init' methods cannot take arguments."
 
 

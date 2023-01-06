@@ -3,7 +3,6 @@ import typing
 from bzd.parser.element import Element
 from bzd.parser.error import Error
 
-from tools.bdl.entities.impl.types import TypeCategory
 from tools.bdl.entities.impl.entity import Entity, Role
 from tools.bdl.entities.impl.fragment.type import Type
 
@@ -25,10 +24,6 @@ class Builtin(Entity):
 	@property
 	def underlyingTypeFQN(self) -> str:
 		return self.name
-
-	@property
-	def typeCategory(self) -> TypeCategory:
-		return TypeCategory.builtin
 
 	@property
 	def isType(self) -> bool:

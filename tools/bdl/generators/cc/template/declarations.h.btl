@@ -30,11 +30,11 @@
 {%- macro declareTrivialTypes(trivialTypes) %}
 	{% for data in trivialTypes %}
 		{% if not data.isExtern %}
-			{% if data.category == "using" %}
+			{% if data.category == Category.using %}
 {{ data.comment | commentBlockToStr }}using {{ data.name }} = {{ data.type | typeToStr }};
-			{% elif data.category == "enum" %}
+			{% elif data.category == Category.enum %}
 {{ declareEnum(data) }}
-			{% elif data.category == "struct" %}
+			{% elif data.category == Category.struct %}
 {{ declareStruct(data) }}
 			{% end %}
 		{% end %}

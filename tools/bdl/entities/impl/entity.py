@@ -13,6 +13,7 @@ from tools.bdl.entities.impl.fragment.sequence import EntitySequence
 from tools.bdl.entities.impl.fragment.fqn import FQN
 from tools.bdl.entities.impl.fragment.type import Type
 from tools.bdl.entities.impl.fragment.parameters_resolved import ParametersResolvedItem
+from tools.bdl.entities.impl.types import Category
 
 if typing.TYPE_CHECKING:
 	from tools.bdl.entities.impl.expression import Expression
@@ -43,8 +44,8 @@ class Entity:
 		self.role = role
 
 	@property
-	def category(self) -> str:
-		return self.element.getAttrValue("category")
+	def category(self) -> Category:
+		return Category(self.element.getAttrValue("category"))
 
 	def copy(self: U) -> U:
 		"""
@@ -245,7 +246,7 @@ class Entity:
 			return Parameters(element=underlyingType.element,
 				NestedElementType=Using,
 				nestedKind=underlyingType.configAttr,
-				filterFct=lambda entity: entity.category == "using")
+				filterFct=lambda entity: entity.category == Category.using)
 		return Parameters(element=self.element, NestedElementType=Using)
 
 	def getConfigValues(self, resolver: typing.Any) -> Parameters:
@@ -259,7 +260,7 @@ class Entity:
 			return Parameters(element=underlyingTypeFQN.element,
 				NestedElementType=Expression,
 				nestedKind=underlyingTypeFQN.configAttr,
-				filterFct=lambda entity: entity.category == "expression")
+				filterFct=lambda entity: entity.category == Category.expression)
 		return Parameters(element=self.element, NestedElementType=Expression)
 
 	def makeValidation(self, resolver: typing.Any, parameters: Parameters, forTemplate: bool) -> Validation[SchemaDict]:
@@ -329,12 +330,12 @@ class Entity:
 
 		# Resolve the types from a config sequence if any.
 		for entity in self.configRaw:
-			if entity.category == "expression":
+			if entity.category == Category.expression:
 				if entity.isType:
 					# Only the type of the expression should be resolved, the value cannot be evaluated
 					# as it might be malformed, this is inherent from config expressions.
 					typing.cast("Expression", entity).type.resolve(resolver=resolver)
-			elif entity.category == "using":
+			elif entity.category == Category.using:
 				typing.cast("Using", entity).resolve(resolver=resolver)
 			else:
 				self.error(f"Configuration can only contain expressions or using statements, not '{entity.category}'.")

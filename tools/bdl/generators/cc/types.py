@@ -8,6 +8,7 @@ from tools.bdl.entities.impl.fragment.fqn import FQN
 from tools.bdl.generators.cc.comments import commentEmbeddedToStr
 from tools.bdl.generators.cc.fqn import fqnToNameStr
 from tools.bdl.generators.cc.builtins import builtins
+from tools.bdl.entities.impl.types import Category
 
 
 class _VisitorType(Visitor):
@@ -45,7 +46,7 @@ class _VisitorType(Visitor):
 
 		# Whether this type should be a reference or not.
 		useReference = self.isTopLevel and self.reference
-		useReference |= self.referenceForInterface and entity.category == "interface"
+		useReference |= self.referenceForInterface and entity.category == Category.interface
 
 		outputList: typing.List[str] = []
 		output: str

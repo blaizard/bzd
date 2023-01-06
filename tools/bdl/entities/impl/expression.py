@@ -13,7 +13,7 @@ from tools.bdl.entities.impl.fragment.parameters import Parameters
 from tools.bdl.entities.impl.fragment.parameters_resolved import ParametersResolved
 from tools.bdl.entities.impl.fragment.fqn import FQN
 from tools.bdl.entities.impl.entity import Entity, EntityExpression, Role
-from tools.bdl.entities.impl.types import TypeCategory
+from tools.bdl.entities.impl.types import Category
 
 if typing.TYPE_CHECKING:
 	from tools.bdl.visitors.symbol_map import Resolver
@@ -151,11 +151,10 @@ class Expression(EntityExpression):
 
 		# Validate the type of arguments.
 		parameterTypeCategories = {*parameters.getUnderlyingTypeCategories(resolver)}
-		if TypeCategory.component in parameterTypeCategories:
-			typeCategory = resolvedTypeEntity.typeCategory  # type: ignore
-			self.assertTrue(condition=typeCategory
-				in [TypeCategory.component, TypeCategory.method, TypeCategory.builtin],
-				message=f"Components are not allowed for this type '{typeCategory}'.")
+		if Category.component in parameterTypeCategories:
+			category = resolvedTypeEntity.category  # type: ignore
+			self.assertTrue(condition=category in [Category.component, Category.method, Category.builtin],
+				message=f"Components are not allowed for this type '{category}'.")
 
 		# Read the validation for the values and evaluate it.
 		validation = self.makeValidationForValues(resolver=resolver, parameters=expectedParameters)

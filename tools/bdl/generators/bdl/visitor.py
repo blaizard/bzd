@@ -6,6 +6,7 @@ from tools.bdl.entities.all import Namespace
 from tools.bdl.entities.impl.fragment.type import Type, Visitor as VisitorType
 from tools.bdl.entities.impl.fragment.parameters_resolved import ParametersResolved
 from bzd.template.template import Template
+from tools.bdl.entities.impl.types import Category
 
 
 class _VisitorType(VisitorType):
@@ -55,6 +56,7 @@ def formatBdl(bdl: Object, includes: typing.List[Path]) -> str:
 	template = Template.fromPath(Path(__file__).parent / "template/file.bdl.btl", indent=True)
 	output = template.render(
 		bdl.tree, {
+		"Category": Category,
 		"typeToStr": _typeToStr,
 		"namespaceToStr": _namespaceToStr,
 		"inlineComment": _inlineComment,

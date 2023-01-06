@@ -7,7 +7,6 @@ from bzd.parser.error import Error
 
 from tools.bdl.entities.impl.fragment.type import Type
 from tools.bdl.entities.impl.entity import Entity, Role
-from tools.bdl.entities.impl.types import TypeCategory
 
 
 class Extern(Entity):
@@ -23,12 +22,6 @@ class Extern(Entity):
 		super().__init__(element, Role.Type)
 		Error.assertHasAttr(element=element, attr="type")
 		Error.assertHasAttr(element=element, attr="name")
-
-	@property
-	def typeCategory(self) -> TypeCategory:
-		if self.type == "type":
-			return TypeCategory.struct
-		return TypeCategory(self.type)
 
 	@property
 	def type(self) -> str:

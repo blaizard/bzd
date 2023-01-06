@@ -21,10 +21,10 @@
 {% end -%}
 
 {%- macro declareNested(data) %}
-{{ data.comment | normalComment }}{{ data.category }}{% if data.isName %} {{ data.name }}{% end %}{{ declareContract(data.contracts) }}{% if data.hasInheritance %} : {{ data.inheritanceList | inheritanceToStr }}
+{{ data.comment | normalComment }}{{ data.category.value }}{% if data.isName %} {{ data.name }}{% end %}{{ declareContract(data.contracts) }}{% if data.hasInheritance %} : {{ data.inheritanceList | inheritanceToStr }}
 {%- end %} {
 	{% if data.isInterface %}
-		{% if data.category == "component" %}
+		{% if data.category.value == "component" %}
 interface:
 		{% end %}
 	{{ declareSymbols(data.interface.sequence) }}
@@ -51,21 +51,21 @@ composition:
 {%- macro declareSymbols(data) %}
 	{% for entity in data %}
 		{% if not entity.isExtern %}
-			{% if entity.category == "using" %}
+			{% if entity.category == Category.using %}
 {{ declareUsing(entity) }}
-			{% elif entity.category == "enum" %}
+			{% elif entity.category == Category.enum %}
 {{ declareEnum(entity) }}
-			{% elif entity.category == "method" %}
+			{% elif entity.category == Category.method %}
 {{ declareMethod(entity) }}
-			{% elif entity.category == "struct" %}
+			{% elif entity.category == Category.struct %}
 {{ declareNested(entity) }}
-			{% elif entity.category == "interface" %}
+			{% elif entity.category == Category.interface %}
 {{ declareNested(entity) }}
-			{% elif entity.category == "component" %}
+			{% elif entity.category == Category.component %}
 {{ declareNested(entity) }}
-			{% elif entity.category == "composition" %}
+			{% elif entity.category == Category.composition %}
 {{ declareNested(entity) }}
-			{% elif entity.category == "expression" %}
+			{% elif entity.category == Category.expression %}
 {{ declareExpression(entity) }};
 			{% end %}
 		{% end %}
@@ -84,7 +84,7 @@ namespace {{ entity | namespaceToStr }};
 
 {% for entity in sequence %}
 	{% if entity.isExtern %}
-{{ entity.comment | normalComment }}extern {{ entity.category }} {{ entity.name }};
+{{ entity.comment | normalComment }}extern {{ entity.category.value }} {{ entity.name }};
 	{% end %}
 {% end %}
 
