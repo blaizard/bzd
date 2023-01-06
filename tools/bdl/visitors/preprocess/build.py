@@ -2,7 +2,7 @@ import typing
 
 from bzd.parser.element import Element, Sequence, ElementBuilder
 
-from tools.bdl.visitor import Visitor, CATEGORY_COMPOSITION, CATEGORY_GLOBAL_COMPOSITION, CATEGORY_CONFIG, CATEGORY_INTERFACE, CATEGORY_GLOBAL
+from tools.bdl.visitor import Visitor, Group
 from tools.bdl.entities.all import Expression, Nested, Method, Using, Use, Enum, Extern, EntityType, Namespace
 from tools.bdl.entities.builder import NamespaceBuilder
 from tools.bdl.visitors.symbol_map import SymbolMap
@@ -29,15 +29,14 @@ class Build(Visitor[None]):
 	def registerEntity(self, entity: EntityType) -> str:
 
 		resolve = self.objectContext.resolve
-		resolve &= (self.category not in {CATEGORY_COMPOSITION, CATEGORY_GLOBAL_COMPOSITION
-											}) or self.objectContext.composition
+		resolve &= (self.group not in {Group.composition, Group.globalComposition}) or self.objectContext.composition
 
 		# Save the serialized payload
 		fqn = self.symbols.insert(name=entity.name if entity.isName else None,
 			namespace=self.namespace,
 			element=entity.element,
 			path=self.objectContext.getSource(),
-			category=self.category)
+			group=self.group)
 
 		# Resolve the symbol
 		if resolve:
@@ -86,7 +85,7 @@ class Build(Visitor[None]):
 				namespace=namespace[:-1],
 				element=NamespaceBuilder(namespace),
 				path=None,
-				category=self.category,
+				group=self.group,
 				conflicts=True)
 
 		self.registerEntity(entity=entity)

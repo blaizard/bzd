@@ -5,7 +5,7 @@ from bzd.parser.error import Error, Result
 from bzd.parser.element import Element, SequenceBuilder
 from bzd.parser.context import Context
 
-from tools.bdl.visitor import Visitor, CATEGORIES, CATEGORY_COMPOSITION, CATEGORY_GLOBAL_COMPOSITION
+from tools.bdl.visitor import Visitor, Group
 from tools.bdl.builtins import Builtins
 from tools.bdl.entities.all import elementToEntity, EntityType
 from tools.bdl.entities.builder import ElementBuilder
@@ -21,7 +21,7 @@ class Resolver:
 	def __init__(self,
 		symbols: "SymbolMap",
 		namespace: typing.List[str] = [],
-		exclude: typing.Optional[typing.List[str]] = None,
+		exclude: typing.Optional[typing.List[Group]] = None,
 		this: typing.Optional[str] = None) -> None:
 		self.symbols = symbols
 		self.namespace = namespace
@@ -159,16 +159,16 @@ class SymbolMap:
 		# Resolve builtins before instering them.
 		entity.resolveMemoized(resolver=self.makeResolver())
 		ElementBuilder.cast(entity.element, ElementBuilder).setAttr("fqn", name)
-		self.builtins[name] = {"c": "builtin", "p": "", "e": entity.element.serialize()}
+		self.builtins[name] = {"g": "builtin", "p": "", "e": entity.element.serialize()}
 		self.entities[name] = entity
 
-	def contains(self, fqn: str, exclude: typing.Optional[typing.List[str]] = None) -> bool:
+	def contains(self, fqn: str, exclude: typing.Optional[typing.List[Group]] = None) -> bool:
 		"""
 		Check if the fqn is registered.
 		"""
 		return False if self._get(fqn=fqn, exclude=exclude) is None else True
 
-	def _get(self, fqn: str, exclude: typing.Optional[typing.List[str]] = None) -> typing.Optional[typing.Any]:
+	def _get(self, fqn: str, exclude: typing.Optional[typing.List[Group]] = None) -> typing.Optional[typing.Any]:
 		"""
 		Return the raw data if it exsits.
 		"""
@@ -178,23 +178,23 @@ class SymbolMap:
 			data = self.builtins[fqn]
 		else:
 			return None
-		if exclude and data["c"] in exclude:
+		if exclude and Group(data["g"]) in exclude:
 			return None
 		return data
 
 	def items(self,
-		categories: typing.Set[str] = set(),
+		groups: typing.Set[Group] = set(),
 		startsWith: str = "") -> typing.Iterator[typing.Tuple[str, EntityType]]:
 		"""
-		Iterate through entities optionaly filtered by their categories.
+		Iterate through entities optionaly filtered by their groups.
 
 		Args:
-			categories: Categories to be returned.
+			groups: Groups to be returned.
 			startsWith: The returned items start with the specified fqn.
 		"""
 
 		for fqn, meta in self.map.items():
-			if meta["c"] in categories:
+			if Group(meta["g"]) in groups:
 				if fqn.startswith(startsWith):
 					entity = self.getEntityResolved(fqn=fqn).value
 					yield fqn, entity
@@ -204,7 +204,7 @@ class SymbolMap:
 		namespace: typing.List[str],
 		path: typing.Optional[Path],
 		element: Element,
-		category: str,
+		group: Group,
 		conflicts: bool = False) -> str:
 		"""
 		Insert a new element into the symbol map.
@@ -212,12 +212,12 @@ class SymbolMap:
 			fqn: Full qualified name.
 			path: Path associated with the element.
 			element: Element to be registered.
-			category: Category associated with the element, will be used for filtering.
+			group: Group associated with the element, will be used for filtering.
 			conflicts: Handle symbol FQN conflicts.
 		"""
 		if name is None:
 			# These are the unnamed elements that should be progpagated to other translation units.
-			if category in {CATEGORY_COMPOSITION, CATEGORY_GLOBAL_COMPOSITION}:
+			if group in {Group.composition, Group.globalComposition}:
 				fqn = FQN.makeUnique(namespace=namespace)
 				# If not, they will be kept private.
 			else:
@@ -237,7 +237,7 @@ class SymbolMap:
 			if not conflicts or element != originalElement:
 				SymbolMap.errorSymbolConflict_(element, originalElement)
 
-		self.map[fqn] = {"c": category, "p": path.as_posix() if path is not None else "", "e": None}
+		self.map[fqn] = {"g": group.value, "p": path.as_posix() if path is not None else "", "e": None}
 
 		# Resolve context
 		context, _, _ = element.context.resolve()
@@ -270,7 +270,7 @@ class SymbolMap:
 					SymbolMap.metaToElement(existingElement))
 			self.map[fqn] = element
 
-	def makeReference(self, fqn: str, category: typing.Optional[str] = None) -> Element:
+	def makeReference(self, fqn: str, group: typing.Optional[Group] = None) -> Element:
 		"""
 		Create a reference from an existing FQN.
 		"""
@@ -295,11 +295,11 @@ class SymbolMap:
 			element = entity.element
 
 			# Remove nested element and change them to references.
-			if any([element.isNestedSequence(category) for category in CATEGORIES]):
+			if any([element.isNestedSequence(group.value) for group in Group]):
 
-				preparedElement = element.copy(ignoreNested=CATEGORIES)
-				for category in CATEGORIES:
-					nested = element.getNestedSequence(category)
+				preparedElement = element.copy(ignoreNested=[group.value for group in Group])
+				for group in Group:
+					nested = element.getNestedSequence(group.value)
 					if nested is not None:
 						sequence = SequenceBuilder()
 						for nestedElement in nested:
@@ -317,7 +317,7 @@ class SymbolMap:
 							else:
 								sequence.pushBackElement(nestedElement)
 						if sequence:
-							preparedElement.setNestedSequence(category, sequence)
+							preparedElement.setNestedSequence(group.value, sequence)
 				element = preparedElement
 
 			# Serialize the element to the map.
@@ -329,9 +329,9 @@ class SymbolMap:
 
 		# Sanity check to ensure that all entries in the map are valid.
 		for fqn, entry in self.map.items():
-			assert "e" in entry and entry["e"], "Invalid element in the map: {}.".format(entry)
-			assert "c" in entry and entry["c"], "Invalid category in the map: {}.".format(entry)
-			assert "p" in entry, "Missing path in the map: {}.".format(entry)
+			assert "e" in entry and entry["e"], f"Invalid element in the map: {entry}."
+			assert "g" in entry and Group(entry["g"]) in Group, f"Invalid group in the map: {entry}."
+			assert "p" in entry, f"Missing path in the map: {entry}."
 
 		# Mark as closed.
 		self.isClosed = True
@@ -347,7 +347,7 @@ class SymbolMap:
 	def metaToElement(meta: typing.Any) -> Element:
 		return Element.fromSerialize(element=meta["e"], context=Context(path=Path(meta["p"])))
 
-	def getEntityResolved(self, fqn: str, exclude: typing.Optional[typing.List[str]] = None) -> Result[EntityType]:
+	def getEntityResolved(self, fqn: str, exclude: typing.Optional[typing.List[Group]] = None) -> Result[EntityType]:
 		"""
 		Return an element from the symbol map.
 		This call assumes that FQN is already resolved.
@@ -362,17 +362,17 @@ class SymbolMap:
 			element = SymbolMap.metaToElement(data)
 			entity = elementToEntity(element=element)
 			# Resolve dependencies
-			for category in CATEGORIES:
-				if element.isNestedSequence(category):
+			for group in Group:
+				if element.isNestedSequence(group.value):
 					updatedSequence = SequenceBuilder()
-					for nested in element.getNestedSequenceAssert(category):
+					for nested in element.getNestedSequenceAssert(group.value):
 						nestedEntity = elementToEntity(nested)
 						# Resolve the reference if any
 						if isinstance(nestedEntity, Reference):
 							nestedEntity = self.getEntityResolved(fqn=nestedEntity.name,
 								exclude=exclude).assertValue(element=element)
 						updatedSequence.pushBackElement(nestedEntity.element)
-					ElementBuilder.cast(element, ElementBuilder).setNestedSequence(kind=category,
+					ElementBuilder.cast(element, ElementBuilder).setNestedSequence(kind=group.value,
 						sequence=updatedSequence)
 			self.entities[fqn] = entity
 
@@ -383,7 +383,7 @@ class SymbolMap:
 		# Return the entity.
 		return Result[EntityType](self.entities[fqn])
 
-	def getEntity(self, fqn: str, exclude: typing.Optional[typing.List[str]] = None) -> Result[EntityType]:
+	def getEntity(self, fqn: str, exclude: typing.Optional[typing.List[Group]] = None) -> Result[EntityType]:
 		"""
 		Return an element from the symbol map and resolves underlying types if needed.
 		"""
@@ -415,5 +415,5 @@ class SymbolMap:
 	def __repr__(self) -> str:
 		content = []
 		for key, data in {**self.map, **self.builtins}.items():
-			content.append("[{}] {}".format(data["c"], key))
+			content.append("[{}] {}".format(data["g"], key))
 		return "\n".join(content)

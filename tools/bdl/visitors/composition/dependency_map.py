@@ -1,7 +1,7 @@
 import typing
 import dataclasses
 
-from tools.bdl.visitor import CATEGORY_COMPOSITION
+from tools.bdl.visitor import Group
 from tools.bdl.visitors.symbol_map import SymbolMap
 from tools.bdl.entities.impl.builtin import Builtin
 from tools.bdl.entities.impl.entity import Entity
@@ -151,7 +151,7 @@ class DependencyMap:
 						namespace=interfaceEntity.namespace,
 						path=None,
 						element=ExpressionBuilder(type=f"this.{interfaceEntity.name}"),
-						category=CATEGORY_COMPOSITION)
+						group=Group.composition)
 					newEntity = self.symbols.getEntityResolved(fqn=fqn).value
 					newResolver = self.symbols.makeResolver(namespace=interfaceEntity.namespace, this=entity.fqn)
 					newEntity.resolveMemoized(resolver=newResolver)

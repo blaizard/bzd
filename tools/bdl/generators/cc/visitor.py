@@ -8,7 +8,7 @@ from tools.bdl.object import Object
 from tools.bdl.entities.all import Namespace, Using, Expression
 from tools.bdl.entities.impl.fragment.type import Type
 from tools.bdl.entities.impl.fragment.parameters_resolved import ParametersResolved, ParametersResolvedItem
-from tools.bdl.entities.impl.types import Category as CategoryOriginal
+from tools.bdl.entities.impl.types import Category
 
 from tools.bdl.generators.cc.types import typeToStr as typeToStrOriginal
 from tools.bdl.generators.cc.value import valueToStr as valueToStrOriginal
@@ -38,7 +38,8 @@ Expressions:
 # String related
 class Transform:
 
-	Category = CategoryOriginal
+	Category = Category
+	AsyncType = AsyncType
 
 	def __init__(self, composition: typing.Optional[Composition] = None, includes: typing.List[Path] = []) -> None:
 		self.composition = composition
@@ -191,7 +192,7 @@ class Transform:
 
 	# Async type
 
-	def asyncTypeToStr(self, asyncType: str) -> str:
+	def asyncTypeToStr(self, asyncType: AsyncType) -> str:
 		return {
 			AsyncType.workload: "bzd::async::Type::workload",
 			AsyncType.service: "bzd::async::Type::service",
