@@ -3,20 +3,20 @@
 
 {#- Generate calls for all init members associated with an expression. -#}
 {%- macro callInitMembers(expresssion) -%}
-	{% for dep in dependencies.map[expresssion].deps %}
+	{% for dep in entites.map[expresssion].deps %}
 co_await !registry.{{ dep.fqn | fqnToNameStr }}_.init(registry);
 	{% end %}
-	{% for dep in dependencies.map[expresssion].pre %}
+	{% for dep in entites.map[expresssion].pre %}
 co_await !{{ dep.type | typeRegistryToStr }}();
 	{% end %}
 {% end -%}
 
 {#- Generate calls for all shutdown members associated with an expression. -#}
 {%- macro callShutdownMembers(expresssion) -%}
-	{% for dep in dependencies.map[expresssion].post %}
+	{% for dep in entites.map[expresssion].post %}
 co_await !{{ dep.type | typeRegistryToStr }}();
 	{% end %}
-	{% for dep in dependencies.map[expresssion].deps %}
+	{% for dep in entites.map[expresssion].deps %}
 co_await !registry.{{ dep.fqn | fqnToNameStr }}_.shutdown(registry);
 	{% end %}
 {% end -%}

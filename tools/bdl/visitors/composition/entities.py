@@ -2,7 +2,7 @@ import typing
 import dataclasses
 
 from tools.bdl.visitor import Group
-from tools.bdl.visitors.symbol_map import SymbolMap
+from tools.bdl.visitors.symbol_map import SymbolMap, Resolver
 from tools.bdl.entities.impl.builtin import Builtin
 from tools.bdl.entities.impl.entity import Entity
 from tools.bdl.entities.impl.expression import Expression
@@ -71,12 +71,13 @@ class Dependencies:
 		return "\n".join(content)
 
 
-class DependencyMap:
+class Entities:
 	"""Class to handle entities and their dependencies."""
 
 	def __init__(self, symbols: SymbolMap) -> None:
 		self.symbols = symbols
 		self.map: typing.Dict[Entity, Dependencies] = {}
+		self.connections: typing.Dict[str, typing.Set[str]] = {}
 
 	def findAllIntra(self, entities: typing.List[Entity]) -> DependencyGroup:
 		"""Find all intra expressions associated with this entities."""
@@ -90,26 +91,57 @@ class DependencyMap:
 
 		return dependencies
 
-	def add(self, entity: Entity) -> None:
+	def processMeta(self, entity: Entity) -> None:
+		"""Process a meta expression, a special function from the language."""
+
+		entity.assertTrue(condition=entity.isType, message=f"Meta expressions must have a type.")
+		if entity.type.fqn == "connect":
+			io1 = entity.parametersResolved[0].expectsFQN()
+			io2 = entity.parametersResolved[1].expectsFQN()
+
+			self.connections.setdefault(io1, set()).add(io2)
+			self.connections.setdefault(io2, set()).add(io1)
+
+			print("HEEEEEEE", io1, io2)
+			# self.connections[]
+			pass
+		else:
+			entity.error(message="Unsupported meta expression.")
+
+	def update(self, entities: typing.List[Entity]) -> None:
+		"""Update the object with new entities."""
+
+		for entity in entities:
+			self.add_(entity)
+		self.addImplicit_()
+
+	def add_(self, entity: Entity) -> None:
 		assert entity not in self.map, f"The entity '{entity}' is already inserted in the dependency map."
-		dependencies = self.resolveDependencies(entity)
 
-		self.map[entity] = dependencies
+		# Resolve the entity against its namespace.
+		resolver = self.symbols.makeResolver(namespace=entity.namespace)
+		entity.resolveMemoized(resolver=resolver)
 
-	def addImplicit(self) -> None:
+		if entity.isRoleMeta:
+			self.processMeta(entity)
+		else:
+			self.map[entity] = self.resolveDependencies(entity=entity, resolver=resolver)
+
+	def addImplicit_(self) -> None:
 		"""Look for all implicit dependencies and add them if not already present."""
 
 		while True:
-			updated = {}
+			updated = set()
 			for entity, dependencies in self.map.items():
 				for dependency in dependencies.deps + dependencies.intra:
 					if dependency not in self.map and dependency not in updated:
-						updated[dependency] = self.resolveDependencies(dependency)
-			if len(updated) == 0:
+						updated.add(dependency)
+			if not updated:
 				break
-			self.map.update(updated)
+			for entity in updated:
+				self.add_(entity)
 
-	def resolveDependencies(self, entity: Entity) -> Dependencies:
+	def resolveDependencies(self, entity: Entity, resolver: Resolver) -> Dependencies:
 		"""Resolve the dependencies for a specific entity."""
 
 		def checkIfInitOrShutdown(interfaceEntity: Entity) -> typing.Optional[DependencyGroup]:
@@ -121,10 +153,6 @@ class DependencyMap:
 
 		# These corresponds to the entities to be executed before / during / after.
 		dependencies = Dependencies()
-
-		# Resolve the entity against its namespace.
-		resolver = self.symbols.makeResolver(namespace=entity.namespace)
-		entity.resolveMemoized(resolver=resolver)
 
 		if isinstance(entity, Expression):
 
