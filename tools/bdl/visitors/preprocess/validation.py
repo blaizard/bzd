@@ -1,5 +1,6 @@
 from tools.bdl.visitor import Visitor as VisitorBase
 from tools.bdl.entities.all import Expression, Builtin, Nested, Method, Using, Enum, Namespace, Use, EntityType
+from tools.bdl.entities.impl.types import Category
 
 
 class Validation(VisitorBase[None]):
@@ -22,35 +23,36 @@ class Validation(VisitorBase[None]):
 		configCategories = {nested.category for nested in entity.configRaw}
 		compositionCategories = {nested.category for nested in entity.composition}
 
-		if entity.category == "interface":
+		if entity.category == Category.interface:
 			entity.assertTrue(condition=entity.isName, message="Interfaces must have a valid name.")
-			entity.assertTrue(condition=interfaceCategories.issubset({"method", "expression"}),
+			entity.assertTrue(condition=interfaceCategories.issubset({Category.method, Category.expression}),
 				message="Interfaces can only expose methods and expressions as interface.")
-			entity.assertTrue(condition=configCategories.issubset({"expression", "using"}),
+			entity.assertTrue(condition=configCategories.issubset({Category.expression, Category.using}),
 				message="Interfaces configuration can only contain expressions and using statements.")
 			entity.assertTrue(condition=len(compositionCategories) == 0,
 				message="Interfaces cannot have nested composition.")
 
-		elif entity.category == "struct":
+		elif entity.category == Category.struct:
 			entity.assertTrue(condition=entity.isName, message="Structures must have a valid name.")
-			entity.assertTrue(condition=interfaceCategories.issubset({"expression", "enum", "struct", "using"}),
+			entity.assertTrue(condition=interfaceCategories.issubset(
+				{Category.expression, Category.enum, Category.struct, Category.using}),
 				message="Structures only accept expressions, enums, nested structs or using statements.")
 			entity.assertTrue(condition=len(configCategories) == 0, message="Structures cannot have configuration.")
 			entity.assertTrue(condition=len(compositionCategories) == 0,
 				message="Structures cannot have nested composition.")
 
-		elif entity.category == "component":
+		elif entity.category == Category.component:
 			entity.assertTrue(condition=entity.isName, message="Components must have a valid name.")
-			entity.assertTrue(condition=interfaceCategories.issubset({"method", "expression"}),
+			entity.assertTrue(condition=interfaceCategories.issubset({Category.method, Category.expression}),
 				message="Components can only expose methods and expressions as interface.")
-			entity.assertTrue(condition=configCategories.issubset({"expression", "using"}),
+			entity.assertTrue(condition=configCategories.issubset({Category.expression, Category.using}),
 				message="Components configuration can only contain expressions or using statements.")
-			entity.assertTrue(condition=compositionCategories.issubset({"expression"}),
+			entity.assertTrue(condition=compositionCategories.issubset({Category.expression}),
 				message="Components composition can only contain expressions.")
 
-		elif entity.category == "composition":
+		elif entity.category == Category.composition:
 			entity.assertTrue(condition=not entity.hasInheritance, message="Compositions cannot have inheritance.")
-			entity.assertTrue(condition=interfaceCategories.issubset({"expression"}),
+			entity.assertTrue(condition=interfaceCategories.issubset({Category.expression}),
 				message="Compositions can only contain expressions.")
 			entity.assertTrue(condition=len(configCategories) == 0, message="Compositions cannot have configuration.")
 			entity.assertTrue(condition=len(compositionCategories) == 0,

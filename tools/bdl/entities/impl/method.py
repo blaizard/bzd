@@ -10,7 +10,7 @@ from tools.bdl.entities.impl.expression import Expression
 from tools.bdl.entities.impl.entity import Entity, Role
 from tools.bdl.entities.impl.fragment.parameters import Parameters
 from tools.bdl.entities.impl.fragment.fqn import FQN
-from tools.bdl.entities.impl.types import TypeCategory
+from tools.bdl.entities.impl.types import Category
 
 
 class Method(Entity):
@@ -30,10 +30,6 @@ class Method(Entity):
 	@property
 	def configAttr(self) -> str:
 		return "argument"
-
-	@property
-	def typeCategory(self) -> TypeCategory:
-		return TypeCategory.method
 
 	@property
 	def isType(self) -> bool:
@@ -63,7 +59,7 @@ class Method(Entity):
 
 		# Validate the type of arguments.
 		parameterTypeCategories = {*self.parameters.getUnderlyingTypeCategories(resolver)}
-		self.assertTrue(condition=TypeCategory.component not in parameterTypeCategories,
+		self.assertTrue(condition=Category.component not in parameterTypeCategories,
 			message=f"Components are not allowed as method parameter.")
 
 		super().resolve(resolver)

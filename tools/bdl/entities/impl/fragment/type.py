@@ -70,7 +70,8 @@ class Type:
 		underlying.resolveMemoized(resolver=resolver)
 
 		# Save the category under {kindAttr}_category.
-		ElementBuilder.cast(self.element, ElementBuilder).setAttr(f"{self.kindAttr}_category", underlying.category)
+		ElementBuilder.cast(self.element, ElementBuilder).setAttr(f"{self.kindAttr}_category",
+			underlying.category.value)
 
 		if self.underlyingTypeAttr is not None and underlying.underlyingTypeFQN is not None:
 			ElementBuilder.cast(self.element, ElementBuilder).setAttr(self.underlyingTypeAttr,

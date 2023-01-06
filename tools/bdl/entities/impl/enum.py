@@ -5,7 +5,6 @@ from bzd.parser.element import Element, Sequence
 from bzd.parser.error import Error
 from bzd.parser.visitor import Visitor as VisitorBase
 
-from tools.bdl.entities.impl.types import TypeCategory
 from tools.bdl.entities.impl.entity import Entity, Role
 from tools.bdl.entities.impl.fragment.fqn import FQN
 
@@ -47,10 +46,6 @@ class Enum(Entity):
 		super().__init__(element, Role.Type)
 		Error.assertHasAttr(element=element, attr="name")
 		Error.assertHasSequence(element=element, sequence="values")
-
-	@property
-	def typeCategory(self) -> TypeCategory:
-		return TypeCategory.enum
 
 	def resolve(self, resolver: typing.Any) -> None:
 		"""

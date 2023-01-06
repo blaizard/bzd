@@ -8,6 +8,7 @@ from tools.bdl.object import Object
 from tools.bdl.entities.all import Namespace, Using, Expression
 from tools.bdl.entities.impl.fragment.type import Type
 from tools.bdl.entities.impl.fragment.parameters_resolved import ParametersResolved, ParametersResolvedItem
+from tools.bdl.entities.impl.types import Category as CategoryOriginal
 
 from tools.bdl.generators.cc.types import typeToStr as typeToStrOriginal
 from tools.bdl.generators.cc.value import valueToStr as valueToStrOriginal
@@ -36,6 +37,8 @@ Expressions:
 
 # String related
 class Transform:
+
+	Category = CategoryOriginal
 
 	def __init__(self, composition: typing.Optional[Composition] = None, includes: typing.List[Path] = []) -> None:
 		self.composition = composition

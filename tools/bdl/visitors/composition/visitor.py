@@ -13,6 +13,7 @@ from tools.bdl.entities.impl.expression import Expression
 from tools.bdl.entities.impl.method import Method
 from tools.bdl.entities.impl.nested import Nested, TYPE_INTERFACE
 from tools.bdl.entities.impl.fragment.fqn import FQN
+from tools.bdl.entities.impl.types import Category
 
 
 @dataclasses.dataclass(frozen=True)
@@ -60,7 +61,7 @@ class Composition:
 
 		counter = 1
 		for fqn, entity in sorted(self.symbols.items(categories={CATEGORY_GLOBAL})):
-			if entity.category in ["expression", "struct", "enum"]:
+			if entity.category in [Category.expression, Category.struct, Category.enum]:
 				self.uids[fqn] = counter
 				counter += 1
 

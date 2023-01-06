@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from bzd.parser.element import Element, Sequence, ElementBuilder, SequenceBuilder
 from bzd.parser.error import Error
 
-from tools.bdl.entities.impl.types import TypeCategory
+from tools.bdl.entities.impl.types import Category
 
 if typing.TYPE_CHECKING:
 	from tools.bdl.entities.impl.expression import Expression
@@ -102,8 +102,8 @@ class ParametersCommon:
 							)
 		return self.list[-1]
 
-	def getUnderlyingTypeCategories(self, resolver: "Resolver") -> typing.Iterator[TypeCategory]:
-		"""Get the typeCategory of the resolved type of the parameters."""
+	def getUnderlyingTypeCategories(self, resolver: "Resolver") -> typing.Iterator[Category]:
+		"""Get the category of the resolved type of the parameters."""
 
 		for param in self:
 			if param.isLiteral or param.isValue:
@@ -111,7 +111,7 @@ class ParametersCommon:
 			elif param.isType:
 				entityType = param.getEntityUnderlyingTypeResolved(resolver)
 				entityType.assertTrue(condition=entityType.isRoleType, message="This entity must be of role type.")
-				yield entityType.typeCategory  # type: ignore
+				yield entityType.category
 			else:
 				self.error(element=param, message="Unsupported parameter.")
 
