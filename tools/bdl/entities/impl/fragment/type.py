@@ -8,6 +8,7 @@ from bzd.parser.error import Error
 from tools.bdl.entities.impl.fragment.contract import Contracts
 from tools.bdl.entities.impl.fragment.parameters import Parameters
 from tools.bdl.entities.impl.fragment.parameters_resolved import ParametersResolved
+from tools.bdl.entities.impl.types import Category
 
 if typing.TYPE_CHECKING:
 	from tools.bdl.entities.all import EntityType
@@ -143,8 +144,8 @@ class Type:
 			expected=f"{self.templateAttr}_expected")
 
 	@property
-	def category(self) -> str:
-		return self.element.getAttr(f"{self.kindAttr}_category").value
+	def category(self) -> Category:
+		return Category(self.element.getAttr(f"{self.kindAttr}_category").value)
 
 	@property
 	def fqn(self) -> str:

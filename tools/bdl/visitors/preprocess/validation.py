@@ -59,7 +59,7 @@ class Validation(VisitorBase[None]):
 				message="Compositions cannot have nested composition.")
 
 		else:
-			entity.assertTrue(condition=False, message="Unsupported nested category: '{}'.".format(entity.category))
+			entity.assertTrue(condition=False, message=f"Unsupported nested category: '{entity.category}'.")
 
 	def visitMethod(self, entity: Method, result: None) -> None:
 

@@ -3,7 +3,7 @@ import enum
 
 
 # Types matching the category of an entity.
-class Category(str, enum.Enum):
+class Category(enum.Enum):
 	struct = "struct"
 	component = "component"
 	interface = "interface"
