@@ -1,4 +1,5 @@
 import typing
+import enum
 from pathlib import Path
 
 from bzd.parser.visitor import Visitor as VisitorBase
@@ -11,21 +12,20 @@ from tools.bdl.entities.all import Expression, Builtin, Nested, Method, Using, E
 
 NamespaceType = typing.List[str]
 
-T = typing.TypeVar("T")
 
-CATEGORY_COMPOSITION = "composition"
-CATEGORY_CONFIG = "config"
-CATEGORY_INTERFACE = "interface"
-CATEGORY_GLOBAL = "global"
-CATEGORY_GLOBAL_COMPOSITION = "globalComposition"
-CATEGORIES = [CATEGORY_COMPOSITION, CATEGORY_CONFIG, CATEGORY_INTERFACE, CATEGORY_GLOBAL, CATEGORY_GLOBAL_COMPOSITION]
+class Group(enum.Enum):
+	composition = "composition"
+	config = "config"
+	interface = "interface"
+	globalGroup = "global"
+	globalComposition = "globalComposition"
 
 
 class Parent:
 
-	def __init__(self, entity: typing.Union[Nested, Namespace], category: typing.Optional[str] = None) -> None:
+	def __init__(self, entity: typing.Union[Nested, Namespace], group: typing.Optional[Group] = None) -> None:
 		self.entity = entity
-		self.category = category
+		self.group = group
 
 	@property
 	def isNested(self) -> bool:
@@ -38,6 +38,9 @@ class Parent:
 		if isinstance(self.entity, Namespace):
 			return self.entity.nameList
 		return []
+
+
+T = typing.TypeVar("T")
 
 
 class Visitor(VisitorBase[T, T]):
@@ -62,18 +65,18 @@ class Visitor(VisitorBase[T, T]):
 		return [name for parent in self.parents for name in parent.namespace]
 
 	@property
-	def category(self) -> str:
+	def group(self) -> Group:
 		"""
-		Return the current category: global, composition, config
+		Return the current group: global, composition, config
 		"""
 		for parent in reversed(self.parents):
-			if parent.category in [CATEGORY_COMPOSITION, CATEGORY_CONFIG]:
-				return parent.category
+			if parent.group in [Group.composition, Group.config]:
+				return parent.group
 			if parent.isNested:
 				assert isinstance(parent.entity, Nested)
 				if parent.entity.category == Category.composition:
-					return CATEGORY_GLOBAL_COMPOSITION
-		return CATEGORY_GLOBAL
+					return Group.globalComposition
+		return Group.globalGroup
 
 	def visitElement(self, element: Element, result: T) -> T:
 		"""
@@ -87,12 +90,12 @@ class Visitor(VisitorBase[T, T]):
 
 			self.level += 1
 
-			for category in CATEGORIES:
-				sequence = element.getNestedSequence(category)
+			for group in Group:
+				sequence = element.getNestedSequence(group.value)
 				if sequence is not None:
-					self.parents.append(Parent(entity=entity, category=category))
+					self.parents.append(Parent(entity=entity, group=group))
 					nestedResult = self._visit(sequence, result)
-					self.entityToNested(category, entity, nestedResult, result)
+					self.entityToNested(group, entity, nestedResult, result)
 					self.parents.pop()
 
 			self.level -= 1
@@ -147,7 +150,7 @@ class Visitor(VisitorBase[T, T]):
 
 		return result
 
-	def entityToNested(self, category: str, entity: Nested, nested: T, result: T) -> None:
+	def entityToNested(self, group: Group, entity: Nested, nested: T, result: T) -> None:
 		"""
 		Associate a nested result with its entity.
 		"""

@@ -10,19 +10,13 @@ from tools.bdl.entities.impl.entity import Entity, Role
 from tools.bdl.entities.impl.fragment.fqn import FQN
 from tools.bdl.entities.impl.types import Category
 
-TYPE_STRUCT = "struct"
-TYPE_COMPONENT = "component"
-TYPE_INTERFACE = "interface"
-TYPE_COMPOSITION = "composition"
-TYPES = [Category.struct, Category.component, Category.interface, Category.composition]
-
 
 class Nested(Entity):
 	"""
 	Defines a nested entity such as a struct, a component or an interface.
 	Nested entities have the following underlying elements:
 	- Attributes:
-		- category: struct, component, interface... see TYPES
+		- category: struct, component, interface... see Nested.categoriesAllowed_
 		- [name]: The name of this entity, for example `struct MyType` would have the name MyType.
 	- Sequences:
 		- [inheritance]: In case the the struct have one or multiple base class.
@@ -31,12 +25,14 @@ class Nested(Entity):
 		- [composition]
 	"""
 
+	categoriesAllowed_ = [Category.struct, Category.component, Category.interface, Category.composition]
+
 	def __init__(self, element: Element) -> None:
 
 		super().__init__(element, Role.Type)
-		self.assertTrue(condition=self.category in TYPES,
+		self.assertTrue(condition=self.category in Nested.categoriesAllowed_,
 			message=
-			f"Unsupported nested type: '{self.category}', only the following are supported: {', '.join([str(t) for t in TYPES])}"
+			f"Unsupported nested type: '{self.category}', only the following are supported: {Nested.categoriesAllowed_}"
 						)
 
 	@property
@@ -73,7 +69,7 @@ class Nested(Entity):
 
 			# Validates that the inheritance type is correct.
 			underlyingTypeFQN = entity.getEntityUnderlyingTypeResolved(resolver=resolver)
-			if underlyingTypeFQN.category in TYPES:
+			if underlyingTypeFQN.category in Nested.categoriesAllowed_:
 				nestedCategory = underlyingTypeFQN.category  # type: ignore
 			elif underlyingTypeFQN.category == Category.extern:
 				nestedCategory = underlyingTypeFQN.type  # type: ignore

@@ -1,23 +1,23 @@
 import typing
 import pathlib
 import dataclasses
+import enum
 
 from bzd.parser.error import Error
 
-from tools.bdl.visitor import CATEGORY_GLOBAL_COMPOSITION, CATEGORY_COMPOSITION, CATEGORY_GLOBAL
+from tools.bdl.visitor import Group
 from tools.bdl.visitors.symbol_map import SymbolMap
 from tools.bdl.visitors.composition.dependency_map import DependencyMap
 from tools.bdl.object import Object
 from tools.bdl.entities.impl.entity import Entity
 from tools.bdl.entities.impl.expression import Expression
 from tools.bdl.entities.impl.method import Method
-from tools.bdl.entities.impl.nested import Nested, TYPE_INTERFACE
+from tools.bdl.entities.impl.nested import Nested
 from tools.bdl.entities.impl.fragment.fqn import FQN
 from tools.bdl.entities.impl.types import Category
 
 
-@dataclasses.dataclass(frozen=True)
-class AsyncType:
+class AsyncType(enum.Enum):
 	workload = "workload"
 	service = "service"
 
@@ -38,7 +38,7 @@ class Composition:
 		# All executors.
 		self.executors: typing.Dict[str, Expression] = {}
 		# All composition per executors.
-		self.composition: typing.Dict[str, typing.Dict[Entity, str]] = {}
+		self.composition: typing.Dict[str, typing.Dict[Entity, AsyncType]] = {}
 
 	def visit(self, bdl: Object) -> "Composition":
 
@@ -60,7 +60,7 @@ class Composition:
 		"""Generate the unique identifiers of the types."""
 
 		counter = 1
-		for fqn, entity in sorted(self.symbols.items(categories={CATEGORY_GLOBAL})):
+		for fqn, entity in sorted(self.symbols.items(groups={Group.globalGroup})):
 			if entity.category in [Category.expression, Category.struct, Category.enum]:
 				self.uids[fqn] = counter
 				counter += 1
@@ -71,8 +71,7 @@ class Composition:
 
 		self.all = {
 			fqn: entity
-			for fqn, entity in self.symbols.items(categories={CATEGORY_GLOBAL_COMPOSITION})
-			if isinstance(entity, Expression)
+			for fqn, entity in self.symbols.items(groups={Group.globalComposition}) if isinstance(entity, Expression)
 		}
 		self.registry = {fqn: entity for fqn, entity in self.all.items() if entity.isName}
 		self.executors = {}
