@@ -6,6 +6,7 @@ from bzd.parser.error import Error
 from bzd.parser.element import Element, ElementSerialize
 from bzd.parser.fragments import Attribute
 
+from tools.bdl.entities.impl.types import Category
 from tools.bdl.entities.all import Expression, Builtin, Nested, Method, Using, Enum, Extern, Namespace, Use, EntityType, elementToEntity
 
 NamespaceType = typing.List[str]
@@ -70,7 +71,7 @@ class Visitor(VisitorBase[T, T]):
 				return parent.category
 			if parent.isNested:
 				assert isinstance(parent.entity, Nested)
-				if parent.entity.category == "composition":
+				if parent.entity.category == Category.composition:
 					return CATEGORY_GLOBAL_COMPOSITION
 		return CATEGORY_GLOBAL
 
