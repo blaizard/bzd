@@ -7,7 +7,7 @@ from bzd.parser.error import Error
 
 from tools.bdl.visitor import Group
 from tools.bdl.visitors.symbol_map import SymbolMap
-from tools.bdl.visitors.composition.dependency_map import DependencyMap
+from tools.bdl.visitors.composition.entities import Entities
 from tools.bdl.object import Object
 from tools.bdl.entities.impl.entity import Entity
 from tools.bdl.entities.impl.expression import Expression
@@ -28,7 +28,7 @@ class Composition:
 
 		self.includes = [] if includes is None else includes
 		self.symbols = SymbolMap()
-		self.dependencies = DependencyMap(symbols=self.symbols)
+		self.entites = Entities(symbols=self.symbols)
 		self.registry: typing.Dict[str, Expression] = {}
 		self.platform: typing.Dict[str, Expression] = {}
 		# Unique identifiers
@@ -39,6 +39,8 @@ class Composition:
 		self.executors: typing.Dict[str, Expression] = {}
 		# All composition per executors.
 		self.composition: typing.Dict[str, typing.Dict[Entity, AsyncType]] = {}
+		# Connection map
+		self.connections: typing.Dict[str, str]
 
 	def visit(self, bdl: Object) -> "Composition":
 
@@ -76,14 +78,12 @@ class Composition:
 		self.registry = {fqn: entity for fqn, entity in self.all.items() if entity.isName}
 		self.executors = {}
 
-		for entity in self.all.values():
-			self.dependencies.add(entity)
-		self.dependencies.addImplicit()
+		self.entites.update(self.all.values())
 
 		# Applications are all intra expressions that are instanciated at top level
 		self.composition = {}
 		for fqn, entity in self.all.items():
-			if entity.isName:
+			if entity.isName or entity.isRoleMeta:
 				continue
 			entity.assertTrue(entity.executor in self.registry, f"The executor '{entity.executor}' is not declared.")
 			self.composition.setdefault(entity.executor, dict())[entity] = AsyncType.workload
@@ -95,10 +95,10 @@ class Composition:
 				self.platform[fqn] = entity
 
 		# Services are all intra expressions that are deps from all tasks, associated executor and infra.
-		commonServices = self.dependencies.findAllIntra(self.platform.values())  # type: ignore
+		commonServices = self.entites.findAllIntra(self.platform.values())  # type: ignore
 		for fqn, executorComposition in self.composition.items():
-			services = commonServices + self.dependencies.findAllIntra(
-				[self.registry[fqn]]) + self.dependencies.findAllIntra([*executorComposition.keys()])
+			services = commonServices + self.entites.findAllIntra(
+				[self.registry[fqn]]) + self.entites.findAllIntra([*executorComposition.keys()])
 			executorComposition.update({entity: AsyncType.service for entity in services})
 
 	def __str__(self) -> str:
@@ -112,7 +112,7 @@ class Composition:
 		addContent(content, "Includes", self.includes)
 		addContent(content, "Symbols", str(self.symbols).split("\n"))
 		addContent(content, "Unique Identifiers", [f"{k}: {v}" for k, v in self.uids.items()])
-		addContent(content, "Dependencies", str(self.dependencies).split("\n"))
+		addContent(content, "Entites", str(self.entites).split("\n"))
 		addContent(content, "Registry", self.registry.values())
 		addContent(content, "Platform", self.platform.keys())
 		addContent(content, "Executors", self.executors.keys())

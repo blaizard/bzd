@@ -106,6 +106,8 @@ class Expression(EntityExpression):
 
 			# Check if this points to a type or a value.
 			entity = self.type.resolve(resolver=resolver, maybeValue=True)
+			if entity.isRoleMeta:
+				self._setMeta()
 
 			# The type refers to a value.
 			if entity.isRoleValue:

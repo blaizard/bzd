@@ -13,6 +13,7 @@ composition {
 	hello = Hello();
 	hello.run();
 	
+	world = Hello();
+
+	connect(hello.input, world.input);
 }
-
-

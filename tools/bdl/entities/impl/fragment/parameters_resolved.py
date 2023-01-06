@@ -46,6 +46,13 @@ class ParametersResolvedItem:
 	def isLValue(self) -> bool:
 		return self.param.isLValue
 
+	def expectsFQN(self) -> str:
+		"""Expects to get an FQN as parameter and return it. If not return an error."""
+
+		self.assertTrue(condition=self.isLValue, message="An LValue is expected.")
+		self.assertTrue(condition=self.param.isType, message="A type is expected.")
+		return self.param.type.fqn
+
 	def error(self, message: str, element: typing.Optional[Element] = None, throw: bool = True) -> str:
 		return Error.handleFromElement(element=self.param.element if element is None else element,
 			message=message,
