@@ -5,7 +5,7 @@ from bzd.parser.element import Element, ElementBuilder
 from bzd.parser.error import Error
 from bzd.validation.validation import Validation
 
-from tools.bdl.entities.impl.fragment.type import Type
+from tools.bdl.entities.impl.fragment.symbol import Symbol
 from tools.bdl.entities.impl.expression import Expression
 from tools.bdl.entities.impl.entity import Entity, Role
 from tools.bdl.entities.impl.fragment.parameters import Parameters
@@ -32,17 +32,17 @@ class Method(Entity):
 		return "argument"
 
 	@property
-	def isType(self) -> bool:
+	def isSymbol(self) -> bool:
 		return self.element.isAttr("type")
 
 	@cached_property
-	def type(self) -> typing.Optional[Type]:
-		return Type(element=self.element,
+	def symbol(self) -> typing.Optional[Symbol]:
+		return Symbol(element=self.element,
 			kind="type",
 			underlyingTypeFQN="fqn_return_type",
 			template="template",
 			contract="contract_return",
-			const="const") if self.isType else None
+			const="const") if self.isSymbol else None
 
 	def resolve(self, resolver: typing.Any) -> None:
 		"""
@@ -51,9 +51,9 @@ class Method(Entity):
 		# Generate this symbol FQN
 		self._setUnderlyingTypeFQN(self.fqn)
 
-		maybeType = self.type
-		if maybeType is not None:
-			entity = maybeType.resolve(resolver=resolver)
+		maybeSymbol = self.symbol
+		if maybeSymbol is not None:
+			entity = maybeSymbol.resolve(resolver=resolver)
 
 		self.parameters.resolve(resolver=resolver)
 

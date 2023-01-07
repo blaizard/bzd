@@ -15,14 +15,14 @@ class Convertible_(Constraint):
 			if base == "Any":
 				return True
 
-			assert context.value.isType, "The expression is not a type."
-			typeFrom = context.value.type
+			assert context.value.isSymbol, "The expression is not a type."
+			typeFrom = context.value.symbol
 
 			# It must be found.
 			entityTo = context.args["resolver"].getEntityResolved(base).value
-			assert entityTo.isType, "The base FQN does not resolve to a type."
+			assert entityTo.isSymbol, "The base FQN does not resolve to a type."
 			assert typeFrom.isConvertible(resolver=context.args["resolver"],
-				to=entityTo.type), f"Type '{typeFrom}' is not convertible to type '{entityTo.type}'."
+				to=entityTo.symbol), f"Type '{typeFrom}' is not convertible to type '{entityTo.symbol}'."
 
 		updatedArgs = self.validate(schema=["mandatory string"], values=args).values
 		processedSchema.installValidation(_process, updatedArgs[0])

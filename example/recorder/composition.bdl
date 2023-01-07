@@ -12,8 +12,9 @@ interface:
 composition {
 	hello = Hello();
 	hello.run();
-	
 	world = Hello();
-
-	connect(hello.input, world.input);
+	connect(hello.input, hello.input);
+	
 }
+
+

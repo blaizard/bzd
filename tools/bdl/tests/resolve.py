@@ -237,7 +237,7 @@ class TestRun(unittest.TestCase):
 		self.assertEqual(call.parametersResolved[1].expected.literal, "0")
 		self.assertEqual(call.parametersResolved[2].name, "var3")
 		self.assertTrue(call.parametersResolved[2].isLValue)
-		self.assertEqual(str(call.parametersResolved[2].param.type), "ref")
+		self.assertEqual(str(call.parametersResolved[2].param.symbol), "ref")
 
 	def testStruct(self) -> None:
 

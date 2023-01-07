@@ -15,7 +15,7 @@ if typing.TYPE_CHECKING:
 	from tools.bdl.visitors.symbol_map import Resolver
 
 
-class Type:
+class Symbol:
 
 	def __init__(self,
 		element: Element,
@@ -82,7 +82,7 @@ class Type:
 		configTypes = underlying.getConfigTemplateTypes(resolver=resolver)
 		if not configTypes:
 			self.assertTrue(condition=(not bool(self.templates)),
-				message=f"Type '{self.kind}' does not support template type arguments.")
+				message=f"Symbol '{self.kind}' does not support template type arguments.")
 		else:
 
 			self.templates.makeParametersResolved(name=self.templateAttr, resolver=resolver, expected=configTypes)
@@ -167,7 +167,7 @@ class Type:
 	def name(self) -> str:
 		return Visitor(entity=self).result
 
-	def isConvertible(self, resolver: "Resolver", to: "Type") -> bool:
+	def isConvertible(self, resolver: "Resolver", to: "Symbol") -> bool:
 		"""Check that the current type is convertible to another type."""
 
 		typeFrom = self.getEntityUnderlyingTypeResolved(resolver=resolver)
@@ -197,7 +197,7 @@ class Type:
 	def __repr__(self) -> str:
 		return self.name
 
-	def __eq__(self, other: "Type") -> bool:
+	def __eq__(self, other: "Symbol") -> bool:
 		return str(self) == str(other)
 
 
@@ -205,7 +205,7 @@ class Visitor(VisitorDepthFirstBase[typing.List[str], str]):
 
 	nestedKind = "template"
 
-	def __init__(self, entity: Type) -> None:
+	def __init__(self, entity: Symbol) -> None:
 
 		# Nested level
 		self.level = 0
@@ -242,7 +242,7 @@ class Visitor(VisitorDepthFirstBase[typing.List[str], str]):
 
 		if element.isAttr("type"):
 
-			entity = Type(element=element,
+			entity = Symbol(element=element,
 				kind="type",
 				underlyingTypeFQN="fqn_type",
 				template="template_resolved" if self.isResolved else "template",
@@ -267,11 +267,21 @@ class Visitor(VisitorDepthFirstBase[typing.List[str], str]):
 
 		return value
 
-	def visitType(self, entity: Type, nested: typing.List[str], parameters: ParametersResolved) -> str:
+	def visitType(self, entity: Symbol, nested: typing.List[str], parameters: ParametersResolved) -> str:
 		"""
 		Called when an element needs to be formatted.
 		"""
 
+		# Build the type. The first fqn is the element and the rest
+		# are the types.
+		kinds: typing.List[str] = []
+		for index, fqn in enumerate(entity.kinds):
+			if index == 0:
+				kinds.append(fqn)
+			else:
+				kinds.append(fqn.split(".")[-1])
+		kind = ".".join(kinds)
+
 		if nested:
-			return "{}<{}>".format(entity.kind, ",".join(nested))
-		return entity.kind
+			return f"{kind}<{','.join(nested)}>"
+		return kind

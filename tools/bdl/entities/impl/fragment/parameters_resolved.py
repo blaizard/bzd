@@ -5,7 +5,7 @@ from bzd.parser.error import Error
 
 if typing.TYPE_CHECKING:
 	from tools.bdl.entities.impl.entity import EntityExpression
-	from tools.bdl.entities.impl.fragment.type import Type
+	from tools.bdl.entities.impl.fragment.symbol import Symbol
 
 
 class ParametersResolvedItem:
@@ -24,14 +24,14 @@ class ParametersResolvedItem:
 		return self.expected.name
 
 	@property
-	def type(self) -> "Type":
-		return self.expected.type
+	def symbol(self) -> "Symbol":
+		return self.expected.symbol
 
 	@property
 	def sameType(self) -> bool:
 		"""If the expected and param types are the same."""
-		if self.expected.isType and self.param.isType:
-			return self.expected.type == self.param.type
+		if self.expected.isSymbol and self.param.isSymbol:
+			return self.expected.symbol == self.param.symbol
 		return False
 
 	@property
@@ -45,13 +45,6 @@ class ParametersResolvedItem:
 	@property
 	def isLValue(self) -> bool:
 		return self.param.isLValue
-
-	def expectsFQN(self) -> str:
-		"""Expects to get an FQN as parameter and return it. If not return an error."""
-
-		self.assertTrue(condition=self.isLValue, message="An LValue is expected.")
-		self.assertTrue(condition=self.param.isType, message="A type is expected.")
-		return self.param.type.fqn
 
 	def error(self, message: str, element: typing.Optional[Element] = None, throw: bool = True) -> str:
 		return Error.handleFromElement(element=self.param.element if element is None else element,

@@ -26,16 +26,16 @@ def valueToStr(item: ParametersResolvedItem,
 	def bindTypeAndValue(values: typing.List[str]) -> str:
 		"""Associate a value with its type."""
 
-		paramTypeStr = typeToStr(item.param.type, referenceForInterface=True,
-			values=values) if item.param.isType else ""
+		paramTypeStr = typeToStr(item.param.symbol, referenceForInterface=True,
+			values=values) if item.param.isSymbol else ""
 		paramValues = values if paramTypeStr == "" else [f"{paramTypeStr}{{{', '.join(values)}}}"]
 
 		# If the types (param and expected) are the same, return already.
 		if item.sameType:
 			return ", ".join(paramValues)
 
-		expectedTypeStr = typeToStr(item.expected.type, referenceForInterface=True,
-			values=paramValues) if item.expected.isType else ""
+		expectedTypeStr = typeToStr(item.expected.symbol, referenceForInterface=True,
+			values=paramValues) if item.expected.isSymbol else ""
 		return ", ".join(paramValues) if expectedTypeStr == "" else f"{expectedTypeStr}{{{', '.join(paramValues)}}}"
 
 	if item.param.isLiteral:

@@ -11,7 +11,7 @@ from tools.bdl.entities.impl.fragment.contract import Contracts
 from tools.bdl.entities.impl.fragment.parameters import Parameters, ResolvedType
 from tools.bdl.entities.impl.fragment.sequence import EntitySequence
 from tools.bdl.entities.impl.fragment.fqn import FQN
-from tools.bdl.entities.impl.fragment.type import Type
+from tools.bdl.entities.impl.fragment.symbol import Symbol
 from tools.bdl.entities.impl.fragment.parameters_resolved import ParametersResolvedItem
 from tools.bdl.entities.impl.types import Category
 
@@ -234,8 +234,8 @@ class Entity:
 		return self.element.getAttr("fqn").value
 
 	@property
-	def fqnToType(self) -> Type:
-		return Type(element=self.element, kind="fqn")
+	def fqnToType(self) -> Symbol:
+		return Symbol(element=self.element, kind="fqn")
 
 	def getConfigTemplateTypes(self, resolver: typing.Any) -> Parameters:
 		"""Get the list of expressions that forms the template types."""
@@ -331,10 +331,10 @@ class Entity:
 		# Resolve the types from a config sequence if any.
 		for entity in self.configRaw:
 			if entity.category == Category.expression:
-				if entity.isType:
+				if entity.isSymbol:
 					# Only the type of the expression should be resolved, the value cannot be evaluated
 					# as it might be malformed, this is inherent from config expressions.
-					typing.cast("Expression", entity).type.resolve(resolver=resolver)
+					typing.cast("Expression", entity).symbol.resolve(resolver=resolver)
 			elif entity.category == Category.using:
 				typing.cast("Using", entity).resolve(resolver=resolver)
 			else:
@@ -374,19 +374,23 @@ class EntityExpression(Entity):
 
 	@property
 	def const(self) -> bool:
-		return self.type.const
+		return self.symbol.const
 
 	@property
 	def isVarArgs(self) -> bool:
 		return self.element.isAttr("name") and self.element.getAttrValue("name").endswith("...")
 
 	@property
-	def isType(self) -> bool:
+	def isSymbol(self) -> bool:
 		return self.element.isAttr("type")
 
 	@cached_property
-	def type(self) -> Type:
-		return Type(element=self.element, kind="type", underlyingTypeFQN="fqn_type", template="template", const="const")
+	def symbol(self) -> Symbol:
+		return Symbol(element=self.element,
+			kind="type",
+			underlyingTypeFQN="fqn_type",
+			template="template",
+			const="const")
 
 	@property
 	def isValue(self) -> bool:
@@ -433,7 +437,7 @@ class EntityExpression(Entity):
 		return self.toString({
 			"name": self.name if self.isName else "",
 			"varArgs": True if self.isVarArgs else None,
-			"type": str(self.type) if self.isType else None,
+			"symbol": str(self.symbol) if self.isSymbol else None,
 			"value": str(self.value) if self.isValue else None,
 			"parameters": "[...]" if self.isParameters else None,
 		})

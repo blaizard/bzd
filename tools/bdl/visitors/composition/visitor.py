@@ -82,23 +82,20 @@ class Composition:
 
 		# Applications are all intra expressions that are instanciated at top level
 		self.composition = {}
-		for fqn, entity in self.all.items():
-			if entity.isName or entity.isRoleMeta:
-				continue
+		for entity in self.entites.getWorkloads():
 			entity.assertTrue(entity.executor in self.registry, f"The executor '{entity.executor}' is not declared.")
 			self.composition.setdefault(entity.executor, dict())[entity] = AsyncType.workload
 			self.addExecutor(entity)
 
 		# Handle platform elements
-		for fqn, entity in self.all.items():
-			if fqn.startswith("platform"):
-				self.platform[fqn] = entity
+		for fqn, entity in self.entites.getPlatform():
+			self.platform[fqn] = entity
 
 		# Services are all intra expressions that are deps from all tasks, associated executor and infra.
 		commonServices = self.entites.findAllIntra(self.platform.values())  # type: ignore
 		for fqn, executorComposition in self.composition.items():
-			services = commonServices + self.entites.findAllIntra(
-				[self.registry[fqn]]) + self.entites.findAllIntra([*executorComposition.keys()])
+			services = commonServices + self.entites.findAllIntra([self.registry[fqn]]) + self.entites.findAllIntra(
+				[*executorComposition.keys()])
 			executorComposition.update({entity: AsyncType.service for entity in services})
 
 	def __str__(self) -> str:

@@ -5,7 +5,7 @@ from bzd.parser.element import Element
 from bzd.parser.error import Error
 from bzd.parser.visitor import Visitor
 
-from tools.bdl.entities.impl.fragment.type import Type
+from tools.bdl.entities.impl.fragment.symbol import Symbol
 from tools.bdl.entities.impl.entity import Entity, Role
 from tools.bdl.entities.impl.fragment.fqn import FQN
 from tools.bdl.entities.impl.types import Category
@@ -45,11 +45,11 @@ class Nested(Entity):
 		return self.element.isNestedSequence("inheritance")
 
 	@cached_property
-	def inheritanceList(self) -> typing.List[Type]:
-		inheritanceList: typing.List[Type] = []
+	def inheritanceList(self) -> typing.List[Symbol]:
+		inheritanceList: typing.List[Symbol] = []
 		for element in self.element.getNestedSequenceOrEmpty("inheritance"):
 			Error.assertHasAttr(element=element, attr="symbol")
-			inheritanceList.append(Type(element=element, kind="symbol"))
+			inheritanceList.append(Symbol(element=element, kind="symbol"))
 		return inheritanceList
 
 	def resolve(self, resolver: typing.Any) -> None:
@@ -68,14 +68,14 @@ class Nested(Entity):
 			self.addParents(fqn=entity.underlyingTypeFQN, parents=entity.getUnderlyingTypeParents(resolver=resolver))
 
 			# Validates that the inheritance type is correct.
-			underlyingTypeFQN = entity.getEntityUnderlyingTypeResolved(resolver=resolver)
-			if underlyingTypeFQN.category in Nested.categoriesAllowed_:
-				nestedCategory = underlyingTypeFQN.category  # type: ignore
-			elif underlyingTypeFQN.category == Category.extern:
-				nestedCategory = underlyingTypeFQN.type  # type: ignore
+			underlyingType = entity.getEntityUnderlyingTypeResolved(resolver=resolver)
+			if underlyingType.category in Nested.categoriesAllowed_:
+				nestedCategory = underlyingType.category  # type: ignore
+			elif underlyingType.category == Category.extern:
+				nestedCategory = underlyingType.type  # type: ignore
 			else:
 				self.error(message="Inheritance can only be done from a nested class, not '{}', category '{}'.".format(
-					entity.underlyingTypeFQN, underlyingTypeFQN.category))
+					entity.underlyingTypeFQN, underlyingType.category))
 
 			if self.category == Category.struct:
 				self.assertTrue(condition=nestedCategory == Category.struct,
