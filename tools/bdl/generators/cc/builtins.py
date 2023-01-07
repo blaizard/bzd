@@ -1,7 +1,7 @@
 import typing
 
 from bzd.parser.error import Error
-from tools.bdl.entities.impl.fragment.type import Type
+from tools.bdl.entities.impl.fragment.symbol import Symbol
 
 TypeConversionCallableReturn = typing.Tuple[str, typing.List[str]]
 
@@ -11,7 +11,7 @@ class IntegerType:
 	constexpr: bool = True
 
 	@staticmethod
-	def toType(entity: Type, nested: typing.List[str], reference: bool,
+	def toType(entity: Symbol, nested: typing.List[str], reference: bool,
 		values: typing.Optional[typing.Sequence[str]]) -> TypeConversionCallableReturn:
 		maybeContractMin = entity.contracts.get("min")
 		isSigned = True if maybeContractMin is None or maybeContractMin.valueNumber < 0 else False
@@ -57,7 +57,7 @@ class ResultType:
 	constexpr = False
 
 	@staticmethod
-	def toType(entity: Type, nested: typing.List[str], reference: bool,
+	def toType(entity: Symbol, nested: typing.List[str], reference: bool,
 		values: typing.Optional[typing.Sequence[str]]) -> TypeConversionCallableReturn:
 
 		if len(nested) == 0:
@@ -72,7 +72,7 @@ class AsyncType:
 	constexpr = False
 
 	@staticmethod
-	def toType(entity: Type, nested: typing.List[str], reference: bool,
+	def toType(entity: Symbol, nested: typing.List[str], reference: bool,
 		values: typing.Optional[typing.Sequence[str]]) -> TypeConversionCallableReturn:
 
 		if len(nested) == 0:
@@ -118,7 +118,7 @@ class ArrayType:
 	constexpr = False
 
 	@classmethod
-	def toType(cls, entity: Type, nested: typing.List[str], reference: bool,
+	def toType(cls, entity: Symbol, nested: typing.List[str], reference: bool,
 		values: typing.Optional[typing.Sequence[str]]) -> TypeConversionCallableReturn:
 
 		if reference:

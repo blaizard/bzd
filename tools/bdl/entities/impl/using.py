@@ -4,7 +4,6 @@ from functools import cached_property
 from bzd.parser.element import Element, ElementBuilder
 from bzd.parser.error import Error
 
-from tools.bdl.entities.impl.fragment.type import Type
 from tools.bdl.entities.impl.fragment.contract import Contracts
 from tools.bdl.entities.impl.entity import EntityExpression, Role
 
@@ -26,7 +25,7 @@ class Using(EntityExpression):
 		"""
 		Resolve entities.
 		"""
-		entity = self.type.resolve(resolver=resolver)
+		entity = self.symbol.resolve(resolver=resolver)
 
 		if entity.isRoleMeta:
 			self._setMeta()
@@ -36,6 +35,6 @@ class Using(EntityExpression):
 	def __repr__(self) -> str:
 		return self.toString({
 			"name": self.name if self.isName else None,
-			"type": self.type.name,
+			"symbol": self.symbol.name,
 			"meta": "True" if self.isRoleMeta else None
 		})

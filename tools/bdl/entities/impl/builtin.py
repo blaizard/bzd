@@ -4,7 +4,7 @@ from bzd.parser.element import Element
 from bzd.parser.error import Error
 
 from tools.bdl.entities.impl.entity import Entity, Role
-from tools.bdl.entities.impl.fragment.type import Type
+from tools.bdl.entities.impl.fragment.symbol import Symbol
 
 
 class Builtin(Entity):
@@ -26,12 +26,12 @@ class Builtin(Entity):
 		return self.name
 
 	@property
-	def isType(self) -> bool:
+	def isSymbol(self) -> bool:
 		return True
 
 	@property
-	def type(self) -> Type:
-		return Type(element=self.element, kind="name")
+	def symbol(self) -> Symbol:
+		return Symbol(element=self.element, kind="name")
 
 	@property
 	def isFQN(self) -> bool:

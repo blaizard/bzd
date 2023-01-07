@@ -54,20 +54,20 @@ class DependencyGroup:
 @dataclasses.dataclass
 class Dependencies:
 	executor: typing.Optional[Entity] = None
-	# Dependencies over other entities
+	# Dependencies over other entities, first level dependencies.
 	deps: DependencyGroup = dataclasses.field(default_factory=DependencyGroup)
-	# Direct dependencies
-	pre: DependencyGroup = dataclasses.field(default_factory=DependencyGroup)
+	# Direct dependencies.
+	init: DependencyGroup = dataclasses.field(default_factory=DependencyGroup)
 	intra: DependencyGroup = dataclasses.field(default_factory=DependencyGroup)
-	post: DependencyGroup = dataclasses.field(default_factory=DependencyGroup)
+	shutdown: DependencyGroup = dataclasses.field(default_factory=DependencyGroup)
 
 	def __repr__(self) -> str:
 		content = []
 		content += [f"executor: {str(self.executor)}"]
 		content += [f"deps: {self.deps}"]
-		content += [f"pre: {self.pre}"]
+		content += [f"init: {self.init}"]
 		content += [f"intra: {self.intra}"]
-		content += [f"post: {self.post}"]
+		content += [f"shutdown: {self.shutdown}"]
 		return "\n".join(content)
 
 
@@ -76,47 +76,77 @@ class Entities:
 
 	def __init__(self, symbols: SymbolMap) -> None:
 		self.symbols = symbols
-		self.map: typing.Dict[Entity, Dependencies] = {}
-		self.connections: typing.Dict[str, typing.Set[str]] = {}
+		# Map of all available components and their dependencies.
+		self.components: typing.Dict[Entity, Dependencies] = {}
+		# Map of all available connections.
+		self.connections: typing.Dict[Entity, typing.Set[Entity]] = {}
 
 	def findAllIntra(self, entities: typing.List[Entity]) -> DependencyGroup:
 		"""Find all intra expressions associated with this entities."""
 
 		dependencies = DependencyGroup()
 		for entity in entities:
-			assert entity in self.map, f"The entity {str(entity)} is not registered in the map."
-			deps = self.findAllIntra([*self.map[entity].deps])
+			assert entity in self.components, f"The entity {str(entity)} is not registered in the map."
+			deps = self.findAllIntra([*self.components[entity].deps])
 			dependencies.pushGroup(deps)
-			dependencies.pushGroup([*self.map[entity].intra])
+			dependencies.pushGroup([*self.components[entity].intra])
 
 		return dependencies
 
 	def processMeta(self, entity: Entity) -> None:
 		"""Process a meta expression, a special function from the language."""
 
-		entity.assertTrue(condition=entity.isType, message=f"Meta expressions must have a type.")
-		if entity.type.fqn == "connect":
-			io1 = entity.parametersResolved[0].expectsFQN()
-			io2 = entity.parametersResolved[1].expectsFQN()
+		entity.assertTrue(condition=entity.isSymbol, message=f"Meta expressions must have a symbol.")
+		if entity.symbol.fqn == "connect":
 
+			io1 = entity.parametersResolved[0].param
+			io2 = entity.parametersResolved[1].param
+
+			io1.assertTrue(condition=io1.isLValue, message="First argument must be a reference to another object.")
+			io2.assertTrue(condition=io2.isLValue, message="Second argument must be a reference to another object.")
+
+			entity.assertTrue(io1 not in self.connections or io2 not in self.connections[io1],
+				f"Connection between '{io1}' and '{io2}' is defined multiple times.")
 			self.connections.setdefault(io1, set()).add(io2)
+			entity.assertTrue(io2 not in self.connections or io1 not in self.connections[io2],
+				f"Connection between '{io1}' and '{io2}' is defined multiple times.")
 			self.connections.setdefault(io2, set()).add(io1)
 
-			print("HEEEEEEE", io1, io2)
-			# self.connections[]
-			pass
 		else:
 			entity.error(message="Unsupported meta expression.")
+
+	def getWorkloads(self) -> typing.Iterable[Entity]:
+		"""List all workloads.
+		Workload are the entities with no name.
+		"""
+		for entity in self.components.keys():
+			if not entity.isName:
+				yield entity
+
+	def getRegistry(self) -> typing.Iterable[typing.Tuple[str, Entity]]:
+		"""The registry."""
+		for entity in self.components.keys():
+			if entity.isName:
+				yield entity.fqn, entity
+
+	def getPlatform(self) -> typing.Iterable[typing.Tuple[str, Entity]]:
+		"""The platform entities."""
+		for entity in self.components.keys():
+			if entity.isName and entity.fqn.startswith("platform"):
+				yield entity.fqn, entity
 
 	def update(self, entities: typing.List[Entity]) -> None:
 		"""Update the object with new entities."""
 
 		for entity in entities:
 			self.add_(entity)
-		self.addImplicit_()
 
 	def add_(self, entity: Entity) -> None:
-		assert entity not in self.map, f"The entity '{entity}' is already inserted in the dependency map."
+		"""Add a single entity."""
+
+		# This can happen when new entries are added from the implicit dependencies.
+		if entity in self.components:
+			return
 
 		# Resolve the entity against its namespace.
 		resolver = self.symbols.makeResolver(namespace=entity.namespace)
@@ -125,34 +155,25 @@ class Entities:
 		if entity.isRoleMeta:
 			self.processMeta(entity)
 		else:
-			self.map[entity] = self.resolveDependencies(entity=entity, resolver=resolver)
+			dependencies = self.resolveDependencies(entity=entity, resolver=resolver)
+			self.components[entity] = dependencies
 
-	def addImplicit_(self) -> None:
-		"""Look for all implicit dependencies and add them if not already present."""
-
-		while True:
-			updated = set()
-			for entity, dependencies in self.map.items():
-				for dependency in dependencies.deps + dependencies.intra:
-					if dependency not in self.map and dependency not in updated:
-						updated.add(dependency)
-			if not updated:
-				break
-			for entity in updated:
-				self.add_(entity)
+			# Add implicit dependencies.
+			for dependency in dependencies.deps + dependencies.intra:
+				self.add_(dependency)
 
 	def resolveDependencies(self, entity: Entity, resolver: Resolver) -> Dependencies:
 		"""Resolve the dependencies for a specific entity."""
 
-		def checkIfInitOrShutdown(interfaceEntity: Entity) -> typing.Optional[DependencyGroup]:
-			if interfaceEntity.contracts.has("init"):
-				return dependencies.pre
-			if interfaceEntity.contracts.has("shutdown"):
-				return dependencies.post
-			return None
-
 		# These corresponds to the entities to be executed before / during / after.
 		dependencies = Dependencies()
+
+		def checkIfInitOrShutdown(interfaceEntity: Entity) -> typing.Optional[DependencyGroup]:
+			if interfaceEntity.contracts.has("init"):
+				return dependencies.init
+			if interfaceEntity.contracts.has("shutdown"):
+				return dependencies.shutdown
+			return None
 
 		if isinstance(entity, Expression):
 
@@ -203,7 +224,11 @@ class Entities:
 		return dependencies
 
 	def __str__(self) -> str:
-		content = []
-		for entity, dependencies in self.map.items():
+		content = ["==== Components ===="]
+		for entity, dependencies in self.components.items():
 			content += [str(entity)] + [f"\t{line}" for line in str(dependencies).split("\n")]
+		content += ["==== Connections ===="]
+		for io, setOfIOs in self.connections.items():
+			content += [f"{io} => {setOfIOs}"]
+
 		return "\n".join(content)

@@ -13,7 +13,7 @@ from tools.bdl.entities.impl.reference import Reference
 from tools.bdl.entities.impl.fragment.fqn import FQN
 
 ResolveShallowFQNResult = Result[typing.Tuple[str, typing.List[str]]]
-resolveFQNResult = Result[typing.List[str]]
+ResolveFQNResult = Result[typing.List[str]]
 
 
 class Resolver:
@@ -76,14 +76,14 @@ class Resolver:
 		# Return the FQN and the unresolved rest.
 		return ResolveShallowFQNResult((fqn, remainingNamespace))
 
-	def resolveFQN(self, name: str) -> resolveFQNResult:
+	def resolveFQN(self, name: str) -> ResolveFQNResult:
 		"""
 		Find the fully qualified name of a given a name and a namespace.
 		Note, name can be a partial fqn.
 		"""
 		maybeFQN = self.resolveShallowFQN(name=name)
 		if not maybeFQN:
-			return resolveFQNResult.makeError(maybeFQN.error)
+			return ResolveFQNResult.makeError(maybeFQN.error)
 
 		fqn: typing.Optional[str]
 		fqn, unresolvedFQN = maybeFQN.value
@@ -107,13 +107,13 @@ class Resolver:
 					fqn = potentialFQN
 					break
 			if fqn is None:
-				return resolveFQNResult.makeError("Symbol '{}' from '{}' in namespace '{}' could not be resolved.".
-					format(nextName, name, ".".join(self.namespace)) if self.
-					namespace else "Symbol '{}' from '{}' could not be resolved.".format(nextName, name))
+				return ResolveFQNResult.makeError(
+					f"Symbol '{nextName}' from '{name}' in namespace '{'.'.join(self.namespace)}' could not be resolved."
+					if self.namespace else f"Symbol '{nextName}' from '{name}' could not be resolved.")
 			fqns.append(fqn)
 
 		# Return the final FQN.
-		return resolveFQNResult(fqns)
+		return ResolveFQNResult(fqns)
 
 
 class SymbolMap:

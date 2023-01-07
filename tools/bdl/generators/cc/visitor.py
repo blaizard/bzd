@@ -6,7 +6,7 @@ from bzd.template.template import Template
 from tools.bdl.visitors.composition.visitor import Composition, AsyncType
 from tools.bdl.object import Object
 from tools.bdl.entities.all import Namespace, Using, Expression
-from tools.bdl.entities.impl.fragment.type import Type
+from tools.bdl.entities.impl.fragment.symbol import Symbol
 from tools.bdl.entities.impl.fragment.parameters_resolved import ParametersResolved, ParametersResolvedItem
 from tools.bdl.entities.impl.types import Category
 
@@ -51,10 +51,10 @@ class Transform:
 
 	# Inheritance related
 
-	def inheritanceToStr(self, inheritanceList: typing.List[Type]) -> str:
+	def inheritanceToStr(self, inheritanceList: typing.List[Symbol]) -> str:
 		return ", ".join([f"public {str(typeToStrOriginal(inheritance))}<Impl>" for inheritance in inheritanceList])
 
-	def inheritanceAdapterToStr(self, inheritanceList: typing.List[Type]) -> str:
+	def inheritanceAdapterToStr(self, inheritanceList: typing.List[Symbol]) -> str:
 		return ", ".join([
 			"public {}<Impl>".format(str(typeToStrOriginal(inheritance, adapter=True)))
 			for inheritance in inheritanceList
@@ -70,21 +70,21 @@ class Transform:
 	def namespaceToStr(self, entity: Namespace) -> str:
 		return "::".join(entity.nameList)
 
-	# Type related
+	# Symbol related
 
-	def typeToStr(self, entity: Type) -> str:
+	def typeToStr(self, entity: Symbol) -> str:
 		return typeToStrOriginal(entity=entity)
 
-	def typeReferenceToStr(self, entity: Type) -> str:
+	def typeReferenceToStr(self, entity: Symbol) -> str:
 		return typeToStrOriginal(entity=entity, reference=True, referenceForInterface=True)
 
-	def typeDefinitionToStr(self, entity: Type) -> str:
+	def typeDefinitionToStr(self, entity: Symbol) -> str:
 		return typeToStrOriginal(entity=entity, definition=True, referenceForInterface=True)
 
-	def typeNonConstToStr(self, entity: Type) -> str:
+	def typeNonConstToStr(self, entity: Symbol) -> str:
 		return typeToStrOriginal(entity=entity, nonConst=True)
 
-	def typeRegistryToStr(self, entity: Type) -> str:
+	def typeRegistryToStr(self, entity: Symbol) -> str:
 		return typeToStrOriginal(entity=entity,
 			registry=self.composition.registry.keys() if self.composition else None)  # type: ignore
 
@@ -118,7 +118,7 @@ class Transform:
 	def paramToDefinition(self, item: ParametersResolvedItem, index: int) -> str:
 
 		if item.param.isLiteral:
-			return f"static constexpr {typeToStrOriginal(item.type)} {item.name}{{{item.param.literal}}};"
+			return f"static constexpr {typeToStrOriginal(item.symbol)} {item.name}{{{item.param.literal}}};"
 		elif item.isLValue:
 			return f"T{index}& {item.name};"
 		elif item.isRValue:
@@ -159,8 +159,8 @@ class Transform:
 		output = ""
 		values = self.paramsDeclarationToList_(
 			params=entity.parametersResolved) if entity.parametersResolved.size() else []
-		entity.assertTrue(condition=entity.isType, message="An expression declaration must have a type.")
-		output += f" {typeToStrOriginal(entity.type, referenceForInterface=True, values=values)}"
+		entity.assertTrue(condition=entity.isSymbol, message="An expression declaration must have a type.")
+		output += f" {typeToStrOriginal(entity.symbol, referenceForInterface=True, values=values)}"
 		if entity.isName:
 			output += f" {entity.name}"
 		if values:

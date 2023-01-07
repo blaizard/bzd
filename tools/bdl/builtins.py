@@ -32,11 +32,15 @@ class ListMeta(Builtin):
 			ElementBuilder("builtin").setAttr("name", "list").addConfigValue(name="values...",
 			kind="Any").setAttr("meta", "1"))
 
+
 class ConnectMeta(Builtin):
 
 	def __init__(self) -> None:
 		super().__init__(
-			ElementBuilder("builtin").setAttr("name", "connect").addConfigValue(name="io1", kind="Any", contract="mandatory").addConfigValue(name="io2", kind="Any", contract="mandatory").setAttr("meta", "1"))
+			ElementBuilder("builtin").setAttr("name", "connect").addConfigValue(name="io1",
+			kind="Any",
+			contract="mandatory").addConfigValue(name="io2", kind="Any", contract="mandatory").setAttr("meta", "1"))
+
 
 # Concrete types
 

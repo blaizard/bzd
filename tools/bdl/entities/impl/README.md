@@ -2,6 +2,15 @@
 
 An entity is a mirror of its underlying element. It simply presents the information in a simpler way.
 
+All entities have the following common attributes:
+
+- _category_: The category of the entity, `expression`, `struct`, etc... This is used to select the `Entity` wrapper class and convert
+  a serializable `Element` into an `Entity`.
+- _fqn_: The Fully Qualified Name. This corresponds to a unique identifier that corresponds to this specific entity. There
+  cannot be more than one entity with the same FQN.
+  FQN is a succession of types separated with ';'. For example a `struct A { c = Integer; }` in a `namespace B` will look like: `B.A`.
+  When instantiated in a composition as such: `composition { a = B.A; a.c; }`, The FQN of `a.c` will be `a;A.c`.
+
 ## Expression
 
 The following is what an epxression looks like:

@@ -2,7 +2,7 @@ import typing
 
 from bzd.parser.error import Error
 
-from tools.bdl.entities.impl.fragment.type import Type, Visitor
+from tools.bdl.entities.impl.fragment.symbol import Symbol, Visitor
 from tools.bdl.entities.impl.fragment.parameters_resolved import ParametersResolved
 from tools.bdl.entities.impl.fragment.fqn import FQN
 from tools.bdl.generators.cc.comments import commentEmbeddedToStr
@@ -14,7 +14,7 @@ from tools.bdl.entities.impl.types import Category
 class _VisitorType(Visitor):
 	"""Visitor to print a type."""
 
-	def __init__(self, entity: Type, namespaceToFQN: typing.Optional[typing.Callable[[typing.List[str]],
+	def __init__(self, entity: Symbol, namespaceToFQN: typing.Optional[typing.Callable[[typing.List[str]],
 		str]], reference: bool, definition: bool, nonConst: bool, referenceForInterface: bool,
 		values: typing.Optional[typing.Sequence[str]]) -> None:
 		self.namespaceToFQN = namespaceToFQN
@@ -39,7 +39,7 @@ class _VisitorType(Visitor):
 	def visitValue(self, value: str, comment: typing.Optional[str]) -> None:
 		self.entity.error(message="No values are allowed within a type.")
 
-	def visitType(self, entity: Type, nested: typing.List[str], parameters: ParametersResolved) -> str:
+	def visitType(self, entity: Symbol, nested: typing.List[str], parameters: ParametersResolved) -> str:
 		"""
 		Called when an element needs to be formatted.
 		"""
@@ -93,7 +93,7 @@ class _VisitorType(Visitor):
 		return output
 
 
-def typeToStr(entity: typing.Optional[Type],
+def typeToStr(entity: typing.Optional[Symbol],
 	adapter: bool = False,
 	reference: bool = False,
 	definition: bool = False,

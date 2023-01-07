@@ -26,7 +26,7 @@ class Result(typing.Generic[V, E]):
 
 	@property
 	def value(self) -> V:
-		assert self.value_ is not None, "Cannot access the value of a result containing an error."
+		assert self.value_ is not None, f"Cannot access the value of a result containing an error: {self.error}"
 		return self.value_
 
 	@property

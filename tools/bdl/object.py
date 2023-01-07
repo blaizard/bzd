@@ -14,7 +14,7 @@ from tools.bdl.visitors.preprocess.process_inclusions import ProcessInclusions
 from tools.bdl.visitors.preprocess.build import Build
 from tools.bdl.visitors.preprocess.validation import Validation
 from tools.bdl.entities.all import EntityType
-from tools.bdl.entities.impl.fragment.type import Type
+from tools.bdl.entities.impl.fragment.symbol import Symbol
 from tools.bdl.entities.impl.use import Use
 
 

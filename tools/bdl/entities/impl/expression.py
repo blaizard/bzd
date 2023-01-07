@@ -7,7 +7,7 @@ from bzd.parser.error import Error
 
 from tools.bdl.contracts.validation import Validation, SchemaDict
 from tools.bdl.contracts.contract import Contract
-from tools.bdl.entities.impl.fragment.type import Type
+from tools.bdl.entities.impl.fragment.symbol import Symbol
 from tools.bdl.entities.impl.fragment.contract import Contracts
 from tools.bdl.entities.impl.fragment.parameters import Parameters
 from tools.bdl.entities.impl.fragment.parameters_resolved import ParametersResolved
@@ -41,7 +41,8 @@ class Expression(EntityExpression):
 	def __init__(self, element: Element) -> None:
 
 		super().__init__(element, Role.Value)
-		self.assertTrue(condition=(self.isValue or self.isType), message="Expression must represent a type or a value.")
+		self.assertTrue(condition=(self.isValue or self.isSymbol),
+			message="Expression must represent a symbol or a value.")
 
 	@property
 	def executor(self) -> str:
@@ -53,8 +54,8 @@ class Expression(EntityExpression):
 		return "executor"
 
 	@cached_property
-	def typeResolved(self) -> Type:
-		return Type(element=self.element,
+	def typeResolved(self) -> Symbol:
+		return Symbol(element=self.element,
 			kind="type",
 			underlyingTypeFQN="fqn_type",
 			template="template_resolved",
@@ -65,13 +66,13 @@ class Expression(EntityExpression):
 		return self.element.isAttr("symbol") and bool(self.element.getAttr("symbol").value)
 
 	@cached_property
-	def interfaceType(self) -> Type:
-		return Type(element=self.element, kind="symbol", underlyingTypeFQN="fqn_interface",
-			const="const") if self.isInterfaceType else self.type
+	def interfaceType(self) -> Symbol:
+		return Symbol(element=self.element, kind="symbol", underlyingTypeFQN="fqn_interface",
+			const="const") if self.isInterfaceType else self.symbol
 
 	@cached_property
-	def interfaceTypeResolved(self) -> Type:
-		return Type(element=self.element, kind="symbol", underlyingTypeFQN="fqn_interface",
+	def interfaceTypeResolved(self) -> Symbol:
+		return Symbol(element=self.element, kind="symbol", underlyingTypeFQN="fqn_interface",
 			const="const") if self.isInterfaceType else self.typeResolved
 
 	@property
@@ -80,8 +81,8 @@ class Expression(EntityExpression):
 		Output the dependency list for this entity.
 		"""
 		dependencies = set()
-		if self.isType:
-			dependencies.update(self.type.dependencies)
+		if self.isSymbol:
+			dependencies.update(self.symbol.dependencies)
 		if self.isParameters:
 			dependencies.update(self.parameters.dependencies)
 
@@ -101,11 +102,11 @@ class Expression(EntityExpression):
 		if self.isValue:
 			self._setLiteral(value=self.value)
 
-		# If it holds a type.
-		elif self.isType:
+		# If it holds a symbol.
+		elif self.isSymbol:
 
 			# Check if this points to a type or a value.
-			entity = self.type.resolve(resolver=resolver, maybeValue=True)
+			entity = self.symbol.resolve(resolver=resolver, maybeValue=True)
 			if entity.isRoleMeta:
 				self._setMeta()
 

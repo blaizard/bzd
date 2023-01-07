@@ -10,7 +10,7 @@ from tools.bdl.entities.impl.types import Category
 if typing.TYPE_CHECKING:
 	from tools.bdl.entities.impl.expression import Expression
 	from tools.bdl.visitors.symbol_map import Resolver
-	from tools.bdl.entities.impl.fragment.type import Type
+	from tools.bdl.entities.impl.fragment.symbol import Symbol
 	from tools.bdl.entities.impl.entity import EntityExpression
 
 
@@ -108,7 +108,7 @@ class ParametersCommon:
 		for param in self:
 			if param.isLiteral or param.isValue:
 				pass
-			elif param.isType:
+			elif param.isSymbol:
 				entityType = param.getEntityUnderlyingTypeResolved(resolver)
 				entityType.assertTrue(condition=entityType.isRoleType, message="This entity must be of role type.")
 				yield entityType.category
@@ -184,7 +184,7 @@ class ParametersCommon:
 			throw=throw)
 
 
-ResolvedType = typing.Union["Entity", "Type"]
+ResolvedType = typing.Union["Entity", "Symbol"]
 
 
 class Parameters(ParametersCommon):

@@ -5,7 +5,6 @@ from functools import cached_property
 from bzd.parser.element import Element
 from bzd.parser.error import Error
 
-from tools.bdl.entities.impl.fragment.type import Type
 from tools.bdl.entities.impl.entity import Entity, Role
 
 
