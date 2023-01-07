@@ -1,6 +1,6 @@
 import typing
 
-from tools.bdl.generators.cc.types import typeToStr
+from tools.bdl.generators.cc.symbol import symbolToStr
 from tools.bdl.generators.cc.fqn import fqnToNameStr
 from tools.bdl.generators.cc.comments import commentParametersResolvedToStr
 from tools.bdl.entities.impl.fragment.parameters_resolved import ParametersResolvedItem
@@ -26,7 +26,7 @@ def valueToStr(item: ParametersResolvedItem,
 	def bindTypeAndValue(values: typing.List[str]) -> str:
 		"""Associate a value with its type."""
 
-		paramTypeStr = typeToStr(item.param.symbol, referenceForInterface=True,
+		paramTypeStr = symbolToStr(item.param.symbol, referenceForInterface=True,
 			values=values) if item.param.isSymbol else ""
 		paramValues = values if paramTypeStr == "" else [f"{paramTypeStr}{{{', '.join(values)}}}"]
 
@@ -34,7 +34,7 @@ def valueToStr(item: ParametersResolvedItem,
 		if item.sameType:
 			return ", ".join(paramValues)
 
-		expectedTypeStr = typeToStr(item.expected.symbol, referenceForInterface=True,
+		expectedTypeStr = symbolToStr(item.expected.symbol, referenceForInterface=True,
 			values=paramValues) if item.expected.isSymbol else ""
 		return ", ".join(paramValues) if expectedTypeStr == "" else f"{expectedTypeStr}{{{', '.join(paramValues)}}}"
 

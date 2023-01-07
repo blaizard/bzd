@@ -149,15 +149,15 @@ class Symbol:
 
 	@property
 	def fqn(self) -> str:
-		return self.kinds[-1]
+		return self.element.getAttr(self.kindAttr).value
 
 	@property
 	def kind(self) -> str:
-		return self.fqn
+		return self.kinds[-1]
 
 	@property
 	def kinds(self) -> typing.List[str]:
-		return self.element.getAttr(self.kindAttr).value.split(";")
+		return self.fqn.split(";")
 
 	@property
 	def comment(self) -> typing.Optional[str]:
@@ -165,7 +165,7 @@ class Symbol:
 
 	@cached_property
 	def name(self) -> str:
-		return Visitor(entity=self).result
+		return Visitor(symbol=self).result
 
 	def isConvertible(self, resolver: "Resolver", to: "Symbol") -> bool:
 		"""Check that the current type is convertible to another type."""
@@ -205,20 +205,20 @@ class Visitor(VisitorDepthFirstBase[typing.List[str], str]):
 
 	nestedKind = "template"
 
-	def __init__(self, entity: Symbol) -> None:
+	def __init__(self, symbol: Symbol) -> None:
 
 		# Nested level
 		self.level = 0
 
 		# Construct the template if any.
-		if entity.templateAttr is not None:
-			self.nestedKind = entity.templateAttr
-			nested = entity.element.getNestedSequence(self.nestedKind)
+		if symbol.templateAttr is not None:
+			self.nestedKind = symbol.templateAttr
+			nested = symbol.element.getNestedSequence(self.nestedKind)
 			template = [] if nested is None else self._visit(sequence=nested)
 		else:
 			template = []
 
-		self.result = self.visitType(entity=entity, nested=template, parameters=entity.templateResolved)
+		self.result = self.visitSymbol(symbol=symbol, nested=template, parameters=symbol.templateResolved)
 
 	@property
 	def isResolved(self) -> bool:
@@ -242,14 +242,14 @@ class Visitor(VisitorDepthFirstBase[typing.List[str], str]):
 
 		if element.isAttr("type"):
 
-			entity = Symbol(element=element,
+			symbol = Symbol(element=element,
 				kind="type",
 				underlyingTypeFQN="fqn_type",
 				template="template_resolved" if self.isResolved else "template",
 				const="const")
-			output = self.visitType(entity=entity,
+			output = self.visitSymbol(symbol=symbol,
 				nested=[] if nested is None else nested,
-				parameters=entity.templateResolved)
+				parameters=symbol.templateResolved)
 
 		else:
 			Error.assertHasAttr(element=element, attr="value")
@@ -267,7 +267,7 @@ class Visitor(VisitorDepthFirstBase[typing.List[str], str]):
 
 		return value
 
-	def visitType(self, entity: Symbol, nested: typing.List[str], parameters: ParametersResolved) -> str:
+	def visitSymbol(self, symbol: Symbol, nested: typing.List[str], parameters: ParametersResolved) -> str:
 		"""
 		Called when an element needs to be formatted.
 		"""
@@ -275,7 +275,7 @@ class Visitor(VisitorDepthFirstBase[typing.List[str], str]):
 		# Build the type. The first fqn is the element and the rest
 		# are the types.
 		kinds: typing.List[str] = []
-		for index, fqn in enumerate(entity.kinds):
+		for index, fqn in enumerate(symbol.kinds):
 			if index == 0:
 				kinds.append(fqn)
 			else:

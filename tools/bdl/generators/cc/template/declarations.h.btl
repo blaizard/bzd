@@ -31,7 +31,7 @@
 	{% for data in trivialTypes %}
 		{% if not data.isExtern %}
 			{% if data.category == Category.using %}
-{{ data.comment | commentBlockToStr }}using {{ data.name }} = {{ data.symbol | typeToStr }};
+{{ data.comment | commentBlockToStr }}using {{ data.name }} = {{ data.symbol | symbolToStr }};
 			{% elif data.category == Category.enum %}
 {{ declareEnum(data) }}
 			{% elif data.category == Category.struct %}
@@ -49,8 +49,8 @@ void myFunction(bzd::MyType& a, const OtherType& b)
 Note: methods do not have optional parameters, they are feed by the method callee, this is because
 it gives a restriction to optional parameters to be put only at the end.-#}
 {%- macro declareMethod(method) -%}
-{{ method.symbol | typeToStr }} {{ method.name }}(
+{{ method.symbol | symbolToStr }} {{ method.name }}(
 	{%- for i, item in method.parameters %}{% if i %}, {% end -%}
-		{{- item.symbol | typeReferenceToStr }} {{ item.name }}
+		{{- item.symbol | symbolReferenceToStr }} {{ item.name }}
 	{%-end -%})
 {%- end -%}

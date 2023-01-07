@@ -10,7 +10,7 @@ from tools.bdl.entities.impl.fragment.symbol import Symbol
 from tools.bdl.entities.impl.fragment.parameters_resolved import ParametersResolved, ParametersResolvedItem
 from tools.bdl.entities.impl.types import Category
 
-from tools.bdl.generators.cc.types import typeToStr as typeToStrOriginal
+from tools.bdl.generators.cc.symbol import symbolToStr as symbolToStrOriginal
 from tools.bdl.generators.cc.value import valueToStr as valueToStrOriginal
 from tools.bdl.generators.cc.comments import commentBlockToStr as commentBlockToStrOriginal, commentEmbeddedToStr as commentEmbeddedToStrOriginal, commentParametersResolvedToStr as commentParametersResolvedToStrOriginal
 from tools.bdl.generators.cc.fqn import fqnToStr as fqnToStrOriginal, fqnToAdapterStr as fqnToAdapterStrOriginal, fqnToNameStr as fqnToNameStrOriginal
@@ -52,11 +52,11 @@ class Transform:
 	# Inheritance related
 
 	def inheritanceToStr(self, inheritanceList: typing.List[Symbol]) -> str:
-		return ", ".join([f"public {str(typeToStrOriginal(inheritance))}<Impl>" for inheritance in inheritanceList])
+		return ", ".join([f"public {str(symbolToStrOriginal(inheritance))}<Impl>" for inheritance in inheritanceList])
 
 	def inheritanceAdapterToStr(self, inheritanceList: typing.List[Symbol]) -> str:
 		return ", ".join([
-			"public {}<Impl>".format(str(typeToStrOriginal(inheritance, adapter=True)))
+			"public {}<Impl>".format(str(symbolToStrOriginal(inheritance, adapter=True)))
 			for inheritance in inheritanceList
 		])
 
@@ -72,20 +72,20 @@ class Transform:
 
 	# Symbol related
 
-	def typeToStr(self, entity: Symbol) -> str:
-		return typeToStrOriginal(entity=entity)
+	def symbolToStr(self, symbol: Symbol) -> str:
+		return symbolToStrOriginal(symbol=symbol)
 
-	def typeReferenceToStr(self, entity: Symbol) -> str:
-		return typeToStrOriginal(entity=entity, reference=True, referenceForInterface=True)
+	def symbolReferenceToStr(self, symbol: Symbol) -> str:
+		return symbolToStrOriginal(symbol=symbol, reference=True, referenceForInterface=True)
 
-	def typeDefinitionToStr(self, entity: Symbol) -> str:
-		return typeToStrOriginal(entity=entity, definition=True, referenceForInterface=True)
+	def symbolDefinitionToStr(self, symbol: Symbol) -> str:
+		return symbolToStrOriginal(symbol=symbol, definition=True, referenceForInterface=True)
 
-	def typeNonConstToStr(self, entity: Symbol) -> str:
-		return typeToStrOriginal(entity=entity, nonConst=True)
+	def symbolNonConstToStr(self, symbol: Symbol) -> str:
+		return symbolToStrOriginal(symbol=symbol, nonConst=True)
 
-	def typeRegistryToStr(self, entity: Symbol) -> str:
-		return typeToStrOriginal(entity=entity,
+	def symbolRegistryToStr(self, symbol: Symbol) -> str:
+		return symbolToStrOriginal(symbol=symbol,
 			registry=self.composition.registry.keys() if self.composition else None)  # type: ignore
 
 	# ParameterResolvedItem related
@@ -118,7 +118,7 @@ class Transform:
 	def paramToDefinition(self, item: ParametersResolvedItem, index: int) -> str:
 
 		if item.param.isLiteral:
-			return f"static constexpr {typeToStrOriginal(item.symbol)} {item.name}{{{item.param.literal}}};"
+			return f"static constexpr {symbolToStrOriginal(item.symbol)} {item.name}{{{item.param.literal}}};"
 		elif item.isLValue:
 			return f"T{index}& {item.name};"
 		elif item.isRValue:
@@ -160,7 +160,7 @@ class Transform:
 		values = self.paramsDeclarationToList_(
 			params=entity.parametersResolved) if entity.parametersResolved.size() else []
 		entity.assertTrue(condition=entity.isSymbol, message="An expression declaration must have a type.")
-		output += f" {typeToStrOriginal(entity.symbol, referenceForInterface=True, values=values)}"
+		output += f" {symbolToStrOriginal(entity.symbol, referenceForInterface=True, values=values)}"
 		if entity.isName:
 			output += f" {entity.name}"
 		if values:

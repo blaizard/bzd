@@ -117,7 +117,7 @@ class Expression(EntityExpression):
 				# It means it refers directly to the entity, in that case it must have a value FQN
 				if entity.underlyingValueFQN is None:
 					self.assertTrue(condition=entity.isFQN, message="A value referenced must have an valid FQN.")
-					self._setUnderlyingValueFQN(fqn=entity.fqn)
+					self._setUnderlyingValueFQN(fqn=self.symbol.fqn)
 				else:
 					self._setUnderlyingValueFQN(fqn=entity.underlyingValueFQN)
 				self._setLiteral(value=entity.literal)
