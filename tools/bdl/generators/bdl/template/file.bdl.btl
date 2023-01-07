@@ -5,10 +5,10 @@
 {%- end -%}
 
 {%- macro declareUsing(data) %}
-{{ data.comment | normalComment }}using {{ data.name }} = {{ data.symbol | typeToStr }}{{ declareContract(data.contracts) }};{% end -%}
+{{ data.comment | normalComment }}using {{ data.name }} = {{ data.symbol | symbolToStr }}{{ declareContract(data.contracts) }};{% end -%}
 
 {%- macro declareMethod(data) %}
-{{ data.comment | normalComment }}method {{ data.name }}({{ printParameters(data.parameters) }}){{ declareContract(data.contracts) }}{% if data.isSymbol %} -> {{ data.symbol | typeToStr }}{% end %};{% end -%}
+{{ data.comment | normalComment }}method {{ data.name }}({{ printParameters(data.parameters) }}){{ declareContract(data.contracts) }}{% if data.isSymbol %} -> {{ data.symbol | symbolToStr }}{% end %};{% end -%}
 
 {%- macro declareEnum(data) %}
 {{ data.comment | normalComment }}enum {{ data.name }}
@@ -41,7 +41,7 @@ composition:
 {% end -%}
 
 {%- macro declareExpression(data) -%}
-	{{ data.comment | normalComment }}{% if data.isName %}{{ data.name }}{% if data.isInterfaceType %}: {{ data.interfaceType | typeToStr }}{% end %} = {% end %}{% if data.isValue %}{{ data.value }}{% else %}{{ data.symbol | typeToStr }}{% if data.isParameters %}({{ printParameters(data.parameters) }}){% end %}{% end %}{{ declareContract(data.contracts) }}
+	{{ data.comment | normalComment }}{% if data.isName %}{{ data.name }}{% if data.isInterfaceType %}: {{ data.interfaceType | symbolToStr }}{% end %} = {% end %}{% if data.isValue %}{{ data.value }}{% else %}{{ data.symbol | symbolToStr }}{% if data.isParameters %}({{ printParameters(data.parameters) }}){% end %}{% end %}{{ declareContract(data.contracts) }}
 {%- end -%}
 
 {%- macro printParameters(parameters) -%}

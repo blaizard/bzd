@@ -62,7 +62,7 @@ public: // Variable accessors.
 	// Getter for the variable '{{ var.name }}'.
 	{{ var.comment | commentBlockToStr -}}
 	// \return The value of '{{ var.name }}'.
-	[[nodiscard]] constexpr {{ var.symbol | typeReferenceToStr }} {{ var.name }}() const noexcept
+	[[nodiscard]] constexpr {{ var.symbol | symbolReferenceToStr }} {{ var.name }}() const noexcept
 	{
 		return static_cast<Impl*>(this)->{{ var.name }};
 	}
@@ -101,7 +101,7 @@ struct Interface<"{{ data.fqn }}">
 template <>
 struct Data<"{{ var.fqn }}">
 {
-	using Type = {{ var.symbol | typeNonConstToStr }};
+	using Type = {{ var.symbol | symbolNonConstToStr }};
 	static UInt32 id;
 };
 			{% end %}

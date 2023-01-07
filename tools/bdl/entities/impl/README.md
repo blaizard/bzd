@@ -9,7 +9,7 @@ All entities have the following common attributes:
 - _fqn_: The Fully Qualified Name. This corresponds to a unique identifier that corresponds to this specific entity. There
   cannot be more than one entity with the same FQN.
   FQN is a succession of types separated with ';'. For example a `struct A { c = Integer; }` in a `namespace B` will look like: `B.A`.
-  When instantiated in a composition as such: `composition { a = B.A; a.c; }`, The FQN of `a.c` will be `a;A.c`.
+  When instantiated in a composition as such: `composition { a = B.A; a.c; }`, The FQN of `a.c` will be `a.c` but its value FQN is `a;A.c`.
 
 ## Expression
 

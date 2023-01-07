@@ -45,69 +45,69 @@ class TestRun(unittest.TestCase):
 		return Template("""{%- include "tools/bdl/generators/cc/template/declarations.h.btl" -%}""" + template).render(
 			composition, Transform(composition=composition))
 
-	def testTypeToStr(self) -> None:
-		output = self.render("""{{ entity("MyStruct.var").typeResolved | typeToStr }}""")
+	def testSymbolToStr(self) -> None:
+		output = self.render("""{{ entity("MyStruct.var").typeResolved | symbolToStr }}""")
 		self.assertEqual(output, "bzd::Int32")
 
-		output = self.render("""{{ entity("myVar").typeResolved | typeToStr }}""")
+		output = self.render("""{{ entity("myVar").typeResolved | symbolToStr }}""")
 		self.assertEqual(output, "const bzd::Int32")
 
-		output = self.render("""{{ entity("myStruct").typeResolved | typeToStr }}""")
+		output = self.render("""{{ entity("myStruct").typeResolved | symbolToStr }}""")
 		self.assertEqual(output, "MyStruct")
 
-		output = self.render("""{{ entity("myComponent").typeResolved | typeToStr }}""")
+		output = self.render("""{{ entity("myComponent").typeResolved | symbolToStr }}""")
 		self.assertEqual(output, "MyComponent<bzd::Float32>")
 
-	def testTypeReferenceToStr(self) -> None:
-		output = self.render("""{{ entity("MyStruct.var").typeResolved | typeReferenceToStr }}""")
+	def testSymbolReferenceToStr(self) -> None:
+		output = self.render("""{{ entity("MyStruct.var").typeResolved | symbolReferenceToStr }}""")
 		self.assertEqual(output, "bzd::Int32&")
 
-		output = self.render("""{{ entity("myVar").typeResolved | typeReferenceToStr }}""")
+		output = self.render("""{{ entity("myVar").typeResolved | symbolReferenceToStr }}""")
 		self.assertEqual(output, "const bzd::Int32&")
 
-		output = self.render("""{{ entity("myStruct").typeResolved | typeReferenceToStr }}""")
+		output = self.render("""{{ entity("myStruct").typeResolved | symbolReferenceToStr }}""")
 		self.assertEqual(output, "MyStruct&")
 
-		output = self.render("""{{ entity("myComponent").typeResolved | typeReferenceToStr }}""")
+		output = self.render("""{{ entity("myComponent").typeResolved | symbolReferenceToStr }}""")
 		self.assertEqual(output, "MyComponent<bzd::Float32>&")
 
-	def testTypeDefinitionToStr(self) -> None:
-		output = self.render("""{{ entity("MyStruct.var").typeResolved | typeDefinitionToStr }}""")
+	def testSymbolDefinitionToStr(self) -> None:
+		output = self.render("""{{ entity("MyStruct.var").typeResolved | symbolDefinitionToStr }}""")
 		self.assertEqual(output, "constexpr bzd::Int32")
 
-		output = self.render("""{{ entity("myVar").typeResolved | typeDefinitionToStr }}""")
+		output = self.render("""{{ entity("myVar").typeResolved | symbolDefinitionToStr }}""")
 		self.assertEqual(output, "const constexpr bzd::Int32")
 
-		output = self.render("""{{ entity("myStruct").typeResolved | typeDefinitionToStr }}""")
+		output = self.render("""{{ entity("myStruct").typeResolved | symbolDefinitionToStr }}""")
 		self.assertEqual(output, "MyStruct")
 
-		output = self.render("""{{ entity("myComponent").typeResolved | typeDefinitionToStr }}""")
+		output = self.render("""{{ entity("myComponent").typeResolved | symbolDefinitionToStr }}""")
 		self.assertEqual(output, "MyComponent<bzd::Float32>")
 
-	def testTypeNonConstToStr(self) -> None:
-		output = self.render("""{{ entity("MyStruct.var").typeResolved | typeNonConstToStr }}""")
+	def testSymbolNonConstToStr(self) -> None:
+		output = self.render("""{{ entity("MyStruct.var").typeResolved | symbolNonConstToStr }}""")
 		self.assertEqual(output, "bzd::Int32")
 
-		output = self.render("""{{ entity("myVar").typeResolved | typeNonConstToStr }}""")
+		output = self.render("""{{ entity("myVar").typeResolved | symbolNonConstToStr }}""")
 		self.assertEqual(output, "bzd::Int32")
 
-		output = self.render("""{{ entity("myStruct").typeResolved | typeNonConstToStr }}""")
+		output = self.render("""{{ entity("myStruct").typeResolved | symbolNonConstToStr }}""")
 		self.assertEqual(output, "MyStruct")
 
-		output = self.render("""{{ entity("myComponent").typeResolved | typeNonConstToStr }}""")
+		output = self.render("""{{ entity("myComponent").typeResolved | symbolNonConstToStr }}""")
 		self.assertEqual(output, "MyComponent<bzd::Float32>")
 
-	def testTypeRegistryToStr(self) -> None:
-		output = self.render("""{{ entity("MyStruct.var").typeResolved | typeRegistryToStr }}""")
+	def testSymbolRegistryToStr(self) -> None:
+		output = self.render("""{{ entity("MyStruct.var").typeResolved | symbolRegistryToStr }}""")
 		self.assertEqual(output, "bzd::Int32")
 
-		output = self.render("""{{ entity("myVar").typeResolved | typeRegistryToStr }}""")
+		output = self.render("""{{ entity("myVar").typeResolved | symbolRegistryToStr }}""")
 		self.assertEqual(output, "const bzd::Int32")
 
-		output = self.render("""{{ entity("myStruct").typeResolved | typeRegistryToStr }}""")
+		output = self.render("""{{ entity("myStruct").typeResolved | symbolRegistryToStr }}""")
 		self.assertEqual(output, "MyStruct")
 
-		output = self.render("""{{ entity("myComponent").typeResolved | typeRegistryToStr }}""")
+		output = self.render("""{{ entity("myComponent").typeResolved | symbolRegistryToStr }}""")
 		self.assertEqual(output, "MyComponent<bzd::Float32>")
 
 	def testExpressionToValue(self) -> None:

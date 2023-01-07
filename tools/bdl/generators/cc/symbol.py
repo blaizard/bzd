@@ -11,10 +11,10 @@ from tools.bdl.generators.cc.builtins import builtins
 from tools.bdl.entities.impl.types import Category
 
 
-class _VisitorType(Visitor):
+class _VisitorSymbol(Visitor):
 	"""Visitor to print a type."""
 
-	def __init__(self, entity: Symbol, namespaceToFQN: typing.Optional[typing.Callable[[typing.List[str]],
+	def __init__(self, symbol: Symbol, namespaceToFQN: typing.Optional[typing.Callable[[typing.List[str]],
 		str]], reference: bool, definition: bool, nonConst: bool, referenceForInterface: bool,
 		values: typing.Optional[typing.Sequence[str]]) -> None:
 		self.namespaceToFQN = namespaceToFQN
@@ -23,8 +23,8 @@ class _VisitorType(Visitor):
 		self.nonConst = nonConst
 		self.referenceForInterface = referenceForInterface
 		self.values_ = values
-		self.entity = entity
-		super().__init__(entity)
+		self.symbol = symbol
+		super().__init__(symbol=symbol)
 
 	@property
 	def isNamespaceToFQN(self) -> bool:
@@ -37,23 +37,23 @@ class _VisitorType(Visitor):
 		return None
 
 	def visitValue(self, value: str, comment: typing.Optional[str]) -> None:
-		self.entity.error(message="No values are allowed within a type.")
+		self.symbol.error(message="No values are allowed within a type.")
 
-	def visitType(self, entity: Symbol, nested: typing.List[str], parameters: ParametersResolved) -> str:
+	def visitSymbol(self, symbol: Symbol, nested: typing.List[str], parameters: ParametersResolved) -> str:
 		"""
 		Called when an element needs to be formatted.
 		"""
 
 		# Whether this type should be a reference or not.
 		useReference = self.isTopLevel and self.reference
-		useReference |= self.referenceForInterface and entity.category == Category.interface
+		useReference |= self.referenceForInterface and symbol.category == Category.interface
 
 		outputList: typing.List[str] = []
 		output: str
-		for index, fqn in enumerate(entity.kinds):
+		for index, fqn in enumerate(symbol.kinds):
 			if fqn in builtins:
 				if callable(builtins[fqn].toType):
-					output, nested = builtins[fqn].toType(entity, nested, useReference, self.values)
+					output, nested = builtins[fqn].toType(symbol, nested, useReference, self.values)
 				else:
 					output = builtins[fqn].toType
 			else:
@@ -79,7 +79,7 @@ class _VisitorType(Visitor):
 
 		if self.isTopLevel:
 			if self.definition:
-				if entity.underlyingTypeFQN in builtins and builtins[entity.underlyingTypeFQN].constexpr:
+				if symbol.underlyingTypeFQN in builtins and builtins[symbol.underlyingTypeFQN].constexpr:
 					output = "constexpr " + output
 
 		# Apply the reference if any.
@@ -87,13 +87,13 @@ class _VisitorType(Visitor):
 			output += "&"
 
 		# Apply const if needed.
-		if entity.const and (not self.isTopLevel or not self.nonConst):
+		if symbol.const and (not self.isTopLevel or not self.nonConst):
 			output = "const " + output
 
 		return output
 
 
-def typeToStr(entity: typing.Optional[Symbol],
+def symbolToStr(symbol: typing.Optional[Symbol],
 	adapter: bool = False,
 	reference: bool = False,
 	definition: bool = False,
@@ -104,14 +104,14 @@ def typeToStr(entity: typing.Optional[Symbol],
 	"""
 	Convert a type object into a C++ string.
 	Args:
-		entity: The Type entity to be converted.
+		symbol: The symbol to be converted.
 		adapter: If the type should be converted into its adapter.
-		reference: If the entity is passed as reference.
+		reference: If the symbol is passed as reference.
 		definition: The type is used for a variable definition.
 		registry: FQNs that matches a registry entry.
 	"""
 
-	if entity is None:
+	if symbol is None:
 		return "void"
 
 	namespaceToFQN: typing.Optional[typing.Callable[[typing.List[str]], str]] = None
@@ -131,7 +131,7 @@ def typeToStr(entity: typing.Optional[Symbol],
 			return "::".join(namespace)
 
 	# Otherwise it must be a normal type
-	return _VisitorType(entity=entity,
+	return _VisitorSymbol(symbol=symbol,
 		namespaceToFQN=namespaceToFQN,
 		reference=reference,
 		definition=definition,
