@@ -100,6 +100,59 @@ class TestRun(unittest.TestCase):
 		composition = Composition()
 		composition.visit(bdl).process()
 
+	def testConnections(self) -> None:
+
+		common = Object.fromContent(content="""
+			component Executor { }
+			component Hello {
+			interface:
+				a = Integer;
+				b = Float;
+			}
+			composition {
+				executor = Executor();
+				hello1 = Hello();
+				hello2 = Hello();
+			}
+			""",
+			objectContext=ObjectContext(resolve=True))
+
+		composition = Object.fromContent(content="""
+			composition {
+				connect(hello1.a, hello1.a);
+			}
+			""",
+			objectContext=ObjectContext(resolve=True))
+		with self.assertRaisesRegex(Exception, r"cannot connect to itself"):
+			Composition().visit(common).visit(composition).process()
+
+		composition = Object.fromContent(content="""
+			composition {
+				connect(hello1.a, hello1.b);
+			}
+			""",
+			objectContext=ObjectContext(resolve=True))
+		with self.assertRaisesRegex(Exception, r"between same types"):
+			Composition().visit(common).visit(composition).process()
+
+		composition = Object.fromContent(content="""
+			composition {
+				connect(hello1.a, hello2.a);
+			}
+			""",
+			objectContext=ObjectContext(resolve=True))
+		Composition().visit(common).visit(composition).process()
+
+		composition = Object.fromContent(content="""
+			composition {
+				connect(hello1.a, hello2.a);
+				connect(hello1.a, hello2.a);
+			}
+			""",
+			objectContext=ObjectContext(resolve=True))
+		with self.assertRaisesRegex(Exception, r"defined multiple times"):
+			Composition().visit(common).visit(composition).process()
+
 
 if __name__ == '__main__':
 	unittest.main()

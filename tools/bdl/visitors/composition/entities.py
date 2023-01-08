@@ -4,9 +4,10 @@ import dataclasses
 from tools.bdl.visitor import Group
 from tools.bdl.visitors.symbol_map import SymbolMap, Resolver
 from tools.bdl.entities.impl.builtin import Builtin
-from tools.bdl.entities.impl.entity import Entity
+from tools.bdl.entities.impl.entity import Entity, EntityExpression
 from tools.bdl.entities.impl.expression import Expression
 from tools.bdl.entities.builder import ExpressionBuilder
+from tools.bdl.entities.impl.fragment.symbol import Symbol
 
 
 class DependencyGroup:
@@ -71,6 +72,36 @@ class Dependencies:
 		return "\n".join(content)
 
 
+class Connections:
+
+	def __init__(self) -> None:
+		self.map: typing.Dict[Symbol, typing.Set[Symbol]] = {}
+
+	def add(self, io1: EntityExpression, io2: EntityExpression) -> None:
+		"""Register a new connection to the connection map."""
+
+		io1.assertTrue(condition=io1.isLValue, message="First argument must be a reference to another object.")
+		io2.assertTrue(condition=io2.isLValue, message="Second argument must be a reference to another object.")
+
+		io1.assertTrue(condition=io1.symbol != io2.symbol, message="A connection cannot connect to itself.")
+		io1.assertTrue(condition=io1.underlyingTypeFQN == io2.underlyingTypeFQN,
+			message=
+			f"Connections cannot only be made between same types, not {io1.underlyingTypeFQN} and {io2.underlyingTypeFQN}."
+						)
+
+		alreadyInserted = io1.symbol in self.map and io2.symbol in self.map[io1.symbol]
+		io1.assertTrue(condition=not alreadyInserted,
+			message=f"Connection between '{io1.symbol}' and '{io2.symbol}' is defined multiple times.")
+		self.map.setdefault(io1.symbol, set()).add(io2.symbol)
+		self.map.setdefault(io2.symbol, set()).add(io1.symbol)
+
+	def __repr__(self) -> str:
+		content = []
+		for io, setOfIOs in self.map.items():
+			content += [f"{io} => {setOfIOs}"]
+		return "\n".join(content)
+
+
 class Entities:
 	"""Class to handle entities and their dependencies."""
 
@@ -79,7 +110,7 @@ class Entities:
 		# Map of all available components and their dependencies.
 		self.components: typing.Dict[Entity, Dependencies] = {}
 		# Map of all available connections.
-		self.connections: typing.Dict[Entity, typing.Set[Entity]] = {}
+		self.connections = Connections()
 
 	def findAllIntra(self, entities: typing.List[Entity]) -> DependencyGroup:
 		"""Find all intra expressions associated with this entities."""
@@ -98,19 +129,7 @@ class Entities:
 
 		entity.assertTrue(condition=entity.isSymbol, message=f"Meta expressions must have a symbol.")
 		if entity.symbol.fqn == "connect":
-
-			io1 = entity.parametersResolved[0].param
-			io2 = entity.parametersResolved[1].param
-
-			io1.assertTrue(condition=io1.isLValue, message="First argument must be a reference to another object.")
-			io2.assertTrue(condition=io2.isLValue, message="Second argument must be a reference to another object.")
-
-			entity.assertTrue(io1 not in self.connections or io2 not in self.connections[io1],
-				f"Connection between '{io1}' and '{io2}' is defined multiple times.")
-			self.connections.setdefault(io1, set()).add(io2)
-			entity.assertTrue(io2 not in self.connections or io1 not in self.connections[io2],
-				f"Connection between '{io1}' and '{io2}' is defined multiple times.")
-			self.connections.setdefault(io2, set()).add(io1)
+			self.connections.add(entity.parametersResolved[0].param, entity.parametersResolved[1].param)
 
 		else:
 			entity.error(message="Unsupported meta expression.")
@@ -228,7 +247,6 @@ class Entities:
 		for entity, dependencies in self.components.items():
 			content += [str(entity)] + [f"\t{line}" for line in str(dependencies).split("\n")]
 		content += ["==== Connections ===="]
-		for io, setOfIOs in self.connections.items():
-			content += [f"{io} => {setOfIOs}"]
+		content += [str("\n".join([f"\t- {c}" for c in str(self.connections).split("\n")]))]
 
 		return "\n".join(content)

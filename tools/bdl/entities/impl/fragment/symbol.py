@@ -200,6 +200,12 @@ class Symbol:
 	def __eq__(self, other: "Symbol") -> bool:
 		return str(self) == str(other)
 
+	def __ne__(self, other: "Symbol") -> bool:
+		return not (self == other)
+
+	def __hash__(self) -> int:
+		return hash(str(self))
+
 
 class Visitor(VisitorDepthFirstBase[typing.List[str], str]):
 
@@ -280,8 +286,12 @@ class Visitor(VisitorDepthFirstBase[typing.List[str], str]):
 				kinds.append(fqn)
 			else:
 				kinds.append(fqn.split(".")[-1])
-		kind = ".".join(kinds)
+		kindStr = ".".join(kinds)
+
+		# If const
+		if symbol.const:
+			kindStr = f"const {kindStr}"
 
 		if nested:
-			return f"{kind}<{','.join(nested)}>"
-		return kind
+			return f"{kindStr}<{','.join(nested)}>"
+		return kindStr
