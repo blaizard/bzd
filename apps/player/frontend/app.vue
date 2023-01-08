@@ -429,7 +429,7 @@
 		//grid-template-columns: auto 1fr;
 		//grid-template-rows: 1fr;
 		//grid-template-columns: 1fr 1fr;
-		//grid-template-columns: 1fr 2fr !important;
+		grid-template-columns: 1fr 2fr !important;
 
 		> * {
 			min-width: 0;

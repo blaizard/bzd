@@ -40,6 +40,12 @@
             ]
         },
         {
+            "action": "file.create",
+            "args": [
+                "toolchain_arm_gcc/arm_gcc.BUILD"
+            ]
+        },
+        {
             "action": "file.write",
             "args": [
                 "WORKSPACE",
@@ -56,12 +62,6 @@
             "action": "exec",
             "args": [
                 "tree -L 2 $(bazel info output_base)/external\n"
-            ]
-        },
-        {
-            "action": "file.create",
-            "args": [
-                "toolchain_arm_gcc/arm_gcc.BUILD"
             ]
         },
         {
@@ -188,7 +188,7 @@
             "action": "file.write",
             "args": [
                 "toolchain_arm_gcc/arm_gcc.BUILD",
-                "\n\tlink_flags = []"
+                "\n\tlink_flags = [ \"--specs=nosys.specs\", ]"
             ]
         },
         {
@@ -217,6 +217,58 @@
             "args": [
                 "toolchain_arm_gcc/arm_gcc.BUILD",
                 "\n\ttoolchain_type = \"@rules_cc//cc:toolchain_type\",\n\ttoolchain = \":cc_toolchain\",\n)\n"
+            ]
+        },
+        {
+            "action": "file.write",
+            "args": [
+                "toolchain_arm_gcc/defs.bzl",
+                "\n\n   native.register_toolchains(\n       \"@arm_gcc//:toolchain\",\n   )\n"
+            ]
+        },
+        {
+            "action": "file.write",
+            "args": [
+                "toolchain_arm_gcc/BUILD",
+                "platform(\n\tname = \"platform\",\n\tconstraint_values = [\n\t\t\"@platforms//os:none\",\n\t\t\"@platforms//cpu:arm\",\n\t],\n)\n"
+            ]
+        },
+        {
+            "action": "file.create",
+            "args": [
+                "example/main.cc"
+            ]
+        },
+        {
+            "action": "file.write",
+            "args": [
+                "example/main.cc",
+                "int main() { return 0; }"
+            ]
+        },
+        {
+            "action": "file.create",
+            "args": [
+                "example/BUILD"
+            ]
+        },
+        {
+            "action": "file.write",
+            "args": [
+                "example/BUILD",
+                "cc_binary(\n\tname = \"example\",\n\tsrcs = [\"main.cc\"],\n)\n"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "bazel run example --platforms=//toolchain_arm_gcc:platform -s\n"
+            ]
+        },
+        {
+            "action": "exec",
+            "args": [
+                "bazel run example --incompatible_enable_cc_toolchain_resolution --platforms=//toolchain_arm_gcc:platform -s\n"
             ]
         }
     ],
