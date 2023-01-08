@@ -28,7 +28,7 @@ class Composition:
 
 		self.includes = [] if includes is None else includes
 		self.symbols = SymbolMap()
-		self.entites = Entities(symbols=self.symbols)
+		self.entities = Entities(symbols=self.symbols)
 		self.registry: typing.Dict[str, Expression] = {}
 		self.platform: typing.Dict[str, Expression] = {}
 		# Unique identifiers
@@ -78,23 +78,23 @@ class Composition:
 		self.registry = {fqn: entity for fqn, entity in self.all.items() if entity.isName}
 		self.executors = {}
 
-		self.entites.update(self.all.values())
+		self.entities.update(self.all.values())
 
 		# Applications are all intra expressions that are instanciated at top level
 		self.composition = {}
-		for entity in self.entites.getWorkloads():
+		for entity in self.entities.getWorkloads():
 			entity.assertTrue(entity.executor in self.registry, f"The executor '{entity.executor}' is not declared.")
 			self.composition.setdefault(entity.executor, dict())[entity] = AsyncType.workload
 			self.addExecutor(entity)
 
 		# Handle platform elements
-		for fqn, entity in self.entites.getPlatform():
+		for fqn, entity in self.entities.getPlatform():
 			self.platform[fqn] = entity
 
 		# Services are all intra expressions that are deps from all tasks, associated executor and infra.
-		commonServices = self.entites.findAllIntra(self.platform.values())  # type: ignore
+		commonServices = self.entities.findAllIntra(self.platform.values())  # type: ignore
 		for fqn, executorComposition in self.composition.items():
-			services = commonServices + self.entites.findAllIntra([self.registry[fqn]]) + self.entites.findAllIntra(
+			services = commonServices + self.entities.findAllIntra([self.registry[fqn]]) + self.entities.findAllIntra(
 				[*executorComposition.keys()])
 			executorComposition.update({entity: AsyncType.service for entity in services})
 
@@ -109,7 +109,7 @@ class Composition:
 		addContent(content, "Includes", self.includes)
 		addContent(content, "Symbols", str(self.symbols).split("\n"))
 		addContent(content, "Unique Identifiers", [f"{k}: {v}" for k, v in self.uids.items()])
-		addContent(content, "Entites", str(self.entites).split("\n"))
+		addContent(content, "Entities", str(self.entities).split("\n"))
 		addContent(content, "Registry", self.registry.values())
 		addContent(content, "Platform", self.platform.keys())
 		addContent(content, "Executors", self.executors.keys())

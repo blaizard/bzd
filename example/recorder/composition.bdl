@@ -5,7 +5,7 @@ namespace example;
 component Hello {
 interface:
 	method run();
-	input = const Integer;
+	input = Float;
 	
 }
 
@@ -13,7 +13,7 @@ composition {
 	hello = Hello();
 	hello.run();
 	world = Hello();
-	connect(hello.input, hello.input);
+	connect(hello.input, world.input);
 	
 }
 

@@ -416,6 +416,7 @@ class EntityExpression(Entity):
 		"""If the expression represents an LValue, in this context an lvalue is
 		a reference to another value."""
 
+		self.assertTrue(condition=self.isSymbol, message="LValues must have a symbol defined.")
 		return self.isRoleValue and self.underlyingValueFQN is not None
 
 	def toParametersResolvedItem(self, name: typing.Optional[str] = None) -> ParametersResolvedItem:
