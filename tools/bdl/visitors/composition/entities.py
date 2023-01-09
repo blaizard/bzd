@@ -1,5 +1,6 @@
 import typing
 import dataclasses
+from functools import cached_property
 
 from tools.bdl.visitor import Group
 from tools.bdl.visitors.symbol_map import SymbolMap, Resolver
@@ -14,7 +15,7 @@ class DependencyGroup:
 	"""List of ordered dependencies."""
 
 	def __init__(self) -> None:
-		self.data: typing.List[Entity] = []
+		self.data: typing.Set[Expression] = set()
 
 	def copy(self) -> "DependencyGroup":
 		"""Create a copy of this object."""
@@ -22,28 +23,38 @@ class DependencyGroup:
 		dependencies.data = self.data.copy()
 		return dependencies
 
-	def push(self, entity: Entity) -> None:
+	def push(self, expression: Expression) -> None:
 		"""Add a new dependency to the list."""
 		# Ignore Builtin dependencies, as they are expected to be available at all time.
-		if isinstance(entity, Builtin):
+		if isinstance(expression, Builtin):
 			return
-		if entity in self.data:
+		if expression in self.data:
 			return
-		self.data.append(entity)
+		self.data.add(expression)
 
-	def pushGroup(self, group: typing.Union["DependencyGroup", typing.List[Entity]]) -> None:
+	def pushGroup(self, group: typing.Union["DependencyGroup", typing.List[Expression]]) -> None:
 		"""Push an ordered group of dependency to the list."""
-		for entity in group:
-			self.push(entity)
+		for expression in group:
+			self.push(expression)
+
+	def isSubset(self, entities: typing.Iterable[Expression]) -> bool:
+		"""Check if this group is contained in an iterable of expressions,
+		assuming the iterable only contains unique entries."""
+
+		count = len(self.data)
+		for entity in entities:
+			if entity in self.data:
+				count -= 1
+		return count == 0
 
 	def __add__(self, other: "DependencyGroup") -> "DependencyGroup":
 		dependencies = self.copy()
 		dependencies.pushGroup(other)
 		return dependencies
 
-	def __iter__(self) -> typing.Iterator[Entity]:
-		for entity in self.data:
-			yield entity
+	def __iter__(self) -> typing.Iterator[Expression]:
+		for expression in self.data:
+			yield expression
 
 	def __len__(self) -> int:
 		return len(self.data)
@@ -54,7 +65,7 @@ class DependencyGroup:
 
 @dataclasses.dataclass
 class Dependencies:
-	executor: typing.Optional[Entity] = None
+	executor: typing.Optional[Expression] = None
 	# Dependencies over other entities, first level dependencies.
 	deps: DependencyGroup = dataclasses.field(default_factory=DependencyGroup)
 	# Direct dependencies.
@@ -108,7 +119,7 @@ class Entities:
 	def __init__(self, symbols: SymbolMap) -> None:
 		self.symbols = symbols
 		# Map of all available components and their dependencies.
-		self.components: typing.Dict[Entity, Dependencies] = {}
+		self.components: typing.Dict[Expression, Dependencies] = {}
 		# Map of all available connections.
 		self.connections = Connections()
 
@@ -124,93 +135,123 @@ class Entities:
 
 		return dependencies
 
-	def processMeta(self, entity: Entity) -> None:
+	def processMeta(self, expression: Expression) -> None:
 		"""Process a meta expression, a special function from the language."""
 
-		entity.assertTrue(condition=entity.isSymbol, message=f"Meta expressions must have a symbol.")
-		if entity.symbol.fqn == "connect":
-			self.connections.add(entity.parametersResolved[0].param, entity.parametersResolved[1].param)
+		expression.assertTrue(condition=expression.isSymbol, message=f"Meta expressions must have a symbol.")
+		if expression.symbol.fqn == "connect":
+			self.connections.add(expression.parametersResolved[0].param, expression.parametersResolved[1].param)
 
 		else:
-			entity.error(message="Unsupported meta expression.")
+			expression.error(message="Unsupported meta expression.")
 
-	def getWorkloads(self) -> typing.Iterable[Entity]:
+	def getWorkloads(self) -> typing.Iterable[Expression]:
 		"""List all workloads.
 		Workload are the entities with no name.
 		"""
-		for entity in self.components.keys():
-			if not entity.isName:
-				yield entity
+		for expression in self.components.keys():
+			if self.isWorkload(expression):
+				yield expression
 
-	def getRegistry(self) -> typing.Iterable[typing.Tuple[str, Entity]]:
+	def resolveDependencies(self, entities: typing.List[Expression]) -> typing.List[Expression]:
+		"""From entities that are part of self.components, resolve the dependencies to ensure
+		that each entity can be create sequentially with only previously created entites as dependencies."""
+
+		resolved: typing.List[Expression] = []
+
+		while entities:
+
+			remaining: typing.List[Expression] = []
+			for entity in entities:
+				if self.components[entity].deps.isSubset(resolved):
+					resolved.append(entity)
+				else:
+					remaining.append(entity)
+
+			if len(entities) == len(remaining):
+				entities[0].error(message="The dependencies of this expression are not met.")
+
+			entities = remaining
+
+		return resolved
+
+	@cached_property
+	def registry(self) -> typing.Iterable[Expression]:
 		"""The registry."""
-		for entity in self.components.keys():
-			if entity.isName:
-				yield entity.fqn, entity
 
-	def getPlatform(self) -> typing.Iterable[typing.Tuple[str, Entity]]:
+		return self.resolveDependencies([e for e in self.components.keys() if self.isRegistry(e)])
+
+	@property
+	def platform(self) -> typing.Iterable[typing.Tuple[str, Expression]]:
 		"""The platform entities."""
-		for entity in self.components.keys():
-			if entity.isName and entity.fqn.startswith("platform"):
-				yield entity.fqn, entity
+		for expression in self.components.keys():
+			if self.isPlatform(expression):
+				yield expression.fqn, expression
 
-	def update(self, entities: typing.List[Entity]) -> None:
-		"""Update the object with new entities."""
+	@staticmethod
+	def isWorkload(expression: Expression) -> bool:
+		return not expression.isName
 
-		for entity in entities:
-			self.add_(entity)
+	@staticmethod
+	def isRegistry(expression: Expression) -> bool:
+		return expression.isName
 
-	def add_(self, entity: Entity) -> None:
-		"""Add a single entity."""
+	@staticmethod
+	def isPlatform(expression: Expression) -> bool:
+		return expression.isName and expression.fqn.startswith("platform")
+
+	def add(self, entity: Entity, isDep: bool = False) -> None:
+		"""Add a new entity."""
 
 		# This can happen when new entries are added from the implicit dependencies.
 		if entity in self.components:
 			return
 
+		entity.assertTrue(condition=isinstance(entity, Expression),
+			message="Only expressions can be added to the composition.")
+		expression = typing.cast(Expression, entity)
+
 		# Resolve the entity against its namespace.
-		resolver = self.symbols.makeResolver(namespace=entity.namespace)
-		entity.resolveMemoized(resolver=resolver)
+		resolver = self.symbols.makeResolver(namespace=expression.namespace)
+		expression.resolveMemoized(resolver=resolver)
 
-		if entity.isRoleMeta:
-			self.processMeta(entity)
+		if not (isDep or self.isWorkload(entity) or self.isPlatform(entity)):
+			return
+
+		if expression.isRoleMeta:
+			self.processMeta(expression=expression)
 		else:
-			dependencies = self.resolveDependencies(entity=entity, resolver=resolver)
-			self.components[entity] = dependencies
+			self.processDependencies(expression=expression, resolver=resolver)
 
-			# Add implicit dependencies.
-			for dependency in dependencies.deps + dependencies.intra:
-				self.add_(dependency)
-
-	def resolveDependencies(self, entity: Entity, resolver: Resolver) -> Dependencies:
-		"""Resolve the dependencies for a specific entity."""
+	def processDependencies(self, expression: Expression, resolver: Resolver) -> None:
+		"""Resolve the dependencies for a specific expression."""
 
 		# These corresponds to the entities to be executed before / during / after.
-		dependencies = Dependencies()
+		self.components[expression] = Dependencies()
 
 		def checkIfInitOrShutdown(interfaceEntity: Entity) -> typing.Optional[DependencyGroup]:
 			if interfaceEntity.contracts.has("init"):
-				return dependencies.init
+				return self.components[expression].init
 			if interfaceEntity.contracts.has("shutdown"):
-				return dependencies.shutdown
+				return self.components[expression].shutdown
 			return None
 
-		if isinstance(entity, Expression):
+		# Set the executor, it is guarantee by the Expressiontype that there is always an executor.
+		self.components[expression].executor = self.symbols.getEntityResolved(fqn=expression.executor).assertValue(
+			element=expression.element)
+		self.add(self.components[expression].executor, isDep=True)
 
-			if entity.executor:
-				dependencies.executor = self.symbols.getEntityResolved(fqn=entity.executor).assertValue(
-					element=entity.element)
+		# Look for all dependencies and add the expression only.
+		for fqn in expression.dependencies:
+			dep = self.symbols.getEntityResolved(fqn=fqn).value
+			if isinstance(dep, Expression):
+				self.components[expression].deps.push(dep)
 
-			# Look for all dependencies and add the expression only.
-			for fqn in entity.dependencies:
-				dep = self.symbols.getEntityResolved(fqn=fqn).value
-				if isinstance(dep, Expression):
-					dependencies.deps.push(dep)
-
-		entityUnderlyingType = entity.getEntityUnderlyingTypeResolved(resolver=resolver)
+		underlyingType = expression.getEntityUnderlyingTypeResolved(resolver=resolver)
 
 		# Check if there are pre/post-requisites (init/shutdown functions)
-		if entityUnderlyingType.isInterface:
-			for interfaceEntity in entityUnderlyingType.interface:
+		if underlyingType.isInterface:
+			for interfaceEntity in underlyingType.interface:
 				maybeGroup = checkIfInitOrShutdown(interfaceEntity)
 				if maybeGroup is not None:
 
@@ -221,13 +262,13 @@ class Entities:
 						element=ExpressionBuilder(type=f"this.{interfaceEntity.name}"),
 						group=Group.composition)
 					newEntity = self.symbols.getEntityResolved(fqn=fqn).value
-					newResolver = self.symbols.makeResolver(namespace=interfaceEntity.namespace, this=entity.fqn)
+					newResolver = self.symbols.makeResolver(namespace=interfaceEntity.namespace, this=expression.fqn)
 					newEntity.resolveMemoized(resolver=newResolver)
 					maybeGroup.push(newEntity)
 
 		# Check if there are dependent composition from this entity.
-		if entityUnderlyingType.isComposition:
-			for compositionEntity in entityUnderlyingType.composition:
+		if underlyingType.isComposition:
+			for compositionEntity in underlyingType.composition:
 				# Composition must only contain unamed entries.
 				compositionEntity.assertTrue(condition=not compositionEntity.isName,
 					message="Variable cannot be created within a nested composition.")
@@ -235,17 +276,19 @@ class Entities:
 
 				# Create a new entity and associate it with its respective objects.
 				entityCopied = compositionEntity.copy()
-				newResolver = self.symbols.makeResolver(namespace=entityCopied.namespace, this=entity.fqn)
+				newResolver = self.symbols.makeResolver(namespace=entityCopied.namespace, this=expression.fqn)
 				entityCopied.resolveMemoized(resolver=newResolver)
 
-				dependencies.intra.push(entityCopied)
+				self.components[expression].intra.push(entityCopied)
 
-		return dependencies
+		# Add implicit dependencies.
+		for dependency in self.components[expression].deps + self.components[expression].intra:
+			self.add(dependency, isDep=True)
 
 	def __str__(self) -> str:
 		content = ["==== Components ===="]
-		for entity, dependencies in self.components.items():
-			content += [str(entity)] + [f"\t{line}" for line in str(dependencies).split("\n")]
+		for expression, dependencies in self.components.items():
+			content += [str(expression)] + [f"\t{line}" for line in str(dependencies).split("\n")]
 		content += ["==== Connections ===="]
 		content += [str("\n".join([f"\t- {c}" for c in str(self.connections).split("\n")]))]
 

@@ -78,7 +78,8 @@ class Composition:
 		self.registry = {fqn: entity for fqn, entity in self.all.items() if entity.isName}
 		self.executors = {}
 
-		self.entities.update(self.all.values())
+		for entity in self.all.values():
+			self.entities.add(entity)
 
 		# Applications are all intra expressions that are instanciated at top level
 		self.composition = {}
@@ -88,7 +89,7 @@ class Composition:
 			self.addExecutor(entity)
 
 		# Handle platform elements
-		for fqn, entity in self.entities.getPlatform():
+		for fqn, entity in self.entities.platform:
 			self.platform[fqn] = entity
 
 		# Services are all intra expressions that are deps from all tasks, associated executor and infra.

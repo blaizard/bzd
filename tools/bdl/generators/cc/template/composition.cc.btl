@@ -123,11 +123,11 @@ namespace bzd::platform {
 
 namespace {
 
-{% for fqn, expression in registry %}
+{% for expression in entities.registry %}
 
-// Specialization for '{{ fqn | fqnToStr }}'.
+// Specialization for '{{ expression.fqn | fqnToStr }}'.
 template <>
-class ResourceSpecialization<"{{ fqn }}">
+class ResourceSpecialization<"{{ expression.fqn }}">
 {
 public:
 	{{ paramsTemplateDefinition(expression.parametersResolved) }}
@@ -144,14 +144,14 @@ protected:
 	bzd::Async<> init([[maybe_unused]] auto& registry) noexcept
 	{
 		{{ callInitMembers(expression) }}
-		{% if fqn in platform %}
-		::bzd::platform::backend::{{ expression.name }} = &registry.{{ fqn | fqnToNameStr }}_.get();
+		{% if expression.fqn in platform %}
+		::bzd::platform::backend::{{ expression.name }} = &registry.{{ expression.fqn | fqnToNameStr }}_.get();
 		{% end %}
 		co_return {};
 	}
 	bzd::Async<> shutdown([[maybe_unused]] auto& registry) noexcept
 	{
-		{% if fqn in platform  %}
+		{% if expression.fqn in platform  %}
 		::bzd::platform::backend::{{ expression.name }} = nullptr;
 		{% end %}
 		{{ callShutdownMembers(expression) }}
@@ -165,19 +165,19 @@ protected:
 [[nodiscard]] auto makeRegistry() noexcept
 {
 	// Definition of all registry entries and their configuration.
-	{% for fqn, expresssion in registry %}
-	static const ResourceSpecialization<"{{ fqn }}">::Config config_{{ fqn | fqnToNameStr }}{ {{- paramsDeclaration(expresssion.parametersResolved | paramsFilterOutLiterals) -}} };
-	static {{ expresssion.typeResolved | symbolDefinitionToStr }} {{ fqn | fqnToNameStr }}{config_{{ fqn | fqnToNameStr }}};
+	{% for expression in entities.registry %}
+	static const ResourceSpecialization<"{{ expression.fqn }}">::Config config_{{ expression.fqn | fqnToNameStr }}{ {{- paramsDeclaration(expression.parametersResolved | paramsFilterOutLiterals) -}} };
+	static {{ expression.typeResolved | symbolDefinitionToStr }} {{ expression.fqn | fqnToNameStr }}{config_{{ expression.fqn | fqnToNameStr }}};
 	{% end %}
 
 	// Declaration of the registry.
 	struct Registry
 	{
-		{% for fqn, expresssion in registry %}
-		Resource<"{{ fqn }}", decltype({{ fqn | fqnToNameStr }})> {{ fqn | fqnToNameStr }}_;
+		{% for expression in entities.registry %}
+		Resource<"{{ expression.fqn }}", decltype({{ expression.fqn | fqnToNameStr }})> {{ expression.fqn | fqnToNameStr }}_;
 		{% end %}
 	};
-	return Registry{ {%- for fqn, expresssion in registry %}{% if not loop.first %}, {% end %}{{ fqn | fqnToNameStr }}{% end -%} };
+	return Registry{ {%- for expression in entities.registry %}{% if not loop.first %}, {% end %}{{ expression.fqn | fqnToNameStr }}{% end -%} };
 }
 
 /// Helper to handle return code.
