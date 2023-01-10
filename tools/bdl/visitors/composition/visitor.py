@@ -29,30 +29,26 @@ class Composition:
 		self.includes = [] if includes is None else includes
 		self.symbols = SymbolMap()
 		self.entities = Entities(symbols=self.symbols)
-		self.registry: typing.Dict[str, Expression] = {}
-		self.platform: typing.Dict[str, Expression] = {}
 		# Unique identifiers
 		self.uids: typing.Dict[str, int] = {}
 		# All top level expressions
 		self.all: typing.Dict[str, Expression] = {}
-		# All executors.
-		self.executors: typing.Dict[str, Expression] = {}
-		# All composition per executors.
-		self.composition: typing.Dict[str, typing.Dict[Entity, AsyncType]] = {}
-		# Connection map
-		self.connections: typing.Dict[str, str]
+		# All asyncs per executors.
+		self.asyncs: typing.Dict[str, typing.Dict[Entity, AsyncType]] = {}
+
+	@property
+	def registry(self) -> typing.Dict[str, Expression]:
+		return self.entities.registry
+
+	@property
+	def platform(self) -> typing.Dict[str, Expression]:
+		return self.entities.platform
 
 	def visit(self, bdl: Object) -> "Composition":
 
 		# Build a master symbol list
 		self.symbols.update(bdl.symbols)
 		return self
-
-	def addExecutor(self, entity: Expression) -> None:
-		"""Add a new executor from the given expression."""
-
-		entity.assertTrue(entity.executor in self.registry, f"The executor '{entity.executor}' is not declared.")
-		self.executors[entity.executor] = self.registry[entity.executor]
 
 	def entity(self, fqn: str) -> Entity:
 		"""Get the entity refered to the given fqn."""
@@ -71,33 +67,21 @@ class Composition:
 
 		self.generateUids()
 
-		self.all = {
-			fqn: entity
-			for fqn, entity in self.symbols.items(groups={Group.globalComposition}) if isinstance(entity, Expression)
-		}
-		self.registry = {fqn: entity for fqn, entity in self.all.items() if entity.isName}
-		self.executors = {}
+		compositionEntities = [
+			entity for fqn, entity in self.symbols.items(groups={Group.globalComposition})
+			if isinstance(entity, Expression)
+		]
 
-		for entity in self.all.values():
+		for entity in compositionEntities:
 			self.entities.add(entity)
 
-		#print(self.entities)
-
 		# Applications are all intra expressions that are instanciated at top level
-		self.composition = {}
-		for entity in self.entities.workloads:
-			entity.assertTrue(entity.executor in self.registry, f"The executor '{entity.executor}' is not declared.")
-			self.composition.setdefault(entity.executor, dict())[entity] = AsyncType.workload
-			self.addExecutor(entity)
-
-		# Handle platform elements
-		for fqn, entity in self.entities.platform:
-			self.platform[fqn] = entity
-
-		# Services are all intra expressions that are deps from all tasks, associated executor and infra.
-		for executorFQN, executorComposition in self.composition.items():
-			for entity in self.entities.services:
-				executorComposition[entity] = AsyncType.service
+		for executorFQN in self.entities.executors:
+			self.asyncs[executorFQN] = {}
+			for entity in self.entities.getWorkloadsByExecutor(executorFQN):
+				self.asyncs[executorFQN][entity] = AsyncType.workload
+			for entity in self.entities.getServicesByExecutor(executorFQN):
+				self.asyncs[executorFQN][entity] = AsyncType.service
 
 	def __str__(self) -> str:
 		"""Print a human readable view of this instance."""
@@ -111,8 +95,6 @@ class Composition:
 		addContent(content, "Symbols", str(self.symbols).split("\n"))
 		addContent(content, "Unique Identifiers", [f"{k}: {v}" for k, v in self.uids.items()])
 		addContent(content, "Entities", str(self.entities).split("\n"))
-		addContent(content, "Registry", self.registry.values())
-		addContent(content, "Platform", self.platform.keys())
 		addContent(content, "Executors", self.executors.keys())
 		for executor, items in self.composition.items():
 			addContent(content, f"Composition '({executor})'", [f"{k}: {v}" for k, v in items.items()])

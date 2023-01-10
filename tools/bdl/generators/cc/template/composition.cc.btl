@@ -123,11 +123,11 @@ namespace bzd::platform {
 
 namespace {
 
-{% for expression in entities.registry %}
+{% for fqn, expression in registry %}
 
-// Specialization for '{{ expression.fqn | fqnToStr }}'.
+// Specialization for '{{ fqn | fqnToStr }}'.
 template <>
-class ResourceSpecialization<"{{ expression.fqn }}">
+class ResourceSpecialization<"{{ fqn }}">
 {
 public:
 	{{ paramsTemplateDefinition(expression.parametersResolved) }}
@@ -144,14 +144,14 @@ protected:
 	bzd::Async<> init([[maybe_unused]] auto& registry) noexcept
 	{
 		{{ callInitMembers(expression) }}
-		{% if expression.fqn in platform %}
-		::bzd::platform::backend::{{ expression.name }} = &registry.{{ expression.fqn | fqnToNameStr }}_.get();
+		{% if fqn in platform %}
+		::bzd::platform::backend::{{ expression.name }} = &registry.{{ fqn | fqnToNameStr }}_.get();
 		{% end %}
 		co_return {};
 	}
 	bzd::Async<> shutdown([[maybe_unused]] auto& registry) noexcept
 	{
-		{% if expression.fqn in platform  %}
+		{% if fqn in platform  %}
 		::bzd::platform::backend::{{ expression.name }} = nullptr;
 		{% end %}
 		{{ callShutdownMembers(expression) }}
@@ -165,19 +165,19 @@ protected:
 [[nodiscard]] auto makeRegistry() noexcept
 {
 	// Definition of all registry entries and their configuration.
-	{% for expression in entities.registry %}
-	static const ResourceSpecialization<"{{ expression.fqn }}">::Config config_{{ expression.fqn | fqnToNameStr }}{ {{- paramsDeclaration(expression.parametersResolved | paramsFilterOutLiterals) -}} };
-	static {{ expression.typeResolved | symbolDefinitionToStr }} {{ expression.fqn | fqnToNameStr }}{config_{{ expression.fqn | fqnToNameStr }}};
+	{% for fqn, expression in registry %}
+	static const ResourceSpecialization<"{{ fqn }}">::Config config_{{ fqn | fqnToNameStr }}{ {{- paramsDeclaration(expression.parametersResolved | paramsFilterOutLiterals) -}} };
+	static {{ expression.typeResolved | symbolDefinitionToStr }} {{ fqn | fqnToNameStr }}{config_{{ fqn | fqnToNameStr }}};
 	{% end %}
 
 	// Declaration of the registry.
 	struct Registry
 	{
-		{% for expression in entities.registry %}
-		Resource<"{{ expression.fqn }}", decltype({{ expression.fqn | fqnToNameStr }})> {{ expression.fqn | fqnToNameStr }}_;
+		{% for fqn, expression in registry %}
+		Resource<"{{ fqn }}", decltype({{ fqn | fqnToNameStr }})> {{ fqn | fqnToNameStr }}_;
 		{% end %}
 	};
-	return Registry{ {%- for expression in entities.registry %}{% if not loop.first %}, {% end %}{{ expression.fqn | fqnToNameStr }}{% end -%} };
+	return Registry{ {%- for fqn, expression in registry %}{% if not loop.first %}, {% end %}{{ fqn | fqnToNameStr }}{% end -%} };
 }
 
 /// Helper to handle return code.
@@ -234,15 +234,15 @@ bool execute() noexcept
 	bzd::log::info("Initialization of platform completed."_csv).sync();
 
 	// Initialize executors.
-	{% for fqn, executor in executors %}
+	{% for fqn, expressions in asyncs %}
 	registry.{{ fqn | fqnToNameStr }}_.init(registry).sync();
 	bzd::log::info("Initialization of '{{ fqn }}' completed."_csv).sync();
 	{% end %}
 
 	// Composition.
-	{% for fqn, executor in executors %}
+	{% for fqn, expressions in asyncs %}
 	bzd::log::info("Composition for '{{ fqn }}'."_csv).sync();
-		{% for expression, asyncType in composition[fqn] %}
+		{% for expression, asyncType in expressions %}
 
 	// {{ asyncType.value }}: {{ expression.symbol | symbolToStr }}()
 	auto async_{{loop.parent.index}}_{{ loop.index }} = [&]() -> bzd::Async<> {
@@ -258,20 +258,20 @@ bool execute() noexcept
 
 	// Execute.
 	bzd::log::info("Execution phase."_csv).sync();
-	{% for executor in executors %}
+	{% for executor in asyncs %}
 	registry.{{ executor | fqnToNameStr }}_.get().start();
 	{% end %}
 
 	// Wait until completion.
-	{% for executor in executors %}
+	{% for executor in asyncs %}
 	registry.{{ executor | fqnToNameStr }}_.get().stop();
 	{% end %}
 	bzd::log::info("Completion."_csv).sync();
 
 	// Compute the return code.
 	bool isSuccess{true};
-	{% for fqn, executor in executors %}
-		{% for expression, asyncType in composition[fqn] %}
+	{% for fqn, expressions in asyncs %}
+		{% for expression, asyncType in expressions %}
 			{% if asyncType == AsyncType.workload %}
 	isSuccess &= verifyReturnedPromise(bzd::move(promise_{{loop.parent.index}}_{{ loop.index }}), "{{ expression.symbol | symbolToStr }}()"_sv);
 			{% end %}

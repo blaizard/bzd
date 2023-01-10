@@ -2,6 +2,7 @@ import typing
 import dataclasses
 import enum
 from functools import cached_property
+from collections import OrderedDict
 
 from bzd.utils.result import Result
 
@@ -112,8 +113,8 @@ class ExpressionEntry:
 	expression: Expression
 	# The asynchronous type of this entity.
 	entryType: EntryType
-	# The executor associated with this entry.
-	executor: typing.Optional[Expression] = None
+	# The executors associated with this entry.
+	executors: typing.Set[str] = dataclasses.field(default_factory=set)
 	# Dependencies over other entities, first level dependencies.
 	deps: DependencyGroup = dataclasses.field(default_factory=DependencyGroup)
 	# Direct dependencies.
@@ -123,7 +124,7 @@ class ExpressionEntry:
 
 	def __repr__(self) -> str:
 		content = [
-			f"type: {str(self.entryType)}", f"expression: {str(self.expression)}", f"executor: {str(self.executor)}",
+			f"type: {str(self.entryType)}", f"expression: {str(self.expression)}", f"executors: {str(self.executors)}",
 			f"deps: {self.deps}", f"init: {self.init}", f"intra: {self.intra}", f"shutdown: {self.shutdown}"
 		]
 		return "\n".join(content)
@@ -212,6 +213,21 @@ class Entities:
 		if expression.symbol.fqn == "connect":
 			self.connections.add(expression.parametersResolved[0].param, expression.parametersResolved[1].param)
 
+			#self.add(expression.parametersResolved[0].param, isDep=True)
+			#self.add(expression.parametersResolved[1].param, isDep=True)
+
+			# Look for all dependencies and add the expression only.
+			"""
+			for fqn in expression.parametersResolved[0].param.dependencies:
+				dep = self.symbols.getEntityResolved(fqn=fqn).value
+				if isinstance(dep, Expression):
+					self.add(dep, isDep=True)
+			for fqn in expression.parametersResolved[1].param.dependencies:
+				dep = self.symbols.getEntityResolved(fqn=fqn).value
+				if isinstance(dep, Expression):
+					self.add(dep, isDep=True)
+			"""
+
 		else:
 			expression.error(message="Unsupported meta expression.")
 
@@ -238,26 +254,49 @@ class Entities:
 		return resolved
 
 	@cached_property
-	def registry(self) -> typing.Iterable[Expression]:
+	def registry(self) -> typing.Dict[str, Expression]:
 		"""The registry."""
-		return self.resolveDependencies([e.expression for e in self.expressions if e.entryType == EntryType.registry])
+		expressions = self.resolveDependencies(
+			[e.expression for e in self.expressions if e.entryType == EntryType.registry])
+		registry = OrderedDict()
+		for e in expressions:
+			registry[e.fqn] = e
+		return registry
 
 	@cached_property
-	def workloads(self) -> typing.Iterable[Expression]:
-		"""List all workloads."""
-		return [e.expression for e in self.expressions if e.entryType == EntryType.workload]
-
-	@cached_property
-	def services(self) -> typing.Iterable[Expression]:
-		"""List all services."""
-		return [e.expression for e in self.expressions if e.entryType == EntryType.service]
-
-	@property
-	def platform(self) -> typing.Iterable[typing.Tuple[str, Expression]]:
+	def platform(self) -> typing.Dict[str, Expression]:
 		"""The platform entities."""
+
+		platform = OrderedDict()
+		for fqn, expression in self.registry.items():
+			if self.isPlatform(expression):
+				platform[fqn] = expression
+		return platform
+
+	@cached_property
+	def workloads(self) -> typing.Iterable[ExpressionEntry]:
+		"""List all workloads."""
+		return [e for e in self.expressions if e.entryType == EntryType.workload]
+
+	@cached_property
+	def services(self) -> typing.Iterable[ExpressionEntry]:
+		"""List all services."""
+		return [e for e in self.expressions if e.entryType == EntryType.service]
+
+	@cached_property
+	def executors(self) -> typing.Dict[str, Expression]:
+		"""List all executors."""
+
+		executors: typing.Set[str] = set()
 		for entry in self.expressions:
-			if self.isPlatform(entry.expression):
-				yield entry.expression.fqn, entry.expression
+			executors.update(entry.executors)
+		return {fqn: self.symbols.getEntityResolved(fqn=fqn).value for fqn in executors}
+
+	def getWorkloadsByExecutor(self, fqn: str) -> typing.Iterable[Expression]:
+		return [entry.expression for entry in self.workloads if fqn in entry.executors]
+
+	def getServicesByExecutor(self, fqn: str) -> typing.Iterable[Expression]:
+		return [entry.expression for entry in self.services if fqn in entry.executors]
 
 	@staticmethod
 	def isPlatform(expression: Expression) -> bool:
@@ -309,8 +348,9 @@ class Entities:
 			return
 
 		# Set the executor, it is guarantee by the Expressiontype that there is always an executor.
-		entry.executor = self.symbols.getEntityResolved(fqn=expression.executor).assertValue(element=expression.element)
-		self.add(entry.executor, isDep=True)
+		executor = self.symbols.getEntityResolved(fqn=expression.executor).assertValue(element=expression.element)
+		entry.executors.add(executor.fqn)
+		self.add(executor, isDep=True)
 
 		# Look for all dependencies and add the expression only.
 		for fqn in expression.dependencies:
