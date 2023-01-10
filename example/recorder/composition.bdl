@@ -19,5 +19,3 @@ composition {
 	connect(hello.input, world.input);
 	
 }
-
-
