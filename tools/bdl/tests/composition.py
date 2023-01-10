@@ -9,7 +9,7 @@ class TestRun(unittest.TestCase):
 
 	def testTemp(self):
 		interface = Object.fromContent(content="""
-			interface Hello {
+			component Hello {
 			config:
 				var = Integer(10) [min(10)];
 			}
@@ -32,7 +32,7 @@ class TestRun(unittest.TestCase):
 	def testCompositionOrder(self) -> None:
 
 		interface = Object.fromContent(content="""
-			interface Hello {
+			component Hello {
 			config:
 				var = Integer(10) [min(10)];
 			}

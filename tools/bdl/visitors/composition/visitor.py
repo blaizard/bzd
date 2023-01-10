@@ -81,9 +81,11 @@ class Composition:
 		for entity in self.all.values():
 			self.entities.add(entity)
 
+		#print(self.entities)
+
 		# Applications are all intra expressions that are instanciated at top level
 		self.composition = {}
-		for entity in self.entities.getWorkloads():
+		for entity in self.entities.workloads:
 			entity.assertTrue(entity.executor in self.registry, f"The executor '{entity.executor}' is not declared.")
 			self.composition.setdefault(entity.executor, dict())[entity] = AsyncType.workload
 			self.addExecutor(entity)
@@ -93,11 +95,9 @@ class Composition:
 			self.platform[fqn] = entity
 
 		# Services are all intra expressions that are deps from all tasks, associated executor and infra.
-		commonServices = self.entities.findAllIntra(self.platform.values())  # type: ignore
-		for fqn, executorComposition in self.composition.items():
-			services = commonServices + self.entities.findAllIntra([self.registry[fqn]]) + self.entities.findAllIntra(
-				[*executorComposition.keys()])
-			executorComposition.update({entity: AsyncType.service for entity in services})
+		for executorFQN, executorComposition in self.composition.items():
+			for entity in self.entities.services:
+				executorComposition[entity] = AsyncType.service
 
 	def __str__(self) -> str:
 		"""Print a human readable view of this instance."""
