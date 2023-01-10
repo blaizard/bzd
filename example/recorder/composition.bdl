@@ -7,6 +7,9 @@ interface:
 	method run();
 	input = Float;
 	
+composition:
+	this.run();
+	
 }
 
 composition {
