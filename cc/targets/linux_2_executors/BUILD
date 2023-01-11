@@ -5,25 +5,16 @@ bdl_library(
     name = "composition",
     srcs = [
         "composition.bdl",
-        "network.bdl",
     ],
     deps = [
+        "//cc/targets/linux:composition",
         "//cc/components/generic/executor",
         "//cc/components/linux/core",
-        "//cc/components/linux/proactor/epoll",
-        "//cc/components/posix/network/tcp:client",
-        "//cc/components/posix/stream/in",
-        "//cc/components/posix/stream/out",
-        "//cc/components/std/clock/steady",
-        "//cc/components/std/clock/system",
-    ],
-    visibility = [
-        "//cc/targets/linux_2_executors:__pkg__",
     ],
 )
 
 cc_library(
-    name = "linux",
+    name = "linux_2_executors",
     srcs = ["main.cc"],
     visibility = [
         "//cc/targets:__pkg__",
