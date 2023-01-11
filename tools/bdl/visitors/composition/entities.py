@@ -68,28 +68,66 @@ class DependencyGroup:
 		return ", ".join([str(e) for e in self.data])
 
 
+@dataclasses.dataclass
+class Output:
+	# The symbol associated with this connection.
+	symbol: Symbol
+	# The FQN of the executor associated with this connection.
+	executor: str
+	# The maximum history required by this connection.
+	history: int = 1
+
+
+@dataclasses.dataclass
+class ConnectionGroup:
+	# The type of symbol for this connection group.
+	symbol: Symbol
+	# The input of this connnection.
+	input: Symbol
+	# The FQN of the executor associated with this input.
+	executor: str
+	# The set of connection object for this group.
+	outputs: typing.List[Output]
+
+
 class Connections:
 
 	def __init__(self) -> None:
 		self.map: typing.Dict[Symbol, typing.Set[Symbol]] = {}
+		self.outputs: typing.Set[Symbol] = set()
+		self.groups: typing.List[ConnectionGroup] = []
 
-	def add(self, io1: EntityExpression, io2: EntityExpression) -> None:
+	def add(self, input: EntityExpression, output: EntityExpression) -> None:
 		"""Register a new connection to the connection map."""
 
-		io1.assertTrue(condition=io1.isLValue, message="First argument must be a reference to another object.")
-		io2.assertTrue(condition=io2.isLValue, message="Second argument must be a reference to another object.")
+		input.assertTrue(condition=input.isLValue, message="First argument must be a reference to another object.")
+		output.assertTrue(condition=output.isLValue, message="Second argument must be a reference to another object.")
 
-		io1.assertTrue(condition=io1.symbol != io2.symbol, message="A connection cannot connect to itself.")
-		io1.assertTrue(condition=io1.underlyingTypeFQN == io2.underlyingTypeFQN,
+		input.assertTrue(condition=input.symbol != output.symbol, message="A connection cannot connect to itself.")
+		input.assertTrue(condition=input.underlyingTypeFQN == output.underlyingTypeFQN,
 			message=
-			f"Connections cannot only be made between same types, not {io1.underlyingTypeFQN} and {io2.underlyingTypeFQN}."
-						)
+			f"Connections cannot only be made between same types, not {input.underlyingTypeFQN} and {output.underlyingTypeFQN}."
+							)
 
-		alreadyInserted = io1.symbol in self.map and io2.symbol in self.map[io1.symbol]
-		io1.assertTrue(condition=not alreadyInserted,
-			message=f"Connection between '{io1.symbol}' and '{io2.symbol}' is defined multiple times.")
-		self.map.setdefault(io1.symbol, set()).add(io2.symbol)
-		self.map.setdefault(io2.symbol, set()).add(io1.symbol)
+		alreadyInserted = input.symbol in self.map and output.symbol in self.map[input.symbol]
+		input.assertTrue(condition=not alreadyInserted,
+			message=f"Connection between '{input.symbol}' and '{output.symbol}' is defined multiple times.")
+		input.assertTrue(condition=input.symbol not in self.outputs,
+			message=f"'{input.symbol}' has already been defined as an output.")
+		self.map.setdefault(input.symbol, set()).add(output.symbol)
+		self.outputs.add(output.symbol)
+
+	def resolve(self, resolver: Resolver) -> None:
+
+		for input, outputs in self.map.items():
+			outputGroup = []
+			for output in outputs:
+				outputGroup.append(Output(symbol=output, executor=output.getThisResolved(resolver=resolver).executor))
+			connection = ConnectionGroup(input=input,
+				symbol=input.getEntityUnderlyingTypeResolved(resolver=resolver).symbol,
+				executor=input.getThisResolved(resolver=resolver).executor,
+				outputs=outputGroup)
+			self.groups.append(connection)
 
 	def __repr__(self) -> str:
 		content = []
@@ -133,7 +171,7 @@ class ExpressionEntry:
 class Components:
 
 	def __init__(self) -> None:
-		self.map: typing.Dict[str, ExpressionEntry] = {}
+		self.map: typing.Dict[str, ExpressionEntry] = OrderedDict()
 
 	@staticmethod
 	def makeId(expression: Expression) -> str:
@@ -141,9 +179,41 @@ class Components:
 		An Identifier is created with the name and the symbol or value.
 		"""
 
-		result = f"{expression.name}|" if expression.isName else "|"
+		result = f"{expression.fqn}|" if expression.isName else "|"
 		result += expression.value if expression.isValue else str(expression.symbol.fqn)
 		return result
+
+	def resolve(self) -> None:
+		"""Resolve the dependencies to ensure that each entry can be created sequentially
+		with only previously created entries as dependencies."""
+
+		def isSatisfied(group: DependencyGroup) -> bool:
+			"""Check that the group dependency is statified with the current map."""
+
+			for expression in group:
+				if self.makeId(expression) not in self.map:
+					return False
+			return True
+
+		entries = [(k, v) for k, v in self.map.items()]
+		self.map: typing.Dict[str, ExpressionEntry] = OrderedDict()
+
+		while entries:
+
+			remaining: typing.List[typing.Tuple[str, ExpressionEntry]] = []
+			for identifier, entry in entries:
+				if isSatisfied(entry.deps):
+					self.map[identifier] = entry
+				else:
+					remaining.append((identifier, entry))
+
+			if len(entries) == len(remaining):
+				entries[0][0].expression.error(message="The dependencies of this expression are not met.")
+
+			entries = remaining
+
+	def close(self) -> None:
+		self.resolve()
 
 	def __contains__(self, expression: Expression) -> bool:
 		"""Check if an entry already exists in the map."""
@@ -213,54 +283,19 @@ class Entities:
 		if expression.symbol.fqn == "connect":
 			self.connections.add(expression.parametersResolved[0].param, expression.parametersResolved[1].param)
 
-			#self.add(expression.parametersResolved[0].param, isDep=True)
-			#self.add(expression.parametersResolved[1].param, isDep=True)
-
-			# Look for all dependencies and add the expression only.
-			"""
-			for fqn in expression.parametersResolved[0].param.dependencies:
-				dep = self.symbols.getEntityResolved(fqn=fqn).value
-				if isinstance(dep, Expression):
-					self.add(dep, isDep=True)
-			for fqn in expression.parametersResolved[1].param.dependencies:
-				dep = self.symbols.getEntityResolved(fqn=fqn).value
-				if isinstance(dep, Expression):
-					self.add(dep, isDep=True)
-			"""
+			self.add(expression.parametersResolved[0].param, isDep=True)
+			self.add(expression.parametersResolved[1].param, isDep=True)
 
 		else:
 			expression.error(message="Unsupported meta expression.")
 
-	def resolveDependencies(self, entities: typing.List[Expression]) -> typing.List[Expression]:
-		"""From entities that are part of self.expressions, resolve the dependencies to ensure
-		that each entity can be create sequentially with only previously created entites as dependencies."""
-
-		resolved: typing.List[Expression] = []
-
-		while entities:
-
-			remaining: typing.List[Expression] = []
-			for entity in entities:
-				if self.expressions[entity].value.deps.isSubset(resolved):
-					resolved.append(entity)
-				else:
-					remaining.append(entity)
-
-			if len(entities) == len(remaining):
-				entities[0].error(message="The dependencies of this expression are not met.")
-
-			entities = remaining
-
-		return resolved
-
 	@cached_property
 	def registry(self) -> typing.Dict[str, Expression]:
 		"""The registry."""
-		expressions = self.resolveDependencies(
-			[e.expression for e in self.expressions if e.entryType == EntryType.registry])
 		registry = OrderedDict()
-		for e in expressions:
-			registry[e.fqn] = e
+		for e in self.expressions:
+			if e.entryType == EntryType.registry:
+				registry[e.expression.fqn] = e.expression
 		return registry
 
 	@cached_property
@@ -309,6 +344,14 @@ class Entities:
 			message="Only expressions can be added to the composition.")
 		expression = typing.cast(Expression, entity)
 
+		# If the entity does not have a fqn (hence a namespace), process its dependencies.
+		if not expression.isFQN:
+			for fqn in expression.dependencies:
+				dep = self.symbols.getEntityResolved(fqn=fqn).value
+				if isinstance(dep, Expression):
+					self.add(dep, isDep=True)
+			return
+
 		# Resolve the entity against its namespace.
 		resolver = self.symbols.makeResolver(namespace=expression.namespace)
 		expression.resolveMemoized(resolver=resolver)
@@ -317,6 +360,11 @@ class Entities:
 			self.processMeta(expression=expression)
 		else:
 			self.processEntry(expression=expression, isDep=isDep, resolver=resolver)
+
+	def close(self) -> None:
+		resolver = self.symbols.makeResolver()
+		self.expressions.close()
+		self.connections.resolve(resolver=resolver)
 
 	def processEntry(self, expression: Expression, isDep: bool, resolver: Resolver) -> None:
 		"""Resolve the dependencies for a specific expression."""

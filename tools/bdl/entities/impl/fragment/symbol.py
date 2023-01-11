@@ -110,11 +110,12 @@ class Symbol:
 		return resolver.getEntity(fqn=self.kind).assertValue(element=self.element, attr=self.kindAttr)
 
 	def getEntityUnderlyingTypeResolved(self, resolver: "Resolver") -> "EntityType":
-		"""
-		Get the entity related to type after resolve.
-		"""
-		entity = self.getEntityResolved(resolver=resolver)
-		return entity.getEntityUnderlyingTypeResolved(resolver=resolver)
+		self.assertTrue(condition=self.underlyingTypeFQN is not None,
+			message=f"The underlying type FQN is missing, {self.element}")
+		return resolver.getEntity(fqn=self.underlyingTypeFQN).assertValue(element=self.element, attr=self.kindAttr)
+
+	def getThisResolved(self, resolver: "Resolver") -> "EntityType":
+		return resolver.getEntity(fqn=self.this).assertValue(element=self.element, attr=self.kindAttr)
 
 	@property
 	def const(self) -> bool:
@@ -150,6 +151,10 @@ class Symbol:
 	@property
 	def fqn(self) -> str:
 		return self.element.getAttr(self.kindAttr).value
+
+	@property
+	def this(self) -> str:
+		return self.kinds[0]
 
 	@property
 	def kind(self) -> str:

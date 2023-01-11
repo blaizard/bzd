@@ -22,6 +22,17 @@ private:
 
 namespace example {
 
+template <class T>
+class Comms
+{
+public:
+	bzd::Result<Object<T>> get() {}
+
+	bzd::Result<> set(const T&) {}
+
+	// void fetch()
+};
+
 class Hello
 {
 public:
@@ -32,9 +43,10 @@ public:
 
 	bzd::Async<> run();
 
-	// Getter for input:
+	// Getter for the latest input value.
 	// input = const Integer;
-	bzd::Async<Object<bzd::Int32>> input();
+	// bzd::Async<Object<bzd::Int32>> input() { return config_.comms<"example.Hello.input">.get(); }
+	// bzd::Async<> input(const bzd::Int32 value) { return config_.comms<"example.Hello.input">.set(value); }
 
 	// Object is a RAII object that is kept alive until the value is needed.
 };

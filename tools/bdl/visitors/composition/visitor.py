@@ -35,6 +35,8 @@ class Composition:
 		self.all: typing.Dict[str, Expression] = {}
 		# All asyncs per executors.
 		self.asyncs: typing.Dict[str, typing.Dict[Entity, AsyncType]] = {}
+		# All connections.
+		#self.connections: typing.Dict[str, int] = {}
 
 	@property
 	def registry(self) -> typing.Dict[str, Expression]:
@@ -74,6 +76,7 @@ class Composition:
 
 		for entity in compositionEntities:
 			self.entities.add(entity)
+		self.entities.close()
 
 		# Applications are all intra expressions that are instanciated at top level
 		for executorFQN in self.entities.executors:

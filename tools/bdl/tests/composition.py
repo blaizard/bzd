@@ -153,6 +153,16 @@ class TestRun(unittest.TestCase):
 		with self.assertRaisesRegex(Exception, r"defined multiple times"):
 			Composition().visit(common).visit(composition).process()
 
+		composition = Object.fromContent(content="""
+			composition {
+				connect(hello1.a, hello2.a);
+				connect(hello2.a, hello1.a);
+			}
+			""",
+			objectContext=ObjectContext(resolve=True))
+		with self.assertRaisesRegex(Exception, r"defined as an output"):
+			Composition().visit(common).visit(composition).process()
+
 
 if __name__ == '__main__':
 	unittest.main()
