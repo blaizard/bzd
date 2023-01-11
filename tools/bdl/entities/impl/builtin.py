@@ -31,7 +31,7 @@ class Builtin(Entity):
 
 	@property
 	def symbol(self) -> Symbol:
-		return Symbol(element=self.element, kind="name")
+		return Symbol(element=self.element, kind="name", underlyingTypeFQN="name")
 
 	@property
 	def isFQN(self) -> bool:
