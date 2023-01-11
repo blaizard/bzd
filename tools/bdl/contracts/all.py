@@ -11,6 +11,7 @@ from tools.bdl.contracts.mandatory import ContractMandatory
 from tools.bdl.contracts.capacity import ContractCapacity
 from tools.bdl.contracts.init import ContractInit
 from tools.bdl.contracts.convertible import ContractConvertible
+from tools.bdl.contracts.executor import ContractExecutor
 
 _Contracts = [
 	ContractInteger(),
@@ -22,7 +23,8 @@ _Contracts = [
 	ContractMandatory(),
 	ContractCapacity(),
 	ContractInit(),
-	ContractConvertible()
+	ContractConvertible(),
+	ContractExecutor()
 ]
 
 

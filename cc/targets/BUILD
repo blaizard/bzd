@@ -5,6 +5,7 @@ cc_library(
     visibility = ["//cc/bzd/platform:__pkg__"],
     deps = select({
         "@platforms//os:linux": ["//cc/targets/linux"],
+        #"@platforms//os:linux": ["//cc/targets/linux_2_executors"],
         "@//tools/bazel_build/platforms/isa:xtensa_lx6": ["//cc/targets/esp32_xtensa_lx6"],
     }),
 )
