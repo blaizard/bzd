@@ -26,9 +26,12 @@ template <class T>
 class Comms
 {
 public:
-	bzd::Result<Object<T>> get() {}
-
-	bzd::Result<> set(const T&) {}
+	// Try to get a slot, if not return an error.
+	// bzd::Result<Object<T>> get();
+	// Retries until a slot in the ring is available.
+	// bzd::Async<Object<T>> get();
+	// bzd::Result<ObjectWriter<T>> set();
+	// bzd::Async<ObjectWriter<T>> set();
 
 	// void fetch()
 };

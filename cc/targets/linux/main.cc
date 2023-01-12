@@ -1,7 +1,7 @@
 int main()
 {
-	extern bool execute() noexcept;
-	if (execute())
+	extern bool runExecutor() noexcept;
+	if (runExecutor())
 	{
 		return 0;
 	}

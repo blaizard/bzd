@@ -33,6 +33,7 @@ class Expression(EntityExpression):
 		- [const]: If the expression is constant.
 		- [underlyingValueFQN]: The actual value discovered after resolution.
 		- [symbol]: The interface type if any (might not be set).
+		- [executor]: The executor for which this expression should run.
 	- Sequence:
 		- argument: The list of arguments to pass to the instanciation or method call.
 		- argument_resolved: List of resolved arguments.
@@ -43,15 +44,6 @@ class Expression(EntityExpression):
 		super().__init__(element, Role.Value)
 		self.assertTrue(condition=(self.isValue or self.isSymbol),
 			message="Expression must represent a symbol or a value.")
-
-	@property
-	def executor(self) -> str:
-		maybeContract = self.contracts.get("executor")
-		if maybeContract is not None:
-			maybeExecutor = maybeContract.value
-			if maybeExecutor is not None:
-				return maybeExecutor
-		return "executor"
 
 	@cached_property
 	def typeResolved(self) -> Symbol:
@@ -109,6 +101,18 @@ class Expression(EntityExpression):
 			entity = self.symbol.resolve(resolver=resolver, maybeValue=True)
 			if entity.isRoleMeta:
 				self._setMeta()
+
+			# Set the executor.
+			# If there is a 'this', propagate the executor.
+			if self.symbol.isThis:
+				self.assertTrue(condition=self.contracts.get("executor") is None,
+					message="executor contracts must be set at object instantiation.")
+				executor = self.symbol.getThisResolved(resolver=resolver).executor
+			else:
+				maybeContract = self.contracts.get("executor")
+				executor = None if maybeContract is None else maybeContract.value
+			if executor is not None:
+				self._setExecutor(executor)
 
 			# The type refers to a value.
 			if entity.isRoleValue:

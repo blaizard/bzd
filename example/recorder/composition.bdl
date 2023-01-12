@@ -13,9 +13,11 @@ composition:
 }
 
 composition {
-	hello = Hello();
-	hello.run() [executor(executor)];
+	hello = Hello() [executor(executor)];
+	hello.run();
 	world = Hello();
 	connect(hello.input, world.input);
 	
 }
+
+

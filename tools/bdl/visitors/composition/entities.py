@@ -69,9 +69,7 @@ class DependencyGroup:
 
 
 @dataclasses.dataclass
-class Output:
-	# The symbol associated with this connection.
-	symbol: Symbol
+class OutputMetadata:
 	# The FQN of the executor associated with this connection.
 	executor: str
 	# The maximum history required by this connection.
@@ -80,22 +78,19 @@ class Output:
 
 @dataclasses.dataclass
 class ConnectionGroup:
-	# The type of symbol for this connection group.
-	symbol: Symbol
-	# The input of this connnection.
-	input: Symbol
 	# The FQN of the executor associated with this input.
 	executor: str
+	# The type of symbol for this connection group.
+	symbol: typing.Optional[Symbol] = None
 	# The set of connection object for this group.
-	outputs: typing.List[Output]
+	outputs: typing.Dict[Symbol, OutputMetadata] = dataclasses.field(default_factory=dict)
 
 
 class Connections:
 
 	def __init__(self) -> None:
-		self.map: typing.Dict[Symbol, typing.Set[Symbol]] = {}
 		self.outputs: typing.Set[Symbol] = set()
-		self.groups: typing.List[ConnectionGroup] = []
+		self.groups: typing.Dict[Symbol, ConnectionGroup] = {}
 
 	def add(self, input: EntityExpression, output: EntityExpression) -> None:
 		"""Register a new connection to the connection map."""
@@ -109,40 +104,47 @@ class Connections:
 			f"Connections cannot only be made between same types, not {input.underlyingTypeFQN} and {output.underlyingTypeFQN}."
 							)
 
-		alreadyInserted = input.symbol in self.map and output.symbol in self.map[input.symbol]
+		alreadyInserted = input.symbol in self.groups and output.symbol in self.groups[input.symbol].outputs
 		input.assertTrue(condition=not alreadyInserted,
 			message=f"Connection between '{input.symbol}' and '{output.symbol}' is defined multiple times.")
 		input.assertTrue(condition=input.symbol not in self.outputs,
 			message=f"'{input.symbol}' has already been defined as an output.")
-		self.map.setdefault(input.symbol, set()).add(output.symbol)
+		if input.symbol not in self.outputs:
+			self.groups[input.symbol] = ConnectionGroup(executor=input.executorOr("executor"))
+		self.groups[input.symbol].outputs[output.symbol] = OutputMetadata(executor=output.executorOr("executor"))
 		self.outputs.add(output.symbol)
 
 	def resolve(self, resolver: Resolver) -> None:
-
+		"""
 		for input, outputs in self.map.items():
 			outputGroup = []
 			for output in outputs:
-				outputGroup.append(Output(symbol=output, executor=output.getThisResolved(resolver=resolver).executor))
-			connection = ConnectionGroup(input=input,
-				symbol=input.getEntityUnderlyingTypeResolved(resolver=resolver).symbol,
-				executor=input.getThisResolved(resolver=resolver).executor,
+				outputGroup.append(Output(symbol=output.symbol, executor=output.executorOr("executor")))
+			connection = ConnectionGroup(input=input.symbol,
+				symbol=input.symbol.getEntityUnderlyingTypeResolved(resolver=resolver).symbol,
+				executor=input.executorOr("executor"),
 				outputs=outputGroup)
 			self.groups.append(connection)
+		"""
 
 	def __repr__(self) -> str:
 		content = []
-		for io, setOfIOs in self.map.items():
-			content += [f"{io} => {setOfIOs}"]
+		for input, connection in self.groups.items():
+			content += [f"{input} => {connection.outputs.keys()}"]
 		return "\n".join(content)
 
 
-class EntryType(enum.Enum):
+class EntryType(enum.Flag):
 	# Items that are part of the registry, should be created before running any asyncs.
-	registry = "registry"
+	registry = enum.auto()
 	# Worload type of asyncs, define the lifetime of the application.
-	workload = "workload"
+	workload = enum.auto()
 	# Service type of asyncs, are stopped when no workloads are running.
-	service = "service"
+	service = enum.auto()
+	# Part of the platform declaration.
+	platform = enum.auto()
+	# Executor type, all executors must also be part of the registry.
+	executor = enum.auto()
 
 
 @dataclasses.dataclass
@@ -232,7 +234,7 @@ class Components:
 		for entry in self.map.values():
 			yield entry
 
-	def insert(self, expression: Expression, entryType: EntryType) -> ExpressionEntry:
+	def insert(self, expression: Expression, entryType: EntryType, executor: str) -> ExpressionEntry:
 		"""Insert a new entry in the map, return the entry if it does not exists or if it can be updated,
 		otherwise it returns None."""
 
@@ -242,7 +244,7 @@ class Components:
 		if identifier in self.map:
 
 			def isOverwritable(entryTypeFrom: EntryType, entryTypeTo: EntryType) -> bool:
-				return (entryTypeFrom == EntryType.service) and (entryTypeTo == EntryType.workload)
+				return (EntryType.service in entryTypeFrom) and (EntryType.workload in entryTypeTo)
 
 			# If this is the exact same expression.
 			if self.map[identifier].entryType == entryType:
@@ -256,8 +258,23 @@ class Components:
 				f"An expression of role '{entryType}' cannot overwrite an expression of role '{self.map[identifier].entryType}'."
 									)
 
-		self.map[identifier] = ExpressionEntry(expression=expression, entryType=entryType)
+		self.map[identifier] = ExpressionEntry(expression=expression, entryType=entryType, executors={executor})
 		return self.map[identifier]
+
+	def getDependencies(self, expression: Expression) -> typing.Iterator[ExpressionEntry]:
+		"""Follow the dependencies of a particular expression and output each if its entries including itself."""
+
+		alreadyVisited: typing.Set[str] = set()
+		toVisit = [expression]
+		while toVisit:
+			expression = toVisit.pop(0)
+			identifier = self.makeId(expression)
+			if identifier not in alreadyVisited:
+				alreadyVisited.add(identifier)
+				if identifier in self.map:
+					entry = self.map[identifier]
+					yield entry
+					toVisit += [*entry.deps, *entry.init, *entry.intra, *entry.shutdown]
 
 	def __repr__(self) -> str:
 		content = []
@@ -294,7 +311,7 @@ class Entities:
 		"""The registry."""
 		registry = OrderedDict()
 		for e in self.expressions:
-			if e.entryType == EntryType.registry:
+			if EntryType.registry in e.entryType:
 				registry[e.expression.fqn] = e.expression
 		return registry
 
@@ -303,29 +320,30 @@ class Entities:
 		"""The platform entities."""
 
 		platform = OrderedDict()
-		for fqn, expression in self.registry.items():
-			if self.isPlatform(expression):
-				platform[fqn] = expression
+		for e in self.expressions:
+			if EntryType.platform in e.entryType:
+				platform[e.expression.fqn] = e.expression
 		return platform
+
+	@cached_property
+	def executors(self) -> typing.Dict[str, Expression]:
+		"""The executor entities."""
+
+		executors = OrderedDict()
+		for e in self.expressions:
+			if EntryType.executor in e.entryType:
+				executors[e.expression.fqn] = e.expression
+		return executors
 
 	@cached_property
 	def workloads(self) -> typing.Iterable[ExpressionEntry]:
 		"""List all workloads."""
-		return [e for e in self.expressions if e.entryType == EntryType.workload]
+		return [e for e in self.expressions if EntryType.workload in e.entryType]
 
 	@cached_property
 	def services(self) -> typing.Iterable[ExpressionEntry]:
 		"""List all services."""
-		return [e for e in self.expressions if e.entryType == EntryType.service]
-
-	@cached_property
-	def executors(self) -> typing.Dict[str, Expression]:
-		"""List all executors."""
-
-		executors: typing.Set[str] = set()
-		for entry in self.expressions:
-			executors.update(entry.executors)
-		return {fqn: self.symbols.getEntityResolved(fqn=fqn).value for fqn in executors}
+		return [e for e in self.expressions if EntryType.service in e.entryType]
 
 	def getWorkloadsByExecutor(self, fqn: str) -> typing.Iterable[Expression]:
 		return [entry.expression for entry in self.workloads if fqn in entry.executors]
@@ -333,11 +351,7 @@ class Entities:
 	def getServicesByExecutor(self, fqn: str) -> typing.Iterable[Expression]:
 		return [entry.expression for entry in self.services if fqn in entry.executors]
 
-	@staticmethod
-	def isPlatform(expression: Expression) -> bool:
-		return expression.isName and expression.fqn.startswith("platform")
-
-	def add(self, entity: Entity, isDep: bool = False) -> None:
+	def add(self, entity: Entity, isDep: bool = False, executor: typing.Optional[str] = None) -> None:
 		"""Add a new entity."""
 
 		entity.assertTrue(condition=isinstance(entity, Expression),
@@ -359,14 +373,10 @@ class Entities:
 		if expression.isRoleMeta:
 			self.processMeta(expression=expression)
 		else:
-			self.processEntry(expression=expression, isDep=isDep, resolver=resolver)
+			self.processEntry(expression=expression, isDep=isDep, resolver=resolver, executor=executor)
 
-	def close(self) -> None:
-		resolver = self.symbols.makeResolver()
-		self.expressions.close()
-		self.connections.resolve(resolver=resolver)
-
-	def processEntry(self, expression: Expression, isDep: bool, resolver: Resolver) -> None:
+	def processEntry(self, expression: Expression, isDep: bool, resolver: Resolver,
+		executor: typing.Optional[str]) -> None:
 		"""Resolve the dependencies for a specific expression."""
 
 		# Find the symbol underlying type.
@@ -386,19 +396,30 @@ class Entities:
 			expression.error(
 				message=f"Unsupported entry type '{underlyingType.category.value}' within the composition stage.")
 
-		# If not dep, only process workload and platform entries.
-		if not (isDep or entryType == EntryType.workload or self.isPlatform(expression)):
+		# Check if a platform.
+		if expression.namespace == ["platform"]:
+			entryType |= EntryType.platform
+		# Check if an executor.
+		if "bzd.platform.Executor" in underlyingType.getParents():
+			expression.assertTrue(condition=underlyingType.category == Category.component,
+				message="Executors must be a component.")
+			entryType |= EntryType.executor
+			executor = expression.fqn
+
+		# If top level, only process a certain type of entry.
+		if not (isDep or (EntryType.workload in entryType) or (EntryType.platform in entryType) or
+			(EntryType.executor in entryType)):
 			return
+
+		# Identify the executor of this entity, it is guarantee by the Expression type that there is always an executor.
+		if executor is None:
+			executor = self.symbols.getEntityResolved(fqn=expression.executorOr("executor")).assertValue(
+				element=expression.element).fqn
 
 		# Register the entry.
-		entry = self.expressions.insert(expression=expression, entryType=entryType)
+		entry = self.expressions.insert(expression=expression, entryType=entryType, executor=executor)
 		if entry is None:
 			return
-
-		# Set the executor, it is guarantee by the Expressiontype that there is always an executor.
-		executor = self.symbols.getEntityResolved(fqn=expression.executor).assertValue(element=expression.element)
-		entry.executors.add(executor.fqn)
-		self.add(executor, isDep=True)
 
 		# Look for all dependencies and add the expression only.
 		for fqn in expression.dependencies:
@@ -448,7 +469,17 @@ class Entities:
 
 		# Add implicit dependencies.
 		for dependency in entry.deps + entry.intra:
-			self.add(dependency, isDep=True)
+			self.add(dependency, isDep=True, executor=executor)
+
+	def close(self) -> None:
+		# Add platform expressions to all executors.
+		for expression in self.platform.values():
+			for entry in self.expressions.getDependencies(expression):
+				entry.executors.update(self.executors.keys())
+
+		resolver = self.symbols.makeResolver()
+		self.expressions.close()
+		self.connections.resolve(resolver=resolver)
 
 	def __str__(self) -> str:
 		content = ["==== Components ====", str(self.expressions)]

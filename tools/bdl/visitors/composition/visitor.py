@@ -46,6 +46,10 @@ class Composition:
 	def platform(self) -> typing.Dict[str, Expression]:
 		return self.entities.platform
 
+	@property
+	def executors(self) -> typing.Dict[str, Expression]:
+		return self.entities.executors
+
 	def visit(self, bdl: Object) -> "Composition":
 
 		# Build a master symbol list
@@ -99,7 +103,7 @@ class Composition:
 		addContent(content, "Unique Identifiers", [f"{k}: {v}" for k, v in self.uids.items()])
 		addContent(content, "Entities", str(self.entities).split("\n"))
 		addContent(content, "Executors", self.executors.keys())
-		for executor, items in self.composition.items():
+		for executor, items in self.asyncs.items():
 			addContent(content, f"Composition '({executor})'", [f"{k}: {v}" for k, v in items.items()])
 
 		return "\n".join(content)

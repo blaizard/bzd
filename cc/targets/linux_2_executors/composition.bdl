@@ -3,7 +3,11 @@ use "cc/components/generic/executor/interface.bdl"
 
 namespace second;
 
+
 composition {
 	core = bzd.platform.linux.Core(stackSize = 100000);
 	executor = bzd.platform.generic.Executor(cores = list(core));
+	
 }
+
+

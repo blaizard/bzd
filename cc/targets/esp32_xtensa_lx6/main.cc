@@ -8,8 +8,8 @@
 
 int main()
 {
-	extern bool execute() noexcept;
-	[[maybe_unused]] const auto result = execute();
+	extern bool runExecutor() noexcept;
+	[[maybe_unused]] const auto result = runExecutor();
 
 #ifdef BZD_EXECUTOR_SIM
 	::std::cout << "<simulation exit code " << ((result) ? 0 : 1) << ">" << ::std::endl;
