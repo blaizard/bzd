@@ -7,9 +7,9 @@ bdl_library(
         "composition.bdl",
     ],
     deps = [
-        "//cc/targets/linux:composition",
         "//cc/components/generic/executor",
         "//cc/components/linux/core",
+        "//cc/targets/linux:composition",
     ],
 )
 

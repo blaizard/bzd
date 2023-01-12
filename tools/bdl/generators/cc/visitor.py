@@ -13,7 +13,7 @@ from tools.bdl.entities.impl.types import Category
 from tools.bdl.generators.cc.symbol import symbolToStr as symbolToStrOriginal
 from tools.bdl.generators.cc.value import valueToStr as valueToStrOriginal
 from tools.bdl.generators.cc.comments import commentBlockToStr as commentBlockToStrOriginal, commentEmbeddedToStr as commentEmbeddedToStrOriginal, commentParametersResolvedToStr as commentParametersResolvedToStrOriginal
-from tools.bdl.generators.cc.fqn import fqnToStr as fqnToStrOriginal, fqnToAdapterStr as fqnToAdapterStrOriginal, fqnToNameStr as fqnToNameStrOriginal
+from tools.bdl.generators.cc.fqn import fqnToStr as fqnToStrOriginal, fqnToAdapterStr as fqnToAdapterStrOriginal, fqnToNameStr as fqnToNameStrOriginal, fqnToExecutionEntryPoint as fqnToExecutionEntryPointOriginal
 """
 Use cases:
 
@@ -190,6 +190,10 @@ class Transform:
 	def fqnToNameStr(self, fqn: str) -> str:
 		return fqnToNameStrOriginal(fqn=fqn)
 
+	def fqnToExecutionEntryPoint(self, fqn: str) -> str:
+		"""Convert the executor FQN into the function name that serves as entry point for the execution."""
+		return fqnToExecutionEntryPointOriginal(fqn=fqn)
+
 	# Async type
 
 	def asyncTypeToStr(self, asyncType: AsyncType) -> str:
@@ -197,10 +201,6 @@ class Transform:
 			AsyncType.workload: "bzd::async::Type::workload",
 			AsyncType.service: "bzd::async::Type::service",
 		}[asyncType]
-
-	# Platform
-	def isPlatform(self, expression: Expression) -> bool:
-		return expression.fqn.startswith("bzd.platform")
 
 	# Parameter
 	def parametersResolvedToStr(self, expression: Expression) -> str:

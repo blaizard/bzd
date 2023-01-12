@@ -153,6 +153,10 @@ class Symbol:
 		return self.element.getAttr(self.kindAttr).value
 
 	@property
+	def isThis(self) -> bool:
+		return len(self.kinds) > 1
+
+	@property
 	def this(self) -> str:
 		return self.kinds[0]
 

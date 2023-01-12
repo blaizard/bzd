@@ -73,6 +73,16 @@ class Entity:
 		ElementBuilder.cast(self.element, ElementBuilder).setAttr("meta", "1")
 
 	@property
+	def executor(self) -> typing.Optional[str]:
+		return self.element.getAttrValue("executor")
+
+	def _setExecutor(self, executor: str) -> None:
+		ElementBuilder.cast(self.element, ElementBuilder).setAttr("executor", executor)
+
+	def executorOr(self, default: str) -> str:
+		return default if self.executor is None else self.executor
+
+	@property
 	def configAttr(self) -> str:
 		return "config"
 
@@ -440,5 +450,6 @@ class EntityExpression(Entity):
 			"varArgs": True if self.isVarArgs else None,
 			"symbol": str(self.symbol) if self.isSymbol else None,
 			"value": str(self.value) if self.isValue else None,
+			"executor": self.executor,
 			"parameters": "[...]" if self.isParameters else None,
 		})

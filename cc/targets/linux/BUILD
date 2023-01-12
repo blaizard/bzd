@@ -7,6 +7,9 @@ bdl_library(
         "composition.bdl",
         "network.bdl",
     ],
+    visibility = [
+        "//cc/targets/linux_2_executors:__pkg__",
+    ],
     deps = [
         "//cc/components/generic/executor",
         "//cc/components/linux/core",
@@ -16,9 +19,6 @@ bdl_library(
         "//cc/components/posix/stream/out",
         "//cc/components/std/clock/steady",
         "//cc/components/std/clock/system",
-    ],
-    visibility = [
-        "//cc/targets/linux_2_executors:__pkg__",
     ],
 )
 

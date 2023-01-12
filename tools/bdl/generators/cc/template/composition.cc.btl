@@ -162,7 +162,7 @@ protected:
 
 // ==== Registry ==============================================================
 
-[[nodiscard]] auto makeRegistry() noexcept
+[[nodiscard]] auto& makeRegistry() noexcept
 {
 	// Definition of all registry entries and their configuration.
 	{% for fqn, expression in registry %}
@@ -177,7 +177,8 @@ protected:
 		Resource<"{{ fqn }}", decltype({{ fqn | fqnToNameStr }})> {{ fqn | fqnToNameStr }}_;
 		{% end %}
 	};
-	return Registry{ {%- for fqn, expression in registry %}{% if not loop.first %}, {% end %}{{ fqn | fqnToNameStr }}{% end -%} };
+	static Registry registry{ {%- for fqn, expression in registry %}{% if not loop.first %}, {% end %}{{ fqn | fqnToNameStr }}{% end -%} };
+	return registry;
 }
 
 /// Helper to handle return code.
@@ -201,6 +202,15 @@ template <class Promise>
 	return true;
 }
 
+bzd::Async<> initPlatform(auto& registry) noexcept
+{
+	{% for fqn, expression in platform %}
+	co_await !registry.{{ fqn | fqnToNameStr }}_.init(registry);
+	{% end %}
+	co_await !bzd::log::info("Initialization of platform completed."_csv);
+	co_return {};
+}
+
 } // namespace
 
 // ==== Identifiers ===========================================================
@@ -221,28 +231,24 @@ template <> UInt32 Data<"{{ fqn }}">::id = {{ uid }}u;
 
 // ==== Execution =============================================================
 
+{% for executorFQN in executors %}
+
 /// Initialize and compose the application.
-bool execute() noexcept
+bool {{ executorFQN | fqnToExecutionEntryPoint }}() noexcept
 {
 	// Create registry.
-	[[maybe_unused]] auto registry = makeRegistry();
+	[[maybe_unused]] auto& registry = makeRegistry();
 
 	// Initialize platform.
-	{% for fqn, expression in platform %}
-	registry.{{ fqn | fqnToNameStr }}_.init(registry).sync();
-	{% end %}
-	bzd::log::info("Initialization of platform completed."_csv).sync();
+	bzd::ignore = initPlatform(registry).sync();
 
 	// Initialize executors.
-	{% for fqn, expressions in asyncs %}
-	registry.{{ fqn | fqnToNameStr }}_.init(registry).sync();
-	bzd::log::info("Initialization of '{{ fqn }}' completed."_csv).sync();
-	{% end %}
+	registry.{{ executorFQN | fqnToNameStr }}_.init(registry).sync();
+	bzd::log::info("[{{ executorFQN }}] Initialization completed."_csv).sync();
 
 	// Composition.
-	{% for fqn, expressions in asyncs %}
-	bzd::log::info("Composition for '{{ fqn }}'."_csv).sync();
-		{% for expression, asyncType in expressions %}
+	bzd::log::info("[{{ executorFQN }}] Composition phase."_csv).sync();
+	{% for expression, asyncType in asyncs.get(executorFQN) %}
 
 	// {{ asyncType.value }}: {{ expression.symbol | symbolToStr }}()
 	auto async_{{loop.parent.index}}_{{ loop.index }} = [&]() -> bzd::Async<> {
@@ -252,30 +258,25 @@ bool execute() noexcept
 		co_return {};
 	};
 	auto promise_{{loop.parent.index}}_{{ loop.index }} = async_{{loop.parent.index}}_{{ loop.index }}();
-	registry.{{ fqn | fqnToNameStr }}_.get().schedule(promise_{{loop.parent.index}}_{{ loop.index }}, {{ asyncType | asyncTypeToStr }});
-		{% end %}
+	registry.{{ executorFQN | fqnToNameStr }}_.get().schedule(promise_{{loop.parent.index}}_{{ loop.index }}, {{ asyncType | asyncTypeToStr }});
 	{% end %}
 
 	// Execute.
-	bzd::log::info("Execution phase."_csv).sync();
-	{% for executor in asyncs %}
-	registry.{{ executor | fqnToNameStr }}_.get().start();
-	{% end %}
+	bzd::log::info("[{{ executorFQN }}] Execution phase."_csv).sync();
+	registry.{{ executorFQN | fqnToNameStr }}_.get().start();
 
 	// Wait until completion.
-	{% for executor in asyncs %}
-	registry.{{ executor | fqnToNameStr }}_.get().stop();
-	{% end %}
-	bzd::log::info("Completion."_csv).sync();
+	registry.{{ executorFQN | fqnToNameStr }}_.get().stop();
+	bzd::log::info("[{{ executorFQN }}] Completion."_csv).sync();
 
 	// Compute the return code.
 	bool isSuccess{true};
-	{% for fqn, expressions in asyncs %}
-		{% for expression, asyncType in expressions %}
-			{% if asyncType == AsyncType.workload %}
+	{% for expression, asyncType in asyncs.get(executorFQN) %}
+		{% if asyncType == AsyncType.workload %}
 	isSuccess &= verifyReturnedPromise(bzd::move(promise_{{loop.parent.index}}_{{ loop.index }}), "{{ expression.symbol | symbolToStr }}()"_sv);
-			{% end %}
 		{% end %}
 	{% end %}
 	return isSuccess;
 }
+
+{% end %}
