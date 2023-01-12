@@ -103,16 +103,15 @@ class Expression(EntityExpression):
 				self._setMeta()
 
 			# Set the executor.
-			# If there is a 'this', propagate the executor.
-			if self.symbol.isThis:
-				self.assertTrue(condition=self.contracts.get("executor") is None,
-					message="executor contracts must be set at object instantiation.")
-				executor = self.symbol.getThisResolved(resolver=resolver).executor
-			else:
-				maybeContract = self.contracts.get("executor")
-				executor = None if maybeContract is None else maybeContract.value
+			executor = self.contracts.get("executor")
 			if executor is not None:
-				self._setExecutor(executor)
+				self.assertTrue(condition=entity.category == Category.component,
+					message="executor contracts must be set at component instantiation.")
+				executor = executor.value
+			# If there is a 'this', propagate the executor.
+			elif self.symbol.isThis:
+				executor = self.symbol.getThisResolved(resolver=resolver).executor
+			self._setExecutor(executor)
 
 			# The type refers to a value.
 			if entity.isRoleValue:
