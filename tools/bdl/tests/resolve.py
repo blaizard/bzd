@@ -511,6 +511,36 @@ class TestRun(unittest.TestCase):
 			objectContext=ObjectContext(resolve=True, composition=True))
 		self.assertTrue(bdl.entity("MyComposition.val1").isRValue)
 
+	def testExecutor(self) -> None:
+		bdl = Object.fromContent(content="""
+				component Test {
+				interface:
+					method run();
+				}
+				composition MyComposition
+				{
+					a = Test() [executor(hello)];
+					b = a.run();
+				}
+				""",
+			objectContext=ObjectContext(resolve=True, composition=True))
+		self.assertEqual(bdl.entity("MyComposition.a").executor, "hello")
+		self.assertEqual(bdl.entity("MyComposition.b").executor, "hello")
+
+		with self.assertRaisesRegex(Exception, r"component instantiation"):
+			Object.fromContent(content="""
+					component Test {
+					interface:
+						method run();
+					}
+					composition MyComposition
+					{
+						a = Test();
+						b = a.run() [executor(hello)];
+					}
+					""",
+				objectContext=ObjectContext(resolve=True, composition=True))
+
 
 if __name__ == '__main__':
 	unittest.main(failfast=True)

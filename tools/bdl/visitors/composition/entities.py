@@ -115,17 +115,8 @@ class Connections:
 		self.outputs.add(output.symbol)
 
 	def resolve(self, resolver: Resolver) -> None:
-		"""
-		for input, outputs in self.map.items():
-			outputGroup = []
-			for output in outputs:
-				outputGroup.append(Output(symbol=output.symbol, executor=output.executorOr("executor")))
-			connection = ConnectionGroup(input=input.symbol,
-				symbol=input.symbol.getEntityUnderlyingTypeResolved(resolver=resolver).symbol,
-				executor=input.executorOr("executor"),
-				outputs=outputGroup)
-			self.groups.append(connection)
-		"""
+		for symbol, group in self.groups.items():
+			group.symbol = symbol.getEntityUnderlyingTypeResolved(resolver=resolver).symbol
 
 	def __repr__(self) -> str:
 		content = []
