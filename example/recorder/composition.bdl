@@ -1,23 +1,24 @@
 
 namespace example;
 
-
 component Hello {
 interface:
 	method run();
-	input = Float;
-	
+	send = Float;
 composition:
 	this.run();
+	
+}
+
+component World {
+interface:
+	receive = const Float;
 	
 }
 
 composition {
 	hello = Hello() [executor(second.executor)];
 	hello.run();
-	world = Hello();
-	connect(hello.input, world.input);
-	
+	world = World();
+	connect(hello.send, world.receive);
 }
-
-

@@ -35,10 +35,14 @@ bzd_cc_binary(
 bzd_cc_binary(
     name = "test",
     targets = {
-        "//cc/targets/linux_2_executors": [""]
+        "hpc": "//cc/targets/linux_2_executors:x86_64_clang",
+        "esp32": "@esp32_xtensa_lx6_gcc//:platform",
     },
     deps = [
         ":lib",
     ]
 )
+
+-> output 2 binaries
+-> wrap the composition of linux_2_executors into "hpc" namespace, same for "esp32".
 """

@@ -54,6 +54,15 @@ public:
 	// Object is a RAII object that is kept alive until the value is needed.
 };
 
+class World
+{
+public:
+	template <class Config>
+	constexpr explicit World(const Config&) noexcept
+	{
+	}
+};
+
 } // namespace example
 
 namespace bzd {
