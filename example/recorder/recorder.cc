@@ -6,10 +6,10 @@ namespace example {
 
 bzd::Async<> Hello::run()
 {
-	co_await !bzd::print("Hello {}"_csv, bzd::Data<"example.Hello.input">::id);
+	co_await !bzd::print("Hello {}"_csv, bzd::Data<"example.Hello.send">::id);
 
 	bzd::Recorder recorder;
-	recorder.publish<"example.Hello.input">(12);
+	recorder.publish<"example.Hello.send">(12);
 
 	co_return {};
 }

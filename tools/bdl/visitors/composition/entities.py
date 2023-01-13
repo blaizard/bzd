@@ -85,10 +85,10 @@ class ConnectionGroup:
 	# The set of connection object for this group.
 	outputs: typing.Dict[Symbol, OutputMetadata] = dataclasses.field(default_factory=dict)
 
-
 class Connections:
 
-	def __init__(self) -> None:
+	def __init__(self, symbols: SymbolMap) -> None:
+		self.resolver = symbols.makeResolver()
 		self.outputs: typing.Set[Symbol] = set()
 		self.groups: typing.Dict[Symbol, ConnectionGroup] = {}
 
@@ -104,19 +104,24 @@ class Connections:
 			f"Connections cannot only be made between same types, not {input.underlyingTypeFQN} and {output.underlyingTypeFQN}."
 							)
 
+		# Check const correctness.
+		inputEntity = input.symbol.getEntityResolved(resolver=self.resolver)
+		inputEntity.assertTrue(condition=not inputEntity.symbol.const, message="A connection sender must not be marked as const.")
+		outputEntity = output.symbol.getEntityResolved(resolver=self.resolver)
+		outputEntity.assertTrue(condition=outputEntity.symbol.const, message="A connection receiver must be marked as const.")
+
 		alreadyInserted = input.symbol in self.groups and output.symbol in self.groups[input.symbol].outputs
 		input.assertTrue(condition=not alreadyInserted,
 			message=f"Connection between '{input.symbol}' and '{output.symbol}' is defined multiple times.")
 		input.assertTrue(condition=input.symbol not in self.outputs,
 			message=f"'{input.symbol}' has already been defined as an output.")
 		if input.symbol not in self.outputs:
-			self.groups[input.symbol] = ConnectionGroup(executor=input.executorOr("executor"))
+			self.groups[input.symbol] = ConnectionGroup(
+				executor=input.executorOr("executor"),
+				symbol=input.symbol.getEntityUnderlyingTypeResolved(resolver=self.resolver).symbol
+			)
 		self.groups[input.symbol].outputs[output.symbol] = OutputMetadata(executor=output.executorOr("executor"))
 		self.outputs.add(output.symbol)
-
-	def resolve(self, resolver: Resolver) -> None:
-		for symbol, group in self.groups.items():
-			group.symbol = symbol.getEntityUnderlyingTypeResolved(resolver=resolver).symbol
 
 	def __repr__(self) -> str:
 		content = []
@@ -201,7 +206,7 @@ class Components:
 					remaining.append((identifier, entry))
 
 			if len(entries) == len(remaining):
-				entries[0][0].expression.error(message="The dependencies of this expression are not met.")
+				entries[0][1].expression.error(message="The dependencies of this expression are not met.")
 
 			entries = remaining
 
@@ -282,7 +287,7 @@ class Entities:
 		# Map of all available components and their dependencies.
 		self.expressions = Components()
 		# Map of all available connections.
-		self.connections = Connections()
+		self.connections = Connections(self.symbols)
 
 	def processMeta(self, expression: Expression) -> None:
 		"""Process a meta expression, a special function from the language."""
@@ -335,6 +340,27 @@ class Entities:
 	def services(self) -> typing.Iterable[ExpressionEntry]:
 		"""List all services."""
 		return [e for e in self.expressions if EntryType.service in e.entryType]
+
+	def getConnectionsByExecutor(self, fqn: str) -> typing.Iterable[Expression]:
+		for input, group in self.connections.groups.items():
+			if group.executor == fqn or any(metadata.executor == fqn for metadata in group.outputs.values()):
+				result = {
+					"symbol": group.symbol,
+					"outputs": []
+				}
+				if group.executor == fqn:
+					result["input"] = {
+						"symbol": input
+					}
+				for output, metadata in group.outputs.items():
+					if metadata.executor == fqn:
+						result["outputs"].append({
+							"symbol": output,
+							"history": metadata.history
+						})
+				yield result
+
+		return [entry.expression for entry in self.workloads if fqn in entry.executors]
 
 	def getWorkloadsByExecutor(self, fqn: str) -> typing.Iterable[Expression]:
 		return [entry.expression for entry in self.workloads if fqn in entry.executors]
@@ -468,9 +494,7 @@ class Entities:
 			for entry in self.expressions.getDependencies(expression):
 				entry.executors.update(self.executors.keys())
 
-		resolver = self.symbols.makeResolver()
 		self.expressions.close()
-		self.connections.resolve(resolver=resolver)
 
 	def __str__(self) -> str:
 		content = ["==== Components ====", str(self.expressions)]

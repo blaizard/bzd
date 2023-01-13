@@ -36,7 +36,7 @@ class Composition:
 		# All asyncs per executors.
 		self.asyncs: typing.Dict[str, typing.Dict[Entity, AsyncType]] = {}
 		# All connections.
-		#self.connections: typing.Dict[str, int] = {}
+		self.connections: typing.Dict[str, typing.Any] = {}
 
 	@property
 	def registry(self) -> typing.Dict[str, Expression]:
@@ -89,6 +89,7 @@ class Composition:
 				self.asyncs[executorFQN][entity] = AsyncType.workload
 			for entity in self.entities.getServicesByExecutor(executorFQN):
 				self.asyncs[executorFQN][entity] = AsyncType.service
+			self.connections[executorFQN] = [*self.entities.getConnectionsByExecutor(executorFQN)]
 
 	def __str__(self) -> str:
 		"""Print a human readable view of this instance."""
