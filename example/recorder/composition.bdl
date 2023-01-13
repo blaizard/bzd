@@ -13,7 +13,7 @@ composition:
 }
 
 composition {
-	hello = Hello() [executor(executor)];
+	hello = Hello() [executor(second.executor)];
 	hello.run();
 	world = Hello();
 	connect(hello.input, world.input);

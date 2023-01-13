@@ -10,16 +10,6 @@ bdl_library(
 )
 
 cc_library(
-    name = "ids",
-    srcs = [
-        "ids.cc",
-    ],
-    deps = [
-        "//cc:bzd",
-    ],
-)
-
-cc_library(
     name = "lib",
     srcs = [
         "recorder.cc",
@@ -29,14 +19,26 @@ cc_library(
     ],
     deps = [
         ":composition",
-        ":ids",
         "//cc:bzd",
     ],
 )
 
 bzd_cc_binary(
     name = "recorder",
+    target = "//cc/targets/linux_2_executors:x86_64_clang",
     deps = [
         ":lib",
     ],
 )
+
+"""
+bzd_cc_binary(
+    name = "test",
+    targets = {
+        "//cc/targets/linux_2_executors": [""]
+    },
+    deps = [
+        ":lib",
+    ]
+)
+"""

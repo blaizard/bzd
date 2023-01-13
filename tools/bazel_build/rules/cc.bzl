@@ -78,6 +78,21 @@ def _cc_binary(ctx, binary_file):
 
     return default_info, []
 
+def _bzd_cc_transition_impl(settings, attr):
+    if not attr.target:
+        return {}
+    return {
+        "//command_line_option:platforms": str(attr.target),
+    }
+
+_bzd_cc_transition = transition(
+    implementation = _bzd_cc_transition_impl,
+    inputs = [],
+    outputs = [
+        "//command_line_option:platforms",
+    ],
+)
+
 def _bzd_cc_generic_impl(ctx):
     # Link the CcInfo providers and generate metadata.
     binary_file, link_metadata_files = cc_link(ctx = ctx, srcs = ctx.files.srcs, deps = ctx.attr.deps, map_analyzer = ctx.attr._map_analyzer_script)
@@ -116,6 +131,9 @@ def _bzd_cc_generic(is_test):
                 doc = "C++ source files",
                 allow_files = True,
             ),
+            "target": attr.label(
+                doc = "Target platform to be used.",
+            ),
             "_map_analyzer_script": attr.label(
                 executable = True,
                 cfg = "exec",
@@ -142,6 +160,9 @@ def _bzd_cc_generic(is_test):
                 default = Label("@bazel_tools//tools/test:lcov_merger"),
             ),
             "_cc_toolchain": attr.label(default = Label("@rules_cc//cc:current_cc_toolchain")),
+            "_allowlist_function_transition": attr.label(
+                default = "@bazel_tools//tools/allowlists/function_transition_allowlist",
+            ),
         },
         executable = True,
         test = is_test,
@@ -150,6 +171,7 @@ def _bzd_cc_generic(is_test):
             "//tools/bazel_build/toolchains/binary:toolchain_type",
         ],
         fragments = ["cpp"],
+        cfg = _bzd_cc_transition,
     )
 
 _bzd_cc_binary = _bzd_cc_generic(is_test = False)
@@ -161,7 +183,7 @@ def bzd_cc_binary(name, tags = [], srcs = [], deps = [], **kwags):
     """
     bdl_composition(
         name = name + ".composition",
-        tags = tags + ["cc"],
+        tags = tags + ["manual", "cc"],
         deps = deps + ["//cc/bzd/platform"],
     )
     _bzd_cc_binary(
@@ -180,7 +202,7 @@ def bzd_cc_test(name, tags = [], srcs = [], deps = [], **kwags):
     """
     bdl_composition(
         name = name + ".composition",
-        tags = tags + ["cc"],
+        tags = tags + ["manual", "cc"],
         deps = deps + ["//cc/bzd/platform"],
         testonly = True,
     )
