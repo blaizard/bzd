@@ -25,3 +25,21 @@ cc_library(
         "//cc/components/posix/stack_trace",
     ],
 )
+
+platform(
+    name = "x86_64_clang",
+    constraint_values = [
+        "//cc/targets:linux_2_executors",
+    ],
+    parents = ["@linux_x86_64_clang//:platform"],
+    visibility = ["//visibility:public"],
+)
+
+platform(
+    name = "x86_64_gcc",
+    constraint_values = [
+        "//cc/targets:linux_2_executors",
+    ],
+    parents = ["@linux_x86_64_gcc//:platform"],
+    visibility = ["//visibility:public"],
+)
