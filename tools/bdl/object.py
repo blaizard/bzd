@@ -146,12 +146,12 @@ class Object:
 		if objectContext.resolve:
 			ProcessInclusions(objectContext=objectContext).visit(data)
 
-		# Validation step
-		Validation().visit(data)
-
 		# Generate the symbol map
 		build = Build(objectContext=objectContext)
 		build.visit(data)
+
+		# Validation step
+		Validation().visit(data)
 
 		return Object(context=parser.context, symbols=build.getSymbolMap(), tree=build.getSymbolTree())
 

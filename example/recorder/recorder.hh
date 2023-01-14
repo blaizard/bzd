@@ -36,6 +36,19 @@ public:
 	// void fetch()
 };
 
+/*The code generation should generate an interface class for the interface part, as follow:
+
+template <class Impl>
+class HelloInterface
+{
+public:
+	// method run();
+
+	// send = Float;
+	ObjectWriter<bzd::Int32> send() { return context_.comms<"example.Hello.send">.set(); }
+};
+*/
+
 class Hello
 {
 public:

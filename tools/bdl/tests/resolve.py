@@ -129,12 +129,12 @@ class TestRun(unittest.TestCase):
 					""",
 				objectContext=ObjectContext(resolve=True))
 
-		with self.assertRaisesRegex(Exception, r"Composition.*cannot.*inheritance"):
+		with self.assertRaisesRegex(Exception, r"Unsupported inheritance"):
 			Object.fromContent(content="""
 					struct A {}
 					composition B : A {}
 					""",
-				objectContext=ObjectContext(resolve=True))
+				objectContext=ObjectContext(resolve=True, composition=True))
 
 		with self.assertRaisesRegex(Exception, r"lower than"):
 			Object.fromContent(content="""
@@ -540,6 +540,17 @@ class TestRun(unittest.TestCase):
 					}
 					""",
 				objectContext=ObjectContext(resolve=True, composition=True))
+
+	def testComponent(self) -> None:
+		with self.assertRaisesRegex(Exception, r"Only.*struct.*interface"):
+			Object.fromContent(content="""
+					component A {}
+					component B {
+					interface:
+						a = A();
+					}
+					""",
+				objectContext=ObjectContext(resolve=True))
 
 
 if __name__ == '__main__':

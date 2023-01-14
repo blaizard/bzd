@@ -104,22 +104,27 @@ class TestRun(unittest.TestCase):
 
 		common = Object.fromContent(content="""
 			component Executor { }
-			component Hello {
+			component Sender {
 			interface:
 				a = Integer;
 				b = Float;
 			}
+			component Receiver {
+			interface:
+				a = const Integer;
+				b = const Float;
+			}
 			composition {
 				executor = Executor();
-				hello1 = Hello();
-				hello2 = Hello();
+				sender = Sender();
+				receiver = Receiver();
 			}
 			""",
 			objectContext=ObjectContext(resolve=True))
 
 		composition = Object.fromContent(content="""
 			composition {
-				connect(hello1.a, hello1.a);
+				connect(sender.a, sender.a);
 			}
 			""",
 			objectContext=ObjectContext(resolve=True))
@@ -128,7 +133,7 @@ class TestRun(unittest.TestCase):
 
 		composition = Object.fromContent(content="""
 			composition {
-				connect(hello1.a, hello1.b);
+				connect(sender.a, sender.b);
 			}
 			""",
 			objectContext=ObjectContext(resolve=True))
@@ -137,7 +142,7 @@ class TestRun(unittest.TestCase):
 
 		composition = Object.fromContent(content="""
 			composition {
-				connect(hello1.a, hello2.a);
+				connect(sender.a, receiver.a);
 			}
 			""",
 			objectContext=ObjectContext(resolve=True))
@@ -145,8 +150,8 @@ class TestRun(unittest.TestCase):
 
 		composition = Object.fromContent(content="""
 			composition {
-				connect(hello1.a, hello2.a);
-				connect(hello1.a, hello2.a);
+				connect(sender.a, receiver.a);
+				connect(sender.a, receiver.a);
 			}
 			""",
 			objectContext=ObjectContext(resolve=True))
@@ -155,12 +160,12 @@ class TestRun(unittest.TestCase):
 
 		composition = Object.fromContent(content="""
 			composition {
-				connect(hello1.a, hello2.a);
-				connect(hello2.a, hello1.a);
+				connect(sender.a, receiver.a);
+				connect(receiver.a, sender.a);
 			}
 			""",
 			objectContext=ObjectContext(resolve=True))
-		with self.assertRaisesRegex(Exception, r"defined as an output"):
+		with self.assertRaisesRegex(Exception, r"must not be marked as const"):
 			Composition().visit(common).visit(composition).process()
 
 
