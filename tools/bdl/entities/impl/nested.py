@@ -74,22 +74,39 @@ class Nested(Entity):
 			elif underlyingType.category == Category.extern:
 				nestedCategory = underlyingType.type  # type: ignore
 			else:
-				self.error(message="Inheritance can only be done from a nested class, not '{}', category '{}'.".format(
-					entity.underlyingTypeFQN, underlyingType.category))
+				self.error(message=
+					f"Inheritance can only be done from a nested class, not '{entity.underlyingTypeFQN}', category '{underlyingType.category}'."
+							)
 
 			if self.category == Category.struct:
 				self.assertTrue(condition=nestedCategory == Category.struct,
-					message="A struct can only inherits from another struct, not '{}'.".format(nestedCategory))
+					message=f"A struct can only inherits from another struct, not '{nestedCategory}'.")
 			elif self.category == Category.interface:
 				self.assertTrue(condition=nestedCategory == Category.interface,
-					message="An interface can only inherits from another interface, not '{}'.".format(nestedCategory))
+					message=f"An interface can only inherits from another interface, not '{nestedCategory}'.")
 			elif self.category == Category.component:
 				self.assertTrue(condition=nestedCategory == Category.interface,
-					message="A component can only inherits from interface(s), not '{}'.".format(nestedCategory))
+					message=f"A component can only inherits from interface(s), not '{nestedCategory}'.")
 			else:
-				self.error(message="Unsupported inheritance for type: '{}'.".format(self.category))
+				self.error(message=f"Unsupported inheritance for type: '{self.category}'.")
+
+		self.validate()
 
 		super().resolve(resolver)
+
+	def validate(self) -> None:
+
+		if self.category in {Category.struct, Category.interface, Category.component}:
+			for entity in self.interface:
+				if entity.category == Category.expression:
+					if entity.isSymbol:
+						allowed = {
+							Category.struct, Category.builtin, Category.enum, Category.using, Category.expression
+						}
+						entity.assertTrue(condition=(entity.symbol.category in allowed),
+							message=
+							f"Only {', '.join(str(c.value) for c in allowed)} can be used as expression in interfaces, not '{entity.symbol.category.value}'"
+											)
 
 	def __repr__(self) -> str:
 		content = self.toString({

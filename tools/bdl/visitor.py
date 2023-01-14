@@ -23,7 +23,7 @@ class Group(enum.Enum):
 
 class Parent:
 
-	def __init__(self, entity: typing.Union[Nested, Namespace], group: typing.Optional[Group] = None) -> None:
+	def __init__(self, entity: typing.Optional[EntityType] = None, group: typing.Optional[Group] = None) -> None:
 		self.entity = entity
 		self.group = group
 
@@ -54,10 +54,6 @@ class Visitor(VisitorBase[T, T]):
 		self.elementToEntityExtenstion = elementToEntityExtenstion
 
 	@property
-	def parent(self) -> typing.Optional[Parent]:
-		return self.parents[-1] if len(self.parents) else None
-
-	@property
 	def namespace(self) -> typing.List[str]:
 		"""
 		Get the list of name constituing the namespace.
@@ -70,13 +66,18 @@ class Visitor(VisitorBase[T, T]):
 		Return the current group: global, composition, config
 		"""
 		for parent in reversed(self.parents):
-			if parent.group in [Group.composition, Group.config]:
+			if parent.group in [Group.globalComposition, Group.composition, Group.config]:
 				return parent.group
-			if parent.isNested:
-				assert isinstance(parent.entity, Nested)
-				if parent.entity.category == Category.composition:
-					return Group.globalComposition
 		return Group.globalGroup
+
+	def entityToGroup(self, entity: EntityType) -> typing.Optional[Group]:
+		"""Define a group based on an entity."""
+
+		if entity.category == Category.composition:
+			return Group.globalComposition
+		elif entity.category == Category.interface:
+			return Group.interface
+		return None
 
 	def visitElement(self, element: Element, result: T) -> T:
 		"""
@@ -84,6 +85,7 @@ class Visitor(VisitorBase[T, T]):
 		"""
 
 		entity = elementToEntity(element=element, extension=self.elementToEntityExtenstion)
+		self.parents.append(Parent(group=self.entityToGroup(entity=entity)))
 
 		# Handle nested object
 		if isinstance(entity, Nested):
@@ -136,8 +138,8 @@ class Visitor(VisitorBase[T, T]):
 
 			self.visitNamespace(entity, result)
 
-			# Update the current namespace
-			self.parents.append(Parent(entity=entity))
+			# Update the current namespace. This is not a popable element, hence insert at the begining.
+			self.parents.insert(0, Parent(entity=entity))
 
 		# Handle use
 		elif isinstance(entity, Use):
@@ -147,6 +149,8 @@ class Visitor(VisitorBase[T, T]):
 		# Should never go here
 		else:
 			Error.handleFromElement(element=element, message="Unexpected entity: {}".format(type(entity)))
+
+		self.parents.pop()
 
 		return result
 

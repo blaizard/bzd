@@ -13,7 +13,7 @@ class Validation(VisitorBase[None]):
 
 		self.validateContract(entity=entity)
 
-		entity.assertTrue(condition=self.parent is not None, message="Expression must be in a nested context.")
+		#entity.assertTrue(condition=self.parent is not None, message="Expression must be in a nested context.")
 
 	def visitNestedEntities(self, entity: Nested, result: None) -> None:
 

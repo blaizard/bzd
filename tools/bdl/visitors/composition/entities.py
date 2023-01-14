@@ -85,6 +85,7 @@ class ConnectionGroup:
 	# The set of connection object for this group.
 	outputs: typing.Dict[Symbol, OutputMetadata] = dataclasses.field(default_factory=dict)
 
+
 class Connections:
 
 	def __init__(self, symbols: SymbolMap) -> None:
@@ -106,9 +107,11 @@ class Connections:
 
 		# Check const correctness.
 		inputEntity = input.symbol.getEntityResolved(resolver=self.resolver)
-		inputEntity.assertTrue(condition=not inputEntity.symbol.const, message="A connection sender must not be marked as const.")
+		inputEntity.assertTrue(condition=not inputEntity.symbol.const,
+			message="A connection sender must not be marked as const.")
 		outputEntity = output.symbol.getEntityResolved(resolver=self.resolver)
-		outputEntity.assertTrue(condition=outputEntity.symbol.const, message="A connection receiver must be marked as const.")
+		outputEntity.assertTrue(condition=outputEntity.symbol.const,
+			message="A connection receiver must be marked as const.")
 
 		alreadyInserted = input.symbol in self.groups and output.symbol in self.groups[input.symbol].outputs
 		input.assertTrue(condition=not alreadyInserted,
@@ -116,10 +119,8 @@ class Connections:
 		input.assertTrue(condition=input.symbol not in self.outputs,
 			message=f"'{input.symbol}' has already been defined as an output.")
 		if input.symbol not in self.outputs:
-			self.groups[input.symbol] = ConnectionGroup(
-				executor=input.executorOr("executor"),
-				symbol=input.symbol.getEntityUnderlyingTypeResolved(resolver=self.resolver).symbol
-			)
+			self.groups[input.symbol] = ConnectionGroup(executor=input.executorOr("executor"),
+				symbol=input.symbol.getEntityUnderlyingTypeResolved(resolver=self.resolver).symbol)
 		self.groups[input.symbol].outputs[output.symbol] = OutputMetadata(executor=output.executorOr("executor"))
 		self.outputs.add(output.symbol)
 
@@ -344,20 +345,12 @@ class Entities:
 	def getConnectionsByExecutor(self, fqn: str) -> typing.Iterable[Expression]:
 		for input, group in self.connections.groups.items():
 			if group.executor == fqn or any(metadata.executor == fqn for metadata in group.outputs.values()):
-				result = {
-					"symbol": group.symbol,
-					"outputs": []
-				}
+				result = {"symbol": group.symbol, "outputs": []}
 				if group.executor == fqn:
-					result["input"] = {
-						"symbol": input
-					}
+					result["input"] = {"symbol": input}
 				for output, metadata in group.outputs.items():
 					if metadata.executor == fqn:
-						result["outputs"].append({
-							"symbol": output,
-							"history": metadata.history
-						})
+						result["outputs"].append({"symbol": output, "history": metadata.history})
 				yield result
 
 		return [entry.expression for entry in self.workloads if fqn in entry.executors]
