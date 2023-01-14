@@ -13,11 +13,17 @@ from tools.bdl.entities.all import Expression, Builtin, Nested, Method, Using, E
 NamespaceType = typing.List[str]
 
 
+class NestedSequence(enum.Enum):
+	composition = "composition"
+	config = "config"
+	interface = "interface"
+
+
 class Group(enum.Enum):
 	composition = "composition"
 	config = "config"
 	interface = "interface"
-	globalGroup = "global"
+	globalGroup = "globalGroup"
 	globalComposition = "globalComposition"
 
 
@@ -66,8 +72,10 @@ class Visitor(VisitorBase[T, T]):
 		Return the current group: global, composition, config
 		"""
 		for parent in reversed(self.parents):
-			if parent.group in [Group.globalComposition, Group.composition, Group.config]:
-				return parent.group
+			#if parent.group is not None:
+			if parent.group is not None:
+				if parent.group in {Group.globalComposition, Group.composition, Group.config}:
+					return parent.group
 		return Group.globalGroup
 
 	def entityToGroup(self, entity: EntityType) -> typing.Optional[Group]:
@@ -78,6 +86,15 @@ class Visitor(VisitorBase[T, T]):
 		elif entity.category == Category.interface:
 			return Group.interface
 		return None
+
+	def nestedToGroup(self, entity: EntityType, nested: NestedSequence) -> typing.Optional[Group]:
+		"""Convert a nested sequence type into a group."""
+
+		return {
+			NestedSequence.composition: Group.composition,
+			NestedSequence.interface: Group.interface,
+			NestedSequence.config: Group.config,
+		}[nested]
 
 	def visitElement(self, element: Element, result: T) -> T:
 		"""
@@ -92,12 +109,11 @@ class Visitor(VisitorBase[T, T]):
 
 			self.level += 1
 
-			for group in Group:
-				sequence = element.getNestedSequence(group.value)
+			for nested in NestedSequence:
+				sequence = element.getNestedSequence(nested.value)
 				if sequence is not None:
-					self.parents.append(Parent(entity=entity, group=group))
+					self.parents.append(Parent(entity=entity, group=self.nestedToGroup(entity, nested)))
 					nestedResult = self._visit(sequence, result)
-					self.entityToNested(group, entity, nestedResult, result)
 					self.parents.pop()
 
 			self.level -= 1
@@ -153,12 +169,6 @@ class Visitor(VisitorBase[T, T]):
 		self.parents.pop()
 
 		return result
-
-	def entityToNested(self, group: Group, entity: Nested, nested: T, result: T) -> None:
-		"""
-		Associate a nested result with its entity.
-		"""
-		pass
 
 	def visitNestedEntities(self, entity: Nested, result: T) -> None:
 		"""

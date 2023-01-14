@@ -182,9 +182,7 @@ class SymbolMap:
 			return None
 		return data
 
-	def items(self,
-		groups: typing.Set[Group] = set(),
-		startsWith: str = "") -> typing.Iterator[typing.Tuple[str, EntityType]]:
+	def items(self, groups: typing.Set[Group], startsWith: str = "") -> typing.Iterator[typing.Tuple[str, EntityType]]:
 		"""
 		Iterate through entities optionaly filtered by their groups.
 
