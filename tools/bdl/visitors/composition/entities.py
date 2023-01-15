@@ -5,6 +5,7 @@ from functools import cached_property
 from collections import OrderedDict
 
 from bzd.utils.result import Result
+from bzd.parser.element import Element
 
 from tools.bdl.visitor import Group
 from tools.bdl.visitors.symbol_map import SymbolMap, Resolver
@@ -385,6 +386,38 @@ class Entities:
 		else:
 			self.processEntry(expression=expression, isDep=isDep, resolver=resolver, executor=executor)
 
+	def createEntityNestedComposition(self,
+		element: Element,
+		expression: Expression,
+		resolveNamespace: typing.List[str],
+		name: typing.Optional[str] = None) -> Entity:
+		"""Create a new entity for nested compositions.
+		
+		Args:
+			element: The element to be used as a based to create the entity.
+			expression: The expression used to create the component containing the composition.
+			resolveNamespace: The namespace to be used for resolving the new entity.
+			name: The name to give to the new entry.
+
+		Return:
+			The newly created entity.
+		"""
+
+		expression.assertTrue(condition=expression.isName,
+			message=f"Nested composition must come from a named expression, coming from {expression} instead.")
+
+		# Insert the new entry in the symbol map.
+		fqn = self.symbols.insert(name=name,
+			namespace=expression.namespace + [expression.name],
+			path=None,
+			element=element,
+			group=Group.composition)
+		entity = self.symbols.getEntityResolved(fqn=fqn).value
+		resolver = self.symbols.makeResolver(namespace=resolveNamespace, this=expression.fqn)
+		entity.resolveMemoized(resolver=resolver)
+
+		return entity
+
 	def processEntry(self, expression: Expression, isDep: bool, resolver: Resolver,
 		executor: typing.Optional[str]) -> None:
 		"""Resolve the dependencies for a specific expression."""
@@ -451,31 +484,25 @@ class Entities:
 				maybeGroup = checkIfInitOrShutdown(interfaceEntity)
 				if maybeGroup is not None:
 
-					# Insert a new entry in the symbol map and resolve it against this entity.
-					fqn = self.symbols.insert(name=None,
-						namespace=interfaceEntity.namespace,
-						path=None,
+					newEntity = self.createEntityNestedComposition(
 						element=ExpressionBuilder(type=f"this.{interfaceEntity.name}"),
-						group=Group.composition)
-					newEntity = self.symbols.getEntityResolved(fqn=fqn).value
-					newResolver = self.symbols.makeResolver(namespace=interfaceEntity.namespace, this=expression.fqn)
-					newEntity.resolveMemoized(resolver=newResolver)
+						expression=expression,
+						resolveNamespace=interfaceEntity.namespace)
 					maybeGroup.push(newEntity)
 
 		# Check if there are dependent composition from this entity.
 		if underlyingType.isComposition:
 			for compositionEntity in underlyingType.composition:
-				# Composition must only contain unamed entries.
-				compositionEntity.assertTrue(condition=not compositionEntity.isName,
-					message="Variable cannot be created within a nested composition.")
+
 				assert isinstance(compositionEntity, Expression), "All composition entities must be an expression."
 
 				# Create a new entity and associate it with its respective objects.
 				entityCopied = compositionEntity.copy()
-				newResolver = self.symbols.makeResolver(namespace=entityCopied.namespace, this=expression.fqn)
-				entityCopied.resolveMemoized(resolver=newResolver)
-
-				entry.intra.push(entityCopied)
+				newEntity = self.createEntityNestedComposition(element=entityCopied.element,
+					expression=expression,
+					resolveNamespace=entityCopied.namespace,
+					name=compositionEntity.name if compositionEntity.isName else None)
+				entry.intra.push(newEntity)
 
 		# Add implicit dependencies.
 		for dependency in entry.deps + entry.intra:

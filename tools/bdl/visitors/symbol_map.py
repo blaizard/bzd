@@ -233,7 +233,7 @@ class SymbolMap:
 		if self.contains(fqn=fqn):
 			originalElement = self.getEntityResolved(fqn=fqn).assertValue(element=element).element
 			if not conflicts or element != originalElement:
-				SymbolMap.errorSymbolConflict_(element, originalElement)
+				SymbolMap.errorSymbolConflict_(fqn, element, originalElement)
 
 		self.map[fqn] = {"g": group.value, "p": path.as_posix() if path is not None else "", "e": None}
 
@@ -248,8 +248,10 @@ class SymbolMap:
 		return fqn
 
 	@staticmethod
-	def errorSymbolConflict_(element1: Element, element2: Element) -> None:
-		message = Error.handleFromElement(element=element1, message="Symbol name is in conflict...", throw=False)
+	def errorSymbolConflict_(fqn: str, element1: Element, element2: Element) -> None:
+		message = Error.handleFromElement(element=element1,
+			message=f"Symbol name '{fqn}' is in conflict...",
+			throw=False)
 		message += Error.handleFromElement(element=element2, message="...with this one.", throw=False)
 		raise Exception(message)
 
@@ -264,7 +266,7 @@ class SymbolMap:
 				continue
 			existingElement = self._get(fqn=fqn)
 			if existingElement is not None and element["p"] != existingElement["p"]:
-				SymbolMap.errorSymbolConflict_(SymbolMap.metaToElement(element),
+				SymbolMap.errorSymbolConflict_(fqn, SymbolMap.metaToElement(element),
 					SymbolMap.metaToElement(existingElement))
 			self.map[fqn] = element
 
