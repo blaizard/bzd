@@ -34,7 +34,9 @@ config:
 	{{ declareSymbols(data.configRaw.sequence) }}
 	{% end %}
 	{% if data.isComposition %}
+		{% if data.category.value != "composition" %}
 composition:
+		{% end %}
 	{{ declareSymbols(data.composition.sequence) }}
 	{% end %}
 }

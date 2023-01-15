@@ -64,8 +64,8 @@ class Composition:
 		"""Generate the unique identifiers of the types."""
 
 		counter = 1
-		for fqn, entity in sorted(self.symbols.items(groups={Group.globalGroup})):
-			if entity.category in [Category.expression, Category.struct, Category.enum]:
+		for fqn, entity in sorted(self.symbols.items(groups={Group.interface})):
+			if entity.category in {Category.expression, Category.struct, Category.enum}:
 				self.uids[fqn] = counter
 				counter += 1
 
@@ -74,7 +74,7 @@ class Composition:
 		self.generateUids()
 
 		compositionEntities = [
-			entity for fqn, entity in self.symbols.items(groups={Group.globalComposition})
+			entity for fqn, entity in self.symbols.items(groups={Group.composition | Group.topLevel})
 			if isinstance(entity, Expression)
 		]
 

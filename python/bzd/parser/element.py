@@ -28,7 +28,10 @@ class Sequence:
 		return [*self][index]  # type: ignore
 
 	def __len__(self) -> int:
-		return len([e for e in self.list if not e.isEmpty()])
+		return len([e for e in self])
+
+	def empty(self) -> bool:
+		return len(self) == 0
 
 	def __add__(self, other: typing.Union[typing.List["Element"], "Sequence"]) -> "Sequence":
 		if isinstance(other, Sequence):

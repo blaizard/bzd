@@ -29,7 +29,7 @@ class Build(Visitor[None]):
 	def registerEntity(self, entity: EntityType) -> str:
 
 		resolve = self.objectContext.resolve
-		resolve &= (self.group not in {Group.composition, Group.globalComposition}) or self.objectContext.composition
+		resolve &= (Group.composition not in self.group) or self.objectContext.composition
 
 		# Save the serialized payload
 		fqn = self.symbols.insert(name=entity.name if entity.isName else None,

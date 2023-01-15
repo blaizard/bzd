@@ -29,17 +29,12 @@ class Validation(VisitorBase[None]):
 				message="Interfaces can only expose methods and expressions as interface.")
 			entity.assertTrue(condition=configCategories.issubset({Category.expression, Category.using}),
 				message="Interfaces configuration can only contain expressions and using statements.")
-			entity.assertTrue(condition=len(compositionCategories) == 0,
-				message="Interfaces cannot have nested composition.")
 
 		elif entity.category == Category.struct:
 			entity.assertTrue(condition=entity.isName, message="Structures must have a valid name.")
 			entity.assertTrue(condition=interfaceCategories.issubset(
 				{Category.expression, Category.enum, Category.struct, Category.using}),
 				message="Structures only accept expressions, enums, nested structs or using statements.")
-			entity.assertTrue(condition=len(configCategories) == 0, message="Structures cannot have configuration.")
-			entity.assertTrue(condition=len(compositionCategories) == 0,
-				message="Structures cannot have nested composition.")
 
 		elif entity.category == Category.component:
 			entity.assertTrue(condition=entity.isName, message="Components must have a valid name.")
@@ -54,9 +49,6 @@ class Validation(VisitorBase[None]):
 			entity.assertTrue(condition=not entity.hasInheritance, message="Compositions cannot have inheritance.")
 			entity.assertTrue(condition=interfaceCategories.issubset({Category.expression}),
 				message="Compositions can only contain expressions.")
-			entity.assertTrue(condition=len(configCategories) == 0, message="Compositions cannot have configuration.")
-			entity.assertTrue(condition=len(compositionCategories) == 0,
-				message="Compositions cannot have nested composition.")
 
 		else:
 			entity.assertTrue(condition=False, message=f"Unsupported nested category: '{entity.category}'.")

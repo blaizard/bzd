@@ -138,7 +138,9 @@ class TestRun(unittest.TestCase):
 
 		with self.assertRaisesRegex(Exception, r"lower than"):
 			Object.fromContent(content="""
-				struct A { struct X { struct Y { a = Integer [min(13)]; }  } }
+				struct Y1 { a = Integer [min(13)]; }
+				struct X1 { using Y = Y1; }
+				struct A { using X = X1; }
 				using B = A;
 				struct C : B {}
 				composition { a = C.X.Y(a = 12); }
