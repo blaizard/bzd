@@ -8,9 +8,6 @@ from bzd.parser.fragments import Fragment, FragmentNestedStart, FragmentNestedSt
 from bzd.parser.element import Element
 
 _regexprBaseName = r"(?!const|interface|struct|component|method|namespace|use|using|config|composition)[0-9a-zA-Z_]+"
-# Match: interface, struct
-_regexprNested = r"(?P<category>(:?interface|struct|component|composition))"
-_regexprNestedTrivial = r"(?P<category>(:?struct))"
 # Match name
 _regexprName = r"(?P<name>" + _regexprBaseName + r")"
 # Match name or varargs
@@ -32,7 +29,10 @@ class FragmentBlockComment(FragmentComment):
 		self.attrs["comment"] = re.sub(re.compile("^(\s*\*)+", re.MULTILINE), "", self.attrs["comment"])
 
 
-def makeGrammarNested(nestedGrammar: Grammar, trivial: bool = False) -> Grammar:
+def makeGrammarNested(nestedGrammar: Grammar,
+	name: str,
+	defaultNested: str = "invalid",
+	nested: typing.Optional[typing.Set[str]] = None) -> Grammar:
 	"""
 	Generate a grammar for a nested entity, it accepst the following format:
 	(interface|struct|component|composition) [name] [contracts] [: inheritance1, inheritance2, ...] {
@@ -46,7 +46,7 @@ def makeGrammarNested(nestedGrammar: Grammar, trivial: bool = False) -> Grammar:
 		nestedName = "inheritance"
 
 	class NestedInterface(FragmentNestedStart):
-		nestedName = "interface"
+		nestedName = defaultNested
 
 	def makeNestedCategory(name: str) -> GrammarItem:
 
@@ -55,6 +55,9 @@ def makeGrammarNested(nestedGrammar: Grammar, trivial: bool = False) -> Grammar:
 
 		return GrammarItem(name + r"(?=:)", FragmentParentElement, [GrammarItem(r":", CategoryFragmentStart, "nested")])
 
+	if nested is None:
+		nested = set()
+
 	grammarAfterName: Grammar = [
 		GrammarItem(r":", InheritanceStart, [
 		GrammarItem(_regexprSymbol, Fragment,
@@ -62,16 +65,13 @@ def makeGrammarNested(nestedGrammar: Grammar, trivial: bool = False) -> Grammar:
 		GrammarItem(r"(?={)", FragmentParentElement)])
 		]),
 		GrammarItem(
-		r"{", NestedInterface, nestedGrammar + [
-		makeNestedCategory("config"),
-		makeNestedCategory("composition"),
-		makeNestedCategory("interface"),
+		r"{", NestedInterface, nestedGrammar + [makeNestedCategory(nestedName) for nestedName in nested] + [
 		GrammarItem(r"}", FragmentNestedStopNewElement),
 		], "nested"),
 	] + makeGrammarContracts()
 
 	return [
-		GrammarItem(_regexprNestedTrivial if trivial else _regexprNested, {},
+		GrammarItem(r"(?P<category>" + name + r")", {},
 		[GrammarItem(_regexprName, Fragment, grammarAfterName)] + grammarAfterName)
 	]
 
@@ -148,12 +148,6 @@ def makeGrammarExpressionFragment(finalGrammar: Grammar = [GrammarItem(r";", Fra
 		GrammarItem(r",", FragmentNewElement),
 		GrammarItem(r"\)", FragmentParentElement)
 		]))
-	"""
-	grammarValue.append(GrammarItem(_regexprType, Fragment,
-		[GrammarItem(r",", FragmentNewElement),
-		GrammarItem(r"\)", FragmentParentElement),
-		GrammarItem(r"\(", ArgumentStart, grammarValue)]))
-	"""
 
 	return makeGrammarType([
 		GrammarItem(r"\(", ArgumentStart,
@@ -307,14 +301,12 @@ class Parser(ParserBase):
 	def __init__(self, content: str) -> None:
 
 		withinNested = makeGrammarUsing() + makeGrammarEnum() + makeGrammarExpression() + makeGrammarMethod()
-		nested = withinNested + makeGrammarNested(
-			withinNested + makeGrammarNested(withinNested + makeGrammarNested(withinNested +
-			makeGrammarNested(withinNested + makeGrammarNested(withinNested, trivial=True), trivial=True),
-			trivial=True),
-			trivial=True),
-			trivial=True)
+		nested = withinNested
 
 		super().__init__(content,
 			grammar=makeGrammarNamespace() + makeGrammarUse() + makeGrammarExtern() + withinNested +
-			makeGrammarNested(nested, trivial=False),
+			makeGrammarNested(withinNested, name="component", nested={"interface", "config", "composition"}) +
+			makeGrammarNested(withinNested, name="interface", defaultNested="interface", nested={"interface",
+			"config"}) + makeGrammarNested(withinNested, name="composition", defaultNested="composition") +
+			makeGrammarNested(withinNested, name="struct", defaultNested="interface"),
 			defaultGrammarPre=[GrammarItemSpaces] + _grammarComments)

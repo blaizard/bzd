@@ -19,19 +19,10 @@ class NestedSequence(enum.Enum):
 	interface = "interface"
 
 
-class Group(enum.Enum):
-	composition = "composition"
-	config = "config"
-	interface = "interface"
-	globalGroup = "globalGroup"
-	globalComposition = "globalComposition"
-
-
 class Parent:
 
-	def __init__(self, entity: typing.Optional[EntityType] = None, group: typing.Optional[Group] = None) -> None:
+	def __init__(self, entity: typing.Optional[EntityType] = None) -> None:
 		self.entity = entity
-		self.group = group
 
 	@property
 	def isNested(self) -> bool:
@@ -46,6 +37,53 @@ class Parent:
 		return []
 
 
+class Group(enum.Flag):
+	builtin = enum.auto()
+	component = enum.auto()
+	composition = enum.auto()
+	interface = enum.auto()
+	struct = enum.auto()
+	config = enum.auto()
+	topLevel = enum.auto()
+	nested = enum.auto()
+
+
+class GroupScope:
+
+	def __init__(self, list: typing.List[Group], group: typing.Optional[Group]) -> None:
+		self.list = list
+		self.group = group
+
+	def __enter__(self) -> None:
+		if self.group is not None:
+			self.list.append(self.group)
+
+	def __exit__(self, exc_type: typing.Any, exc_value: typing.Any, exc_tb: typing.Any) -> None:
+		if self.group is not None:
+			self.list.pop()
+
+
+class Groups:
+
+	def __init__(self) -> None:
+		self.list: typing.List[Group] = []
+
+	def scope(self, group: typing.Optional[Group]) -> GroupScope:
+		return GroupScope(list=self.list, group=group)
+
+	@property
+	def group(self) -> Group:
+		"""Return the current group: global, composition, config."""
+
+		if len(self.list) == 0:
+			return Group.topLevel
+
+		if all(group == self.list[0] for group in self.list):
+			return self.list[0] | Group.topLevel
+
+		return self.list[-1] | Group.nested
+
+
 T = typing.TypeVar("T")
 
 
@@ -58,6 +96,7 @@ class Visitor(VisitorBase[T, T]):
 		self.level = 0
 		self.parents: typing.List[Parent] = []
 		self.elementToEntityExtenstion = elementToEntityExtenstion
+		self.groups = Groups()
 
 	@property
 	def namespace(self) -> typing.List[str]:
@@ -68,23 +107,19 @@ class Visitor(VisitorBase[T, T]):
 
 	@property
 	def group(self) -> Group:
-		"""
-		Return the current group: global, composition, config
-		"""
-		for parent in reversed(self.parents):
-			#if parent.group is not None:
-			if parent.group is not None:
-				if parent.group in {Group.globalComposition, Group.composition, Group.config}:
-					return parent.group
-		return Group.globalGroup
+		return self.groups.group
 
 	def entityToGroup(self, entity: EntityType) -> typing.Optional[Group]:
 		"""Define a group based on an entity."""
 
 		if entity.category == Category.composition:
-			return Group.globalComposition
+			return Group.composition
 		elif entity.category == Category.interface:
 			return Group.interface
+		elif entity.category == Category.component:
+			return Group.component
+		elif entity.category == Category.struct:
+			return Group.struct
 		return None
 
 	def nestedToGroup(self, entity: EntityType, nested: NestedSequence) -> typing.Optional[Group]:
@@ -102,71 +137,73 @@ class Visitor(VisitorBase[T, T]):
 		"""
 
 		entity = elementToEntity(element=element, extension=self.elementToEntityExtenstion)
-		self.parents.append(Parent(group=self.entityToGroup(entity=entity)))
+		with self.groups.scope(group=self.entityToGroup(entity=entity)):
 
-		# Handle nested object
-		if isinstance(entity, Nested):
+			# Handle nested object
+			if isinstance(entity, Nested):
 
-			self.level += 1
+				self.level += 1
 
-			for nested in NestedSequence:
-				sequence = element.getNestedSequence(nested.value)
-				if sequence is not None:
-					self.parents.append(Parent(entity=entity, group=self.nestedToGroup(entity, nested)))
-					nestedResult = self._visit(sequence, result)
-					self.parents.pop()
+				entity.assertTrue(condition=not element.isNestedSequence("invalid")
+					or element.getNestedSequence("invalid").empty(),
+					message=f"This element '{entity.category}' does not support direct nested scope.")
+				for nested in NestedSequence:
+					sequence = element.getNestedSequence(nested.value)
+					if sequence is not None:
+						self.parents.append(Parent(entity=entity))
+						with self.groups.scope(group=self.nestedToGroup(entity, nested)):
+							nestedResult = self._visit(sequence, result)
+						self.parents.pop()
 
-			self.level -= 1
+				self.level -= 1
 
-			self.visitNestedEntities(entity, result)
+				self.visitNestedEntities(entity, result)
 
-		# Handle expression
-		elif isinstance(entity, Expression):
+			# Handle expression
+			elif isinstance(entity, Expression):
 
-			self.visitExpression(entity, result)
+				self.visitExpression(entity, result)
 
-		# Handle method
-		elif isinstance(entity, Method):
+			# Handle method
+			elif isinstance(entity, Method):
 
-			self.visitMethod(entity, result)
+				self.visitMethod(entity, result)
 
-		# Handle using
-		elif isinstance(entity, Using):
+			# Handle using
+			elif isinstance(entity, Using):
 
-			self.visitUsing(entity, result)
+				self.visitUsing(entity, result)
 
-		# Handle extern
-		elif isinstance(entity, Extern):
+			# Handle extern
+			elif isinstance(entity, Extern):
 
-			self.visitExtern(entity, result)
+				self.visitExtern(entity, result)
 
-		# Handle enum
-		elif isinstance(entity, Enum):
+			# Handle enum
+			elif isinstance(entity, Enum):
 
-			self.visitEnum(entity, result)
+				self.visitEnum(entity, result)
 
-		# Handle namespace
-		elif isinstance(entity, Namespace):
+			# Handle namespace
+			elif isinstance(entity, Namespace):
 
-			Error.assertTrue(element=element,
-				condition=(self.level == 0),
-				message="Namespaces can only be declared at top level.")
+				Error.assertTrue(element=element,
+					condition=(self.level == 0),
+					message="Namespaces can only be declared at top level.")
 
-			self.visitNamespace(entity, result)
+				self.visitNamespace(entity, result)
 
-			# Update the current namespace. This is not a popable element, hence insert at the begining.
-			self.parents.insert(0, Parent(entity=entity))
+				# Update the current namespace. This is not a popable element, hence insert at the begining.
+				self.parents.insert(0, Parent(entity=entity))
 
-		# Handle use
-		elif isinstance(entity, Use):
+			# Handle use
+			elif isinstance(entity, Use):
 
-			self.visitUse(entity, result)
+				self.visitUse(entity, result)
 
-		# Should never go here
-		else:
-			Error.handleFromElement(element=element, message="Unexpected entity: {}".format(type(entity)))
-
-		self.parents.pop()
+			# Should never go here
+			else:
+				Error.handleFromElement(element=element, message="Unexpected entity: {}".format(type(entity)))
 
 		return result
 

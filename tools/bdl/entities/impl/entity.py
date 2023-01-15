@@ -86,6 +86,14 @@ class Entity:
 	def configAttr(self) -> str:
 		return "config"
 
+	@property
+	def interfaceAttr(self) -> str:
+		return "interface"
+
+	@property
+	def compositionAttr(self) -> str:
+		return "composition"
+
 	def getParents(self) -> typing.List[str]:
 		"""
 		Get the current entity direct parents.
@@ -169,7 +177,7 @@ class Entity:
 
 	@property
 	def isInterface(self) -> bool:
-		return self.element.isNestedSequence("interface")
+		return self.element.isNestedSequence(self.interfaceAttr)
 
 	@property
 	def isConfig(self) -> bool:
@@ -181,11 +189,11 @@ class Entity:
 
 	@property
 	def isComposition(self) -> bool:
-		return self.element.isNestedSequence("composition")
+		return self.element.isNestedSequence(self.compositionAttr)
 
 	@property
 	def interface(self) -> EntitySequence:
-		return self._getNestedByCategory("interface")
+		return self._getNestedByCategory(self.interfaceAttr)
 
 	@property
 	def config(self) -> EntitySequence:
@@ -197,7 +205,7 @@ class Entity:
 
 	@property
 	def composition(self) -> EntitySequence:
-		return self._getNestedByCategory("composition")
+		return self._getNestedByCategory(self.compositionAttr)
 
 	@property
 	def isRoleValue(self) -> bool:

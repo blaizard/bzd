@@ -202,7 +202,7 @@ template <class Promise>
 	return true;
 }
 
-bzd::Async<> initPlatform(auto& registry) noexcept
+bzd::Async<> initPlatform([[maybe_unused]] auto& registry) noexcept
 {
 	{% for fqn, expression in platform %}
 	co_await !registry.{{ fqn | fqnToNameStr }}_.init(registry);

@@ -159,7 +159,7 @@ class SymbolMap:
 		# Resolve builtins before instering them.
 		entity.resolveMemoized(resolver=self.makeResolver())
 		ElementBuilder.cast(entity.element, ElementBuilder).setAttr("fqn", name)
-		self.builtins[name] = {"g": "builtin", "p": "", "e": entity.element.serialize()}
+		self.builtins[name] = {"g": Group.builtin.value, "p": "", "e": entity.element.serialize()}
 		self.entities[name] = entity
 
 	def contains(self, fqn: str, exclude: typing.Optional[typing.List[Group]] = None) -> bool:
@@ -178,7 +178,7 @@ class SymbolMap:
 			data = self.builtins[fqn]
 		else:
 			return None
-		if exclude and Group(data["g"]) in exclude:
+		if exclude and exclude in Group(data["g"]):
 			return None
 		return data
 
@@ -192,7 +192,7 @@ class SymbolMap:
 		"""
 
 		for fqn, meta in self.map.items():
-			if Group(meta["g"]) in groups:
+			if any(group in Group(meta["g"]) for group in groups):
 				if fqn.startswith(startsWith):
 					entity = self.getEntityResolved(fqn=fqn).value
 					yield fqn, entity
@@ -215,7 +215,7 @@ class SymbolMap:
 		"""
 		if name is None:
 			# These are the unnamed elements that should be progpagated to other translation units.
-			if group in {Group.composition, Group.globalComposition}:
+			if Group.composition in group:
 				fqn = FQN.makeUnique(namespace=namespace)
 				# If not, they will be kept private.
 			else:
@@ -327,8 +327,8 @@ class SymbolMap:
 
 		# Sanity check to ensure that all entries in the map are valid.
 		for fqn, entry in self.map.items():
+			_ = Group(entry["g"])
 			assert "e" in entry and entry["e"], f"Invalid element in the map: {entry}."
-			assert "g" in entry and Group(entry["g"]) in Group, f"Invalid group in the map: {entry}."
 			assert "p" in entry, f"Missing path in the map: {entry}."
 
 		# Mark as closed.
@@ -413,5 +413,5 @@ class SymbolMap:
 	def __repr__(self) -> str:
 		content = []
 		for key, data in {**self.map, **self.builtins}.items():
-			content.append("[{}] {}".format(data["g"], key))
+			content.append("[{}] {}".format(Group(data["g"]), key))
 		return "\n".join(content)
