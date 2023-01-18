@@ -181,6 +181,18 @@ protected:
 	return registry;
 }
 
+{% for executorFQN in executors %}
+
+[[maybe_unused]] void makeComms{{ executorFQN | fqnToCapitalized }}() noexcept
+{
+	// Definition of communication ring buffers for all the types used within this executor.
+	{% for connection in connections[executorFQN] %}
+	//bzd::threadsafe::RingBuffer<{{ connection.symbol | symbolToStr }}, {{ connection | connectionCount }}u> comm_{{ connection.input | symbolToNameStr }};
+	{% end %}
+}
+
+{% end %}
+
 /// Helper to handle return code.
 template <class Promise>
 [[nodiscard]] constexpr bzd::Bool verifyReturnedPromise(Promise&& promise, const bzd::StringView taskName) noexcept
@@ -234,7 +246,7 @@ template <> UInt32 Data<"{{ fqn }}">::id = {{ uid }}u;
 {% for executorFQN in executors %}
 
 /// Initialize and compose the application.
-bool {{ executorFQN | fqnToExecutionEntryPoint }}() noexcept
+bool run{{ executorFQN | fqnToCapitalized }}() noexcept
 {
 	// Create registry.
 	[[maybe_unused]] auto& registry = makeRegistry();
