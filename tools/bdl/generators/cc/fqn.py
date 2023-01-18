@@ -16,7 +16,6 @@ def fqnToNameStr(fqn: str) -> str:
 	return "_".join(split)
 
 
-def fqnToExecutionEntryPoint(fqn: str) -> str:
+def fqnToCapitalized(fqn: str) -> str:
 	split = FQN.toNamespace(fqn)
-	name = "".join([p.capitalize() for p in split])
-	return f"run{name}"
+	return "".join([p.capitalize() for p in split])

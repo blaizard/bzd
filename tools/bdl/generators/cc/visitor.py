@@ -13,7 +13,7 @@ from tools.bdl.entities.impl.types import Category
 from tools.bdl.generators.cc.symbol import symbolToStr as symbolToStrOriginal
 from tools.bdl.generators.cc.value import valueToStr as valueToStrOriginal
 from tools.bdl.generators.cc.comments import commentBlockToStr as commentBlockToStrOriginal, commentEmbeddedToStr as commentEmbeddedToStrOriginal, commentParametersResolvedToStr as commentParametersResolvedToStrOriginal
-from tools.bdl.generators.cc.fqn import fqnToStr as fqnToStrOriginal, fqnToAdapterStr as fqnToAdapterStrOriginal, fqnToNameStr as fqnToNameStrOriginal, fqnToExecutionEntryPoint as fqnToExecutionEntryPointOriginal
+from tools.bdl.generators.cc.fqn import fqnToStr as fqnToStrOriginal, fqnToAdapterStr as fqnToAdapterStrOriginal, fqnToNameStr as fqnToNameStrOriginal, fqnToCapitalized as fqnToCapitalizedOriginal
 """
 Use cases:
 
@@ -74,6 +74,11 @@ class Transform:
 
 	def symbolToStr(self, symbol: Symbol) -> str:
 		return symbolToStrOriginal(symbol=symbol)
+
+	def symbolToNameStr(self, symbol: Symbol) -> str:
+		split = symbol.fqn.split(";")
+		fqn = [split[0]] + [fqn.split(".")[-1] for fqn in split[1:]]
+		return fqnToNameStrOriginal(".".join(fqn))
 
 	def symbolReferenceToStr(self, symbol: Symbol) -> str:
 		return symbolToStrOriginal(symbol=symbol, reference=True, referenceForInterface=True)
@@ -190,9 +195,9 @@ class Transform:
 	def fqnToNameStr(self, fqn: str) -> str:
 		return fqnToNameStrOriginal(fqn=fqn)
 
-	def fqnToExecutionEntryPoint(self, fqn: str) -> str:
-		"""Convert the executor FQN into the function name that serves as entry point for the execution."""
-		return fqnToExecutionEntryPointOriginal(fqn=fqn)
+	def fqnToCapitalized(self, fqn: str) -> str:
+		"""Convert an FQN into a capitalized name."""
+		return fqnToCapitalizedOriginal(fqn=fqn)
 
 	# Async type
 
@@ -207,6 +212,13 @@ class Transform:
 		if expression.element.isAttr("key"):
 			return expression.element.getAttr("key").value
 		return ""
+
+	# Connection
+	def connectionCount(self, connection: typing.Any) -> int:
+		count = 1
+		for output in connection.get("outputs", []):
+			count = max(count, output.get("history", 1))
+		return count + 1
 
 
 def formatCc(bdl: Object, includes: typing.List[Path]) -> str:

@@ -143,14 +143,14 @@ public:
 
 		return {};
 	}
-	/*
-		/// Get the a scoped range of the next element available for writing.
-		/// If \b count is defined, it will return a scope with the specific number of element.
-		/// If not or null, all remaining elements will be returned in the range.
-		[[nodiscard]] constexpr auto asSpansForWriting(const bzd::Size count = 0u) noexcept
-		{
-		}
-	*/
+
+	/// Get the a scoped range of the next element available for writing.
+	/// If \b count is defined, it will return a scope with the specific number of element.
+	/// If not or null, all remaining elements will be returned in the range.
+	// [[nodiscard]] constexpr auto asSpansForWriting(const bzd::Size count = 0u) noexcept
+	// {
+	// }
+
 	/// Get the a scoped range of elements available for reading.
 	/// If \b count is defined, it will return a scope with the specific number of element,
 	/// starting from the \b first or last depending on the parameter value.

@@ -346,9 +346,7 @@ class Entities:
 	def getConnectionsByExecutor(self, fqn: str) -> typing.Iterable[Expression]:
 		for input, group in self.connections.groups.items():
 			if group.executor == fqn or any(metadata.executor == fqn for metadata in group.outputs.values()):
-				result = {"symbol": group.symbol, "outputs": []}
-				if group.executor == fqn:
-					result["input"] = {"symbol": input}
+				result = {"symbol": group.symbol, "input": input, "emitter": (group.executor == fqn), "outputs": []}
 				for output, metadata in group.outputs.items():
 					if metadata.executor == fqn:
 						result["outputs"].append({"symbol": output, "history": metadata.history})
