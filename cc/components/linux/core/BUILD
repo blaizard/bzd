@@ -22,10 +22,10 @@ cc_library(
         "//cc/bzd/container:optional",
         "//cc/bzd/container:stack",
         "//cc/bzd/core:error",
+        "//cc/bzd/core:print",
         "//cc/bzd/math:ceil",
         "//cc/bzd/utility:align_up",
         "//cc/components/posix:error",
         "//cc/libs/pthread",
-        "//cc/bzd/core:print"
     ],
 )

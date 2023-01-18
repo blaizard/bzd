@@ -4,11 +4,11 @@
 #include "cc/bzd/container/result.hh"
 #include "cc/bzd/container/stack.hh"
 #include "cc/bzd/core/error.hh"
+#include "cc/bzd/core/print.hh"
 #include "cc/bzd/math/ceil.hh"
 #include "cc/bzd/utility/align_up.hh"
 #include "cc/components/linux/core/interface.hh"
 #include "cc/components/posix/error.hh"
-#include "cc/bzd/core/print.hh"
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE // Needed for sched_setaffinity
 #endif

@@ -41,10 +41,15 @@ jobs:
         ./tools/bazel run tools/docker_images:xtensa_qemu
         ./tools/bazel test ... --output_groups=+metadata --config=esp32_xtensa_lx6_gcc --config=prod --config=cc --platform_suffix=esp32_xtensa_lx6_gcc_prod
 
-    - name: "[sanitizer] asan/lsan"
+    - name: "[sanitizer] asan/lsan/ubsan"
       run: |
         ./tools/bazel clean --expunge
-        ./tools/bazel test ... --config=linux_x86_64_clang --config=cc --config=sanitizer --config=asan --config=lsan --platform_suffix=clang_asan_lsan
+        ./tools/bazel test ... --config=linux_x86_64_clang --config=cc --config=sanitizer --config=asan --config=lsan --config=ubsan --platform_suffix=clang_asan_lsan_ubsan
+
+    - name: "[sanitizer] tsan"
+      run: |
+        ./tools/bazel clean --expunge
+        ./tools/bazel test ... --config=linux_x86_64_clang --config=cc --config=sanitizer --config=tsan --platform_suffix=clang_tsan
 
     - name: "[sanitizer] sanitizer"
       run: |
