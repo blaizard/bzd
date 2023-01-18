@@ -19,12 +19,16 @@ public:
 public:
 	bzd::Async<> lock() noexcept
 	{
-		while (acquired_.exchange(true))
+		while (!tryLock())
 		{
 			co_await bzd::async::yield();
 		}
 		co_return {};
 	}
+
+	/// Tries to lock the mutex. Returns immediately.
+	/// On successful lock acquisition returns true, otherwise returns false.
+	constexpr Bool tryLock() noexcept { return !acquired_.exchange(true); }
 
 	constexpr void unlock() noexcept { acquired_.store(false); }
 

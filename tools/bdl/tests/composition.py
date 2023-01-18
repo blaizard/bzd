@@ -100,6 +100,33 @@ class TestRun(unittest.TestCase):
 		composition = Composition()
 		composition.visit(bdl).process()
 
+	def testNestedComposition(self) -> None:
+
+		bdl = Object.fromContent(content="""
+			component World {
+			}
+			component Hello {
+			interface:
+				method run();
+			composition:
+				world = World();
+			}
+			component Executor { }
+			composition {
+				executor = Executor();
+				test1 = Hello();
+				test2 = Hello();
+				test1.run();
+				test2.run();
+			}
+			""",
+			objectContext=ObjectContext(resolve=True))
+
+		composition = Composition()
+		composition.visit(bdl).process()
+		composition.entity("test1.world")
+		composition.entity("test2.world")
+
 	def testConnections(self) -> None:
 
 		common = Object.fromContent(content="""

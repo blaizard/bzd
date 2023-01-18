@@ -5,6 +5,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":non_owning_forward_list",
+        ":ring_buffer",
     ],
 )
 
@@ -72,5 +73,23 @@ cc_library(
         "//cc/bzd/utility:ignore",
         "//cc/bzd/utility/synchronization:spin_mutex",
         "//cc/bzd/utility/synchronization:sync_lock_guard",
+    ],
+)
+
+cc_library(
+    name = "ring_buffer",
+    hdrs = [
+        "ring_buffer.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/container:optional",
+        "//cc/bzd/container:spans",
+        "//cc/bzd/container/range:associate_scope",
+        "//cc/bzd/container/storage:fixed",
+        "//cc/bzd/core/assert:minimal",
+        "//cc/bzd/platform:atomic",
+        "//cc/bzd/utility:scope_guard",
+        "//cc/bzd/utility/synchronization:spin_shared_mutex",
     ],
 )

@@ -306,7 +306,7 @@ class Parser(ParserBase):
 		super().__init__(content,
 			grammar=makeGrammarNamespace() + makeGrammarUse() + makeGrammarExtern() + withinNested +
 			makeGrammarNested(withinNested, name="component", nested={"interface", "config", "composition"}) +
-			makeGrammarNested(withinNested, name="interface", defaultNested="interface", nested={"interface",
-			"config"}) + makeGrammarNested(withinNested, name="composition", defaultNested="composition") +
+			makeGrammarNested(withinNested, name="interface", defaultNested="interface") +
+			makeGrammarNested(withinNested, name="composition", defaultNested="composition") +
 			makeGrammarNested(withinNested, name="struct", defaultNested="interface"),
 			defaultGrammarPre=[GrammarItemSpaces] + _grammarComments)

@@ -9,6 +9,7 @@ cc_library(
     deps = [
         ":view_interface",
         "//cc/bzd/container:tuple",
+        "//cc/bzd/type_traits:is_rvalue_reference",
         "//cc/bzd/utility:begin",
         "//cc/bzd/utility:end",
     ],
