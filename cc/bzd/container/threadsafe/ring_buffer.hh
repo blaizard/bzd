@@ -38,7 +38,7 @@ public: // Types.
 		Self& operator=(const Self&) = delete;
 		Self& operator=(Self&&) = delete;
 		constexpr ScopeOptional(Self&& other) noexcept :
-			ScopeOptional{bzd::move(other)}, mutex_{other.mutex_}, shared_{other.shared_}, counter_{other.counter_}
+			bzd::Optional<U>{bzd::move(other)}, mutex_{other.mutex_}, shared_{other.shared_}, counter_{other.counter_}
 		{
 			other.mutex_ = nullptr;
 			other.counter_ = nullptr;
