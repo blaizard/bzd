@@ -115,7 +115,7 @@ TEST(RingBuffer, Basic)
 		}
 	}
 
-    for (bzd::Int8 i = 15; i<30; ++i)
+	for (bzd::Int8 i = 15; i < 30; ++i)
 	{
 		auto scope = container.nextForWriting();
 		ASSERT_TRUE(scope);
