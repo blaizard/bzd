@@ -68,9 +68,21 @@
         {
             "category": "sanitizer",
             "commands": [
-                "./tools/bazel test ... --config=linux_x86_64_clang --config=cc --config=sanitizer --config=asan --config=lsan --platform_suffix=clang_asan_lsan"
+                "./tools/bazel test ... --config=linux_x86_64_clang --config=cc --config=sanitizer --config=asan --config=lsan --config=ubsan --platform_suffix=clang_asan_lsan_ubsan"
             ],
-            "name": "asan/lsan",
+            "name": "asan/lsan/ubsan",
+            "tags": [
+                "x86_64",
+                "clang",
+                "static_analyzer"
+            ]
+        },
+        {
+            "category": "sanitizer",
+            "commands": [
+                "./tools/bazel test ... --config=linux_x86_64_clang --config=cc --config=sanitizer --config=tsan --platform_suffix=clang_tsan"
+            ],
+            "name": "tsan",
             "tags": [
                 "x86_64",
                 "clang",

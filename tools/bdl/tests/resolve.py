@@ -29,7 +29,7 @@ class TestRun(unittest.TestCase):
 				objectContext=ObjectContext(resolve=True))
 
 		Object.fromContent(content="""
-				interface Test { config: value = Integer; }
+				component Test { config: value = Integer; }
 				using MyType = Test;
 				struct temp {
 					var = MyType(value=1);
@@ -39,7 +39,7 @@ class TestRun(unittest.TestCase):
 
 		with self.assertRaisesRegex(Exception, r"expects an integer"):
 			Object.fromContent(content="""
-				interface Test { config: value = Integer; }
+				component Test { config: value = Integer; }
 				using MyType = Test [integer];
 				struct temp {
 					var = MyType(value=1);
@@ -274,14 +274,14 @@ class TestRun(unittest.TestCase):
 	def testValues(self) -> None:
 
 		bdl = Object.fromContent(content="""
-				interface Test { config: value = Integer; }
+				component Test { config: value = Integer; }
 				composition MyComposition { val1 = Test(value=12); }
 				""",
 			objectContext=ObjectContext(resolve=True, composition=True))
 		self.assertTrue(bdl.entity("MyComposition.val1").isRValue)
 
 		bdl = Object.fromContent(content="""
-					interface Test { config: value = Integer; }
+					component Test { config: value = Integer; }
 					composition MyComposition { val1 = Test(12); }
 					""",
 			objectContext=ObjectContext(resolve=True, composition=True))
@@ -290,7 +290,7 @@ class TestRun(unittest.TestCase):
 		# Mispelled value key
 		with self.assertRaisesRegex(Exception, r"not expected"):
 			Object.fromContent(content="""
-				interface Test { config: value = Integer; }
+				component Test { config: value = Integer; }
 				composition MyComposition { val1 = Test(vaue=1); }
 				""",
 				objectContext=ObjectContext(resolve=True, composition=True))
@@ -298,14 +298,14 @@ class TestRun(unittest.TestCase):
 		# Multiple arguments
 		with self.assertRaisesRegex(Exception, r"integer"):
 			Object.fromContent(content="""
-				interface Test { config: value = Integer; }
+				component Test { config: value = Integer; }
 				composition MyComposition { val1 = Test(value="dsdsd"); }
 				""",
 				objectContext=ObjectContext(resolve=True, composition=True))
 
 		with self.assertRaisesRegex(Exception, r"Symbol.*resolved"):
 			Object.fromContent(content="""
-				interface Test { config: value = Callable; }
+				component Test { config: value = Callable; }
 				composition MyComposition { val2 = Test(value=val1); }
 				""",
 				objectContext=ObjectContext(resolve=True, composition=True))
@@ -317,7 +317,7 @@ class TestRun(unittest.TestCase):
 				objectContext=ObjectContext(resolve=True, composition=True))
 
 		bdl = Object.fromContent(content="""
-			interface Test { config: value = Integer; }
+			component Test { config: value = Integer; }
 			composition MyComposition { val1 = Integer(32); val2 = Test(value=val1); }
 			""",
 			objectContext=ObjectContext(resolve=True, composition=True))
@@ -328,14 +328,14 @@ class TestRun(unittest.TestCase):
 		# Variable arguments
 		with self.assertRaisesRegex(Exception, r"Variable arguments.*end"):
 			Object.fromContent(content="""
-					interface Test { config: multi... = Integer; i = Integer; }
+					component Test { config: multi... = Integer; i = Integer; }
 					composition MyComposition { val1 = Test(12); }
 					""",
 				objectContext=ObjectContext(resolve=True, composition=True))
 
 		# Value with no argument
 		bdl = Object.fromContent(content="""
-				interface Test { config: a = Vector<Integer>(); }
+				component Test { config: a = Vector<Integer>(); }
 				composition { val1 = Test(); }
 				""",
 			objectContext=ObjectContext(resolve=True, composition=True))
@@ -343,7 +343,7 @@ class TestRun(unittest.TestCase):
 
 		bdl = Object.fromContent(content="""
 				using MyInteger3 = Integer;
-				interface Test { config: value = MyInteger3(20) [min(10) max(32)]; }
+				component Test { config: value = MyInteger3(20) [min(10) max(32)]; }
 				composition MyComposition { val1 = Test(); }
 				""",
 			objectContext=ObjectContext(resolve=True, composition=True))
@@ -354,20 +354,20 @@ class TestRun(unittest.TestCase):
 		# Mandatory template.
 		with self.assertRaisesRegex(Exception, r"mandatory"):
 			Object.fromContent(content="""
-				interface Test { config: using Type = Integer [mandatory]; }
+				component Test { config: using Type = Integer [mandatory]; }
 				composition MyComposition { val1 = Test; }
 				""",
 				objectContext=ObjectContext(resolve=True, composition=True))
 
 		with self.assertRaisesRegex(Exception, r"type"):
 			Object.fromContent(content="""
-				interface Test { config: using Value = Integer; }
+				component Test { config: using Value = Integer; }
 				composition MyComposition { val1 = Test<12>; }
 				""",
 				objectContext=ObjectContext(resolve=True, composition=True))
 
 		bdl = Object.fromContent(content="""
-			interface Test { config: using Type = Void; }
+			component Test { config: using Type = Void; }
 			composition MyComposition { val1 = Test<Void>; }
 			""",
 			objectContext=ObjectContext(resolve=True, composition=True))
@@ -375,20 +375,20 @@ class TestRun(unittest.TestCase):
 
 		with self.assertRaisesRegex(Exception, r"lower than"):
 			Object.fromContent(content="""
-			interface Test { config: value = Integer [min(10)]; }
+			component Test { config: value = Integer [min(10)]; }
 			composition MyComposition { val1 = Test(2); }
 			""",
 				objectContext=ObjectContext(resolve=True, composition=True))
 
 		with self.assertRaisesRegex(Exception, r"higher than"):
 			Object.fromContent(content="""
-			interface Test { config: value = Integer [max(10)]; }
+			component Test { config: value = Integer [max(10)]; }
 			composition MyComposition { val1 = Test(20); }
 			""",
 				objectContext=ObjectContext(resolve=True, composition=True))
 
 		bdl = Object.fromContent(content="""
-			interface Test { config: value = Integer(15) [min(10) max(32)]; }
+			component Test { config: value = Integer(15) [min(10) max(32)]; }
 			composition MyComposition { val1 = Test(23); }
 			""",
 			objectContext=ObjectContext(resolve=True, composition=True))
@@ -396,14 +396,14 @@ class TestRun(unittest.TestCase):
 
 		with self.assertRaisesRegex(Exception, r"mandatory"):
 			Object.fromContent(content="""
-				interface Test { config: value1 = Integer [min(10) max(32)]; valuw2 = [mandatory]; }
+				component Test { config: value1 = Integer [min(10) max(32)]; valuw2 = [mandatory]; }
 				composition MyComposition { val1 = Test(23); }
 				""",
 				objectContext=ObjectContext(resolve=True, composition=True))
 
 		with self.assertRaisesRegex(Exception, r"lower.*minimum"):
 			Object.fromContent(content="""
-				interface Test { config: value = Integer [min(10) max(32)]; }
+				component Test { config: value = Integer [min(10) max(32)]; }
 				composition MyComposition { val1 = Integer(1); val2 = Test(value = val1); }
 				""",
 				objectContext=ObjectContext(resolve=True, composition=True))
@@ -411,7 +411,7 @@ class TestRun(unittest.TestCase):
 		with self.assertRaisesRegex(Exception, r"lower.*minimum"):
 			Object.fromContent(content="""
 				using MyInteger = Integer;
-				interface Test { config: value = MyInteger [min(10) max(32)]; }
+				component Test { config: value = MyInteger [min(10) max(32)]; }
 				composition MyComposition { val1 = MyInteger(1); val2 = Test(value = val1); }
 				""",
 				objectContext=ObjectContext(resolve=True, composition=True))
@@ -420,21 +420,21 @@ class TestRun(unittest.TestCase):
 				using MyInteger1 = Integer;
 				using MyInteger2 = MyInteger1;
 				using MyInteger3 = MyInteger2;
-				interface Test { config: value = MyInteger3(20) [min(10) max(32)]; }
+				component Test { config: value = MyInteger3(20) [min(10) max(32)]; }
 				composition MyComposition { val1 = Test(); }
 				""",
 			objectContext=ObjectContext(resolve=True, composition=True))
 		self.assertTrue(bdl.entity("MyComposition.val1").isRValue)
 
 		bdl = Object.fromContent(content="""
-				interface Test { config: val1 = Integer(23); val2 = Integer;}
+				component Test { config: val1 = Integer(23); val2 = Integer;}
 				composition MyComposition { value = Test(val2 = 3); }
 				""",
 			objectContext=ObjectContext(resolve=True, composition=True))
 		self.assertTrue(bdl.entity("MyComposition.value").isRValue)
 
 		bdl = Object.fromContent(content="""
-				interface Test { config: value = Integer; }
+				component Test { config: value = Integer; }
 				composition MyComposition { val1 = Test(value=Integer(12)); }
 				""",
 			objectContext=ObjectContext(resolve=True, composition=True))
@@ -450,7 +450,7 @@ class TestRun(unittest.TestCase):
 
 		with self.assertRaisesRegex(Exception, r"Missing.*mandatory"):
 			Object.fromContent(content="""
-				interface Test { config: value = Integer [mandatory]; }
+				component Test { config: value = Integer [mandatory]; }
 				composition MyComposition {
 					val1 = Test;
 				}
@@ -459,13 +459,13 @@ class TestRun(unittest.TestCase):
 
 		with self.assertRaisesRegex(Exception, r"lower.*minimum"):
 			Object.fromContent(content="""
-				interface Test { config: value = Integer(1) [min(10) max(32)]; }
+				component Test { config: value = Integer(1) [min(10) max(32)]; }
 				composition MyComposition { val1 = Test; }
 				""",
 				objectContext=ObjectContext(resolve=True, composition=True))
 
 		bdl = Object.fromContent(content="""
-				interface Test { config: value = Vector<Integer>; }
+				component Test { config: value = Vector<Integer>; }
 				composition MyComposition {
 					value1 = Integer(1);
 					value2 = 2;
@@ -483,7 +483,7 @@ class TestRun(unittest.TestCase):
 
 	def testInstanceWithParameters(self) -> None:
 		Object.fromContent(content="""
-				interface Test { config: value = Integer; }
+				component Test { config: value = Integer; }
 				composition MyComposition
 				{
 					val1 = Test(value = 23);
@@ -493,7 +493,7 @@ class TestRun(unittest.TestCase):
 			objectContext=ObjectContext(resolve=True, composition=True))
 
 		bdl = Object.fromContent(content="""
-				interface Test { config: using hello = Integer; }
+				component Test { config: using hello = Integer; }
 				composition MyComposition
 				{
 					val1 = Test<Float>();
@@ -503,7 +503,7 @@ class TestRun(unittest.TestCase):
 		self.assertTrue(bdl.entity("MyComposition.val1").isRValue)
 
 		bdl = Object.fromContent(content="""
-				interface Test { config: value = Integer; }
+				component Test { config: value = Integer; }
 				component MyComponent : Test { config: hello = Integer; }
 				composition MyComposition
 				{

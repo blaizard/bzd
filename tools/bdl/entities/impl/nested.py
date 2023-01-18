@@ -85,7 +85,7 @@ class Nested(Entity):
 				self.assertTrue(condition=nestedCategory == Category.interface,
 					message=f"An interface can only inherits from another interface, not '{nestedCategory}'.")
 			elif self.category == Category.component:
-				self.assertTrue(condition=nestedCategory == Category.interface,
+				self.assertTrue(condition=nestedCategory in {Category.interface, Category.component},
 					message=f"A component can only inherits from interface(s), not '{nestedCategory}'.")
 			else:
 				self.error(message=f"Unsupported inheritance for type: '{self.category}'.")

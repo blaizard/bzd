@@ -19,32 +19,50 @@ public: // Constructors/assignments.
 	SpinSharedMutex& operator=(SpinSharedMutex&&) noexcept = delete;
 
 public: // API.
-	// Locks the mutex, blocks if the mutex is not available.
+	/// Locks the mutex, blocks if the mutex is not available.
 	constexpr void lock() noexcept
 	{
-		UInt32 expected;
-		do
-		{
-			expected = 0;
-		} while (!lock_.compareExchange(expected, 1, MemoryOrder::acquire));
+		while (tryLock())
+			;
 	}
 
-	// Unlocks the mutex.
-	constexpr void unlock() noexcept { lock_.store(0, MemoryOrder::release); }
+	/// Tries to lock the mutex. Returns immediately.
+	/// On successful lock acquisition returns true, otherwise returns false.
+	constexpr Bool tryLock() noexcept
+	{
+		UInt32 expected{0u};
+		return lock_.compareExchange(expected, 1u, MemoryOrder::acquire);
+	}
+
+	/// Unlocks the mutex.
+	constexpr void unlock() noexcept { lock_.store(0u, MemoryOrder::release); }
 
 	constexpr void lockShared() noexcept
+	{
+		while (tryLockShared())
+			;
+	}
+
+	/// Tries to lock the mutex. Returns immediately.
+	/// On successful lock acquisition returns true, otherwise returns false.
+	constexpr Bool tryLockShared() noexcept
 	{
 		UInt32 expected;
 		do
 		{
 			expected = lock_.load(MemoryOrder::relaxed) & 0xffff0000;
-		} while (!lock_.compareExchange(expected, expected + 0x10000, MemoryOrder::acquire));
+			if (lock_.compareExchange(expected, expected + 0x10000, MemoryOrder::acquire))
+			{
+				return true;
+			}
+		} while (expected != 1u);
+		return false;
 	}
 
 	// Unlocks the shared mutex.
 	constexpr void unlockShared() noexcept { lock_ -= 0x10000; }
 
 private:
-	Atomic<UInt32> lock_{0};
+	Atomic<UInt32> lock_{0u};
 };
 } // namespace bzd

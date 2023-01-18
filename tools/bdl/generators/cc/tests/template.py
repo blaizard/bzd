@@ -18,10 +18,12 @@ class TestRun(unittest.TestCase):
 				var = Integer(1);
 			}
 			interface MyInterface {
+			}
+			component MyComponentParent {
 			config:
 				var = Integer(1);
 			}
-			component MyComponent : MyInterface {
+			component MyComponent : MyComponentParent {
 			config:
 				using T = Any;
 			}

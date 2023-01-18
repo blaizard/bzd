@@ -8,7 +8,7 @@
 #include "cc/bzd/utility/align_up.hh"
 #include "cc/components/linux/core/interface.hh"
 #include "cc/components/posix/error.hh"
-
+#include "cc/bzd/core/print.hh"
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE // Needed for sched_setaffinity
 #endif
@@ -130,10 +130,10 @@ private:
 	{
 		auto linux = reinterpret_cast<Self*>(object);
 		auto& workload = linux->workload_.value();
-		::std::cout << "Workload Wrapper Enter" << ::std::endl;
+		bzd::print("Workload Wrapper Enter\n"_csv).sync();
 		workload(*linux);
-		::std::cout << "Workload Wrapper Exit" << ::std::endl;
-		::std::cout << "Stack usage: " << linux->getStackUsage() << " / " << linux->stack_->size() << ::std::endl;
+		bzd::print("Workload Wrapper Exit\n"_csv).sync();
+		bzd::print("Stack usage: {:} / {:}\n"_csv, linux->getStackUsage(), linux->stack_->size()).sync();
 
 		return nullptr;
 	}

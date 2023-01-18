@@ -18,9 +18,13 @@ public: // Constructors/assignments.
 public: // API.
 	constexpr void lock() noexcept
 	{
-		while (lock_.exchange(true, MemoryOrder::acquire))
+		while (!tryLock())
 			;
 	}
+
+	/// Tries to lock the mutex. Returns immediately.
+	/// On successful lock acquisition returns true, otherwise returns false.
+	constexpr Bool tryLock() noexcept { return !lock_.exchange(true, MemoryOrder::acquire); }
 
 	constexpr void unlock() noexcept { lock_.store(false, MemoryOrder::release); }
 

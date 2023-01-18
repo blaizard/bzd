@@ -26,5 +26,6 @@ cc_library(
         "//cc/bzd/utility:align_up",
         "//cc/components/posix:error",
         "//cc/libs/pthread",
+        "//cc/bzd/core:print"
     ],
 )

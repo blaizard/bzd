@@ -49,3 +49,14 @@ bzd_cc_test(
         "//cc/bzd/test:exec_point",
     ],
 )
+
+bzd_cc_test(
+    name = "ring_buffer",
+    srcs = [
+        "ring_buffer.cc",
+    ],
+    deps = [
+        "//cc/bzd/container/threadsafe:ring_buffer",
+        "//cc/bzd/test",
+    ],
+)
