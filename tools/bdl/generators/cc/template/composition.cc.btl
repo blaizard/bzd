@@ -140,6 +140,10 @@ public:
 	{% end %}
 	};
 
+	struct Comms
+	{
+	};
+
 protected:
 	bzd::Async<> init([[maybe_unused]] auto& registry) noexcept
 	{
