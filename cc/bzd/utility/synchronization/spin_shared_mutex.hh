@@ -22,7 +22,7 @@ public: // API.
 	/// Locks the mutex, blocks if the mutex is not available.
 	constexpr void lock() noexcept
 	{
-		while (tryLock())
+		while (!tryLock())
 			;
 	}
 
@@ -31,7 +31,7 @@ public: // API.
 	constexpr Bool tryLock() noexcept
 	{
 		UInt32 expected{0u};
-		return lock_.compareExchange(expected, 1u, MemoryOrder::acquire);
+		return lock_.compareExchange(expected, lockValue, MemoryOrder::acquire);
 	}
 
 	/// Unlocks the mutex.
@@ -39,7 +39,7 @@ public: // API.
 
 	constexpr void lockShared() noexcept
 	{
-		while (tryLockShared())
+		while (!tryLockShared())
 			;
 	}
 
@@ -50,19 +50,21 @@ public: // API.
 		UInt32 expected;
 		do
 		{
-			expected = lock_.load(MemoryOrder::relaxed) & 0xffff0000;
-			if (lock_.compareExchange(expected, expected + 0x10000, MemoryOrder::acquire))
+			expected = lock_.load(MemoryOrder::relaxed) & lockSharedMask;
+			if (lock_.compareExchange(expected, expected + 1u, MemoryOrder::acquire))
 			{
 				return true;
 			}
-		} while (expected != 1u);
+		} while ((expected & lockValue) != lockValue);
 		return false;
 	}
 
 	// Unlocks the shared mutex.
-	constexpr void unlockShared() noexcept { lock_ -= 0x10000; }
+	constexpr void unlockShared() noexcept { --lock_; }
 
 private:
+	static constexpr UInt32 lockValue = 0x80000000;
+	static constexpr UInt32 lockSharedMask = 0x7fffffff;
 	Atomic<UInt32> lock_{0u};
 };
 } // namespace bzd

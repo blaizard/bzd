@@ -61,10 +61,18 @@ public:
 
 	// Getter for the latest input value.
 	// input = const Integer;
-	// bzd::Async<Object<bzd::Int32>> input() { return config_.comms<"example.Hello.input">.get(); }
-	// bzd::Async<> input(const bzd::Int32 value) { return config_.comms<"example.Hello.input">.set(value); }
+	// bzd::Async<Object<bzd::Int32>> input() { return context_.comms.input.get(); }
+	// bzd::Async<> input(const bzd::Int32 value) { return config_.comms<"example.hello.input">.set(value); }
 
 	// Object is a RAII object that is kept alive until the value is needed.
+	/*
+	context_ = {
+		comms {
+			//bzd::coms::Writer<bzd::Int32>
+			bzd::threadsafe::interface::RingBuffer<bzd::Int32>& input = makeCommsExecutor().comms_example_hello_input;
+		}
+	}
+	*/
 };
 
 class World
