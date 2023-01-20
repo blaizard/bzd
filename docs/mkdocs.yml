@@ -1,0 +1,31 @@
+site_name: Documentation
+docs_dir: ../
+use_directory_urls: false
+repo_name: "bzd"
+repo_url: "https://github.com/blaizard/bzd"
+
+nav:
+  - Home: README.md
+  - Components: docs/components.md
+  - Bazel:
+    - nodejs: docs/api/bazel/nodejs.md
+    - nodejs_web: docs/api/bazel/nodejs_web.md
+    - package: docs/api/bazel/package.md
+
+theme:
+  name: material
+  highlightjs: true
+  hljs_languages:
+    - C++
+    - python
+    - JavaScript
+  palette:
+    primary: "blue grey"
+    accent: "light blue"
+
+plugins:
+  - exclude:
+      glob:
+        - bazel-out/*
+        - external/*
+        - tools/documentation/*
