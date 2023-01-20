@@ -8,7 +8,7 @@ class Steady : public bzd::Clock
 {
 public:
 	template <class Context>
-	constexpr Steady(const Context&) noexcept
+	constexpr Steady(Context&) noexcept
 	{
 	}
 

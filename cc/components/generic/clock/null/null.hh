@@ -8,7 +8,7 @@ class Null : public bzd::Clock
 {
 public:
 	template <class Context>
-	constexpr explicit Null(const Context&) noexcept
+	constexpr explicit Null(Context&) noexcept
 	{
 	}
 

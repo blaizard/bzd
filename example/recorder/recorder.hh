@@ -75,15 +75,14 @@ template <class Context>
 class Hello
 {
 public:
-	constexpr explicit Hello(Context& context) noexcept : context_{context}
-	{
-	}
+	constexpr explicit Hello(Context& context) noexcept : context_{context} {}
 
 	bzd::Async<> run()
 	{
 		{
 			auto maybeScope = context_.io.send.set();
-			if (maybeScope) {
+			if (maybeScope)
+			{
 				maybeScope.valueMutable() = 12.4;
 			}
 		}
@@ -120,7 +119,7 @@ class World
 {
 public:
 	template <class Context>
-	constexpr explicit World(const Context&) noexcept
+	constexpr explicit World(Context&) noexcept
 	{
 	}
 };

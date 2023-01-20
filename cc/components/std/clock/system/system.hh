@@ -8,7 +8,7 @@ class System : public bzd::Clock
 {
 public:
 	template <class Context>
-	constexpr System(const Context&) noexcept
+	constexpr System(Context&) noexcept
 	{
 	}
 

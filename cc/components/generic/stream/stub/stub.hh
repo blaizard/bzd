@@ -7,7 +7,7 @@ class Stub : public bzd::IOStream
 {
 public:
 	template <class Context>
-	constexpr explicit Stub(const Context&) noexcept
+	constexpr explicit Stub(Context&) noexcept
 	{
 	}
 
