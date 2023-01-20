@@ -15,6 +15,24 @@ private: // Types.
 
 	public:
 		constexpr auto set() noexcept { return ring_.nextForWriting(); }
+		constexpr bzd::Bool set(const T& value) noexcept
+        {
+            if (auto maybeWriter = set(); maybeWriter)
+            {
+                maybeWriter.valueMutable() = value;
+                return true;
+            }
+            return false;
+        }
+		constexpr bzd::Bool set(T&& value) noexcept
+        {
+            if (auto maybeWriter = set(); maybeWriter)
+            {
+                maybeWriter.valueMutable() = bzd::move(value);
+                return true;
+            }
+            return false;
+        }
 
 	private:
 		bzd::threadsafe::RingBuffer<T, capacity>& ring_;

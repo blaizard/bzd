@@ -79,13 +79,7 @@ public:
 
 	bzd::Async<> run()
 	{
-		{
-			auto maybeScope = context_.io.send.set();
-			if (maybeScope)
-			{
-				maybeScope.valueMutable() = 12.4;
-			}
-		}
+		context_.io.send.set(12.4);
 
 		/*co_await !bzd::print("Hello {}"_csv, bzd::Data<"example.Hello.send">::id);
 
