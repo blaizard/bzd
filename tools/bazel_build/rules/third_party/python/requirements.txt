@@ -5,3 +5,6 @@ gitignore_parser
 toml
 typed-ast
 pyserial
+mkdocs
+mkdocs-material
+mkdocs-exclude
