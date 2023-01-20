@@ -35,8 +35,12 @@ TEST_ASYNC(Tcp, Client)
 	{
 		bzd::platform::posix::sync::Proactor proactor{};
 	};
-	Config config{};
-	bzd::platform::posix::network::tcp::Client client{config};
+	struct Context
+	{
+		Config config{};
+	};
+	Context context{};
+	bzd::platform::posix::network::tcp::Client client{context};
 	[[maybe_unused]] auto stream = co_await client.connect("google.com", 80);
 	co_return {};
 }
