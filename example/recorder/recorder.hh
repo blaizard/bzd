@@ -67,8 +67,9 @@ public:
 	// Object is a RAII object that is kept alive until the value is needed.
 	/*
 	context_ = {
+		template <class T0>
 		comms {
-			//bzd::coms::Writer<bzd::Int32>
+			bzd::io::Writer<bzd::Int32> input = io_example_hello_input.makeWriter();
 			bzd::threadsafe::interface::RingBuffer<bzd::Int32>& input = makeCommsExecutor().comms_example_hello_input;
 		}
 	}

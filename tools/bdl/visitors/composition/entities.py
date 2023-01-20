@@ -343,6 +343,28 @@ class Entities:
 		"""List all services."""
 		return [e for e in self.expressions if EntryType.service in e.entryType]
 
+	@cached_property
+	def registryConnections(self) -> typing.Dict[str, typing.Dict[str, typing.Any]]:
+
+		result = {fqn: OrderedDict() for fqn in self.registry.keys()}
+
+		def addEntry(symbol: Symbol, kind: str, input: Symbol) -> None:
+			fqn = symbol.this
+			name = symbol.propertyName
+			symbol.assertTrue(condition=fqn in self.registry, message=f"The instance of one of the connection to '{str(symbol)}', namely '{fqn}', is not present in the registry.")
+			symbol.assertTrue(condition=name not in result[fqn], message=f"The property named '{name}' is connected twice.")
+			result[fqn][name] = {
+				"type": kind,
+				"input": input
+			}
+
+		for input, group in self.connections.groups.items():
+			addEntry(symbol=input, kind="writer", input=input)
+			for output, metadata in group.outputs.items():
+				addEntry(symbol=output, kind="reader", input=input)
+	
+		return result
+
 	def getConnectionsByExecutor(self, fqn: str) -> typing.Iterable[Expression]:
 		for input, group in self.connections.groups.items():
 			if group.executor == fqn or any(metadata.executor == fqn for metadata in group.outputs.values()):
@@ -353,6 +375,13 @@ class Entities:
 				yield result
 
 		return [entry.expression for entry in self.workloads if fqn in entry.executors]
+
+	def getRegistryByExecutor(self, fqn: str) -> typing.Dict[str, Expression]:
+		registry = OrderedDict()
+		for entry in self.expressions:
+			if EntryType.registry in entry.entryType and fqn in entry.executors:
+				registry[entry.expression.fqn] = entry.expression
+		return registry
 
 	def getWorkloadsByExecutor(self, fqn: str) -> typing.Iterable[Expression]:
 		return [entry.expression for entry in self.workloads if fqn in entry.executors]

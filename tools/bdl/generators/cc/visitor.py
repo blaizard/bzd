@@ -220,6 +220,37 @@ class Transform:
 			count = max(count, output.get("history", 1))
 		return count + 1
 
+	def registryConnectionsDeclaration(self, connections: typing.Any) -> str:
+		args = []
+		factoryTypes = {
+			"reader": "makeReader()",
+			"writer": "makeWriter()"
+		}
+		for name, connection in connections.items():
+			symbolName = "io_buffer_" + self.symbolToNameStr(connection["input"])
+			factory = factoryTypes[connection["type"]]
+			args.append(f"/*{name}*/{symbolName}.{factory}")
+		return ", ".join(args)
+
+	# Generic iterable
+
+	def iterableConstructorDefinitionRValue(self, name: str, it: typing.Iterable[str]) -> str:
+		args = []
+		assigns = []
+		for index, variableName in enumerate(it):
+			args.append(f"T{index}&& {variableName}_")
+			assigns.append(f"{variableName}{{bzd::move({variableName}_)}}")
+		if not args:
+			return f"{name}() noexcept = default;"
+		return f"constexpr {name}({', '.join(args)}) noexcept : {', '.join(assigns)} {{}}"
+
+	def iterableTemplateDefinition(self, it: typing.Iterable[typing.Any]) -> str:
+		args = []
+		for index, item in enumerate(it):
+			args.append(f"class T{index}")
+		if not args:
+			return ""
+		return f"template <{', '.join(args)}>"
 
 def formatCc(bdl: Object, includes: typing.List[Path]) -> str:
 

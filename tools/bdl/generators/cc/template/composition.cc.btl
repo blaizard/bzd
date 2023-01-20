@@ -23,6 +23,7 @@ co_await !registry.{{ dep.fqn | fqnToNameStr }}_.shutdown(registry);
 
 #include "cc/bzd/core/logger.hh"
 #include "cc/bzd/core/assert.hh"
+#include "cc/bzd/core/io/buffer.hh"
 #include "cc/bzd/platform/clock.hh"
 #include "cc/bzd/platform/stream.hh"
 #include "cc/bzd/platform/atomic.hh"
@@ -140,8 +141,13 @@ public:
 	{% end %}
 	};
 
-	struct Comms
+	{{ iterableTemplateDefinition(registryConnections[fqn].keys()) }}
+	struct IO
 	{
+		{{ iterableConstructorDefinitionRValue("IO", registryConnections[fqn].keys()) }}
+	{% for index, name in registryConnections[fqn].keys() %}
+		T{{ index }} {{ name }};
+	{% end %}
 	};
 
 protected:
@@ -166,33 +172,31 @@ protected:
 
 // ==== Registry ==============================================================
 
-[[nodiscard]] auto& makeRegistry() noexcept
+{% for executorFQN in executors %}
+
+[[nodiscard]] auto& makeRegistry{{ executorFQN | fqnToCapitalized }}() noexcept
 {
+	// Definition of communication ring buffers.
+	{% for connection in connections[executorFQN] %}
+	bzd::io::Buffer<{{ connection.symbol | symbolToStr }}, {{ connection | connectionCount }}u> io_buffer_{{ connection.input | symbolToNameStr }};
+	{% end %}
+
 	// Definition of all registry entries and their configuration.
-	{% for fqn, expression in registry %}
+	{% for fqn, expression in registryByExecutor[executorFQN] %}
 	static const ResourceSpecialization<"{{ fqn }}">::Config config_{{ fqn | fqnToNameStr }}{ {{- paramsDeclaration(expression.parametersResolved | paramsFilterOutLiterals) -}} };
+	[[maybe_unused]] static const ResourceSpecialization<"{{ fqn }}">::IO io_{{ fqn | fqnToNameStr }}{ {{- registryConnectionsDeclaration(registryConnections[fqn]) -}} };
 	static {{ expression.typeResolved | symbolDefinitionToStr }} {{ fqn | fqnToNameStr }}{config_{{ fqn | fqnToNameStr }}};
 	{% end %}
 
 	// Declaration of the registry.
 	struct Registry
 	{
-		{% for fqn, expression in registry %}
+		{% for fqn, expression in registryByExecutor[executorFQN] %}
 		Resource<"{{ fqn }}", decltype({{ fqn | fqnToNameStr }})> {{ fqn | fqnToNameStr }}_;
 		{% end %}
 	};
-	static Registry registry{ {%- for fqn, expression in registry %}{% if not loop.first %}, {% end %}{{ fqn | fqnToNameStr }}{% end -%} };
+	static Registry registry{ {%- for fqn, expression in registryByExecutor[executorFQN] %}{% if not loop.first %}, {% end %}{{ fqn | fqnToNameStr }}{% end -%} };
 	return registry;
-}
-
-{% for executorFQN in executors %}
-
-[[maybe_unused]] void makeComms{{ executorFQN | fqnToCapitalized }}() noexcept
-{
-	// Definition of communication ring buffers for all the types used within this executor.
-	{% for connection in connections[executorFQN] %}
-	//bzd::threadsafe::RingBuffer<{{ connection.symbol | symbolToStr }}, {{ connection | connectionCount }}u> comm_{{ connection.input | symbolToNameStr }};
-	{% end %}
 }
 
 {% end %}
@@ -253,7 +257,7 @@ template <> UInt32 Data<"{{ fqn }}">::id = {{ uid }}u;
 bool run{{ executorFQN | fqnToCapitalized }}() noexcept
 {
 	// Create registry.
-	[[maybe_unused]] auto& registry = makeRegistry();
+	[[maybe_unused]] auto& registry = makeRegistry{{ executorFQN | fqnToCapitalized }}();
 
 	// Initialize platform.
 	bzd::ignore = initPlatform(registry).sync();
