@@ -7,8 +7,8 @@ namespace bzd::platform::std::clock {
 class Steady : public bzd::Clock
 {
 public:
-	template <class Config>
-	constexpr Steady(const Config&) noexcept
+	template <class Context>
+	constexpr Steady(const Context&) noexcept
 	{
 	}
 

@@ -10,14 +10,14 @@
 
 namespace bzd::platform::posix::network::tcp {
 
-template <class Config>
-class Client : public bzd::platform::network::tcp::Client<Client<Config>>
+template <class Context>
+class Client : public bzd::platform::network::tcp::Client<Client<Context>>
 {
 public:
 	using Stream = typename bzd::platform::network::tcp::ClientTraits<Client>::Stream;
 
 public:
-	explicit Client(Config& config) : config_{config} {}
+	explicit Client(Context& context) : context_{context} {}
 
 	bzd::Async<Stream> connect(const StringView endpoint, const PortType port) noexcept
 	{
@@ -26,7 +26,7 @@ public:
 		if (maybeAddress)
 		{
 			auto socket = co_await !createSocketAndConnect(maybeAddress.value());
-			co_return Stream(config_, bzd::move(socket));
+			co_return Stream(context_, bzd::move(socket));
 		}
 
 		// If not assume it is a hostname
@@ -44,7 +44,7 @@ public:
 			}
 			else
 			{
-				co_return Stream(config_, bzd::move(maybeSocket.valueMutable()));
+				co_return Stream(context_, bzd::move(maybeSocket.valueMutable()));
 			}
 		}
 		co_return bzd::error::Failure("Client initialization failed."_csv);
@@ -58,43 +58,43 @@ private:
 		{
 			co_return bzd::move(maybeSocket).propagate();
 		}
-		co_await !config_.proactor.connect(maybeSocket->getFileDescriptor(), address);
+		co_await !context_.config.proactor.connect(maybeSocket->getFileDescriptor(), address);
 		co_return bzd::move(maybeSocket.valueMutable());
 	}
 
 private:
-	Config& config_;
+	Context& context_;
 };
 
 } // namespace bzd::platform::posix::network::tcp
 
 namespace bzd::platform::network::tcp {
-template <class Config>
-struct ClientTraits<bzd::platform::posix::network::tcp::Client<Config>>
+template <class Context>
+struct ClientTraits<bzd::platform::posix::network::tcp::Client<Context>>
 {
 	using Socket = bzd::platform::posix::network::Socket;
 
 	class Stream : public bzd::IOStream
 	{
 	private:
-		friend class bzd::platform::posix::network::tcp::Client<Config>;
-		constexpr Stream(Config& config, Socket&& socket) noexcept : config_{config}, socket_{bzd::move(socket)} {}
+		friend class bzd::platform::posix::network::tcp::Client<Context>;
+		constexpr Stream(Context& context, Socket&& socket) noexcept : context_{context}, socket_{bzd::move(socket)} {}
 
 	public:
-		constexpr Stream(Stream&& other) noexcept : config_{other.config_}, socket_{bzd::move(other.socket_)} {}
+		constexpr Stream(Stream&& other) noexcept : context_{other.context_}, socket_{bzd::move(other.socket_)} {}
 
 		bzd::Async<> write(const bzd::Span<const Byte> data) noexcept override
 		{
-			co_return co_await config_.proactor.write(socket_.getFileDescriptor(), data);
+			co_return co_await context_.config.proactor.write(socket_.getFileDescriptor(), data);
 		}
 
 		bzd::Async<bzd::Span<const Byte>> read(bzd::Span<Byte>&& data) noexcept override
 		{
-			co_return co_await config_.proactor.read(socket_.getFileDescriptor(), bzd::move(data));
+			co_return co_await context_.config.proactor.read(socket_.getFileDescriptor(), bzd::move(data));
 		}
 
 	private:
-		Config& config_;
+		Context& context_;
 		Socket socket_;
 	};
 };

@@ -8,8 +8,8 @@ namespace bzd::platform::esp32::clock {
 class Xthal : public bzd::Clock
 {
 public:
-	template <class Config>
-	constexpr explicit Xthal(const Config&) noexcept
+	template <class Context>
+	constexpr explicit Xthal(const Context&) noexcept
 	{
 	}
 

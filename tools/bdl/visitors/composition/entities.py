@@ -351,18 +351,19 @@ class Entities:
 		def addEntry(symbol: Symbol, kind: str, input: Symbol) -> None:
 			fqn = symbol.this
 			name = symbol.propertyName
-			symbol.assertTrue(condition=fqn in self.registry, message=f"The instance of one of the connection to '{str(symbol)}', namely '{fqn}', is not present in the registry.")
-			symbol.assertTrue(condition=name not in result[fqn], message=f"The property named '{name}' is connected twice.")
-			result[fqn][name] = {
-				"type": kind,
-				"input": input
-			}
+			symbol.assertTrue(condition=fqn in self.registry,
+				message=
+				f"The instance of one of the connection to '{str(symbol)}', namely '{fqn}', is not present in the registry."
+								)
+			symbol.assertTrue(condition=name not in result[fqn],
+				message=f"The property named '{name}' is connected twice.")
+			result[fqn][name] = {"type": kind, "input": input}
 
 		for input, group in self.connections.groups.items():
 			addEntry(symbol=input, kind="writer", input=input)
 			for output, metadata in group.outputs.items():
 				addEntry(symbol=output, kind="reader", input=input)
-	
+
 		return result
 
 	def getConnectionsByExecutor(self, fqn: str) -> typing.Iterable[Expression]:

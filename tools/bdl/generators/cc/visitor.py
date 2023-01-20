@@ -222,10 +222,7 @@ class Transform:
 
 	def registryConnectionsDeclaration(self, connections: typing.Any) -> str:
 		args = []
-		factoryTypes = {
-			"reader": "makeReader()",
-			"writer": "makeWriter()"
-		}
+		factoryTypes = {"reader": "makeReader()", "writer": "makeWriter()"}
 		for name, connection in connections.items():
 			symbolName = "io_buffer_" + self.symbolToNameStr(connection["input"])
 			factory = factoryTypes[connection["type"]]
@@ -251,6 +248,7 @@ class Transform:
 		if not args:
 			return ""
 		return f"template <{', '.join(args)}>"
+
 
 def formatCc(bdl: Object, includes: typing.List[Path]) -> str:
 

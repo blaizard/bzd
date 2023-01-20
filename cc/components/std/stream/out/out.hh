@@ -7,8 +7,8 @@ namespace bzd::platform::std {
 class Out : public bzd::OStream
 {
 public:
-	template <class Config>
-	constexpr explicit Out(const Config&) noexcept
+	template <class Context>
+	constexpr explicit Out(const Context&) noexcept
 	{
 	}
 

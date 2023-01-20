@@ -13,15 +13,15 @@
 
 namespace bzd::platform::esp32 {
 
-template <class Config>
+template <class Context>
 class Core : public bzd::platform::Core
 {
 private:
-	using Self = Core<Config>;
+	using Self = Core<Context>;
 	static constexpr bzd::Byte freertosStackTaintingByte{0xa5};
 
 public:
-	constexpr Core(const Config& config) noexcept : config_{config} {}
+	constexpr Core(const Context& context) noexcept : context_{context} {}
 
 	Result<void, bzd::Error> start(const bzd::FunctionRef<void(bzd::platform::Core&)> workload) noexcept override
 	{
@@ -36,13 +36,13 @@ public:
 		}
 		// Create the task and make sure the operation is successful. This will immediatly run the task.
 		handle_ = xTaskCreateStaticPinnedToCore(workloadWrapper,
-												Config::name.data(),
+												Context::Config::name.data(),
 												stack_.size() / sizeof(StackType_t),
 												static_cast<void*>(this),
 												getFreeRTOSPriority(),
 												reinterpret_cast<StackType_t*>(stack_.data()),
 												&tcb_,
-												Config::cpu);
+												Context::Config::cpu);
 		if (!handle_)
 		{
 			return bzd::error::Failure("xTaskCreateStatic"_csv);
@@ -59,7 +59,7 @@ public:
 		}
 		vSemaphoreDelete(mutex_);
 
-		::std::cout << "Stack usage: " << getStackUsage() << " / " << Config::stackSize << ::std::endl;
+		::std::cout << "Stack usage: " << getStackUsage() << " / " << Context::Config::stackSize << ::std::endl;
 
 		return bzd::nullresult;
 	}
@@ -76,7 +76,7 @@ private:
 		// In freeRTOS context:
 		// - 0 is the lowest priority.
 		// - configMAX_PRIORITIES - 1 is the highest priority.
-		return (configMAX_PRIORITIES - 1) * Config::priority / 100;
+		return (configMAX_PRIORITIES - 1) * Context::Config::priority / 100;
 	}
 
 	static void workloadWrapper(void* object)
@@ -92,8 +92,8 @@ private:
 	}
 
 private:
-	const Config& config_;
-	bzd::Stack<Config::stackSize, alignof(StackType_t)> stack_{};
+	const Context& context;
+	bzd::Stack<Context::Config::stackSize, alignof(StackType_t)> stack_{};
 	bzd::Optional<bzd::FunctionRef<void(bzd::platform::Core&)>> workload_{};
 	TaskHandle_t handle_{};
 	StaticTask_t tcb_{};

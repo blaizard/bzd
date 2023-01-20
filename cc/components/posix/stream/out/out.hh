@@ -5,21 +5,21 @@
 #include <unistd.h>
 
 namespace bzd::platform::posix {
-template <class Config>
+template <class Context>
 class Out : public bzd::OStream
 {
 public:
-	constexpr Out(Config& config) noexcept : config_{config} {}
+	constexpr Out(Context& context) noexcept : context_{context} {}
 
 	bzd::Async<> write(const bzd::Span<const bzd::Byte> data) noexcept final
 	{
-		co_await !config_.proactor.write(out_, data);
+		co_await !context_.config.proactor.write(out_, data);
 		::std::flush(::std::cout);
 		co_return {};
 	}
 
 private:
-	Config& config_;
+	Context& context_;
 	FileDescriptor out_{STDOUT_FILENO};
 };
 } // namespace bzd::platform::posix
