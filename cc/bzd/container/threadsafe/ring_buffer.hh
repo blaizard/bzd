@@ -17,7 +17,7 @@ class RingBuffer
 {
 public: // Traits.
 	using Self = RingBuffer<T, capacity>;
-	using StorageType = impl::FixedStorage<T, capacity>;
+	using StorageType = bzd::impl::FixedStorage<T, capacity>;
 	using ValueType = typename StorageType::ValueType;
 	using ValueMutableType = typename StorageType::ValueMutableType;
 

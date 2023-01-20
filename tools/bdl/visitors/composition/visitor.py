@@ -37,6 +37,7 @@ class Composition:
 		self.asyncs: typing.Dict[str, typing.Dict[Entity, AsyncType]] = {}
 		# All connections.
 		self.connections: typing.Dict[str, typing.Any] = {}
+		self.registryByExecutor: typing.Dict[str, typing.Dict[str, Entity]] = {}
 
 	@property
 	def registry(self) -> typing.Dict[str, Expression]:
@@ -49,6 +50,10 @@ class Composition:
 	@property
 	def executors(self) -> typing.Dict[str, Expression]:
 		return self.entities.executors
+
+	@property
+	def registryConnections(self) -> typing.Dict[str, typing.Dict[str, typing.Any]]:
+		return self.entities.registryConnections
 
 	def visit(self, bdl: Object) -> "Composition":
 
@@ -85,6 +90,7 @@ class Composition:
 		# Applications are all intra expressions that are instanciated at top level
 		for executorFQN in self.entities.executors:
 			self.asyncs[executorFQN] = {}
+			self.registryByExecutor[executorFQN] = self.entities.getRegistryByExecutor(executorFQN)
 			for entity in self.entities.getWorkloadsByExecutor(executorFQN):
 				self.asyncs[executorFQN][entity] = AsyncType.workload
 			for entity in self.entities.getServicesByExecutor(executorFQN):

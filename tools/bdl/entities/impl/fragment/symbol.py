@@ -158,7 +158,12 @@ class Symbol:
 
 	@property
 	def this(self) -> str:
-		return self.kinds[0]
+		fqn = [self.kinds[0]] + [kind.split(".")[-1] for kind in self.kinds[1:-1]]
+		return ".".join(fqn)
+
+	@property
+	def propertyName(self) -> str:
+		return self.kinds[-1].split(".")[-1]
 
 	@property
 	def kind(self) -> str:
