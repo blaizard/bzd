@@ -14,7 +14,7 @@ private:
 
 public:
 	template <class Context>
-	constexpr explicit Core(const Context&) noexcept
+	constexpr explicit Core(Context&) noexcept
 	{
 	}
 

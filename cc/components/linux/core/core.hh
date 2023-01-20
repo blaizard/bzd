@@ -27,7 +27,7 @@ private:
 	using Self = Core<Context>;
 
 public:
-	explicit Core(const Context&) noexcept : core_id_{0}
+	explicit Core(Context&) noexcept : core_id_{0}
 	{
 		bzd::ignore = Context::Config::priority;
 		bzd::ignore = Context::Config::name;

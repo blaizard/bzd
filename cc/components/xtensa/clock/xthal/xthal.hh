@@ -9,7 +9,7 @@ class Xthal : public bzd::Clock
 {
 public:
 	template <class Context>
-	constexpr explicit Xthal(const Context&) noexcept
+	constexpr explicit Xthal(Context&) noexcept
 	{
 	}
 

@@ -8,7 +8,7 @@ class Out : public bzd::OStream
 {
 public:
 	template <class Context>
-	constexpr explicit Out(const Context&) noexcept
+	constexpr explicit Out(Context&) noexcept
 	{
 	}
 

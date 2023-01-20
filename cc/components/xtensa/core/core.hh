@@ -21,7 +21,7 @@ private:
 	static constexpr bzd::Byte freertosStackTaintingByte{0xa5};
 
 public:
-	constexpr Core(const Context& context) noexcept : context_{context} {}
+	constexpr Core(Context& context) noexcept : context_{context} {}
 
 	Result<void, bzd::Error> start(const bzd::FunctionRef<void(bzd::platform::Core&)> workload) noexcept override
 	{
@@ -92,7 +92,7 @@ private:
 	}
 
 private:
-	const Context& context;
+	Context& context;
 	bzd::Stack<Context::Config::stackSize, alignof(StackType_t)> stack_{};
 	bzd::Optional<bzd::FunctionRef<void(bzd::platform::Core&)>> workload_{};
 	TaskHandle_t handle_{};
