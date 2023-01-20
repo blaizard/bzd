@@ -92,7 +92,7 @@ private:
 	}
 
 private:
-	Context& context;
+	Context& context_;
 	bzd::Stack<Context::Config::stackSize, alignof(StackType_t)> stack_{};
 	bzd::Optional<bzd::FunctionRef<void(bzd::platform::Core&)>> workload_{};
 	TaskHandle_t handle_{};
