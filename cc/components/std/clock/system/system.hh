@@ -7,8 +7,8 @@ namespace bzd::platform::std::clock {
 class System : public bzd::Clock
 {
 public:
-	template <class Config>
-	constexpr System(const Config&) noexcept
+	template <class Context>
+	constexpr System(const Context&) noexcept
 	{
 	}
 

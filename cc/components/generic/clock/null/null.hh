@@ -7,8 +7,8 @@ namespace bzd::platform::generic::clock {
 class Null : public bzd::Clock
 {
 public:
-	template <class Config>
-	constexpr explicit Null(const Config&) noexcept
+	template <class Context>
+	constexpr explicit Null(const Context&) noexcept
 	{
 	}
 

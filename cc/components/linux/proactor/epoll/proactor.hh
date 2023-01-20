@@ -22,8 +22,8 @@ public:
 	using posix::sync::Proactor::connect;
 	using posix::sync::Proactor::write;
 
-	template <class Config>
-	constexpr Proactor(const Config&) noexcept
+	template <class Context>
+	constexpr Proactor(const Context&) noexcept
 	{
 	}
 

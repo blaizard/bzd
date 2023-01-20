@@ -9,14 +9,14 @@
 
 namespace bzd::platform::generic {
 
-template <class Config>
-class Executor : public bzd::platform::Executor<Executor<Config>>
+template <class Context>
+class Executor : public bzd::platform::Executor<Executor<Context>>
 {
 public:
-	using Self = Executor<Config>;
+	using Self = Executor<Context>;
 
 public:
-	constexpr Executor(const Config& config) noexcept : config_{config}, executor_{} {}
+	constexpr Executor(const Context& context) noexcept : context_{context}, executor_{} {}
 
 	/// Assign a workload to this executor.
 	constexpr void schedule(bzd::concepts::async auto& async, const bzd::async::Type type) noexcept
@@ -35,7 +35,7 @@ public:
 	bzd::Result<void, bzd::Error> start() noexcept
 	{
 		const auto run = bzd::FunctionRef<void(bzd::platform::Core&)>::toMember<Self, &Self::run>(*this);
-		for (auto& core : config_.cores)
+		for (auto& core : context_.config.cores)
 		{
 			if (auto result = core.start(run); !result)
 			{
@@ -48,7 +48,7 @@ public:
 	/// Stop the executor.
 	bzd::Result<void, bzd::Error> stop() noexcept
 	{
-		for (auto& core : config_.cores)
+		for (auto& core : context_.config.cores)
 		{
 			if (auto result = core.stop(); !result)
 			{
@@ -84,9 +84,9 @@ private:
 				break;
 			}
 			// Get the index of the core in the array.
-			const auto it = bzd::algorithm::findIf(config_.cores, [&core](auto& value) { return &core == &value; });
-			bzd::assert::isTrue(it != config_.cores.end(), "Core must be registered.");
-			const auto index = bzd::distance(config_.cores.begin(), it);
+			const auto it = bzd::algorithm::findIf(context_.config.cores, [&core](auto& value) { return &core == &value; });
+			bzd::assert::isTrue(it != context_.config.cores.end(), "Core must be registered.");
+			const auto index = bzd::distance(context_.config.cores.begin(), it);
 			runCore = idle(index, core);
 		} while (runCore);
 	}
@@ -103,7 +103,7 @@ private:
 	}
 
 private:
-	const Config& config_;
+	const Context& context_;
 	bzd::coroutine::impl::Executor executor_;
 	bzd::Atomic<bzd::Size> workloadCount_{0};
 };

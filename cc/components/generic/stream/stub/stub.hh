@@ -6,8 +6,8 @@ namespace bzd::platform::generic::stream {
 class Stub : public bzd::IOStream
 {
 public:
-	template <class Config>
-	constexpr explicit Stub(const Config&) noexcept
+	template <class Context>
+	constexpr explicit Stub(const Context&) noexcept
 	{
 	}
 

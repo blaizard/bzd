@@ -20,17 +20,17 @@
 
 namespace bzd::platform::linux {
 
-template <class Config>
+template <class Context>
 class Core : public bzd::platform::Core
 {
 private:
-	using Self = Core<Config>;
+	using Self = Core<Context>;
 
 public:
-	explicit Core(const Config) noexcept : core_id_{0}
+	explicit Core(const Context) noexcept : core_id_{0}
 	{
-		bzd::ignore = Config::priority;
-		bzd::ignore = Config::name;
+		bzd::ignore = Context::Config::priority;
+		bzd::ignore = Context::Config::name;
 	}
 
 	~Core() noexcept
@@ -52,7 +52,7 @@ public:
 				return bzd::error::Errno("sysconf");
 			}
 
-			const Size actualSize = bzd::alignUp(Config::stackSize, alignment);
+			const Size actualSize = bzd::alignUp(Context::Config::stackSize, alignment);
 			void* memory = nullptr;
 			if (const auto result = ::posix_memalign(&memory, alignment, actualSize); result != 0)
 			{

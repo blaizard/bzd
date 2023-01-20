@@ -99,6 +99,19 @@ protected:
 	bzd::Int32 refCount_{0};
 };
 
+template <class ConfigType, class IOType>
+[[nodiscard]] constexpr auto makeContext(ConfigType&& config_, IOType&& io_) noexcept
+{
+	struct Context
+	{
+		using Config = ConfigType;
+		using IO = IOType;
+		const Config config;
+		IO io;
+	};
+	return Context{bzd::move(config_), bzd::move(io_)};
+}
+
 } // namespace
 
 // ==== Platform ==============================================================
@@ -183,9 +196,11 @@ protected:
 
 	// Definition of all registry entries and their configuration.
 	{% for fqn, expression in registryByExecutor[executorFQN] %}
-	static const ResourceSpecialization<"{{ fqn }}">::Config config_{{ fqn | fqnToNameStr }}{ {{- paramsDeclaration(expression.parametersResolved | paramsFilterOutLiterals) -}} };
-	[[maybe_unused]] static const ResourceSpecialization<"{{ fqn }}">::IO io_{{ fqn | fqnToNameStr }}{ {{- registryConnectionsDeclaration(registryConnections[fqn]) -}} };
-	static {{ expression.typeResolved | symbolDefinitionToStr }} {{ fqn | fqnToNameStr }}{config_{{ fqn | fqnToNameStr }}};
+	static auto context_{{ fqn | fqnToNameStr }} = makeContext(
+		ResourceSpecialization<"{{ fqn }}">::Config{ {{- paramsDeclaration(expression.parametersResolved | paramsFilterOutLiterals) -}} },
+		ResourceSpecialization<"{{ fqn }}">::IO{ {{- registryConnectionsDeclaration(registryConnections[fqn]) -}} }
+	);
+	static {{ expression.typeResolved | symbolDefinitionToStr }} {{ fqn | fqnToNameStr }}{context_{{ fqn | fqnToNameStr }}};
 	{% end %}
 
 	// Declaration of the registry.
