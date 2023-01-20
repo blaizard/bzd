@@ -1,0 +1,32 @@
+
+namespace example;
+
+
+// / Emit integer continuously.
+component Emitter {
+interface:
+	method generate();
+	send = Integer;
+	
+composition:
+	this.generate();
+	
+}
+
+// / Poll and receive data.
+component Poller {
+interface:
+	method poll();
+	receive = const Integer;
+	
+}
+
+composition {
+	emitter = Emitter();
+	poller = Poller();
+	poller.poll();
+	connect(emitter.send, poller.receive);
+	
+}
+
+

@@ -199,7 +199,7 @@ protected:
 {
 	// Definition of communication ring buffers.
 	{% for connection in connections[executorFQN] %}
-	bzd::io::Buffer<{{ connection.symbol | symbolToStr }}, {{ connection | connectionCount }}u> io_buffer_{{ connection.input | symbolToNameStr }};
+	static bzd::io::Buffer<{{ connection.symbol | symbolToStr }}, {{ connection | connectionCount }}u> io_buffer_{{ connection.input | symbolToNameStr }}{};
 	{% end %}
 
 	// Definition of all registry entries and their configuration.
@@ -267,7 +267,7 @@ struct Data
 };
 
 {% for fqn, uid in uids %}
-template <> UInt32 Data<"{{ fqn }}">::id = {{ uid }}u;
+// template <> UInt32 Data<"{{ fqn }}">::id = {{ uid }}u;
 {% end %}
 
 } // namespace bzd

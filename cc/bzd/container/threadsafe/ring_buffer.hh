@@ -72,10 +72,10 @@ public: // Types.
 public:
 	RingBuffer() = default;
 
-	RingBuffer(const Self&) = default;
-	Self& operator=(const Self&) = default;
-	RingBuffer(Self&&) = default;
-	Self& operator=(Self&&) = default;
+	RingBuffer(const Self&) = delete;
+	Self& operator=(const Self&) = delete;
+	RingBuffer(Self&&) = delete;
+	Self& operator=(Self&&) = delete;
 	~RingBuffer() = default;
 
 public: // Size.
