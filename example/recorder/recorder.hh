@@ -20,6 +20,28 @@ private:
 	bzd::Span<T> range_;
 };
 
+namespace bzd {
+
+template <bzd::meta::StringLiteral name>
+struct Data;
+
+class Recorder
+{
+public:
+	template <bzd::meta::StringLiteral name>
+	void publish(typename bzd::Data<name>::Type&& value) noexcept
+	{
+		const auto id = bzd::Data<name>::id;
+		bzd::serialize(string_, id);
+		bzd::serialize(string_, value);
+	}
+
+private:
+	bzd::String<128u> string_;
+};
+
+} // namespace bzd
+
 namespace example {
 
 template <class T>
@@ -49,15 +71,30 @@ public:
 };
 */
 
+template <class Context>
 class Hello
 {
 public:
-	template <class Config>
-	constexpr explicit Hello(const Config&) noexcept
+	constexpr explicit Hello(Context& context) noexcept : context_{context}
 	{
 	}
 
-	bzd::Async<> run();
+	bzd::Async<> run()
+	{
+		{
+			auto maybeScope = context_.io.send.set();
+			if (maybeScope) {
+				maybeScope.valueMutable() = 12.4;
+			}
+		}
+
+		/*co_await !bzd::print("Hello {}"_csv, bzd::Data<"example.Hello.send">::id);
+
+		bzd::Recorder recorder;
+		recorder.publish<"example.Hello.send">(12);*/
+
+		co_return {};
+	}
 
 	// Getter for the latest input value.
 	// input = const Integer;
@@ -74,37 +111,18 @@ public:
 		}
 	}
 	*/
+
+private:
+	Context& context_;
 };
 
 class World
 {
 public:
-	template <class Config>
-	constexpr explicit World(const Config&) noexcept
+	template <class Context>
+	constexpr explicit World(const Context&) noexcept
 	{
 	}
 };
 
 } // namespace example
-
-namespace bzd {
-
-template <bzd::meta::StringLiteral name>
-struct Data;
-
-class Recorder
-{
-public:
-	template <bzd::meta::StringLiteral name>
-	void publish(typename bzd::Data<name>::Type&& value) noexcept
-	{
-		const auto id = bzd::Data<name>::id;
-		bzd::serialize(string_, id);
-		bzd::serialize(string_, value);
-	}
-
-private:
-	bzd::String<128u> string_;
-};
-
-} // namespace bzd

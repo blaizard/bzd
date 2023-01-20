@@ -11,9 +11,6 @@ bdl_library(
 
 cc_library(
     name = "lib",
-    srcs = [
-        "recorder.cc",
-    ],
     hdrs = [
         "recorder.hh",
     ],
