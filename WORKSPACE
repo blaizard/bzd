@@ -26,12 +26,6 @@ load("//toolchains:register.bzl", "toolchains_register")
 
 toolchains_register()
 
-# Documentation
-
-load("//tools/documentation:dependencies.bzl", "documentation_load")
-
-documentation_load()
-
 # Coverage
 
 load("//tools/coverage:dependencies.bzl", "coverage_load")

@@ -1,17 +1,73 @@
 #pragma once
 
 #include "cc/bzd/container/optional.hh"
-#include "cc/bzd/container/range/associate_scope.hh"
 #include "cc/bzd/container/spans.hh"
 #include "cc/bzd/container/storage/fixed.hh"
 #include "cc/bzd/core/assert/minimal.hh"
 #include "cc/bzd/platform/atomic.hh"
+#include "cc/bzd/utility/max.hh"
 #include "cc/bzd/utility/scope_guard.hh"
 #include "cc/bzd/utility/synchronization/spin_shared_mutex.hh"
 
 namespace bzd::threadsafe {
 
-// Single produce, multi consumer
+/// Result for the ring buffer.
+template <class T>
+class RingBufferResult : public bzd::Optional<T>
+{
+public:
+	constexpr RingBufferResult() noexcept : bzd::Optional<T>{bzd::nullopt} {}
+	constexpr explicit RingBufferResult(T value, const bzd::Size index) noexcept : bzd::Optional<T>{value}, index_{index} {}
+	constexpr RingBufferResult(T value, const bzd::Size index, bzd::SpinSharedMutex& mutex) noexcept :
+		bzd::Optional<T>{value}, index_{index}, mutex_{&mutex}, shared_{true}
+	{
+	}
+	constexpr RingBufferResult(T value, const bzd::Size index, bzd::SpinSharedMutex& mutex, bzd::Atomic<bzd::Size>& counter) noexcept :
+		bzd::Optional<T>{value}, index_{index}, mutex_{&mutex}, shared_{false}, counter_{&counter}
+	{
+	}
+
+	RingBufferResult(const RingBufferResult&) = delete;
+	RingBufferResult& operator=(const RingBufferResult&) = delete;
+	RingBufferResult& operator=(RingBufferResult&&) = delete;
+	constexpr RingBufferResult(RingBufferResult&& other) noexcept :
+		bzd::Optional<T>{static_cast<bzd::Optional<T>&&>(other)}, index_{other.index_}, mutex_{other.mutex_}, shared_{other.shared_},
+		counter_{other.counter_}
+	{
+		other.mutex_ = nullptr;
+		other.counter_ = nullptr;
+	}
+
+	constexpr ~RingBufferResult() noexcept
+	{
+		if (mutex_)
+		{
+			if (shared_)
+			{
+				mutex_->unlockShared();
+			}
+			else
+			{
+				mutex_->unlock();
+			}
+		}
+		if (counter_)
+		{
+			++(*counter_);
+		}
+	}
+
+public: // API.
+	[[nodiscard]] constexpr bzd::Size index() const noexcept { return index_; }
+
+private:
+	const bzd::Size index_{0u};
+	bzd::SpinSharedMutex* mutex_{nullptr};
+	bzd::Bool shared_{false};
+	bzd::Atomic<bzd::Size>* counter_{nullptr};
+};
+
+// Single producer, multi consumer ring buffer.
 template <class T, Size capacity>
 class RingBuffer
 {
@@ -21,61 +77,13 @@ public: // Traits.
 	using ValueType = typename StorageType::ValueType;
 	using ValueMutableType = typename StorageType::ValueMutableType;
 
-public: // Types.
-	template <class U>
-	class ScopeOptional : public bzd::Optional<U>
-	{
-	public:
-		constexpr ScopeOptional() noexcept : bzd::Optional<U>{bzd::nullopt} {}
-		constexpr explicit ScopeOptional(U value) noexcept : bzd::Optional<U>{value} {}
-		constexpr ScopeOptional(U value, bzd::SpinSharedMutex& mutex) noexcept : bzd::Optional<U>{value}, mutex_{&mutex}, shared_{true} {}
-		constexpr ScopeOptional(U value, bzd::SpinSharedMutex& mutex, bzd::Atomic<bzd::Size>& counter) noexcept :
-			bzd::Optional<U>{value}, mutex_{&mutex}, shared_{false}, counter_{&counter}
-		{
-		}
-
-		ScopeOptional(const Self&) = delete;
-		Self& operator=(const Self&) = delete;
-		Self& operator=(Self&&) = delete;
-		constexpr ScopeOptional(Self&& other) noexcept :
-			bzd::Optional<U>{bzd::move(other)}, mutex_{other.mutex_}, shared_{other.shared_}, counter_{other.counter_}
-		{
-			other.mutex_ = nullptr;
-			other.counter_ = nullptr;
-		}
-
-		constexpr ~ScopeOptional() noexcept
-		{
-			if (mutex_)
-			{
-				if (shared_)
-				{
-					mutex_->unlockShared();
-				}
-				else
-				{
-					mutex_->unlock();
-				}
-			}
-			if (counter_)
-			{
-				++(*counter_);
-			}
-		}
-
-	private:
-		bzd::SpinSharedMutex* mutex_{nullptr};
-		bzd::Bool shared_{false};
-		bzd::Atomic<bzd::Size>* counter_{nullptr};
-	};
-
 public:
 	RingBuffer() = default;
 
-	RingBuffer(const Self&) = delete;
-	Self& operator=(const Self&) = delete;
-	RingBuffer(Self&&) = delete;
-	Self& operator=(Self&&) = delete;
+	RingBuffer(const RingBuffer&) = delete;
+	RingBuffer& operator=(const RingBuffer&) = delete;
+	RingBuffer(RingBuffer&&) = delete;
+	RingBuffer& operator=(RingBuffer&&) = delete;
 	~RingBuffer() = default;
 
 public: // Size.
@@ -86,7 +94,7 @@ public: // Size.
 
 public:
 	/// Get the next element as a scoped reference for writing.
-	[[nodiscard]] constexpr ScopeOptional<T&> nextForWriting() noexcept
+	[[nodiscard]] constexpr RingBufferResult<T&> nextForWriting() noexcept
 	{
 		// Reserve a new entry.
 		const auto write = write_.load();
@@ -104,18 +112,20 @@ public:
 		{
 			++read_;
 		}
-		return {storage_.dataMutable()[index], locks_[index], write_};
+		return {/*value*/ storage_.dataMutable()[index], /*index*/ write, /*mutex*/ locks_[index], /*counter*/ write_};
 	}
 
 	/// Get the last element written to the ring as a scoped reference for reading.
-	[[nodiscard]] constexpr ScopeOptional<const T&> lastForReading() noexcept
+	///
+	/// \param start Starting from a specific index.
+	[[nodiscard]] constexpr RingBufferResult<const T&> lastForReading(const bzd::Size start = 0u) noexcept
 	{
 		// Attempt to reserve the last entry.
-		auto [begin, end, maybeIndex] = tryAcquireLockForReading([](bzd::Size& begin, bzd::Size& end) {
-			if ((end - begin) > 0)
+		auto [begin, end, maybeIndex] = tryAcquireLockForReading([start](bzd::Size& begin, bzd::Size& end) {
+			if (end > begin)
 			{
 				begin = end - 1u;
-				return true;
+				return (begin >= start);
 			}
 			return false;
 		});
@@ -123,22 +133,27 @@ public:
 		if (maybeIndex)
 		{
 			const auto index = maybeIndex.value();
-			return {storage_.data()[index], locks_[index]};
+			return {/*value*/ storage_.data()[index], /*index*/ begin, /*mutex*/ locks_[index]};
 		}
 
 		return {};
 	}
 
 	/// Get the first element written to the ring (and not overwritten) as a scoped reference for reading.
-	[[nodiscard]] constexpr ScopeOptional<const T&> firstForReading() noexcept
+	///
+	/// \param start Starting from a specific index.
+	[[nodiscard]] constexpr RingBufferResult<const T&> firstForReading(const bzd::Size start = 0u) noexcept
 	{
 		// Attempt to reserve the first entry.
-		auto [begin, end, maybeIndex] = tryAcquireLockForReading([](bzd::Size& begin, bzd::Size& end) { return (end - begin) > 0; });
+		auto [begin, end, maybeIndex] = tryAcquireLockForReading([start](bzd::Size& begin, bzd::Size& end) {
+			begin = bzd::max(start, begin);
+			return end > begin;
+		});
 
 		if (maybeIndex)
 		{
 			const auto index = maybeIndex.value();
-			return {storage_.data()[index], locks_[index]};
+			return {/*value*/ storage_.data()[index], /*index*/ begin, /*mutex*/ locks_[index]};
 		}
 
 		return {};
@@ -155,13 +170,20 @@ public:
 	/// If \b count is defined, it will return a scope with the specific number of element,
 	/// starting from the \b first or last depending on the parameter value.
 	/// If not or null, all remaining elements will be returned in the range.
-	[[nodiscard]] constexpr auto asSpansForReading(const bzd::Size count = 0u, const bzd::Bool first = true) noexcept
+	///
+	/// \param count The number of element to include the output range. If null, all available elements are returned.
+	/// \param first If set, the range will start from the first element inserted, otherwise from the latest.
+	/// \param start Starting from a specific index, in other word, excluing every entries oldest that this.
+	[[nodiscard]] constexpr RingBufferResult<bzd::Spans<const T, 2u>> asSpansForReading(const bzd::Size count = 0u,
+																						const bzd::Bool first = true,
+																						const bzd::Size start = 0u) noexcept
 	{
 		// Attempt to reserve the first entry and compute the indexes of interest.
-		auto [begin, end, maybeIndex] = tryAcquireLockForReading([count, first](bzd::Size& begin, bzd::Size& end) {
+		auto [begin, end, maybeIndex] = tryAcquireLockForReading([count, first, start](bzd::Size& begin, bzd::Size& end) {
+			begin = bzd::max(begin, start);
 			if (count)
 			{
-				if ((end - begin) >= count)
+				if (end >= begin + count)
 				{
 					if (first)
 					{
@@ -175,30 +197,20 @@ public:
 				}
 				return false;
 			}
-			return (end - begin) > 0;
+			return end > begin;
 		});
 
 		// Attempt succeeded.
+		// Note that it is enough to only acquire the lock of the first element, as the
+		// following cannot be written anyway unless the first is unlocked.
 		if (maybeIndex)
 		{
-			// Lock all the rest until write (but excluding it).
-			// It must succeed as nothing can be written until then.
-			for (auto index = begin + 1u; index < end; ++index)
-			{
-				const auto lockAcquired = locks_[index % capacity].tryLockShared();
-				bzd::assert::isTrue(lockAcquired);
-			}
+			const auto index = maybeIndex.value();
+			const auto spans = makeSpans(storage_.data(), begin, end);
+			return {/*value*/ spans, /*index*/ begin, /*mutex*/ locks_[index]};
 		}
 
-		bzd::ScopeGuard unlockScope{[begin = begin, end = end, this]() {
-			for (auto index = begin; index < end; ++index)
-			{
-				locks_[index % capacity].unlockShared();
-			}
-		}};
-
-		const auto spans = makeSpans(storage_.data(), begin, end);
-		return range::associateScope(bzd::move(spans), bzd::move(unlockScope));
+		return {};
 	}
 
 private:

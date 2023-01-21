@@ -30,15 +30,48 @@ private:
 template <class Ring>
 class Reader
 {
+private:
+	using Value = typename Ring::ValueType;
+
 public:
 	constexpr explicit Reader(Ring& ring) noexcept : ring_{ring} {}
 
 public:
-	constexpr auto get() noexcept { return ring_.lastForReading(); }
-	constexpr auto get(const bzd::Size count) noexcept { return ring_.asSpansForReading(/*count*/ count, /*first*/ false); }
+	constexpr auto tryGet() noexcept
+	{
+		auto scope = ring_.lastForReading(/*start*/ index_);
+		if (scope)
+		{
+			index_ = scope.index() + 1u;
+		}
+		return scope;
+	}
+
+	bzd::Async<bzd::threadsafe::RingBufferResult<const Value&>> get() noexcept
+	{
+		while (true)
+		{
+			if (auto maybeValue = tryGet(); maybeValue)
+			{
+				co_return maybeValue;
+			}
+			co_await bzd::async::yield();
+		}
+	}
+
+	constexpr auto tryGet(const bzd::Size count) noexcept
+	{
+		auto scope = ring_.asSpansForReading(/*count*/ count, /*first*/ false, /*start*/ index_);
+		if (scope)
+		{
+			index_ = scope.index() + 1u;
+		}
+		return scope;
+	}
 
 private:
 	Ring& ring_;
+	bzd::Size index_{0};
 };
 
 template <class T, Size capacity>
