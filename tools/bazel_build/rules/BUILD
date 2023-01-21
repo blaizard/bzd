@@ -16,6 +16,9 @@ bzl_library(
         "docker.bzl",
     ],
     visibility = ["//visibility:public"],
+    deps = [
+        "@io_bazel_rules_docker//container",
+    ],
 )
 
 bzd_nodejs_library(
@@ -66,6 +69,14 @@ bzl_library(
         "cc.bzl",
     ],
     visibility = ["//visibility:public"],
+    deps = [
+        ":bdl",
+        ":package",
+        "//tools/bazel_build:binary_wrapper",
+        "//tools/bazel_build/rules/third_party/cc:bzl",
+        "@bazel_skylib//lib:sets",
+        "@bazel_skylib//rules:common_settings",
+    ],
 )
 
 bzl_library(
@@ -74,4 +85,7 @@ bzl_library(
         "bdl.bzl",
     ],
     visibility = ["//visibility:public"],
+    deps = [
+        "//tools/bazel_build/rules/assets/cc:defs",
+    ],
 )
