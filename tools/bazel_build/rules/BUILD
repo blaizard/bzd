@@ -5,7 +5,18 @@ exports_files([
     "nodejs.bzl",
     "nodejs_web.bzl",
     "package.bzl",
+    "docker.bzl",
+    "cc.bzl",
+    "bdl.bzl",
 ])
+
+bzl_library(
+    name = "docker",
+    srcs = [
+        "docker.bzl",
+    ],
+    visibility = ["//visibility:public"],
+)
 
 bzd_nodejs_library(
     name = "mocha",
@@ -55,9 +66,6 @@ bzl_library(
         "cc.bzl",
     ],
     visibility = ["//visibility:public"],
-    deps = [
-        ":manifest",
-    ],
 )
 
 bzl_library(
