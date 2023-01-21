@@ -6,7 +6,11 @@ import os
 import socket
 import socketserver
 import tarfile
-import tempfile
+import sys
+import pathlib
+import mimetypes
+import functools
+import typing
 
 
 class WebServer(socketserver.TCPServer):
@@ -25,6 +29,34 @@ class WebServer(socketserver.TCPServer):
 			print("\r<Keyboard interrupt>")
 		finally:
 			self.server_close()
+
+
+class ArchiveRequestHandler(http.server.SimpleHTTPRequestHandler):
+
+	def __init__(self, archive: pathlib.Path, *args: typing.Any, **kwargs: typing.Any) -> None:
+		mimetypes.init()
+		self.archive = tarfile.open(archive, "r")
+		prefix = os.path.commonprefix(self.archive.getnames())
+		prefix = "." if prefix == "." else "/".join(prefix.split("/")[:-1])
+		self.prefix = prefix + "/" if prefix else ""
+		super().__init__(*args, **kwargs)
+
+	def do_GET(self) -> None:
+		path = pathlib.Path("/index.html" if self.path == "/" else self.path)
+		pathInArchive = self.prefix + str(path.relative_to('/'))
+
+		try:
+			reader = self.archive.extractfile(pathInArchive)
+		except KeyError:
+			self.send_response(http.HTTPStatus.NOT_FOUND)
+			self.end_headers()
+			return
+
+		self.send_response(http.HTTPStatus.OK)
+		self.send_header("Content-type", mimetypes.guess_type(path)[0] or "text/html")
+		self.end_headers()
+		if reader is not None:
+			self.wfile.write(reader.read())
 
 
 if __name__ == "__main__":
@@ -50,35 +82,25 @@ if __name__ == "__main__":
 
 	args = parser.parse_args()
 
-	tempPath = None
-	try:
+	# If archive is set, serve files from this specific archive
+	if os.path.isfile(args.path):
+		print(f"Serving archive '{args.path}'.")
+		handler = functools.partial(ArchiveRequestHandler, pathlib.Path(args.path))
 
-		# If archive is set, serve files from this specific archive
-		if os.path.isfile(args.path):
-			tempPath = tempfile.TemporaryDirectory()
-			package = tarfile.open(args.path)
-			try:
-				print(f"Extracting content of '{args.path}' to temporary directory '{tempPath.name}'.")
-				package.extractall(tempPath.name)
-			finally:
-				package.close()
-			os.chdir(tempPath.name)
-
-		# If special path, serve it
-		elif os.path.isdir(args.path):
-			os.chdir(args.path)
-
-		# If the root is somewhere else
-		if args.root:
-			os.chdir(args.root)
-
+	# If special path, serve it
+	elif os.path.isdir(args.path):
+		print(f"Serving directory '{args.path}'.")
 		handler = http.server.SimpleHTTPRequestHandler
-		server = WebServer((args.hostname, args.port), handler)
-		print(f"Web server ready, serving '{args.path}' at 'http://{server.hostname}:{server.port}'.")
-		server.run()
+		os.chdir(args.path)
 
-	# Cleanup RAII style
-	finally:
-		if tempPath:
-			print(f"Cleaning up temporary directory '{tempPath.name}'.")
-			tempPath.cleanup()
+	else:
+		print(f"Invalid path '{args.path}'.")
+		sys.exit(1)
+
+	# If the root is somewhere else
+	if args.root:
+		os.chdir(args.root)
+
+	server = WebServer((args.hostname, args.port), handler)
+	print(f"Web server ready, serving '{args.path}' at 'http://{server.hostname}:{server.port}'.")
+	server.run()
