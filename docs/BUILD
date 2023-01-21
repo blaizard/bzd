@@ -2,15 +2,15 @@ load("//tools/bazel_build:binary_wrapper.bzl", "sh_binary_wrapper")
 
 genrule(
     name = "build",
-    outs = ["docs.tar"],
     srcs = [
         "mkdocs.yml",
         "//:README.md",
     ] + glob([
         "**/*.md",
         "**/*.jpg",
-        "**/*.png"
+        "**/*.png",
     ]),
+    outs = ["docs.tar"],
     cmd = """
     temp=$$(mktemp -d)
     $(location //tools/documentation:mkdocs_wrapper) -- build --config-file $(location mkdocs.yml) --site-dir "$${temp}"
@@ -18,7 +18,7 @@ genrule(
     rm -rfd "$${temp}"
     """,
     tools = [
-        "//tools/documentation:mkdocs_wrapper"
+        "//tools/documentation:mkdocs_wrapper",
     ],
 )
 

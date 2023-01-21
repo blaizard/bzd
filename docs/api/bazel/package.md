@@ -1,6 +1,8 @@
 <!-- Generated with Stardoc: http://skydoc.bazel.build -->
 
-<a name="#BzdPackageFragment"></a>
+
+
+<a id="BzdPackageFragment"></a>
 
 ## BzdPackageFragment
 
@@ -14,14 +16,14 @@ BzdPackageFragment(<a href="#BzdPackageFragment-root">root</a>, <a href="#BzdPac
 
 
 | Name  | Description |
-| :-------------: | :-------------: |
-| root |  (Undocumented)    |
-| files |  (Undocumented)    |
-| files_remap |  (Undocumented)    |
-| tars |  (Undocumented)    |
+| :------------- | :------------- |
+| <a id="BzdPackageFragment-root"></a>root |  (Undocumented)    |
+| <a id="BzdPackageFragment-files"></a>files |  (Undocumented)    |
+| <a id="BzdPackageFragment-files_remap"></a>files_remap |  (Undocumented)    |
+| <a id="BzdPackageFragment-tars"></a>tars |  (Undocumented)    |
 
 
-<a name="#BzdPackageMetadataFragment"></a>
+<a id="BzdPackageMetadataFragment"></a>
 
 ## BzdPackageMetadataFragment
 
@@ -35,11 +37,11 @@ BzdPackageMetadataFragment(<a href="#BzdPackageMetadataFragment-manifests">manif
 
 
 | Name  | Description |
-| :-------------: | :-------------: |
-| manifests |  (Undocumented)    |
+| :------------- | :------------- |
+| <a id="BzdPackageMetadataFragment-manifests"></a>manifests |  (Undocumented)    |
 
 
-<a name="#bzd_package"></a>
+<a id="bzd_package"></a>
 
 ## bzd_package
 
@@ -53,7 +55,7 @@ bzd_package(<a href="#bzd_package-kargs">kargs</a>)
 
 
 | Name  | Description | Default Value |
-| :-------------: | :-------------: | :-------------: |
-| kargs |  <p align="center"> - </p>   |  none |
+| :------------- | :------------- | :------------- |
+| <a id="bzd_package-kargs"></a>kargs |  <p align="center"> - </p>   |  none |
 
 

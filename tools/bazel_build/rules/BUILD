@@ -50,14 +50,6 @@ bzl_library(
 )
 
 bzl_library(
-    name = "manifest",
-    srcs = [
-        "manifest.bzl",
-    ],
-    visibility = ["//visibility:public"],
-)
-
-bzl_library(
     name = "cc",
     srcs = [
         "cc.bzl",

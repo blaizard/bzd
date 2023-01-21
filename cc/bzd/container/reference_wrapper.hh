@@ -13,6 +13,11 @@ private:
 
 public: // Constructor.
 	constexpr ReferenceWrapper(Value& value) noexcept : value_{&value} {}
+	ReferenceWrapper(const ReferenceWrapper&) = default;
+	ReferenceWrapper& operator=(const ReferenceWrapper&) = default;
+	ReferenceWrapper(ReferenceWrapper&&) = default;
+	ReferenceWrapper& operator=(ReferenceWrapper&&) = default;
+	~ReferenceWrapper() = default;
 
 public: // API.
 	[[nodiscard]] constexpr operator Value&() const noexcept { return *value_; }

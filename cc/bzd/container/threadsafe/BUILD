@@ -85,10 +85,10 @@ cc_library(
     deps = [
         "//cc/bzd/container:optional",
         "//cc/bzd/container:spans",
-        "//cc/bzd/container/range:associate_scope",
         "//cc/bzd/container/storage:fixed",
         "//cc/bzd/core/assert:minimal",
         "//cc/bzd/platform:atomic",
+        "//cc/bzd/utility:max",
         "//cc/bzd/utility:scope_guard",
         "//cc/bzd/utility/synchronization:spin_shared_mutex",
     ],

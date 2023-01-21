@@ -18,7 +18,7 @@ public:
 		{
 			context_.io.send.set(counter);
 			co_await !bzd::print("Sending {:d}\n"_csv, counter);
-			co_await !bzd::delay(1_s);
+			co_await !bzd::delay(100_ms);
 			++counter;
 		}
 		co_return {};
@@ -39,14 +39,8 @@ public:
 		bzd::Int32 counter = 0;
 		while (counter < 10)
 		{
-			const auto maybeValue = context_.io.receive.get();
-			if (!maybeValue)
-			{
-				co_await !bzd::print("Nothing received, waiting...\n"_csv);
-				co_await !bzd::delay(100_ms);
-				continue;
-			}
-			co_await !bzd::print("Received {:d}\n"_csv, maybeValue.value());
+			const auto result = co_await !context_.io.receive.get();
+			co_await !bzd::print("Received {:}\n"_csv, result.value());
 			++counter;
 		}
 		co_return {};

@@ -2,9 +2,12 @@ load("@io_bazel_stardoc//stardoc:stardoc.bzl", "stardoc")
 load("//tools/bazel_build:copy_outputs.bzl", "copy_outputs")
 
 rule_names = [
+    "bdl",
+    "docker",
     "nodejs",
     "nodejs_web",
     "package",
+    "cc",
 ]
 
 [stardoc(

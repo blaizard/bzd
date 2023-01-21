@@ -1,6 +1,8 @@
 <!-- Generated with Stardoc: http://skydoc.bazel.build -->
 
-<a name="#BzdNodeJsWebProvider"></a>
+
+
+<a id="BzdNodeJsWebProvider"></a>
 
 ## BzdNodeJsWebProvider
 
@@ -14,11 +16,11 @@ BzdNodeJsWebProvider(<a href="#BzdNodeJsWebProvider-tar">tar</a>)
 
 
 | Name  | Description |
-| :-------------: | :-------------: |
-| tar |  (Undocumented)    |
+| :------------- | :------------- |
+| <a id="BzdNodeJsWebProvider-tar"></a>tar |  (Undocumented)    |
 
 
-<a name="#bzd_nodejs_web"></a>
+<a id="bzd_nodejs_web"></a>
 
 ## bzd_nodejs_web
 
@@ -32,13 +34,13 @@ bzd_nodejs_web(<a href="#bzd_nodejs_web-name">name</a>, <a href="#bzd_nodejs_web
 
 
 | Name  | Description | Default Value |
-| :-------------: | :-------------: | :-------------: |
-| name |  <p align="center"> - </p>   |  none |
-| aliases |  <p align="center"> - </p>   |  <code>{}</code> |
-| srcs |  <p align="center"> - </p>   |  <code>[]</code> |
-| packages |  <p align="center"> - </p>   |  <code>{}</code> |
-| deps |  <p align="center"> - </p>   |  <code>[]</code> |
-| visibility |  <p align="center"> - </p>   |  <code>[]</code> |
-| kwargs |  <p align="center"> - </p>   |  none |
+| :------------- | :------------- | :------------- |
+| <a id="bzd_nodejs_web-name"></a>name |  <p align="center"> - </p>   |  none |
+| <a id="bzd_nodejs_web-aliases"></a>aliases |  <p align="center"> - </p>   |  <code>{}</code> |
+| <a id="bzd_nodejs_web-srcs"></a>srcs |  <p align="center"> - </p>   |  <code>[]</code> |
+| <a id="bzd_nodejs_web-packages"></a>packages |  <p align="center"> - </p>   |  <code>{}</code> |
+| <a id="bzd_nodejs_web-deps"></a>deps |  <p align="center"> - </p>   |  <code>[]</code> |
+| <a id="bzd_nodejs_web-visibility"></a>visibility |  <p align="center"> - </p>   |  <code>[]</code> |
+| <a id="bzd_nodejs_web-kwargs"></a>kwargs |  <p align="center"> - </p>   |  none |
 
 

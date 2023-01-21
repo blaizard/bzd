@@ -1,6 +1,8 @@
 <!-- Generated with Stardoc: http://skydoc.bazel.build -->
 
-<a name="#bzd_nodejs_install"></a>
+
+
+<a id="bzd_nodejs_install"></a>
 
 ## bzd_nodejs_install
 
@@ -14,17 +16,17 @@ bzd_nodejs_install(<a href="#bzd_nodejs_install-name">name</a>, <a href="#bzd_no
 
 
 | Name  | Description | Type | Mandatory | Default |
-| :-------------: | :-------------: | :-------------: | :-------------: | :-------------: |
-| name |  A unique name for this target.   | <a href="https://bazel.build/docs/build-ref.html#name">Name</a> | required |  |
-| aliases |  Name of the alias and path (relative to the workspace root).   | <a href="https://bazel.build/docs/skylark/lib/dict.html">Dictionary: String -> String</a> | optional | {} |
-| data |  Data to be added to the runfile list   | <a href="https://bazel.build/docs/build-ref.html#labels">List of labels</a> | optional | [] |
-| deps |  Dependencies   | <a href="https://bazel.build/docs/build-ref.html#labels">List of labels</a> | optional | [] |
-| packages |  Package dependencies   | <a href="https://bazel.build/docs/skylark/lib/dict.html">Dictionary: String -> String</a> | optional | {} |
-| srcs |  Source files   | <a href="https://bazel.build/docs/build-ref.html#labels">List of labels</a> | optional | [] |
-| tools |  Additional tools to be added to the runfile   | <a href="https://bazel.build/docs/build-ref.html#labels">List of labels</a> | optional | [] |
+| :------------- | :------------- | :------------- | :------------- | :------------- |
+| <a id="bzd_nodejs_install-name"></a>name |  A unique name for this target.   | <a href="https://bazel.build/concepts/labels#target-names">Name</a> | required |  |
+| <a id="bzd_nodejs_install-aliases"></a>aliases |  Name of the alias and path (relative to the workspace root).   | <a href="https://bazel.build/rules/lib/dict">Dictionary: String -> String</a> | optional | <code>{}</code> |
+| <a id="bzd_nodejs_install-data"></a>data |  Data to be added to the runfile list   | <a href="https://bazel.build/concepts/labels">List of labels</a> | optional | <code>[]</code> |
+| <a id="bzd_nodejs_install-deps"></a>deps |  Dependencies   | <a href="https://bazel.build/concepts/labels">List of labels</a> | optional | <code>[]</code> |
+| <a id="bzd_nodejs_install-packages"></a>packages |  Package dependencies   | <a href="https://bazel.build/rules/lib/dict">Dictionary: String -> String</a> | optional | <code>{}</code> |
+| <a id="bzd_nodejs_install-srcs"></a>srcs |  Source files   | <a href="https://bazel.build/concepts/labels">List of labels</a> | optional | <code>[]</code> |
+| <a id="bzd_nodejs_install-tools"></a>tools |  Additional tools to be added to the runfile   | <a href="https://bazel.build/concepts/labels">List of labels</a> | optional | <code>[]</code> |
 
 
-<a name="#bzd_nodejs_library"></a>
+<a id="bzd_nodejs_library"></a>
 
 ## bzd_nodejs_library
 
@@ -38,17 +40,17 @@ bzd_nodejs_library(<a href="#bzd_nodejs_library-name">name</a>, <a href="#bzd_no
 
 
 | Name  | Description | Type | Mandatory | Default |
-| :-------------: | :-------------: | :-------------: | :-------------: | :-------------: |
-| name |  A unique name for this target.   | <a href="https://bazel.build/docs/build-ref.html#name">Name</a> | required |  |
-| aliases |  Name of the alias and path (relative to the workspace root).   | <a href="https://bazel.build/docs/skylark/lib/dict.html">Dictionary: String -> String</a> | optional | {} |
-| data |  Data to be added to the runfile list   | <a href="https://bazel.build/docs/build-ref.html#labels">List of labels</a> | optional | [] |
-| deps |  Dependencies   | <a href="https://bazel.build/docs/build-ref.html#labels">List of labels</a> | optional | [] |
-| packages |  Package dependencies   | <a href="https://bazel.build/docs/skylark/lib/dict.html">Dictionary: String -> String</a> | optional | {} |
-| srcs |  Source files   | <a href="https://bazel.build/docs/build-ref.html#labels">List of labels</a> | optional | [] |
-| tools |  Additional tools to be added to the runfile   | <a href="https://bazel.build/docs/build-ref.html#labels">List of labels</a> | optional | [] |
+| :------------- | :------------- | :------------- | :------------- | :------------- |
+| <a id="bzd_nodejs_library-name"></a>name |  A unique name for this target.   | <a href="https://bazel.build/concepts/labels#target-names">Name</a> | required |  |
+| <a id="bzd_nodejs_library-aliases"></a>aliases |  Name of the alias and path (relative to the workspace root).   | <a href="https://bazel.build/rules/lib/dict">Dictionary: String -> String</a> | optional | <code>{}</code> |
+| <a id="bzd_nodejs_library-data"></a>data |  Data to be added to the runfile list   | <a href="https://bazel.build/concepts/labels">List of labels</a> | optional | <code>[]</code> |
+| <a id="bzd_nodejs_library-deps"></a>deps |  Dependencies   | <a href="https://bazel.build/concepts/labels">List of labels</a> | optional | <code>[]</code> |
+| <a id="bzd_nodejs_library-packages"></a>packages |  Package dependencies   | <a href="https://bazel.build/rules/lib/dict">Dictionary: String -> String</a> | optional | <code>{}</code> |
+| <a id="bzd_nodejs_library-srcs"></a>srcs |  Source files   | <a href="https://bazel.build/concepts/labels">List of labels</a> | optional | <code>[]</code> |
+| <a id="bzd_nodejs_library-tools"></a>tools |  Additional tools to be added to the runfile   | <a href="https://bazel.build/concepts/labels">List of labels</a> | optional | <code>[]</code> |
 
 
-<a name="#BzdNodeJsDepsProvider"></a>
+<a id="BzdNodeJsDepsProvider"></a>
 
 ## BzdNodeJsDepsProvider
 
@@ -62,14 +64,14 @@ BzdNodeJsDepsProvider(<a href="#BzdNodeJsDepsProvider-packages">packages</a>, <a
 
 
 | Name  | Description |
-| :-------------: | :-------------: |
-| packages |  (Undocumented)    |
-| srcs |  (Undocumented)    |
-| aliases |  (Undocumented)    |
-| data |  (Undocumented)    |
+| :------------- | :------------- |
+| <a id="BzdNodeJsDepsProvider-packages"></a>packages |  (Undocumented)    |
+| <a id="BzdNodeJsDepsProvider-srcs"></a>srcs |  (Undocumented)    |
+| <a id="BzdNodeJsDepsProvider-aliases"></a>aliases |  (Undocumented)    |
+| <a id="BzdNodeJsDepsProvider-data"></a>data |  (Undocumented)    |
 
 
-<a name="#BzdNodeJsInstallProvider"></a>
+<a id="BzdNodeJsInstallProvider"></a>
 
 ## BzdNodeJsInstallProvider
 
@@ -83,13 +85,13 @@ BzdNodeJsInstallProvider(<a href="#BzdNodeJsInstallProvider-package_json">packag
 
 
 | Name  | Description |
-| :-------------: | :-------------: |
-| package_json |  (Undocumented)    |
-| node_modules |  (Undocumented)    |
-| aliases |  (Undocumented)    |
+| :------------- | :------------- |
+| <a id="BzdNodeJsInstallProvider-package_json"></a>package_json |  (Undocumented)    |
+| <a id="BzdNodeJsInstallProvider-node_modules"></a>node_modules |  (Undocumented)    |
+| <a id="BzdNodeJsInstallProvider-aliases"></a>aliases |  (Undocumented)    |
 
 
-<a name="#bzd_nodejs_aliases_symlinks"></a>
+<a id="bzd_nodejs_aliases_symlinks"></a>
 
 ## bzd_nodejs_aliases_symlinks
 
@@ -103,12 +105,12 @@ bzd_nodejs_aliases_symlinks(<a href="#bzd_nodejs_aliases_symlinks-files">files</
 
 
 | Name  | Description | Default Value |
-| :-------------: | :-------------: | :-------------: |
-| files |  <p align="center"> - </p>   |  none |
-| aliases |  <p align="center"> - </p>   |  none |
+| :------------- | :------------- | :------------- |
+| <a id="bzd_nodejs_aliases_symlinks-files"></a>files |  <p align="center"> - </p>   |  none |
+| <a id="bzd_nodejs_aliases_symlinks-aliases"></a>aliases |  <p align="center"> - </p>   |  none |
 
 
-<a name="#bzd_nodejs_binary"></a>
+<a id="bzd_nodejs_binary"></a>
 
 ## bzd_nodejs_binary
 
@@ -122,16 +124,16 @@ bzd_nodejs_binary(<a href="#bzd_nodejs_binary-name">name</a>, <a href="#bzd_node
 
 
 | Name  | Description | Default Value |
-| :-------------: | :-------------: | :-------------: |
-| name |  <p align="center"> - </p>   |  none |
-| main |  <p align="center"> - </p>   |  none |
-| args |  <p align="center"> - </p>   |  <code>[]</code> |
-| visibility |  <p align="center"> - </p>   |  <code>[]</code> |
-| tags |  <p align="center"> - </p>   |  <code>[]</code> |
-| kwargs |  <p align="center"> - </p>   |  none |
+| :------------- | :------------- | :------------- |
+| <a id="bzd_nodejs_binary-name"></a>name |  <p align="center"> - </p>   |  none |
+| <a id="bzd_nodejs_binary-main"></a>main |  <p align="center"> - </p>   |  none |
+| <a id="bzd_nodejs_binary-args"></a>args |  <p align="center"> - </p>   |  <code>[]</code> |
+| <a id="bzd_nodejs_binary-visibility"></a>visibility |  <p align="center"> - </p>   |  <code>[]</code> |
+| <a id="bzd_nodejs_binary-tags"></a>tags |  <p align="center"> - </p>   |  <code>[]</code> |
+| <a id="bzd_nodejs_binary-kwargs"></a>kwargs |  <p align="center"> - </p>   |  none |
 
 
-<a name="#bzd_nodejs_docker"></a>
+<a id="bzd_nodejs_docker"></a>
 
 ## bzd_nodejs_docker
 
@@ -145,16 +147,16 @@ bzd_nodejs_docker(<a href="#bzd_nodejs_docker-name">name</a>, <a href="#bzd_node
 
 
 | Name  | Description | Default Value |
-| :-------------: | :-------------: | :-------------: |
-| name |  <p align="center"> - </p>   |  none |
-| deps |  <p align="center"> - </p>   |  none |
-| cmd |  <p align="center"> - </p>   |  none |
-| base |  <p align="center"> - </p>   |  <code>"@docker_image_nodejs//image"</code> |
-| include_metadata |  <p align="center"> - </p>   |  <code>False</code> |
-| deploy |  <p align="center"> - </p>   |  <code>{}</code> |
+| :------------- | :------------- | :------------- |
+| <a id="bzd_nodejs_docker-name"></a>name |  <p align="center"> - </p>   |  none |
+| <a id="bzd_nodejs_docker-deps"></a>deps |  <p align="center"> - </p>   |  none |
+| <a id="bzd_nodejs_docker-cmd"></a>cmd |  <p align="center"> - </p>   |  none |
+| <a id="bzd_nodejs_docker-base"></a>base |  <p align="center"> - </p>   |  <code>"@docker_image_nodejs//image"</code> |
+| <a id="bzd_nodejs_docker-include_metadata"></a>include_metadata |  <p align="center"> - </p>   |  <code>False</code> |
+| <a id="bzd_nodejs_docker-deploy"></a>deploy |  <p align="center"> - </p>   |  <code>{}</code> |
 
 
-<a name="#bzd_nodejs_test"></a>
+<a id="bzd_nodejs_test"></a>
 
 ## bzd_nodejs_test
 
@@ -168,16 +170,16 @@ bzd_nodejs_test(<a href="#bzd_nodejs_test-name">name</a>, <a href="#bzd_nodejs_t
 
 
 | Name  | Description | Default Value |
-| :-------------: | :-------------: | :-------------: |
-| name |  <p align="center"> - </p>   |  none |
-| main |  <p align="center"> - </p>   |  none |
-| deps |  <p align="center"> - </p>   |  <code>[]</code> |
-| visibility |  <p align="center"> - </p>   |  <code>[]</code> |
-| tags |  <p align="center"> - </p>   |  <code>[]</code> |
-| kwargs |  <p align="center"> - </p>   |  none |
+| :------------- | :------------- | :------------- |
+| <a id="bzd_nodejs_test-name"></a>name |  <p align="center"> - </p>   |  none |
+| <a id="bzd_nodejs_test-main"></a>main |  <p align="center"> - </p>   |  none |
+| <a id="bzd_nodejs_test-deps"></a>deps |  <p align="center"> - </p>   |  <code>[]</code> |
+| <a id="bzd_nodejs_test-visibility"></a>visibility |  <p align="center"> - </p>   |  <code>[]</code> |
+| <a id="bzd_nodejs_test-tags"></a>tags |  <p align="center"> - </p>   |  <code>[]</code> |
+| <a id="bzd_nodejs_test-kwargs"></a>kwargs |  <p align="center"> - </p>   |  none |
 
 
-<a name="#bzd_nodejs_deps_aspect"></a>
+<a id="bzd_nodejs_deps_aspect"></a>
 
 ## bzd_nodejs_deps_aspect
 
@@ -191,7 +193,7 @@ bzd_nodejs_deps_aspect(<a href="#bzd_nodejs_deps_aspect-name">name</a>)
 
 
 | Name | Type |
-| :-------------: | :-------------: |
+| :------------- | :------------- |
 | deps| String |
 
 
@@ -199,7 +201,7 @@ bzd_nodejs_deps_aspect(<a href="#bzd_nodejs_deps_aspect-name">name</a>)
 
 
 | Name  | Description | Type | Mandatory | Default |
-| :-------------: | :-------------: | :-------------: | :-------------: | :-------------: |
-| name |  A unique name for this target.   | <a href="https://bazel.build/docs/build-ref.html#name">Name</a> | required |   |
+| :------------- | :------------- | :------------- | :------------- | :------------- |
+| <a id="bzd_nodejs_deps_aspect-name"></a>name |  A unique name for this target.   | <a href="https://bazel.build/concepts/labels#target-names">Name</a> | required |   |
 
 

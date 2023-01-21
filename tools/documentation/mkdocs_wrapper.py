@@ -3,4 +3,4 @@ import sys
 from pkg_resources import load_entry_point
 
 if __name__ == "__main__":
-    sys.exit(load_entry_point("mkdocs", "console_scripts", "mkdocs")())
+	sys.exit(load_entry_point("mkdocs", "console_scripts", "mkdocs")())
