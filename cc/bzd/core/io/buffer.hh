@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cc/bzd/container/threadsafe/ring_buffer.hh"
+#include "cc/bzd/core/async.hh"
 
 namespace bzd::io {
 
