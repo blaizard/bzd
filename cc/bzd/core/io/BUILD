@@ -8,5 +8,6 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/container/threadsafe:ring_buffer",
+        "//cc/bzd/core/async"
     ],
 )
