@@ -16,12 +16,9 @@ public: // Traits.
 	using Config = typename GatewayTraits<Impl>::Config;
 
 public: // Methods.
-    // Connect to another gateway.
-    // The argument passed is the config used to create the other gateway.
-	bzd::Async<Stream> connect(const Config& config) noexcept
-	{
-		return bzd::impl::getImplementation(this)->connect(config);
-	}
+		// Connect to another gateway.
+		// The argument passed is the config used to create the other gateway.
+	bzd::Async<Stream> connect(const Config& config) noexcept { return bzd::impl::getImplementation(this)->connect(config); }
 };
 
 } // namespace bzd::platform

@@ -8,10 +8,7 @@ class Shmem : public bzd::platform::Gateway<Shmem<Context>>
 public:
 	constexpr Shmem(Context& context) noexcept : context_{context} {}
 
-	bzd::Async<> connect() noexcept
-	{
-		co_return {};
-	}
+	bzd::Async<> connect() noexcept { co_return {}; }
 
 private:
 	Context& context_;

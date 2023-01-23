@@ -7,6 +7,7 @@ use "cc/components/linux/proactor/epoll/interface.bdl"
 use "cc/components/posix/shmem/interface.bdl"
 
 
+
 composition {
 	core1 = bzd.platform.linux.Core(stackSize = 200000, name = 2.3);
 	core2 = bzd.platform.linux.Core(stackSize = 200000);
@@ -23,3 +24,5 @@ composition platform {
 	systemClock: bzd.Clock = bzd.platform.std.clock.System();
 	
 }
+
+

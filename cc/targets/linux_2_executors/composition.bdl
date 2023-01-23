@@ -1,5 +1,6 @@
 use "cc/components/linux/core/interface.bdl"
 use "cc/components/generic/executor/interface.bdl"
+use "cc/components/posix/shmem/interface.bdl"
 
 namespace second;
 
@@ -7,6 +8,7 @@ namespace second;
 composition {
 	core = bzd.platform.linux.Core(stackSize = 100000);
 	executor = bzd.platform.generic.Executor(cores = list(core));
+	shmem = bzd.platform.posix.Shmem("/hello");
 	
 }
 
