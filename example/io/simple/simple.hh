@@ -16,7 +16,7 @@ public:
 		bzd::Int32 counter = 0;
 		while (true)
 		{
-			context_.io.send.set(counter);
+			co_await !context_.io.send.set(counter);
 			co_await !bzd::print("Sending {:d}\n"_csv, counter);
 			co_await !bzd::delay(100_ms);
 			++counter;

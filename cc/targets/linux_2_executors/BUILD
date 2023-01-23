@@ -9,6 +9,7 @@ bdl_library(
     deps = [
         "//cc/components/generic/executor",
         "//cc/components/linux/core",
+        "//cc/components/posix/shmem",
         "//cc/targets/linux:composition",
     ],
 )

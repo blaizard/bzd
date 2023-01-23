@@ -5,5 +5,8 @@ namespace bzd.platform.posix;
 
 component Shmem : bzd.platform.Gateway {
 config:
-    name = String;
+	name = String;
+	
 }
+
+

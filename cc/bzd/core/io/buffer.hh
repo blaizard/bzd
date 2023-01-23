@@ -8,20 +8,44 @@ namespace bzd::io {
 template <class Ring>
 class Writer
 {
+private:
+	using Value = typename Ring::ValueMutableType;
+
 public:
 	constexpr explicit Writer(Ring& ring) noexcept : ring_{ring} {}
 
 public:
-	constexpr auto set() noexcept { return ring_.nextForWriting(); }
+	constexpr auto trySet() noexcept { return ring_.nextForWriting(); }
+
 	template <class T>
-	constexpr bzd::Bool set(T&& value) noexcept
+	constexpr bzd::Bool trySet(T&& value) noexcept
 	{
-		if (auto maybeWriter = set(); maybeWriter)
+		if (auto maybeWriter = trySet(); maybeWriter)
 		{
 			maybeWriter.valueMutable() = bzd::forward<T>(value);
 			return true;
 		}
 		return false;
+	}
+
+	bzd::Async<bzd::threadsafe::RingBufferResult<Value&>> set() noexcept
+	{
+		while (true)
+		{
+			if (auto maybeValue = trySet(); maybeValue)
+			{
+				co_return maybeValue;
+			}
+			co_await bzd::async::yield();
+		}
+	}
+
+	template <class T>
+	bzd::Async<> set(T&& value) noexcept
+	{
+		auto writer = co_await !set();
+		writer.valueMutable() = bzd::forward<T>(value);
+		co_return {};
 	}
 
 private:

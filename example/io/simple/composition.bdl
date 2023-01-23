@@ -2,7 +2,7 @@
 namespace example;
 
 
-// / Emit integer continuously.
+// Emit integer continuously.
 component Emitter {
 interface:
 	method generate();
@@ -13,7 +13,7 @@ composition:
 	
 }
 
-// / Poll and receive data.
+// Poll and receive data.
 component Poller {
 interface:
 	method poll();
