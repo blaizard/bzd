@@ -108,9 +108,11 @@ class Connections:
 
 		# Check const correctness.
 		inputEntity = input.symbol.getEntityResolved(resolver=self.resolver)
+		assert isinstance(inputEntity, EntityExpression)
 		inputEntity.assertTrue(condition=not inputEntity.symbol.const,
 			message="A connection sender must not be marked as const.")
 		outputEntity = output.symbol.getEntityResolved(resolver=self.resolver)
+		assert isinstance(outputEntity, EntityExpression)
 		outputEntity.assertTrue(condition=outputEntity.symbol.const,
 			message="A connection receiver must be marked as const.")
 
@@ -120,8 +122,10 @@ class Connections:
 		input.assertTrue(condition=input.symbol not in self.outputs,
 			message=f"'{input.symbol}' has already been defined as an output.")
 		if input.symbol not in self.outputs:
+			inputEntityType = input.symbol.getEntityUnderlyingTypeResolved(resolver=self.resolver)
+			assert hasattr(inputEntityType, "symbol")
 			self.groups[input.symbol] = ConnectionGroup(executor=input.executorOr("executor"),
-				symbol=input.symbol.getEntityUnderlyingTypeResolved(resolver=self.resolver).symbol)
+				symbol=inputEntityType.symbol)
 		self.groups[input.symbol].outputs[output.symbol] = OutputMetadata(executor=output.executorOr("executor"))
 		self.outputs.add(output.symbol)
 
@@ -196,7 +200,7 @@ class Components:
 			return True
 
 		entries = [(k, v) for k, v in self.map.items()]
-		self.map: typing.Dict[str, ExpressionEntry] = OrderedDict()
+		self.map = OrderedDict()
 
 		while entries:
 
@@ -232,7 +236,7 @@ class Components:
 		for entry in self.map.values():
 			yield entry
 
-	def insert(self, expression: Expression, entryType: EntryType, executor: str) -> ExpressionEntry:
+	def insert(self, expression: Expression, entryType: EntryType, executor: str) -> typing.Optional[ExpressionEntry]:
 		"""Insert a new entry in the map, return the entry if it does not exists or if it can be updated,
 		otherwise it returns None."""
 
@@ -346,7 +350,7 @@ class Entities:
 	@cached_property
 	def registryConnections(self) -> typing.Dict[str, typing.Dict[str, typing.Any]]:
 
-		result = {fqn: OrderedDict() for fqn in self.registry.keys()}
+		result: typing.Dict[str, typing.Dict[str, typing.Any]] = {fqn: OrderedDict() for fqn in self.registry.keys()}
 
 		def addEntry(symbol: Symbol, kind: str, input: Symbol) -> None:
 			fqn = symbol.this
@@ -366,10 +370,10 @@ class Entities:
 
 		return result
 
-	def getConnectionsByExecutor(self, fqn: str) -> typing.Iterable[Expression]:
+	def getConnectionsByExecutor(self, fqn: str) -> typing.Iterable[typing.Dict[str, typing.Any]]:
 		for input, group in self.connections.groups.items():
 			if group.executor == fqn or any(metadata.executor == fqn for metadata in group.outputs.values()):
-				result = {"symbol": group.symbol, "input": input, "emitter": (group.executor == fqn), "outputs": []}
+				result: typing.Dict[str, typing.Any] = {"symbol": group.symbol, "input": input, "emitter": (group.executor == fqn), "outputs": []}
 				for output, metadata in group.outputs.items():
 					if metadata.executor == fqn:
 						result["outputs"].append({"symbol": output, "history": metadata.history})
@@ -502,6 +506,7 @@ class Entities:
 		if underlyingType.isInterface:
 
 			def checkIfInitOrShutdown(interfaceEntity: Entity) -> typing.Optional[DependencyGroup]:
+				assert entry is not None
 				if interfaceEntity.contracts.has("init"):
 					return entry.init
 				if interfaceEntity.contracts.has("shutdown"):
@@ -516,6 +521,7 @@ class Entities:
 						element=ExpressionBuilder(type=f"this.{interfaceEntity.name}"),
 						expression=expression,
 						resolveNamespace=interfaceEntity.namespace)
+					assert isinstance(newEntity, Expression)
 					maybeGroup.push(newEntity)
 
 		# Check if there are dependent composition from this entity.
@@ -530,6 +536,7 @@ class Entities:
 					expression=expression,
 					resolveNamespace=entityCopied.namespace,
 					name=compositionEntity.name if compositionEntity.isName else None)
+				assert isinstance(newEntity, Expression)
 				entry.intra.push(newEntity)
 
 		# Add implicit dependencies.

@@ -119,7 +119,7 @@ class ArrayType:
 
 	@classmethod
 	def toType(cls, entity: Symbol, nested: typing.List[str], reference: bool,
-		values: typing.Optional[typing.Sequence[str]]) -> TypeConversionCallableReturn:
+		values: typing.Optional[typing.List[str]]) -> TypeConversionCallableReturn:
 
 		if reference:
 			return f"bzd::interface::{cls.name}", nested
