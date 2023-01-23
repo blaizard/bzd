@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cc/bzd/core/async.hh"
+#include "tools/bdl/generators/cc/adapter/types.hh"
 
 namespace bzd::platform {
 

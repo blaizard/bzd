@@ -113,11 +113,7 @@ class ParametersCommon:
 				entityType.assertTrue(condition=entityType.isRoleType, message="This entity must be of role type.")
 				yield entityType.category
 			else:
-				self.error(element=param, message="Unsupported parameter.")
-
-	@staticmethod
-	def makeKey(name: typing.Optional[str], index: int) -> Key:
-		return index if name is None else name
+				self.error(element=param.element, message="Unsupported parameter.")
 
 	def items(self, includeVarArgs: bool) -> typing.Iterator[typing.Tuple[Key, "EntityExpression"]]:
 		for key, entity, _ in self.itemsMetadata(includeVarArgs=includeVarArgs):
@@ -184,7 +180,7 @@ class ParametersCommon:
 			throw=throw)
 
 
-ResolvedType = typing.Union["Entity", "Symbol"]
+ResolvedType = typing.Union["EntityExpression", "Symbol"]
 
 
 class Parameters(ParametersCommon):

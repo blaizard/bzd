@@ -30,7 +30,7 @@ class Parent:
 
 	@property
 	def namespace(self) -> typing.List[str]:
-		if self.isNested:
+		if self.entity and self.isNested:
 			return [self.entity.name] if self.entity.isName else []
 		if isinstance(self.entity, Namespace):
 			return self.entity.nameList
@@ -145,7 +145,7 @@ class Visitor(VisitorBase[T, T]):
 				self.level += 1
 
 				entity.assertTrue(condition=not element.isNestedSequence("invalid")
-					or element.getNestedSequence("invalid").empty(),
+					or element.getNestedSequence("invalid").empty(), # type: ignore
 					message=f"This element '{entity.category}' does not support direct nested scope.")
 				for nested in NestedSequence:
 					sequence = element.getNestedSequence(nested.value)
