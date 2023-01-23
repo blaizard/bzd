@@ -4,7 +4,7 @@ use "cc/components/posix/stream/in/interface.bdl"
 use "cc/components/std/clock/steady/interface.bdl"
 use "cc/components/std/clock/system/interface.bdl"
 use "cc/components/linux/proactor/epoll/interface.bdl"
-
+use "cc/components/posix/shmem/interface.bdl"
 
 
 composition {
@@ -12,6 +12,7 @@ composition {
 	core2 = bzd.platform.linux.Core(stackSize = 200000);
 	executor = bzd.platform.generic.Executor(cores = list(core1, core2));
 	proactor = bzd.platform.linux.epoll.Proactor();
+	shmem = bzd.platform.posix.Shmem("/hello");
 	
 }
 
@@ -22,5 +23,3 @@ composition platform {
 	systemClock: bzd.Clock = bzd.platform.std.clock.System();
 	
 }
-
-

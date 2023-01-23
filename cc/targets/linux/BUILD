@@ -19,6 +19,7 @@ bdl_library(
         "//cc/components/posix/stream/out",
         "//cc/components/std/clock/steady",
         "//cc/components/std/clock/system",
+        "//cc/components/posix/shmem"
     ],
 )
 
