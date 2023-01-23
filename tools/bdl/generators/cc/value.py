@@ -40,7 +40,7 @@ def valueToStr(item: ParametersResolvedItem,
 		return ", ".join(paramValues) if expectedTypeStr == "" else f"{expectedTypeStr}{{{', '.join(paramValues)}}}"
 
 	if item.param.isLiteral:
-		value = bindTypeAndValue([item.param.literal]) # type: ignore
+		value = bindTypeAndValue([item.param.literal])  # type: ignore
 	elif item.isLValue:
 		fqn = item.param.underlyingValueFQN
 		assert fqn is not None

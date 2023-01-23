@@ -12,12 +12,12 @@ import struct
 import fcntl
 
 
-def resize(fd, rows, columns):
+def resize(fd: int, rows: int, columns: int) -> None:
 	winsize = struct.pack("HHHH", rows, columns, 0, 0)
 	fcntl.ioctl(fd, termios.TIOCSWINSZ, winsize)
 
 
-def main(cwd: pathlib.Path, env: typing.Dict[str, str], args: typing.Sequence[str]) -> None:
+def main(cwd: pathlib.Path, env: typing.Dict[str, str], args: typing.List[str]) -> None:
 
 	# Save original tty setting then set it to raw mode
 	#old_tty = termios.tcgetattr(sys.stdin)

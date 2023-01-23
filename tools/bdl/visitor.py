@@ -144,8 +144,9 @@ class Visitor(VisitorBase[T, T]):
 
 				self.level += 1
 
-				entity.assertTrue(condition=not element.isNestedSequence("invalid")
-					or element.getNestedSequence("invalid").empty(), # type: ignore
+				entity.assertTrue(
+					condition=not element.isNestedSequence("invalid")
+					or element.getNestedSequence("invalid").empty(),  # type: ignore
 					message=f"This element '{entity.category}' does not support direct nested scope.")
 				for nested in NestedSequence:
 					sequence = element.getNestedSequence(nested.value)
