@@ -1,7 +1,7 @@
-load("@rules_python//python:pip.bzl", "pip_install")
+load("@rules_python//python:pip.bzl", "pip_parse")
 
 def bazel_rules_python_register():
-    pip_install(
+    pip_parse(
         name = "python_deps",
-        requirements = "//tools/bazel_build/rules/third_party/python:requirements.txt",
+        requirements_lock = "//tools/bazel_build/rules/third_party/python:requirements.txt",
     )

@@ -3,15 +3,10 @@ namespace bzd.platform;
 
 /*
  * Gateway interface to bridge executors together.
- * 
  * Need to provide several fuctions to support the following use cases:
- * 
  * - inproc
- * 
  * - shared memory: The ring buffer must be created in a special memory region.
- * 
  * - ethernet
- * 
  * - can
  */
 extern interface Gateway;
