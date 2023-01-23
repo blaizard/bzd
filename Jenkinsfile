@@ -105,17 +105,6 @@ pipeline
 						archiveArtifacts artifacts: "bazel-out/coverage_cc/**/*", onlyIfSuccessful: true
 					}
 				}
-				stage("[coverage] Python")
-				{
-					steps
-					{
-						lock("coverage")
-						{
-							sh "./tools/bazel coverage ... --config=py --platform_suffix=coverage_py && ./tools/bazel run tools/coverage --platform_suffix=coverage_py -- --output bazel-out/coverage_py"
-						}
-						archiveArtifacts artifacts: "bazel-out/coverage_py/**/*", onlyIfSuccessful: true
-					}
-				}
 				stage("[coverage] NodeJs")
 				{
 					steps

@@ -104,18 +104,6 @@
         {
             "category": "coverage",
             "commands": [
-                "./tools/bazel coverage ... --config=py --platform_suffix=coverage_py && ./tools/bazel run tools/coverage --platform_suffix=coverage_py -- --output bazel-out/coverage_py"
-            ],
-            "name": "Python",
-            "output": "bazel-out/coverage_py",
-            "tags": [
-                "x86_64",
-                "py"
-            ]
-        },
-        {
-            "category": "coverage",
-            "commands": [
                 "./tools/bazel coverage ... --config=nodejs --platform_suffix=coverage_nodejs && ./tools/bazel run tools/coverage --platform_suffix=coverage_nodejs -- --output bazel-out/coverage_nodejs"
             ],
             "name": "NodeJs",

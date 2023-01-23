@@ -126,7 +126,8 @@ def localCommand(cmds: List[str],
 		stream.addStderr(remainingStderr)
 
 		if not timer.is_alive():
-			stream.addStderr(f"Execution of '{' '.join(cmds)}' timed out after {timeoutS}s, terminating process.\n".encode())
+			stream.addStderr(
+				f"Execution of '{' '.join(cmds)}' timed out after {timeoutS}s, terminating process.\n".encode())
 		else:
 			returnCode = proc.returncode
 			if returnCode == None:
