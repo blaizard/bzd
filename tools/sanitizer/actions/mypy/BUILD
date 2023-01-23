@@ -15,8 +15,6 @@ py_binary(
         requirement("mypy"),
         requirement("typing_extensions"),
         requirement("mypy_extensions"),
-        requirement("typed-ast"),
-        requirement("toml"),
         "//python/bzd/utils:worker",
         "//tools/sanitizer/utils/python:workspace",
     ],

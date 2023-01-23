@@ -155,7 +155,7 @@ class ProcessedSchema:
 
 		# Add any 'check' function to the validation.
 		if hasattr(constraint, "check"):
-			self.validations.append(constraint.check)  # type: ignore
+			self.validations.append(constraint.check)
 
 	def installValidation(self, validation: ValidationCallable, args: typing.Any) -> None:
 		"""

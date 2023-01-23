@@ -142,7 +142,7 @@ def makeGrammarExpressionFragment(finalGrammar: Grammar = [GrammarItem(r";", Fra
 		GrammarItem(_regexprValue, Fragment,
 		[GrammarItem(r",", FragmentNewElement),
 		GrammarItem(r"\)", FragmentParentElement)]))
-	grammarValue.append(
+	grammarValue.extend(
 		makeGrammarType([
 		GrammarItem(r"\(", ArgumentStart, grammarValue),
 		GrammarItem(r",", FragmentNewElement),
