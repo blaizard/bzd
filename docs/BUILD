@@ -5,6 +5,7 @@ genrule(
     srcs = [
         "mkdocs.yml",
         "//:README.md",
+        "//cc:documentation",
     ] + glob([
         "**/*.md",
         "**/*.jpg",

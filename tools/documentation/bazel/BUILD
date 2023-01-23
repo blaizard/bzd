@@ -22,9 +22,5 @@ rule_names = [
 
 copy_outputs(
     name = "bazel",
-    inputs = [
-        ":nodejs",
-        ":nodejs_web",
-        ":package",
-    ],
+    inputs = [":{}".format(name) for name in rule_names],
 )

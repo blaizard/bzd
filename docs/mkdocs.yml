@@ -6,19 +6,27 @@ repo_url: "https://github.com/blaizard/bzd"
 
 nav:
   - Home: README.md
-  - Components: docs/components.md
+  - BDL:
+    - Overview: docs/bdl/overview.md
+    - Syntax: docs/bdl/syntax.md
+    - Components: docs/bdl/components.md
+    - Composition: docs/bdl/composition.md
+    - Executors: docs/bdl/executors.md
+    - Gateway: docs/bdl/gateway.md
+    - System: docs/bdl/system.md
   - Bazel:
+    - bdl: docs/api/bazel/bdl.md
+    - cc: docs/api/bazel/cc.md
+    - docker: docs/api/bazel/docker.md
     - nodejs: docs/api/bazel/nodejs.md
     - nodejs_web: docs/api/bazel/nodejs_web.md
     - package: docs/api/bazel/package.md
+  - C++:
+    - Layout: cc/README.md
+    - Async: cc/bzd/core/async/README.md
 
 theme:
   name: material
-  highlightjs: true
-  hljs_languages:
-    - C++
-    - python
-    - JavaScript
   palette:
     primary: "blue grey"
     accent: "light blue"
@@ -31,6 +39,10 @@ plugins:
         - tools/documentation/*
 
 markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid

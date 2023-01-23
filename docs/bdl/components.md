@@ -1,15 +1,15 @@
 # Components
 
-This framework offers component based development. Components comes at various level of the development and can be asociated to become a larger component. Components can also contains sub-components. It defines a composable entity which roles varies from a driver to a functional component.
+This framework offers component based development. Components comes at various level of the development and can be asociated to become a larger component. Components can also contains sub-components. It defines a composable entity which roles can vary from a driver to a functional component.
 
-It is declared and defined through a bdl language file. A component contains 2 entities, an interface, that is shared between all components of the same type and an implementation specific configuration.
+A component contains 2 entities, an interface, that is shared between all components of the same type and an implementation specific configuration.
 
 For exampe, we will define a square which interface is a generic shape.
 
 ```bdl
 interface Shape
 {
-	using Area = Integer [min = 0];
+	using Area = Integer [min(0)];
 	method surface() -> Area;
 }
 
@@ -56,7 +56,8 @@ Area ComplexShape::surface()
 }
 ```
 
-Sub-components helps for encapsulation and hence reduce the complexity during component re-use and composition. For example, imagine a complex sub-system:
+Sub-components helps for encapsulation and hence reduce the complexity and composability while improving re-usability.
+For example, imagine a complex sub-system:
 ```bdl
 component RobotLeg : Kinematics
 {

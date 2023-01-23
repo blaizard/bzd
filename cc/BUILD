@@ -17,7 +17,7 @@ bzd_cc_library(
 filegroup(
     name = "documentation",
     srcs = glob([
-        "bzd/**/*.hh",
+        "**/*.md",
     ]),
     visibility = ["//visibility:public"],
 )

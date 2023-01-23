@@ -1,17 +1,6 @@
-# Bdl Syntax
+# Syntax
 
-The following describes the the Bzd Description Language (BDL) used to describe interfaces to communicate between components.
-
-## Use Cases
-
-The following use cases are coverd by this description language:
-- Provide an inter-core/inter-language communication mean between components.
-- Reduce boiler plate for interfaces.
-- Enfore input/output constraints (contracts).
-
-For example:
-- Describe API for REST-based communication between client and server.
-- Describe interface for C++ drivers.
+The following describes the syntax of the Bzd Description Language (BDL) used to describe interfaces to communicate between components.
 
 ## Types
 
@@ -19,27 +8,26 @@ For example:
 
 The following built-in types are made available by the implementation as built-in types.
 
-- Boolean
-- Integer (*)
-- Float (*)
-- String
-- Optional<T>
-- Result<T, E>
-- Async<T, E>
-- Sequence<T>
-- Tuple<T, U, ...>
-- Variant<T, U, ...>
-- Callable
-
-(*) These types cannot be used directly and need to be used through a `using` statement to enforce strong typing.
+| Syntax | Description |
+| ----------- | ----------- |
+| Void | Empty type, usually used for return statements. |
+| Boolean | Binary type evaluating to `true` or `false`. |
+| Integer | Represents an arithmetic integer. Its size can be defined with contracts. |
+| Float | Represents an arithmetic floating point. Its size can be defined with contracts. |
+| Byte | Type representing a byte. |
+| String | Type representing a string. |
+| Result<T> | Templated type that contains either a value of type `T` or an error. |
+| Async<T> | Templated type that contains an asynchronous prommise returning a value of type `T` or an error. |
+| Array<T> | A fixed length array of type `T`. Its capacity may be defined with contracts. |
+| Vector<T> | A resizable and sequential container of type `T`. Its capacity may be defined with contracts. |
 
 ### Structures
 
 ```
 struct Coord
 {
-	Float x;
-	Float y;
+	x = Float;
+	y = Integer;
 }
 ```
 
@@ -47,16 +35,16 @@ struct Coord
 ```
 enum MyEnum
 {
-	FIRST,
-	SECOND
+	first,
+	second
 }
 ```
 
 ### Strong Types
 
-Strong typing is supported with the `using` keyword. For example, to define an integer strong type, this can be done as follow:
+Strong typing is supported with the `using` keyword. For example, to define an integer with strong typing, this can be done as follow:
 ```
-using MyStrongType = Integer [min = 0, max = 23];
+using MyStrongType = Integer [min(0), max(23)];
 ```
 
 ## Namespaces
@@ -66,6 +54,7 @@ To prevent symbol leakage, files can be defined to be under a specific namespace
 namespace bzd.dummy;
 ```
 In this example, all entities declared in this file will be accessed prepended by the `bzd.dummy` namespace.
+Only one namespace can be declared within a file and the namespace statement must be at the top of the file.
 
 ## Dependencies
 
@@ -74,9 +63,9 @@ All BDL dependencies should be imported at the top of the file, referenced by th
 use "cc/bzd/core/my_interface.bdl"
 ```
 
-## Variables
+## Expressions
 
-A variable is defined as follow:
+An expression is defined as follow:
 ```
 [const] <type> <name> [= <value>] [[<contracts>...]];
 ```
@@ -85,27 +74,51 @@ A variable is defined as follow:
 
 A function is defined as follow:
 ```
-method <name>(<variable1>, ...) [-> <type>] [[<contracts>...]];
+method <name>(<expression1>, ...) [-> <type>] [[<contracts>...]];
 ```
 
 ## Interfaces
 
-Interfaces are pure virtual classes that are defined with the keywork `interface`.
-It contains children which can be either functions or variables.
+Interfaces are used by components to expose their public interfaces, they are defined with the keywork `interface`.
+Note that the defintition does not imply a specific interface implementation.
 
 ## Components
 
 A component is the implementation of one or multiple interfaces. It can be instantiated and exposes
 the functionality of the interface it inherits from.
-In addition it exposes things like configuration details, dependencies... to the description language.
+In addition it describes its configuration and compisition to the description language.
 
-For example:
-```
-namespace bzd.platform.impl;
+### Configuration
 
-component MyModule : bzd.platform.Reader
+A component should tell how it is instancited during composition, this is done under the `config` scope as follow:
+```bdl
+component MyModule
 {
 config:
-	channel = Integer;
+	channel = String;
+	capacity = Integer(100) [min(1)];
 }
 ```
+
+The composition will then instanciate this component by requiring a string as its `channel` argument and an optional `capacity` argument.
+```bdl
+composition {
+	module = MyModule(channel = "channel1");
+}
+```
+
+### Composition
+
+Similarly a predefined composition can be described for a component when instantiated. For example:
+```bdl
+component MyModule
+{
+interface:
+	method run();
+composition:
+	this.run();
+}
+```
+
+This will create a workload from the `run` method when the component `MyModule` is instantiated.
+Note that this workload will be a service because it was not explicitly declared by the user.
