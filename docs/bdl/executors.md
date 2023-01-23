@@ -1,9 +1,11 @@
 # Executors
 
-An executor is a group of computation units (cores) that can share workload between each others.
-They share the same work queue and a component gets executed on an arbitrary core, unless constraints are defined for specific cores.
-```
-[ executor ] 1 <- * [ core ]
+An executor is a group of computation units (cores) that can share workloads between each others.
+They share the same work queue and a component gets executed on an arbitrary core.
+
+```mermaid
+classDiagram
+   Executor "1" --> "*" Core
 ```
 
 Cores can be assigned with a maximum load or other specific atrtibutes.
@@ -43,14 +45,4 @@ composition
    comp1 = Component [executor(linux)];
 }
 ```
-If omitted, the component will run on the default executor.
-
-To associate a group of entities to an executor, this can be done at the composition level.
-For example, to instanciate a component and execute it on the `esp32` executor, it can be done as follow:
-
-```bdl
-composition [executor(esp32)]
-{
-   comp1 = Component;
-}
-```
+If omitted, the component will run on the default `executor`.

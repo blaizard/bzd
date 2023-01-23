@@ -1,4 +1,4 @@
-# ::bzd
+# bzd Framework
 
 [![Build Status](https://travis-ci.com/blaizard/bzd.svg?branch=master)](https://travis-ci.com/blaizard/bzd)
 [![CI](https://github.com/blaizard/bzd/workflows/CI/badge.svg)](https://github.com/blaizard/bzd/actions)
@@ -13,14 +13,15 @@ This mono-repository enables the following technologies:
 ## Overview
 
 This framework is built to run on all sort of embedded platforms, from bare metals 8-bit microcontrollers to high performance compute units.
-It is made to remove any dependencies from STL, but provide a similar set of containers and utilities to develop applications in an
+It is made to remove any dependencies from STL, but provide a similar set of components and utilities to develop applications in an
 efficient and safe manner.
 
 It features the followings:
 
 - No dynamic allocations. All storage is declared either at compile time or on the stack.
-- Self contained, no reliance on third-party nor STL dependencies.
+- The core library is self contained, no reliance on third-party, only on the freestanding STL.
 - Flexible error handling model.
+- Based on C++ coroutines.
 - Compile-time string formating tool.
 - Lightweight.
 - Usefull set of containers.
@@ -82,12 +83,13 @@ To run all tests, run the following command:
 
 This is a non-exhaustive list of languages and their supported tools. In addition to that
 formater and linters for YAML, json and markdown are also available.
-|Language|Formatters|Code Analyzers|Code Coverage|Test Framework|Documentation|
-|--|--|--|--|--|--|
-|C++|clang-format|clang-tidy, asan, lsan|Yes|Yes|doxygen-based|
-|Python|yapf|mypy|Yes|Yes||
-|Node|prettier|eslint|Yes|Yes||
-|Skylark|buildifier|buildifier|||stardoc|
+
+| Language | Formatters   | Code Analyzers                      | Code Coverage | Test Framework | Documentation |
+| -------- | ------------ | ----------------------------------- | ------------- | -------------- | ------------- |
+| C++      | clang-format | clang-tidy, asan, lsan, tsan, ubsan | Yes           | Yes            | doxygen-based |
+| Python   | yapf         | mypy                                | Yes           | Yes            |               |
+| Node     | prettier     | eslint                              | Yes           | Yes            |               |
+| Skylark  | buildifier   | buildifier                          |               |                | stardoc       |
 
 ## Naming Convention
 

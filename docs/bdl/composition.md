@@ -1,4 +1,4 @@
-# Bdl Composition
+# Composition
 
 The composition stage brings all components together to compose a running system.
 
