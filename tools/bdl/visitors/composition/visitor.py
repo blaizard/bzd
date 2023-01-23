@@ -90,7 +90,7 @@ class Composition:
 		# Applications are all intra expressions that are instanciated at top level
 		for executorFQN in self.entities.executors:
 			self.asyncs[executorFQN] = {}
-			self.registryByExecutor[executorFQN] = self.entities.getRegistryByExecutor(executorFQN) # type: ignore
+			self.registryByExecutor[executorFQN] = self.entities.getRegistryByExecutor(executorFQN)  # type: ignore
 			for entity in self.entities.getWorkloadsByExecutor(executorFQN):
 				self.asyncs[executorFQN][entity] = AsyncType.workload
 			for entity in self.entities.getServicesByExecutor(executorFQN):

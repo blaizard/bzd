@@ -60,8 +60,4 @@ if __name__ == "__main__":
 
 	worker.stop()
 
-	if not isSuccess:
-		print("---- MYPY ----")
-		main(clean_exit=True, args=["--version"])
-
 	sys.exit(0 if isSuccess else 1)

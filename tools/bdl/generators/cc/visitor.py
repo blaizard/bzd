@@ -140,7 +140,7 @@ class Transform:
 		"""
 		registry = self.composition.registry.keys() if self.composition and isRegistry else None
 		symbols = self.composition.symbols if self.composition else None
-		return [valueToStrOriginal(item, symbols=symbols, registry=registry) for item in params] # type: ignore
+		return [valueToStrOriginal(item, symbols=symbols, registry=registry) for item in params]  # type: ignore
 
 	def paramsDeclaration(self, params: ParametersResolved, isRegistry: bool = False) -> str:
 		return ", ".join(self.paramsDeclarationToList_(params=params, isRegistry=isRegistry))

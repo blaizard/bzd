@@ -373,7 +373,12 @@ class Entities:
 	def getConnectionsByExecutor(self, fqn: str) -> typing.Iterable[typing.Dict[str, typing.Any]]:
 		for input, group in self.connections.groups.items():
 			if group.executor == fqn or any(metadata.executor == fqn for metadata in group.outputs.values()):
-				result: typing.Dict[str, typing.Any] = {"symbol": group.symbol, "input": input, "emitter": (group.executor == fqn), "outputs": []}
+				result: typing.Dict[str, typing.Any] = {
+					"symbol": group.symbol,
+					"input": input,
+					"emitter": (group.executor == fqn),
+					"outputs": []
+				}
 				for output, metadata in group.outputs.items():
 					if metadata.executor == fqn:
 						result["outputs"].append({"symbol": output, "history": metadata.history})

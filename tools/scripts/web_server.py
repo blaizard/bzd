@@ -82,10 +82,12 @@ if __name__ == "__main__":
 
 	args = parser.parse_args()
 
+	handler: typing.Type[http.server.BaseHTTPRequestHandler]
+
 	# If archive is set, serve files from this specific archive
 	if os.path.isfile(args.path):
 		print(f"Serving archive '{args.path}'.")
-		handler = functools.partial(ArchiveRequestHandler, pathlib.Path(args.path))
+		handler = functools.partial(ArchiveRequestHandler, pathlib.Path(args.path))  # type: ignore
 
 	# If special path, serve it
 	elif os.path.isdir(args.path):

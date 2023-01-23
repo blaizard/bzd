@@ -5,6 +5,7 @@ from tools.bdl.object import Object, ObjectContext
 from tools.bdl.entities.all import Expression
 from tools.bdl.entities.impl.fragment.parameters_resolved import ParametersResolvedItem
 
+
 class TestRun(unittest.TestCase):
 
 	def testContracts(self) -> None:

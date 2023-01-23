@@ -174,7 +174,7 @@ class Expression(EntityExpression):
 		Error.assertTrue(element=self.element, attr="type", condition=bool(result), message=str(result))
 
 		# Compute and set the literal value if any.
-		maybeValue = resolvedTypeEntity.toLiteral(result.values) # type: ignore
+		maybeValue = resolvedTypeEntity.toLiteral(result.values)  # type: ignore
 		if maybeValue is not None:
 			self.assertTrue(condition=isinstance(maybeValue, str),
 				message=f"The returned value from toLiteral must be a string, not {str(maybeValue)}")

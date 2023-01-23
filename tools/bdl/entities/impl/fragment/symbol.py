@@ -212,10 +212,10 @@ class Symbol:
 	def __repr__(self) -> str:
 		return self.name
 
-	def __eq__(self, other: "Symbol") -> bool: # type: ignore
+	def __eq__(self, other: "Symbol") -> bool:  # type: ignore
 		return str(self) == str(other)
 
-	def __ne__(self, other: "Symbol") -> bool: # type: ignore
+	def __ne__(self, other: "Symbol") -> bool:  # type: ignore
 		return not (self == other)
 
 	def __hash__(self) -> int:
