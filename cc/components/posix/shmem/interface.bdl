@@ -1,0 +1,9 @@
+use "cc/bzd/platform/interfaces/gateway.bdl"
+
+namespace bzd.platform.posix;
+
+
+component Shmem : bzd.platform.Gateway {
+config:
+    name = String;
+}

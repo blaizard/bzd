@@ -31,6 +31,17 @@ bdl_library(
 )
 
 bdl_library(
+    name = "gateway",
+    srcs = [
+        "gateway.bdl",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/platform/interfaces/cc:gateway",
+    ],
+)
+
+bdl_library(
     name = "stream",
     srcs = [
         "stream.bdl",
