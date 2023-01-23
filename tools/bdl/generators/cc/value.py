@@ -6,6 +6,7 @@ from tools.bdl.generators.cc.comments import commentParametersResolvedToStr
 from tools.bdl.entities.impl.fragment.parameters_resolved import ParametersResolvedItem
 from tools.bdl.visitors.symbol_map import SymbolMap
 from tools.bdl.entities.impl.types import Category
+from tools.bdl.entities.impl.expression import Expression
 
 
 def valueToStr(item: ParametersResolvedItem,
@@ -39,9 +40,10 @@ def valueToStr(item: ParametersResolvedItem,
 		return ", ".join(paramValues) if expectedTypeStr == "" else f"{expectedTypeStr}{{{', '.join(paramValues)}}}"
 
 	if item.param.isLiteral:
-		value = bindTypeAndValue([item.param.literal])
+		value = bindTypeAndValue([item.param.literal]) # type: ignore
 	elif item.isLValue:
 		fqn = item.param.underlyingValueFQN
+		assert fqn is not None
 		value = fqnToNameStr(fqn)
 		if registry is not None:
 			# Get the value from the registry instead of directly.
@@ -50,9 +52,11 @@ def valueToStr(item: ParametersResolvedItem,
 		if symbols is not None:
 			# Cast values to there underlying interface type.
 			expectedType = item.expected.underlyingTypeFQN
+			assert expectedType is not None
 			if symbols.getEntityResolved(expectedType).value.category == Category.interface:
 				value = f"bzd::Interface<\"{expectedType}\">::cast({value})"
 	elif item.isRValue:
+		assert isinstance(item.param, Expression)
 		values = [valueToStr(item=i, symbols=symbols, registry=registry) for i in item.param.parametersResolved]
 		value = bindTypeAndValue(values)
 	else:

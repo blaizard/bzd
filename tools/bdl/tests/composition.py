@@ -7,7 +7,7 @@ from tools.bdl.visitors.composition.visitor import Composition
 
 class TestRun(unittest.TestCase):
 
-	def testTemp(self):
+	def testTemp(self) -> None:
 		interface = Object.fromContent(content="""
 			component Hello {
 			config:

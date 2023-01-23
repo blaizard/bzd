@@ -3,12 +3,12 @@ from pathlib import Path
 
 from bzd.template.template import Template
 
-from tools.bdl.visitors.composition.visitor import Composition, AsyncType
+from tools.bdl.visitors.composition.visitor import Composition, AsyncType as AsyncTypeOriginal
 from tools.bdl.object import Object
 from tools.bdl.entities.all import Namespace, Using, Expression
 from tools.bdl.entities.impl.fragment.symbol import Symbol
 from tools.bdl.entities.impl.fragment.parameters_resolved import ParametersResolved, ParametersResolvedItem
-from tools.bdl.entities.impl.types import Category
+from tools.bdl.entities.impl.types import Category as CategoryOriginal
 
 from tools.bdl.generators.cc.symbol import symbolToStr as symbolToStrOriginal
 from tools.bdl.generators.cc.value import valueToStr as valueToStrOriginal
@@ -38,8 +38,8 @@ Expressions:
 # String related
 class Transform:
 
-	Category = Category
-	AsyncType = AsyncType
+	Category = CategoryOriginal
+	AsyncType = AsyncTypeOriginal
 
 	def __init__(self, composition: typing.Optional[Composition] = None, includes: typing.List[Path] = []) -> None:
 		self.composition = composition
@@ -129,6 +129,7 @@ class Transform:
 		elif item.isRValue:
 			return f"T{index} {item.name};"
 		item.error(message="Type not supported, should never happen.")
+		return ""
 
 	def paramsDeclarationToList_(self, params: ParametersResolved, isRegistry: bool = False) -> typing.List[str]:
 		"""Declare inline parameters.
@@ -139,12 +140,12 @@ class Transform:
 		"""
 		registry = self.composition.registry.keys() if self.composition and isRegistry else None
 		symbols = self.composition.symbols if self.composition else None
-		return [valueToStrOriginal(item, symbols=symbols, registry=registry) for item in params]
+		return [valueToStrOriginal(item, symbols=symbols, registry=registry) for item in params] # type: ignore
 
 	def paramsDeclaration(self, params: ParametersResolved, isRegistry: bool = False) -> str:
 		return ", ".join(self.paramsDeclarationToList_(params=params, isRegistry=isRegistry))
 
-	def paramsFilterOutLiterals(self, params: ParametersResolved) -> typing.Iterator[ParametersResolved]:
+	def paramsFilterOutLiterals(self, params: ParametersResolved) -> typing.Iterator[ParametersResolvedItem]:
 		for item in params:
 			if item.param.isLiteral:
 				continue
@@ -201,10 +202,10 @@ class Transform:
 
 	# Async type
 
-	def asyncTypeToStr(self, asyncType: AsyncType) -> str:
+	def asyncTypeToStr(self, asyncType: AsyncTypeOriginal) -> str:
 		return {
-			AsyncType.workload: "bzd::async::Type::workload",
-			AsyncType.service: "bzd::async::Type::service",
+			AsyncTypeOriginal.workload: "bzd::async::Type::workload",
+			AsyncTypeOriginal.service: "bzd::async::Type::service",
 		}[asyncType]
 
 	# Parameter

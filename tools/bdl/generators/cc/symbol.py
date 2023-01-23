@@ -36,8 +36,9 @@ class _VisitorSymbol(Visitor):
 			return self.values_
 		return None
 
-	def visitValue(self, value: str, comment: typing.Optional[str]) -> None:
+	def visitValue(self, value: str, comment: typing.Optional[str]) -> str:
 		self.symbol.error(message="No values are allowed within a type.")
+		return ""
 
 	def visitSymbol(self, symbol: Symbol, nested: typing.List[str], parameters: ParametersResolved) -> str:
 		"""
