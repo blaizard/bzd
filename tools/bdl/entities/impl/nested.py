@@ -6,7 +6,7 @@ from bzd.parser.error import Error
 from bzd.parser.visitor import Visitor
 
 from tools.bdl.entities.impl.fragment.symbol import Symbol
-from tools.bdl.entities.impl.entity import Entity, Role
+from tools.bdl.entities.impl.entity import Entity, Role, EntityExpression
 from tools.bdl.entities.impl.fragment.fqn import FQN
 from tools.bdl.entities.impl.types import Category
 
@@ -70,7 +70,7 @@ class Nested(Entity):
 			# Validates that the inheritance type is correct.
 			underlyingType = entity.getEntityUnderlyingTypeResolved(resolver=resolver)
 			if underlyingType.category in Nested.categoriesAllowed_:
-				nestedCategory = underlyingType.category  # type: ignore
+				nestedCategory = underlyingType.category
 			elif underlyingType.category == Category.extern:
 				nestedCategory = underlyingType.type  # type: ignore
 			else:
@@ -99,6 +99,7 @@ class Nested(Entity):
 		if self.category in {Category.struct, Category.interface, Category.component}:
 			for entity in self.interface:
 				if entity.category == Category.expression:
+					assert isinstance(entity, EntityExpression)
 					if entity.isSymbol:
 						allowed = {
 							Category.struct, Category.builtin, Category.enum, Category.using, Category.expression
@@ -111,7 +112,7 @@ class Nested(Entity):
 	def __repr__(self) -> str:
 		content = self.toString({
 			"name": self.name if self.isName else "",
-			"category": self.category,
+			"category": str(self.category),
 			"inheritance": ", ".join([str(t) for t in self.inheritanceList])
 		})
 

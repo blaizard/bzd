@@ -7,11 +7,13 @@ from bzd.validation.schema import TypeContext
 
 from tools.bdl.contracts.traits import ContractTraits, Role
 
-
-def getValueFromSingleParameter_(resolver, typeFQN: str, value: typing.Any, defaultValue: str) -> typing.Any:
+def getValueFromSingleParameter_(resolver: typing.Any, typeFQN: str, value: typing.Any, defaultValue: str) -> typing.Any:
 	"""Extract value of single parameter expressions."""
 
+	from tools.bdl.visitors.symbol_map import Resolver
 	from tools.bdl.entities.impl.expression import Expression
+
+	assert isinstance(resolver, Resolver), f"The resolver is not valid: {str(resolver)}."
 	if isinstance(value, Expression):
 		if value.isLiteral:
 			return value.literal

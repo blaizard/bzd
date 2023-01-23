@@ -5,7 +5,7 @@ from bzd.parser.error import Error, Result
 from bzd.parser.element import Element, SequenceBuilder
 from bzd.parser.context import Context
 
-from tools.bdl.visitor import Visitor, Group
+from tools.bdl.visitor import Visitor, Group, NestedSequence
 from tools.bdl.builtins import Builtins
 from tools.bdl.entities.all import elementToEntity, EntityType
 from tools.bdl.entities.builder import ElementBuilder
@@ -178,8 +178,10 @@ class SymbolMap:
 			data = self.builtins[fqn]
 		else:
 			return None
-		if exclude and exclude in Group(data["g"]):
-			return None
+		if exclude:
+			for group in exclude:
+				if group in Group(data["g"]):
+					return None
 		return data
 
 	def items(self, groups: typing.Set[Group], startsWith: str = "") -> typing.Iterator[typing.Tuple[str, EntityType]]:
@@ -295,10 +297,10 @@ class SymbolMap:
 			element = entity.element
 
 			# Remove nested element and change them to references.
-			if any([element.isNestedSequence(group.value) for group in Group]):
+			if any([element.isNestedSequence(group.value) for group in NestedSequence]):
 
-				preparedElement = element.copy(ignoreNested=[group.value for group in Group])
-				for group in Group:
+				preparedElement = element.copy(ignoreNested=[group.value for group in NestedSequence])
+				for group in NestedSequence:
 					nested = element.getNestedSequence(group.value)
 					if nested is not None:
 						sequence = SequenceBuilder()
@@ -362,7 +364,7 @@ class SymbolMap:
 			element = SymbolMap.metaToElement(data)
 			entity = elementToEntity(element=element)
 			# Resolve dependencies
-			for group in Group:
+			for group in NestedSequence:
 				if element.isNestedSequence(group.value):
 					updatedSequence = SequenceBuilder()
 					for nested in element.getNestedSequenceAssert(group.value):

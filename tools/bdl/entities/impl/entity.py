@@ -285,16 +285,16 @@ class Entity:
 		"""
 		Generate the validation object.
 		"""
-		schema = {}
+		schema: typing.Dict[str, str] = {}
 		for key, expression in parameters.items(includeVarArgs=True):
-			key = "*" if expression.isVarArgs else str(key)
+			keyStr = "*" if expression.isVarArgs else str(key)
 			maybeContracts = expression.contracts.validationForTemplate if forTemplate else expression.contracts.validationForValue
-			schema[key] = maybeContracts if maybeContracts is not None else ""
+			schema[keyStr] = maybeContracts if maybeContracts is not None else ""
 			# Add that template argument must be part of the given type.
 			if forTemplate:
 				expression.assertTrue(condition=expression.underlyingTypeFQN is not None,
 					message=f"The type '{expression}' was not resolved.")
-				schema[key] += f" convertible({str(expression.underlyingTypeFQN)})"
+				schema[keyStr] += f" convertible({str(expression.underlyingTypeFQN)})"
 
 		if schema:
 			try:
@@ -349,10 +349,11 @@ class Entity:
 		# Resolve the types from a config sequence if any.
 		for entity in self.configRaw:
 			if entity.category == Category.expression:
+				entity = typing.cast("Expression", entity)
 				if entity.isSymbol:
 					# Only the type of the expression should be resolved, the value cannot be evaluated
 					# as it might be malformed, this is inherent from config expressions.
-					typing.cast("Expression", entity).symbol.resolve(resolver=resolver)
+					entity.symbol.resolve(resolver=resolver)
 			elif entity.category == Category.using:
 				typing.cast("Using", entity).resolve(resolver=resolver)
 			else:
@@ -396,7 +397,7 @@ class EntityExpression(Entity):
 
 	@property
 	def isVarArgs(self) -> bool:
-		return self.element.isAttr("name") and self.element.getAttrValue("name").endswith("...")
+		return self.element.isAttr("name") and self.element.getAttr("name").value.endswith("...")
 
 	@property
 	def isSymbol(self) -> bool:
@@ -455,7 +456,7 @@ class EntityExpression(Entity):
 
 		return self.toString({
 			"name": self.name if self.isName else "",
-			"varArgs": True if self.isVarArgs else None,
+			"varArgs": "true" if self.isVarArgs else None,
 			"symbol": str(self.symbol) if self.isSymbol else None,
 			"value": str(self.value) if self.isValue else None,
 			"executor": self.executor,

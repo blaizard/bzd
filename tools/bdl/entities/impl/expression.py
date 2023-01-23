@@ -76,6 +76,7 @@ class Expression(EntityExpression):
 		if self.isSymbol:
 			dependencies.update(self.symbol.dependencies)
 		if self.isParameters:
+			assert self.parameters is not None
 			dependencies.update(self.parameters.dependencies)
 
 		return dependencies
@@ -103,15 +104,18 @@ class Expression(EntityExpression):
 				self._setMeta()
 
 			# Set the executor.
-			executor = self.contracts.get("executor")
-			if executor is not None:
+			executorContract = self.contracts.get("executor")
+			if executorContract is not None:
 				self.assertTrue(condition=entity.category == Category.component,
 					message="executor contracts must be set at component instantiation.")
-				executor = executor.value
+				executor = executorContract.value
 			# If there is a 'this', propagate the executor.
 			elif self.symbol.isThis:
 				executor = self.symbol.getThisResolved(resolver=resolver).executor
-			self._setExecutor(executor)
+			else:
+				executor = None
+			if executor is not None:
+				self._setExecutor(executor)
 
 			# The type refers to a value.
 			if entity.isRoleValue:
@@ -129,6 +133,7 @@ class Expression(EntityExpression):
 			elif entity.isRoleType:
 
 				# Generate the argument list and resolve it.
+				assert self.parameters is not None
 				self.parameters.resolve(resolver=resolver)
 				self._resolveAndValidateParameters(resolver, entity, self.parameters)
 
@@ -158,7 +163,7 @@ class Expression(EntityExpression):
 		# Validate the type of arguments.
 		parameterTypeCategories = {*parameters.getUnderlyingTypeCategories(resolver)}
 		if Category.component in parameterTypeCategories:
-			category = resolvedTypeEntity.category  # type: ignore
+			category = resolvedTypeEntity.category
 			self.assertTrue(condition=category in [Category.component, Category.method, Category.builtin],
 				message=f"Components are not allowed for this type '{category}'.")
 
@@ -169,7 +174,7 @@ class Expression(EntityExpression):
 		Error.assertTrue(element=self.element, attr="type", condition=bool(result), message=str(result))
 
 		# Compute and set the literal value if any.
-		maybeValue = resolvedTypeEntity.toLiteral(result.values)
+		maybeValue = resolvedTypeEntity.toLiteral(result.values) # type: ignore
 		if maybeValue is not None:
 			self.assertTrue(condition=isinstance(maybeValue, str),
 				message=f"The returned value from toLiteral must be a string, not {str(maybeValue)}")

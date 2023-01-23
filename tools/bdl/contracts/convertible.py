@@ -4,7 +4,6 @@ from bzd.validation.schema import Context, Constraint, ProcessedSchema
 
 from tools.bdl.contracts.traits import ContractTraits, Role
 
-
 class Convertible_(Constraint):
 
 	def install(self, processedSchema: ProcessedSchema, args: typing.List[str]) -> None:
@@ -13,8 +12,10 @@ class Convertible_(Constraint):
 			assert "resolver" in context.args
 
 			if base == "Any":
-				return True
+				return
 
+			from tools.bdl.entities.impl.entity import EntityExpression
+			assert isinstance(context.value, EntityExpression), "The value must be an expression."
 			assert context.value.isSymbol, "The expression is not a type."
 			typeFrom = context.value.symbol
 

@@ -84,7 +84,7 @@ class Symbol:
 			self.assertTrue(condition=(not bool(self.templates)),
 				message=f"Symbol '{self.kind}' does not support template type arguments.")
 		else:
-
+			assert isinstance(self.templateAttr, str)
 			self.templates.makeParametersResolved(name=self.templateAttr, resolver=resolver, expected=configTypes)
 
 			# Make sure none of the template arguments have a meta role.
@@ -112,6 +112,7 @@ class Symbol:
 	def getEntityUnderlyingTypeResolved(self, resolver: "Resolver") -> "EntityType":
 		self.assertTrue(condition=self.underlyingTypeFQN is not None,
 			message=f"The underlying type FQN is missing, {self.element}")
+		assert isinstance(self.underlyingTypeFQN, str)
 		return resolver.getEntity(fqn=self.underlyingTypeFQN).assertValue(element=self.element, attr=self.kindAttr)
 
 	def getThisResolved(self, resolver: "Resolver") -> "EntityType":
@@ -192,7 +193,7 @@ class Symbol:
 
 		# Check if it is convertible to any of its parent.
 		for parentFQN in typeFrom.getUnderlyingTypeParents(resolver=resolver):
-			entity = resolver.getEntityResolved(fqn=parentFQN).assertValue(element=typeFrom)
+			entity = resolver.getEntityResolved(fqn=parentFQN).assertValue(element=typeFrom.element)
 			if entity == typeTo:
 				return True
 
@@ -211,10 +212,10 @@ class Symbol:
 	def __repr__(self) -> str:
 		return self.name
 
-	def __eq__(self, other: "Symbol") -> bool:
+	def __eq__(self, other: "Symbol") -> bool: # type: ignore
 		return str(self) == str(other)
 
-	def __ne__(self, other: "Symbol") -> bool:
+	def __ne__(self, other: "Symbol") -> bool: # type: ignore
 		return not (self == other)
 
 	def __hash__(self) -> int:
