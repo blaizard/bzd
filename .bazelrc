@@ -54,7 +54,8 @@ coverage:cc --action_env=COVERAGE_GCOV_OPTIONS=--branch-probabilities
 # Select only Python targets
 build:py --build_tests_only
 test:py --test_lang_filters=py
-coverage:py --test_env=PYTHON_COVERAGE=external/coveragepy/coverage/__main__.py
+# Note: coverage for python seems to be broken, waiting for https://github.com/bazelbuild/rules_python/pull/977 to land.
+# coverage:py --test_env=PYTHON_COVERAGE=external/coveragepy/coverage/__main__.py
 
 # Select only NodeJs targets
 build:nodejs --build_tag_filters=nodejs
