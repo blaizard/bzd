@@ -33,6 +33,7 @@ jobs:
         source-directory: ".dist"
         destination-github-username: "blaizard"
         destination-repository-name: "blaizard.github.io"
+        user-email: doc.publish@blaizard.com
         target-branch: main
         target-directory: .
 
