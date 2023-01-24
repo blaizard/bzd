@@ -374,6 +374,12 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 				block = self.visitInclude(element=element)
 				self.appendBlock(element=element, result=result, block=block)
 
+			# Escape characters
+			elif category == "escape":
+				Error.assertHasAttr(element=element, attr="value")
+				string = element.getAttr("value").value
+				result.append(string)
+
 			else:
 				raise Exception("Unsupported category: '{}'.".format(category))
 
