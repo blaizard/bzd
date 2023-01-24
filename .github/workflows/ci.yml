@@ -35,7 +35,7 @@ jobs:
         destination-repository-name: "blaizard.github.io"
         user-email: doc.publish@blaizard.com
         target-branch: main
-        target-directory: .
+        target-directory: "bzd/"
 
     - name: "[normal] clang-tidy"
       run: |
