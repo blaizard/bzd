@@ -7,6 +7,8 @@ from bzd.parser.element import Element
 
 # Match all remaining content
 _regexprContent = r"(?P<content>((?!{[{%#]).)+?)(?={[{%#])"
+# Match escape characters.
+_regexprEscape = r"{(?P<value>{[{%#])"
 # Strip left of control and comments blocks until the first newline
 _regexprContentStripAuto = r"(?P<content>((?!{[{%#]).)*?\n)[ \t]*(?={[%#])"
 # Strip right of content when followed by a left stripped block
@@ -371,10 +373,19 @@ def makeGrammarComments() -> Grammar:
 	return makeGrammarCommentStart(
 		[GrammarItem(_regexprComment, {"category": "comment"}, makeGrammarCommentStop(FragmentNewElement))])
 
+def makeGrammarEscape() -> Grammar:
+	"""
+	Generate the grammar for escaping code blocks.
+	"""
+
+	class FragmentEscape(FragmentNewElement):
+		default = {"category": "escape"}
+
+	return [GrammarItem(_regexprEscape, FragmentEscape)]
 
 class Parser(ParserBase):
 
 	def __init__(self, content: str) -> None:
 		super().__init__(content,
-			grammar=makeGrammarSubstitution() + makeGrammarControl() + makeGrammarComments() + makeGrammarContent(),
+			grammar=makeGrammarEscape() + makeGrammarSubstitution() + makeGrammarControl() + makeGrammarComments() + makeGrammarContent(),
 			defaultGrammarPost=[GrammarItemSpaces])

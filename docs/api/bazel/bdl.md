@@ -42,7 +42,7 @@ Bzd Description Language generator rule.
 | Name  | Description | Type | Mandatory | Default |
 | :------------- | :------------- | :------------- | :------------- | :------------- |
 | <a id="bdl_library-name"></a>name |  A unique name for this target.   | <a href="https://bazel.build/concepts/labels#target-names">Name</a> | required |  |
-| <a id="bdl_library-deps"></a>deps |  List of bdl dependencies. Language specifiic dependencies will have their public interface included in the generated file.   | <a href="https://bazel.build/concepts/labels">List of labels</a> | optional | <code>[]</code> |
+| <a id="bdl_library-deps"></a>deps |  List of bdl dependencies. Language specific dependencies will have their public interface included in the generated file.   | <a href="https://bazel.build/concepts/labels">List of labels</a> | optional | <code>[]</code> |
 | <a id="bdl_library-srcs"></a>srcs |  List of Bzd Description Language (bdl) files to be included.   | <a href="https://bazel.build/concepts/labels">List of labels</a> | required |  |
 
 

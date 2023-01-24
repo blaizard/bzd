@@ -7,6 +7,7 @@ Syntax:
 - Substitutions blocks are denoted as follow: `{{...}}`
 - Control blocks are denoted as follow: `{%...%}`
 - Comment blocks are denoted as follow: `{#...#}`
+- The sequences `{{`, `{%` and `{#` can respectively be escaped using: `{{{`, `{{%` and `{{#`.
 
 - White spaces:
 

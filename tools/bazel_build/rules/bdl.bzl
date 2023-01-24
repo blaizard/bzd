@@ -136,7 +136,7 @@ bdl_library = rule(
         "deps": attr.label_list(
             providers = [BdlProvider, CcInfo],
             aspects = [_bdl_aspect],
-            doc = "List of bdl dependencies. Language specifiic dependencies will have their public interface included in the generated file.",
+            doc = "List of bdl dependencies. Language specific dependencies will have their public interface included in the generated file.",
         ),
         "_bdl": attr.label(
             default = Label("//tools/bdl"),
