@@ -20,6 +20,22 @@ jobs:
         export PATH="${PATH}:${GITHUB_WORKSPACE}/bin"
         ./info.sh
 
+    - name: Build documentation
+      run: |
+        ./tools/bazel build docs
+        rm -rfd .dist
+        mkdir -p .dist
+        tar -xf ./bazel-bin/docs/docs.tar -C .dist
+    - uses: cpina/github-action-push-to-another-repository@main
+      env:
+        SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
+      with:
+        source-directory: ".dist"
+        destination-github-username: "blaizard"
+        destination-repository-name: "blaizard.github.io"
+        target-branch: main
+        target-directory: .
+
     - name: "[normal] clang-tidy"
       run: |
         ./tools/bazel clean --expunge
