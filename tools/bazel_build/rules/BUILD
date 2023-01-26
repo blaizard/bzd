@@ -8,6 +8,7 @@ exports_files([
     "docker.bzl",
     "cc.bzl",
     "bdl.bzl",
+    "documentation.bzl",
 ])
 
 bzl_library(
@@ -18,6 +19,17 @@ bzl_library(
     visibility = ["//visibility:public"],
     deps = [
         "@io_bazel_rules_docker//container",
+    ],
+)
+
+bzl_library(
+    name = "documentation",
+    srcs = [
+        "documentation.bzl",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//tools/bazel_build:binary_wrapper",
     ],
 )
 

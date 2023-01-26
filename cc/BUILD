@@ -1,4 +1,5 @@
 load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_library")
+load("//tools/bazel_build/rules:documentation.bzl", "doc_library")
 
 bzd_cc_library(
     name = "bzd",
@@ -14,10 +15,11 @@ bzd_cc_library(
     ],
 )
 
-filegroup(
+doc_library(
     name = "documentation",
-    srcs = glob([
-        "**/*.md",
-    ]),
-    visibility = ["//visibility:public"],
+    srcs = [
+        ("Directory Layout", "README.md"),
+        ("Core", "//cc/bzd/core/async:documentation"),
+    ],
+    visibility = ["//docs:__pkg__"],
 )

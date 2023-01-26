@@ -1,36 +1,15 @@
-load("//tools/bazel_build:binary_wrapper.bzl", "sh_binary_wrapper")
+load("//tools/bazel_build/rules:documentation.bzl", "doc_binary")
 
-genrule(
-    name = "build",
+doc_binary(
+    name = "docs",
     srcs = [
-        "mkdocs.yml",
-        "//:README.md",
-        "//cc:documentation",
-    ] + glob([
-        "**/*.md",
+        ("Home", "//:README.md"),
+        ("BDL", "//docs/bdl"),
+        ("Bazel", "//docs/api/bazel"),
+        ("C++", "//cc:documentation"),
+    ],
+    data = glob([
         "**/*.jpg",
         "**/*.png",
     ]),
-    outs = ["docs.tar"],
-    cmd = """
-    temp=$$(mktemp -d)
-    $(location //tools/documentation:mkdocs_wrapper) -- build --config-file $(location mkdocs.yml) --site-dir "$${temp}"
-    tar -cvf $@ -C "$${temp}" .
-    rm -rfd "$${temp}"
-    """,
-    tools = [
-        "//tools/documentation:mkdocs_wrapper",
-    ],
-)
-
-sh_binary_wrapper(
-    name = "docs",
-    binary = "//tools/scripts:web_server",
-    command = """
-        {binary} docs/docs.tar "$@"
-    """,
-    data = [
-        "docs.tar",
-    ],
-    visibility = ["//visibility:public"],
 )
