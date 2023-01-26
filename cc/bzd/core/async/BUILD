@@ -1,4 +1,13 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
+load("//tools/bazel_build/rules:documentation.bzl", "doc_library")
+
+doc_library(
+    name = "documentation",
+    srcs = [
+        ("Async", "README.md"),
+    ],
+    visibility = ["//cc:__pkg__"],
+)
 
 cc_library(
     name = "async",

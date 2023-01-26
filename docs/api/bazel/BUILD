@@ -1,13 +1,14 @@
 load("@io_bazel_stardoc//stardoc:stardoc.bzl", "stardoc")
-load("//tools/bazel_build:copy_outputs.bzl", "copy_outputs")
+load("//tools/bazel_build/rules:documentation.bzl", "doc_library")
 
-rule_names = [
+_RULE_NAMES = [
     "bdl",
+    "cc",
     "docker",
+    "documentation",
     "nodejs",
     "nodejs_web",
     "package",
-    "cc",
 ]
 
 [stardoc(
@@ -18,9 +19,13 @@ rule_names = [
     deps = [
         "//tools/bazel_build/rules:{}".format(name),
     ],
-) for name in rule_names]
+) for name in _RULE_NAMES]
 
-copy_outputs(
+doc_library(
     name = "bazel",
-    inputs = [":{}".format(name) for name in rule_names],
+    srcs = [
+        "{}.md".format(name)
+        for name in _RULE_NAMES
+    ],
+    visibility = ["//docs:__pkg__"],
 )

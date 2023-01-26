@@ -20,5 +20,6 @@ class TestRun(unittest.TestCase):
 		result = template.render({})
 		self.assertEqual("a {% b %} c", result)
 
+
 if __name__ == '__main__':
 	unittest.main()

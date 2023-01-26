@@ -373,6 +373,7 @@ def makeGrammarComments() -> Grammar:
 	return makeGrammarCommentStart(
 		[GrammarItem(_regexprComment, {"category": "comment"}, makeGrammarCommentStop(FragmentNewElement))])
 
+
 def makeGrammarEscape() -> Grammar:
 	"""
 	Generate the grammar for escaping code blocks.
@@ -383,9 +384,11 @@ def makeGrammarEscape() -> Grammar:
 
 	return [GrammarItem(_regexprEscape, FragmentEscape)]
 
+
 class Parser(ParserBase):
 
 	def __init__(self, content: str) -> None:
 		super().__init__(content,
-			grammar=makeGrammarEscape() + makeGrammarSubstitution() + makeGrammarControl() + makeGrammarComments() + makeGrammarContent(),
+			grammar=makeGrammarEscape() + makeGrammarSubstitution() + makeGrammarControl() + makeGrammarComments() +
+			makeGrammarContent(),
 			defaultGrammarPost=[GrammarItemSpaces])

@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.com/blaizard/bzd.svg?branch=master)](https://travis-ci.com/blaizard/bzd)
 [![CI](https://github.com/blaizard/bzd/workflows/CI/badge.svg)](https://github.com/blaizard/bzd/actions)
 
-Access the [rendered verion of this documentation](https://blaizard.github.io/bzd).
+Access the [rendered version of this documentation](https://blaizard.github.io/bzd).
 
 Fullstack, lightweight and flexible framework for IoT applications.
 This mono-repository enables the following technologies:
