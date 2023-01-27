@@ -39,7 +39,10 @@ def _doc_library_impl(ctx):
         if _DocumentationProvider in src:
             if not name:
                 name = src.label.name
-            navigation.append((name, src[_DocumentationProvider].navigation))
+            if name == "**":
+                navigation.extend(src[_DocumentationProvider].navigation)
+            else:
+                navigation.append((name, src[_DocumentationProvider].navigation))
             transitive_deps.append(src[_DocumentationProvider].files)
         elif src.files:
             for f in src.files.to_list():
