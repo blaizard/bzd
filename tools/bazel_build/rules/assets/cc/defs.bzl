@@ -17,7 +17,7 @@ def _cc_config(ctx):
     )
     return cc_toolchain, feature_configuration
 
-def _cc_compile(ctx, hdrs = [], srcs = [], deps = []):
+def _cc_compile(ctx, name, hdrs = [], srcs = [], deps = []):
     """
     Compile header, source and dependencies and return internal artifacts.
     """
@@ -33,18 +33,21 @@ def _cc_compile(ctx, hdrs = [], srcs = [], deps = []):
         public_hdrs = hdrs,
         private_hdrs = [f for f in srcs if f.basename.endswith(_CC_HDRS_EXTENSIONS)],
         compilation_contexts = [cc_info.compilation_context for cc_info in cc_infos],
-        name = ctx.attr.name,
+        name = name,
     )
 
     return compilation_context, cc_outputs, cc_infos
 
-def cc_compile(ctx, hdrs = [], srcs = [], deps = []):
+def cc_compile(ctx, name = None, hdrs = [], srcs = [], deps = []):
     """
     Compile header, source and dependencies and return a CcInfo.
     """
 
+    if name == None:
+        name = ctx.attr.name
+
     cc_toolchain, feature_configuration = _cc_config(ctx)
-    compilation_context, cc_outputs, cc_infos = _cc_compile(ctx, hdrs, srcs, deps)
+    compilation_context, cc_outputs, cc_infos = _cc_compile(ctx, name, hdrs, srcs, deps)
 
     linking_context, _ = cc_common.create_linking_context_from_compilation_outputs(
         actions = ctx.actions,
@@ -52,22 +55,25 @@ def cc_compile(ctx, hdrs = [], srcs = [], deps = []):
         cc_toolchain = cc_toolchain,
         compilation_outputs = cc_outputs,
         linking_contexts = [cc_info.linking_context for cc_info in cc_infos],
-        name = ctx.attr.name,
+        name = name,
     )
 
     return CcInfo(compilation_context = compilation_context, linking_context = linking_context)
 
-def cc_link(ctx, hdrs = [], srcs = [], deps = [], map_analyzer = None):
+def cc_link(ctx, name = None, hdrs = [], srcs = [], deps = [], map_analyzer = None):
     """
     Compile and link.
     """
 
-    cc_toolchain, feature_configuration = _cc_config(ctx)
-    compilation_context, cc_outputs, cc_infos = _cc_compile(ctx, hdrs, srcs, deps)
+    if name == None:
+        name = ctx.attr.name
 
-    map_file = ctx.actions.declare_file("{}.map".format(ctx.attr.name))
+    cc_toolchain, feature_configuration = _cc_config(ctx)
+    compilation_context, cc_outputs, cc_infos = _cc_compile(ctx, name, hdrs, srcs, deps)
+
+    map_file = ctx.actions.declare_file("{}.map".format(name))
     linking_outputs = cc_common.link(
-        name = ctx.attr.name + ".binary",
+        name = name + ".binary",
         actions = ctx.actions,
         feature_configuration = feature_configuration,
         cc_toolchain = cc_toolchain,
@@ -81,11 +87,11 @@ def cc_link(ctx, hdrs = [], srcs = [], deps = [], map_analyzer = None):
 
     # Analyze the map file.
     if map_analyzer:
-        metadata_file = ctx.actions.declare_file("{}.map.metadata".format(ctx.attr.name))
+        metadata_file = ctx.actions.declare_file("{}.map.metadata".format(name))
         ctx.actions.run(
             inputs = [map_file, binary_file],
             outputs = [metadata_file],
-            progress_message = "Generating metadata for {}".format(ctx.attr.name),
+            progress_message = "Generating metadata for {}".format(name),
             arguments = ["--output", metadata_file.path, "--binary", binary_file.path, map_file.path],
             tools = map_analyzer.data_runfiles.files,
             executable = map_analyzer.files_to_run,

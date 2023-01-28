@@ -36,10 +36,11 @@ class ObjectContext:
 		self.resolve = resolve
 		self.composition = composition
 
-	def pushSource(self, path: Path) -> None:
+	def pushSource(self, source: str) -> None:
 		"""
 		Push a dependency for this object.
 		"""
+		path = self.getPathFromSource(source)
 		# Check for circular dependencies
 		if path in self.sources:
 			raise Exception("Circular dependency detected:\n{}".format("\n".join([f.as_posix() for f in self.sources])))
@@ -57,18 +58,25 @@ class ObjectContext:
 		"""
 		return self.sources[-1] if len(self.sources) > 0 else None
 
-	def getPreprocessedPath(self, path: Path) -> Path:
-		"""
-		Return the preprocessed path from a BDL path.
-		"""
-		return Path(self.preprocessFormat.format(path.as_posix()))
+	def getPathFromSource(self, source: str) -> Path:
+		"""Extract the path name from the source."""
+		splitted = source.split("@")
+		assert len(splitted) <= 2, f"The source '{source}' is malformed."
+		return Path(splitted[0])
 
-	def isPreprocessed(self, path: Path) -> bool:
+	def getPreprocessedPathFromSource(self, source: str) -> Path:
+		"""Extract the preprocess path name from the source."""
+		splitted = source.split("@")
+		assert len(splitted) <= 2, f"The source '{source}' is malformed."
+		return Path(splitted[1]) if len(splitted) == 2 else Path(self.preprocessFormat.format(source))
+
+	def isPreprocessed(self, source: str) -> bool:
 		"""
 		Check if a BDL file has a preprocessed counter-part.
 		"""
 
-		preprocessed = self.getPreprocessedPath(path=path)
+		path = self.getPathFromSource(source=source)
+		preprocessed = self.getPreprocessedPathFromSource(source=source)
 		if preprocessed.is_file():
 			# If the source file is present, compare its modification time with the preprocessed.
 			if path.is_file():
@@ -77,20 +85,22 @@ class ObjectContext:
 			return True
 		return False
 
-	def savePreprocess(self, path: Path, object: "Object") -> None:
+	def savePreprocess(self, source: str, object: "Object") -> None:
 		"""
 		Save the serialized content of preprocessed object.
 		"""
 
 		content = object.serialize()
-		self.getPreprocessedPath(path=path).write_text(content, encoding="ascii")
+		preprocessedPath = self.getPreprocessedPathFromSource(source=source)
+		preprocessedPath.parent.mkdir(parents=True, exist_ok=True)
+		preprocessedPath.write_text(content, encoding="ascii")
 
-	def loadPreprocess(self, path: Path) -> "Object":
+	def loadPreprocess(self, source: str) -> "Object":
 		"""
 		Read a serialized preprocessed file and return it.
 		"""
 
-		preprocessedPath = self.getPreprocessedPath(path=path)
+		preprocessedPath = self.getPreprocessedPathFromSource(source=source)
 		data = preprocessedPath.read_text(encoding="ascii")
 
 		# Unserialize the data
@@ -99,25 +109,26 @@ class ObjectContext:
 		symbols = SymbolMap.fromSerialize(payload["symbols"])
 		return Object(context=context, symbols=symbols, tree=SymbolTree.fromSerialize(payload["tree"], symbols))
 
-	def preprocess(self, path: Path) -> "Object":
+	def preprocess(self, source: str) -> "Object":
 		"""
 		Preprocess a bdl file and save its output, or use the preprocessed file if present.
 		"""
 
-		if self.isPreprocessed(path=path):
-			return self.loadPreprocess(path=path)
+		if self.isPreprocessed(source=source):
+			return self.loadPreprocess(source=source)
 
 		# Push current dependency
-		self.pushSource(path)
+		self.pushSource(source=source)
 
 		# Parse the input file.
+		path = self.getPathFromSource(source=source)
 		parser = Parser.fromPath(path)
 		bdl = Object._makeObject(parser=parser, objectContext=self)
 
 		# Save the preprocessed payload to a file.
 		# Do not save when ignoring dependencies, as this creates un-complete views.
 		if self.resolve:
-			self.savePreprocess(path=path, object=bdl)
+			self.savePreprocess(source=source, object=bdl)
 
 		# Pop dependency
 		self.popSource()

@@ -12,13 +12,13 @@ formatters = {"bdl": formatBdl, "cc": formatCc}
 compositions = {"cc": compositionCc}
 
 
-def preprocess(path: Path, objectContext: typing.Optional[ObjectContext] = None) -> Object:
+def preprocess(source: str, objectContext: typing.Optional[ObjectContext] = None) -> Object:
 
 	objectContext = objectContext if objectContext is not None else ObjectContext()
 	assert objectContext
 
 	# Preprocess the object
-	return objectContext.preprocess(path=path)
+	return objectContext.preprocess(source=source)
 
 
 def generate(formatType: str, bdl: Object, includes: typing.List[Path]) -> str:
@@ -43,9 +43,9 @@ def compose(formatType: str, bdls: typing.Sequence[Object], output: Path, includ
 
 
 def main(formatType: str,
-	path: Path,
+	source: str,
 	includes: typing.List[Path],
 	objectContext: typing.Optional[ObjectContext] = None) -> str:
 
-	bdl = preprocess(path=path, objectContext=objectContext)
+	bdl = preprocess(source=source, objectContext=objectContext)
 	return generate(formatType=formatType, bdl=bdl, includes=includes)
