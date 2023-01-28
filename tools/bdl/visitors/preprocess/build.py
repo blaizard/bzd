@@ -69,10 +69,10 @@ class Build(Visitor[None]):
 
 	def visitUse(self, entity: Use, result: None) -> None:
 		if self.objectContext.resolve:
-			entity.assertTrue(condition=self.objectContext.isPreprocessed(entity.path),
+			entity.assertTrue(condition=self.objectContext.isPreprocessed(entity.path.as_posix()),
 				message="Cannot find preprocessed entity for '{}'.".format(entity.path))
 
-			bdl = self.objectContext.loadPreprocess(path=entity.path)
+			bdl = self.objectContext.loadPreprocess(source=entity.path.as_posix())
 			self.symbols.update(bdl.symbols)
 
 		self.registerEntity(entity=entity)

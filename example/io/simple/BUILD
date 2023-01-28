@@ -1,6 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_binary")
-load("//tools/bazel_build/rules:bdl.bzl", "bdl_library")
+load("//tools/bazel_build/rules:bdl.bzl", "bdl_library", "bdl_system")
 
 bdl_library(
     name = "composition",
@@ -18,6 +18,17 @@ cc_library(
         ":composition",
         "//cc:bzd",
     ],
+)
+
+bdl_system(
+    name = "system",
+    targets = {
+        "//cc/targets/linux:x86_64_clang": "hpc,old",
+    },
+    deps = [
+        ":lib",
+    ],
+    tags = ["manual"],
 )
 
 bzd_cc_binary(

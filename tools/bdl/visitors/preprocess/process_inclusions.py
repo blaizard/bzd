@@ -16,9 +16,9 @@ class ProcessInclusions(VisitorBase[None]):
 	def visitUse(self, entity: Use, result: None) -> None:
 
 		try:
-			if not self.objectContext.isPreprocessed(path=entity.path):
-				self.objectContext.preprocess(path=entity.path)
-			assert self.objectContext.isPreprocessed(path=entity.path), "Unable to find preprocessed file."
+			if not self.objectContext.isPreprocessed(source=entity.path.as_posix()):
+				self.objectContext.preprocess(source=entity.path.as_posix())
+			assert self.objectContext.isPreprocessed(source=entity.path.as_posix()), "Unable to find preprocessed file."
 
 		except Exception as e:
 			entity.error(message=str(e))
