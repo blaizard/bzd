@@ -62,7 +62,8 @@ def _clang_tidy_aspect_impl(target, ctx):
     srcs = _get_sources(ctx)
 
     for src in srcs:
-        output = ctx.actions.declare_file("{}.clang_tidy".format(src.short_path.replace("/", ".")))
+        # The label name should also be used to avoid a conflict with 2 cc_library rules with the shared file for example.
+        output = ctx.actions.declare_file("{}.{}.clang_tidy".format(src.short_path.replace("/", "."), ctx.label.name))
         inputs = depset(direct = [src], transitive = [target[CcInfo].compilation_context.headers])
         ctx.actions.run(
             inputs = inputs,
