@@ -92,7 +92,6 @@ class ObjectContext:
 
 		content = object.serialize()
 		preprocessedPath = self.getPreprocessedPathFromSource(source=source)
-		preprocessedPath.parent.mkdir(parents=True, exist_ok=True)
 		preprocessedPath.write_text(content, encoding="ascii")
 
 	def loadPreprocess(self, source: str) -> "Object":
