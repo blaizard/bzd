@@ -9,11 +9,11 @@ It is the most top level view of the composition.
 
 Defining a system is done with Bazel through a rule, as follow:
 ```bzl
-bzd_system(
+bdl_system(
     nae = "application",
     targets = {
         "esp32": "//cc/targets/esp32_xtensa_lx6",
-        "hpc": "//cc/targets/linux",
+        "hpc": "//cc/targets/linux:x86_64_clang",
         "script": "//python/targets/linux",
     },
     deps = [
@@ -27,6 +27,81 @@ executors are refered under the namespace `esp32`. Similarly the second one runs
 under the namespace `hpc`. The third one, is a python binary that runs under `linux` and defined under `script` namespace.
 
 Under the hood, this rule will invoke 1 composition process and 3 binary rules that uses the same composition BDL files.
+
+To describe a target, the user should use the following rule:
+```bdl
+bdl_target(
+    name = "x86_64_clang",
+    compositions = [
+        "composition.bdl",
+    ],
+    platform = "//platform:linux_x86_64_clang",
+    language = "cc",
+    deps = [
+        ":lib",
+    ]
+)
+```
+
+## Process
+
+A system rule will perform the following operations to generate the various binaries for the system.
+Givien the following targets:
+```bdl
+bdl_target(
+    name = "a",
+    compositions = [
+        "a_composition.bdl",
+    ],
+    deps = [
+        "//:a_lib",
+    ],
+    platform = "@target_platform//:linux"
+)
+bdl_target(
+    name = "b",
+    compositions = [
+        "b_composition.bdl",
+    ],
+    deps = [
+        "//:b_lib",
+    ],
+    platform = "@target_platform//:windows"
+)
+bdl_system(
+    nae = "app",
+    targets = {
+        "hpc": ":a",
+        "win": ":b",
+    },
+    deps = [
+        "//:lib"
+    ],
+)
+```
+
+```mermaid
+flowchart TB
+    subgraph ide1 [Precompile targets compositions]
+    direction TB
+    A[`a_composition`\nassociate the namespace `hpc`]
+    B[`b_composition`\nassociate the namespace `win`]
+    end
+    C[Compose all bdl files\n`a_composition`, `:a_lib`, `b_composition`, `:b_lib` and `:lib`]
+    D[Generate all C++/Python/etc. files for the composition.]
+    subgraph ide2 [Compile]
+    direction TB
+    E[Compile `hpc` with platform `:linux`\n`a`, `app` and `hpc.*` executors from composition]
+    F[Compile `win` with platform `:windows`\n`b`, `app` and `win.*` executors from composition]
+    end
+    G[Binary for `hpc`]
+    H[Binary for `win`]
+    A & B --> C
+    C --> D
+    D --> E & F
+    E --> G
+    F --> H
+```
 
 ## Parameters
 
