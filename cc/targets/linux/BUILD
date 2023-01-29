@@ -6,18 +6,18 @@ cc_library(
     srcs = ["main.cc"],
     visibility = ["//visibility:public"],
     deps = [
-        "//cc/components/generic/panic/throw",
-        "//cc/components/posix/stack_trace",
         "//cc/components/generic/executor",
+        "//cc/components/generic/panic/throw",
         "//cc/components/linux/core",
         "//cc/components/linux/proactor/epoll",
         "//cc/components/posix/network/tcp:client",
         "//cc/components/posix/shmem",
+        "//cc/components/posix/stack_trace",
         "//cc/components/posix/stream/in",
         "//cc/components/posix/stream/out",
         "//cc/components/std/clock/steady",
         "//cc/components/std/clock/system",
-    ]
+    ],
 )
 
 bdl_target(

@@ -12,13 +12,15 @@ formatters = {"bdl": formatBdl, "cc": formatCc}
 compositions = {"cc": compositionCc}
 
 
-def preprocess(source: str, objectContext: typing.Optional[ObjectContext] = None) -> Object:
+def preprocess(source: str,
+	namespace: typing.Optional[str] = None,
+	objectContext: typing.Optional[ObjectContext] = None) -> Object:
 
 	objectContext = objectContext if objectContext is not None else ObjectContext()
 	assert objectContext
 
 	# Preprocess the object
-	return objectContext.preprocess(source=source)
+	return objectContext.preprocess(source=source, namespace=namespace)
 
 
 def generate(formatType: str, bdl: Object, includes: typing.List[Path]) -> str:

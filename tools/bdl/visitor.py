@@ -21,7 +21,7 @@ class NestedSequence(enum.Enum):
 
 class Parent:
 
-	def __init__(self, entity: typing.Optional[EntityType] = None) -> None:
+	def __init__(self, entity: typing.Optional[typing.Union[EntityType, typing.List[str]]] = None) -> None:
 		self.entity = entity
 
 	@property
@@ -31,9 +31,11 @@ class Parent:
 	@property
 	def namespace(self) -> typing.List[str]:
 		if self.entity and self.isNested:
-			return [self.entity.name] if self.entity.isName else []
+			return [self.entity.name] if self.entity.isName else []  # type: ignore
 		if isinstance(self.entity, Namespace):
 			return self.entity.nameList
+		if isinstance(self.entity, list):
+			return self.entity
 		return []
 
 
@@ -92,11 +94,23 @@ class Visitor(VisitorBase[T, T]):
 	nestedKind = None
 
 	def __init__(self,
+		namespace: typing.Optional[str] = None,
 		elementToEntityExtenstion: typing.Optional[typing.Dict[str, typing.Type[EntityType]]] = None) -> None:
+		"""Create a visitor for the bdl grammar.
+		
+		Args:
+			namespace: An optional namespace to start the discovery from.
+			elementToEntityExtenstion: Extension to be used when a new element is discovered.
+		"""
+
 		self.level = 0
 		self.parents: typing.List[Parent] = []
 		self.elementToEntityExtenstion = elementToEntityExtenstion
 		self.groups = Groups()
+
+		# Insert the initial namespace if any.
+		if namespace:
+			self.parents.append(Parent(entity=namespace.split(".")))
 
 	@property
 	def namespace(self) -> typing.List[str]:
@@ -195,7 +209,7 @@ class Visitor(VisitorBase[T, T]):
 				self.visitNamespace(entity, result)
 
 				# Update the current namespace. This is not a popable element, hence insert at the begining.
-				self.parents.insert(0, Parent(entity=entity))
+				self.parents.append(Parent(entity=entity))
 
 			# Handle use
 			elif isinstance(entity, Use):
