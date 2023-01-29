@@ -11,8 +11,8 @@ from tools.bdl.visitors.symbol_tree import SymbolTree
 
 class Build(Visitor[None]):
 
-	def __init__(self, objectContext: typing.Any) -> None:
-		super().__init__()
+	def __init__(self, objectContext: typing.Any, namespace: typing.Optional[str] = None) -> None:
+		super().__init__(namespace=namespace)
 		self.objectContext = objectContext
 		self.symbols = SymbolMap()
 		self.tree = SymbolTree(symbols=self.symbols)

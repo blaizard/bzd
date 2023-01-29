@@ -12,6 +12,10 @@ if __name__ == "__main__":
 	parser.add_argument("-o", "--output", default=None, type=Path, help="Output path of generated file.")
 	parser.add_argument("--format", default="bdl", type=str, choices=formatters.keys(), help="Formatting type.")
 	parser.add_argument("--no-color", action="store_true", help="Don't use colors.")
+	parser.add_argument("--namespace",
+		default=None,
+		type=str,
+		help="Namespace to be injected in the preprocessed files.")
 	parser.add_argument("--preprocess-format",
 		default=None,
 		type=str,
@@ -42,7 +46,7 @@ if __name__ == "__main__":
 
 			if config.stage == "preprocess":
 
-				preprocess(source=source, objectContext=objectContext)
+				preprocess(source=source, namespace=config.namespace, objectContext=objectContext)
 
 			else:
 				if config.stage == "generate":

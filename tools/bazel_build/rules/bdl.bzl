@@ -61,11 +61,35 @@ _bdl_aspect = aspect(
     attr_aspects = ["deps"],
 )
 
-def _make_bdl_arguments(ctx, stage, args):
-    _PREPROCESS_FORMAT = "{}/{{}}.o".format(ctx.bin_dir.path)
-    return ["--stage", stage, "--preprocess-format", _PREPROCESS_FORMAT] + args
+def _make_bdl_arguments(ctx, stage, format = None, output = None, includes = None, namespace = None, args = None):
+    """Create the argument list for the `bdl` tool."""
 
-def _precompile_bdl(ctx, srcs, deps, output_dir = None):
+    _PREPROCESS_FORMAT = "{}/{{}}.o".format(ctx.bin_dir.path)
+    arguments = ["--stage", stage, "--preprocess-format", _PREPROCESS_FORMAT]
+    if format:
+        arguments += ["--format", format]
+    if output:
+        arguments += ["--output", output.path]
+    if includes:
+        arguments += [a for include in includes for a in ("--include", include.short_path)]
+    if namespace:
+        arguments += ["--namespace", namespace]
+    if args:
+        arguments += args
+    return arguments
+
+def _precompile_bdl(ctx, srcs, deps, output_dir = None, namespace = None):
+    """Precompile a set of bdls.
+
+    Args:
+        ctx: The context used for this action.
+        srcs: The set of bdls to be precompiled.
+        deps: The dependencies associated with these bdls, must have a `BdlProvider`.
+        output_dir: The output directory where the precompiled objects show be stored,
+                    if not specified, it will be stored in the same directory as the source file.
+        namespace: The namespace in which the bdls files should be compiled.
+    """
+
     # Input files and bdls
     input_sources = depset(transitive = [dep[BdlProvider].sources for dep in deps])
     input_files = depset(srcs, transitive = [dep[BdlProvider].files for dep in deps])
@@ -97,7 +121,12 @@ def _precompile_bdl(ctx, srcs, deps, output_dir = None):
         inputs = input_files,
         outputs = [bdl["output"] for bdl in metadata],
         progress_message = "Preprocess BDL manifest(s) {}".format(", ".join([bdl["input"].short_path for bdl in metadata])),
-        arguments = _make_bdl_arguments(ctx, "preprocess", ["{}@{}".format(bdl["input"].path, bdl["output"].path) for bdl in metadata]),
+        arguments = _make_bdl_arguments(
+            ctx = ctx,
+            stage = "preprocess",
+            namespace = namespace,
+            args = ["{}@{}".format(bdl["input"].path, bdl["output"].path) for bdl in metadata],
+        ),
         executable = ctx.attr._bdl.files_to_run,
     )
 
@@ -119,7 +148,11 @@ def _bdl_library_impl(ctx):
     generated = {fmt: [] for fmt in _FORMATS.keys()}
 
     # Pre-compile the BDLs into their language agnostics format.
-    bdl_provider, metadata = _precompile_bdl(ctx, ctx.files.srcs, ctx.attr.deps)
+    bdl_provider, metadata = _precompile_bdl(
+        ctx = ctx,
+        srcs = ctx.files.srcs,
+        deps = ctx.attr.deps,
+    )
 
     # Generate the format specific outputs
     for bdl in metadata:
@@ -128,7 +161,6 @@ def _bdl_library_impl(ctx):
             includes = []
             for dep in ctx.attr.deps:
                 includes.extend(data["includes_getter"](dep))
-            arguments_includes = ["--include={}".format(include.short_path) for include in includes]
 
             # Generate the output
             outputs = [ctx.actions.declare_file(output.format(bdl["relative_name"])) for output in data["outputs"]]
@@ -136,7 +168,14 @@ def _bdl_library_impl(ctx):
                 inputs = bdl_provider.files,
                 outputs = outputs,
                 progress_message = "Generating {} build files from manifest {}".format(data["display"], bdl["input"].short_path),
-                arguments = _make_bdl_arguments(ctx, "generate", arguments_includes + ["--format", fmt, "--output", outputs[0].path, bdl["input"].path]),
+                arguments = _make_bdl_arguments(
+                    ctx = ctx,
+                    stage = "generate",
+                    format = fmt,
+                    output = outputs[0],
+                    includes = includes,
+                    args = [bdl["input"].path],
+                ),
                 executable = ctx.attr._bdl.files_to_run,
             )
 
@@ -187,8 +226,8 @@ bdl_library = rule(
     fragments = ["cpp"],
 )
 
-def _make_composition_language_providers(ctx, name, deps, extra_bdl_provider = None):
-    bdl_providers = [dep[BdlProvider] for dep in deps if BdlProvider in dep] + ([extra_bdl_provider] if extra_bdl_provider else [])
+def _make_composition_language_providers(ctx, name, deps, extra_bdl_providers = None):
+    bdl_providers = [dep[BdlProvider] for dep in deps if BdlProvider in dep] + (extra_bdl_providers if extra_bdl_providers else [])
     sources = depset(transitive = [provider.sources for provider in bdl_providers])
     files = depset(transitive = [provider.files for provider in bdl_providers])
 
@@ -198,9 +237,6 @@ def _make_composition_language_providers(ctx, name, deps, extra_bdl_provider = N
     if not files:
         return [CcInfo()]
 
-    # Generate the list of files to be includes.
-    arguments_includes = ["--include={}".format(hdrs.short_path) for hdrs in cc_composition_hdrs.to_list()]
-
     # Generate the output
     output = ctx.actions.declare_file("{}.main.cc".format(name))
     ctx.actions.run(
@@ -208,7 +244,14 @@ def _make_composition_language_providers(ctx, name, deps, extra_bdl_provider = N
         inputs = files,
         outputs = [output],
         progress_message = "Generating C++ composition for //{}:{}".format(ctx.label.package, name),
-        arguments = _make_bdl_arguments(ctx, "compose", ["--format", "cc", "--output", output.path] + arguments_includes + ["{}@{}".format(source[0].path, source[1].path) for source in sources.to_list()]),
+        arguments = _make_bdl_arguments(
+            ctx = ctx,
+            stage = "compose",
+            includes = cc_composition_hdrs.to_list(),
+            format = "cc",
+            output = output,
+            args = ["{}@{}".format(source[0].path, source[1].path) for source in sources.to_list()],
+        ),
         executable = ctx.attr._bdl.files_to_run,
     )
 
@@ -262,22 +305,35 @@ def _bdl_system_impl(ctx):
             targets[name] = target
 
     # Loop through all the name/target pairs and generate the composition files.
-    outputs = []
+    bdl_providers = []
+    deps = []
     for name, target in targets.items():
         target_provider = target[_TargetProvider]
         target_name = "{}.{}".format(ctx.label.name, name)
 
         # Generate the target-specific composition by injecting the new namespace.
-        # Need to understand how to deal with the name.
-        bdl_provider, _ = _precompile_bdl(ctx, target_provider.compositions, target_provider.deps, target_name)
-
-        # Generate the composition.
-        cc_info, default_info_provider, cc_provider = _make_composition_language_providers(
+        bdl_provider, _ = _precompile_bdl(
             ctx = ctx,
-            name = target_name,
-            deps = ctx.attr.deps + target_provider.deps,
-            extra_bdl_provider = bdl_provider,
+            srcs = target_provider.compositions,
+            deps = target_provider.deps,
+            output_dir = target_name,
+            namespace = name,
         )
+        bdl_providers.append(bdl_provider)
+        deps += target_provider.deps
+
+    # Generate the composition files.
+    cc_info, default_info_provider, cc_provider = _make_composition_language_providers(
+        ctx = ctx,
+        name = ctx.attr.name,
+        deps = ctx.attr.deps + deps,
+        extra_bdl_providers = bdl_providers,
+    )
+
+    outputs = []
+    for name, target in targets.items():
+        target_provider = target[_TargetProvider]
+        target_name = "{}.{}".format(ctx.label.name, name)
 
         # C++
         if target_provider.language == "cc":

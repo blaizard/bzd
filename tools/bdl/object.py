@@ -108,9 +108,13 @@ class ObjectContext:
 		symbols = SymbolMap.fromSerialize(payload["symbols"])
 		return Object(context=context, symbols=symbols, tree=SymbolTree.fromSerialize(payload["tree"], symbols))
 
-	def preprocess(self, source: str) -> "Object":
+	def preprocess(self, source: str, namespace: typing.Optional[str] = None) -> "Object":
 		"""
 		Preprocess a bdl file and save its output, or use the preprocessed file if present.
+
+		Args:
+			source: The source file the be preprocessed.
+			namespace: An optional wrapping namespace to be used for this file.
 		"""
 
 		if self.isPreprocessed(source=source):
@@ -122,7 +126,7 @@ class ObjectContext:
 		# Parse the input file.
 		path = self.getPathFromSource(source=source)
 		parser = Parser.fromPath(path)
-		bdl = Object._makeObject(parser=parser, objectContext=self)
+		bdl = Object._makeObject(parser=parser, namespace=namespace, objectContext=self)
 
 		# Save the preprocessed payload to a file.
 		# Do not save when ignoring dependencies, as this creates un-complete views.
@@ -146,10 +150,10 @@ class Object:
 		self.tree = tree
 
 	@staticmethod
-	def _makeObject(parser: BaseParser, objectContext: ObjectContext) -> "Object":
-		"""
-		Helper to make an object from a parser.
-		"""
+	def _makeObject(parser: BaseParser, objectContext: ObjectContext,
+		namespace: typing.Optional[str] = None) -> "Object":
+		"""Helper to make an object from a parser."""
+
 		data = parser.parse()
 
 		# Look for all includes, this stage ensures that dependencies are present and preprocessed.
@@ -157,7 +161,7 @@ class Object:
 			ProcessInclusions(objectContext=objectContext).visit(data)
 
 		# Generate the symbol map
-		build = Build(objectContext=objectContext)
+		build = Build(namespace=namespace, objectContext=objectContext)
 		build.visit(data)
 
 		# Validation step
@@ -167,8 +171,8 @@ class Object:
 
 	@staticmethod
 	def fromContent(content: str, objectContext: typing.Optional[ObjectContext] = None) -> "Object":
-		"""
-		Make an object from a the content of a bdl file.
+		"""Make an object from a the content of a bdl file.
+
 		This is mainly used for testing purpose.
 		"""
 
