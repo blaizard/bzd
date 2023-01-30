@@ -33,7 +33,7 @@ if __name__ == "__main__":
 	navigation = json.loads(args.navigation)
 
 	# Create the mkdocs.yml file.
-	template = Template.fromPath(pathlib.Path(__file__).parent / "mkdocs.yml.template", indent=True)
+	template = Template.fromPath(pathlib.Path(__file__).parent / "mkdocs.yml.btl", indent=True)
 	output = template.render({"navigation": "\n".join(navigationToMkDocsList(navigation))})
 	pathlib.Path("./mkdocs.yml").write_text(output)
 
