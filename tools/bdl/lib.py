@@ -23,31 +23,31 @@ def preprocess(source: str,
 	return objectContext.preprocess(source=source, namespace=namespace)
 
 
-def generate(formatType: str, bdl: Object, includes: typing.List[Path]) -> str:
+def generate(formatType: str, bdl: Object, data: typing.Optional[Path] = None) -> str:
 
 	assert formatType in formatters, "Format '{}' not supported.".format(formatType)
 
 	# Format using a specific formatter
-	return formatters[formatType](bdl=bdl, includes=includes)
+	return formatters[formatType](bdl=bdl, data=data)
 
 
-def compose(formatType: str, bdls: typing.Sequence[Object], output: Path, includes: typing.List[Path]) -> None:
+def compose(formatType: str, bdls: typing.Sequence[Object], output: Path, data: typing.Optional[Path] = None) -> None:
 
-	composition = Composition(includes=includes)
+	composition = Composition()
 	for bdl in bdls:
 		composition.visit(bdl)
 	composition.process()
 
 	# Generate the composition using a specific formatter
-	data = compositions[formatType](composition=composition)
+	content = compositions[formatType](composition=composition, data=data)
 
-	output.write_text(data)
+	output.write_text(content)
 
 
 def main(formatType: str,
 	source: str,
-	includes: typing.List[Path],
-	objectContext: typing.Optional[ObjectContext] = None) -> str:
+	objectContext: typing.Optional[ObjectContext] = None,
+	data: typing.Optional[Path] = None) -> str:
 
 	bdl = preprocess(source=source, objectContext=objectContext)
-	return generate(formatType=formatType, bdl=bdl, includes=includes)
+	return generate(formatType=formatType, bdl=bdl, data=data)

@@ -236,7 +236,8 @@ class Components:
 		for entry in self.map.values():
 			yield entry
 
-	def insert(self, expression: Expression, entryType: EntryType, executor: str) -> typing.Optional[ExpressionEntry]:
+	def insert(self, expression: Expression, entryType: EntryType,
+		executor: typing.Optional[str]) -> typing.Optional[ExpressionEntry]:
 		"""Insert a new entry in the map, return the entry if it does not exists or if it can be updated,
 		otherwise it returns None."""
 
@@ -260,7 +261,8 @@ class Components:
 				f"An expression of role '{entryType}' cannot overwrite an expression of role '{self.map[identifier].entryType}'."
 									)
 
-		self.map[identifier] = ExpressionEntry(expression=expression, entryType=entryType, executors={executor})
+		executors = set() if executor is None else {executor}
+		self.map[identifier] = ExpressionEntry(expression=expression, entryType=entryType, executors=executors)
 		return self.map[identifier]
 
 	def getDependencies(self, expression: Expression) -> typing.Iterator[ExpressionEntry]:
@@ -477,7 +479,7 @@ class Entities:
 				message=f"Unsupported entry type '{underlyingType.category.value}' within the composition stage.")
 
 		# Check if a platform.
-		if expression.namespace == ["platform"]:
+		if expression.namespace and expression.namespace[-1] == "platform":
 			entryType |= EntryType.platform
 		# Check if an executor.
 		if "bzd.platform.Executor" in underlyingType.getParents():
@@ -493,8 +495,10 @@ class Entities:
 
 		# Identify the executor of this entity, it is guarantee by the Expression type that there is always an executor.
 		if executor is None:
-			executor = self.symbols.getEntityResolved(fqn=expression.executorOr("executor")).assertValue(
-				element=expression.element).fqn
+			maybeExecutorFQN = expression.executor
+			if maybeExecutorFQN is not None:
+				executor = self.symbols.getEntityResolved(fqn=maybeExecutorFQN).assertValue(
+					element=expression.element).fqn
 
 		# Register the entry.
 		entry = self.expressions.insert(expression=expression, entryType=entryType, executor=executor)

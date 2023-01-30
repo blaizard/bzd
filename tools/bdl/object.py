@@ -67,8 +67,8 @@ class ObjectContext:
 	def getPreprocessedPathFromSource(self, source: str) -> Path:
 		"""Extract the preprocess path name from the source."""
 		splitted = source.split("@")
-		assert len(splitted) <= 2, f"The source '{source}' is malformed."
-		return Path(splitted[1]) if len(splitted) == 2 else Path(self.preprocessFormat.format(source))
+		assert len(splitted) <= 3, f"The source '{source}' is malformed."
+		return Path(splitted[1]) if len(splitted) > 1 else Path(self.preprocessFormat.format(source))
 
 	def isPreprocessed(self, source: str) -> bool:
 		"""
