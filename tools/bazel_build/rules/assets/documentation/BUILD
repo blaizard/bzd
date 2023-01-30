@@ -5,7 +5,7 @@ py_binary(
     name = "builder",
     srcs = ["builder.py"],
     data = [
-        ":mkdocs.yml.template",
+        ":mkdocs.yml.btl",
     ],
     visibility = ["//visibility:public"],
     deps = [

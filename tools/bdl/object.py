@@ -37,9 +37,8 @@ class ObjectContext:
 		self.composition = composition
 
 	def pushSource(self, source: str) -> None:
-		"""
-		Push a dependency for this object.
-		"""
+		"""Push a dependency for this object."""
+
 		path = self.getPathFromSource(source)
 		# Check for circular dependencies
 		if path in self.sources:
@@ -47,33 +46,38 @@ class ObjectContext:
 		self.sources.append(path)
 
 	def popSource(self) -> None:
-		"""
-		Pop last dependency.
-		"""
+		"""Pop last dependency."""
+
 		self.sources.pop()
 
 	def getSource(self) -> typing.Optional[Path]:
-		"""
-		Get the current source file path.
-		"""
+		"""Get the current source file path."""
+
 		return self.sources[-1] if len(self.sources) > 0 else None
 
 	def getPathFromSource(self, source: str) -> Path:
 		"""Extract the path name from the source."""
+
 		splitted = source.split("@")
 		assert len(splitted) <= 2, f"The source '{source}' is malformed."
 		return Path(splitted[0])
 
 	def getPreprocessedPathFromSource(self, source: str) -> Path:
 		"""Extract the preprocess path name from the source."""
+
 		splitted = source.split("@")
 		assert len(splitted) <= 3, f"The source '{source}' is malformed."
 		return Path(splitted[1]) if len(splitted) > 1 else Path(self.preprocessFormat.format(source))
 
+	def getTargetFromSource(self, source: str) -> typing.Optional[str]:
+		"""Extract the target from the source."""
+
+		splitted = source.split("@")
+		assert len(splitted) <= 3, f"The source '{source}' is malformed."
+		return splitted[2] if len(splitted) == 3 else None
+
 	def isPreprocessed(self, source: str) -> bool:
-		"""
-		Check if a BDL file has a preprocessed counter-part.
-		"""
+		"""Check if a BDL file has a preprocessed counter-part."""
 
 		path = self.getPathFromSource(source=source)
 		preprocessed = self.getPreprocessedPathFromSource(source=source)
@@ -86,18 +90,14 @@ class ObjectContext:
 		return False
 
 	def savePreprocess(self, source: str, object: "Object") -> None:
-		"""
-		Save the serialized content of preprocessed object.
-		"""
+		"""Save the serialized content of preprocessed object."""
 
 		content = object.serialize()
 		preprocessedPath = self.getPreprocessedPathFromSource(source=source)
 		preprocessedPath.write_text(content, encoding="ascii")
 
 	def loadPreprocess(self, source: str) -> "Object":
-		"""
-		Read a serialized preprocessed file and return it.
-		"""
+		"""Read a serialized preprocessed file and return it."""
 
 		preprocessedPath = self.getPreprocessedPathFromSource(source=source)
 		data = preprocessedPath.read_text(encoding="ascii")
@@ -109,8 +109,7 @@ class ObjectContext:
 		return Object(context=context, symbols=symbols, tree=SymbolTree.fromSerialize(payload["tree"], symbols))
 
 	def preprocess(self, source: str, namespace: typing.Optional[str] = None) -> "Object":
-		"""
-		Preprocess a bdl file and save its output, or use the preprocessed file if present.
+		"""Preprocess a bdl file and save its output, or use the preprocessed file if present.
 
 		Args:
 			source: The source file the be preprocessed.
@@ -140,9 +139,7 @@ class ObjectContext:
 
 
 class Object:
-	"""
-	BDL object representation.
-	"""
+	"""BDL object representation."""
 
 	def __init__(self, context: Context, symbols: SymbolMap, tree: SymbolTree) -> None:
 		self.context = context
@@ -188,9 +185,7 @@ class Object:
 		return maybeEntity.value
 
 	def serialize(self) -> str:
-		"""
-		Serialize the current object.
-		"""
+		"""Serialize the current object."""
 
 		return json.dumps(
 			{
@@ -201,9 +196,8 @@ class Object:
 			separators=(",", ":"))
 
 	def __repr__(self) -> str:
-		"""
-		Print an object (for debug purpose only).
-		"""
+		"""Print an object (for debug purpose only)."""
+
 		content = ""
 		content += "--- Symbols\n"
 		content += "".join(["\t{}\n".format(line) for line in str(self.symbols).split("\n")])
