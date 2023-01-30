@@ -23,8 +23,10 @@ assert(value <= {{ contract.value }});
 #include "tools/bdl/generators/cc/adapter/types.hh"
 
 // **** Dependencies ****
+{% for taregt, includes in data.cc.includes %}
 {% for path in includes %}
 #include "{{ path }}"
+{% end %}
 {% end %}
 // ****
 

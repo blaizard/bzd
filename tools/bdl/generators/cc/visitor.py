@@ -1,4 +1,5 @@
 import typing
+import json
 from pathlib import Path
 
 from bzd.template.template import Template
@@ -41,9 +42,9 @@ class Transform:
 	Category = CategoryOriginal
 	AsyncType = AsyncTypeOriginal
 
-	def __init__(self, composition: typing.Optional[Composition] = None, includes: typing.List[Path] = []) -> None:
+	def __init__(self, composition: typing.Optional[Composition] = None, data: typing.Optional[Path] = None) -> None:
 		self.composition = composition
-		self.includes = includes
+		self.data = json.loads(data.read_text()) if data else {}
 
 	def toCamelCase(self, string: str) -> str:
 		assert len(string), "String cannot be empty."
@@ -251,17 +252,17 @@ class Transform:
 		return f"template <{', '.join(args)}>"
 
 
-def formatCc(bdl: Object, includes: typing.List[Path]) -> str:
+def formatCc(bdl: Object, data: typing.Optional[Path] = None) -> str:
 
 	template = Template.fromPath(Path(__file__).parent / "template/file.h.btl", indent=True)
-	output = template.render(bdl.tree, Transform(includes=includes))
+	output = template.render(bdl.tree, Transform(data=data))
 
 	return output
 
 
-def compositionCc(composition: Composition) -> str:
+def compositionCc(composition: Composition, data: typing.Optional[Path] = None) -> str:
 
 	template = Template.fromPath(Path(__file__).parent / "template/composition.cc.btl", indent=True)
-	output = template.render(composition, Transform(composition=composition))
+	output = template.render(composition, Transform(composition=composition, data=data))
 
 	return output

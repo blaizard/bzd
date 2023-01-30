@@ -24,9 +24,8 @@ class AsyncType(enum.Enum):
 
 class Composition:
 
-	def __init__(self, includes: typing.Optional[typing.List[pathlib.Path]] = None) -> None:
+	def __init__(self) -> None:
 
-		self.includes = [] if includes is None else includes
 		self.symbols = SymbolMap()
 		self.entities = Entities(symbols=self.symbols)
 		# Unique identifiers
@@ -105,7 +104,6 @@ class Composition:
 			content += [f"\t- {item}" for item in contentList]
 
 		content: typing.List[str] = []
-		addContent(content, "Includes", self.includes)
 		addContent(content, "Symbols", str(self.symbols).split("\n"))
 		addContent(content, "Unique Identifiers", [f"{k}: {v}" for k, v in self.uids.items()])
 		addContent(content, "Entities", str(self.entities).split("\n"))

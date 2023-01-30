@@ -1,4 +1,5 @@
 import typing
+import json
 from pathlib import Path
 
 from tools.bdl.object import Object
@@ -51,7 +52,7 @@ def _inheritanceToStr(inheritanceList: typing.List[Symbol]) -> str:
 	return ", ".join([str(_symbolToStr(inheritance)) for inheritance in inheritanceList])
 
 
-def formatBdl(bdl: Object, includes: typing.List[Path]) -> str:
+def formatBdl(bdl: Object, data: typing.Optional[Path] = None) -> str:
 
 	template = Template.fromPath(Path(__file__).parent / "template/file.bdl.btl", indent=True)
 	output = template.render(
@@ -61,7 +62,8 @@ def formatBdl(bdl: Object, includes: typing.List[Path]) -> str:
 		"namespaceToStr": _namespaceToStr,
 		"inlineComment": _inlineComment,
 		"normalComment": _normalComment,
-		"inheritanceToStr": _inheritanceToStr
+		"inheritanceToStr": _inheritanceToStr,
+		"data": json.loads(data.read_text()) if data else {}
 		})
 
 	return output
