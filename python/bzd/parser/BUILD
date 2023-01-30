@@ -1,4 +1,5 @@
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
+load("//tools/bazel_build/rules:documentation.bzl", "doc_library")
 
 py_library(
     name = "parser",
@@ -26,4 +27,12 @@ py_binary(
         "//python/bzd:env",
         "//python/bzd/utils:file",
     ],
+)
+
+doc_library(
+    name = "documentation",
+    srcs = [
+        ("Parser", "README.md"),
+    ],
+    visibility = ["//python/bzd:__pkg__"],
 )

@@ -1,4 +1,5 @@
 load("@rules_python//python:defs.bzl", "py_library")
+load("//tools/bazel_build/rules:documentation.bzl", "doc_library")
 
 py_library(
     name = "template",
@@ -10,4 +11,12 @@ py_library(
         "//python:bzd",
         "//python/bzd/parser",
     ],
+)
+
+doc_library(
+    name = "documentation",
+    srcs = [
+        ("Template", "README.md"),
+    ],
+    visibility = ["//python/bzd:__pkg__"],
 )
