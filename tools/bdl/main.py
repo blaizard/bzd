@@ -40,7 +40,8 @@ if __name__ == "__main__":
 
 	if config.stage == "compose":
 
-		bdls = [objectContext.loadPreprocess(source=source) for source in config.inputs]
+		bdls = [(objectContext.loadPreprocess(source=source), objectContext.getTargetFromSource(source=source))
+			for source in config.inputs]
 		compose(formatType=config.format, bdls=bdls, output=config.output, data=config.data)
 
 	else:

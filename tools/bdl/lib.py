@@ -31,11 +31,14 @@ def generate(formatType: str, bdl: Object, data: typing.Optional[Path] = None) -
 	return formatters[formatType](bdl=bdl, data=data)
 
 
-def compose(formatType: str, bdls: typing.Sequence[Object], output: Path, data: typing.Optional[Path] = None) -> None:
+def compose(formatType: str,
+	bdls: typing.Sequence[typing.Tuple[Object, typing.Optional[str]]],
+	output: Path,
+	data: typing.Optional[Path] = None) -> None:
 
 	composition = Composition()
 	for bdl in bdls:
-		composition.visit(bdl)
+		composition.visit(bdl[0], bdl[1])
 	composition.process()
 
 	# Generate the composition using a specific formatter
