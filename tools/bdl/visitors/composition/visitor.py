@@ -54,7 +54,13 @@ class Composition:
 	def registryConnections(self) -> typing.Dict[str, typing.Dict[str, typing.Any]]:
 		return self.entities.registryConnections
 
-	def visit(self, bdl: Object) -> "Composition":
+	def visit(self, bdl: Object, target: typing.Optional[str] = None) -> "Composition":
+		"""Add a specific BDL object to the composition.
+
+		Args:
+			bdl: The object to visit.
+			target: An optional target to associate this bdl with.
+		"""
 
 		# Build a master symbol list
 		self.symbols.update(bdl.symbols)
@@ -62,6 +68,7 @@ class Composition:
 
 	def entity(self, fqn: str) -> Entity:
 		"""Get the entity refered to the given fqn."""
+
 		return self.symbols.getEntityResolved(fqn=fqn).value
 
 	def generateUids(self) -> None:
