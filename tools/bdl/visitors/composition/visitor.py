@@ -63,7 +63,7 @@ class Composition:
 		"""
 
 		# Build a master symbol list
-		self.symbols.update(bdl.symbols)
+		self.symbols.update(bdl.symbols, {target} if target else None)
 		return self
 
 	def entity(self, fqn: str) -> Entity:

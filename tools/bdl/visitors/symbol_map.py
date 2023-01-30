@@ -205,6 +205,7 @@ class SymbolMap:
 		path: typing.Optional[Path],
 		element: Element,
 		group: Group,
+		tags: typing.Optional[typing.Set[str]] = None,
 		conflicts: bool = False) -> str:
 		"""
 		Insert a new element into the symbol map.
@@ -213,6 +214,7 @@ class SymbolMap:
 			path: Path associated with the element.
 			element: Element to be registered.
 			group: Group associated with the element, will be used for filtering.
+			tags: Associate the entry with user-defined tags.
 			conflicts: Handle symbol FQN conflicts.
 		"""
 		if name is None:
@@ -238,6 +240,8 @@ class SymbolMap:
 				SymbolMap.errorSymbolConflict_(fqn, element, originalElement)
 
 		self.map[fqn] = {"g": group.value, "p": path.as_posix() if path is not None else "", "e": None}
+		if tags:
+			self.map[fqn]["t"] = tags
 
 		# Resolve context
 		context, _, _ = element.context.resolve()
@@ -257,9 +261,12 @@ class SymbolMap:
 		message += Error.handleFromElement(element=element2, message="...with this one.", throw=False)
 		raise Exception(message)
 
-	def update(self, symbols: "SymbolMap") -> None:
-		"""
-		Register multiple symbols.
+	def update(self, symbols: "SymbolMap", tags: typing.Optional[typing.Set[str]] = None) -> None:
+		"""Register multiple symbols.
+		
+		Args:
+			symbols: The symbol map.
+			tags: The optional tags to be added.
 		"""
 		for fqn, element in symbols.map.items():
 
@@ -270,6 +277,8 @@ class SymbolMap:
 			if existingElement is not None and element["p"] != existingElement["p"]:
 				SymbolMap.errorSymbolConflict_(fqn, SymbolMap.metaToElement(element),
 					SymbolMap.metaToElement(existingElement))
+			if tags:
+				element["t"] = tags
 			self.map[fqn] = element
 
 	def makeReference(self, fqn: str, group: typing.Optional[Group] = None) -> Element:

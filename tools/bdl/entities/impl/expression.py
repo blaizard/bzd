@@ -106,8 +106,11 @@ class Expression(EntityExpression):
 			# Set the executor.
 			executorContract = self.contracts.get("executor")
 			if executorContract is not None:
-				self.assertTrue(condition=entity.category in {Category.component, Category.method},
-					message=f"`executor` contracts must be set at component instantiation, not '{entity.category}'.")
+				validExecutorContract = entity.category == Category.component
+				validExecutorContract |= (entity.category == Category.method) and not self.symbol.isThis
+				self.assertTrue(condition=validExecutorContract,
+					message=
+					"`executor` contracts must be set either at component instantiation or at free function call.")
 				executor = executorContract.value
 			# If there is a 'this', propagate the executor.
 			elif self.symbol.isThis:
