@@ -124,8 +124,8 @@ class TestRun(unittest.TestCase):
 
 		composition = Composition()
 		composition.visit(bdl).process()
-		composition.entity("test1.world")
-		composition.entity("test2.world")
+		composition.view().entity("test1.world")
+		composition.view().entity("test2.world")
 
 	def testConnections(self) -> None:
 

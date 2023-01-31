@@ -43,7 +43,7 @@ class TestRun(unittest.TestCase):
 		return composition
 
 	def render(self, template: str) -> str:
-		composition = self.composition.makeView()
+		composition = self.composition.view()
 		return Template("""{%- include "tools/bdl/generators/cc/template/declarations.h.btl" -%}""" + template).render(
 			composition, Transform(composition=composition))
 
