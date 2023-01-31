@@ -36,6 +36,11 @@ class CompositionView:
 		else:
 			self.excluding = set()
 
+	def entity(self, fqn: str) -> Entity:
+		"""Get the entity refered to the given fqn."""
+
+		return self.symbols.getEntityResolved(fqn=fqn).value
+
 	def isValidTarget(self, target: str) -> bool:
 		return all((target != excluding) for excluding in self.excluding)
 
@@ -146,11 +151,6 @@ class Composition:
 		self.symbols.update(bdl.symbols)
 		return self
 
-	def entity(self, fqn: str) -> Entity:
-		"""Get the entity refered to the given fqn."""
-
-		return self.symbols.getEntityResolved(fqn=fqn).value
-
 	def generateUids(self) -> None:
 		"""Generate the unique identifiers of the types."""
 
@@ -183,7 +183,7 @@ class Composition:
 				self.asyncs[executorFQN][entity] = AsyncType.service
 			self.connections[executorFQN] = [*self.entities.getConnectionsByExecutor(executorFQN)]
 
-	def makeView(self, target: typing.Optional[str] = None) -> CompositionView:
+	def view(self, target: typing.Optional[str] = None) -> CompositionView:
 		"""Get a composition view for a specific target."""
 
 		return CompositionView(self, target=target)
