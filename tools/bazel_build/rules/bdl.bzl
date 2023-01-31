@@ -62,7 +62,7 @@ _bdl_aspect = aspect(
     attr_aspects = ["deps"],
 )
 
-def _make_bdl_arguments(ctx, stage, format = None, output = None, namespace = None, data = None, args = None):
+def _make_bdl_arguments(ctx, stage, format = None, output = None, namespace = None, data = None, targets = None, args = None):
     """Create the argument list for the `bdl` tool."""
 
     _PREPROCESS_FORMAT = "{}/{{}}.o".format(ctx.bin_dir.path)
@@ -70,11 +70,13 @@ def _make_bdl_arguments(ctx, stage, format = None, output = None, namespace = No
     if format:
         arguments += ["--format", format]
     if output:
-        arguments += ["--output", output.path]
+        arguments += ["--output", output]
     if namespace:
         arguments += ["--namespace", namespace]
     if data:
         arguments += ["--data", data.path]
+    if targets:
+        arguments += [i for target in targets for i in ("--target", target)]
     if args:
         arguments += args
     return arguments
@@ -188,7 +190,7 @@ def _bdl_library_impl(ctx):
                     ctx = ctx,
                     stage = "generate",
                     format = fmt,
-                    output = outputs[0],
+                    output = outputs[0].path,
                     data = data_file,
                     args = [bdl["input"].path],
                 ),
@@ -262,13 +264,16 @@ def _make_composition_language_providers(ctx, name, deps, target_deps = None, ta
     bdl_providers = [(dep[BdlProvider], None) for dep in deps if BdlProvider in dep] + [(provider, name) for name, provider in target_bdl_providers.items()]
 
     # Source list with the following format <path>@<precompiled>@<target> (where @<target> is optional)
-    sources = ["{}@{}{}".format(source[0].path, source[1].path, ("@" + target) if target else "") for provider, target in bdl_providers for source in provider.sources.to_list()]
+    sources = ["{}@{}".format(source[0].path, source[1].path) for provider, target in bdl_providers for source in provider.sources.to_list()]
 
     # Contains all bdl files, this is used for debugging purpose.
     files = depset(transitive = [provider.files for provider, target in bdl_providers])
 
     # Contains all deps grouped by target.
     combined_deps = dict({None: deps}, **target_deps)
+
+    # List all targets
+    targets = [target for target in target_bdl_providers.keys()]
 
     # If there is no files to process, ignore.
     if not files:
@@ -280,7 +285,7 @@ def _make_composition_language_providers(ctx, name, deps, target_deps = None, ta
 
     language_specific_data = _make_bdl_data_file(
         includes_per_target = dict({
-            "": deps_to_cc_hdrs(deps),
+            "all": deps_to_cc_hdrs(deps),
         }, **{target: deps_to_cc_hdrs(deps) for target, deps in target_deps.items()}),
     )
 
@@ -291,28 +296,31 @@ def _make_composition_language_providers(ctx, name, deps, target_deps = None, ta
         content = json.encode(language_specific_data),
     )
 
-    # Generate the output
-    output = ctx.actions.declare_file("{}.main.cc".format(name))
+    # Generate the expected output files.
+    outputs = {target: ctx.actions.declare_file("{}.composition.{}.cc".format(name, target)) for target in (targets if targets else ["all"])}
+
     ctx.actions.run(
         # files also needs to be passed into argument for debugging purpose, in order to display a nice error message.
         inputs = depset([data_file], transitive = [files]),
-        outputs = [output],
+        outputs = outputs.values(),
         progress_message = "Generating C++ composition for //{}:{}".format(ctx.label.package, name),
         arguments = _make_bdl_arguments(
             ctx = ctx,
             stage = "compose",
             format = "cc",
-            output = output,
+            targets = targets,
+            output = "{}/{}.composition".format(outputs.values()[0].dirname, name),
             data = data_file,
             args = sources,
         ),
         executable = ctx.attr._bdl.files_to_run,
     )
 
-    all_deps = [dep for target, deps in combined_deps.items() for dep in deps]
-    cc_info_provider = cc_compile(ctx = ctx, name = name, srcs = [output], deps = all_deps)
+    for target, output in outputs.items():
+        all_deps = [dep for target, deps in combined_deps.items() for dep in deps]
+        cc_info_provider = cc_compile(ctx = ctx, name = "{}.{}".format(name, target), srcs = [output], deps = all_deps)
 
-    return [cc_info_provider, DefaultInfo(files = depset([output])), _BdlCcProvider(srcs = [output], deps = all_deps)]
+    return [cc_info_provider, DefaultInfo(files = depset(outputs.values())), _BdlCcProvider(srcs = [output], deps = all_deps)]
 
 def _bdl_composition_impl(ctx):
     return _make_composition_language_providers(
@@ -355,8 +363,10 @@ def _bdl_system_impl(ctx):
     targets = {}
     for target, names in ctx.attr.targets.items():
         for name in names.split(","):
+            if name in ("all"):
+                fail("The target name '{}' is protected and therefore cannot be used.".format(name))
             if name in targets:
-                fail("The target namespace '{}' is defined twice.".format(name))
+                fail("The target name '{}' is defined twice.".format(name))
             targets[name] = target
 
     # Loop through all the name/target pairs and generate the composition files.

@@ -1,3 +1,5 @@
+#pragma once
+
 #include "cc/bzd/core/channel.hh"
 #include "cc/components/posix/stream/in/interface.hh"
 

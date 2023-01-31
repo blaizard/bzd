@@ -1,3 +1,5 @@
+#pragma once
+
 #include "cc/components/posix/shmem/interface.hh"
 
 namespace bzd::platform::posix {

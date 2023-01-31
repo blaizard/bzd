@@ -9,7 +9,7 @@ from tools.bdl.generators.cc.visitor import formatCc, compositionCc
 from tools.bdl.object import Object, ObjectContext
 
 formatters = {"bdl": formatBdl, "cc": formatCc}
-compositions = {"cc": compositionCc}
+compositions_ = {"cc": compositionCc}
 
 
 def preprocess(source: str,
@@ -32,19 +32,22 @@ def generate(formatType: str, bdl: Object, data: typing.Optional[Path] = None) -
 
 
 def compose(formatType: str,
-	bdls: typing.Sequence[typing.Tuple[Object, typing.Optional[str]]],
+	bdls: typing.Sequence[Object],
 	output: Path,
+	targets: typing.Set[str],
 	data: typing.Optional[Path] = None) -> None:
 
-	composition = Composition()
+	composition = Composition(targets=targets)
 	for bdl in bdls:
-		composition.visit(bdl[0], bdl[1])
+		composition.visit(bdl)
 	composition.process()
 
-	# Generate the composition using a specific formatter
-	content = compositions[formatType](composition=composition, data=data)
-
-	output.write_text(content)
+	# Generate the composition views using a specific formatter and call the language-specific composition.
+	if targets:
+		compositions = {target: composition.forTarget(target) for target in targets}
+	else:
+		compositions = {"all": composition.forTarget()}
+	compositions_[formatType](compositions=compositions, data=data, output=output)
 
 
 def main(formatType: str,

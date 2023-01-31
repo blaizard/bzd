@@ -21,7 +21,6 @@ cc_library(
 
 bdl_system(
     name = "system",
-    tags = ["manual"],
     targets = {
         "//cc/targets/linux:x86_64_clang": "hpc,old",
     },
