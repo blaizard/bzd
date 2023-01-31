@@ -29,6 +29,11 @@ if __name__ == "__main__":
 		type=Path,
 		default=None,
 		help="Data file to be added to the generation or composition phase.")
+	parser.add_argument("--target",
+		dest="targets",
+		action="append",
+		default=[],
+		help="Generate the composition for the given targets.")
 	parser.add_argument("inputs", type=str, nargs="+", help="Input file to be passed to the parser.")
 
 	config = parser.parse_args()
@@ -40,9 +45,12 @@ if __name__ == "__main__":
 
 	if config.stage == "compose":
 
-		bdls = [(objectContext.loadPreprocess(source=source), objectContext.getTargetFromSource(source=source))
-			for source in config.inputs]
-		compose(formatType=config.format, bdls=bdls, output=config.output, data=config.data)
+		bdls = [(objectContext.loadPreprocess(source=source)) for source in config.inputs]
+		compose(formatType=config.format,
+			bdls=bdls,
+			output=config.output,
+			targets=set(config.targets),
+			data=config.data)
 
 	else:
 

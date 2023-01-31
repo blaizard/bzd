@@ -66,15 +66,8 @@ class ObjectContext:
 		"""Extract the preprocess path name from the source."""
 
 		splitted = source.split("@")
-		assert len(splitted) <= 3, f"The source '{source}' is malformed."
+		assert len(splitted) <= 2, f"The source '{source}' is malformed."
 		return Path(splitted[1]) if len(splitted) > 1 else Path(self.preprocessFormat.format(source))
-
-	def getTargetFromSource(self, source: str) -> typing.Optional[str]:
-		"""Extract the target from the source."""
-
-		splitted = source.split("@")
-		assert len(splitted) <= 3, f"The source '{source}' is malformed."
-		return splitted[2] if len(splitted) == 3 else None
 
 	def isPreprocessed(self, source: str) -> bool:
 		"""Check if a BDL file has a preprocessed counter-part."""

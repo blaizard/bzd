@@ -290,6 +290,8 @@ class Components:
 class Entities:
 	"""Class to handle entities and their dependencies."""
 
+	defaultExecutorName_ = "~defaultExecutor"
+
 	def __init__(self, symbols: SymbolMap) -> None:
 		self.symbols = symbols
 		# Map of all available components and their dependencies.
@@ -496,7 +498,9 @@ class Entities:
 		# Identify the executor of this entity, it is guarantee by the Expression type that there is always an executor.
 		if executor is None:
 			maybeExecutorFQN = expression.executor
-			if maybeExecutorFQN is not None:
+			if maybeExecutorFQN is None:
+				executor = self.defaultExecutorName_
+			else:
 				executor = self.symbols.getEntityResolved(fqn=maybeExecutorFQN).assertValue(
 					element=expression.element).fqn
 
@@ -553,10 +557,23 @@ class Entities:
 			self.add(dependency, isDep=True, executor=executor)
 
 	def close(self) -> None:
+
 		# Add platform expressions to all executors.
 		for expression in self.platform.values():
 			for entry in self.expressions.getDependencies(expression):
 				entry.executors.update(self.executors.keys())
+
+		# Replace the default executor with an actual value if there is only one executor,
+		# otherwise, raise an error.
+		executors = self.executors.keys()
+		for e in self.expressions:
+			# We only check cases with a single executor because, other case should be platforms.
+			if len(e.executors) == 1 and self.defaultExecutorName_ in e.executors:
+				e.expression.assertTrue(condition=len(executors) == 1,
+					message=
+					f"No executor is assigned to this expression on a multi-executor ({', '.join([*executors])}) composition."
+										)
+				e.executors = {*executors}
 
 		self.expressions.close()
 

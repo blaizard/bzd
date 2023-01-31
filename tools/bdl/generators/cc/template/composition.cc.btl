@@ -32,9 +32,11 @@ co_await !registry.{{ dep.fqn | fqnToNameStr }}_.shutdown(registry);
 #include "cc/bzd/utility/synchronization/spin_mutex.hh"
 #include "cc/bzd/utility/synchronization/sync_lock_guard.hh"
 {% for target, includes in data.cc.includes %}
-// Includes for target: '{{ target }}'.
+{% if isValidTarget(target) %}
+// Includes for '{{ target }}' target.
 {% for path in includes %}
 #include "{{ path }}"
+{% end %}
 {% end %}
 {% end %}
 
@@ -280,7 +282,7 @@ struct Data
 {% for executorFQN in executors %}
 
 /// Initialize and compose the application.
-bool run{{ executorFQN | fqnToCapitalized }}() noexcept
+bool run{{ stripTargetFromFQN(executorFQN) | fqnToCapitalized }}() noexcept
 {
 	// Create registry.
 	[[maybe_unused]] auto& registry = makeRegistry{{ executorFQN | fqnToCapitalized }}();

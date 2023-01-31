@@ -4,7 +4,7 @@ from pathlib import Path
 
 from bzd.template.template import Template
 
-from tools.bdl.visitors.composition.visitor import Composition, AsyncType as AsyncTypeOriginal
+from tools.bdl.visitors.composition.visitor import CompositionView, AsyncType as AsyncTypeOriginal
 from tools.bdl.object import Object
 from tools.bdl.entities.all import Namespace, Using, Expression
 from tools.bdl.entities.impl.fragment.symbol import Symbol
@@ -42,7 +42,8 @@ class Transform:
 	Category = CategoryOriginal
 	AsyncType = AsyncTypeOriginal
 
-	def __init__(self, composition: typing.Optional[Composition] = None, data: typing.Optional[Path] = None) -> None:
+	def __init__(self, composition: typing.Optional[CompositionView] = None,
+		data: typing.Optional[Path] = None) -> None:
 		self.composition = composition
 		self.data = json.loads(data.read_text()) if data else {}
 
@@ -260,9 +261,11 @@ def formatCc(bdl: Object, data: typing.Optional[Path] = None) -> str:
 	return output
 
 
-def compositionCc(composition: Composition, data: typing.Optional[Path] = None) -> str:
+def compositionCc(compositions: typing.Dict[str, CompositionView], output: Path,
+	data: typing.Optional[Path] = None) -> None:
 
 	template = Template.fromPath(Path(__file__).parent / "template/composition.cc.btl", indent=True)
-	output = template.render(composition, Transform(composition=composition, data=data))
 
-	return output
+	for target, composition in compositions.items():
+		content = template.render(composition, Transform(composition=composition, data=data))
+		(output.parent / f"{output.name}.{target}.cc").write_text(content)
