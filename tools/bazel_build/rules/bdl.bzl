@@ -270,7 +270,7 @@ def _make_composition_language_providers(ctx, name, deps, target_deps = None, ta
     files = depset(transitive = [provider.files for provider, target in bdl_providers])
 
     # Contains all deps grouped by target.
-    combined_deps = dict({None: deps}, **target_deps)
+    combined_deps = dict({"all": deps}, **target_deps)
 
     # List all targets
     targets = [target for target in target_bdl_providers.keys()]

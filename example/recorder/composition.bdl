@@ -21,9 +21,7 @@ interface:
 composition {
 	hello = Hello() [executor(second.executor)];
 	hello.run();
-	world = World();
+	world = World() [executor(executor)];
 	connect(hello.send, world.receive);
 	
 }
-
-
