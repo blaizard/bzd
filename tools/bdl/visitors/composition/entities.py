@@ -569,7 +569,7 @@ class Entities:
 		for e in self.expressions:
 			# We only check cases with a single executor because, other case should be platforms.
 			if len(e.executors) == 1 and self.defaultExecutorName_ in e.executors:
-				e.expression.assertTrue(condition=len(executors) == 1,
+				e.expression.assertTrue(condition=len(executors) <= 1,
 					message=
 					f"No executor is assigned to this expression on a multi-executor ({', '.join([*executors])}) composition."
 										)
