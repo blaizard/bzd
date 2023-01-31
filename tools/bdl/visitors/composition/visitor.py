@@ -183,7 +183,7 @@ class Composition:
 				self.asyncs[executorFQN][entity] = AsyncType.service
 			self.connections[executorFQN] = [*self.entities.getConnectionsByExecutor(executorFQN)]
 
-	def forTarget(self, target: typing.Optional[str] = None) -> CompositionView:
+	def makeView(self, target: typing.Optional[str] = None) -> CompositionView:
 		"""Get a composition view for a specific target."""
 
 		return CompositionView(self, target=target)

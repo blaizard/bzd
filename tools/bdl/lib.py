@@ -44,9 +44,9 @@ def compose(formatType: str,
 
 	# Generate the composition views using a specific formatter and call the language-specific composition.
 	if targets:
-		compositions = {target: composition.forTarget(target) for target in targets}
+		compositions = {target: composition.makeView(target) for target in targets}
 	else:
-		compositions = {"all": composition.forTarget()}
+		compositions = {"all": composition.makeView()}
 	compositions_[formatType](compositions=compositions, data=data, output=output)
 
 
