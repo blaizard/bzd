@@ -22,7 +22,8 @@ cc_library(
 bdl_system(
     name = "system",
     targets = {
-        "//cc/targets/linux:x86_64_clang": "hpc,old",
+        "old": "//cc/targets/linux:x86_64_clang",
+        "hpc": "//cc/targets/linux:x86_64_clang",
     },
     deps = [
         ":lib",

@@ -316,18 +316,21 @@ def _make_composition_language_providers(ctx, name, deps, target_deps = None, ta
         executable = ctx.attr._bdl.files_to_run,
     )
 
+    cc_providers = {}
     for target, output in outputs.items():
-        all_deps = [dep for target, deps in combined_deps.items() for dep in deps]
-        cc_info_provider = cc_compile(ctx = ctx, name = "{}.{}".format(name, target), srcs = [output], deps = all_deps)
+        deps = combined_deps["all"] + ([] if target == "all" else combined_deps.get(target, []))
+        cc_providers[target] = _BdlCcProvider(srcs = [output], deps = deps)
 
-    return [cc_info_provider, DefaultInfo(files = depset(outputs.values())), _BdlCcProvider(srcs = [output], deps = all_deps)]
+    return cc_providers
 
 def _bdl_composition_impl(ctx):
-    return _make_composition_language_providers(
+    cc_providers = _make_composition_language_providers(
         ctx = ctx,
         name = ctx.attr.name,
         deps = ctx.attr.deps,
     )
+    cc_info_provider = cc_compile(ctx = ctx, srcs = cc_providers["all"].srcs, deps = cc_providers["all"].deps)
+    return cc_info_provider
 
 _COMMON_ATTRS = {
     "_bdl": attr.label(
@@ -388,7 +391,7 @@ def _bdl_system_impl(ctx):
         deps[name] = target_provider.deps
 
     # Generate the composition files.
-    cc_info, default_info_provider, cc_provider = _make_composition_language_providers(
+    cc_providers = _make_composition_language_providers(
         ctx = ctx,
         name = ctx.attr.name,
         deps = ctx.attr.deps,
@@ -397,9 +400,9 @@ def _bdl_system_impl(ctx):
     )
 
     outputs = []
-    for name, target in targets.items():
-        target_provider = target[_TargetProvider]
-        target_name = "{}.{}".format(ctx.label.name, name)
+    for target, cc_provider in cc_providers.items():
+        target_provider = targets[target][_TargetProvider]
+        target_name = "{}.{}".format(ctx.label.name, target)
 
         # C++
         if target_provider.language == "cc":
@@ -411,7 +414,7 @@ def _bdl_system_impl(ctx):
 
     return [DefaultInfo(files = depset(outputs))]
 
-bdl_system = rule(
+_bdl_system = rule(
     implementation = _bdl_system_impl,
     doc = """Generate a system from targets.""",
     attrs = dict({
@@ -431,6 +434,19 @@ bdl_system = rule(
     ],
     fragments = ["cpp"],
 )
+
+def bdl_system(targets, **kwargs):
+    targets_processed = {}
+    for name, target in targets.items():
+        if target in targets_processed:
+            targets_processed[target] += "," + name
+        else:
+            targets_processed[target] = name
+
+    _bdl_system(
+        targets = targets_processed,
+        **kwargs
+    )
 
 def _bdl_target_impl(ctx):
     return _TargetProvider(
