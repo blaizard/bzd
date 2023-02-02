@@ -1,5 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
-load("//tools/bazel_build/rules:bdl.bzl", "bdl_library", "bdl_target")
+load("//tools/bazel_build/rules:bdl.bzl", "bdl_library", "bdl_target", "bdl_target_platform")
 
 cc_library(
     name = "main",
@@ -21,18 +21,35 @@ cc_library(
 )
 
 bdl_target(
-    name = "x86_64_clang",
-    compositions = [
+    name = "auto",
+    composition = [
         "composition.bdl",
         "network.bdl",
     ],
     language = "cc",
-    platform = "@linux_x86_64_clang//:platform",
     visibility = [
         "//visibility:public",
     ],
     deps = [
         ":main",
+    ],
+)
+
+bdl_target_platform(
+    name = "x86_64_gcc",
+    platform = "@linux_x86_64_gcc//:platform",
+    target = ":auto",
+    visibility = [
+        "//visibility:public",
+    ],
+)
+
+bdl_target_platform(
+    name = "x86_64_clang",
+    platform = "@linux_x86_64_clang//:platform",
+    target = ":auto",
+    visibility = [
+        "//visibility:public",
     ],
 )
 

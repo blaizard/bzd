@@ -15,7 +15,7 @@ CcCompositionProvider = provider(fields = ["hdrs"])
 _TargetProvider = provider(
     doc = "Provider for a target.",
     fields = {
-        "compositions": "List of composition files for this target.",
+        "composition": "List of composition files for this target.",
         "deps": "List of dependencies for this target.",
         "language": "Language used for this target.",
     },
@@ -30,8 +30,8 @@ _BdlCcProvider = provider(
 _BdlSystemProvider = provider(
     doc = "Provider for system rules",
     fields = {
-        "cc": "A set of cc providers keyed by target names."
-    }
+        "cc": "A set of cc providers keyed by target names.",
+    },
 )
 
 def _get_cc_public_header(target):
@@ -442,7 +442,7 @@ def _bdl_system_impl(ctx):
         # Generate the target-specific composition by injecting the new namespace.
         bdl_provider, _ = _precompile_bdl(
             ctx = ctx,
-            srcs = target_provider.compositions,
+            srcs = target_provider.composition,
             deps = target_provider.deps,
             output_dir = target_name,
             namespace = name,
@@ -460,7 +460,7 @@ def _bdl_system_impl(ctx):
     )
 
     return _BdlSystemProvider(
-        cc = cc_providers
+        cc = cc_providers,
     )
 
 _bdl_system = rule(
@@ -481,8 +481,10 @@ _bdl_system = rule(
 )
 
 def _bdl_binary_transition_impl(settings, attr):
-    if not attr.platform:
+    if not hasattr(attr, "platform"):
         fail("This rule does not contain a valid platform attribute.")
+    if not attr.platform:
+        return {}
     return {
         "//command_line_option:platforms": str(attr.platform),
     }
@@ -496,7 +498,6 @@ _bdl_binary_transition = transition(
 )
 
 def _bdl_binary_impl(ctx):
-
     target_provider = ctx.attr.target[_TargetProvider]
     system = ctx.attr.system[_BdlSystemProvider]
     name = ctx.label.name
@@ -509,17 +510,18 @@ def _bdl_binary_impl(ctx):
     else:
         fail("Unsupported target language '{}'.".format(target_provider.language))
 
-    # Build the binaries
-    binaries = _bdl_binary_build(ctx=ctx, name = name, binary_file = binary_file)
+    # Build the binaries.
+    binaries = _bdl_binary_build(ctx = ctx, name = name, binary_file = binary_file)
 
-    return _bdl_binary_execution(ctx=ctx, binaries=binaries)
+    # Add the execution wrapper.
+    return _bdl_binary_execution(ctx = ctx, binaries = binaries)
 
 _bdl_binary = rule(
     implementation = _bdl_binary_impl,
     doc = """Create a binary from a system rule.""",
     attrs = {
         "platform": attr.label(
-            mandatory = True,
+            default = None,
             doc = "The platform used for the transition of this rule.",
         ),
         "target": attr.label(
@@ -534,7 +536,7 @@ _bdl_binary = rule(
         "system": attr.label(
             mandatory = True,
             doc = "The system rule associated with this target.",
-            providers = [_BdlSystemProvider]
+            providers = [_BdlSystemProvider],
         ),
         "_allowlist_function_transition": attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist",
@@ -557,22 +559,31 @@ _bdl_binary = rule(
     ],
     fragments = ["cpp"],
     cfg = _bdl_binary_transition,
-    executable = True
+    executable = True,
 )
 
 def bdl_system(name, targets, **kwargs):
+    """Create a system rule.
 
-    def _platform_to_target(platform):
-        """Convert a platform label into its related target label."""
-        return str(Label(platform)) + ".target"
+    A system rule create a composition and build all related binary together.
+
+    Args:
+        target: a dictionary with name and target corresponding to the binaries
+                for this system.
+    """
+
+    def _target_to_platform(target):
+        """Convert a target label into its related platform label."""
+        if Label(target).name == "auto":
+            return None
+        return str(Label(target)) + ".platform"
 
     targets_processed = {}
-    for target_name, platform in targets.items():
-        target_rule = _platform_to_target(platform)
-        if target_rule in targets_processed:
-            targets_processed[target_rule] += "," + target_name
+    for target_name, target in targets.items():
+        if target in targets_processed:
+            targets_processed[target] += "," + target_name
         else:
-            targets_processed[target_rule] = target_name
+            targets_processed[target] = target_name
 
     _bdl_system(
         name = "{}.system".format(name),
@@ -580,23 +591,23 @@ def bdl_system(name, targets, **kwargs):
         **kwargs
     )
 
-    for target_name, platform in targets.items():
+    for target_name, target in targets.items():
         _bdl_binary(
             name = "{}.{}".format(name, target_name) if len(targets) > 1 else name,
-            platform = platform,
-            target = _platform_to_target(platform),
+            platform = _target_to_platform(target),
+            target = target,
             target_name = target_name,
-            system = "{}.system".format(name)
+            system = "{}.system".format(name),
         )
 
 def _bdl_target_impl(ctx):
     return _TargetProvider(
-        compositions = ctx.files.compositions,
+        composition = ctx.files.composition,
         deps = ctx.attr.deps,
         language = ctx.attr.language,
     )
 
-_bdl_target = rule(
+bdl_target = rule(
     implementation = _bdl_target_impl,
     doc = """Target definition for the bzd framework.""",
     attrs = {
@@ -605,7 +616,7 @@ _bdl_target = rule(
             doc = "Compilation language for this rule.",
             values = ["cc"],
         ),
-        "compositions": attr.label_list(
+        "composition": attr.label_list(
             mandatory = True,
             allow_files = [".bdl"],
             doc = "List of composition bdl source files for this target.",
@@ -617,20 +628,21 @@ _bdl_target = rule(
     },
 )
 
-def bdl_target(name, platform, language, **kwargs):
-
-    # The main rule of bdl_target is a platform simply because transitions
-    # with bdl_binary cannot be achieved with providers. It must be a hard coded string
-    # that come from the platform label.
-    native.platform(
-        name = name,
-        parents = [platform],
-        visibility = ["//visibility:public"],
-    )
-    # This is the associated target rule to this target. The relation between this
+def bdl_target_platform(name, target, platform, visibility = None, tags = None):
+    # This is the main target rule to this target. The relation between this
     # and the platform are through their name.
-    _bdl_target(
-        name = "{}.target".format(name),
-        language = language,
-        **kwargs
+    native.alias(
+        name = name,
+        actual = target,
+        visibility = visibility,
+        tags = tags,
+    )
+
+    # A platform should be used here because we need to hardcode the name of the platform,
+    # to be able to use it into the bazel transition.
+    native.platform(
+        name = "{}.platform".format(name),
+        parents = [platform],
+        visibility = visibility,
+        tags = tags,
     )

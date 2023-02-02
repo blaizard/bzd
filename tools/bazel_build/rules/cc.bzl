@@ -1,10 +1,10 @@
 load("//tools/bazel_build:binary_wrapper.bzl", "sh_binary_wrapper_impl")
 load("//tools/bazel_build/rules:package.bzl", "BzdPackageFragment", "BzdPackageMetadataFragment")
-load("//tools/bazel_build/rules:bdl.bzl", "bdl_composition")
+load("//tools/bazel_build/rules:bdl.bzl", "bdl_composition", "bdl_system")
 load("@bazel_skylib//lib:sets.bzl", "sets")
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("//tools/bazel_build/rules/assets/cc:defs.bzl", "cc_compile", "cc_link")
-load("@rules_cc//cc:defs.bzl", "cc_test")
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 
 def _cc_binary(ctx, binary_file):
     """
@@ -177,7 +177,7 @@ def _bzd_cc_generic(is_test):
 _bzd_cc_binary = _bzd_cc_generic(is_test = False)
 _bzd_cc_test = _bzd_cc_generic(is_test = True)
 
-def bzd_cc_binary(name, tags = [], srcs = [], deps = [], **kwags):
+def bzd_cc_binary2(name, tags = [], srcs = [], deps = [], **kwags):
     """
     Rule to define a bzd C++ binary.
     """
@@ -194,6 +194,27 @@ def bzd_cc_binary(name, tags = [], srcs = [], deps = [], **kwags):
             name + ".composition",
         ],
         **kwags
+    )
+
+def bzd_cc_binary(name, target = "//cc/targets:auto", tags = [], srcs = [], deps = [], **kwargs):
+    """Rule that defines a bzd C++ binary."""
+
+    if srcs:
+        cc_library(
+            name = "{}.lib".format(name),
+            tags = tags + ["manual", "cc"],
+            srcs = srcs,
+        )
+        deps.append("{}.lib".format(name))
+
+    bdl_system(
+        name = name,
+        targets = {
+            "": target,
+        },
+        tags = tags + ["cc"],
+        deps = deps,
+        **kwargs
     )
 
 def bzd_cc_test(name, tags = [], srcs = [], deps = [], **kwags):
