@@ -1,5 +1,7 @@
 load("//tools/bazel_build/rules/assets/cc:defs.bzl", "cc_compile", "cc_link")
 load("@bazel_skylib//lib:sets.bzl", "sets")
+load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
+load("//tools/bazel_build:binary_wrapper.bzl", "sh_binary_wrapper_impl")
 
 BdlTagProvider = provider(fields = [])
 BdlProvider = provider(
@@ -15,7 +17,6 @@ _TargetProvider = provider(
     fields = {
         "compositions": "List of composition files for this target.",
         "deps": "List of dependencies for this target.",
-        "platform": "Target platform for this target.",
         "language": "Language used for this target.",
     },
 )
@@ -25,6 +26,12 @@ _BdlCcProvider = provider(
         "srcs": "Source files.",
         "deps": "Dependencies.",
     },
+)
+_BdlSystemProvider = provider(
+    doc = "Provider for system rules",
+    fields = {
+        "cc": "A set of cc providers keyed by target names."
+    }
 )
 
 def _get_cc_public_header(target):
@@ -361,12 +368,65 @@ bdl_composition = rule(
     fragments = ["cpp"],
 )
 
+def _bdl_binary_build(ctx, name, binary_file):
+    """Prepare the binary for the execution stage.
+
+    Args:
+        ctx: The context of the action.
+        name: The name of the output.
+        binary_file: The binary of language-specific rule.
+
+    Returns:
+        A list of binaries.
+    """
+
+    binary_toolchain = ctx.toolchains["//tools/bazel_build/toolchains/binary:toolchain_type"].info
+    binaries = [binary_file]
+
+    # Run the build steps
+    for index, build in enumerate(binary_toolchain.build):
+        build_binary_file = ctx.actions.declare_file("{}.build.{}".format(name, index))
+        ctx.actions.run(
+            inputs = [binary_file],
+            outputs = [build_binary_file],
+            tools = build.data_runfiles.files,
+            arguments = [binary_file.path, build_binary_file.path],
+            executable = build.files_to_run,
+        )
+        binaries.append(build_binary_file)
+
+    return binaries
+
+def _bdl_binary_execution(ctx, binaries):
+    """Build the executor provider."""
+
+    binary_toolchain = ctx.toolchains["//tools/bazel_build/toolchains/binary:toolchain_type"].info
+
+    # Identify the executor
+    executor = ctx.attr._executor[BuildSettingInfo].value
+    executors_mapping = {value: key for key, values in binary_toolchain.executors.items() for value in values.split(",")}
+    if executor not in executors_mapping:
+        fail("This platform does not support the '{}' executor, only the followings are supported: {}.".format(executor, executors_mapping.keys()))
+
+    args = []
+    if ctx.attr._debug[BuildSettingInfo].value:
+        args.append("--debug")
+    args += [binary.short_path for binary in binaries]
+
+    return sh_binary_wrapper_impl(
+        ctx = ctx,
+        binary = executors_mapping[executor],
+        output = ctx.outputs.executable,
+        extra_runfiles = binaries,
+        command = "{{binary}} {} $@".format(" ".join(args)),
+    )
+
 def _bdl_system_impl(ctx):
     # Compose the target and their name into a dictionary.
     targets = {}
     for target, names in ctx.attr.targets.items():
         for name in names.split(","):
-            if name in ("all"):
+            if name in ("all",):
                 fail("The target name '{}' is protected and therefore cannot be used.".format(name))
             if name in targets:
                 fail("The target name '{}' is defined twice.".format(name))
@@ -399,20 +459,9 @@ def _bdl_system_impl(ctx):
         target_bdl_providers = bdl_providers,
     )
 
-    outputs = []
-    for target, cc_provider in cc_providers.items():
-        target_provider = targets[target][_TargetProvider]
-        target_name = "{}.{}".format(ctx.label.name, target)
-
-        # C++
-        if target_provider.language == "cc":
-            binary_file, _ = cc_link(ctx, name = target_name + ".temp", srcs = cc_provider.srcs, deps = cc_provider.deps)
-            outputs.append(binary_file)
-
-        else:
-            fail("Unsupported target language '{}'.".format(target_provider.language))
-
-    return [DefaultInfo(files = depset(outputs))]
+    return _BdlSystemProvider(
+        cc = cc_providers
+    )
 
 _bdl_system = rule(
     implementation = _bdl_system_impl,
@@ -429,34 +478,125 @@ _bdl_system = rule(
             aspects = [_bdl_aspect],
         ),
     }, **_COMMON_ATTRS),
-    toolchains = [
-        "@rules_cc//cc:toolchain_type",
-    ],
-    fragments = ["cpp"],
 )
 
-def bdl_system(targets, **kwargs):
+def _bdl_binary_transition_impl(settings, attr):
+    if not attr.platform:
+        fail("This rule does not contain a valid platform attribute.")
+    return {
+        "//command_line_option:platforms": str(attr.platform),
+    }
+
+_bdl_binary_transition = transition(
+    implementation = _bdl_binary_transition_impl,
+    inputs = [],
+    outputs = [
+        "//command_line_option:platforms",
+    ],
+)
+
+def _bdl_binary_impl(ctx):
+
+    target_provider = ctx.attr.target[_TargetProvider]
+    system = ctx.attr.system[_BdlSystemProvider]
+    name = ctx.label.name
+
+    # C++
+    if target_provider.language == "cc":
+        cc_provider = system.cc[ctx.attr.target_name]
+        binary_file, metadata_files = cc_link(ctx, name = name, srcs = cc_provider.srcs, deps = cc_provider.deps, map_analyzer = ctx.attr._map_analyzer_script)
+
+    else:
+        fail("Unsupported target language '{}'.".format(target_provider.language))
+
+    # Build the binaries
+    binaries = _bdl_binary_build(ctx=ctx, name = name, binary_file = binary_file)
+
+    return _bdl_binary_execution(ctx=ctx, binaries=binaries)
+
+_bdl_binary = rule(
+    implementation = _bdl_binary_impl,
+    doc = """Create a binary from a system rule.""",
+    attrs = {
+        "platform": attr.label(
+            mandatory = True,
+            doc = "The platform used for the transition of this rule.",
+        ),
+        "target": attr.label(
+            mandatory = True,
+            doc = "The target label for this binary.",
+            providers = [_TargetProvider],
+        ),
+        "target_name": attr.string(
+            mandatory = True,
+            doc = "The name of the target.",
+        ),
+        "system": attr.label(
+            mandatory = True,
+            doc = "The system rule associated with this target.",
+            providers = [_BdlSystemProvider]
+        ),
+        "_allowlist_function_transition": attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist",
+        ),
+        "_map_analyzer_script": attr.label(
+            executable = True,
+            cfg = "exec",
+            default = Label("//tools/bazel_build/rules/assets/cc/map_analyzer"),
+        ),
+        "_executor": attr.label(
+            default = "//tools/bazel_build/settings/executor",
+        ),
+        "_debug": attr.label(
+            default = "//tools/bazel_build/settings/debug",
+        ),
+    },
+    toolchains = [
+        "@rules_cc//cc:toolchain_type",
+        "//tools/bazel_build/toolchains/binary:toolchain_type",
+    ],
+    fragments = ["cpp"],
+    cfg = _bdl_binary_transition,
+    executable = True
+)
+
+def bdl_system(name, targets, **kwargs):
+
+    def _platform_to_target(platform):
+        """Convert a platform label into its related target label."""
+        return str(Label(platform)) + ".target"
+
     targets_processed = {}
-    for name, target in targets.items():
-        if target in targets_processed:
-            targets_processed[target] += "," + name
+    for target_name, platform in targets.items():
+        target_rule = _platform_to_target(platform)
+        if target_rule in targets_processed:
+            targets_processed[target_rule] += "," + target_name
         else:
-            targets_processed[target] = name
+            targets_processed[target_rule] = target_name
 
     _bdl_system(
+        name = "{}.system".format(name),
         targets = targets_processed,
         **kwargs
     )
+
+    for target_name, platform in targets.items():
+        _bdl_binary(
+            name = "{}.{}".format(name, target_name) if len(targets) > 1 else name,
+            platform = platform,
+            target = _platform_to_target(platform),
+            target_name = target_name,
+            system = "{}.system".format(name)
+        )
 
 def _bdl_target_impl(ctx):
     return _TargetProvider(
         compositions = ctx.files.compositions,
         deps = ctx.attr.deps,
-        platform = ctx.attr.platform,
         language = ctx.attr.language,
     )
 
-bdl_target = rule(
+_bdl_target = rule(
     implementation = _bdl_target_impl,
     doc = """Target definition for the bzd framework.""",
     attrs = {
@@ -474,9 +614,23 @@ bdl_target = rule(
             doc = "List of dependencies.",
             aspects = [_bdl_aspect],
         ),
-        "platform": attr.label(
-            mandatory = True,
-            doc = "The target platform for which this target should be compiled against.",
-        ),
     },
 )
+
+def bdl_target(name, platform, language, **kwargs):
+
+    # The main rule of bdl_target is a platform simply because transitions
+    # with bdl_binary cannot be achieved with providers. It must be a hard coded string
+    # that come from the platform label.
+    native.platform(
+        name = name,
+        parents = [platform],
+        visibility = ["//visibility:public"],
+    )
+    # This is the associated target rule to this target. The relation between this
+    # and the platform are through their name.
+    _bdl_target(
+        name = "{}.target".format(name),
+        language = language,
+        **kwargs
+    )
