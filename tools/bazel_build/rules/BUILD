@@ -98,7 +98,9 @@ bzl_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        "//tools/bazel_build:binary_wrapper",
         "//tools/bazel_build/rules/assets/cc:defs",
         "@bazel_skylib//lib:sets",
+        "@bazel_skylib//rules:common_settings",
     ],
 )
