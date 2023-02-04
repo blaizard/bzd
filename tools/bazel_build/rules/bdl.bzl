@@ -126,7 +126,7 @@ def _precompile_bdl(ctx, srcs, deps, output_dir = None, namespace = None):
             build_root_path = ctx.build_file_path.rsplit("/", 1)[0] + "/"
             relative_name = input_file.path.replace(build_root_path, "").replace(".bdl", "")
         else:
-            relative_name = "{}/{}".format(output_dir, input_file.basename.replace(".bdl", ""))
+            relative_name = "{}/{}/{}".format(output_dir, input_file.dirname, input_file.basename.replace(".bdl", ""))
 
         # Create the output file
         output = ctx.actions.declare_file("{}.bdl.o".format(relative_name))

@@ -351,6 +351,17 @@ class SymbolMap:
 	def metaToElement(meta: typing.Any) -> Element:
 		return Element.fromSerialize(element=meta["e"], context=Context(path=Path(meta["p"])))
 
+	def similarFQN(self, fqn: str) -> typing.List[str]:
+		"""Find a related FQN that has similar name that the one in argument."""
+
+		all_fqns = [k for k in [*self.map.keys(), *self.builtins.keys()] if not k.endswith("~")]
+		similar = []
+		for f in all_fqns:
+			if fqn in f:
+				similar.append(f)
+		similar.sort()
+		return similar
+
 	def getEntityResolved(self, fqn: str, exclude: typing.Optional[typing.List[Group]] = None) -> Result[EntityType]:
 		"""
 		Return an element from the symbol map.
@@ -359,7 +370,10 @@ class SymbolMap:
 
 		data = self._get(fqn=fqn, exclude=exclude)
 		if data is None:
-			return Result[EntityType].makeError("Unable to find symbol '{}'.".format(fqn))
+			similar = self.similarFQN(fqn=fqn)
+			message = f"Unable to find symbol '{fqn}', did you mean {', '.join(similar)}?" if len(
+				similar) else f"Unable to find symbol '{fqn}'."
+			return Result[EntityType].makeError(message)
 
 		# Not memoized
 		if fqn not in self.entities:
