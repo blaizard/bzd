@@ -1,14 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
-    name = "platform",
-    visibility = ["//visibility:public"],
-    deps = [
-        "//cc/targets",
-    ],
-)
-
-cc_library(
     name = "compiler",
     hdrs = [
         "compiler.hh",

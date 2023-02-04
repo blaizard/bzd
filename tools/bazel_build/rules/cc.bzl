@@ -1,211 +1,22 @@
-load("//tools/bazel_build:binary_wrapper.bzl", "sh_binary_wrapper_impl")
-load("//tools/bazel_build/rules:package.bzl", "BzdPackageFragment", "BzdPackageMetadataFragment")
-load("//tools/bazel_build/rules:bdl.bzl", "bdl_composition", "bdl_system")
+load("//tools/bazel_build/rules:bdl.bzl", "bdl_system", "bdl_system_test")
 load("@bazel_skylib//lib:sets.bzl", "sets")
-load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
-load("//tools/bazel_build/rules/assets/cc:defs.bzl", "cc_compile", "cc_link")
-load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+load("//tools/bazel_build/rules/assets/cc:defs.bzl", "cc_compile")
+load("@rules_cc//cc:defs.bzl", "cc_library")
 
-def _cc_binary(ctx, binary_file):
-    """
-    Prepare the binary for the execution stage.
-
-    Returns:
-        A tuple containing the DefaultInfo provider and the metadata.
-    """
-
-    binary_toolchain = ctx.toolchains["//tools/bazel_build/toolchains/binary:toolchain_type"].info
-
-    # Application binary build stage
-
-    binaries = [binary_file]
-
-    # Run the build steps
-    for index, build in enumerate(binary_toolchain.build):
-        build_binary_file = ctx.actions.declare_file("{}.build.{}".format(ctx.attr.name, index))
-        ctx.actions.run(
-            inputs = [binary_file],
-            outputs = [build_binary_file],
-            tools = build.data_runfiles.files,
-            arguments = [binary_file.path, build_binary_file.path],
-            executable = build.files_to_run,
-        )
-        binaries.append(build_binary_file)
-
-    # Application metadata phase
-
-    #metadata_list = binary_toolchain.metadata if binary_toolchain.metadata else [ctx.attr._metadata_script]
-
-    """
-    for index, metadata in enumerate(metadata_list):
-        is_executable = bool(OutputGroupInfo in metadata)
-        if is_executable:
-            metadata_file = ctx.actions.declare_file(".bzd/{}.metadata.{}".format(ctx.attr.name, index))
-            ctx.actions.run(
-                inputs = [executable, binary_final],
-                outputs = [metadata_file],
-                progress_message = "Generating metadata for {}".format(ctx.attr.name),
-                arguments = [executable.path, binary_stripped.path, binary_final.path, metadata_file.path],
-                tools = metadata.data_runfiles.files,
-                executable = metadata.files_to_run,
-            )
-            metadata_manifests.append(metadata_file)
-        else:
-            metadata_manifests.append(metadata.files.to_list()[0])
-    """
-
-    # Application execution phase
-
-    # Identify the executor
-    executor = ctx.attr._executor[BuildSettingInfo].value
-    executors_mapping = {value: key for key, values in binary_toolchain.executors.items() for value in values.split(",")}
-
-    if executor not in executors_mapping:
-        fail("This platform does not support the '{}' executor, only the followings are supported: {}.".format(executor, executors_mapping.keys()))
-
-    args = []
-    if ctx.attr._debug[BuildSettingInfo].value:
-        args.append("--debug")
-    args += ["\"{}\"".format(binary.short_path) for binary in binaries]
-
-    default_info = sh_binary_wrapper_impl(
-        ctx = ctx,
-        binary = executors_mapping[executor],
-        output = ctx.outputs.executable,
-        extra_runfiles = binaries,
-        command = "{{binary}} {} $@".format(" ".join(args)),
-    )
-
-    return default_info, []
-
-def _bzd_cc_transition_impl(settings, attr):
-    if not attr.target:
-        return {}
-    return {
-        "//command_line_option:platforms": str(attr.target),
-    }
-
-_bzd_cc_transition = transition(
-    implementation = _bzd_cc_transition_impl,
-    inputs = [],
-    outputs = [
-        "//command_line_option:platforms",
-    ],
-)
-
-def _bzd_cc_generic_impl(ctx):
-    # Link the CcInfo providers and generate metadata.
-    binary_file, link_metadata_files = cc_link(ctx = ctx, srcs = ctx.files.srcs, deps = ctx.attr.deps, map_analyzer = ctx.attr._map_analyzer_script)
-
-    # Make the executor from the binary toolchain
-    default_info, binary_metadata_files = _cc_binary(ctx, binary_file)
-
-    # Manifests to be exported.
-    manifests = ctx.files._default_metadata_files + binary_metadata_files + link_metadata_files
-
-    return [
-        default_info,
-        BzdPackageFragment(
-            files = [binary_file],
-        ),
-        BzdPackageMetadataFragment(
-            manifests = manifests,
-        ),
-        OutputGroupInfo(metadata = manifests),
-        coverage_common.instrumented_files_info(
-            ctx,
-            source_attributes = ["srcs"],
-            dependency_attributes = ["deps"],
-        ),
-    ]
-
-def _bzd_cc_generic(is_test):
-    return rule(
-        implementation = _bzd_cc_generic_impl,
-        attrs = {
-            "deps": attr.label_list(
-                doc = "C++ dependencies",
-                providers = [CcInfo],
-            ),
-            "srcs": attr.label_list(
-                doc = "C++ source files",
-                allow_files = True,
-            ),
-            "target": attr.label(
-                doc = "Target platform to be used.",
-            ),
-            "_map_analyzer_script": attr.label(
-                executable = True,
-                cfg = "exec",
-                default = Label("//tools/bazel_build/rules/assets/cc/map_analyzer"),
-            ),
-            "_default_metadata_files": attr.label_list(
-                default = [
-                    Label("//tools/bazel_build/rules/assets/cc:metadata_json"),
-                ],
-                allow_files = True,
-            ),
-            "_is_test": attr.bool(
-                default = is_test,
-            ),
-            "_executor": attr.label(
-                default = "//tools/bazel_build/settings/executor",
-            ),
-            "_debug": attr.label(
-                default = "//tools/bazel_build/settings/debug",
-            ),
-            "_lcov_merger": attr.label(
-                cfg = "exec",
-                executable = True,
-                default = Label("@bazel_tools//tools/test:lcov_merger"),
-            ),
-            "_cc_toolchain": attr.label(default = Label("@rules_cc//cc:current_cc_toolchain")),
-            "_allowlist_function_transition": attr.label(
-                default = "@bazel_tools//tools/allowlists/function_transition_allowlist",
-            ),
-        },
-        executable = True,
-        test = is_test,
-        toolchains = [
-            "@rules_cc//cc:toolchain_type",
-            "//tools/bazel_build/toolchains/binary:toolchain_type",
-        ],
-        fragments = ["cpp"],
-        cfg = _bzd_cc_transition,
-    )
-
-_bzd_cc_binary = _bzd_cc_generic(is_test = False)
-_bzd_cc_test = _bzd_cc_generic(is_test = True)
-
-def bzd_cc_binary2(name, tags = [], srcs = [], deps = [], **kwags):
-    """
-    Rule to define a bzd C++ binary.
-    """
-    bdl_composition(
-        name = name + ".composition",
-        tags = tags + ["manual", "cc"],
-        deps = deps + ["//cc/bzd/platform"],
-    )
-    _bzd_cc_binary(
-        name = name,
-        tags = tags + ["cc"],
-        srcs = srcs,
-        deps = [
-            name + ".composition",
-        ],
-        **kwags
-    )
-
-def bzd_cc_binary(name, target = "//cc/targets:auto", tags = [], srcs = [], deps = [], **kwargs):
+def bzd_cc_binary(name, target = "//cc/targets:auto", tags = [], srcs = [], deps = [], testonly = False, **kwargs):
     """Rule that defines a bzd C++ binary."""
 
+    updated_deps = deps + []
     if srcs:
         cc_library(
             name = "{}.lib".format(name),
             tags = tags + ["manual", "cc"],
             srcs = srcs,
+            deps = deps,
+            testonly = testonly,
+            alwayslink = True,
         )
-        deps.append("{}.lib".format(name))
+        updated_deps.append("{}.lib".format(name))
 
     bdl_system(
         name = name,
@@ -213,40 +24,35 @@ def bzd_cc_binary(name, target = "//cc/targets:auto", tags = [], srcs = [], deps
             "": target,
         },
         tags = tags + ["cc"],
-        deps = deps,
+        deps = updated_deps,
+        testonly = testonly,
         **kwargs
     )
 
-def bzd_cc_test(name, tags = [], srcs = [], deps = [], **kwags):
-    """
-    Rule to define a bzd C++ test.
-    """
-    bdl_composition(
-        name = name + ".composition",
-        tags = tags + ["manual", "cc"],
-        deps = deps + ["//cc/bzd/platform"],
-        testonly = True,
-    )
-    _bzd_cc_test(
-        name = name,
-        tags = tags + ["cc"],
-        srcs = srcs,
-        deps = [
-            name + ".composition",
-        ],
-        **kwags
-    )
+def bzd_cc_test(name, target = "//cc/targets:auto", tags = [], srcs = [], deps = [], testonly = True, **kwargs):
+    """Rule that defines a bzd C++ test binary."""
 
-    # Use a specific rule for coverage, I am not able to make _bzd_cc_test
-    # compatible with coverage, to be investigated.
-    cc_test(
-        name = "{}.coverage".format(name),
-        tags = tags + ["cc-coverage"],
-        srcs = srcs,
-        deps = [
-            name + ".composition",
-        ],
-        **kwags
+    updated_deps = deps + []
+    if srcs:
+        cc_library(
+            name = "{}.lib".format(name),
+            tags = tags + ["manual", "cc"],
+            srcs = srcs,
+            deps = deps,
+            testonly = testonly,
+            alwayslink = True,
+        )
+        updated_deps.append("{}.lib".format(name))
+
+    bdl_system_test(
+        name = name,
+        targets = {
+            "": target,
+        },
+        tags = tags + ["cc"],
+        deps = updated_deps,
+        testonly = testonly,
+        **kwargs
     )
 
 def _bzd_cc_library_impl(ctx):
@@ -301,9 +107,8 @@ _bzd_cc_library = rule(
 )
 
 def bzd_cc_library(tags = [], **kwags):
-    """
-    Rule to define a bzd C++ library.
-    """
+    """Rule to define a bzd C++ library."""
+
     _bzd_cc_library(
         tags = tags + ["cc"],
         **kwags
