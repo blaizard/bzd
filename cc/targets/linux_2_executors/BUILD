@@ -1,46 +1,48 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
-load("//tools/bazel_build/rules:bdl.bzl", "bdl_library")
-
-bdl_library(
-    name = "composition",
-    srcs = [
-        "composition.bdl",
-    ],
-    deps = [
-        "//cc/components/generic/executor",
-        "//cc/components/linux/core",
-        "//cc/components/posix/shmem",
-        "//cc/targets/linux:composition",
-    ],
-)
+load("//tools/bazel_build/rules:bdl.bzl", "bdl_target", "bdl_target_platform")
 
 cc_library(
-    name = "linux_2_executors",
+    name = "main",
     srcs = ["main.cc"],
-    visibility = [
-        "//cc/targets:__pkg__",
-    ],
+    visibility = ["//visibility:public"],
     deps = [
-        ":composition",
+        "//cc/components/generic/executor",
         "//cc/components/generic/panic/throw",
+        "//cc/components/linux/core",
+        "//cc/components/posix/shmem",
         "//cc/components/posix/stack_trace",
     ],
 )
 
-platform(
-    name = "x86_64_clang",
-    constraint_values = [
-        "//cc/targets:linux_2_executors",
+bdl_target(
+    name = "auto",
+    composition = [
+        "composition.bdl",
+        "//cc/targets/linux:composition",
     ],
-    parents = ["@linux_x86_64_clang//:platform"],
-    visibility = ["//visibility:public"],
+    language = "cc",
+    visibility = [
+        "//visibility:public",
+    ],
+    deps = [
+        ":main",
+    ],
 )
 
-platform(
+bdl_target_platform(
     name = "x86_64_gcc",
-    constraint_values = [
-        "//cc/targets:linux_2_executors",
+    platform = "@linux_x86_64_gcc//:platform",
+    target = ":auto",
+    visibility = [
+        "//visibility:public",
     ],
-    parents = ["@linux_x86_64_gcc//:platform"],
-    visibility = ["//visibility:public"],
+)
+
+bdl_target_platform(
+    name = "x86_64_clang",
+    platform = "@linux_x86_64_clang//:platform",
+    target = ":auto",
+    visibility = [
+        "//visibility:public",
+    ],
 )

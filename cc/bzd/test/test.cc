@@ -48,7 +48,7 @@ bool bzd::test::Manager::run()
 	::bzd::print("[==========] Running test(s)\n"_csv).sync();
 	if (!node->info)
 	{
-		::bzd::print("[   FAILED ] Empty test suite is considered as a failed test.\n"_csv).sync();
+		::bzd::print("[   FAILED ] Empty test suite is considered a failed test.\n"_csv).sync();
 		return false;
 	}
 

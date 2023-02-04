@@ -1,25 +1,8 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
-load("//tools/bazel_build/rules:bdl.bzl", "bdl_library")
-
-bdl_library(
-    name = "composition",
-    srcs = [
-        "composition.bdl",
-    ],
-    deps = [
-        "//cc/bzd/platform/interfaces:clock",
-        "//cc/bzd/platform/interfaces:stream",
-        "//cc/components/generic/clock/null",
-        "//cc/components/generic/executor",
-        "//cc/components/generic/stream/stub",
-        "//cc/components/std/stream/out",
-        "//cc/components/xtensa/clock/xthal",
-        "//cc/components/xtensa/core",
-    ],
-)
+load("//tools/bazel_build/rules:bdl.bzl", "bdl_target", "bdl_target_platform")
 
 cc_library(
-    name = "esp32_xtensa_lx6",
+    name = "main",
     srcs = ["main.cc"],
     local_defines = select({
         "//toolchains/cc/fragments/esptool:is_sim": ["BZD_EXECUTOR_SIM=1"],
@@ -28,12 +11,40 @@ cc_library(
     target_compatible_with = [
         "@//tools/bazel_build/platforms/isa:xtensa_lx6",
     ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc:bzd",
+        "//cc/bzd/platform/interfaces:clock",
+        "//cc/bzd/platform/interfaces:stream",
+        "//cc/components/generic/clock/null",
+        "//cc/components/generic/executor",
+        "//cc/components/generic/panic/trap",
+        "//cc/components/generic/stream/stub",
+        "//cc/components/std/stream/out",
+        "//cc/components/xtensa/clock/xthal",
+        "//cc/components/xtensa/core",
+    ],
+)
+
+bdl_target(
+    name = "auto",
+    composition = [
+        "composition.bdl",
+    ],
+    language = "cc",
     visibility = [
-        "//cc/targets:__pkg__",
+        "//visibility:public",
     ],
     deps = [
-        ":composition",
-        "//cc:bzd",
-        "//cc/components/generic/panic/trap",
+        ":main",
+    ],
+)
+
+bdl_target_platform(
+    name = "gcc",
+    platform = "@esp32_xtensa_lx6_gcc//:platform",
+    target = ":auto",
+    visibility = [
+        "//visibility:public",
     ],
 )

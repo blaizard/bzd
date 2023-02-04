@@ -83,11 +83,8 @@ bzl_library(
     visibility = ["//visibility:public"],
     deps = [
         ":bdl",
-        ":package",
-        "//tools/bazel_build:binary_wrapper",
-        "//tools/bazel_build/rules/third_party/cc:bzl",
+        "//tools/bazel_build/rules/assets/cc:defs",
         "@bazel_skylib//lib:sets",
-        "@bazel_skylib//rules:common_settings",
     ],
 )
 
@@ -98,8 +95,10 @@ bzl_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        ":package",
         "//tools/bazel_build:binary_wrapper",
         "//tools/bazel_build/rules/assets/cc:defs",
+        "//tools/bazel_build/rules/third_party/cc:bzl",
         "@bazel_skylib//lib:sets",
         "@bazel_skylib//rules:common_settings",
     ],
