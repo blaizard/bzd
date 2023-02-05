@@ -3,7 +3,9 @@ load("@python_deps//:requirements.bzl", "requirement")
 
 py_binary(
     name = "builder",
-    srcs = ["builder.py"],
+    srcs = [
+        "builder.py",
+    ],
     data = [
         ":mkdocs.yml.btl",
     ],
@@ -27,4 +29,10 @@ py_binary(
         requirement("mkdocs-material"),
         requirement("mkdocs-exclude"),
     ],
+)
+
+py_binary(
+    name = "preprocessor",
+    srcs = ["preprocessor.py"],
+    visibility = ["//visibility:public"],
 )

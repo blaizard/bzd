@@ -1,5 +1,5 @@
 site_name: Documentation
-docs_dir: .
+docs_dir: {{ root }}
 use_directory_urls: false
 repo_name: "bzd"
 repo_url: "https://github.com/blaizard/bzd"
