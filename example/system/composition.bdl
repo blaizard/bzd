@@ -23,7 +23,7 @@ interface:
 
 composition {
 	emitter = Emitter() [executor(hpc.executor)];
-	poller = Poller() [executor(old.executor)];
+	poller = Poller() [executor(esp32.executor)];
 	poller.poll();
 	connect(emitter.send, poller.receive);
 	

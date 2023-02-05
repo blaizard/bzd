@@ -20,11 +20,11 @@ from tools.bdl.entities.impl.use import Use
 
 class ObjectContext:
 
-	def __init__(
-			self,
-			preprocessFormat: typing.Optional[str] = None,
-			resolve: bool = False,
-			composition: bool = False) -> None:
+	def __init__(self,
+		preprocessFormat: typing.Optional[str] = None,
+		searchFormats: typing.Optional[typing.List[str]] = None,
+		resolve: bool = False,
+		composition: bool = False) -> None:
 		"""
 		Args:
 			resolve: Resolve all symbols.
@@ -32,6 +32,7 @@ class ObjectContext:
 		"""
 
 		self.preprocessFormat = "{}.o" if preprocessFormat is None else preprocessFormat
+		self.searchFormats = searchFormats if searchFormats else []
 		self.sources: typing.List[Path] = []
 		self.resolve = resolve
 		self.composition = composition
@@ -69,6 +70,23 @@ class ObjectContext:
 		assert len(splitted) <= 2, f"The source '{source}' is malformed."
 		return Path(splitted[1]) if len(splitted) > 1 else Path(self.preprocessFormat.format(source))
 
+	def findPreprocess(self, source: str) -> typing.Optional[Path]:
+		"""Search for the preprocessed object file if any."""
+
+		def getPreprocessedPath(source: str, path: Path) -> typing.Iterator[Path]:
+			yield self.getPreprocessedPathFromSource(source=source)
+			for fmt in self.searchFormats:
+				yield Path(fmt.format(path))
+
+		path = self.getPathFromSource(source=source)
+		for preprocessed in getPreprocessedPath(source=source, path=path):
+			if preprocessed.is_file():
+				# Compare its modification time with the source file.
+				if path.stat().st_mtime > preprocessed.stat().st_mtime:
+					return None
+				return preprocessed
+		return None
+
 	def isPreprocessed(self, source: str) -> bool:
 		"""Check if a BDL file has a preprocessed counter-part."""
 
@@ -89,11 +107,10 @@ class ObjectContext:
 		preprocessedPath = self.getPreprocessedPathFromSource(source=source)
 		preprocessedPath.write_text(content, encoding="ascii")
 
-	def loadPreprocess(self, source: str) -> "Object":
+	def loadPreprocess(self, preprocess: Path) -> "Object":
 		"""Read a serialized preprocessed file and return it."""
 
-		preprocessedPath = self.getPreprocessedPathFromSource(source=source)
-		data = preprocessedPath.read_text(encoding="ascii")
+		data = preprocess.read_text(encoding="ascii")
 
 		# Unserialize the data
 		payload = json.loads(data)
@@ -109,8 +126,9 @@ class ObjectContext:
 			namespace: An optional wrapping namespace to be used for this file.
 		"""
 
-		if self.isPreprocessed(source=source):
-			return self.loadPreprocess(source=source)
+		maybePreprocess = self.findPreprocess(source=source)
+		if maybePreprocess:
+			return self.loadPreprocess(preprocess=maybePreprocess)
 
 		# Push current dependency
 		self.pushSource(source=source)
