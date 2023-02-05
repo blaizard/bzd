@@ -3,7 +3,8 @@ load("//tools/bazel_build:binary_wrapper.bzl", "sh_binary_wrapper_impl")
 _DocumentationProvider = provider(
     doc = "Provider for documentation entities.",
     fields = {
-        "files": "The input files associated with this documentation.",
+        "markdowns": "The markdown files associated with this documentation.",
+        "data": "The data files associated with this documentation.",
         "navigation": "The navigation map.",
     },
 )
@@ -20,10 +21,28 @@ _COMMON_ATTRS = {
         doc = "Extra files used in the documentation.",
         allow_files = True,
     ),
+    "_preprocessor": attr.label(
+        executable = True,
+        cfg = "exec",
+        default = Label("//tools/bazel_build/rules/assets/documentation:preprocessor"),
+    ),
 }
 
-def _doc_preprocess(ctx, files, deps):
-    return files
+def _doc_preprocess(ctx, markdown, deps):
+    # No pre-processing for generated markdown.
+    if markdown.path.startswith(ctx.bin_dir.path):
+        return markdown
+
+    new_file = ctx.actions.declare_file(markdown.basename, sibling = markdown)
+    ctx.actions.run(
+        inputs = deps + [markdown],
+        outputs = [new_file],
+        tools = [ctx.executable._preprocessor],
+        executable = ctx.executable._preprocessor,
+        arguments = ["--output", new_file.path, markdown.path],
+        progress_message = "Preprocessing {}".format(markdown.path),
+    )
+    return new_file
 
 def _doc_library_impl(ctx):
     if len(ctx.attr.srcs) != len(ctx.attr.titles):
@@ -32,7 +51,7 @@ def _doc_library_impl(ctx):
     # Create the navigation map and gather dependencies.
     navigation = []
     markdowns = []
-    transitive_deps = []
+    providers = []
     for index in range(0, len(ctx.attr.srcs)):
         name = ctx.attr.titles[index]
         src = ctx.attr.srcs[index]
@@ -43,21 +62,21 @@ def _doc_library_impl(ctx):
                 navigation.extend(src[_DocumentationProvider].navigation)
             else:
                 navigation.append((name, src[_DocumentationProvider].navigation))
-            transitive_deps.append(src[_DocumentationProvider].files)
+            providers.append(src[_DocumentationProvider])
         elif src.files:
             for f in src.files.to_list():
                 if not name:
                     name = f.basename[:-(len(f.extension) + 1)]
-                navigation.append((name, f.path))
-            markdowns += src.files.to_list()
+                markdown = _doc_preprocess(ctx, f, ctx.files.data)
+                navigation.append((name, markdown.short_path))
+                markdowns.append(markdown)
         else:
             fail("Input source file '{}', not supported.".format(src))
 
-    deps = depset(ctx.files.data, transitive = transitive_deps)
-    preprocessed_markdowns = _doc_preprocess(ctx, markdowns, deps)
-    files = depset(preprocessed_markdowns, transitive = [deps])
+    data = depset(ctx.files.data, transitive = [p.data for p in providers])
+    markdowns = depset(markdowns, transitive = [p.markdowns for p in providers])
 
-    return _DocumentationProvider(files = files, navigation = navigation)
+    return _DocumentationProvider(markdowns = markdowns, data = data, navigation = navigation)
 
 _doc_library = rule(
     implementation = _doc_library_impl,
@@ -68,12 +87,23 @@ _doc_library = rule(
 def _doc_binary_impl(ctx):
     provider = _doc_library_impl(ctx)
     package = ctx.actions.declare_file("{}.tar".format(ctx.label.name))
+
+    # Symlink the data to make sure it resides in the the same directory as the markdowns.
+    data = []
+    for f in provider.data.to_list():
+        new_file = ctx.actions.declare_file(f.basename, sibling = f)
+        ctx.actions.symlink(
+            target_file = f,
+            output = new_file,
+        )
+        data.append(new_file)
+
     ctx.actions.run(
-        inputs = provider.files,
+        inputs = depset(data, transitive = [provider.markdowns]),
         outputs = [package],
         tools = [ctx.executable._builder, ctx.executable._mkdocs],
         executable = ctx.executable._builder,
-        arguments = ["--navigation", json.encode(provider.navigation), "--mkdocs", ctx.executable._mkdocs.path, package.path],
+        arguments = ["--navigation", json.encode(provider.navigation), "--root", ctx.bin_dir.path, "--mkdocs", ctx.executable._mkdocs.path, package.path],
     )
 
     return [
@@ -103,7 +133,6 @@ _doc_binary = rule(
         "_web_server": attr.label(
             executable = True,
             cfg = "target",
-            allow_files = True,
             default = Label("//tools/scripts:web_server"),
         ),
     }, **_COMMON_ATTRS),
