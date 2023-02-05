@@ -10,6 +10,7 @@ BdlProvider = provider(
     fields = {
         "sources": "Pair of input and preprocessed bdl files.",
         "files": "All files, containts the same set of files as in `sources`, but uses a different format for convenience.",
+        "search_formats": "Set of search formats string to locate the preprocessed object files.",
     },
 )
 CcCompositionProvider = provider(fields = ["hdrs"])
@@ -59,6 +60,7 @@ def _bdl_aspect_impl(target, ctx):
             BdlProvider(
                 sources = depset(transitive = [dep[BdlProvider].sources for dep in ctx.rule.attr.deps if BdlProvider in dep]),
                 files = depset(transitive = [dep[BdlProvider].files for dep in ctx.rule.attr.deps if BdlProvider in dep]),
+                search_formats = sets.to_list(sets.make([d for dep in ctx.rule.attr.deps if BdlProvider in dep for d in dep[BdlProvider].search_formats])),
             ),
             cc_composition_provider,
         ]
@@ -70,11 +72,15 @@ _bdl_aspect = aspect(
     attr_aspects = ["deps"],
 )
 
-def _make_bdl_arguments(ctx, stage, format = None, output = None, namespace = None, data = None, targets = None, args = None):
+def _get_preprocessed_format(ctx):
+    return "{}/{{}}.o".format(ctx.bin_dir.path)
+
+def _make_bdl_arguments(ctx, stage, search_formats = None, format = None, output = None, namespace = None, data = None, targets = None, args = None):
     """Create the argument list for the `bdl` tool."""
 
-    _PREPROCESS_FORMAT = "{}/{{}}.o".format(ctx.bin_dir.path)
-    arguments = ["--stage", stage, "--preprocess-format", _PREPROCESS_FORMAT]
+    arguments = ["--stage", stage, "--preprocess-format", _get_preprocessed_format(ctx)]
+    if search_formats:
+        arguments += [i for fmt in search_formats for i in ("--search-format", fmt)]
     if format:
         arguments += ["--format", format]
     if output:
@@ -115,6 +121,7 @@ def _precompile_bdl(ctx, srcs, deps, output_dir = None, namespace = None):
     # Input files and bdls
     input_sources = depset(transitive = [dep[BdlProvider].sources for dep in deps])
     input_files = depset(srcs, transitive = [dep[BdlProvider].files for dep in deps])
+    search_formats = sets.make([d for dep in deps for d in dep[BdlProvider].search_formats])
 
     # Output files
     metadata = []
@@ -138,6 +145,11 @@ def _precompile_bdl(ctx, srcs, deps, output_dir = None, namespace = None):
             "relative_name": relative_name,
         })
 
+    # Add the new path to the list, it must be done before preprocessing the files,
+    # as some might refer to others.
+    sets.insert(search_formats, _get_preprocessed_format(ctx))
+    search_formats = sets.to_list(search_formats)
+
     # Preprocess all input files at once, this stage is language agnostic.
     ctx.actions.run(
         inputs = input_files,
@@ -147,6 +159,7 @@ def _precompile_bdl(ctx, srcs, deps, output_dir = None, namespace = None):
             ctx = ctx,
             stage = "preprocess",
             namespace = namespace,
+            search_formats = search_formats,
             args = ["{}@{}".format(bdl["input"].path, bdl["output"].path) for bdl in metadata],
         ),
         executable = ctx.attr._bdl.files_to_run,
@@ -155,7 +168,7 @@ def _precompile_bdl(ctx, srcs, deps, output_dir = None, namespace = None):
     sources = depset([(bdl["input"], bdl["output"]) for bdl in metadata], transitive = [input_sources])
     files = depset([bdl["output"] for bdl in metadata], transitive = [input_files])
 
-    return BdlProvider(sources = sources, files = files), metadata
+    return BdlProvider(sources = sources, files = files, search_formats = search_formats), metadata
 
 def _bdl_library_impl(ctx):
     _FORMATS = {
@@ -197,6 +210,7 @@ def _bdl_library_impl(ctx):
                 arguments = _make_bdl_arguments(
                     ctx = ctx,
                     stage = "generate",
+                    search_formats = bdl_provider.search_formats,
                     format = fmt,
                     output = outputs[0].path,
                     data = data_file,
@@ -277,6 +291,9 @@ def _make_composition_language_providers(ctx, name, deps, target_deps = None, ta
     # Contains all bdl files, this is used for debugging purpose.
     files = depset(transitive = [provider.files for provider, target in bdl_providers])
 
+    # Contains all search format strings.
+    search_formats = sets.to_list(sets.make([fmt for provider, target in bdl_providers for fmt in provider.search_formats]))
+
     # Contains all deps grouped by target.
     combined_deps = dict({"all": deps}, **target_deps)
 
@@ -316,6 +333,7 @@ def _make_composition_language_providers(ctx, name, deps, target_deps = None, ta
             ctx = ctx,
             stage = "compose",
             format = "cc",
+            search_formats = search_formats,
             targets = targets,
             output = "{}/{}.composition".format(outputs.values()[0].dirname, name),
             data = data_file,
@@ -452,6 +470,7 @@ _bdl_system = rule(
 )
 
 def _bdl_binary_transition_impl(settings, attr):
+    _ignore = settings
     if not hasattr(attr, "platform"):
         fail("This rule does not contain a valid platform attribute.")
     if not attr.platform:
@@ -584,6 +603,7 @@ def _bdl_system_generic(is_test, name, targets, testonly, deps, **kwargs):
         targets = targets_processed,
         testonly = testonly,
         deps = deps,
+        tags = ["manual"],
     )
 
     binary_rule = _bdl_test if is_test else _bdl_binary
@@ -641,12 +661,36 @@ def bdl_target(name, **kwargs):
         **kwargs
     )
 
+def _bdl_target_platform_impl(ctx):
+    return ctx.attr.target[_TargetProvider]
+
+_bdl_target_platform = rule(
+    implementation = _bdl_target_platform_impl,
+    doc = """Target definition specialized for a specific platform for the bzd framework.""",
+    attrs = {
+        "target": attr.label(
+            mandatory = True,
+            providers = [_TargetProvider],
+            doc = "The target associated with this target platform.",
+        ),
+        "platform": attr.label(
+            mandatory = True,
+            doc = "The platform associated with this target platform.",
+        ),
+        "_allowlist_function_transition": attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist",
+        ),
+    },
+    cfg = _bdl_binary_transition,
+)
+
 def bdl_target_platform(name, target, platform, visibility = None, tags = None):
     # This is the main target rule to this target. The relation between this
     # and the platform are through their name.
-    native.alias(
+    _bdl_target_platform(
         name = name,
-        actual = target,
+        target = target,
+        platform = platform,
         visibility = visibility,
         tags = tags,
     )
