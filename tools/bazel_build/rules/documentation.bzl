@@ -44,6 +44,18 @@ def _doc_preprocess(ctx, markdown, deps):
     )
     return new_file
 
+def _doc_preprocess_data(ctx, data):
+    # No pre-processing for generated data.
+    if data.path.startswith(ctx.bin_dir.path):
+        return data
+
+    new_data = ctx.actions.declare_file(data.basename, sibling = data)
+    ctx.actions.symlink(
+        target_file = data,
+        output = new_data,
+    )
+    return new_data
+
 def _doc_library_impl(ctx):
     if len(ctx.attr.srcs) != len(ctx.attr.titles):
         fail("There is not enough sources/titles pair defined.")
@@ -73,7 +85,13 @@ def _doc_library_impl(ctx):
         else:
             fail("Input source file '{}', not supported.".format(src))
 
-    data = depset(ctx.files.data, transitive = [p.data for p in providers])
+    # Symlink the data to make sure it resides in the the same directory as the markdowns.
+    data = []
+    for f in ctx.files.data:
+        new_file = _doc_preprocess_data(ctx, f)
+        data.append(new_file)
+
+    data = depset(data, transitive = [p.data for p in providers])
     markdowns = depset(markdowns, transitive = [p.markdowns for p in providers])
 
     return _DocumentationProvider(markdowns = markdowns, data = data, navigation = navigation)
@@ -88,18 +106,8 @@ def _doc_binary_impl(ctx):
     provider = _doc_library_impl(ctx)
     package = ctx.actions.declare_file("{}.tar".format(ctx.label.name))
 
-    # Symlink the data to make sure it resides in the the same directory as the markdowns.
-    data = []
-    for f in provider.data.to_list():
-        new_file = ctx.actions.declare_file(f.basename, sibling = f)
-        ctx.actions.symlink(
-            target_file = f,
-            output = new_file,
-        )
-        data.append(new_file)
-
     ctx.actions.run(
-        inputs = depset(data, transitive = [provider.markdowns]),
+        inputs = depset(transitive = [provider.data, provider.markdowns]),
         outputs = [package],
         tools = [ctx.executable._builder, ctx.executable._mkdocs],
         executable = ctx.executable._builder,
