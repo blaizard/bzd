@@ -497,6 +497,10 @@ def _bdl_binary_impl(ctx):
         cc_provider = system.cc[ctx.attr.target_name]
         binary_file, metadata_files = cc_link(ctx, name = name, srcs = cc_provider.srcs, deps = cc_provider.deps, map_analyzer = ctx.attr._map_analyzer_script)
         metadata = ctx.files._cc_metadata
+        extra_providers = [coverage_common.instrumented_files_info(
+            ctx,
+            dependency_attributes = ["deps"],
+        )]
 
     else:
         fail("Unsupported target language '{}'.".format(target_provider.language))
@@ -516,7 +520,7 @@ def _bdl_binary_impl(ctx):
             manifests = metadata + build_metadata + execution_metadata,
         ),
         OutputGroupInfo(metadata = metadata + build_metadata + execution_metadata),
-    ]
+    ] + extra_providers
 
 def _bzd_binary_generic(is_test):
     return rule(
