@@ -8,7 +8,7 @@ load("//tools/bazel_build/rules:package.bzl", "BzdPackageFragment", "BzdPackageM
 
 _BdlTagProvider = provider(
     doc = "Empty provider to identify a BDL library.",
-    fields = []
+    fields = [],
 )
 
 _BdlProvider = provider(
@@ -47,8 +47,8 @@ _BdlCcProvider = provider(
 _BdlCcCompositionProvider = provider(
     doc = "Provider to gather public header files from cc rules.",
     fields = {
-        "hdrs": "list of public header files."
-    }
+        "hdrs": "list of public header files.",
+    },
 )
 
 # ---- Aspects ----
