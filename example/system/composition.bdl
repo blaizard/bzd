@@ -8,9 +8,6 @@ interface:
 	method generate();
 	send = Integer;
 	
-composition:
-	this.generate();
-	
 }
 
 // Poll and receive data.
@@ -23,6 +20,7 @@ interface:
 
 composition {
 	emitter = Emitter() [executor(hpc.executor)];
+	emitter.generate();
 	poller = Poller() [executor(esp32.executor)];
 	poller.poll();
 	connect(emitter.send, poller.receive);
