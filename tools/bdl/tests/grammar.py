@@ -372,7 +372,7 @@ class TestRun(unittest.TestCase):
 			"argument": []
 		}])
 
-		parser = Parser(content="var1 = Vector<Vector<Integer, 2>>();")
+		parser = Parser(content="var1 = Vector<Vector<Integer, String>>();")
 		self.assertParserEqual(parser, [{
 			"@": {
 			"category": "expression",
@@ -390,7 +390,7 @@ class TestRun(unittest.TestCase):
 			}
 			}, {
 			'@': {
-			'value': '2'
+			'symbol': 'String'
 			}
 			}]
 			}],

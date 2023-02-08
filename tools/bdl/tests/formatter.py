@@ -18,7 +18,7 @@ struct   ab {
 // Contracts
 defaultConstant = const int32 [min(-1)   max(35) ];
 
-complex = int32<Int, List<T<A/*Variable A*/, B, C<45>>>>;
+complex = int32<Int, List<T<A/*Variable A*/, B, C<UInt>>>>;
 }
 
 interface MyFy {

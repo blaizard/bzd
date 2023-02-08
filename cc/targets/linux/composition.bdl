@@ -24,5 +24,3 @@ composition platform {
 	systemClock: bzd.Clock = bzd.platform.std.clock.System();
 	
 }
-
-

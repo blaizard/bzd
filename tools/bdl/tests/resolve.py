@@ -415,7 +415,7 @@ class TestRun(unittest.TestCase):
 				""",
 				objectContext=ObjectContext(resolve=True, composition=True))
 
-		with self.assertRaisesRegex(Exception, r"symbol"):
+		with self.assertRaisesRegex(Exception, r"Invalid"):
 			Object.fromContent(content="""
 				component Test { config: using Value = Integer; }
 				composition MyComposition { val1 = Test<12>; }

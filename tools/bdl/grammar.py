@@ -7,7 +7,7 @@ from bzd.parser.grammar import Grammar, GrammarItem, GrammarItemSpaces
 from bzd.parser.fragments import Fragment, FragmentNestedStart, FragmentNestedStopNewElement, FragmentNewElement, FragmentParentElement, FragmentComment
 from bzd.parser.element import Element
 
-_regexprBaseName = r"(?!const|interface|struct|component|method|namespace|use|using|config|composition)[0-9a-zA-Z_]+"
+_regexprBaseName = r"(?!const|interface|struct|component|method|namespace|use|using|config|composition|[0-9])[0-9a-zA-Z_]+"
 # Match name
 _regexprName = r"(?P<name>" + _regexprBaseName + r")"
 # Match name or varargs
@@ -77,7 +77,7 @@ def makeGrammarNested(nestedGrammar: Grammar,
 	]
 
 
-def makeGrammarSymbol2(nextGrammar: Grammar) -> Grammar:
+def makeGrammarSymbol(nextGrammar: Grammar) -> Grammar:
 	"""
 	Generate a grammar for Symbol, it accepts the following format:
 	Type = [const] Type1[<Type, Type, ...>]
@@ -95,29 +95,6 @@ def makeGrammarSymbol2(nextGrammar: Grammar) -> Grammar:
 		GrammarItem(r",", FragmentNewElement),
 		GrammarItem(r">", FragmentParentElement), nextGrammar
 		]))
-	return grammar
-
-
-def makeGrammarSymbol(nextGrammar: Grammar) -> Grammar:
-	"""
-	Generate a grammar for Type, it accepts the following format:
-	Type = [const] Type1[<Type, Type, ...>]
-	    or [const] value;
-
-	Nested type elements are included under `template`.
-	"""
-
-	class TemplateStart(FragmentNestedStart):
-		nestedName = "template"
-
-	grammar: Grammar = [GrammarItem(r"const", {"const": ""})]
-	followUpGrammar: Grammar = [
-		GrammarItem(r"<", TemplateStart, [grammar]),
-		GrammarItem(r",", FragmentNewElement),
-		GrammarItem(r">", FragmentParentElement), nextGrammar
-	]
-	grammar.append(GrammarItem(_regexprValue, Fragment, followUpGrammar))
-	grammar.append(GrammarItem(_makeRegexprFQN("symbol"), Fragment, followUpGrammar))
 	return grammar
 
 
@@ -164,20 +141,23 @@ def makeGrammarExpressionFragment(finalGrammar: Grammar = [GrammarItem(r";", Fra
 	class ArgumentStart(FragmentNestedStart):
 		nestedName = "argument"
 
-	grammarValue: Grammar = []
+	grammarValue: Grammar = [
+		GrammarItem(r",", FragmentNewElement),
+		GrammarItem(r"\)", FragmentParentElement),
+		makeGrammarContracts(), finalGrammar
+	]
+
+	# Test for value
+	grammarValue.extend([GrammarItem(_regexprValue, Fragment, grammarValue)])
+
+	# Test for symbol
 	grammarValue.extend(
 		makeGrammarSymbol([
-		GrammarItem(r"\(", ArgumentStart, grammarValue),
-		GrammarItem(r",", FragmentNewElement),
-		GrammarItem(r"\)", FragmentParentElement)
+		GrammarItem(r"\(", ArgumentStart, [GrammarItem(_regexprName + r"\s*=", Fragment, grammarValue), grammarValue]),
+		grammarValue,
 		]))
 
-	return makeGrammarSymbol([
-		GrammarItem(r"\(", ArgumentStart,
-		[GrammarItem(_regexprName + r"\s*=", Fragment, grammarValue),
-		GrammarItem(r"\)", FragmentParentElement)] + grammarValue),
-		makeGrammarContracts(), finalGrammar
-	])
+	return grammarValue
 
 
 def makeGrammarVariable(finalGrammar: Grammar = [GrammarItem(r";", FragmentNewElement)]) -> Grammar:
@@ -225,7 +205,7 @@ def makeGrammarMethod() -> Grammar:
 		]),
 		makeGrammarContracts(),
 		GrammarItem(r"->", Fragment,
-		[makeGrammarSymbol2([makeGrammarContracts(name="contract_return"),
+		[makeGrammarSymbol([makeGrammarContracts(name="contract_return"),
 		GrammarItem(r";", FragmentNewElement)])]),
 		GrammarItem(r";", FragmentNewElement)
 		])
@@ -242,7 +222,7 @@ def makeGrammarUsing() -> Grammar:
 	return [
 		GrammarItem(r"using", {"category": "using"}, [
 		GrammarItem(_regexprName, Fragment, [
-		GrammarItem(r"=", Fragment, makeGrammarSymbol2([makeGrammarContracts(),
+		GrammarItem(r"=", Fragment, makeGrammarSymbol([makeGrammarContracts(),
 		GrammarItem(r";", FragmentNewElement)]))
 		])
 		])
