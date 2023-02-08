@@ -12,15 +12,13 @@ _regexprBaseName = r"(?!const|interface|struct|component|method|namespace|use|us
 _regexprName = r"(?P<name>" + _regexprBaseName + r")"
 # Match name or varargs
 _regexprNameOrVarArgs = r"(?P<name>" + _regexprBaseName + r"(?:\.\.\.)?)"
-# Match: any type expect protected types
-_regexprType = r"(?P<type>" + _regexprBaseName + r"(?:\." + _regexprBaseName + ")*)"
-# Match a symbol
-_regexprSymbol = r"(?P<symbol>" + _regexprBaseName + r"(?:\." + _regexprBaseName + ")*)"
 # Match: "string", 12, -45, 5.1854, true, false
 _regexprValue = r"(?P<value>\".*?(?<!\\)\"|-?[0-9]+(?:\.[0-9]*)?|true|false)"
 # Match string
 _regexprString = r"\"(?P<value>.*?)\""
-
+# Match any type of symbol except protected types
+def _makeRegexprFQN(name):
+	return r"(?P<" + name + r">" + _regexprBaseName + r"(?:\." + _regexprBaseName + ")*)"
 
 class FragmentBlockComment(FragmentComment):
 
@@ -60,7 +58,7 @@ def makeGrammarNested(nestedGrammar: Grammar,
 
 	grammarAfterName: Grammar = [
 		GrammarItem(r":", InheritanceStart, [
-		GrammarItem(_regexprSymbol, Fragment,
+		GrammarItem(_makeRegexprFQN("interface"), Fragment,
 		[GrammarItem(r",", FragmentNewElement),
 		GrammarItem(r"(?={)", FragmentParentElement)])
 		]),
@@ -75,11 +73,30 @@ def makeGrammarNested(nestedGrammar: Grammar,
 		[GrammarItem(_regexprName, Fragment, grammarAfterName)] + grammarAfterName)
 	]
 
+def makeGrammarSymbol2(nextGrammar: Grammar) -> Grammar:
+	"""
+	Generate a grammar for Symbol, it accepts the following format:
+	Type = [const] Type1[<Type, Type, ...>]
+
+	Nested type elements are included under `template`.
+	"""
+
+	class TemplateStart(FragmentNestedStart):
+		nestedName = "template"
+
+	grammar: Grammar = [GrammarItem(r"const", {"const": ""})]
+	grammar.append(GrammarItem(_makeRegexprFQN("type"), Fragment, [
+		GrammarItem(r"<", TemplateStart, [grammar]),
+		GrammarItem(r",", FragmentNewElement),
+		GrammarItem(r">", FragmentParentElement), nextGrammar
+	]))
+	return grammar
 
 def makeGrammarSymbol(nextGrammar: Grammar) -> Grammar:
 	"""
 	Generate a grammar for Type, it accepts the following format:
 	Type = [const] Type1[<Type, Type, ...>]
+	    or [const] value;
 
 	Nested type elements are included under `template`.
 	"""
@@ -94,7 +111,7 @@ def makeGrammarSymbol(nextGrammar: Grammar) -> Grammar:
 		GrammarItem(r">", FragmentParentElement), nextGrammar
 	]
 	grammar.append(GrammarItem(_regexprValue, Fragment, followUpGrammar))
-	grammar.append(GrammarItem(_regexprType, Fragment, followUpGrammar))
+	grammar.append(GrammarItem(_makeRegexprFQN("type"), Fragment, followUpGrammar))
 	return grammar
 
 
@@ -114,7 +131,7 @@ def makeGrammarContracts(name: str = "contract") -> Grammar:
 
 	return [
 		GrammarItem(r"\[", ContractStart, [
-		GrammarItem(_regexprType, Fragment, [
+		GrammarItem(_makeRegexprFQN("type"), Fragment, [
 		GrammarItem(r"\(", ValuesStart, [
 		GrammarItem(r"(?P<value>[\-\.0-9a-zA-Z_]+)", Fragment, [
 		GrammarItem(r",", FragmentNewElement),
@@ -132,16 +149,16 @@ def makeGrammarExpressionFragment(finalGrammar: Grammar = [GrammarItem(r";", Fra
 	"""
 	Generate a grammar for an expression, it accepts the following format:
 	type[(arg1, arg2, ...)] [contract];
+
+	This needs to be changed to the following:
+		[type or value]([name = ] recursive, [name = ] recursive, ...) [contracts]
+
 	"""
 
 	class ArgumentStart(FragmentNestedStart):
 		nestedName = "argument"
 
 	grammarValue = []
-	grammarValue.append(
-		GrammarItem(_regexprValue, Fragment,
-		[GrammarItem(r",", FragmentNewElement),
-		GrammarItem(r"\)", FragmentParentElement)]))
 	grammarValue.extend(
 		makeGrammarSymbol([
 		GrammarItem(r"\(", ArgumentStart, grammarValue),
@@ -160,11 +177,11 @@ def makeGrammarExpressionFragment(finalGrammar: Grammar = [GrammarItem(r";", Fra
 def makeGrammarVariable(finalGrammar: Grammar = [GrammarItem(r";", FragmentNewElement)]) -> Grammar:
 	"""
 	Generate a grammar for Variables, it accepts the following format:
-	name [: symbol] = type[(value)] [contract];
+	name [: interface] = type[(value)] [contract];
 	"""
 
 	return [
-		GrammarItem(_regexprNameOrVarArgs + r"\s*(:\s*" + _regexprSymbol + r"\s*)?=", {"category": "expression"},
+		GrammarItem(_regexprNameOrVarArgs + r"\s*(:\s*" + _makeRegexprFQN("interface") + r"\s*)?=", {"category": "expression"},
 		makeGrammarExpressionFragment(finalGrammar))
 	]
 
@@ -202,7 +219,7 @@ def makeGrammarMethod() -> Grammar:
 		]),
 		makeGrammarContracts(),
 		GrammarItem(r"->", Fragment,
-		[makeGrammarSymbol([makeGrammarContracts(name="contract_return"),
+		[makeGrammarSymbol2([makeGrammarContracts(name="contract_return"),
 		GrammarItem(r";", FragmentNewElement)])]),
 		GrammarItem(r";", FragmentNewElement)
 		])
@@ -219,7 +236,7 @@ def makeGrammarUsing() -> Grammar:
 	return [
 		GrammarItem(r"using", {"category": "using"}, [
 		GrammarItem(_regexprName, Fragment,
-		[GrammarItem(r"=", Fragment, makeGrammarSymbol([makeGrammarContracts(),
+		[GrammarItem(r"=", Fragment, makeGrammarSymbol2([makeGrammarContracts(),
 		GrammarItem(r";", FragmentNewElement)]))])
 		])
 	]

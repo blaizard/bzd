@@ -35,7 +35,7 @@ interface MyFy
 			'i': 0,
 			'e': 10
 			},
-			'symbol': {
+			'interface': {
 			'v': None,
 			'i': 0,
 			'e': 10
@@ -67,7 +67,7 @@ interface MyFy
 			'i': 37,
 			'e': 54
 			},
-			'symbol': {
+			'interface': {
 			'v': None,
 			'i': 37,
 			'e': 54
@@ -130,7 +130,7 @@ interface MyFy
 			'i': 86,
 			'e': 104
 			},
-			'symbol': {
+			'interface': {
 			'v': None,
 			'i': 86,
 			'e': 104
@@ -229,7 +229,7 @@ interface MyFy
 			'i': 180,
 			'e': 189
 			},
-			'symbol': {
+			'interface': {
 			'v': None,
 			'i': 180,
 			'e': 189
@@ -271,7 +271,7 @@ interface MyFy
 			'i': 223,
 			'e': 228
 			},
-			'symbol': {
+			'interface': {
 			'v': None,
 			'i': 223,
 			'e': 228
@@ -294,7 +294,7 @@ interface MyFy
 			'i': 238,
 			'e': 248
 			},
-			'symbol': {
+			'interface': {
 			'v': None,
 			'i': 238,
 			'e': 248
@@ -331,7 +331,7 @@ interface MyFy
 			'i': 273,
 			'e': 289
 			},
-			'symbol': {
+			'interface': {
 			'v': None,
 			'i': 273,
 			'e': 289

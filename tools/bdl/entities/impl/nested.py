@@ -48,8 +48,8 @@ class Nested(Entity):
 	def inheritanceList(self) -> typing.List[Symbol]:
 		inheritanceList: typing.List[Symbol] = []
 		for element in self.element.getNestedSequenceOrEmpty("inheritance"):
-			Error.assertHasAttr(element=element, attr="symbol")
-			inheritanceList.append(Symbol(element=element, kind="symbol"))
+			Error.assertHasAttr(element=element, attr="interface")
+			inheritanceList.append(Symbol(element=element, kind="interface"))
 		return inheritanceList
 
 	def resolve(self, resolver: typing.Any) -> None:

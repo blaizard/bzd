@@ -55,16 +55,16 @@ class Expression(EntityExpression):
 
 	@property
 	def isInterfaceType(self) -> bool:
-		return self.element.isAttr("symbol") and bool(self.element.getAttr("symbol").value)
+		return self.element.isAttr("interface") and bool(self.element.getAttr("interface").value)
 
 	@cached_property
 	def interfaceType(self) -> Symbol:
-		return Symbol(element=self.element, kind="symbol", underlyingTypeFQN="fqn_interface",
+		return Symbol(element=self.element, kind="interface", underlyingTypeFQN="fqn_interface",
 			const="const") if self.isInterfaceType else self.symbol
 
 	@cached_property
 	def interfaceTypeResolved(self) -> Symbol:
-		return Symbol(element=self.element, kind="symbol", underlyingTypeFQN="fqn_interface",
+		return Symbol(element=self.element, kind="interface", underlyingTypeFQN="fqn_interface",
 			const="const") if self.isInterfaceType else self.typeResolved
 
 	@property
@@ -90,6 +90,11 @@ class Expression(EntityExpression):
 		if self.isInterfaceType:
 			self.interfaceType.resolve(resolver=resolver)
 			# TODO: Ensure that the interface is part of the parent type.
+
+		# Process "items" nested sequence to generate either a value, a symbol or a regexpr.
+		# Handle: value + symbol + value -> Must become a value
+		# Handle: symbol
+		# Handle: hello(value) / value -> "hello" is a build time function
 
 		# If it holds a value, it is considered a literal.
 		if self.isValue:
