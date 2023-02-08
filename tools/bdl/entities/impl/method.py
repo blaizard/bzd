@@ -33,12 +33,12 @@ class Method(Entity):
 
 	@property
 	def isSymbol(self) -> bool:
-		return self.element.isAttr("type")
+		return self.element.isAttr("symbol")
 
 	@cached_property
 	def symbol(self) -> typing.Optional[Symbol]:
 		return Symbol(element=self.element,
-			kind="type",
+			kind="symbol",
 			underlyingTypeFQN="fqn_return_type",
 			template="template",
 			contract="contract_return",

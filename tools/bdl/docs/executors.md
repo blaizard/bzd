@@ -23,6 +23,7 @@ composition
 Sometimes, for portability purpose, you might want to inject the knowledge of cores at runtime.
 To do so, a platform specific executor can be made, abstracting the notion of cores.
 For example, a linux machine can be composed as follow:
+
 ```bdl
 composition
 {
@@ -39,10 +40,12 @@ For each supported platform a default executor is available, it's full qualified
 ## Association
 
 A component instanciation defines where the components resides and run. This is done with the `executor` contract.
+
 ```bdl
 composition
 {
    comp1 = Component [executor(linux)];
 }
 ```
+
 If omitted, the component will run on the default `executor`.

@@ -49,6 +49,7 @@ composition:
 ```
 
 The C++ implementation of the complex component could be something like:
+
 ```c++
 Area ComplexShape::surface()
 {
@@ -58,6 +59,7 @@ Area ComplexShape::surface()
 
 Sub-components helps for encapsulation and hence reduce the complexity and composability while improving re-usability.
 For example, imagine a complex sub-system:
+
 ```bdl
 component RobotLeg : Kinematics
 {

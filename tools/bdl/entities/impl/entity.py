@@ -401,12 +401,12 @@ class EntityExpression(Entity):
 
 	@property
 	def isSymbol(self) -> bool:
-		return self.element.isAttr("type")
+		return self.element.isAttr("symbol")
 
 	@cached_property
 	def symbol(self) -> Symbol:
 		return Symbol(element=self.element,
-			kind="type",
+			kind="symbol",
 			underlyingTypeFQN="fqn_type",
 			template="template",
 			const="const")

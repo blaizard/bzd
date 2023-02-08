@@ -19,7 +19,7 @@ class Using(EntityExpression):
 	def __init__(self, element: Element) -> None:
 
 		super().__init__(element, Role.Type)
-		Error.assertHasAttr(element=element, attr="type")
+		Error.assertHasAttr(element=element, attr="symbol")
 
 	def resolve(self, resolver: typing.Any) -> None:
 		"""

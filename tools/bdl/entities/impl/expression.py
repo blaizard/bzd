@@ -48,7 +48,7 @@ class Expression(EntityExpression):
 	@cached_property
 	def typeResolved(self) -> Symbol:
 		return Symbol(element=self.element,
-			kind="type",
+			kind="symbol",
 			underlyingTypeFQN="fqn_type",
 			template="template_resolved",
 			const="const")
@@ -179,7 +179,7 @@ class Expression(EntityExpression):
 		validation = self.makeValidationForValues(resolver=resolver, parameters=expectedParameters)
 		arguments = parameters.getValuesOrTypesAsDict(resolver=resolver, varArgs=False)
 		result = validation.validate(arguments, output="return")
-		Error.assertTrue(element=self.element, attr="type", condition=bool(result), message=str(result))
+		Error.assertTrue(element=self.element, attr="symbol", condition=bool(result), message=str(result))
 
 		# Compute and set the literal value if any.
 		maybeValue = resolvedTypeEntity.toLiteral(result.values)  # type: ignore

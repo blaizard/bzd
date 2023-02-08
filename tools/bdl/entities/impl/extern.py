@@ -12,19 +12,19 @@ class Extern(Entity):
 	"""
 	A extern statement is used to pull a symbol coming from an external file (not interpretable by BDL).
 	- Attributes:
-		- type: The type of external symbol.
+		- category: The category of external symbol.
 		- name: The name of the symbol.
 	"""
 
 	def __init__(self, element: Element) -> None:
 
 		super().__init__(element, Role.Type)
-		Error.assertHasAttr(element=element, attr="type")
+		Error.assertHasAttr(element=element, attr="category")
 		Error.assertHasAttr(element=element, attr="name")
 
 	@property
 	def type(self) -> str:
-		return self.element.getAttr("type").value
+		return self.element.getAttr("category").value
 
 	def resolve(self, resolver: typing.Any) -> None:
 		"""
@@ -35,4 +35,4 @@ class Extern(Entity):
 		super().resolve(resolver)
 
 	def __repr__(self) -> str:
-		return self.toString({"name": self.name, "type": self.type})
+		return self.toString({"name": self.name, "category": self.type})

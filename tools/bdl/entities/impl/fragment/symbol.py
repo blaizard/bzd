@@ -261,10 +261,10 @@ class Visitor(VisitorDepthFirstBase[typing.List[str], str]):
 	def visitElement(self, element: Element, result: typing.List[str],
 		nested: typing.Optional[typing.List[str]]) -> typing.List[str]:
 
-		if element.isAttr("type"):
+		if element.isAttr("symbol"):
 
 			symbol = Symbol(element=element,
-				kind="type",
+				kind="symbol",
 				underlyingTypeFQN="fqn_type",
 				template="template_resolved" if self.isResolved else "template",
 				const="const")
