@@ -40,7 +40,7 @@ interface MyFy
 			'i': 0,
 			'e': 10
 			},
-			'type': {
+			'symbol': {
 			'v': 'Float',
 			'i': 11,
 			'e': 16
@@ -82,7 +82,7 @@ interface MyFy
 			'i': 55,
 			'e': 60
 			},
-			'type': {
+			'symbol': {
 			'v': 'int32',
 			'i': 61,
 			'e': 66
@@ -140,7 +140,7 @@ interface MyFy
 			'i': 86,
 			'e': 104
 			},
-			'type': {
+			'symbol': {
 			'v': 'int32',
 			'i': 105,
 			'e': 110
@@ -211,7 +211,7 @@ interface MyFy
 			'i': 175,
 			'e': 179
 			},
-			'type': {
+			'symbol': {
 			'v': 'Result',
 			'i': 209,
 			'e': 215
@@ -234,7 +234,7 @@ interface MyFy
 			'i': 180,
 			'e': 189
 			},
-			'type': {
+			'symbol': {
 			'v': 'Sequence',
 			'i': 190,
 			'e': 198
@@ -242,7 +242,7 @@ interface MyFy
 			},
 			'template': [{
 			'@': {
-			'type': {
+			'symbol': {
 			'v': 'char',
 			'i': 199,
 			'e': 203
@@ -252,7 +252,7 @@ interface MyFy
 			}],
 			'template': [{
 			'@': {
-			'type': {
+			'symbol': {
 			'v': 'int',
 			'i': 216,
 			'e': 219
@@ -276,7 +276,7 @@ interface MyFy
 			'i': 223,
 			'e': 228
 			},
-			'type': {
+			'symbol': {
 			'v': 'MyType',
 			'i': 229,
 			'e': 235
@@ -304,7 +304,7 @@ interface MyFy
 			'i': 249,
 			'e': 254
 			},
-			'type': {
+			'symbol': {
 			'v': 'MyType',
 			'i': 255,
 			'e': 261
@@ -336,7 +336,7 @@ interface MyFy
 			'i': 273,
 			'e': 289
 			},
-			'type': {
+			'symbol': {
 			'v': 'MyType',
 			'i': 290,
 			'e': 296

@@ -6,6 +6,7 @@ It is the most top level view of the composition.
 ## Definition
 
 Defining a system is done with Bazel through a rule, as follow:
+
 ```bzl
 bdl_system(
     nae = "application",
@@ -27,6 +28,7 @@ under the namespace `hpc`. The third one, is a python binary that runs under `li
 Under the hood, this rule will invoke 1 composition process and 3 binary rules that uses the same composition BDL files.
 
 To describe a target, the user should use the following rule:
+
 ```bdl
 bdl_target(
     name = "x86_64_clang",
@@ -45,6 +47,7 @@ bdl_target(
 
 A system rule will perform the following operations to generate the various binaries for the system.
 Givien the following targets:
+
 ```bdl
 bdl_target(
     name = "a",

@@ -17,6 +17,6 @@ composition x86 {
 composition {
     esp32.ip = "192.168.1.3" [override];
     x86.ip = "192.168.1.4" [override];
-    connect(esp32.ethernet, x86.ethernet);  
+    connect(esp32.ethernet, x86.ethernet);
 }
 ```

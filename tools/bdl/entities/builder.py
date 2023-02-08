@@ -30,7 +30,7 @@ class ElementBuilder(Element):
 		"""
 		element = ElementBuilder(category="expression")
 		if kind is not None:
-			element.setAttr("type", kind)
+			element.setAttr("symbol", kind)
 		if literal is not None:
 			element.setAttr("value", literal)
 			element.setAttr("literal", literal)
@@ -45,7 +45,7 @@ class ElementBuilder(Element):
 		"""
 		Create a configuration entry
 		"""
-		element = ElementBuilder(category="using").setAttr("type", kind).setAttr("name", name)
+		element = ElementBuilder(category="using").setAttr("symbol", kind).setAttr("name", name)
 		if contract is not None:
 			element.addContract(contract)
 		self.pushBackElementToNestedSequence(kind="config", element=element)
@@ -81,7 +81,7 @@ class ExpressionBuilder(ElementBuilder):
 		super().__init__("expression")
 		if name is not None:
 			self.setAttr("name", name)
-		self.setAttr("type", type)
+		self.setAttr("symbol", type)
 
 
 class SequenceBuilder(Sequence):

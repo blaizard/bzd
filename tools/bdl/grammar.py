@@ -16,9 +16,12 @@ _regexprNameOrVarArgs = r"(?P<name>" + _regexprBaseName + r"(?:\.\.\.)?)"
 _regexprValue = r"(?P<value>\".*?(?<!\\)\"|-?[0-9]+(?:\.[0-9]*)?|true|false)"
 # Match string
 _regexprString = r"\"(?P<value>.*?)\""
+
+
 # Match any type of symbol except protected types
-def _makeRegexprFQN(name):
+def _makeRegexprFQN(name: str) -> str:
 	return r"(?P<" + name + r">" + _regexprBaseName + r"(?:\." + _regexprBaseName + ")*)"
+
 
 class FragmentBlockComment(FragmentComment):
 
@@ -73,6 +76,7 @@ def makeGrammarNested(nestedGrammar: Grammar,
 		[GrammarItem(_regexprName, Fragment, grammarAfterName)] + grammarAfterName)
 	]
 
+
 def makeGrammarSymbol2(nextGrammar: Grammar) -> Grammar:
 	"""
 	Generate a grammar for Symbol, it accepts the following format:
@@ -85,12 +89,14 @@ def makeGrammarSymbol2(nextGrammar: Grammar) -> Grammar:
 		nestedName = "template"
 
 	grammar: Grammar = [GrammarItem(r"const", {"const": ""})]
-	grammar.append(GrammarItem(_makeRegexprFQN("type"), Fragment, [
+	grammar.append(
+		GrammarItem(_makeRegexprFQN("symbol"), Fragment, [
 		GrammarItem(r"<", TemplateStart, [grammar]),
 		GrammarItem(r",", FragmentNewElement),
 		GrammarItem(r">", FragmentParentElement), nextGrammar
-	]))
+		]))
 	return grammar
+
 
 def makeGrammarSymbol(nextGrammar: Grammar) -> Grammar:
 	"""
@@ -111,7 +117,7 @@ def makeGrammarSymbol(nextGrammar: Grammar) -> Grammar:
 		GrammarItem(r">", FragmentParentElement), nextGrammar
 	]
 	grammar.append(GrammarItem(_regexprValue, Fragment, followUpGrammar))
-	grammar.append(GrammarItem(_makeRegexprFQN("type"), Fragment, followUpGrammar))
+	grammar.append(GrammarItem(_makeRegexprFQN("symbol"), Fragment, followUpGrammar))
 	return grammar
 
 
@@ -148,17 +154,17 @@ def makeGrammarContracts(name: str = "contract") -> Grammar:
 def makeGrammarExpressionFragment(finalGrammar: Grammar = [GrammarItem(r";", FragmentNewElement)]) -> Grammar:
 	"""
 	Generate a grammar for an expression, it accepts the following format:
-	type[(arg1, arg2, ...)] [contract];
+	symbol[(arg1, arg2, ...)] [contract];
 
 	This needs to be changed to the following:
-		[type or value]([name = ] recursive, [name = ] recursive, ...) [contracts]
+		[symbol or value]([name = ] recursive, [name = ] recursive, ...) [contracts]
 
 	"""
 
 	class ArgumentStart(FragmentNestedStart):
 		nestedName = "argument"
 
-	grammarValue = []
+	grammarValue: Grammar = []
 	grammarValue.extend(
 		makeGrammarSymbol([
 		GrammarItem(r"\(", ArgumentStart, grammarValue),
@@ -177,19 +183,19 @@ def makeGrammarExpressionFragment(finalGrammar: Grammar = [GrammarItem(r";", Fra
 def makeGrammarVariable(finalGrammar: Grammar = [GrammarItem(r";", FragmentNewElement)]) -> Grammar:
 	"""
 	Generate a grammar for Variables, it accepts the following format:
-	name [: interface] = type[(value)] [contract];
+	name [: interface] = symbol[(value)] [contract];
 	"""
 
 	return [
-		GrammarItem(_regexprNameOrVarArgs + r"\s*(:\s*" + _makeRegexprFQN("interface") + r"\s*)?=", {"category": "expression"},
-		makeGrammarExpressionFragment(finalGrammar))
+		GrammarItem(_regexprNameOrVarArgs + r"\s*(:\s*" + _makeRegexprFQN("interface") + r"\s*)?=",
+		{"category": "expression"}, makeGrammarExpressionFragment(finalGrammar))
 	]
 
 
 def makeGrammarExpression() -> Grammar:
 	"""
 	Generate a grammar for Variables, it accepts the following format:
-	[name [: interface] =] type[(value)] [contract];
+	[name [: interface] =] symbol[(value)] [contract];
 	"""
 
 	finalGrammar: Grammar = [GrammarItem(r";", FragmentNewElement)]
@@ -235,9 +241,10 @@ def makeGrammarUsing() -> Grammar:
 
 	return [
 		GrammarItem(r"using", {"category": "using"}, [
-		GrammarItem(_regexprName, Fragment,
-		[GrammarItem(r"=", Fragment, makeGrammarSymbol2([makeGrammarContracts(),
-		GrammarItem(r";", FragmentNewElement)]))])
+		GrammarItem(_regexprName, Fragment, [
+		GrammarItem(r"=", Fragment, makeGrammarSymbol2([makeGrammarContracts(),
+		GrammarItem(r";", FragmentNewElement)]))
+		])
 		])
 	]
 
@@ -245,7 +252,7 @@ def makeGrammarUsing() -> Grammar:
 def makeGrammarExtern() -> Grammar:
 	"""
 	Generate a grammar for extern keyword, it accepts the following format:
-	extern type symbol;
+	extern category symbol;
 	"""
 
 	return [
