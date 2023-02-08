@@ -4,7 +4,7 @@ doc_binary(
     name = "docs",
     srcs = [
         ("**", "//:documentation"),
-        ("BDL", "//docs/bdl"),
+        ("BDL", "//tools/bdl/docs"),
         ("Bazel", "//docs/api/bazel"),
         ("C++", "//cc:documentation"),
         ("Python", "//python/bzd:documentation"),

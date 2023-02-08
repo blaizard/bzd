@@ -76,7 +76,7 @@ def makeGrammarNested(nestedGrammar: Grammar,
 	]
 
 
-def makeGrammarType(nextGrammar: Grammar) -> Grammar:
+def makeGrammarSymbol(nextGrammar: Grammar) -> Grammar:
 	"""
 	Generate a grammar for Type, it accepts the following format:
 	Type = [const] Type1[<Type, Type, ...>]
@@ -143,13 +143,13 @@ def makeGrammarExpressionFragment(finalGrammar: Grammar = [GrammarItem(r";", Fra
 		[GrammarItem(r",", FragmentNewElement),
 		GrammarItem(r"\)", FragmentParentElement)]))
 	grammarValue.extend(
-		makeGrammarType([
+		makeGrammarSymbol([
 		GrammarItem(r"\(", ArgumentStart, grammarValue),
 		GrammarItem(r",", FragmentNewElement),
 		GrammarItem(r"\)", FragmentParentElement)
 		]))
 
-	return makeGrammarType([
+	return makeGrammarSymbol([
 		GrammarItem(r"\(", ArgumentStart,
 		[GrammarItem(_regexprName + r"\s*=", Fragment, grammarValue),
 		GrammarItem(r"\)", FragmentParentElement)] + grammarValue),
@@ -202,7 +202,7 @@ def makeGrammarMethod() -> Grammar:
 		]),
 		makeGrammarContracts(),
 		GrammarItem(r"->", Fragment,
-		[makeGrammarType([makeGrammarContracts(name="contract_return"),
+		[makeGrammarSymbol([makeGrammarContracts(name="contract_return"),
 		GrammarItem(r";", FragmentNewElement)])]),
 		GrammarItem(r";", FragmentNewElement)
 		])
@@ -219,7 +219,7 @@ def makeGrammarUsing() -> Grammar:
 	return [
 		GrammarItem(r"using", {"category": "using"}, [
 		GrammarItem(_regexprName, Fragment,
-		[GrammarItem(r"=", Fragment, makeGrammarType([makeGrammarContracts(),
+		[GrammarItem(r"=", Fragment, makeGrammarSymbol([makeGrammarContracts(),
 		GrammarItem(r";", FragmentNewElement)]))])
 		])
 	]
