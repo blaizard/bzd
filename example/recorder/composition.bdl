@@ -22,8 +22,20 @@ composition {
 	hello = Hello() [executor(second.executor)];
 	hello.run();
 	world = World() [executor(executor)];
-	connect(hello.send, world.receive);
 	
+	//recorder = Recorder();
+
+	// Regexpr choices:
+	// glob(include=..., exclude=...) <- cannot easily express lists.
+	// include(..., ..., ...).exclude(..., ...) <- ugly
+	// hello.* <- type regexpr (cannot express lists nor exclusions)
+	// hello.* + yes.* - hello.this
+	// +hello.world* +world* -world.this <- the nicest I think, thanks chatGPT!
+	// r"hello.world*" + r"world*" - r"world.this" <- will use this instead.
+
+	// Connect all signals to this recorder
+	//connect(include(*).exclude(""), recorder);
+
+	connect(hello.send, world.receive);
+
 }
-
-

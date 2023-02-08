@@ -117,7 +117,7 @@ class TestRun(unittest.TestCase):
 			"argument": [{
 			"@": {
 			"category": "expression",
-			"symbol": None,
+			"interface": None,
 			"name": "a",
 			"type": "int"
 			}
@@ -133,14 +133,14 @@ class TestRun(unittest.TestCase):
 			"argument": [{
 			"@": {
 			"category": "expression",
-			"symbol": None,
+			"interface": None,
 			"name": "a",
 			"type": "int"
 			}
 			}, {
 			"@": {
 			"category": "expression",
-			"symbol": None,
+			"interface": None,
 			"name": "b",
 			"type": "float",
 			"const": ""
@@ -167,7 +167,7 @@ class TestRun(unittest.TestCase):
 			"argument": [{
 			"@": {
 			"category": "expression",
-			"symbol": None,
+			"interface": None,
 			"name": "a",
 			"type": "Vector"
 			},
@@ -190,7 +190,7 @@ class TestRun(unittest.TestCase):
 			"@": {
 			"category": "expression",
 			"name": "var1",
-			"symbol": None,
+			"interface": None,
 			"type": "Integer"
 			}
 		}])
@@ -202,7 +202,7 @@ class TestRun(unittest.TestCase):
 		self.assertParserEqual(parser, [{
 			"@": {
 			"category": "expression",
-			"symbol": None,
+			"interface": None,
 			"name": "var1",
 			"type": "Integer",
 			},
@@ -217,7 +217,7 @@ class TestRun(unittest.TestCase):
 		self.assertParserEqual(parser, [{
 			"@": {
 			"category": "expression",
-			"symbol": None,
+			"interface": None,
 			"const": "",
 			"name": "var1",
 			"type": "Float",
@@ -243,7 +243,7 @@ class TestRun(unittest.TestCase):
 		self.assertParserEqual(parser, [{
 			"@": {
 			"category": "expression",
-			"symbol": None,
+			"interface": None,
 			"name": "var1",
 			"type": "Integer",
 			},
@@ -262,7 +262,7 @@ class TestRun(unittest.TestCase):
 		self.assertParserEqual(parser, [{
 			"@": {
 			"category": "expression",
-			"symbol": None,
+			"interface": None,
 			"name": "var1",
 			"type": "Integer",
 			},
@@ -278,7 +278,7 @@ class TestRun(unittest.TestCase):
 		self.assertParserEqual(parser, [{
 			"@": {
 			"category": "expression",
-			"symbol": None,
+			"interface": None,
 			"name": "var1",
 			"type": "Integer",
 			},
@@ -294,7 +294,7 @@ class TestRun(unittest.TestCase):
 		self.assertParserEqual(parser, [{
 			"@": {
 			"category": "expression",
-			"symbol": None,
+			"interface": None,
 			"name": "var1",
 			"type": "Integer",
 			},
@@ -342,7 +342,7 @@ class TestRun(unittest.TestCase):
 		self.assertParserEqual(parser, [{
 			"@": {
 			"category": "expression",
-			"symbol": "my.base.type",
+			"interface": "my.base.type",
 			"name": "var1",
 			"type": "Integer",
 			},
@@ -353,7 +353,7 @@ class TestRun(unittest.TestCase):
 		self.assertParserEqual(parser, [{
 			"@": {
 			"category": "expression",
-			"symbol": None,
+			"interface": None,
 			"name": "var1",
 			"type": "Vector",
 			},
@@ -369,7 +369,7 @@ class TestRun(unittest.TestCase):
 		self.assertParserEqual(parser, [{
 			"@": {
 			"category": "expression",
-			"symbol": None,
+			"interface": None,
 			"name": "var1",
 			"type": "Vector",
 			},
