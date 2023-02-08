@@ -1,6 +1,4 @@
-# BDL
-
-BDL stands for Bzd Description Language and is the high level abstract language for this framework.
+# Tool
 
 This document describes the tool behind the language, which role is to parse, validate and generate artifacts from bdl files.
 
@@ -164,7 +162,7 @@ public:
 #### Interfaces Casting
 
 Object which implements an interface are casted down to their interfaces when used in the composition, this is done
-automatically by the code generator and it ensures that the object is used by its interface only.
+automatically by the code generator and it ensures that the object is used through its interface only.
 
 The code generation specialize the `bzd::Interface` type with the fully qualified name of the object type. It can then
 be used like this:

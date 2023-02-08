@@ -1,7 +1,5 @@
 # System
 
-TO BE IMPLEMENTED! Only a concept for the moment.
-
 A system is a group or targets. It consitutes one or multiple binaries that are ready for deployment.
 It is the most top level view of the composition.
 
@@ -50,26 +48,28 @@ Givien the following targets:
 ```bdl
 bdl_target(
     name = "a",
-    compositions = [
+    composition = [
         "a_composition.bdl",
     ],
     deps = [
         "//:a_lib",
     ],
-    platform = "@target_platform//:linux"
+    platform = "@target_platform//:linux",
+    language = "cc"
 )
 bdl_target(
     name = "b",
-    compositions = [
+    composition = [
         "b_composition.bdl",
     ],
     deps = [
         "//:b_lib",
     ],
-    platform = "@target_platform//:windows"
+    platform = "@target_platform//:windows",
+    language = "cc"
 )
 bdl_system(
-    nae = "app",
+    name = "app",
     targets = {
         "hpc": ":a",
         "win": ":b",
