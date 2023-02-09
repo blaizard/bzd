@@ -47,6 +47,13 @@ class Sequence:
 			listStr.append(formattedStr)
 		return "\n".join(listStr)
 
+	def copy(self) -> "SequenceBuilder":
+		"""Create a copy of this sequence."""
+
+		sequence = SequenceBuilder(context=self.context)
+		sequence.list = self.list.copy()
+		return sequence
+
 	def serialize(self, ignoreContext: bool = False) -> SequenceSerialize:
 		"""
 		Serialize a sequence.
