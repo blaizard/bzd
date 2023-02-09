@@ -42,8 +42,8 @@ class Expression(EntityExpression):
 	def __init__(self, element: Element) -> None:
 
 		super().__init__(element, Role.Value)
-		self.assertTrue(condition=(self.isValue or self.isSymbol),
-			message="Expression must represent a symbol or a value.")
+		#self.assertTrue(condition=(self.isValue or self.isSymbol),
+		#	message="Expression must represent a symbol or a value.")
 
 	@cached_property
 	def typeResolved(self) -> Symbol:
@@ -81,16 +81,40 @@ class Expression(EntityExpression):
 
 		return dependencies
 
+	def processFragments(self) -> None:
+		"""Process fragments to build a value or a symbol."""
+
+		fragments = self.element.getNestedSequenceAssert("fragments")
+		if fragments is None:
+			print(self.element)
+		self.assertTrue(condition=len(fragments) == 1, message=f"This expression must have a single fragment.")
+		elementBuilder = ElementBuilder.cast(self.element, ElementBuilder)
+		for fragment in fragments:
+			if fragment.isAttr("value"):
+				elementBuilder.setAttr("value", fragment.getAttr("value").value)
+			if fragment.isAttr("symbol"):
+				elementBuilder.setAttr("symbol", fragment.getAttr("symbol").value)
+				sequence = fragment.getNestedSequence("argument")
+				if sequence:
+					elementBuilder.setNestedSequence("argument", sequence.copy())
+				sequence = fragment.getNestedSequence("template")
+				if sequence:
+					elementBuilder.setNestedSequence("template", sequence.copy())
+			else:
+				self.error(message=f"Unsupported fragment.")
+
 	def resolve(self, resolver: "Resolver") -> None:
-		"""
-		Resolve entities.
-		"""
+		"""Resolve entities."""
 
 		# Resolve the interface associated with this expression.
 		if self.isInterfaceType:
 			self.interfaceType.resolve(resolver=resolver)
 			# TODO: Ensure that the interface is part of the parent type.
 
+		print("---------------------------")
+		print(self.element)
+
+		self.processFragments()
 		# Process "items" nested sequence to generate either a value, a symbol or a regexpr.
 		# Handle: value + symbol + value -> Must become a value
 		# Handle: symbol

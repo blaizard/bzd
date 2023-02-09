@@ -125,9 +125,13 @@ class TestRun(unittest.TestCase):
 			"@": {
 			"category": "expression",
 			"interface": None,
-			"name": "a",
+			"name": "a"
+			},
+			"fragments": [{
+			"@": {
 			"symbol": "int"
 			}
+			}]
 			}]
 		}])
 
@@ -142,16 +146,24 @@ class TestRun(unittest.TestCase):
 			"category": "expression",
 			"interface": None,
 			"name": "a",
+			},
+			"fragments": [{
+			"@": {
 			"symbol": "int"
-			}
+			},
+			}]
 			}, {
 			"@": {
 			"category": "expression",
 			"interface": None,
 			"name": "b",
-			"symbol": "float",
-			"const": ""
-			}
+			},
+			"fragments": [{
+			"@": {
+			"const": "",
+			"symbol": "float"
+			},
+			}]
 			}]
 		}])
 
@@ -176,6 +188,9 @@ class TestRun(unittest.TestCase):
 			"category": "expression",
 			"interface": None,
 			"name": "a",
+			},
+			"fragments": [{
+			"@": {
 			"symbol": "Vector"
 			},
 			"template": [{
@@ -185,25 +200,35 @@ class TestRun(unittest.TestCase):
 			}],
 			"argument": [{
 			'@': {
-			'value': '12'
-			}
+			"category": "expression"
+			},
+			"fragments": [{
+			"@": {
+			"value": "12"
+			},
 			}]
+			}]
+			}],
 			}]
 		}])
 
 	def testExpression(self) -> None:
 		parser = Parser(content="var1 = Integer;")
 		self.assertParserEqual(parser, [{
-			"@": {
-			"category": "expression",
-			"name": "var1",
-			"interface": None,
-			"symbol": "Integer"
+			'@': {
+			'category': 'expression',
+			'interface': None,
+			'name': 'var1'
+			},
+			'fragments': [{
+			'@': {
+			'symbol': 'Integer'
 			}
+			}]
 		}])
 
 		parser = Parser(content="Integer;")
-		self.assertParserEqual(parser, [{"@": {"category": "expression", "symbol": "Integer"}}])
+		self.assertParserEqual(parser, [{'@': {'category': 'expression'}, 'fragments': [{'@': {'symbol': 'Integer'}}]}])
 
 		parser = Parser(content="var1 = Integer(12);")
 		self.assertParserEqual(parser, [{
@@ -211,11 +236,55 @@ class TestRun(unittest.TestCase):
 			"category": "expression",
 			"interface": None,
 			"name": "var1",
-			"symbol": "Integer",
+			},
+			"fragments": [{
+			'@': {
+			'symbol': 'Integer'
 			},
 			"argument": [{
 			"@": {
+			"category": "expression",
+			},
+			"fragments": [{
+			"@": {
 			"value": "12"
+			}
+			}]
+			}]
+			}]
+		}])
+
+		parser = Parser(content="var1 = Integer(12); var2 = Integer;")
+		self.assertParserEqual(parser, [{
+			"@": {
+			"category": "expression",
+			"interface": None,
+			"name": "var1",
+			},
+			"fragments": [{
+			'@': {
+			'symbol': 'Integer'
+			},
+			"argument": [{
+			"@": {
+			"category": "expression",
+			},
+			"fragments": [{
+			"@": {
+			"value": "12"
+			}
+			}]
+			}]
+			}]
+		}, {
+			'@': {
+			'category': 'expression',
+			'interface': None,
+			'name': 'var2'
+			},
+			'fragments': [{
+			'@': {
+			'symbol': 'Integer'
 			}
 			}]
 		}])
@@ -225,14 +294,23 @@ class TestRun(unittest.TestCase):
 			"@": {
 			"category": "expression",
 			"interface": None,
-			"const": "",
 			"name": "var1",
-			"symbol": "Float",
+			},
+			"fragments": [{
+			"@": {
+			"const": "",
+			"symbol": "Float"
 			},
 			"argument": [{
 			"@": {
+			"category": "expression",
+			},
+			"fragments": [{
+			"@": {
 			"value": "-2.5"
 			}
+			}]
+			}]
 			}],
 			"contract": [{
 			'@': {
@@ -246,21 +324,46 @@ class TestRun(unittest.TestCase):
 			}]
 		}])
 
-		parser = Parser(content="var1 = Integer(-2.5, 54);")
+		parser = Parser(content="var1 = Integer(-2.5, 54); var2 = Integer;")
 		self.assertParserEqual(parser, [{
 			"@": {
 			"category": "expression",
 			"interface": None,
 			"name": "var1",
-			"symbol": "Integer",
+			},
+			"fragments": [{
+			"@": {
+			"symbol": "Integer"
 			},
 			"argument": [{
 			"@": {
+			"category": "expression",
+			},
+			"fragments": [{
+			"@": {
 			"value": "-2.5"
-			}
+			},
+			}]
 			}, {
 			"@": {
+			"category": "expression",
+			},
+			"fragments": [{
+			"@": {
 			"value": "54"
+			},
+			}]
+			}]
+			}],
+		}, {
+			'@': {
+			'category': 'expression',
+			'interface': None,
+			'name': 'var2'
+			},
+			'fragments': [{
+			'@': {
+			'symbol': 'Integer'
 			}
 			}]
 		}])
@@ -271,13 +374,22 @@ class TestRun(unittest.TestCase):
 			"category": "expression",
 			"interface": None,
 			"name": "var1",
-			"symbol": "Integer",
+			},
+			"fragments": [{
+			"@": {
+			"symbol": "Integer"
 			},
 			"argument": [{
 			"@": {
+			"category": "expression",
 			"name": "key",
+			},
+			"fragments": [{
+			"@": {
 			"value": "12"
-			}
+			},
+			}]
+			}]
 			}]
 		}])
 
@@ -287,13 +399,22 @@ class TestRun(unittest.TestCase):
 			"category": "expression",
 			"interface": None,
 			"name": "var1",
-			"symbol": "Integer",
+			},
+			"fragments": [{
+			"@": {
+			"symbol": "Integer"
 			},
 			"argument": [{
 			"@": {
+			"category": "expression",
 			"name": "key",
+			},
+			"fragments": [{
+			"@": {
 			"symbol": "my.symbol"
 			}
+			}]
+			}]
 			}]
 		}])
 
@@ -302,18 +423,32 @@ class TestRun(unittest.TestCase):
 			"@": {
 			"category": "expression",
 			"interface": None,
-			"name": "var1",
-			"symbol": "Integer",
+			"name": "var1"
+			},
+			"fragments": [{
+			"@": {
+			"symbol": "Integer"
 			},
 			"argument": [{
 			"@": {
-			"name": "key",
+			"category": "expression",
+			"name": "key"
+			},
+			"fragments": [{
+			"@": {
 			"symbol": "Integer"
 			},
 			"argument": [{
 			'@': {
+			"category": "expression"
+			},
+			"fragments": [{
+			"@": {
 			'value': '12'
-			}
+			},
+			}]
+			}]
+			}]
 			}]
 			}]
 		}])
@@ -322,27 +457,45 @@ class TestRun(unittest.TestCase):
 		self.assertParserEqual(parser, [{
 			"@": {
 			"category": "expression",
+			},
+			"fragments": [{
+			"@": {
 			"symbol": "fct",
 			},
 			"argument": [{
 			"@": {
 			"name": "key",
+			"category": "expression",
+			},
+			"fragments": [{
+			"@": {
 			"value": "12"
-			}
+			},
 			}]
+			}]
+			}],
 		}])
 
 		parser = Parser(content="this.is.fqn(12);")
 		self.assertParserEqual(parser, [{
 			"@": {
 			"category": "expression",
+			},
+			"fragments": [{
+			"@": {
 			"symbol": "this.is.fqn",
 			},
 			"argument": [{
 			"@": {
+			"category": "expression",
+			},
+			"fragments": [{
+			"@": {
 			"value": "12"
-			}
+			},
 			}]
+			}]
+			}],
 		}])
 
 		parser = Parser(content="var1: my.base.type = Integer();")
@@ -351,9 +504,13 @@ class TestRun(unittest.TestCase):
 			"category": "expression",
 			"interface": "my.base.type",
 			"name": "var1",
+			},
+			"fragments": [{
+			"@": {
 			"symbol": "Integer",
 			},
 			"argument": []
+			}],
 		}])
 
 		parser = Parser(content="var1 = Vector<Integer>();")
@@ -362,6 +519,9 @@ class TestRun(unittest.TestCase):
 			"category": "expression",
 			"interface": None,
 			"name": "var1",
+			},
+			"fragments": [{
+			"@": {
 			"symbol": "Vector",
 			},
 			"template": [{
@@ -370,6 +530,7 @@ class TestRun(unittest.TestCase):
 			}
 			}],
 			"argument": []
+			}],
 		}])
 
 		parser = Parser(content="var1 = Vector<Vector<Integer, String>>();")
@@ -378,6 +539,9 @@ class TestRun(unittest.TestCase):
 			"category": "expression",
 			"interface": None,
 			"name": "var1",
+			},
+			"fragments": [{
+			"@": {
 			"symbol": "Vector",
 			},
 			"template": [{
@@ -395,6 +559,7 @@ class TestRun(unittest.TestCase):
 			}]
 			}],
 			"argument": []
+			}]
 		}])
 
 

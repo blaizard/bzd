@@ -88,14 +88,18 @@ def makeGrammarSymbol(nextGrammar: Grammar) -> Grammar:
 	class TemplateStart(FragmentNestedStart):
 		nestedName = "template"
 
-	grammar: Grammar = [GrammarItem(r"const", {"const": ""})]
-	grammar.append(
-		GrammarItem(_makeRegexprFQN("symbol"), Fragment, [
-		GrammarItem(r"<", TemplateStart, [grammar]),
-		GrammarItem(r",", FragmentNewElement),
-		GrammarItem(r">", FragmentParentElement), nextGrammar
-		]))
-	return grammar
+	def makeGrammar(continuation: Grammar, nested: typing.Optional[Grammar] = None) -> Grammar:
+		grammar: Grammar = [GrammarItem(r"const", {"const": ""})]
+		grammar.append(
+			GrammarItem(_makeRegexprFQN("symbol"), Fragment,
+			[GrammarItem(r"<", TemplateStart, [grammar if nested is None else nested]), continuation]))
+		return grammar
+
+	nested = makeGrammar([GrammarItem(r",", FragmentNewElement), GrammarItem(r">", FragmentParentElement)])
+
+	topLevel = makeGrammar(nextGrammar, nested)
+
+	return topLevel
 
 
 def makeGrammarContracts(name: str = "contract") -> Grammar:
@@ -131,33 +135,48 @@ def makeGrammarContracts(name: str = "contract") -> Grammar:
 def makeGrammarExpressionFragment(finalGrammar: Grammar = [GrammarItem(r";", FragmentNewElement)]) -> Grammar:
 	"""
 	Generate a grammar for an expression, it accepts the following format:
-	symbol[(arg1, arg2, ...)] [contract];
+	(symbol|value)[(arg1, arg2, ...)] (+|-) (symbol|value)[(arg1, arg2, ...)] ... [contract];
 
-	This needs to be changed to the following:
-		[symbol or value]([name = ] recursive, [name = ] recursive, ...) [contracts]
-
+	where argX is a recursive call to this grammar.
 	"""
+
+	class FragmentsStart(FragmentNestedStart):
+		nestedName = "fragments"
 
 	class ArgumentStart(FragmentNestedStart):
 		nestedName = "argument"
 
-	grammarValue: Grammar = [
-		GrammarItem(r",", FragmentNewElement),
-		GrammarItem(r"\)", FragmentParentElement),
-		makeGrammarContracts(), finalGrammar
-	]
+	def makeGrammar(continuation: Grammar, nested: typing.Optional[Grammar] = None) -> Grammar:
+		grammarValue: Grammar = []
+		grammarWrapper: Grammar = [GrammarItem("", FragmentsStart, grammarValue)]
 
-	# Test for value
-	grammarValue.extend([GrammarItem(_regexprValue, Fragment, grammarValue)])
+		# Test for value
+		grammarValue.extend([GrammarItem(_regexprValue, Fragment, grammarValue)])
 
-	# Test for symbol
-	grammarValue.extend(
-		makeGrammarSymbol([
-		GrammarItem(r"\(", ArgumentStart, [GrammarItem(_regexprName + r"\s*=", Fragment, grammarValue), grammarValue]),
-		grammarValue,
-		]))
+		# Test for symbol
+		grammarValue.extend(
+			makeGrammarSymbol([
+			GrammarItem(
+			r"\(",
+			ArgumentStart,
+			[
+			# Empty parenthesis will not have nested fragments, which will simplify the parsing.
+			GrammarItem(r"\)", FragmentParentElement),
+			GrammarItem("", {"category": "expression"}, [
+			GrammarItem(_regexprName + r"\s*="),
+			grammarWrapper if nested is None else nested,
+			])
+			]),
+			grammarValue,
+			]))
 
-	return grammarValue
+		# End
+		grammarValue.append(GrammarItem("", FragmentParentElement, continuation))
+
+		return grammarWrapper
+
+	nestedGrammar = makeGrammar([GrammarItem(",", FragmentNewElement), GrammarItem("\)", FragmentParentElement)])
+	return makeGrammar([makeGrammarContracts(), finalGrammar], nestedGrammar)
 
 
 def makeGrammarVariable(finalGrammar: Grammar = [GrammarItem(r";", FragmentNewElement)]) -> Grammar:
