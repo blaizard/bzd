@@ -10,14 +10,14 @@ class TestRun(unittest.TestCase):
 
 	def testContracts(self) -> None:
 
-		#with self.assertRaisesRegex(Exception, r"lower than"):
-		Object.fromContent(content="""
-			using NewType = Integer [min(1) max(4)];
-			struct temp {
-				var = NewType(0);
-			}
-			""",
-			objectContext=ObjectContext(resolve=True))
+		with self.assertRaisesRegex(Exception, r"lower than"):
+			Object.fromContent(content="""
+				using NewType = Integer [min(1) max(4)];
+				struct temp {
+					var = NewType(0);
+				}
+				""",
+				objectContext=ObjectContext(resolve=True))
 
 		with self.assertRaisesRegex(Exception, r"lower than"):
 			Object.fromContent(content="""
@@ -252,7 +252,7 @@ class TestRun(unittest.TestCase):
 				interface MyInterface {}
 				component MyComponent : MyInterface {}
 				method hello(var1 = Integer, var2 = Float, var3 = MyInterface);
-				composition { ref = MyComponent(), call = hello(var3 = ref, var1 = 1); }
+				composition { ref = MyComponent(); call = hello(var3 = ref, var1 = 1); }
 				""",
 			objectContext=ObjectContext(resolve=True, composition=True))
 		call = bdl.entity("call")
