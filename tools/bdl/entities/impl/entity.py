@@ -274,47 +274,12 @@ class Entity:
 
 		from tools.bdl.entities.impl.expression import Expression
 		if self.underlyingTypeFQN:
-			underlyingTypeFQN = resolver.getEntityResolved(fqn=self.underlyingTypeFQN).assertValue(element=self.element)
-			return Parameters(element=underlyingTypeFQN.element,
+			underlyingTypeEntity = resolver.getEntityResolved(fqn=self.underlyingTypeFQN).assertValue(element=self.element)
+			return Parameters(element=underlyingTypeEntity.element,
 				NestedElementType=Expression,
-				nestedKind=underlyingTypeFQN.configAttr,
+				nestedKind=underlyingTypeEntity.configAttr,
 				filterFct=lambda entity: entity.category == Category.expression)
 		return Parameters(element=self.element, NestedElementType=Expression)
-
-	def makeValidation(self, resolver: typing.Any, parameters: Parameters, forTemplate: bool) -> Validation[SchemaDict]:
-		"""
-		Generate the validation object.
-		"""
-		schema: typing.Dict[str, str] = {}
-		for key, expression in parameters.items(includeVarArgs=True):
-			keyStr = "*" if expression.isVarArgs else str(key)
-			maybeContracts = expression.contracts.validationForTemplate if forTemplate else expression.contracts.validationForValue
-			schema[keyStr] = maybeContracts if maybeContracts is not None else ""
-			# Add that template argument must be part of the given type.
-			if forTemplate:
-				expression.assertTrue(condition=expression.underlyingTypeFQN is not None,
-					message=f"The type '{expression}' was not resolved.")
-				schema[keyStr] += f" convertible({str(expression.underlyingTypeFQN)})"
-
-		if schema:
-			try:
-				return Validation(schema=schema, args={"resolver": resolver})
-			except Exception as e:
-				self.error(message=str(e))
-
-		return Validation(schema={}, args={"resolver": resolver})
-
-	def makeValidationForTemplate(self, resolver: typing.Any, parameters: Parameters) -> Validation[SchemaDict]:
-		"""
-		Generate the validation object for template parameters.
-		"""
-		return self.makeValidation(resolver=resolver, parameters=parameters, forTemplate=True)
-
-	def makeValidationForValues(self, resolver: typing.Any, parameters: Parameters) -> Validation[SchemaDict]:
-		"""
-		Generate the validation object for value parameters.
-		"""
-		return self.makeValidation(resolver=resolver, parameters=parameters, forTemplate=False)
 
 	def markAsResolved(self) -> None:
 		"""

@@ -47,7 +47,9 @@ class Validation(typing.Generic[Schema]):
 		# It should not be passed into the install function, otherwise this would
 		# make memoization invalid.
 		self.args = args
-		self._prepocessSchema(self._inputToInternal(schema))
+		# This is only used for debug purposes.
+		self.schema: typing.Dict[str, str] = self._inputToInternal(schema)
+		self._prepocessSchema(self.schema)
 
 	def _inputToInternal(self, schema: Values) -> ValuesDict:
 		"""
@@ -152,3 +154,7 @@ class Validation(typing.Generic[Schema]):
 			assert False, "Unsupported output type '{}'.".format(output)
 
 		return results
+
+	def __str__(self) -> str:
+		attrs = " ".join([f"{k}=\"{v}\"" for k, v in self.schema.items()])
+		return f"<Validation {attrs} />"

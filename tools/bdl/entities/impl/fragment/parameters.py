@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from bzd.parser.element import Element, Sequence, ElementBuilder, SequenceBuilder
 from bzd.parser.error import Error
 
+from tools.bdl.contracts.validation import Validation, SchemaDict
 from tools.bdl.entities.impl.types import Category
 
 if typing.TYPE_CHECKING:
@@ -157,6 +158,38 @@ class ParametersCommon:
 		for param in self:
 			dependencies.update(param.dependencies)
 		return dependencies
+
+	def makeValidation(self, resolver: "Resolver", forTemplate: bool) -> Validation[SchemaDict]:
+		"""Generate the validation object."""
+
+		schema: typing.Dict[str, str] = {}
+		for key, expression in self.items(includeVarArgs=True):
+			keyStr = "*" if expression.isVarArgs else str(key)
+			maybeContracts = expression.contracts.validationForTemplate if forTemplate else expression.contracts.validationForValue
+			schema[keyStr] = maybeContracts if maybeContracts is not None else ""
+			# Add that template argument must be part of the given type.
+			if forTemplate:
+				expression.assertTrue(condition=expression.underlyingTypeFQN is not None,
+					message=f"The type '{expression}' was not resolved.")
+				schema[keyStr] += f" convertible({str(expression.underlyingTypeFQN)})"
+
+		if schema:
+			try:
+				return Validation(schema=schema, args={"resolver": resolver})
+			except Exception as e:
+				self.error(message=str(e))
+
+		return Validation(schema={}, args={"resolver": resolver})
+
+	def makeValidationForTemplate(self, resolver: "Resolver") -> Validation[SchemaDict]:
+		"""Generate the validation object for template parameters."""
+
+		return self.makeValidation(resolver=resolver, forTemplate=True)
+
+	def makeValidationForValues(self, resolver: "Resolver") -> Validation[SchemaDict]:
+		"""Generate the validation object for value parameters."""
+
+		return self.makeValidation(resolver=resolver, forTemplate=False)
 
 	def __repr__(self) -> str:
 		content = []

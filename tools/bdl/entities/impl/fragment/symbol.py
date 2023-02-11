@@ -93,7 +93,7 @@ class Symbol:
 					message="Template arguments cannot have a 'meta' role.")
 
 			# Validate the template arguments
-			validation = underlying.makeValidationForTemplate(resolver=resolver, parameters=configTypes)
+			validation = configTypes.makeValidationForTemplate(resolver=resolver)
 			arguments = self.templates.getValuesOrTypesAsDict(resolver=resolver, varArgs=False)
 			result = validation.validate(arguments, output="return")
 			self.assertTrue(condition=bool(result), message=str(result))

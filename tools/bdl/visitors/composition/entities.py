@@ -422,6 +422,10 @@ class Entities:
 		resolver = self.symbols.makeResolver(namespace=expression.namespace)
 		expression.resolveMemoized(resolver=resolver)
 
+		if expression.fqn == "executor":
+			print(expression)
+			print(expression.element)
+
 		if expression.isRoleMeta:
 			self.processMeta(expression=expression)
 		else:
@@ -531,7 +535,7 @@ class Entities:
 				if maybeGroup is not None:
 
 					newEntity = self.createEntityNestedComposition(
-						element=ExpressionBuilder(type=f"this.{interfaceEntity.name}"),
+						element=ExpressionBuilder(symbol=f"this.{interfaceEntity.name}"),
 						expression=expression,
 						resolveNamespace=interfaceEntity.namespace)
 					assert isinstance(newEntity, Expression)

@@ -59,9 +59,9 @@ class Resolver:
 			if self.symbols.contains(fqn=fqn, exclude=self.exclude):
 				break
 			if not potentialNamespace:
+				ending = self.symbols.terminateErrorMessageSimilarFQN(nameFirst)
 				return ResolveShallowFQNResult.makeError(
-					"Symbol '{}' in namespace '{}' could not be resolved.".format(nameFirst, ".".join(self.
-					namespace)) if self.namespace else "Symbol '{}' could not be resolved.".format(nameFirst))
+					f"Symbol '{nameFirst}' in namespace '{'.'.join(self.namespace)}' could not be resolved{ending}" if self.namespace else f"Symbol '{nameFirst}' could not be resolved{ending}")
 			potentialNamespace.pop()
 
 		# Attempt to resolve as much as possible.
@@ -107,9 +107,10 @@ class Resolver:
 					fqn = potentialFQN
 					break
 			if fqn is None:
+				ending = self.symbols.terminateErrorMessageSimilarFQN(fqn)
 				return ResolveFQNResult.makeError(
-					f"Symbol '{nextName}' from '{name}' in namespace '{'.'.join(self.namespace)}' could not be resolved."
-					if self.namespace else f"Symbol '{nextName}' from '{name}' could not be resolved.")
+					f"Symbol '{nextName}' from '{name}' in namespace '{'.'.join(self.namespace)}' could not be resolved{ending}"
+					if self.namespace else f"Symbol '{nextName}' from '{name}' could not be resolved{ending}")
 			fqns.append(fqn)
 
 		# Return the final FQN.
@@ -362,6 +363,12 @@ class SymbolMap:
 		similar.sort()
 		return similar
 
+	def terminateErrorMessageSimilarFQN(self, fqn: str) -> typing.List[str]:
+		"""Create a string to be added to terminate an error message."""
+
+		similar = self.similarFQN(fqn=fqn)
+		return f", did you mean {', '.join(similar)}?" if similar else "."
+
 	def getEntityResolved(self, fqn: str, exclude: typing.Optional[typing.List[Group]] = None) -> Result[EntityType]:
 		"""
 		Return an element from the symbol map.
@@ -370,9 +377,7 @@ class SymbolMap:
 
 		data = self._get(fqn=fqn, exclude=exclude)
 		if data is None:
-			similar = self.similarFQN(fqn=fqn)
-			message = f"Unable to find symbol '{fqn}', did you mean {', '.join(similar)}?" if len(
-				similar) else f"Unable to find symbol '{fqn}'."
+			message = f"Unable to find symbol '{fqn}'{self.terminateErrorMessageSimilarFQN(fqn)}"
 			return Result[EntityType].makeError(message)
 
 		# Not memoized

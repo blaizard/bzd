@@ -14,6 +14,7 @@ from tools.bdl.entities.impl.fragment.parameters_resolved import ParametersResol
 from tools.bdl.entities.impl.fragment.fqn import FQN
 from tools.bdl.entities.impl.entity import Entity, EntityExpression, Role
 from tools.bdl.entities.impl.types import Category
+from tools.bdl.entities.impl.fragment.expression_fragment import ExpressionFragment
 
 if typing.TYPE_CHECKING:
 	from tools.bdl.visitors.symbol_map import Resolver
@@ -81,27 +82,20 @@ class Expression(EntityExpression):
 
 		return dependencies
 
-	def processFragments(self) -> None:
+	def processFragments(self, resolver: "Resolver") -> None:
 		"""Process fragments to build a value or a symbol."""
 
+		self.assertTrue(condition=self.element.isNestedSequence("fragments"), message=f"Missing nested sequence 'fragment' for: {self.element}")
 		fragments = self.element.getNestedSequenceAssert("fragments")
-		if fragments is None:
-			print(self.element)
 		self.assertTrue(condition=len(fragments) == 1, message=f"This expression must have a single fragment.")
 		elementBuilder = ElementBuilder.cast(self.element, ElementBuilder)
-		for fragment in fragments:
-			if fragment.isAttr("value"):
-				elementBuilder.setAttr("value", fragment.getAttr("value").value)
-			if fragment.isAttr("symbol"):
-				elementBuilder.setAttr("symbol", fragment.getAttr("symbol").value)
-				sequence = fragment.getNestedSequence("argument")
-				if sequence:
-					elementBuilder.setNestedSequence("argument", sequence.copy())
-				sequence = fragment.getNestedSequence("template")
-				if sequence:
-					elementBuilder.setNestedSequence("template", sequence.copy())
-			else:
-				self.error(message=f"Unsupported fragment.")
+
+		for element in fragments:
+
+			fragment = ExpressionFragment.make(element)
+			fragment.resolve(resolver=resolver)
+
+		fragment.toElement(self.element)
 
 	def resolve(self, resolver: "Resolver") -> None:
 		"""Resolve entities."""
@@ -111,28 +105,17 @@ class Expression(EntityExpression):
 			self.interfaceType.resolve(resolver=resolver)
 			# TODO: Ensure that the interface is part of the parent type.
 
-		print("---------------------------")
-		print(self.element)
-
-		self.processFragments()
-		# Process "items" nested sequence to generate either a value, a symbol or a regexpr.
-		# Handle: value + symbol + value -> Must become a value
-		# Handle: symbol
-		# Handle: hello(value) / value -> "hello" is a build time function
+		self.processFragments(resolver=resolver)
 
 		# If it holds a value, it is considered a literal.
 		if self.isValue:
-			self._setLiteral(value=self.value)
+			pass
 
 		# If it holds a symbol.
 		elif self.isSymbol:
 
-			# Check if this points to a type or a value.
-			entity = self.symbol.resolve(resolver=resolver, maybeValue=True)
-			if entity.isRoleMeta:
-				self._setMeta()
-
 			# Set the executor.
+			entity = self.symbol.getEntityResolved(resolver=resolver)
 			executorContract = self.contracts.get("executor")
 			if executorContract is not None:
 				validExecutorContract = entity.category == Category.component
@@ -149,68 +132,16 @@ class Expression(EntityExpression):
 			if executor is not None:
 				self._setExecutor(executor)
 
-			# The type refers to a value.
-			if entity.isRoleValue:
-				self.assertTrue(condition=self.isParameters == False,
-					message="Cannot instantiate a value from another value.")
-				# It means it refers directly to the entity, in that case it must have a value FQN
-				if entity.underlyingValueFQN is None:
-					self.assertTrue(condition=entity.isFQN, message="A value referenced must have an valid FQN.")
-					self._setUnderlyingValueFQN(fqn=self.symbol.fqn)
-				else:
-					self._setUnderlyingValueFQN(fqn=entity.underlyingValueFQN)
-				self._setLiteral(value=entity.literal)
-
-			# The type refers to an actual type and will be instantiated as part of this expression.
-			elif entity.isRoleType:
-
-				# Generate the argument list and resolve it.
-				assert self.parameters is not None
-				self.parameters.resolve(resolver=resolver)
-				self._resolveAndValidateParameters(resolver, entity, self.parameters)
-
-			else:
-				self.error(message=f"Cannot create an expression from '{entity.fqn}'.")
-
-			super().resolve(resolver)
-
 		else:
 			self.error(message="Unsupported expression.")
+
+		super().resolve(resolver)
 
 		# Validate the whole expression with the contracts if any.
 		if self.contracts.validationForValue:
 			validation = Validation(schema=[self.contracts.validationForValue], args={"resolver": resolver})
 			result = validation.validate([self], output="return")
 			self.assertTrue(condition=bool(result), message=str(result))
-
-	def _resolveAndValidateParameters(self, resolver: "Resolver", resolvedTypeEntity: Entity,
-		parameters: Parameters) -> None:
-		"""Resolve and validate tthe parameters passed into argument."""
-
-		# Make the resolved parameters before the validation is completed. This is because
-		# it might make use of the parametersResolved.
-		expectedParameters = self.getConfigValues(resolver=resolver)
-		parameters.makeParametersResolved(name="argument", resolver=resolver, expected=expectedParameters)
-
-		# Validate the type of arguments.
-		parameterTypeCategories = {*parameters.getUnderlyingTypeCategories(resolver)}
-		if Category.component in parameterTypeCategories:
-			category = resolvedTypeEntity.category
-			self.assertTrue(condition=category in [Category.component, Category.method, Category.builtin],
-				message=f"Components are not allowed for this type '{category}'.")
-
-		# Read the validation for the values and evaluate it.
-		validation = self.makeValidationForValues(resolver=resolver, parameters=expectedParameters)
-		arguments = parameters.getValuesOrTypesAsDict(resolver=resolver, varArgs=False)
-		result = validation.validate(arguments, output="return")
-		Error.assertTrue(element=self.element, attr="symbol", condition=bool(result), message=str(result))
-
-		# Compute and set the literal value if any.
-		maybeValue = resolvedTypeEntity.toLiteral(result.values)  # type: ignore
-		if maybeValue is not None:
-			self.assertTrue(condition=isinstance(maybeValue, str),
-				message=f"The returned value from toLiteral must be a string, not {str(maybeValue)}")
-			self._setLiteral(maybeValue)
 
 	@cached_property
 	def parameters(self) -> typing.Optional[Parameters]:

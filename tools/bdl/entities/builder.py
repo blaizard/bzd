@@ -77,12 +77,14 @@ class MethodBuilder(ElementBuilder):
 
 class ExpressionBuilder(ElementBuilder):
 
-	def __init__(self, type: str, name: typing.Optional[str] = None) -> None:
+	def __init__(self, symbol: str, name: typing.Optional[str] = None) -> None:
 		super().__init__("expression")
 		if name is not None:
 			self.setAttr("name", name)
-		self.setAttr("symbol", type)
 
+		fragment = Element()
+		fragment.setAttr("symbol", symbol)
+		self.pushBackElementToNestedSequence(kind="fragments", element=fragment)
 
 class SequenceBuilder(Sequence):
 	pass
