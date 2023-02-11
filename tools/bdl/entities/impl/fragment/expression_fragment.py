@@ -14,20 +14,21 @@ if typing.TYPE_CHECKING:
 	from tools.bdl.visitors.symbol_map import Resolver
 	from tools.bdl.entities.impl.expression import Expression
 
+
 class ExpressionFragment(EntityExpression):
 
 	def __init__(self, element: Element) -> None:
 		super().__init__(element, Role.Value)
 
 	@staticmethod
-	def make(element: Element) -> "ExpressionFragment":
+	def make(element: Element) -> "ExpressionFragment":  # type: ignore
 		"""Make an ExpressionFragment from an element."""
 
 		if element.isAttr("value"):
 			return ValueFragment(element)
 		elif element.isAttr("symbol"):
 			return SymbolFragment(element)
-		
+
 		ExpressionFragment(element).error(message=f"Unsupported expression fragment for element: '{element}'.")
 
 	def resolve(self, resolver: "Resolver") -> None:
@@ -43,7 +44,8 @@ class ExpressionFragment(EntityExpression):
 				elementBuilder.setAttr(attr, self.element.getAttr(attr).value)
 
 		# Copy sequences.
-		for nested in ("argument", "argument_resolved", "argument_expected", "template", "template_resolved", "template_expected"):
+		for nested in ("argument", "argument_resolved", "argument_expected", "template", "template_resolved",
+			"template_expected"):
 			sequence = self.element.getNestedSequence(nested)
 			if sequence:
 				elementBuilder.setNestedSequence(nested, sequence)
@@ -52,18 +54,12 @@ class ExpressionFragment(EntityExpression):
 		contracts = Contracts(element=element, sequenceKind="contract")
 		contracts.resolve(self.contracts)
 
-	def error(self, message: str) -> None:
-		Error.handleFromElement(element=self.element, message=message)
-
-	def assertTrue(self, condition: bool, message: str) -> None:
-		Error.assertTrue(condition=condition,
-			element=self.element,
-			message=message)
 
 class ValueFragment(ExpressionFragment):
 
 	def resolve(self, resolver: "Resolver") -> None:
 		self._setLiteral(self.value)
+
 
 class SymbolFragment(ExpressionFragment):
 
@@ -111,13 +107,13 @@ class SymbolFragment(ExpressionFragment):
 
 		from tools.bdl.entities.impl.expression import Expression
 		if self.underlyingTypeFQN:
-			underlyingTypeEntity = resolver.getEntityResolved(fqn=self.underlyingTypeFQN).assertValue(element=self.element)
+			underlyingTypeEntity = resolver.getEntityResolved(fqn=self.underlyingTypeFQN).assertValue(
+				element=self.element)
 			return Parameters(element=underlyingTypeEntity.element,
 				NestedElementType=Expression,
 				nestedKind=underlyingTypeEntity.configAttr,
 				filterFct=lambda entity: entity.category == Category.expression)
 		return Parameters(element=self.element, NestedElementType=Expression)
-
 
 	def _resolveAndValidateParameters(self, resolver: "Resolver", resolvedTypeEntity: Entity,
 		parameters: Parameters) -> None:

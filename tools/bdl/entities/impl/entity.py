@@ -274,7 +274,8 @@ class Entity:
 
 		from tools.bdl.entities.impl.expression import Expression
 		if self.underlyingTypeFQN:
-			underlyingTypeEntity = resolver.getEntityResolved(fqn=self.underlyingTypeFQN).assertValue(element=self.element)
+			underlyingTypeEntity = resolver.getEntityResolved(fqn=self.underlyingTypeFQN).assertValue(
+				element=self.element)
 			return Parameters(element=underlyingTypeEntity.element,
 				NestedElementType=Expression,
 				nestedKind=underlyingTypeEntity.configAttr,
