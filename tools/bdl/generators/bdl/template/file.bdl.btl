@@ -42,8 +42,19 @@ composition:
 }
 {% end -%}
 
+{%- macro declareExpressionFragments(fragments) -%}
+	{%- for fragment in fragments %}
+		{%- if fragment.isValue %}
+			{{- fragment.value }}
+		{%- elif fragment.isSymbol %}
+			{{- fragment.symbol | symbolToStr }}
+			{%- if fragment.isParameters %}({{ printParameters(fragment.parameters) }}){% end %}
+		{%- end %}
+	{%- end %}
+{%- end -%}
+
 {%- macro declareExpression(data) -%}
-	{{ data.comment | normalComment }}{% if data.isName %}{{ data.name }}{% if data.isInterfaceType %}: {{ data.interfaceType | symbolToStr }}{% end %} = {% end %}{% if data.isValue %}{{ data.value }}{% else %}{{ data.symbol | symbolToStr }}{% if data.isParameters %}({{ printParameters(data.parameters) }}){% end %}{% end %}{{ declareContract(data.contracts) }}
+	{{ data.comment | normalComment }}{% if data.isName %}{{ data.name }}{% if data.isInterfaceType %}: {{ data.interfaceType | symbolToStr }}{% end %} = {% end %}{{- declareExpressionFragments(data.fragments) -}}{{ declareContract(data.contracts) }}
 {%- end -%}
 
 {%- macro printParameters(parameters) -%}

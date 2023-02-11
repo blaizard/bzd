@@ -52,7 +52,8 @@ class Expression(EntityExpression):
 			kind="symbol",
 			underlyingTypeFQN="fqn_type",
 			template="template_resolved",
-			const="const")
+			const="const",
+			contract="contract")
 
 	@property
 	def isInterfaceType(self) -> bool:
@@ -67,6 +68,12 @@ class Expression(EntityExpression):
 	def interfaceTypeResolved(self) -> Symbol:
 		return Symbol(element=self.element, kind="interface", underlyingTypeFQN="fqn_interface",
 			const="const") if self.isInterfaceType else self.typeResolved
+
+	@property
+	def fragments(self) -> typing.List[ExpressionFragment]:
+		"""Return a list with all fragments."""
+
+		return [ExpressionFragment.make(element) for element in self.element.getNestedSequenceOrEmpty("fragments")]
 
 	@property
 	def dependencies(self) -> typing.Set[str]:
@@ -86,13 +93,9 @@ class Expression(EntityExpression):
 		"""Process fragments to build a value or a symbol."""
 
 		self.assertTrue(condition=self.element.isNestedSequence("fragments"), message=f"Missing nested sequence 'fragment' for: {self.element}")
-		fragments = self.element.getNestedSequenceAssert("fragments")
-		self.assertTrue(condition=len(fragments) == 1, message=f"This expression must have a single fragment.")
-		elementBuilder = ElementBuilder.cast(self.element, ElementBuilder)
 
-		for element in fragments:
-
-			fragment = ExpressionFragment.make(element)
+		self.assertTrue(condition=len(self.fragments) == 1, message=f"This expression must have a single fragment.")
+		for fragment in self.fragments:
 			fragment.resolve(resolver=resolver)
 
 		fragment.toElement(self.element)

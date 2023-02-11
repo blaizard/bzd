@@ -6,7 +6,7 @@ from bzd.parser.error import Error
 
 from tools.bdl.entities.impl.fragment.parameters import Parameters
 from tools.bdl.entities.impl.fragment.symbol import Symbol
-from tools.bdl.entities.impl.entity import Entity, Role
+from tools.bdl.entities.impl.entity import Entity, EntityExpression, Role
 from tools.bdl.entities.impl.types import Category
 from tools.bdl.entities.impl.fragment.contract import Contracts
 
@@ -14,7 +14,7 @@ if typing.TYPE_CHECKING:
 	from tools.bdl.visitors.symbol_map import Resolver
 	from tools.bdl.entities.impl.expression import Expression
 
-class ExpressionFragment(Entity):
+class ExpressionFragment(EntityExpression):
 
 	def __init__(self, element: Element) -> None:
 		super().__init__(element, Role.Value)
@@ -62,41 +62,21 @@ class ExpressionFragment(Entity):
 
 class ValueFragment(ExpressionFragment):
 
-	@property
-	def value(self) -> str:
-		return self.element.getAttr("value").value
-
 	def resolve(self, resolver: "Resolver") -> None:
 		self._setLiteral(self.value)
 
 class SymbolFragment(ExpressionFragment):
 
-	@property
-	def const(self) -> bool:
-		return self.symbol.const
-
-	@cached_property
-	def isParameters(self) -> bool:
-		return self.element.isNestedSequence("argument")
-
 	@cached_property
 	def parameters(self) -> typing.Optional[Parameters]:
-		"""Return the Parameters object if there are parameters. In case the expression
+		"""
+		Return the Parameters object if there are parameters. In case the expression
 		is declared with empty parenthesis or without the Parameters object will be empty.
 		"""
 		from tools.bdl.entities.impl.expression import Expression
 		if self.isParameters:
 			return Parameters(element=self.element, NestedElementType=Expression, nestedKind="argument")
 		return Parameters(element=self.element, NestedElementType=Expression)
-
-	@property
-	def symbol(self) -> str:
-		return Symbol(element=self.element,
-			kind="symbol",
-			underlyingTypeFQN="fqn_type",
-			template="template",
-			const="const",
-			contract="contract")
 
 	def resolve(self, resolver: "Resolver") -> None:
 		entity = self.symbol.resolve(resolver=resolver, maybeValue=True)
