@@ -27,7 +27,7 @@ class Template:
 		return "".join(output)
 
 	def _render(
-		self, substitutions: typing.Union[SubstitutionsAccessor, SubstitutionWrapper]
+	    self, substitutions: typing.Union[SubstitutionsAccessor, SubstitutionWrapper]
 	) -> typing.Tuple[ResultType, SubstitutionWrapper]:
 
 		sequence = self.parser.parse()

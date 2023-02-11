@@ -40,7 +40,7 @@ class Composer:
 		if not self.check_event(StreamEndEvent):
 			event = self.get_event()
 			raise ComposerError("expected a single document in the stream", document.start_mark,
-				"but found another document", event.start_mark)
+			                    "but found another document", event.start_mark)
 
 		# Drop the STREAM-END event.
 		self.get_event()
@@ -72,7 +72,7 @@ class Composer:
 		if anchor is not None:
 			if anchor in self.anchors:
 				raise ComposerError("found duplicate anchor %r; first occurrence" % anchor,
-					self.anchors[anchor].start_mark, "second occurrence", event.start_mark)
+				                    self.anchors[anchor].start_mark, "second occurrence", event.start_mark)
 		self.descend_resolver(parent, index)
 		if self.check_event(ScalarEvent):
 			node = self.compose_scalar_node(anchor)

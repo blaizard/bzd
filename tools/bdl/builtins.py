@@ -29,17 +29,18 @@ class ListMeta(Builtin):
 
 	def __init__(self) -> None:
 		super().__init__(
-			ElementBuilder("builtin").setAttr("name", "list").addConfigValue(name="values...",
-			kind="Any").setAttr("meta", "1"))
+		    ElementBuilder("builtin").setAttr("name", "list").addConfigValue(name="values...",
+		                                                                     kind="Any").setAttr("meta", "1"))
 
 
 class ConnectMeta(Builtin):
 
 	def __init__(self) -> None:
 		super().__init__(
-			ElementBuilder("builtin").setAttr("name", "connect").addConfigValue(name="io1",
-			kind="Any",
-			contract="mandatory").addConfigValue(name="io2", kind="Any", contract="mandatory").setAttr("meta", "1"))
+		    ElementBuilder("builtin").setAttr("name", "connect").addConfigValue(
+		        name="io1", kind="Any", contract="mandatory").addConfigValue(name="io2",
+		                                                                     kind="Any",
+		                                                                     contract="mandatory").setAttr("meta", "1"))
 
 
 # Concrete types
@@ -55,8 +56,8 @@ class Integer(Builtin):
 
 	def __init__(self) -> None:
 		super().__init__(
-			ElementBuilder("builtin").setAttr("name", "Integer").addContract("integer").addConfigValue(name="value",
-			literal="0"))
+		    ElementBuilder("builtin").setAttr("name", "Integer").addContract("integer").addConfigValue(name="value",
+		                                                                                               literal="0"))
 
 	def toLiteral(self, args: typing.Dict[str, EntityExpression]) -> typing.Optional[str]:
 		return toLiteralSingleValue_(self, args)
@@ -66,8 +67,8 @@ class Float(Builtin):
 
 	def __init__(self) -> None:
 		super().__init__(
-			ElementBuilder("builtin").setAttr("name", "Float").addContract("float").setAttr("parents",
-			"Integer").addConfigValue(name="value", literal="0"))
+		    ElementBuilder("builtin").setAttr("name", "Float").addContract("float").setAttr(
+		        "parents", "Integer").addConfigValue(name="value", literal="0"))
 
 	def toLiteral(self, args: typing.Dict[str, EntityExpression]) -> typing.Optional[str]:
 		return toLiteralSingleValue_(self, args)
@@ -77,8 +78,8 @@ class Boolean(Builtin):
 
 	def __init__(self) -> None:
 		super().__init__(
-			ElementBuilder("builtin").setAttr("name", "Boolean").addContract("boolean").addConfigValue(name="value",
-			literal="false"))
+		    ElementBuilder("builtin").setAttr("name", "Boolean").addContract("boolean").addConfigValue(name="value",
+		                                                                                               literal="false"))
 
 	def toLiteral(self, args: typing.Dict[str, EntityExpression]) -> typing.Optional[str]:
 		return toLiteralSingleValue_(self, args)
@@ -88,8 +89,8 @@ class Byte(Builtin):
 
 	def __init__(self) -> None:
 		super().__init__(
-			ElementBuilder("builtin").setAttr("name",
-			"Byte").addContract("integer min(0) max(255)").addConfigValue(name="value", literal="0"))
+		    ElementBuilder("builtin").setAttr("name", "Byte").addContract("integer min(0) max(255)").addConfigValue(
+		        name="value", literal="0"))
 
 	def toLiteral(self, args: typing.Dict[str, EntityExpression]) -> typing.Optional[str]:
 		return toLiteralSingleValue_(self, args)
@@ -99,8 +100,8 @@ class String(Builtin):
 
 	def __init__(self) -> None:
 		super().__init__(
-			ElementBuilder("builtin").setAttr("name", "String").addContract("string").addConfigValue(name="value",
-			literal="\"\""))
+		    ElementBuilder("builtin").setAttr("name", "String").addContract("string").addConfigValue(name="value",
+		                                                                                             literal="\"\""))
 
 	def toLiteral(self, args: typing.Dict[str, EntityExpression]) -> typing.Optional[str]:
 		return toLiteralSingleValue_(self, args)
@@ -122,18 +123,20 @@ class Array(Builtin):
 
 	def __init__(self) -> None:
 		super().__init__(
-			ElementBuilder("builtin").setAttr("name", "Array").addConfigType(kind="Any",
-			name="Type",
-			contract="mandatory").addConfigValue(name="values...", kind="Any"))
+		    ElementBuilder("builtin").setAttr("name", "Array").addConfigType(kind="Any",
+		                                                                     name="Type",
+		                                                                     contract="mandatory").addConfigValue(
+		                                                                         name="values...", kind="Any"))
 
 
 class Vector(Builtin):
 
 	def __init__(self) -> None:
 		super().__init__(
-			ElementBuilder("builtin").setAttr("name", "Vector").addConfigType(kind="Any",
-			name="Type",
-			contract="mandatory").addConfigValue(name="values...", kind="Any"))
+		    ElementBuilder("builtin").setAttr("name", "Vector").addConfigType(kind="Any",
+		                                                                      name="Type",
+		                                                                      contract="mandatory").addConfigValue(
+		                                                                          name="values...", kind="Any"))
 
 
 class Callable(Builtin):
@@ -143,18 +146,18 @@ class Callable(Builtin):
 
 
 Builtins = [
-	AnyMeta(),
-	ListMeta(),
-	ConnectMeta(),
-	Void(),
-	Integer(),
-	Float(),
-	Boolean(),
-	Byte(),
-	String(),
-	Result(),
-	Async(),
-	Array(),
-	Vector(),
-	Callable()
+    AnyMeta(),
+    ListMeta(),
+    ConnectMeta(),
+    Void(),
+    Integer(),
+    Float(),
+    Boolean(),
+    Byte(),
+    String(),
+    Result(),
+    Async(),
+    Array(),
+    Vector(),
+    Callable()
 ]

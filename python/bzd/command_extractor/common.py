@@ -89,16 +89,16 @@ class CommandExtractor:
 		"""Helper to generate batched schema entries for ItemString."""
 		output: typing.Dict[str, Processor] = {}
 		for kind, category in kinds.items():
-			output[re.escape(kind)] = Processor(1,
-				lambda factory, x, category=category: self.result.append(factory.make(ItemString, category, x)))
+			output[re.escape(kind)] = Processor(
+			    1, lambda factory, x, category=category: self.result.append(factory.make(ItemString, category, x)))
 		return output
 
 	def generateItem(self, kinds: typing.Mapping[str, enum.Enum]) -> typing.Dict[str, Processor]:
 		"""Helper to generate batched schema entries for Item."""
 		output: typing.Dict[str, Processor] = {}
 		for kind, category in kinds.items():
-			output[re.escape(kind)] = Processor(0,
-				lambda factory, category=category: self.result.append(factory.make(Item, category)))
+			output[re.escape(kind)] = Processor(
+			    0, lambda factory, category=category: self.result.append(factory.make(Item, category)))
 		return output
 
 	def parse(self, cmdString: str, schema: Schema, fallback: Fallback) -> None:

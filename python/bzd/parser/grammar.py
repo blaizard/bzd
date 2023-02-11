@@ -11,10 +11,10 @@ Grammar = List[Any]
 class GrammarItem:
 
 	def __init__(self,
-		regexpr: Optional[str] = None,
-		fragment: Union[Type[Fragment], Dict[str, str]] = Fragment,
-		grammar: Optional[Union[Grammar, str]] = None,
-		checkpoint: Optional[str] = None) -> None:
+	             regexpr: Optional[str] = None,
+	             fragment: Union[Type[Fragment], Dict[str, str]] = Fragment,
+	             grammar: Optional[Union[Grammar, str]] = None,
+	             checkpoint: Optional[str] = None) -> None:
 
 		self.regexpr_ = regexpr
 

@@ -34,7 +34,7 @@ class Using(EntityExpression):
 
 	def __repr__(self) -> str:
 		return self.toString({
-			"name": self.name if self.isName else None,
-			"symbol": self.symbol.name,
-			"meta": "True" if self.isRoleMeta else None
+		    "name": self.name if self.isName else None,
+		    "symbol": self.symbol.name,
+		    "meta": "True" if self.isRoleMeta else None
 		})

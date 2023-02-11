@@ -14,9 +14,9 @@ from tools.bdl.entities.impl.types import Category
 class _VisitorSymbol(Visitor):
 	"""Visitor to print a type."""
 
-	def __init__(self, symbol: Symbol, namespaceToFQN: typing.Optional[typing.Callable[[typing.List[str]],
-		str]], reference: bool, definition: bool, nonConst: bool, referenceForInterface: bool,
-		values: typing.Optional[typing.Sequence[str]]) -> None:
+	def __init__(self, symbol: Symbol, namespaceToFQN: typing.Optional[typing.Callable[[typing.List[str]], str]],
+	             reference: bool, definition: bool, nonConst: bool, referenceForInterface: bool,
+	             values: typing.Optional[typing.Sequence[str]]) -> None:
 		self.namespaceToFQN = namespaceToFQN
 		self.reference = reference
 		self.definition = definition
@@ -95,13 +95,13 @@ class _VisitorSymbol(Visitor):
 
 
 def symbolToStr(symbol: typing.Optional[Symbol],
-	adapter: bool = False,
-	reference: bool = False,
-	definition: bool = False,
-	nonConst: bool = False,
-	referenceForInterface: bool = False,
-	values: typing.Optional[typing.Sequence[str]] = None,
-	registry: typing.Optional[typing.Sequence[str]] = None) -> str:
+                adapter: bool = False,
+                reference: bool = False,
+                definition: bool = False,
+                nonConst: bool = False,
+                referenceForInterface: bool = False,
+                values: typing.Optional[typing.Sequence[str]] = None,
+                registry: typing.Optional[typing.Sequence[str]] = None) -> str:
 	"""
 	Convert a type object into a C++ string.
 	Args:
@@ -133,9 +133,9 @@ def symbolToStr(symbol: typing.Optional[Symbol],
 
 	# Otherwise it must be a normal type
 	return _VisitorSymbol(symbol=symbol,
-		namespaceToFQN=namespaceToFQN,
-		reference=reference,
-		definition=definition,
-		nonConst=nonConst,
-		referenceForInterface=referenceForInterface,
-		values=values).result
+	                      namespaceToFQN=namespaceToFQN,
+	                      reference=reference,
+	                      definition=definition,
+	                      nonConst=nonConst,
+	                      referenceForInterface=referenceForInterface,
+	                      values=values).result

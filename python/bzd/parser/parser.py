@@ -11,10 +11,10 @@ from bzd.parser.error import Error
 class Parser:
 
 	def __init__(self,
-		content: str,
-		grammar: Grammar,
-		defaultGrammarPre: Grammar = [],
-		defaultGrammarPost: Grammar = []) -> None:
+	             content: str,
+	             grammar: Grammar,
+	             defaultGrammarPre: Grammar = [],
+	             defaultGrammarPost: Grammar = []) -> None:
 
 		self.grammar = grammar
 		self.defaultGrammarPre = defaultGrammarPre
@@ -57,7 +57,7 @@ class Parser:
 		# Grammar link to a checkpoint
 		if isinstance(item.grammar, str):
 			assert item.grammar in checkpoints, "Unknown checkpoint '{}', ensure the parser discovered it before referencing it.".format(
-				item.grammar)
+			    item.grammar)
 			assert item.checkpoint is None, "A grammar item referencing to a checkpoint cannot set a checkpoint."
 			return checkpoints[item.grammar]
 
@@ -86,7 +86,7 @@ class Parser:
 			while index < len(content):
 				m = None
 				for item in self.iterateGrammar(self.defaultGrammarPre + element.getGrammar() +
-					self.defaultGrammarPost):
+				                                self.defaultGrammarPost):
 					m = re.match(item.regexpr, content[index:])
 					if m:
 						fragment = item.fragment(index, index + m.end(), match=m)

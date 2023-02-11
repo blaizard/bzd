@@ -22,9 +22,9 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 
 	files = Files(args.workspace, include=[
-		"**/*.py",
+	    "**/*.py",
 	], exclude=[
-		"**tools/bzd/generator/yaml**",
+	    "**tools/bzd/generator/yaml**",
 	])
 
 	# Process the varous files

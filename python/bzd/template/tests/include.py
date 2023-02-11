@@ -12,7 +12,7 @@ class TestRun(unittest.TestCase):
 
 	def testIncludeMacro(self) -> None:
 		template = Template(
-			"{% include \"python/bzd/template/tests/support/include_macro.btl\" %} {{ goodbye(\"you\") }}")
+		    "{% include \"python/bzd/template/tests/support/include_macro.btl\" %} {{ goodbye(\"you\") }}")
 		result = template.render({})
 		self.assertEqual(" Goodbye you", result)
 

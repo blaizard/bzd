@@ -127,7 +127,7 @@ class SequenceParser(Sequence):
 	"""
 
 	def __init__(self, context: typing.Optional[Context], grammar: Grammar,
-		parent: typing.Optional["ElementParser"]) -> None:
+	             parent: typing.Optional["ElementParser"]) -> None:
 		super().__init__(context)
 		self.grammar = grammar
 		self.parent = parent
@@ -139,8 +139,8 @@ class SequenceParser(Sequence):
 		- grammar: Optionaly provides a grammar to the new element or reuse existing one.
 		"""
 		element = ElementParser(context=Context(parent=self),
-			grammar=self.grammar if grammar is None else grammar,
-			parent=self)
+		                        grammar=self.grammar if grammar is None else grammar,
+		                        parent=self)
 		self.list.append(element)
 		return element
 
@@ -168,8 +168,8 @@ class Element:
 		assert isinstance(element["@"], dict)
 		e.attrs = {key: Attribute.fromSerialize(attr) for key, attr in element["@"].items()}
 		e.sequences = {
-			key: Sequence.fromSerialize(sequence, Context(parent=e))  # type: ignore
-			for key, sequence in element.items() if key != "@"
+		    key: Sequence.fromSerialize(sequence, Context(parent=e))  # type: ignore
+		    for key, sequence in element.items() if key != "@"
 		}
 		return e
 
@@ -250,8 +250,8 @@ class Element:
 		Serialize an element.
 		"""
 		data: ElementSerialize = {
-			"@": {key: attr.serialize(ignoreContext=ignoreContext)
-			for key, attr in self.getAttrs().items()}
+		    "@": {key: attr.serialize(ignoreContext=ignoreContext)
+		          for key, attr in self.getAttrs().items()}
 		}
 		for kind, sequence in self.getNestedSequences():
 			data[kind] = sequence.serialize(ignoreContext=ignoreContext)
@@ -306,8 +306,8 @@ class Element:
 
 		contentContext = ["context=\"{}\"".format(self.context)] if self.context is not None else []
 		content = "<Element {}/>".format(" ".join(
-			["{}:{}:{}=\"{}\"".format(key, attr.index, attr.end, attr.value)
-			for key, attr in self.attrs.items()] + contentContext))
+		    ["{}:{}:{}=\"{}\"".format(key, attr.index, attr.end, attr.value)
+		     for key, attr in self.attrs.items()] + contentContext))
 
 		if nested:
 			for kind, sequence in self.sequences.items():
@@ -410,9 +410,9 @@ class ElementBuilder(Element):
 class ElementParser(Element):
 
 	def __init__(self,
-		context: typing.Optional[Context],
-		grammar: Grammar,
-		parent: typing.Optional[SequenceParser] = None) -> None:
+	             context: typing.Optional[Context],
+	             grammar: Grammar,
+	             parent: typing.Optional[SequenceParser] = None) -> None:
 		super().__init__(context)
 		self.grammar = grammar
 		self.parent = parent
@@ -444,5 +444,5 @@ class ElementParser(Element):
 	def getSequence(self) -> SequenceParser:
 		assert not self.isRoot, "reached root element"
 		assert isinstance(self.parent,
-			SequenceParser), "parent must be a sequence, instead {}".format(type(self.parent))
+		                  SequenceParser), "parent must be a sequence, instead {}".format(type(self.parent))
 		return self.parent

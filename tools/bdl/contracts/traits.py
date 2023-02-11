@@ -60,7 +60,7 @@ class ContractTraits:
 			return self.resolveConflictInternals(base, derived)
 		except Exception as e:
 			raise Exception("Conflict with base contract [{}] and derived [{}]: {}".format(
-				str(base), str(derived), str(e)))
+			    str(base), str(derived), str(e)))
 
 	def resolveConflictInternals(self, base: Contract, derived: Contract) -> typing.Optional[Contract]:
 		"""

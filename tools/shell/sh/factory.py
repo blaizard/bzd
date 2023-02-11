@@ -22,18 +22,18 @@ class Sh(Factory):
 		"""Tell if this is a sh-compatibel shell."""
 
 		return os.environ.get("SHELL", "").endswith((
-			"/sh",
-			"/bash",
+		    "/sh",
+		    "/bash",
 		))
 
 	def build(self, workspace: pathlib.Path) -> None:
 		"""Build the configuration if needed."""
 
 		content = self.renderTemplate(
-			pathlib.Path("tools/shell/sh/srcs/bashrc.btl"), {
-			"always": pathlib.Path("tools/shell/sh/srcs/always"),
-			"interactive": pathlib.Path("tools/shell/sh/srcs/interactive")
-			})
+		    pathlib.Path("tools/shell/sh/srcs/bashrc.btl"), {
+		        "always": pathlib.Path("tools/shell/sh/srcs/always"),
+		        "interactive": pathlib.Path("tools/shell/sh/srcs/interactive")
+		    })
 		self.path = workspace / "tools/shell/sh/bashrc.sh"
 		self.path.write_text(content)
 
@@ -53,10 +53,10 @@ class Sh(Factory):
 		content = hookFile.read_text()
 		hook = "# bzd-hook-start\n# This is a generate hook from the bzd monorepo, please do not remove.\nsource ~/.bzd/bashrc.sh\n# bzd-hook-end\n"
 		updateContent = re.sub(r"^#\s*bzd-hook-start[\s\S]*\n#\s*bzd-hook-end\n",
-			hook,
-			content,
-			count=1,
-			flags=re.MULTILINE)
+		                       hook,
+		                       content,
+		                       count=1,
+		                       flags=re.MULTILINE)
 		if id(content) == id(updateContent):
 			updateContent += "\n" + hook
 		if content != updateContent:

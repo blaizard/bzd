@@ -35,7 +35,7 @@ def runGdb(name: str) -> None:
 	counter = 50
 	while counter:
 		if localDocker(["exec", name, "/bin/bash", "-c", "exit", "0"], ignoreFailure=True,
-			timeoutS=1).getReturnCode() == 0:
+		               timeoutS=1).getReturnCode() == 0:
 			break
 		time.sleep(0.1)
 		counter -= 1
@@ -43,11 +43,11 @@ def runGdb(name: str) -> None:
 
 	# Start gdb + gdbgui
 	localDocker(["exec", "-t", name, "gdbgui", "-r", "--port=8080", "-g", "xtensa-esp32-elf-gdb"],
-		stdin=True,
-		stdout=True,
-		stderr=True,
-		ignoreFailure=True,
-		timeoutS=0)
+	            stdin=True,
+	            stdout=True,
+	            stderr=True,
+	            ignoreFailure=True,
+	            timeoutS=0)
 
 
 if __name__ == "__main__":
@@ -56,8 +56,8 @@ if __name__ == "__main__":
 	parser.add_argument("--target", choices=targets.keys(), default="esp32", help="Target.")
 	parser.add_argument('--debug', default=False, action="store_true", help="Use GDB to debug the target.")
 	parser.add_argument('--name',
-		default=f"xtensa_qemu_{os.getpid()}_{time.time_ns()}_{random.randrange(sys.maxsize)}",
-		help="Name of the container.")
+	                    default=f"xtensa_qemu_{os.getpid()}_{time.time_ns()}_{random.randrange(sys.maxsize)}",
+	                    help="Name of the container.")
 	parser.add_argument("elf", type=str, help="Binary in ELF format to be executed.")
 	parser.add_argument("image", type=str, help="Binary image to be executed.")
 
@@ -68,18 +68,18 @@ if __name__ == "__main__":
 	# Create the flash.
 	flashPath = pathlib.Path(f"flash.bin")
 	createFlash(flashPath, typing.cast(int, target["memorySize"]),
-		{offset: pathlib.Path(f.format(binary=args.image))
-		for offset, f in target["memoryMap"].items()})  # type: ignore
+	            {offset: pathlib.Path(f.format(binary=args.image))
+	             for offset, f in target["memoryMap"].items()})  # type: ignore
 
 	if args.debug:
 		gdb = threading.Thread(target=runGdb, args=(args.name, ))
 		gdb.start()
 
 	cmds = [
-		"run", "-t", "--rm", "--name", args.name,
-		"--volume={}:/bzd/flash.bin:rw".format(flashPath.resolve().as_posix()), "--volume={}:/root/.gdbinit:ro".format(
-		pathlib.Path("toolchains/cc/fragments/esptool/qemu/.gdbinit").resolve().as_posix()),
-		"--volume={}:/bzd/binary.bin:ro".format(pathlib.Path(args.elf).resolve().as_posix())
+	    "run", "-t", "--rm", "--name", args.name,
+	    "--volume={}:/bzd/flash.bin:rw".format(flashPath.resolve().as_posix()), "--volume={}:/root/.gdbinit:ro".format(
+	        pathlib.Path("toolchains/cc/fragments/esptool/qemu/.gdbinit").resolve().as_posix()),
+	    "--volume={}:/bzd/binary.bin:ro".format(pathlib.Path(args.elf).resolve().as_posix())
 	]
 
 	if args.debug:
@@ -87,8 +87,8 @@ if __name__ == "__main__":
 		cmds += ["-p", "8080", "--volume={}:/code:ro".format(os.environ["BUILD_WORKSPACE_DIRECTORY"])]
 
 	cmds += [
-		image("xtensa_qemu"), "qemu-system-xtensa", "-no-reboot", "-nographic", "-machine", "esp32", "-m", "4",
-		"-drive", "file=/bzd/flash.bin,if=mtd,format=raw", "-nic", "user,model=open_eth,hostfwd=tcp::80-:80"
+	    image("xtensa_qemu"), "qemu-system-xtensa", "-no-reboot", "-nographic", "-machine", "esp32", "-m", "4",
+	    "-drive", "file=/bzd/flash.bin,if=mtd,format=raw", "-nic", "user,model=open_eth,hostfwd=tcp::80-:80"
 	]
 
 	if args.debug:

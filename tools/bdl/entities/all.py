@@ -30,24 +30,24 @@ EntityType = typing.Union[Expression, Nested, Method, Using, Enum, Extern, Names
 SymbolType = typing.Union[Expression, Nested, Method, Using, Enum, Extern]
 
 CATEGORY_TO_ENTITY: typing.Dict[str, typing.Type[EntityType]] = {
-	"struct": Nested,
-	"interface": Nested,
-	"component": Nested,
-	"composition": Nested,
-	"builtin": Builtin,
-	"expression": Expression,
-	"method": Method,
-	"using": Using,
-	"enum": Enum,
-	"namespace": Namespace,
-	"use": Use,
-	"reference": Reference,
-	"extern": Extern
+    "struct": Nested,
+    "interface": Nested,
+    "component": Nested,
+    "composition": Nested,
+    "builtin": Builtin,
+    "expression": Expression,
+    "method": Method,
+    "using": Using,
+    "enum": Enum,
+    "namespace": Namespace,
+    "use": Use,
+    "reference": Reference,
+    "extern": Extern
 }
 
 
 def elementToEntity(element: Element,
-	extension: typing.Optional[typing.Dict[str, typing.Type[EntityType]]] = None) -> EntityType:
+                    extension: typing.Optional[typing.Dict[str, typing.Type[EntityType]]] = None) -> EntityType:
 	"""
 	Instantiate an entity from an element.
 	"""

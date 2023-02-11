@@ -71,7 +71,7 @@ class BaseResolver:
 			elif node_check is dict:
 				node_check = MappingNode
 			elif node_check not in [ScalarNode, SequenceNode, MappingNode
-									] and not isinstance(node_check, str) and node_check is not None:
+			                        ] and not isinstance(node_check, str) and node_check is not None:
 				raise ResolverError("Invalid node checker: %s" % node_check)
 			if not isinstance(index_check, (str, int)) and index_check is not None:
 				raise ResolverError("Invalid index checker: %s" % index_check)
@@ -164,25 +164,25 @@ class Resolver(BaseResolver):
 
 
 Resolver.add_implicit_resolver(
-	'tag:yaml.org,2002:bool',
-	re.compile(
-	r'''^(?:yes|Yes|YES|no|No|NO
+    'tag:yaml.org,2002:bool',
+    re.compile(
+        r'''^(?:yes|Yes|YES|no|No|NO
                     |true|True|TRUE|false|False|FALSE
                     |on|On|ON|off|Off|OFF)$''', re.X), list('yYnNtTfFoO'))
 
 Resolver.add_implicit_resolver(
-	'tag:yaml.org,2002:float',
-	re.compile(
-	r'''^(?:[-+]?(?:[0-9][0-9_]*)\.[0-9_]*(?:[eE][-+][0-9]+)?
+    'tag:yaml.org,2002:float',
+    re.compile(
+        r'''^(?:[-+]?(?:[0-9][0-9_]*)\.[0-9_]*(?:[eE][-+][0-9]+)?
                     |\.[0-9_]+(?:[eE][-+][0-9]+)?
                     |[-+]?[0-9][0-9_]*(?::[0-5]?[0-9])+\.[0-9_]*
                     |[-+]?\.(?:inf|Inf|INF)
                     |\.(?:nan|NaN|NAN))$''', re.X), list('-+0123456789.'))
 
 Resolver.add_implicit_resolver(
-	'tag:yaml.org,2002:int',
-	re.compile(
-	r'''^(?:[-+]?0b[0-1_]+
+    'tag:yaml.org,2002:int',
+    re.compile(
+        r'''^(?:[-+]?0b[0-1_]+
                     |[-+]?0[0-7_]+
                     |[-+]?(?:0|[1-9][0-9_]*)
                     |[-+]?0x[0-9a-fA-F_]+
@@ -191,15 +191,15 @@ Resolver.add_implicit_resolver(
 Resolver.add_implicit_resolver('tag:yaml.org,2002:merge', re.compile(r'^(?:<<)$'), ['<'])
 
 Resolver.add_implicit_resolver(
-	'tag:yaml.org,2002:null',
-	re.compile(r'''^(?: ~
+    'tag:yaml.org,2002:null',
+    re.compile(r'''^(?: ~
                     |null|Null|NULL
                     | )$''', re.X), ['~', 'n', 'N', ''])
 
 Resolver.add_implicit_resolver(
-	'tag:yaml.org,2002:timestamp',
-	re.compile(
-	r'''^(?:[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]
+    'tag:yaml.org,2002:timestamp',
+    re.compile(
+        r'''^(?:[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]
                     |[0-9][0-9][0-9][0-9] -[0-9][0-9]? -[0-9][0-9]?
                      (?:[Tt]|[ \t]+)[0-9][0-9]?
                      :[0-9][0-9] :[0-9][0-9] (?:\.[0-9]*)?

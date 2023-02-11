@@ -27,7 +27,7 @@ class ParserGcc(Parser):
 			table: typing.Optional[FixedTable] = None
 			for line in f:
 				table = FixedTable.fromPattern(
-					line, re.compile(r'^(.*)\s(0x[0-9a-f]{8,})\s(\s+0x[0-9a-f]+)\s(.*)$', re.IGNORECASE))
+				    line, re.compile(r'^(.*)\s(0x[0-9a-f]{8,})\s(\s+0x[0-9a-f]+)\s(.*)$', re.IGNORECASE))
 				if table:
 					break
 
@@ -92,9 +92,9 @@ class ParserGcc(Parser):
 					if cellContent[1] != " ":
 						m = re.match(r'^(?!LONG|load address)([^\(:]+).*$', maybeUnit)
 						units.append({
-							"section": section,
-							"size": int(maybeSize, 16),
-							"units": m.group(1) if m else "undefined"
+						    "section": section,
+						    "size": int(maybeSize, 16),
+						    "units": m.group(1) if m else "undefined"
 						})
 
 			self.setParsedData(units=units, sections=sections, areUnitsPath=True)

@@ -33,14 +33,14 @@ def main(cwd: pathlib.Path, env: typing.Dict[str, str], args: typing.List[str]) 
 	try:
 		# use os.setsid() make it run in a new process group, or bash job control will not be enabled
 		p = subprocess.Popen(["/bin/bash"] + args,
-			cwd=cwd,
-			env=env,
-			bufsize=0,
-			preexec_fn=os.setsid,
-			stdin=slave,
-			stdout=slave,
-			stderr=slave,
-			universal_newlines=True)
+		                     cwd=cwd,
+		                     env=env,
+		                     bufsize=0,
+		                     preexec_fn=os.setsid,
+		                     stdin=slave,
+		                     stdout=slave,
+		                     stderr=slave,
+		                     universal_newlines=True)
 
 		while p.poll() is None:
 			r, w, e = select.select([sys.stdin, master], [], [])
@@ -63,12 +63,12 @@ if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Pseudo terminal.")
 	parser.add_argument("-c", "--cwd", dest="cwd", default=os.getcwd(), type=str, help="The current working directory.")
 	parser.add_argument("-e",
-		"--env",
-		dest="env",
-		type=lambda x: x.split("=", 2),
-		action="append",
-		default=[],
-		help="Environment variable to be passed to the terminal.")
+	                    "--env",
+	                    dest="env",
+	                    type=lambda x: x.split("=", 2),
+	                    action="append",
+	                    default=[],
+	                    help="Environment variable to be passed to the terminal.")
 	parser.add_argument("-t", "--term", default="xterm-color", type=str, help="The terminal name.")
 	parser.add_argument('rest', nargs=argparse.REMAINDER)
 	args = parser.parse_args()

@@ -20,7 +20,7 @@ class ProcessInclusions(VisitorBase[None]):
 			if maybePreprocess is None:
 				self.objectContext.preprocess(source=entity.path.as_posix())
 				assert self.objectContext.findPreprocess(
-					source=entity.path.as_posix()), f"Unable to find preprocessed file for '{entity.path}'."
+				    source=entity.path.as_posix()), f"Unable to find preprocessed file for '{entity.path}'."
 
 		except Exception as e:
 			entity.error(message=str(e))

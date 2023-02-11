@@ -42,8 +42,9 @@ class Transform:
 	Category = CategoryOriginal
 	AsyncType = AsyncTypeOriginal
 
-	def __init__(self, composition: typing.Optional[CompositionView] = None,
-		data: typing.Optional[Path] = None) -> None:
+	def __init__(self,
+	             composition: typing.Optional[CompositionView] = None,
+	             data: typing.Optional[Path] = None) -> None:
 		self.composition = composition
 		self.data = json.loads(data.read_text()) if data else {}
 
@@ -58,8 +59,8 @@ class Transform:
 
 	def inheritanceAdapterToStr(self, inheritanceList: typing.List[Symbol]) -> str:
 		return ", ".join([
-			"public {}<Impl>".format(str(symbolToStrOriginal(inheritance, adapter=True)))
-			for inheritance in inheritanceList
+		    "public {}<Impl>".format(str(symbolToStrOriginal(inheritance, adapter=True)))
+		    for inheritance in inheritanceList
 		])
 
 	# Path related
@@ -92,8 +93,8 @@ class Transform:
 		return symbolToStrOriginal(symbol=symbol, nonConst=True)
 
 	def symbolRegistryToStr(self, symbol: Symbol) -> str:
-		return symbolToStrOriginal(symbol=symbol,
-			registry=self.composition.registry.keys() if self.composition else None)  # type: ignore
+		return symbolToStrOriginal(
+		    symbol=symbol, registry=self.composition.registry.keys() if self.composition else None)  # type: ignore
 
 	# ParameterResolvedItem related
 
@@ -166,7 +167,7 @@ class Transform:
 		"""
 		output = ""
 		values = self.paramsDeclarationToList_(
-			params=entity.parametersResolved) if entity.parametersResolved.size() else []
+		    params=entity.parametersResolved) if entity.parametersResolved.size() else []
 		entity.assertTrue(condition=entity.isSymbol, message="An expression declaration must have a type.")
 		output += f" {symbolToStrOriginal(entity.symbol, referenceForInterface=True, values=values)}"
 		if entity.isName:
@@ -206,8 +207,8 @@ class Transform:
 
 	def asyncTypeToStr(self, asyncType: AsyncTypeOriginal) -> str:
 		return {
-			AsyncTypeOriginal.workload: "bzd::async::Type::workload",
-			AsyncTypeOriginal.service: "bzd::async::Type::service",
+		    AsyncTypeOriginal.workload: "bzd::async::Type::workload",
+		    AsyncTypeOriginal.service: "bzd::async::Type::service",
 		}[asyncType]
 
 	# Parameter
@@ -261,8 +262,9 @@ def formatCc(bdl: Object, data: typing.Optional[Path] = None) -> str:
 	return output
 
 
-def compositionCc(compositions: typing.Dict[str, CompositionView], output: Path,
-	data: typing.Optional[Path] = None) -> None:
+def compositionCc(compositions: typing.Dict[str, CompositionView],
+                  output: Path,
+                  data: typing.Optional[Path] = None) -> None:
 
 	template = Template.fromPath(Path(__file__).parent / "template/composition.cc.btl", indent=True)
 

@@ -27,7 +27,7 @@ class SymbolTree(EntitySequence):
 	def addEntity(self, entity: EntityType) -> None:
 		entity.assertTrue(condition=entity.isFQN, message="Entity is missing FQN attribute.")
 		assert self.symbols.contains(entity.fqn), "This FQN '{}' is not registered in the symbol map.".format(
-			entity.fqn)
+		    entity.fqn)
 		self.sequence_.append(entity)
 
 	def entity(self, fqn: str) -> EntityType:

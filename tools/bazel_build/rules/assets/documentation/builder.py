@@ -36,8 +36,8 @@ if __name__ == "__main__":
 	# Create the mkdocs.yml file.
 	template = Template.fromPath(pathlib.Path(__file__).parent / "mkdocs.yml.btl", indent=True)
 	output = template.render({
-		"navigation": "\n".join(navigationToMkDocsList(navigation)),
-		"root": args.root.as_posix()
+	    "navigation": "\n".join(navigationToMkDocsList(navigation)),
+	    "root": args.root.as_posix()
 	})
 	pathlib.Path("./mkdocs.yml").write_text(output)
 

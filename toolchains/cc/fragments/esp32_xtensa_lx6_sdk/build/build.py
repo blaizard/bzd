@@ -11,9 +11,9 @@ from bzd.utils.run import localCommand
 from bzd.command_extractor.gcc import CommandExtractorGcc, Categories, ItemLibrary
 
 path_compile_commands = pathlib.Path(
-	"toolchains/cc/fragments/esp32_xtensa_lx6_sdk/build/project/build/compile_commands.json")
+    "toolchains/cc/fragments/esp32_xtensa_lx6_sdk/build/project/build/compile_commands.json")
 path_linker_command = pathlib.Path(
-	"toolchains/cc/fragments/esp32_xtensa_lx6_sdk/build/project/build/CMakeFiles/bzd.elf.dir/link.txt")
+    "toolchains/cc/fragments/esp32_xtensa_lx6_sdk/build/project/build/CMakeFiles/bzd.elf.dir/link.txt")
 
 
 def copyFiles(output: pathlib.Path, paths: typing.Iterable[pathlib.Path]) -> None:
@@ -60,10 +60,10 @@ if __name__ == "__main__":
 
 	parser = argparse.ArgumentParser(description="Generate the content of the esp32 SDK from esp-idf.")
 	parser.add_argument("-o",
-		"--output",
-		type=pathlib.Path,
-		default="./output",
-		help="Output directory where to store the results.")
+	                    "--output",
+	                    type=pathlib.Path,
+	                    default="./output",
+	                    help="Output directory where to store the results.")
 
 	args = parser.parse_args()
 
@@ -78,9 +78,9 @@ if __name__ == "__main__":
 
 	# Cleanup the sub-directories that will be generated
 	for name in (
-		"ld",
-		"lib",
-		"include",
+	    "ld",
+	    "lib",
+	    "include",
 	):
 		if (outputResolved / name).is_dir():
 			shutil.rmtree(outputResolved / name)
@@ -89,8 +89,8 @@ if __name__ == "__main__":
 	localCommand(cmds=["idf.py", "build"], cwd=workspace / "toolchains/cc/fragments/esp32_xtensa_lx6_sdk/build/project")
 
 	commands = {
-		"compile": CommandEntry("compile_flags"),
-		"link": CommandEntry("link_flags"),
+	    "compile": CommandEntry("compile_flags"),
+	    "link": CommandEntry("link_flags"),
 	}
 
 	# Look for the compile command of the main.
@@ -111,18 +111,18 @@ if __name__ == "__main__":
 		gcc = CommandExtractorGcc(cwd=workspace / "toolchains/cc/fragments/esp32_xtensa_lx6_sdk/build/project/build")
 		gcc.parse(entry.command)
 		result = gcc.values(
-			exclude={
-			Categories.includeSearchPath: None,
-			Categories.librarySearchPath: None,
-			Categories.unhandled: None,
-			Categories.standard: None,
-			Categories.optimisation: None,
-			Categories.outputPath: None,
-			Categories.debug: None,
-			Categories.compileOnly: None,
-			Categories.warning: None,
-			Categories.flag: {r"macro-prefix-map=.*"},
-			})
+		    exclude={
+		        Categories.includeSearchPath: None,
+		        Categories.librarySearchPath: None,
+		        Categories.unhandled: None,
+		        Categories.standard: None,
+		        Categories.optimisation: None,
+		        Categories.outputPath: None,
+		        Categories.debug: None,
+		        Categories.compileOnly: None,
+		        Categories.warning: None,
+		        Categories.flag: {r"macro-prefix-map=.*"},
+		    })
 
 		print(f"==== Copy the following to '{entry.destination}' ===")
 		for item in result:

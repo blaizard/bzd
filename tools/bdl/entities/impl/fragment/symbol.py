@@ -18,12 +18,12 @@ if typing.TYPE_CHECKING:
 class Symbol:
 
 	def __init__(self,
-		element: Element,
-		kind: str,
-		underlyingTypeFQN: typing.Optional[str] = None,
-		template: typing.Optional[str] = None,
-		contract: typing.Optional[str] = None,
-		const: typing.Optional[str] = None) -> None:
+	             element: Element,
+	             kind: str,
+	             underlyingTypeFQN: typing.Optional[str] = None,
+	             template: typing.Optional[str] = None,
+	             contract: typing.Optional[str] = None,
+	             const: typing.Optional[str] = None) -> None:
 
 		Error.assertHasAttr(element=element, attr=kind)
 		self.element = element
@@ -72,17 +72,17 @@ class Symbol:
 
 		# Save the category under {kindAttr}_category.
 		ElementBuilder.cast(self.element, ElementBuilder).setAttr(f"{self.kindAttr}_category",
-			underlying.category.value)
+		                                                          underlying.category.value)
 
 		if self.underlyingTypeAttr is not None and underlying.underlyingTypeFQN is not None:
 			ElementBuilder.cast(self.element, ElementBuilder).setAttr(self.underlyingTypeAttr,
-				underlying.underlyingTypeFQN)
+			                                                          underlying.underlyingTypeFQN)
 
 		# Validate template arguments
 		configTypes = underlying.getConfigTemplateTypes(resolver=resolver)
 		if not configTypes:
 			self.assertTrue(condition=(not bool(self.templates)),
-				message=f"Symbol '{self.kind}' does not support template type arguments.")
+			                message=f"Symbol '{self.kind}' does not support template type arguments.")
 		else:
 			assert isinstance(self.templateAttr, str)
 			self.templates.makeParametersResolved(name=self.templateAttr, resolver=resolver, expected=configTypes)
@@ -90,7 +90,7 @@ class Symbol:
 			# Make sure none of the template arguments have a meta role.
 			for item in self.templateResolved:
 				item.assertTrue(condition=not item.param.isRoleMeta,
-					message="Template arguments cannot have a 'meta' role.")
+				                message="Template arguments cannot have a 'meta' role.")
 
 			# Validate the template arguments
 			validation = configTypes.makeValidationForTemplate(resolver=resolver)
@@ -111,7 +111,7 @@ class Symbol:
 
 	def getEntityUnderlyingTypeResolved(self, resolver: "Resolver") -> "EntityType":
 		self.assertTrue(condition=self.underlyingTypeFQN is not None,
-			message=f"The underlying type FQN is missing, {self.element}")
+		                message=f"The underlying type FQN is missing, {self.element}")
 		assert isinstance(self.underlyingTypeFQN, str)
 		return resolver.getEntity(fqn=self.underlyingTypeFQN).assertValue(element=self.element, attr=self.kindAttr)
 
@@ -141,9 +141,9 @@ class Symbol:
 	def templateResolved(self) -> ParametersResolved:
 		from tools.bdl.entities.impl.using import Using
 		return ParametersResolved(element=self.element,
-			NestedElementType=Using,
-			param=f"{self.templateAttr}_resolved",
-			expected=f"{self.templateAttr}_expected")
+		                          NestedElementType=Using,
+		                          param=f"{self.templateAttr}_resolved",
+		                          expected=f"{self.templateAttr}_expected")
 
 	@property
 	def category(self) -> Category:
@@ -204,10 +204,10 @@ class Symbol:
 
 	def assertTrue(self, condition: bool, message: str, throw: bool = True) -> typing.Optional[str]:
 		return Error.assertTrue(condition=condition,
-			element=self.element,
-			attr=self.kindAttr,
-			message=message,
-			throw=throw)
+		                        element=self.element,
+		                        attr=self.kindAttr,
+		                        message=message,
+		                        throw=throw)
 
 	def __repr__(self) -> str:
 		return self.name
@@ -259,18 +259,18 @@ class Visitor(VisitorDepthFirstBase[typing.List[str], str]):
 		return []
 
 	def visitElement(self, element: Element, result: typing.List[str],
-		nested: typing.Optional[typing.List[str]]) -> typing.List[str]:
+	                 nested: typing.Optional[typing.List[str]]) -> typing.List[str]:
 
 		if element.isAttr("symbol"):
 
 			symbol = Symbol(element=element,
-				kind="symbol",
-				underlyingTypeFQN="fqn_type",
-				template="template_resolved" if self.isResolved else "template",
-				const="const")
+			                kind="symbol",
+			                underlyingTypeFQN="fqn_type",
+			                template="template_resolved" if self.isResolved else "template",
+			                const="const")
 			output = self.visitSymbol(symbol=symbol,
-				nested=[] if nested is None else nested,
-				parameters=symbol.templateResolved)
+			                          nested=[] if nested is None else nested,
+			                          parameters=symbol.templateResolved)
 
 		else:
 			Error.assertHasAttr(element=element, attr="value")

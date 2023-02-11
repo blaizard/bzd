@@ -2,7 +2,7 @@ import typing
 
 
 def isEqual(d1: typing.MutableMapping[typing.Any, typing.Any], d2: typing.MutableMapping[typing.Any,
-	typing.Any]) -> bool:
+                                                                                         typing.Any]) -> bool:
 
 	if len(d1.keys()) != len(d2.keys()):
 		return False

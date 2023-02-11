@@ -76,14 +76,14 @@ class _NoopTimer:
 
 
 def localCommand(cmds: List[str],
-	ignoreFailure: bool = False,
-	cwd: Optional[Path] = None,
-	env: Optional[Dict[str, str]] = None,
-	timeoutS: float = 60.,
-	stdin: bool = False,
-	stdout: bool = False,
-	stderr: bool = False,
-	maxOutputSize: int = 1000000) -> _ExecuteResult:
+                 ignoreFailure: bool = False,
+                 cwd: Optional[Path] = None,
+                 env: Optional[Dict[str, str]] = None,
+                 timeoutS: float = 60.,
+                 stdin: bool = False,
+                 stdout: bool = False,
+                 stderr: bool = False,
+                 maxOutputSize: int = 1000000) -> _ExecuteResult:
 	"""Run a process locally.
 	
 	Args:
@@ -102,11 +102,11 @@ def localCommand(cmds: List[str],
 	sel = selectors.DefaultSelector()
 	stream = _ExecuteResultStreamWriter(stdout, stderr, maxOutputSize)
 	proc = subprocess.Popen(cmds,
-		cwd=cwd,
-		stdout=subprocess.PIPE,
-		stdin=None if stdin else subprocess.PIPE,
-		stderr=subprocess.PIPE,
-		env=env)
+	                        cwd=cwd,
+	                        stdout=subprocess.PIPE,
+	                        stdin=None if stdin else subprocess.PIPE,
+	                        stderr=subprocess.PIPE,
+	                        env=env)
 	timer: threading.Timer = threading.Timer(timeoutS, proc.kill) if timeoutS > 0.0 else _NoopTimer()  # type: ignore
 	sel.register(proc.stdout, events=selectors.EVENT_READ)  # type: ignore
 	sel.register(proc.stderr, events=selectors.EVENT_READ)  # type: ignore
@@ -127,7 +127,7 @@ def localCommand(cmds: List[str],
 
 		if not timer.is_alive():
 			stream.addStderr(
-				f"Execution of '{' '.join(cmds)}' timed out after {timeoutS}s, terminating process.\n".encode())
+			    f"Execution of '{' '.join(cmds)}' timed out after {timeoutS}s, terminating process.\n".encode())
 		else:
 			returnCode = proc.returncode
 			if returnCode == None:

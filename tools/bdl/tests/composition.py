@@ -14,7 +14,7 @@ class TestRun(unittest.TestCase):
 				var = Integer(10) [min(10)];
 			}
 			""",
-			objectContext=ObjectContext(resolve=True))
+		                               objectContext=ObjectContext(resolve=True))
 
 		compositionNormal = Object.fromContent(content="""
 			component Executor { }
@@ -26,7 +26,7 @@ class TestRun(unittest.TestCase):
 				test = Hello(var = default);
 			}
 			""",
-			objectContext=ObjectContext(resolve=True))
+		                                       objectContext=ObjectContext(resolve=True))
 		Composition().visit(interface).visit(compositionNormal).process()
 
 	def testCompositionOrder(self) -> None:
@@ -37,7 +37,7 @@ class TestRun(unittest.TestCase):
 				var = Integer(10) [min(10)];
 			}
 			""",
-			objectContext=ObjectContext(resolve=True))
+		                               objectContext=ObjectContext(resolve=True))
 
 		compositionNormal = Object.fromContent(content="""
 			component Executor { }
@@ -49,7 +49,7 @@ class TestRun(unittest.TestCase):
 				test = Hello(var = default);
 			}
 			""",
-			objectContext=ObjectContext(resolve=True))
+		                                       objectContext=ObjectContext(resolve=True))
 		Composition().visit(interface).visit(compositionNormal).process()
 
 		# Variable defined after.
@@ -63,7 +63,7 @@ class TestRun(unittest.TestCase):
 				default = Integer(32);
 			}
 			""",
-			objectContext=ObjectContext(resolve=True))
+		                                           objectContext=ObjectContext(resolve=True))
 		Composition().visit(interface).visit(compositionWrongOrder).process()
 
 		# Variable defined after with wrong contract.
@@ -77,7 +77,7 @@ class TestRun(unittest.TestCase):
 				default = Integer(9);
 			}
 			""",
-			objectContext=ObjectContext(resolve=True))
+		                                           objectContext=ObjectContext(resolve=True))
 		with self.assertRaisesRegex(Exception, r"lower than"):
 			Composition().visit(interface).visit(compositionWrongOrder).process()
 
@@ -95,7 +95,7 @@ class TestRun(unittest.TestCase):
 				test2 = Hello();
 			}
 			""",
-			objectContext=ObjectContext(resolve=True))
+		                         objectContext=ObjectContext(resolve=True))
 
 		composition = Composition()
 		composition.visit(bdl).process()
@@ -120,7 +120,7 @@ class TestRun(unittest.TestCase):
 				test2.run();
 			}
 			""",
-			objectContext=ObjectContext(resolve=True))
+		                         objectContext=ObjectContext(resolve=True))
 
 		composition = Composition()
 		composition.visit(bdl).process()
@@ -147,14 +147,14 @@ class TestRun(unittest.TestCase):
 				receiver = Receiver();
 			}
 			""",
-			objectContext=ObjectContext(resolve=True))
+		                            objectContext=ObjectContext(resolve=True))
 
 		composition = Object.fromContent(content="""
 			composition {
 				connect(sender.a, sender.a);
 			}
 			""",
-			objectContext=ObjectContext(resolve=True))
+		                                 objectContext=ObjectContext(resolve=True))
 		with self.assertRaisesRegex(Exception, r"cannot connect to itself"):
 			Composition().visit(common).visit(composition).process()
 
@@ -163,7 +163,7 @@ class TestRun(unittest.TestCase):
 				connect(sender.a, sender.b);
 			}
 			""",
-			objectContext=ObjectContext(resolve=True))
+		                                 objectContext=ObjectContext(resolve=True))
 		with self.assertRaisesRegex(Exception, r"between same types"):
 			Composition().visit(common).visit(composition).process()
 
@@ -172,7 +172,7 @@ class TestRun(unittest.TestCase):
 				connect(sender.a, receiver.a);
 			}
 			""",
-			objectContext=ObjectContext(resolve=True))
+		                                 objectContext=ObjectContext(resolve=True))
 		Composition().visit(common).visit(composition).process()
 
 		composition = Object.fromContent(content="""
@@ -181,7 +181,7 @@ class TestRun(unittest.TestCase):
 				connect(sender.a, receiver.a);
 			}
 			""",
-			objectContext=ObjectContext(resolve=True))
+		                                 objectContext=ObjectContext(resolve=True))
 		with self.assertRaisesRegex(Exception, r"defined multiple times"):
 			Composition().visit(common).visit(composition).process()
 
@@ -191,7 +191,7 @@ class TestRun(unittest.TestCase):
 				connect(receiver.a, sender.a);
 			}
 			""",
-			objectContext=ObjectContext(resolve=True))
+		                                 objectContext=ObjectContext(resolve=True))
 		with self.assertRaisesRegex(Exception, r"must not be marked as const"):
 			Composition().visit(common).visit(composition).process()
 

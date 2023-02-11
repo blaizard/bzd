@@ -33,10 +33,10 @@ class Build(Visitor[None]):
 
 		# Save the serialized payload
 		fqn = self.symbols.insert(name=entity.name if entity.isName else None,
-			namespace=self.namespace,
-			element=entity.element,
-			path=self.objectContext.getSource(),
-			group=self.group)
+		                          namespace=self.namespace,
+		                          element=entity.element,
+		                          path=self.objectContext.getSource(),
+		                          group=self.group)
 
 		# Resolve the symbol
 		if resolve:
@@ -71,7 +71,7 @@ class Build(Visitor[None]):
 		if self.objectContext.resolve:
 			maybePreprocess = self.objectContext.findPreprocess(source=entity.path.as_posix())
 			entity.assertTrue(condition=maybePreprocess is not None,
-				message=f"Cannot find preprocessed entity for '{entity.path}'.")
+			                  message=f"Cannot find preprocessed entity for '{entity.path}'.")
 			bdl = self.objectContext.loadPreprocess(preprocess=maybePreprocess)
 			self.symbols.update(bdl.symbols)
 
@@ -82,10 +82,10 @@ class Build(Visitor[None]):
 		for name in entity.nameList:
 			namespace.append(name)
 			self.symbols.insert(name=namespace[-1],
-				namespace=namespace[:-1],
-				element=NamespaceBuilder(namespace),
-				path=None,
-				group=self.group,
-				conflicts=True)
+			                    namespace=namespace[:-1],
+			                    element=NamespaceBuilder(namespace),
+			                    path=None,
+			                    group=self.group,
+			                    conflicts=True)
 
 		self.registerEntity(entity=entity)

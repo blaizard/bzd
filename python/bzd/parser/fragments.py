@@ -88,7 +88,7 @@ class Fragment:
 
 	def __repr__(self) -> str:
 		return "<{}:{}:{} {}/>".format(self.__class__.__name__, self.index, self.end,
-			" ".join(["{}='{}'".format(key, value) for key, value in self.attrs.items()]))
+		                               " ".join(["{}='{}'".format(key, value) for key, value in self.attrs.items()]))
 
 
 class FragmentComment(Fragment):
@@ -110,8 +110,8 @@ class FragmentComment(Fragment):
 			# Append the comments
 			if key in attrs:
 				attrs[key] = AttributeParser(index=IGNORE_INDEX_VALUE,
-					end=0,
-					value=attrs[key].value + "\n\n{}".format(updatedValue))
+				                             end=0,
+				                             value=attrs[key].value + "\n\n{}".format(updatedValue))
 			else:
 				attrs[key] = AttributeParser(index=IGNORE_INDEX_VALUE, end=0, value=updatedValue)
 

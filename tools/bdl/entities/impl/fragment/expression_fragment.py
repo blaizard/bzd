@@ -45,7 +45,7 @@ class ExpressionFragment(EntityExpression):
 
 		# Copy sequences.
 		for nested in ("argument", "argument_resolved", "argument_expected", "template", "template_resolved",
-			"template_expected"):
+		               "template_expected"):
 			sequence = self.element.getNestedSequence(nested)
 			if sequence:
 				elementBuilder.setNestedSequence(nested, sequence)
@@ -82,7 +82,7 @@ class SymbolFragment(ExpressionFragment):
 		# The type refers to a value.
 		if entity.isRoleValue:
 			self.assertTrue(condition=self.isParameters == False,
-				message="Cannot instantiate a value from another value.")
+			                message="Cannot instantiate a value from another value.")
 			# It means it refers directly to the entity, in that case it must have a value FQN
 			if entity.underlyingValueFQN is None:
 				self.assertTrue(condition=entity.isFQN, message="A value referenced must have an valid FQN.")
@@ -108,15 +108,15 @@ class SymbolFragment(ExpressionFragment):
 		from tools.bdl.entities.impl.expression import Expression
 		if self.underlyingTypeFQN:
 			underlyingTypeEntity = resolver.getEntityResolved(fqn=self.underlyingTypeFQN).assertValue(
-				element=self.element)
+			    element=self.element)
 			return Parameters(element=underlyingTypeEntity.element,
-				NestedElementType=Expression,
-				nestedKind=underlyingTypeEntity.configAttr,
-				filterFct=lambda entity: entity.category == Category.expression)
+			                  NestedElementType=Expression,
+			                  nestedKind=underlyingTypeEntity.configAttr,
+			                  filterFct=lambda entity: entity.category == Category.expression)
 		return Parameters(element=self.element, NestedElementType=Expression)
 
 	def _resolveAndValidateParameters(self, resolver: "Resolver", resolvedTypeEntity: Entity,
-		parameters: Parameters) -> None:
+	                                  parameters: Parameters) -> None:
 		"""Resolve and validate tthe parameters passed into argument."""
 
 		# Make the resolved parameters before the validation is completed. This is because
@@ -129,7 +129,7 @@ class SymbolFragment(ExpressionFragment):
 		if Category.component in parameterTypeCategories:
 			category = resolvedTypeEntity.category
 			self.assertTrue(condition=category in [Category.component, Category.method, Category.builtin],
-				message=f"Components are not allowed for this type '{category}'.")
+			                message=f"Components are not allowed for this type '{category}'.")
 
 		# Read the validation for the values and evaluate it.
 		validation = expectedParameters.makeValidationForValues(resolver=resolver)
@@ -141,5 +141,5 @@ class SymbolFragment(ExpressionFragment):
 		maybeValue = resolvedTypeEntity.toLiteral(result.values)  # type: ignore
 		if maybeValue is not None:
 			self.assertTrue(condition=isinstance(maybeValue, str),
-				message=f"The returned value from toLiteral must be a string, not {str(maybeValue)}")
+			                message=f"The returned value from toLiteral must be a string, not {str(maybeValue)}")
 			self._setLiteral(maybeValue)

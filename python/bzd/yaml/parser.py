@@ -75,8 +75,8 @@ class Parser:
 	# do not give many comments here.
 
 	DEFAULT_TAGS = {
-		'!': '!',
-		'!!': 'tag:yaml.org,2002:',
+	    '!': '!',
+	    '!!': 'tag:yaml.org,2002:',
 	}
 
 	def __init__(self):
@@ -167,7 +167,7 @@ class Parser:
 			version, tags = self.process_directives()
 			if not self.check_token(DocumentStartToken):
 				raise ParserError(None, None, "expected '<document start>', but found %r" % self.peek_token().id,
-					self.peek_token().start_mark)
+				                  self.peek_token().start_mark)
 			token = self.get_token()
 			end_mark = token.end_mark
 			event = DocumentStartEvent(start_mark, end_mark, explicit=True, version=version, tags=tags)
@@ -218,7 +218,7 @@ class Parser:
 				major, minor = token.value
 				if major != 1:
 					raise ParserError(None, None, "found incompatible YAML document (version 1.* is required)",
-						token.start_mark)
+					                  token.start_mark)
 				self.yaml_version = token.value
 			elif token.name == 'TAG':
 				handle, prefix = token.value
@@ -292,7 +292,7 @@ class Parser:
 				if handle is not None:
 					if handle not in self.tag_handles:
 						raise ParserError("while parsing a node", start_mark, "found undefined tag handle %r" % handle,
-							tag_mark)
+						                  tag_mark)
 					tag = self.tag_handles[handle] + suffix
 				else:
 					tag = suffix
@@ -348,7 +348,7 @@ class Parser:
 						node = 'flow'
 					token = self.peek_token()
 					raise ParserError("while parsing a %s node" % node, start_mark,
-						"expected the node content, but found %r" % token.id, token.start_mark)
+					                  "expected the node content, but found %r" % token.id, token.start_mark)
 		return event
 
 	# block_sequence ::= BLOCK-SEQUENCE-START (BLOCK-ENTRY block_node?)* BLOCK-END
@@ -370,7 +370,7 @@ class Parser:
 		if not self.check_token(BlockEndToken):
 			token = self.peek_token()
 			raise ParserError("while parsing a block collection", self.marks[-1],
-				"expected <block end>, but found %r" % token.id, token.start_mark)
+			                  "expected <block end>, but found %r" % token.id, token.start_mark)
 		token = self.get_token()
 		event = SequenceEndEvent(token.start_mark, token.end_mark)
 		self.state = self.states.pop()
@@ -415,7 +415,7 @@ class Parser:
 		if not self.check_token(BlockEndToken):
 			token = self.peek_token()
 			raise ParserError("while parsing a block mapping", self.marks[-1],
-				"expected <block end>, but found %r" % token.id, token.start_mark)
+			                  "expected <block end>, but found %r" % token.id, token.start_mark)
 		token = self.get_token()
 		event = MappingEndEvent(token.start_mark, token.end_mark)
 		self.state = self.states.pop()
@@ -460,7 +460,7 @@ class Parser:
 				else:
 					token = self.peek_token()
 					raise ParserError("while parsing a flow sequence", self.marks[-1],
-						"expected ',' or ']', but got %r" % token.id, token.start_mark)
+					                  "expected ',' or ']', but got %r" % token.id, token.start_mark)
 
 			if self.check_token(KeyToken):
 				token = self.peek_token()
@@ -523,7 +523,7 @@ class Parser:
 				else:
 					token = self.peek_token()
 					raise ParserError("while parsing a flow mapping", self.marks[-1],
-						"expected ',' or '}', but got %r" % token.id, token.start_mark)
+					                  "expected ',' or '}', but got %r" % token.id, token.start_mark)
 			if self.check_token(KeyToken):
 				token = self.get_token()
 				if not self.check_token(ValueToken, FlowEntryToken, FlowMappingEndToken):

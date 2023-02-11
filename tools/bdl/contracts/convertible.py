@@ -23,8 +23,9 @@ class Convertible_(Constraint):
 			# It must be found.
 			entityTo = context.args["resolver"].getEntityResolved(base).value
 			assert entityTo.isSymbol, "The base FQN does not resolve to a type."
-			assert typeFrom.isConvertible(resolver=context.args["resolver"],
-				to=entityTo.symbol), f"Type '{typeFrom}' is not convertible to type '{entityTo.symbol}'."
+			assert typeFrom.isConvertible(
+			    resolver=context.args["resolver"],
+			    to=entityTo.symbol), f"Type '{typeFrom}' is not convertible to type '{entityTo.symbol}'."
 
 		updatedArgs = self.validate(schema=["mandatory string"], values=args).values
 		processedSchema.installValidation(_process, updatedArgs[0])
