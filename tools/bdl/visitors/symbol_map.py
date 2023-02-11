@@ -59,9 +59,10 @@ class Resolver:
 			if self.symbols.contains(fqn=fqn, exclude=self.exclude):
 				break
 			if not potentialNamespace:
-				ending = self.symbols.terminateErrorMessageSimilarFQN(nameFirst)
+				ending = self.symbols.terminateErrorMessageSimilarFQN(fqn=nameFirst)
 				return ResolveShallowFQNResult.makeError(
-					f"Symbol '{nameFirst}' in namespace '{'.'.join(self.namespace)}' could not be resolved{ending}" if self.namespace else f"Symbol '{nameFirst}' could not be resolved{ending}")
+					f"Symbol '{nameFirst}' in namespace '{'.'.join(self.namespace)}' could not be resolved{ending}"
+					if self.namespace else f"Symbol '{nameFirst}' could not be resolved{ending}")
 			potentialNamespace.pop()
 
 		# Attempt to resolve as much as possible.
@@ -107,7 +108,7 @@ class Resolver:
 					fqn = potentialFQN
 					break
 			if fqn is None:
-				ending = self.symbols.terminateErrorMessageSimilarFQN(fqn)
+				ending = self.symbols.terminateErrorMessageSimilarFQN(fqn=nextName)
 				return ResolveFQNResult.makeError(
 					f"Symbol '{nextName}' from '{name}' in namespace '{'.'.join(self.namespace)}' could not be resolved{ending}"
 					if self.namespace else f"Symbol '{nextName}' from '{name}' could not be resolved{ending}")
@@ -363,7 +364,7 @@ class SymbolMap:
 		similar.sort()
 		return similar
 
-	def terminateErrorMessageSimilarFQN(self, fqn: str) -> typing.List[str]:
+	def terminateErrorMessageSimilarFQN(self, fqn: str) -> str:
 		"""Create a string to be added to terminate an error message."""
 
 		similar = self.similarFQN(fqn=fqn)
@@ -377,7 +378,7 @@ class SymbolMap:
 
 		data = self._get(fqn=fqn, exclude=exclude)
 		if data is None:
-			message = f"Unable to find symbol '{fqn}'{self.terminateErrorMessageSimilarFQN(fqn)}"
+			message = f"Unable to find symbol '{fqn}'{self.terminateErrorMessageSimilarFQN(fqn=fqn)}"
 			return Result[EntityType].makeError(message)
 
 		# Not memoized

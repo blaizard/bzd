@@ -86,5 +86,6 @@ class ExpressionBuilder(ElementBuilder):
 		fragment.setAttr("symbol", symbol)
 		self.pushBackElementToNestedSequence(kind="fragments", element=fragment)
 
+
 class SequenceBuilder(Sequence):
 	pass

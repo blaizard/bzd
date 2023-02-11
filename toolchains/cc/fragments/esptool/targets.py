@@ -12,6 +12,6 @@ targets = {
 	0x10000: "{binary}"
 	},
 	"args":
-	"--chip esp32 --port {device} --baud 460800 --before default_reset --after hard_reset write_flash --flash_mode dio --flash_freq 40m --flash_size detect {memory}"
+		"--chip esp32 --port {device} --baud 460800 --before default_reset --after hard_reset write_flash --flash_mode dio --flash_freq 40m --flash_size detect {memory}"
 	}
 }

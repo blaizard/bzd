@@ -92,7 +92,8 @@ class Expression(EntityExpression):
 	def processFragments(self, resolver: "Resolver") -> None:
 		"""Process fragments to build a value or a symbol."""
 
-		self.assertTrue(condition=self.element.isNestedSequence("fragments"), message=f"Missing nested sequence 'fragment' for: {self.element}")
+		self.assertTrue(condition=self.element.isNestedSequence("fragments"),
+			message=f"Missing nested sequence 'fragment' for: {self.element}")
 
 		self.assertTrue(condition=len(self.fragments) == 1, message=f"This expression must have a single fragment.")
 		for fragment in self.fragments:
