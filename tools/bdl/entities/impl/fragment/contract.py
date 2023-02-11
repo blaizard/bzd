@@ -81,7 +81,7 @@ class Contracts:
 			contractTraits = AllContracts.allPublic.get(contract.type)
 			if contractTraits is None:
 				Error.handleFromElement(element=self.element,
-					message="Contract of type '{}' is not supported.".format(contract.type))
+				                        message="Contract of type '{}' is not supported.".format(contract.type))
 
 	def resolve(self, contracts: "Contracts") -> None:
 		"""

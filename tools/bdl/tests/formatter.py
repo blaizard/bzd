@@ -42,8 +42,8 @@ varInitialized= MyType(   42 );
 		output = formatBdl(bdl)
 
 		self.assertEqual(
-			self._stripString(output),
-			self._stripString("""
+		    self._stripString(output),
+		    self._stripString("""
 // This is a multi-line comment
 struct ab {
 	// Contracts

@@ -45,9 +45,9 @@ class TestRun(unittest.TestCase):
 	def testPipeSubsitution(self) -> None:
 		template = Template("{{str | lowerCase | capitalize }}")
 		result = template.render({
-			"str": "ThIs IS SOMEhting MesSy",
-			"lowerCase": lambda x: x.lower(),
-			"capitalize": lambda x: x.capitalize()
+		    "str": "ThIs IS SOMEhting MesSy",
+		    "lowerCase": lambda x: x.lower(),
+		    "capitalize": lambda x: x.capitalize()
 		})
 		self.assertEqual("This is somehting messy", result)
 

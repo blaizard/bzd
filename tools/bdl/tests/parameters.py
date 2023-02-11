@@ -11,7 +11,7 @@ class TestRun(unittest.TestCase):
 	def testSimple(self) -> None:
 
 		element = ElementBuilder("builtin").addConfigValue(kind="Integer", name="a").addConfigValue(kind="Integer",
-			name="b")
+		                                                                                            name="b")
 		params = Parameters(element=element, NestedElementType=Expression, nestedKind="config")
 		assert params.size() == 2
 		copy = params.copy()

@@ -13,10 +13,10 @@ if __name__ == "__main__":
 
 	parser = argparse.ArgumentParser(description="Generate compilation database")
 	parser.add_argument("--workspace",
-		dest="workspace",
-		type=str,
-		default=os.environ.get("BUILD_WORKSPACE_DIRECTORY", "."),
-		help="Full path of the workspace to be sanitized.")
+	                    dest="workspace",
+	                    type=str,
+	                    default=os.environ.get("BUILD_WORKSPACE_DIRECTORY", "."),
+	                    help="Full path of the workspace to be sanitized.")
 	parser.add_argument("--action", dest="actions", action="append", default=[], help="Action(s) to be performed")
 
 	args = parser.parse_args()

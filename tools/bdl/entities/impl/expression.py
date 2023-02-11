@@ -49,11 +49,11 @@ class Expression(EntityExpression):
 	@cached_property
 	def typeResolved(self) -> Symbol:
 		return Symbol(element=self.element,
-			kind="symbol",
-			underlyingTypeFQN="fqn_type",
-			template="template_resolved",
-			const="const",
-			contract="contract")
+		              kind="symbol",
+		              underlyingTypeFQN="fqn_type",
+		              template="template_resolved",
+		              const="const",
+		              contract="contract")
 
 	@property
 	def isInterfaceType(self) -> bool:
@@ -62,12 +62,12 @@ class Expression(EntityExpression):
 	@cached_property
 	def interfaceType(self) -> Symbol:
 		return Symbol(element=self.element, kind="interface", underlyingTypeFQN="fqn_interface",
-			const="const") if self.isInterfaceType else self.symbol
+		              const="const") if self.isInterfaceType else self.symbol
 
 	@cached_property
 	def interfaceTypeResolved(self) -> Symbol:
 		return Symbol(element=self.element, kind="interface", underlyingTypeFQN="fqn_interface",
-			const="const") if self.isInterfaceType else self.typeResolved
+		              const="const") if self.isInterfaceType else self.typeResolved
 
 	@property
 	def fragments(self) -> typing.List[ExpressionFragment]:
@@ -93,7 +93,7 @@ class Expression(EntityExpression):
 		"""Process fragments to build a value or a symbol."""
 
 		self.assertTrue(condition=self.element.isNestedSequence("fragments"),
-			message=f"Missing nested sequence 'fragment' for: {self.element}")
+		                message=f"Missing nested sequence 'fragment' for: {self.element}")
 
 		self.assertTrue(condition=len(self.fragments) == 1, message=f"This expression must have a single fragment.")
 		for fragment in self.fragments:
@@ -124,9 +124,10 @@ class Expression(EntityExpression):
 			if executorContract is not None:
 				validExecutorContract = entity.category == Category.component
 				validExecutorContract |= (entity.category == Category.method) and not self.symbol.isThis
-				self.assertTrue(condition=validExecutorContract,
-					message=
-					"`executor` contracts must be set either at component instantiation or at free function call.")
+				self.assertTrue(
+				    condition=validExecutorContract,
+				    message=
+				    "`executor` contracts must be set either at component instantiation or at free function call.")
 				executor = executorContract.value
 			# If there is a 'this', propagate the executor.
 			elif self.symbol.isThis:
@@ -160,6 +161,6 @@ class Expression(EntityExpression):
 	@cached_property
 	def parametersResolved(self) -> ParametersResolved:
 		return ParametersResolved(element=self.element,
-			NestedElementType=Expression,
-			param="argument_resolved",
-			expected="argument_expected")
+		                          NestedElementType=Expression,
+		                          param="argument_resolved",
+		                          expected="argument_expected")

@@ -24,11 +24,11 @@ Schema = typing.TypeVar("Schema", SchemaList, SchemaDict)
 class Validation(typing.Generic[Schema]):
 
 	AVAILABLE_CONSTRAINTS: typing.Dict[str, typing.Type[Constraint]] = {
-		"boolean": Boolean,
-		"integer": Integer,
-		"float": Float,
-		"string": String,
-		"mandatory": Mandatory
+	    "boolean": Boolean,
+	    "integer": Integer,
+	    "float": Float,
+	    "string": String,
+	    "mandatory": Mandatory
 	}
 
 	memoizedProcessedSchema_: typing.Dict[typing.Tuple[str, int], ProcessedSchema] = {}
@@ -135,8 +135,8 @@ class Validation(typing.Generic[Schema]):
 					results.addError(key, ["no value expected."])
 				else:
 					results.addError(key, [
-						"value not expected, valid choices are: {}.".format(", ".join(
-						["'{}'".format(x) for x in self.processed.keys()]))
+					    "value not expected, valid choices are: {}.".format(", ".join(
+					        ["'{}'".format(x) for x in self.processed.keys()]))
 					])
 
 			# Check for mandatory values

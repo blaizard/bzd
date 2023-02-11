@@ -22,35 +22,35 @@ class ParserClang(Parser):
 
 			# First line corresponds to the formating.
 			table = FixedTable.fromHeader(header=f.readline().lower(),
-				schema={
-				"vma": {
-				"align": "right"
-				},
-				"lma": {
-				"align": "right"
-				},
-				"size": {
-				"align": "right"
-				},
-				"align": {
-				"align": "right"
-				},
-				"out": {
-				"align": "left"
-				},
-				"in": {
-				"align": "left"
-				},
-				"symbol": {
-				"align": "left"
-				},
-				})
+			                              schema={
+			                                  "vma": {
+			                                      "align": "right"
+			                                  },
+			                                  "lma": {
+			                                      "align": "right"
+			                                  },
+			                                  "size": {
+			                                      "align": "right"
+			                                  },
+			                                  "align": {
+			                                      "align": "right"
+			                                  },
+			                                  "out": {
+			                                      "align": "left"
+			                                  },
+			                                  "in": {
+			                                      "align": "left"
+			                                  },
+			                                  "symbol": {
+			                                      "align": "left"
+			                                  },
+			                              })
 
 			if not table:
 				return False
 
 			if not table.isValidIdentifier("vma") or not table.isValidIdentifier("size") or not table.isValidIdentifier(
-				"out") or not table.isValidIdentifier("in"):
+			    "out") or not table.isValidIdentifier("in"):
 				return False
 
 			section = None

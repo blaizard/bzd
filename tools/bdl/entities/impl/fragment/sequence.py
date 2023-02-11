@@ -53,8 +53,8 @@ class EntitySequence:
 	@property
 	def nestedList(self) -> typing.List["Nested"]:
 		return typing.cast(
-			typing.List["Nested"],
-			self._filteredList(Category.struct, Category.interface, Category.component, Category.composition))
+		    typing.List["Nested"],
+		    self._filteredList(Category.struct, Category.interface, Category.component, Category.composition))
 
 	@property
 	def isExpression(self) -> bool:

@@ -9,7 +9,7 @@ from tools.bdl.contracts.traits import ContractTraits, Role
 
 
 def getValueFromSingleParameter_(resolver: typing.Any, typeFQN: str, value: typing.Any,
-	defaultValue: str) -> typing.Any:
+                                 defaultValue: str) -> typing.Any:
 	"""Extract value of single parameter expressions."""
 
 	from tools.bdl.visitors.symbol_map import Resolver
@@ -30,7 +30,7 @@ def getValueFromSingleParameter_(resolver: typing.Any, typeFQN: str, value: typi
 			elif value.parametersResolved.size() == 1:
 				return value.parametersResolved[0].param.literal
 			raise Exception(
-				f"There are too many initializers for '{typeFQN}', only 1 is expected:\n{value.parametersResolved}")
+			    f"There are too many initializers for '{typeFQN}', only 1 is expected:\n{value.parametersResolved}")
 
 	return value
 

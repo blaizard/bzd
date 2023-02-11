@@ -21,10 +21,10 @@ from tools.bdl.entities.impl.use import Use
 class ObjectContext:
 
 	def __init__(self,
-		preprocessFormat: typing.Optional[str] = None,
-		searchFormats: typing.Optional[typing.List[str]] = None,
-		resolve: bool = False,
-		composition: bool = False) -> None:
+	             preprocessFormat: typing.Optional[str] = None,
+	             searchFormats: typing.Optional[typing.List[str]] = None,
+	             resolve: bool = False,
+	             composition: bool = False) -> None:
 		"""
 		Args:
 			resolve: Resolve all symbols.
@@ -158,8 +158,9 @@ class Object:
 		self.tree = tree
 
 	@staticmethod
-	def _makeObject(parser: BaseParser, objectContext: ObjectContext,
-		namespace: typing.Optional[str] = None) -> "Object":
+	def _makeObject(parser: BaseParser,
+	                objectContext: ObjectContext,
+	                namespace: typing.Optional[str] = None) -> "Object":
 		"""Helper to make an object from a parser."""
 
 		data = parser.parse()
@@ -199,12 +200,12 @@ class Object:
 		"""Serialize the current object."""
 
 		return json.dumps(
-			{
-			"context": self.context.serialize(),
-			"symbols": self.symbols.serialize(),
-			"tree": self.tree.serialize()
-			},
-			separators=(",", ":"))
+		    {
+		        "context": self.context.serialize(),
+		        "symbols": self.symbols.serialize(),
+		        "tree": self.tree.serialize()
+		    },
+		    separators=(",", ":"))
 
 	def __repr__(self) -> str:
 		"""Print an object (for debug purpose only)."""

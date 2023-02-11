@@ -101,31 +101,33 @@ class Connections:
 		output.assertTrue(condition=output.isLValue, message="Second argument must be a reference to another object.")
 
 		input.assertTrue(condition=input.symbol != output.symbol, message="A connection cannot connect to itself.")
-		input.assertTrue(condition=input.underlyingTypeFQN == output.underlyingTypeFQN,
-			message=
-			f"Connections cannot only be made between same types, not {input.underlyingTypeFQN} and {output.underlyingTypeFQN}."
-							)
+		input.assertTrue(
+		    condition=input.underlyingTypeFQN == output.underlyingTypeFQN,
+		    message=
+		    f"Connections cannot only be made between same types, not {input.underlyingTypeFQN} and {output.underlyingTypeFQN}."
+		)
 
 		# Check const correctness.
 		inputEntity = input.symbol.getEntityResolved(resolver=self.resolver)
 		assert isinstance(inputEntity, EntityExpression)
 		inputEntity.assertTrue(condition=not inputEntity.symbol.const,
-			message="A connection sender must not be marked as const.")
+		                       message="A connection sender must not be marked as const.")
 		outputEntity = output.symbol.getEntityResolved(resolver=self.resolver)
 		assert isinstance(outputEntity, EntityExpression)
 		outputEntity.assertTrue(condition=outputEntity.symbol.const,
-			message="A connection receiver must be marked as const.")
+		                        message="A connection receiver must be marked as const.")
 
 		alreadyInserted = input.symbol in self.groups and output.symbol in self.groups[input.symbol].outputs
-		input.assertTrue(condition=not alreadyInserted,
-			message=f"Connection between '{input.symbol}' and '{output.symbol}' is defined multiple times.")
+		input.assertTrue(
+		    condition=not alreadyInserted,
+		    message=f"Connection between '{input.symbol}' and '{output.symbol}' is defined multiple times.")
 		input.assertTrue(condition=input.symbol not in self.outputs,
-			message=f"'{input.symbol}' has already been defined as an output.")
+		                 message=f"'{input.symbol}' has already been defined as an output.")
 		if input.symbol not in self.outputs:
 			inputEntityType = input.symbol.getEntityUnderlyingTypeResolved(resolver=self.resolver)
 			assert hasattr(inputEntityType, "symbol")
 			self.groups[input.symbol] = ConnectionGroup(executor=input.executorOr("executor"),
-				symbol=inputEntityType.symbol)
+			                                            symbol=inputEntityType.symbol)
 		self.groups[input.symbol].outputs[output.symbol] = OutputMetadata(executor=output.executorOr("executor"))
 		self.outputs.add(output.symbol)
 
@@ -166,8 +168,8 @@ class ExpressionEntry:
 
 	def __repr__(self) -> str:
 		content = [
-			f"type: {str(self.entryType)}", f"expression: {str(self.expression)}", f"executors: {str(self.executors)}",
-			f"deps: {self.deps}", f"init: {self.init}", f"intra: {self.intra}", f"shutdown: {self.shutdown}"
+		    f"type: {str(self.entryType)}", f"expression: {str(self.expression)}", f"executors: {str(self.executors)}",
+		    f"deps: {self.deps}", f"init: {self.init}", f"intra: {self.intra}", f"shutdown: {self.shutdown}"
 		]
 		return "\n".join(content)
 
@@ -237,7 +239,7 @@ class Components:
 			yield entry
 
 	def insert(self, expression: Expression, entryType: EntryType,
-		executor: typing.Optional[str]) -> typing.Optional[ExpressionEntry]:
+	           executor: typing.Optional[str]) -> typing.Optional[ExpressionEntry]:
 		"""Insert a new entry in the map, return the entry if it does not exists or if it can be updated,
 		otherwise it returns None."""
 
@@ -251,15 +253,17 @@ class Components:
 
 			# If this is the exact same expression.
 			if self.map[identifier].entryType == entryType:
-				expression.assertTrue(condition=(self.map[identifier].expression == expression),
-					message=f"This expression already exits and cannot be redeclared as the same role: '{entryType}'.")
+				expression.assertTrue(
+				    condition=(self.map[identifier].expression == expression),
+				    message=f"This expression already exits and cannot be redeclared as the same role: '{entryType}'.")
 				return None
 			if isOverwritable(entryType, self.map[identifier].entryType):
 				return None
-			expression.assertTrue(condition=isOverwritable(self.map[identifier].entryType, entryType),
-				message=
-				f"An expression of role '{entryType}' cannot overwrite an expression of role '{self.map[identifier].entryType}'."
-									)
+			expression.assertTrue(
+			    condition=isOverwritable(self.map[identifier].entryType, entryType),
+			    message=
+			    f"An expression of role '{entryType}' cannot overwrite an expression of role '{self.map[identifier].entryType}'."
+			)
 
 		executors = set() if executor is None else {executor}
 		self.map[identifier] = ExpressionEntry(expression=expression, entryType=entryType, executors=executors)
@@ -359,12 +363,13 @@ class Entities:
 		def addEntry(symbol: Symbol, kind: str, input: Symbol) -> None:
 			fqn = symbol.this
 			name = symbol.propertyName
-			symbol.assertTrue(condition=fqn in self.registry,
-				message=
-				f"The instance of one of the connection to '{str(symbol)}', namely '{fqn}', is not present in the registry."
-								)
+			symbol.assertTrue(
+			    condition=fqn in self.registry,
+			    message=
+			    f"The instance of one of the connection to '{str(symbol)}', namely '{fqn}', is not present in the registry."
+			)
 			symbol.assertTrue(condition=name not in result[fqn],
-				message=f"The property named '{name}' is connected twice.")
+			                  message=f"The property named '{name}' is connected twice.")
 			result[fqn][name] = {"type": kind, "input": input}
 
 		for input, group in self.connections.groups.items():
@@ -378,10 +383,10 @@ class Entities:
 		for input, group in self.connections.groups.items():
 			if group.executor == fqn or any(metadata.executor == fqn for metadata in group.outputs.values()):
 				result: typing.Dict[str, typing.Any] = {
-					"symbol": group.symbol,
-					"input": input,
-					"emitter": (group.executor == fqn),
-					"outputs": []
+				    "symbol": group.symbol,
+				    "input": input,
+				    "emitter": (group.executor == fqn),
+				    "outputs": []
 				}
 				for output, metadata in group.outputs.items():
 					if metadata.executor == fqn:
@@ -407,7 +412,7 @@ class Entities:
 		"""Add a new entity."""
 
 		entity.assertTrue(condition=isinstance(entity, Expression),
-			message="Only expressions can be added to the composition.")
+		                  message="Only expressions can be added to the composition.")
 		expression = typing.cast(Expression, entity)
 
 		# If the entity does not have a fqn (hence a namespace), process its dependencies.
@@ -422,20 +427,16 @@ class Entities:
 		resolver = self.symbols.makeResolver(namespace=expression.namespace)
 		expression.resolveMemoized(resolver=resolver)
 
-		if expression.fqn == "executor":
-			print(expression)
-			print(expression.element)
-
 		if expression.isRoleMeta:
 			self.processMeta(expression=expression)
 		else:
 			self.processEntry(expression=expression, isDep=isDep, resolver=resolver, executor=executor)
 
 	def createEntityNestedComposition(self,
-		element: Element,
-		expression: Expression,
-		resolveNamespace: typing.List[str],
-		name: typing.Optional[str] = None) -> Entity:
+	                                  element: Element,
+	                                  expression: Expression,
+	                                  resolveNamespace: typing.List[str],
+	                                  name: typing.Optional[str] = None) -> Entity:
 		"""Create a new entity for nested compositions.
 		
 		Args:
@@ -448,15 +449,16 @@ class Entities:
 			The newly created entity.
 		"""
 
-		expression.assertTrue(condition=expression.isName,
-			message=f"Nested composition must come from a named expression, coming from {expression} instead.")
+		expression.assertTrue(
+		    condition=expression.isName,
+		    message=f"Nested composition must come from a named expression, coming from {expression} instead.")
 
 		# Insert the new entry in the symbol map.
 		fqn = self.symbols.insert(name=name,
-			namespace=expression.namespace + [expression.name],
-			path=None,
-			element=element,
-			group=Group.composition)
+		                          namespace=expression.namespace + [expression.name],
+		                          path=None,
+		                          element=element,
+		                          group=Group.composition)
 		entity = self.symbols.getEntityResolved(fqn=fqn).value
 		resolver = self.symbols.makeResolver(namespace=resolveNamespace, this=expression.fqn)
 		entity.resolveMemoized(resolver=resolver)
@@ -464,7 +466,7 @@ class Entities:
 		return entity
 
 	def processEntry(self, expression: Expression, isDep: bool, resolver: Resolver,
-		executor: typing.Optional[str]) -> None:
+	                 executor: typing.Optional[str]) -> None:
 		"""Resolve the dependencies for a specific expression."""
 
 		# Find the symbol underlying type.
@@ -475,14 +477,14 @@ class Entities:
 			entryType = EntryType.service if isDep else EntryType.workload
 		elif underlyingType.category in {Category.component, Category.struct, Category.enum, Category.using}:
 			expression.assertTrue(condition=expression.isName,
-				message="All expressions from the registry must have a name.")
+			                      message="All expressions from the registry must have a name.")
 			entryType = EntryType.registry
 		elif underlyingType.category in {Category.builtin}:
 			# Ignore all builtins as they are expected to be all the time available.
 			return
 		else:
 			expression.error(
-				message=f"Unsupported entry type '{underlyingType.category.value}' within the composition stage.")
+			    message=f"Unsupported entry type '{underlyingType.category.value}' within the composition stage.")
 
 		# Check if a platform.
 		if expression.namespace and expression.namespace[-1] == "platform":
@@ -490,13 +492,13 @@ class Entities:
 		# Check if an executor.
 		if "bzd.platform.Executor" in underlyingType.getParents():
 			expression.assertTrue(condition=underlyingType.category == Category.component,
-				message="Executors must be a component.")
+			                      message="Executors must be a component.")
 			entryType |= EntryType.executor
 			executor = expression.fqn
 
 		# If top level, only process a certain type of entry.
 		if not (isDep or (EntryType.workload in entryType) or (EntryType.platform in entryType) or
-			(EntryType.executor in entryType)):
+		        (EntryType.executor in entryType)):
 			return
 
 		# Identify the executor of this entity, it is guarantee by the Expression type that there is always an executor.
@@ -506,7 +508,7 @@ class Entities:
 				executor = self.defaultExecutorName_
 			else:
 				executor = self.symbols.getEntityResolved(fqn=maybeExecutorFQN).assertValue(
-					element=expression.element).fqn
+				    element=expression.element).fqn
 
 		# Register the entry.
 		entry = self.expressions.insert(expression=expression, entryType=entryType, executor=executor)
@@ -535,9 +537,9 @@ class Entities:
 				if maybeGroup is not None:
 
 					newEntity = self.createEntityNestedComposition(
-						element=ExpressionBuilder(symbol=f"this.{interfaceEntity.name}"),
-						expression=expression,
-						resolveNamespace=interfaceEntity.namespace)
+					    element=ExpressionBuilder(symbol=f"this.{interfaceEntity.name}"),
+					    expression=expression,
+					    resolveNamespace=interfaceEntity.namespace)
 					assert isinstance(newEntity, Expression)
 					maybeGroup.push(newEntity)
 
@@ -549,10 +551,11 @@ class Entities:
 
 				# Create a new entity and associate it with its respective objects.
 				entityCopied = compositionEntity.copy()
-				newEntity = self.createEntityNestedComposition(element=entityCopied.element,
-					expression=expression,
-					resolveNamespace=entityCopied.namespace,
-					name=compositionEntity.name if compositionEntity.isName else None)
+				newEntity = self.createEntityNestedComposition(
+				    element=entityCopied.element,
+				    expression=expression,
+				    resolveNamespace=entityCopied.namespace,
+				    name=compositionEntity.name if compositionEntity.isName else None)
 				assert isinstance(newEntity, Expression)
 				entry.intra.push(newEntity)
 
@@ -573,10 +576,11 @@ class Entities:
 		for e in self.expressions:
 			# We only check cases with a single executor because, other case should be platforms.
 			if len(e.executors) == 1 and self.defaultExecutorName_ in e.executors:
-				e.expression.assertTrue(condition=len(executors) <= 1,
-					message=
-					f"No executor is assigned to this expression on a multi-executor ({', '.join([*executors])}) composition."
-										)
+				e.expression.assertTrue(
+				    condition=len(executors) <= 1,
+				    message=
+				    f"No executor is assigned to this expression on a multi-executor ({', '.join([*executors])}) composition."
+				)
 				e.executors = {*executors}
 
 		self.expressions.close()

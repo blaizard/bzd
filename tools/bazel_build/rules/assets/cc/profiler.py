@@ -109,11 +109,11 @@ if __name__ == '__main__':
 		groupedResult[matchedGroup] += size
 
 	finalResult = {
-		"size_groups": {
-		"units": groupedResult,
-		},
-		"size": os.path.getsize(args.binary_final),
-		"compilers": compilers
+	    "size_groups": {
+	        "units": groupedResult,
+	    },
+	    "size": os.path.getsize(args.binary_final),
+	    "compilers": compilers
 	}
 
 	with open(args.output, "w+") as f:

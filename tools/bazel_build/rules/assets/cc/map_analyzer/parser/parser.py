@@ -24,9 +24,9 @@ class Parser:
 		self.setParsedData()
 
 	def setParsedData(self,
-		sections: typing.Optional[Fragment] = None,
-		units: typing.Optional[Fragment] = None,
-		areUnitsPath: bool = False) -> None:
+	                  sections: typing.Optional[Fragment] = None,
+	                  units: typing.Optional[Fragment] = None,
+	                  areUnitsPath: bool = False) -> None:
 		"""
 		Set the raw data from the specialized parser.
 
@@ -93,7 +93,7 @@ class Parser:
 
 			if "address" in item and item["size"]:
 				aggregatedSections[item["section"]]["address"] = min(
-					aggregatedSections[item["section"]].get("address", sys.maxsize), item["address"])
+				    aggregatedSections[item["section"]].get("address", sys.maxsize), item["address"])
 
 		# Remove empty sections
 		return {section: obj for section, obj in aggregatedSections.items() if obj["size"] > 0}

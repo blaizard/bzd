@@ -19,10 +19,10 @@ ResolveFQNResult = Result[typing.List[str]]
 class Resolver:
 
 	def __init__(self,
-		symbols: "SymbolMap",
-		namespace: typing.List[str] = [],
-		exclude: typing.Optional[typing.List[Group]] = None,
-		this: typing.Optional[str] = None) -> None:
+	             symbols: "SymbolMap",
+	             namespace: typing.List[str] = [],
+	             exclude: typing.Optional[typing.List[Group]] = None,
+	             this: typing.Optional[str] = None) -> None:
 		self.symbols = symbols
 		self.namespace = namespace
 		self.exclude = exclude
@@ -61,8 +61,8 @@ class Resolver:
 			if not potentialNamespace:
 				ending = self.symbols.terminateErrorMessageSimilarFQN(fqn=nameFirst)
 				return ResolveShallowFQNResult.makeError(
-					f"Symbol '{nameFirst}' in namespace '{'.'.join(self.namespace)}' could not be resolved{ending}"
-					if self.namespace else f"Symbol '{nameFirst}' could not be resolved{ending}")
+				    f"Symbol '{nameFirst}' in namespace '{'.'.join(self.namespace)}' could not be resolved{ending}"
+				    if self.namespace else f"Symbol '{nameFirst}' could not be resolved{ending}")
 			potentialNamespace.pop()
 
 		# Attempt to resolve as much as possible.
@@ -99,7 +99,7 @@ class Resolver:
 			# If it has an underlying type, add it to the list as well as its parents (if any).
 			if entity.underlyingTypeFQN is not None:
 				potentialNamespaceFQNs += [entity.underlyingTypeFQN
-											] + entity.getEntityUnderlyingTypeResolved(resolver=self).getParents()
+				                           ] + entity.getEntityUnderlyingTypeResolved(resolver=self).getParents()
 			# Check if there is any match.
 			fqn = None
 			for potentialNamespaceFQN in potentialNamespaceFQNs:
@@ -110,8 +110,8 @@ class Resolver:
 			if fqn is None:
 				ending = self.symbols.terminateErrorMessageSimilarFQN(fqn=nextName)
 				return ResolveFQNResult.makeError(
-					f"Symbol '{nextName}' from '{name}' in namespace '{'.'.join(self.namespace)}' could not be resolved{ending}"
-					if self.namespace else f"Symbol '{nextName}' from '{name}' could not be resolved{ending}")
+				    f"Symbol '{nextName}' from '{name}' in namespace '{'.'.join(self.namespace)}' could not be resolved{ending}"
+				    if self.namespace else f"Symbol '{nextName}' from '{name}' could not be resolved{ending}")
 			fqns.append(fqn)
 
 		# Return the final FQN.
@@ -202,12 +202,12 @@ class SymbolMap:
 					yield fqn, entity
 
 	def insert(self,
-		name: typing.Optional[str],
-		namespace: typing.List[str],
-		path: typing.Optional[Path],
-		element: Element,
-		group: Group,
-		conflicts: bool = False) -> str:
+	           name: typing.Optional[str],
+	           namespace: typing.List[str],
+	           path: typing.Optional[Path],
+	           element: Element,
+	           group: Group,
+	           conflicts: bool = False) -> str:
 		"""
 		Insert a new element into the symbol map.
 		Args:
@@ -254,8 +254,8 @@ class SymbolMap:
 	@staticmethod
 	def errorSymbolConflict_(fqn: str, element1: Element, element2: Element) -> None:
 		message = Error.handleFromElement(element=element1,
-			message=f"Symbol name '{fqn}' is in conflict...",
-			throw=False)
+		                                  message=f"Symbol name '{fqn}' is in conflict...",
+		                                  throw=False)
 		message += Error.handleFromElement(element=element2, message="...with this one.", throw=False)
 		raise Exception(message)
 
@@ -273,7 +273,7 @@ class SymbolMap:
 			existingElement = self._get(fqn=fqn)
 			if existingElement is not None and element["p"] != existingElement["p"]:
 				SymbolMap.errorSymbolConflict_(fqn, SymbolMap.metaToElement(element),
-					SymbolMap.metaToElement(existingElement))
+				                               SymbolMap.metaToElement(existingElement))
 			self.map[fqn] = element
 
 	def makeReference(self, fqn: str, group: typing.Optional[Group] = None) -> Element:
@@ -296,8 +296,9 @@ class SymbolMap:
 			if fqn in self.builtins:
 				continue
 
-			entity.assertTrue(condition=fqn in self.map,
-				message="Entry '{}' was not properly created before being added to the entities map.".format(fqn))
+			entity.assertTrue(
+			    condition=fqn in self.map,
+			    message="Entry '{}' was not properly created before being added to the entities map.".format(fqn))
 			element = entity.element
 
 			# Remove nested element and change them to references.
@@ -394,10 +395,10 @@ class SymbolMap:
 						# Resolve the reference if any
 						if isinstance(nestedEntity, Reference):
 							nestedEntity = self.getEntityResolved(fqn=nestedEntity.name,
-								exclude=exclude).assertValue(element=element)
+							                                      exclude=exclude).assertValue(element=element)
 						updatedSequence.pushBackElement(nestedEntity.element)
 					ElementBuilder.cast(element, ElementBuilder).setNestedSequence(kind=group.value,
-						sequence=updatedSequence)
+					                                                               sequence=updatedSequence)
 			self.entities[fqn] = entity
 
 		# Return the referenced type in case of reference.

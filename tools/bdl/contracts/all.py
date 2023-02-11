@@ -14,17 +14,17 @@ from tools.bdl.contracts.convertible import ContractConvertible
 from tools.bdl.contracts.executor import ContractExecutor
 
 _Contracts = [
-	ContractInteger(),
-	ContractFloat(),
-	ContractString(),
-	ContractBoolean(),
-	ContractMin(),
-	ContractMax(),
-	ContractMandatory(),
-	ContractCapacity(),
-	ContractInit(),
-	ContractConvertible(),
-	ContractExecutor()
+    ContractInteger(),
+    ContractFloat(),
+    ContractString(),
+    ContractBoolean(),
+    ContractMin(),
+    ContractMax(),
+    ContractMandatory(),
+    ContractCapacity(),
+    ContractInit(),
+    ContractConvertible(),
+    ContractExecutor()
 ]
 
 

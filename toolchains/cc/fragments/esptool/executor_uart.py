@@ -24,7 +24,7 @@ def getDevice(args: argparse.Namespace) -> Device:
 			accessibleDevices = filteredDevices.filterByAccess()
 			if accessibleDevices.empty():
 				logging.error(
-					f"The device(s) {str(filteredDevices.get())} is(are) a match for {target}, but you don't have the necessary permission for access."
+				    f"The device(s) {str(filteredDevices.get())} is(are) a match for {target}, but you don't have the necessary permission for access."
 				)
 				logging.error("Use the following command and reboot: sudo usermod -a -G dialout $USER")
 				sys.exit(1)
@@ -47,9 +47,9 @@ if __name__ == "__main__":
 	parser.add_argument("--parity", choices=["none", "even", "odd", "mark", "space"], default="none", help="Parity.")
 	parser.add_argument("--stop_bits", type=float, default=1, help="Number of stop bits.")
 	parser.add_argument("--flow_control",
-		choices=["none", "xonxoff", "rtscts", "dsrdtr"],
-		default="none",
-		help="Flow control.")
+	                    choices=["none", "xonxoff", "rtscts", "dsrdtr"],
+	                    default="none",
+	                    help="Flow control.")
 	parser.add_argument("--target", choices=targets.keys(), default="esp32", help="Target.")
 	parser.add_argument("elf", type=str, help="Binary in ELF format to be executed.")
 	parser.add_argument("image", type=str, help="Binary image to be executed.")
@@ -61,17 +61,17 @@ if __name__ == "__main__":
 	logging.info(f"Programming {args.target} target through device {device}...")
 
 	commandArgs = str(target["args"]).format(
-		device=device,
-		memory=" ".join([
-		"0x{:x} {}".format(offset, f.format(binary=args.image))
-		for offset, f in target["memoryMap"].items()  # type: ignore
-		]))
+	    device=device,
+	    memory=" ".join([
+	        "0x{:x} {}".format(offset, f.format(binary=args.image))
+	        for offset, f in target["memoryMap"].items()  # type: ignore
+	    ]))
 
 	result = localPython(script="external/esptool/esptool.py",
-		args=shlex.split(commandArgs),
-		ignoreFailure=True,
-		stdout=True,
-		stderr=True)
+	                     args=shlex.split(commandArgs),
+	                     ignoreFailure=True,
+	                     stdout=True,
+	                     stderr=True)
 
 	if result.getReturnCode() != 0:
 		logging.error(f"Operation failed with return code {result.getReturnCode()}.")
@@ -80,9 +80,9 @@ if __name__ == "__main__":
 		sys.exit(1)
 
 	uart = Uart(device=device,
-		baudrate=args.baud_rate,
-		dataBits=args.data_bits,
-		stopBits=args.stop_bits,
-		parity=args.parity,
-		controlFlow=args.flow_control)
+	            baudrate=args.baud_rate,
+	            dataBits=args.data_bits,
+	            stopBits=args.stop_bits,
+	            parity=args.parity,
+	            controlFlow=args.flow_control)
 	uart.start()

@@ -41,9 +41,9 @@ class ItemLibrary(ItemPathOrString):
 class CommandExtractorGcc(CommandExtractor):
 
 	def __init__(self,
-		cwd: pathlib.Path,
-		includeSearchPaths: typing.List[pathlib.Path] = [],
-		libSearchPaths: typing.List[pathlib.Path] = []) -> None:
+	             cwd: pathlib.Path,
+	             includeSearchPaths: typing.List[pathlib.Path] = [],
+	             libSearchPaths: typing.List[pathlib.Path] = []) -> None:
 		super().__init__()
 		self.cwd = cwd
 		for path in [cwd] + includeSearchPaths:
@@ -125,26 +125,30 @@ class CommandExtractorGcc(CommandExtractor):
 	def parse(self, cmdString: str) -> None:  # type: ignore
 
 		super().parse(
-			cmdString, {
-			r'-L':
-			Processor(1, lambda factory, x: self.addSearchPath(Categories.librarySearchPath, pathlib.Path(x), factory)),
-			r'-l':
-			Processor(1, lambda factory, x: self.addLibrary(x, factory)),
-			r'-T':
-			Processor(1, lambda factory, x: self.addLinkerScript(x, factory)),
-			r'-I':
-			Processor(1, lambda factory, x: self.addSearchPath(Categories.includeSearchPath, pathlib.Path(x), factory)),
-			r'-o':
-			Processor(1, lambda factory, x: self.addOutputPath(x, factory)),
-			**self.generateItemString({
-			r"-u": Categories.undefine,
-			r"-D": Categories.define,
-			r"-W": Categories.warning,
-			r"-m": Categories.mode,
-			r"-f": Categories.flag,
-			r"-O": Categories.optimisation,
-			r"-g": Categories.debug,
-			r"-std": Categories.standard
-			}),
-			**self.generateItem({r"-c": Categories.compileOnly}),
-			}, self._fallback)
+		    cmdString, {
+		        r'-L':
+		            Processor(
+		                1,
+		                lambda factory, x: self.addSearchPath(Categories.librarySearchPath, pathlib.Path(x), factory)),
+		        r'-l':
+		            Processor(1, lambda factory, x: self.addLibrary(x, factory)),
+		        r'-T':
+		            Processor(1, lambda factory, x: self.addLinkerScript(x, factory)),
+		        r'-I':
+		            Processor(
+		                1,
+		                lambda factory, x: self.addSearchPath(Categories.includeSearchPath, pathlib.Path(x), factory)),
+		        r'-o':
+		            Processor(1, lambda factory, x: self.addOutputPath(x, factory)),
+		        **self.generateItemString({
+		            r"-u": Categories.undefine,
+		            r"-D": Categories.define,
+		            r"-W": Categories.warning,
+		            r"-m": Categories.mode,
+		            r"-f": Categories.flag,
+		            r"-O": Categories.optimisation,
+		            r"-g": Categories.debug,
+		            r"-std": Categories.standard
+		        }),
+		        **self.generateItem({r"-c": Categories.compileOnly}),
+		    }, self._fallback)

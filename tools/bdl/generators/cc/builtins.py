@@ -12,7 +12,7 @@ class IntegerType:
 
 	@staticmethod
 	def toType(entity: Symbol, nested: typing.List[str], reference: bool,
-		values: typing.Optional[typing.Sequence[str]]) -> TypeConversionCallableReturn:
+	           values: typing.Optional[typing.Sequence[str]]) -> TypeConversionCallableReturn:
 		maybeContractMin = entity.contracts.get("min")
 		isSigned = True if maybeContractMin is None or maybeContractMin.valueNumber < 0 else False
 		maybeContractMax = entity.contracts.get("max")
@@ -58,7 +58,7 @@ class ResultType:
 
 	@staticmethod
 	def toType(entity: Symbol, nested: typing.List[str], reference: bool,
-		values: typing.Optional[typing.Sequence[str]]) -> TypeConversionCallableReturn:
+	           values: typing.Optional[typing.Sequence[str]]) -> TypeConversionCallableReturn:
 
 		if len(nested) == 0:
 			nested.append("void")
@@ -73,7 +73,7 @@ class AsyncType:
 
 	@staticmethod
 	def toType(entity: Symbol, nested: typing.List[str], reference: bool,
-		values: typing.Optional[typing.Sequence[str]]) -> TypeConversionCallableReturn:
+	           values: typing.Optional[typing.Sequence[str]]) -> TypeConversionCallableReturn:
 
 		if len(nested) == 0:
 			nested.append("void")
@@ -119,7 +119,7 @@ class ArrayType:
 
 	@classmethod
 	def toType(cls, entity: Symbol, nested: typing.List[str], reference: bool,
-		values: typing.Optional[typing.List[str]]) -> TypeConversionCallableReturn:
+	           values: typing.Optional[typing.List[str]]) -> TypeConversionCallableReturn:
 
 		if reference:
 			return f"bzd::interface::{cls.name}", nested
@@ -142,16 +142,16 @@ class VectorType(ArrayType):
 
 
 builtins: typing.Dict[str, typing.Any] = {
-	"Any": AnyType,
-	"list": ListType,
-	"Integer": IntegerType,
-	"Float": FloatType,
-	"Void": VoidType,
-	"Byte": Byte,
-	"String": StringType,
-	"Span": SpanType,
-	"Array": ArrayType,
-	"Vector": VectorType,
-	"Result": ResultType,
-	"Callable": CallableType
+    "Any": AnyType,
+    "list": ListType,
+    "Integer": IntegerType,
+    "Float": FloatType,
+    "Void": VoidType,
+    "Byte": Byte,
+    "String": StringType,
+    "Span": SpanType,
+    "Array": ArrayType,
+    "Vector": VectorType,
+    "Result": ResultType,
+    "Callable": CallableType
 }

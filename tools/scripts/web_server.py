@@ -63,22 +63,23 @@ if __name__ == "__main__":
 
 	parser = argparse.ArgumentParser(description="Web server for testing purpose only.")
 	parser.add_argument("-u",
-		"--hostname",
-		dest="hostname",
-		default="0.0.0.0",
-		type=str,
-		help="The hostname to be used.")
+	                    "--hostname",
+	                    dest="hostname",
+	                    default="0.0.0.0",
+	                    type=str,
+	                    help="The hostname to be used.")
 	parser.add_argument("-p", "--port", dest="port", default=0, type=int, help="Port to be used.")
 	parser.add_argument("-r",
-		"--root",
-		dest="root",
-		default=None,
-		type=str,
-		help="Prefix path where the files to serve are located.")
-	parser.add_argument("path",
-		default=".",
-		nargs='?',
-		help="Serve files from this specific directory or archive, by default the current directory will be used.")
+	                    "--root",
+	                    dest="root",
+	                    default=None,
+	                    type=str,
+	                    help="Prefix path where the files to serve are located.")
+	parser.add_argument(
+	    "path",
+	    default=".",
+	    nargs='?',
+	    help="Serve files from this specific directory or archive, by default the current directory will be used.")
 
 	args = parser.parse_args()
 

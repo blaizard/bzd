@@ -17,9 +17,9 @@ def mypyWorker(package: str, stdout: TextIO) -> None:
 
 	# To support namespace, the package has to be passed
 	main(stdout=stdout,
-		stderr=stdout,
-		clean_exit=True,
-		args=["--config-file", configFile, "--strict", "--follow-imports", "normal", "--pretty", "-p", package])
+	     stderr=stdout,
+	     clean_exit=True,
+	     args=["--config-file", configFile, "--strict", "--follow-imports", "normal", "--pretty", "-p", package])
 
 
 if __name__ == "__main__":
@@ -29,7 +29,7 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 
 	files = Files(args.workspace, include=[
-		"**/*.py",
+	    "**/*.py",
 	], exclude=["**python/bzd/yaml**", "**_test.py"])
 
 	# Set the include paths

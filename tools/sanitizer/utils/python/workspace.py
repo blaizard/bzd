@@ -10,11 +10,11 @@ from gitignore_parser import parse_gitignore
 class Files:
 
 	def __init__(self,
-		path: Path,
-		include: Optional[List[str]] = None,
-		exclude: Optional[List[str]] = None,
-		excludeFile: Optional[str] = None,
-		useGitignore: bool = False) -> None:
+	             path: Path,
+	             include: Optional[List[str]] = None,
+	             exclude: Optional[List[str]] = None,
+	             excludeFile: Optional[str] = None,
+	             useGitignore: bool = False) -> None:
 		configRaw = Path(__file__).parent.parent.parent.joinpath(".sanitizer.json").read_text()
 		config = json.loads(configRaw)
 		self.path = path
@@ -32,7 +32,7 @@ class Files:
 			if workspace.joinpath("WORKSPACE").is_file():
 				return workspace
 			assert workspace != workspace.parent, "Could not find any workspace directory associated with {}".format(
-				path)
+			    path)
 			workspace = workspace.parent
 
 	def getWorkspace(self) -> Path:
@@ -69,12 +69,12 @@ class Files:
 			# Ignore symlinks and gitignore directories
 			if self.gitignoreMatches:
 				dirnames[:] = [
-					d for d in dirnames if not Path(dirpath).joinpath(d).is_symlink()
-					and not self.gitignoreMatches(Path(dirpath).joinpath(d).as_posix())
+				    d for d in dirnames if not Path(dirpath).joinpath(d).is_symlink()
+				    and not self.gitignoreMatches(Path(dirpath).joinpath(d).as_posix())
 				]
 				filenames[:] = [
-					d for d in filenames if not Path(dirpath).joinpath(d).is_symlink()
-					and not self.gitignoreMatches(Path(dirpath).joinpath(d).as_posix())
+				    d for d in filenames if not Path(dirpath).joinpath(d).is_symlink()
+				    and not self.gitignoreMatches(Path(dirpath).joinpath(d).as_posix())
 				]
 			for filename in filenames:
 				path = Path(dirpath).joinpath(filename)

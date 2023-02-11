@@ -165,8 +165,8 @@ class Composition:
 		self.generateUids()
 
 		compositionEntities = [
-			entity for fqn, entity in self.symbols.items(groups={Group.composition | Group.topLevel})
-			if isinstance(entity, Expression)
+		    entity for fqn, entity in self.symbols.items(groups={Group.composition | Group.topLevel})
+		    if isinstance(entity, Expression)
 		]
 
 		for entity in compositionEntities:

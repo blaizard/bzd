@@ -22,7 +22,7 @@ class Contract:
 				valueElement = ElementBuilder().setAttr("value", value)
 				contractElement.pushBackElementToNestedSequence(kind="values", element=valueElement)
 		ElementBuilder.cast(element, ElementBuilder).pushBackElementToNestedSequence(kind="contract",
-			element=contractElement)
+		                                                                             element=contractElement)
 
 	@property
 	def type(self) -> str:

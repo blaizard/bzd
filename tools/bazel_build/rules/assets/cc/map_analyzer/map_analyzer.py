@@ -15,7 +15,7 @@ AggregateConfigType = typing.Dict[str, typing.List[str]]
 
 
 def generateBerkeleyConfig(
-		filePath: pathlib.Path) -> typing.Optional[typing.Tuple[FilterConfigType, AggregateConfigType]]:
+        filePath: pathlib.Path) -> typing.Optional[typing.Tuple[FilterConfigType, AggregateConfigType]]:
 	"""
 	Classify sections to match berkeley respresentation:
 		remove: !SEC_ALLOC
@@ -33,12 +33,12 @@ def generateBerkeleyConfig(
 
 	filterConfig: FilterConfigType = []
 	aggregateConfig: AggregateConfigType = {
-		# text/code segment.
-		"text": [],
-		# data segment: typically contains initallized variables.
-		"data": [],
-		# block starting symbol: typically contains uninitallized variables.
-		"bss": []
+	    # text/code segment.
+	    "text": [],
+	    # data segment: typically contains initallized variables.
+	    "data": [],
+	    # block starting symbol: typically contains uninitallized variables.
+	    "bss": []
 	}
 
 	FLAG_SHF_WRITE = 0x1
@@ -84,12 +84,12 @@ def analyze(data: Parser) -> None:
 		if address:
 			if address in byAddresses:
 				print("Sections '{}' and '{}' are located at the same address: {:#08x}.".format(
-					section, byAddresses[address]["section"], address),
-					file=sys.stderr)
+				    section, byAddresses[address]["section"], address),
+				      file=sys.stderr)
 				continue
 			byAddresses[address] = {"size": obj.get("size"), "address": address, "section": section}
 	sortedByAddresses: typing.List[typing.Dict[str, typing.Any]] = sorted([obj for address, obj in byAddresses.items()],
-		key=lambda x: x["address"])  # type: ignore
+	                                                                      key=lambda x: x["address"])  # type: ignore
 
 	# Ensure there is no overlaps
 	addressEnd = 0
@@ -103,7 +103,7 @@ def analyze(data: Parser) -> None:
 		assert isinstance(address, int)
 		if address < addressEnd:
 			print("Section '{}'@{:#08x} overlaps with previous section '{}'.".format(section, address, previousSection),
-				file=sys.stderr)
+			      file=sys.stderr)
 
 		addressEnd = address + size
 		previousSection = section
@@ -151,12 +151,12 @@ if __name__ == '__main__':
 
 	with open(args.output, "w+") as f:
 		f.write(
-			json.dumps(
-			{"size_groups": {
-			"units": data.getByAggregatedUnits(),
-			"sections": data.getByAggregatedSections()
-			}},
-			indent=4,
-			sort_keys=True))
+		    json.dumps(
+		        {"size_groups": {
+		            "units": data.getByAggregatedUnits(),
+		            "sections": data.getByAggregatedSections()
+		        }},
+		        indent=4,
+		        sort_keys=True))
 
 	sys.exit(0)

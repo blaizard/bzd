@@ -8,24 +8,24 @@ from bzd.parser.fragments import Fragment, FragmentNestedStart, FragmentNestedSt
 
 _grammarComment = [GrammarItem(r"//(?P<comment>[^\n]*)", FragmentComment)]
 _grammarVariableDeclaration = [
-	GrammarItem(r"const", {"const": ""}),
-	GrammarItem(r"(?P<kind>int|float)", {"variable": ""}, [
-	GrammarItem(r"(?P<name>[a-zA-Z_]+)", Fragment, [
-	GrammarItem(r";", FragmentNewElement),
-	GrammarItem(r"=", Fragment,
-	[GrammarItem(r"(?P<value>[0-9]+)", Fragment, [
-	GrammarItem(r";", FragmentNewElement),
-	])])
-	]),
-	]),
+    GrammarItem(r"const", {"const": ""}),
+    GrammarItem(r"(?P<kind>int|float)", {"variable": ""}, [
+        GrammarItem(r"(?P<name>[a-zA-Z_]+)", Fragment, [
+            GrammarItem(r";", FragmentNewElement),
+            GrammarItem(r"=", Fragment,
+                        [GrammarItem(r"(?P<value>[0-9]+)", Fragment, [
+                            GrammarItem(r";", FragmentNewElement),
+                        ])])
+        ]),
+    ]),
 ]
 _grammarFunctionDeclaration = [
-	GrammarItem(r"(?P<return>void|int|float)", {"function": ""}, [
-	GrammarItem(r"(?P<name>[a-zA-Z_]+)\s*\(\s*\)", Fragment, [
-	GrammarItem(r"{", FragmentNestedStart,
-	_grammarVariableDeclaration + [GrammarItem(r"}", FragmentNestedStopNewElement)])
-	])
-	]),
+    GrammarItem(r"(?P<return>void|int|float)", {"function": ""}, [
+        GrammarItem(r"(?P<name>[a-zA-Z_]+)\s*\(\s*\)", Fragment, [
+            GrammarItem(r"{", FragmentNestedStart,
+                        _grammarVariableDeclaration + [GrammarItem(r"}", FragmentNestedStopNewElement)])
+        ])
+    ]),
 ]
 
 _grammar: Grammar = _grammarVariableDeclaration + _grammarFunctionDeclaration

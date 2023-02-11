@@ -59,8 +59,9 @@ class FixedTable:
 	A fixed table is a table which columns have a fixed width accross the rows.
 	"""
 
-	def __init__(self, separations: typing.List[int],
-		nameToIndex: typing.Optional[typing.Dict[str, int]] = None) -> None:
+	def __init__(self,
+	             separations: typing.List[int],
+	             nameToIndex: typing.Optional[typing.Dict[str, int]] = None) -> None:
 		self.separations = separations
 		self.nameToIndex = nameToIndex if nameToIndex else {}
 

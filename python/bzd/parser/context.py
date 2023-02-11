@@ -13,9 +13,9 @@ ContextDataType = typing.Union[pathlib.Path, str, "Sequence", "Element"]
 class Context:
 
 	def __init__(self,
-		path: typing.Optional[pathlib.Path] = None,
-		content: typing.Optional[str] = None,
-		parent: typing.Optional[typing.Union["Element", "Sequence"]] = None) -> None:
+	             path: typing.Optional[pathlib.Path] = None,
+	             content: typing.Optional[str] = None,
+	             parent: typing.Optional[typing.Union["Element", "Sequence"]] = None) -> None:
 		self.data: typing.Optional[ContextDataType] = None
 		self.content: typing.Optional[str] = content
 		if path is not None:
@@ -77,8 +77,8 @@ class Context:
 		return Context(path=None if path is None else pathlib.Path(path))
 
 	def resolve(self,
-		element: typing.Optional["Element"] = None,
-		attr: typing.Optional[str] = None) -> typing.Tuple["Context", int, int]:
+	            element: typing.Optional["Element"] = None,
+	            attr: typing.Optional[str] = None) -> typing.Tuple["Context", int, int]:
 		"""
 		Get the root context and indexes associated with this context, go up the parent chain if needed.
 		"""

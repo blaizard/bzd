@@ -53,7 +53,7 @@ class Worker:
 		self.context = _Context()
 		assert maxWorker
 		self.workerList = [
-			multiprocessing.Process(target=Worker._taskWrapper, args=(task, self.context)) for i in range(maxWorker)
+		    multiprocessing.Process(target=Worker._taskWrapper, args=(task, self.context)) for i in range(maxWorker)
 		]
 		self.expectedData = 0
 
@@ -97,7 +97,7 @@ class Worker:
 				else:
 					exceptionTypeStr = str(exceptionType)
 				stdout.write("Failed with exception of type '{}' and message: {}\n".format(
-					exceptionTypeStr, exceptionValue))
+				    exceptionTypeStr, exceptionValue))
 				stdout.write(traceback.format_exc())
 
 			context.output.put((isSuccess, result, stdout.getvalue(), workloadContext.data))

@@ -262,9 +262,9 @@ class Entity:
 		if self.underlyingTypeFQN:
 			underlyingType = resolver.getEntityResolved(fqn=self.underlyingTypeFQN).assertValue(element=self.element)
 			return Parameters(element=underlyingType.element,
-				NestedElementType=Using,
-				nestedKind=underlyingType.configAttr,
-				filterFct=lambda entity: entity.category == Category.using)
+			                  NestedElementType=Using,
+			                  nestedKind=underlyingType.configAttr,
+			                  filterFct=lambda entity: entity.category == Category.using)
 		return Parameters(element=self.element, NestedElementType=Using)
 
 	def getConfigValues(self, resolver: typing.Any) -> Parameters:
@@ -275,11 +275,11 @@ class Entity:
 		from tools.bdl.entities.impl.expression import Expression
 		if self.underlyingTypeFQN:
 			underlyingTypeEntity = resolver.getEntityResolved(fqn=self.underlyingTypeFQN).assertValue(
-				element=self.element)
+			    element=self.element)
 			return Parameters(element=underlyingTypeEntity.element,
-				NestedElementType=Expression,
-				nestedKind=underlyingTypeEntity.configAttr,
-				filterFct=lambda entity: entity.category == Category.expression)
+			                  NestedElementType=Expression,
+			                  nestedKind=underlyingTypeEntity.configAttr,
+			                  filterFct=lambda entity: entity.category == Category.expression)
 		return Parameters(element=self.element, NestedElementType=Expression)
 
 	def markAsResolved(self) -> None:
@@ -308,7 +308,7 @@ class Entity:
 		maybeSchema = self.contracts.validationForEntity
 		if maybeSchema:
 			resultValidate = Validation(schema=[maybeSchema], args={
-				"resolver": resolver
+			    "resolver": resolver
 			}).validate([self], output="return")
 			self.assertTrue(condition=bool(resultValidate), message=str(resultValidate))
 
@@ -327,18 +327,18 @@ class Entity:
 
 	def error(self, message: str, element: typing.Optional[Element] = None, throw: bool = True) -> str:
 		return Error.handleFromElement(element=self.element if element is None else element,
-			message=message,
-			throw=throw)
+		                               message=message,
+		                               throw=throw)
 
 	def assertTrue(self,
-		condition: bool,
-		message: str,
-		element: typing.Optional[Element] = None,
-		throw: bool = True) -> typing.Optional[str]:
+	               condition: bool,
+	               message: str,
+	               element: typing.Optional[Element] = None,
+	               throw: bool = True) -> typing.Optional[str]:
 		return Error.assertTrue(condition=condition,
-			element=self.element if element is None else element,
-			message=message,
-			throw=throw)
+		                        element=self.element if element is None else element,
+		                        message=message,
+		                        throw=throw)
 
 	def toString(self, attrs: typing.MutableMapping[str, typing.Optional[str]] = {}) -> str:
 		entities = ["{}=\"{}\"".format(key, value) for key, value in attrs.items() if value]
@@ -372,10 +372,10 @@ class EntityExpression(Entity):
 	@cached_property
 	def symbol(self) -> Symbol:
 		return Symbol(element=self.element,
-			kind="symbol",
-			underlyingTypeFQN="fqn_type",
-			template="template",
-			const="const")
+		              kind="symbol",
+		              underlyingTypeFQN="fqn_type",
+		              template="template",
+		              const="const")
 
 	@property
 	def isValue(self) -> bool:
@@ -421,10 +421,10 @@ class EntityExpression(Entity):
 	def __repr__(self) -> str:
 
 		return self.toString({
-			"name": self.name if self.isName else "",
-			"varArgs": "true" if self.isVarArgs else None,
-			"symbol": str(self.symbol) if self.isSymbol else None,
-			"value": str(self.value) if self.isValue else None,
-			"executor": self.executor,
-			"parameters": "[...]" if self.isParameters else None,
+		    "name": self.name if self.isName else "",
+		    "varArgs": "true" if self.isVarArgs else None,
+		    "symbol": str(self.symbol) if self.isSymbol else None,
+		    "value": str(self.value) if self.isValue else None,
+		    "executor": self.executor,
+		    "parameters": "[...]" if self.isParameters else None,
 		})

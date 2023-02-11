@@ -31,14 +31,14 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 	nestedKind = None
 
 	def __init__(self,
-		substitutions: typing.Union[SubstitutionsAccessor, SubstitutionWrapper],
-		includeDirs: typing.Sequence[pathlib.Path] = [pathlib.Path(__file__).parent.parent.parent.parent],
-		indent: bool = False) -> None:
+	             substitutions: typing.Union[SubstitutionsAccessor, SubstitutionWrapper],
+	             includeDirs: typing.Sequence[pathlib.Path] = [pathlib.Path(__file__).parent.parent.parent.parent],
+	             indent: bool = False) -> None:
 		# Re-use directly substitution wrapper if provided.
 		# This is needed by the include control block, as we want macros (for example) to be executed
 		# with the current substition object and not a copy at a given time.
 		self.substitutions = substitutions if isinstance(substitutions,
-			SubstitutionWrapper) else SubstitutionWrapper(substitutions)
+		                                                 SubstitutionWrapper) else SubstitutionWrapper(substitutions)
 		self.includeDirs = includeDirs
 		# Indent multiline substitution blocks to mmaatch the start of the block.
 		self.indent = indent
@@ -66,17 +66,17 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 				return value[key]
 			except:
 				raise Exception(
-					f"Substitution value for the key '{key}' does not exists. Value is: '{Error.valueExtract(value)}'")
+				    f"Substitution value for the key '{key}' does not exists. Value is: '{Error.valueExtract(value)}'")
 
 		operators: typing.Dict[str, typing.Callable[[typing.Any, typing.Any], typing.Any]] = {
-			"|": (lambda l, r: r(l)),
-			"==": (lambda l, r: l == r),
-			"!=": (lambda l, r: l != r),
-			">": (lambda l, r: l > r),
-			">=": (lambda l, r: l >= r),
-			"<": (lambda l, r: l < r),
-			"<=": (lambda l, r: l <= r),
-			"in": (lambda l, r: l in r),
+		    "|": (lambda l, r: r(l)),
+		    "==": (lambda l, r: l == r),
+		    "!=": (lambda l, r: l != r),
+		    ">": (lambda l, r: l > r),
+		    ">=": (lambda l, r: l >= r),
+		    "<": (lambda l, r: l < r),
+		    "<=": (lambda l, r: l <= r),
+		    "in": (lambda l, r: l in r),
 		}
 
 		operatorsUnary: typing.Dict[str, typing.Callable[[typing.Any], typing.Any]] = {"not": (lambda r: not r)}
@@ -160,9 +160,10 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 		value = self.resolveExpression(element.getNestedSequenceAssert("value"))
 
 		# Save the output
-		assert isinstance(value,
-			(int, float, str, pathlib.Path
-				)), f"The resulting substitued value must be a number, a string or a path, instead received {type(value)}."
+		assert isinstance(
+		    value,
+		    (int, float, str, pathlib.Path
+		     )), f"The resulting substitued value must be a number, a string or a path, instead received {type(value)}."
 		self.appendSubstitution(element=element, result=result, string=str(value))
 
 	def appendSubstitution(self, element: Element, result: ResultType, string: str) -> ResultType:
@@ -259,8 +260,9 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 
 		# Sanity check
 		Error.assertTrue(element=element,
-			condition=len(argList) == len(args),
-			message="Wrong number of argument(s), expected {}: {}".format(len(argList), ", ".join(argList)))
+		                 condition=len(argList) == len(args),
+		                 message="Wrong number of argument(s), expected {}: {}".format(
+		                     len(argList), ", ".join(argList)))
 
 		for i, name in enumerate(argList):
 			self.substitutions.register(element=element, key=name, value=args[i])
@@ -284,9 +286,9 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 
 		name = element.getAttr("name").value
 		Error.assertTrue(element=element,
-			attr="name",
-			condition=(name not in self.substitutions),
-			message="Name conflict with macro and an already existing name: '{}'.".format(name))
+		                 attr="name",
+		                 condition=(name not in self.substitutions),
+		                 message="Name conflict with macro and an already existing name: '{}'.".format(name))
 
 		# Register the macro
 		self.substitutions.register(element=element, key=name, value=lambda *args: self.processMacro(element, *args))
@@ -300,18 +302,18 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 		includePathStr = element.getAttr("value").value
 
 		Error.assertTrue(element=element,
-			condition=isinstance(includePathStr, str),
-			message="The include path must resolve into a string, instead: '{}'.".format(includePathStr))
+		                 condition=isinstance(includePathStr, str),
+		                 message="The include path must resolve into a string, instead: '{}'.".format(includePathStr))
 		path = pathlib.Path(includePathStr)
 		paths = [(base / path) for base in self.includeDirs if (base / path).is_file()]
 		Error.assertTrue(element=element,
-			condition=len(paths) > 0,
-			message="No valid file '{}' within {}".format(includePathStr,
-			str([f.as_posix() for f in self.includeDirs])))
+		                 condition=len(paths) > 0,
+		                 message="No valid file '{}' within {}".format(includePathStr,
+		                                                               str([f.as_posix() for f in self.includeDirs])))
 
 		template = bzd.template.template.Template(template=paths[0].read_text(),
-			includeDirs=self.includeDirs,
-			indent=self.indent)
+		                                          includeDirs=self.includeDirs,
+		                                          indent=self.indent)
 		result, substitutions = template._render(substitutions=self.substitutions)
 
 		# Update the current substitution object

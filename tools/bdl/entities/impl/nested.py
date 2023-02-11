@@ -30,10 +30,11 @@ class Nested(Entity):
 	def __init__(self, element: Element) -> None:
 
 		super().__init__(element, Role.Type)
-		self.assertTrue(condition=self.category in Nested.categoriesAllowed_,
-			message=
-			f"Unsupported nested type: '{self.category}', only the following are supported: {Nested.categoriesAllowed_}"
-						)
+		self.assertTrue(
+		    condition=self.category in Nested.categoriesAllowed_,
+		    message=
+		    f"Unsupported nested type: '{self.category}', only the following are supported: {Nested.categoriesAllowed_}"
+		)
 
 	@property
 	def configAttr(self) -> str:
@@ -74,19 +75,21 @@ class Nested(Entity):
 			elif underlyingType.category == Category.extern:
 				nestedCategory = underlyingType.type  # type: ignore
 			else:
-				self.error(message=
-					f"Inheritance can only be done from a nested class, not '{entity.underlyingTypeFQN}', category '{underlyingType.category}'."
-							)
+				self.error(
+				    message=
+				    f"Inheritance can only be done from a nested class, not '{entity.underlyingTypeFQN}', category '{underlyingType.category}'."
+				)
 
 			if self.category == Category.struct:
 				self.assertTrue(condition=nestedCategory == Category.struct,
-					message=f"A struct can only inherits from another struct, not '{nestedCategory}'.")
+				                message=f"A struct can only inherits from another struct, not '{nestedCategory}'.")
 			elif self.category == Category.interface:
-				self.assertTrue(condition=nestedCategory == Category.interface,
-					message=f"An interface can only inherits from another interface, not '{nestedCategory}'.")
+				self.assertTrue(
+				    condition=nestedCategory == Category.interface,
+				    message=f"An interface can only inherits from another interface, not '{nestedCategory}'.")
 			elif self.category == Category.component:
 				self.assertTrue(condition=nestedCategory in {Category.interface, Category.component},
-					message=f"A component can only inherits from interface(s), not '{nestedCategory}'.")
+				                message=f"A component can only inherits from interface(s), not '{nestedCategory}'.")
 			else:
 				self.error(message=f"Unsupported inheritance for type: '{self.category}'.")
 
@@ -102,18 +105,19 @@ class Nested(Entity):
 					assert isinstance(entity, EntityExpression)
 					if entity.isSymbol:
 						allowed = {
-							Category.struct, Category.builtin, Category.enum, Category.using, Category.expression
+						    Category.struct, Category.builtin, Category.enum, Category.using, Category.expression
 						}
-						entity.assertTrue(condition=(entity.symbol.category in allowed),
-							message=
-							f"Only {', '.join(str(c.value) for c in allowed)} can be used as expression in interfaces, not '{entity.symbol.category.value}'"
-											)
+						entity.assertTrue(
+						    condition=(entity.symbol.category in allowed),
+						    message=
+						    f"Only {', '.join(str(c.value) for c in allowed)} can be used as expression in interfaces, not '{entity.symbol.category.value}'"
+						)
 
 	def __repr__(self) -> str:
 		content = self.toString({
-			"name": self.name if self.isName else "",
-			"category": str(self.category),
-			"inheritance": ", ".join([str(t) for t in self.inheritanceList])
+		    "name": self.name if self.isName else "",
+		    "category": str(self.category),
+		    "inheritance": ", ".join([str(t) for t in self.inheritanceList])
 		})
 
 		for category in ["config", "interface", "composition"]:

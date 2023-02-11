@@ -13,8 +13,8 @@ compositions_ = {"cc": compositionCc}
 
 
 def preprocess(source: str,
-	namespace: typing.Optional[str] = None,
-	objectContext: typing.Optional[ObjectContext] = None) -> Object:
+               namespace: typing.Optional[str] = None,
+               objectContext: typing.Optional[ObjectContext] = None) -> Object:
 
 	objectContext = objectContext if objectContext is not None else ObjectContext()
 	assert objectContext
@@ -32,10 +32,10 @@ def generate(formatType: str, bdl: Object, data: typing.Optional[Path] = None) -
 
 
 def compose(formatType: str,
-	bdls: typing.Sequence[Object],
-	output: Path,
-	targets: typing.Set[str],
-	data: typing.Optional[Path] = None) -> None:
+            bdls: typing.Sequence[Object],
+            output: Path,
+            targets: typing.Set[str],
+            data: typing.Optional[Path] = None) -> None:
 
 	composition = Composition(targets=targets)
 	for bdl in bdls:
@@ -51,9 +51,9 @@ def compose(formatType: str,
 
 
 def main(formatType: str,
-	source: str,
-	objectContext: typing.Optional[ObjectContext] = None,
-	data: typing.Optional[Path] = None) -> str:
+         source: str,
+         objectContext: typing.Optional[ObjectContext] = None,
+         data: typing.Optional[Path] = None) -> str:
 
 	bdl = preprocess(source=source, objectContext=objectContext)
 	return generate(formatType=formatType, bdl=bdl, data=data)

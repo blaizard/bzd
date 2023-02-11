@@ -92,13 +92,13 @@ class Error:
 		paddingLine = re.sub(r"[^\s]", " ", contentByLine[line])
 		contentByLine.insert(line + 1, "{padding}^".format(padding=paddingLine[0:column]))
 		contentByLine.insert(
-			line + 2, "{path}:{line}:{column}: {colorBegin}error: {message}{colorEnd}".format(
-			path="<string>" if context.path is None else context.path,
-			line=line + 1,
-			column=column + 1,
-			colorBegin=colorBegin,
-			message=message,
-			colorEnd=colorEnd))
+		    line + 2, "{path}:{line}:{column}: {colorBegin}error: {message}{colorEnd}".format(
+		        path="<string>" if context.path is None else context.path,
+		        line=line + 1,
+		        column=column + 1,
+		        colorBegin=colorBegin,
+		        message=message,
+		        colorEnd=colorEnd))
 
 		return "\n" + "\n".join(contentByLine[max(0, line - 1):endLine + 3])
 
@@ -116,9 +116,9 @@ class Error:
 
 	@staticmethod
 	def handleFromElement(element: Element,
-		attr: typing.Optional[str] = None,
-		message: str = "Error",
-		throw: bool = True) -> str:
+	                      attr: typing.Optional[str] = None,
+	                      message: str = "Error",
+	                      throw: bool = True) -> str:
 		message = Error.toStringFromElement(element=element, attr=attr, message=message)
 		if throw:
 			raise ExceptionParser(message=message)
@@ -126,10 +126,10 @@ class Error:
 
 	@staticmethod
 	def assertTrue(element: Element,
-		condition: bool,
-		message: str,
-		attr: typing.Optional[str] = None,
-		throw: bool = True) -> typing.Optional[str]:
+	               condition: bool,
+	               message: str,
+	               attr: typing.Optional[str] = None,
+	               throw: bool = True) -> typing.Optional[str]:
 		"""
 		Ensures a specific condition evaluates to True.
 		"""
@@ -146,9 +146,9 @@ class Error:
 
 		if not element.isAttr(attr):
 			return Error.handleFromElement(element=element,
-				attr=None,
-				message="Mising mandatory attribute '{}'.".format(attr),
-				throw=throw)
+			                               attr=None,
+			                               message="Mising mandatory attribute '{}'.".format(attr),
+			                               throw=throw)
 		return None
 
 	@staticmethod
@@ -159,7 +159,7 @@ class Error:
 
 		if not element.isNestedSequence(sequence):
 			return Error.handleFromElement(element=element,
-				attr=None,
-				message="Mising mandatory sequence '{}'.".format(sequence),
-				throw=throw)
+			                               attr=None,
+			                               message="Mising mandatory sequence '{}'.".format(sequence),
+			                               throw=throw)
 		return None

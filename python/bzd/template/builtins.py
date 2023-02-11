@@ -10,8 +10,9 @@ class BuiltinsBtl:
 
 		assert len(args) > 1, "The builtin function 'merge' requires at least 2 arguments."
 		first = args[0]
-		assert all(isinstance(i, type(first))
-			for i in args[1:]), "The builtin function 'merge' requires all its elements to be of identical types."
+		assert all(
+		    isinstance(i, type(first))
+		    for i in args[1:]), "The builtin function 'merge' requires all its elements to be of identical types."
 
 		if isinstance(first, list):
 			return sum(args, [])

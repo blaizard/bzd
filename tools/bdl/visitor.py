@@ -94,8 +94,8 @@ class Visitor(VisitorBase[T, T]):
 	nestedKind = None
 
 	def __init__(self,
-		namespace: typing.Optional[str] = None,
-		elementToEntityExtenstion: typing.Optional[typing.Dict[str, typing.Type[EntityType]]] = None) -> None:
+	             namespace: typing.Optional[str] = None,
+	             elementToEntityExtenstion: typing.Optional[typing.Dict[str, typing.Type[EntityType]]] = None) -> None:
 		"""Create a visitor for the bdl grammar.
 		
 		Args:
@@ -140,9 +140,9 @@ class Visitor(VisitorBase[T, T]):
 		"""Convert a nested sequence type into a group."""
 
 		return {
-			NestedSequence.composition: Group.composition,
-			NestedSequence.interface: Group.interface,
-			NestedSequence.config: Group.config,
+		    NestedSequence.composition: Group.composition,
+		    NestedSequence.interface: Group.interface,
+		    NestedSequence.config: Group.config,
 		}[nested]
 
 	def visitElement(self, element: Element, result: T) -> T:
@@ -159,9 +159,9 @@ class Visitor(VisitorBase[T, T]):
 				self.level += 1
 
 				entity.assertTrue(
-					condition=not element.isNestedSequence("invalid")
-					or element.getNestedSequence("invalid").empty(),  # type: ignore
-					message=f"This element '{entity.category}' does not support direct nested scope.")
+				    condition=not element.isNestedSequence("invalid")
+				    or element.getNestedSequence("invalid").empty(),  # type: ignore
+				    message=f"This element '{entity.category}' does not support direct nested scope.")
 				for nested in NestedSequence:
 					sequence = element.getNestedSequence(nested.value)
 					if sequence is not None:
@@ -203,8 +203,8 @@ class Visitor(VisitorBase[T, T]):
 			elif isinstance(entity, Namespace):
 
 				Error.assertTrue(element=element,
-					condition=(self.level == 0),
-					message="Namespaces can only be declared at top level.")
+				                 condition=(self.level == 0),
+				                 message="Namespaces can only be declared at top level.")
 
 				self.visitNamespace(entity, result)
 

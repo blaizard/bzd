@@ -38,11 +38,11 @@ class Method(Entity):
 	@cached_property
 	def symbol(self) -> typing.Optional[Symbol]:
 		return Symbol(element=self.element,
-			kind="symbol",
-			underlyingTypeFQN="fqn_return_type",
-			template="template",
-			contract="contract_return",
-			const="const") if self.isSymbol else None
+		              kind="symbol",
+		              underlyingTypeFQN="fqn_return_type",
+		              template="template",
+		              contract="contract_return",
+		              const="const") if self.isSymbol else None
 
 	def resolve(self, resolver: typing.Any) -> None:
 		"""
@@ -60,7 +60,7 @@ class Method(Entity):
 		# Validate the type of arguments.
 		parameterTypeCategories = {*self.parameters.getUnderlyingTypeCategories(resolver)}
 		self.assertTrue(condition=Category.component not in parameterTypeCategories,
-			message=f"Components are not allowed as method parameter.")
+		                message=f"Components are not allowed as method parameter.")
 
 		super().resolve(resolver)
 

@@ -135,7 +135,7 @@ class ProcessedSchema:
 		self.type = constraint
 
 	def install(self, constraints: typing.Dict[str, typing.Type[Constraint]], name: str,
-		args: typing.List[str]) -> None:
+	            args: typing.List[str]) -> None:
 		"""
 		Install a new constraint.
 		"""

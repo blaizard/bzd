@@ -79,12 +79,12 @@ class Factory(ABC):
 		"""Render a template."""
 
 		configs = {
-			config.name: config
-			for config in
-			[self.getConfigNormal(),
-			self.getConfigStress(),
-			self.getConfigCoverage(),
-			self.getConfigSanitizer()] if config is not None
+		    config.name: config
+		    for config in
+		    [self.getConfigNormal(),
+		     self.getConfigStress(),
+		     self.getConfigCoverage(),
+		     self.getConfigSanitizer()] if config is not None
 		}
 
 		rawData = json.loads(pathlib.Path("tools/ci/stages.json").read_text())

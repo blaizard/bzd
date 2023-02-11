@@ -21,10 +21,10 @@ class ElementBuilder(Element):
 		return self
 
 	def addConfigValue(self,
-		kind: typing.Optional[str] = None,
-		literal: typing.Optional[str] = None,
-		name: typing.Optional[str] = None,
-		contract: typing.Optional[str] = None) -> "ElementBuilder":
+	                   kind: typing.Optional[str] = None,
+	                   literal: typing.Optional[str] = None,
+	                   name: typing.Optional[str] = None,
+	                   contract: typing.Optional[str] = None) -> "ElementBuilder":
 		"""
 		Create a configuration entry
 		"""
