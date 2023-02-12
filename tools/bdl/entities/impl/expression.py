@@ -14,7 +14,7 @@ from tools.bdl.entities.impl.fragment.parameters_resolved import ParametersResol
 from tools.bdl.entities.impl.fragment.fqn import FQN
 from tools.bdl.entities.impl.entity import Entity, EntityExpression, Role
 from tools.bdl.entities.impl.types import Category
-from tools.bdl.entities.impl.fragment.expression_fragment import ExpressionFragment
+from tools.bdl.entities.impl.fragment.expression_fragment import ExpressionFragment, OperatorFragment
 
 if typing.TYPE_CHECKING:
 	from tools.bdl.visitors.symbol_map import Resolver
@@ -89,17 +89,62 @@ class Expression(EntityExpression):
 
 		return dependencies
 
-	def processFragments(self, resolver: "Resolver") -> None:
+	def resolveFragments(self, resolver: "Resolver") -> None:
 		"""Process fragments to build a value or a symbol."""
 
 		self.assertTrue(condition=self.element.isNestedSequence("fragments"),
 		                message=f"Missing nested sequence 'fragment' for: {self.element}")
 
-		self.assertTrue(condition=len(self.fragments) == 1, message=f"This expression must have a single fragment.")
-		for fragment in self.fragments:
+		# Resolve all fragments
+		fragments = self.fragments
+		for fragment in fragments:
 			fragment.resolve(resolver=resolver)
 
-		fragment.toElement(self.element)
+		operatorsPrecedence = [
+		    ("unary", {"-", "+"}),
+		    ("binary", {"*", "/"}),
+		    ("binary", {"+", "-"}),
+		]
+
+		for kind, operators in operatorsPrecedence:
+
+			fragmentPrevious: typing.Optional[ExpressionFragment] = None
+			index = 0
+			while index < len(fragments):
+
+				fragment = fragments[index]
+				fragmentNext: typing.Optional[ExpressionFragment] = fragments[index +
+				                                                              1] if index + 1 < len(fragments) else None
+				if isinstance(fragment, OperatorFragment) and fragment.operator in operators:
+
+					# Look for operators that are preceded with another operator or at the begining.
+					isUnary = kind == "unary"
+					isUnary &= fragmentPrevious is None or isinstance(fragmentPrevious, OperatorFragment)
+					isUnary &= fragmentNext is not None and not isinstance(fragmentNext, OperatorFragment)
+					if isUnary:
+						assert fragmentNext
+						fragmentNext.unary(fragment)
+						del fragments[index]
+						index += 1
+						fragmentPrevious = fragment
+						continue
+
+					# Look for operators that are between 2 non-operators.
+					isBinary = kind == "binary"
+					isBinary &= fragmentPrevious is not None and not isinstance(fragmentPrevious, OperatorFragment)
+					isBinary &= fragmentNext is not None and not isinstance(fragmentNext, OperatorFragment)
+					if isBinary:
+						assert fragmentPrevious
+						assert fragmentNext
+						fragmentPrevious.binary(fragment, fragmentNext)
+						del fragments[index:index + 2]
+						continue
+
+				index += 1
+				fragmentPrevious = fragment
+
+		self.assertTrue(condition=len(fragments) == 1, message=f"This expression is malformed: {fragments}")
+		fragments[0].toElement(self.element)
 
 	def resolve(self, resolver: "Resolver") -> None:
 		"""Resolve entities."""
@@ -109,7 +154,7 @@ class Expression(EntityExpression):
 			self.interfaceType.resolve(resolver=resolver)
 			# TODO: Ensure that the interface is part of the parent type.
 
-		self.processFragments(resolver=resolver)
+		self.resolveFragments(resolver=resolver)
 
 		# If it holds a value, it is considered a literal.
 		if self.isValue:

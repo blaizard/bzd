@@ -405,6 +405,35 @@ class TestRun(unittest.TestCase):
 		assert isinstance(val1, Expression)
 		self.assertTrue(val1.isRValue)
 
+		bdl = Object.fromContent(content="""
+				composition MyComposition { val1 = -1; val2 = +23; }
+				""",
+		                         objectContext=ObjectContext(resolve=True, composition=True))
+		val1 = bdl.entity("MyComposition.val1")
+		assert isinstance(val1, Expression)
+		self.assertEqual(val1.literal, "-1")
+		val2 = bdl.entity("MyComposition.val2")
+		assert isinstance(val2, Expression)
+		self.assertEqual(val2.literal, "23")
+
+		bdl = Object.fromContent(content="""
+				composition MyComposition {
+					val1 = 2 + 4;
+					val2 = 2 - 4;
+					val3 = val1 + val2 - 7 + -3;
+					val4 = val1 + val2 * 7;
+				}
+				""",
+		                         objectContext=ObjectContext(resolve=True, composition=True))
+		val1 = bdl.entity("MyComposition.val1")
+		self.assertEqual(val1.literal, "6")
+		val2 = bdl.entity("MyComposition.val2")
+		self.assertEqual(val2.literal, "-2")
+		val3 = bdl.entity("MyComposition.val3")
+		self.assertEqual(val3.literal, "-6")
+		val4 = bdl.entity("MyComposition.val4")
+		self.assertEqual(val4.literal, "-8")
+
 	def testTemplates(self) -> None:
 
 		# Mandatory template.

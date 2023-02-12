@@ -16,6 +16,8 @@ _regexprNameOrVarArgs = r"(?P<name>" + _regexprBaseName + r"(?:\.\.\.)?)"
 _regexprValue = r"(?P<value>\".*?(?<!\\)\"|-?[0-9]+(?:\.[0-9]*)?|true|false)"
 # Match string
 _regexprString = r"\"(?P<value>.*?)\""
+# Match operator
+_regexprOperator = r"(?P<operator>[\+\-\\\*])"
 
 
 # Match any type of symbol except protected types
@@ -150,8 +152,11 @@ def makeGrammarExpressionFragment(finalGrammar: Grammar = [GrammarItem(r";", Fra
 		grammarValue: Grammar = []
 		grammarWrapper: Grammar = [GrammarItem("", FragmentsStart, grammarValue)]
 
+		# Test for operator
+		grammarValue.append(GrammarItem(_regexprOperator, FragmentNewElement, grammarValue))
+
 		# Test for value
-		grammarValue.extend([GrammarItem(_regexprValue, Fragment, grammarValue)])
+		grammarValue.append(GrammarItem(_regexprValue, FragmentNewElement, grammarValue))
 
 		# Test for symbol
 		grammarValue.extend(
@@ -167,7 +172,7 @@ def makeGrammarExpressionFragment(finalGrammar: Grammar = [GrammarItem(r";", Fra
 		                    grammarWrapper if nested is None else nested,
 		                ])
 		            ]),
-		        grammarValue,
+		        GrammarItem("", FragmentNewElement, grammarValue)
 		    ]))
 
 		# End

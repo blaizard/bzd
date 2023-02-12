@@ -146,6 +146,15 @@ class Entity:
 		return self.element.getAttrValue("fqn_value")
 
 	@property
+	def isOperator(self) -> bool:
+		"""Check if it has an operator."""
+		return self.element.isAttr("operator")
+
+	@property
+	def operator(self) -> str:
+		return self.element.getAttr("operator").value
+
+	@property
 	def isLiteral(self) -> bool:
 		"""Check if a value has a literal underlying value."""
 		return self.element.isAttr("literal")
@@ -156,6 +165,28 @@ class Entity:
 		Get the underlying literal value if any.
 		"""
 		return self.element.getAttrValue("literal")
+
+	@property
+	def literalNative(self) -> typing.Optional[typing.Union[int, float, str, bool]]:
+		"""
+		Get the underlying literal value if any within its native type.
+		"""
+
+		literal = self.literal
+		if literal is None:
+			return None
+		if literal == "true":
+			return True
+		if literal == "false":
+			return False
+		if literal.startswith("\""):
+			assert literal.endswith(
+			    "\""), f"If a literal starts with \", it also must end with \", instead received: '{literal}'."
+			return literal[1:-1]
+		converted = float(literal)
+		if converted.is_integer():
+			return int(converted)
+		return converted
 
 	def getEntityUnderlyingTypeResolved(self, resolver: "Resolver") -> "EntityType":
 		"""
@@ -425,6 +456,7 @@ class EntityExpression(Entity):
 		    "varArgs": "true" if self.isVarArgs else None,
 		    "symbol": str(self.symbol) if self.isSymbol else None,
 		    "value": str(self.value) if self.isValue else None,
+		    "operator": str(self.operator) if self.isOperator else None,
 		    "executor": self.executor,
 		    "parameters": "[...]" if self.isParameters else None,
 		})

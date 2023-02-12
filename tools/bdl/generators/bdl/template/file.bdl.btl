@@ -44,11 +44,14 @@ composition:
 
 {%- macro declareExpressionFragments(fragments) -%}
 	{%- for fragment in fragments %}
+		{%- if not loop.first %} {% end %}
 		{%- if fragment.isValue %}
 			{{- fragment.value }}
 		{%- elif fragment.isSymbol %}
 			{{- fragment.symbol | symbolToStr }}
 			{%- if fragment.isParameters %}({{ printParameters(fragment.parameters) }}){% end %}
+		{%- elif fragment.isOperator %}
+			{{- fragment.operator }}
 		{%- end %}
 	{%- end %}
 {%- end -%}

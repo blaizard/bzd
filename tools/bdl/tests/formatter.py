@@ -38,6 +38,10 @@ varInitialized= MyType(   42 );
 
 	method myMethod() -> Integer;
 }
+composition 
+{
+	var1 = 12 + ab.int32;
+	}
 """)
 		output = formatBdl(bdl)
 
@@ -58,7 +62,10 @@ interface MyFy {
 	varConst = const MyType<T> [/*Immer*/integer];
 	varInitialized = MyType(42);
 	method myMethod() -> Integer;
+}
 
+composition {
+	var1 = 12 + ab.int32;
 }"""))
 
 
