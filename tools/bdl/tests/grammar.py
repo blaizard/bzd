@@ -7,6 +7,8 @@ from tools.bdl.grammar import Parser
 
 class TestRun(unittest.TestCase):
 
+	maxDiff = 4096
+
 	def _clearSertializedForCompare(self, sequence: typing.List[typing.Any]) -> None:
 		for element in sequence:
 			for key in element.keys():
@@ -307,7 +309,11 @@ class TestRun(unittest.TestCase):
 		            },
 		            "fragments": [{
 		                "@": {
-		                    "value": "-2.5"
+		                    "operator": "-"
+		                }
+		            }, {
+		                "@": {
+		                    "value": "2.5"
 		                }
 		            }]
 		        }]
@@ -341,7 +347,11 @@ class TestRun(unittest.TestCase):
 		            },
 		            "fragments": [{
 		                "@": {
-		                    "value": "-2.5"
+		                    "operator": "-"
+		                },
+		            }, {
+		                "@": {
+		                    "value": "2.5"
 		                },
 		            }]
 		        }, {
@@ -560,6 +570,105 @@ class TestRun(unittest.TestCase):
 		        }],
 		        "argument": []
 		    }]
+		}])
+
+		parser = Parser(content="var1 = 12 + 9;")
+		self.assertParserEqual(parser, [{
+		    '@': {
+		        'category': 'expression',
+		        'interface': None,
+		        'name': 'var1'
+		    },
+		    'fragments': [{
+		        '@': {
+		            'value': '12'
+		        }
+		    }, {
+		        '@': {
+		            'operator': '+'
+		        }
+		    }, {
+		        '@': {
+		            'value': '9'
+		        }
+		    }]
+		}])
+
+		parser = Parser(content="var3 = var1 - var2;")
+		self.assertParserEqual(parser, [{
+		    '@': {
+		        'category': 'expression',
+		        'interface': None,
+		        'name': 'var3'
+		    },
+		    'fragments': [{
+		        '@': {
+		            'symbol': 'var1'
+		        }
+		    }, {
+		        '@': {
+		            'operator': '-'
+		        }
+		    }, {
+		        '@': {
+		            'symbol': 'var2'
+		        }
+		    }]
+		}])
+
+		parser = Parser(content="var3 = var1(12) * var2(13, 14);")
+		self.assertParserEqual(parser, [{
+		    '@': {
+		        'category': 'expression',
+		        'interface': None,
+		        'name': 'var3'
+		    },
+		    'fragments': [
+		        {
+		            '@': {
+		                'symbol': 'var1'
+		            },
+		            "argument": [{
+		                '@': {
+		                    'category': 'expression',
+		                },
+		                'fragments': [{
+		                    "@": {
+		                        'value': '12'
+		                    }
+		                }, ]
+		            }]
+		        },
+		        {
+		            '@': {
+		                'operator': '*'
+		            }
+		        },
+		        {
+		            '@': {
+		                'symbol': 'var2'
+		            },
+		            "argument": [{
+		                '@': {
+		                    'category': 'expression',
+		                },
+		                'fragments': [{
+		                    "@": {
+		                        'value': '13'
+		                    }
+		                }, ]
+		            }, {
+		                '@': {
+		                    'category': 'expression',
+		                },
+		                'fragments': [{
+		                    "@": {
+		                        'value': '14'
+		                    }
+		                }, ]
+		            }]
+		        },
+		    ]
 		}])
 
 

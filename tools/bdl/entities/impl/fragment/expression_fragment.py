@@ -28,6 +28,8 @@ class ExpressionFragment(EntityExpression):
 			return ValueFragment(element)
 		elif element.isAttr("symbol"):
 			return SymbolFragment(element)
+		elif element.isAttr("operator"):
+			return OperatorFragment(element)
 
 		ExpressionFragment(element).error(message=f"Unsupported expression fragment for element: '{element}'.")
 
@@ -54,11 +56,51 @@ class ExpressionFragment(EntityExpression):
 		contracts = Contracts(element=element, sequenceKind="contract")
 		contracts.resolve(self.contracts)
 
+	def unary(self, operator: "OperatorFragment") -> None:
+		"""Support for unary operators."""
+
+		literal = self.literalNative
+		self.assertTrue(condition=isinstance(literal, (int, float)),
+		                message="Unary operators can only be used with numbers.")
+		if operator.operator == '+':
+			pass
+		elif operator.operator == '-':
+			self._setLiteral(str(-literal)) # type: ignore
+		else:
+			self.error(f"Unsupported unary operator '{operator.operator}'.")
+
+	def binary(self, operator: "OperatorFragment", fragment: "ExpressionFragment") -> None:
+		"""Support for binary operators."""
+
+		literal1 = self.literalNative
+		literal2 = fragment.literalNative
+		self.assertTrue(condition=isinstance(literal1, (int, float)),
+		                message="Bainry operators can only be used with numbers.")
+		fragment.assertTrue(condition=isinstance(literal2, (int, float)),
+		                    message="Bainry operators can only be used with numbers.")
+		if operator.operator == '+':
+			self._setLiteral(str(literal1 + literal2)) # type: ignore
+		elif operator.operator == '-':
+			self._setLiteral(str(literal1 - literal2)) # type: ignore
+		elif operator.operator == '*':
+			self._setLiteral(str(literal1 * literal2)) # type: ignore
+		elif operator.operator == '/':
+			self._setLiteral(str(literal1 / literal2)) # type: ignore
+		else:
+			self.error(f"Unsupported binary operator '{operator.operator}'.")
+
 
 class ValueFragment(ExpressionFragment):
 
 	def resolve(self, resolver: "Resolver") -> None:
 		self._setLiteral(self.value)
+
+
+class OperatorFragment(ExpressionFragment):
+
+	@property
+	def operator(self) -> str:
+		return self.element.getAttr("operator").value
 
 
 class SymbolFragment(ExpressionFragment):
