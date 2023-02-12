@@ -43,9 +43,7 @@ def _inlineComment(comment: typing.Optional[str]) -> str:
 def _normalComment(comment: typing.Optional[str]) -> str:
 	if comment is None:
 		return ""
-	if len(comment.split("\n")) > 1:
-		return "/*\n{comment}\n */\n".format(comment="\n".join([" * {}".format(line) for line in comment.split("\n")]))
-	return "// {comment}\n".format(comment=comment)
+	return "".join([f"// {line}\n" for line in comment.split("\n")])
 
 
 def _inheritanceToStr(inheritanceList: typing.List[Symbol]) -> str:
