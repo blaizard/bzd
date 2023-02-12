@@ -16,6 +16,8 @@ _regexprNameOrVarArgs = r"(?P<name>" + _regexprBaseName + r"(?:\.\.\.)?)"
 _regexprValue = r"(?P<value>\".*?(?<!\\)\"|-?[0-9]+(?:\.[0-9]*)?|true|false)"
 # Match string
 _regexprString = r"\"(?P<value>.*?)\""
+# Match regular expression
+_regexprRegexpr = r"/(?P<regexpr>[^\s]+)/"
 # Match operator
 _regexprOperator = r"(?P<operator>[\+\-\\\*])"
 
@@ -152,13 +154,16 @@ def makeGrammarExpressionFragment(finalGrammar: Grammar = [GrammarItem(r";", Fra
 		grammarValue: Grammar = []
 		grammarWrapper: Grammar = [GrammarItem("", FragmentsStart, grammarValue)]
 
-		# Test for operator
+		# Test for regular expression (must be before operator as it will match with '/').
+		grammarValue.append(GrammarItem(_regexprRegexpr, FragmentNewElement, grammarValue))
+
+		# Test for operator.
 		grammarValue.append(GrammarItem(_regexprOperator, FragmentNewElement, grammarValue))
 
-		# Test for value
+		# Test for value.
 		grammarValue.append(GrammarItem(_regexprValue, FragmentNewElement, grammarValue))
 
-		# Test for symbol
+		# Test for symbol.
 		grammarValue.extend(
 		    makeGrammarSymbol([
 		        GrammarItem(

@@ -1,4 +1,5 @@
 import typing
+import re
 from functools import cached_property
 
 from bzd.parser.element import Element, ElementBuilder
@@ -30,6 +31,8 @@ class ExpressionFragment(EntityExpression):
 			return SymbolFragment(element)
 		elif element.isAttr("operator"):
 			return OperatorFragment(element)
+		elif element.isAttr("regexpr"):
+			return RegexprFragment(element)
 
 		ExpressionFragment(element).error(message=f"Unsupported expression fragment for element: '{element}'.")
 
@@ -90,17 +93,27 @@ class ExpressionFragment(EntityExpression):
 			self.error(f"Unsupported binary operator '{operator.operator}'.")
 
 
+class OperatorFragment(ExpressionFragment):
+	pass
+
+
 class ValueFragment(ExpressionFragment):
 
 	def resolve(self, resolver: "Resolver") -> None:
 		self._setLiteral(self.value)
 
 
-class OperatorFragment(ExpressionFragment):
+class RegexprFragment(ExpressionFragment):
 
 	@property
-	def operator(self) -> str:
-		return self.element.getAttr("operator").value
+	def regexpr(self) -> str:
+		return self.element.getAttr("regexpr").value
+
+	def resolve(self, resolver: "Resolver") -> None:
+		try:
+			re.compile(self.regexpr)
+		except re.error:
+			self.error("Invalid regular expression.")
 
 
 class SymbolFragment(ExpressionFragment):

@@ -33,6 +33,10 @@
             "name": "storage.modifier.const"
         },
         {
+            "match": "/[^\\s]+/",
+            "name": "string.regexp"
+        },
+        {
             "begin": "/\\*",
             "end": "\\*/",
             "name": "comment.block"
