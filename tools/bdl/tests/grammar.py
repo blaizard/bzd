@@ -671,6 +671,28 @@ class TestRun(unittest.TestCase):
 		    ]
 		}])
 
+		parser = Parser(content="reg1 = /a\\..*/ - /a\\.b\\..*/;")
+		self.assertParserEqual(parser, [{
+		    '@': {
+		        'category': 'expression',
+		        'interface': None,
+		        'name': 'reg1'
+		    },
+		    'fragments': [{
+		        '@': {
+		            'regexpr': 'a\\..*'
+		        }
+		    }, {
+		        '@': {
+		            'operator': '-'
+		        }
+		    }, {
+		        '@': {
+		            'regexpr': 'a\\.b\\..*'
+		        }
+		    }]
+		}])
+
 
 if __name__ == '__main__':
 	unittest.main()
