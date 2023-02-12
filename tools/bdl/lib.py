@@ -11,6 +11,7 @@ from tools.bdl.object import Object, ObjectContext
 formatters = {"bdl": formatBdl, "cc": formatCc}
 compositions_ = {"cc": compositionCc}
 
+
 def preprocess(source: str,
                namespace: typing.Optional[str] = None,
                objectContext: typing.Optional[ObjectContext] = None) -> Object:

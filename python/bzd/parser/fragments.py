@@ -111,7 +111,7 @@ class FragmentComment(Fragment):
 			if key in attrs:
 				attrs[key] = AttributeParser(index=IGNORE_INDEX_VALUE,
 				                             end=0,
-				                             value=attrs[key].value + "\n\n{}".format(updatedValue))
+				                             value=attrs[key].value + "\n{}".format(updatedValue))
 			else:
 				attrs[key] = AttributeParser(index=IGNORE_INDEX_VALUE, end=0, value=updatedValue)
 
