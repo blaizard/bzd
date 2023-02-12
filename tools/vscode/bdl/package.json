@@ -28,7 +28,7 @@
         ]
     },
     "description": "Syntax highlighting for .bdl & .btl language.",
-    "displayName": "::bzd",
+    "displayName": "bzd",
     "engines": {
         "vscode": "*"
     },
@@ -37,7 +37,7 @@
     "publisher": "Blaizard",
     "repository": {
         "type": "git",
-        "url": "https://github.com/blaizard/cpp-async.git"
+        "url": "https://github.com/blaizard/bzd.git"
     },
     "version": "1.0.0"
 }

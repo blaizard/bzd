@@ -25,6 +25,10 @@
             "name": "keyword.control"
         },
         {
+            "match": "extern",
+            "name": "keyword.control"
+        },
+        {
             "match": "const",
             "name": "storage.modifier.const"
         },
