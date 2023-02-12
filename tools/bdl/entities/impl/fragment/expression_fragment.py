@@ -65,7 +65,7 @@ class ExpressionFragment(EntityExpression):
 		if operator.operator == '+':
 			pass
 		elif operator.operator == '-':
-			self._setLiteral(str(-literal)) # type: ignore
+			self._setLiteral(str(-literal))  # type: ignore
 		else:
 			self.error(f"Unsupported unary operator '{operator.operator}'.")
 
@@ -79,13 +79,13 @@ class ExpressionFragment(EntityExpression):
 		fragment.assertTrue(condition=isinstance(literal2, (int, float)),
 		                    message="Bainry operators can only be used with numbers.")
 		if operator.operator == '+':
-			self._setLiteral(str(literal1 + literal2)) # type: ignore
+			self._setLiteral(str(literal1 + literal2))  # type: ignore
 		elif operator.operator == '-':
-			self._setLiteral(str(literal1 - literal2)) # type: ignore
+			self._setLiteral(str(literal1 - literal2))  # type: ignore
 		elif operator.operator == '*':
-			self._setLiteral(str(literal1 * literal2)) # type: ignore
+			self._setLiteral(str(literal1 * literal2))  # type: ignore
 		elif operator.operator == '/':
-			self._setLiteral(str(literal1 / literal2)) # type: ignore
+			self._setLiteral(str(literal1 / literal2))  # type: ignore
 		else:
 			self.error(f"Unsupported binary operator '{operator.operator}'.")
 
