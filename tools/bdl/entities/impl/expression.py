@@ -164,15 +164,13 @@ class Expression(EntityExpression):
 		elif self.isSymbol:
 
 			# Set the executor.
-			entity = self.symbol.getEntityResolved(resolver=resolver)
 			executorContract = self.contracts.get("executor")
 			if executorContract is not None:
-				validExecutorContract = entity.category == Category.component
-				validExecutorContract |= (entity.category == Category.method) and not self.symbol.isThis
-				self.assertTrue(
-				    condition=validExecutorContract,
-				    message=
-				    "`executor` contracts must be set either at component instantiation or at free function call.")
+				if self.symbol.isThis:
+					this = self.symbol.getThisResolved(resolver=resolver)
+					self.assertTrue(
+				    	condition=this.executor == executorContract.value,
+				    	message=f"The executors between this expression and its instance, mismatch: '{executorContract.value}' vs '{this.executor}'.")
 				executor = executorContract.value
 			# If there is a 'this', propagate the executor.
 			elif self.symbol.isThis:

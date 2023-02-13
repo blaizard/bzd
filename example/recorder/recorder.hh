@@ -2,6 +2,7 @@
 
 #include "cc/bzd.hh"
 #include "cc/bzd/core/serialization/serialization.hh"
+#include "example/recorder/composition.hh"
 
 template <class T>
 class Object
@@ -114,6 +115,16 @@ class World
 public:
 	template <class Context>
 	constexpr explicit World(Context&) noexcept
+	{
+	}
+};
+
+
+class Recorder : public bzd::platform::Recorder<Recorder>
+{
+public:
+	template <class Context>
+	constexpr explicit Recorder(Context&) noexcept
 	{
 	}
 };

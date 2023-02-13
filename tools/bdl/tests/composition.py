@@ -24,6 +24,8 @@ class TestRun(unittest.TestCase):
 			composition Comp {
 				default = Integer(32);
 				test = Hello(var = default);
+				anotherDefault = 12;
+				test2 = Hello(var = anotherDefault);
 			}
 			""",
 		                                       objectContext=ObjectContext(resolve=True))

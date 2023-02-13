@@ -42,6 +42,14 @@ bdl_library(
 )
 
 bdl_library(
+    name = "recorder",
+    srcs = [
+        "recorder.bdl",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+bdl_library(
     name = "stream",
     srcs = [
         "stream.bdl",
