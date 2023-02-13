@@ -434,6 +434,17 @@ class TestRun(unittest.TestCase):
 		val4 = bdl.entity("MyComposition.val4")
 		self.assertEqual(val4.literal, "-8")
 
+		bdl = Object.fromContent(content="""
+				composition MyComposition {
+					val1 = /12.*/;
+					val2 = /12.*/ - /43.*/;
+					val3 = val1 + /43.*/;
+				}
+				""",
+		                         objectContext=ObjectContext(resolve=True, composition=True))
+		val1 = bdl.entity("MyComposition.val1")
+		val2 = bdl.entity("MyComposition.val2")
+
 	def testTemplates(self) -> None:
 
 		# Mandatory template.

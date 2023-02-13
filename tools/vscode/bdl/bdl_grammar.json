@@ -33,6 +33,14 @@
             "name": "storage.modifier.const"
         },
         {
+            "match": "(list|Any|connect)",
+            "name": "support.type"
+        },
+        {
+            "match": "(composition|interface|config):",
+            "name": "storage.type.modifier.access.control"
+        },
+        {
             "match": "/[^\\s]+/",
             "name": "string.regexp"
         },

@@ -345,7 +345,7 @@ class ElementBuilder(Element):
 
 	def removeAttr(self: U, key: str) -> U:
 		"""
-		Remove an attribute from the element.
+		Remove an existing attribute from the element.
 		"""
 		del self.attrs[key]
 		return self
@@ -378,6 +378,13 @@ class ElementBuilder(Element):
 		"""
 		sequence.context.setParent(self)
 		self.sequences[kind] = sequence
+		return self
+
+	def removeNestedSequence(self: U, kind: str) -> U:
+		"""
+		Remove an existing nested sequence.
+		"""
+		del self.sequences[kind]
 		return self
 
 	def pushBackElementToNestedSequence(self: U, kind: str, element: Element) -> U:
