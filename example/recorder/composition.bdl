@@ -1,3 +1,4 @@
+use "cc/bzd/platform/interfaces/recorder.bdl"
 
 namespace example;
 
@@ -18,22 +19,20 @@ interface:
 	
 }
 
+component Recorder : bzd.platform.Recorder {
+}
+
 composition {
+	// Regexpr for objects in the various executors.
+	regexprExecutorSecond = /hello.*/;
+	regexprExecutor = /world.*/;
+
 	hello = Hello() [executor(second.executor)];
 	hello.run();
 	world = World() [executor(executor)];
-	// recorder = Recorder();
-	// Regexpr choices:
-	// glob(include=..., exclude=...) <- cannot easily express lists.
-	// include(..., ..., ...).exclude(..., ...) <- ugly
-	// hello.* <- type regexpr (cannot express lists nor exclusions)
-	// hello.* + yes.* - hello.this
-	// +hello.world* +world* -world.this <- the nicest I think, thanks chatGPT!
-	// /hello.world*.help/ + /world.*.hello/ - /world.this/ <- will use this instead.
-	// Connect all signals to this recorder
-	// connect(include(*).exclude(""), recorder);
 	connect(hello.send, world.receive);
-	
+
+	// Add the recorder
+	recorder = Recorder() [executor(executor)];
+	connect(recorder, regexprExecutor + regexprExecutorSecond);
 }
-
-

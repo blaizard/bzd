@@ -109,7 +109,7 @@ class ParametersCommon:
 		"""Get the category of the resolved type of the parameters."""
 
 		for param in self:
-			if param.isLiteral or param.isValue:
+			if param.isLiteral or param.isValue or param.isRegexpr:
 				pass
 			elif param.isSymbol:
 				entityType = param.getEntityUnderlyingTypeResolved(resolver)

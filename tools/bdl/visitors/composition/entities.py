@@ -94,10 +94,20 @@ class Connections:
 		self.outputs: typing.Set[Symbol] = set()
 		self.groups: typing.Dict[Symbol, ConnectionGroup] = {}
 
+	def addRecorder(self, recorder: EntityExpression, output: EntityExpression) -> None:
+		pass
+
 	def add(self, input: EntityExpression, output: EntityExpression) -> None:
 		"""Register a new connection to the connection map."""
 
 		input.assertTrue(condition=input.isLValue, message="First argument must be a reference to another object.")
+
+		# If the input is a Recorder.
+		inputEntityType = input.symbol.getEntityUnderlyingTypeResolved(resolver=self.resolver)
+		if "bzd.platform.Recorder" in inputEntityType.getParents():
+			self.addRecorder(recorder=input, output=output)
+			return
+
 		output.assertTrue(condition=output.isLValue, message="Second argument must be a reference to another object.")
 
 		input.assertTrue(condition=input.symbol != output.symbol, message="A connection cannot connect to itself.")
@@ -429,7 +439,7 @@ class Entities:
 
 		if expression.isRoleMeta:
 			self.processMeta(expression=expression)
-		else:
+		elif expression.isSymbol:
 			self.processEntry(expression=expression, isDep=isDep, resolver=resolver, executor=executor)
 
 	def createEntityNestedComposition(self,

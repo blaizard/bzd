@@ -649,7 +649,7 @@ class TestRun(unittest.TestCase):
 		assert isinstance(bdl.entity("MyComposition.b"), Expression)
 		self.assertEqual(bdl.entity("MyComposition.b").executor, "hello")
 
-		with self.assertRaisesRegex(Exception, r"component instantiation"):
+		with self.assertRaisesRegex(Exception, r"executors between this expression"):
 			Object.fromContent(content="""
 					component Test {
 					interface:
