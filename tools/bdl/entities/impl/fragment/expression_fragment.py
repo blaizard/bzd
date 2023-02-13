@@ -50,7 +50,7 @@ class ExpressionFragment(EntityExpression):
 
 		# Copy sequences.
 		for nested in ("argument", "argument_resolved", "argument_expected", "template", "template_resolved",
-		               "template_expected"):
+		               "template_expected", "regexpr_include", "regexpr_exclude"):
 			sequence = self.element.getNestedSequence(nested)
 			if sequence:
 				elementBuilder.setNestedSequence(nested, sequence)
@@ -63,34 +63,55 @@ class ExpressionFragment(EntityExpression):
 		"""Support for unary operators."""
 
 		literal = self.literalNative
-		self.assertTrue(condition=isinstance(literal, (int, float)),
-		                message="Unary operators can only be used with numbers.")
-		if operator.operator == '+':
-			pass
-		elif operator.operator == '-':
-			self._setLiteral(str(-literal))  # type: ignore
-		else:
-			self.error(f"Unsupported unary operator '{operator.operator}'.")
+		if isinstance(literal, (int, float)):
+			if operator.operator == '+':
+				pass
+			elif operator.operator == '-':
+				self._setLiteral(str(-literal))
+			else:
+				self.error(f"Unsupported unary operator with number '{operator.operator}'.")
+			return
+
+		regexpr = self.regexpr
+		if regexpr.isValid:
+			if operator.operator == "+":
+				pass
+			elif operator.operator == "-":
+				regexpr.negate()
+			else:
+				self.error(f"Unsupported unary operator with regexpr '{operator.operator}'.")
+
+		self.error(f"Unsupported unary operator '{operator.operator}'.")
 
 	def binary(self, operator: "OperatorFragment", fragment: "ExpressionFragment") -> None:
 		"""Support for binary operators."""
 
 		literal1 = self.literalNative
 		literal2 = fragment.literalNative
-		self.assertTrue(condition=isinstance(literal1, (int, float)),
-		                message="Bainry operators can only be used with numbers.")
-		fragment.assertTrue(condition=isinstance(literal2, (int, float)),
-		                    message="Bainry operators can only be used with numbers.")
-		if operator.operator == '+':
-			self._setLiteral(str(literal1 + literal2))  # type: ignore
-		elif operator.operator == '-':
-			self._setLiteral(str(literal1 - literal2))  # type: ignore
-		elif operator.operator == '*':
-			self._setLiteral(str(literal1 * literal2))  # type: ignore
-		elif operator.operator == '/':
-			self._setLiteral(str(literal1 / literal2))  # type: ignore
-		else:
-			self.error(f"Unsupported binary operator '{operator.operator}'.")
+		if isinstance(literal1, (int, float)) and isinstance(literal2, (int, float)):
+			if operator.operator == '+':
+				self._setLiteral(str(literal1 + literal2))
+			elif operator.operator == '-':
+				self._setLiteral(str(literal1 - literal2))
+			elif operator.operator == '*':
+				self._setLiteral(str(literal1 * literal2))
+			elif operator.operator == '/':
+				self._setLiteral(str(literal1 / literal2))
+			else:
+				self.error(f"Unsupported binary operator with numbers '{operator.operator}'.")
+			return
+
+		regexpr1 = self.regexpr
+		regexpr2 = fragment.regexpr
+		if regexpr1.isValid and regexpr2.isValid:
+			self.assertTrue(condition=operator.operator in ("+", "-"),
+			                message=f"Unsupported binary operator with regexprs '{operator.operator}'.")
+			if operator.operator == "-":
+				regexpr2.negate()
+			regexpr1.merge(regexpr2)
+			return
+
+		self.error(f"Unsupported binary operator '{operator.operator}'.")
 
 
 class OperatorFragment(ExpressionFragment):
@@ -105,15 +126,15 @@ class ValueFragment(ExpressionFragment):
 
 class RegexprFragment(ExpressionFragment):
 
-	@property
-	def regexpr(self) -> str:
-		return self.element.getAttr("regexpr").value
-
 	def resolve(self, resolver: "Resolver") -> None:
+
+		regexpr = self.element.getAttr("regexpr").value
 		try:
-			re.compile(self.regexpr)
+			re.compile(regexpr)
 		except re.error:
 			self.error("Invalid regular expression.")
+
+		self.regexpr.include(regexpr)
 
 
 class SymbolFragment(ExpressionFragment):
@@ -144,7 +165,12 @@ class SymbolFragment(ExpressionFragment):
 				self._setUnderlyingValueFQN(self.symbol.fqn)
 			else:
 				self._setUnderlyingValueFQN(entity.underlyingValueFQN)
+
+			# Propagate the literal value.
 			self._setLiteral(entity.literal)
+
+			# Propagate the regexpr.
+			self._setRegexpr(entity.regexpr)
 
 		# The type refers to an actual type and will be instantiated as part of this expression.
 		elif entity.isRoleType:

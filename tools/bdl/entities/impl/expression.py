@@ -182,8 +182,11 @@ class Expression(EntityExpression):
 			if executor is not None:
 				self._setExecutor(executor)
 
+		elif self.isRegexpr:
+			pass
+
 		else:
-			self.error(message="Unsupported expression.")
+			self.error(message=f"Unsupported expression: {self.element}")
 
 		super().resolve(resolver)
 

@@ -14,6 +14,7 @@ from tools.bdl.entities.impl.fragment.fqn import FQN
 from tools.bdl.entities.impl.fragment.symbol import Symbol
 from tools.bdl.entities.impl.fragment.parameters_resolved import ParametersResolvedItem
 from tools.bdl.entities.impl.types import Category
+from tools.bdl.entities.impl.fragment.regexpr import Regexpr
 
 if typing.TYPE_CHECKING:
 	from tools.bdl.entities.impl.expression import Expression
@@ -153,6 +154,22 @@ class Entity:
 	@property
 	def operator(self) -> str:
 		return self.element.getAttr("operator").value
+
+	@property
+	def isRegexpr(self) -> bool:
+		return Regexpr(self.element).isValid
+
+	@property
+	def regexpr(self) -> Regexpr:
+		return Regexpr(self.element)
+
+	def _setRegexpr(self, regexpr: typing.Optional[Regexpr]) -> None:
+		"""Set or unset the regular expression associated with this element."""
+
+		if regexpr is None:
+			self.regexpr.clear()
+		else:
+			self.regexpr.assign(regexpr)
 
 	@property
 	def isLiteral(self) -> bool:
