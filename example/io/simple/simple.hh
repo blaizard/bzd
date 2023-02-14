@@ -17,7 +17,7 @@ public:
 		while (true)
 		{
 			co_await !context_.io.send.set(counter);
-			co_await !bzd::print("Sending {:d}\n"_csv, counter);
+			co_await !bzd::print("Sending: {:d}\n"_csv, counter);
 			co_await !bzd::delay(100_ms);
 			++counter;
 		}
@@ -40,7 +40,7 @@ public:
 		while (counter < 10)
 		{
 			const auto result = co_await !bzd::async::any(context_.io.receive.get(), bzd::timeout(1_s));
-			co_await !bzd::print("Received {:}\n"_csv, result.value());
+			co_await !bzd::print("Receiver {:}: {:}\n"_csv, context_.config.id, result.value());
 			++counter;
 		}
 		co_return {};

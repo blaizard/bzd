@@ -24,15 +24,16 @@ component Recorder : bzd.platform.Recorder {
 
 composition {
 	// Regexpr for objects in the various executors.
-	regexprExecutorSecond = /hello.*/;
-	regexprExecutor = /world.*/;
+	regexprExecutorSecond = /example\.hello.*/;
+	regexprExecutor = /example\.world.*/;
 	hello = Hello() [executor(second.executor)];
 	hello.run();
 	world = World() [executor(executor)];
 	connect(hello.send, world.receive);
 	// Add the recorder
-	recorder = Recorder() [executor(executor)];
+	recorder = const Recorder() [executor(executor)];
 	connect(recorder, regexprExecutor + regexprExecutorSecond);
+	connect(recorder, hello.send);
 	
 }
 

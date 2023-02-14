@@ -437,13 +437,17 @@ class TestRun(unittest.TestCase):
 		bdl = Object.fromContent(content="""
 				composition MyComposition {
 					val1 = /12.*/;
-					val2 = /12.*/ - /43.*/;
+					val2 = /12.*/ - /123.*/;
 					val3 = val1 + /43.*/;
 				}
 				""",
 		                         objectContext=ObjectContext(resolve=True, composition=True))
-		val1 = bdl.entity("MyComposition.val1")
-		val2 = bdl.entity("MyComposition.val2")
+		regexpr1 = bdl.entity("MyComposition.val1")
+		self.assertEqual(regexpr1.regexpr.match(["123", "1", "12", "437"]), {"123", "12"})
+		regexpr2 = bdl.entity("MyComposition.val2")
+		self.assertEqual(regexpr2.regexpr.match(["123", "1", "12", "437"]), {"12"})
+		regexpr3 = bdl.entity("MyComposition.val3")
+		self.assertEqual(regexpr3.regexpr.match(["123", "1", "12", "437"]), {"123", "12", "437"})
 
 	def testTemplates(self) -> None:
 
