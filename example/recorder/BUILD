@@ -8,8 +8,8 @@ bdl_library(
         "composition.bdl",
     ],
     deps = [
-        "//cc/bzd/platform/interfaces:recorder"
-    ]
+        "//cc/bzd/platform/interfaces:recorder",
+    ],
 )
 
 cc_library(

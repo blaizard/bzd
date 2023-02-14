@@ -128,13 +128,12 @@ class RegexprFragment(ExpressionFragment):
 
 	def resolve(self, resolver: "Resolver") -> None:
 
-		regexpr = self.element.getAttr("regexpr").value
 		try:
-			re.compile(regexpr)
+			re.compile(self.regexprAttr)
 		except re.error:
 			self.error("Invalid regular expression.")
 
-		self.regexpr.include(regexpr)
+		self.regexpr.include(self.regexprAttr)
 
 
 class SymbolFragment(ExpressionFragment):

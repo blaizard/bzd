@@ -52,6 +52,8 @@ composition:
 			{%- if fragment.isParameters %}({{ printParameters(fragment.parameters) }}){% end %}
 		{%- elif fragment.isOperator %}
 			{{- fragment.operator }}
+		{%- elif fragment.isRegexprAttr -%}
+			/{{ fragment.regexprAttr }}/
 		{%- end %}
 	{%- end %}
 {%- end -%}
