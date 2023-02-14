@@ -169,8 +169,10 @@ class Expression(EntityExpression):
 				if self.symbol.isThis:
 					this = self.symbol.getThisResolved(resolver=resolver)
 					self.assertTrue(
-				    	condition=this.executor == executorContract.value,
-				    	message=f"The executors between this expression and its instance, mismatch: '{executorContract.value}' vs '{this.executor}'.")
+					    condition=this.executor == executorContract.value,
+					    message=
+					    f"The executors between this expression and its instance, mismatch: '{executorContract.value}' vs '{this.executor}'."
+					)
 				executor = executorContract.value
 			# If there is a 'this', propagate the executor.
 			elif self.symbol.isThis:

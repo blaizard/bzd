@@ -26,13 +26,14 @@ composition {
 	// Regexpr for objects in the various executors.
 	regexprExecutorSecond = /hello.*/;
 	regexprExecutor = /world.*/;
-
 	hello = Hello() [executor(second.executor)];
 	hello.run();
 	world = World() [executor(executor)];
 	connect(hello.send, world.receive);
-
 	// Add the recorder
 	recorder = Recorder() [executor(executor)];
 	connect(recorder, regexprExecutor + regexprExecutorSecond);
+	
 }
+
+

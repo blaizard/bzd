@@ -119,7 +119,6 @@ public:
 	}
 };
 
-
 class Recorder : public bzd::platform::Recorder<Recorder>
 {
 public:

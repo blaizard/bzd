@@ -1,7 +1,10 @@
 
 namespace bzd.platform;
 
+
 // Recorder interface, must be used for all recorders specialization.
-interface Recorder
-{
+interface Recorder {
+	
 }
+
+

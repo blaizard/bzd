@@ -156,6 +156,14 @@ class Entity:
 		return self.element.getAttr("operator").value
 
 	@property
+	def isRegexprAttr(self) -> bool:
+		return self.element.isAttr("regexpr")
+
+	@property
+	def regexprAttr(self) -> str:
+		return self.element.getAttr("regexpr").value
+
+	@property
 	def isRegexpr(self) -> bool:
 		return Regexpr(self.element).isValid
 
@@ -473,6 +481,7 @@ class EntityExpression(Entity):
 		    "symbol": str(self.symbol) if self.isSymbol else None,
 		    "value": str(self.value) if self.isValue else None,
 		    "operator": str(self.operator) if self.isOperator else None,
+		    "regexpr": str(self.regexprAttr) if self.isRegexprAttr else None,
 		    "executor": self.executor,
 		    "parameters": "[...]" if self.isParameters else None,
 		})
