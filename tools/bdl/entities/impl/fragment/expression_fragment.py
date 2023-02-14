@@ -133,7 +133,7 @@ class RegexprFragment(ExpressionFragment):
 		except re.error:
 			self.error("Invalid regular expression.")
 
-		self.regexpr.include(self.regexprAttr)
+		self.regexpr.addInclude(self.regexprAttr)
 
 
 class SymbolFragment(ExpressionFragment):

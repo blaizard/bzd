@@ -19,13 +19,19 @@ interface:
 	method poll();
 	receive = const Integer;
 	
+config:
+	id = const Integer;
+	
 }
 
 composition {
 	emitter = Emitter();
-	poller = Poller();
-	poller.poll();
-	connect(emitter.send, poller.receive);
+	poller1 = Poller(id = 1);
+	poller1.poll();
+	connect(emitter.send, poller1.receive);
+	poller2 = Poller(id = 2);
+	poller2.poll();
+	connect(emitter.send, poller2.receive);
 	
 }
 

@@ -1,304 +1,18 @@
 import typing
-import dataclasses
-import enum
 from functools import cached_property
 from collections import OrderedDict
 
-from bzd.utils.result import Result
 from bzd.parser.element import Element
 
 from tools.bdl.visitor import Group
 from tools.bdl.visitors.symbol_map import SymbolMap, Resolver
-from tools.bdl.entities.impl.builtin import Builtin
-from tools.bdl.entities.impl.entity import Entity, EntityExpression
+from tools.bdl.entities.impl.entity import Entity
 from tools.bdl.entities.impl.expression import Expression
 from tools.bdl.entities.builder import ExpressionBuilder
 from tools.bdl.entities.impl.fragment.symbol import Symbol
 from tools.bdl.entities.impl.types import Category
-
-
-class DependencyGroup:
-	"""List of ordered dependencies."""
-
-	def __init__(self) -> None:
-		self.data: typing.Set[Expression] = set()
-
-	def copy(self) -> "DependencyGroup":
-		"""Create a copy of this object."""
-		dependencies = DependencyGroup()
-		dependencies.data = self.data.copy()
-		return dependencies
-
-	def push(self, expression: Expression) -> None:
-		"""Add a new dependency to the list."""
-		# Ignore Builtin dependencies, as they are expected to be available at all time.
-		if isinstance(expression, Builtin):
-			return
-		if expression in self.data:
-			return
-		self.data.add(expression)
-
-	def pushGroup(self, group: typing.Union["DependencyGroup", typing.List[Expression]]) -> None:
-		"""Push an ordered group of dependency to the list."""
-		for expression in group:
-			self.push(expression)
-
-	def isSubset(self, entities: typing.Iterable[Expression]) -> bool:
-		"""Check if this group is contained in an iterable of expressions,
-		assuming the iterable only contains unique entries."""
-
-		count = len(self.data)
-		for entity in entities:
-			if entity in self.data:
-				count -= 1
-		return count == 0
-
-	def __add__(self, other: "DependencyGroup") -> "DependencyGroup":
-		dependencies = self.copy()
-		dependencies.pushGroup(other)
-		return dependencies
-
-	def __iter__(self) -> typing.Iterator[Expression]:
-		for expression in self.data:
-			yield expression
-
-	def __len__(self) -> int:
-		return len(self.data)
-
-	def __repr__(self) -> str:
-		return ", ".join([str(e) for e in self.data])
-
-
-@dataclasses.dataclass
-class OutputMetadata:
-	# The FQN of the executor associated with this connection.
-	executor: str
-	# The maximum history required by this connection.
-	history: int = 1
-
-
-@dataclasses.dataclass
-class ConnectionGroup:
-	# The FQN of the executor associated with this input.
-	executor: str
-	# The type of symbol for this connection group.
-	symbol: typing.Optional[Symbol] = None
-	# The set of connection object for this group.
-	outputs: typing.Dict[Symbol, OutputMetadata] = dataclasses.field(default_factory=dict)
-
-
-class Connections:
-
-	def __init__(self, symbols: SymbolMap) -> None:
-		self.resolver = symbols.makeResolver()
-		self.outputs: typing.Set[Symbol] = set()
-		self.groups: typing.Dict[Symbol, ConnectionGroup] = {}
-
-	def addRecorder(self, recorder: EntityExpression, output: EntityExpression) -> None:
-		pass
-
-	def add(self, input: EntityExpression, output: EntityExpression) -> None:
-		"""Register a new connection to the connection map."""
-
-		input.assertTrue(condition=input.isLValue, message="First argument must be a reference to another object.")
-
-		# If the input is a Recorder.
-		inputEntityType = input.symbol.getEntityUnderlyingTypeResolved(resolver=self.resolver)
-		if "bzd.platform.Recorder" in inputEntityType.getParents():
-			self.addRecorder(recorder=input, output=output)
-			return
-
-		output.assertTrue(condition=output.isLValue, message="Second argument must be a reference to another object.")
-
-		input.assertTrue(condition=input.symbol != output.symbol, message="A connection cannot connect to itself.")
-		input.assertTrue(
-		    condition=input.underlyingTypeFQN == output.underlyingTypeFQN,
-		    message=
-		    f"Connections cannot only be made between same types, not {input.underlyingTypeFQN} and {output.underlyingTypeFQN}."
-		)
-
-		# Check const correctness.
-		inputEntity = input.symbol.getEntityResolved(resolver=self.resolver)
-		assert isinstance(inputEntity, EntityExpression)
-		inputEntity.assertTrue(condition=not inputEntity.symbol.const,
-		                       message="A connection sender must not be marked as const.")
-		outputEntity = output.symbol.getEntityResolved(resolver=self.resolver)
-		assert isinstance(outputEntity, EntityExpression)
-		outputEntity.assertTrue(condition=outputEntity.symbol.const,
-		                        message="A connection receiver must be marked as const.")
-
-		alreadyInserted = input.symbol in self.groups and output.symbol in self.groups[input.symbol].outputs
-		input.assertTrue(
-		    condition=not alreadyInserted,
-		    message=f"Connection between '{input.symbol}' and '{output.symbol}' is defined multiple times.")
-		input.assertTrue(condition=input.symbol not in self.outputs,
-		                 message=f"'{input.symbol}' has already been defined as an output.")
-		if input.symbol not in self.outputs:
-			inputEntityType = input.symbol.getEntityUnderlyingTypeResolved(resolver=self.resolver)
-			assert hasattr(inputEntityType, "symbol")
-			self.groups[input.symbol] = ConnectionGroup(executor=input.executorOr("executor"),
-			                                            symbol=inputEntityType.symbol)
-		self.groups[input.symbol].outputs[output.symbol] = OutputMetadata(executor=output.executorOr("executor"))
-		self.outputs.add(output.symbol)
-
-	def __repr__(self) -> str:
-		content = []
-		for input, connection in self.groups.items():
-			content += [f"{input} => {connection.outputs.keys()}"]
-		return "\n".join(content)
-
-
-class EntryType(enum.Flag):
-	# Items that are part of the registry, should be created before running any asyncs.
-	registry = enum.auto()
-	# Worload type of asyncs, define the lifetime of the application.
-	workload = enum.auto()
-	# Service type of asyncs, are stopped when no workloads are running.
-	service = enum.auto()
-	# Part of the platform declaration.
-	platform = enum.auto()
-	# Executor type, all executors must also be part of the registry.
-	executor = enum.auto()
-
-
-@dataclasses.dataclass
-class ExpressionEntry:
-	# The expression itself.
-	expression: Expression
-	# The asynchronous type of this entity.
-	entryType: EntryType
-	# The executors associated with this entry.
-	executors: typing.Set[str] = dataclasses.field(default_factory=set)
-	# Dependencies over other entities, first level dependencies.
-	deps: DependencyGroup = dataclasses.field(default_factory=DependencyGroup)
-	# Direct dependencies.
-	init: DependencyGroup = dataclasses.field(default_factory=DependencyGroup)
-	intra: DependencyGroup = dataclasses.field(default_factory=DependencyGroup)
-	shutdown: DependencyGroup = dataclasses.field(default_factory=DependencyGroup)
-
-	def __repr__(self) -> str:
-		content = [
-		    f"type: {str(self.entryType)}", f"expression: {str(self.expression)}", f"executors: {str(self.executors)}",
-		    f"deps: {self.deps}", f"init: {self.init}", f"intra: {self.intra}", f"shutdown: {self.shutdown}"
-		]
-		return "\n".join(content)
-
-
-class Components:
-
-	def __init__(self) -> None:
-		self.map: typing.Dict[str, ExpressionEntry] = OrderedDict()
-
-	@staticmethod
-	def makeId(expression: Expression) -> str:
-		"""Create an identifier from an expression.
-		An Identifier is created with the name and the symbol or value.
-		"""
-
-		result = f"{expression.fqn}|" if expression.isName else "|"
-		result += expression.value if expression.isValue else str(expression.symbol.fqn)
-		return result
-
-	def resolve(self) -> None:
-		"""Resolve the dependencies to ensure that each entry can be created sequentially
-		with only previously created entries as dependencies."""
-
-		def isSatisfied(group: DependencyGroup) -> bool:
-			"""Check that the group dependency is statified with the current map."""
-
-			for expression in group:
-				if self.makeId(expression) not in self.map:
-					return False
-			return True
-
-		entries = [(k, v) for k, v in self.map.items()]
-		self.map = OrderedDict()
-
-		while entries:
-
-			remaining: typing.List[typing.Tuple[str, ExpressionEntry]] = []
-			for identifier, entry in entries:
-				if isSatisfied(entry.deps):
-					self.map[identifier] = entry
-				else:
-					remaining.append((identifier, entry))
-
-			if len(entries) == len(remaining):
-				entries[0][1].expression.error(message="The dependencies of this expression are not met.")
-
-			entries = remaining
-
-	def close(self) -> None:
-		self.resolve()
-
-	def __contains__(self, expression: Expression) -> bool:
-		"""Check if an entry already exists in the map."""
-
-		return self.makeId(expression) in self.map
-
-	def __getitem__(self, expression: Expression) -> Result[ExpressionEntry, str]:
-		"""Get a specific item."""
-
-		identifier = self.makeId(expression)
-		if identifier not in self.map:
-			return Result.makeError(f"The expression with the identifier '{identifier}' is not registered in the map.")
-		return Result(self.map[identifier])
-
-	def __iter__(self) -> typing.Iterator[ExpressionEntry]:
-		for entry in self.map.values():
-			yield entry
-
-	def insert(self, expression: Expression, entryType: EntryType,
-	           executor: typing.Optional[str]) -> typing.Optional[ExpressionEntry]:
-		"""Insert a new entry in the map, return the entry if it does not exists or if it can be updated,
-		otherwise it returns None."""
-
-		identifier = self.makeId(expression)
-
-		# Ensure that only a workload can superseed an existing expression with the same id.
-		if identifier in self.map:
-
-			def isOverwritable(entryTypeFrom: EntryType, entryTypeTo: EntryType) -> bool:
-				return (EntryType.service in entryTypeFrom) and (EntryType.workload in entryTypeTo)
-
-			# If this is the exact same expression.
-			if self.map[identifier].entryType == entryType:
-				expression.assertTrue(
-				    condition=(self.map[identifier].expression == expression),
-				    message=f"This expression already exits and cannot be redeclared as the same role: '{entryType}'.")
-				return None
-			if isOverwritable(entryType, self.map[identifier].entryType):
-				return None
-			expression.assertTrue(
-			    condition=isOverwritable(self.map[identifier].entryType, entryType),
-			    message=
-			    f"An expression of role '{entryType}' cannot overwrite an expression of role '{self.map[identifier].entryType}'."
-			)
-
-		executors = set() if executor is None else {executor}
-		self.map[identifier] = ExpressionEntry(expression=expression, entryType=entryType, executors=executors)
-		return self.map[identifier]
-
-	def getDependencies(self, expression: Expression) -> typing.Iterator[ExpressionEntry]:
-		"""Follow the dependencies of a particular expression and output each if its entries including itself."""
-
-		alreadyVisited: typing.Set[str] = set()
-		toVisit = [expression]
-		while toVisit:
-			expression = toVisit.pop(0)
-			identifier = self.makeId(expression)
-			if identifier not in alreadyVisited:
-				alreadyVisited.add(identifier)
-				if identifier in self.map:
-					entry = self.map[identifier]
-					yield entry
-					toVisit += [*entry.deps, *entry.init, *entry.intra, *entry.shutdown]
-
-	def __repr__(self) -> str:
-		content = []
-		for identifier, entry in self.map.items():
-			content += [identifier] + [f"\t{line}" for line in str(entry).split("\n")]
-		return "\n".join(content)
+from tools.bdl.visitors.composition.connections import Connections
+from tools.bdl.visitors.composition.components import Components, ExpressionEntry, EntryType, DependencyGroup
 
 
 class Entities:
@@ -384,26 +98,27 @@ class Entities:
 
 		for input, group in self.connections.groups.items():
 			addEntry(symbol=input, kind="writer", input=input)
-			for output, metadata in group.outputs.items():
+			for output, _ in group.outputs.items():
 				addEntry(symbol=output, kind="reader", input=input)
 
 		return result
 
 	def getConnectionsByExecutor(self, fqn: str) -> typing.Iterable[typing.Dict[str, typing.Any]]:
 		for input, group in self.connections.groups.items():
-			if group.executor == fqn or any(metadata.executor == fqn for metadata in group.outputs.values()):
-				result: typing.Dict[str, typing.Any] = {
-				    "symbol": group.symbol,
-				    "input": input,
-				    "emitter": (group.executor == fqn),
-				    "outputs": []
-				}
-				for output, metadata in group.outputs.items():
-					if metadata.executor == fqn:
-						result["outputs"].append({"symbol": output, "history": metadata.history})
+			isExecutor = fqn in self.expressions.fromSymbol(symbol=input).value.executors
+			result: typing.Dict[str, typing.Any] = {
+			    "symbol": group.symbol,
+			    "input": input,
+			    "emitter": isExecutor,
+			    "outputs": []
+			}
+			for output, metadata in group.outputs.items():
+				isOutputExecutor = fqn in self.expressions.fromSymbol(symbol=output).value.executors
+				if isOutputExecutor:
+					result["outputs"].append({"symbol": output, "history": metadata.history})
+					isExecutor = True
+			if isExecutor:
 				yield result
-
-		return [entry.expression for entry in self.workloads if fqn in entry.executors]
 
 	def getRegistryByExecutor(self, fqn: str) -> typing.Dict[str, Expression]:
 		registry = OrderedDict()
@@ -574,6 +289,9 @@ class Entities:
 			self.add(dependency, isDep=True, executor=executor)
 
 	def close(self) -> None:
+
+		# Close the connection object.
+		self.connections.close()
 
 		# Add platform expressions to all executors.
 		for expression in self.platform.values():
