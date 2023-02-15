@@ -7,7 +7,7 @@ from bzd.parser.grammar import Grammar, GrammarItem, GrammarItemSpaces
 from bzd.parser.fragments import Fragment, FragmentNestedStart, FragmentNestedStopNewElement, FragmentNewElement, FragmentParentElement, FragmentComment
 from bzd.parser.element import Element
 
-_regexprBaseName = r"(?!const|interface|struct|component|method|namespace|use|using|config|composition|[0-9])[0-9a-zA-Z_]+"
+_regexprBaseName = r"(?!const\b|interface\b|struct\b|component\b|method\b|namespace\b|use\b|using\b|config\b|composition\b|[0-9])[0-9a-zA-Z_]+"
 # Match name
 _regexprName = r"(?P<name>" + _regexprBaseName + r")"
 # Match name or varargs
