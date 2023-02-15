@@ -179,14 +179,14 @@ class Entities:
 
 	def createEntityNestedComposition(self,
 	                                  element: Element,
-	                                  expression: Expression,
+	                                  this: Expression,
 	                                  resolveNamespace: typing.List[str],
 	                                  name: typing.Optional[str] = None) -> Entity:
 		"""Create a new entity for nested compositions.
 		
 		Args:
 			element: The element to be used as a based to create the entity.
-			expression: The expression used to create the component containing the composition.
+			this: The expression used to create the component containing the composition.
 			resolveNamespace: The namespace to be used for resolving the new entity.
 			name: The name to give to the new entry.
 
@@ -194,18 +194,18 @@ class Entities:
 			The newly created entity.
 		"""
 
-		expression.assertTrue(
-		    condition=expression.isName,
-		    message=f"Nested composition must come from a named expression, coming from {expression} instead.")
+		this.assertTrue(condition=this.isName,
+		                message=f"Nested composition must come from a named expression, coming from {this} instead.")
 
 		# Insert the new entry in the symbol map.
 		fqn = self.symbols.insert(name=name,
-		                          namespace=expression.namespace + [expression.name],
+		                          namespace=this.namespace + [this.name],
 		                          path=None,
 		                          element=element,
 		                          group=Group.composition)
 		entity = self.symbols.getEntityResolved(fqn=fqn).value
-		resolver = self.symbols.makeResolver(namespace=resolveNamespace, this=expression.fqn)
+
+		resolver = self.symbols.makeResolver(namespace=resolveNamespace, this=this.fqn)
 		entity.resolveMemoized(resolver=resolver)
 
 		return entity
@@ -283,7 +283,7 @@ class Entities:
 
 					newEntity = self.createEntityNestedComposition(
 					    element=ExpressionBuilder(symbol=f"this.{interfaceEntity.name}"),
-					    expression=expression,
+					    this=expression,
 					    resolveNamespace=interfaceEntity.namespace)
 					assert isinstance(newEntity, Expression)
 					maybeGroup.push(newEntity)
@@ -295,10 +295,10 @@ class Entities:
 				assert isinstance(compositionEntity, Expression), "All composition entities must be an expression."
 
 				# Create a new entity and associate it with its respective objects.
-				entityCopied = compositionEntity.copy()
+				entityCopied = compositionEntity.deepCopy()
 				newEntity = self.createEntityNestedComposition(
 				    element=entityCopied.element,
-				    expression=expression,
+				    this=expression,
 				    resolveNamespace=entityCopied.namespace,
 				    name=compositionEntity.name if compositionEntity.isName else None)
 				assert isinstance(newEntity, Expression)
