@@ -100,6 +100,20 @@ class TestRun(unittest.TestCase):
 		assert isinstance(ca, Expression)
 		self.assertTrue(ca.isRValue)
 
+		# Deep inheritance
+		bdl = Object.fromContent(content="""
+				interface A { a = Float; }
+				interface B : A { b = Integer; }
+				component C : B { interface: c = Float; }
+				""",
+		                         objectContext=ObjectContext(resolve=True))
+		a = bdl.entity("C.c")
+		assert isinstance(a, Expression)
+		self.assertTrue(a.isRValue)
+		b = bdl.entity("C.b")
+		assert isinstance(b, Expression)
+		self.assertTrue(b.isRValue)
+
 		with self.assertRaisesRegex(Exception, r"nested class"):
 			Object.fromContent(content="""
 					struct A { a = Integer; }
@@ -201,6 +215,9 @@ class TestRun(unittest.TestCase):
 		b = bdl.entity("bzd.test.nested.B.b")
 		assert isinstance(b, Expression)
 		self.assertTrue(b.isRValue)
+		cb = bdl.entity("bzd.test.nested.C.b")
+		assert isinstance(cb, Expression)
+		self.assertTrue(cb.isRValue)
 		test = bdl.entity("bzd.test.nested.MyComposition.test")
 		assert isinstance(test, Expression)
 		self.assertTrue(test.isLValue)

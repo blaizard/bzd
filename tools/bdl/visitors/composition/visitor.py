@@ -39,7 +39,7 @@ class CompositionView:
 	def entity(self, fqn: str) -> Entity:
 		"""Get the entity refered to the given fqn."""
 
-		return self.symbols.getEntityResolved(fqn=fqn).value
+		return self.symbols.getEntity(fqn=fqn).value
 
 	def isValidTarget(self, target: str) -> bool:
 		return all((target != excluding) for excluding in self.excluding)

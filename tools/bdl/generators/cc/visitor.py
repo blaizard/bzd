@@ -220,7 +220,7 @@ class Transform:
 	# Connection
 	def connectionCount(self, connection: typing.Any) -> int:
 		count = 1
-		for output in connection.get("outputs", []):
+		for output in connection.get("readers", []):
 			count = max(count, output.get("history", 1))
 		return count + 1
 
@@ -228,7 +228,7 @@ class Transform:
 		args = []
 		factoryTypes = {"reader": "makeReader()", "writer": "makeWriter()"}
 		for name, connection in connections.items():
-			symbolName = "io_buffer_" + self.symbolToNameStr(connection["input"])
+			symbolName = "io_buffer_" + self.fqnToNameStr(connection["writter"])
 			factory = factoryTypes[connection["type"]]
 			args.append(f"/*{name}*/{symbolName}.{factory}")
 		return ", ".join(args)

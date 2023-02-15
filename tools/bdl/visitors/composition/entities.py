@@ -11,7 +11,7 @@ from tools.bdl.entities.impl.expression import Expression
 from tools.bdl.entities.builder import ExpressionBuilder
 from tools.bdl.entities.impl.fragment.symbol import Symbol
 from tools.bdl.entities.impl.types import Category
-from tools.bdl.visitors.composition.connections import Connections
+from tools.bdl.visitors.composition.connections import Connections, EndpointId
 from tools.bdl.visitors.composition.components import Components, ExpressionEntry, EntryType, DependencyGroup
 
 
@@ -32,10 +32,11 @@ class Entities:
 
 		expression.assertTrue(condition=expression.isSymbol, message=f"Meta expressions must have a symbol.")
 		if expression.symbol.fqn == "connect":
-			self.connections.add(expression.parametersResolved[0].param, expression.parametersResolved[1].param)
-
 			self.add(expression.parametersResolved[0].param, isDep=True)
 			self.add(expression.parametersResolved[1].param, isDep=True)
+
+			# Connections must be made after the resolving the symbol, as it must first be registered in the endpoints list.
+			self.connections.add(expression.parametersResolved[0].param, expression.parametersResolved[1].param)
 
 		else:
 			expression.error(message="Unsupported meta expression.")
@@ -81,41 +82,60 @@ class Entities:
 
 	@cached_property
 	def registryConnections(self) -> typing.Dict[str, typing.Dict[str, typing.Any]]:
+		"""Provide a registry that containts all available connections.
+		
+		{
+			"example.hello": {
+				"send": {
+					"type": "writer",
+					"writter": "example.hello.send"
+				}
+			},
+			...
+		}
+		"""
 
 		result: typing.Dict[str, typing.Dict[str, typing.Any]] = {fqn: OrderedDict() for fqn in self.registry.keys()}
 
-		def addEntry(symbol: Symbol, kind: str, input: Symbol) -> None:
-			fqn = symbol.this
-			name = symbol.propertyName
-			symbol.assertTrue(
-			    condition=fqn in self.registry,
-			    message=
-			    f"The instance of one of the connection to '{str(symbol)}', namely '{fqn}', is not present in the registry."
-			)
-			symbol.assertTrue(condition=name not in result[fqn],
-			                  message=f"The property named '{name}' is connected twice.")
-			result[fqn][name] = {"type": kind, "input": input}
+		def addEntry(identifier: EndpointId, kind: str, writter: EndpointId) -> None:
+			result[identifier.this][identifier.name] = {"type": kind, "writter": str(writter)}
 
-		for input, group in self.connections.groups.items():
-			addEntry(symbol=input, kind="writer", input=input)
-			for output, _ in group.outputs.items():
-				addEntry(symbol=output, kind="reader", input=input)
+		for writter, group in self.connections.groups.items():
+			addEntry(identifier=writter, kind="writer", writter=writter)
+			for reader in group:
+				addEntry(identifier=reader, kind="reader", writter=writter)
 
 		return result
 
 	def getConnectionsByExecutor(self, fqn: str) -> typing.Iterable[typing.Dict[str, typing.Any]]:
-		for input, group in self.connections.groups.items():
-			isExecutor = fqn in self.expressions.fromSymbol(symbol=input).value.executors
+		"""Provide an iterator over all connections for a specific executor.
+		
+		[
+			{
+				"symbol": <Data type symbol>,
+				"writter": "example.hello.send",
+				"readers": [
+					{
+						"history": 1
+					},
+					...
+				]
+			},
+			...
+		]
+		"""
+
+		for writter, group in self.connections.groups.items():
+			isExecutor = fqn in self.expressions.fromIdentifier(writter.this).value.executors
 			result: typing.Dict[str, typing.Any] = {
-			    "symbol": group.symbol,
-			    "input": input,
-			    "emitter": isExecutor,
-			    "outputs": []
+			    "symbol": self.connections.endpoints[writter].symbol,
+			    "writter": str(writter),
+			    "readers": []
 			}
-			for output, metadata in group.outputs.items():
-				isOutputExecutor = fqn in self.expressions.fromSymbol(symbol=output).value.executors
+			for reader in group:
+				isOutputExecutor = fqn in self.expressions.fromIdentifier(reader.this).value.executors
 				if isOutputExecutor:
-					result["outputs"].append({"symbol": output, "history": metadata.history})
+					result["readers"].append({"history": self.connections.endpoints[reader].history})
 					isExecutor = True
 			if isExecutor:
 				yield result
@@ -283,6 +303,13 @@ class Entities:
 				    name=compositionEntity.name if compositionEntity.isName else None)
 				assert isinstance(newEntity, Expression)
 				entry.intra.push(newEntity)
+
+		# Add inputs/outputs to the connection list.
+		if underlyingType.category in {Category.component}:
+			result = self.symbols.getChildren(fqn=expression.fqn, groups={Group.interface})
+			for fqn, entity in result.value.items():
+				if isinstance(entity, Expression) and entity.isSymbol:
+					self.connections.addEndpoint(this=expression, endpoint=entity)
 
 		# Add implicit dependencies.
 		for dependency in entry.deps + entry.intra:
