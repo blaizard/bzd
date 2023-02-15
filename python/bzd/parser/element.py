@@ -79,15 +79,12 @@ T = typing.TypeVar("T", bound="SequenceBuilder")
 
 
 class SequenceBuilder(Sequence):
-	"""
-	Represents a sequence that can be built.
-	"""
+	"""Represents a sequence that can be built."""
 
 	@staticmethod
 	def cast(sequence: Sequence, classType: typing.Type[T]) -> T:
-		"""
-		Return a copy of the sequence casted to a given type.
-		"""
+		"""Return a copy of the sequence casted to a given type."""
+
 		assert isinstance(sequence, Sequence)
 		assert isinstance(classType, type)
 		assert issubclass(classType, SequenceBuilder)
@@ -101,34 +98,29 @@ class SequenceBuilder(Sequence):
 		return self
 
 	def pushBackElement(self: T, element: "Element") -> T:
-		"""
-		Add an element to the sequence at the end of the list.
-		"""
+		"""Add an element to the sequence at the end of the list."""
+
 		element.context.setParent(self)
 		self.list.append(element)
 		return self
 
 	def pushFrontElement(self: T, element: "Element") -> T:
-		"""
-		Add an element to the sequence at the begining of the list.
-		"""
+		"""Add an element to the sequence at the begining of the list."""
+
 		element.context.setParent(self)
 		self.list.insert(0, element)
 		return self
 
 	def removeElement(self: T, element: "Element") -> T:
-		"""
-		Remove an element from the sequence.
-		"""
+		"""Remove an element from the sequence."""
+
 		element.context.clear()
 		self.list.remove(element)
 		return self
 
 
 class SequenceParser(Sequence):
-	"""
-	This represents a sequence of Elements.
-	"""
+	"""This represents a sequence of Elements."""
 
 	def __init__(self, context: typing.Optional[Context], grammar: Grammar,
 	             parent: typing.Optional["ElementParser"]) -> None:
@@ -137,8 +129,7 @@ class SequenceParser(Sequence):
 		self.parent = parent
 
 	def makeElement(self, grammar: typing.Optional[Grammar] = None) -> "ElementParser":
-		"""
-		Create a new element in the sequence.
+		"""Create a new element in the sequence.
 		Params:
 		- grammar: Optionaly provides a grammar to the new element or reuse existing one.
 		"""
@@ -165,9 +156,8 @@ class Element:
 
 	@staticmethod
 	def fromSerialize(element: ElementSerialize, context: typing.Optional[Context] = None) -> "Element":
-		"""
-		Create an element from a serialized element.
-		"""
+		"""Create an element from a serialized element."""
+
 		e = Element(context)
 		assert isinstance(element["@"], dict)
 		e.attrs = {key: Attribute.fromSerialize(attr) for key, attr in element["@"].items()}
@@ -178,81 +168,70 @@ class Element:
 		return e
 
 	def isEmpty(self) -> bool:
-		"""
-		Check wether or not an element is empty. Empty means with no data.
-		"""
+		"""Check wether or not an element is empty. Empty means with no data."""
+
 		return (len(self.attrs.keys()) + len(self.sequences.keys())) == 0
 
 	def getAttrs(self) -> typing.Mapping[str, Attribute]:
-		"""
-		Return the attributes as a dictionary.
-		"""
+		"""Return the attributes as a dictionary."""
+
 		return self.attrs
 
 	def getAttr(self, name: str) -> Attribute:
-		"""
-		Return a specific name attribute value
-		"""
+		"""Return a specific name attribute value."""
+
 		assert name in self.attrs, f"Attribute '{name}' is not present in '{str(self)}'."
 		return self.attrs[name]
 
 	def getAttrValue(self, name: str, default: typing.Optional[str] = None) -> typing.Optional[str]:
-		"""
-		Return a specific name attribute value
-		"""
+		"""Return a specific name attribute value."""
+
 		if name in self.attrs:
 			return self.attrs[name].value
 		return default
 
 	def isAttr(self, name: str) -> bool:
-		"""
-		Check if an attribute is present
-		"""
+		"""Check if an attribute is present."""
+
 		if name in self.attrs:
 			return True
 		return False
 
 	def isNestedSequence(self, kind: str) -> bool:
-		"""
-		Check if a sequence exists.
-		"""
+		"""Check if a sequence exists."""
+
 		return bool(kind in self.sequences)
 
 	def getNestedSequence(self, kind: str) -> typing.Optional[Sequence]:
-		"""
-		Get a current sequence of None if it does not exists.
-		"""
+		"""Get a current sequence of None if it does not exists."""
+
 		assert kind != "@", "Nested sequence name '@' cannot be used."
 		return self.sequences.get(kind, None)
 
 	def getNestedSequenceAssert(self, kind: str) -> Sequence:
-		"""
-		Get a current sequence of None if it does not exists.
-		"""
+		"""Get a current sequence of None if it does not exists."""
+
 		maybeSequence = self.getNestedSequence(kind)
 		assert maybeSequence is not None, "Sequence must be non-null."
 		return maybeSequence
 
 	def getNestedSequenceOrEmpty(self, kind: str) -> Sequence:
-		"""
-		Get a current sequence of an empty one if it does not exists.
-		"""
+		"""Get a current sequence of an empty one if it does not exists."""
+
 		maybeSequence = self.getNestedSequence(kind)
 		if maybeSequence is None:
 			return Sequence()
 		return maybeSequence
 
 	def getNestedSequences(self) -> typing.Iterator[typing.Tuple[str, Sequence]]:
-		"""
-		Generator going through all sequences.
-		"""
+		"""Generator going through all sequences."""
+
 		for kind, sequence in self.sequences.items():
 			yield kind, sequence
 
 	def serialize(self, ignoreContext: bool = False) -> ElementSerialize:
-		"""
-		Serialize an element.
-		"""
+		"""Serialize an element."""
+
 		data: ElementSerialize = {
 		    "@": {key: attr.serialize(ignoreContext=ignoreContext)
 		          for key, attr in self.getAttrs().items()}
@@ -281,9 +260,8 @@ class Element:
 		return element
 
 	def getIndexes(self, attr: typing.Optional[str] = None) -> typing.Tuple[int, int]:
-		"""
-		Calculate the index of this element.
-		"""
+		"""Calculate the index of this element."""
+
 		if attr is not None and self.isAttr(attr):
 			return self.getAttr(attr).index, self.getAttr(attr).end
 
@@ -314,9 +292,7 @@ class Element:
 		return not (self == other)
 
 	def toString(self, nested: bool = True) -> str:
-		"""
-		Human readable string representation of the element.
-		"""
+		"""Human readable string representation of the element."""
 
 		contentContext = ["context=\"{}\"".format(self.context)] if self.context is not None else []
 		content = "<Element {}/>".format(" ".join(
@@ -340,9 +316,8 @@ class ElementBuilder(Element):
 
 	@staticmethod
 	def cast(element: Element, classType: typing.Type[U]) -> U:
-		"""
-		Return a copy of the element casted to a given type.
-		"""
+		"""Return a copy of the element casted to a given type."""
+
 		assert isinstance(element, Element)
 		assert isinstance(classType, type)
 		assert issubclass(classType, ElementBuilder)
@@ -351,78 +326,68 @@ class ElementBuilder(Element):
 		return typing.cast(U, copiedElement)
 
 	def get(self) -> Element:
-		"""
-		Return the underlying element class.
-		"""
+		"""Return the underlying element class."""
+
 		self.__class__ = Element  # type: ignore
 		return typing.cast(Element, self)
 
 	def removeAttr(self: U, key: str) -> U:
-		"""
-		Remove an existing attribute from the element.
-		"""
+		"""Remove an existing attribute from the element."""
+
 		del self.attrs[key]
 		return self
 
 	def setAttr(self: U, key: str, value: str, index: int = IGNORE_INDEX_VALUE, end: int = 0) -> U:
-		"""
-		Add an attribute to the element.
-		"""
+		"""Add an attribute to the element."""
+
 		self.attrs[key] = AttributeParser(index=index, end=end, value=value)
 		return self
 
 	def setAttrs(self: U, data: typing.Dict[str, str]) -> U:
-		"""
-		Add multiple attributes to an element.
-		"""
+		"""Add multiple attributes to an element."""
+
 		for key, value in data.items():
 			self.setAttr(key, value)
 		return self
 
 	def updateAttr(self: U, key: str, value: str) -> U:
-		"""
-		Update the value of an exsiting attribute.
-		"""
+		"""Update the value of an exsiting attribute."""
+
 		self.attrs[key].setValue(value)
 		return self
 
 	def setNestedSequence(self: U, kind: str, sequence: Sequence) -> U:
-		"""
-		Set a nested sequence and overwrite exsiting one.
-		"""
+		"""Set a nested sequence and overwrite exsiting one."""
+
 		sequence.context.setParent(self)
 		self.sequences[kind] = sequence
 		return self
 
 	def removeNestedSequence(self: U, kind: str) -> U:
-		"""
-		Remove an existing nested sequence.
-		"""
+		"""Remove an existing nested sequence."""
+
 		del self.sequences[kind]
 		return self
 
 	def pushBackElementToNestedSequence(self: U, kind: str, element: Element) -> U:
-		"""
-		Add an element to a new or existing nested sequence.
-		"""
+		"""Add an element to a new or existing nested sequence."""
+
 		if kind not in self.sequences:
 			self.sequences[kind] = Sequence(context=Context(parent=self))
 		SequenceBuilder.cast(self.sequences[kind], SequenceBuilder).pushBackElement(element)
 		return self
 
 	def pushFrontElementToNestedSequence(self: U, kind: str, element: Element) -> U:
-		"""
-		Add an element to a new or existing nested sequence.
-		"""
+		"""Add an element to a new or existing nested sequence."""
+
 		if kind not in self.sequences:
 			self.sequences[kind] = Sequence(context=Context(parent=self))
 		SequenceBuilder.cast(self.sequences[kind], SequenceBuilder).pushFrontElement(element)
 		return self
 
 	def removeElementFromNestedSequence(self: U, kind: str, element: Element) -> U:
-		"""
-		Remove an element from a nested sequence.
-		"""
+		"""Remove an element from a nested sequence."""
+
 		if kind in self.sequences:
 			SequenceBuilder.cast(self.sequences[kind], SequenceBuilder).removeElement(element)
 		return self
@@ -443,15 +408,13 @@ class ElementParser(Element):
 		return self.parent is None
 
 	def add(self, fragment: Fragment) -> None:
-		"""
-		Add a new fragment to this element.
-		"""
+		"""Add a new fragment to this element."""
+
 		fragment.merge(self.attrs)
 
 	def setGrammar(self, grammar: Grammar) -> None:
-		"""
-		Update the grammar of the current element.
-		"""
+		"""Update the grammar of the current element."""
+
 		self.grammar = grammar
 
 	def getGrammar(self) -> Grammar:
