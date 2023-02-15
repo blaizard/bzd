@@ -218,5 +218,6 @@ class TestRun(unittest.TestCase):
 		                                 objectContext=ObjectContext(resolve=True))
 		Composition().visit(composition).process()
 
+
 if __name__ == '__main__':
 	unittest.main()
