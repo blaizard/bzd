@@ -33,6 +33,8 @@ class Metadata:
 	history: int = 1
 	# If it is intended to accept multiple connection on the same endpoint.
 	multi: bool = False
+	# Number of connections attributed to this endpoint.
+	connections: int = 0
 
 
 class Connections:
@@ -79,6 +81,11 @@ class Connections:
 		assert writter != reader, f"A connection cannot connect to itself: '{writter}' -> '{reader}'."
 		assert not (writter in self.groups and reader in self.groups[writter]
 		            ), f"Connection between '{writter}' and '{reader}' is defined multiple times."
+
+		self.endpoints[writter].connections += 1
+		self.endpoints[reader].connections += 1
+		assert self.endpoints[reader].connections == 1 or self.endpoints[
+		    reader].multi, f"Readers can only have a single connection, '{reader}' has registered {self.endpoints[reader].connections} already."
 
 		if writter not in self.groups:
 			self.groups[writter] = set()
@@ -135,8 +142,11 @@ class Connections:
 
 			# Register the connections.
 			recorder.assertTrue(condition=bool(matches), message="The recorder is not associated with any IO.")
-			for identifier in matches:
-				self.addConnection(writter=identifier, reader=EndpointId(this=recorder.fqn, name="inputs"))
+			try:
+				for identifier in matches:
+					self.addConnection(writter=identifier, reader=EndpointId(this=recorder.fqn, name="inputs"))
+			except AssertionError as e:
+				recorder.error(str(e))
 
 	def __repr__(self) -> str:
 		content = []
