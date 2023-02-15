@@ -197,6 +197,26 @@ class TestRun(unittest.TestCase):
 		with self.assertRaisesRegex(Exception, r"must not be marked as const"):
 			Composition().visit(common).visit(composition).process()
 
+	def testCompositionThis(self) -> None:
+
+		composition = Object.fromContent(content="""
+			component MyComponent {
+			interface:
+				method run();
+
+			composition:
+				this.run();
+			}
+
+			composition {
+				component1 = MyComponent();
+				component2 = MyComponent();
+				component3 = MyComponent();
+				component3.run();
+			}
+			""",
+		                                 objectContext=ObjectContext(resolve=True))
+		Composition().visit(composition).process()
 
 if __name__ == '__main__':
 	unittest.main()
