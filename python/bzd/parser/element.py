@@ -54,17 +54,21 @@ class Sequence:
 		sequence.list = self.list.copy()
 		return sequence
 
+	def deepCopy(self) -> "Sequence":
+		"""Create a deep copy of this sequence."""
+
+		serialized = self.serialize(ignoreContext=True)
+		return Sequence.fromSerialize(serialized, context=self.context)
+
 	def serialize(self, ignoreContext: bool = False) -> SequenceSerialize:
-		"""
-		Serialize a sequence.
-		"""
+		"""Serialize a sequence."""
+
 		return [element.serialize(ignoreContext=ignoreContext) for element in self]
 
 	@staticmethod
 	def fromSerialize(sequence: SequenceSerialize, context: typing.Optional[Context] = None) -> "Sequence":
-		"""
-		Create a sequence from a serialized sequence.
-		"""
+		"""Create a sequence from a serialized sequence."""
+
 		s = SequenceBuilder(context)
 		for e in sequence:
 			s.pushBackElement(Element.fromSerialize(e))
@@ -258,12 +262,22 @@ class Element:
 		return data
 
 	def copy(self, ignoreNested: typing.List[str] = []) -> "ElementBuilder":
-		"""
-		Shallow copy an element to create a new element object.
-		"""
+		"""Shallow copy an element to create a new element object."""
+
 		element = ElementBuilder(context=self.context)
 		element.attrs = copy.deepcopy(self.attrs)
 		element.sequences = {kind: sequence for kind, sequence in self.sequences.items() if kind not in ignoreNested}
+		return element
+
+	def deepCopy(self, ignoreNested: typing.List[str] = []) -> "ElementBuilder":
+		"""Deep copy an element to create a new element object."""
+
+		element = ElementBuilder(context=self.context)
+		element.attrs = copy.deepcopy(self.attrs)
+		element.sequences = {
+		    kind: sequence.deepCopy()
+		    for kind, sequence in self.sequences.items() if kind not in ignoreNested
+		}
 		return element
 
 	def getIndexes(self, attr: typing.Optional[str] = None) -> typing.Tuple[int, int]:

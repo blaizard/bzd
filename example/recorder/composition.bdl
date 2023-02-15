@@ -35,6 +35,8 @@ composition {
 	hello.run();
 	hello2 = Hello() [executor(second.executor)];
 	hello2.run();
+	hello3 = Hello() [executor(second.executor)];
+	hello3.run();
 	world = World() [executor(executor)];
 	connect(hello.send, world.receive);
 	// Add the recorder

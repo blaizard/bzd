@@ -49,11 +49,17 @@ class Entity:
 		return Category(self.element.getAttrValue("category"))
 
 	def copy(self: U) -> U:
-		"""
-		Make a copy of the current entity.
-		"""
+		"""Make a shallow copy of the current entity."""
+
 		copySelf = copy.copy(self)
 		copySelf.element = self.element.copy()
+		return copySelf
+
+	def deepCopy(self: U) -> U:
+		"""Make a deep copy of the current entity."""
+
+		copySelf = copy.copy(self)
+		copySelf.element = self.element.deepCopy()
 		return copySelf
 
 	def toLiteral(self, args: typing.Dict[str, "EntityExpression"]) -> typing.Optional[str]:
