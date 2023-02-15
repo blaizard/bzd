@@ -8,6 +8,8 @@ from bzd.utils.result import Result
 from tools.bdl.entities.impl.builtin import Builtin
 from tools.bdl.entities.impl.expression import Expression
 from tools.bdl.entities.impl.fragment.symbol import Symbol
+from tools.bdl.entities.impl.types import Category
+from tools.bdl.visitors.symbol_map import Resolver
 
 
 class DependencyGroup:
@@ -91,6 +93,7 @@ class ExpressionEntry:
 	shutdown: DependencyGroup = dataclasses.field(default_factory=DependencyGroup)
 
 	def __repr__(self) -> str:
+
 		content = [
 		    f"type: {str(self.entryType)}", f"expression: {str(self.expression)}", f"executors: {str(self.executors)}",
 		    f"deps: {self.deps}", f"init: {self.init}", f"intra: {self.intra}", f"shutdown: {self.shutdown}"
@@ -108,12 +111,12 @@ class Components:
 		"""Create an identifier from an expression.
 		An Identifier is created with the name and the symbol or value.
 		"""
+		expression.assertTrue(condition=expression.isSymbol,
+		                      message="Only expressions with symbol can be part of the 'Components' list.")
 
 		if expression.isName:
 			identifier = expression.fqn
 		else:
-			expression.assertTrue(condition=expression.isSymbol,
-			                      message="Only expressions with symbol can be part of the 'Components' list.")
 			identifier = expression.symbol.fqn
 		return identifier
 

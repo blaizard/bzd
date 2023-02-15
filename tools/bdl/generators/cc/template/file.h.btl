@@ -57,19 +57,6 @@ public: // Methods
 	}
 
 			{% end %}
-
-public: // Variable accessors.
-
-			{% for var in data.interface.expressionList %}
-	// Getter for the variable '{{ var.name }}'.
-	{{ var.comment | commentBlockToStr -}}
-	// \return The value of '{{ var.name }}'.
-	[[nodiscard]] constexpr {{ var.symbol | symbolReferenceToStr }} {{ var.name }}() const noexcept
-	{
-		return static_cast<Impl*>(this)->{{ var.name }};
-	}
-
-			{% end %}
 };
 
 		{%- end -%}
@@ -100,12 +87,14 @@ struct Interface<"{{ data.fqn }}">
 	{% if not data.isExtern %}
 		{% if data.category in btl.set(Category.component, Category.interface) %}
 			{% for var in data.interface.expressionList %}
+				{% if not var.isVarArgs %}
 template <>
 struct Data<"{{ var.fqn }}">
 {
 	using Type = {{ var.symbol | symbolNonConstToStr }};
 	static UInt32 id;
 };
+				{% end %}
 			{% end %}
 		{% end %}
 	{% end %}

@@ -192,7 +192,7 @@ class Object:
 		"""Convinience function to lookup for an entity based on its FQN and return it.
 		If the symbol does not exists, this will throw."""
 
-		maybeEntity = self.symbols.getEntityResolved(fqn)
+		maybeEntity = self.symbols.getEntity(fqn)
 		assert bool(maybeEntity), maybeEntity.error
 		return maybeEntity.value
 

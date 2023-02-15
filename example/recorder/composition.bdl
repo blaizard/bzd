@@ -3,7 +3,12 @@ use "cc/bzd/platform/interfaces/recorder.bdl"
 namespace example;
 
 
-component Hello {
+interface Base {
+	another = const Integer;
+	
+}
+
+component Hello : Base {
 interface:
 	method run();
 	send = Float;
@@ -28,12 +33,13 @@ composition {
 	regexprExecutor = /example\.world.*/;
 	hello = Hello() [executor(second.executor)];
 	hello.run();
+	hello2 = Hello() [executor(second.executor)];
+	hello2.run();
 	world = World() [executor(executor)];
 	connect(hello.send, world.receive);
 	// Add the recorder
 	recorder = const Recorder() [executor(executor)];
 	connect(recorder, regexprExecutor + regexprExecutorSecond);
-	connect(recorder, hello.send);
 	
 }
 

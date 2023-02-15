@@ -157,7 +157,7 @@ class TestRun(unittest.TestCase):
 			}
 			""",
 		                                 objectContext=ObjectContext(resolve=True))
-		with self.assertRaisesRegex(Exception, r"cannot connect to itself"):
+		with self.assertRaisesRegex(Exception, r"must be marked as const"):
 			Composition().visit(common).visit(composition).process()
 
 		composition = Object.fromContent(content="""

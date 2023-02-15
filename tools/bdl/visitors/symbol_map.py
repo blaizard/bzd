@@ -59,7 +59,7 @@ class Resolver:
 			if self.symbols.contains(fqn=fqn, exclude=self.exclude):
 				break
 			if not potentialNamespace:
-				ending = self.symbols.terminateErrorMessageSimilarFQN(fqn=nameFirst)
+				ending = self.symbols._terminateErrorMessageSimilarFQN(fqn=nameFirst)
 				return ResolveShallowFQNResult.makeError(
 				    f"Symbol '{nameFirst}' in namespace '{'.'.join(self.namespace)}' could not be resolved{ending}"
 				    if self.namespace else f"Symbol '{nameFirst}' could not be resolved{ending}")
@@ -108,7 +108,7 @@ class Resolver:
 					fqn = potentialFQN
 					break
 			if fqn is None:
-				ending = self.symbols.terminateErrorMessageSimilarFQN(fqn=nextName)
+				ending = self.symbols._terminateErrorMessageSimilarFQN(fqn=nextName)
 				return ResolveFQNResult.makeError(
 				    f"Symbol '{nextName}' from '{name}' in namespace '{'.'.join(self.namespace)}' could not be resolved{ending}"
 				    if self.namespace else f"Symbol '{nextName}' from '{name}' could not be resolved{ending}")
@@ -186,20 +186,25 @@ class SymbolMap:
 					return None
 		return data
 
-	def items(self, groups: typing.Set[Group], startsWith: str = "") -> typing.Iterator[typing.Tuple[str, EntityType]]:
+	def items(self,
+	          groups: typing.Set[Group],
+	          startsWith: str = "",
+	          depth: int = 0) -> typing.Iterator[typing.Tuple[str, EntityType]]:
 		"""
 		Iterate through entities optionaly filtered by their groups.
 
 		Args:
 			groups: Groups to be returned.
 			startsWith: The returned items start with the specified fqn.
+			depth: depth level until which entity should be selected. A value of 0 means no limit.
 		"""
 
 		for fqn, meta in self.map.items():
 			if any(group in Group(meta["g"]) for group in groups):
 				if fqn.startswith(startsWith):
-					entity = self.getEntityResolved(fqn=fqn).value
-					yield fqn, entity
+					if depth == 0 or fqn[len(startsWith):].count(".") < depth:
+						entity = self.getEntityResolved(fqn=fqn).value
+						yield fqn, entity
 
 	def insert(self,
 	           name: typing.Optional[str],
@@ -365,7 +370,7 @@ class SymbolMap:
 		similar.sort()
 		return similar
 
-	def terminateErrorMessageSimilarFQN(self, fqn: str) -> str:
+	def _terminateErrorMessageSimilarFQN(self, fqn: str) -> str:
 		"""Create a string to be added to terminate an error message."""
 
 		similar = self.similarFQN(fqn=fqn)
@@ -379,8 +384,8 @@ class SymbolMap:
 
 		data = self._get(fqn=fqn, exclude=exclude)
 		if data is None:
-			message = f"Unable to find symbol '{fqn}'{self.terminateErrorMessageSimilarFQN(fqn=fqn)}"
-			return Result[EntityType].makeError(message)
+			message = f"Unable to find symbol '{fqn}'{self._terminateErrorMessageSimilarFQN(fqn=fqn)}"
+			return Result.makeError(message)
 
 		# Not memoized
 		if fqn not in self.entities:
@@ -409,30 +414,54 @@ class SymbolMap:
 		return Result[EntityType](self.entities[fqn])
 
 	def getEntity(self, fqn: str, exclude: typing.Optional[typing.List[Group]] = None) -> Result[EntityType]:
-		"""
-		Return an element from the symbol map and resolves underlying types if needed.
-		"""
+		"""Return an element from the symbol map and resolves underlying types if needed."""
 
-		namespace = []
+		namespaceChoices: typing.List[typing.List[str]] = [[]]
 		result = None
 		for name in FQN.toNamespace(fqn):
-			namespace.append(name)
-			result = self.getEntityResolved(fqn=FQN.fromNamespace(namespace=namespace), exclude=exclude)
-			if not result:
-				continue
-			if result.value.underlyingTypeFQN is not None:
-				namespace = FQN.toNamespace(result.value.underlyingTypeFQN)
+			for namespace in namespaceChoices:
+				namespace.append(name)
+				result = self.getEntityResolved(fqn=FQN.fromNamespace(namespace=namespace), exclude=exclude)
+				if not result:
+					continue
+				if result.value.underlyingTypeFQN is not None:
+					# If there is a type associated with this entity, add it to the namespace and its parents.
+					namespaceChoices = [FQN.toNamespace(result.value.underlyingTypeFQN)]
+					for fqn in self.getEntityResolved(result.value.underlyingTypeFQN).value.getParents():
+						namespaceChoices.append(FQN.toNamespace(fqn))
+				else:
+					# Use the entity as a namespace for the following entries.
+					namespaceChoices = [namespace]
+				break
 
 		if not result:
-			return Result.makeError("Could not resolve symbol '{}'.".format(fqn))
+			return Result.makeError(f"Could not resolve symbol '{fqn}'.")
 
 		return Result(result.value)
 
+	def getChildren(self, fqn: str, groups: typing.Set[Group]) -> Result[typing.Dict[str, EntityType]]:
+		"""Get all children of a specific element, the fqn passed into argument must already be resolved."""
+
+		result = self.getEntityResolved(fqn=fqn)
+		if not result:
+			return Result.makeError(result.error)
+
+		if result.value.underlyingTypeFQN is None:
+			return Result.makeError(
+			    f"The entity {result.value.fqn} does not have an underlying type, hence cannot have children.")
+
+		children: typing.Dict[str, EntityType] = {}
+		for prefix in [result.value.underlyingTypeFQN] + self.getEntityResolved(
+		    result.value.underlyingTypeFQN).value.getParents():
+			for fqn, item in self.items(groups=groups, startsWith=f"{prefix}.", depth=1):
+				if fqn not in children:
+					children[fqn] = item
+		return Result(children)
+
 	@staticmethod
 	def fromSerialize(data: typing.Dict[str, typing.Any]) -> "SymbolMap":
-		"""
-		Create a symbol map from a serialized object.
-		"""
+		"""Create a symbol map from a serialized object."""
+
 		symbols = SymbolMap()
 		symbols.map = data
 		return symbols

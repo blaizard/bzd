@@ -59,7 +59,7 @@ composition:
 {%- end -%}
 
 {%- macro declareExpression(data) -%}
-	{{ data.comment | normalComment }}{% if data.isName %}{{ data.name }}{% if data.isInterfaceType %}: {{ data.interfaceType | symbolToStr }}{% end %} = {% end %}{{- declareExpressionFragments(data.fragments) -}}{{ declareContract(data.contracts) }}
+	{{ data.comment | normalComment }}{% if data.isName %}{{ data.name }}{% if data.isVarArgs %}...{% end %}{% if data.isInterfaceType %}: {{ data.interfaceType | symbolToStr }}{% end %} = {% end %}{{- declareExpressionFragments(data.fragments) -}}{{ declareContract(data.contracts) }}
 {%- end -%}
 
 {%- macro printParameters(parameters) -%}
