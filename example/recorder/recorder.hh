@@ -80,10 +80,10 @@ public:
 
 	bzd::Async<> run()
 	{
-		for (int i=0; i<10; ++i)
+		for (int i = 0; i < 10; ++i)
 		{
-			context_.io.send.set(12.4);
-			co_await !bzd::print("Sending {}\n"_csv, 12.4);
+			co_await !context_.io.send.set(i);
+			co_await !bzd::print("Sending {}\n"_csv, i);
 			co_await !bzd::delay(100_ms);
 		}
 
@@ -115,35 +115,23 @@ private:
 	Context& context_;
 };
 
-class World
-{
-public:
-	template <class Context>
-	constexpr explicit World(Context&) noexcept
-	{
-	}
-};
-
 template <class Context>
 class Recorder : public bzd::platform::Recorder<Recorder<Context>>
 {
 public:
-	constexpr explicit Recorder(Context& context) noexcept : context_{context}
-	{
-	}
+	constexpr explicit Recorder(Context& context) noexcept : context_{context} {}
 
 	bzd::Async<> run()
 	{
 		const auto& executor = co_await bzd::async::getExecutor();
 		while (executor.isRunning())
 		{
-			/*co_await !bzd::apply([this](auto&... reader) -> bzd::Async<> {
+			co_await !bzd::apply(
+				[this](auto&... reader) -> bzd::Async<> {
 					(co_await !this->serializeNewData(reader), ...);
 					co_return {};
-				}, context_.io.inputs);*/
-			bzd::apply([this](auto&... reader) {
-					(this->serializeNewData(reader), ...);
-				}, context_.io.inputs);
+				},
+				context_.io.inputs);
 			co_await bzd::async::yield();
 		}
 		co_return {};
@@ -151,17 +139,14 @@ public:
 
 private:
 	template <class Reader>
-	void serializeNewData(Reader& reader)
+	bzd::Async<> serializeNewData(Reader& reader)
 	{
-		//co_await !bzd::print("Hello ");
 		auto scope = reader.tryGet();
-		//co_await !bzd::print("World\n");
-		//co_await !bzd::print("Anything? {:}\n"_csv, bool(scope));
 		if (scope)
 		{
-			bzd::print("Value: {:}\n"_csv, scope.value()).sync();
+			co_await !bzd::print("Value: {:}\n"_csv, scope.value());
 		}
-		//co_return {};
+		co_return {};
 	}
 
 private:
