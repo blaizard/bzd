@@ -184,7 +184,7 @@ class TestRun(unittest.TestCase):
 			}
 			""",
 		                                 objectContext=ObjectContext(resolve=True))
-		with self.assertRaisesRegex(Exception, r"defined multiple times"):
+		with self.assertRaisesRegex(Exception, r"is already connected to"):
 			Composition().visit(common).visit(composition).process()
 
 		composition = Object.fromContent(content="""
