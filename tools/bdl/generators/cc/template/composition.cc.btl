@@ -204,7 +204,7 @@ protected:
 {
 	// Definition of communication ring buffers.
 	{% for connection in connections[executorFQN] %}
-	static bzd::io::Buffer<{{ connection.symbol | symbolToStr }}, {{ connection | connectionCount }}u> io_buffer_{{ connection.writter | fqnToNameStr }}{};
+	static bzd::io::Buffer<{{ connection.symbol | symbolToStr }}, {{ connection | connectionCount }}u> io_buffer_{{ connection.identifier | fqnToNameStr }}{};
 	{% end %}
 
 	// Definition of all registry entries and their configuration.

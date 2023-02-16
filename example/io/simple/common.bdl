@@ -24,15 +24,4 @@ config:
 	
 }
 
-composition {
-	emitter = Emitter();
-	poller1 = Poller(id = 1);
-	poller1.poll();
-	connect(emitter.send, poller1.receive);
-	poller2 = Poller(id = 2);
-	poller2.poll();
-	connect(emitter.send, poller2.receive);
-	
-}
-
 

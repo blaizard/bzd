@@ -38,9 +38,8 @@ class ConnectMeta(Builtin):
 	def __init__(self) -> None:
 		super().__init__(
 		    ElementBuilder("builtin").setAttr("name", "connect").addConfigValue(
-		        name="io1", kind="Any", contract="mandatory").addConfigValue(name="io2",
-		                                                                     kind="Any",
-		                                                                     contract="mandatory").setAttr("meta", "1"))
+		        name="writer", kind="Any", contract="mandatory").addConfigValue(name="readers...",
+		                                                                        kind="Any").setAttr("meta", "1"))
 
 
 # Concrete types

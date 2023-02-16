@@ -1,0 +1,16 @@
+
+namespace example;
+
+
+composition {
+	// Having no connections, the code generator will create a stub for sending data.
+	// This stub will have no effect in the final binary and its existence is known
+	// during composition at build time, therefore should be optimized out by the
+	// compiler.
+	// The result will be an application that constantly send data to a stub.
+	emitter = Emitter();
+	emitter.generate();
+	
+}
+
+

@@ -1,0 +1,24 @@
+
+namespace example;
+
+
+composition {
+	// Create the emitter, it will automatically generate data and be registered as a service,
+	// this is done from the component composition.
+	emitter = Emitter();
+	// Create the first poller as an application.
+	poller1 = Poller(id = 1);
+	poller1.poll();
+	// Create the second poller as an application.
+	poller2 = Poller(id = 2);
+	poller2.poll();
+	// Connect the emitter to both pollers.
+	// This can be done in multiple ways:
+	// - connect(emitter.send, /example.poller.*/);
+	// - connect(emitter.send, poller1.receive, poller2.receive);
+	// - connect(emitter.send, poller1.receive); connect(emitter.send, poller2.receive);
+	connect(emitter.send, poller1.receive, poller2.receive);
+	
+}
+
+

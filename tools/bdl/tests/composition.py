@@ -157,16 +157,16 @@ class TestRun(unittest.TestCase):
 			}
 			""",
 		                                 objectContext=ObjectContext(resolve=True))
-		with self.assertRaisesRegex(Exception, r"must be marked as const"):
+		with self.assertRaisesRegex(Exception, r"is not a valid reader IO"):
 			Composition().visit(common).visit(composition).process()
 
 		composition = Object.fromContent(content="""
 			composition {
-				connect(sender.a, sender.b);
+				connect(sender.a, receiver.b);
 			}
 			""",
 		                                 objectContext=ObjectContext(resolve=True))
-		with self.assertRaisesRegex(Exception, r"between same types"):
+		with self.assertRaisesRegex(Exception, r"between the same types"):
 			Composition().visit(common).visit(composition).process()
 
 		composition = Object.fromContent(content="""
@@ -194,7 +194,7 @@ class TestRun(unittest.TestCase):
 			}
 			""",
 		                                 objectContext=ObjectContext(resolve=True))
-		with self.assertRaisesRegex(Exception, r"must not be marked as const"):
+		with self.assertRaisesRegex(Exception, r"not a valid writer IO"):
 			Composition().visit(common).visit(composition).process()
 
 	def testCompositionThis(self) -> None:

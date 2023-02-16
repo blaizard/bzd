@@ -225,12 +225,36 @@ class Transform:
 		return count + 1
 
 	def registryConnectionsDeclaration(self, connections: typing.Any) -> str:
+
+		def getBufferName(identifier: str) -> str:
+			return "io_buffer_" + self.fqnToNameStr(identifier)
+
 		args = []
 		factoryTypes = {"reader": "makeReader()", "writer": "makeWriter()"}
-		for name, connection in connections.items():
-			symbolName = "io_buffer_" + self.fqnToNameStr(connection["writter"])
-			factory = factoryTypes[connection["type"]]
-			args.append(f"/*{name}*/{symbolName}.{factory}")
+		factoryStubTypes = {"reader": "bzd::io::ReaderStub", "writer": "bzd::io::WriterStub"}
+		for name, metadata in connections.items():
+
+			kind = metadata["type"]
+
+			# if multi arguments, create a tuple.
+			if metadata["multi"]:
+				params = []
+				for identifier in metadata["connections"]:
+					params.append(f"{getBufferName(identifier)}.{factoryTypes[kind]}")
+				arg = f"bzd::makeTuple({', '.join(params)})"
+			# Use stubs if no connection exists.
+			elif len(metadata["connections"]) == 0:
+				arg = f"{factoryStubTypes[kind]}<{self.symbolToStr(metadata['symbol'])}>()"
+			else:
+				if kind == "reader":
+					identifier = metadata["connections"][0]
+					assert len(metadata["connections"]), f"Must be only one connection, {metadata['connections']}"
+				else:
+					identifier = metadata["identifier"]
+				arg = f"{getBufferName(identifier)}.{factoryTypes[kind]}"
+
+			args.append(f"/*{name}*/{arg}")
+
 		return ", ".join(args)
 
 	# Generic iterable

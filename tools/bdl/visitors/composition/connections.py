@@ -26,15 +26,24 @@ class EndpointId:
 
 @dataclasses.dataclass
 class Metadata:
-	writter: bool
+	# If this is a writer endpoint or not.
+	isWriter: bool
 	# The type of symbol for this endpoint.
 	symbol: Symbol
+	# The connections associated with this endpoint.
+	connections: typing.Set[EndpointId] = dataclasses.field(default_factory=set)
 	# The maximum history required by this endpoint.
 	history: int = 1
 	# If it is intended to accept multiple connection on the same endpoint.
 	multi: bool = False
-	# Number of connections attributed to this endpoint.
-	connections: int = 0
+
+
+@dataclasses.dataclass
+class ConnectionArguments:
+	# The writer associated with this connection.
+	writer: EntityExpression
+	# The set of readers associated with the writer.
+	readers: typing.Set[EntityExpression]
 
 
 class Connections:
@@ -43,15 +52,7 @@ class Connections:
 		self.resolver = symbols.makeResolver()
 		# List of all available endpoints. Endpoints are the end of each connection.
 		self.endpoints: typing.Dict[EndpointId, Metadata] = {}
-		self.groups: typing.Dict[EndpointId, typing.Set[EndpointId]] = {}
-		self.recorders: typing.Dict[Symbol, typing.Set[EntityExpression]] = {}
-
-	def addRecorder(self, recorder: Symbol, output: EntityExpression) -> None:
-		"""Register a new recorder."""
-
-		if recorder not in self.recorders:
-			self.recorders[recorder] = set()
-		self.recorders[recorder].add(output)
+		self.connections: typing.List[ConnectionArguments] = []
 
 	def addEndpoint(self, this: EntityExpression, endpoint: EntityExpression) -> None:
 		"""Register a new endpoint."""
@@ -62,94 +63,92 @@ class Connections:
 		identifier = EndpointId(this=this.fqn, name=endpoint.name)
 		this.assertTrue(condition=identifier not in self.endpoints,
 		                message=f"The endpoint '{this.fqn}.{endpoint.name}' is already registered.")
-		self.endpoints[identifier] = Metadata(writter=not endpoint.const,
+		self.endpoints[identifier] = Metadata(isWriter=not endpoint.const,
 		                                      symbol=endpoint.symbol,
 		                                      multi=endpoint.isVarArgs)
 
-	def addConnection(self, writter: EndpointId, reader: EndpointId) -> None:
-		"""Add a new connection between a writter and a reader."""
+	def addConnection(self, writer: EndpointId, reader: EndpointId) -> None:
+		"""Add a new connection between a writer and a reader."""
 
 		# Make sure the endpoints exists.
-		assert writter in self.endpoints, f"The writter '{writter}' is not registered, only the followings are: {list(self.endpoints.keys())}."
+		assert writer in self.endpoints, f"The writer '{writer}' is not registered, only the followings are: {list(self.endpoints.keys())}."
 		assert reader in self.endpoints, f"The reader '{reader}' is not registered, only the followings are: {list(self.endpoints.keys())}."
 
 		# Check const correctness.
-		assert self.endpoints[writter].writter, f"The writter '{writter}' must not be marked as const."
-		assert not self.endpoints[reader].writter, f"The reader '{reader}' must be marked as const."
+		assert self.endpoints[writer].isWriter, f"The writer '{writer}' must not be marked as const."
+		assert not self.endpoints[reader].isWriter, f"The reader '{reader}' must be marked as const."
 
 		# Sanity checks.
-		assert writter != reader, f"A connection cannot connect to itself: '{writter}' -> '{reader}'."
-		assert not (writter in self.groups and reader in self.groups[writter]
-		            ), f"Connection between '{writter}' and '{reader}' is defined multiple times."
+		assert writer != reader, f"A connection cannot connect to itself: '{writer}' -> '{reader}'."
+		assert len(self.endpoints[reader].connections) == 0 or self.endpoints[
+		    reader].multi, f"Readers can only have a single connection, '{reader}' is already connected to {self.endpoints[reader].connections}."
+		assert reader not in self.endpoints[
+		    writer].connections, f"Connection between '{writer}' and '{reader}' is defined multiple times."
 
-		self.endpoints[writter].connections += 1
-		self.endpoints[reader].connections += 1
-		assert self.endpoints[reader].connections == 1 or self.endpoints[
-		    reader].multi, f"Readers can only have a single connection, '{reader}' has registered {self.endpoints[reader].connections} already."
+		self.endpoints[reader].connections.add(writer)
+		self.endpoints[writer].connections.add(reader)
 
-		if writter not in self.groups:
-			self.groups[writter] = set()
-		self.groups[writter].add(reader)
+		# Make sure the types are compatibles.
+		writerTypeFQN = self.endpoints[writer].symbol.underlyingTypeFQN
+		readerTypeFQN = self.endpoints[reader].symbol.underlyingTypeFQN
+		assert writerTypeFQN == readerTypeFQN or writerTypeFQN == "Any" or readerTypeFQN == "Any", f"A connection must be made between the same types, not '{writerTypeFQN}' and '{readerTypeFQN}'."
 
-	def add(self, input: EntityExpression, output: EntityExpression) -> None:
-		"""Register a new connection to the connection map."""
+	def add(self, writer: EntityExpression, *readers: EntityExpression) -> None:
+		"""Register a new connection for later processing."""
+		self.connections.append(ConnectionArguments(writer=writer, readers=set(readers)))
 
-		input.assertTrue(condition=input.isLValue, message="First argument must be a reference to another object.")
+	def getIdentifiers(self, entity: EntityExpression, identifiers: typing.Set[EndpointId],
+	                   description: str) -> typing.Set[EndpointId]:
+		"""Get the list of identifiers filtered by the entity."""
 
-		# If the input is a bzd.platform.Recorder.
-		inputEntityType = input.symbol.getEntityUnderlyingTypeResolved(resolver=self.resolver)
-		if "bzd.platform.Recorder" in inputEntityType.getParents():
-			self.addRecorder(recorder=input.symbol, output=output)
-			return
+		# If the entity contains a regular expression.
+		if entity.isRegexpr:
+			matches = entity.regexpr.match(identifiers)
+			entity.assertTrue(condition=bool(matches), message="There are no matches from this regular expression.")
+			return matches
 
-		output.assertTrue(condition=output.isLValue, message="Second argument must be a reference to another object.")
+		# Else it should point to a signal input.
+		entity.assertTrue(condition=entity.isSymbol, message="Must be a regexpr of a symbol.")
+		entity.assertTrue(condition=entity.isLValue, message="Must be a reference to another object.")
 
-		input.assertTrue(
-		    condition=input.underlyingTypeFQN == output.underlyingTypeFQN,
-		    message=
-		    f"Connections cannot only be made between same types, not {input.underlyingTypeFQN} and {output.underlyingTypeFQN}."
-		)
+		# If the entity represents a special type.
+		entityType = entity.symbol.getEntityUnderlyingTypeResolved(resolver=self.resolver)
+		if "bzd.platform.Recorder" in entityType.getParents():
+			identifier = EndpointId(str(entity.symbol), "inputs")
+		else:
+			identifier = EndpointId.fromSymbol(entity.symbol)
+		entity.assertTrue(condition=identifier in identifiers, message=f"'{identifier}' is not a valid {description}.")
 
-		try:
-			self.addConnection(writter=EndpointId.fromSymbol(input.symbol), reader=EndpointId.fromSymbol(output.symbol))
-		except AssertionError as e:
-			input.error(str(e))
+		return {identifier}
 
 	def close(self) -> None:
-		# List of all writters.
-		identifiers = {identifier for identifier, metadata in self.endpoints.items() if metadata.writter}
-		for recorder, entities in self.recorders.items():
+		"""Process all the connections."""
 
-			matches: typing.Set[EndpointId] = set()
-			for entity in entities:
-				# If the entity contains a regular expression.
-				if entity.isRegexpr:
-					newMatches = entity.regexpr.match(identifiers)
-					entity.assertTrue(condition=bool(newMatches),
-					                  message="There are no matches from this regular expression.")
-					entity.assertTrue(condition=bool(newMatches - matches),
-					                  message=f"All matches are alreay sets: {newMatches}")
-					matches.update(newMatches)
-				# Else it should point to a signal input.
-				else:
-					entity.assertTrue(condition=entity.isSymbol, message="Must be a regexpr of a symbol.")
-					entity.assertTrue(condition=entity.isLValue, message="Must be a reference to another object.")
-					identifier = EndpointId.fromSymbol(entity.symbol)
-					entity.assertTrue(condition=identifier in identifiers,
-					                  message="A recorder must be connected to a IO generator.")
-					entity.assertTrue(condition=identifier not in matches, message=f"This entity is already twice.")
-					matches.add(identifier)
+		# List all available identifiers.
+		allWriters = {identifier for identifier, metadata in self.endpoints.items() if metadata.isWriter}
+		allReaders = {identifier for identifier, metadata in self.endpoints.items() if not metadata.isWriter}
+
+		for connection in self.connections:
+
+			# Match the identifiers.
+			writers = self.getIdentifiers(connection.writer, allWriters, "writer IO")
+			readers: typing.Set[EndpointId] = set()
+			for entity in connection.readers:
+				matches = self.getIdentifiers(entity, allReaders, "reader IO")
+				entity.assertTrue(condition=bool(matches - readers),
+				                  message=f"This expression does not match any IO readers.")
+				readers.update(matches)
 
 			# Register the connections.
-			recorder.assertTrue(condition=bool(matches), message="The recorder is not associated with any IO.")
-			try:
-				for identifier in matches:
-					self.addConnection(writter=identifier, reader=EndpointId(this=recorder.fqn, name="inputs"))
-			except AssertionError as e:
-				recorder.error(str(e))
+			for writer in writers:
+				for reader in readers:
+					try:
+						self.addConnection(writer=writer, reader=reader)
+					except AssertionError as e:
+						connection.writer.error(str(e))
 
 	def __repr__(self) -> str:
 		content = []
-		for writter, readers in self.groups.items():
-			content += [f"{writter} => {readers}"]
+		for writer, metadata in self.endpoints.items():
+			content += [f"{writer} => {metadata.connections}"]
 		return "\n".join(content)

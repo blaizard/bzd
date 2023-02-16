@@ -1,7 +1,7 @@
 #pragma once
 
 #include "cc/bzd.hh"
-#include "example/io/simple/composition.hh"
+#include "example/io/simple/common.hh"
 
 namespace example {
 
