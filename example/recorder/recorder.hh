@@ -80,7 +80,12 @@ public:
 
 	bzd::Async<> run()
 	{
-		context_.io.send.set(12.4);
+		for (int i=0; i<10; ++i)
+		{
+			context_.io.send.set(12.4);
+			co_await !bzd::print("Sending {}\n"_csv, 12.4);
+			co_await !bzd::delay(100_ms);
+		}
 
 		/*co_await !bzd::print("Hello {}"_csv, bzd::Data<"example.Hello.send">::id);
 
@@ -119,13 +124,48 @@ public:
 	}
 };
 
-class Recorder : public bzd::platform::Recorder<Recorder>
+template <class Context>
+class Recorder : public bzd::platform::Recorder<Recorder<Context>>
 {
 public:
-	template <class Context>
-	constexpr explicit Recorder(Context&) noexcept
+	constexpr explicit Recorder(Context& context) noexcept : context_{context}
 	{
 	}
+
+	bzd::Async<> run()
+	{
+		const auto& executor = co_await bzd::async::getExecutor();
+		while (executor.isRunning())
+		{
+			/*co_await !bzd::apply([this](auto&... reader) -> bzd::Async<> {
+					(co_await !this->serializeNewData(reader), ...);
+					co_return {};
+				}, context_.io.inputs);*/
+			bzd::apply([this](auto&... reader) {
+					(this->serializeNewData(reader), ...);
+				}, context_.io.inputs);
+			co_await bzd::async::yield();
+		}
+		co_return {};
+	}
+
+private:
+	template <class Reader>
+	void serializeNewData(Reader& reader)
+	{
+		//co_await !bzd::print("Hello ");
+		auto scope = reader.tryGet();
+		//co_await !bzd::print("World\n");
+		//co_await !bzd::print("Anything? {:}\n"_csv, bool(scope));
+		if (scope)
+		{
+			bzd::print("Value: {:}\n"_csv, scope.value()).sync();
+		}
+		//co_return {};
+	}
+
+private:
+	Context& context_;
 };
 
 } // namespace example
