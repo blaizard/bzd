@@ -52,6 +52,27 @@ private:
 	Ring& ring_;
 };
 
+template <class Value>
+class WriterStub
+{
+public:
+	constexpr auto trySet() noexcept { return bzd::Optional<Value&>{}; }
+
+	template <class T>
+	constexpr bzd::Bool trySet(T&&) noexcept
+	{
+		return true;
+	}
+
+	bzd::Async<bzd::Optional<Value&>> set() noexcept { co_await bzd::Optional<Value&>{}; }
+
+	template <class T>
+	bzd::Async<> set(T&&) noexcept
+	{
+		co_return {};
+	}
+};
+
 template <class Ring>
 class Reader
 {
@@ -97,6 +118,17 @@ public:
 private:
 	Ring& ring_;
 	bzd::Size index_{0};
+};
+
+template <class Value>
+class ReaderStub
+{
+public:
+	constexpr auto tryGet() noexcept { return bzd::Optional<const Value&>{}; }
+
+	bzd::Async<bzd::Optional<const Value&>> get() noexcept { co_return bzd::Optional<const Value&>{}; }
+
+	constexpr auto tryGet(const bzd::Size) noexcept { return bzd::Optional<bzd::Spans<const Value, 2u>>{}; }
 };
 
 template <class T, Size capacity>

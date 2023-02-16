@@ -41,8 +41,6 @@ composition {
 	connect(hello.send, world.receive);
 	// Add the recorder
 	recorder = const Recorder() [executor(executor)];
-	connect(recorder, regexprExecutor + regexprExecutorSecond);
+	connect(regexprExecutor + regexprExecutorSecond, recorder);
 	
 }
-
-

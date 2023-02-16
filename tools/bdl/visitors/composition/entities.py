@@ -32,11 +32,12 @@ class Entities:
 
 		expression.assertTrue(condition=expression.isSymbol, message=f"Meta expressions must have a symbol.")
 		if expression.symbol.fqn == "connect":
-			self.add(expression.parametersResolved[0].param, isDep=True)
-			self.add(expression.parametersResolved[1].param, isDep=True)
+			arguments = []
+			for argument in expression.parametersResolved:
+				self.add(argument.param, isDep=True)
+				arguments.append(argument.param)
 
-			# Connections must be made after the resolving the symbol, as it must first be registered in the endpoints list.
-			self.connections.add(expression.parametersResolved[0].param, expression.parametersResolved[1].param)
+			self.connections.add(*arguments)
 
 		else:
 			expression.error(message="Unsupported meta expression.")
@@ -82,13 +83,16 @@ class Entities:
 
 	@cached_property
 	def registryConnections(self) -> typing.Dict[str, typing.Dict[str, typing.Any]]:
-		"""Provide a registry that containts all available connections.
+		"""Provide a registry that contains all available connections.
 		
 		{
 			"example.hello": {
 				"send": {
 					"type": "writer",
-					"writter": "example.hello.send"
+					"multi": False,
+					"connections": {"example.hello.send"},
+					"symbol": <symbol>,
+					"identifier": "example.hello.send"
 				}
 			},
 			...
@@ -97,23 +101,25 @@ class Entities:
 
 		result: typing.Dict[str, typing.Dict[str, typing.Any]] = {fqn: OrderedDict() for fqn in self.registry.keys()}
 
-		def addEntry(identifier: EndpointId, kind: str, writter: EndpointId) -> None:
-			result[identifier.this][identifier.name] = {"type": kind, "writter": str(writter)}
-
-		for writter, group in self.connections.groups.items():
-			addEntry(identifier=writter, kind="writer", writter=writter)
-			for reader in group:
-				addEntry(identifier=reader, kind="reader", writter=writter)
+		for identifier, metadata in self.connections.endpoints.items():
+			if identifier.this in result:
+				result[identifier.this][identifier.name] = {
+				    "type": "writer" if metadata.isWriter else "reader",
+				    "multi": metadata.multi,
+				    "connections": [str(connection) for connection in metadata.connections],
+				    "symbol": metadata.symbol,
+				    "identifier": str(identifier)
+				}
 
 		return result
 
 	def getConnectionsByExecutor(self, fqn: str) -> typing.Iterable[typing.Dict[str, typing.Any]]:
-		"""Provide an iterator over all connections for a specific executor.
+		"""Provide an iterator over all connections writers for a specific executor.
 		
 		[
 			{
 				"symbol": <Data type symbol>,
-				"writter": "example.hello.send",
+				"writer": "example.hello.send",
 				"readers": [
 					{
 						"history": 1
@@ -125,20 +131,21 @@ class Entities:
 		]
 		"""
 
-		for writter, group in self.connections.groups.items():
-			isExecutor = fqn in self.expressions.fromIdentifier(writter.this).value.executors
-			result: typing.Dict[str, typing.Any] = {
-			    "symbol": self.connections.endpoints[writter].symbol,
-			    "writter": str(writter),
-			    "readers": []
-			}
-			for reader in group:
-				isOutputExecutor = fqn in self.expressions.fromIdentifier(reader.this).value.executors
-				if isOutputExecutor:
-					result["readers"].append({"history": self.connections.endpoints[reader].history})
-					isExecutor = True
-			if isExecutor:
-				yield result
+		for identifier, metadata in self.connections.endpoints.items():
+			if metadata.isWriter:
+				result: typing.Dict[str, typing.Any] = {
+				    "symbol": metadata.symbol,
+				    "identifier": str(identifier),
+				    "readers": []
+				}
+				isExecutor = fqn in self.expressions.fromIdentifier(identifier.this).value.executors
+				for identifierReader in metadata.connections:
+					isReaderExecutor = fqn in self.expressions.fromIdentifier(identifierReader.this).value.executors
+					if isReaderExecutor:
+						result["readers"].append({"history": self.connections.endpoints[identifierReader].history})
+						isExecutor = True
+				if isExecutor:
+					yield result
 
 	def getRegistryByExecutor(self, fqn: str) -> typing.Dict[str, Expression]:
 		registry = OrderedDict()
