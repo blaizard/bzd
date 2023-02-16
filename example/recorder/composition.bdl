@@ -3,12 +3,7 @@ use "cc/bzd/platform/interfaces/recorder.bdl"
 namespace example;
 
 
-interface Base {
-	another = const Integer;
-	
-}
-
-component Hello : Base {
+component Hello {
 interface:
 	method run();
 	send = Float;
@@ -18,17 +13,13 @@ composition:
 	
 }
 
-component World {
-interface:
-	receive = const Float;
-	
-}
-
 component Recorder : bzd.platform.Recorder {
 interface:
 	method run();
+	
 composition:
 	this.run();
+	
 }
 
 composition {
@@ -39,9 +30,10 @@ composition {
 	hello2.run();
 	hello3 = Hello();
 	hello3.run();
-
 	// Add the recorder
 	recorder = Recorder();
 	connect(/.*/, recorder);
 	
 }
+
+
