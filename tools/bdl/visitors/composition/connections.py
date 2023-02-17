@@ -114,7 +114,7 @@ class Connections:
 		# If the entity represents a special type.
 		entityType = entity.symbol.getEntityUnderlyingTypeResolved(resolver=self.resolver)
 		if "bzd.platform.Recorder" in entityType.getParents():
-			identifier = EndpointId(str(entity.symbol), "inputs")
+			identifier = EndpointId(str(entity.symbol), "readers")
 		else:
 			identifier = EndpointId.fromSymbol(entity.symbol)
 		entity.assertTrue(condition=identifier in identifiers, message=f"'{identifier}' is not a valid {description}.")

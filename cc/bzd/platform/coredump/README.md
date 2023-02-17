@@ -1,7 +1,7 @@
 # Coredumps
 
 Core dumps should be short enough to be written to the stderr in case of crash, with enough information to be able
-to recreate teh stacktraces.
+to recreate the stacktraces.
 In addition, it might be appended with extra information to have extra level of introspection.
 
 Here is the format of a given core dump:

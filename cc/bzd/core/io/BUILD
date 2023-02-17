@@ -9,5 +9,6 @@ cc_library(
     deps = [
         "//cc/bzd/container/threadsafe:ring_buffer",
         "//cc/bzd/core/async",
+        "//cc/bzd/meta:string_literal",
     ],
 )

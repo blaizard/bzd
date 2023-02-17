@@ -70,8 +70,8 @@ config:
 	logger = Logger;
 
 composition:
-	connect(actuator1.error, logger);
-	connect(actuator2.error, logger);
-	connect(actuator3.error, logger);
+	connect(this.actuator1.error, logger);
+	connect(this.actuator2.error, logger);
+	connect(this.actuator3.error, logger);
 }
 ```
