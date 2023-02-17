@@ -2,10 +2,11 @@
 
 #include "cc/bzd/container/threadsafe/ring_buffer.hh"
 #include "cc/bzd/core/async.hh"
+#include "cc/bzd/meta/string_literal.hh"
 
 namespace bzd::io {
 
-template <class Ring>
+template <class Ring, meta::StringLiteral identifier>
 class Writer
 {
 private:
@@ -73,10 +74,10 @@ public:
 	}
 };
 
-template <class Ring>
+template <class Ring, meta::StringLiteral identifier>
 class Reader
 {
-private:
+public:
 	using Value = typename Ring::ValueType;
 
 public:
@@ -115,6 +116,8 @@ public:
 		return scope;
 	}
 
+	constexpr StringView getName() const noexcept { return StringView{identifier.data(), identifier.size()}; }
+
 private:
 	Ring& ring_;
 	bzd::Size index_{0};
@@ -131,15 +134,15 @@ public:
 	constexpr auto tryGet(const bzd::Size) noexcept { return bzd::Optional<bzd::Spans<const Value, 2u>>{}; }
 };
 
-template <class T, Size capacity>
+template <class T, Size capacity, meta::StringLiteral identifier>
 class Buffer
 {
 private: // Types.
 	using Ring = bzd::threadsafe::RingBuffer<T, capacity>;
 
 public: // API.
-	constexpr auto makeWriter() noexcept { return bzd::io::Writer<Ring>{ring_}; }
-	constexpr auto makeReader() noexcept { return bzd::io::Reader<Ring>{ring_}; }
+	constexpr auto makeWriter() noexcept { return bzd::io::Writer<Ring, identifier>{ring_}; }
+	constexpr auto makeReader() noexcept { return bzd::io::Reader<Ring, identifier>{ring_}; }
 
 private:
 	Ring ring_{};

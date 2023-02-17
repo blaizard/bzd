@@ -121,30 +121,29 @@ class Recorder : public bzd::platform::Recorder<Recorder<Context>>
 public:
 	constexpr explicit Recorder(Context& context) noexcept : context_{context} {}
 
-	bzd::Async<> run()
+	bzd::Async<> run() noexcept
 	{
-		const auto& executor = co_await bzd::async::getExecutor();
-		while (executor.isRunning())
-		{
-			co_await !bzd::apply(
-				[this](auto&... reader) -> bzd::Async<> {
-					(co_await !this->serializeNewData(reader), ...);
-					co_return {};
-				},
-				context_.io.inputs);
-			co_await bzd::async::yield();
-		}
+		co_await !bzd::apply(
+			[this](auto&... reader) -> bzd::Async<> {
+				bzd::ignore = co_await bzd::async::all(this->record(reader)...);
+				co_return {};
+			},
+			context_.io.readers);
 		co_return {};
 	}
 
 private:
 	template <class Reader>
-	bzd::Async<> serializeNewData(Reader& reader)
+	bzd::Async<> record(Reader& reader) noexcept
 	{
-		auto scope = reader.tryGet();
-		if (scope)
+		const auto& executor = co_await bzd::async::getExecutor();
+		while (executor.isRunning())
 		{
-			co_await !bzd::print("Value: {:}\n"_csv, scope.value());
+			auto scope = co_await !reader.get();
+			if (scope)
+			{
+				co_await !bzd::print("{}: {}\n"_csv, reader.getName(), scope.value());
+			}
 		}
 		co_return {};
 	}
