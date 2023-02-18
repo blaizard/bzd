@@ -4,8 +4,8 @@ namespace bzd.platform;
 
 // Recorder interface, must be used for all recorders specialization.
 interface Recorder {
-	// Tuple containing each reader connected to this recorder.
-	readers... = const Any;
+	// Tuple containing each sink connected to this recorder.
+	sinks... = const Any;
 	
 }
 

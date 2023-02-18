@@ -26,8 +26,8 @@ class EndpointId:
 
 @dataclasses.dataclass
 class Metadata:
-	# If this is a writer endpoint or not.
-	isWriter: bool
+	# If this is a source endpoint or not.
+	isSource: bool
 	# The type of symbol for this endpoint.
 	symbol: Symbol
 	# The connections associated with this endpoint.
@@ -40,10 +40,10 @@ class Metadata:
 
 @dataclasses.dataclass
 class ConnectionArguments:
-	# The writer associated with this connection.
-	writer: EntityExpression
-	# The set of readers associated with the writer.
-	readers: typing.Set[EntityExpression]
+	# The source associated with this connection.
+	source: EntityExpression
+	# The set of sinks associated with the source.
+	sinks: typing.Set[EntityExpression]
 
 
 class Connections:
@@ -63,39 +63,39 @@ class Connections:
 		identifier = EndpointId(this=this.fqn, name=endpoint.name)
 		this.assertTrue(condition=identifier not in self.endpoints,
 		                message=f"The endpoint '{this.fqn}.{endpoint.name}' is already registered.")
-		self.endpoints[identifier] = Metadata(isWriter=not endpoint.const,
+		self.endpoints[identifier] = Metadata(isSource=not endpoint.const,
 		                                      symbol=endpoint.symbol,
 		                                      multi=endpoint.isVarArgs)
 
-	def addConnection(self, writer: EndpointId, reader: EndpointId) -> None:
-		"""Add a new connection between a writer and a reader."""
+	def addConnection(self, source: EndpointId, sink: EndpointId) -> None:
+		"""Add a new connection between a source and a sink."""
 
 		# Make sure the endpoints exists.
-		assert writer in self.endpoints, f"The writer '{writer}' is not registered, only the followings are: {list(self.endpoints.keys())}."
-		assert reader in self.endpoints, f"The reader '{reader}' is not registered, only the followings are: {list(self.endpoints.keys())}."
+		assert source in self.endpoints, f"The source '{source}' is not registered, only the followings are: {list(self.endpoints.keys())}."
+		assert sink in self.endpoints, f"The sink '{sink}' is not registered, only the followings are: {list(self.endpoints.keys())}."
 
 		# Check const correctness.
-		assert self.endpoints[writer].isWriter, f"The writer '{writer}' must not be marked as const."
-		assert not self.endpoints[reader].isWriter, f"The reader '{reader}' must be marked as const."
+		assert self.endpoints[source].isSource, f"The source '{source}' must not be marked as const."
+		assert not self.endpoints[sink].isSource, f"The sink '{sink}' must be marked as const."
 
 		# Sanity checks.
-		assert writer != reader, f"A connection cannot connect to itself: '{writer}' -> '{reader}'."
-		assert len(self.endpoints[reader].connections) == 0 or self.endpoints[
-		    reader].multi, f"Readers can only have a single connection, '{reader}' is already connected to {self.endpoints[reader].connections}."
-		assert reader not in self.endpoints[
-		    writer].connections, f"Connection between '{writer}' and '{reader}' is defined multiple times."
+		assert source != sink, f"A connection cannot connect to itself: '{source}' -> '{sink}'."
+		assert len(self.endpoints[sink].connections) == 0 or self.endpoints[
+		    sink].multi, f"Sinks can only have a single connection, '{sink}' is already connected to {self.endpoints[sink].connections}."
+		assert sink not in self.endpoints[
+		    source].connections, f"Connection between '{source}' and '{sink}' is defined multiple times."
 
-		self.endpoints[reader].connections.add(writer)
-		self.endpoints[writer].connections.add(reader)
+		self.endpoints[sink].connections.add(source)
+		self.endpoints[source].connections.add(sink)
 
 		# Make sure the types are compatibles.
-		writerTypeFQN = self.endpoints[writer].symbol.underlyingTypeFQN
-		readerTypeFQN = self.endpoints[reader].symbol.underlyingTypeFQN
-		assert writerTypeFQN == readerTypeFQN or writerTypeFQN == "Any" or readerTypeFQN == "Any", f"A connection must be made between the same types, not '{writerTypeFQN}' and '{readerTypeFQN}'."
+		sourceTypeFQN = self.endpoints[source].symbol.underlyingTypeFQN
+		sinkTypeFQN = self.endpoints[sink].symbol.underlyingTypeFQN
+		assert sourceTypeFQN == sinkTypeFQN or sourceTypeFQN == "Any" or sinkTypeFQN == "Any", f"A connection must be made between the same types, not '{sourceTypeFQN}' and '{sinkTypeFQN}'."
 
-	def add(self, writer: EntityExpression, *readers: EntityExpression) -> None:
+	def add(self, source: EntityExpression, *sinks: EntityExpression) -> None:
 		"""Register a new connection for later processing."""
-		self.connections.append(ConnectionArguments(writer=writer, readers=set(readers)))
+		self.connections.append(ConnectionArguments(source=source, sinks=set(sinks)))
 
 	def getIdentifiers(self, entity: EntityExpression, identifiers: typing.Set[EndpointId],
 	                   description: str) -> typing.Set[EndpointId]:
@@ -114,7 +114,7 @@ class Connections:
 		# If the entity represents a special type.
 		entityType = entity.symbol.getEntityUnderlyingTypeResolved(resolver=self.resolver)
 		if "bzd.platform.Recorder" in entityType.getParents():
-			identifier = EndpointId(str(entity.symbol), "readers")
+			identifier = EndpointId(str(entity.symbol), "sinks")
 		else:
 			identifier = EndpointId.fromSymbol(entity.symbol)
 		entity.assertTrue(condition=identifier in identifiers, message=f"'{identifier}' is not a valid {description}.")
@@ -125,30 +125,30 @@ class Connections:
 		"""Process all the connections."""
 
 		# List all available identifiers.
-		allWriters = {identifier for identifier, metadata in self.endpoints.items() if metadata.isWriter}
-		allReaders = {identifier for identifier, metadata in self.endpoints.items() if not metadata.isWriter}
+		allSources = {identifier for identifier, metadata in self.endpoints.items() if metadata.isSource}
+		allSinks = {identifier for identifier, metadata in self.endpoints.items() if not metadata.isSource}
 
 		for connection in self.connections:
 
 			# Match the identifiers.
-			writers = self.getIdentifiers(connection.writer, allWriters, "writer IO")
-			readers: typing.Set[EndpointId] = set()
-			for entity in connection.readers:
-				matches = self.getIdentifiers(entity, allReaders, "reader IO")
-				entity.assertTrue(condition=bool(matches - readers),
-				                  message=f"This expression does not match any IO readers.")
-				readers.update(matches)
+			sources = self.getIdentifiers(connection.source, allSources, "source IO")
+			sinks: typing.Set[EndpointId] = set()
+			for entity in connection.sinks:
+				matches = self.getIdentifiers(entity, allSinks, "sink IO")
+				entity.assertTrue(condition=bool(matches - sinks),
+				                  message=f"This expression does not match any IO sinks.")
+				sinks.update(matches)
 
 			# Register the connections.
-			for writer in writers:
-				for reader in readers:
+			for source in sources:
+				for sink in sinks:
 					try:
-						self.addConnection(writer=writer, reader=reader)
+						self.addConnection(source=source, sink=sink)
 					except AssertionError as e:
-						connection.writer.error(str(e))
+						connection.source.error(str(e))
 
 	def __repr__(self) -> str:
 		content = []
-		for writer, metadata in self.endpoints.items():
-			content += [f"{writer} => {metadata.connections}"]
+		for source, metadata in self.endpoints.items():
+			content += [f"{source} => {metadata.connections}"]
 		return "\n".join(content)

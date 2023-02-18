@@ -88,7 +88,7 @@ class Entities:
 		{
 			"example.hello": {
 				"send": {
-					"type": "writer",
+					"type": "source",
 					"multi": False,
 					"connections": {"example.hello.send"},
 					"symbol": <symbol>,
@@ -104,7 +104,7 @@ class Entities:
 		for identifier, metadata in self.connections.endpoints.items():
 			if identifier.this in result:
 				result[identifier.this][identifier.name] = {
-				    "type": "writer" if metadata.isWriter else "reader",
+				    "type": "source" if metadata.isSource else "sink",
 				    "multi": metadata.multi,
 				    "connections": [str(connection) for connection in metadata.connections],
 				    "symbol": metadata.symbol,
@@ -114,13 +114,13 @@ class Entities:
 		return result
 
 	def getConnectionsByExecutor(self, fqn: str) -> typing.Iterable[typing.Dict[str, typing.Any]]:
-		"""Provide an iterator over all connections writers for a specific executor.
+		"""Provide an iterator over all connections sources for a specific executor.
 		
 		[
 			{
 				"symbol": <Data type symbol>,
-				"writer": "example.hello.send",
-				"readers": [
+				"source": "example.hello.send",
+				"sinks": [
 					{
 						"history": 1
 					},
@@ -132,17 +132,16 @@ class Entities:
 		"""
 
 		for identifier, metadata in self.connections.endpoints.items():
-			if metadata.isWriter:
+			if metadata.isSource:
 				result: typing.Dict[str, typing.Any] = {
 				    "symbol": metadata.symbol,
 				    "identifier": str(identifier),
-				    "readers": []
+				    "sinks": []
 				}
 				isExecutor = fqn in self.expressions.fromIdentifier(identifier.this).value.executors
-				for identifierReader in metadata.connections:
-					isReaderExecutor = fqn in self.expressions.fromIdentifier(identifierReader.this).value.executors
-					if isReaderExecutor:
-						result["readers"].append({"history": self.connections.endpoints[identifierReader].history})
+				for identifierSink in metadata.connections:
+					if fqn in self.expressions.fromIdentifier(identifierSink.this).value.executors:
+						result["sinks"].append({"history": self.connections.endpoints[identifierSink].history})
 						isExecutor = True
 				if isExecutor:
 					yield result

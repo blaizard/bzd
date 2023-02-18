@@ -157,7 +157,7 @@ class TestRun(unittest.TestCase):
 			}
 			""",
 		                                 objectContext=ObjectContext(resolve=True))
-		with self.assertRaisesRegex(Exception, r"is not a valid reader IO"):
+		with self.assertRaisesRegex(Exception, r"is not a valid sink IO"):
 			Composition().visit(common).visit(composition).process()
 
 		composition = Object.fromContent(content="""
@@ -194,7 +194,7 @@ class TestRun(unittest.TestCase):
 			}
 			""",
 		                                 objectContext=ObjectContext(resolve=True))
-		with self.assertRaisesRegex(Exception, r"not a valid writer IO"):
+		with self.assertRaisesRegex(Exception, r"not a valid source IO"):
 			Composition().visit(common).visit(composition).process()
 
 	def testCompositionThis(self) -> None:
