@@ -124,25 +124,25 @@ public:
 	bzd::Async<> run() noexcept
 	{
 		co_await !bzd::apply(
-			[this](auto&... reader) -> bzd::Async<> {
-				bzd::ignore = co_await bzd::async::all(this->record(reader)...);
+			[this](auto&... sink) -> bzd::Async<> {
+				bzd::ignore = co_await bzd::async::all(this->record(sink)...);
 				co_return {};
 			},
-			context_.io.readers);
+			context_.io.sinks);
 		co_return {};
 	}
 
 private:
 	template <class Reader>
-	bzd::Async<> record(Reader& reader) noexcept
+	bzd::Async<> record(Reader& sink) noexcept
 	{
 		const auto& executor = co_await bzd::async::getExecutor();
 		while (executor.isRunning())
 		{
-			auto scope = co_await !reader.get();
+			auto scope = co_await !sink.get();
 			if (scope)
 			{
-				co_await !bzd::print("{}: {}\n"_csv, reader.getName(), scope.value());
+				co_await !bzd::print("{}: {}\n"_csv, sink.getName(), scope.value());
 			}
 		}
 		co_return {};

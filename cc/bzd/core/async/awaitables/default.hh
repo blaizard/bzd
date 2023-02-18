@@ -11,7 +11,7 @@ public:
 	constexpr explicit Awaiter(Async& async) noexcept : async_{async} {}
 
 	// NOLINTNEXTLINE(readability-identifier-naming)
-	constexpr bool await_ready() noexcept { return async_.isCompleted(); }
+	constexpr bool await_ready() noexcept { return false; }
 
 	template <class U>
 	// NOLINTNEXTLINE(readability-identifier-naming)

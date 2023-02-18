@@ -220,7 +220,7 @@ class Transform:
 	# Connection
 	def connectionCount(self, connection: typing.Any) -> int:
 		count = 1
-		for output in connection.get("readers", []):
+		for output in connection.get("sinks", []):
 			count = max(count, output.get("history", 1))
 		return count + 1
 
@@ -230,8 +230,8 @@ class Transform:
 			return "io_buffer_" + self.fqnToNameStr(identifier)
 
 		args = []
-		factoryTypes = {"reader": "makeReader()", "writer": "makeWriter()"}
-		factoryStubTypes = {"reader": "bzd::io::ReaderStub", "writer": "bzd::io::WriterStub"}
+		factoryTypes = {"sink": "makeSink()", "source": "makeSource()"}
+		factoryStubTypes = {"sink": "bzd::io::SinkStub", "source": "bzd::io::SourceStub"}
 		for name, metadata in connections.items():
 
 			kind = metadata["type"]
@@ -246,7 +246,7 @@ class Transform:
 			elif len(metadata["connections"]) == 0:
 				arg = f"{factoryStubTypes[kind]}<{self.symbolToStr(metadata['symbol'])}>()"
 			else:
-				if kind == "reader":
+				if kind == "sink":
 					identifier = metadata["connections"][0]
 					assert len(metadata["connections"]), f"Must be only one connection, {metadata['connections']}"
 				else:

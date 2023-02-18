@@ -7,13 +7,13 @@
 namespace bzd::io {
 
 template <class Ring, meta::StringLiteral identifier>
-class Writer
+class Source
 {
 private:
 	using Value = typename Ring::ValueMutableType;
 
 public:
-	constexpr explicit Writer(Ring& ring) noexcept : ring_{ring} {}
+	constexpr explicit Source(Ring& ring) noexcept : ring_{ring} {}
 
 public:
 	constexpr auto trySet() noexcept { return ring_.nextForWriting(); }
@@ -54,7 +54,7 @@ private:
 };
 
 template <class Value>
-class WriterStub
+class SourceStub
 {
 public:
 	constexpr auto trySet() noexcept { return bzd::Optional<Value&>{}; }
@@ -75,13 +75,13 @@ public:
 };
 
 template <class Ring, meta::StringLiteral identifier>
-class Reader
+class Sink
 {
 public:
 	using Value = typename Ring::ValueType;
 
 public:
-	constexpr explicit Reader(Ring& ring) noexcept : ring_{ring} {}
+	constexpr explicit Sink(Ring& ring) noexcept : ring_{ring} {}
 
 public:
 	constexpr auto tryGet() noexcept
@@ -124,7 +124,7 @@ private:
 };
 
 template <class Value>
-class ReaderStub
+class SinkStub
 {
 public:
 	constexpr auto tryGet() noexcept { return bzd::Optional<const Value&>{}; }
@@ -141,8 +141,8 @@ private: // Types.
 	using Ring = bzd::threadsafe::RingBuffer<T, capacity>;
 
 public: // API.
-	constexpr auto makeWriter() noexcept { return bzd::io::Writer<Ring, identifier>{ring_}; }
-	constexpr auto makeReader() noexcept { return bzd::io::Reader<Ring, identifier>{ring_}; }
+	constexpr auto makeSource() noexcept { return bzd::io::Source<Ring, identifier>{ring_}; }
+	constexpr auto makeSink() noexcept { return bzd::io::Sink<Ring, identifier>{ring_}; }
 
 private:
 	Ring ring_{};

@@ -38,7 +38,7 @@ class ConnectMeta(Builtin):
 	def __init__(self) -> None:
 		super().__init__(
 		    ElementBuilder("builtin").setAttr("name", "connect").addConfigValue(
-		        name="writer", kind="Any", contract="mandatory").addConfigValue(name="readers...",
+		        name="source", kind="Any", contract="mandatory").addConfigValue(name="sinks...",
 		                                                                        kind="Any").setAttr("meta", "1"))
 
 
