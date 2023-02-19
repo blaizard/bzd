@@ -212,7 +212,7 @@ public:
 		{
 			// Drain remaining handles
 			auto maybeExecutable = pop();
-			if (maybeExecutable.hasValue())
+			while (maybeExecutable.hasValue())
 			{
 				auto& executable = maybeExecutable.valueMutable();
 				const auto isCanceled = executable.isCanceled();
@@ -225,12 +225,9 @@ public:
 					executable.resume(context);
 				}
 
-				// Enqueue an executable if needed.
-				auto maybeExecutableToEnqueue = context.popContinuation();
-				if (maybeExecutableToEnqueue)
-				{
-					push(maybeExecutableToEnqueue.valueMutable());
-				}
+				// Execute the continuation if any, this instead of enqueuing it,
+				// as this will speed up execution by avoiding unecessary atomic operations.
+				maybeExecutable = context.popContinuation();
 			}
 			context.updateTick();
 		}

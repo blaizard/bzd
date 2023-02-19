@@ -61,6 +61,7 @@ bzd::Async<int> nested(bzd::interface::String& trace, bzd::StringView id, int re
 {
 	appendToTrace(trace, id, 1);
 	auto result = co_await nop(trace, id, retVal);
+	co_await bzd::async::yield();
 	appendToTrace(trace, id, 2);
 	co_return result;
 }
@@ -110,7 +111,7 @@ TEST_ASYNC(Coroutine, asyncAll)
 {
 	bzd::String<128> trace;
 	const auto result = co_await bzd::async::all(nested(trace, "a", 10), nested(trace, "b", -4));
-	EXPECT_EQ(trace, "[a1][b1][a0][b0][a2][b2]");
+	EXPECT_EQ(trace, "[a1][a0][b1][b0][a2][b2]");
 	EXPECT_EQ(result.size(), 2U);
 	EXPECT_TRUE(result.get<0>());
 	EXPECT_EQ(result.get<0>().value(), 10);
@@ -122,7 +123,7 @@ TEST_ASYNC(Coroutine, asyncAllDifferent)
 {
 	bzd::String<128> trace;
 	[[maybe_unused]] auto result = co_await bzd::async::all(nested(trace, "a"), deepNested(trace, "b"));
-	EXPECT_EQ(trace, "[a1][b3][a0][b1][a2][b0][b2][b4][b3][b1][b0][b2][b4][b3][b1][b0][b2][b4]");
+	EXPECT_EQ(trace, "[a1][a0][b3][b1][b0][a2][b2][b4][b3][b1][b0][b2][b4][b3][b1][b0][b2][b4]");
 	co_return {};
 }
 
@@ -130,7 +131,7 @@ TEST_ASYNC(Coroutine, asyncAllMany)
 {
 	bzd::String<128> trace;
 	[[maybe_unused]] auto result = co_await bzd::async::all(nested(trace, "a"), nested(trace, "b"), nested(trace, "c"), nested(trace, "d"));
-	EXPECT_EQ(trace, "[a1][b1][c1][d1][a0][b0][c0][d0][a2][b2][c2][d2]");
+	EXPECT_EQ(trace, "[a1][a0][b1][b0][c1][c0][d1][d0][a2][b2][c2][d2]");
 	co_return {};
 }
 
@@ -147,7 +148,8 @@ TEST_ASYNC(Coroutine, asyncAllNested)
 {
 	bzd::String<128> trace;
 	[[maybe_unused]] auto result = co_await bzd::async::all(asyncAllNested(trace, "a"), deepNested(trace, "b"));
-	EXPECT_EQ(trace, "[a5][b3][b1][y1][z1][b0][y0][z0][b2][y2][z2][b4][b3][b1][a6][b0][b2][b4][b3][b1][b0][b2][b4]");
+	//::std::cout << ::std::endl << "HERE: " << trace.data() << ::std::endl;
+	EXPECT_EQ(trace, "[a5][b3][b1][b0][y1][y0][z1][z0][b2][b4][b3][b1][b0][y2][z2][a6][b2][b4][b3][b1][b0][b2][b4]");
 	co_return {};
 }
 
@@ -156,7 +158,7 @@ TEST_ASYNC(Coroutine, asyncAny)
 	bzd::String<128> trace;
 	const auto result = co_await bzd::async::any(nested(trace, "a"), deepNested(trace, "b"));
 	//::std::cout << ::std::endl << "HERE: " << trace.data() << ::std::endl;
-	EXPECT_EQ(trace, "[a1][b3][a0][b1][a2]");
+	EXPECT_EQ(trace, "[a1][a0][b3][b1][b0][a2]");
 	EXPECT_EQ(result.size(), 2U);
 	EXPECT_TRUE(result.get<0>());
 	EXPECT_FALSE(result.get<1>());
@@ -170,7 +172,7 @@ TEST_ASYNC(Coroutine, asyncAnyMany)
 	const auto result =
 		co_await bzd::async::any(deepNested(trace, "a"), deepNested(trace, "b"), nested(trace, "c", -432), deepNested(trace, "d"));
 	//::std::cout << ::std::endl << "HERE: " << trace.data() << ::std::endl;
-	EXPECT_EQ(trace, "[a3][b3][c1][d3][a1][b1][c0][d1][a0][b0][c2]");
+	EXPECT_EQ(trace, "[a3][a1][a0][b3][b1][b0][c1][c0][d3][d1][d0][a2][a4][a3][a1][a0][b2][b4][b3][b1][b0][c2]");
 	EXPECT_EQ(result.size(), 4U);
 	EXPECT_FALSE(result.get<0>());
 	EXPECT_FALSE(result.get<1>());
@@ -215,18 +217,20 @@ TEST_ASYNC(Coroutine, asyncAnyNested)
 		bzd::String<128> trace;
 		co_await !anyNested(trace, "a");
 		//::std::cout << ::std::endl << "HERE: " << trace.data() << ::std::endl;
-		EXPECT_EQ(trace, "[a6][b3][c1][b1][c0][b0][c2][a7]");
+		EXPECT_EQ(trace, "[a6][b3][b1][b0][c1][c0][b2][b4][b3][b1][b0][c2][a7]");
 	}
 	{
 		bzd::String<128> trace;
 		[[maybe_unused]] const auto result = co_await bzd::async::any(nested(trace, "d"), anyNested(trace, "a"));
-		EXPECT_EQ(trace, "[d1][a6][d0][d2]");
+		//::std::cout << ::std::endl << "HERE: " << trace.data() << ::std::endl;
+		EXPECT_EQ(trace, "[d1][d0][a6][d2]");
 	}
 	{
 		bzd::String<128> trace;
 		[[maybe_unused]] const auto result =
 			co_await bzd::async::any(bzd::async::any(anyNested(trace, "d"), anyNested(trace, "a")), nested(trace, "c"));
-		EXPECT_EQ(trace, "[c1][d6][a6][c0][c2]");
+		//::std::cout << ::std::endl << "HERE: " << trace.data() << ::std::endl;
+		EXPECT_EQ(trace, "[c1][c0][d6][a6][c2]");
 	}
 
 	co_return {};
