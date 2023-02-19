@@ -39,12 +39,12 @@ public:
 	/// Called by the scheduler when an executable is detected as being canceled.
 	constexpr void cancel(bzd::ExecutorContext<Executable>& context) noexcept
 	{
-		bzd::Optional<Executable&> executable{*this};
+		Executable* executable{this};
 
-		// Unroll all the direct continuation from the callstackk.
+		// Unroll all the direct continuation from the callstack.
 		while (executable->continuation_.is<Executable*>())
 		{
-			executable.emplace(*(executable->continuation_.get<Executable*>()));
+			executable = executable->continuation_.get<Executable*>();
 		}
 
 		// All cancellation must terminate with a callback, if this fails it means that
