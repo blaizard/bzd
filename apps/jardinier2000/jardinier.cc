@@ -19,7 +19,7 @@ bzd::Async<bool> water(bzd::Size wateringTimeS, bzd::UInt64 wakeUpPeriodS)
 	gpio_set_level(waterPumpPin, 0);
 
 	co_await bzd::log::info("Going to sleep, will wake up in {}s..."_csv, wakeUpPeriodS);
-	esp_sleep_enable_timer_wakeup(/*time us*/ wakeUpPeriodS * 1000000);
+	esp_sleep_enable_timer_wakeup(/*time us*/ wakeUpPeriodS * 1000000ull);
 	esp_deep_sleep_start();
 
 	co_return true;
