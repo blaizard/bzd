@@ -23,9 +23,8 @@ public: // Coroutine specializations.
 	// NOLINTNEXTLINE(readability-identifier-naming)
 	constexpr bool await_suspend(bzd::coroutine::impl::coroutine_handle<T> caller) noexcept
 	{
-		bzd::coroutine::impl::Executable& promise = caller.promise();
-		auto ref = promise.suspend();
-		onSuspend_(bzd::move(ref));
+		bzd::coroutine::impl::Executable& executable = caller.promise();
+		onSuspend_(executable.suspend());
 		return true;
 	}
 

@@ -24,8 +24,6 @@ class Executor;
 namespace interface {
 template <class T>
 class Executable;
-template <class T>
-class ExecutableRef;
 } // namespace interface
 
 namespace coroutine::impl {
@@ -116,42 +114,6 @@ private:
 	Continuation continuation_{};
 };
 
-using SuspendedId = Size;
-
-template <class Executable, Size n>
-class Suspended
-{
-public:
-	constexpr Optional<SuspendedId> push(Executable& executable) noexcept
-	{
-		SuspendedId index;
-		do
-		{
-			index = used_.countLOne();
-			if (index == n)
-			{
-				return bzd::nullopt;
-			}
-		} while (!used_.compareSet(index));
-		data_[index] = &executable;
-		return index;
-	}
-
-	constexpr Optional<Executable&> get(const SuspendedId index) noexcept
-	{
-		auto& executable = *(data_[index]);
-		if (!used_.compareClear(index))
-		{
-			return bzd::nullopt;
-		}
-		return executable;
-	}
-
-private:
-	threadsafe::Bitset<n> used_;
-	Array<Executable*, n> data_;
-};
-
 /// The executor concept is a workload scheduler that owns several executables
 /// and executes them.
 /// An executor is thread-safe and can be shared betweeen multiple threads or cores.
@@ -226,7 +188,8 @@ public:
 				}
 
 				// Execute the continuation if any, this instead of enqueuing it,
-				// as this will speed up execution by avoiding unecessary atomic operations.
+				// as this will speed up execution by avoiding unecessary atomic operations
+				// and keeping continuation running on the same core to please caching.
 				maybeExecutable = context.popContinuation();
 			}
 			context.updateTick();
@@ -357,26 +320,13 @@ private:
 		return bzd::nullopt;
 	}
 
-	/// Suspend an executable.
-	/// TODO: make it really noexcept.
-	[[nodiscard]] constexpr SuspendedId suspend(Executable& executable) noexcept
-	{
-		const auto maybeSuspendId = suspended_.push(executable);
-		bzd::assert::isTrue(maybeSuspendId.hasValue());
-		return maybeSuspendId.value();
-	}
-
 private:
 	template <class U>
 	friend class bzd::interface::Executable;
-	template <class U>
-	friend class bzd::interface::ExecutableRef;
 	friend struct bzd::coroutine::impl::Yield;
 
 	/// List of pending workload waiting to be scheduled.
 	bzd::threadsafe::NonOwningQueue<Executable> queue_{};
-	/// List of suspended workloads
-	Suspended<Executable, 128u> suspended_;
 	/// Keep contexts about the current runnning scheduler.
 	bzd::threadsafe::NonOwningForwardList<ExecutorContext<Executable>> context_{};
 	/// Mutex to protect access over the context queue.
@@ -397,44 +347,97 @@ private:
 
 namespace bzd::interface {
 
+/// Type to store an executable when suspended.
 template <class T>
-class ExecutableRef
+class ExecutableSuspended
 {
 public:
-	ExecutableRef() = default;
-	constexpr ExecutableRef(bzd::Executor<T>& executor, const SuspendedId id) noexcept : executor_{&executor}, suspendId_{id} {}
-	ExecutableRef(const ExecutableRef&) = delete;
-	ExecutableRef& operator=(const ExecutableRef&) = delete;
-	ExecutableRef(ExecutableRef&&) = default;
-	ExecutableRef& operator=(ExecutableRef&&) = default;
-
-public: // API.
-	/// Function to re-schedule the executable after a suspend operation.
-	constexpr void schedule() && noexcept
+	constexpr ExecutableSuspended() noexcept : executable_{nullptr}, onCancel_{makeCallback()} {}
+	constexpr ExecutableSuspended(T& executable) noexcept : executable_{&executable}, onCancel_{makeCallback()}
 	{
-		auto maybeExecutable = executor_->suspended_.get(suspendId_);
-		if (maybeExecutable)
+		if (executable.cancel_)
 		{
-			maybeExecutable->scheduleAfterSuspend();
+			executable.cancel_->addOneTimeCallback(onCancel_);
+		}
+	}
+	ExecutableSuspended(const ExecutableSuspended&) = delete;
+	ExecutableSuspended& operator=(const ExecutableSuspended&) = delete;
+	constexpr ExecutableSuspended(ExecutableSuspended&& other) noexcept : executable_{nullptr}, onCancel_{makeCallback()}
+	{
+		*this = bzd::move(other);
+	}
+	constexpr ExecutableSuspended& operator=(ExecutableSuspended&& other) noexcept
+	{
+		// Do not allow move from a non-empty container.
+		bzd::assert::isTrue(executable_.load() == nullptr);
+
+		auto* executable = other.executable_.exchange(processing_);
+		if (executable != processing_)
+		{
+			if (executable)
+			{
+				// Store the executble now, in that case, if a race happen with a cancellation,
+				// nothing will be done until addOneTimeCallback is invoked.
+				executable_.store(executable);
+				if (executable->cancel_)
+				{
+					executable->cancel_->removeCallback(other.onCancel_);
+					executable->cancel_->addOneTimeCallback(onCancel_);
+				}
+			}
+			other.executable_.store(nullptr);
+		}
+
+		return *this;
+	}
+	constexpr ~ExecutableSuspended() noexcept
+	{
+		schedule();
+		// When this got deleted, there can be a cancellation going on.
+		// Wait until it is completly done.
+		while (executable_.load())
+		{
+		};
+	}
+
+public:
+	constexpr void schedule() noexcept
+	{
+		auto* executable = executable_.exchange(processing_);
+		if (executable != processing_)
+		{
+			if (executable)
+			{
+				executable->cancel_->removeCallback(onCancel_);
+				executable->reschedule();
+			}
+			executable_.store(nullptr);
 		}
 	}
 
 private:
-	bzd::Executor<T>* executor_{nullptr};
-	SuspendedId suspendId_{};
+	constexpr void cancel() noexcept
+	{
+		auto* executable = executable_.exchange(processing_);
+		if (executable != processing_)
+		{
+			if (executable)
+			{
+				executable->reschedule();
+			}
+			executable_.store(nullptr);
+		}
+	}
+
+private:
+	auto makeCallback() { return bzd::FunctionRef<void(void)>::toMember<ExecutableSuspended, &ExecutableSuspended::cancel>(*this); }
+
+private:
+	// Special value to denote that scheduling/cancellation is on-going.
+	static inline T* processing_{reinterpret_cast<T*>(1)};
+	bzd::Atomic<T*> executable_;
+	bzd::CancellationCallback onCancel_;
 };
-
-/*
-/!\ Warning
-
-There is still 2 potential issues:
-1. The executor gets destroyed before the ExecutableRef
-2. The ExecutableRef is already scheduled by the cancellation and later on, it calls schedule() and it works since another one on the same
-slot schedules it.
-	-> In other word, the suspendId_ is not enough to ensure this is the right one.
-
--> These 2 things can be solved by reseting the ExecutableRef after a cancellation.
-*/
 
 /// Executable interface class.
 ///
@@ -483,32 +486,15 @@ public:
 		metadata_.type_ = type;
 	}
 
-	/// This function registers a callback to re-schedule the executable on a cancellation.
-	/// It is needed to properly destroy the executable when a cancellation is triggered.
-	/// This function does not need to be thread safe as it is executed only before being suspended.
-	constexpr ExecutableRef<T> suspend() noexcept
-	{
-		// If there is a cancellation token, register an action on cancellation.
-		if (cancel_)
-		{
-			bzd::assert::isTrue(!cancellationCallback_.hasValue());
-			cancellationCallback_.emplace(bzd::FunctionRef<void(void)>::toMember<Self, &Self::scheduleAfterCancellation>(*this));
-			cancel_->addOneTimeCallback(cancellationCallback_.valueMutable());
-		}
-
-		assert::isTrue(executor_.hasValue());
-		suspendId_ = executor_->suspend(getExecutable());
-
-		return {executor_.valueMutable(), suspendId_};
-	}
+	constexpr auto suspend() noexcept { return ExecutableSuspended{getExecutable()}; }
 
 	constexpr void destroy() noexcept
 	{
 		assert::isTrue(isDetached(), "Executable still owned by the queue.");
 		if (executor_.hasValue())
 		{
-			//  If there is an executor wait until it is safe to discard the element, this to avoid any
-			//  potential out of scope object access.
+			// If there is an executor wait until it is safe to discard the element, this to avoid any
+			// potential out of scope object access.
 			// bzd::ignore = executor_->pop(getExecutable());
 			// executor_->waitToDiscard();
 			executor_.reset();
@@ -527,45 +513,15 @@ public:
 	}
 
 private:
-	constexpr void scheduleAfterCancellation() noexcept
-	{
-		auto maybeExecutable = executor_->suspended_.get(suspendId_);
-		if (!maybeExecutable)
-		{
-			return;
-		}
-		// Sanity check, the executable poped and this one must be the same.
-		assert::isTrue(&maybeExecutable.value() == &getExecutable());
-		// The cancellation was already pop-ed from the token, so no need to remove it again,
-		// also this might lead to a dead-lock.
-		cancellationCallback_.reset();
-		getExecutor().push(getExecutable());
-	}
-
-	/// Enqueue an executable to its executor. This assumes that an executor is already associated with this executable.
-	constexpr void scheduleAfterSuspend() noexcept
-	{
-		// Remove the cancellation if any.
-		if (cancellationCallback_.hasValue())
-		{
-			bzd::assert::isTrue(cancel_.hasValue());
-			cancel_->removeCallback(cancellationCallback_.valueMutable());
-			cancellationCallback_.reset();
-		}
-		getExecutor().push(getExecutable());
-	}
-
-private:
 	friend class bzd::Executor<T>;
-	friend class bzd::interface::ExecutableRef<T>;
+	friend class bzd::interface::ExecutableSuspended<T>;
 
 	constexpr void setExecutor(bzd::Executor<T>& executor) noexcept { executor_.emplace(executor); }
+	constexpr void reschedule() noexcept { getExecutor().push(getExecutable()); }
 
 	bzd::Optional<bzd::Executor<T>&> executor_{};
 	bzd::Optional<CancellationToken&> cancel_{};
 	bzd::ExecutableMetadata metadata_{};
-	bzd::Optional<CancellationCallback> cancellationCallback_{};
-	SuspendedId suspendId_;
 };
 
 } // namespace bzd::interface

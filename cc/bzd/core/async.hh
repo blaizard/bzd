@@ -23,7 +23,7 @@
 
 namespace bzd::async {
 using Executable = bzd::coroutine::impl::Executable;
-using ExecutableRef = bzd::interface::ExecutableRef<Executable>;
+using ExecutableSuspended = bzd::interface::ExecutableSuspended<Executable>;
 using Executor = bzd::coroutine::impl::Executor;
 using Type = bzd::ExecutableMetadata::Type;
 } // namespace bzd::async

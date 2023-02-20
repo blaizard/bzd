@@ -78,19 +78,17 @@ public: // API.
 		auto scope = makeSyncLockGuard(mutex_);
 		flag_.store(true);
 		// Trigger and pop the callbacks if any.
-		while (true)
 		{
-			const CancellationCallback* callback{nullptr};
+			auto scope = makeSyncLockGuard(mutexCallbacks_);
+			while (true)
 			{
-				auto scope = makeSyncLockGuard(mutexCallbacks_);
 				auto maybeCallback = callbacks_.popBack();
 				if (!maybeCallback)
 				{
 					break;
 				}
-				callback = &maybeCallback.value();
+				maybeCallback.value()();
 			}
-			(*callback)();
 		}
 		// Trigger the children cancellation tokens.
 		for (auto& token : children_)
