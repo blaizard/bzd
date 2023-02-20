@@ -187,3 +187,27 @@ const auto value = co_await !bzd::async::any(myFunc(), timeout(1_s));
 // or
 const auto value = co_await bzd::async::any(timeout(1_s), myFunc()).assertHasValue<1>();
 ```
+
+### Executor
+
+The executors are used to run and schedule asyncs (aka coroutines).
+
+This is what the executor flowchart looks like;
+
+```mermaid
+flowchart TD
+    A["Queue.pop()"] -->|Executable| B
+    B["isCanceled?"] -->|yes| C
+    B -->|no| E
+    C["cancel(context)"] --> D
+    E["resume(context)"] --> D
+    D["context.popContinuation()"] -->|Executable| B
+    D -->|null| A
+```
+
+The executor context, is unique to the instance of the executor, it is passed to the current coroutine being executed or cancelled.
+It has for role to contain the continuation if any, that will be used for the next coroutine to be executed. This could be done
+directly by returning it in the `await_suspend`, this would work fine in a single threaded system. Here we want to allow parallel
+execution on different cores if available, and for branching (`async::all` or `async::any`), we would have a race if multiple
+continuation are called concurrently. Having it after the completion of the coroutine helps with that effect, because it ensures that
+the parent is completed before the execution of the continuation.

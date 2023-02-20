@@ -21,7 +21,8 @@ bzd_cc_test(
     timeout = "long",
     srcs = [
         "multithread.cc",
-        "stress.cc",
+        "stack_overflow.cc",
+        "suspend.cc",
     ],
     tags = ["stress"],
     target_compatible_with = select({
