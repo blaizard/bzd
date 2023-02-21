@@ -329,6 +329,7 @@ constexpr auto getExecutor() noexcept { return bzd::coroutine::impl::GetExecutor
 
 constexpr auto getExecutable() noexcept { return bzd::coroutine::impl::GetExecutable{}; }
 
+/// Create a suspension point. Detatch temporarly the current async from its executor.
 template <class... Args>
 constexpr auto suspend(Args&&... args) noexcept
 {

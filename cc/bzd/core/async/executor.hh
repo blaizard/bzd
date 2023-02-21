@@ -352,8 +352,9 @@ template <class T>
 class ExecutableSuspended
 {
 public:
-	constexpr ExecutableSuspended() noexcept : executable_{nullptr}, onCancel_{makeCallback()} {}
-	constexpr ExecutableSuspended(T& executable) noexcept : executable_{&executable}, onCancel_{makeCallback()}
+	constexpr ExecutableSuspended() noexcept : executable_{nullptr}, onCancel_{makeCallback()}, onUserCancel_{onCancel_} {}
+	constexpr ExecutableSuspended(T& executable, const bzd::FunctionRef<void(void)> onCancel) noexcept :
+		executable_{&executable}, onCancel_{makeCallback()}, onUserCancel_{onCancel}
 	{
 		if (executable.cancel_)
 		{
@@ -362,10 +363,7 @@ public:
 	}
 	ExecutableSuspended(const ExecutableSuspended&) = delete;
 	ExecutableSuspended& operator=(const ExecutableSuspended&) = delete;
-	constexpr ExecutableSuspended(ExecutableSuspended&& other) noexcept : executable_{nullptr}, onCancel_{makeCallback()}
-	{
-		*this = bzd::move(other);
-	}
+	constexpr ExecutableSuspended(ExecutableSuspended&& other) noexcept : ExecutableSuspended{} { *this = bzd::move(other); }
 	constexpr ExecutableSuspended& operator=(ExecutableSuspended&& other) noexcept
 	{
 		// Do not allow move from a non-empty container.
@@ -379,6 +377,7 @@ public:
 				// Store the executble now, in that case, if a race happen with a cancellation,
 				// nothing will be done until addOneTimeCallback is invoked.
 				executable_.store(executable);
+				onUserCancel_ = bzd::move(other.onUserCancel_);
 				if (executable->cancel_)
 				{
 					executable->cancel_->removeCallback(other.onCancel_);
@@ -392,12 +391,11 @@ public:
 	}
 	constexpr ~ExecutableSuspended() noexcept
 	{
-		schedule();
-		// When this got deleted, there can be a cancellation going on.
-		// Wait until it is completly done.
-		while (executable_.load())
+		// There can be a cancellation going on, so wait until it is completly done.
+		while (executable_.load() == processing)
 		{
 		};
+		bzd::assert::isTrue(!executable_.load(), "ExecutableSuspended was destroyed with an executable.");
 	}
 
 public:
@@ -423,6 +421,7 @@ private:
 		{
 			if (executable)
 			{
+				onUserCancel_();
 				executable->reschedule();
 			}
 			executable_.store(nullptr);
@@ -437,6 +436,7 @@ private:
 	static inline T* processing{reinterpret_cast<T*>(1)};
 	bzd::Atomic<T*> executable_;
 	bzd::CancellationCallback onCancel_;
+	bzd::FunctionRef<void(void)> onUserCancel_;
 };
 
 /// Executable interface class.
@@ -486,7 +486,7 @@ public:
 		metadata_.type_ = type;
 	}
 
-	constexpr auto suspend() noexcept { return ExecutableSuspended{getExecutable()}; }
+	constexpr auto suspend(const bzd::FunctionRef<void(void)> onCancel) noexcept { return ExecutableSuspended{getExecutable(), onCancel}; }
 
 	constexpr void destroy() noexcept
 	{
