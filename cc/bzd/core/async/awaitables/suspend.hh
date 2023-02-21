@@ -24,7 +24,7 @@ public: // Coroutine specializations.
 	constexpr bool await_suspend(bzd::coroutine::impl::coroutine_handle<T> caller) noexcept
 	{
 		bzd::coroutine::impl::Executable& executable = caller.promise();
-		onSuspend_(executable.suspend());
+		onSuspend_(executable.suspend(bzd::FunctionRef<void(void)>{onCancellation_}));
 		return true;
 	}
 

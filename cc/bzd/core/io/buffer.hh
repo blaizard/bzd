@@ -102,6 +102,7 @@ public:
 			{
 				co_return maybeValue;
 			}
+			// co_await bzd::async::suspend([](auto&&) {});
 			co_await bzd::async::yield();
 		}
 	}
