@@ -265,7 +265,8 @@ TEST_ASYNC(Coroutine, asyncAnyDestroy)
 bzd::Async<> asyncSuspend(bzd::interface::String& trace, bzd::StringView id)
 {
 	appendToTrace(trace, id, 0);
-	co_await bzd::async::suspend([](auto&&) {});
+	bzd::async::ExecutableSuspended suspended{};
+	co_await bzd::async::suspend([&](auto&& executable) { suspended = bzd::move(executable); });
 	appendToTrace(trace, id, 1);
 
 	co_return {};

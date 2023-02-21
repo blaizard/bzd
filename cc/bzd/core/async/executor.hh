@@ -371,8 +371,8 @@ public:
 		// Do not allow move from a non-empty container.
 		bzd::assert::isTrue(executable_.load() == nullptr);
 
-		auto* executable = other.executable_.exchange(processing_);
-		if (executable != processing_)
+		auto* executable = other.executable_.exchange(processing);
+		if (executable != processing)
 		{
 			if (executable)
 			{
@@ -403,8 +403,8 @@ public:
 public:
 	constexpr void schedule() noexcept
 	{
-		auto* executable = executable_.exchange(processing_);
-		if (executable != processing_)
+		auto* executable = executable_.exchange(processing);
+		if (executable != processing)
 		{
 			if (executable)
 			{
@@ -418,8 +418,8 @@ public:
 private:
 	constexpr void cancel() noexcept
 	{
-		auto* executable = executable_.exchange(processing_);
-		if (executable != processing_)
+		auto* executable = executable_.exchange(processing);
+		if (executable != processing)
 		{
 			if (executable)
 			{
@@ -434,7 +434,7 @@ private:
 
 private:
 	// Special value to denote that scheduling/cancellation is on-going.
-	static inline T* processing_{reinterpret_cast<T*>(1)};
+	static inline T* processing{reinterpret_cast<T*>(1)};
 	bzd::Atomic<T*> executable_;
 	bzd::CancellationCallback onCancel_;
 };
