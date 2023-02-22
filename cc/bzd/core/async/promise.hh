@@ -11,8 +11,6 @@
 #include "cc/bzd/utility/constexpr_for.hh"
 #include "cc/bzd/utility/source_location.hh"
 
-#include <iostream>
-
 namespace bzd::coroutine::impl {
 
 /// Executable type for coroutines.

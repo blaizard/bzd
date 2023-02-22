@@ -78,4 +78,7 @@ cc_library(
         "utility.hh",
     ],
     visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/core/async",
+    ],
 )

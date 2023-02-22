@@ -1,152 +1,82 @@
 #pragma once
 
+#include "cc/bzd/container/non_owning_list.hh"
 #include "cc/bzd/container/threadsafe/ring_buffer.hh"
 #include "cc/bzd/core/async.hh"
+#include "cc/bzd/core/io/sink.hh"
+#include "cc/bzd/core/io/source.hh"
 #include "cc/bzd/meta/string_literal.hh"
+#include "cc/bzd/utility/synchronization/spin_mutex.hh"
+#include "cc/bzd/utility/synchronization/sync_lock_guard.hh"
 
 namespace bzd::io {
-
-template <class Ring, meta::StringLiteral identifier>
-class Source
-{
-private:
-	using Value = typename Ring::ValueMutableType;
-
-public:
-	constexpr explicit Source(Ring& ring) noexcept : ring_{ring} {}
-
-public:
-	constexpr auto trySet() noexcept { return ring_.nextForWriting(); }
-
-	template <class T>
-	constexpr bzd::Bool trySet(T&& value) noexcept
-	{
-		if (auto maybeWriter = trySet(); maybeWriter)
-		{
-			maybeWriter.valueMutable() = bzd::forward<T>(value);
-			return true;
-		}
-		return false;
-	}
-
-	bzd::Async<bzd::threadsafe::RingBufferResult<Value&>> set() noexcept
-	{
-		while (true)
-		{
-			if (auto maybeValue = trySet(); maybeValue)
-			{
-				co_return maybeValue;
-			}
-			co_await bzd::async::yield();
-		}
-	}
-
-	template <class T>
-	bzd::Async<> set(T&& value) noexcept
-	{
-		auto writer = co_await !set();
-		writer.valueMutable() = bzd::forward<T>(value);
-		co_return {};
-	}
-
-private:
-	Ring& ring_;
-};
-
-template <class Value>
-class SourceStub
-{
-public:
-	constexpr auto trySet() noexcept { return bzd::Optional<Value&>{}; }
-
-	template <class T>
-	constexpr bzd::Bool trySet(T&&) noexcept
-	{
-		return true;
-	}
-
-	bzd::Async<bzd::Optional<Value&>> set() noexcept { co_await bzd::Optional<Value&>{}; }
-
-	template <class T>
-	bzd::Async<> set(T&&) noexcept
-	{
-		co_return {};
-	}
-};
-
-template <class Ring, meta::StringLiteral identifier>
-class Sink
-{
-public:
-	using Value = typename Ring::ValueType;
-
-public:
-	constexpr explicit Sink(Ring& ring) noexcept : ring_{ring} {}
-
-public:
-	constexpr auto tryGet() noexcept
-	{
-		auto scope = ring_.lastForReading(/*start*/ index_);
-		if (scope)
-		{
-			index_ = scope.index() + 1u;
-		}
-		return scope;
-	}
-
-	bzd::Async<bzd::threadsafe::RingBufferResult<const Value&>> get() noexcept
-	{
-		while (true)
-		{
-			if (auto maybeValue = tryGet(); maybeValue)
-			{
-				co_return maybeValue;
-			}
-			// co_await bzd::async::suspend([](auto&&) {});
-			co_await bzd::async::yield();
-		}
-	}
-
-	constexpr auto tryGet(const bzd::Size count) noexcept
-	{
-		auto scope = ring_.asSpansForReading(/*count*/ count, /*first*/ false, /*start*/ index_);
-		if (scope)
-		{
-			index_ = scope.index() + 1u;
-		}
-		return scope;
-	}
-
-	constexpr StringView getName() const noexcept { return StringView{identifier.data(), identifier.size()}; }
-
-private:
-	Ring& ring_;
-	bzd::Size index_{0};
-};
-
-template <class Value>
-class SinkStub
-{
-public:
-	constexpr auto tryGet() noexcept { return bzd::Optional<const Value&>{}; }
-
-	bzd::Async<bzd::Optional<const Value&>> get() noexcept { co_return bzd::Optional<const Value&>{}; }
-
-	constexpr auto tryGet(const bzd::Size) noexcept { return bzd::Optional<bzd::Spans<const Value, 2u>>{}; }
-};
 
 template <class T, Size capacity, meta::StringLiteral identifier>
 class Buffer
 {
 private: // Types.
+	using Self = Buffer<T, capacity, identifier>;
 	using Ring = bzd::threadsafe::RingBuffer<T, capacity>;
+	using Value = typename Ring::ValueType;
+	using ValueMutable = typename Ring::ValueMutableType;
+	using Index = typename Ring::Index;
+	struct Element : public bzd::NonOwningListElement
+	{
+		const Index index;
+		bzd::async::ExecutableSuspended executable{};
+	};
 
 public: // API.
-	constexpr auto makeSource() noexcept { return bzd::io::Source<Ring, identifier>{ring_}; }
-	constexpr auto makeSink() noexcept { return bzd::io::Sink<Ring, identifier>{ring_}; }
+	constexpr auto makeSource() noexcept { return bzd::io::Source<Self>{*this}; }
+	constexpr auto makeSink() noexcept { return bzd::io::Sink<Self>{*this}; }
+
+	constexpr StringView getName() const noexcept { return StringView{identifier.data(), identifier.size()}; }
 
 private:
+	/// Notify that new data has been added to the buffer.
+	void notifyNewData() noexcept
+	{
+		const auto lock = makeSyncLockGuard(mutex_);
+		const auto index = ring_.indexWrite();
+		suspended_.removeIf([index](Element& element) {
+			if (index >= element.index)
+			{
+				element.executable.schedule();
+				return true;
+			}
+			return false;
+		});
+	}
+
+	/// Wait for new data to arrive.
+	bzd::Async<> waitForData(const Index index) noexcept
+	{
+		Element element{.index = index};
+		auto lock = makeSyncLockGuard(mutex_);
+		if (ring_.indexRead() < index)
+		{
+			co_await bzd::async::suspend(
+				[&](auto&& executable) {
+					element.executable = bzd::move(executable);
+					bzd::ignore = suspended_.pushFront(element);
+					lock.release();
+				},
+				[&]() {
+					auto lock = makeSyncLockGuard(mutex_);
+					bzd::ignore = suspended_.erase(element);
+				});
+		}
+
+		co_return {};
+	}
+
+private:
+	friend class bzd::io::Source<Self>;
+	friend class bzd::io::Sink<Self>;
+
 	Ring ring_{};
+	SpinMutex mutex_{};
+	bzd::NonOwningList<Element> suspended_{};
 };
 
 } // namespace bzd::io

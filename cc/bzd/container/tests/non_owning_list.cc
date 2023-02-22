@@ -129,3 +129,31 @@ TEST(NonOwningList, ConstIterator)
 	}
 	EXPECT_EQ(counter, 4U);
 }
+
+TEST(NonOwningList, RemoveIf)
+{
+	ElementType elements[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+	NonOwningListForTest list;
+	EXPECT_TRUE(list.pushBack(elements[0]));
+	EXPECT_TRUE(list.pushBack(elements[1]));
+	EXPECT_TRUE(list.pushBack(elements[2]));
+	EXPECT_TRUE(list.pushBack(elements[3]));
+	EXPECT_EQ(list.size(), 4u);
+
+	// Nothing should be removed.
+	list.removeIf([](const auto&) { return false; });
+	EXPECT_EQ(list.size(), 4u);
+
+	// Remove even numbers.
+	list.removeIf([](const auto& element) { return (element.value_ % 2); });
+	EXPECT_EQ(list.size(), 2u);
+
+	auto it = list.begin();
+	EXPECT_EQ(it->value_, 0);
+	++it;
+	EXPECT_EQ(it->value_, 2);
+
+	// Remove everything.
+	list.removeIf([](const auto&) { return true; });
+	EXPECT_EQ(list.size(), 0u);
+}
