@@ -15,14 +15,17 @@ namespace bzd::threadsafe {
 template <class T>
 class RingBufferResult : public bzd::Optional<T>
 {
-public:
+public: // Traits.
+	using Index = bzd::Size;
+
+public: // Constructors/destructor/...
 	constexpr RingBufferResult() noexcept : bzd::Optional<T>{bzd::nullopt} {}
-	constexpr explicit RingBufferResult(T value, const bzd::Size index) noexcept : bzd::Optional<T>{value}, index_{index} {}
-	constexpr RingBufferResult(T value, const bzd::Size index, bzd::SpinSharedMutex& mutex) noexcept :
+	constexpr explicit RingBufferResult(T value, const Index index) noexcept : bzd::Optional<T>{value}, index_{index} {}
+	constexpr RingBufferResult(T value, const Index index, bzd::SpinSharedMutex& mutex) noexcept :
 		bzd::Optional<T>{value}, index_{index}, mutex_{&mutex}, shared_{true}
 	{
 	}
-	constexpr RingBufferResult(T value, const bzd::Size index, bzd::SpinSharedMutex& mutex, bzd::Atomic<bzd::Size>& counter) noexcept :
+	constexpr RingBufferResult(T value, const Index index, bzd::SpinSharedMutex& mutex, bzd::Atomic<Index>& counter) noexcept :
 		bzd::Optional<T>{value}, index_{index}, mutex_{&mutex}, shared_{false}, counter_{&counter}
 	{
 	}
@@ -58,13 +61,13 @@ public:
 	}
 
 public: // API.
-	[[nodiscard]] constexpr bzd::Size index() const noexcept { return index_; }
+	[[nodiscard]] constexpr Index index() const noexcept { return index_; }
 
 private:
-	const bzd::Size index_{0u};
+	const Index index_{0u};
 	bzd::SpinSharedMutex* mutex_{nullptr};
 	bzd::Bool shared_{false};
-	bzd::Atomic<bzd::Size>* counter_{nullptr};
+	bzd::Atomic<Index>* counter_{nullptr};
 };
 
 // Single producer, multi consumer ring buffer.
@@ -76,6 +79,7 @@ public: // Traits.
 	using StorageType = bzd::impl::FixedStorage<T, capacity>;
 	using ValueType = typename StorageType::ValueType;
 	using ValueMutableType = typename StorageType::ValueMutableType;
+	using Index = typename RingBufferResult<T>::Index;
 
 public:
 	RingBuffer() = default;
@@ -92,7 +96,11 @@ public: // Size.
 	[[nodiscard]] constexpr bzd::Size size() const noexcept { return write_.load() - read_.load(); }
 	//[[nodiscard]] constexpr bzd::Size capacity() const noexcept { return capacity; }
 
-public:
+public: // Indexes.
+	[[nodiscard]] constexpr Index indexRead() const noexcept { return read_.load(); }
+	[[nodiscard]] constexpr Index indexWrite() const noexcept { return write_.load(); }
+
+public: // Access.
 	/// Get the next element as a scoped reference for writing.
 	[[nodiscard]] constexpr RingBufferResult<T&> nextForWriting() noexcept
 	{
@@ -118,10 +126,10 @@ public:
 	/// Get the last element written to the ring as a scoped reference for reading.
 	///
 	/// \param start Starting from a specific index.
-	[[nodiscard]] constexpr RingBufferResult<const T&> lastForReading(const bzd::Size start = 0u) noexcept
+	[[nodiscard]] constexpr RingBufferResult<const T&> lastForReading(const Index start = 0u) noexcept
 	{
 		// Attempt to reserve the last entry.
-		auto [begin, end, maybeIndex] = tryAcquireLockForReading([start](bzd::Size& begin, bzd::Size& end) {
+		auto [begin, end, maybeIndex] = tryAcquireLockForReading([start](Index& begin, Index& end) {
 			if (end > begin)
 			{
 				begin = end - 1u;
@@ -142,10 +150,10 @@ public:
 	/// Get the first element written to the ring (and not overwritten) as a scoped reference for reading.
 	///
 	/// \param start Starting from a specific index.
-	[[nodiscard]] constexpr RingBufferResult<const T&> firstForReading(const bzd::Size start = 0u) noexcept
+	[[nodiscard]] constexpr RingBufferResult<const T&> firstForReading(const Index start = 0u) noexcept
 	{
 		// Attempt to reserve the first entry.
-		auto [begin, end, maybeIndex] = tryAcquireLockForReading([start](bzd::Size& begin, bzd::Size& end) {
+		auto [begin, end, maybeIndex] = tryAcquireLockForReading([start](Index& begin, Index& end) {
 			begin = bzd::max(start, begin);
 			return end > begin;
 		});
@@ -162,7 +170,7 @@ public:
 	/// Get the a scoped range of the next element available for writing.
 	/// If \b count is defined, it will return a scope with the specific number of element.
 	/// If not or null, all remaining elements will be returned in the range.
-	// [[nodiscard]] constexpr auto asSpansForWriting(const bzd::Size count = 0u) noexcept
+	// [[nodiscard]] constexpr auto asSpansForWriting(const Index count = 0u) noexcept
 	// {
 	// }
 
@@ -174,12 +182,12 @@ public:
 	/// \param count The number of element to include the output range. If null, all available elements are returned.
 	/// \param first If set, the range will start from the first element inserted, otherwise from the latest.
 	/// \param start Starting from a specific index, in other word, excluing every entries oldest that this.
-	[[nodiscard]] constexpr RingBufferResult<bzd::Spans<const T, 2u>> asSpansForReading(const bzd::Size count = 0u,
-																						const bzd::Bool first = true,
-																						const bzd::Size start = 0u) noexcept
+	[[nodiscard]] constexpr RingBufferResult<bzd::Spans<const T, 2u>> asSpansForReading(const Index count = 0u,
+																						const Index first = true,
+																						const Index start = 0u) noexcept
 	{
 		// Attempt to reserve the first entry and compute the indexes of interest.
-		auto [begin, end, maybeIndex] = tryAcquireLockForReading([count, first, start](bzd::Size& begin, bzd::Size& end) {
+		auto [begin, end, maybeIndex] = tryAcquireLockForReading([count, first, start](Index& begin, Index& end) {
 			begin = bzd::max(begin, start);
 			if (count)
 			{
@@ -215,7 +223,7 @@ public:
 
 private:
 	/// Try to acquire a reading lock of the entry at the specified index.
-	constexpr bzd::Optional<bzd::Size> tryAcquireLockForReading(const bzd::Size read) noexcept
+	constexpr bzd::Optional<Index> tryAcquireLockForReading(const Index read) noexcept
 	{
 		const auto index = read % capacity;
 		const auto lockAcquired = locks_[index].tryLockShared();
@@ -237,9 +245,9 @@ private:
 
 	struct ResultForReading
 	{
-		const bzd::Size begin{0u};
-		const bzd::Size end{0u};
-		const bzd::Optional<bzd::Size> maybeIndex{};
+		const Index begin{0u};
+		const Index end{0u};
+		const bzd::Optional<Index> maybeIndex{};
 	};
 
 	/// Try to acquire a reading lock of the entry defined by the callable.
@@ -266,7 +274,7 @@ private:
 
 	/// Create a Spans of 2 as a range starting from \b being to \b end.
 	template <class U>
-	static constexpr bzd::Spans<U, 2u> makeSpans(U* data, const bzd::Size begin, const bzd::Size end) noexcept
+	static constexpr bzd::Spans<U, 2u> makeSpans(U* data, const Index begin, const Index end) noexcept
 	{
 		if (begin == end)
 		{
@@ -283,8 +291,8 @@ private:
 private: // Variables.
 	StorageType storage_{};
 	bzd::SpinSharedMutex locks_[capacity];
-	bzd::Atomic<bzd::Size> write_{0};
-	bzd::Atomic<bzd::Size> read_{0};
+	bzd::Atomic<Index> write_{0};
+	bzd::Atomic<Index> read_{0};
 };
 
 } // namespace bzd::threadsafe

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "cc/bzd/container/result.hh"
+#include "cc/bzd/container/optional.hh"
 #include "cc/bzd/type_traits/add_const.hh"
 #include "cc/bzd/type_traits/conditional.hh"
 #include "cc/bzd/type_traits/is_const.hh"
@@ -8,13 +8,6 @@
 #include "cc/bzd/utility/ignore.hh"
 
 namespace bzd {
-enum class NonOwningListErrorType
-{
-	elementAlreadyInserted,
-	elementAlreadyRemoved,
-	empty,
-};
-
 struct NonOwningListElement
 {
 	NonOwningListElement* next_{nullptr};
@@ -80,8 +73,6 @@ template <class T>
 class NonOwningList
 {
 public: // Traits.
-	template <class V>
-	using Result = bzd::Result<V, NonOwningListErrorType>;
 	using Iterator = bzd::impl::NonOwningListIterator<T>;
 	using ConstIterator = bzd::impl::NonOwningListIterator<bzd::typeTraits::AddConst<T>>;
 
@@ -110,15 +101,15 @@ public:
 		}
 	}
 
-	[[nodiscard]] constexpr Result<void> pushFront(T& element) noexcept { return insert(first_, element); }
+	[[nodiscard]] constexpr Optional<T&> pushFront(NonOwningListElement& element) noexcept { return insert(first_, element); }
 
-	[[nodiscard]] constexpr Result<void> pushBack(T& element) noexcept { return insert(*last_.previous_, element); }
+	[[nodiscard]] constexpr Optional<T&> pushBack(NonOwningListElement& element) noexcept { return insert(*last_.previous_, element); }
 
-	[[nodiscard]] constexpr Result<void> insert(NonOwningListElement& previous, T& element) noexcept
+	[[nodiscard]] constexpr Optional<T&> insert(NonOwningListElement& previous, NonOwningListElement& element) noexcept
 	{
 		if (element.next_ != nullptr)
 		{
-			return bzd::error::make(NonOwningListErrorType::elementAlreadyInserted);
+			return bzd::nullopt;
 		}
 
 		const auto next = previous.next_;
@@ -129,50 +120,50 @@ public:
 
 		++size_;
 
-		return nullresult;
+		return static_cast<T&>(element);
 	}
 
-	[[nodiscard]] constexpr Result<T&> front() noexcept
+	[[nodiscard]] constexpr Optional<T&> front() noexcept
 	{
 		if (empty())
 		{
-			return bzd::error::make(NonOwningListErrorType::empty);
+			return bzd::nullopt;
 		}
 		return static_cast<T&>(*(first_.next_));
 	}
 
-	[[nodiscard]] constexpr Result<T&> back() noexcept
+	[[nodiscard]] constexpr Optional<T&> back() noexcept
 	{
 		if (empty())
 		{
-			return bzd::error::make(NonOwningListErrorType::empty);
+			return bzd::nullopt;
 		}
 		return static_cast<T&>(*(last_.previous_));
 	}
 
-	[[nodiscard]] constexpr Result<T&> popFront() noexcept
+	[[nodiscard]] constexpr Optional<T&> popFront() noexcept
 	{
 		if (empty())
 		{
-			return bzd::error::make(NonOwningListErrorType::empty);
+			return bzd::nullopt;
 		}
 		return erase(*(first_.next_));
 	}
 
-	[[nodiscard]] constexpr Result<T&> popBack() noexcept
+	[[nodiscard]] constexpr Optional<T&> popBack() noexcept
 	{
 		if (empty())
 		{
-			return bzd::error::make(NonOwningListErrorType::empty);
+			return bzd::nullopt;
 		}
 		return erase(*(last_.previous_));
 	}
 
-	[[nodiscard]] constexpr Result<T&> erase(NonOwningListElement& element) noexcept
+	[[nodiscard]] constexpr Optional<T&> erase(NonOwningListElement& element) noexcept
 	{
 		if (element.next_ == nullptr)
 		{
-			return bzd::error::make(NonOwningListErrorType::elementAlreadyRemoved);
+			return bzd::nullopt;
 		}
 
 		auto previous = element.previous_;
@@ -183,6 +174,25 @@ public:
 		--size_;
 
 		return static_cast<T&>(element);
+	}
+
+	template <class Callable>
+	constexpr void removeIf(Callable&& callable) noexcept
+	{
+		auto current = first_.next_;
+		while (current != &last_)
+		{
+			if (callable(static_cast<T&>(*current)))
+			{
+				const auto next = current->next_;
+				bzd::ignore = erase(*current);
+				current = next;
+			}
+			else
+			{
+				current = current->next_;
+			}
+		}
 	}
 
 private:

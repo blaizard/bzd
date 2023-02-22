@@ -25,7 +25,17 @@ public: // Constructors
 		scope.cleanup_.reset();
 	}
 
-	// Destructor
+	/// Release the scope before the destructor.
+	constexpr void release() noexcept
+	{
+		if (cleanup_)
+		{
+			cleanup_.value()();
+			cleanup_.reset();
+		}
+	}
+
+	/// Destructor
 	constexpr ~ScopeGuard() noexcept
 	{
 		if (cleanup_)
