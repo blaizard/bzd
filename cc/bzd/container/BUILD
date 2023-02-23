@@ -137,6 +137,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":optional",
+        "//cc/bzd/container/iterator:bidirectional",
         "//cc/bzd/type_traits:add_const",
         "//cc/bzd/type_traits:conditional",
         "//cc/bzd/type_traits:is_const",

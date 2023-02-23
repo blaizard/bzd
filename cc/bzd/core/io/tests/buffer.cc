@@ -75,7 +75,6 @@ TEST_ASYNC(Buffer, Async)
 	bzd::io::Buffer<int, 10u, "my.id"> buffer{};
 	auto source = buffer.makeSource();
 	auto sink = buffer.makeSink();
-
 	{
 		const auto result = co_await bzd::async::any(sink.get(), bzd::test::delay(10));
 		EXPECT_FALSE(result.get<0>());
@@ -100,10 +99,10 @@ TEST_ASYNC(Buffer, Async)
 		EXPECT_EQ(result.get<0>().value(), 13);
 	}
 	{
-		const auto result = co_await bzd::async::all(sink.get(), source.set(14));
+		const auto result = co_await bzd::async::all(source.set(14), sink.get());
 		EXPECT_TRUE(result.get<0>());
 		EXPECT_TRUE(result.get<1>());
-		EXPECT_EQ(result.get<0>().value(), 14);
+		EXPECT_EQ(result.get<1>().value(), 14);
 	}
 
 	co_return {};

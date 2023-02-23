@@ -34,7 +34,7 @@ struct DefaultPolicies
 	static constexpr void decrement(auto*& data) noexcept { --data; }
 	static constexpr void increment(auto*& data, const int n) noexcept { data += n; }
 	static constexpr void decrement(auto*& data, const int n) noexcept { data -= n; }
-	static constexpr auto& at(auto* data, const Size n) noexcept { return data[n]; }
+	static constexpr auto& at(auto* data, const Size n) noexcept { return static_cast<ValueType&>(data[n]); }
 };
 
 } // namespace impl
