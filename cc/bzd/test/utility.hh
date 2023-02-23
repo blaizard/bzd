@@ -17,7 +17,7 @@ void dump(const T& object)
 	std::cout << std::dec << std::endl;
 }
 
-bzd::Async<> delay(const bzd::Size count)
+bzd::Async<> delay(const bzd::Size count) noexcept
 {
 	for (bzd::Size i = 0; i < count; ++i)
 	{
@@ -26,7 +26,8 @@ bzd::Async<> delay(const bzd::Size count)
 	co_return {};
 }
 
-bzd::Async<> timeout(const bzd::Size count)
+// NOLINTNEXTLINE(bugprone-exception-escape)
+bzd::Async<> timeout(const bzd::Size count) noexcept
 {
 	co_await !delay(count);
 	co_return bzd::error::Timeout("Operation timed out after {} ticks"_csv, count);

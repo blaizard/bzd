@@ -406,7 +406,10 @@ public:
 		{
 			if (executable)
 			{
-				executable->cancel_->removeCallback(onCancel_);
+				if (executable->cancel_)
+				{
+					executable->cancel_->removeCallback(onCancel_);
+				}
 				executable->reschedule();
 			}
 			executable_.store(nullptr);

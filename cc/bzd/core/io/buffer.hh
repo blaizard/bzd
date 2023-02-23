@@ -22,7 +22,7 @@ private: // Types.
 	using Index = typename Ring::Index;
 	struct Element : public bzd::NonOwningListElement
 	{
-		const Index index;
+		Index index{};
 		bzd::async::ExecutableSuspended executable{};
 	};
 
@@ -51,9 +51,10 @@ private:
 	/// Wait for new data to arrive.
 	bzd::Async<> waitForData(const Index index) noexcept
 	{
-		Element element{.index = index};
+		Element element;
+		element.index = index;
 		auto lock = makeSyncLockGuard(mutex_);
-		if (ring_.indexRead() < index)
+		if (ring_.indexWrite() <= index)
 		{
 			co_await bzd::async::suspend(
 				[&](auto&& executable) {
@@ -65,6 +66,12 @@ private:
 					auto lock = makeSyncLockGuard(mutex_);
 					bzd::ignore = suspended_.erase(element);
 				});
+		}
+		else
+		{
+			// Still wait for a cycle to avoid the caller to take
+			// all CPU if the producer is faster than the consumer.
+			co_await bzd::async::yield();
 		}
 
 		co_return {};

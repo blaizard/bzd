@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cc/bzd/container/iterator/bidirectional.hh"
 #include "cc/bzd/container/optional.hh"
 #include "cc/bzd/type_traits/add_const.hh"
 #include "cc/bzd/type_traits/conditional.hh"
@@ -15,66 +16,25 @@ struct NonOwningListElement
 };
 } // namespace bzd
 
-namespace bzd::impl {
-template <class U>
-class NonOwningListIterator
-{
-public: // Traits
-	using Self = NonOwningListIterator<U>;
-	using IndexType = bzd::Size;
-	using DifferenceType = bzd::Int32;
-	using ValueType = U;
-	static constexpr auto category = bzd::typeTraits::IteratorCategory::forward;
-
-private: // Internal Traits.
-	using UnderlyingValuePtrType =
-		typeTraits::Conditional<bzd::typeTraits::isConst<ValueType>, const NonOwningListElement, NonOwningListElement>*;
-
-public:
-	constexpr NonOwningListIterator(UnderlyingValuePtrType ptr) noexcept : current_{ptr} {}
-
-public: // Modifiers.
-	constexpr Self& operator++() noexcept
-	{
-		next();
-		return *this;
-	}
-
-	constexpr Self operator++(int) noexcept
-	{
-		Self it{*this};
-		++(*this);
-		return it;
-	}
-
-public: // Comparators.
-	[[nodiscard]] constexpr bool operator==(const Self& other) const noexcept { return (current_ == other.current_); }
-	[[nodiscard]] constexpr bool operator!=(const Self& other) const noexcept { return !(other == *this); }
-
-public: // Accessors.
-	[[nodiscard]] constexpr ValueType& operator*() const noexcept { return *static_cast<ValueType*>(current_); }
-	[[nodiscard]] constexpr ValueType* operator->() const noexcept { return static_cast<ValueType*>(current_); }
-
-private:
-	constexpr void next() noexcept
-	{
-		bzd::assert::isTrue(current_->next_);
-		current_ = current_->next_;
-	}
-
-private:
-	UnderlyingValuePtrType current_;
-};
-} // namespace bzd::impl
-
 namespace bzd {
 
 template <class T>
 class NonOwningList
 {
+private:
+	template <class V, class S>
+	struct DefaultPolicies : public bzd::iterator::impl::DefaultPolicies<V>
+	{
+		using StorageValueType = S;
+		static constexpr void increment(auto*& data) noexcept { data = data->next_; }
+		static constexpr void decrement(auto*& data) noexcept { data = data->previous_; }
+	};
+
 public: // Traits.
-	using Iterator = bzd::impl::NonOwningListIterator<T>;
-	using ConstIterator = bzd::impl::NonOwningListIterator<bzd::typeTraits::AddConst<T>>;
+	using Value = bzd::typeTraits::AddConst<T>;
+	using ValueMutable = T;
+	using ConstIterator = bzd::iterator::Bidirectional<Value, void, DefaultPolicies<Value, const NonOwningListElement>>;
+	using Iterator = bzd::iterator::Bidirectional<ValueMutable, void, DefaultPolicies<ValueMutable, NonOwningListElement>>;
 
 public:
 	constexpr NonOwningList() noexcept : first_{&last_, nullptr}, last_{nullptr, &first_} {}
@@ -101,22 +61,35 @@ public:
 		}
 	}
 
-	[[nodiscard]] constexpr Optional<T&> pushFront(NonOwningListElement& element) noexcept { return insert(first_, element); }
+	/// Prepends the given element value to the beginning of the container.
+	///
+	/// \param element The element to be added.
+	/// \return A reference to the element added in case of success, empty optional otherwise.
+	[[nodiscard]] constexpr Optional<T&> pushFront(NonOwningListElement& element) noexcept { return insert(begin(), element); }
 
-	[[nodiscard]] constexpr Optional<T&> pushBack(NonOwningListElement& element) noexcept { return insert(*last_.previous_, element); }
+	/// Appends the given element value to the end of the container.
+	///
+	/// \param element The element to be added.
+	/// \return A reference to the element added in case of success, empty optional otherwise.
+	[[nodiscard]] constexpr Optional<T&> pushBack(NonOwningListElement& element) noexcept { return insert(end(), element); }
 
-	[[nodiscard]] constexpr Optional<T&> insert(NonOwningListElement& previous, NonOwningListElement& element) noexcept
+	/// Insert the new element before the iterator at the specified position.
+	///
+	/// \param pos The iterator pointing to the element before which the new element should be inserted.
+	/// \param element The element to be added.
+	///	\return A reference to the element added in case of success, empty optional otherwise.
+	[[nodiscard]] constexpr Optional<T&> insert(Iterator pos, NonOwningListElement& element) noexcept
 	{
 		if (element.next_ != nullptr)
 		{
 			return bzd::nullopt;
 		}
 
-		const auto next = previous.next_;
-		previous.next_ = &element;
-		element.next_ = next;
-		element.previous_ = &previous;
-		next->previous_ = &element;
+		auto previous = pos->previous_;
+		previous->next_ = &element;
+		element.next_ = &(*pos);
+		element.previous_ = previous;
+		pos->previous_ = &element;
 
 		++size_;
 
