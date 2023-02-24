@@ -5,7 +5,7 @@
 #include "cc/bzd/container/range/associate_scope.hh"
 #include "cc/bzd/container/threadsafe/bitset.hh"
 #include "cc/bzd/container/threadsafe/non_owning_forward_list.hh"
-#include "cc/bzd/container/threadsafe/non_owning_queue_spin.hh"
+#include "cc/bzd/container/threadsafe/non_owning_ring_spin.hh"
 #include "cc/bzd/container/variant.hh"
 #include "cc/bzd/core/async/cancellation.hh"
 #include "cc/bzd/core/async/coroutine.hh"
@@ -188,8 +188,9 @@ public:
 				}
 
 				// Execute the continuation if any, this instead of enqueuing it,
-				// as this will speed up execution by avoiding unecessary atomic operations
-				// and keeping continuation running on the same core to please caching.
+				// as it will speed up execution by avoiding unecessary atomic operations,
+				// keeping continuation running on the same core to please caching
+				// and reduce the number of spin locks required to update the queue.
 				maybeExecutable = context.popContinuation();
 			}
 			context.updateTick();
@@ -215,8 +216,6 @@ public:
 	}
 
 	constexpr Bool isRunning() const noexcept { return status_.load() == Status::running; }
-
-	// constexpr void waitToDiscard() noexcept { /*queue_.waitToDiscard();*/ }
 
 	/// Schedule a new executable on this executor.
 	constexpr void schedule(Executable& executable, const bzd::ExecutableMetadata::Type type) noexcept
@@ -293,12 +292,12 @@ private:
 		}
 		++queueCount_;
 		// Only at the end push the executable to the work queue.
-		queue_.pushFront(executable);
+		queue_.pushBack(executable);
 	}
 
 	[[nodiscard]] bzd::Optional<Executable&> pop() noexcept
 	{
-		auto maybeExecutable = queue_.popBack();
+		auto maybeExecutable = queue_.popFront();
 		if (maybeExecutable)
 		{
 			// Show the stack usage
@@ -326,7 +325,7 @@ private:
 	friend struct bzd::coroutine::impl::Yield;
 
 	/// List of pending workload waiting to be scheduled.
-	bzd::threadsafe::NonOwningQueue<Executable> queue_{};
+	bzd::threadsafe::NonOwningRingSpin<Executable> queue_{};
 	/// Keep contexts about the current runnning scheduler.
 	bzd::threadsafe::NonOwningForwardList<ExecutorContext<Executable>> context_{};
 	/// Mutex to protect access over the context queue.
@@ -448,7 +447,7 @@ private:
 ///
 /// \tparam T The child class, this is a CRTP desgin pattern.
 template <class T>
-class Executable : public bzd::threadsafe::NonOwningQueueElement
+class Executable : public bzd::threadsafe::NonOwningRingSpinElement
 {
 public:
 	using Self = Executable<T>;
@@ -496,10 +495,6 @@ public:
 		assert::isTrue(isDetached(), "Executable still owned by the queue.");
 		if (executor_.hasValue())
 		{
-			// If there is an executor wait until it is safe to discard the element, this to avoid any
-			// potential out of scope object access.
-			// bzd::ignore = executor_->pop(getExecutable());
-			// executor_->waitToDiscard();
 			executor_.reset();
 		}
 	}

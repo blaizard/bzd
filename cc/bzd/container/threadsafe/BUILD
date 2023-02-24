@@ -77,6 +77,20 @@ cc_library(
 )
 
 cc_library(
+    name = "non_owning_ring_spin",
+    hdrs = [
+        "non_owning_ring_spin.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/container:optional",
+        "//cc/bzd/utility:ignore",
+        "//cc/bzd/utility/synchronization:spin_mutex",
+        "//cc/bzd/utility/synchronization:sync_lock_guard",
+    ],
+)
+
+cc_library(
     name = "ring_buffer",
     hdrs = [
         "ring_buffer.hh",

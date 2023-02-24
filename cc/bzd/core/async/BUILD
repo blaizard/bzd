@@ -37,7 +37,7 @@ cc_library(
         "//cc/bzd/container/range:associate_scope",
         "//cc/bzd/container/threadsafe:bitset",
         "//cc/bzd/container/threadsafe:non_owning_forward_list",
-        "//cc/bzd/container/threadsafe:non_owning_queue_spin",
+        "//cc/bzd/container/threadsafe:non_owning_ring_spin",
         "//cc/bzd/core:error",
         "//cc/bzd/core/assert:minimal",
         "//cc/bzd/meta:always_false",

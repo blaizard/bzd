@@ -39,14 +39,24 @@ bzd_cc_test(
 )
 
 bzd_cc_test(
-    name = "non_owning_queue",
+    name = "non_owning_queue_spin",
     srcs = [
-        "non_owning_queue.cc",
+        "non_owning_queue_spin.cc",
     ],
     deps = [
         "//cc/bzd/container/threadsafe:non_owning_queue_spin",
         "//cc/bzd/test",
-        "//cc/bzd/test:exec_point",
+    ],
+)
+
+bzd_cc_test(
+    name = "non_owning_ring_spin",
+    srcs = [
+        "non_owning_ring_spin.cc",
+    ],
+    deps = [
+        "//cc/bzd/container/threadsafe:non_owning_ring_spin",
+        "//cc/bzd/test",
     ],
 )
 

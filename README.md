@@ -40,7 +40,7 @@ The following target platforms are currently supported:
 
 \* Default.
 
-When debug is support by the platform, one can run a target with `--config=debug` option and a debug environment will
+When debug is supported by the platform, one can run a target with `--config=debug` option and a debug environment will
 be made available.
 
 ## Build

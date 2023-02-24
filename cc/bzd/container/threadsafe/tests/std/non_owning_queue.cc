@@ -9,7 +9,7 @@
 
 namespace bzd::test {
 
-class ListElement : public bzd::threadsafe::NonOwningQueueElement
+class ListElement : public bzd::threadsafe::NonOwningQueueSpinElement
 {
 public:
 	ListElement() = default;
@@ -18,7 +18,7 @@ public:
 	bzd::Size value{0};
 };
 
-TEST(NonOwningQueue, StressPush)
+TEST(NonOwningQueueSpin, StressPush)
 {
 	// Coonfiguration.
 	static constexpr Size nbPushThreads{3};
@@ -39,7 +39,7 @@ TEST(NonOwningQueue, StressPush)
 	}
 
 	// Queue
-	threadsafe::NonOwningQueue<ListElement> queue;
+	threadsafe::NonOwningQueueSpin<ListElement> queue;
 
 	// Create pushers
 	for (Size i = 0; i < nbPushThreads; ++i)
