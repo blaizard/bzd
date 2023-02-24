@@ -6,7 +6,7 @@
 
 namespace bzd {
 
-/// Timer that manage different time and alarms.
+/// General purpose timer that can manage multiple alarms.
 template <class Time>
 class Timer
 {
@@ -51,16 +51,16 @@ public:
 		{
 			if (element.alarm <= it->alarm)
 			{
-				list_.insert(it, element);
 				break;
 			}
 		}
+		list_.insert(it, element);
 
 		// Start the alarm.
 		timerStart(getNextAlarm());
 	}
 
-	/// Check the time and process all timers that are expired.
+	/// Check and process all timers that are expired, reload the timer if needed.
 	///
 	/// This function is ISR safe.
 	constexpr void process() noexcept {}
