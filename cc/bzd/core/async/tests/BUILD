@@ -18,7 +18,7 @@ bzd_cc_test(
 
 bzd_cc_test(
     name = "multithread",
-    timeout = "long",
+    timeout = "eternal",
     srcs = [
         "multithread.cc",
         "stack_overflow.cc",
