@@ -7,38 +7,38 @@
 
 namespace bzd::threadsafe {
 
-class NonOwningQueueElement
+class NonOwningQueueSpinElement
 {
 public:
-	NonOwningQueueElement() = default;
+	NonOwningQueueSpinElement() = default;
 	// A copy constructor will simply copy the element without copying the next element,
 	// this is to ensure consistency with the queue.
-	constexpr NonOwningQueueElement(const NonOwningQueueElement&) noexcept {}
+	constexpr NonOwningQueueSpinElement(const NonOwningQueueSpinElement&) noexcept {}
 	// NOLINTNEXTLINE(bugprone-unhandled-self-assignment)
-	constexpr NonOwningQueueElement& operator=(const NonOwningQueueElement&) noexcept
+	constexpr NonOwningQueueSpinElement& operator=(const NonOwningQueueSpinElement&) noexcept
 	{
 		next_ = nullptr;
 		return *this;
 	}
-	NonOwningQueueElement(NonOwningQueueElement&&) = delete;
-	NonOwningQueueElement& operator=(NonOwningQueueElement&&) = delete;
-	~NonOwningQueueElement() = default;
+	NonOwningQueueSpinElement(NonOwningQueueSpinElement&&) = delete;
+	NonOwningQueueSpinElement& operator=(NonOwningQueueSpinElement&&) = delete;
+	~NonOwningQueueSpinElement() = default;
 
 protected:
 	[[nodiscard]] constexpr Bool isDetached() const noexcept { return (next_ == nullptr); }
 
 private:
 	template <class T>
-	friend class NonOwningQueue;
+	friend class NonOwningQueueSpin;
 
-	NonOwningQueueElement* next_{nullptr};
+	NonOwningQueueSpinElement* next_{nullptr};
 };
 
 template <class T>
-class NonOwningQueue
+class NonOwningQueueSpin
 {
 public:
-	using Self = NonOwningQueue<T>;
+	using Self = NonOwningQueueSpin<T>;
 	using ElementType = T;
 
 public:
@@ -112,8 +112,8 @@ public:
 	*/
 
 protected:
-	NonOwningQueueElement* head_{nullptr};
-	NonOwningQueueElement* tail_{nullptr};
+	NonOwningQueueSpinElement* head_{nullptr};
+	NonOwningQueueSpinElement* tail_{nullptr};
 	SpinMutex mutex_{};
 };
 
