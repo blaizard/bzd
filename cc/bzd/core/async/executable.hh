@@ -21,8 +21,24 @@ struct Yield;
 }
 
 /// Metadata of an executable, propagated to all its children.
+///
+/// All flags are set atomically, but with no memory fencing guarantee, the reader should
+/// therefore take care of the fencing if required.
 class ExecutableMetadata
 {
+public: // Constructors/destructor/...
+	ExecutableMetadata() = default;
+	constexpr ExecutableMetadata(const ExecutableMetadata& other) noexcept { *this = other; }
+	constexpr ExecutableMetadata& operator=(const ExecutableMetadata& other) noexcept
+	{
+		type_ = other.type_;
+		flags_.store(other.flags_.load(MemoryOrder::relaxed), MemoryOrder::relaxed);
+		return *this;
+	}
+	ExecutableMetadata(ExecutableMetadata&&) = delete;
+	ExecutableMetadata& operator=(ExecutableMetadata&&) = delete;
+	~ExecutableMetadata() = default;
+
 public: // Types.
 	/// The executable type can only be set once.
 	enum class Type : bzd::UInt8
@@ -35,15 +51,29 @@ public: // Types.
 		service
 	};
 
+	/// Contains the flags associated with the executbale.
+	enum class Flags : bzd::UInt8
+	{
+		none = 0,
+		/// If the executable needs to be skipped from the executor queue.
+		skip = 1
+	};
+
 public: // Accessors.
 	[[nodiscard]] constexpr Type getType() const noexcept { return type_; }
+	[[nodiscard]] constexpr Bool skip() const noexcept { return flags_.load(MemoryOrder::relaxed) == Flags::skip; }
 
 private:
 	template <class U>
 	friend class bzd::interface::Executable;
 
+	constexpr void setSkip() noexcept { flags_.store(Flags::skip, MemoryOrder::relaxed); }
+	constexpr void clearSkip() noexcept { flags_.store(Flags::none, MemoryOrder::relaxed); }
+
 	// Type of executable.
 	Type type_{Type::unset};
+	// Flags associated with this executable.
+	bzd::Atomic<Flags> flags_{Flags::none};
 };
 
 } // namespace bzd
@@ -172,17 +202,14 @@ private:
 
 /// Type to store an executable when suspended for use with ISR (aka in wait-free context).
 template <class T>
-class ExecutableSuspendedISR : public bzd::impl::ExecutableSuspendedFactory<T, ExecutableSuspendedISR<T>>
+class ExecutableSuspendedForISR : public bzd::impl::ExecutableSuspendedFactory<T, ExecutableSuspendedForISR<T>>
 {
 public:
-	using bzd::impl::ExecutableSuspendedFactory<T, ExecutableSuspendedISR<T>>::ExecutableSuspendedFactory;
+	using bzd::impl::ExecutableSuspendedFactory<T, ExecutableSuspendedForISR<T>>::ExecutableSuspendedFactory;
 
 private:
-	friend class bzd::impl::ExecutableSuspendedFactory<T, ExecutableSuspended<T>>;
-	static constexpr void reschedule(T&) noexcept
-	{
-		// TBD.
-	}
+	friend class bzd::impl::ExecutableSuspendedFactory<T, ExecutableSuspendedForISR<T>>;
+	static constexpr void reschedule(T& executable) noexcept { executable.clearSkip(); }
 };
 
 /// Executable interface class.
@@ -216,6 +243,10 @@ public:
 		return cancel_->isCanceled();
 	}
 
+	[[nodiscard]] constexpr Bool skip() const noexcept { return metadata_.skip(); }
+	constexpr void clearSkip() noexcept { metadata_.clearSkip(); }
+	constexpr void setSkip() noexcept { metadata_.setSkip(); }
+
 	constexpr bzd::Executor<T>& getExecutor() noexcept
 	{
 		bzd::assert::isTrue(executor_.hasValue());
@@ -232,10 +263,20 @@ public:
 		metadata_.type_ = type;
 	}
 
-	template <template <class> class Suspended>
 	constexpr auto suspend(const bzd::FunctionRef<void(void)> onCancel) noexcept
 	{
-		return Suspended<T>{getExecutable(), onCancel};
+		return bzd::interface::ExecutableSuspended<T> {
+			getExecutable(), onCancel
+		};
+	}
+
+	constexpr auto suspendForISR(const bzd::FunctionRef<void(void)> onCancel) noexcept
+	{
+		setSkip();
+		reschedule();
+		return bzd::interface::ExecutableSuspendedForISR<T> {
+			getExecutable(), onCancel
+		};
 	}
 
 	constexpr void destroy() noexcept

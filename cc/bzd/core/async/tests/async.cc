@@ -272,10 +272,31 @@ bzd::Async<> asyncSuspend(bzd::interface::String& trace, bzd::StringView id)
 	co_return {};
 }
 
-TEST_ASYNC(Coroutine, asyncAnyWait)
+TEST_ASYNC(Coroutine, asyncAnySuspend)
 {
 	bzd::String<128> trace;
 	[[maybe_unused]] const auto result = co_await bzd::async::any(yieldLoop(trace, "a", 2), asyncSuspend(trace, "b"));
+	EXPECT_EQ(trace, "[a0][b0][a0]");
+	EXPECT_TRUE(result.get<0>());
+	EXPECT_FALSE(result.get<1>());
+
+	co_return {};
+}
+
+bzd::Async<> asyncSuspendForISR(bzd::interface::String& trace, bzd::StringView id)
+{
+	appendToTrace(trace, id, 0);
+	bzd::async::ExecutableSuspendedForISR suspended{};
+	co_await bzd::async::suspendForISR([&](auto&& executable) { suspended = bzd::move(executable); });
+	appendToTrace(trace, id, 1);
+
+	co_return {};
+}
+
+TEST_ASYNC(Coroutine, asyncAnySuspendForISR)
+{
+	bzd::String<128> trace;
+	[[maybe_unused]] const auto result = co_await bzd::async::any(yieldLoop(trace, "a", 2), asyncSuspendForISR(trace, "b"));
 	EXPECT_EQ(trace, "[a0][b0][a0]");
 	EXPECT_TRUE(result.get<0>());
 	EXPECT_FALSE(result.get<1>());

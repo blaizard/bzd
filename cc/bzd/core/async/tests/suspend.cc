@@ -11,22 +11,25 @@ template <class Result>
 	return bzd::apply([](auto&... asyncs) -> bool { return (asyncs.hasValue() || ...); }, bzd::forward<Result>(result));
 }
 
-template <bzd::Bool onlyCancellation, bzd::Bool earlyCancellation>
+template <bzd::Bool useISR, bzd::Bool onlyCancellation, bzd::Bool earlyCancellation>
 void makeStressCancellationSuspend(const bzd::Size iterations)
 {
+	using ExecutableSuspended =
+		bzd::typeTraits::Conditional<useISR, bzd::async::ExecutableSuspendedForISR, bzd::async::ExecutableSuspended>;
+
 	for (bzd::Size iteration = 0; iteration < iterations; ++iteration)
 	{
 		bzd::coroutine::impl::Executor executor{};
 		std::thread thread;
 		bzd::Atomic<bzd::Bool> shouldReturn{false};
-		bzd::async::ExecutableSuspended executableStore{};
+		ExecutableSuspended executableStore{};
 
 		auto workloadSuspend = [&]() -> bzd::Async<> {
 			if (earlyCancellation)
 			{
 				shouldReturn.store(true);
 			}
-			co_await bzd::async::suspend([&](auto&& executable) {
+			auto onSuspend = [&](auto&& executable) {
 				thread = std::thread{[&shouldReturn, &executableStore, executable = bzd::move(executable)]() mutable {
 					shouldReturn.store(true);
 					if constexpr (!onlyCancellation)
@@ -40,7 +43,15 @@ void makeStressCancellationSuspend(const bzd::Size iterations)
 						executableStore = bzd::move(executable);
 					}
 				}};
-			});
+			};
+			if constexpr (useISR)
+			{
+				co_await bzd::async::suspendForISR(bzd::move(onSuspend));
+			}
+			else
+			{
+				co_await bzd::async::suspend(bzd::move(onSuspend));
+			}
 			co_return {};
 		};
 
@@ -76,12 +87,24 @@ void makeStressCancellationSuspend(const bzd::Size iterations)
 
 TEST(Coroutine, StressCancellationSuspend)
 {
-	makeStressCancellationSuspend<false, false>(1000);
-	makeStressCancellationSuspend<false, true>(1000);
+	makeStressCancellationSuspend<false, false, false>(1000);
+	makeStressCancellationSuspend<false, false, true>(1000);
 }
 
 TEST(Coroutine, StressCancellationSuspendOnlyCancellation)
 {
-	makeStressCancellationSuspend<true, false>(1000);
-	makeStressCancellationSuspend<true, true>(1000);
+	makeStressCancellationSuspend<false, true, false>(1000);
+	makeStressCancellationSuspend<false, true, true>(1000);
+}
+
+TEST(Coroutine, StressCancellationSuspendForISR)
+{
+	makeStressCancellationSuspend<true, false, false>(1000);
+	makeStressCancellationSuspend<true, false, true>(1000);
+}
+
+TEST(Coroutine, StressCancellationSuspendForISROnlyCancellation)
+{
+	makeStressCancellationSuspend<true, true, false>(1000);
+	makeStressCancellationSuspend<true, true, true>(1000);
 }

@@ -256,7 +256,7 @@ private:
 
 	[[nodiscard]] bzd::Optional<Executable&> pop() noexcept
 	{
-		auto maybeExecutable = queue_.popFront();
+		auto maybeExecutable = queue_.popFront([](auto& exectuable) { return !exectuable.skip(); });
 		if (maybeExecutable)
 		{
 			// Show the stack usage
