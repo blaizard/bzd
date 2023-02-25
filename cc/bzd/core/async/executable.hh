@@ -61,14 +61,14 @@ public: // Types.
 
 public: // Accessors.
 	[[nodiscard]] constexpr Type getType() const noexcept { return type_; }
-	[[nodiscard]] constexpr Bool skip() const noexcept { return flags_.load(MemoryOrder::relaxed) == Flags::skip; }
+	[[nodiscard]] constexpr Bool isSkipped() const noexcept { return flags_.load(MemoryOrder::relaxed) == Flags::skip; }
 
 private:
 	template <class U>
 	friend class bzd::interface::Executable;
 
-	constexpr void setSkip() noexcept { flags_.store(Flags::skip, MemoryOrder::relaxed); }
-	constexpr void clearSkip() noexcept { flags_.store(Flags::none, MemoryOrder::relaxed); }
+	constexpr void skip() noexcept { flags_.store(Flags::skip, MemoryOrder::relaxed); }
+	constexpr void unskip() noexcept { flags_.store(Flags::none, MemoryOrder::relaxed); }
 
 	// Type of executable.
 	Type type_{Type::unset};
@@ -209,7 +209,7 @@ public:
 
 private:
 	friend class bzd::impl::ExecutableSuspendedFactory<T, ExecutableSuspendedForISR<T>>;
-	static constexpr void reschedule(T& executable) noexcept { executable.clearSkip(); }
+	static constexpr void reschedule(T& executable) noexcept { executable.getExecutor().unskip(executable); }
 };
 
 /// Executable interface class.
@@ -243,9 +243,8 @@ public:
 		return cancel_->isCanceled();
 	}
 
-	[[nodiscard]] constexpr Bool skip() const noexcept { return metadata_.skip(); }
-	constexpr void clearSkip() noexcept { metadata_.clearSkip(); }
-	constexpr void setSkip() noexcept { metadata_.setSkip(); }
+	[[nodiscard]] constexpr Bool isSkipped() const noexcept { return metadata_.isSkipped(); }
+	constexpr void skip() noexcept { metadata_.skip(); }
 
 	constexpr bzd::Executor<T>& getExecutor() noexcept
 	{
@@ -272,8 +271,7 @@ public:
 
 	constexpr auto suspendForISR(const bzd::FunctionRef<void(void)> onCancel) noexcept
 	{
-		setSkip();
-		reschedule();
+		getExecutor().pushSkip(getExecutable());
 		return bzd::interface::ExecutableSuspendedForISR<T> {
 			getExecutable(), onCancel
 		};
@@ -304,10 +302,16 @@ private:
 	template <class, class>
 	friend class bzd::impl::ExecutableSuspendedFactory;
 	friend class bzd::interface::ExecutableSuspended<T>;
+	friend class bzd::interface::ExecutableSuspendedForISR<T>;
 	friend struct bzd::coroutine::impl::Yield;
 
 	constexpr void setExecutor(bzd::Executor<T>& executor) noexcept { executor_.emplace(executor); }
 	constexpr void reschedule() noexcept { getExecutor().push(getExecutable()); }
+	constexpr void unskip() noexcept
+	{
+		assert::isTrue(!isDetached(), "Executable must be attached.");
+		metadata_.unskip();
+	}
 
 	bzd::Optional<bzd::Executor<T>&> executor_{};
 	bzd::Optional<CancellationToken&> cancel_{};

@@ -245,18 +245,43 @@ private:
 	{
 		// It is important to update the counters before being pushed, otherwise the exectuable might be
 		// popped before the counters are increases, leaving them in an incoherent state.
+		incrementCounters(executable);
+		// Only at the end push the executable to the work queue.
+		queue_.pushBack(executable);
+	}
+
+	/// Push a new workload to the queue and mark it as skipped.
+	///
+	/// It will not be executed until the `unskip` call is performed.
+	///
+	/// \param executable The workload to be pushed and skipped.
+	constexpr void pushSkip(Executable& executable) noexcept
+	{
+		executable.skip();
+		queue_.pushBack(executable);
+	}
+
+	/// Unskip an executable already added to the queue.
+	///
+	/// This call is ISR friendly.
+	constexpr void unskip(Executable& executable) noexcept
+	{
+		incrementCounters(executable);
+		executable.unskip();
+	}
+
+	constexpr void incrementCounters(Executable& executable) noexcept
+	{
 		if (executable.getType() == ExecutableMetadata::Type::workload)
 		{
 			++workloadCount_;
 		}
 		++queueCount_;
-		// Only at the end push the executable to the work queue.
-		queue_.pushBack(executable);
 	}
 
 	[[nodiscard]] bzd::Optional<Executable&> pop() noexcept
 	{
-		auto maybeExecutable = queue_.popFront([](auto& exectuable) { return !exectuable.skip(); });
+		auto maybeExecutable = queue_.popFront([](auto& exectuable) { return !exectuable.isSkipped(); });
 		if (maybeExecutable)
 		{
 			// Show the stack usage
@@ -281,6 +306,8 @@ private:
 private:
 	template <class U>
 	friend class bzd::interface::Executable;
+	template <class U>
+	friend class bzd::interface::ExecutableSuspendedForISR;
 
 	/// List of pending workload waiting to be scheduled.
 	bzd::threadsafe::NonOwningRingSpin<Executable> queue_{};
