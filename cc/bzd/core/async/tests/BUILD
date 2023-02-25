@@ -17,12 +17,46 @@ bzd_cc_test(
 )
 
 bzd_cc_test(
+    name = "suspend",
+    timeout = "moderate",
+    srcs = [
+        "suspend.cc",
+    ],
+    tags = ["stress"],
+    target_compatible_with = select({
+        "@esp32_xtensa_lx6_gcc//:compiler": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+    deps = [
+        "//cc/bzd/core:delay",
+        "//cc/bzd/core/async",
+        "//cc/bzd/test",
+    ],
+)
+
+bzd_cc_test(
+    name = "stack_overflow",
+    timeout = "moderate",
+    srcs = [
+        "stack_overflow.cc",
+    ],
+    tags = ["stress"],
+    target_compatible_with = select({
+        "@esp32_xtensa_lx6_gcc//:compiler": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+    deps = [
+        "//cc/bzd/core:delay",
+        "//cc/bzd/core/async",
+        "//cc/bzd/test",
+    ],
+)
+
+bzd_cc_test(
     name = "multithread",
     timeout = "eternal",
     srcs = [
         "multithread.cc",
-        "stack_overflow.cc",
-        "suspend.cc",
     ],
     tags = ["stress"],
     target_compatible_with = select({
