@@ -188,6 +188,13 @@ const auto value = co_await !bzd::async::any(myFunc(), timeout(1_s));
 const auto value = co_await bzd::async::any(timeout(1_s), myFunc()).assertHasValue<1>();
 ```
 
+### Suspend
+
+Suspending the execution of an async can be done with `bzd::async::suspend(...)`. This function takes 2 callables as arguments,
+the first, that is guaranteed to be called, contains a movable-only suspended executable object as argument.
+The user needs to dispose it from this callback.
+The second argument is optional and provides a callback to deal with cancellation.
+
 ### Executor
 
 The executors are used to run and schedule asyncs (aka coroutines).
