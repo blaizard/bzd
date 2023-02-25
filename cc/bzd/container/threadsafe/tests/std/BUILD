@@ -52,6 +52,7 @@ cc_library(
     ],
     deps = [
         "//cc/bzd/container:vector",
+        "//cc/bzd/platform:atomic",
         "//cc/libs/pthread",
     ],
 )

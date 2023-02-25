@@ -1,4 +1,5 @@
 #include "cc/bzd/container/vector.hh"
+#include "cc/bzd/platform/atomic.hh"
 
 #include <thread>
 #include <vector>
