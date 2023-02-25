@@ -21,6 +21,7 @@ cc_library(
         "awaitables/yield.hh",
         "cancellation.hh",
         "coroutine.hh",
+        "executable.hh",
         "executor.hh",
         "promise.hh",
         "//cc/bzd/core:async.hh",

@@ -1,18 +1,12 @@
 #pragma once
 
-#include "cc/bzd/container/array.hh"
 #include "cc/bzd/container/function_ref.hh"
 #include "cc/bzd/container/range/associate_scope.hh"
-#include "cc/bzd/container/threadsafe/bitset.hh"
 #include "cc/bzd/container/threadsafe/non_owning_forward_list.hh"
 #include "cc/bzd/container/threadsafe/non_owning_ring_spin.hh"
 #include "cc/bzd/container/variant.hh"
-#include "cc/bzd/core/async/cancellation.hh"
-#include "cc/bzd/core/async/coroutine.hh"
+#include "cc/bzd/core/async/executable.hh"
 #include "cc/bzd/platform/atomic.hh"
-#include "cc/bzd/type_traits/is_base_of.hh"
-#include "cc/bzd/utility/ignore.hh"
-#include "cc/bzd/utility/scope_guard.hh"
 #include "cc/bzd/utility/synchronization/spin_shared_mutex.hh"
 #include "cc/bzd/utility/synchronization/sync_lock_guard.hh"
 
@@ -20,41 +14,6 @@ namespace bzd {
 
 template <class Executable>
 class Executor;
-
-namespace interface {
-template <class T>
-class Executable;
-} // namespace interface
-
-namespace coroutine::impl {
-struct Yield;
-}
-
-/// Metadata of an executable, propagated to all its children.
-class ExecutableMetadata
-{
-public: // Types.
-	/// The executable type can only be set once.
-	enum class Type : bzd::UInt8
-	{
-		unset,
-		/// Defines the type of executable that needs to complete.
-		workload,
-		/// Defines the type of executable that can be terminated if no
-		/// workload executables are running.
-		service
-	};
-
-public: // Accessors.
-	[[nodiscard]] constexpr Type getType() const noexcept { return type_; }
-
-private:
-	template <class U>
-	friend class bzd::interface::Executable;
-
-	// Type of executable.
-	Type type_{Type::unset};
-};
 
 /// Executor context.
 template <class Executable>
@@ -322,7 +281,6 @@ private:
 private:
 	template <class U>
 	friend class bzd::interface::Executable;
-	friend struct bzd::coroutine::impl::Yield;
 
 	/// List of pending workload waiting to be scheduled.
 	bzd::threadsafe::NonOwningRingSpin<Executable> queue_{};
@@ -343,183 +301,3 @@ private:
 };
 
 } // namespace bzd
-
-namespace bzd::interface {
-
-/// Type to store an executable when suspended.
-template <class T>
-class ExecutableSuspended
-{
-public:
-	constexpr ExecutableSuspended() noexcept : executable_{nullptr}, onCancel_{makeCallback()}, onUserCancel_{onCancel_} {}
-	constexpr ExecutableSuspended(T& executable, const bzd::FunctionRef<void(void)> onCancel) noexcept :
-		executable_{&executable}, onCancel_{makeCallback()}, onUserCancel_{onCancel}
-	{
-		if (executable.cancel_)
-		{
-			executable.cancel_->addOneTimeCallback(onCancel_);
-		}
-	}
-	ExecutableSuspended(const ExecutableSuspended&) = delete;
-	ExecutableSuspended& operator=(const ExecutableSuspended&) = delete;
-	constexpr ExecutableSuspended(ExecutableSuspended&& other) noexcept : ExecutableSuspended{} { *this = bzd::move(other); }
-	constexpr ExecutableSuspended& operator=(ExecutableSuspended&& other) noexcept
-	{
-		// Do not allow move from a non-empty container.
-		bzd::assert::isTrue(executable_.load() == nullptr);
-
-		auto* executable = other.executable_.exchange(processing);
-		if (executable != processing)
-		{
-			if (executable)
-			{
-				// Store the executble now, in that case, if a race happen with a cancellation,
-				// nothing will be done until addOneTimeCallback is invoked.
-				executable_.store(executable);
-				onUserCancel_ = bzd::move(other.onUserCancel_);
-				if (executable->cancel_)
-				{
-					executable->cancel_->removeCallback(other.onCancel_);
-					executable->cancel_->addOneTimeCallback(onCancel_);
-				}
-			}
-			other.executable_.store(nullptr);
-		}
-
-		return *this;
-	}
-	constexpr ~ExecutableSuspended() noexcept
-	{
-		// There can be a cancellation going on, so wait until it is completly done.
-		while (executable_.load() == processing)
-		{
-		};
-		bzd::assert::isTrue(!executable_.load(), "ExecutableSuspended was destroyed with an executable.");
-	}
-
-public:
-	constexpr void schedule() noexcept
-	{
-		auto* executable = executable_.exchange(processing);
-		if (executable != processing)
-		{
-			if (executable)
-			{
-				if (executable->cancel_)
-				{
-					executable->cancel_->removeCallback(onCancel_);
-				}
-				executable->reschedule();
-			}
-			executable_.store(nullptr);
-		}
-	}
-
-private:
-	constexpr void cancel() noexcept
-	{
-		auto* executable = executable_.exchange(processing);
-		if (executable != processing)
-		{
-			if (executable)
-			{
-				onUserCancel_();
-				executable->reschedule();
-			}
-			executable_.store(nullptr);
-		}
-	}
-
-private:
-	auto makeCallback() { return bzd::FunctionRef<void(void)>::toMember<ExecutableSuspended, &ExecutableSuspended::cancel>(*this); }
-
-private:
-	// Special value to denote that scheduling/cancellation is on-going.
-	static inline T* processing{reinterpret_cast<T*>(1)};
-	bzd::Atomic<T*> executable_;
-	bzd::CancellationCallback onCancel_;
-	bzd::FunctionRef<void(void)> onUserCancel_;
-};
-
-/// Executable interface class.
-///
-/// This class provides helpers to access the associated executor.
-///
-/// \tparam T The child class, this is a CRTP desgin pattern.
-template <class T>
-class Executable : public bzd::threadsafe::NonOwningRingSpinElement
-{
-public:
-	using Self = Executable<T>;
-
-public:
-	~Executable() noexcept { destroy(); }
-
-	constexpr void setCancellationToken(CancellationToken& token) noexcept
-	{
-		bzd::assert::isTrue(cancel_.empty());
-		cancel_.emplace(token);
-	}
-
-	constexpr bzd::Optional<CancellationToken&> getCancellationToken() noexcept { return cancel_; }
-
-	constexpr Bool isCanceled() const noexcept
-	{
-		if (cancel_.empty())
-		{
-			return false;
-		}
-		return cancel_->isCanceled();
-	}
-
-	constexpr bzd::Executor<T>& getExecutor() noexcept
-	{
-		bzd::assert::isTrue(executor_.hasValue());
-		return executor_.valueMutable();
-	}
-
-	constexpr T& getExecutable() noexcept { return *static_cast<T*>(this); }
-
-	[[nodiscard]] constexpr bzd::ExecutableMetadata::Type getType() const noexcept { return metadata_.getType(); }
-
-	constexpr void setType(const bzd::ExecutableMetadata::Type type) noexcept
-	{
-		bzd::assert::isTrue(metadata_.getType() == bzd::ExecutableMetadata::Type::unset);
-		metadata_.type_ = type;
-	}
-
-	constexpr auto suspend(const bzd::FunctionRef<void(void)> onCancel) noexcept { return ExecutableSuspended{getExecutable(), onCancel}; }
-
-	constexpr void destroy() noexcept
-	{
-		assert::isTrue(isDetached(), "Executable still owned by the queue.");
-		if (executor_.hasValue())
-		{
-			executor_.reset();
-		}
-	}
-
-	/// Propagate the context of this executable to another one.
-	constexpr void propagate(T& executable) noexcept
-	{
-		// Propagate the cancellation token if any.
-		executable.cancel_ = cancel_;
-		// Propagate the executor.
-		executable.executor_ = executor_;
-		// Propagate the metadata.
-		executable.metadata_ = metadata_;
-	}
-
-private:
-	friend class bzd::Executor<T>;
-	friend class bzd::interface::ExecutableSuspended<T>;
-
-	constexpr void setExecutor(bzd::Executor<T>& executor) noexcept { executor_.emplace(executor); }
-	constexpr void reschedule() noexcept { getExecutor().push(getExecutable()); }
-
-	bzd::Optional<bzd::Executor<T>&> executor_{};
-	bzd::Optional<CancellationToken&> cancel_{};
-	bzd::ExecutableMetadata metadata_{};
-};
-
-} // namespace bzd::interface
