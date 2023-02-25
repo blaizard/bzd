@@ -12,7 +12,7 @@ struct Yield : public bzd::coroutine::impl::suspend_always
 	constexpr bool await_suspend(bzd::coroutine::impl::coroutine_handle<T> caller) noexcept
 	{
 		auto& executable{caller.promise()};
-		executable.getExecutor().push(executable);
+		executable.reschedule();
 		return true;
 	}
 };
