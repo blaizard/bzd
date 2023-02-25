@@ -3,6 +3,8 @@
 #include "cc/bzd/core/panic.hh"
 #include "cc/bzd/test/test.hh"
 
+#include <iostream>
+
 class TestAssert : public bzd::reader::impl::Schema
 {
 public:
