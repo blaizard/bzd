@@ -52,7 +52,18 @@ public:
 		tail_ = &element;
 	}
 
-	[[nodiscard]] constexpr Optional<ElementType&> popFront() noexcept
+	/// Push an element at the front of the ring, it will be the first to be poped.
+	constexpr void pushFront(ElementType& element) noexcept
+	{
+		const auto lock = makeSyncLockGuard(mutex_);
+
+		element.next_ = head_;
+		tail_->next_ = &element;
+		head_ = &element;
+	}
+
+	template <class Callable>
+	[[nodiscard]] constexpr Optional<ElementType&> popFront(Callable&& callable) noexcept
 	{
 		const auto lock = makeSyncLockGuard(mutex_);
 
@@ -60,7 +71,7 @@ public:
 		while (head_ != originalTail)
 		{
 			// Advance if no match.
-			if (head_ == &dummy_)
+			if (head_ == &dummy_ || !callable(*static_cast<ElementType*>(head_)))
 			{
 				tail_ = head_;
 				head_ = head_->next_;
@@ -77,6 +88,11 @@ public:
 		}
 
 		return bzd::nullopt;
+	}
+
+	[[nodiscard]] constexpr Optional<ElementType&> popFront() noexcept
+	{
+		return popFront([](ElementType&) -> bool { return true; });
 	}
 
 	constexpr void clear() noexcept
