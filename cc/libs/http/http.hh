@@ -7,6 +7,8 @@
 #include "cc/bzd/utility/synchronization/mutex.hh"
 #include "cc/libs/reader/stream_reader.hh"
 
+#include <iostream>
+
 // TO READ: https://fasterthanli.me/articles/the-http-crash-course-nobody-asked-for
 
 namespace bzd::http {
