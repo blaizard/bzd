@@ -61,14 +61,14 @@ public: // Types.
 
 public: // Accessors.
 	[[nodiscard]] constexpr Type getType() const noexcept { return type_; }
-	[[nodiscard]] constexpr Bool isSkipped() const noexcept { return flags_.load(MemoryOrder::relaxed) == Flags::skip; }
+	[[nodiscard]] constexpr Bool isSkipped() const noexcept { return flags_.load(MemoryOrder::acquire) == Flags::skip; }
 
 private:
 	template <class U>
 	friend class bzd::interface::Executable;
 
-	constexpr void skip() noexcept { flags_.store(Flags::skip, MemoryOrder::relaxed); }
-	constexpr void unskip() noexcept { flags_.store(Flags::none, MemoryOrder::relaxed); }
+	constexpr void skip() noexcept { flags_.store(Flags::skip, MemoryOrder::release); }
+	constexpr void unskip() noexcept { flags_.store(Flags::none, MemoryOrder::release); }
 
 	// Type of executable.
 	Type type_{Type::unset};
@@ -307,11 +307,7 @@ private:
 
 	constexpr void setExecutor(bzd::Executor<T>& executor) noexcept { executor_.emplace(executor); }
 	constexpr void reschedule() noexcept { getExecutor().push(getExecutable()); }
-	constexpr void unskip() noexcept
-	{
-		assert::isTrue(!isDetached(), "Executable must be attached.");
-		metadata_.unskip();
-	}
+	constexpr void unskip() noexcept { metadata_.unskip(); }
 
 	bzd::Optional<bzd::Executor<T>&> executor_{};
 	bzd::Optional<CancellationToken&> cancel_{};
