@@ -132,6 +132,7 @@ public:
 		return erase(*(last_.previous_));
 	}
 
+	[[nodiscard]] constexpr Optional<T&> erase(Iterator pos) noexcept { return erase(*pos); }
 	[[nodiscard]] constexpr Optional<T&> erase(NonOwningListElement& element) noexcept
 	{
 		if (element.next_ == nullptr)
