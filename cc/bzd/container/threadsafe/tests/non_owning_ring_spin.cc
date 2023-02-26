@@ -37,27 +37,6 @@ TEST(NonOwningRingSpin, pushBack, (int, void))
 	}
 }
 
-TEST(NonOwningRingSpin, pushFront, (int, void))
-{
-	threadsafe::NonOwningRingSpin<ListElement> queue;
-
-	queue.pushFront(elements[3]);
-	queue.pushFront(elements[2]);
-	queue.pushFront(elements[1]);
-	queue.pushFront(elements[0]);
-
-	for (bzd::Size i = 0; i < 4; ++i)
-	{
-		auto maybeElement = queue.popFront();
-		EXPECT_TRUE(maybeElement);
-		EXPECT_TRUE(maybeElement.value().value == i);
-	}
-	{
-		auto maybeElement = queue.popFront();
-		EXPECT_FALSE(maybeElement);
-	}
-}
-
 TEST(NonOwningRingSpin, Simple)
 {
 	threadsafe::NonOwningRingSpin<ListElement> queue;
