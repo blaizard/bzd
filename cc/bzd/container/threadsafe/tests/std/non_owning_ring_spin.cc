@@ -31,10 +31,6 @@ TEST(NonOwningRingSpin, StressPush)
 		elements,
 		[&](ListElement& element) { queue.pushBack(element); },
 		[&]() { return queue.popFront(); });
-	makePushPopStressTest<3, 2, 1000>(
-		elements,
-		[&](ListElement& element) { queue.pushFront(element); },
-		[&]() { return queue.popFront(); });
 }
 
 } // namespace bzd::test

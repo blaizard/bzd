@@ -42,23 +42,16 @@ public:
 	using ElementType = T;
 
 public:
+	constexpr NonOwningRingSpin() noexcept { dummy_.next_ = &dummy_; }
+
+public:
 	/// Push an element at the back of the ring, it will be the last to be poped.
 	constexpr void pushBack(ElementType& element) noexcept
 	{
 		const auto lock = makeSyncLockGuard(mutex_);
 
-		element.next_ = head_;
-		tail_->next_ = &element;
-		tail_ = &element;
-	}
-
-	/// Push an element at the front of the ring, it will be the first to be poped.
-	constexpr void pushFront(ElementType& element) noexcept
-	{
-		const auto lock = makeSyncLockGuard(mutex_);
-
-		element.next_ = head_;
-		tail_->next_ = &element;
+		element.next_ = head_->next_;
+		head_->next_ = &element;
 		head_ = &element;
 	}
 
@@ -67,25 +60,23 @@ public:
 	{
 		const auto lock = makeSyncLockGuard(mutex_);
 
-		auto originalTail = tail_;
-		while (head_ != originalTail)
+		auto originalHead = head_;
+		do
 		{
+			auto element = head_->next_;
+
 			// Advance if no match.
-			if (head_ == &dummy_ || !callable(*static_cast<ElementType*>(head_)))
+			if (element == &dummy_ || !callable(*static_cast<ElementType*>(element)))
 			{
-				tail_ = head_;
-				head_ = head_->next_;
+				head_ = element;
 			}
 			else
 			{
-				auto element = head_;
-				head_ = element->next_;
-				tail_->next_ = head_;
+				head_->next_ = element->next_;
 				element->next_ = nullptr;
-
 				return *static_cast<ElementType*>(element);
 			}
-		}
+		} while (head_ != originalHead);
 
 		return bzd::nullopt;
 	}
@@ -104,8 +95,7 @@ public:
 		} while (element.hasValue());
 	}
 
-	/*
-	void print()
+	/*void print()
 	{
 		::std::cout << "----------------------------" << ::std::endl;
 		::std::cout << "head";
@@ -119,25 +109,12 @@ public:
 				break;
 			}
 		}
-		::std::cout << ::std::endl << "tail";
-		ptr = tail_;
-		while (ptr)
-		{
-			::std::cout << " -> " << ptr;
-			ptr = ptr->next_;
-			if (ptr == tail_)
-			{
-				break;
-			}
-		}
 		::std::cout << ::std::endl;
-	}
-	*/
+	}*/
 
 protected:
 	NonOwningRingSpinElement dummy_{};
 	NonOwningRingSpinElement* head_{&dummy_};
-	NonOwningRingSpinElement* tail_{&dummy_};
 	SpinMutex mutex_{};
 };
 
