@@ -8,5 +8,6 @@ cc_library(
         "//cc/bzd/container:non_owning_list",
         "//cc/bzd/utility/synchronization:spin_mutex",
         "//cc/bzd/utility/synchronization:sync_lock_guard",
+        "//cc/bzd/core/async"
     ],
 )
