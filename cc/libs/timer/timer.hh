@@ -3,6 +3,7 @@
 #include "cc/bzd/container/non_owning_list.hh"
 #include "cc/bzd/utility/synchronization/spin_mutex.hh"
 #include "cc/bzd/utility/synchronization/sync_lock_guard.hh"
+#include "cc/bzd/core/async.hh"
 
 namespace bzd {
 
