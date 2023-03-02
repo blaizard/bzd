@@ -80,11 +80,10 @@ public:
 		{
 			// Set the executable in suspended mode and re-arm the alarm if needed.
 			{
-				auto lock = makeSyncLockGuard(mutex_);
 				co_await bzd::async::suspendForISR([&](auto&& executable) {
+					auto lock = makeSyncLockGuard(mutex_);
 					executable_ = bzd::move(executable);
 					alarmUpdate();
-					lock.release();
 				});
 			}
 

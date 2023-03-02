@@ -12,4 +12,7 @@ cc_library(
         "//cc/bzd/container:result",
         "//cc/bzd/core:error",
     ],
+    target_compatible_with = [
+        "@//tools/bazel_build/platforms/isa:xtensa_lx6",
+    ],
 )
