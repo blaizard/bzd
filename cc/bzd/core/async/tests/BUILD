@@ -41,10 +41,6 @@ bzd_cc_test(
         "stack_overflow.cc",
     ],
     tags = ["stress"],
-    target_compatible_with = select({
-        "@esp32_xtensa_lx6_gcc//:compiler": ["@platforms//:incompatible"],
-        "//conditions:default": [],
-    }),
     deps = [
         "//cc/bzd/core:delay",
         "//cc/bzd/core/async",

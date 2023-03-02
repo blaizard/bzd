@@ -146,6 +146,8 @@ class Expression(EntityExpression):
 		self.assertTrue(condition=len(fragments) == 1, message=f"This expression is malformed: {fragments}")
 		fragments[0].toElement(self.element)
 
+		# TODO: If mark as "mandatory", remove the default value.
+
 	def resolve(self, resolver: "Resolver") -> None:
 		"""Resolve entities."""
 

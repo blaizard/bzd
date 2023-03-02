@@ -38,7 +38,7 @@ RUN git clone --depth 1 https://github.com/espressif/qemu.git \
     && git am /bzd/0001_fixing_number_of_registers_to_152.patch \
 	&& mkdir -p build \
 	&& cd build \
-	&& ../configure --target-list=xtensa-softmmu --enable-debug --enable-sanitizers --disable-strip --disable-capstone --disable-vnc \
+	&& ../configure --target-list=xtensa-softmmu --enable-strip --disable-capstone --disable-vnc \
 	&& make vga=no -j$(nproc) \
 	&& make install
 

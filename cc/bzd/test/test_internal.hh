@@ -56,7 +56,7 @@
 
 #define BZDTEST_ASYNC_(testCaseName, testName)                                                                                             \
 	BZDTEST_REGISTER_(testCaseName, testName)                                                                                              \
-	bzd::Async<> BZDTEST_FCT_NAME_(testCaseName, testName)(const ::bzd::test::Context&);                                                   \
+	::bzd::Async<> BZDTEST_FCT_NAME_(testCaseName, testName)(const ::bzd::test::Context&);                                                 \
 	void BZDTEST_CLASS_NAME_(testCaseName, testName)::test(const ::bzd::test::Context& test) const                                         \
 	{                                                                                                                                      \
 		const auto result = BZDTEST_FCT_NAME_(testCaseName, testName)(test).sync();                                                        \
@@ -65,7 +65,44 @@
 			BZDTEST_FAIL_FATAL_("Failure\nUnhandled failure from async.", result.error().getMessage().data());                             \
 		}                                                                                                                                  \
 	}                                                                                                                                      \
-	bzd::Async<> BZDTEST_FCT_NAME_(testCaseName, testName)([[maybe_unused]] const ::bzd::test::Context& test)
+	::bzd::Async<> BZDTEST_FCT_NAME_(testCaseName, testName)([[maybe_unused]] const ::bzd::test::Context& test)
+
+#define BZDTEST_ASYNC_MULTITHREAD_(testCaseName, testName, nbThreads)                                                                      \
+	BZDTEST_REGISTER_(testCaseName, testName)                                                                                              \
+	::bzd::Async<> BZDTEST_FCT_NAME_(testCaseName, testName)(const ::bzd::test::Context&);                                                 \
+	void BZDTEST_CLASS_NAME_(testCaseName, testName)::test(const ::bzd::test::Context& test) const                                         \
+	{                                                                                                                                      \
+		::bzd::coroutine::impl::Executor executor{};                                                                                       \
+		::bzd::Array<std::thread, nbThreads> threads;                                                                                      \
+		::bzd::Atomic<::bzd::Bool> isTerminated{false};                                                                                    \
+		auto onTerminate = [&isTerminated]() -> ::bzd::Optional<::bzd::async::Executable&> {                                               \
+			isTerminated.store(true);                                                                                                      \
+			return bzd::nullopt;                                                                                                           \
+		};                                                                                                                                 \
+		auto promise = BZDTEST_FCT_NAME_(testCaseName, testName)(test);                                                                    \
+		promise.enqueue(executor, ::bzd::async::Type::workload, onTerminate);                                                              \
+		for (auto& entry : threads)                                                                                                        \
+		{                                                                                                                                  \
+			entry = ::std::thread{[&executor, &isTerminated]() {                                                                           \
+				while (!isTerminated.load())                                                                                               \
+				{                                                                                                                          \
+					executor.run();                                                                                                        \
+				}                                                                                                                          \
+			}};                                                                                                                            \
+		}                                                                                                                                  \
+		for (auto& entry : threads)                                                                                                        \
+		{                                                                                                                                  \
+			entry.join();                                                                                                                  \
+		}                                                                                                                                  \
+		const auto result = promise.moveResultOut();                                                                                       \
+		if (!static_cast<bool>(result))                                                                                                    \
+		{                                                                                                                                  \
+			BZDTEST_FAIL_FATAL_("Failure\nUnhandled failure from async.", result.error().getMessage().data());                             \
+		}                                                                                                                                  \
+		BZDTEST_TEST_EQ_(executor.getQueueCount(), 0U, BZDTEST_FAIL_FATAL_);                                                               \
+		BZDTEST_TEST_EQ_(executor.getWorkloadCount(), 0, BZDTEST_FAIL_FATAL_);                                                             \
+	}                                                                                                                                      \
+	::bzd::Async<> BZDTEST_FCT_NAME_(testCaseName, testName)([[maybe_unused]] const ::bzd::test::Context& test)
 
 #define BZDTEST_CONSTEXPR_BEGIN_(testCaseName, testName)                                                                                   \
 	BZDTEST_REGISTER_(testCaseName, testName)                                                                                              \

@@ -73,132 +73,128 @@ bzd::Async<> cancellationNestedWorkload(const bzd::Size counter)
 }
 
 template <ForkType forkType, class Function>
-void spawnConcurrentThreads(bzd::Async<> (*workload)(const bzd::Size), const bzd::Size iterations, const Function counterGenerator)
+bzd::Async<> runConcurrentTest(bzd::Async<> (*workload)(const bzd::Size), const bzd::Size iterations, const Function counterGenerator)
 {
 	for (bzd::Size iteration = 0; iteration < iterations; ++iteration)
 	{
-		bzd::coroutine::impl::Executor executor{};
-		bzd::Array<std::thread, 10> threads;
-
 		auto promise1 = workload(counterGenerator());
 		auto promise2 = workload(counterGenerator());
 		auto promise3 = workload(counterGenerator());
 		auto promise4 = workload(counterGenerator());
 		auto promise5 = workload(counterGenerator());
 
-		auto execute = [&](auto& promise) {
-			promise.enqueue(executor);
-			for (auto& entry : threads)
-			{
-				entry = std::thread{[&executor]() { executor.run(); }};
-			}
-
-			for (auto& entry : threads)
-			{
-				entry.join();
-			}
-
-			EXPECT_TRUE(promise.hasResult());
-		};
-
 		if constexpr (forkType == ForkType::any)
 		{
-			auto promise =
-				bzd::async::any(bzd::move(promise1), bzd::move(promise2), bzd::move(promise3), bzd::move(promise4), bzd::move(promise5));
-			execute(promise);
-			EXPECT_TRUE(isValidResultForAny(promise.moveResultOut()));
+			auto result = co_await bzd::async::any(bzd::move(promise1),
+												   bzd::move(promise2),
+												   bzd::move(promise3),
+												   bzd::move(promise4),
+												   bzd::move(promise5));
+			EXPECT_TRUE(isValidResultForAny(result));
 		}
 		else if constexpr (forkType == ForkType::all)
 		{
-			auto promise =
-				bzd::async::all(bzd::move(promise1), bzd::move(promise2), bzd::move(promise3), bzd::move(promise4), bzd::move(promise5));
-			execute(promise);
-			EXPECT_TRUE(isValidResultForAll(promise.moveResultOut()));
+			auto result = co_await bzd::async::all(bzd::move(promise1),
+												   bzd::move(promise2),
+												   bzd::move(promise3),
+												   bzd::move(promise4),
+												   bzd::move(promise5));
+			EXPECT_TRUE(isValidResultForAll(result));
 		}
 		else if constexpr (forkType == ForkType::random)
 		{
 			if (static_cast<bzd::Bool>(counterGenerator() % 2))
 			{
-				auto promise = bzd::async::any(bzd::move(promise1),
-											   bzd::move(promise2),
-											   bzd::move(promise3),
-											   bzd::move(promise4),
-											   bzd::move(promise5));
-				execute(promise);
-				EXPECT_TRUE(isValidResultForAny(promise.moveResultOut()));
+				auto result = co_await bzd::async::any(bzd::move(promise1),
+													   bzd::move(promise2),
+													   bzd::move(promise3),
+													   bzd::move(promise4),
+													   bzd::move(promise5));
+				EXPECT_TRUE(isValidResultForAny(result));
 			}
 			else
 			{
-				auto promise = bzd::async::all(bzd::move(promise1),
-											   bzd::move(promise2),
-											   bzd::move(promise3),
-											   bzd::move(promise4),
-											   bzd::move(promise5));
-				execute(promise);
-				EXPECT_TRUE(isValidResultForAll(promise.moveResultOut()));
+				auto result = co_await bzd::async::all(bzd::move(promise1),
+													   bzd::move(promise2),
+													   bzd::move(promise3),
+													   bzd::move(promise4),
+													   bzd::move(promise5));
+				EXPECT_TRUE(isValidResultForAll(result));
 			}
 		}
 		else
 		{
 			bzd::assert::unreachable();
 		}
-
-		EXPECT_EQ(executor.getQueueCount(), 0U);
-		EXPECT_EQ(executor.getWorkloadCount(), 0);
 	}
+
+	co_return {};
 }
 
-TEST(Coroutine, StressAllNull)
+TEST_ASYNC_MULTITHREAD(Coroutine, StressAllNull, 10)
 {
-	spawnConcurrentThreads<ForkType::all>(cancellationWorkload, 1000, []() { return 0; });
+	co_await !runConcurrentTest<ForkType::all>(cancellationWorkload, 1000, []() { return 0; });
+	co_return {};
 }
 
-TEST(Coroutine, StressAnyNull)
+TEST_ASYNC_MULTITHREAD(Coroutine, StressAnyNull, 10)
 {
-	spawnConcurrentThreads<ForkType::any>(cancellationWorkload, 1000, []() { return 0; });
+	co_await !runConcurrentTest<ForkType::any>(cancellationWorkload, 1000, []() { return 0; });
+	co_return {};
 }
 
-TEST(Coroutine, StressAllFixed)
+TEST_ASYNC_MULTITHREAD(Coroutine, StressAllFixed, 10)
 {
-	spawnConcurrentThreads<ForkType::all>(cancellationWorkload, 1000, []() { return 10; });
+	co_await !runConcurrentTest<ForkType::all>(cancellationWorkload, 1000, []() { return 10; });
+	co_return {};
 }
 
-TEST(Coroutine, StressAnyFixed)
+TEST_ASYNC_MULTITHREAD(Coroutine, StressAnyFixed, 10)
 {
-	spawnConcurrentThreads<ForkType::any>(cancellationWorkload, 1000, []() { return 10; });
+	co_await !runConcurrentTest<ForkType::any>(cancellationWorkload, 1000, []() { return 10; });
+	co_return {};
 }
 
-TEST(Coroutine, StressAllRandom)
+TEST_ASYNC_MULTITHREAD(Coroutine, StressAllRandom, 10)
 {
-	spawnConcurrentThreads<ForkType::all>(cancellationWorkload, 1000, [&]() { return test.random<int, 0, 100>(); });
+	co_await !runConcurrentTest<ForkType::all>(cancellationWorkload, 1000, [&]() { return test.random<int, 0, 100>(); });
+	co_return {};
 }
 
-TEST(Coroutine, StressAnyRandom)
+TEST_ASYNC_MULTITHREAD(Coroutine, StressAnyRandom, 10)
 {
-	spawnConcurrentThreads<ForkType::any>(cancellationWorkload, 1000, [&]() { return test.random<int, 0, 100>(); });
+	co_await !runConcurrentTest<ForkType::any>(cancellationWorkload, 1000, [&]() { return test.random<int, 0, 100>(); });
+	co_return {};
 }
 
-TEST(Coroutine, StressAllNested)
+TEST_ASYNC_MULTITHREAD(Coroutine, StressAllNested, 10)
 {
-	spawnConcurrentThreads<ForkType::all>(cancellationNestedWorkload<ForkType::all>, 100, [&]() { return test.random<int, 0, 5>(); });
+	co_await !runConcurrentTest<ForkType::all>(cancellationNestedWorkload<ForkType::all>, 100, [&]() { return test.random<int, 0, 5>(); });
+	co_return {};
 }
 
-TEST(Coroutine, StressAnyNested)
+TEST_ASYNC_MULTITHREAD(Coroutine, StressAnyNested, 10)
 {
-	spawnConcurrentThreads<ForkType::any>(cancellationNestedWorkload<ForkType::any>, 100, [&]() { return test.random<int, 0, 5>(); });
+	co_await !runConcurrentTest<ForkType::any>(cancellationNestedWorkload<ForkType::any>, 100, [&]() { return test.random<int, 0, 5>(); });
+	co_return {};
 }
 
-TEST(Coroutine, StressAllAnyNested)
+TEST_ASYNC_MULTITHREAD(Coroutine, StressAllAnyNested, 10)
 {
-	spawnConcurrentThreads<ForkType::all>(cancellationNestedWorkload<ForkType::any>, 100, [&]() { return test.random<int, 0, 5>(); });
+	co_await !runConcurrentTest<ForkType::all>(cancellationNestedWorkload<ForkType::any>, 100, [&]() { return test.random<int, 0, 5>(); });
+	co_return {};
 }
 
-TEST(Coroutine, StressAnyAllNested)
+TEST_ASYNC_MULTITHREAD(Coroutine, StressAnyAllNested, 10)
 {
-	spawnConcurrentThreads<ForkType::any>(cancellationNestedWorkload<ForkType::all>, 100, [&]() { return test.random<int, 0, 5>(); });
+	co_await !runConcurrentTest<ForkType::any>(cancellationNestedWorkload<ForkType::all>, 100, [&]() { return test.random<int, 0, 5>(); });
+	co_return {};
 }
 
-TEST(Coroutine, StressRandomNested)
+TEST_ASYNC_MULTITHREAD(Coroutine, StressRandomNested, 10)
 {
-	spawnConcurrentThreads<ForkType::random>(cancellationNestedWorkload<ForkType::random>, 100, [&]() { return test.random<int, 0, 5>(); });
+	co_await !runConcurrentTest<ForkType::random>(cancellationNestedWorkload<ForkType::random>, 100, [&]() {
+		return test.random<int, 0, 5>();
+	});
+	co_return {};
 }

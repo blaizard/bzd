@@ -10,6 +10,8 @@
 #include "cc/bzd/utility/source_location.hh"
 
 namespace bzd {
+
+/// Platform agnostic error type.
 enum class ErrorType : bzd::UInt8
 {
 	/// Any error that do not fall in the below categories.

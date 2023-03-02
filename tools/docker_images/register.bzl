@@ -20,7 +20,7 @@ IMAGES = {
         tag = "latest",
     ),
     "xtensa_qemu": struct(
-        digest = "sha256:473c71ec94c4fe3acd26f7b9274accabbda73959b6cd062996a8880fc1a2f6b9",
+        digest = "sha256:c6060b4cfba287f7ca7cb0290d27a8b5f6884d34c744742b5fc9672ed02a81dc",
         registry = "index.docker.io",
         repository = "blaizard/xtensa_qemu",
         tag = "latest",

@@ -1,6 +1,6 @@
 use "cc/components/std/stream/out/interface.bdl"
 use "cc/components/generic/stream/stub/interface.bdl"
-use "cc/components/xtensa/clock/xthal/interface.bdl"
+use "cc/components/xtensa/clock/timer/interface.bdl"
 use "cc/components/generic/clock/null/interface.bdl"
 use "cc/components/xtensa/core/interface.bdl"
 use "cc/bzd/platform/interfaces/stream.bdl"
@@ -20,7 +20,7 @@ composition {
 composition platform {
 	out: bzd.OStream = bzd.platform.std.Out();
 	in: bzd.IStream = bzd.platform.generic.stream.Stub();
-	steadyClock: bzd.Clock = bzd.platform.esp32.clock.Xthal();
+	steadyClock: bzd.Clock = bzd.platform.esp32.clock.Timer();
 	systemClock: bzd.Clock = bzd.platform.generic.clock.Null();
 	
 }

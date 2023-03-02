@@ -85,8 +85,19 @@ if __name__ == "__main__":
 		if (outputResolved / name).is_dir():
 			shutil.rmtree(outputResolved / name)
 
-	# Build the workspace
-	localCommand(cmds=["idf.py", "build"], cwd=workspace / "toolchains/cc/fragments/esp32_xtensa_lx6_sdk/build/project")
+	# Cleanup the project
+	projectPath = workspace / "toolchains/cc/fragments/esp32_xtensa_lx6_sdk/build/project"
+	(projectPath / "sdkconfig").unlink(missing_ok=True)
+
+	# Create the build directory
+	buildPath = projectPath / "build"
+	if buildPath.is_dir():
+		shutil.rmtree(buildPath)
+	buildPath.mkdir()
+
+	# Build the project
+	localCommand(cmds=["cmake", "..", "-G", "Unix Makefiles"], cwd=buildPath, stdout=True, stderr=True)
+	localCommand(cmds=["make"], cwd=buildPath, stdout=True, stderr=True, timeoutS=300)
 
 	commands = {
 	    "compile": CommandEntry("compile_flags"),
