@@ -16,7 +16,8 @@ TEST_ASYNC_MULTITHREAD(Timer, Stress, 4)
 		{
 			co_await !timer.waitUntil(current.load());
 			++sync;
-			while (sync.load() != 0) {
+			while (sync.load() != 0)
+			{
 				co_await bzd::async::yield();
 			}
 		}
@@ -28,7 +29,8 @@ TEST_ASYNC_MULTITHREAD(Timer, Stress, 4)
 		{
 			co_await !timer.waitUntil(current.load());
 			++sync;
-			while (sync.load() != 0) {
+			while (sync.load() != 0)
+			{
 				co_await bzd::async::yield();
 			}
 		}
@@ -36,12 +38,13 @@ TEST_ASYNC_MULTITHREAD(Timer, Stress, 4)
 	};
 
 	auto sequencer = [&]() -> bzd::Async<> {
-		for (bzd::UInt64 t = 0; t<100; ++t)
+		for (bzd::UInt64 t = 0; t < 100; ++t)
 		{
 			current.store(t);
 			timer = current.load();
 			// Wait for the wait until to be completed.
-			while (sync.load() < 2) {
+			while (sync.load() < 2)
+			{
 				co_await bzd::async::yield();
 			}
 			sync.store(0);
