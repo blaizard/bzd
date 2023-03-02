@@ -1,51 +1,46 @@
 #pragma once
 
 #include "cc/bzd/container/non_owning_list.hh"
+#include "cc/bzd/core/async.hh"
 #include "cc/bzd/utility/synchronization/spin_mutex.hh"
 #include "cc/bzd/utility/synchronization/sync_lock_guard.hh"
-#include "cc/bzd/core/async.hh"
 
 namespace bzd {
 
 /// General purpose timer that can manage multiple alarms.
-template <class Time, class Duration, class Impl>
-class Timer
+template <class Time, class Impl, Bool retroactiveAlarm = true, Size bitWidth = 64>
+class TimerISR
 {
 public:
 	struct Element : public bzd::NonOwningListElement
 	{
 		/// The alarm at which time the element should be processed.
 		Time alarm;
+		/// The suspended executable associated with this element.
+		bzd::async::ExecutableSuspended executable;
 	};
 
 public:
-	void timerStart(const Time alarm)
+	bzd::Async<> waitUntil(const Time time) noexcept
 	{
-		// call the actual function to start the timer
-		nextAlarm_ = alarm;
+		Element element;
+		element.alarm = time;
+		co_await bzd::async::suspend(
+			[&](auto&& executable) {
+				element.executable = bzd::move(executable);
+				add(element);
+			},
+			[&]() { remove(element); });
+
+		co_return {};
 	}
 
-	void timerStop()
-	{
-		// call the actual function to stop the timer
-		nextAlarm_.clear();
-	}
-
-public:
 	/// Add a new timer element to the list.
 	///
 	/// This function is threadsafe but not ISR safe.
-	constexpr void add(Element& element, const Duration duration) noexcept
+	constexpr void add(Element& element) noexcept
 	{
-		element.alarm = impl().durationToTime(duration);
 		auto lock = makeSyncLockGuard(mutex_);
-
-		// If the timer is running, stop it. This ensures
-		// that no ISR will be triggered when we insert the new element.
-		if (nextAlarm_)
-		{
-			timerStop();
-		}
 
 		// Add the new element, sorted by alarm time.
 		auto it = list_.begin();
@@ -59,7 +54,7 @@ public:
 		bzd::ignore = list_.insert(it, element);
 
 		// Start the timer.
-		timerStartIfNeeded();
+		alarmUpdate();
 	}
 
 	/// Remove an element previously added.
@@ -67,25 +62,14 @@ public:
 	{
 		auto lock = makeSyncLockGuard(mutex_);
 
-		// If the timer is running, stop it. This ensures
-		// that no ISR will be triggered when we insert the new element.
-		if (nextAlarm_)
-		{
-			timerStop();
-		}
-
 		bzd::ignore = list_.erase(element);
 
 		// Start the timer.
-		timerStartIfNeeded();
+		alarmUpdate();
 	}
 
 	/// Trigger to be called from an ISR.
-	constexpr void triggerForISR() noexcept
-	{
-		nextAlarm_.clear();
-		executable_.schedule();
-	}
+	constexpr void triggerForISR() noexcept { executable_.schedule(); }
 
 	/// Check and process all timers that are expired, reload the timer if needed.
 	///
@@ -94,17 +78,30 @@ public:
 	{
 		while (true)
 		{
-			co_await bzd::async::suspendForISR([&](auto&& executable) { executable_ = bzd::move(executable); });
+			// Set the executable in suspended mode and re-arm the alarm if needed.
+			{
+				auto lock = makeSyncLockGuard(mutex_);
+				co_await bzd::async::suspendForISR([&](auto&& executable) {
+					executable_ = bzd::move(executable);
+					alarmUpdate();
+					lock.release();
+				});
+			}
 
 			{
 				auto lock = makeSyncLockGuard(mutex_);
 
 				// Trigger the alarm expired.
-				const auto time = impl().getTime();
+				auto maybeTime = impl().getTime();
+				if (!maybeTime)
+				{
+					co_return bzd::move(maybeTime).propagate();
+				}
 				for (auto it = list_.begin(); it != list_.end();)
 				{
-					if (it->alarm <= time)
+					if (it->alarm <= maybeTime.value())
 					{
+						it->executable.schedule();
 						bzd::ignore = list_.erase(it++);
 					}
 					else
@@ -112,9 +109,6 @@ public:
 						break;
 					}
 				}
-
-				// Start the timer if needed.
-				timerStartIfNeeded();
 			}
 		}
 		co_return {};
@@ -132,12 +126,36 @@ private:
 	}
 
 	/// Arm the timer if needed.
-	constexpr void timerStartIfNeeded() noexcept
+	bzd::Result<void, bzd::Error> alarmUpdate() noexcept
 	{
 		const auto maybeAlarm = getNextAlarm();
 		if (maybeAlarm)
 		{
-			timerStart(maybeAlarm.value());
+			auto result = impl().alarmSet(maybeAlarm.value());
+			if (!result)
+			{
+				return bzd::move(result).propagate();
+			}
+			if constexpr (!retroactiveAlarm)
+			{
+				// Check if the current time is already passed, if so trigger the callback.
+				// This is needed for some architecture that will not trigger the ISR if the
+				// alarm is already passed.
+				auto maybeTime = impl().getTime();
+				if (!maybeTime)
+				{
+					return bzd::move(maybeTime).propagate();
+				}
+				if (maybeTime.value() >= maybeAlarm.value())
+				{
+					executable_.schedule();
+				}
+			}
+			return bzd::nullresult;
+		}
+		else
+		{
+			return impl().alarmClear();
 		}
 	}
 
@@ -147,8 +165,8 @@ private:
 private:
 	SpinMutex mutex_{};
 	bzd::NonOwningList<Element> list_{};
-	bzd::Optional<Time> nextAlarm_{};
 	bzd::async::ExecutableSuspendedForISR executable_{};
+	Time timeAdd_{0};
 };
 
 } // namespace bzd

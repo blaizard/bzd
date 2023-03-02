@@ -20,32 +20,22 @@ cc_library(
     ],
 )
 
-bdl_library(
-    name = "1_emitter_bdl",
-    srcs = [
-        "1_emitter.bdl",
-    ],
-)
-
 bzd_cc_binary(
     name = "1_emitter",
-    deps = [
-        ":1_emitter_bdl",
-        ":lib",
+    bdls = [
+        "1_emitter.bdl",
     ],
-)
-
-bdl_library(
-    name = "1_emitter_2_pollers_bdl",
-    srcs = [
-        "1_emitter_2_pollers.bdl",
+    deps = [
+        ":lib",
     ],
 )
 
 bzd_cc_binary(
     name = "1_emitter_2_pollers",
+    bdls = [
+        "1_emitter_2_pollers.bdl",
+    ],
     deps = [
-        ":1_emitter_2_pollers_bdl",
         ":lib",
     ],
 )

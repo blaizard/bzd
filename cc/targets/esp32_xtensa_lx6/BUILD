@@ -21,7 +21,7 @@ cc_library(
         "//cc/components/generic/panic/trap",
         "//cc/components/generic/stream/stub",
         "//cc/components/std/stream/out",
-        "//cc/components/xtensa/clock/xthal",
+        "//cc/components/xtensa/clock/timer",
         "//cc/components/xtensa/core",
     ],
 )

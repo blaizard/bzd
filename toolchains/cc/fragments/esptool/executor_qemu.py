@@ -88,7 +88,7 @@ if __name__ == "__main__":
 
 	cmds += [
 	    image("xtensa_qemu"), "qemu-system-xtensa", "-no-reboot", "-nographic", "-machine", "esp32", "-m", "4",
-	    "-drive", "file=/bzd/flash.bin,if=mtd,format=raw", "-nic", "user,model=open_eth,hostfwd=tcp::80-:80"
+	    "-drive", "file=/bzd/flash.bin,if=mtd,format=raw"
 	]
 
 	if args.debug:

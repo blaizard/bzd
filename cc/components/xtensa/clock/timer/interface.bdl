@@ -1,0 +1,15 @@
+
+namespace bzd.platform.esp32.clock;
+
+
+component Timer {
+interface:
+	method init() [init];
+	method service();
+	
+composition:
+	this.service();
+	
+}
+
+

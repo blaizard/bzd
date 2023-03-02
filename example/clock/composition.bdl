@@ -1,0 +1,11 @@
+
+namespace example;
+
+
+method counter(count = Integer(1) [min(1) mandatory], periodMs = Integer(1000) [min(0)]);
+composition {
+	counter(count = 10, periodMs = 1000);
+	
+}
+
+

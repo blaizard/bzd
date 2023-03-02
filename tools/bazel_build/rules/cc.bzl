@@ -1,22 +1,31 @@
-load("//tools/bazel_build/rules:bdl.bzl", "bdl_system", "bdl_system_test")
+load("//tools/bazel_build/rules:bdl.bzl", "bdl_library", "bdl_system", "bdl_system_test")
 load("@bazel_skylib//lib:sets.bzl", "sets")
 load("//tools/bazel_build/rules/assets/cc:defs.bzl", "cc_compile")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
-def bzd_cc_binary(name, target = "//cc/targets:auto", tags = [], srcs = [], deps = [], testonly = False, **kwargs):
+def bzd_cc_binary(name, target = "//cc/targets:auto", tags = [], bdls = [], hdrs = [], srcs = [], deps = [], testonly = False, **kwargs):
     """Rule that defines a bzd C++ binary."""
 
     updated_deps = deps + []
-    if srcs:
+    if bdls:
+        bdl_library(
+            name = "{}.bdls".format(name),
+            tags = tags + ["manual"],
+            srcs = bdls,
+        )
+        updated_deps.append("{}.bdls".format(name))
+
+    if hdrs or srcs:
         cc_library(
-            name = "{}.lib".format(name),
+            name = "{}.srcs".format(name),
             tags = tags + ["manual", "cc"],
+            hdrs = hdrs,
             srcs = srcs,
-            deps = deps,
+            deps = updated_deps,
             testonly = testonly,
             alwayslink = True,
         )
-        updated_deps.append("{}.lib".format(name))
+        updated_deps.append("{}.srcs".format(name))
 
     bdl_system(
         name = name,
@@ -29,20 +38,29 @@ def bzd_cc_binary(name, target = "//cc/targets:auto", tags = [], srcs = [], deps
         **kwargs
     )
 
-def bzd_cc_test(name, target = "//cc/targets:auto", tags = [], srcs = [], deps = [], testonly = True, **kwargs):
+def bzd_cc_test(name, target = "//cc/targets:auto", tags = [], bdls = [], hdrs = [], srcs = [], deps = [], testonly = True, **kwargs):
     """Rule that defines a bzd C++ test binary."""
 
     updated_deps = deps + []
-    if srcs:
+    if bdls:
+        bdl_library(
+            name = "{}.bdls".format(name),
+            tags = tags + ["manual"],
+            srcs = bdls,
+        )
+        updated_deps.append("{}.bdls".format(name))
+
+    if hdrs or srcs:
         cc_library(
-            name = "{}.lib".format(name),
+            name = "{}.srcs".format(name),
             tags = tags + ["manual", "cc"],
+            hdrs = hdrs,
             srcs = srcs,
-            deps = deps,
+            deps = updated_deps,
             testonly = testonly,
             alwayslink = True,
         )
-        updated_deps.append("{}.lib".format(name))
+        updated_deps.append("{}.srcs".format(name))
 
     bdl_system_test(
         name = name,
