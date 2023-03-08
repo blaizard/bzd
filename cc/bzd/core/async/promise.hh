@@ -68,6 +68,12 @@ public:
 		context_->setContinuation(bzd::ExecutorContext<Executable>::Continuation{&executable});
 	}
 
+	constexpr void thenEnqueueCallback(OnTerminateCallback onTerminate) noexcept
+	{
+		bzd::assert::isTrue(context_);
+		context_->setContinuation(onTerminate);
+	}
+
 	constexpr void setContinuation(Executable& continuation) noexcept
 	{
 		// Disabled to support generators
