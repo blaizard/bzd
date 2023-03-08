@@ -334,7 +334,7 @@ constexpr auto getExecutable() noexcept { return bzd::coroutine::impl::GetExecut
 template <class... Args>
 constexpr auto suspend(Args&&... args) noexcept
 {
-	return bzd::coroutine::impl::Suspend{bzd::forward<Args>(args)...};
+	return bzd::coroutine::impl::Suspend</*forISR*/ false, Args&&...>{bzd::forward<Args>(args)...};
 }
 
 /// Create a suspension point. Mark the current async as skipped, it will still reside
@@ -344,7 +344,7 @@ constexpr auto suspend(Args&&... args) noexcept
 template <class... Args>
 constexpr auto suspendForISR(Args&&... args) noexcept
 {
-	return bzd::coroutine::impl::SuspendForISR{bzd::forward<Args>(args)...};
+	return bzd::coroutine::impl::Suspend</*forISR*/ true, Args&&...>{bzd::forward<Args>(args)...};
 }
 
 /// Executes multiple asynchronous function according to the executor policy and return once all are completed.
