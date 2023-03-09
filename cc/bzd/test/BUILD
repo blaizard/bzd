@@ -11,6 +11,18 @@ bdl_library(
 )
 
 cc_library(
+    name = "multithread",
+    hdrs = [
+        "multithread.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":test",
+        "//cc/libs/pthread",
+    ],
+)
+
+cc_library(
     name = "test",
     srcs = [
         "test.cc",

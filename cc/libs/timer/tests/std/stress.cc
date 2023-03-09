@@ -1,7 +1,5 @@
-#include "cc/bzd/test/test.hh"
+#include "cc/bzd/test/multithread.hh"
 #include "cc/libs/timer/tests/std/timer.hh"
-
-#include <iostream>
 
 TEST_ASYNC_MULTITHREAD(Timer, Stress, 4)
 {
@@ -49,7 +47,6 @@ TEST_ASYNC_MULTITHREAD(Timer, Stress, 4)
 			}
 			sync.store(0);
 		}
-		::std::cout << "end!" << ::std::endl;
 		co_return {};
 	};
 

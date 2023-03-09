@@ -32,7 +32,7 @@ bzd::Async<bzd::Span<const bzd::Byte>> Proactor::read(const posix::FileDescripto
 
 		// 1. Register event
 		co_await bzd::async::suspend([&](auto&& executable) {
-			epollData.executable_ = bzd::move(executable);
+			epollData.executable_.own(bzd::move(executable));
 			::epoll_ctl(epollFd_.native(), EPOLL_CTL_ADD, epollData.fd_.native(), &ev);
 		}, [&]() {
 			::epoll_ctl(epollFd_.native(), EPOLL_CTL_DEL, epollData.fd_.native(), nullptr);

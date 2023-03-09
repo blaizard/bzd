@@ -1,5 +1,3 @@
-#!/usr/bin/python3
-
 import argparse
 import http.server
 import os
@@ -43,7 +41,8 @@ class ArchiveRequestHandler(http.server.SimpleHTTPRequestHandler):
 
 	def do_GET(self) -> None:
 		path = pathlib.Path("/index.html" if self.path == "/" else self.path)
-		pathInArchive = self.prefix + str(path.relative_to('/'))
+		fullPathInArchive = self.prefix + str(path.relative_to('/'))
+		pathInArchive = fullPathInArchive.split("?", 1)[0]
 
 		try:
 			reader = self.archive.extractfile(pathInArchive)
