@@ -58,7 +58,7 @@ private:
 		{
 			co_await bzd::async::suspend(
 				[&](auto&& executable) {
-					element.executable = bzd::move(executable);
+					element.executable.own(bzd::move(executable));
 					bzd::ignore = suspended_.pushFront(element);
 					lock.release();
 				},

@@ -27,7 +27,7 @@ public:
 		element.alarm = time;
 		co_await bzd::async::suspend(
 			[&](auto&& executable) {
-				element.executable = bzd::move(executable);
+				element.executable.own(bzd::move(executable));
 				add(element);
 			},
 			[&]() { remove(element); });
@@ -82,7 +82,7 @@ public:
 			{
 				co_await bzd::async::suspendForISR([&](auto&& executable) {
 					auto lock = makeSyncLockGuard(mutex_);
-					executable_ = bzd::move(executable);
+					executable_.own(bzd::move(executable));
 					alarmUpdate();
 				});
 			}

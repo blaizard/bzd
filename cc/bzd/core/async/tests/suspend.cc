@@ -1,9 +1,7 @@
 #include "cc/bzd/container/array.hh"
 #include "cc/bzd/core/async.hh"
 #include "cc/bzd/core/delay.hh"
-#include "cc/bzd/test/test.hh"
-
-#include <thread>
+#include "cc/bzd/test/multithread.hh"
 
 template <class Result>
 [[nodiscard]] bool isValidResultForAny(Result&& result)
@@ -30,17 +28,16 @@ void makeStressCancellationSuspend(const bzd::Size iterations)
 				shouldReturn.store(true);
 			}
 			auto onSuspend = [&](auto&& executable) {
-				thread = std::thread{[&shouldReturn, &executableStore, executable = bzd::move(executable)]() mutable {
+				executableStore.own(bzd::move(executable));
+				thread = std::thread{[&shouldReturn, &executableStore]() mutable {
 					shouldReturn.store(true);
 					if constexpr (!onlyCancellation)
 					{
-						(void)executableStore;
-						bzd::move(executable).schedule();
+						bzd::move(executableStore).schedule();
 					}
 					else
 					{
-						// Move the executable here to make sure it does not reschedule itself on destruction.
-						executableStore = bzd::move(executable);
+						(void)executableStore;
 					}
 				}};
 			};
@@ -107,4 +104,67 @@ TEST(Coroutine, StressCancellationSuspendForISROnlyCancellation)
 {
 	makeStressCancellationSuspend<true, true, false>(1000);
 	makeStressCancellationSuspend<true, true, true>(1000);
+}
+
+TEST_ASYNC_MULTITHREAD(Coroutine, StressSuspend, 3)
+{
+	bzd::async::ExecutableSuspended executable{};
+	bzd::Atomic<bzd::UInt64> current{0};
+	bzd::Atomic<bzd::Size> sync{2};
+
+	auto sequence1 = [&]() -> bzd::Async<> {
+		while (true)
+		{
+			executable.schedule();
+			++sync;
+			while (sync.load() > 2)
+			{
+				executable.schedule();
+				co_await bzd::async::yield();
+			}
+			++sync;
+			while (sync.load() < 2)
+			{
+				co_await bzd::async::yield();
+			}
+		}
+		co_return {};
+	};
+
+	auto sequence2 = [&]() -> bzd::Async<> {
+		while (true)
+		{
+			executable.schedule();
+			++sync;
+			while (sync.load() > 2)
+			{
+				executable.schedule();
+				co_await bzd::async::yield();
+			}
+			++sync;
+			while (sync.load() < 2)
+			{
+				co_await bzd::async::yield();
+			}
+		}
+		co_return {};
+	};
+
+	auto sequencer = [&]() -> bzd::Async<> {
+		for (bzd::UInt64 t = 0; t < 1000; ++t)
+		{
+			co_await bzd::async::suspend([&](auto&& suspended) { executable.own(bzd::move(suspended)); });
+			// Wait for the wait until to be completed.
+			while (sync.load() < 4)
+			{
+				co_await bzd::async::yield();
+			}
+			sync.store(0);
+		}
+		co_return {};
+	};
+
+	bzd::ignore = co_await bzd::async::any(sequencer(), sequence1(), sequence2());
+
+	co_return {};
 }

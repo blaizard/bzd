@@ -128,6 +128,17 @@ public: // API.
 		bzd::ignore = callbacks_.erase(callback);
 	}
 
+	constexpr void replaceCallback(CancellationCallback& previous, CancellationCallback& callback) noexcept
+	{
+		auto scope = makeSyncLockGuard(mutexCallbacks_);
+		// If the token was already cancelled, do nothing.
+		if (callbacks_.erase(previous))
+		{
+			const auto result = callbacks_.pushFront(callback);
+			bzd::assert::isTrue(result.hasValue());
+		}
+	}
+
 private:
 	bzd::Atomic<Bool> flag_{false};
 	bzd::SpinMutex mutex_{};

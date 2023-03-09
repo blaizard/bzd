@@ -1,7 +1,7 @@
 #include "cc/bzd/container/threadsafe/non_owning_queue_spin.hh"
 
 #include "cc/bzd/container/threadsafe/tests/std/utils.hh"
-#include "cc/bzd/test/test.hh"
+#include "cc/bzd/test/multithread.hh"
 
 #include <vector>
 

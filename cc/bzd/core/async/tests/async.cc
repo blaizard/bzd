@@ -266,7 +266,7 @@ bzd::Async<> asyncSuspend(bzd::interface::String& trace, bzd::StringView id)
 {
 	appendToTrace(trace, id, 0);
 	bzd::async::ExecutableSuspended suspended{};
-	co_await bzd::async::suspend([&](auto&& executable) { suspended = bzd::move(executable); });
+	co_await bzd::async::suspend([&](auto&& executable) { suspended.own(bzd::move(executable)); });
 	appendToTrace(trace, id, 1);
 
 	co_return {};
@@ -287,7 +287,7 @@ bzd::Async<> asyncSuspendForISR(bzd::interface::String& trace, bzd::StringView i
 {
 	appendToTrace(trace, id, 0);
 	bzd::async::ExecutableSuspendedForISR suspended{};
-	co_await bzd::async::suspendForISR([&](auto&& executable) { suspended = bzd::move(executable); });
+	co_await bzd::async::suspendForISR([&](auto&& executable) { suspended.own(bzd::move(executable)); });
 	appendToTrace(trace, id, 1);
 
 	co_return {};

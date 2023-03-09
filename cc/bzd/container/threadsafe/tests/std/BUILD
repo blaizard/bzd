@@ -27,7 +27,7 @@ bzd_cc_test(
     deps = [
         ":utils",
         "//cc/bzd/container/threadsafe:non_owning_queue_spin",
-        "//cc/bzd/test",
+        "//cc/bzd/test:multithread",
     ],
 )
 
@@ -41,7 +41,7 @@ bzd_cc_test(
     deps = [
         ":utils",
         "//cc/bzd/container/threadsafe:non_owning_ring_spin",
-        "//cc/bzd/test",
+        "//cc/bzd/test:multithread",
     ],
 )
 
@@ -53,6 +53,5 @@ cc_library(
     deps = [
         "//cc/bzd/container:vector",
         "//cc/bzd/platform:atomic",
-        "//cc/libs/pthread",
     ],
 )

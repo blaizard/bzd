@@ -30,7 +30,7 @@ bzd_cc_test(
     deps = [
         "//cc/bzd/core:delay",
         "//cc/bzd/core/async",
-        "//cc/bzd/test",
+        "//cc/bzd/test:multithread",
     ],
 )
 
@@ -62,6 +62,6 @@ bzd_cc_test(
     deps = [
         "//cc/bzd/core:delay",
         "//cc/bzd/core/async",
-        "//cc/bzd/test",
+        "//cc/bzd/test:multithread",
     ],
 )

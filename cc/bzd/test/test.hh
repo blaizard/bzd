@@ -13,10 +13,6 @@
 /// Run a coroutine-based test in an asynchronous context.
 #define TEST_ASYNC(testCaseName, testName) BZDTEST_ASYNC_(testCaseName, testName)
 
-/// Run a coroutine-based test in an asynchronous context using a multithreaded executor.
-/// This requires the include `#include <thread>`.
-#define TEST_ASYNC_MULTITHREAD(testCaseName, testName, nbThreads) BZDTEST_ASYNC_MULTITHREAD_(testCaseName, testName, nbThreads)
-
 /// Executes a test case at compile time.
 /// \{
 #define TEST_CONSTEXPR_BEGIN(testCaseName, testName) BZDTEST_CONSTEXPR_BEGIN_(testCaseName, testName)

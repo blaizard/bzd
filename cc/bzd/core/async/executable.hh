@@ -7,6 +7,8 @@
 #include "cc/bzd/utility/synchronization/spin_shared_mutex.hh"
 #include "cc/bzd/utility/synchronization/sync_lock_guard.hh"
 
+#include <iostream>
+
 namespace bzd {
 template <class Executable>
 class Executor;
@@ -96,74 +98,60 @@ public: // Constructors/destructor/...
 	}
 	ExecutableSuspendedFactory(const ExecutableSuspendedFactory&) = delete;
 	ExecutableSuspendedFactory& operator=(const ExecutableSuspendedFactory&) = delete;
-	constexpr ExecutableSuspendedFactory(ExecutableSuspendedFactory&& other) noexcept : ExecutableSuspendedFactory{}
-	{
-		*this = bzd::move(other);
-	}
-	constexpr ExecutableSuspendedFactory& operator=(ExecutableSuspendedFactory&& other) noexcept
-	{
-		// Do not allow move from a non-empty container.
-		bzd::assert::isTrue(executable_.load() == nullptr);
+	ExecutableSuspendedFactory(ExecutableSuspendedFactory&&) = delete;
+	ExecutableSuspendedFactory& operator=(ExecutableSuspendedFactory&&) = delete;
 
-		auto* executable = other.executable_.exchange(processing);
-		if (executable != processing)
-		{
-			if (executable)
-			{
-				// Store the executble now, in that case, if a race happen with a cancellation,
-				// nothing will be done until addOneTimeCallback is invoked.
-				executable_.store(executable);
-				onUserCancel_ = bzd::move(other.onUserCancel_);
-				if (executable->cancel_)
-				{
-					executable->cancel_->removeCallback(other.onCancel_);
-					executable->cancel_->addOneTimeCallback(onCancel_);
-				}
-			}
-			other.executable_.store(nullptr);
-		}
-
-		return *this;
-	}
 	constexpr ~ExecutableSuspendedFactory() noexcept
 	{
-		// There can be a cancellation going on, so wait until it is completly done.
-		while (executable_.load() == processing)
-		{
-		};
 		bzd::assert::isTrue(!executable_.load(), "Suspended was destroyed with an executable.");
 	}
 
 public: // API.
+	/// Become the owner of another ExecutableSuspended.
+	///
+	/// The current object must be empty.
+	///
+	/// @param other The new ExecutableSuspended to be owned.
+	constexpr void own(ExecutableSuspendedFactory&& other) noexcept
+	{
+		bzd::assert::isTrue(executable_.load() == nullptr);
+
+		auto* executable = other.executable_.exchange(nullptr);
+		if (executable)
+		{
+			onUserCancel_ = other.onUserCancel_;
+			if (executable->cancel_)
+			{
+				executable->cancel_->replaceCallback(other.onCancel_, onCancel_);
+			}
+			// Assign the executable at the end, to avoid a race when calling "schedule()" concurrently.
+			executable_.store(executable);
+		}
+	}
+
+	/// Reschedule the suspended executable owned by this object.
 	constexpr void schedule() noexcept
 	{
-		auto* executable = executable_.exchange(processing);
-		if (executable != processing)
+		auto* executable = executable_.exchange(nullptr);
+		if (executable)
 		{
-			if (executable)
+			if (executable->cancel_)
 			{
-				if (executable->cancel_)
-				{
-					executable->cancel_->removeCallback(onCancel_);
-				}
-				Impl::reschedule(*executable);
+				executable->cancel_->removeCallback(onCancel_);
 			}
-			executable_.store(nullptr);
+			//::std::cout << "reschedule!" << ::std::endl;
+			Impl::reschedule(*executable);
 		}
 	}
 
 private:
 	constexpr void cancel() noexcept
 	{
-		auto* executable = executable_.exchange(processing);
-		if (executable != processing)
+		auto* executable = executable_.exchange(nullptr);
+		if (executable)
 		{
-			if (executable)
-			{
-				onUserCancel_();
-				Impl::reschedule(*executable);
-			}
-			executable_.store(nullptr);
+			onUserCancel_();
+			Impl::reschedule(*executable);
 		}
 	}
 
@@ -173,8 +161,6 @@ private:
 	}
 
 private:
-	// Special value to denote that scheduling/cancellation is on-going.
-	static inline T* processing{reinterpret_cast<T*>(1)};
 	bzd::Atomic<T*> executable_;
 	bzd::CancellationCallback onCancel_;
 	bzd::FunctionRef<void(void)> onUserCancel_;
