@@ -31,6 +31,7 @@ bzd_cc_test(
         "//cc/bzd/core:delay",
         "//cc/bzd/core/async",
         "//cc/bzd/test:multithread",
+        "//cc/bzd/test:sync_barrier",
     ],
 )
 

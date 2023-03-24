@@ -98,12 +98,15 @@ public: // Constructors/destructor/...
 	}
 	ExecutableSuspendedFactory(const ExecutableSuspendedFactory&) = delete;
 	ExecutableSuspendedFactory& operator=(const ExecutableSuspendedFactory&) = delete;
-	ExecutableSuspendedFactory(ExecutableSuspendedFactory&&) = delete;
 	ExecutableSuspendedFactory& operator=(ExecutableSuspendedFactory&&) = delete;
+	constexpr ExecutableSuspendedFactory(ExecutableSuspendedFactory&& other) noexcept : ExecutableSuspendedFactory{}
+	{
+		own(bzd::move(other));
+	}
 
 	constexpr ~ExecutableSuspendedFactory() noexcept
 	{
-		bzd::assert::isTrue(!executable_.load(), "Suspended was destroyed with an executable.");
+		bzd::assert::isTrue(!executable_.load(), "Destroyed with an executable.");
 	}
 
 public: // API.
@@ -116,6 +119,10 @@ public: // API.
 	{
 		bzd::assert::isTrue(executable_.load() == nullptr);
 
+		// During this transition time when the executable is exchanged, it might be
+		// that a schedule() or a cancel() happens. To ensure these events are not missed,
+		// missed_ is introduced.
+		missed_.store(MissedTrigger::none);
 		auto* executable = other.executable_.exchange(nullptr);
 		if (executable)
 		{
@@ -127,10 +134,26 @@ public: // API.
 			// Assign the executable at the end, to avoid a race when calling "schedule()" concurrently.
 			executable_.store(executable);
 		}
+
+		// Take care of missed event if any.
+		const auto missed = missed_.load();
+		switch (missed)
+		{
+		case MissedTrigger::schedule:
+			schedule();
+			break;
+
+		case MissedTrigger::cancel:
+			cancel();
+			break;
+
+		case MissedTrigger::none:
+			break;
+		}
 	}
 
 	/// Reschedule the suspended executable owned by this object.
-	constexpr void schedule() noexcept
+	constexpr Bool schedule() noexcept
 	{
 		auto* executable = executable_.exchange(nullptr);
 		if (executable)
@@ -139,9 +162,12 @@ public: // API.
 			{
 				executable->cancel_->removeCallback(onCancel_);
 			}
-			//::std::cout << "reschedule!" << ::std::endl;
 			Impl::reschedule(*executable);
+			return true;
 		}
+
+		missed_.store(MissedTrigger::schedule);
+		return false;
 	}
 
 private:
@@ -153,6 +179,10 @@ private:
 			onUserCancel_();
 			Impl::reschedule(*executable);
 		}
+		else
+		{
+			missed_.store(MissedTrigger::cancel);
+		}
 	}
 
 	auto makeCallback()
@@ -161,9 +191,17 @@ private:
 	}
 
 private:
+	enum class MissedTrigger
+	{
+		none,
+		schedule,
+		cancel
+	};
+
 	bzd::Atomic<T*> executable_;
 	bzd::CancellationCallback onCancel_;
 	bzd::FunctionRef<void(void)> onUserCancel_;
+	bzd::Atomic<MissedTrigger> missed_{MissedTrigger::none};
 };
 
 } // namespace bzd::impl

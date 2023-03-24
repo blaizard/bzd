@@ -7,6 +7,7 @@ bzd_cc_test(
     tags = ["manual"],
     deps = [
         "//cc/bzd/test:multithread",
+        "//cc/bzd/test:sync_barrier",
         "//cc/libs/timer/tests/std:timer",
     ],
 )
