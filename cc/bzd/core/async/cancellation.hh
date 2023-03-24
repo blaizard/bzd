@@ -130,12 +130,21 @@ public: // API.
 
 	constexpr void replaceCallback(CancellationCallback& previous, CancellationCallback& callback) noexcept
 	{
-		auto scope = makeSyncLockGuard(mutexCallbacks_);
+		auto scope1 = makeSyncLockGuard(mutex_);
+		auto scope2 = makeSyncLockGuard(mutexCallbacks_);
+
 		// If the token was already cancelled, do nothing.
 		if (callbacks_.erase(previous))
 		{
-			const auto result = callbacks_.pushFront(callback);
-			bzd::assert::isTrue(result.hasValue());
+			if (isCanceled())
+			{
+				callback();
+			}
+			else
+			{
+				const auto result = callbacks_.pushFront(callback);
+				bzd::assert::isTrue(result.hasValue());
+			}
 		}
 	}
 

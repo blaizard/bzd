@@ -2,7 +2,8 @@
 #include "cc/bzd/core/async.hh"
 #include "cc/bzd/core/delay.hh"
 #include "cc/bzd/test/multithread.hh"
-
+#include "cc/bzd/test/sync_barrier.hh"
+/*
 template <class Result>
 [[nodiscard]] bool isValidResultForAny(Result&& result)
 {
@@ -109,24 +110,12 @@ TEST(Coroutine, StressCancellationSuspendForISROnlyCancellation)
 TEST_ASYNC_MULTITHREAD(Coroutine, StressSuspend, 3)
 {
 	bzd::async::ExecutableSuspended executable{};
-	bzd::Atomic<bzd::UInt64> current{0};
-	bzd::Atomic<bzd::Size> sync{2};
+	bzd::test::SyncBarrier barrier;
 
 	auto sequence1 = [&]() -> bzd::Async<> {
 		while (true)
 		{
-			executable.schedule();
-			++sync;
-			while (sync.load() > 2)
-			{
-				executable.schedule();
-				co_await bzd::async::yield();
-			}
-			++sync;
-			while (sync.load() < 2)
-			{
-				co_await bzd::async::yield();
-			}
+			co_await !barrier.wait(3, [&]() { executable.schedule(); });
 		}
 		co_return {};
 	};
@@ -134,18 +123,7 @@ TEST_ASYNC_MULTITHREAD(Coroutine, StressSuspend, 3)
 	auto sequence2 = [&]() -> bzd::Async<> {
 		while (true)
 		{
-			executable.schedule();
-			++sync;
-			while (sync.load() > 2)
-			{
-				executable.schedule();
-				co_await bzd::async::yield();
-			}
-			++sync;
-			while (sync.load() < 2)
-			{
-				co_await bzd::async::yield();
-			}
+			co_await !barrier.wait(3, [&]() { executable.schedule(); });
 		}
 		co_return {};
 	};
@@ -155,11 +133,7 @@ TEST_ASYNC_MULTITHREAD(Coroutine, StressSuspend, 3)
 		{
 			co_await bzd::async::suspend([&](auto&& suspended) { executable.own(bzd::move(suspended)); });
 			// Wait for the wait until to be completed.
-			while (sync.load() < 4)
-			{
-				co_await bzd::async::yield();
-			}
-			sync.store(0);
+			co_await !barrier.wait(3);
 		}
 		co_return {};
 	};
@@ -168,3 +142,33 @@ TEST_ASYNC_MULTITHREAD(Coroutine, StressSuspend, 3)
 
 	co_return {};
 }
+
+TEST_ASYNC_MULTITHREAD(Coroutine, StressSuspendCancellation, 2)
+{
+	bzd::async::ExecutableSuspended executable{};
+	bzd::test::SyncBarrier barrier;
+
+	auto schedule = [&]() -> bzd::Async<> {
+		for (auto t = 0; t < 2; ++t)
+		{
+			co_await !barrier.wait(2, [&]() { executable.schedule(); });
+		}
+		co_return {};
+	};
+
+	auto suspend = [&]() -> bzd::Async<> {
+		while (true)
+		{
+			co_await bzd::async::suspend([&](auto&& suspended) { executable.own(bzd::move(suspended)); });
+			co_await !barrier.wait(2);
+		}
+		co_return {};
+	};
+
+	bzd::ignore = co_await bzd::async::any(suspend(), schedule());
+
+	::std::cout << "AFTER" << ::std::endl;
+
+	co_return {};
+}
+

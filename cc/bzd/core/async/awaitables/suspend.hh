@@ -40,8 +40,28 @@ private:
 	bzd::Optional<Executable&> onTerminateCallback() noexcept
 	{
 		bzd::assert::isTrue(executable_);
+		// TO BE FIXED, somehow if a cancellation happens, there is a race.
+		// This is maybe because the executable already calls the cancel() callback and
+		// schedule the executable in the queue. At the point of calling onSuspend_ for example,
+		// the Suspend might alreaddy be destroyed.
+		/*if (executable_->isCanceled())
+		{
+			return *executable_;
+		}*/
+
 		auto suspended = executable_->suspend(bzd::FunctionRef<void(void)>{onCancellation_});
 		onSuspend_(bzd::move(suspended));
+		::std::cout << "SUSPEND!" << ::std::endl;
+
+		// The cancel callback should be set at the end.
+		// suspended.addCallback(...);
+
+		// Only here we want the cancellation to be effective, not before.
+
+		// Idea:
+		// Make the ExecutableSuspended object a member of this class? and only pass a sort of unique_ptr of it.
+		// This should simplify things as there are no need for a complex own(...) function.
+		// <- will not work because the object that reschedule need to have a local lifetime detached from this awaitable.
 
 		return bzd::nullopt;
 	}
