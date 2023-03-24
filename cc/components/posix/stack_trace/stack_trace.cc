@@ -114,20 +114,20 @@ constexpr const char* getSignalName(int sig) noexcept
 
 bzd::StringView exec(const char* cmd)
 {
-	constexpr std::size_t maxSize = 1024;
+	constexpr ::std::size_t maxSize = 1024;
 	static char result[maxSize + 1];
-	std::memset(result, 0, sizeof(result));
+	::std::memset(result, 0, sizeof(result));
 
-	std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd, "r"), pclose);
+	;;std::unique_ptr<FILE, decltype(&pclose)> pipe(::popen(cmd, "r"), ::pclose);
 	if (!pipe)
 	{
 		return nullptr;
 	}
 
-	std::size_t index = 0;
-	while (index < maxSize && fgets(&result[index], static_cast<int>(maxSize - index), pipe.get()) != nullptr)
+	::std::size_t index = 0;
+	while (index < maxSize && ::fgets(&result[index], static_cast<int>(maxSize - index), pipe.get()) != nullptr)
 	{
-		index = strlen(result);
+		index = ::strlen(result);
 	}
 
 	result[sizeof(result) - 1] = '\0';
