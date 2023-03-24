@@ -38,7 +38,7 @@ private:
 		return points;
 	}
 
-	constexpr SyncPoint() = default;
+	SyncPoint() = default;
 
 private:
 	std::mutex mutex_;

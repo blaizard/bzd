@@ -28,3 +28,29 @@ private:
 }
 
 ```
+
+## Sync Barrier
+
+The sync barrier ensures that multiple threads waits until they all reach the `barrier.wait(...)` statement.
+Optionally, a callable can be called while waiting.
+
+Usage:
+
+```c++
+#include "cc/bzd/test/sync_barrier.hh"
+
+bzd::test::SyncBarrier barrier;
+
+auto thread1 = [&]() {
+    while (...) {
+        co_await !barrier.wait(2);
+    }
+}
+
+auto thread2 = [&]() {
+    while (...) {
+        co_await !barrier.wait(2, []() { ... });
+    }
+}
+
+```
