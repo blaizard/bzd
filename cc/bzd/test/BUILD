@@ -46,6 +46,19 @@ cc_library(
 )
 
 cc_library(
+    name = "sync_barrier",
+    hdrs = [
+        "sync_barrier.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/core/async",
+        "//cc/bzd/platform:atomic",
+        "//cc/bzd/platform:types",
+    ],
+)
+
+cc_library(
     name = "sync_point",
     hdrs = [
         "sync_point.hh",
