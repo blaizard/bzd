@@ -3,25 +3,22 @@
 #include "cc/bzd/core/delay.hh"
 #include "cc/bzd/test/multithread.hh"
 #include "cc/bzd/test/sync_barrier.hh"
-/*
+
 template <class Result>
 [[nodiscard]] bool isValidResultForAny(Result&& result)
 {
 	return bzd::apply([](auto&... asyncs) -> bool { return (asyncs.hasValue() || ...); }, bzd::forward<Result>(result));
 }
 
-template <bzd::Bool useISR, bzd::Bool onlyCancellation, bzd::Bool earlyCancellation>
+template <bzd::Bool onlyCancellation, bzd::Bool earlyCancellation>
 void makeStressCancellationSuspend(const bzd::Size iterations)
 {
-	using ExecutableSuspended =
-		bzd::typeTraits::Conditional<useISR, bzd::async::ExecutableSuspendedForISR, bzd::async::ExecutableSuspended>;
-
 	for (bzd::Size iteration = 0; iteration < iterations; ++iteration)
 	{
 		bzd::coroutine::impl::Executor executor{};
 		std::thread thread;
 		bzd::Atomic<bzd::Bool> shouldReturn{false};
-		ExecutableSuspended executableStore{};
+		bzd::async::ExecutableSuspended executableStore{};
 
 		auto workloadSuspend = [&]() -> bzd::Async<> {
 			if (earlyCancellation)
@@ -42,14 +39,7 @@ void makeStressCancellationSuspend(const bzd::Size iterations)
 					}
 				}};
 			};
-			if constexpr (useISR)
-			{
-				co_await bzd::async::suspendForISR(bzd::move(onSuspend));
-			}
-			else
-			{
-				co_await bzd::async::suspend(bzd::move(onSuspend));
-			}
+			co_await bzd::async::suspend(bzd::move(onSuspend));
 			co_return {};
 		};
 
@@ -85,26 +75,14 @@ void makeStressCancellationSuspend(const bzd::Size iterations)
 
 TEST(Coroutine, StressCancellationSuspend)
 {
-	makeStressCancellationSuspend<false, false, false>(1000);
-	makeStressCancellationSuspend<false, false, true>(1000);
+	makeStressCancellationSuspend</*onlyCancellation*/false, /*earlyCancellation*/false>(1000);
+	makeStressCancellationSuspend</*onlyCancellation*/false, /*earlyCancellation*/true>(1000);
 }
 
 TEST(Coroutine, StressCancellationSuspendOnlyCancellation)
 {
-	makeStressCancellationSuspend<false, true, false>(1000);
-	makeStressCancellationSuspend<false, true, true>(1000);
-}
-
-TEST(Coroutine, StressCancellationSuspendForISR)
-{
-	makeStressCancellationSuspend<true, false, false>(1000);
-	makeStressCancellationSuspend<true, false, true>(1000);
-}
-
-TEST(Coroutine, StressCancellationSuspendForISROnlyCancellation)
-{
-	makeStressCancellationSuspend<true, true, false>(1000);
-	makeStressCancellationSuspend<true, true, true>(1000);
+	makeStressCancellationSuspend</*onlyCancellation*/true, /*earlyCancellation*/false>(1000);
+	makeStressCancellationSuspend</*onlyCancellation*/true, /*earlyCancellation*/true>(1000);
 }
 
 TEST_ASYNC_MULTITHREAD(Coroutine, StressSuspend, 3)
@@ -166,8 +144,6 @@ TEST_ASYNC_MULTITHREAD(Coroutine, StressSuspendCancellation, 2)
 	};
 
 	bzd::ignore = co_await bzd::async::any(suspend(), schedule());
-
-	::std::cout << "AFTER" << ::std::endl;
 
 	co_return {};
 }

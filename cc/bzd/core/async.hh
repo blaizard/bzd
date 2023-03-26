@@ -24,7 +24,6 @@
 namespace bzd::async {
 using Executable = bzd::coroutine::impl::Executable;
 using ExecutableSuspended = bzd::interface::ExecutableSuspended<Executable>;
-using ExecutableSuspendedForISR = bzd::interface::ExecutableSuspendedForISR<Executable>;
 using Executor = bzd::coroutine::impl::Executor;
 using Type = bzd::ExecutableMetadata::Type;
 } // namespace bzd::async
@@ -330,21 +329,14 @@ constexpr auto getExecutor() noexcept { return bzd::coroutine::impl::GetExecutor
 
 constexpr auto getExecutable() noexcept { return bzd::coroutine::impl::GetExecutable{}; }
 
-/// Create a suspension point. Detatch temporarly the current async from its executor.
-template <class... Args>
-constexpr auto suspend(Args&&... args) noexcept
-{
-	return bzd::coroutine::impl::Suspend</*forISR*/ false, Args&&...>{bzd::forward<Args>(args)...};
-}
-
 /// Create a suspension point. Mark the current async as skipped, it will still reside
 /// in the executor workload queue but will not be processed.
 ///
 /// This is suitable for ISR.
 template <class... Args>
-constexpr auto suspendForISR(Args&&... args) noexcept
+constexpr auto suspend(Args&&... args) noexcept
 {
-	return bzd::coroutine::impl::Suspend</*forISR*/ true, Args&&...>{bzd::forward<Args>(args)...};
+	return bzd::coroutine::impl::Suspend{bzd::forward<Args>(args)...};
 }
 
 /// Executes multiple asynchronous function according to the executor policy and return once all are completed.

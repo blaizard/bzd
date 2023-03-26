@@ -119,7 +119,7 @@ public:
 		{
 			// Set the executable in suspended mode and re-arm the alarm if needed.
 			{
-				co_await bzd::async::suspendForISR([&](auto&& executable) {
+				co_await bzd::async::suspend([&](auto&& executable) {
 					if (executable_.own(bzd::move(executable)))
 					{
 						executable_.schedule();
@@ -212,7 +212,7 @@ private:
 private:
 	SpinMutex mutex_{};
 	bzd::NonOwningList<Element> list_{};
-	bzd::ExecutableSuspendedRetroactive<bzd::async::ExecutableSuspendedForISR> executable_{};
+	bzd::ExecutableSuspendedRetroactive<bzd::async::ExecutableSuspended> executable_{};
 	Time timeAdd_{0};
 };
 
