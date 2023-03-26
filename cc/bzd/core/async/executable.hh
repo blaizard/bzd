@@ -80,31 +80,23 @@ private:
 
 } // namespace bzd
 
-namespace bzd::impl {
+namespace bzd::interface {
 
-/// Factory to store an executable when suspended.
-template <class T, class Impl>
-class ExecutableSuspendedFactory
+/// Type to store an executable when suspended for use with ISR (aka in wait-free context).
+template <class T>
+class ExecutableSuspended
 {
 public: // Constructors/destructor/...
-	constexpr ExecutableSuspendedFactory() noexcept : executable_{nullptr}, onCancel_{makeCallback()}, onUserCancel_{onCancel_} {}
-	constexpr ExecutableSuspendedFactory(T& executable, const bzd::FunctionRef<void(void)> onCancel) noexcept :
-		executable_{&executable}, onCancel_{makeCallback()}, onUserCancel_{onCancel}
-	{
-		if (executable.cancel_)
-		{
-			executable.cancel_->addOneTimeCallback(onCancel_);
-		}
-	}
-	ExecutableSuspendedFactory(const ExecutableSuspendedFactory&) = delete;
-	ExecutableSuspendedFactory& operator=(const ExecutableSuspendedFactory&) = delete;
-	ExecutableSuspendedFactory& operator=(ExecutableSuspendedFactory&&) = delete;
-	constexpr ExecutableSuspendedFactory(ExecutableSuspendedFactory&& other) noexcept : ExecutableSuspendedFactory{}
+	constexpr ExecutableSuspended() noexcept : executable_{nullptr}, onCancel_{makeCallback()}, onUserCancel_{onCancel_}, owner_{this} {}
+	ExecutableSuspended(const ExecutableSuspended&) = delete;
+	ExecutableSuspended& operator=(const ExecutableSuspended&) = delete;
+	ExecutableSuspended& operator=(ExecutableSuspended&&) = delete;
+	constexpr ExecutableSuspended(ExecutableSuspended&& other) noexcept : ExecutableSuspended{}
 	{
 		own(bzd::move(other));
 	}
 
-	constexpr ~ExecutableSuspendedFactory() noexcept
+	constexpr ~ExecutableSuspended() noexcept
 	{
 		bzd::assert::isTrue(!executable_.load(), "Destroyed with an executable.");
 	}
@@ -113,42 +105,19 @@ public: // API.
 	/// Become the owner of another ExecutableSuspended.
 	///
 	/// The current object must be empty.
+	/// This function cannot be used after activated.
 	///
 	/// @param other The new ExecutableSuspended to be owned.
-	constexpr void own(ExecutableSuspendedFactory&& other) noexcept
+	constexpr void own(ExecutableSuspended&& other) noexcept
 	{
 		bzd::assert::isTrue(executable_.load() == nullptr);
 
-		// During this transition time when the executable is exchanged, it might be
-		// that a schedule() or a cancel() happens. To ensure these events are not missed,
-		// missed_ is introduced.
-		missed_.store(MissedTrigger::none);
 		auto* executable = other.executable_.exchange(nullptr);
 		if (executable)
 		{
+			other.owner_ = this;
 			onUserCancel_ = other.onUserCancel_;
-			if (executable->cancel_)
-			{
-				executable->cancel_->replaceCallback(other.onCancel_, onCancel_);
-			}
-			// Assign the executable at the end, to avoid a race when calling "schedule()" concurrently.
 			executable_.store(executable);
-		}
-
-		// Take care of missed event if any.
-		const auto missed = missed_.load();
-		switch (missed)
-		{
-		case MissedTrigger::schedule:
-			schedule();
-			break;
-
-		case MissedTrigger::cancel:
-			cancel();
-			break;
-
-		case MissedTrigger::none:
-			break;
 		}
 	}
 
@@ -162,11 +131,10 @@ public: // API.
 			{
 				executable->cancel_->removeCallback(onCancel_);
 			}
-			Impl::reschedule(*executable);
+			unskip(*executable);
 			return true;
 		}
 
-		missed_.store(MissedTrigger::schedule);
 		return false;
 	}
 
@@ -177,63 +145,41 @@ private:
 		if (executable)
 		{
 			onUserCancel_();
-			Impl::reschedule(*executable);
-		}
-		else
-		{
-			missed_.store(MissedTrigger::cancel);
+			unskip(*executable);
 		}
 	}
 
 	auto makeCallback()
 	{
-		return bzd::FunctionRef<void(void)>::toMember<ExecutableSuspendedFactory, &ExecutableSuspendedFactory::cancel>(*this);
+		return bzd::FunctionRef<void(void)>::toMember<ExecutableSuspended, &ExecutableSuspended::cancel>(*this);
 	}
 
-private:
-	enum class MissedTrigger
-	{
-		none,
-		schedule,
-		cancel
-	};
+	constexpr void unskip(T& executable) noexcept { executable.getExecutor().unskip(executable); }
 
+protected:
+	constexpr void activate(T& executable) noexcept
+	{
+		if (owner_ && executable.cancel_)
+		{
+			executable.cancel_->addOneTimeCallback(owner_->onCancel_);
+			// After adding the callback, check if a reschedule was triggered,
+			// if so, the cancellation might not have been removed if it was done
+			// before the previous statement.
+			if (!owner_->executable_)
+			{
+				executable.cancel_->removeCallback(owner_->onCancel_);
+			}
+		}
+		// Only after this statement, the executable might not be valid (it might
+		// be executed already by a concurrent thread).
+		executable.reschedule(/*increment*/false);
+	}
+
+protected:
 	bzd::Atomic<T*> executable_;
 	bzd::CancellationCallback onCancel_;
 	bzd::FunctionRef<void(void)> onUserCancel_;
-	bzd::Atomic<MissedTrigger> missed_{MissedTrigger::none};
-};
-
-} // namespace bzd::impl
-
-namespace bzd::interface {
-
-/// Type to store an executable when suspended.
-///
-/// This type deals with a suspended executable that is poped from the executor queue.
-/// It should be used as the prefered method as the suspended executable will not affect
-/// the queue as it is completly removed.
-template <class T>
-class ExecutableSuspended : public bzd::impl::ExecutableSuspendedFactory<T, ExecutableSuspended<T>>
-{
-public:
-	using bzd::impl::ExecutableSuspendedFactory<T, ExecutableSuspended<T>>::ExecutableSuspendedFactory;
-
-private:
-	friend class bzd::impl::ExecutableSuspendedFactory<T, ExecutableSuspended<T>>;
-	static constexpr void reschedule(T& executable) noexcept { executable.reschedule(); }
-};
-
-/// Type to store an executable when suspended for use with ISR (aka in wait-free context).
-template <class T>
-class ExecutableSuspendedForISR : public bzd::impl::ExecutableSuspendedFactory<T, ExecutableSuspendedForISR<T>>
-{
-public:
-	using bzd::impl::ExecutableSuspendedFactory<T, ExecutableSuspendedForISR<T>>::ExecutableSuspendedFactory;
-
-private:
-	friend class bzd::impl::ExecutableSuspendedFactory<T, ExecutableSuspendedForISR<T>>;
-	static constexpr void reschedule(T& executable) noexcept { executable.getExecutor().unskip(executable); }
+	ExecutableSuspended* owner_{nullptr};
 };
 
 /// Executable interface class.
@@ -286,21 +232,6 @@ public:
 		metadata_.type_ = type;
 	}
 
-	constexpr auto suspend(const bzd::FunctionRef<void(void)> onCancel) noexcept
-	{
-		return bzd::interface::ExecutableSuspended<T> {
-			getExecutable(), onCancel
-		};
-	}
-
-	constexpr auto suspendForISR(const bzd::FunctionRef<void(void)> onCancel) noexcept
-	{
-		getExecutor().pushSkip(getExecutable());
-		return bzd::interface::ExecutableSuspendedForISR<T> {
-			getExecutable(), onCancel
-		};
-	}
-
 	constexpr void destroy() noexcept
 	{
 		assert::isTrue(isDetached(), "Executable still owned by the queue.");
@@ -323,14 +254,14 @@ public:
 
 private:
 	friend class bzd::Executor<T>;
-	template <class, class>
-	friend class bzd::impl::ExecutableSuspendedFactory;
 	friend class bzd::interface::ExecutableSuspended<T>;
-	friend class bzd::interface::ExecutableSuspendedForISR<T>;
 	friend struct bzd::coroutine::impl::Yield;
 
 	constexpr void setExecutor(bzd::Executor<T>& executor) noexcept { executor_.emplace(executor); }
-	constexpr void reschedule() noexcept { getExecutor().push(getExecutable()); }
+	/// Reschedule the async in the executor.
+	///
+	/// \param increment Increment the internal counters.
+	constexpr void reschedule(const Bool increment = true) noexcept { getExecutor().push(getExecutable(), increment); }
 	constexpr void unskip() noexcept { metadata_.unskip(); }
 
 	bzd::Optional<bzd::Executor<T>&> executor_{};

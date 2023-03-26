@@ -195,8 +195,7 @@ the first, that is guaranteed to be called, contains a movable-only suspended ex
 The user needs to dispose it from this callback.
 The second argument is optional and provides a callback to deal with cancellation.
 
-In the context of ISR, when only a wait-free operation is required, `bzd::async::suspend` should not be used as it uses a lock.
-Instead, `bzd::async::suspendForISR` can be used and uses the same arguments as its counterpart.
+This can be used in the context of ISR.
 
 ### Executor
 

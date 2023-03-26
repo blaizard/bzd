@@ -202,6 +202,11 @@ public:
 		return range::associateScope(context_, bzd::move(scope));
 	}
 
+	constexpr void pushBack(Executable& executable) noexcept
+	{
+		queue_.pushBack(executable);
+	}
+
 private:
 	/// Create a scope for the current context, it uses RAII pattern to control the lifetime of the context.
 	///
@@ -241,23 +246,16 @@ private:
 	/// It is pushed at the end of the queue, so will be executed after all previous workload are.
 	///
 	/// \param executable The workload to be executed.
-	constexpr void push(Executable& executable) noexcept
+	/// \param increment Increment the counters.
+	constexpr void push(Executable& executable, const Bool increment = true) noexcept
 	{
-		// It is important to update the counters before being pushed, otherwise the exectuable might be
-		// popped before the counters are increases, leaving them in an incoherent state.
-		incrementCounters(executable);
+		if (increment)
+		{
+			// It is important to update the counters before being pushed, otherwise the exectuable might be
+			// popped before the counters are increases, leaving them in an incoherent state.
+			incrementCounters(executable);
+		}
 		// Only at the end push the executable to the work queue.
-		queue_.pushBack(executable);
-	}
-
-	/// Push a new workload to the queue and mark it as skipped.
-	///
-	/// It will not be executed until the `unskip` call is performed.
-	///
-	/// \param executable The workload to be pushed and skipped.
-	constexpr void pushSkip(Executable& executable) noexcept
-	{
-		executable.skip();
 		queue_.pushBack(executable);
 	}
 
@@ -307,7 +305,7 @@ private:
 	template <class U>
 	friend class bzd::interface::Executable;
 	template <class U>
-	friend class bzd::interface::ExecutableSuspendedForISR;
+	friend class bzd::interface::ExecutableSuspended;
 
 	/// List of pending workload waiting to be scheduled.
 	bzd::threadsafe::NonOwningRingSpin<Executable> queue_{};
