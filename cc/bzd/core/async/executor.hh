@@ -202,10 +202,7 @@ public:
 		return range::associateScope(context_, bzd::move(scope));
 	}
 
-	constexpr void pushBack(Executable& executable) noexcept
-	{
-		queue_.pushBack(executable);
-	}
+	constexpr void pushBack(Executable& executable) noexcept { queue_.pushBack(executable); }
 
 private:
 	/// Create a scope for the current context, it uses RAII pattern to control the lifetime of the context.

@@ -118,7 +118,7 @@ bzd::StringView exec(const char* cmd)
 	static char result[maxSize + 1];
 	::std::memset(result, 0, sizeof(result));
 
-	;;std::unique_ptr<FILE, decltype(&pclose)> pipe(::popen(cmd, "r"), ::pclose);
+	::std::unique_ptr<FILE, decltype(&pclose)> pipe(::popen(cmd, "r"), ::pclose);
 	if (!pipe)
 	{
 		return nullptr;
