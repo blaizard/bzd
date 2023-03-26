@@ -75,14 +75,14 @@ void makeStressCancellationSuspend(const bzd::Size iterations)
 
 TEST(Coroutine, StressCancellationSuspend)
 {
-	makeStressCancellationSuspend</*onlyCancellation*/false, /*earlyCancellation*/false>(1000);
-	makeStressCancellationSuspend</*onlyCancellation*/false, /*earlyCancellation*/true>(1000);
+	makeStressCancellationSuspend</*onlyCancellation*/ false, /*earlyCancellation*/ false>(1000);
+	makeStressCancellationSuspend</*onlyCancellation*/ false, /*earlyCancellation*/ true>(1000);
 }
 
 TEST(Coroutine, StressCancellationSuspendOnlyCancellation)
 {
-	makeStressCancellationSuspend</*onlyCancellation*/true, /*earlyCancellation*/false>(1000);
-	makeStressCancellationSuspend</*onlyCancellation*/true, /*earlyCancellation*/true>(1000);
+	makeStressCancellationSuspend</*onlyCancellation*/ true, /*earlyCancellation*/ false>(1000);
+	makeStressCancellationSuspend</*onlyCancellation*/ true, /*earlyCancellation*/ true>(1000);
 }
 
 TEST_ASYNC_MULTITHREAD(Coroutine, StressSuspend, 3)
@@ -147,4 +147,3 @@ TEST_ASYNC_MULTITHREAD(Coroutine, StressSuspendCancellation, 2)
 
 	co_return {};
 }
-

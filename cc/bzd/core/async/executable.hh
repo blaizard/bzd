@@ -91,15 +91,9 @@ public: // Constructors/destructor/...
 	ExecutableSuspended(const ExecutableSuspended&) = delete;
 	ExecutableSuspended& operator=(const ExecutableSuspended&) = delete;
 	ExecutableSuspended& operator=(ExecutableSuspended&&) = delete;
-	constexpr ExecutableSuspended(ExecutableSuspended&& other) noexcept : ExecutableSuspended{}
-	{
-		own(bzd::move(other));
-	}
+	constexpr ExecutableSuspended(ExecutableSuspended&& other) noexcept : ExecutableSuspended{} { own(bzd::move(other)); }
 
-	constexpr ~ExecutableSuspended() noexcept
-	{
-		bzd::assert::isTrue(!executable_.load(), "Destroyed with an executable.");
-	}
+	constexpr ~ExecutableSuspended() noexcept { bzd::assert::isTrue(!executable_.load(), "Destroyed with an executable."); }
 
 public: // API.
 	/// Become the owner of another ExecutableSuspended.
@@ -149,10 +143,7 @@ private:
 		}
 	}
 
-	auto makeCallback()
-	{
-		return bzd::FunctionRef<void(void)>::toMember<ExecutableSuspended, &ExecutableSuspended::cancel>(*this);
-	}
+	auto makeCallback() { return bzd::FunctionRef<void(void)>::toMember<ExecutableSuspended, &ExecutableSuspended::cancel>(*this); }
 
 	constexpr void unskip(T& executable) noexcept { executable.getExecutor().unskip(executable); }
 
@@ -172,7 +163,7 @@ protected:
 		}
 		// Only after this statement, the executable might not be valid (it might
 		// be executed already by a concurrent thread).
-		executable.reschedule(/*increment*/false);
+		executable.reschedule(/*increment*/ false);
 	}
 
 protected:
