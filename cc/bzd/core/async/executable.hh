@@ -164,6 +164,7 @@ protected:
 		bzd::assert::isTrue(*owner_);
 		if (executable.cancel_)
 		{
+			// NOLINTNEXTLINE(clang-analyzer-core.NullDereference), already tested above.
 			auto& owner = **owner_;
 			executable.cancel_->addOneTimeCallback(owner.onCancel_);
 			// After adding the callback, check if a reschedule was triggered,
