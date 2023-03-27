@@ -137,7 +137,12 @@ TEST_ASYNC_MULTITHREAD(Coroutine, StressSuspendCancellation, 2)
 	auto suspend = [&]() -> bzd::Async<> {
 		while (true)
 		{
-			co_await bzd::async::suspend([&](auto&& suspended) { executable.own(bzd::move(suspended)); });
+			co_await bzd::async::suspend([&](auto&& suspended) {
+				bzd::async::ExecutableSuspended intermediate{};
+				// This tests second level "owner" of the ExecutableSuspended.
+				intermediate.own(bzd::move(suspended));
+				executable.own(bzd::move(intermediate));
+			});
 			co_await !barrier.wait(2);
 		}
 		co_return {};
