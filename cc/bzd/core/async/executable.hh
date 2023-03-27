@@ -87,12 +87,11 @@ template <class T>
 class ExecutableSuspended
 {
 public: // Constructors/destructor/...
-	constexpr ExecutableSuspended() noexcept : executable_{nullptr}, onCancel_{makeCallback()}, onUserCancel_{onCancel_}, owner_{this} {}
+	constexpr ExecutableSuspended() noexcept : executable_{nullptr}, onCancel_{makeCallback()}, onUserCancel_{onCancel_} {}
 	ExecutableSuspended(const ExecutableSuspended&) = delete;
 	ExecutableSuspended& operator=(const ExecutableSuspended&) = delete;
 	ExecutableSuspended& operator=(ExecutableSuspended&&) = delete;
 	constexpr ExecutableSuspended(ExecutableSuspended&& other) noexcept : ExecutableSuspended{} { own(bzd::move(other)); }
-
 	constexpr ~ExecutableSuspended() noexcept { bzd::assert::isTrue(!executable_.load(), "Destroyed with an executable."); }
 
 public: // API.
@@ -105,11 +104,16 @@ public: // API.
 	constexpr void own(ExecutableSuspended&& other) noexcept
 	{
 		bzd::assert::isTrue(executable_.load() == nullptr);
+		// ExecutableSuspended that are owned must have an owner, if not it means that they are
+		// already activated. We cannot own an ExecutableSuspended after being activated.
+		bzd::assert::isTrue(other.owner_);
+		bzd::assert::isTrue(*(other.owner_));
 
 		auto* executable = other.executable_.exchange(nullptr);
 		if (executable)
 		{
-			other.owner_ = this;
+			owner_ = other.owner_;
+			*owner_ = this;
 			onUserCancel_ = other.onUserCancel_;
 			executable_.store(executable);
 		}
@@ -148,19 +152,30 @@ private:
 	constexpr void unskip(T& executable) noexcept { executable.getExecutor().unskip(executable); }
 
 protected:
+	/// Enable the executable by adding the cancellation callback
+	/// and rescheduling it.
+	///
+	/// After this call, the ExecutableSuspended cannot be moved anymore.
+	///
+	/// \param executable The executable to be activated.
 	constexpr void activate(T& executable) noexcept
 	{
-		if (owner_ && executable.cancel_)
+		bzd::assert::isTrue(owner_);
+		bzd::assert::isTrue(*owner_);
+		if (executable.cancel_)
 		{
-			executable.cancel_->addOneTimeCallback(owner_->onCancel_);
+			auto& owner = **owner_;
+			executable.cancel_->addOneTimeCallback(owner.onCancel_);
 			// After adding the callback, check if a reschedule was triggered,
 			// if so, the cancellation might not have been removed if it was done
 			// before the previous statement.
-			if (!owner_->executable_)
+			if (!owner.executable_.load())
 			{
-				executable.cancel_->removeCallback(owner_->onCancel_);
+				executable.cancel_->removeCallback(owner.onCancel_);
 			}
 		}
+		// Make sure the executable cannot be activated twice.
+		*owner_ = nullptr;
 		// Only after this statement, the executable might not be valid (it might
 		// be executed already by a concurrent thread).
 		executable.reschedule(/*increment*/ false);
@@ -170,7 +185,7 @@ protected:
 	bzd::Atomic<T*> executable_;
 	bzd::CancellationCallback onCancel_;
 	bzd::FunctionRef<void(void)> onUserCancel_;
-	ExecutableSuspended* owner_{nullptr};
+	ExecutableSuspended** owner_{nullptr};
 };
 
 /// Executable interface class.

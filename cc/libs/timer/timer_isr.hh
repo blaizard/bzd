@@ -145,7 +145,7 @@ public:
 				{
 					if (it->alarm <= maybeTime.value())
 					{
-						auto executable{bzd::move(it->executable)};
+						auto& executable{it->executable};
 						// It is important to delete the element before scheduling it, as it resides
 						// in the coroutine frame and can be out of scope otherwise.
 						bzd::ignore = list_.erase(it++);

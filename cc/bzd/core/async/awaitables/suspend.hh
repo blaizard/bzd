@@ -12,9 +12,10 @@ class ExecutableSuspendedFactory : public bzd::interface::ExecutableSuspended<T>
 {
 public:
 	constexpr ExecutableSuspendedFactory(T& executable, const bzd::FunctionRef<void(void)> onCancel) noexcept :
-		bzd::interface::ExecutableSuspended<T>{}, executableRaw_{executable} {
+		bzd::interface::ExecutableSuspended<T>{}, executableRaw_{executable}, ownerStorage_{this} {
 			this->executable_.store(&executable);
 	this->onUserCancel_ = onCancel;
+	this->owner_ = &ownerStorage_;
 } ExecutableSuspendedFactory(const ExecutableSuspendedFactory&) = delete;
 ExecutableSuspendedFactory& operator=(const ExecutableSuspendedFactory&) = delete;
 ExecutableSuspendedFactory(ExecutableSuspendedFactory&&) = delete;
@@ -23,6 +24,7 @@ constexpr ~ExecutableSuspendedFactory() noexcept { this->activate(executableRaw_
 
 private:
 T& executableRaw_;
+bzd::interface::ExecutableSuspended<Executable>* ownerStorage_;
 }; // namespace bzd::coroutine::impl
 
 /// Awaitable to detach an async object and optionally execute a callable.
@@ -56,7 +58,7 @@ private:
 
 		executable_->skip();
 		auto suspended = impl::ExecutableSuspendedFactory<Executable>{*executable_, bzd::FunctionRef<void(void)>{onCancellation_}};
-		onSuspend_(bzd::move(suspended));
+		onSuspend_(static_cast<bzd::interface::ExecutableSuspended<Executable>&&>(suspended));
 
 		return bzd::nullopt;
 	}

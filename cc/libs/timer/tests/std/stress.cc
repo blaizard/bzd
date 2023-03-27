@@ -2,9 +2,6 @@
 #include "cc/bzd/test/sync_barrier.hh"
 #include "cc/libs/timer/tests/std/timer.hh"
 
-// Issue when running:
-// bazel test //cc/libs/timer/tests/std:tests --runs_per_test=100 --test_timeout=5 --config=dev --jobs=1 --config=sanitizer --config=tsan
-
 TEST_ASYNC_MULTITHREAD(Timer, Stress, 4)
 {
 	bzd::test::TimerTest timer{};
@@ -32,9 +29,8 @@ TEST_ASYNC_MULTITHREAD(Timer, Stress, 4)
 	};
 
 	auto sequencer = [&]() -> bzd::Async<> {
-		for (bzd::UInt64 t = 0; t < 10; ++t)
+		for (auto t = 0; t < 10; ++t)
 		{
-			::std::cout << t << ::std::endl;
 			current.store(t);
 			timer = current.load();
 			co_await !barrier.wait(3);
