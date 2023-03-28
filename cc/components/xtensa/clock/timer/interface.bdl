@@ -3,7 +3,7 @@ use "cc/bzd/platform/interfaces/clock.bdl"
 namespace bzd.platform.esp32.clock;
 
 
-component Timer : bzd.Clock2 {
+component Timer : bzd.Clock {
 interface:
 	method init() [init];
 	method service();

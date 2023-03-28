@@ -4,7 +4,7 @@ use "cc/bzd/platform/interfaces/clock.bdl"
 namespace example;
 
 
-method counter(clock = bzd.Clock2, count = Integer(1) [min(1) mandatory], periodMs = Integer(1000) [min(0)]);
+method counter(clock = bzd.Clock, count = Integer(1) [min(1) mandatory], periodMs = Integer(1000) [min(0)]);
 composition {
 	// This will use the default steady clock.
 	counter(clock = platform.steadyClock, count = 10, periodMs = 1000);

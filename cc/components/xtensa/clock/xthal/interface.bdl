@@ -3,7 +3,7 @@ use "cc/bzd/platform/interfaces/clock.bdl"
 namespace bzd.platform.esp32.clock;
 
 
-component Xthal : bzd.Clock2 {
+component Xthal : bzd.Clock {
 interface:
 	method exec();
 	

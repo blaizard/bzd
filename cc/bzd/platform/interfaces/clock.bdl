@@ -1,6 +1,6 @@
 
 namespace bzd;
 
-extern interface Clock2;
+extern interface Clock;
 
 

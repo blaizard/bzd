@@ -4,7 +4,7 @@ use "cc/bzd/platform/interfaces/clock.bdl"
 namespace bzd.platform.generic.clock;
 
 
-component Null : bzd.Clock2 {
+component Null : bzd.Clock {
 interface:
 	
 }

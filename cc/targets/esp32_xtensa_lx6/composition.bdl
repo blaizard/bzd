@@ -20,8 +20,8 @@ composition {
 composition platform {
 	out: bzd.OStream = bzd.platform.std.Out();
 	in: bzd.IStream = bzd.platform.generic.stream.Stub();
-	steadyClock: bzd.Clock2 = bzd.platform.esp32.clock.Timer();
-	systemClock: bzd.Clock2 = bzd.platform.generic.clock.Null();
+	steadyClock: bzd.Clock = bzd.platform.esp32.clock.Timer();
+	systemClock: bzd.Clock = bzd.platform.generic.clock.Null();
 	
 }
 
