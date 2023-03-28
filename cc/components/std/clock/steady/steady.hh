@@ -1,10 +1,10 @@
 #pragma once
 
-#include "cc/bzd/core/clock.hh"
+#include "cc/components/std/clock/steady/interface.hh"
 
 namespace bzd::platform::std::clock {
 
-class Steady : public bzd::Clock
+class Steady : public bzd::Clock2
 {
 public:
 	template <class Context>
@@ -12,11 +12,7 @@ public:
 	{
 	}
 
-	ClockTick getTicks() noexcept override;
-
-	ClockTick msToTicks(const bzd::units::Millisecond time) noexcept override;
-
-	bzd::units::Millisecond ticksToMs(const ClockTick& ticks) noexcept override;
+	bzd::Result<bzd::units::Millisecond, bzd::Error> getTime() noexcept override;
 };
 
 } // namespace bzd::platform::std::clock

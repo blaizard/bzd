@@ -4,19 +4,9 @@
 
 namespace bzd::platform::std::clock {
 
-ClockTick System::getTicks() noexcept
+bzd::Result<bzd::units::Millisecond, bzd::Error> System::getTime() noexcept
 {
-	const auto ticks =
-		::std::chrono::duration_cast<::std::chrono::milliseconds>(::std::chrono::system_clock::now().time_since_epoch()).count();
-	return static_cast<ClockTick>(ticks);
-}
-
-ClockTick System::msToTicks(const bzd::units::Millisecond time) noexcept { return static_cast<ClockTick>(time.get()); }
-
-bzd::units::Millisecond System::ticksToMs(const ClockTick& ticks) noexcept
-{
-	// NOLINTNEXTLINE(bugprone-narrowing-conversions)
-	return static_cast<bzd::units::Millisecond>(ticks.get());
+	return ::std::chrono::duration_cast<::std::chrono::milliseconds>(::std::chrono::system_clock::now().time_since_epoch()).count();
 }
 
 } // namespace bzd::platform::std::clock

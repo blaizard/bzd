@@ -1,12 +1,10 @@
 
+use "cc/bzd/platform/interfaces/clock.bdl"
+
 namespace bzd.platform.generic.clock;
 
 
-interface DummyNull {
-	
-}
-
-component Null : DummyNull {
+component Null : bzd.Clock2 {
 interface:
 	
 }

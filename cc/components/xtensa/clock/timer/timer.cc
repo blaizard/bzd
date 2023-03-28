@@ -60,24 +60,29 @@ bzd::Async<> Timer::shutdown() noexcept
 	co_return {};
 }
 
-ClockTick Timer::getTicks() noexcept { return static_cast<ClockTick>(0); }
-
-ClockTick Timer::msToTicks(const bzd::units::Millisecond) noexcept { return static_cast<ClockTick>(0); }
-
-bzd::units::Millisecond Timer::ticksToMs(const ClockTick&) noexcept { return static_cast<bzd::units::Millisecond>(0); }
-
 bzd::Async<> Timer::delay(const bzd::units::Millisecond duration) noexcept
 {
-	auto maybeTime = getTime();
+	auto maybeTime = getTime_();
 	if (!maybeTime)
 	{
 		co_return bzd::move(maybeTime).propagate();
 	}
-	co_await !waitUntil(maybeTime.value() + duration.get() * 10);
+	co_await !waitUntil_(maybeTime.value() + duration.get() * 10);
 	co_return {};
 }
 
-bzd::Result<Timer::Time, bzd::Error> Timer::getTime() noexcept
+bzd::Result<bzd::units::Millisecond, bzd::Error> Timer::getTime() noexcept
+{
+	// TODO: To be updated, the / 10 is inefficient here.
+	auto maybeTime = getTime_();
+	if (!maybeTime)
+	{
+		return bzd::move(maybeTime).propagate();
+	}
+	return bzd::units::Millisecond(maybeTime.value() / 10);
+}
+
+bzd::Result<Timer::Time, bzd::Error> Timer::getTime_() noexcept
 {
 	Timer::Time count{};
 	if (const auto result = ::gptimer_get_raw_count(gptimer_, &count); result != ESP_OK)
@@ -87,7 +92,7 @@ bzd::Result<Timer::Time, bzd::Error> Timer::getTime() noexcept
 	return count;
 }
 
-bzd::Result<void, bzd::Error> Timer::alarmSet(const Time time)
+bzd::Result<void, bzd::Error> Timer::alarmSet_(const Time time)
 {
 	const ::gptimer_alarm_config_t config{.alarm_count = time, .reload_count = 0, .flags = {.auto_reload_on_alarm = false}};
 	if (const auto result = ::gptimer_set_alarm_action(gptimer_, &config); result != ESP_OK)
@@ -97,7 +102,7 @@ bzd::Result<void, bzd::Error> Timer::alarmSet(const Time time)
 	return bzd::nullresult;
 }
 
-bzd::Result<void, bzd::Error> Timer::alarmClear()
+bzd::Result<void, bzd::Error> Timer::alarmClear_()
 {
 	if (const auto result = ::gptimer_set_alarm_action(gptimer_, nullptr); result != ESP_OK)
 	{

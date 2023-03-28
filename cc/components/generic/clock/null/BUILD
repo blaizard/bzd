@@ -6,6 +6,9 @@ bdl_library(
     srcs = [
         "interface.bdl",
     ],
+    deps = [
+        "//cc/bzd/platform/interfaces:clock"
+    ]
 )
 
 cc_library(
@@ -19,6 +22,5 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":bdl",
-        "//cc/bzd/core:clock",
     ],
 )

@@ -1,8 +1,6 @@
 #include "cc/bzd/core/logger.hh"
 
 #include "cc/bzd/core/logger/backend/logger.hh"
-#include "cc/bzd/core/units.hh"
-#include "cc/bzd/platform/clock.hh"
 
 namespace {
 const char* levelToStr(const bzd::log::Level level)

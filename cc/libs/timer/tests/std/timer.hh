@@ -20,9 +20,9 @@ public: // Init/shutdown functions.
 		thread_ = std::thread([this]() {
 			while (stop_.load() == false)
 			{
-				if (alarm_.load() <= getTime().value())
+				if (alarm_.load() <= getTime_().value())
 				{
-					alarmClear();
+					alarmClear_();
 					triggerForISR();
 				}
 			}
@@ -51,21 +51,21 @@ public: // Init/shutdown functions.
 
 	bzd::Async<> delay(const Duration duration) noexcept
 	{
-		co_await !waitUntil(time_.load() + duration);
+		co_await !waitUntil_(time_.load() + duration);
 		co_return {};
 	}
 
 private: // Implementation.
 	friend class bzd::TimerISR<UInt64, TimerTest>;
 
-	bzd::Result<Time, bzd::Error> getTime() noexcept { return time_.load(); }
+	bzd::Result<Time, bzd::Error> getTime_() noexcept { return time_.load(); }
 
-	bzd::Result<void, bzd::Error> alarmSet(const Time alarm)
+	bzd::Result<void, bzd::Error> alarmSet_(const Time alarm)
 	{
 		alarm_.store(alarm);
 		return bzd::nullresult;
 	}
-	bzd::Result<void, bzd::Error> alarmClear()
+	bzd::Result<void, bzd::Error> alarmClear_()
 	{
 		alarm_.store(invalid);
 		return bzd::nullresult;

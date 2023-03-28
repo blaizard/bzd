@@ -1,6 +1,5 @@
 #include "cc/bzd/container/array.hh"
 #include "cc/bzd/core/async.hh"
-#include "cc/bzd/core/delay.hh"
 #include "cc/bzd/test/multithread.hh"
 #include "cc/bzd/test/sync_barrier.hh"
 

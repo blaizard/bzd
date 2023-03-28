@@ -13,11 +13,11 @@ bdl_library(
 
 cc_library(
     name = "steady",
-    srcs = [
-        "steady.cc",
-    ],
     hdrs = [
         "steady.hh",
+    ],
+    srcs = [
+        "steady.cc",
     ],
     visibility = ["//visibility:public"],
     deps = [

@@ -12,6 +12,7 @@ bzd_cc_library(
         "//cc/bzd/meta",
         "//cc/bzd/type_traits",
         "//cc/bzd/utility",
+        "//cc/bzd/platform"
     ],
 )
 

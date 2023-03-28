@@ -1,7 +1,6 @@
 #include "cc/bzd/test/test.hh"
-
-#include "cc/bzd/core/print.hh"
 #include "cc/bzd/platform/clock.hh"
+#include "cc/bzd/core/print.hh"
 
 // Empty namespace to hold all the registered tests
 namespace {
@@ -65,7 +64,7 @@ bool bzd::test::Manager::run()
 		::bzd::print(" (seed={})\n"_csv, seed).sync();
 
 		currentTestFailed_ = false;
-		const auto tickStart = clock.getTicks();
+		const auto maybeTimeStart = clock.getTime();
 		try
 		{
 			node->function(context);
@@ -74,18 +73,18 @@ bool bzd::test::Manager::run()
 		{
 			fail(node->info->file, -1, "Unknown C++ exception thrown in the test body.");
 		}
-
-		const auto tickDiff = (clock.getTicks() - tickStart);
+		const auto maybeTimeStop = clock.getTime();
+		const auto timeDiffMs = (maybeTimeStart && maybeTimeStop) ? (maybeTimeStop.value() - maybeTimeStart.value()).get() : -1;
 
 		// Print the test status
 		if (currentTestFailed_)
 		{
 			++nbFailedTests;
-			::bzd::print("[   FAILED ] ({}ms)\n"_csv, clock.ticksToMs(tickDiff).get()).sync();
+			::bzd::print("[   FAILED ] ({}ms)\n"_csv, timeDiffMs).sync();
 		}
 		else
 		{
-			::bzd::print("[       OK ] ({}ms)\n"_csv, clock.ticksToMs(tickDiff).get()).sync();
+			::bzd::print("[       OK ] ({}ms)\n"_csv, timeDiffMs).sync();
 		}
 
 		node = node->next;

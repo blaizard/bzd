@@ -7,7 +7,7 @@ bdl_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//cc/bzd/core:clock",
+        "//cc/bzd/platform/interfaces/cc:clock",
     ],
 )
 
