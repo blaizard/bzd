@@ -1,6 +1,7 @@
 #include "cc/bzd/test/test.hh"
-#include "cc/bzd/platform/clock.hh"
+
 #include "cc/bzd/core/print.hh"
+#include "cc/bzd/platform/clock.hh"
 
 // Empty namespace to hold all the registered tests
 namespace {

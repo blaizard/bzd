@@ -5,12 +5,12 @@ bzd_cc_library(
     name = "platform",
     visibility = ["//visibility:public"],
     deps = [
-        ":compiler",
-        ":types",
-        ":panic",
         ":atomic",
+        ":clock",
+        ":compiler",
+        ":panic",
         ":stream",
-        ":clock"
+        ":types",
     ],
 )
 

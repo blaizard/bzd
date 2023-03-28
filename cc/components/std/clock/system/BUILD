@@ -13,11 +13,11 @@ bdl_library(
 
 cc_library(
     name = "system",
-    hdrs = [
-        "system.hh",
-    ],
     srcs = [
         "system.cc",
+    ],
+    hdrs = [
+        "system.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [

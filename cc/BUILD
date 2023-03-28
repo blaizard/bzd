@@ -10,9 +10,9 @@ bzd_cc_library(
         "//cc/bzd/core",
         "//cc/bzd/math",
         "//cc/bzd/meta",
+        "//cc/bzd/platform",
         "//cc/bzd/type_traits",
         "//cc/bzd/utility",
-        "//cc/bzd/platform"
     ],
 )
 
