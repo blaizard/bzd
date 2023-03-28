@@ -18,7 +18,7 @@ bzd::Async<> run(Network& network)
 	co_await !bzd::log::info("Receiving..."_csv);
 
 	bzd::Array<bzd::Byte, 1000u> data;
-	const auto result = co_await !bzd::async::any(response.read(data.asBytesMutable()), bzd::timeout(1000_ms));
+	const auto result = co_await !bzd::async::any(response.read(data.asBytesMutable()), bzd::platform::steadyClock().timeout(1000_ms));
 	co_await !bzd::log::info(bzd::StringView{reinterpret_cast<const char*>(result.data()), result.size()});
 
 	co_return {};

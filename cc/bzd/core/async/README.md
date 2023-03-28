@@ -192,7 +192,10 @@ const auto value = co_await bzd::async::any(timeout(1_s), myFunc()).assertHasVal
 
 Suspending the execution of an async can be done with `bzd::async::suspend(...)`. This function takes 2 callables as arguments,
 the first, that is guaranteed to be called, contains a movable-only suspended executable object as argument.
-The user needs to dispose it from this callback.
+The user needs to dispose it within this callback. Once the callback is completed, the suspended executbale object
+cannot be moved anymore.
+It is also guaranteed that no cancellation can occur during the lifetime of this callback.
+
 The second argument is optional and provides a callback to deal with cancellation.
 
 This can be used in the context of ISR.

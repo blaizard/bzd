@@ -5,7 +5,7 @@
 
 namespace bzd::platform::esp32::clock {
 
-class Xthal : public bzd::Clock
+class Xthal : public bzd::Clock2
 {
 public:
 	template <class Context>
@@ -13,11 +13,7 @@ public:
 	{
 	}
 
-	ClockTick getTicks() noexcept override;
-
-	ClockTick msToTicks(const bzd::units::Millisecond time) noexcept override;
-
-	bzd::units::Millisecond ticksToMs(const ClockTick& ticks) noexcept override;
+	bzd::Result<bzd::units::Millisecond, bzd::Error> getTime() noexcept final;
 
 	bzd::Async<> exec() noexcept;
 

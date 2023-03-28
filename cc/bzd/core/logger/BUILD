@@ -12,7 +12,6 @@ cc_library(
     deps = [
         ":minimal",
         "//cc/bzd/core/logger/backend",
-        "//cc/bzd/platform:clock",
         "//cc/bzd/utility/pattern/formatter:to_stream",
     ],
 )

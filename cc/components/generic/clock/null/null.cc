@@ -2,14 +2,9 @@
 
 namespace bzd::platform::generic::clock {
 
-ClockTick Null::getTicks() noexcept { return static_cast<ClockTick>(0); }
-
-ClockTick Null::msToTicks(const bzd::units::Millisecond time) noexcept { return static_cast<ClockTick>(time.get()); }
-
-bzd::units::Millisecond Null::ticksToMs(const ClockTick& ticks) noexcept
+bzd::Result<bzd::units::Millisecond, bzd::Error> Null::getTime() noexcept
 {
-	// NOLINTNEXTLINE(bugprone-narrowing-conversions)
-	return static_cast<bzd::units::Millisecond>(ticks.get());
+	return static_cast<bzd::units::Millisecond>(0);
 }
 
 } // namespace bzd::platform::generic::clock

@@ -6,8 +6,6 @@ bzd_cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":channel",
-        ":clock",
-        ":delay",
         ":error",
         ":print",
         ":units",
@@ -55,36 +53,6 @@ cc_library(
         "//cc/bzd/utility:distance",
         "//cc/bzd/utility/synchronization:lock_guard",
         "//cc/bzd/utility/synchronization:mutex",
-    ],
-)
-
-cc_library(
-    name = "clock",
-    hdrs = [
-        "clock.hh",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//cc/bzd/container:named_type",
-        "//cc/bzd/core:units",
-        "//cc/bzd/core/async",
-        "//cc/bzd/platform:types",
-    ],
-)
-
-cc_library(
-    name = "delay",
-    srcs = [
-        "delay.cc",
-    ],
-    hdrs = [
-        "delay.hh",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":units",
-        "//cc/bzd/core/async",
-        "//cc/bzd/platform:clock",
     ],
 )
 

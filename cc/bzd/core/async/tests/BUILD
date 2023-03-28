@@ -28,7 +28,6 @@ bzd_cc_test(
         "//conditions:default": [],
     }),
     deps = [
-        "//cc/bzd/core:delay",
         "//cc/bzd/core/async",
         "//cc/bzd/test:multithread",
         "//cc/bzd/test:sync_barrier",
@@ -43,7 +42,6 @@ bzd_cc_test(
     ],
     tags = ["stress"],
     deps = [
-        "//cc/bzd/core:delay",
         "//cc/bzd/core/async",
         "//cc/bzd/test",
     ],
@@ -61,7 +59,6 @@ bzd_cc_test(
         "//conditions:default": [],
     }),
     deps = [
-        "//cc/bzd/core:delay",
         "//cc/bzd/core/async",
         "//cc/bzd/test:multithread",
     ],

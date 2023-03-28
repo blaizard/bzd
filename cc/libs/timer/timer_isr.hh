@@ -60,7 +60,7 @@ public:
 	};
 
 public:
-	bzd::Async<> waitUntil(const Time time) noexcept
+	bzd::Async<> waitUntil_(const Time time) noexcept
 	{
 		Element element;
 		element.alarm = time;
@@ -136,7 +136,7 @@ public:
 				auto lock = makeSyncLockGuard(mutex_);
 
 				// Trigger the alarm expired.
-				auto maybeTime = impl().getTime();
+				auto maybeTime = impl().getTime_();
 				if (!maybeTime)
 				{
 					co_return bzd::move(maybeTime).propagate();
@@ -178,10 +178,10 @@ private:
 		const auto maybeAlarm = getNextAlarm();
 		if (!maybeAlarm)
 		{
-			return impl().alarmClear();
+			return impl().alarmClear_();
 		}
 
-		auto result = impl().alarmSet(maybeAlarm.value());
+		auto result = impl().alarmSet_(maybeAlarm.value());
 		if (!result)
 		{
 			return bzd::move(result).propagate();
@@ -192,7 +192,7 @@ private:
 			// Check if the current time is already passed, if so trigger the callback.
 			// This is needed for some architecture that will not trigger the ISR if the
 			// alarm is already passed.
-			auto maybeTime = impl().getTime();
+			auto maybeTime = impl().getTime_();
 			if (!maybeTime)
 			{
 				return bzd::move(maybeTime).propagate();

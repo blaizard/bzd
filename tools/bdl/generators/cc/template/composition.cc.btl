@@ -24,7 +24,6 @@ co_await !registry.{{ dep.fqn | fqnToNameStr }}_.shutdown(registry);
 #include "cc/bzd/core/logger.hh"
 #include "cc/bzd/core/assert.hh"
 #include "cc/bzd/core/io/buffer.hh"
-#include "cc/bzd/platform/clock.hh"
 #include "cc/bzd/platform/stream.hh"
 #include "cc/bzd/platform/atomic.hh"
 #include "cc/bzd/algorithm/copy_n.hh"

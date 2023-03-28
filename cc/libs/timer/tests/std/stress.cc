@@ -13,7 +13,7 @@ TEST_ASYNC_MULTITHREAD(Timer, Stress, 4)
 	auto sequence1 = [&]() -> bzd::Async<> {
 		while (true)
 		{
-			co_await !timer.waitUntil(current.load());
+			co_await !timer.waitUntil_(current.load());
 			co_await !barrier.wait(3);
 		}
 		co_return {};
@@ -22,7 +22,7 @@ TEST_ASYNC_MULTITHREAD(Timer, Stress, 4)
 	auto sequence2 = [&]() -> bzd::Async<> {
 		while (true)
 		{
-			co_await !timer.waitUntil(current.load());
+			co_await !timer.waitUntil_(current.load());
 			co_await !barrier.wait(3);
 		}
 		co_return {};

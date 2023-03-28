@@ -5,20 +5,10 @@
 
 namespace bzd::platform::esp32::clock {
 
-ClockTick Xthal::getTicks() noexcept
+bzd::Result<bzd::units::Millisecond, bzd::Error> Xthal::getTime() noexcept
 {
 	exec().sync();
-	return static_cast<ClockTick>(ticks_);
-}
-
-ClockTick Xthal::msToTicks(const bzd::units::Millisecond time) noexcept
-{
-	return static_cast<ClockTick>(static_cast<bzd::UInt64>(time.get()) * (CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ * 1000));
-}
-
-bzd::units::Millisecond Xthal::ticksToMs(const ClockTick& ticks) noexcept
-{
-	return static_cast<bzd::units::Millisecond>(ticks.get() / (CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ * 1000));
+	return static_cast<bzd::units::Millisecond>(ticks_.get() / (CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ * 1000));
 }
 
 bzd::Async<> Xthal::exec() noexcept

@@ -1,4 +1,20 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
+load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_library")
+
+bzd_cc_library(
+    name = "platform",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":compiler",
+        ":types",
+        ":panic",
+        ":atomic",
+        ":stream",
+        ":clock"
+    ],
+)
+
+# ---- Individual items ----
 
 cc_library(
     name = "compiler",
@@ -53,6 +69,6 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//cc/bzd/core:clock",
+        "//cc/bzd/platform/interfaces:clock",
     ],
 )

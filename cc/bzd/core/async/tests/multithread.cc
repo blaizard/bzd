@@ -2,7 +2,6 @@
 
 #include "cc/bzd/container/array.hh"
 #include "cc/bzd/core/async.hh"
-#include "cc/bzd/core/delay.hh"
 
 enum class ForkType
 {
