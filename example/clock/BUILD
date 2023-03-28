@@ -7,8 +7,8 @@ bdl_library(
         "composition.bdl",
     ],
     deps = [
-        "//cc/bzd/platform/interfaces:clock"
-    ]
+        "//cc/bzd/platform/interfaces:clock",
+    ],
 )
 
 bzd_cc_binary(
@@ -17,6 +17,6 @@ bzd_cc_binary(
         "counter.hh",
     ],
     deps = [
-        ":composition"
-    ]
+        ":composition",
+    ],
 )

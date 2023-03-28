@@ -9,9 +9,9 @@ cc_library(
         "//cc/bzd/platform/interfaces:__pkg__",
     ],
     deps = [
+        "//cc/bzd/core:units",
         "//cc/bzd/core/async",
         "//tools/bdl/generators/cc/adapter:types",
-        "//cc/bzd/core:units"
     ],
 )
 

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "cc/bzd.hh"
-#include "example/io/simple/common.hh"
 #include "cc/bzd/platform/clock.hh"
+#include "example/io/simple/common.hh"
 
 namespace example {
 

@@ -1,9 +1,9 @@
 #pragma once
 
 #include "cc/bzd/core/async.hh"
+#include "cc/bzd/core/error.hh"
 #include "cc/bzd/core/units.hh"
 #include "cc/bzd/platform/types.hh"
-#include "cc/bzd/core/error.hh"
 #include "tools/bdl/generators/cc/adapter/types.hh"
 
 namespace bzd {
