@@ -8,7 +8,7 @@
 namespace bzd::platform::esp32::clock {
 
 class Timer
-	: public bzd::Clock2
+	: public bzd::Clock
 	, public bzd::TimerISR<UInt64, Timer, /*retroactiveAlarm*/ false>
 {
 public:

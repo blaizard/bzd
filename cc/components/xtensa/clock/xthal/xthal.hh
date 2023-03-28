@@ -5,7 +5,7 @@
 
 namespace bzd::platform::esp32::clock {
 
-class Xthal : public bzd::Clock2
+class Xthal : public bzd::Clock
 {
 public:
 	template <class Context>

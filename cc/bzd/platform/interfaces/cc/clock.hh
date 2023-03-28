@@ -8,7 +8,7 @@
 
 namespace bzd {
 
-class Clock2
+class Clock
 {
 public:
 	virtual bzd::Async<> delay(const bzd::units::Millisecond time) noexcept
