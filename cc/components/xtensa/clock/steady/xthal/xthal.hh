@@ -3,9 +3,9 @@
 #include "cc/bzd/core/async.hh"
 #include "cc/bzd/core/clock.hh"
 
-namespace bzd::platform::esp32::clock {
+namespace bzd::platform::esp32::clock::steady {
 
-class Xthal : public bzd::Clock
+class Xthal : public bzd::SteadyClock
 {
 public:
 	template <class Context>
@@ -21,4 +21,4 @@ private:
 	bzd::UInt64 ticks_{0};
 };
 
-} // namespace bzd::platform::esp32::clock
+} // namespace bzd::platform::esp32::clock::steady

@@ -4,7 +4,7 @@
 
 namespace bzd::platform::std::clock {
 
-class System : public bzd::Clock
+class System : public bzd::SystemClock
 {
 public:
 	template <class Context>

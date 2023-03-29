@@ -300,7 +300,7 @@ bool run{{ stripTargetFromFQN(executorFQN) | fqnToCapitalized }}() noexcept
 	// {{ asyncType.value }}: {{ expression.symbol | symbolToStr }}()
 	auto async_{{loop.parent.index}}_{{ loop.index }} = [&]() -> bzd::Async<> {
 		{{ callInitMembers(expression) }}
-		co_await !{{ expression.symbol | symbolRegistryToStr }}( {{- paramsDeclaration(expression.parametersResolved, true) -}} );
+		co_await !{{ expression.symbol | symbolRegistryToStr }}({{- paramsDeclaration(expression.parametersResolved, true) -}} );
 		{{ callShutdownMembers(expression) }}
 		co_return {};
 	};

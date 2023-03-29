@@ -166,13 +166,25 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 		     )), f"The resulting substitued value must be a number, a string or a path, instead received {type(value)}."
 		self.appendSubstitution(element=element, result=result, string=str(value))
 
+	def getIndentation(self, result: ResultType) -> str:
+		"""Calculate the current identation."""
+
+		string = ""
+		for element in reversed(result):
+			if "\n" in element:
+				index = element.rindex("\n") + 1
+				string = element[index:] + string
+				break
+			string = element + string
+		indent = re.sub(r"[^\s]", " ", string)
+		return indent
+
 	def appendSubstitution(self, element: Element, result: ResultType, string: str) -> ResultType:
 
 		# Apply indentation if enabled
 		if self.indent and result:
-			m = self.indentRegexpr.search(result[-1])
-			if m:
-				string = string.replace("\n", "\n" + m.group(1))
+			indentation = self.getIndentation(result)
+			string = string.replace("\n", "\n" + indentation)
 
 		result.append(string)
 		return result

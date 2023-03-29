@@ -19,7 +19,10 @@ def mypyWorker(package: str, stdout: TextIO) -> None:
 	main(stdout=stdout,
 	     stderr=stdout,
 	     clean_exit=True,
-	     args=["--config-file", configFile, "--strict", "--follow-imports", "normal", "--pretty", "-p", package])
+	     args=[
+	         "--config-file", configFile, "--strict", "--follow-imports", "silent", "--show-error-context", "--pretty",
+	         "-p", package
+	     ])
 
 
 if __name__ == "__main__":

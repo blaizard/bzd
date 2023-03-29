@@ -1,0 +1,11 @@
+use "cc/bzd/platform/interfaces/clock.bdl"
+
+namespace bzd.platform.generic.clock.steady;
+
+
+component Null : bzd.SteadyClock {
+interface:
+	
+}
+
+

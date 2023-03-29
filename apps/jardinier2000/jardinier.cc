@@ -9,20 +9,20 @@ namespace jardinier {
 
 constexpr gpio_num_t waterPumpPin{GPIO_NUM_23};
 
-bzd::Async<bool> water(bzd::Size wateringTimeS, bzd::UInt64 wakeUpPeriodS)
+bzd::Async<> water(bzd::SteadyClock& clock, bzd::Size wateringTimeS, bzd::UInt64 wakeUpPeriodS)
 {
 	co_await bzd::log::info("Watering for {}s..."_csv, wateringTimeS);
 	gpio_reset_pin(waterPumpPin);
 	gpio_set_direction(waterPumpPin, GPIO_MODE_OUTPUT);
 	gpio_set_level(waterPumpPin, 1);
-	co_await bzd::platform::steadyClock().delay(bzd::units::Second{wateringTimeS});
+	co_await clock.delay(bzd::units::Second{wateringTimeS});
 	gpio_set_level(waterPumpPin, 0);
 
 	co_await bzd::log::info("Going to sleep, will wake up in {}s..."_csv, wakeUpPeriodS);
 	esp_sleep_enable_timer_wakeup(/*time us*/ wakeUpPeriodS * 1000000ull);
 	esp_deep_sleep_start();
 
-	co_return true;
+	co_return {};
 }
 
 } // namespace jardinier
