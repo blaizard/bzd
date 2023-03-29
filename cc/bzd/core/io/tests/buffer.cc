@@ -107,3 +107,31 @@ TEST_ASYNC(Buffer, Async)
 
 	co_return {};
 }
+
+TEST_ASYNC(Buffer, Notification)
+{
+	bzd::io::Buffer<int, 10u, "my.id"> buffer{};
+	auto source = buffer.makeSource();
+	auto sink = buffer.makeSink();
+
+	auto setWithDelay = [&source]() -> bzd::Async<> {
+		co_await bzd::async::yield();
+		co_await bzd::async::yield();
+		co_await bzd::async::yield();
+		co_await bzd::async::yield();
+		// Test that the notification happens after setting the value.
+		auto setter = co_await !source.set();
+		co_await bzd::async::yield();
+		setter.valueMutable() = 14;
+		co_return {};
+	};
+
+	{
+		const auto result = co_await bzd::async::all(sink.get(), setWithDelay());
+		EXPECT_TRUE(result.get<0>());
+		EXPECT_TRUE(result.get<1>());
+		EXPECT_EQ(result.get<0>().value(), 14);
+	}
+
+	co_return {};
+}

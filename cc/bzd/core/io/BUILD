@@ -9,6 +9,7 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        "//cc/bzd/container:function_ref",
         "//cc/bzd/container:non_owning_list",
         "//cc/bzd/container:optional",
         "//cc/bzd/container/threadsafe:ring_buffer",
