@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cc/bzd/container/function_ref.hh"
 #include "cc/bzd/container/optional.hh"
 #include "cc/bzd/container/threadsafe/ring_buffer.hh"
 #include "cc/bzd/core/async.hh"
@@ -12,6 +13,37 @@ class Source
 {
 private:
 	using Value = typename Buffer::ValueMutable;
+	class SetResult : public bzd::threadsafe::RingBufferResult<Value&>
+	{
+	private:
+		using RingBufferResult = typename bzd::threadsafe::RingBufferResult<Value&>;
+
+	public:
+		explicit constexpr SetResult(RingBufferResult&& result) noexcept : RingBufferResult{bzd::move(result)} {}
+		constexpr SetResult(RingBufferResult&& result, bzd::FunctionRef<void(void)> notify) noexcept :
+			RingBufferResult{bzd::move(result)}, notify_{notify}
+		{
+		}
+
+		SetResult(const SetResult&) = delete;
+		SetResult& operator=(const SetResult&) = delete;
+		SetResult& operator=(SetResult&&) = delete;
+		constexpr SetResult(SetResult&& other) noexcept : RingBufferResult{static_cast<RingBufferResult&&>(other)}, notify_{other.notify_}
+		{
+			other.notify_.reset();
+		}
+
+		constexpr ~SetResult() noexcept
+		{
+			if (notify_.hasValue())
+			{
+				notify_.value()();
+			}
+		}
+
+	private:
+		bzd::Optional<bzd::FunctionRef<void(void)>> notify_{};
+	};
 
 public:
 	constexpr explicit Source(Buffer& buffer) noexcept : buffer_{buffer} {}
@@ -22,9 +54,10 @@ public:
 		auto result = buffer_.ring_.nextForWriting();
 		if (result)
 		{
-			buffer_.notifyNewData();
+			// Notify of a new set only after the object destruction.
+			return SetResult{bzd::move(result), bzd::FunctionRef<void(void)>::toMember<Buffer, &Buffer::notifyNewData>(buffer_)};
 		}
-		return result;
+		return SetResult{bzd::move(result)};
 	}
 
 	template <class T>
@@ -38,7 +71,7 @@ public:
 		return false;
 	}
 
-	bzd::Async<bzd::threadsafe::RingBufferResult<Value&>> set() noexcept
+	bzd::Async<SetResult> set() noexcept
 	{
 		while (true)
 		{
