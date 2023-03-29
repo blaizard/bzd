@@ -1,19 +1,19 @@
-#include "cc/components/xtensa/clock/timer/timer.hh"
+#include "cc/components/xtensa/clock/steady/gptimer/gptimer.hh"
 
 #include "cc/components/xtensa/error.hh"
 #include "sdkconfig.h"
 
-namespace bzd::platform::esp32::clock {
+namespace bzd::platform::esp32::clock::steady {
 
 static bool gptimerCallback(::gptimer_handle_t, const ::gptimer_alarm_event_data_t*, void* userCtx)
 {
-	Timer& timer = *static_cast<Timer*>(userCtx);
+	GPTimer& timer = *static_cast<GPTimer*>(userCtx);
 	timer.triggerForISR();
 	// return whether we need to yield at the end of ISR
 	return false;
 }
 
-bzd::Async<> Timer::init() noexcept
+bzd::Async<> GPTimer::init() noexcept
 {
 	const ::gptimer_config_t config{.clk_src = GPTIMER_CLK_SRC_APB,
 									.direction = GPTIMER_COUNT_UP,
@@ -42,7 +42,7 @@ bzd::Async<> Timer::init() noexcept
 	co_return {};
 }
 
-bzd::Async<> Timer::shutdown() noexcept
+bzd::Async<> GPTimer::shutdown() noexcept
 {
 	if (const auto result = ::gptimer_stop(gptimer_); result != ESP_OK)
 	{
@@ -60,21 +60,21 @@ bzd::Async<> Timer::shutdown() noexcept
 	co_return {};
 }
 
-bzd::Async<> Timer::delay(const bzd::units::Millisecond duration) noexcept
+bzd::Async<> GPTimer::delay(const bzd::units::Millisecond duration) noexcept
 {
-	auto maybeTime = getTime_();
+	auto maybeTime = getTicks();
 	if (!maybeTime)
 	{
 		co_return bzd::move(maybeTime).propagate();
 	}
-	co_await !waitUntil_(maybeTime.value() + duration.get() * 10);
+	co_await !waitUntilTicks(maybeTime.value() + duration.get() * 10);
 	co_return {};
 }
 
-bzd::Result<bzd::units::Millisecond, bzd::Error> Timer::getTime() noexcept
+bzd::Result<bzd::units::Millisecond, bzd::Error> GPTimer::getTime() noexcept
 {
 	// TODO: To be updated, the / 10 is inefficient here.
-	auto maybeTime = getTime_();
+	auto maybeTime = getTicks();
 	if (!maybeTime)
 	{
 		return bzd::move(maybeTime).propagate();
@@ -82,9 +82,9 @@ bzd::Result<bzd::units::Millisecond, bzd::Error> Timer::getTime() noexcept
 	return bzd::units::Millisecond(maybeTime.value() / 10);
 }
 
-bzd::Result<Timer::Time, bzd::Error> Timer::getTime_() noexcept
+bzd::Result<GPTimer::Tick, bzd::Error> GPTimer::getTicks() noexcept
 {
-	Timer::Time count{};
+	Tick count{};
 	if (const auto result = ::gptimer_get_raw_count(gptimer_, &count); result != ESP_OK)
 	{
 		return bzd::error::EspErr("gptimer_get_raw_count", result);
@@ -92,7 +92,7 @@ bzd::Result<Timer::Time, bzd::Error> Timer::getTime_() noexcept
 	return count;
 }
 
-bzd::Result<void, bzd::Error> Timer::alarmSet_(const Time time)
+bzd::Result<void, bzd::Error> GPTimer::alarmSet(const Tick time)
 {
 	const ::gptimer_alarm_config_t config{.alarm_count = time, .reload_count = 0, .flags = {.auto_reload_on_alarm = false}};
 	if (const auto result = ::gptimer_set_alarm_action(gptimer_, &config); result != ESP_OK)
@@ -102,7 +102,7 @@ bzd::Result<void, bzd::Error> Timer::alarmSet_(const Time time)
 	return bzd::nullresult;
 }
 
-bzd::Result<void, bzd::Error> Timer::alarmClear_()
+bzd::Result<void, bzd::Error> GPTimer::alarmClear()
 {
 	if (const auto result = ::gptimer_set_alarm_action(gptimer_, nullptr); result != ESP_OK)
 	{
@@ -111,4 +111,4 @@ bzd::Result<void, bzd::Error> Timer::alarmClear_()
 	return bzd::nullresult;
 }
 
-} // namespace bzd::platform::esp32::clock
+} // namespace bzd::platform::esp32::clock::steady

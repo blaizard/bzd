@@ -20,8 +20,8 @@ composition {
 composition platform {
 	out: bzd.OStream = bzd.platform.posix.Out(proactor = proactor);
 	in: bzd.IStream = bzd.platform.posix.In(proactor = proactor);
-	steadyClock: bzd.Clock = bzd.platform.std.clock.Steady();
-	systemClock: bzd.Clock = bzd.platform.std.clock.System();
+	steadyClock: bzd.SteadyClock = bzd.platform.std.clock.Steady();
+	systemClock: bzd.SystemClock = bzd.platform.std.clock.System();
 	
 }
 

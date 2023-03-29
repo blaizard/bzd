@@ -9,7 +9,7 @@ namespace bzd::test {
 class TimerTest : public bzd::TimerISR<UInt64, TimerTest>
 {
 public:
-	using Time = UInt64;
+	using Tick = UInt64;
 	using Duration = UInt32;
 	using Element = typename bzd::TimerISR<UInt64, TimerTest>::Element;
 
@@ -20,9 +20,9 @@ public: // Init/shutdown functions.
 		thread_ = std::thread([this]() {
 			while (stop_.load() == false)
 			{
-				if (alarm_.load() <= getTime_().value())
+				if (alarm_.load() <= getTicks().value())
 				{
-					alarmClear_();
+					alarmClear();
 					triggerForISR();
 				}
 			}
@@ -37,7 +37,7 @@ public: // Init/shutdown functions.
 		co_return {};
 	}
 
-	constexpr TimerTest& operator=(const Time time) noexcept
+	constexpr TimerTest& operator=(const Tick time) noexcept
 	{
 		time_.store(time);
 		return *this;
@@ -51,30 +51,30 @@ public: // Init/shutdown functions.
 
 	bzd::Async<> delay(const Duration duration) noexcept
 	{
-		co_await !waitUntil_(time_.load() + duration);
+		co_await !waitUntilTicks(time_.load() + duration);
 		co_return {};
 	}
 
 private: // Implementation.
 	friend class bzd::TimerISR<UInt64, TimerTest>;
 
-	bzd::Result<Time, bzd::Error> getTime_() noexcept { return time_.load(); }
+	bzd::Result<Tick, bzd::Error> getTicks() noexcept { return time_.load(); }
 
-	bzd::Result<void, bzd::Error> alarmSet_(const Time alarm)
+	bzd::Result<void, bzd::Error> alarmSet(const Tick alarm)
 	{
 		alarm_.store(alarm);
 		return bzd::nullresult;
 	}
-	bzd::Result<void, bzd::Error> alarmClear_()
+	bzd::Result<void, bzd::Error> alarmClear()
 	{
 		alarm_.store(invalid);
 		return bzd::nullresult;
 	}
 
 private:
-	static constexpr Time invalid = bzd::NumericLimits<Time>::max();
-	bzd::Atomic<Time> time_{0};
-	bzd::Atomic<Time> alarm_{invalid};
+	static constexpr Tick invalid = bzd::NumericLimits<Tick>::max();
+	bzd::Atomic<Tick> time_{0};
+	bzd::Atomic<Tick> alarm_{invalid};
 	bzd::Atomic<Bool> stop_{false};
 	std::thread thread_{};
 };

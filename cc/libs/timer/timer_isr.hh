@@ -43,24 +43,24 @@ private:
 
 /// General purpose timer that can manage multiple alarms.
 ///
-/// \tparam Time The type used to hold a time.
+/// \tparam Tick The type used to hold a time.
 /// \tparam Impl The timer implementation, this is the CRTP of the child.
 /// \tparam retroactiveAlarm If the ISR triggers retroactive counters, in other word,
 ///         if the counter is older that the timer, will an interrupt be trigger?
-template <class Time, class Impl, Bool retroactiveAlarm = true>
+template <class Tick, class Impl, Bool retroactiveAlarm = true>
 class TimerISR
 {
 public:
 	struct Element : public bzd::NonOwningListElement
 	{
 		/// The alarm at which time the element should be processed.
-		Time alarm;
+		Tick alarm;
 		/// The suspended executable associated with this element.
 		bzd::async::ExecutableSuspended executable;
 	};
 
 public:
-	bzd::Async<> waitUntil_(const Time time) noexcept
+	bzd::Async<> waitUntilTicks(const Tick time) noexcept
 	{
 		Element element;
 		element.alarm = time;
@@ -136,7 +136,7 @@ public:
 				auto lock = makeSyncLockGuard(mutex_);
 
 				// Trigger the alarm expired.
-				auto maybeTime = impl().getTime_();
+				auto maybeTime = impl().getTicks();
 				if (!maybeTime)
 				{
 					co_return bzd::move(maybeTime).propagate();
@@ -162,7 +162,7 @@ public:
 	}
 
 private:
-	[[nodiscard]] constexpr bzd::Optional<Time> getNextAlarm() noexcept
+	[[nodiscard]] constexpr bzd::Optional<Tick> getNextAlarm() noexcept
 	{
 		const auto& element = list_.front();
 		if (!element)
@@ -178,10 +178,10 @@ private:
 		const auto maybeAlarm = getNextAlarm();
 		if (!maybeAlarm)
 		{
-			return impl().alarmClear_();
+			return impl().alarmClear();
 		}
 
-		auto result = impl().alarmSet_(maybeAlarm.value());
+		auto result = impl().alarmSet(maybeAlarm.value());
 		if (!result)
 		{
 			return bzd::move(result).propagate();
@@ -192,7 +192,7 @@ private:
 			// Check if the current time is already passed, if so trigger the callback.
 			// This is needed for some architecture that will not trigger the ISR if the
 			// alarm is already passed.
-			auto maybeTime = impl().getTime_();
+			auto maybeTime = impl().getTicks();
 			if (!maybeTime)
 			{
 				return bzd::move(maybeTime).propagate();
@@ -213,7 +213,7 @@ private:
 	SpinMutex mutex_{};
 	bzd::NonOwningList<Element> list_{};
 	bzd::ExecutableSuspendedRetroactive<bzd::async::ExecutableSuspended> executable_{};
-	Time timeAdd_{0};
+	Tick timeAdd_{0};
 };
 
 } // namespace bzd

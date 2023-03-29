@@ -1,9 +1,9 @@
 use "cc/bzd/platform/interfaces/clock.bdl"
 
-namespace bzd.platform.esp32.clock;
+namespace bzd.platform.esp32.clock.steady;
 
 
-component Xthal : bzd.Clock {
+component Xthal : bzd.SteadyClock {
 interface:
 	method exec();
 	

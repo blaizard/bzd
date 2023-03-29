@@ -7,6 +7,9 @@ bdl_library(
     srcs = [
         "composition.bdl",
     ],
+    deps = [
+        "//cc/bzd/platform/interfaces:clock",
+    ],
 )
 
 cc_library(

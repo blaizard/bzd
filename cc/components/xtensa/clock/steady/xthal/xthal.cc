@@ -1,9 +1,9 @@
-#include "cc/components/xtensa/clock/xthal/xthal.hh"
+#include "cc/components/xtensa/clock/steady/xthal/xthal.hh"
 
 #include "sdkconfig.h"
 #include "xtensa/core-macros.h"
 
-namespace bzd::platform::esp32::clock {
+namespace bzd::platform::esp32::clock::steady {
 
 bzd::Result<bzd::units::Millisecond, bzd::Error> Xthal::getTime() noexcept
 {
@@ -25,4 +25,4 @@ bzd::Async<> Xthal::exec() noexcept
 	co_return {};
 }
 
-} // namespace bzd::platform::esp32::clock
+} // namespace bzd::platform::esp32::clock::steady

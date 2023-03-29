@@ -146,7 +146,10 @@ class Transform:
 		return [valueToStrOriginal(item, symbols=symbols, registry=registry) for item in params]  # type: ignore
 
 	def paramsDeclaration(self, params: ParametersResolved, isRegistry: bool = False) -> str:
-		return ", ".join(self.paramsDeclarationToList_(params=params, isRegistry=isRegistry))
+		paramsToList = self.paramsDeclarationToList_(params=params, isRegistry=isRegistry)
+		if len(paramsToList) < 2:
+			return ", ".join(paramsToList)
+		return ",\n".join(paramsToList)
 
 	def paramsFilterOutLiterals(self, params: ParametersResolved) -> typing.Iterator[ParametersResolvedItem]:
 		for item in params:

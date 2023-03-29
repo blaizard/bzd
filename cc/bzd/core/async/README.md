@@ -10,10 +10,10 @@ Thanks to this object you can, for example, resume the coroutine. The coroutine_
 ### Frame
 
 The frame contains the current state of the coroutine.
-Coroutine function is created by the compiler when you call a new coroutine, for example `auto resumable_object = bzd::delay(10_ms);`
+Coroutine function is created by the compiler when you call a new coroutine, for example `auto resumable_object = delay(10_ms);`
 
 ```c++
-Async<> bzd::delay(args...)
+Async<> delay(args...)
 {
     auto* frame = new CoroDelayFrame{args...};
     auto return_object = frame->_promise.get_return_object();

@@ -3,7 +3,7 @@ use "cc/bzd/platform/interfaces/clock.bdl"
 namespace bzd.platform.std.clock;
 
 
-component Steady : bzd.Clock {
+component Steady : bzd.SteadyClock {
 interface:
 	
 }

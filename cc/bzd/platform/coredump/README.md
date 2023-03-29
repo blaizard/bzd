@@ -20,4 +20,12 @@ Some information about core dump file format:
 - http://uhlo.blogspot.com/2012/05/brief-look-into-core-dumps.html
 - https://github.com/Percona-Lab/coredumper
 
+- https://github.com/efiop/criu-coredump/blob/master/criu_coredump/core_dump.py
+- https://stackoverflow.com/questions/17972945/core-dump-note-section
+- https://stackoverflow.com/questions/26641418/creating-coredump-for-arm-based-embedded-system
+
+The most relevant:
+
+- https://github.com/checkpoint-restore/criu/tree/criu-dev/coredump/criu_coredump
+
 To create a elf file, we can use: https://github.com/serge1/ELFIO

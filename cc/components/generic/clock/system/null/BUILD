@@ -12,22 +12,15 @@ bdl_library(
 )
 
 cc_library(
-    name = "timer",
+    name = "null",
     srcs = [
-        "timer.cc",
+        "null.cc",
     ],
     hdrs = [
-        "timer.hh",
-    ],
-    target_compatible_with = [
-        "@//tools/bazel_build/platforms/isa:xtensa_lx6",
+        "null.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
         ":bdl",
-        "//cc/bzd/core:print",
-        "//cc/bzd/core/async",
-        "//cc/components/xtensa:error",
-        "//cc/libs/timer:timer_isr",
     ],
 )
