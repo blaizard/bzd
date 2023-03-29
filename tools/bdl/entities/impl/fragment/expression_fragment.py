@@ -189,10 +189,19 @@ class SymbolFragment(ExpressionFragment):
 		if self.underlyingTypeFQN:
 			underlyingTypeEntity = resolver.getEntityResolved(fqn=self.underlyingTypeFQN).assertValue(
 			    element=self.element)
-			return Parameters(element=underlyingTypeEntity.element,
-			                  NestedElementType=Expression,
-			                  nestedKind=underlyingTypeEntity.configAttr,
-			                  filterFct=lambda entity: entity.category == Category.expression)
+			params = Parameters(element=underlyingTypeEntity.element, NestedElementType=Expression)
+
+			# Take into account the parents as well.
+			for fqn in reversed([self.underlyingTypeFQN, *underlyingTypeEntity.getParents()]):
+				parentEntity = resolver.getEntityResolved(fqn=fqn).assertValue(element=self.element)
+				parentParams = Parameters(element=parentEntity.element,
+				                          NestedElementType=Expression,
+				                          nestedKind=parentEntity.configAttr,
+				                          filterFct=lambda entity: entity.category == Category.expression)
+				params.extend(parentParams)
+
+			return params
+
 		return Parameters(element=self.element, NestedElementType=Expression)
 
 	def _resolveAndValidateParameters(self, resolver: "Resolver", resolvedTypeEntity: Entity,

@@ -1,4 +1,5 @@
 import typing
+import math
 from functools import cached_property
 from dataclasses import dataclass
 
@@ -131,6 +132,18 @@ class ParametersCommon:
 		for key, _, _ in self.itemsMetadata(includeVarArgs=includeVarArgs):
 			yield key
 
+	def getOrders(self) -> typing.Tuple[int, int]:
+		"""Get the min and max of the order field of the data."""
+
+		if len(self.list) == 0:
+			return 0, 0
+		retMin = math.inf
+		retMax = -math.inf
+		for _, data in enumerate(self.list):
+			retMin = min(retMin, data.order)
+			retMax = max(retMax, data.order)
+		return int(retMin), int(retMax)
+
 	def getMetadata(self, key: Key) -> typing.Optional[Data]:
 		"""Return the metadata at a specific key or None if not available"""
 
@@ -243,6 +256,15 @@ class Parameters(ParametersCommon):
 					# We must construct the NestedElementType only after filtering as
 					# some entities are not constructible with any elements.
 					self.append(self.NestedElementType(e), order=index)
+
+	def extend(self, params: "Parameters", left: bool = False) -> None:
+		"""Merge another params into this one."""
+
+		retMin, retMax = self.getOrders()
+		order = (retMin - len(params)) if left else (retMax + 1)
+		for expression in params:
+			self.append(expression, order=order)
+			order += 1
 
 	def copy(self) -> "Parameters":
 		"""
