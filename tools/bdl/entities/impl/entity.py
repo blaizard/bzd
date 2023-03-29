@@ -329,21 +329,6 @@ class Entity:
 			                  filterFct=lambda entity: entity.category == Category.using)
 		return Parameters(element=self.element, NestedElementType=Using)
 
-	def getConfigValues(self, resolver: typing.Any) -> Parameters:
-		"""
-		Get the list of expressions that forms the values.
-		"""
-
-		from tools.bdl.entities.impl.expression import Expression
-		if self.underlyingTypeFQN:
-			underlyingTypeEntity = resolver.getEntityResolved(fqn=self.underlyingTypeFQN).assertValue(
-			    element=self.element)
-			return Parameters(element=underlyingTypeEntity.element,
-			                  NestedElementType=Expression,
-			                  nestedKind=underlyingTypeEntity.configAttr,
-			                  filterFct=lambda entity: entity.category == Category.expression)
-		return Parameters(element=self.element, NestedElementType=Expression)
-
 	def markAsResolved(self) -> None:
 		"""
 		Mark an entity as resolved.

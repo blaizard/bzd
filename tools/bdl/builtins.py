@@ -42,6 +42,20 @@ class ConnectMeta(Builtin):
 		                                                                        kind="Any").setAttr("meta", "1"))
 
 
+class ComponentBase(Builtin):
+
+	def __init__(self) -> None:
+		"""
+		component ComponentBase {
+		config:
+			in: bzd.IStream = platform.in;
+			out: bzd.OStream = platform.out;
+			steadyClock: bzd.SteadyClock = platform.steadyClock;
+		}
+		"""
+		pass
+
+
 # Concrete types
 
 

@@ -695,6 +695,24 @@ class TestRun(unittest.TestCase):
 					""",
 			                   objectContext=ObjectContext(resolve=True))
 
+	def testComponentConfig(self) -> None:
+		Object.fromContent(content="""
+				component Base {
+				config:
+					a = String;
+				}
+				component A : Base {
+				config:
+					b = Integer;
+				}
+				composition {
+					a = A(a="hello", b=12);
+					b = A(b=12, a="hello");
+					c = A("hello", 12);
+				}
+				""",
+		                   objectContext=ObjectContext(resolve=True, composition=True))
+
 
 if __name__ == '__main__':
 	unittest.main(failfast=True)
