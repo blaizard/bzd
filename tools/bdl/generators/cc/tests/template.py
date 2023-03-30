@@ -133,7 +133,7 @@ class TestRun(unittest.TestCase):
 		self.assertEqual(output, "MyStruct{/*var*/bzd::Int32{bzd::Float32{2}}}")
 
 		output = self.render("""{{ entity("myComponent") | expressionToValue }}""")
-		self.assertEqual(output, "MyComponent<bzd::Float32>{}")
+		self.assertEqual(output, "MyComponent<bzd::Float32>{/*var*/bzd::Int32{1}}")
 
 
 if __name__ == '__main__':
