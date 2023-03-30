@@ -3,9 +3,18 @@ use "cc/bzd/platform/interfaces/tcp.bdl"
 namespace trader;
 
 
-method run(client = bzd.platform.network.tcp.Client);
+component Trader {
+interface:
+	method run();
+	
+config:
+	client = bzd.platform.network.tcp.Client;
+	
+}
+
 composition {
-	run(client = network.tcp.client);
+	trader = Trader(client = network.tcp.client);
+	trader.run();
 	
 }
 

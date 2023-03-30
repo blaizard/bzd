@@ -51,10 +51,10 @@ def valueToStr(item: ParametersResolvedItem,
 			value = f"registry.{value}_.get()"
 		if symbols is not None:
 			# Cast values to there underlying interface type.
-			expectedType = item.expected.underlyingTypeFQN
-			assert expectedType is not None
-			if symbols.getEntityResolved(expectedType).value.category == Category.interface:
-				value = f"bzd::Interface<\"{expectedType}\">::cast({value})"
+			expectedInterface = item.expected.underlyingInterfaceFQN or item.expected.underlyingTypeFQN
+			assert expectedInterface is not None
+			if symbols.getEntityResolved(expectedInterface).value.category == Category.interface:
+				value = f"bzd::Interface<\"{expectedInterface}\">::cast({value})"
 	elif item.isRValue:
 		assert isinstance(item.param, Expression)
 		values = [valueToStr(item=i, symbols=symbols, registry=registry) for i in item.param.parametersResolved]

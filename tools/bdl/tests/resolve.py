@@ -631,7 +631,7 @@ class TestRun(unittest.TestCase):
 				component Test { config: using hello = Integer; }
 				composition MyComposition
 				{
-					val1 = Test<Float>();
+					val1 = Test<Integer>();
 				}
 				""",
 		                         objectContext=ObjectContext(resolve=True, composition=True))
@@ -712,6 +712,22 @@ class TestRun(unittest.TestCase):
 				}
 				""",
 		                   objectContext=ObjectContext(resolve=True, composition=True))
+
+		with self.assertRaisesRegex(Exception, r"duplicated"):
+			Object.fromContent(content="""
+					component Base {
+					config:
+						a = String;
+					}
+					component A : Base {
+					config:
+						a = Integer;
+					}
+					composition {
+						a = A(a=21);
+					}
+					""",
+			                   objectContext=ObjectContext(resolve=True, composition=True))
 
 
 if __name__ == '__main__':

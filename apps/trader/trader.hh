@@ -5,23 +5,32 @@
 
 namespace trader {
 
-template <class Network>
-bzd::Async<> run(Network& network)
+template <class Context>
+class Trader
 {
-	constexpr bzd::StringView hostname{"www.google.com"_sv};
+public:
+	explicit constexpr Trader(Context& context) noexcept : context_{context} {}
 
-	co_await !bzd::log::info("Connecting to {}"_csv, hostname);
+	bzd::Async<> run()
+	{
+		constexpr bzd::StringView hostname{"www.google.com"_sv};
 
-	bzd::http::Client client{network, hostname, 80};
-	auto response = co_await !client.get("/"_sv).header("Host", hostname).header("User-Agent", "bzd").header("Accept", "*/*").send();
+		co_await !bzd::log::info("Connecting to {}"_csv, hostname);
 
-	co_await !bzd::log::info("Receiving..."_csv);
+		bzd::http::Client client{context_.config.client, hostname, 80};
+		auto response = co_await !client.get("/"_sv).header("Host", hostname).header("User-Agent", "bzd").header("Accept", "*/*").send();
 
-	bzd::Array<bzd::Byte, 1000u> data;
-	const auto result = co_await !bzd::async::any(response.read(data.asBytesMutable()), bzd::platform::steadyClock().timeout(1000_ms));
-	co_await !bzd::log::info(bzd::StringView{reinterpret_cast<const char*>(result.data()), result.size()});
+		co_await !bzd::log::info("Receiving..."_csv);
 
-	co_return {};
-}
+		bzd::Array<bzd::Byte, 1000u> data;
+		const auto result = co_await !bzd::async::any(response.read(data.asBytesMutable()), bzd::platform::steadyClock().timeout(1000_ms));
+		co_await !bzd::log::info(bzd::StringView{reinterpret_cast<const char*>(result.data()), result.size()});
+
+		co_return {};
+	}
+
+private:
+	Context& context_;
+};
 
 } // namespace trader

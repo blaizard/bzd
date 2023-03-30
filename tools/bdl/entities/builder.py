@@ -21,19 +21,23 @@ class ElementBuilder(Element):
 		return self
 
 	def addConfigValue(self,
-	                   kind: typing.Optional[str] = None,
+	                   symbol: typing.Optional[str] = None,
 	                   literal: typing.Optional[str] = None,
 	                   name: typing.Optional[str] = None,
+	                   interface: typing.Optional[str] = None,
 	                   contract: typing.Optional[str] = None) -> "ElementBuilder":
 		"""
 		Create a configuration entry
 		"""
 		element = ElementBuilder(category="expression")
-		if kind is not None:
-			element.setAttr("symbol", kind)
+		if symbol is not None:
+			nested = Element().setAttr("symbol", symbol)
+			element.pushBackElementToNestedSequence("fragments", nested)
+		if interface is not None:
+			element.setAttr("interface", interface)
 		if literal is not None:
-			element.setAttr("value", literal)
-			element.setAttr("literal", literal)
+			nested = Element().setAttr("value", literal)
+			element.pushBackElementToNestedSequence("fragments", nested)
 		if name is not None:
 			element.setAttr("name", name)
 		if contract is not None:
@@ -41,11 +45,11 @@ class ElementBuilder(Element):
 		self.pushBackElementToNestedSequence(kind="config", element=element)
 		return self
 
-	def addConfigType(self, kind: str, name: str, contract: typing.Optional[str] = None) -> "ElementBuilder":
+	def addConfigType(self, symbol: str, name: str, contract: typing.Optional[str] = None) -> "ElementBuilder":
 		"""
 		Create a configuration entry
 		"""
-		element = ElementBuilder(category="using").setAttr("symbol", kind).setAttr("name", name)
+		element = ElementBuilder(category="using").setAttr("symbol", symbol).setAttr("name", name)
 		if contract is not None:
 			element.addContract(contract)
 		self.pushBackElementToNestedSequence(kind="config", element=element)

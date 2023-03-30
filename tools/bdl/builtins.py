@@ -30,7 +30,7 @@ class ListMeta(Builtin):
 	def __init__(self) -> None:
 		super().__init__(
 		    ElementBuilder("builtin").setAttr("name", "list").addConfigValue(name="values...",
-		                                                                     kind="Any").setAttr("meta", "1"))
+		                                                                     symbol="Any").setAttr("meta", "1"))
 
 
 class ConnectMeta(Builtin):
@@ -38,22 +38,20 @@ class ConnectMeta(Builtin):
 	def __init__(self) -> None:
 		super().__init__(
 		    ElementBuilder("builtin").setAttr("name", "connect").addConfigValue(
-		        name="source", kind="Any", contract="mandatory").addConfigValue(name="sinks...",
-		                                                                        kind="Any").setAttr("meta", "1"))
+		        name="source", symbol="Any", contract="mandatory").addConfigValue(name="sinks...",
+		                                                                          symbol="Any").setAttr("meta", "1"))
 
 
-class ComponentBase(Builtin):
+class ComponentBaseMeta(Builtin):
 
 	def __init__(self) -> None:
-		"""
-		component ComponentBase {
-		config:
-			in: bzd.IStream = platform.in;
-			out: bzd.OStream = platform.out;
-			steadyClock: bzd.SteadyClock = platform.steadyClock;
-		}
-		"""
-		pass
+		super().__init__(
+		    ElementBuilder("component").setAttr("name", "ComponentBase").addConfigValue(
+		        name="in", interface="bzd.IStream", symbol="platform.in").addConfigValue(
+		            name="out", interface="bzd.OStream",
+		            symbol="platform.out").addConfigValue(name="steadyClock",
+		                                                  interface="bzd.SteadyClock",
+		                                                  symbol="platform.steadyClock").setAttr("meta", "1"))
 
 
 # Concrete types
@@ -80,8 +78,8 @@ class Float(Builtin):
 
 	def __init__(self) -> None:
 		super().__init__(
-		    ElementBuilder("builtin").setAttr("name", "Float").addContract("float").setAttr(
-		        "parents", "Integer").addConfigValue(name="value", literal="0"))
+		    ElementBuilder("builtin").setAttr("name", "Float").addContract("float").addConfigValue(name="value",
+		                                                                                           literal="0"))
 
 	def toLiteral(self, args: typing.Dict[str, EntityExpression]) -> typing.Optional[str]:
 		return toLiteralSingleValue_(self, args)
@@ -123,33 +121,33 @@ class String(Builtin):
 class Result(Builtin):
 
 	def __init__(self) -> None:
-		super().__init__(ElementBuilder("builtin").setAttr("name", "Result").addConfigType(name="Value", kind="Any"))
+		super().__init__(ElementBuilder("builtin").setAttr("name", "Result").addConfigType(name="Value", symbol="Any"))
 
 
 class Async(Builtin):
 
 	def __init__(self) -> None:
-		super().__init__(ElementBuilder("builtin").setAttr("name", "Async").addConfigType(name="Value", kind="Any"))
+		super().__init__(ElementBuilder("builtin").setAttr("name", "Async").addConfigType(name="Value", symbol="Any"))
 
 
 class Array(Builtin):
 
 	def __init__(self) -> None:
 		super().__init__(
-		    ElementBuilder("builtin").setAttr("name", "Array").addConfigType(kind="Any",
+		    ElementBuilder("builtin").setAttr("name", "Array").addConfigType(symbol="Any",
 		                                                                     name="Type",
 		                                                                     contract="mandatory").addConfigValue(
-		                                                                         name="values...", kind="Any"))
+		                                                                         name="values...", symbol="Any"))
 
 
 class Vector(Builtin):
 
 	def __init__(self) -> None:
 		super().__init__(
-		    ElementBuilder("builtin").setAttr("name", "Vector").addConfigType(kind="Any",
+		    ElementBuilder("builtin").setAttr("name", "Vector").addConfigType(symbol="Any",
 		                                                                      name="Type",
 		                                                                      contract="mandatory").addConfigValue(
-		                                                                          name="values...", kind="Any"))
+		                                                                          name="values...", symbol="Any"))
 
 
 class Callable(Builtin):
@@ -162,6 +160,7 @@ Builtins = [
     AnyMeta(),
     ListMeta(),
     ConnectMeta(),
+    ComponentBaseMeta(),
     Void(),
     Integer(),
     Float(),

@@ -8,7 +8,7 @@ class TestRun(unittest.TestCase):
 
 	def testMethod(self) -> None:
 
-		with self.assertRaisesRegex(Exception, r"already defined"):
+		with self.assertRaisesRegex(Exception, r"duplicated"):
 			Object.fromContent(content="method hello(a = Integer(), a = Interger());")
 		Object.fromContent(content="method hello(a = Integer(), b = Interger());")
 

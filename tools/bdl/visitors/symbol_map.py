@@ -363,12 +363,9 @@ class SymbolMap:
 		"""Find a related FQN that has similar name that the one in argument."""
 
 		all_fqns = [k for k in [*self.map.keys(), *self.builtins.keys()] if not k.endswith("~")]
-		similar = []
-		for f in all_fqns:
-			if fqn in f:
-				similar.append(f)
+		similar = [f for f in all_fqns if fqn in f]
 		similar.sort()
-		return similar
+		return similar if len(similar) <= 5 else [*similar[:5], "..."]
 
 	def _terminateErrorMessageSimilarFQN(self, fqn: str) -> str:
 		"""Create a string to be added to terminate an error message."""

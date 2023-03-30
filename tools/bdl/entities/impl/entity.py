@@ -323,10 +323,15 @@ class Entity:
 		from tools.bdl.entities.impl.using import Using
 		if self.underlyingTypeFQN:
 			underlyingType = resolver.getEntityResolved(fqn=self.underlyingTypeFQN).assertValue(element=self.element)
-			return Parameters(element=underlyingType.element,
-			                  NestedElementType=Using,
-			                  nestedKind=underlyingType.configAttr,
-			                  filterFct=lambda entity: entity.category == Category.using)
+			params = Parameters(element=underlyingType.element,
+			                    NestedElementType=Using,
+			                    nestedKind=underlyingType.configAttr,
+			                    filterFct=lambda entity: entity.category == Category.using)
+			# Resolve the parameters only when used.
+			for entity in params:
+				typing.cast("Using", entity).resolveMemoized(resolver=resolver)
+			return params
+
 		return Parameters(element=self.element, NestedElementType=Using)
 
 	def markAsResolved(self) -> None:
@@ -359,18 +364,12 @@ class Entity:
 			}).validate([self], output="return")
 			self.assertTrue(condition=bool(resultValidate), message=str(resultValidate))
 
-		# Resolve the types from a config sequence if any.
 		for entity in self.configRaw:
-			if entity.category == Category.expression:
-				entity = typing.cast("Expression", entity)
-				if entity.isSymbol:
-					# Only the type of the expression should be resolved, the value cannot be evaluated
-					# as it might be malformed, this is inherent from config expressions.
-					entity.symbol.resolve(resolver=resolver)
-			elif entity.category == Category.using:
-				typing.cast("Using", entity).resolve(resolver=resolver)
-			else:
-				self.error(f"Configuration can only contain expressions or using statements, not '{entity.category}'.")
+			self.assertTrue(
+			    condition=entity.category in {Category.expression, Category.using},
+			    message=f"Configuration can only contain expressions or using statements, not '{entity.category}'.")
+			# Note, config entities are resolved only later, when used.
+			# This allow symbol discovery at a later stage, only when the element is actually instanciated.
 
 	def error(self, message: str, element: typing.Optional[Element] = None, throw: bool = True) -> str:
 		return Error.handleFromElement(element=self.element if element is None else element,
@@ -463,6 +462,12 @@ class EntityExpression(Entity):
 			element.removeAttr("name")
 		expected = EntityExpression(element=element, role=self.role)
 		return ParametersResolvedItem(param=self, expected=expected)
+
+	@property
+	def underlyingInterfaceFQN(self) -> typing.Optional[str]:
+		"""Get the underlying element interface FQN if available."""
+
+		return self.element.getAttrValue("fqn_interface")
 
 	def __repr__(self) -> str:
 

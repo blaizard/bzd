@@ -69,6 +69,12 @@ class ParametersCommon:
 		return self.list[index].entity
 
 	@property
+	def names(self) -> typing.Set[str]:
+		"""Retrieve the set of names of the various elements from the list."""
+
+		return {data.name for data in self.list if data.name is not None}
+
+	@property
 	def isNamed(self) -> typing.Optional[bool]:
 		"""
 		Wether or not a parameter pack contains named parameters or not.
@@ -95,8 +101,11 @@ class ParametersCommon:
 		entity.assertTrue(
 		    condition=not self.isVarArgs or allowMultiVarArgs,
 		    message=f"Variable arguments '{entity}' can only be present at the end of the parameter list.\n{str(self)}")
+		name = entity.name if entity.isName else None
+		entity.assertTrue(condition=(name is None) or (name not in self.names),
+		                  message=f"The name of the parameter '{name}' is duplicated.")
 		# Add the element.
-		self.list.append(Data(name=entity.name if entity.isName else None, entity=entity, **kwargs))
+		self.list.append(Data(name=name, entity=entity, **kwargs))
 		# This is about having only named or only unamed parameters. Either:
 		# (name1 = 0, name2 = 2, ...) or (0, 2, ...)
 		entity.assertTrue(
