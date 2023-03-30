@@ -10,7 +10,7 @@ class TestRun(unittest.TestCase):
 
 	def testSimple(self) -> None:
 
-		element = ElementBuilder("builtin").addConfigValue(kind="Integer", name="a").addConfigValue(kind="Integer",
+		element = ElementBuilder("builtin").addConfigValue(symbol="Integer", name="a").addConfigValue(symbol="Integer",
 		                                                                                            name="b")
 		params = Parameters(element=element, NestedElementType=Expression, nestedKind="config")
 		assert params.size() == 2
