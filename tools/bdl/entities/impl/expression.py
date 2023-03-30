@@ -93,7 +93,7 @@ class Expression(EntityExpression):
 		"""Process fragments to build a value or a symbol."""
 
 		self.assertTrue(condition=self.element.isNestedSequence("fragments"),
-		                message=f"Missing nested sequence 'fragment' for: {self.element}")
+		                message=f"Missing nested sequence 'fragments' for: {self.element}")
 
 		# Resolve all fragments
 		fragments = self.fragments

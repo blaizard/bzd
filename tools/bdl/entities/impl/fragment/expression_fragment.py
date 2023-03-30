@@ -183,7 +183,7 @@ class SymbolFragment(ExpressionFragment):
 			self.error(message=f"Cannot create an expression from '{entity.fqn}'.")
 
 	def getConfigValues(self, resolver: "Resolver") -> Parameters:
-		"""Get the list of expressions that forms the values."""
+		"""Get the list of expressions that forms the values and resolve them."""
 
 		from tools.bdl.entities.impl.expression import Expression
 		if self.underlyingTypeFQN:
@@ -199,6 +199,11 @@ class SymbolFragment(ExpressionFragment):
 				                          nestedKind=parentEntity.configAttr,
 				                          filterFct=lambda entity: entity.category == Category.expression)
 				params.extend(parentParams)
+
+			# Resolve the types from a config sequence if any.
+			# These are resolved only when used, allowing symbol to be only available during composition.
+			for entity in params:
+				typing.cast("Expression", entity).resolve(resolver=resolver)
 
 			return params
 
@@ -217,8 +222,11 @@ class SymbolFragment(ExpressionFragment):
 		parameterTypeCategories = {*parameters.getUnderlyingTypeCategories(resolver)}
 		if Category.component in parameterTypeCategories:
 			category = resolvedTypeEntity.category
-			self.assertTrue(condition=category in [Category.component, Category.method, Category.builtin],
-			                message=f"Components are not allowed for this type '{category}'.")
+			self.assertTrue(
+			    condition=category in [Category.component, Category.method, Category.builtin],
+			    message=
+			    f"{resolvedTypeEntity}: Components as parameters are not allowed for entities of category '{category}'."
+			)
 
 		# Read the validation for the values and evaluate it.
 		validation = expectedParameters.makeValidationForValues(resolver=resolver)
