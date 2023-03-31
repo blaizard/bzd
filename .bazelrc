@@ -99,7 +99,7 @@ test:esp32_xtensa_lx6_gcc --strategy=TestRunner=sandboxed
 
 # clang_tidy
 build:clang_tidy --aspects=//tools/clang_tidy:defs.bzl%clang_tidy_aspect
-build:clang_tidy --output_groups=report
+build:clang_tidy --output_groups=+report
 
 # Development and production build configuration
 build:dev -c dbg
