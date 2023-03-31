@@ -141,7 +141,7 @@ def _make_bdl_data_file(includes_per_target):
     """
     return {
         "cc": {
-            "includes": {target: sets.to_list(sets.make([f.path for f in deps])) for target, deps in includes_per_target.items()},
+            "includes": {target: sets.to_list(sets.make([f.short_path for f in deps])) for target, deps in includes_per_target.items()},
         },
     }
 

@@ -6,11 +6,18 @@ doc_library(
         ("Overview", "overview.md"),
         ("Syntax", "syntax.md"),
         ("Components", "components.md"),
-        ("Composition", "composition.md"),
+        ("Build", "build.md"),
+        ("Generators", ":generators"),
         ("Executors", "executors.md"),
         ("Gateway", "gateway.md"),
         ("System", "system.md"),
-        ("Tool", "tool.md"),
     ],
     visibility = ["//docs:__pkg__"],
+)
+
+doc_library(
+    name = "generators",
+    srcs = [
+        ("C++", "cc.md"),
+    ],
 )
