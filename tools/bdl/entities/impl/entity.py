@@ -220,9 +220,8 @@ class Entity:
 		return converted
 
 	def getEntityUnderlyingTypeResolved(self, resolver: "Resolver") -> "EntityType":
-		"""
-		Get the entity related to type after resolve.
-		"""
+		"""Get the entity related to type after resolve."""
+
 		self.assertTrue(condition=self.underlyingTypeFQN is not None, message="Underlying type is not available.")
 		assert self.underlyingTypeFQN is not None
 		entity = resolver.getEntityResolved(fqn=self.underlyingTypeFQN).assertValue(element=self.element)
@@ -312,10 +311,6 @@ class Entity:
 	@property
 	def fqn(self) -> str:
 		return self.element.getAttr("fqn").value
-
-	@property
-	def fqnToType(self) -> Symbol:
-		return Symbol(element=self.element, kind="fqn")
 
 	def getConfigTemplateTypes(self, resolver: typing.Any) -> Parameters:
 		"""Get the list of expressions that forms the template types."""
