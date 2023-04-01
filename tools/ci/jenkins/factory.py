@@ -19,7 +19,7 @@ class Jenkins(Factory):
 		return ConfigStress(runs=10)
 
 	def getConfigCoverage(self) -> typing.Optional[ConfigCoverage]:
-		return ConfigCoverage()
+		return ConfigCoverage(exclude={"cc"})
 
 	def getConfigSanitizer(self) -> typing.Optional[ConfigSanitizer]:
 		return ConfigSanitizer()

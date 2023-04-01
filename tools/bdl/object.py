@@ -118,7 +118,7 @@ class ObjectContext:
 		symbols = SymbolMap.fromSerialize(payload["symbols"])
 		return Object(context=context, symbols=symbols, tree=SymbolTree.fromSerialize(payload["tree"], symbols))
 
-	def preprocess(self, source: str, namespace: typing.Optional[str] = None) -> "Object":
+	def preprocess(self, source: str, namespace: typing.Optional[typing.List[str]] = None) -> "Object":
 		"""Preprocess a bdl file and save its output, or use the preprocessed file if present.
 
 		Args:
@@ -160,7 +160,7 @@ class Object:
 	@staticmethod
 	def _makeObject(parser: BaseParser,
 	                objectContext: ObjectContext,
-	                namespace: typing.Optional[str] = None) -> "Object":
+	                namespace: typing.Optional[typing.List[str]] = None) -> "Object":
 		"""Helper to make an object from a parser."""
 
 		data = parser.parse()

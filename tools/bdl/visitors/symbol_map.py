@@ -41,8 +41,8 @@ class Resolver:
 		return self.symbols.getEntityResolved(fqn=fqn, exclude=self.exclude)
 
 	def resolveShallowFQN(self, name: str) -> ResolveShallowFQNResult:
-		"""
-		Find the fully qualified name of a given a name and a namespace.
+		"""Find the fully qualified name of a given a name and a namespace.
+		
 		Note, name can be a partial fqn.
 		"""
 		nameFirst = FQN.toNamespace(name)[0]
@@ -51,6 +51,10 @@ class Resolver:
 			if self.this is None:
 				return ResolveShallowFQNResult.makeError("Keyword 'this' must be used in an object context.")
 			nameFirst = self.this
+
+		elif nameFirst == "target":
+			# TODO: implement
+			pass
 
 		# Look for a symbol match of the first part of the name.
 		potentialNamespace = self.namespace.copy()

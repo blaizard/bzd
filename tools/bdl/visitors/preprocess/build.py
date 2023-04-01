@@ -11,11 +11,20 @@ from tools.bdl.visitors.symbol_tree import SymbolTree
 
 class Build(Visitor[None]):
 
-	def __init__(self, objectContext: typing.Any, namespace: typing.Optional[str] = None) -> None:
+	def __init__(self, objectContext: typing.Any, namespace: typing.Optional[typing.List[str]] = None) -> None:
 		super().__init__(namespace=namespace)
 		self.objectContext = objectContext
 		self.symbols = SymbolMap()
 		self.tree = SymbolTree(symbols=self.symbols)
+
+		# Visit the namespace
+		if namespace:
+			self.symbols.insert(name=namespace[-1],
+			                    namespace=namespace[:-1],
+			                    element=NamespaceBuilder(namespace),
+			                    path=None,
+			                    group=self.group,
+			                    conflicts=True)
 
 	def visitFinal(self, result: None) -> None:
 		self.symbols.close()

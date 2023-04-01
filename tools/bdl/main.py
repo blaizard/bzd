@@ -70,7 +70,9 @@ if __name__ == "__main__":
 
 			if config.stage == "preprocess":
 
-				preprocess(source=source, namespace=config.namespace, objectContext=objectContext)
+				preprocess(source=source,
+				           namespace=config.namespace.split(".") if config.namespace else None,
+				           objectContext=objectContext)
 
 			else:
 				if config.stage == "generate":
