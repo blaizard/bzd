@@ -47,11 +47,14 @@ class ComponentBaseMeta(Builtin):
 	def __init__(self) -> None:
 		super().__init__(
 		    ElementBuilder("component").setAttr("name", "ComponentBase").addConfigValue(
-		        name="in", interface="bzd.IStream", symbol="platform.in").addConfigValue(
-		            name="out", interface="bzd.OStream",
-		            symbol="platform.out").addConfigValue(name="steadyClock",
-		                                                  interface="bzd.SteadyClock",
-		                                                  symbol="platform.steadyClock").setAttr("meta", "1"))
+		        name="in", interface="bzd.IStream",
+		        symbol="target.platform.in").addConfigValue(name="out",
+		                                                    interface="bzd.OStream",
+		                                                    symbol="target.platform.out").addConfigValue(
+		                                                        name="steadyClock",
+		                                                        interface="bzd.SteadyClock",
+		                                                        symbol="target.platform.steadyClock").setAttr(
+		                                                            "meta", "1"))
 
 
 # Concrete types

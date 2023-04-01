@@ -94,17 +94,6 @@ pipeline
 						sh "./tools/bazel test ... --config=linux_x86_64_clang --config=cc --config=sanitizer --config=tsan --platform_suffix=clang_tsan"
 					}
 				}
-				stage("[coverage] C++")
-				{
-					steps
-					{
-						lock("coverage")
-						{
-							sh "./tools/bazel coverage cc/... --config=linux_x86_64_gcc --config=cc --platform_suffix=coverage_cc && ./tools/bazel run tools/coverage --platform_suffix=coverage_cc -- --output bazel-out/coverage_cc"
-						}
-						archiveArtifacts artifacts: "bazel-out/coverage_cc/**/*", onlyIfSuccessful: true
-					}
-				}
 				stage("[coverage] NodeJs")
 				{
 					steps

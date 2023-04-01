@@ -12,9 +12,8 @@ class ElementBuilder(Element):
 		self.setAttr("category", category)
 
 	def addContract(self, contract: str) -> "ElementBuilder":
-		"""
-		Add a contract to the element.
-		"""
+		"""Add a contract to the element."""
+
 		parsed = Validation.parse(contract)
 		for kind, values in parsed.items():
 			Contract.add(element=self, kind=kind, values=values)
@@ -26,9 +25,8 @@ class ElementBuilder(Element):
 	                   name: typing.Optional[str] = None,
 	                   interface: typing.Optional[str] = None,
 	                   contract: typing.Optional[str] = None) -> "ElementBuilder":
-		"""
-		Create a configuration entry
-		"""
+		"""Create a configuration entry."""
+
 		element = ElementBuilder(category="expression")
 		if symbol is not None:
 			nested = Element().setAttr("symbol", symbol)
@@ -46,9 +44,8 @@ class ElementBuilder(Element):
 		return self
 
 	def addConfigType(self, symbol: str, name: str, contract: typing.Optional[str] = None) -> "ElementBuilder":
-		"""
-		Create a configuration entry
-		"""
+		"""Create a configuration entry."""
+
 		element = ElementBuilder(category="using").setAttr("symbol", symbol).setAttr("name", name)
 		if contract is not None:
 			element.addContract(contract)

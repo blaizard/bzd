@@ -94,7 +94,7 @@ class Visitor(VisitorBase[T, T]):
 	nestedKind = None
 
 	def __init__(self,
-	             namespace: typing.Optional[str] = None,
+	             namespace: typing.Optional[typing.List[str]] = None,
 	             elementToEntityExtenstion: typing.Optional[typing.Dict[str, typing.Type[EntityType]]] = None) -> None:
 		"""Create a visitor for the bdl grammar.
 		
@@ -110,7 +110,7 @@ class Visitor(VisitorBase[T, T]):
 
 		# Insert the initial namespace if any.
 		if namespace:
-			self.parents.append(Parent(entity=namespace.split(".")))
+			self.parents.append(Parent(entity=namespace))
 
 	@property
 	def namespace(self) -> typing.List[str]:
