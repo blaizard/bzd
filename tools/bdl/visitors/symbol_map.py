@@ -22,16 +22,25 @@ class Resolver:
 	             symbols: "SymbolMap",
 	             namespace: typing.List[str] = [],
 	             exclude: typing.Optional[typing.List[Group]] = None,
-	             this: typing.Optional[str] = None) -> None:
+	             this: typing.Optional[str] = None,
+	             target: typing.Optional[str] = None) -> None:
 		self.symbols = symbols
 		self.namespace = namespace
 		self.exclude = exclude
 		self.this = this
+		self.target = target
+
+	def make(self, namespace: typing.List[str]) -> "Resolver":
+		"""Create a new resolver with an updated namespace.
+		
+		Note: exclude and this should not be propagated, they both concern the first level resolver.
+		"""
+
+		return Resolver(symbols=self.symbols, namespace=namespace, target=self.target)
 
 	def makeFQN(self, name: str) -> str:
-		"""
-		Create an FQN out of a name.
-		"""
+		"""Create an FQN out of a name."""
+
 		return FQN.fromNamespace(name=name, namespace=self.namespace)
 
 	def getEntity(self, fqn: str) -> Result[EntityType]:
@@ -53,8 +62,9 @@ class Resolver:
 			nameFirst = self.this
 
 		elif nameFirst == "target":
-			# TODO: implement
-			pass
+			if self.target is None:
+				return ResolveShallowFQNResult.makeError("Keyword 'target' must be used in a composition context.")
+			nameFirst = self.target
 
 		# Look for a symbol match of the first part of the name.
 		potentialNamespace = self.namespace.copy()
@@ -120,6 +130,13 @@ class Resolver:
 
 		# Return the final FQN.
 		return ResolveFQNResult(fqns)
+
+	def __repr__(self) -> str:
+
+		attrs = {"namespace": self.namespace, "this": self.this, "exclude": self.exclude}
+
+		entities = ["{}=\"{}\"".format(key, value) for key, value in attrs.items() if value]
+		return "<{}/>".format(" ".join([type(self).__name__] + entities))
 
 
 class SymbolMap:

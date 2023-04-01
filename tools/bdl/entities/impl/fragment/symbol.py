@@ -57,29 +57,28 @@ class Symbol:
 			maybeValue: Set to true if the type might represent a value.
 		"""
 
+		# Make the fully qualified kind name.
 		fqns = resolver.resolveFQN(name=self.kind).assertValue(element=self.element, attr=self.kindAttr)
-
 		ElementBuilder.cast(self.element, ElementBuilder).updateAttr(self.kindAttr, ";".join(fqns))
 
 		# Resolve the templates if available
 		self.templates.resolve(resolver=resolver)
 
-		# Get and save the underlying type
-		underlying = self.getEntityResolved(resolver=resolver)
-		self.assertTrue(condition=underlying.isRoleType or maybeValue, message="This is not a valid type.")
+		# Get the symbol entity and save it as the underlying type
+		entity = self.getEntityResolved(resolver=resolver)
+		self.assertTrue(condition=entity.isRoleType or maybeValue, message="This is not a valid type.")
+
 		# Resolve the entity, this is needed only if the entity is defined after the one holding this type.
-		underlying.resolveMemoized(resolver=resolver)
+		entity.resolveMemoized(resolver=resolver.make(namespace=self.namespace))
 
 		# Save the category under {kindAttr}_category.
-		ElementBuilder.cast(self.element, ElementBuilder).setAttr(f"{self.kindAttr}_category",
-		                                                          underlying.category.value)
+		ElementBuilder.cast(self.element, ElementBuilder).setAttr(f"{self.kindAttr}_category", entity.category.value)
 
-		if self.underlyingTypeAttr is not None and underlying.underlyingTypeFQN is not None:
-			ElementBuilder.cast(self.element, ElementBuilder).setAttr(self.underlyingTypeAttr,
-			                                                          underlying.underlyingTypeFQN)
+		if self.underlyingTypeAttr is not None and entity.underlyingTypeFQN is not None:
+			ElementBuilder.cast(self.element, ElementBuilder).setAttr(self.underlyingTypeAttr, entity.underlyingTypeFQN)
 
 		# Validate template arguments
-		configTypes = underlying.getConfigTemplateTypes(resolver=resolver)
+		configTypes = entity.getConfigTemplateTypes(resolver=resolver)
 		if not configTypes:
 			self.assertTrue(condition=(not bool(self.templates)),
 			                message=f"Symbol '{self.kind}' does not support template type arguments.")
@@ -99,9 +98,9 @@ class Symbol:
 			self.assertTrue(condition=bool(result), message=str(result))
 
 		# Resolve contract
-		self.contracts.resolve(underlying.contracts)
+		self.contracts.resolve(entity.contracts)
 
-		return underlying
+		return entity
 
 	def getEntityResolved(self, resolver: "Resolver") -> "EntityType":
 		"""
@@ -173,6 +172,12 @@ class Symbol:
 	@property
 	def kinds(self) -> typing.List[str]:
 		return self.fqn.split(";")
+
+	@property
+	def namespace(self) -> typing.List[str]:
+		"""Namespace associated with this symbol."""
+
+		return self.kind.split(".")[:-1]
 
 	@property
 	def comment(self) -> typing.Optional[str]:
