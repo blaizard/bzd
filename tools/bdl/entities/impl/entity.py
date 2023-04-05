@@ -349,7 +349,8 @@ class Entity:
 		if self.isResolved:
 			return
 		self.resolve(resolver=resolver)
-		self.markAsResolved()
+		if resolver.memoize:
+			self.markAsResolved()
 
 	def resolve(self, resolver: "Resolver") -> None:
 		"""Generic validation for all entities.

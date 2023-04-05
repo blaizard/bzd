@@ -23,12 +23,14 @@ class Resolver:
 	             namespace: typing.List[str] = [],
 	             exclude: typing.Optional[typing.List[Group]] = None,
 	             this: typing.Optional[str] = None,
-	             target: typing.Optional[str] = None) -> None:
+	             target: typing.Optional[str] = None,
+				 memoize: bool = False) -> None:
 		self.symbols = symbols
 		self.namespace = namespace
 		self.exclude = exclude
 		self.this = this
 		self.target = target
+		self.memoize = memoize
 
 	def make(self, namespace: typing.List[str], this: typing.Optional[str] = None) -> "Resolver":
 		"""Create a new resolver with an updated namespace.
@@ -36,7 +38,7 @@ class Resolver:
 		Note: exclude and this should not be propagated, they both concern the first level resolver.
 		"""
 
-		return Resolver(symbols=self.symbols, namespace=namespace, this=this, target=self.target)
+		return Resolver(symbols=self.symbols, namespace=namespace, this=this, target=self.target, memoize=self.memoize)
 
 	def makeFQN(self, name: str) -> str:
 		"""Create an FQN out of a name."""
