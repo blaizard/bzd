@@ -32,7 +32,7 @@ class Namespace(Entity):
 		super().__init__(element, Role.Type)
 		Error.assertHasSequence(element=element, sequence="name")
 
-	@cached_property
+	@property
 	def nameList(self) -> typing.List[str]:
 		sequence = self.element.getNestedSequence("name")
 		assert sequence is not None

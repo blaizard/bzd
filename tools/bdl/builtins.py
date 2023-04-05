@@ -42,6 +42,14 @@ class ConnectMeta(Builtin):
 		                                                                          symbol="Any").setAttr("meta", "1"))
 
 
+class BindMeta(Builtin):
+
+	def __init__(self) -> None:
+		super().__init__(
+		    ElementBuilder("builtin").setAttr("name", "bind").addConfigValue(name="symbols...",
+		                                                                     symbol="Any").setAttr("meta", "1"))
+
+
 class ComponentBaseMeta(Builtin):
 
 	def __init__(self) -> None:
@@ -163,6 +171,7 @@ Builtins = [
     AnyMeta(),
     ListMeta(),
     ConnectMeta(),
+    BindMeta(),
     ComponentBaseMeta(),
     Void(),
     Integer(),

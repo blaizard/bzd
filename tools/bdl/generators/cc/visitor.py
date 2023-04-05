@@ -79,7 +79,7 @@ class Transform:
 		return symbolToStrOriginal(symbol=symbol)
 
 	def symbolToNameStr(self, symbol: Symbol) -> str:
-		split = symbol.fqn.split(";")
+		split = symbol.kinds
 		fqn = [split[0]] + [fqn.split(".")[-1] for fqn in split[1:]]
 		return fqnToNameStrOriginal(".".join(fqn))
 

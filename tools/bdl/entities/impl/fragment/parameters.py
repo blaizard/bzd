@@ -4,7 +4,7 @@ from functools import cached_property
 from dataclasses import dataclass
 
 from bzd.parser.element import Element, Sequence, ElementBuilder, SequenceBuilder
-from bzd.parser.error import Error
+from bzd.parser.error import Error, AssertionResult
 
 from tools.bdl.contracts.validation import Validation, SchemaDict
 from tools.bdl.entities.impl.types import Category
@@ -175,9 +175,8 @@ class ParametersCommon:
 
 	@property
 	def dependencies(self) -> typing.Set[str]:
-		"""
-		Output the dependency list for this entity.
-		"""
+		"""Output the dependency list for this entity."""
+
 		dependencies = set()
 		for param in self:
 			dependencies.update(param.dependencies)
@@ -188,7 +187,7 @@ class ParametersCommon:
 
 		schema: typing.Dict[str, str] = {}
 		for key, expression in self.items(includeVarArgs=True):
-			keyStr = "*" if expression.isVarArgs else str(key)
+			keyStr = "*" if expression.isVarArgs else str(key.index if forTemplate else key)
 			maybeContracts = expression.contracts.validationForTemplate if forTemplate else expression.contracts.validationForValue
 			schema[keyStr] = maybeContracts if maybeContracts is not None else ""
 			# Add that template argument must be part of the given type.
@@ -221,7 +220,7 @@ class ParametersCommon:
 			content.append("{}: {}".format(str(key), str(metadata)))
 		return "\n".join(content)
 
-	def error(self, message: str, element: typing.Optional[Element] = None, throw: bool = True) -> str:
+	def error(self, message: str, element: typing.Optional[Element] = None, throw: bool = True) -> AssertionResult:
 		return Error.handleFromElement(element=self.element if element is None else element,
 		                               message=message,
 		                               throw=throw)
@@ -230,7 +229,7 @@ class ParametersCommon:
 	               condition: bool,
 	               message: str,
 	               element: typing.Optional[Element] = None,
-	               throw: bool = True) -> typing.Optional[str]:
+	               throw: bool = True) -> AssertionResult:
 		return Error.assertTrue(condition=condition,
 		                        element=self.element if element is None else element,
 		                        message=message,

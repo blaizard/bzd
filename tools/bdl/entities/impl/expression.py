@@ -17,7 +17,7 @@ from tools.bdl.entities.impl.types import Category
 from tools.bdl.entities.impl.fragment.expression_fragment import ExpressionFragment, OperatorFragment
 
 if typing.TYPE_CHECKING:
-	from tools.bdl.visitors.symbol_map import Resolver
+	from tools.bdl.visitors.symbol_map import Resolver, SymbolMap
 
 
 class Expression(EntityExpression):
@@ -46,7 +46,7 @@ class Expression(EntityExpression):
 		#self.assertTrue(condition=(self.isValue or self.isSymbol),
 		#	message="Expression must represent a symbol or a value.")
 
-	@cached_property
+	@property
 	def typeResolved(self) -> Symbol:
 		return Symbol(element=self.element,
 		              kind="symbol",
@@ -59,12 +59,12 @@ class Expression(EntityExpression):
 	def isInterfaceType(self) -> bool:
 		return self.element.isAttr("interface") and bool(self.element.getAttr("interface").value)
 
-	@cached_property
+	@property
 	def interfaceType(self) -> Symbol:
 		return Symbol(element=self.element, kind="interface", underlyingTypeFQN="fqn_interface",
 		              const="const") if self.isInterfaceType else self.symbol
 
-	@cached_property
+	@property
 	def interfaceTypeResolved(self) -> Symbol:
 		return Symbol(element=self.element, kind="interface", underlyingTypeFQN="fqn_interface",
 		              const="const") if self.isInterfaceType else self.typeResolved
@@ -77,17 +77,25 @@ class Expression(EntityExpression):
 
 	@property
 	def dependencies(self) -> typing.Set[str]:
-		"""
-		Output the dependency list for this entity.
-		"""
+		"""Output the dependency list for this entity."""
+
 		dependencies = set()
 		if self.isSymbol:
 			dependencies.update(self.symbol.dependencies)
-		if self.isParameters:
-			assert self.parameters is not None
-			dependencies.update(self.parameters.dependencies)
+			dependencies.update(self.parametersResolved.dependencies)
 
 		return dependencies
+
+	@property
+	def this(self) -> typing.Optional[str]:
+		"""Get the fqn of 'this' from this expression if available."""
+
+		return self.symbol.this if self.isSymbol and self.symbol.isThis else None
+
+	def makeResolver(self, symbols: "SymbolMap") -> "Resolver":
+		"""Create a resolver for this expression."""
+
+		return symbols.makeResolver(namespace=self.namespace, this=self.this)
 
 	def resolveFragments(self, resolver: "Resolver") -> None:
 		"""Process fragments to build a value or a symbol."""
@@ -149,7 +157,11 @@ class Expression(EntityExpression):
 		# TODO: If mark as "mandatory", remove the default value.
 
 	def resolve(self, resolver: "Resolver") -> None:
-		"""Resolve entities."""
+		"""Resolve entities.
+		
+		Args:
+			- resolver: The resolver to be used.
+		"""
 
 		# Resolve the interface associated with this expression.
 		if self.isInterfaceType:
@@ -167,6 +179,7 @@ class Expression(EntityExpression):
 
 			# Set the executor.
 			executorContract = self.contracts.get("executor")
+
 			if executorContract is not None:
 				if self.symbol.isThis:
 					this = self.symbol.getThisResolved(resolver=resolver)
@@ -198,8 +211,8 @@ class Expression(EntityExpression):
 			result = validation.validate([self], output="return")
 			self.assertTrue(condition=bool(result), message=str(result))
 
-	@cached_property
-	def parameters(self) -> typing.Optional[Parameters]:
+	@property
+	def parameters(self) -> Parameters:
 		"""
 		Return the Parameters object if there are parameters. In case the expression
 		is declared with empty parenthesis or without the Parameters object will be empty.
@@ -208,7 +221,7 @@ class Expression(EntityExpression):
 			return Parameters(element=self.element, NestedElementType=Expression, nestedKind="argument")
 		return Parameters(element=self.element, NestedElementType=Expression)
 
-	@cached_property
+	@property
 	def parametersResolved(self) -> ParametersResolved:
 		return ParametersResolved(element=self.element,
 		                          NestedElementType=Expression,

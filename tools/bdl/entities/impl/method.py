@@ -35,7 +35,7 @@ class Method(Entity):
 	def isSymbol(self) -> bool:
 		return self.element.isAttr("symbol")
 
-	@cached_property
+	@property
 	def symbol(self) -> typing.Optional[Symbol]:
 		return Symbol(element=self.element,
 		              kind="symbol",
@@ -64,7 +64,7 @@ class Method(Entity):
 
 		super().resolve(resolver)
 
-	@cached_property
+	@property
 	def parameters(self) -> Parameters:
 		return Parameters(element=self.element, NestedElementType=Expression, nestedKind="argument")
 

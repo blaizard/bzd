@@ -15,7 +15,7 @@ class EnumValue(Entity):
 		super().__init__(element, Role.Value)
 		Error.assertHasAttr(element=element, attr="name")
 
-	@cached_property
+	@property
 	def comment(self) -> typing.Optional[str]:
 		return self.element.getAttrValue("comment")
 
@@ -55,7 +55,7 @@ class Enum(Entity):
 		self._setUnderlyingTypeFQN(self.fqn)
 		super().resolve(resolver)
 
-	@cached_property
+	@property
 	def values(self) -> typing.Iterable[EnumValue]:
 		sequence = self.element.getNestedSequence("values")
 		assert sequence is not None

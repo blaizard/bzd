@@ -44,7 +44,8 @@ class ExpressionFragment(EntityExpression):
 
 		# Copy attributes.
 		elementBuilder = ElementBuilder.cast(element, ElementBuilder)
-		for attr in ("symbol", "value", "symbol_category", "meta", "literal", "const", "fqn_type", "fqn_value"):
+		for attr in ("symbol", "value", "symbol_category", "symbol_resolved", "meta", "literal", "const", "fqn_type",
+		             "fqn_value"):
 			if self.element.isAttr(attr):
 				elementBuilder.setAttr(attr, self.element.getAttr(attr).value)
 
@@ -138,7 +139,7 @@ class RegexprFragment(ExpressionFragment):
 
 class SymbolFragment(ExpressionFragment):
 
-	@cached_property
+	@property
 	def parameters(self) -> typing.Optional[Parameters]:
 		"""
 		Return the Parameters object if there are parameters. In case the expression
@@ -161,7 +162,7 @@ class SymbolFragment(ExpressionFragment):
 			# It means it refers directly to the entity, in that case it must have a value FQN
 			if entity.underlyingValueFQN is None:
 				self.assertTrue(condition=entity.isFQN, message="A value referenced must have an valid FQN.")
-				self._setUnderlyingValueFQN(self.symbol.fqn)
+				self._setUnderlyingValueFQN(str(self.symbol))
 			else:
 				self._setUnderlyingValueFQN(entity.underlyingValueFQN)
 
@@ -198,12 +199,11 @@ class SymbolFragment(ExpressionFragment):
 				                          NestedElementType=Expression,
 				                          nestedKind=parentEntity.configAttr,
 				                          filterFct=lambda entity: entity.category == Category.expression)
+				# Resolve the types from a config sequence if any.
+				# These are resolved only when used, allowing symbol to be only available during composition.
+				for entity in parentParams:
+					typing.cast("Expression", entity).resolve(resolver=resolver.make(namespace=parentEntity.namespace))
 				params.extend(parentParams)
-
-			# Resolve the types from a config sequence if any.
-			# These are resolved only when used, allowing symbol to be only available during composition.
-			for entity in params:
-				typing.cast("Expression", entity).resolve(resolver=resolver)
 
 			return params
 

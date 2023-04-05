@@ -19,11 +19,13 @@ interface:
 }
 
 composition {
-	emitter = Emitter() [executor(hpc.executor)];
+	emitter = Emitter();
 	emitter.generate();
-	poller = Poller() [executor(esp32.executor)];
+	poller = Poller();
 	poller.poll();
 	connect(emitter.send, poller.receive);
+	bind(emitter) [executor(hpc.executor)];
+	bind(poller) [executor(esp32.executor)];
 	
 }
 

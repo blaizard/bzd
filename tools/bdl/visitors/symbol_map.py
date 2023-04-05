@@ -30,13 +30,13 @@ class Resolver:
 		self.this = this
 		self.target = target
 
-	def make(self, namespace: typing.List[str]) -> "Resolver":
+	def make(self, namespace: typing.List[str], this: typing.Optional[str] = None) -> "Resolver":
 		"""Create a new resolver with an updated namespace.
 		
 		Note: exclude and this should not be propagated, they both concern the first level resolver.
 		"""
 
-		return Resolver(symbols=self.symbols, namespace=namespace, target=self.target)
+		return Resolver(symbols=self.symbols, namespace=namespace, this=this, target=self.target)
 
 	def makeFQN(self, name: str) -> str:
 		"""Create an FQN out of a name."""
@@ -47,6 +47,8 @@ class Resolver:
 		return self.symbols.getEntity(fqn=fqn, exclude=self.exclude)
 
 	def getEntityResolved(self, fqn: str) -> Result[EntityType]:
+		if fqn.startswith("target."):
+			return self.symbols.getEntityResolved(fqn="Any")
 		return self.symbols.getEntityResolved(fqn=fqn, exclude=self.exclude)
 
 	def resolveShallowFQN(self, name: str) -> ResolveShallowFQNResult:
@@ -63,7 +65,7 @@ class Resolver:
 
 		elif nameFirst == "target":
 			if self.target is None:
-				return ResolveShallowFQNResult.makeError("Keyword 'target' must be used in a composition context.")
+				return ResolveShallowFQNResult((name, []))
 			nameFirst = self.target
 
 		# Look for a symbol match of the first part of the name.
@@ -279,11 +281,8 @@ class SymbolMap:
 
 	@staticmethod
 	def errorSymbolConflict_(fqn: str, element1: Element, element2: Element) -> None:
-		message = Error.handleFromElement(element=element1,
-		                                  message=f"Symbol name '{fqn}' is in conflict...",
-		                                  throw=False)
-		message += Error.handleFromElement(element=element2, message="...with this one.", throw=False)
-		raise Exception(message)
+		Error.handleFromElement(element=element1, message=f"Symbol name '{fqn}' is in conflict...",
+		                        throw=False).extend(element=element2, message="...with this one.")
 
 	def update(self, symbols: "SymbolMap") -> None:
 		"""Register multiple symbols.

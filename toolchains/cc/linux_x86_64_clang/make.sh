@@ -2,7 +2,7 @@
 
 set -e
 
-VERSION=15.0.6
+VERSION=16.0.0
 HOST=linux_x86_64
 PACKAGE=${HOST}_${VERSION}
 

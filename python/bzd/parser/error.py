@@ -32,6 +32,33 @@ class ExceptionParser(Exception):
 		super().__init__(message)
 
 
+class AssertionResult:
+	"""Type returned by an assertion."""
+
+	def __init__(self, message: typing.Optional[str] = None) -> None:
+		self.message = message
+
+	def __bool__(self) -> bool:
+		return isinstance(self.message, str)
+
+	def extend(self,
+	           element: Element,
+	           message: str,
+	           attr: typing.Optional[str] = None,
+	           throw: bool = True) -> "AssertionResult":
+		"""Extend an assertion message if any."""
+
+		if bool(self):
+			self.message += Error.toStringFromElement(element=element, attr=attr, message=message)  # type: ignore
+			if throw:
+				raise ExceptionParser(message=self.message)
+
+		return self
+
+	def __str__(self) -> str:
+		return self.message if bool(self) else ""  # type: ignore
+
+
 class Error:
 	"""
 	Handle errors.
@@ -118,28 +145,28 @@ class Error:
 	def handleFromElement(element: Element,
 	                      attr: typing.Optional[str] = None,
 	                      message: str = "Error",
-	                      throw: bool = True) -> str:
+	                      throw: bool = True) -> AssertionResult:
 		message = Error.toStringFromElement(element=element, attr=attr, message=message)
 		if throw:
 			raise ExceptionParser(message=message)
-		return message
+		return AssertionResult(message)
 
 	@staticmethod
 	def assertTrue(element: Element,
 	               condition: bool,
 	               message: str,
 	               attr: typing.Optional[str] = None,
-	               throw: bool = True) -> typing.Optional[str]:
+	               throw: bool = True) -> AssertionResult:
 		"""
 		Ensures a specific condition evaluates to True.
 		"""
 
 		if not condition:
 			return Error.handleFromElement(element=element, attr=attr, message=message, throw=throw)
-		return None
+		return AssertionResult()
 
 	@staticmethod
-	def assertHasAttr(element: Element, attr: str, throw: bool = True) -> typing.Optional[str]:
+	def assertHasAttr(element: Element, attr: str, throw: bool = True) -> AssertionResult:
 		"""
 		Ensures an element has a specific attribute.
 		"""
@@ -149,10 +176,10 @@ class Error:
 			                               attr=None,
 			                               message="Mising mandatory attribute '{}'.".format(attr),
 			                               throw=throw)
-		return None
+		return AssertionResult()
 
 	@staticmethod
-	def assertHasSequence(element: Element, sequence: str, throw: bool = True) -> typing.Optional[str]:
+	def assertHasSequence(element: Element, sequence: str, throw: bool = True) -> AssertionResult:
 		"""
 		Ensures an element has a specific sequence.
 		"""
@@ -162,4 +189,4 @@ class Error:
 			                               attr=None,
 			                               message="Mising mandatory sequence '{}'.".format(sequence),
 			                               throw=throw)
-		return None
+		return AssertionResult()

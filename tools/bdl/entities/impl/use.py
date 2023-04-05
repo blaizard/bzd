@@ -20,7 +20,7 @@ class Use(Entity):
 		super().__init__(element, Role.Meta)
 		Error.assertHasAttr(element=element, attr="value")
 
-	@cached_property
+	@property
 	def path(self) -> Path:
 		return Path(self.element.getAttr("value").value)
 

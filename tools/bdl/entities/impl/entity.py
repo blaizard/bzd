@@ -4,7 +4,7 @@ import copy
 from functools import cached_property
 
 from bzd.parser.element import Element, ElementBuilder
-from bzd.parser.error import Error
+from bzd.parser.error import Error, AssertionResult
 
 from tools.bdl.contracts.validation import Validation, SchemaDict
 from tools.bdl.entities.impl.fragment.contract import Contracts
@@ -340,16 +340,23 @@ class Entity:
 		return self.element.getAttrValue("resolved") == "1"
 
 	def resolveMemoized(self, resolver: "Resolver") -> None:
+		"""Resolve the current symbol.
+		
+		Args:
+			- resolver: The resolver for this entity.
 		"""
-		Resolve the current symbol.
-		"""
+
 		if self.isResolved:
 			return
 		self.resolve(resolver=resolver)
 		self.markAsResolved()
 
 	def resolve(self, resolver: "Resolver") -> None:
-		"""Generic validation for all entities."""
+		"""Generic validation for all entities.
+		
+		Args:
+			- resolver: The resolver for this entity.
+		"""
 
 		# Validate the contracts.
 		maybeSchema = self.contracts.validationForEntity
@@ -366,7 +373,7 @@ class Entity:
 			# Note, config entities are resolved only later, when used.
 			# This allow symbol discovery at a later stage, only when the element is actually instanciated.
 
-	def error(self, message: str, element: typing.Optional[Element] = None, throw: bool = True) -> str:
+	def error(self, message: str, element: typing.Optional[Element] = None, throw: bool = True) -> AssertionResult:
 		return Error.handleFromElement(element=self.element if element is None else element,
 		                               message=message,
 		                               throw=throw)
@@ -375,7 +382,7 @@ class Entity:
 	               condition: bool,
 	               message: str,
 	               element: typing.Optional[Element] = None,
-	               throw: bool = True) -> typing.Optional[str]:
+	               throw: bool = True) -> AssertionResult:
 		return Error.assertTrue(condition=condition,
 		                        element=self.element if element is None else element,
 		                        message=message,
@@ -410,7 +417,7 @@ class EntityExpression(Entity):
 	def isSymbol(self) -> bool:
 		return self.element.isAttr("symbol")
 
-	@cached_property
+	@property
 	def symbol(self) -> Symbol:
 		return Symbol(element=self.element,
 		              kind="symbol",
@@ -426,7 +433,7 @@ class EntityExpression(Entity):
 	def value(self) -> str:
 		return self.element.getAttr("value").value
 
-	@cached_property
+	@property
 	def isParameters(self) -> bool:
 		return self.element.isNestedSequence("argument")
 

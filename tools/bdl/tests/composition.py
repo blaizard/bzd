@@ -218,6 +218,29 @@ class TestRun(unittest.TestCase):
 		                                 objectContext=ObjectContext(resolve=True))
 		Composition().visit(composition).process()
 
+	def testCompositionThisMulti(self) -> None:
+
+		composition = Object.fromContent(content="""
+			component MyComponent {
+			interface:
+				method run();
+
+			composition:
+				this.run();
+			}
+
+			composition {
+				component1 = MyComponent();
+				component1.run();
+				component2 = MyComponent();
+				component2.run();
+				component3 = MyComponent();
+				component3.run();
+			}
+			""",
+		                                 objectContext=ObjectContext(resolve=True))
+		Composition().visit(composition).process()
+
 
 if __name__ == '__main__':
 	unittest.main()
