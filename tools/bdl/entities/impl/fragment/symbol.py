@@ -3,7 +3,7 @@ from functools import cached_property
 
 from bzd.parser.element import Element, Sequence, ElementBuilder, SequenceBuilder
 from bzd.parser.visitor import VisitorDepthFirst as VisitorDepthFirstBase
-from bzd.parser.error import Error
+from bzd.parser.error import Error, AssertionResult
 
 from tools.bdl.entities.impl.fragment.contract import Contracts
 from tools.bdl.entities.impl.fragment.parameters import Parameters
@@ -54,12 +54,12 @@ class Symbol:
 		"""Resolve the types and nested templates by updating their symbol to fqn.
 
 		Args:
-			maybeValue: Set to true if the type might represent a value.
+			- maybeValue: Set to true if the type might represent a value.
 		"""
 
 		# Make the fully qualified kind name.
-		fqns = resolver.resolveFQN(name=self.kind).assertValue(element=self.element, attr=self.kindAttr)
-		ElementBuilder.cast(self.element, ElementBuilder).updateAttr(self.kindAttr, ";".join(fqns))
+		fqns = resolver.resolveFQN(name=self.fqn).assertValue(element=self.element, attr=self.kindAttr)
+		ElementBuilder.cast(self.element, ElementBuilder).setAttr(f"{self.kindAttr}_resolved", ";".join(fqns))
 
 		# Resolve the templates if available
 		self.templates.resolve(resolver=resolver)
@@ -68,7 +68,9 @@ class Symbol:
 		entity = self.getEntityResolved(resolver=resolver)
 		self.assertTrue(condition=entity.isRoleType or maybeValue, message="This is not a valid type.")
 
-		# Resolve the entity, this is needed only if the entity is defined after the one holding this type.
+		# Resolve the entity, this is needed if the entity is not discovered yet.
+		# It might happens for entities that are defined in a config section for example, which are only
+		# resolved when used.
 		entity.resolveMemoized(resolver=resolver.make(namespace=self.namespace))
 
 		# Save the category under {kindAttr}_category.
@@ -106,7 +108,7 @@ class Symbol:
 		"""
 		Get the entity related to type after resolve.
 		"""
-		return resolver.getEntity(fqn=self.kind).assertValue(element=self.element, attr=self.kindAttr)
+		return resolver.getEntityResolved(fqn=self.kind).assertValue(element=self.element, attr=self.kindAttr)
 
 	def getEntityUnderlyingTypeResolved(self, resolver: "Resolver") -> "EntityType":
 		self.assertTrue(condition=self.underlyingTypeFQN is not None,
@@ -131,12 +133,12 @@ class Symbol:
 	def isTemplate(self) -> bool:
 		return bool(self.templates)
 
-	@cached_property
+	@property
 	def templates(self) -> "Parameters":
 		from tools.bdl.entities.impl.using import Using
 		return Parameters(element=self.element, NestedElementType=Using, nestedKind=self.templateAttr)
 
-	@cached_property
+	@property
 	def templateResolved(self) -> ParametersResolved:
 		from tools.bdl.entities.impl.using import Using
 		return ParametersResolved(element=self.element,
@@ -171,7 +173,8 @@ class Symbol:
 
 	@property
 	def kinds(self) -> typing.List[str]:
-		return self.fqn.split(";")
+		return self.element.getAttr(f"{self.kindAttr}_resolved").value.split(";") if self.element.isAttr(
+		    f"{self.kindAttr}_resolved") else [self.fqn]
 
 	@property
 	def namespace(self) -> typing.List[str]:
@@ -183,7 +186,7 @@ class Symbol:
 	def comment(self) -> typing.Optional[str]:
 		return self.element.getAttrValue("comment")
 
-	@cached_property
+	@property
 	def name(self) -> str:
 		return Visitor(symbol=self).result
 
@@ -204,10 +207,10 @@ class Symbol:
 
 		return False
 
-	def error(self, message: str, throw: bool = True) -> str:
+	def error(self, message: str, throw: bool = True) -> AssertionResult:
 		return Error.handleFromElement(element=self.element, attr=self.kindAttr, message=message, throw=throw)
 
-	def assertTrue(self, condition: bool, message: str, throw: bool = True) -> typing.Optional[str]:
+	def assertTrue(self, condition: bool, message: str, throw: bool = True) -> AssertionResult:
 		return Error.assertTrue(condition=condition,
 		                        element=self.element,
 		                        attr=self.kindAttr,

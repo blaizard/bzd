@@ -1,7 +1,7 @@
 import typing
 
 from bzd.parser.element import Element
-from bzd.parser.error import Error
+from bzd.parser.error import Error, AssertionResult
 
 if typing.TYPE_CHECKING:
 	from tools.bdl.entities.impl.entity import EntityExpression
@@ -46,7 +46,7 @@ class ParametersResolvedItem:
 	def isLValue(self) -> bool:
 		return self.param.isLValue
 
-	def error(self, message: str, element: typing.Optional[Element] = None, throw: bool = True) -> str:
+	def error(self, message: str, element: typing.Optional[Element] = None, throw: bool = True) -> AssertionResult:
 		return Error.handleFromElement(element=self.param.element if element is None else element,
 		                               message=message,
 		                               throw=throw)
@@ -55,7 +55,7 @@ class ParametersResolvedItem:
 	               condition: bool,
 	               message: str,
 	               element: typing.Optional[Element] = None,
-	               throw: bool = True) -> typing.Optional[str]:
+	               throw: bool = True) -> AssertionResult:
 		return Error.assertTrue(condition=condition,
 		                        element=self.param.element if element is None else element,
 		                        message=message,
@@ -82,6 +82,15 @@ class ParametersResolved:
 			self.list.append(ParametersResolvedItem(NestedElementType(paramElement),
 			                                        NestedElementType(expectedElement)))
 
+	@property
+	def dependencies(self) -> typing.Set[str]:
+		"""Output the dependency list for this entity."""
+
+		dependencies = set()
+		for param in self:
+			dependencies.update(param.param.dependencies)
+		return dependencies
+
 	def __iter__(self) -> typing.Iterator[ParametersResolvedItem]:
 		for parameter in self.list:
 			yield parameter
@@ -101,7 +110,7 @@ class ParametersResolved:
 	def size(self) -> int:
 		return len(self.list)
 
-	def error(self, message: str, element: typing.Optional[Element] = None, throw: bool = True) -> str:
+	def error(self, message: str, element: typing.Optional[Element] = None, throw: bool = True) -> AssertionResult:
 		return Error.handleFromElement(element=self.element if element is None else element,
 		                               message=message,
 		                               throw=throw)
@@ -110,7 +119,7 @@ class ParametersResolved:
 	               condition: bool,
 	               message: str,
 	               element: typing.Optional[Element] = None,
-	               throw: bool = True) -> typing.Optional[str]:
+	               throw: bool = True) -> AssertionResult:
 		return Error.assertTrue(condition=condition,
 		                        element=self.element if element is None else element,
 		                        message=message,

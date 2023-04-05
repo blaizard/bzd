@@ -45,7 +45,7 @@ class Nested(Entity):
 	def hasInheritance(self) -> bool:
 		return self.element.isNestedSequence("inheritance")
 
-	@cached_property
+	@property
 	def inheritanceList(self) -> typing.List[Symbol]:
 		inheritanceList: typing.List[Symbol] = []
 		for element in self.element.getNestedSequenceOrEmpty("inheritance"):

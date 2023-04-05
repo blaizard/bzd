@@ -33,7 +33,7 @@
             "name": "storage.modifier.const"
         },
         {
-            "match": "(list|Any|connect)",
+            "match": "(list|Any|connect|bind)",
             "name": "support.type"
         },
         {

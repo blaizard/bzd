@@ -117,7 +117,7 @@ class Components:
 		if expression.isName:
 			identifier = expression.fqn
 		else:
-			identifier = expression.symbol.fqn
+			identifier = str(expression.symbol)
 		return identifier
 
 	def resolve(self) -> None:
@@ -184,7 +184,9 @@ class Components:
 			if self.map[identifier].entryType == entryType:
 				expression.assertTrue(
 				    condition=(self.map[identifier].expression == expression),
-				    message=f"This expression already exits and cannot be redeclared as the same role: '{entryType}'.")
+				    message=
+				    f"This expression already exits and cannot be redeclared as the same role: '{entryType}', identifier: {identifier}."
+				)
 				return None
 			if isOverwritable(entryType, self.map[identifier].entryType):
 				return None

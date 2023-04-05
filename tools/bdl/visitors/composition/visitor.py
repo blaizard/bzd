@@ -113,7 +113,7 @@ class Composition:
 		# All targets available, an empty set if there are no target for this composition.
 		self.targets = targets if targets else set()
 		self.symbols = SymbolMap()
-		self.entities = Entities(symbols=self.symbols)
+		self.entities = Entities(symbols=self.symbols, targets=self.targets)
 		# Unique identifiers
 		self.uids: typing.Dict[str, int] = {}
 		# All top level expressions
@@ -169,9 +169,7 @@ class Composition:
 		    if isinstance(entity, Expression)
 		]
 
-		for entity in compositionEntities:
-			self.entities.add(entity)
-		self.entities.close()
+		self.entities.process(compositionEntities)
 
 		# Applications are all intra expressions that are instanciated at top level
 		for executorFQN in self.entities.executors:

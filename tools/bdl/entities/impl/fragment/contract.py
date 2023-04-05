@@ -32,6 +32,17 @@ class Contracts:
 				return True
 		return False
 
+	def assertOnly(self, kinds: typing.Set[str]) -> None:
+		"""Assert that only the contract kinds passed into argument are available in this one."""
+
+		for contract in self:
+			Error.assertTrue(
+			    condition=contract.type in kinds,
+			    element=self.element,
+			    message=
+			    f"The contract type '{contract.type}' is not allowed for this entity, only the following(s) are supported: {', '.join(kinds)}."
+			)
+
 	@property
 	def validationForAll(self) -> typing.Optional[str]:
 		"""
@@ -98,7 +109,9 @@ class Contracts:
 				try:
 					contract = contractTraits.resolveConflict(base=contract, derived=existing)
 				except Exception as e:
-					Error.handleFromElement(element=self.element, message=str(e))
+					Error.handleFromElement(element=self.element, message=str(e),
+					                        throw=False).extend(element=contracts.element,
+					                                            message="Base contract is here.")
 				# Remove the existing contract if resolved into a new contract
 				if contract is not None:
 					self.remove(contract.type)

@@ -20,24 +20,36 @@ class Entities:
 
 	defaultExecutorName_ = "~defaultExecutor"
 
-	def __init__(self, symbols: SymbolMap) -> None:
+	def __init__(self, symbols: SymbolMap, targets: typing.Set[str]) -> None:
 		self.symbols = symbols
 		# Map of all available components and their dependencies.
 		self.expressions = Components()
 		# Map of all available connections.
 		self.connections = Connections(self.symbols)
+		# The targets of this system.
+		self.targets = targets
 
-	def processMeta(self, expression: Expression) -> None:
+	def processMeta(self, expression: Expression, fqns: typing.Optional[typing.Set[str]] = None) -> None:
 		"""Process a meta expression, a special function from the language."""
 
 		expression.assertTrue(condition=expression.isSymbol, message=f"Meta expressions must have a symbol.")
 		if expression.symbol.fqn == "connect":
 			arguments = []
-			for argument in expression.parametersResolved:
-				self.add(argument.param, isDep=True)
-				arguments.append(argument.param)
+			for paramResolved in expression.parametersResolved:
+				self.addDependency(paramResolved.param, executor=None)
+				arguments.append(paramResolved.param)
 
 			self.connections.add(*arguments)
+
+		elif expression.symbol.fqn == "bind":
+
+			assert fqns is not None, "FQNs must be set with bind."
+			expression.contracts.assertOnly({"executor"})
+			for param in expression.parameters:
+				identifiers = set(param.regexpr.match(fqns) if param.isRegexpr else [str(param.symbol)])
+				for fqn in identifiers:
+					entity = self.symbols.getEntityResolved(fqn=fqn).assertValue(element=expression.element)
+					entity.contracts.resolve(expression.contracts)
 
 		else:
 			expression.error(message="Unsupported meta expression.")
@@ -159,6 +171,50 @@ class Entities:
 	def getServicesByExecutor(self, fqn: str) -> typing.Iterable[Expression]:
 		return [entry.expression for entry in self.services if fqn in entry.executors]
 
+	def process(self, expressions: typing.Iterable[Entity]) -> None:
+
+		remaining: typing.List[Expression] = []
+
+		# Create a set of available fqns. This describes only the expressions that have a name,
+		# so at declaration time.
+		fqns = {entity.fqn for entity in expressions if entity.isFQN and entity.isName}
+
+		# First stage.
+		for entity in expressions:
+
+			entity.assertTrue(condition=isinstance(entity, Expression),
+			                  message="Only expressions can be added to the composition.")
+			expression = typing.cast(Expression, entity)
+
+			# Resolve all the expressions, this will ignore 'target.*' fqns.
+			expression.resolve(resolver=expression.makeResolver(symbols=self.symbols))
+
+			# Select elements that are part of the first stage.
+			if expression.isSymbol and str(expression.symbol) == "bind":
+				self.processMeta(expression=expression, fqns=fqns)
+			else:
+				remaining.append(expression)
+
+		# Second stage.
+		for expression in remaining:
+			expression.resolve(resolver=expression.makeResolver(symbols=self.symbols))
+			self.add(entity=expression)
+
+		# Final stage.
+		self.close()
+
+	def addDependency(self, entity: Entity, executor: typing.Optional[str]) -> None:
+
+		if entity.isFQN:
+			self.add(entity=entity, isDep=True, executor=executor)
+		else:
+			# If the entity does not have a fqn (hence a namespace), process its dependencies.
+			# This is the case for parameters for example.
+			for fqn in entity.dependencies:
+				dependency = self.symbols.getEntityResolved(fqn=fqn).value
+				if isinstance(dependency, Expression):
+					self.addDependency(dependency, executor=executor)
+
 	def add(self, entity: Entity, isDep: bool = False, executor: typing.Optional[str] = None) -> None:
 		"""Add a new entity."""
 
@@ -166,16 +222,8 @@ class Entities:
 		                  message="Only expressions can be added to the composition.")
 		expression = typing.cast(Expression, entity)
 
-		# If the entity does not have a fqn (hence a namespace), process its dependencies.
-		if not expression.isFQN:
-			for fqn in expression.dependencies:
-				dep = self.symbols.getEntityResolved(fqn=fqn).value
-				if isinstance(dep, Expression):
-					self.add(dep, isDep=True)
-			return
-
 		# Resolve the entity against its namespace.
-		resolver = self.symbols.makeResolver(namespace=expression.namespace)
+		resolver = expression.makeResolver(symbols=self.symbols)
 		expression.resolveMemoized(resolver=resolver)
 
 		if expression.isRoleMeta:
@@ -187,6 +235,7 @@ class Entities:
 	                                  element: Element,
 	                                  this: Expression,
 	                                  resolveNamespace: typing.List[str],
+	                                  resolver: Resolver,
 	                                  name: typing.Optional[str] = None) -> Entity:
 		"""Create a new entity for nested compositions.
 		
@@ -194,6 +243,7 @@ class Entities:
 			element: The element to be used as a based to create the entity.
 			this: The expression used to create the component containing the composition.
 			resolveNamespace: The namespace to be used for resolving the new entity.
+			resolver: The resolver associated with the creator.
 			name: The name to give to the new entry.
 
 		Return:
@@ -211,8 +261,7 @@ class Entities:
 		                          group=Group.composition)
 		entity = self.symbols.getEntityResolved(fqn=fqn).value
 
-		resolver = self.symbols.makeResolver(namespace=resolveNamespace, this=this.fqn)
-		entity.resolveMemoized(resolver=resolver)
+		entity.resolveMemoized(resolver=resolver.make(namespace=resolveNamespace, this=this.fqn))
 
 		return entity
 
@@ -252,14 +301,14 @@ class Entities:
 		        (EntryType.executor in entryType)):
 			return
 
-		# Identify the executor of this entity, it is guarantee by the Expression type that there is always an executor.
+		# Identify the executor of this entity.
 		if executor is None:
 			maybeExecutorFQN = expression.executor
 			if maybeExecutorFQN is None:
 				executor = self.defaultExecutorName_
 			else:
-				executor = self.symbols.getEntityResolved(fqn=maybeExecutorFQN).assertValue(
-				    element=expression.element).fqn
+				executor = maybeExecutorFQN
+				self.symbols.getEntityResolved(fqn=executor).assertValue(element=expression.element)
 
 		# Register the entry.
 		entry = self.expressions.insert(expression=expression, entryType=entryType, executor=executor)
@@ -290,7 +339,8 @@ class Entities:
 					newEntity = self.createEntityNestedComposition(
 					    element=ExpressionBuilder(symbol=f"this.{interfaceEntity.name}"),
 					    this=expression,
-					    resolveNamespace=interfaceEntity.namespace)
+					    resolveNamespace=interfaceEntity.namespace,
+					    resolver=resolver)
 					assert isinstance(newEntity, Expression)
 					maybeGroup.push(newEntity)
 
@@ -306,6 +356,7 @@ class Entities:
 				    element=entityCopied.element,
 				    this=expression,
 				    resolveNamespace=entityCopied.namespace,
+				    resolver=resolver,
 				    name=compositionEntity.name if compositionEntity.isName else None)
 				assert isinstance(newEntity, Expression)
 				entry.intra.push(newEntity)
@@ -319,7 +370,7 @@ class Entities:
 
 		# Add implicit dependencies.
 		for dependency in entry.deps + entry.intra:
-			self.add(dependency, isDep=True, executor=executor)
+			self.addDependency(dependency, executor=executor)
 
 	def close(self) -> None:
 
