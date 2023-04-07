@@ -24,7 +24,7 @@ class Resolver:
 	             exclude: typing.Optional[typing.List[Group]] = None,
 	             this: typing.Optional[str] = None,
 	             target: typing.Optional[str] = None,
-				 memoize: bool = False) -> None:
+	             memoize: bool = False) -> None:
 		self.symbols = symbols
 		self.namespace = namespace
 		self.exclude = exclude

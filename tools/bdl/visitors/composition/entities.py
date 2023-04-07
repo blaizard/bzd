@@ -29,27 +29,34 @@ class Entities:
 		# The targets of this system.
 		self.targets = targets
 
-	def processMeta(self, expression: Expression, fqns: typing.Optional[typing.Set[str]] = None) -> None:
+	def processFirstStage(self, expression: Expression,
+	                      fqns: typing.Optional[typing.Set[str]]) -> typing.Optional[Expression]:
+		"""Process first stage expression and return the one that are not processed."""
+
+		if expression.isSymbol:
+			if expression.symbol.fqn == "bind":
+
+				assert fqns is not None, "FQNs must be set with bind."
+				expression.contracts.assertOnly({"executor"})
+				for param in expression.parameters:
+					identifiers = set(param.regexpr.match(fqns) if param.isRegexpr else [str(param.symbol)])
+					for fqn in identifiers:
+						entity = self.symbols.getEntityResolved(fqn=fqn).assertValue(element=expression.element)
+						entity.contracts.merge(expression.contracts)
+				return None
+		return expression
+
+	def processMeta(self, expression: Expression) -> None:
 		"""Process a meta expression, a special function from the language."""
 
 		expression.assertTrue(condition=expression.isSymbol, message=f"Meta expressions must have a symbol.")
 		if expression.symbol.fqn == "connect":
 			arguments = []
 			for paramResolved in expression.parametersResolved:
-				self.addDependency(paramResolved.param, executor=None)
+				self.addResolvedDependency(paramResolved.param, executor=None)
 				arguments.append(paramResolved.param)
 
 			self.connections.add(*arguments)
-
-		elif expression.symbol.fqn == "bind":
-
-			assert fqns is not None, "FQNs must be set with bind."
-			expression.contracts.assertOnly({"executor"})
-			for param in expression.parameters:
-				identifiers = set(param.regexpr.match(fqns) if param.isRegexpr else [str(param.symbol)])
-				for fqn in identifiers:
-					entity = self.symbols.getEntityResolved(fqn=fqn).assertValue(element=expression.element)
-					entity.contracts.resolve(expression.contracts)
 
 		else:
 			expression.error(message="Unsupported meta expression.")
@@ -171,65 +178,112 @@ class Entities:
 	def getServicesByExecutor(self, fqn: str) -> typing.Iterable[Expression]:
 		return [entry.expression for entry in self.services if fqn in entry.executors]
 
-	def process(self, expressions: typing.Iterable[Entity]) -> None:
+	def getExecutor(self, expression: Expression) -> typing.Optional[str]:
+		"""Identify the executor associated with an expression."""
 
-		remaining: typing.List[Expression] = []
+		executor = expression.executor
+
+		if expression.isSymbol:
+			if executor is not None:
+				if expression.symbol.isThis:
+					resolver = expression.makeResolver(symbols=self.symbols)
+					this = expression.symbol.getThisResolved(resolver=resolver)
+					expression.assertTrue(
+					    condition=this.executor == executor,
+					    message=
+					    f"The executors between this expression and its instance, mismatch: '{executor}' vs '{this.executor}'."
+					)
+			# If there is a 'this', propagate the executor.
+			elif expression.symbol.isThis:
+				resolver = expression.makeResolver(symbols=self.symbols)
+				this = expression.symbol.getThisResolved(resolver=resolver)
+				executor = this.executor
+
+		# Make sure the executor exists.
+		if executor is not None:
+			self.symbols.getEntityResolved(fqn=executor).assertValue(element=expression.element)
+
+		return executor
+
+	def process(self, expressions: typing.Iterable[Expression]) -> None:
 
 		# Create a set of available fqns. This describes only the expressions that have a name,
 		# so at declaration time.
-		fqns = {entity.fqn for entity in expressions if entity.isFQN and entity.isName}
+		fqns = {expression.fqn for expression in expressions if expression.isFQN and expression.isName}
 
 		# First stage.
-		for entity in expressions:
+		executors: typing.List[Expression] = []
+		workloads: typing.List[Expression] = []
+		platforms: typing.List[Expression] = []
+		meta: typing.List[Expression] = []
+		for expression in expressions:
+			resolver = expression.makeResolver(symbols=self.symbols)
+			expression.resolveMemoized(resolver=resolver)
 
-			entity.assertTrue(condition=isinstance(entity, Expression),
-			                  message="Only expressions can be added to the composition.")
-			expression = typing.cast(Expression, entity)
+			if self.processFirstStage(expression=expression, fqns=fqns) is None:
+				continue
 
-			# Resolve all the expressions, this will ignore 'target.*' fqns.
-			expression.resolve(resolver=expression.makeResolver(symbols=self.symbols))
+			# Classify the expressions.
+			if expression.isSymbol:
+				if expression.isExecutor:
+					executors.append(expression)
+				elif expression.namespace and expression.namespace[-1] == "platform":
+					platforms.append(expression)
+				elif expression.isRoleMeta:
+					meta.append(expression)
+				else:
+					underlyingType = expression.getEntityUnderlyingTypeResolved(resolver=resolver)
+					if underlyingType.category == Category.method:
+						workloads.append(expression)
 
-			# Select elements that are part of the first stage.
-			if expression.isSymbol and str(expression.symbol) == "bind":
-				self.processMeta(expression=expression, fqns=fqns)
-			else:
-				remaining.append(expression)
+		# Find the name of the default executor.
+		defaultExecutor = executors[0].fqn if len(executors) == 1 else None
 
 		# Second stage.
-		for expression in remaining:
-			expression.resolve(resolver=expression.makeResolver(symbols=self.symbols))
-			self.add(entity=expression)
+		# - workloads and executors must have a valid executor.
+		for expression in executors + workloads:
+
+			executor = self.getExecutor(expression=expression) or defaultExecutor
+			expression.assertTrue(condition=executor is not None,
+			                      message="This workload does not have an executor assigned.")
+			self.addResolved(expression=expression, executor=executor)
+
+		# - meta should be processed at the end, to ensure that all symbols are
+		# available at that time. Symbols like class instance member for example.
+		for expression in platforms + meta:
+
+			executor = self.getExecutor(expression=expression)
+			self.addResolved(expression=expression, executor=executor)
 
 		# Final stage.
 		self.close()
 
-	def addDependency(self, entity: Entity, executor: typing.Optional[str]) -> None:
-
-		if entity.isFQN:
-			self.add(entity=entity, isDep=True, executor=executor)
-		else:
-			# If the entity does not have a fqn (hence a namespace), process its dependencies.
-			# This is the case for parameters for example.
-			for fqn in entity.dependencies:
-				dependency = self.symbols.getEntityResolved(fqn=fqn).value
-				if isinstance(dependency, Expression):
-					self.addDependency(dependency, executor=executor)
-
-	def add(self, entity: Entity, isDep: bool = False, executor: typing.Optional[str] = None) -> None:
-		"""Add a new entity."""
+	def addResolvedDependency(self, entity: Entity, executor: typing.Optional[str]) -> None:
+		"""Add a new dependency to the composition."""
 
 		entity.assertTrue(condition=isinstance(entity, Expression),
 		                  message="Only expressions can be added to the composition.")
 		expression = typing.cast(Expression, entity)
 
-		# Resolve the entity against its namespace.
-		resolver = expression.makeResolver(symbols=self.symbols)
-		expression.resolveMemoized(resolver=resolver)
+		if expression.isFQN:
+			self.addResolved(expression=expression, isDepedency=True, executor=executor)
+
+		else:
+			# If the entity does not have a fqn (hence a namespace), process its dependencies.
+			# This is the case for parameters for example.
+			for fqn in expression.dependencies:
+				dependency = self.symbols.getEntityResolved(fqn=fqn).value
+				if isinstance(dependency, Expression):
+					dependency.resolveMemoized(resolver=dependency.makeResolver(symbols=self.symbols))
+					self.addResolvedDependency(dependency, executor=executor)
+
+	def addResolved(self, expression: Expression, executor: typing.Optional[str], isDepedency: bool = False) -> None:
+		"""Add a new entity to the composition."""
 
 		if expression.isRoleMeta:
 			self.processMeta(expression=expression)
 		elif expression.isSymbol:
-			self.processEntry(expression=expression, isDep=isDep, resolver=resolver, executor=executor)
+			self.processEntry(expression=expression, isDepedency=isDepedency, executor=executor)
 
 	def createEntityNestedComposition(self,
 	                                  element: Element,
@@ -260,21 +314,21 @@ class Entities:
 		                          element=element,
 		                          group=Group.composition)
 		entity = self.symbols.getEntityResolved(fqn=fqn).value
-
 		entity.resolveMemoized(resolver=resolver.make(namespace=resolveNamespace, this=this.fqn))
 
 		return entity
 
-	def processEntry(self, expression: Expression, isDep: bool, resolver: Resolver,
-	                 executor: typing.Optional[str]) -> None:
+	def processEntry(self, expression: Expression, isDepedency: bool, executor: typing.Optional[str]) -> None:
 		"""Resolve the dependencies for a specific expression."""
+
+		resolver = expression.makeResolver(symbols=self.symbols)
 
 		# Find the symbol underlying type.
 		underlyingType = expression.getEntityUnderlyingTypeResolved(resolver=resolver)
 
 		# Identify the type of entry.
 		if underlyingType.category == Category.method:
-			entryType = EntryType.service if isDep else EntryType.workload
+			entryType = EntryType.service if isDepedency else EntryType.workload
 		elif underlyingType.category in {Category.component, Category.struct, Category.enum, Category.using}:
 			expression.assertTrue(condition=expression.isName,
 			                      message="All expressions from the registry must have a name.")
@@ -290,25 +344,20 @@ class Entities:
 		if expression.namespace and expression.namespace[-1] == "platform":
 			entryType |= EntryType.platform
 		# Check if an executor.
-		if "bzd.platform.Executor" in underlyingType.getParents():
+		if expression.isExecutor:
 			expression.assertTrue(condition=underlyingType.category == Category.component,
 			                      message="Executors must be a component.")
 			entryType |= EntryType.executor
 			executor = expression.fqn
 
 		# If top level, only process a certain type of entry.
-		if not (isDep or (EntryType.workload in entryType) or (EntryType.platform in entryType) or
+		if not (isDepedency or (EntryType.workload in entryType) or (EntryType.platform in entryType) or
 		        (EntryType.executor in entryType)):
 			return
 
-		# Identify the executor of this entity.
-		if executor is None:
-			maybeExecutorFQN = expression.executor
-			if maybeExecutorFQN is None:
-				executor = self.defaultExecutorName_
-			else:
-				executor = maybeExecutorFQN
-				self.symbols.getEntityResolved(fqn=executor).assertValue(element=expression.element)
+		# Set the default executor.
+		executor = self.defaultExecutorName_ if executor is None else executor
+		assert isinstance(executor, str)
 
 		# Register the entry.
 		entry = self.expressions.insert(expression=expression, entryType=entryType, executor=executor)
@@ -319,6 +368,7 @@ class Entities:
 		for fqn in expression.dependencies:
 			dep = self.symbols.getEntityResolved(fqn=fqn).value
 			if isinstance(dep, Expression):
+				dep.resolveMemoized(resolver=dep.makeResolver(symbols=self.symbols))
 				entry.deps.push(dep)
 
 		# Check if there are pre/post-requisites (init/shutdown functions)
@@ -370,7 +420,7 @@ class Entities:
 
 		# Add implicit dependencies.
 		for dependency in entry.deps + entry.intra:
-			self.addDependency(dependency, executor=executor)
+			self.addResolvedDependency(dependency, executor=executor)
 
 	def close(self) -> None:
 

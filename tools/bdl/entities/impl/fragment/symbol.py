@@ -100,7 +100,7 @@ class Symbol:
 			self.assertTrue(condition=bool(result), message=str(result))
 
 		# Resolve contract
-		self.contracts.resolve(entity.contracts)
+		self.contracts.merge(entity.contracts)
 
 		return entity
 

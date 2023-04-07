@@ -116,8 +116,6 @@ class Composition:
 		self.entities = Entities(symbols=self.symbols, targets=self.targets)
 		# Unique identifiers
 		self.uids: typing.Dict[str, int] = {}
-		# All top level expressions
-		self.all: typing.Dict[str, Expression] = {}
 		# All asyncs per executors.
 		self.asyncs: typing.Dict[str, typing.Dict[Entity, AsyncType]] = {}
 		# All connections.

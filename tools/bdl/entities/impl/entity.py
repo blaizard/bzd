@@ -80,16 +80,6 @@ class Entity:
 		ElementBuilder.cast(self.element, ElementBuilder).setAttr("meta", "1")
 
 	@property
-	def executor(self) -> typing.Optional[str]:
-		return self.element.getAttrValue("executor")
-
-	def _setExecutor(self, executor: str) -> None:
-		ElementBuilder.cast(self.element, ElementBuilder).setAttr("executor", executor)
-
-	def executorOr(self, default: str) -> str:
-		return default if self.executor is None else self.executor
-
-	@property
 	def configAttr(self) -> str:
 		return "config"
 
@@ -293,6 +283,23 @@ class Entity:
 		return Contracts(element=self.element, sequenceKind=self.contractAttr)
 
 	@property
+	def isExecutor(self) -> bool:
+		"""If this element is an executor, return True."""
+		maybeExecutor = self.contracts.get("executor")
+		return maybeExecutor is not None and maybeExecutor.isValue == False
+
+	@property
+	def executor(self) -> typing.Optional[str]:
+		"""Get the executor directly associated with this entity."""
+
+		maybeExecutor = self.contracts.get("executor")
+		if maybeExecutor is None:
+			return None
+		if maybeExecutor.isValue:
+			return maybeExecutor.value
+		return self.fqn
+
+	@property
 	def comment(self) -> typing.Optional[str]:
 		return self.element.getAttrValue("comment")
 
@@ -481,6 +488,5 @@ class EntityExpression(Entity):
 		    "value": str(self.value) if self.isValue else None,
 		    "operator": str(self.operator) if self.isOperator else None,
 		    "regexpr": str(self.regexprAttr) if self.isRegexprAttr else None,
-		    "executor": self.executor,
 		    "parameters": "[...]" if self.isParameters else None,
 		})

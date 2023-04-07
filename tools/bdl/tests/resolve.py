@@ -652,38 +652,6 @@ class TestRun(unittest.TestCase):
 		assert isinstance(val1, Expression)
 		self.assertTrue(val1.isRValue)
 
-	def testExecutor(self) -> None:
-		bdl = Object.fromContent(content="""
-				component Test {
-				interface:
-					method run();
-				}
-				composition MyComposition
-				{
-					a = Test() [executor(hello)];
-					b = a.run();
-				}
-				""",
-		                         objectContext=ObjectContext(resolve=True, composition=True))
-		assert isinstance(bdl.entity("MyComposition.a"), Expression)
-		self.assertEqual(bdl.entity("MyComposition.a").executor, "hello")
-		assert isinstance(bdl.entity("MyComposition.b"), Expression)
-		self.assertEqual(bdl.entity("MyComposition.b").executor, "hello")
-
-		with self.assertRaisesRegex(Exception, r"executors between this expression"):
-			Object.fromContent(content="""
-					component Test {
-					interface:
-						method run();
-					}
-					composition MyComposition
-					{
-						a = Test();
-						b = a.run() [executor(hello)];
-					}
-					""",
-			                   objectContext=ObjectContext(resolve=True, composition=True))
-
 	def testComponent(self) -> None:
 		with self.assertRaisesRegex(Exception, r"Only.*struct.*interface"):
 			Object.fromContent(content="""

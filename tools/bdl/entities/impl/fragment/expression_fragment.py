@@ -58,7 +58,7 @@ class ExpressionFragment(EntityExpression):
 
 		# Merge contracts with the existing ones if any, otherwise just create it.
 		contracts = Contracts(element=element, sequenceKind="contract")
-		contracts.resolve(self.contracts)
+		contracts.merge(self.contracts)
 
 	def unary(self, operator: "OperatorFragment") -> None:
 		"""Support for unary operators."""

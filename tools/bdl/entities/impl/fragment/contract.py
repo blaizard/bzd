@@ -94,7 +94,7 @@ class Contracts:
 				Error.handleFromElement(element=self.element,
 				                        message="Contract of type '{}' is not supported.".format(contract.type))
 
-	def resolve(self, contracts: "Contracts") -> None:
+	def merge(self, contracts: "Contracts") -> None:
 		"""
 		Merge a base contract into this one. The order is important, as type are inherited from the deepest base.
 		"""
