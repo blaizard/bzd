@@ -19,7 +19,7 @@ class TestRun(unittest.TestCase):
 		compositionNormal = Object.fromContent(content="""
 			component Executor { }
 			composition {
-				executor = Executor();
+				executor = Executor() [executor];
 			}
 			composition Comp {
 				default = Integer(32);
@@ -44,7 +44,7 @@ class TestRun(unittest.TestCase):
 		compositionNormal = Object.fromContent(content="""
 			component Executor { }
 			composition {
-				executor = Executor();
+				executor = Executor() [executor];
 			}
 			composition Comp {
 				default = Integer(32);
@@ -58,7 +58,7 @@ class TestRun(unittest.TestCase):
 		compositionWrongOrder = Object.fromContent(content="""
 			component Executor { }
 			composition {
-				executor = Executor();
+				executor = Executor() [executor];
 			}
 			composition Comp {
 				test = Hello(var = default);
@@ -72,7 +72,7 @@ class TestRun(unittest.TestCase):
 		compositionWrongOrder = Object.fromContent(content="""
 			component Executor { }
 			composition {
-				executor = Executor();
+				executor = Executor() [executor];
 			}
 			composition Comp {
 				test = Hello(var = default);
@@ -92,7 +92,7 @@ class TestRun(unittest.TestCase):
 			}
 			component Executor { }
 			composition {
-				executor = Executor();
+				executor = Executor() [executor];
 				test1 = Hello();
 				test2 = Hello();
 			}
@@ -105,6 +105,7 @@ class TestRun(unittest.TestCase):
 	def testNestedComposition(self) -> None:
 
 		bdl = Object.fromContent(content="""
+			component Executor { }
 			component World {
 			}
 			component Hello {
@@ -113,9 +114,8 @@ class TestRun(unittest.TestCase):
 			composition:
 				world = World();
 			}
-			component Executor { }
 			composition {
-				executor = Executor();
+				executor = Executor() [executor];
 				test1 = Hello();
 				test2 = Hello();
 				test1.run();
@@ -144,7 +144,7 @@ class TestRun(unittest.TestCase):
 				b = const Float;
 			}
 			composition {
-				executor = Executor();
+				executor = Executor() [executor];
 				sender = Sender();
 				receiver = Receiver();
 			}
@@ -200,6 +200,7 @@ class TestRun(unittest.TestCase):
 	def testCompositionThis(self) -> None:
 
 		composition = Object.fromContent(content="""
+			component Executor { }
 			component MyComponent {
 			interface:
 				method run();
@@ -209,6 +210,7 @@ class TestRun(unittest.TestCase):
 			}
 
 			composition {
+				executor = Executor() [executor];
 				component1 = MyComponent();
 				component2 = MyComponent();
 				component3 = MyComponent();
@@ -221,6 +223,7 @@ class TestRun(unittest.TestCase):
 	def testCompositionThisMulti(self) -> None:
 
 		composition = Object.fromContent(content="""
+			component Executor { }
 			component MyComponent {
 			interface:
 				method run();
@@ -230,6 +233,7 @@ class TestRun(unittest.TestCase):
 			}
 
 			composition {
+				executor = Executor() [executor];
 				component1 = MyComponent();
 				component1.run();
 				component2 = MyComponent();
@@ -240,6 +244,39 @@ class TestRun(unittest.TestCase):
 			""",
 		                                 objectContext=ObjectContext(resolve=True))
 		Composition().visit(composition).process()
+
+	def testExecutor(self) -> None:
+		composition = Object.fromContent(content="""
+				composition {
+					hello = Void;
+				}
+				component Test {
+				interface:
+					method run();
+				}
+				composition MyComposition
+				{
+					a = Test() [executor(hello)];
+					b = a.run();
+				}
+				""",
+		                                 objectContext=ObjectContext(resolve=True))
+		Composition().visit(composition).process()
+
+		with self.assertRaisesRegex(Exception, r"executors between this expression"):
+			composition = Object.fromContent(content="""
+					component Test {
+					interface:
+						method run();
+					}
+					composition MyComposition
+					{
+						a = Test();
+						b = a.run() [executor(hello)];
+					}
+					""",
+			                                 objectContext=ObjectContext(resolve=True))
+			Composition().visit(composition).process()
 
 
 if __name__ == '__main__':

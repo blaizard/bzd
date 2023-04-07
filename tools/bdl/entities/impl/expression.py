@@ -95,7 +95,9 @@ class Expression(EntityExpression):
 	def makeResolver(self, symbols: "SymbolMap") -> "Resolver":
 		"""Create a resolver for this expression."""
 
-		return symbols.makeResolver(namespace=self.namespace, this=self.this)
+		if self.isFQN:
+			return symbols.makeResolver(namespace=self.namespace, this=self.this)
+		return symbols.makeResolver(this=self.this)
 
 	def resolveFragments(self, resolver: "Resolver") -> None:
 		"""Process fragments to build a value or a symbol."""
@@ -169,39 +171,8 @@ class Expression(EntityExpression):
 			# TODO: Ensure that the interface is part of the parent type.
 
 		self.resolveFragments(resolver=resolver)
-
-		# If it holds a value, it is considered a literal.
-		if self.isValue:
-			pass
-
-		# If it holds a symbol.
-		elif self.isSymbol:
-
-			# Set the executor.
-			executorContract = self.contracts.get("executor")
-
-			if executorContract is not None:
-				if self.symbol.isThis:
-					this = self.symbol.getThisResolved(resolver=resolver)
-					self.assertTrue(
-					    condition=this.executor == executorContract.value,
-					    message=
-					    f"The executors between this expression and its instance, mismatch: '{executorContract.value}' vs '{this.executor}'."
-					)
-				executor = executorContract.value
-			# If there is a 'this', propagate the executor.
-			elif self.symbol.isThis:
-				executor = self.symbol.getThisResolved(resolver=resolver).executor
-			else:
-				executor = None
-			if executor is not None:
-				self._setExecutor(executor)
-
-		elif self.isRegexpr:
-			pass
-
-		else:
-			self.error(message=f"Unsupported expression: {self.element}")
+		self.assertTrue(condition=self.isValue or self.isSymbol or self.isRegexpr,
+		                message=f"Unsupported expression: {self.element}")
 
 		super().resolve(resolver)
 
