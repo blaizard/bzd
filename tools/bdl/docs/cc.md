@@ -22,8 +22,8 @@ namespace bzd.example;
 
 interface MyInterface {
   enum Error {
-    UNINITIALIZED,
-    OTHER
+    uninitialized,
+    other
   }
   method process() -> Error;
 }
@@ -39,7 +39,7 @@ class Implementation : public bzd::example::MyInterface<Implementation> // Adapt
 public:
   constexpr Error process() noexcept // Implementation of the method.
   {
-    return bzd::example::MyInterface::Error::OTHER; // Access trivial types.
+    return bzd::example::MyInterface::Error::other; // Access trivial types.
   }
 };
 ```
@@ -99,3 +99,39 @@ be used like this:
 ```c++
 bzd::Interface<"bzd.example.MyInterface">::cast(object);
 ```
+
+## Composition
+
+When composing component together, we need to distinguish between several types of component.
+
+1. `platform` components, which are target specific and might or might not be singleton on a target.
+  - For example: a proactor, an stdout...
+2. Functional components with no workloads that are the input of 2 other components running on different executors.
+  - It can be part of the registry of both executors or only of one.
+3. Functional components with a workload.
+  - These must be assigned to an executor.
+
+Should we have a single registry? or a common registry and an executor specific registry?
+This could be solved as an implementation detail by the component itself, using a singleton pattern for example.
+
+Ultimately `1.` and `2.` should be the same.
+
+Use case, stdout backend running on a specific executor:
+```bdl
+component Stdout {
+interface:
+  method backend();
+composition:
+  this.backend();
+}
+
+composition {
+  exec1 = Executor() [executor];
+  exec2 = Executor() [executor];
+  stdout = Stdout() [executor(exec1)];
+}
+```
+<- This is not a good composition. It should be splitted into a backend and an 2 frontends.
+They would both communicate 
+
+Use case:

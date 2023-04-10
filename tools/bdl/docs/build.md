@@ -54,6 +54,10 @@ Components might come from the platform used, others are functional to perform t
 During `composition` stage, all top level composition elements are being resolved. Nested composition elements are
 only resolved if the corresponding component is instantiated. Unused components in the build tree are automatically removed.
 
+The composition stage is done in 2 sub-stages, the first one that only process certain type of builtin expression, such as `bind`
+for example. This assigns contracts to expressions before being evaluated.
+The second stage process all elements.
+
 ## Generators
 
 Generators can follow a `preprocess` or a `composition` stage and are responsible for generating additional output.
