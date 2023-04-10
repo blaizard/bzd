@@ -12,7 +12,7 @@ BDL or (Bzd Description Language) is a DSL (Domain Specific Language) for the bz
 | Core        | A unit of execution, one or multiple cores that share the same memory compose an executor.                  |
 | Executor    | This is the minimal scheduling unit, it maybe contain multiple workloads and may execute on multiple cores. |
 | Platform    | Implicit dependencies that a binary relies on.                                                              |
-| Target      | A group of executors and platform aied at creating a single binary.                                         |
+| Target      | A group of executors and a single platform amed at creating a single binary.                                |
 | System      | A group of targets that constitute a complete deployable system.                                            |
 | Gateway     | Ports or connection endpoints for an executor, that aims at linking executors together.                     |
 | Buses       | Connection between executors.                                                                               |

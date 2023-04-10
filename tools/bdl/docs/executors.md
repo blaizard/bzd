@@ -16,7 +16,7 @@ composition
 {
    core0 = FreeRTOS(stackSize = 4000, load = 20%);
    core1 = FreeRTOS(stackSize = 10000);
-   esp32 = Executor(core0, core1);
+   esp32 = Executor(core0, core1) [executor];
 }
 ```
 
@@ -27,7 +27,7 @@ For example, a linux machine can be composed as follow:
 ```bdl
 composition
 {
-   linux = LinuxExecutor;
+   linux = LinuxExecutor [executor];
 }
 ```
 
@@ -35,11 +35,13 @@ Multiple executors can be created and deployed on the same process/binary, this 
 
 ## Default executor
 
-For each supported platform a default executor is available, it's full qualified name is `executor` and resides at the top level.
+When the system only has a single executor, it is automatically assigned to all workloads, therefore there is no need for specific assignment.
 
 ## Association
 
-A component instanciation defines where the components resides and run. This is done with the `executor` contract.
+If the system contains multiple executor, however, it is necessary to define where workloads are running.
+
+This can be done in 2 different ways. By either specifying it at component instanciation, This is done with the `executor` contract.
 
 ```bdl
 composition
@@ -48,4 +50,13 @@ composition
 }
 ```
 
-If omitted, the component will run on the default `executor`.
+or separatly from the component, using the builtin function `bind`, to bind a fqn or a regular expression to an executor, for example:
+
+```bdl
+composition
+{
+   bind(/comp1.*/) [executor(linux)];
+}
+```
+
+This tells that all fqn starting with `comp1` will be assigned to the executor `linux`.

@@ -35,7 +35,7 @@ bdl_target(
     compositions = [
         "composition.bdl",
     ],
-    platform = "//platform:linux_x86_64_clang",
+    platform = "//platform:linux_x86_6registry4_clang",
     language = "cc",
     deps = [
         ":lib",
@@ -107,6 +107,8 @@ flowchart TB
 ```
 
 ## Parameters
+
+/!\ This is not implemented yet.
 
 Some attributes might require parametrization, for example when defining a gateway for a specific platform, the IP address
 might be needed for an ethernet-based gateway.
