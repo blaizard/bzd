@@ -3,7 +3,7 @@ namespace example;
 
 
 // Emit integer continuously.
-component Emitter {
+component Emitter : ComponentBase {
 interface:
 	method generate();
 	send = Integer;
@@ -11,7 +11,7 @@ interface:
 }
 
 // Poll and receive data.
-component Poller {
+component Poller : ComponentBase {
 interface:
 	method poll();
 	receive = const Integer;

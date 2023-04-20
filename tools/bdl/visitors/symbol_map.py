@@ -11,6 +11,7 @@ from tools.bdl.entities.all import elementToEntity, EntityType
 from tools.bdl.entities.builder import ElementBuilder
 from tools.bdl.entities.impl.reference import Reference
 from tools.bdl.entities.impl.fragment.fqn import FQN
+from tools.bdl.entities.impl.expression import Expression
 
 ResolveShallowFQNResult = Result[typing.Tuple[str, typing.List[str]]]
 ResolveFQNResult = Result[typing.List[str]]
@@ -32,13 +33,24 @@ class Resolver:
 		self.target = target
 		self.memoize = memoize
 
-	def make(self, namespace: typing.List[str], this: typing.Optional[str] = None) -> "Resolver":
+	def make(self,
+	         namespace: typing.Optional[typing.List[str]] = None,
+	         expression: typing.Optional[Expression] = None,
+	         this: typing.Optional[str] = None) -> "Resolver":
 		"""Create a new resolver with an updated namespace.
 		
 		Note: exclude and this should not be propagated, they both concern the first level resolver.
 		"""
 
-		return Resolver(symbols=self.symbols, namespace=namespace, this=this, target=self.target, memoize=self.memoize)
+		if namespace is not None:
+			assert expression is None
+			return Resolver(symbols=self.symbols,
+			                namespace=namespace,
+			                this=this,
+			                target=self.target,
+			                memoize=self.memoize)
+		assert expression is not None
+		return expression.makeResolver(symbols=self.symbols, target=self.target, memoize=self.memoize)
 
 	def makeFQN(self, name: str) -> str:
 		"""Create an FQN out of a name."""

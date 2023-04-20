@@ -9,7 +9,7 @@ from tools.bdl.entities.impl.builtin import Builtin
 from tools.bdl.entities.impl.expression import Expression
 from tools.bdl.entities.impl.fragment.symbol import Symbol
 from tools.bdl.entities.impl.types import Category
-from tools.bdl.visitors.symbol_map import Resolver
+from tools.bdl.visitors.symbol_map import Resolver, SymbolMap
 
 
 class DependencyGroup:
@@ -75,6 +75,19 @@ class EntryType(enum.Flag):
 	platform = enum.auto()
 	# Executor type, all executors must also be part of the registry.
 	executor = enum.auto()
+
+
+@dataclasses.dataclass
+class Context:
+	# The executor for this context.
+	executor: str
+	# The target for this context.
+	target: str
+
+	def makeResolver(self, symbols: SymbolMap, expression: Expression, **kwargs: typing.Any) -> Resolver:
+		"""Create a resolver object, used to find (resolve) symbols."""
+
+		return expression.makeResolver(symbols=symbols, target=self.target, **kwargs)
 
 
 @dataclasses.dataclass
@@ -168,7 +181,7 @@ class Components:
 			yield entry
 
 	def insert(self, expression: Expression, entryType: EntryType,
-	           executor: typing.Optional[str]) -> typing.Optional[ExpressionEntry]:
+	           context: Context) -> typing.Optional[ExpressionEntry]:
 		"""Insert a new entry in the map, return the entry if it does not exists or if it can be updated,
 		otherwise it returns None."""
 
@@ -196,15 +209,8 @@ class Components:
 			    f"An expression of role '{entryType}' cannot overwrite an expression of role '{self.map[identifier].entryType}'."
 			)
 
-		executors = set() if executor is None else {executor}
-		self.map[identifier] = ExpressionEntry(expression=expression, entryType=entryType, executors=executors)
+		self.map[identifier] = ExpressionEntry(expression=expression, entryType=entryType, executors={context.executor})
 		return self.map[identifier]
-
-	def fromSymbol(self, symbol: Symbol) -> Result[ExpressionEntry, str]:
-		"""Get the ExpressionEntry associated with a specific symbol."""
-
-		identifier = symbol.this if symbol.isThis else symbol.kind
-		return self.fromIdentifier(identifier=identifier)
 
 	def fromIdentifier(self, identifier: str) -> Result[ExpressionEntry, str]:
 		"""Get the ExpressionEntry associated with a specific symbol."""
