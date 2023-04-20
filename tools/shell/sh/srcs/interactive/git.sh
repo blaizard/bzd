@@ -13,7 +13,7 @@ bzd_git_reset()
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         git fetch --prune
         git reset --hard $origin
-        git clean -fd
+        git clean -xfd
         git submodule update --init --recursive
     fi
 }

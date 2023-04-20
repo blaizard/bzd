@@ -92,12 +92,12 @@ class Expression(EntityExpression):
 
 		return self.symbol.this if self.isSymbol and self.symbol.isThis else None
 
-	def makeResolver(self, symbols: "SymbolMap") -> "Resolver":
+	def makeResolver(self, symbols: "SymbolMap", **kwargs: typing.Any) -> "Resolver":
 		"""Create a resolver for this expression."""
 
 		if self.isFQN:
-			return symbols.makeResolver(namespace=self.namespace, this=self.this)
-		return symbols.makeResolver(this=self.this)
+			return symbols.makeResolver(namespace=self.namespace, this=self.this, **kwargs)
+		return symbols.makeResolver(this=self.this, **kwargs)
 
 	def resolveFragments(self, resolver: "Resolver") -> None:
 		"""Process fragments to build a value or a symbol."""

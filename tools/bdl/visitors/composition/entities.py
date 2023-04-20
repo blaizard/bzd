@@ -12,7 +12,7 @@ from tools.bdl.entities.builder import ExpressionBuilder
 from tools.bdl.entities.impl.fragment.symbol import Symbol
 from tools.bdl.entities.impl.types import Category
 from tools.bdl.visitors.composition.connections import Connections, EndpointId
-from tools.bdl.visitors.composition.components import Components, ExpressionEntry, EntryType, DependencyGroup
+from tools.bdl.visitors.composition.components import Components, ExpressionEntry, EntryType, DependencyGroup, Context
 
 
 class Entities:
@@ -53,7 +53,7 @@ class Entities:
 		if expression.symbol.fqn == "connect":
 			arguments = []
 			for paramResolved in expression.parametersResolved:
-				self.addResolvedDependency(paramResolved.param, executor=None)
+				#self.addResolvedDependency(paramResolved.param, executor=None)
 				arguments.append(paramResolved.param)
 
 			self.connections.add(*arguments)
@@ -178,8 +178,8 @@ class Entities:
 	def getServicesByExecutor(self, fqn: str) -> typing.Iterable[Expression]:
 		return [entry.expression for entry in self.services if fqn in entry.executors]
 
-	def getExecutor(self, expression: Expression) -> typing.Optional[str]:
-		"""Identify the executor associated with an expression."""
+	def getContext(self, expression: Expression, defaultExecutor: typing.Optional[str]) -> Context:
+		"""Identify the executor and target pair associated with an expression."""
 
 		executor = expression.executor
 
@@ -199,11 +199,25 @@ class Entities:
 				this = expression.symbol.getThisResolved(resolver=resolver)
 				executor = this.executor
 
-		# Make sure the executor exists.
-		if executor is not None:
-			self.symbols.getEntityResolved(fqn=executor).assertValue(element=expression.element)
+		if executor is None:
+			executor = defaultExecutor
 
-		return executor
+		expression.assertTrue(condition=executor is not None,
+		                      message="This expression does not have an executor assigned.")
+
+		# Make sure the executor exists.
+		assert executor
+		entity = self.symbols.getEntityResolved(fqn=executor).assertValue(element=expression.element)
+
+		# Identify the target.
+		target = None
+		for t in self.targets:
+			if executor.startswith(f"{t}."):
+				target = t
+		entity.assertTrue(condition=target is not None, message="There is no target associated with this executor.")
+
+		assert target
+		return Context(executor=executor, target=target)
 
 	def process(self, expressions: typing.Iterable[Expression]) -> None:
 
@@ -243,22 +257,20 @@ class Entities:
 		# - workloads and executors must have a valid executor.
 		for expression in executors + workloads:
 
-			executor = self.getExecutor(expression=expression) or defaultExecutor
-			expression.assertTrue(condition=executor is not None,
-			                      message="This workload does not have an executor assigned.")
-			self.addResolved(expression=expression, executor=executor)
+			context = self.getContext(expression=expression, defaultExecutor=defaultExecutor)
+			resolver = context.makeResolver(symbols=self.symbols, expression=expression)
+			expression.resolve(resolver=resolver)
+			self.addResolved(expression=expression, context=context)
 
 		# - meta should be processed at the end, to ensure that all symbols are
 		# available at that time. Symbols like class instance member for example.
-		for expression in platforms + meta:
-
-			executor = self.getExecutor(expression=expression)
-			self.addResolved(expression=expression, executor=executor)
+		for expression in meta:
+			self.processMeta(expression=expression)
 
 		# Final stage.
 		self.close()
 
-	def addResolvedDependency(self, entity: Entity, executor: typing.Optional[str]) -> None:
+	def addResolvedDependency(self, entity: Entity, context: Context) -> None:
 		"""Add a new dependency to the composition."""
 
 		entity.assertTrue(condition=isinstance(entity, Expression),
@@ -266,7 +278,7 @@ class Entities:
 		expression = typing.cast(Expression, entity)
 
 		if expression.isFQN:
-			self.addResolved(expression=expression, isDepedency=True, executor=executor)
+			self.addResolved(expression=expression, isDepedency=True, context=context)
 
 		else:
 			# If the entity does not have a fqn (hence a namespace), process its dependencies.
@@ -274,16 +286,17 @@ class Entities:
 			for fqn in expression.dependencies:
 				dependency = self.symbols.getEntityResolved(fqn=fqn).value
 				if isinstance(dependency, Expression):
-					dependency.resolveMemoized(resolver=dependency.makeResolver(symbols=self.symbols))
-					self.addResolvedDependency(dependency, executor=executor)
+					resolver = context.makeResolver(symbols=self.symbols, expression=dependency)
+					dependency.resolveMemoized(resolver=resolver)
+					self.addResolvedDependency(dependency, context=context)
 
-	def addResolved(self, expression: Expression, executor: typing.Optional[str], isDepedency: bool = False) -> None:
+	def addResolved(self, expression: Expression, context: Context, isDepedency: bool = False) -> None:
 		"""Add a new entity to the composition."""
 
 		if expression.isRoleMeta:
 			self.processMeta(expression=expression)
 		elif expression.isSymbol:
-			self.processEntry(expression=expression, isDepedency=isDepedency, executor=executor)
+			self.processEntry(expression=expression, isDepedency=isDepedency, context=context)
 
 	def createEntityNestedComposition(self,
 	                                  element: Element,
@@ -318,10 +331,10 @@ class Entities:
 
 		return entity
 
-	def processEntry(self, expression: Expression, isDepedency: bool, executor: typing.Optional[str]) -> None:
+	def processEntry(self, expression: Expression, isDepedency: bool, context: Context) -> None:
 		"""Resolve the dependencies for a specific expression."""
 
-		resolver = expression.makeResolver(symbols=self.symbols)
+		resolver = context.makeResolver(symbols=self.symbols, expression=expression)
 
 		# Find the symbol underlying type.
 		underlyingType = expression.getEntityUnderlyingTypeResolved(resolver=resolver)
@@ -348,27 +361,22 @@ class Entities:
 			expression.assertTrue(condition=underlyingType.category == Category.component,
 			                      message="Executors must be a component.")
 			entryType |= EntryType.executor
-			executor = expression.fqn
 
 		# If top level, only process a certain type of entry.
 		if not (isDepedency or (EntryType.workload in entryType) or (EntryType.platform in entryType) or
 		        (EntryType.executor in entryType)):
 			return
 
-		# Set the default executor.
-		executor = self.defaultExecutorName_ if executor is None else executor
-		assert isinstance(executor, str)
-
 		# Register the entry.
-		entry = self.expressions.insert(expression=expression, entryType=entryType, executor=executor)
+		entry = self.expressions.insert(expression=expression, entryType=entryType, context=context)
 		if entry is None:
 			return
 
 		# Look for all dependencies and add the expression only.
 		for fqn in expression.dependencies:
-			dep = self.symbols.getEntityResolved(fqn=fqn).value
+			dep = resolver.getEntityResolved(fqn=fqn).assertValue(element=expression.element)
 			if isinstance(dep, Expression):
-				dep.resolveMemoized(resolver=dep.makeResolver(symbols=self.symbols))
+				dep.resolveMemoized(resolver=resolver.make(expression=dep))
 				entry.deps.push(dep)
 
 		# Check if there are pre/post-requisites (init/shutdown functions)
@@ -420,7 +428,7 @@ class Entities:
 
 		# Add implicit dependencies.
 		for dependency in entry.deps + entry.intra:
-			self.addResolvedDependency(dependency, executor=executor)
+			self.addResolvedDependency(dependency, context=context)
 
 	def close(self) -> None:
 
@@ -428,9 +436,9 @@ class Entities:
 		self.connections.close()
 
 		# Add platform expressions to all executors.
-		for expression in self.platform.values():
-			for entry in self.expressions.getDependencies(expression):
-				entry.executors.update(self.executors.keys())
+		#for expression in self.platform.values():
+		#	for entry in self.expressions.getDependencies(expression):
+		#		entry.executors.update(self.executors.keys())
 
 		# Replace the default executor with an actual value if there is only one executor,
 		# otherwise, raise an error.

@@ -105,11 +105,16 @@ bzd::Interface<"bzd.example.MyInterface">::cast(object);
 When composing component together, we need to distinguish between several types of component.
 
 1. `platform` components, which are target specific and might or might not be singleton on a target.
-  - For example: a proactor, an stdout...
+
+- For example: a proactor, an stdout...
+
 2. Functional components with no workloads that are the input of 2 other components running on different executors.
-  - It can be part of the registry of both executors or only of one.
+
+- It can be part of the registry of both executors or only of one.
+
 3. Functional components with a workload.
-  - These must be assigned to an executor.
+
+- These must be assigned to an executor.
 
 Should we have a single registry? or a common registry and an executor specific registry?
 This could be solved as an implementation detail by the component itself, using a singleton pattern for example.
@@ -117,6 +122,7 @@ This could be solved as an implementation detail by the component itself, using 
 Ultimately `1.` and `2.` should be the same.
 
 Use case, stdout backend running on a specific executor:
+
 ```bdl
 component Stdout {
 interface:
@@ -131,7 +137,28 @@ composition {
   stdout = Stdout() [executor(exec1)];
 }
 ```
+
 <- This is not a good composition. It should be splitted into a backend and an 2 frontends.
-They would both communicate 
+They would both communicate with the backend via io.
 
 Use case:
+
+---
+
+Idea:
+
+init <- cout and clock are never set. Need to use alternative (handled by the platform).
+shutdown <-
+
+workload / service <- cout / clock are set.
+
+Forward declaration of static members.
+
+c = C(out)
+out = Out(c)
+a = A(out)
+b = B(out)
+
+c.init(?)
+out.int(?)
+a.init(out)

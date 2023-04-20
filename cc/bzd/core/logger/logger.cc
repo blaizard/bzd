@@ -55,11 +55,7 @@ bzd::Async<> toStream(bzd::OStream& os, const Date& d)
 // NOLINTNEXTLINE(bugprone-exception-escape)
 bzd::Async<> bzd::Logger::printHeader(const bzd::log::Level level, const SourceLocation location) noexcept
 {
-	auto& backend = bzd::backend::Logger::getDefault();
-	/*	const auto ms = bzd::platform::systemClock().getMs();
-
-		const Date date{ms};*/
-	co_await !toStream(backend, "{} [{}:{}] "_csv, levelToStr(level), location.getFileName(), location.getLine());
+	co_await !toStream(stream_, "{} [{}:{}] "_csv, levelToStr(level), location.getFileName(), location.getLine());
 	co_return {};
 }
 

@@ -130,10 +130,10 @@ private:
 	{
 		auto linux = reinterpret_cast<Self*>(object);
 		auto& workload = linux->workload_.value();
-		bzd::print("Workload Wrapper Enter\n"_csv).sync();
+		// bzd::print("Workload Wrapper Enter\n"_csv).sync();
 		workload(*linux);
-		bzd::print("Workload Wrapper Exit\n"_csv).sync();
-		bzd::print("Stack usage: {:} / {:}\n"_csv, linux->getStackUsage(), linux->stack_->size()).sync();
+		// bzd::print("Workload Wrapper Exit\n"_csv).sync();
+		// bzd::print("Stack usage: {:} / {:}\n"_csv, linux->getStackUsage(), linux->stack_->size()).sync();
 
 		return nullptr;
 	}

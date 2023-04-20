@@ -16,9 +16,20 @@ enum class Level
 };
 }
 
+// Specialization for bzd::Error type.
+inline bzd::Async<> toStream(bzd::OStream& stream, const bzd::Error& e)
+{
+	co_await !::toStream(stream, "[origin:{}:{}] [{}] {}"_csv, e.getSource(), e.getLine(), e.getTypeAsString(), e.getMessage());
+	co_return {};
+}
+
 namespace bzd {
 class Logger
 {
+public:
+	Logger() noexcept : stream_{bzd::backend::Logger::getDefault()} {}
+	constexpr explicit Logger(bzd::OStream& stream) noexcept : stream_{stream} {}
+
 public:
 	/// Set an error log entry.
 	template <class A>
@@ -290,9 +301,20 @@ private:
 	Async<> printHeader(const bzd::log::Level level, const SourceLocation location) noexcept;
 
 	template <class... Args>
-	Async<> print(const bzd::log::Level level, const SourceLocation location, Args&&... args) noexcept;
+	Async<> print(const bzd::log::Level level, const SourceLocation location, Args&&... args) noexcept
+	{
+		if (level <= minLevel_)
+		{
+			auto scope = co_await stream_.getLock();
+			co_await !printHeader(level, location);
+			co_await !toStream(stream_, bzd::forward<Args>(args)...);
+			co_await !stream_.write("\n"_sv.asBytes());
+		}
+		co_return {};
+	}
 
 protected:
+	bzd::OStream& stream_;
 	bzd::log::Level minLevel_{bzd::log::Level::INFO};
 };
 
@@ -533,27 +555,3 @@ Async<> debug(A&& a, B&& b, C&& c, D&& d, E&& e, F&& f, G&& g, const SourceLocat
 }
 
 } // namespace bzd::log
-
-// Specialization for bzd::Error type.
-inline bzd::Async<> toStream(bzd::OStream& stream, const bzd::Error& e)
-{
-	co_await !::toStream(stream, "[origin:{}:{}] [{}] {}"_csv, e.getSource(), e.getLine(), e.getTypeAsString(), e.getMessage());
-	co_return {};
-}
-
-// ----------------------------------------------------------------------------
-// Implementation
-
-template <class... Args>
-bzd::Async<> bzd::Logger::print(const bzd::log::Level level, const SourceLocation location, Args&&... args) noexcept
-{
-	if (level <= minLevel_)
-	{
-		auto& backend = bzd::backend::Logger::getDefault();
-		auto scope = co_await backend.getLock();
-		co_await !printHeader(level, location);
-		co_await !toStream(backend, bzd::forward<Args>(args)...);
-		co_await !backend.write("\n"_sv.asBytes());
-	}
-	co_return {};
-}
