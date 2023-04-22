@@ -77,7 +77,7 @@ class Entities:
 	def registry(self) -> typing.Dict[Context, typing.Dict[str, ExpressionEntry]]:
 		"""Get the sorted registry expression entry list for a specific context."""
 
-		result = {}
+		result: typing.Dict[Context, typing.Dict[str, ExpressionEntry]] = {}
 		for context, entries in self.all.items():
 			result[context] = OrderedDict()
 			for entry in entries:
@@ -95,7 +95,7 @@ class Entities:
 	def workloads(self) -> typing.Dict[Context, typing.List[ExpressionEntry]]:
 		"""Get the sorted wokloads expression entry list for a specific context."""
 
-		result = {}
+		result: typing.Dict[Context, typing.List[ExpressionEntry]] = {}
 		for context, entries in self.all.items():
 			result[context] = [entry for entry in entries if entry.isWorkload]
 		return result
@@ -104,13 +104,13 @@ class Entities:
 	def services(self) -> typing.Dict[Context, typing.List[ExpressionEntry]]:
 		"""Get the sorted services expression entry list for a specific context."""
 
-		result = {}
+		result: typing.Dict[Context, typing.List[ExpressionEntry]] = {}
 		for context, entries in self.all.items():
 			result[context] = [entry for entry in entries if entry.isService]
 		return result
 
 	@cached_property
-	def ios(self) -> typing.Dict[Context, typing.List[ExpressionEntry]]:
+	def ios(self) -> typing.Dict[Context, typing.List[typing.Dict[str, typing.Any]]]:
 		"""Provide a dictionary grouped by contexts of all connections.
 		
 		[
@@ -128,15 +128,15 @@ class Entities:
 		]
 		"""
 
-		result = {}
+		result: typing.Dict[Context, typing.List[typing.Dict[str, typing.Any]]] = {}
 		for context in self.contexts:
 			result[context] = []
 			for identifier, metadata in self.connections.endpoints.items():
 				if metadata.isSource:
 					entry: typing.Dict[str, typing.Any] = {
-						"symbol": metadata.symbol,
-						"identifier": str(identifier),
-						"sinks": []
+					    "symbol": metadata.symbol,
+					    "identifier": str(identifier),
+					    "sinks": []
 					}
 					isPartOfContext = bool(self.expressions.fromIdentifier(identifier.this, context=context))
 					for identifierSink in metadata.connections:
@@ -145,7 +145,7 @@ class Entities:
 							isPartOfContext = True
 					if isPartOfContext:
 						result[context].append(entry)
-	
+
 		return result
 
 	@cached_property

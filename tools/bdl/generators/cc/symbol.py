@@ -101,7 +101,7 @@ def symbolToStr(symbol: typing.Optional[Symbol],
                 nonConst: bool = False,
                 referenceForInterface: bool = False,
                 values: typing.Optional[typing.Sequence[str]] = None,
-                registry: typing.Optional[typing.Sequence[str]] = None) -> str:
+                registry: bool = False) -> str:
 	"""
 	Convert a type object into a C++ string.
 	Args:
@@ -109,7 +109,7 @@ def symbolToStr(symbol: typing.Optional[Symbol],
 		adapter: If the type should be converted into its adapter.
 		reference: If the symbol is passed as reference.
 		definition: The type is used for a variable definition.
-		registry: FQNs that matches a registry entry.
+		registry: True if the entry is expected to be from the registry (for members only).
 	"""
 
 	if symbol is None:
