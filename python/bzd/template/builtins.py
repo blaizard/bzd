@@ -2,7 +2,7 @@ import typing
 
 
 class BuiltinsBtl:
-	"""Builtins utility functions to be used within the template."""
+	"""Builtins utility functions to be used within the template, available under `btl` namespace."""
 
 	@staticmethod
 	def merge(*args: typing.Any) -> typing.Any:

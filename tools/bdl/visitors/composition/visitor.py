@@ -8,6 +8,7 @@ from bzd.parser.error import Error
 from tools.bdl.visitor import Group
 from tools.bdl.visitors.symbol_map import SymbolMap
 from tools.bdl.visitors.composition.entities import Entities
+from tools.bdl.visitors.composition.components import Context, ExpressionEntry
 from tools.bdl.object import Object
 from tools.bdl.entities.impl.entity import Entity
 from tools.bdl.entities.impl.expression import Expression
@@ -29,73 +30,37 @@ class CompositionView:
 
 		self.composition = composition
 		self.target = target
+		self.contexts = {context for context in self.composition.contexts if target is None or context.target == target}
 
-		if target:
-			assert target in self.composition.targets, f"Using an unknown target '{target}', known targets are: {self.composition.targets}"
-			self.excluding = self.composition.targets.difference({target})
-		else:
-			self.excluding = set()
+	@property
+	def registry(self) -> typing.Dict[Context, typing.Dict[str, ExpressionEntry]]:
+		return self.composition.registry
+
+	@property
+	def services(self) -> typing.Dict[Context, typing.List[ExpressionEntry]]:
+		return self.composition.services
+
+	@property
+	def workloads(self) -> typing.Dict[Context, typing.List[ExpressionEntry]]:
+		return self.composition.workloads
+
+	@property
+	def ios(self) -> typing.Dict[Context, typing.Any]:
+		return self.composition.ios
+
+	@property
+	def iosRegistry(self) -> typing.Dict[str, typing.Dict[str, typing.Any]]:
+		return self.composition.iosRegistry
+
+	def isValidTarget(self, target: str) -> bool:
+		if self.target is None:
+			return True
+		return target == self.target
 
 	def entity(self, fqn: str) -> Entity:
 		"""Get the entity refered to the given fqn."""
 
 		return self.symbols.getEntity(fqn=fqn).value
-
-	def isValidTarget(self, target: str) -> bool:
-		return all((target != excluding) for excluding in self.excluding)
-
-	def isValidFQN_(self, fqn: str) -> bool:
-		for target in self.excluding:
-			if fqn.startswith(target + "."):
-				return False
-		return True
-
-	def stripTargetFromFQN(self, fqn: str) -> str:
-		if self.target and fqn.startswith(self.target + "."):
-			return fqn[(len(self.target) + 1):]
-		return fqn
-
-	def filterDictOfFQN_(self, dictOfFQN: typing.Dict[str, typing.Any]) -> typing.Dict[str, typing.Any]:
-		return {fqn: item for fqn, item in dictOfFQN.items() if self.isValidFQN_(fqn)}
-
-	@property
-	def registry(self) -> typing.Dict[str, Expression]:
-		return self.filterDictOfFQN_(self.composition.registry)
-
-	@property
-	def registryByExecutor(self) -> typing.Dict[str, typing.Dict[str, Entity]]:
-		return {fqn: self.filterDictOfFQN_(item) for fqn, item in self.composition.registryByExecutor.items()}
-
-	@property
-	def platform(self) -> typing.Dict[str, Expression]:
-		return self.filterDictOfFQN_(self.composition.platform)
-
-	@property
-	def executors(self) -> typing.Dict[str, Expression]:
-		return self.filterDictOfFQN_(self.composition.executors)
-
-	@property
-	def registryConnections(self) -> typing.Dict[str, Expression]:
-		return self.filterDictOfFQN_(self.composition.registryConnections)
-
-	@property
-	def connections(self) -> typing.Dict[str, typing.Any]:
-		return self.filterDictOfFQN_(self.composition.connections)
-
-	@property
-	def asyncs(self) -> typing.Dict[str, typing.Dict[Entity, AsyncType]]:
-		output: typing.Dict[str, typing.Dict[Entity, AsyncType]] = {}
-		for fqn, dictOfEntities in self.composition.asyncs.items():
-			if self.isValidFQN_(fqn):
-				output[fqn] = {}
-				for entity, data in dictOfEntities.items():
-					if self.isValidFQN_(entity.fqn):
-						output[fqn][entity] = data
-		return output
-
-	@property
-	def entities(self) -> Entities:
-		return self.composition.entities
 
 	@property
 	def symbols(self) -> SymbolMap:
@@ -116,27 +81,30 @@ class Composition:
 		self.entities = Entities(symbols=self.symbols, targets=self.targets)
 		# Unique identifiers
 		self.uids: typing.Dict[str, int] = {}
-		# All asyncs per executors.
-		self.asyncs: typing.Dict[str, typing.Dict[Entity, AsyncType]] = {}
-		# All connections.
-		self.connections: typing.Dict[str, typing.Any] = {}
-		self.registryByExecutor: typing.Dict[str, typing.Dict[str, Entity]] = {}
 
 	@property
-	def registry(self) -> typing.Dict[str, Expression]:
+	def contexts(self) -> typing.Set[Context]:
+		return self.entities.contexts
+
+	@property
+	def registry(self) -> typing.Dict[Context, typing.Dict[str, ExpressionEntry]]:
 		return self.entities.registry
 
 	@property
-	def platform(self) -> typing.Dict[str, Expression]:
-		return self.entities.platform
+	def services(self) -> typing.Dict[Context, typing.List[ExpressionEntry]]:
+		return self.entities.services
 
 	@property
-	def executors(self) -> typing.Dict[str, Expression]:
-		return self.entities.executors
+	def workloads(self) -> typing.Dict[Context, typing.List[ExpressionEntry]]:
+		return self.entities.workloads
 
 	@property
-	def registryConnections(self) -> typing.Dict[str, typing.Dict[str, typing.Any]]:
-		return self.entities.registryConnections
+	def ios(self) -> typing.Dict[Context, typing.Any]:
+		return self.entities.ios
+
+	@property
+	def iosRegistry(self) -> typing.Dict[str, typing.Dict[str, typing.Any]]:
+		return self.entities.iosRegistry
 
 	def visit(self, bdl: Object) -> "Composition":
 		"""Add a specific BDL object to the composition.
@@ -169,16 +137,6 @@ class Composition:
 
 		self.entities.process(compositionEntities)
 
-		# Applications are all intra expressions that are instanciated at top level
-		for executorFQN in self.entities.executors:
-			self.asyncs[executorFQN] = {}
-			self.registryByExecutor[executorFQN] = self.entities.getRegistryByExecutor(executorFQN)  # type: ignore
-			for entity in self.entities.getWorkloadsByExecutor(executorFQN):
-				self.asyncs[executorFQN][entity] = AsyncType.workload
-			for entity in self.entities.getServicesByExecutor(executorFQN):
-				self.asyncs[executorFQN][entity] = AsyncType.service
-			self.connections[executorFQN] = [*self.entities.getConnectionsByExecutor(executorFQN)]
-
 	def view(self, target: typing.Optional[str] = None) -> CompositionView:
 		"""Get a composition view for a specific target."""
 
@@ -196,7 +154,5 @@ class Composition:
 		addContent(content, "Unique Identifiers", [f"{k}: {v}" for k, v in self.uids.items()])
 		addContent(content, "Entities", str(self.entities).split("\n"))
 		addContent(content, "Executors", self.executors.keys())
-		for executor, items in self.asyncs.items():
-			addContent(content, f"Composition '({executor})'", [f"{k}: {v}" for k, v in items.items()])
 
 		return "\n".join(content)
