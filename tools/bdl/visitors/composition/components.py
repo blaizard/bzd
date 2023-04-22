@@ -72,6 +72,7 @@ class EntryType(enum.Flag):
 	# Service type of asyncs, are stopped when no workloads are running.
 	service = enum.auto()
 
+
 @dataclasses.dataclass(frozen=True)
 class Context:
 	# The executor for this context.
@@ -92,6 +93,7 @@ class Context:
 
 	def __repr__(self) -> str:
 		return f"{self.target}::{self.executor}"
+
 
 @dataclasses.dataclass
 class ExpressionEntry:
@@ -121,8 +123,8 @@ class ExpressionEntry:
 	def __repr__(self) -> str:
 
 		content = [
-		    f"type: {str(self.entryType)}", f"expression: {str(self.expression)}",
-		    f"deps: {self.deps}", f"init: {self.init}", f"intra: {self.intra}", f"shutdown: {self.shutdown}"
+		    f"type: {str(self.entryType)}", f"expression: {str(self.expression)}", f"deps: {self.deps}",
+		    f"init: {self.init}", f"intra: {self.intra}", f"shutdown: {self.shutdown}"
 		]
 		return "\n".join(content)
 
@@ -142,7 +144,7 @@ class Components:
 		"""Collection of all context available in this instance."""
 
 		assert self.isResolved
-		return self.resolved.keys()
+		return set(self.resolved.keys())
 
 	@property
 	def all(self) -> typing.Dict[Context, typing.List[ExpressionEntry]]:
@@ -216,7 +218,7 @@ class Components:
 		identifier = self.makeId(expression)
 
 		if identifier not in self.map:
-			self.map[identifier] : typing.Dict[Context, ExpressionEntry] = {}
+			self.map[identifier] = {}
 		entries = self.map[identifier]
 
 		# Ensure that only a workload can superseed an existing expression with the same id/context.
@@ -248,7 +250,9 @@ class Components:
 		if identifier not in self.map:
 			return Result.makeError(f"The expression with the identifier '{identifier}' is not registered in the map.")
 		if context not in self.map[identifier]:
-			return Result.makeError(f"The expression with the identifier '{identifier}' matches but does not have a entry matching '{context}'.")
+			return Result.makeError(
+			    f"The expression with the identifier '{identifier}' matches but does not have a entry matching '{context}'."
+			)
 		return Result(self.map[identifier][context])
 
 	def __repr__(self) -> str:

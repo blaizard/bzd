@@ -45,7 +45,7 @@ class CompositionView:
 		return self.composition.workloads
 
 	@property
-	def ios(self) -> typing.Dict[Context, typing.Any]:
+	def ios(self) -> typing.Dict[Context, typing.List[typing.Dict[str, typing.Any]]]:
 		return self.composition.ios
 
 	@property
@@ -99,7 +99,7 @@ class Composition:
 		return self.entities.workloads
 
 	@property
-	def ios(self) -> typing.Dict[Context, typing.Any]:
+	def ios(self) -> typing.Dict[Context, typing.List[typing.Dict[str, typing.Any]]]:
 		return self.entities.ios
 
 	@property
@@ -153,6 +153,6 @@ class Composition:
 		addContent(content, "Symbols", str(self.symbols).split("\n"))
 		addContent(content, "Unique Identifiers", [f"{k}: {v}" for k, v in self.uids.items()])
 		addContent(content, "Entities", str(self.entities).split("\n"))
-		addContent(content, "Executors", self.executors.keys())
+		addContent(content, "Contexts", self.contexts)
 
 		return "\n".join(content)
