@@ -2,7 +2,7 @@
 
 set -e
 
-VERSION=16.0.0
+VERSION=16.0.2
 HOST=linux_x86_64
 PACKAGE=${HOST}_${VERSION}
 
@@ -19,6 +19,7 @@ cmake -G "Unix Makefiles" -S llvm -B build -DCMAKE_BUILD_TYPE="Release" \
                                 -DLLVM_EXTERNALIZE_DEBUGINFO=On \
                                 -DLLVM_STATIC_LINK_CXX_STDLIB=On \
                                 -DLLVM_INCLUDE_TESTS=Off \
+                                -DLLVM_INCLUDE_BENCHMARKS \
                                 -DLLVM_INCLUDE_EXAMPLES=Off
 
 cd build

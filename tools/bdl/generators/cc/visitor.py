@@ -4,7 +4,8 @@ from pathlib import Path
 
 from bzd.template.template import Template
 
-from tools.bdl.visitors.composition.visitor import CompositionView, AsyncType as AsyncTypeOriginal
+from tools.bdl.visitors.composition.visitor import CompositionView
+from tools.bdl.visitors.composition.components import EntryType
 from tools.bdl.object import Object
 from tools.bdl.entities.all import Namespace, Using, Expression
 from tools.bdl.entities.impl.fragment.symbol import Symbol
@@ -40,7 +41,6 @@ Expressions:
 class Transform:
 
 	Category = CategoryOriginal
-	AsyncType = AsyncTypeOriginal
 
 	def __init__(self,
 	             composition: typing.Optional[CompositionView] = None,
@@ -93,8 +93,7 @@ class Transform:
 		return symbolToStrOriginal(symbol=symbol, nonConst=True)
 
 	def symbolRegistryToStr(self, symbol: Symbol) -> str:
-		return symbolToStrOriginal(
-		    symbol=symbol, registry=self.composition.registry.keys() if self.composition else None)  # type: ignore
+		return symbolToStrOriginal(symbol=symbol, registry=True)
 
 	# ParameterResolvedItem related
 
@@ -208,10 +207,10 @@ class Transform:
 
 	# Async type
 
-	def asyncTypeToStr(self, asyncType: AsyncTypeOriginal) -> str:
+	def asyncTypeToStr(self, asyncType: EntryType) -> str:
 		return {
-		    AsyncTypeOriginal.workload: "bzd::async::Type::workload",
-		    AsyncTypeOriginal.service: "bzd::async::Type::service",
+		    EntryType.workload: "bzd::async::Type::workload",
+		    EntryType.service: "bzd::async::Type::service",
 		}[asyncType]
 
 	# Parameter

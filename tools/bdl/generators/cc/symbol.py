@@ -122,14 +122,11 @@ def symbolToStr(symbol: typing.Optional[Symbol],
 			return "::".join(namespace[0:-1] + ["adapter"] + namespace[-1:])
 
 	# If the type is part of the registry
-	elif registry is not None:
+	elif registry and symbol.isThis:
 
 		def namespaceToFQN(namespace: typing.List[str]) -> str:
 			fqn = FQN.fromNamespace(namespace=namespace)
-			assert registry is not None
-			if fqn in registry:
-				return "registry.{}_.get()".format(fqnToNameStr(fqn))
-			return "::".join(namespace)
+			return "registry.{}_.get()".format(fqnToNameStr(fqn))
 
 	# Otherwise it must be a normal type
 	return _VisitorSymbol(symbol=symbol,

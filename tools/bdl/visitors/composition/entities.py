@@ -61,79 +61,57 @@ class Entities:
 		else:
 			expression.error(message="Unsupported meta expression.")
 
-	@cached_property
-	def registry(self) -> typing.Dict[str, Expression]:
-		"""The registry."""
-		registry = OrderedDict()
-		for e in self.expressions:
-			if EntryType.registry in e.entryType:
-				registry[e.expression.fqn] = e.expression
-		return registry
+	@property
+	def contexts(self) -> typing.Set[Context]:
+		"""Get the set of available contexts."""
+
+		return self.expressions.contexts
+
+	@property
+	def all(self) -> typing.Dict[Context, typing.List[ExpressionEntry]]:
+		"""Get the sorted expression entry list for a specific context."""
+
+		return self.expressions.all
 
 	@cached_property
-	def platform(self) -> typing.Dict[str, Expression]:
-		"""The platform entities."""
+	def registry(self) -> typing.Dict[Context, typing.Dict[str, ExpressionEntry]]:
+		"""Get the sorted registry expression entry list for a specific context."""
 
-		platform = OrderedDict()
-		for e in self.expressions:
-			if EntryType.platform in e.entryType:
-				platform[e.expression.fqn] = e.expression
-		return platform
-
-	@cached_property
-	def executors(self) -> typing.Dict[str, Expression]:
-		"""The executor entities."""
-
-		executors = OrderedDict()
-		for e in self.expressions:
-			if EntryType.executor in e.entryType:
-				executors[e.expression.fqn] = e.expression
-		return executors
-
-	@cached_property
-	def workloads(self) -> typing.Iterable[ExpressionEntry]:
-		"""List all workloads."""
-		return [e for e in self.expressions if EntryType.workload in e.entryType]
-
-	@cached_property
-	def services(self) -> typing.Iterable[ExpressionEntry]:
-		"""List all services."""
-		return [e for e in self.expressions if EntryType.service in e.entryType]
-
-	@cached_property
-	def registryConnections(self) -> typing.Dict[str, typing.Dict[str, typing.Any]]:
-		"""Provide a registry that contains all available connections.
-		
-		{
-			"example.hello": {
-				"send": {
-					"type": "source",
-					"multi": False,
-					"connections": {"example.hello.send"},
-					"symbol": <symbol>,
-					"identifier": "example.hello.send"
-				}
-			},
-			...
-		}
-		"""
-
-		result: typing.Dict[str, typing.Dict[str, typing.Any]] = {fqn: OrderedDict() for fqn in self.registry.keys()}
-
-		for identifier, metadata in self.connections.endpoints.items():
-			if identifier.this in result:
-				result[identifier.this][identifier.name] = {
-				    "type": "source" if metadata.isSource else "sink",
-				    "multi": metadata.multi,
-				    "connections": [str(connection) for connection in metadata.connections],
-				    "symbol": metadata.symbol,
-				    "identifier": str(identifier)
-				}
-
+		result = {}
+		for context, entries in self.all.items():
+			result[context] = OrderedDict()
+			for entry in entries:
+				if entry.isRegistry:
+					result[context][entry.expression.fqn] = entry
 		return result
 
-	def getConnectionsByExecutor(self, fqn: str) -> typing.Iterable[typing.Dict[str, typing.Any]]:
-		"""Provide an iterator over all connections sources for a specific executor.
+	@cached_property
+	def registryFQNs(self) -> typing.Set[str]:
+		"""Set of all registry FQNs."""
+
+		return {fqn for _, entries in self.registry.items() for fqn in entries.keys()}
+
+	@cached_property
+	def workloads(self) -> typing.Dict[Context, typing.List[ExpressionEntry]]:
+		"""Get the sorted wokloads expression entry list for a specific context."""
+
+		result = {}
+		for context, entries in self.all.items():
+			result[context] = [entry for entry in entries if entry.isWorkload]
+		return result
+
+	@cached_property
+	def services(self) -> typing.Dict[Context, typing.List[ExpressionEntry]]:
+		"""Get the sorted services expression entry list for a specific context."""
+
+		result = {}
+		for context, entries in self.all.items():
+			result[context] = [entry for entry in entries if entry.isService]
+		return result
+
+	@cached_property
+	def ios(self) -> typing.Dict[Context, typing.List[ExpressionEntry]]:
+		"""Provide a dictionary grouped by contexts of all connections.
 		
 		[
 			{
@@ -150,33 +128,57 @@ class Entities:
 		]
 		"""
 
-		for identifier, metadata in self.connections.endpoints.items():
-			if metadata.isSource:
-				result: typing.Dict[str, typing.Any] = {
-				    "symbol": metadata.symbol,
-				    "identifier": str(identifier),
-				    "sinks": []
+		result = {}
+		for context in self.contexts:
+			result[context] = []
+			for identifier, metadata in self.connections.endpoints.items():
+				if metadata.isSource:
+					entry: typing.Dict[str, typing.Any] = {
+						"symbol": metadata.symbol,
+						"identifier": str(identifier),
+						"sinks": []
+					}
+					isPartOfContext = bool(self.expressions.fromIdentifier(identifier.this, context=context))
+					for identifierSink in metadata.connections:
+						if bool(self.expressions.fromIdentifier(identifierSink.this, context=context)):
+							entry["sinks"].append({"history": self.connections.endpoints[identifierSink].history})
+							isPartOfContext = True
+					if isPartOfContext:
+						result[context].append(entry)
+	
+		return result
+
+	@cached_property
+	def iosRegistry(self) -> typing.Dict[str, typing.Dict[str, typing.Any]]:
+		"""Provide a registry that contains all available connections.
+		
+		{
+			"example.hello": {
+				"send": {
+					"type": "source",
+					"multi": False,
+					"connections": {"example.hello.send"},
+					"symbol": <symbol>,
+					"identifier": "example.hello.send"
 				}
-				isExecutor = fqn in self.expressions.fromIdentifier(identifier.this).value.executors
-				for identifierSink in metadata.connections:
-					if fqn in self.expressions.fromIdentifier(identifierSink.this).value.executors:
-						result["sinks"].append({"history": self.connections.endpoints[identifierSink].history})
-						isExecutor = True
-				if isExecutor:
-					yield result
+			},
+			...
+		}
+		"""
 
-	def getRegistryByExecutor(self, fqn: str) -> typing.Dict[str, Expression]:
-		registry = OrderedDict()
-		for entry in self.expressions:
-			if EntryType.registry in entry.entryType and fqn in entry.executors:
-				registry[entry.expression.fqn] = entry.expression
-		return registry
+		result: typing.Dict[str, typing.Dict[str, typing.Any]] = {fqn: OrderedDict() for fqn in self.registryFQNs}
 
-	def getWorkloadsByExecutor(self, fqn: str) -> typing.Iterable[Expression]:
-		return [entry.expression for entry in self.workloads if fqn in entry.executors]
+		for identifier, metadata in self.connections.endpoints.items():
+			if identifier.this in result:
+				result[identifier.this][identifier.name] = {
+				    "type": "source" if metadata.isSource else "sink",
+				    "multi": metadata.multi,
+				    "connections": [str(connection) for connection in metadata.connections],
+				    "symbol": metadata.symbol,
+				    "identifier": str(identifier)
+				}
 
-	def getServicesByExecutor(self, fqn: str) -> typing.Iterable[Expression]:
-		return [entry.expression for entry in self.services if fqn in entry.executors]
+		return result
 
 	def getContext(self, expression: Expression, defaultExecutor: typing.Optional[str]) -> Context:
 		"""Identify the executor and target pair associated with an expression."""
@@ -209,14 +211,18 @@ class Entities:
 		assert executor
 		entity = self.symbols.getEntityResolved(fqn=executor).assertValue(element=expression.element)
 
+		return self.getContextFromExecutor(executor=executor)
+
+	def getContextFromExecutor(self, executor: str) -> Context:
+		"""Get a context from an executor, throw if none is found."""
+
 		# Identify the target.
 		target = None
 		for t in self.targets:
 			if executor.startswith(f"{t}."):
 				target = t
-		entity.assertTrue(condition=target is not None, message="There is no target associated with this executor.")
+		assert target is not None, f"There is no target associated with this executor '{executor}'."
 
-		assert target
 		return Context(executor=executor, target=target)
 
 	def process(self, expressions: typing.Iterable[Expression]) -> None:
@@ -228,7 +234,6 @@ class Entities:
 		# First stage.
 		executors: typing.List[Expression] = []
 		workloads: typing.List[Expression] = []
-		platforms: typing.List[Expression] = []
 		meta: typing.List[Expression] = []
 		for expression in expressions:
 			resolver = expression.makeResolver(symbols=self.symbols)
@@ -241,8 +246,6 @@ class Entities:
 			if expression.isSymbol:
 				if expression.isExecutor:
 					executors.append(expression)
-				elif expression.namespace and expression.namespace[-1] == "platform":
-					platforms.append(expression)
 				elif expression.isRoleMeta:
 					meta.append(expression)
 				else:
@@ -353,20 +356,6 @@ class Entities:
 			expression.error(
 			    message=f"Unsupported entry type '{underlyingType.category.value}' within the composition stage.")
 
-		# Check if a platform.
-		if expression.namespace and expression.namespace[-1] == "platform":
-			entryType |= EntryType.platform
-		# Check if an executor.
-		if expression.isExecutor:
-			expression.assertTrue(condition=underlyingType.category == Category.component,
-			                      message="Executors must be a component.")
-			entryType |= EntryType.executor
-
-		# If top level, only process a certain type of entry.
-		if not (isDepedency or (EntryType.workload in entryType) or (EntryType.platform in entryType) or
-		        (EntryType.executor in entryType)):
-			return
-
 		# Register the entry.
 		entry = self.expressions.insert(expression=expression, entryType=entryType, context=context)
 		if entry is None:
@@ -431,28 +420,7 @@ class Entities:
 			self.addResolvedDependency(dependency, context=context)
 
 	def close(self) -> None:
-
-		# Close the connection object.
 		self.connections.close()
-
-		# Add platform expressions to all executors.
-		#for expression in self.platform.values():
-		#	for entry in self.expressions.getDependencies(expression):
-		#		entry.executors.update(self.executors.keys())
-
-		# Replace the default executor with an actual value if there is only one executor,
-		# otherwise, raise an error.
-		executors = self.executors.keys()
-		for e in self.expressions:
-			# We only check cases with a single executor because, other case should be platforms.
-			if len(e.executors) == 1 and self.defaultExecutorName_ in e.executors:
-				e.expression.assertTrue(
-				    condition=len(executors) <= 1,
-				    message=
-				    f"No executor is assigned to this expression on a multi-executor ({', '.join([*executors])}) composition."
-				)
-				e.executors = {*executors}
-
 		self.expressions.close()
 
 	def __str__(self) -> str:

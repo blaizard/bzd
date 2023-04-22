@@ -2,25 +2,37 @@
 {%- include "tools/bdl/generators/cc/template/declarations.h.btl" -%}
 
 {#- Generate calls for all init members associated with an expression. -#}
-{%- macro callInitMembers(expresssion) -%}
-	{% for dep in entities.expressions[expresssion].value.deps %}
+{%- macro callInitMembers(entry) -%}
+	{% for dep in entry.deps %}
 co_await !registry.{{ dep.fqn | fqnToNameStr }}_.init(registry);
 	{% end %}
-	{% for dep in entities.expressions[expresssion].value.init %}
+	{% for dep in entry.init %}
 co_await !{{ dep.symbol | symbolRegistryToStr }}();
 	{% end %}
 {% end -%}
 
 {#- Generate calls for all shutdown members associated with an expression. -#}
-{%- macro callShutdownMembers(expresssion) -%}
-	{% for dep in entities.expressions[expresssion].value.shutdown %}
+{%- macro callShutdownMembers(entry) -%}
+	{% for dep in entry.shutdown %}
 co_await !{{ dep.symbol | symbolRegistryToStr }}();
 	{% end %}
-	{% for dep in entities.expressions[expresssion].value.deps %}
+	{% for dep in entry.deps %}
 co_await !registry.{{ dep.fqn | fqnToNameStr }}_.shutdown(registry);
 	{% end %}
 {% end -%}
 
+{#- Generate the list of includes for a specific target. -#}
+{%- macro generateIncludesForTarget(target) -%}
+	{% for includesTarget, includes in data.cc.includes -%}
+		{% if target == includesTarget -%}
+			{% for path in includes %}
+#include "{{ path }}"
+			{% end -%}
+		{% end -%}
+	{% end -%}
+{%- end -%}
+
+// Includes for all target.
 #include "cc/bzd/core/logger.hh"
 #include "cc/bzd/core/assert.hh"
 #include "cc/bzd/core/io/buffer.hh"
@@ -30,16 +42,9 @@ co_await !registry.{{ dep.fqn | fqnToNameStr }}_.shutdown(registry);
 #include "cc/bzd/meta/string_literal.hh"
 #include "cc/bzd/utility/synchronization/spin_mutex.hh"
 #include "cc/bzd/utility/synchronization/sync_lock_guard.hh"
-{% for target, includes in data.cc.includes %}
-{% if isValidTarget(target) %}
+{{ generateIncludesForTarget("all") }}
 // Includes for '{{ target }}' target.
-{% for path in includes %}
-#include "{{ path }}"
-{% end %}
-{% end %}
-{% end %}
-
-// for deploy in deployments
+{{ generateIncludesForTarget(target) }}
 
 namespace {
 
@@ -50,6 +55,56 @@ enum class Status
 	initialized,
 	shuttingDown,
 };
+
+template <class ConfigType, class IOType>
+[[nodiscard]] constexpr auto makeContext(ConfigType&& config_, IOType&& io_) noexcept
+{
+	struct Context
+	{
+		constexpr Context(ConfigType&& config_, IOType&& io_) noexcept : config{bzd::move(config_)}, io{bzd::move(io_)} {}
+
+		Context(const Context&) = delete;
+		Context& operator=(const Context&) = delete;
+		Context(Context&&) = delete;
+		Context& operator=(Context&&) = delete;
+		~Context() = default;
+
+		using Config = ConfigType;
+		using IO = IOType;
+		const Config config;
+		IO io;
+	};
+	return Context{bzd::move(config_), bzd::move(io_)};
+}
+
+/// Helper to handle return code.
+template <class Promise>
+[[nodiscard]] constexpr bzd::Bool verifyReturnedPromise(Promise&& promise, const bzd::StringView taskName) noexcept
+{
+	if (!promise.hasResult())
+	{
+		bzd::log::error("Task '{}' did not terminate correctly."_csv, taskName).sync();
+		return false;
+	}
+	
+	const auto result{promise.moveResultOut()};
+	if (result.hasError())
+	{
+		bzd::log::error("Task '{}' terminated with an error."_csv, taskName).sync();
+		bzd::log::error(result.error()).sync();
+		return false;
+	}
+
+	return true;
+}
+
+} // namespace
+
+{% for context in contexts %}
+
+// ==== Specializations =======================================================
+
+namespace bzd::registry::{{ context.executor | fqnToNameStr }} {
 
 template <bzd::meta::StringLiteral name>
 class ResourceSpecialization;
@@ -103,162 +158,79 @@ protected:
 	bzd::Int32 refCount_{0};
 };
 
-template <class ConfigType, class IOType>
-[[nodiscard]] constexpr auto makeContext(ConfigType&& config_, IOType&& io_) noexcept
-{
-	struct Context
-	{
-		constexpr Context(ConfigType&& config_, IOType&& io_) noexcept : config{bzd::move(config_)}, io{bzd::move(io_)} {}
-
-		Context(const Context&) = delete;
-		Context& operator=(const Context&) = delete;
-		Context(Context&&) = delete;
-		Context& operator=(Context&&) = delete;
-		~Context() = default;
-
-		using Config = ConfigType;
-		using IO = IOType;
-		const Config config;
-		IO io;
-	};
-	return Context{bzd::move(config_), bzd::move(io_)};
-}
-
-} // namespace
-
-// ==== Platform ==============================================================
-
-namespace bzd::platform::backend {
-{% for fqn, expression in platform %}
-static ::{{ expression.interfaceTypeResolved | symbolToStr }}* {{ expression.name }}{nullptr};
-{% end %}
-} // bzd::platform::backend
-
-namespace bzd::platform {
-
-{% for fqn, expression in platform %}
-[[nodiscard]] ::{{ expression.interfaceTypeResolved | symbolToStr }}& {{ expression.name }}() noexcept
-{
-	return *::bzd::platform::backend::{{ expression.name }};
-}
-{% end %}
-
-} // bzd::platform
-
-// ==== Specializations =======================================================
-
-namespace {
-
-{% for fqn, expression in registry %}
+	{% for fqn, entry in registry[context] %}
 
 // Specialization for '{{ fqn | fqnToStr }}'.
 template <>
 class ResourceSpecialization<"{{ fqn }}">
 {
 public:
-	{{ paramsTemplateDefinition(expression.parametersResolved) }}
+	{{ paramsTemplateDefinition(entry.expression.parametersResolved) }}
 	struct Config
 	{
-		{{ paramsConstructorDefinition("Config", expression.parametersResolved) }}
-	{% for index, item in expression.parametersResolved %}
+		{{ paramsConstructorDefinition("Config", entry.expression.parametersResolved) }}
+		{% for index, item in entry.expression.parametersResolved %}
 		{{ item.comment | commentBlockToStr }}
 		{{- paramToDefinition(item, index) }}
-	{% end %}
+		{% end %}
 	};
 
-	{{ iterableTemplateDefinition(registryConnections[fqn].keys()) }}
+	{{ iterableTemplateDefinition(iosRegistry[fqn].keys()) }}
 	struct IO
 	{
-		{{ iterableConstructorDefinitionRValue("IO", registryConnections[fqn].keys()) }}
-	{% for index, name in registryConnections[fqn].keys() %}
+		{{ iterableConstructorDefinitionRValue("IO", iosRegistry[fqn].keys()) }}
+		{% for index, name in iosRegistry[fqn].keys() %}
 		T{{ index }} {{ name }};
-	{% end %}
+		{% end %}
 	};
 
 protected:
 	bzd::Async<> init([[maybe_unused]] auto& registry) noexcept
 	{
-		{{ callInitMembers(expression) }}
-		{% if fqn in platform %}
-		::bzd::platform::backend::{{ expression.name }} = &registry.{{ fqn | fqnToNameStr }}_.get();
-		{% end %}
+		{{ callInitMembers(entry) }}
 		co_return {};
 	}
 	bzd::Async<> shutdown([[maybe_unused]] auto& registry) noexcept
 	{
-		{% if fqn in platform  %}
-		::bzd::platform::backend::{{ expression.name }} = nullptr;
-		{% end %}
-		{{ callShutdownMembers(expression) }}
+		{{ callShutdownMembers(entry) }}
 		co_return {};
 	}
 };
-{% end %}
+	{% end %}
 
 // ==== Registry ==============================================================
 
-{% for executorFQN in executors %}
-
-[[nodiscard]] auto& makeRegistry{{ executorFQN | fqnToCapitalized }}() noexcept
+[[nodiscard]] auto& make() noexcept
 {
 	// Definition of communication ring buffers.
-	{% for connection in connections[executorFQN] %}
+	{% for connection in ios[context] %}
 	static bzd::io::Buffer<{{ connection.symbol | symbolToStr }}, {{ connection | connectionCount }}u, "{{ connection.identifier }}"> io_buffer_{{ connection.identifier | fqnToNameStr }}{};
 	{% end %}
 
 	// Definition of all registry entries and their configuration.
-	{% for fqn, expression in registryByExecutor[executorFQN] %}
+	{% for fqn, entry in registry[context] %}
+	// {{ fqn }}
 	static auto context_{{ fqn | fqnToNameStr }} = makeContext(
-		ResourceSpecialization<"{{ fqn }}">::Config{ {{- paramsDeclaration(expression.parametersResolved | paramsFilterOutLiterals) -}} },
-		ResourceSpecialization<"{{ fqn }}">::IO{ {{- registryConnectionsDeclaration(registryConnections[fqn]) -}} }
+		ResourceSpecialization<"{{ fqn }}">::Config{ {{- paramsDeclaration(entry.expression.parametersResolved | paramsFilterOutLiterals) -}} },
+		ResourceSpecialization<"{{ fqn }}">::IO{ {{- registryConnectionsDeclaration(iosRegistry[fqn]) -}} }
 	);
-	static {{ expression.typeResolved | symbolDefinitionToStr }} {{ fqn | fqnToNameStr }}{context_{{ fqn | fqnToNameStr }}};
+	static {{ entry.expression.typeResolved | symbolDefinitionToStr }} {{ fqn | fqnToNameStr }}{context_{{ fqn | fqnToNameStr }}};
 	{% end %}
 
 	// Declaration of the registry.
 	struct Registry
 	{
-		{% for fqn, expression in registryByExecutor[executorFQN] %}
+		{% for fqn, entry in registry[context] %}
 		Resource<"{{ fqn }}", decltype({{ fqn | fqnToNameStr }})> {{ fqn | fqnToNameStr }}_;
 		{% end %}
 	};
-	static Registry registry{ {%- for fqn, expression in registryByExecutor[executorFQN] %}{% if not loop.first %}, {% end %}{{ fqn | fqnToNameStr }}{% end -%} };
+	static Registry registry{ {%- for fqn, entry in registry[context] %}{% if not loop.first %}, {% end %}{{ fqn | fqnToNameStr }}{% end -%} };
 	return registry;
 }
 
+} // namespace bzd::registry::{{ context.executor | fqnToNameStr }}
+
 {% end %}
-
-/// Helper to handle return code.
-template <class Promise>
-[[nodiscard]] constexpr bzd::Bool verifyReturnedPromise(Promise&& promise, const bzd::StringView taskName) noexcept
-{
-	if (!promise.hasResult())
-	{
-		bzd::log::error("Task '{}' did not terminate correctly."_csv, taskName).sync();
-		return false;
-	}
-	
-	const auto result{promise.moveResultOut()};
-	if (result.hasError())
-	{
-		bzd::log::error("Task '{}' terminated with an error."_csv, taskName).sync();
-		bzd::log::error(result.error()).sync();
-		return false;
-	}
-
-	return true;
-}
-
-bzd::Async<> initPlatform([[maybe_unused]] auto& registry) noexcept
-{
-	{% for fqn, expression in platform %}
-	co_await !registry.{{ fqn | fqnToNameStr }}_.init(registry);
-	{% end %}
-	co_await !bzd::log::info("Initialization of platform completed."_csv);
-	co_return {};
-}
-
-} // namespace
 
 // ==== Identifiers ===========================================================
 
@@ -278,50 +250,45 @@ struct Data
 
 // ==== Execution =============================================================
 
-{% for executorFQN in executors %}
+{% for context in contexts %}
 
 /// Initialize and compose the application.
-bool run{{ stripTargetFromFQN(executorFQN) | fqnToCapitalized }}() noexcept
+bool run{{ context.executorWithoutTarget | fqnToCapitalized }}() noexcept
 {
 	// Create registry.
-	[[maybe_unused]] auto& registry = makeRegistry{{ executorFQN | fqnToCapitalized }}();
-
-	// Initialize platform.
-	bzd::ignore = initPlatform(registry).sync();
+	[[maybe_unused]] auto& registry = bzd::registry::{{ context.executor | fqnToNameStr }}::make();
 
 	// Initialize executors.
-	registry.{{ executorFQN | fqnToNameStr }}_.init(registry).sync();
-	bzd::log::info("[{{ executorFQN }}] Initialization completed."_csv).sync();
+	registry.{{ context.executor | fqnToNameStr }}_.init(registry).sync();
+	bzd::log::info("[{{ context.executor }}] Initialization completed."_csv).sync();
 
 	// Composition.
-	bzd::log::info("[{{ executorFQN }}] Composition phase."_csv).sync();
-	{% for expression, asyncType in asyncs.get(executorFQN) %}
+	bzd::log::info("[{{ context.executor }}] Composition phase."_csv).sync();
+	{% for entry in btl.merge(services[context], workloads[context]) %}
 
-	// {{ asyncType.value }}: {{ expression.symbol | symbolToStr }}()
+	// {{ entry.entryType.value }}: {{ entry.expression.symbol | symbolToStr }}()
 	auto async_{{loop.parent.index}}_{{ loop.index }} = [&]() -> bzd::Async<> {
-		{{ callInitMembers(expression) }}
-		co_await !{{ expression.symbol | symbolRegistryToStr }}({{- paramsDeclaration(expression.parametersResolved, true) -}} );
-		{{ callShutdownMembers(expression) }}
+		{{ callInitMembers(entry) }}
+		co_await !{{ entry.expression.symbol | symbolRegistryToStr }}({{- paramsDeclaration(entry.expression.parametersResolved, true) -}} );
+		{{ callShutdownMembers(entry) }}
 		co_return {};
 	};
 	auto promise_{{loop.parent.index}}_{{ loop.index }} = async_{{loop.parent.index}}_{{ loop.index }}();
-	registry.{{ executorFQN | fqnToNameStr }}_.get().schedule(promise_{{loop.parent.index}}_{{ loop.index }}, {{ asyncType | asyncTypeToStr }});
+	registry.{{ context.executor | fqnToNameStr }}_.get().schedule(promise_{{loop.parent.index}}_{{ loop.index }}, {{ entry.entryType | asyncTypeToStr }});
 	{% end %}
 
 	// Execute.
-	bzd::log::info("[{{ executorFQN }}] Execution phase."_csv).sync();
-	registry.{{ executorFQN | fqnToNameStr }}_.get().start();
+	bzd::log::info("[{{ context.executor }}] Execution phase."_csv).sync();
+	registry.{{ context.executor | fqnToNameStr }}_.get().start();
 
 	// Wait until completion.
-	registry.{{ executorFQN | fqnToNameStr }}_.get().stop();
-	bzd::log::info("[{{ executorFQN }}] Completion."_csv).sync();
+	registry.{{ context.executor | fqnToNameStr }}_.get().stop();
+	bzd::log::info("[{{ context.executor }}] Completion."_csv).sync();
 
 	// Compute the return code.
 	bool isSuccess{true};
-	{% for expression, asyncType in asyncs.get(executorFQN) %}
-		{% if asyncType == AsyncType.workload %}
-	isSuccess &= verifyReturnedPromise(bzd::move(promise_{{loop.parent.index}}_{{ loop.index }}), "{{ expression.symbol | symbolToStr }}()"_sv);
-		{% end %}
+	{% for entry in workloads[context] %}
+	isSuccess &= verifyReturnedPromise(bzd::move(promise_{{loop.parent.index}}_{{ loop.index }}), "{{ entry.expression.symbol | symbolToStr }}()"_sv);
 	{% end %}
 	return isSuccess;
 }

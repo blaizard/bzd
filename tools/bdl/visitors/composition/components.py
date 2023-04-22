@@ -71,24 +71,27 @@ class EntryType(enum.Flag):
 	workload = enum.auto()
 	# Service type of asyncs, are stopped when no workloads are running.
 	service = enum.auto()
-	# Part of the platform declaration.
-	platform = enum.auto()
-	# Executor type, all executors must also be part of the registry.
-	executor = enum.auto()
 
-
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class Context:
 	# The executor for this context.
 	executor: str
 	# The target for this context.
 	target: str
 
+	@property
+	def executorWithoutTarget(self) -> str:
+		"""Return the executor name without the target name."""
+
+		return self.executor[len(self.target) + 1:]
+
 	def makeResolver(self, symbols: SymbolMap, expression: Expression, **kwargs: typing.Any) -> Resolver:
 		"""Create a resolver object, used to find (resolve) symbols."""
 
 		return expression.makeResolver(symbols=symbols, target=self.target, **kwargs)
 
+	def __repr__(self) -> str:
+		return f"{self.target}::{self.executor}"
 
 @dataclasses.dataclass
 class ExpressionEntry:
@@ -96,8 +99,6 @@ class ExpressionEntry:
 	expression: Expression
 	# The asynchronous type of this entity.
 	entryType: EntryType
-	# The executors associated with this entry.
-	executors: typing.Set[str] = dataclasses.field(default_factory=set)
 	# Dependencies over other entities, first level dependencies.
 	deps: DependencyGroup = dataclasses.field(default_factory=DependencyGroup)
 	# Direct dependencies.
@@ -105,10 +106,22 @@ class ExpressionEntry:
 	intra: DependencyGroup = dataclasses.field(default_factory=DependencyGroup)
 	shutdown: DependencyGroup = dataclasses.field(default_factory=DependencyGroup)
 
+	@property
+	def isRegistry(self) -> bool:
+		return EntryType.registry in self.entryType
+
+	@property
+	def isWorkload(self) -> bool:
+		return EntryType.workload in self.entryType
+
+	@property
+	def isService(self) -> bool:
+		return EntryType.service in self.entryType
+
 	def __repr__(self) -> str:
 
 		content = [
-		    f"type: {str(self.entryType)}", f"expression: {str(self.expression)}", f"executors: {str(self.executors)}",
+		    f"type: {str(self.entryType)}", f"expression: {str(self.expression)}",
 		    f"deps: {self.deps}", f"init: {self.init}", f"intra: {self.intra}", f"shutdown: {self.shutdown}"
 		]
 		return "\n".join(content)
@@ -117,7 +130,26 @@ class ExpressionEntry:
 class Components:
 
 	def __init__(self) -> None:
-		self.map: typing.Dict[str, ExpressionEntry] = OrderedDict()
+
+		self.map: typing.Dict[str, typing.Dict[Context, ExpressionEntry]] = {}
+		# Flag flipped when the data is resolved.
+		self.isResolved = False
+		# Ordered view of the map, commputed only after close.
+		self.resolved: typing.Dict[Context, typing.List[ExpressionEntry]] = {}
+
+	@property
+	def contexts(self) -> typing.Set[Context]:
+		"""Collection of all context available in this instance."""
+
+		assert self.isResolved
+		return self.resolved.keys()
+
+	@property
+	def all(self) -> typing.Dict[Context, typing.List[ExpressionEntry]]:
+		"""Collection of all expression entites available in this instance."""
+
+		assert self.isResolved
+		return self.resolved
 
 	@staticmethod
 	def makeId(expression: Expression) -> str:
@@ -137,105 +169,93 @@ class Components:
 		"""Resolve the dependencies to ensure that each entry can be created sequentially
 		with only previously created entries as dependencies."""
 
-		def isSatisfied(group: DependencyGroup) -> bool:
-			"""Check that the group dependency is statified with the current map."""
+		assert not self.isResolved
 
-			for expression in group:
-				if self.makeId(expression) not in self.map:
-					return False
-			return True
+		self.resolved = {}
+		contexts = {context for entries in self.map.values() for context in entries.keys()}
+		for context in contexts:
 
-		entries = [(k, v) for k, v in self.map.items()]
-		self.map = OrderedDict()
+			self.resolved[context] = []
+			discovered = set()
 
-		while entries:
+			def isSatisfied(group: DependencyGroup) -> bool:
+				"""Check that the group dependency is statified with the current map."""
 
-			remaining: typing.List[typing.Tuple[str, ExpressionEntry]] = []
-			for identifier, entry in entries:
-				if isSatisfied(entry.deps):
-					self.map[identifier] = entry
-				else:
-					remaining.append((identifier, entry))
+				for expression in group:
+					if self.makeId(expression) not in discovered:
+						return False
+				return True
 
-			if len(entries) == len(remaining):
-				entries[0][1].expression.error(message="The dependencies of this expression are not met.")
+			entries = [(identifier, entries[context]) for identifier, entries in self.map.items() if context in entries]
+			while entries:
 
-			entries = remaining
+				remaining: typing.List[typing.Tuple[str, ExpressionEntry]] = []
+				for identifier, entry in entries:
+					if isSatisfied(entry.deps):
+						self.resolved[context].append(entry)
+						discovered.add(identifier)
+					else:
+						remaining.append((identifier, entry))
+
+				if len(entries) == len(remaining):
+					entries[0][1].expression.error(message="The dependencies of this expression are not met.")
+
+				entries = remaining
+
+		self.isResolved = True
 
 	def close(self) -> None:
 		self.resolve()
-
-	def __contains__(self, expression: Expression) -> bool:
-		"""Check if an entry already exists in the map."""
-
-		return self.makeId(expression) in self.map
-
-	def __getitem__(self, expression: Expression) -> Result[ExpressionEntry, str]:
-		"""Get a specific item."""
-
-		identifier = self.makeId(expression)
-		return self.fromIdentifier(identifier=identifier)
-
-	def __iter__(self) -> typing.Iterator[ExpressionEntry]:
-		for entry in self.map.values():
-			yield entry
 
 	def insert(self, expression: Expression, entryType: EntryType,
 	           context: Context) -> typing.Optional[ExpressionEntry]:
 		"""Insert a new entry in the map, return the entry if it does not exists or if it can be updated,
 		otherwise it returns None."""
 
+		assert not self.isResolved
 		identifier = self.makeId(expression)
 
-		# Ensure that only a workload can superseed an existing expression with the same id.
-		if identifier in self.map:
+		if identifier not in self.map:
+			self.map[identifier] : typing.Dict[Context, ExpressionEntry] = {}
+		entries = self.map[identifier]
+
+		# Ensure that only a workload can superseed an existing expression with the same id/context.
+		if context in entries:
 
 			def isOverwritable(entryTypeFrom: EntryType, entryTypeTo: EntryType) -> bool:
 				return (EntryType.service in entryTypeFrom) and (EntryType.workload in entryTypeTo)
 
-			# If this is the exact same expression.
-			if self.map[identifier].entryType == entryType:
-				expression.assertTrue(
-				    condition=(self.map[identifier].expression == expression),
-				    message=
-				    f"This expression already exits and cannot be redeclared as the same role: '{entryType}', identifier: {identifier}."
-				)
+			# If it has the same type.
+			if entries[context].entryType == entryType:
 				return None
-			if isOverwritable(entryType, self.map[identifier].entryType):
+			# If it is already overwitten.
+			if isOverwritable(entryType, entries[context].entryType):
 				return None
 			expression.assertTrue(
-			    condition=isOverwritable(self.map[identifier].entryType, entryType),
+			    condition=isOverwritable(entries[context].entryType, entryType),
 			    message=
-			    f"An expression of role '{entryType}' cannot overwrite an expression of role '{self.map[identifier].entryType}'."
+			    f"An expression of role '{entryType}' cannot overwrite an expression of role '{entries[context].entryType}'."
 			)
 
-		self.map[identifier] = ExpressionEntry(expression=expression, entryType=entryType, executors={context.executor})
-		return self.map[identifier]
+		# Note, it is important to do a copy of the expression, as multilpe expression will co-exist with different
+		# arguments, for example when used with `target.out`.
+		entries[context] = ExpressionEntry(expression=expression.deepCopy(), entryType=entryType)
+		return entries[context]
 
-	def fromIdentifier(self, identifier: str) -> Result[ExpressionEntry, str]:
+	def fromIdentifier(self, identifier: str, context: Context) -> Result[ExpressionEntry, str]:
 		"""Get the ExpressionEntry associated with a specific symbol."""
 
 		if identifier not in self.map:
 			return Result.makeError(f"The expression with the identifier '{identifier}' is not registered in the map.")
-		return Result(self.map[identifier])
-
-	def getDependencies(self, expression: Expression) -> typing.Iterator[ExpressionEntry]:
-		"""Follow the dependencies of a particular expression and output each if its entries including itself."""
-
-		alreadyVisited: typing.Set[str] = set()
-		toVisit = [expression]
-		while toVisit:
-			expression = toVisit.pop(0)
-			identifier = self.makeId(expression)
-			if identifier not in alreadyVisited:
-				alreadyVisited.add(identifier)
-				if identifier in self.map:
-					entry = self.map[identifier]
-					yield entry
-					toVisit += [*entry.deps, *entry.init, *entry.intra, *entry.shutdown]
+		if context not in self.map[identifier]:
+			return Result.makeError(f"The expression with the identifier '{identifier}' matches but does not have a entry matching '{context}'.")
+		return Result(self.map[identifier][context])
 
 	def __repr__(self) -> str:
 		content = []
-		for identifier, entry in self.map.items():
-			content += [identifier] + [f"\t{line}" for line in str(entry).split("\n")]
+		for identifier, entries in self.map.items():
+			content += [identifier]
+			for context, entry in entries.items():
+				content += [f"\t{context}"]
+				content += [f"\t\t{line}" for line in str(entry).split("\n")]
 		return "\n".join(content)
