@@ -1,10 +1,11 @@
+use "cc/bzd/platform/interfaces/stream.bdl"
 
 namespace example;
 
 
-method run();
+method run(out = bzd.OStream);
 composition {
-	run();
+	run(out = target.platform.out);
 	
 }
 

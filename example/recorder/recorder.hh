@@ -83,8 +83,8 @@ public:
 		for (int i = 0; i < 10; ++i)
 		{
 			co_await !context_.io.send.set(i);
-			co_await !bzd::print("Sending {}\n"_csv, i);
-			co_await !bzd::platform::steadyClock().delay(100_ms);
+			co_await !bzd::print(context_.config.out, "Sending {}\n"_csv, i);
+			co_await !context_.config.steadyClock.delay(100_ms);
 		}
 
 		/*co_await !bzd::print("Hello {}"_csv, bzd::Data<"example.Hello.send">::id);
@@ -142,7 +142,7 @@ private:
 			auto scope = co_await !sink.get();
 			if (scope)
 			{
-				co_await !bzd::print("{}: {}\n"_csv, sink.getName(), scope.value());
+				co_await !bzd::print(context_.config.out, "{}: {}\n"_csv, sink.getName(), scope.value());
 			}
 		}
 		co_return {};

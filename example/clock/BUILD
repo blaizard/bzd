@@ -8,6 +8,7 @@ bdl_library(
     ],
     deps = [
         "//cc/bzd/platform/interfaces:clock",
+        "//cc/bzd/platform/interfaces:stream",
     ],
 )
 
