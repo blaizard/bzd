@@ -3,7 +3,7 @@ use "cc/bzd/platform/interfaces/tcp.bdl"
 namespace trader;
 
 
-component Trader {
+component Trader : ComponentBase {
 interface:
 	method run();
 	
@@ -13,7 +13,7 @@ config:
 }
 
 composition {
-	trader = Trader(client = network.tcp.client);
+	trader = Trader(client = target.network.tcp.client);
 	trader.run();
 	
 }
