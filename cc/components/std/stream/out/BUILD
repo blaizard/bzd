@@ -7,6 +7,9 @@ bdl_library(
         "interface.bdl",
     ],
     visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/platform/interfaces:stream",
+    ],
 )
 
 cc_library(

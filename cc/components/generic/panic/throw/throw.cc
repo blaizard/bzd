@@ -1,5 +1,5 @@
 #include "cc/bzd/platform/panic.hh"
 
-namespace bzd::platform {
-void panic() { throw 42; }
-} // namespace bzd::platform
+#include <iostream>
+
+void bzd::platform::panic(const bzd::FunctionRef<void(bzd::OStream&)>) { throw 42; }

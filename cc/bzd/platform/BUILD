@@ -38,6 +38,10 @@ cc_library(
         "panic.hh",
     ],
     visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/container:function_ref",
+        "//cc/bzd/core:channel",
+    ],
 )
 
 cc_library(

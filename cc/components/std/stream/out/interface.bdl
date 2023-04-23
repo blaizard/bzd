@@ -1,12 +1,9 @@
+use "cc/bzd/platform/interfaces/stream.bdl"
 
 namespace bzd.platform.std;
 
 
-interface DummyOut {
-	
-}
-
-component Out : DummyOut {
+component Out : bzd.OStream {
 interface:
 	
 }

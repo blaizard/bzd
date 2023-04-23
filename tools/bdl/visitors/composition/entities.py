@@ -51,12 +51,7 @@ class Entities:
 
 		expression.assertTrue(condition=expression.isSymbol, message=f"Meta expressions must have a symbol.")
 		if expression.symbol.fqn == "connect":
-			arguments = []
-			for paramResolved in expression.parametersResolved:
-				#self.addResolvedDependency(paramResolved.param, executor=None)
-				arguments.append(paramResolved.param)
-
-			self.connections.add(*arguments)
+			self.connections.add(*[paramResolved.param for paramResolved in expression.parametersResolved])
 
 		else:
 			expression.error(message="Unsupported meta expression.")
@@ -221,7 +216,7 @@ class Entities:
 		for t in self.targets:
 			if executor.startswith(f"{t}."):
 				target = t
-		assert target is not None, f"There is no target associated with this executor '{executor}'."
+		assert target is not None, f"There is no target associated with this executor '{executor}', available targets are: {str(self.targets)}."
 
 		return Context(executor=executor, target=target)
 
@@ -268,6 +263,14 @@ class Entities:
 		# - meta should be processed at the end, to ensure that all symbols are
 		# available at that time. Symbols like class instance member for example.
 		for expression in meta:
+
+			# Add argument of the meta, like and a source for example that is only instantiated
+			# but not 'used' (like no explicit workload is called).
+			for paramResolved in expression.parametersResolved:
+				context = self.getContext(expression=typing.cast(Expression, paramResolved.param),
+				                          defaultExecutor=defaultExecutor)
+				self.addResolvedDependency(paramResolved.param, context=context)
+
 			self.processMeta(expression=expression)
 
 		# Final stage.

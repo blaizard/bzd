@@ -30,7 +30,7 @@ def bzd_cc_binary(name, target = "//cc/targets:auto", tags = [], bdls = [], hdrs
     bdl_system(
         name = name,
         targets = {
-            "": target,
+            "default": target,
         },
         tags = tags + ["cc"],
         deps = updated_deps,
@@ -65,7 +65,7 @@ def bzd_cc_test(name, target = "//cc/targets:auto", tags = [], bdls = [], hdrs =
     bdl_system_test(
         name = name,
         targets = {
-            "": target,
+            "default": target,
         },
         tags = tags + ["cc"],
         deps = updated_deps,

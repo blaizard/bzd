@@ -5,7 +5,7 @@ namespace jardinier;
 
 method water(clock = bzd.SteadyClock, wateringTimeS = Integer, wakeUpPeriodS = Integer);
 composition {
-	water(clock = platform.steadyClock, wateringTimeS = 5, wakeUpPeriodS = 2 * 24 * 3600);
+	water(clock = target.platform.steadyClock, wateringTimeS = 5, wakeUpPeriodS = 2 * 24 * 3600);
 	
 }
 

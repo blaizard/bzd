@@ -123,9 +123,9 @@ public:
 		}
 	}
 
-	void printNode(ElementPtrType node)
+	void printNode([[maybe_unused]] ElementPtrType node)
 	{
-		const auto printAddress = [this](const ElementPtrType address) {
+		/*const auto printAddress = [this](const ElementPtrType address) {
 			toStream(bzd::platform::out(),
 					 "{} {}"_csv,
 					 address,
@@ -139,7 +139,7 @@ public:
 			bzd::platform::out().write(bzd::StringView{" -> "}.asBytes()).sync();
 			printAddress(node->next_.load());
 		}
-		bzd::platform::out().write(bzd::StringView{"\n"}.asBytes()).sync();
+		bzd::platform::out().write(bzd::StringView{"\n"}.asBytes()).sync();*/
 	}
 };
 } // namespace bzd::test

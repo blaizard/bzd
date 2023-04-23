@@ -26,11 +26,11 @@ class AsyncType(enum.Enum):
 class CompositionView:
 	"""Create a composition view, this is the interface exposed to the composition template."""
 
-	def __init__(self, composition: "Composition", target: typing.Optional[str]) -> None:
+	def __init__(self, composition: "Composition", target: str) -> None:
 
 		self.composition = composition
 		self.target = target
-		self.contexts = {context for context in self.composition.contexts if target is None or context.target == target}
+		self.contexts = {context for context in self.composition.contexts if context.target == target}
 
 	@property
 	def registry(self) -> typing.Dict[Context, typing.Dict[str, ExpressionEntry]]:
@@ -53,8 +53,6 @@ class CompositionView:
 		return self.composition.iosRegistry
 
 	def isValidTarget(self, target: str) -> bool:
-		if self.target is None:
-			return True
 		return target == self.target
 
 	def entity(self, fqn: str) -> Entity:
@@ -73,10 +71,10 @@ class CompositionView:
 
 class Composition:
 
-	def __init__(self, targets: typing.Optional[typing.Set[str]] = None) -> None:
+	def __init__(self, targets: typing.Set[str]) -> None:
 
 		# All targets available, an empty set if there are no target for this composition.
-		self.targets = targets if targets else set()
+		self.targets = targets
 		self.symbols = SymbolMap()
 		self.entities = Entities(symbols=self.symbols, targets=self.targets)
 		# Unique identifiers
@@ -137,7 +135,7 @@ class Composition:
 
 		self.entities.process(compositionEntities)
 
-	def view(self, target: typing.Optional[str] = None) -> CompositionView:
+	def view(self, target: str) -> CompositionView:
 		"""Get a composition view for a specific target."""
 
 		return CompositionView(self, target=target)

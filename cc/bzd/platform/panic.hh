@@ -1,8 +1,11 @@
 #pragma once
 
+#include "cc/bzd/container/function_ref.hh"
+#include "cc/bzd/core/channel.hh"
+
 namespace bzd::platform {
 
-/// Trigger a panic signal and abort immediately the current execution of the program.
-void panic();
+/// Abort immediately the current execution of the program.
+void panic(const bzd::FunctionRef<void(bzd::OStream&)> callback);
 
 } // namespace bzd::platform

@@ -1,19 +1,17 @@
 #include "cc/bzd/core/logger.hh"
 
-#include "cc/bzd/core/logger/backend/logger.hh"
-
 namespace {
 const char* levelToStr(const bzd::log::Level level)
 {
 	switch (level)
 	{
-	case bzd::log::Level::ERROR:
+	case bzd::log::Level::error:
 		return "[e]";
-	case bzd::log::Level::WARNING:
+	case bzd::log::Level::warning:
 		return "[w]";
-	case bzd::log::Level::INFO:
+	case bzd::log::Level::info:
 		return "[i]";
-	case bzd::log::Level::DEBUG:
+	case bzd::log::Level::debug:
 		return "[d]";
 	default:
 		bzd::assert::unreachable();
@@ -23,12 +21,6 @@ const char* levelToStr(const bzd::log::Level level)
 } // namespace
 
 void bzd::Logger::setMinimumLevel(const bzd::log::Level level) noexcept { minLevel_ = level; }
-
-bzd::Logger& bzd::Logger::getDefault() noexcept
-{
-	static Logger logger;
-	return logger;
-}
 
 /*
 namespace {
@@ -57,24 +49,4 @@ bzd::Async<> bzd::Logger::printHeader(const bzd::log::Level level, const SourceL
 {
 	co_await !toStream(stream_, "{} [{}:{}] "_csv, levelToStr(level), location.getFileName(), location.getLine());
 	co_return {};
-}
-
-void bzd::minimal::log::error(const char* message, const SourceLocation location) noexcept
-{
-	bzd::Logger::getDefault().error(message, location).sync();
-}
-
-void bzd::minimal::log::warning(const char* message, const SourceLocation location) noexcept
-{
-	bzd::Logger::getDefault().warning(message, location).sync();
-}
-
-void bzd::minimal::log::info(const char* message, const SourceLocation location) noexcept
-{
-	bzd::Logger::getDefault().info(message, location).sync();
-}
-
-void bzd::minimal::log::debug(const char* message, const SourceLocation location) noexcept
-{
-	bzd::Logger::getDefault().debug(message, location).sync();
 }

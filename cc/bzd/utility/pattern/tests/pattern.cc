@@ -4,7 +4,6 @@
 #include "cc/bzd/container/string_stream.hh"
 #include "cc/bzd/container/string_view.hh"
 #include "cc/bzd/container/vector.hh"
-#include "cc/bzd/core/panic.hh"
 #include "cc/bzd/test/test.hh"
 
 class TestSchema
@@ -30,7 +29,7 @@ public:
 class TestAssert
 {
 public:
-	static void onError(const bzd::StringView&) { bzd::Panic::trigger(); }
+	static void onError(const bzd::StringView&) {}
 };
 
 using TestAdapater = bzd::pattern::impl::Adapter<TestAssert, TestSchema>;

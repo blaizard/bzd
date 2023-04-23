@@ -30,13 +30,19 @@ public: //  Constructors/Factories.
 	// Lambda (const and mutable).
 	template <class T>
 	requires(!concepts::sameClassAs<T, Self> && concepts::invocableR<T, ReturnType, Args...>)
-	constexpr explicit FunctionRef(T& lambda) noexcept
+	constexpr FunctionRef(T& lambda) noexcept
+	{
+		*this = toMember<T, &T::operator()>(lambda);
+	}
+	template <class T>
+	requires(!concepts::sameClassAs<T, Self> && concepts::invocableR<T, ReturnType, Args...>)
+	constexpr FunctionRef(const T& lambda) noexcept
 	{
 		*this = toMember<T, &T::operator()>(lambda);
 	}
 
 	// Function pointer.
-	constexpr explicit FunctionRef(FunctionPointer pointer) noexcept : storage_{pointer} {}
+	constexpr FunctionRef(FunctionPointer pointer) noexcept : storage_{pointer} {}
 
 	// Pointer to member (mutable).
 	template <class Object, ReturnType (Object::*memberPtr)(Args...)>
