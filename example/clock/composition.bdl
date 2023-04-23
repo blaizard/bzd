@@ -1,12 +1,13 @@
 use "cc/bzd/platform/interfaces/clock.bdl"
+use "cc/bzd/platform/interfaces/stream.bdl"
 
 namespace example;
 
 
-method counter(clock = bzd.SteadyClock, count = Integer(1) [min(1) mandatory], periodMs = Integer(1000) [min(0)]);
+method counter(out = bzd.OStream, clock = bzd.SteadyClock, count = Integer(1) [min(1) mandatory], periodMs = Integer(1000) [min(0)]);
 composition {
 	// This will use the default steady clock.
-	counter(clock = platform.steadyClock, count = 10, periodMs = 1000);
+	counter(out = target.platform.out, clock = target.platform.steadyClock, count = 10, periodMs = 1000);
 	
 }
 

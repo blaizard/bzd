@@ -1,12 +1,12 @@
-#include "cc/bzd.hh"
+#include "example/terminal/composition.hh"
 #include "example/terminal/reader.hh"
 
 namespace example {
 
-bzd::Async<> run()
+bzd::Async<> run(bzd::OStream& out, bzd::IStream& in)
 {
 	bzd::Array<bzd::Byte, 2> separators{bzd::Byte{' '}, bzd::Byte{'\t'}};
-	bzd::Reader<16> reader{bzd::platform::in(), bzd::platform::out(), separators.asSpan()};
+	bzd::Reader<16> reader{in, out, separators.asSpan()};
 
 	bzd::Map<bzd::StringView, bzd::Int32, 12> keywords{
 		{"info"_sv, 0},
@@ -17,17 +17,17 @@ bzd::Async<> run()
 		{"--help"_sv, 5},
 	};
 
-	co_await !bzd::print("Please type something...\n"_csv);
+	co_await !bzd::print(out, "Please type something...\n"_csv);
 
 	{
 		const auto result = co_await reader.readAnyOf(keywords);
 		if (result)
 		{
-			co_await !bzd::print("Matched {}\n"_csv, result.value());
+			co_await !bzd::print(out, "Matched {}\n"_csv, result.value());
 		}
 		else
 		{
-			co_await !bzd::log::error(result.error());
+			// co_await !bzd::log::error(result.error());
 			reader.clear();
 		}
 	}
@@ -37,11 +37,11 @@ bzd::Async<> run()
 		const auto result = co_await reader.readUntil(bzd::Byte{'\n'});
 		if (result)
 		{
-			co_await !bzd::platform::out().write(result.value());
+			co_await !out.write(result.value());
 		}
 		else
 		{
-			co_await !bzd::log::error(result.error());
+			// co_await !bzd::log::error(result.error());
 			reader.clear();
 		}
 	}

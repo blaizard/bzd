@@ -3,7 +3,7 @@ use "cc/bzd/platform/interfaces/recorder.bdl"
 namespace example;
 
 
-component Hello {
+component Hello : ComponentBase {
 interface:
 	method run();
 	send = Float;
@@ -13,7 +13,7 @@ composition:
 	
 }
 
-component Recorder : bzd.platform.Recorder {
+component Recorder : bzd.platform.Recorder, ComponentBase {
 interface:
 	method run();
 	
