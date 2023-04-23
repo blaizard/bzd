@@ -15,16 +15,16 @@ public:
 	{
 		constexpr bzd::StringView hostname{"www.google.com"_sv};
 
-		co_await !bzd::log::info("Connecting to {}"_csv, hostname);
+		co_await !bzd::log::info(context_.config.out, "Connecting to {}"_csv, hostname);
 
 		bzd::http::Client client{context_.config.client, hostname, 80};
 		auto response = co_await !client.get("/"_sv).header("Host", hostname).header("User-Agent", "bzd").header("Accept", "*/*").send();
 
-		co_await !bzd::log::info("Receiving..."_csv);
+		co_await !bzd::log::info(context_.config.out, "Receiving..."_csv);
 
 		bzd::Array<bzd::Byte, 1000u> data;
-		const auto result = co_await !bzd::async::any(response.read(data.asBytesMutable()), bzd::platform::steadyClock().timeout(1000_ms));
-		co_await !bzd::log::info(bzd::StringView{reinterpret_cast<const char*>(result.data()), result.size()});
+		const auto result = co_await !bzd::async::any(response.read(data.asBytesMutable()), context_.config.steadyClock.timeout(1000_ms));
+		co_await !bzd::log::info(context_.config.out, bzd::StringView{reinterpret_cast<const char*>(result.data()), result.size()});
 
 		co_return {};
 	}
