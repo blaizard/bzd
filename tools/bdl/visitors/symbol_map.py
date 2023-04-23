@@ -96,12 +96,11 @@ class Resolver:
 			potentialNamespace.pop()
 
 		# Attempt to resolve as much as possible.
-		potentialNamespace = FQN.toNamespace(name)[1:]
+		potentialNamespace = FQN.toNamespace(fqn) + FQN.toNamespace(name)[1:]
 		remainingNamespace: typing.List[str] = []
 		while potentialNamespace:
-			potentialFQN = FQN.fromNamespace(namespace=FQN.toNamespace(fqn) + potentialNamespace)
-			if self.symbols.contains(fqn=potentialFQN, exclude=self.exclude):
-				fqn = potentialFQN
+			fqn = FQN.fromNamespace(namespace=potentialNamespace)
+			if self.symbols.contains(fqn=fqn, exclude=self.exclude):
 				break
 			remainingNamespace.insert(0, potentialNamespace.pop())
 
