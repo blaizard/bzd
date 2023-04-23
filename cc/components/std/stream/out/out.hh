@@ -1,4 +1,6 @@
-#include "cc/bzd/core/channel.hh"
+#pragma once
+
+#include "cc/components/std/stream/out/interface.hh"
 
 #include <iostream>
 #include <unistd.h>

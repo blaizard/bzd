@@ -11,13 +11,13 @@ from tools.bdl.entities.impl.expression import Expression
 
 def valueToStr(item: ParametersResolvedItem,
                symbols: typing.Optional[SymbolMap] = None,
-               registry: typing.Optional[typing.Sequence[str]] = None,
+               registry: bool = False,
                includeComment: bool = True) -> str:
 	"""Convert an item object into a C++ string.
 	Args:
 		item: The item to be converted.
 		symbols: The symbols map to be used.
-		registry: FQNs that matches a registry entry.
+		registry: True, if the value is expected to be from the registry.
 		includeComment; Whether or not comment should be prepended to the value.
 	"""
 
@@ -45,9 +45,7 @@ def valueToStr(item: ParametersResolvedItem,
 		fqn = item.param.underlyingValueFQN
 		assert fqn is not None
 		value = fqnToNameStr(fqn)
-		if registry is not None:
-			# Get the value from the registry instead of directly.
-			assert fqn in registry, f"The fqn '{fqn}' is not present in the registry."
+		if registry:
 			value = f"registry.{value}_.get()"
 		if symbols is not None:
 			# Cast values to there underlying interface type.

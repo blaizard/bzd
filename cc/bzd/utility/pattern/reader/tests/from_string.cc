@@ -1,6 +1,5 @@
 #include "cc/bzd/utility/pattern/reader/from_string.hh"
 
-#include "cc/bzd/core/panic.hh"
 #include "cc/bzd/test/test.hh"
 
 #include <iostream>
@@ -8,11 +7,7 @@
 class TestAssert : public bzd::reader::impl::Schema
 {
 public:
-	static void onError(const bzd::StringView& str)
-	{
-		::std::cout << "Error at: " << str.data() << ::std::endl;
-		bzd::Panic::trigger();
-	}
+	static void onError(const bzd::StringView& str) { ::std::cout << "Error at: " << str.data() << ::std::endl; }
 };
 
 using TestAdapater = bzd::pattern::impl::Adapter<TestAssert>;

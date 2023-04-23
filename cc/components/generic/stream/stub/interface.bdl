@@ -1,13 +1,10 @@
+use "cc/bzd/platform/interfaces/stream.bdl"
 
 namespace bzd.platform.generic.stream;
 
 
-interface DummyStub {
-	
-}
-
 // Generic stream stub that does nothing.
-component Stub : DummyStub {
+component Stub : bzd.IOStream {
 interface:
 	
 }

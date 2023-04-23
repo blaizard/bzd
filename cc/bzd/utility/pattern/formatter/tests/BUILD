@@ -9,7 +9,6 @@ bzd_cc_test(
     deps = [
         "//cc/bzd/container:string_stream",
         "//cc/bzd/core/assert",
-        "//cc/bzd/core/panic",
         "//cc/bzd/test",
         "//cc/bzd/utility/pattern/formatter:to_string",
     ],

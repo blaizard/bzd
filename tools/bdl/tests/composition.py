@@ -17,6 +17,7 @@ class TestRun(unittest.TestCase):
 		                               objectContext=ObjectContext(resolve=True))
 
 		compositionNormal = Object.fromContent(content="""
+			namespace default;
 			component Executor { }
 			composition {
 				executor = Executor() [executor];
@@ -29,11 +30,12 @@ class TestRun(unittest.TestCase):
 			}
 			""",
 		                                       objectContext=ObjectContext(resolve=True))
-		Composition().visit(interface).visit(compositionNormal).process()
+		Composition(targets={"default"}).visit(interface).visit(compositionNormal).process()
 
 	def testCompositionOrder(self) -> None:
 
 		interface = Object.fromContent(content="""
+			namespace default;
 			component Hello {
 			config:
 				var = Integer(10) [min(10)];
@@ -42,6 +44,7 @@ class TestRun(unittest.TestCase):
 		                               objectContext=ObjectContext(resolve=True))
 
 		compositionNormal = Object.fromContent(content="""
+			namespace default;
 			component Executor { }
 			composition {
 				executor = Executor() [executor];
@@ -52,10 +55,11 @@ class TestRun(unittest.TestCase):
 			}
 			""",
 		                                       objectContext=ObjectContext(resolve=True))
-		Composition().visit(interface).visit(compositionNormal).process()
+		Composition(targets={"default"}).visit(interface).visit(compositionNormal).process()
 
 		# Variable defined after.
 		compositionWrongOrder = Object.fromContent(content="""
+			namespace default;
 			component Executor { }
 			composition {
 				executor = Executor() [executor];
@@ -66,10 +70,11 @@ class TestRun(unittest.TestCase):
 			}
 			""",
 		                                           objectContext=ObjectContext(resolve=True))
-		Composition().visit(interface).visit(compositionWrongOrder).process()
+		Composition(targets={"default"}).visit(interface).visit(compositionWrongOrder).process()
 
 		# Variable defined after with wrong contract.
 		compositionWrongOrder = Object.fromContent(content="""
+			namespace default;
 			component Executor { }
 			composition {
 				executor = Executor() [executor];
@@ -81,11 +86,12 @@ class TestRun(unittest.TestCase):
 			""",
 		                                           objectContext=ObjectContext(resolve=True))
 		with self.assertRaisesRegex(Exception, r"lower than"):
-			Composition().visit(interface).visit(compositionWrongOrder).process()
+			Composition(targets={"default"}).visit(interface).visit(compositionWrongOrder).process()
 
 	def testCompositionInit(self) -> None:
 
 		bdl = Object.fromContent(content="""
+			namespace default;
 			component Hello {
 			interface:
 				method init() [init];
@@ -99,7 +105,7 @@ class TestRun(unittest.TestCase):
 			""",
 		                         objectContext=ObjectContext(resolve=True))
 
-		composition = Composition()
+		composition = Composition(targets={"default"})
 		composition.visit(bdl).process()
 
 	def testNestedComposition(self) -> None:
@@ -114,7 +120,7 @@ class TestRun(unittest.TestCase):
 			composition:
 				world = World();
 			}
-			composition {
+			composition default {
 				executor = Executor() [executor];
 				test1 = Hello();
 				test2 = Hello();
@@ -124,10 +130,10 @@ class TestRun(unittest.TestCase):
 			""",
 		                         objectContext=ObjectContext(resolve=True))
 
-		composition = Composition()
+		composition = Composition(targets={"default"})
 		composition.visit(bdl).process()
-		composition.view().entity("test1.world")
-		composition.view().entity("test2.world")
+		composition.view(target="default").entity("default.test1.world")
+		composition.view(target="default").entity("default.test2.world")
 
 	def testConnections(self) -> None:
 
@@ -143,7 +149,7 @@ class TestRun(unittest.TestCase):
 				a = const Integer;
 				b = const Float;
 			}
-			composition {
+			composition default {
 				executor = Executor() [executor];
 				sender = Sender();
 				receiver = Receiver();
@@ -153,53 +159,54 @@ class TestRun(unittest.TestCase):
 
 		composition = Object.fromContent(content="""
 			composition {
-				connect(sender.a, sender.a);
+				connect(default.sender.a, default.sender.a);
 			}
 			""",
 		                                 objectContext=ObjectContext(resolve=True))
 		with self.assertRaisesRegex(Exception, r"is not a valid sink IO"):
-			Composition().visit(common).visit(composition).process()
+			Composition(targets={"default"}).visit(common).visit(composition).process()
 
 		composition = Object.fromContent(content="""
 			composition {
-				connect(sender.a, receiver.b);
+				connect(default.sender.a, default.receiver.b);
 			}
 			""",
 		                                 objectContext=ObjectContext(resolve=True))
 		with self.assertRaisesRegex(Exception, r"between the same types"):
-			Composition().visit(common).visit(composition).process()
+			Composition(targets={"default"}).visit(common).visit(composition).process()
 
 		composition = Object.fromContent(content="""
 			composition {
-				connect(sender.a, receiver.a);
+				connect(default.sender.a, default.receiver.a);
 			}
 			""",
 		                                 objectContext=ObjectContext(resolve=True))
-		Composition().visit(common).visit(composition).process()
+		Composition(targets={"default"}).visit(common).visit(composition).process()
 
 		composition = Object.fromContent(content="""
 			composition {
-				connect(sender.a, receiver.a);
-				connect(sender.a, receiver.a);
+				connect(default.sender.a, default.receiver.a);
+				connect(default.sender.a, default.receiver.a);
 			}
 			""",
 		                                 objectContext=ObjectContext(resolve=True))
 		with self.assertRaisesRegex(Exception, r"is already connected to"):
-			Composition().visit(common).visit(composition).process()
+			Composition(targets={"default"}).visit(common).visit(composition).process()
 
 		composition = Object.fromContent(content="""
 			composition {
-				connect(sender.a, receiver.a);
-				connect(receiver.a, sender.a);
+				connect(default.sender.a, default.receiver.a);
+				connect(default.receiver.a, default.sender.a);
 			}
 			""",
 		                                 objectContext=ObjectContext(resolve=True))
 		with self.assertRaisesRegex(Exception, r"not a valid source IO"):
-			Composition().visit(common).visit(composition).process()
+			Composition(targets={"default"}).visit(common).visit(composition).process()
 
 	def testCompositionThis(self) -> None:
 
 		composition = Object.fromContent(content="""
+			namespace default;
 			component Executor { }
 			component MyComponent {
 			interface:
@@ -218,11 +225,12 @@ class TestRun(unittest.TestCase):
 			}
 			""",
 		                                 objectContext=ObjectContext(resolve=True))
-		Composition().visit(composition).process()
+		Composition(targets={"default"}).visit(composition).process()
 
 	def testCompositionThisMulti(self) -> None:
 
 		composition = Object.fromContent(content="""
+			namespace default;
 			component Executor { }
 			component MyComponent {
 			interface:
@@ -243,10 +251,11 @@ class TestRun(unittest.TestCase):
 			}
 			""",
 		                                 objectContext=ObjectContext(resolve=True))
-		Composition().visit(composition).process()
+		Composition(targets={"default"}).visit(composition).process()
 
 	def testExecutor(self) -> None:
 		composition = Object.fromContent(content="""
+				namespace default;
 				composition {
 					hello = Void;
 				}
@@ -256,15 +265,16 @@ class TestRun(unittest.TestCase):
 				}
 				composition MyComposition
 				{
-					a = Test() [executor(hello)];
+					a = Test() [executor(default.hello)];
 					b = a.run();
 				}
 				""",
 		                                 objectContext=ObjectContext(resolve=True))
-		Composition().visit(composition).process()
+		Composition(targets={"default"}).visit(composition).process()
 
 		with self.assertRaisesRegex(Exception, r"executors between this expression"):
 			composition = Object.fromContent(content="""
+					namespace default;
 					component Test {
 					interface:
 						method run();
@@ -272,11 +282,11 @@ class TestRun(unittest.TestCase):
 					composition MyComposition
 					{
 						a = Test();
-						b = a.run() [executor(hello)];
+						b = a.run() [executor(default.hello)];
 					}
 					""",
 			                                 objectContext=ObjectContext(resolve=True))
-			Composition().visit(composition).process()
+			Composition(targets={"default"}).visit(composition).process()
 
 
 if __name__ == '__main__':

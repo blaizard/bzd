@@ -2,6 +2,7 @@
 
 #include "cc/bzd/core/async.hh"
 #include "cc/bzd/meta/macro.hh"
+#include "cc/bzd/test/composition.hh"
 #include "cc/bzd/type_traits/is_same_class.hh"
 #include "cc/bzd/utility/numeric_limits.hh"
 #include "cc/bzd/utility/pattern/formatter/integral.hh"
@@ -508,7 +509,7 @@ public:
 	Manager(Manager const&) = delete;
 	void operator=(Manager const&) = delete;
 
-	bool run();
+	bool run(bzd::OStream& out, bzd::SteadyClock& steadyClock);
 
 	template <class Value1, class Value2>
 	void fail(const char* const file, const bzd::Int32 line, const char* const message, Value1&& value1, Value2&& value2)
@@ -539,6 +540,6 @@ private:
 	bool currentTestFailed_ = false;
 };
 
-bzd::Async<bool> run();
+bzd::Async<bool> run(bzd::OStream& out, bzd::SteadyClock& steadyClock);
 
 } // namespace bzd::test

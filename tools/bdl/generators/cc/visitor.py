@@ -140,9 +140,8 @@ class Transform:
 			params: The parameters to be serialized.
 			isRegistry: Use registry variable instead of direct variables.
 		"""
-		registry = self.composition.registry.keys() if self.composition and isRegistry else None
 		symbols = self.composition.symbols if self.composition else None
-		return [valueToStrOriginal(item, symbols=symbols, registry=registry) for item in params]  # type: ignore
+		return [valueToStrOriginal(item, symbols=symbols, registry=isRegistry) for item in params]
 
 	def paramsDeclaration(self, params: ParametersResolved, isRegistry: bool = False) -> str:
 		paramsToList = self.paramsDeclarationToList_(params=params, isRegistry=isRegistry)

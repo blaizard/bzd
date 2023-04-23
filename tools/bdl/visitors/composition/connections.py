@@ -117,7 +117,9 @@ class Connections:
 			identifier = EndpointId(str(entity.symbol), "sinks")
 		else:
 			identifier = EndpointId.fromSymbol(entity.symbol)
-		entity.assertTrue(condition=identifier in identifiers, message=f"'{identifier}' is not a valid {description}.")
+		entity.assertTrue(
+		    condition=identifier in identifiers,
+		    message=f"'{identifier}' is not a valid {description}, valid {description} are: {identifiers}.")
 
 		return {identifier}
 

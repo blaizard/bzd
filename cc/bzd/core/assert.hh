@@ -46,8 +46,7 @@ constexpr void bzd::assert::isTrue(const bool condition, A&& a, const bzd::Sourc
 {
 	if (!condition)
 	{
-		bzd::log::error(bzd::forward<A>(a), location);
-		bzd::platform::panic();
+		bzd::platform::panic([&](bzd::OStream& out) { bzd::Logger{out}.error(bzd::forward<A>(a), location).sync(); });
 	}
 }
 
@@ -56,8 +55,7 @@ constexpr void bzd::assert::isTrue(const bool condition, A&& a, B&& b, const bzd
 {
 	if (!condition)
 	{
-		bzd::log::error(bzd::forward<A>(a), bzd::forward<B>(b), location);
-		bzd::platform::panic();
+		bzd::platform::panic([&](bzd::OStream& out) { bzd::Logger{out}.error(bzd::forward<A>(a), bzd::forward<B>(b), location).sync(); });
 	}
 }
 template <class A, class B, class C>
@@ -65,8 +63,9 @@ constexpr void bzd::assert::isTrue(const bool condition, A&& a, B&& b, C&& c, co
 {
 	if (!condition)
 	{
-		bzd::log::error(bzd::forward<A>(a), bzd::forward<B>(b), bzd::forward<C>(c), location);
-		bzd::platform::panic();
+		bzd::platform::panic([&](bzd::OStream& out) {
+			bzd::Logger{out}.error(bzd::forward<A>(a), bzd::forward<B>(b), bzd::forward<C>(c), location).sync();
+		});
 	}
 }
 template <class A, class B, class C, class D>
@@ -74,8 +73,9 @@ constexpr void bzd::assert::isTrue(const bool condition, A&& a, B&& b, C&& c, D&
 {
 	if (!condition)
 	{
-		bzd::log::error(bzd::forward<A>(a), bzd::forward<B>(b), bzd::forward<C>(c), bzd::forward<D>(d), location);
-		bzd::platform::panic();
+		bzd::platform::panic([&](bzd::OStream& out) {
+			bzd::Logger{out}.error(bzd::forward<A>(a), bzd::forward<B>(b), bzd::forward<C>(c), bzd::forward<D>(d), location).sync();
+		});
 	}
 }
 template <class A, class B, class C, class D, class E>
@@ -83,8 +83,11 @@ constexpr void bzd::assert::isTrue(const bool condition, A&& a, B&& b, C&& c, D&
 {
 	if (!condition)
 	{
-		bzd::log::error(bzd::forward<A>(a), bzd::forward<B>(b), bzd::forward<C>(c), bzd::forward<D>(d), bzd::forward<E>(e), location);
-		bzd::platform::panic();
+		bzd::platform::panic([&](bzd::OStream& out) {
+			bzd::Logger{out}
+				.error(bzd::forward<A>(a), bzd::forward<B>(b), bzd::forward<C>(c), bzd::forward<D>(d), bzd::forward<E>(e), location)
+				.sync();
+		});
 	}
 }
 template <class A, class B, class C, class D, class E, class F>
@@ -92,14 +95,17 @@ constexpr void bzd::assert::isTrue(const bool condition, A&& a, B&& b, C&& c, D&
 {
 	if (!condition)
 	{
-		bzd::log::error(bzd::forward<A>(a),
-						bzd::forward<B>(b),
-						bzd::forward<C>(c),
-						bzd::forward<D>(d),
-						bzd::forward<E>(e),
-						bzd::forward<F>(f),
-						location);
-		bzd::platform::panic();
+		bzd::platform::panic([&](bzd::OStream& out) {
+			bzd::Logger{out}
+				.error(bzd::forward<A>(a),
+					   bzd::forward<B>(b),
+					   bzd::forward<C>(c),
+					   bzd::forward<D>(d),
+					   bzd::forward<E>(e),
+					   bzd::forward<F>(f),
+					   location)
+				.sync();
+		});
 	}
 }
 template <class A, class B, class C, class D, class E, class F, class G>
@@ -108,15 +114,18 @@ constexpr void bzd::assert::isTrue(
 {
 	if (!condition)
 	{
-		bzd::log::error(bzd::forward<A>(a),
-						bzd::forward<B>(b),
-						bzd::forward<C>(c),
-						bzd::forward<D>(d),
-						bzd::forward<E>(e),
-						bzd::forward<F>(f),
-						bzd::forward<G>(g),
-						location);
-		bzd::platform::panic();
+		bzd::platform::panic([&](bzd::OStream& out) {
+			bzd::Logger{out}
+				.error(bzd::forward<A>(a),
+					   bzd::forward<B>(b),
+					   bzd::forward<C>(c),
+					   bzd::forward<D>(d),
+					   bzd::forward<E>(e),
+					   bzd::forward<F>(f),
+					   bzd::forward<G>(g),
+					   location)
+				.sync();
+		});
 	}
 }
 

@@ -6,6 +6,9 @@ bdl_library(
     srcs = [
         "interface.bdl",
     ],
+    deps = [
+        "//cc/bzd/platform/interfaces:stream",
+    ],
 )
 
 cc_library(

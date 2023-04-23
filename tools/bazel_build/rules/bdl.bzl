@@ -129,7 +129,7 @@ def _make_bdl_arguments(ctx, stage, search_formats = None, format = None, output
     if data:
         arguments += ["--data", data.path]
     if targets:
-        arguments += [i for target in targets for i in ("--target", target)]
+        arguments += [i for target in targets if target for i in ("--target", target)]
     if args:
         arguments += args
     return arguments
@@ -448,7 +448,7 @@ def _bdl_system_impl(ctx):
     targets = {}
     for target, names in ctx.attr.targets.items():
         for name in names.split(","):
-            if name in ("all",):
+            if name in ("all", ""):
                 fail("The target name '{}' is protected and therefore cannot be used.".format(name))
             if name in targets:
                 fail("The target name '{}' is defined twice.".format(name))

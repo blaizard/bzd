@@ -38,12 +38,12 @@ class TestRun(unittest.TestCase):
 			}
 			""",
 		                         objectContext=ObjectContext(resolve=True))
-		composition = Composition()
+		composition = Composition(targets={"default"})
 		composition.visit(bdl).process()
 		return composition
 
 	def render(self, template: str) -> str:
-		composition = self.composition.view()
+		composition = self.composition.view(target="default")
 		return Template("""{%- include "tools/bdl/generators/cc/template/declarations.h.btl" -%}""" + template).render(
 		    composition, Transform(composition=composition))
 

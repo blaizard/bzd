@@ -1,6 +1,6 @@
 #pragma once
 
-#include "cc/bzd/core/channel.hh"
+#include "cc/components/generic/stream/stub/interface.hh"
 
 namespace bzd::platform::generic::stream {
 class Stub : public bzd::IOStream

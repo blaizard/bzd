@@ -10,19 +10,6 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        ":minimal",
-        "//cc/bzd/core/logger/backend",
         "//cc/bzd/utility/pattern/formatter:to_stream",
-    ],
-)
-
-cc_library(
-    name = "minimal",
-    hdrs = [
-        "minimal.hh",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//cc/bzd/utility:source_location",
     ],
 )
