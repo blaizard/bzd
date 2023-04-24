@@ -1,9 +1,9 @@
-use "cc/bzd/platform/interfaces/clock.bdl"
+use "cc/bzd/platform/interfaces/timer.bdl"
 
 namespace bzd.platform.generic.clock.steady;
 
 
-component Null : bzd.SteadyClock {
+component Null : bzd.Timer {
 interface:
 	
 }

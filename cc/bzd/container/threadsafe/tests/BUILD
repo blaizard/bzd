@@ -22,7 +22,6 @@ cc_library(
     deps = [
         "//cc/bzd/container/threadsafe:non_owning_forward_list",
         "//cc/bzd/core/assert",
-        "//cc/bzd/platform:stream",
         "//cc/bzd/utility/pattern/formatter:to_string",
     ],
 )

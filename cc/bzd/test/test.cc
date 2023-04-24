@@ -1,7 +1,6 @@
 #include "cc/bzd/test/test.hh"
 
 #include "cc/bzd/core/print.hh"
-#include "cc/bzd/platform/clock.hh"
 
 // Empty namespace to hold all the registered tests
 namespace {
@@ -40,7 +39,7 @@ void Manager::failInternals(
 	::bzd::printNoLock(out, "Assertion failed.\n").sync();
 }
 
-bool bzd::test::Manager::run(bzd::OStream& out, bzd::SteadyClock& steadyClock)
+bool bzd::test::Manager::run(bzd::OStream& out, bzd::Timer& timer)
 {
 	bzd::Size nbFailedTests{0};
 	auto* node = &nodeRoot;
@@ -66,7 +65,7 @@ bool bzd::test::Manager::run(bzd::OStream& out, bzd::SteadyClock& steadyClock)
 		::bzd::print(out, " (seed={})\n"_csv, seed).sync();
 
 		currentTestFailed_ = false;
-		const auto maybeTimeStart = steadyClock.getTime();
+		const auto maybeTimeStart = timer.getTime();
 		try
 		{
 			node->function(context);
@@ -75,7 +74,7 @@ bool bzd::test::Manager::run(bzd::OStream& out, bzd::SteadyClock& steadyClock)
 		{
 			fail(node->info->file, -1, "Unknown C++ exception thrown in the test body.");
 		}
-		const auto maybeTimeStop = steadyClock.getTime();
+		const auto maybeTimeStop = timer.getTime();
 		const auto timeDiffMs = (maybeTimeStart && maybeTimeStop) ? (maybeTimeStop.value() - maybeTimeStart.value()).get() : -1;
 
 		// Print the test status
@@ -96,9 +95,9 @@ bool bzd::test::Manager::run(bzd::OStream& out, bzd::SteadyClock& steadyClock)
 	return (nbFailedTests == 0);
 }
 
-bzd::Async<bool> run(bzd::OStream& out, bzd::SteadyClock& steadyClock)
+bzd::Async<bool> run(bzd::OStream& out, bzd::Timer& timer)
 {
-	if (::bzd::test::Manager::getInstance().run(out, steadyClock))
+	if (::bzd::test::Manager::getInstance().run(out, timer))
 	{
 		co_return true;
 	}

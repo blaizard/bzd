@@ -1,7 +1,6 @@
 #pragma once
 
 #include "cc/bzd.hh"
-#include "cc/bzd/platform/clock.hh"
 #include "example/io/simple/common.hh"
 
 namespace example {
@@ -19,7 +18,7 @@ public:
 		{
 			co_await !bzd::print(context_.config.out, "Sending: {:d}\n"_csv, counter);
 			co_await !context_.io.send.set(counter);
-			co_await !context_.config.steadyClock.delay(1_s);
+			co_await !context_.config.timer.delay(1_s);
 			++counter;
 		}
 		co_return {};
@@ -40,7 +39,7 @@ public:
 		bzd::Int32 counter = 0;
 		while (counter < 10)
 		{
-			const auto result = co_await !bzd::async::any(context_.io.receive.get(), context_.config.steadyClock.timeout(2_s));
+			const auto result = co_await !bzd::async::any(context_.io.receive.get(), context_.config.timer.timeout(2_s));
 			co_await !bzd::print(context_.config.out, "Receiver {:}: {:}\n"_csv, context_.config.id, result.value());
 			++counter;
 		}

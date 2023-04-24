@@ -4,7 +4,6 @@ use "cc/components/xtensa/clock/steady/gptimer/interface.bdl"
 use "cc/components/generic/clock/system/null/interface.bdl"
 use "cc/components/xtensa/core/interface.bdl"
 use "cc/bzd/platform/interfaces/stream.bdl"
-use "cc/bzd/platform/interfaces/clock.bdl"
 
 
 
@@ -20,8 +19,8 @@ composition {
 composition {
 	out: bzd.OStream = bzd.platform.std.Out();
 	in: bzd.IStream = bzd.platform.generic.stream.Stub();
-	steadyClock: bzd.SteadyClock = bzd.platform.esp32.clock.steady.GPTimer();
-	systemClock: bzd.SystemClock = bzd.platform.generic.clock.system.Null();
+	timer: bzd.Timer = bzd.platform.esp32.clock.steady.GPTimer();
+	clock: bzd.Clock = bzd.platform.generic.clock.system.Null();
 	
 }
 

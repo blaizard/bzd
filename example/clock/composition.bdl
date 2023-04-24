@@ -4,10 +4,10 @@ use "cc/bzd/platform/interfaces/stream.bdl"
 namespace example;
 
 
-method counter(out = bzd.OStream, clock = bzd.SteadyClock, count = Integer(1) [min(1) mandatory], periodMs = Integer(1000) [min(0)]);
+method counter(out = bzd.OStream, timer = bzd.Timer, count = Integer(1) [min(1) mandatory], periodMs = Integer(1000) [min(0)]);
 composition {
 	// This will use the default steady clock.
-	counter(out = target.out, clock = target.steadyClock, count = 10, periodMs = 1000);
+	counter(out = target.out, timer = target.timer, count = 10, periodMs = 1000);
 	
 }
 

@@ -4,7 +4,7 @@
 
 namespace bzd::platform::generic::clock::system {
 
-class Null : public bzd::SystemClock
+class Null : public bzd::Clock
 {
 public:
 	template <class Context>

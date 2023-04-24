@@ -1,9 +1,9 @@
-use "cc/bzd/platform/interfaces/clock.bdl"
+use "cc/bzd/platform/interfaces/timer.bdl"
 
 namespace bzd.platform.esp32.clock.steady;
 
 
-component GPTimer : bzd.SteadyClock {
+component GPTimer : bzd.Timer {
 interface:
 	method init() [init];
 	method shutdown() [shutdown];

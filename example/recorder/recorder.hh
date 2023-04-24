@@ -84,7 +84,7 @@ public:
 		{
 			co_await !context_.io.send.set(i);
 			co_await !bzd::print(context_.config.out, "Sending {}\n"_csv, i);
-			co_await !context_.config.steadyClock.delay(100_ms);
+			co_await !context_.config.timer.delay(100_ms);
 		}
 
 		/*co_await !bzd::print("Hello {}"_csv, bzd::Data<"example.Hello.send">::id);

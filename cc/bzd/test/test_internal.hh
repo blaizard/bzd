@@ -509,7 +509,7 @@ public:
 	Manager(Manager const&) = delete;
 	void operator=(Manager const&) = delete;
 
-	bool run(bzd::OStream& out, bzd::SteadyClock& steadyClock);
+	bool run(bzd::OStream& out, bzd::Timer& timer);
 
 	template <class Value1, class Value2>
 	void fail(const char* const file, const bzd::Int32 line, const char* const message, Value1&& value1, Value2&& value2)
@@ -540,6 +540,6 @@ private:
 	bool currentTestFailed_ = false;
 };
 
-bzd::Async<bool> run(bzd::OStream& out, bzd::SteadyClock& steadyClock);
+bzd::Async<bool> run(bzd::OStream& out, bzd::Timer& timer);
 
 } // namespace bzd::test

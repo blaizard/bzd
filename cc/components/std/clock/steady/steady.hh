@@ -4,7 +4,7 @@
 
 namespace bzd::platform::std::clock {
 
-class Steady : public bzd::SteadyClock
+class Steady : public bzd::Timer
 {
 public:
 	template <class Context>

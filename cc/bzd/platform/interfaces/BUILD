@@ -70,3 +70,14 @@ bdl_library(
         "//cc/bzd/platform/interfaces/cc:tcp",
     ],
 )
+
+bdl_library(
+    name = "timer",
+    srcs = [
+        "timer.bdl",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/platform/interfaces/cc:timer",
+    ],
+)

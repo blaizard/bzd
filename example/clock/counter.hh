@@ -5,12 +5,12 @@
 
 namespace example {
 
-bzd::Async<> counter(auto& out, auto& clock, const bzd::UInt32 count, const bzd::UInt32 periodMs)
+bzd::Async<> counter(auto& out, auto& timer, const bzd::UInt32 count, const bzd::UInt32 periodMs)
 {
 	for (bzd::UInt32 n = 0u; n < count; ++n)
 	{
 		co_await !bzd::print(out, "Delay {}\n"_csv, n);
-		co_await !clock.delay(bzd::units::Millisecond{periodMs});
+		co_await !timer.delay(bzd::units::Millisecond{periodMs});
 	}
 
 	co_return {};

@@ -7,7 +7,7 @@ bdl_library(
         "interface.bdl",
     ],
     deps = [
-        "//cc/bzd/platform/interfaces:clock",
+        "//cc/bzd/platform/interfaces:timer",
     ],
 )
 

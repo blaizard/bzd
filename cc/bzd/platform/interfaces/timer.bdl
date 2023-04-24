@@ -1,0 +1,8 @@
+
+namespace bzd;
+
+// A steady clock.
+// This is a monotonic clock.
+extern interface Timer;
+
+
