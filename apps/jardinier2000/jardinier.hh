@@ -5,6 +5,6 @@
 
 namespace jardinier {
 
-bzd::Async<> water(bzd::Timer& timer, bzd::Size wateringTimeS, bzd::UInt64 wakeUpPeriodS);
+bzd::Async<> water(bzd::Timer& timer, bzd::OStream& out, bzd::Size wateringTimeS, bzd::UInt64 wakeUpPeriodS);
 
 }
