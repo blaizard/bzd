@@ -244,14 +244,14 @@ protected:
 	bzd::Async<> init([[maybe_unused]] auto& registry) noexcept
 	{
 		{{ callInitMembers(entry) }}
-		{% if fqn.endswith("platform.out") %}
+		{% if fqn.endswith(".out") %}
 		registry.out.set(registry.{{ fqn | fqnToNameStr }}_.get());
 		{% end %}
 		co_return {};
 	}
 	bzd::Async<> shutdown([[maybe_unused]] auto& registry) noexcept
 	{
-		{% if fqn.endswith("platform.out") %}
+		{% if fqn.endswith(".out") %}
 		registry.out.clear();
 		{% end %}
 		{{ callShutdownMembers(entry) }}

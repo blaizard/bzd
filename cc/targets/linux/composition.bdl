@@ -17,7 +17,7 @@ composition {
 	
 }
 
-composition platform {
+composition {
 	out: bzd.OStream = bzd.platform.posix.Out(proactor = proactor);
 	in: bzd.IStream = bzd.platform.posix.In(proactor = proactor);
 	steadyClock: bzd.SteadyClock = bzd.platform.std.clock.Steady();

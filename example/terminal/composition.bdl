@@ -5,7 +5,7 @@ namespace example;
 
 method run(out = bzd.OStream, in = bzd.IStream);
 composition {
-	run(out = target.platform.out, in = target.platform.in);
+	run(out = target.out, in = target.in);
 	
 }
 
