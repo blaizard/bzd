@@ -150,7 +150,12 @@ class Composition:
 		content: typing.List[str] = []
 		addContent(content, "Symbols", str(self.symbols).split("\n"))
 		addContent(content, "Unique Identifiers", [f"{k}: {v}" for k, v in self.uids.items()])
-		addContent(content, "Entities", str(self.entities).split("\n"))
 		addContent(content, "Contexts", self.contexts)
+		for context in self.contexts:
+			addContent(content, f"Registry: {context}",
+			           [f"{k}: {v.expression}" for k, v in self.registry.get(context, {}).items()])
+			addContent(content, f"Services: {context}", [v.expression for v in self.services.get(context, [])])
+			addContent(content, f"Workloads: {context}", [v.expression for v in self.workloads.get(context, [])])
+			addContent(content, f"IOs: {context}", [v["identifier"] for v in self.ios.get(context, [])])
 
 		return "\n".join(content)

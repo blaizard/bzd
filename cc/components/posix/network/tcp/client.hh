@@ -17,7 +17,7 @@ public:
 	using Stream = typename bzd::platform::network::tcp::ClientTraits<Client>::Stream;
 
 public:
-	explicit Client(Context& context) : context_{context} {}
+	explicit Client(Context& context) : context_{context}, logger_{context.config.out} {}
 
 	bzd::Async<Stream> connect(const StringView endpoint, const PortType port) noexcept
 	{
@@ -40,7 +40,7 @@ public:
 			auto maybeSocket = co_await createSocketAndConnect(address);
 			if (!maybeSocket)
 			{
-				co_await !bzd::log::warning(maybeSocket.error());
+				co_await !logger_.warning(maybeSocket.error());
 			}
 			else
 			{
@@ -64,6 +64,7 @@ private:
 
 private:
 	Context& context_;
+	bzd::Logger logger_;
 };
 
 } // namespace bzd::platform::posix::network::tcp

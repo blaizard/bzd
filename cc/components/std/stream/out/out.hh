@@ -9,6 +9,7 @@ namespace bzd::platform::std {
 class Out : public bzd::OStream
 {
 public:
+	Out() = default;
 	template <class Context>
 	constexpr explicit Out(Context&) noexcept
 	{

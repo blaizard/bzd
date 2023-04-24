@@ -7,7 +7,6 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/components/generic/executor",
-        "//cc/components/generic/panic/throw",
         "//cc/components/linux/core",
         "//cc/components/linux/proactor/epoll",
         "//cc/components/posix/network/tcp:client",
@@ -17,6 +16,7 @@ cc_library(
         "//cc/components/posix/stream/out",
         "//cc/components/std/clock/steady",
         "//cc/components/std/clock/system",
+        "//cc/components/std/stream/out",
     ],
 )
 

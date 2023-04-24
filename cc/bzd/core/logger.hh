@@ -316,21 +316,3 @@ protected:
 };
 
 } // namespace bzd
-
-namespace bzd::log {
-template <class... Args>
-Async<> error([[maybe_unused]] Args&&... args)
-{
-	co_return {};
-}
-template <class... Args>
-Async<> info([[maybe_unused]] Args&&... args)
-{
-	co_return {};
-}
-template <class... Args>
-Async<> warning([[maybe_unused]] Args&&... args)
-{
-	co_return {};
-}
-} // namespace bzd::log

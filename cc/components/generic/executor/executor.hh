@@ -16,7 +16,7 @@ public:
 	using Self = Executor<Context>;
 
 public:
-	constexpr Executor(Context& context) noexcept : context_{context}, executor_{} {}
+	constexpr Executor(Context& context) noexcept : context_{context}, executor_{}, logger_{context.config.out} {}
 
 	/// Assign a workload to this executor.
 	constexpr void schedule(bzd::concepts::async auto& async, const bzd::async::Type type) noexcept
@@ -96,7 +96,7 @@ private:
 	{
 		if (--workloadCount_ == 0u)
 		{
-			bzd::log::info("All workloads are terminated, requesting shutdown.").sync();
+			logger_.info("All workloads are terminated, requesting shutdown.").sync();
 			executor_.requestShutdown();
 		}
 		return bzd::nullopt;
@@ -105,6 +105,7 @@ private:
 private:
 	Context& context_;
 	bzd::coroutine::impl::Executor executor_;
+	bzd::Logger logger_;
 	bzd::Atomic<bzd::Size> workloadCount_{0};
 };
 
