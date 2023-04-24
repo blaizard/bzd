@@ -31,7 +31,7 @@ public:
 		{
 			if (auto socketCreated = co_await createSocketAndBind(address); !socketCreated)
 			{
-				co_await !bzd::log::warning(socketCreated.error());
+				// co_await !bzd::log::warning(socketCreated.error());
 			}
 			else
 			{

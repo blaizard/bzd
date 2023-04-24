@@ -1,10 +1,21 @@
-#include "cc/bzd.hh"
+#include "cc/bzd/platform/panic.hh"
+#include "cc/components/std/stream/out/out.hh"
 
 #include <esp_system.h>
 
 #ifdef BZD_EXECUTOR_SIM
 #include <iostream>
 #endif
+
+void bzd::platform::panic(const bzd::FunctionRef<void(bzd::OStream&)> callback)
+{
+	::bzd::platform::std::Out out{};
+	callback(out);
+	::std::cout << "Infinite loop..." << ::std::endl;
+	while (true)
+	{
+	};
+}
 
 int main()
 {

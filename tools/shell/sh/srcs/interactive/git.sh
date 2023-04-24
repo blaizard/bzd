@@ -13,7 +13,8 @@ bzd_git_reset()
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         git fetch --prune
         git reset --hard $origin
-        git clean -xfd
+        # Note: do not delete untracked files as they might be used (for local configuration for example).
+        git clean -fd
         git submodule update --init --recursive
     fi
 }
