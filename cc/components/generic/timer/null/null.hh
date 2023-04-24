@@ -4,7 +4,7 @@
 
 namespace bzd::platform::generic::timer {
 
-class Null : public bzd::Clock
+class Null : public bzd::Timer
 {
 public:
 	template <class Context>
