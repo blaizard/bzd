@@ -3,9 +3,9 @@ use "cc/bzd/platform/interfaces/timer.bdl"
 namespace jardinier;
 
 
-method water(timer = bzd.Timer, wateringTimeS = Integer, wakeUpPeriodS = Integer);
+method water(timer = {timer}, out = {out}, wateringTimeS = Integer, wakeUpPeriodS = Integer);
 composition {
-	water(timer = target.timer, wateringTimeS = 5, wakeUpPeriodS = 2 * 24 * 3600);
+	water(wateringTimeS = 5, wakeUpPeriodS = 2 * 24 * 3600);
 	
 }
 
