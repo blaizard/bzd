@@ -12,6 +12,7 @@ from tools.bdl.entities.builder import ElementBuilder
 from tools.bdl.entities.impl.reference import Reference
 from tools.bdl.entities.impl.fragment.fqn import FQN
 from tools.bdl.entities.impl.expression import Expression
+from tools.bdl.entities.impl.types import Category
 
 ResolveShallowFQNResult = Result[typing.Tuple[str, typing.List[str]]]
 ResolveFQNResult = Result[typing.List[str]]
@@ -75,25 +76,26 @@ class Resolver:
 		if nameFirst == "this":
 			if self.this is None:
 				return ResolveShallowFQNResult.makeError("Keyword 'this' must be used in an object context.")
-			nameFirst = self.this
+			fqn = self.this
 
 		elif nameFirst == "target":
 			if self.target is None:
 				return ResolveShallowFQNResult((name, []))
-			nameFirst = self.target
+			fqn = self.target
 
-		# Look for a symbol match of the first part of the name.
-		potentialNamespace = self.namespace.copy()
-		while True:
-			fqn = FQN.fromNamespace(name=nameFirst, namespace=potentialNamespace)
-			if self.symbols.contains(fqn=fqn, exclude=self.exclude):
-				break
-			if not potentialNamespace:
-				ending = self.symbols._terminateErrorMessageSimilarFQN(fqn=nameFirst)
-				return ResolveShallowFQNResult.makeError(
-				    f"Symbol '{nameFirst}' in namespace '{'.'.join(self.namespace)}' could not be resolved{ending}"
-				    if self.namespace else f"Symbol '{nameFirst}' could not be resolved{ending}")
-			potentialNamespace.pop()
+		else:
+			# Look for a symbol match of the first part of the name, only if `nameFirst` is not a special name.
+			potentialNamespace = self.namespace.copy()
+			while True:
+				fqn = FQN.fromNamespace(name=nameFirst, namespace=potentialNamespace)
+				if self.symbols.contains(fqn=fqn, exclude=self.exclude):
+					break
+				if not potentialNamespace:
+					ending = self.symbols._terminateErrorMessageSimilarFQN(fqn=nameFirst)
+					return ResolveShallowFQNResult.makeError(
+					    f"Symbol '{nameFirst}' in namespace '{'.'.join(self.namespace)}' could not be resolved{ending}"
+					    if self.namespace else f"Symbol '{nameFirst}' could not be resolved{ending}")
+				potentialNamespace.pop()
 
 		# Attempt to resolve as much as possible.
 		potentialNamespace = FQN.toNamespace(fqn) + FQN.toNamespace(name)[1:]

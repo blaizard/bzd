@@ -1,14 +1,14 @@
 #pragma once
 
-#include "cc/components/std/clock/system/interface.hh"
+#include "cc/components/std/clock/system_clock/interface.hh"
 
 namespace bzd::platform::std::clock {
 
-class System : public bzd::Clock
+class SystemClock : public bzd::Clock
 {
 public:
 	template <class Context>
-	constexpr System(Context&) noexcept
+	constexpr SystemClock(Context&) noexcept
 	{
 	}
 

@@ -1,9 +1,8 @@
 #pragma once
 
 #include "cc/bzd/core/async.hh"
-#include "cc/bzd/core/clock.hh"
 
-namespace bzd::platform::esp32::clock::steady {
+namespace bzd::platform::esp32::timer {
 
 class Xthal : public bzd::Timer
 {
@@ -21,4 +20,4 @@ private:
 	bzd::UInt64 ticks_{0};
 };
 
-} // namespace bzd::platform::esp32::clock::steady
+} // namespace bzd::platform::esp32::timer

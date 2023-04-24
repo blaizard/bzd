@@ -1,9 +1,9 @@
-#include "cc/components/xtensa/clock/steady/gptimer/gptimer.hh"
+#include "cc/components/xtensa/timer/gptimer/gptimer.hh"
 
 #include "cc/components/xtensa/error.hh"
 #include "sdkconfig.h"
 
-namespace bzd::platform::esp32::clock::steady {
+namespace bzd::platform::esp32::timer {
 
 static bool gptimerCallback(::gptimer_handle_t, const ::gptimer_alarm_event_data_t*, void* userCtx)
 {
@@ -111,4 +111,4 @@ bzd::Result<void, bzd::Error> GPTimer::alarmClear()
 	return bzd::nullresult;
 }
 
-} // namespace bzd::platform::esp32::clock::steady
+} // namespace bzd::platform::esp32::timer

@@ -14,9 +14,9 @@ cc_library(
         "//cc/components/posix/stack_trace",
         "//cc/components/posix/stream/in",
         "//cc/components/posix/stream/out",
-        "//cc/components/std/clock/steady",
-        "//cc/components/std/clock/system",
+        "//cc/components/std/clock/system_clock",
         "//cc/components/std/stream/out",
+        "//cc/components/std/timer/steady_clock",
     ],
 )
 

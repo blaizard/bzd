@@ -1,6 +1,6 @@
 use "cc/bzd/platform/interfaces/timer.bdl"
 
-namespace bzd.platform.esp32.clock.steady;
+namespace bzd.platform.esp32.timer;
 
 
 component GPTimer : bzd.Timer {

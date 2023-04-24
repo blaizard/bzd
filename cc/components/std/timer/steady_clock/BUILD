@@ -7,17 +7,17 @@ bdl_library(
         "interface.bdl",
     ],
     deps = [
-        "//cc/bzd/platform/interfaces:clock",
+        "//cc/bzd/platform/interfaces:timer",
     ],
 )
 
 cc_library(
-    name = "system",
+    name = "steady_clock",
     srcs = [
-        "system.cc",
+        "steady_clock.cc",
     ],
     hdrs = [
-        "system.hh",
+        "steady_clock.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
