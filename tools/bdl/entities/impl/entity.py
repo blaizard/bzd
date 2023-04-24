@@ -176,6 +176,15 @@ class Entity:
 			self.regexpr.assign(regexpr)
 
 	@property
+	def isPreset(self) -> bool:
+		return self.element.isAttr("preset")
+
+	@property
+	def preset(self) -> str:
+		"""Get the preset associated with this entity."""
+		return self.element.getAttr("preset").value
+
+	@property
 	def isLiteral(self) -> bool:
 		"""Check if a value has a literal underlying value."""
 		return self.element.isAttr("literal")

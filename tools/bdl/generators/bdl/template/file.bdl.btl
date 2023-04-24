@@ -47,6 +47,8 @@ composition:
 		{%- if not loop.first %} {% end %}
 		{%- if fragment.isValue %}
 			{{- fragment.value }}
+		{%- elif fragment.isPreset -%}
+			{ {{- fragment.preset -}} }
 		{%- elif fragment.isSymbol %}
 			{{- fragment.symbol | symbolToStr }}
 			{%- if fragment.isParameters %}({{ printParameters(fragment.parameters) }}){% end %}

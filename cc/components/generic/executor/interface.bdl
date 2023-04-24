@@ -6,12 +6,13 @@ namespace bzd.platform.generic;
 
 // Generic executor that takes all cores as argument
 // and simply execute them.
-component Executor : bzd.platform.Executor, ComponentBase {
+component Executor : bzd.platform.Executor {
 interface:
 	
 config:
 	// The cores to be used by this executor.
 	cores = Array<bzd.platform.Core>;
+	out = {out};
 	
 }
 
