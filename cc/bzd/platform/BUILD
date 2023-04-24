@@ -6,10 +6,8 @@ bzd_cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":atomic",
-        ":clock",
         ":compiler",
         ":panic",
-        ":stream",
         ":types",
     ],
 )
@@ -52,27 +50,5 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/container:named_type",
-    ],
-)
-
-cc_library(
-    name = "stream",
-    hdrs = [
-        "stream.hh",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//cc/bzd/core:channel",
-    ],
-)
-
-cc_library(
-    name = "clock",
-    hdrs = [
-        "clock.hh",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//cc/bzd/platform/interfaces:clock",
     ],
 )

@@ -5,7 +5,7 @@
 
 namespace bzd::platform::esp32::clock::steady {
 
-class Xthal : public bzd::SteadyClock
+class Xthal : public bzd::Timer
 {
 public:
 	template <class Context>

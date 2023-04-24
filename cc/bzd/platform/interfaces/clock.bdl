@@ -1,7 +1,8 @@
 
 namespace bzd;
 
-extern interface SteadyClock;
-extern interface SystemClock;
+// A system clock.
+// This represents the best guest of the actual UTC time.
+extern interface Clock;
 
 

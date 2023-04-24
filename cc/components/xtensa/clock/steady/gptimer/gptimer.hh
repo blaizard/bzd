@@ -8,7 +8,7 @@
 namespace bzd::platform::esp32::clock::steady {
 
 class GPTimer
-	: public bzd::SteadyClock
+	: public bzd::Timer
 	, public bzd::TimerISR<UInt64, GPTimer, /*retroactiveAlarm*/ false>
 {
 public:

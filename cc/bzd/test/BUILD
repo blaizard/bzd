@@ -9,8 +9,8 @@ bdl_library(
         "composition.bdl",
     ],
     deps = [
-        "//cc/bzd/platform/interfaces:clock",
         "//cc/bzd/platform/interfaces:stream",
+        "//cc/bzd/platform/interfaces:timer",
     ],
 )
 
@@ -41,7 +41,6 @@ cc_library(
         "//cc/bzd/core:print",
         "//cc/bzd/core/async",
         "//cc/bzd/meta:macro",
-        "//cc/bzd/platform:clock",
         "//cc/bzd/type_traits:is_same_class",
         "//cc/bzd/utility:numeric_limits",
         "//cc/bzd/utility/random:uniform_int_distribution",

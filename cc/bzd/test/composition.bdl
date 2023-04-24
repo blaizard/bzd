@@ -1,13 +1,13 @@
 use "cc/bzd/platform/interfaces/stream.bdl"
-use "cc/bzd/platform/interfaces/clock.bdl"
+use "cc/bzd/platform/interfaces/timer.bdl"
 
 namespace bzd.test;
 
 
 // Test suite runner.
-method run(out = bzd.OStream, steadyClock = bzd.SteadyClock);
+method run(out = bzd.OStream, timer = bzd.Timer);
 composition {
-	run(out = target.out, steadyClock = target.steadyClock);
+	run(out = target.out, timer = target.timer);
 	
 }
 

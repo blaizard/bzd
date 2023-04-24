@@ -57,3 +57,18 @@ cc_library(
         "//tools/bdl/generators/cc/adapter:types",
     ],
 )
+
+cc_library(
+    name = "timer",
+    hdrs = [
+        "timer.hh",
+    ],
+    visibility = [
+        "//cc/bzd/platform/interfaces:__pkg__",
+    ],
+    deps = [
+        "//cc/bzd/core:units",
+        "//cc/bzd/core/async",
+        "//tools/bdl/generators/cc/adapter:types",
+    ],
+)

@@ -1,11 +1,11 @@
-use "cc/bzd/platform/interfaces/clock.bdl"
+use "cc/bzd/platform/interfaces/timer.bdl"
 
 namespace jardinier;
 
 
-method water(clock = bzd.SteadyClock, wateringTimeS = Integer, wakeUpPeriodS = Integer);
+method water(timer = bzd.Timer, wateringTimeS = Integer, wakeUpPeriodS = Integer);
 composition {
-	water(clock = target.steadyClock, wateringTimeS = 5, wakeUpPeriodS = 2 * 24 * 3600);
+	water(timer = target.timer, wateringTimeS = 5, wakeUpPeriodS = 2 * 24 * 3600);
 	
 }
 
