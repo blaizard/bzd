@@ -1,4 +1,4 @@
-use "cc/bzd/platform/interfaces/clock.bdl"
+use "cc/bzd/platform/interfaces/timer.bdl"
 use "cc/bzd/platform/interfaces/stream.bdl"
 
 namespace example;

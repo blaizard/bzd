@@ -1,8 +1,8 @@
 #pragma once
 
-#include "cc/components/generic/clock/system/null/interface.hh"
+#include "cc/components/generic/timer/null/interface.hh"
 
-namespace bzd::platform::generic::clock::system {
+namespace bzd::platform::generic::timer {
 
 class Null : public bzd::Clock
 {
@@ -15,4 +15,4 @@ public:
 	bzd::Result<bzd::units::Millisecond, bzd::Error> getTime() noexcept override;
 };
 
-} // namespace bzd::platform::generic::clock::system
+} // namespace bzd::platform::generic::timer

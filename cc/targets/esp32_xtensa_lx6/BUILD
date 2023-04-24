@@ -14,14 +14,13 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/platform:panic",
-        "//cc/bzd/platform/interfaces:clock",
         "//cc/bzd/platform/interfaces:stream",
-        "//cc/components/generic/clock/system/null",
+        "//cc/components/generic/clock/null",
         "//cc/components/generic/executor",
         "//cc/components/generic/stream/stub",
         "//cc/components/std/stream/out",
-        "//cc/components/xtensa/clock/steady/gptimer",
         "//cc/components/xtensa/core",
+        "//cc/components/xtensa/timer/gptimer",
     ],
 )
 

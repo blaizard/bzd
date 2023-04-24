@@ -1,8 +1,8 @@
 use "cc/components/linux/core/interface.bdl"
 use "cc/components/posix/stream/out/interface.bdl"
 use "cc/components/posix/stream/in/interface.bdl"
-use "cc/components/std/clock/steady/interface.bdl"
-use "cc/components/std/clock/system/interface.bdl"
+use "cc/components/std/timer/steady_clock/interface.bdl"
+use "cc/components/std/clock/system_clock/interface.bdl"
 use "cc/components/linux/proactor/epoll/interface.bdl"
 use "cc/components/posix/shmem/interface.bdl"
 
@@ -20,8 +20,8 @@ composition {
 composition {
 	out: bzd.OStream = bzd.platform.posix.Out(proactor = proactor);
 	in: bzd.IStream = bzd.platform.posix.In(proactor = proactor);
-	timer: bzd.Timer = bzd.platform.std.clock.Steady();
-	clock: bzd.Clock = bzd.platform.std.clock.System();
+	timer: bzd.Timer = bzd.platform.std.timer.SteadyClock();
+	clock: bzd.Clock = bzd.platform.std.clock.SystemClock();
 	
 }
 

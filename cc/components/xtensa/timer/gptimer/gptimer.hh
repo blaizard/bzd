@@ -1,11 +1,11 @@
 #pragma once
 
 #include "cc/bzd/core/async.hh"
-#include "cc/components/xtensa/clock/steady/gptimer/interface.hh"
+#include "cc/components/xtensa/timer/gptimer/interface.hh"
 #include "cc/libs/timer/timer_isr.hh"
 #include "driver/gptimer.h"
 
-namespace bzd::platform::esp32::clock::steady {
+namespace bzd::platform::esp32::timer {
 
 class GPTimer
 	: public bzd::Timer
@@ -39,4 +39,4 @@ private:
 	::gptimer_handle_t gptimer_;
 };
 
-} // namespace bzd::platform::esp32::clock::steady
+} // namespace bzd::platform::esp32::timer
