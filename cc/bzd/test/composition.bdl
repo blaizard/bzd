@@ -7,7 +7,7 @@ namespace bzd.test;
 // Test suite runner.
 method run(out = bzd.OStream, steadyClock = bzd.SteadyClock);
 composition {
-	run(out = target.platform.out, steadyClock = target.platform.steadyClock);
+	run(out = target.out, steadyClock = target.steadyClock);
 	
 }
 

@@ -180,11 +180,14 @@ class Components:
 			self.resolved[context] = []
 			discovered = set()
 
+			def isExpressionDiscovered(expression: Expression) -> bool:
+				return self.makeId(expression) in discovered
+
 			def isSatisfied(group: DependencyGroup) -> bool:
 				"""Check that the group dependency is statified with the current map."""
 
 				for expression in group:
-					if self.makeId(expression) not in discovered:
+					if not isExpressionDiscovered(expression):
 						return False
 				return True
 
@@ -200,7 +203,10 @@ class Components:
 						remaining.append((identifier, entry))
 
 				if len(entries) == len(remaining):
-					entries[0][1].expression.error(message="The dependencies of this expression are not met.")
+					entry = entries[0][1]
+					dependenciesNotMet = [str(e) for e in entry.deps if not isExpressionDiscovered(e)]
+					entry.expression.error(
+					    message=f"Not all dependencies of this expression are met: {', '.join(dependenciesNotMet)}")
 
 				entries = remaining
 

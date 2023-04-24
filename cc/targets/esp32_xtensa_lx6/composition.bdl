@@ -17,7 +17,7 @@ composition {
 	
 }
 
-composition platform {
+composition {
 	out: bzd.OStream = bzd.platform.std.Out();
 	in: bzd.IStream = bzd.platform.generic.stream.Stub();
 	steadyClock: bzd.SteadyClock = bzd.platform.esp32.clock.steady.GPTimer();
