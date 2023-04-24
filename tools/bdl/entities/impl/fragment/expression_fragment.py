@@ -33,6 +33,8 @@ class ExpressionFragment(EntityExpression):
 			return OperatorFragment(element)
 		elif element.isAttr("regexpr"):
 			return RegexprFragment(element)
+		elif element.isAttr("preset"):
+			return PresetFragment(element)
 
 		ExpressionFragment(element).error(message=f"Unsupported expression fragment for element: '{element}'.")
 
@@ -44,8 +46,8 @@ class ExpressionFragment(EntityExpression):
 
 		# Copy attributes.
 		elementBuilder = ElementBuilder.cast(element, ElementBuilder)
-		for attr in ("symbol", "value", "symbol_category", "symbol_resolved", "meta", "literal", "const", "fqn_type",
-		             "fqn_value"):
+		for attr in ("interface", "symbol", "value", "symbol_category", "symbol_resolved", "meta", "literal", "const",
+		             "fqn_type", "fqn_value"):
 			if self.element.isAttr(attr):
 				elementBuilder.setAttr(attr, self.element.getAttr(attr).value)
 
@@ -240,3 +242,40 @@ class SymbolFragment(ExpressionFragment):
 			self.assertTrue(condition=isinstance(maybeValue, str),
 			                message=f"The returned value from toLiteral must be a string, not {str(maybeValue)}")
 			self._setLiteral(maybeValue)
+
+
+class PresetFragment(SymbolFragment):
+
+	def resolve(self, resolver: "Resolver") -> None:
+
+		presets = {
+		    "out": {
+		        "interface": "bzd.OStream",
+		        "symbol": "target.out"
+		    },
+		    "in": {
+		        "interface": "bzd.IStream",
+		        "symbol": "target.in"
+		    },
+		    "timer": {
+		        "interface": "bzd.Timer",
+		        "symbol": "target.timer"
+		    },
+		    "clock": {
+		        "interface": "bzd.Clock",
+		        "symbol": "target.clock"
+		    },
+		    "network.tcp.client": {
+		        "interface": "bzd.network.tcp.Client",
+		        "symbol": "target.network.tcp.client"
+		    }
+		}
+
+		if self.preset in presets:
+			for attr, value in presets[self.preset].items():
+				ElementBuilder.cast(self.element, ElementBuilder).setAttr(attr, value)
+
+		else:
+			self.error(message=f"The preset '{self.preset}' is not supported.")
+
+		super().resolve(resolver=resolver)

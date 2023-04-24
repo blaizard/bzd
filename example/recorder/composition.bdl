@@ -3,19 +3,27 @@ use "cc/bzd/platform/interfaces/recorder.bdl"
 namespace example;
 
 
-component Hello : ComponentBase {
+component Hello {
 interface:
 	method run();
 	send = Float;
+	
+config:
+	out = {out};
+	timer = {timer};
 	
 composition:
 	this.run();
 	
 }
 
-component Recorder : bzd.platform.Recorder, ComponentBase {
+component Recorder : bzd.platform.Recorder {
 interface:
 	method run();
+	
+config:
+	out = {out};
+	timer = {timer};
 	
 composition:
 	this.run();

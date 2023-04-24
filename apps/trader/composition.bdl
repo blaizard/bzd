@@ -3,11 +3,13 @@ use "cc/bzd/platform/interfaces/tcp.bdl"
 namespace trader;
 
 
-component Trader : ComponentBase {
+component Trader {
 interface:
 	method run();
 	
 config:
+	out = {out};
+	timer = {timer};
 	client = bzd.platform.network.tcp.Client;
 	
 }

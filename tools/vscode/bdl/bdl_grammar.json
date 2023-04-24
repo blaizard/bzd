@@ -45,6 +45,10 @@
             "name": "string.regexp"
         },
         {
+            "match": "{[\\S\\.]+}",
+            "name": "entity.name.function.macro"
+        },
+        {
             "begin": "/\\*",
             "end": "\\*/",
             "name": "comment.block"

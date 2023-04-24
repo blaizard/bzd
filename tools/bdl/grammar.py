@@ -8,17 +8,19 @@ from bzd.parser.fragments import Fragment, FragmentNestedStart, FragmentNestedSt
 from bzd.parser.element import Element
 
 _regexprBaseName = r"(?!const\b|interface\b|struct\b|component\b|method\b|namespace\b|use\b|using\b|config\b|composition\b|[0-9])[0-9a-zA-Z_]+"
-# Match name
+# Match name: abc
 _regexprName = r"(?P<name>" + _regexprBaseName + r")"
-# Match name or varargs
+# Match name or varargs: abc or abc...
 _regexprNameOrVarArgs = r"(?P<name>" + _regexprBaseName + r"(?:\.\.\.)?)"
 # Match: "string", 12, -45, 5.1854, true, false
 _regexprValue = r"(?P<value>\".*?(?<!\\)\"|-?[0-9]+(?:\.[0-9]*)?|true|false)"
-# Match string
+# Match string: "hello"
 _regexprString = r"\"(?P<value>.*?)\""
-# Match regular expression
+# Match regular expression: /.*/
 _regexprRegexpr = r"/(?P<regexpr>[^\s]+)/"
-# Match operator
+# Match preset: {abc.def}
+_regexprPreset = r"\{(?P<preset>" + _regexprBaseName + r"(?:\." + _regexprBaseName + ")*)\}"
+# Match operator: + or - or \ or *
 _regexprOperator = r"(?P<operator>[\+\-\\\*])"
 
 
@@ -162,6 +164,9 @@ def makeGrammarExpressionFragment(finalGrammar: Grammar = [GrammarItem(r";", Fra
 
 		# Test for value.
 		grammarValue.append(GrammarItem(_regexprValue, FragmentNewElement, grammarValue))
+
+		# Test for preset.
+		grammarValue.append(GrammarItem(_regexprPreset, FragmentNewElement, grammarValue))
 
 		# Test for symbol.
 		grammarValue.extend(

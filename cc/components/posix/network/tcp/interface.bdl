@@ -4,11 +4,12 @@ use "cc/components/posix/proactor/interface.bdl"
 namespace bzd.platform.posix.network.tcp;
 
 
-component Client : bzd.platform.network.tcp.Client, ComponentBase {
+component Client : bzd.platform.network.tcp.Client {
 interface:
 	
 config:
 	proactor = Proactor;
+	out = {out};
 	
 }
 
