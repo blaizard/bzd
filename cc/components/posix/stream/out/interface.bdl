@@ -5,10 +5,10 @@ namespace bzd.components.posix;
 
 
 component Out : bzd.OStream {
-interface:
-	
 config:
 	proactor = Proactor;
+	
+interface:
 	
 }
 

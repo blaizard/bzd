@@ -4,13 +4,13 @@ namespace example;
 
 // Emit integer continuously.
 component Emitter {
-interface:
-	method generate();
-	send = Integer;
-	
 config:
 	out = {out};
 	timer = {timer};
+	
+interface:
+	method generate();
+	send = Integer;
 	
 composition:
 	this.generate();
@@ -19,14 +19,14 @@ composition:
 
 // Poll and receive data.
 component Poller {
-interface:
-	method poll();
-	receive = const Integer;
-	
 config:
 	out = {out};
 	timer = {timer};
 	id = const Integer;
+	
+interface:
+	method poll();
+	receive = const Integer;
 	
 }
 

@@ -4,13 +4,13 @@ namespace trader;
 
 
 component Trader {
-interface:
-	method run();
-	
 config:
 	out = {out};
 	timer = {timer};
 	client = {network.tcp.client};
+	
+interface:
+	method run();
 	
 }
 

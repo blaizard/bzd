@@ -5,11 +5,11 @@ namespace bzd.components.posix.network.tcp;
 
 
 component Client : bzd.network.tcp.Client {
-interface:
-	
 config:
 	proactor = Proactor;
 	out = {out};
+	
+interface:
 	
 }
 
