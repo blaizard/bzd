@@ -9,7 +9,7 @@
 
 void bzd::platform::panic(const bzd::FunctionRef<void(bzd::OStream&)> callback)
 {
-	::bzd::platform::std::Out out{};
+	::bzd::components::std::Out out{};
 	callback(out);
 	::std::cout << "Infinite loop..." << ::std::endl;
 	while (true)
