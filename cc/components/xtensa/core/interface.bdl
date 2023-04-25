@@ -1,4 +1,4 @@
-use "cc/bzd/platform/interfaces/core.bdl"
+use "interfaces/core.bdl"
 
 namespace bzd.components.esp32;
 

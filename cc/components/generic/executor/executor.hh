@@ -3,9 +3,9 @@
 #include "cc/bzd/container/function_ref.hh"
 #include "cc/bzd/core/async.hh"
 #include "cc/bzd/core/logger.hh"
-#include "cc/bzd/platform/interfaces/core.hh"
-#include "cc/bzd/platform/interfaces/executor.hh"
 #include "cc/bzd/utility/apply.hh"
+#include "interfaces/core.hh"
+#include "interfaces/executor.hh"
 
 namespace bzd::components::generic {
 

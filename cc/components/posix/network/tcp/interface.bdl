@@ -1,4 +1,4 @@
-use "cc/bzd/platform/interfaces/tcp.bdl"
+use "interfaces/tcp.bdl"
 use "cc/components/posix/proactor/interface.bdl"
 
 namespace bzd.components.posix.network.tcp;

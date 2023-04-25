@@ -1,5 +1,5 @@
 use "cc/components/posix/proactor/interface.bdl"
-use "cc/bzd/platform/interfaces/stream.bdl"
+use "interfaces/stream.bdl"
 
 namespace bzd.components.posix;
 

@@ -1,4 +1,4 @@
-use "cc/bzd/platform/interfaces/gateway.bdl"
+use "interfaces/gateway.bdl"
 
 namespace bzd.components.posix;
 

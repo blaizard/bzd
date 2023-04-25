@@ -1,5 +1,5 @@
-use "cc/bzd/platform/interfaces/stream.bdl"
-use "cc/bzd/platform/interfaces/timer.bdl"
+use "interfaces/stream.bdl"
+use "interfaces/timer.bdl"
 
 namespace bzd.test;
 

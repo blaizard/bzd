@@ -10,8 +10,8 @@ bdl_library(
         "//visibility:public",
     ],
     deps = [
-        "//cc/bzd/platform/interfaces:tcp",
         "//cc/components/posix/proactor",
+        "//interfaces:tcp",
     ],
 )
 
