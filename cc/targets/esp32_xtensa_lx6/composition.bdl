@@ -9,18 +9,18 @@ use "cc/bzd/platform/interfaces/stream.bdl"
 
 composition {
 	// Core 0 is considered the "Protocol CPU", it runs most of ESP IDF services.
-	core0 = bzd.platform.esp32.Core(stackSize = 16000, name = "core[0]", cpu = 0, priority = 50);
+	core0 = bzd.components.esp32.Core(stackSize = 16000, name = "core[0]", cpu = 0, priority = 50);
 	// Core 1 is the "application CPU", hence it should have the highest priority.
-	core1 = bzd.platform.esp32.Core(stackSize = 16000, name = "core[1]", cpu = 1, priority = 100);
-	executor = bzd.platform.generic.Executor(cores = list(core0, core1)) [executor];
+	core1 = bzd.components.esp32.Core(stackSize = 16000, name = "core[1]", cpu = 1, priority = 100);
+	executor = bzd.components.generic.Executor(cores = list(core0, core1)) [executor];
 	
 }
 
 composition {
-	out: bzd.OStream = bzd.platform.std.Out();
-	in: bzd.IStream = bzd.platform.generic.stream.Stub();
-	timer: bzd.Timer = bzd.platform.esp32.timer.GPTimer();
-	clock: bzd.Clock = bzd.platform.generic.clock.Null();
+	out: bzd.OStream = bzd.components.std.Out();
+	in: bzd.IStream = bzd.components.generic.stream.Stub();
+	timer: bzd.Timer = bzd.components.esp32.timer.GPTimer();
+	clock: bzd.Clock = bzd.components.generic.clock.Null();
 	
 }
 

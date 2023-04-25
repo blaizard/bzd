@@ -73,7 +73,7 @@
 	::bzd::Async<> BZDTEST_FCT_NAME_(testCaseName, testName)(const ::bzd::test::Context&);                                                 \
 	void BZDTEST_CLASS_NAME_(testCaseName, testName)::test(const ::bzd::test::Context& test) const                                         \
 	{                                                                                                                                      \
-		::bzd::coroutine::impl::Executor executor{};                                                                                       \
+		::bzd::async::Executor executor{};                                                                                                 \
 		::bzd::Array<std::thread, nbThreads> threads;                                                                                      \
 		::bzd::Atomic<::bzd::Bool> isTerminated{false};                                                                                    \
 		auto onTerminate = [&isTerminated]() -> ::bzd::Optional<::bzd::async::Executable&> {                                               \

@@ -18,10 +18,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-namespace bzd::platform::linux {
+namespace bzd::components::linux {
 
 template <class Context>
-class Core : public bzd::platform::Core
+class Core : public bzd::Core
 {
 private:
 	using Self = Core<Context>;
@@ -41,7 +41,7 @@ public:
 		}
 	}
 
-	Result<void, bzd::Error> start(const bzd::FunctionRef<void(bzd::platform::Core&)> workload) noexcept override
+	Result<void, bzd::Error> start(const bzd::FunctionRef<void(bzd::Core&)> workload) noexcept override
 	{
 		// Allocate the aligned memory for the stack.
 		if (stack_.empty())
@@ -142,9 +142,9 @@ private:
 	CoreId core_id_;
 	bzd::Optional<bzd::interface::Stack<StackDirection::downward>> stack_ {
 	};
-	bzd::Optional<bzd::FunctionRef<void(bzd::platform::Core&)>> workload_;
+	bzd::Optional<bzd::FunctionRef<void(bzd::Core&)>> workload_;
 	pthread_attr_t attr_;
 	pthread_t thread_;
 };
 
-} // namespace bzd::platform::linux
+} // namespace bzd::components::linux

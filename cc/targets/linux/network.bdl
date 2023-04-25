@@ -4,7 +4,7 @@ namespace network;
 
 
 composition tcp {
-	client = bzd.platform.posix.network.tcp.Client(proactor = proactor);
+	client = bzd.components.posix.network.tcp.Client(proactor = proactor);
 	
 }
 

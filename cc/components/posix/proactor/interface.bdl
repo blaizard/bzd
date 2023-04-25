@@ -1,6 +1,6 @@
 use "cc/components/posix/io/file_descriptor.bdl"
 
-namespace bzd.platform.posix;
+namespace bzd.components.posix;
 
 extern interface Proactor;
 

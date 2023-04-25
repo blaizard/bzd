@@ -1,6 +1,12 @@
 #include "cc/bzd/core/assert/minimal.hh"
+#include "cc/bzd/platform/panic.hh"
 
 #include "cc/bzd/test/test.hh"
+
+void bzd::platform::panic(const bzd::FunctionRef<void(bzd::OStream&)>)
+{
+	throw 42;
+}
 
 TEST(AssertMinimal, Base)
 {

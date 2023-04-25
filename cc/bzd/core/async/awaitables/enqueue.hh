@@ -3,11 +3,11 @@
 #include "cc/bzd/core/async/promise.hh"
 #include "cc/bzd/utility/apply.hh"
 
-namespace bzd::coroutine::impl {
+namespace bzd::async::awaitable {
 
 /// Awaitable to enqueue an async object.
 template <class... Asyncs>
-class Enqueue : public bzd::coroutine::impl::suspend_always
+class Enqueue : public bzd::async::impl::suspend_always
 {
 public:
 	using Self = Enqueue<Asyncs...>;
@@ -16,7 +16,7 @@ public:
 
 protected:
 	template <class... Ts>
-	constexpr Enqueue(Executable::OnTerminateCallback callback, Ts&&... asyncs) noexcept :
+	constexpr Enqueue(bzd::async::impl::PromiseBase::OnTerminateCallback callback, Ts&&... asyncs) noexcept :
 		callback_{callback}, asyncs_{inPlace, bzd::forward<Ts>(asyncs)...}
 	{
 	}
@@ -26,7 +26,7 @@ protected:
 	constexpr Enqueue(Self&&) noexcept = delete;
 	constexpr Self& operator=(Self&&) noexcept = delete;
 
-	constexpr void enqueueAsyncs(Executable& caller, bzd::Optional<CancellationToken&> maybeToken) noexcept
+	constexpr void enqueueAsyncs(bzd::async::impl::PromiseBase& caller, bzd::Optional<CancellationToken&> maybeToken) noexcept
 	{
 		auto& executor{caller.getExecutor()};
 		continuation_.emplace(caller);
@@ -42,9 +42,9 @@ protected:
 	}
 
 protected:
-	Executable::OnTerminateCallback callback_;
+	bzd::async::impl::PromiseBase::OnTerminateCallback callback_;
 	bzd::Tuple<Asyncs...> asyncs_;
-	bzd::Optional<Executable&> continuation_{};
+	bzd::Optional<bzd::async::impl::PromiseBase&> continuation_{};
 };
 
 template <class... Asyncs>
@@ -57,14 +57,15 @@ public: // Traits.
 public: // Constructor.
 	template <class... Ts>
 	constexpr EnqueueAll(Ts&&... asyncs) noexcept :
-		Enqueue<Asyncs...>{Executable::OnTerminateCallback::toMember<Self, &Self::onTerminateCallback>(*this), bzd::forward<Ts>(asyncs)...}
+		Enqueue<Asyncs...>{bzd::async::impl::PromiseBase::OnTerminateCallback::toMember<Self, &Self::onTerminateCallback>(*this),
+						   bzd::forward<Ts>(asyncs)...}
 	{
 	}
 
 public: // Coroutine specializations.
 	template <class T>
 	// NOLINTNEXTLINE(readability-identifier-naming)
-	constexpr void await_suspend(bzd::coroutine::impl::coroutine_handle<T> caller) noexcept
+	constexpr void await_suspend(bzd::async::impl::coroutine_handle<T> caller) noexcept
 	{
 		auto& promise = caller.promise();
 		this->enqueueAsyncs(promise, promise.getCancellationToken());
@@ -82,7 +83,7 @@ public: // Coroutine specializations.
 	}
 
 private:
-	constexpr bzd::Optional<Executable&> onTerminateCallback() noexcept
+	constexpr bzd::Optional<bzd::async::impl::PromiseBase&> onTerminateCallback() noexcept
 	{
 		// Atomically count the number of async completed, and only for the last one,
 		// push the caller back into the scheduling queue.
@@ -108,14 +109,15 @@ public: // Traits.
 public: // Constructor.
 	template <class... Ts>
 	constexpr EnqueueAny(Ts&&... asyncs) noexcept :
-		Enqueue<Asyncs...>{Executable::OnTerminateCallback::toMember<Self, &Self::onTerminateCallback>(*this), bzd::forward<Ts>(asyncs)...}
+		Enqueue<Asyncs...>{bzd::async::impl::PromiseBase::OnTerminateCallback::toMember<Self, &Self::onTerminateCallback>(*this),
+						   bzd::forward<Ts>(asyncs)...}
 	{
 	}
 
 public: // Coroutine specializations.
 	template <class T>
 	// NOLINTNEXTLINE(readability-identifier-naming)
-	constexpr void await_suspend(bzd::coroutine::impl::coroutine_handle<T> caller) noexcept
+	constexpr void await_suspend(bzd::async::impl::coroutine_handle<T> caller) noexcept
 	{
 		auto& promise = caller.promise();
 
@@ -143,7 +145,7 @@ public: // Coroutine specializations.
 	}
 
 private:
-	constexpr bzd::Optional<Executable&> onTerminateCallback() noexcept
+	constexpr bzd::Optional<bzd::async::impl::PromiseBase&> onTerminateCallback() noexcept
 	{
 		// Atomically count the number of async completed
 		auto current = ++counter_;
@@ -172,4 +174,4 @@ private:
 	CancellationToken token_{};
 };
 
-} // namespace bzd::coroutine::impl
+} // namespace bzd::async::awaitable

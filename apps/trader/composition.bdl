@@ -10,12 +10,12 @@ interface:
 config:
 	out = {out};
 	timer = {timer};
-	client = bzd.platform.network.tcp.Client;
+	client = {network.tcp.client};
 	
 }
 
 composition {
-	trader = Trader(client = target.network.tcp.client);
+	trader = Trader();
 	trader.run();
 	
 }

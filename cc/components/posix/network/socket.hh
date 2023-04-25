@@ -7,7 +7,7 @@
 
 #include <sys/socket.h>
 
-namespace bzd::platform::posix::network {
+namespace bzd::components::posix::network {
 
 class Socket
 {
@@ -45,7 +45,7 @@ public:
 
 private:
 	/// File descriptor associated with this socket.
-	bzd::platform::posix::FileDescriptorOwner fd_{};
+	bzd::components::posix::FileDescriptorOwner fd_{};
 };
 
-} // namespace bzd::platform::posix::network
+} // namespace bzd::components::posix::network

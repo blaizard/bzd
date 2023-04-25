@@ -17,7 +17,7 @@ composition:
 	
 }
 
-component Recorder : bzd.platform.Recorder {
+component Recorder : bzd.Recorder {
 interface:
 	method run();
 	

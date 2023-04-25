@@ -2,34 +2,36 @@
 
 #include "cc/bzd/core/async/promise.hh"
 
-namespace bzd::coroutine::impl {
+namespace bzd::async::awaitable {
 
 /// Creates an ExecutableSuspended object for sharing.
 ///
 /// This object activates the ExecutableSuspended on destruction.
 template <class T>
-class ExecutableSuspendedFactory : public bzd::interface::ExecutableSuspended<T>
+class ExecutableSuspendedFactory : public bzd::async::impl::ExecutableSuspended<T>
 {
 public:
 	constexpr ExecutableSuspendedFactory(T& executable, const bzd::FunctionRef<void(void)> onCancel) noexcept :
-		bzd::interface::ExecutableSuspended<T>{}, executableRaw_{executable}, ownerStorage_{this} {
-			this->executable_.store(&executable);
-	this->onUserCancel_ = onCancel;
-	this->owner_ = &ownerStorage_;
-} ExecutableSuspendedFactory(const ExecutableSuspendedFactory&) = delete;
-ExecutableSuspendedFactory& operator=(const ExecutableSuspendedFactory&) = delete;
-ExecutableSuspendedFactory(ExecutableSuspendedFactory&&) = delete;
-ExecutableSuspendedFactory& operator=(ExecutableSuspendedFactory&&) = delete;
-constexpr ~ExecutableSuspendedFactory() noexcept { this->activate(executableRaw_); }
+		bzd::async::impl::ExecutableSuspended<T>{}, executableRaw_{executable}, ownerStorage_{this}
+	{
+		this->executable_.store(&executable);
+		this->onUserCancel_ = onCancel;
+		this->owner_ = &ownerStorage_;
+	}
+	ExecutableSuspendedFactory(const ExecutableSuspendedFactory&) = delete;
+	ExecutableSuspendedFactory& operator=(const ExecutableSuspendedFactory&) = delete;
+	ExecutableSuspendedFactory(ExecutableSuspendedFactory&&) = delete;
+	ExecutableSuspendedFactory& operator=(ExecutableSuspendedFactory&&) = delete;
+	constexpr ~ExecutableSuspendedFactory() noexcept { this->activate(executableRaw_); }
 
 private:
-T& executableRaw_;
-bzd::interface::ExecutableSuspended<Executable>* ownerStorage_;
+	T& executableRaw_;
+	bzd::async::impl::ExecutableSuspended<bzd::async::impl::PromiseBase>* ownerStorage_;
 }; // namespace bzd::coroutine::impl
 
 /// Awaitable to detach an async object and optionally execute a callable.
 template <class OnSuspend, class OnCancellation = void (*)(void)>
-class Suspend : public bzd::coroutine::impl::suspend_always
+class Suspend : public bzd::async::impl::suspend_always
 {
 public: // Constructor.
 	constexpr Suspend(OnSuspend&& onSuspend, OnCancellation&& onCancellation) noexcept :
@@ -41,24 +43,26 @@ public: // Constructor.
 public: // Coroutine specializations.
 	template <class T>
 	// NOLINTNEXTLINE(readability-identifier-naming)
-	constexpr bool await_suspend(bzd::coroutine::impl::coroutine_handle<T> caller) noexcept
+	constexpr bool await_suspend(bzd::async::impl::coroutine_handle<T> caller) noexcept
 	{
-		executable_ = &caller.promise();
+		promise_ = &caller.promise();
 
-		auto callback = bzd::FunctionRef<bzd::Optional<Executable&>(void)>::toMember<Suspend, &Suspend::onTerminateCallback>(*this);
-		executable_->thenEnqueueCallback(callback);
+		auto callback =
+			bzd::FunctionRef<bzd::Optional<bzd::async::impl::PromiseBase&>(void)>::toMember<Suspend, &Suspend::onTerminateCallback>(*this);
+		promise_->thenEnqueueCallback(callback);
 
 		return true;
 	}
 
 private:
-	bzd::Optional<Executable&> onTerminateCallback() noexcept
+	bzd::Optional<bzd::async::impl::PromiseBase&> onTerminateCallback() noexcept
 	{
-		bzd::assert::isTrue(executable_);
+		bzd::assert::isTrue(promise_);
 
-		executable_->skip();
-		auto suspended = impl::ExecutableSuspendedFactory<Executable>{*executable_, bzd::FunctionRef<void(void)>{onCancellation_}};
-		onSuspend_(static_cast<bzd::interface::ExecutableSuspended<Executable>&&>(suspended));
+		promise_->skip();
+		auto suspended =
+			ExecutableSuspendedFactory<bzd::async::impl::PromiseBase>{*promise_, bzd::FunctionRef<void(void)>{onCancellation_}};
+		onSuspend_(static_cast<bzd::async::impl::ExecutableSuspended<bzd::async::impl::PromiseBase>&&>(suspended));
 
 		return bzd::nullopt;
 	}
@@ -66,7 +70,7 @@ private:
 private:
 	OnSuspend onSuspend_;
 	OnCancellation onCancellation_;
-	bzd::coroutine::impl::Executable* executable_{nullptr};
+	bzd::async::impl::PromiseBase* promise_{nullptr};
 };
 
-} // namespace bzd::coroutine::impl
+} // namespace bzd::async::awaitable

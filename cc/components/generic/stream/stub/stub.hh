@@ -2,7 +2,7 @@
 
 #include "cc/components/generic/stream/stub/interface.hh"
 
-namespace bzd::platform::generic::stream {
+namespace bzd::components::generic::stream {
 class Stub : public bzd::IOStream
 {
 public:
@@ -15,4 +15,4 @@ public:
 
 	bzd::Async<bzd::Span<const bzd::Byte>> read(bzd::Span<bzd::Byte>&&) noexcept override { co_return bzd::Span<const bzd::Byte>{}; }
 };
-} // namespace bzd::platform::generic::stream
+} // namespace bzd::components::generic::stream

@@ -2,14 +2,14 @@
 
 #include "cc/bzd/core/async/promise.hh"
 
-namespace bzd::coroutine::impl {
+namespace bzd::async::awaitable {
 
 /// Awaitable to yield the current execution.
-struct Yield : public bzd::coroutine::impl::suspend_always
+struct Yield : public bzd::async::impl::suspend_always
 {
 	template <class T>
 	// NOLINTNEXTLINE(readability-identifier-naming)
-	constexpr bool await_suspend(bzd::coroutine::impl::coroutine_handle<T> caller) noexcept
+	constexpr bool await_suspend(bzd::async::impl::coroutine_handle<T> caller) noexcept
 	{
 		auto& executable{caller.promise()};
 		executable.reschedule();
@@ -17,4 +17,4 @@ struct Yield : public bzd::coroutine::impl::suspend_always
 	}
 };
 
-} // namespace bzd::coroutine::impl
+} // namespace bzd::async::awaitable

@@ -3,7 +3,7 @@
 #include <iostream>
 #include <unistd.h>
 
-namespace bzd::platform::posix {
+namespace bzd::components::posix {
 
 FileDescriptorOwner& FileDescriptorOwner::operator=(FileDescriptorOwner&& other) noexcept
 {
@@ -31,4 +31,4 @@ void FileDescriptorOwner::reset() noexcept
 
 FileDescriptorOwner::~FileDescriptorOwner() noexcept { reset(); }
 
-} // namespace bzd::platform::posix
+} // namespace bzd::components::posix

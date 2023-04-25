@@ -2,7 +2,7 @@
 
 #include "cc/components/std/clock/system_clock/interface.hh"
 
-namespace bzd::platform::std::clock {
+namespace bzd::components::std::clock {
 
 class SystemClock : public bzd::Clock
 {
@@ -15,4 +15,4 @@ public:
 	bzd::Result<bzd::units::Millisecond, bzd::Error> getTime() noexcept override;
 };
 
-} // namespace bzd::platform::std::clock
+} // namespace bzd::components::std::clock

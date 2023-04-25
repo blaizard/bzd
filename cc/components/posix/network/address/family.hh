@@ -2,7 +2,7 @@
 
 #include <sys/socket.h>
 
-namespace bzd::platform::posix::network {
+namespace bzd::components::posix::network {
 
 enum class AddressFamily
 {

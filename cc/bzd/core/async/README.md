@@ -4,7 +4,7 @@
 
 ### Handle
 
-The thing referred by `bzd::coroutine::impl::coroutine_handle<>` is an object, that refers to the coroutine’s dynamically allocated state.
+The thing referred by `bzd::async::impl::coroutine_handle<>` is an object, that refers to the coroutine’s dynamically allocated state.
 Thanks to this object you can, for example, resume the coroutine. The coroutine_handle is a templated type, where Promise type is its template argument.
 
 ### Frame

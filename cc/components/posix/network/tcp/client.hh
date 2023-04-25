@@ -8,13 +8,13 @@
 #include "cc/components/posix/network/tcp/interface.hh"
 #include "cc/components/posix/proactor/proactor.hh"
 
-namespace bzd::platform::posix::network::tcp {
+namespace bzd::components::posix::network::tcp {
 
 template <class Context>
-class Client : public bzd::platform::network::tcp::Client<Client<Context>>
+class Client : public bzd::network::tcp::Client<Client<Context>>
 {
 public:
-	using Stream = typename bzd::platform::network::tcp::ClientTraits<Client>::Stream;
+	using Stream = typename bzd::network::tcp::ClientTraits<Client>::Stream;
 
 public:
 	explicit Client(Context& context) : context_{context}, logger_{context.config.out} {}
@@ -67,18 +67,18 @@ private:
 	bzd::Logger logger_;
 };
 
-} // namespace bzd::platform::posix::network::tcp
+} // namespace bzd::components::posix::network::tcp
 
-namespace bzd::platform::network::tcp {
+namespace bzd::network::tcp {
 template <class Context>
-struct ClientTraits<bzd::platform::posix::network::tcp::Client<Context>>
+struct ClientTraits<bzd::components::posix::network::tcp::Client<Context>>
 {
-	using Socket = bzd::platform::posix::network::Socket;
+	using Socket = bzd::components::posix::network::Socket;
 
 	class Stream : public bzd::IOStream
 	{
 	private:
-		friend class bzd::platform::posix::network::tcp::Client<Context>;
+		friend class bzd::components::posix::network::tcp::Client<Context>;
 		constexpr Stream(Context& context, Socket&& socket) noexcept : context_{context}, socket_{bzd::move(socket)} {}
 
 	public:
@@ -99,4 +99,4 @@ struct ClientTraits<bzd::platform::posix::network::tcp::Client<Context>>
 		Socket socket_;
 	};
 };
-} // namespace bzd::platform::network::tcp
+} // namespace bzd::network::tcp

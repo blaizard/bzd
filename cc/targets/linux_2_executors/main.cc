@@ -2,13 +2,15 @@
 #include "cc/components/std/stream/out/out.hh"
 
 #include <atomic>
+#include <exception>
 #include <thread>
 
 void bzd::platform::panic(const bzd::FunctionRef<void(bzd::OStream&)> callback)
 {
-	::bzd::platform::std::Out out{};
+	::bzd::components::std::Out out{};
 	callback(out);
-	throw 42;
+	// Triggers a signal on POSIX which provoques a stack trace dump.
+	std::terminate();
 }
 
 int main()

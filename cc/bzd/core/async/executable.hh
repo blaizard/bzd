@@ -7,20 +7,17 @@
 #include "cc/bzd/utility/synchronization/spin_shared_mutex.hh"
 #include "cc/bzd/utility/synchronization/sync_lock_guard.hh"
 
-#include <iostream>
+namespace bzd::async::awaitable {
+struct Yield;
+}
 
-namespace bzd {
+namespace bzd::async::impl {
+
 template <class Executable>
 class Executor;
 
-namespace interface {
 template <class T>
 class Executable;
-} // namespace interface
-
-namespace coroutine::impl {
-struct Yield;
-}
 
 /// Metadata of an executable, propagated to all its children.
 ///
@@ -67,7 +64,7 @@ public: // Accessors.
 
 private:
 	template <class U>
-	friend class bzd::interface::Executable;
+	friend class bzd::async::impl::Executable;
 
 	constexpr void skip() noexcept { flags_.store(Flags::skip, MemoryOrder::release); }
 	constexpr void unskip() noexcept { flags_.store(Flags::none, MemoryOrder::release); }
@@ -77,10 +74,6 @@ private:
 	// Flags associated with this executable.
 	bzd::Atomic<Flags> flags_{Flags::none};
 };
-
-} // namespace bzd
-
-namespace bzd::interface {
 
 /// Type to store an executable when suspended for use with ISR (aka in wait-free context).
 template <class T>
@@ -223,7 +216,7 @@ public:
 	[[nodiscard]] constexpr Bool isSkipped() const noexcept { return metadata_.isSkipped(); }
 	constexpr void skip() noexcept { metadata_.skip(); }
 
-	constexpr bzd::Executor<T>& getExecutor() noexcept
+	constexpr bzd::async::impl::Executor<T>& getExecutor() noexcept
 	{
 		bzd::assert::isTrue(executor_.hasValue());
 		return executor_.valueMutable();
@@ -231,11 +224,11 @@ public:
 
 	constexpr T& getExecutable() noexcept { return *static_cast<T*>(this); }
 
-	[[nodiscard]] constexpr bzd::ExecutableMetadata::Type getType() const noexcept { return metadata_.getType(); }
+	[[nodiscard]] constexpr bzd::async::impl::ExecutableMetadata::Type getType() const noexcept { return metadata_.getType(); }
 
-	constexpr void setType(const bzd::ExecutableMetadata::Type type) noexcept
+	constexpr void setType(const bzd::async::impl::ExecutableMetadata::Type type) noexcept
 	{
-		bzd::assert::isTrue(metadata_.getType() == bzd::ExecutableMetadata::Type::unset);
+		bzd::assert::isTrue(metadata_.getType() == bzd::async::impl::ExecutableMetadata::Type::unset);
 		metadata_.type_ = type;
 	}
 
@@ -260,20 +253,20 @@ public:
 	}
 
 private:
-	friend class bzd::Executor<T>;
-	friend class bzd::interface::ExecutableSuspended<T>;
-	friend struct bzd::coroutine::impl::Yield;
+	friend class bzd::async::impl::Executor<T>;
+	friend class bzd::async::impl::ExecutableSuspended<T>;
+	friend struct bzd::async::awaitable::Yield;
 
-	constexpr void setExecutor(bzd::Executor<T>& executor) noexcept { executor_.emplace(executor); }
+	constexpr void setExecutor(bzd::async::impl::Executor<T>& executor) noexcept { executor_.emplace(executor); }
 	/// Reschedule the async in the executor.
 	///
 	/// \param increment Increment the internal counters.
 	constexpr void reschedule(const Bool increment = true) noexcept { getExecutor().push(getExecutable(), increment); }
 	constexpr void unskip() noexcept { metadata_.unskip(); }
 
-	bzd::Optional<bzd::Executor<T>&> executor_{};
+	bzd::Optional<bzd::async::impl::Executor<T>&> executor_{};
 	bzd::Optional<CancellationToken&> cancel_{};
-	bzd::ExecutableMetadata metadata_{};
+	bzd::async::impl::ExecutableMetadata metadata_{};
 };
 
-} // namespace bzd::interface
+} // namespace bzd::async::impl

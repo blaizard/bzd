@@ -13,6 +13,7 @@ load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_test")
     deps = [
         "//cc/bzd/core/assert",
         "//cc/bzd/test",
+        "//cc/bzd/platform:panic"
     ],
 ) for path in glob([
     "*.cc",

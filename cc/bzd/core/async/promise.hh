@@ -11,38 +11,38 @@
 #include "cc/bzd/utility/constexpr_for.hh"
 #include "cc/bzd/utility/source_location.hh"
 
-namespace bzd::coroutine::impl {
+namespace bzd::async::impl {
 
 /// Executable type for coroutines.
-class Executable : public bzd::interface::Executable<Executable>
+class PromiseBase : public bzd::async::impl::Executable<PromiseBase>
 {
 public: // Traits.
-	using OnTerminateCallback = bzd::FunctionRef<bzd::Optional<Executable&>(void)>;
+	using OnTerminateCallback = bzd::FunctionRef<bzd::Optional<PromiseBase&>(void)>;
 	using SetErrorCallback = bzd::FunctionRef<void(bzd::Error&&)>;
 	using PropagateErrorCallback = bzd::FunctionRef<bzd::Optional<bzd::Error>(void)>;
 
 public:
-	constexpr explicit Executable(bzd::coroutine::impl::coroutine_handle<> handle, SetErrorCallback&& callback) noexcept :
+	constexpr explicit PromiseBase(bzd::async::impl::coroutine_handle<> handle, SetErrorCallback&& callback) noexcept :
 		handle_{handle}, errorHandlingCallback_{bzd::inPlaceType<SetErrorCallback>, bzd::move(callback)}
 	{
 	}
 
 	/// Called by the scheduler to resume an executable.
-	void resume(bzd::ExecutorContext<Executable>& context) noexcept
+	void resume(bzd::async::impl::ExecutorContext<PromiseBase>& context) noexcept
 	{
 		context_ = &context;
 		handle_.resume();
 	}
 
 	/// Called by the scheduler when an executable is detected as being canceled.
-	constexpr void cancel(bzd::ExecutorContext<Executable>& context) noexcept
+	constexpr void cancel(bzd::async::impl::ExecutorContext<PromiseBase>& context) noexcept
 	{
-		Executable* executable{this};
+		PromiseBase* executable{this};
 
 		// Unroll all the direct continuation from the callstack.
-		while (executable->continuation_.is<Executable*>())
+		while (executable->continuation_.is<PromiseBase*>())
 		{
-			executable = executable->continuation_.get<Executable*>();
+			executable = executable->continuation_.get<PromiseBase*>();
 		}
 
 		// All cancellation must terminate with a callback, if this fails it means that
@@ -62,10 +62,10 @@ public:
 		context_->setContinuation(bzd::move(continuation_));
 	}
 
-	constexpr void thenEnqueueExecutable(Executable& executable) noexcept
+	constexpr void thenEnqueueExecutable(PromiseBase& executable) noexcept
 	{
 		bzd::assert::isTrue(context_);
-		context_->setContinuation(bzd::ExecutorContext<Executable>::Continuation{&executable});
+		context_->setContinuation(bzd::async::impl::ExecutorContext<PromiseBase>::Continuation{&executable});
 	}
 
 	constexpr void thenEnqueueCallback(OnTerminateCallback onTerminate) noexcept
@@ -74,11 +74,11 @@ public:
 		context_->setContinuation(onTerminate);
 	}
 
-	constexpr void setContinuation(Executable& continuation) noexcept
+	constexpr void setContinuation(PromiseBase& continuation) noexcept
 	{
 		// Disabled to support generators
 		// bzd::assert::isTrue(continuation_.is<bzd::Monostate>());
-		continuation_.emplace<Executable*>(&continuation);
+		continuation_.emplace<PromiseBase*>(&continuation);
 	}
 
 	constexpr void setConditionalContinuation(OnTerminateCallback onTerminate) noexcept
@@ -112,9 +112,9 @@ public:
 		do
 		{
 			auto& continuation = executable->continuation_;
-			bzd::assert::isTrue(continuation.template is<Executable*>() && continuation.template get<Executable*>(),
+			bzd::assert::isTrue(continuation.template is<PromiseBase*>() && continuation.template get<PromiseBase*>(),
 								"Cannot propagate error on this type of async");
-			executable = continuation.template get<Executable*>();
+			executable = continuation.template get<PromiseBase*>();
 		} while (executable->mustPropagateError());
 		continuation_ = bzd::move(executable->continuation_);
 
@@ -124,16 +124,14 @@ public:
 	}
 
 private:
-	bzd::coroutine::impl::coroutine_handle<> handle_;
+	bzd::async::impl::coroutine_handle<> handle_;
 	bzd::Variant<SetErrorCallback, PropagateErrorCallback> errorHandlingCallback_;
-	bzd::ExecutorContext<Executable>* context_{nullptr};
-	bzd::ExecutorContext<Executable>::Continuation continuation_{};
+	bzd::async::impl::ExecutorContext<PromiseBase>* context_{nullptr};
+	bzd::async::impl::ExecutorContext<PromiseBase>::Continuation continuation_{};
 };
 
-using Executor = bzd::Executor<Executable>;
-
 template <class T>
-class Promise : public Executable
+class Promise : public PromiseBase
 {
 private:
 	using Self = Promise<T>;
@@ -145,7 +143,7 @@ protected:
 		constexpr bool await_ready() noexcept { return false; }
 
 		// NOLINTNEXTLINE(readability-identifier-naming)
-		constexpr bool await_suspend(bzd::coroutine::impl::coroutine_handle<T> handle) noexcept
+		constexpr bool await_suspend(bzd::async::impl::coroutine_handle<T> handle) noexcept
 		{
 			auto& promise = handle.promise();
 
@@ -170,7 +168,7 @@ protected:
 
 public:
 	constexpr Promise(SetErrorCallback&& callback) noexcept :
-		Executable{bzd::coroutine::impl::coroutine_handle<T>::from_promise(static_cast<T&>(*this)), bzd::move(callback)}
+		PromiseBase{bzd::async::impl::coroutine_handle<T>::from_promise(static_cast<T&>(*this)), bzd::move(callback)}
 	{
 	}
 
@@ -181,7 +179,7 @@ public:
 	~Promise() noexcept = default;
 
 	// NOLINTNEXTLINE(readability-identifier-naming)
-	constexpr bzd::coroutine::impl::suspend_always initial_suspend(/*SourceLocation source = SourceLocation::current()*/) noexcept
+	constexpr bzd::async::impl::suspend_always initial_suspend(/*SourceLocation source = SourceLocation::current()*/) noexcept
 	{
 		//::std::cout << "{" << source.getFile() << ":" << source.getLine() << "    " << source.getFunction() << "}" << ::std::endl;
 
@@ -212,9 +210,9 @@ public: // Memory allocation
 		*/
 };
 
-} // namespace bzd::coroutine::impl
+} // namespace bzd::async::impl
 
-namespace bzd::coroutine {
+namespace bzd::async {
 template <class T, class PromiseType>
 class Promise : public impl::Promise<PromiseType>
 {
@@ -246,12 +244,14 @@ public:
 	static constexpr Bool resultTypeIsResult = ResultOfError<ResultType>::value;
 	static constexpr Bool resultTypeIsTupleOfOptionalResultsWithError = TupleOfOptionalResultsOfError<ResultType>::value;
 
-	constexpr Promise() noexcept : impl::Promise<PromiseType>{impl::Executable::SetErrorCallback::toMember<Self, &Self::setError>(*this)} {}
+	constexpr Promise() noexcept : impl::Promise<PromiseType>{impl::PromiseBase::SetErrorCallback::toMember<Self, &Self::setError>(*this)}
+	{
+	}
 
 	// NOLINTNEXTLINE(readability-identifier-naming)
 	constexpr auto get_return_object() noexcept
 	{
-		return bzd::coroutine::impl::coroutine_handle<PromiseType>::from_promise(static_cast<PromiseType&>(*this));
+		return bzd::async::impl::coroutine_handle<PromiseType>::from_promise(static_cast<PromiseType&>(*this));
 	}
 
 	constexpr bool hasResult() const noexcept { return result_.hasValue(); }
@@ -321,4 +321,4 @@ private:
 	Bool isCompleted_{false};
 };
 
-} // namespace bzd::coroutine
+} // namespace bzd::async

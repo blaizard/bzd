@@ -7,10 +7,10 @@
 #include "cc/bzd/platform/interfaces/executor.hh"
 #include "cc/bzd/utility/apply.hh"
 
-namespace bzd::platform::generic {
+namespace bzd::components::generic {
 
 template <class Context>
-class Executor : public bzd::platform::Executor<Executor<Context>>
+class Executor : public bzd::Executor<Executor<Context>>
 {
 public:
 	using Self = Executor<Context>;
@@ -34,7 +34,7 @@ public:
 	/// Start the executor.
 	bzd::Result<void, bzd::Error> start() noexcept
 	{
-		const auto run = bzd::FunctionRef<void(bzd::platform::Core&)>::toMember<Self, &Self::run>(*this);
+		const auto run = bzd::FunctionRef<void(bzd::Core&)>::toMember<Self, &Self::run>(*this);
 		for (auto& core : context_.config.cores)
 		{
 			if (auto result = core.start(run); !result)
@@ -65,7 +65,7 @@ private:
 	/// \param index The core index the way it was registered within the executor.
 	/// \param core The core instance.
 	/// \return True if the core should continue running, false if it should be stopped.
-	Bool idle(const Size index, bzd::platform::Core&) noexcept
+	Bool idle(const Size index, bzd::Core&) noexcept
 	{
 		// Only keep core 0 running.
 		return (index == 0u);
@@ -73,7 +73,7 @@ private:
 
 private:
 	/// Run the executor.
-	constexpr void run(bzd::platform::Core& core) noexcept
+	constexpr void run(bzd::Core& core) noexcept
 	{
 		Bool runCore{true};
 		do
@@ -104,9 +104,9 @@ private:
 
 private:
 	Context& context_;
-	bzd::coroutine::impl::Executor executor_;
+	bzd::async::Executor executor_;
 	bzd::Logger logger_;
 	bzd::Atomic<bzd::Size> workloadCount_{0};
 };
 
-} // namespace bzd::platform::generic
+} // namespace bzd::components::generic

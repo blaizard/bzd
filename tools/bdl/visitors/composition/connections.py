@@ -113,7 +113,7 @@ class Connections:
 
 		# If the entity represents a special type.
 		entityType = entity.symbol.getEntityUnderlyingTypeResolved(resolver=self.resolver)
-		if "bzd.platform.Recorder" in entityType.getParents():
+		if "bzd.Recorder" in entityType.getParents():
 			identifier = EndpointId(str(entity.symbol), "sinks")
 		else:
 			identifier = EndpointId.fromSymbol(entity.symbol)

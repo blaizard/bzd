@@ -1,5 +1,5 @@
 
-namespace bzd.platform;
+namespace bzd;
 
 // A logical core is a processing unit that accepts a single scheduler.
 extern interface Core;

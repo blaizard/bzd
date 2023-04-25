@@ -4,7 +4,7 @@
 #include "cc/components/posix/error.hh"
 #include "cc/components/posix/io/file_descriptor.hh"
 
-namespace bzd::platform::posix::network {
+namespace bzd::components::posix::network {
 
 using SocketOption = int;
 using SocketOptionLevel = int;
@@ -17,4 +17,4 @@ Result<void, Error> setSocketOptions(const FileDescriptor fd,
 									 const SocketOptionName name,
 									 const SocketOption value) noexcept;
 
-} // namespace bzd::platform::posix::network
+} // namespace bzd::components::posix::network

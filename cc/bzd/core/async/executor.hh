@@ -10,7 +10,7 @@
 #include "cc/bzd/utility/synchronization/spin_shared_mutex.hh"
 #include "cc/bzd/utility/synchronization/sync_lock_guard.hh"
 
-namespace bzd {
+namespace bzd::async::impl {
 
 template <class Executable>
 class Executor;
@@ -20,7 +20,7 @@ template <class Executable>
 class ExecutorContext : public bzd::threadsafe::NonOwningForwardListElement</*multi container*/ false>
 {
 public: // Traits.
-	using Executor = bzd::Executor<Executable>;
+	using Executor = bzd::async::impl::Executor<Executable>;
 	using IdType = UInt32;
 	using TickType = UInt32;
 	using OnTerminateCallback = bzd::FunctionRef<bzd::Optional<Executable&>(void)>;
@@ -41,7 +41,7 @@ public:
 	}
 
 private:
-	friend class bzd::Executor<Executable>;
+	friend class bzd::async::impl::Executor<Executable>;
 
 	constexpr void updateTick() noexcept { ++tick_; }
 
@@ -177,7 +177,7 @@ public:
 	constexpr Bool isRunning() const noexcept { return status_.load() == Status::running; }
 
 	/// Schedule a new executable on this executor.
-	constexpr void schedule(Executable& executable, const bzd::ExecutableMetadata::Type type) noexcept
+	constexpr void schedule(Executable& executable, const ExecutableMetadata::Type type) noexcept
 	{
 		executable.setType(type);
 		executable.setExecutor(*this);
@@ -300,9 +300,9 @@ private:
 
 private:
 	template <class U>
-	friend class bzd::interface::Executable;
+	friend class bzd::async::impl::Executable;
 	template <class U>
-	friend class bzd::interface::ExecutableSuspended;
+	friend class bzd::async::impl::ExecutableSuspended;
 
 	/// List of pending workload waiting to be scheduled.
 	bzd::threadsafe::NonOwningRingSpin<Executable> queue_{};
@@ -322,4 +322,4 @@ private:
 	bzd::Atomic<Int32> workloadCount_{0u};
 };
 
-} // namespace bzd
+} // namespace bzd::async::impl

@@ -1,17 +1,17 @@
 use "cc/bzd/platform/interfaces/executor.bdl"
 use "cc/bzd/platform/interfaces/core.bdl"
 
-namespace bzd.platform.generic;
+namespace bzd.components.generic;
 
 
 // Generic executor that takes all cores as argument
 // and simply execute them.
-component Executor : bzd.platform.Executor {
+component Executor : bzd.Executor {
 interface:
 	
 config:
 	// The cores to be used by this executor.
-	cores = Array<bzd.platform.Core>;
+	cores = Array<bzd.Core>;
 	out = {out};
 	
 }

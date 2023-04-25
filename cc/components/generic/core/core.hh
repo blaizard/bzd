@@ -5,9 +5,9 @@
 #include "cc/bzd/container/stack.hh"
 #include "cc/components/generic/core/interface.hh"
 
-namespace bzd::platform::generic {
+namespace bzd::components::generic {
 
-class Core : public bzd::platform::Core
+class Core : public bzd::Core
 {
 private:
 	using Self = Core;
@@ -22,7 +22,7 @@ public:
 
 	bzd::Result<void, bzd::Error> stop() noexcept override { return bzd::nullresult; }
 
-	bzd::Result<void, bzd::Error> start(const bzd::FunctionRef<void(bzd::platform::Core&)> workload) noexcept override
+	bzd::Result<void, bzd::Error> start(const bzd::FunctionRef<void(bzd::Core&)> workload) noexcept override
 	{
 		workload(*this);
 		return bzd::nullresult;
@@ -37,4 +37,4 @@ public:
 	CoreId getId() noexcept override { return 0; }
 };
 
-} // namespace bzd::platform::generic
+} // namespace bzd::components::generic

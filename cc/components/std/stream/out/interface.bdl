@@ -1,6 +1,6 @@
 use "cc/bzd/platform/interfaces/stream.bdl"
 
-namespace bzd.platform.std;
+namespace bzd.components.std;
 
 
 component Out : bzd.OStream {

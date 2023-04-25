@@ -1,5 +1,5 @@
 
-namespace bzd.platform;
+namespace bzd;
 
 
 // Executes workload on a single or multiple logical cores.

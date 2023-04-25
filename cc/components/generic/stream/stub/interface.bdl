@@ -1,6 +1,6 @@
 use "cc/bzd/platform/interfaces/stream.bdl"
 
-namespace bzd.platform.generic.stream;
+namespace bzd.components.generic.stream;
 
 
 // Generic stream stub that does nothing.

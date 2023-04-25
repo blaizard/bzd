@@ -9,7 +9,7 @@ TEST_ASYNC(Reader, readUntil)
 	struct
 	{
 	} context;
-	bzd::platform::generic::stream::Stub out{context};
+	bzd::components::generic::stream::Stub out{context};
 	bzd::test::IStream<16> mock{};
 	bzd::Reader<16> reader{mock, out};
 

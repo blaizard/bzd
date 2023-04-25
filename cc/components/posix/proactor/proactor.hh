@@ -4,7 +4,7 @@
 #include "cc/components/posix/io/file_descriptor.hh"
 #include "cc/components/posix/network/address/address.hh"
 
-namespace bzd::platform::posix {
+namespace bzd::components::posix {
 
 template <class Impl>
 class Proactor
@@ -42,4 +42,4 @@ public:
 	}
 };
 
-} // namespace bzd::platform::posix
+} // namespace bzd::components::posix

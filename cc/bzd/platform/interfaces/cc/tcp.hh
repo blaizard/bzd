@@ -4,7 +4,7 @@
 #include "cc/bzd/core/async.hh"
 #include "tools/bdl/generators/cc/adapter/types.hh"
 
-namespace bzd::platform::network::tcp {
+namespace bzd::network::tcp {
 
 template <class Impl>
 struct ClientTraits;
@@ -23,4 +23,4 @@ public: // Methods.
 	}
 };
 
-} // namespace bzd::platform::network::tcp
+} // namespace bzd::network::tcp

@@ -4,7 +4,7 @@
 
 #include <unistd.h>
 
-namespace bzd::platform::posix::network {
+namespace bzd::components::posix::network {
 
 bzd::Result<Socket, bzd::Error> Socket::make(const AddressFamily family, const SocketType type, const int protocol) noexcept
 {
@@ -63,4 +63,4 @@ bzd::Async<Socket> Socket::accept() noexcept
 
 void Socket::reset() noexcept { fd_.reset(); }
 
-} // namespace bzd::platform::posix::network
+} // namespace bzd::components::posix::network

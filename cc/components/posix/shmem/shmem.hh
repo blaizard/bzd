@@ -2,10 +2,10 @@
 
 #include "cc/components/posix/shmem/interface.hh"
 
-namespace bzd::platform::posix {
+namespace bzd::components::posix {
 
 template <class Context>
-class Shmem : public bzd::platform::Gateway<Shmem<Context>>
+class Shmem : public bzd::Gateway<Shmem<Context>>
 {
 public:
 	constexpr Shmem(Context& context) noexcept : context_{context} {}
@@ -16,4 +16,4 @@ private:
 	Context& context_;
 };
 
-} // namespace bzd::platform::posix
+} // namespace bzd::components::posix

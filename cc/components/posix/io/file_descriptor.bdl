@@ -1,5 +1,5 @@
 
-namespace bzd.platform.posix;
+namespace bzd.components.posix;
 
 extern struct FileDescriptor;
 extern struct FileDescriptorOwner;

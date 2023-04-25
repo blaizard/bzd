@@ -4,12 +4,12 @@
 #include "cc/components/posix/proactor/interface.hh"
 #include "cc/components/posix/proactor/sync/proactor.hh"
 
-namespace bzd::platform::linux::epoll {
+namespace bzd::components::linux::epoll {
 
 /// Proactor for basic POSIX functionalities
 class Proactor
 	: posix::sync::Proactor
-	, public bzd::platform::posix::Proactor<Proactor>
+	, public bzd::components::posix::Proactor<Proactor>
 {
 private:
 	struct EpollData
@@ -40,4 +40,4 @@ private:
 	posix::FileDescriptorOwner epollFd_{};
 };
 
-} // namespace bzd::platform::linux::epoll
+} // namespace bzd::components::linux::epoll

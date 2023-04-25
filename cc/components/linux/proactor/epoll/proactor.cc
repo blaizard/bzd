@@ -5,7 +5,7 @@
 #include <sys/epoll.h>
 #include <unistd.h>
 
-namespace bzd::platform::linux::epoll {
+namespace bzd::components::linux::epoll {
 
 // NOLINTNEXTLINE(bugprone-exception-escape)
 bzd::Async<> Proactor::init() noexcept
@@ -86,4 +86,4 @@ bzd::Async<> Proactor::exec() noexcept
 	co_return {};
 }
 
-} // namespace bzd::platform::linux::epoll
+} // namespace bzd::components::linux::epoll

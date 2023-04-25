@@ -3,7 +3,7 @@
 #include "cc/bzd/core/async.hh"
 #include "tools/bdl/generators/cc/adapter/types.hh"
 
-namespace bzd::platform {
+namespace bzd {
 
 template <class Impl>
 struct GatewayTraits;
@@ -22,4 +22,4 @@ public: // Methods.
 	bzd::Async<Stream> connect(const Config& config) noexcept { return bzd::impl::getImplementation(this)->connect(config); }
 };
 
-} // namespace bzd::platform
+} // namespace bzd

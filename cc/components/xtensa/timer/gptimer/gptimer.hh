@@ -5,7 +5,7 @@
 #include "cc/libs/timer/timer_isr.hh"
 #include "driver/gptimer.h"
 
-namespace bzd::platform::esp32::timer {
+namespace bzd::components::esp32::timer {
 
 class GPTimer
 	: public bzd::Timer
@@ -39,4 +39,4 @@ private:
 	::gptimer_handle_t gptimer_;
 };
 
-} // namespace bzd::platform::esp32::timer
+} // namespace bzd::components::esp32::timer

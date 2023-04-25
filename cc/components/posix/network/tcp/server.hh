@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-namespace bzd::platform::posix::network::tcp {
+namespace bzd::components::posix::network::tcp {
 class Server
 {
 public:
@@ -85,7 +85,7 @@ private:
 private:
 	Socket socket_{};
 };
-} // namespace bzd::platform::posix::network::tcp
+} // namespace bzd::components::posix::network::tcp
 
 /*
 Usage in bdl:

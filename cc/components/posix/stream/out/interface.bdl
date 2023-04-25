@@ -1,7 +1,7 @@
 use "cc/components/posix/proactor/interface.bdl"
 use "cc/bzd/platform/interfaces/stream.bdl"
 
-namespace bzd.platform.posix;
+namespace bzd.components.posix;
 
 
 component Out : bzd.OStream {

@@ -2,7 +2,7 @@
 
 #include "cc/bzd/core/async/promise.hh"
 
-namespace bzd::coroutine::impl {
+namespace bzd::async::awaitable {
 
 template <class Async>
 class Awaiter
@@ -15,7 +15,7 @@ public:
 
 	template <class U>
 	// NOLINTNEXTLINE(readability-identifier-naming)
-	constexpr bool await_suspend(bzd::coroutine::impl::coroutine_handle<U> caller) noexcept
+	constexpr bool await_suspend(bzd::async::impl::coroutine_handle<U> caller) noexcept
 	{
 		bzd::assert::isTrue(static_cast<bool>(async_.handle_));
 		// caller ()
@@ -46,4 +46,4 @@ protected:
 	Async& async_;
 };
 
-} // namespace bzd::coroutine::impl
+} // namespace bzd::async::awaitable

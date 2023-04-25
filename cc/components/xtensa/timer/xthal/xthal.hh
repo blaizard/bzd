@@ -2,7 +2,7 @@
 
 #include "cc/bzd/core/async.hh"
 
-namespace bzd::platform::esp32::timer {
+namespace bzd::components::esp32::timer {
 
 class Xthal : public bzd::Timer
 {
@@ -20,4 +20,4 @@ private:
 	bzd::UInt64 ticks_{0};
 };
 
-} // namespace bzd::platform::esp32::timer
+} // namespace bzd::components::esp32::timer

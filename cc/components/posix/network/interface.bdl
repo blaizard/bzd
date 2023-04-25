@@ -1,6 +1,6 @@
 use "cc/components/posix/network/types.bdl"
 
-namespace bzd.platform.posix.network;
+namespace bzd.components.posix.network;
 
 
 component TCP {

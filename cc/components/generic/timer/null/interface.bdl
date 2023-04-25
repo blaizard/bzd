@@ -1,6 +1,6 @@
 use "cc/bzd/platform/interfaces/timer.bdl"
 
-namespace bzd.platform.generic.timer;
+namespace bzd.components.generic.timer;
 
 
 component Null : bzd.Timer {
