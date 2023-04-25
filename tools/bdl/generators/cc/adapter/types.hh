@@ -56,12 +56,14 @@ constexpr auto* getImplementation(T<Impl>* obj, InterfaceMember interface, ImplM
 template <template <class> class T, class Impl>
 constexpr auto& getInterface(Impl& impl) noexcept
 {
+	static_assert(concepts::derivedFrom<Impl, T<Impl>>, "The object does not implement the requested interface.");
 	return static_cast<T<Impl>&>(impl);
 }
 
 template <class T, class Impl>
 constexpr auto& getInterface(Impl& impl) noexcept
 {
+	static_assert(concepts::derivedFrom<Impl, T>, "The object does not implement the requested interface.");
 	return static_cast<T&>(impl);
 }
 /// \}
