@@ -1,83 +1,74 @@
-load("//tools/bazel_build/rules:bdl.bzl", "bdl_library")
+load("@rules_cc//cc:defs.bzl", "cc_library")
 
-bdl_library(
+cc_library(
     name = "clock",
-    srcs = [
-        "clock.bdl",
+    hdrs = [
+        "clock.hh",
     ],
-    visibility = ["//visibility:public"],
+    visibility = [
+        "//interfaces:__pkg__",
+    ],
     deps = [
-        "//cc/bzd/platform/interfaces/cc:clock",
+        "//cc/bzd/core:units",
+        "//cc/bzd/core/async",
+        "//tools/bdl/generators/cc/adapter:types",
     ],
 )
 
-bdl_library(
+cc_library(
     name = "core",
-    srcs = [
-        "core.bdl",
+    hdrs = [
+        "core.hh",
     ],
-    visibility = ["//visibility:public"],
+    visibility = [
+        "//interfaces:__pkg__",
+    ],
     deps = [
-        "//cc/bzd/platform/interfaces/cc:core",
+        "//cc/bzd/container:string_view",
+        "//tools/bdl/generators/cc/adapter:types",
     ],
 )
 
-bdl_library(
-    name = "executor",
-    srcs = [
-        "executor.bdl",
-    ],
-    visibility = ["//visibility:public"],
-)
-
-bdl_library(
+cc_library(
     name = "gateway",
-    srcs = [
-        "gateway.bdl",
+    hdrs = [
+        "gateway.hh",
     ],
-    visibility = ["//visibility:public"],
+    visibility = [
+        "//interfaces:__pkg__",
+    ],
     deps = [
-        "//cc/bzd/platform/interfaces/cc:gateway",
+        "//cc/bzd/core/async",
+        "//tools/bdl/generators/cc/adapter:types",
     ],
 )
 
-bdl_library(
-    name = "recorder",
-    srcs = [
-        "recorder.bdl",
-    ],
-    visibility = ["//visibility:public"],
-)
-
-bdl_library(
-    name = "stream",
-    srcs = [
-        "stream.bdl",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//cc/bzd/core:channel",
-    ],
-)
-
-bdl_library(
+cc_library(
     name = "tcp",
-    srcs = [
-        "tcp.bdl",
+    hdrs = [
+        "tcp.hh",
     ],
-    visibility = ["//visibility:public"],
+    visibility = [
+        "//interfaces:__pkg__",
+    ],
     deps = [
-        "//cc/bzd/platform/interfaces/cc:tcp",
+        "//cc/bzd/container:string_view",
+        "//cc/bzd/core/async",
+        "//tools/bdl/generators/cc/adapter:types",
     ],
 )
 
-bdl_library(
+cc_library(
     name = "timer",
-    srcs = [
-        "timer.bdl",
+    hdrs = [
+        "timer.hh",
     ],
-    visibility = ["//visibility:public"],
+    visibility = [
+        "//interfaces:__pkg__",
+    ],
     deps = [
-        "//cc/bzd/platform/interfaces/cc:timer",
+        "//cc/bzd/core:units",
+        "//cc/bzd/core/async",
+        "//tools/bdl/generators/cc/adapter:types",
     ],
 )

@@ -9,7 +9,7 @@ bdl_library(
         "composition.bdl",
     ],
     deps = [
-        "//cc/bzd/platform/interfaces:stream",
+        "//interfaces:stream",
     ],
 )
 

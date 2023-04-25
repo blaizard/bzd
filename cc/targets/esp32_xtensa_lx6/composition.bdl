@@ -3,7 +3,7 @@ use "cc/components/generic/stream/stub/interface.bdl"
 use "cc/components/xtensa/timer/gptimer/interface.bdl"
 use "cc/components/generic/clock/null/interface.bdl"
 use "cc/components/xtensa/core/interface.bdl"
-use "cc/bzd/platform/interfaces/stream.bdl"
+use "interfaces/stream.bdl"
 
 
 

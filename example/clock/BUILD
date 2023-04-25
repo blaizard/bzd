@@ -7,8 +7,8 @@ bdl_library(
         "composition.bdl",
     ],
     deps = [
-        "//cc/bzd/platform/interfaces:stream",
-        "//cc/bzd/platform/interfaces:timer",
+        "//interfaces:stream",
+        "//interfaces:timer",
     ],
 )
 

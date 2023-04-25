@@ -1,4 +1,4 @@
-use "cc/bzd/platform/interfaces/stream.bdl"
+use "interfaces/stream.bdl"
 
 namespace example;
 

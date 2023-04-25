@@ -1,4 +1,4 @@
-use "cc/bzd/platform/interfaces/recorder.bdl"
+use "interfaces/recorder.bdl"
 
 namespace example;
 
