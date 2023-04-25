@@ -5,8 +5,6 @@ namespace bzd.components.esp32;
 
 // Core abstraction for Xtensa CPU.
 component Core : bzd.Core {
-interface:
-	
 config:
 	// Stack size for the current core.
 	stackSize = StackSize(16000);
@@ -16,6 +14,8 @@ config:
 	cpu = Integer [min(0) max(1)];
 	// Priority of the task in percent (0 beeing the lowest, 100 the highest).
 	priority = Integer [min(0) max(100)];
+	
+interface:
 	
 }
 

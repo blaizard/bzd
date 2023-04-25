@@ -4,13 +4,13 @@ namespace example;
 
 
 component Hello {
-interface:
-	method run();
-	send = Float;
-	
 config:
 	out = {out};
 	timer = {timer};
+	
+interface:
+	method run();
+	send = Float;
 	
 composition:
 	this.run();
@@ -18,12 +18,12 @@ composition:
 }
 
 component Recorder : bzd.Recorder {
-interface:
-	method run();
-	
 config:
 	out = {out};
 	timer = {timer};
+	
+interface:
+	method run();
 	
 composition:
 	this.run();

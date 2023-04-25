@@ -4,11 +4,11 @@ namespace bzd.components.posix.network;
 
 
 component TCP {
-interface:
-	method disconnect();
-	
 config:
 	proactor = Void;
+	
+interface:
+	method disconnect();
 	
 }
 
