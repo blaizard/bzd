@@ -104,3 +104,7 @@ constexpr auto fromString(Range&& range, T& data) noexcept
 //    - `.` means any character.
 // For example:
 // - "HTTP{:f}\s+{:i}\s+{[A-Z]*}"
+//
+// ALTERNATIVE:
+// fromString(stream, "HTTP"_csv, float, "\s+"_csv, int, "\s+"_csv, string);
+// doesn't look so good, better the initial proposal.

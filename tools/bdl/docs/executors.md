@@ -8,7 +8,7 @@ classDiagram
    Executor "1" --> "*" Core
 ```
 
-Cores can be assigned with a maximum load or other specific atrtibutes.
+Cores can be assigned with a maximum load or other specific attributes (to be implementated).
 
 ```bdl
 // A workload will run on either core0 or core1.

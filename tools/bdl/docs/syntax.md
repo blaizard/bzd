@@ -73,8 +73,15 @@ use "cc/bzd/core/my_interface.bdl"
 An expression is defined as follow:
 
 ```
-[const] <type> <name> [= <value>] [[<contracts>...]];
+[const] <type> <name> [= <values>] [[<contracts>...]];
 ```
+
+where `values` can be an association of `value`, `symbol`, `regexpr` or `preset`.
+
+- `value` is either a string `"hello"`, a number `42` or `-3.14` or a boolean `true` or `false`.
+- `symbol` is either a relative symbol to the current namespace `abc` or a fully qualified name `this.is.abc`.
+- `regexpr` is a regular expression `/[a-z]*/`.
+- `preset` is a preset that is replaced by a predefined content. For example `abc = {out};` is equivalent to `abd: bzd.OStream = target.out;`
 
 ## Methods
 

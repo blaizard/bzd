@@ -56,7 +56,7 @@ only resolved if the corresponding component is instantiated. Unused components 
 
 The composition stage is done in 2 sub-stages, the first one that only process certain type of builtin expression, such as `bind`
 for example. This assigns contracts to expressions before being evaluated.
-The second stage process all elements.
+The second stage process all the rest of top level elements and their dependencies.
 
 ## Generators
 
