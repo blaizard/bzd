@@ -8,7 +8,7 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 
-namespace bzd::platform::posix::network {
+namespace bzd::components::posix::network {
 
 bzd::Result<Address, bzd::Error> Address::fromIpV4(const Protocol protocol, const StringView string, const PortType port) noexcept
 {
@@ -92,4 +92,4 @@ void Addresses::reset() noexcept
 
 Addresses::~Addresses() noexcept { reset(); }
 
-} // namespace bzd::platform::posix::network
+} // namespace bzd::components::posix::network

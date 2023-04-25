@@ -22,10 +22,10 @@
 #include "cc/bzd/utility/synchronization/sync_lock_guard.hh"
 
 namespace bzd::async {
-using Executable = bzd::coroutine::impl::Executable;
-using ExecutableSuspended = bzd::interface::ExecutableSuspended<Executable>;
-using Executor = bzd::coroutine::impl::Executor;
-using Type = bzd::ExecutableMetadata::Type;
+using Executable = bzd::async::impl::PromiseBase;
+using ExecutableSuspended = bzd::async::impl::ExecutableSuspended<Executable>;
+using Executor = bzd::async::impl::Executor<Executable>;
+using Type = bzd::async::impl::ExecutableMetadata::Type;
 } // namespace bzd::async
 
 namespace bzd::impl {
@@ -45,7 +45,7 @@ struct AsyncTaskTraits
 {
 	static constexpr AsyncType type{AsyncType::task};
 	static constexpr Bool isReentrant = false;
-	using PromiseType = bzd::coroutine::PromiseTask<T>;
+	using PromiseType = bzd::async::PromiseTask<T>;
 };
 
 template <class T>
@@ -53,7 +53,7 @@ struct AsyncGeneratorTraits
 {
 	static constexpr AsyncType type{AsyncType::generator};
 	static constexpr Bool isReentrant = true;
-	using PromiseType = bzd::coroutine::PromiseGenerator<T>;
+	using PromiseType = bzd::async::PromiseGenerator<T>;
 };
 
 template <class T, template <class> class Traits>
@@ -68,7 +68,7 @@ public: // Traits
 	static constexpr AsyncType type{Traits<T>::type};
 
 public: // constructor/destructor/assignments
-	constexpr Async(bzd::coroutine::impl::coroutine_handle<PromiseType> h) noexcept : handle_(h) {}
+	constexpr Async(bzd::async::impl::coroutine_handle<PromiseType> h) noexcept : handle_(h) {}
 
 	constexpr Async(const Self&) noexcept = delete;
 	constexpr Self& operator=(const Self&) noexcept = delete;
@@ -120,7 +120,7 @@ public:
 		public:
 			constexpr explicit AsyncPropagate(Self& async) noexcept : async_{async} {}
 
-			constexpr auto operator co_await() noexcept { return bzd::coroutine::impl::Propagate<Async, index>(async_); }
+			constexpr auto operator co_await() noexcept { return bzd::async::awaitable::Propagate<Async, index>(async_); }
 
 		private:
 			Self& async_;
@@ -176,17 +176,15 @@ public:
 	}
 
 public: // coroutine specific
-	constexpr auto operator co_await() noexcept { return bzd::coroutine::impl::Awaiter<Async>(*this); }
+	constexpr auto operator co_await() noexcept { return bzd::async::awaitable::Awaiter<Async>(*this); }
 
 private:
 	template <class... Args>
-	friend class bzd::coroutine::impl::Enqueue;
+	friend class bzd::async::awaitable::Enqueue;
 	template <class... Args>
-	friend class bzd::coroutine::impl::EnqueueAny;
+	friend class bzd::async::awaitable::EnqueueAny;
 	template <class U>
-	friend class bzd::coroutine::impl::Promise;
-	template <class U>
-	friend class bzd::coroutine::impl::Awaiter;
+	friend class bzd::async::awaitable::Awaiter;
 
 	/// Destroy the current async and nested ones.
 	///
@@ -267,7 +265,7 @@ private:
 	}
 
 private:
-	bzd::coroutine::impl::coroutine_handle<PromiseType> handle_{};
+	bzd::async::impl::coroutine_handle<PromiseType> handle_{};
 };
 
 } // namespace bzd::impl
@@ -323,11 +321,11 @@ bzd::Async<> forEach(T&& generator, Callable&& callable) noexcept
 	}
 }
 
-constexpr auto yield() noexcept { return bzd::coroutine::impl::Yield{}; }
+constexpr auto yield() noexcept { return bzd::async::awaitable::Yield{}; }
 
-constexpr auto getExecutor() noexcept { return bzd::coroutine::impl::GetExecutor{}; }
+constexpr auto getExecutor() noexcept { return bzd::async::awaitable::GetExecutor{}; }
 
-constexpr auto getExecutable() noexcept { return bzd::coroutine::impl::GetExecutable{}; }
+constexpr auto getExecutable() noexcept { return bzd::async::awaitable::GetExecutable{}; }
 
 /// Create a suspension point. Mark the current async as skipped, it will still reside
 /// in the executor workload queue but will not be processed.
@@ -336,23 +334,25 @@ constexpr auto getExecutable() noexcept { return bzd::coroutine::impl::GetExecut
 template <class... Args>
 constexpr auto suspend(Args&&... args) noexcept
 {
-	return bzd::coroutine::impl::Suspend{bzd::forward<Args>(args)...};
+	return bzd::async::awaitable::Suspend{bzd::forward<Args>(args)...};
 }
 
 /// Executes multiple asynchronous function according to the executor policy and return once all are completed.
 template <concepts::async... Asyncs>
-requires(!concepts::lValueReference<Asyncs> && ...)
-impl::Async<typename bzd::coroutine::impl::EnqueueAll<Asyncs...>::ResultType, impl::AsyncTaskTraits> all(Asyncs&&... asyncs) noexcept
+requires(!concepts::lValueReference<Asyncs> &&
+		 ...)::bzd::impl::Async<typename bzd::async::awaitable::EnqueueAll<Asyncs...>::ResultType, ::bzd::impl::AsyncTaskTraits>
+all(Asyncs&&... asyncs) noexcept
 {
-	co_return (co_await bzd::coroutine::impl::EnqueueAll<Asyncs...>{bzd::forward<Asyncs>(asyncs)...});
+	co_return (co_await bzd::async::awaitable::EnqueueAll<Asyncs...>{bzd::forward<Asyncs>(asyncs)...});
 }
 
 /// Executes multiple asynchronous function according to the executor policy and return once at least one of them is completed.
 template <concepts::async... Asyncs>
-requires(!concepts::lValueReference<Asyncs> && ...)
-impl::Async<typename bzd::coroutine::impl::EnqueueAny<Asyncs...>::ResultType, impl::AsyncTaskTraits> any(Asyncs&&... asyncs) noexcept
+requires(!concepts::lValueReference<Asyncs> &&
+		 ...)::bzd::impl::Async<typename bzd::async::awaitable::EnqueueAny<Asyncs...>::ResultType, ::bzd::impl::AsyncTaskTraits>
+any(Asyncs&&... asyncs) noexcept
 {
-	co_return (co_await bzd::coroutine::impl::EnqueueAny<Asyncs...>{bzd::forward<Asyncs>(asyncs)...});
+	co_return (co_await bzd::async::awaitable::EnqueueAny<Asyncs...>{bzd::forward<Asyncs>(asyncs)...});
 }
 
 } // namespace bzd::async

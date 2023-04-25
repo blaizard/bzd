@@ -10,7 +10,7 @@
 
 #include <netdb.h>
 
-namespace bzd::platform::posix::network {
+namespace bzd::components::posix::network {
 
 // Address family abstraction.
 class Address
@@ -121,4 +121,4 @@ private:
 	::addrinfo* addr_{nullptr};
 };
 
-} // namespace bzd::platform::posix::network
+} // namespace bzd::components::posix::network

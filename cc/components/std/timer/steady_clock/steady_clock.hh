@@ -2,7 +2,7 @@
 
 #include "cc/components/std/timer/steady_clock/interface.hh"
 
-namespace bzd::platform::std::timer {
+namespace bzd::components::std::timer {
 
 class SteadyClock : public bzd::Timer
 {
@@ -15,4 +15,4 @@ public:
 	bzd::Result<bzd::units::Millisecond, bzd::Error> getTime() noexcept override;
 };
 
-} // namespace bzd::platform::std::timer
+} // namespace bzd::components::std::timer

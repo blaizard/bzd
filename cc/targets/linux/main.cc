@@ -1,11 +1,14 @@
 #include "cc/bzd/platform/panic.hh"
 #include "cc/components/std/stream/out/out.hh"
 
-void bzd::platform::panic(const bzd::FunctionRef<void(bzd::OStream&)> callback)
+#include <exception>
+
+void __attribute__((weak)) bzd::platform::panic(const bzd::FunctionRef<void(bzd::OStream&)> callback)
 {
-	::bzd::platform::std::Out out{};
+	::bzd::components::std::Out out{};
 	callback(out);
-	throw 42;
+	// Triggers a signal on POSIX which provoques a stack trace dump.
+	std::terminate();
 }
 
 int main()

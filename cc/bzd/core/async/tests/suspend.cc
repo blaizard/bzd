@@ -14,7 +14,7 @@ void makeStressCancellationSuspend(const bzd::Size iterations)
 {
 	for (bzd::Size iteration = 0; iteration < iterations; ++iteration)
 	{
-		bzd::coroutine::impl::Executor executor{};
+		bzd::async::Executor executor{};
 		std::thread thread;
 		bzd::Atomic<bzd::Bool> shouldReturn{false};
 		bzd::async::ExecutableSuspended executableStore{};

@@ -4,7 +4,7 @@
 
 #include <sys/socket.h>
 
-namespace bzd::platform::posix::network {
+namespace bzd::components::posix::network {
 
 /// Type for a socket.
 enum class SocketType
@@ -54,4 +54,4 @@ constexpr SocketTypeOption operator|(const SocketTypeOption a, const SocketTypeO
 	return static_cast<SocketTypeOption>(bzd::toUnderlying(a) | bzd::toUnderlying(b));
 }
 
-} // namespace bzd::platform::posix::network
+} // namespace bzd::components::posix::network

@@ -1,10 +1,10 @@
 use "cc/bzd/platform/interfaces/core.bdl"
 
-namespace bzd.platform.generic;
+namespace bzd.components.generic;
 
 
 // Core abstraction for generic system.
-component Core : bzd.platform.Core {
+component Core : bzd.Core {
 interface:
 	
 }

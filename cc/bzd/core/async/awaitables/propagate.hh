@@ -3,7 +3,7 @@
 #include "cc/bzd/core/async/awaitables/default.hh"
 #include "cc/bzd/meta/always_false.hh"
 
-namespace bzd::coroutine::impl {
+namespace bzd::async::awaitable {
 
 template <class Async, Size index>
 class Propagate : public Awaiter<Async>
@@ -37,4 +37,4 @@ public:
 	}
 };
 
-} // namespace bzd::coroutine::impl
+} // namespace bzd::async::awaitable

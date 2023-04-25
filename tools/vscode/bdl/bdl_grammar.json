@@ -1,44 +1,44 @@
 {
     "patterns": [
         {
-            "match": "(struct|interface|component|composition)(?!:)",
+            "match": "(composition|interface|config):",
+            "name": "storage.type.modifier.access.control"
+        },
+        {
+            "match": "(struct|interface|component|composition)\\b",
             "name": "storage.type.class"
         },
         {
-            "match": "namespace",
+            "match": "namespace\\b",
             "name": "storage.type.namespace"
         },
         {
-            "match": "method",
+            "match": "method\\b",
             "name": "storage.type.function"
         },
         {
-            "match": "enum",
+            "match": "enum\\b",
             "name": "storage.type.enum"
         },
         {
-            "match": "use",
+            "match": "use\\b",
             "name": "keyword.control"
         },
         {
-            "match": "using",
+            "match": "using\\b",
             "name": "keyword.control"
         },
         {
-            "match": "extern",
+            "match": "extern\\b",
             "name": "keyword.control"
         },
         {
-            "match": "const",
+            "match": "const\\b",
             "name": "storage.modifier.const"
         },
         {
-            "match": "(list|Any|connect|bind)",
+            "match": "(list|Any|connect|bind)\\b",
             "name": "support.type"
-        },
-        {
-            "match": "(composition|interface|config):",
-            "name": "storage.type.modifier.access.control"
         },
         {
             "match": "/[^\\s]+/",

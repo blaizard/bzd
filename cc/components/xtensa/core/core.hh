@@ -11,10 +11,10 @@
 #include <freertos/task.h>
 #include <iostream>
 
-namespace bzd::platform::esp32 {
+namespace bzd::components::esp32 {
 
 template <class Context>
-class Core : public bzd::platform::Core
+class Core : public bzd::Core
 {
 private:
 	using Self = Core<Context>;
@@ -23,7 +23,7 @@ private:
 public:
 	constexpr Core(Context& context) noexcept : context_{context} {}
 
-	Result<void, bzd::Error> start(const bzd::FunctionRef<void(bzd::platform::Core&)> workload) noexcept override
+	Result<void, bzd::Error> start(const bzd::FunctionRef<void(bzd::Core&)> workload) noexcept override
 	{
 		// No need to taint the stack, this is already done by freertos with configCHECK_FOR_STACK_OVERFLOW = 2
 		// stack_.taint(freertosStackTaintingByte);
@@ -94,11 +94,11 @@ private:
 private:
 	Context& context_;
 	bzd::Stack<Context::Config::stackSize, alignof(StackType_t)> stack_{};
-	bzd::Optional<bzd::FunctionRef<void(bzd::platform::Core&)>> workload_{};
+	bzd::Optional<bzd::FunctionRef<void(bzd::Core&)>> workload_{};
 	TaskHandle_t handle_{};
 	StaticTask_t tcb_{};
 	StaticSemaphore_t mutexBuffer_{};
 	SemaphoreHandle_t mutex_{nullptr};
 };
 
-} // namespace bzd::platform::esp32
+} // namespace bzd::components::esp32

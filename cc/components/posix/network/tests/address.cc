@@ -2,7 +2,7 @@
 
 #include "cc/bzd/test/test.hh"
 
-namespace bzd::platform::posix::network {
+namespace bzd::components::posix::network {
 
 TEST(Address, fromIpV4)
 {
@@ -34,4 +34,4 @@ TEST(Address, Addresses)
 	}
 }
 
-} // namespace bzd::platform::posix::network
+} // namespace bzd::components::posix::network

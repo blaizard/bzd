@@ -3,7 +3,7 @@
 #include "cc/components/xtensa/error.hh"
 #include "sdkconfig.h"
 
-namespace bzd::platform::esp32::timer {
+namespace bzd::components::esp32::timer {
 
 static bool gptimerCallback(::gptimer_handle_t, const ::gptimer_alarm_event_data_t*, void* userCtx)
 {
@@ -111,4 +111,4 @@ bzd::Result<void, bzd::Error> GPTimer::alarmClear()
 	return bzd::nullresult;
 }
 
-} // namespace bzd::platform::esp32::timer
+} // namespace bzd::components::esp32::timer

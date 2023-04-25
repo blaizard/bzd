@@ -2,7 +2,7 @@
 
 #include "cc/bzd/platform/types.hh"
 
-namespace bzd::platform::posix {
+namespace bzd::components::posix {
 
 /// The file descriptor object, non owning, that can be passsed around.
 class FileDescriptor
@@ -55,4 +55,4 @@ public:
 	void reset() noexcept;
 };
 
-} // namespace bzd::platform::posix
+} // namespace bzd::components::posix

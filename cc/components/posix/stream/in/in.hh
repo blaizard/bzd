@@ -9,7 +9,7 @@
 #include <termios.h>
 #include <unistd.h>
 
-namespace bzd::platform::posix {
+namespace bzd::components::posix {
 template <class Context>
 class In : public bzd::IStream
 {
@@ -62,4 +62,4 @@ private:
 	termios current_{};
 	FileDescriptor in_{STDIN_FILENO};
 };
-} // namespace bzd::platform::posix
+} // namespace bzd::components::posix

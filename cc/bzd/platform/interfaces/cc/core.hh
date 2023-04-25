@@ -3,7 +3,7 @@
 #include "cc/bzd/platform/types.hh"
 #include "tools/bdl/generators/cc/adapter/types.hh"
 
-namespace bzd::platform {
+namespace bzd {
 
 // Type describing the size of a stack.
 using StackSize = bzd::UInt32;
@@ -23,10 +23,10 @@ public:
 	[[nodiscard]] virtual bzd::Result<void, bzd::Error> stop() noexcept = 0;
 
 	// Get the current stack usage.
-	[[nodiscard]] virtual bzd::platform::StackSize getStackUsage() noexcept = 0;
+	[[nodiscard]] virtual bzd::StackSize getStackUsage() noexcept = 0;
 
 	// Get the current core identifier.
-	[[nodiscard]] virtual bzd::platform::CoreId getId() noexcept = 0;
+	[[nodiscard]] virtual bzd::CoreId getId() noexcept = 0;
 };
 
-} // namespace bzd::platform
+} // namespace bzd

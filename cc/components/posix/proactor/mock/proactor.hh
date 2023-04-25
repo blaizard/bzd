@@ -2,9 +2,9 @@
 
 #include "cc/components/posix/proactor/interface.hh"
 
-namespace bzd::platform::posix::mock {
+namespace bzd::components::posix::mock {
 
-class Proactor : public bzd::platform::posix::Proactor<Proactor>
+class Proactor : public bzd::components::posix::Proactor<Proactor>
 {
 public:
 	bzd::Async<> write(const FileDescriptor, const bzd::Span<const bzd::Byte>) noexcept { co_return {}; }
@@ -14,4 +14,4 @@ public:
 	bzd::Async<> connect(const FileDescriptor, const network::Address&) noexcept { co_return {}; }
 };
 
-} // namespace bzd::platform::posix::mock
+} // namespace bzd::components::posix::mock

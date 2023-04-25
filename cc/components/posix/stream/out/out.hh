@@ -6,7 +6,7 @@
 #include <iostream>
 #include <unistd.h>
 
-namespace bzd::platform::posix {
+namespace bzd::components::posix {
 template <class Context>
 class Out : public bzd::OStream
 {
@@ -24,4 +24,4 @@ private:
 	Context& context_;
 	FileDescriptor out_{STDOUT_FILENO};
 };
-} // namespace bzd::platform::posix
+} // namespace bzd::components::posix

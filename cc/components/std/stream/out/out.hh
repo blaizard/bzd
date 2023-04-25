@@ -5,7 +5,7 @@
 #include <iostream>
 #include <unistd.h>
 
-namespace bzd::platform::std {
+namespace bzd::components::std {
 class Out : public bzd::OStream
 {
 public:
@@ -22,4 +22,4 @@ public:
 		co_return {};
 	}
 };
-} // namespace bzd::platform::std
+} // namespace bzd::components::std

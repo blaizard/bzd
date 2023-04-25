@@ -1,9 +1,9 @@
 use "cc/components/posix/proactor/interface.bdl"
 
-namespace bzd.platform.posix.sync;
+namespace bzd.components.posix.sync;
 
 
-component Proactor : bzd.platform.posix.Proactor {
+component Proactor : bzd.components.posix.Proactor {
 interface:
 	
 }

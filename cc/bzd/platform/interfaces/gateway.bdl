@@ -1,5 +1,5 @@
 
-namespace bzd.platform;
+namespace bzd;
 
 // Gateway interface to bridge executors together.
 // Need to provide several fuctions to support the following use cases:

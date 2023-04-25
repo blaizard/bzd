@@ -2,7 +2,7 @@
 
 #include "cc/components/generic/clock/null/interface.hh"
 
-namespace bzd::platform::generic::clock {
+namespace bzd::components::generic::clock {
 
 class Null : public bzd::Clock
 {
@@ -15,4 +15,4 @@ public:
 	bzd::Result<bzd::units::Millisecond, bzd::Error> getTime() noexcept override;
 };
 
-} // namespace bzd::platform::generic::clock
+} // namespace bzd::components::generic::clock

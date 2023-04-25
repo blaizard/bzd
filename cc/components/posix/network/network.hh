@@ -16,10 +16,10 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-namespace bzd::platform::posix::network {
+namespace bzd::components::posix::network {
 // TCP connection
 class TCP
-//	: public bzd::platform::posix::network::adapter::TCP<TCP>
+//	: public bzd::components::posix::network::adapter::TCP<TCP>
 //	: public bzd::IOStream
 {
 public:
@@ -93,4 +93,4 @@ public:
 private:
 	int socket_{-1};
 };
-} // namespace bzd::platform::posix::network
+} // namespace bzd::components::posix::network

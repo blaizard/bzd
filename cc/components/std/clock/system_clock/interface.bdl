@@ -1,6 +1,6 @@
 use "cc/bzd/platform/interfaces/clock.bdl"
 
-namespace bzd.platform.std.clock;
+namespace bzd.components.std.clock;
 
 
 component SystemClock : bzd.Clock {

@@ -9,10 +9,10 @@
 #include <poll.h>
 #include <unistd.h>
 
-namespace bzd::platform::posix::sync {
+namespace bzd::components::posix::sync {
 
 /// Proactor for basic POSIX functionalities
-class Proactor : public bzd::platform::posix::Proactor<Proactor>
+class Proactor : public bzd::components::posix::Proactor<Proactor>
 {
 public:
 	/// Perform a synchronous write operation.
@@ -109,4 +109,4 @@ private:
 	}
 };
 
-} // namespace bzd::platform::posix::sync
+} // namespace bzd::components::posix::sync

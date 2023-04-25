@@ -1,4 +1,4 @@
-namespace bzd::platform {
+namespace bzd::component {
 template <Size stackSize>
 class Thread
 {
@@ -9,4 +9,4 @@ public:
 private:
 	bzs::Stack<stackSize> stack_;
 };
-} // namespace bzd::platform
+} // namespace bzd::component

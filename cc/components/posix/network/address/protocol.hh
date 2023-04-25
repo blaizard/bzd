@@ -3,7 +3,7 @@
 #include "cc/bzd/meta/string_literal.hh"
 #include "cc/components/posix/network/address/socket_type.hh"
 
-namespace bzd::platform::posix::network {
+namespace bzd::components::posix::network {
 
 /// See /etc/protocols or https://en.wikipedia.org/wiki/List_of_IP_protocol_numbers
 class Protocol
@@ -31,4 +31,4 @@ inline constexpr Protocol tcp{SocketType::stream, 6};
 inline constexpr Protocol udp{SocketType::datagram, 17};
 } // namespace protocol
 
-} // namespace bzd::platform::posix::network
+} // namespace bzd::components::posix::network

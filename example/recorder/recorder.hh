@@ -26,6 +26,11 @@ namespace bzd {
 template <bzd::meta::StringLiteral name>
 struct Data;
 
+}
+
+namespace example {
+
+/*
 class Recorder
 {
 public:
@@ -40,11 +45,7 @@ public:
 private:
 	bzd::String<128u> string_;
 };
-
-} // namespace bzd
-
-namespace example {
-
+*/
 template <class T>
 class Comms
 {
@@ -116,7 +117,7 @@ private:
 };
 
 template <class Context>
-class Recorder : public bzd::platform::Recorder<Recorder<Context>>
+class Recorder : public bzd::Recorder<Recorder<Context>>
 {
 public:
 	constexpr explicit Recorder(Context& context) noexcept : context_{context} {}

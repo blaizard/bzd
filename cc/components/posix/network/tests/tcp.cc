@@ -10,18 +10,18 @@ TEST_ASYNC(Tcp, Server)
 	// TODO: use an API abstraction.
 	/*
 		{
-			bzd::platform::posix::network::tcp::Server server;
+			bzd::components::posix::network::tcp::Server server;
 			co_await !server.bind("localhost", 8888);
 			co_await !server.listen();
 		}
 
 		{
-			bzd::platform::posix::network::tcp::Server server;
+			bzd::components::posix::network::tcp::Server server;
 			co_await !server.bind("0.0.0.0", 8889);
 		}
 
 		{
-			bzd::platform::posix::network::tcp::Server server;
+			bzd::components::posix::network::tcp::Server server;
 			co_await !server.bind("::1", 8889);
 		}
 	*/
@@ -33,14 +33,14 @@ TEST_ASYNC(Tcp, Client)
 {
 	struct Config
 	{
-		bzd::platform::posix::sync::Proactor proactor{};
+		bzd::components::posix::sync::Proactor proactor{};
 	};
 	struct Context
 	{
 		Config config{};
 	};
 	/*Context context{};
-	bzd::platform::posix::network::tcp::Client client{context};
+	bzd::components::posix::network::tcp::Client client{context};
 	[[maybe_unused]] auto stream = co_await client.connect("google.com", 80);*/
 	co_return {};
 }

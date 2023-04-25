@@ -2,7 +2,7 @@
 
 #include <sys/socket.h>
 
-namespace bzd::platform::posix::network {
+namespace bzd::components::posix::network {
 
 Result<SocketOption, Error> getSocketOptions(const FileDescriptor fd, const SocketOptionLevel level, const SocketOptionName name) noexcept
 {
@@ -27,4 +27,4 @@ Result<void, Error> setSocketOptions(const FileDescriptor fd,
 	return bzd::nullresult;
 }
 
-} // namespace bzd::platform::posix::network
+} // namespace bzd::components::posix::network
