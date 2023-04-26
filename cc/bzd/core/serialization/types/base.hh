@@ -60,9 +60,9 @@ struct Serialization
 ///
 /// \param range The output range to be written to.
 /// \param args The value(s) to be written.
-/// \return The number of bytes written.
+/// \return The number of bytes written or nullopt in case of error (buffer is too small for example).
 template <concepts::outputStreamRange Range, class... Args>
-constexpr Size serialize(Range&& range, Args&&... args) noexcept
+constexpr Optional<Size> serialize(Range&& range, Args&&... args) noexcept
 {
 	return Serialization<Args...>::serialize(bzd::forward<Range>(range), bzd::forward<Args>(args)...);
 }
@@ -71,7 +71,7 @@ constexpr Size serialize(Range&& range, Args&&... args) noexcept
 /// Converts an output range into an output stream.
 template <concepts::outputRange Range, class... Args>
 requires(!concepts::outputStreamRange<Range>)
-constexpr Size serialize(Range&& range, Args&&... args) noexcept
+constexpr Optional<Size> serialize(Range&& range, Args&&... args) noexcept
 {
 	range::Stream stream{bzd::begin(range), bzd::end(range)};
 	return bzd::serialize(stream, bzd::forward<Args>(args)...);

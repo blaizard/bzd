@@ -23,7 +23,7 @@ struct Header
 	static constexpr Header accept(const StringView value) noexcept { return {"Accept"_sv, value}; }
 };
 
-template <class Client>
+template <class Client, Size bufferCapacity = 128u>
 class Response : public bzd::IStream
 {
 public:
@@ -105,7 +105,7 @@ private:
 private:
 	Client& client_;
 	Size connectCounter_;
-	StreamReader<256u> reader_;
+	StreamReader<bufferCapacity> reader_;
 };
 
 template <meta::StringLiteral method, class Client, Size capacityHeaders = 1u>
@@ -136,8 +136,8 @@ public:
 
 	constexpr auto header(const StringView key, const StringView value) && { return bzd::move(*this).header(Header{key, value}); }
 
-	template <Size bufferCapacity = 100>
-	Async<Response<Client>> send() &&
+	template <Size bufferCapacity = 128u>
+	Async<Response<Client, bufferCapacity>> send() &&
 	{
 		auto scope = co_await !client_.connectIfNeeded();
 
@@ -150,7 +150,7 @@ public:
 		co_await !::toStream(buffer, "\r\n"_csv);
 		co_await !buffer.flush();
 
-		co_return Response<Client>{client_};
+		co_return Response<Client, bufferCapacity>{client_};
 	}
 
 private:
@@ -189,7 +189,7 @@ private:
 	template <meta::StringLiteral, class, Size>
 	friend class Request;
 
-	template <class>
+	template <class, Size>
 	friend class Response;
 
 	Async<lockGuard::Type<Mutex>> connectIfNeeded()

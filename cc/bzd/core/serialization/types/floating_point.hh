@@ -21,12 +21,16 @@ struct Serialization<T>
 				  "The floating point representation is not compliant with the IEC 559/IEEE 754 standard.");
 
 	template <concepts::outputStreamRange Range>
-	static constexpr Size serialize(Range&& range, const Type& value) noexcept
+	static constexpr Optional<Size> serialize(Range&& range, const Type& value) noexcept
 	{
 		const auto bytes = Span<const Type>{&value, 1u}.asBytes();
 		const auto view = bytes | impl::serialization::normalizeByteOrder();
 		const auto result = algorithm::byteCopy(view, range);
-		return bzd::distance(bzd::begin(view), result.in);
+		if (static_cast<Size>(bzd::distance(bzd::begin(view), result.in)) == bytes.size())
+		{
+			return bytes.size();
+		}
+		return bzd::nullopt;
 	}
 
 	template <concepts::inputStreamRange Range>

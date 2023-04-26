@@ -18,16 +18,20 @@ struct Serialization<T>
 	static constexpr Byte boolValueFalse{0u};
 
 	template <concepts::outputStreamRange Range>
-	static constexpr Size serialize(Range&& range, const Type& value) noexcept
+	static constexpr Optional<Size> serialize(Range&& range, const Type& value) noexcept
 	requires(concepts::sameAs<Type, bool> || concepts::sameAs<Type, Bool>)
 	{
 		const auto data = {(value) ? boolValueTrue : boolValueFalse};
 		const auto result = algorithm::byteCopy(data, range);
-		return bzd::distance(bzd::begin(data), result.in);
+		if (static_cast<Size>(bzd::distance(bzd::begin(data), result.in)) == 1u)
+		{
+			return 1u;
+		}
+		return bzd::nullopt;
 	}
 
 	template <concepts::outputStreamRange Range>
-	static constexpr Size serialize(Range&& range, const Type& value) noexcept
+	static constexpr Optional<Size> serialize(Range&& range, const Type& value) noexcept
 	requires(concepts::sameAs<Type, Int8> || concepts::sameAs<Type, UInt8> || concepts::sameAs<Type, Int16> ||
 			 concepts::sameAs<Type, UInt16> || concepts::sameAs<Type, Int32> || concepts::sameAs<Type, UInt32> ||
 			 concepts::sameAs<Type, Int64> || concepts::sameAs<Type, UInt64> || concepts::sameAs<Type, Byte> ||
@@ -36,7 +40,11 @@ struct Serialization<T>
 		const auto bytes = Span<const Type>{&value, 1u}.asBytes();
 		const auto view = bytes | impl::serialization::normalizeByteOrder();
 		const auto result = algorithm::byteCopy(view, range);
-		return bzd::distance(bzd::begin(view), result.in);
+		if (static_cast<Size>(bzd::distance(bzd::begin(view), result.in)) == bytes.size())
+		{
+			return bytes.size();
+		}
+		return bzd::nullopt;
 	}
 
 	template <concepts::inputStreamRange Range>
@@ -72,11 +80,12 @@ struct Serialization<T>
 		auto bytes = Span<Type>{&value, 1u}.asBytesMutable();
 		const auto result = algorithm::byteCopy(range | impl::serialization::normalizeByteOrder(), bytes);
 		const Size size = bzd::distance(bzd::begin(bytes), result.out);
-		if (size != bytes.size())
+		if (size == bytes.size())
 		{
-			return bzd::nullopt;
+			return size;
 		}
-		return size;
+		return bzd::nullopt;
+		;
 	}
 };
 
