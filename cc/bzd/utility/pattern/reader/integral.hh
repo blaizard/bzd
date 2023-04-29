@@ -18,7 +18,8 @@ template <concepts::integral T>
 struct Formatter<T>
 {
 private:
-	static constexpr Array<const char, 16> digitsPredefined{inPlace, '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+	static constexpr Array<const char, 16> digitsPredefined{
+		inPlace, '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
 public:
 	template <concepts::inputStreamRange Range, Size base = 10, class Digits = decltype(digitsPredefined)>

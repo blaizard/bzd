@@ -11,6 +11,7 @@ cc_library(
         "//cc/bzd/container:array",
         "//cc/bzd/container:string",
         "//cc/bzd/container:vector",
+        "//cc/bzd/container/range/views:reverse",
         "//cc/bzd/meta:always_false",
         "//cc/bzd/type_traits:container",
         "//cc/bzd/type_traits:is_floating_point",
