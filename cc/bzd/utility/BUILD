@@ -36,7 +36,6 @@ bzd_cc_library(
         ":withdraw",
         "//cc/bzd/utility/bit",
         "//cc/bzd/utility/pattern/formatter:to_string",
-        "//cc/bzd/utility/pattern/reader:from_string",
         "//cc/bzd/utility/random",
         "//cc/bzd/utility/synchronization",
     ],
