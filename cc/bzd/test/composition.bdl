@@ -5,9 +5,9 @@ namespace bzd.test;
 
 
 // Test suite runner.
-method run(out = bzd.OStream, timer = bzd.Timer);
+method run(out = {out}, timer = {timer});
 composition {
-	run(out = target.out, timer = target.timer);
+	run();
 	
 }
 

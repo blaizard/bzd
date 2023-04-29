@@ -19,30 +19,30 @@ struct Metadata
 {
 	enum class Sign
 	{
-		AUTO,
-		ALWAYS,
-		ONLY_NEGATIVE
+		automatic,
+		always,
+		only_negative
 	};
 
 	enum class Format
 	{
-		AUTO,
-		BINARY,
-		DECIMAL,
-		OCTAL,
-		HEXADECIMAL_LOWER,
-		HEXADECIMAL_UPPER,
-		FIXED_POINT,
-		FIXED_POINT_PERCENT,
-		POINTER
+		automatic,
+		binary,
+		decimal,
+		octal,
+		hexadecimal_lower,
+		hexadecimal_upper,
+		fixed_point,
+		fixed_point_percent,
+		pointer
 	};
 
 	bzd::Size index = 0;
-	Sign sign = Sign::AUTO;
+	Sign sign = Sign::automatic;
 	bool alternate = false;
 	bool isPrecision = false;
 	bzd::Size precision = 0;
-	Format format = Format::AUTO;
+	Format format = Format::automatic;
 };
 
 // ---- Formatter ----
@@ -55,15 +55,15 @@ class StringFormatter
 {
 public:
 	template <class Range, class T>
-	static constexpr void process(Range& range, const T& value, [[maybe_unused]] const Metadata& metadata) noexcept
+	static constexpr bzd::Optional<Size> process(Range& range, const T& value, [[maybe_unused]] const Metadata& metadata) noexcept
 	{
 		if constexpr (toStringFormatterWithMetadata<Range, T>)
 		{
-			toString(range, value, metadata);
+			return toString(range, value, metadata);
 		}
 		else
 		{
-			toString(range, value);
+			return toString(range, value);
 		}
 	}
 };
@@ -120,28 +120,28 @@ public:
 			switch (format.front())
 			{
 			case 'b':
-				metadata.format = Metadata::Format::BINARY;
+				metadata.format = Metadata::Format::binary;
 				break;
 			case 'd':
-				metadata.format = Metadata::Format::DECIMAL;
+				metadata.format = Metadata::Format::decimal;
 				break;
 			case 'o':
-				metadata.format = Metadata::Format::OCTAL;
+				metadata.format = Metadata::Format::octal;
 				break;
 			case 'x':
-				metadata.format = Metadata::Format::HEXADECIMAL_LOWER;
+				metadata.format = Metadata::Format::hexadecimal_lower;
 				break;
 			case 'X':
-				metadata.format = Metadata::Format::HEXADECIMAL_UPPER;
+				metadata.format = Metadata::Format::hexadecimal_upper;
 				break;
 			case 'f':
-				metadata.format = Metadata::Format::FIXED_POINT;
+				metadata.format = Metadata::Format::fixed_point;
 				break;
 			case '%':
-				metadata.format = Metadata::Format::FIXED_POINT_PERCENT;
+				metadata.format = Metadata::Format::fixed_point_percent;
 				break;
 			case 'p':
-				metadata.format = Metadata::Format::POINTER;
+				metadata.format = Metadata::Format::pointer;
 				break;
 			default:
 				Adapter::onError("Unsupported conversion format, only the following is "
@@ -160,20 +160,20 @@ public:
 	{
 		switch (metadata.format)
 		{
-		case Metadata::Format::BINARY:
-		case Metadata::Format::OCTAL:
-		case Metadata::Format::HEXADECIMAL_LOWER:
-		case Metadata::Format::HEXADECIMAL_UPPER:
+		case Metadata::Format::binary:
+		case Metadata::Format::octal:
+		case Metadata::Format::hexadecimal_lower:
+		case Metadata::Format::hexadecimal_upper:
 			Adapter::assertTrue(bzd::typeTraits::isIntegral<ValueType>, "Argument must be an integral");
 			break;
-		case Metadata::Format::DECIMAL:
-		case Metadata::Format::FIXED_POINT:
-		case Metadata::Format::FIXED_POINT_PERCENT:
+		case Metadata::Format::decimal:
+		case Metadata::Format::fixed_point:
+		case Metadata::Format::fixed_point_percent:
 			Adapter::assertTrue(bzd::typeTraits::isArithmetic<ValueType>, "Argument must be arithmetic");
 			break;
-		case Metadata::Format::POINTER:
+		case Metadata::Format::pointer:
 			[[fallthrough]];
-		case Metadata::Format::AUTO:
+		case Metadata::Format::automatic:
 			break;
 		}
 	}
@@ -201,13 +201,13 @@ private:
 		switch (format.front())
 		{
 		case '+':
-			metadata.sign = Metadata::Sign::ALWAYS;
+			metadata.sign = Metadata::Sign::always;
 			break;
 		case '-':
-			metadata.sign = Metadata::Sign::ONLY_NEGATIVE;
+			metadata.sign = Metadata::Sign::only_negative;
 			break;
 		}
-		if (metadata.sign != Metadata::Sign::AUTO)
+		if (metadata.sign != Metadata::Sign::automatic)
 		{
 			format.removePrefix(1);
 		}
@@ -220,45 +220,42 @@ constexpr bzd::StringView processCommon(const bzd::StringView stringView, const 
 {
 	switch (metadata.format)
 	{
-	case Metadata::Format::AUTO:
+	case Metadata::Format::automatic:
 		return ((metadata.isPrecision) ? stringView.subStr(0, bzd::min(metadata.precision, stringView.size())) : stringView);
-	case Metadata::Format::FIXED_POINT:
-	case Metadata::Format::FIXED_POINT_PERCENT:
-	case Metadata::Format::DECIMAL:
-	case Metadata::Format::BINARY:
-	case Metadata::Format::HEXADECIMAL_LOWER:
-	case Metadata::Format::HEXADECIMAL_UPPER:
-	case Metadata::Format::OCTAL:
-	case Metadata::Format::POINTER:
+	case Metadata::Format::fixed_point:
+	case Metadata::Format::fixed_point_percent:
+	case Metadata::Format::decimal:
+	case Metadata::Format::binary:
+	case Metadata::Format::hexadecimal_lower:
+	case Metadata::Format::hexadecimal_upper:
+	case Metadata::Format::octal:
+	case Metadata::Format::pointer:
 		break;
 	}
 	return {};
 }
 
 template <concepts::integral T>
-constexpr void toString(bzd::interface::String& str, const T value, const Metadata& metadata) noexcept
+constexpr bzd::Optional<bzd::Size> toString(bzd::interface::String& str, const T value, const Metadata& metadata) noexcept
 {
 	switch (metadata.format)
 	{
-	case Metadata::Format::AUTO:
-	case Metadata::Format::DECIMAL:
-		::toString(str, value);
-		break;
-	case Metadata::Format::BINARY:
+	case Metadata::Format::automatic:
+	case Metadata::Format::decimal:
+		return ::toString(str, value);
+	case Metadata::Format::binary:
 		if (metadata.alternate)
 		{
 			str += "0b"_sv;
 		}
-		bzd::format::toStringBin(str, value);
-		break;
-	case Metadata::Format::HEXADECIMAL_LOWER:
+		return bzd::format::toStringBin(str, value);
+	case Metadata::Format::hexadecimal_lower:
 		if (metadata.alternate)
 		{
 			str += "0x"_sv;
 		}
-		bzd::format::toStringHex(str, value);
-		break;
-	case Metadata::Format::HEXADECIMAL_UPPER:
+		return bzd::format::toStringHex(str, value);
+	case Metadata::Format::hexadecimal_upper:
 		if (metadata.alternate)
 		{
 			str += "0x"_sv;
@@ -266,61 +263,74 @@ constexpr void toString(bzd::interface::String& str, const T value, const Metada
 		{
 			constexpr bzd::Array<const char, 16>
 				digits{inPlace, '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
-			bzd::format::toStringHex(str, value, digits);
+			return bzd::format::toStringHex(str, value, digits);
 		}
-		break;
-	case Metadata::Format::OCTAL:
+	case Metadata::Format::octal:
 		if (metadata.alternate)
 		{
 			str += "0o"_sv;
 		}
-		bzd::format::toStringOct(str, value);
-		break;
-	case Metadata::Format::FIXED_POINT:
-	case Metadata::Format::FIXED_POINT_PERCENT:
-	case Metadata::Format::POINTER:
+		return bzd::format::toStringOct(str, value);
+	case Metadata::Format::fixed_point:
+	case Metadata::Format::fixed_point_percent:
+	case Metadata::Format::pointer:
 		break;
 	}
+	return bzd::nullopt;
 }
 
 template <concepts::floatingPoint T>
-constexpr void toString(bzd::interface::String& str, const T value, const Metadata& metadata) noexcept
+constexpr bzd::Optional<bzd::Size> toString(bzd::interface::String& str, const T value, const Metadata& metadata) noexcept
 {
 	switch (metadata.format)
 	{
-	case Metadata::Format::AUTO:
-	case Metadata::Format::DECIMAL:
-		::toString(str, value);
-		break;
-	case Metadata::Format::FIXED_POINT:
-		::toString(str, value, (metadata.isPrecision) ? metadata.precision : 6);
-		break;
-	case Metadata::Format::FIXED_POINT_PERCENT:
-		::toString(str, value * 100., (metadata.isPrecision) ? metadata.precision : 6);
-		str += "%"_sv;
-		break;
-	case Metadata::Format::BINARY:
-	case Metadata::Format::HEXADECIMAL_LOWER:
-	case Metadata::Format::HEXADECIMAL_UPPER:
-	case Metadata::Format::OCTAL:
-	case Metadata::Format::POINTER:
+	case Metadata::Format::automatic:
+	case Metadata::Format::decimal:
+		return ::toString(str, value);
+	case Metadata::Format::fixed_point:
+		return ::toString(str, value, (metadata.isPrecision) ? metadata.precision : 6);
+	case Metadata::Format::fixed_point_percent:
+	{
+		const auto result = ::toString(str, value * 100., (metadata.isPrecision) ? metadata.precision : 6);
+		if (result)
+		{
+			if (str.append("%"_sv) == 1u)
+			{
+				return result.value() + 1u;
+			}
+		}
+	}
+	break;
+	case Metadata::Format::binary:
+	case Metadata::Format::hexadecimal_lower:
+	case Metadata::Format::hexadecimal_upper:
+	case Metadata::Format::octal:
+	case Metadata::Format::pointer:
 		break;
 	}
+	return bzd::nullopt;
 }
 
 template <class T>
 requires(concepts::pointer<T> && !concepts::constructible<bzd::StringView, T>)
-constexpr void toString(bzd::interface::String& str, const T value, const Metadata&) noexcept
+constexpr bzd::Optional<bzd::Size> toString(bzd::interface::String& str, const T value, const Metadata&) noexcept
 {
 	Metadata metadata{};
-	metadata.format = Metadata::Format::HEXADECIMAL_LOWER;
+	metadata.format = Metadata::Format::hexadecimal_lower;
 	metadata.alternate = true;
-	toString(str, reinterpret_cast<Size>(value), metadata);
+	return toString(str, reinterpret_cast<Size>(value), metadata);
 }
 
-constexpr void toString(bzd::interface::String& str, const bzd::StringView stringView, const Metadata& metadata) noexcept
+constexpr bzd::Optional<bzd::Size> toString(bzd::interface::String& str,
+											const bzd::StringView stringView,
+											const Metadata& metadata) noexcept
 {
-	str += processCommon(stringView, metadata);
+	const auto data = processCommon(stringView, metadata);
+	if (str.append(data) == data.size())
+	{
+		return data.size();
+	}
+	return bzd::nullopt;
 }
 
 } // namespace bzd::format::impl
@@ -351,21 +361,33 @@ constexpr void toString(bzd::interface::String& str, const bzd::StringView strin
 /// \param str run-time or compile-time string containing the format.
 /// \param args Arguments to be passed for the format.
 template <bzd::concepts::appendableWithBytes Container, bzd::concepts::constexprStringView Pattern, class... Args>
-constexpr void toString(Container& str, const Pattern& pattern, const Args&... args) noexcept
+constexpr bzd::Optional<bzd::Size> toString(Container& str, const Pattern& pattern, const Args&... args) noexcept
 {
 	const auto [parser, processor] =
 		bzd::pattern::impl::make<Container&, bzd::format::impl::StringFormatter, bzd::format::impl::SchemaFormat>(pattern, args...);
+	bzd::Size count{0u};
 
 	// Run-time call
 	for (const auto& result : parser)
 	{
 		if (!result.str.empty())
 		{
-			str.append(result.str);
+			if (str.append(result.str) != result.str.size())
+			{
+				return bzd::nullopt;
+			}
+			count += result.str.size();
 		}
 		if (result.isMetadata)
 		{
-			processor.process(str, result.metadata);
+			const auto maybeCount = processor.process(str, result.metadata);
+			if (!maybeCount)
+			{
+				return bzd::nullopt;
+			}
+			count += maybeCount.value();
 		}
 	}
+
+	return count;
 }

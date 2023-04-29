@@ -20,21 +20,21 @@ TEST(Format_, ParseMetadataSign)
 		bzd::StringView str("}");
 		TestAdapater::Metadata metadata{};
 		TestAdapater::template parse<TestAdapater>(metadata, str);
-		EXPECT_EQ(metadata.sign, bzd::format::impl::Metadata::Sign::AUTO);
+		EXPECT_EQ(metadata.sign, bzd::format::impl::Metadata::Sign::automatic);
 	}
 
 	{
 		bzd::StringView str("-}");
 		TestAdapater::Metadata metadata{};
 		TestAdapater::template parse<TestAdapater>(metadata, str);
-		EXPECT_EQ(metadata.sign, bzd::format::impl::Metadata::Sign::ONLY_NEGATIVE);
+		EXPECT_EQ(metadata.sign, bzd::format::impl::Metadata::Sign::only_negative);
 	}
 
 	{
 		bzd::StringView str("+}");
 		TestAdapater::Metadata metadata{};
 		TestAdapater::template parse<TestAdapater>(metadata, str);
-		EXPECT_EQ(metadata.sign, bzd::format::impl::Metadata::Sign::ALWAYS);
+		EXPECT_EQ(metadata.sign, bzd::format::impl::Metadata::Sign::always);
 	}
 }
 

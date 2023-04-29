@@ -73,9 +73,9 @@ constexpr bzd::StringView operator""_sv(const char* str, bzd::Size size) noexcep
 template <bzd::meta::StringLiteral str>
 constexpr auto operator""_csv() noexcept
 {
-	struct StrView : ::bzd::ConstexprStringView
+	struct ConstStrView : ::bzd::ConstexprStringView
 	{
 		[[nodiscard]] static constexpr const char* value() noexcept { return str.data(); }
 	};
-	return StrView{};
+	return ConstStrView{};
 }

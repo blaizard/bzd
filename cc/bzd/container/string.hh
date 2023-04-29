@@ -3,6 +3,7 @@
 #include "cc/bzd/algorithm/copy.hh"
 #include "cc/bzd/algorithm/fill_n.hh"
 #include "cc/bzd/container/impl/span_resizeable.hh"
+#include "cc/bzd/container/optional.hh"
 #include "cc/bzd/container/span.hh"
 #include "cc/bzd/container/storage/non_owning.hh"
 #include "cc/bzd/container/string_view.hh"
@@ -122,8 +123,25 @@ constexpr bool operator==(const interface::String& lhs, const char* const rhs) n
 
 } // namespace bzd
 
-constexpr void toString(bzd::interface::String& str, const bzd::interface::String& data) noexcept { str.append(data); }
+constexpr bzd::Optional<bzd::Size> toString(bzd::interface::String& str, const bzd::interface::String& data) noexcept
+{
+	if (str.append(data) == data.size())
+	{
+		return data.size();
+	}
+	return bzd::nullopt;
+}
 
-constexpr void toString(bzd::interface::String& str, const bzd::StringView data) noexcept { str.append(data); }
+constexpr bzd::Optional<bzd::Size> toString(bzd::interface::String& str, const bzd::StringView data) noexcept
+{
+	if (str.append(data) == data.size())
+	{
+		return data.size();
+	}
+	return bzd::nullopt;
+}
 
-constexpr void toString(bzd::interface::String& str, const char* const data) noexcept { str.append(bzd::StringView{data}); }
+constexpr bzd::Optional<bzd::Size> toString(bzd::interface::String& str, const char* const data) noexcept
+{
+	return toString(str, bzd::StringView{data});
+}

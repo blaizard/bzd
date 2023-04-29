@@ -2,6 +2,7 @@
 
 #include "cc/bzd/algorithm/reverse.hh"
 #include "cc/bzd/container/array.hh"
+#include "cc/bzd/container/optional.hh"
 #include "cc/bzd/container/string.hh"
 #include "cc/bzd/container/vector.hh"
 #include "cc/bzd/meta/always_false.hh"
@@ -16,7 +17,7 @@ static constexpr bzd::Array<const char, 16> digits{inPlace, '0', '1', '2', '3', 
 }
 
 template <Size base = 10, concepts::appendableWithBytes Container, class T, class Digits>
-constexpr void integer(Container& str, const T& n, const Digits& digits = bzd::format::impl::digits) noexcept
+constexpr bzd::Optional<bzd::Size> integer(Container& str, const T& n, const Digits& digits = bzd::format::impl::digits) noexcept
 {
 	static_assert(base > 1 && base <= 16, "Invalid base size.");
 	static_assert(Digits::size() >= base, "There is not enough digits for the base.");
@@ -32,22 +33,31 @@ constexpr void integer(Container& str, const T& n, const Digits& digits = bzd::f
 	{
 		const auto digit = digits[static_cast<Size>(number % base)];
 		number /= base;
-		str.append(digit);
+		if (!str.append(digit))
+		{
+			return bzd::nullopt;
+		}
 	} while (number);
 
 	if constexpr (bzd::typeTraits::isSigned<T>)
 	{
 		if (n < 0)
 		{
-			str.append('-');
+			if (!str.append('-'))
+			{
+				return bzd::nullopt;
+			}
 		}
 	}
+
 	// NOLINTNEXTLINE(bugprone-narrowing-conversions)
 	bzd::algorithm::reverse(str.begin() + indexBegin, str.end());
+
+	return static_cast<bzd::Size>(bzd::distance(str.begin() + indexBegin, str.end()));
 }
 
 template <concepts::appendableWithBytes Container, class T>
-constexpr void floatingPoint(Container& str, const T& n, const Size maxPrecision) noexcept
+constexpr bzd::Optional<bzd::Size> floatingPoint(Container& str, const T& n, const Size maxPrecision) noexcept
 {
 	constexpr const T resolutionList[15] = {1,
 											0.1,
@@ -68,10 +78,18 @@ constexpr void floatingPoint(Container& str, const T& n, const Size maxPrecision
 	auto resolution = resolutionList[maxPrecision];
 	const T roundedNumber = n + resolution / 2;
 
-	bzd::format::impl::integer(str, static_cast<int>(roundedNumber), bzd::format::impl::digits);
+	const auto result = bzd::format::impl::integer(str, static_cast<int>(roundedNumber), bzd::format::impl::digits);
+	if (!result)
+	{
+		return bzd::nullopt;
+	}
 
-	str += '.';
+	if (!str.append('.'))
+	{
+		return bzd::nullopt;
+	}
 
+	auto counter = result.value() + 1u;
 	auto afterComma = (roundedNumber - static_cast<T>(static_cast<int>(n)));
 	while (afterComma >= resolution * 2)
 	{
@@ -79,61 +97,69 @@ constexpr void floatingPoint(Container& str, const T& n, const Size maxPrecision
 		resolution *= 10;
 
 		const auto digit = static_cast<int>(afterComma);
-		str.append('0' + digit);
+		if (!str.append('0' + digit))
+		{
+			return bzd::nullopt;
+		}
+		++counter;
 		afterComma -= static_cast<T>(digit);
 	}
+
+	return counter;
 }
 } // namespace bzd::format::impl
 
 namespace bzd::format {
 
 template <concepts::appendableWithBytes Container, concepts::integral T>
-constexpr void toStringHex(Container& str, const T& data, const bzd::Array<const char, 16>& digits = bzd::format::impl::digits) noexcept
+constexpr Optional<Size> toStringHex(Container& str,
+									 const T& data,
+									 const bzd::Array<const char, 16>& digits = bzd::format::impl::digits) noexcept
 {
-	bzd::format::impl::integer<16u>(str, data, digits);
+	return bzd::format::impl::integer<16u>(str, data, digits);
 }
 
 template <concepts::appendableWithBytes Container, concepts::integral T>
-constexpr void toStringOct(Container& str, const T& data) noexcept
+constexpr Optional<Size> toStringOct(Container& str, const T& data) noexcept
 {
-	bzd::format::impl::integer<8u>(str, data, bzd::format::impl::digits);
+	return bzd::format::impl::integer<8u>(str, data, bzd::format::impl::digits);
 }
 
 template <concepts::appendableWithBytes Container, concepts::integral T>
-constexpr void toStringBin(Container& str, const T& data) noexcept
+constexpr Optional<Size> toStringBin(Container& str, const T& data) noexcept
 {
-	bzd::format::impl::integer<2u>(str, data, bzd::format::impl::digits);
+	return bzd::format::impl::integer<2u>(str, data, bzd::format::impl::digits);
 }
 } // namespace bzd::format
 
 // Integers
 
 template <bzd::concepts::appendableWithBytes Container, bzd::concepts::integral T>
-constexpr void toString(Container& str, const T data) noexcept
+constexpr bzd::Optional<bzd::Size> toString(Container& str, const T data) noexcept
 {
-	bzd::format::impl::integer(str, data, bzd::format::impl::digits);
+	return bzd::format::impl::integer(str, data, bzd::format::impl::digits);
 }
 
 // Floating points
 
 template <bzd::concepts::appendableWithBytes Container, bzd::concepts::floatingPoint T>
-constexpr void toString(Container& str, const T data, const bzd::Size maxPrecision = 6) noexcept
+constexpr bzd::Optional<bzd::Size> toString(Container& str, const T data, const bzd::Size maxPrecision = 6) noexcept
 {
-	bzd::format::impl::floatingPoint(str, data, maxPrecision);
+	return bzd::format::impl::floatingPoint(str, data, maxPrecision);
 }
 
 // Boolean
 
 template <bzd::concepts::appendableWithBytes Container>
-constexpr void toString(Container& str, const bzd::Bool value) noexcept
+constexpr bzd::Optional<bzd::Size> toString(Container& str, const bzd::Bool value) noexcept
 {
-	str.append((value) ? "true"_sv.asBytes() : "false"_sv.asBytes());
+	return str.append((value) ? "true"_sv.asBytes() : "false"_sv.asBytes());
 }
 
 // Chars
 
 template <bzd::concepts::appendableWithBytes Container>
-constexpr void toString(Container& str, const char c) noexcept
+constexpr bzd::Optional<bzd::Size> toString(Container& str, const char c) noexcept
 {
-	str.append(c);
+	return str.append(c);
 }

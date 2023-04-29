@@ -27,6 +27,7 @@ cc_library(
     deps = [
         ":base",
         "//cc/bzd/algorithm:byte_copy",
+        "//cc/bzd/container:optional",
         "//cc/bzd/container:span",
         "//cc/bzd/platform:types",
         "//cc/bzd/type_traits:is_integral",
