@@ -23,6 +23,9 @@ TEST(Regexpr, SpecialChar)
 	EXPECT_RESULT_EQ(bzd::Regexpr{"a\\*c"}.match(bzd::range::Stream{"a*c"_sv}), 3u);
 	EXPECT_RESULT_EQ(bzd::Regexpr{"a.c"}.match(bzd::range::Stream{"abc"_sv}), 3u);
 	EXPECT_FALSE(bzd::Regexpr{"\\"}.match(bzd::range::Stream{""_sv}));
+	EXPECT_TRUE(bzd::Regexpr{"\\\\"}.match(bzd::range::Stream{"\\"_sv}));
+	EXPECT_TRUE(bzd::Regexpr{"\\s"}.match(bzd::range::Stream{" "_sv}));
+	EXPECT_TRUE(bzd::Regexpr{"\\s+a"}.match(bzd::range::Stream{" \t\na"_sv}));
 }
 
 TEST(Regexpr, Brackets)
