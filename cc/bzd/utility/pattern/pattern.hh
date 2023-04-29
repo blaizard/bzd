@@ -102,10 +102,10 @@ template <class Adapter>
 constexpr bzd::Size parseIndex(bzd::StringView& pattern, const bzd::Size autoIndex) noexcept
 {
 	bzd::Size index = 0;
-	const auto isDefined = ::fromString(pattern, index);
-	if (isDefined)
+	const auto maybeIndex = bzd::fromString(pattern, index);
+	if (maybeIndex)
 	{
-		pattern.removePrefix(bzd::distance(pattern.begin(), isDefined.value()));
+		pattern.removePrefix(maybeIndex.value());
 	}
 	if (pattern.front() == ':')
 	{
@@ -115,7 +115,7 @@ constexpr bzd::Size parseIndex(bzd::StringView& pattern, const bzd::Size autoInd
 	{
 		Adapter::assertTrue(pattern.front() == '}', "Expecting closing '}' for the replacement field");
 	}
-	return (isDefined) ? index : autoIndex;
+	return (maybeIndex) ? index : autoIndex;
 }
 
 template <class Adapter, bzd::concepts::constexprStringView Pattern>
@@ -229,16 +229,18 @@ private:
 	public:
 		constexpr ProcessorType(Lambdas& lambdas) noexcept : lambdas_{lambdas} {}
 
-		constexpr void process(Range& range, const typename Adapter::Metadata& metadata) const noexcept
+		constexpr bzd::Optional<bzd::Size> process(Range& range, const typename Adapter::Metadata& metadata) const noexcept
 		{
 			const auto index = metadata.index;
 			Size counter = 0;
+			bzd::Optional<bzd::Size> result{};
 			constexprForContainerInc(lambdas_, [&](auto lambda) {
 				if (counter++ == index)
 				{
-					lambda(range, metadata);
+					result = lambda(range, metadata);
 				}
 			});
+			return result;
 		}
 
 	private:

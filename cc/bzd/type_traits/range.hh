@@ -60,25 +60,28 @@ template <class T, typeTraits::IteratorCategory category>
 concept rangeCategory = ((typeTraits::rangeCategory<T> & category) == category);
 
 template <class T>
-concept inputRange = range<T> && rangeCategory<T, typeTraits::IteratorCategory::input>;
+concept inputOrOutputRange = range<T> && inputOrOutputIterator<typeTraits::RangeIterator<T>>;
 
 template <class T>
-concept outputRange = range<T> && rangeCategory<T, typeTraits::IteratorCategory::output>;
+concept inputRange = inputOrOutputRange<T> && rangeCategory<T, typeTraits::IteratorCategory::input>;
 
 template <class T>
-concept forwardRange = range<T> && rangeCategory<T, typeTraits::IteratorCategory::forward>;
+concept outputRange = inputOrOutputRange<T> && rangeCategory<T, typeTraits::IteratorCategory::output>;
 
 template <class T>
-concept bidirectionalRange = range<T> && rangeCategory<T, typeTraits::IteratorCategory::bidirectional>;
+concept forwardRange = inputRange<T> && rangeCategory<T, typeTraits::IteratorCategory::forward>;
 
 template <class T>
-concept randomAccessRange = range<T> && rangeCategory<T, typeTraits::IteratorCategory::randomAccess>;
+concept bidirectionalRange = forwardRange<T> && rangeCategory<T, typeTraits::IteratorCategory::bidirectional>;
 
 template <class T>
-concept contiguousRange = range<T> && rangeCategory<T, typeTraits::IteratorCategory::contiguous>;
+concept randomAccessRange = bidirectionalRange<T> && rangeCategory<T, typeTraits::IteratorCategory::randomAccess>;
 
 template <class T>
-concept streamRange = range<T> && rangeCategory<T, typeTraits::IteratorCategory::stream>;
+concept contiguousRange = randomAccessRange<T> && rangeCategory<T, typeTraits::IteratorCategory::contiguous>;
+
+template <class T>
+concept streamRange = inputOrOutputRange<T> && rangeCategory<T, typeTraits::IteratorCategory::stream>;
 
 template <class T>
 concept byteCopyableRange = range<T> && sizeof(typeTraits::RangeValue<T>) == 1u && concepts::triviallyCopyable<typeTraits::RangeValue<T>>;

@@ -350,6 +350,7 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        ":optional",
         ":span",
         ":string_view",
         "//cc/bzd/algorithm:copy",

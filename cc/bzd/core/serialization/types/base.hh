@@ -44,7 +44,7 @@ namespace bzd {
 /// struct Serialization<T>
 /// {
 ///     template <concepts::outputStreamRange Range>
-///     static constexpr Size serialize(Range&& range, const T& value) noexcept { ... }
+///     static constexpr Optional<Size> serialize(Range&& range, const T& value) noexcept { ... }
 ///
 ///     template <concepts::inputStreamRange Range>
 ///     static constexpr Optional<Size> deserialize(Range&& range, T& value) noexcept { ... }
@@ -73,7 +73,7 @@ template <concepts::outputRange Range, class... Args>
 requires(!concepts::outputStreamRange<Range>)
 constexpr Optional<Size> serialize(Range&& range, Args&&... args) noexcept
 {
-	range::Stream stream{bzd::begin(range), bzd::end(range)};
+	range::Stream stream{range};
 	return bzd::serialize(stream, bzd::forward<Args>(args)...);
 }
 
@@ -94,7 +94,7 @@ template <concepts::inputRange Range, class... Args>
 requires(!concepts::inputStreamRange<Range>)
 constexpr Optional<Size> deserialize(Range&& range, Args&&... args) noexcept
 {
-	range::Stream stream{bzd::begin(range), bzd::end(range)};
+	range::Stream stream{range};
 	return bzd::deserialize(stream, bzd::forward<Args>(args)...);
 }
 
