@@ -3,6 +3,7 @@
 #include "cc/bzd/algorithm/reverse.hh"
 #include "cc/bzd/container/array.hh"
 #include "cc/bzd/container/optional.hh"
+#include "cc/bzd/container/range/views/reverse.hh"
 #include "cc/bzd/container/string.hh"
 #include "cc/bzd/container/vector.hh"
 #include "cc/bzd/meta/always_false.hh"
@@ -21,8 +22,10 @@ constexpr bzd::Optional<bzd::Size> integer(Container& str, const T& n, const Dig
 {
 	static_assert(base > 1 && base <= 16, "Invalid base size.");
 	static_assert(Digits::size() >= base, "There is not enough digits for the base.");
+	static_assert(sizeof(T) <= 8, "Only up to 64-bit integers are supported.");
 
-	const Size indexBegin = str.size();
+	bzd::String<64u> buffer{};
+
 	T number = n;
 	if constexpr (bzd::typeTraits::isSigned<T>)
 	{
@@ -33,7 +36,7 @@ constexpr bzd::Optional<bzd::Size> integer(Container& str, const T& n, const Dig
 	{
 		const auto digit = digits[static_cast<Size>(number % base)];
 		number /= base;
-		if (!str.append(digit))
+		if (!buffer.append(digit))
 		{
 			return bzd::nullopt;
 		}
@@ -43,17 +46,18 @@ constexpr bzd::Optional<bzd::Size> integer(Container& str, const T& n, const Dig
 	{
 		if (n < 0)
 		{
-			if (!str.append('-'))
+			if (!buffer.append('-'))
 			{
 				return bzd::nullopt;
 			}
 		}
 	}
 
-	// NOLINTNEXTLINE(bugprone-narrowing-conversions)
-	bzd::algorithm::reverse(str.begin() + indexBegin, str.end());
-
-	return static_cast<bzd::Size>(bzd::distance(str.begin() + indexBegin, str.end()));
+	for (const auto c : bzd::range::Reverse{buffer})
+	{
+		str.append(c);
+	}
+	return buffer.size();
 }
 
 template <concepts::appendableWithBytes Container, class T>

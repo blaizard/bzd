@@ -93,11 +93,11 @@ TEST(ToString, Overflow)
 		str.clear();
 		toString(str, 12);
 		EXPECT_EQ(str.size(), 1U);
-		EXPECT_STREQ(str.data(), "2");
+		EXPECT_STREQ(str.data(), "1");
 
 		str.clear();
 		toString(str, -12);
 		EXPECT_EQ(str.size(), 1U);
-		EXPECT_STREQ(str.data(), "2");
+		EXPECT_STREQ(str.data(), "-");
 	}
 }
