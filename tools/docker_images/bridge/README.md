@@ -3,7 +3,6 @@
 First of all to install all tools, do the following:
 
 ```sh
-export DEBIAN_FRONTEND=noninteractive
 apt install -y docker.io docker-compose wget
 wget "https://raw.githubusercontent.com/blaizard/cpp-async/master/tools/docker_images/bridge/docker-compose.yml" -O "docker-compose.yml"
 ```
