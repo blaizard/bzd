@@ -83,7 +83,7 @@ private:
 		{
 			co_return bzd::error::Data("Missing HTTP/*.");
 		}
-		/*if (!::fromString("HTTP{}\s+{}\s+{[A-Z]+}", version, code, statusString))
+		/*if (!bzd::fromString("HTTP{}\s+{}\s+{:[A-Z]+}", version, code, statusString))
 		{
 			co_return bzd::error::Data("Malformed status header.");
 		}*/

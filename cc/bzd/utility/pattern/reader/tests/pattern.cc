@@ -26,17 +26,25 @@ TEST(PatternFromString, NoArguments)
 
 TEST(PatternFromString, SimpleArguments)
 {
-	bzd::UInt32 a;
 	{
+		bzd::UInt32 a;
 		const auto result = bzd::fromString("Hello 12"_sv, "Hello {}"_csv, a);
 		EXPECT_TRUE(result);
 		EXPECT_EQ(result.value(), 8u);
 		EXPECT_EQ(a, 12u);
 	}
 	{
+		bzd::UInt32 a;
 		const auto result = bzd::fromString("World 12"_sv, "[A-Za-z]+ {}"_csv, a);
 		EXPECT_TRUE(result);
 		EXPECT_EQ(result.value(), 8u);
 		EXPECT_EQ(a, 12u);
+	}
+	{
+		bzd::String<12u> hello;
+		const auto result = bzd::fromString("Hello World"_sv, "Hello {}"_csv, hello.appender());
+		EXPECT_TRUE(result);
+		// EXPECT_EQ(result.value(), 8u);
+		// EXPECT_STREQ(hello.data(), "World");
 	}
 }

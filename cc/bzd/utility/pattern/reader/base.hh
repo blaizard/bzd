@@ -3,6 +3,7 @@
 #include "cc/bzd/container/optional.hh"
 #include "cc/bzd/container/range/stream.hh"
 #include "cc/bzd/meta/always_false.hh"
+#include "cc/bzd/type_traits/is_same_class.hh"
 #include "cc/bzd/type_traits/range.hh"
 
 namespace bzd {
@@ -19,40 +20,40 @@ namespace bzd {
 /// How to use it?
 /// \code
 /// template <concepts::??? T>
-/// struct Formatter<T>
+/// struct Matcher<T>
 /// {
-///     template <concepts::outputStreamRange Range>
-///     static constexpr Optional<Size> toString(Range&& range, const T& value) noexcept { ... }
-///
 ///     template <concepts::inputStreamRange Range>
 ///     static constexpr Optional<Size> fromString(Range&& range, T& value) noexcept { ... }
 /// };
 /// \endcode
 template <class... Args>
-struct Formatter;
-
-/*
-/// Format the value of a data type into a byte stream.
-///
-/// \param range The output range to be written to.
-/// \param args The value(s) to be written.
-/// \return The number of bytes written or nullopt in case of error (buffer is too small for example).
-template <concepts::outputStreamRange Range, class... Args>
-constexpr Optional<Size> toString(Range&& range, Args&&... args) noexcept
+struct Matcher
 {
-	return Formatter<Args...>::toString(bzd::forward<Range>(range), bzd::forward<Args>(args)...);
-}
+	static_assert(bzd::meta::alwaysFalse<Args...>, "This type has no matcher specialization.");
+};
 
-/// \copydoc toString
-/// Converts an output range into an output stream.
-template <concepts::outputRange Range, class... Args>
-requires(!concepts::outputStreamRange<Range>)
-constexpr Optional<Size> toString(Range&& range, Args&&... args) noexcept
+struct FromStringMetadata
 {
-	range::Stream stream{bzd::begin(range), bzd::end(range)};
-	return bzd::toString(stream, bzd::forward<Args>(args)...);
-}
-*/
+	bzd::Size index{0u};
+	bzd::StringView pattern{};
+};
+
+namespace typeTraits {
+
+/// Match the Matcher specialization.
+template <class... Args>
+struct Matcher : ::bzd::Matcher<typeTraits::RemoveCVRef<Args>...>
+{
+};
+
+/// Match the Matcher specialization when invoked with metadata.
+template <class T, concepts::sameClassAs<FromStringMetadata> Metadata>
+struct Matcher<T, Metadata> : ::bzd::Matcher<typeTraits::RemoveCVRef<T>>
+{
+};
+
+} // namespace typeTraits
+
 /// Match the value of a data type from a byte stream.
 ///
 /// \param range The input range to be read from.
@@ -61,7 +62,7 @@ constexpr Optional<Size> toString(Range&& range, Args&&... args) noexcept
 template <concepts::inputStreamRange Range, class... Args>
 constexpr Optional<Size> fromString(Range&& range, Args&&... args) noexcept
 {
-	return ::bzd::Formatter<typeTraits::RemoveCVRef<Args>...>::fromString(bzd::forward<Range>(range), bzd::forward<Args>(args)...);
+	return ::bzd::typeTraits::Matcher<Args...>::fromString(bzd::forward<Range>(range), bzd::forward<Args>(args)...);
 }
 
 /// \copydoc fromString
@@ -80,9 +81,8 @@ namespace bzd::concepts {
 
 /// Checks if a specific specialization for fromString exists.
 template <class Range, class... Args>
-concept fromStringSpecialization =
-	requires(Range&& range, Args&&... args) {
-		::bzd::Formatter<typeTraits::RemoveCVRef<Args>...>::fromString(bzd::forward<Range>(range), bzd::forward<Args>(args)...);
-	};
+concept fromString = requires(Range&& range, Args&&... args) {
+						 ::bzd::typeTraits::Matcher<Args...>::fromString(bzd::forward<Range>(range), bzd::forward<Args>(args)...);
+					 };
 
 } // namespace bzd::concepts
