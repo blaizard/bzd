@@ -12,6 +12,7 @@ cc_library(
         "//cc/bzd/meta:always_false",
         "//cc/bzd/type_traits:container",
         "//cc/bzd/type_traits:is_same_class",
+        "//cc/bzd/container:string_view"
     ],
 )
 
