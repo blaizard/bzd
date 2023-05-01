@@ -10,6 +10,7 @@ bzd_cc_library(
         ":contains",
         ":find",
         ":find_conditional",
+        ":last",
         ":macro",
         ":range",
         ":string_literal",
@@ -77,6 +78,17 @@ cc_library(
         ":find_conditional",
         "//cc/bzd/platform:types",
         "//cc/bzd/type_traits:is_same",
+    ],
+)
+
+cc_library(
+    name = "last",
+    hdrs = [
+        "last.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":type",
     ],
 )
 

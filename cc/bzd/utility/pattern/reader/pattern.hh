@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cc/bzd/container/string.hh"
 #include "cc/bzd/type_traits/container.hh"
 #include "cc/bzd/utility/pattern/pattern.hh"
 #include "cc/bzd/utility/pattern/reader/base.hh"
@@ -9,21 +10,15 @@
 
 namespace bzd::reader::impl {
 
-struct Metadata
-{
-	bzd::Size index{0u};
-	bzd::StringView pattern{};
-};
-
-// ---- Formatter ----
+// ---- Matcher ----
 
 class StringReader
 {
 public:
 	template <class Range, class T>
-	static constexpr auto process(Range& range, T& value, [[maybe_unused]] const Metadata& metadata) noexcept
+	static constexpr auto process(Range& range, T& value, [[maybe_unused]] const FromStringMetadata& metadata) noexcept
 	{
-		if constexpr (bzd::concepts::fromStringSpecialization<Range, T&, const Metadata&>)
+		if constexpr (bzd::concepts::fromString<Range, T&, const FromStringMetadata&>)
 		{
 			return ::bzd::fromString(range, value, metadata);
 		}
@@ -37,7 +32,7 @@ public:
 class Schema
 {
 public:
-	using Metadata = bzd::reader::impl::Metadata;
+	using Metadata = bzd::FromStringMetadata;
 
 	template <class Adapter>
 	static constexpr void parse(Metadata&, bzd::StringView& pattern) noexcept
@@ -51,19 +46,12 @@ public:
 	}
 };
 
-/// Try to match a range with a pattern.
-template <bzd::concepts::inputStreamRange Range>
-constexpr bzd::Optional<bzd::Size> match(Range&&, const bzd::StringView) noexcept
-{
-	return bzd::nullopt;
-}
-
 } // namespace bzd::reader::impl
 
 namespace bzd {
 
-template <concepts::constexprStringView T, class... Args>
-struct Formatter<T, Args...>
+template <concepts::constexprStringView T, class... Ts>
+struct Matcher<T, Ts...>
 {
 	// Proposed syntax:
 	// - Matches the string, unless:
@@ -76,11 +64,12 @@ struct Formatter<T, Args...>
 	// For example:
 	// - "HTTP{:f}\s+{:i}\s+{[A-Z]*}"
 	// fromString(myString, ".*{}.*"_csv, )
-	template <bzd::concepts::inputStreamRange Range>
-	static constexpr Optional<Size> fromString(Range&& range, const T& pattern, Args&... args) noexcept
+	template <bzd::concepts::inputStreamRange Range, class... Args>
+	static constexpr Optional<Size> fromString(Range&& range, const T& pattern, Args&&... args) noexcept
 	{
 		auto [context, processor] =
-			bzd::pattern::impl::make<Range, bzd::reader::impl::StringReader, bzd::reader::impl::Schema>(pattern, args...);
+			bzd::pattern::impl::make<Range, bzd::reader::impl::StringReader, bzd::reader::impl::Schema>(pattern,
+																										bzd::forward<Args>(args)...);
 		Size counter{0u};
 
 		// Run-time call
@@ -108,6 +97,22 @@ struct Formatter<T, Args...>
 		}
 
 		return counter;
+	}
+};
+
+template <concepts::outputStreamRange Output>
+struct Matcher<Output>
+{
+	template <bzd::concepts::inputStreamRange Range>
+	static constexpr Optional<Size> fromString(Range&&, Output&, const FromStringMetadata&) noexcept
+	{
+		return 0u;
+	}
+
+	template <class Adapter, class ValueType>
+	static constexpr void check(const FromStringMetadata&) noexcept
+	{
+		// TO BE IMPLEMENTED.
 	}
 };
 
