@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cc/bzd/container/string.hh"
+#include "cc/bzd/container/variant.hh"
 #include "cc/bzd/type_traits/container.hh"
 #include "cc/bzd/utility/pattern/pattern.hh"
 #include "cc/bzd/utility/pattern/reader/base.hh"
@@ -16,7 +17,7 @@ class StringReader
 {
 public:
 	template <class Range, class T>
-	static constexpr auto process(Range& range, T& value, [[maybe_unused]] const FromStringMetadata& metadata) noexcept
+	static constexpr auto process(Range& range, T& value, [[maybe_unused]] const auto& metadata) noexcept
 	{
 		if constexpr (bzd::concepts::fromString<Range, T&, const FromStringMetadata&>)
 		{
@@ -34,6 +35,19 @@ class Schema
 public:
 	using Metadata = bzd::FromStringMetadata;
 
+	static constexpr bool isTestFeature = true;
+
+	/// Check if a specialization implements a custom metadata.
+	template <class T>
+	static constexpr Bool hasMetadata() noexcept
+	{
+		return concepts::matcherMetadata<T>;
+	}
+
+	/// Get the specialization associated with a type.
+	template <class T>
+	using Specialization = typename typeTraits::template Matcher<T>;
+
 	template <class Adapter>
 	static constexpr void parse(Metadata&, bzd::StringView& pattern) noexcept
 	{
@@ -50,8 +64,8 @@ public:
 
 namespace bzd {
 
-template <concepts::constexprStringView T, class... Ts>
-struct Matcher<T, Ts...>
+template <concepts::constexprStringView T>
+struct Matcher<T>
 {
 	// Proposed syntax:
 	// - Matches the string, unless:
@@ -87,7 +101,7 @@ struct Matcher<T, Ts...>
 			}
 			if (fragment.isMetadata)
 			{
-				const auto maybeSize = processor.process(range, fragment.metadata);
+				const auto maybeSize = processor.process(range, fragment);
 				if (!maybeSize)
 				{
 					return bzd::nullopt;
@@ -103,16 +117,27 @@ struct Matcher<T, Ts...>
 template <concepts::outputStreamRange Output>
 struct Matcher<Output>
 {
+	struct Metadata
+	{
+		bzd::StringView regexpr{"[^\\w]+"};
+	};
+
 	template <bzd::concepts::inputStreamRange Range>
 	static constexpr Optional<Size> fromString(Range&&, Output&, const FromStringMetadata&) noexcept
 	{
 		return 0u;
 	}
 
-	template <class Adapter, class ValueType>
-	static constexpr void check(const FromStringMetadata&) noexcept
+	template <class Adapter>
+	static constexpr Metadata parse(bzd::StringView& pattern) noexcept
 	{
-		// TO BE IMPLEMENTED.
+		Size index = 0u;
+		for (; index < pattern.size() && pattern[index] != '}'; ++index)
+		{
+		}
+		Metadata metadata{pattern.subStr(0u, index)};
+		pattern.removePrefix(index);
+		return metadata;
 	}
 };
 

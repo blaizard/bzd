@@ -13,7 +13,7 @@ public:
 	static constexpr auto make(const Args&... args) noexcept
 	{
 		// Make the actual lambda
-		const auto lambdas = bzd::makeTuple([&args](Range& range, const typename Adapter::Metadata& metadata) -> bzd::Async<> {
+		const auto lambdas = bzd::makeTuple([&args](Range& range, const auto& metadata) -> bzd::Async<> {
 			co_await !Adapter::process(range, args, metadata);
 			co_return {};
 		}...);
@@ -28,77 +28,78 @@ private:
 	public:
 		constexpr ProcessorType(Lambdas& lambdas) noexcept : lambdas_{lambdas} {}
 
-		bzd::Async<> process(Range& range, const typename Adapter::Metadata& metadata) const noexcept
+		template <class Fragment>
+		bzd::Async<> process(Range& range, const Fragment& fragment) const noexcept
 		{
-			const auto index = metadata.index;
+			const auto index = fragment.index;
 			if constexpr (Lambdas::size() > 0)
 			{
 				if (index == 0)
 				{
-					co_await !lambdas_.template get<0>()(range, metadata);
+					co_await !lambdas_.template get<0>()(range, fragment.metadata);
 				}
 			}
 			if constexpr (Lambdas::size() > 1)
 			{
 				if (index == 1)
 				{
-					co_await !lambdas_.template get<1>()(range, metadata);
+					co_await !lambdas_.template get<1>()(range, fragment.metadata);
 				}
 			}
 			if constexpr (Lambdas::size() > 2)
 			{
 				if (index == 2)
 				{
-					co_await !lambdas_.template get<2>()(range, metadata);
+					co_await !lambdas_.template get<2>()(range, fragment.metadata);
 				}
 			}
 			if constexpr (Lambdas::size() > 3)
 			{
 				if (index == 3)
 				{
-					co_await !lambdas_.template get<3>()(range, metadata);
+					co_await !lambdas_.template get<3>()(range, fragment.metadata);
 				}
 			}
 			if constexpr (Lambdas::size() > 4)
 			{
 				if (index == 4)
 				{
-					co_await !lambdas_.template get<4>()(range, metadata);
+					co_await !lambdas_.template get<4>()(range, fragment.metadata);
 				}
 			}
 			if constexpr (Lambdas::size() > 5)
 			{
 				if (index == 5)
 				{
-					co_await !lambdas_.template get<5>()(range, metadata);
+					co_await !lambdas_.template get<5>()(range, fragment.metadata);
 				}
 			}
 			if constexpr (Lambdas::size() > 6)
 			{
 				if (index == 6)
 				{
-					co_await !lambdas_.template get<6>()(range, metadata);
+					co_await !lambdas_.template get<6>()(range, fragment.metadata);
 				}
 			}
 			if constexpr (Lambdas::size() > 7)
 			{
 				if (index == 7)
 				{
-					co_await !lambdas_.template get<7>()(range, metadata);
+					co_await !lambdas_.template get<7>()(range, fragment.metadata);
 				}
 			}
 			if constexpr (Lambdas::size() > 8)
 			{
 				if (index == 8)
 				{
-					co_await !lambdas_.template get<8>()(range, metadata);
+					co_await !lambdas_.template get<8>()(range, fragment.metadata);
 				}
 			}
 			if constexpr (Lambdas::size() > 9)
 			{
 				if (index == 9)
 				{
-					co_await !lambdas_.template get<9>()(range, metadata);
+					co_await !lambdas_.template get<9>()(range, fragment.metadata);
 				}
 			}
 			static_assert(Lambdas::size() <= 10, "Too many arguments passed to format, not supported.");
@@ -126,7 +127,7 @@ constexpr auto makeAsync(const Pattern&, Args&... args) noexcept
 
 		return bzd::makeTuple(bzd::move(parser), bzd::move(processor));
 	*/
-	constexpr auto iterable = parse<Adapter<ConstexprAssert, Formatter, Schema>, Pattern>();
+	constexpr auto iterable = parse<Adapter<ConstexprAssert, Formatter, Schema>, Pattern, Args...>();
 	static_assert(iterable.size() > 0, "Compile-time string format check failed.");
 	auto processor = ProcessorAsync<Range, Adapter<RuntimeAssert, Formatter, Schema>>::make(args...);
 

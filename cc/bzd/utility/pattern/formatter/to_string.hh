@@ -37,7 +37,6 @@ struct Metadata
 		pointer
 	};
 
-	bzd::Size index = 0;
 	Sign sign = Sign::automatic;
 	bool alternate = false;
 	bool isPrecision = false;
@@ -70,10 +69,128 @@ public:
 
 // ---- Schema ----
 
+class SpecializationTemp
+{
+public:
+	using Metadata = bzd::format::impl::Metadata;
+	template <class Adapter>
+	static constexpr Metadata parse(bzd::StringView& format) noexcept
+	{
+		Metadata metadata{};
+
+		// Parse sign: [sign]
+		parseSign<Adapter>(format, metadata);
+		Adapter::assertTrue(format.size() > 0, "Replacement field format ended abruptly (after parseSign)");
+
+		// Parse alternate form [#]
+		if (format.front() == '#')
+		{
+			metadata.alternate = true;
+			format.removePrefix(1);
+			Adapter::assertTrue(format.size() > 0, "Replacement field format ended abruptly '#')");
+		}
+
+		// Parse precision [.precision]
+		if (format.front() == '.')
+		{
+			format.removePrefix(1);
+			metadata.isPrecision = parseUnsignedInteger(format, metadata.precision);
+			Adapter::assertTrue(format.size() > 0, "Replacement field format ended abruptly (after precision)");
+		}
+
+		// Parse type [type]
+		if (format.front() != '}')
+		{
+			switch (format.front())
+			{
+			case 'b':
+				metadata.format = Metadata::Format::binary;
+				break;
+			case 'd':
+				metadata.format = Metadata::Format::decimal;
+				break;
+			case 'o':
+				metadata.format = Metadata::Format::octal;
+				break;
+			case 'x':
+				metadata.format = Metadata::Format::hexadecimal_lower;
+				break;
+			case 'X':
+				metadata.format = Metadata::Format::hexadecimal_upper;
+				break;
+			case 'f':
+				metadata.format = Metadata::Format::fixed_point;
+				break;
+			case '%':
+				metadata.format = Metadata::Format::fixed_point_percent;
+				break;
+			case 'p':
+				metadata.format = Metadata::Format::pointer;
+				break;
+			default:
+				Adapter::onError("Unsupported conversion format, only the following is "
+								 "supported: [bdoxXfp%]");
+			}
+			format.removePrefix(1);
+			Adapter::assertTrue(format.size() > 0, "Replacement field format ended abruptly (after type)");
+		}
+
+		return metadata;
+	}
+
+private:
+	/// Parse an unsigned integer
+	static constexpr bool parseUnsignedInteger(bzd::StringView& format, bzd::Size& integer) noexcept
+	{
+		bool isDefined = false;
+		integer = 0;
+		for (; format.size() > 0 && format.front() >= '0' && format.front() <= '9';)
+		{
+			isDefined = true;
+			integer = integer * 10 + (format.front() - '0');
+			format.removePrefix(1);
+		}
+		return isDefined;
+	}
+
+	// Sign
+
+	template <class Adapter>
+	static constexpr void parseSign(bzd::StringView& format, Metadata& metadata) noexcept
+	{
+		switch (format.front())
+		{
+		case '+':
+			metadata.sign = Metadata::Sign::always;
+			break;
+		case '-':
+			metadata.sign = Metadata::Sign::only_negative;
+			break;
+		}
+		if (metadata.sign != Metadata::Sign::automatic)
+		{
+			format.removePrefix(1);
+		}
+	}
+};
+
 class SchemaFormat
 {
 public:
 	using Metadata = bzd::format::impl::Metadata;
+
+	static constexpr bool isTestFeature = false;
+
+	/// Check if a specialization implements a custom metadata.
+	template <class T>
+	static constexpr Bool hasMetadata() noexcept
+	{
+		return true;
+	}
+
+	/// Get the specialization associated with a type.
+	template <class T>
+	using Specialization = SpecializationTemp;
 
 	/// \brief Parse a metadata conversion string.
 	///
@@ -380,7 +497,7 @@ constexpr bzd::Optional<bzd::Size> toString(Container& str, const Pattern& patte
 		}
 		if (result.isMetadata)
 		{
-			const auto maybeCount = processor.process(str, result.metadata);
+			const auto maybeCount = processor.process(str, result);
 			if (!maybeCount)
 			{
 				return bzd::nullopt;
