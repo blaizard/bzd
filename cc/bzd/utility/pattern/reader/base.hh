@@ -27,6 +27,20 @@ namespace bzd {
 ///     static constexpr Optional<Size> fromString(Range&& range, T& value) noexcept { ... }
 /// };
 /// \endcode
+///
+/// or with metadata:
+/// \code
+/// template <concepts::??? T>
+/// struct Matcher<T>
+/// {
+///     struct Metadata {};
+///
+///     static constexpr Metadata metadata() noexcept { .... }
+///
+///     template <concepts::inputStreamRange Range>
+///     static constexpr Optional<Size> fromString(Range&& range, T& value, const Metadata) noexcept { ... }
+/// };
+/// \endcode
 template <class... Args>
 struct Matcher
 {
@@ -42,14 +56,8 @@ struct FromStringMetadata
 namespace typeTraits {
 
 /// Match the Matcher specialization.
-template <class... Args>
-struct Matcher : ::bzd::Matcher<typeTraits::RemoveCVRef<Args>...>
-{
-};
-
-/// Match the Matcher specialization when invoked with metadata.
-template <class T, concepts::sameClassAs<FromStringMetadata> Metadata>
-struct Matcher<T, Metadata> : ::bzd::Matcher<typeTraits::RemoveCVRef<T>>
+template <class T, class... Ts>
+struct Matcher : ::bzd::Matcher<typeTraits::RemoveCVRef<T>>
 {
 };
 
@@ -85,5 +93,9 @@ template <class Range, class... Args>
 concept fromString = requires(Range&& range, Args&&... args) {
 						 ::bzd::typeTraits::Matcher<Args...>::fromString(bzd::forward<Range>(range), bzd::forward<Args>(args)...);
 					 };
+
+/// Checks if a Matcher specialization has metadata.
+template <class... Args>
+concept matcherMetadata = requires { typename ::bzd::typeTraits::template Matcher<Args...>::Metadata; };
 
 } // namespace bzd::concepts

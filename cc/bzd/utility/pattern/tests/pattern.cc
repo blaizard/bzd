@@ -9,6 +9,19 @@
 class TestSchema
 {
 public:
+	static constexpr bool isTestFeature = false;
+
+	/// Check if a specialization implements a custom metadata.
+	template <class T>
+	static constexpr bool hasMetadata() noexcept
+	{
+		return false;
+	}
+
+	/// Get the specialization associated with a type.
+	template <class T>
+	using Specialization = void;
+
 	struct Metadata
 	{
 		bzd::Size index{};
@@ -138,9 +151,10 @@ TEST(Format, Parser)
 		[[maybe_unused]] constexpr auto context = bzd::pattern::impl::parse<TestAdapater, decltype("Hello"_csv)>();
 	}
 	{
-		[[maybe_unused]] constexpr auto context = bzd::pattern::impl::parse<TestAdapater, decltype("Hello {}"_csv)>();
+		[[maybe_unused]] constexpr auto context = bzd::pattern::impl::parse<TestAdapater, decltype("Hello {}"_csv), int>();
 	}
 	{
-		[[maybe_unused]] constexpr auto context = bzd::pattern::impl::parse<TestAdapater, decltype("Hello {} you {} {}{}"_csv)>();
+		[[maybe_unused]] constexpr auto context =
+			bzd::pattern::impl::parse<TestAdapater, decltype("Hello {} you {} {}{}"_csv), int, int, int, int>();
 	}
 }

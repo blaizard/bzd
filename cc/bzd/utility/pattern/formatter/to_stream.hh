@@ -70,7 +70,7 @@ bzd::Async<> toStream(bzd::OStream& stream, const Pattern& pattern, const Args&.
 		}
 		if (result.isMetadata)
 		{
-			co_await !processor.process(stream, result.metadata);
+			co_await !processor.process(stream, result);
 		}
 	}
 

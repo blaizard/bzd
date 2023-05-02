@@ -8,11 +8,11 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/container:optional",
+        "//cc/bzd/container:string_view",
         "//cc/bzd/container/range:stream",
         "//cc/bzd/meta:always_false",
         "//cc/bzd/type_traits:container",
         "//cc/bzd/type_traits:is_same_class",
-        "//cc/bzd/container:string_view"
     ],
 )
 
@@ -63,6 +63,7 @@ cc_library(
         ":integral",
         ":regexpr",
         "//cc/bzd/container:string",
+        "//cc/bzd/container:variant",
         "//cc/bzd/type_traits:container",
         "//cc/bzd/utility/pattern",
     ],

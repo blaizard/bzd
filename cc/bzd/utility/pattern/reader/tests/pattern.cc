@@ -24,6 +24,17 @@ TEST(PatternFromString, NoArguments)
 	EXPECT_FALSE(result2);
 }
 
+TEST(PatternFromString, MatcherMetadata)
+{
+	{
+		bzd::String<12> string{""};
+		auto appender = string.appender();
+		EXPECT_TRUE(bzd::concepts::matcherMetadata<decltype(appender)>);
+	}
+	EXPECT_FALSE(bzd::concepts::matcherMetadata<int>);
+	EXPECT_FALSE(bzd::concepts::matcherMetadata<unsigned int&>);
+}
+
 TEST(PatternFromString, SimpleArguments)
 {
 	{

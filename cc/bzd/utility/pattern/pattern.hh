@@ -118,12 +118,61 @@ constexpr bzd::Size parseIndex(bzd::StringView& pattern, const bzd::Size autoInd
 	return (maybeIndex) ? index : autoIndex;
 }
 
-template <class Adapter, bzd::concepts::constexprStringView Pattern>
+struct DefaultMetadata
+{
+	using Metadata = bzd::StringView;
+	template <class Adapter>
+	static constexpr Metadata parse(bzd::StringView& pattern) noexcept
+	{
+		Size index = 0u;
+		for (; index < pattern.size() && pattern[index] != '}'; ++index)
+		{
+		}
+		const auto result = pattern.subStr(0u, index);
+		pattern.removePrefix(index);
+		return result;
+	}
+};
+
+template <class Metadata, class Adapter, class Tuple, Size index = Tuple::size()>
+constexpr Metadata parseMetadata(const Size metadataIndex, bzd::StringView& pattern) noexcept
+{
+	if constexpr (index > 0)
+	{
+		using ValueType = bzd::typeTraits::RemoveCVRef<typename Tuple::template Get<index - 1>>;
+		if (metadataIndex == index - 1)
+		{
+			if constexpr (Adapter::template hasMetadata<ValueType>())
+			{
+				return Adapter::template Specialization<ValueType>::template parse<Adapter>(pattern);
+			}
+			else
+			{
+				return DefaultMetadata::template parse<Adapter>(pattern);
+			}
+		}
+
+		return parseMetadata<Metadata, Adapter, Tuple, index - 1>(metadataIndex, pattern);
+	}
+
+	return {};
+}
+
+template <class Adapter, class T>
+using Metadata = typename typeTraits::
+	Conditional<Adapter::template hasMetadata<T>(), typename Adapter::template Specialization<T>, DefaultMetadata>::Metadata;
+
+template <class Adapter, bzd::concepts::constexprStringView Pattern, class... Args>
 constexpr auto parse() noexcept
 {
+	using Tuple = bzd::meta::Tuple<Args...>;
+	using MetadataVariant = bzd::Variant<bzd::Monostate, Metadata<Adapter, Args>...>;
+
 	struct Result : public ResultStaticString
 	{
+		Size index{};
 		typename Adapter::Metadata metadata{};
+		MetadataVariant metadatas{};
 	};
 
 	// Calculate the size and make the output array.
@@ -143,11 +192,30 @@ constexpr auto parse() noexcept
 			Adapter::assertTrue(pattern.size() > 1, "Unexpected return state for parseStaticString");
 			pattern.removePrefix(1);
 			// Look for the index
-			results[index].metadata.index = parseIndex<Adapter>(pattern, autoIndex++);
+			results[index].index = parseIndex<Adapter>(pattern, autoIndex++);
 			Adapter::assertTrue(pattern.size() > 0, "Replacement field pattern ended abruptly (after parseIndex)");
+			Adapter::assertTrue(results[index].index < Tuple::size(),
+								"The index of one for the field is greater than the number of argument provided.");
+			auto copyPattern = pattern;
+			results[index].metadatas = parseMetadata<MetadataVariant, Adapter, Tuple>(results[index].index, copyPattern);
+			Adapter::assertTrue(!results[index].metadatas.template is<bzd::Monostate>(), "The metadata was not processed.");
+			Adapter::assertTrue(copyPattern.size() > 0, "Replacement field pattern ended abruptly (after parseIndex)");
+			Adapter::assertTrue(copyPattern.front() == '}', "Invalid format for replacement field, expecting '}'");
+			copyPattern.removePrefix(1);
 			Adapter::template parse<Adapter>(results[index].metadata, pattern);
 		}
 		++index;
+	}
+
+	// Ensure that all arguments have been taken into account within the pattern.
+	for (Size index = 0; index < Tuple::size(); ++index)
+	{
+		bool usedAtLeastOnce = false;
+		for (const auto& result : results)
+		{
+			usedAtLeastOnce |= (result.isMetadata && result.index == index);
+		}
+		Adapter::assertTrue(usedAtLeastOnce, "At least one argument is not being used by the formating string");
 	}
 
 	return results;
@@ -190,9 +258,8 @@ constexpr bool contextCheck(const Context& context, const T& tuple) noexcept
 		{
 			if (fragment.isMetadata)
 			{
-				Adapter::assertTrue(fragment.metadata.index < T::size(),
-									"The index specified is greater than the number of arguments provided");
-				if (fragment.metadata.index == index - 1)
+				Adapter::assertTrue(fragment.index < T::size(), "The index specified is greater than the number of arguments provided");
+				if (fragment.index == index - 1)
 				{
 					usedAtLeastOnce = true;
 					Adapter::template check<Adapter, ValueType>(fragment.metadata);
@@ -215,9 +282,8 @@ public:
 	static constexpr auto make(Args&... args) noexcept
 	{
 		// Make the actual lambda
-		const auto lambdas = bzd::makeTuple([&args](Range & range, const typename Adapter::Metadata& metadata) -> auto{
-			return Adapter::process(range, args, metadata);
-		}...);
+		const auto lambdas =
+			bzd::makeTuple([&args](Range & range, const auto& metadata) -> auto{ return Adapter::process(range, args, metadata); }...);
 
 		return ProcessorType<decltype(lambdas)>{lambdas};
 	}
@@ -229,15 +295,16 @@ private:
 	public:
 		constexpr ProcessorType(Lambdas& lambdas) noexcept : lambdas_{lambdas} {}
 
-		constexpr bzd::Optional<bzd::Size> process(Range& range, const typename Adapter::Metadata& metadata) const noexcept
+		template <class Fragment>
+		constexpr bzd::Optional<bzd::Size> process(Range& range, const Fragment& fragment) const noexcept
 		{
-			const auto index = metadata.index;
+			const auto index = fragment.index;
 			Size counter = 0;
 			bzd::Optional<bzd::Size> result{};
 			constexprForContainerInc(lambdas_, [&](auto lambda) {
 				if (counter++ == index)
 				{
-					result = lambda(range, metadata);
+					result = lambda(range, fragment.metadata);
 				}
 			});
 			return result;
@@ -254,7 +321,7 @@ constexpr auto make(const Pattern&, Args&&... args) noexcept
 	using ConstexprAdapter = Adapter<ConstexprAssert, Formatter, Schema>;
 
 	constexpr const bzd::meta::Tuple<Args...> tuple{};
-	constexpr auto context = parse<ConstexprAdapter, Pattern>();
+	constexpr auto context = parse<ConstexprAdapter, Pattern, Args...>();
 	constexpr auto isValid = contextCheck<Range, decltype(tuple)::size(), ConstexprAdapter>(context, tuple);
 	static_assert(isValid, "Compile-time string format check failed.");
 
