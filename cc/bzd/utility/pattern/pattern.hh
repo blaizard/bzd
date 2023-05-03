@@ -1,11 +1,12 @@
 #pragma once
 
+#include "cc/bzd/container/function_ref.hh"
 #include "cc/bzd/container/optional.hh"
 #include "cc/bzd/container/string_view.hh"
 #include "cc/bzd/container/tuple.hh"
 #include "cc/bzd/container/vector.hh"
 #include "cc/bzd/core/assert/minimal.hh"
-#include "cc/bzd/meta/tuple.hh"
+#include "cc/bzd/utility/apply.hh"
 #include "cc/bzd/utility/constexpr_for.hh"
 #include "cc/bzd/utility/ignore.hh"
 #include "cc/bzd/utility/pattern/reader/integral.hh"
@@ -134,45 +135,43 @@ struct DefaultMetadata
 	}
 };
 
-template <class Metadata, class Adapter, class Tuple, Size index = Tuple::size()>
-constexpr Metadata parseMetadata(const Size metadataIndex, bzd::StringView& pattern) noexcept
-{
-	if constexpr (index > 0)
-	{
-		using ValueType = bzd::typeTraits::RemoveCVRef<typename Tuple::template Get<index - 1>>;
-		if (metadataIndex == index - 1)
-		{
-			if constexpr (Adapter::template hasMetadata<ValueType>())
-			{
-				return Adapter::template Specialization<ValueType>::template parse<Adapter>(pattern);
-			}
-			else
-			{
-				return DefaultMetadata::template parse<Adapter>(pattern);
-			}
-		}
+template <class Adapter, class T>
+using Metadata = typename typeTraits::
+	Conditional<Adapter::template hasMetadata<T>(), typename Adapter::template Specialization<T>, DefaultMetadata>::Metadata;
 
-		return parseMetadata<Metadata, Adapter, Tuple, index - 1>(metadataIndex, pattern);
+template <class Adapter, class... Args>
+using Metadatas = bzd::Variant<bzd::Monostate, Metadata<Adapter, Args>...>;
+
+template <class ReturnType, class Adapter, class T, class... Ts>
+constexpr ReturnType parseMetadata(const Size metadataIndex, bzd::StringView& pattern, const Size index = 0u) noexcept
+{
+	if (metadataIndex == index)
+	{
+		if constexpr (Adapter::template hasMetadata<T>())
+		{
+			return Adapter::template Specialization<T>::template parse<Adapter>(pattern);
+		}
+		else
+		{
+			return DefaultMetadata::template parse<Adapter>(pattern);
+		}
+	}
+
+	if constexpr (sizeof...(Ts))
+	{
+		return parseMetadata<ReturnType, Adapter, Ts...>(metadataIndex, pattern, index + 1u);
 	}
 
 	return {};
 }
 
-template <class Adapter, class T>
-using Metadata = typename typeTraits::
-	Conditional<Adapter::template hasMetadata<T>(), typename Adapter::template Specialization<T>, DefaultMetadata>::Metadata;
-
 template <class Adapter, bzd::concepts::constexprStringView Pattern, class... Args>
 constexpr auto parse() noexcept
 {
-	using Tuple = bzd::meta::Tuple<Args...>;
-	using MetadataVariant = bzd::Variant<bzd::Monostate, Metadata<Adapter, Args>...>;
-
 	struct Result : public ResultStaticString
 	{
 		Size index{};
-		typename Adapter::Metadata metadata{};
-		MetadataVariant metadatas{};
+		Metadatas<Adapter, Args...> metadatas{};
 	};
 
 	// Calculate the size and make the output array.
@@ -194,21 +193,22 @@ constexpr auto parse() noexcept
 			// Look for the index
 			results[index].index = parseIndex<Adapter>(pattern, autoIndex++);
 			Adapter::assertTrue(pattern.size() > 0, "Replacement field pattern ended abruptly (after parseIndex)");
-			Adapter::assertTrue(results[index].index < Tuple::size(),
+			Adapter::assertTrue(sizeof...(Args) >= 0 && results[index].index < sizeof...(Args),
 								"The index of one for the field is greater than the number of argument provided.");
-			auto copyPattern = pattern;
-			results[index].metadatas = parseMetadata<MetadataVariant, Adapter, Tuple>(results[index].index, copyPattern);
-			Adapter::assertTrue(!results[index].metadatas.template is<bzd::Monostate>(), "The metadata was not processed.");
-			Adapter::assertTrue(copyPattern.size() > 0, "Replacement field pattern ended abruptly (after parseIndex)");
-			Adapter::assertTrue(copyPattern.front() == '}', "Invalid format for replacement field, expecting '}'");
-			copyPattern.removePrefix(1);
-			Adapter::template parse<Adapter>(results[index].metadata, pattern);
+			if constexpr (sizeof...(Args))
+			{
+				results[index].metadatas = parseMetadata<decltype(Result::metadatas), Adapter, Args...>(results[index].index, pattern);
+				Adapter::assertTrue(!results[index].metadatas.template is<bzd::Monostate>(), "The metadata was not processed.");
+				Adapter::assertTrue(pattern.size() > 0, "Replacement field pattern ended abruptly (after parseIndex)");
+				Adapter::assertTrue(pattern.front() == '}', "Invalid format for replacement field, expecting '}'");
+				pattern.removePrefix(1);
+			}
 		}
 		++index;
 	}
 
 	// Ensure that all arguments have been taken into account within the pattern.
-	for (Size index = 0; index < Tuple::size(); ++index)
+	for (Size index = 0; index < sizeof...(Args); ++index)
 	{
 		bool usedAtLeastOnce = false;
 		for (const auto& result : results)
@@ -236,44 +236,6 @@ public:
 	}
 };
 
-template <class Adapter, class Range, class Value, class Metadata>
-concept compatibleProcessor = requires(Range& range, Value& value, Metadata& metadata) { Adapter::process(range, value, metadata); };
-
-/// Check the pattern context.
-///
-/// Check the pattern context with the argument type, this to ensure type safety.
-/// This function should only be used at compile time.
-template <class Range, Size index, class Adapter, class Context, class T>
-constexpr bool contextCheck(const Context& context, const T& tuple) noexcept
-{
-	if constexpr (index > 0)
-	{
-		using ValueType = bzd::typeTraits::RemoveCVRef<typename T::template Get<index - 1>>;
-
-		Adapter::assertTrue(compatibleProcessor<Adapter, Range, ValueType, typename Adapter::Metadata>,
-							"This value type does not have any compatible processor.");
-
-		bool usedAtLeastOnce = false;
-		for (const auto& fragment : context)
-		{
-			if (fragment.isMetadata)
-			{
-				Adapter::assertTrue(fragment.index < T::size(), "The index specified is greater than the number of arguments provided");
-				if (fragment.index == index - 1)
-				{
-					usedAtLeastOnce = true;
-					Adapter::template check<Adapter, ValueType>(fragment.metadata);
-				}
-			}
-		}
-
-		Adapter::assertTrue(usedAtLeastOnce, "At least one argument is not being used by the formating string");
-		bzd::ignore = contextCheck<Range, index - 1, Adapter>(context, tuple);
-	}
-
-	return true;
-}
-
 template <class Range, class Adapter>
 class Processor
 {
@@ -281,9 +243,21 @@ public:
 	template <class... Args>
 	static constexpr auto make(Args&... args) noexcept
 	{
-		// Make the actual lambda
-		const auto lambdas =
-			bzd::makeTuple([&args](Range & range, const auto& metadata) -> auto{ return Adapter::process(range, args, metadata); }...);
+		// Make a lambda that capture the arguments and cast the Metadata type into the correct one.
+		const auto lambdas = bzd::makeTuple([&args](Range & range, const Metadatas<Adapter, Args...>& metadatas) -> auto{
+			const auto& metadata = metadatas.template get<Metadata<Adapter, Args>>();
+			return Adapter::process(range, args, metadata);
+		}...);
+		/*const auto lambdasErased = bzd::apply([](const auto&... items) -> auto {
+			if constexpr (sizeof...(Args))
+			{
+				return bzd::makeArray(bzd::FunctionRef<bzd::Optional<bzd::Size>(Range&, const MetadataVariant&)>{items}...);
+			}
+			else
+			{
+				return nullptr;
+			}
+		}, lambdas);*/
 
 		return ProcessorType<decltype(lambdas)>{lambdas};
 	}
@@ -304,7 +278,7 @@ private:
 			constexprForContainerInc(lambdas_, [&](auto lambda) {
 				if (counter++ == index)
 				{
-					result = lambda(range, fragment.metadata);
+					result = lambda(range, fragment.metadatas);
 				}
 			});
 			return result;
@@ -319,12 +293,8 @@ template <class Range, class Formatter, class Schema, bzd::concepts::constexprSt
 constexpr auto make(const Pattern&, Args&&... args) noexcept
 {
 	using ConstexprAdapter = Adapter<ConstexprAssert, Formatter, Schema>;
-
-	constexpr const bzd::meta::Tuple<Args...> tuple{};
 	constexpr auto context = parse<ConstexprAdapter, Pattern, Args...>();
-	constexpr auto isValid = contextCheck<Range, decltype(tuple)::size(), ConstexprAdapter>(context, tuple);
-	static_assert(isValid, "Compile-time string format check failed.");
-
+	static_assert(context.size() >= 0, "Compile-time string format check failed.");
 	auto processor = Processor<Range, Adapter<RuntimeAssert, Formatter, Schema>>::make(args...);
 
 	return bzd::makeTuple(bzd::move(context), bzd::move(processor));

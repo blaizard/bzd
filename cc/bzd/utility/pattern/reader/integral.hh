@@ -22,11 +22,13 @@ private:
 		inPlace, '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
 public:
-	template <concepts::inputStreamRange Range, Size base = 10, concepts::range Digits = decltype(digitsPredefined)>
-	static constexpr Optional<Size> fromString(Range&& range, T& data, const Digits& digits = digitsPredefined) noexcept
+	template <concepts::inputStreamRange Range, Size base = 10>		   //, concepts::range Digits = decltype(digitsPredefined)>
+	static constexpr Optional<Size> fromString(Range&& range, T& data) //, const Digits& digits = digitsPredefined) noexcept
 	{
+		const auto& digits = digitsPredefined;
+
 		static_assert(base > 1 && base <= 16, "Invalid base size.");
-		static_assert(Digits::size() >= base, "There is not enough digits for the base.");
+		// static_assert(Digits::size() >= base, "There is not enough digits for the base.");
 
 		data = 0;
 		Size index = 0u;

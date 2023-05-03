@@ -53,9 +53,14 @@ TEST(PatternFromString, SimpleArguments)
 	}
 	{
 		bzd::String<12u> hello;
-		const auto result = bzd::fromString("Hello World"_sv, "Hello {}"_csv, hello.appender());
-		EXPECT_TRUE(result);
-		// EXPECT_EQ(result.value(), 8u);
-		// EXPECT_STREQ(hello.data(), "World");
+		const auto result1 = bzd::fromString("Hello World"_sv, "Hello {:.+}"_csv, hello.assigner());
+		EXPECT_TRUE(result1);
+		EXPECT_EQ(result1.value(), 11u);
+		EXPECT_STREQ(hello.data(), "World");
+
+		const auto result2 = bzd::fromString("Hello WORld"_sv, "Hello {:[A-Z]+}"_csv, hello.assigner());
+		EXPECT_TRUE(result2);
+		EXPECT_EQ(result2.value(), 9u);
+		EXPECT_STREQ(hello.data(), "WOR");
 	}
 }

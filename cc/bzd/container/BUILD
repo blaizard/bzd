@@ -60,6 +60,7 @@ cc_library(
         ":span",
         "//cc/bzd/container/storage:fixed",
         "//cc/bzd/platform:types",
+        "//cc/bzd/type_traits:is_same",
         "//cc/bzd/utility:forward",
         "//cc/bzd/utility:in_place",
     ],
