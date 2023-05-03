@@ -19,7 +19,7 @@ public:
 	template <class Range, class T>
 	static constexpr auto process(Range& range, T& value, [[maybe_unused]] const auto& metadata) noexcept
 	{
-		if constexpr (bzd::concepts::fromString<Range, T&, const FromStringMetadata&>)
+		if constexpr (bzd::concepts::fromString<Range, T&, decltype(metadata)>)
 		{
 			return ::bzd::fromString(range, value, metadata);
 		}
@@ -119,13 +119,18 @@ struct Matcher<Output>
 {
 	struct Metadata
 	{
-		bzd::StringView regexpr{"[^\\w]+"};
+		bzd::StringView regexpr{"[^\\w]"};
 	};
 
 	template <bzd::concepts::inputStreamRange Range>
-	static constexpr Optional<Size> fromString(Range&&, Output&, const FromStringMetadata&) noexcept
+	static constexpr Optional<Size> fromString(Range&& range, Output& output, const Metadata& metadata) noexcept
 	{
-		return 0u;
+		bzd::Regexpr regexpr{metadata.regexpr};
+		if (const auto result = regexpr.capture(range, output); result)
+		{
+			return result.value();
+		}
+		return bzd::nullopt;
 	}
 
 	template <class Adapter>

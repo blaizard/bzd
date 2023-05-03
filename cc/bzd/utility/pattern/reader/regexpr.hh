@@ -231,6 +231,64 @@ public:
 		return matcher(regexpr_, range);
 	}
 
+	template <bzd::concepts::inputStreamRange Range, bzd::concepts::outputStreamRange Output>
+	[[nodiscard]] constexpr Result<Size, Error> capture(Range&& range, Output& output) noexcept
+	{
+		InputStreamCaptureRange capture{range, output};
+		return matcher(regexpr_, capture);
+	}
+
+private:
+	template <bzd::concepts::outputStreamRange Capture, class Iterator>
+	class IteratorCapture : public Iterator
+	{
+	public:
+		constexpr IteratorCapture(Capture& capture, const Iterator& it) noexcept : Iterator{it}, capture_{capture} {}
+		constexpr IteratorCapture& operator++() noexcept
+		{
+			captureByte();
+			Iterator::operator++();
+			return *this;
+		}
+		constexpr IteratorCapture operator++(int) noexcept
+		{
+			IteratorCapture it{*this};
+			captureByte();
+			Iterator::operator++(0);
+			return it;
+		}
+
+	private:
+		constexpr void captureByte() noexcept
+		{
+			auto it = capture_.begin();
+			if (it != capture_.end())
+			{
+				*it = Iterator::operator*();
+				++it;
+			}
+		}
+
+	private:
+		Capture& capture_;
+	};
+
+	template <bzd::concepts::inputStreamRange Range, bzd::concepts::outputStreamRange Capture>
+	class InputStreamCaptureRange
+	{
+	public:
+		constexpr InputStreamCaptureRange(Range& range, Capture& capture) noexcept : range_{range}, capture_{capture} {}
+
+	public:
+		constexpr auto begin() noexcept { return IteratorCapture{capture_, range_.begin()}; }
+		constexpr auto end() noexcept { return range_.end(); }
+		constexpr auto size() noexcept { return range_.size(); }
+
+	private:
+		Range& range_;
+		Capture& capture_;
+	};
+
 private:
 	bzd::StringView regexpr_;
 };

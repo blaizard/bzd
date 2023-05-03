@@ -4,6 +4,7 @@
 #include "cc/bzd/container/span.hh"
 #include "cc/bzd/container/storage/fixed.hh"
 #include "cc/bzd/platform/types.hh"
+#include "cc/bzd/type_traits/is_same.hh"
 #include "cc/bzd/utility/in_place.hh"
 
 #include <initializer_list>
@@ -49,6 +50,12 @@ public:
 	static constexpr Size capacity() noexcept { return maxCapacity; }
 	static constexpr Size size() noexcept { return maxCapacity; }
 };
+
+template <class T, concepts::sameAs<T>... Ts>
+constexpr auto makeArray(T&& t, Ts&&... ts) noexcept
+{
+	return bzd::Array<T, sizeof...(Ts) + 1u>{inPlace, bzd::forward<T>(t), bzd::forward<Ts>(ts)...};
+}
 
 } // namespace bzd
 
