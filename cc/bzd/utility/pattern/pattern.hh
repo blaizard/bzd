@@ -122,17 +122,6 @@ constexpr bzd::Size parseIndex(bzd::StringView& pattern, const bzd::Size autoInd
 struct DefaultMetadata
 {
 	using Metadata = bzd::StringView;
-	template <class Adapter>
-	static constexpr Metadata parse(bzd::StringView& pattern) noexcept
-	{
-		Size index = 0u;
-		for (; index < pattern.size() && pattern[index] != '}'; ++index)
-		{
-		}
-		const auto result = pattern.subStr(0u, index);
-		pattern.removePrefix(index);
-		return result;
-	}
 };
 
 template <class Adapter, class T>
@@ -142,24 +131,39 @@ using Metadata = typename typeTraits::
 template <class Adapter, class... Args>
 using Metadatas = bzd::Variant<bzd::Monostate, Metadata<Adapter, Args>...>;
 
+template <class Adapter>
+constexpr bzd::StringView parseOptions(bzd::StringView& pattern) noexcept
+{
+	Size index = 0u;
+	for (; index < pattern.size() && pattern[index] != '}'; ++index)
+	{
+	}
+	const auto result = pattern.subStr(0u, index);
+	pattern.removePrefix(index);
+	Adapter::assertTrue(pattern.size() > 0, "Replacement field pattern ended abruptly (after parseIndex)");
+	Adapter::assertTrue(pattern.front() == '}', "Invalid format for replacement field, expecting '}'");
+	pattern.removePrefix(1);
+	return result;
+}
+
 template <class ReturnType, class Adapter, class T, class... Ts>
-constexpr ReturnType parseMetadata(const Size metadataIndex, bzd::StringView& pattern, const Size index = 0u) noexcept
+constexpr ReturnType parseMetadata(const Size metadataIndex, const bzd::StringView options, const Size index = 0u) noexcept
 {
 	if (metadataIndex == index)
 	{
 		if constexpr (Adapter::template hasMetadata<T>())
 		{
-			return Adapter::template Specialization<T>::template parse<Adapter>(pattern);
+			return Adapter::template Specialization<T>::template parse<Adapter>(options);
 		}
 		else
 		{
-			return DefaultMetadata::template parse<Adapter>(pattern);
+			return options;
 		}
 	}
 
 	if constexpr (sizeof...(Ts))
 	{
-		return parseMetadata<ReturnType, Adapter, Ts...>(metadataIndex, pattern, index + 1u);
+		return parseMetadata<ReturnType, Adapter, Ts...>(metadataIndex, options, index + 1u);
 	}
 
 	return {};
@@ -197,11 +201,9 @@ constexpr auto parse() noexcept
 								"The index of one for the field is greater than the number of argument provided.");
 			if constexpr (sizeof...(Args))
 			{
-				results[index].metadatas = parseMetadata<decltype(Result::metadatas), Adapter, Args...>(results[index].index, pattern);
+				const auto options = parseOptions<Adapter>(pattern);
+				results[index].metadatas = parseMetadata<decltype(Result::metadatas), Adapter, Args...>(results[index].index, options);
 				Adapter::assertTrue(!results[index].metadatas.template is<bzd::Monostate>(), "The metadata was not processed.");
-				Adapter::assertTrue(pattern.size() > 0, "Replacement field pattern ended abruptly (after parseIndex)");
-				Adapter::assertTrue(pattern.front() == '}', "Invalid format for replacement field, expecting '}'");
-				pattern.removePrefix(1);
 			}
 		}
 		++index;

@@ -9,8 +9,6 @@
 class TestSchema
 {
 public:
-	static constexpr bool isTestFeature = false;
-
 	/// Check if a specialization implements a custom metadata.
 	template <class T>
 	static constexpr bool hasMetadata() noexcept
@@ -21,22 +19,6 @@ public:
 	/// Get the specialization associated with a type.
 	template <class T>
 	using Specialization = void;
-
-	struct Metadata
-	{
-		bzd::Size index{};
-	};
-
-	template <class Adapter>
-	static constexpr void parse(Metadata&, bzd::StringView& pattern) noexcept
-	{
-		pattern.removePrefix(1);
-	}
-
-	template <class Adapter, class ValueType>
-	static constexpr void check(const Metadata&) noexcept
-	{
-	}
 };
 
 class TestAssert
