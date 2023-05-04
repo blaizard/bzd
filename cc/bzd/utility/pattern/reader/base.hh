@@ -25,32 +25,36 @@ namespace bzd {
 /// {
 ///     template <concepts::inputStreamRange Range>
 ///     static constexpr Optional<Size> fromString(Range&& range, T& value) noexcept { ... }
+///
+///     // or (if available and it will be choosen first) the options parameters corresponds to
+///     // everything in between {:<options>}.
+///
+///     template <concepts::inputStreamRange Range>
+///     static constexpr Optional<Size> fromString(Range&& range, T& value, const bzd::StringView options = ""_sv) noexcept { ... }
 /// };
 /// \endcode
 ///
-/// or with metadata:
+/// or with metadata. In that case, the Metadata type defines the type used and the function must have a "parse" function
+/// that parses the options string and generate a Metadata structure. This function is called during build time only, so
+/// it must be constexpr.
+///
 /// \code
 /// template <concepts::??? T>
 /// struct Matcher<T>
 /// {
 ///     struct Metadata {};
 ///
-///     static constexpr Metadata metadata() noexcept { .... }
+///	    template <class Adapter>
+///	    static constexpr Metadata parse(const bzd::StringView options) noexcept { ... }
 ///
 ///     template <concepts::inputStreamRange Range>
-///     static constexpr Optional<Size> fromString(Range&& range, T& value, const Metadata) noexcept { ... }
+///     static constexpr Optional<Size> fromString(Range&& range, T& value, const Metadata metadata = Metadata{}) noexcept { ... }
 /// };
 /// \endcode
 template <class... Args>
 struct Matcher
 {
 	static_assert(bzd::meta::alwaysFalse<Args...>, "This type has no matcher specialization.");
-};
-
-struct FromStringMetadata
-{
-	bzd::Size index{0u};
-	bzd::StringView pattern{};
 };
 
 namespace typeTraits {

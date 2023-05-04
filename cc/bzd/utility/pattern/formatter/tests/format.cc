@@ -6,49 +6,6 @@
 #include "cc/bzd/utility/pattern/formatter/to_stream.hh"
 #include "cc/bzd/utility/pattern/formatter/to_string.hh"
 
-class TestAssert : public bzd::format::impl::SchemaFormat
-{
-public:
-	static void onError(const bzd::StringView&) {}
-};
-
-using TestAdapater = bzd::pattern::impl::Adapter<TestAssert>;
-
-TEST(Format_, ParseMetadataSign)
-{
-	{
-		bzd::StringView str("}");
-		TestAdapater::Metadata metadata{};
-		TestAdapater::template parse<TestAdapater>(metadata, str);
-		EXPECT_EQ(metadata.sign, bzd::format::impl::Metadata::Sign::automatic);
-	}
-
-	{
-		bzd::StringView str("-}");
-		TestAdapater::Metadata metadata{};
-		TestAdapater::template parse<TestAdapater>(metadata, str);
-		EXPECT_EQ(metadata.sign, bzd::format::impl::Metadata::Sign::only_negative);
-	}
-
-	{
-		bzd::StringView str("+}");
-		TestAdapater::Metadata metadata{};
-		TestAdapater::template parse<TestAdapater>(metadata, str);
-		EXPECT_EQ(metadata.sign, bzd::format::impl::Metadata::Sign::always);
-	}
-}
-
-TEST(Format_, ParseMetadataPrecision)
-{
-	{
-		bzd::StringView str(".3f}");
-		TestAdapater::Metadata metadata{};
-		TestAdapater::template parse<TestAdapater>(metadata, str);
-		EXPECT_TRUE(metadata.isPrecision);
-		EXPECT_EQ(metadata.precision, 3U);
-	}
-}
-
 template <bzd::Size N, class... Args>
 void expectStringStreamFormat(const char* expected, Args&&... args)
 {

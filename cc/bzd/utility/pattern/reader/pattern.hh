@@ -17,7 +17,7 @@ class StringReader
 {
 public:
 	template <class Range, class T>
-	static constexpr auto process(Range& range, T& value, [[maybe_unused]] const auto& metadata) noexcept
+	static constexpr auto process(Range& range, T& value, [[maybe_unused]] const auto metadata) noexcept
 	{
 		if constexpr (bzd::concepts::fromString<Range, T&, decltype(metadata)>)
 		{
@@ -33,10 +33,6 @@ public:
 class Schema
 {
 public:
-	using Metadata = bzd::FromStringMetadata;
-
-	static constexpr bool isTestFeature = true;
-
 	/// Check if a specialization implements a custom metadata.
 	template <class T>
 	static constexpr Bool hasMetadata() noexcept
@@ -47,17 +43,6 @@ public:
 	/// Get the specialization associated with a type.
 	template <class T>
 	using Specialization = typename typeTraits::template Matcher<T>;
-
-	template <class Adapter>
-	static constexpr void parse(Metadata&, bzd::StringView& pattern) noexcept
-	{
-		pattern.removePrefix(1);
-	}
-
-	template <class Adapter, class ValueType>
-	static constexpr void check(const Metadata&) noexcept
-	{
-	}
 };
 
 } // namespace bzd::reader::impl
@@ -123,7 +108,7 @@ struct Matcher<Output>
 	};
 
 	template <bzd::concepts::inputStreamRange Range>
-	static constexpr Optional<Size> fromString(Range&& range, Output& output, const Metadata& metadata) noexcept
+	static constexpr Optional<Size> fromString(Range&& range, Output& output, const Metadata metadata = Metadata{}) noexcept
 	{
 		bzd::Regexpr regexpr{metadata.regexpr};
 		if (const auto result = regexpr.capture(range, output); result)
@@ -134,14 +119,13 @@ struct Matcher<Output>
 	}
 
 	template <class Adapter>
-	static constexpr Metadata parse(bzd::StringView& pattern) noexcept
+	static constexpr Metadata parse(const bzd::StringView options) noexcept
 	{
-		Size index = 0u;
-		for (; index < pattern.size() && pattern[index] != '}'; ++index)
+		Metadata metadata{};
+		if (!options.empty())
 		{
+			metadata.regexpr = options;
 		}
-		Metadata metadata{pattern.subStr(0u, index)};
-		pattern.removePrefix(index);
 		return metadata;
 	}
 };

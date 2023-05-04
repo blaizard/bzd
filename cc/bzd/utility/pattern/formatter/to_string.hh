@@ -54,7 +54,7 @@ class StringFormatter
 {
 public:
 	template <class Range, class T>
-	static constexpr bzd::Optional<Size> process(Range& range, const T& value, [[maybe_unused]] const Metadata& metadata) noexcept
+	static constexpr bzd::Optional<Size> process(Range& range, const T& value, [[maybe_unused]] const Metadata metadata) noexcept
 	{
 		if constexpr (toStringFormatterWithMetadata<Range, T>)
 		{
@@ -74,65 +74,68 @@ class SpecializationTemp
 public:
 	using Metadata = bzd::format::impl::Metadata;
 	template <class Adapter>
-	static constexpr Metadata parse(bzd::StringView& format) noexcept
+	static constexpr Metadata parse(bzd::StringView options) noexcept
 	{
 		Metadata metadata{};
 
-		// Parse sign: [sign]
-		parseSign<Adapter>(format, metadata);
-		Adapter::assertTrue(format.size() > 0, "Replacement field format ended abruptly (after parseSign)");
-
-		// Parse alternate form [#]
-		if (format.front() == '#')
+		while (!options.empty())
 		{
-			metadata.alternate = true;
-			format.removePrefix(1);
-			Adapter::assertTrue(format.size() > 0, "Replacement field format ended abruptly '#')");
-		}
-
-		// Parse precision [.precision]
-		if (format.front() == '.')
-		{
-			format.removePrefix(1);
-			metadata.isPrecision = parseUnsignedInteger(format, metadata.precision);
-			Adapter::assertTrue(format.size() > 0, "Replacement field format ended abruptly (after precision)");
-		}
-
-		// Parse type [type]
-		if (format.front() != '}')
-		{
-			switch (format.front())
+			const auto c = options.front();
+			options.removePrefix(1);
+			switch (c)
 			{
-			case 'b':
-				metadata.format = Metadata::Format::binary;
+			// Parse sign: [sign]
+			case '+':
+				Adapter::assertTrue(metadata.sign == Metadata::Sign::automatic, "Sign option can only be assigned once.");
+				metadata.sign = Metadata::Sign::always;
 				break;
-			case 'd':
-				metadata.format = Metadata::Format::decimal;
+			case '-':
+				Adapter::assertTrue(metadata.sign == Metadata::Sign::automatic, "Sign option can only be assigned once.");
+				metadata.sign = Metadata::Sign::only_negative;
 				break;
-			case 'o':
-				metadata.format = Metadata::Format::octal;
+			// Parse precision [.precision]
+			case '.':
+				Adapter::assertTrue(!metadata.isPrecision, "Precision option can only be assigned once.");
+				metadata.isPrecision = parseUnsignedInteger(options, metadata.precision);
 				break;
-			case 'x':
-				metadata.format = Metadata::Format::hexadecimal_lower;
+			// Parse alternate form [#]
+			case '#':
+				Adapter::assertTrue(!metadata.alternate, "Alternate option can only be assigned once.");
+				metadata.alternate = true;
 				break;
-			case 'X':
-				metadata.format = Metadata::Format::hexadecimal_upper;
-				break;
-			case 'f':
-				metadata.format = Metadata::Format::fixed_point;
-				break;
-			case '%':
-				metadata.format = Metadata::Format::fixed_point_percent;
-				break;
-			case 'p':
-				metadata.format = Metadata::Format::pointer;
-				break;
+			// Parse type [type]
 			default:
-				Adapter::onError("Unsupported conversion format, only the following is "
-								 "supported: [bdoxXfp%]");
+				Adapter::assertTrue(metadata.format == Metadata::Format::automatic, "Conversion format option can only be assigned once.");
+				switch (c)
+				{
+				case 'b':
+					metadata.format = Metadata::Format::binary;
+					break;
+				case 'd':
+					metadata.format = Metadata::Format::decimal;
+					break;
+				case 'o':
+					metadata.format = Metadata::Format::octal;
+					break;
+				case 'x':
+					metadata.format = Metadata::Format::hexadecimal_lower;
+					break;
+				case 'X':
+					metadata.format = Metadata::Format::hexadecimal_upper;
+					break;
+				case 'f':
+					metadata.format = Metadata::Format::fixed_point;
+					break;
+				case '%':
+					metadata.format = Metadata::Format::fixed_point_percent;
+					break;
+				case 'p':
+					metadata.format = Metadata::Format::pointer;
+					break;
+				default:
+					Adapter::onError("Unsupported option, only the following is supported: [+-#.<precision>bdoxXfp%]");
+				}
 			}
-			format.removePrefix(1);
-			Adapter::assertTrue(format.size() > 0, "Replacement field format ended abruptly (after type)");
 		}
 
 		return metadata;
@@ -152,35 +155,11 @@ private:
 		}
 		return isDefined;
 	}
-
-	// Sign
-
-	template <class Adapter>
-	static constexpr void parseSign(bzd::StringView& format, Metadata& metadata) noexcept
-	{
-		switch (format.front())
-		{
-		case '+':
-			metadata.sign = Metadata::Sign::always;
-			break;
-		case '-':
-			metadata.sign = Metadata::Sign::only_negative;
-			break;
-		}
-		if (metadata.sign != Metadata::Sign::automatic)
-		{
-			format.removePrefix(1);
-		}
-	}
 };
 
 class SchemaFormat
 {
 public:
-	using Metadata = bzd::format::impl::Metadata;
-
-	static constexpr bool isTestFeature = false;
-
 	/// Check if a specialization implements a custom metadata.
 	template <class T>
 	static constexpr Bool hasMetadata() noexcept
@@ -192,143 +171,30 @@ public:
 	template <class T>
 	using Specialization = SpecializationTemp;
 
-	/// \brief Parse a metadata conversion string.
-	///
-	/// Format compatible with python format (with some exceptions)
-	///
-	/// format_spec ::=  [sign][#][.precision][type]
-	/// sign        ::=  "+" | "-" | " "
-	/// precision   ::=  integer
-	/// type        ::=  "b" | "d" | "f" | "o" | "x" | "X" | "f" | "p" | "%"
-	/// d	Decimal integer
-	/// b	Binary format
-	/// o	Octal format
-	/// x	Hexadecimal format (lower case)
-	/// X	Hexadecimal format (upper case)
-	/// f	Displays fixed point number (Default: 6)
-	/// p    Pointer
-	/// %	Percentage. Multiples by 100 and puts % at the end.
-	template <class Adapter>
-	static constexpr void parse(Metadata& metadata, bzd::StringView& format) noexcept
-	{
-		// Parse sign: [sign]
-		parseSign<Adapter>(format, metadata);
-		Adapter::assertTrue(format.size() > 0, "Replacement field format ended abruptly (after parseSign)");
-
-		// Parse alternate form [#]
-		if (format.front() == '#')
+	/*
+		template <class Adapter, class ValueType>
+		static constexpr void check(const Metadata& metadata) noexcept
 		{
-			metadata.alternate = true;
-			format.removePrefix(1);
-			Adapter::assertTrue(format.size() > 0, "Replacement field format ended abruptly '#')");
-		}
-
-		// Parse precision [.precision]
-		if (format.front() == '.')
-		{
-			format.removePrefix(1);
-			metadata.isPrecision = parseUnsignedInteger(format, metadata.precision);
-			Adapter::assertTrue(format.size() > 0, "Replacement field format ended abruptly (after precision)");
-		}
-
-		// Parse type [type]
-		if (format.front() != '}')
-		{
-			switch (format.front())
+			switch (metadata.format)
 			{
-			case 'b':
-				metadata.format = Metadata::Format::binary;
+			case Metadata::Format::binary:
+			case Metadata::Format::octal:
+			case Metadata::Format::hexadecimal_lower:
+			case Metadata::Format::hexadecimal_upper:
+				Adapter::assertTrue(bzd::typeTraits::isIntegral<ValueType>, "Argument must be an integral");
 				break;
-			case 'd':
-				metadata.format = Metadata::Format::decimal;
+			case Metadata::Format::decimal:
+			case Metadata::Format::fixed_point:
+			case Metadata::Format::fixed_point_percent:
+				Adapter::assertTrue(bzd::typeTraits::isArithmetic<ValueType>, "Argument must be arithmetic");
 				break;
-			case 'o':
-				metadata.format = Metadata::Format::octal;
+			case Metadata::Format::pointer:
+				[[fallthrough]];
+			case Metadata::Format::automatic:
 				break;
-			case 'x':
-				metadata.format = Metadata::Format::hexadecimal_lower;
-				break;
-			case 'X':
-				metadata.format = Metadata::Format::hexadecimal_upper;
-				break;
-			case 'f':
-				metadata.format = Metadata::Format::fixed_point;
-				break;
-			case '%':
-				metadata.format = Metadata::Format::fixed_point_percent;
-				break;
-			case 'p':
-				metadata.format = Metadata::Format::pointer;
-				break;
-			default:
-				Adapter::onError("Unsupported conversion format, only the following is "
-								 "supported: [bdoxXfp%]");
 			}
-			format.removePrefix(1);
-			Adapter::assertTrue(format.size() > 0, "Replacement field format ended abruptly (after type)");
 		}
-		Adapter::assertTrue(format.front() == '}', "Invalid format for replacement field, expecting '}'");
-
-		format.removePrefix(1);
-	}
-
-	template <class Adapter, class ValueType>
-	static constexpr void check(const Metadata& metadata) noexcept
-	{
-		switch (metadata.format)
-		{
-		case Metadata::Format::binary:
-		case Metadata::Format::octal:
-		case Metadata::Format::hexadecimal_lower:
-		case Metadata::Format::hexadecimal_upper:
-			Adapter::assertTrue(bzd::typeTraits::isIntegral<ValueType>, "Argument must be an integral");
-			break;
-		case Metadata::Format::decimal:
-		case Metadata::Format::fixed_point:
-		case Metadata::Format::fixed_point_percent:
-			Adapter::assertTrue(bzd::typeTraits::isArithmetic<ValueType>, "Argument must be arithmetic");
-			break;
-		case Metadata::Format::pointer:
-			[[fallthrough]];
-		case Metadata::Format::automatic:
-			break;
-		}
-	}
-
-private:
-	/// Parse an unsigned integer
-	static constexpr bool parseUnsignedInteger(bzd::StringView& format, bzd::Size& integer) noexcept
-	{
-		bool isDefined = false;
-		integer = 0;
-		for (; format.size() > 0 && format.front() >= '0' && format.front() <= '9';)
-		{
-			isDefined = true;
-			integer = integer * 10 + (format.front() - '0');
-			format.removePrefix(1);
-		}
-		return isDefined;
-	}
-
-	// Sign
-
-	template <class Adapter>
-	static constexpr void parseSign(bzd::StringView& format, Metadata& metadata) noexcept
-	{
-		switch (format.front())
-		{
-		case '+':
-			metadata.sign = Metadata::Sign::always;
-			break;
-		case '-':
-			metadata.sign = Metadata::Sign::only_negative;
-			break;
-		}
-		if (metadata.sign != Metadata::Sign::automatic)
-		{
-			format.removePrefix(1);
-		}
-	}
+	*/
 };
 
 // ---- toString specializations ----
