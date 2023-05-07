@@ -18,7 +18,7 @@ namespace bzd {
 /// - String matching.
 /// - Character group [...], negation [^...] and ranges [...-...].
 /// - Repetitions: '*', '+' and '?'.
-/// - Special characters: '.', '\s'.
+/// - Special characters: '.', '\s', '\w'.
 class Regexpr
 {
 public:
@@ -145,6 +145,15 @@ private:
 				if (value == 's')
 				{
 					if (*itRange == ' ' || *itRange == '\t' || *itRange == '\r' || *itRange == '\n' || *itRange == '\f')
+					{
+						++itRange;
+						return 1u;
+					}
+				}
+				if (value == 'w')
+				{
+					if ((*itRange >= 'a' && *itRange <= 'z') || (*itRange >= 'A' && *itRange <= 'Z') ||
+						(*itRange >= '0' && *itRange <= '9') || *itRange >= '_')
 					{
 						++itRange;
 						return 1u;

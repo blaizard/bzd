@@ -1,4 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
+load("//tools/bazel_build/rules:documentation.bzl", "doc_library")
 
 cc_library(
     name = "pattern",
@@ -18,7 +19,7 @@ cc_library(
         "//cc/bzd/utility:apply",
         "//cc/bzd/utility:constexpr_for",
         "//cc/bzd/utility:ignore",
-        "//cc/bzd/utility/pattern/reader:integral",
+        "//cc/bzd/utility/pattern/matcher:integral",
     ],
 )
 
@@ -34,4 +35,12 @@ cc_library(
         ":pattern",
         "//cc/bzd/core/async",
     ],
+)
+
+doc_library(
+    name = "documentation",
+    srcs = [
+        ("Pattern", "README.md"),
+    ],
+    visibility = ["//cc:__pkg__"],
 )

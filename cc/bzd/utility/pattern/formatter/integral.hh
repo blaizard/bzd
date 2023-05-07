@@ -53,7 +53,7 @@ constexpr bzd::Optional<bzd::Size> integer(Container& str, const T& n, const Dig
 		}
 	}
 
-	for (const auto c : bzd::range::Reverse{buffer})
+	for (const auto c : buffer | bzd::range::reverse())
 	{
 		str.append(c);
 	}

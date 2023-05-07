@@ -1,17 +1,10 @@
-#include "cc/bzd/utility/pattern/reader/pattern.hh"
+#include "cc/bzd/utility/pattern/matcher/pattern.hh"
 
 #include "cc/bzd/test/test.hh"
-#include "cc/bzd/utility/pattern/reader/integral.hh"
+#include "cc/bzd/utility/pattern/matcher/integral.hh"
+#include "cc/bzd/utility/pattern/matcher/output_stream.hh"
 
 #include <iostream>
-
-class TestAssert : public bzd::reader::impl::Schema
-{
-public:
-	static void onError(const bzd::StringView& str) { ::std::cout << "Error at: " << str.data() << ::std::endl; }
-};
-
-using TestAdapater = bzd::pattern::impl::Adapter<TestAssert>;
 
 TEST(PatternFromString, NoArguments)
 {
@@ -24,32 +17,28 @@ TEST(PatternFromString, NoArguments)
 	EXPECT_FALSE(result2);
 }
 
-TEST(PatternFromString, MatcherMetadata)
-{
-	{
-		bzd::String<12> string{""};
-		auto appender = string.appender();
-		EXPECT_TRUE(bzd::concepts::matcherMetadata<decltype(appender)>);
-	}
-	EXPECT_FALSE(bzd::concepts::matcherMetadata<int>);
-	EXPECT_FALSE(bzd::concepts::matcherMetadata<unsigned int&>);
-}
-
 TEST(PatternFromString, SimpleArguments)
 {
 	{
-		bzd::UInt32 a;
+		bzd::UInt32 a{};
 		const auto result = bzd::fromString("Hello 12"_sv, "Hello {}"_csv, a);
 		EXPECT_TRUE(result);
 		EXPECT_EQ(result.value(), 8u);
 		EXPECT_EQ(a, 12u);
 	}
 	{
-		bzd::UInt32 a;
+		bzd::UInt32 a{};
 		const auto result = bzd::fromString("World 12"_sv, "[A-Za-z]+ {}"_csv, a);
 		EXPECT_TRUE(result);
 		EXPECT_EQ(result.value(), 8u);
 		EXPECT_EQ(a, 12u);
+	}
+	{
+		bzd::UInt32 a{};
+		const auto result = bzd::fromString("World 0xa2"_sv, "[A-Za-z]+ 0x{:x}"_csv, a);
+		EXPECT_TRUE(result);
+		EXPECT_EQ(result.value(), 10u);
+		EXPECT_EQ(a, 162u);
 	}
 	{
 		bzd::String<12u> hello;
