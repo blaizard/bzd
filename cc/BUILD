@@ -21,6 +21,7 @@ doc_library(
     srcs = [
         ("Directory Layout", "README.md"),
         ("**", "//cc/bzd/core/async:documentation"),
+        ("**", "//cc/bzd/utility/pattern:documentation"),
     ],
     visibility = ["//docs:__pkg__"],
 )

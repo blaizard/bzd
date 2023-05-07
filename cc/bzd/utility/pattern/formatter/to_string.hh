@@ -30,10 +30,10 @@ struct Metadata
 		binary,
 		decimal,
 		octal,
-		hexadecimal_lower,
-		hexadecimal_upper,
-		fixed_point,
-		fixed_point_percent,
+		hexadecimalLower,
+		hexadecimalUpper,
+		fixedPoint,
+		fixedPointPercent,
 		pointer
 	};
 
@@ -118,16 +118,16 @@ public:
 					metadata.format = Metadata::Format::octal;
 					break;
 				case 'x':
-					metadata.format = Metadata::Format::hexadecimal_lower;
+					metadata.format = Metadata::Format::hexadecimalLower;
 					break;
 				case 'X':
-					metadata.format = Metadata::Format::hexadecimal_upper;
+					metadata.format = Metadata::Format::hexadecimalUpper;
 					break;
 				case 'f':
-					metadata.format = Metadata::Format::fixed_point;
+					metadata.format = Metadata::Format::fixedPoint;
 					break;
 				case '%':
-					metadata.format = Metadata::Format::fixed_point_percent;
+					metadata.format = Metadata::Format::fixedPointPercent;
 					break;
 				case 'p':
 					metadata.format = Metadata::Format::pointer;
@@ -160,41 +160,9 @@ private:
 class SchemaFormat
 {
 public:
-	/// Check if a specialization implements a custom metadata.
-	template <class T>
-	static constexpr Bool hasMetadata() noexcept
-	{
-		return true;
-	}
-
 	/// Get the specialization associated with a type.
 	template <class T>
 	using Specialization = SpecializationTemp;
-
-	/*
-		template <class Adapter, class ValueType>
-		static constexpr void check(const Metadata& metadata) noexcept
-		{
-			switch (metadata.format)
-			{
-			case Metadata::Format::binary:
-			case Metadata::Format::octal:
-			case Metadata::Format::hexadecimal_lower:
-			case Metadata::Format::hexadecimal_upper:
-				Adapter::assertTrue(bzd::typeTraits::isIntegral<ValueType>, "Argument must be an integral");
-				break;
-			case Metadata::Format::decimal:
-			case Metadata::Format::fixed_point:
-			case Metadata::Format::fixed_point_percent:
-				Adapter::assertTrue(bzd::typeTraits::isArithmetic<ValueType>, "Argument must be arithmetic");
-				break;
-			case Metadata::Format::pointer:
-				[[fallthrough]];
-			case Metadata::Format::automatic:
-				break;
-			}
-		}
-	*/
 };
 
 // ---- toString specializations ----
@@ -205,12 +173,12 @@ constexpr bzd::StringView processCommon(const bzd::StringView stringView, const 
 	{
 	case Metadata::Format::automatic:
 		return ((metadata.isPrecision) ? stringView.subStr(0, bzd::min(metadata.precision, stringView.size())) : stringView);
-	case Metadata::Format::fixed_point:
-	case Metadata::Format::fixed_point_percent:
+	case Metadata::Format::fixedPoint:
+	case Metadata::Format::fixedPointPercent:
 	case Metadata::Format::decimal:
 	case Metadata::Format::binary:
-	case Metadata::Format::hexadecimal_lower:
-	case Metadata::Format::hexadecimal_upper:
+	case Metadata::Format::hexadecimalLower:
+	case Metadata::Format::hexadecimalUpper:
 	case Metadata::Format::octal:
 	case Metadata::Format::pointer:
 		break;
@@ -232,13 +200,13 @@ constexpr bzd::Optional<bzd::Size> toString(bzd::interface::String& str, const T
 			str += "0b"_sv;
 		}
 		return bzd::format::toStringBin(str, value);
-	case Metadata::Format::hexadecimal_lower:
+	case Metadata::Format::hexadecimalLower:
 		if (metadata.alternate)
 		{
 			str += "0x"_sv;
 		}
 		return bzd::format::toStringHex(str, value);
-	case Metadata::Format::hexadecimal_upper:
+	case Metadata::Format::hexadecimalUpper:
 		if (metadata.alternate)
 		{
 			str += "0x"_sv;
@@ -254,8 +222,8 @@ constexpr bzd::Optional<bzd::Size> toString(bzd::interface::String& str, const T
 			str += "0o"_sv;
 		}
 		return bzd::format::toStringOct(str, value);
-	case Metadata::Format::fixed_point:
-	case Metadata::Format::fixed_point_percent:
+	case Metadata::Format::fixedPoint:
+	case Metadata::Format::fixedPointPercent:
 	case Metadata::Format::pointer:
 		break;
 	}
@@ -270,9 +238,9 @@ constexpr bzd::Optional<bzd::Size> toString(bzd::interface::String& str, const T
 	case Metadata::Format::automatic:
 	case Metadata::Format::decimal:
 		return ::toString(str, value);
-	case Metadata::Format::fixed_point:
+	case Metadata::Format::fixedPoint:
 		return ::toString(str, value, (metadata.isPrecision) ? metadata.precision : 6);
-	case Metadata::Format::fixed_point_percent:
+	case Metadata::Format::fixedPointPercent:
 	{
 		const auto result = ::toString(str, value * 100., (metadata.isPrecision) ? metadata.precision : 6);
 		if (result)
@@ -285,8 +253,8 @@ constexpr bzd::Optional<bzd::Size> toString(bzd::interface::String& str, const T
 	}
 	break;
 	case Metadata::Format::binary:
-	case Metadata::Format::hexadecimal_lower:
-	case Metadata::Format::hexadecimal_upper:
+	case Metadata::Format::hexadecimalLower:
+	case Metadata::Format::hexadecimalUpper:
 	case Metadata::Format::octal:
 	case Metadata::Format::pointer:
 		break;
@@ -299,7 +267,7 @@ requires(concepts::pointer<T> && !concepts::constructible<bzd::StringView, T>)
 constexpr bzd::Optional<bzd::Size> toString(bzd::interface::String& str, const T value, const Metadata&) noexcept
 {
 	Metadata metadata{};
-	metadata.format = Metadata::Format::hexadecimal_lower;
+	metadata.format = Metadata::Format::hexadecimalLower;
 	metadata.alternate = true;
 	return toString(str, reinterpret_cast<Size>(value), metadata);
 }
@@ -334,7 +302,7 @@ constexpr bzd::Optional<bzd::Size> toString(bzd::interface::String& str,
 /// x	Hexadecimal format (lower case)
 /// X	Hexadecimal format (upper case)
 /// f	Displays fixed point number (Default: 6)
-/// p    Pointer
+/// p   Pointer
 /// %	Percentage. Multiples by 100 and puts % at the end.
 /// \endcode
 ///

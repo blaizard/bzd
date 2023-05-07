@@ -1,4 +1,4 @@
-#include "cc/bzd/utility/pattern/reader/regexpr.hh"
+#include "cc/bzd/utility/regexpr/regexpr.hh"
 
 #include "cc/bzd/test/test.hh"
 

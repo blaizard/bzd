@@ -9,13 +9,6 @@
 class TestSchema
 {
 public:
-	/// Check if a specialization implements a custom metadata.
-	template <class T>
-	static constexpr bool hasMetadata() noexcept
-	{
-		return false;
-	}
-
 	/// Get the specialization associated with a type.
 	template <class T>
 	using Specialization = void;

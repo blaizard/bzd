@@ -1,4 +1,17 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
+load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_library")
+
+bzd_cc_library(
+    name = "matcher",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":integral",
+        ":output_stream",
+        ":pattern",
+    ],
+)
+
+# ---- Individual items ----
 
 cc_library(
     name = "base",
@@ -38,17 +51,15 @@ cc_library(
 )
 
 cc_library(
-    name = "regexpr",
+    name = "output_stream",
     hdrs = [
-        "regexpr.hh",
+        "output_stream.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//cc/bzd/container:function_ref",
-        "//cc/bzd/container:optional",
-        "//cc/bzd/container:result",
-        "//cc/bzd/container:string_view",
+        ":base",
         "//cc/bzd/type_traits:range",
+        "//cc/bzd/utility/regexpr",
     ],
 )
 
@@ -61,10 +72,10 @@ cc_library(
     deps = [
         ":base",
         ":integral",
-        ":regexpr",
         "//cc/bzd/container:string",
         "//cc/bzd/container:variant",
         "//cc/bzd/type_traits:container",
         "//cc/bzd/utility/pattern",
+        "//cc/bzd/utility/regexpr",
     ],
 )

@@ -9,7 +9,7 @@
 #include "cc/bzd/utility/apply.hh"
 #include "cc/bzd/utility/constexpr_for.hh"
 #include "cc/bzd/utility/ignore.hh"
-#include "cc/bzd/utility/pattern/reader/integral.hh"
+#include "cc/bzd/utility/pattern/matcher/integral.hh"
 
 namespace bzd::pattern::impl {
 
@@ -124,9 +124,17 @@ struct DefaultMetadata
 	using Metadata = bzd::StringView;
 };
 
+namespace concepts {
+
+/// Checks if a specialization has metadata.
+template <class Adapter, class T>
+concept metadata = requires { typename Adapter::template Specialization<T>::Metadata; };
+
+} // namespace concepts
+
 template <class Adapter, class T>
 using Metadata = typename typeTraits::
-	Conditional<Adapter::template hasMetadata<T>(), typename Adapter::template Specialization<T>, DefaultMetadata>::Metadata;
+	Conditional<concepts::metadata<Adapter, T>, typename Adapter::template Specialization<T>, DefaultMetadata>::Metadata;
 
 template <class Adapter, class... Args>
 using Metadatas = bzd::Variant<bzd::Monostate, Metadata<Adapter, Args>...>;
@@ -151,7 +159,7 @@ constexpr ReturnType parseMetadata(const Size metadataIndex, const bzd::StringVi
 {
 	if (metadataIndex == index)
 	{
-		if constexpr (Adapter::template hasMetadata<T>())
+		if constexpr (concepts::metadata<Adapter, T>)
 		{
 			return Adapter::template Specialization<T>::template parse<Adapter>(options);
 		}
