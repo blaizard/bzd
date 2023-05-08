@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cc/bzd/algorithm/byte_copy.hh"
 #include "cc/bzd/algorithm/reverse.hh"
 #include "cc/bzd/container/array.hh"
 #include "cc/bzd/container/optional.hh"
@@ -7,18 +8,18 @@
 #include "cc/bzd/container/string.hh"
 #include "cc/bzd/container/vector.hh"
 #include "cc/bzd/meta/always_false.hh"
-#include "cc/bzd/type_traits/container.hh"
 #include "cc/bzd/type_traits/is_floating_point.hh"
 #include "cc/bzd/type_traits/is_integral.hh"
 #include "cc/bzd/type_traits/is_signed.hh"
+#include "cc/bzd/type_traits/range.hh"
 
 namespace bzd::format::impl {
 namespace {
 static constexpr bzd::Array<const char, 16> digits{inPlace, '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 }
 
-template <Size base = 10, concepts::appendableWithBytes Container, class T, class Digits>
-constexpr bzd::Optional<bzd::Size> integer(Container& str, const T& n, const Digits& digits = bzd::format::impl::digits) noexcept
+template <Size base = 10, concepts::outputStreamRange Range, class T, class Digits>
+constexpr bzd::Optional<bzd::Size> integer(Range&& range, const T& n, const Digits& digits = bzd::format::impl::digits) noexcept
 {
 	static_assert(base > 1 && base <= 16, "Invalid base size.");
 	static_assert(Digits::size() >= base, "There is not enough digits for the base.");
@@ -53,15 +54,15 @@ constexpr bzd::Optional<bzd::Size> integer(Container& str, const T& n, const Dig
 		}
 	}
 
-	for (const auto c : buffer | bzd::range::reverse())
+	if (algorithm::byteCopyReturnSize(buffer | bzd::range::reverse(), range) != buffer.size())
 	{
-		str.append(c);
+		return bzd::nullopt;
 	}
 	return buffer.size();
 }
 
-template <concepts::appendableWithBytes Container, class T>
-constexpr bzd::Optional<bzd::Size> floatingPoint(Container& str, const T& n, const Size maxPrecision) noexcept
+template <concepts::outputStreamRange Range, class T>
+constexpr bzd::Optional<bzd::Size> floatingPoint(Range&& range, const T& n, const Size maxPrecision) noexcept
 {
 	constexpr const T resolutionList[15] = {1,
 											0.1,
@@ -82,13 +83,13 @@ constexpr bzd::Optional<bzd::Size> floatingPoint(Container& str, const T& n, con
 	auto resolution = resolutionList[maxPrecision];
 	const T roundedNumber = n + resolution / 2;
 
-	const auto result = bzd::format::impl::integer(str, static_cast<int>(roundedNumber), bzd::format::impl::digits);
+	const auto result = bzd::format::impl::integer(range, static_cast<int>(roundedNumber), bzd::format::impl::digits);
 	if (!result)
 	{
 		return bzd::nullopt;
 	}
 
-	if (!str.append('.'))
+	if (!algorithm::byteCopyReturnSize("."_sv, range))
 	{
 		return bzd::nullopt;
 	}
@@ -101,7 +102,8 @@ constexpr bzd::Optional<bzd::Size> floatingPoint(Container& str, const T& n, con
 		resolution *= 10;
 
 		const auto digit = static_cast<int>(afterComma);
-		if (!str.append('0' + digit))
+		const char array[1] = {static_cast<const char>('0' + digit)};
+		if (!algorithm::byteCopyReturnSize(array, range))
 		{
 			return bzd::nullopt;
 		}
@@ -115,55 +117,64 @@ constexpr bzd::Optional<bzd::Size> floatingPoint(Container& str, const T& n, con
 
 namespace bzd::format {
 
-template <concepts::appendableWithBytes Container, concepts::integral T>
-constexpr Optional<Size> toStringHex(Container& str,
+template <concepts::outputStreamRange Range, concepts::integral T>
+constexpr Optional<Size> toStringHex(Range&& range,
 									 const T& data,
 									 const bzd::Array<const char, 16>& digits = bzd::format::impl::digits) noexcept
 {
-	return bzd::format::impl::integer<16u>(str, data, digits);
+	return bzd::format::impl::integer<16u>(bzd::forward<Range>(range), data, digits);
 }
 
-template <concepts::appendableWithBytes Container, concepts::integral T>
-constexpr Optional<Size> toStringOct(Container& str, const T& data) noexcept
+template <concepts::outputStreamRange Range, concepts::integral T>
+constexpr Optional<Size> toStringOct(Range&& range, const T& data) noexcept
 {
-	return bzd::format::impl::integer<8u>(str, data, bzd::format::impl::digits);
+	return bzd::format::impl::integer<8u>(bzd::forward<Range>(range), data, bzd::format::impl::digits);
 }
 
-template <concepts::appendableWithBytes Container, concepts::integral T>
-constexpr Optional<Size> toStringBin(Container& str, const T& data) noexcept
+template <concepts::outputStreamRange Range, concepts::integral T>
+constexpr Optional<Size> toStringBin(Range&& range, const T& data) noexcept
 {
-	return bzd::format::impl::integer<2u>(str, data, bzd::format::impl::digits);
+	return bzd::format::impl::integer<2u>(bzd::forward<Range>(range), data, bzd::format::impl::digits);
 }
 } // namespace bzd::format
 
 // Integers
 
-template <bzd::concepts::appendableWithBytes Container, bzd::concepts::integral T>
-constexpr bzd::Optional<bzd::Size> toString(Container& str, const T data) noexcept
+template <bzd::concepts::outputStreamRange Range, bzd::concepts::integral T>
+constexpr bzd::Optional<bzd::Size> toString(Range&& range, const T data) noexcept
 {
-	return bzd::format::impl::integer(str, data, bzd::format::impl::digits);
+	return bzd::format::impl::integer(bzd::forward<Range>(range), data, bzd::format::impl::digits);
 }
 
 // Floating points
 
-template <bzd::concepts::appendableWithBytes Container, bzd::concepts::floatingPoint T>
-constexpr bzd::Optional<bzd::Size> toString(Container& str, const T data, const bzd::Size maxPrecision = 6) noexcept
+template <bzd::concepts::outputStreamRange Range, bzd::concepts::floatingPoint T>
+constexpr bzd::Optional<bzd::Size> toString(Range&& range, const T data, const bzd::Size maxPrecision = 6) noexcept
 {
-	return bzd::format::impl::floatingPoint(str, data, maxPrecision);
+	return bzd::format::impl::floatingPoint(bzd::forward<Range>(range), data, maxPrecision);
 }
 
 // Boolean
 
-template <bzd::concepts::appendableWithBytes Container>
-constexpr bzd::Optional<bzd::Size> toString(Container& str, const bzd::Bool value) noexcept
+template <bzd::concepts::outputStreamRange Range>
+constexpr bzd::Optional<bzd::Size> toString(Range&& range, const bzd::Bool value) noexcept
 {
-	return str.append((value) ? "true"_sv.asBytes() : "false"_sv.asBytes());
+	const auto string = (value) ? "true"_sv.asBytes() : "false"_sv.asBytes();
+	if (bzd::algorithm::byteCopyReturnSize(string, range) != string.size())
+	{
+		return bzd::nullopt;
+	}
+	return string.size();
 }
 
 // Chars
 
-template <bzd::concepts::appendableWithBytes Container>
-constexpr bzd::Optional<bzd::Size> toString(Container& str, const char c) noexcept
+template <bzd::concepts::outputStreamRange Range>
+constexpr bzd::Optional<bzd::Size> toString(Range&& range, const char c) noexcept
 {
-	return str.append(c);
+	if (!bzd::algorithm::byteCopyReturnSize(bzd::StringView{&c, 1u}, range))
+	{
+		return bzd::nullopt;
+	}
+	return 1u;
 }

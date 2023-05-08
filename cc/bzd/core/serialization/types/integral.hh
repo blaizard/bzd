@@ -22,8 +22,7 @@ struct Serialization<T>
 	requires(concepts::sameAs<Type, bool> || concepts::sameAs<Type, Bool>)
 	{
 		const auto data = {(value) ? boolValueTrue : boolValueFalse};
-		const auto result = algorithm::byteCopy(data, range);
-		if (static_cast<Size>(bzd::distance(bzd::begin(data), result.in)) == 1u)
+		if (algorithm::byteCopyReturnSize(data, range) == 1u)
 		{
 			return 1u;
 		}
@@ -39,8 +38,7 @@ struct Serialization<T>
 	{
 		const auto bytes = Span<const Type>{&value, 1u}.asBytes();
 		const auto view = bytes | impl::serialization::normalizeByteOrder();
-		const auto result = algorithm::byteCopy(view, range);
-		if (static_cast<Size>(bzd::distance(bzd::begin(view), result.in)) == bytes.size())
+		if (algorithm::byteCopyReturnSize(view, range) == bytes.size())
 		{
 			return bytes.size();
 		}
@@ -52,19 +50,17 @@ struct Serialization<T>
 	requires(concepts::sameAs<Type, bool> || concepts::sameAs<Type, Bool>)
 	{
 		Byte bytes[1u];
-		const auto result = algorithm::byteCopy(range, bytes);
-		const Size size = bzd::distance(bzd::begin(bytes), result.out);
-		if (size == 1u)
+		if (algorithm::byteCopyReturnSize(range, bytes) == 1u)
 		{
 			if (bytes[0] == boolValueTrue)
 			{
 				value = true;
-				return size;
+				return 1u;
 			}
 			else if (bytes[0] == boolValueFalse)
 			{
 				value = false;
-				return size;
+				return 1u;
 			}
 		}
 		return bzd::nullopt;
@@ -77,15 +73,13 @@ struct Serialization<T>
 			 concepts::sameAs<Type, Int64> || concepts::sameAs<Type, UInt64> || concepts::sameAs<Type, Byte> ||
 			 concepts::sameAs<Type, char>)
 	{
-		auto bytes = Span<Type>{&value, 1u}.asBytesMutable();
-		const auto result = algorithm::byteCopy(range | impl::serialization::normalizeByteOrder(), bytes);
-		const Size size = bzd::distance(bzd::begin(bytes), result.out);
-		if (size == bytes.size())
+		const auto bytes = Span<Type>{&value, 1u}.asBytesMutable();
+		const auto view = range | impl::serialization::normalizeByteOrder();
+		if (algorithm::byteCopyReturnSize(view, bytes) == bytes.size())
 		{
-			return size;
+			return bytes.size();
 		}
 		return bzd::nullopt;
-		;
 	}
 };
 

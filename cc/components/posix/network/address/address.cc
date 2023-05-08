@@ -68,7 +68,7 @@ bzd::Result<Addresses, bzd::Error> Addresses::fromHostname(const Protocol protoc
 	Addresses addresses{};
 	::addrinfo hints{};
 	String<8> portStr;
-	toString(portStr, port);
+	toString(portStr.assigner(), port);
 
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = bzd::toUnderlying(protocol.getSocketType());

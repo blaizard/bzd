@@ -38,7 +38,7 @@ requires(concepts::integral<T> || concepts::floatingPoint<T> || (concepts::point
 Async<> toStream(bzd::OStream& stream, const T& value, const Metadata& metadata) noexcept
 {
 	bzd::String<80> str{};
-	toString(str, value, metadata);
+	toString(str.assigner(), value, metadata);
 	co_await !stream.write(str.asBytes());
 	co_return {};
 }

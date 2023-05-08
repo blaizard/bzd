@@ -7,16 +7,17 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        "//cc/bzd/algorithm:byte_copy",
         "//cc/bzd/algorithm:reverse",
         "//cc/bzd/container:array",
         "//cc/bzd/container:string",
         "//cc/bzd/container:vector",
         "//cc/bzd/container/range/views:reverse",
         "//cc/bzd/meta:always_false",
-        "//cc/bzd/type_traits:container",
         "//cc/bzd/type_traits:is_floating_point",
         "//cc/bzd/type_traits:is_integral",
         "//cc/bzd/type_traits:is_signed",
+        "//cc/bzd/type_traits:range",
     ],
 )
 
@@ -28,6 +29,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":integral",
+        "//cc/bzd/algorithm:byte_copy",
         "//cc/bzd/container:array",
         "//cc/bzd/container:string",
         "//cc/bzd/container:tuple",

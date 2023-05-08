@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cc/bzd/algorithm/byte_copy.hh"
 #include "cc/bzd/algorithm/copy.hh"
 #include "cc/bzd/algorithm/fill_n.hh"
 #include "cc/bzd/container/impl/span_resizeable.hh"
@@ -10,6 +11,7 @@
 #include "cc/bzd/platform/types.hh"
 #include "cc/bzd/type_traits/add_const.hh"
 #include "cc/bzd/type_traits/is_trivially_copyable.hh"
+#include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/utility/min.hh"
 
 namespace bzd::impl {
@@ -123,25 +125,28 @@ constexpr bool operator==(const interface::String& lhs, const char* const rhs) n
 
 } // namespace bzd
 
-constexpr bzd::Optional<bzd::Size> toString(bzd::interface::String& str, const bzd::interface::String& data) noexcept
+template <bzd::concepts::outputStreamRange Range>
+constexpr bzd::Optional<bzd::Size> toString(Range&& range, const bzd::interface::String& data) noexcept
 {
-	if (str.append(data) == data.size())
+	if (bzd::algorithm::byteCopyReturnSize(data, range) == data.size())
 	{
 		return data.size();
 	}
 	return bzd::nullopt;
 }
 
-constexpr bzd::Optional<bzd::Size> toString(bzd::interface::String& str, const bzd::StringView data) noexcept
+template <bzd::concepts::outputStreamRange Range>
+constexpr bzd::Optional<bzd::Size> toString(Range&& range, const bzd::StringView data) noexcept
 {
-	if (str.append(data) == data.size())
+	if (bzd::algorithm::byteCopyReturnSize(data, range) == data.size())
 	{
 		return data.size();
 	}
 	return bzd::nullopt;
 }
 
-constexpr bzd::Optional<bzd::Size> toString(bzd::interface::String& str, const char* const data) noexcept
+template <bzd::concepts::outputStreamRange Range>
+constexpr bzd::Optional<bzd::Size> toString(Range&& range, const char* const data) noexcept
 {
-	return toString(str, bzd::StringView{data});
+	return ::toString(bzd::forward<Range>(range), bzd::StringView{data});
 }

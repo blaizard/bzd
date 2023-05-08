@@ -8,6 +8,8 @@
 #include "cc/bzd/type_traits/decay.hh"
 #include "cc/bzd/type_traits/enable_if.hh"
 #include "cc/bzd/type_traits/first_type.hh"
+#include "cc/bzd/type_traits/invocable.hh"
+#include "cc/bzd/type_traits/invoke_result.hh"
 #include "cc/bzd/type_traits/is_lvalue_reference.hh"
 #include "cc/bzd/type_traits/is_reference.hh"
 #include "cc/bzd/type_traits/is_same.hh"
@@ -152,6 +154,22 @@ public: // API
 		{
 			data_ = OptionalEmptyType{};
 		}
+	}
+
+public: // Monadic API.
+	/// If the optional contains a value, invokes 'callable' with the contained value as an argument,
+	/// and returns the result of that invocation; otherwise, returns an empty optional.
+	///
+	/// \param callable A suitable function or Callable object that returns an optional.
+	/// \return The result of 'callable' or an empty optional.
+	template <concepts::invocable<const T&> Callable>
+	constexpr auto andThen(Callable&& callable) const& noexcept
+	{
+		if (hasValue())
+		{
+			return bzd::forward<Callable>(callable)(value());
+		}
+		return typeTraits::InvokeResult<Callable, const T&>{};
 	}
 
 private:
