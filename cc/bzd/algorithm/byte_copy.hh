@@ -29,7 +29,7 @@ constexpr auto byteCopy(InputRange&& input, OutputRange&& output)
 		auto n = bzd::min(bzd::size(input), bzd::size(output));
 		for (; n > 0; --n)
 		{
-			reinterpret_cast<bzd::Byte&>(*outputFirst) = static_cast<const bzd::Byte>(*inputFirst);
+			*outputFirst = static_cast<const typeTraits::RangeValue<OutputRange>>(static_cast<const bzd::Byte>(*inputFirst));
 			++outputFirst;
 			++inputFirst;
 		}
@@ -38,13 +38,53 @@ constexpr auto byteCopy(InputRange&& input, OutputRange&& output)
 	{
 		while (inputFirst != inputLast && outputFirst != outputLast)
 		{
-			reinterpret_cast<bzd::Byte&>(*outputFirst) = static_cast<const bzd::Byte>(*inputFirst);
+			*outputFirst = static_cast<const typeTraits::RangeValue<OutputRange>>(static_cast<const bzd::Byte>(*inputFirst));
 			++outputFirst;
 			++inputFirst;
 		}
 	}
 
 	return range::InOutResult{inputFirst, outputFirst};
+}
+
+/// Copy an input range into an output range at byte level.
+///
+/// \param[in] input The range of elements to copy from.
+/// \param[out] output The range of the destination range.
+///
+/// \return The remain of the output range.
+template <concepts::inputRange InputRange, concepts::outputRange OutputRange>
+requires(concepts::byteCopyableRange<InputRange> && concepts::byteCopyableRange<OutputRange>)
+constexpr bzd::Size byteCopyReturnSize(InputRange&& input, OutputRange&& output)
+{
+	auto inputFirst = bzd::begin(input);
+	const auto inputLast = bzd::end(input);
+	auto outputFirst = bzd::begin(output);
+	const auto outputLast = bzd::end(output);
+
+	if constexpr (concepts::sizedRange<InputRange> && concepts::sizedRange<OutputRange>)
+	{
+		const auto n = bzd::min(bzd::size(input), bzd::size(output));
+		for (bzd::Size i = 0; i < n; ++i)
+		{
+			*outputFirst = static_cast<const typeTraits::RangeValue<OutputRange>>(static_cast<const bzd::Byte>(*inputFirst));
+			++outputFirst;
+			++inputFirst;
+		}
+		return n;
+	}
+	else
+	{
+		bzd::Size n = 0u;
+		while (inputFirst != inputLast && outputFirst != outputLast)
+		{
+			*outputFirst = static_cast<const typeTraits::RangeValue<OutputRange>>(static_cast<const bzd::Byte>(*inputFirst));
+			++outputFirst;
+			++inputFirst;
+			++n;
+		}
+		return n;
+	}
 }
 
 } // namespace bzd::algorithm

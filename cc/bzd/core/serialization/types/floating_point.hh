@@ -25,8 +25,7 @@ struct Serialization<T>
 	{
 		const auto bytes = Span<const Type>{&value, 1u}.asBytes();
 		const auto view = bytes | impl::serialization::normalizeByteOrder();
-		const auto result = algorithm::byteCopy(view, range);
-		if (static_cast<Size>(bzd::distance(bzd::begin(view), result.in)) == bytes.size())
+		if (algorithm::byteCopyReturnSize(view, range) == bytes.size())
 		{
 			return bytes.size();
 		}
@@ -37,13 +36,12 @@ struct Serialization<T>
 	static constexpr Optional<Size> deserialize(Range&& range, Type& value) noexcept
 	{
 		auto bytes = Span<Type>{&value, 1u}.asBytesMutable();
-		const auto result = algorithm::byteCopy(range | impl::serialization::normalizeByteOrder(), bytes);
-		const Size size = bzd::distance(bzd::begin(bytes), result.out);
-		if (size != bytes.size())
+		const auto view = range | impl::serialization::normalizeByteOrder();
+		if (algorithm::byteCopyReturnSize(view, bytes) == bytes.size())
 		{
-			return bzd::nullopt;
+			return bytes.size();
 		}
-		return size;
+		return bzd::nullopt;
 	}
 };
 

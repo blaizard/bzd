@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cc/bzd/algorithm/byte_copy.hh"
 #include "cc/bzd/container/array.hh"
 #include "cc/bzd/container/string.hh"
 #include "cc/bzd/container/string_view.hh"
@@ -186,42 +187,59 @@ constexpr bzd::StringView processCommon(const bzd::StringView stringView, const 
 	return {};
 }
 
-template <concepts::integral T>
-constexpr bzd::Optional<bzd::Size> toString(bzd::interface::String& str, const T value, const Metadata& metadata) noexcept
+template <concepts::outputStreamRange Range, concepts::integral T>
+constexpr bzd::Optional<bzd::Size> toString(Range&& range, const T value, const Metadata& metadata) noexcept
 {
+	bzd::Size count = 0u;
 	switch (metadata.format)
 	{
 	case Metadata::Format::automatic:
 	case Metadata::Format::decimal:
-		return ::toString(str, value);
+		return ::toString(range, value);
 	case Metadata::Format::binary:
 		if (metadata.alternate)
 		{
-			str += "0b"_sv;
+			if (bzd::algorithm::byteCopyReturnSize("0b"_sv, range) != 2u)
+			{
+				return bzd::nullopt;
+			}
+			count += 2u;
 		}
-		return bzd::format::toStringBin(str, value);
+		return bzd::format::toStringBin(range, value).andThen([&count](const auto value) { return value + count; });
 	case Metadata::Format::hexadecimalLower:
 		if (metadata.alternate)
 		{
-			str += "0x"_sv;
+			if (bzd::algorithm::byteCopyReturnSize("0x"_sv, range) != 2u)
+			{
+				return bzd::nullopt;
+			}
+			count += 2u;
 		}
-		return bzd::format::toStringHex(str, value);
+		return bzd::format::toStringHex(range, value).andThen([&count](const auto value) { return value + count; });
 	case Metadata::Format::hexadecimalUpper:
 		if (metadata.alternate)
 		{
-			str += "0x"_sv;
+			if (bzd::algorithm::byteCopyReturnSize("0x"_sv, range) != 2u)
+			{
+				return bzd::nullopt;
+			}
+			count += 2u;
 		}
 		{
 			constexpr bzd::Array<const char, 16>
 				digits{inPlace, '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
-			return bzd::format::toStringHex(str, value, digits);
+			return bzd::format::toStringHex(range, value, digits).andThen([&count](const auto value) { return value + count; });
 		}
 	case Metadata::Format::octal:
 		if (metadata.alternate)
 		{
-			str += "0o"_sv;
+			if (bzd::algorithm::byteCopyReturnSize("0o"_sv, range) != 2u)
+			{
+				return bzd::nullopt;
+			}
+			count += 2u;
 		}
-		return bzd::format::toStringOct(str, value);
+		return bzd::format::toStringOct(range, value).andThen([&count](const auto value) { return value + count; });
 	case Metadata::Format::fixedPoint:
 	case Metadata::Format::fixedPointPercent:
 	case Metadata::Format::pointer:
@@ -230,22 +248,22 @@ constexpr bzd::Optional<bzd::Size> toString(bzd::interface::String& str, const T
 	return bzd::nullopt;
 }
 
-template <concepts::floatingPoint T>
-constexpr bzd::Optional<bzd::Size> toString(bzd::interface::String& str, const T value, const Metadata& metadata) noexcept
+template <concepts::outputStreamRange Range, concepts::floatingPoint T>
+constexpr bzd::Optional<bzd::Size> toString(Range&& range, const T value, const Metadata& metadata) noexcept
 {
 	switch (metadata.format)
 	{
 	case Metadata::Format::automatic:
 	case Metadata::Format::decimal:
-		return ::toString(str, value);
+		return ::toString(range, value);
 	case Metadata::Format::fixedPoint:
-		return ::toString(str, value, (metadata.isPrecision) ? metadata.precision : 6);
+		return ::toString(range, value, (metadata.isPrecision) ? metadata.precision : 6);
 	case Metadata::Format::fixedPointPercent:
 	{
-		const auto result = ::toString(str, value * 100., (metadata.isPrecision) ? metadata.precision : 6);
+		const auto result = ::toString(range, value * 100., (metadata.isPrecision) ? metadata.precision : 6);
 		if (result)
 		{
-			if (str.append("%"_sv) == 1u)
+			if (bzd::algorithm::byteCopyReturnSize("%"_sv, range))
 			{
 				return result.value() + 1u;
 			}
@@ -262,26 +280,25 @@ constexpr bzd::Optional<bzd::Size> toString(bzd::interface::String& str, const T
 	return bzd::nullopt;
 }
 
-template <class T>
+template <concepts::outputStreamRange Range, class T>
 requires(concepts::pointer<T> && !concepts::constructible<bzd::StringView, T>)
-constexpr bzd::Optional<bzd::Size> toString(bzd::interface::String& str, const T value, const Metadata&) noexcept
+constexpr bzd::Optional<bzd::Size> toString(Range&& range, const T value, const Metadata&) noexcept
 {
 	Metadata metadata{};
 	metadata.format = Metadata::Format::hexadecimalLower;
 	metadata.alternate = true;
-	return toString(str, reinterpret_cast<Size>(value), metadata);
+	return toString(range, reinterpret_cast<Size>(value), metadata);
 }
 
-constexpr bzd::Optional<bzd::Size> toString(bzd::interface::String& str,
-											const bzd::StringView stringView,
-											const Metadata& metadata) noexcept
+template <concepts::outputStreamRange Range>
+constexpr bzd::Optional<bzd::Size> toString(Range&& range, const bzd::StringView stringView, const Metadata& metadata) noexcept
 {
 	const auto data = processCommon(stringView, metadata);
-	if (str.append(data) == data.size())
+	if (bzd::algorithm::byteCopyReturnSize(data, range) != data.size())
 	{
-		return data.size();
+		return bzd::nullopt;
 	}
-	return bzd::nullopt;
+	return data.size();
 }
 
 } // namespace bzd::format::impl
@@ -311,11 +328,11 @@ constexpr bzd::Optional<bzd::Size> toString(bzd::interface::String& str,
 /// \param out Output stream where the formating string will be written to.
 /// \param str run-time or compile-time string containing the format.
 /// \param args Arguments to be passed for the format.
-template <bzd::concepts::appendableWithBytes Container, bzd::concepts::constexprStringView Pattern, class... Args>
-constexpr bzd::Optional<bzd::Size> toString(Container& str, const Pattern& pattern, const Args&... args) noexcept
+template <bzd::concepts::outputStreamRange Range, bzd::concepts::constexprStringView Pattern, class... Args>
+constexpr bzd::Optional<bzd::Size> toString(Range&& range, const Pattern& pattern, const Args&... args) noexcept
 {
 	const auto [parser, processor] =
-		bzd::pattern::impl::make<Container&, bzd::format::impl::StringFormatter, bzd::format::impl::SchemaFormat>(pattern, args...);
+		bzd::pattern::impl::make<Range&, bzd::format::impl::StringFormatter, bzd::format::impl::SchemaFormat>(pattern, args...);
 	bzd::Size count{0u};
 
 	// Run-time call
@@ -323,7 +340,7 @@ constexpr bzd::Optional<bzd::Size> toString(Container& str, const Pattern& patte
 	{
 		if (!result.str.empty())
 		{
-			if (str.append(result.str) != result.str.size())
+			if (bzd::algorithm::byteCopyReturnSize(result.str, range) != result.str.size())
 			{
 				return bzd::nullopt;
 			}
@@ -331,7 +348,7 @@ constexpr bzd::Optional<bzd::Size> toString(Container& str, const Pattern& patte
 		}
 		if (result.isMetadata)
 		{
-			const auto maybeCount = processor.process(str, result);
+			const auto maybeCount = processor.process(range, result);
 			if (!maybeCount)
 			{
 				return bzd::nullopt;

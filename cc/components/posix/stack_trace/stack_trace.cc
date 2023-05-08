@@ -259,7 +259,7 @@ void callStack() noexcept // NOLINT(bugprone-exception-escape)
 		if (!path.empty())
 		{
 			bzd::String<1024> command;
-			toString(command,
+			toString(command.assigner(),
 					 "exec 2>/dev/null; addr2line -f -e \"{}\" {:#x} {:#x}"_csv,
 					 path,
 					 reinterpret_cast<bzd::IntPointer>(info.address),
