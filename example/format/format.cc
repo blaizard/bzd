@@ -8,18 +8,24 @@ public:
 	constexpr Date(bzd::UInt16 y, bzd::UInt16 m, bzd::UInt16 d) : y_{y}, m_{m}, d_{d} {}
 
 private:
-	friend bzd::Async<> toStream(bzd::OStream& os, const Date& d);
+	friend struct bzd::FormatterAsync<Date>;
 
 	bzd::UInt16 y_;
 	bzd::UInt16 m_;
 	bzd::UInt16 d_;
 };
 
-bzd::Async<> toStream(bzd::OStream& os, const Date& d)
+namespace bzd {
+template <>
+struct FormatterAsync<Date>
 {
-	co_await !toStream(os, "{:.4}:{:.2}:{:.2}"_csv, int(d.y_), int(d.m_), int(d.d_));
-	co_return {};
-}
+	static bzd::Async<> toStream(bzd::OStream& os, const Date& d)
+	{
+		co_await !bzd::toStream(os, "{:}:{:}:{:}"_csv, int(d.y_), int(d.m_), int(d.d_));
+		co_return {};
+	}
+};
+} // namespace bzd
 
 namespace example {
 
@@ -32,7 +38,7 @@ bzd::Async<> run(bzd::OStream& out)
 	co_await !toStream(out, "This date {} is {:.2%} true!\n{}\n"_csv, date, 0.85, "Hello World!"_sv);
 
 	bzd::String<128> str;
-	toString(str, "This date {}."_csv, 12);
+	bzd::toString(str.assigner(), "This date {}."_csv, 12);
 	std::cout << str.data() << std::endl;
 
 	co_return {};

@@ -61,17 +61,10 @@ private:
 	class StringReader
 	{
 	public:
-		template <class Range, class Value>
-		static constexpr auto process(Range& range, Value& value, [[maybe_unused]] const auto metadata) noexcept
+		template <class... Args>
+		static constexpr bzd::Optional<Size> process(Args&&... args) noexcept
 		{
-			if constexpr (bzd::concepts::fromString<Range, Value&, decltype(metadata)>)
-			{
-				return ::bzd::fromString(range, value, metadata);
-			}
-			else
-			{
-				return ::bzd::fromString(range, value);
-			}
+			return ::bzd::fromString(bzd::forward<Args>(args)...);
 		}
 	};
 

@@ -10,6 +10,7 @@ bzd_cc_test(
         "//cc/bzd/container:string_stream",
         "//cc/bzd/core/assert",
         "//cc/bzd/test",
+        "//cc/bzd/utility/pattern/formatter:to_stream",
         "//cc/bzd/utility/pattern/formatter:to_string",
     ],
 )

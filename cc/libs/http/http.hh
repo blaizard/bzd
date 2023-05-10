@@ -142,12 +142,12 @@ public:
 		auto scope = co_await !client_.connectIfNeeded();
 
 		OStreamBuffered<bufferCapacity> buffer{client_.stream_.valueMutable()};
-		co_await !::toStream(buffer, "{} {} HTTP/1.1\r\n"_csv, method.data(), path_);
+		co_await !bzd::toStream(buffer, "{} {} HTTP/1.1\r\n"_csv, method.data(), path_);
 		for (const auto& header : headers_)
 		{
-			co_await !::toStream(buffer, "{}: {}\r\n"_csv, header.key, header.value);
+			co_await !bzd::toStream(buffer, "{}: {}\r\n"_csv, header.key, header.value);
 		}
-		co_await !::toStream(buffer, "\r\n"_csv);
+		co_await !bzd::toStream(buffer, "\r\n"_csv);
 		co_await !buffer.flush();
 
 		co_return Response<Client, bufferCapacity>{client_};

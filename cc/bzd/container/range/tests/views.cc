@@ -25,6 +25,27 @@ TEST(Views, Drop)
 	}
 }
 
+TEST(Views, Take)
+{
+	bzd::test::Range<bzd::typeTraits::IteratorCategory::forward, int, 5> range{0, 1, 2, 3, 4};
+	bzd::range::Take view{range, 2};
+
+	const auto expected = {0, 1};
+	{
+		const auto isEqual = bzd::algorithm::equal(view, expected);
+		EXPECT_TRUE(isEqual);
+	}
+	{
+		const auto isEqual = bzd::algorithm::equal(range | bzd::range::take(2), expected);
+		EXPECT_TRUE(isEqual);
+	}
+	{
+		const auto expected2 = {0};
+		const auto isEqual = bzd::algorithm::equal(range | bzd::range::take(2) | bzd::range::take(1), expected2);
+		EXPECT_TRUE(isEqual);
+	}
+}
+
 TEST(Views, Transform)
 {
 	bzd::test::Range<bzd::typeTraits::IteratorCategory::forward, int, 5> range{0, 1, 2, 3, 4};

@@ -124,29 +124,3 @@ constexpr bool operator==(const interface::String& lhs, const char* const rhs) n
 }
 
 } // namespace bzd
-
-template <bzd::concepts::outputStreamRange Range>
-constexpr bzd::Optional<bzd::Size> toString(Range&& range, const bzd::interface::String& data) noexcept
-{
-	if (bzd::algorithm::byteCopyReturnSize(data, range) == data.size())
-	{
-		return data.size();
-	}
-	return bzd::nullopt;
-}
-
-template <bzd::concepts::outputStreamRange Range>
-constexpr bzd::Optional<bzd::Size> toString(Range&& range, const bzd::StringView data) noexcept
-{
-	if (bzd::algorithm::byteCopyReturnSize(data, range) == data.size())
-	{
-		return data.size();
-	}
-	return bzd::nullopt;
-}
-
-template <bzd::concepts::outputStreamRange Range>
-constexpr bzd::Optional<bzd::Size> toString(Range&& range, const char* const data) noexcept
-{
-	return ::toString(bzd::forward<Range>(range), bzd::StringView{data});
-}

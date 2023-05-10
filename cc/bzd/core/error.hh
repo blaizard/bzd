@@ -57,7 +57,7 @@ public:
 		auto& maybeString = message_.template get<Optional<interface::String&>>();
 		if (maybeString)
 		{
-			::toString(maybeString.valueMutable().assigner(), bzd::forward<Args>(args)...);
+			bzd::toString(maybeString.valueMutable().assigner(), bzd::forward<Args>(args)...);
 		}
 	}
 
