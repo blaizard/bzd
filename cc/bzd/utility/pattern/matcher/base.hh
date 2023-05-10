@@ -48,13 +48,3 @@ constexpr Optional<Size> fromString(Range&& range, Args&&... args) noexcept
 }
 
 } // namespace bzd
-
-namespace bzd::concepts {
-
-/// Checks if a specific specialization for fromString exists.
-template <class Range, class... Args>
-concept fromString = requires(Range&& range, Args&&... args) {
-						 ::bzd::typeTraits::Matcher<Args...>::fromString(bzd::forward<Range>(range), bzd::forward<Args>(args)...);
-					 };
-
-} // namespace bzd::concepts

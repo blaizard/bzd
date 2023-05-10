@@ -10,12 +10,12 @@ template <bzd::Size N, class... Args>
 void expectStringStreamFormat(const char* expected, Args&&... args)
 {
 	bzd::String<N> str;
-	const auto result = toString(str.assigner(), bzd::forward<Args>(args)...);
+	const auto result = bzd::toString(str.assigner(), bzd::forward<Args>(args)...);
 	EXPECT_TRUE(result);
 	EXPECT_STREQ(str.data(), expected);
 
 	bzd::StringStream<N> stream;
-	toStream(stream, bzd::forward<Args>(args)...).sync();
+	bzd::toStream(stream, bzd::forward<Args>(args)...).sync();
 	EXPECT_STREQ(stream.str().data(), expected);
 }
 
@@ -38,7 +38,7 @@ TEST_CONSTEXPR_BEGIN(Format_, Constexpr)
 {
 	{
 		bzd::String<128> str;
-		const auto result = toString(str.assigner(), "Hello World"_csv);
+		const auto result = bzd::toString(str.assigner(), "Hello World"_csv);
 		EXPECT_TRUE(result);
 		EXPECT_EQ(result.value(), 11u);
 		EXPECT_STREQ(str.data(), "Hello World");
@@ -46,7 +46,7 @@ TEST_CONSTEXPR_BEGIN(Format_, Constexpr)
 
 	{
 		bzd::String<128> str;
-		const auto result = toString(str.assigner(), "Hello {}"_csv, "World");
+		const auto result = bzd::toString(str.assigner(), "Hello {}"_csv, "World");
 		EXPECT_TRUE(result);
 		EXPECT_EQ(result.value(), 11u);
 		EXPECT_STREQ(str.data(), "Hello World");
@@ -54,7 +54,7 @@ TEST_CONSTEXPR_BEGIN(Format_, Constexpr)
 
 	{
 		bzd::String<128> str;
-		const auto result = toString(str.assigner(), "Hello {}"_csv, 12);
+		const auto result = bzd::toString(str.assigner(), "Hello {}"_csv, 12);
 		EXPECT_TRUE(result);
 		EXPECT_EQ(result.value(), 8u);
 		EXPECT_STREQ(str.data(), "Hello 12");

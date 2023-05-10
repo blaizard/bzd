@@ -2,6 +2,7 @@
 
 #include "cc/bzd/algorithm/fill.hh"
 #include "cc/bzd/core/error.hh"
+#include "cc/bzd/utility/pattern/formatter/to_string.hh"
 #include "cc/components/posix/error.hh"
 
 #include <arpa/inet.h>
@@ -68,7 +69,7 @@ bzd::Result<Addresses, bzd::Error> Addresses::fromHostname(const Protocol protoc
 	Addresses addresses{};
 	::addrinfo hints{};
 	String<8> portStr;
-	toString(portStr.assigner(), port);
+	bzd::toString(portStr.assigner(), port);
 
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = bzd::toUnderlying(protocol.getSocketType());

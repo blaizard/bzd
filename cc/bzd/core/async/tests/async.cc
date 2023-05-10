@@ -3,7 +3,7 @@
 #include "cc/bzd/container/string.hh"
 #include "cc/bzd/test/test.hh"
 #include "cc/bzd/test/types/move_only.hh"
-#include "cc/bzd/utility/pattern/formatter/integral.hh"
+#include "cc/bzd/utility/pattern/formatter/to_string/integral.hh"
 #include "cc/bzd/utility/scope_guard.hh"
 
 namespace {
@@ -11,7 +11,7 @@ void appendToTrace(bzd::interface::String& trace, bzd::StringView id, int checkp
 {
 	trace += '[';
 	trace += id;
-	::toString(trace.appender(), checkpoint);
+	bzd::toString(trace.appender(), checkpoint);
 	trace += ']';
 	//::std::cout << "[" << id.data() << checkpoint << "]" << ::std::flush;
 }

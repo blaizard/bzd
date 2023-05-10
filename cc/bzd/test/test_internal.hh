@@ -5,7 +5,7 @@
 #include "cc/bzd/test/composition.hh"
 #include "cc/bzd/type_traits/is_same_class.hh"
 #include "cc/bzd/utility/numeric_limits.hh"
-#include "cc/bzd/utility/pattern/formatter/integral.hh"
+#include "cc/bzd/utility/pattern/formatter/to_string/integral.hh"
 #include "cc/bzd/utility/random/uniform_int_distribution.hh"
 #include "cc/bzd/utility/random/xorwow_engine.hh"
 
@@ -280,27 +280,27 @@ public:
 private:
 	constexpr char charToString(const char c) { return (c >= 32 && c < 127) ? c : '?'; }
 
-	constexpr void valueToString(short value) { ::toString(string_.appender(), static_cast<bzd::Int64>(value)); }
-	constexpr void valueToString(int value) { ::toString(string_.appender(), static_cast<bzd::Int64>(value)); }
-	constexpr void valueToString(long int value) { ::toString(string_.appender(), static_cast<bzd::Int64>(value)); }
-	constexpr void valueToString(long long int value) { ::toString(string_.appender(), static_cast<bzd::Int64>(value)); }
-	constexpr void valueToString(unsigned short value) { ::toString(string_.appender(), static_cast<bzd::UInt64>(value)); }
-	constexpr void valueToString(unsigned int value) { ::toString(string_.appender(), static_cast<bzd::UInt64>(value)); }
-	constexpr void valueToString(unsigned long int value) { ::toString(string_.appender(), static_cast<bzd::UInt64>(value)); }
-	constexpr void valueToString(unsigned long long int value) { ::toString(string_.appender(), static_cast<bzd::UInt64>(value)); }
+	constexpr void valueToString(short value) { ::bzd::toString(string_.appender(), static_cast<bzd::Int64>(value)); }
+	constexpr void valueToString(int value) { ::bzd::toString(string_.appender(), static_cast<bzd::Int64>(value)); }
+	constexpr void valueToString(long int value) { ::bzd::toString(string_.appender(), static_cast<bzd::Int64>(value)); }
+	constexpr void valueToString(long long int value) { ::bzd::toString(string_.appender(), static_cast<bzd::Int64>(value)); }
+	constexpr void valueToString(unsigned short value) { ::bzd::toString(string_.appender(), static_cast<bzd::UInt64>(value)); }
+	constexpr void valueToString(unsigned int value) { ::bzd::toString(string_.appender(), static_cast<bzd::UInt64>(value)); }
+	constexpr void valueToString(unsigned long int value) { ::bzd::toString(string_.appender(), static_cast<bzd::UInt64>(value)); }
+	constexpr void valueToString(unsigned long long int value) { ::bzd::toString(string_.appender(), static_cast<bzd::UInt64>(value)); }
 
-	constexpr void valueToString(float value) { ::toString(string_.appender(), value); }
-	constexpr void valueToString(double value) { ::toString(string_.appender(), value); }
+	constexpr void valueToString(float value) { ::bzd::toString(string_.appender(), value); }
+	constexpr void valueToString(double value) { ::bzd::toString(string_.appender(), value); }
 
 	constexpr void valueToString(char value) { valueToString(static_cast<unsigned char>(value)); }
-	constexpr void valueToString(unsigned char value) { ::toString(string_.appender(), "{} ({:#x})"_csv, charToString(value), value); }
+	constexpr void valueToString(unsigned char value) { ::bzd::toString(string_.appender(), "{} ({:#x})"_csv, charToString(value), value); }
 
 	constexpr void valueToString(bool value) { string_ = (value) ? "true"_sv : "false"_sv; }
 
 	template <class U>
 	constexpr void valueToString(U* value)
 	{
-		::toString(string_.appender(), "{:#x}"_csv, reinterpret_cast<bzd::UInt64>(value));
+		::bzd::toString(string_.appender(), "{:#x}"_csv, reinterpret_cast<bzd::UInt64>(value));
 	}
 
 	constexpr void valueToString(const unsigned char* value) { valueToString(reinterpret_cast<const char*>(value)); }

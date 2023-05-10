@@ -14,8 +14,15 @@ public:
 	{
 		// Make the actual lambda
 		const auto lambdas = bzd::makeTuple([&args](Range& range, const Metadatas<Adapter, Args...>& metadatas) -> bzd::Async<> {
-			const auto& metadata = metadatas.template get<Metadata<Adapter, Args>>();
-			co_await !Adapter::process(range, args, metadata);
+			if constexpr (concepts::metadata<Adapter, Args>)
+			{
+				const auto& metadata = metadatas.template get<Metadata<Adapter, Args>>();
+				co_await !Adapter::process(range, args, metadata);
+			}
+			else
+			{
+				co_await !Adapter::process(range, args);
+			}
 			co_return {};
 		}...);
 

@@ -6,7 +6,7 @@
 #include "cc/bzd/core/channel.hh"
 #include "cc/bzd/core/error.hh"
 #include "cc/bzd/platform/types.hh"
-#include "cc/bzd/utility/pattern/formatter/integral.hh"
+#include "cc/bzd/utility/pattern/formatter/to_string/integral.hh"
 #include "cc/bzd/utility/scope_guard.hh"
 #include "cc/components/posix/network/interface.hh"
 #include "cc/components/posix/network/types.hh"
@@ -38,7 +38,7 @@ public:
 		hints.ai_protocol = IPPROTO_TCP;
 
 		String<8> portStr;
-		toString(portStr, port);
+		bzd::toString(portStr.assigner(), port);
 
 		struct addrinfo* addrs{nullptr};
 		if (const auto result = ::getaddrinfo(hostname.data(), portStr.data(), &hints, &addrs); result != 0)

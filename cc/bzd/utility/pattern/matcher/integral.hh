@@ -37,14 +37,14 @@ public:
 		switch (metadata.format)
 		{
 		case Metadata::Format::binary:
-			return fromStringBase<Range, 2u>(bzd::forward<Range>(range), data, metadata);
+			return fromStringBase<2u>(bzd::forward<Range>(range), data, metadata);
 		case Metadata::Format::octal:
-			return fromStringBase<Range, 8u>(bzd::forward<Range>(range), data, metadata);
+			return fromStringBase<8u>(bzd::forward<Range>(range), data, metadata);
 		case Metadata::Format::decimal:
-			return fromStringBase<Range, 10u>(bzd::forward<Range>(range), data, metadata);
+			return fromStringBase<10u>(bzd::forward<Range>(range), data, metadata);
 		case Metadata::Format::hexadecimalLower:
 		case Metadata::Format::hexadecimalUpper:
-			return fromStringBase<Range, 16u>(bzd::forward<Range>(range), data, metadata);
+			return fromStringBase<16u>(bzd::forward<Range>(range), data, metadata);
 		}
 		return bzd::nullopt;
 	}
@@ -84,7 +84,7 @@ public:
 	}
 
 private:
-	template <concepts::inputStreamRange Range, Size base>
+	template <Size base, concepts::inputStreamRange Range>
 	static constexpr Optional<Size> fromStringBase(Range&& range, T& data, const Metadata metadata) noexcept
 	{
 		static_assert(base > 1 && base <= 16, "Invalid base size.");

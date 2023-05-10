@@ -165,6 +165,7 @@ constexpr ReturnType parseMetadata(const Size metadataIndex, const bzd::StringVi
 		}
 		else
 		{
+			Adapter::assertTrue(options.empty(), "Pattern options are not supported for this type.");
 			return options;
 		}
 	}
@@ -255,19 +256,16 @@ public:
 	{
 		// Make a lambda that capture the arguments and cast the Metadata type into the correct one.
 		const auto lambdas = bzd::makeTuple([&args](Range & range, const Metadatas<Adapter, Args...>& metadatas) -> auto{
-			const auto& metadata = metadatas.template get<Metadata<Adapter, Args>>();
-			return Adapter::process(range, args, metadata);
-		}...);
-		/*const auto lambdasErased = bzd::apply([](const auto&... items) -> auto {
-			if constexpr (sizeof...(Args))
+			if constexpr (concepts::metadata<Adapter, Args>)
 			{
-				return bzd::makeArray(bzd::FunctionRef<bzd::Optional<bzd::Size>(Range&, const MetadataVariant&)>{items}...);
+				const auto& metadata = metadatas.template get<Metadata<Adapter, Args>>();
+				return Adapter::process(range, args, metadata);
 			}
 			else
 			{
-				return nullptr;
+				return Adapter::process(range, args);
 			}
-		}, lambdas);*/
+		}...);
 
 		return ProcessorType<decltype(lambdas)>{lambdas};
 	}

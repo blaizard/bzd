@@ -9,6 +9,7 @@ bzd_cc_library(
         ":all",
         ":drop",
         ":reverse",
+        ":take",
         ":transform",
     ],
 )
@@ -62,6 +63,19 @@ cc_library(
         ":adaptor",
         "//cc/bzd/container/iterator:reverse",
         "//cc/bzd/container/range:view_interface",
+    ],
+)
+
+cc_library(
+    name = "take",
+    hdrs = [
+        "take.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":adaptor",
+        "//cc/bzd/container/range:view_interface",
+        "//cc/bzd/utility:advance",
     ],
 )
 

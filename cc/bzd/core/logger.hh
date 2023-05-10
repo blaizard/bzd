@@ -2,7 +2,21 @@
 
 #include "cc/bzd/core/async.hh"
 #include "cc/bzd/utility/pattern/formatter/to_stream.hh"
+#include "cc/bzd/utility/pattern/formatter/to_stream/base.hh"
 #include "cc/bzd/utility/source_location.hh"
+
+namespace bzd {
+template <>
+struct FormatterAsync<bzd::Error>
+{
+	// Specialization for bzd::Error type.
+	static bzd::Async<> toStream(bzd::OStream& stream, const bzd::Error& e)
+	{
+		co_await !bzd::toStream(stream, "[origin:{}:{}] [{}] {}"_csv, e.getSource(), e.getLine(), e.getTypeAsString(), e.getMessage());
+		co_return {};
+	}
+};
+} // namespace bzd
 
 namespace bzd::log {
 enum class Level
@@ -12,13 +26,6 @@ enum class Level
 	info = 2,
 	debug = 3
 };
-}
-
-// Specialization for bzd::Error type.
-inline bzd::Async<> toStream(bzd::OStream& stream, const bzd::Error& e)
-{
-	co_await !::toStream(stream, "[origin:{}:{}] [{}] {}"_csv, e.getSource(), e.getLine(), e.getTypeAsString(), e.getMessage());
-	co_return {};
 }
 
 namespace bzd {
