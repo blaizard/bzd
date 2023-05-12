@@ -38,18 +38,6 @@ cc_library(
 )
 
 cc_library(
-    name = "output_range",
-    hdrs = [
-        "output_range.hh",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":output_stream",
-        "//cc/bzd/container/range:stream",
-    ],
-)
-
-cc_library(
     name = "output_stream",
     hdrs = [
         "output_stream.hh",
