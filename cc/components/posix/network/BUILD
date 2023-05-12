@@ -31,7 +31,7 @@ cc_library(
         "//cc/bzd/core/async",
         "//cc/bzd/platform:types",
         "//cc/bzd/utility:scope_guard",
-        "//cc/bzd/utility/pattern/formatter/to_string:integral",
+        "//cc/bzd/utility/pattern/to_string:integral",
         "//cc/components/posix/network/address",
     ],
 )

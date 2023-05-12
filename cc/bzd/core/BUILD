@@ -67,7 +67,7 @@ cc_library(
         "//cc/bzd/container:variant",
         "//cc/bzd/type_traits:remove_cvref",
         "//cc/bzd/utility:source_location",
-        "//cc/bzd/utility/pattern/formatter:to_string",
+        "//cc/bzd/utility/pattern:to_string",
     ],
 )
 
@@ -79,7 +79,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/core/async",
-        "//cc/bzd/utility/pattern/formatter:to_stream",
+        "//cc/bzd/utility/pattern:to_stream",
     ],
 )
 

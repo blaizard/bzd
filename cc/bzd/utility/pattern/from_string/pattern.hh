@@ -3,14 +3,14 @@
 #include "cc/bzd/container/string.hh"
 #include "cc/bzd/container/variant.hh"
 #include "cc/bzd/type_traits/container.hh"
-#include "cc/bzd/utility/pattern/matcher/base.hh"
+#include "cc/bzd/utility/pattern/from_string/base.hh"
 #include "cc/bzd/utility/pattern/pattern.hh"
 #include "cc/bzd/utility/regexpr/regexpr.hh"
 
 namespace bzd {
 
 template <concepts::constexprStringView T>
-struct Matcher<T>
+struct FromString<T>
 {
 public:
 	// Proposed syntax:
@@ -25,9 +25,9 @@ public:
 	// - "HTTP{:f}\s+{:i}\s+{[A-Z]*}"
 	// fromString(myString, ".*{}.*"_csv, )
 	template <bzd::concepts::inputStreamRange Range, class... Args>
-	static constexpr Optional<Size> fromString(Range&& range, const T& pattern, Args&&... args) noexcept
+	static constexpr Optional<Size> process(Range&& range, const T& pattern, Args&&... args) noexcept
 	{
-		auto [context, processor] = bzd::pattern::impl::make<Range, StringReader, Schema>(pattern, bzd::forward<Args>(args)...);
+		auto [context, processor] = bzd::pattern::impl::make<Range, Schema>(pattern, bzd::forward<Args>(args)...);
 		Size counter{0u};
 
 		// Run-time call
@@ -58,22 +58,12 @@ public:
 	}
 
 private:
-	class StringReader
-	{
-	public:
-		template <class... Args>
-		static constexpr bzd::Optional<Size> process(Args&&... args) noexcept
-		{
-			return ::bzd::fromString(bzd::forward<Args>(args)...);
-		}
-	};
-
 	class Schema
 	{
 	public:
 		/// Get the specialization associated with a type.
 		template <class Value>
-		using Specialization = typename typeTraits::template Matcher<Value>;
+		using Specialization = typename typeTraits::template FromString<Value>;
 	};
 };
 

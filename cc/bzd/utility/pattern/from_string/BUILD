@@ -1,17 +1,4 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
-load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_library")
-
-bzd_cc_library(
-    name = "matcher",
-    visibility = ["//visibility:public"],
-    deps = [
-        ":integral",
-        ":output_stream",
-        ":pattern",
-    ],
-)
-
-# ---- Individual items ----
 
 cc_library(
     name = "base",
@@ -47,6 +34,18 @@ cc_library(
         "//cc/bzd/type_traits:remove_reference",
         "//cc/bzd/utility:begin",
         "//cc/bzd/utility:end",
+    ],
+)
+
+cc_library(
+    name = "output_range",
+    hdrs = [
+        "output_range.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":output_stream",
+        "//cc/bzd/container/range:stream",
     ],
 )
 

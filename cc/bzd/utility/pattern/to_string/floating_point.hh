@@ -4,13 +4,13 @@
 #include "cc/bzd/container/string_view.hh"
 #include "cc/bzd/type_traits/is_floating_point.hh"
 #include "cc/bzd/type_traits/range.hh"
-#include "cc/bzd/utility/pattern/formatter/to_string/base.hh"
-#include "cc/bzd/utility/pattern/formatter/to_string/integral.hh"
+#include "cc/bzd/utility/pattern/to_string/base.hh"
+#include "cc/bzd/utility/pattern/to_string/integral.hh"
 
 namespace bzd {
 
 template <concepts::floatingPoint T>
-struct Formatter<T>
+struct ToString<T>
 {
 public:
 	struct Metadata
@@ -82,15 +82,15 @@ public:
 
 public:
 	template <concepts::outputStreamRange Range>
-	static constexpr bzd::Optional<bzd::Size> toString(Range&& range, const T& n, const Size precision) noexcept
+	static constexpr bzd::Optional<bzd::Size> process(Range&& range, const T& n, const Size precision) noexcept
 	{
 		Metadata metadata{};
 		metadata.precision = precision;
-		return toString(bzd::forward<Range>(range), n, metadata);
+		return process(bzd::forward<Range>(range), n, metadata);
 	}
 
 	template <concepts::outputStreamRange Range>
-	static constexpr bzd::Optional<bzd::Size> toString(Range&& range, const T& n, const Metadata metadata = Metadata{}) noexcept
+	static constexpr bzd::Optional<bzd::Size> process(Range&& range, const T& n, const Metadata metadata = Metadata{}) noexcept
 	{
 		switch (metadata.format)
 		{

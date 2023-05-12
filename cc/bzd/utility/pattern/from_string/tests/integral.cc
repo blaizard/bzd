@@ -1,4 +1,4 @@
-#include "cc/bzd/utility/pattern/matcher/integral.hh"
+#include "cc/bzd/utility/pattern/from_string/integral.hh"
 
 #include "cc/bzd/test/test.hh"
 
@@ -42,7 +42,7 @@ TEST(IntegralFromString, Integer)
 
 TEST(IntegralFromString, Hexadecimal)
 {
-	using Metadata = typename bzd::Matcher<bzd::Int32>::Metadata;
+	using Metadata = typename bzd::FromString<bzd::Int32>::Metadata;
 
 	{
 		bzd::Int32 n;

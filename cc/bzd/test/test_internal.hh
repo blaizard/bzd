@@ -5,7 +5,7 @@
 #include "cc/bzd/test/composition.hh"
 #include "cc/bzd/type_traits/is_same_class.hh"
 #include "cc/bzd/utility/numeric_limits.hh"
-#include "cc/bzd/utility/pattern/formatter/to_string/integral.hh"
+#include "cc/bzd/utility/pattern/to_string/integral.hh"
 #include "cc/bzd/utility/random/uniform_int_distribution.hh"
 #include "cc/bzd/utility/random/xorwow_engine.hh"
 

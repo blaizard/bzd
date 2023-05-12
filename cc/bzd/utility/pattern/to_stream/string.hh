@@ -3,25 +3,25 @@
 #include "cc/bzd/container/string.hh"
 #include "cc/bzd/container/string_view.hh"
 #include "cc/bzd/type_traits/is_convertible.hh"
-#include "cc/bzd/utility/pattern/formatter/to_stream/base.hh"
-#include "cc/bzd/utility/pattern/formatter/to_string/string.hh"
+#include "cc/bzd/utility/pattern/to_stream/base.hh"
+#include "cc/bzd/utility/pattern/to_string/string.hh"
 
 namespace bzd {
 
 template <class T>
 requires(concepts::convertible<T, bzd::StringView> || concepts::convertible<T, bzd::interface::String>)
-struct FormatterAsync<T> : Formatter<T>
+struct ToStream<T> : ToString<T>
 {
 public:
-	using Metadata = typename Formatter<T>::Metadata;
+	using Metadata = typename ToString<T>::Metadata;
 
-	static bzd::Async<> toStream(bzd::OStream& stream, const bzd::StringView value, const Metadata metadata = Metadata{}) noexcept
+	static bzd::Async<> process(bzd::OStream& stream, const bzd::StringView value, const Metadata metadata = Metadata{}) noexcept
 	{
 		co_await !toStreamBase(stream, value, metadata);
 		co_return {};
 	}
 
-	static bzd::Async<> toStream(bzd::OStream& stream, const bzd::interface::String& value, const Metadata metadata = Metadata{}) noexcept
+	static bzd::Async<> process(bzd::OStream& stream, const bzd::interface::String& value, const Metadata metadata = Metadata{}) noexcept
 	{
 		co_await !toStreamBase(stream, value, metadata);
 		co_return {};

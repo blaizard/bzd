@@ -9,18 +9,18 @@
 
 namespace bzd {
 
-/// This is the matcher base template and is used for partial or full specialization.
+/// This is the FromString base template and is used for partial or full specialization.
 template <class... Args>
-struct Matcher
+struct FromString
 {
-	static_assert(bzd::meta::alwaysFalse<Args...>, "This type has no matcher specialization.");
+	static_assert(bzd::meta::alwaysFalse<Args...>, "This type has no FromString specialization.");
 };
 
 namespace typeTraits {
 
-/// Match the Matcher specialization.
+/// Match the FromString specialization.
 template <class T, class... Ts>
-struct Matcher : ::bzd::Matcher<typeTraits::RemoveCVRef<T>>
+struct FromString : ::bzd::FromString<typeTraits::RemoveCVRef<T>>
 {
 };
 
@@ -34,7 +34,7 @@ struct Matcher : ::bzd::Matcher<typeTraits::RemoveCVRef<T>>
 template <concepts::inputStreamRange Range, class... Args>
 constexpr Optional<Size> fromString(Range&& range, Args&&... args) noexcept
 {
-	return ::bzd::typeTraits::Matcher<Args...>::fromString(bzd::forward<Range>(range), bzd::forward<Args>(args)...);
+	return ::bzd::typeTraits::FromString<Args...>::process(bzd::forward<Range>(range), bzd::forward<Args>(args)...);
 }
 
 /// \copydoc fromString

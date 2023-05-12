@@ -2,13 +2,13 @@
 
 #include "cc/bzd/algorithm/byte_copy.hh"
 #include "cc/bzd/container/string_view.hh"
-#include "cc/bzd/utility/pattern/formatter/to_string/base.hh"
 #include "cc/bzd/utility/pattern/pattern.hh"
+#include "cc/bzd/utility/pattern/to_string/base.hh"
 
 namespace bzd {
 
 template <concepts::constexprStringView Pattern>
-struct Formatter<Pattern>
+struct ToString<Pattern>
 {
 public:
 	/// \brief String formating.
@@ -37,9 +37,9 @@ public:
 	/// \param str run-time or compile-time string containing the format.
 	/// \param args Arguments to be passed for the format.
 	template <bzd::concepts::outputStreamRange Range, class... Args>
-	static constexpr bzd::Optional<bzd::Size> toString(Range&& range, const Pattern& pattern, const Args&... args) noexcept
+	static constexpr bzd::Optional<bzd::Size> process(Range&& range, const Pattern& pattern, const Args&... args) noexcept
 	{
-		const auto [parser, processor] = bzd::pattern::impl::make<Range&, StringFormatter, Schema>(pattern, args...);
+		const auto [parser, processor] = bzd::pattern::impl::make<Range&, Schema>(pattern, args...);
 		bzd::Size count{0u};
 
 		// Run-time call
@@ -68,31 +68,21 @@ public:
 	}
 
 private:
-	class StringFormatter
-	{
-	public:
-		template <class... Args>
-		static constexpr bzd::Optional<Size> process(Args&&... args) noexcept
-		{
-			return ::bzd::toString(bzd::forward<Args>(args)...);
-		}
-	};
-
 	class Schema
 	{
 	public:
 		/// Get the specialization associated with a type.
 		template <class Value>
-		using Specialization = typename typeTraits::template Formatter<Value>;
+		using Specialization = typename typeTraits::template ToString<Value>;
 	};
 };
 
 template <>
-struct Formatter<char>
+struct ToString<char>
 {
 public:
 	template <bzd::concepts::outputStreamRange Range>
-	static constexpr bzd::Optional<bzd::Size> toString(Range&& range, const char c) noexcept
+	static constexpr bzd::Optional<bzd::Size> process(Range&& range, const char c) noexcept
 	{
 		if (!bzd::algorithm::byteCopyReturnSize(bzd::StringView{&c, 1u}, range))
 		{

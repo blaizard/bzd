@@ -2,7 +2,7 @@
 
 #include "cc/bzd/algorithm/fill.hh"
 #include "cc/bzd/core/error.hh"
-#include "cc/bzd/utility/pattern/formatter/to_string.hh"
+#include "cc/bzd/utility/pattern/to_string.hh"
 #include "cc/components/posix/error.hh"
 
 #include <arpa/inet.h>

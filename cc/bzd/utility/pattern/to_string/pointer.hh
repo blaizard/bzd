@@ -4,19 +4,19 @@
 #include "cc/bzd/type_traits/is_convertible.hh"
 #include "cc/bzd/type_traits/is_pointer.hh"
 #include "cc/bzd/type_traits/range.hh"
-#include "cc/bzd/utility/pattern/formatter/to_string/base.hh"
-#include "cc/bzd/utility/pattern/formatter/to_string/integral.hh"
+#include "cc/bzd/utility/pattern/to_string/base.hh"
+#include "cc/bzd/utility/pattern/to_string/integral.hh"
 
 namespace bzd {
 
 template <class T>
 requires(concepts::pointer<T> && !concepts::convertible<T, bzd::StringView>)
-struct Formatter<T>
+struct ToString<T>
 {
 	template <bzd::concepts::outputStreamRange Range>
-	static constexpr bzd::Optional<bzd::Size> toString(Range&& range, const T value) noexcept
+	static constexpr bzd::Optional<bzd::Size> process(Range&& range, const T value) noexcept
 	{
-		using Metadata = bzd::Formatter<bzd::UInt64>::Metadata;
+		using Metadata = bzd::ToString<bzd::UInt64>::Metadata;
 
 		Metadata metadata{};
 		metadata.format = Metadata::Format::hexadecimalLower;

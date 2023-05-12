@@ -8,7 +8,7 @@ public:
 	constexpr Date(bzd::UInt16 y, bzd::UInt16 m, bzd::UInt16 d) : y_{y}, m_{m}, d_{d} {}
 
 private:
-	friend struct bzd::FormatterAsync<Date>;
+	friend struct bzd::ToStream<Date>;
 
 	bzd::UInt16 y_;
 	bzd::UInt16 m_;
@@ -17,9 +17,9 @@ private:
 
 namespace bzd {
 template <>
-struct FormatterAsync<Date>
+struct ToStream<Date>
 {
-	static bzd::Async<> toStream(bzd::OStream& os, const Date& d)
+	static bzd::Async<> process(bzd::OStream& os, const Date& d)
 	{
 		co_await !bzd::toStream(os, "{:}:{:}:{:}"_csv, int(d.y_), int(d.m_), int(d.d_));
 		co_return {};
