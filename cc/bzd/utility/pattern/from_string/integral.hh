@@ -10,12 +10,12 @@
 #include "cc/bzd/type_traits/remove_reference.hh"
 #include "cc/bzd/utility/begin.hh"
 #include "cc/bzd/utility/end.hh"
-#include "cc/bzd/utility/pattern/matcher/base.hh"
+#include "cc/bzd/utility/pattern/from_string/base.hh"
 
 namespace bzd {
 
 template <concepts::integral T>
-struct Matcher<T>
+struct FromString<T>
 {
 public:
 	struct Metadata
@@ -32,7 +32,7 @@ public:
 	};
 
 	template <concepts::inputStreamRange Range>
-	static constexpr Optional<Size> fromString(Range&& range, T& data, const Metadata metadata = Metadata{}) noexcept
+	static constexpr Optional<Size> process(Range&& range, T& data, const Metadata metadata = Metadata{}) noexcept
 	{
 		switch (metadata.format)
 		{

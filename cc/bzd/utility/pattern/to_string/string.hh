@@ -5,13 +5,13 @@
 #include "cc/bzd/container/string.hh"
 #include "cc/bzd/container/string_view.hh"
 #include "cc/bzd/type_traits/is_convertible.hh"
-#include "cc/bzd/utility/pattern/formatter/to_string/base.hh"
+#include "cc/bzd/utility/pattern/to_string/base.hh"
 
 namespace bzd {
 
 template <class T>
 requires(concepts::convertible<T, bzd::StringView> || concepts::convertible<T, bzd::interface::String>)
-struct Formatter<T>
+struct ToString<T>
 {
 	struct Metadata
 	{
@@ -20,17 +20,17 @@ struct Formatter<T>
 	};
 
 	template <bzd::concepts::outputStreamRange Range>
-	static constexpr bzd::Optional<bzd::Size> toString(Range&& range,
-													   const bzd::StringView value,
-													   const Metadata metadata = Metadata{}) noexcept
+	static constexpr bzd::Optional<bzd::Size> process(Range&& range,
+													  const bzd::StringView value,
+													  const Metadata metadata = Metadata{}) noexcept
 	{
 		return toStringBase(bzd::forward<Range>(range), value, metadata);
 	}
 
 	template <bzd::concepts::outputStreamRange Range>
-	static constexpr bzd::Optional<bzd::Size> toString(Range&& range,
-													   const bzd::interface::String& value,
-													   const Metadata metadata = Metadata{}) noexcept
+	static constexpr bzd::Optional<bzd::Size> process(Range&& range,
+													  const bzd::interface::String& value,
+													  const Metadata metadata = Metadata{}) noexcept
 	{
 		return toStringBase(bzd::forward<Range>(range), value, metadata);
 	}

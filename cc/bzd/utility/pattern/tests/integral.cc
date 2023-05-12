@@ -1,5 +1,5 @@
 #include "cc/bzd/test/test.hh"
-#include "cc/bzd/utility/pattern/formatter/to_string.hh"
+#include "cc/bzd/utility/pattern/to_string.hh"
 
 TEST(ToString, Integer)
 {

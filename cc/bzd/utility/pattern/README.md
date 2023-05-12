@@ -35,18 +35,12 @@ struct MySpecialization<T>
 {
     template <concepts::inputStreamRange Range>
     static constexpr Optional<Size> fromString(Range&& range, T& value) noexcept { ... }
-
-    // or (if available and it will be choosen first) the options parameters corresponds to
-    // everything in between {:<options>}.
-
-    template <concepts::inputStreamRange Range>
-    static constexpr Optional<Size> fromString(Range&& range, T& value, const bzd::StringView options = ""_sv) noexcept { ... }
 };
 ```
 
 or with metadata. In that case, the Metadata type defines the type used and the function must have a "parse" function
 that parses the options string and generate a Metadata structure. This function is called during build time only, so
-it must be constexpr.
+it must be constexpr. Metadata are optional and are parsed from the options as a StringView following the pattern: `{:<options>}`.
 
 ```c++
 template <concepts::??? T>

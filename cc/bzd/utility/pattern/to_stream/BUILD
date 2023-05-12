@@ -21,7 +21,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":base",
-        "//cc/bzd/utility/pattern/formatter/to_string:boolean",
+        "//cc/bzd/utility/pattern/to_string:boolean",
     ],
 )
 
@@ -33,7 +33,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":base",
-        "//cc/bzd/utility/pattern/formatter/to_string:floating_point",
+        "//cc/bzd/utility/pattern/to_string:floating_point",
     ],
 )
 
@@ -45,7 +45,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":base",
-        "//cc/bzd/utility/pattern/formatter/to_string:integral",
+        "//cc/bzd/utility/pattern/to_string:integral",
     ],
 )
 
@@ -70,7 +70,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":base",
-        "//cc/bzd/utility/pattern/formatter/to_string:pointer",
+        "//cc/bzd/utility/pattern/to_string:pointer",
     ],
 )
 
@@ -85,6 +85,6 @@ cc_library(
         "//cc/bzd/container:string",
         "//cc/bzd/container:string_view",
         "//cc/bzd/type_traits:is_convertible",
-        "//cc/bzd/utility/pattern/formatter/to_string:string",
+        "//cc/bzd/utility/pattern/to_string:string",
     ],
 )

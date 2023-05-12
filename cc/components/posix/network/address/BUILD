@@ -24,7 +24,7 @@ cc_library(
         "//cc/bzd/core:error",
         "//cc/bzd/meta:string_literal",
         "//cc/bzd/utility:to_underlying",
-        "//cc/bzd/utility/pattern/formatter:to_string",
+        "//cc/bzd/utility/pattern:to_string",
         "//cc/components/posix:error",
         "//cc/components/posix/network:interface",
     ],

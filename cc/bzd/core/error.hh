@@ -6,7 +6,7 @@
 #include "cc/bzd/container/variant.hh"
 #include "cc/bzd/type_traits/remove_reference.hh"
 #include "cc/bzd/utility/in_place.hh"
-#include "cc/bzd/utility/pattern/formatter/to_string.hh"
+#include "cc/bzd/utility/pattern/to_string.hh"
 #include "cc/bzd/utility/source_location.hh"
 
 namespace bzd {

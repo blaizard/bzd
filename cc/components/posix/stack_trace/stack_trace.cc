@@ -5,7 +5,7 @@
 #include "cc/bzd/core/channel.hh"
 #include "cc/bzd/platform/types.hh"
 #include "cc/bzd/utility/ignore.hh"
-#include "cc/bzd/utility/pattern/formatter/to_stream.hh"
+#include "cc/bzd/utility/pattern/to_stream.hh"
 #include "cc/bzd/utility/singleton.hh"
 #include "cc/components/posix/error.hh"
 

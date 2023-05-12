@@ -1,8 +1,5 @@
-#include "cc/bzd/utility/pattern/matcher/pattern.hh"
-
 #include "cc/bzd/test/test.hh"
-#include "cc/bzd/utility/pattern/matcher/integral.hh"
-#include "cc/bzd/utility/pattern/matcher/output_stream.hh"
+#include "cc/bzd/utility/pattern/from_string.hh"
 
 #include <iostream>
 
@@ -41,15 +38,17 @@ TEST(PatternFromString, SimpleArguments)
 		EXPECT_EQ(a, 162u);
 	}
 	{
-		bzd::String<12u> hello;
-		const auto result1 = bzd::fromString("Hello World"_sv, "Hello {:.+}"_csv, hello.assigner());
+		bzd::String<12u> world;
+		const auto result1 = bzd::fromString("Hello World"_sv, "Hello {:.+}"_csv, world.assigner());
 		EXPECT_TRUE(result1);
 		EXPECT_EQ(result1.value(), 11u);
-		EXPECT_STREQ(hello.data(), "World");
+		EXPECT_STREQ(world.data(), "World");
 
-		const auto result2 = bzd::fromString("Hello WORld"_sv, "Hello {:[A-Z]+}"_csv, hello.assigner());
+		bzd::String<12u> hello;
+		const auto result2 = bzd::fromString("Hello WORld"_sv, "{:[a-zA-Z]+} {:[A-Z]+}"_csv, hello.assigner(), world.appender());
 		EXPECT_TRUE(result2);
 		EXPECT_EQ(result2.value(), 9u);
-		EXPECT_STREQ(hello.data(), "WOR");
+		EXPECT_STREQ(hello.data(), "Hello");
+		EXPECT_STREQ(world.data(), "WorldWOR");
 	}
 }

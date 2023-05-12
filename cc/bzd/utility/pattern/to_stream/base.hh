@@ -8,16 +8,16 @@ namespace bzd {
 
 /// This is the formatter base template and is used for partial or full specialization.
 template <class... Args>
-struct FormatterAsync
+struct ToStream
 {
-	static_assert(bzd::meta::alwaysFalse<Args...>, "This type has no asynchronous formatter specialization.");
+	static_assert(bzd::meta::alwaysFalse<Args...>, "This type has no ToStream specialization.");
 };
 
 namespace typeTraits {
 
-/// Match the Formatter specialization.
+/// Match the ToStream specialization.
 template <class T, class... Ts>
-struct FormatterAsync : ::bzd::FormatterAsync<typeTraits::RemoveCVRef<T>>
+struct ToStream : ::bzd::ToStream<typeTraits::RemoveCVRef<T>>
 {
 };
 
@@ -31,7 +31,7 @@ struct FormatterAsync : ::bzd::FormatterAsync<typeTraits::RemoveCVRef<T>>
 template <class... Args>
 bzd::Async<> toStream(bzd::OStream& stream, Args&&... args) noexcept
 {
-	co_await !::bzd::typeTraits::FormatterAsync<Args...>::toStream(stream, bzd::forward<Args>(args)...);
+	co_await !::bzd::typeTraits::ToStream<Args...>::process(stream, bzd::forward<Args>(args)...);
 	co_return {};
 }
 
@@ -40,25 +40,19 @@ bzd::Async<> toStream(bzd::OStream& stream, Args&&... args) noexcept
 namespace bzd::impl {
 
 template <class T, Size maxBufferSize>
-struct FormatterAsyncToFormatter : ::bzd::Formatter<T>
+struct ToStreamToString : ::bzd::ToString<T>
 {
 	template <class... Args>
-	static bzd::Async<> toStream(bzd::OStream& stream, Args&&... args) noexcept
+	static bzd::Async<> process(bzd::OStream& stream, Args&&... args) noexcept
 	{
 		bzd::String<maxBufferSize> string;
-		if (!::bzd::Formatter<T>::toString(string.assigner(), bzd::forward<Args>(args)...))
+		if (!::bzd::ToString<T>::process(string.assigner(), bzd::forward<Args>(args)...))
 		{
 			co_return bzd::error::Failure("Cannot assign value to string.");
 		}
 		co_await !stream.write(string.asBytes());
 		co_return {};
 	}
-};
-
-template <class T, Size maxBufferSize>
-struct FormatterAsyncToFormatterWithMetadata : ::bzd::impl::FormatterAsyncToFormatter<T, maxBufferSize>
-{
-	using Metadata = typename ::bzd::Formatter<T>::Metadata;
 };
 
 } // namespace bzd::impl

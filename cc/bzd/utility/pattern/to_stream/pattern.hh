@@ -2,12 +2,12 @@
 
 #include "cc/bzd/container/string_view.hh"
 #include "cc/bzd/utility/pattern/async.hh"
-#include "cc/bzd/utility/pattern/formatter/to_stream/base.hh"
+#include "cc/bzd/utility/pattern/to_stream/base.hh"
 
 namespace bzd {
 
 template <concepts::constexprStringView Pattern>
-struct FormatterAsync<Pattern>
+struct ToStream<Pattern>
 {
 public:
 	// Note, Args&& here doesn't work for esp32 gcc compiler, the values are garbage, it seems that the temporary
@@ -15,9 +15,9 @@ public:
 	// Would be worth trying again with a new version of the compiler.
 	// TODO: Try to enable Args&& with an updated esp32 gcc compiler
 	template <class... Args>
-	static bzd::Async<> toStream(bzd::OStream& stream, const Pattern& pattern, const Args&... args) noexcept
+	static bzd::Async<> process(bzd::OStream& stream, const Pattern& pattern, const Args&... args) noexcept
 	{
-		const auto [parser, processor] = bzd::pattern::impl::makeAsync<bzd::OStream&, StreamFormatter, Schema>(pattern, args...);
+		const auto [parser, processor] = bzd::pattern::impl::makeAsync<bzd::OStream&, Schema>(pattern, args...);
 
 		// Run-time call
 		for (const auto& result : parser)
@@ -36,23 +36,12 @@ public:
 	}
 
 private:
-	class StreamFormatter
-	{
-	public:
-		template <class... Args>
-		static bzd::Async<> process(Args&&... args) noexcept
-		{
-			co_await !::bzd::toStream(bzd::forward<Args>(args)...);
-			co_return {};
-		}
-	};
-
 	class Schema
 	{
 	public:
 		/// Get the specialization associated with a type.
 		template <class Value>
-		using Specialization = typename typeTraits::template FormatterAsync<Value>;
+		using Specialization = typename typeTraits::template ToStream<Value>;
 	};
 };
 

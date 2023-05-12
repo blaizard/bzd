@@ -10,6 +10,6 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//cc/bzd/utility/pattern/formatter:to_stream",
+        "//cc/bzd/utility/pattern:to_stream",
     ],
 )

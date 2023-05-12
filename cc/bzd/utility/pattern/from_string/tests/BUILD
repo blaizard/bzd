@@ -8,8 +8,6 @@ bzd_cc_test(
     ],
     deps = [
         "//cc/bzd/test",
-        "//cc/bzd/utility/pattern/matcher:integral",
-        "//cc/bzd/utility/pattern/matcher:output_stream",
-        "//cc/bzd/utility/pattern/matcher:pattern",
+        "//cc/bzd/utility/pattern:from_string",
     ],
 )

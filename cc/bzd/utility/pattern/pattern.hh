@@ -9,7 +9,7 @@
 #include "cc/bzd/utility/apply.hh"
 #include "cc/bzd/utility/constexpr_for.hh"
 #include "cc/bzd/utility/ignore.hh"
-#include "cc/bzd/utility/pattern/matcher/integral.hh"
+#include "cc/bzd/utility/pattern/from_string/integral.hh"
 
 namespace bzd::pattern::impl {
 
@@ -259,11 +259,11 @@ public:
 			if constexpr (concepts::metadata<Adapter, Args>)
 			{
 				const auto& metadata = metadatas.template get<Metadata<Adapter, Args>>();
-				return Adapter::process(range, args, metadata);
+				return Adapter::template Specialization<Args>::process(range, args, metadata);
 			}
 			else
 			{
-				return Adapter::process(range, args);
+				return Adapter::template Specialization<Args>::process(range, args);
 			}
 		}...);
 
@@ -297,13 +297,12 @@ private:
 	};
 };
 
-template <class Range, class Formatter, class Schema, bzd::concepts::constexprStringView Pattern, class... Args>
+template <class Range, class Schema, bzd::concepts::constexprStringView Pattern, class... Args>
 constexpr auto make(const Pattern&, Args&&... args) noexcept
 {
-	using ConstexprAdapter = Adapter<ConstexprAssert, Formatter, Schema>;
-	constexpr auto context = parse<ConstexprAdapter, Pattern, Args...>();
+	constexpr auto context = parse<Adapter<ConstexprAssert, Schema>, Pattern, Args...>();
 	static_assert(context.size() >= 0, "Compile-time string format check failed.");
-	auto processor = Processor<Range, Adapter<RuntimeAssert, Formatter, Schema>>::make(args...);
+	auto processor = Processor<Range, Adapter<RuntimeAssert, Schema>>::make(args...);
 
 	return bzd::makeTuple(bzd::move(context), bzd::move(processor));
 }

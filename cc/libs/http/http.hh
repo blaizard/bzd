@@ -2,7 +2,8 @@
 
 #include "cc/bzd/container/map.hh"
 #include "cc/bzd/container/ostream_buffered.hh"
-#include "cc/bzd/utility/pattern/formatter/to_stream.hh"
+#include "cc/bzd/utility/pattern/from_string.hh"
+#include "cc/bzd/utility/pattern/to_stream.hh"
 #include "cc/bzd/utility/synchronization/lock_guard.hh"
 #include "cc/bzd/utility/synchronization/mutex.hh"
 #include "cc/libs/reader/stream_reader.hh"
@@ -78,6 +79,16 @@ private:
 	bzd::Async<Status> readStatus() noexcept
 	{
 		const auto string = co_await !bzd::make<bzd::String<100>>(reader_.readUntil("\r\n"_sv.asBytes(), /*include*/ true));
+		bzd::String<3u> version;
+		Status status{};
+		if (!bzd::fromString(string, "HTTP/{:[0-9]\\.?[0-9]?}\\s*{}"_csv, version.assigner(), status.code))
+		{
+			co_return bzd::error::Data("Malformed header: {}."_csv, string);
+		}
+
+		::std::cout << version.data() << ::std::endl;
+		::std::cout << status.code << ::std::endl;
+
 		auto it = bzd::algorithm::search(string, "HTTP/"_sv);
 		if (it == string.end())
 		{

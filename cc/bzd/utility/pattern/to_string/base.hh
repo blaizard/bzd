@@ -9,18 +9,18 @@
 
 namespace bzd {
 
-/// This is the formatter base template and is used for partial or full specialization.
+/// This is the ToString base template and is used for partial or full specialization.
 template <class... Args>
-struct Formatter
+struct ToString
 {
-	static_assert(bzd::meta::alwaysFalse<Args...>, "This type has no formatter specialization.");
+	static_assert(bzd::meta::alwaysFalse<Args...>, "This type has no ToString specialization.");
 };
 
 namespace typeTraits {
 
-/// Match the Formatter specialization.
+/// Match the ToString specialization.
 template <class T, class... Ts>
-struct Formatter : ::bzd::Formatter<typeTraits::RemoveCVRef<T>>
+struct ToString : ::bzd::ToString<typeTraits::RemoveCVRef<T>>
 {
 };
 
@@ -34,7 +34,7 @@ struct Formatter : ::bzd::Formatter<typeTraits::RemoveCVRef<T>>
 template <concepts::outputStreamRange Range, class... Args>
 constexpr Optional<Size> toString(Range&& range, Args&&... args) noexcept
 {
-	return ::bzd::typeTraits::Formatter<Args...>::toString(bzd::forward<Range>(range), bzd::forward<Args>(args)...);
+	return ::bzd::typeTraits::ToString<Args...>::process(bzd::forward<Range>(range), bzd::forward<Args>(args)...);
 }
 
 /// \copydoc toString
