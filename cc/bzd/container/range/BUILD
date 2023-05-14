@@ -32,6 +32,7 @@ cc_library(
     deps = [
         ":view_interface",
         "//cc/bzd/container/iterator:input_or_output_reference",
+        "//cc/bzd/type_traits:is_same_template",
         "//cc/bzd/type_traits:sentinel_for",
         "//cc/bzd/utility:distance",
     ],

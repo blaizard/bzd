@@ -19,7 +19,7 @@ public:
 	/// Create an output stream buffered object from an existing string.
 	constexpr explicit OStreamBuffered(bzd::OStream& stream) noexcept : stream_{stream} {}
 
-	/// Write new data to the buffer, if full the data are automatically flushed.
+	/// Write new data to the buffer, if full the data is automatically flushed.
 	bzd::Async<> write(const bzd::Span<const bzd::Byte> data) noexcept override
 	{
 		auto dataLeft = data;

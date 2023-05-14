@@ -4,6 +4,7 @@
 #include "cc/bzd/type_traits/is_base_of.hh"
 #include "cc/bzd/type_traits/is_pointer.hh"
 #include "cc/bzd/type_traits/remove_pointer.hh"
+#include "cc/bzd/type_traits/underlying_type.hh"
 
 namespace bzd::typeTraits {
 
@@ -16,16 +17,18 @@ struct IteratorBase
 ///
 /// Add multi dimensions hierarchy to iterator category concept, this is a problem already pointed, see:
 /// https://www.boost.org/doc/libs/1_40_0/libs/iterator/doc/new-iter-concepts.html
-enum class IteratorCategory : bzd::Size
+enum class IteratorCategory
 {
 	/// An input iterator is an iterator that can read from the pointed-to element.
 	/// Input iterators only guarantee validity for single pass algorithms: once an input iterator i has been incremented,
 	/// all copies of its previous value may be invalidated.
 	input = 0x01,
 	/// An output iterator is an iterator that can write to the pointed-to element.
+	/// Similarly to the input iterator, all copies of its previous value may be invalidated.
 	output = 0x02,
 	/// A forward iterator is an iterator that can read data from the pointed-to element.
-	/// Unlike an input iterator and output iterator, it can be used in multipass algorithms.
+	/// Unlike an input iterator and output iterator, it can be used in multipass algorithms since it
+	/// guarantees that two iterators to the same range can be compared against each other.
 	forward = 0x04 | input | output,
 	/// A bidirectional iterator is an iterator that can be moved in both directions (i.e. incremented and decremented).
 	bidirectional = 0x08 | forward,
@@ -41,13 +44,13 @@ enum class IteratorCategory : bzd::Size
 /// Bitwise or operator to IteratorCategory.
 constexpr IteratorCategory operator|(const IteratorCategory left, const IteratorCategory right) noexcept
 {
-	return IteratorCategory{static_cast<Size>(left) | static_cast<Size>(right)};
+	return IteratorCategory{static_cast<UnderlyingType<IteratorCategory>>(left) | static_cast<UnderlyingType<IteratorCategory>>(right)};
 }
 
 /// Bitwise and operator to IteratorCategory.
 constexpr IteratorCategory operator&(const IteratorCategory left, const IteratorCategory right) noexcept
 {
-	return IteratorCategory{static_cast<Size>(left) & static_cast<Size>(right)};
+	return IteratorCategory{static_cast<UnderlyingType<IteratorCategory>>(left) & static_cast<UnderlyingType<IteratorCategory>>(right)};
 }
 
 template <class>
