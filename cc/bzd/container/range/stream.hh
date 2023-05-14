@@ -2,6 +2,7 @@
 
 #include "cc/bzd/container/iterator/input_or_output_reference.hh"
 #include "cc/bzd/container/range/view_interface.hh"
+#include "cc/bzd/type_traits/is_same_template.hh"
 #include "cc/bzd/type_traits/sentinel_for.hh"
 #include "cc/bzd/utility/distance.hh"
 
@@ -36,16 +37,23 @@ public:
 public:
 	constexpr auto begin() noexcept
 	{
-		constexpr typeTraits::IteratorCategory category =
-			typeTraits::iteratorCategory<Iterator> & (typeTraits::IteratorCategory::input | typeTraits::IteratorCategory::output);
-		return iterator::InputOrOutputReference<Iterator, category | typeTraits::IteratorCategory::stream>{it_};
+		if constexpr (concepts::sameTemplate<Iterator, iterator::InputOrOutputReference>)
+		{
+			return it_;
+		}
+		else
+		{
+			constexpr auto category =
+				typeTraits::iteratorCategory<Iterator> & (typeTraits::IteratorCategory::input | typeTraits::IteratorCategory::output);
+			using Policies = iterator::InputOrOutputReferencePolicies<category | typeTraits::IteratorCategory::stream>;
+			return iterator::InputOrOutputReference<Iterator, Policies>{it_};
+		}
 	}
 	constexpr auto end() const noexcept { return end_; }
-	constexpr auto size() const noexcept
-	requires(concepts::forwardIterator<Iterator> && concepts::forwardIterator<Sentinel>)
-	{
-		return bzd::distance(it_, end_);
-	}
+
+	/// A Stream cannot have a size eventhough, it could have if it comes from a sized range.
+	/// Deleting it ensure no wrong uses that would make it incompatible with the concept.
+	constexpr auto size() const noexcept = delete;
 
 protected:
 	Iterator it_;

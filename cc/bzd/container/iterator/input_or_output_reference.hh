@@ -5,17 +5,26 @@
 
 namespace bzd::iterator {
 
+/// Used to configure the InputOrOutputReference iterator.
+/// Note, a struct is used in order to ease some function in the type_traits library,
+/// namely is_same_template where arguments must be a type to work.
+template <typeTraits::IteratorCategory iteratorCategory>
+struct InputOrOutputReferencePolicies
+{
+	static constexpr auto category = iteratorCategory;
+};
+
 /// Reference to an input and/or output iterator.
 ///
 /// This is used to implement single pass range for example.
-template <concepts::inputOrOutputIterator Iterator, typeTraits::IteratorCategory iteratorCategory>
+template <concepts::inputOrOutputIterator Iterator, class Policies>
 class InputOrOutputReference : public typeTraits::IteratorBase
 {
 public: // Traits
 	using Self = InputOrOutputReference;
 	using DifferenceType = typename typeTraits::IteratorDifference<Iterator>;
 	using ValueType = typename typeTraits::IteratorValue<Iterator>;
-	static constexpr auto category = iteratorCategory;
+	static constexpr auto category = Policies::category;
 
 public: // Constructors.
 	constexpr explicit InputOrOutputReference(Iterator& it) noexcept : it_{it} {}
