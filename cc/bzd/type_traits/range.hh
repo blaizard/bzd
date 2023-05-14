@@ -81,15 +81,12 @@ template <class T>
 concept contiguousRange = randomAccessRange<T> && rangeCategory<T, typeTraits::IteratorCategory::contiguous>;
 
 template <class T>
-concept streamRange = inputOrOutputRange<T> && rangeCategory<T, typeTraits::IteratorCategory::stream>;
-
-template <class T>
 concept byteCopyableRange = range<T> && sizeof(typeTraits::RangeValue<T>) == 1u && concepts::triviallyCopyable<typeTraits::RangeValue<T>>;
 
 template <class T>
-concept inputStreamRange = streamRange<T> && byteCopyableRange<T> && inputRange<T>;
+concept inputByteCopyableRange = byteCopyableRange<T> && inputRange<T>;
 
 template <class T>
-concept outputStreamRange = streamRange<T> && byteCopyableRange<T> && outputRange<T>;
+concept outputByteCopyableRange = byteCopyableRange<T> && outputRange<T>;
 
 } // namespace bzd::concepts

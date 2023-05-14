@@ -6,7 +6,7 @@
 
 namespace bzd {
 
-template <concepts::outputStreamRange Output>
+template <concepts::outputByteCopyableRange Output>
 struct FromString<Output>
 {
 	struct Metadata
@@ -14,7 +14,7 @@ struct FromString<Output>
 		bzd::StringView regexpr{"[\\w]+"};
 	};
 
-	template <bzd::concepts::inputStreamRange Range, class T>
+	template <bzd::concepts::inputByteCopyableRange Range, class T>
 	static constexpr Optional<Size> process(Range&& range, T&& output, const Metadata metadata = Metadata{}) noexcept
 	{
 		bzd::Regexpr regexpr{metadata.regexpr};

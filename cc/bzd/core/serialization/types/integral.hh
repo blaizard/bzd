@@ -17,7 +17,7 @@ struct Serialization<T>
 	static constexpr Byte boolValueTrue{1u};
 	static constexpr Byte boolValueFalse{0u};
 
-	template <concepts::outputStreamRange Range>
+	template <concepts::outputByteCopyableRange Range>
 	static constexpr Optional<Size> serialize(Range&& range, const Type& value) noexcept
 	requires(concepts::sameAs<Type, bool> || concepts::sameAs<Type, Bool>)
 	{
@@ -29,7 +29,7 @@ struct Serialization<T>
 		return bzd::nullopt;
 	}
 
-	template <concepts::outputStreamRange Range>
+	template <concepts::outputByteCopyableRange Range>
 	static constexpr Optional<Size> serialize(Range&& range, const Type& value) noexcept
 	requires(concepts::sameAs<Type, Int8> || concepts::sameAs<Type, UInt8> || concepts::sameAs<Type, Int16> ||
 			 concepts::sameAs<Type, UInt16> || concepts::sameAs<Type, Int32> || concepts::sameAs<Type, UInt32> ||
@@ -45,7 +45,7 @@ struct Serialization<T>
 		return bzd::nullopt;
 	}
 
-	template <concepts::inputStreamRange Range>
+	template <concepts::inputByteCopyableRange Range>
 	static constexpr Optional<Size> deserialize(Range&& range, Type& value) noexcept
 	requires(concepts::sameAs<Type, bool> || concepts::sameAs<Type, Bool>)
 	{
@@ -66,7 +66,7 @@ struct Serialization<T>
 		return bzd::nullopt;
 	}
 
-	template <concepts::inputStreamRange Range>
+	template <concepts::inputByteCopyableRange Range>
 	static constexpr Optional<Size> deserialize(Range&& range, Type& value) noexcept
 	requires(concepts::sameAs<Type, Int8> || concepts::sameAs<Type, UInt8> || concepts::sameAs<Type, Int16> ||
 			 concepts::sameAs<Type, UInt16> || concepts::sameAs<Type, Int32> || concepts::sameAs<Type, UInt32> ||

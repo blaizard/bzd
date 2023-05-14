@@ -24,7 +24,4 @@ concept reducible = requires(Container container, Value& value) {
 							} -> bzd::concepts::convertible<Value&>;
 					};
 
-template <class Container>
-concept containerFromString = outputRange<Container>;
-
 } // namespace bzd::concepts

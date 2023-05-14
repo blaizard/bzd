@@ -6,7 +6,7 @@
 TEST(Stream, Simple)
 {
 	bzd::Array<bzd::Int32, 12u> container{bzd::inPlace, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
-	bzd::range::Stream stream{container};
+	auto stream = bzd::range::makeStream(container);
 
 	auto it1 = stream.begin();
 	EXPECT_EQ(*it1, 0);
@@ -29,7 +29,7 @@ TEST(Stream, Nested)
 {
 	bzd::Array<bzd::Int32, 12u> container{bzd::inPlace, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
 
-	bzd::range::Stream stream1{container};
+	auto stream1 = bzd::range::makeStream(container);
 	auto it1 = stream1.begin();
 	EXPECT_EQ(*it1, 0);
 	++it1;
@@ -46,4 +46,23 @@ TEST(Stream, Nested)
 
 	EXPECT_EQ(*it2, 4);
 	++it2;
+
+	auto stream3 = bzd::range::makeStream(stream1);
+	auto it3 = stream3.begin();
+	EXPECT_EQ(*it3, 5);
+	++it3;
+}
+
+TEST(Stream, TypeTraits)
+{
+	bzd::Array<bzd::Int32, 12u> container;
+	auto stream = bzd::range::makeStream(container);
+
+	constexpr auto isInputOrOutputReference1 =
+		bzd::concepts::sameTemplate<bzd::typeTraits::RangeIterator<decltype(stream)>, bzd::iterator::InputOrOutputReference>;
+	EXPECT_TRUE(isInputOrOutputReference1);
+
+	auto it = stream.begin();
+	constexpr auto isInputOrOutputReference2 = bzd::concepts::sameTemplate<decltype(it), bzd::iterator::InputOrOutputReference>;
+	EXPECT_TRUE(isInputOrOutputReference2);
 }

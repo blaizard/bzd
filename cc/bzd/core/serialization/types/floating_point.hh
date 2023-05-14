@@ -20,7 +20,7 @@ struct Serialization<T>
 	static_assert(NumericLimits<Type>::isIEC559(),
 				  "The floating point representation is not compliant with the IEC 559/IEEE 754 standard.");
 
-	template <concepts::outputStreamRange Range>
+	template <concepts::outputByteCopyableRange Range>
 	static constexpr Optional<Size> serialize(Range&& range, const Type& value) noexcept
 	{
 		const auto bytes = Span<const Type>{&value, 1u}.asBytes();
@@ -32,7 +32,7 @@ struct Serialization<T>
 		return bzd::nullopt;
 	}
 
-	template <concepts::inputStreamRange Range>
+	template <concepts::inputByteCopyableRange Range>
 	static constexpr Optional<Size> deserialize(Range&& range, Type& value) noexcept
 	{
 		auto bytes = Span<Type>{&value, 1u}.asBytesMutable();

@@ -31,20 +31,10 @@ struct FromString : ::bzd::FromString<typeTraits::RemoveCVRef<T>>
 /// \param range The input range to be read from.
 /// \param args The value(s) to be read.
 /// \return The number of bytes read in case of success, otherwise an empty result.
-template <concepts::inputStreamRange Range, class... Args>
+template <concepts::inputByteCopyableRange Range, class... Args>
 constexpr Optional<Size> fromString(Range&& range, Args&&... args) noexcept
 {
 	return ::bzd::typeTraits::FromString<Args...>::process(bzd::forward<Range>(range), bzd::forward<Args>(args)...);
-}
-
-/// \copydoc fromString
-/// Converts an input range into an input stream.
-template <concepts::inputRange Range, class... Args>
-requires(!concepts::inputStreamRange<Range>)
-constexpr Optional<Size> fromString(Range&& range, Args&&... args) noexcept
-{
-	::bzd::range::Stream stream{range};
-	return ::bzd::fromString(stream, bzd::forward<Args>(args)...);
 }
 
 } // namespace bzd

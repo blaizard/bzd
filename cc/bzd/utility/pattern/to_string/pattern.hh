@@ -36,10 +36,11 @@ public:
 	/// \param out Output stream where the formating string will be written to.
 	/// \param str run-time or compile-time string containing the format.
 	/// \param args Arguments to be passed for the format.
-	template <bzd::concepts::outputStreamRange Range, class... Args>
+	template <bzd::concepts::outputByteCopyableRange Range, class... Args>
 	static constexpr bzd::Optional<bzd::Size> process(Range&& range, const Pattern& pattern, const Args&... args) noexcept
 	{
-		const auto [parser, processor] = bzd::pattern::impl::make<Range&, Schema>(pattern, args...);
+		auto stream = bzd::range::makeStream(range);
+		const auto [parser, processor] = bzd::pattern::impl::make<decltype(stream)&, Schema>(pattern, args...);
 		bzd::Size count{0u};
 
 		// Run-time call
@@ -47,7 +48,7 @@ public:
 		{
 			if (!result.str.empty())
 			{
-				if (bzd::algorithm::byteCopyReturnSize(result.str, range) != result.str.size())
+				if (bzd::algorithm::byteCopyReturnSize(result.str, stream) != result.str.size())
 				{
 					return bzd::nullopt;
 				}
@@ -55,7 +56,7 @@ public:
 			}
 			if (result.isMetadata)
 			{
-				const auto maybeCount = processor.process(range, result);
+				const auto maybeCount = processor.process(stream, result);
 				if (!maybeCount)
 				{
 					return bzd::nullopt;
@@ -81,7 +82,7 @@ template <>
 struct ToString<char>
 {
 public:
-	template <bzd::concepts::outputStreamRange Range>
+	template <bzd::concepts::outputByteCopyableRange Range>
 	static constexpr bzd::Optional<bzd::Size> process(Range&& range, const char c) noexcept
 	{
 		if (!bzd::algorithm::byteCopyReturnSize(bzd::StringView{&c, 1u}, range))

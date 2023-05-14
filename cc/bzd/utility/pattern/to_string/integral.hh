@@ -94,7 +94,7 @@ public:
 	}
 
 public:
-	template <concepts::outputStreamRange Range>
+	template <concepts::outputByteCopyableRange Range>
 	static constexpr Optional<Size> process(Range&& range, const T& data, const Metadata metadata = Metadata{}) noexcept
 	{
 		switch (metadata.format)
@@ -113,7 +113,7 @@ public:
 		return bzd::nullopt;
 	}
 
-	template <Size base, concepts::outputStreamRange Range>
+	template <Size base, concepts::outputByteCopyableRange Range>
 	static constexpr bzd::Optional<bzd::Size> toStringBase(Range&& range, const T& n, const Metadata& metadata) noexcept
 	{
 		const auto& digits = (metadata.format == Metadata::Format::hexadecimalUpper) ? digitsUpperCase : digitsLowerCase;
@@ -121,20 +121,21 @@ public:
 		static_assert(base > 1 && base <= 16, "Invalid base size.");
 		static_assert(sizeof(T) <= 8, "Only up to 64-bit integers are supported.");
 
+		auto stream = bzd::range::makeStream(range);
 		Size count = 0u;
 		if (metadata.alternate)
 		{
 			switch (metadata.format)
 			{
 			case Metadata::Format::binary:
-				if (bzd::algorithm::byteCopyReturnSize("0b"_sv, range) != 2u)
+				if (bzd::algorithm::byteCopyReturnSize("0b"_sv, stream) != 2u)
 				{
 					return bzd::nullopt;
 				}
 				count += 2u;
 				break;
 			case Metadata::Format::octal:
-				if (bzd::algorithm::byteCopyReturnSize("0o"_sv, range) != 2u)
+				if (bzd::algorithm::byteCopyReturnSize("0o"_sv, stream) != 2u)
 				{
 					return bzd::nullopt;
 				}
@@ -145,7 +146,7 @@ public:
 				break;
 			case Metadata::Format::hexadecimalLower:
 			case Metadata::Format::hexadecimalUpper:
-				if (bzd::algorithm::byteCopyReturnSize("0x"_sv, range) != 2u)
+				if (bzd::algorithm::byteCopyReturnSize("0x"_sv, stream) != 2u)
 				{
 					return bzd::nullopt;
 				}
@@ -183,7 +184,7 @@ public:
 			}
 		}
 
-		if (algorithm::byteCopyReturnSize(buffer | bzd::range::reverse(), range) != buffer.size())
+		if (algorithm::byteCopyReturnSize(buffer | bzd::range::reverse(), stream) != buffer.size())
 		{
 			return bzd::nullopt;
 		}

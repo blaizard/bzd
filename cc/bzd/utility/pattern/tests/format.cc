@@ -14,6 +14,11 @@ void expectStringStreamFormat(const char* expected, Args&&... args)
 	EXPECT_TRUE(result);
 	EXPECT_STREQ(str.data(), expected);
 
+	bzd::Array<char, N> array{};
+	const auto resultArray = bzd::toString(array, bzd::forward<Args>(args)...);
+	EXPECT_TRUE(resultArray);
+	EXPECT_STREQ(array.data(), expected);
+
 	bzd::StringStream<N> stream;
 	bzd::toStream(stream, bzd::forward<Args>(args)...).sync();
 	EXPECT_STREQ(stream.str().data(), expected);

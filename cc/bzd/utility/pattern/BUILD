@@ -33,7 +33,7 @@ bzd_cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/utility/pattern/from_string:integral",
-        "//cc/bzd/utility/pattern/from_string:output_stream",
+        "//cc/bzd/utility/pattern/from_string:output_range",
         "//cc/bzd/utility/pattern/from_string:pattern",
     ],
 )

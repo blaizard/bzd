@@ -19,7 +19,7 @@ struct ToString<T>
 		bzd::Size precision = 6;
 	};
 
-	template <bzd::concepts::outputStreamRange Range>
+	template <bzd::concepts::outputByteCopyableRange Range>
 	static constexpr bzd::Optional<bzd::Size> process(Range&& range,
 													  const bzd::StringView value,
 													  const Metadata metadata = Metadata{}) noexcept
@@ -27,7 +27,7 @@ struct ToString<T>
 		return toStringBase(bzd::forward<Range>(range), value, metadata);
 	}
 
-	template <bzd::concepts::outputStreamRange Range>
+	template <bzd::concepts::outputByteCopyableRange Range>
 	static constexpr bzd::Optional<bzd::Size> process(Range&& range,
 													  const bzd::interface::String& value,
 													  const Metadata metadata = Metadata{}) noexcept
@@ -58,7 +58,7 @@ struct ToString<T>
 	}
 
 private:
-	template <bzd::concepts::outputStreamRange Range, class U>
+	template <bzd::concepts::outputByteCopyableRange Range, class U>
 	static constexpr bzd::Optional<bzd::Size> toStringBase(Range&& range, const U& value, const Metadata metadata) noexcept
 	{
 		if (metadata.isPrecision)

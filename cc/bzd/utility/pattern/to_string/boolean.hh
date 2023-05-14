@@ -10,7 +10,7 @@ namespace bzd {
 template <>
 struct ToString<bzd::Bool>
 {
-	template <bzd::concepts::outputStreamRange Range>
+	template <bzd::concepts::outputByteCopyableRange Range>
 	static constexpr bzd::Optional<bzd::Size> process(Range&& range, const bzd::Bool value) noexcept
 	{
 		const auto string = (value) ? "true"_sv.asBytes() : "false"_sv.asBytes();
