@@ -31,20 +31,10 @@ struct ToString : ::bzd::ToString<typeTraits::RemoveCVRef<T>>
 /// \param range The input range to be written to.
 /// \param args The value(s) to be written.
 /// \return The number of bytes written in case of success, otherwise an empty result.
-template <concepts::outputStreamRange Range, class... Args>
+template <concepts::outputByteCopyableRange Range, class... Args>
 constexpr Optional<Size> toString(Range&& range, Args&&... args) noexcept
 {
 	return ::bzd::typeTraits::ToString<Args...>::process(bzd::forward<Range>(range), bzd::forward<Args>(args)...);
-}
-
-/// \copydoc toString
-/// Converts an output range into an output stream.
-template <concepts::outputRange Range, class... Args>
-requires(!concepts::outputStreamRange<Range>)
-constexpr Optional<Size> toString(Range&& range, Args&&... args) noexcept
-{
-	::bzd::range::Stream stream{range};
-	return ::bzd::toString(stream, bzd::forward<Args>(args)...);
 }
 
 } // namespace bzd

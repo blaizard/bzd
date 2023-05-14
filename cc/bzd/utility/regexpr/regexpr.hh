@@ -2,6 +2,7 @@
 
 #include "cc/bzd/container/function_ref.hh"
 #include "cc/bzd/container/optional.hh"
+#include "cc/bzd/container/range/stream.hh"
 #include "cc/bzd/container/result.hh"
 #include "cc/bzd/container/string_view.hh"
 #include "cc/bzd/type_traits/range.hh"
@@ -32,8 +33,7 @@ public:
 	constexpr explicit Regexpr(const bzd::StringView regexpr) noexcept : regexpr_{regexpr} {}
 
 private:
-	template <bzd::concepts::inputStreamRange Range>
-	static constexpr Result<Size, Error> matcher(bzd::StringView regexpr, Range&& range) noexcept
+	static constexpr Result<Size, Error> matcher(bzd::StringView regexpr, auto& stream) noexcept
 	{
 		Size counter{0u};
 		while (!regexpr.empty())
@@ -42,7 +42,7 @@ private:
 
 			struct Matcher
 			{
-				bzd::typeTraits::AddPointer<Result<Size, Error>(bzd::StringView, Range&&)> processor;
+				bzd::typeTraits::AddPointer<Result<Size, Error>(bzd::StringView, decltype(stream))> processor;
 				bzd::StringView regexpr;
 			} matcher;
 
@@ -53,7 +53,7 @@ private:
 				{
 					return bzd::error::make(Error::malformed);
 				}
-				matcher = Matcher{Regexpr::matcherBrackets<Range>, regexpr.subStr(1u, maybePos - 1u)};
+				matcher = Matcher{Regexpr::matcherBrackets<decltype(stream)>, regexpr.subStr(1u, maybePos - 1u)};
 				regexpr.removePrefix(maybePos + 1u);
 			}
 			else if (regexpr[0] == '\\')
@@ -62,12 +62,12 @@ private:
 				{
 					return bzd::error::make(Error::malformed);
 				}
-				matcher = Matcher{Regexpr::matcherSingleChar<Range>, regexpr.subStr(0, 2u)};
+				matcher = Matcher{Regexpr::matcherSingleChar<decltype(stream)>, regexpr.subStr(0, 2u)};
 				regexpr.removePrefix(2u);
 			}
 			else
 			{
-				matcher = Matcher{Regexpr::matcherSingleChar<Range>, regexpr.subStr(0, 1u)};
+				matcher = Matcher{Regexpr::matcherSingleChar<decltype(stream)>, regexpr.subStr(0, 1u)};
 				regexpr.removePrefix(1u);
 			}
 
@@ -101,7 +101,7 @@ private:
 
 			do
 			{
-				auto maybeCounter = matcher.processor(matcher.regexpr, range);
+				auto maybeCounter = matcher.processor(matcher.regexpr, stream);
 				if (!maybeCounter)
 				{
 					if (maybeCounter.error() == Error::malformed)
@@ -123,11 +123,10 @@ private:
 		return counter;
 	}
 
-	template <bzd::concepts::inputStreamRange Range>
-	static constexpr Result<Size, Error> matcherSingleChar(const bzd::StringView regexpr, Range&& range) noexcept
+	static constexpr Result<Size, Error> matcherSingleChar(const bzd::StringView regexpr, auto& stream) noexcept
 	{
-		auto itRange = bzd::begin(range);
-		if (itRange != bzd::end(range))
+		auto itRange = bzd::begin(stream);
+		if (itRange != bzd::end(stream))
 		{
 			auto value = regexpr[0];
 			if (value == '*' || value == '+' || value == '?')
@@ -169,11 +168,10 @@ private:
 		return bzd::error::make(Error::noMatch);
 	}
 
-	template <bzd::concepts::inputStreamRange Range>
-	static constexpr Result<Size, Error> matcherBrackets(const bzd::StringView regexpr, Range&& range) noexcept
+	static constexpr Result<Size, Error> matcherBrackets(const bzd::StringView regexpr, auto& stream) noexcept
 	{
 		// Value to be tested.
-		auto itRange = bzd::begin(range);
+		auto itRange = bzd::begin(stream);
 		const auto value = *itRange;
 
 		// Regexpr within the brackets to be tested.
@@ -234,21 +232,24 @@ private:
 	}
 
 public:
-	template <bzd::concepts::inputStreamRange Range>
+	template <bzd::concepts::inputByteCopyableRange Range>
 	[[nodiscard]] constexpr Result<Size, Error> match(Range&& range) noexcept
 	{
-		return matcher(regexpr_, range);
+		auto stream = bzd::range::makeStream(range);
+		return matcher(regexpr_, stream);
 	}
 
-	template <bzd::concepts::inputStreamRange Range, bzd::concepts::outputStreamRange Output>
+	template <bzd::concepts::inputByteCopyableRange Range, bzd::concepts::outputByteCopyableRange Output>
 	[[nodiscard]] constexpr Result<Size, Error> capture(Range&& range, Output& output) noexcept
 	{
-		InputStreamCaptureRange capture{range, output};
+		auto iStream = bzd::range::makeStream(range);
+		auto oStream = bzd::range::makeStream(output);
+		InputStreamCaptureRange capture{iStream, oStream};
 		return matcher(regexpr_, capture);
 	}
 
 private:
-	template <bzd::concepts::outputStreamRange Capture, class Iterator>
+	template <bzd::concepts::outputByteCopyableRange Capture, class Iterator>
 	class IteratorCapture : public Iterator
 	{
 	public:
@@ -282,7 +283,7 @@ private:
 		Capture& capture_;
 	};
 
-	template <bzd::concepts::inputStreamRange Range, bzd::concepts::outputStreamRange Capture>
+	template <bzd::concepts::inputByteCopyableRange Range, bzd::concepts::outputByteCopyableRange Capture>
 	class InputStreamCaptureRange
 	{
 	public:

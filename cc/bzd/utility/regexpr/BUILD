@@ -11,6 +11,7 @@ cc_library(
         "//cc/bzd/container:optional",
         "//cc/bzd/container:result",
         "//cc/bzd/container:string_view",
+        "//cc/bzd/container/range:stream",
         "//cc/bzd/type_traits:range",
     ],
 )

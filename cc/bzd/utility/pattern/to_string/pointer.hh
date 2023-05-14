@@ -13,7 +13,7 @@ template <class T>
 requires(concepts::pointer<T> && !concepts::convertible<T, bzd::StringView>)
 struct ToString<T>
 {
-	template <bzd::concepts::outputStreamRange Range>
+	template <bzd::concepts::outputByteCopyableRange Range>
 	static constexpr bzd::Optional<bzd::Size> process(Range&& range, const T value) noexcept
 	{
 		using Metadata = bzd::ToString<bzd::UInt64>::Metadata;

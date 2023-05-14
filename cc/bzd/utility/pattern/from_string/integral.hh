@@ -31,7 +31,7 @@ public:
 		Format format{Format::decimal};
 	};
 
-	template <concepts::inputStreamRange Range>
+	template <concepts::inputByteCopyableRange Range>
 	static constexpr Optional<Size> process(Range&& range, T& data, const Metadata metadata = Metadata{}) noexcept
 	{
 		switch (metadata.format)
@@ -84,7 +84,7 @@ public:
 	}
 
 private:
-	template <Size base, concepts::inputStreamRange Range>
+	template <Size base, concepts::inputByteCopyableRange Range>
 	static constexpr Optional<Size> fromStringBase(Range&& range, T& data, const Metadata metadata) noexcept
 	{
 		static_assert(base > 1 && base <= 16, "Invalid base size.");

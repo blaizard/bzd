@@ -36,9 +36,6 @@ enum class IteratorCategory
 	randomAccess = 0x10 | bidirectional,
 	/// A contiguous iterator is a random access iterator that provides a guarantee that its elements are stored contiguously in the memory.
 	contiguous = 0x20 | randomAccess,
-	/// A stream iterator is a single pass iterator that pushes the concept further than input or output,
-	/// by enforcing this onto its associated range. Therefore this concept applies to ranges more than iterators.
-	stream = 0x40
 };
 
 /// Bitwise or operator to IteratorCategory.

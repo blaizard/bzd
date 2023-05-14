@@ -2,7 +2,7 @@
 
 The pattern library is a flexible framework to deal with pattern and specializations at compile time.
 
-It allow the build up of tools like `fmt`.
+It allow the build up of tools like `std::format`.
 
 ## What does it do?
 
@@ -33,7 +33,7 @@ Given `MySpecialization`, a struct specialized.
 template <concepts::??? T>
 struct MySpecialization<T>
 {
-    template <concepts::inputStreamRange Range>
+    template <concepts::inputByteCopyableRange Range>
     static constexpr Optional<Size> fromString(Range&& range, T& value) noexcept { ... }
 };
 ```
@@ -53,7 +53,7 @@ struct MySpecialization<T>
     template <class Adapter>
     static constexpr Metadata parse(const bzd::StringView options) noexcept { ... }
 
-    template <concepts::inputStreamRange Range>
+    template <concepts::inputByteCopyableRange Range>
     static constexpr Optional<Size> fromString(Range&& range, T& value, const Metadata metadata = Metadata{}) noexcept { ... }
 };
 ```

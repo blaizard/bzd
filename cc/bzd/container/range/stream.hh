@@ -23,10 +23,6 @@ class Stream : public ViewInterface<Stream<Iterator, Sentinel>>
 {
 public:
 	constexpr Stream(Iterator begin, Sentinel end) noexcept : it_{begin}, end_{end} {}
-	template <concepts::inputOrOutputRange Range>
-	constexpr explicit Stream(Range&& range) noexcept : it_{bzd::begin(range)}, end_{bzd::end(range)}
-	{
-	}
 
 	Stream(const Stream&) = delete;
 	Stream& operator=(const Stream&) = delete;
@@ -45,8 +41,7 @@ public:
 		{
 			constexpr auto category =
 				typeTraits::iteratorCategory<Iterator> & (typeTraits::IteratorCategory::input | typeTraits::IteratorCategory::output);
-			using Policies = iterator::InputOrOutputReferencePolicies<category | typeTraits::IteratorCategory::stream>;
-			return iterator::InputOrOutputReference<Iterator, Policies>{it_};
+			return iterator::InputOrOutputReference<Iterator, iterator::InputOrOutputReferencePolicies<category>>{it_};
 		}
 	}
 	constexpr auto end() const noexcept { return end_; }
@@ -60,7 +55,14 @@ protected:
 	Sentinel end_;
 };
 
+/// Create a Stream from a range.
+///
+/// Note: a deduction guide cannot be used for the Stream class, as it conflicts with the copy/move constructors
+/// when constructing from another Stream.
 template <concepts::inputOrOutputRange Range>
-Stream(Range&& range) -> Stream<typeTraits::RangeIterator<Range>, typeTraits::RangeSentinel<Range>>;
+constexpr auto makeStream(Range&& range) noexcept
+{
+	return Stream{bzd::begin(range), bzd::end(range)};
+}
 
 } // namespace bzd::range

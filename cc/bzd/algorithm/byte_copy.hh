@@ -15,8 +15,7 @@ namespace bzd::algorithm {
 /// \param[out] output The range of the destination range.
 ///
 /// \return The remain of the output range.
-template <concepts::inputRange InputRange, concepts::outputRange OutputRange>
-requires(concepts::byteCopyableRange<InputRange> && concepts::byteCopyableRange<OutputRange>)
+template <concepts::inputByteCopyableRange InputRange, concepts::outputByteCopyableRange OutputRange>
 constexpr auto byteCopy(InputRange&& input, OutputRange&& output)
 {
 	auto inputFirst = bzd::begin(input);
@@ -53,8 +52,7 @@ constexpr auto byteCopy(InputRange&& input, OutputRange&& output)
 /// \param[out] output The range of the destination range.
 ///
 /// \return The remain of the output range.
-template <concepts::inputRange InputRange, concepts::outputRange OutputRange>
-requires(concepts::byteCopyableRange<InputRange> && concepts::byteCopyableRange<OutputRange>)
+template <concepts::inputByteCopyableRange InputRange, concepts::outputByteCopyableRange OutputRange>
 constexpr bzd::Size byteCopyReturnSize(InputRange&& input, OutputRange&& output)
 {
 	auto inputFirst = bzd::begin(input);

@@ -38,9 +38,9 @@ cc_library(
 )
 
 cc_library(
-    name = "output_stream",
+    name = "output_range",
     hdrs = [
-        "output_stream.hh",
+        "output_range.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [

@@ -81,7 +81,7 @@ public:
 	}
 
 public:
-	template <concepts::outputStreamRange Range>
+	template <concepts::outputByteCopyableRange Range>
 	static constexpr bzd::Optional<bzd::Size> process(Range&& range, const T& n, const Size precision) noexcept
 	{
 		Metadata metadata{};
@@ -89,20 +89,21 @@ public:
 		return process(bzd::forward<Range>(range), n, metadata);
 	}
 
-	template <concepts::outputStreamRange Range>
+	template <concepts::outputByteCopyableRange Range>
 	static constexpr bzd::Optional<bzd::Size> process(Range&& range, const T& n, const Metadata metadata = Metadata{}) noexcept
 	{
+		auto stream = bzd::range::makeStream(range);
 		switch (metadata.format)
 		{
 		case Metadata::Format::automatic:
 		case Metadata::Format::fixedPoint:
-			return toStringBase(bzd::forward<Range>(range), n, metadata);
+			return toStringBase(stream, n, metadata);
 		case Metadata::Format::fixedPointPercent:
 		{
-			const auto result = toStringBase(bzd::forward<Range>(range), n * 100., metadata);
+			const auto result = toStringBase(stream, n * 100., metadata);
 			if (result)
 			{
-				if (bzd::algorithm::byteCopyReturnSize("%"_sv, range))
+				if (bzd::algorithm::byteCopyReturnSize("%"_sv, stream))
 				{
 					return result.value() + 1u;
 				}
@@ -113,7 +114,7 @@ public:
 	}
 
 private:
-	template <concepts::outputStreamRange Range>
+	template <concepts::outputByteCopyableRange Range>
 	static constexpr bzd::Optional<bzd::Size> toStringBase(Range&& range, const T& n, const Metadata& metadata) noexcept
 	{
 		constexpr const T resolutionList[15] = {1,

@@ -24,10 +24,11 @@ public:
 	// For example:
 	// - "HTTP{:f}\s+{:i}\s+{[A-Z]*}"
 	// fromString(myString, ".*{}.*"_csv, )
-	template <bzd::concepts::inputStreamRange Range, class... Args>
+	template <bzd::concepts::inputByteCopyableRange Range, class... Args>
 	static constexpr Optional<Size> process(Range&& range, const T& pattern, Args&&... args) noexcept
 	{
-		auto [context, processor] = bzd::pattern::impl::make<Range, Schema>(pattern, bzd::forward<Args>(args)...);
+		auto stream = bzd::range::makeStream(range);
+		auto [context, processor] = bzd::pattern::impl::make<decltype(stream), Schema>(pattern, bzd::forward<Args>(args)...);
 		Size counter{0u};
 
 		// Run-time call
@@ -36,7 +37,7 @@ public:
 			if (!fragment.str.empty())
 			{
 				bzd::Regexpr regexpr{fragment.str};
-				const auto maybeSize = regexpr.match(range);
+				const auto maybeSize = regexpr.match(stream);
 				if (!maybeSize)
 				{
 					return bzd::nullopt;
@@ -45,7 +46,7 @@ public:
 			}
 			if (fragment.isMetadata)
 			{
-				const auto maybeSize = processor.process(range, fragment);
+				const auto maybeSize = processor.process(stream, fragment);
 				if (!maybeSize)
 				{
 					return bzd::nullopt;
