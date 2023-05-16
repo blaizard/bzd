@@ -46,7 +46,7 @@ cc_library(
     deps = [
         ":base",
         "//cc/bzd/type_traits:range",
-        "//cc/bzd/utility/regexpr",
+        "//cc/bzd/utility/regexp",
     ],
 )
 
@@ -63,6 +63,6 @@ cc_library(
         "//cc/bzd/container:variant",
         "//cc/bzd/type_traits:container",
         "//cc/bzd/utility/pattern",
-        "//cc/bzd/utility/regexpr",
+        "//cc/bzd/utility/regexp",
     ],
 )

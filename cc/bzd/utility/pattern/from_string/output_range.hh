@@ -2,7 +2,7 @@
 
 #include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/utility/pattern/from_string/base.hh"
-#include "cc/bzd/utility/regexpr/regexpr.hh"
+#include "cc/bzd/utility/regexp/regexp.hh"
 
 namespace bzd {
 
@@ -11,14 +11,14 @@ struct FromString<Output>
 {
 	struct Metadata
 	{
-		bzd::StringView regexpr{"[\\w]+"};
+		bzd::StringView regexp{"[\\w]+"};
 	};
 
 	template <bzd::concepts::inputByteCopyableRange Range, class T>
 	static constexpr Optional<Size> process(Range&& range, T&& output, const Metadata metadata = Metadata{}) noexcept
 	{
-		bzd::Regexpr regexpr{metadata.regexpr};
-		if (const auto result = regexpr.capture(range, output); result)
+		bzd::Regexp regexp{metadata.regexp};
+		if (const auto result = regexp.capture(range, output); result)
 		{
 			return result.value();
 		}
@@ -31,7 +31,7 @@ struct FromString<Output>
 		Metadata metadata{};
 		if (!options.empty())
 		{
-			metadata.regexpr = options;
+			metadata.regexp = options;
 		}
 		return metadata;
 	}
