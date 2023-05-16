@@ -1,9 +1,12 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
-    name = "regexpr",
+    name = "regexp",
     hdrs = [
-        "regexpr.hh",
+        "matcher_brackets.hh",
+        "matcher_single_char.hh",
+        "regexp.hh",
+        "types.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [

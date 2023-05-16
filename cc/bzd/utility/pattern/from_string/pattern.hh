@@ -5,7 +5,7 @@
 #include "cc/bzd/type_traits/container.hh"
 #include "cc/bzd/utility/pattern/from_string/base.hh"
 #include "cc/bzd/utility/pattern/pattern.hh"
-#include "cc/bzd/utility/regexpr/regexpr.hh"
+#include "cc/bzd/utility/regexp/regexp.hh"
 
 namespace bzd {
 
@@ -36,8 +36,8 @@ public:
 		{
 			if (!fragment.str.empty())
 			{
-				bzd::Regexpr regexpr{fragment.str};
-				const auto maybeSize = regexpr.match(stream);
+				bzd::Regexp regexp{fragment.str};
+				const auto maybeSize = regexp.match(stream);
 				if (!maybeSize)
 				{
 					return bzd::nullopt;

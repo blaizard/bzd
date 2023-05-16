@@ -13,6 +13,7 @@
 #include "cc/bzd/type_traits/is_lvalue_reference.hh"
 #include "cc/bzd/type_traits/is_reference.hh"
 #include "cc/bzd/type_traits/is_same.hh"
+#include "cc/bzd/type_traits/is_same_class.hh"
 #include "cc/bzd/type_traits/remove_volatile.hh"
 #include "cc/bzd/utility/forward.hh"
 #include "cc/bzd/utility/in_place.hh"
@@ -163,13 +164,32 @@ public: // Monadic API.
 	/// \param callable A suitable function or Callable object that returns an optional.
 	/// \return The result of 'callable' or an empty optional.
 	template <concepts::invocable<const T&> Callable>
-	constexpr auto andThen(Callable&& callable) const& noexcept
+	constexpr auto andThen(Callable&& callable) && noexcept
 	{
 		if (hasValue())
 		{
-			return bzd::forward<Callable>(callable)(value());
+			return bzd::forward<Callable>(callable)(valueMutable());
 		}
-		return typeTraits::InvokeResult<Callable, const T&>{};
+		using ReturnType = typeTraits::InvokeResult<Callable, const T&>;
+		if constexpr (!concepts::sameAs<ReturnType, void>)
+		{
+			return ReturnType{};
+		}
+	}
+
+	/// Returns *this if it contains a value. Otherwise, returns the result of `callable`.
+	///
+	/// \param callable A suitable function or Callable object that returns an optional.
+	/// \return The result of 'callable' or an empty optional.
+	template <concepts::invocable<> Callable>
+	requires(concepts::sameClassAs<typeTraits::InvokeResult<Callable>, Optional>)
+	constexpr Optional orElse(Callable&& callable) && noexcept
+	{
+		if (hasValue())
+		{
+			return *this;
+		}
+		return bzd::forward<Callable>(callable)();
 	}
 
 private:
