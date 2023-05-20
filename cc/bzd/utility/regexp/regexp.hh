@@ -4,6 +4,7 @@
 #include "cc/bzd/container/optional.hh"
 #include "cc/bzd/container/range/stream.hh"
 #include "cc/bzd/container/string_view.hh"
+#include "cc/bzd/type_traits/is_reference.hh"
 #include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/utility/regexp/matcher_brackets.hh"
 #include "cc/bzd/utility/regexp/matcher_single_char.hh"
@@ -19,7 +20,7 @@ namespace bzd {
 /// - String matching.
 /// - Character group [...], negation [^...] and ranges [...-...].
 /// - Repetitions: '*', '+' and '?'.
-/// - Special characters: '.', '\s', '\w'.
+/// - Special characters: '.', '\s', '\S', '\w', '\W'.
 class Regexp
 {
 public:
@@ -185,6 +186,7 @@ public:
 
 private:
 	template <bzd::concepts::outputByteCopyableRange Capture, class Iterator>
+	requires(!bzd::concepts::reference<Capture>)
 	class IteratorCapture : public Iterator
 	{
 	public:
@@ -219,6 +221,7 @@ private:
 	};
 
 	template <bzd::concepts::inputByteCopyableRange Range, bzd::concepts::outputByteCopyableRange Capture>
+	requires(!bzd::concepts::reference<Range> && !bzd::concepts::reference<Capture>)
 	class InputStreamCaptureRange
 	{
 	public:
