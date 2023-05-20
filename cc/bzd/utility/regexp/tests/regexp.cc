@@ -4,9 +4,9 @@
 
 #define EXPECT_RESULT_EQ(r, v)                                                                                                             \
 	{                                                                                                                                      \
-		const auto result = r;                                                                                                             \
-		EXPECT_TRUE(result);                                                                                                               \
-		EXPECT_EQ(result.value(), v);                                                                                                      \
+		const auto regexpResult_ = r;                                                                                                      \
+		EXPECT_TRUE(regexpResult_);                                                                                                        \
+		EXPECT_EQ(regexpResult_.value(), v);                                                                                               \
 	}
 
 TEST(Regexp, String)
@@ -119,4 +119,31 @@ TEST(Regexp, QuestionMark)
 	EXPECT_RESULT_EQ(bzd::Regexp{"a?b?"}.match("ab"_sv), 2u);
 	EXPECT_FALSE(bzd::Regexp{"?"}.match(""_sv));
 	EXPECT_FALSE(bzd::Regexp{"?"}.match("?"_sv));
+}
+
+TEST(Regexp, Capture)
+{
+	{
+		bzd::Regexp regexp{"abc"_sv};
+		bzd::String<12> string;
+		const auto result = regexp.capture("abc", string.assigner());
+		EXPECT_RESULT_EQ(result, 3u);
+		EXPECT_STREQ("abc", string.data());
+	}
+
+	{
+		bzd::Regexp regexp{"a[0-9]+c"_sv};
+		bzd::String<12> string;
+		const auto result = regexp.capture("a1239c", string.assigner());
+		EXPECT_RESULT_EQ(result, 6u);
+		EXPECT_STREQ("a1239c", string.data());
+	}
+
+	{
+		bzd::Regexp regexp{"a[0-9]+c"_sv};
+		bzd::String<12> string;
+		const auto result = regexp.capture("a1239", string.assigner());
+		EXPECT_FALSE(result);
+		EXPECT_STREQ("a1239", string.data());
+	}
 }

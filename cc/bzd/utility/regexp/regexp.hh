@@ -26,10 +26,110 @@ public:
 	constexpr explicit Regexp(const bzd::StringView regexp) noexcept : regexp_{regexp} {}
 
 private:
-	static constexpr Result<Size, regexp::Error> matcher(bzd::StringView regexp, auto& stream) noexcept
+	struct Context
 	{
-		auto it = bzd::begin(stream);
-		const auto end = bzd::end(stream);
+		bzd::StringView regexp;
+		bzd::Variant<bzd::Monostate, regexp::MatcherBrackets, regexp::MatcherSingleChar> matcher{};
+		Size minMatch{1u};
+		Size maxMatch{1u};
+		Size currentMatch{0u};
+		Size counter{0u};
+	};
+
+	class ContextResult : public bzd::Result<Context, regexp::Error>
+	{
+	public:
+		using bzd::Result<Context, regexp::Error>::Result;
+
+		/// Update the counter of the context.
+		constexpr void update(const Result<Size, regexp::Error>& maybeCounter) noexcept
+		{
+			auto& context = this->valueMutable();
+			if (!maybeCounter)
+			{
+				if (maybeCounter.error() == regexp::Error::malformed)
+				{
+					*this = bzd::error::make(regexp::Error::malformed);
+				}
+				else if (context.currentMatch < context.minMatch)
+				{
+					*this = bzd::error::make(regexp::Error::noMatch);
+				}
+				else
+				{
+					// Condition to exit.
+					context.maxMatch = context.currentMatch = 1u;
+				}
+			}
+			else
+			{
+				context.counter += maybeCounter.value();
+				++context.currentMatch;
+			}
+		}
+
+		constexpr bzd::Bool loop() const noexcept
+		{
+			if (hasError())
+			{
+				return false;
+			}
+			const auto& context = this->value();
+			return (context.maxMatch == 0u || context.currentMatch < context.maxMatch);
+		}
+	};
+
+	constexpr ContextResult next(Context&& context) noexcept
+	{
+		// Identify the matcher.
+		if (auto maybeValue = regexp::MatcherBrackets::make(context.regexp); maybeValue)
+		{
+			context.matcher.set<regexp::MatcherBrackets>(maybeValue.value());
+		}
+		else if (auto maybeValue = regexp::MatcherSingleChar::make(context.regexp); maybeValue)
+		{
+			context.matcher.set<regexp::MatcherSingleChar>(maybeValue.value());
+		}
+		else
+		{
+			return bzd::error::make(regexp::Error::malformed);
+		}
+
+		// Identify the number of times the matcher should match.
+		context.currentMatch = 0u;
+		context.minMatch = 1u;
+		context.maxMatch = 1u;
+		if (context.regexp.size())
+		{
+			if (context.regexp[0] == '*')
+			{
+				context.minMatch = 0u;
+				context.maxMatch = 0u;
+				context.regexp.removePrefix(1u);
+			}
+			else if (context.regexp[0] == '+')
+			{
+				context.minMatch = 1u;
+				context.maxMatch = 0u;
+				context.regexp.removePrefix(1u);
+			}
+			else if (context.regexp[0] == '?')
+			{
+				context.minMatch = 0u;
+				context.maxMatch = 1u;
+				context.regexp.removePrefix(1u);
+			}
+		}
+
+		return context;
+	}
+
+public:
+	template <bzd::concepts::inputByteCopyableRange Range>
+	[[nodiscard]] constexpr Result<Size, regexp::Error> match(Range&& range) noexcept
+	{
+		auto it = bzd::begin(range);
+		const auto end = bzd::end(range);
 
 		const auto matcherProcessor = [&it, &end](auto matcher) -> Result<Size, regexp::Error> {
 			Size counter = 0u;
@@ -56,91 +156,31 @@ private:
 			return bzd::error::make(regexp::Error::noMatch);
 		};
 
-		Size counter{0u};
-		while (!regexp.empty())
+		Context context{regexp_};
+		while (!context.regexp.empty())
 		{
-			// Identify the matcher.
-			bzd::Variant<bzd::Monostate, regexp::MatcherBrackets, regexp::MatcherSingleChar> matcher;
-			if (auto maybeValue = regexp::MatcherBrackets::make(regexp); maybeValue)
+			auto result = next(bzd::move(context));
+			while (result.loop())
 			{
-				matcher.set<regexp::MatcherBrackets>(maybeValue.value());
+				const auto maybeCounter = matcherProcessor(result.value().matcher);
+				result.update(maybeCounter);
 			}
-			else if (auto maybeValue = regexp::MatcherSingleChar::make(regexp); maybeValue)
+			if (!result)
 			{
-				matcher.set<regexp::MatcherSingleChar>(maybeValue.value());
+				return bzd::move(result).propagate();
 			}
-			else
-			{
-				return bzd::error::make(regexp::Error::malformed);
-			}
-
-			// Identify the number of times the matcher should match.
-			Size minMatch = 1u;
-			Size maxMatch = 1u;
-			Size currentMatch = 0u;
-
-			if (regexp.size())
-			{
-				if (regexp[0] == '*')
-				{
-					minMatch = 0u;
-					maxMatch = 0u;
-					regexp.removePrefix(1u);
-				}
-				else if (regexp[0] == '+')
-				{
-					minMatch = 1u;
-					maxMatch = 0u;
-					regexp.removePrefix(1u);
-				}
-				else if (regexp[0] == '?')
-				{
-					minMatch = 0u;
-					maxMatch = 1u;
-					regexp.removePrefix(1u);
-				}
-			}
-
-			// Match.
-			do
-			{
-				const auto maybeCounter = matcherProcessor(matcher);
-				if (!maybeCounter)
-				{
-					if (maybeCounter.error() == regexp::Error::malformed)
-					{
-						return bzd::error::make(regexp::Error::malformed);
-					}
-					break;
-				}
-				counter += maybeCounter.value();
-				++currentMatch;
-			} while (maxMatch == 0u || currentMatch < maxMatch);
-
-			if (currentMatch < minMatch)
-			{
-				return bzd::error::make(regexp::Error::noMatch);
-			}
+			context = bzd::move(result).value();
 		}
-
-		return counter;
-	}
-
-public:
-	template <bzd::concepts::inputByteCopyableRange Range>
-	[[nodiscard]] constexpr Result<Size, regexp::Error> match(Range&& range) noexcept
-	{
-		auto stream = bzd::range::makeStream(range);
-		return matcher(regexp_, stream);
+		return context.counter;
 	}
 
 	template <bzd::concepts::inputByteCopyableRange Range, bzd::concepts::outputByteCopyableRange Output>
-	[[nodiscard]] constexpr Result<Size, regexp::Error> capture(Range&& range, Output& output) noexcept
+	[[nodiscard]] constexpr Result<Size, regexp::Error> capture(Range&& range, Output&& output) noexcept
 	{
 		auto iStream = bzd::range::makeStream(range);
 		auto oStream = bzd::range::makeStream(output);
 		InputStreamCaptureRange capture{iStream, oStream};
-		return matcher(regexp_, capture);
+		return match(capture);
 	}
 
 private:
