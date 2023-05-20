@@ -33,13 +33,16 @@ public:
 			}
 			value = regexp[1];
 			regexp.removePrefix(2u);
-			if (value == 's')
+			switch (value)
 			{
+			case 's':
 				return MatcherSingleChar{&MatcherSingleChar::matchSpace};
-			}
-			else if (value == 'w')
-			{
+			case 'S':
+				return MatcherSingleChar{&MatcherSingleChar::matchNotSpace};
+			case 'w':
 				return MatcherSingleChar{&MatcherSingleChar::matchWord};
+			case 'W':
+				return MatcherSingleChar{&MatcherSingleChar::matchNotWord};
 			}
 		}
 		else
@@ -72,9 +75,27 @@ private:
 		return bzd::error::make(Error::noMatch);
 	}
 
+	constexpr Result matchNotWord(const char c) noexcept
+	{
+		if (!matchWord(c))
+		{
+			return Success::last;
+		}
+		return bzd::error::make(Error::noMatch);
+	}
+
 	constexpr Result matchSpace(const char c) noexcept
 	{
 		if (c == ' ' || c == '\t' || c == '\r' || c == '\n' || c == '\f')
+		{
+			return Success::last;
+		}
+		return bzd::error::make(Error::noMatch);
+	}
+
+	constexpr Result matchNotSpace(const char c) noexcept
+	{
+		if (!matchSpace(c))
 		{
 			return Success::last;
 		}
