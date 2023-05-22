@@ -9,7 +9,11 @@
 
 namespace bzd::test {
 
-template <class T, bzd::Size capacity>
+/// Emulation of an input channel.
+///
+/// \tparam useInternalBuffer Return data from the internal buffer instead of the one passed into argument.
+///                           This behavior is use to support zero copy.
+template <class T, bzd::Size capacity, bzd::Bool useInternalBuffer = false>
 class IChannel : public bzd::IChannel<T>
 {
 protected:
@@ -32,24 +36,34 @@ public:
 		{
 			co_return bzd::error::Eof("No more data available."_csv);
 		}
-		bzd::Size index{0};
-		for (const auto b : buffer_.asSpanForReading())
+		if constexpr (useInternalBuffer)
 		{
-			if (index >= data.size())
-			{
-				break;
-			}
-			data[index++] = b;
-			buffer_.consume(1);
+			const auto span = buffer_.asSpanForReading();
+			const auto count = bzd::min(data.size(), span.size());
+			buffer_.consume(count);
+			co_return span.first(count);
 		}
-		co_return data.first(index);
+		else
+		{
+			bzd::Size index{0};
+			for (const auto b : buffer_.asSpanForReading())
+			{
+				if (index >= data.size())
+				{
+					break;
+				}
+				data[index++] = b;
+				buffer_.consume(1);
+			}
+			co_return data.first(index);
+		}
 	}
 
 private:
 	bzd::RingBuffer<T, capacity> buffer_{};
 };
 
-template <bzd::Size capacity>
-using IStream = IChannel<bzd::Byte, capacity>;
+template <bzd::Size capacity, bzd::Bool useInternalBuffer = false>
+using IStream = IChannel<bzd::Byte, capacity, useInternalBuffer>;
 
 } // namespace bzd::test

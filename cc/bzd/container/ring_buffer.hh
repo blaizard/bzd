@@ -94,6 +94,17 @@ public: // Modifiers.
 		read_ += n;
 	}
 
+	/// Re-add to the list the last n element previously consumed.
+	constexpr void unconsume(const bzd::Size n) noexcept
+	{
+		read_ -= n;
+		if (size() > capacity())
+		{
+			read_ = write_ - capacity();
+			overrun_ = true;
+		}
+	}
+
 	/// Assign the given span to the ring buffer. All previously available data are
 	/// removed.
 	constexpr void assign(const bzd::Span<const T> span) noexcept

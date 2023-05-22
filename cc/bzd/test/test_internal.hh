@@ -37,7 +37,7 @@
 		{                                                                                                                                  \
 			(this->registerTest(::bzd::test::FunctionPointer::toMember<BZDTEST_CLASS_NAME_(testCaseName, testName),                        \
 																	   &BZDTEST_CLASS_NAME_(testCaseName, testName)::test<Types>>(*this),  \
-								typeToString<Types>()),                                                                                    \
+								::bzd::test::typeToString<Types>()),                                                                       \
 			 ...);                                                                                                                         \
 		}                                                                                                                                  \
 		template <class TestType>                                                                                                          \
@@ -55,7 +55,7 @@
 	template <class TestType>                                                                                                              \
 	void BZDTEST_CLASS_NAME_(testCaseName, testName)<Types...>::test([[maybe_unused]] const ::bzd::test::Context& test) const
 
-#define BZDTEST_ASYNC_(testCaseName, testName)                                                                                             \
+#define BZDTEST_ASYNC_2(testCaseName, testName)                                                                                            \
 	BZDTEST_REGISTER_(testCaseName, testName)                                                                                              \
 	::bzd::Async<> BZDTEST_FCT_NAME_(testCaseName, testName)(const ::bzd::test::Context&);                                                 \
 	void BZDTEST_CLASS_NAME_(testCaseName, testName)::test(const ::bzd::test::Context& test) const                                         \
@@ -66,6 +66,23 @@
 			BZDTEST_FAIL_FATAL_("Failure\nUnhandled failure from async.", result.error().getMessage().data());                             \
 		}                                                                                                                                  \
 	}                                                                                                                                      \
+	::bzd::Async<> BZDTEST_FCT_NAME_(testCaseName, testName)([[maybe_unused]] const ::bzd::test::Context& test)
+
+#define BZDTEST_ASYNC_3(testCaseName, testName, typeList)                                                                                  \
+	BZDTEST_TEMPLATE_REGISTER_(testCaseName, testName, typeList)                                                                           \
+	template <class TestType>                                                                                                              \
+	::bzd::Async<> BZDTEST_FCT_NAME_(testCaseName, testName)(const ::bzd::test::Context&);                                                 \
+	template <class... Types>                                                                                                              \
+	template <class TestType>                                                                                                              \
+	void BZDTEST_CLASS_NAME_(testCaseName, testName)<Types...>::test(const ::bzd::test::Context& test) const                               \
+	{                                                                                                                                      \
+		const auto result = BZDTEST_FCT_NAME_(testCaseName, testName)<TestType>(test).sync();                                              \
+		if (!static_cast<bool>(result))                                                                                                    \
+		{                                                                                                                                  \
+			BZDTEST_FAIL_FATAL_("Failure\nUnhandled failure from async.", result.error().getMessage().data());                             \
+		}                                                                                                                                  \
+	}                                                                                                                                      \
+	template <class TestType>                                                                                                              \
 	::bzd::Async<> BZDTEST_FCT_NAME_(testCaseName, testName)([[maybe_unused]] const ::bzd::test::Context& test)
 
 #define BZDTEST_ASYNC_MULTITHREAD_(testCaseName, testName, nbThreads)                                                                      \

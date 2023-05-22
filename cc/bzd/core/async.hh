@@ -277,6 +277,8 @@ class Async : public impl::Async<bzd::Result<V, E>, impl::AsyncTaskTraits>
 {
 public:
 	using impl::Async<bzd::Result<V, E>, impl::AsyncTaskTraits>::Async;
+	using Value = V;
+	using Error = E;
 };
 
 template <class V = void, class E = bzd::Error>
@@ -284,6 +286,8 @@ class Generator : public impl::Async<bzd::Result<V, E>, impl::AsyncGeneratorTrai
 {
 public:
 	using impl::Async<bzd::Result<V, E>, impl::AsyncGeneratorTraits>::Async;
+	using Value = V;
+	using Error = E;
 };
 
 } // namespace bzd
