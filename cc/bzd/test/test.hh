@@ -11,7 +11,7 @@
 #define TEST(...) BZD_GET_MACRO(BZDTEST_, __VA_ARGS__)(__VA_ARGS__)
 
 /// Run a coroutine-based test in an asynchronous context.
-#define TEST_ASYNC(testCaseName, testName) BZDTEST_ASYNC_(testCaseName, testName)
+#define TEST_ASYNC(...) BZD_GET_MACRO(BZDTEST_ASYNC_, __VA_ARGS__)(__VA_ARGS__)
 
 /// Executes a test case at compile time.
 /// \{

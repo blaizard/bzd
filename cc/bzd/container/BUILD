@@ -9,6 +9,7 @@ bzd_cc_library(
         ":array",
         ":btree",
         ":function_ref",
+        ":ichannel_buffered",
         ":map",
         ":named_type",
         ":non_owning_list",
@@ -91,6 +92,24 @@ cc_library(
         "//cc/bzd/type_traits:add_pointer",
         "//cc/bzd/type_traits:invocable",
         "//cc/bzd/type_traits:is_same_class",
+    ],
+)
+
+cc_library(
+    name = "ichannel_buffered",
+    hdrs = [
+        "ichannel_buffered.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":optional",
+        ":ring_buffer",
+        ":span",
+        "//cc/bzd/algorithm:copy",
+        "//cc/bzd/container/range/views:drop",
+        "//cc/bzd/core:channel",
+        "//cc/bzd/core/async",
+        "//cc/bzd/platform:types",
     ],
 )
 

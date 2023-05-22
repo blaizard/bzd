@@ -18,7 +18,7 @@ namespace bzd::range {
 /// for things like serialization, format...
 /// Stream may or may not be bounded, in the latter case their sentinel will never
 /// be reached and their size will be infinite.
-template <concepts::inputOrOutputIterator Iterator, concepts::sentinelFor<Iterator> Sentinel>
+template <concepts::inputOrOutputIterator Iterator, concepts::sentinelFor<Iterator> Sentinel = Iterator>
 class Stream : public ViewInterface<Stream<Iterator, Sentinel>>
 {
 public:
@@ -26,8 +26,8 @@ public:
 
 	Stream(const Stream&) = delete;
 	Stream& operator=(const Stream&) = delete;
-	Stream(Stream&&) = delete;
-	Stream& operator=(Stream&&) = delete;
+	Stream(Stream&&) = default;
+	Stream& operator=(Stream&&) = default;
 	~Stream() = default;
 
 public:
