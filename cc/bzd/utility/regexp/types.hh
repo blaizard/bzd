@@ -13,7 +13,8 @@ enum class Success
 enum class Error
 {
 	malformed,
-	noMatch
+	noMatch,
+	noMoreInput,
 };
 
 using Result = bzd::Result<Success, Error>;

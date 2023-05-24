@@ -15,6 +15,7 @@ TEST(Regexp, String)
 	EXPECT_RESULT_EQ(regexp.match("abc"), 3u);
 	EXPECT_FALSE(regexp.match("Hello"));
 	EXPECT_FALSE(regexp.match("qabc"));
+	EXPECT_FALSE(regexp.match("ab"));
 	EXPECT_RESULT_EQ(regexp.match("abcq"), 3u);
 }
 

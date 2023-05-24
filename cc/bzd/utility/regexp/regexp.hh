@@ -26,7 +26,7 @@ class Regexp
 public:
 	constexpr explicit Regexp(const bzd::StringView regexp) noexcept : regexp_{regexp} {}
 
-private:
+protected:
 	struct Context
 	{
 		bzd::StringView regexp;
@@ -35,6 +35,38 @@ private:
 		Size maxMatch{1u};
 		Size currentMatch{0u};
 		Size counter{0u};
+
+		struct ResultProcess
+		{
+			Size counter{0u};
+			Optional<regexp::Error> maybeError{};
+		};
+
+		template <concepts::inputIterator Iterator, concepts::sentinelFor<Iterator> Sentinel>
+		constexpr ResultProcess process(Iterator& it,
+										const Sentinel& end,
+										ResultProcess resultProcess = ResultProcess{0u, bzd::nullopt}) noexcept
+		{
+			while (it != end)
+			{
+				auto result = matcher.match([](bzd::Monostate) -> regexp::Result { return bzd::error::make(regexp::Error::malformed); },
+											[&it](auto& matcher) { return matcher(*it); });
+				if (result)
+				{
+					++it;
+					++resultProcess.counter;
+					if (result.value() == regexp::Success::last)
+					{
+						return resultProcess;
+					}
+					continue;
+				}
+				resultProcess.maybeError = result.error();
+				return resultProcess;
+			}
+			resultProcess.maybeError = regexp::Error::noMoreInput;
+			return resultProcess;
+		}
 	};
 
 	class ContextResult : public bzd::Result<Context, regexp::Error>
@@ -43,12 +75,12 @@ private:
 		using bzd::Result<Context, regexp::Error>::Result;
 
 		/// Update the counter of the context.
-		constexpr void update(const Result<Size, regexp::Error>& maybeCounter) noexcept
+		constexpr void update(const Context::ResultProcess result) noexcept
 		{
 			auto& context = this->valueMutable();
-			if (!maybeCounter)
+			if (result.maybeError)
 			{
-				if (maybeCounter.error() == regexp::Error::malformed)
+				if (result.maybeError.value() == regexp::Error::malformed)
 				{
 					*this = bzd::error::make(regexp::Error::malformed);
 				}
@@ -64,7 +96,7 @@ private:
 			}
 			else
 			{
-				context.counter += maybeCounter.value();
+				context.counter += result.counter;
 				++context.currentMatch;
 			}
 		}
@@ -132,39 +164,14 @@ public:
 		auto it = bzd::begin(range);
 		const auto end = bzd::end(range);
 
-		const auto matcherProcessor = [&it, &end](auto matcher) -> Result<Size, regexp::Error> {
-			Size counter = 0u;
-			while (it != end)
-			{
-				auto result = matcher.match([](bzd::Monostate) -> regexp::Result { return bzd::error::make(regexp::Error::malformed); },
-											[&it](auto& matcher) { return matcher(*it); });
-
-				if (result)
-				{
-					++it;
-					++counter;
-					if (result.value() == regexp::Success::last)
-					{
-						return counter;
-					}
-					else
-					{
-						continue;
-					}
-				}
-				return bzd::move(result).propagate();
-			}
-			return bzd::error::make(regexp::Error::noMatch);
-		};
-
 		Context context{regexp_};
 		while (!context.regexp.empty())
 		{
 			auto result = next(bzd::move(context));
 			while (result.loop())
 			{
-				const auto maybeCounter = matcherProcessor(result.value().matcher);
-				result.update(maybeCounter);
+				const auto resultProcess = result.valueMutable().process(it, end);
+				result.update(resultProcess);
 			}
 			if (!result)
 			{
@@ -237,7 +244,7 @@ private:
 		Capture& capture_;
 	};
 
-private:
+protected:
 	bzd::StringView regexp_;
 };
 
