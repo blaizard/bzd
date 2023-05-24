@@ -19,3 +19,15 @@ cc_library(
         "//cc/bzd/type_traits:range",
     ],
 )
+
+cc_library(
+    name = "async",
+    hdrs = [
+        "async.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":regexp",
+        "//cc/bzd/core/async",
+    ],
+)

@@ -10,3 +10,16 @@ bzd_cc_test(
         "//cc/bzd/utility/regexp",
     ],
 )
+
+bzd_cc_test(
+    name = "async",
+    srcs = [
+        "async.cc",
+    ],
+    deps = [
+        "//cc/bzd/container:ichannel_buffered",
+        "//cc/bzd/test",
+        "//cc/bzd/test/types",
+        "//cc/bzd/utility/regexp:async",
+    ],
+)

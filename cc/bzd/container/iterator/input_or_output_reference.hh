@@ -27,7 +27,7 @@ public: // Traits
 	static constexpr auto category = Policies::category;
 
 public: // Constructors.
-	constexpr explicit InputOrOutputReference(Iterator& it) noexcept : it_{it} {}
+	constexpr explicit InputOrOutputReference(Iterator& it) noexcept : it_{&it} {}
 
 	InputOrOutputReference(const InputOrOutputReference&) = default;
 	InputOrOutputReference& operator=(const InputOrOutputReference&) = default;
@@ -38,20 +38,21 @@ public: // Constructors.
 public: // API.
 	constexpr Self& operator++() noexcept
 	{
-		++it_;
+		++(*it_);
 		return *this;
 	}
 
-	[[nodiscard]] constexpr Bool operator==(const Self& it) const noexcept { return it_ == it; }
-	[[nodiscard]] constexpr Bool operator==(const Iterator& it) const noexcept { return it_ == it; }
+	[[nodiscard]] constexpr Bool operator==(const Self& it) const noexcept { return (*it_) == it; }
+	[[nodiscard]] constexpr Bool operator==(const Iterator& it) const noexcept { return (*it_) == it; }
 	[[nodiscard]] constexpr Bool operator!=(const Self& it) const noexcept { return !(it == *this); }
 	[[nodiscard]] constexpr Bool operator!=(const Iterator& it) const noexcept { return !(it == *this); }
 
-	[[nodiscard]] constexpr ValueType& operator*() const noexcept { return *it_; }
-	[[nodiscard]] constexpr ValueType* operator->() const noexcept { return &(*it_); }
+	[[nodiscard]] constexpr ValueType& operator*() const noexcept { return *(*it_); }
+	[[nodiscard]] constexpr ValueType* operator->() const noexcept { return &(*(*it_)); }
 
 private:
-	Iterator& it_;
+	// Note, it must be a pointer and not a reference to allow copy and move assignments.
+	Iterator* it_;
 };
 
 } // namespace bzd::iterator

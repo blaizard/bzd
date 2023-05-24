@@ -15,13 +15,17 @@ namespace bzd::concepts {
 
 namespace impl {
 template <class T>
-concept readerAsyncReturn = concepts::async<T> && concepts::inputRange<T>;
+concept readerAsyncReturn = concepts::async<T> && concepts::inputRange<typename T::Value>;
 }
 
 template <class T>
-concept readerAsync = requires(T& t) { { t.reader() } -> impl::readerAsyncReturn; };
+concept readerAsync = requires(T& t) {
+						  {
+							  t.reader()
+							  } -> impl::readerAsyncReturn;
+					  };
 
-}
+} // namespace bzd::concepts
 
 namespace bzd {
 
@@ -54,8 +58,21 @@ public:
 		{
 			other.ichannel_.reset();
 		}
-		ReaderScope& operator=(ReaderScope&&) = delete;
-		constexpr ~ReaderScope() noexcept
+		constexpr ReaderScope& operator=(ReaderScope&& other) noexcept
+		{
+			close();
+
+			static_cast<Parent&>(*this) = static_cast<Parent&&>(other);
+			ichannel_ = other.ichannel_;
+			write_ = other.write_;
+			other.ichannel_.reset();
+
+			return *this;
+		}
+		constexpr ~ReaderScope() noexcept { close(); }
+
+	private:
+		constexpr void close() noexcept
 		{
 			if (ichannel_.hasValue())
 			{
@@ -226,14 +243,5 @@ private: // Variables.
 	bzd::IChannel<T>& in_;
 	bzd::RingBuffer<T, bufferCapacity> buffer_;
 };
-
-template <class T, class Value>
-requires concepts::appendable<T, Value>
-bzd::Async<T> make(bzd::Generator<Value>&& generator) noexcept
-{
-	T container;
-	co_await !bzd::async::forEach(bzd::move(generator), [&container](const Value& value) { container.append(value); });
-	co_return container;
-}
 
 } // namespace bzd
