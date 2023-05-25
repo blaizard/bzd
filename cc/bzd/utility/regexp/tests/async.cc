@@ -113,3 +113,36 @@ TEST_ASYNC(RegexpAsync, Features, (TestIChannel, TestIChannelZeroCopy))
 
 	co_return {};
 }
+
+TEST_ASYNC(RegexpAsync, Capture, (TestIChannel, TestIChannelZeroCopy))
+{
+	TestType in{};
+	bzd::IChannelBuffered<char, 8u> channel{in};
+
+	{
+		in << "a*c";
+		bzd::String<12u> string;
+		const auto size = co_await !bzd::RegexpAsync{"a\\*c"}.capture(channel, string.assigner());
+		EXPECT_EQ(size, 3u);
+		EXPECT_STREQ("a*c", string.data());
+	}
+
+	{
+		in << "a1239c";
+		bzd::String<12u> string;
+		const auto size = co_await !bzd::RegexpAsync{"a[0-9]+c"}.capture(channel, string.assigner());
+		EXPECT_EQ(size, 6u);
+		EXPECT_STREQ("a1239c", string.data());
+	}
+
+	{
+		in << "a1239";
+
+		bzd::String<12> string;
+		const auto result = co_await bzd::RegexpAsync{"a[0-9]+c"}.capture(channel, string.assigner());
+		EXPECT_FALSE(result);
+		EXPECT_STREQ("a1239", string.data());
+	}
+
+	co_return {};
+}

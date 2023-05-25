@@ -15,8 +15,8 @@ cc_library(
         "//cc/bzd/container:result",
         "//cc/bzd/container:string_view",
         "//cc/bzd/container/range:stream",
-        "//cc/bzd/type_traits:is_reference",
         "//cc/bzd/type_traits:range",
+        "//cc/bzd/utility/memory:non_null_ptr",
     ],
 )
 
@@ -29,5 +29,7 @@ cc_library(
     deps = [
         ":regexp",
         "//cc/bzd/core/async",
+        "//cc/bzd/type_traits:channel",
+        "//cc/bzd/type_traits:invoke_result",
     ],
 )

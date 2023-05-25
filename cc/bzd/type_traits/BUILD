@@ -13,6 +13,7 @@ bzd_cc_library(
         ":add_rvalue_reference",
         ":add_volatile",
         ":assignable_from",
+        ":channel",
         ":conditional",
         ":container",
         ":decay",
@@ -151,6 +152,18 @@ cc_library(
     deps = [
         ":is_same",
         "//cc/bzd/utility:forward",
+    ],
+)
+
+cc_library(
+    name = "channel",
+    hdrs = [
+        "channel.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":range",
+        "//cc/bzd/core/async",
     ],
 )
 
