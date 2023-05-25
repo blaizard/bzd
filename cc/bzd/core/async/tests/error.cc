@@ -50,6 +50,10 @@ TEST_ASYNC(Error, Simple)
 		EXPECT_EQ(value, 42);
 	}
 	{
+		const auto value = co_await !generateSuccessInt(42);
+		EXPECT_EQ(value, 42);
+	}
+	{
 		int step{-1};
 		const auto result = co_await nestedError(step);
 		EXPECT_FALSE(result);

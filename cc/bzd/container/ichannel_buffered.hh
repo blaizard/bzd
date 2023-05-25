@@ -9,24 +9,6 @@
 #include "cc/bzd/type_traits/container.hh"
 #include "cc/bzd/type_traits/range.hh"
 
-#include <iostream>
-
-namespace bzd::concepts {
-
-namespace impl {
-template <class T>
-concept readerAsyncReturn = concepts::async<T> && concepts::inputRange<typename T::Value>;
-}
-
-template <class T>
-concept readerAsync = requires(T& t) {
-						  {
-							  t.reader()
-							  } -> impl::readerAsyncReturn;
-					  };
-
-} // namespace bzd::concepts
-
 namespace bzd {
 
 /// Create a buffered input channel.

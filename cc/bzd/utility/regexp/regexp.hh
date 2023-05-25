@@ -4,8 +4,8 @@
 #include "cc/bzd/container/optional.hh"
 #include "cc/bzd/container/range/stream.hh"
 #include "cc/bzd/container/string_view.hh"
-#include "cc/bzd/type_traits/is_reference.hh"
 #include "cc/bzd/type_traits/range.hh"
+#include "cc/bzd/utility/memory/non_null_ptr.hh"
 #include "cc/bzd/utility/regexp/matcher_brackets.hh"
 #include "cc/bzd/utility/regexp/matcher_single_char.hh"
 #include "cc/bzd/utility/regexp/types.hh"
@@ -187,17 +187,17 @@ public:
 	{
 		auto iStream = bzd::range::makeStream(range);
 		auto oStream = bzd::range::makeStream(output);
-		InputStreamCaptureRange capture{iStream, oStream};
+		InputStreamCaptureRange capture{bzd::move(iStream), oStream};
 		return match(capture);
 	}
 
-private:
+protected:
 	template <bzd::concepts::outputByteCopyableRange Capture, class Iterator>
 	requires(!bzd::concepts::reference<Capture>)
 	class IteratorCapture : public Iterator
 	{
 	public:
-		constexpr IteratorCapture(Capture& capture, const Iterator& it) noexcept : Iterator{it}, capture_{capture} {}
+		constexpr IteratorCapture(Capture& capture, const Iterator& it) noexcept : Iterator{it}, capture_{&capture} {}
 		constexpr IteratorCapture& operator++() noexcept
 		{
 			captureByte();
@@ -215,8 +215,8 @@ private:
 	private:
 		constexpr void captureByte() noexcept
 		{
-			auto it = capture_.begin();
-			if (it != capture_.end())
+			auto it = capture_->begin();
+			if (it != capture_->end())
 			{
 				*it = Iterator::operator*();
 				++it;
@@ -224,24 +224,29 @@ private:
 		}
 
 	private:
-		Capture& capture_;
+		bzd::NonNullPtr<Capture*> capture_;
 	};
 
 	template <bzd::concepts::inputByteCopyableRange Range, bzd::concepts::outputByteCopyableRange Capture>
-	requires(!bzd::concepts::reference<Range> && !bzd::concepts::reference<Capture>)
 	class InputStreamCaptureRange
 	{
 	public:
-		constexpr InputStreamCaptureRange(Range& range, Capture& capture) noexcept : range_{range}, capture_{capture} {}
+		constexpr InputStreamCaptureRange(Range&& range, Capture& capture) noexcept : range_{bzd::move(range)}, capture_{&capture} {}
+
+		InputStreamCaptureRange(const InputStreamCaptureRange&) = delete;
+		InputStreamCaptureRange& operator=(const InputStreamCaptureRange&) = delete;
+		InputStreamCaptureRange(InputStreamCaptureRange&&) = default;
+		InputStreamCaptureRange& operator=(InputStreamCaptureRange&&) = default;
+		~InputStreamCaptureRange() = default;
 
 	public:
-		constexpr auto begin() noexcept { return IteratorCapture{capture_, range_.begin()}; }
+		constexpr auto begin() noexcept { return IteratorCapture{*capture_, range_.begin()}; }
 		constexpr auto end() noexcept { return range_.end(); }
 		constexpr auto size() noexcept { return range_.size(); }
 
 	private:
-		Range& range_;
-		Capture& capture_;
+		Range range_;
+		bzd::NonNullPtr<Capture*> capture_;
 	};
 
 protected:

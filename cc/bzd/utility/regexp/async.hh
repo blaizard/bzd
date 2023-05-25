@@ -1,6 +1,8 @@
 #pragma once
 
 #include "cc/bzd/core/async.hh"
+#include "cc/bzd/type_traits/channel.hh"
+#include "cc/bzd/type_traits/invoke_result.hh"
 #include "cc/bzd/utility/regexp/regexp.hh"
 
 namespace bzd {
@@ -11,10 +13,10 @@ public:
 	using bzd::Regexp::Regexp;
 
 public:
-	template <class ReaderAsync>
-	bzd::Async<Size> match(ReaderAsync&& reader) noexcept
+	template <concepts::readerAsync ReaderAsync>
+	bzd::Async<Size> match(ReaderAsync&& input) noexcept
 	{
-		auto range = co_await !reader.reader();
+		auto range = co_await !input.reader();
 		auto it = bzd::begin(range);
 		auto end = bzd::end(range);
 
@@ -29,7 +31,7 @@ public:
 				{
 					if (it == end)
 					{
-						range = co_await !reader.reader();
+						range = co_await !input.reader();
 						it = bzd::begin(range);
 						end = bzd::end(range);
 						if (it == end)
@@ -58,17 +60,34 @@ public:
 		co_return context.counter;
 	}
 
-	/*
-		// (wip)
-		template <class ReaderAsync>
-		bzd::Async<Size> capture(ReaderAsync&& reader, Output&& output) noexcept
+	template <concepts::readerAsync ReaderAsync, bzd::concepts::outputByteCopyableRange Output>
+	bzd::Async<Size> capture(ReaderAsync&& input, Output&& output) noexcept
+	{
+		auto oStream = bzd::range::makeStream(output);
+		ReaderAsyncCaptureRange readerCapture{input, oStream};
+		co_return co_await !match(readerCapture);
+	}
+
+private:
+	template <concepts::readerAsync ReaderAsync, bzd::concepts::outputByteCopyableRange Capture>
+	class ReaderAsyncCaptureRange
+	{
+	private:
+		using ReaderAsyncType = typename bzd::typeTraits::InvokeResult<decltype(&ReaderAsync::reader), ReaderAsync>::Value;
+
+	public:
+		constexpr ReaderAsyncCaptureRange(ReaderAsync& input, Capture& capture) noexcept : input_{input}, capture_{capture} {}
+
+		bzd::Async<InputStreamCaptureRange<ReaderAsyncType, Capture>> reader() noexcept
 		{
-			auto iStream = bzd::range::makeStream(range);
-			auto oStream = bzd::range::makeStream(output);
-			InputStreamCaptureRange capture{iStream, oStream};
-			co_return co_await !match(capture);
+			auto range = co_await !input_.reader();
+			co_return InputStreamCaptureRange<ReaderAsyncType, Capture>{bzd::move(range), capture_};
 		}
-	*/
+
+	private:
+		ReaderAsync& input_;
+		Capture& capture_;
+	};
 };
 
 } // namespace bzd
