@@ -12,11 +12,11 @@ cc_library(
     deps = [
         "//cc/bzd/container:function_ref",
         "//cc/bzd/container:optional",
+        "//cc/bzd/container:reference_wrapper",
         "//cc/bzd/container:result",
         "//cc/bzd/container:string_view",
         "//cc/bzd/container/range:stream",
         "//cc/bzd/type_traits:range",
-        "//cc/bzd/utility/memory:non_null_ptr",
     ],
 )
 

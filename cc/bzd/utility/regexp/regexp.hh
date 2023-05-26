@@ -3,9 +3,9 @@
 #include "cc/bzd/container/function_ref.hh"
 #include "cc/bzd/container/optional.hh"
 #include "cc/bzd/container/range/stream.hh"
+#include "cc/bzd/container/reference_wrapper.hh"
 #include "cc/bzd/container/string_view.hh"
 #include "cc/bzd/type_traits/range.hh"
-#include "cc/bzd/utility/memory/non_null_ptr.hh"
 #include "cc/bzd/utility/regexp/matcher_brackets.hh"
 #include "cc/bzd/utility/regexp/matcher_single_char.hh"
 #include "cc/bzd/utility/regexp/types.hh"
@@ -187,8 +187,14 @@ public:
 	{
 		auto iStream = bzd::range::makeStream(range);
 		auto oStream = bzd::range::makeStream(output);
-		InputStreamCaptureRange capture{bzd::move(iStream), oStream};
-		return match(capture);
+		Bool overflow = false;
+		InputStreamCaptureRange capture{bzd::move(iStream), oStream, overflow};
+		auto result = match(capture);
+		if (overflow)
+		{
+			return bzd::error::make(regexp::Error::noMoreCapture);
+		}
+		return bzd::move(result);
 	}
 
 protected:
@@ -197,7 +203,10 @@ protected:
 	class IteratorCapture : public Iterator
 	{
 	public:
-		constexpr IteratorCapture(Capture& capture, const Iterator& it) noexcept : Iterator{it}, capture_{&capture} {}
+		constexpr IteratorCapture(Capture& capture, const Iterator& it, Bool& overflow) noexcept :
+			Iterator{it}, capture_{capture}, overflow_{overflow}
+		{
+		}
 		constexpr IteratorCapture& operator++() noexcept
 		{
 			captureByte();
@@ -221,17 +230,25 @@ protected:
 				*it = Iterator::operator*();
 				++it;
 			}
+			else
+			{
+				overflow_.get() = true;
+			}
 		}
 
 	private:
-		bzd::NonNullPtr<Capture*> capture_;
+		bzd::ReferenceWrapper<Capture> capture_;
+		bzd::ReferenceWrapper<Bool> overflow_;
 	};
 
 	template <bzd::concepts::inputByteCopyableRange Range, bzd::concepts::outputByteCopyableRange Capture>
 	class InputStreamCaptureRange
 	{
 	public:
-		constexpr InputStreamCaptureRange(Range&& range, Capture& capture) noexcept : range_{bzd::move(range)}, capture_{&capture} {}
+		constexpr InputStreamCaptureRange(Range&& range, Capture& capture, Bool& overflow) noexcept :
+			range_{bzd::move(range)}, capture_{capture}, overflow_{overflow}
+		{
+		}
 
 		InputStreamCaptureRange(const InputStreamCaptureRange&) = delete;
 		InputStreamCaptureRange& operator=(const InputStreamCaptureRange&) = delete;
@@ -240,13 +257,14 @@ protected:
 		~InputStreamCaptureRange() = default;
 
 	public:
-		constexpr auto begin() noexcept { return IteratorCapture{*capture_, range_.begin()}; }
+		constexpr auto begin() noexcept { return IteratorCapture{capture_.get(), range_.begin(), overflow_}; }
 		constexpr auto end() noexcept { return range_.end(); }
 		constexpr auto size() noexcept { return range_.size(); }
 
 	private:
 		Range range_;
-		bzd::NonNullPtr<Capture*> capture_;
+		bzd::ReferenceWrapper<Capture> capture_;
+		bzd::ReferenceWrapper<Bool> overflow_;
 	};
 
 protected:

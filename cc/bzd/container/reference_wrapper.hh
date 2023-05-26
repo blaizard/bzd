@@ -22,6 +22,7 @@ public: // Constructor.
 public: // API.
 	[[nodiscard]] constexpr operator Value&() const noexcept { return *value_; }
 	[[nodiscard]] constexpr Value& get() const noexcept { return *value_; }
+	[[nodiscard]] constexpr Value* operator->() const noexcept { return &(*value_); }
 
 public: // Comparison operators.
 	[[nodiscard]] constexpr bzd::Bool operator==(const Self& other) const noexcept { return (value_ == other.value_); }
@@ -30,4 +31,17 @@ public: // Comparison operators.
 private:
 	Value* value_;
 };
+
+template <class T>
+[[nodiscard]] constexpr auto ref(T& value) noexcept
+{
+	return ReferenceWrapper<T>{value};
+}
+
+template <class T>
+[[nodiscard]] constexpr auto cref(const T& value) noexcept
+{
+	return ReferenceWrapper<const T>{value};
+}
+
 } // namespace bzd

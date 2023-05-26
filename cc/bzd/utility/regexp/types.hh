@@ -15,6 +15,7 @@ enum class Error
 	malformed,
 	noMatch,
 	noMoreInput,
+	noMoreCapture,
 };
 
 using Result = bzd::Result<Success, Error>;

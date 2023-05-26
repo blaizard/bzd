@@ -13,8 +13,8 @@ public:
 	using bzd::Regexp::Regexp;
 
 public:
-	template <concepts::readerAsync ReaderAsync>
-	bzd::Async<Size> match(ReaderAsync&& input) noexcept
+	template <concepts::readerAsync Input>
+	bzd::Async<Size> match(Input&& input) noexcept
 	{
 		auto range = co_await !input.reader();
 		auto it = bzd::begin(range);
@@ -48,6 +48,7 @@ public:
 				switch (result.error())
 				{
 				case regexp::Error::noMoreInput:
+				case regexp::Error::noMoreCapture:
 					co_return bzd::error::Data("Not enough data");
 				case regexp::Error::noMatch:
 					co_return bzd::error::Data("No match");
@@ -60,33 +61,43 @@ public:
 		co_return context.counter;
 	}
 
-	template <concepts::readerAsync ReaderAsync, bzd::concepts::outputByteCopyableRange Output>
-	bzd::Async<Size> capture(ReaderAsync&& input, Output&& output) noexcept
+	template <concepts::readerAsync Input, bzd::concepts::outputByteCopyableRange Output>
+	bzd::Async<Size> capture(Input&& input, Output&& output) noexcept
 	{
 		auto oStream = bzd::range::makeStream(output);
-		ReaderAsyncCaptureRange readerCapture{input, oStream};
-		co_return co_await !match(readerCapture);
+		Bool overflow = false;
+		ReaderAsyncCaptureRange readerCapture{input, oStream, overflow};
+		const auto size = co_await !match(readerCapture);
+		if (overflow)
+		{
+			co_return bzd::error::Data("Capture overflow");
+		}
+		co_return size;
 	}
 
 private:
-	template <concepts::readerAsync ReaderAsync, bzd::concepts::outputByteCopyableRange Capture>
+	template <concepts::readerAsync Input, bzd::concepts::outputByteCopyableRange Capture>
 	class ReaderAsyncCaptureRange
 	{
 	private:
-		using ReaderAsyncType = typename bzd::typeTraits::InvokeResult<decltype(&ReaderAsync::reader), ReaderAsync>::Value;
+		using ReaderAsyncType = typename bzd::typeTraits::InvokeResult<decltype(&Input::reader), Input>::Value;
 
 	public:
-		constexpr ReaderAsyncCaptureRange(ReaderAsync& input, Capture& capture) noexcept : input_{input}, capture_{capture} {}
+		constexpr ReaderAsyncCaptureRange(Input& input, Capture& capture, Bool& overflow) noexcept :
+			input_{input}, capture_{capture}, overflow_{overflow}
+		{
+		}
 
 		bzd::Async<InputStreamCaptureRange<ReaderAsyncType, Capture>> reader() noexcept
 		{
 			auto range = co_await !input_.reader();
-			co_return InputStreamCaptureRange<ReaderAsyncType, Capture>{bzd::move(range), capture_};
+			co_return InputStreamCaptureRange<ReaderAsyncType, Capture>{bzd::move(range), capture_, overflow_};
 		}
 
 	private:
-		ReaderAsync& input_;
+		Input& input_;
 		Capture& capture_;
+		bzd::ReferenceWrapper<Bool> overflow_;
 	};
 };
 

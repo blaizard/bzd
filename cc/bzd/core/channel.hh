@@ -39,11 +39,7 @@ public:
 	{
 		for (const auto& span : data.spans())
 		{
-			auto result = co_await write(span);
-			if (!result)
-			{
-				co_return bzd::move(result).propagate();
-			}
+			co_await !write(span);
 		}
 		co_return {};
 	}
@@ -51,11 +47,7 @@ public:
 	/// Get a scope lock guard for writing to this channel.
 	///
 	/// \return A scoped-lock providing exclusive write access to this channel.
-	[[nodiscard]] bzd::Async<bzd::lockGuard::Type<bzd::Mutex>> getLock() noexcept
-	{
-		auto scope = co_await bzd::makeLockGuard(mutex_);
-		co_return bzd::move(scope);
-	}
+	[[nodiscard]] bzd::Async<bzd::lockGuard::Type<bzd::Mutex>> getLock() noexcept { co_return co_await bzd::makeLockGuard(mutex_); }
 
 private:
 	bzd::Mutex mutex_{};
