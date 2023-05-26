@@ -15,24 +15,26 @@ public:
 	// Would be worth trying again with a new version of the compiler.
 	// TODO: Try to enable Args&& with an updated esp32 gcc compiler
 	template <class... Args>
-	static bzd::Async<> process(bzd::OStream& stream, const Pattern& pattern, const Args&... args) noexcept
+	static bzd::Async<Size> process(bzd::OStream& stream, const Pattern& pattern, const Args&... args) noexcept
 	{
 		const auto [parser, processor] = bzd::pattern::impl::makeAsync<bzd::OStream&, Schema>(pattern, args...);
 
+		Size counter{0u};
 		// Run-time call
 		for (const auto& result : parser)
 		{
 			if (!result.str.empty())
 			{
 				co_await !stream.write(result.str.asBytes());
+				counter += result.str.size();
 			}
 			if (result.isMetadata)
 			{
-				co_await !processor.process(stream, result);
+				counter += co_await !processor.process(stream, result);
 			}
 		}
 
-		co_return {};
+		co_return counter;
 	}
 
 private:

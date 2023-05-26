@@ -57,6 +57,7 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        "//cc/bzd/container:reference_wrapper",
         "//cc/bzd/type_traits:is_same",
         "//cc/bzd/type_traits:iterator",
     ],

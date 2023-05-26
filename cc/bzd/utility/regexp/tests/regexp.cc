@@ -147,4 +147,18 @@ TEST(Regexp, Capture)
 		EXPECT_FALSE(result);
 		EXPECT_STREQ("a1239", string.data());
 	}
+	// String too small but match.
+	{
+		bzd::String<2> string;
+		const auto result = bzd::Regexp{"[0-9]+"}.capture("1239", string.assigner());
+		EXPECT_FALSE(result);
+		EXPECT_STREQ("12", string.data());
+	}
+	// String too small no match.
+	{
+		bzd::String<4> string;
+		const auto result = bzd::Regexp{"[0-9]+a"}.capture("1239", string.assigner());
+		EXPECT_FALSE(result);
+		EXPECT_STREQ("1239", string.data());
+	}
 }

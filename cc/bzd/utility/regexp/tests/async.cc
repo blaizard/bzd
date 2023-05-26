@@ -144,5 +144,25 @@ TEST_ASYNC(RegexpAsync, Capture, (TestIChannel, TestIChannelZeroCopy))
 		EXPECT_STREQ("a1239", string.data());
 	}
 
+	// String too small but match.
+	{
+		in << "1239";
+
+		bzd::String<2> string;
+		const auto result = co_await bzd::RegexpAsync{"[0-9]+"}.capture(channel, string.assigner());
+		EXPECT_FALSE(result);
+		EXPECT_STREQ("12", string.data());
+	}
+
+	// String too small no match.
+	{
+		in << "1239";
+
+		bzd::String<4> string;
+		const auto result = co_await bzd::RegexpAsync{"[0-9]+a"}.capture(channel, string.assigner());
+		EXPECT_FALSE(result);
+		EXPECT_STREQ("1239", string.data());
+	}
+
 	co_return {};
 }

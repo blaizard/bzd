@@ -10,10 +10,14 @@ template <>
 struct ToStream<bzd::Error>
 {
 	// Specialization for bzd::Error type.
-	static bzd::Async<> process(bzd::OStream& stream, const bzd::Error& e)
+	static bzd::Async<Size> process(bzd::OStream& stream, const bzd::Error& e)
 	{
-		co_await !bzd::toStream(stream, "[origin:{}:{}] [{}] {}"_csv, e.getSource(), e.getLine(), e.getTypeAsString(), e.getMessage());
-		co_return {};
+		co_return co_await bzd::toStream(stream,
+										 "[origin:{}:{}] [{}] {}"_csv,
+										 e.getSource(),
+										 e.getLine(),
+										 e.getTypeAsString(),
+										 e.getMessage());
 	}
 };
 } // namespace bzd

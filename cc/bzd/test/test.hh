@@ -21,14 +21,14 @@
 
 /// Verifies that condition is true.
 /// \{
-#define EXPECT_TRUE(condition) BZDTEST_TEST_BOOLEAN_(condition, condition, true, BZDTEST_FAIL_NONFATAL_)
-#define ASSERT_TRUE(condition) BZDTEST_TEST_BOOLEAN_(condition, condition, true, BZDTEST_FAIL_FATAL_)
+#define EXPECT_TRUE(condition) BZDTEST_TEST_TRUE_BOOLEAN_(condition, BZDTEST_FAIL_NONFATAL_)
+#define ASSERT_TRUE(condition) BZDTEST_TEST_TRUE_BOOLEAN_(condition, BZDTEST_FAIL_FATAL_)
 /// \}
 
 /// Verifies that condition is false.
 /// \{
-#define EXPECT_FALSE(condition) BZDTEST_TEST_BOOLEAN_(!(condition), condition, false, BZDTEST_FAIL_NONFATAL_)
-#define ASSERT_FALSE(condition) BZDTEST_TEST_BOOLEAN_(!(condition), condition, false, BZDTEST_FAIL_FATAL_)
+#define EXPECT_FALSE(condition) BZDTEST_TEST_FALSE_BOOLEAN_(condition, BZDTEST_FAIL_NONFATAL_)
+#define ASSERT_FALSE(condition) BZDTEST_TEST_FALSE_BOOLEAN_(condition, BZDTEST_FAIL_FATAL_)
 /// \}
 
 /// Verifies that an async result is true.

@@ -38,6 +38,14 @@ bzd_cc_library(
     ],
 )
 
+bzd_cc_library(
+    name = "from_stream",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/utility/pattern/from_stream:pattern",
+    ],
+)
+
 cc_library(
     name = "pattern",
     hdrs = [

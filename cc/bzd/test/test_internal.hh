@@ -147,17 +147,29 @@
 #define BZDTEST_FAIL_FATAL_(...) return ::bzd::test::Manager::getInstance().fail(__FILE__, __LINE__, __VA_ARGS__)
 #define BZDTEST_FAIL_NONFATAL_(...) ::bzd::test::Manager::getInstance().fail(__FILE__, __LINE__, __VA_ARGS__)
 
-#define BZDTEST_TEST_BOOLEAN_(condition, actual, expected, failFct)                                                                        \
-	if (const auto bzdTestResult_ = static_cast<bool>(condition); !bzdTestResult_)                                                         \
-	{                                                                                                                                      \
-		failFct("Failure\nTest [bool]: " #actual " == " #expected, static_cast<bool>(bzdTestResult_), static_cast<bool>(expected));        \
-	}
+#define BZDTEST_TEST_TRUE_BOOLEAN_(actual, failFct)                                                                                        \
+	[](const bool condition) {                                                                                                             \
+		if (!condition)                                                                                                                    \
+		{                                                                                                                                  \
+			failFct("Failure\nTest [bool]: " #actual " == true", condition, true);                                                         \
+		}                                                                                                                                  \
+	}(static_cast<bool>(actual));
+
+#define BZDTEST_TEST_FALSE_BOOLEAN_(actual, failFct)                                                                                       \
+	[](const bool condition) {                                                                                                             \
+		if (condition)                                                                                                                     \
+		{                                                                                                                                  \
+			failFct("Failure\nTest [bool]: " #actual " == false", condition, false);                                                       \
+		}                                                                                                                                  \
+	}(static_cast<bool>(actual));
 
 #define BZDTEST_TEST_ASYNC_BOOLEAN_(result, failFct)                                                                                       \
-	if (!static_cast<bool>(result))                                                                                                        \
-	{                                                                                                                                      \
-		failFct("Failure\nTest [async]: " #result, (result).error().getMessage().data());                                                  \
-	}
+	[](const auto& r) {                                                                                                                    \
+		if (!static_cast<bool>(r))                                                                                                         \
+		{                                                                                                                                  \
+			failFct("Failure\nTest [async]: " #result, r.error().getMessage().data());                                                     \
+		}                                                                                                                                  \
+	}(result);
 
 #define BZDTEST_TEST_EQ_(expression1, expression2, failFct)                                                                                \
 	[](const auto& a, const auto& b) {                                                                                                     \

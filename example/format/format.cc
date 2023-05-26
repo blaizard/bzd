@@ -19,10 +19,9 @@ namespace bzd {
 template <>
 struct ToStream<Date>
 {
-	static bzd::Async<> process(bzd::OStream& os, const Date& d)
+	static bzd::Async<Size> process(bzd::OStream& os, const Date& d)
 	{
-		co_await !bzd::toStream(os, "{:}:{:}:{:}"_csv, int(d.y_), int(d.m_), int(d.d_));
-		co_return {};
+		co_return co_await bzd::toStream(os, "{:}:{:}:{:}"_csv, int(d.y_), int(d.m_), int(d.d_));
 	}
 };
 } // namespace bzd
