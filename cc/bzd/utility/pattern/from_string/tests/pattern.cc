@@ -1,8 +1,6 @@
 #include "cc/bzd/test/test.hh"
 #include "cc/bzd/utility/pattern/from_string.hh"
 
-#include <iostream>
-
 TEST(PatternFromString, NoArguments)
 {
 	const bzd::StringView str{"Hello World"};

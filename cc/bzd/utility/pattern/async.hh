@@ -10,7 +10,7 @@ class ProcessorAsync
 {
 public:
 	template <class... Args>
-	static constexpr auto make(const Args&... args) noexcept
+	static constexpr auto make(Args&... args) noexcept
 	{
 		// Make the actual lambda
 		const auto lambdas = bzd::makeTuple([&args](Range& range, const Metadatas<Adapter, Args...>& metadatas) -> bzd::Async<Size> {

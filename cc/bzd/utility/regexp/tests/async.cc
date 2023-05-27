@@ -109,6 +109,15 @@ TEST_ASYNC(RegexpAsync, Features, (TestIChannel, TestIChannelZeroCopy))
 		in << "a012345c";
 		const auto result = co_await bzd::RegexpAsync{"a[0-9]*d"}.match(channel);
 		EXPECT_FALSE(result);
+		// Flush the rest.
+		const auto size = co_await !bzd::RegexpAsync{".*"}.match(channel);
+		EXPECT_EQ(size, 1u);
+	}
+
+	{
+		in << "012345";
+		const auto size = co_await !bzd::RegexpAsync{"[0-9]+"}.match(channel);
+		EXPECT_EQ(size, 6u);
 	}
 
 	co_return {};
@@ -142,6 +151,15 @@ TEST_ASYNC(RegexpAsync, Capture, (TestIChannel, TestIChannelZeroCopy))
 		const auto result = co_await bzd::RegexpAsync{"a[0-9]+c"}.capture(channel, string.assigner());
 		EXPECT_FALSE(result);
 		EXPECT_STREQ("a1239", string.data());
+	}
+
+	{
+		in << "1239";
+
+		bzd::String<10> string;
+		const auto size = co_await !bzd::RegexpAsync{"[0-9]+"}.capture(channel, string.assigner());
+		EXPECT_EQ(size, 4u);
+		EXPECT_STREQ("1239", string.data());
 	}
 
 	// String too small but match.
