@@ -31,12 +31,22 @@ public:
 				{
 					if (it == end)
 					{
-						range = co_await !input.reader();
-						it = bzd::begin(range);
-						end = bzd::end(range);
+						auto maybeRange = co_await input.reader();
+						if (maybeRange)
+						{
+							range = bzd::move(maybeRange.valueMutable());
+							it = bzd::begin(range);
+							end = bzd::end(range);
+						}
+						else if (maybeRange.error().getType() != bzd::ErrorType::eof)
+						{
+							co_return bzd::move(maybeRange).propagate();
+						}
+						// If there are still no input after fetching new data.
 						if (it == end)
 						{
-							co_return bzd::error::Data("Not enough data");
+							resultProcess.maybeError = regexp::Error::noMoreInput;
+							break;
 						}
 					}
 					resultProcess = result.valueMutable().process(it, end, resultProcess);

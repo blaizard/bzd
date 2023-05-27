@@ -15,6 +15,20 @@ cc_library(
 )
 
 cc_library(
+    name = "output_range",
+    hdrs = [
+        "output_range.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":base",
+        "//cc/bzd/type_traits:range",
+        "//cc/bzd/utility/pattern/from_string:output_range",
+        "//cc/bzd/utility/regexp:async",
+    ],
+)
+
+cc_library(
     name = "pattern",
     hdrs = [
         "pattern.hh",

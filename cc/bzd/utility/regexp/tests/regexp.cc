@@ -78,6 +78,7 @@ TEST(Regexp, Star)
 	EXPECT_RESULT_EQ(bzd::Regexp{"a*b*"}.match("ab"_sv), 2u);
 	EXPECT_FALSE(bzd::Regexp{"*"}.match(""_sv));
 	EXPECT_FALSE(bzd::Regexp{"*"}.match("*"_sv));
+	EXPECT_TRUE(bzd::Regexp{".+"}.match("Hello"_sv));
 }
 
 TEST(Regexp, StarBrackets)
@@ -86,6 +87,7 @@ TEST(Regexp, StarBrackets)
 	EXPECT_RESULT_EQ(regexp.match("a1c"_sv), 3u);
 	EXPECT_RESULT_EQ(regexp.match("a0123456789c"_sv), 12u);
 	EXPECT_RESULT_EQ(regexp.match("ac"_sv), 2u);
+	EXPECT_RESULT_EQ(bzd::Regexp{"[0-9]*"}.match("12345"_sv), 5u);
 }
 
 TEST(Regexp, Plus)
@@ -99,6 +101,7 @@ TEST(Regexp, Plus)
 	EXPECT_RESULT_EQ(bzd::Regexp{"a+b+"}.match("ab"_sv), 2u);
 	EXPECT_FALSE(bzd::Regexp{"+"}.match(""_sv));
 	EXPECT_FALSE(bzd::Regexp{"+"}.match("+"_sv));
+	EXPECT_RESULT_EQ(bzd::Regexp{"[0-9]+"}.match("12345"_sv), 5u);
 }
 
 TEST(Regexp, PlusBrackets)

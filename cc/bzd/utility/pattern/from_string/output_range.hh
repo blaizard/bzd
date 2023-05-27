@@ -11,7 +11,7 @@ struct FromString<Output>
 {
 	struct Metadata
 	{
-		bzd::StringView regexp{"[\\w]+"};
+		bzd::StringView regexp{"\\w+"};
 	};
 
 	template <bzd::concepts::inputByteCopyableRange Range, class T>

@@ -25,3 +25,44 @@ TEST_ASYNC(PatternFromStream, NoArguments, (TestIChannel, TestIChannelZeroCopy))
 
 	co_return {};
 }
+
+TEST_ASYNC(PatternFromStream, StringArgument, (TestIChannel, TestIChannelZeroCopy))
+{
+	TestType in{};
+	bzd::IChannelBuffered<char, 16u> channel{in};
+
+	in << "Hello World";
+	{
+		bzd::String<12u> world;
+		const auto size = co_await !bzd::fromStream(channel, "Hello {}"_csv, world.assigner());
+		EXPECT_EQ(size, 11u);
+		EXPECT_STREQ(world.data(), "World");
+	}
+
+	in << "1 23456789abcd";
+	{
+		bzd::String<12u> numbers;
+		const auto size = co_await !bzd::fromStream(channel, "[0-9]+ {:[0-9]+}"_csv, numbers.assigner());
+		EXPECT_EQ(size, 10u);
+		EXPECT_STREQ(numbers.data(), "23456789");
+	}
+
+	// Read the rest.
+	{
+		bzd::String<12u> rest;
+		const auto size = co_await !bzd::fromStream(channel, "{:.*}"_csv, rest.assigner());
+		EXPECT_EQ(size, 4u);
+		EXPECT_STREQ(rest.data(), "abcd");
+	}
+
+	// String too small
+	in << "Hello Mister";
+	{
+		bzd::String<2u> string;
+		const auto result = co_await bzd::fromStream(channel, "{:.*}"_csv, string.assigner());
+		EXPECT_FALSE(result);
+		EXPECT_STREQ(string.data(), "He");
+	}
+
+	co_return {};
+}
