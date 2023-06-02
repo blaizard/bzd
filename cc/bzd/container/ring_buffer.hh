@@ -6,7 +6,9 @@
 #include "cc/bzd/container/storage/fixed.hh"
 #include "cc/bzd/core/assert/minimal.hh"
 #include "cc/bzd/platform/types.hh"
+#include "cc/bzd/utility/ignore.hh"
 #include "cc/bzd/utility/in_place.hh"
+#include "cc/bzd/utility/min.hh"
 #include "cc/bzd/utility/move.hh"
 
 namespace bzd::impl {
@@ -95,14 +97,41 @@ public: // Modifiers.
 	}
 
 	/// Re-add to the list the last n element previously consumed.
-	constexpr void unconsume(const bzd::Size n) noexcept
+	///
+	/// \param n The number of elements to "unconsume".
+	/// \return The number of elements that have been "unconsumed".
+	constexpr bzd::Size unconsume(const bzd::Size n) noexcept
 	{
-		read_ -= n;
-		if (size() > capacity())
+		const auto maxN = capacity() - (write_ - read_);
+		if (n > maxN)
 		{
-			read_ = write_ - capacity();
+			read_ -= maxN;
 			overrun_ = true;
+			return maxN;
 		}
+		read_ -= n;
+		return n;
+	}
+
+	/// Re-add to the list the buffer passed into argument, if the buffer is already part of
+	/// the ring, do not copy it, otherwise copy it.
+	///
+	/// \param span The span to "unconsume".
+	/// \return The number of elements that have been "unconsumed".
+	constexpr bzd::Size unconsume(const bzd::Span<const T> span) noexcept
+	{
+		const auto n = unconsume(span.size());
+		if (n)
+		{
+			const auto actualSpan = span.last(n);
+			const auto spanForReading = asSpanForReading();
+			// Copy the data if it it not the same.
+			if (spanForReading.data() != actualSpan.data())
+			{
+				bzd::ignore = copy(read_, actualSpan);
+			}
+		}
+		return n;
 	}
 
 	/// Assign the given span to the ring buffer. All previously available data are
@@ -115,18 +144,11 @@ public: // Modifiers.
 			read_ = (span.data() - storage_.data()) / sizeof(T);
 			write_ = read_ + span.size();
 		}
-		else if (span.size() <= storage_.size())
-		{
-			algorithm::copy(span.begin(), span.end(), storage_.dataMutable());
-			read_ = 0;
-			write_ = span.size();
-		}
 		else
 		{
-			algorithm::copy(span.end() - storage_.size(), span.end(), storage_.dataMutable());
 			read_ = 0;
 			write_ = span.size();
-			overrun_ = true;
+			overrun_ = copy(0u, span).isOverrun;
 		}
 	}
 
@@ -135,6 +157,18 @@ public: // Modifiers.
 	{
 		write_ += n;
 		if (size() > capacity())
+		{
+			read_ = write_ - capacity();
+			overrun_ = true;
+		}
+	}
+
+	/// Produce new data in the ring buffer.
+	constexpr void produce(const bzd::Span<const T> span) noexcept
+	{
+		const auto [isOverrun, n] = copy(write_, span);
+		write_ += n;
+		if (isOverrun || size() > capacity())
 		{
 			read_ = write_ - capacity();
 			overrun_ = true;
@@ -162,6 +196,34 @@ public: // Modifiers.
 	}
 
 	constexpr void clearOverrun() noexcept { overrun_ = false; }
+
+private:
+	struct CopyResult
+	{
+		bzd::Bool isOverrun;
+		bzd::Size n;
+	};
+
+	/// Copy some data at a given index.
+	///
+	/// \param index The index at which the span should be written to.
+	/// \param span The span to be copied.
+	/// \return A CopyResult instance.
+	[[nodiscard]] constexpr CopyResult copy(const bzd::Size index, const bzd::Span<const T> span) noexcept
+	{
+		const auto overrun = (span.size() > capacity());
+		const auto actualSpan = (overrun) ? span.last(capacity()) : span;
+		const auto actualIndex = index % capacity();
+		const auto sizeBeforeSplit = (capacity() - actualIndex);
+		const auto firstSpan = actualSpan.subSpan(0, bzd::min(span.size(), sizeBeforeSplit));
+		algorithm::copy(firstSpan, storage_.dataMutable() + actualIndex);
+		if (sizeBeforeSplit < span.size())
+		{
+			const auto secondSpan = actualSpan.subSpan(sizeBeforeSplit);
+			algorithm::copy(secondSpan, storage_.dataMutable());
+		}
+		return {overrun, actualSpan.size()};
+	}
 
 private: // Variables.
 	StorageType storage_{};

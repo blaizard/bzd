@@ -65,14 +65,21 @@ public: // Constructor/assignment
 	constexpr Span(const Storage& storage) noexcept : storage_{storage} {}
 
 	// Forward copy constraint to the storage type.
-	template <class U, class V>
+	template <concepts::convertible<T> U, class V>
 	constexpr Span(const Span<U, V>& span) noexcept : storage_(span.storage_)
 	{
 	}
 
 	// Forward move constraint to the storage type.
-	template <class U, class V>
+	template <concepts::convertible<T> U, class V>
 	constexpr Span(Span<U, V>&& span) noexcept : storage_(bzd::move(span.storage_))
+	{
+	}
+
+	// Construct from a pair of iterator.
+	template <concepts::contiguousIterator U, concepts::sentinelFor<U> V>
+	requires(concepts::convertible<typeTraits::IteratorValue<U>, ValueMutableType>)
+	constexpr Span(U it, V end) noexcept : storage_(&(*it), bzd::distance(it, end))
 	{
 	}
 

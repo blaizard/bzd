@@ -9,7 +9,7 @@ cc_library(
     deps = [
         "//cc/bzd/container:optional",
         "//cc/bzd/container:string_view",
-        "//cc/bzd/container/range:stream",
+        "//cc/bzd/container/range/views:stream",
         "//cc/bzd/meta:always_false",
         "//cc/bzd/type_traits:container",
         "//cc/bzd/type_traits:is_same_class",

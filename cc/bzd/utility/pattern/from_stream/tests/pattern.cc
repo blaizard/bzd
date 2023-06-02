@@ -3,10 +3,14 @@
 #include "cc/bzd/test/types/ichannel.hh"
 #include "cc/bzd/utility/pattern/from_stream.hh"
 
-using TestIChannel = bzd::test::IChannel<char, 32u, false>;
-using TestIChannelZeroCopy = bzd::test::IChannel<char, 32u, true>;
+using TestIChannel = bzd::test::IChannel<char, 32u>;
+using TestIChannelZeroCopy = bzd::test::IChannel<char, 32u, bzd::test::IChannelMode::zeroCopy>;
+using TestIChannelChunks = bzd::test::IChannel<char, 32u, bzd::test::IChannelMode::chunks>;
+using TestIChannelZeroCopyChunks = bzd::test::IChannel<char, 32u, bzd::test::IChannelMode::zeroCopy | bzd::test::IChannelMode::chunks>;
 
-TEST_ASYNC(PatternFromStream, NoArguments, (TestIChannel, TestIChannelZeroCopy))
+#define AllTestIChannel (TestIChannel, TestIChannelZeroCopy, TestIChannelChunks, TestIChannelZeroCopyChunks)
+
+TEST_ASYNC(PatternFromStream, NoArguments, AllTestIChannel)
 {
 	TestType in{};
 	bzd::IChannelBuffered<char, 16u> channel{in};
@@ -26,7 +30,7 @@ TEST_ASYNC(PatternFromStream, NoArguments, (TestIChannel, TestIChannelZeroCopy))
 	co_return {};
 }
 
-TEST_ASYNC(PatternFromStream, StringArgument, (TestIChannel, TestIChannelZeroCopy))
+TEST_ASYNC(PatternFromStream, StringArgument, AllTestIChannel)
 {
 	TestType in{};
 	bzd::IChannelBuffered<char, 16u> channel{in};

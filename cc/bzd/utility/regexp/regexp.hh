@@ -2,7 +2,7 @@
 
 #include "cc/bzd/container/function_ref.hh"
 #include "cc/bzd/container/optional.hh"
-#include "cc/bzd/container/range/stream.hh"
+#include "cc/bzd/container/range/views/stream.hh"
 #include "cc/bzd/container/reference_wrapper.hh"
 #include "cc/bzd/container/string_view.hh"
 #include "cc/bzd/type_traits/range.hh"
@@ -185,8 +185,8 @@ public:
 	template <bzd::concepts::inputByteCopyableRange Range, bzd::concepts::outputByteCopyableRange Output>
 	[[nodiscard]] constexpr Result<Size, regexp::Error> capture(Range&& range, Output&& output) noexcept
 	{
-		auto iStream = bzd::range::makeStream(range);
-		auto oStream = bzd::range::makeStream(output);
+		bzd::range::Stream iStream{bzd::inPlace, range};
+		bzd::range::Stream oStream{bzd::inPlace, output};
 		Bool overflow = false;
 		InputStreamCaptureRange capture{bzd::move(iStream), oStream, overflow};
 		auto result = match(capture);

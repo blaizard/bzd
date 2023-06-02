@@ -1,9 +1,9 @@
 #pragma once
 
 #include "cc/bzd/container/optional.hh"
-#include "cc/bzd/container/range/stream.hh"
 #include "cc/bzd/container/range/views/all.hh"
 #include "cc/bzd/container/range/views/reverse.hh"
+#include "cc/bzd/container/range/views/stream.hh"
 #include "cc/bzd/meta/always_false.hh"
 #include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/utility/bit/endian.hh"

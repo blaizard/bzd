@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cc/bzd/container/range/view_interface.hh"
+#include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/type_traits/sentinel_for.hh"
 
 namespace bzd::range {
@@ -22,3 +23,8 @@ private:
 };
 
 } // namespace bzd::range
+
+namespace bzd::typeTraits {
+template <class Iterator, class Sentinel>
+inline constexpr bzd::Bool enableBorrowedRange<bzd::range::SubRange<Iterator, Sentinel>> = true;
+}

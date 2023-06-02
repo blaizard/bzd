@@ -23,20 +23,20 @@ public:
 	/// Reader for data gather either from the input channel or the internal buffer.
 	///
 	/// Uppon destruction of the range, the data consumed will be reflected in the buffer ring.
-	class ReaderScope : public range::Stream<typename bzd::Span<const T>::Iterator>
+	class ReaderScope : public range::Stream<bzd::Span<const T>>
 	{
 	private:
-		using Parent = range::Stream<typename bzd::Span<const T>::Iterator>;
+		using Parent = range::Stream<bzd::Span<const T>>;
 
 	public:
-		constexpr ReaderScope(IChannelBuffered& ichannel, const bzd::Span<const T> span, const bzd::Span<T> write = {}) noexcept :
-			Parent{span.begin(), span.end()}, ichannel_{ichannel}, write_{write}
+		constexpr ReaderScope(IChannelBuffered& ichannel, const bzd::Span<const T>& span) noexcept :
+			Parent{bzd::inPlace, span}, ichannel_{ichannel}
 		{
 		}
 
 		ReaderScope(const ReaderScope&) = delete;
 		ReaderScope& operator=(const ReaderScope&) = delete;
-		constexpr ReaderScope(ReaderScope&& other) noexcept : Parent{bzd::move(other)}, ichannel_{other.ichannel_}, write_{other.write_}
+		constexpr ReaderScope(ReaderScope&& other) noexcept : Parent{static_cast<Parent&&>(other)}, ichannel_{other.ichannel_}
 		{
 			other.ichannel_.reset();
 		}
@@ -46,7 +46,6 @@ public:
 
 			static_cast<Parent&>(*this) = static_cast<Parent&&>(other);
 			ichannel_ = other.ichannel_;
-			write_ = other.write_;
 			other.ichannel_.reset();
 
 			return *this;
@@ -58,18 +57,13 @@ public:
 		{
 			if (ichannel_.hasValue())
 			{
-				const auto size = bzd::distance(this->it_, this->end_);
-				if (!bzd::Span<const T>(&(*this->it_), size).isSubSpan(write_))
-				{
-					bzd::algorithm::copy(*this, write_ | range::drop(write_.size() - size));
-				}
-				ichannel_.valueMutable().buffer_.unconsume(size);
+				const auto left = bzd::Span<const T>{this->it_, this->end_};
+				ichannel_.valueMutable().buffer_.unconsume(left);
 			}
 		}
 
 	private:
 		bzd::Optional<IChannelBuffered&> ichannel_;
-		bzd::Span<T> write_;
 	};
 
 public:
@@ -90,7 +84,7 @@ public:
 
 	/// Read from the input channel as a ReaderScope.
 	///
-	/// Uppon destruction of the range, the data consumed will be reflected in the buffer ring.
+	/// \note Uppon destruction of the range, the data consumed will be removed from the buffer ring.
 	bzd::Async<ReaderScope> reader() noexcept
 	{
 		const auto readFromBuffer = buffer_.asSpanForReading();
@@ -103,32 +97,61 @@ public:
 		const auto data = co_await !in_.read(bzd::move(writeToBuffer));
 		buffer_.produce(data.size());
 		buffer_.consume(data.size());
-		co_return ReaderScope{*this, data, writeToBuffer.first(data.size())};
+		co_return ReaderScope{*this, data};
 	}
 
-	/*
-		/// Read a minimum of `count` bytes and return a Stream range.
-		///
-		/// When destroyed, the stream range writes back the bytes that have not been
-		/// consumed by the stream range into the buffer.
-		bzd::Async<Scope> read(const bzd::Size minSize) noexcept
+	/// Read at least `count` bytes and return a Stream range.
+	///
+	/// \note Uppon destruction of the range, the data consumed will be removed from the buffer ring.
+	/*bzd::Async<ReaderScope<bzd::Spans<const T, 3u>, true>> read(const bzd::Size count) noexcept
+	{
+		using Spans = bzd::Spans<const T, 3u>;
+
+		// Span to hold freshly read buffer.
+		bzd::Span<const T> dataRead{};
+
+		// Read data.
+		if (buffer_.size() < count)
 		{
-			Scope scope{buffer_.asSpans()};
-
-			for (Size index = 2u; index < 4u && scope.size() < minSize; ++index)
+			while (true)
 			{
-				auto span = buffer_.asSpanForWriting();
-				if (span.empty())
+				auto writeToBuffer = buffer_.asSpanForWriting();
+				// If there is no space for writing, it means that the ring buffer is too small to contain
+				// the data.
+				if (writeToBuffer.empty())
 				{
-					co_return bzd::error::Failure("Buffer of {} entries is full."_csv, buffer_.size());
+					co_return bzd::error::Failure{"RingBuffer<{}> vs {}"_csv, bufferCapacity, count};
 				}
-				const auto data = co_await !in_.readToBuffer(bzd::move(span));
-				scope[index] = data;
-			}
 
-			co_return bzd::move(scope);
+				dataRead = co_await !in_.read(bzd::move(writeToBuffer));
+				buffer_.produce(dataRead.size());
+
+				// If there is no data, return an end of buffer failure.
+				// This should be covered by the IChannel already.
+				if (dataRead.empty())
+				{
+					co_return bzd::error::Eof{};
+				}
+				// If there are enough data, exit the loop.
+				else if ((buffer_.size() + dataRead.size()) >= count)
+				{
+					break;
+				}
+				// Copy the buffer to the ring buffer if needed.
+				else if (!dataRead.isSubSpan(writeToBuffer))
+				{
+					bzd::algorithm::copy(dataRead, writeToBuffer);
+				}
+			}
 		}
-	*/
+
+		//const auto spans = buffer_.asSpans();
+		//co_return ReaderScope<Spans, true>{Spans{bzd::inPlace, spans[0], spans[1], dataRead}};
+		//co_return ReaderScope<Spans, true>{Spans{bzd::inPlace, dataRead}};
+		Spans spans{bzd::inPlace, dataRead};
+		//spans[2] = dataRead;
+		co_return ReaderScope<Spans, true>{bzd::move(spans)};
+	}*/
 
 	/// Read data until a specific value is found.
 	auto readUntil(const T value, const Bool include = false) noexcept

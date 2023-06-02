@@ -3,7 +3,7 @@
 #include "cc/bzd/container/array.hh"
 #include "cc/bzd/container/iterator/container_of_iterables.hh"
 #include "cc/bzd/container/span.hh"
-#include "cc/bzd/utility/constexpr_for.hh"
+#include "cc/bzd/utility/apply.hh"
 #include "cc/bzd/utility/in_place.hh"
 #include "cc/bzd/utility/min.hh"
 
@@ -44,11 +44,12 @@ public:
 	/// \return The sum of all span sizes.
 	[[nodiscard]] constexpr Size size() const noexcept
 	{
-		Size sum = 0;
-		constexprForContainerInc(spans_, [&](const auto& span) { sum += span.size(); });
-		return sum;
+		return bzd::apply([](const auto&... span) { return (span.size() + ...); }, spans_);
 	}
 	[[nodiscard]] constexpr Bool empty() const noexcept { return (size() == 0); }
+
+	[[nodiscard]] constexpr auto& operator[](const Size index) noexcept { return spans_[index]; }
+	[[nodiscard]] constexpr auto& operator[](const Size index) const noexcept { return spans_[index]; }
 
 	/// Create a sub view of this spans.
 	///

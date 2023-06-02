@@ -2,11 +2,12 @@
 
 #include "cc/bzd/container/range/view_interface.hh"
 #include "cc/bzd/container/range/views/adaptor.hh"
+#include "cc/bzd/type_traits/is_same_class.hh"
 #include "cc/bzd/type_traits/range.hh"
 
 namespace bzd::range {
 
-template <concepts::range V>
+template <concepts::borrowedRange V>
 class All : public ViewInterface<All<V>>
 {
 private: // Traits.
@@ -14,9 +15,7 @@ private: // Traits.
 	using Sentinel = typeTraits::RangeSentinel<V>;
 
 public:
-	/// Note the reference is important here, otherwise the range is copied.
-	/// This can therefore works for every type of ranges: owning or borrowing.
-	constexpr All(V& view) noexcept : begin_{bzd::begin(view)}, end_{bzd::end(view)} {}
+	constexpr explicit All(bzd::InPlace, auto&& view) noexcept : begin_{bzd::begin(view)}, end_{bzd::end(view)} {}
 
 public:
 	constexpr auto begin() const noexcept { return begin_; }
@@ -27,6 +26,14 @@ private:
 	Sentinel end_;
 };
 
+template <class T>
+All(bzd::InPlace, T&&) -> All<T&&>;
+
 inline constexpr Adaptor<All> all;
 
 } // namespace bzd::range
+
+namespace bzd::typeTraits {
+template <class V>
+inline constexpr bzd::Bool enableBorrowedRange<bzd::range::All<V>> = concepts::borrowedRange<V>;
+}

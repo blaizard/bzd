@@ -3,6 +3,7 @@
 #include "cc/bzd/container/string.hh"
 #include "cc/bzd/container/string_view.hh"
 #include "cc/bzd/core/channel.hh"
+#include "cc/bzd/type_traits/range.hh"
 
 namespace bzd::impl {
 class StringStream : public bzd::OStream

@@ -32,6 +32,18 @@ TEST(ContainerSpan, Constructor)
 	// bzd::Span<int> spanCopyNonConst(spanCopyConst);
 }
 
+TEST(ContainerSpan, SpanOfSpan)
+{
+	bzd::Span<bzd::Span<int>> empty{};
+	EXPECT_EQ(empty.size(), 0U);
+
+	int array[5];
+	bzd::Span<int> span(array, 5);
+	bzd::Span<bzd::Span<int>> spanOfspan{&span, 1};
+	EXPECT_EQ(spanOfspan.size(), 1U);
+	EXPECT_EQ(spanOfspan[0].size(), 5U);
+}
+
 TEST(ContainerSpan, Iterator)
 {
 	int array[5] = {0, 1, 2, 3, 4};

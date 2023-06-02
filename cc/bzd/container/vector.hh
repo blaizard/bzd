@@ -7,6 +7,7 @@
 #include "cc/bzd/container/storage/resizeable.hh"
 #include "cc/bzd/core/assert/minimal.hh"
 #include "cc/bzd/platform/types.hh"
+#include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/utility/forward.hh"
 #include "cc/bzd/utility/in_place.hh"
 
@@ -127,4 +128,5 @@ public: // Constructors/assignments.
 	{
 	}
 };
+
 } // namespace bzd
