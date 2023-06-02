@@ -24,21 +24,6 @@ cc_library(
 )
 
 cc_library(
-    name = "stream",
-    hdrs = [
-        "stream.hh",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":view_interface",
-        "//cc/bzd/container/iterator:input_or_output_reference",
-        "//cc/bzd/type_traits:is_same_template",
-        "//cc/bzd/type_traits:sentinel_for",
-        "//cc/bzd/utility:distance",
-    ],
-)
-
-cc_library(
     name = "subrange",
     hdrs = [
         "subrange.hh",
@@ -46,6 +31,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":view_interface",
+        "//cc/bzd/type_traits:range",
         "//cc/bzd/type_traits:sentinel_for",
     ],
 )

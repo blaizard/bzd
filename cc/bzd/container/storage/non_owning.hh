@@ -21,13 +21,14 @@ public:
 
 public: // Constructors
 	// Default/copy/move constructor/assignment.
-	constexpr NonOwningStorage() noexcept = default;
-	constexpr NonOwningStorage(const Self&) noexcept = default;
-	constexpr Self& operator=(const Self&) noexcept = default;
-	constexpr NonOwningStorage(Self&&) noexcept = default;
-	constexpr Self& operator=(Self&&) noexcept = default;
+	NonOwningStorage() = default;
+	NonOwningStorage(const Self&) = default;
+	Self& operator=(const Self&) = default;
+	NonOwningStorage(Self&&) = default;
+	Self& operator=(Self&&) = default;
+	~NonOwningStorage() = default;
 
-	explicit constexpr NonOwningStorage(T* const data, const bzd::Size size) noexcept : data_{data}, size_{size} {}
+	constexpr NonOwningStorage(T* const data, const bzd::Size size) noexcept : data_{data}, size_{size} {}
 
 	// Ability to construct a const storage from a non-const
 	constexpr NonOwningStorage(const SelfNonConst& storage) noexcept

@@ -43,6 +43,18 @@ public: // Constructors/assignments.
 	{
 	}
 
+	template <Size index>
+	constexpr auto& get() noexcept
+	{
+		return (*this)[index];
+	}
+
+	template <Size index>
+	constexpr const auto& get() const noexcept
+	{
+		return (*this)[index];
+	}
+
 public:
 	/// \brief Returns the number of elements that the array can hold.
 	///

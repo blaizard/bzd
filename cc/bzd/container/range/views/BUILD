@@ -8,7 +8,9 @@ bzd_cc_library(
         ":adaptor",
         ":all",
         ":drop",
+        ":owning",
         ":reverse",
+        ":stream",
         ":take",
         ":transform",
     ],
@@ -25,6 +27,7 @@ cc_library(
     deps = [
         "//cc/bzd/type_traits:range",
         "//cc/bzd/utility:forward",
+        "//cc/bzd/utility:in_place",
     ],
 )
 
@@ -37,6 +40,7 @@ cc_library(
     deps = [
         ":adaptor",
         "//cc/bzd/container/range:view_interface",
+        "//cc/bzd/type_traits:is_same_class",
     ],
 )
 
@@ -54,6 +58,20 @@ cc_library(
 )
 
 cc_library(
+    name = "owning",
+    hdrs = [
+        "owning.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":adaptor",
+        "//cc/bzd/container/range:view_interface",
+        "//cc/bzd/utility:move",
+        "//cc/bzd/utility:size",
+    ],
+)
+
+cc_library(
     name = "reverse",
     hdrs = [
         "reverse.hh",
@@ -63,6 +81,23 @@ cc_library(
         ":adaptor",
         "//cc/bzd/container/iterator:reverse",
         "//cc/bzd/container/range:view_interface",
+        "//cc/bzd/type_traits:is_same_class",
+    ],
+)
+
+cc_library(
+    name = "stream",
+    hdrs = [
+        "stream.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":adaptor",
+        "//cc/bzd/container/iterator:input_or_output_reference",
+        "//cc/bzd/container/range:view_interface",
+        "//cc/bzd/type_traits:is_same_class",
+        "//cc/bzd/type_traits:is_same_template",
+        "//cc/bzd/type_traits:sentinel_for",
     ],
 )
 

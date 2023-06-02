@@ -1,6 +1,6 @@
 #pragma once
 
-#include "cc/bzd/container/range/stream.hh"
+#include "cc/bzd/container/range/views/stream.hh"
 #include "cc/bzd/core/async.hh"
 #include "cc/bzd/meta/always_false.hh"
 #include "cc/bzd/type_traits/channel.hh"

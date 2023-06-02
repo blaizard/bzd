@@ -7,7 +7,7 @@
 
 namespace bzd::range {
 
-template <concepts::range V>
+template <concepts::borrowedRange V>
 class Take : public ViewInterface<Take<V>>
 {
 private: // Traits.
@@ -16,9 +16,7 @@ private: // Traits.
 	using DifferenceType = typeTraits::IteratorDifference<Iterator>;
 
 public:
-	/// Note the reference is important here, otherwise the range is copied.
-	/// This can therefore works for every type of ranges: owning or borrowing.
-	constexpr Take(V& view, const DifferenceType count) noexcept : begin_{bzd::begin(view)}, end_{bzd::begin(view)}
+	constexpr Take(bzd::InPlace, auto&& view, const DifferenceType count) noexcept : begin_{bzd::begin(view)}, end_{bzd::begin(view)}
 	{
 		bzd::advance(end_, count, bzd::end(view));
 	}
@@ -32,6 +30,14 @@ private:
 	Sentinel end_;
 };
 
+template <class T>
+Take(bzd::InPlace, T&&, const auto) -> Take<T&&>;
+
 inline constexpr Adaptor<Take> take;
 
 } // namespace bzd::range
+
+namespace bzd::typeTraits {
+template <class V>
+inline constexpr bzd::Bool enableBorrowedRange<bzd::range::Take<V>> = concepts::borrowedRange<V>;
+}

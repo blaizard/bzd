@@ -704,8 +704,10 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":declval",
+        ":is_lvalue_reference",
         ":is_trivially_copyable",
         ":iterator",
+        ":remove_cvref",
         "//cc/bzd/utility:begin",
         "//cc/bzd/utility:end",
         "//cc/bzd/utility:size",

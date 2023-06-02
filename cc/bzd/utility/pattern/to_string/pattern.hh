@@ -39,7 +39,7 @@ public:
 	template <bzd::concepts::outputByteCopyableRange Range, class... Args>
 	static constexpr bzd::Optional<bzd::Size> process(Range&& range, const Pattern& pattern, const Args&... args) noexcept
 	{
-		auto stream = bzd::range::makeStream(range);
+		bzd::range::Stream stream{bzd::inPlace, range};
 		const auto [parser, processor] = bzd::pattern::impl::make<decltype(stream)&, Schema>(pattern, args...);
 		bzd::Size count{0u};
 

@@ -2,9 +2,11 @@
 
 #include "cc/bzd/container/iterator/input_or_output_reference.hh"
 #include "cc/bzd/container/range/view_interface.hh"
+#include "cc/bzd/container/range/views/adaptor.hh"
+#include "cc/bzd/type_traits/is_same_class.hh"
 #include "cc/bzd/type_traits/is_same_template.hh"
-#include "cc/bzd/type_traits/sentinel_for.hh"
-#include "cc/bzd/utility/distance.hh"
+#include "cc/bzd/type_traits/range.hh"
+#include "cc/bzd/utility/in_place.hh"
 
 namespace bzd::range {
 
@@ -18,11 +20,15 @@ namespace bzd::range {
 /// for things like serialization, format...
 /// Stream may or may not be bounded, in the latter case their sentinel will never
 /// be reached and their size will be infinite.
-template <concepts::inputOrOutputIterator Iterator, concepts::sentinelFor<Iterator> Sentinel = Iterator>
-class Stream : public ViewInterface<Stream<Iterator, Sentinel>>
+template <concepts::borrowedRange V>
+class Stream : public ViewInterface<Stream<V>>
 {
+private: // Traits.
+	using Iterator = typeTraits::RangeIterator<V>;
+	using Sentinel = typeTraits::RangeSentinel<V>;
+
 public:
-	constexpr Stream(Iterator begin, Sentinel end) noexcept : it_{begin}, end_{end} {}
+	constexpr Stream(bzd::InPlace, auto&& view) noexcept : it_{bzd::begin(view)}, end_{bzd::end(view)} {}
 
 	Stream(const Stream&) = delete;
 	Stream& operator=(const Stream&) = delete;
@@ -55,14 +61,14 @@ protected:
 	Sentinel end_;
 };
 
-/// Create a Stream from a range.
-///
-/// Note: a deduction guide cannot be used for the Stream class, as it conflicts with the copy/move constructors
-/// when constructing from another Stream.
-template <concepts::inputOrOutputRange Range>
-constexpr auto makeStream(Range&& range) noexcept
-{
-	return Stream{bzd::begin(range), bzd::end(range)};
-}
+template <class T>
+Stream(bzd::InPlace, T&&) -> Stream<T&&>;
+
+inline constexpr Adaptor<Stream> stream;
 
 } // namespace bzd::range
+
+namespace bzd::typeTraits {
+template <class V>
+inline constexpr bzd::Bool enableBorrowedRange<bzd::range::Stream<V>> = concepts::borrowedRange<V>;
+}

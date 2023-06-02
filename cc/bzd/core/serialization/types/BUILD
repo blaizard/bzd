@@ -8,9 +8,9 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/container:optional",
-        "//cc/bzd/container/range:stream",
         "//cc/bzd/container/range/views:all",
         "//cc/bzd/container/range/views:reverse",
+        "//cc/bzd/container/range/views:stream",
         "//cc/bzd/meta:always_false",
         "//cc/bzd/type_traits:container",
         "//cc/bzd/utility:ignore",

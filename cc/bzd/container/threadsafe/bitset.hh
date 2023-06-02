@@ -7,8 +7,6 @@
 #include "cc/bzd/utility/bit/count_lsb_zero.hh"
 #include "cc/bzd/utility/min.hh"
 
-#include <iostream>
-
 namespace bzd::threadsafe {
 
 /// Thread safe implementation of a bitset.

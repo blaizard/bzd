@@ -7,7 +7,7 @@
 
 namespace bzd::range {
 
-template <concepts::range V, class F>
+template <concepts::borrowedRange V, class F>
 class Transform : public ViewInterface<Transform<V, F>>
 {
 private: // Traits.
@@ -26,9 +26,9 @@ private: // Traits.
 	};
 
 public:
-	/// Note the reference is important here, otherwise the range is copied.
-	/// This can therefore works for every type of ranges: owning or borrowing.
-	constexpr Transform(V& view, F&& func) noexcept : begin_{bzd::begin(view), bzd::move(func)}, end_{bzd::end(view)} {}
+	constexpr Transform(bzd::InPlace, auto&& view, auto&& func) noexcept : begin_{bzd::begin(view), bzd::move(func)}, end_{bzd::end(view)}
+	{
+	}
 
 public:
 	constexpr Iterator begin() const noexcept { return begin_; }
@@ -38,6 +38,9 @@ private:
 	Iterator begin_;
 	Sentinel end_;
 };
+
+template <class T, class F>
+Transform(bzd::InPlace, T&&, F&&) -> Transform<T&&, typeTraits::RemoveReference<F>>;
 
 inline constexpr Adaptor<Transform> transform;
 

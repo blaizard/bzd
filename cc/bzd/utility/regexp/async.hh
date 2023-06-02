@@ -74,7 +74,7 @@ public:
 	template <concepts::readerAsync Input, bzd::concepts::outputByteCopyableRange Output>
 	bzd::Async<Size> capture(Input&& input, Output&& output) noexcept
 	{
-		auto oStream = bzd::range::makeStream(output);
+		bzd::range::Stream oStream{bzd::inPlace, output};
 		Bool overflow = false;
 		ReaderAsyncCaptureRange readerCapture{input, oStream, overflow};
 		const auto size = co_await !match(readerCapture);

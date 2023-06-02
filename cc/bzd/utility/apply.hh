@@ -7,23 +7,23 @@
 
 namespace bzd::impl {
 
-template <class F, class Tuple, bzd::Size... I>
-constexpr decltype(auto) apply(F&& f, Tuple&& tuple, bzd::meta::range::Type<I...>)
+template <class F, class T, bzd::Size... i>
+constexpr decltype(auto) apply(F&& f, T&& t, bzd::meta::range::Type<i...>)
 {
-	return bzd::forward<F>(f)(tuple.template get<I>()...);
+	return bzd::forward<F>(f)(t.template get<i>()...);
 }
 
 } // namespace bzd::impl
 
 namespace bzd {
-/// Invoke the Callable object f with a tuple of arguments.
+/// Invoke the Callable object f with a fixed size container.
 ///
 /// \param f Callable object to be invoked.
-/// \param tuple whose elements to be used as arguments to f.
+/// \param t whose elements to be used as arguments to f.
 /// \return The value returned by f.
-template <class F, class Tuple>
-constexpr decltype(auto) apply(F&& f, Tuple&& tuple)
+template <class F, class T>
+constexpr decltype(auto) apply(F&& f, T&& t)
 {
-	return impl::apply(bzd::forward<F>(f), bzd::forward<Tuple>(tuple), bzd::meta::Range<0, typeTraits::RemoveReference<Tuple>::size()>{});
+	return impl::apply(bzd::forward<F>(f), bzd::forward<T>(t), bzd::meta::Range<0, typeTraits::RemoveReference<T>::size()>{});
 }
 } // namespace bzd

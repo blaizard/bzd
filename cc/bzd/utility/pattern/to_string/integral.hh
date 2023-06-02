@@ -121,7 +121,7 @@ public:
 		static_assert(base > 1 && base <= 16, "Invalid base size.");
 		static_assert(sizeof(T) <= 8, "Only up to 64-bit integers are supported.");
 
-		auto stream = bzd::range::makeStream(range);
+		bzd::range::Stream stream{bzd::inPlace, range};
 		Size count = 0u;
 		if (metadata.alternate)
 		{

@@ -3,8 +3,8 @@
 #include "cc/bzd/test/test.hh"
 #include "cc/bzd/test/types/ichannel.hh"
 
-using TestIChannel = bzd::test::IChannel<char, 32u, false>;
-using TestIChannelZeroCopy = bzd::test::IChannel<char, 32u, true>;
+using TestIChannel = bzd::test::IChannel<char, 32u>;
+using TestIChannelZeroCopy = bzd::test::IChannel<char, 32u, bzd::test::IChannelMode::zeroCopy>;
 
 TEST_ASYNC(IChannelBuffered, Reader, (TestIChannel, TestIChannelZeroCopy))
 {
@@ -75,3 +75,21 @@ TEST_ASYNC(IChannelBuffered, Reader, (TestIChannel, TestIChannelZeroCopy))
 
 	co_return {};
 }
+
+/*
+TEST_ASYNC(IChannelBuffered, Read, (TestIChannel))
+{
+	TestType in{};
+	bzd::IChannelBuffered<char, 16u> channel{in};
+	EXPECT_EQ(channel.size(), 0u);
+
+	// Empty ichannel
+	{
+		auto maybeScope = co_await channel.read(12u);
+		EXPECT_FALSE(maybeScope);
+		EXPECT_EQ(channel.size(), 0u);
+	}
+
+	co_return {};
+}
+*/

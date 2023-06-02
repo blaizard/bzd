@@ -289,6 +289,8 @@ cc_library(
         "//cc/bzd/container/storage:fixed",
         "//cc/bzd/core/assert:minimal",
         "//cc/bzd/platform:types",
+        "//cc/bzd/utility:ignore",
+        "//cc/bzd/utility:min",
         "//cc/bzd/utility:move",
     ],
 )
@@ -305,6 +307,7 @@ cc_library(
         "//cc/bzd/core/assert:minimal",
         "//cc/bzd/type_traits:enable_if",
         "//cc/bzd/type_traits:is_const",
+        "//cc/bzd/type_traits:range",
         "//cc/bzd/type_traits:remove_const",
         "//cc/bzd/utility:swap",
     ],
@@ -320,7 +323,7 @@ cc_library(
         ":array",
         ":span",
         "//cc/bzd/container/iterator:container_of_iterables",
-        "//cc/bzd/utility:constexpr_for",
+        "//cc/bzd/utility:apply",
         "//cc/bzd/utility:min",
     ],
 )
@@ -348,6 +351,7 @@ cc_library(
         ":string",
         ":string_view",
         "//cc/bzd/core:channel",
+        "//cc/bzd/type_traits:range",
     ],
 )
 
@@ -363,6 +367,7 @@ cc_library(
         "//cc/bzd/meta:string_literal",
         "//cc/bzd/platform:types",
         "//cc/bzd/type_traits:is_base_of",
+        "//cc/bzd/type_traits:range",
     ],
 )
 
@@ -450,6 +455,7 @@ cc_library(
         "//cc/bzd/container/storage:resizeable",
         "//cc/bzd/core/assert:minimal",
         "//cc/bzd/platform:types",
+        "//cc/bzd/type_traits:range",
         "//cc/bzd/utility:forward",
         "//cc/bzd/utility:in_place",
     ],

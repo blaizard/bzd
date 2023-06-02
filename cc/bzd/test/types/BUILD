@@ -43,6 +43,7 @@ cc_library(
         "//cc/bzd/core:channel",
         "//cc/bzd/core/async",
         "//cc/bzd/platform:types",
+        "//cc/bzd/utility:to_underlying",
     ],
 )
 

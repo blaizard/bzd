@@ -3,6 +3,7 @@
 #include "cc/bzd/container/impl/span.hh"
 #include "cc/bzd/container/storage/non_owning.hh"
 #include "cc/bzd/platform/types.hh"
+#include "cc/bzd/type_traits/range.hh"
 
 namespace bzd {
 
@@ -32,6 +33,11 @@ public: // Constructors
 };
 
 } // namespace bzd
+
+namespace bzd::typeTraits {
+template <class T>
+inline constexpr bzd::Bool enableBorrowedRange<bzd::Span<T>> = true;
+}
 
 // Implementation of Span specific impl::Span functions.
 namespace bzd::impl {

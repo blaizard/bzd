@@ -4,10 +4,14 @@
 #include "cc/bzd/test/test.hh"
 #include "cc/bzd/test/types/ichannel.hh"
 
-using TestIChannel = bzd::test::IChannel<char, 32u, false>;
-using TestIChannelZeroCopy = bzd::test::IChannel<char, 32u, true>;
+using TestIChannel = bzd::test::IChannel<char, 32u>;
+using TestIChannelZeroCopy = bzd::test::IChannel<char, 32u, bzd::test::IChannelMode::zeroCopy>;
+using TestIChannelChunks = bzd::test::IChannel<char, 32u, bzd::test::IChannelMode::chunks>;
+using TestIChannelZeroCopyChunks = bzd::test::IChannel<char, 32u, bzd::test::IChannelMode::zeroCopy | bzd::test::IChannelMode::chunks>;
 
-TEST_ASYNC(RegexpAsync, String, (TestIChannel, TestIChannelZeroCopy))
+#define AllTestIChannel (TestIChannel, TestIChannelZeroCopy, TestIChannelChunks, TestIChannelZeroCopyChunks)
+
+TEST_ASYNC(RegexpAsync, String, AllTestIChannel)
 {
 	TestType in{};
 	bzd::IChannelBuffered<char, 16u> channel{in};
@@ -57,7 +61,7 @@ TEST_ASYNC(RegexpAsync, String, (TestIChannel, TestIChannelZeroCopy))
 	co_return {};
 }
 
-TEST_ASYNC(RegexpAsync, SplitChannel, (TestIChannel, TestIChannelZeroCopy))
+TEST_ASYNC(RegexpAsync, SplitChannel, AllTestIChannel)
 {
 	TestType in{};
 	bzd::IChannelBuffered<char, 4u> channel{in};
@@ -76,7 +80,7 @@ TEST_ASYNC(RegexpAsync, SplitChannel, (TestIChannel, TestIChannelZeroCopy))
 	co_return {};
 }
 
-TEST_ASYNC(RegexpAsync, Features, (TestIChannel, TestIChannelZeroCopy))
+TEST_ASYNC(RegexpAsync, Features, AllTestIChannel)
 {
 	TestType in{};
 	bzd::IChannelBuffered<char, 8u> channel{in};
@@ -123,7 +127,7 @@ TEST_ASYNC(RegexpAsync, Features, (TestIChannel, TestIChannelZeroCopy))
 	co_return {};
 }
 
-TEST_ASYNC(RegexpAsync, Capture, (TestIChannel, TestIChannelZeroCopy))
+TEST_ASYNC(RegexpAsync, Capture, AllTestIChannel)
 {
 	TestType in{};
 	bzd::IChannelBuffered<char, 8u> channel{in};

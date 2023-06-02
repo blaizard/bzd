@@ -6,4 +6,8 @@
 namespace bzd::concepts {
 template <class T, class U>
 concept sameClassAs = sameAs<typeTraits::RemoveCVRef<T>, typeTraits::RemoveCVRef<U>>;
-}
+
+template <class T, class U>
+concept notSameClassAs = !
+sameClassAs<T, U>;
+} // namespace bzd::concepts

@@ -2,7 +2,8 @@
 
 #include "cc/bzd/container/impl/span.hh"
 #include "cc/bzd/container/iterator/input_or_output_reference.hh"
-#include "cc/bzd/container/range/stream.hh"
+#include "cc/bzd/container/range/subrange.hh"
+#include "cc/bzd/container/range/views/stream.hh"
 #include "cc/bzd/type_traits/is_convertible.hh"
 #include "cc/bzd/type_traits/is_trivially_copyable.hh"
 #include "cc/bzd/type_traits/sentinel_for.hh"
@@ -39,11 +40,13 @@ protected:
 	/// This construct is using RAII to close the transaction once out of scope.
 	/// This makes the appender very efficient as setting the size and post processing
 	/// is done all at once and at the end.
-	class AppenderScope : public range::Stream<Iterator, Iterator>
+	class AppenderScope : public range::Stream<range::SubRange<Iterator, Iterator>>
 	{
 	public:
 		constexpr explicit AppenderScope(Self& self) noexcept :
-			range::Stream<Iterator, Iterator>{&self.data()[self.size()], &self.data()[self.capacity()]}, self_{self}
+			range::Stream<range::SubRange<Iterator, Iterator>>{bzd::inPlace,
+															   range::SubRange{&self.data()[self.size()], &self.data()[self.capacity()]}},
+			self_{self}
 		{
 		}
 
