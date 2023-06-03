@@ -7,37 +7,41 @@
 
 namespace bzd::range {
 
-template <concepts::borrowedRange V>
-class Take : public ViewInterface<Take<V>>
+template <concepts::borrowedRange Range>
+class Take : public ViewInterface<Take<Range>>
 {
 private: // Traits.
-	using Iterator = typeTraits::RangeIterator<V>;
-	using Sentinel = typeTraits::RangeIterator<V>;
+	using Iterator = typeTraits::RangeIterator<Range>;
 	using DifferenceType = typeTraits::IteratorDifference<Iterator>;
 
 public:
-	constexpr Take(bzd::InPlace, auto&& view, const DifferenceType count) noexcept : begin_{bzd::begin(view)}, end_{bzd::begin(view)}
+	constexpr Take(bzd::InPlace, auto&& range, const DifferenceType count) noexcept :
+		range_{bzd::forward<decltype(range)>(range)}, count_{count}
 	{
-		bzd::advance(end_, count, bzd::end(view));
 	}
 
 public:
-	constexpr Iterator begin() const noexcept { return begin_; }
-	constexpr Sentinel end() const noexcept { return end_; }
+	constexpr auto begin() const noexcept { return bzd::begin(range_); }
+	constexpr auto end() const noexcept
+	{
+		auto end = bzd::begin(range_);
+		bzd::advance(end, count_, bzd::end(range_));
+		return end;
+	}
 
 private:
-	Iterator begin_;
-	Sentinel end_;
+	Range range_;
+	DifferenceType count_;
 };
 
-template <class T>
-Take(bzd::InPlace, T&&, const auto) -> Take<T&&>;
+template <class Range>
+Take(bzd::InPlace, Range&&, const auto) -> Take<Range&&>;
 
 inline constexpr Adaptor<Take> take;
 
 } // namespace bzd::range
 
 namespace bzd::typeTraits {
-template <class V>
-inline constexpr bzd::Bool enableBorrowedRange<bzd::range::Take<V>> = concepts::borrowedRange<V>;
+template <class Range>
+inline constexpr bzd::Bool enableBorrowedRange<bzd::range::Take<Range>> = concepts::borrowedRange<Range>;
 }

@@ -44,8 +44,8 @@ protected:
 	{
 	public:
 		constexpr explicit AppenderScope(Self& self) noexcept :
-			range::Stream<range::SubRange<Iterator, Iterator>>{bzd::inPlace,
-															   range::SubRange{&self.data()[self.size()], &self.data()[self.capacity()]}},
+			range::Stream<range::SubRange<Iterator, Iterator>>{
+				bzd::inPlace, range::SubRange{bzd::begin(self) + self.size(), bzd::begin(self) + self.capacity()}},
 			self_{self}
 		{
 		}

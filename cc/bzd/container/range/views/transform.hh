@@ -7,40 +7,40 @@
 
 namespace bzd::range {
 
-template <concepts::borrowedRange V, class F>
-class Transform : public ViewInterface<Transform<V, F>>
+template <concepts::borrowedRange Range, class Function>
+class Transform : public ViewInterface<Transform<Range, Function>>
 {
 private: // Traits.
-	using IteratorBase = typeTraits::RangeIterator<V>;
-	using Sentinel = typeTraits::RangeSentinel<V>;
+	using IteratorBase = typeTraits::RangeIterator<Range>;
 	class Iterator : public IteratorBase
 	{
 	public:
-		constexpr Iterator(IteratorBase&& it, F&& func) noexcept : IteratorBase{bzd::move(it)}, func_{bzd::move(func)} {}
+		constexpr Iterator(IteratorBase&& it, Function& func) noexcept : IteratorBase{bzd::move(it)}, func_{func} {}
 
 		constexpr auto operator*() const noexcept { return func_(IteratorBase::operator*()); }
 		// TODO: add overloads for all accessors
 
 	private:
-		F func_;
+		Function& func_;
 	};
 
 public:
-	constexpr Transform(bzd::InPlace, auto&& view, auto&& func) noexcept : begin_{bzd::begin(view), bzd::move(func)}, end_{bzd::end(view)}
+	constexpr Transform(bzd::InPlace, auto&& range, auto&& func) noexcept :
+		range_{bzd::forward<decltype(range)>(range)}, func_{bzd::forward<decltype(func)>(func)}
 	{
 	}
 
 public:
-	constexpr Iterator begin() const noexcept { return begin_; }
-	constexpr Sentinel end() const noexcept { return end_; }
+	constexpr auto begin() const noexcept { return Iterator{bzd::begin(range_), func_}; }
+	constexpr auto end() const noexcept { return bzd::end(range_); }
 
 private:
-	Iterator begin_;
-	Sentinel end_;
+	Range range_;
+	Function func_;
 };
 
-template <class T, class F>
-Transform(bzd::InPlace, T&&, F&&) -> Transform<T&&, typeTraits::RemoveReference<F>>;
+template <class Range, class Function>
+Transform(bzd::InPlace, Range&&, Function&&) -> Transform<Range&&, Function&&>;
 
 inline constexpr Adaptor<Transform> transform;
 

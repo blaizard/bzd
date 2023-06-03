@@ -7,37 +7,41 @@
 
 namespace bzd::range {
 
-template <concepts::borrowedRange V>
-class Drop : public ViewInterface<Drop<V>>
+template <concepts::borrowedRange Range>
+class Drop : public ViewInterface<Drop<Range>>
 {
 private: // Traits.
-	using Iterator = typeTraits::RangeIterator<V>;
-	using Sentinel = typeTraits::RangeSentinel<V>;
+	using Iterator = typeTraits::RangeIterator<Range>;
 	using DifferenceType = typeTraits::IteratorDifference<Iterator>;
 
 public:
-	constexpr Drop(bzd::InPlace, auto&& view, const DifferenceType count) noexcept : begin_{bzd::begin(view)}, end_{bzd::end(view)}
+	constexpr Drop(bzd::InPlace, auto&& range, const DifferenceType count) noexcept :
+		range_{bzd::forward<decltype(range)>(range)}, count_{count}
 	{
-		bzd::advance(begin_, count, end_);
 	}
 
 public:
-	constexpr Iterator begin() const noexcept { return begin_; }
-	constexpr Sentinel end() const noexcept { return end_; }
+	constexpr auto begin() const noexcept
+	{
+		auto begin = bzd::begin(range_);
+		bzd::advance(begin, count_, end());
+		return begin;
+	}
+	constexpr auto end() const noexcept { return bzd::end(range_); }
 
 private:
-	Iterator begin_;
-	Sentinel end_;
+	Range range_;
+	DifferenceType count_;
 };
 
-template <class T>
-Drop(bzd::InPlace, T&&, const auto) -> Drop<T&&>;
+template <class Range>
+Drop(bzd::InPlace, Range&&, const auto) -> Drop<Range&&>;
 
 inline constexpr Adaptor<Drop> drop;
 
 } // namespace bzd::range
 
 namespace bzd::typeTraits {
-template <class V>
-inline constexpr bzd::Bool enableBorrowedRange<bzd::range::Drop<V>> = concepts::borrowedRange<V>;
+template <class Range>
+inline constexpr bzd::Bool enableBorrowedRange<bzd::range::Drop<Range>> = concepts::borrowedRange<Range>;
 }
