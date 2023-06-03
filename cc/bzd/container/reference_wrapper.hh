@@ -25,7 +25,7 @@ public: // API.
 	[[nodiscard]] constexpr Value* operator->() const noexcept { return &(*value_); }
 
 public: // Comparison operators.
-	[[nodiscard]] constexpr bzd::Bool operator==(const Self& other) const noexcept { return (value_ == other.value_); }
+	[[nodiscard]] constexpr bzd::Bool operator==(const Self& other) const noexcept { return (*value_ == *(other.value_)); }
 	[[nodiscard]] constexpr bzd::Bool operator!=(const Self& other) const noexcept { return !(*this == other); }
 
 private:

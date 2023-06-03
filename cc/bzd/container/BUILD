@@ -26,6 +26,7 @@ bzd_cc_library(
         ":string",
         ":string_stream",
         ":string_view",
+        ":value_wrapper",
         ":variant",
         ":vector",
         "//cc/bzd/container/impl",
@@ -410,6 +411,18 @@ cc_library(
         "//cc/bzd/utility:forward",
         "//cc/bzd/utility:in_place",
         "//cc/bzd/utility:move",
+    ],
+)
+
+cc_library(
+    name = "value_wrapper",
+    hdrs = [
+        "value_wrapper.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/platform:types",
+        "//cc/bzd/type_traits:remove_reference",
     ],
 )
 

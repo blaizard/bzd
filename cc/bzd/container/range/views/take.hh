@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cc/bzd/container/range/view_interface.hh"
+#include "cc/bzd/container/range/view_storage.hh"
 #include "cc/bzd/container/range/views/adaptor.hh"
 #include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/utility/advance.hh"
@@ -21,16 +22,16 @@ public:
 	}
 
 public:
-	constexpr auto begin() const noexcept { return bzd::begin(range_); }
+	constexpr auto begin() const noexcept { return bzd::begin(range_.get()); }
 	constexpr auto end() const noexcept
 	{
-		auto end = bzd::begin(range_);
-		bzd::advance(end, count_, bzd::end(range_));
+		auto end = begin();
+		bzd::advance(end, count_, bzd::end(range_.get()));
 		return end;
 	}
 
 private:
-	Range range_;
+	ViewStorage<Range> range_;
 	DifferenceType count_;
 };
 
