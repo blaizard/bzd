@@ -30,7 +30,7 @@ public:
 
 	public:
 		constexpr ReaderScope(IChannelBuffered& ichannel, const bzd::Span<const T>& span) noexcept :
-			Parent{bzd::inPlace, span}, ichannel_{ichannel}
+			Parent{bzd::inPlace, bzd::move(span)}, ichannel_{ichannel}
 		{
 		}
 
@@ -57,7 +57,7 @@ public:
 		{
 			if (ichannel_.hasValue())
 			{
-				const auto left = bzd::Span<const T>{this->it_, this->end_};
+				const auto left = bzd::Span<const T>{this->it_, this->end()};
 				ichannel_.valueMutable().buffer_.unconsume(left);
 			}
 		}

@@ -20,15 +20,14 @@ namespace bzd::range {
 /// for things like serialization, format...
 /// Stream may or may not be bounded, in the latter case their sentinel will never
 /// be reached and their size will be infinite.
-template <concepts::borrowedRange V>
-class Stream : public ViewInterface<Stream<V>>
+template <concepts::borrowedRange Range>
+class Stream : public ViewInterface<Stream<Range>>
 {
 private: // Traits.
-	using Iterator = typeTraits::RangeIterator<V>;
-	using Sentinel = typeTraits::RangeSentinel<V>;
+	using Iterator = typeTraits::RangeIterator<Range>;
 
 public:
-	constexpr Stream(bzd::InPlace, auto&& view) noexcept : it_{bzd::begin(view)}, end_{bzd::end(view)} {}
+	constexpr Stream(bzd::InPlace, auto&& range) noexcept : range_{bzd::forward<decltype(range)>(range)}, it_{bzd::begin(range_)} {}
 
 	Stream(const Stream&) = delete;
 	Stream& operator=(const Stream&) = delete;
@@ -50,25 +49,25 @@ public:
 			return iterator::InputOrOutputReference<Iterator, iterator::InputOrOutputReferencePolicies<category>>{it_};
 		}
 	}
-	constexpr auto end() const noexcept { return end_; }
+	constexpr auto end() const noexcept { return bzd::end(range_); }
 
 	/// A Stream cannot have a size eventhough, it could have if it comes from a sized range.
 	/// Deleting it ensure no wrong uses that would make it incompatible with the concept.
 	constexpr auto size() const noexcept = delete;
 
 protected:
+	Range range_;
 	Iterator it_;
-	Sentinel end_;
 };
 
-template <class T>
-Stream(bzd::InPlace, T&&) -> Stream<T&&>;
+template <class Range>
+Stream(bzd::InPlace, Range&&) -> Stream<Range&&>;
 
 inline constexpr Adaptor<Stream> stream;
 
 } // namespace bzd::range
 
 namespace bzd::typeTraits {
-template <class V>
-inline constexpr bzd::Bool enableBorrowedRange<bzd::range::Stream<V>> = concepts::borrowedRange<V>;
+template <class Range>
+inline constexpr bzd::Bool enableBorrowedRange<bzd::range::Stream<Range>> = concepts::borrowedRange<Range>;
 }

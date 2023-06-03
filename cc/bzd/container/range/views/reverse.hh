@@ -8,34 +8,29 @@
 
 namespace bzd::range {
 
-template <concepts::bidirectionalRange V>
-requires concepts::borrowedRange<V>
-class Reverse : public ViewInterface<Reverse<V>>
+template <concepts::bidirectionalRange Range>
+requires concepts::borrowedRange<Range>
+class Reverse : public ViewInterface<Reverse<Range>>
 {
-private: // Traits.
-	using Iterator = typeTraits::RangeIterator<V>;
-	using Sentinel = typeTraits::RangeSentinel<V>;
+public:
+	constexpr explicit Reverse(bzd::InPlace, auto&& range) noexcept : range_{bzd::forward<decltype(range)>(range)} {}
 
 public:
-	constexpr explicit Reverse(bzd::InPlace, auto&& view) noexcept : begin_{bzd::begin(view)}, end_{bzd::end(view)} {}
-
-public:
-	constexpr auto begin() const noexcept { return bzd::iterator::Reverse{end_}; }
-	constexpr auto end() const noexcept { return bzd::iterator::Reverse{begin_}; }
+	constexpr auto begin() const noexcept { return bzd::iterator::Reverse{bzd::end(range_)}; }
+	constexpr auto end() const noexcept { return bzd::iterator::Reverse{bzd::begin(range_)}; }
 
 private:
-	Iterator begin_;
-	Sentinel end_;
+	Range range_;
 };
 
-template <class T>
-Reverse(bzd::InPlace, T&&) -> Reverse<T&&>;
+template <class Range>
+Reverse(bzd::InPlace, Range&&) -> Reverse<Range&&>;
 
 inline constexpr Adaptor<Reverse> reverse;
 
 } // namespace bzd::range
 
 namespace bzd::typeTraits {
-template <class V>
-inline constexpr bzd::Bool enableBorrowedRange<bzd::range::Reverse<V>> = concepts::borrowedRange<V>;
+template <class Range>
+inline constexpr bzd::Bool enableBorrowedRange<bzd::range::Reverse<Range>> = concepts::borrowedRange<Range>;
 }

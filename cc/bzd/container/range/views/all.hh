@@ -7,33 +7,28 @@
 
 namespace bzd::range {
 
-template <concepts::borrowedRange V>
-class All : public ViewInterface<All<V>>
+template <concepts::borrowedRange Range>
+class All : public ViewInterface<All<Range>>
 {
-private: // Traits.
-	using Iterator = typeTraits::RangeIterator<V>;
-	using Sentinel = typeTraits::RangeSentinel<V>;
+public:
+	constexpr explicit All(bzd::InPlace, auto&& range) noexcept : range_{bzd::forward<decltype(range)>(range)} {}
 
 public:
-	constexpr explicit All(bzd::InPlace, auto&& view) noexcept : begin_{bzd::begin(view)}, end_{bzd::end(view)} {}
-
-public:
-	constexpr auto begin() const noexcept { return begin_; }
-	constexpr auto end() const noexcept { return end_; }
+	constexpr auto begin() const noexcept { return bzd::begin(range_); }
+	constexpr auto end() const noexcept { return bzd::end(range_); }
 
 private:
-	Iterator begin_;
-	Sentinel end_;
+	Range range_;
 };
 
-template <class T>
-All(bzd::InPlace, T&&) -> All<T&&>;
+template <class Range>
+All(bzd::InPlace, Range&&) -> All<Range&&>;
 
 inline constexpr Adaptor<All> all;
 
 } // namespace bzd::range
 
 namespace bzd::typeTraits {
-template <class V>
-inline constexpr bzd::Bool enableBorrowedRange<bzd::range::All<V>> = concepts::borrowedRange<V>;
+template <class Range>
+inline constexpr bzd::Bool enableBorrowedRange<bzd::range::All<Range>> = concepts::borrowedRange<Range>;
 }

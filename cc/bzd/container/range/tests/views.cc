@@ -33,6 +33,10 @@ TEST(Views, Drop)
 		const auto isEqual = bzd::algorithm::equal(range | bzd::range::drop(2) | bzd::range::drop(1), expected2);
 		EXPECT_TRUE(isEqual);
 	}
+	{
+		const auto isEqual = bzd::algorithm::equal("hello"_sv | bzd::range::drop(2), "llo"_sv);
+		EXPECT_TRUE(isEqual);
+	}
 
 	EXPECT_TRUE(bzd::concepts::borrowedRange<bzd::range::Drop<bzd::Span<int>>>);
 	// EXPECT_FALSE(bzd::concepts::borrowedRange<bzd::range::Drop<bzd::String<1u>>>);
@@ -88,6 +92,17 @@ TEST(Views, Reverse)
 	const auto expected = {4, 3, 2, 1, 0};
 	{
 		const auto isEqual = bzd::algorithm::equal(view, expected);
+		EXPECT_TRUE(isEqual);
+	}
+}
+
+TEST(Views, Owning)
+{
+	bzd::String<12u> v{"Hello World"};
+	auto myOwningView = bzd::range::Owning(bzd::inPlace, std::move(v));
+	EXPECT_EQ(myOwningView.size(), 11u);
+	{
+		const auto isEqual = bzd::algorithm::equal(myOwningView, "Hello World"_sv);
 		EXPECT_TRUE(isEqual);
 	}
 }
