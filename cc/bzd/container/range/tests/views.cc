@@ -3,8 +3,8 @@
 #include "cc/bzd/algorithm/equal.hh"
 #include "cc/bzd/container/array.hh"
 #include "cc/bzd/test/test.hh"
+#include "cc/bzd/test/types/move_only.hh"
 #include "cc/bzd/test/types/range.hh"
-
 /*
 TEST(Views, Borrowed)
 {
@@ -13,6 +13,40 @@ TEST(Views, Borrowed)
 	bzd::ignore = bzd::algorithm::equal(bzd::makeArray(0, 1, 2, 3) | bzd::range::drop(2), expected);
 }
 */
+
+template <class Range, class Expected>
+void helperTestCopy(Range&& range, Expected&& expected)
+{
+	// Copy constructor.
+	auto copy{range};
+	{
+		const auto isEqual = bzd::algorithm::equal(copy, expected);
+		EXPECT_TRUE(isEqual);
+	}
+	// Copy assignment.
+	copy = range;
+	{
+		const auto isEqual = bzd::algorithm::equal(copy, expected);
+		EXPECT_TRUE(isEqual);
+	}
+}
+
+template <class Range, class Expected>
+void helperTestMove(Range&& range, Expected&& expected)
+{
+	// Move constructor.
+	auto move{bzd::move(range)};
+	{
+		const auto isEqual = bzd::algorithm::equal(move, expected);
+		EXPECT_TRUE(isEqual);
+	}
+	// Move assignment.
+	move = bzd::move(range);
+	{
+		const auto isEqual = bzd::algorithm::equal(move, expected);
+		EXPECT_TRUE(isEqual);
+	}
+}
 
 TEST(Views, Drop)
 {
@@ -39,9 +73,10 @@ TEST(Views, Drop)
 	}
 
 	EXPECT_TRUE(bzd::concepts::borrowedRange<bzd::range::Drop<bzd::Span<int>>>);
-	// EXPECT_FALSE(bzd::concepts::borrowedRange<bzd::range::Drop<bzd::String<1u>>>);
 	EXPECT_TRUE(bzd::concepts::borrowedRange<bzd::range::Drop<bzd::String<1u>&>>);
-	// EXPECT_FALSE(bzd::concepts::borrowedRange<bzd::range::Drop<bzd::String<1u>&&>>);
+
+	helperTestCopy(bzd::range::Drop{bzd::inPlace, "012345"_sv, 2}, "2345"_sv);
+	helperTestMove(bzd::range::Drop{bzd::inPlace, "012345"_sv, 2}, "2345"_sv);
 }
 
 TEST(Views, Take)
@@ -64,12 +99,8 @@ TEST(Views, Take)
 		EXPECT_TRUE(isEqual);
 	}
 
-	/*
-		EXPECT_TRUE(bzd::concepts::borrowedRange<bzd::range::Take<bzd::Span<int>>>);
-		EXPECT_FALSE(bzd::concepts::borrowedRange<bzd::range::Take<bzd::String<1u>>>);
-		EXPECT_TRUE(bzd::concepts::borrowedRange<bzd::range::Take<bzd::String<1u>&>>);
-		EXPECT_FALSE(bzd::concepts::borrowedRange<bzd::range::Take<bzd::String<1u>&&>>);
-	*/
+	helperTestCopy(bzd::range::Take{bzd::inPlace, "012345"_sv, 2}, "01"_sv);
+	helperTestMove(bzd::range::Take{bzd::inPlace, "012345"_sv, 2}, "01"_sv);
 }
 
 TEST(Views, Transform)
@@ -82,6 +113,9 @@ TEST(Views, Transform)
 		const auto isEqual = bzd::algorithm::equal(view, expected);
 		EXPECT_TRUE(isEqual);
 	}
+
+	helperTestCopy(bzd::range::Transform{bzd::inPlace, "ABC"_sv, [](const char c) { return c + ('a' - 'A'); }}, "abc"_sv);
+	helperTestMove(bzd::range::Transform{bzd::inPlace, "ABC"_sv, [](const char c) { return c + ('a' - 'A'); }}, "abc"_sv);
 }
 
 TEST(Views, Reverse)
@@ -94,6 +128,9 @@ TEST(Views, Reverse)
 		const auto isEqual = bzd::algorithm::equal(view, expected);
 		EXPECT_TRUE(isEqual);
 	}
+
+	helperTestCopy(bzd::range::Reverse{bzd::inPlace, "012345"_sv}, "543210"_sv);
+	helperTestMove(bzd::range::Reverse{bzd::inPlace, "012345"_sv}, "543210"_sv);
 }
 
 TEST(Views, Owning)
@@ -105,4 +142,6 @@ TEST(Views, Owning)
 		const auto isEqual = bzd::algorithm::equal(myOwningView, "Hello World"_sv);
 		EXPECT_TRUE(isEqual);
 	}
+
+	helperTestMove(bzd::range::Owning{bzd::inPlace, "012345"_sv}, "012345"_sv);
 }

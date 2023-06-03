@@ -40,6 +40,7 @@ cc_library(
     deps = [
         ":adaptor",
         "//cc/bzd/container/range:view_interface",
+        "//cc/bzd/container/range:view_storage",
         "//cc/bzd/type_traits:is_same_class",
     ],
 )
@@ -53,6 +54,7 @@ cc_library(
     deps = [
         ":adaptor",
         "//cc/bzd/container/range:view_interface",
+        "//cc/bzd/container/range:view_storage",
         "//cc/bzd/utility:advance",
     ],
 )
@@ -81,6 +83,7 @@ cc_library(
         ":adaptor",
         "//cc/bzd/container/iterator:reverse",
         "//cc/bzd/container/range:view_interface",
+        "//cc/bzd/container/range:view_storage",
         "//cc/bzd/type_traits:is_same_class",
     ],
 )
@@ -110,6 +113,7 @@ cc_library(
     deps = [
         ":adaptor",
         "//cc/bzd/container/range:view_interface",
+        "//cc/bzd/container/range:view_storage",
         "//cc/bzd/utility:advance",
     ],
 )
@@ -123,6 +127,7 @@ cc_library(
     deps = [
         ":adaptor",
         "//cc/bzd/container/range:view_interface",
+        "//cc/bzd/container/range:view_storage",
         "//cc/bzd/utility:advance",
     ],
 )

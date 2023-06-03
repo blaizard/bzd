@@ -2,6 +2,7 @@
 
 #include "cc/bzd/container/iterator/reverse.hh"
 #include "cc/bzd/container/range/view_interface.hh"
+#include "cc/bzd/container/range/view_storage.hh"
 #include "cc/bzd/container/range/views/adaptor.hh"
 #include "cc/bzd/type_traits/is_same_class.hh"
 #include "cc/bzd/type_traits/range.hh"
@@ -16,11 +17,11 @@ public:
 	constexpr explicit Reverse(bzd::InPlace, auto&& range) noexcept : range_{bzd::forward<decltype(range)>(range)} {}
 
 public:
-	constexpr auto begin() const noexcept { return bzd::iterator::Reverse{bzd::end(range_)}; }
-	constexpr auto end() const noexcept { return bzd::iterator::Reverse{bzd::begin(range_)}; }
+	constexpr auto begin() const noexcept { return bzd::iterator::Reverse{bzd::end(range_.get())}; }
+	constexpr auto end() const noexcept { return bzd::iterator::Reverse{bzd::begin(range_.get())}; }
 
 private:
-	Range range_;
+	ViewStorage<Range> range_;
 };
 
 template <class Range>
