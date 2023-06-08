@@ -1,13 +1,13 @@
 #pragma once
 
 #include "cc/bzd/container/iterator/reverse.hh"
-#include "cc/bzd/container/range/view_interface.hh"
-#include "cc/bzd/container/range/view_storage.hh"
-#include "cc/bzd/container/range/views/adaptor.hh"
+#include "cc/bzd/container/ranges/view_interface.hh"
+#include "cc/bzd/container/wrapper.hh"
+#include "cc/bzd/container/ranges/views/adaptor.hh"
 #include "cc/bzd/type_traits/is_same_class.hh"
 #include "cc/bzd/type_traits/range.hh"
 
-namespace bzd::range {
+namespace bzd::ranges {
 
 template <concepts::bidirectionalRange Range>
 requires concepts::borrowedRange<Range>
@@ -21,7 +21,7 @@ public:
 	constexpr auto end() const noexcept { return bzd::iterator::Reverse{bzd::begin(range_.get())}; }
 
 private:
-	ViewStorage<Range> range_;
+	bzd::Wrapper<Range> range_;
 };
 
 template <class Range>
@@ -29,9 +29,9 @@ Reverse(bzd::InPlace, Range&&) -> Reverse<Range&&>;
 
 inline constexpr Adaptor<Reverse> reverse;
 
-} // namespace bzd::range
+} // namespace bzd::ranges
 
 namespace bzd::typeTraits {
 template <class Range>
-inline constexpr bzd::Bool enableBorrowedRange<bzd::range::Reverse<Range>> = concepts::borrowedRange<Range>;
+inline constexpr bzd::Bool enableBorrowedRange<bzd::ranges::Reverse<Range>> = concepts::borrowedRange<Range>;
 }

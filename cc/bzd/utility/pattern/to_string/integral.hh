@@ -2,7 +2,7 @@
 
 #include "cc/bzd/algorithm/byte_copy.hh"
 #include "cc/bzd/container/array.hh"
-#include "cc/bzd/container/range/views/reverse.hh"
+#include "cc/bzd/container/ranges/views/reverse.hh"
 #include "cc/bzd/container/string.hh"
 #include "cc/bzd/type_traits/is_integral.hh"
 #include "cc/bzd/type_traits/is_signed.hh"
@@ -121,7 +121,7 @@ public:
 		static_assert(base > 1 && base <= 16, "Invalid base size.");
 		static_assert(sizeof(T) <= 8, "Only up to 64-bit integers are supported.");
 
-		bzd::range::Stream stream{bzd::inPlace, range};
+		bzd::ranges::Stream stream{bzd::inPlace, range};
 		Size count = 0u;
 		if (metadata.alternate)
 		{
@@ -184,7 +184,7 @@ public:
 			}
 		}
 
-		if (algorithm::byteCopyReturnSize(buffer | bzd::range::reverse(), stream) != buffer.size())
+		if (algorithm::byteCopyReturnSize(buffer | bzd::ranges::reverse(), stream) != buffer.size())
 		{
 			return bzd::nullopt;
 		}

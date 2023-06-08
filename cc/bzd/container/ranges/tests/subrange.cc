@@ -1,4 +1,4 @@
-#include "cc/bzd/container/range/subrange.hh"
+#include "cc/bzd/container/ranges/subrange.hh"
 
 #include "cc/bzd/container/vector.hh"
 #include "cc/bzd/test/test.hh"
@@ -7,7 +7,7 @@
 TEST(SubRange, Simple)
 {
 	bzd::Vector<bzd::UInt32, 12> vector;
-	bzd::range::SubRange emptyVectorView{vector.begin(), vector.end()};
+	bzd::ranges::SubRange emptyVectorView{vector.begin(), vector.end()};
 
 	static_assert(bzd::concepts::begin<decltype(emptyVectorView)>, "SubRange must validate the `begin` concept.");
 	static_assert(bzd::concepts::end<decltype(emptyVectorView)>, "SubRange must validate the `end` concept.");
@@ -20,7 +20,7 @@ TEST(SubRange, Simple)
 	vector.pushBack(1u);
 	vector.pushBack(2u);
 	vector.pushBack(3u);
-	bzd::range::SubRange nonEmptyVectorView{vector.begin(), vector.end()};
+	bzd::ranges::SubRange nonEmptyVectorView{vector.begin(), vector.end()};
 	EXPECT_FALSE(nonEmptyVectorView.empty());
 	EXPECT_EQ(nonEmptyVectorView.size(), 3);
 }
@@ -38,7 +38,7 @@ TEST(SubRange, VariousTypes)
 {
 	{
 		bzd::test::Range<bzd::typeTraits::IteratorCategory::input> range;
-		bzd::range::SubRange subView{range.begin(), range.end()};
+		bzd::ranges::SubRange subView{range.begin(), range.end()};
 		static_assert(!bzd::concepts::sizedRange<decltype(subView)>, "No size member.");
 		static_assert(!hasSize<decltype(subView)>, "No size member.");
 		static_assert(!hasData<decltype(subView)>, "No data member.");
@@ -48,7 +48,7 @@ TEST(SubRange, VariousTypes)
 	}
 	{
 		bzd::test::Range<bzd::typeTraits::IteratorCategory::output> range;
-		bzd::range::SubRange subView{range.begin(), range.end()};
+		bzd::ranges::SubRange subView{range.begin(), range.end()};
 		static_assert(!bzd::concepts::sizedRange<decltype(subView)>, "No size member.");
 		static_assert(!hasSize<decltype(subView)>, "No size member.");
 		static_assert(!hasData<decltype(subView)>, "No data member.");
@@ -58,7 +58,7 @@ TEST(SubRange, VariousTypes)
 	}
 	{
 		bzd::test::Range<bzd::typeTraits::IteratorCategory::forward> range;
-		bzd::range::SubRange subView{range.begin(), range.end()};
+		bzd::ranges::SubRange subView{range.begin(), range.end()};
 		static_assert(bzd::concepts::sizedRange<decltype(subView)>, "Size member.");
 		static_assert(hasSize<decltype(subView)>, "Has size member.");
 		static_assert(!hasData<decltype(subView)>, "No data member.");
@@ -68,7 +68,7 @@ TEST(SubRange, VariousTypes)
 	}
 	{
 		bzd::test::Range<bzd::typeTraits::IteratorCategory::bidirectional> range;
-		bzd::range::SubRange subView{range.begin(), range.end()};
+		bzd::ranges::SubRange subView{range.begin(), range.end()};
 		static_assert(bzd::concepts::sizedRange<decltype(subView)>, "Size member.");
 		static_assert(hasSize<decltype(subView)>, "Has size member.");
 		static_assert(!hasData<decltype(subView)>, "No data member.");
@@ -78,7 +78,7 @@ TEST(SubRange, VariousTypes)
 	}
 	{
 		bzd::test::Range<bzd::typeTraits::IteratorCategory::randomAccess> range;
-		bzd::range::SubRange subView{range.begin(), range.end()};
+		bzd::ranges::SubRange subView{range.begin(), range.end()};
 		static_assert(bzd::concepts::sizedRange<decltype(subView)>, "Size member.");
 		static_assert(hasSize<decltype(subView)>, "Has size member.");
 		static_assert(!hasData<decltype(subView)>, "No data member.");
@@ -88,7 +88,7 @@ TEST(SubRange, VariousTypes)
 	}
 	{
 		bzd::test::Range<bzd::typeTraits::IteratorCategory::contiguous> range;
-		bzd::range::SubRange subView{range.begin(), range.end()};
+		bzd::ranges::SubRange subView{range.begin(), range.end()};
 		static_assert(bzd::concepts::sizedRange<decltype(subView)>, "Size member.");
 		static_assert(hasSize<decltype(subView)>, "Has size member.");
 		static_assert(hasData<decltype(subView)>, "No data member.");

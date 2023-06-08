@@ -48,17 +48,3 @@ cc_library(
         "//cc/bzd/type_traits:sized_sentinel_for",
     ],
 )
-
-cc_library(
-    name = "view_storage",
-    hdrs = [
-        "view_storage.hh",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//cc/bzd/container:reference_wrapper",
-        "//cc/bzd/container:value_wrapper",
-        "//cc/bzd/type_traits:conditional",
-        "//cc/bzd/type_traits:is_lvalue_reference"
-    ],
-)

@@ -19,7 +19,7 @@ public:
 
 private:
 	template <bzd::Size... i>
-	constexpr StringLiteral(const char (&arr)[n], bzd::meta::range::Type<i...>) noexcept : data_{arr[i]..., '\0'}
+	constexpr StringLiteral(const char (&arr)[n], bzd::meta::ranges::Type<i...>) noexcept : data_{arr[i]..., '\0'}
 	{
 	}
 

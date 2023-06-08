@@ -39,8 +39,8 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":adaptor",
-        "//cc/bzd/container/range:view_interface",
-        "//cc/bzd/container/range:view_storage",
+        "//cc/bzd/container/ranges:view_interface",
+        "//cc/bzd/container:wrapper",
         "//cc/bzd/type_traits:is_same_class",
     ],
 )
@@ -53,8 +53,8 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":adaptor",
-        "//cc/bzd/container/range:view_interface",
-        "//cc/bzd/container/range:view_storage",
+        "//cc/bzd/container/ranges:view_interface",
+        "//cc/bzd/container:wrapper",
         "//cc/bzd/utility:advance",
     ],
 )
@@ -67,7 +67,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":adaptor",
-        "//cc/bzd/container/range:view_interface",
+        "//cc/bzd/container/ranges:view_interface",
         "//cc/bzd/utility:move",
         "//cc/bzd/utility:size",
     ],
@@ -82,8 +82,8 @@ cc_library(
     deps = [
         ":adaptor",
         "//cc/bzd/container/iterator:reverse",
-        "//cc/bzd/container/range:view_interface",
-        "//cc/bzd/container/range:view_storage",
+        "//cc/bzd/container/ranges:view_interface",
+        "//cc/bzd/container:wrapper",
         "//cc/bzd/type_traits:is_same_class",
     ],
 )
@@ -97,10 +97,13 @@ cc_library(
     deps = [
         ":adaptor",
         "//cc/bzd/container/iterator:input_or_output_reference",
-        "//cc/bzd/container/range:view_interface",
+        "//cc/bzd/container/ranges:view_interface",
+        "//cc/bzd/container:wrapper",
         "//cc/bzd/type_traits:is_same_class",
         "//cc/bzd/type_traits:is_same_template",
         "//cc/bzd/type_traits:sentinel_for",
+        "//cc/bzd/utility:distance",
+        "//cc/bzd/utility:advance",
     ],
 )
 
@@ -112,8 +115,8 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":adaptor",
-        "//cc/bzd/container/range:view_interface",
-        "//cc/bzd/container/range:view_storage",
+        "//cc/bzd/container/ranges:view_interface",
+        "//cc/bzd/container:wrapper",
         "//cc/bzd/utility:advance",
     ],
 )
@@ -126,8 +129,8 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":adaptor",
-        "//cc/bzd/container/range:view_interface",
-        "//cc/bzd/container/range:view_storage",
+        "//cc/bzd/container/ranges:view_interface",
+        "//cc/bzd/container:wrapper",
         "//cc/bzd/utility:advance",
     ],
 )

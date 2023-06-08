@@ -1,6 +1,6 @@
 #pragma once
 
-namespace bzd::range {
+namespace bzd::ranges {
 
 /// Results used to associate an intput with its output.
 /// This is mainly used by the algorithm library.
@@ -12,4 +12,4 @@ struct InOutResult
 	Out out;
 };
 
-} // namespace bzd::range
+} // namespace bzd::ranges

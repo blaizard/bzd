@@ -5,6 +5,7 @@ bzd_plugin(
     backend_entry_point = "sonos_backend.mjs",
     backend_packages = {
         "sonos": "",
+        "chromecast-api": "",
     },
     frontend_entry_point = "sonos_frontend.vue",
     frontend_srcs = [

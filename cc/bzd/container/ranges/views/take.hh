@@ -1,12 +1,12 @@
 #pragma once
 
-#include "cc/bzd/container/range/view_interface.hh"
-#include "cc/bzd/container/range/view_storage.hh"
-#include "cc/bzd/container/range/views/adaptor.hh"
+#include "cc/bzd/container/ranges/view_interface.hh"
+#include "cc/bzd/container/wrapper.hh"
+#include "cc/bzd/container/ranges/views/adaptor.hh"
 #include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/utility/advance.hh"
 
-namespace bzd::range {
+namespace bzd::ranges {
 
 template <concepts::borrowedRange Range>
 class Take : public ViewInterface<Take<Range>>
@@ -31,7 +31,7 @@ public:
 	}
 
 private:
-	ViewStorage<Range> range_;
+	bzd::Wrapper<Range> range_;
 	DifferenceType count_;
 };
 
@@ -40,9 +40,9 @@ Take(bzd::InPlace, Range&&, const auto) -> Take<Range&&>;
 
 inline constexpr Adaptor<Take> take;
 
-} // namespace bzd::range
+} // namespace bzd::ranges
 
 namespace bzd::typeTraits {
 template <class Range>
-inline constexpr bzd::Bool enableBorrowedRange<bzd::range::Take<Range>> = concepts::borrowedRange<Range>;
+inline constexpr bzd::Bool enableBorrowedRange<bzd::ranges::Take<Range>> = concepts::borrowedRange<Range>;
 }

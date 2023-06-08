@@ -15,7 +15,7 @@ cc_library(
         "//cc/bzd/container:reference_wrapper",
         "//cc/bzd/container:result",
         "//cc/bzd/container:string_view",
-        "//cc/bzd/container/range/views:stream",
+        "//cc/bzd/container/ranges/views:stream",
         "//cc/bzd/type_traits:range",
     ],
 )

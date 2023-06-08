@@ -1,6 +1,6 @@
 #pragma once
 
-#include "cc/bzd/container/range/in_out_result.hh"
+#include "cc/bzd/container/ranges/in_out_result.hh"
 #include "cc/bzd/type_traits/iterator.hh"
 #include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/type_traits/sentinel_for.hh"
@@ -69,7 +69,7 @@ constexpr auto copy(InputRange&& input, OutputRange&& output)
 		}
 	}
 
-	return range::InOutResult{inputFirst, outputFirst};
+	return ranges::InOutResult{inputFirst, outputFirst};
 }
 
 } // namespace bzd::algorithm

@@ -1,12 +1,12 @@
 #pragma once
 
-#include "cc/bzd/container/range/view_interface.hh"
-#include "cc/bzd/container/range/view_storage.hh"
-#include "cc/bzd/container/range/views/adaptor.hh"
+#include "cc/bzd/container/ranges/view_interface.hh"
+#include "cc/bzd/container/wrapper.hh"
+#include "cc/bzd/container/ranges/views/adaptor.hh"
 #include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/utility/advance.hh"
 
-namespace bzd::range {
+namespace bzd::ranges {
 
 template <concepts::borrowedRange Range, class Function>
 class Transform : public ViewInterface<Transform<Range, Function>>
@@ -36,7 +36,7 @@ public:
 	constexpr auto end() const noexcept { return bzd::end(range_.get()); }
 
 private:
-	ViewStorage<Range> range_;
+	bzd::Wrapper<Range> range_;
 	Function func_;
 };
 
@@ -45,4 +45,4 @@ Transform(bzd::InPlace, Range&&, Function) -> Transform<Range&&, typeTraits::Rem
 
 inline constexpr Adaptor<Transform> transform;
 
-} // namespace bzd::range
+} // namespace bzd::ranges

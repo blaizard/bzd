@@ -92,7 +92,7 @@ public:
 	template <concepts::outputByteCopyableRange Range>
 	static constexpr bzd::Optional<bzd::Size> process(Range&& range, const T& n, const Metadata metadata = Metadata{}) noexcept
 	{
-		bzd::range::Stream stream{bzd::inPlace, range};
+		bzd::ranges::Stream stream{bzd::inPlace, range};
 		switch (metadata.format)
 		{
 		case Metadata::Format::automatic:

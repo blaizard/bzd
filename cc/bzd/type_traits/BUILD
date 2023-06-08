@@ -670,8 +670,8 @@ cc_library(
         ":is_pointer",
         ":remove_pointer",
         ":true_type",
-        ":underlying_type",
         ":void_type",
+        "//cc/bzd/utility:to_underlying"
     ],
 )
 

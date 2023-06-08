@@ -4,7 +4,7 @@
 #include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/type_traits/sized_sentinel_for.hh"
 
-namespace bzd::range {
+namespace bzd::ranges {
 
 template <class Range>
 class ViewInterface
@@ -59,4 +59,4 @@ private:
 	const Range& child() const noexcept { return *static_cast<const Range*>(this); }
 };
 
-} // namespace bzd::range
+} // namespace bzd::ranges

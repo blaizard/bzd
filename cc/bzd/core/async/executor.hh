@@ -1,7 +1,7 @@
 #pragma once
 
 #include "cc/bzd/container/function_ref.hh"
-#include "cc/bzd/container/range/associate_scope.hh"
+#include "cc/bzd/container/ranges/associate_scope.hh"
 #include "cc/bzd/container/threadsafe/non_owning_forward_list.hh"
 #include "cc/bzd/container/threadsafe/non_owning_ring_spin.hh"
 #include "cc/bzd/container/variant.hh"
@@ -199,7 +199,7 @@ public:
 	[[nodiscard]] auto getRangeContext() noexcept
 	{
 		auto scope = makeSyncSharedLockGuard(contextMutex_);
-		return range::associateScope(context_, bzd::move(scope));
+		return ranges::associateScope(context_, bzd::move(scope));
 	}
 
 	constexpr void pushBack(Executable& executable) noexcept { queue_.pushBack(executable); }

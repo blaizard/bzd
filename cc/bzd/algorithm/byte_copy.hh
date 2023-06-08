@@ -1,6 +1,6 @@
 #pragma once
 
-#include "cc/bzd/container/range/in_out_result.hh"
+#include "cc/bzd/container/ranges/in_out_result.hh"
 #include "cc/bzd/type_traits/is_trivially_copyable.hh"
 #include "cc/bzd/type_traits/iterator.hh"
 #include "cc/bzd/type_traits/range.hh"
@@ -43,7 +43,7 @@ constexpr auto byteCopy(InputRange&& input, OutputRange&& output)
 		}
 	}
 
-	return range::InOutResult{inputFirst, outputFirst};
+	return ranges::InOutResult{inputFirst, outputFirst};
 }
 
 /// Copy an input range into an output range at byte level.

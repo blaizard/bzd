@@ -1,10 +1,10 @@
 #pragma once
 
-#include "cc/bzd/container/range/view_interface.hh"
+#include "cc/bzd/container/ranges/view_interface.hh"
 #include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/type_traits/sentinel_for.hh"
 
-namespace bzd::range {
+namespace bzd::ranges {
 
 /// Create a sub range from a pair of iterator and sentinel.
 template <concepts::inputOrOutputIterator Iterator, concepts::sentinelFor<Iterator> Sentinel>
@@ -22,9 +22,9 @@ private:
 	Sentinel end_;
 };
 
-} // namespace bzd::range
+} // namespace bzd::ranges
 
 namespace bzd::typeTraits {
 template <class Iterator, class Sentinel>
-inline constexpr bzd::Bool enableBorrowedRange<bzd::range::SubRange<Iterator, Sentinel>> = true;
+inline constexpr bzd::Bool enableBorrowedRange<bzd::ranges::SubRange<Iterator, Sentinel>> = true;
 }

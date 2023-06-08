@@ -29,8 +29,9 @@ bzd_cc_library(
         ":value_wrapper",
         ":variant",
         ":vector",
+        ":wrapper",
         "//cc/bzd/container/impl",
-        "//cc/bzd/container/range:subrange",
+        "//cc/bzd/container/ranges:subrange",
         "//cc/bzd/container/threadsafe",
         "//cc/bzd/core/assert",
     ],
@@ -107,7 +108,7 @@ cc_library(
         ":ring_buffer",
         ":span",
         "//cc/bzd/algorithm:copy",
-        "//cc/bzd/container/range/views:drop",
+        "//cc/bzd/container/ranges/views:drop",
         "//cc/bzd/core:channel",
         "//cc/bzd/core/async",
         "//cc/bzd/platform:types",
@@ -471,5 +472,19 @@ cc_library(
         "//cc/bzd/type_traits:range",
         "//cc/bzd/utility:forward",
         "//cc/bzd/utility:in_place",
+    ],
+)
+
+cc_library(
+    name = "wrapper",
+    hdrs = [
+        "wrapper.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":reference_wrapper",
+        ":value_wrapper",
+        "//cc/bzd/type_traits:conditional",
+        "//cc/bzd/type_traits:is_lvalue_reference"
     ],
 )
