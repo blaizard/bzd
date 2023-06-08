@@ -8,7 +8,7 @@
 namespace bzd::impl {
 
 template <class F, class T, bzd::Size... i>
-constexpr decltype(auto) apply(F&& f, T&& t, bzd::meta::range::Type<i...>)
+constexpr decltype(auto) apply(F&& f, T&& t, bzd::meta::ranges::Type<i...>)
 {
 	return bzd::forward<F>(f)(t.template get<i>()...);
 }

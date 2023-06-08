@@ -1,12 +1,12 @@
 #pragma once
 
-#include "cc/bzd/container/range/view_interface.hh"
-#include "cc/bzd/container/range/view_storage.hh"
-#include "cc/bzd/container/range/views/adaptor.hh"
+#include "cc/bzd/container/ranges/view_interface.hh"
+#include "cc/bzd/container/wrapper.hh"
+#include "cc/bzd/container/ranges/views/adaptor.hh"
 #include "cc/bzd/type_traits/is_same_class.hh"
 #include "cc/bzd/type_traits/range.hh"
 
-namespace bzd::range {
+namespace bzd::ranges {
 
 template <concepts::borrowedRange Range>
 class All : public ViewInterface<All<Range>>
@@ -19,7 +19,7 @@ public:
 	constexpr auto end() const noexcept { return bzd::end(range_.get()); }
 
 private:
-	ViewStorage<Range> range_;
+	bzd::Wrapper<Range> range_;
 };
 
 template <class Range>
@@ -27,9 +27,9 @@ All(bzd::InPlace, Range&&) -> All<Range&&>;
 
 inline constexpr Adaptor<All> all;
 
-} // namespace bzd::range
+} // namespace bzd::ranges
 
 namespace bzd::typeTraits {
 template <class Range>
-inline constexpr bzd::Bool enableBorrowedRange<bzd::range::All<Range>> = concepts::borrowedRange<Range>;
+inline constexpr bzd::Bool enableBorrowedRange<bzd::ranges::All<Range>> = concepts::borrowedRange<Range>;
 }

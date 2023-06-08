@@ -1,7 +1,7 @@
 #pragma once
 
 #include "cc/bzd/algorithm/byte_copy.hh"
-#include "cc/bzd/container/range/views/take.hh"
+#include "cc/bzd/container/ranges/views/take.hh"
 #include "cc/bzd/container/string.hh"
 #include "cc/bzd/container/string_view.hh"
 #include "cc/bzd/type_traits/is_convertible.hh"
@@ -64,7 +64,7 @@ private:
 		if (metadata.isPrecision)
 		{
 			const auto size = bzd::min(metadata.precision, value.size());
-			if (bzd::algorithm::byteCopyReturnSize(value | bzd::range::take(size), range) == size)
+			if (bzd::algorithm::byteCopyReturnSize(value | bzd::ranges::take(size), range) == size)
 			{
 				return size;
 			}

@@ -1,12 +1,12 @@
 #pragma once
 
-#include "cc/bzd/container/range/view_interface.hh"
+#include "cc/bzd/container/ranges/view_interface.hh"
 #include "cc/bzd/container/tuple.hh"
 #include "cc/bzd/type_traits/is_rvalue_reference.hh"
 #include "cc/bzd/utility/begin.hh"
 #include "cc/bzd/utility/end.hh"
 
-namespace bzd::range {
+namespace bzd::ranges {
 
 namespace impl {
 template <class T, class... Args>
@@ -49,4 +49,4 @@ template <class T, class... Args>
 	}
 }
 
-} // namespace bzd::range
+} // namespace bzd::ranges

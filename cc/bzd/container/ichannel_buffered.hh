@@ -2,7 +2,7 @@
 
 #include "cc/bzd/algorithm/copy.hh"
 #include "cc/bzd/container/optional.hh"
-#include "cc/bzd/container/range/views/drop.hh"
+#include "cc/bzd/container/ranges/views/drop.hh"
 #include "cc/bzd/container/ring_buffer.hh"
 #include "cc/bzd/core/async.hh"
 #include "cc/bzd/core/channel.hh"
@@ -23,10 +23,10 @@ public:
 	/// Reader for data gather either from the input channel or the internal buffer.
 	///
 	/// Uppon destruction of the range, the data consumed will be reflected in the buffer ring.
-	class ReaderScope : public range::Stream<bzd::Span<const T>>
+	class ReaderScope : public ranges::Stream<bzd::Span<const T>>
 	{
 	private:
-		using Parent = range::Stream<bzd::Span<const T>>;
+		using Parent = ranges::Stream<bzd::Span<const T>>;
 
 	public:
 		constexpr ReaderScope(IChannelBuffered& ichannel, const bzd::Span<const T>& span) noexcept :

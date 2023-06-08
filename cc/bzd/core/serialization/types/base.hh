@@ -1,9 +1,9 @@
 #pragma once
 
 #include "cc/bzd/container/optional.hh"
-#include "cc/bzd/container/range/views/all.hh"
-#include "cc/bzd/container/range/views/reverse.hh"
-#include "cc/bzd/container/range/views/stream.hh"
+#include "cc/bzd/container/ranges/views/all.hh"
+#include "cc/bzd/container/ranges/views/reverse.hh"
+#include "cc/bzd/container/ranges/views/stream.hh"
 #include "cc/bzd/meta/always_false.hh"
 #include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/utility/bit/endian.hh"
@@ -17,11 +17,11 @@ inline constexpr auto normalizeByteOrder() noexcept
 	// The endianness of serialized data are little endian.
 	if constexpr (bzd::Endian::native == bzd::Endian::little)
 	{
-		return bzd::range::all();
+		return bzd::ranges::all();
 	}
 	else
 	{
-		return bzd::range::reverse();
+		return bzd::ranges::reverse();
 	}
 }
 

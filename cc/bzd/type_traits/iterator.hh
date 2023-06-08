@@ -4,7 +4,7 @@
 #include "cc/bzd/type_traits/is_base_of.hh"
 #include "cc/bzd/type_traits/is_pointer.hh"
 #include "cc/bzd/type_traits/remove_pointer.hh"
-#include "cc/bzd/type_traits/underlying_type.hh"
+#include "cc/bzd/utility/to_underlying.hh"
 
 namespace bzd::typeTraits {
 
@@ -41,13 +41,13 @@ enum class IteratorCategory
 /// Bitwise or operator to IteratorCategory.
 constexpr IteratorCategory operator|(const IteratorCategory left, const IteratorCategory right) noexcept
 {
-	return IteratorCategory{static_cast<UnderlyingType<IteratorCategory>>(left) | static_cast<UnderlyingType<IteratorCategory>>(right)};
+	return IteratorCategory{bzd::toUnderlying(left) | bzd::toUnderlying(right)};
 }
 
 /// Bitwise and operator to IteratorCategory.
 constexpr IteratorCategory operator&(const IteratorCategory left, const IteratorCategory right) noexcept
 {
-	return IteratorCategory{static_cast<UnderlyingType<IteratorCategory>>(left) & static_cast<UnderlyingType<IteratorCategory>>(right)};
+	return IteratorCategory{bzd::toUnderlying(left) & bzd::toUnderlying(right)};
 }
 
 template <class>

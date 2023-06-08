@@ -57,8 +57,8 @@ cc_library(
     deps = [
         ":span",
         "//cc/bzd/container/iterator:input_or_output_reference",
-        "//cc/bzd/container/range:subrange",
-        "//cc/bzd/container/range/views:stream",
+        "//cc/bzd/container/ranges:subrange",
+        "//cc/bzd/container/ranges/views:stream",
         "//cc/bzd/type_traits:is_convertible",
         "//cc/bzd/type_traits:is_trivially_copyable",
         "//cc/bzd/type_traits:sentinel_for",

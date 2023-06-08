@@ -4,7 +4,7 @@
 #include "cc/bzd/utility/forward.hh"
 #include "cc/bzd/utility/in_place.hh"
 
-namespace bzd::range {
+namespace bzd::ranges {
 
 template <template <class...> class T>
 struct Adaptor
@@ -17,7 +17,7 @@ struct Adaptor
 	}
 };
 
-} // namespace bzd::range
+} // namespace bzd::ranges
 
 /// No need to require the borroedRange here as it is already enforced by the adaptor.
 template <bzd::concepts::range Range, class Adaptor>

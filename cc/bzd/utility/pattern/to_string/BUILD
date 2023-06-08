@@ -9,7 +9,7 @@ cc_library(
     deps = [
         "//cc/bzd/container:optional",
         "//cc/bzd/container:string_view",
-        "//cc/bzd/container/range/views:stream",
+        "//cc/bzd/container/ranges/views:stream",
         "//cc/bzd/meta:always_false",
         "//cc/bzd/type_traits:container",
         "//cc/bzd/type_traits:is_same_class",
@@ -55,7 +55,7 @@ cc_library(
         "//cc/bzd/algorithm:byte_copy",
         "//cc/bzd/container:array",
         "//cc/bzd/container:string",
-        "//cc/bzd/container/range/views:reverse",
+        "//cc/bzd/container/ranges/views:reverse",
         "//cc/bzd/type_traits:is_integral",
         "//cc/bzd/type_traits:is_signed",
     ],
@@ -102,7 +102,7 @@ cc_library(
         "//cc/bzd/algorithm:byte_copy",
         "//cc/bzd/container:string",
         "//cc/bzd/container:string_view",
-        "//cc/bzd/container/range/views:take",
+        "//cc/bzd/container/ranges/views:take",
         "//cc/bzd/type_traits:is_convertible",
     ],
 )
