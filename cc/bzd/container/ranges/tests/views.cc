@@ -61,7 +61,7 @@ TEST(Views, Drop)
 	{
 		const auto isEqual = bzd::algorithm::equal(bzd::move(view) | bzd::ranges::all(), expected);
 		// This should not compile.
-		//const auto isEqual = bzd::algorithm::equal(bzd::move(range) | bzd::ranges::drop(2), expected);
+		// const auto isEqual = bzd::algorithm::equal(bzd::move(range) | bzd::ranges::drop(2), expected);
 		EXPECT_TRUE(isEqual);
 	}
 	{

@@ -485,6 +485,6 @@ cc_library(
         ":reference_wrapper",
         ":value_wrapper",
         "//cc/bzd/type_traits:conditional",
-        "//cc/bzd/type_traits:is_lvalue_reference"
+        "//cc/bzd/type_traits:is_lvalue_reference",
     ],
 )

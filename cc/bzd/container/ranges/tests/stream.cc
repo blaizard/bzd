@@ -31,14 +31,16 @@ TEST(Stream, Move)
 
 	auto stream1 = bzd::ranges::Stream(bzd::inPlace, container);
 
-	auto stream2 = [stream1 = bzd::move(stream1)]() mutable -> auto {
+	auto stream2 = [stream1 = bzd::move(stream1)]() mutable -> auto
+	{
 		auto it1 = stream1.begin();
 		EXPECT_EQ(*it1, 0);
 		++it1;
 		EXPECT_EQ(*it1, 1);
 		++it1;
 		return bzd::move(stream1);
-	}();
+	}
+	();
 
 	auto it2 = stream2.begin();
 	EXPECT_EQ(*it2, 2);

@@ -671,7 +671,7 @@ cc_library(
         ":remove_pointer",
         ":true_type",
         ":void_type",
-        "//cc/bzd/utility:to_underlying"
+        "//cc/bzd/utility:to_underlying",
     ],
 )
 

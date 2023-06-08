@@ -9,7 +9,7 @@ namespace bzd {
 
 template <class T>
 using Wrapper = bzd::typeTraits::Conditional<typeTraits::isLValueReference<T>,
-												 bzd::ReferenceWrapper<typeTraits::RemoveReference<T>>,
-												 bzd::ValueWrapper<typeTraits::RemoveReference<T>>>;
+											 bzd::ReferenceWrapper<typeTraits::RemoveReference<T>>,
+											 bzd::ValueWrapper<typeTraits::RemoveReference<T>>>;
 
 }
