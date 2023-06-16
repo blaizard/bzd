@@ -4,20 +4,24 @@ set -e
 
 # Best, get the packages from: https://github.com/indygreg/python-build-standalone
 
-VERSION=3.8.15
+VERSION=3.8.17
 HOST=linux_x86_64
 PACKAGE=${HOST}_${VERSION}
 
-rm -rf Python-${VERSION}
-curl -L https://www.python.org/ftp/python/${VERSION}/Python-${VERSION}.tar.xz | tar -xJ
+sudo apt install -y libffi-dev
 
-rm -rf Python-${VERSION}-build
-mkdir Python-${VERSION}-build
-pushd Python-${VERSION}-build
+rm -rf cpython-${VERSION} cpython-${VERSION}-build
+curl -L https://github.com/python/cpython/archive/refs/tags/v${VERSION}.tar.gz | tar -xz
 
-../Python-${VERSION}/configure --prefix="$(pwd)/../${PACKAGE}"
+mkdir cpython-${VERSION}-build
+pushd cpython-${VERSION}-build
+
+../cpython-${VERSION}/configure --prefix="$(pwd)/../${PACKAGE}" \
+        --enable-optimizations \
+        --with-lto \
+        --with-system-ffi
 make -j$(nproc)
-make install
+make altinstall
 
 popd
 
