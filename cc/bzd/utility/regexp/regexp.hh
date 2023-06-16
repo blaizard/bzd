@@ -2,7 +2,7 @@
 
 #include "cc/bzd/container/function_ref.hh"
 #include "cc/bzd/container/optional.hh"
-#include "cc/bzd/container/ranges/views/stream.hh"
+#include "cc/bzd/container/ranges/stream.hh"
 #include "cc/bzd/container/reference_wrapper.hh"
 #include "cc/bzd/container/string_view.hh"
 #include "cc/bzd/type_traits/range.hh"

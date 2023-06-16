@@ -4,9 +4,8 @@
 #include "cc/bzd/type_traits/iterator.hh"
 
 namespace bzd {
-template <class Iterator>
-requires concepts::forwardIterator<Iterator>
-[[nodiscard]] constexpr auto distance(Iterator first, Iterator last) noexcept
+template <concepts::forwardIterator Iterator, concepts::sentinelFor<Iterator> Sentinel>
+[[nodiscard]] constexpr auto distance(Iterator first, Sentinel last) noexcept
 {
 	using DifferenceType = typeTraits::IteratorDifference<Iterator>;
 

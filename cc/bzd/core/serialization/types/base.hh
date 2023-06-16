@@ -3,7 +3,7 @@
 #include "cc/bzd/container/optional.hh"
 #include "cc/bzd/container/ranges/views/all.hh"
 #include "cc/bzd/container/ranges/views/reverse.hh"
-#include "cc/bzd/container/ranges/views/stream.hh"
+#include "cc/bzd/container/ranges/stream.hh"
 #include "cc/bzd/meta/always_false.hh"
 #include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/utility/bit/endian.hh"

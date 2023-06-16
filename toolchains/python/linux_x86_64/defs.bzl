@@ -5,10 +5,10 @@ def load_linux_x86_64_python():
         name = "python3_linux_x86_64",
         build_file = "//toolchains/python/linux_x86_64:python.BUILD",
         urls = [
-            "http://data.blaizard.com/file/bzd/toolchains/python3/linux_x86_64_3.8.15.tar.xz",
+            "http://data.blaizard.com/file/bzd/toolchains/python3/linux_x86_64_3.8.16.tar.gz",
         ],
-        strip_prefix = "linux_x86_64_3.8.15",
-        sha256 = "5dd3935f945e695b237e23ec4c981381fedb422eabb8f16118f46de379233402",
+        strip_prefix = "python",
+        sha256 = "afc9953aa0bf9f3a966025a6747e9d65bfb6fb5fc756b95a5d438c948380e431",
     )
 
     http_archive(

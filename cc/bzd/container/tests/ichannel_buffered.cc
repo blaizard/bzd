@@ -5,6 +5,8 @@
 
 using TestIChannel = bzd::test::IChannel<char, 32u>;
 using TestIChannelZeroCopy = bzd::test::IChannel<char, 32u, bzd::test::IChannelMode::zeroCopy>;
+using TestIChannelChunks = bzd::test::IChannel<char, 32u, bzd::test::IChannelMode::chunks>;
+using TestIChannelZeroCopyChunks = bzd::test::IChannel<char, 32u, bzd::test::IChannelMode::zeroCopy | bzd::test::IChannelMode::chunks>;
 
 TEST_ASYNC(IChannelBuffered, Reader, (TestIChannel, TestIChannelZeroCopy))
 {
@@ -76,20 +78,71 @@ TEST_ASYNC(IChannelBuffered, Reader, (TestIChannel, TestIChannelZeroCopy))
 	co_return {};
 }
 
-/*
-TEST_ASYNC(IChannelBuffered, Read, (TestIChannel))
+TEST_ASYNC(IChannelBuffered, Read, (TestIChannel, TestIChannelZeroCopy, TestIChannelChunks, TestIChannelZeroCopyChunks))
 {
 	TestType in{};
-	bzd::IChannelBuffered<char, 16u> channel{in};
+	bzd::IChannelBuffered<char, 8u> channel{in};
 	EXPECT_EQ(channel.size(), 0u);
 
 	// Empty ichannel
 	{
 		auto maybeScope = co_await channel.read(12u);
 		EXPECT_FALSE(maybeScope);
+		EXPECT_EQ(maybeScope.error().getType(), bzd::ErrorType::eof);
 		EXPECT_EQ(channel.size(), 0u);
+	}
+
+	in << "hello";
+	{
+		auto maybeScope = co_await channel.read(4u);
+		EXPECT_TRUE(maybeScope);
+		EXPECT_EQ(channel.size(), 0u);
+	}
+
+	{
+		auto maybeScope = co_await channel.read(4u);
+		EXPECT_TRUE(maybeScope);
+		auto it = maybeScope->begin();
+		EXPECT_EQ(*it, 'h');
+		++it;
+		EXPECT_EQ(*it, 'e');
+		++it;
+	}
+
+	// Not enough samples
+	{
+		auto maybeScope = co_await channel.read(4u);
+		EXPECT_FALSE(maybeScope);
+		EXPECT_EQ(maybeScope.error().getType(), bzd::ErrorType::eof);
+	}
+
+	in << " me!";
+	{
+		auto maybeScope = co_await channel.read(4u);
+		EXPECT_TRUE(maybeScope);
+		auto it = maybeScope->begin();
+		EXPECT_EQ(*it, 'l');
+		++it;
+		EXPECT_EQ(*it, 'l');
+		++it;
+		EXPECT_EQ(*it, 'o');
+		++it;
+		EXPECT_EQ(*it, ' ');
+		++it;
+	}
+
+	// Just enough samples, need to fetch '!'
+	{
+		auto maybeScope = co_await channel.read(3u);
+		EXPECT_TRUE(maybeScope);
+		auto it = maybeScope->begin();
+		EXPECT_EQ(*it, 'm');
+		++it;
+		EXPECT_EQ(*it, 'e');
+		++it;
+		EXPECT_EQ(*it, '!');
+		++it;
 	}
 
 	co_return {};
 }
-*/

@@ -109,6 +109,7 @@ cc_library(
         ":span",
         "//cc/bzd/algorithm:copy",
         "//cc/bzd/container/ranges/views:drop",
+        "//cc/bzd/container/ranges/views:reverse",
         "//cc/bzd/core:channel",
         "//cc/bzd/core/async",
         "//cc/bzd/platform:types",

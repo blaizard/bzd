@@ -23,7 +23,9 @@ namespace bzd::ranges {
 /// for things like serialization, format...
 /// Stream may or may not be bounded, in the latter case their sentinel will never
 /// be reached and their size will be infinite.
-template <concepts::borrowedRange Range>
+///
+/// Note, this is not a view because such range can own non-borrowed ranges.
+template <concepts::range Range>
 class Stream : public ViewInterface<Stream<Range>>
 {
 private: // Traits.
@@ -72,6 +74,7 @@ public:
 		}
 	}
 	constexpr auto end() const noexcept { return bzd::end(range_.get()); }
+	constexpr auto end() noexcept { return bzd::end(range_.get()); }
 
 	/// A Stream cannot have a size eventhough, it could have if it comes from a sized range.
 	/// Deleting it ensure no wrong uses that would make it incompatible with the concept.
@@ -84,8 +87,6 @@ protected:
 
 template <class Range>
 Stream(bzd::InPlace, Range&&) -> Stream<Range&&>;
-
-inline constexpr Adaptor<Stream> stream;
 
 } // namespace bzd::ranges
 

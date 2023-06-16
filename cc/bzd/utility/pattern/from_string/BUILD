@@ -9,7 +9,7 @@ cc_library(
     deps = [
         "//cc/bzd/container:optional",
         "//cc/bzd/container:string_view",
-        "//cc/bzd/container/ranges/views:stream",
+        "//cc/bzd/container/ranges:stream",
         "//cc/bzd/meta:always_false",
         "//cc/bzd/type_traits:container",
         "//cc/bzd/type_traits:is_same_class",
@@ -27,7 +27,7 @@ cc_library(
         "//cc/bzd/container:array",
         "//cc/bzd/container:optional",
         "//cc/bzd/container:string_view",
-        "//cc/bzd/container/ranges/views:stream",
+        "//cc/bzd/container/ranges:stream",
         "//cc/bzd/type_traits:is_integral",
         "//cc/bzd/type_traits:is_signed",
         "//cc/bzd/type_traits:range",

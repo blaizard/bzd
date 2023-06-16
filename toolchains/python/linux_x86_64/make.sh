@@ -2,6 +2,8 @@
 
 set -e
 
+# Best, get the packages from: https://github.com/indygreg/python-build-standalone
+
 VERSION=3.8.15
 HOST=linux_x86_64
 PACKAGE=${HOST}_${VERSION}
