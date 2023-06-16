@@ -4,8 +4,6 @@ set -e
 
 VERSION=$1
 
-. ~/.bashrc
-
 sudo apt-get install -y --no-install-recommends \
     curl \
     xz-utils \

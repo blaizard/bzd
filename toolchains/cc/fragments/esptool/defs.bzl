@@ -1,11 +1,9 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 def toolchain_fragment_esptool():
-    tools_package_name = "esptool"
-
     http_archive(
-        name = tools_package_name,
-        build_file = "//toolchains/cc/fragments/esptool:{}.BUILD".format(tools_package_name),
+        name = "esptool",
+        build_file = "//toolchains/cc/fragments/esptool:esptool.BUILD",
         urls = [
             "http://data.blaizard.com/file/bzd/esptool/esptool-4.3.zip",
         ],

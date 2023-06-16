@@ -50,6 +50,11 @@ public:
 	{
 	}
 
+	constexpr Error(const SourceLocation& location, const ErrorType type) noexcept :
+		source_{location.getFileName()}, line_{location.getLine()}, type_{type}, message_{inPlaceIndex<0>, "No message"}
+	{
+	}
+
 	template <class... Args>
 	constexpr Error(const SourceLocation& location, const ErrorType type, Args&&... args) noexcept :
 		source_{location.getFileName()}, line_{location.getLine()}, type_{type}, message_{inPlaceIndex<1>, reserveBuffer()}

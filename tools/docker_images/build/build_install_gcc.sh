@@ -4,15 +4,15 @@ set -e
 
 # https://gcc.gnu.org/wiki/InstallingGCC
 
-INSTALL_PATH=/usr/local
+# Default to /usr instead of /usr/local, this will install it along side other gcc distro, which
+# is needed for clang to find installed gcc version. This is a requisite when build llvm-project for example.
+INSTALL_PATH=/usr
 LONG_BIT=$(getconf LONG_BIT)
 while [[ $# -gt 0 ]] && [[ "$1" == "--"* ]] ;
 do
     opt="$1";
     shift;
     case "$opt" in
-        "--static" )
-           STATIC=true;;
         "--install" )
             INSTALL_PATH="$1"; shift;;
         *) echo >&2 "Invalid option: $@"; exit 1;;
@@ -20,7 +20,6 @@ do
 done
 VERSION=$1
 
-. ~/.bashrc
 
 sudo apt-get install -y --no-install-recommends \
     curl \
@@ -53,8 +52,6 @@ elif [ "$LONG_BIT" = 64 ]; then
 echo "export LD_LIBRARY_PATH=${INSTALL_PATH}/lib64:${LD_LIBRARY_PATH}" >> ~/.bashrc
 fi
 
-if [ "$STATIC" = true ]; then
-
 # Create a g++ wrapper to build static binaries.
 cat <<EOT > "${INSTALL_PATH}/bin/gcc-static" && chmod +x "${INSTALL_PATH}/bin/gcc-static"
 #!/bin/bash
@@ -65,15 +62,6 @@ cat <<EOT > "${INSTALL_PATH}/bin/g++-static" && chmod +x "${INSTALL_PATH}/bin/g+
 #!/bin/bash
 ${INSTALL_PATH}/bin/g++ -static-libgcc -static-libstdc++ "\$@"
 EOT
-echo "export CC=${INSTALL_PATH}/bin/gcc-static" >> ~/.bashrc
-echo "export CXX=${INSTALL_PATH}/bin/g++-static" >> ~/.bashrc
-
-else
-
-echo "export CC=${INSTALL_PATH}/bin/gcc" >> ~/.bashrc
-echo "export CXX=${INSTALL_PATH}/bin/g++" >> ~/.bashrc
-
-fi
 
 popd
 

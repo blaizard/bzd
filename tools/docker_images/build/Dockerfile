@@ -20,7 +20,11 @@ RUN echo "#!/bin/bash" > ~/.bashrc && chmod +x ~/.bashrc
 
 # GCC
 COPY build_install_gcc.sh /build_install_gcc.sh
-RUN /build_install_gcc.sh --static 12.2.0
+RUN /build_install_gcc.sh --install /usr 12.2.0
+
+# Used to link statically for maximal portability
+ENV CC=/usr/bin/gcc-static
+ENV CXX=/usr/bin/g++-static
 
 # CMake
 COPY build_install_cmake.sh /build_install_cmake.sh

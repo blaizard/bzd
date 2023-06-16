@@ -5,11 +5,24 @@ try-import .bazelrc.local
 # Add timestamps
 common --show_timestamps
 
-# Build specific options
+# If a command fails, print out the full command line.
+# https://bazel.build/reference/command-line-reference#flag--verbose_failures
 build --verbose_failures
 
 # Set default options used by the default run
 build --strip=never
+
+# If true, build runfiles symlink forests for external repositories under .runfiles/wsname/external/repo (in addition to .runfiles/repo).
+# https://bazel.build/reference/command-line-reference#flag--legacy_external_runfiles
+build --nolegacy_external_runfiles
+
+# If true, the target platform is used in the output directory name instead of the CPU.
+# https://bazel.build/reference/command-line-reference#flag--experimental_platform_in_output_dir
+build --experimental_platform_in_output_dir 
+
+# Limit the resources usage on the host.
+build --local_cpu_resources=HOST_CPUS*.5
+build --local_ram_resources=HOST_RAM*.5
 
 # Global test specific options
 test --test_output=errors
@@ -36,7 +49,8 @@ build:docker --spawn_strategy=docker,sandboxed
 build:docker --config=docker_sandbox
 
 # Remote
-build:remote --remote_executor=grpc://localhost:8980
+build:remote --remote_executor=grpc://10.10.0.11:8980
+build:remote --jobs=24
 build:remote --dynamic_mode=off
 build:remote --spawn_strategy=remote,sandboxed
 build:remote --remote_download_minimal
@@ -73,6 +87,9 @@ build --workspace_status_command tools/bazel_build/buildstamp/stamp.sh
 build --incompatible_force_strict_header_check_from_starlark
 build --strict_filesets
 build --strict_system_includes
+
+# Do not look for the system wide default c++ toolchain.
+common --repo_env=BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN=1
 
 # Increase hermeticity
 build --incompatible_strict_action_env=true

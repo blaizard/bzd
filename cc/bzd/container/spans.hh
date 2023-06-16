@@ -88,6 +88,26 @@ public:
 		return sub;
 	}
 
+	constexpr auto first(const Size count) const noexcept
+	{
+		return subSpans(0, count);
+	}
+
+	constexpr auto first(const Size count) noexcept
+	{
+		return subSpans(0, count);
+	}
+
+	constexpr auto last(const Size count) const noexcept
+	{
+		return subSpans(size() - count, count);
+	}
+
+	constexpr auto last(const Size count) noexcept
+	{
+		return subSpans(size() - count, count);
+	}
+
 public: // Iterators
 	[[nodiscard]] constexpr auto begin() noexcept { return Iterator{spans_.begin(), spans_.end()}; }
 	[[nodiscard]] constexpr auto begin() const noexcept { return ConstIterator{spans_.begin(), spans_.end()}; }

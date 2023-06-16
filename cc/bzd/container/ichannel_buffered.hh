@@ -3,11 +3,14 @@
 #include "cc/bzd/algorithm/copy.hh"
 #include "cc/bzd/container/optional.hh"
 #include "cc/bzd/container/ranges/views/drop.hh"
+#include "cc/bzd/container/ranges/views/reverse.hh"
 #include "cc/bzd/container/ring_buffer.hh"
 #include "cc/bzd/core/async.hh"
 #include "cc/bzd/core/channel.hh"
 #include "cc/bzd/type_traits/container.hh"
 #include "cc/bzd/type_traits/range.hh"
+
+#include <iostream>
 
 namespace bzd {
 
@@ -29,7 +32,7 @@ public:
 		using Parent = ranges::Stream<bzd::Span<const T>>;
 
 	public:
-		constexpr ReaderScope(IChannelBuffered& ichannel, const bzd::Span<const T>& span) noexcept :
+		constexpr ReaderScope(IChannelBuffered& ichannel, const bzd::Span<const T> span) noexcept :
 			Parent{bzd::inPlace, bzd::move(span)}, ichannel_{ichannel}
 		{
 		}
@@ -59,6 +62,53 @@ public:
 			{
 				const auto left = bzd::Span<const T>{this->it_, this->end()};
 				ichannel_.valueMutable().buffer_.unconsume(left);
+			}
+		}
+
+	private:
+		bzd::Optional<IChannelBuffered&> ichannel_;
+	};
+
+	class ReadScope : public ranges::Stream<bzd::Spans<const T, 3u>>
+	{
+	private:
+		using Parent = ranges::Stream<bzd::Spans<const T, 3u>>;
+
+	public:
+		constexpr ReadScope(IChannelBuffered& ichannel, const bzd::Spans<const T, 3u> spans) noexcept :
+			Parent{bzd::inPlace, bzd::move(spans)}, ichannel_{ichannel}
+		{
+		}
+
+		ReadScope(const ReadScope&) = delete;
+		ReadScope& operator=(const ReadScope&) = delete;
+		constexpr ReadScope(ReadScope&& other) noexcept : Parent{static_cast<Parent&&>(other)}, ichannel_{other.ichannel_}
+		{
+			other.ichannel_.reset();
+		}
+		constexpr ReadScope& operator=(ReadScope&& other) noexcept
+		{
+			close();
+
+			static_cast<Parent&>(*this) = static_cast<Parent&&>(other);
+			ichannel_ = other.ichannel_;
+			other.ichannel_.reset();
+
+			return *this;
+		}
+		constexpr ~ReadScope() noexcept { close(); }
+
+	private:
+		constexpr void close() noexcept
+		{
+			if (ichannel_.hasValue())
+			{
+				const auto unconsumed = bzd::distance(this->it_, this->end());
+				const auto left = this->range_.get().last(unconsumed);
+				for (const auto& span : left.spans() | bzd::ranges::reverse())
+				{
+					ichannel_.valueMutable().buffer_.unconsume(span);
+				}
 			}
 		}
 
@@ -103,11 +153,10 @@ public:
 	/// Read at least `count` bytes and return a Stream range.
 	///
 	/// \note Uppon destruction of the range, the data consumed will be removed from the buffer ring.
-	/*bzd::Async<ReaderScope<bzd::Spans<const T, 3u>, true>> read(const bzd::Size count) noexcept
+	bzd::Async<ReadScope> read(const bzd::Size count) noexcept
 	{
-		using Spans = bzd::Spans<const T, 3u>;
-
 		// Span to hold freshly read buffer.
+		auto buffer = buffer_.asSpans();
 		bzd::Span<const T> dataRead{};
 
 		// Read data.
@@ -123,6 +172,7 @@ public:
 					co_return bzd::error::Failure{"RingBuffer<{}> vs {}"_csv, bufferCapacity, count};
 				}
 
+				buffer = buffer_.asSpans();
 				dataRead = co_await !in_.read(bzd::move(writeToBuffer));
 				buffer_.produce(dataRead.size());
 
@@ -133,7 +183,7 @@ public:
 					co_return bzd::error::Eof{};
 				}
 				// If there are enough data, exit the loop.
-				else if ((buffer_.size() + dataRead.size()) >= count)
+				else if ((buffer.size() + dataRead.size()) >= count)
 				{
 					break;
 				}
@@ -145,13 +195,10 @@ public:
 			}
 		}
 
-		//const auto spans = buffer_.asSpans();
-		//co_return ReaderScope<Spans, true>{Spans{bzd::inPlace, spans[0], spans[1], dataRead}};
-		//co_return ReaderScope<Spans, true>{Spans{bzd::inPlace, dataRead}};
-		Spans spans{bzd::inPlace, dataRead};
-		//spans[2] = dataRead;
-		co_return ReaderScope<Spans, true>{bzd::move(spans)};
-	}*/
+		bzd::Spans<const T, 3u> spans{bzd::inPlace, buffer[0], buffer[1], dataRead};
+		buffer_.consume(spans.size());
+		co_return ReadScope{*this, spans};
+	}
 
 	/// Read data until a specific value is found.
 	auto readUntil(const T value, const Bool include = false) noexcept
@@ -186,6 +233,24 @@ public:
 	[[nodiscard]] constexpr bzd::Bool full() const noexcept { return size() >= capacity(); }
 	[[nodiscard]] constexpr bzd::Size size() const noexcept { return buffer_.size(); }
 	[[nodiscard]] constexpr bzd::Size capacity() const noexcept { return buffer_.capacity(); }
+
+	/*
+	void print()
+	{
+		const auto spans = buffer_.asSpans();
+		print(spans);
+	}
+	template <class Spans>
+	void print(const Spans& spans)
+	{
+		::std::cout << "[" << spans.size() << "] [";
+		for (const auto c : spans)
+		{
+			::std::cout << c;
+		}
+		::std::cout << "]" << ::std::endl;
+	}
+	*/
 
 private:
 	/// Read data until a specific value is found.

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cc/bzd/core/async.hh"
+#include "cc/components/xtensa/timer/xthal/interface.hh"
 
 namespace bzd::components::esp32::timer {
 

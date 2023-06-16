@@ -1,4 +1,4 @@
-#include "cc/bzd/container/ranges/views/stream.hh"
+#include "cc/bzd/container/ranges/stream.hh"
 
 #include "cc/bzd/container/array.hh"
 #include "cc/bzd/test/test.hh"

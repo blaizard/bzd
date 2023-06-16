@@ -4,8 +4,6 @@ set -e
 
 VERSION=$1
 
-. ~/.bashrc
-
 # Remove existing openssl
 sudo apt-get purge -y \
     openssl \
