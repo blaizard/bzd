@@ -23,7 +23,7 @@ cmake -G "Unix Makefiles" -S llvm -B build -DCMAKE_BUILD_TYPE="Release" \
                                 -DLLVM_INCLUDE_EXAMPLES=Off
 
 cd build
-make -j4 #$(nproc)
+make -j$(nproc)
 make install
 
 # Create an archive.
