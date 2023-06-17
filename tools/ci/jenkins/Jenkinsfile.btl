@@ -29,9 +29,9 @@ pipeline
 				sh "git submodule foreach --recursive git reset --hard"
 				sh "git submodule update --init --recursive"
 				sh "ls -ll /"
-				sh "./info.sh"
 				// Wake-up the remote executor.
 				sh "./tools/bazel run //apps/wake_on_lan:client -- --wait 10.10.0.11:8980 --timeout 300 08:bf:b8:14:04:b6 --remote_local_fallback"
+				sh "./info.sh"
 			}
 		}
 		// Parallelized tests are done here
