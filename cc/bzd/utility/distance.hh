@@ -2,6 +2,7 @@
 
 #include "cc/bzd/platform/types.hh"
 #include "cc/bzd/type_traits/iterator.hh"
+#include "cc/bzd/type_traits/sentinel_for.hh"
 
 namespace bzd {
 template <concepts::forwardIterator Iterator, concepts::sentinelFor<Iterator> Sentinel>
