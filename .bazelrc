@@ -57,7 +57,10 @@ build:remote --remote_download_minimal
 build:remote --disk_cache=
 build:remote --define=EXECUTOR=remote
 build:remote --config=docker_sandbox
-build:remote --noremote_accept_cached # Do not use remote-cache
+
+# local
+build:local --remote_executor=
+build:local --jobs=HOST_CPUS
 
 # Select only C++ targets
 build --build_tag_filters=-cc-coverage
