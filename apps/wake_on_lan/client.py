@@ -78,7 +78,6 @@ if __name__ == "__main__":
 		timeLimit = time.perf_counter() + args.timeout
 		connectionOpen = False
 		while time.perf_counter() < timeLimit:
-			print(f"Checking {host} at {port} for {entry}...")
 			if checkConnection(host, port, timeoutS=2):
 				connectionOpen = True
 				break
