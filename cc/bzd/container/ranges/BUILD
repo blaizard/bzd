@@ -32,6 +32,7 @@ cc_library(
     deps = [
         "//cc/bzd/container:wrapper",
         "//cc/bzd/container/iterator:input_or_output_reference",
+        "//cc/bzd/container/ranges/views:adaptor",
         ":view_interface",
         "//cc/bzd/type_traits:is_same_class",
         "//cc/bzd/type_traits:is_same_template",

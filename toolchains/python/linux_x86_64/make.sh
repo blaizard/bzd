@@ -18,12 +18,16 @@ pushd cpython-${VERSION}-build
 
 ../cpython-${VERSION}/configure --prefix="$(pwd)/../${PACKAGE}" \
         --enable-optimizations \
-        --with-lto \
-        --with-system-ffi
+        --with-lto
 make -j$(nproc)
 make altinstall
 
 popd
+
+# Trim useless directories
+find ${PACKAGE} -name __pycache__ -type d -exec rm  -rf {} \;
+find ${PACKAGE} -name test -type d -exec rm  -rf {} \;
+find ${PACKAGE} -name tests -type d -exec rm  -rf {} \;
 
 # Create an archive.
 tar -cvJf ${PACKAGE}.tar.xz ${PACKAGE}
