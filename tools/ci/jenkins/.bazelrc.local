@@ -1,6 +1,3 @@
-# Limit CPU usage.
-build --jobs 1
-
 # Tweak the output.
 build --show_progress_rate_limit=60
 build --noshow_loading_progress
