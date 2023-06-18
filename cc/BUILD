@@ -1,5 +1,5 @@
 load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_library")
-load("//tools/bazel_build/rules:documentation.bzl", "doc_library")
+load("@rules_doc//doc:defs.bzl", "doc_library")
 
 bzd_cc_library(
     name = "bzd",

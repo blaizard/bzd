@@ -1,7 +1,7 @@
 load("//tools/bazel_build/rules/assets/cc:defs.bzl", "cc_compile", "cc_link")
 load("@bazel_skylib//lib:sets.bzl", "sets")
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
-load("//tools/bazel_build:binary_wrapper.bzl", "sh_binary_wrapper_impl")
+load("@utils//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
 load("//tools/bazel_build/rules:package.bzl", "BzdPackageFragment", "BzdPackageMetadataFragment")
 
 # ---- Providers ----

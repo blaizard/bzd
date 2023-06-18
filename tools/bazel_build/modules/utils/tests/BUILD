@@ -1,4 +1,4 @@
-load("//tools/bazel_build:binary_wrapper.bzl", "sh_binary_wrapper")
+load("@binary_wrapper//:defs.bzl", "sh_binary_wrapper")
 
 filegroup(
     name = "echo",

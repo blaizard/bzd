@@ -1,4 +1,4 @@
-load("//tools/bazel_build:binary_wrapper.bzl", "sh_binary_wrapper_impl")
+load("@utils//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
 load("//tools/bazel_build/rules:nodejs.bzl", "BzdNodeJsDepsProvider", "BzdNodeJsInstallProvider", "bzd_nodejs_aliases_symlinks", "bzd_nodejs_install")
 load("//tools/bazel_build/rules:package.bzl", "BzdPackageFragment", "BzdPackageMetadataFragment")
 

@@ -6,3 +6,4 @@
 **Dockerfile
 **docker-compose.yml
 **CMakeLists.txt
+**MODULE.bazel

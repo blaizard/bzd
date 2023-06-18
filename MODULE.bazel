@@ -1,0 +1,23 @@
+module(name = "bzd", version = "0.1")
+
+bazel_dep(name = "platforms", version = "0.0.6")
+bazel_dep(name = "utils", version = "1.0")
+bazel_dep(name = "rules_doc", version = "1.0")
+bazel_dep(name = "bazel_skylib", version = "1.4.2")
+bazel_dep(name = "stardoc", version = "0.5.6")
+bazel_dep(name = "toolchain_python", version = "1.0")
+
+# Override some of the modules that are local.
+[local_path_override(
+    module_name = name,
+    path = "tools/bazel_build/modules/" + name
+) for name in ("utils", "rules_doc", "toolchain_python",)]
+
+# Python
+
+toolchain_python = use_extension("@toolchain_python//:extensions.bzl", "toolchain_python")
+toolchain_python.toolchain(
+    name = "python"
+)
+use_repo(toolchain_python, "python")
+register_toolchains("@python//:all")

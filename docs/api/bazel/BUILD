@@ -1,11 +1,10 @@
-load("@io_bazel_stardoc//stardoc:stardoc.bzl", "stardoc")
-load("//tools/bazel_build/rules:documentation.bzl", "doc_library")
+load("@stardoc//stardoc:stardoc.bzl", "stardoc")
+load("@rules_doc//doc:defs.bzl", "doc_library")
 
 _RULE_NAMES = [
     "bdl",
     "cc",
     "docker",
-    "documentation",
     "nodejs",
     "nodejs_web",
     "package",
