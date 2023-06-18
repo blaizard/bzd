@@ -5,7 +5,7 @@ sh_binary_wrapper(
     name = "clang_format",
     binary = ":binary",
     command = """
-{binary} --clang-format $(location //toolchains/cc/linux_x86_64_clang:clang_format) $@
+{binary} --clang-format $(rootpath //toolchains/cc/linux_x86_64_clang:clang_format) $@
     """,
     data = [
         "//toolchains/cc/linux_x86_64_clang:clang_format",
@@ -20,10 +20,6 @@ py_binary(
             "*.py",
         ],
     ),
-    args = [
-        "--clang-format",
-        "$(location //toolchains/cc/linux_x86_64_clang:clang_format)",
-    ],
     data = [
         "//toolchains/cc/linux_x86_64_clang:clang_format",
     ],
