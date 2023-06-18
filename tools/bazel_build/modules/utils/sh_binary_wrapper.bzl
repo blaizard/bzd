@@ -50,8 +50,7 @@ def _sh_binary_wrapper_impl(ctx):
         command = ctx.attr.command,
     )
 
-"""
-Binary wrapper rule. Wraps a bazel executable into this rule
+"""Binary wrapper rule. Wraps a bazel executable into this rule
 and decorates it with custom arguments or wrapping script.
 """
 sh_binary_wrapper = rule(

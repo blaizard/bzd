@@ -8,7 +8,6 @@ exports_files([
     "docker.bzl",
     "cc.bzl",
     "bdl.bzl",
-    "documentation.bzl",
 ])
 
 bzl_library(
@@ -19,17 +18,6 @@ bzl_library(
     visibility = ["//visibility:public"],
     deps = [
         "@io_bazel_rules_docker//container",
-    ],
-)
-
-bzl_library(
-    name = "documentation",
-    srcs = [
-        "documentation.bzl",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//tools/bazel_build:binary_wrapper",
     ],
 )
 
@@ -50,9 +38,9 @@ bzl_library(
     visibility = ["//visibility:public"],
     deps = [
         ":package",
-        "//tools/bazel_build:binary_wrapper",
         "@bazel_skylib//rules:common_settings",
         "@io_bazel_rules_docker//container",
+        "@utils//:sh_binary_wrapper",
     ],
 )
 
@@ -96,10 +84,10 @@ bzl_library(
     visibility = ["//visibility:public"],
     deps = [
         ":package",
-        "//tools/bazel_build:binary_wrapper",
         "//tools/bazel_build/rules/assets/cc:defs",
         "//tools/bazel_build/rules/third_party/cc:bzl",
         "@bazel_skylib//lib:sets",
         "@bazel_skylib//rules:common_settings",
+        "@utils//:sh_binary_wrapper",
     ],
 )

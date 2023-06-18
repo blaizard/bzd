@@ -62,17 +62,18 @@ def formatYaml(path: str, stdout: TextIO) -> None:
 def evaluateFiles(task: Callable[[str, TextIO], Any], workspace: Path, **kwargs: Any) -> bool:
 	files = Files(workspace, useGitignore=True, **kwargs)
 	worker = bzd.utils.worker.Worker(task)
-	worker.start()
-	for path in files.data():
-		worker.add(path.as_posix(), timeoutS=600)
+	try:
+		worker.start()
+		for path in files.data():
+			worker.add(path.as_posix(), timeoutS=600)
 
-	isSuccess = True
-	for result in worker.data():
-		if not result.isSuccess():
-			isSuccess = False
-			print(result.getOutput(), end="")
-
-	worker.stop()
+		isSuccess = True
+		for result in worker.data():
+			if not result.isSuccess():
+				isSuccess = False
+				print(result.getOutput(), end="")
+	finally:
+		worker.stop()
 
 	return isSuccess
 

@@ -1,5 +1,5 @@
 load("@rules_python//python:python.bzl", "py_binary")
-load("//tools/bazel_build:binary_wrapper.bzl", "sh_binary_wrapper")
+load("@utils//:sh_binary_wrapper.bzl", "sh_binary_wrapper")
 
 sh_binary_wrapper(
     name = "clang_format",

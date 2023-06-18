@@ -7,14 +7,6 @@ cc_library(
 )
 
 bzl_library(
-    name = "binary_wrapper",
-    srcs = [
-        "binary_wrapper.bzl",
-    ],
-    visibility = ["//visibility:public"],
-)
-
-bzl_library(
     name = "multi_run",
     srcs = [
         "multi_run.bzl",

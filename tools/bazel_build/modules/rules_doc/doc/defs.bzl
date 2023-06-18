@@ -1,4 +1,4 @@
-load("//tools/bazel_build:binary_wrapper.bzl", "sh_binary_wrapper_impl")
+load("@utils//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
 
 _DocumentationProvider = provider(
     doc = "Provider for documentation entities.",
@@ -24,7 +24,7 @@ _COMMON_ATTRS = {
     "_preprocessor": attr.label(
         executable = True,
         cfg = "exec",
-        default = Label("//tools/bazel_build/rules/assets/documentation:preprocessor"),
+        default = Label("@rules_doc//doc:preprocessor"),
     ),
 }
 
@@ -131,17 +131,17 @@ _doc_binary = rule(
         "_builder": attr.label(
             executable = True,
             cfg = "exec",
-            default = Label("//tools/bazel_build/rules/assets/documentation:builder"),
+            default = Label("@rules_doc//doc:builder"),
         ),
         "_mkdocs": attr.label(
             executable = True,
             cfg = "exec",
-            default = Label("//tools/bazel_build/rules/assets/documentation:mkdocs_wrapper"),
+            default = Label("@rules_doc//doc:mkdocs_wrapper"),
         ),
         "_web_server": attr.label(
             executable = True,
             cfg = "target",
-            default = Label("//tools/scripts:web_server"),
+            default = Label("@utils//:web_server"),
         ),
     }, **_COMMON_ATTRS),
     doc = "Create a documentation binary.",

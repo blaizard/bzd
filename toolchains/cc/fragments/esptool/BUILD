@@ -1,4 +1,4 @@
-load("//tools/bazel_build:binary_wrapper.bzl", "sh_binary_wrapper")
+load("@utils//:sh_binary_wrapper.bzl", "sh_binary_wrapper")
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 load("@bazel_skylib//lib:selects.bzl", "selects")
 

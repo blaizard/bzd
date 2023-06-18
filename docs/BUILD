@@ -1,4 +1,4 @@
-load("//tools/bazel_build/rules:documentation.bzl", "doc_binary")
+load("@rules_doc//doc:defs.bzl", "doc_binary")
 
 doc_binary(
     name = "docs",
