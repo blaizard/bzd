@@ -11,17 +11,17 @@ import platform
 import struct
 
 def processRun(args) -> None:
-	"""
-	Execute a process and exit if it fails
-	"""
+	"""Execute a process and exit if it fails."""
+
 	result = subprocess.run(args)
 	if result.returncode != 0:
 		sys.exit(result.returncode)
 
 def getOSAndArchitecture() -> str:
+	"""Get the OS architecture identifier."""
 
 	# Identify the bit width.
-	bitsize = str(8 * struct.calcsize("P"))
+	bitSize = str(8 * struct.calcsize("P"))
 
 	# Identify the architecture.
 	machine = "unknown_"
@@ -40,7 +40,7 @@ def getOSAndArchitecture() -> str:
 	elif sys.platform.startswith("darwin"):
 		os = "darwin"
 
-	return "{}_{}{}".format(os, machine, bitsize)
+	return f"{os}_{machine}{bitSize}"
 
 if __name__== "__main__":
 
@@ -68,7 +68,7 @@ if __name__== "__main__":
 		basename = OSAndArchitectureToBasename[OSAndArchitecture]
 
 		url = "https://github.com/bazelbuild/bazelisk/releases/download/v1.15.0/{}".format(basename)
-		print("No bazel binary detected, downloading bazelisk from {}...".format(url))
+		print(f"No bazel binary detected, downloading bazelisk from {url}...", flush=True)
 		with urllib.request.urlopen(url) as response, open(bazeliskPath, "wb") as f:
 			shutil.copyfileobj(response, f)
 
