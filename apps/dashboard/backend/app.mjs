@@ -60,16 +60,6 @@ async function getData(type, uid, cache) {
 		async (uid) => {
 			let data = await keyValueStore.get("tiles", uid, null);
 			Exception.assert(data !== null, "There is no data associated with UID '{}'.", uid);
-
-			// If there is a constructor, call it
-			const type = data["source.type"];
-			if (type in Plugins && "module" in Plugins[type]) {
-				const plugin = (await Plugins[type].module()).default;
-				if ("constructor" in plugin) {
-					data = await plugin.constructor(data);
-				}
-			}
-
 			return data;
 		},
 		{
@@ -84,14 +74,15 @@ async function getData(type, uid, cache) {
 			const plugin = (await Plugins[type].module()).default;
 
 			// Install plugin specific cache entries
-			(plugin.cache || []).forEach((entry) => {
-				Exception.assert(entry.collection, "Cache collection must be set.");
-				Exception.assert(typeof entry.fetch === "function", "Cache fetch must be a function.");
+			Object.entries(plugin.cache || {}).forEach((entry) => {
+				const [collection, metadata] = entry;
+				Exception.assert(collection, "Cache collection must be set.");
+				Exception.assert(typeof metadata.fetch === "function", "Cache fetch must be a function.");
 				let options = {};
-				if ("timeout" in entry) {
-					options.timeout = entry.timeout;
+				if ("timeout" in metadata) {
+					options.timeout = metadata.timeout;
 				}
-				cache.register(entry.collection, entry.fetch, options);
+				cache.register(collection, metadata.fetch, options);
 			});
 
 			// Install plugin

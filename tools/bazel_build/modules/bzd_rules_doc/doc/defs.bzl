@@ -1,4 +1,4 @@
-load("@utils//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
+load("@bzd_utils//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
 
 _DocumentationProvider = provider(
     doc = "Provider for documentation entities.",
@@ -24,7 +24,7 @@ _COMMON_ATTRS = {
     "_preprocessor": attr.label(
         executable = True,
         cfg = "exec",
-        default = Label("@rules_doc//doc:preprocessor"),
+        default = Label("@bzd_rules_doc//doc:preprocessor"),
     ),
 }
 
@@ -131,17 +131,17 @@ _doc_binary = rule(
         "_builder": attr.label(
             executable = True,
             cfg = "exec",
-            default = Label("@rules_doc//doc:builder"),
+            default = Label("@bzd_rules_doc//doc:builder"),
         ),
         "_mkdocs": attr.label(
             executable = True,
             cfg = "exec",
-            default = Label("@rules_doc//doc:mkdocs_wrapper"),
+            default = Label("@bzd_rules_doc//doc:mkdocs_wrapper"),
         ),
         "_web_server": attr.label(
             executable = True,
             cfg = "target",
-            default = Label("@utils//:web_server"),
+            default = Label("@bzd_utils//:web_server"),
         ),
     }, **_COMMON_ATTRS),
     doc = "Create a documentation binary.",

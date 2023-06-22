@@ -1,5 +1,5 @@
 load("@rules_python//python:defs.bzl", "py_binary")
-load("@rules_doc_pip//:requirements.bzl", "requirement")
+load("@bzd_rules_doc_pip//:requirements.bzl", "requirement")
 
 py_binary(
     name = "builder",

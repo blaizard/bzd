@@ -1,4 +1,4 @@
-load("@utils//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
+load("@bzd_utils//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("//tools/bazel_build/rules:package.bzl", "BzdPackageFragment", "BzdPackageMetadataFragment", "bzd_package")
 load("@io_bazel_rules_docker//container:container.bzl", "container_image", "container_push")

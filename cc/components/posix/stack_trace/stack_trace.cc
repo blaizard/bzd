@@ -331,7 +331,7 @@ void sigHandler(const int sig)
 bool installStackTrace()
 {
 	// Specify that the signal handler will be allocated onto the alternate signal stack.
-	static bzd::Array<bzd::UInt8, SIGSTKSZ> stack;
+	static bzd::Array<bzd::UInt8, 16384u> stack;
 
 	stack_t signalStack{};
 	signalStack.ss_size = stack.size();

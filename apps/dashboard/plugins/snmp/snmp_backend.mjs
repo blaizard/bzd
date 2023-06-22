@@ -102,9 +102,8 @@ class Snmp {
 }
 
 export default {
-	cache: [
-		{
-			collection: "snmp.oid",
+	cache: {
+		"snmp.oid": {
 			fetch: async (host, version, community, oids, ttl, previous, options) => {
 				// Update the time in ms.
 				options.timeout = ttl * 1000;
@@ -114,40 +113,41 @@ export default {
 				return await snmp.getAndClose(oids);
 			},
 		},
-	],
-	constructor: async (data) => {
-		const updateObj = (obj, oid, ttl) => {
-			oid = Snmp.normalizeOid(oid);
-			obj[oid] = Math.min(obj[oid] || Number.MAX_VALUE, ttl);
-		};
-
-		const oidTtlMap = (data["snmp.array"] || []).reduce((obj, item) => {
-			const ttl = item.ttl || 2000;
-			updateObj(obj, item.oid, ttl);
-			(item.ops || [])
-				.filter((item) => Snmp.isOid(item.value))
-				.forEach((item) => {
-					updateObj(obj, item.value, ttl);
-				});
-			return obj;
-		}, {});
-
-		// Sort the Oids by ttl
-		data.oidsByTtl = Object.keys(oidTtlMap).reduce((obj, oid) => {
-			const ttl = oidTtlMap[oid];
-			obj[ttl] = obj[ttl] || [];
-			obj[ttl].push(oid);
-			return obj;
-		}, {});
-
-		return data;
+		"snmp.oidsByTtl": {
+			fetch: async (snmpArray) => {
+				const updateObj = (obj, oid, ttl) => {
+					oid = Snmp.normalizeOid(oid);
+					obj[oid] = Math.min(obj[oid] || Number.MAX_VALUE, ttl);
+				};
+		
+				const oidTtlMap = snmpArray.reduce((obj, item) => {
+					const ttl = item.ttl || 2000;
+					updateObj(obj, item.oid, ttl);
+					(item.ops || [])
+						.filter((item) => Snmp.isOid(item.value))
+						.forEach((item) => {
+							updateObj(obj, item.value, ttl);
+						});
+					return obj;
+				}, {});
+		
+				// Sort the Oids by ttl
+				return Object.keys(oidTtlMap).reduce((obj, oid) => {
+					const ttl = oidTtlMap[oid];
+					obj[ttl] = obj[ttl] || [];
+					obj[ttl].push(oid);
+					return obj;
+				}, {});
+			},
+			timeout: 60 * 60 * 1000, // 1h
+		}
 	},
 	fetch: async (data, cache) => {
-		Exception.assert("oidsByTtl" in data, "Seems that the constructor was not called.");
+		const oidsByTtl = await cache.get("snmp.oidsByTtl", data["snmp.array"] || []);
 
 		let promises = [];
-		for (const ttl in data.oidsByTtl) {
-			const oids = data.oidsByTtl[ttl];
+		for (const ttl in oidsByTtl) {
+			const oids = oidsByTtl[ttl];
 			const promise = cache.get("snmp.oid", data["snmp.host"], data["snmp.version"], data["snmp.community"], oids, ttl);
 			promises.push(promise);
 		}

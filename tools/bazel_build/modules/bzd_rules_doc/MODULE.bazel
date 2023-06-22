@@ -1,0 +1,11 @@
+module(name = "bzd_rules_doc", version = "1.0")
+
+bazel_dep(name = "bzd_utils", version = "1.0")
+bazel_dep(name = "rules_python", version = "0.23.1")
+
+pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
+pip.parse(
+    name = "bzd_rules_doc_pip",
+    requirements_lock = "@bzd_rules_doc//doc:requirements.txt",
+)
+use_repo(pip, "bzd_rules_doc_pip")

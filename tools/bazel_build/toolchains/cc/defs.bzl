@@ -51,6 +51,7 @@ def _impl(ctx):
             ["'-L{}',".format(t) for t in ctx.attr.linker_dirs] +
             ["'{}',".format(t) for t in ctx.attr.link_flags],
         ),
+        "%{sysroot}": ctx.attr.sysroot,
         "%{exec_compatible_with}": "\n".join(['"{}",'.format(t) for t in ctx.attr.exec_compatible_with]),
         "%{target_compatible_with}": "\n".join(['"{}",'.format(t) for t in ctx.attr.target_compatible_with]),
         "%{alias}": "\n".join([alias_template.format(k, v) for k, v in ctx.attr.alias.items()]),
@@ -115,6 +116,7 @@ _toolchain_maker_linux = repository_rule(
         "builtin_include_directories": attr.string_list(),
         "system_directories": attr.string_list(),
         "linker_dirs": attr.string_list(),
+        "sysroot": attr.string(),
         # Flags
         "link_flags": attr.string_list(),
         "compile_flags": attr.string_list(),

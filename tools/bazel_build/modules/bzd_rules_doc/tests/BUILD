@@ -1,4 +1,4 @@
-load("@rules_doc:defs.bzl", "doc_binary", "doc_library")
+load("@bzd_rules_doc//doc:defs.bzl", "doc_binary", "doc_library")
 
 doc_library(
     name = "lib1",

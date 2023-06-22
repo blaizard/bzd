@@ -17,9 +17,8 @@ function _getStatus(item) {
 }
 
 export default {
-	cache: [
-		{
-			collection: "travisci.builds",
+	cache: {
+		"travisci.builds": {
 			fetch: async (endpoint, repositorySlug, token) => {
 				// Build the URL
 				const url = "https://api." + endpoint + "/repo/" + encodeURIComponent(repositorySlug) + "/builds?limit=50";
@@ -50,7 +49,7 @@ export default {
 			},
 			timeout: 10 * 1000,
 		},
-	],
+	},
 	fetch: async (data, cache) => {
 		const builds = await cache.get(
 			"travisci.builds",

@@ -6,3 +6,10 @@ py_binary(
         "client.py",
     ],
 )
+
+py_binary(
+    name = "server",
+    srcs = [
+        "server.py",
+    ],
+)
