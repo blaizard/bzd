@@ -40,7 +40,7 @@ bzl_library(
         ":package",
         "@bazel_skylib//rules:common_settings",
         "@io_bazel_rules_docker//container",
-        "@utils//:sh_binary_wrapper",
+        "@bzd_utils//:sh_binary_wrapper",
     ],
 )
 
@@ -88,6 +88,6 @@ bzl_library(
         "//tools/bazel_build/rules/third_party/cc:bzl",
         "@bazel_skylib//lib:sets",
         "@bazel_skylib//rules:common_settings",
-        "@utils//:sh_binary_wrapper",
+        "@bzd_utils//:sh_binary_wrapper",
     ],
 )

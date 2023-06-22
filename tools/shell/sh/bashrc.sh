@@ -46,16 +46,6 @@ alias bzd_reload='. ~/.bashrc'
 # Only output to interactive shell.
 if ${bzd_is_shell}; then
 
-# ---- Content from update.sh
-# Auto update script 
-bzd_update()
-{
-    url="https://raw.githubusercontent.com/blaizard/cpp-async/master/tools/shell/sh/bashrc.sh"
-	wget -q --no-cache "$url" -O ~/.bzd_update_temp
-	rm -rfd ~/.bzd && mkdir -p ~/.bzd && mv ~/.bzd_update_temp ~/.bzd/bashrc.sh
-	bzd_reload
-}
-
 # ---- Content from clean.sh
 _bzd_free_size_kb()
 {
@@ -85,6 +75,22 @@ bzd_clean_disk()
     total_free_end=$(_bzd_free_size_kb)
     total_free_saved=$(($total_free_end - $total_free_begin))
     echo "---- Saved ${total_free_saved}K bytes."
+}
+
+# ---- Content from google_chrome.sh
+bzd_google_chrome() {
+    # Start chrome in an isolated sandbox and it will not affect the main chrome profile.
+    google-chrome --disable-site-isolation-trials --disable-web-security --allow-file-access-from-files --user-data-dir=/tmp
+}
+
+# ---- Content from update.sh
+# Auto update script 
+bzd_update()
+{
+    url="https://raw.githubusercontent.com/blaizard/cpp-async/master/tools/shell/sh/bashrc.sh"
+	wget -q --no-cache "$url" -O ~/.bzd_update_temp
+	rm -rfd ~/.bzd && mkdir -p ~/.bzd && mv ~/.bzd_update_temp ~/.bzd/bashrc.sh
+	bzd_reload
 }
 
 # ---- Content from git.sh
@@ -141,12 +147,6 @@ EOF
 bzd_math() {
     py_code="from math import *; print(${@})"
     python -c "${py_code}"
-}
-
-# ---- Content from google_chrome.sh
-bzd_google_chrome() {
-    # Start chrome in an isolated sandbox and it will not affect the main chrome profile.
-    google-chrome --disable-site-isolation-trials --disable-web-security --allow-file-access-from-files --user-data-dir=/tmp
 }
 
 # ---- Content from prompt.sh

@@ -37,9 +37,8 @@ function getFetchOptions(username, token) {
 }
 
 export default {
-	cache: [
-		{
-			collection: "github.builds",
+	cache: {
+		"github.builds": {
 			fetch: async function (username, repository, workflowId, token) {
 				// Build the URL
 				const baseUrl =
@@ -67,8 +66,7 @@ export default {
 			},
 			timeout: 60 * 1000,
 		},
-		{
-			collection: "github.jobs",
+		"github.jobs": {
 			fetch: async (url, username, token, prevValue, cacheOptions) => {
 				const resultJobs = await HttpClient.get(url, getFetchOptions(username, token));
 
@@ -112,7 +110,7 @@ export default {
 				};
 			},
 		},
-	],
+	},
 	fetch: async (data, cache) => {
 		const builds = await cache.get(
 			"github.builds",

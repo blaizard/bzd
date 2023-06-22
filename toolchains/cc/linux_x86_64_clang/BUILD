@@ -1,5 +1,5 @@
 load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_test")
-load("@utils//:sh_binary_wrapper.bzl", "sh_binary_wrapper")
+load("@bzd_utils//:sh_binary_wrapper.bzl", "sh_binary_wrapper")
 
 bzd_cc_test(
     name = "test",

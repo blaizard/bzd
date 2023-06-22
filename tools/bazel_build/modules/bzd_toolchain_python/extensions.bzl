@@ -83,7 +83,7 @@ def _toolchain_python_impl(module_ctx):
             for arch, repository in repositories.items():
                 http_archive(
                     name = "python_{}_{}".format(toolchain.version, arch),
-                    build_file = "@toolchain_python//:python.BUILD",
+                    build_file = "@bzd_toolchain_python//:python.BUILD",
                     **repository
                 )
             _toolchain_repository(

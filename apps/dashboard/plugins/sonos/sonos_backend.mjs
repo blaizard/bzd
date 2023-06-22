@@ -39,9 +39,8 @@ async function _next(data, cache, increment) {
 }
 
 export default {
-	cache: [
-		{
-			collection: "sonos.device",
+	cache: {
+		"sonos.device": {
 			fetch: async (previous) => {
 				let discovery = new Sonos.AsyncDeviceDiscovery();
 				const instance = await discovery.discover();
@@ -94,7 +93,7 @@ export default {
 			},
 			timeout: 60 * 1000 * 30,
 		},
-	],
+	},
 	fetch: async (data, cache) => {
 		const device = await cache.get("sonos.device");
 
@@ -105,6 +104,14 @@ export default {
 			name: device.name,
 			state: device.track.state,
 		};
+	},
+	tasks: {
+		"default": {
+			task: async (cache) => {
+
+			},
+			period: 60 * 1000 * 30,
+		}
 	},
 	events: {
 		async play(data, cache) {

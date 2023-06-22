@@ -140,6 +140,7 @@ cc_toolchain_config(
     ],
     unfiltered_compile_flags = [],
     supports_start_end_lib = False,
+    builtin_sysroot = "%{sysroot}",
 )
 
 cc_toolchain(

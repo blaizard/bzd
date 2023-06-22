@@ -17,9 +17,8 @@ function _getStatus(item) {
 }
 
 export default {
-	cache: [
-		{
-			collection: "jenkins.builds",
+	cache: {
+		"jenkins.builds": {
 			fetch: async (url, build, branch, user, token) => {
 				// Build the URL
 				const baseUrl = url + "/job/" + build + "/job/" + branch;
@@ -53,7 +52,7 @@ export default {
 			},
 			timeout: 10 * 1000,
 		},
-	],
+	},
 	fetch: async (data, cache) => {
 		const builds = await cache.get(
 			"jenkins.builds",

@@ -1,5 +1,5 @@
 load("@stardoc//stardoc:stardoc.bzl", "stardoc")
-load("@rules_doc//doc:defs.bzl", "doc_library")
+load("@bzd_rules_doc//doc:defs.bzl", "doc_library")
 
 _RULE_NAMES = [
     "bdl",
