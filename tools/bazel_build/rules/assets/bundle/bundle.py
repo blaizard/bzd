@@ -7,9 +7,10 @@ import stat
 
 class Bundler:
 
-	def __init__(self, path: pathlib.Path, executable: pathlib.Path) -> None:
+	def __init__(self, path: pathlib.Path, executable: pathlib.Path, cwd: pathlib.Path) -> None:
 		self.path = path
 		self.executable = executable
+		self.cwd = cwd
 
 	def process(self, output: pathlib.Path) -> None:
 
@@ -43,7 +44,8 @@ function cleanup {
 }
 trap cleanup EXIT
 sed '0,/^#EOF#$/d' "$0" | tar -C "$temp" -zx
-RUNFILES_DIR="$temp" "$temp/""" + str(self.executable).encode() + b"""";
+cd $temp/""" + str(self.cwd).encode() + b"""
+RUNFILES_DIR="$temp" """ + str(self.executable).encode() + b""";
 exit 0;
 #EOF#
 """)
@@ -60,10 +62,14 @@ if __name__ == "__main__":
 	                    "--output",
 	                    default="/tmp/output.sh",
 	                    help="The output path for the self extracting bundle.")
+	parser.add_argument("-c",
+	                    "--cwd",
+	                    default=".",
+	                    help="The relative directory where the execution takes place.")
 	parser.add_argument("manifest", help="The path of the manifest to be used.")
 	parser.add_argument("executable", help="The path of the executable within the archive.")
 
 	args = parser.parse_args()
 
-	bundler = Bundler(pathlib.Path(args.manifest), pathlib.Path(args.executable))
+	bundler = Bundler(pathlib.Path(args.manifest), pathlib.Path(args.executable), pathlib.Path(args.cwd))
 	bundler.process(pathlib.Path(args.output))
