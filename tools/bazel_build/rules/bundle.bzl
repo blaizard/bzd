@@ -6,6 +6,7 @@ def _bzd_bundle_impl(ctx):
         fail("The binary target '{}' must have a FilesToRunProvider".format(binary))
     manifest = binary.files_to_run.runfiles_manifest
     executable = binary.files_to_run.executable
+    workspace = binary.label.workspace_name or "_main"
 
     if binary.default_runfiles == None:
         fail("The binary target '{}' must have a default_runfiles".format(binary))
@@ -15,7 +16,7 @@ def _bzd_bundle_impl(ctx):
     ctx.actions.run(
         inputs = [manifest] + inputs.to_list(),
         outputs = [output],
-        arguments = ["-o", output.path, manifest.path, "_main/" + executable.short_path],
+        arguments = ["--output", output.path, "--cwd", workspace, manifest.path, executable.short_path],
         executable = ctx.executable._bundle,
     )
 
