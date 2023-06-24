@@ -106,12 +106,10 @@ export default {
 		};
 	},
 	tasks: {
-		"default": {
-			task: async (cache) => {
-
-			},
+		default: {
+			task: async (cache) => {},
 			period: 60 * 1000 * 30,
-		}
+		},
 	},
 	events: {
 		async play(data, cache) {

@@ -4,6 +4,7 @@ import socketserver
 from http import HTTPStatus
 import os
 
+
 class Handler(http.server.SimpleHTTPRequestHandler):
 
 	def do_GET(self):
@@ -19,6 +20,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 		else:
 			self.send_response(HTTPStatus.NOT_FOUND)
 			self.end_headers()
+
 
 if __name__ == "__main__":
 
