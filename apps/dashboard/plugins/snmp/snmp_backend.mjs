@@ -119,7 +119,7 @@ export default {
 					oid = Snmp.normalizeOid(oid);
 					obj[oid] = Math.min(obj[oid] || Number.MAX_VALUE, ttl);
 				};
-		
+
 				const oidTtlMap = snmpArray.reduce((obj, item) => {
 					const ttl = item.ttl || 2000;
 					updateObj(obj, item.oid, ttl);
@@ -130,7 +130,7 @@ export default {
 						});
 					return obj;
 				}, {});
-		
+
 				// Sort the Oids by ttl
 				return Object.keys(oidTtlMap).reduce((obj, oid) => {
 					const ttl = oidTtlMap[oid];
@@ -140,7 +140,7 @@ export default {
 				}, {});
 			},
 			timeout: 60 * 60 * 1000, // 1h
-		}
+		},
 	},
 	fetch: async (data, cache) => {
 		const oidsByTtl = await cache.get("snmp.oidsByTtl", data["snmp.array"] || []);

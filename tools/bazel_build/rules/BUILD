@@ -39,8 +39,8 @@ bzl_library(
     deps = [
         ":package",
         "@bazel_skylib//rules:common_settings",
-        "@io_bazel_rules_docker//container",
         "@bzd_utils//:sh_binary_wrapper",
+        "@io_bazel_rules_docker//container",
     ],
 )
 

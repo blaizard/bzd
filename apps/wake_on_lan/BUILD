@@ -1,4 +1,5 @@
 load("@rules_python//python:defs.bzl", "py_binary")
+load("//tools/bazel_build/rules:bundle.bzl", "bzd_bundle")
 
 py_binary(
     name = "client",
@@ -12,4 +13,10 @@ py_binary(
     srcs = [
         "server.py",
     ],
+)
+
+bzd_bundle(
+    name = "server_bundle",
+    binary = ":server",
+    tags = ["manual"],
 )
