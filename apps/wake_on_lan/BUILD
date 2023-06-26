@@ -1,5 +1,5 @@
 load("@rules_python//python:defs.bzl", "py_binary")
-load("//tools/bazel_build/rules:bundle.bzl", "bzd_bundle")
+load("@bzd_bundle//:defs.bzl", "bzd_bundle")
 
 py_binary(
     name = "client",
