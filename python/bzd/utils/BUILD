@@ -1,5 +1,5 @@
 load("@rules_python//python:defs.bzl", "py_library")
-load("@python_deps//:requirements.bzl", "requirement")
+load("@pip//:requirements.bzl", "requirement")
 
 py_library(
     name = "run",

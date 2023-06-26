@@ -5,19 +5,25 @@ bazel_dep(name = "bzd_utils", version = "1.0")
 bazel_dep(name = "bzd_rules_doc", version = "1.0")
 bazel_dep(name = "bazel_skylib", version = "1.4.2")
 bazel_dep(name = "stardoc", version = "0.5.6")
-bazel_dep(name = "bzd_toolchain_python", version = "1.0")
+bazel_dep(name = "bzd_bundle", version = "1.0")
+bazel_dep(name = "rules_python", version = "0.23.1")
 
 # Override some of the modules that are local.
 [local_path_override(
     module_name = name,
     path = "tools/bazel_build/modules/" + name
-) for name in ("bzd_utils", "bzd_rules_doc", "bzd_toolchain_python",)]
+) for name in ("bzd_utils", "bzd_rules_doc", "bzd_toolchain_python", "bzd_bundle", )]
 
 # Python
 
-toolchain_python = use_extension("@bzd_toolchain_python//:extensions.bzl", "toolchain_python")
-toolchain_python.toolchain(
-    name = "python"
+python = use_extension("@rules_python//python/extensions:python.bzl", "python")
+python.toolchain(
+    python_version = "3.8",
 )
-use_repo(toolchain_python, "python")
-register_toolchains("@python//:all")
+
+pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
+pip.parse(
+    name = "pip",
+    requirements_lock = "//tools/python:requirements.txt",
+)
+use_repo(pip, "pip")

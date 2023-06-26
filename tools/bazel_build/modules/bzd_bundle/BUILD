@@ -1,9 +1,9 @@
 load("@rules_python//python:defs.bzl", "py_binary")
 
 py_binary(
-    name = "bundle",
+    name = "bundler",
     srcs = [
-        "bundle.py",
+        "bundler.py",
     ],
     visibility = ["//visibility:public"],
 )

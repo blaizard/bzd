@@ -105,12 +105,6 @@ export default {
 			state: device.track.state,
 		};
 	},
-	tasks: {
-		default: {
-			task: async (cache) => {},
-			period: 60 * 1000 * 30,
-		},
-	},
 	events: {
 		async play(data, cache) {
 			let device = await cache.get("sonos.device");

@@ -62,10 +62,7 @@ if __name__ == "__main__":
 	                    "--output",
 	                    default="/tmp/output.sh",
 	                    help="The output path for the self extracting bundle.")
-	parser.add_argument("-c",
-	                    "--cwd",
-	                    default=".",
-	                    help="The relative directory where the execution takes place.")
+	parser.add_argument("-c", "--cwd", default=".", help="The relative directory where the execution takes place.")
 	parser.add_argument("manifest", help="The path of the manifest to be used.")
 	parser.add_argument("executable", help="The path of the executable within the archive.")
 

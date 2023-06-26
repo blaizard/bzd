@@ -7,7 +7,7 @@ import os
 
 class Handler(http.server.SimpleHTTPRequestHandler):
 
-	def do_GET(self):
+	def do_GET(self) -> None:
 		if self.path == '/suspend':
 
 			# Reply.

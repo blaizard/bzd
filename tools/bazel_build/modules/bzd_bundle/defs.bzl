@@ -16,8 +16,9 @@ def _bzd_bundle_impl(ctx):
     ctx.actions.run(
         inputs = [manifest] + inputs.to_list(),
         outputs = [output],
+        progress_message = "Bundling {}...".format(str(binary.label)),
         arguments = ["--output", output.path, "--cwd", workspace, manifest.path, executable.short_path],
-        executable = ctx.executable._bundle,
+        executable = ctx.executable._bundler,
     )
 
     return [
@@ -35,8 +36,8 @@ bzd_bundle = rule(
             executable = True,
             doc = "The binnary target to bundle.",
         ),
-        "_bundle": attr.label(
-            default = Label("//tools/bazel_build/rules/assets/bundle"),
+        "_bundler": attr.label(
+            default = Label("@bzd_bundle//:bundler"),
             cfg = "exec",
             executable = True,
         ),
