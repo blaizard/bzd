@@ -90,7 +90,7 @@ public:
 		}
 	}
 
-private:
+protected:
 	bzd::RingBuffer<T, capacity> buffer_{};
 };
 
