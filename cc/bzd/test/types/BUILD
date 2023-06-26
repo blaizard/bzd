@@ -9,6 +9,7 @@ bzd_cc_library(
     deps = [
         ":copy_only",
         ":ichannel",
+        ":ichannel_generator",
         ":istream_reader",
         ":lifetime_counter",
         ":move_only",
@@ -27,6 +28,16 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/platform:types",
+    ],
+)
+
+cc_library(
+    name = "ichannel_generator",
+    hdrs = [
+        "ichannel_generator.hh",
+    ],
+    deps = [
+        ":ichannel",
     ],
 )
 

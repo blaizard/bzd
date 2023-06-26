@@ -2,6 +2,7 @@
 
 #include "cc/bzd/test/test.hh"
 #include "cc/bzd/test/types/ichannel.hh"
+#include "cc/bzd/test/types/ichannel_generator.hh"
 
 using TestIChannel = bzd::test::IChannel<char, 32u>;
 using TestIChannelZeroCopy = bzd::test::IChannel<char, 32u, bzd::test::IChannelMode::zeroCopy>;
@@ -142,6 +143,41 @@ TEST_ASYNC(IChannelBuffered, Read, (TestIChannel, TestIChannelZeroCopy, TestICha
 		++it;
 		EXPECT_EQ(*it, '!');
 		++it;
+	}
+
+	co_return {};
+}
+
+using TestIChannelGenerator = bzd::test::IChannelGenerator<bzd::Int32, 32u>;
+using TestIChannelGeneratorZeroCopy = bzd::test::IChannelGenerator<bzd::Int32, 32u, bzd::test::IChannelMode::zeroCopy>;
+using TestIChannelGeneratorChunks = bzd::test::IChannelGenerator<bzd::Int32, 32u, bzd::test::IChannelMode::chunks>;
+using TestIChannelGeneratorZeroCopyChunks =
+	bzd::test::IChannelGenerator<bzd::Int32, 32u, bzd::test::IChannelMode::zeroCopy | bzd::test::IChannelMode::chunks>;
+
+TEST_ASYNC(IChannelBuffered,
+		   Stress,
+		   (TestIChannelGenerator, TestIChannelGeneratorZeroCopy, TestIChannelGeneratorChunks, TestIChannelGeneratorZeroCopyChunks))
+{
+	TestType in{0};
+	bzd::IChannelBuffered<bzd::Int32, 16u> channel{in};
+
+	bzd::Int32 expected{0};
+	for (bzd::Size iteration = 0u; iteration < 1000u; ++iteration)
+	{
+		// Produce some data.
+		const auto nbRead = test.random<bzd::Size, 1u, 16u>();
+		auto maybeScope = co_await channel.read(nbRead);
+		EXPECT_TRUE(maybeScope);
+
+		// Read some of it.
+		const auto nbMaxConsume = test.random<bzd::Size, 0u, 16u>();
+		auto it = maybeScope->begin();
+		for (bzd::Size i = 0u; i < nbMaxConsume && it != maybeScope->end(); ++i)
+		{
+			EXPECT_EQ(*it, expected);
+			++it;
+			++expected;
+		}
 	}
 
 	co_return {};
