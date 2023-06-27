@@ -145,95 +145,120 @@
 	}
 
 #define BZDTEST_FAIL_FATAL_(...) return ::bzd::test::Manager::getInstance().fail(__FILE__, __LINE__, __VA_ARGS__)
+#define BZDTEST_FAIL_FATAL_ASYNC_(...)                                                                                                     \
+	{                                                                                                                                      \
+		::bzd::test::Manager::getInstance().fail(__FILE__, __LINE__, __VA_ARGS__);                                                         \
+		co_return {};                                                                                                                      \
+	}
 #define BZDTEST_FAIL_NONFATAL_(...) ::bzd::test::Manager::getInstance().fail(__FILE__, __LINE__, __VA_ARGS__)
 
 #define BZDTEST_TEST_TRUE_BOOLEAN_(actual, failFct)                                                                                        \
-	[](const bool condition) {                                                                                                             \
+	{                                                                                                                                      \
+		const bool condition{actual};                                                                                                      \
 		if (!condition)                                                                                                                    \
 		{                                                                                                                                  \
 			failFct("Failure\nTest [bool]: " #actual " == true", condition, true);                                                         \
 		}                                                                                                                                  \
-	}(static_cast<bool>(actual));
+	}
 
 #define BZDTEST_TEST_FALSE_BOOLEAN_(actual, failFct)                                                                                       \
-	[](const bool condition) {                                                                                                             \
+	{                                                                                                                                      \
+		const bool condition{actual};                                                                                                      \
 		if (condition)                                                                                                                     \
 		{                                                                                                                                  \
 			failFct("Failure\nTest [bool]: " #actual " == false", condition, false);                                                       \
 		}                                                                                                                                  \
-	}(static_cast<bool>(actual));
+	}
 
 #define BZDTEST_TEST_ASYNC_BOOLEAN_(result, failFct)                                                                                       \
-	[](const auto& r) {                                                                                                                    \
+	{                                                                                                                                      \
+		const auto& result{r};                                                                                                             \
 		if (!static_cast<bool>(r))                                                                                                         \
 		{                                                                                                                                  \
 			failFct("Failure\nTest [async]: " #result, r.error().getMessage().data());                                                     \
 		}                                                                                                                                  \
-	}(result);
+	}
 
 #define BZDTEST_TEST_EQ_(expression1, expression2, failFct)                                                                                \
-	[](const auto& a, const auto& b) {                                                                                                     \
+	{                                                                                                                                      \
+		const auto& a{expression1};                                                                                                        \
+		const auto& b{expression2};                                                                                                        \
 		if (!(a == b))                                                                                                                     \
 		{                                                                                                                                  \
 			failFct("Failure\nTest: " #expression1 " == " #expression2, a, b);                                                             \
 		}                                                                                                                                  \
-	}((expression1), (expression2));
+	}
 
 #define BZDTEST_TEST_NE_(expression1, expression2, failFct)                                                                                \
-	[](const auto& a, const auto& b) {                                                                                                     \
+	{                                                                                                                                      \
+		const auto& a{expression1};                                                                                                        \
+		const auto& b{expression2};                                                                                                        \
 		if (!(a != b))                                                                                                                     \
 		{                                                                                                                                  \
 			failFct("Failure\nTest: " #expression1 " != " #expression2, a, b);                                                             \
 		}                                                                                                                                  \
-	}((expression1), (expression2));
+	}
 
 #define BZDTEST_TEST_LT_(expression1, expression2, failFct)                                                                                \
-	[](const auto& a, const auto& b) {                                                                                                     \
+	{                                                                                                                                      \
+		const auto& a{expression1};                                                                                                        \
+		const auto& b{expression2};                                                                                                        \
 		if (!(a < b))                                                                                                                      \
 		{                                                                                                                                  \
 			failFct("Failure\nTest: " #expression1 " < " #expression2, a, b);                                                              \
 		}                                                                                                                                  \
-	}((expression1), (expression2));
+	}
 
 #define BZDTEST_TEST_LE_(expression1, expression2, failFct)                                                                                \
-	[](const auto& a, const auto& b) {                                                                                                     \
+	{                                                                                                                                      \
+		const auto& a{expression1};                                                                                                        \
+		const auto& b{expression2};                                                                                                        \
 		if (!(a <= b))                                                                                                                     \
 		{                                                                                                                                  \
 			failFct("Failure\nTest: " #expression1 " <= " #expression2, a, b);                                                             \
 		}                                                                                                                                  \
-	}((expression1), (expression2));
+	}
 
 #define BZDTEST_TEST_GT_(expression1, expression2, failFct)                                                                                \
-	[](const auto& a, const auto& b) {                                                                                                     \
+	{                                                                                                                                      \
+		const auto& a{expression1};                                                                                                        \
+		const auto& b{expression2};                                                                                                        \
 		if (!(a > b))                                                                                                                      \
 		{                                                                                                                                  \
 			failFct("Failure\nTest: " #expression1 " > " #expression2, a, b);                                                              \
 		}                                                                                                                                  \
-	}((expression1), (expression2));
+	}
 
 #define BZDTEST_TEST_GE_(expression1, expression2, failFct)                                                                                \
-	[](const auto& a, const auto& b) {                                                                                                     \
+	{                                                                                                                                      \
+		const auto& a{expression1};                                                                                                        \
+		const auto& b{expression2};                                                                                                        \
 		if (!(a >= b))                                                                                                                     \
 		{                                                                                                                                  \
 			failFct("Failure\nTest: " #expression1 " >= " #expression2, a, b);                                                             \
 		}                                                                                                                                  \
-	}((expression1), (expression2));
+	}
 
 #define BZDTEST_TEST_NEAR_(number1, number2, absError, failFct)                                                                            \
-	[](const auto& a, const auto& b, const auto& err) {                                                                                    \
+	{                                                                                                                                      \
+		const auto& a{number1};                                                                                                            \
+		const auto& b{number2};                                                                                                            \
+		const auto& err{absError};                                                                                                         \
 		if (!bzd::test::impl::near(a, b, err))                                                                                             \
 		{                                                                                                                                  \
 			failFct("Failure\nTest: " #number1 " ~== " #number2 " (+/- " #absError ")", a, b);                                             \
 		}                                                                                                                                  \
-	}((number1), (number2), (absError));
+	}
 
 #define BZDTEST_TEST_STREQ_(str1, str2, failFct)                                                                                           \
-	[](const auto& a, const auto& b) {                                                                                                     \
+	{                                                                                                                                      \
+		const auto& a{str1};                                                                                                               \
+		const auto& b{str2};                                                                                                               \
 		if (bzd::test::impl::strcmp(a, b) != 0)                                                                                            \
 		{                                                                                                                                  \
 			failFct("Failure\nTest [string]: " #str1 " == " #str2, a, b);                                                                  \
 		}                                                                                                                                  \
-	}((str1), (str2));
+	}
 
 #define BZDTEST_TEST_ANY_THROW_(expression, failFct)                                                                                       \
 	{                                                                                                                                      \
@@ -253,7 +278,9 @@
 	}
 
 #define BZDTEST_TEST_EQ_VALUES_(container1, container2, failFct)                                                                           \
-	[](const auto& a, const auto& b) {                                                                                                     \
+	{                                                                                                                                      \
+		const auto& a{container1};                                                                                                         \
+		const auto& b{container2};                                                                                                         \
 		if (!(a.size() == b.size()))                                                                                                       \
 		{                                                                                                                                  \
 			failFct("Failure\nTest: " #container1 ".size() == " #container2 ".size()", a.size(), b.size());                                \
@@ -270,7 +297,7 @@
 				++it;                                                                                                                      \
 			}                                                                                                                              \
 		}                                                                                                                                  \
-	}((container1), (container2));
+	}
 
 namespace bzd::test::impl {
 constexpr int strcmp(const char* it1, const char* it2) noexcept
