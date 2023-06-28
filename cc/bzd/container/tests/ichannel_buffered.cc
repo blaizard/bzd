@@ -162,7 +162,7 @@ TEST_ASYNC(IChannelBuffered,
 	bzd::IChannelBuffered<bzd::Int32, 16u> channel{in};
 
 	bzd::Int32 expected{0};
-	for (bzd::Size iteration = 0u; iteration < 1000u; ++iteration)
+	for (bzd::Size iteration = 0u; iteration < 1000u || expected < 1000; ++iteration)
 	{
 		// Produce some data.
 		const auto nbRead = test.random<bzd::Size, 1u, 16u>();

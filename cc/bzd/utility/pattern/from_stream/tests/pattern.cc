@@ -59,7 +59,7 @@ TEST_ASYNC(PatternFromStream, StringArgument, AllTestIChannel)
 		EXPECT_STREQ(rest.data(), "abcd");
 	}
 
-	// String too small
+	// String too short.
 	in << "Hello Mister";
 	{
 		bzd::String<2u> string;

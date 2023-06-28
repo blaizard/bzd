@@ -160,7 +160,7 @@ public:
 		bzd::Span<const T> dataRead{};
 
 		// Read data.
-		if (buffer_.size() < count)
+		if (buffer.size() < count)
 		{
 			while (true)
 			{
@@ -172,7 +172,6 @@ public:
 					co_return bzd::error::Failure{"RingBuffer<{}> vs {}"_csv, bufferCapacity, count};
 				}
 
-				buffer = buffer_.asSpans();
 				dataRead = co_await !in_.read(bzd::move(writeToBuffer));
 				buffer_.produce(dataRead.size());
 
@@ -192,6 +191,9 @@ public:
 				{
 					bzd::algorithm::copy(dataRead, writeToBuffer);
 				}
+
+				// Update the buffer
+				buffer = buffer_.asSpans();
 			}
 		}
 
@@ -313,5 +315,8 @@ private: // Variables.
 	bzd::IChannel<T>& in_;
 	bzd::RingBuffer<T, bufferCapacity> buffer_;
 };
+
+template <Size bufferCapacity>
+using IStreamBuffered = IChannelBuffered<bzd::Byte, bufferCapacity>;
 
 } // namespace bzd

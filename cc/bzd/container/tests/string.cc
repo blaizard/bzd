@@ -131,8 +131,11 @@ TEST(ContainerString, OperatorsPlusEqual)
 
 TEST_CONSTEXPR_BEGIN(ContainerString, Constexpr)
 {
-	bzd::String<6> string("Hello");
+	bzd::String<16> string("Hello");
 	EXPECT_STREQ(string.data(), "Hello");
+
+	bzd::String<5> stringShort("Hello");
+	EXPECT_STREQ(stringShort.data(), "Hello");
 }
 TEST_CONSTEXPR_END(ContainerString, Constexpr)
 
@@ -155,7 +158,7 @@ TEST(ContainerString, Copy)
 	EXPECT_STREQ(copy2.data(), "Hello");
 }
 
-TEST(ContainerVector, AppenderScope)
+TEST(ContainerString, AppenderScope)
 {
 	bzd::String<5> string;
 
@@ -174,7 +177,7 @@ TEST(ContainerVector, AppenderScope)
 	EXPECT_STREQ(string.data(), "uvw");
 }
 
-TEST(ContainerVector, AssignerScope)
+TEST(ContainerString, AssignerScope)
 {
 	bzd::String<5> string;
 
@@ -190,4 +193,21 @@ TEST(ContainerVector, AssignerScope)
 
 	bzd::algorithm::copy(""_sv, string.assigner());
 	EXPECT_STREQ(string.data(), "");
+}
+
+TEST(ContainerString, ShortString)
+{
+	const auto string = "Hello"_s;
+	EXPECT_STREQ(string.data(), "Hello");
+
+	switch (string)
+	{
+	case "Hello"_s:
+		break;
+	case "Helln"_s:
+		EXPECT_FALSE(true);
+		break;
+	default:
+		EXPECT_FALSE(true);
+	}
 }

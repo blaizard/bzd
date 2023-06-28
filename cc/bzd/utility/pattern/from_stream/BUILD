@@ -15,6 +15,20 @@ cc_library(
 )
 
 cc_library(
+    name = "integral",
+    hdrs = [
+        "integral.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":base",
+        "//cc/bzd/type_traits:is_integral",
+        "//cc/bzd/type_traits:range",
+        "//cc/bzd/utility/pattern/from_string:integral",
+    ],
+)
+
+cc_library(
     name = "output_range",
     hdrs = [
         "output_range.hh",
