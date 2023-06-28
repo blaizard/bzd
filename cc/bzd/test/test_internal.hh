@@ -154,109 +154,109 @@
 
 #define BZDTEST_TEST_TRUE_BOOLEAN_(actual, failFct)                                                                                        \
 	{                                                                                                                                      \
-		const bool condition{actual};                                                                                                      \
-		if (!condition)                                                                                                                    \
+		const bool bzdTestCondition_{actual};                                                                                              \
+		if (!bzdTestCondition_)                                                                                                            \
 		{                                                                                                                                  \
-			failFct("Failure\nTest [bool]: " #actual " == true", condition, true);                                                         \
+			failFct("Failure\nTest [bool]: " #actual " == true", bzdTestCondition_, true);                                                 \
 		}                                                                                                                                  \
 	}
 
 #define BZDTEST_TEST_FALSE_BOOLEAN_(actual, failFct)                                                                                       \
 	{                                                                                                                                      \
-		const bool condition{actual};                                                                                                      \
-		if (condition)                                                                                                                     \
+		const bool bzdTestCondition_{actual};                                                                                              \
+		if (bzdTestCondition_)                                                                                                             \
 		{                                                                                                                                  \
-			failFct("Failure\nTest [bool]: " #actual " == false", condition, false);                                                       \
+			failFct("Failure\nTest [bool]: " #actual " == false", bzdTestCondition_, false);                                               \
 		}                                                                                                                                  \
 	}
 
 #define BZDTEST_TEST_ASYNC_BOOLEAN_(result, failFct)                                                                                       \
 	{                                                                                                                                      \
-		const auto& result{r};                                                                                                             \
-		if (!static_cast<bool>(r))                                                                                                         \
+		const auto& bzdTestResult_{result};                                                                                                \
+		if (!static_cast<bool>(bzdTestResult_))                                                                                            \
 		{                                                                                                                                  \
-			failFct("Failure\nTest [async]: " #result, r.error().getMessage().data());                                                     \
+			failFct("Failure\nTest [async]: " #result, bzdTestResult_.error().getMessage().data());                                        \
 		}                                                                                                                                  \
 	}
 
 #define BZDTEST_TEST_EQ_(expression1, expression2, failFct)                                                                                \
 	{                                                                                                                                      \
-		const auto& a{expression1};                                                                                                        \
-		const auto& b{expression2};                                                                                                        \
-		if (!(a == b))                                                                                                                     \
+		const auto& bzdTestA_{expression1};                                                                                                \
+		const auto& bzdTestB_{expression2};                                                                                                \
+		if (!(bzdTestA_ == bzdTestB_))                                                                                                     \
 		{                                                                                                                                  \
-			failFct("Failure\nTest: " #expression1 " == " #expression2, a, b);                                                             \
+			failFct("Failure\nTest: " #expression1 " == " #expression2, bzdTestA_, bzdTestB_);                                             \
 		}                                                                                                                                  \
 	}
 
 #define BZDTEST_TEST_NE_(expression1, expression2, failFct)                                                                                \
 	{                                                                                                                                      \
-		const auto& a{expression1};                                                                                                        \
-		const auto& b{expression2};                                                                                                        \
-		if (!(a != b))                                                                                                                     \
+		const auto& bzdTestA_{expression1};                                                                                                \
+		const auto& bzdTestB_{expression2};                                                                                                \
+		if (!(bzdTestA_ != bzdTestB_))                                                                                                     \
 		{                                                                                                                                  \
-			failFct("Failure\nTest: " #expression1 " != " #expression2, a, b);                                                             \
+			failFct("Failure\nTest: " #expression1 " != " #expression2, bzdTestA_, bzdTestB_);                                             \
 		}                                                                                                                                  \
 	}
 
 #define BZDTEST_TEST_LT_(expression1, expression2, failFct)                                                                                \
 	{                                                                                                                                      \
-		const auto& a{expression1};                                                                                                        \
-		const auto& b{expression2};                                                                                                        \
-		if (!(a < b))                                                                                                                      \
+		const auto& bzdTestA_{expression1};                                                                                                \
+		const auto& bzdTestB_{expression2};                                                                                                \
+		if (!(bzdTestA_ < bzdTestB_))                                                                                                      \
 		{                                                                                                                                  \
-			failFct("Failure\nTest: " #expression1 " < " #expression2, a, b);                                                              \
+			failFct("Failure\nTest: " #expression1 " < " #expression2, bzdTestA_, bzdTestB_);                                              \
 		}                                                                                                                                  \
 	}
 
 #define BZDTEST_TEST_LE_(expression1, expression2, failFct)                                                                                \
 	{                                                                                                                                      \
-		const auto& a{expression1};                                                                                                        \
-		const auto& b{expression2};                                                                                                        \
-		if (!(a <= b))                                                                                                                     \
+		const auto& bzdTestA_{expression1};                                                                                                \
+		const auto& bzdTestB_{expression2};                                                                                                \
+		if (!(bzdTestA_ <= bzdTestB_))                                                                                                     \
 		{                                                                                                                                  \
-			failFct("Failure\nTest: " #expression1 " <= " #expression2, a, b);                                                             \
+			failFct("Failure\nTest: " #expression1 " <= " #expression2, bzdTestA_, bzdTestB_);                                             \
 		}                                                                                                                                  \
 	}
 
 #define BZDTEST_TEST_GT_(expression1, expression2, failFct)                                                                                \
 	{                                                                                                                                      \
-		const auto& a{expression1};                                                                                                        \
-		const auto& b{expression2};                                                                                                        \
-		if (!(a > b))                                                                                                                      \
+		const auto& bzdTestA_{expression1};                                                                                                \
+		const auto& bzdTestB_{expression2};                                                                                                \
+		if (!(bzdTestA_ > bzdTestB_))                                                                                                      \
 		{                                                                                                                                  \
-			failFct("Failure\nTest: " #expression1 " > " #expression2, a, b);                                                              \
+			failFct("Failure\nTest: " #expression1 " > " #expression2, bzdTestA_, bzdTestB_);                                              \
 		}                                                                                                                                  \
 	}
 
 #define BZDTEST_TEST_GE_(expression1, expression2, failFct)                                                                                \
 	{                                                                                                                                      \
-		const auto& a{expression1};                                                                                                        \
-		const auto& b{expression2};                                                                                                        \
-		if (!(a >= b))                                                                                                                     \
+		const auto& bzdTestA_{expression1};                                                                                                \
+		const auto& bzdTestB_{expression2};                                                                                                \
+		if (!(bzdTestA_ >= bzdTestB_))                                                                                                     \
 		{                                                                                                                                  \
-			failFct("Failure\nTest: " #expression1 " >= " #expression2, a, b);                                                             \
+			failFct("Failure\nTest: " #expression1 " >= " #expression2, bzdTestA_, bzdTestB_);                                             \
 		}                                                                                                                                  \
 	}
 
 #define BZDTEST_TEST_NEAR_(number1, number2, absError, failFct)                                                                            \
 	{                                                                                                                                      \
-		const auto& a{number1};                                                                                                            \
-		const auto& b{number2};                                                                                                            \
-		const auto& err{absError};                                                                                                         \
-		if (!bzd::test::impl::near(a, b, err))                                                                                             \
+		const auto& bzdTestA_{number1};                                                                                                    \
+		const auto& bzdTestB_{number2};                                                                                                    \
+		const auto& bzdTestErr_{absError};                                                                                                 \
+		if (!bzd::test::impl::near(bzdTestA_, bzdTestB_, bzdTestErr_))                                                                     \
 		{                                                                                                                                  \
-			failFct("Failure\nTest: " #number1 " ~== " #number2 " (+/- " #absError ")", a, b);                                             \
+			failFct("Failure\nTest: " #number1 " ~== " #number2 " (+/- " #absError ")", bzdTestA_, bzdTestB_);                             \
 		}                                                                                                                                  \
 	}
 
 #define BZDTEST_TEST_STREQ_(str1, str2, failFct)                                                                                           \
 	{                                                                                                                                      \
-		const auto& a{str1};                                                                                                               \
-		const auto& b{str2};                                                                                                               \
-		if (bzd::test::impl::strcmp(a, b) != 0)                                                                                            \
+		const auto& bzdTestA_{str1};                                                                                                       \
+		const auto& bzdTestB_{str2};                                                                                                       \
+		if (bzd::test::impl::strcmp(bzdTestA_, bzdTestB_) != 0)                                                                            \
 		{                                                                                                                                  \
-			failFct("Failure\nTest [string]: " #str1 " == " #str2, a, b);                                                                  \
+			failFct("Failure\nTest [string]: " #str1 " == " #str2, bzdTestA_, bzdTestB_);                                                  \
 		}                                                                                                                                  \
 	}
 
@@ -279,16 +279,16 @@
 
 #define BZDTEST_TEST_EQ_VALUES_(container1, container2, failFct)                                                                           \
 	{                                                                                                                                      \
-		const auto& a{container1};                                                                                                         \
-		const auto& b{container2};                                                                                                         \
-		if (!(a.size() == b.size()))                                                                                                       \
+		const auto& bzdTestA_{container1};                                                                                                 \
+		const auto& bzdTestB_{container2};                                                                                                 \
+		if (!(bzdTestA_.size() == bzdTestB_.size()))                                                                                       \
 		{                                                                                                                                  \
-			failFct("Failure\nTest: " #container1 ".size() == " #container2 ".size()", a.size(), b.size());                                \
+			failFct("Failure\nTest: " #container1 ".size() == " #container2 ".size()", bzdTestA_.size(), bzdTestB_.size());                \
 		}                                                                                                                                  \
 		else                                                                                                                               \
 		{                                                                                                                                  \
-			auto it = b.begin();                                                                                                           \
-			for (const auto& value : a)                                                                                                    \
+			auto it = bzdTestB_.begin();                                                                                                   \
+			for (const auto& value : bzdTestA_)                                                                                            \
 			{                                                                                                                              \
 				if (!(value == *it))                                                                                                       \
 				{                                                                                                                          \

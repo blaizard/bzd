@@ -42,6 +42,7 @@ bzd_cc_library(
     name = "from_stream",
     visibility = ["//visibility:public"],
     deps = [
+        "//cc/bzd/utility/pattern/from_stream:integral",
         "//cc/bzd/utility/pattern/from_stream:output_range",
         "//cc/bzd/utility/pattern/from_stream:pattern",
     ],

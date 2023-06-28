@@ -8,11 +8,11 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc:bzd",
+        "//cc/bzd/container:ichannel_buffered",
         "//cc/bzd/container:ostream_buffered",
-        "//cc/bzd/utility/pattern:from_string",
+        "//cc/bzd/utility/pattern:from_stream",
         "//cc/bzd/utility/pattern:to_stream",
         "//cc/bzd/utility/synchronization:lock_guard",
         "//cc/bzd/utility/synchronization:mutex",
-        "//cc/libs/reader:stream_reader",
     ],
 )

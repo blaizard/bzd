@@ -50,7 +50,7 @@ protected:
 			while (it != end)
 			{
 				auto result = matcher.match([](bzd::Monostate) -> regexp::Result { return bzd::error::make(regexp::Error::malformed); },
-											[&it](auto& matcher) { return matcher(*it); });
+											[&it](auto& matcher) { return matcher(static_cast<const char>(*it)); });
 				if (result)
 				{
 					++it;
@@ -227,7 +227,7 @@ protected:
 			auto it = capture_->begin();
 			if (it != capture_->end())
 			{
-				*it = Iterator::operator*();
+				*it = static_cast<bzd::typeTraits::RangeValue<Capture>>(Iterator::operator*());
 				++it;
 			}
 			else

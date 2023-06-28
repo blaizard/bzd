@@ -1,12 +1,12 @@
 #pragma once
 
+#include "cc/bzd/container/ichannel_buffered.hh"
 #include "cc/bzd/container/map.hh"
 #include "cc/bzd/container/ostream_buffered.hh"
-#include "cc/bzd/utility/pattern/from_string.hh"
+#include "cc/bzd/utility/pattern/from_stream.hh"
 #include "cc/bzd/utility/pattern/to_stream.hh"
 #include "cc/bzd/utility/synchronization/lock_guard.hh"
 #include "cc/bzd/utility/synchronization/mutex.hh"
-#include "cc/libs/reader/stream_reader.hh"
 
 #include <iostream>
 
@@ -49,7 +49,6 @@ public:
 			[[fallthrough]];
 		case Status::Version::version1dot1:
 			break;
-		case Status::Version::version2:
 		case Status::Version::unknown:
 			co_return bzd::error::Failure("Version not supported.");
 		}
@@ -67,33 +66,54 @@ private:
 		{
 			version1dot0,
 			version1dot1,
-			version2,
 			unknown
 		};
-		Version version;
-		UInt16 code;
+		Version version{Version::unknown};
+		UInt16 code{};
 	};
 
 	/// Read the first line that should look like this.
 	/// HTTP/1.1 200 OK
 	bzd::Async<Status> readStatus() noexcept
 	{
-		const auto string = co_await !bzd::make<bzd::String<100>>(reader_.readUntil("\r\n"_sv.asBytes(), /*include*/ true));
 		bzd::String<3u> version;
+		bzd::String<4u> code;
+		co_await !bzd::fromStream(reader_, "HTTP/{:[0-9.]+}\\s+{:[0-9]+}\\s+"_csv, version.assigner(), code.assigner());
+
 		Status status{};
-		if (!bzd::fromString(string, "HTTP/{:[0-9]\\.?[0-9]?}\\s*{}"_csv, version.assigner(), status.code))
+		switch (version)
 		{
-			co_return bzd::error::Data("Malformed header: {}."_csv, string);
+		case "1.0"_s:
+			status.version = Status::Version::version1dot0;
+			break;
+		case "1.1"_s:
+			status.version = Status::Version::version1dot1;
+			break;
 		}
 
-		::std::cout << version.data() << ::std::endl;
-		::std::cout << status.code << ::std::endl;
+		/*
+				const auto string = co_await !bzd::make<bzd::String<100>>(reader_.readUntil("\r\n"_sv.asBytes(), true));
+				bzd::String<3u> version;
+				if (!bzd::fromString(string, "HTTP/{:[0-9.]+}\\s*{}"_csv, version.assigner(), status.code))
+				{
+					co_return bzd::error::Data("Malformed header: {}."_csv, string);
+				}
 
-		auto it = bzd::algorithm::search(string, "HTTP/"_sv);
-		if (it == string.end())
-		{
-			co_return bzd::error::Data("Missing HTTP/*.");
-		}
+				::std::cout << version.data() << ::std::endl;
+				::std::cout << status.code << ::std::endl;
+
+				auto it = bzd::algorithm::search(string, "HTTP/"_sv);
+				if (it == string.end())
+				{
+					co_return bzd::error::Data("Missing HTTP/.");
+				}
+
+				switch (version)
+				{
+				case "1.0"_s:
+
+				}
+			*/
 		/*if (!bzd::fromString("HTTP{}\s+{}\s+{:[A-Z]+}", version, code, statusString))
 		{
 			co_return bzd::error::Data("Malformed status header.");
@@ -110,13 +130,13 @@ private:
 		{
 			co_return Status{versionMatch->second, 100u};
 		}*/
-		co_return Status{Status::Version::unknown, 100u};
+		co_return status;
 	}
 
 private:
 	Client& client_;
 	Size connectCounter_;
-	StreamReader<bufferCapacity> reader_;
+	bzd::IStreamBuffered<bufferCapacity> reader_;
 };
 
 template <meta::StringLiteral method, class Client, Size capacityHeaders = 1u>

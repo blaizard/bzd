@@ -388,11 +388,13 @@ cc_library(
         "//cc/bzd/algorithm:copy",
         "//cc/bzd/algorithm:fill_n",
         "//cc/bzd/container/impl:span_resizeable",
+        "//cc/bzd/meta:string_literal",
         "//cc/bzd/platform:types",
         "//cc/bzd/type_traits:add_const",
         "//cc/bzd/type_traits:is_trivially_copyable",
         "//cc/bzd/type_traits:range",
         "//cc/bzd/utility:min",
+        "//cc/bzd/utility/bit",
     ],
 )
 

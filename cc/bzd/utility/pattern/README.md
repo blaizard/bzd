@@ -49,7 +49,7 @@ struct MySpecialization<T>
     /// The type of metadata to be used, this tell the pattern framework that this specialization is using custom metadata.
     struct Metadata {};
 
-    /// If Metadata is provided, this function must exists, it is used to convert at compile time the optiosn into metadata.
+    /// If Metadata is provided, this function must exists, it is used to convert at compile time the options into metadata.
     template <class Adapter>
     static constexpr Metadata parse(const bzd::StringView options) noexcept { ... }
 
