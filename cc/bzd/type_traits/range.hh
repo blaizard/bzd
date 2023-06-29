@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cc/bzd/type_traits/async.hh"
 #include "cc/bzd/type_traits/declval.hh"
 #include "cc/bzd/type_traits/is_lvalue_reference.hh"
 #include "cc/bzd/type_traits/is_trivially_copyable.hh"
@@ -96,5 +97,18 @@ concept outputByteCopyableRange = byteCopyableRange<T> && outputRange<T>;
 
 template <class T>
 concept borrowedRange = range<T> && (typeTraits::isLValueReference<T> || typeTraits::enableBorrowedRange<typeTraits::RemoveCVRef<T>>);
+
+template <class T>
+concept asyncRange = inputOrOutputRange<T> && requires(T&& t) {
+												  {
+													  t.next()
+													  } -> concepts::async;
+											  };
+
+template <class T>
+concept asyncInputByteCopyableRange = inputByteCopyableRange<T> && asyncRange<T>;
+
+template <class T>
+concept asyncOutputByteCopyableRange = outputByteCopyableRange<T> && asyncRange<T>;
 
 } // namespace bzd::concepts

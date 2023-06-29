@@ -15,6 +15,7 @@
 #include "cc/bzd/core/async/promise.hh"
 #include "cc/bzd/core/error.hh"
 #include "cc/bzd/meta/always_false.hh"
+#include "cc/bzd/type_traits/async.hh"
 #include "cc/bzd/type_traits/is_lvalue_reference.hh"
 #include "cc/bzd/type_traits/is_same_template.hh"
 #include "cc/bzd/type_traits/remove_reference.hh"
@@ -30,20 +31,10 @@ using Type = bzd::async::impl::ExecutableMetadata::Type;
 
 namespace bzd::impl {
 
-struct AsyncTag
-{
-};
-
-enum class AsyncType
-{
-	task,
-	generator
-};
-
 template <class T>
 struct AsyncTaskTraits
 {
-	static constexpr AsyncType type{AsyncType::task};
+	static constexpr typeTraits::AsyncType type{typeTraits::AsyncType::task};
 	static constexpr Bool isReentrant = false;
 	using PromiseType = bzd::async::PromiseTask<T>;
 };
@@ -51,7 +42,7 @@ struct AsyncTaskTraits
 template <class T>
 struct AsyncGeneratorTraits
 {
-	static constexpr AsyncType type{AsyncType::generator};
+	static constexpr typeTraits::AsyncType type{typeTraits::AsyncType::generator};
 	static constexpr Bool isReentrant = true;
 	using PromiseType = bzd::async::PromiseGenerator<T>;
 };
@@ -64,8 +55,7 @@ public: // Traits
 	using promise_type = PromiseType; // Needed for the corountine compiler hooks.
 	using ResultType = typename PromiseType::ResultType;
 	using Self = Async;
-	using Tag = bzd::impl::AsyncTag;
-	static constexpr AsyncType type{Traits<T>::type};
+	static constexpr typeTraits::AsyncType type{Traits<T>::type};
 
 public: // constructor/destructor/assignments
 	constexpr Async(bzd::async::impl::coroutine_handle<PromiseType> h) noexcept : handle_(h) {}
@@ -291,19 +281,6 @@ public:
 };
 
 } // namespace bzd
-
-namespace bzd::concepts {
-template <class T>
-concept async = requires(T t) {
-					{
-						t.type
-						} -> sameAs<const bzd::impl::AsyncType&>;
-				};
-template <class T>
-concept asyncTask = sameTemplate<T, bzd::Async>;
-template <class T>
-concept asyncGenerator = sameTemplate<T, bzd::Generator>;
-} // namespace bzd::concepts
 
 namespace bzd::async {
 

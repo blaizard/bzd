@@ -29,7 +29,6 @@ cc_library(
     deps = [
         ":regexp",
         "//cc/bzd/core/async",
-        "//cc/bzd/type_traits:channel",
         "//cc/bzd/type_traits:invoke_result",
     ],
 )

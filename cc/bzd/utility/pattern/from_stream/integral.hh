@@ -7,27 +7,25 @@
 
 namespace bzd {
 
-template <concepts::readerAsync Input, class Callback>
+template <concepts::asyncInputByteCopyableRange Input, class Callback>
 bzd::Async<Size> forEach(Input&& input, Callback&& callback) noexcept
 {
-	auto range = co_await !input.reader();
-	auto it = bzd::begin(range);
-	auto end = bzd::end(range);
+	auto it = bzd::begin(input);
+	auto end = bzd::end(input);
 	Size count{0u};
 	while (true)
 	{
 		if (it == end)
 		{
-			auto maybeRange = co_await input.reader();
-			if (maybeRange)
+			auto mayebSuccess = co_await input.next();
+			if (mayebSuccess)
 			{
-				range = bzd::move(maybeRange.valueMutable());
-				it = bzd::begin(range);
-				end = bzd::end(range);
+				it = bzd::begin(input);
+				end = bzd::end(input);
 			}
-			else if (maybeRange.error().getType() != bzd::ErrorType::eof)
+			else if (mayebSuccess.error().getType() != bzd::ErrorType::eof)
 			{
-				co_return bzd::move(maybeRange).propagate();
+				co_return bzd::move(mayebSuccess).propagate();
 			}
 			// If there are still no input after fetching new data.
 			if (it == end)
@@ -52,12 +50,13 @@ struct FromStream<T> : public FromString<T>
 {
 	using Metadata = typename bzd::FromString<T>::Metadata;
 
-	template <concepts::readerAsync Input>
+	template <concepts::asyncInputByteCopyableRange Input>
 	static bzd::Async<Size> process(Input&& input, T& output, const Metadata metadata = Metadata{}) noexcept
 	{
 		(void)metadata;
 		output = 0u;
-		const auto count = co_await !forEach(bzd::forward<Input>(input), [&](const char c) -> Bool {
+		const auto count = co_await !forEach(bzd::forward<Input>(input), [&](const auto input) -> Bool {
+			const char c = static_cast<char>(input);
 			if (c < '0' || c > '9')
 			{
 				return false;
