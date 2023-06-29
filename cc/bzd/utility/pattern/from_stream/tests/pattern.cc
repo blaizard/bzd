@@ -16,14 +16,14 @@ TEST_ASYNC(PatternFromStream, NoArguments, AllTestIChannel)
 	bzd::IChannelBuffered<char, 16u> channel{in};
 
 	in << "Hello World";
-	const auto result = co_await bzd::fromStream(channel, "Hello"_csv);
+	const auto result = co_await bzd::fromStream(channel.reader(), "Hello"_csv);
 	EXPECT_TRUE(result);
 	EXPECT_EQ(result.value(), 5u);
 
-	const auto result2 = co_await bzd::fromStream(channel, "World"_csv);
+	const auto result2 = co_await bzd::fromStream(channel.reader(), "World"_csv);
 	EXPECT_FALSE(result2);
 
-	const auto result3 = co_await bzd::fromStream(channel, "\\s+World"_csv);
+	const auto result3 = co_await bzd::fromStream(channel.reader(), "\\s+World"_csv);
 	EXPECT_TRUE(result3);
 	EXPECT_EQ(result3.value(), 6u);
 
@@ -38,7 +38,7 @@ TEST_ASYNC(PatternFromStream, StringArgument, AllTestIChannel)
 	in << "Hello World";
 	{
 		bzd::String<12u> world;
-		const auto size = co_await !bzd::fromStream(channel, "Hello {}"_csv, world.assigner());
+		const auto size = co_await !bzd::fromStream(channel.reader(), "Hello {}"_csv, world.assigner());
 		EXPECT_EQ(size, 11u);
 		EXPECT_STREQ(world.data(), "World");
 	}
@@ -46,7 +46,7 @@ TEST_ASYNC(PatternFromStream, StringArgument, AllTestIChannel)
 	in << "1 23456789abcd";
 	{
 		bzd::String<12u> numbers;
-		const auto size = co_await !bzd::fromStream(channel, "[0-9]+ {:[0-9]+}"_csv, numbers.assigner());
+		const auto size = co_await !bzd::fromStream(channel.reader(), "[0-9]+ {:[0-9]+}"_csv, numbers.assigner());
 		EXPECT_EQ(size, 10u);
 		EXPECT_STREQ(numbers.data(), "23456789");
 	}
@@ -54,7 +54,7 @@ TEST_ASYNC(PatternFromStream, StringArgument, AllTestIChannel)
 	// Read the rest.
 	{
 		bzd::String<12u> rest;
-		const auto size = co_await !bzd::fromStream(channel, "{:.*}"_csv, rest.assigner());
+		const auto size = co_await !bzd::fromStream(channel.reader(), "{:.*}"_csv, rest.assigner());
 		EXPECT_EQ(size, 4u);
 		EXPECT_STREQ(rest.data(), "abcd");
 	}
@@ -63,7 +63,7 @@ TEST_ASYNC(PatternFromStream, StringArgument, AllTestIChannel)
 	in << "Hello Mister";
 	{
 		bzd::String<2u> string;
-		const auto result = co_await bzd::fromStream(channel, "{:.*}"_csv, string.assigner());
+		const auto result = co_await bzd::fromStream(channel.reader(), "{:.*}"_csv, string.assigner());
 		EXPECT_FALSE(result);
 		EXPECT_STREQ(string.data(), "He");
 	}

@@ -10,7 +10,6 @@ cc_library(
         "//cc/bzd/container/ranges:stream",
         "//cc/bzd/core/async",
         "//cc/bzd/meta:always_false",
-        "//cc/bzd/type_traits:channel",
     ],
 )
 

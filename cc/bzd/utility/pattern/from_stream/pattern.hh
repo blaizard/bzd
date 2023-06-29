@@ -11,7 +11,7 @@ template <concepts::constexprStringView T>
 struct FromStream<T>
 {
 public:
-	template <concepts::readerAsync Input, class... Args>
+	template <concepts::asyncInputByteCopyableRange Input, class... Args>
 	static bzd::Async<Size> process(Input&& input, const T& pattern, Args&&... args) noexcept
 	{
 		const auto [context, processor] = bzd::pattern::impl::makeAsync<Input&, Schema>(pattern, args...);

@@ -3,7 +3,6 @@
 #include "cc/bzd/container/ranges/stream.hh"
 #include "cc/bzd/core/async.hh"
 #include "cc/bzd/meta/always_false.hh"
-#include "cc/bzd/type_traits/channel.hh"
 
 namespace bzd {
 
@@ -29,7 +28,7 @@ struct FromStream : ::bzd::FromStream<typeTraits::RemoveCVRef<T>>
 /// \param input The input to be read from.
 /// \param args The value(s) to be read.
 /// \return The number of bytes read in case of success, otherwise an empty result.
-template <concepts::readerAsync Input, class... Args>
+template <concepts::asyncInputByteCopyableRange Input, class... Args>
 bzd::Async<Size> fromStream(Input&& input, Args&&... args) noexcept
 {
 	co_return co_await ::bzd::typeTraits::FromStream<Args...>::process(bzd::forward<Input>(input), bzd::forward<Args>(args)...);

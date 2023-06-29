@@ -18,7 +18,7 @@ TEST_ASYNC(PatternFromStream, Integral, AllTestIChannel)
 	in << "Hello 42";
 	{
 		bzd::UInt16 value;
-		const auto size = co_await !bzd::fromStream(channel, "Hello {}"_csv, value);
+		const auto size = co_await !bzd::fromStream(channel.reader(), "Hello {}"_csv, value);
 		EXPECT_EQ(size, 8u);
 		EXPECT_EQ(value, 42u);
 	}

@@ -29,7 +29,7 @@ class Response : public bzd::IStream
 {
 public:
 	constexpr Response(Client& client) noexcept :
-		client_{client}, connectCounter_{client.connectCounter_}, reader_{client_.stream_.valueMutable()}
+		client_{client}, connectCounter_{client.connectCounter_}, stream_{client_.stream_.valueMutable()}
 	{
 	}
 
@@ -52,10 +52,10 @@ public:
 		case Status::Version::unknown:
 			co_return bzd::error::Failure("Version not supported.");
 		}
-		// co_await reader_.readUntil("/r/n"_sv.asBytes());
+		// co_await stream_.readUntil("/r/n"_sv.asBytes());
 		::std::cout << "[-> " << code << " <-]" << std::endl;
 
-		const auto read = co_await !reader_.read(bzd::move(data));
+		const auto read = co_await !stream_.read(bzd::move(data));
 		co_return read;
 	}
 
@@ -77,10 +77,9 @@ private:
 	bzd::Async<Status> readStatus() noexcept
 	{
 		bzd::String<3u> version;
-		bzd::String<4u> code;
-		co_await !bzd::fromStream(reader_, "HTTP/{:[0-9.]+}\\s+{:[0-9]+}\\s+"_csv, version.assigner(), code.assigner());
-
 		Status status{};
+		co_await !bzd::fromStream(stream_.reader(), "HTTP/{:[0-9.]+}\\s+{}\\s+"_csv, version.assigner(), status.code);
+
 		switch (version)
 		{
 		case "1.0"_s:
@@ -136,7 +135,7 @@ private:
 private:
 	Client& client_;
 	Size connectCounter_;
-	bzd::IStreamBuffered<bufferCapacity> reader_;
+	bzd::IStreamBuffered<bufferCapacity> stream_;
 };
 
 template <meta::StringLiteral method, class Client, Size capacityHeaders = 1u>

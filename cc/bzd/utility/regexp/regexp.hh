@@ -188,7 +188,7 @@ public:
 		bzd::ranges::Stream iStream{bzd::inPlace, range};
 		bzd::ranges::Stream oStream{bzd::inPlace, output};
 		Bool overflow = false;
-		InputStreamCaptureRange capture{bzd::move(iStream), oStream, overflow};
+		InputStreamCaptureRange capture{iStream, oStream, overflow};
 		auto result = match(capture);
 		if (overflow)
 		{
@@ -245,8 +245,8 @@ protected:
 	class InputStreamCaptureRange
 	{
 	public:
-		constexpr InputStreamCaptureRange(Range&& range, Capture& capture, Bool& overflow) noexcept :
-			range_{bzd::move(range)}, capture_{capture}, overflow_{overflow}
+		constexpr InputStreamCaptureRange(Range& range, Capture& capture, Bool& overflow) noexcept :
+			range_{range}, capture_{capture}, overflow_{overflow}
 		{
 		}
 
@@ -257,12 +257,12 @@ protected:
 		~InputStreamCaptureRange() = default;
 
 	public:
-		constexpr auto begin() noexcept { return IteratorCapture{capture_.get(), range_.begin(), overflow_}; }
-		constexpr auto end() noexcept { return range_.end(); }
-		constexpr auto size() noexcept { return range_.size(); }
+		constexpr auto begin() noexcept { return IteratorCapture{capture_.get(), range_.get().begin(), overflow_}; }
+		constexpr auto end() noexcept { return range_.get().end(); }
+		constexpr auto size() noexcept { return range_.get().size(); }
 
-	private:
-		Range range_;
+	protected:
+		bzd::ReferenceWrapper<Range> range_;
 		bzd::ReferenceWrapper<Capture> capture_;
 		bzd::ReferenceWrapper<Bool> overflow_;
 	};

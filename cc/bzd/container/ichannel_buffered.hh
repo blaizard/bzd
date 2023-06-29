@@ -32,10 +32,7 @@ public:
 		using Parent = ranges::Stream<bzd::Span<const T>>;
 
 	public:
-		constexpr ReaderScope(IChannelBuffered& ichannel, const bzd::Span<const T> span) noexcept :
-			Parent{bzd::inPlace, bzd::move(span)}, ichannel_{ichannel}
-		{
-		}
+		constexpr ReaderScope(IChannelBuffered& ichannel) noexcept : Parent{bzd::inPlace, bzd::Span<const T>{}}, ichannel_{ichannel} {}
 
 		ReaderScope(const ReaderScope&) = delete;
 		ReaderScope& operator=(const ReaderScope&) = delete;
@@ -55,7 +52,31 @@ public:
 		}
 		constexpr ~ReaderScope() noexcept { close(); }
 
+		bzd::Async<> next() noexcept
+		{
+			auto chunk = co_await !nextChuck();
+			static_cast<Parent&>(*this) = Parent{bzd::inPlace, chunk};
+			co_return {};
+		}
+
 	private:
+		bzd::Async<bzd::Span<const T>> nextChuck() noexcept
+		{
+			auto& buffer = ichannel_.valueMutable().buffer_;
+			auto& in = ichannel_.valueMutable().in_;
+			const auto readFromBuffer = buffer.asSpanForReading();
+			if (!readFromBuffer.empty())
+			{
+				buffer.consume(readFromBuffer.size());
+				co_return readFromBuffer;
+			}
+			auto writeToBuffer = buffer.asSpanForWriting();
+			const auto data = co_await !in.read(bzd::move(writeToBuffer));
+			buffer.produce(data.size());
+			buffer.consume(data.size());
+			co_return data;
+		}
+
 		constexpr void close() noexcept
 		{
 			if (ichannel_.hasValue())
@@ -135,20 +156,7 @@ public:
 	/// Read from the input channel as a ReaderScope.
 	///
 	/// \note Uppon destruction of the range, the data consumed will be removed from the buffer ring.
-	bzd::Async<ReaderScope> reader() noexcept
-	{
-		const auto readFromBuffer = buffer_.asSpanForReading();
-		if (!readFromBuffer.empty())
-		{
-			buffer_.consume(readFromBuffer.size());
-			co_return ReaderScope{*this, readFromBuffer};
-		}
-		auto writeToBuffer = buffer_.asSpanForWriting();
-		const auto data = co_await !in_.read(bzd::move(writeToBuffer));
-		buffer_.produce(data.size());
-		buffer_.consume(data.size());
-		co_return ReaderScope{*this, data};
-	}
+	ReaderScope reader() noexcept { return {*this}; }
 
 	/// Read at least `count` bytes and return a Stream range.
 	///

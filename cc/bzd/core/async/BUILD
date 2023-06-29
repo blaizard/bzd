@@ -42,6 +42,7 @@ cc_library(
         "//cc/bzd/core:error",
         "//cc/bzd/core/assert:minimal",
         "//cc/bzd/meta:always_false",
+        "//cc/bzd/type_traits:async",
         "//cc/bzd/type_traits:is_base_of",
         "//cc/bzd/type_traits:is_lvalue_reference",
         "//cc/bzd/type_traits:is_same_template",
