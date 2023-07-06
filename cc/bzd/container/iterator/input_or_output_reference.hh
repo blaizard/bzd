@@ -43,16 +43,27 @@ public: // API.
 		return *this;
 	}
 
-	[[nodiscard]] constexpr Bool operator==(const Self& it) const noexcept { return it_ == it; }
-	[[nodiscard]] constexpr Bool operator==(const Iterator& it) const noexcept { return it_ == it; }
-	[[nodiscard]] constexpr Bool operator!=(const Self& it) const noexcept { return !(it == *this); }
-	[[nodiscard]] constexpr Bool operator!=(const Iterator& it) const noexcept { return !(it == *this); }
-
 	[[nodiscard]] constexpr ValueType& operator*() const noexcept { return *(it_.get()); }
 	[[nodiscard]] constexpr ValueType* operator->() const noexcept { return &(*(it_.get())); }
 
 private:
-	// Note, it must be a pointer and not a reference to allow copy and move assignments.
+	friend constexpr Bool operator==(const InputOrOutputReference<Iterator, Policies>& it1, const Iterator& it2) noexcept
+	{
+		return it1.it_.get() == it2;
+	}
+	friend constexpr Bool operator==(const Iterator& it1, const InputOrOutputReference<Iterator, Policies>& it2) noexcept
+	{
+		return it2.it_.get() == it1;
+	}
+	friend constexpr Bool operator!=(const InputOrOutputReference<Iterator, Policies>& it1, const Iterator& it2) noexcept
+	{
+		return it1.it_.get() != it2;
+	}
+	friend constexpr Bool operator!=(const Iterator& it1, const InputOrOutputReference<Iterator, Policies>& it2) noexcept
+	{
+		return it2.it_.get() != it1;
+	}
+
 	bzd::ReferenceWrapper<Iterator> it_;
 };
 

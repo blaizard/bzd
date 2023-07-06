@@ -2,41 +2,118 @@
 
 set -e
 
-GCC_VERSION=11.2.0
-BINUTILS_VERSION=2.39
+GCC_VERSION=13.1.0
 HOST=linux_x86_64
 PACKAGE=${HOST}_${GCC_VERSION}
+INSTALL="$(pwd)/${PACKAGE}"
 
-# --- Compile binutils ----
+# ---- Setup ----
 
-# https://ftp.gnu.org/gnu/binutils/
-rm -rfd binutils-${BINUTILS_VERSION}
-curl -L https://ftp.gnu.org/gnu/binutils/binutils-${BINUTILS_VERSION}.tar.xz | tar -xJ
+sudo apt install -y \
+    git \
+    automake \
+    texinfo \
+    bison \
+    flex
 
-mkdir binutils-${BINUTILS_VERSION}-build
-pushd binutils-${BINUTILS_VERSION}-build
+mkdir -p srcs build/{isl,mpfr,gmp,mpc,gcc,binutils} ${INSTALL}
 
-../binutils-${BINUTILS_VERSION}/configure --prefix="$(pwd)/../${PACKAGE}"
-make -j$(getconf _NPROCESSORS_ONLN)
-make install
+export PATH="${INSTALL}/bin:${PATH}"
+export LD_LIBRARY_PATH="${INSTALL}/lib:${LD_LIBRARY_PATH}"
 
+# ---- Get the sources ----
+
+pushd srcs
+git clone --depth 1 https://repo.or.cz/isl.git -b "isl-0.26"
+git clone --depth 1 https://gitlab.inria.fr/mpfr/mpfr.git -b "4.2"
+curl -L https://gmplib.org/download/gmp/gmp-6.2.1.tar.xz | toolchains/cc/linux_x86_64_gcc/patchall.pytar -xJ --transform 's/gmp[^\/]*/gmp/'
+git clone --depth 1 https://gitlab.inria.fr/mpc/mpc.git -b "1.3.1"
+git clone --depth 1 https://github.com/gcc-mirror/gcc.git -b "releases/gcc-${GCC_VERSION}"
+git clone --depth 1 https://sourceware.org/git/binutils-gdb.git -b "binutils-2_39" binutils
 popd
 
-# --- Compile GCC ----
+# ---- Build isl ----
 
-# https://gcc.gnu.org/mirrors.html
-rm -rfd gcc-${GCC_VERSION}
-curl -L https://ftp.gnu.org/gnu/gcc/gcc-${GCC_VERSION}/gcc-${GCC_VERSION}.tar.xz | tar -xJ
-
-mkdir gcc-${GCC_VERSION}-build
-pushd gcc-${GCC_VERSION}-build
-
-../gcc-${GCC_VERSION}/configure --prefix="$(pwd)/../${PACKAGE}" --disable-multilib --disable-bootstrap --enable-languages=c,c++,lto
+(cd srcs/isl; ./autogen.sh)
+pushd build/isl
+../../srcs/isl/configure --prefix="${INSTALL}"
 make -j$(nproc)
 make install
-
 popd
 
-# Create an archive.
+# ---- Build mpfr ----
+
+(cd srcs/mpfr; ./autogen.sh)
+pushd build/mpfr
+../../srcs/mpfr/configure --prefix="${INSTALL}"
+make -j$(nproc)
+make install
+popd
+
+# ---- Build gmp ----
+
+pushd build/gmp
+../../srcs/gmp/configure --prefix="${INSTALL}"
+make -j$(nproc)
+make install
+popd
+
+# ---- Build mpc ----
+
+(cd srcs/mpc; autoreconf -i)
+pushd build/mpc
+../../srcs/mpc/configure \
+    --prefix="${INSTALL}" \
+    --with-gmp="${INSTALL}" \
+    --with-mpfr="${INSTALL}"
+make -j$(nproc)
+make install
+popd
+
+# ---- Build gcc ----
+
+pushd build/gcc
+../../srcs/gcc/configure \
+    --prefix="${INSTALL}" \
+    --disable-multilib \
+    --disable-bootstrap \
+    --disable-nls \
+    --enable-lto \
+    --enable-languages=c,c++,lto \
+    --with-isl="${INSTALL}" \
+    --with-gmp="${INSTALL}" \
+    --with-mpfr="${INSTALL}" \
+    --with-mpc="${INSTALL}"
+make -j$(nproc)
+make install
+popd
+
+# ---- Build binutils ----
+
+pushd build/binutils
+../../srcs/binutils/configure \
+    --prefix="${INSTALL}" \
+    --disable-multilib \
+    --disable-bootstrap \
+    --disable-nls \
+    --enable-lto \
+    --with-isl="${INSTALL}" \
+    --with-gmp="${INSTALL}" \
+    --with-mpfr="${INSTALL}" \
+    --with-mpc="${INSTALL}"
+make -j$(nproc)
+make install
+popd
+
+# ---- Strip all ----
+
+find "${INSTALL}" -type f -executable | grep -vF '.a' | grep -vF '.la' | xargs -n1 strip
+
+# ---- Set the RPATH ----
+
+./toolchains/cc/linux_x86_64_gcc/patchall.py "${INSTALL}"
+
+# ---- Create an archive ----
+
 tar -cvJf ${PACKAGE}.tar.xz ${PACKAGE}
 echo "Archive successfully built at $(pwd)/${PACKAGE}.tar.xz"

@@ -14,9 +14,9 @@ namespace bzd::concepts {
 
 template <class T>
 concept range = requires(T& t) {
-					bzd::begin(t);
-					bzd::end(t);
-				};
+	bzd::begin(t);
+	bzd::end(t);
+};
 
 template <class T>
 concept sizedRange = range<T> && requires(T& t) { bzd::size(t); };
@@ -100,10 +100,10 @@ concept borrowedRange = range<T> && (typeTraits::isLValueReference<T> || typeTra
 
 template <class T>
 concept asyncRange = inputOrOutputRange<T> && requires(T&& t) {
-												  {
-													  t.next()
-													  } -> concepts::async;
-											  };
+	{
+		t.next()
+	} -> concepts::async;
+};
 
 template <class T>
 concept asyncInputByteCopyableRange = inputByteCopyableRange<T> && asyncRange<T>;
