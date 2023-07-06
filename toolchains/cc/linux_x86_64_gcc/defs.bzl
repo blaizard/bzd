@@ -13,17 +13,17 @@ BINARIES = {
     "strip": "bin/strip",
 }
 
-def _load_linux_x86_64_gcc_11_2_0(name):
+def _load_linux_x86_64_gcc_13_1_0(name):
     # Load dependencies
-    package_name = "linux_x86_64_gcc_11_2_0"
+    package_name = "linux_x86_64_gcc_13_1_0"
     http_archive(
         name = package_name,
         build_file = "//toolchains/cc/linux_x86_64_gcc:{}.BUILD".format(package_name),
         urls = [
-            "http://data.blaizard.com/file/bzd/toolchains/cc/gcc/linux_x86_64/linux_x86_64_11.2.0.tar.xz",
+            "http://data.blaizard.com/file/bzd/toolchains/cc/gcc/linux_x86_64/linux_x86_64_13.1.0.tar.xz",
         ],
-        strip_prefix = "linux_x86_64_11.2.0",
-        sha256 = "e7322906acb4671afb23e7e8f7cc68528495392a8e640f8e146b572e411897fa",
+        strip_prefix = "linux_x86_64_13.1.0",
+        sha256 = "69aa67e72e68310df259152180dc12e0fc25cf54faf2b46d74884aa14bdfdabf",
     )
 
     toolchain_definition = {
@@ -42,15 +42,15 @@ def _load_linux_x86_64_gcc_11_2_0(name):
             "/usr/include",
         ],
         "system_directories": [
-            "external/{}/include/c++/11.2.0/x86_64-pc-linux-gnu".format(package_name),
-            "external/{}/include/c++/11.2.0".format(package_name),
-            "external/{}/lib/gcc/x86_64-pc-linux-gnu/11.2.0/include".format(package_name),
-            "external/{}/lib/gcc/x86_64-pc-linux-gnu/11.2.0/include-fixed".format(package_name),
+            "external/{}/include/c++/13.1.0/x86_64-pc-linux-gnu".format(package_name),
+            "external/{}/include/c++/13.1.0".format(package_name),
+            "external/{}/lib/gcc/x86_64-pc-linux-gnu/13.1.0/include".format(package_name),
+            "external/{}/lib/gcc/x86_64-pc-linux-gnu/13.1.0/include-fixed".format(package_name),
             "/usr/include/x86_64-linux-gnu",
             "/usr/include",
         ],
         "linker_dirs": [
-            "external/{}/lib/gcc/x86_64-pc-linux-gnu/11.2.0".format(package_name),
+            "external/{}/lib/gcc/x86_64-pc-linux-gnu/13.1.0".format(package_name),
             "external/{}/lib64".format(package_name),
         ],
         "compile_flags": [
@@ -93,4 +93,4 @@ def _load_linux_x86_64_gcc_11_2_0(name):
     )
 
 def load_linux_x86_64_gcc():
-    _load_linux_x86_64_gcc_11_2_0(name = "linux_x86_64_gcc")
+    _load_linux_x86_64_gcc_13_1_0(name = "linux_x86_64_gcc")

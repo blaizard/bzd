@@ -20,7 +20,7 @@ public:
 	constexpr MoveOnly(const Self&) noexcept = delete;
 	constexpr Self& operator=(const Self&) noexcept = delete;
 	constexpr MoveOnly(Self&& move) noexcept { *this = bzd::move(move); }
-	Self& operator=(Self&& move) noexcept
+	constexpr Self& operator=(Self&& move) noexcept
 	{
 		movedCounter_ = move.movedCounter_ + 1;
 		destroyedBeforeMoved_ = move.destroyedBeforeMoved_;

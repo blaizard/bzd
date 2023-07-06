@@ -8,16 +8,25 @@ package(default_visibility = ["//visibility:public"])
 ) for key, path in BINARIES.items()]
 
 filegroup(
+    name = "base_files",
+    srcs = glob([
+        "lib/*.so*",
+    ]),
+)
+
+filegroup(
     name = "ar_files",
     srcs = [
         ":ar",
-    ]
+        ":base_files"
+    ],
 )
 
 filegroup(
     name = "as_files",
     srcs = [
         ":as",
+        ":base_files"
     ]
 )
 
@@ -28,7 +37,8 @@ filegroup(
         ":cpp",
         ":cov",
         ":header_files",
-    ] + glob(["libexec/gcc/x86_64-pc-linux-gnu/11.2.0/*",])
+        ":base_files"
+    ] + glob(["libexec/gcc/x86_64-pc-linux-gnu/13.1.0/*",])
 )
 
 filegroup(
@@ -38,9 +48,10 @@ filegroup(
         ":ld",
         ":dynamic_libraries_files",
         ":static_libraries_files",
+        ":base_files"
     ] + glob([
-        "libexec/gcc/x86_64-pc-linux-gnu/11.2.0/*",
-        "lib/gcc/x86_64-pc-linux-gnu/11.2.0/*"
+        "libexec/gcc/x86_64-pc-linux-gnu/13.1.0/*",
+        "lib/gcc/x86_64-pc-linux-gnu/13.1.0/*"
     ])
 )
 
@@ -48,6 +59,7 @@ filegroup(
     name = "objcopy_files",
     srcs = [
         ":objcopy",
+        ":base_files"
     ]
 )
 
@@ -55,19 +67,24 @@ filegroup(
     name = "strip_files",
     srcs = [
         ":strip",
+        ":base_files"
     ]
 )
 
 filegroup(
     name = "dynamic_libraries_files",
-    srcs = glob([
+    srcs = [
+        ":base_files"
+    ] + glob([
         "lib64/*.so*",
     ]),
 )
 
 filegroup(
     name = "static_libraries_files",
-    srcs = glob([
+    srcs = [
+        ":base_files"
+    ] + glob([
         "lib64/*.a",
     ]),
 )
@@ -75,9 +92,9 @@ filegroup(
 filegroup(
     name = "header_files",
     srcs = glob([
-        "lib/gcc/x86_64-pc-linux-gnu/11.2.0/include/**/*",
-        "lib/gcc/x86_64-pc-linux-gnu/11.2.0/include-fixed/**/*",
-        "include/c++/11.2.0/**/*",
+        "lib/gcc/x86_64-pc-linux-gnu/13.1.0/include/**/*",
+        "lib/gcc/x86_64-pc-linux-gnu/13.1.0/include-fixed/**/*",
+        "include/c++/13.1.0/**/*",
     ])
 )
 
@@ -85,9 +102,9 @@ filegroup(
 genrule(
     name = "package",
     srcs = ["@linux_x86_64_gcc//:all_files"],
-    outs = ["linux_x86_64_11.2.0.tar.xz"],
+    outs = ["linux_x86_64_13.1.0.tar.xz"],
     tags = ["manual"],
     cmd = """
-    tar -cJf $@ --dereference --transform 's/^\\./linux_x86_64_11.2.0/' -C external/linux_x86_64_gcc_11_2_0 .
+    tar -cJf $@ --dereference --transform 's/^\\./linux_x86_64_13.1.0/' -C external/linux_x86_64_gcc_13_1_0 .
     """
 )

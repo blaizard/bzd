@@ -7,6 +7,12 @@ It is necessary to use an old distro, in order to rely on an old glibc. This inc
 docker build tools/docker_images/build -t blaizard/build:x86_64
 ```
 
+# Push
+
+```bash
+docker push blaizard/build:x86_64
+```
+
 # Use it
 
 ```bash

@@ -17,10 +17,10 @@ namespace bzd::concepts {
 
 template <class T>
 concept async = requires(T t) {
-					{
-						t.type
-						} -> sameClassAs<typeTraits::AsyncType>;
-				};
+	{
+		t.type
+	} -> sameClassAs<typeTraits::AsyncType>;
+};
 template <class T>
 concept asyncTask = async<T> && (T::type == typeTraits::AsyncType::task);
 template <class T>

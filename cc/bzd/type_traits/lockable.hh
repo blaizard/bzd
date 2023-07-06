@@ -6,14 +6,14 @@ namespace bzd::concepts {
 /// semantics for execution agents (i.e. threads).
 template <class T>
 concept basicLockable = requires(T t) {
-							t.lock();
-							t.unlock();
-						};
+	t.lock();
+	t.unlock();
+};
 
 template <class T>
 concept sharedLockable = requires(T t) {
-							 t.lockShared();
-							 t.unlockShared();
-						 };
+	t.lockShared();
+	t.unlockShared();
+};
 
 } // namespace bzd::concepts

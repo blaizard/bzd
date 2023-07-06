@@ -17,9 +17,9 @@ _repositories = {
         "linux_x86_64": {
             "linux_x86_64": {
                 "urls": [
-                    "http://data.blaizard.com/file/bzd/toolchains/cc/gcc/linux_x86_64/linux_x86_64_11.2.0.tar.xz",
+                    "http://data.blaizard.com/file/bzd/toolchains/cc/gcc/linux_x86_64/linux_x86_64_13.1.0.tar.xz",
                 ],
-                "strip_prefix": "linux_x86_64_11.2.0",
+                "strip_prefix": "linux_x86_64_13.1.0",
                 "sha256": "e7322906acb4671afb23e7e8f7cc68528495392a8e640f8e146b572e411897fa",
             },
         },

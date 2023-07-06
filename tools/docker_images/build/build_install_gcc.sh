@@ -7,7 +7,6 @@ set -e
 # Default to /usr instead of /usr/local, this will install it along side other gcc distro, which
 # is needed for clang to find installed gcc version. This is a requisite when build llvm-project for example.
 INSTALL_PATH=/usr
-LONG_BIT=$(getconf LONG_BIT)
 while [[ $# -gt 0 ]] && [[ "$1" == "--"* ]] ;
 do
     opt="$1";
@@ -23,6 +22,7 @@ VERSION=$1
 
 sudo apt-get install -y --no-install-recommends \
     curl \
+    file \
     build-essential \
     g++-multilib \
     xz-utils \
@@ -36,21 +36,12 @@ mkdir gcc-${VERSION}-build
 pushd gcc-${VERSION}-build
 
 ../gcc-${VERSION}/configure \
-    --prefix=${INSTALL_PATH} \
     --disable-bootstrap \
     --disable-nls \
     --enable-languages=c,c++
 
 make -j$(nproc)
 make install
-echo "export PATH=${INSTALL_PATH}/bin:${PATH}" >> ~/.bashrc
-
-# Set LD_LIBRARY_PATH
-if [ "$LONG_BIT" = 32 ]; then
-echo "export LD_LIBRARY_PATH=${INSTALL_PATH}/lib32:${LD_LIBRARY_PATH}" >> ~/.bashrc
-elif [ "$LONG_BIT" = 64 ]; then
-echo "export LD_LIBRARY_PATH=${INSTALL_PATH}/lib64:${LD_LIBRARY_PATH}" >> ~/.bashrc
-fi
 
 # Create a g++ wrapper to build static binaries.
 cat <<EOT > "${INSTALL_PATH}/bin/gcc-static" && chmod +x "${INSTALL_PATH}/bin/gcc-static"

@@ -38,7 +38,7 @@ public:
 	constexpr Protocol::Number protocol() const noexcept { return protocol_; }
 
 	/// Create an address object from an addrinfo structure.
-	constexpr Address(const ::addrinfo& addr) noexcept : size_{addr.ai_addrlen}, type_{addr.ai_socktype}, protocol_{addr.ai_protocol}
+	explicit Address(const ::addrinfo& addr) noexcept : size_{addr.ai_addrlen}, type_{addr.ai_socktype}, protocol_{addr.ai_protocol}
 	{
 		bzd::algorithm::copyN(reinterpret_cast<bzd::Byte*>(addr.ai_addr), size_, reinterpret_cast<bzd::Byte*>(&storageErased_));
 	}

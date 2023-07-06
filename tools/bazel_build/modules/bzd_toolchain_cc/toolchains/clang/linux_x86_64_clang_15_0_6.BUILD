@@ -16,9 +16,9 @@ genrule(
         ":clang_tidy",
         ":llvm_symbolizer",
     ],
-    outs = ["linux_x86_64_15.0.6.tar.xz"],
+    outs = ["linux_x86_64_16.0.6.tar.xz"],
     tags = ["manual"],
     cmd = """
-    tar -cJf $@ --dereference --transform 's/^\\./linux_x86_64_15.0.6/' -C external/linux_x86_64_clang_15_0_6 .
+    tar -cJf $@ --dereference --transform 's/^\\./linux_x86_64_16.0.6/' -C external/linux_x86_64_clang_16_0_6 .
     """
 )

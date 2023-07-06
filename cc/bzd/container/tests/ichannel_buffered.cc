@@ -17,17 +17,19 @@ TEST_ASYNC(IChannelBuffered, Reader, (TestIChannel, TestIChannelZeroCopy))
 
 	// Empty ichannel
 	{
-		auto maybeScope = co_await channel.reader();
-		EXPECT_FALSE(maybeScope);
+		auto reader = channel.reader();
+		auto maybeSuccess = co_await reader.next();
+		EXPECT_FALSE(maybeSuccess);
 		EXPECT_EQ(channel.size(), 0u);
 	}
 
 	// Add content to ichannel
 	in << "abcdef";
 	{
-		auto scope = co_await !channel.reader();
+		auto reader = channel.reader();
+		co_await !reader.next();
 		EXPECT_EQ(channel.size(), 0u);
-		auto it = scope.begin();
+		auto it = reader.begin();
 		EXPECT_EQ(*it, 'a');
 		++it;
 		EXPECT_EQ(*it, 'b');
@@ -38,9 +40,10 @@ TEST_ASYNC(IChannelBuffered, Reader, (TestIChannel, TestIChannelZeroCopy))
 
 	// Consume from the inner buffer
 	{
-		auto scope = co_await !channel.reader();
+		auto reader = channel.reader();
+		co_await !reader.next();
 		EXPECT_EQ(channel.size(), 0u);
-		auto it = scope.begin();
+		auto it = reader.begin();
 		EXPECT_EQ(*it, 'c');
 		++it;
 		EXPECT_EQ(*it, 'd');
@@ -51,9 +54,10 @@ TEST_ASYNC(IChannelBuffered, Reader, (TestIChannel, TestIChannelZeroCopy))
 
 	// Consume from the inner buffer
 	{
-		auto scope = co_await !channel.reader();
+		auto reader = channel.reader();
+		co_await !reader.next();
 		EXPECT_EQ(channel.size(), 0u);
-		auto it = scope.begin();
+		auto it = reader.begin();
 		EXPECT_EQ(*it, 'e');
 		++it;
 		EXPECT_EQ(*it, 'f');
@@ -65,9 +69,10 @@ TEST_ASYNC(IChannelBuffered, Reader, (TestIChannel, TestIChannelZeroCopy))
 	// Consume from the new buffer
 	in << "ghi";
 	{
-		auto scope = co_await !channel.reader();
+		auto reader = channel.reader();
+		co_await !reader.next();
 		EXPECT_EQ(channel.size(), 0u);
-		auto it = scope.begin();
+		auto it = reader.begin();
 		EXPECT_EQ(*it, 'g');
 		++it;
 		EXPECT_EQ(*it, 'h');
@@ -176,6 +181,106 @@ TEST_ASYNC(IChannelBuffered,
 		{
 			ASSERT_ASYNC_EQ(*it, expected);
 			++it;
+			++expected;
+		}
+	}
+
+	co_return {};
+}
+
+TEST_ASYNC(IChannelBuffered,
+		   BenchmarkReader,
+		   (TestIChannelGenerator, TestIChannelGeneratorZeroCopy, TestIChannelGeneratorChunks, TestIChannelGeneratorZeroCopyChunks))
+{
+	TestType in{0};
+	bzd::IChannelBuffered<bzd::Int32, 16u> channel{in};
+
+	auto reader = channel.reader();
+	auto it = bzd::begin(reader);
+	auto end = bzd::end(reader);
+
+	for (bzd::Int32 expected = 0; expected < 100000; ++expected)
+	{
+		if (it == end)
+		{
+			co_await !reader.next();
+			it = bzd::begin(reader);
+			end = bzd::end(reader);
+		}
+
+		EXPECT_EQ(*it, expected);
+		++it;
+	}
+
+	co_return {};
+}
+
+template <class T>
+bzd::Generator<bzd::Int32> consume(T&& reader) noexcept
+{
+	auto it = bzd::begin(reader);
+	auto end = bzd::end(reader);
+
+	while (true)
+	{
+		if (it == end)
+		{
+			co_await !reader.next();
+			it = bzd::begin(reader);
+			end = bzd::end(reader);
+		}
+
+		co_yield *it;
+		++it;
+	}
+}
+
+TEST_ASYNC(IChannelBuffered,
+		   BenchmarkReaderGenerator,
+		   (TestIChannelGenerator, TestIChannelGeneratorZeroCopy, TestIChannelGeneratorChunks, TestIChannelGeneratorZeroCopyChunks))
+{
+	TestType in{0};
+	bzd::IChannelBuffered<bzd::Int32, 16u> channel{in};
+
+	auto reader = channel.reader();
+	auto generator = consume(bzd::move(reader));
+
+	for (bzd::Int32 expected = 0; expected < 100000; ++expected)
+	{
+		const auto value = co_await generator;
+		EXPECT_EQ(value.value(), expected);
+	}
+
+	co_return {};
+}
+
+template <class T>
+bzd::Generator<T&> consumeSpan(T&& reader) noexcept
+{
+	while (true)
+	{
+		co_await !reader.next();
+		co_yield reader;
+	}
+}
+
+TEST_ASYNC(IChannelBuffered,
+		   BenchmarkReaderGeneratorSpan,
+		   (TestIChannelGenerator, TestIChannelGeneratorZeroCopy, TestIChannelGeneratorChunks, TestIChannelGeneratorZeroCopyChunks))
+{
+	TestType in{0};
+	bzd::IChannelBuffered<bzd::Int32, 16u> channel{in};
+
+	auto reader = channel.reader();
+	auto generator = consumeSpan(bzd::move(reader));
+
+	for (bzd::Int32 expected = 0; expected < 100000;)
+	{
+		auto span = co_await generator;
+		auto& range = span.valueMutable();
+		for (const auto value : range)
+		{
+			EXPECT_EQ(value, expected);
 			++expected;
 		}
 	}

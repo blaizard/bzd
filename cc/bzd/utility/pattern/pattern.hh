@@ -255,7 +255,7 @@ public:
 	static constexpr auto make(Args&... args) noexcept
 	{
 		// Make a lambda that capture the arguments and cast the Metadata type into the correct one.
-		const auto lambdas = bzd::makeTuple([&args](Range & range, const Metadatas<Adapter, Args...>& metadatas) -> auto{
+		const auto lambdas = bzd::makeTuple([&args](Range& range, const Metadatas<Adapter, Args...>& metadatas) -> auto {
 			if constexpr (concepts::metadata<Adapter, Args>)
 			{
 				const auto& metadata = metadatas.template get<Metadata<Adapter, Args>>();
