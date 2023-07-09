@@ -14,11 +14,16 @@ public:
 	using bzd::Regexp::Regexp;
 
 public:
-	template <concepts::asyncInputByteCopyableRange Input>
-	bzd::Async<Size> match(Input&& input) noexcept
+	template <concepts::generatorInputByteCopyableRange Generator>
+	bzd::Async<Size> match(Generator&& generator) noexcept
 	{
-		auto it = bzd::begin(input);
-		auto end = bzd::end(input);
+		auto maybeRange = co_await generator;
+		if (!maybeRange)
+		{
+			co_return bzd::move(maybeRange).propagate();
+		}
+		auto it = bzd::begin(maybeRange.valueMutable());
+		auto end = bzd::end(maybeRange.valueMutable());
 
 		Context context{regexp_};
 		while (!context.regexp.empty())
@@ -31,15 +36,15 @@ public:
 				{
 					if (it == end)
 					{
-						auto mayebSuccess = co_await input.next();
-						if (mayebSuccess)
+						maybeRange = co_await generator;
+						if (maybeRange)
 						{
-							it = bzd::begin(input);
-							end = bzd::end(input);
+							it = bzd::begin(maybeRange.valueMutable());
+							end = bzd::end(maybeRange.valueMutable());
 						}
-						else if (mayebSuccess.error().getType() != bzd::ErrorType::eof)
+						else if (maybeRange.error().getType() != bzd::ErrorType::eof)
 						{
-							co_return bzd::move(mayebSuccess).propagate();
+							co_return bzd::move(maybeRange).propagate();
 						}
 						// If there are still no input after fetching new data.
 						if (it == end)
@@ -70,13 +75,13 @@ public:
 		co_return context.counter;
 	}
 
-	template <concepts::asyncInputByteCopyableRange Input, bzd::concepts::outputByteCopyableRange Output>
-	bzd::Async<Size> capture(Input&& input, Output&& output) noexcept
+	template <concepts::generatorInputByteCopyableRange Generator, bzd::concepts::outputByteCopyableRange Output>
+	bzd::Async<Size> capture(Generator&& generator, Output&& output) noexcept
 	{
 		bzd::ranges::Stream oStream{bzd::inPlace, output};
 		Bool overflow = false;
-		InputStreamCaptureRangeAsync readerCapture{input, oStream, overflow};
-		const auto size = co_await !match(readerCapture);
+		auto wrappedGenerator = generatorCaptureWrapper(generator, oStream, overflow);
+		const auto size = co_await !match(wrappedGenerator);
 		if (overflow)
 		{
 			co_return bzd::error::Data("Capture overflow");
@@ -85,17 +90,22 @@ public:
 	}
 
 private:
-	template <concepts::asyncInputByteCopyableRange Input, bzd::concepts::outputByteCopyableRange Capture>
-	class InputStreamCaptureRangeAsync : public InputStreamCaptureRange<Input, Capture>
-	{
-	public:
-		constexpr InputStreamCaptureRangeAsync(Input& input, Capture& capture, Bool& overflow) noexcept :
-			InputStreamCaptureRange<Input, Capture>{input, capture, overflow}
-		{
-		}
 
-		bzd::Async<> next() noexcept { co_return co_await this->range_.get().next(); }
-	};
+	template <concepts::generatorInputByteCopyableRange Generator, bzd::concepts::outputByteCopyableRange Capture>
+	bzd::Generator<InputStreamCaptureRange<typename Generator::ResultType::Value, Capture>> generatorCaptureWrapper(Generator& generator, Capture& capture, Bool& overflow) noexcept
+	{
+		while (!generator.isCompleted())
+		{
+			auto result = co_await generator;
+			if (!result)
+			{
+				co_yield bzd::move(result).propagate();
+				break;
+			}
+			auto value = result.valueMutable();
+			co_yield InputStreamCaptureRange<typename Generator::ResultType::Value, Capture>{value, capture, overflow};
+		}
+	}
 };
 
 } // namespace bzd

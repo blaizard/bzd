@@ -11,10 +11,10 @@ template <concepts::constexprStringView T>
 struct FromStream<T>
 {
 public:
-	template <concepts::asyncInputByteCopyableRange Input, class... Args>
-	static bzd::Async<Size> process(Input&& input, const T& pattern, Args&&... args) noexcept
+	template <concepts::generatorInputByteCopyableRange Generator, class... Args>
+	static bzd::Async<Size> process(Generator&& generator, const T& pattern, Args&&... args) noexcept
 	{
-		const auto [context, processor] = bzd::pattern::impl::makeAsync<Input&, Schema>(pattern, args...);
+		const auto [context, processor] = bzd::pattern::impl::makeAsync<Generator&, Schema>(pattern, args...);
 		Size counter{0u};
 
 		// Run-time call
@@ -23,12 +23,12 @@ public:
 			if (!fragment.str.empty())
 			{
 				bzd::RegexpAsync regexp{fragment.str};
-				const auto size = co_await !regexp.match(input);
+				const auto size = co_await !regexp.match(generator);
 				counter += size;
 			}
 			if (fragment.isMetadata)
 			{
-				const auto size = co_await !processor.process(input, fragment);
+				const auto size = co_await !processor.process(generator, fragment);
 				counter += size;
 			}
 		}

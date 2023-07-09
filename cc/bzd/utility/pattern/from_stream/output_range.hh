@@ -12,11 +12,11 @@ struct FromStream<Output> : public bzd::FromString<Output>
 {
 	using Metadata = typename bzd::FromString<Output>::Metadata;
 
-	template <concepts::asyncInputByteCopyableRange Input, class T>
-	static bzd::Async<Size> process(Input&& input, T&& output, const Metadata metadata = Metadata{}) noexcept
+	template <concepts::generatorInputByteCopyableRange Generator, class T>
+	static bzd::Async<Size> process(Generator&& generator, T&& output, const Metadata metadata = Metadata{}) noexcept
 	{
 		bzd::RegexpAsync regexp{metadata.regexp};
-		co_return co_await regexp.capture(bzd::forward<Input>(input), output);
+		co_return co_await regexp.capture(bzd::forward<Generator>(generator), output);
 	}
 };
 

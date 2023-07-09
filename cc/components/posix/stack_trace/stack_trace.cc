@@ -218,12 +218,12 @@ SymbolicInfo makeSymbolicInfo(void* address)
 		{
 			symbolicInfo.offset = reinterpret_cast<bzd::IntPointer>(address) - reinterpret_cast<bzd::IntPointer>(info.dli_saddr);
 		}
-		else if (extraInfo)
+		/*else if (extraInfo)
 		{
 			const ::link_map& linkMap = reinterpret_cast<const ::link_map&>(extraInfo);
 			// NOLINTNEXTLINE(clang-analyzer-core.UndefinedBinaryOperatorResult)
 			symbolicInfo.offset = reinterpret_cast<bzd::IntPointer>(address) - reinterpret_cast<bzd::IntPointer>(linkMap.l_ld);
-		}
+		}*/
 	}
 
 	symbolicInfo.address = (info.dli_fbase == selfBaseAddress) ? address : reinterpret_cast<void*>(symbolicInfo.offset);

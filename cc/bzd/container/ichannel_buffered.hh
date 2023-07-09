@@ -9,8 +9,7 @@
 #include "cc/bzd/core/channel.hh"
 #include "cc/bzd/type_traits/container.hh"
 #include "cc/bzd/type_traits/range.hh"
-
-#include <iostream>
+#include "cc/bzd/utility/scope_guard.hh"
 
 namespace bzd {
 
@@ -23,73 +22,6 @@ template <class T, Size bufferCapacity>
 class IChannelBuffered : public bzd::IChannel<T>
 {
 public:
-	/// Reader for data gather either from the input channel or the internal buffer.
-	///
-	/// Uppon destruction of the range, the data consumed will be reflected in the buffer ring.
-	class ReaderScope : public ranges::Stream<bzd::Span<const T>>
-	{
-	private:
-		using Parent = ranges::Stream<bzd::Span<const T>>;
-
-	public:
-		constexpr ReaderScope(IChannelBuffered& ichannel) noexcept : Parent{bzd::inPlace, bzd::Span<const T>{}}, ichannel_{ichannel} {}
-
-		ReaderScope(const ReaderScope&) = delete;
-		ReaderScope& operator=(const ReaderScope&) = delete;
-		constexpr ReaderScope(ReaderScope&& other) noexcept : Parent{static_cast<Parent&&>(other)}, ichannel_{other.ichannel_}
-		{
-			other.ichannel_.reset();
-		}
-		constexpr ReaderScope& operator=(ReaderScope&& other) noexcept
-		{
-			close();
-
-			static_cast<Parent&>(*this) = static_cast<Parent&&>(other);
-			ichannel_ = other.ichannel_;
-			other.ichannel_.reset();
-
-			return *this;
-		}
-		constexpr ~ReaderScope() noexcept { close(); }
-
-		bzd::Async<> next() noexcept
-		{
-			auto chunk = co_await !nextChuck();
-			static_cast<Parent&>(*this) = Parent{bzd::inPlace, chunk};
-			co_return {};
-		}
-
-	private:
-		bzd::Async<bzd::Span<const T>> nextChuck() noexcept
-		{
-			auto& buffer = ichannel_.valueMutable().buffer_;
-			auto& in = ichannel_.valueMutable().in_;
-			const auto readFromBuffer = buffer.asSpanForReading();
-			if (!readFromBuffer.empty())
-			{
-				buffer.consume(readFromBuffer.size());
-				co_return readFromBuffer;
-			}
-			auto writeToBuffer = buffer.asSpanForWriting();
-			const auto data = co_await !in.read(bzd::move(writeToBuffer));
-			buffer.produce(data.size());
-			buffer.consume(data.size());
-			co_return data;
-		}
-
-		constexpr void close() noexcept
-		{
-			if (ichannel_.hasValue())
-			{
-				const auto left = bzd::Span<const T>{this->it_, this->end()};
-				ichannel_.valueMutable().buffer_.unconsume(left);
-			}
-		}
-
-	private:
-		bzd::Optional<IChannelBuffered&> ichannel_;
-	};
-
 	class ReadScope : public ranges::Stream<bzd::Spans<const T, 3u>>
 	{
 	private:
@@ -153,10 +85,46 @@ public:
 		co_return readFromBuffer.first(count);
 	}
 
-	/// Read from the input channel as a ReaderScope.
+private:
+	using ReaderRangeBegin = iterator::InputOrOutputReference<typename bzd::Span<const T>::Iterator, iterator::InputOrOutputReferencePolicies<typeTraits::IteratorCategory::input>>;
+	using ReaderRangeEnd = typename bzd::Span<const T>::ConstIterator;
+	using ReaderRange = ranges::SubRange<ReaderRangeBegin, ReaderRangeEnd>;
+
+public:
+	/// A generator to read from the input channel.
 	///
-	/// \note Uppon destruction of the range, the data consumed will be removed from the buffer ring.
-	ReaderScope reader() noexcept { return {*this}; }
+	/// \note Uppon destruction of the range, the data consumed will "unconsumed" from the buffer range,
+	/// this feature allow zero copy when possible.
+	bzd::Generator<ReaderRange> reader() noexcept
+	{
+		while (true)
+		{
+			auto data = buffer_.asSpanForReading();
+			if (!data.empty())
+			{
+				buffer_.consume(data.size());
+			}
+			else
+			{
+				auto writeToBuffer = buffer_.asSpanForWriting();
+				data = co_await !in_.read(bzd::move(writeToBuffer));
+				buffer_.produce(data.size());
+				buffer_.consume(data.size());
+			}
+
+			auto it = bzd::begin(data);
+			const auto end = bzd::end(data);
+			auto scope = bzd::ScopeGuard{[this, &it, &end]() {
+				const auto left = bzd::Span<const T>{it, end};
+				buffer_.unconsume(left);
+			}};
+
+			do
+			{
+				co_yield ReaderRange{ReaderRangeBegin{it}, end};
+			} while (it != end);
+		}
+	}
 
 	/// Read at least `count` bytes and return a Stream range.
 	///

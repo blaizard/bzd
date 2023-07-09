@@ -22,8 +22,8 @@ concept async = requires(T t) {
 	} -> sameClassAs<typeTraits::AsyncType>;
 };
 template <class T>
-concept asyncTask = async<T> && (T::type == typeTraits::AsyncType::task);
+concept asyncTask = async<T> && (typeTraits::RemoveCVRef<T>::type == typeTraits::AsyncType::task);
 template <class T>
-concept asyncGenerator = async<T> && (T::type == typeTraits::AsyncType::generator);
+concept asyncGenerator = async<T> && (typeTraits::RemoveCVRef<T>::type == typeTraits::AsyncType::generator);
 
 } // namespace bzd::concepts

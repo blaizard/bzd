@@ -4,10 +4,6 @@ set -e
 
 VERSION=$1
 
-sudo apt-get install -y --no-install-recommends \
-    git \
-    python3
-
 curl -L https://github.com/llvm/llvm-project/releases/download/llvmorg-${VERSION}/llvm-project-${VERSION}.src.tar.xz | tar -xJ
 pushd "llvm-project-${VERSION}.src"
 cmake -G "Unix Makefiles" -S llvm -B build -DCMAKE_BUILD_TYPE="Release" \
