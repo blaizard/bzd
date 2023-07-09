@@ -106,7 +106,8 @@ concept asyncRange = inputOrOutputRange<T> && requires(T&& t) {
 };
 
 template <class T>
-concept generatorInputByteCopyableRange = concepts::asyncGenerator<T> && inputByteCopyableRange<typename typeTraits::RemoveCVRef<T>::ResultType::Value>;
+concept generatorInputByteCopyableRange =
+	concepts::asyncGenerator<T> && inputByteCopyableRange<typename typeTraits::RemoveCVRef<T>::ResultType::Value>;
 
 template <class T>
 concept asyncInputByteCopyableRange = inputByteCopyableRange<T> && asyncRange<T>;

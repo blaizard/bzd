@@ -228,7 +228,7 @@ TEST_ASYNC(IChannelBuffered,
 		++it;
 	}
 
-	auto newGenerator = bzd::move(generator);	
+	auto newGenerator = bzd::move(generator);
 
 	{
 		auto result = co_await newGenerator;
