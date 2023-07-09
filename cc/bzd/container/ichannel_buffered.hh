@@ -86,7 +86,9 @@ public:
 	}
 
 private:
-	using ReaderRangeBegin = iterator::InputOrOutputReference<typename bzd::Span<const T>::Iterator, iterator::InputOrOutputReferencePolicies<typeTraits::IteratorCategory::input>>;
+	using ReaderRangeBegin =
+		iterator::InputOrOutputReference<typename bzd::Span<const T>::Iterator,
+										 iterator::InputOrOutputReferencePolicies<typeTraits::IteratorCategory::input>>;
 	using ReaderRangeEnd = typename bzd::Span<const T>::ConstIterator;
 	using ReaderRange = ranges::SubRange<ReaderRangeBegin, ReaderRangeEnd>;
 

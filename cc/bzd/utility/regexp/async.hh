@@ -90,9 +90,10 @@ public:
 	}
 
 private:
-
 	template <concepts::generatorInputByteCopyableRange Generator, bzd::concepts::outputByteCopyableRange Capture>
-	bzd::Generator<InputStreamCaptureRange<typename Generator::ResultType::Value, Capture>> generatorCaptureWrapper(Generator& generator, Capture& capture, Bool& overflow) noexcept
+	bzd::Generator<InputStreamCaptureRange<typename Generator::ResultType::Value, Capture>> generatorCaptureWrapper(Generator& generator,
+																													Capture& capture,
+																													Bool& overflow) noexcept
 	{
 		while (!generator.isCompleted())
 		{

@@ -61,7 +61,6 @@ TEST_ASYNC(RegexpAsync, String, AllTestIChannel)
 	co_return {};
 }
 
-
 TEST_ASYNC(RegexpAsync, SplitChannel, AllTestIChannel)
 {
 	TestType in{};
