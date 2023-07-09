@@ -17,8 +17,8 @@ TEST_ASYNC(IChannelBuffered, Reader, (TestIChannel, TestIChannelZeroCopy))
 
 	// Empty ichannel
 	{
-		auto reader = channel.reader();
-		auto maybeSuccess = co_await reader.next();
+		auto generator = channel.reader();
+		auto maybeSuccess = co_await generator;
 		EXPECT_FALSE(maybeSuccess);
 		EXPECT_EQ(channel.size(), 0u);
 	}
@@ -26,10 +26,11 @@ TEST_ASYNC(IChannelBuffered, Reader, (TestIChannel, TestIChannelZeroCopy))
 	// Add content to ichannel
 	in << "abcdef";
 	{
-		auto reader = channel.reader();
-		co_await !reader.next();
+		auto generator = channel.reader();
+		auto maybeRange = co_await generator;
+		EXPECT_TRUE(maybeRange);
 		EXPECT_EQ(channel.size(), 0u);
-		auto it = reader.begin();
+		auto it = maybeRange->begin();
 		EXPECT_EQ(*it, 'a');
 		++it;
 		EXPECT_EQ(*it, 'b');
@@ -40,10 +41,10 @@ TEST_ASYNC(IChannelBuffered, Reader, (TestIChannel, TestIChannelZeroCopy))
 
 	// Consume from the inner buffer
 	{
-		auto reader = channel.reader();
-		co_await !reader.next();
+		auto generator = channel.reader();
+		auto maybeRange = co_await generator;
 		EXPECT_EQ(channel.size(), 0u);
-		auto it = reader.begin();
+		auto it = maybeRange->begin();
 		EXPECT_EQ(*it, 'c');
 		++it;
 		EXPECT_EQ(*it, 'd');
@@ -54,10 +55,10 @@ TEST_ASYNC(IChannelBuffered, Reader, (TestIChannel, TestIChannelZeroCopy))
 
 	// Consume from the inner buffer
 	{
-		auto reader = channel.reader();
-		co_await !reader.next();
+		auto generator = channel.reader();
+		auto maybeRange = co_await generator;
 		EXPECT_EQ(channel.size(), 0u);
-		auto it = reader.begin();
+		auto it = maybeRange->begin();
 		EXPECT_EQ(*it, 'e');
 		++it;
 		EXPECT_EQ(*it, 'f');
@@ -69,10 +70,10 @@ TEST_ASYNC(IChannelBuffered, Reader, (TestIChannel, TestIChannelZeroCopy))
 	// Consume from the new buffer
 	in << "ghi";
 	{
-		auto reader = channel.reader();
-		co_await !reader.next();
+		auto generator = channel.reader();
+		auto maybeRange = co_await generator;
 		EXPECT_EQ(channel.size(), 0u);
-		auto it = reader.begin();
+		auto it = maybeRange->begin();
 		EXPECT_EQ(*it, 'g');
 		++it;
 		EXPECT_EQ(*it, 'h');
@@ -195,94 +196,45 @@ TEST_ASYNC(IChannelBuffered,
 	TestType in{0};
 	bzd::IChannelBuffered<bzd::Int32, 16u> channel{in};
 
-	auto reader = channel.reader();
-	auto it = bzd::begin(reader);
-	auto end = bzd::end(reader);
+	auto generator = channel.reader();
 
-	for (bzd::Int32 expected = 0; expected < 100000; ++expected)
-	{
-		if (it == end)
-		{
-			co_await !reader.next();
-			it = bzd::begin(reader);
-			end = bzd::end(reader);
-		}
-
-		EXPECT_EQ(*it, expected);
-		++it;
-	}
-
-	co_return {};
-}
-
-template <class T>
-bzd::Generator<bzd::Int32> consume(T&& reader) noexcept
-{
-	auto it = bzd::begin(reader);
-	auto end = bzd::end(reader);
-
-	while (true)
-	{
-		if (it == end)
-		{
-			co_await !reader.next();
-			it = bzd::begin(reader);
-			end = bzd::end(reader);
-		}
-
-		co_yield *it;
-		++it;
-	}
-}
-
-TEST_ASYNC(IChannelBuffered,
-		   BenchmarkReaderGenerator,
-		   (TestIChannelGenerator, TestIChannelGeneratorZeroCopy, TestIChannelGeneratorChunks, TestIChannelGeneratorZeroCopyChunks))
-{
-	TestType in{0};
-	bzd::IChannelBuffered<bzd::Int32, 16u> channel{in};
-
-	auto reader = channel.reader();
-	auto generator = consume(bzd::move(reader));
-
-	for (bzd::Int32 expected = 0; expected < 100000; ++expected)
-	{
-		const auto value = co_await generator;
-		EXPECT_EQ(value.value(), expected);
-	}
-
-	co_return {};
-}
-
-template <class T>
-bzd::Generator<T&> consumeSpan(T&& reader) noexcept
-{
-	while (true)
-	{
-		co_await !reader.next();
-		co_yield reader;
-	}
-}
-
-TEST_ASYNC(IChannelBuffered,
-		   BenchmarkReaderGeneratorSpan,
-		   (TestIChannelGenerator, TestIChannelGeneratorZeroCopy, TestIChannelGeneratorChunks, TestIChannelGeneratorZeroCopyChunks))
-{
-	TestType in{0};
-	bzd::IChannelBuffered<bzd::Int32, 16u> channel{in};
-
-	auto reader = channel.reader();
-	auto generator = consumeSpan(bzd::move(reader));
-
-	for (bzd::Int32 expected = 0; expected < 100000;)
+	for (bzd::Int32 expected = 0; expected < 1000;)
 	{
 		auto span = co_await generator;
-		auto& range = span.valueMutable();
+		auto range = span.valueMutable();
 		for (const auto value : range)
 		{
 			EXPECT_EQ(value, expected);
 			++expected;
 		}
+	}
+
+	co_return {};
+}
+
+TEST_ASYNC(IChannelBuffered,
+		   BenchmarkReaderMove,
+		   (TestIChannelGenerator, TestIChannelGeneratorZeroCopy, TestIChannelGeneratorChunks, TestIChannelGeneratorZeroCopyChunks))
+{
+	TestType in{0};
+	bzd::IChannelBuffered<bzd::Int32, 16u> channel{in};
+
+	auto generator = channel.reader();
+
+	{
+		auto result = co_await generator;
+		auto it = bzd::begin(result.valueMutable());
+		EXPECT_EQ(*it, 0);
+		++it;
+	}
+
+	auto newGenerator = bzd::move(generator);	
+
+	{
+		auto result = co_await newGenerator;
+		auto it = bzd::begin(result.valueMutable());
+		EXPECT_EQ(*it, 1);
+		++it;
 	}
 
 	co_return {};

@@ -79,6 +79,7 @@ public:
 	/// A Stream cannot have a size eventhough, it could have if it comes from a sized range.
 	/// Deleting it ensure no wrong uses that would make it incompatible with the concept.
 	constexpr auto size() const noexcept = delete;
+	constexpr auto empty() const noexcept { return it_ == end(); }
 
 protected:
 	bzd::Wrapper<Range> range_;

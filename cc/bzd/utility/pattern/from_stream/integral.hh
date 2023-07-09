@@ -7,25 +7,30 @@
 
 namespace bzd {
 
-template <concepts::asyncInputByteCopyableRange Input, class Callback>
-bzd::Async<Size> forEach(Input&& input, Callback&& callback) noexcept
+template <concepts::generatorInputByteCopyableRange Generator, class Callback>
+bzd::Async<Size> forEach(Generator&& generator, Callback&& callback) noexcept
 {
-	auto it = bzd::begin(input);
-	auto end = bzd::end(input);
+	auto result = co_await generator;
+	if (!result)
+	{
+		co_return bzd::move(result).propagate();
+	}
+	auto it = bzd::begin(result.valueMutable());
+	auto end = bzd::end(result.valueMutable());
 	Size count{0u};
 	while (true)
 	{
 		if (it == end)
 		{
-			auto mayebSuccess = co_await input.next();
-			if (mayebSuccess)
+			result = co_await generator;
+			if (result)
 			{
-				it = bzd::begin(input);
-				end = bzd::end(input);
+				it = bzd::begin(result.valueMutable());
+				end = bzd::end(result.valueMutable());
 			}
-			else if (mayebSuccess.error().getType() != bzd::ErrorType::eof)
+			else if (result.error().getType() != bzd::ErrorType::eof)
 			{
-				co_return bzd::move(mayebSuccess).propagate();
+				co_return bzd::move(result).propagate();
 			}
 			// If there are still no input after fetching new data.
 			if (it == end)
@@ -50,12 +55,12 @@ struct FromStream<T> : public FromString<T>
 {
 	using Metadata = typename bzd::FromString<T>::Metadata;
 
-	template <concepts::asyncInputByteCopyableRange Input>
-	static bzd::Async<Size> process(Input&& input, T& output, const Metadata metadata = Metadata{}) noexcept
+	template <concepts::generatorInputByteCopyableRange Generator>
+	static bzd::Async<Size> process(Generator&& generator, T& output, const Metadata metadata = Metadata{}) noexcept
 	{
 		(void)metadata;
 		output = 0u;
-		const auto count = co_await !forEach(bzd::forward<Input>(input), [&](const auto input) -> Bool {
+		const auto count = co_await !forEach(bzd::forward<Generator>(generator), [&](const auto input) -> Bool {
 			const char c = static_cast<char>(input);
 			if (c < '0' || c > '9')
 			{
