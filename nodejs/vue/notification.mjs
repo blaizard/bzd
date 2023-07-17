@@ -100,8 +100,8 @@ export default {
 							{
 								timeOnScreen: 0,
 							},
-							options
-						)
+							options,
+						),
 					);
 				},
 				success(message, options) {

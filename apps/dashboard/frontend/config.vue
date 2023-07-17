@@ -142,7 +142,7 @@
 						},
 						{
 							auto: "Auto",
-						}
+						},
 					);
 			},
 		},
@@ -191,7 +191,7 @@
 					Exception.assert(
 						["source", "visualization"].includes(data.metadata.type),
 						"Unsupported plugin type: '{}'",
-						data.metadata.type
+						data.metadata.type,
 					);
 					data.module = "module" in data ? await data.module() : {}; // Load the frontend plugin to load the icon
 					plugins[data.metadata.type][name] = data;

@@ -38,6 +38,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":composition",
+        "//cc/bzd/container:ring_buffer",
         "//cc/bzd/core:print",
         "//cc/bzd/core/async",
         "//cc/bzd/meta:macro",
@@ -48,7 +49,6 @@ cc_library(
         "//cc/bzd/utility:numeric_limits",
         "//cc/bzd/utility/random:uniform_int_distribution",
         "//cc/bzd/utility/random:xorwow_engine",
-        "//cc/bzd/container:ring_buffer"
     ],
 )
 

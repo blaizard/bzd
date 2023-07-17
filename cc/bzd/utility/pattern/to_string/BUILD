@@ -36,10 +36,9 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        ":integral"
+        ":integral",
     ],
 )
-
 
 cc_library(
     name = "floating_point",

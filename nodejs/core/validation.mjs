@@ -14,7 +14,7 @@ class Constraint {
 			this.isValidNbArgs(this.args.length),
 			"Wrong number of arguments passed to '{}': {}",
 			this.name,
-			this.args.length
+			this.args.length,
 		);
 
 		this.create();
@@ -200,7 +200,7 @@ export default class Validation {
 				 */
 				allMandatory: false,
 			},
-			options
+			options,
 		);
 
 		let result = {};
@@ -212,7 +212,7 @@ export default class Validation {
 					key,
 					!(this.schema[key].mandatory || options.allMandatory) ||
 						(key in values && options.valueExists(key, values[key])),
-					"mandatory"
+					"mandatory",
 				)
 			) {
 				if (key in values) {
@@ -335,7 +335,7 @@ export default class Validation {
 					Exception.assert(
 						["string", "integer", "float", "boolean"].includes(this.args[0]),
 						"'{}' is not a supported type",
-						this.args[0]
+						this.args[0],
 					);
 					this.entry.type = this.args[0];
 				}

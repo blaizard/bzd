@@ -23,7 +23,7 @@ program
 		"-p, --port <number>",
 		"Port to be used to serve the application, can also be set with the environemnt variable BZD_PORT.",
 		8080,
-		parseInt
+		parseInt,
 	)
 	.option("-s, --static <path>", "Directory to static serve.", ".")
 	.parse(process.argv);
@@ -107,7 +107,7 @@ function pathToPathList(path) {
 				read: true,
 				write: true,
 				executable: true,
-			})
+			}),
 		);
 	});
 

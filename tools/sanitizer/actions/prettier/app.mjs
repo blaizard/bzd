@@ -7,7 +7,7 @@ async function evaluateFiles(parser, workspace, options) {
 
 	for await (const path of files.data()) {
 		const content = await FileSystem.readFile(path);
-		const formattedContent = Prettier.format(content, {
+		const formattedContent = await Prettier.format(content, {
 			printWidth: 120,
 			parser: parser,
 			useTabs: true,
@@ -30,28 +30,28 @@ async function evaluateFiles(parser, workspace, options) {
 	promiseList.push(
 		evaluateFiles("babel", workspace, {
 			include: ["**.mjs", "**.cjs", "**.js"],
-		})
+		}),
 	);
 	promiseList.push(
 		evaluateFiles("vue", workspace, {
 			include: ["**.vue"],
-		})
+		}),
 	);
 	promiseList.push(
 		evaluateFiles("css", workspace, {
 			include: ["**.css"],
-		})
+		}),
 	);
 	promiseList.push(
 		evaluateFiles("scss", workspace, {
 			include: ["**.scss"],
-		})
+		}),
 	);
 	promiseList.push(
 		evaluateFiles("markdown", workspace, {
 			include: ["**.md"],
 			exclude: ["docs/api/**"],
-		})
+		}),
 	);
 
 	await Promise.all(promiseList);

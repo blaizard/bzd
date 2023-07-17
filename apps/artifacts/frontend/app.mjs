@@ -57,7 +57,7 @@ Vue.use(CachePlugin, {
 					response.data.map((item) => {
 						item.permissions = Permissions.makeFromEntry(item);
 						return item;
-					})
+					}),
 				);
 			} while (next);
 			list.sort((a, b) => Intl.Collator().compare(a.name, b.name));
