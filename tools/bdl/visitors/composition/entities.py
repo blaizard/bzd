@@ -111,7 +111,7 @@ class Entities:
 		[
 			{
 				"symbol": <Data type symbol>,
-				"source": "example.hello.send",
+				"source": "example.hello.myval",
 				"sinks": [
 					{
 						"history": 1
@@ -149,12 +149,12 @@ class Entities:
 		
 		{
 			"example.hello": {
-				"send": {
+				"myval": {
 					"type": "source",
 					"multi": False,
-					"connections": {"example.hello.send"},
+					"connections": {"example.hello.myval"},
 					"symbol": <symbol>,
-					"identifier": "example.hello.send"
+					"identifier": "example.hello.myval"
 				}
 			},
 			...

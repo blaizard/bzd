@@ -19,16 +19,11 @@ void helperTestCopy(Range&& range, Expected&& expected)
 {
 	// Copy constructor.
 	auto copy{range};
-	{
-		const auto isEqual = bzd::algorithm::equal(copy, expected);
-		EXPECT_TRUE(isEqual);
-	}
+	EXPECT_EQ_RANGE(copy, expected);
+
 	// Copy assignment.
 	copy = range;
-	{
-		const auto isEqual = bzd::algorithm::equal(copy, expected);
-		EXPECT_TRUE(isEqual);
-	}
+	EXPECT_EQ_RANGE(copy, expected);
 }
 
 template <class Range, class Expected>
@@ -36,16 +31,11 @@ void helperTestMove(Range&& range, Expected&& expected)
 {
 	// Move constructor.
 	auto move{bzd::move(range)};
-	{
-		const auto isEqual = bzd::algorithm::equal(move, expected);
-		EXPECT_TRUE(isEqual);
-	}
+	EXPECT_EQ_RANGE(move, expected);
+
 	// Move assignment.
 	move = bzd::move(range);
-	{
-		const auto isEqual = bzd::algorithm::equal(move, expected);
-		EXPECT_TRUE(isEqual);
-	}
+	EXPECT_EQ_RANGE(move, expected);
 }
 
 TEST(Views, Drop)
@@ -54,29 +44,14 @@ TEST(Views, Drop)
 	bzd::ranges::Drop view{bzd::inPlace, range, 2};
 
 	const auto expected = {2, 3, 4};
-	{
-		const auto isEqual = bzd::algorithm::equal(view, expected);
-		EXPECT_TRUE(isEqual);
-	}
-	{
-		const auto isEqual = bzd::algorithm::equal(bzd::move(view) | bzd::ranges::all(), expected);
-		// This should not compile.
-		// const auto isEqual = bzd::algorithm::equal(bzd::move(range) | bzd::ranges::drop(2), expected);
-		EXPECT_TRUE(isEqual);
-	}
-	{
-		const auto isEqual = bzd::algorithm::equal(range | bzd::ranges::drop(2), expected);
-		EXPECT_TRUE(isEqual);
-	}
-	{
-		const auto expected2 = {3, 4};
-		const auto isEqual = bzd::algorithm::equal(range | bzd::ranges::drop(2) | bzd::ranges::drop(1), expected2);
-		EXPECT_TRUE(isEqual);
-	}
-	{
-		const auto isEqual = bzd::algorithm::equal("hello"_sv | bzd::ranges::drop(2), "llo"_sv);
-		EXPECT_TRUE(isEqual);
-	}
+	EXPECT_EQ_RANGE(view, expected);
+	EXPECT_EQ_RANGE(bzd::move(view) | bzd::ranges::all(), expected);
+	EXPECT_EQ_RANGE(range | bzd::ranges::drop(2), expected);
+
+	const auto expected2 = {3, 4};
+	EXPECT_EQ_RANGE(range | bzd::ranges::drop(2) | bzd::ranges::drop(1), expected2);
+
+	EXPECT_EQ_RANGE("hello"_sv | bzd::ranges::drop(2), "llo"_sv);
 
 	EXPECT_TRUE(bzd::concepts::borrowedRange<bzd::ranges::Drop<bzd::Span<int>>>);
 	EXPECT_TRUE(bzd::concepts::borrowedRange<bzd::ranges::Drop<bzd::String<1u>&>>);
@@ -91,19 +66,11 @@ TEST(Views, Take)
 	bzd::ranges::Take view{bzd::inPlace, range, 2};
 
 	const auto expected = {0, 1};
-	{
-		const auto isEqual = bzd::algorithm::equal(view, expected);
-		EXPECT_TRUE(isEqual);
-	}
-	{
-		const auto isEqual = bzd::algorithm::equal(range | bzd::ranges::take(2), expected);
-		EXPECT_TRUE(isEqual);
-	}
-	{
-		const auto expected2 = {0};
-		const auto isEqual = bzd::algorithm::equal(range | bzd::ranges::take(2) | bzd::ranges::take(1), expected2);
-		EXPECT_TRUE(isEqual);
-	}
+	EXPECT_EQ_RANGE(view, expected);
+	EXPECT_EQ_RANGE(range | bzd::ranges::take(2), expected);
+
+	const auto expected2 = {0};
+	EXPECT_EQ_RANGE(range | bzd::ranges::take(2) | bzd::ranges::take(1), expected2);
 
 	helperTestCopy(bzd::ranges::Take{bzd::inPlace, "012345"_sv, 2}, "01"_sv);
 	helperTestMove(bzd::ranges::Take{bzd::inPlace, "012345"_sv, 2}, "01"_sv);
@@ -115,10 +82,7 @@ TEST(Views, Transform)
 	bzd::ranges::Transform view{bzd::inPlace, range, [](const auto value) { return value * value; }};
 
 	const auto expected = {0, 1, 4, 9, 16};
-	{
-		const auto isEqual = bzd::algorithm::equal(view, expected);
-		EXPECT_TRUE(isEqual);
-	}
+	EXPECT_EQ_RANGE(view, expected);
 
 	helperTestCopy(bzd::ranges::Transform{bzd::inPlace, "ABC"_sv, [](const char c) { return c + ('a' - 'A'); }}, "abc"_sv);
 	helperTestMove(bzd::ranges::Transform{bzd::inPlace, "ABC"_sv, [](const char c) { return c + ('a' - 'A'); }}, "abc"_sv);
@@ -130,10 +94,7 @@ TEST(Views, Reverse)
 	bzd::ranges::Reverse view{bzd::inPlace, range};
 
 	const auto expected = {4, 3, 2, 1, 0};
-	{
-		const auto isEqual = bzd::algorithm::equal(view, expected);
-		EXPECT_TRUE(isEqual);
-	}
+	EXPECT_EQ_RANGE(view, expected);
 
 	helperTestCopy(bzd::ranges::Reverse{bzd::inPlace, "012345"_sv}, "543210"_sv);
 	helperTestMove(bzd::ranges::Reverse{bzd::inPlace, "012345"_sv}, "543210"_sv);
@@ -144,10 +105,8 @@ TEST(Views, Owning)
 	bzd::StringView v{"Hello World"_sv};
 	auto myOwningView = bzd::ranges::Owning(bzd::inPlace, std::move(v));
 	EXPECT_EQ(myOwningView.size(), 11);
-	{
-		const auto isEqual = bzd::algorithm::equal(myOwningView, "Hello World"_sv);
-		EXPECT_TRUE(isEqual);
-	}
+
+	EXPECT_EQ_RANGE(myOwningView, "Hello World"_sv);
 
 	helperTestMove(bzd::ranges::Owning{bzd::inPlace, "012345"_sv}, "012345"_sv);
 }

@@ -15,6 +15,7 @@ public:
 	constexpr Mutex& operator=(const Mutex& mutex) noexcept = delete;
 	Mutex(Mutex&& mutex) noexcept = delete;
 	Mutex& operator=(Mutex&& mutex) noexcept = delete;
+	~Mutex() = default;
 
 public:
 	bzd::Async<> lock() noexcept

@@ -19,7 +19,9 @@ public: // Traits.
 	using Index = bzd::Size;
 
 public: // Constructors/destructor/...
-	constexpr RingBufferResult() noexcept : bzd::Optional<T>{bzd::nullopt} {}
+	constexpr RingBufferResult() noexcept : bzd::Optional<T> { bzd::nullopt }
+	{
+	}
 	constexpr explicit RingBufferResult(T value, const Index index) noexcept : bzd::Optional<T>{value}, index_{index} {}
 	constexpr RingBufferResult(T value, const Index index, bzd::SpinSharedMutex& mutex) noexcept :
 		bzd::Optional<T>{value}, index_{index}, mutex_{&mutex}, shared_{true}

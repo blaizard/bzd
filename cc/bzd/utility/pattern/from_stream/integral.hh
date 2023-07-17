@@ -18,7 +18,7 @@ bzd::Async<Size> forEach(Generator&& generator, Callback&& callback) noexcept
 	auto it = bzd::begin(result.valueMutable());
 	auto end = bzd::end(result.valueMutable());
 	Size count{0u};
-	while (true)
+	while (!generator.isCompleted())
 	{
 		if (it == end)
 		{
@@ -27,15 +27,19 @@ bzd::Async<Size> forEach(Generator&& generator, Callback&& callback) noexcept
 			{
 				it = bzd::begin(result.valueMutable());
 				end = bzd::end(result.valueMutable());
+				// If there are still no input after fetching new data.
+				if (it == end)
+				{
+					break;
+				}
 			}
-			else if (result.error().getType() != bzd::ErrorType::eof)
-			{
-				co_return bzd::move(result).propagate();
-			}
-			// If there are still no input after fetching new data.
-			if (it == end)
+			else if (result.error().getType() == bzd::ErrorType::eof)
 			{
 				break;
+			}
+			else
+			{
+				co_return bzd::move(result).propagate();
 			}
 		}
 
@@ -43,6 +47,7 @@ bzd::Async<Size> forEach(Generator&& generator, Callback&& callback) noexcept
 		{
 			break;
 		}
+
 		++count;
 		++it;
 	}
@@ -58,20 +63,99 @@ struct FromStream<T> : public FromString<T>
 	template <concepts::generatorInputByteCopyableRange Generator>
 	static bzd::Async<Size> process(Generator&& generator, T& output, const Metadata metadata = Metadata{}) noexcept
 	{
-		(void)metadata;
 		output = 0u;
-		const auto count = co_await !forEach(bzd::forward<Generator>(generator), [&](const auto input) -> Bool {
-			const char c = static_cast<char>(input);
-			if (c < '0' || c > '9')
-			{
+		bzd::Size count{};
+		bzd::Bool isNegative{false};
+
+		if constexpr (concepts::isSigned<typeTraits::RemoveReference<T>>)
+		{
+			co_await !forEach(generator, [&](const auto input) -> Bool {
+				const char c = static_cast<char>(input);
+				if (c == '-')
+				{
+					isNegative = true;
+					return true;
+				}
 				return false;
-			}
-			output = output * 10 + (c - '0');
-			return true;
-		});
+			});
+		}
+
+		switch (metadata.format)
+		{
+		case Metadata::Format::binary:
+			count = co_await !forEach(bzd::forward<Generator>(generator), [&](const auto input) -> Bool {
+				const char c = static_cast<char>(input);
+				if (c >= '0' && c <= '1')
+				{
+					output = output * 2 + (c - '0');
+					return true;
+				}
+				return false;
+			});
+			break;
+		case Metadata::Format::octal:
+			count = co_await !forEach(bzd::forward<Generator>(generator), [&](const auto input) -> Bool {
+				const char c = static_cast<char>(input);
+				if (c >= '0' && c <= '7')
+				{
+					output = output * 8 + (c - '0');
+					return true;
+				}
+				return false;
+			});
+			break;
+		case Metadata::Format::decimal:
+			count = co_await !forEach(bzd::forward<Generator>(generator), [&](const auto input) -> Bool {
+				const char c = static_cast<char>(input);
+				if (c >= '0' && c <= '9')
+				{
+					output = output * 10 + (c - '0');
+					return true;
+				}
+				return false;
+			});
+			break;
+		case Metadata::Format::hexadecimalLower:
+			count = co_await !forEach(bzd::forward<Generator>(generator), [&](const auto input) -> Bool {
+				const char c = static_cast<char>(input);
+				if (c >= '0' && c <= '9')
+				{
+					output = output * 16 + (c - '0');
+					return true;
+				}
+				if (c >= 'a' && c <= 'f')
+				{
+					output = output * 16 + (c - 'a' + 10);
+					return true;
+				}
+				return false;
+			});
+			break;
+		case Metadata::Format::hexadecimalUpper:
+			count = co_await !forEach(bzd::forward<Generator>(generator), [&](const auto input) -> Bool {
+				const char c = static_cast<char>(input);
+				if (c >= '0' && c <= '9')
+				{
+					output = output * 16 + (c - '0');
+					return true;
+				}
+				if (c >= 'A' && c <= 'F')
+				{
+					output = output * 16 + (c - 'A' + 10);
+					return true;
+				}
+				return false;
+			});
+			break;
+		};
 		if (!count)
 		{
 			co_return bzd::error::Failure{"No integral"};
+		}
+		if (isNegative)
+		{
+			output = -output;
+			++count;
 		}
 		co_return count;
 	}

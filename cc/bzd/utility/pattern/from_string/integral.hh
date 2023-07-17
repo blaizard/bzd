@@ -97,7 +97,7 @@ private:
 		Bool isNegative = false;
 		if (it != last && *it == '-')
 		{
-			if (!concepts::isSigned<typeTraits::RemoveReference<T>>)
+			if constexpr (!concepts::isSigned<typeTraits::RemoveReference<T>>)
 			{
 				return bzd::nullopt;
 			}

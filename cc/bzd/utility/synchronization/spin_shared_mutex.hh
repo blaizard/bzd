@@ -17,6 +17,7 @@ public: // Constructors/assignments.
 	constexpr SpinSharedMutex& operator=(const SpinSharedMutex&) noexcept = delete;
 	SpinSharedMutex(SpinSharedMutex&&) noexcept = delete;
 	SpinSharedMutex& operator=(SpinSharedMutex&&) noexcept = delete;
+	~SpinSharedMutex() = default;
 
 public: // API.
 	/// Locks the mutex, blocks if the mutex is not available.

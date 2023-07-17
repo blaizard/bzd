@@ -10,8 +10,10 @@ struct EspErr : public bzd::ResultError<bzd::Error>
 {
 	// NOLINTNEXTLINE(bugprone-exception-escape)
 	EspErr(const bzd::StringView function, ::esp_err_t errorCode, const SourceLocation location = SourceLocation::current()) noexcept :
-		bzd::ResultError<bzd::Error>{
-			location, ErrorType::failure, "'{}', code {}, '{}'"_csv, function, errorCode, ::esp_err_to_name(errorCode)}
+		bzd::ResultError<bzd::Error>
+	{
+		location, ErrorType::failure, "'{}', code {}, '{}'"_csv, function, errorCode, ::esp_err_to_name(errorCode)
+	}
 	{
 	}
 };

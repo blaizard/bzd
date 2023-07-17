@@ -7,6 +7,7 @@ bzd_cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/utility/pattern/to_string:boolean",
+        "//cc/bzd/utility/pattern/to_string:byte",
         "//cc/bzd/utility/pattern/to_string:floating_point",
         "//cc/bzd/utility/pattern/to_string:integral",
         "//cc/bzd/utility/pattern/to_string:pattern",
@@ -20,6 +21,7 @@ bzd_cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/utility/pattern/to_stream:boolean",
+        "//cc/bzd/utility/pattern/to_stream:byte",
         "//cc/bzd/utility/pattern/to_stream:floating_point",
         "//cc/bzd/utility/pattern/to_stream:integral",
         "//cc/bzd/utility/pattern/to_stream:pattern",

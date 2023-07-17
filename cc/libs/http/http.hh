@@ -41,16 +41,18 @@ public:
 			co_return bzd::error::Failure("Session expired.");
 		}
 
+		auto reader = stream_.reader();
+
 		// Transfer-Encoding
-		const auto [version, code] = co_await !readStatus();
+		const auto [version, code] = co_await !readStatus(reader);
 		switch (version)
 		{
-		case Status::Version::version1dot0:
+		case "1.0"_s:
 			[[fallthrough]];
-		case Status::Version::version1dot1:
+		case "1.1"_s:
 			break;
-		case Status::Version::unknown:
-			co_return bzd::error::Failure("Version not supported.");
+		default:
+			co_return bzd::error::Failure("Version {} not supported."_csv, version);
 		}
 		// co_await stream_.readUntil("/r/n"_sv.asBytes());
 		::std::cout << "[-> " << code << " <-]" << std::endl;
@@ -62,73 +64,16 @@ public:
 private:
 	struct Status
 	{
-		enum class Version
-		{
-			version1dot0,
-			version1dot1,
-			unknown
-		};
-		Version version{Version::unknown};
+		bzd::String<3> version{};
 		UInt16 code{};
 	};
 
 	/// Read the first line that should look like this.
 	/// HTTP/1.1 200 OK
-	bzd::Async<Status> readStatus() noexcept
+	bzd::Async<Status> readStatus(auto& reader) noexcept
 	{
-		bzd::String<3u> version;
 		Status status{};
-		co_await !bzd::fromStream(stream_.reader(), "HTTP/{:[0-9.]+}\\s+{}\\s+"_csv, version.assigner(), status.code);
-
-		switch (version)
-		{
-		case "1.0"_s:
-			status.version = Status::Version::version1dot0;
-			break;
-		case "1.1"_s:
-			status.version = Status::Version::version1dot1;
-			break;
-		}
-
-		/*
-				const auto string = co_await !bzd::make<bzd::String<100>>(reader_.readUntil("\r\n"_sv.asBytes(), true));
-				bzd::String<3u> version;
-				if (!bzd::fromString(string, "HTTP/{:[0-9.]+}\\s*{}"_csv, version.assigner(), status.code))
-				{
-					co_return bzd::error::Data("Malformed header: {}."_csv, string);
-				}
-
-				::std::cout << version.data() << ::std::endl;
-				::std::cout << status.code << ::std::endl;
-
-				auto it = bzd::algorithm::search(string, "HTTP/"_sv);
-				if (it == string.end())
-				{
-					co_return bzd::error::Data("Missing HTTP/.");
-				}
-
-				switch (version)
-				{
-				case "1.0"_s:
-
-				}
-			*/
-		/*if (!bzd::fromString("HTTP{}\s+{}\s+{:[A-Z]+}", version, code, statusString))
-		{
-			co_return bzd::error::Data("Malformed status header.");
-		}*/
-		/*const bzd::Map<StringView, typename Status::Version, 3u> versions{{"1.0"_sv, Status::Version::version1dot0},
-																		  {"1.1"_sv, Status::Version::version1dot1},
-																		  {"2"_sv, Status::Version::version2}};
-		const auto versionMatch = bzd::algorithm::startsWithAnyOf(
-			it,
-			string.end(),
-			versions,
-			[](const auto& value) -> const auto& { return value.first; });
-		if (versionMatch != versions.end())
-		{
-			co_return Status{versionMatch->second, 100u};
-		}*/
+		co_await !bzd::fromStream(reader, "HTTP/{:[0-9.]+}\\s+{}\\s+"_csv, status.version.assigner(), status.code);
 		co_return status;
 	}
 

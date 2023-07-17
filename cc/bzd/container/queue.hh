@@ -93,9 +93,16 @@ private:
 	using typename interface::Queue<T, CapacityType>::Element;
 
 public:
-	constexpr Queue() :
-		interface::Queue<T, CapacityType>{{data_, N}} {}
+	constexpr Queue() : interface::Queue<T, CapacityType>
+	{
+		{
+			data_, N
+		}
+	}
+	{
+	}
 
-		private : Element data_[N];
+private:
+	Element data_[N];
 };
 } // namespace bzd

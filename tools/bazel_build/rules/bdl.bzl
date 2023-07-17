@@ -195,7 +195,7 @@ def _precompile_bdl(ctx, srcs, deps, output_dir = None, namespace = None):
     ctx.actions.run(
         inputs = input_files,
         outputs = [bdl["output"] for bdl in metadata],
-        progress_message = "Preprocess BDL manifest(s) {}".format(", ".join([bdl["input"].short_path for bdl in metadata])),
+        progress_message = "Preprocessing BDL manifest(s) {}".format(", ".join([bdl["input"].short_path for bdl in metadata])),
         arguments = _make_bdl_arguments(
             ctx = ctx,
             stage = "preprocess",
@@ -385,7 +385,7 @@ def _make_composition_language_providers(ctx, name, deps, target_deps = None, ta
 
     cc_providers = {}
     for target, output in outputs.items():
-        deps = combined_deps["all"] + ([] if target == "all" else combined_deps.get(target, []))
+        deps = combined_deps["all"] + ([] if target == "all" else combined_deps.get(target, [])) + ctx.attr._deps_cc
         cc_providers[target] = _BdlCcProvider(srcs = [output], deps = deps)
 
     return cc_providers
@@ -498,6 +498,9 @@ _bdl_system = rule(
             mandatory = True,
             doc = "List of dependencies.",
             aspects = [_aspect_bdl_providers],
+        ),
+        "_deps_cc": attr.label_list(
+            default = [Label("//tools/bdl/generators/cc/adapter:context")],
         ),
         "_bdl": attr.label(
             default = Label("//tools/bdl"),
