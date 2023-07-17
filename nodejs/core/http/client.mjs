@@ -56,7 +56,7 @@ export default class HttpClient {
 				 */
 				timeoutMs: 60 * 1000,
 			},
-			options
+			options,
 		);
 
 		// Handle queries
@@ -147,7 +147,7 @@ export default class HttpClient {
 				"Request to '{}' responded with: {}: {}",
 				url,
 				result.code,
-				result.data
+				result.data,
 			);
 		}
 

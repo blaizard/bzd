@@ -21,7 +21,7 @@ export default class StorageGoogleCloudStorage extends Base {
 			{
 				prefix: null,
 			},
-			options
+			options,
 		);
 		this.storage = new Storage();
 		this.bucketName = bucketName;
@@ -108,9 +108,9 @@ export default class StorageGoogleCloudStorage extends Base {
 							read: true,
 							write: true,
 							delete: true,
-						}
+						},
 					  )
-					: name
+					: name,
 			);
 		}
 		if (apiResponse && "pageToken" in apiResponse) {

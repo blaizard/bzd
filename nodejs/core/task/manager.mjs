@@ -120,7 +120,7 @@ export default class Manager {
 		Exception.assert(this.isRegistered(task.id), "The task " + task + " is not registered");
 		Exception.assert(
 			task.status === Task.STATUS_IDLE,
-			() => "Task " + task + " should be have its status to idle, instead: " + task.status
+			() => "Task " + task + " should be have its status to idle, instead: " + task.status,
 		);
 		Exception.assert(typeof delayMs === "number", () => "The delay specified is not a number: " + delayMs);
 
@@ -213,7 +213,7 @@ export default class Manager {
 					() => {
 						this.taskScheduler();
 					},
-					nextTimestamp > timestamp ? nextTimestamp - timestamp : 1
+					nextTimestamp > timestamp ? nextTimestamp - timestamp : 1,
 				);
 				this.schedulerTimestamp = nextTimestamp;
 			}

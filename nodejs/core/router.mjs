@@ -18,7 +18,7 @@ export default class Router {
 					throw new Exception("Route not found for '{}'.", path);
 				},
 			},
-			config
+			config,
 		);
 		this.routes = new Map();
 		this.dirty = true;

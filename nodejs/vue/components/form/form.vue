@@ -79,7 +79,7 @@
 			Object.keys(elements).reduce((obj, key) => {
 				obj[key + "FormElement"] = elements[key];
 				return obj;
-			}, {})
+			}, {}),
 		),
 		props: {
 			description: { type: Array, required: true },
@@ -184,7 +184,7 @@
 						"Validation error(s); " +
 							Object.keys(result)
 								.map((name) => name + ": " + result[name])
-								.join(", ")
+								.join(", "),
 					);
 				}
 			},

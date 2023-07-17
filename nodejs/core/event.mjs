@@ -10,7 +10,7 @@ export default class Event {
 					/// trigger new one.
 					proactive: false,
 				},
-				options[id]
+				options[id],
 			);
 		}
 
@@ -94,7 +94,7 @@ export default class Event {
 				() => {
 					resolve();
 				},
-				/*once*/ true
+				/*once*/ true,
 			);
 		});
 	}

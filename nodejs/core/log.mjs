@@ -17,7 +17,7 @@ class Logger {
 			{
 				level: Logger.levels.info.level,
 			},
-			config
+			config,
 		);
 	}
 
