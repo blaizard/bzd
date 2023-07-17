@@ -5,10 +5,12 @@ bdl_library(
     name = "interface",
     srcs = [
         "interface.bdl",
-        "types.bdl",
     ],
     visibility = [
         "//visibility:public",
+    ],
+    deps = [
+        "//interfaces:network",
     ],
 )
 

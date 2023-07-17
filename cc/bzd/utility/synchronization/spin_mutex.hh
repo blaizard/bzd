@@ -14,6 +14,7 @@ public: // Constructors/assignments.
 	constexpr SpinMutex& operator=(const SpinMutex&) noexcept = delete;
 	SpinMutex(SpinMutex&&) noexcept = delete;
 	SpinMutex& operator=(SpinMutex&&) noexcept = delete;
+	~SpinMutex() = default;
 
 public: // API.
 	constexpr void lock() noexcept

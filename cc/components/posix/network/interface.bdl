@@ -1,4 +1,4 @@
-use "cc/components/posix/network/types.bdl"
+use "interfaces/network.bdl"
 
 namespace bzd.components.posix.network;
 

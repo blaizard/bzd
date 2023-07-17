@@ -1,0 +1,17 @@
+use "interfaces/tcp.bdl"
+
+namespace bzd.components.generic.network.tcp;
+
+
+// A mockup of a network client interface.
+component Client : bzd.network.tcp.Client {
+config:
+	out = {out};
+	read = Callable;
+	write = Callable;
+	
+interface:
+	
+}
+
+

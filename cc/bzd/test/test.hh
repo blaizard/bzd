@@ -89,16 +89,16 @@
 #define ASSERT_ASYNC_STREQ(str1, str2) BZDTEST_TEST_STREQ_(str1, str2, BZDTEST_FAIL_FATAL_ASYNC_)
 /// \}
 
+/// Verifies that the two ranges: range1 and range2 have the same contents.
+/// \{
+#define EXPECT_EQ_RANGE(range1, range2) BZDTEST_TEST_EQ_RANGE_(range1, range2, BZDTEST_FAIL_NONFATAL_)
+#define ASSERT_EQ_RANGE(range1, range2) BZDTEST_TEST_EQ_RANGE_(range1, range2, BZDTEST_FAIL_FATAL_)
+#define ASSERT_ASYNC_EQ_RANGE(range1, range2) BZDTEST_TEST_EQ_RANGE_(range1, range2, BZDTEST_FAIL_FATAL_ASYNC_)
+/// \}
+
 /// Verifies that statement throws an exception of any type.
 /// \{
 #define EXPECT_ANY_THROW(expression) BZDTEST_TEST_ANY_THROW_(expression, BZDTEST_FAIL_NONFATAL_)
 #define ASSERT_ANY_THROW(expression) BZDTEST_TEST_ANY_THROW_(expression, BZDTEST_FAIL_FATAL_)
 #define ASSERT_ASYNC_ANY_THROW(expression) BZDTEST_TEST_ANY_THROW_(expression, BZDTEST_FAIL_FATAL_ASYNC_)
-/// \}
-
-/// Verifies that values of container1 == values of container2.
-/// \{
-#define EXPECT_EQ_VALUES(container1, container2) BZDTEST_TEST_EQ_VALUES_(container1, container2, BZDTEST_FAIL_NONFATAL_)
-#define ASSERT_EQ_VALUES(container1, container2) BZDTEST_TEST_EQ_VALUES_(container1, container2, BZDTEST_FAIL_FATAL_)
-#define ASSERT_ASYNC_EQ_VALUES(container1, container2) BZDTEST_TEST_EQ_VALUES_(container1, container2, BZDTEST_FAIL_FATAL_ASYNC_)
 /// \}

@@ -20,6 +20,11 @@ public: // Traits.
 	using ValueConstType = bzd::typeTraits::AddConst<T>;
 
 public:
+	OChannel() = default;
+	OChannel(const OChannel&) = delete;
+	OChannel& operator=(const OChannel&) = delete;
+	constexpr OChannel(OChannel&&) noexcept {}
+	constexpr OChannel& operator=(OChannel&&) noexcept { return *this; }
 	virtual ~OChannel() = default;
 
 public:
@@ -61,6 +66,11 @@ public: // Traits.
 	using ValueConstType = bzd::typeTraits::AddConst<T>;
 
 public:
+	IChannel() = default;
+	IChannel(const IChannel&) = delete;
+	IChannel& operator=(const IChannel&) = delete;
+	IChannel(IChannel&&) = default;
+	IChannel& operator=(IChannel&&) = default;
 	virtual ~IChannel() = default;
 
 public:

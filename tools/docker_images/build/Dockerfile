@@ -4,7 +4,8 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y \
 	sudo \
-	ca-certificates
+	ca-certificates \
+	git
 
 # GCC
 COPY build_install_gcc.sh /build_install_gcc.sh

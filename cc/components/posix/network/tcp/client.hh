@@ -19,7 +19,7 @@ public:
 public:
 	explicit Client(Context& context) : context_{context}, logger_{context.config.out} {}
 
-	bzd::Async<Stream> connect(const StringView endpoint, const PortType port) noexcept
+	bzd::Async<Stream> connect(const StringView endpoint, const bzd::network::PortType port) noexcept
 	{
 		// Try to connect as it is an IP address
 		auto maybeAddress = Address::fromIp(protocol::tcp, endpoint, port);
@@ -38,14 +38,11 @@ public:
 		for (const auto& address : result.value())
 		{
 			auto maybeSocket = co_await createSocketAndConnect(address);
-			if (!maybeSocket)
-			{
-				co_await !logger_.warning(maybeSocket.error());
-			}
-			else
+			if (maybeSocket)
 			{
 				co_return Stream(context_, bzd::move(maybeSocket.valueMutable()));
 			}
+			co_await !logger_.warning(maybeSocket.error());
 		}
 		co_return bzd::error::Failure("Client initialization failed."_csv);
 	}
@@ -82,14 +79,12 @@ struct ClientTraits<bzd::components::posix::network::tcp::Client<Context>>
 		constexpr Stream(Context& context, Socket&& socket) noexcept : context_{context}, socket_{bzd::move(socket)} {}
 
 	public:
-		constexpr Stream(Stream&& other) noexcept : context_{other.context_}, socket_{bzd::move(other.socket_)} {}
-
-		bzd::Async<> write(const bzd::Span<const Byte> data) noexcept override
+		bzd::Async<> write(const bzd::Span<const Byte> data) noexcept final
 		{
 			co_return co_await context_.config.proactor.write(socket_.getFileDescriptor(), data);
 		}
 
-		bzd::Async<bzd::Span<const Byte>> read(bzd::Span<Byte>&& data) noexcept override
+		bzd::Async<bzd::Span<const Byte>> read(bzd::Span<Byte>&& data) noexcept final
 		{
 			co_return co_await context_.config.proactor.read(socket_.getFileDescriptor(), bzd::move(data));
 		}

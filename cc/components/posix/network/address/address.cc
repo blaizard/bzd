@@ -11,7 +11,9 @@
 
 namespace bzd::components::posix::network {
 
-bzd::Result<Address, bzd::Error> Address::fromIpV4(const Protocol protocol, const StringView string, const PortType port) noexcept
+bzd::Result<Address, bzd::Error> Address::fromIpV4(const Protocol protocol,
+												   const StringView string,
+												   const bzd::network::PortType port) noexcept
 {
 	Address address{sizeof(::sockaddr_in), protocol};
 	::sockaddr_in& storage{reinterpret_cast<::sockaddr_in&>(address.storage_)};
@@ -32,7 +34,9 @@ bzd::Result<Address, bzd::Error> Address::fromIpV4(const Protocol protocol, cons
 	return address;
 }
 
-bzd::Result<Address, bzd::Error> Address::fromIpV6(const Protocol protocol, const StringView string, const PortType port) noexcept
+bzd::Result<Address, bzd::Error> Address::fromIpV6(const Protocol protocol,
+												   const StringView string,
+												   const bzd::network::PortType port) noexcept
 {
 	Address address{sizeof(::sockaddr_in6), protocol};
 	::sockaddr_in6& storage{reinterpret_cast<::sockaddr_in6&>(address.storage_)};
@@ -53,18 +57,17 @@ bzd::Result<Address, bzd::Error> Address::fromIpV6(const Protocol protocol, cons
 	return address;
 }
 
-bzd::Result<Address, bzd::Error> Address::fromIp(const Protocol protocol, const StringView string, const PortType port) noexcept
+bzd::Result<Address, bzd::Error> Address::fromIp(const Protocol protocol,
+												 const StringView string,
+												 const bzd::network::PortType port) noexcept
 {
 	// Choose between ipv4 and ipv6.
-	auto maybeAddress = (string.contains(':')) ? fromIpV6(protocol, string, port) : fromIpV4(protocol, string, port);
-	if (!maybeAddress)
-	{
-		return bzd::move(maybeAddress).propagate();
-	}
-	return bzd::move(maybeAddress).valueMutable();
+	return (string.contains(':')) ? fromIpV6(protocol, string, port) : fromIpV4(protocol, string, port);
 }
 
-bzd::Result<Addresses, bzd::Error> Addresses::fromHostname(const Protocol protocol, const StringView hostname, const PortType port) noexcept
+bzd::Result<Addresses, bzd::Error> Addresses::fromHostname(const Protocol protocol,
+														   const StringView hostname,
+														   const bzd::network::PortType port) noexcept
 {
 	Addresses addresses{};
 	::addrinfo hints{};
@@ -77,7 +80,7 @@ bzd::Result<Addresses, bzd::Error> Addresses::fromHostname(const Protocol protoc
 
 	if (const auto result = ::getaddrinfo(hostname.data(), portStr.data(), &hints, &addresses.addr_); result != 0)
 	{
-		return bzd::error::Failure("getaddrinfo for '{}:{}', {}"_csv, hostname, portStr, ::gai_strerror(result));
+		return bzd::error::Failure("'{}:{}', {}"_csv, hostname, portStr, ::gai_strerror(result));
 	}
 	return addresses;
 }

@@ -11,7 +11,7 @@ namespace bzd::components::posix::network::tcp {
 class Server
 {
 public:
-	bzd::Async<> bind(const StringView endpoint, const PortType port) noexcept
+	bzd::Async<> bind(const StringView endpoint, const bzd::network::PortType port) noexcept
 	{
 		// Try to connect as it is an IP address
 		auto maybeAddress = Address::fromIp(protocol::tcp, endpoint, port);

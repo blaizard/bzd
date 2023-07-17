@@ -9,7 +9,6 @@
 #include "cc/bzd/utility/pattern/to_string/integral.hh"
 #include "cc/bzd/utility/scope_guard.hh"
 #include "cc/components/posix/network/interface.hh"
-#include "cc/components/posix/network/types.hh"
 
 #include <netdb.h>
 #include <sys/socket.h>
@@ -23,7 +22,7 @@ class TCP
 //	: public bzd::IOStream
 {
 public:
-	bzd::Async<> connect(const StringView hostname, const PortType port)
+	bzd::Async<> connect(const StringView hostname, const bzd::network::PortType port)
 	{
 		if (socket_ != -1)
 		{

@@ -17,14 +17,6 @@ public:
 	template <concepts::generatorInputByteCopyableRange Generator>
 	bzd::Async<Size> match(Generator&& generator) noexcept
 	{
-		auto maybeRange = co_await generator;
-		if (!maybeRange)
-		{
-			co_return bzd::move(maybeRange).propagate();
-		}
-		auto it = bzd::begin(maybeRange.valueMutable());
-		auto end = bzd::end(maybeRange.valueMutable());
-
 		Context context{regexp_};
 		while (!context.regexp.empty())
 		{
@@ -34,25 +26,26 @@ public:
 				Context::ResultProcess resultProcess{};
 				do
 				{
-					if (it == end)
+					auto maybeRange = co_await generator;
+					if (!maybeRange)
 					{
-						maybeRange = co_await generator;
-						if (maybeRange)
-						{
-							it = bzd::begin(maybeRange.valueMutable());
-							end = bzd::end(maybeRange.valueMutable());
-						}
-						else if (maybeRange.error().getType() != bzd::ErrorType::eof)
-						{
-							co_return bzd::move(maybeRange).propagate();
-						}
-						// If there are still no input after fetching new data.
-						if (it == end)
+						if (maybeRange.error().getType() == bzd::ErrorType::eof)
 						{
 							resultProcess.maybeError = regexp::Error::noMoreInput;
 							break;
 						}
+						co_return bzd::move(maybeRange).propagate();
 					}
+
+					auto it = bzd::begin(maybeRange.valueMutable());
+					auto end = bzd::end(maybeRange.valueMutable());
+					// If there are still no input after fetching new data.
+					if (it == end)
+					{
+						resultProcess.maybeError = regexp::Error::noMoreInput;
+						break;
+					}
+
 					resultProcess = result.valueMutable().process(it, end, resultProcess);
 				} while (resultProcess.maybeError && resultProcess.maybeError.value() == regexp::Error::noMoreInput);
 				result.update(resultProcess);

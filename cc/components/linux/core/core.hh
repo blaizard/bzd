@@ -140,8 +140,7 @@ private:
 
 private:
 	CoreId core_id_;
-	bzd::Optional<bzd::interface::Stack<StackDirection::downward>> stack_ {
-	};
+	bzd::Optional<bzd::interface::Stack<StackDirection::downward>> stack_{};
 	bzd::Optional<bzd::FunctionRef<void(bzd::Core&)>> workload_;
 	pthread_attr_t attr_;
 	pthread_t thread_;

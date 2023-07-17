@@ -26,6 +26,18 @@ cc_library(
 )
 
 cc_library(
+    name = "byte",
+    hdrs = [
+        "byte.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":base",
+        "//cc/bzd/utility/pattern/to_string:byte",
+    ],
+)
+
+cc_library(
     name = "floating_point",
     hdrs = [
         "floating_point.hh",

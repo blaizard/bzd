@@ -74,7 +74,7 @@ filegroup(
     name = "header_files",
     srcs = glob([
         "include/c++/v1/**/*",
-        "lib/clang/16/include/**/*",
+        "lib/clang/17/include/**/*",
         "include/x86_64-unknown-linux-gnu/c++/v1/**/*"
     ])
 )
@@ -108,9 +108,9 @@ genrule(
         ":clang_tidy",
         ":llvm_symbolizer",
     ],
-    outs = ["linux_x86_64_16.0.6.tar.xz"],
+    outs = ["linux_x86_64_17.0.0.tar.xz"],
     tags = ["manual"],
     cmd = """
-    tar -cJf $@ --dereference --transform 's/^\\./linux_x86_64_16.0.6/' -C external/linux_x86_64_clang_16_0_6 .
+    tar -cJf $@ --dereference --transform 's/^\\./linux_x86_64_17.0.0/' -C external/linux_x86_64_clang_17_0_0 .
     """
 )

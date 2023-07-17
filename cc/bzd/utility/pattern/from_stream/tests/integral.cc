@@ -15,12 +15,42 @@ TEST_ASYNC(PatternFromStream, Integral, AllTestIChannel)
 	TestType in{};
 	bzd::IChannelBuffered<char, 16u> channel{in};
 
-	in << "Hello 42";
+	in << "42";
 	{
 		bzd::UInt16 value;
-		const auto size = co_await !bzd::fromStream(channel.reader(), "Hello {}"_csv, value);
-		EXPECT_EQ(size, 8u);
+		const auto size = co_await !bzd::fromStream(channel.reader(), value);
+		EXPECT_EQ(size, 2u);
 		EXPECT_EQ(value, 42u);
+	}
+
+	in << "1234";
+	{
+		bzd::Int32 value;
+		const auto size = co_await !bzd::fromStream(channel.reader(), value);
+		EXPECT_EQ(size, 4u);
+		EXPECT_EQ(value, 1234);
+	}
+
+	in << "-1234";
+	{
+		bzd::Int32 value;
+		const auto size = co_await !bzd::fromStream(channel.reader(), value);
+		EXPECT_EQ(size, 5u);
+		EXPECT_EQ(value, -1234);
+	}
+
+	in << "42abcd";
+	{
+		bzd::Int8 value;
+		const auto size = co_await !bzd::fromStream(channel.reader(), value);
+		EXPECT_EQ(size, 2u);
+		EXPECT_EQ(value, 42);
+	}
+
+	{
+		bzd::Int8 value;
+		const auto maybeSize = co_await bzd::fromStream(channel.reader(), value);
+		EXPECT_FALSE(maybeSize);
 	}
 
 	co_return {};

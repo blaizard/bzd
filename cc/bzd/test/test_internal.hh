@@ -1,9 +1,13 @@
 #pragma once
 
+#include "cc/bzd/container/ring_buffer.hh"
 #include "cc/bzd/core/async.hh"
 #include "cc/bzd/meta/macro.hh"
 #include "cc/bzd/test/composition.hh"
 #include "cc/bzd/type_traits/is_same_class.hh"
+#include "cc/bzd/type_traits/remove_cvref.hh"
+#include "cc/bzd/utility/begin.hh"
+#include "cc/bzd/utility/end.hh"
 #include "cc/bzd/utility/numeric_limits.hh"
 #include "cc/bzd/utility/pattern/to_string/integral.hh"
 #include "cc/bzd/utility/random/uniform_int_distribution.hh"
@@ -19,7 +23,7 @@
 	class BZDTEST_CLASS_NAME_(testCaseName, testName) : public ::bzd::test::Test<1>                                                        \
 	{                                                                                                                                      \
 	public:                                                                                                                                \
-		BZDTEST_CLASS_NAME_(testCaseName, testName)() : ::bzd::test::Test<1>{#testCaseName, #testName, __FILE__}                           \
+		BZDTEST_CLASS_NAME_(testCaseName, testName)() : ::bzd::test::Test<1> { #testCaseName, #testName, __FILE__ }                        \
 		{                                                                                                                                  \
 			this->registerTest(::bzd::test::FunctionPointer::toMember<BZDTEST_CLASS_NAME_(testCaseName, testName),                         \
 																	  &BZDTEST_CLASS_NAME_(testCaseName, testName)::test>(*this));         \
@@ -33,7 +37,7 @@
 	class BZDTEST_CLASS_NAME_(testCaseName, testName) : public ::bzd::test::Test<sizeof...(Types)>                                         \
 	{                                                                                                                                      \
 	public:                                                                                                                                \
-		BZDTEST_CLASS_NAME_(testCaseName, testName)() : ::bzd::test::Test<sizeof...(Types)>{#testCaseName, #testName, __FILE__}            \
+		BZDTEST_CLASS_NAME_(testCaseName, testName)() : ::bzd::test::Test<sizeof...(Types)> { #testCaseName, #testName, __FILE__ }         \
 		{                                                                                                                                  \
 			(this->registerTest(::bzd::test::FunctionPointer::toMember<BZDTEST_CLASS_NAME_(testCaseName, testName),                        \
 																	   &BZDTEST_CLASS_NAME_(testCaseName, testName)::test<Types>>(*this),  \
@@ -158,30 +162,30 @@
 	}
 
 #define BZDTEST_TEST_TRUE_BOOLEAN_(actual, failFct)                                                                                        \
-	if (![](const auto& bzdTestCondition_) {                                                                                               \
+	if (![](const bool bzdTestCondition_) {                                                                                               \
 			BZDTEST_FAIL_(!bzdTestCondition_, "Failure\nTest [bool]: " #actual " == true", bzdTestCondition_, true);                       \
 			return true;                                                                                                                   \
-		}(actual))                                                                                                                         \
+		}(static_cast<bool>(actual)))                                                                                                                         \
 	{                                                                                                                                      \
 		failFct;                                                                                                                           \
 	}
 
 #define BZDTEST_TEST_FALSE_BOOLEAN_(actual, failFct)                                                                                       \
-	if (![](const auto& bzdTestCondition_) {                                                                                               \
+	if (![](const bool bzdTestCondition_) {                                                                                               \
 			BZDTEST_FAIL_(bzdTestCondition_, "Failure\nTest [bool]: " #actual " == false", bzdTestCondition_, false);                      \
 			return true;                                                                                                                   \
-		}(actual))                                                                                                                         \
+		}(static_cast<bool>(actual)))                                                                                                                         \
 	{                                                                                                                                      \
 		failFct;                                                                                                                           \
 	}
 
 #define BZDTEST_TEST_ASYNC_BOOLEAN_(result, failFct)                                                                                       \
-	if (![](const auto& bzdTestResult_) {                                                                                                  \
+	if (![](const bool bzdTestResult_) {                                                                                                  \
 			BZDTEST_FAIL_(!static_cast<bool>(bzdTestResult_),                                                                              \
 						  "Failure\nTest [async]: " #result,                                                                               \
 						  bzdTestResult_.error().getMessage().data());                                                                     \
 			return true;                                                                                                                   \
-		}(result))                                                                                                                         \
+		}(static_cast<bool>(result)))                                                                                                                         \
 	{                                                                                                                                      \
 		failFct;                                                                                                                           \
 	}
@@ -282,31 +286,39 @@
 		failFct;                                                                                                                           \
 	}
 
-#define BZDTEST_TEST_EQ_VALUES_(container1, container2, failFct)                                                                           \
+#define BZDTEST_TEST_EQ_RANGE_(range1, range2, failFct)                                                                                    \
 	if (![](const auto& bzdTestA_, const auto& bzdTestB_) {                                                                                \
-			if (!(bzdTestA_.size() == bzdTestB_.size()))                                                                                   \
+			auto first1 = bzd::begin(bzdTestA_);                                                                                           \
+			auto first2 = bzd::begin(bzdTestB_);                                                                                           \
+			auto last1 = bzd::end(bzdTestA_);                                                                                              \
+			auto last2 = bzd::end(bzdTestB_);                                                                                              \
+			using Value1 = ::bzd::typeTraits::RemoveCVRef<decltype(*first1)>;                                                              \
+			using Value2 = ::bzd::typeTraits::RemoveCVRef<decltype(*first2)>;                                                              \
+			::bzd::test::impl::Values<Value1> values1;                                                                                     \
+			::bzd::test::impl::Values<Value2> values2;                                                                                     \
+			for (; first1 != last1 && first2 != last2; ++first1, ++first2)                                                                 \
 			{                                                                                                                              \
-				BZDTEST_FAIL_(true,                                                                                                        \
-							  "Failure\nTest: " #container1 ".size() == " #container2 ".size()",                                           \
-							  bzdTestA_.size(),                                                                                            \
-							  bzdTestB_.size());                                                                                           \
+				values1.pushBack(*first1);                                                                                                 \
+				values2.pushBack(*first2);                                                                                                 \
+				BZDTEST_FAIL_(!(*first1 == *first2), "Failure\nTest: " #range1 " != " #range2, values1, values2);                          \
 			}                                                                                                                              \
-			else                                                                                                                           \
-			{                                                                                                                              \
-				auto it = bzdTestB_.begin();                                                                                               \
-				for (const auto& value : bzdTestA_)                                                                                        \
-				{                                                                                                                          \
-					BZDTEST_FAIL_(!(value == *it), "Failure\nTest: " #container1 " == " #container2 " at index ", value, *it);             \
-					++it;                                                                                                                  \
-				}                                                                                                                          \
-			}                                                                                                                              \
+			BZDTEST_FAIL_(first1 != last1, "Failure\nTest: " #range2 " terminated while " #range1 " did not");                             \
+			BZDTEST_FAIL_(first2 != last2, "Failure\nTest: " #range1 " terminated while " #range2 " did not");                             \
 			return true;                                                                                                                   \
-		}((container1), (container2)))                                                                                                     \
+		}((range1), (range2)))                                                                                                             \
 	{                                                                                                                                      \
 		failFct;                                                                                                                           \
 	}
 
 namespace bzd::test::impl {
+
+template <class T>
+class Values : public ::bzd::RingBuffer<T, 8u>
+{
+public:
+	using ::bzd::RingBuffer<T, 8u>::RingBuffer;
+};
+
 constexpr int strcmp(const char* it1, const char* it2) noexcept
 {
 	while (*it1 && *it2 && *it1 == *it2)
@@ -331,17 +343,10 @@ class Value
 {
 public:
 	constexpr Value(const T& value) { valueToString(value); }
-
-	template <class U>
-	constexpr Value(U&& value) // NOLINT(bugprone-forwarding-reference-overload)
-	{
-		valueToString(value);
-	}
-
 	constexpr const char* valueToString() const { return string_.data(); }
 
 private:
-	constexpr char charToString(const char c) { return (c >= 32 && c < 127) ? c : '?'; }
+	constexpr char charToString(char c) { return (c >= 32 && c < 127) ? c : '?'; }
 
 	constexpr void valueToString(short value) { ::bzd::toString(string_.appender(), static_cast<bzd::Int64>(value)); }
 	constexpr void valueToString(int value) { ::bzd::toString(string_.appender(), static_cast<bzd::Int64>(value)); }
@@ -363,6 +368,11 @@ private:
 	template <class U>
 	constexpr void valueToString(U* value)
 	{
+		valueToString(static_cast<const U*>(value));
+	}
+	template <class U>
+	constexpr void valueToString(const U* value)
+	{
 		::bzd::toString(string_.appender(), "{:#x}"_csv, reinterpret_cast<bzd::UInt64>(value));
 	}
 
@@ -371,26 +381,57 @@ private:
 	constexpr void valueToString(char* value) { valueToString(static_cast<const char*>(value)); }
 	constexpr void valueToString(const char* value)
 	{
+		const char* ptr = value;
 		string_ += '"';
-		for (int maxChar = 0; maxChar < 64 && *value; ++maxChar)
+		for (int maxChar = 0; maxChar < 64 && *ptr; ++maxChar)
 		{
-			const char c = *value++;
+			const char c = *ptr++;
 			string_ += charToString(c);
 		}
-		if (*value)
+		if (*ptr)
 		{
 			string_ += "[...]"_sv;
 		}
 		string_ += '"';
 	}
+	constexpr void valueToString(::bzd::Byte value)
+	{
+		::bzd::toString(string_.appender(), "{:#x}({})"_csv, value, charToString(static_cast<char>(value)));
+	}
 
 	template <class U>
-	constexpr void valueToString(U&&)
+	constexpr void valueToString(Values<U>& values)
 	{
+		if (values.overrun())
+		{
+			string_ += "[...]"_sv;
+		}
+		for (const auto& value : values.asSpans())
+		{
+			valueToString(value);
+			string_ += " "_sv;
+		}
+	}
+
+	template <class U>
+	void valueToString(U&& values)
+	{
+		const auto* const data = reinterpret_cast<const ::bzd::Byte*>(&values);
+
+		::bzd::toString(string_.appender(), "[Binary ({} bytes)] "_csv, sizeof(U));
+		for (bzd::UInt32 i = 0; i < 8u && i < sizeof(U); ++i)
+		{
+			valueToString(data[i]);
+			string_ += " "_sv;
+		}
+		if (8u < sizeof(U))
+		{
+			string_ += "[...]"_sv;
+		}
 	}
 
 private:
-	bzd::String<100> string_{};
+	::bzd::String<100> string_{};
 };
 
 } // namespace bzd::test::impl

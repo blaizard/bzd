@@ -1,3 +1,4 @@
+use "interfaces/network.bdl"
 
 namespace bzd.network.tcp;
 

@@ -42,6 +42,14 @@ bdl_library(
 )
 
 bdl_library(
+    name = "network",
+    srcs = [
+        "network.bdl",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+bdl_library(
     name = "recorder",
     srcs = [
         "recorder.bdl",
@@ -67,6 +75,7 @@ bdl_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        ":network",
         "//cc/bzd/platform/interfaces:tcp",
     ],
 )

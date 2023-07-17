@@ -41,6 +41,7 @@ co_await !registry.{{ dep.fqn | fqnToNameStr }}_.shutdown(registry);
 #include "cc/bzd/meta/string_literal.hh"
 #include "cc/bzd/utility/synchronization/spin_mutex.hh"
 #include "cc/bzd/utility/synchronization/sync_lock_guard.hh"
+#include "tools/bdl/generators/cc/adapter/context.hh"
 {{ generateIncludesForTarget("all") }}
 // Includes for '{{ target }}' target.
 {{ generateIncludesForTarget(target) }}
@@ -54,27 +55,6 @@ enum class Status
 	initialized,
 	shuttingDown,
 };
-
-template <class ConfigType, class IOType>
-[[nodiscard]] constexpr auto makeContext(ConfigType&& config_, IOType&& io_) noexcept
-{
-	struct Context
-	{
-		constexpr Context(ConfigType&& config_, IOType&& io_) noexcept : config{bzd::move(config_)}, io{bzd::move(io_)} {}
-
-		Context(const Context&) = delete;
-		Context& operator=(const Context&) = delete;
-		Context(Context&&) = delete;
-		Context& operator=(Context&&) = delete;
-		~Context() = default;
-
-		using Config = ConfigType;
-		using IO = IOType;
-		const Config config;
-		IO io;
-	};
-	return Context{bzd::move(config_), bzd::move(io_)};
-}
 
 /// Helper to handle return code.
 template <class Promise>
@@ -271,7 +251,7 @@ protected:
 	// Definition of all registry entries and their configuration.
 	{% for fqn, entry in registry[context] %}
 	// {{ fqn }}
-	static auto context_{{ fqn | fqnToNameStr }} = makeContext(
+	static auto context_{{ fqn | fqnToNameStr }} = bzd::generator::makeContext(
 		ResourceSpecialization<"{{ fqn }}">::Config{ {{- paramsDeclaration(entry.expression.parametersResolved | paramsFilterOutLiterals) -}} },
 		ResourceSpecialization<"{{ fqn }}">::IO{ {{- registryConnectionsDeclaration(iosRegistry[fqn]) -}} }
 	);

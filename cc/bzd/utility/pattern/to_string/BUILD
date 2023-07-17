@@ -30,6 +30,18 @@ cc_library(
 )
 
 cc_library(
+    name = "byte",
+    hdrs = [
+        "byte.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":integral"
+    ],
+)
+
+
+cc_library(
     name = "floating_point",
     hdrs = [
         "floating_point.hh",

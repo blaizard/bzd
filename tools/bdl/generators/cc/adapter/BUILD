@@ -1,6 +1,18 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
+    name = "context",
+    hdrs = [
+        "context.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/utility:forward",
+        "//cc/bzd/utility:move",
+    ],
+)
+
+cc_library(
     name = "types",
     hdrs = [
         "types.hh",

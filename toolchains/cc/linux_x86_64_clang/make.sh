@@ -2,7 +2,7 @@
 
 set -e
 
-VERSION=16.0.6
+VERSION=17.0.0
 HOST=linux_x86_64
 PACKAGE=${HOST}_${VERSION}
 INSTALL=$(pwd)/${PACKAGE}
@@ -10,13 +10,12 @@ INSTALL=$(pwd)/${PACKAGE}
 # ---- Setup ----
 
 sudo apt install -y \
-    git \
-    python3
+    git
 
 mkdir -p build ${INSTALL}
 
-export CC=/usr/local/bin/clang
-export CXX=/usr/local/bin/clang++
+export CC=/usr/local/bin/gcc-static
+export CXX=/usr/local/bin/g++-static
 
 # ---- Get the sources ----
 
@@ -30,10 +29,7 @@ cmake -G "Unix Makefiles" -S llvm -B ../build -DCMAKE_BUILD_TYPE="Release" \
                                 -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra;lld" \
                                 -DLLVM_ENABLE_RUNTIMES="compiler-rt;libcxx;libcxxabi;libunwind" \
                                 -DLLVM_TARGETS_TO_BUILD="X86" \
-                                -DLLVM_ENABLE_LIBCXX=On \
-                                -DLIBCXXABI_USE_COMPILER_RT=On \
-                                -DLIBCXXABI_USE_LLVM_UNWINDER=On \
-                                -DLIBCXX_USE_COMPILER_RT=On \
+                                -DLLVM_STATIC_LINK_CXX_STDLIB=On \
                                 -DLLVM_EXTERNALIZE_DEBUGINFO=On \
                                 -DLLVM_INCLUDE_TESTS=Off \
                                 -DLLVM_INCLUDE_BENCHMARKS=Off \
@@ -56,7 +52,7 @@ find "${INSTALL}" -type f -executable | grep -vF '.a' | grep -vF '.la' | xargs -
 
 # ---- Set the RPATH ----
 
-./toolchains/cc/linux_x86_64_gcc/patchall.py "${INSTALL}"
+patchall.py "${INSTALL}"
 
 # ---- Create an archive ----
 

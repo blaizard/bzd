@@ -1,5 +1,5 @@
 
-namespace bzd.components.posix.network;
+namespace bzd.network;
 
 
 using PortType = Integer [min(1) max(65535)];

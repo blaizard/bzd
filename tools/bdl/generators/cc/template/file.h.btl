@@ -71,15 +71,26 @@ public: // Methods
 namespace bzd
 {
 {% for data in nestedList %}
-	{% if data.category == Category.interface %}
+	{% if data.category in btl.set(Category.component, Category.interface) %}
 template <>
 struct Interface<"{{ data.fqn }}">
 {
+	{{ iterableTemplateDefinition(data.interface.expressionList) }}
+	struct IO
+	{
+		{% for index, expression in data.interface.expressionList %}
+		T{{ index }} {{ expression.name }};
+		{% end %}
+	};
+
+{% if data.category == Category.interface %}
 	template <class Impl>
 	[[nodiscard]] static constexpr auto& cast(Impl& impl) noexcept
 	{
 		return ::bzd::impl::getInterface<{{ namespace | namespaceToStr }}::{{ data.name }}>(impl);
 	}
+{% end %}
+
 };
 	{% end %}
 {% end %}

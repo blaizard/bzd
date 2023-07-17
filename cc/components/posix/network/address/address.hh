@@ -6,7 +6,7 @@
 #include "cc/components/posix/network/address/family.hh"
 #include "cc/components/posix/network/address/protocol.hh"
 #include "cc/components/posix/network/address/socket_type.hh"
-#include "cc/components/posix/network/types.hh"
+#include "interfaces/network.hh"
 
 #include <netdb.h>
 
@@ -19,17 +19,17 @@ public:
 	/// Create an address object from an IP v4 address and a port number.
 	[[nodiscard]] static bzd::Result<Address, bzd::Error> fromIpV4(const Protocol protocol,
 																   const StringView string,
-																   const PortType port) noexcept;
+																   const bzd::network::PortType port) noexcept;
 
 	/// Create an address object from an IP v6 address and a port number.
 	[[nodiscard]] static bzd::Result<Address, bzd::Error> fromIpV6(const Protocol protocol,
 																   const StringView string,
-																   const PortType port) noexcept;
+																   const bzd::network::PortType port) noexcept;
 
 	/// Create an address object from an IP address and a port number.
 	[[nodiscard]] static bzd::Result<Address, bzd::Error> fromIp(const Protocol protocol,
 																 const StringView string,
-																 const PortType port) noexcept;
+																 const bzd::network::PortType port) noexcept;
 
 	constexpr AddressFamily family() const noexcept { return AddressFamily{storage_.ss_family}; }
 	constexpr const ::sockaddr* native() const noexcept { return &storageErased_; }
@@ -94,7 +94,7 @@ public:
 	/// Create an address object from a hostname and a port number.
 	[[nodiscard]] static bzd::Result<Addresses, bzd::Error> fromHostname(const Protocol protocol,
 																		 const StringView hostname,
-																		 const PortType port) noexcept;
+																		 const bzd::network::PortType port) noexcept;
 
 public: // Copy/move constructors/assignments
 	Addresses(const Addresses&) = delete;

@@ -43,9 +43,9 @@ private:
 	using typename interface::Pool<T, CapacityType>::Element;
 
 public:
-	constexpr Pool() : interface::Pool<T, CapacityType>({data_, N}) {
-	}
+	constexpr Pool() : interface::Pool<T, CapacityType>({data_, N}) {}
 
-	private : Element data_[N];
+private:
+	Element data_[N];
 };
 } // namespace bzd
