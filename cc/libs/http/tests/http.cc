@@ -15,15 +15,15 @@ struct Config
 
 TEST_ASYNC(Http, Simple)
 {
-	auto context =
-		bzd::generator::makeContext(Config{.read = [](const auto&&) { return "Hello"_sv.asBytes(); }, .write = [](const auto) {}});
+	auto context = bzd::generator::makeContext(
+		Config{.read = [](const auto&&) { return "HTTP/1.1 200 OK"_sv.asBytes(); }, .write = [](const auto) {}});
 
 	bzd::components::generic::network::tcp::Client network{context};
 	bzd::http::Client client{network, "", 1234u};
 
 	auto response = co_await !client.get("/").send();
 	bzd::Array<char, 100u> data;
-	bzd::ignore = co_await response.read(data.asBytesMutable());
+	bzd::ignore = co_await !response.read(data.asBytesMutable());
 
 	co_return {};
 }
