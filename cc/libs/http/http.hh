@@ -46,6 +46,7 @@ public:
 
 		// Transfer-Encoding
 		const auto [version, code] = co_await !readStatus(reader);
+
 		switch (version)
 		{
 		case "1.0"_s:
@@ -55,7 +56,12 @@ public:
 		default:
 			co_return bzd::error::Failure("Version '{}' not supported."_csv, version);
 		}
-		// co_await stream_.readUntil("/r/n"_sv.asBytes());
+
+		if (code != 200)
+		{
+			co_await !error(reader, "Code {}: {}"_csv, code);
+		}
+
 		::std::cout << "[-> " << code << " <-]" << std::endl;
 
 		const auto read = co_await !stream_.read(bzd::move(data));
@@ -74,14 +80,21 @@ private:
 	bzd::Async<Status> readStatus(auto& reader) noexcept
 	{
 		Status status{};
-		const auto maybeSuccess = co_await bzd::fromStream(reader, "HTTP/{:[0-9.]+}\\s+{}\\s+"_csv, status.version.assigner(), status.code);
+		const auto maybeSuccess =
+			co_await bzd::fromStream(reader, "HTTP/{:[0-9.]+}\\s+{}\\s+[^\n]*\n"_csv, status.version.assigner(), status.code);
 		if (!maybeSuccess)
 		{
-			bzd::StringStream<64u> buffer;
-			bzd::ignore = co_await bzd::toStream(buffer, "{:.10}"_csv, reader);
-			co_return bzd::error::Failure("Malformed header: {}"_csv, buffer.str());
+			co_await !error(reader, "Malformed status: {}"_csv);
 		}
 		co_return status;
+	}
+
+	template <class... Args>
+	bzd::Async<> error(auto& reader, Args&&... args) noexcept
+	{
+		bzd::StringStream<80u> buffer;
+		bzd::ignore = co_await bzd::toStream(buffer, "[...]{:.64}[...]"_csv, reader);
+		co_return bzd::error::Failure(bzd::forward<Args>(args)..., buffer.str());
 	}
 
 private:
@@ -90,20 +103,23 @@ private:
 	bzd::IStreamBuffered<bufferCapacity> stream_;
 };
 
-template <meta::StringLiteral method, class Client, Size capacityHeaders = 1u>
+template <class Client, Size capacityHeaders = 1u>
 class Request
 {
 private:
 	template <Size otherCapacityHeaders>
-	using RequestCompatible = Request<method, Client, otherCapacityHeaders>;
+	using RequestCompatible = Request<Client, otherCapacityHeaders>;
 
 public:
-	constexpr Request(Client& client, const StringView path) noexcept : client_{client}, path_{path} {}
+	constexpr Request(Client& client, const StringView method, const StringView path) noexcept :
+		client_{client}, method_{method}, path_{path}
+	{
+	}
 
 private:
 	template <Size oldCapacityHeaders>
 	constexpr Request(RequestCompatible<oldCapacityHeaders>&& other) noexcept :
-		client_{other.client_}, path_{other.path_}, headers_{bzd::move(other.headers_)}
+		client_{other.client_}, method_{other.method_}, path_{other.path_}, headers_{bzd::move(other.headers_)}
 	{
 	}
 
@@ -124,7 +140,7 @@ public:
 		auto scope = co_await !client_.connectIfNeeded();
 
 		OStreamBuffered<bufferCapacity> buffer{client_.stream_.valueMutable()};
-		co_await !bzd::toStream(buffer, "{} {} HTTP/1.1\r\n"_csv, method.data(), path_);
+		co_await !bzd::toStream(buffer, "{} {} HTTP/1.1\r\n"_csv, method_, path_);
 		for (const auto& header : headers_)
 		{
 			co_await !bzd::toStream(buffer, "{}: {}\r\n"_csv, header.key, header.value);
@@ -136,10 +152,11 @@ public:
 	}
 
 private:
-	template <meta::StringLiteral, class, Size>
+	template <class, Size>
 	friend class Request;
 
 	Client& client_;
+	StringView method_;
 	StringView path_;
 	Vector<Header, capacityHeaders> headers_{};
 };
@@ -157,18 +174,17 @@ public:
 	{
 	}
 
-	template <meta::StringLiteral method>
-	constexpr auto request(const StringView path = "/"_sv) noexcept
+	constexpr auto request(const StringView method = "GET"_sv, const StringView path = "/"_sv) noexcept
 	{
-		return Request<method, Self>{*this, path};
+		return Request<Self>{*this, method, path};
 	}
-	constexpr auto get(const StringView path = "/"_sv) noexcept { return request<"GET">(path); }
-	constexpr auto head(const StringView path = "/"_sv) noexcept { return request<"HEAD">(path); }
-	constexpr auto post(const StringView path = "/"_sv) noexcept { return request<"POST">(path); }
-	constexpr auto put(const StringView path = "/"_sv) noexcept { return request<"PUT">(path); }
+	constexpr auto get(const StringView path = "/"_sv) noexcept { return request("GET"_sv, path); }
+	constexpr auto head(const StringView path = "/"_sv) noexcept { return request("HEAD"_sv, path); }
+	constexpr auto post(const StringView path = "/"_sv) noexcept { return request("POST"_sv, path); }
+	constexpr auto put(const StringView path = "/"_sv) noexcept { return request("PUT"_sv, path); }
 
 private:
-	template <meta::StringLiteral, class, Size>
+	template <class, Size>
 	friend class Request;
 
 	template <class, Size>
