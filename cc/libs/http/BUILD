@@ -10,6 +10,7 @@ cc_library(
         "//cc:bzd",
         "//cc/bzd/container:ichannel_buffered",
         "//cc/bzd/container:ostream_buffered",
+        "//cc/bzd/container:string_stream",
         "//cc/bzd/utility/pattern:from_stream",
         "//cc/bzd/utility/pattern:to_stream",
         "//cc/bzd/utility/synchronization:lock_guard",

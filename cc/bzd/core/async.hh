@@ -298,8 +298,24 @@ bzd::Async<> forEach(T&& generator, Callable&& callable) noexcept
 		{
 			co_return bzd::move(result).propagate();
 		}
-		callable(bzd::move(result).valueMutable());
+
+		if constexpr (concepts::asyncCallable<Callable, decltype(bzd::move(result).valueMutable())>)
+		{
+			if (!co_await !callable(bzd::move(result).valueMutable()))
+			{
+				break;
+			}
+		}
+		else
+		{
+			if (!callable(bzd::move(result).valueMutable()))
+			{
+				break;
+			}
+		}
 	}
+
+	co_return {};
 }
 
 constexpr auto yield() noexcept { return bzd::async::awaitable::Yield{}; }

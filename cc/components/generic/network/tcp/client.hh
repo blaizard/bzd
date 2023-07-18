@@ -16,7 +16,10 @@ public:
 public:
 	explicit Client(Context& context) noexcept : context_{context} {}
 
-	bzd::Async<Stream> connect(const StringView, const bzd::network::PortType) noexcept { co_return Stream{context_}; }
+	bzd::Async<Stream> connect(const StringView hostname, const bzd::network::PortType port) noexcept
+	{
+		co_return Stream{context_, hostname, port};
+	}
 
 private:
 	Context& context_;
@@ -31,21 +34,44 @@ struct ClientTraits<bzd::components::generic::network::tcp::Client<Context>>
 	class Stream : public bzd::IOStream
 	{
 	public:
-		explicit constexpr Stream(Context& context) noexcept : context_{context} {}
+		explicit constexpr Stream(Context& context, const StringView hostname, const bzd::network::PortType port) noexcept :
+			context_{context}, hostname_{hostname}, port_{port}
+		{
+		}
 
 	public:
-		bzd::Async<> write(const bzd::Span<const Byte>) noexcept override { co_return {}; }
+		bzd::Async<> write(const bzd::Span<const Byte> data) noexcept override
+		{
+			struct
+			{
+				const bzd::Span<const Byte> data;
+				const StringView hostname;
+				const bzd::network::PortType port;
+				const bzd::UInt32 index;
+			} context{data, hostname_, port_, indexWrite_++};
+			context_.config.write(context);
+			co_return {};
+		}
 
 		bzd::Async<bzd::Span<const Byte>> read(bzd::Span<Byte>&& data) noexcept override
 		{
-			const auto output = context_.config.read(bzd::move(data));
+			struct
+			{
+				const bzd::Span<Byte> data;
+				const StringView hostname;
+				const bzd::network::PortType port;
+				const bzd::UInt32 index;
+			} context{bzd::move(data), hostname_, port_, indexRead_++};
+			const auto output = context_.config.read(bzd::move(context));
 			co_return output;
 		}
 
 	private:
 		Context& context_;
-		Size countRead_{0u};
-		Size countWrite_{0u};
+		StringView hostname_;
+		bzd::network::PortType port_;
+		bzd::UInt32 indexRead_{0u};
+		bzd::UInt32 indexWrite_{0u};
 	};
 };
 } // namespace bzd::network::tcp
