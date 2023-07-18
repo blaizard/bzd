@@ -203,7 +203,6 @@ public:
 	{{ paramsTemplateDefinition(entry.expression.parametersResolved) }}
 	struct Config
 	{
-		{{ paramsConstructorDefinition("Config", entry.expression.parametersResolved) }}
 		{% for index, item in entry.expression.parametersResolved %}
 		{{ item.comment | commentBlockToStr }}
 		{{- paramToDefinition(item, index) }}
@@ -213,7 +212,6 @@ public:
 	{{ iterableTemplateDefinition(iosRegistry[fqn].keys()) }}
 	struct IO
 	{
-		{{ iterableConstructorDefinitionRValue("IO", iosRegistry[fqn].keys()) }}
 		{% for index, name in iosRegistry[fqn].keys() %}
 		T{{ index }} {{ name }};
 		{% end %}
@@ -252,7 +250,7 @@ protected:
 	{% for fqn, entry in registry[context] %}
 	// {{ fqn }}
 	static auto context_{{ fqn | fqnToNameStr }} = bzd::generator::makeContext(
-		ResourceSpecialization<"{{ fqn }}">::Config{ {{- paramsDeclaration(entry.expression.parametersResolved | paramsFilterOutLiterals) -}} },
+		ResourceSpecialization<"{{ fqn }}">::Config{ {{- paramsDesignatedInitializers(entry.expression.parametersResolved | paramsFilterOutLiterals) -}} },
 		ResourceSpecialization<"{{ fqn }}">::IO{ {{- registryConnectionsDeclaration(iosRegistry[fqn]) -}} }
 	);
 	static {{ entry.expression.typeResolved | symbolDefinitionToStr }} {{ fqn | fqnToNameStr }}{context_{{ fqn | fqnToNameStr }}};

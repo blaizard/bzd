@@ -30,6 +30,22 @@ cc_library(
 )
 
 cc_library(
+    name = "input_range",
+    hdrs = [
+        "input_range.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":base",
+        "//cc/bzd/algorithm:byte_copy",
+        "//cc/bzd/container:string",
+        "//cc/bzd/container:string_view",
+        "//cc/bzd/container/ranges/views:take",
+        "//cc/bzd/type_traits:is_convertible",
+    ],
+)
+
+cc_library(
     name = "byte",
     hdrs = [
         "byte.hh",
@@ -99,21 +115,5 @@ cc_library(
         "//cc/bzd/container:string_view",
         "//cc/bzd/type_traits:is_convertible",
         "//cc/bzd/type_traits:is_pointer",
-    ],
-)
-
-cc_library(
-    name = "string",
-    hdrs = [
-        "string.hh",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":base",
-        "//cc/bzd/algorithm:byte_copy",
-        "//cc/bzd/container:string",
-        "//cc/bzd/container:string_view",
-        "//cc/bzd/container/ranges/views:take",
-        "//cc/bzd/type_traits:is_convertible",
     ],
 )

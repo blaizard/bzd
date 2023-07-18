@@ -10,7 +10,7 @@
 namespace bzd {
 
 template <class T>
-requires(concepts::convertible<T, bzd::StringView> || concepts::convertible<T, bzd::interface::String>)
+requires(concepts::convertible<T, bzd::StringView> || concepts::inputByteCopyableRange<T>)
 struct ToString<T>
 {
 	struct Metadata
@@ -19,20 +19,17 @@ struct ToString<T>
 		bzd::Size precision = 6;
 	};
 
-	template <bzd::concepts::outputByteCopyableRange Range>
-	static constexpr bzd::Optional<bzd::Size> process(Range&& range,
-													  const bzd::StringView value,
-													  const Metadata metadata = Metadata{}) noexcept
+	template <bzd::concepts::outputByteCopyableRange Range, class U>
+	static constexpr bzd::Optional<bzd::Size> process(Range&& range, U&& value, const Metadata metadata = Metadata{}) noexcept
 	{
-		return toStringBase(bzd::forward<Range>(range), value, metadata);
-	}
-
-	template <bzd::concepts::outputByteCopyableRange Range>
-	static constexpr bzd::Optional<bzd::Size> process(Range&& range,
-													  const bzd::interface::String& value,
-													  const Metadata metadata = Metadata{}) noexcept
-	{
-		return toStringBase(bzd::forward<Range>(range), value, metadata);
+		if constexpr (concepts::convertible<U, bzd::StringView>)
+		{
+			return toStringBase(bzd::forward<Range>(range), bzd::StringView{value}, metadata);
+		}
+		else
+		{
+			return toStringBase(bzd::forward<Range>(range), bzd::forward<U>(value), metadata);
+		}
 	}
 
 	template <class Adapter>
@@ -58,23 +55,16 @@ struct ToString<T>
 	}
 
 private:
-	template <bzd::concepts::outputByteCopyableRange Range, class U>
-	static constexpr bzd::Optional<bzd::Size> toStringBase(Range&& range, const U& value, const Metadata metadata) noexcept
+	template <concepts::outputByteCopyableRange Range, class U>
+	static constexpr bzd::Optional<bzd::Size> toStringBase(Range&& range, U&& value, const Metadata metadata) noexcept
 	{
 		if (metadata.isPrecision)
 		{
-			const auto size = bzd::min(metadata.precision, value.size());
-			if (bzd::algorithm::byteCopyReturnSize(value | bzd::ranges::take(size), range) == size)
-			{
-				return size;
-			}
+			return bzd::algorithm::byteCopyReturnSize(value | bzd::ranges::take(metadata.precision), range);
 		}
 		else
 		{
-			if (bzd::algorithm::byteCopyReturnSize(value, range) == value.size())
-			{
-				return value.size();
-			}
+			return bzd::algorithm::byteCopyReturnSize(value, range);
 		}
 		return bzd::nullopt;
 	}

@@ -97,22 +97,6 @@ class Transform:
 
 	# ParameterResolvedItem related
 
-	def paramsConstructorDefinition(self, name: str, params: ParametersResolved) -> str:
-		args = []
-		assigns = []
-		for index, item in enumerate(params):
-			if item.param.isLiteral:
-				pass
-			elif item.isLValue:
-				args.append(f"T{index}& {item.name}_")
-				assigns.append(f"{item.name}{{{item.name}_}}")
-			elif item.isRValue:
-				args.append(f"T{index}&& {item.name}_")
-				assigns.append(f"{item.name}{{bzd::move({item.name}_)}}")
-		if not args:
-			return f"{name}() noexcept = default;"
-		return f"constexpr {name}({', '.join(args)}) noexcept : {', '.join(assigns)} {{}}"
-
 	def paramsTemplateDefinition(self, params: ParametersResolved) -> str:
 		args = []
 		for index, item in enumerate(params):
@@ -143,7 +127,21 @@ class Transform:
 		symbols = self.composition.symbols if self.composition else None
 		return [valueToStrOriginal(item, symbols=symbols, registry=isRegistry) for item in params]
 
-	def paramsDeclaration(self, params: ParametersResolved, isRegistry: bool = False) -> str:
+	def paramsDesignatedInitializers(self, params: ParametersResolved) -> str:
+		"""Initializing an aggregate with designated initializers.
+
+		Note, it must have named parameters.
+		Something like this:
+		`.hello = "here", .world = 2`
+		"""
+
+		values = {item.name: valueToStrOriginal(item, includeComment=False) for item in params}
+		valueToList = [f".{key} = {value}" for key, value in values.items()]
+		if len(valueToList) < 2:
+			return ", ".join(valueToList)
+		return ",\n".join(valueToList)
+
+	def paramsDeclaration(self, params: ParametersResolved, isRegistry: bool) -> str:
 		paramsToList = self.paramsDeclarationToList_(params=params, isRegistry=isRegistry)
 		if len(paramsToList) < 2:
 			return ", ".join(paramsToList)
@@ -254,21 +252,11 @@ class Transform:
 					identifier = metadata["identifier"]
 				arg = f"{getBufferName(identifier)}.{factoryTypes[kind]}"
 
-			args.append(f"/*{name}*/{arg}")
+			args.append(f".{name} = {arg}")
 
 		return ", ".join(args)
 
 	# Generic iterable
-
-	def iterableConstructorDefinitionRValue(self, name: str, it: typing.Iterable[str]) -> str:
-		args = []
-		assigns = []
-		for index, variableName in enumerate(it):
-			args.append(f"T{index}&& {variableName}_")
-			assigns.append(f"{variableName}{{bzd::move({variableName}_)}}")
-		if not args:
-			return f"{name}() noexcept = default;"
-		return f"constexpr {name}({', '.join(args)}) noexcept : {', '.join(assigns)} {{}}"
 
 	def iterableTemplateDefinition(self, it: typing.Iterable[typing.Any]) -> str:
 		args = []

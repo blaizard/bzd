@@ -123,6 +123,7 @@ TEST_ASYNC(Generator, ForLoop)
 	co_await !bzd::async::forEach(bzd::move(async), [&](auto&& value) {
 		EXPECT_EQ(value, expected);
 		++expected;
+		return true;
 	});
 	EXPECT_EQ(expected, 10u);
 

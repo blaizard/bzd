@@ -50,6 +50,31 @@ cc_library(
 )
 
 cc_library(
+    name = "generator_input_range",
+    hdrs = [
+        "generator_input_range.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":input_range",
+    ],
+)
+
+cc_library(
+    name = "input_range",
+    hdrs = [
+        "input_range.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":base",
+        "//cc/bzd/container:string_view",
+        "//cc/bzd/type_traits:is_convertible",
+        "//cc/bzd/utility/pattern/to_string:input_range",
+    ],
+)
+
+cc_library(
     name = "integral",
     hdrs = [
         "integral.hh",
@@ -83,20 +108,5 @@ cc_library(
     deps = [
         ":base",
         "//cc/bzd/utility/pattern/to_string:pointer",
-    ],
-)
-
-cc_library(
-    name = "string",
-    hdrs = [
-        "string.hh",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":base",
-        "//cc/bzd/container:string",
-        "//cc/bzd/container:string_view",
-        "//cc/bzd/type_traits:is_convertible",
-        "//cc/bzd/utility/pattern/to_string:string",
     ],
 )

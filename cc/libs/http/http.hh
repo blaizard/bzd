@@ -3,6 +3,7 @@
 #include "cc/bzd/container/ichannel_buffered.hh"
 #include "cc/bzd/container/map.hh"
 #include "cc/bzd/container/ostream_buffered.hh"
+#include "cc/bzd/container/string_stream.hh"
 #include "cc/bzd/utility/pattern/from_stream.hh"
 #include "cc/bzd/utility/pattern/to_stream.hh"
 #include "cc/bzd/utility/synchronization/lock_guard.hh"
@@ -52,7 +53,7 @@ public:
 		case "1.1"_s:
 			break;
 		default:
-			co_return bzd::error::Failure("Version {} not supported."_csv, version);
+			co_return bzd::error::Failure("Version '{}' not supported."_csv, version);
 		}
 		// co_await stream_.readUntil("/r/n"_sv.asBytes());
 		::std::cout << "[-> " << code << " <-]" << std::endl;
@@ -73,7 +74,13 @@ private:
 	bzd::Async<Status> readStatus(auto& reader) noexcept
 	{
 		Status status{};
-		co_await !bzd::fromStream(reader, "HTTP/{:[0-9.]+}\\s+{}\\s+"_csv, status.version.assigner(), status.code);
+		const auto maybeSuccess = co_await bzd::fromStream(reader, "HTTP/{:[0-9.]+}\\s+{}\\s+"_csv, status.version.assigner(), status.code);
+		if (!maybeSuccess)
+		{
+			bzd::StringStream<64u> buffer;
+			bzd::ignore = co_await bzd::toStream(buffer, "{:.10}"_csv, reader);
+			co_return bzd::error::Failure("Malformed header: {}"_csv, buffer.str());
+		}
 		co_return status;
 	}
 

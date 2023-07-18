@@ -26,7 +26,7 @@ export LD_LIBRARY_PATH="${INSTALL}/lib:${LD_LIBRARY_PATH}"
 pushd srcs
 git clone --depth 1 https://repo.or.cz/isl.git -b "isl-0.26"
 git clone --depth 1 https://gitlab.inria.fr/mpfr/mpfr.git -b "4.2"
-curl -L https://gmplib.org/download/gmp/gmp-6.2.1.tar.xz | toolchains/cc/linux_x86_64_gcc/patchall.pytar -xJ --transform 's/gmp[^\/]*/gmp/'
+curl -L https://gmplib.org/download/gmp/gmp-6.2.1.tar.xz | tar -xJ --transform 's/gmp[^\/]*/gmp/'
 git clone --depth 1 https://gitlab.inria.fr/mpc/mpc.git -b "1.3.1"
 git clone --depth 1 https://github.com/gcc-mirror/gcc.git -b "releases/gcc-${GCC_VERSION}"
 git clone --depth 1 https://sourceware.org/git/binutils-gdb.git -b "binutils-2_39" binutils
@@ -111,7 +111,7 @@ find "${INSTALL}" -type f -executable | grep -vF '.a' | grep -vF '.la' | xargs -
 
 # ---- Set the RPATH ----
 
-./toolchains/cc/linux_x86_64_gcc/patchall.py "${INSTALL}"
+patchall.py "${INSTALL}"
 
 # ---- Create an archive ----
 

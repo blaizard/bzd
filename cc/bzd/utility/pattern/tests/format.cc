@@ -32,7 +32,7 @@ TEST(Format_, StreamStringFormat)
 	expectStringStreamFormat<256>("Hello 12.5", "Hello {:.1f}"_csv, 12.45);
 	expectStringStreamFormat<256>("Hello 15.%", "Hello {:%}"_csv, 0.15);
 	expectStringStreamFormat<256>("Hello World", "Hello {}"_csv, "World");
-	expectStringStreamFormat<256>("Hello World", "Hello {}"_csv, "World");
+	expectStringStreamFormat<256>("Hello World", "Hello {:.100}"_csv, "World");
 	expectStringStreamFormat<256>("Hello Wo", "Hello {:.2}"_csv, "World");
 	expectStringStreamFormat<256>("This milk is 3.5%", "This {1} is {0:.1%}"_csv, 0.0349, "milk");
 	expectStringStreamFormat<256>("42 == 0b101010 == 0o52 == 0x2a == 0x2A", "{} == {0:#b} == {0:#o} == {0:#x} == {0:#X}"_csv, 42);

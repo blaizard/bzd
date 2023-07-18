@@ -26,4 +26,11 @@ concept asyncTask = async<T> && (typeTraits::RemoveCVRef<T>::type == typeTraits:
 template <class T>
 concept asyncGenerator = async<T> && (typeTraits::RemoveCVRef<T>::type == typeTraits::AsyncType::generator);
 
+template <class T, class... Args>
+concept asyncCallable = requires(T t, Args... args) {
+	{
+		t(args...)
+	} -> async;
+};
+
 } // namespace bzd::concepts

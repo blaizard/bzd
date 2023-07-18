@@ -14,8 +14,9 @@ struct Config
 
 TEST_ASYNC(Client, Simple)
 {
-	auto context = bzd::generator::makeContext(
-		Config{.read = [](bzd::Span<Byte>&&) { return "Hello"_sv.asBytes(); }, .write = [](const bzd::Span<const Byte>) {}});
+	auto context =
+		bzd::generator::makeContext(Config{.read = [](const auto&&) { return "Hello"_sv.asBytes(); },
+										   .write = [](const auto context) { EXPECT_EQ_RANGE(context.data, "World"_sv.asBytes()); }});
 
 	tcp::Client client{context};
 
@@ -25,6 +26,8 @@ TEST_ASYNC(Client, Simple)
 	const auto span = co_await !stream.read(data.asBytesMutable());
 
 	EXPECT_EQ_RANGE(span, "Hello"_sv.asBytes());
+
+	co_await !stream.write("World"_sv.asBytes());
 
 	co_return {};
 }
