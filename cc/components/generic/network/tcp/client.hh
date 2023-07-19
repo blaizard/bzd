@@ -42,6 +42,7 @@ struct ClientTraits<bzd::components::generic::network::tcp::Client<Context>>
 	public:
 		bzd::Async<> write(const bzd::Span<const Byte> data) noexcept override
 		{
+			co_await bzd::async::yield();
 			struct
 			{
 				const bzd::Span<const Byte> data;
@@ -55,6 +56,7 @@ struct ClientTraits<bzd::components::generic::network::tcp::Client<Context>>
 
 		bzd::Async<bzd::Span<const Byte>> read(bzd::Span<Byte>&& data) noexcept override
 		{
+			co_await bzd::async::yield();
 			struct
 			{
 				const bzd::Span<Byte> data;

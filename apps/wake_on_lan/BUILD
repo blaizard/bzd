@@ -16,7 +16,7 @@ py_binary(
 )
 
 bzd_bundle(
-    name = "server_bundle",
+    name = "bzd_wol_server",
     binary = ":server",
     tags = ["manual"],
 )

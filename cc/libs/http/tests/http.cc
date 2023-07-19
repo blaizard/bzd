@@ -16,10 +16,10 @@ struct Config
 TEST_ASYNC(Http, Simple)
 {
 	auto context = bzd::generator::makeContext(
-		Config{.read = [](const auto&&) { return "HTTP/1.1 200 OK"_sv.asBytes(); }, .write = [](const auto) {}});
+		Config{.read = [](const auto&&) { return "HTTP/1.1 200 OK\r\n"_sv.asBytes(); }, .write = [](const auto) {}});
 
 	bzd::components::generic::network::tcp::Client network{context};
-	bzd::http::Client client{network, "", 1234u};
+	bzd::http::Client client{network, test.timer(), "", 1234u};
 
 	auto response = co_await !client.get("/").send();
 	bzd::Array<char, 100u> data;

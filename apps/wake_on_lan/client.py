@@ -4,6 +4,7 @@ import struct
 import socket
 import typing
 import time
+import urllib.request
 
 
 def checkMAC(mac: str) -> bool:
@@ -53,19 +54,8 @@ def checkConnection(host: str, port: int, timeoutS: int = 1) -> bool:
 		return True
 
 
-if __name__ == "__main__":
-
-	parser = argparse.ArgumentParser(description="Wake On Lan client.")
-	parser.add_argument("-b", "--broadcast", default="255.255.255.255", help="The broadcast address to be used.")
-	parser.add_argument("-t", "--timeout", default=60, type=int, help="Timeout in S until which the check returns.")
-	parser.add_argument("-w",
-	                    "--wait",
-	                    action="append",
-	                    default=[],
-	                    help="Wait until a specific TCP connection is open.")
-	parser.add_argument("mac", help="The mac address for the machine to wake up.")
-
-	args = parser.parse_args()
+def commandWol(args: argparse.Namespace) -> None:
+	"""Wake on LAN command."""
 
 	assert checkMAC(args.mac), f"Mac address '{args.mac}' should have the following format: XX:XX:XX:XX:XX:XX"
 
@@ -83,3 +73,42 @@ if __name__ == "__main__":
 				break
 			time.sleep(1)
 		assert connectionOpen, f"Connection for {entry} timed out after {args.timeout}s"
+
+
+def commandSuspend(args: argparse.Namespace) -> None:
+	"""Suspend a machine running the server."""
+
+	host, port = getHostPort(args.ip)
+
+	try:
+		urllib.request.urlopen(f"http://{host}:{port}/suspend").read()
+	except Exception as e:
+		print(str(e))
+
+
+if __name__ == "__main__":
+
+	parser = argparse.ArgumentParser(description="Wake On Lan client.")
+	subparsers = parser.add_subparsers(help="Available sub-commands.", dest="command")
+
+	wolParser = subparsers.add_parser("wol", help="Wake-up a machine from its MAC address.")
+	wolParser.add_argument("-b", "--broadcast", default="255.255.255.255", help="The broadcast address to be used.")
+	wolParser.add_argument("-t", "--timeout", default=60, type=int, help="Timeout in S until which the check returns.")
+	wolParser.add_argument("-w",
+	                       "--wait",
+	                       action="append",
+	                       default=[],
+	                       help="Wait until a specific TCP connection is open.")
+	wolParser.add_argument("mac", help="The mac address for the machine to wake up.")
+
+	shutdownParser = subparsers.add_parser("suspend", help="Suspend a machine running the server.")
+	shutdownParser.add_argument("ip", help="The ip:port address for the machine to suspend.")
+
+	args = parser.parse_args()
+
+	if args.command == "wol":
+		commandWol(args)
+	elif args.command == "suspend":
+		commandSuspend(args)
+	else:
+		assert False, f"Unknown command: '{args.command}'."

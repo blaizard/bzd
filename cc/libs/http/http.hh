@@ -8,6 +8,7 @@
 #include "cc/bzd/utility/pattern/to_stream.hh"
 #include "cc/bzd/utility/synchronization/lock_guard.hh"
 #include "cc/bzd/utility/synchronization/mutex.hh"
+#include "interfaces/timer.hh"
 
 #include <iostream>
 
@@ -93,7 +94,8 @@ private:
 	bzd::Async<> error(auto& reader, Args&&... args) noexcept
 	{
 		bzd::StringStream<80u> buffer;
-		bzd::ignore = co_await bzd::toStream(buffer, "[...]{:.64}[...]"_csv, reader);
+		auto fillBuffer = bzd::toStream(buffer, "[...]{:.64}[...]"_csv, reader);
+		bzd::ignore = co_await bzd::async::any(bzd::move(fillBuffer), client_.timer_.timeout(1_s));
 		co_return bzd::error::Failure(bzd::forward<Args>(args)..., buffer.str());
 	}
 
@@ -169,8 +171,8 @@ public: // Traits.
 	using Self = Client<Network>;
 
 public:
-	constexpr Client(Network& network, const StringView hostname, const UInt32 port) noexcept :
-		network_{network}, hostname_{hostname}, port_{port}
+	constexpr Client(Network& network, bzd::Timer& timer, const StringView hostname, const UInt32 port) noexcept :
+		network_{network}, timer_{timer}, hostname_{hostname}, port_{port}
 	{
 	}
 
@@ -200,6 +202,7 @@ private:
 
 private:
 	Network& network_;
+	bzd::Timer& timer_;
 	Optional<typename Network::Stream> stream_;
 	StringView hostname_;
 	UInt32 port_;
