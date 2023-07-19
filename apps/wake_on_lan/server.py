@@ -5,6 +5,18 @@ from http import HTTPStatus
 import os
 
 
+class HTTPServer(socketserver.TCPServer):
+	allow_reuse_address = True
+
+	def run(self) -> None:
+		try:
+			self.serve_forever()
+		except KeyboardInterrupt:
+			print("\r<Keyboard interrupt>")
+		finally:
+			self.server_close()
+
+
 class Handler(http.server.SimpleHTTPRequestHandler):
 
 	def do_GET(self) -> None:
@@ -15,6 +27,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 			self.end_headers()
 
 			# Execute the suspend command.
+			print("Suspending...")
 			os.system("systemctl suspend")
 
 		else:
@@ -30,6 +43,6 @@ if __name__ == "__main__":
 
 	args = parser.parse_args()
 
-	server = socketserver.TCPServer((args.bind, args.port), Handler)
+	server = HTTPServer((args.bind, args.port), Handler)
 	print(f"Server started at {args.bind}:{args.port}")
 	server.serve_forever()

@@ -15,5 +15,6 @@ cc_library(
         "//cc/bzd/utility/pattern:to_stream",
         "//cc/bzd/utility/synchronization:lock_guard",
         "//cc/bzd/utility/synchronization:mutex",
+        "//interfaces:timer",
     ],
 )

@@ -55,7 +55,7 @@ bool bzd::test::Manager::run(bzd::OStream& out, bzd::Timer& timer)
 	while (node->isValid())
 	{
 		const auto seed = node->info->getSeed();
-		bzd::test::Context context{seed};
+		bzd::test::Context context{seed, timer};
 
 		::bzd::print(out, "[ RUN      ] {}.{}"_csv, node->info->testCaseName, node->info->testName).sync();
 		if (node->variant.size())
