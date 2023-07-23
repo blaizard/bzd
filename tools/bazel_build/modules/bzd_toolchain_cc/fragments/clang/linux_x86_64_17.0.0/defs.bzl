@@ -1,15 +1,14 @@
-load("@bzd_toolchain_cc//cc:defs.bzl", "toolchain_maker", "toolchain_merge", "get_location")
+load("@bzd_toolchain_cc//cc:defs.bzl", "get_location", "toolchain_maker", "toolchain_merge")
 load("@bzd_toolchain_cc//:fragments/clang/linux/defs.bzl", "linux")
 
 def linux_x86_64(module_ctx, name):
-
     repository_path = get_location(module_ctx, name)
     toolchain_definition = {
         "url": "http://data.blaizard.com/file/bzd/toolchains/cc/clang/linux_x86_64/linux_x86_64_17.0.0.tar.xz",
         "strip_prefix": "linux_x86_64_17.0.0",
         "sha256": "1a3a7a8df2ca2dd84358b8202c256ba93789871bd2329ba426337cdfdd9de4ef",
         "build_files": [
-            "@bzd_toolchain_cc//:fragments/clang/linux_x86_64_17.0.0/linux_x86_64.BUILD"
+            "@bzd_toolchain_cc//:fragments/clang/linux_x86_64_17.0.0/linux_x86_64.BUILD",
         ],
         "builtin_include_directories": [
             "/usr/include/x86_64-linux-gnu",
@@ -63,5 +62,5 @@ def linux_x86_64(module_ctx, name):
     return toolchain_definition
 
 linux_x86_64_17_0_0 = {
-    "linux-x86_64": linux_x86_64
+    "linux-x86_64": linux_x86_64,
 }

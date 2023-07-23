@@ -23,7 +23,7 @@ export default class API {
 				 */
 				plugins: [],
 			},
-			options,
+			options
 		);
 
 		this.schema = schema;
@@ -62,7 +62,7 @@ export default class API {
 			method in this.schema[endpoint],
 			"The method '{}' is not valid for endpoint '{}'",
 			method,
-			endpoint,
+			endpoint
 		);
 	}
 }

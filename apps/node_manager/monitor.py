@@ -3,7 +3,6 @@ import typing
 import json
 
 from apps.node_manager.rest_server import RESTServerContext
-
 """Data format output:
 
 ```json
@@ -20,6 +19,7 @@ Temperatures are in Celsius.
 CPU loads are in percent.
 """
 
+
 def monitorTemperatures() -> typing.Any:
 
 	data = {}
@@ -28,17 +28,19 @@ def monitorTemperatures() -> typing.Any:
 		data[name] = [item.current for item in group]
 	return data
 
+
 def monitorCPUs() -> typing.Any:
 	return [*psutil.cpu_percent(interval=1, percpu=True)]
 
+
 def monitor() -> typing.Any:
-    return {"cpus": monitorCPUs(), "temperatures": monitorTemperatures()}
+	return {"cpus": monitorCPUs(), "temperatures": monitorTemperatures()}
+
 
 def handlerMonitor(context: RESTServerContext) -> None:
 
 	context.header("Content-type", "application/json")
 	context.write(json.dumps(monitor()))
 
-handlersMonitor = {
-	"/monitor": handlerMonitor
-}
+
+handlersMonitor = {"/monitor": handlerMonitor}

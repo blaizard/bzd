@@ -69,7 +69,7 @@ export default class Terminal {
 			],
 			{
 				stdio: ["pipe", "pipe", "pipe"],
-			},
+			}
 		);
 
 		//

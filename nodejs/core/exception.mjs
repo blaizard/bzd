@@ -166,7 +166,7 @@ const ExceptionFactory = (...topics) => {
 					level: "error",
 					topics: topics,
 				},
-				...args,
+				...args
 			);
 		}
 

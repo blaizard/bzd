@@ -1,5 +1,4 @@
 def linux(module_ctx, name):
-
     _ = module_ctx
     _ = name
 
@@ -20,5 +19,5 @@ def linux(module_ctx, name):
         },
         "app_executors": {
             "@bzd_toolchain_cc//cc:executor_host": "default,host",
-        }
+        },
     }

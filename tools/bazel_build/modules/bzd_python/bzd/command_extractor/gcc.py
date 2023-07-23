@@ -30,7 +30,7 @@ class Categories(enum.Enum):
 Result = typing.Sequence[Item]
 
 
-class ItemLibrary(ItemPathOrString):
+class ItemLibrary(ItemPathOrString):  # type: ignore
 
 	@property
 	def name(self) -> str:
@@ -38,7 +38,7 @@ class ItemLibrary(ItemPathOrString):
 		return re.sub(r"lib(.*)\.a", r"\1", pathlib.Path(self.pathOrValue).name)
 
 
-class CommandExtractorGcc(CommandExtractor):
+class CommandExtractorGcc(CommandExtractor):  # type: ignore
 
 	def __init__(self,
 	             cwd: pathlib.Path,
@@ -122,7 +122,7 @@ class CommandExtractorGcc(CommandExtractor):
 			print("Unhandled argument:", arg)
 			self.result.append(factory.make(ItemString, Categories.unhandled, arg))
 
-	def parse(self, cmdString: str) -> None:  # type: ignore
+	def parse(self, cmdString: str) -> None:
 
 		super().parse(
 		    cmdString, {

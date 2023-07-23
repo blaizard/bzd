@@ -12,7 +12,7 @@ export default class Services {
 				/// Contet are passed to the start function.
 				makeContext: (/*name*/) => ({}),
 			},
-			options,
+			options
 		);
 		this.services = {};
 		this.instances = {};

@@ -14,7 +14,7 @@ function _unitsToString(unitList, value, maxNbUnits = 1, decimalPoints = 1) {
 	let output = [];
 	for (let i = maxNbUnits; i > 0 && unitIndex >= 0; --i) {
 		output.push(
-			parseFloat(value).toFixed(decimalPoints) + (value < 2 ? unitList[unitIndex][0] : unitList[unitIndex][1]),
+			parseFloat(value).toFixed(decimalPoints) + (value < 2 ? unitList[unitIndex][0] : unitList[unitIndex][1])
 		);
 		value = (value - parseInt(value)) * unitList[unitIndex][2];
 		unitIndex--;
@@ -34,7 +34,7 @@ export function bytesToString(value, decimalPoints = 1) {
 		],
 		value,
 		/*maxNbUnits*/ 1,
-		decimalPoints,
+		decimalPoints
 	);
 }
 
@@ -49,7 +49,7 @@ export function timeMsToString(value, maxNbUnits = 1) {
 		],
 		value,
 		maxNbUnits,
-		/*decimalPoints*/ 0,
+		/*decimalPoints*/ 0
 	);
 }
 

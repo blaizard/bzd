@@ -15,7 +15,6 @@ def _executable_to_path(ctx, executable):
     return "$RUNFILES_DIR/{}".format(runfiles_relative_tool_path)
 
 def sh_binary_wrapper_impl(ctx, output, binary = None, locations = {}, extra_runfiles = [], expand_targets = [], symlinks = {}, root_symlinks = {}, files = None, command = "{binary} $@"):
-
     # Prepare the runfiles for the execution
     runfiles = ctx.runfiles(
         files = extra_runfiles,

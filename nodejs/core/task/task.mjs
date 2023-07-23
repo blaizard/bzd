@@ -43,7 +43,7 @@ export default class Task {
 				 */
 				isValid: (iteration) => iteration < 1,
 			},
-			config,
+			config
 		);
 		// The number of times this task has been executed
 		this.iteration = 0;
@@ -53,15 +53,15 @@ export default class Task {
 		// Sanity check
 		Exception.assert(
 			typeof this.config.priority === "number",
-			() => "config.priority must be a number, instead: " + JSON.stringify(this.config.priority),
+			() => "config.priority must be a number, instead: " + JSON.stringify(this.config.priority)
 		);
 		Exception.assert(
 			this.config.priority >= Task.PRIORITY_LOWEST && this.config.priority <= Task.PRIORITY_HIGHEST,
-			() => "config.priority is not in the range, instead: " + JSON.stringify(this.config.priority),
+			() => "config.priority is not in the range, instead: " + JSON.stringify(this.config.priority)
 		);
 		Exception.assert(
 			typeof this.action === "function",
-			() => "Task " + this.toString() + " action must be a function, instead: " + JSON.stringify(this.action),
+			() => "Task " + this.toString() + " action must be a function, instead: " + JSON.stringify(this.action)
 		);
 	}
 

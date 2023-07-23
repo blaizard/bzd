@@ -37,7 +37,7 @@
 						},
 						(message = null) => {
 							this.$notification.error({ "bzd-payment": message });
-						},
+						}
 					);
 			},
 		},

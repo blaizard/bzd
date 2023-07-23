@@ -155,7 +155,7 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 	async generateRefreshToken(uid, roles, persistent, session) {
 		return await this._generateToken(
 			{ uid: uid, roles: roles, persistent: persistent, session: session },
-			persistent ? this.options.tokenRefreshLongTermExpiresIn : this.options.tokenRefreshShortTermExpiresIn,
+			persistent ? this.options.tokenRefreshLongTermExpiresIn : this.options.tokenRefreshShortTermExpiresIn
 		);
 	}
 

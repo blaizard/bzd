@@ -24,7 +24,7 @@ export default {
 				const proxy = DockerV2Proxy.makeFromStorageDockerV2(
 					params["docker.proxy.url"],
 					params["docker.proxy.port"],
-					await context.getVolume(),
+					await context.getVolume()
 				);
 				await proxy.start();
 				return proxy;

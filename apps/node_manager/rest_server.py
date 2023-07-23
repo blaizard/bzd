@@ -4,7 +4,8 @@ import typing
 from http import HTTPStatus
 from functools import partial
 
-Handlers = typing.Dict[str, typing.Callable[["RESTServerContext"], None]]
+Handlers = typing.Mapping[str, typing.Callable[["RESTServerContext"], None]]
+
 
 class RESTServerContext:
 
@@ -19,6 +20,7 @@ class RESTServerContext:
 		if isinstance(data, str):
 			data = data.encode()
 		self.data.append(data)
+
 
 class Handler(http.server.SimpleHTTPRequestHandler):
 
@@ -43,6 +45,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 		else:
 			self.send_response(HTTPStatus.NOT_FOUND)
 			self.end_headers()
+
 
 class RESTServer(socketserver.TCPServer):
 	allow_reuse_address = True

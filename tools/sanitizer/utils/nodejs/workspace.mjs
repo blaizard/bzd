@@ -14,7 +14,7 @@ export default class Workspace {
 				include: [],
 				exclude: [],
 			},
-			options,
+			options
 		);
 		Exception.assert(typeof path == "string", "Path must be a string: {}", path);
 		this.path = path;

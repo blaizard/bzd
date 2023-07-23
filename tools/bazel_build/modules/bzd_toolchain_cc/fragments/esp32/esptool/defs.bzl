@@ -1,8 +1,6 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-load("@bzd_toolchain_cc//cc:defs.bzl", "get_location")
 
 def esptool(module_ctx, name = "esptool"):
-
     _ = module_ctx
     _ = name
 

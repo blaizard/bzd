@@ -73,7 +73,7 @@ export default class Upload {
 				 */
 				onComplete: (/*item, response*/) => {},
 			},
-			config,
+			config
 		);
 	}
 
@@ -90,7 +90,7 @@ export default class Upload {
 				 */
 				beforeUpload: async () => {},
 			},
-			options,
+			options
 		);
 
 		return new Promise((resolve, reject) => {
@@ -119,7 +119,7 @@ export default class Upload {
 							return null;
 						})
 						.filter((filter) => Boolean(filter))
-						.join(","),
+						.join(",")
 				);
 			}
 			input.style.display = "none";
@@ -129,7 +129,7 @@ export default class Upload {
 					await options.beforeUpload();
 					this.handleFiles(input.files, nothrow).then(resolve).catch(reject);
 				},
-				false,
+				false
 			);
 
 			// Open the file explorer to select the file
@@ -166,7 +166,7 @@ export default class Upload {
 	async handleFiles(files, nothrow) {
 		const maxNbFiles = Math.min(
 			files.length,
-			typeof this.config.max === "function" ? this.config.max() : this.config.max,
+			typeof this.config.max === "function" ? this.config.max() : this.config.max
 		);
 		let promiseList = [];
 
@@ -210,7 +210,7 @@ export default class Upload {
 							this.config.onProgress(item);
 						}
 					},
-					false,
+					false
 				);
 				xhr.onerror = () => {
 					item.error = "An error occurred during the transaction";

@@ -117,7 +117,7 @@
 				const sunday = new Date(1985, 3, 7);
 				const formatter = new Intl.DateTimeFormat(undefined, { weekday: "narrow" });
 				return [...Array(7).keys()].map((index) =>
-					formatter.format(new Date(sunday.getTime()).setDate(sunday.getDate() + index)),
+					formatter.format(new Date(sunday.getTime()).setDate(sunday.getDate() + index))
 				);
 			},
 			months() {

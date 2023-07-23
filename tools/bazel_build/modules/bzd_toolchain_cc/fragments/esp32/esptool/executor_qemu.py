@@ -67,7 +67,7 @@ if __name__ == "__main__":
 	flashPath = pathlib.Path("flash.bin")
 	createFlash(flashPath, typing.cast(int, target["memorySize"]),
 	            {offset: pathlib.Path(f.format(binary=args.image))
-	             for offset, f in target["memoryMap"].items()})  # type: ignore
+	             for offset, f in target["memoryMap"].items()})
 
 	if args.debug:
 		gdb = threading.Thread(target=runGdb, args=(args.name, ))
@@ -78,9 +78,8 @@ if __name__ == "__main__":
 	assert gdbinit.is_file()
 
 	cmds = [
-	    "run", "-t", "--rm", "--name", args.name,
-	    f"--volume={flashPath.resolve().as_posix()}:/bzd/flash.bin:rw",
-		f"--volume={gdbinit.resolve().as_posix()}:/root/.gdbinit:ro",
+	    "run", "-t", "--rm", "--name", args.name, f"--volume={flashPath.resolve().as_posix()}:/bzd/flash.bin:rw",
+	    f"--volume={gdbinit.resolve().as_posix()}:/root/.gdbinit:ro",
 	    f"--volume={pathlib.Path(args.elf).resolve().as_posix()}:/bzd/binary.bin:ro"
 	]
 

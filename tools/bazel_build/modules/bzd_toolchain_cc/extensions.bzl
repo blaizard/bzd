@@ -8,19 +8,17 @@ _repositories.update(esp32)
 _repositories.update(gcc)
 
 def _make_configs(name, version):
-
     configs = {}
     for target, config_by_executions in _repositories[version].items():
         for execution, factory in config_by_executions.items():
             configs["{}-{}-{}".format(name, execution, target)] = struct(
-                        factory = factory,
-                        execution = execution,
-                        target = target
-                    )
+                factory = factory,
+                execution = execution,
+                target = target,
+            )
     return configs
 
 def _toolchain_repository_impl(repository_ctx):
-
     build_content = """# ---- Compiler constraint value
 """
 
@@ -62,7 +60,6 @@ platform(
     targets = {}
     configs = _make_configs(repository_ctx.attr.repo_name, repository_ctx.attr.version)
     for repo_name, config in configs.items():
-
         execution_constraints = constraints_from_platform(config.execution)
         target_constraints = constraints_from_platform(config.target)
         targets[config.target] = target_constraints
@@ -96,12 +93,12 @@ toolchain(
     toolchain_type = "@bzd_toolchain_cc//binary:toolchain_type",
 )
 """.format(
-    comment = "{}/{} (execution/target)".format(config.execution, config.target),
-    name = "{}-{}".format(config.execution, config.target),
-    repo_name = repo_name,
-    execution_constraints = "\n".join(["\"{}\",".format(c) for c in execution_constraints]),
-    target_constraints = "\n".join(["\"{}\",".format(c) for c in target_constraints]),
-)
+            comment = "{}/{} (execution/target)".format(config.execution, config.target),
+            name = "{}-{}".format(config.execution, config.target),
+            repo_name = repo_name,
+            execution_constraints = "\n".join(["\"{}\",".format(c) for c in execution_constraints]),
+            target_constraints = "\n".join(["\"{}\",".format(c) for c in target_constraints]),
+        )
 
     build_content += "\n# ---- Platforms & Configs\n"
 
@@ -126,16 +123,16 @@ config_setting(
     visibility = ["//visibility:public"],
 )
 """.format(
-    target = target,
-    target_constraints = "\n".join(["\"{}\",".format(c) for c in target_constraints]),
-)
+            target = target,
+            target_constraints = "\n".join(["\"{}\",".format(c) for c in target_constraints]),
+        )
 
     build_content += "\n# ---- Extra\n" + repository_ctx.attr.extra
 
     repository_ctx.file(
         "BUILD",
         executable = False,
-        content = build_content
+        content = build_content,
     )
 
 toolchain_repository = repository_rule(
@@ -145,11 +142,10 @@ toolchain_repository = repository_rule(
         "version": attr.string(values = _repositories.keys(), mandatory = True),
         "default": attr.bool(mandatory = True),
         "extra": attr.string(),
-    }
+    },
 )
 
 def _toolchain_cc_impl(module_ctx):
-
     # Gather all the toolchains registered.
     configs = {}
     for mod in module_ctx.modules:
@@ -159,17 +155,15 @@ def _toolchain_cc_impl(module_ctx):
                 fail("A toolchain with the name '{}' already exists.".format(toolchain.name))
             configs[toolchain.name] = struct(
                 version = toolchain.version,
-                default = toolchain.default
+                default = toolchain.default,
             )
 
     # Build the repositories.
     for name, toolchain in configs.items():
-
         # Create execution/target specific repositories.
         configs = _make_configs(name, toolchain.version)
         tools = {}
         for repo_name, config in configs.items():
-
             result = config.factory(module_ctx, repo_name)
             if result:
                 for target, actual in result.setdefault("tools", {}).items():
@@ -187,9 +181,9 @@ alias(
     visibility = ["//visibility:public"],
 )
 """.format(
-    tool_name = tool_name,
-    select_al_isa = ",\n".join(["\"{}\": \"{}\"".format(constraint, target) for constraint, target in al_isa.items()])
-)
+                tool_name = tool_name,
+                select_al_isa = ",\n".join(["\"{}\": \"{}\"".format(constraint, target) for constraint, target in al_isa.items()]),
+            )
 
         # Create the main repository.
         toolchain_repository(
@@ -197,7 +191,7 @@ alias(
             repo_name = name,
             version = toolchain.version,
             default = toolchain.default,
-            extra = extra
+            extra = extra,
         )
 
 toolchain_cc = module_extension(

@@ -277,10 +277,10 @@
 									this.components[id] || {
 										type: type,
 										name: null,
-									},
+									}
 								);
 								return id;
-							}),
+							})
 					);
 				}
 				this.$set(this.configs, configId, {

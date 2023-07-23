@@ -15,10 +15,7 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 
 	if args.server:
-		handlers = {
-			**handlersPower,
-			**handlersMonitor
-		}
+		handlers = {**handlersPower, **handlersMonitor}
 
 		server = RESTServer(args.bind, args.port, handlers)
 		print(f"Server started at http://{args.bind}:{args.port}")

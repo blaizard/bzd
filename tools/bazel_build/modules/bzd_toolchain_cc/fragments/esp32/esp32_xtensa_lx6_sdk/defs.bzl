@@ -2,7 +2,6 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bzd_toolchain_cc//cc:defs.bzl", "get_location")
 
 def esp32_xtensa_lx6_sdk(module_ctx, name = "esp32_xtensa_lx6_sdk"):
-
     version = "5dabe9f8a000131b0d72294f415332d8ef640126"
     http_archive(
         name = name,

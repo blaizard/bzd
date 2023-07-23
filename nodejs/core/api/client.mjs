@@ -50,7 +50,7 @@ export default class APIClient extends Base {
 				"{} {}: validation is not available for {}.",
 				method,
 				endpoint,
-				requestOptions.type,
+				requestOptions.type
 			);
 			const validation = new Validation(requestOptions.validation);
 			validation.validate(data, {
@@ -65,7 +65,7 @@ export default class APIClient extends Base {
 				method != "get",
 				"{}: Body cannot be set with method '{}', this is against recommendation in the HTTP/1.1 spec, section 4.3",
 				endpoint,
-				method,
+				method
 			);
 			Exception.assert(typeof data === "object", "Data must be of type 'object', got '{:j}' instead.", data);
 			fetchOptions.json = data;
@@ -90,7 +90,7 @@ export default class APIClient extends Base {
 			if (this.schema[endpoint][method].authentication) {
 				Exception.assert(
 					this.isAuthentication(),
-					"This route has authentication requirement but no authentication object was specified.",
+					"This route has authentication requirement but no authentication object was specified."
 				);
 				await this.options.authentication.setAuthenticationFetch(fetchOptions);
 			}
@@ -103,7 +103,7 @@ export default class APIClient extends Base {
 						"{} {}: validation is not available for {}.",
 						method,
 						endpoint,
-						responseOptions.type,
+						responseOptions.type
 					);
 					const validation = new Validation(responseOptions.validation);
 					validation.validate(result, {

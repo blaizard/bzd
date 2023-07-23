@@ -40,7 +40,7 @@ export default class PersistenceTimeSeries {
 				 */
 				maxEntriesPerFile: 100,
 			},
-			options,
+			options
 		);
 		this.path = path;
 		this.event = new Event({
@@ -60,7 +60,7 @@ export default class PersistenceTimeSeries {
 			unique: true,
 			uniqueMerge: (a, b, timestamp) => {
 				Exception.unreachable(
-					"Duplicate timestamps (" + timestamp + ") are in the index for entries: " + a + " and " + b,
+					"Duplicate timestamps (" + timestamp + ") are in the index for entries: " + a + " and " + b
 				);
 			},
 		});
@@ -143,7 +143,7 @@ export default class PersistenceTimeSeries {
 			const result = await this.getPersistenceByTimestamp(
 				timestamp,
 				/*forWrite*/ false,
-				isFirst ? TimeSeries.FIND_IMMEDIATELY_BEFORE : TimeSeries.FIND_IMMEDIATELY_AFTER,
+				isFirst ? TimeSeries.FIND_IMMEDIATELY_BEFORE : TimeSeries.FIND_IMMEDIATELY_AFTER
 			);
 
 			isFirst = false;
@@ -282,7 +282,7 @@ export default class PersistenceTimeSeries {
 								" in index, returned index: " +
 								index +
 								" " +
-								JSON.stringify(t.data),
+								JSON.stringify(t.data)
 						);
 						Exception.assert("length" in t.data[index][1], "No length property for index entry " + index);
 						++t.data[index][1].length;
@@ -290,7 +290,7 @@ export default class PersistenceTimeSeries {
 						// Update the timestampEnd field
 						Exception.assert(
 							"timestampEnd" in t.data[index][1],
-							() => "No timestampEnd property for index entry " + index + "  " + JSON.stringify(t.data[index]),
+							() => "No timestampEnd property for index entry " + index + "  " + JSON.stringify(t.data[index])
 						);
 						t.data[index][1].timestampEnd = Math.max(t.data[index][1].timestampEnd, timestamp);
 					});
@@ -318,7 +318,7 @@ export default class PersistenceTimeSeries {
 			{
 				savepointTask: this.options.savepointTask,
 			},
-			this.optionsDataReadOnly,
+			this.optionsDataReadOnly
 		);
 	}
 
@@ -334,7 +334,7 @@ export default class PersistenceTimeSeries {
 	async getPersistenceByTimestamp(timestamp, forWrite = false, mode = TimeSeries.FIND_IMMEDIATELY_BEFORE) {
 		Exception.assert(
 			typeof timestamp == "number",
-			"Timestamp passed to getPersistenceByTimestamp is not a number: " + timestamp,
+			"Timestamp passed to getPersistenceByTimestamp is not a number: " + timestamp
 		);
 
 		const metadata = await this.getMetadata(timestamp, forWrite, mode);
@@ -354,7 +354,7 @@ export default class PersistenceTimeSeries {
 		Exception.assert(metadata.path in this.persistenceCache, "Persistence " + metadata.path + " does not exists");
 		Exception.assert(
 			this.persistenceCache[metadata.path] instanceof PersistenceDisk,
-			"Persistence " + metadata.path + " is not of Persistence type",
+			"Persistence " + metadata.path + " is not of Persistence type"
 		);
 		Exception.assert(this.persistenceCache[metadata.path].isReady(), "Persistence " + metadata.path + " is not ready");
 
@@ -362,7 +362,7 @@ export default class PersistenceTimeSeries {
 			{
 				persistence: this.persistenceCache[metadata.path],
 			},
-			metadata,
+			metadata
 		);
 	}
 
@@ -415,7 +415,7 @@ export default class PersistenceTimeSeries {
 			{
 				index: result.index,
 			},
-			await this.getPersistenceByTimestamp(result.timestamp, /*forWrite*/ false),
+			await this.getPersistenceByTimestamp(result.timestamp, /*forWrite*/ false)
 		);
 	}
 
