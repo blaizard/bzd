@@ -6,9 +6,9 @@ import typing
 
 from elftools.elf.elffile import ELFFile
 
-from tools.bazel_build.rules.assets.cc.map_analyzer.parser.clang import ParserClang
-from tools.bazel_build.rules.assets.cc.map_analyzer.parser.gcc import ParserGcc
-from tools.bazel_build.rules.assets.cc.map_analyzer.parser.parser import Parser
+from binary.map_analyzer.parser.clang import ParserClang
+from binary.map_analyzer.parser.gcc import ParserGcc
+from binary.map_analyzer.parser.parser import Parser
 
 FilterConfigType = typing.List[str]
 AggregateConfigType = typing.Dict[str, typing.List[str]]

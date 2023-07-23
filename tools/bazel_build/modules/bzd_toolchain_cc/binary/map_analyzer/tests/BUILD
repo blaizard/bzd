@@ -16,6 +16,6 @@ py_test(
         "gcc.map",
     ],
     deps = [
-        "//tools/bazel_build/rules/assets/cc/map_analyzer/parser",
+        "@bzd_toolchain_cc//binary/map_analyzer/parser",
     ],
 )

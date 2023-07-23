@@ -1,4 +1,4 @@
-load("@pip//:requirements.bzl", "requirement")
+load("@bzd_toolchain_cc_pip//:requirements.bzl", "requirement")
 load("@rules_python//python:defs.bzl", "py_binary")
 
 py_binary(
@@ -7,6 +7,6 @@ py_binary(
     visibility = ["//visibility:public"],
     deps = [
         requirement("pyelftools"),
-        "//tools/bazel_build/rules/assets/cc/map_analyzer/parser",
+        "@bzd_toolchain_cc//binary/map_analyzer/parser",
     ],
 )

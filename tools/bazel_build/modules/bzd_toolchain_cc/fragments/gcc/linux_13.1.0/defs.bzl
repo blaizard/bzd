@@ -1,4 +1,4 @@
-load("@bzd_toolchain_cc//cc:defs.bzl", "get_location", "toolchain_maker", "toolchain_merge")
+load("@bzd_toolchain_cc//cc:toolchain.bzl", "get_location", "toolchain_maker", "toolchain_merge")
 load("@bzd_toolchain_cc//:fragments/gcc/linux/defs.bzl", "linux")
 
 def linux_x86_64(module_ctx, name):

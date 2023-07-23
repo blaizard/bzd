@@ -76,7 +76,6 @@ if __name__ == '__main__':
 	parser.add_argument("--format", choices=["elf-dwarf"], default="elf-dwarf", help="Binary format.")
 	parser.add_argument("--groups", default=None, help="Groups schema if any.")
 	parser.add_argument("binary", help="Path of the binary to profile.")
-	parser.add_argument("binary_stripped", help="Path of the stripped binary to profile.")
 	parser.add_argument("binary_final", help="Path of the final binary to profile.")
 	parser.add_argument("output", help="Path of the json output.")
 
@@ -117,6 +116,9 @@ if __name__ == '__main__':
 	}
 
 	with open(args.output, "w+") as f:
-		f.write(json.dumps(finalResult))
+		f.write(
+		    json.dumps(finalResult,
+		        indent=4,
+		        sort_keys=True))
 
 	sys.exit(0)

@@ -1,215 +1,101 @@
-load("@bzd_toolchain_cc//cc:flags.bzl", "COPTS_CLANG", "COPTS_CLANG_COVERAGE", "COPTS_CLANG_DEV", "COPTS_CLANG_PROD", "COPTS_GCC", "COPTS_GCC_COVERAGE", "COPTS_GCC_DEV", "COPTS_GCC_PROD", "LINKOPTS_CLANG", "LINKOPTS_CLANG_COVERAGE", "LINKOPTS_GCC", "LINKOPTS_GCC_COVERAGE")
-load("@bazel_skylib//lib:sets.bzl", "sets")
+load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 
-def _impl(repository_ctx):
-    # Create a UID
-    uid = repository_ctx.name.replace("~", "-")
+_CC_SRCS_EXTENSIONS = (".c", ".cc", ".cpp", ".cxx", ".c++", ".C")
+_CC_HDRS_EXTENSIONS = (".h", ".hh", ".hpp", ".hxx", ".inc", ".inl", ".H")
 
-    # Create the loads statements.
-    loads = []
-    for repo, interfaces in repository_ctx.attr.loads.items():
-        uniq = sets.to_list(sets.make(interfaces))
-        loads.append("load(\"{}\", {})".format(repo, ", ".join(["\"{}\"".format(i) for i in uniq])))
+def _cc_config(ctx):
+    """
+    Helper function to gather toolchain and feature config
+    """
 
-    # Build the binary toolchain arguments
-    binary_kwargs = []
-    binary_kwargs.append("build = [{}],".format(", ".join(["\"{}\"".format(build) for build in repository_ctx.attr.app_build])))
-    binary_kwargs.append("metadata = [{}],".format(", ".join(["\"{}\"".format(metadata) for metadata in repository_ctx.attr.app_metadata])))
-    if not repository_ctx.attr.app_executors:
-        fail("Toolchain is missing executors.")
-    binary_kwargs.append("executors = {},".format(repository_ctx.attr.app_executors))
+    cc_toolchain = find_cpp_toolchain(ctx)
+    feature_configuration = cc_common.configure_features(
+        ctx = ctx,
+        cc_toolchain = cc_toolchain,
+        requested_features = ctx.features,
+        unsupported_features = ctx.disabled_features,
+    )
+    return cc_toolchain, feature_configuration
 
-    # Set the default values of the binaries
-    binaries = {
-        "as": "/usr/bin/false",
-        "ar": "/usr/bin/false",
-        "ld": "/usr/bin/false",
-        "cc": "/usr/bin/false",
-        "cov": "/usr/bin/false",
-        "cpp": "/usr/bin/false",
-        "nm": "/usr/bin/false",
-        "objdump": "/usr/bin/false",
-        "objcopy": "/usr/bin/false",
-        "strip": "/usr/bin/false",
-    }
-    binaries.update(repository_ctx.attr.binaries)
+def _cc_compile(ctx, name, hdrs = [], srcs = [], deps = []):
+    """
+    Compile header, source and dependencies and return internal artifacts.
+    """
 
-    # Create aliases.
-    alias_template = "alias(name = \"{}\", actual = \"{}\")"
-    aliases = dict(
-        {key: value for key, value in binaries.items() if not value.startswith("/")},
-        **repository_ctx.attr.aliases
+    cc_toolchain, feature_configuration = _cc_config(ctx)
+
+    cc_infos = [dep[CcInfo] for dep in deps if CcInfo in dep]
+    compilation_context, cc_outputs = cc_common.compile(
+        actions = ctx.actions,
+        feature_configuration = feature_configuration,
+        cc_toolchain = cc_toolchain,
+        srcs = [f for f in srcs if f.basename.endswith(_CC_SRCS_EXTENSIONS)],
+        public_hdrs = hdrs,
+        private_hdrs = [f for f in srcs if f.basename.endswith(_CC_HDRS_EXTENSIONS)],
+        compilation_contexts = [cc_info.compilation_context for cc_info in cc_infos],
+        name = name,
     )
 
-    build_substitutions = {
-        "%{uid}": uid,
-        "%{loads}": "\n".join(loads),
-        "%{repository_path}": "external/" + repository_ctx.name,
-        "%{cpu}": repository_ctx.attr.cpu,
-        "%{compiler}": repository_ctx.attr.compiler,
-        "%{ar}": binaries["ar"],
-        "%{as}": binaries["as"],
-        "%{cc}": binaries["cc"],
-        "%{cpp}": binaries["cpp"],
-        "%{cov}": binaries["cov"],
-        "%{nm}": binaries["nm"],
-        "%{ld}": binaries["ld"],
-        "%{objcopy}": binaries["objcopy"],
-        "%{objdump}": binaries["objdump"],
-        "%{strip}": binaries["strip"],
-        "%{builtin_include_directories}": "\n".join(["'{}',".format(t) for t in repository_ctx.attr.builtin_include_directories]),
-        "%{compile_flags}": "\n".join(
-            ["'-isystem', '{}',".format(t) for t in repository_ctx.attr.system_directories] +
-            ["'{}',".format(t) for t in repository_ctx.attr.compile_flags],
-        ),
-        "%{compile_dev_flags}": "\n".join(
-            ["'{}',".format(t) for t in repository_ctx.attr.compile_dev_flags],
-        ),
-        "%{compile_prod_flags}": "\n".join(
-            ["'{}',".format(t) for t in repository_ctx.attr.compile_prod_flags],
-        ),
-        "%{link_flags}": "\n".join(
-            ["'-L{}',".format(t) for t in repository_ctx.attr.linker_dirs] +
-            ["'{}',".format(t) for t in repository_ctx.attr.link_flags],
-        ),
-        "%{sysroot}": repository_ctx.attr.sysroot,
-        "%{aliases}": "\n".join([alias_template.format(k, v) for k, v in aliases.items()]),
-        "%{binary_kwargs}": "\n".join(binary_kwargs),
-        "%{coverage_compile_flags}": "\n".join(["'{}',".format(t) for t in repository_ctx.attr.coverage_compile_flags]),
-        "%{coverage_link_flags}": "\n".join(["'{}',".format(t) for t in repository_ctx.attr.coverage_link_flags]),
-    }
+    return compilation_context, cc_outputs, cc_infos
 
-    # Substitute the BUILD file content.
-    template = repository_ctx.read(Label("@bzd_toolchain_cc//cc:unix/template.BUILD"))
-    for key, value in build_substitutions.items():
-        template = template.replace(key, value)
+def cc_compile(ctx, name = None, hdrs = [], srcs = [], deps = []):
+    """
+    Compile header, source and dependencies and return a CcInfo.
+    """
 
-    # Append extra build files fragments.
-    for path in repository_ctx.attr.build_files:
-        template += "\n" + repository_ctx.read(path)
+    if name == None:
+        name = ctx.attr.name
 
-    repository_ctx.file("BUILD", content = template, executable = False)
+    cc_toolchain, feature_configuration = _cc_config(ctx)
+    compilation_context, cc_outputs, cc_infos = _cc_compile(ctx, name, hdrs, srcs, deps)
 
-    # Download the data.
-    repository_ctx.download_and_extract(
-        url = repository_ctx.attr.url,
-        sha256 = repository_ctx.attr.sha256,
-        stripPrefix = repository_ctx.attr.strip_prefix,
+    linking_context, _ = cc_common.create_linking_context_from_compilation_outputs(
+        actions = ctx.actions,
+        feature_configuration = feature_configuration,
+        cc_toolchain = cc_toolchain,
+        compilation_outputs = cc_outputs,
+        linking_contexts = [cc_info.linking_context for cc_info in cc_infos],
+        name = name,
     )
 
-    # Apply patches
-    for patch in repository_ctx.attr.patches:
-        repository_ctx.patch(patch)
+    return CcInfo(compilation_context = compilation_context, linking_context = linking_context)
 
-"""
-Linux specific implementation of the toolchain
-"""
-_toolchain_maker_linux = repository_rule(
-    implementation = _impl,
-    attrs = {
-        "default": attr.bool(default = False, doc = "Make this compiler the default one, it will be automatically selected when no compiler is given."),
-        "cpu": attr.string(default = "unknown"),
-        "compiler": attr.string(default = "unknown"),
-        # Download.
-        "loads": attr.string_list_dict(),
-        "build_files": attr.label_list(),
-        "url": attr.string(mandatory = True),
-        "strip_prefix": attr.string(),
-        "sha256": attr.string(),
-        "patches": attr.label_list(allow_files = True),
-        # Run-time libraries
-        "builtin_include_directories": attr.string_list(),
-        "system_directories": attr.string_list(),
-        "linker_dirs": attr.string_list(),
-        "sysroot": attr.string(),
-        # Flags
-        "link_flags": attr.string_list(),
-        "compile_flags": attr.string_list(),
-        "compile_dev_flags": attr.string_list(),
-        "compile_prod_flags": attr.string_list(),
-        # Coverage
-        "coverage_compile_flags": attr.string_list(),
-        "coverage_link_flags": attr.string_list(),
-        # Aliases
-        "aliases": attr.string_dict(),
-        # Tools
-        "binaries": attr.string_dict(),
-        "tools": attr.string_dict(),
-        # Execution
-        "app_build": attr.string_list(),
-        "app_metadata": attr.string_list(),
-        "app_executors": attr.string_dict(),
-    },
-)
+def cc_link(ctx, name = None, hdrs = [], srcs = [], deps = [], map_analyzer = None):
+    """
+    Compile and link.
+    """
 
-"""
-Creates a toolchain to be used with bazel.
+    if name == None:
+        name = ctx.attr.name
 
-This rule also creates few important assets:
- - A toolchain: "@<id>//:toolchain"
-"""
+    cc_toolchain, feature_configuration = _cc_config(ctx)
+    compilation_context, cc_outputs, cc_infos = _cc_compile(ctx, name, hdrs, srcs, deps)
 
-def toolchain_maker(name, implementation, definition):
-    if implementation == "linux_gcc":
-        updated_definition = toolchain_merge({
-            "compile_dev_flags": COPTS_GCC_DEV,
-            "compile_prod_flags": COPTS_GCC_PROD,
-            "compile_flags": COPTS_GCC,
-            "link_flags": LINKOPTS_GCC,
-            "coverage_compile_flags": COPTS_GCC_COVERAGE,
-            "coverage_link_flags": LINKOPTS_GCC_COVERAGE,
-        }, definition)
+    map_file = ctx.actions.declare_file("{}.map".format(name))
+    linking_outputs = cc_common.link(
+        name = name + ".binary",
+        actions = ctx.actions,
+        feature_configuration = feature_configuration,
+        cc_toolchain = cc_toolchain,
+        compilation_outputs = cc_outputs,
+        linking_contexts = [cc_info.linking_context for cc_info in cc_infos],
+        additional_outputs = [map_file],
+        user_link_flags = ["-Wl,-Map={}".format(map_file.path)],
+    )
+    binary_file = linking_outputs.executable
+    metadata_files = []
 
-        _toolchain_maker_linux(
-            name = name,
-            **updated_definition
+    # Analyze the map file.
+    if map_analyzer:
+        metadata_file = ctx.actions.declare_file("{}.metadata.map".format(name))
+        ctx.actions.run(
+            inputs = [map_file, binary_file],
+            outputs = [metadata_file],
+            progress_message = "Generating metadata for {}".format(name),
+            arguments = ["--output", metadata_file.path, "--binary", binary_file.path, map_file.path],
+            tools = map_analyzer.data_runfiles.files,
+            executable = map_analyzer.files_to_run,
         )
+        metadata_files.append(metadata_file)
 
-    elif implementation == "linux_clang":
-        updated_definition = toolchain_merge({
-            "compile_dev_flags": COPTS_CLANG_DEV,
-            "compile_prod_flags": COPTS_CLANG_PROD,
-            "compile_flags": COPTS_CLANG,
-            "link_flags": LINKOPTS_CLANG,
-            "coverage_compile_flags": COPTS_CLANG_COVERAGE,
-            "coverage_link_flags": LINKOPTS_CLANG_COVERAGE,
-        }, definition)
-
-        _toolchain_maker_linux(
-            name = name,
-            **updated_definition
-        )
-
-    else:
-        fail("Unsupported toolchain type '{}'".format(implementation))
-
-    #native.register_toolchains(
-    #    "@{}//:toolchain".format(name),
-    #    "@{}//:binary_toolchain".format(name),
-    #)
-
-def toolchain_merge(data1, data2):
-    """Merge 2 toolchain data entries."""
-
-    # Make a copy of data1 so that it can be mutated
-    result = {}
-    result.update(data1)
-
-    # Populate the data2 items
-    for key2, value2 in data2.items():
-        if key2 in data1:
-            if type(data1[key2]) != type(value2):
-                fail("Trying to merge conflicting types for key '{}'.".format(key2))
-            if type(value2) == "list":
-                result[key2] = data1[key2] + value2
-            elif data1[key2] != value2:
-                fail("Trying to merge different values for key '{}'.".format(key2))
-        else:
-            result[key2] = value2
-
-    return result
-
-def get_location(module_ctx, name):
-    """Return the full name of the repository on disk."""
-
-    return "external/" + module_ctx.path(".").basename + "~" + name
+    return binary_file, metadata_files
