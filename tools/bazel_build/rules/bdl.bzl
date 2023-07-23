@@ -1,4 +1,4 @@
-load("//tools/bazel_build/rules/assets/cc:defs.bzl", "cc_compile", "cc_link")
+load("@bzd_toolchain_cc//cc:defs.bzl", "cc_compile", "cc_link")
 load("@bazel_skylib//lib:sets.bzl", "sets")
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@bzd_utils//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
@@ -399,11 +399,12 @@ def _bdl_binary_build(ctx, name, binary_file):
         binary_file: The binary of language-specific rule.
 
     Returns:
-        A list of binaries.
+        A list of binaries and metadatas
     """
 
     binary_toolchain = ctx.toolchains["@bzd_toolchain_cc//binary:toolchain_type"].info
     binaries = [binary_file]
+    metadatas = []
 
     # Run the build steps
     for index, build in enumerate(binary_toolchain.build):
@@ -417,7 +418,19 @@ def _bdl_binary_build(ctx, name, binary_file):
         )
         binaries.append(build_binary_file)
 
-    return binaries, []
+    # Run the metadata steps
+    for index, metadata in enumerate(binary_toolchain.metadata):
+        metadata_file = ctx.actions.declare_file("{}.metadata.{}".format(name, index))
+        ctx.actions.run(
+            inputs = binaries,
+            outputs = [metadata_file],
+            tools = metadata.default_runfiles.files,
+            arguments = [b.path for b in binaries] + [metadata_file.path],
+            executable = metadata.files_to_run,
+        )
+        metadatas.append(metadata_file)
+
+    return binaries, metadatas
 
 def _bdl_binary_execution(ctx, binaries):
     """Build the executor provider."""
@@ -543,9 +556,9 @@ def _bdl_binary_impl(ctx):
             files = binaries,
         ),
         BzdPackageMetadataFragment(
-            manifests = metadata + build_metadata + execution_metadata,
+            manifests = metadata_files + metadata + build_metadata + execution_metadata,
         ),
-        OutputGroupInfo(metadata = metadata + build_metadata + execution_metadata),
+        OutputGroupInfo(metadata = metadata_files + metadata + build_metadata + execution_metadata),
     ] + extra_providers
 
 def _bzd_binary_generic(is_test):
@@ -577,7 +590,7 @@ def _bzd_binary_generic(is_test):
             "_map_analyzer_script": attr.label(
                 executable = True,
                 cfg = "exec",
-                default = Label("//tools/bazel_build/rules/assets/cc/map_analyzer"),
+                default = Label("@bzd_toolchain_cc//binary/map_analyzer"),
             ),
             "_executor": attr.label(
                 default = "//tools/bazel_build/settings/executor",

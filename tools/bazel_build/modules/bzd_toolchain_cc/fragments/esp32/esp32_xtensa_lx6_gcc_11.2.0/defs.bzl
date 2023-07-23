@@ -1,4 +1,4 @@
-load("@bzd_toolchain_cc//cc:defs.bzl", "get_location", "toolchain_maker", "toolchain_merge")
+load("@bzd_toolchain_cc//cc:toolchain.bzl", "get_location", "toolchain_maker", "toolchain_merge")
 load("@bzd_toolchain_cc//:fragments/esp32/esp32_xtensa_lx6_sdk/defs.bzl", "esp32_xtensa_lx6_sdk")
 load("@bzd_toolchain_cc//fragments/esp32/esptool:defs.bzl", "esptool")
 

@@ -3,8 +3,8 @@ import unittest
 import typing
 import pathlib
 
-from tools.bazel_build.rules.assets.cc.map_analyzer.parser.gcc import ParserGcc
-from tools.bazel_build.rules.assets.cc.map_analyzer.parser.clang import ParserClang
+from binary.map_analyzer.parser.gcc import ParserGcc
+from binary.map_analyzer.parser.clang import ParserClang
 
 
 class TestRun(unittest.TestCase):

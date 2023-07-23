@@ -1,6 +1,6 @@
 load("//tools/bazel_build/rules:bdl.bzl", "bdl_library", "bdl_system", "bdl_system_test")
 load("@bazel_skylib//lib:sets.bzl", "sets")
-load("//tools/bazel_build/rules/assets/cc:defs.bzl", "cc_compile")
+load("@bzd_toolchain_cc//cc:defs.bzl", "cc_compile")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
 def bzd_cc_binary(name, target = "//cc/targets:auto", tags = [], bdls = [], hdrs = [], srcs = [], deps = [], testonly = False, **kwargs):

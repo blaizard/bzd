@@ -3,6 +3,7 @@ load("@rules_python//python:defs.bzl", "py_library")
 exports_files([
     "executor_qemu.py",
     "executor_uart.py",
+    "profile_groups.json",
 ])
 
 filegroup(
