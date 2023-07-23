@@ -23,33 +23,33 @@ jobs:
     - name: "[normal] clang-tidy"
       run: |
         ./tools/bazel clean --expunge
-        ./tools/bazel test ... --output_groups=+metadata --config=dev --config=clang_tidy --platform_suffix=clang_tidy
+        ./tools/bazel test ... --output_groups=+metadata --config=dev --config=clang-tidy --platform_suffix=clang-tidy
 
-    - name: "[normal] linux_x86_64_clang prod"
+    - name: "[normal] clang prod"
       run: |
         ./tools/bazel clean --expunge
-        ./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=prod --config=cc --platform_suffix=linux_x86_64_clang_prod
+        ./tools/bazel test ... --output_groups=+metadata --config=clang --config=prod --config=cc --platform_suffix=clang-prod
 
-    - name: "[normal] linux_x86_64_gcc prod"
+    - name: "[normal] gcc prod"
       run: |
         ./tools/bazel clean --expunge
-        ./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_gcc --config=prod --config=cc --platform_suffix=linux_x86_64_gcc_prod
+        ./tools/bazel test ... --output_groups=+metadata --config=gcc --config=prod --config=cc --platform_suffix=gcc-prod
 
-    - name: "[normal] esp32_xtensa_lx6_gcc prod"
+    - name: "[normal] esp32 prod"
       run: |
         ./tools/bazel clean --expunge
         ./tools/bazel run tools/docker_images:xtensa_qemu
-        ./tools/bazel test ... --output_groups=+metadata --config=esp32_xtensa_lx6_gcc --config=prod --config=cc --platform_suffix=esp32_xtensa_lx6_gcc_prod
+        ./tools/bazel test ... --output_groups=+metadata --config=esp32 --config=prod --config=cc --platform_suffix=esp32-prod
 
     - name: "[sanitizer] asan/lsan/ubsan"
       run: |
         ./tools/bazel clean --expunge
-        ./tools/bazel test ... --config=linux_x86_64_clang --config=cc --config=sanitizer --config=asan --config=lsan --config=ubsan --platform_suffix=clang_asan_lsan_ubsan
+        ./tools/bazel test ... --config=clang --config=cc --config=sanitizer --config=asan --config=lsan --config=ubsan --platform_suffix=clang-asan-lsan-ubsan
 
     - name: "[sanitizer] tsan"
       run: |
         ./tools/bazel clean --expunge
-        ./tools/bazel test ... --config=linux_x86_64_clang --config=cc --config=sanitizer --config=tsan --platform_suffix=clang_tsan
+        ./tools/bazel test ... --config=clang --config=cc --config=sanitizer --config=tsan --platform_suffix=clang-tsan
 
     - name: "[sanitizer] sanitizer"
       run: |

@@ -77,14 +77,14 @@ TEST(ContainerTuple, NonDefaultConstructor)
 	};
 
 	constexpr const bzd::Tuple<NonDefaultConstructor, NonDefaultConstructor> tuple{bzd::inPlace, 12, -2};
-	EXPECT_EQ(tuple.get<0>().value, 12);
-	EXPECT_EQ(tuple.get<1>().value, -2);
+	EXPECT_EQ(tuple.template get<0>().value, 12);
+	EXPECT_EQ(tuple.template get<1>().value, -2);
 
 	auto tupleCopy{tuple};
-	EXPECT_EQ(tupleCopy.get<0>().value, 12);
+	EXPECT_EQ(tupleCopy.template get<0>().value, 12);
 
 	auto tupleMove{bzd::move(tuple)};
-	EXPECT_EQ(tupleMove.get<0>().value, 12);
+	EXPECT_EQ(tupleMove.template get<0>().value, 12);
 }
 
 TEST(ContainerTuple, Copy)
@@ -97,19 +97,19 @@ TEST(ContainerTuple, Copy)
 	};
 
 	const bzd::Tuple<int, char, NonDefaultConstructor> tuple{bzd::inPlace, 12, 'a', 3};
-	EXPECT_EQ(tuple.get<0>(), 12);
-	EXPECT_EQ(tuple.get<1>(), 'a');
-	EXPECT_EQ(tuple.get<2>().value, 3);
+	EXPECT_EQ(tuple.template get<0>(), 12);
+	EXPECT_EQ(tuple.template get<1>(), 'a');
+	EXPECT_EQ(tuple.template get<2>().value, 3);
 
 	const auto tupleCopy{tuple};
-	EXPECT_EQ(tupleCopy.get<0>(), 12);
-	EXPECT_EQ(tupleCopy.get<1>(), 'a');
-	EXPECT_EQ(tupleCopy.get<2>().value, 3);
+	EXPECT_EQ(tupleCopy.template get<0>(), 12);
+	EXPECT_EQ(tupleCopy.template get<1>(), 'a');
+	EXPECT_EQ(tupleCopy.template get<2>().value, 3);
 
 	const auto tupleCopy2 = tuple;
-	EXPECT_EQ(tupleCopy2.get<0>(), 12);
-	EXPECT_EQ(tupleCopy2.get<1>(), 'a');
-	EXPECT_EQ(tupleCopy2.get<2>().value, 3);
+	EXPECT_EQ(tupleCopy2.template get<0>(), 12);
+	EXPECT_EQ(tupleCopy2.template get<1>(), 'a');
+	EXPECT_EQ(tupleCopy2.template get<2>().value, 3);
 }
 
 TEST(ContainerTuple, Move)
@@ -122,19 +122,19 @@ TEST(ContainerTuple, Move)
 	};
 
 	bzd::Tuple<int, char, NonDefaultConstructor> tuple{bzd::inPlace, 12, 'a', 3};
-	EXPECT_EQ(tuple.get<0>(), 12);
-	EXPECT_EQ(tuple.get<1>(), 'a');
-	EXPECT_EQ(tuple.get<2>().value, 3);
+	EXPECT_EQ(tuple.template get<0>(), 12);
+	EXPECT_EQ(tuple.template get<1>(), 'a');
+	EXPECT_EQ(tuple.template get<2>().value, 3);
 
 	auto tupleMove{bzd::move(tuple)};
-	EXPECT_EQ(tupleMove.get<0>(), 12);
-	EXPECT_EQ(tupleMove.get<1>(), 'a');
-	EXPECT_EQ(tupleMove.get<2>().value, 3);
+	EXPECT_EQ(tupleMove.template get<0>(), 12);
+	EXPECT_EQ(tupleMove.template get<1>(), 'a');
+	EXPECT_EQ(tupleMove.template get<2>().value, 3);
 
 	const auto tupleMove2 = bzd::move(tupleMove);
-	EXPECT_EQ(tupleMove2.get<0>(), 12);
-	EXPECT_EQ(tupleMove2.get<1>(), 'a');
-	EXPECT_EQ(tupleMove2.get<2>().value, 3);
+	EXPECT_EQ(tupleMove2.template get<0>(), 12);
+	EXPECT_EQ(tupleMove2.template get<1>(), 'a');
+	EXPECT_EQ(tupleMove2.template get<2>().value, 3);
 }
 
 TEST(ContainerTuple, Iterator)

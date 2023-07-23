@@ -24,7 +24,7 @@ bzd_cc_test(
     ],
     tags = ["stress"],
     target_compatible_with = select({
-        "@esp32_xtensa_lx6_gcc//:compiler": ["@platforms//:incompatible"],
+        "@esp32//:toolchain": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
     deps = [
@@ -55,7 +55,7 @@ bzd_cc_test(
     ],
     tags = ["stress"],
     target_compatible_with = select({
-        "@esp32_xtensa_lx6_gcc//:compiler": ["@platforms//:incompatible"],
+        "@esp32//:toolchain": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
     deps = [

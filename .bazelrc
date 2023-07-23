@@ -106,25 +106,25 @@ build --incompatible_strict_action_env=true
 build --incompatible_enable_cc_toolchain_resolution=true
 build --incompatible_use_cc_configure_from_rules_cc=true
 
-# linux_x86_64_clang
-build:linux_x86_64_clang --platforms="@linux_x86_64_clang//:platform"
-build:linux_x86_64_clang --platform_suffix=linux_x86_64_clang
+# clang
+build:clang --platforms="@clang//:platform"
+build:clang --platform_suffix=clang
 
-# linux_x86_64_gcc
-build:linux_x86_64_gcc --platforms="@linux_x86_64_gcc//:platform"
-build:linux_x86_64_gcc --platform_suffix=linux_x86_64_gcc
-coverage:linux_x86_64_gcc --experimental_split_coverage_postprocessing
-coverage:linux_x86_64_gcc --experimental_fetch_all_coverage_outputs
+# gcc
+build:gcc --platforms="@gcc//:platform"
+build:gcc --platform_suffix=gcc
+coverage:gcc --experimental_split_coverage_postprocessing
+coverage:gcc --experimental_fetch_all_coverage_outputs
 
-# esp32_xtensa_lx6_gcc
-build:esp32_xtensa_lx6_gcc --platforms="@esp32_xtensa_lx6_gcc//:platform"
-build:esp32_xtensa_lx6_gcc --features=-supports_dynamic_linker
-build:esp32_xtensa_lx6_gcc --platform_suffix=esp32_xtensa_lx6_gcc
-test:esp32_xtensa_lx6_gcc --strategy=TestRunner=sandboxed
+# esp32-xtensa_lx6-gcc
+build:esp32 --platforms="@esp32//:platform-esp32-xtensa_lx6"
+build:esp32 --features=-supports_dynamic_linker
+build:esp32 --platform_suffix=esp32-xtensa_lx6-gcc
+test:esp32 --strategy=TestRunner=sandboxed
 
-# clang_tidy
-build:clang_tidy --aspects=//tools/clang_tidy:defs.bzl%clang_tidy_aspect
-build:clang_tidy --output_groups=+report
+# clang-tidy
+build:clang-tidy --aspects=//tools/clang_tidy:defs.bzl%clang_tidy_aspect
+build:clang-tidy --output_groups=+report
 
 # Development and production build configuration
 build:dev -c dbg

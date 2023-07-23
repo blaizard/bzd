@@ -3,13 +3,13 @@ load("@bzd_utils//:sh_binary_wrapper.bzl", "sh_binary_wrapper")
 
 sh_binary_wrapper(
     name = "clang_format",
-    binary = ":binary",
+    locations = {
+        ":binary": "binary",
+        "@clang//:clang_format": "clang_format",
+    },
     command = """
-{binary} --clang-format $(rootpath //toolchains/cc/linux_x86_64_clang:clang_format) $@
+{binary} --clang-format {clang_format} $@
     """,
-    data = [
-        "//toolchains/cc/linux_x86_64_clang:clang_format",
-    ],
     visibility = ["//tools/sanitizer:__pkg__"],
 )
 
@@ -20,9 +20,6 @@ py_binary(
             "*.py",
         ],
     ),
-    data = [
-        "//toolchains/cc/linux_x86_64_clang:clang_format",
-    ],
     main = "clang_format.py",
     deps = [
         "//python/bzd/utils:run",

@@ -30,7 +30,7 @@ pipeline
 				sh "git submodule update --init --recursive"
 				sh "ls -ll /"
 				// Wake-up the remote executor.
-				sh "./tools/bazel run //apps/wake_on_lan:client --config=local -- wol --wait 10.10.0.11:8980 --timeout 300 08:bf:b8:14:04:b6"
+				sh "./tools/bazel run //apps/node_manager:client --config=local -- wol --wait 10.10.0.11:8980 --timeout 300 08:bf:b8:14:04:b6"
 				sh "./info.sh"
 			}
 		}
@@ -43,57 +43,57 @@ pipeline
 				{
 					steps
 					{
-						sh "./tools/bazel test ... --output_groups=+metadata --config=dev --config=clang_tidy --platform_suffix=clang_tidy"
+						sh "./tools/bazel test ... --output_groups=+metadata --config=dev --config=clang-tidy --platform_suffix=clang-tidy"
 					}
 				}
-				stage("[normal] linux_x86_64_clang prod")
+				stage("[normal] clang prod")
 				{
 					steps
 					{
-						sh "./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=prod --config=cc --platform_suffix=linux_x86_64_clang_prod"
+						sh "./tools/bazel test ... --output_groups=+metadata --config=clang --config=prod --config=cc --platform_suffix=clang-prod"
 					}
 				}
-				stage("[normal] linux_x86_64_gcc prod")
+				stage("[normal] gcc prod")
 				{
 					steps
 					{
-						sh "./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_gcc --config=prod --config=cc --platform_suffix=linux_x86_64_gcc_prod"
+						sh "./tools/bazel test ... --output_groups=+metadata --config=gcc --config=prod --config=cc --platform_suffix=gcc-prod"
 					}
 				}
-				stage("[normal] esp32_xtensa_lx6_gcc prod")
+				stage("[normal] esp32 prod")
 				{
 					steps
 					{
 						sh "./tools/bazel run tools/docker_images:xtensa_qemu"
-						sh "./tools/bazel test ... --output_groups=+metadata --config=esp32_xtensa_lx6_gcc --config=prod --config=cc --platform_suffix=esp32_xtensa_lx6_gcc_prod"
+						sh "./tools/bazel test ... --output_groups=+metadata --config=esp32 --config=prod --config=cc --platform_suffix=esp32-prod"
 					}
 				}
 				stage("[stress] dev (10 runs)")
 				{
 					steps
 					{
-						sh "./tools/bazel test ... --build_tests_only --test_tag_filters=stress,-cc-coverage --config=dev --runs_per_test=10 --platform_suffix=stress_dev"
+						sh "./tools/bazel test ... --build_tests_only --test_tag_filters=stress,-cc-coverage --config=dev --runs_per_test=10 --platform_suffix=stress-dev"
 					}
 				}
 				stage("[stress] prod (10 runs)")
 				{
 					steps
 					{
-						sh "./tools/bazel test ... --build_tests_only --test_tag_filters=stress,-cc-coverage --config=prod --runs_per_test=10 --platform_suffix=stress_prod"
+						sh "./tools/bazel test ... --build_tests_only --test_tag_filters=stress,-cc-coverage --config=prod --runs_per_test=10 --platform_suffix=stress-prod"
 					}
 				}
 				stage("[sanitizer] asan/lsan/ubsan")
 				{
 					steps
 					{
-						sh "./tools/bazel test ... --config=linux_x86_64_clang --config=cc --config=sanitizer --config=asan --config=lsan --config=ubsan --platform_suffix=clang_asan_lsan_ubsan"
+						sh "./tools/bazel test ... --config=clang --config=cc --config=sanitizer --config=asan --config=lsan --config=ubsan --platform_suffix=clang-asan-lsan-ubsan"
 					}
 				}
 				stage("[sanitizer] tsan")
 				{
 					steps
 					{
-						sh "./tools/bazel test ... --config=linux_x86_64_clang --config=cc --config=sanitizer --config=tsan --platform_suffix=clang_tsan"
+						sh "./tools/bazel test ... --config=clang --config=cc --config=sanitizer --config=tsan --platform_suffix=clang-tsan"
 					}
 				}
 				stage("[coverage] NodeJs")
@@ -102,9 +102,9 @@ pipeline
 					{
 						lock("coverage")
 						{
-							sh "./tools/bazel coverage ... --config=nodejs --platform_suffix=coverage_nodejs && ./tools/bazel run tools/coverage --platform_suffix=coverage_nodejs -- --output bazel-out/coverage_nodejs"
+							sh "./tools/bazel coverage ... --config=nodejs --platform_suffix=coverage-nodejs && ./tools/bazel run tools/coverage --platform_suffix=coverage-nodejs -- --output bazel-out/coverage-nodejs"
 						}
-						archiveArtifacts artifacts: "bazel-out/coverage_nodejs/**/*", onlyIfSuccessful: true
+						archiveArtifacts artifacts: "bazel-out/coverage-nodejs/**/*", onlyIfSuccessful: true
 					}
 				}
 				stage("[sanitizer] sanitizer")
@@ -130,7 +130,7 @@ pipeline
     post {
         always {
 			sh "./info.sh"
-			sh "./tools/bazel run //apps/wake_on_lan:client --config=local -- suspend 10.10.0.10:8000"
+			sh "./tools/bazel run //apps/node_manager:client --config=local -- suspend 10.10.0.10:8000"
         }
     }
 }

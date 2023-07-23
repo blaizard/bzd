@@ -5,11 +5,12 @@ cc_library(
     name = "main",
     srcs = ["main.cc"],
     local_defines = select({
-        "//toolchains/cc/fragments/esptool:is_sim": ["BZD_EXECUTOR_SIM=1"],
+        "//tools/bazel_build/settings/executor:is_sim": ["BZD_EXECUTOR_SIM=1"],
+        "//tools/bazel_build/settings/executor:is_default": ["BZD_EXECUTOR_SIM=1"],
         "//conditions:default": [],
     }),
     target_compatible_with = [
-        "@//tools/bazel_build/platforms/isa:xtensa_lx6",
+        "@bzd_platforms//isa:xtensa_lx6",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -40,7 +41,7 @@ bdl_target(
 
 bdl_target_platform(
     name = "gcc",
-    platform = "@esp32_xtensa_lx6_gcc//:platform",
+    platform = "@esp32//:platform-esp32-xtensa_lx6",
     target = ":auto",
     visibility = [
         "//visibility:public",

@@ -1,3 +1,0 @@
-# System Monitor
-
-Create a REST server to output in json format, system information such as load, temperature...

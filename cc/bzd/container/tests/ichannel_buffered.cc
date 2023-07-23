@@ -171,12 +171,12 @@ TEST_ASYNC(IChannelBuffered,
 	for (bzd::Size iteration = 0u; iteration < 1000u || expected < 1000; ++iteration)
 	{
 		// Produce some data.
-		const auto nbRead = test.random<bzd::Size, 1u, 16u>();
+		const auto nbRead = test.template random<bzd::Size, 1u, 16u>();
 		auto maybeScope = co_await channel.read(nbRead);
 		ASSERT_ASYNC_TRUE(maybeScope);
 
 		// Read some of it.
-		const auto nbMaxConsume = test.random<bzd::Size, 0u, 16u>();
+		const auto nbMaxConsume = test.template random<bzd::Size, 0u, 16u>();
 		auto it = maybeScope->begin();
 		for (bzd::Size i = 0u; i < nbMaxConsume && it != maybeScope->end(); ++i)
 		{
