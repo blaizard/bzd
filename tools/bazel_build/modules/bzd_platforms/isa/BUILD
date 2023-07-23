@@ -1,6 +1,6 @@
-package(default_visibility = ["//visibility:public"])
-
 load("@bzd_platforms//:defs.bzl", "ISA_CONSTRAINTS")
+
+package(default_visibility = ["//visibility:public"])
 
 # Instruction Set Architecture, try to match https://en.wikipedia.org/wiki/Comparison_of_instruction_set_architectures
 alias(

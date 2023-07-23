@@ -16,7 +16,7 @@ export default class TimeseriesElasticsearch extends Timeseries {
 				key: null,
 				prefix: "timeseries_",
 			},
-			options,
+			options
 		);
 
 		let fetchOptions = {
@@ -35,7 +35,7 @@ export default class TimeseriesElasticsearch extends Timeseries {
 			"Using elasticsearch key value store DB at '{}' (prefix: {}, authentication: {}).",
 			host,
 			this.options.prefix,
-			"authentication" in fetchOptions ? "on" : "off",
+			"authentication" in fetchOptions ? "on" : "off"
 		);
 		this.fetch = new HttpClientFactory(host, fetchOptions);
 	}
@@ -77,14 +77,14 @@ export default class TimeseriesElasticsearch extends Timeseries {
 							date: "desc",
 						},
 					},
-				},
+				}
 			);
 			Exception.assert("hits" in result && "hits" in result.hits, "Result malformed: {:j}", result);
 
 			return CollectionPaging.makeFromTotal(
 				result.hits.hits.map((item) => [item._source.date, item._source.data]),
 				paging,
-				result.hits.total.value,
+				result.hits.total.value
 			);
 		}
 		catch (e) {

@@ -6,7 +6,7 @@ import pathlib
 
 from bzd.utils.uart import Devices, Device, Uart
 from bzd.utils.run import localPython
-from bzd.utils import logging
+from bzd.utils.logging import Logger
 from fragments.esp32.esptool.targets import targets
 
 
@@ -19,22 +19,22 @@ def getDevice(args: argparse.Namespace) -> Device:
 	target = args.target
 	devices = Devices()
 	if not devices.empty():
-		filteredDevices = devices.filterByVidPids(targets.get(target, {}).get("usbIds", []))  # type: ignore
+		filteredDevices = devices.filterByVidPids(targets.get(target, {}).get("usbIds", []))
 		if not filteredDevices.empty():
 			accessibleDevices = filteredDevices.filterByAccess()
 			if accessibleDevices.empty():
-				logging.error(
+				Logger.error(
 				    f"The device(s) {str(filteredDevices.get())} is(are) a match for {target}, but you don't have the necessary permission for access."
 				)
-				logging.error("Use the following command and reboot: sudo usermod -a -G dialout $USER")
+				Logger.error("Use the following command and reboot: sudo usermod -a -G dialout $USER")
 				sys.exit(1)
 			return accessibleDevices.get()[0]
 
-		logging.info(f"No device compatible with {target}, please use one from the following list:")
+		Logger.info(f"No device compatible with {target}, please use one from the following list:")
 		for device, description in devices.getInfo().items():
-			logging.info(f"- {device}: {description}")
+			Logger.info(f"- {device}: {description}")
 		sys.exit(1)
-	logging.error(f"No device found.")
+	Logger.error(f"No device found.")
 	sys.exit(1)
 
 
@@ -62,14 +62,13 @@ if __name__ == "__main__":
 	target = targets[args.target]
 	device = getDevice(args)
 
-	logging.info(f"Programming {args.target} target through device {device}...")
+	Logger.info(f"Programming {args.target} target through device {device}...")
 
-	commandArgs = str(target["args"]).format(
-	    device=device,
-	    memory=" ".join([
-	        "0x{:x} {}".format(offset, f.format(binary=args.image))
-	        for offset, f in target["memoryMap"].items()  # type: ignore
-	    ]))
+	commandArgs = str(target["args"]).format(device=device,
+	                                         memory=" ".join([
+	                                             "0x{:x} {}".format(offset, f.format(binary=args.image))
+	                                             for offset, f in target["memoryMap"].items()
+	                                         ]))
 
 	result = localPython(script=args.esptool,
 	                     args=shlex.split(commandArgs),
@@ -78,9 +77,9 @@ if __name__ == "__main__":
 	                     stderr=True)
 
 	if result.getReturnCode() != 0:
-		logging.error(f"Operation failed with return code {result.getReturnCode()}.")
-		logging.info("Troubleshooting:")
-		logging.info("- Connection failed `Timed out waiting for packet header`: try to press the BOOT button.")
+		Logger.error(f"Operation failed with return code {result.getReturnCode()}.")
+		Logger.info("Troubleshooting:")
+		Logger.info("- Connection failed `Timed out waiting for packet header`: try to press the BOOT button.")
 		sys.exit(1)
 
 	uart = Uart(device=device,

@@ -217,7 +217,7 @@
 			labelYMaxNbChars() {
 				return Math.max(
 					this.configProcessed.formatY(this.valuesMinY).length,
-					this.configProcessed.formatY(this.valuesMaxY).length,
+					this.configProcessed.formatY(this.valuesMaxY).length
 				);
 			},
 			/**
@@ -280,7 +280,7 @@
 						 */
 						showCursor: true,
 					},
-					this.config,
+					this.config
 				);
 			},
 			/**

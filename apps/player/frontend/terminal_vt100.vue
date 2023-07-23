@@ -372,7 +372,7 @@
 						Log.error(
 							"Command '{}' followed with '{}...' is malformed or not supported.",
 							matchStr,
-							stream.substring(0, 10),
+							stream.substring(0, 10)
 						);
 						continue;
 					}

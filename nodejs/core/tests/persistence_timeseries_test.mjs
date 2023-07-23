@@ -70,7 +70,7 @@ describe("PersistenceTimeSeries", () => {
 						++count;
 					},
 					50,
-					80,
+					80
 				);
 				Exception.assertEqual(count, 81);
 			}

@@ -12,14 +12,14 @@ py_binary(
 py_binary(
     name = "server",
     srcs = [
-        "power.py",
         "monitor.py",
+        "power.py",
         "rest_server.py",
         "server.py",
     ],
     deps = [
         requirement("psutil"),
-    ]
+    ],
 )
 
 bzd_bundle(

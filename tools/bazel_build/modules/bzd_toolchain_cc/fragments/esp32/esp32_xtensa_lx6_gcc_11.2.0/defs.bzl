@@ -1,9 +1,8 @@
-load("@bzd_toolchain_cc//cc:defs.bzl", "toolchain_maker", "toolchain_merge", "get_location")
+load("@bzd_toolchain_cc//cc:defs.bzl", "get_location", "toolchain_maker", "toolchain_merge")
 load("@bzd_toolchain_cc//:fragments/esp32/esp32_xtensa_lx6_sdk/defs.bzl", "esp32_xtensa_lx6_sdk")
 load("@bzd_toolchain_cc//fragments/esp32/esptool:defs.bzl", "esptool")
 
 def linux_x86_64(module_ctx, name):
-
     repository_path = get_location(module_ctx, name)
     toolchain_definition = {
         "url": "http://data.blaizard.com/file/bzd/toolchains/cc/gcc/esp32_xtensa_lx6/xtensa-esp32-elf-gcc11_2_0-esp-2022r1-linux-amd64.tar.xz",
@@ -60,7 +59,7 @@ def linux_x86_64(module_ctx, name):
             "objdump": "xtensa-esp32-elf/bin/objdump",
             "ld": "xtensa-esp32-elf/bin/ld",
             "strip": "xtensa-esp32-elf/bin/strip",
-        }
+        },
     }
 
     toolchain_definition = toolchain_merge(toolchain_definition, esptool(module_ctx))
@@ -73,5 +72,5 @@ def linux_x86_64(module_ctx, name):
     )
 
 esp32_xtensa_lx6_gcc_11_2_0 = {
-    "linux-x86_64": linux_x86_64
+    "linux-x86_64": linux_x86_64,
 }

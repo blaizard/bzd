@@ -34,7 +34,7 @@ class Webpack {
 	static hash(path) {
 		// Keep 8 characters from the path
 		let hashStr = Math.abs(
-			path.split("").reduce((prevHash, currVal) => ((prevHash << 5) - prevHash + currVal.charCodeAt(0)) | 0, 0),
+			path.split("").reduce((prevHash, currVal) => ((prevHash << 5) - prevHash + currVal.charCodeAt(0)) | 0, 0)
 		).toString();
 		for (let i = 0; i < path.length; i += path.length / 8) {
 			hashStr += path.charAt(Math.floor(i));
@@ -140,7 +140,7 @@ class Webpack {
 				 */
 				temp: [],
 			},
-			config,
+			config
 		);
 
 		// ---- Sanity check --------------------------------------------------
@@ -172,7 +172,7 @@ class Webpack {
 						config,
 						content,
 						entry.getPath() ? Path.basename(entry.getPath()) : "tmp",
-						config.tempPath,
+						config.tempPath
 					);
 				}
 				return entry;
@@ -252,7 +252,7 @@ class Webpack {
 					(isDev ? "development" : "production") +
 					(config.hmr ? " with hmr enabled" : "") +
 					": " +
-					config.output,
+					config.output
 			);
 
 			// Setup the webpack config increment
@@ -479,7 +479,7 @@ function getWebpackConfigDefault(isDev, config) {
 									"</body>" +
 									"</html>",
 							},
-							config.templates[i],
+							config.templates[i]
 						);
 
 						// Update the path
@@ -532,7 +532,7 @@ function getWebpackConfigDefault(isDev, config) {
 								"Generated \"" +
 									configTemplate.output +
 									"\"" +
-									(configTemplate.entryId === false ? "" : " for entry \"" + configTemplate.entryId + "\""),
+									(configTemplate.entryId === false ? "" : " for entry \"" + configTemplate.entryId + "\"")
 							);
 						}
 						catch (e) {
@@ -551,7 +551,7 @@ function getWebpackConfigDefault(isDev, config) {
 					updatedManifest = await config.hooks.manifest(updatedManifest, config);
 					await writeFileAsync(
 						Path.resolve(config.output, "manifest.json"),
-						JSON.stringify(updatedManifest, null, "\t"),
+						JSON.stringify(updatedManifest, null, "\t")
 					);
 					console.log("Generated \"manifest.json\"");
 
@@ -627,7 +627,7 @@ async function manifestCreate(config, entrypoints) {
 		manifest.entries[entryId] = {};
 		for (const type in entrypoints[entryId]) {
 			manifest.entries[entryId][type] = entrypoints[entryId][type].filter(
-				(ep) => manifest.common[type].indexOf(ep) === -1 && !isLibrary(ep),
+				(ep) => manifest.common[type].indexOf(ep) === -1 && !isLibrary(ep)
 			);
 		}
 		manifest.entries[entryId]["lib"] = (entrypoints[entryId]["js"] || []).filter((ep) => isLibrary(ep));
@@ -687,7 +687,7 @@ function manifestToString(config, manifest) {
 					};
 					maxSizes = maxSizes.map((value) => [value[0], Math.max(value[1], (item[value[0]] || "").toString().length)]);
 					return item;
-				}),
+				})
 			);
 		}
 		return output.sort((a, b) => a.path.localeCompare(b.path));
@@ -703,11 +703,11 @@ function manifestToString(config, manifest) {
 	let outputList = ["    " + maxSizes.map((value) => value[0].padStart(value[1], " ")).join("  ")];
 	for (const entry in stats) {
 		outputList.push(
-			"* " + entry + " (" + bytesToString(stats[entry].reduce((sum, value) => sum + value.rawSize, 0)) + ")",
+			"* " + entry + " (" + bytesToString(stats[entry].reduce((sum, value) => sum + value.rawSize, 0)) + ")"
 		);
 		stats[entry].forEach((stat) => {
 			outputList.push(
-				"    " + maxSizes.map((value) => (stat[value[0]] || "").toString().padStart(value[1], " ")).join("  "),
+				"    " + maxSizes.map((value) => (stat[value[0]] || "").toString().padStart(value[1], " ")).join("  ")
 			);
 		});
 	}

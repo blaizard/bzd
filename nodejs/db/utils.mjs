@@ -44,7 +44,7 @@ export class CollectionPaging {
 	static makeFromTotal(data, paging, total) {
 		return new CollectionPaging(
 			data,
-			total > (paging.page + 1) * paging.max ? { page: paging.page + 1, max: paging.max } : null,
+			total > (paging.page + 1) * paging.max ? { page: paging.page + 1, max: paging.max } : null
 		);
 	}
 

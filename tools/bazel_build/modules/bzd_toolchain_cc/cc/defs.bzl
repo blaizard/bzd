@@ -2,7 +2,6 @@ load("@bzd_toolchain_cc//cc:flags.bzl", "COPTS_CLANG", "COPTS_CLANG_COVERAGE", "
 load("@bazel_skylib//lib:sets.bzl", "sets")
 
 def _impl(repository_ctx):
-
     # Create a UID
     uid = repository_ctx.name.replace("~", "-")
 
@@ -37,8 +36,10 @@ def _impl(repository_ctx):
 
     # Create aliases.
     alias_template = "alias(name = \"{}\", actual = \"{}\")"
-    aliases = dict({key: value for key, value in binaries.items() if not value.startswith("/")},
-        **repository_ctx.attr.aliases)
+    aliases = dict(
+        {key: value for key, value in binaries.items() if not value.startswith("/")},
+        **repository_ctx.attr.aliases
+    )
 
     build_substitutions = {
         "%{uid}": uid,
@@ -87,7 +88,7 @@ def _impl(repository_ctx):
     for path in repository_ctx.attr.build_files:
         template += "\n" + repository_ctx.read(path)
 
-    repository_ctx.file("BUILD", content=template, executable=False)
+    repository_ctx.file("BUILD", content = template, executable = False)
 
     # Download the data.
     repository_ctx.download_and_extract(
@@ -115,7 +116,7 @@ _toolchain_maker_linux = repository_rule(
         "url": attr.string(mandatory = True),
         "strip_prefix": attr.string(),
         "sha256": attr.string(),
-        "patches": attr.label_list(allow_files=True),
+        "patches": attr.label_list(allow_files = True),
         # Run-time libraries
         "builtin_include_directories": attr.string_list(),
         "system_directories": attr.string_list(),

@@ -1,5 +1,4 @@
 def linux(module_ctx, name):
-
     _ = module_ctx
     _ = name
 
@@ -27,6 +26,6 @@ def linux(module_ctx, name):
             ":executor_host": "default,host",
         },
         "loads": {
-            "@bzd_utils//:sh_binary_wrapper.bzl": ["sh_binary_wrapper"]
-        }
+            "@bzd_utils//:sh_binary_wrapper.bzl": ["sh_binary_wrapper"],
+        },
     }

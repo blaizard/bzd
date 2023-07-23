@@ -167,25 +167,33 @@ TEST_ASYNC_MULTITHREAD(Coroutine, StressAnyRandom, 10)
 
 TEST_ASYNC_MULTITHREAD(Coroutine, StressAllNested, 10)
 {
-	co_await !runConcurrentTest<ForkType::all>(cancellationNestedWorkload<ForkType::all>, 100, [&]() { return test.template random<int, 0, 5>(); });
+	co_await !runConcurrentTest<ForkType::all>(cancellationNestedWorkload<ForkType::all>, 100, [&]() {
+		return test.template random<int, 0, 5>();
+	});
 	co_return {};
 }
 
 TEST_ASYNC_MULTITHREAD(Coroutine, StressAnyNested, 10)
 {
-	co_await !runConcurrentTest<ForkType::any>(cancellationNestedWorkload<ForkType::any>, 100, [&]() { return test.template random<int, 0, 5>(); });
+	co_await !runConcurrentTest<ForkType::any>(cancellationNestedWorkload<ForkType::any>, 100, [&]() {
+		return test.template random<int, 0, 5>();
+	});
 	co_return {};
 }
 
 TEST_ASYNC_MULTITHREAD(Coroutine, StressAllAnyNested, 10)
 {
-	co_await !runConcurrentTest<ForkType::all>(cancellationNestedWorkload<ForkType::any>, 100, [&]() { return test.template random<int, 0, 5>(); });
+	co_await !runConcurrentTest<ForkType::all>(cancellationNestedWorkload<ForkType::any>, 100, [&]() {
+		return test.template random<int, 0, 5>();
+	});
 	co_return {};
 }
 
 TEST_ASYNC_MULTITHREAD(Coroutine, StressAnyAllNested, 10)
 {
-	co_await !runConcurrentTest<ForkType::any>(cancellationNestedWorkload<ForkType::all>, 100, [&]() { return test.template random<int, 0, 5>(); });
+	co_await !runConcurrentTest<ForkType::any>(cancellationNestedWorkload<ForkType::all>, 100, [&]() {
+		return test.template random<int, 0, 5>();
+	});
 	co_return {};
 }
 

@@ -57,7 +57,7 @@ describe("Cache", () => {
 			},
 			{
 				timeout: 10,
-			},
+			}
 		);
 
 		const promiseDelay = (t) => {
@@ -76,7 +76,7 @@ describe("Cache", () => {
 					await promiseDelay(Math.random() * 10);
 					const result = await cache.get("test", n);
 					sum += result;
-				})(),
+				})()
 			);
 		}
 

@@ -20,7 +20,7 @@ export default class StorageWebdav extends Storage {
 				username: "",
 				password: "",
 			},
-			options,
+			options
 		);
 		this.fetch = new HttpClientFactory(url, {
 			authentication: {
@@ -123,8 +123,8 @@ export default class StorageWebdav extends Storage {
 							created: "creationdate" in result ? new Date(Date.parse(result["creationdate"])) : undefined,
 							size: "getcontentlength" in result ? parseInt(result["getcontentlength"]) : undefined,
 						},
-						{ read: true, list: isDirectory },
-					),
+						{ read: true, list: isDirectory }
+					)
 				);
 			}
 		}

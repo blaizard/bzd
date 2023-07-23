@@ -13,7 +13,7 @@ export default class AuthenticationServer {
 				verifyRefreshCallback: null,
 			},
 			defaultOptions,
-			options,
+			options
 		);
 	}
 

@@ -1,6 +1,6 @@
-package(default_visibility = ["//visibility:public"])
-
 load("@bzd_platforms//:defs.bzl", "AL_CONSTRAINTS", "ISA_CONSTRAINTS")
+
+package(default_visibility = ["//visibility:public"])
 
 [config_setting(
     name = "{}-{}".format(al, isa),

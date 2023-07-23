@@ -55,7 +55,7 @@ export default {
 			"travisci.builds",
 			data["travisci.endpoint"],
 			data["travisci.repository"],
-			data["travisci.token"],
+			data["travisci.token"]
 		);
 		return {
 			builds: builds,

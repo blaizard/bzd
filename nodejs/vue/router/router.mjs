@@ -30,13 +30,13 @@ class RouterManager {
 				 */
 				authentication: null,
 			},
-			options,
+			options
 		);
 
 		this.routers = new Map();
 		this.path = "/";
 		this.regexMatchPath = new RegExp(
-			this.options.hash ? "^[^#]+(?:#([^?]+))?(?:\\?.*)?$" : "^.*://[^/]+/([^?#]*)(?:[?#].*)?$",
+			this.options.hash ? "^[^#]+(?:#([^?]+))?(?:\\?.*)?$" : "^.*://[^/]+/([^?#]*)(?:[?#].*)?$"
 		);
 	}
 
@@ -61,7 +61,7 @@ class RouterManager {
 				if (route.authentication) {
 					Exception.assert(
 						this.options.authentication,
-						"This route has authentication requirement but no authentication object was specified.",
+						"This route has authentication requirement but no authentication object was specified."
 					);
 					await this.options.authentication.refreshAuthentication();
 				}
@@ -70,7 +70,7 @@ class RouterManager {
 					vueElt.$refs[options.ref].componentSet(
 						route.component,
 						this._getUid(vueElt),
-						Object.assign({}, args, routerOptions.props),
+						Object.assign({}, args, routerOptions.props)
 					);
 				}
 				if (route.handler) {
@@ -123,7 +123,7 @@ class RouterManager {
 			"Registered router '{}' with parent '{}' (nb routers: {})",
 			uid,
 			this.routers.get(uid).parent,
-			this.routers.size,
+			this.routers.size
 		);
 
 		await this._propagate(uid);
@@ -144,7 +144,7 @@ class RouterManager {
 				parent.children.delete(uid),
 				"Child '{}' was not registered in parent '{}'",
 				uid,
-				this.routers.get(uid).parent,
+				this.routers.get(uid).parent
 			);
 		}
 		this.routers.delete(uid);
@@ -188,7 +188,7 @@ class RouterManager {
 				 */
 				props: {},
 			},
-			options,
+			options
 		);
 
 		// Update the url
@@ -248,7 +248,7 @@ class RouterManager {
 		router.pathPropagate = "/" + (data.vars["bzd.core.router.rest"] || "");
 		router.path = data.path.substr(
 			0,
-			data.path.length - router.pathPropagate.length + (router.pathPropagate == "/" ? 1 : 0),
+			data.path.length - router.pathPropagate.length + (router.pathPropagate == "/" ? 1 : 0)
 		);
 
 		Log.debug(
@@ -256,7 +256,7 @@ class RouterManager {
 			uid,
 			router.path,
 			data.vars,
-			router.pathPropagate,
+			router.pathPropagate
 		);
 
 		// Propagate to nested routers.

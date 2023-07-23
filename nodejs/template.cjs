@@ -10,7 +10,7 @@ class Template {
 				 */
 				path: "",
 			},
-			options,
+			options
 		);
 
 		Assert.ok(typeof template === "string", "The template is not a string");
@@ -52,7 +52,7 @@ class Template {
 				Assert.ok(typeof curArgs === "object", () => "The key \"" + key + "\" is invalid (error with \"" + curKey + "\").");
 				Assert.ok(
 					curKey in curArgs,
-					() => "The key \"" + curKey + "\" in \"" + JSON.stringify(curArgs) + "\" is not available",
+					() => "The key \"" + curKey + "\" in \"" + JSON.stringify(curArgs) + "\" is not available"
 				);
 				curArgs = curArgs[curKey];
 
