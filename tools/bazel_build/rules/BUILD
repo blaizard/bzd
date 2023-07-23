@@ -71,7 +71,7 @@ bzl_library(
     visibility = ["//visibility:public"],
     deps = [
         ":bdl",
-        "//tools/bazel_build/rules/assets/cc:defs",
+        "@bzd_toolchain_cc//cc:defs",
         "@bazel_skylib//lib:sets",
     ],
 )
@@ -84,7 +84,7 @@ bzl_library(
     visibility = ["//visibility:public"],
     deps = [
         ":package",
-        "//tools/bazel_build/rules/assets/cc:defs",
+        "@bzd_toolchain_cc//cc:defs",
         "//tools/bazel_build/rules/third_party/cc:bzl",
         "@bazel_skylib//lib:sets",
         "@bazel_skylib//rules:common_settings",
