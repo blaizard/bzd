@@ -4,8 +4,5 @@ mypy_extensions
 yapf
 gitignore_parser
 pyserial
-mkdocs
-mkdocs-material
-mkdocs-exclude
 typing_extensions
 psutil
