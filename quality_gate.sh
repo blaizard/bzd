@@ -7,25 +7,25 @@ set -e
 EXTRA_FLAGS="$@"
 
 echo  "==== [normal] clang-tidy ==============================="
-./tools/bazel test ... --output_groups=+metadata --config=dev --config=clang_tidy --platform_suffix=clang_tidy $EXTRA_FLAGS
-echo  "==== [normal] linux_x86_64_clang prod ==============================="
-./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_clang --config=prod --config=cc --platform_suffix=linux_x86_64_clang_prod $EXTRA_FLAGS
-echo  "==== [normal] linux_x86_64_gcc prod ==============================="
-./tools/bazel test ... --output_groups=+metadata --config=linux_x86_64_gcc --config=prod --config=cc --platform_suffix=linux_x86_64_gcc_prod $EXTRA_FLAGS
-echo  "==== [normal] esp32_xtensa_lx6_gcc prod ==============================="
+./tools/bazel test ... --output_groups=+metadata --config=dev --config=clang-tidy --platform_suffix=clang-tidy $EXTRA_FLAGS
+echo  "==== [normal] clang prod ==============================="
+./tools/bazel test ... --output_groups=+metadata --config=clang --config=prod --config=cc --platform_suffix=clang-prod $EXTRA_FLAGS
+echo  "==== [normal] gcc prod ==============================="
+./tools/bazel test ... --output_groups=+metadata --config=gcc --config=prod --config=cc --platform_suffix=gcc-prod $EXTRA_FLAGS
+echo  "==== [normal] esp32 prod ==============================="
 ./tools/bazel run tools/docker_images:xtensa_qemu $EXTRA_FLAGS
-./tools/bazel test ... --output_groups=+metadata --config=esp32_xtensa_lx6_gcc --config=prod --config=cc --platform_suffix=esp32_xtensa_lx6_gcc_prod $EXTRA_FLAGS
+./tools/bazel test ... --output_groups=+metadata --config=esp32 --config=prod --config=cc --platform_suffix=esp32-prod $EXTRA_FLAGS
 echo  "==== [stress] dev (100 runs) ==============================="
-./tools/bazel test ... --build_tests_only --test_tag_filters=stress,-cc-coverage --config=dev --runs_per_test=100 --platform_suffix=stress_dev $EXTRA_FLAGS
+./tools/bazel test ... --build_tests_only --test_tag_filters=stress,-cc-coverage --config=dev --runs_per_test=100 --platform_suffix=stress-dev $EXTRA_FLAGS
 echo  "==== [stress] prod (100 runs) ==============================="
-./tools/bazel test ... --build_tests_only --test_tag_filters=stress,-cc-coverage --config=prod --runs_per_test=100 --platform_suffix=stress_prod $EXTRA_FLAGS
+./tools/bazel test ... --build_tests_only --test_tag_filters=stress,-cc-coverage --config=prod --runs_per_test=100 --platform_suffix=stress-prod $EXTRA_FLAGS
 echo  "==== [sanitizer] asan/lsan/ubsan ==============================="
-./tools/bazel test ... --config=linux_x86_64_clang --config=cc --config=sanitizer --config=asan --config=lsan --config=ubsan --platform_suffix=clang_asan_lsan_ubsan $EXTRA_FLAGS
+./tools/bazel test ... --config=clang --config=cc --config=sanitizer --config=asan --config=lsan --config=ubsan --platform_suffix=clang-asan-lsan-ubsan $EXTRA_FLAGS
 echo  "==== [sanitizer] tsan ==============================="
-./tools/bazel test ... --config=linux_x86_64_clang --config=cc --config=sanitizer --config=tsan --platform_suffix=clang_tsan $EXTRA_FLAGS
+./tools/bazel test ... --config=clang --config=cc --config=sanitizer --config=tsan --platform_suffix=clang-tsan $EXTRA_FLAGS
 echo  "==== [coverage] C++ ==============================="
-./tools/bazel coverage cc/... --config=linux_x86_64_gcc --config=cc --platform_suffix=coverage_cc && ./tools/bazel run tools/coverage --platform_suffix=coverage_cc -- --output bazel-out/coverage_cc $EXTRA_FLAGS
+./tools/bazel coverage cc/... --config=gcc --config=cc --platform_suffix=coverage-cc && ./tools/bazel run tools/coverage --platform_suffix=coverage-cc -- --output bazel-out/coverage-cc $EXTRA_FLAGS
 echo  "==== [coverage] NodeJs ==============================="
-./tools/bazel coverage ... --config=nodejs --platform_suffix=coverage_nodejs && ./tools/bazel run tools/coverage --platform_suffix=coverage_nodejs -- --output bazel-out/coverage_nodejs $EXTRA_FLAGS
+./tools/bazel coverage ... --config=nodejs --platform_suffix=coverage-nodejs && ./tools/bazel run tools/coverage --platform_suffix=coverage-nodejs -- --output bazel-out/coverage-nodejs $EXTRA_FLAGS
 echo  "==== [sanitizer] sanitizer ==============================="
 ./sanitize.sh $EXTRA_FLAGS

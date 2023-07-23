@@ -269,10 +269,10 @@ TEST(RingBuffer, Stress)
 
 	for (int iteration = 0; iteration < 10000; ++iteration)
 	{
-		bzd::Size random = test.random<bzd::Size, 0, 16>();
+		bzd::Size random = test.template random<bzd::Size, 0, 16>();
 
 		// Write X entries.
-		if (test.random<bzd::Bool>())
+		if (test.template random<bzd::Bool>())
 		{
 			auto span = ring.asSpanForWriting();
 			const auto count = bzd::min(random, span.size());

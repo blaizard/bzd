@@ -119,7 +119,7 @@ _bzd_cc_library = rule(
     },
     toolchains = [
         "@rules_cc//cc:toolchain_type",
-        "//tools/bazel_build/toolchains/binary:toolchain_type",
+        "@bzd_toolchain_cc//binary:toolchain_type",
     ],
     fragments = ["cpp"],
 )

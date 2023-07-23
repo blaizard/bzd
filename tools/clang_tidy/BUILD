@@ -2,7 +2,7 @@ load("@bzd_utils//:sh_binary_wrapper.bzl", "sh_binary_wrapper")
 
 sh_binary_wrapper(
     name = "clang_tidy",
-    binary = "//toolchains/cc/linux_x86_64_clang:clang_tidy",
+    binary = "@clang//:clang_tidy",
     command = """
         ln -s $RUNFILES_DIR external
         ln -s $RUNFILES_DIR/__main__/.clang-tidy .clang-tidy

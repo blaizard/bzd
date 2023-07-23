@@ -14,13 +14,13 @@ def _impl(ctx):
         fail("Toolchain is missing executors.")
     binary_kwargs.append("executors = {},".format(ctx.attr.app_executors))
 
-    # Generate the constraint value for the compiler.
+    # Generate the constraint value for the toolchain.
     if ctx.attr.default:
-        compiler_constraint_value = """alias(name = "compiler", actual = "@//tools/bazel_build/platforms/compiler:default")"""
+        compiler_constraint_value = """alias(name = "toolchain", actual = "@bzd_platforms//toolchain:default")"""
     else:
         compiler_constraint_value = """constraint_value(
-            name = "compiler",
-            constraint_setting = "@//tools/bazel_build/platforms/compiler:compiler",
+            name = "toolchain",
+            constraint_setting = "@bzd_platforms//toolchain:toolchain",
         )"""
 
     build_substitutions = {
@@ -152,7 +152,7 @@ Creates a toolchain to be used with bazel.
 
 This rule also creates few important assets:
  - A toolchain: "@<id>//:toolchain"
- - A compiler target: "@<id>//:compiler"
+ - A toolchain target: "@<id>//:toolchain"
  - A platform: "@<id>//:platform"
  - An execution platform: "@<id>//:execution_platform"
  - A config setting: "@<id>//:target"

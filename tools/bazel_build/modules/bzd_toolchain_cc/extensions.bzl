@@ -1,46 +1,204 @@
-_repositories = {
-    "clang_15.0.6": {
-        # Target
-        "linux_x86_64": {
-            # Host
-            "linux_x86_64": {
-                "build_files": "@bzd_toolchain_cc//:toolchains/clang/linux_clang.BUILD",
-                "urls": [
-                    "http://data.blaizard.com/file/bzd/toolchains/cc/clang/linux_x86_64/linux_x86_64_15.0.6.tar.xz",
-                ],
-                "strip_prefix": "linux_x86_64_15.0.6",
-                "sha256": "53e7a89dffc0297a3ca208b49f9448b507d7298b01d53a36e03db0d2b4f4b896",
-            },
-        },
-    },
-    "gcc_11.2.0": {
-        "linux_x86_64": {
-            "linux_x86_64": {
-                "urls": [
-                    "http://data.blaizard.com/file/bzd/toolchains/cc/gcc/linux_x86_64/linux_x86_64_13.1.0.tar.xz",
-                ],
-                "strip_prefix": "linux_x86_64_13.1.0",
-                "sha256": "e7322906acb4671afb23e7e8f7cc68528495392a8e640f8e146b572e411897fa",
-            },
-        },
-        "esp32_xtensa_lx6": {
-            "linux_x86_64": {
-                "urls": [
-                    "http://data.blaizard.com/file/bzd/toolchains/cc/gcc/esp32_xtensa_lx6/xtensa-esp32-elf-gcc11_2_0-esp-2022r1-linux-amd64.tar.xz",
-                ],
-                "strip_prefix": "xtensa-esp32-elf",
-                "sha256": "698d8407e18275d18feb7d1afdb68800b97904fbe39080422fb8609afa49df30",
-            },
-        },
-    },
-}
+load("@bzd_platforms//:defs.bzl", "constraints_from_platform")
+load("@bzd_toolchain_cc//:fragments/clang/defs.bzl", "clang")
+load("@bzd_toolchain_cc//:fragments/esp32/defs.bzl", "esp32")
+load("@bzd_toolchain_cc//:fragments/gcc/defs.bzl", "gcc")
+
+_repositories = dict(**clang)
+_repositories.update(esp32)
+_repositories.update(gcc)
+
+def _make_configs(name, version):
+
+    configs = {}
+    for target, config_by_executions in _repositories[version].items():
+        for execution, factory in config_by_executions.items():
+            configs["{}-{}-{}".format(name, execution, target)] = struct(
+                        factory = factory,
+                        execution = execution,
+                        target = target
+                    )
+    return configs
+
+def _toolchain_repository_impl(repository_ctx):
+
+    build_content = """# ---- Compiler constraint value
+"""
+
+    # Generate the constraint value for the toolchain.
+    if repository_ctx.attr.default:
+        build_content += """
+alias(
+    name = "toolchain",
+    actual = "@bzd_platforms//toolchain:default",
+    visibility = ["//visibility:public"],
+)
+"""
+    else:
+        build_content += """
+constraint_value(
+    name = "toolchain",
+    constraint_setting = "@bzd_platforms//toolchain:toolchain",
+    visibility = ["//visibility:public"],
+)
+"""
+
+    build_content += """
+
+platform(
+    name = "platform",
+    parents = [
+        "@local_config_platform//:host",
+    ],
+    constraint_values = [
+        ":toolchain",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+# ---- Toolchains (CC & Binary)
+"""
+
+    # Add the cc and binary toolchains.
+    targets = {}
+    configs = _make_configs(repository_ctx.attr.repo_name, repository_ctx.attr.version)
+    for repo_name, config in configs.items():
+
+        execution_constraints = constraints_from_platform(config.execution)
+        target_constraints = constraints_from_platform(config.target)
+        targets[config.target] = target_constraints
+
+        build_content += """
+# -------- {comment}
+
+toolchain(
+    name = "{name}",
+    exec_compatible_with = [
+        {execution_constraints}
+    ],
+    target_compatible_with = [
+        ":toolchain",
+        {target_constraints}
+    ],
+    toolchain = "@{repo_name}//:cc_toolchain",
+    toolchain_type = "@rules_cc//cc:toolchain_type",
+)
+
+toolchain(
+    name = "binary-{name}",
+    exec_compatible_with = [
+        {execution_constraints}
+    ],
+    target_compatible_with = [
+        ":toolchain",
+        {target_constraints}
+    ],
+    toolchain = "@{repo_name}//:binary_toolchain",
+    toolchain_type = "@bzd_toolchain_cc//binary:toolchain_type",
+)
+""".format(
+    comment = "{}/{} (execution/target)".format(config.execution, config.target),
+    name = "{}-{}".format(config.execution, config.target),
+    repo_name = repo_name,
+    execution_constraints = "\n".join(["\"{}\",".format(c) for c in execution_constraints]),
+    target_constraints = "\n".join(["\"{}\",".format(c) for c in target_constraints]),
+)
+
+    build_content += "\n# ---- Platforms & Configs\n"
+
+    # Add the various platforms for the targets.
+    for target, target_constraints in targets.items():
+        build_content += """
+platform(
+    name = "platform-{target}",
+    constraint_values = [
+        ":toolchain",
+        {target_constraints}
+    ],
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "{target}",
+    constraint_values = [
+        ":toolchain",
+        {target_constraints}
+    ],
+    visibility = ["//visibility:public"],
+)
+""".format(
+    target = target,
+    target_constraints = "\n".join(["\"{}\",".format(c) for c in target_constraints]),
+)
+
+    build_content += "\n# ---- Extra\n" + repository_ctx.attr.extra
+
+    repository_ctx.file(
+        "BUILD",
+        executable = False,
+        content = build_content
+    )
+
+toolchain_repository = repository_rule(
+    implementation = _toolchain_repository_impl,
+    attrs = {
+        "repo_name": attr.string(mandatory = True),
+        "version": attr.string(values = _repositories.keys(), mandatory = True),
+        "default": attr.bool(mandatory = True),
+        "extra": attr.string(),
+    }
+)
 
 def _toolchain_cc_impl(module_ctx):
+
+    # Gather all the toolchains registered.
+    configs = {}
     for mod in module_ctx.modules:
         for toolchain in mod.tags.toolchain:
-            repositories = _repositories[toolchain.version]
-            for arch, repository in repositories.items():
-                pass
+            # No need to check the version, it is already enforced in the attribute.
+            if toolchain.name in configs:
+                fail("A toolchain with the name '{}' already exists.".format(toolchain.name))
+            configs[toolchain.name] = struct(
+                version = toolchain.version,
+                default = toolchain.default
+            )
+
+    # Build the repositories.
+    for name, toolchain in configs.items():
+
+        # Create execution/target specific repositories.
+        configs = _make_configs(name, toolchain.version)
+        tools = {}
+        for repo_name, config in configs.items():
+
+            result = config.factory(module_ctx, repo_name)
+            if result:
+                for target, actual in result.setdefault("tools", {}).items():
+                    tools.setdefault(target, {})["@bzd_platforms//al_isa:{}".format(config.execution)] = "@{}//:{}".format(repo_name, actual)
+
+        extra = ""
+
+        for tool_name, al_isa in tools.items():
+            extra += """
+alias(
+    name = "{tool_name}",
+    actual = select({{
+        {select_al_isa}
+    }}),
+    visibility = ["//visibility:public"],
+)
+""".format(
+    tool_name = tool_name,
+    select_al_isa = ",\n".join(["\"{}\": \"{}\"".format(constraint, target) for constraint, target in al_isa.items()])
+)
+
+        # Create the main repository.
+        toolchain_repository(
+            name = name,
+            repo_name = name,
+            version = toolchain.version,
+            default = toolchain.default,
+            extra = extra
+        )
 
 toolchain_cc = module_extension(
     implementation = _toolchain_cc_impl,
@@ -49,6 +207,7 @@ toolchain_cc = module_extension(
             attrs = {
                 "name": attr.string(mandatory = True),
                 "version": attr.string(values = _repositories.keys(), mandatory = True),
+                "default": attr.bool(default = False),
             },
         ),
     },

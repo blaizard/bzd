@@ -77,32 +77,32 @@ TEST_ASYNC(Buffer, Async)
 	auto sink = buffer.makeSink();
 	{
 		const auto result = co_await bzd::async::any(sink.get(), bzd::test::delay(10));
-		EXPECT_FALSE(result.get<0>());
-		EXPECT_TRUE(result.get<1>());
+		EXPECT_FALSE(result.template get<0>());
+		EXPECT_TRUE(result.template get<1>());
 	}
 	co_await !source.set(12);
 	{
 		const auto result = co_await bzd::async::any(sink.get(), bzd::test::delay(10));
-		EXPECT_TRUE(result.get<0>());
-		EXPECT_FALSE(result.get<1>());
-		EXPECT_EQ(result.get<0>().value().value(), 12);
+		EXPECT_TRUE(result.template get<0>());
+		EXPECT_FALSE(result.template get<1>());
+		EXPECT_EQ(result.template get<0>().value().value(), 12);
 	}
 	{
 		const auto result = co_await bzd::async::any(sink.get(), bzd::test::delay(10));
-		EXPECT_FALSE(result.get<0>());
-		EXPECT_TRUE(result.get<1>());
+		EXPECT_FALSE(result.template get<0>());
+		EXPECT_TRUE(result.template get<1>());
 	}
 	{
 		const auto result = co_await bzd::async::all(sink.get(), source.set(13));
-		EXPECT_TRUE(result.get<0>());
-		EXPECT_TRUE(result.get<1>());
-		EXPECT_EQ(result.get<0>().value(), 13);
+		EXPECT_TRUE(result.template get<0>());
+		EXPECT_TRUE(result.template get<1>());
+		EXPECT_EQ(result.template get<0>().value(), 13);
 	}
 	{
 		const auto result = co_await bzd::async::all(source.set(14), sink.get());
-		EXPECT_TRUE(result.get<0>());
-		EXPECT_TRUE(result.get<1>());
-		EXPECT_EQ(result.get<1>().value(), 14);
+		EXPECT_TRUE(result.template get<0>());
+		EXPECT_TRUE(result.template get<1>());
+		EXPECT_EQ(result.template get<1>().value(), 14);
 	}
 
 	co_return {};
@@ -128,9 +128,9 @@ TEST_ASYNC(Buffer, Notification)
 
 	{
 		const auto result = co_await bzd::async::all(sink.get(), setWithDelay());
-		EXPECT_TRUE(result.get<0>());
-		EXPECT_TRUE(result.get<1>());
-		EXPECT_EQ(result.get<0>().value(), 14);
+		EXPECT_TRUE(result.template get<0>());
+		EXPECT_TRUE(result.template get<1>());
+		EXPECT_EQ(result.template get<0>().value(), 14);
 	}
 
 	co_return {};

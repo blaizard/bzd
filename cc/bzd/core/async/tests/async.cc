@@ -113,9 +113,9 @@ TEST_ASYNC(Coroutine, asyncAll)
 	const auto result = co_await bzd::async::all(nested(trace, "a", 10), nested(trace, "b", -4));
 	EXPECT_EQ(trace, "[a1][a0][b1][b0][a2][b2]");
 	EXPECT_EQ(result.size(), 2U);
-	EXPECT_TRUE(result.get<0>());
-	EXPECT_EQ(result.get<0>().value(), 10);
-	EXPECT_EQ(result.get<1>().value(), -4);
+	EXPECT_TRUE(result.template get<0>());
+	EXPECT_EQ(result.template get<0>().value(), 10);
+	EXPECT_EQ(result.template get<1>().value(), -4);
 	co_return {};
 }
 
@@ -160,9 +160,9 @@ TEST_ASYNC(Coroutine, asyncAny)
 	//::std::cout << ::std::endl << "HERE: " << trace.data() << ::std::endl;
 	EXPECT_EQ(trace, "[a1][a0][b3][b1][b0][a2]");
 	EXPECT_EQ(result.size(), 2U);
-	EXPECT_TRUE(result.get<0>());
-	EXPECT_FALSE(result.get<1>());
-	EXPECT_EQ(result.get<0>().value().value(), 42);
+	EXPECT_TRUE(result.template get<0>());
+	EXPECT_FALSE(result.template get<1>());
+	EXPECT_EQ(result.template get<0>().value().value(), 42);
 	co_return {};
 }
 
@@ -174,11 +174,11 @@ TEST_ASYNC(Coroutine, asyncAnyMany)
 	//::std::cout << ::std::endl << "HERE: " << trace.data() << ::std::endl;
 	EXPECT_EQ(trace, "[a3][a1][a0][b3][b1][b0][c1][c0][d3][d1][d0][a2][a4][a3][a1][a0][b2][b4][b3][b1][b0][c2]");
 	EXPECT_EQ(result.size(), 4U);
-	EXPECT_FALSE(result.get<0>());
-	EXPECT_FALSE(result.get<1>());
-	EXPECT_TRUE(result.get<2>());
-	EXPECT_FALSE(result.get<3>());
-	EXPECT_EQ(result.get<2>().value().value(), -432);
+	EXPECT_FALSE(result.template get<0>());
+	EXPECT_FALSE(result.template get<1>());
+	EXPECT_TRUE(result.template get<2>());
+	EXPECT_FALSE(result.template get<3>());
+	EXPECT_EQ(result.template get<2>().value().value(), -432);
 	co_return {};
 }
 
@@ -208,7 +208,7 @@ bzd::Async<int> anyNested(bzd::interface::String& trace, bzd::StringView id)
 	const auto result = co_await bzd::async::any(deepNested(trace, "b"), nested(trace, "c", 42));
 	appendToTrace(trace, id, 7);
 
-	co_return result.get<1>().value().value();
+	co_return result.template get<1>().value().value();
 }
 
 TEST_ASYNC(Coroutine, asyncAnyNested)
@@ -277,8 +277,8 @@ TEST_ASYNC(Coroutine, asyncAnySuspend)
 	bzd::String<128> trace;
 	[[maybe_unused]] const auto result = co_await bzd::async::any(yieldLoop(trace, "a", 2), asyncSuspend(trace, "b"));
 	EXPECT_EQ(trace, "[a0][b0][a0]");
-	EXPECT_TRUE(result.get<0>());
-	EXPECT_FALSE(result.get<1>());
+	EXPECT_TRUE(result.template get<0>());
+	EXPECT_FALSE(result.template get<1>());
 
 	co_return {};
 }
@@ -308,10 +308,10 @@ TEST_ASYNC(Coroutine, fibonacci)
 {
 	const auto result = co_await bzd::async::all(asyncFibonacci(12), asyncFibonacci(16), asyncFibonacci(18), asyncFibonacci(20));
 	EXPECT_EQ(result.size(), 4U);
-	EXPECT_EQ(result.get<0>().value(), 144);
-	EXPECT_EQ(result.get<1>().value(), 987);
-	EXPECT_EQ(result.get<2>().value(), 2584);
-	EXPECT_EQ(result.get<3>().value(), 6765);
+	EXPECT_EQ(result.template get<0>().value(), 144);
+	EXPECT_EQ(result.template get<1>().value(), 987);
+	EXPECT_EQ(result.template get<2>().value(), 2584);
+	EXPECT_EQ(result.template get<3>().value(), 6765);
 	co_return {};
 }
 

@@ -17,7 +17,7 @@ public:
 
 		co_await !logger_.info("Connecting to {}"_csv, hostname);
 
-		bzd::http::Client client{context_.config.client, hostname, 80};
+		bzd::http::Client client{context_.config.client, context_.config.timer, hostname, 80};
 		auto response = co_await !client.get("/"_sv).header("Host", hostname).header("User-Agent", "bzd").header("Accept", "*/*").send();
 
 		co_await !logger_.info("Receiving..."_csv);

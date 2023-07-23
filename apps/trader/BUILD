@@ -18,7 +18,7 @@ cc_library(
         "trader.hh",
     ],
     target_compatible_with = select({
-        "@esp32_xtensa_lx6_gcc//:compiler": ["@platforms//:incompatible"],
+        "@esp32//:toolchain": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
     deps = [

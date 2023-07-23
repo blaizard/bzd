@@ -402,7 +402,7 @@ def _bdl_binary_build(ctx, name, binary_file):
         A list of binaries.
     """
 
-    binary_toolchain = ctx.toolchains["//tools/bazel_build/toolchains/binary:toolchain_type"].info
+    binary_toolchain = ctx.toolchains["@bzd_toolchain_cc//binary:toolchain_type"].info
     binaries = [binary_file]
 
     # Run the build steps
@@ -422,7 +422,7 @@ def _bdl_binary_build(ctx, name, binary_file):
 def _bdl_binary_execution(ctx, binaries):
     """Build the executor provider."""
 
-    binary_toolchain = ctx.toolchains["//tools/bazel_build/toolchains/binary:toolchain_type"].info
+    binary_toolchain = ctx.toolchains["@bzd_toolchain_cc//binary:toolchain_type"].info
 
     # Identify the executor
     executor = ctx.attr._executor[BuildSettingInfo].value
@@ -594,7 +594,7 @@ def _bzd_binary_generic(is_test):
         },
         toolchains = [
             "@rules_cc//cc:toolchain_type",
-            "//tools/bazel_build/toolchains/binary:toolchain_type",
+            "@bzd_toolchain_cc//binary:toolchain_type",
         ],
         fragments = ["cpp"],
         cfg = _transition_platform,

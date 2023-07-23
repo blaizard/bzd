@@ -17,7 +17,7 @@ cc_library(
         "core.hh",
     ],
     target_compatible_with = [
-        "@//tools/bazel_build/platforms/isa:xtensa_lx6",
+        "@bzd_platforms//isa:xtensa_lx6",
     ],
     visibility = ["//visibility:public"],
     deps = [

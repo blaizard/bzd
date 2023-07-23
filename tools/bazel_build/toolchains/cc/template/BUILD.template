@@ -169,7 +169,7 @@ toolchain(
         %{exec_compatible_with}
     ],
     target_compatible_with = [
-        ":compiler",
+        ":toolchain",
         %{target_compatible_with}
     ],
     toolchain = ":cc_toolchain",
@@ -189,11 +189,11 @@ toolchain(
         %{exec_compatible_with}
     ],
     target_compatible_with = [
-        ":compiler",
+        ":toolchain",
         %{target_compatible_with}
     ],
     toolchain = ":binary",
-    toolchain_type = "@//tools/bazel_build/toolchains/binary:toolchain_type",
+    toolchain_type = "@bzd_toolchain_cc//binary:toolchain_type",
 )
 
 # Platform definition
@@ -203,7 +203,7 @@ toolchain(
 platform(
     name = "platform",
     constraint_values = [
-        ":compiler",
+        ":toolchain",
         %{target_compatible_with}
     ],
 )
@@ -211,7 +211,7 @@ platform(
 config_setting(
     name = "target",
     constraint_values = [
-        ":compiler",
+        ":toolchain",
     ],
 )
 

@@ -21,7 +21,7 @@ cc_library(
         "jardinier.hh",
     ],
     target_compatible_with = select({
-        "@esp32_xtensa_lx6_gcc//:compiler": [],
+        "@esp32//:toolchain": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
     deps = [

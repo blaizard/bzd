@@ -1,22 +1,44 @@
-def sh_binary_wrapper_impl(ctx, binary, output, extra_runfiles = [], expand_targets = [], symlinks = {}, root_symlinks = {}, files = None, command = "{binary} $@"):
-    executable = binary.files_to_run.executable
+def _update_runfiles(ctx, runfiles, binary):
+    """Update the current runfiles and return the executable."""
+
+    # Combine the runfiles and the executable (which is not always captured in the runfiles, especially with files).
+    runfiles = runfiles.merge_all([ctx.runfiles(
+        files = [binary.files_to_run.executable],
+    ), binary.default_runfiles])
+
+    return runfiles, binary.files_to_run.executable
+
+def _executable_to_path(ctx, executable):
+    """Return the path of the executable."""
+
+    runfiles_relative_tool_path = ctx.workspace_name + "/" + executable.short_path
+    return "$RUNFILES_DIR/{}".format(runfiles_relative_tool_path)
+
+def sh_binary_wrapper_impl(ctx, output, binary = None, locations = {}, extra_runfiles = [], expand_targets = [], symlinks = {}, root_symlinks = {}, files = None, command = "{binary} $@"):
 
     # Prepare the runfiles for the execution
     runfiles = ctx.runfiles(
-        files = [executable] + extra_runfiles,
+        files = extra_runfiles,
         symlinks = symlinks,
         root_symlinks = root_symlinks,
     )
-    runfiles = runfiles.merge(binary.default_runfiles)
 
-    runfiles_relative_tool_path = ctx.workspace_name + "/" + executable.short_path
+    # Add binaries
+    extra_substitutions = {}
+
+    locations_to_key = dict(locations)
+    locations_to_key.update({binary: "binary"} if binary else {})
+
+    for location, key in locations_to_key.items():
+        runfiles, extra_executable = _update_runfiles(ctx, runfiles, location)
+        extra_substitutions[key] = _executable_to_path(ctx, extra_executable)
+
     command_pre = """#!/bin/bash
     set -e
     if [ -z "$RUNFILES_DIR" ]; then
         export RUNFILES_DIR="$0.runfiles"
     fi
     """
-    binary_path = "$RUNFILES_DIR/{}".format(runfiles_relative_tool_path)
 
     # Expand the location targets
     command_expanded = ctx.expand_location(command, targets = expand_targets)
@@ -26,9 +48,9 @@ def sh_binary_wrapper_impl(ctx, binary, output, extra_runfiles = [], expand_targ
         output = output,
         is_executable = True,
         content = command_pre + command_expanded.format(
-            binary = binary_path,
             root = "$RUNFILES_DIR",
             workspace = "$RUNFILES_DIR/{}".format(ctx.workspace_name),
+            **extra_substitutions
         ),
     )
 
@@ -42,6 +64,7 @@ def _sh_binary_wrapper_impl(ctx):
     return sh_binary_wrapper_impl(
         ctx = ctx,
         binary = ctx.attr.binary,
+        locations = ctx.attr.locations,
         output = ctx.outputs.executable,
         extra_runfiles = ctx.files.data,
         expand_targets = ctx.attr.data,
@@ -60,8 +83,12 @@ sh_binary_wrapper = rule(
             allow_files = True,
             executable = True,
             cfg = "exec",
-            mandatory = True,
             doc = "Label or file of the binary to be wrapped.",
+        ),
+        "locations": attr.label_keyed_string_dict(
+            allow_files = True,
+            cfg = "exec",
+            doc = "Executables or files to add to the runfiles and that can be accessed via their associated string.",
         ),
         "command": attr.string(
             default = "{binary} $@",

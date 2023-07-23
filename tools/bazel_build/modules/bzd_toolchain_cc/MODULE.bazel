@@ -1,1 +1,15 @@
 module(name = "bzd_toolchain_cc", version = "1.0")
+
+bazel_dep(name = "bzd_platforms", version = "1.0")
+bazel_dep(name = "bzd_utils", version = "1.0")
+bazel_dep(name = "bzd_python", version = "1.0")
+bazel_dep(name = "rules_cc", version = "0.0.6")
+bazel_dep(name = "rules_python", version = "0.24.0")
+bazel_dep(name = "bazel_skylib", version = "1.4.2")
+
+pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
+pip.parse(
+    hub_name = "bzd_toolchain_cc_pip",
+    requirements_lock = "@bzd_toolchain_cc//:python/requirements.txt",
+)
+use_repo(pip, "bzd_toolchain_cc_pip")
