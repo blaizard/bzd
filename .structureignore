@@ -7,3 +7,4 @@
 **docker-compose.yml
 **CMakeLists.txt
 **MODULE.bazel
+**MODULE.bazel.lock

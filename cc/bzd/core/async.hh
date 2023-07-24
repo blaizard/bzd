@@ -287,13 +287,9 @@ namespace bzd::async {
 template <concepts::asyncGenerator T, class Callable>
 bzd::Async<> forEach(T&& generator, Callable&& callable) noexcept
 {
-	while (true)
+	while (!generator.isCompleted())
 	{
 		auto result = co_await generator;
-		if (generator.isCompleted())
-		{
-			co_return {};
-		}
 		if (!result)
 		{
 			co_return bzd::move(result).propagate();
@@ -301,7 +297,7 @@ bzd::Async<> forEach(T&& generator, Callable&& callable) noexcept
 
 		if constexpr (concepts::asyncCallable<Callable, decltype(bzd::move(result).valueMutable())>)
 		{
-			if (!co_await !callable(bzd::move(result).valueMutable()))
+			if (!(co_await !callable(bzd::move(result).valueMutable())))
 			{
 				break;
 			}

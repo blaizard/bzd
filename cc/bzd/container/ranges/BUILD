@@ -16,6 +16,20 @@ cc_library(
 )
 
 cc_library(
+    name = "async",
+    hdrs = [
+        "async.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/core/async",
+        "//cc/bzd/type_traits:declval",
+        "//cc/bzd/type_traits:range",
+        "//cc/bzd/type_traits:remove_cvref",
+    ],
+)
+
+cc_library(
     name = "in_out_result",
     hdrs = [
         "in_out_result.hh",

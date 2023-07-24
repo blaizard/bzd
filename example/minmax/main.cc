@@ -10,8 +10,8 @@ auto minmax(int i1, int i2, int i3, int i4) noexcept -> bzd::Tuple<int, int>
 /*
 int main()
 {
-	const auto result = minmax(4, -8, 6, 10);
-	bzd::format::toStream(bzd::platform::out(), "min: {}, max: {}\n"_csv, result.get<0>(), result.get<1>()).sync();
+	const auto [min, max] = minmax(4, -8, 6, 10);
+	bzd::format::toStream(bzd::platform::out(), "min: {}, max: {}\n"_csv, min, max).sync();
 
 	return 0;
 }

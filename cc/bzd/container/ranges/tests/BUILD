@@ -8,8 +8,11 @@ load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_test")
     deps = [
         "//cc/bzd/algorithm:equal",
         "//cc/bzd/container",
+        "//cc/bzd/container:ichannel_buffered",
+        "//cc/bzd/container/ranges:async",
         "//cc/bzd/container/ranges/views",
         "//cc/bzd/test",
+        "//cc/bzd/test/types:ichannel",
         "//cc/bzd/test/types:move_only",
         "//cc/bzd/test/types:range",
     ],
