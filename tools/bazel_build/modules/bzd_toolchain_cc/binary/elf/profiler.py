@@ -116,9 +116,6 @@ if __name__ == '__main__':
 	}
 
 	with open(args.output, "w+") as f:
-		f.write(
-		    json.dumps(finalResult,
-		        indent=4,
-		        sort_keys=True))
+		f.write(json.dumps(finalResult, indent=4, sort_keys=True))
 
 	sys.exit(0)
