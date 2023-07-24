@@ -10,7 +10,7 @@ using TestIChannelZeroCopy = bzd::test::IChannel<char, 32u, bzd::test::IChannelM
 using TestIChannelChunks = bzd::test::IChannel<char, 32u, bzd::test::IChannelMode::chunks>;
 using TestIChannelZeroCopyChunks = bzd::test::IChannel<char, 32u, bzd::test::IChannelMode::zeroCopy | bzd::test::IChannelMode::chunks>;
 
-TEST_ASYNC(AsyncRange, Simple, (TestIChannel /*, TestIChannelZeroCopy, TestIChannelChunks, TestIChannelZeroCopyChunks*/))
+TEST_ASYNC(AsyncRange, Simple, (TestIChannel, TestIChannelZeroCopy, TestIChannelChunks, TestIChannelZeroCopyChunks))
 {
 	TestType in{};
 	bzd::IChannelBuffered<char, 16u> channel{in};
