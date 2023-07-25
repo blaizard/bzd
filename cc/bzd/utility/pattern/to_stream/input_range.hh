@@ -8,7 +8,7 @@
 namespace bzd {
 
 template <class T>
-requires(concepts::convertible<T, bzd::StringView> || concepts::inputByteCopyableRange<T>)
+requires(concepts::convertible<T, bzd::StringView> || (concepts::syncRange<T> && concepts::inputByteCopyableRange<T>))
 struct ToStream<T> : ToString<bzd::StringView>
 {
 public:

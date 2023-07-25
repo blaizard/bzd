@@ -19,6 +19,20 @@ concept range = requires(T& t) {
 };
 
 template <class T>
+concept syncRange = range<T> && requires(T& t) {
+	{
+		bzd::begin(t)
+	} -> concepts::sync;
+};
+
+template <class T>
+concept asyncRange = range<T> && requires(T& t) {
+	{
+		bzd::begin(t)
+	} -> concepts::async;
+};
+
+template <class T>
 concept sizedRange = range<T> && requires(T& t) { bzd::size(t); };
 
 template <class T>
@@ -106,7 +120,7 @@ template <class T>
 concept borrowedRange = range<T> && (typeTraits::isLValueReference<T> || typeTraits::enableBorrowedRange<typeTraits::RemoveCVRef<T>>);
 
 template <class T>
-concept asyncRange = inputOrOutputRange<T> && requires(T&& t) {
+concept asyncRange2 = inputOrOutputRange<T> && requires(T&& t) {
 	{
 		t.next()
 	} -> concepts::async;
@@ -117,9 +131,9 @@ concept generatorInputByteCopyableRange =
 	concepts::asyncGenerator<T> && inputByteCopyableRange<typename typeTraits::RemoveCVRef<T>::ResultType::Value>;
 
 template <class T>
-concept asyncInputByteCopyableRange = inputByteCopyableRange<T> && asyncRange<T>;
+concept asyncInputByteCopyableRange = inputByteCopyableRange<T> && asyncRange2<T>;
 
 template <class T>
-concept asyncOutputByteCopyableRange = outputByteCopyableRange<T> && asyncRange<T>;
+concept asyncOutputByteCopyableRange = outputByteCopyableRange<T> && asyncRange2<T>;
 
 } // namespace bzd::concepts

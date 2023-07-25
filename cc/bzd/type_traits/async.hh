@@ -22,6 +22,8 @@ concept async = requires(T t) {
 	} -> sameClassAs<typeTraits::AsyncType>;
 };
 template <class T>
+concept sync = !async<T>;
+template <class T>
 concept asyncTask = async<T> && (typeTraits::RemoveCVRef<T>::type == typeTraits::AsyncType::task);
 template <class T>
 concept asyncGenerator = async<T> && (typeTraits::RemoveCVRef<T>::type == typeTraits::AsyncType::generator);
