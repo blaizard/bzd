@@ -8,6 +8,7 @@ bzd_cc_library(
         ":adaptor",
         ":all",
         ":drop",
+        ":join",
         ":owning",
         ":reverse",
         ":take",
@@ -55,6 +56,22 @@ cc_library(
         "//cc/bzd/container:wrapper",
         "//cc/bzd/container/ranges:view_interface",
         "//cc/bzd/utility:advance",
+    ],
+)
+
+cc_library(
+    name = "join",
+    hdrs = [
+        "join.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":adaptor",
+        "//cc/bzd/container:wrapper",
+        "//cc/bzd/container/iterator:container_of_iterables",
+        "//cc/bzd/container/ranges:view_interface",
+        "//cc/bzd/type_traits:is_same_class",
+        "//cc/bzd/utility:apply",
     ],
 )
 

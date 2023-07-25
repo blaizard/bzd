@@ -96,6 +96,12 @@ public:
 		return bzd::move(moveOptionalResultOut().valueMutable());
 	}
 
+	[[nodiscard]] constexpr ResultType& result() noexcept
+	{
+		bzd::assert::isTrue(hasResult());
+		return handle_.promise().result().valueMutable();
+	}
+
 	template <bzd::Size index = 0>
 	constexpr auto assertHasValue() noexcept
 	{
@@ -271,6 +277,50 @@ public:
 	using Error = E;
 };
 
+} // namespace bzd
+
+namespace bzd::iterator {
+
+template <class T>
+class Generator
+{
+public: // Traits.
+	using ValueType = typename T::Value;
+	static constexpr auto category = typeTraits::IteratorCategory::output;
+	struct Sentinel
+	{
+	};
+
+public: // Constructors
+	constexpr explicit Generator(T& generator) noexcept : generator_{generator} {}
+
+public: // API
+	bzd::Async<> operator++() noexcept
+	{
+		auto result = co_await generator_;
+		if (!result)
+		{
+			co_return bzd::move(result).propagate();
+		}
+		co_return {};
+	}
+
+public: // Comparators.
+	[[nodiscard]] constexpr Bool operator==(const Sentinel) const noexcept { return generator_.isCompleted(); }
+	[[nodiscard]] constexpr Bool operator!=(const Sentinel sentinel) const noexcept { return !(*this == sentinel); }
+
+public: // Accessors.
+	[[nodiscard]] constexpr auto& operator*() const { return generator_.result().valueMutable(); }
+	[[nodiscard]] constexpr auto* operator->() const { return &(generator_.result().valueMutable()); }
+
+private:
+	T& generator_;
+};
+
+} // namespace bzd::iterator
+
+namespace bzd {
+
 template <class V = void, class E = bzd::Error>
 class Generator : public impl::Async<bzd::Result<V, E>, impl::AsyncGeneratorTraits>
 {
@@ -278,6 +328,17 @@ public:
 	using impl::Async<bzd::Result<V, E>, impl::AsyncGeneratorTraits>::Async;
 	using Value = V;
 	using Error = E;
+	using Iterator = bzd::iterator::Generator<Generator<V, E>>;
+
+public:
+	bzd::Async<Iterator> begin() noexcept
+	{
+		Iterator it{*this};
+		co_await !++it;
+		co_return it;
+	}
+
+	constexpr typename Iterator::Sentinel end() const noexcept { return {}; }
 };
 
 } // namespace bzd

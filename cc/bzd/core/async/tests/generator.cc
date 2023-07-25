@@ -129,3 +129,17 @@ TEST_ASYNC(Generator, ForLoop)
 
 	co_return {};
 }
+
+TEST_ASYNC(Generator, Iterator)
+{
+	auto async = generator(10);
+	bzd::Size expected{0};
+	for (auto it = co_await !async.begin(); it != async.end(); co_await !++it)
+	{
+		EXPECT_EQ(*it, expected);
+		++expected;
+	}
+	EXPECT_EQ(expected, 10u);
+
+	co_return {};
+}

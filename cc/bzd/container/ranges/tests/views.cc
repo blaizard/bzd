@@ -110,3 +110,15 @@ TEST(Views, Owning)
 
 	helperTestMove(bzd::ranges::Owning{bzd::inPlace, "012345"_sv}, "012345"_sv);
 }
+
+TEST(Views, Join)
+{
+	const auto container = {"Hello"_sv, " "_sv, "World"_sv};
+	auto view = bzd::ranges::Join(bzd::inPlace, container);
+	EXPECT_EQ(view.size(), 11u);
+
+	EXPECT_EQ_RANGE(view, "Hello World"_sv);
+
+	helperTestCopy(bzd::ranges::Join{bzd::inPlace, container}, "Hello World"_sv);
+	helperTestMove(bzd::ranges::Join{bzd::inPlace, container}, "Hello World"_sv);
+}
