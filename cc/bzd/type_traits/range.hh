@@ -21,6 +21,13 @@ concept range = requires(T& t) {
 template <class T>
 concept sizedRange = range<T> && requires(T& t) { bzd::size(t); };
 
+template <class T>
+concept staticSizedRange = range<T> && sizedRange<T>&&
+						   requires(T)
+{
+	T::size();
+};
+
 } // namespace bzd::concepts
 
 namespace bzd::typeTraits {

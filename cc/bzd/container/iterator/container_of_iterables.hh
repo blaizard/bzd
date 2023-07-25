@@ -11,11 +11,11 @@ class ContainerOfIterables : public typeTraits::IteratorBase
 {
 public: // Traits.
 	using Self = ContainerOfIterables<Iterator>;
-	using ContainerValueType = typename Iterator::ValueType;
+	using ContainerValueType = typeTraits::IteratorValue<Iterator>;
 	using NestedIterator = typename ContainerValueType::Iterator;
 	using IndexType = typename NestedIterator::IndexType;
-	using DifferenceType = typename NestedIterator::DifferenceType;
-	using ValueType = typename NestedIterator::ValueType;
+	using DifferenceType = typeTraits::IteratorDifference<NestedIterator>;
+	using ValueType = typeTraits::IteratorValue<NestedIterator>;
 	static constexpr auto category = typeTraits::IteratorCategory::forward;
 
 public: // Constructors.
