@@ -12,6 +12,7 @@
 #include "cc/bzd/core/async/awaitables/yield.hh"
 #include "cc/bzd/core/async/cancellation.hh"
 #include "cc/bzd/core/async/coroutine.hh"
+#include "cc/bzd/core/async/forward.hh"
 #include "cc/bzd/core/async/promise.hh"
 #include "cc/bzd/core/error.hh"
 #include "cc/bzd/meta/always_false.hh"
@@ -268,7 +269,7 @@ private:
 
 namespace bzd {
 
-template <class V = void, class E = bzd::Error>
+template <class V, class E>
 class Async : public impl::Async<bzd::Result<V, E>, impl::AsyncTaskTraits>
 {
 public:
@@ -282,13 +283,16 @@ public:
 namespace bzd::iterator {
 
 template <class T>
-class Generator
+class Generator : public typeTraits::IteratorBase
 {
 public: // Traits.
 	using ValueType = typename T::Value;
+	using DifferenceType = bzd::Int32;
 	static constexpr auto category = typeTraits::IteratorCategory::output;
 	struct Sentinel
 	{
+		[[nodiscard]] constexpr Bool operator==(const Generator other) const noexcept { return other == *this; }
+		[[nodiscard]] constexpr Bool operator!=(const Generator other) const noexcept { return !(other == *this); }
 	};
 
 public: // Constructors
@@ -321,7 +325,7 @@ private:
 
 namespace bzd {
 
-template <class V = void, class E = bzd::Error>
+template <class V, class E>
 class Generator : public impl::Async<bzd::Result<V, E>, impl::AsyncGeneratorTraits>
 {
 public:

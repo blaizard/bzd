@@ -55,6 +55,7 @@ cc_library(
         ":adaptor",
         "//cc/bzd/container:wrapper",
         "//cc/bzd/container/ranges:view_interface",
+        "//cc/bzd/core/async:forward",
         "//cc/bzd/utility:advance",
     ],
 )

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cc/bzd/type_traits/async.hh"
 #include "cc/bzd/type_traits/derived_from.hh"
 #include "cc/bzd/type_traits/is_base_of.hh"
 #include "cc/bzd/type_traits/is_pointer.hh"
@@ -82,8 +83,25 @@ inline constexpr IteratorCategory iteratorCategory = Iterator<T>::category;
 
 namespace bzd::concepts {
 
+/// Check that it is an iterator.
 template <class T>
 concept iterator = concepts::derivedFrom<T, typeTraits::IteratorBase> || concepts::pointer<T>;
+
+/// Check that it is a synchronous iterator.
+template <class T>
+concept syncIterator = iterator<T> && requires(T& t) {
+	{
+		++t
+	} -> concepts::sync;
+};
+
+/// Check that it is an asynchronous iterator.
+template <class T>
+concept asyncIterator = iterator<T> && requires(T& t) {
+	{
+		++t
+	} -> concepts::async;
+};
 
 /// Check that an iterator satisfies a specific iterator category.
 template <class T, typeTraits::IteratorCategory category>

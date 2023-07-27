@@ -1,31 +1,26 @@
 #pragma once
 
-#include "cc/bzd/math/abs.hh"
-#include "cc/bzd/platform/types.hh"
-#include "cc/bzd/type_traits/assignable_from.hh"
-#include "cc/bzd/type_traits/iterator.hh"
-#include "cc/bzd/type_traits/sentinel_for.hh"
-#include "cc/bzd/type_traits/sized_sentinel_for.hh"
-#include "cc/bzd/utility/move.hh"
+#include "cc/bzd/core/async.hh"
+#include "cc/bzd/utility/advance.hh"
 
 namespace bzd {
 
 /// Increments given iterator `it` for `n` times.
 template <concepts::inputOrOutputIterator Iterator>
-requires(concepts::syncIterator<Iterator>)
-constexpr void advance(Iterator& it, const typeTraits::IteratorDifference<Iterator> n) noexcept
+requires(concepts::asyncIterator<Iterator>)
+bzd::Async<> advance(Iterator& it, const typeTraits::IteratorDifference<Iterator> n) noexcept
 {
 	auto dist = n;
 	if constexpr (concepts::randomAccessIterator<Iterator>)
 	{
-		it += dist;
+		co_await !(it += dist);
 	}
 	else
 	{
 		while (dist > 0)
 		{
 			--dist;
-			++it;
+			co_await !++it;
 		}
 
 		// To support a negative `n` value.
@@ -34,16 +29,17 @@ constexpr void advance(Iterator& it, const typeTraits::IteratorDifference<Iterat
 			while (dist < 0)
 			{
 				++dist;
-				--it;
+				co_await !--it;
 			}
 		}
 	}
+	co_return {};
 }
 
 /// Increments given iterator `it` until `it` == `bound`.
 template <concepts::inputOrOutputIterator Iterator, concepts::sentinelFor<Iterator> Sentinel>
-requires(concepts::syncIterator<Iterator>)
-constexpr void advance(Iterator& it, Sentinel bound) noexcept
+requires(concepts::asyncIterator<Iterator>)
+bzd::Async<> advance(Iterator& it, Sentinel bound) noexcept
 {
 	if constexpr (concepts::assignableFrom<Iterator&, Sentinel>)
 	{
@@ -51,21 +47,24 @@ constexpr void advance(Iterator& it, Sentinel bound) noexcept
 	}
 	else if constexpr (concepts::sizedSentinelFor<Sentinel, Iterator>)
 	{
-		bzd::advance(it, bound - it);
+		co_await !bzd::advance(it, bound - it);
 	}
 	else
 	{
 		while (it != bound)
 		{
-			++it;
+			co_await !++it;
 		}
 	}
+	co_return {};
 }
 
 /// Increments given iterator `it` for `n` times, or until `it` == `bound`, whichever comes first.
 template <concepts::inputOrOutputIterator Iterator, concepts::sentinelFor<Iterator> Sentinel>
-requires(concepts::syncIterator<Iterator>)
-constexpr auto advance(Iterator& it, const typeTraits::IteratorDifference<Iterator> n, Sentinel bound) noexcept
+requires(concepts::asyncIterator<Iterator>)
+bzd::Async<typeTraits::IteratorDifference<Iterator>> advance(Iterator& it,
+															 const typeTraits::IteratorDifference<Iterator> n,
+															 Sentinel bound) noexcept
 {
 	using ResultType = typeTraits::IteratorDifference<Iterator>;
 
@@ -74,11 +73,11 @@ constexpr auto advance(Iterator& it, const typeTraits::IteratorDifference<Iterat
 		const ResultType dist = bzd::abs(bound - it) - bzd::abs(n);
 		if (dist < 0)
 		{
-			bzd::advance(it, bound);
-			return -dist;
+			co_await !bzd::advance(it, bound);
+			co_return -dist;
 		}
-		bzd::advance(it, n);
-		return ResultType{0};
+		co_await !bzd::advance(it, n);
+		co_return ResultType{0};
 	}
 	else
 	{
@@ -87,7 +86,7 @@ constexpr auto advance(Iterator& it, const typeTraits::IteratorDifference<Iterat
 		while (dist > 0 && it != bound)
 		{
 			--dist;
-			++it;
+			co_await !++it;
 		}
 
 		// To support a negative `n` value.
@@ -96,11 +95,11 @@ constexpr auto advance(Iterator& it, const typeTraits::IteratorDifference<Iterat
 			while (dist < 0 && it != bound)
 			{
 				++dist;
-				--it;
+				co_await !--it;
 			}
 		}
 
-		return dist;
+		co_return dist;
 	}
 }
 

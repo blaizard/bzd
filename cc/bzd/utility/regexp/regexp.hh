@@ -40,12 +40,26 @@ protected:
 		{
 			Size counter{0u};
 			Optional<regexp::Error> maybeError{};
+			Bool exitAfterIcrement{false};
+
+			constexpr Bool loop(const Bool moreDataAvailable) noexcept
+			{
+				if (exitAfterIcrement)
+				{
+					return false;
+				}
+				if (!moreDataAvailable)
+				{
+					maybeError = regexp::Error::noMoreInput;
+				}
+				return moreDataAvailable;
+			}
 		};
 
 		template <concepts::inputIterator Iterator, concepts::sentinelFor<Iterator> Sentinel>
 		constexpr ResultProcess process(Iterator& it,
 										const Sentinel& end,
-										ResultProcess resultProcess = ResultProcess{0u, bzd::nullopt}) noexcept
+										ResultProcess resultProcess = ResultProcess{0u, bzd::nullopt, false}) noexcept
 		{
 			while (it != end)
 			{
@@ -66,6 +80,24 @@ protected:
 			}
 			resultProcess.maybeError = regexp::Error::noMoreInput;
 			return resultProcess;
+		}
+
+		constexpr Bool process2(const auto byte, ResultProcess& resultProcess) noexcept
+		{
+			auto result = matcher.match([](bzd::Monostate) -> regexp::Result { return bzd::error::make(regexp::Error::malformed); },
+										[c = static_cast<const char>(byte)](auto& matcher) { return matcher(c); });
+
+			if (result)
+			{
+				++resultProcess.counter;
+				if (result.value() == regexp::Success::last)
+				{
+					resultProcess.exitAfterIcrement = true;
+				}
+				return true;
+			}
+			resultProcess.maybeError = result.error();
+			return false;
 		}
 	};
 
@@ -170,7 +202,14 @@ public:
 			auto result = next(bzd::move(context));
 			while (result.loop())
 			{
-				const auto resultProcess = result.valueMutable().process(it, end);
+				Context::ResultProcess resultProcess{};
+				for (; resultProcess.loop(it != end); ++it)
+				{
+					if (!result.valueMutable().process2(*it, resultProcess))
+					{
+						break;
+					}
+				}
 				result.update(resultProcess);
 			}
 			if (!result)
