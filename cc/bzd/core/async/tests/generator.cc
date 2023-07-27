@@ -134,10 +134,11 @@ TEST_ASYNC(Generator, Iterator)
 {
 	auto async = generator(10);
 	bzd::Size expected{0};
-	for (auto it = co_await !async.begin(); it != async.end(); co_await !++it)
+	for (auto it = co_await !async.begin(); it != async.end();)
 	{
 		EXPECT_EQ(*it, expected);
 		++expected;
+		co_await !++it;
 	}
 	EXPECT_EQ(expected, 10u);
 

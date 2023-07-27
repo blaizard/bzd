@@ -664,6 +664,7 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        ":async",
         ":derived_from",
         ":false_type",
         ":is_base_of",
@@ -703,7 +704,6 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        ":async",
         ":declval",
         ":is_lvalue_reference",
         ":is_trivially_copyable",

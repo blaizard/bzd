@@ -196,6 +196,9 @@ private:
 	bzd::Variant<OptionalEmptyType, ValueContainer> data_{};
 };
 
+template <class T>
+Optional(T&&) -> Optional<T>;
+
 } // namespace bzd::impl
 
 namespace bzd {

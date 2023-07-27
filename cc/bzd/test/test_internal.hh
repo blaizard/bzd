@@ -287,21 +287,52 @@
 		failFct;                                                                                                                           \
 	}
 
+#define BZDTEST_BEGIN_(range)                                                                                                              \
+	[](auto&& bzdTestRange_) {                                                                                                             \
+		if constexpr (::bzd::concepts::syncRange<::bzd::typeTraits::RemoveCVRef<decltype(bzdTestRange_)>>)                                 \
+		{                                                                                                                                  \
+			return ::bzd::Optional{::bzd::begin(bzdTestRange_)};                                                                           \
+		}                                                                                                                                  \
+		else                                                                                                                               \
+		{                                                                                                                                  \
+			return ::bzd::begin(bzdTestRange_).sync();                                                                                     \
+		}                                                                                                                                  \
+	}(range)
+
+#define BZDTEST_INCREMENT_(it)                                                                                                             \
+	([](auto& bzdTestIt_) {                                                                                                                \
+		if constexpr (::bzd::concepts::syncIterator<::bzd::typeTraits::RemoveCVRef<decltype(bzdTestIt_)>>)                                 \
+		{                                                                                                                                  \
+			++bzdTestIt_;                                                                                                                  \
+			return true;                                                                                                                   \
+		}                                                                                                                                  \
+		else                                                                                                                               \
+		{                                                                                                                                  \
+			return (++bzdTestIt_).sync().hasValue();                                                                                       \
+		}                                                                                                                                  \
+	})(it)
+
 #define BZDTEST_TEST_EQ_RANGE_(range1, range2, failFct)                                                                                    \
-	if (![](const auto& bzdTestA_, const auto& bzdTestB_) {                                                                                \
-			auto first1 = bzd::begin(bzdTestA_);                                                                                           \
-			auto first2 = bzd::begin(bzdTestB_);                                                                                           \
+	if (![](auto&& bzdTestA_, auto&& bzdTestB_) {                                                                                          \
+			auto maybeFirst1 = BZDTEST_BEGIN_(bzdTestA_);                                                                                  \
+			BZDTEST_FAIL_(!maybeFirst1, "Failure\nTest: bzd::begin(" #range1 ") failed");                                                  \
+			auto& first1 = maybeFirst1.valueMutable();                                                                                     \
+			auto maybeFirst2 = BZDTEST_BEGIN_(bzdTestB_);                                                                                  \
+			BZDTEST_FAIL_(!maybeFirst2, "Failure\nTest: bzd::begin(" #range2 ") failed");                                                  \
+			auto& first2 = maybeFirst2.valueMutable();                                                                                     \
 			auto last1 = bzd::end(bzdTestA_);                                                                                              \
 			auto last2 = bzd::end(bzdTestB_);                                                                                              \
 			using Value1 = ::bzd::typeTraits::RemoveCVRef<decltype(*first1)>;                                                              \
 			using Value2 = ::bzd::typeTraits::RemoveCVRef<decltype(*first2)>;                                                              \
 			::bzd::test::impl::Values<Value1> values1;                                                                                     \
 			::bzd::test::impl::Values<Value2> values2;                                                                                     \
-			for (; first1 != last1 && first2 != last2; ++first1, ++first2)                                                                 \
+			for (; first1 != last1 && first2 != last2;)                                                                                    \
 			{                                                                                                                              \
 				values1.pushBack(*first1);                                                                                                 \
 				values2.pushBack(*first2);                                                                                                 \
 				BZDTEST_FAIL_(!(*first1 == *first2), "Failure\nTest: " #range1 " != " #range2, values1, values2);                          \
+				BZDTEST_FAIL_(!BZDTEST_INCREMENT_(first1), "Failure\nTest: ++it1 failed", values1, values2);                               \
+				BZDTEST_FAIL_(!BZDTEST_INCREMENT_(first2), "Failure\nTest: ++it2 failed", values1, values2);                               \
 			}                                                                                                                              \
 			BZDTEST_FAIL_(first1 != last1, "Failure\nTest: " #range2 " terminated while " #range1 " did not");                             \
 			BZDTEST_FAIL_(first2 != last2, "Failure\nTest: " #range1 " terminated while " #range2 " did not");                             \

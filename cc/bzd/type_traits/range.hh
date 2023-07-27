@@ -1,6 +1,5 @@
 #pragma once
 
-#include "cc/bzd/type_traits/async.hh"
 #include "cc/bzd/type_traits/declval.hh"
 #include "cc/bzd/type_traits/is_lvalue_reference.hh"
 #include "cc/bzd/type_traits/is_trivially_copyable.hh"
@@ -12,12 +11,14 @@
 
 namespace bzd::concepts {
 
+/// Check that it is a range.
 template <class T>
 concept range = requires(T& t) {
 	bzd::begin(t);
 	bzd::end(t);
 };
 
+/// Check that it is a synchronous range.
 template <class T>
 concept syncRange = range<T> && requires(T& t) {
 	{
@@ -25,6 +26,7 @@ concept syncRange = range<T> && requires(T& t) {
 	} -> concepts::sync;
 };
 
+/// Check that it is an asynchronous range.
 template <class T>
 concept asyncRange = range<T> && requires(T& t) {
 	{
@@ -32,9 +34,11 @@ concept asyncRange = range<T> && requires(T& t) {
 	} -> concepts::async;
 };
 
+/// Check that it is a range which has a size.
 template <class T>
 concept sizedRange = range<T> && requires(T& t) { bzd::size(t); };
 
+/// Check that it is a range which has a build type calculated size.
 template <class T>
 concept staticSizedRange = range<T> && sizedRange<T>&&
 						   requires(T)
@@ -49,10 +53,21 @@ namespace bzd::typeTraits {
 template <class T>
 struct Range;
 
-template <concepts::range T>
+template <concepts::syncRange T>
 struct Range<T>
 {
 	using Iterator = decltype(bzd::begin(bzd::typeTraits::declval<T&>()));
+	using Sentinel = decltype(bzd::end(bzd::typeTraits::declval<T&>()));
+	// using Size = decltype(bzd::size(bzd::typeTraits::declval<T&>()));
+	using ValueType = typename typeTraits::Iterator<Iterator>::ValueType;
+	using DifferenceType = typename typeTraits::Iterator<Iterator>::DifferenceType;
+	static constexpr typeTraits::IteratorCategory category = typeTraits::Iterator<Iterator>::category;
+};
+
+template <concepts::asyncRange T>
+struct Range<T>
+{
+	using Iterator = decltype(bzd::begin(bzd::typeTraits::declval<T&>()))::Value;
 	using Sentinel = decltype(bzd::end(bzd::typeTraits::declval<T&>()));
 	// using Size = decltype(bzd::size(bzd::typeTraits::declval<T&>()));
 	using ValueType = typename typeTraits::Iterator<Iterator>::ValueType;

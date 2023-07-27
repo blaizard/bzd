@@ -61,6 +61,18 @@ cc_library(
 )
 
 cc_library(
+    name = "advance_async",
+    hdrs = [
+        "advance_async.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":advance",
+        "//cc/bzd/core/async",
+    ],
+)
+
+cc_library(
     name = "align_down",
     hdrs = [
         "align_down.hh",

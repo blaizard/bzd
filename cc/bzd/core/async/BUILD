@@ -41,6 +41,7 @@ cc_library(
         "//cc/bzd/container/threadsafe:non_owning_ring_spin",
         "//cc/bzd/core:error",
         "//cc/bzd/core/assert:minimal",
+        "//cc/bzd/core/async:forward",
         "//cc/bzd/meta:always_false",
         "//cc/bzd/type_traits:async",
         "//cc/bzd/type_traits:is_base_of",
@@ -54,4 +55,12 @@ cc_library(
         "//cc/bzd/utility/synchronization:spin_shared_mutex",
         "//cc/bzd/utility/synchronization:sync_lock_guard",
     ],
+)
+
+cc_library(
+    name = "forward",
+    hdrs = [
+        "forward.hh",
+    ],
+    visibility = ["//visibility:public"],
 )
