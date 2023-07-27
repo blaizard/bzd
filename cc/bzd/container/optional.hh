@@ -31,6 +31,12 @@ private:
 	explicit constexpr OptionalNull() noexcept {}
 };
 
+} // namespace bzd::impl
+
+namespace bzd {
+
+// \brief Type managing an optional contained value, i.e. a value that may or
+// may not be present.
 template <class T>
 class Optional
 {
@@ -58,7 +64,7 @@ public: // Constructors
 	constexpr Self& operator=(Self&& optional) noexcept = default;
 
 	// Support for bzd::nullopt
-	constexpr Optional(const OptionalNull&) noexcept : Optional{} {}
+	constexpr Optional(const impl::OptionalNull&) noexcept : Optional{} {}
 
 	// Forward constructor to storage type for all non-self typed
 	template <class... Args>
@@ -199,14 +205,6 @@ private:
 template <class T>
 Optional(T&&) -> Optional<T>;
 
-} // namespace bzd::impl
-
-namespace bzd {
-
 constexpr impl::OptionalNull nullopt = impl::OptionalNull::make();
 
-// \brief Type managing an optional contained value, i.e. a value that may or
-// may not be present.
-template <class T>
-using Optional = impl::Optional<T>;
 } // namespace bzd
