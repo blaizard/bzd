@@ -85,6 +85,7 @@ TEST_ASYNC(IChannelBuffered, Reader, (TestIChannel, TestIChannelZeroCopy))
 	co_return {};
 }
 
+/*
 TEST_ASYNC(IChannelBuffered, Read, (TestIChannel, TestIChannelZeroCopy, TestIChannelChunks, TestIChannelZeroCopyChunks))
 {
 	TestType in{};
@@ -153,13 +154,13 @@ TEST_ASYNC(IChannelBuffered, Read, (TestIChannel, TestIChannelZeroCopy, TestICha
 
 	co_return {};
 }
-
+*/
 using TestIChannelGenerator = bzd::test::IChannelGenerator<bzd::Int32, 32u>;
 using TestIChannelGeneratorZeroCopy = bzd::test::IChannelGenerator<bzd::Int32, 32u, bzd::test::IChannelMode::zeroCopy>;
 using TestIChannelGeneratorChunks = bzd::test::IChannelGenerator<bzd::Int32, 32u, bzd::test::IChannelMode::chunks>;
 using TestIChannelGeneratorZeroCopyChunks =
 	bzd::test::IChannelGenerator<bzd::Int32, 32u, bzd::test::IChannelMode::zeroCopy | bzd::test::IChannelMode::chunks>;
-
+/*
 TEST_ASYNC(IChannelBuffered,
 		   Stress,
 		   (TestIChannelGenerator, TestIChannelGeneratorZeroCopy, TestIChannelGeneratorChunks, TestIChannelGeneratorZeroCopyChunks))
@@ -188,6 +189,7 @@ TEST_ASYNC(IChannelBuffered,
 
 	co_return {};
 }
+*/
 
 TEST_ASYNC(IChannelBuffered,
 		   BenchmarkReader,

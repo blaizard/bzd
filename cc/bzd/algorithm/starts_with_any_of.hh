@@ -5,9 +5,9 @@
 #include "cc/bzd/type_traits/iterator.hh"
 #include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/type_traits/sentinel_for.hh"
-#include "cc/bzd/utility/begin.hh"
-#include "cc/bzd/utility/end.hh"
-#include "cc/bzd/utility/size.hh"
+#include "cc/bzd/utility/ranges/begin.hh"
+#include "cc/bzd/utility/ranges/end.hh"
+#include "cc/bzd/utility/ranges/size.hh"
 
 namespace bzd::algorithm {
 

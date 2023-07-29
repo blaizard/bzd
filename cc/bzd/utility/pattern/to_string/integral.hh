@@ -2,12 +2,12 @@
 
 #include "cc/bzd/algorithm/byte_copy.hh"
 #include "cc/bzd/container/array.hh"
-#include "cc/bzd/container/ranges/views/reverse.hh"
 #include "cc/bzd/container/string.hh"
 #include "cc/bzd/type_traits/is_integral.hh"
 #include "cc/bzd/type_traits/is_signed.hh"
 #include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/utility/pattern/to_string/base.hh"
+#include "cc/bzd/utility/ranges/views/reverse.hh"
 
 namespace bzd {
 

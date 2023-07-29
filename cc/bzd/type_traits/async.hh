@@ -16,7 +16,7 @@ enum class AsyncType
 namespace bzd::concepts {
 
 template <class T>
-concept async = requires(T t) {
+concept async = requires(T& t) {
 	{
 		t.type
 	} -> sameClassAs<typeTraits::AsyncType>;

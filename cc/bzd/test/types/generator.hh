@@ -26,7 +26,7 @@ bzd::Generator<T> generator(const T start, const T end, const T increment = stat
 }
 
 template <concepts::syncRange Range>
-bzd::Generator<typeTraits::RangeValue<Range>> generator(Range&& range) noexcept
+bzd::Generator<typeTraits::RemoveCVRef<typeTraits::RangeValue<Range>>> generator(Range&& range) noexcept
 {
 	for (const auto& value : range)
 	{

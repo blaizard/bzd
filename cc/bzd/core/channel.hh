@@ -6,7 +6,7 @@
 #include "cc/bzd/core/async.hh"
 #include "cc/bzd/platform/types.hh"
 #include "cc/bzd/type_traits/add_const.hh"
-#include "cc/bzd/utility/distance.hh"
+#include "cc/bzd/utility/iterators/distance.hh"
 #include "cc/bzd/utility/synchronization/lock_guard.hh"
 #include "cc/bzd/utility/synchronization/mutex.hh"
 

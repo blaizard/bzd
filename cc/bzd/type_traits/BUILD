@@ -709,9 +709,9 @@ cc_library(
         ":is_trivially_copyable",
         ":iterator",
         ":remove_cvref",
-        "//cc/bzd/utility:begin",
-        "//cc/bzd/utility:end",
-        "//cc/bzd/utility:size",
+        "//cc/bzd/utility/ranges:begin",
+        "//cc/bzd/utility/ranges:end",
+        "//cc/bzd/utility/ranges:size",
     ],
 )
 

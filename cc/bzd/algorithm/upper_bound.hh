@@ -4,10 +4,10 @@
 #include "cc/bzd/type_traits/predicate.hh"
 #include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/type_traits/sentinel_for.hh"
-#include "cc/bzd/utility/advance.hh"
 #include "cc/bzd/utility/comparison/less.hh"
-#include "cc/bzd/utility/distance.hh"
 #include "cc/bzd/utility/forward.hh"
+#include "cc/bzd/utility/iterators/advance.hh"
+#include "cc/bzd/utility/iterators/distance.hh"
 
 namespace bzd::algorithm {
 

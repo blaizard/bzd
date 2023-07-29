@@ -5,31 +5,24 @@ bzd_cc_library(
     name = "utility",
     visibility = ["//visibility:public"],
     deps = [
-        ":advance",
         ":align_down",
         ":align_up",
         ":apply",
-        ":begin",
         ":constexpr_for",
         ":container_of",
-        ":distance",
-        ":end",
         ":forward",
         ":ignore",
         ":in_place",
         ":max",
         ":min",
         ":move",
-        ":next",
         ":numeric_limits",
         ":offset_of",
         ":ownership",
-        ":prev",
         ":ratio",
         ":scope_guard",
         ":signal",
         ":singleton",
-        ":size",
         ":source_location",
         ":swap",
         ":to_underlying",
@@ -43,34 +36,6 @@ bzd_cc_library(
 )
 
 # ---- Individual items ----
-
-cc_library(
-    name = "advance",
-    hdrs = [
-        "advance.hh",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//cc/bzd/math:abs",
-        "//cc/bzd/type_traits:assignable_from",
-        "//cc/bzd/type_traits:iterator",
-        "//cc/bzd/type_traits:sentinel_for",
-        "//cc/bzd/type_traits:sized_sentinel_for",
-        "//cc/bzd/utility:move",
-    ],
-)
-
-cc_library(
-    name = "advance_async",
-    hdrs = [
-        "advance_async.hh",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":advance",
-        "//cc/bzd/core/async",
-    ],
-)
 
 cc_library(
     name = "align_down",
@@ -109,17 +74,6 @@ cc_library(
 )
 
 cc_library(
-    name = "begin",
-    hdrs = [
-        "begin.hh",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//cc/bzd/platform:types",
-    ],
-)
-
-cc_library(
     name = "constexpr_for",
     hdrs = [
         "constexpr_for.hh",
@@ -142,29 +96,6 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":offset_of",
-    ],
-)
-
-cc_library(
-    name = "distance",
-    hdrs = [
-        "distance.hh",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//cc/bzd/type_traits:iterator",
-        "//cc/bzd/type_traits:sentinel_for",
-    ],
-)
-
-cc_library(
-    name = "end",
-    hdrs = [
-        "end.hh",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//cc/bzd/platform:types",
     ],
 )
 
@@ -227,17 +158,6 @@ cc_library(
 )
 
 cc_library(
-    name = "next",
-    hdrs = [
-        "next.hh",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":advance",
-    ],
-)
-
-cc_library(
     name = "numeric_limits",
     hdrs = [
         "numeric_limits.hh",
@@ -267,17 +187,6 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/core/assert",
-    ],
-)
-
-cc_library(
-    name = "prev",
-    hdrs = [
-        "prev.hh",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":advance",
     ],
 )
 
@@ -324,17 +233,6 @@ cc_library(
         "singleton.hh",
     ],
     visibility = ["//visibility:public"],
-)
-
-cc_library(
-    name = "size",
-    hdrs = [
-        "size.hh",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//cc/bzd/platform:types",
-    ],
 )
 
 cc_library(

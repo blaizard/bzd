@@ -88,12 +88,12 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//cc/bzd/container/ranges:in_out_result",
         "//cc/bzd/type_traits:is_trivially_copyable",
         "//cc/bzd/type_traits:iterator",
         "//cc/bzd/type_traits:range",
         "//cc/bzd/type_traits:sentinel_for",
         "//cc/bzd/utility:min",
+        "//cc/bzd/utility/ranges:in_out_result",
     ],
 )
 
@@ -104,11 +104,11 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//cc/bzd/container/ranges:in_out_result",
         "//cc/bzd/type_traits:iterator",
         "//cc/bzd/type_traits:range",
         "//cc/bzd/type_traits:sentinel_for",
         "//cc/bzd/utility:min",
+        "//cc/bzd/utility/ranges:in_out_result",
     ],
 )
 
@@ -268,10 +268,10 @@ cc_library(
         "//cc/bzd/type_traits:predicate",
         "//cc/bzd/type_traits:range",
         "//cc/bzd/type_traits:sentinel_for",
-        "//cc/bzd/utility:advance",
-        "//cc/bzd/utility:distance",
         "//cc/bzd/utility:forward",
         "//cc/bzd/utility/comparison",
+        "//cc/bzd/utility/iterators:advance",
+        "//cc/bzd/utility/iterators:distance",
     ],
 )
 
@@ -379,10 +379,10 @@ cc_library(
         "//cc/bzd/type_traits:range",
         "//cc/bzd/type_traits:remove_cvref",
         "//cc/bzd/type_traits:sentinel_for",
-        "//cc/bzd/utility:distance",
         "//cc/bzd/utility:forward",
         "//cc/bzd/utility:swap",
         "//cc/bzd/utility/comparison",
+        "//cc/bzd/utility/iterators:distance",
     ],
 )
 
@@ -398,9 +398,9 @@ cc_library(
         "//cc/bzd/type_traits:iterator",
         "//cc/bzd/type_traits:range",
         "//cc/bzd/type_traits:sentinel_for",
-        "//cc/bzd/utility:begin",
-        "//cc/bzd/utility:end",
-        "//cc/bzd/utility:size",
+        "//cc/bzd/utility/ranges:begin",
+        "//cc/bzd/utility/ranges:end",
+        "//cc/bzd/utility/ranges:size",
     ],
 )
 
@@ -415,9 +415,9 @@ cc_library(
         "//cc/bzd/type_traits:predicate",
         "//cc/bzd/type_traits:range",
         "//cc/bzd/type_traits:sentinel_for",
-        "//cc/bzd/utility:advance",
-        "//cc/bzd/utility:distance",
         "//cc/bzd/utility:forward",
         "//cc/bzd/utility/comparison",
+        "//cc/bzd/utility/iterators:advance",
+        "//cc/bzd/utility/iterators:distance",
     ],
 )

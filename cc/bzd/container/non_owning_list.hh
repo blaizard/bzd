@@ -1,12 +1,12 @@
 #pragma once
 
-#include "cc/bzd/container/iterator/bidirectional.hh"
 #include "cc/bzd/container/optional.hh"
 #include "cc/bzd/type_traits/add_const.hh"
 #include "cc/bzd/type_traits/conditional.hh"
 #include "cc/bzd/type_traits/is_const.hh"
 #include "cc/bzd/type_traits/iterator.hh"
 #include "cc/bzd/utility/ignore.hh"
+#include "cc/bzd/utility/iterators/bidirectional.hh"
 
 namespace bzd {
 struct NonOwningListElement
