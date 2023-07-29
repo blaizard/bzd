@@ -1,13 +1,13 @@
 #pragma once
 
 #include "cc/bzd/container/array.hh"
-#include "cc/bzd/container/iterator/tuple.hh"
 #include "cc/bzd/meta/choose_nth.hh"
 #include "cc/bzd/platform/types.hh"
 #include "cc/bzd/type_traits/enable_if.hh"
 #include "cc/bzd/type_traits/is_same.hh"
 #include "cc/bzd/utility/forward.hh"
 #include "cc/bzd/utility/in_place.hh"
+#include "cc/bzd/utility/iterators/tuple.hh"
 #include "cc/bzd/utility/move.hh"
 
 namespace bzd::impl {

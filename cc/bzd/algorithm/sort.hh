@@ -6,8 +6,8 @@
 #include "cc/bzd/type_traits/remove_cvref.hh"
 #include "cc/bzd/type_traits/sentinel_for.hh"
 #include "cc/bzd/utility/comparison/less.hh"
-#include "cc/bzd/utility/distance.hh"
 #include "cc/bzd/utility/forward.hh"
+#include "cc/bzd/utility/iterators/distance.hh"
 #include "cc/bzd/utility/swap.hh"
 
 namespace bzd::algorithm {

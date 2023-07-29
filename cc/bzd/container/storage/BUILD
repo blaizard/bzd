@@ -38,9 +38,9 @@ cc_library(
         "//cc/bzd/container:reference_wrapper",
         "//cc/bzd/platform:types",
         "//cc/bzd/type_traits:conditional",
-        "//cc/bzd/utility:distance",
         "//cc/bzd/utility:forward",
         "//cc/bzd/utility:in_place",
         "//cc/bzd/utility:min",
+        "//cc/bzd/utility/iterators:distance",
     ],
 )

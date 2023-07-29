@@ -1,10 +1,10 @@
 #pragma once
 
 #include "cc/bzd/container/array.hh"
-#include "cc/bzd/container/iterator/container_of_iterables.hh"
 #include "cc/bzd/container/span.hh"
 #include "cc/bzd/utility/apply.hh"
 #include "cc/bzd/utility/in_place.hh"
+#include "cc/bzd/utility/iterators/container_of_iterables.hh"
 #include "cc/bzd/utility/min.hh"
 
 namespace bzd {
@@ -21,6 +21,8 @@ public: // Traits.
 	using Self = Spans<T, N>;
 	using Iterator = bzd::iterator::ContainerOfIterables<typename Array<Span<T>, N>::Iterator>;
 	using ConstIterator = bzd::iterator::ContainerOfIterables<typename Array<Span<T>, N>::ConstIterator>;
+	using Sentinel = bzd::iterator::Sentinel<Iterator>;
+	using ConstSentinel = bzd::iterator::Sentinel<ConstIterator>;
 
 public: // Constructors/assignments.
 	constexpr Spans() noexcept = default;
@@ -97,10 +99,20 @@ public:
 	constexpr auto last(const Size count) noexcept { return subSpans(size() - count, count); }
 
 public: // Iterators
-	[[nodiscard]] constexpr auto begin() noexcept { return Iterator{spans_.begin(), spans_.end()}; }
-	[[nodiscard]] constexpr auto begin() const noexcept { return ConstIterator{spans_.begin(), spans_.end()}; }
-	[[nodiscard]] constexpr auto end() noexcept { return Iterator{spans_.end()}; }
-	[[nodiscard]] constexpr auto end() const noexcept { return ConstIterator{spans_.end()}; }
+	[[nodiscard]] constexpr auto begin() noexcept
+	{
+		Iterator it{spans_.begin(), spans_.end()};
+		++it;
+		return it;
+	}
+	[[nodiscard]] constexpr auto begin() const noexcept
+	{
+		ConstIterator it{spans_.begin(), spans_.end()};
+		++it;
+		return it;
+	}
+	[[nodiscard]] constexpr auto end() noexcept { return Sentinel{}; }
+	[[nodiscard]] constexpr auto end() const noexcept { return ConstSentinel{}; }
 
 private:
 	template <class U, Size M>

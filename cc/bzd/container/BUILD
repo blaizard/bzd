@@ -31,9 +31,9 @@ bzd_cc_library(
         ":vector",
         ":wrapper",
         "//cc/bzd/container/impl",
-        "//cc/bzd/container/ranges:subrange",
         "//cc/bzd/container/threadsafe",
         "//cc/bzd/core/assert",
+        "//cc/bzd/utility/ranges:subrange",
     ],
 )
 
@@ -108,11 +108,11 @@ cc_library(
         ":ring_buffer",
         ":span",
         "//cc/bzd/algorithm:copy",
-        "//cc/bzd/container/ranges/views:drop",
-        "//cc/bzd/container/ranges/views:reverse",
         "//cc/bzd/core:channel",
         "//cc/bzd/core/async",
         "//cc/bzd/platform:types",
+        "//cc/bzd/utility/ranges/views:drop",
+        "//cc/bzd/utility/ranges/views:reverse",
     ],
 )
 
@@ -160,12 +160,12 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":optional",
-        "//cc/bzd/container/iterator:bidirectional",
         "//cc/bzd/type_traits:add_const",
         "//cc/bzd/type_traits:conditional",
         "//cc/bzd/type_traits:is_const",
         "//cc/bzd/type_traits:iterator",
         "//cc/bzd/utility:ignore",
+        "//cc/bzd/utility/iterators:bidirectional",
     ],
 )
 
@@ -325,9 +325,9 @@ cc_library(
     deps = [
         ":array",
         ":span",
-        "//cc/bzd/container/iterator:container_of_iterables",
         "//cc/bzd/utility:apply",
         "//cc/bzd/utility:min",
+        "//cc/bzd/utility/iterators:container_of_iterables",
     ],
 )
 
@@ -406,7 +406,6 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":array",
-        "//cc/bzd/container/iterator:tuple",
         "//cc/bzd/meta:choose_nth",
         "//cc/bzd/platform:types",
         "//cc/bzd/type_traits:enable_if",
@@ -415,6 +414,7 @@ cc_library(
         "//cc/bzd/utility:forward",
         "//cc/bzd/utility:in_place",
         "//cc/bzd/utility:move",
+        "//cc/bzd/utility/iterators:tuple",
     ],
 )
 

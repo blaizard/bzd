@@ -2,15 +2,15 @@
 
 #include "cc/bzd/container/array.hh"
 #include "cc/bzd/container/optional.hh"
-#include "cc/bzd/container/ranges/stream.hh"
 #include "cc/bzd/container/string_view.hh"
 #include "cc/bzd/type_traits/is_integral.hh"
 #include "cc/bzd/type_traits/is_signed.hh"
 #include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/type_traits/remove_reference.hh"
-#include "cc/bzd/utility/begin.hh"
-#include "cc/bzd/utility/end.hh"
 #include "cc/bzd/utility/pattern/from_string/base.hh"
+#include "cc/bzd/utility/ranges/begin.hh"
+#include "cc/bzd/utility/ranges/end.hh"
+#include "cc/bzd/utility/ranges/stream.hh"
 
 namespace bzd {
 

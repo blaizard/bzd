@@ -4,9 +4,9 @@
 #include "cc/bzd/container/reference_wrapper.hh"
 #include "cc/bzd/platform/types.hh"
 #include "cc/bzd/type_traits/conditional.hh"
-#include "cc/bzd/utility/distance.hh"
 #include "cc/bzd/utility/forward.hh"
 #include "cc/bzd/utility/in_place.hh"
+#include "cc/bzd/utility/iterators/distance.hh"
 #include "cc/bzd/utility/min.hh"
 
 namespace bzd::impl {

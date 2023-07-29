@@ -1,10 +1,10 @@
 #pragma once
 
-#include "cc/bzd/container/ranges/in_out_result.hh"
 #include "cc/bzd/type_traits/iterator.hh"
 #include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/type_traits/sentinel_for.hh"
 #include "cc/bzd/utility/min.hh"
+#include "cc/bzd/utility/ranges/in_out_result.hh"
 
 namespace bzd::algorithm {
 

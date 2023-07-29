@@ -2,13 +2,13 @@
 
 #include "cc/bzd/algorithm/copy.hh"
 #include "cc/bzd/container/optional.hh"
-#include "cc/bzd/container/ranges/views/drop.hh"
-#include "cc/bzd/container/ranges/views/reverse.hh"
 #include "cc/bzd/container/ring_buffer.hh"
 #include "cc/bzd/core/async.hh"
 #include "cc/bzd/core/channel.hh"
 #include "cc/bzd/type_traits/container.hh"
 #include "cc/bzd/type_traits/range.hh"
+#include "cc/bzd/utility/ranges/views/drop.hh"
+#include "cc/bzd/utility/ranges/views/reverse.hh"
 #include "cc/bzd/utility/scope_guard.hh"
 
 namespace bzd {
@@ -131,7 +131,7 @@ public:
 	/// Read at least `count` bytes and return a Stream range.
 	///
 	/// \note Uppon destruction of the range, the data consumed will be removed from the buffer ring.
-	bzd::Async<ReadScope> read(const bzd::Size count) noexcept
+	/*bzd::Async<ReadScope> read(const bzd::Size count) noexcept
 	{
 		// Span to hold freshly read buffer.
 		auto buffer = buffer_.asSpans();
@@ -178,7 +178,7 @@ public:
 		bzd::Spans<const T, 3u> spans{bzd::inPlace, buffer[0], buffer[1], dataRead};
 		buffer_.consume(spans.size());
 		co_return ReadScope{*this, spans};
-	}
+	}*/
 
 	/// Read data until a specific value is found.
 	auto readUntil(const T value, const Bool include = false) noexcept

@@ -37,14 +37,14 @@ cc_library(
         "//cc/bzd/algorithm:lexicographical_compare",
         "//cc/bzd/algorithm:rsearch",
         "//cc/bzd/algorithm:search",
-        "//cc/bzd/container/iterator:contiguous",
         "//cc/bzd/core/assert:minimal",
         "//cc/bzd/type_traits:enable_if",
         "//cc/bzd/type_traits:is_const",
         "//cc/bzd/type_traits:iterator",
-        "//cc/bzd/utility:distance",
         "//cc/bzd/utility:forward",
         "//cc/bzd/utility:move",
+        "//cc/bzd/utility/iterators:contiguous",
+        "//cc/bzd/utility/iterators:distance",
     ],
 )
 
@@ -56,11 +56,11 @@ cc_library(
     visibility = ["//cc/bzd/container:__pkg__"],
     deps = [
         ":span",
-        "//cc/bzd/container/iterator:input_or_output_reference",
-        "//cc/bzd/container/ranges:stream",
-        "//cc/bzd/container/ranges:subrange",
         "//cc/bzd/type_traits:is_convertible",
         "//cc/bzd/type_traits:is_trivially_copyable",
         "//cc/bzd/type_traits:sentinel_for",
+        "//cc/bzd/utility/iterators:input_or_output_reference",
+        "//cc/bzd/utility/ranges:stream",
+        "//cc/bzd/utility/ranges:subrange",
     ],
 )
