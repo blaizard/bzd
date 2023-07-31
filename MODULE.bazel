@@ -5,6 +5,7 @@ bazel_dep(name = "bzd_utils", version = "1.0")
 bazel_dep(name = "bzd_rules_doc", version = "1.0")
 bazel_dep(name = "bzd_toolchain_cc", version = "1.0")
 bazel_dep(name = "bzd_platforms", version = "1.0")
+bazel_dep(name = "bzd_sanitizer", version = "1.0")
 bazel_dep(name = "bazel_skylib", version = "1.4.2")
 bazel_dep(name = "stardoc", version = "0.5.6")
 bazel_dep(name = "bzd_bundle", version = "1.0")
@@ -14,7 +15,7 @@ bazel_dep(name = "rules_python", version = "0.24.0")
 [local_path_override(
     module_name = name,
     path = "tools/bazel_build/modules/" + name
-) for name in ("bzd_utils", "bzd_rules_doc", "bzd_toolchain_cc", "bzd_bundle", "bzd_platforms", "bzd_python", )]
+) for name in ("bzd_utils", "bzd_rules_doc", "bzd_toolchain_cc", "bzd_bundle", "bzd_platforms", "bzd_python", "bzd_sanitizer", )]
 
 # Python
 
