@@ -1,6 +1,6 @@
 {
   "lockFileVersion": 1,
-  "moduleFileHash": "d6e92b1172932022e267ffc55cf36602d6382032ed09f14fff42fc70e983b111",
+  "moduleFileHash": "b54f87acf6a2bf041bb14461146d8fe42141b4907cbcde01d43f10992ea2480e",
   "flags": {
     "cmdRegistries": [
       "https://bcr.bazel.build/"
@@ -13,6 +13,7 @@
     "compatibilityMode": "ERROR"
   },
   "localOverrideHashes": {
+    "bzd_sanitizer": "9074b823f9ff8ef62832f7820907c3eb1206b1286d45ba4a9c1ef4a0751d6cd6",
     "bzd_python": "938b99acb046dd676db3cbfbca80276d75fdfb40a6f41f28dd299b15c9cc9178",
     "bazel_tools": "11c49407fdc54b48d69dcd4478440118124b9cd51b2dca5947a6414a585964a1",
     "bzd_utils": "3fd02528f02ac3659a566c951f88577ea433cdd44498f3a4f650dcd8a57c57bc",
@@ -40,7 +41,7 @@
           "usingModule": "<root>",
           "location": {
             "file": "@@//:MODULE.bazel",
-            "line": 21,
+            "line": 22,
             "column": 23
           },
           "imports": {},
@@ -52,7 +53,7 @@
               "devDependency": false,
               "location": {
                 "file": "@@//:MODULE.bazel",
-                "line": 22,
+                "line": 23,
                 "column": 17
               }
             }
@@ -66,7 +67,7 @@
           "usingModule": "<root>",
           "location": {
             "file": "@@//:MODULE.bazel",
-            "line": 26,
+            "line": 27,
             "column": 20
           },
           "imports": {
@@ -80,7 +81,7 @@
               "devDependency": false,
               "location": {
                 "file": "@@//:MODULE.bazel",
-                "line": 27,
+                "line": 28,
                 "column": 10
               }
             }
@@ -94,7 +95,7 @@
           "usingModule": "<root>",
           "location": {
             "file": "@@//:MODULE.bazel",
-            "line": 35,
+            "line": 36,
             "column": 29
           },
           "imports": {
@@ -110,7 +111,7 @@
               "devDependency": false,
               "location": {
                 "file": "@@//:MODULE.bazel",
-                "line": 36,
+                "line": 37,
                 "column": 23
               }
             },
@@ -120,7 +121,7 @@
               "devDependency": false,
               "location": {
                 "file": "@@//:MODULE.bazel",
-                "line": 44,
+                "line": 45,
                 "column": 23
               }
             },
@@ -130,7 +131,7 @@
               "devDependency": false,
               "location": {
                 "file": "@@//:MODULE.bazel",
-                "line": 51,
+                "line": 52,
                 "column": 23
               }
             }
@@ -147,6 +148,7 @@
         "bzd_rules_doc": "bzd_rules_doc@_",
         "bzd_toolchain_cc": "bzd_toolchain_cc@_",
         "bzd_platforms": "bzd_platforms@_",
+        "bzd_sanitizer": "bzd_sanitizer@_",
         "bazel_skylib": "bazel_skylib@1.4.2",
         "stardoc": "stardoc@0.5.6",
         "bzd_bundle": "bzd_bundle@_",
@@ -436,6 +438,51 @@
         "bazel_tools": "bazel_tools@_",
         "local_config_platform": "local_config_platform@_",
         "platforms": "platforms@0.0.6"
+      }
+    },
+    "bzd_sanitizer@_": {
+      "name": "bzd_sanitizer",
+      "version": "1.0",
+      "key": "bzd_sanitizer@_",
+      "repoName": "bzd_sanitizer",
+      "executionPlatformsToRegister": [],
+      "toolchainsToRegister": [],
+      "extensionUsages": [
+        {
+          "extensionBzlFile": "@rules_python//python/extensions:pip.bzl",
+          "extensionName": "pip",
+          "usingModule": "bzd_sanitizer@_",
+          "location": {
+            "file": "@@bzd_sanitizer~override//:MODULE.bazel",
+            "line": 7,
+            "column": 20
+          },
+          "imports": {
+            "bzd_sanitizer_pip": "bzd_sanitizer_pip"
+          },
+          "devImports": [],
+          "tags": [
+            {
+              "tagName": "parse",
+              "attributeValues": {"hub_name":"--bzd_sanitizer_pip","requirements_lock":"--@bzd_sanitizer_pip//:requirements.txt"},
+              "devDependency": false,
+              "location": {
+                "file": "@@bzd_sanitizer~override//:MODULE.bazel",
+                "line": 8,
+                "column": 10
+              }
+            }
+          ],
+          "hasDevUseExtension": false,
+          "hasNonDevUseExtension": true
+        }
+      ],
+      "deps": {
+        "bazel_tools": "bazel_tools@_",
+        "local_config_platform": "local_config_platform@_",
+        "bzd_utils": "bzd_utils@_",
+        "rules_python": "rules_python@0.24.0",
+        "bzd_python": "bzd_python@_"
       }
     },
     "bazel_skylib@1.4.2": {

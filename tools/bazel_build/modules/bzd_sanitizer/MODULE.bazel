@@ -1,0 +1,12 @@
+module(name = "bzd_sanitizer", version = "1.0")
+
+bazel_dep(name = "bzd_utils", version = "1.0")
+bazel_dep(name = "rules_python", version = "0.24.0")
+bazel_dep(name = "bzd_python", version = "1.0")
+
+pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
+pip.parse(
+    hub_name = "bzd_sanitizer_pip",
+    requirements_lock = "@bzd_sanitizer_pip//:requirements.txt",
+)
+use_repo(pip, "bzd_sanitizer_pip")
