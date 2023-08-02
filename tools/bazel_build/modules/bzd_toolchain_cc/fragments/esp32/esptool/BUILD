@@ -10,8 +10,7 @@ filegroup(
     name = "esp32_bin",
     srcs = glob([
         "bin/esp32/*",
-        "qemu/.gdbinit",
-    ]),
+    ]) + ["qemu/.gdbinit"],
 )
 
 py_library(

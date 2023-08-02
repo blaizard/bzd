@@ -23,7 +23,7 @@ bzd_nodejs_docker(
     },
     include_metadata = True,
     deps = {
-        "//apps/dashboard/frontend": "frontend",
         "//apps/dashboard/backend": "backend",
+        "//apps/dashboard/frontend": "frontend",
     },
 )

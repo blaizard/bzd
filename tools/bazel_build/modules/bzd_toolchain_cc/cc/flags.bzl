@@ -1,3 +1,5 @@
+"""CC flags."""
+
 _COPTS_COMMON = [
     # Warnings.
     "-Wall",

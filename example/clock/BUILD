@@ -1,5 +1,5 @@
-load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_binary")
 load("//tools/bazel_build/rules:bdl.bzl", "bdl_library")
+load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_binary")
 
 bdl_library(
     name = "composition",

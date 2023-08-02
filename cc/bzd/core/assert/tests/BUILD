@@ -6,8 +6,8 @@ load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_test")
         path,
     ],
     target_compatible_with = select({
-        "@gcc//:toolchain": [],
         "@clang//:toolchain": [],
+        "@gcc//:toolchain": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
     deps = [

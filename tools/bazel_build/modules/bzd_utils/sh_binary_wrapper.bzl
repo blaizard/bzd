@@ -1,3 +1,5 @@
+"""Bash binary rules."""
+
 def _update_runfiles(ctx, runfiles, binary):
     """Update the current runfiles and return the executable."""
 
@@ -15,6 +17,24 @@ def _executable_to_path(ctx, executable):
     return "$RUNFILES_DIR/{}".format(runfiles_relative_tool_path)
 
 def sh_binary_wrapper_impl(ctx, output, binary = None, locations = {}, extra_runfiles = [], expand_targets = [], symlinks = {}, root_symlinks = {}, files = None, command = "{binary} $@"):
+    """Bash binary wrapper rule.
+
+    Args:
+        ctx: The rule context.
+        output: The output file to be generated.
+        binary: The binary file.
+        locations: dictionary of locations to be expanded.
+        extra_runfiles: Additional runfiles to be added.
+        expand_targets: Targets to be expanded.
+        symlinks: Symbolic links to be added.
+        root_symlinks: Symbolic links to be added to the root.
+        files: Files to be added in the runfiles.
+        command: The command to be used.
+
+    Returns:
+        A DefaultInfo provider pointing to the new binary rule.
+    """
+
     # Prepare the runfiles for the execution
     runfiles = ctx.runfiles(
         files = extra_runfiles,
@@ -72,10 +92,8 @@ def _sh_binary_wrapper_impl(ctx):
         command = ctx.attr.command,
     )
 
-"""Binary wrapper rule. Wraps a bazel executable into this rule
-and decorates it with custom arguments or wrapping script.
-"""
 sh_binary_wrapper = rule(
+    doc = "Binary wrapper rule. Wraps a bazel executable into this rule and decorates it with custom arguments or wrapping script.",
     implementation = _sh_binary_wrapper_impl,
     attrs = {
         "binary": attr.label(
@@ -84,11 +102,6 @@ sh_binary_wrapper = rule(
             cfg = "exec",
             doc = "Label or file of the binary to be wrapped.",
         ),
-        "locations": attr.label_keyed_string_dict(
-            allow_files = True,
-            cfg = "exec",
-            doc = "Executables or files to add to the runfiles and that can be accessed via their associated string.",
-        ),
         "command": attr.string(
             default = "{binary} $@",
             doc = "Content of the wrapping script, by default it simply forwards all command line arguments to the binary.",
@@ -96,8 +109,13 @@ sh_binary_wrapper = rule(
         "data": attr.label_list(
             allow_files = True,
         ),
-        "symlinks": attr.label_keyed_string_dict(),
+        "locations": attr.label_keyed_string_dict(
+            allow_files = True,
+            cfg = "exec",
+            doc = "Executables or files to add to the runfiles and that can be accessed via their associated string.",
+        ),
         "root_symlinks": attr.label_keyed_string_dict(),
+        "symlinks": attr.label_keyed_string_dict(),
     },
     executable = True,
 )

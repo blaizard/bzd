@@ -1,3 +1,5 @@
+"""Rule for running multiple targets."""
+
 def _multi_run_impl(ctx):
     runfiles = ctx.runfiles(files = [])
     executables = []

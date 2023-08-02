@@ -1,5 +1,5 @@
-load("@rules_cc//cc:defs.bzl", "cc_library")
 load("@bzd_rules_doc//doc:defs.bzl", "doc_library")
+load("@rules_cc//cc:defs.bzl", "cc_library")
 
 doc_library(
     name = "documentation",

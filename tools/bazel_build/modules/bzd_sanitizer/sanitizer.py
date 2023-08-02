@@ -6,7 +6,7 @@ import typing
 import time
 
 from bzd.utils.run import localCommand
-from context import Context
+from lib.context import Context
 
 
 def getFileList(workspace: pathlib.Path, path: pathlib.Path, all: bool) -> typing.List[str]:
@@ -16,14 +16,15 @@ def getFileList(workspace: pathlib.Path, path: pathlib.Path, all: bool) -> typin
 		result = localCommand(["git", "ls-files", path], cwd=workspace)
 	else:
 		result = localCommand(["git", "ls-files", "--other", "--modified", "--exclude-standard", path], cwd=workspace)
-	fileList = list(filter(len, result.getStdout().split("\n")))
+	fileList = list(result.getStdout().split("\n"))
 
 	# If there are no files, try a diff with the last commit.
 	if len(fileList) == 0:
 		result = localCommand(["git", "diff", "--name-only", "--diff-filter=ACMRU", "HEAD~1", path], cwd=workspace)
-		fileList = list(filter(lambda x: (workspace / x).is_file(), result.getStdout().split("\n")))
+		fileList = list(result.getStdout().split("\n"))
 
-	return fileList
+	# Only keep existing files.
+	return [f for f in fileList if (workspace / f).is_file()]
 
 
 if __name__ == "__main__":
@@ -32,6 +33,7 @@ if __name__ == "__main__":
 	parser.add_argument("-u", "--use", type=str, action="append", default=[], help="Actions to be used.")
 	parser.add_argument("-a", "--all", action="store_true", help="Sanitize all files in the workspace.")
 	parser.add_argument("-c", "--check", action="store_true", help="Only check if the files need to be sanitized.")
+	parser.add_argument("-n", "--no-colors", action="store_true", help="If set, the output will have colors.")
 	parser.add_argument("-w",
 	                    "--workspace",
 	                    type=pathlib.Path,
@@ -47,26 +49,42 @@ if __name__ == "__main__":
 		sys.exit(0)
 
 	contextFilePath = args.workspace / ".sanitizer~"
-	context = Context(workspace=args.workspace, fileList=fileList)
+	context = Context(workspace=args.workspace, fileList=fileList, check=args.check, colors=not args.no_colors)
 	context.toFile(path=contextFilePath)
-
-	if args.check:
-		message = "Checking"
-	else:
-		message = "Sanitizing"
 
 	success = True
 	try:
-		print(f"{message} {context.size()} file(s) in {args.workspace / args.path}:")
+
+		print(
+		    f"{'Checking' if context.check else 'Sanitizing'} {context.size()} file(s) in {args.workspace / args.path}:"
+		)
 		for action in args.use:
-			print(f"\t- {action}...", end="", flush=True)
+
+			printActionContext = context.printAction(action)
 			startTime = time.monotonic()
 
-			status = "PASSED" if result.getReturnCode() == 0 else "FAILED"
+			result = localCommand([
+			    os.environ.get("BAZEL_REAL", "bazel"), "run", "--ui_event_filters=-info,-stdout,-stderr",
+			    "--noshow_progress", action, "--",
+			    str(contextFilePath)
+			],
+			                      ignoreFailure=True,
+			                      timeoutS=600,
+			                      cwd=args.workspace)
+
+			passed = (result.getReturnCode() == 0)
 			elapsedTime = time.monotonic() - startTime
-			print(f" {status} ({elapsedTime:.1f}s)")
+			printActionContext.printStatus(passed, elapsedTime)
+
+			if not passed:
+				context.printSection(title="ERROR", level=1)
+				print(result.getOutput(), end="")
+				context.printSection(title="COMMAND", level=1)
+				print(f"{context.color('command')}bazel run {action} -- {contextFilePath}{context.color()}")
+				success = False
 
 	finally:
-		contextFilePath.unlink()
+		if success:
+			contextFilePath.unlink()
 
 	sys.exit(0 if success else 1)

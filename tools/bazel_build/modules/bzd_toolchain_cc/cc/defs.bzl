@@ -1,11 +1,18 @@
+"""CC compilation helpers."""
+
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 
 _CC_SRCS_EXTENSIONS = (".c", ".cc", ".cpp", ".cxx", ".c++", ".C")
 _CC_HDRS_EXTENSIONS = (".h", ".hh", ".hpp", ".hxx", ".inc", ".inl", ".H")
 
 def _cc_config(ctx):
-    """
-    Helper function to gather toolchain and feature config
+    """Helper function to gather toolchain and feature config.
+
+    Args:
+        ctx: The rule context.
+
+    Returns:
+        The cc_toolchain and feature_configuration
     """
 
     cc_toolchain = find_cpp_toolchain(ctx)
@@ -18,8 +25,17 @@ def _cc_config(ctx):
     return cc_toolchain, feature_configuration
 
 def _cc_compile(ctx, name, hdrs = [], srcs = [], deps = []):
-    """
-    Compile header, source and dependencies and return internal artifacts.
+    """Compile header, source and dependencies and return internal artifacts.
+
+    Args:
+        ctx: The rule context.
+        name: The name of the target.
+        hdrs: The header files.
+        srcs: The source files.
+        deps: The dependendies.
+
+    Returns:
+        The compilation_context, cc_outputs and cc_infos.
     """
 
     cc_toolchain, feature_configuration = _cc_config(ctx)
@@ -39,8 +55,17 @@ def _cc_compile(ctx, name, hdrs = [], srcs = [], deps = []):
     return compilation_context, cc_outputs, cc_infos
 
 def cc_compile(ctx, name = None, hdrs = [], srcs = [], deps = []):
-    """
-    Compile header, source and dependencies and return a CcInfo.
+    """Compile header, source and dependencies and return a CcInfo.
+
+    Args:
+        ctx: The rule context.
+        name: The name of the target.
+        hdrs: The header files.
+        srcs: The source files.
+        deps: The dependendies.
+
+    Returns:
+        The CcInfo provider.
     """
 
     if name == None:
@@ -61,15 +86,25 @@ def cc_compile(ctx, name = None, hdrs = [], srcs = [], deps = []):
     return CcInfo(compilation_context = compilation_context, linking_context = linking_context)
 
 def cc_link(ctx, name = None, hdrs = [], srcs = [], deps = [], map_analyzer = None):
-    """
-    Compile and link.
+    """Compile and link.
+
+    Args:
+        ctx: The rule context.
+        name: The name of the target.
+        hdrs: The header files.
+        srcs: The source files.
+        deps: The dependendies.
+        map_analyzer: The map analyzer binary.
+
+    Returns:
+        The binary file and metadata files.
     """
 
     if name == None:
         name = ctx.attr.name
 
     cc_toolchain, feature_configuration = _cc_config(ctx)
-    compilation_context, cc_outputs, cc_infos = _cc_compile(ctx, name, hdrs, srcs, deps)
+    _compilation_context, cc_outputs, cc_infos = _cc_compile(ctx, name, hdrs, srcs, deps)
 
     map_file = ctx.actions.declare_file("{}.map".format(name))
     linking_outputs = cc_common.link(

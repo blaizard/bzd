@@ -1,26 +1,28 @@
-load("@bzd_toolchain_cc//cc:defs.bzl", "cc_compile", "cc_link")
+"""BDL rules."""
+
 load("@bazel_skylib//lib:sets.bzl", "sets")
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
+load("@bzd_toolchain_cc//cc:defs.bzl", "cc_compile", "cc_link")
 load("@bzd_utils//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
-load("//tools/bazel_build/rules:package.bzl", "BzdPackageFragment", "BzdPackageMetadataFragment")
+load("//tools/bazel_build/rules:package.bzl", "BzdPackageFragmentInfo", "BzdPackageMetadataFragmentInfo")
 
 # ---- Providers ----
 
-_BdlTagProvider = provider(
+_BdlTagInfo = provider(
     doc = "Empty provider to identify a BDL library.",
     fields = [],
 )
 
-_BdlProvider = provider(
+_BdlInfo = provider(
     doc = "Provider for bdl files.",
     fields = {
-        "sources": "Pair of input and preprocessed bdl files.",
         "files": "All files, containts the same set of files as in `sources`, but uses a different format for convenience.",
         "search_formats": "Set of search formats string to locate the preprocessed object files.",
+        "sources": "Pair of input and preprocessed bdl files.",
     },
 )
 
-_BdlTargetProvider = provider(
+_BdlTargetInfo = provider(
     doc = "Provider for a target.",
     fields = {
         "composition": "List of composition files for this target.",
@@ -29,22 +31,22 @@ _BdlTargetProvider = provider(
     },
 )
 
-_BdlSystemProvider = provider(
+_BdlSystemInfo = provider(
     doc = "Provider for a system rule.",
     fields = {
-        "cc": "A set of _BdlCcProvider keyed by target names.",
+        "cc": "A set of _BdlCcInfo keyed by target names.",
     },
 )
 
-_BdlCcProvider = provider(
+_BdlCcInfo = provider(
     doc = "Files used to commpile a CC binary.",
     fields = {
-        "srcs": "Source files.",
         "deps": "Dependencies.",
+        "srcs": "Source files.",
     },
 )
 
-_BdlCcCompositionProvider = provider(
+_BdlCcCompositionInfo = provider(
     doc = "Provider to gather public header files from cc rules.",
     fields = {
         "hdrs": "list of public header files.",
@@ -66,18 +68,18 @@ def _aspect_bdl_providers_impl(target, ctx):
     # Are considered composition public headers when the target is not a BDL library but has a bdl library as a diret dependency.
     # Then it means it relies on a BDL interface.
     cc_hdrs = []
-    if _BdlTagProvider not in target:
-        if any([dep for dep in ctx.rule.attr.deps if _BdlTagProvider in dep]):
+    if _BdlTagInfo not in target:
+        if any([dep for dep in ctx.rule.attr.deps if _BdlTagInfo in dep]):
             cc_hdrs = _get_cc_public_header(target)
 
-    cc_composition_provider = _BdlCcCompositionProvider(hdrs = depset(cc_hdrs, transitive = [dep[_BdlCcCompositionProvider].hdrs for dep in ctx.rule.attr.deps if _BdlCcCompositionProvider in dep]))
+    cc_composition_provider = _BdlCcCompositionInfo(hdrs = depset(cc_hdrs, transitive = [dep[_BdlCcCompositionInfo].hdrs for dep in ctx.rule.attr.deps if _BdlCcCompositionInfo in dep]))
 
-    if _BdlProvider not in target:
+    if _BdlInfo not in target:
         return [
-            _BdlProvider(
-                sources = depset(transitive = [dep[_BdlProvider].sources for dep in ctx.rule.attr.deps if _BdlProvider in dep]),
-                files = depset(transitive = [dep[_BdlProvider].files for dep in ctx.rule.attr.deps if _BdlProvider in dep]),
-                search_formats = sets.to_list(sets.make([d for dep in ctx.rule.attr.deps if _BdlProvider in dep for d in dep[_BdlProvider].search_formats])),
+            _BdlInfo(
+                sources = depset(transitive = [dep[_BdlInfo].sources for dep in ctx.rule.attr.deps if _BdlInfo in dep]),
+                files = depset(transitive = [dep[_BdlInfo].files for dep in ctx.rule.attr.deps if _BdlInfo in dep]),
+                search_formats = sets.to_list(sets.make([d for dep in ctx.rule.attr.deps if _BdlInfo in dep for d in dep[_BdlInfo].search_formats])),
             ),
             cc_composition_provider,
         ]
@@ -91,8 +93,7 @@ _aspect_bdl_providers = aspect(
 
 # ---- Transisitions ----
 
-def _transition_platform_impl(settings, attr):
-    _ignore = settings
+def _transition_platform_impl(_settings, attr):
     if not hasattr(attr, "platform"):
         fail("This rule does not contain a valid platform attribute.")
     if not attr.platform:
@@ -153,16 +154,16 @@ def _precompile_bdl(ctx, srcs, deps, output_dir = None, namespace = None):
     Args:
         ctx: The context used for this action.
         srcs: The set of bdls to be precompiled.
-        deps: The dependencies associated with these bdls, must have a `_BdlProvider`.
+        deps: The dependencies associated with these bdls, must have a `_BdlInfo`.
         output_dir: The output directory where the precompiled objects show be stored,
                     if not specified, it will be stored in the same directory as the source file.
         namespace: The namespace in which the bdls files should be compiled.
     """
 
     # Input files and bdls
-    input_sources = depset(transitive = [dep[_BdlProvider].sources for dep in deps])
-    input_files = depset(srcs, transitive = [dep[_BdlProvider].files for dep in deps])
-    search_formats = sets.make([d for dep in deps for d in dep[_BdlProvider].search_formats])
+    input_sources = depset(transitive = [dep[_BdlInfo].sources for dep in deps])
+    input_files = depset(srcs, transitive = [dep[_BdlInfo].files for dep in deps])
+    search_formats = sets.make([d for dep in deps for d in dep[_BdlInfo].search_formats])
 
     # Output files
     metadata = []
@@ -181,8 +182,8 @@ def _precompile_bdl(ctx, srcs, deps, output_dir = None, namespace = None):
 
         # Build the object
         metadata.append({
-            "output": output,
             "input": input_file,
+            "output": output,
             "relative_name": relative_name,
         })
 
@@ -209,7 +210,7 @@ def _precompile_bdl(ctx, srcs, deps, output_dir = None, namespace = None):
     sources = depset([(bdl["input"], bdl["output"]) for bdl in metadata], transitive = [input_sources])
     files = depset([bdl["output"] for bdl in metadata], transitive = [input_files])
 
-    return _BdlProvider(sources = sources, files = files, search_formats = search_formats), metadata
+    return _BdlInfo(sources = sources, files = files, search_formats = search_formats), metadata
 
 def _bdl_library_impl(ctx):
     _FORMATS = {
@@ -268,7 +269,7 @@ def _bdl_library_impl(ctx):
 
     return [
         bdl_provider,
-        _BdlTagProvider(),
+        _BdlTagInfo(),
         cc_info_provider,
     ]
 
@@ -279,26 +280,26 @@ bdl_library = rule(
     The files are generated at the same path of the target, with the name of the target appended with a language specific file extension.
     """,
     attrs = {
+        "deps": attr.label_list(
+            providers = [_BdlInfo, CcInfo],
+            aspects = [_aspect_bdl_providers],
+            doc = "List of bdl dependencies. Language specific dependencies will have their public interface included in the generated file.",
+        ),
         "srcs": attr.label_list(
             mandatory = True,
             allow_files = [".bdl"],
             doc = "List of Bzd Description Language (bdl) files to be included.",
-        ),
-        "deps": attr.label_list(
-            providers = [_BdlProvider, CcInfo],
-            aspects = [_aspect_bdl_providers],
-            doc = "List of bdl dependencies. Language specific dependencies will have their public interface included in the generated file.",
         ),
         "_bdl": attr.label(
             default = Label("//tools/bdl"),
             cfg = "exec",
             executable = True,
         ),
-        "_deps_cc": attr.label_list(
-            default = [Label("//tools/bdl/generators/cc/adapter:types")],
-        ),
         "_cc_toolchain": attr.label(
             default = Label("@rules_cc//cc:current_cc_toolchain"),
+        ),
+        "_deps_cc": attr.label_list(
+            default = [Label("//tools/bdl/generators/cc/adapter:types")],
         ),
     },
     toolchains = [
@@ -313,18 +314,18 @@ def _make_composition_language_providers(ctx, name, deps, target_deps = None, ta
     Args:
         ctx: The context of the action running the composition.
         name: The name of the generated output.
-        deps: The dependencies associated with this action, it shall contain _BdlProvider and lannguage specific providers
+        deps: The dependencies associated with this action, it shall contain _BdlInfo and lannguage specific providers
               such as CcInfo, etc.
         target_deps: Dictionary keyed by target name of the dependencies.
-        target_bdl_providers: Dictionary keyed by target of extra _BdlProvider to be added.
+        target_bdl_providers: Dictionary keyed by target of extra _BdlInfo to be added.
     """
 
     # Set the defaulf value for optional arguments.
     target_deps = target_deps if target_deps else {}
     target_bdl_providers = target_bdl_providers if target_bdl_providers else {}
 
-    # Contains all BDL providers following this schema: List[Pair[_BdlProvider, Optional[target]]]
-    bdl_providers = [(dep[_BdlProvider], None) for dep in deps if _BdlProvider in dep] + [(provider, name) for name, provider in target_bdl_providers.items()]
+    # Contains all BDL providers following this schema: List[Pair[_BdlInfo, Optional[target]]]
+    bdl_providers = [(dep[_BdlInfo], None) for dep in deps if _BdlInfo in dep] + [(provider, name) for name, provider in target_bdl_providers.items()]
 
     # Source list with the following format <path>@<precompiled>@<target> (where @<target> is optional)
     sources = ["{}@{}".format(source[0].path, source[1].path) for provider, target in bdl_providers for source in provider.sources.to_list()]
@@ -347,7 +348,7 @@ def _make_composition_language_providers(ctx, name, deps, target_deps = None, ta
 
     # Create the language specific data file.
     def deps_to_cc_hdrs(deps):
-        return [f for dep in deps if _BdlCcCompositionProvider in dep for f in dep[_BdlCcCompositionProvider].hdrs.to_list()]
+        return [f for dep in deps if _BdlCcCompositionInfo in dep for f in dep[_BdlCcCompositionInfo].hdrs.to_list()]
 
     language_specific_data = _make_bdl_data_file(
         includes_per_target = dict({
@@ -386,7 +387,7 @@ def _make_composition_language_providers(ctx, name, deps, target_deps = None, ta
     cc_providers = {}
     for target, output in outputs.items():
         deps = combined_deps["all"] + ([] if target == "all" else combined_deps.get(target, [])) + ctx.attr._deps_cc
-        cc_providers[target] = _BdlCcProvider(srcs = [output], deps = deps)
+        cc_providers[target] = _BdlCcInfo(srcs = [output], deps = deps)
 
     return cc_providers
 
@@ -471,7 +472,7 @@ def _bdl_system_impl(ctx):
     bdl_providers = {}
     deps = {}
     for name, target in targets.items():
-        target_provider = target[_BdlTargetProvider]
+        target_provider = target[_BdlTargetInfo]
         target_name = "{}.{}".format(ctx.label.name, name)
 
         # Generate the target-specific composition by injecting the new namespace.
@@ -494,7 +495,7 @@ def _bdl_system_impl(ctx):
         target_bdl_providers = bdl_providers,
     )
 
-    return _BdlSystemProvider(
+    return _BdlSystemInfo(
         cc = cc_providers,
     )
 
@@ -502,18 +503,15 @@ _bdl_system = rule(
     implementation = _bdl_system_impl,
     doc = """Generate a system from targets.""",
     attrs = {
-        "targets": attr.label_keyed_string_dict(
-            mandatory = True,
-            providers = [_BdlTargetProvider],
-            doc = "Targets to be included for the system definition.",
-        ),
         "deps": attr.label_list(
             mandatory = True,
             doc = "List of dependencies.",
             aspects = [_aspect_bdl_providers],
         ),
-        "_deps_cc": attr.label_list(
-            default = [Label("//tools/bdl/generators/cc/adapter:context")],
+        "targets": attr.label_keyed_string_dict(
+            mandatory = True,
+            providers = [_BdlTargetInfo],
+            doc = "Targets to be included for the system definition.",
         ),
         "_bdl": attr.label(
             default = Label("//tools/bdl"),
@@ -523,12 +521,15 @@ _bdl_system = rule(
         "_cc_toolchain": attr.label(
             default = Label("@rules_cc//cc:current_cc_toolchain"),
         ),
+        "_deps_cc": attr.label_list(
+            default = [Label("//tools/bdl/generators/cc/adapter:context")],
+        ),
     },
 )
 
 def _bdl_binary_impl(ctx):
-    target_provider = ctx.attr.target[_BdlTargetProvider]
-    system = ctx.attr.system[_BdlSystemProvider]
+    target_provider = ctx.attr.target[_BdlTargetInfo]
+    system = ctx.attr.system[_BdlSystemInfo]
     name = ctx.label.name
 
     # C++
@@ -552,10 +553,10 @@ def _bdl_binary_impl(ctx):
 
     return [
         default_info,
-        BzdPackageFragment(
+        BzdPackageFragmentInfo(
             files = binaries,
         ),
-        BzdPackageMetadataFragment(
+        BzdPackageMetadataFragmentInfo(
             manifests = metadata_files + metadata + build_metadata + execution_metadata,
         ),
         OutputGroupInfo(metadata = metadata_files + metadata + build_metadata + execution_metadata),
@@ -570,39 +571,39 @@ def _bzd_binary_generic(is_test):
                 default = None,
                 doc = "The platform used for the transition of this rule.",
             ),
+            "system": attr.label(
+                mandatory = True,
+                doc = "The system rule associated with this target.",
+                providers = [_BdlSystemInfo],
+            ),
             "target": attr.label(
                 mandatory = True,
                 doc = "The target label for this binary.",
-                providers = [_BdlTargetProvider],
+                providers = [_BdlTargetInfo],
             ),
             "target_name": attr.string(
                 mandatory = True,
                 doc = "The name of the target.",
             ),
-            "system": attr.label(
-                mandatory = True,
-                doc = "The system rule associated with this target.",
-                providers = [_BdlSystemProvider],
-            ),
             "_allowlist_function_transition": attr.label(
                 default = "@bazel_tools//tools/allowlists/function_transition_allowlist",
-            ),
-            "_map_analyzer_script": attr.label(
-                executable = True,
-                cfg = "exec",
-                default = Label("@bzd_toolchain_cc//binary/map_analyzer"),
-            ),
-            "_executor": attr.label(
-                default = "//tools/bazel_build/settings/executor",
-            ),
-            "_debug": attr.label(
-                default = "//tools/bazel_build/settings/debug",
             ),
             "_cc_metadata": attr.label_list(
                 default = [
                     Label("//tools/bazel_build/rules/assets/cc:metadata_json"),
                 ],
                 allow_files = True,
+            ),
+            "_debug": attr.label(
+                default = "//tools/bazel_build/settings/debug",
+            ),
+            "_executor": attr.label(
+                default = "//tools/bazel_build/settings/executor",
+            ),
+            "_map_analyzer_script": attr.label(
+                executable = True,
+                cfg = "exec",
+                default = Label("@bzd_toolchain_cc//binary/map_analyzer"),
             ),
         },
         toolchains = [
@@ -624,8 +625,13 @@ def _bdl_system_generic(is_test, name, targets, testonly, deps, **kwargs):
     A system rule create a composition and build all related binary together.
 
     Args:
-        target: a dictionary with name and target corresponding to the binaries
+        is_test: If this is a test or not.
+        name: The name of the system.
+        targets: a dictionary with name and target corresponding to the binaries
                 for this system.
+        testonly: Set testonly attribute.
+        deps: Dependencies for the rule.
+        **kwargs: Additional attributes to pass to the rule.
     """
 
     def _target_to_platform(target):
@@ -669,7 +675,7 @@ def bdl_system_test(name, targets, deps = None, testonly = True, **kwargs):
     _bdl_system_generic(is_test = True, name = name, targets = targets, deps = deps, testonly = True if testonly == None else testonly, **kwargs)
 
 def _bdl_target_impl(ctx):
-    return _BdlTargetProvider(
+    return _BdlTargetInfo(
         composition = ctx.files.composition,
         deps = ctx.attr.deps,
         language = ctx.attr.language,
@@ -679,11 +685,6 @@ _bdl_target = rule(
     implementation = _bdl_target_impl,
     doc = """Target definition for the bzd framework.""",
     attrs = {
-        "language": attr.string(
-            mandatory = True,
-            doc = "Compilation language for this rule.",
-            values = ["cc"],
-        ),
         "composition": attr.label_list(
             mandatory = True,
             allow_files = [".bdl"],
@@ -692,6 +693,11 @@ _bdl_target = rule(
         "deps": attr.label_list(
             doc = "List of dependencies.",
             aspects = [_aspect_bdl_providers],
+        ),
+        "language": attr.string(
+            mandatory = True,
+            doc = "Compilation language for this rule.",
+            values = ["cc"],
         ),
     },
 )
@@ -705,20 +711,20 @@ def bdl_target(name, **kwargs):
     )
 
 def _bdl_target_platform_impl(ctx):
-    return ctx.attr.target[_BdlTargetProvider]
+    return ctx.attr.target[_BdlTargetInfo]
 
 _bdl_target_platform = rule(
     implementation = _bdl_target_platform_impl,
     doc = """Target definition specialized for a specific platform for the bzd framework.""",
     attrs = {
-        "target": attr.label(
-            mandatory = True,
-            providers = [_BdlTargetProvider],
-            doc = "The target associated with this target platform.",
-        ),
         "platform": attr.label(
             mandatory = True,
             doc = "The platform associated with this target platform.",
+        ),
+        "target": attr.label(
+            mandatory = True,
+            providers = [_BdlTargetInfo],
+            doc = "The target associated with this target platform.",
         ),
         "_allowlist_function_transition": attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist",

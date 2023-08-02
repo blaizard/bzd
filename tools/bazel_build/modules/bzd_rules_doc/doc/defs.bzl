@@ -1,25 +1,27 @@
+"""Rules for documentation."""
+
 load("@bzd_utils//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
 
-_DocumentationProvider = provider(
+_DocumentationInfo = provider(
     doc = "Provider for documentation entities.",
     fields = {
-        "markdowns": "The markdown files associated with this documentation.",
         "data": "The data files associated with this documentation.",
+        "markdowns": "The markdown files associated with this documentation.",
         "navigation": "The navigation map.",
     },
 )
 
 _COMMON_ATTRS = {
+    "data": attr.label_list(
+        doc = "Extra files used in the documentation.",
+        allow_files = True,
+    ),
     "srcs": attr.label_list(
         doc = "Source files associated with this documentation",
         allow_files = True,
     ),
     "titles": attr.string_list(
         doc = "Titles associated with each source file.",
-    ),
-    "data": attr.label_list(
-        doc = "Extra files used in the documentation.",
-        allow_files = True,
     ),
     "_preprocessor": attr.label(
         executable = True,
@@ -67,14 +69,14 @@ def _doc_library_impl(ctx):
     for index in range(0, len(ctx.attr.srcs)):
         name = ctx.attr.titles[index]
         src = ctx.attr.srcs[index]
-        if _DocumentationProvider in src:
+        if _DocumentationInfo in src:
             if not name:
                 name = src.label.name
             if name == "**":
-                navigation.extend(src[_DocumentationProvider].navigation)
+                navigation.extend(src[_DocumentationInfo].navigation)
             else:
-                navigation.append((name, src[_DocumentationProvider].navigation))
-            providers.append(src[_DocumentationProvider])
+                navigation.append((name, src[_DocumentationInfo].navigation))
+            providers.append(src[_DocumentationInfo])
         elif src.files:
             for f in src.files.to_list():
                 if not name:
@@ -94,7 +96,7 @@ def _doc_library_impl(ctx):
     data = depset(data, transitive = [p.data for p in providers])
     markdowns = depset(markdowns, transitive = [p.markdowns for p in providers])
 
-    return _DocumentationProvider(markdowns = markdowns, data = data, navigation = navigation)
+    return _DocumentationInfo(markdowns = markdowns, data = data, navigation = navigation)
 
 _doc_library = rule(
     implementation = _doc_library_impl,
@@ -167,6 +169,7 @@ def doc_library(srcs = None, data = None, **kwargs):
     Args:
         srcs: A list of pair `title`/`source` or simply `source` associated with this documentation unit.
         data: Additional data that are needed for the documentation.
+        **kwargs: Additional arguments to be passed to the rule.
     """
     _doc_library(
         srcs = [_get_title_source_pair(item)[1] for item in srcs],
@@ -184,6 +187,7 @@ def doc_binary(srcs = None, data = None, **kwargs):
     Args:
         srcs: A list of pair `title`/`source` or simply `source` associated with this documentation unit.
         data: Additional data that are needed for the documentation.
+        **kwargs: Additional arguments to be passed to the rule.
     """
     _doc_binary(
         srcs = [_get_title_source_pair(item)[1] for item in srcs],

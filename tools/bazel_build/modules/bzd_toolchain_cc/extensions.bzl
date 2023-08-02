@@ -1,3 +1,5 @@
+"""Module extension for CC toolchains."""
+
 load("@bzd_platforms//:defs.bzl", "constraints_from_platform")
 load("@bzd_toolchain_cc//:fragments/clang/defs.bzl", "clang")
 load("@bzd_toolchain_cc//:fragments/esp32/defs.bzl", "esp32")
@@ -138,10 +140,10 @@ config_setting(
 toolchain_repository = repository_rule(
     implementation = _toolchain_repository_impl,
     attrs = {
-        "repo_name": attr.string(mandatory = True),
-        "version": attr.string(values = _repositories.keys(), mandatory = True),
         "default": attr.bool(mandatory = True),
         "extra": attr.string(),
+        "repo_name": attr.string(mandatory = True),
+        "version": attr.string(values = _repositories.keys(), mandatory = True),
     },
 )
 
@@ -199,9 +201,9 @@ toolchain_cc = module_extension(
     tag_classes = {
         "toolchain": tag_class(
             attrs = {
+                "default": attr.bool(default = False),
                 "name": attr.string(mandatory = True),
                 "version": attr.string(values = _repositories.keys(), mandatory = True),
-                "default": attr.bool(default = False),
             },
         ),
     },

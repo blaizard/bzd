@@ -1,5 +1,5 @@
-load("//tools/bazel_build/rules:nodejs.bzl", "bzd_nodejs_library")
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+load("//tools/bazel_build/rules:nodejs.bzl", "bzd_nodejs_library")
 
 exports_files([
     "nodejs.bzl",
@@ -24,8 +24,8 @@ bzl_library(
 bzd_nodejs_library(
     name = "mocha",
     packages = {
-        "mocha": "",
         "c8": "",
+        "mocha": "",
     },
     visibility = ["//visibility:public"],
 )

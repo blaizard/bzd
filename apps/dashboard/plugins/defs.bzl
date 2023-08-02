@@ -1,12 +1,14 @@
+"""Plugins helper for the dashboard."""
+
 load("//tools/bazel_build/rules:nodejs.bzl", "bzd_nodejs_library")
 
 PluginInfo = provider(
     doc = "Provider for plugins",
     fields = {
-        "name": "Name of the plugin",
-        "metadata": "metadata information",
-        "entry_point": "entry point",
         "deps": "dependencies",
+        "entry_point": "entry point",
+        "metadata": "metadata information",
+        "name": "Name of the plugin",
     },
 )
 
@@ -16,17 +18,17 @@ def _bzd_plugin_impl(ctx):
 _bzd_plugin = rule(
     implementation = _bzd_plugin_impl,
     attrs = {
-        "plugin_name": attr.string(
-            mandatory = True,
+        "deps": attr.label(),
+        "entry_point": attr.label(
+            allow_single_file = True,
         ),
         "metadata": attr.label(
             allow_single_file = True,
             mandatory = True,
         ),
-        "entry_point": attr.label(
-            allow_single_file = True,
+        "plugin_name": attr.string(
+            mandatory = True,
         ),
-        "deps": attr.label(),
     },
 )
 
@@ -110,6 +112,13 @@ _bzd_plugins_gen_index = rule(
 )
 
 def bzd_plugins(name, plugins):
+    """Plugins herlper.
+
+    Args:
+        name: The name of the plugin collection.
+        plugins: The plugins.
+    """
+
     plugins_normalized = [str(Label(plugin)) for plugin in plugins]
 
     _bzd_plugins_gen_index(

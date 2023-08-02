@@ -18,9 +18,9 @@ py_library(
         "entities/**/*.py",
         "visitors/**/*.py",
     ]) + [
-        "visitor.py",
-        "object.py",
         "builtins.py",
+        "object.py",
+        "visitor.py",
     ],
     visibility = [":__subpackages__"],
     deps = [

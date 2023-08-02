@@ -1,6 +1,8 @@
+"""Rules for yarn."""
+
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-def load_linux_x86_64_yarn():
+def load_linux_x86_64_yarn(name = "unused"):
     http_archive(
         name = "yarn",
         build_file = "//toolchains/nodejs/linux_x86_64_yarn:yarn.BUILD",

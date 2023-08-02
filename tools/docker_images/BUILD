@@ -1,5 +1,5 @@
-load("//tools/docker_images:register.bzl", "IMAGES", "docker_images_config")
 load("//tools/bazel_build/rules:docker.bzl", "bzd_docker_load")
+load("//tools/docker_images:register.bzl", "IMAGES", "docker_images_config")
 
 # Pre-load images into docker.
 [bzd_docker_load(

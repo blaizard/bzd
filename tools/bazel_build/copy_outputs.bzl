@@ -1,3 +1,5 @@
+"""Rule to copy the output."""
+
 def _copy_outputs_impl(ctx):
     ctx.actions.write(
         output = ctx.outputs.executable,

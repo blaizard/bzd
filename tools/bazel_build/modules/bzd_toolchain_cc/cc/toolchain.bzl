@@ -1,5 +1,7 @@
-load("@bzd_toolchain_cc//cc:flags.bzl", "COPTS_CLANG", "COPTS_CLANG_COVERAGE", "COPTS_CLANG_DEV", "COPTS_CLANG_PROD", "COPTS_GCC", "COPTS_GCC_COVERAGE", "COPTS_GCC_DEV", "COPTS_GCC_PROD", "LINKOPTS_CLANG", "LINKOPTS_CLANG_COVERAGE", "LINKOPTS_GCC", "LINKOPTS_GCC_COVERAGE")
+"""CC Toolchains."""
+
 load("@bazel_skylib//lib:sets.bzl", "sets")
+load("@bzd_toolchain_cc//cc:flags.bzl", "COPTS_CLANG", "COPTS_CLANG_COVERAGE", "COPTS_CLANG_DEV", "COPTS_CLANG_PROD", "COPTS_GCC", "COPTS_GCC_COVERAGE", "COPTS_GCC_DEV", "COPTS_GCC_PROD", "LINKOPTS_CLANG", "LINKOPTS_CLANG_COVERAGE", "LINKOPTS_GCC", "LINKOPTS_GCC_COVERAGE")
 
 def _impl(repository_ctx):
     # Create a UID
@@ -21,15 +23,15 @@ def _impl(repository_ctx):
 
     # Set the default values of the binaries
     binaries = {
-        "as": "/usr/bin/false",
         "ar": "/usr/bin/false",
-        "ld": "/usr/bin/false",
+        "as": "/usr/bin/false",
         "cc": "/usr/bin/false",
         "cov": "/usr/bin/false",
         "cpp": "/usr/bin/false",
+        "ld": "/usr/bin/false",
         "nm": "/usr/bin/false",
-        "objdump": "/usr/bin/false",
         "objcopy": "/usr/bin/false",
+        "objdump": "/usr/bin/false",
         "strip": "/usr/bin/false",
     }
     binaries.update(repository_ctx.attr.binaries)
@@ -42,41 +44,41 @@ def _impl(repository_ctx):
     )
 
     build_substitutions = {
-        "%{uid}": uid,
-        "%{loads}": "\n".join(loads),
-        "%{repository_path}": "external/" + repository_ctx.name,
-        "%{cpu}": repository_ctx.attr.cpu,
-        "%{compiler}": repository_ctx.attr.compiler,
+        "%{aliases}": "\n".join([alias_template.format(k, v) for k, v in aliases.items()]),
         "%{ar}": binaries["ar"],
         "%{as}": binaries["as"],
-        "%{cc}": binaries["cc"],
-        "%{cpp}": binaries["cpp"],
-        "%{cov}": binaries["cov"],
-        "%{nm}": binaries["nm"],
-        "%{ld}": binaries["ld"],
-        "%{objcopy}": binaries["objcopy"],
-        "%{objdump}": binaries["objdump"],
-        "%{strip}": binaries["strip"],
+        "%{binary_kwargs}": "\n".join(binary_kwargs),
         "%{builtin_include_directories}": "\n".join(["'{}',".format(t) for t in repository_ctx.attr.builtin_include_directories]),
+        "%{cc}": binaries["cc"],
+        "%{compile_dev_flags}": "\n".join(
+            ["'{}',".format(t) for t in repository_ctx.attr.compile_dev_flags],
+        ),
         "%{compile_flags}": "\n".join(
             ["'-isystem', '{}',".format(t) for t in repository_ctx.attr.system_directories] +
             ["'{}',".format(t) for t in repository_ctx.attr.compile_flags],
         ),
-        "%{compile_dev_flags}": "\n".join(
-            ["'{}',".format(t) for t in repository_ctx.attr.compile_dev_flags],
-        ),
         "%{compile_prod_flags}": "\n".join(
             ["'{}',".format(t) for t in repository_ctx.attr.compile_prod_flags],
         ),
+        "%{compiler}": repository_ctx.attr.compiler,
+        "%{coverage_compile_flags}": "\n".join(["'{}',".format(t) for t in repository_ctx.attr.coverage_compile_flags]),
+        "%{coverage_link_flags}": "\n".join(["'{}',".format(t) for t in repository_ctx.attr.coverage_link_flags]),
+        "%{cov}": binaries["cov"],
+        "%{cpp}": binaries["cpp"],
+        "%{cpu}": repository_ctx.attr.cpu,
+        "%{ld}": binaries["ld"],
         "%{link_flags}": "\n".join(
             ["'-L{}',".format(t) for t in repository_ctx.attr.linker_dirs] +
             ["'{}',".format(t) for t in repository_ctx.attr.link_flags],
         ),
+        "%{loads}": "\n".join(loads),
+        "%{nm}": binaries["nm"],
+        "%{objcopy}": binaries["objcopy"],
+        "%{objdump}": binaries["objdump"],
+        "%{repository_path}": "external/" + repository_ctx.name,
+        "%{strip}": binaries["strip"],
         "%{sysroot}": repository_ctx.attr.sysroot,
-        "%{aliases}": "\n".join([alias_template.format(k, v) for k, v in aliases.items()]),
-        "%{binary_kwargs}": "\n".join(binary_kwargs),
-        "%{coverage_compile_flags}": "\n".join(["'{}',".format(t) for t in repository_ctx.attr.coverage_compile_flags]),
-        "%{coverage_link_flags}": "\n".join(["'{}',".format(t) for t in repository_ctx.attr.coverage_link_flags]),
+        "%{uid}": uid,
     }
 
     # Substitute the BUILD file content.
@@ -101,63 +103,65 @@ def _impl(repository_ctx):
     for patch in repository_ctx.attr.patches:
         repository_ctx.patch(patch)
 
-"""
-Linux specific implementation of the toolchain
-"""
 _toolchain_maker_linux = repository_rule(
+    doc = "Linux specific implementation of the toolchain.",
     implementation = _impl,
     attrs = {
-        "default": attr.bool(default = False, doc = "Make this compiler the default one, it will be automatically selected when no compiler is given."),
-        "cpu": attr.string(default = "unknown"),
-        "compiler": attr.string(default = "unknown"),
-        # Download.
-        "loads": attr.string_list_dict(),
+        # Aliases
+        "aliases": attr.string_dict(),
+        # Execution
+        "app_build": attr.string_list(),
+        "app_executors": attr.string_dict(),
+        "app_metadata": attr.string_list(),
+        # Tools
+        "binaries": attr.string_dict(),
         "build_files": attr.label_list(),
-        "url": attr.string(mandatory = True),
-        "strip_prefix": attr.string(),
-        "sha256": attr.string(),
-        "patches": attr.label_list(allow_files = True),
         # Run-time libraries
         "builtin_include_directories": attr.string_list(),
-        "system_directories": attr.string_list(),
-        "linker_dirs": attr.string_list(),
-        "sysroot": attr.string(),
-        # Flags
-        "link_flags": attr.string_list(),
-        "compile_flags": attr.string_list(),
         "compile_dev_flags": attr.string_list(),
+        "compile_flags": attr.string_list(),
         "compile_prod_flags": attr.string_list(),
+        "compiler": attr.string(default = "unknown"),
         # Coverage
         "coverage_compile_flags": attr.string_list(),
         "coverage_link_flags": attr.string_list(),
-        # Aliases
-        "aliases": attr.string_dict(),
-        # Tools
-        "binaries": attr.string_dict(),
+        "cpu": attr.string(default = "unknown"),
+        "default": attr.bool(default = False, doc = "Make this compiler the default one, it will be automatically selected when no compiler is given."),
+        # Flags
+        "link_flags": attr.string_list(),
+        "linker_dirs": attr.string_list(),
+        # Download.
+        "loads": attr.string_list_dict(),
+        "patches": attr.label_list(allow_files = True),
+        "sha256": attr.string(),
+        "strip_prefix": attr.string(),
+        "sysroot": attr.string(),
+        "system_directories": attr.string_list(),
         "tools": attr.string_dict(),
-        # Execution
-        "app_build": attr.string_list(),
-        "app_metadata": attr.string_list(),
-        "app_executors": attr.string_dict(),
+        "url": attr.string(mandatory = True),
     },
 )
 
-"""
-Creates a toolchain to be used with bazel.
-
-This rule also creates few important assets:
- - A toolchain: "@<id>//:toolchain"
-"""
-
 def toolchain_maker(name, implementation, definition):
+    """Creates a toolchain to be used with bazel.
+
+    This rule also creates few important assets:
+    - A toolchain: "@<id>//:toolchain"
+
+    Args:
+        name: The name of the toolchain.
+        implementation: The implementation type.
+        definition: The definition metadata.
+    """
+
     if implementation == "linux_gcc":
         updated_definition = toolchain_merge({
             "compile_dev_flags": COPTS_GCC_DEV,
-            "compile_prod_flags": COPTS_GCC_PROD,
             "compile_flags": COPTS_GCC,
-            "link_flags": LINKOPTS_GCC,
+            "compile_prod_flags": COPTS_GCC_PROD,
             "coverage_compile_flags": COPTS_GCC_COVERAGE,
             "coverage_link_flags": LINKOPTS_GCC_COVERAGE,
+            "link_flags": LINKOPTS_GCC,
         }, definition)
 
         _toolchain_maker_linux(
@@ -168,11 +172,11 @@ def toolchain_maker(name, implementation, definition):
     elif implementation == "linux_clang":
         updated_definition = toolchain_merge({
             "compile_dev_flags": COPTS_CLANG_DEV,
-            "compile_prod_flags": COPTS_CLANG_PROD,
             "compile_flags": COPTS_CLANG,
-            "link_flags": LINKOPTS_CLANG,
+            "compile_prod_flags": COPTS_CLANG_PROD,
             "coverage_compile_flags": COPTS_CLANG_COVERAGE,
             "coverage_link_flags": LINKOPTS_CLANG_COVERAGE,
+            "link_flags": LINKOPTS_CLANG,
         }, definition)
 
         _toolchain_maker_linux(
@@ -189,7 +193,15 @@ def toolchain_maker(name, implementation, definition):
     #)
 
 def toolchain_merge(data1, data2):
-    """Merge 2 toolchain data entries."""
+    """Merge 2 toolchain data entries into a new one.
+
+    Args:
+        data1: The first data to be merged.
+        data2: The second data to be merged.
+
+    Returns:
+        The merged data.
+    """
 
     # Make a copy of data1 so that it can be mutated
     result = {}

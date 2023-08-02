@@ -3,9 +3,8 @@ load("//tools/bazel_build/rules:nodejs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "client",
     srcs = glob([
-        "client.mjs",
         "client/*.mjs",
-    ]),
+    ]) + ["client.mjs"],
     visibility = ["//visibility:public"],
     deps = [
         "//nodejs:bzd",
@@ -21,13 +20,13 @@ bzd_nodejs_library(
         "server.mjs",
     ],
     packages = {
+        "compression": "",
+        "cookie-parser": "",
         "express": "",
         "express-minify": "",
         "helmet": "",
         "http": "",
-        "compression": "",
         "multer": "",
-        "cookie-parser": "",
     },
     visibility = ["//visibility:public"],
     deps = [

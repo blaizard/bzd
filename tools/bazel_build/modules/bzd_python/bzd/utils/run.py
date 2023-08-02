@@ -2,14 +2,17 @@ import os
 import subprocess
 import sys
 import threading
-from typing import Any, List, Dict, Optional, Tuple
+from typing import Any, List, Dict, Optional, Tuple, TextIO, Union
 from pathlib import Path
 import selectors
 
 
 class _ExecuteResultStreamWriter:
 
-	def __init__(self, stdout: bool = False, stderr: bool = False, maxSize: int = 1000000) -> None:
+	def __init__(self,
+	             stdout: Union[bool, TextIO] = False,
+	             stderr: Union[bool, TextIO] = False,
+	             maxSize: int = 1000000) -> None:
 		self.output: List[Tuple[bool, bytes]] = []
 		self.stdout = stdout
 		self.stderr = stderr
@@ -26,16 +29,18 @@ class _ExecuteResultStreamWriter:
 	def addStdout(self, data: bytes) -> None:
 		if data != b"":
 			self._addBuffer(True, data)
-			if self.stdout:
-				sys.stdout.write(data.decode(errors="ignore"))
-				sys.stdout.flush()
+			if self.stdout is not False:
+				output = sys.stdout if isinstance(self.stdout, bool) else self.stdout
+				output.write(data.decode(errors="ignore"))
+				output.flush()
 
 	def addStderr(self, data: bytes) -> None:
 		if data != b"":
 			self._addBuffer(False, data)
-			if self.stderr:
-				sys.stderr.write(data.decode(errors="ignore"))
-				sys.stderr.flush()
+			if self.stderr is not False:
+				output = sys.stderr if isinstance(self.stderr, bool) else self.stderr
+				output.write(data.decode(errors="ignore"))
+				output.flush()
 
 
 class _ExecuteResult:
@@ -59,7 +64,7 @@ class _ExecuteResult:
 	def isSuccess(self) -> bool:
 		return self.returncode == 0
 
-	def isFailed(self) -> bool:
+	def isFailure(self) -> bool:
 		return self.returncode != 0
 
 
@@ -81,8 +86,8 @@ def localCommand(cmds: List[str],
                  env: Optional[Dict[str, str]] = None,
                  timeoutS: float = 60.,
                  stdin: bool = False,
-                 stdout: bool = False,
-                 stderr: bool = False,
+                 stdout: Union[bool, TextIO] = False,
+                 stderr: Union[bool, TextIO] = False,
                  maxOutputSize: int = 1000000) -> _ExecuteResult:
 	"""Run a process locally.
 	

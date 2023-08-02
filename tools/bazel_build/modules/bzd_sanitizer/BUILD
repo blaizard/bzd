@@ -7,5 +7,6 @@ py_binary(
     ],
     deps = [
         "@bzd_python//bzd/utils:run",
+        "@bzd_sanitizer//lib:context",
     ],
 )

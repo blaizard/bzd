@@ -1,4 +1,7 @@
-module(name = "bzd_toolchain_cc", version = "1.0")
+module(
+    name = "bzd_toolchain_cc",
+    version = "1.0",
+)
 
 bazel_dep(name = "bzd_platforms", version = "1.0")
 bazel_dep(name = "bzd_utils", version = "1.0")

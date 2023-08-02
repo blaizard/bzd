@@ -1,6 +1,8 @@
+"""Platform helpers."""
+
 AL_CONSTRAINTS = {
-    "linux": "@platforms//os:linux",
     "esp32": None,
+    "linux": "@platforms//os:linux",
 }
 
 ISA_CONSTRAINTS = {
@@ -9,12 +11,27 @@ ISA_CONSTRAINTS = {
 }
 
 def _constraint_target(kind, name):
-    """Create the constraint target string."""
+    """Create the constraint target string.
+
+    Args:
+        kind: The kind of constraint.
+        name: The name of the constraint.
+
+    Returns:
+        A string corresponding to the constraint target.
+    """
 
     return "@bzd_platforms//{}:{}".format(kind, name)
 
 def constraints_from_platform(platform):
-    """Return the set of constraints from a platform name."""
+    """Return the set of constraints from a platform name.
+
+    Args:
+        platform: The platform name.
+
+    Returns:
+        A list containing the constraints to statisfy for this platform.
+    """
 
     constraints = []
     al, isa = platform.split("-")

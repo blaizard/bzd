@@ -73,9 +73,8 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "crypto",
     srcs = glob([
-        "crypto.mjs",
         "impl/crypto/*",
-    ]),
+    ]) + ["crypto.mjs"],
     visibility = ["//visibility:public"],
     deps = [
         ":exception",

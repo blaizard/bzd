@@ -1,4 +1,7 @@
-module(name = "bzd_rules_doc", version = "1.0")
+module(
+    name = "bzd_rules_doc",
+    version = "1.0",
+)
 
 bazel_dep(name = "bzd_utils", version = "1.0")
 bazel_dep(name = "rules_python", version = "0.24.0")

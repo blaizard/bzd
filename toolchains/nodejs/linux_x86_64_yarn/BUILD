@@ -1,6 +1,6 @@
 load("@bzd_utils//:sh_binary_wrapper.bzl", "sh_binary_wrapper")
-load("//tools/bazel_build/toolchains/nodejs:defs.bzl", "nodejs_toolchain")
 load("//tools/bazel_build/rules:nodejs.bzl", "bzd_nodejs_test")
+load("//tools/bazel_build/toolchains/nodejs:defs.bzl", "nodejs_toolchain")
 
 sh_binary_wrapper(
     name = "node",
