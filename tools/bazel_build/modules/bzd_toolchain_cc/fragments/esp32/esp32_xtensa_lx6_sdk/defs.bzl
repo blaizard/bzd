@@ -1,3 +1,5 @@
+"""Metadata for ESP32 toolchains."""
+
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bzd_toolchain_cc//cc:toolchain.bzl", "get_location")
 
@@ -15,9 +17,6 @@ def esp32_xtensa_lx6_sdk(module_ctx, name = "esp32_xtensa_lx6_sdk"):
 
     repository_path = get_location(module_ctx, name)
     return {
-        "system_directories": [
-            "{}/include".format(repository_path),
-        ],
         "compile_flags": [
             "-DMBEDTLS_CONFIG_FILE=\"mbedtls/esp_config.h\"",
             "-DUNITY_INCLUDE_CONFIG_H",
@@ -35,10 +34,6 @@ def esp32_xtensa_lx6_sdk(module_ctx, name = "esp32_xtensa_lx6_sdk"):
             "-DIDF_VER=\"v5.0.1\"",
             "-DESP_PLATFORM",
             "-D_POSIX_READER_WRITER_LOCKS",
-        ],
-        "linker_dirs": [
-            "{}/ld".format(repository_path),
-            "{}/lib".format(repository_path),
         ],
         "link_flags": [
             "-mlongcalls",
@@ -466,5 +461,12 @@ def esp32_xtensa_lx6_sdk(module_ctx, name = "esp32_xtensa_lx6_sdk"):
             "-lrtc",
             "-u",
             "vfs_include_syscalls_impl",
+        ],
+        "linker_dirs": [
+            "{}/ld".format(repository_path),
+            "{}/lib".format(repository_path),
+        ],
+        "system_directories": [
+            "{}/include".format(repository_path),
         ],
     }

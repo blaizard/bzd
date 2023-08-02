@@ -1,9 +1,8 @@
+"""Metadata for esptool toolchains."""
+
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-def esptool(module_ctx, name = "esptool"):
-    _ = module_ctx
-    _ = name
-
+def esptool(_module_ctx):
     http_archive(
         name = "esptool",
         build_file = "@bzd_toolchain_cc//fragments/esp32/esptool:esptool.BUILD",
@@ -18,11 +17,11 @@ def esptool(module_ctx, name = "esptool"):
         "app_build": [
             "@esptool//:esp32_build",
         ],
+        "app_executors": {
+            "@esptool//:executor_qemu": "default,sim",
+            "@esptool//:executor_uart_wrapped": "uart",
+        },
         "app_metadata": [
             "@esptool//:esp32_metadata",
         ],
-        "app_executors": {
-            "@esptool//:executor_uart_wrapped": "uart",
-            "@esptool//:executor_qemu": "default,sim",
-        },
     }

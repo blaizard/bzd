@@ -1,10 +1,24 @@
-load("//tools/bazel_build/rules:bdl.bzl", "bdl_library", "bdl_system", "bdl_system_test")
+"""Rules for CC."""
+
 load("@bazel_skylib//lib:sets.bzl", "sets")
 load("@bzd_toolchain_cc//cc:defs.bzl", "cc_compile")
 load("@rules_cc//cc:defs.bzl", "cc_library")
+load("//tools/bazel_build/rules:bdl.bzl", "bdl_library", "bdl_system", "bdl_system_test")
 
 def bzd_cc_binary(name, target = "//cc/targets:auto", tags = [], bdls = [], hdrs = [], srcs = [], deps = [], testonly = False, **kwargs):
-    """Rule that defines a bzd C++ binary."""
+    """Rule that defines a bzd C++ binary.
+
+    Args:
+        name: Name for the target.
+        target: The target name.
+        tags: Tags to be added to the rules.
+        bdls: BDLs to be added to the rule.
+        hdrs: Headers to be added to the rule.
+        srcs: Sources to be added to the rule.
+        deps: Dependencies to be added to the rule.
+        testonly: If this is a testonly target.
+        **kwargs: Additional attributes to be added to the `bdl_system` rule.
+    """
 
     updated_deps = deps + []
     if bdls:
@@ -39,7 +53,19 @@ def bzd_cc_binary(name, target = "//cc/targets:auto", tags = [], bdls = [], hdrs
     )
 
 def bzd_cc_test(name, target = "//cc/targets:auto", tags = [], bdls = [], hdrs = [], srcs = [], deps = [], testonly = True, **kwargs):
-    """Rule that defines a bzd C++ test binary."""
+    """Rule that defines a bzd C++ test binary.
+
+    Args:
+        name: Name for the target.
+        target: The target name.
+        tags: Tags to be added to the rules.
+        bdls: BDLs to be added to the rule.
+        hdrs: Headers to be added to the rule.
+        srcs: Sources to be added to the rule.
+        deps: Dependencies to be added to the rule.
+        testonly: If this is a testonly target.
+        **kwargs: Additional attributes to be added to the `bdl_system` rule.
+    """
 
     updated_deps = deps + []
     if bdls:

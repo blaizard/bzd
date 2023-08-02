@@ -5,8 +5,8 @@ cc_library(
     name = "main",
     srcs = ["main.cc"],
     local_defines = select({
-        "//tools/bazel_build/settings/executor:is_sim": ["BZD_EXECUTOR_SIM=1"],
         "//tools/bazel_build/settings/executor:is_default": ["BZD_EXECUTOR_SIM=1"],
+        "//tools/bazel_build/settings/executor:is_sim": ["BZD_EXECUTOR_SIM=1"],
         "//conditions:default": [],
     }),
     target_compatible_with = [

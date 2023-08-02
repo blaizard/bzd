@@ -1,4 +1,4 @@
-# Create a bundle with a binary, a self contained, self extractable binary that can run on various hosts.
+""" Create a bundle with a binary, a self contained, self extractable binary that can run on various hosts."""
 
 def _bzd_bundle_impl(ctx):
     binary = ctx.attr.binary

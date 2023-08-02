@@ -1,3 +1,5 @@
+"""Registry for docker images used in this repository."""
+
 load("//tools/bazel_build/rules:docker.bzl", "bzd_docker_pull")
 
 IMAGES = {
@@ -5,6 +7,12 @@ IMAGES = {
         digest = "sha256:5b6a59e0c6a28e4dedef5ac2e8a44e2c1327927ede53ae5425923950ac9d99df",
         registry = "index.docker.io",
         repository = "blaizard/bridge",
+        tag = "latest",
+    ),
+    "compiler_explorer": struct(
+        digest = "sha256:d61369a460589987fa292f7a083720c4057e4b3170cc08e265c6b5cfc6c2eb50",
+        registry = "index.docker.io",
+        repository = "blaizard/compiler_explorer",
         tag = "latest",
     ),
     "nodejs": struct(
@@ -23,12 +31,6 @@ IMAGES = {
         digest = "sha256:c6060b4cfba287f7ca7cb0290d27a8b5f6884d34c744742b5fc9672ed02a81dc",
         registry = "index.docker.io",
         repository = "blaizard/xtensa_qemu",
-        tag = "latest",
-    ),
-    "compiler_explorer": struct(
-        digest = "sha256:d61369a460589987fa292f7a083720c4057e4b3170cc08e265c6b5cfc6c2eb50",
-        registry = "index.docker.io",
-        repository = "blaizard/compiler_explorer",
         tag = "latest",
     ),
 }
@@ -65,7 +67,7 @@ docker_images_config = rule(
     },
 )
 
-def docker_execution_platforms():
+def docker_execution_platforms(name):
     native.register_execution_platforms(
         "@//tools/docker_images/linux_x86_64",
     )

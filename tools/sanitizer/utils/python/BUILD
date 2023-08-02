@@ -1,5 +1,5 @@
-load("@rules_python//python:python.bzl", "py_library")
 load("@pip//:requirements.bzl", "requirement")
+load("@rules_python//python:python.bzl", "py_library")
 
 py_library(
     name = "workspace",

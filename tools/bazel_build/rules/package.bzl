@@ -1,21 +1,21 @@
-BzdPackageFragment = provider(fields = ["root", "files", "files_remap", "tars"])
-BzdPackageMetadataFragment = provider(fields = ["manifests"])
-_BzdPackageMetadata = provider(fields = ["manifests"])
+"""Package rules."""
+
+BzdPackageFragmentInfo = provider("Provider for a package fragment.", fields = ["root", "files", "files_remap", "tars"])
+BzdPackageMetadataFragmentInfo = provider("Provider for metadata framgnets.", fields = ["manifests"])
+_BzdPackageMetadataInfo = provider("Provider for metadata.", fields = ["manifests"])
 
 # ---- Aspect
 
 def _bzd_package_metadata_aspect_impl(target, ctx):
     manifests = []
     if hasattr(ctx.rule.attr, "dep"):
-        manifests += ctx.rule.attr.dep[_BzdPackageMetadata].manifests
-    if BzdPackageMetadataFragment in target:
-        manifests += target[BzdPackageMetadataFragment].manifests
-    return [_BzdPackageMetadata(manifests = manifests)]
+        manifests += ctx.rule.attr.dep[_BzdPackageMetadataInfo].manifests
+    if BzdPackageMetadataFragmentInfo in target:
+        manifests += target[BzdPackageMetadataFragmentInfo].manifests
+    return [_BzdPackageMetadataInfo(manifests = manifests)]
 
-"""
-Aspects to gather data from bzd depedencies.
-"""
 _bzd_package_metadata_aspect = aspect(
+    doc = "Aspects to gather data from bzd depedencies.",
     implementation = _bzd_package_metadata_aspect_impl,
     attr_aspects = ["dep"],
 )
@@ -33,13 +33,13 @@ def _bzd_package_impl(ctx):
     manifests = []
     metadata_args = []
     for target, root in ctx.attr.deps.items():
-        if _BzdPackageMetadata in target:
-            manifests += target[_BzdPackageMetadata].manifests
+        if _BzdPackageMetadataInfo in target:
+            manifests += target[_BzdPackageMetadataInfo].manifests
             for manifest in manifests:
                 metadata_args += ["--input", root, manifest.path]
 
-        if BzdPackageFragment in target:
-            fragment = target[BzdPackageFragment]
+        if BzdPackageFragmentInfo in target:
+            fragment = target[BzdPackageFragmentInfo]
 
             if not root:
                 fail("Each package fragment must have a valid root.")
@@ -71,7 +71,7 @@ def _bzd_package_impl(ctx):
                     ]
 
         else:
-            fail("Dependencies for this rule requires BzdPackageFragment provider.")
+            fail("Dependencies for this rule requires BzdPackageFragmentInfo provider.")
 
     # Build buildstamp
     buildstamp = ctx.actions.declare_file("{}.buildstamp.json".format(ctx.label.name))
@@ -137,15 +137,15 @@ _bzd_package = rule(
             default = False,
             doc = "Include the metadata as part of the package.",
         ),
+        "internal_config": attr.string(),
+        "_buildstamp": attr.label(
+            default = Label("//tools/bazel_build/buildstamp"),
+        ),
         "_metadata": attr.label(
             default = Label("//tools/bazel_build/rules/assets/package:metadata"),
             cfg = "exec",
             executable = True,
         ),
-        "_buildstamp": attr.label(
-            default = Label("//tools/bazel_build/buildstamp"),
-        ),
-        "internal_config": attr.string(),
     },
     executable = True,
 )
@@ -153,8 +153,8 @@ _bzd_package = rule(
 def bzd_package(**kargs):
     _bzd_package(
         internal_config = select({
-            "//tools/bazel_build/settings/build:prod": "prod",
             "//tools/bazel_build/settings/build:dev": "dev",
+            "//tools/bazel_build/settings/build:prod": "prod",
         }),
         **kargs
     )

@@ -1,4 +1,7 @@
-module(name = "bzd", version = "0.1")
+module(
+    name = "bzd",
+    version = "0.1",
+)
 
 bazel_dep(name = "platforms", version = "0.0.6")
 bazel_dep(name = "bzd_utils", version = "1.0")
@@ -14,8 +17,8 @@ bazel_dep(name = "rules_python", version = "0.24.0")
 # Override some of the modules that are local.
 [local_path_override(
     module_name = name,
-    path = "tools/bazel_build/modules/" + name
-) for name in ("bzd_utils", "bzd_rules_doc", "bzd_toolchain_cc", "bzd_bundle", "bzd_platforms", "bzd_python", "bzd_sanitizer", )]
+    path = "tools/bazel_build/modules/" + name,
+) for name in ("bzd_utils", "bzd_rules_doc", "bzd_toolchain_cc", "bzd_bundle", "bzd_platforms", "bzd_python", "bzd_sanitizer")]
 
 # Python
 
@@ -36,22 +39,25 @@ use_repo(pip, "pip")
 toolchain_cc = use_extension("@bzd_toolchain_cc//:extensions.bzl", "toolchain_cc")
 toolchain_cc.toolchain(
     name = "clang",
+    default = True,
     version = "clang_17.0.0",
-    default = True
 )
 use_repo(toolchain_cc, "clang")
+
 register_toolchains("@clang//:all")
 
 toolchain_cc.toolchain(
     name = "esp32",
-    version = "esp32_gcc_12.2.0"
+    version = "esp32_gcc_12.2.0",
 )
 use_repo(toolchain_cc, "esp32")
+
 register_toolchains("@esp32//:all")
 
 toolchain_cc.toolchain(
     name = "gcc",
-    version = "gcc_13.1.0"
+    version = "gcc_13.1.0",
 )
 use_repo(toolchain_cc, "gcc")
+
 register_toolchains("@gcc//:all")

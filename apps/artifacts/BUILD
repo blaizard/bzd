@@ -23,7 +23,7 @@ bzd_nodejs_docker(
     },
     include_metadata = True,
     deps = {
-        "//apps/artifacts/frontend": "frontend",
         "//apps/artifacts/backend": "backend",
+        "//apps/artifacts/frontend": "frontend",
     },
 )

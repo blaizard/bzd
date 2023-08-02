@@ -1,22 +1,25 @@
-load("@bzd_utils//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
+"""Rules for NodeJs."""
+
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
-load("//tools/bazel_build/rules:package.bzl", "BzdPackageFragment", "BzdPackageMetadataFragment", "bzd_package")
+load("@bzd_utils//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
 load("@io_bazel_rules_docker//container:container.bzl", "container_image", "container_push")
+load("//tools/bazel_build/rules:package.bzl", "BzdPackageFragmentInfo", "BzdPackageMetadataFragmentInfo", "bzd_package")
 
 # ---- Providers
 
-BzdNodeJsInstallProvider = provider(fields = ["package_json", "node_modules", "aliases"])
-BzdNodeJsDepsProvider = provider(fields = ["packages", "srcs", "aliases", "data"])
+BzdNodeJsInstallInfo = provider(
+    "Provider for installation information.",
+    fields = ["package_json", "node_modules", "aliases"],
+)
+BzdNodeJsDepsInfo = provider("Provider for dependencies information", fields = ["packages", "srcs", "aliases", "data"])
 
 # ---- Utils
 
-"""
-Merge providers of types BzdNodeJsDepsProvider together
-"""
-
 def _bzd_nodejs_deps_provider_merge(deps, ctx = None):
-    srcs = depset(transitive = [it[BzdNodeJsDepsProvider].srcs for it in deps])
-    data = depset(transitive = [it[BzdNodeJsDepsProvider].data for it in deps])
+    """Merge providers of types BzdNodeJsDepsInfo together."""
+
+    srcs = depset(transitive = [it[BzdNodeJsDepsInfo].srcs for it in deps])
+    data = depset(transitive = [it[BzdNodeJsDepsInfo].data for it in deps])
     packages = {}
     aliases = {}
 
@@ -30,7 +33,7 @@ def _bzd_nodejs_deps_provider_merge(deps, ctx = None):
         packages = dict(ctx.attr.packages)
         aliases = ctx.attr.aliases
 
-    provider = BzdNodeJsDepsProvider(
+    provider = BzdNodeJsDepsInfo(
         srcs = srcs,
         data = data,
         packages = packages,
@@ -39,14 +42,14 @@ def _bzd_nodejs_deps_provider_merge(deps, ctx = None):
 
     for it in deps:
         # Merge packages
-        for name, version in it[BzdNodeJsDepsProvider].packages.items():
+        for name, version in it[BzdNodeJsDepsInfo].packages.items():
             # If the version already stored is different
             if name in provider.packages and provider.packages[name] and version and provider.packages[name] != version:
                 fail("Version conflict for package '{}': '{}' vs '{}'".format(name, version, provider.packages[name]))
             provider.packages[name] = version
 
         # Merge aliases
-        for name, path in it[BzdNodeJsDepsProvider].aliases.items():
+        for name, path in it[BzdNodeJsDepsInfo].aliases.items():
             # If the alias already stored is different
             if name in provider.aliases and provider.aliases[name] != path:
                 fail("Path conflict for alias '{}': '{}' vs '{}'".format(name, path, provider.aliases[name]))
@@ -56,49 +59,43 @@ def _bzd_nodejs_deps_provider_merge(deps, ctx = None):
 
 # ---- Aspect
 
-def _bzd_nodejs_deps_aspect_impl(target, ctx):
+def _bzd_nodejs_deps_aspect_impl(_target, ctx):
     if ctx.rule.kind == "bzd_nodejs_library":
         return []
     return [_bzd_nodejs_deps_provider_merge(deps = ctx.rule.attr.deps)]
 
-"""
-Aspects to gather data from bzd depedencies.
-"""
 bzd_nodejs_deps_aspect = aspect(
+    doc = "Aspects to gather data from bzd depedencies.",
     implementation = _bzd_nodejs_deps_aspect_impl,
     attr_aspects = ["deps"],
 )
 
 # ---- bzd_nodejs_library
 
-"""
-A library contains all depdencies used for this target.
-"""
-
 _COMMON_ATTRS = {
     "aliases": attr.string_dict(
         doc = "Name of the alias and path (relative to the workspace root).",
-    ),
-    "srcs": attr.label_list(
-        allow_files = True,
-        doc = "Source files",
     ),
     "data": attr.label_list(
         allow_files = True,
         doc = "Data to be added to the runfile list",
     ),
-    "tools": attr.label_list(
-        doc = "Additional tools to be added to the runfile",
-        cfg = "target",
+    "deps": attr.label_list(
+        aspects = [bzd_nodejs_deps_aspect],
+        allow_files = True,
+        doc = "Dependencies",
     ),
     "packages": attr.string_dict(
         allow_empty = True,
         doc = "Package dependencies",
     ),
-    "deps": attr.label_list(
-        aspects = [bzd_nodejs_deps_aspect],
+    "srcs": attr.label_list(
         allow_files = True,
-        doc = "Dependencies",
+        doc = "Source files",
+    ),
+    "tools": attr.label_list(
+        doc = "Additional tools to be added to the runfile",
+        cfg = "target",
     ),
 }
 
@@ -106,32 +103,28 @@ def _bzd_nodejs_library_impl(ctx):
     return [DefaultInfo(), _bzd_nodejs_deps_provider_merge(deps = ctx.attr.deps, ctx = ctx)]
 
 bzd_nodejs_library = rule(
+    doc = "A library contains all depdencies used for this target.",
     implementation = _bzd_nodejs_library_impl,
     attrs = _COMMON_ATTRS,
 )
 
 # ---- bzd_nodejs_install
 
-"""
-Install a NodeJs environment, dealing with the creation of the package.json
-and the installation of the actual packages.
-"""
-
 def _bzd_nodejs_install_impl(ctx):
-    depsProvider = _bzd_nodejs_deps_provider_merge(deps = ctx.attr.deps, ctx = ctx)
+    deps_provider = _bzd_nodejs_deps_provider_merge(deps = ctx.attr.deps, ctx = ctx)
 
     # --- Generate the package.json file
     package_json = ctx.actions.declare_file("{}.nodejs_install/package.json".format(ctx.label.name))
 
     # Build the dependencies template replacement string
-    dependencies = ",\n".join(["\"{}\": \"{}\"".format(name, version if version else "latest") for name, version in depsProvider.packages.items()])
+    dependencies = ",\n".join(["\"{}\": \"{}\"".format(name, version if version else "latest") for name, version in deps_provider.packages.items()])
 
     ctx.actions.expand_template(
         template = ctx.file._package_json_template,
         output = package_json,
         substitutions = {
-            "{name}": "{}.{}".format(ctx.label.package.replace("/", "."), ctx.attr.name),
             "{dependencies}": dependencies,
+            "{name}": "{}.{}".format(ctx.label.package.replace("/", "."), ctx.attr.name),
         },
     )
 
@@ -181,32 +174,36 @@ def _bzd_nodejs_install_impl(ctx):
     # Return the provides (including outputs and dependencies)
     return [
         DefaultInfo(files = depset([package_json, node_modules])),
-        BzdPackageMetadataFragment(manifests = [metadata]),
-        BzdNodeJsInstallProvider(
+        BzdPackageMetadataFragmentInfo(manifests = [metadata]),
+        BzdNodeJsInstallInfo(
             package_json = package_json,
             node_modules = node_modules,
-            aliases = depsProvider.aliases,
+            aliases = deps_provider.aliases,
         ),
-        depsProvider,
+        deps_provider,
     ]
 
 _INSTALL_ATTRS = dict(_COMMON_ATTRS)
 _INSTALL_ATTRS.update({
-    "_package_json_template": attr.label(
-        default = Label("//tools/bazel_build/rules/assets/nodejs:package_json_template"),
-        allow_single_file = True,
+    "_cache": attr.label(
+        default = "//tools/bazel_build/settings/cache",
     ),
     "_metadata": attr.label(
         default = Label("//tools/bazel_build/rules/assets/nodejs:metadata"),
         cfg = "exec",
         executable = True,
     ),
-    "_cache": attr.label(
-        default = "//tools/bazel_build/settings/cache",
+    "_package_json_template": attr.label(
+        default = Label("//tools/bazel_build/rules/assets/nodejs:package_json_template"),
+        allow_single_file = True,
     ),
 })
 
 bzd_nodejs_install = rule(
+    doc = """
+Install a NodeJs environment, dealing with the creation of the package.json
+and the installation of the actual packages.
+""",
     implementation = _bzd_nodejs_install_impl,
     attrs = _INSTALL_ATTRS,
     toolchains = ["//tools/bazel_build/toolchains/nodejs:toolchain_type"],
@@ -214,11 +211,17 @@ bzd_nodejs_install = rule(
 
 # ---- bzd_nodejs_aliases_symlinks
 
-"""
-Generate the symlinks dictionary to be passed to root_symlinks or symlinks
-"""
-
 def bzd_nodejs_aliases_symlinks(files, aliases):
+    """Generate the symlinks dictionary to be passed to root_symlinks or symlinks.
+
+    Args:
+        files: The list of files.
+        aliases: The list of aliases.
+
+    Returns:
+        A dictionary of symlinks
+    """
+
     symlinks = {}
     for name, directory in aliases.items():
         for f in files:
@@ -230,12 +233,12 @@ def bzd_nodejs_aliases_symlinks(files, aliases):
 # ---- _bzd_nodejs_exec
 
 COMMON_EXEC_ATTRS = {
+    "dep": attr.label(
+        mandatory = True,
+    ),
     "main": attr.label(
         mandatory = True,
         allow_single_file = True,
-    ),
-    "dep": attr.label(
-        mandatory = True,
     ),
     "_metadata_json": attr.label(
         default = Label("//tools/bazel_build/rules/assets/nodejs:metadata_json"),
@@ -243,19 +246,17 @@ COMMON_EXEC_ATTRS = {
     ),
 }
 
-"""
-Implementation of the executor
-"""
-
 def _bzd_nodejs_exec_impl(ctx, is_test):
+    """Implementation of the executor."""
+
     # Retrieve install artefacts generated by ctx.attr.dep
-    node_modules = ctx.attr.dep[BzdNodeJsInstallProvider].node_modules
-    package_json = ctx.attr.dep[BzdNodeJsInstallProvider].package_json
-    aliases = ctx.attr.dep[BzdNodeJsInstallProvider].aliases
+    node_modules = ctx.attr.dep[BzdNodeJsInstallInfo].node_modules
+    package_json = ctx.attr.dep[BzdNodeJsInstallInfo].package_json
+    aliases = ctx.attr.dep[BzdNodeJsInstallInfo].aliases
 
     # Retrieve source files and data
-    srcs = ctx.attr.dep[BzdNodeJsDepsProvider].srcs.to_list()
-    data = ctx.attr.dep[BzdNodeJsDepsProvider].data.to_list()
+    srcs = ctx.attr.dep[BzdNodeJsDepsInfo].srcs.to_list()
+    data = ctx.attr.dep[BzdNodeJsDepsInfo].data.to_list()
 
     # Gather toolchain executable
     toolchain_executable = ctx.toolchains["//tools/bazel_build/toolchains/nodejs:toolchain_type"].executable
@@ -266,8 +267,8 @@ def _bzd_nodejs_exec_impl(ctx, is_test):
     {{binary}}"""
 
     # Add prefix command to support code coverage
-    isCoverage = ctx.configuration.coverage_enabled
-    if isCoverage:
+    is_coverage = ctx.configuration.coverage_enabled
+    if is_coverage:
         command += " \"{{root}}/node_modules/c8/bin/c8\" --reporter lcov --reporter text --allowExternal {{binary}}"
 
     if is_test:
@@ -275,7 +276,7 @@ def _bzd_nodejs_exec_impl(ctx, is_test):
     else:
         command += " \"{}\" $@"
 
-    if isCoverage:
+    if is_coverage:
         command += " && cp \"coverage/lcov.info\" \"$COVERAGE_OUTPUT_FILE\""
 
     # Generate the symlinks for the aliases
@@ -296,7 +297,7 @@ def _bzd_nodejs_exec_impl(ctx, is_test):
         ),
     ]
 
-    if isCoverage:
+    if is_coverage:
         result.append(
             coverage_common.instrumented_files_info(
                 ctx,
@@ -312,12 +313,12 @@ def _bzd_nodejs_exec_impl(ctx, is_test):
         }
         files_remap.update(symlinks)
 
-        result.append(BzdPackageFragment(
+        result.append(BzdPackageFragmentInfo(
             files = srcs,
             files_remap = files_remap,
         ))
 
-        result.append(BzdPackageMetadataFragment(
+        result.append(BzdPackageMetadataFragmentInfo(
             manifests = [ctx.file._metadata_json],
         ))
 
@@ -325,14 +326,11 @@ def _bzd_nodejs_exec_impl(ctx, is_test):
 
 # ---- _bzd_nodejs_binary
 
-"""
-NodeJs web application executor
-"""
-
 def _bzd_nodejs_binary_impl(ctx):
     return _bzd_nodejs_exec_impl(ctx, is_test = False)
 
 _bzd_nodejs_binary = rule(
+    doc = "NodeJs web application executor.",
     implementation = _bzd_nodejs_binary_impl,
     attrs = COMMON_EXEC_ATTRS,
     executable = True,
@@ -357,14 +355,11 @@ def bzd_nodejs_binary(name, main, args = [], visibility = [], tags = [], **kwarg
 
 # ---- _bzd_nodejs_test
 
-"""
-NodeJs web application tester
-"""
-
 def _bzd_nodejs_test_impl(ctx):
     return _bzd_nodejs_exec_impl(ctx, is_test = True)
 
 _bzd_nodejs_test = rule(
+    doc = "NodeJs web application tester.",
     implementation = _bzd_nodejs_test_impl,
     attrs = COMMON_EXEC_ATTRS,
     test = True,
@@ -392,6 +387,17 @@ def bzd_nodejs_test(name, main, deps = [], visibility = [], tags = [], **kwargs)
 # ---- Docker Package ----
 
 def bzd_nodejs_docker(name, deps, cmd, base = "@docker_image_nodejs//image", include_metadata = False, deploy = {}):
+    """Rule for embedding a NodeJs application into Docker.
+
+    Args:
+        name: The name of the target.
+        deps: The dependencies.
+        cmd: The command to be used.
+        base: The base image.
+        include_metadata: Wether metadata shall be included.
+        deploy: The deploy rules.
+    """
+
     bzd_package(
         name = "{}.package".format(name),
         tags = ["nodejs"],

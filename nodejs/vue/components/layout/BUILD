@@ -17,9 +17,9 @@ bzd_nodejs_library(
 
 bzd_nodejs_library(
     name = "component",
-    srcs = glob([
+    srcs = [
         "component.vue",
-    ]),
+    ],
     visibility = ["//visibility:public"],
     deps = [
         "//nodejs:vue",

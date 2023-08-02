@@ -1,10 +1,13 @@
-NodeJsToolchainProvider = provider(
+"""NodeJs toolchain."""
+
+NodeJsToolchainInfo = provider(
+    "Provide NodeJs toolchain information",
     fields = ["manager", "node"],
 )
 
 def _nodejs_toolchain_impl(ctx):
     toolchain_info = platform_common.ToolchainInfo(
-        executable = NodeJsToolchainProvider(
+        executable = NodeJsToolchainInfo(
             manager = ctx.attr.manager,
             node = ctx.attr.node,
         ),

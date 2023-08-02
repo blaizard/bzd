@@ -1,3 +1,5 @@
+"""Loader for sanitizer dependencies."""
+
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("//tools/sanitizer/actions/buildifier:dependencies.bzl", "buildifier_load")
 

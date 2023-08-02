@@ -1,3 +1,5 @@
+"""Docker rules."""
+
 load("@io_bazel_rules_docker//container:container.bzl", "container_pull")
 
 def bzd_docker_pull(**kwargs):
@@ -24,6 +26,9 @@ bzd_docker_load = rule(
     doc = "Load a docker image.",
     implementation = _bzd_docker_load_impl,
     attrs = {
+        "digest": attr.string(
+            doc = "The digest of the image to pull.",
+        ),
         "registry": attr.string(
             mandatory = True,
             doc = "The registry from which we are pulling.",
@@ -31,9 +36,6 @@ bzd_docker_load = rule(
         "repository": attr.string(
             mandatory = True,
             doc = "The name of the image.",
-        ),
-        "digest": attr.string(
-            doc = "The digest of the image to pull.",
         ),
     },
     executable = True,
