@@ -20,13 +20,15 @@ ResolveFQNResult = Result[typing.List[str]]
 
 class Resolver:
 
-	def __init__(self,
-	             symbols: "SymbolMap",
-	             namespace: typing.List[str] = [],
-	             exclude: typing.Optional[typing.List[Group]] = None,
-	             this: typing.Optional[str] = None,
-	             target: typing.Optional[str] = None,
-	             memoize: bool = False) -> None:
+	def __init__(
+	    self,
+	    symbols: "SymbolMap",
+	    namespace: typing.List[str] = [],
+	    exclude: typing.Optional[typing.List[Group]] = None,
+	    this: typing.Optional[str] = None,
+	    target: typing.Optional[str] = None,
+	    memoize: bool = False,
+	) -> None:
 		self.symbols = symbols
 		self.namespace = namespace
 		self.exclude = exclude
@@ -34,22 +36,26 @@ class Resolver:
 		self.target = target
 		self.memoize = memoize
 
-	def make(self,
-	         namespace: typing.Optional[typing.List[str]] = None,
-	         expression: typing.Optional[Expression] = None,
-	         this: typing.Optional[str] = None) -> "Resolver":
+	def make(
+	    self,
+	    namespace: typing.Optional[typing.List[str]] = None,
+	    expression: typing.Optional[Expression] = None,
+	    this: typing.Optional[str] = None,
+	) -> "Resolver":
 		"""Create a new resolver with an updated namespace.
-		
-		Note: exclude and this should not be propagated, they both concern the first level resolver.
-		"""
+
+        Note: exclude and this should not be propagated, they both concern the first level resolver.
+        """
 
 		if namespace is not None:
 			assert expression is None
-			return Resolver(symbols=self.symbols,
-			                namespace=namespace,
-			                this=this,
-			                target=self.target,
-			                memoize=self.memoize)
+			return Resolver(
+			    symbols=self.symbols,
+			    namespace=namespace,
+			    this=this,
+			    target=self.target,
+			    memoize=self.memoize,
+			)
 		assert expression is not None
 		return expression.makeResolver(symbols=self.symbols, target=self.target, memoize=self.memoize)
 
@@ -68,9 +74,9 @@ class Resolver:
 
 	def resolveShallowFQN(self, name: str) -> ResolveShallowFQNResult:
 		"""Find the fully qualified name of a given a name and a namespace.
-		
-		Note, name can be a partial fqn.
-		"""
+
+        Note, name can be a partial fqn.
+        """
 		nameFirst = FQN.toNamespace(name)[0]
 
 		if nameFirst == "this":
@@ -111,9 +117,9 @@ class Resolver:
 
 	def resolveFQN(self, name: str) -> ResolveFQNResult:
 		"""
-		Find the fully qualified name of a given a name and a namespace.
-		Note, name can be a partial fqn.
-		"""
+        Find the fully qualified name of a given a name and a namespace.
+        Note, name can be a partial fqn.
+        """
 		maybeFQN = self.resolveShallowFQN(name=name)
 		if not maybeFQN:
 			return ResolveFQNResult.makeError(maybeFQN.error)
@@ -150,30 +156,33 @@ class Resolver:
 		return ResolveFQNResult(fqns)
 
 	def __repr__(self) -> str:
+		attrs = {
+		    "namespace": self.namespace,
+		    "this": self.this,
+		    "exclude": self.exclude,
+		}
 
-		attrs = {"namespace": self.namespace, "this": self.this, "exclude": self.exclude}
-
-		entities = ["{}=\"{}\"".format(key, value) for key, value in attrs.items() if value]
+		entities = ['{}="{}"'.format(key, value) for key, value in attrs.items() if value]
 		return "<{}/>".format(" ".join([type(self).__name__] + entities))
 
 
 class SymbolMap:
 	"""
-	Symbol map looks like this:
-	 - bzd: <namespace "bzd">                         <- Created implicitly by "bzd.nested" namespace
-	 - bzd.nested: <namespace "bzd.nested">
-	 - bzd.nested.Struct: <nested>
-	                          <reference "bzd.nested.Struct.a">
-	                          <reference "bzd.nested.Struct.b">
-	                          <expression> <- unamed expression
-	 - bzd.nested.Struct.a: <expression "a">
-	 - bzd.nested.Struct.b: <expression "b">
-	 - bzd.Child: <nested>
-	                 <reference "bzd.Child.c">
-	 - bzd.Child.c: <expression "c">
-	 - _0~: <nested>                                  <- unamed top level element
-	 - 321332-323-3~: <expression>                    <- unamed composition expression
-	"""
+    Symbol map looks like this:
+     - bzd: <namespace "bzd">                         <- Created implicitly by "bzd.nested" namespace
+     - bzd.nested: <namespace "bzd.nested">
+     - bzd.nested.Struct: <nested>
+                              <reference "bzd.nested.Struct.a">
+                              <reference "bzd.nested.Struct.b">
+                              <expression> <- unamed expression
+     - bzd.nested.Struct.a: <expression "a">
+     - bzd.nested.Struct.b: <expression "b">
+     - bzd.Child: <nested>
+                     <reference "bzd.Child.c">
+     - bzd.Child.c: <expression "c">
+     - _0~: <nested>                                  <- unamed top level element
+     - 321332-323-3~: <expression>                    <- unamed composition expression
+    """
 
 	def __init__(self) -> None:
 		self.staticUid: int = 0
@@ -189,30 +198,34 @@ class SymbolMap:
 
 	def makeResolver(self, *args: typing.Any, **kwargs: typing.Any) -> Resolver:
 		"""
-		Create a resolver object, used to find (resolve) symbols.
-		"""
+        Create a resolver object, used to find (resolve) symbols.
+        """
 		return Resolver(self, *args, **kwargs)
 
 	def insertBuiltin(self, name: str, entity: EntityType) -> None:
 		"""
-		Insert a builtin entry to the mix.
-		"""
+        Insert a builtin entry to the mix.
+        """
 		# Resolve builtins before instering them.
 		entity.resolveMemoized(resolver=self.makeResolver())
 		ElementBuilder.cast(entity.element, ElementBuilder).setAttr("fqn", name)
-		self.builtins[name] = {"g": Group.builtin.value, "p": "", "e": entity.element.serialize()}
+		self.builtins[name] = {
+		    "g": Group.builtin.value,
+		    "p": "",
+		    "e": entity.element.serialize(),
+		}
 		self.entities[name] = entity
 
 	def contains(self, fqn: str, exclude: typing.Optional[typing.List[Group]] = None) -> bool:
 		"""
-		Check if the fqn is registered.
-		"""
+        Check if the fqn is registered.
+        """
 		return False if self._get(fqn=fqn, exclude=exclude) is None else True
 
 	def _get(self, fqn: str, exclude: typing.Optional[typing.List[Group]] = None) -> typing.Optional[typing.Any]:
 		"""
-		Return the raw data if it exsits.
-		"""
+        Return the raw data if it exsits.
+        """
 		if fqn in self.map:
 			data = self.map[fqn]
 		elif fqn in self.builtins:
@@ -230,13 +243,13 @@ class SymbolMap:
 	          startsWith: str = "",
 	          depth: int = 0) -> typing.Iterator[typing.Tuple[str, EntityType]]:
 		"""
-		Iterate through entities optionaly filtered by their groups.
+        Iterate through entities optionaly filtered by their groups.
 
-		Args:
-			groups: Groups to be returned.
-			startsWith: The returned items start with the specified fqn.
-			depth: depth level until which entity should be selected. A value of 0 means no limit.
-		"""
+        Args:
+                groups: Groups to be returned.
+                startsWith: The returned items start with the specified fqn.
+                depth: depth level until which entity should be selected. A value of 0 means no limit.
+        """
 
 		for fqn, meta in self.map.items():
 			if any(group in Group(meta["g"]) for group in groups):
@@ -245,22 +258,24 @@ class SymbolMap:
 						entity = self.getEntityResolved(fqn=fqn).value
 						yield fqn, entity
 
-	def insert(self,
-	           name: typing.Optional[str],
-	           namespace: typing.List[str],
-	           path: typing.Optional[Path],
-	           element: Element,
-	           group: Group,
-	           conflicts: bool = False) -> str:
+	def insert(
+	    self,
+	    name: typing.Optional[str],
+	    namespace: typing.List[str],
+	    path: typing.Optional[Path],
+	    element: Element,
+	    group: Group,
+	    conflicts: bool = False,
+	) -> str:
 		"""
-		Insert a new element into the symbol map.
-		Args:
-			fqn: Full qualified name.
-			path: Path associated with the element.
-			element: Element to be registered.
-			group: Group associated with the element, will be used for filtering.
-			conflicts: Handle symbol FQN conflicts.
-		"""
+        Insert a new element into the symbol map.
+        Args:
+                fqn: Full qualified name.
+                path: Path associated with the element.
+                element: Element to be registered.
+                group: Group associated with the element, will be used for filtering.
+                conflicts: Handle symbol FQN conflicts.
+        """
 		if name is None:
 			# These are the unnamed elements that should be progpagated to other translation units.
 			if Group.composition in group:
@@ -279,11 +294,15 @@ class SymbolMap:
 		ElementBuilder.cast(element, ElementBuilder).setAttr("fqn", fqn)
 
 		if self.contains(fqn=fqn):
-			originalElement = self.getEntityResolved(fqn=fqn).assertValue(element=element).element
+			originalElement = (self.getEntityResolved(fqn=fqn).assertValue(element=element).element)
 			if not conflicts or element != originalElement:
 				SymbolMap.errorSymbolConflict_(fqn, element, originalElement)
 
-		self.map[fqn] = {"g": group.value, "p": path.as_posix() if path is not None else "", "e": None}
+		self.map[fqn] = {
+		    "g": group.value,
+		    "p": path.as_posix() if path is not None else "",
+		    "e": None,
+		}
 
 		# Resolve context
 		context, _, _ = element.context.resolve()
@@ -297,54 +316,58 @@ class SymbolMap:
 
 	@staticmethod
 	def errorSymbolConflict_(fqn: str, element1: Element, element2: Element) -> None:
-		Error.handleFromElement(element=element1, message=f"Symbol name '{fqn}' is in conflict...",
-		                        throw=False).extend(element=element2, message="...with this one.")
+		Error.handleFromElement(
+		    element=element1,
+		    message=f"Symbol name '{fqn}' is in conflict...",
+		    throw=False,
+		).extend(element=element2, message="...with this one.")
 
 	def update(self, symbols: "SymbolMap") -> None:
 		"""Register multiple symbols.
-		
-		Args:
-			symbols: The symbol map.
-		"""
-		for fqn, element in symbols.map.items():
 
+        Args:
+                symbols: The symbol map.
+        """
+		for fqn, element in symbols.map.items():
 			# Ignore private entries
 			if FQN.isPrivate(fqn):
 				continue
 			existingElement = self._get(fqn=fqn)
 			if existingElement is not None and element["p"] != existingElement["p"]:
-				SymbolMap.errorSymbolConflict_(fqn, SymbolMap.metaToElement(element),
-				                               SymbolMap.metaToElement(existingElement))
+				SymbolMap.errorSymbolConflict_(
+				    fqn,
+				    SymbolMap.metaToElement(element),
+				    SymbolMap.metaToElement(existingElement),
+				)
 			self.map[fqn] = element
 
 	def makeReference(self, fqn: str, group: typing.Optional[Group] = None) -> Element:
 		"""
-		Create a reference from an existing FQN.
-		"""
+        Create a reference from an existing FQN.
+        """
 		assert self.contains(fqn=fqn), "The FQN '{}' is not part of the symbol map.".format(fqn)
 		return ElementBuilder("reference").setAttr(key="name", value=fqn)
 
 	def close(self) -> None:
 		"""
-		Close the map to prevent any further editing.
-		"""
+        Close the map to prevent any further editing.
+        """
 
 		# Create serialized blobs for elements present in the entities map.
 		removeFQNs: typing.Set[str] = set()
 		for fqn, entity in self.entities.items():
-
 			# Ignore builtins
 			if fqn in self.builtins:
 				continue
 
 			entity.assertTrue(
 			    condition=fqn in self.map,
-			    message="Entry '{}' was not properly created before being added to the entities map.".format(fqn))
+			    message="Entry '{}' was not properly created before being added to the entities map.".format(fqn),
+			)
 			element = entity.element
 
 			# Remove nested element and change them to references.
 			if any([element.isNestedSequence(group.value) for group in NestedSequence]):
-
 				preparedElement = element.copy(ignoreNested=[group.value for group in NestedSequence])
 				for group in NestedSequence:
 					nested = element.getNestedSequence(group.value)
@@ -386,8 +409,8 @@ class SymbolMap:
 
 	def serialize(self) -> typing.Dict[str, typing.Any]:
 		"""
-		Return a serialized version of this map.
-		"""
+        Return a serialized version of this map.
+        """
 		assert self.isClosed, "Can only be serialized after being closed."
 		return self.map
 
@@ -411,9 +434,9 @@ class SymbolMap:
 
 	def getEntityResolved(self, fqn: str, exclude: typing.Optional[typing.List[Group]] = None) -> Result[EntityType]:
 		"""
-		Return an element from the symbol map.
-		This call assumes that FQN is already resolved.
-		"""
+        Return an element from the symbol map.
+        This call assumes that FQN is already resolved.
+        """
 
 		data = self._get(fqn=fqn, exclude=exclude)
 		if data is None:

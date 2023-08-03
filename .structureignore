@@ -1,5 +1,5 @@
 **BUILD
-**BUILD.template
+**/*.BUILD
 **WORKSPACE
 **README.md
 **Jenkinsfile
@@ -8,3 +8,4 @@
 **CMakeLists.txt
 **MODULE.bazel
 **MODULE.bazel.lock
+.clang-tidy

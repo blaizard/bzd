@@ -16,6 +16,7 @@ class Convertible_(Constraint):
 				return
 
 			from tools.bdl.entities.impl.entity import EntityExpression
+
 			assert isinstance(context.value, EntityExpression), "The value must be an expression."
 			assert context.value.isSymbol, "The expression is not a type."
 			typeFrom = context.value.symbol

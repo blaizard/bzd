@@ -10,7 +10,6 @@ from elftools.elf.elffile import ELFFile
 
 
 def processElfDwarf(path: str) -> Tuple[Dict[str, int], List[str]]:
-
 	compilers = set()
 	compilerList: List[str] = []
 
@@ -23,7 +22,6 @@ def processElfDwarf(path: str) -> Tuple[Dict[str, int], List[str]]:
 
 		dwarfInfo = elffile.get_dwarf_info()
 		for CU in dwarfInfo.iter_CUs():
-
 			topDIE = CU.get_top_DIE()
 			name = topDIE.get_full_path()
 
@@ -37,7 +35,7 @@ def processElfDwarf(path: str) -> Tuple[Dict[str, int], List[str]]:
 			# Gather compilers
 			if topDIE.tag == "DW_TAG_compile_unit":
 				if "DW_AT_producer" in topDIE.attributes:
-					compiler = topDIE.attributes["DW_AT_producer"].value.decode("ascii", errors="ignore").lower()
+					compiler = (topDIE.attributes["DW_AT_producer"].value.decode("ascii", errors="ignore").lower())
 					# Remove everything after the first argument
 					index = compiler.find(" -")
 					if index != -1:
@@ -70,8 +68,7 @@ def dieInfoRec(die: Any) -> int:
 	return size
 
 
-if __name__ == '__main__':
-
+if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Binary profiler.")
 	parser.add_argument("--format", choices=["elf-dwarf"], default="elf-dwarf", help="Binary format.")
 	parser.add_argument("--groups", default=None, help="Groups schema if any.")
@@ -112,7 +109,7 @@ if __name__ == '__main__':
 	        "units": groupedResult,
 	    },
 	    "size": os.path.getsize(args.binary_final),
-	    "compilers": compilers
+	    "compilers": compilers,
 	}
 
 	with open(args.output, "w+") as f:

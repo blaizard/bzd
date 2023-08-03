@@ -28,7 +28,7 @@ def parse_category(string: str, args: typing.Any) -> typing.List[str]:
 	string = string.lower()
 	outputs = []
 	for category, regexprMaybeList in args.items():
-		for regexpr in regexprMaybeList if isinstance(regexprMaybeList, list) else [regexprMaybeList]:
+		for regexpr in (regexprMaybeList if isinstance(regexprMaybeList, list) else [regexprMaybeList]):
 			if re.search(regexpr, string):
 				outputs.append(category)
 	if not outputs:
@@ -38,7 +38,12 @@ def parse_category(string: str, args: typing.Any) -> typing.List[str]:
 
 
 def extract(data: typing.Any, config: typing.Any) -> typing.Any:
-	types = {"date": parser_date, "number": parse_number, "category": parse_category, "copy": parse_copy}
+	types = {
+	    "date": parser_date,
+	    "number": parse_number,
+	    "category": parse_category,
+	    "copy": parse_copy,
+	}
 
 	assert "columns" in config, "Missing columns key."
 

@@ -12,7 +12,6 @@ class TestRun(unittest.TestCase):
 		return [line.strip() for line in content.split("\n") if line.strip()]
 
 	def testFormatter(self) -> None:
-
 		bdl = Object.fromContent(content="""/*
   This is a multi-line comment
  */
@@ -68,8 +67,9 @@ interface MyFy {
 composition {
 	var1 = 12 + ab.int32;
 	regexpr1 = /12/-/da\.ds.*/;
-}"""))
+}"""),
+		)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 	unittest.main()

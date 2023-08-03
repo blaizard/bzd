@@ -9,7 +9,6 @@ from typing import Tuple, List, Mapping, Any
 
 
 def printTable(data: List[List[str]], headers: List[str]) -> None:
-
 	# Calculate column sizes
 	columnSizes: List[int] = []
 	for row in [headers] + data:
@@ -36,7 +35,6 @@ def printMetadataCC(data: Mapping[str, Any]) -> None:
 		groups: List[List[str]] = []
 		size = 0
 		for unit, item in group.items():
-
 			if isinstance(item, int):
 				partSize = item
 			elif isinstance(item, dict):
@@ -62,7 +60,6 @@ def printMetadata(metadata: Mapping[str, Any]) -> None:
 
 
 if __name__ == "__main__":
-
 	parser = argparse.ArgumentParser(description="Metadata visualizer.")
 	parser.add_argument("--bazel", default="bazel", help="Bazel binary path.")
 	parser.add_argument("path", help="Path of the root or file to be visualized.")
@@ -73,11 +70,14 @@ if __name__ == "__main__":
 
 	# If directory, look for all metadata
 	if os.path.isdir(args.path):
-
-		proc = subprocess.run([args.bazel, "query", "kind(bzd_package, //...)"], cwd=args.path, stdout=subprocess.PIPE)
+		proc = subprocess.run(
+		    [args.bazel, "query", "kind(bzd_package, //...)"],
+		    cwd=args.path,
+		    stdout=subprocess.PIPE,
+		)
 		targets = proc.stdout.decode("ascii").strip().split("\n")
 		for target in targets:
-			m = re.match(r'^//(.*):(.*)$', target)
+			m = re.match(r"^//(.*):(.*)$", target)
 			assert m, "Unable to match: {}".format(target)
 			metadataList.append("{}/bazel-bin/{}/{}.metadata.json".format(args.path, m.group(1), m.group(2)))
 

@@ -24,7 +24,12 @@ class ContractTraits:
     Base class to define a contract.
     """
 
-	def __init__(self, name: str, role: int, constraint: typing.Optional[typing.Type[Constraint]] = None) -> None:
+	def __init__(
+	    self,
+	    name: str,
+	    role: int,
+	    constraint: typing.Optional[typing.Type[Constraint]] = None,
+	) -> None:
 		# Name of the contract
 		self.name = name
 		# Defines contract role

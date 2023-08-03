@@ -11,7 +11,6 @@ from typing import Any, Dict
 
 
 def parseYarn(yarnLockPath: str, packages: Dict[str, Any] = {}) -> Dict[str, Any]:
-
 	pattern = re.compile("^(.*)@([^@]*)[:,]$")
 
 	current = None
@@ -35,9 +34,13 @@ def parseYarn(yarnLockPath: str, packages: Dict[str, Any] = {}) -> Dict[str, Any
 
 
 if __name__ == "__main__":
-
 	parser = argparse.ArgumentParser(description="Information generator for NodeJs rules.")
-	parser.add_argument("--package_json", type=str, default="packages.json", help="Path of the packages json file.")
+	parser.add_argument(
+	    "--package_json",
+	    type=str,
+	    default="packages.json",
+	    help="Path of the packages json file.",
+	)
 	parser.add_argument("--yarn_lock", type=str, help="Path of the packages json file.")
 	parser.add_argument("output", default="package.manifest", help="Path of the generated file.")
 

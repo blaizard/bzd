@@ -4,13 +4,24 @@ from collections import defaultdict
 from tools.bdl.entities.impl.types import Category
 
 if typing.TYPE_CHECKING:
-	from tools.bdl.entities.all import Expression, Extern, Builtin, Nested, Method, Using, Enum, Namespace, Use, EntityType
+	from tools.bdl.entities.all import (
+	    Expression,
+	    Extern,
+	    Builtin,
+	    Nested,
+	    Method,
+	    Using,
+	    Enum,
+	    Namespace,
+	    Use,
+	    EntityType,
+	)
 
 
 class EntitySequence:
 	"""
-	Defines an entity sequence
-	"""
+    Defines an entity sequence
+    """
 
 	def __init__(self, sequence: typing.List["EntityType"]) -> None:
 		self.sequence_ = sequence
@@ -19,8 +30,8 @@ class EntitySequence:
 	@property
 	def sequence(self) -> typing.List["EntityType"]:
 		"""
-		Used for customization.
-		"""
+        Used for customization.
+        """
 		return self.sequence_
 
 	def __iter__(self) -> typing.Iterator["EntityType"]:
@@ -48,13 +59,24 @@ class EntitySequence:
 
 	@property
 	def isNested(self) -> bool:
-		return self._is(Category.struct, Category.interface, Category.component, Category.composition)
+		return self._is(
+		    Category.struct,
+		    Category.interface,
+		    Category.component,
+		    Category.composition,
+		)
 
 	@property
 	def nestedList(self) -> typing.List["Nested"]:
 		return typing.cast(
 		    typing.List["Nested"],
-		    self._filteredList(Category.struct, Category.interface, Category.component, Category.composition))
+		    self._filteredList(
+		        Category.struct,
+		        Category.interface,
+		        Category.component,
+		        Category.composition,
+		    ),
+		)
 
 	@property
 	def isExpression(self) -> bool:

@@ -48,5 +48,5 @@ class TestRun(unittest.TestCase):
 		self.assertEqual(" aa ab ba bb", result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 	unittest.main()

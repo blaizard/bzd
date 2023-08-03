@@ -45,9 +45,9 @@ class SubstitutionWrapper:
 
 	def update(self, other: "SubstitutionWrapper") -> None:
 		"""
-		Update the current object with another substitution wrapper.
-		This will only update the ext part.
-		"""
+        Update the current object with another substitution wrapper.
+        This will only update the ext part.
+        """
 		for key, value in other.ext.items():
 			if value:
 				if key not in self.ext:

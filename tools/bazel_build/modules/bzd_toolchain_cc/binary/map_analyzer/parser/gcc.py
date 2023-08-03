@@ -7,27 +7,31 @@ from .parser import Parser
 
 class ParserGcc(Parser):
 	"""
-	Gcc-generated map file parser. 
-	"""
+    Gcc-generated map file parser.
+    """
 
 	def parse(self) -> bool:
 		"""
-		Parse the file.
+        Parse the file.
 
-		Returns:
-			True in case of success, False otherwise.
-		"""
+        Returns:
+                True in case of success, False otherwise.
+        """
 
 		with open(self.path, "r") as f:
-
 			# Look for a line that ends with "memory map"
-			if not self._goto(f, re.compile(r'^.*memory map$', re.IGNORECASE)):
+			if not self._goto(f, re.compile(r"^.*memory map$", re.IGNORECASE)):
 				return False
 
 			table: typing.Optional[FixedTable] = None
 			for line in f:
 				table = FixedTable.fromPattern(
-				    line, re.compile(r'^(.*)\s(0x[0-9a-f]{8,})\s(\s+0x[0-9a-f]+)\s(.*)$', re.IGNORECASE))
+				    line,
+				    re.compile(
+				        r"^(.*)\s(0x[0-9a-f]{8,})\s(\s+0x[0-9a-f]+)\s(.*)$",
+				        re.IGNORECASE,
+				    ),
+				)
 				if table:
 					break
 
@@ -36,13 +40,13 @@ class ParserGcc(Parser):
 
 			# Go back to the begining
 			f.seek(0)
-			self._goto(f, re.compile(r'^.*memory map$', re.IGNORECASE))
+			self._goto(f, re.compile(r"^.*memory map$", re.IGNORECASE))
 
 			sections = []
 			units = []
 			section = None
 			isSection = False
-			regexprHex = re.compile(r'^0x[0-9a-f]+$', re.IGNORECASE)
+			regexprHex = re.compile(r"^0x[0-9a-f]+$", re.IGNORECASE)
 
 			for line in f:
 				parts = table.parse(line)
@@ -64,7 +68,7 @@ class ParserGcc(Parser):
 						# Some section are appended with some extra info, ignore it, such as:
 						# - <section> memory region -> ram
 						# - <section> memory region ->
-						section = re.sub(r'memory\s+region\s+->.*$', '', maybeSection)
+						section = re.sub(r"memory\s+region\s+->.*$", "", maybeSection)
 						isSection = True
 
 				# If the data only contains the section, ignore as we have already handled it
@@ -81,7 +85,11 @@ class ParserGcc(Parser):
 
 				# Populate the section
 				if section and isSection:
-					sections.append({"section": section, "address": int(maybeAddress, 16), "size": int(maybeSize, 16)})
+					sections.append({
+					    "section": section,
+					    "address": int(maybeAddress, 16),
+					    "size": int(maybeSize, 16),
+					})
 				isSection = False
 
 				# Populate the unit
@@ -90,11 +98,11 @@ class ParserGcc(Parser):
 					cellContent = parts.get(3, strip=False)
 					assert cellContent
 					if cellContent[1] != " ":
-						m = re.match(r'^(?!LONG|load address)([^\(:]+).*$', maybeUnit)
+						m = re.match(r"^(?!LONG|load address)([^\(:]+).*$", maybeUnit)
 						units.append({
 						    "section": section,
 						    "size": int(maybeSize, 16),
-						    "units": m.group(1) if m else "undefined"
+						    "units": m.group(1) if m else "undefined",
 						})
 
 			self.setParsedData(units=units, sections=sections, areUnitsPath=True)

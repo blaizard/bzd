@@ -39,17 +39,23 @@ def getDevice(args: argparse.Namespace) -> Device:
 
 
 if __name__ == "__main__":
-
 	parser = argparse.ArgumentParser(description="ESP32 executor script.")
 	parser.add_argument("--device", type=Device, help="Device.")
 	parser.add_argument("--baud_rate", type=int, default=115200, help="Baudrate of the communication.")
 	parser.add_argument("--data_bits", type=int, default=8, help="Data bits.")
-	parser.add_argument("--parity", choices=["none", "even", "odd", "mark", "space"], default="none", help="Parity.")
+	parser.add_argument(
+	    "--parity",
+	    choices=["none", "even", "odd", "mark", "space"],
+	    default="none",
+	    help="Parity.",
+	)
 	parser.add_argument("--stop_bits", type=float, default=1, help="Number of stop bits.")
-	parser.add_argument("--flow_control",
-	                    choices=["none", "xonxoff", "rtscts", "dsrdtr"],
-	                    default="none",
-	                    help="Flow control.")
+	parser.add_argument(
+	    "--flow_control",
+	    choices=["none", "xonxoff", "rtscts", "dsrdtr"],
+	    default="none",
+	    help="Flow control.",
+	)
 	parser.add_argument("--target", choices=targets.keys(), default="esp32", help="Target.")
 	parser.add_argument("--esptool", default="esptool.py", help="Path of the esptool.")
 	parser.add_argument("elf", type=str, help="Binary in ELF format to be executed.")
@@ -64,17 +70,19 @@ if __name__ == "__main__":
 
 	Logger.info(f"Programming {args.target} target through device {device}...")
 
-	commandArgs = str(target["args"]).format(device=device,
-	                                         memory=" ".join([
-	                                             "0x{:x} {}".format(offset, f.format(binary=args.image))
-	                                             for offset, f in target["memoryMap"].items()
-	                                         ]))
+	commandArgs = str(target["args"]).format(
+	    device=device,
+	    memory=" ".join(
+	        ["0x{:x} {}".format(offset, f.format(binary=args.image)) for offset, f in target["memoryMap"].items()]),
+	)
 
-	result = localPython(script=args.esptool,
-	                     args=shlex.split(commandArgs),
-	                     ignoreFailure=True,
-	                     stdout=True,
-	                     stderr=True)
+	result = localPython(
+	    script=args.esptool,
+	    args=shlex.split(commandArgs),
+	    ignoreFailure=True,
+	    stdout=True,
+	    stderr=True,
+	)
 
 	if result.getReturnCode() != 0:
 		Logger.error(f"Operation failed with return code {result.getReturnCode()}.")
@@ -82,10 +90,12 @@ if __name__ == "__main__":
 		Logger.info("- Connection failed `Timed out waiting for packet header`: try to press the BOOT button.")
 		sys.exit(1)
 
-	uart = Uart(device=device,
-	            baudrate=args.baud_rate,
-	            dataBits=args.data_bits,
-	            stopBits=args.stop_bits,
-	            parity=args.parity,
-	            controlFlow=args.flow_control)
+	uart = Uart(
+	    device=device,
+	    baudrate=args.baud_rate,
+	    dataBits=args.data_bits,
+	    stopBits=args.stop_bits,
+	    parity=args.parity,
+	    controlFlow=args.flow_control,
+	)
 	uart.start()

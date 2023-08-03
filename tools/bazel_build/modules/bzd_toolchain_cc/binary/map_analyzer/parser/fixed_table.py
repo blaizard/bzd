@@ -6,8 +6,8 @@ PartsType = typing.List[str]
 
 class _Row:
 	"""
-	Table row accessor class.
-	"""
+    Table row accessor class.
+    """
 
 	def __init__(self, table: "FixedTable", parts: PartsType) -> None:
 		self.table = table
@@ -15,15 +15,15 @@ class _Row:
 
 	def get(self, identifier: typing.Union[int, str], strip: bool = True) -> typing.Optional[str]:
 		"""
-		Access a single element from the row.
+        Access a single element from the row.
 
-		Args:
-			identifier: The cell position identifier within the row.
-			strip: Wether stripped output is needed or not.
+        Args:
+                identifier: The cell position identifier within the row.
+                strip: Wether stripped output is needed or not.
 
-		Returns:
-			The element, or None if no element is present.
-		"""
+        Returns:
+                The element, or None if no element is present.
+        """
 		assert self.table.isValidIdentifier(identifier), "Invalid identifier: {}".format(identifier)
 
 		if isinstance(identifier, int):
@@ -37,44 +37,46 @@ class _Row:
 
 	def size(self) -> int:
 		"""
-		Get the number of elements from the row.
+        Get the number of elements from the row.
 
-		Returns:
-			The size of the row.
-		"""
+        Returns:
+                The size of the row.
+        """
 		return len(self.parts)
 
 	def empty(self) -> bool:
 		"""
-		Tells if a row is empty or not.
+        Tells if a row is empty or not.
 
-		Returns:
-			True if there is no element in the row, False otherwise.
-		"""
+        Returns:
+                True if there is no element in the row, False otherwise.
+        """
 		return self.size() == 0
 
 
 class FixedTable:
 	"""
-	A fixed table is a table which columns have a fixed width accross the rows.
-	"""
+    A fixed table is a table which columns have a fixed width accross the rows.
+    """
 
-	def __init__(self,
-	             separations: typing.List[int],
-	             nameToIndex: typing.Optional[typing.Dict[str, int]] = None) -> None:
+	def __init__(
+	    self,
+	    separations: typing.List[int],
+	    nameToIndex: typing.Optional[typing.Dict[str, int]] = None,
+	) -> None:
 		self.separations = separations
 		self.nameToIndex = nameToIndex if nameToIndex else {}
 
 	def isValidIdentifier(self, identifier: typing.Union[int, str]) -> bool:
 		"""
-		Tells if a specific identifier is valid.
+        Tells if a specific identifier is valid.
 
-		Args:
-			identifier: The identifier to be tested.
+        Args:
+                identifier: The identifier to be tested.
 
-		Returns:
-			True if it is a valid id, False otherwise.
-		"""
+        Returns:
+                True if it is a valid id, False otherwise.
+        """
 		if isinstance(identifier, int):
 			return identifier >= 0 and identifier < self.nbColumns()
 
@@ -86,15 +88,15 @@ class FixedTable:
 	@staticmethod
 	def fromHeader(header: str, schema: typing.Dict[str, typing.Any]) -> typing.Optional["FixedTable"]:
 		"""
-		Make a FixedTable instance from the header line.
+        Make a FixedTable instance from the header line.
 
-		Args:
-			header: The header string line.
-			schema: A schema describing the columns.
+        Args:
+                header: The header string line.
+                schema: A schema describing the columns.
 
-		Returns:
-			A FixedTable instance in case of succes, None otherwise.
-		"""
+        Returns:
+                A FixedTable instance in case of succes, None otherwise.
+        """
 
 		separations = [0]
 		nameToIndex = {}
@@ -109,7 +111,7 @@ class FixedTable:
 				end = result + len(name) + 1
 			else:
 				end = result + len(name)
-				nbBlanks = re.search(r'\S', header[end:])
+				nbBlanks = re.search(r"\S", header[end:])
 				end += nbBlanks.start() if nbBlanks else 0
 
 			assert name not in nameToIndex, "Cell name already discovered: {}".format(name)
@@ -122,15 +124,15 @@ class FixedTable:
 	@staticmethod
 	def fromPattern(line: str, regexpr: typing.Pattern[str]) -> typing.Optional["FixedTable"]:
 		"""
-		Make a FixedTable instance from a row and a regular expression. 
+        Make a FixedTable instance from a row and a regular expression.
 
-		Args:
-			line: The row string line.
-			regexpr: The regular expression where each capture element corresponds to a cell.
+        Args:
+                line: The row string line.
+                regexpr: The regular expression where each capture element corresponds to a cell.
 
-		Returns:
-			A FixedTable instance in case of succes, None otherwise.
-		"""
+        Returns:
+                A FixedTable instance in case of succes, None otherwise.
+        """
 
 		m = regexpr.match(line)
 		if not m:
@@ -143,24 +145,24 @@ class FixedTable:
 
 	def nbColumns(self) -> int:
 		"""
-		Return the number of columns of this table.
+        Return the number of columns of this table.
 
-		Returns:
-			The number of columns.
-		"""
+        Returns:
+                The number of columns.
+        """
 
 		return len(self.separations) - 1
 
 	def parse(self, line: str) -> _Row:
 		"""
-		Parse a new string line.
+        Parse a new string line.
 
-		Args:
-			line: The row string line.
+        Args:
+                line: The row string line.
 
-		Returns:
-			A row accessor of the parsed line.
-		"""
+        Returns:
+                A row accessor of the parsed line.
+        """
 
 		# Split the data into cells
 		parts = [line[i:j] for i, j in zip(self.separations, self.separations[1:] + [len(line)])]
@@ -171,7 +173,7 @@ class FixedTable:
 			if parts[i]:
 				# Wrap content that is not the first cell, and that has content
 				# on the first position or is further than the number of columns.
-				if i and (parts[i][0] != ' ' or i >= self.nbColumns()):
+				if i and (parts[i][0] != " " or i >= self.nbColumns()):
 					carry = parts[i] + carry
 					parts[i] = ""
 				else:

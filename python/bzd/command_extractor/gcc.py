@@ -6,7 +6,15 @@ import re
 import os
 import enum
 
-from bzd.command_extractor.common import CommandExtractor, Processor, Item, ItemString, ItemPath, ItemPathOrString, ItemFactory
+from bzd.command_extractor.common import (
+    CommandExtractor,
+    Processor,
+    Item,
+    ItemString,
+    ItemPath,
+    ItemPathOrString,
+    ItemFactory,
+)
 
 
 class Categories(enum.Enum):
@@ -40,10 +48,12 @@ class ItemLibrary(ItemPathOrString):
 
 class CommandExtractorGcc(CommandExtractor):
 
-	def __init__(self,
-	             cwd: pathlib.Path,
-	             includeSearchPaths: typing.List[pathlib.Path] = [],
-	             libSearchPaths: typing.List[pathlib.Path] = []) -> None:
+	def __init__(
+	    self,
+	    cwd: pathlib.Path,
+	    includeSearchPaths: typing.List[pathlib.Path] = [],
+	    libSearchPaths: typing.List[pathlib.Path] = [],
+	) -> None:
 		super().__init__()
 		self.cwd = cwd
 		for path in [cwd] + includeSearchPaths:
@@ -54,7 +64,7 @@ class CommandExtractorGcc(CommandExtractor):
 	def addLibrary(self, name: str, factory: ItemFactory = ItemFactory()) -> None:
 		"""Add a new library the the list."""
 
-		fileName = name if re.match(r'lib.*\.a', pathlib.Path(name).name) else "lib{}.a".format(name)
+		fileName = (name if re.match(r"lib.*\.a", pathlib.Path(name).name) else "lib{}.a".format(name))
 		for path in self.librarySearchPaths:
 			fullPath = path / fileName
 			if fullPath.is_file():
@@ -74,7 +84,12 @@ class CommandExtractorGcc(CommandExtractor):
 		self.result.append(factory.make(ItemPathOrString, Categories.linkerScript, fileName))
 		print("WARNING: cannot locate linker script {}".format(fileName))
 
-	def addSearchPath(self, category: Categories, path: pathlib.Path, factory: ItemFactory = ItemFactory()) -> None:
+	def addSearchPath(
+	        self,
+	        category: Categories,
+	        path: pathlib.Path,
+	        factory: ItemFactory = ItemFactory(),
+	) -> None:
 		"""Add a search path to a container."""
 
 		searchPath = factory.make(ItemPath, category, path)
@@ -123,22 +138,24 @@ class CommandExtractorGcc(CommandExtractor):
 			self.result.append(factory.make(ItemString, Categories.unhandled, arg))
 
 	def parse(self, cmdString: str) -> None:  # type: ignore
-
 		super().parse(
-		    cmdString, {
-		        r'-L':
+		    cmdString,
+		    {
+		        r"-L":
 		            Processor(
 		                1,
-		                lambda factory, x: self.addSearchPath(Categories.librarySearchPath, pathlib.Path(x), factory)),
-		        r'-l':
+		                lambda factory, x: self.addSearchPath(Categories.librarySearchPath, pathlib.Path(x), factory),
+		            ),
+		        r"-l":
 		            Processor(1, lambda factory, x: self.addLibrary(x, factory)),
-		        r'-T':
+		        r"-T":
 		            Processor(1, lambda factory, x: self.addLinkerScript(x, factory)),
-		        r'-I':
+		        r"-I":
 		            Processor(
 		                1,
-		                lambda factory, x: self.addSearchPath(Categories.includeSearchPath, pathlib.Path(x), factory)),
-		        r'-o':
+		                lambda factory, x: self.addSearchPath(Categories.includeSearchPath, pathlib.Path(x), factory),
+		            ),
+		        r"-o":
 		            Processor(1, lambda factory, x: self.addOutputPath(x, factory)),
 		        **self.generateItemString({
 		            r"-u": Categories.undefine,
@@ -148,7 +165,9 @@ class CommandExtractorGcc(CommandExtractor):
 		            r"-f": Categories.flag,
 		            r"-O": Categories.optimisation,
 		            r"-g": Categories.debug,
-		            r"-std": Categories.standard
+		            r"-std": Categories.standard,
 		        }),
 		        **self.generateItem({r"-c": Categories.compileOnly}),
-		    }, self._fallback)
+		    },
+		    self._fallback,
+		)

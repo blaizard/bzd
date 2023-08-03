@@ -30,15 +30,17 @@ class Loop:
 class Visitor(VisitorBase[ResultType, ResultType]):
 	nestedKind = None
 
-	def __init__(self,
-	             substitutions: typing.Union[SubstitutionsAccessor, SubstitutionWrapper],
-	             includeDirs: typing.Sequence[pathlib.Path] = [pathlib.Path(__file__).parent.parent.parent.parent],
-	             indent: bool = False) -> None:
+	def __init__(
+	    self,
+	    substitutions: typing.Union[SubstitutionsAccessor, SubstitutionWrapper],
+	    includeDirs: typing.Sequence[pathlib.Path] = [pathlib.Path(__file__).parent.parent.parent.parent],
+	    indent: bool = False,
+	) -> None:
 		# Re-use directly substitution wrapper if provided.
 		# This is needed by the include control block, as we want macros (for example) to be executed
 		# with the current substition object and not a copy at a given time.
-		self.substitutions = substitutions if isinstance(substitutions,
-		                                                 SubstitutionWrapper) else SubstitutionWrapper(substitutions)
+		self.substitutions = (substitutions
+		                      if isinstance(substitutions, SubstitutionWrapper) else SubstitutionWrapper(substitutions))
 		self.includeDirs = includeDirs
 		# Indent multiline substitution blocks to mmaatch the start of the block.
 		self.indent = indent
@@ -51,9 +53,9 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 
 	def resolveExpressions(self, sequence: Sequence) -> typing.List[typing.Any]:
 		"""Resolve expressions into their values.
-		Expression is a nested sequence that might correspond to callable arguments, pipeable expression or more
-		simply a single expression.
-		"""
+        Expression is a nested sequence that might correspond to callable arguments, pipeable expression or more
+        simply a single expression.
+        """
 
 		values: typing.List[typing.Any] = []
 		operator = None
@@ -82,17 +84,16 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 		operatorsUnary: typing.Dict[str, typing.Callable[[typing.Any], typing.Any]] = {"not": (lambda r: not r)}
 
 		for element in sequence:
-
 			try:
-
 				elementType = element.getAttr("type").value
 
 				if elementType in operators:
-					assert operator is None, f"Detected 2 consecutive operators '{operator}' and '{elementType}'."
+					assert (operator is None), f"Detected 2 consecutive operators '{operator}' and '{elementType}'."
 					operator = elementType
 
 				elif elementType in operatorsUnary:
-					assert operatorUnary is None, f"Detected 2 consecutive unary operators '{operatorUnary}' and '{elementType}'."
+					assert (operatorUnary
+					        is None), f"Detected 2 consecutive unary operators '{operatorUnary}' and '{elementType}'."
 					operatorUnary = elementType
 
 				else:
@@ -100,7 +101,7 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 					if elementType == "symbol":
 						value = self.substitutions
 						for symbol in element.getNestedSequenceAssert(kind="symbol"):
-							symbolType = symbol.getAttr("type").value if symbol.isAttr("type") else "symbol"
+							symbolType = (symbol.getAttr("type").value if symbol.isAttr("type") else "symbol")
 							if symbolType == "symbol":
 								key = symbol.getAttr("value").value
 								value = substitute(value, key)
@@ -126,7 +127,7 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 						assert False, f"Unsupported element type '{elementType}'."
 
 					if operator is not None:
-						assert len(values) > 0, "There is no value to apply this {operator} operator."
+						assert (len(values) > 0), "There is no value to apply this {operator} operator."
 						values[-1] = operators[operator](values[-1], value)
 						operator = None
 
@@ -149,13 +150,13 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 		"""Resolve a single expression and ensure it is unique."""
 
 		values = self.resolveExpressions(sequence)
-		assert len(values) == 1, f"There are more than a single value: {[type(v) for v in values]}."
+		assert (len(values) == 1), f"There are more than a single value: {[type(v) for v in values]}."
 		return values[0]
 
 	def visitSubstitution(self, element: Element, result: ResultType) -> None:
 		"""
-		Handle substitution.
-		"""
+        Handle substitution.
+        """
 
 		value = self.resolveExpression(element.getNestedSequenceAssert("value"))
 
@@ -180,7 +181,6 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 		return indent
 
 	def appendSubstitution(self, element: Element, result: ResultType, string: str) -> ResultType:
-
 		# Apply indentation if enabled
 		if self.indent and result:
 			indentation = self.getIndentation(result)
@@ -190,14 +190,13 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 		return result
 
 	def appendBlock(self, element: Element, result: ResultType, block: ResultType) -> ResultType:
-
 		result += block
 		return result
 
 	def visitForBlock(self, element: Element) -> ResultType:
 		"""
-		Handle for loop block.
-		"""
+        Handle for loop block.
+        """
 
 		Error.assertHasAttr(element=element, attr="value1")
 		Error.assertHasSequence(element=element, sequence="iterable")
@@ -222,7 +221,7 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 				self.substitutions.unregister(value1)
 				loop._inc()
 		else:
-			iterablePair = iterable.items() if isinstance(iterable, dict) else enumerate(iterable)
+			iterablePair = (iterable.items() if isinstance(iterable, dict) else enumerate(iterable))
 			for key, value in iterablePair:
 				self.substitutions.register(element=element, key=value1, value=key)
 				self.substitutions.register(element=element, key=value2, value=value)
@@ -236,8 +235,8 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 
 	def visitIfBlock(self, element: Element, optionalCondition: bool) -> ResultType:
 		"""
-		Handle if block.
-		"""
+        Handle if block.
+        """
 
 		sequence = element.getNestedSequenceAssert(kind="nested")
 
@@ -256,8 +255,8 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 
 	def processMacro(self, element: Element, *args: typing.Any) -> str:
 		"""
-		Process a macro already defined.
-		"""
+        Process a macro already defined.
+        """
 
 		sequence = element.getNestedSequence("nested")
 		assert sequence
@@ -271,10 +270,11 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 			argList.append(arg.getAttr("name").value)
 
 		# Sanity check
-		Error.assertTrue(element=element,
-		                 condition=len(argList) == len(args),
-		                 message="Wrong number of argument(s), expected {}: {}".format(
-		                     len(argList), ", ".join(argList)))
+		Error.assertTrue(
+		    element=element,
+		    condition=len(argList) == len(args),
+		    message="Wrong number of argument(s), expected {}: {}".format(len(argList), ", ".join(argList)),
+		)
 
 		for i, name in enumerate(argList):
 			self.substitutions.register(element=element, key=name, value=args[i])
@@ -289,43 +289,55 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 
 	def visitMacro(self, element: Element) -> None:
 		"""
-		Handle macro definition block.
-		"""
+        Handle macro definition block.
+        """
 
 		Error.assertHasSequence(element=element, sequence="argument")
 		Error.assertHasSequence(element=element, sequence="nested")
 		Error.assertHasAttr(element=element, attr="name")
 
 		name = element.getAttr("name").value
-		Error.assertTrue(element=element,
-		                 attr="name",
-		                 condition=(name not in self.substitutions),
-		                 message="Name conflict with macro and an already existing name: '{}'.".format(name))
+		Error.assertTrue(
+		    element=element,
+		    attr="name",
+		    condition=(name not in self.substitutions),
+		    message="Name conflict with macro and an already existing name: '{}'.".format(name),
+		)
 
 		# Register the macro
-		self.substitutions.register(element=element, key=name, value=lambda *args: self.processMacro(element, *args))
+		self.substitutions.register(
+		    element=element,
+		    key=name,
+		    value=lambda *args: self.processMacro(element, *args),
+		)
 
 	def visitInclude(self, element: Element) -> ResultType:
 		"""
-		Handle include.
-		"""
+        Handle include.
+        """
 
 		Error.assertHasAttr(element=element, attr="value")
 		includePathStr = element.getAttr("value").value
 
-		Error.assertTrue(element=element,
-		                 condition=isinstance(includePathStr, str),
-		                 message="The include path must resolve into a string, instead: '{}'.".format(includePathStr))
+		Error.assertTrue(
+		    element=element,
+		    condition=isinstance(includePathStr, str),
+		    message="The include path must resolve into a string, instead: '{}'.".format(includePathStr),
+		)
 		path = pathlib.Path(includePathStr)
 		paths = [(base / path) for base in self.includeDirs if (base / path).is_file()]
-		Error.assertTrue(element=element,
-		                 condition=len(paths) > 0,
-		                 message="No valid file '{}' within {}".format(includePathStr,
-		                                                               str([f.as_posix() for f in self.includeDirs])))
+		Error.assertTrue(
+		    element=element,
+		    condition=len(paths) > 0,
+		    message="No valid file '{}' within {}".format(includePathStr,
+		                                                  str([f.as_posix() for f in self.includeDirs])),
+		)
 
-		template = bzd.template.template.Template(template=paths[0].read_text(),
-		                                          includeDirs=self.includeDirs,
-		                                          indent=self.indent)
+		template = bzd.template.template.Template(
+		    template=paths[0].read_text(),
+		    includeDirs=self.includeDirs,
+		    indent=self.indent,
+		)
 		result, substitutions = template._render(substitutions=self.substitutions)
 
 		# Update the current substitution object
@@ -335,14 +347,13 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 
 	def visitElement(self, element: Element, result: ResultType) -> ResultType:
 		"""
-		Go through all elements and dispatch the action.
-		"""
+        Go through all elements and dispatch the action.
+        """
 
 		Error.assertHasAttr(element=element, attr="category")
 		category = element.getAttr("category").value
 
 		try:
-
 			# Raw content
 			if category == "content":
 				Error.assertHasAttr(element=element, attr="content")

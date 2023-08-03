@@ -19,7 +19,6 @@ factories: typing.Final[typing.Iterable[typing.Type[Factory]]] = (
 )
 
 if __name__ == "__main__":
-
 	parser = argparse.ArgumentParser(description="Wrapper for CI generation files")
 	parser.add_argument("workspace", type=pathlib.Path, help="Workspace to be processed.")
 	args = parser.parse_args()

@@ -1,9 +1,10 @@
 import typing
 
 
-def isEqual(d1: typing.MutableMapping[typing.Any, typing.Any], d2: typing.MutableMapping[typing.Any,
-                                                                                         typing.Any]) -> bool:
-
+def isEqual(
+    d1: typing.MutableMapping[typing.Any, typing.Any],
+    d2: typing.MutableMapping[typing.Any, typing.Any],
+) -> bool:
 	if len(d1.keys()) != len(d2.keys()):
 		return False
 
@@ -20,8 +21,10 @@ def isEqual(d1: typing.MutableMapping[typing.Any, typing.Any], d2: typing.Mutabl
 	return True
 
 
-def updateDeep(d: typing.MutableMapping[typing.Any, typing.Any],
-               u: typing.MutableMapping[typing.Any, typing.Any]) -> typing.MutableMapping[typing.Any, typing.Any]:
+def updateDeep(
+    d: typing.MutableMapping[typing.Any, typing.Any],
+    u: typing.MutableMapping[typing.Any, typing.Any],
+) -> typing.MutableMapping[typing.Any, typing.Any]:
 	"""Deep update of 2 dictionaries."""
 
 	for k, v in u.items():

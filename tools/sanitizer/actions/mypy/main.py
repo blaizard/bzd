@@ -14,15 +14,23 @@ includePaths = ["python"]
 
 
 def mypyWorker(package: str, stdout: TextIO) -> None:
-
 	# To support namespace, the package has to be passed
-	main(stdout=stdout,
-	     stderr=stdout,
-	     clean_exit=True,
-	     args=[
-	         "--config-file", configFile, "--strict", "--follow-imports", "silent", "--show-error-context", "--pretty",
-	         "-p", package
-	     ])
+	main(
+	    stdout=stdout,
+	    stderr=stdout,
+	    clean_exit=True,
+	    args=[
+	        "--config-file",
+	        configFile,
+	        "--strict",
+	        "--follow-imports",
+	        "silent",
+	        "--show-error-context",
+	        "--pretty",
+	        "-p",
+	        package,
+	    ],
+	)
 
 
 if __name__ == "__main__":
@@ -31,9 +39,13 @@ if __name__ == "__main__":
 
 	args = parser.parse_args()
 
-	files = Files(args.workspace, include=[
-	    "**/*.py",
-	], exclude=["**python/bzd/yaml**", "**_test.py"])
+	files = Files(
+	    args.workspace,
+	    include=[
+	        "**/*.py",
+	    ],
+	    exclude=["**python/bzd/yaml**", "**_test.py"],
+	)
 
 	# Set the include paths
 	includeFullPaths = [args.workspace.as_posix()] + ["{}/{}".format(args.workspace, path) for path in includePaths]
@@ -43,7 +55,6 @@ if __name__ == "__main__":
 	worker = bzd.utils.worker.Worker(mypyWorker)
 	worker.start()
 	for path in files.data(relative=True):
-
 		# Strip name from include paths (if available)
 		# and generate package name
 		pathStr = path.with_suffix("").as_posix()

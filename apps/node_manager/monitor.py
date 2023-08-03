@@ -21,7 +21,6 @@ CPU loads are in percent.
 
 
 def monitorTemperatures() -> typing.Any:
-
 	data = {}
 	temperatures = psutil.sensors_temperatures()
 	for name, group in temperatures.items():
@@ -38,7 +37,6 @@ def monitor() -> typing.Any:
 
 
 def handlerMonitor(context: RESTServerContext) -> None:
-
 	context.header("Content-type", "application/json")
 	context.write(json.dumps(monitor()))
 

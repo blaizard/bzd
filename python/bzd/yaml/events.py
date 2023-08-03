@@ -8,9 +8,9 @@ class Event(object):
 		self.end_mark = end_mark
 
 	def __repr__(self):
-		attributes = [key for key in ['anchor', 'tag', 'implicit', 'value'] if hasattr(self, key)]
-		arguments = ', '.join(['%s=%r' % (key, getattr(self, key)) for key in attributes])
-		return '%s(%s)' % (self.__class__.__name__, arguments)
+		attributes = [key for key in ["anchor", "tag", "implicit", "value"] if hasattr(self, key)]
+		arguments = ", ".join(["%s=%r" % (key, getattr(self, key)) for key in attributes])
+		return "%s(%s)" % (self.__class__.__name__, arguments)
 
 
 class NodeEvent(Event):

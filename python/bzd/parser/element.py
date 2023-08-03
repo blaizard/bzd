@@ -5,7 +5,14 @@ from dataclasses import dataclass
 
 from bzd.utils.dict import isEqual
 
-from bzd.parser.fragments import Fragment, Attributes, Attribute, AttributeParser, AttributesSerialize, IGNORE_INDEX_VALUE
+from bzd.parser.fragments import (
+    Fragment,
+    Attributes,
+    Attribute,
+    AttributeParser,
+    AttributesSerialize,
+    IGNORE_INDEX_VALUE,
+)
 from bzd.parser.grammar import Grammar
 from bzd.parser.context import Context
 
@@ -122,20 +129,26 @@ class SequenceBuilder(Sequence):
 class SequenceParser(Sequence):
 	"""This represents a sequence of Elements."""
 
-	def __init__(self, context: typing.Optional[Context], grammar: Grammar,
-	             parent: typing.Optional["ElementParser"]) -> None:
+	def __init__(
+	    self,
+	    context: typing.Optional[Context],
+	    grammar: Grammar,
+	    parent: typing.Optional["ElementParser"],
+	) -> None:
 		super().__init__(context)
 		self.grammar = grammar
 		self.parent = parent
 
 	def makeElement(self, grammar: typing.Optional[Grammar] = None) -> "ElementParser":
 		"""Create a new element in the sequence.
-		Params:
-		- grammar: Optionaly provides a grammar to the new element or reuse existing one.
-		"""
-		element = ElementParser(context=Context(parent=self),
-		                        grammar=self.grammar if grammar is None else grammar,
-		                        parent=self)
+        Params:
+        - grammar: Optionaly provides a grammar to the new element or reuse existing one.
+        """
+		element = ElementParser(
+		    context=Context(parent=self),
+		    grammar=self.grammar if grammar is None else grammar,
+		    parent=self,
+		)
 		self.list.append(element)
 		return element
 
@@ -162,7 +175,8 @@ class Element:
 		assert isinstance(element["@"], dict)
 		e.attrs = {key: Attribute.fromSerialize(attr) for key, attr in element["@"].items()}
 		e.sequences = {
-		    key: Sequence.fromSerialize(sequence, Context(parent=e))  # type: ignore
+		    key:
+		        Sequence.fromSerialize(sequence, Context(parent=e))  # type: ignore
 		    for key, sequence in element.items() if key != "@"
 		}
 		return e
@@ -180,7 +194,7 @@ class Element:
 	def getAttr(self, name: str) -> Attribute:
 		"""Return a specific name attribute value."""
 
-		assert name in self.attrs, f"Attribute '{name}' is not present in '{str(self)}'."
+		assert (name in self.attrs), f"Attribute '{name}' is not present in '{str(self)}'."
 		return self.attrs[name]
 
 	def getAttrValue(self, name: str, default: typing.Optional[str] = None) -> typing.Optional[str]:
@@ -233,8 +247,10 @@ class Element:
 		"""Serialize an element."""
 
 		data: ElementSerialize = {
-		    "@": {key: attr.serialize(ignoreContext=ignoreContext)
-		          for key, attr in self.getAttrs().items()}
+		    "@": {
+		        key: attr.serialize(ignoreContext=ignoreContext)
+		        for key, attr in self.getAttrs().items()
+		    }
 		}
 		for kind, sequence in self.getNestedSequences():
 			data[kind] = sequence.serialize(ignoreContext=ignoreContext)
@@ -294,9 +310,9 @@ class Element:
 	def toString(self, nested: bool = True) -> str:
 		"""Human readable string representation of the element."""
 
-		contentContext = ["context=\"{}\"".format(self.context)] if self.context is not None else []
+		contentContext = (['context="{}"'.format(self.context)] if self.context is not None else [])
 		content = "<Element {}/>".format(" ".join(
-		    ["{}:{}:{}=\"{}\"".format(key, attr.index, attr.end, attr.value)
+		    ['{}:{}:{}="{}"'.format(key, attr.index, attr.end, attr.value)
 		     for key, attr in self.attrs.items()] + contentContext))
 
 		if nested:
@@ -395,10 +411,12 @@ class ElementBuilder(Element):
 
 class ElementParser(Element):
 
-	def __init__(self,
-	             context: typing.Optional[Context],
-	             grammar: Grammar,
-	             parent: typing.Optional[SequenceParser] = None) -> None:
+	def __init__(
+	    self,
+	    context: typing.Optional[Context],
+	    grammar: Grammar,
+	    parent: typing.Optional[SequenceParser] = None,
+	) -> None:
 		super().__init__(context)
 		self.grammar = grammar
 		self.parent = parent

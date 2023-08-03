@@ -20,9 +20,12 @@ def worker(contextPath: pathlib.Path,
 
 	with worker.start(throwOnException=False) as w:
 		for f in context.data(**filters):
-			w.add([context.workspace, f, context.check] + ([] if args is None else args), timeoutS=timeoutS)
+			w.add(
+			    [context.workspace, f, context.check] + ([] if args is None else args),
+			    timeoutS=timeoutS,
+			)
 		for result in w.data():
-			if (not result.getResult()) or result.isException():
+			if (not bool(result.getResult())) or result.isException():
 				isFailure = True
 				path = str(result.getInput()[1])
 				context.printSection(title=path, level=2)

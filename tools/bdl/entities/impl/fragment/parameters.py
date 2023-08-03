@@ -77,9 +77,9 @@ class ParametersCommon:
 	@property
 	def isNamed(self) -> typing.Optional[bool]:
 		"""
-		Wether or not a parameter pack contains named parameters or not.
-		Returns None if it contains no parameters.
-		"""
+        Wether or not a parameter pack contains named parameters or not.
+        Returns None if it contains no parameters.
+        """
 		if not self.empty():
 			return self.at(0).isName
 		return None
@@ -87,23 +87,28 @@ class ParametersCommon:
 	@property
 	def isVarArgs(self) -> typing.Optional[bool]:
 		"""
-		Wether or not the last parameter is a var args.
-		"""
+        Wether or not the last parameter is a var args.
+        """
 		if not self.empty():
 			return self.at(-1).isVarArgs
 		return None
 
-	def append(self,
-	           entity: "EntityExpression",
-	           allowMix: bool = False,
-	           allowMultiVarArgs: bool = False,
-	           **kwargs: typing.Any) -> Data:
+	def append(
+	    self,
+	    entity: "EntityExpression",
+	    allowMix: bool = False,
+	    allowMultiVarArgs: bool = False,
+	    **kwargs: typing.Any,
+	) -> Data:
 		entity.assertTrue(
 		    condition=not self.isVarArgs or allowMultiVarArgs,
-		    message=f"Variable arguments '{entity}' can only be present at the end of the parameter list.\n{str(self)}")
+		    message=f"Variable arguments '{entity}' can only be present at the end of the parameter list.\n{str(self)}",
+		)
 		name = entity.name if entity.isName else None
-		entity.assertTrue(condition=(name is None) or (name not in self.names),
-		                  message=f"The name of the parameter '{name}' is duplicated.")
+		entity.assertTrue(
+		    condition=(name is None) or (name not in self.names),
+		    message=f"The name of the parameter '{name}' is duplicated.",
+		)
 		# Add the element.
 		self.list.append(Data(name=name, entity=entity, **kwargs))
 		# This is about having only named or only unamed parameters. Either:
@@ -111,7 +116,7 @@ class ParametersCommon:
 		entity.assertTrue(
 		    condition=allowMix or self.isNamed == entity.isName,
 		    message=
-		    f"Cannot mix named and unnamed parameters: 0:'{self.at(0)}' and {self.size()-1}:'{entity}':\nParameters:\n{str(self)}"
+		    f"Cannot mix named and unnamed parameters: 0:'{self.at(0)}' and {self.size()-1}:'{entity}':\nParameters:\n{str(self)}",
 		)
 		return self.list[-1]
 
@@ -123,7 +128,10 @@ class ParametersCommon:
 				pass
 			elif param.isSymbol:
 				entityType = param.getEntityUnderlyingTypeResolved(resolver)
-				entityType.assertTrue(condition=entityType.isRoleType, message="This entity must be of role type.")
+				entityType.assertTrue(
+				    condition=entityType.isRoleType,
+				    message="This entity must be of role type.",
+				)
 				yield entityType.category
 			else:
 				self.error(element=param.element, message="Unsupported parameter.")
@@ -187,13 +195,16 @@ class ParametersCommon:
 
 		schema: typing.Dict[str, str] = {}
 		for key, expression in self.items(includeVarArgs=True):
-			keyStr = "*" if expression.isVarArgs else str(key.index if forTemplate else key)
-			maybeContracts = expression.contracts.validationForTemplate if forTemplate else expression.contracts.validationForValue
+			keyStr = ("*" if expression.isVarArgs else str(key.index if forTemplate else key))
+			maybeContracts = (expression.contracts.validationForTemplate
+			                  if forTemplate else expression.contracts.validationForValue)
 			schema[keyStr] = maybeContracts if maybeContracts is not None else ""
 			# Add that template argument must be part of the given type.
 			if forTemplate:
-				expression.assertTrue(condition=expression.underlyingTypeFQN is not None,
-				                      message=f"The type '{expression}' was not resolved.")
+				expression.assertTrue(
+				    condition=expression.underlyingTypeFQN is not None,
+				    message=f"The type '{expression}' was not resolved.",
+				)
 				schema[keyStr] += f" convertible({str(expression.underlyingTypeFQN)})"
 
 		if schema:
@@ -221,19 +232,25 @@ class ParametersCommon:
 		return "\n".join(content)
 
 	def error(self, message: str, element: typing.Optional[Element] = None, throw: bool = True) -> AssertionResult:
-		return Error.handleFromElement(element=self.element if element is None else element,
-		                               message=message,
-		                               throw=throw)
+		return Error.handleFromElement(
+		    element=self.element if element is None else element,
+		    message=message,
+		    throw=throw,
+		)
 
-	def assertTrue(self,
-	               condition: bool,
-	               message: str,
-	               element: typing.Optional[Element] = None,
-	               throw: bool = True) -> AssertionResult:
-		return Error.assertTrue(condition=condition,
-		                        element=self.element if element is None else element,
-		                        message=message,
-		                        throw=throw)
+	def assertTrue(
+	    self,
+	    condition: bool,
+	    message: str,
+	    element: typing.Optional[Element] = None,
+	    throw: bool = True,
+	) -> AssertionResult:
+		return Error.assertTrue(
+		    condition=condition,
+		    element=self.element if element is None else element,
+		    message=message,
+		    throw=throw,
+		)
 
 
 ResolvedType = typing.Union["EntityExpression", "Symbol"]
@@ -244,12 +261,13 @@ class Parameters(ParametersCommon):
     Describes the parameter list, a collection of expression.
     """
 
-	def __init__(self,
-	             element: Element,
-	             NestedElementType: typing.Type["EntityExpression"],
-	             nestedKind: typing.Optional[str] = None,
-	             filterFct: typing.Optional[typing.Callable[["EntityExpression"], bool]] = None) -> None:
-
+	def __init__(
+	    self,
+	    element: Element,
+	    NestedElementType: typing.Type["EntityExpression"],
+	    nestedKind: typing.Optional[str] = None,
+	    filterFct: typing.Optional[typing.Callable[["EntityExpression"], bool]] = None,
+	) -> None:
 		super().__init__(element=element)
 		self.NestedElementType = NestedElementType
 
@@ -258,6 +276,7 @@ class Parameters(ParametersCommon):
 			sequence = self.element.getNestedSequence(nestedKind)
 			if sequence:
 				from tools.bdl.entities.impl.entity import EntityExpression
+
 				for index, e in enumerate(sequence):
 					if filterFct is not None and not filterFct(EntityExpression(e)):
 						continue
@@ -276,8 +295,8 @@ class Parameters(ParametersCommon):
 
 	def copy(self) -> "Parameters":
 		"""
-		Copy the parameter list and optionally filter it.
-		"""
+        Copy the parameter list and optionally filter it.
+        """
 		parameters = Parameters(element=self.element, NestedElementType=self.NestedElementType)
 		parameters.list = self.list.copy()
 		return parameters
@@ -290,18 +309,23 @@ class Parameters(ParametersCommon):
 
 	def mergeDefaults(self, defaults: "Parameters") -> None:
 		"""Merge default parameters with the current ones.
-		Default parameters are always named and are ordered correctly.
-		"""
+        Default parameters are always named and are ordered correctly.
+        """
 
 		# Merge the values, do not include var args.
 		for key, default, metadata in defaults.itemsMetadata(includeVarArgs=False):
-			default.assertTrue(condition=default.isName, message=f"Default parameters must be named: '{default}'.")
+			default.assertTrue(
+			    condition=default.isName,
+			    message=f"Default parameters must be named: '{default}'.",
+			)
 			# Check if there is a match with the name first, if not check with the index.
 			# If no match add the default parameter.
 			maybeMetadata = self.getMetadata(key)
 			if maybeMetadata is None:
-				default.assertTrue(condition=not default.contracts.has("mandatory"),
-				                   message=f"Missing mandatory parameter: '{str(key)}'.")
+				default.assertTrue(
+				    condition=not default.contracts.has("mandatory"),
+				    message=f"Missing mandatory parameter: '{str(key)}'.",
+				)
 				maybeMetadata = self.append(default, allowMix=True, default=True)
 			# Merge the metadata
 			maybeMetadata.name = default.name
@@ -315,9 +339,9 @@ class Parameters(ParametersCommon):
 
 	def toResolvedSequence(self, resolver: "Resolver", varArgs: bool) -> Sequence:
 		"""
-		Build the resolved sequence of those parameters.
-		Must be called after mergeDefaults.
-		"""
+        Build the resolved sequence of those parameters.
+        Must be called after mergeDefaults.
+        """
 		items = [metadata for _, _, metadata in self.itemsMetadata(includeVarArgs=varArgs)]
 		items = sorted(items, key=lambda k: k.order)
 
@@ -339,5 +363,5 @@ class Parameters(ParametersCommon):
 		ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence(f"{name}_resolved", sequenceValues)
 
 		sequence = expected.toResolvedSequence(resolver=resolver, varArgs=True)
-		sequence += [sequence[-1]] * (len(sequenceValues) - len(sequence)) if expected.isVarArgs else []
+		sequence += ([sequence[-1]] * (len(sequenceValues) - len(sequence)) if expected.isVarArgs else [])
 		ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence(f"{name}_expected", sequence)

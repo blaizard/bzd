@@ -21,5 +21,5 @@ class TestRun(unittest.TestCase):
 		self.assertEqual("a {% b %} c", result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 	unittest.main()

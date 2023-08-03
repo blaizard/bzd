@@ -12,7 +12,6 @@ factories: typing.Final[typing.Iterable[typing.Type[Factory]]] = (Sh, )
 
 
 def buildAll(workspace: pathlib.Path) -> None:
-
 	for factoryClass in factories:
 		factory = factoryClass()
 		logging.info(f"Building {factory.getName()}.")
@@ -20,13 +19,10 @@ def buildAll(workspace: pathlib.Path) -> None:
 
 
 if __name__ == "__main__":
-
 	for factoryClass in factories:
-
 		factory = factoryClass()
 		# Look for the type of shell used on the current platform.
 		if factory.isCompatible():
-
 			logging.info(f"Building {factory.getName()}.")
 			factory.build(workspace=pathlib.Path(os.environ.get("BUILD_WORKSPACE_DIRECTORY", ".")))
 

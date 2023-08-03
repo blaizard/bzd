@@ -77,7 +77,6 @@ def changed(lib: pathlib.Path) -> None:
 
 
 if __name__ == "__main__":
-
 	parser = argparse.ArgumentParser(description="Playground to write grammar schema for parsing.")
 	parser.add_argument("path", type=pathlib.Path, help="File to watch.")
 	args = parser.parse_args()
@@ -85,7 +84,7 @@ if __name__ == "__main__":
 	bzd.parser.error.useColors = True
 
 	assert "BUILD_WORKSPACE_DIRECTORY" in os.environ, "This binary must run with bazel."
-	path = pathlib.Path(os.environ["BUILD_WORKSPACE_DIRECTORY"]).resolve(strict=True) / args.path
+	path = (pathlib.Path(os.environ["BUILD_WORKSPACE_DIRECTORY"]).resolve(strict=True) / args.path)
 
 	if not path.is_file():
 		path.write_text(defaultContent)

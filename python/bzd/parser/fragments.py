@@ -1,5 +1,14 @@
 import re
-from typing import cast, Dict, Mapping, Match, MutableMapping, Optional, Union, TYPE_CHECKING
+from typing import (
+    cast,
+    Dict,
+    Mapping,
+    Match,
+    MutableMapping,
+    Optional,
+    Union,
+    TYPE_CHECKING,
+)
 
 if TYPE_CHECKING:
 	from bzd.parser.element import ElementParser
@@ -39,8 +48,8 @@ class Attribute:
 	@staticmethod
 	def fromSerialize(attribute: AttributeSerialize) -> "Attribute":
 		"""
-		Create an attribute from a serialized attribute.
-		"""
+        Create an attribute from a serialized attribute.
+        """
 		return Attribute(attribute)
 
 
@@ -55,9 +64,9 @@ Attributes = Dict[str, Attribute]
 
 class Fragment:
 	"""
-	A fragment is the smallest typed entity, that optionally contains attributes.
-	It describes any entity discovered by the parser. 
-	"""
+    A fragment is the smallest typed entity, that optionally contains attributes.
+    It describes any entity discovered by the parser.
+    """
 
 	default: Dict[str, str] = {}
 
@@ -80,25 +89,28 @@ class Fragment:
 
 	def next(self, element: "ElementParser", grammar: Optional["Grammar"]) -> "ElementParser":
 		"""Returns the next element for the next entity.
-		This is where elements can be terminated and new ones can be generated.
-		"""
+        This is where elements can be terminated and new ones can be generated.
+        """
 		if grammar is not None:
 			element.setGrammar(grammar)
 		return element
 
 	def __repr__(self) -> str:
-		return "<{}:{}:{} {}/>".format(self.__class__.__name__, self.index, self.end,
-		                               " ".join(["{}='{}'".format(key, value) for key, value in self.attrs.items()]))
+		return "<{}:{}:{} {}/>".format(
+		    self.__class__.__name__,
+		    self.index,
+		    self.end,
+		    " ".join(["{}='{}'".format(key, value) for key, value in self.attrs.items()]),
+		)
 
 
 class FragmentComment(Fragment):
 	"""
-	Helper fragment for comments.
-	"""
+    Helper fragment for comments.
+    """
 
 	def merge(self, attrs: Attributes) -> None:
 		for key, value in self.attrs.items():
-
 			# Remove empty lines at the begining and end
 			value = re.sub(r"^(\s*\n)+", "", value)
 			value = re.sub(r"(\n\s*)+$", "", value)
@@ -109,17 +121,19 @@ class FragmentComment(Fragment):
 
 			# Append the comments
 			if key in attrs:
-				attrs[key] = AttributeParser(index=IGNORE_INDEX_VALUE,
-				                             end=0,
-				                             value=attrs[key].value + "\n{}".format(updatedValue))
+				attrs[key] = AttributeParser(
+				    index=IGNORE_INDEX_VALUE,
+				    end=0,
+				    value=attrs[key].value + "\n{}".format(updatedValue),
+				)
 			else:
 				attrs[key] = AttributeParser(index=IGNORE_INDEX_VALUE, end=0, value=updatedValue)
 
 
 class FragmentNewElement(Fragment):
 	"""
-	Helper fragment to create a new element.
-	"""
+    Helper fragment to create a new element.
+    """
 
 	def next(self, element: "ElementParser", grammar: Optional["Grammar"]) -> "ElementParser":
 		return element.getSequence().makeElement(grammar=grammar)
@@ -127,8 +141,8 @@ class FragmentNewElement(Fragment):
 
 class FragmentParentElement(Fragment):
 	"""
-	Helper fragment to continue on the parent element.
-	"""
+    Helper fragment to continue on the parent element.
+    """
 
 	def next(self, element: "ElementParser", grammar: Optional["Grammar"]) -> "ElementParser":
 		element = element.getSequence().getElement()
@@ -139,8 +153,8 @@ class FragmentParentElement(Fragment):
 
 class FragmentNestedStart(Fragment):
 	"""
-	Helper fragment to start a nested sequence.
-	"""
+    Helper fragment to start a nested sequence.
+    """
 
 	nestedName = "nested"
 
@@ -151,8 +165,8 @@ class FragmentNestedStart(Fragment):
 
 class FragmentNestedStopNewElement(Fragment):
 	"""
-	Helper fragment to stop a nested sequence and create a new element.
-	"""
+    Helper fragment to stop a nested sequence and create a new element.
+    """
 
 	def next(self, element: "ElementParser", grammar: Optional["Grammar"]) -> "ElementParser":
-		return element.getSequence().getElement().getSequence().makeElement(grammar=grammar)
+		return (element.getSequence().getElement().getSequence().makeElement(grammar=grammar))

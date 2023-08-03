@@ -1,7 +1,13 @@
 import pathlib
 import typing
 
-from tools.ci.factory import Factory, ConfigNormal, ConfigStress, ConfigCoverage, ConfigSanitizer
+from tools.ci.factory import (
+    Factory,
+    ConfigNormal,
+    ConfigStress,
+    ConfigCoverage,
+    ConfigSanitizer,
+)
 
 
 class Jenkins(Factory):

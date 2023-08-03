@@ -6,8 +6,8 @@ from tools.bdl.entities.impl.fragment.parameters_resolved import ParametersResol
 
 def commentBlockToStr(comment: typing.Optional[str]) -> str:
 	"""
-	Normal block comments.
-	"""
+    Normal block comments.
+    """
 
 	if comment is None:
 		return ""
@@ -16,8 +16,8 @@ def commentBlockToStr(comment: typing.Optional[str]) -> str:
 
 def commentEmbeddedToStr(comment: typing.Optional[str]) -> str:
 	"""
-	Inline and embedded comments.
-	"""
+    Inline and embedded comments.
+    """
 
 	if comment is None:
 		return ""
@@ -27,7 +27,7 @@ def commentEmbeddedToStr(comment: typing.Optional[str]) -> str:
 
 def commentParametersResolvedToStr(item: ParametersResolvedItem) -> str:
 	"""
-	Create an inline comment from a parameter resolved entry.
-	"""
+    Create an inline comment from a parameter resolved entry.
+    """
 
 	return f"/*{item.name}*/" if item.isName else ""

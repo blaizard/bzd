@@ -9,7 +9,6 @@ from tools.bdl.entities.impl.entity import Entity, Role
 
 
 class _Visitor(VisitorBase[str, typing.List[str]]):
-
 	nestedKind = None
 
 	def visitBegin(self, result: typing.Any) -> typing.List[str]:
@@ -23,10 +22,10 @@ class _Visitor(VisitorBase[str, typing.List[str]]):
 
 class Namespace(Entity):
 	"""
-	A namespace defines a scope in which entities are available.
-	- Sequence:
-		- name: The list of names constituing the namespace.
-	"""
+    A namespace defines a scope in which entities are available.
+    - Sequence:
+            - name: The list of names constituing the namespace.
+    """
 
 	def __init__(self, element: Element) -> None:
 		super().__init__(element, Role.Type)

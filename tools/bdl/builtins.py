@@ -10,7 +10,10 @@ def toLiteralSingleValue_(self: Builtin, args: typing.Dict[str, EntityExpression
 	"""Helper function to return the literal of the only argument 'value' or None if there is no literal."""
 
 	self.assertTrue(len(args) == 1, "There must always be a single argument.")
-	self.assertTrue("value" in args, f"There must always be a single argument named 'value', not '{str(args)}'.")
+	self.assertTrue(
+	    "value" in args,
+	    f"There must always be a single argument named 'value', not '{str(args)}'.",
+	)
 	if args["value"].isLiteral:
 		return args["value"].literal
 	return None
@@ -108,7 +111,7 @@ class String(Builtin):
 	def __init__(self) -> None:
 		super().__init__(
 		    ElementBuilder("builtin").setAttr("name", "String").addContract("string").addConfigValue(name="value",
-		                                                                                             literal="\"\""))
+		                                                                                             literal='""'))
 
 	def toLiteral(self, args: typing.Dict[str, EntityExpression]) -> typing.Optional[str]:
 		return toLiteralSingleValue_(self, args)
@@ -167,5 +170,5 @@ Builtins = [
     Async(),
     Array(),
     Vector(),
-    Callable()
+    Callable(),
 ]

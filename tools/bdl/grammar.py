@@ -4,7 +4,14 @@ from pathlib import Path
 
 from bzd.parser.parser import Parser as ParserBase
 from bzd.parser.grammar import Grammar, GrammarItem, GrammarItemSpaces
-from bzd.parser.fragments import Fragment, FragmentNestedStart, FragmentNestedStopNewElement, FragmentNewElement, FragmentParentElement, FragmentComment
+from bzd.parser.fragments import (
+    Fragment,
+    FragmentNestedStart,
+    FragmentNestedStopNewElement,
+    FragmentNewElement,
+    FragmentParentElement,
+    FragmentComment,
+)
 from bzd.parser.element import Element
 
 _regexprBaseName = r"(?!const\b|interface\b|struct\b|component\b|method\b|namespace\b|use\b|using\b|config\b|composition\b|[0-9])[0-9a-zA-Z_]+"
@@ -19,14 +26,14 @@ _regexprString = r"\"(?P<value>.*?)\""
 # Match regular expression: /.*/
 _regexprRegexpr = r"/(?P<regexpr>[^\s]+)/"
 # Match preset: {abc.def}
-_regexprPreset = r"\{(?P<preset>" + _regexprBaseName + r"(?:\." + _regexprBaseName + ")*)\}"
+_regexprPreset = (r"\{(?P<preset>" + _regexprBaseName + r"(?:\." + _regexprBaseName + ")*)\}")
 # Match operator: + or - or \ or *
 _regexprOperator = r"(?P<operator>[\+\-\\\*])"
 
 
 # Match any type of symbol except protected types
 def _makeRegexprFQN(name: str) -> str:
-	return r"(?P<" + name + r">" + _regexprBaseName + r"(?:\." + _regexprBaseName + ")*)"
+	return (r"(?P<" + name + r">" + _regexprBaseName + r"(?:\." + _regexprBaseName + ")*)")
 
 
 class FragmentBlockComment(FragmentComment):
@@ -36,18 +43,20 @@ class FragmentBlockComment(FragmentComment):
 		self.attrs["comment"] = re.sub(re.compile("^(\s*\*)+", re.MULTILINE), "", self.attrs["comment"])
 
 
-def makeGrammarNested(nestedGrammar: Grammar,
-                      name: str,
-                      defaultNested: str = "invalid",
-                      nested: typing.Optional[typing.Set[str]] = None) -> Grammar:
+def makeGrammarNested(
+    nestedGrammar: Grammar,
+    name: str,
+    defaultNested: str = "invalid",
+    nested: typing.Optional[typing.Set[str]] = None,
+) -> Grammar:
 	"""
-	Generate a grammar for a nested entity, it accepst the following format:
-	(interface|struct|component|composition) [name] [contracts] [: inheritance1, inheritance2, ...] {
-		nestedGrammar
-	}
+    Generate a grammar for a nested entity, it accepst the following format:
+    (interface|struct|component|composition) [name] [contracts] [: inheritance1, inheritance2, ...] {
+            nestedGrammar
+    }
 
-	Nested type elements are included under `nested`.
-	"""
+    Nested type elements are included under `nested`.
+    """
 
 	class InheritanceStart(FragmentNestedStart):
 		nestedName = "inheritance"
@@ -60,36 +69,56 @@ def makeGrammarNested(nestedGrammar: Grammar,
 		class CategoryFragmentStart(FragmentNestedStart):
 			nestedName = name
 
-		return GrammarItem(name + r"(?=:)", FragmentParentElement, [GrammarItem(r":", CategoryFragmentStart, "nested")])
+		return GrammarItem(
+		    name + r"(?=:)",
+		    FragmentParentElement,
+		    [GrammarItem(r":", CategoryFragmentStart, "nested")],
+		)
 
 	if nested is None:
 		nested = set()
 
 	grammarAfterName: Grammar = [
-	    GrammarItem(r":", InheritanceStart, [
-	        GrammarItem(_makeRegexprFQN("interface"), Fragment,
-	                    [GrammarItem(r",", FragmentNewElement),
-	                     GrammarItem(r"(?={)", FragmentParentElement)])
-	    ]),
 	    GrammarItem(
-	        r"{", NestedInterface, nestedGrammar + [makeNestedCategory(nestedName) for nestedName in nested] + [
+	        r":",
+	        InheritanceStart,
+	        [
+	            GrammarItem(
+	                _makeRegexprFQN("interface"),
+	                Fragment,
+	                [
+	                    GrammarItem(r",", FragmentNewElement),
+	                    GrammarItem(r"(?={)", FragmentParentElement),
+	                ],
+	            )
+	        ],
+	    ),
+	    GrammarItem(
+	        r"{",
+	        NestedInterface,
+	        nestedGrammar + [makeNestedCategory(nestedName) for nestedName in nested] + [
 	            GrammarItem(r"}", FragmentNestedStopNewElement),
-	        ], "nested"),
+	        ],
+	        "nested",
+	    ),
 	] + makeGrammarContracts()
 
 	return [
-	    GrammarItem(r"(?P<category>" + name + r")", {},
-	                [GrammarItem(_regexprName, Fragment, grammarAfterName)] + grammarAfterName)
+	    GrammarItem(
+	        r"(?P<category>" + name + r")",
+	        {},
+	        [GrammarItem(_regexprName, Fragment, grammarAfterName)] + grammarAfterName,
+	    )
 	]
 
 
 def makeGrammarSymbol(nextGrammar: Grammar) -> Grammar:
 	"""
-	Generate a grammar for Symbol, it accepts the following format:
-	Type = [const] Type1[<Type, Type, ...>]
+    Generate a grammar for Symbol, it accepts the following format:
+    Type = [const] Type1[<Type, Type, ...>]
 
-	Nested type elements are included under `template`.
-	"""
+    Nested type elements are included under `template`.
+    """
 
 	class TemplateStart(FragmentNestedStart):
 		nestedName = "template"
@@ -97,11 +126,20 @@ def makeGrammarSymbol(nextGrammar: Grammar) -> Grammar:
 	def makeGrammar(continuation: Grammar, nested: typing.Optional[Grammar] = None) -> Grammar:
 		grammar: Grammar = [GrammarItem(r"const", {"const": ""})]
 		grammar.append(
-		    GrammarItem(_makeRegexprFQN("symbol"), Fragment,
-		                [GrammarItem(r"<", TemplateStart, [grammar if nested is None else nested]), continuation]))
+		    GrammarItem(
+		        _makeRegexprFQN("symbol"),
+		        Fragment,
+		        [
+		            GrammarItem(r"<", TemplateStart, [grammar if nested is None else nested]),
+		            continuation,
+		        ],
+		    ))
 		return grammar
 
-	nested = makeGrammar([GrammarItem(r",", FragmentNewElement), GrammarItem(r">", FragmentParentElement)])
+	nested = makeGrammar([
+	    GrammarItem(r",", FragmentNewElement),
+	    GrammarItem(r">", FragmentParentElement),
+	])
 
 	topLevel = makeGrammar(nextGrammar, nested)
 
@@ -110,11 +148,11 @@ def makeGrammarSymbol(nextGrammar: Grammar) -> Grammar:
 
 def makeGrammarContracts(name: str = "contract") -> Grammar:
 	"""
-	Generate a grammar for Contracts, it accepts the following format:
-	[Type1[(value1, value2, ...)], Type2[(value1, value2, ...)] ...]
+    Generate a grammar for Contracts, it accepts the following format:
+    [Type1[(value1, value2, ...)], Type2[(value1, value2, ...)] ...]
 
-	Nested type elements are included under `contracts`.
-	"""
+    Nested type elements are included under `contracts`.
+    """
 
 	class ContractStart(FragmentNestedStart):
 		nestedName = name
@@ -123,28 +161,44 @@ def makeGrammarContracts(name: str = "contract") -> Grammar:
 		nestedName = "values"
 
 	return [
-	    GrammarItem(r"\[", ContractStart, [
-	        GrammarItem(_makeRegexprFQN("type"), Fragment, [
-	            GrammarItem(r"\(", ValuesStart, [
-	                GrammarItem(r"(?P<value>[\-\.0-9a-zA-Z_]+)", Fragment, [
-	                    GrammarItem(r",", FragmentNewElement),
-	                    GrammarItem(r"\)", FragmentParentElement),
-	                ]),
-	            ]),
-	            GrammarItem(r"\]", FragmentParentElement),
-	            GrammarItem(r"", FragmentNewElement),
-	        ])
-	    ]),
+	    GrammarItem(
+	        r"\[",
+	        ContractStart,
+	        [
+	            GrammarItem(
+	                _makeRegexprFQN("type"),
+	                Fragment,
+	                [
+	                    GrammarItem(
+	                        r"\(",
+	                        ValuesStart,
+	                        [
+	                            GrammarItem(
+	                                r"(?P<value>[\-\.0-9a-zA-Z_]+)",
+	                                Fragment,
+	                                [
+	                                    GrammarItem(r",", FragmentNewElement),
+	                                    GrammarItem(r"\)", FragmentParentElement),
+	                                ],
+	                            ),
+	                        ],
+	                    ),
+	                    GrammarItem(r"\]", FragmentParentElement),
+	                    GrammarItem(r"", FragmentNewElement),
+	                ],
+	            )
+	        ],
+	    ),
 	]
 
 
 def makeGrammarExpressionFragment(finalGrammar: Grammar = [GrammarItem(r";", FragmentNewElement)]) -> Grammar:
 	"""
-	Generate a grammar for an expression, it accepts the following format:
-	(symbol|value)[(arg1, arg2, ...)] (+|-) (symbol|value)[(arg1, arg2, ...)] ... [contract];
+    Generate a grammar for an expression, it accepts the following format:
+    (symbol|value)[(arg1, arg2, ...)] (+|-) (symbol|value)[(arg1, arg2, ...)] ... [contract];
 
-	where argX is a recursive call to this grammar.
-	"""
+    where argX is a recursive call to this grammar.
+    """
 
 	class FragmentsStart(FragmentNestedStart):
 		nestedName = "fragments"
@@ -177,12 +231,17 @@ def makeGrammarExpressionFragment(finalGrammar: Grammar = [GrammarItem(r";", Fra
 		            [
 		                # Empty parenthesis will not have nested fragments, which will simplify the parsing.
 		                GrammarItem(r"\)", FragmentParentElement),
-		                GrammarItem("", {"category": "expression"}, [
-		                    GrammarItem(_regexprName + r"\s*="),
-		                    grammarWrapper if nested is None else nested,
-		                ])
-		            ]),
-		        GrammarItem("", FragmentNewElement, grammarValue)
+		                GrammarItem(
+		                    "",
+		                    {"category": "expression"},
+		                    [
+		                        GrammarItem(_regexprName + r"\s*="),
+		                        grammarWrapper if nested is None else nested,
+		                    ],
+		                ),
+		            ],
+		        ),
+		        GrammarItem("", FragmentNewElement, grammarValue),
 		    ]))
 
 		# End
@@ -196,160 +255,239 @@ def makeGrammarExpressionFragment(finalGrammar: Grammar = [GrammarItem(r";", Fra
 
 def makeGrammarVariable(finalGrammar: Grammar = [GrammarItem(r";", FragmentNewElement)]) -> Grammar:
 	"""
-	Generate a grammar for Variables, it accepts the following format:
-	name [: interface] = symbol[(value)] [contract];
-	"""
+    Generate a grammar for Variables, it accepts the following format:
+    name [: interface] = symbol[(value)] [contract];
+    """
 
 	return [
-	    GrammarItem(_regexprNameOrVarArgs + r"\s*(:\s*" + _makeRegexprFQN("interface") + r"\s*)?=",
-	                {"category": "expression"}, makeGrammarExpressionFragment(finalGrammar))
+	    GrammarItem(
+	        _regexprNameOrVarArgs + r"\s*(:\s*" + _makeRegexprFQN("interface") + r"\s*)?=",
+	        {"category": "expression"},
+	        makeGrammarExpressionFragment(finalGrammar),
+	    )
 	]
 
 
 def makeGrammarExpression() -> Grammar:
 	"""
-	Generate a grammar for Variables, it accepts the following format:
-	[name [: interface] =] symbol[(value)] [contract];
-	"""
+    Generate a grammar for Variables, it accepts the following format:
+    [name [: interface] =] symbol[(value)] [contract];
+    """
 
 	finalGrammar: Grammar = [GrammarItem(r";", FragmentNewElement)]
 
 	return makeGrammarVariable(finalGrammar) + [
-	    GrammarItem(r"(?=" + _regexprBaseName + r")", {"category": "expression"},
-	                makeGrammarExpressionFragment(finalGrammar))
+	    GrammarItem(
+	        r"(?=" + _regexprBaseName + r")",
+	        {"category": "expression"},
+	        makeGrammarExpressionFragment(finalGrammar),
+	    )
 	]
 
 
 def makeGrammarMethod() -> Grammar:
 	"""
-	Generate a grammar for methods, it accepts the following format:
-	method name([inputs...]) [contract] [-> returntype [contract]];
-	"""
+    Generate a grammar for methods, it accepts the following format:
+    method name([inputs...]) [contract] [-> returntype [contract]];
+    """
 
 	class ArgumentStart(FragmentNestedStart):
 		nestedName = "argument"
 
 	return [
-	    GrammarItem(r"method", {"category": "method"}, [
-	        GrammarItem(_regexprName, Fragment, [
-	            GrammarItem(r"\(", ArgumentStart, [
-	                makeGrammarVariable(
-	                    [GrammarItem(r",", FragmentNewElement),
-	                     GrammarItem(r"\)", FragmentParentElement)]),
-	                GrammarItem(r"\)", FragmentParentElement)
-	            ]),
-	            makeGrammarContracts(),
-	            GrammarItem(r"->", Fragment, [
-	                makeGrammarSymbol(
-	                    [makeGrammarContracts(name="contract_return"),
-	                     GrammarItem(r";", FragmentNewElement)])
-	            ]),
-	            GrammarItem(r";", FragmentNewElement)
-	        ])
-	    ])
+	    GrammarItem(
+	        r"method",
+	        {"category": "method"},
+	        [
+	            GrammarItem(
+	                _regexprName,
+	                Fragment,
+	                [
+	                    GrammarItem(
+	                        r"\(",
+	                        ArgumentStart,
+	                        [
+	                            makeGrammarVariable([
+	                                GrammarItem(r",", FragmentNewElement),
+	                                GrammarItem(r"\)", FragmentParentElement),
+	                            ]),
+	                            GrammarItem(r"\)", FragmentParentElement),
+	                        ],
+	                    ),
+	                    makeGrammarContracts(),
+	                    GrammarItem(
+	                        r"->",
+	                        Fragment,
+	                        [
+	                            makeGrammarSymbol([
+	                                makeGrammarContracts(name="contract_return"),
+	                                GrammarItem(r";", FragmentNewElement),
+	                            ])
+	                        ],
+	                    ),
+	                    GrammarItem(r";", FragmentNewElement),
+	                ],
+	            )
+	        ],
+	    )
 	]
 
 
 def makeGrammarUsing() -> Grammar:
 	"""
-	Generate a grammar for using keyword, it accepts the following format:
-	using name = Type [contract];
-	"""
+    Generate a grammar for using keyword, it accepts the following format:
+    using name = Type [contract];
+    """
 
 	return [
-	    GrammarItem(r"using", {"category": "using"}, [
-	        GrammarItem(_regexprName, Fragment, [
-	            GrammarItem(r"=", Fragment,
-	                        makeGrammarSymbol([makeGrammarContracts(),
-	                                           GrammarItem(r";", FragmentNewElement)]))
-	        ])
-	    ])
+	    GrammarItem(
+	        r"using",
+	        {"category": "using"},
+	        [
+	            GrammarItem(
+	                _regexprName,
+	                Fragment,
+	                [
+	                    GrammarItem(
+	                        r"=",
+	                        Fragment,
+	                        makeGrammarSymbol([
+	                            makeGrammarContracts(),
+	                            GrammarItem(r";", FragmentNewElement),
+	                        ]),
+	                    )
+	                ],
+	            )
+	        ],
+	    )
 	]
 
 
 def makeGrammarExtern() -> Grammar:
 	"""
-	Generate a grammar for extern keyword, it accepts the following format:
-	extern category symbol;
-	"""
+    Generate a grammar for extern keyword, it accepts the following format:
+    extern category symbol;
+    """
 
 	return [
-	    GrammarItem(r"extern", {"extern": "true"}, [
-	        GrammarItem(r"(?P<category>(:?interface|struct))", Fragment,
-	                    [GrammarItem(_regexprName, Fragment, [GrammarItem(r";", FragmentNewElement)])])
-	    ])
+	    GrammarItem(
+	        r"extern",
+	        {"extern": "true"},
+	        [
+	            GrammarItem(
+	                r"(?P<category>(:?interface|struct))",
+	                Fragment,
+	                [GrammarItem(
+	                    _regexprName,
+	                    Fragment,
+	                    [GrammarItem(r";", FragmentNewElement)],
+	                )],
+	            )
+	        ],
+	    )
 	]
 
 
 def makeGrammarEnum() -> Grammar:
 	"""
-	Generate a grammar for an enum, it accepts the following format:
-	enum name { VALUE1 [,VALUE2 [,...]] }
-	"""
+    Generate a grammar for an enum, it accepts the following format:
+    enum name { VALUE1 [,VALUE2 [,...]] }
+    """
 
 	class EnumStart(FragmentNestedStart):
 		nestedName = "values"
 
 	return [
-	    GrammarItem(r"enum", {"category": "enum"}, [
-	        GrammarItem(_regexprName, Fragment, [
-	            GrammarItem(r"{", EnumStart, [
-	                GrammarItem(_regexprName, Fragment, [
-	                    GrammarItem(r",", FragmentNewElement),
-	                    GrammarItem(r"}", FragmentNestedStopNewElement),
-	                ])
-	            ])
-	        ])
-	    ])
+	    GrammarItem(
+	        r"enum",
+	        {"category": "enum"},
+	        [
+	            GrammarItem(
+	                _regexprName,
+	                Fragment,
+	                [
+	                    GrammarItem(
+	                        r"{",
+	                        EnumStart,
+	                        [
+	                            GrammarItem(
+	                                _regexprName,
+	                                Fragment,
+	                                [
+	                                    GrammarItem(r",", FragmentNewElement),
+	                                    GrammarItem(r"}", FragmentNestedStopNewElement),
+	                                ],
+	                            )
+	                        ],
+	                    )
+	                ],
+	            )
+	        ],
+	    )
 	]
 
 
 def makeGrammarNamespace() -> Grammar:
 	"""
-	Generate a grammar for namespace, it accepts the following format:
-	namespace level1[.level2[.level3...]];
-	"""
+    Generate a grammar for namespace, it accepts the following format:
+    namespace level1[.level2[.level3...]];
+    """
 
 	class NamespaceStart(FragmentNestedStart):
 		default = {"category": "namespace"}
 		nestedName = "name"
 
 	return [
-	    GrammarItem(r"namespace", NamespaceStart, [
-	        GrammarItem(_regexprName, Fragment,
-	                    [GrammarItem(r"\.", FragmentNewElement),
-	                     GrammarItem(r";", FragmentNestedStopNewElement)])
-	    ])
+	    GrammarItem(
+	        r"namespace",
+	        NamespaceStart,
+	        [
+	            GrammarItem(
+	                _regexprName,
+	                Fragment,
+	                [
+	                    GrammarItem(r"\.", FragmentNewElement),
+	                    GrammarItem(r";", FragmentNestedStopNewElement),
+	                ],
+	            )
+	        ],
+	    )
 	]
 
 
 def makeGrammarUse() -> Grammar:
 	"""
-	Generate a grammar for use, it accepts the following format:
-	use "path/to/file"
-	"""
-	return [GrammarItem(r"use", {"category": "use"}, [GrammarItem(_regexprString, FragmentNewElement)])]
+    Generate a grammar for use, it accepts the following format:
+    use "path/to/file"
+    """
+	return [GrammarItem(
+	    r"use",
+	    {"category": "use"},
+	    [GrammarItem(_regexprString, FragmentNewElement)],
+	)]
 
 
 # Comments allowed by the grammar
 _grammarComments = [
     GrammarItem(r"/\*(?P<comment>([\s\S]*?))\*/", FragmentBlockComment),
-    GrammarItem(r"//(?P<comment>[^\n]*)", FragmentComment)
+    GrammarItem(r"//(?P<comment>[^\n]*)", FragmentComment),
 ]
 
 
 class Parser(ParserBase):
 
 	def __init__(self, content: str) -> None:
-
-		withinNested = makeGrammarUsing() + makeGrammarEnum() + makeGrammarExpression() + makeGrammarMethod()
+		withinNested = (makeGrammarUsing() + makeGrammarEnum() + makeGrammarExpression() + makeGrammarMethod())
 		nested = withinNested
 
 		super().__init__(
 		    content,
-		    grammar=makeGrammarNamespace() + makeGrammarUse() + makeGrammarExtern() + withinNested +
-		    makeGrammarNested(withinNested, name="component", nested={"interface", "config", "composition"}) +
-		    makeGrammarNested(withinNested, name="interface", defaultNested="interface") +
+		    grammar=makeGrammarNamespace() + makeGrammarUse() + makeGrammarExtern() + withinNested + makeGrammarNested(
+		        withinNested,
+		        name="component",
+		        nested={"interface", "config", "composition"},
+		    ) + makeGrammarNested(withinNested, name="interface", defaultNested="interface") +
 		    makeGrammarNested(withinNested, name="composition", defaultNested="composition") +
 		    makeGrammarNested(withinNested, name="struct", defaultNested="interface"),
-		    defaultGrammarPre=[GrammarItemSpaces] + _grammarComments)
+		    defaultGrammarPre=[GrammarItemSpaces] + _grammarComments,
+		)

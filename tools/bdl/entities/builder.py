@@ -19,12 +19,14 @@ class ElementBuilder(Element):
 			Contract.add(element=self, kind=kind, values=values)
 		return self
 
-	def addConfigValue(self,
-	                   symbol: typing.Optional[str] = None,
-	                   literal: typing.Optional[str] = None,
-	                   name: typing.Optional[str] = None,
-	                   interface: typing.Optional[str] = None,
-	                   contract: typing.Optional[str] = None) -> "ElementBuilder":
+	def addConfigValue(
+	    self,
+	    symbol: typing.Optional[str] = None,
+	    literal: typing.Optional[str] = None,
+	    name: typing.Optional[str] = None,
+	    interface: typing.Optional[str] = None,
+	    contract: typing.Optional[str] = None,
+	) -> "ElementBuilder":
 		"""Create a configuration entry."""
 
 		element = ElementBuilder(category="expression")
@@ -46,7 +48,7 @@ class ElementBuilder(Element):
 	def addConfigType(self, symbol: str, name: str, contract: typing.Optional[str] = None) -> "ElementBuilder":
 		"""Create a configuration entry."""
 
-		element = ElementBuilder(category="using").setAttr("symbol", symbol).setAttr("name", name)
+		element = (ElementBuilder(category="using").setAttr("symbol", symbol).setAttr("name", name))
 		if contract is not None:
 			element.addContract(contract)
 		self.pushBackElementToNestedSequence(kind="config", element=element)

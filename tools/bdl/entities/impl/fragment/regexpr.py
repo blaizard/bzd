@@ -69,14 +69,16 @@ class Regexpr:
 		if self.element.isNestedSequence("regexpr_exclude"):
 			elementBuilder.removeNestedSequence("regexpr_exclude")
 
-	def match(self,
-	          iterable: typing.Iterable[typing.Any],
-	          toString: typing.Callable[[typing.Any], str] = str) -> typing.Set[typing.Any]:
+	def match(
+	    self,
+	    iterable: typing.Iterable[typing.Any],
+	    toString: typing.Callable[[typing.Any], str] = str,
+	) -> typing.Set[typing.Any]:
 		"""Match values from an iterable."""
 
 		# Prepare the regular expressions.
 		regexprInclude = re.compile("(" + "|".join(self.includes) + ")")
-		regexprExclude = re.compile("(" + "|".join(self.excludes) + ")") if self.excludes else None
+		regexprExclude = (re.compile("(" + "|".join(self.excludes) + ")") if self.excludes else None)
 
 		matches = set()
 		for value in iterable:

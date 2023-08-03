@@ -6,7 +6,6 @@ import platform
 from tools.bazel_build.buildstamp.buildstamp_data import BUILDSTAMP
 
 if __name__ == "__main__":
-
 	parser = argparse.ArgumentParser(description="Convert a stamp file to json output.")
 	parser.add_argument("output", help="Json output.")
 

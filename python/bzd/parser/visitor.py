@@ -9,11 +9,9 @@ U = typing.TypeVar("U")
 
 
 class _VisitorCommon(typing.Generic[T, U]):
-
 	nestedKind: typing.Optional[str] = "nested"
 
 	def visit(self, sequence: Sequence) -> U:
-
 		result = self._visit(sequence=sequence)  # type: ignore
 		return self.visitFinal(result=result)
 
@@ -26,15 +24,15 @@ class _VisitorCommon(typing.Generic[T, U]):
 
 class Visitor(_VisitorCommon[T, U]):
 	"""
-	Visitor for parsed sequence.
+    Visitor for parsed sequence.
 
-	class Print(Visitor):
-		def visitElement(self, element):
-			print(element)
+    class Print(Visitor):
+            def visitElement(self, element):
+                    print(element)
 
-	printer = Print()
-	printer.visit(data)
-	"""
+    printer = Print()
+    printer.visit(data)
+    """
 
 	def _visit(self, sequence: Sequence, result: typing.Any = None) -> T:
 		assert isinstance(sequence, Sequence), "Must be a sequence, instead: {}".format(type(sequence))
@@ -62,8 +60,8 @@ class Visitor(_VisitorCommon[T, U]):
 
 class VisitorDepthFirst(_VisitorCommon[T, U]):
 	"""
-	Visitor for parsed sequence.
-	"""
+    Visitor for parsed sequence.
+    """
 
 	def _visit(self, sequence: Sequence) -> T:
 		assert isinstance(sequence, Sequence), "Must be a sequence, instead: {}".format(type(sequence))

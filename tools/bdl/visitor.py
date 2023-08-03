@@ -8,7 +8,19 @@ from bzd.parser.element import Element, ElementSerialize
 from bzd.parser.fragments import Attribute
 
 from tools.bdl.entities.impl.types import Category
-from tools.bdl.entities.all import Expression, Builtin, Nested, Method, Using, Enum, Extern, Namespace, Use, EntityType, elementToEntity
+from tools.bdl.entities.all import (
+    Expression,
+    Builtin,
+    Nested,
+    Method,
+    Using,
+    Enum,
+    Extern,
+    Namespace,
+    Use,
+    EntityType,
+    elementToEntity,
+)
 
 NamespaceType = typing.List[str]
 
@@ -90,18 +102,19 @@ T = typing.TypeVar("T")
 
 
 class Visitor(VisitorBase[T, T]):
-
 	nestedKind = None
 
-	def __init__(self,
-	             namespace: typing.Optional[typing.List[str]] = None,
-	             elementToEntityExtenstion: typing.Optional[typing.Dict[str, typing.Type[EntityType]]] = None) -> None:
+	def __init__(
+	    self,
+	    namespace: typing.Optional[typing.List[str]] = None,
+	    elementToEntityExtenstion: typing.Optional[typing.Dict[str, typing.Type[EntityType]]] = None,
+	) -> None:
 		"""Create a visitor for the bdl grammar.
-		
-		Args:
-			namespace: An optional namespace to start the discovery from.
-			elementToEntityExtenstion: Extension to be used when a new element is discovered.
-		"""
+
+        Args:
+                namespace: An optional namespace to start the discovery from.
+                elementToEntityExtenstion: Extension to be used when a new element is discovered.
+        """
 
 		self.level = 0
 		self.parents: typing.List[Parent] = []
@@ -115,8 +128,8 @@ class Visitor(VisitorBase[T, T]):
 	@property
 	def namespace(self) -> typing.List[str]:
 		"""
-		Get the list of name constituing the namespace.
-		"""
+        Get the list of name constituing the namespace.
+        """
 		return [name for parent in self.parents for name in parent.namespace]
 
 	@property
@@ -147,21 +160,20 @@ class Visitor(VisitorBase[T, T]):
 
 	def visitElement(self, element: Element, result: T) -> T:
 		"""
-		Main visitor, called each time a new element is discovered.
-		"""
+        Main visitor, called each time a new element is discovered.
+        """
 
 		entity = elementToEntity(element=element, extension=self.elementToEntityExtenstion)
 		with self.groups.scope(group=self.entityToGroup(entity=entity)):
-
 			# Handle nested object
 			if isinstance(entity, Nested):
-
 				self.level += 1
 
 				entity.assertTrue(
 				    condition=not element.isNestedSequence("invalid")
 				    or element.getNestedSequence("invalid").empty(),  # type: ignore
-				    message=f"This element '{entity.category}' does not support direct nested scope.")
+				    message=f"This element '{entity.category}' does not support direct nested scope.",
+				)
 				for nested in NestedSequence:
 					sequence = element.getNestedSequence(nested.value)
 					if sequence is not None:
@@ -176,35 +188,31 @@ class Visitor(VisitorBase[T, T]):
 
 			# Handle expression
 			elif isinstance(entity, Expression):
-
 				self.visitExpression(entity, result)
 
 			# Handle method
 			elif isinstance(entity, Method):
-
 				self.visitMethod(entity, result)
 
 			# Handle using
 			elif isinstance(entity, Using):
-
 				self.visitUsing(entity, result)
 
 			# Handle extern
 			elif isinstance(entity, Extern):
-
 				self.visitExtern(entity, result)
 
 			# Handle enum
 			elif isinstance(entity, Enum):
-
 				self.visitEnum(entity, result)
 
 			# Handle namespace
 			elif isinstance(entity, Namespace):
-
-				Error.assertTrue(element=element,
-				                 condition=(self.level == 0),
-				                 message="Namespaces can only be declared at top level.")
+				Error.assertTrue(
+				    element=element,
+				    condition=(self.level == 0),
+				    message="Namespaces can only be declared at top level.",
+				)
 
 				self.visitNamespace(entity, result)
 
@@ -213,59 +221,61 @@ class Visitor(VisitorBase[T, T]):
 
 			# Handle use
 			elif isinstance(entity, Use):
-
 				self.visitUse(entity, result)
 
 			# Should never go here
 			else:
-				Error.handleFromElement(element=element, message="Unexpected entity: {}".format(type(entity)))
+				Error.handleFromElement(
+				    element=element,
+				    message="Unexpected entity: {}".format(type(entity)),
+				)
 
 		return result
 
 	def visitNestedEntities(self, entity: Nested, result: T) -> None:
 		"""
-		Called when discovering a nested entity.
-		"""
+        Called when discovering a nested entity.
+        """
 		pass
 
 	def visitExpression(self, entity: Expression, result: T) -> None:
 		"""
-		Called when discovering an expression.
-		"""
+        Called when discovering an expression.
+        """
 		pass
 
 	def visitMethod(self, entity: Method, result: T) -> None:
 		"""
-		Called when discovering a method.
-		"""
+        Called when discovering a method.
+        """
 		pass
 
 	def visitUsing(self, entity: Using, result: T) -> None:
 		"""
-		Called when discovering a using keyword.
-		"""
+        Called when discovering a using keyword.
+        """
 		pass
 
 	def visitExtern(self, entity: Extern, result: T) -> None:
 		"""
-		Called when discovering an extern keyword.
-		"""
+        Called when discovering an extern keyword.
+        """
 		pass
 
 	def visitEnum(self, entity: Enum, result: T) -> None:
 		"""
-		Called when discovering an enum.
-		"""
+        Called when discovering an enum.
+        """
 		pass
 
 	def visitNamespace(self, entity: Namespace, result: T) -> None:
 		"""
-		Called when discovering a namespace.
-		"""
+        Called when discovering a namespace.
+        """
 		pass
 
 	def visitUse(self, entity: Use, result: T) -> None:
 		"""
-		Called when discovering an use statement.
-		"""
+        Called when discovering an use statement.
+        """
 		pass

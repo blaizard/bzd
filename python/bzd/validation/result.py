@@ -39,13 +39,12 @@ class Result(typing.Generic[T]):
 		return not bool(self.errors) and not bool(self.globalErrors)
 
 	def __repr__(self) -> str:
-
 		if bool(self):
 			return str(self.values_)
 
 		if self.isList:
 			FORMAT_NOT_VALIDATE_SINGLE = "position {key} does not validate: {message}"
-			FORMAT_NOT_VALIDATE_MULTI = "Some positional values do not validate: {message}"
+			FORMAT_NOT_VALIDATE_MULTI = ("Some positional values do not validate: {message}")
 		else:
 			FORMAT_NOT_VALIDATE_SINGLE = "'{key}' does not validate: {message}"
 			FORMAT_NOT_VALIDATE_MULTI = "Some values do not validate: {message}"
@@ -58,7 +57,7 @@ class Result(typing.Generic[T]):
 			for key, result in self.errors.items():
 				content.append(FORMAT_NOT_VALIDATE_SINGLE.format(key=key, message=", ".join(result)))
 		else:
-			messages = ["{}: \"{}\"".format(key, ", ".join(result)) for key, result in self.errors.items()]
+			messages = ['{}: "{}"'.format(key, ", ".join(result)) for key, result in self.errors.items()]
 			content.append(FORMAT_NOT_VALIDATE_MULTI.format(message="; ".join(messages)))
 
 		return "; ".join(content) if content else "no errors"

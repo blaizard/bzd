@@ -40,7 +40,7 @@ class DependencyGroup:
 
 	def isSubset(self, entities: typing.Iterable[Expression]) -> bool:
 		"""Check if this group is contained in an iterable of expressions,
-		assuming the iterable only contains unique entries."""
+        assuming the iterable only contains unique entries."""
 
 		count = len(self.data)
 		for entity in entities:
@@ -121,10 +121,13 @@ class ExpressionEntry:
 		return EntryType.service in self.entryType
 
 	def __repr__(self) -> str:
-
 		content = [
-		    f"type: {str(self.entryType)}", f"expression: {str(self.expression)}", f"deps: {self.deps}",
-		    f"init: {self.init}", f"intra: {self.intra}", f"shutdown: {self.shutdown}"
+		    f"type: {str(self.entryType)}",
+		    f"expression: {str(self.expression)}",
+		    f"deps: {self.deps}",
+		    f"init: {self.init}",
+		    f"intra: {self.intra}",
+		    f"shutdown: {self.shutdown}",
 		]
 		return "\n".join(content)
 
@@ -132,7 +135,6 @@ class ExpressionEntry:
 class Components:
 
 	def __init__(self) -> None:
-
 		self.map: typing.Dict[str, typing.Dict[Context, ExpressionEntry]] = {}
 		# Flag flipped when the data is resolved.
 		self.isResolved = False
@@ -156,10 +158,12 @@ class Components:
 	@staticmethod
 	def makeId(expression: Expression) -> str:
 		"""Create an identifier from an expression.
-		An Identifier is created with the name and the symbol or value.
-		"""
-		expression.assertTrue(condition=expression.isSymbol,
-		                      message="Only expressions with symbol can be part of the 'Components' list.")
+        An Identifier is created with the name and the symbol or value.
+        """
+		expression.assertTrue(
+		    condition=expression.isSymbol,
+		    message="Only expressions with symbol can be part of the 'Components' list.",
+		)
 
 		if expression.isName:
 			identifier = expression.fqn
@@ -169,14 +173,13 @@ class Components:
 
 	def resolve(self) -> None:
 		"""Resolve the dependencies to ensure that each entry can be created sequentially
-		with only previously created entries as dependencies."""
+        with only previously created entries as dependencies."""
 
 		assert not self.isResolved
 
 		self.resolved = {}
 		contexts = {context for entries in self.map.values() for context in entries.keys()}
 		for context in contexts:
-
 			self.resolved[context] = []
 			discovered = set()
 
@@ -193,7 +196,6 @@ class Components:
 
 			entries = [(identifier, entries[context]) for identifier, entries in self.map.items() if context in entries]
 			while entries:
-
 				remaining: typing.List[typing.Tuple[str, ExpressionEntry]] = []
 				for identifier, entry in entries:
 					if isSatisfied(entry.deps):
@@ -218,7 +220,7 @@ class Components:
 	def insert(self, expression: Expression, entryType: EntryType,
 	           context: Context) -> typing.Optional[ExpressionEntry]:
 		"""Insert a new entry in the map, return the entry if it does not exists or if it can be updated,
-		otherwise it returns None."""
+        otherwise it returns None."""
 
 		assert not self.isResolved
 		identifier = self.makeId(expression)
@@ -242,7 +244,7 @@ class Components:
 			expression.assertTrue(
 			    condition=isOverwritable(entries[context].entryType, entryType),
 			    message=
-			    f"An expression of role '{entryType}' cannot overwrite an expression of role '{entries[context].entryType}'."
+			    f"An expression of role '{entryType}' cannot overwrite an expression of role '{entries[context].entryType}'.",
 			)
 
 		# Note, it is important to do a copy of the expression, as multilpe expression will co-exist with different

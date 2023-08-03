@@ -1,6 +1,11 @@
 import typing
 
-from bzd.validation.validation import Validation as ValidationBase, Schema, SchemaDict as SchemaDict_, SchemaList as SchemaList_
+from bzd.validation.validation import (
+    Validation as ValidationBase,
+    Schema,
+    SchemaDict as SchemaDict_,
+    SchemaList as SchemaList_,
+)
 from bzd.validation.schema import Constraint
 
 from tools.bdl.contracts.all import _Contracts

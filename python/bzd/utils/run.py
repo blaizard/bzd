@@ -40,7 +40,11 @@ class _ExecuteResultStreamWriter:
 
 class _ExecuteResult:
 
-	def __init__(self, stream: _ExecuteResultStreamWriter = _ExecuteResultStreamWriter(), returncode: int = 1) -> None:
+	def __init__(
+	        self,
+	        stream: _ExecuteResultStreamWriter = _ExecuteResultStreamWriter(),
+	        returncode: int = 1,
+	) -> None:
 		self.output = stream.output
 		self.returncode = returncode
 
@@ -75,38 +79,42 @@ class _NoopTimer:
 		pass
 
 
-def localCommand(cmds: List[str],
-                 ignoreFailure: bool = False,
-                 cwd: Optional[Path] = None,
-                 env: Optional[Dict[str, str]] = None,
-                 timeoutS: float = 60.,
-                 stdin: bool = False,
-                 stdout: bool = False,
-                 stderr: bool = False,
-                 maxOutputSize: int = 1000000) -> _ExecuteResult:
+def localCommand(
+    cmds: List[str],
+    ignoreFailure: bool = False,
+    cwd: Optional[Path] = None,
+    env: Optional[Dict[str, str]] = None,
+    timeoutS: float = 60.0,
+    stdin: bool = False,
+    stdout: bool = False,
+    stderr: bool = False,
+    maxOutputSize: int = 1000000,
+) -> _ExecuteResult:
 	"""Run a process locally.
-	
-	Args:
-		cmds: The list of commands to be executed.
-		ignoreFailure: If set to True, uppon failure (return code != 0), it will throw.
-		cwd: The current working directory.
-		env: The set of environment variable to be injected to the process.
-		timeoutS: The timeout in seconds until when the command terminates.
-		          A value of 0, give an unlimited timeout.
-		stdin: If set to True, the input stream will also be streamed to stdin.
-		stdout: If set to True, the output will also be streamed to stdout.
-		stderr: If set to True, the errors will also be streamed to stderr.
-		maxOutputSize: The maximum size of the output, if larger, only the most recent output will be kept.
-	"""
+
+    Args:
+            cmds: The list of commands to be executed.
+            ignoreFailure: If set to True, uppon failure (return code != 0), it will throw.
+            cwd: The current working directory.
+            env: The set of environment variable to be injected to the process.
+            timeoutS: The timeout in seconds until when the command terminates.
+                      A value of 0, give an unlimited timeout.
+            stdin: If set to True, the input stream will also be streamed to stdin.
+            stdout: If set to True, the output will also be streamed to stdout.
+            stderr: If set to True, the errors will also be streamed to stderr.
+            maxOutputSize: The maximum size of the output, if larger, only the most recent output will be kept.
+    """
 
 	sel = selectors.DefaultSelector()
 	stream = _ExecuteResultStreamWriter(stdout, stderr, maxOutputSize)
-	proc = subprocess.Popen(cmds,
-	                        cwd=cwd,
-	                        stdout=subprocess.PIPE,
-	                        stdin=None if stdin else subprocess.PIPE,
-	                        stderr=subprocess.PIPE,
-	                        env=env)
+	proc = subprocess.Popen(
+	    cmds,
+	    cwd=cwd,
+	    stdout=subprocess.PIPE,
+	    stdin=None if stdin else subprocess.PIPE,
+	    stderr=subprocess.PIPE,
+	    env=env,
+	)
 	timer: threading.Timer = threading.Timer(timeoutS, proc.kill) if timeoutS > 0.0 else _NoopTimer()  # type: ignore
 	sel.register(proc.stdout, events=selectors.EVENT_READ)  # type: ignore
 	sel.register(proc.stderr, events=selectors.EVENT_READ)  # type: ignore
@@ -138,35 +146,35 @@ def localCommand(cmds: List[str],
 
 	result = _ExecuteResult(stream=stream, returncode=returnCode)
 
-	assert ignoreFailure or returnCode == 0, f"Return code {result.getReturnCode()}\n{result.getOutput()}"
+	assert (ignoreFailure or returnCode == 0), f"Return code {result.getReturnCode()}\n{result.getOutput()}"
 
 	return result
 
 
 def localPython(script: str, args: List[str] = [], **kwargs: Any) -> _ExecuteResult:
 	"""
-	Execute a python script locally.
-	"""
+    Execute a python script locally.
+    """
 	return localCommand([sys.executable, script] + args, **kwargs)
 
 
 def localBash(script: bytes, args: List[str] = [], **kwargs: Any) -> _ExecuteResult:
 	"""
-	Execute a bash script locally.
-	"""
+    Execute a bash script locally.
+    """
 	return localCommand(["bash", "-s", "--"] + args, **kwargs)
 
 
 def localBazelBinary(path: str, args: List[str] = [], env: Dict[str, str] = {}, **kwargs: Any) -> _ExecuteResult:
 	"""
-	Execute a bazel binary locally. The caller must run bazel and all runfiles must be already available.
-	"""
-	env["RUNFILES_DIR"] = os.environ["RUNFILES_DIR"] if "RUNFILES_DIR" in os.environ else os.path.dirname(os.getcwd())
+    Execute a bazel binary locally. The caller must run bazel and all runfiles must be already available.
+    """
+	env["RUNFILES_DIR"] = (os.environ["RUNFILES_DIR"] if "RUNFILES_DIR" in os.environ else os.path.dirname(os.getcwd()))
 	return localCommand([path] + args, env=env, **kwargs)
 
 
 def localDocker(args: List[str] = [], **kwargs: Any) -> _ExecuteResult:
 	"""
-	Execute a docker-compose run service.
-	"""
+    Execute a docker-compose run service.
+    """
 	return localCommand(["docker"] + args, **kwargs)

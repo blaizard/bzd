@@ -36,7 +36,7 @@ class ParametersResolvedItem:
 
 	@property
 	def comment(self) -> typing.Optional[str]:
-		return self.expected.comment if self.param.comment is None else self.param.comment
+		return (self.expected.comment if self.param.comment is None else self.param.comment)
 
 	@property
 	def isRValue(self) -> bool:
@@ -47,38 +47,49 @@ class ParametersResolvedItem:
 		return self.param.isLValue
 
 	def error(self, message: str, element: typing.Optional[Element] = None, throw: bool = True) -> AssertionResult:
-		return Error.handleFromElement(element=self.param.element if element is None else element,
-		                               message=message,
-		                               throw=throw)
+		return Error.handleFromElement(
+		    element=self.param.element if element is None else element,
+		    message=message,
+		    throw=throw,
+		)
 
-	def assertTrue(self,
-	               condition: bool,
-	               message: str,
-	               element: typing.Optional[Element] = None,
-	               throw: bool = True) -> AssertionResult:
-		return Error.assertTrue(condition=condition,
-		                        element=self.param.element if element is None else element,
-		                        message=message,
-		                        throw=throw)
+	def assertTrue(
+	    self,
+	    condition: bool,
+	    message: str,
+	    element: typing.Optional[Element] = None,
+	    throw: bool = True,
+	) -> AssertionResult:
+		return Error.assertTrue(
+		    condition=condition,
+		    element=self.param.element if element is None else element,
+		    message=message,
+		    throw=throw,
+		)
 
 
 class ParametersResolved:
 
-	def __init__(self, element: Element, NestedElementType: typing.Type["EntityExpression"], param: str,
-	             expected: str) -> None:
+	def __init__(
+	    self,
+	    element: Element,
+	    NestedElementType: typing.Type["EntityExpression"],
+	    param: str,
+	    expected: str,
+	) -> None:
 		"""Construct the ParametersResolved object.
-		
-		Args:
-			element: The element associated with these resolved parameters.
-			param: The name of the nested sequence containing the resolved parameters.
-			expected: The name of the nested sequence containing the expected parameters.
-		"""
+
+        Args:
+                element: The element associated with these resolved parameters.
+                param: The name of the nested sequence containing the resolved parameters.
+                expected: The name of the nested sequence containing the expected parameters.
+        """
 		self.element = element
 		self.list: typing.List[ParametersResolvedItem] = []
 
 		paramSequence = self.element.getNestedSequenceOrEmpty(param)
 		expectedSequence = self.element.getNestedSequenceOrEmpty(expected)
-		for (paramElement, expectedElement) in zip(paramSequence, expectedSequence):
+		for paramElement, expectedElement in zip(paramSequence, expectedSequence):
 			self.list.append(ParametersResolvedItem(NestedElementType(paramElement),
 			                                        NestedElementType(expectedElement)))
 
@@ -111,19 +122,25 @@ class ParametersResolved:
 		return len(self.list)
 
 	def error(self, message: str, element: typing.Optional[Element] = None, throw: bool = True) -> AssertionResult:
-		return Error.handleFromElement(element=self.element if element is None else element,
-		                               message=message,
-		                               throw=throw)
+		return Error.handleFromElement(
+		    element=self.element if element is None else element,
+		    message=message,
+		    throw=throw,
+		)
 
-	def assertTrue(self,
-	               condition: bool,
-	               message: str,
-	               element: typing.Optional[Element] = None,
-	               throw: bool = True) -> AssertionResult:
-		return Error.assertTrue(condition=condition,
-		                        element=self.element if element is None else element,
-		                        message=message,
-		                        throw=throw)
+	def assertTrue(
+	    self,
+	    condition: bool,
+	    message: str,
+	    element: typing.Optional[Element] = None,
+	    throw: bool = True,
+	) -> AssertionResult:
+		return Error.assertTrue(
+		    condition=condition,
+		    element=self.element if element is None else element,
+		    message=message,
+		    throw=throw,
+		)
 
 	def __repr__(self) -> str:
 		content = []

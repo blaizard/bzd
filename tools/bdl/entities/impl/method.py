@@ -15,13 +15,13 @@ from tools.bdl.entities.impl.types import Category
 
 class Method(Entity):
 	"""
-	A method is a definition of a functional object.
-	- Attributes:
-		- name: The name of the method.
-		- [type]: The return type if any.
-	- Sequence:
-		- argument: The list of arguments to this method.
-	"""
+    A method is a definition of a functional object.
+    - Attributes:
+            - name: The name of the method.
+            - [type]: The return type if any.
+    - Sequence:
+            - argument: The list of arguments to this method.
+    """
 
 	def __init__(self, element: Element) -> None:
 		super().__init__(element, Role.Type)
@@ -37,17 +37,19 @@ class Method(Entity):
 
 	@property
 	def symbol(self) -> typing.Optional[Symbol]:
-		return Symbol(element=self.element,
-		              kind="symbol",
-		              underlyingTypeFQN="fqn_return_type",
-		              template="template",
-		              contract="contract_return",
-		              const="const") if self.isSymbol else None
+		return (Symbol(
+		    element=self.element,
+		    kind="symbol",
+		    underlyingTypeFQN="fqn_return_type",
+		    template="template",
+		    contract="contract_return",
+		    const="const",
+		) if self.isSymbol else None)
 
 	def resolve(self, resolver: typing.Any) -> None:
 		"""
-		Resolve entities.
-		"""
+        Resolve entities.
+        """
 		# Generate this symbol FQN
 		self._setUnderlyingTypeFQN(self.fqn)
 
@@ -59,8 +61,10 @@ class Method(Entity):
 
 		# Validate the type of arguments.
 		parameterTypeCategories = {*self.parameters.getUnderlyingTypeCategories(resolver)}
-		self.assertTrue(condition=Category.component not in parameterTypeCategories,
-		                message=f"Components are not allowed as method parameter.")
+		self.assertTrue(
+		    condition=Category.component not in parameterTypeCategories,
+		    message=f"Components are not allowed as method parameter.",
+		)
 
 		super().resolve(resolver)
 

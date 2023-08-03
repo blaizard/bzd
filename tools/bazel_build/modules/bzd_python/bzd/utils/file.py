@@ -5,11 +5,16 @@ import time
 
 class Watcher:
 
-	def __init__(self, path: pathlib.Path, callback: typing.Callable[[pathlib.Path], None], rateS: float = 1.) -> None:
+	def __init__(
+	    self,
+	    path: pathlib.Path,
+	    callback: typing.Callable[[pathlib.Path], None],
+	    rateS: float = 1.0,
+	) -> None:
 		self.path = path
 		self.callback = callback
 		self.rateS = rateS
-		self.stamp: float = 0.
+		self.stamp: float = 0.0
 
 	def poll(self) -> None:
 		stamp = self.path.stat().st_mtime

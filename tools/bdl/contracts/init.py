@@ -13,14 +13,14 @@ class InitConstraint_(Constraint):
 		self.validate(schema=["string"] * len(args), values=args)
 
 	def check(self, context: TypeContext) -> None:
-
 		assert "resolver" in context.args
 
 		from tools.bdl.entities.impl.entity import Entity
+
 		if isinstance(context.value, Entity):
-			underlyingTypeFQN = context.args["resolver"].getEntityResolved(context.value.underlyingTypeFQN).value
-			assert underlyingTypeFQN.category == Category.method, "'init' constraint applies only to methods."
-			assert underlyingTypeFQN.parameters.empty(), "'init' methods cannot take arguments."
+			underlyingTypeFQN = (context.args["resolver"].getEntityResolved(context.value.underlyingTypeFQN).value)
+			assert (underlyingTypeFQN.category == Category.method), "'init' constraint applies only to methods."
+			assert (underlyingTypeFQN.parameters.empty()), "'init' methods cannot take arguments."
 
 
 class ContractInit(ContractTraits):

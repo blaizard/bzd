@@ -17,14 +17,15 @@ if typing.TYPE_CHECKING:
 
 class Symbol:
 
-	def __init__(self,
-	             element: Element,
-	             kind: str,
-	             underlyingTypeFQN: typing.Optional[str] = None,
-	             template: typing.Optional[str] = None,
-	             contract: typing.Optional[str] = None,
-	             const: typing.Optional[str] = None) -> None:
-
+	def __init__(
+	    self,
+	    element: Element,
+	    kind: str,
+	    underlyingTypeFQN: typing.Optional[str] = None,
+	    template: typing.Optional[str] = None,
+	    contract: typing.Optional[str] = None,
+	    const: typing.Optional[str] = None,
+	) -> None:
 		Error.assertHasAttr(element=element, attr=kind)
 		self.element = element
 		self.kindAttr = kind
@@ -42,8 +43,8 @@ class Symbol:
 	@property
 	def dependencies(self) -> typing.Set[str]:
 		"""
-		Output the dependency list for this type.
-		"""
+        Output the dependency list for this type.
+        """
 		dependencies = {*self.kinds}
 		for params in self.templates:
 			dependencies.update(params.dependencies)
@@ -53,9 +54,9 @@ class Symbol:
 	def resolve(self, resolver: "Resolver", maybeValue: bool = False) -> "EntityType":
 		"""Resolve the types and nested templates by updating their symbol to fqn.
 
-		Args:
-			- maybeValue: Set to true if the type might represent a value.
-		"""
+        Args:
+                - maybeValue: Set to true if the type might represent a value.
+        """
 
 		# Make the fully qualified kind name.
 		fqns = resolver.resolveFQN(name=self.fqn).assertValue(element=self.element, attr=self.kindAttr)
@@ -66,7 +67,10 @@ class Symbol:
 
 		# Get the symbol entity and save it as the underlying type
 		entity = self.getEntityResolved(resolver=resolver)
-		self.assertTrue(condition=entity.isRoleType or maybeValue, message="This is not a valid type.")
+		self.assertTrue(
+		    condition=entity.isRoleType or maybeValue,
+		    message="This is not a valid type.",
+		)
 
 		# Resolve the entity, this is needed if the entity is not discovered yet.
 		# It might happens for entities that are defined in a config section for example, which are only
@@ -82,16 +86,20 @@ class Symbol:
 		# Validate template arguments
 		configTypes = entity.getConfigTemplateTypes(resolver=resolver)
 		if not configTypes:
-			self.assertTrue(condition=(not bool(self.templates)),
-			                message=f"Symbol '{self.kind}' does not support template type arguments.")
+			self.assertTrue(
+			    condition=(not bool(self.templates)),
+			    message=f"Symbol '{self.kind}' does not support template type arguments.",
+			)
 		else:
 			assert isinstance(self.templateAttr, str)
 			self.templates.makeParametersResolved(name=self.templateAttr, resolver=resolver, expected=configTypes)
 
 			# Make sure none of the template arguments have a meta role.
 			for item in self.templateResolved:
-				item.assertTrue(condition=not item.param.isRoleMeta,
-				                message="Template arguments cannot have a 'meta' role.")
+				item.assertTrue(
+				    condition=not item.param.isRoleMeta,
+				    message="Template arguments cannot have a 'meta' role.",
+				)
 
 			# Validate the template arguments
 			validation = configTypes.makeValidationForTemplate(resolver=resolver)
@@ -106,13 +114,15 @@ class Symbol:
 
 	def getEntityResolved(self, resolver: "Resolver") -> "EntityType":
 		"""
-		Get the entity related to type after resolve.
-		"""
+        Get the entity related to type after resolve.
+        """
 		return resolver.getEntityResolved(fqn=self.kind).assertValue(element=self.element, attr=self.kindAttr)
 
 	def getEntityUnderlyingTypeResolved(self, resolver: "Resolver") -> "EntityType":
-		self.assertTrue(condition=self.underlyingTypeFQN is not None,
-		                message=f"The underlying type FQN is missing, {self.element}")
+		self.assertTrue(
+		    condition=self.underlyingTypeFQN is not None,
+		    message=f"The underlying type FQN is missing, {self.element}",
+		)
 		assert isinstance(self.underlyingTypeFQN, str)
 		return resolver.getEntity(fqn=self.underlyingTypeFQN).assertValue(element=self.element, attr=self.kindAttr)
 
@@ -136,15 +146,19 @@ class Symbol:
 	@property
 	def templates(self) -> "Parameters":
 		from tools.bdl.entities.impl.using import Using
+
 		return Parameters(element=self.element, NestedElementType=Using, nestedKind=self.templateAttr)
 
 	@property
 	def templateResolved(self) -> ParametersResolved:
 		from tools.bdl.entities.impl.using import Using
-		return ParametersResolved(element=self.element,
-		                          NestedElementType=Using,
-		                          param=f"{self.templateAttr}_resolved",
-		                          expected=f"{self.templateAttr}_expected")
+
+		return ParametersResolved(
+		    element=self.element,
+		    NestedElementType=Using,
+		    param=f"{self.templateAttr}_resolved",
+		    expected=f"{self.templateAttr}_expected",
+		)
 
 	@property
 	def category(self) -> Category:
@@ -173,8 +187,8 @@ class Symbol:
 
 	@property
 	def kinds(self) -> typing.List[str]:
-		return self.element.getAttr(f"{self.kindAttr}_resolved").value.split(";") if self.element.isAttr(
-		    f"{self.kindAttr}_resolved") else [self.fqn]
+		return (self.element.getAttr(f"{self.kindAttr}_resolved").value.split(";")
+		        if self.element.isAttr(f"{self.kindAttr}_resolved") else [self.fqn])
 
 	@property
 	def namespace(self) -> typing.List[str]:
@@ -211,11 +225,13 @@ class Symbol:
 		return Error.handleFromElement(element=self.element, attr=self.kindAttr, message=message, throw=throw)
 
 	def assertTrue(self, condition: bool, message: str, throw: bool = True) -> AssertionResult:
-		return Error.assertTrue(condition=condition,
-		                        element=self.element,
-		                        attr=self.kindAttr,
-		                        message=message,
-		                        throw=throw)
+		return Error.assertTrue(
+		    condition=condition,
+		    element=self.element,
+		    attr=self.kindAttr,
+		    message=message,
+		    throw=throw,
+		)
 
 	def __repr__(self) -> str:
 		return self.name
@@ -231,11 +247,9 @@ class Symbol:
 
 
 class Visitor(VisitorDepthFirstBase[typing.List[str], str]):
-
 	nestedKind = "template"
 
 	def __init__(self, symbol: Symbol) -> None:
-
 		# Nested level
 		self.level = 0
 
@@ -266,24 +280,37 @@ class Visitor(VisitorDepthFirstBase[typing.List[str], str]):
 	def visitBegin(self) -> typing.List[str]:
 		return []
 
-	def visitElement(self, element: Element, result: typing.List[str],
-	                 nested: typing.Optional[typing.List[str]]) -> typing.List[str]:
-
+	def visitElement(
+	    self,
+	    element: Element,
+	    result: typing.List[str],
+	    nested: typing.Optional[typing.List[str]],
+	) -> typing.List[str]:
 		if element.isAttr("symbol"):
-
-			symbol = Symbol(element=element,
-			                kind="symbol",
-			                underlyingTypeFQN="fqn_type",
-			                template="template_resolved" if self.isResolved else "template",
-			                const="const")
-			output = self.visitSymbol(symbol=symbol,
-			                          nested=[] if nested is None else nested,
-			                          parameters=symbol.templateResolved)
+			symbol = Symbol(
+			    element=element,
+			    kind="symbol",
+			    underlyingTypeFQN="fqn_type",
+			    template="template_resolved" if self.isResolved else "template",
+			    const="const",
+			)
+			output = self.visitSymbol(
+			    symbol=symbol,
+			    nested=[] if nested is None else nested,
+			    parameters=symbol.templateResolved,
+			)
 
 		else:
 			Error.assertHasAttr(element=element, attr="value")
-			Error.assertTrue(element=element, condition=not nested, message="Value cannot have nested entities.")
-			output = self.visitValue(value=element.getAttr("value").value, comment=element.getAttrValue("comment"))
+			Error.assertTrue(
+			    element=element,
+			    condition=not nested,
+			    message="Value cannot have nested entities.",
+			)
+			output = self.visitValue(
+			    value=element.getAttr("value").value,
+			    comment=element.getAttrValue("comment"),
+			)
 
 		result.append(output)
 
@@ -291,15 +318,15 @@ class Visitor(VisitorDepthFirstBase[typing.List[str], str]):
 
 	def visitValue(self, value: str, comment: typing.Optional[str]) -> str:
 		"""
-		Called when an element needs to be formatted.
-		"""
+        Called when an element needs to be formatted.
+        """
 
 		return value
 
 	def visitSymbol(self, symbol: Symbol, nested: typing.List[str], parameters: ParametersResolved) -> str:
 		"""
-		Called when an element needs to be formatted.
-		"""
+        Called when an element needs to be formatted.
+        """
 
 		# Build the type. The first fqn is the element and the rest
 		# are the types.
