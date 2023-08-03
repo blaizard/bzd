@@ -87,8 +87,8 @@ def _sh_binary_wrapper_impl(ctx):
         output = ctx.outputs.executable,
         extra_runfiles = ctx.files.data,
         expand_targets = ctx.attr.data,
-        symlinks = ctx.attr.symlinks,
-        root_symlinks = ctx.attr.root_symlinks,
+        symlinks = {v: k.files.to_list()[0] for k, v in ctx.attr.symlinks.items()},
+        root_symlinks = {v: k.files.to_list()[0] for k, v in ctx.attr.root_symlinks.items()},
         command = ctx.attr.command,
     )
 
@@ -114,8 +114,8 @@ sh_binary_wrapper = rule(
             cfg = "exec",
             doc = "Executables or files to add to the runfiles and that can be accessed via their associated string.",
         ),
-        "root_symlinks": attr.label_keyed_string_dict(),
-        "symlinks": attr.label_keyed_string_dict(),
+        "root_symlinks": attr.label_keyed_string_dict(allow_files = True),
+        "symlinks": attr.label_keyed_string_dict(allow_files = True),
     },
     executable = True,
 )

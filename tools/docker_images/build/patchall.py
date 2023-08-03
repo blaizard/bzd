@@ -7,7 +7,6 @@ import subprocess
 import typing
 
 if __name__ == "__main__":
-
 	parser = argparse.ArgumentParser(description="Update the rpath of all files within a directory.")
 	parser.add_argument("path", help="The directory in which the rpath should be updated.")
 
@@ -45,7 +44,16 @@ if __name__ == "__main__":
 			if lib in libraries:
 				origin = pathlib.Path("$ORIGIN") / os.path.relpath(libraries[lib], path.parent)
 				subprocess.run(["patchelf", "--remove-rpath", directory / path], check=True)
-				subprocess.run(["patchelf", "--force-rpath", "--set-rpath", origin, directory / path], check=True)
+				subprocess.run(
+				    [
+				        "patchelf",
+				        "--force-rpath",
+				        "--set-rpath",
+				        origin,
+				        directory / path,
+				    ],
+				    check=True,
+				)
 				assigned[lib] = libraries[lib] / lib
 			else:
 				unassigned.setdefault(lib, set()).add(path)

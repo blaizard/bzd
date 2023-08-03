@@ -13,7 +13,6 @@ class Bundler:
 		self.cwd = cwd
 
 	def process(self, output: pathlib.Path) -> None:
-
 		with tempfile.TemporaryFile(suffix=".tar.gz") as fd:
 			# Create an archive with the files from the manifest.
 			with tarfile.open(fileobj=fd, mode="w:gz") as tar:
@@ -56,17 +55,27 @@ exit 0;
 
 
 if __name__ == "__main__":
-
 	parser = argparse.ArgumentParser(description="Bundler.")
-	parser.add_argument("-o",
-	                    "--output",
-	                    default="/tmp/output.sh",
-	                    help="The output path for the self extracting bundle.")
-	parser.add_argument("-c", "--cwd", default=".", help="The relative directory where the execution takes place.")
+	parser.add_argument(
+	    "-o",
+	    "--output",
+	    default="/tmp/output.sh",
+	    help="The output path for the self extracting bundle.",
+	)
+	parser.add_argument(
+	    "-c",
+	    "--cwd",
+	    default=".",
+	    help="The relative directory where the execution takes place.",
+	)
 	parser.add_argument("manifest", help="The path of the manifest to be used.")
 	parser.add_argument("executable", help="The path of the executable within the archive.")
 
 	args = parser.parse_args()
 
-	bundler = Bundler(pathlib.Path(args.manifest), pathlib.Path(args.executable), pathlib.Path(args.cwd))
+	bundler = Bundler(
+	    pathlib.Path(args.manifest),
+	    pathlib.Path(args.executable),
+	    pathlib.Path(args.cwd),
+	)
 	bundler.process(pathlib.Path(args.output))

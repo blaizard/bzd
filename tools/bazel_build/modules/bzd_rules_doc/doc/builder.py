@@ -19,11 +19,15 @@ def navigationToMkDocsList(navigation: typing.List[typing.Tuple[str, typing.Any]
 
 
 if __name__ == "__main__":
-
 	parser = argparse.ArgumentParser(description="MkDocs documentation builder.")
 	parser.add_argument("--navigation", type=str, default="[]", help="Navigation as a json string.")
 	parser.add_argument("--mkdocs", type=pathlib.Path, default="mkdocs", help="Path of the mkdocs tool.")
-	parser.add_argument("--root", type=pathlib.Path, default=".", help="Root directory for the documentation.")
+	parser.add_argument(
+	    "--root",
+	    type=pathlib.Path,
+	    default=".",
+	    help="Root directory for the documentation.",
+	)
 	parser.add_argument("output", type=str, help="Output package name.")
 
 	args = parser.parse_args()
@@ -32,12 +36,26 @@ if __name__ == "__main__":
 
 	# Create the mkdocs.yml file.
 	template = (pathlib.Path(__file__).parent / "mkdocs.yml.template").read_text()
-	output = template.format(navigation="\n".join(navigationToMkDocsList(navigation)), root=args.root.as_posix())
+	output = template.format(
+	    navigation="\n".join(navigationToMkDocsList(navigation)),
+	    root=args.root.as_posix(),
+	)
 	pathlib.Path("./mkdocs.yml").write_text(output)
 
 	# Generate the site with mkdocs and package everything.
 	with tempfile.TemporaryDirectory() as path:
-		subprocess.run([args.mkdocs, "--", "build", "--strict", "--config-file", "mkdocs.yml", "--site-dir", path],
-		               capture_output=True)
+		subprocess.run(
+		    [
+		        args.mkdocs,
+		        "--",
+		        "build",
+		        "--strict",
+		        "--config-file",
+		        "mkdocs.yml",
+		        "--site-dir",
+		        path,
+		    ],
+		    capture_output=True,
+		)
 		with tarfile.open(args.output, "w:") as package:
 			package.add(path, arcname="./")

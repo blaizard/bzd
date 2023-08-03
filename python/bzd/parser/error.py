@@ -19,8 +19,8 @@ class Result(ResultBase[V, str]):
 
 	def assertValue(self, element: Element, attr: typing.Optional[str] = None) -> V:
 		"""
-		Ensure the result holds a value, else print the error and throw.
-		"""
+        Ensure the result holds a value, else print the error and throw.
+        """
 		if not bool(self):
 			Error.handleFromElement(element=element, attr=attr, message=self.error)
 		return self.value
@@ -41,11 +41,13 @@ class AssertionResult:
 	def __bool__(self) -> bool:
 		return isinstance(self.message, str)
 
-	def extend(self,
-	           element: Element,
-	           message: str,
-	           attr: typing.Optional[str] = None,
-	           throw: bool = True) -> "AssertionResult":
+	def extend(
+	    self,
+	    element: Element,
+	    message: str,
+	    attr: typing.Optional[str] = None,
+	    throw: bool = True,
+	) -> "AssertionResult":
 		"""Extend an assertion message if any."""
 
 		if bool(self):
@@ -61,8 +63,8 @@ class AssertionResult:
 
 class Error:
 	"""
-	Handle errors.
-	"""
+    Handle errors.
+    """
 
 	@staticmethod
 	def valueExtract(value: typing.Any) -> str:
@@ -71,7 +73,6 @@ class Error:
 
 	@staticmethod
 	def toString(context: typing.Optional[Context], index: int, end: int, message: str) -> str:
-
 		# Look for the content
 		if context is None:
 			return message
@@ -119,13 +120,16 @@ class Error:
 		paddingLine = re.sub(r"[^\s]", " ", contentByLine[line])
 		contentByLine.insert(line + 1, "{padding}^".format(padding=paddingLine[0:column]))
 		contentByLine.insert(
-		    line + 2, "{path}:{line}:{column}: {colorBegin}error: {message}{colorEnd}".format(
+		    line + 2,
+		    "{path}:{line}:{column}: {colorBegin}error: {message}{colorEnd}".format(
 		        path="<string>" if context.path is None else context.path,
 		        line=line + 1,
 		        column=column + 1,
 		        colorBegin=colorBegin,
 		        message=message,
-		        colorEnd=colorEnd))
+		        colorEnd=colorEnd,
+		    ),
+		)
 
 		return "\n" + "\n".join(contentByLine[max(0, line - 1):endLine + 3])
 
@@ -142,24 +146,28 @@ class Error:
 		return message
 
 	@staticmethod
-	def handleFromElement(element: Element,
-	                      attr: typing.Optional[str] = None,
-	                      message: str = "Error",
-	                      throw: bool = True) -> AssertionResult:
+	def handleFromElement(
+	    element: Element,
+	    attr: typing.Optional[str] = None,
+	    message: str = "Error",
+	    throw: bool = True,
+	) -> AssertionResult:
 		message = Error.toStringFromElement(element=element, attr=attr, message=message)
 		if throw:
 			raise ExceptionParser(message=message)
 		return AssertionResult(message)
 
 	@staticmethod
-	def assertTrue(element: Element,
-	               condition: bool,
-	               message: str,
-	               attr: typing.Optional[str] = None,
-	               throw: bool = True) -> AssertionResult:
+	def assertTrue(
+	    element: Element,
+	    condition: bool,
+	    message: str,
+	    attr: typing.Optional[str] = None,
+	    throw: bool = True,
+	) -> AssertionResult:
 		"""
-		Ensures a specific condition evaluates to True.
-		"""
+        Ensures a specific condition evaluates to True.
+        """
 
 		if not condition:
 			return Error.handleFromElement(element=element, attr=attr, message=message, throw=throw)
@@ -168,25 +176,29 @@ class Error:
 	@staticmethod
 	def assertHasAttr(element: Element, attr: str, throw: bool = True) -> AssertionResult:
 		"""
-		Ensures an element has a specific attribute.
-		"""
+        Ensures an element has a specific attribute.
+        """
 
 		if not element.isAttr(attr):
-			return Error.handleFromElement(element=element,
-			                               attr=None,
-			                               message="Mising mandatory attribute '{}'.".format(attr),
-			                               throw=throw)
+			return Error.handleFromElement(
+			    element=element,
+			    attr=None,
+			    message="Mising mandatory attribute '{}'.".format(attr),
+			    throw=throw,
+			)
 		return AssertionResult()
 
 	@staticmethod
 	def assertHasSequence(element: Element, sequence: str, throw: bool = True) -> AssertionResult:
 		"""
-		Ensures an element has a specific sequence.
-		"""
+        Ensures an element has a specific sequence.
+        """
 
 		if not element.isNestedSequence(sequence):
-			return Error.handleFromElement(element=element,
-			                               attr=None,
-			                               message="Mising mandatory sequence '{}'.".format(sequence),
-			                               throw=throw)
+			return Error.handleFromElement(
+			    element=element,
+			    attr=None,
+			    message="Mising mandatory sequence '{}'.".format(sequence),
+			    throw=throw,
+			)
 		return AssertionResult()

@@ -7,15 +7,14 @@ from bzd.parser.error import Error
 class Contract:
 
 	def __init__(self, element: Element) -> None:
-
 		Error.assertHasAttr(element=element, attr="type")
 		self.element = element
 
 	@staticmethod
 	def add(element: Element, kind: str, values: typing.Optional[typing.List[str]] = None) -> None:
 		"""
-		Add a contract to the element.
-		"""
+        Add a contract to the element.
+        """
 		contractElement = ElementBuilder().setAttr("type", kind)
 		if values is not None:
 			for value in values:

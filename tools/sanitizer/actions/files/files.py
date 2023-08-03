@@ -55,7 +55,12 @@ def formatYaml(path: str, stdout: TextIO) -> None:
 		stdout.write("Cannot parse yaml file '{}'\n".format(path))
 		raise
 	formattedContent = bzd.yaml.dump(  # type: ignore
-	    parsedContent, default_flow_style=False, allow_unicode=True, indent=4, encoding=None)
+	    parsedContent,
+	    default_flow_style=False,
+	    allow_unicode=True,
+	    indent=4,
+	    encoding=None,
+	)
 	Path(path).write_text(formattedContent, encoding="utf-8")
 
 
@@ -79,7 +84,6 @@ def evaluateFiles(task: Callable[[str, TextIO], Any], workspace: Path, **kwargs:
 
 
 if __name__ == "__main__":
-
 	parser = argparse.ArgumentParser(description="Tool checking and formating json files.")
 	parser.add_argument("workspace", type=Path, help="Workspace to be processed.")
 

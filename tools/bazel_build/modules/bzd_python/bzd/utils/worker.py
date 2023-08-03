@@ -80,10 +80,10 @@ class WorkerContextManager:
 	def add(self, data: Any, timeoutS: int = 0) -> None:
 		"""Add a new workload to processed.
 
-		Args:
-			data: The data to be passed to the workload.
-			timeoutS: The timeout for this workload. By default there is no timeout.
-		"""
+        Args:
+                data: The data to be passed to the workload.
+                timeoutS: The timeout for this workload. By default there is no timeout.
+        """
 		with self.worker.context.count.get_lock():
 			self.worker.context.count.value += 1  # type: ignore
 		self.worker.expectedData += 1
@@ -92,7 +92,11 @@ class WorkerContextManager:
 
 class Worker:
 
-	def __init__(self, task: Callable[[Any, TextIO], Any], maxWorker: Optional[int] = os.cpu_count()) -> None:
+	def __init__(
+	        self,
+	        task: Callable[[Any, TextIO], Any],
+	        maxWorker: Optional[int] = os.cpu_count(),
+	) -> None:
 		self.context = _Context()
 		assert maxWorker
 		self.workerList = [
@@ -102,10 +106,8 @@ class Worker:
 
 	@staticmethod
 	def _taskWrapper(task: Callable[[Any, TextIO], Any], context: _Context) -> None:
-
 		# Loop unless the workers are notified to be stopped by the master process
 		while context.count.value > 0 or context.stop.value == 0:  # type: ignore
-
 			# Wait until there is data available or stop is raised
 			try:
 				workloadContext = context.data.get_nowait()

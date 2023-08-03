@@ -12,7 +12,13 @@ from tools.bdl.entities.builder import ExpressionBuilder
 from tools.bdl.entities.impl.fragment.symbol import Symbol
 from tools.bdl.entities.impl.types import Category
 from tools.bdl.visitors.composition.connections import Connections, EndpointId
-from tools.bdl.visitors.composition.components import Components, ExpressionEntry, EntryType, DependencyGroup, Context
+from tools.bdl.visitors.composition.components import (
+    Components,
+    ExpressionEntry,
+    EntryType,
+    DependencyGroup,
+    Context,
+)
 
 
 class Entities:
@@ -35,7 +41,6 @@ class Entities:
 
 		if expression.isSymbol:
 			if expression.symbol.fqn == "bind":
-
 				assert fqns is not None, "FQNs must be set with bind."
 				expression.contracts.assertOnly({"executor"})
 				for param in expression.parameters:
@@ -49,7 +54,10 @@ class Entities:
 	def processMeta(self, expression: Expression) -> None:
 		"""Process a meta expression, a special function from the language."""
 
-		expression.assertTrue(condition=expression.isSymbol, message=f"Meta expressions must have a symbol.")
+		expression.assertTrue(
+		    condition=expression.isSymbol,
+		    message=f"Meta expressions must have a symbol.",
+		)
 		if expression.symbol.fqn == "connect":
 			self.connections.add(*[paramResolved.param for paramResolved in expression.parametersResolved])
 
@@ -107,21 +115,21 @@ class Entities:
 	@cached_property
 	def ios(self) -> typing.Dict[Context, typing.List[typing.Dict[str, typing.Any]]]:
 		"""Provide a dictionary grouped by contexts of all connections.
-		
-		[
-			{
-				"symbol": <Data type symbol>,
-				"source": "example.hello.myval",
-				"sinks": [
-					{
-						"history": 1
-					},
-					...
-				]
-			},
-			...
-		]
-		"""
+
+        [
+                {
+                        "symbol": <Data type symbol>,
+                        "source": "example.hello.myval",
+                        "sinks": [
+                                {
+                                        "history": 1
+                                },
+                                ...
+                        ]
+                },
+                ...
+        ]
+        """
 
 		result: typing.Dict[Context, typing.List[typing.Dict[str, typing.Any]]] = {}
 		for context in self.contexts:
@@ -131,7 +139,7 @@ class Entities:
 					entry: typing.Dict[str, typing.Any] = {
 					    "symbol": metadata.symbol,
 					    "identifier": str(identifier),
-					    "sinks": []
+					    "sinks": [],
 					}
 					isPartOfContext = bool(self.expressions.fromIdentifier(identifier.this, context=context))
 					for identifierSink in metadata.connections:
@@ -146,20 +154,20 @@ class Entities:
 	@cached_property
 	def iosRegistry(self) -> typing.Dict[str, typing.Dict[str, typing.Any]]:
 		"""Provide a registry that contains all available connections.
-		
-		{
-			"example.hello": {
-				"myval": {
-					"type": "source",
-					"multi": False,
-					"connections": {"example.hello.myval"},
-					"symbol": <symbol>,
-					"identifier": "example.hello.myval"
-				}
-			},
-			...
-		}
-		"""
+
+        {
+                "example.hello": {
+                        "myval": {
+                                "type": "source",
+                                "multi": False,
+                                "connections": {"example.hello.myval"},
+                                "symbol": <symbol>,
+                                "identifier": "example.hello.myval"
+                        }
+                },
+                ...
+        }
+        """
 
 		result: typing.Dict[str, typing.Dict[str, typing.Any]] = {fqn: OrderedDict() for fqn in self.registryFQNs}
 
@@ -170,7 +178,7 @@ class Entities:
 				    "multi": metadata.multi,
 				    "connections": [str(connection) for connection in metadata.connections],
 				    "symbol": metadata.symbol,
-				    "identifier": str(identifier)
+				    "identifier": str(identifier),
 				}
 
 		return result
@@ -188,7 +196,7 @@ class Entities:
 					expression.assertTrue(
 					    condition=this.executor == executor,
 					    message=
-					    f"The executors between this expression and its instance, mismatch: '{executor}' vs '{this.executor}'."
+					    f"The executors between this expression and its instance, mismatch: '{executor}' vs '{this.executor}'.",
 					)
 			# If there is a 'this', propagate the executor.
 			elif expression.symbol.isThis:
@@ -199,8 +207,10 @@ class Entities:
 		if executor is None:
 			executor = defaultExecutor
 
-		expression.assertTrue(condition=executor is not None,
-		                      message="This expression does not have an executor assigned.")
+		expression.assertTrue(
+		    condition=executor is not None,
+		    message="This expression does not have an executor assigned.",
+		)
 
 		# Make sure the executor exists.
 		assert executor
@@ -216,12 +226,13 @@ class Entities:
 		for t in self.targets:
 			if executor.startswith(f"{t}."):
 				target = t
-		assert target is not None, f"There is no target associated with this executor '{executor}', available targets are: {str(self.targets)}."
+		assert (
+		    target is not None
+		), f"There is no target associated with this executor '{executor}', available targets are: {str(self.targets)}."
 
 		return Context(executor=executor, target=target)
 
 	def process(self, expressions: typing.Iterable[Expression]) -> None:
-
 		# Create a set of available fqns. This describes only the expressions that have a name,
 		# so at declaration time.
 		fqns = {expression.fqn for expression in expressions if expression.isFQN and expression.isName}
@@ -254,7 +265,6 @@ class Entities:
 		# Second stage.
 		# - workloads and executors must have a valid executor.
 		for expression in executors + workloads:
-
 			context = self.getContext(expression=expression, defaultExecutor=defaultExecutor)
 			resolver = context.makeResolver(symbols=self.symbols, expression=expression)
 			expression.resolve(resolver=resolver)
@@ -263,12 +273,13 @@ class Entities:
 		# - meta should be processed at the end, to ensure that all symbols are
 		# available at that time. Symbols like class instance member for example.
 		for expression in meta:
-
 			# Add argument of the meta, like and a source for example that is only instantiated
 			# but not 'used' (like no explicit workload is called).
 			for paramResolved in expression.parametersResolved:
-				context = self.getContext(expression=typing.cast(Expression, paramResolved.param),
-				                          defaultExecutor=defaultExecutor)
+				context = self.getContext(
+				    expression=typing.cast(Expression, paramResolved.param),
+				    defaultExecutor=defaultExecutor,
+				)
 				self.addResolvedDependency(paramResolved.param, context=context)
 
 			self.processMeta(expression=expression)
@@ -279,8 +290,10 @@ class Entities:
 	def addResolvedDependency(self, entity: Entity, context: Context) -> None:
 		"""Add a new dependency to the composition."""
 
-		entity.assertTrue(condition=isinstance(entity, Expression),
-		                  message="Only expressions can be added to the composition.")
+		entity.assertTrue(
+		    condition=isinstance(entity, Expression),
+		    message="Only expressions can be added to the composition.",
+		)
 		expression = typing.cast(Expression, entity)
 
 		if expression.isFQN:
@@ -304,34 +317,40 @@ class Entities:
 		elif expression.isSymbol:
 			self.processEntry(expression=expression, isDepedency=isDepedency, context=context)
 
-	def createEntityNestedComposition(self,
-	                                  element: Element,
-	                                  this: Expression,
-	                                  resolveNamespace: typing.List[str],
-	                                  resolver: Resolver,
-	                                  name: typing.Optional[str] = None) -> Entity:
+	def createEntityNestedComposition(
+	    self,
+	    element: Element,
+	    this: Expression,
+	    resolveNamespace: typing.List[str],
+	    resolver: Resolver,
+	    name: typing.Optional[str] = None,
+	) -> Entity:
 		"""Create a new entity for nested compositions.
-		
-		Args:
-			element: The element to be used as a based to create the entity.
-			this: The expression used to create the component containing the composition.
-			resolveNamespace: The namespace to be used for resolving the new entity.
-			resolver: The resolver associated with the creator.
-			name: The name to give to the new entry.
 
-		Return:
-			The newly created entity.
-		"""
+        Args:
+                element: The element to be used as a based to create the entity.
+                this: The expression used to create the component containing the composition.
+                resolveNamespace: The namespace to be used for resolving the new entity.
+                resolver: The resolver associated with the creator.
+                name: The name to give to the new entry.
 
-		this.assertTrue(condition=this.isName,
-		                message=f"Nested composition must come from a named expression, coming from {this} instead.")
+        Return:
+                The newly created entity.
+        """
+
+		this.assertTrue(
+		    condition=this.isName,
+		    message=f"Nested composition must come from a named expression, coming from {this} instead.",
+		)
 
 		# Insert the new entry in the symbol map.
-		fqn = self.symbols.insert(name=name,
-		                          namespace=this.namespace + [this.name],
-		                          path=None,
-		                          element=element,
-		                          group=Group.composition)
+		fqn = self.symbols.insert(
+		    name=name,
+		    namespace=this.namespace + [this.name],
+		    path=None,
+		    element=element,
+		    group=Group.composition,
+		)
 		entity = self.symbols.getEntityResolved(fqn=fqn).value
 		entity.resolveMemoized(resolver=resolver.make(namespace=resolveNamespace, this=this.fqn))
 
@@ -348,9 +367,16 @@ class Entities:
 		# Identify the type of entry.
 		if underlyingType.category == Category.method:
 			entryType = EntryType.service if isDepedency else EntryType.workload
-		elif underlyingType.category in {Category.component, Category.struct, Category.enum, Category.using}:
-			expression.assertTrue(condition=expression.isName,
-			                      message="All expressions from the registry must have a name.")
+		elif underlyingType.category in {
+		    Category.component,
+		    Category.struct,
+		    Category.enum,
+		    Category.using,
+		}:
+			expression.assertTrue(
+			    condition=expression.isName,
+			    message="All expressions from the registry must have a name.",
+			)
 			entryType = EntryType.registry
 		elif underlyingType.category in {Category.builtin}:
 			# Ignore all builtins as they are expected to be all the time available.
@@ -374,7 +400,7 @@ class Entities:
 		# Check if there are pre/post-requisites (init/shutdown functions)
 		if underlyingType.isInterface:
 
-			def checkIfInitOrShutdown(interfaceEntity: Entity) -> typing.Optional[DependencyGroup]:
+			def checkIfInitOrShutdown(interfaceEntity: Entity, ) -> typing.Optional[DependencyGroup]:
 				assert entry is not None
 				if interfaceEntity.contracts.has("init"):
 					return entry.init
@@ -385,19 +411,18 @@ class Entities:
 			for interfaceEntity in underlyingType.interface:
 				maybeGroup = checkIfInitOrShutdown(interfaceEntity)
 				if maybeGroup is not None:
-
 					newEntity = self.createEntityNestedComposition(
 					    element=ExpressionBuilder(symbol=f"this.{interfaceEntity.name}"),
 					    this=expression,
 					    resolveNamespace=interfaceEntity.namespace,
-					    resolver=resolver)
+					    resolver=resolver,
+					)
 					assert isinstance(newEntity, Expression)
 					maybeGroup.push(newEntity)
 
 		# Check if there are dependent composition from this entity.
 		if underlyingType.isComposition:
 			for compositionEntity in underlyingType.composition:
-
 				assert isinstance(compositionEntity, Expression), "All composition entities must be an expression."
 
 				# Create a new entity and associate it with its respective objects.
@@ -407,7 +432,8 @@ class Entities:
 				    this=expression,
 				    resolveNamespace=entityCopied.namespace,
 				    resolver=resolver,
-				    name=compositionEntity.name if compositionEntity.isName else None)
+				    name=compositionEntity.name if compositionEntity.isName else None,
+				)
 				assert isinstance(newEntity, Expression)
 				entry.intra.push(newEntity)
 

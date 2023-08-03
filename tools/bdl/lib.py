@@ -12,10 +12,11 @@ formatters = {"bdl": formatBdl, "cc": formatCc}
 compositions_ = {"cc": compositionCc}
 
 
-def preprocess(source: str,
-               namespace: typing.Optional[typing.List[str]] = None,
-               objectContext: typing.Optional[ObjectContext] = None) -> Object:
-
+def preprocess(
+    source: str,
+    namespace: typing.Optional[typing.List[str]] = None,
+    objectContext: typing.Optional[ObjectContext] = None,
+) -> Object:
 	objectContext = objectContext if objectContext is not None else ObjectContext()
 	assert objectContext
 
@@ -24,19 +25,19 @@ def preprocess(source: str,
 
 
 def generate(formatType: str, bdl: Object, data: typing.Optional[Path] = None) -> str:
-
 	assert formatType in formatters, "Format '{}' not supported.".format(formatType)
 
 	# Format using a specific formatter
 	return formatters[formatType](bdl=bdl, data=data)
 
 
-def compose(formatType: str,
-            bdls: typing.Sequence[Object],
-            output: Path,
-            targets: typing.Set[str],
-            data: typing.Optional[Path] = None) -> None:
-
+def compose(
+    formatType: str,
+    bdls: typing.Sequence[Object],
+    output: Path,
+    targets: typing.Set[str],
+    data: typing.Optional[Path] = None,
+) -> None:
 	composition = Composition(targets=targets)
 	for bdl in bdls:
 		composition.visit(bdl)
@@ -47,10 +48,11 @@ def compose(formatType: str,
 	compositions_[formatType](compositions=compositions, data=data, output=output)
 
 
-def main(formatType: str,
-         source: str,
-         objectContext: typing.Optional[ObjectContext] = None,
-         data: typing.Optional[Path] = None) -> str:
-
+def main(
+    formatType: str,
+    source: str,
+    objectContext: typing.Optional[ObjectContext] = None,
+    data: typing.Optional[Path] = None,
+) -> str:
 	bdl = preprocess(source=source, objectContext=objectContext)
 	return generate(formatType=formatType, bdl=bdl, data=data)

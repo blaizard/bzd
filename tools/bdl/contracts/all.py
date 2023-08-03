@@ -26,7 +26,7 @@ _Contracts = [
     ContractInit(),
     ContractShutdown(),
     ContractConvertible(),
-    ContractExecutor()
+    ContractExecutor(),
 ]
 
 

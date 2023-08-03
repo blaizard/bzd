@@ -12,6 +12,7 @@ py_binary(
     data = [
         "@buildifier_prebuilt//:buildifier",
     ],
+    visibility = ["//visibility:public"],
     deps = [
         "@bzd_python//bzd/utils:run",
         "@bzd_sanitizer//lib:worker",

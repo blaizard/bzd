@@ -9,13 +9,25 @@ from tools.bdl.visitors.composition.components import EntryType
 from tools.bdl.object import Object
 from tools.bdl.entities.all import Namespace, Using, Expression
 from tools.bdl.entities.impl.fragment.symbol import Symbol
-from tools.bdl.entities.impl.fragment.parameters_resolved import ParametersResolved, ParametersResolvedItem
+from tools.bdl.entities.impl.fragment.parameters_resolved import (
+    ParametersResolved,
+    ParametersResolvedItem,
+)
 from tools.bdl.entities.impl.types import Category as CategoryOriginal
 
 from tools.bdl.generators.cc.symbol import symbolToStr as symbolToStrOriginal
 from tools.bdl.generators.cc.value import valueToStr as valueToStrOriginal
-from tools.bdl.generators.cc.comments import commentBlockToStr as commentBlockToStrOriginal, commentEmbeddedToStr as commentEmbeddedToStrOriginal, commentParametersResolvedToStr as commentParametersResolvedToStrOriginal
-from tools.bdl.generators.cc.fqn import fqnToStr as fqnToStrOriginal, fqnToAdapterStr as fqnToAdapterStrOriginal, fqnToNameStr as fqnToNameStrOriginal, fqnToCapitalized as fqnToCapitalizedOriginal
+from tools.bdl.generators.cc.comments import (
+    commentBlockToStr as commentBlockToStrOriginal,
+    commentEmbeddedToStr as commentEmbeddedToStrOriginal,
+    commentParametersResolvedToStr as commentParametersResolvedToStrOriginal,
+)
+from tools.bdl.generators.cc.fqn import (
+    fqnToStr as fqnToStrOriginal,
+    fqnToAdapterStr as fqnToAdapterStrOriginal,
+    fqnToNameStr as fqnToNameStrOriginal,
+    fqnToCapitalized as fqnToCapitalizedOriginal,
+)
 """
 Use cases:
 
@@ -39,12 +51,13 @@ Expressions:
 
 # String related
 class Transform:
-
 	Category = CategoryOriginal
 
-	def __init__(self,
-	             composition: typing.Optional[CompositionView] = None,
-	             data: typing.Optional[Path] = None) -> None:
+	def __init__(
+	    self,
+	    composition: typing.Optional[CompositionView] = None,
+	    data: typing.Optional[Path] = None,
+	) -> None:
 		self.composition = composition
 		self.data = json.loads(data.read_text()) if data else {}
 
@@ -107,7 +120,6 @@ class Transform:
 		return f"template <{', '.join(args)}>"
 
 	def paramToDefinition(self, item: ParametersResolvedItem, index: int) -> str:
-
 		if item.param.isLiteral:
 			return f"static constexpr {symbolToStrOriginal(item.symbol)} {item.name}{{{item.param.literal}}};"
 		elif item.isLValue:
@@ -120,20 +132,20 @@ class Transform:
 	def paramsDeclarationToList_(self, params: ParametersResolved, isRegistry: bool = False) -> typing.List[str]:
 		"""Declare inline parameters.
 
-		Args:
-			params: The parameters to be serialized.
-			isRegistry: Use registry variable instead of direct variables.
-		"""
+        Args:
+                params: The parameters to be serialized.
+                isRegistry: Use registry variable instead of direct variables.
+        """
 		symbols = self.composition.symbols if self.composition else None
 		return [valueToStrOriginal(item, symbols=symbols, registry=isRegistry) for item in params]
 
 	def paramsDesignatedInitializers(self, params: ParametersResolved) -> str:
 		"""Initializing an aggregate with designated initializers.
 
-		Note, it must have named parameters.
-		Something like this:
-		`.hello = "here", .world = 2`
-		"""
+        Note, it must have named parameters.
+        Something like this:
+        `.hello = "here", .world = 2`
+        """
 
 		values = {item.name: valueToStrOriginal(item, includeComment=False) for item in params}
 		valueToList = [f".{key} = {value}" for key, value in values.items()]
@@ -160,14 +172,17 @@ class Transform:
 
 	def expressionToDefinition(self, entity: Expression) -> str:
 		"""
-		normal           -> int myvar{value}
-		no default value -> int myvar
-		unamed           -> int{value}
-		"""
+        normal           -> int myvar{value}
+        no default value -> int myvar
+        unamed           -> int{value}
+        """
 		output = ""
-		values = self.paramsDeclarationToList_(
-		    params=entity.parametersResolved) if entity.parametersResolved.size() else []
-		entity.assertTrue(condition=entity.isSymbol, message="An expression declaration must have a type.")
+		values = (self.paramsDeclarationToList_(
+		    params=entity.parametersResolved) if entity.parametersResolved.size() else [])
+		entity.assertTrue(
+		    condition=entity.isSymbol,
+		    message="An expression declaration must have a type.",
+		)
 		output += f" {symbolToStrOriginal(entity.symbol, referenceForInterface=True, values=values)}"
 		if entity.isName:
 			output += f" {entity.name}"
@@ -230,9 +245,11 @@ class Transform:
 
 		args = []
 		factoryTypes = {"sink": "makeSink()", "source": "makeSource()"}
-		factoryStubTypes = {"sink": "bzd::io::SinkStub", "source": "bzd::io::SourceStub"}
+		factoryStubTypes = {
+		    "sink": "bzd::io::SinkStub",
+		    "source": "bzd::io::SourceStub",
+		}
 		for name, metadata in connections.items():
-
 			kind = metadata["type"]
 
 			# if multi arguments, create a tuple.
@@ -268,17 +285,17 @@ class Transform:
 
 
 def formatCc(bdl: Object, data: typing.Optional[Path] = None) -> str:
-
 	template = Template.fromPath(Path(__file__).parent / "template/file.h.btl", indent=True)
 	output = template.render(bdl.tree, Transform(data=data))
 
 	return output
 
 
-def compositionCc(compositions: typing.Dict[str, CompositionView],
-                  output: Path,
-                  data: typing.Optional[Path] = None) -> None:
-
+def compositionCc(
+    compositions: typing.Dict[str, CompositionView],
+    output: Path,
+    data: typing.Optional[Path] = None,
+) -> None:
 	template = Template.fromPath(Path(__file__).parent / "template/composition.cc.btl", indent=True)
 
 	for target, composition in compositions.items():

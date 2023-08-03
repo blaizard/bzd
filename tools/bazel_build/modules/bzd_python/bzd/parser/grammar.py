@@ -10,12 +10,13 @@ Grammar = List[Any]
 
 class GrammarItem:
 
-	def __init__(self,
-	             regexpr: Optional[str] = None,
-	             fragment: Union[Type[Fragment], Dict[str, str]] = Fragment,
-	             grammar: Optional[Union[Grammar, str]] = None,
-	             checkpoint: Optional[str] = None) -> None:
-
+	def __init__(
+	    self,
+	    regexpr: Optional[str] = None,
+	    fragment: Union[Type[Fragment], Dict[str, str]] = Fragment,
+	    grammar: Optional[Union[Grammar, str]] = None,
+	    checkpoint: Optional[str] = None,
+	) -> None:
 		self.regexpr_ = regexpr
 
 		if isinstance(fragment, dict):
@@ -37,7 +38,7 @@ class GrammarItem:
 	@cached_property
 	def regexpr(self) -> typing.Pattern[str]:
 		# Lazy precompilation of the regular expression.
-		return re.compile(r"") if self.regexpr_ is None else re.compile(self.regexpr_, re.DOTALL)
+		return (re.compile(r"") if self.regexpr_ is None else re.compile(self.regexpr_, re.DOTALL))
 
 	def __repr__(self) -> str:
 		return str(self.regexpr)

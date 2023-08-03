@@ -7,14 +7,17 @@ TypeConversionCallableReturn = typing.Tuple[str, typing.List[str]]
 
 
 class IntegerType:
-
 	constexpr: bool = True
 
 	@staticmethod
-	def toType(entity: Symbol, nested: typing.List[str], reference: bool,
-	           values: typing.Optional[typing.Sequence[str]]) -> TypeConversionCallableReturn:
+	def toType(
+	    entity: Symbol,
+	    nested: typing.List[str],
+	    reference: bool,
+	    values: typing.Optional[typing.Sequence[str]],
+	) -> TypeConversionCallableReturn:
 		maybeContractMin = entity.contracts.get("min")
-		isSigned = True if maybeContractMin is None or maybeContractMin.valueNumber < 0 else False
+		isSigned = (True if maybeContractMin is None or maybeContractMin.valueNumber < 0 else False)
 		maybeContractMax = entity.contracts.get("max")
 		bits = 32
 		if maybeContractMax is not None:
@@ -28,38 +31,40 @@ class IntegerType:
 			elif maxValue < 2**64:
 				bits = 64
 			else:
-				Error.handleFromElement(element=entity.element, message="Value too large, max supported is 64-bit.")
+				Error.handleFromElement(
+				    element=entity.element,
+				    message="Value too large, max supported is 64-bit.",
+				)
 		if isSigned:
 			return "bzd::Int{}".format(bits), nested
 		return "bzd::UInt{}".format(bits), nested
 
 
 class FloatType:
-
 	constexpr = True
 	toType = "bzd::Float32"
 
 
 class VoidType:
-
 	constexpr = False
 	toType = "void"
 
 
 class Byte:
-
 	constexpr = True
 	toType = "bzd::Byte"
 
 
 class ResultType:
-
 	constexpr = False
 
 	@staticmethod
-	def toType(entity: Symbol, nested: typing.List[str], reference: bool,
-	           values: typing.Optional[typing.Sequence[str]]) -> TypeConversionCallableReturn:
-
+	def toType(
+	    entity: Symbol,
+	    nested: typing.List[str],
+	    reference: bool,
+	    values: typing.Optional[typing.Sequence[str]],
+	) -> TypeConversionCallableReturn:
 		if len(nested) == 0:
 			nested.append("void")
 		if len(nested) == 1:
@@ -68,13 +73,15 @@ class ResultType:
 
 
 class AsyncType:
-
 	constexpr = False
 
 	@staticmethod
-	def toType(entity: Symbol, nested: typing.List[str], reference: bool,
-	           values: typing.Optional[typing.Sequence[str]]) -> TypeConversionCallableReturn:
-
+	def toType(
+	    entity: Symbol,
+	    nested: typing.List[str],
+	    reference: bool,
+	    values: typing.Optional[typing.Sequence[str]],
+	) -> TypeConversionCallableReturn:
 		if len(nested) == 0:
 			nested.append("void")
 		if len(nested) == 1:
@@ -83,44 +90,42 @@ class AsyncType:
 
 
 class CallableType:
-
 	constexpr = False
 	toType = "bzd::FunctionRef<void(void)>"
 
 
 class SpanType:
-
 	constexpr = False
 	toType = "bzd::Span"
 
 
 class StringType:
-
 	constexpr = True
 	toType = "bzd::StringView"
 
 
 class AnyType:
-
 	constexpr = True
 	toType = ""
 
 
 class ListType:
-
 	constexpr = True
 	toType = ""
 
 
 class ArrayType:
-
 	name = "Array"
 	constexpr = False
 
 	@classmethod
-	def toType(cls, entity: Symbol, nested: typing.List[str], reference: bool,
-	           values: typing.Optional[typing.List[str]]) -> TypeConversionCallableReturn:
-
+	def toType(
+	    cls,
+	    entity: Symbol,
+	    nested: typing.List[str],
+	    reference: bool,
+	    values: typing.Optional[typing.List[str]],
+	) -> TypeConversionCallableReturn:
 		if reference:
 			return f"bzd::interface::{cls.name}", nested
 		maybeContractCapacity = entity.contracts.get("capacity")
@@ -153,5 +158,5 @@ builtins: typing.Dict[str, typing.Any] = {
     "Array": ArrayType,
     "Vector": VectorType,
     "Result": ResultType,
-    "Callable": CallableType
+    "Callable": CallableType,
 }

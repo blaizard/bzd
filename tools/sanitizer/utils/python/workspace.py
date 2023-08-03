@@ -9,13 +9,15 @@ from gitignore_parser import parse_gitignore
 
 class Files:
 
-	def __init__(self,
-	             path: Path,
-	             include: Optional[List[str]] = None,
-	             exclude: Optional[List[str]] = None,
-	             excludeFile: Optional[str] = None,
-	             useGitignore: bool = False) -> None:
-		configRaw = Path(__file__).parent.parent.parent.joinpath(".sanitizer.json").read_text()
+	def __init__(
+	    self,
+	    path: Path,
+	    include: Optional[List[str]] = None,
+	    exclude: Optional[List[str]] = None,
+	    excludeFile: Optional[str] = None,
+	    useGitignore: bool = False,
+	) -> None:
+		configRaw = (Path(__file__).parent.parent.parent.joinpath(".sanitizer.json").read_text())
 		config = json.loads(configRaw)
 		self.path = path
 		self.workspace = Files._findWorkspace(path)
@@ -23,7 +25,7 @@ class Files:
 		self.excludeFile = excludeFile
 		self.excludeFileCache: Dict[Path, Optional[Filter]] = {}
 		self.include = Filter(["**"] if include is None else include)
-		self.gitignoreMatches = parse_gitignore(self.workspace / ".gitignore") if useGitignore else None
+		self.gitignoreMatches = (parse_gitignore(self.workspace / ".gitignore") if useGitignore else None)
 
 	@staticmethod
 	def _findWorkspace(path: Path) -> Path:
@@ -31,20 +33,20 @@ class Files:
 		while True:
 			if workspace.joinpath("WORKSPACE").is_file():
 				return workspace
-			assert workspace != workspace.parent, "Could not find any workspace directory associated with {}".format(
-			    path)
+			assert (workspace
+			        != workspace.parent), "Could not find any workspace directory associated with {}".format(path)
 			workspace = workspace.parent
 
 	def getWorkspace(self) -> Path:
 		"""
-		Return the root directory of the workspace.
-		"""
+        Return the root directory of the workspace.
+        """
 		return self.workspace
 
 	def isExcluded(self, relativePath: Path) -> bool:
 		"""
-		Check if a file is excluded from the search.
-		"""
+        Check if a file is excluded from the search.
+        """
 		if self.exclude.match(relativePath):
 			return True
 		if self.excludeFile:
@@ -54,7 +56,7 @@ class Files:
 				ignoreFilePath = searchDir / self.excludeFile
 				if ignoreFilePath not in self.excludeFileCache:
 					path = self.workspace / ignoreFilePath
-					self.excludeFileCache[ignoreFilePath] = Filter.fromFile(path) if path.is_file() else None
+					self.excludeFileCache[ignoreFilePath] = (Filter.fromFile(path) if path.is_file() else None)
 				excludeFilter = self.excludeFileCache[ignoreFilePath]
 				if excludeFilter:
 					if excludeFilter.match(relativePath.relative_to(searchDir)):
@@ -63,9 +65,9 @@ class Files:
 
 	def data(self, relative: bool = False) -> Iterable[Path]:
 		"""
-		Generator of discovered file path.
-		"""
-		for (dirpath, dirnames, filenames) in os.walk(self.path):
+        Generator of discovered file path.
+        """
+		for dirpath, dirnames, filenames in os.walk(self.path):
 			# Ignore symlinks and gitignore directories
 			if self.gitignoreMatches:
 				dirnames[:] = [

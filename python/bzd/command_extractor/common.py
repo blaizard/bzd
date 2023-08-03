@@ -90,7 +90,9 @@ class CommandExtractor:
 		output: typing.Dict[str, Processor] = {}
 		for kind, category in kinds.items():
 			output[re.escape(kind)] = Processor(
-			    1, lambda factory, x, category=category: self.result.append(factory.make(ItemString, category, x)))
+			    1,
+			    lambda factory, x, category=category: self.result.append(factory.make(ItemString, category, x)),
+			)
 		return output
 
 	def generateItem(self, kinds: typing.Mapping[str, enum.Enum]) -> typing.Dict[str, Processor]:
@@ -98,25 +100,25 @@ class CommandExtractor:
 		output: typing.Dict[str, Processor] = {}
 		for kind, category in kinds.items():
 			output[re.escape(kind)] = Processor(
-			    0, lambda factory, category=category: self.result.append(factory.make(Item, category)))
+			    0,
+			    lambda factory, category=category: self.result.append(factory.make(Item, category)),
+			)
 		return output
 
 	def parse(self, cmdString: str, schema: Schema, fallback: Fallback) -> None:
-
 		activeSchema: typing.Optional[Processor] = None
 		factory: typing.Optional[ItemFactory] = None
 		for arg in shlex.split(cmdString):
-
 			remmainder = arg
 			if activeSchema is None:
 				isMatch = False
 				for keys, entry in schema.items():
-					if re.match(r'^' + keys, arg):
+					if re.match(r"^" + keys, arg):
 						assert not isMatch, f"There are more than one match: {keys}"
 						isMatch = True
 						activeSchema = entry
 						factory = ItemFactory()
-						remmainder = re.sub(r'^' + keys + '=?', "", arg)
+						remmainder = re.sub(r"^" + keys + "=?", "", arg)
 
 				if not isMatch:
 					fallback(ItemFactory(original=[arg]), arg)

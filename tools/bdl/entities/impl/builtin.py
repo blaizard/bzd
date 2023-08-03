@@ -9,13 +9,13 @@ from tools.bdl.entities.impl.fragment.symbol import Symbol
 
 class Builtin(Entity):
 	"""
-	Builtin types, cannot be created by the user, but are available implicitly in the language.
-	- Attributes:
-		- name: The name of the buildin type.
-		- meta: Whether this type is a meta type or not.
-	- Sequence:
-		- [config]: Configuration for the type.
-	"""
+    Builtin types, cannot be created by the user, but are available implicitly in the language.
+    - Attributes:
+            - name: The name of the buildin type.
+            - meta: Whether this type is a meta type or not.
+    - Sequence:
+            - [config]: Configuration for the type.
+    """
 
 	def __init__(self, element: Element) -> None:
 		super().__init__(element, Role.Type)

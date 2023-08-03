@@ -29,7 +29,7 @@ class TestRun(unittest.TestCase):
 		result = template.render({"a": lambda x, y: x + y})
 		self.assertEqual("Hello 10.0", result)
 
-		template = Template("Hello {{a(\"agent\", \" 007\")}}")
+		template = Template('Hello {{a("agent", " 007")}}')
 		result = template.render({"a": lambda x, y: x + y})
 		self.assertEqual("Hello agent 007", result)
 
@@ -47,7 +47,7 @@ class TestRun(unittest.TestCase):
 		result = template.render({
 		    "str": "ThIs IS SOMEhting MesSy",
 		    "lowerCase": lambda x: x.lower(),
-		    "capitalize": lambda x: x.capitalize()
+		    "capitalize": lambda x: x.capitalize(),
 		})
 		self.assertEqual("This is somehting messy", result)
 
@@ -127,5 +127,5 @@ class TestRun(unittest.TestCase):
 		self.assertEqual("False", result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 	unittest.main()

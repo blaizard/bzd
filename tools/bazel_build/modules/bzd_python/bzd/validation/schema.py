@@ -28,9 +28,9 @@ class Context:
 	@property
 	def resolvedValue(self) -> typing.Any:
 		"""
-		Return the value resolved, which is either the underlying value or the actual value,
-		depending on whether the underlying exists.
-		"""
+        Return the value resolved, which is either the underlying value or the actual value,
+        depending on whether the underlying exists.
+        """
 		return self.value if self.underlying_ is None else self.underlying_
 
 
@@ -45,7 +45,6 @@ T = typing.TypeVar("T", typing.List[typing.Any], typing.Dict[typing.Any, typing.
 
 
 class Constraint:
-
 	constraints: typing.Dict[str, typing.Type["Constraint"]] = {}
 
 	def __init__(self, name: str) -> None:
@@ -53,15 +52,15 @@ class Constraint:
 
 	def install(self, processedSchema: "ProcessedSchema", args: typing.List[str]) -> None:
 		"""
-		Install a contraint.
-		"""
+        Install a contraint.
+        """
 		assert False, "Constraint missing 'install' overload."
 
 	@staticmethod
 	def _toInteger(value: str) -> int:
 		"""
-		Convert to integer or throw.
-		"""
+        Convert to integer or throw.
+        """
 		try:
 			converted = float(value)
 			assert converted.is_integer()
@@ -72,8 +71,8 @@ class Constraint:
 	@staticmethod
 	def _toFloat(value: str) -> float:
 		"""
-		Convert to integer or throw.
-		"""
+        Convert to integer or throw.
+        """
 		try:
 			return float(value)
 		except:
@@ -82,6 +81,7 @@ class Constraint:
 	@staticmethod
 	def validate(schema: T, values: Values) -> "Result[T]":
 		import bzd.validation.validation
+
 		return bzd.validation.validation.Validation(schema=schema).validate(values)
 
 
@@ -121,24 +121,28 @@ class ProcessedSchema:
 
 	def setMandatory(self) -> None:
 		"""
-		Set this constraint as mandatory.
-		"""
+        Set this constraint as mandatory.
+        """
 		assert self.mandatory_ == False, "Mandatory constraint already set."
 		self.mandatory_ = True
 
 	def setType(self, constraint: Constraint) -> None:
 		"""
-		Set a specific constraint as a type.
-		"""
+        Set a specific constraint as a type.
+        """
 
-		assert self.type is None, f"A type for this constraint is already specified: {str(self.type)}"
+		assert (self.type is None), f"A type for this constraint is already specified: {str(self.type)}"
 		self.type = constraint
 
-	def install(self, constraints: typing.Dict[str, typing.Type[Constraint]], name: str,
-	            args: typing.List[str]) -> None:
+	def install(
+	    self,
+	    constraints: typing.Dict[str, typing.Type[Constraint]],
+	    name: str,
+	    args: typing.List[str],
+	) -> None:
 		"""
-		Install a new constraint.
-		"""
+        Install a new constraint.
+        """
 
 		# Check if the constraint is a type specialization, this gets the priority over
 		# globally available constraints.
@@ -159,16 +163,16 @@ class ProcessedSchema:
 
 	def installValidation(self, validation: ValidationCallable, args: typing.Any) -> None:
 		"""
-		Add a validation callable to the list.
-		"""
+        Add a validation callable to the list.
+        """
 
 		bound = partial(validation, args)
 		self.validations.append(bound)
 
 	def validate(self, value: str, args: typing.Any) -> ProcessedResult:
 		"""
-		Validate a value.
-		"""
+        Validate a value.
+        """
 
 		result = ProcessedResult()
 		context = TypeContext(value=value, args=args)

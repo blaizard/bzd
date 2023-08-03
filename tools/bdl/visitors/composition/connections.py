@@ -9,7 +9,6 @@ from tools.bdl.entities.impl.types import Category
 
 @dataclasses.dataclass(frozen=True)
 class EndpointId:
-
 	# The fqn of the object instance.
 	this: str
 	# The name of the property.
@@ -17,7 +16,10 @@ class EndpointId:
 
 	@staticmethod
 	def fromSymbol(symbol: Symbol) -> "EndpointId":
-		symbol.assertTrue(condition=symbol.isThis, message=f"The symbol must point to an instance member.")
+		symbol.assertTrue(
+		    condition=symbol.isThis,
+		    message=f"The symbol must point to an instance member.",
+		)
 		return EndpointId(this=symbol.this, name=symbol.propertyName)
 
 	def __repr__(self) -> str:
@@ -61,29 +63,36 @@ class Connections:
 		endpoint.assertTrue(condition=endpoint.isSymbol, message="Endpoint must have a symbol.")
 
 		identifier = EndpointId(this=this.fqn, name=endpoint.name)
-		this.assertTrue(condition=identifier not in self.endpoints,
-		                message=f"The endpoint '{this.fqn}.{endpoint.name}' is already registered.")
-		self.endpoints[identifier] = Metadata(isSource=not endpoint.const,
-		                                      symbol=endpoint.symbol,
-		                                      multi=endpoint.isVarArgs)
+		this.assertTrue(
+		    condition=identifier not in self.endpoints,
+		    message=f"The endpoint '{this.fqn}.{endpoint.name}' is already registered.",
+		)
+		self.endpoints[identifier] = Metadata(
+		    isSource=not endpoint.const,
+		    symbol=endpoint.symbol,
+		    multi=endpoint.isVarArgs,
+		)
 
 	def addConnection(self, source: EndpointId, sink: EndpointId) -> None:
 		"""Add a new connection between a source and a sink."""
 
 		# Make sure the endpoints exists.
-		assert source in self.endpoints, f"The source '{source}' is not registered, only the followings are: {list(self.endpoints.keys())}."
-		assert sink in self.endpoints, f"The sink '{sink}' is not registered, only the followings are: {list(self.endpoints.keys())}."
+		assert (source in self.endpoints
+		        ), f"The source '{source}' is not registered, only the followings are: {list(self.endpoints.keys())}."
+		assert (sink in self.endpoints
+		        ), f"The sink '{sink}' is not registered, only the followings are: {list(self.endpoints.keys())}."
 
 		# Check const correctness.
 		assert self.endpoints[source].isSource, f"The source '{source}' must not be marked as const."
 		assert not self.endpoints[sink].isSource, f"The sink '{sink}' must be marked as const."
 
 		# Sanity checks.
-		assert source != sink, f"A connection cannot connect to itself: '{source}' -> '{sink}'."
-		assert len(self.endpoints[sink].connections) == 0 or self.endpoints[
-		    sink].multi, f"Sinks can only have a single connection, '{sink}' is already connected to {self.endpoints[sink].connections}."
-		assert sink not in self.endpoints[
-		    source].connections, f"Connection between '{source}' and '{sink}' is defined multiple times."
+		assert (source != sink), f"A connection cannot connect to itself: '{source}' -> '{sink}'."
+		assert (
+		    len(self.endpoints[sink].connections) == 0 or self.endpoints[sink].multi
+		), f"Sinks can only have a single connection, '{sink}' is already connected to {self.endpoints[sink].connections}."
+		assert (sink not in self.endpoints[source].connections
+		        ), f"Connection between '{source}' and '{sink}' is defined multiple times."
 
 		self.endpoints[sink].connections.add(source)
 		self.endpoints[source].connections.add(sink)
@@ -91,20 +100,28 @@ class Connections:
 		# Make sure the types are compatibles.
 		sourceTypeFQN = self.endpoints[source].symbol.underlyingTypeFQN
 		sinkTypeFQN = self.endpoints[sink].symbol.underlyingTypeFQN
-		assert sourceTypeFQN == sinkTypeFQN or sourceTypeFQN == "Any" or sinkTypeFQN == "Any", f"A connection must be made between the same types, not '{sourceTypeFQN}' and '{sinkTypeFQN}'."
+		assert (sourceTypeFQN == sinkTypeFQN or sourceTypeFQN == "Any" or sinkTypeFQN == "Any"
+		        ), f"A connection must be made between the same types, not '{sourceTypeFQN}' and '{sinkTypeFQN}'."
 
 	def add(self, source: EntityExpression, *sinks: EntityExpression) -> None:
 		"""Register a new connection for later processing."""
 		self.connections.append(ConnectionArguments(source=source, sinks=set(sinks)))
 
-	def getIdentifiers(self, entity: EntityExpression, identifiers: typing.Set[EndpointId],
-	                   description: str) -> typing.Set[EndpointId]:
+	def getIdentifiers(
+	    self,
+	    entity: EntityExpression,
+	    identifiers: typing.Set[EndpointId],
+	    description: str,
+	) -> typing.Set[EndpointId]:
 		"""Get the list of identifiers filtered by the entity."""
 
 		# If the entity contains a regular expression.
 		if entity.isRegexpr:
 			matches = entity.regexpr.match(identifiers)
-			entity.assertTrue(condition=bool(matches), message="There are no matches from this regular expression.")
+			entity.assertTrue(
+			    condition=bool(matches),
+			    message="There are no matches from this regular expression.",
+			)
 			return matches
 
 		# Else it should point to a signal input.
@@ -119,7 +136,8 @@ class Connections:
 			identifier = EndpointId.fromSymbol(entity.symbol)
 		entity.assertTrue(
 		    condition=identifier in identifiers,
-		    message=f"'{identifier}' is not a valid {description}, valid {description} are: {identifiers}.")
+		    message=f"'{identifier}' is not a valid {description}, valid {description} are: {identifiers}.",
+		)
 
 		return {identifier}
 
@@ -131,14 +149,15 @@ class Connections:
 		allSinks = {identifier for identifier, metadata in self.endpoints.items() if not metadata.isSource}
 
 		for connection in self.connections:
-
 			# Match the identifiers.
 			sources = self.getIdentifiers(connection.source, allSources, "source IO")
 			sinks: typing.Set[EndpointId] = set()
 			for entity in connection.sinks:
 				matches = self.getIdentifiers(entity, allSinks, "sink IO")
-				entity.assertTrue(condition=bool(matches - sinks),
-				                  message=f"This expression does not match any IO sinks.")
+				entity.assertTrue(
+				    condition=bool(matches - sinks),
+				    message=f"This expression does not match any IO sinks.",
+				)
 				sinks.update(matches)
 
 			# Register the connections.

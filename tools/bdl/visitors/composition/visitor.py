@@ -27,7 +27,6 @@ class CompositionView:
 	"""Create a composition view, this is the interface exposed to the composition template."""
 
 	def __init__(self, composition: "Composition", target: str) -> None:
-
 		self.composition = composition
 		self.target = target
 		self.contexts = {context for context in self.composition.contexts if context.target == target}
@@ -72,7 +71,6 @@ class CompositionView:
 class Composition:
 
 	def __init__(self, targets: typing.Set[str]) -> None:
-
 		# All targets available, an empty set if there are no target for this composition.
 		self.targets = targets
 		self.symbols = SymbolMap()
@@ -107,9 +105,9 @@ class Composition:
 	def visit(self, bdl: Object) -> "Composition":
 		"""Add a specific BDL object to the composition.
 
-		Args:
-			bdl: The object to visit.
-		"""
+        Args:
+                bdl: The object to visit.
+        """
 
 		# Build a master symbol list
 		self.symbols.update(bdl.symbols)
@@ -125,7 +123,6 @@ class Composition:
 				counter += 1
 
 	def process(self) -> None:
-
 		self.generateUids()
 
 		compositionEntities = [
@@ -143,7 +140,11 @@ class Composition:
 	def __str__(self) -> str:
 		"""Print a human readable view of this instance."""
 
-		def addContent(content: typing.List[str], title: str, contentList: typing.Iterable[typing.Any]) -> None:
+		def addContent(
+		    content: typing.List[str],
+		    title: str,
+		    contentList: typing.Iterable[typing.Any],
+		) -> None:
 			content.append(f"==== {title} ====")
 			content += [f"\t- {item}" for item in contentList]
 
@@ -152,10 +153,25 @@ class Composition:
 		addContent(content, "Unique Identifiers", [f"{k}: {v}" for k, v in self.uids.items()])
 		addContent(content, "Contexts", self.contexts)
 		for context in self.contexts:
-			addContent(content, f"Registry: {context}",
-			           [f"{k}: {v.expression}" for k, v in self.registry.get(context, {}).items()])
-			addContent(content, f"Services: {context}", [v.expression for v in self.services.get(context, [])])
-			addContent(content, f"Workloads: {context}", [v.expression for v in self.workloads.get(context, [])])
-			addContent(content, f"IOs: {context}", [v["identifier"] for v in self.ios.get(context, [])])
+			addContent(
+			    content,
+			    f"Registry: {context}",
+			    [f"{k}: {v.expression}" for k, v in self.registry.get(context, {}).items()],
+			)
+			addContent(
+			    content,
+			    f"Services: {context}",
+			    [v.expression for v in self.services.get(context, [])],
+			)
+			addContent(
+			    content,
+			    f"Workloads: {context}",
+			    [v.expression for v in self.workloads.get(context, [])],
+			)
+			addContent(
+			    content,
+			    f"IOs: {context}",
+			    [v["identifier"] for v in self.ios.get(context, [])],
+			)
 
 		return "\n".join(content)

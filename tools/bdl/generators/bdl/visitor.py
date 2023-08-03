@@ -51,17 +51,18 @@ def _inheritanceToStr(inheritanceList: typing.List[Symbol]) -> str:
 
 
 def formatBdl(bdl: Object, data: typing.Optional[Path] = None) -> str:
-
 	template = Template.fromPath(Path(__file__).parent / "template/file.bdl.btl", indent=True)
 	output = template.render(
-	    bdl.tree, {
+	    bdl.tree,
+	    {
 	        "Category": Category,
 	        "symbolToStr": _symbolToStr,
 	        "namespaceToStr": _namespaceToStr,
 	        "inlineComment": _inlineComment,
 	        "normalComment": _normalComment,
 	        "inheritanceToStr": _inheritanceToStr,
-	        "data": json.loads(data.read_text()) if data else {}
-	    })
+	        "data": json.loads(data.read_text()) if data else {},
+	    },
+	)
 
 	return output

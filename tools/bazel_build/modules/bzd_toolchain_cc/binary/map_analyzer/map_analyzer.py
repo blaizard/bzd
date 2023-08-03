@@ -15,21 +15,21 @@ AggregateConfigType = typing.Dict[str, typing.List[str]]
 
 
 def generateBerkeleyConfig(
-        filePath: pathlib.Path) -> typing.Optional[typing.Tuple[FilterConfigType, AggregateConfigType]]:
+    filePath: pathlib.Path, ) -> typing.Optional[typing.Tuple[FilterConfigType, AggregateConfigType]]:
 	"""
-	Classify sections to match berkeley respresentation:
-		remove: !SEC_ALLOC
-		text: SEC_CODE || SEC_READONLY
-		data: SEC_HAS_CONTENTS
-		bss: other
+    Classify sections to match berkeley respresentation:
+            remove: !SEC_ALLOC
+            text: SEC_CODE || SEC_READONLY
+            data: SEC_HAS_CONTENTS
+            bss: other
 
-	Those flags can be obtained with objdump:
-	objdump -h bazel-bin/example/example.stripped
+    Those flags can be obtained with objdump:
+    objdump -h bazel-bin/example/example.stripped
 
-	See implementation from GNU size:
-	static void berkeley_sum (bfd *abfd ATTRIBUTE_UNUSED, sec_ptr sec,
-			void *ignore ATTRIBUTE_UNUSED)
-	"""
+    See implementation from GNU size:
+    static void berkeley_sum (bfd *abfd ATTRIBUTE_UNUSED, sec_ptr sec,
+                    void *ignore ATTRIBUTE_UNUSED)
+    """
 
 	filterConfig: FilterConfigType = []
 	aggregateConfig: AggregateConfigType = {
@@ -38,7 +38,7 @@ def generateBerkeleyConfig(
 	    # data segment: typically contains initallized variables.
 	    "data": [],
 	    # block starting symbol: typically contains uninitallized variables.
-	    "bss": []
+	    "bss": [],
 	}
 
 	FLAG_SHF_WRITE = 0x1
@@ -48,7 +48,6 @@ def generateBerkeleyConfig(
 	with open(filePath, "rb") as f:
 		elffile = ELFFile(f)
 		for section in elffile.iter_sections():
-
 			if not section.name:
 				continue
 
@@ -74,8 +73,8 @@ def generateBerkeleyConfig(
 
 def analyze(data: Parser) -> None:
 	"""
-	Analyze the data gathered from the linker map.
-	"""
+    Analyze the data gathered from the linker map.
+    """
 
 	# Build a list sorted by addresses
 	byAddresses: typing.Dict[int, typing.Dict[str, typing.Any]] = {}
@@ -83,11 +82,17 @@ def analyze(data: Parser) -> None:
 		address = obj.get("address")
 		if address:
 			if address in byAddresses:
-				print("Sections '{}' and '{}' are located at the same address: {:#08x}.".format(
-				    section, byAddresses[address]["section"], address),
-				      file=sys.stderr)
+				print(
+				    "Sections '{}' and '{}' are located at the same address: {:#08x}.".format(
+				        section, byAddresses[address]["section"], address),
+				    file=sys.stderr,
+				)
 				continue
-			byAddresses[address] = {"size": obj.get("size"), "address": address, "section": section}
+			byAddresses[address] = {
+			    "size": obj.get("size"),
+			    "address": address,
+			    "section": section,
+			}
 	sortedByAddresses: typing.List[typing.Dict[str, typing.Any]] = sorted([obj for address, obj in byAddresses.items()],
 	                                                                      key=lambda x: x["address"])  # type: ignore
 
@@ -95,26 +100,31 @@ def analyze(data: Parser) -> None:
 	addressEnd = 0
 	previousSection = None
 	for item in sortedByAddresses:
-
 		address = item["address"]
 		size = item["size"]
 		section = item["section"]
 
 		assert isinstance(address, int)
 		if address < addressEnd:
-			print("Section '{}'@{:#08x} overlaps with previous section '{}'.".format(section, address, previousSection),
-			      file=sys.stderr)
+			print(
+			    "Section '{}'@{:#08x} overlaps with previous section '{}'.".format(section, address, previousSection),
+			    file=sys.stderr,
+			)
 
 		addressEnd = address + size
 		previousSection = section
-		#print("{:#08x} {:#08x} {:8} {:32}".format(address, addressEnd, size, section))
+		# print("{:#08x} {:#08x} {:8} {:32}".format(address, addressEnd, size, section))
 
 
-if __name__ == '__main__':
-
+if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Map file analyzer.")
 	parser.add_argument("-o", "--output", default="map.json", help="Path of the json output.")
-	parser.add_argument("-b", "--binary", type=pathlib.Path, help="Build configuration from the binary file provided.")
+	parser.add_argument(
+	    "-b",
+	    "--binary",
+	    type=pathlib.Path,
+	    help="Build configuration from the binary file provided.",
+	)
 	parser.add_argument("map", type=pathlib.Path, help="Path of the map file to analyze.")
 
 	args = parser.parse_args()
@@ -154,9 +164,10 @@ if __name__ == '__main__':
 		    json.dumps(
 		        {"size_groups": {
 		            "units": data.getByAggregatedUnits(),
-		            "sections": data.getByAggregatedSections()
+		            "sections": data.getByAggregatedSections(),
 		        }},
 		        indent=4,
-		        sort_keys=True))
+		        sort_keys=True,
+		    ))
 
 	sys.exit(0)

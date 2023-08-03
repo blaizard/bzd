@@ -12,7 +12,8 @@ class TestRun(unittest.TestCase):
 
 	@cached_property
 	def composition(self) -> Composition:
-		bdl = Object.fromContent(content="""
+		bdl = Object.fromContent(
+		    content="""
 			method myMethod(arg1 = Integer(1));
 			struct MyStruct {
 				var = Integer(1);
@@ -37,7 +38,8 @@ class TestRun(unittest.TestCase):
 				myComponent = MyComponent<Float>();
 			}
 			""",
-		                         objectContext=ObjectContext(resolve=True))
+		    objectContext=ObjectContext(resolve=True),
+		)
 		composition = Composition(targets={"default"})
 		composition.visit(bdl).process()
 		return composition
@@ -124,7 +126,9 @@ class TestRun(unittest.TestCase):
 
 		output = self.render("""{{ entity("myVarVarArgs") | expressionToValue }}""")
 		self.assertEqual(
-		    output, "bzd::Vector<bzd::Int32, 4u>{bzd::inPlace, /*values*/1, /*values*/2, /*values*/3, /*values*/4}")
+		    output,
+		    "bzd::Vector<bzd::Int32, 4u>{bzd::inPlace, /*values*/1, /*values*/2, /*values*/3, /*values*/4}",
+		)
 
 		output = self.render("""{{ entity("myStruct") | expressionToValue }}""")
 		self.assertEqual(output, "MyStruct{/*var*/bzd::Int32{2}}")
@@ -136,5 +140,5 @@ class TestRun(unittest.TestCase):
 		self.assertEqual(output, "MyComponent<bzd::Float32>{/*var*/bzd::Int32{1}}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 	unittest.main(failfast=True)

@@ -14,9 +14,16 @@ from tools.bdl.entities.impl.types import Category
 class _VisitorSymbol(Visitor):
 	"""Visitor to print a type."""
 
-	def __init__(self, symbol: Symbol, namespaceToFQN: typing.Optional[typing.Callable[[typing.List[str]], str]],
-	             reference: bool, definition: bool, nonConst: bool, referenceForInterface: bool,
-	             values: typing.Optional[typing.Sequence[str]]) -> None:
+	def __init__(
+	    self,
+	    symbol: Symbol,
+	    namespaceToFQN: typing.Optional[typing.Callable[[typing.List[str]], str]],
+	    reference: bool,
+	    definition: bool,
+	    nonConst: bool,
+	    referenceForInterface: bool,
+	    values: typing.Optional[typing.Sequence[str]],
+	) -> None:
 		self.namespaceToFQN = namespaceToFQN
 		self.reference = reference
 		self.definition = definition
@@ -42,12 +49,12 @@ class _VisitorSymbol(Visitor):
 
 	def visitSymbol(self, symbol: Symbol, nested: typing.List[str], parameters: ParametersResolved) -> str:
 		"""
-		Called when an element needs to be formatted.
-		"""
+        Called when an element needs to be formatted.
+        """
 
 		# Whether this type should be a reference or not.
 		useReference = self.isTopLevel and self.reference
-		useReference |= self.referenceForInterface and symbol.category == Category.interface
+		useReference |= (self.referenceForInterface and symbol.category == Category.interface)
 
 		outputList: typing.List[str] = []
 		output: str
@@ -80,7 +87,7 @@ class _VisitorSymbol(Visitor):
 
 		if self.isTopLevel:
 			if self.definition:
-				if symbol.underlyingTypeFQN in builtins and builtins[symbol.underlyingTypeFQN].constexpr:
+				if (symbol.underlyingTypeFQN in builtins and builtins[symbol.underlyingTypeFQN].constexpr):
 					output = "constexpr " + output
 
 		# Apply the reference if any.
@@ -94,23 +101,25 @@ class _VisitorSymbol(Visitor):
 		return output
 
 
-def symbolToStr(symbol: typing.Optional[Symbol],
-                adapter: bool = False,
-                reference: bool = False,
-                definition: bool = False,
-                nonConst: bool = False,
-                referenceForInterface: bool = False,
-                values: typing.Optional[typing.Sequence[str]] = None,
-                registry: bool = False) -> str:
+def symbolToStr(
+    symbol: typing.Optional[Symbol],
+    adapter: bool = False,
+    reference: bool = False,
+    definition: bool = False,
+    nonConst: bool = False,
+    referenceForInterface: bool = False,
+    values: typing.Optional[typing.Sequence[str]] = None,
+    registry: bool = False,
+) -> str:
 	"""
-	Convert a type object into a C++ string.
-	Args:
-		symbol: The symbol to be converted.
-		adapter: If the type should be converted into its adapter.
-		reference: If the symbol is passed as reference.
-		definition: The type is used for a variable definition.
-		registry: True if the entry is expected to be from the registry (for members only).
-	"""
+    Convert a type object into a C++ string.
+    Args:
+            symbol: The symbol to be converted.
+            adapter: If the type should be converted into its adapter.
+            reference: If the symbol is passed as reference.
+            definition: The type is used for a variable definition.
+            registry: True if the entry is expected to be from the registry (for members only).
+    """
 
 	if symbol is None:
 		return "void"
@@ -129,10 +138,12 @@ def symbolToStr(symbol: typing.Optional[Symbol],
 			return "registry.{}_.get()".format(fqnToNameStr(fqn))
 
 	# Otherwise it must be a normal type
-	return _VisitorSymbol(symbol=symbol,
-	                      namespaceToFQN=namespaceToFQN,
-	                      reference=reference,
-	                      definition=definition,
-	                      nonConst=nonConst,
-	                      referenceForInterface=referenceForInterface,
-	                      values=values).result
+	return _VisitorSymbol(
+	    symbol=symbol,
+	    namespaceToFQN=namespaceToFQN,
+	    reference=reference,
+	    definition=definition,
+	    nonConst=nonConst,
+	    referenceForInterface=referenceForInterface,
+	    values=values,
+	).result

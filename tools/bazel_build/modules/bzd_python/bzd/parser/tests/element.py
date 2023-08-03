@@ -9,7 +9,6 @@ from bzd.parser.element import ElementBuilder
 class TestRun(unittest.TestCase):
 
 	def testEqual(self) -> None:
-
 		element1 = ElementBuilder().setAttrs({"a": "1", "b": "2"})
 
 		self.assertEqual(element1, element1)
@@ -25,5 +24,5 @@ class TestRun(unittest.TestCase):
 		self.assertNotEqual(ElementBuilder(), element1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 	unittest.main()

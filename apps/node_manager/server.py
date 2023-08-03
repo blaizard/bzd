@@ -6,7 +6,6 @@ from apps.node_manager.power import handlersPower
 from apps.node_manager.monitor import handlersMonitor, monitor
 
 if __name__ == "__main__":
-
 	parser = argparse.ArgumentParser(description="WOL manager.")
 	parser.add_argument("-b", "--bind", default="0.0.0.0", help="Address to bind.")
 	parser.add_argument("-p", "--port", default=8000, type=int, help="Port to bind.")

@@ -21,7 +21,6 @@ class EnumValue(Entity):
 
 
 class _Visitor(VisitorBase[str, typing.List[str]]):
-
 	nestedKind = None
 
 	def visitBegin(self, result: typing.Any) -> typing.List[str]:
@@ -35,12 +34,12 @@ class _Visitor(VisitorBase[str, typing.List[str]]):
 
 class Enum(Entity):
 	"""
-	Enumerates available values for a type.
-	- Attributes:
-		- name: The name of the enum.
-	- Sequence:
-		- values: The different values.
-	"""
+    Enumerates available values for a type.
+    - Attributes:
+            - name: The name of the enum.
+    - Sequence:
+            - values: The different values.
+    """
 
 	def __init__(self, element: Element) -> None:
 		super().__init__(element, Role.Type)
@@ -49,8 +48,8 @@ class Enum(Entity):
 
 	def resolve(self, resolver: typing.Any) -> None:
 		"""
-		Resolve entities.
-		"""
+        Resolve entities.
+        """
 		# Generate this symbol FQN
 		self._setUnderlyingTypeFQN(self.fqn)
 		super().resolve(resolver)

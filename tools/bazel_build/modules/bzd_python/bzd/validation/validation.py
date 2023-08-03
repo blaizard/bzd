@@ -2,7 +2,14 @@ import typing
 import re
 
 from bzd.validation.result import Result
-from bzd.validation.schema import Constraint, ProcessedSchema, ProcessedResult, Values, ValuesList, ValuesDict
+from bzd.validation.schema import (
+    Constraint,
+    ProcessedSchema,
+    ProcessedResult,
+    Values,
+    ValuesList,
+    ValuesDict,
+)
 from bzd.validation.constraints.boolean import Boolean
 from bzd.validation.constraints.integer import Integer
 from bzd.validation.constraints.float import Float
@@ -22,13 +29,12 @@ Schema = typing.TypeVar("Schema", SchemaList, SchemaDict)
 
 
 class Validation(typing.Generic[Schema]):
-
 	AVAILABLE_CONSTRAINTS: typing.Dict[str, typing.Type[Constraint]] = {
 	    "boolean": Boolean,
 	    "integer": Integer,
 	    "float": Float,
 	    "string": String,
-	    "mandatory": Mandatory
+	    "mandatory": Mandatory,
 	}
 
 	memoizedProcessedSchema_: typing.Dict[typing.Tuple[str, int], ProcessedSchema] = {}
@@ -36,10 +42,10 @@ class Validation(typing.Generic[Schema]):
 	def __init__(self, schema: Schema, args: typing.Any = None) -> None:
 		"""Initialize the Validation object.
 
-		Args:
-			schema: The schema to be used.
-			args: Arguments to be passed to the constraints.
-		"""
+        Args:
+                schema: The schema to be used.
+                args: Arguments to be passed to the constraints.
+        """
 
 		self.processed: typing.Dict[str, ProcessedSchema] = {}
 		self.isList = isinstance(schema, list)
@@ -53,8 +59,8 @@ class Validation(typing.Generic[Schema]):
 
 	def _inputToInternal(self, schema: Values) -> ValuesDict:
 		"""
-		Convert a user provided schema into an internal schema.
-		"""
+        Convert a user provided schema into an internal schema.
+        """
 		if isinstance(schema, list):
 			return {str(i): value for i, value in enumerate(schema)}
 		return schema
@@ -62,9 +68,9 @@ class Validation(typing.Generic[Schema]):
 	@staticmethod
 	def parse(constraints: str) -> typing.Dict[str, typing.List[str]]:
 		"""
-		Parse string formatted contract and return the parsed data structure.
-		Note, it is ok to use a dictionary as dicts preserve insertion order in Python 3.7+
-		"""
+        Parse string formatted contract and return the parsed data structure.
+        Note, it is ok to use a dictionary as dicts preserve insertion order in Python 3.7+
+        """
 		assert isinstance(constraints, str), f"Constraint must be a string, received: {str(constraints)}"
 		constraintList = [constraint for constraint in constraints.split() if constraint]
 		result = {}
@@ -80,11 +86,10 @@ class Validation(typing.Generic[Schema]):
 
 	def _prepocessSchema(self, schema: SchemaDict) -> None:
 		"""
-		Preprocess the schema.
-		"""
+        Preprocess the schema.
+        """
 
 		for key, constraints in schema.items():
-
 			# The key must include all variability to generate the processed schema.
 			memoizedKey = (constraints, id(self.AVAILABLE_CONSTRAINTS))
 
@@ -105,14 +110,14 @@ class Validation(typing.Generic[Schema]):
 
 	def __len__(self) -> int:
 		"""
-		Get the number of entries.
-		"""
+        Get the number of entries.
+        """
 		return len(self.processed.keys())
 
 	def validate(self, values: Values, output: str = "throw") -> Result[Schema]:
 		"""
-		Validates the values passed into argument.
-		"""
+        Validates the values passed into argument.
+        """
 		results = Result[Schema](self.isList)
 
 		if self.isList and not isinstance(values, list):
@@ -134,10 +139,13 @@ class Validation(typing.Generic[Schema]):
 				elif not self.processed:
 					results.addError(key, ["no value expected."])
 				else:
-					results.addError(key, [
-					    "value not expected, valid choices are: {}.".format(", ".join(
-					        ["'{}'".format(x) for x in self.processed.keys()]))
-					])
+					results.addError(
+					    key,
+					    [
+					        "value not expected, valid choices are: {}.".format(", ".join(
+					            ["'{}'".format(x) for x in self.processed.keys()]))
+					    ],
+					)
 
 			# Check for mandatory values
 			for key, constraints in self.processed.items():
@@ -156,5 +164,5 @@ class Validation(typing.Generic[Schema]):
 		return results
 
 	def __str__(self) -> str:
-		attrs = " ".join([f"{k}=\"{v}\"" for k, v in self.schema.items()])
+		attrs = " ".join([f'{k}="{v}"' for k, v in self.schema.items()])
 		return f"<Validation {attrs} />"

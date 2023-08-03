@@ -29,9 +29,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 		super().__init__(*args, **kwargs)
 
 	def do_GET(self) -> None:
-
 		if self.path in self.handlers:
-
 			context = RESTServerContext()
 			self.handlers[self.path](context)
 

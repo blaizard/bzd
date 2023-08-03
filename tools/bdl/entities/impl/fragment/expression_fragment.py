@@ -46,14 +46,32 @@ class ExpressionFragment(EntityExpression):
 
 		# Copy attributes.
 		elementBuilder = ElementBuilder.cast(element, ElementBuilder)
-		for attr in ("interface", "symbol", "value", "symbol_category", "symbol_resolved", "meta", "literal", "const",
-		             "fqn_type", "fqn_value"):
+		for attr in (
+		    "interface",
+		    "symbol",
+		    "value",
+		    "symbol_category",
+		    "symbol_resolved",
+		    "meta",
+		    "literal",
+		    "const",
+		    "fqn_type",
+		    "fqn_value",
+		):
 			if self.element.isAttr(attr):
 				elementBuilder.setAttr(attr, self.element.getAttr(attr).value)
 
 		# Copy sequences.
-		for nested in ("argument", "argument_resolved", "argument_expected", "template", "template_resolved",
-		               "template_expected", "regexpr_include", "regexpr_exclude"):
+		for nested in (
+		    "argument",
+		    "argument_resolved",
+		    "argument_expected",
+		    "template",
+		    "template_resolved",
+		    "template_expected",
+		    "regexpr_include",
+		    "regexpr_exclude",
+		):
 			sequence = self.element.getNestedSequence(nested)
 			if sequence:
 				elementBuilder.setNestedSequence(nested, sequence)
@@ -67,9 +85,9 @@ class ExpressionFragment(EntityExpression):
 
 		literal = self.literalNative
 		if isinstance(literal, (int, float)):
-			if operator.operator == '+':
+			if operator.operator == "+":
 				pass
-			elif operator.operator == '-':
+			elif operator.operator == "-":
 				self._setLiteral(str(-literal))
 			else:
 				self.error(f"Unsupported unary operator with number '{operator.operator}'.")
@@ -92,13 +110,13 @@ class ExpressionFragment(EntityExpression):
 		literal1 = self.literalNative
 		literal2 = fragment.literalNative
 		if isinstance(literal1, (int, float)) and isinstance(literal2, (int, float)):
-			if operator.operator == '+':
+			if operator.operator == "+":
 				self._setLiteral(str(literal1 + literal2))
-			elif operator.operator == '-':
+			elif operator.operator == "-":
 				self._setLiteral(str(literal1 - literal2))
-			elif operator.operator == '*':
+			elif operator.operator == "*":
 				self._setLiteral(str(literal1 * literal2))
-			elif operator.operator == '/':
+			elif operator.operator == "/":
 				self._setLiteral(str(literal1 / literal2))
 			else:
 				self.error(f"Unsupported binary operator with numbers '{operator.operator}'.")
@@ -107,8 +125,10 @@ class ExpressionFragment(EntityExpression):
 		regexpr1 = self.regexpr
 		regexpr2 = fragment.regexpr
 		if regexpr1.isValid and regexpr2.isValid:
-			self.assertTrue(condition=operator.operator in ("+", "-"),
-			                message=f"Unsupported binary operator with regexprs '{operator.operator}'.")
+			self.assertTrue(
+			    condition=operator.operator in ("+", "-"),
+			    message=f"Unsupported binary operator with regexprs '{operator.operator}'.",
+			)
 			if operator.operator == "-":
 				regexpr2.negate()
 			regexpr1.merge(regexpr2)
@@ -130,7 +150,6 @@ class ValueFragment(ExpressionFragment):
 class RegexprFragment(ExpressionFragment):
 
 	def resolve(self, resolver: "Resolver") -> None:
-
 		try:
 			re.compile(self.regexprAttr)
 		except re.error:
@@ -144,12 +163,17 @@ class SymbolFragment(ExpressionFragment):
 	@property
 	def parameters(self) -> typing.Optional[Parameters]:
 		"""
-		Return the Parameters object if there are parameters. In case the expression
-		is declared with empty parenthesis or without the Parameters object will be empty.
-		"""
+        Return the Parameters object if there are parameters. In case the expression
+        is declared with empty parenthesis or without the Parameters object will be empty.
+        """
 		from tools.bdl.entities.impl.expression import Expression
+
 		if self.isParameters:
-			return Parameters(element=self.element, NestedElementType=Expression, nestedKind="argument")
+			return Parameters(
+			    element=self.element,
+			    NestedElementType=Expression,
+			    nestedKind="argument",
+			)
 		return Parameters(element=self.element, NestedElementType=Expression)
 
 	def resolve(self, resolver: "Resolver") -> None:
@@ -159,11 +183,16 @@ class SymbolFragment(ExpressionFragment):
 
 		# The type refers to a value.
 		if entity.isRoleValue:
-			self.assertTrue(condition=self.isParameters == False,
-			                message="Cannot instantiate a value from another value.")
+			self.assertTrue(
+			    condition=self.isParameters == False,
+			    message="Cannot instantiate a value from another value.",
+			)
 			# It means it refers directly to the entity, in that case it must have a value FQN
 			if entity.underlyingValueFQN is None:
-				self.assertTrue(condition=entity.isFQN, message="A value referenced must have an valid FQN.")
+				self.assertTrue(
+				    condition=entity.isFQN,
+				    message="A value referenced must have an valid FQN.",
+				)
 				self._setUnderlyingValueFQN(str(self.symbol))
 			else:
 				self._setUnderlyingValueFQN(entity.underlyingValueFQN)
@@ -176,7 +205,6 @@ class SymbolFragment(ExpressionFragment):
 
 		# The type refers to an actual type and will be instantiated as part of this expression.
 		elif entity.isRoleType:
-
 			# Generate the argument list and resolve it.
 			assert self.parameters is not None
 			self.parameters.resolve(resolver=resolver)
@@ -189,6 +217,7 @@ class SymbolFragment(ExpressionFragment):
 		"""Get the list of expressions that forms the values and resolve them."""
 
 		from tools.bdl.entities.impl.expression import Expression
+
 		if self.underlyingTypeFQN:
 			underlyingTypeEntity = resolver.getEntityResolved(fqn=self.underlyingTypeFQN).assertValue(
 			    element=self.element)
@@ -197,10 +226,12 @@ class SymbolFragment(ExpressionFragment):
 			# Take into account the parents as well.
 			for fqn in reversed([self.underlyingTypeFQN, *underlyingTypeEntity.getParents()]):
 				parentEntity = resolver.getEntityResolved(fqn=fqn).assertValue(element=self.element)
-				parentParams = Parameters(element=parentEntity.element,
-				                          NestedElementType=Expression,
-				                          nestedKind=parentEntity.configAttr,
-				                          filterFct=lambda entity: entity.category == Category.expression)
+				parentParams = Parameters(
+				    element=parentEntity.element,
+				    NestedElementType=Expression,
+				    nestedKind=parentEntity.configAttr,
+				    filterFct=lambda entity: entity.category == Category.expression,
+				)
 				# Resolve the types from a config sequence if any.
 				# These are resolved only when used, allowing symbol to be only available during composition.
 				for entity in parentParams:
@@ -227,27 +258,33 @@ class SymbolFragment(ExpressionFragment):
 			self.assertTrue(
 			    condition=category in [Category.component, Category.method, Category.builtin],
 			    message=
-			    f"{resolvedTypeEntity}: Components as parameters are not allowed for entities of category '{category}'."
+			    f"{resolvedTypeEntity}: Components as parameters are not allowed for entities of category '{category}'.",
 			)
 
 		# Read the validation for the values and evaluate it.
 		validation = expectedParameters.makeValidationForValues(resolver=resolver)
 		arguments = parameters.getValuesOrTypesAsDict(resolver=resolver, varArgs=False)
 		result = validation.validate(arguments, output="return")
-		Error.assertTrue(element=self.element, attr="symbol", condition=bool(result), message=str(result))
+		Error.assertTrue(
+		    element=self.element,
+		    attr="symbol",
+		    condition=bool(result),
+		    message=str(result),
+		)
 
 		# Compute and set the literal value if any.
 		maybeValue = resolvedTypeEntity.toLiteral(result.values)  # type: ignore
 		if maybeValue is not None:
-			self.assertTrue(condition=isinstance(maybeValue, str),
-			                message=f"The returned value from toLiteral must be a string, not {str(maybeValue)}")
+			self.assertTrue(
+			    condition=isinstance(maybeValue, str),
+			    message=f"The returned value from toLiteral must be a string, not {str(maybeValue)}",
+			)
 			self._setLiteral(maybeValue)
 
 
 class PresetFragment(SymbolFragment):
 
 	def resolve(self, resolver: "Resolver") -> None:
-
 		presets = {
 		    "out": {
 		        "interface": "bzd.OStream",
@@ -267,8 +304,8 @@ class PresetFragment(SymbolFragment):
 		    },
 		    "network.tcp.client": {
 		        "interface": "bzd.network.tcp.Client",
-		        "symbol": "target.network.tcp.client"
-		    }
+		        "symbol": "target.network.tcp.client",
+		    },
 		}
 
 		if self.preset in presets:

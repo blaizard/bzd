@@ -6,8 +6,8 @@ E = typing.TypeVar("E")
 
 class Result(typing.Generic[V, E]):
 	"""
-	Result class.
-	"""
+    Result class.
+    """
 
 	def __init__(self, value: V) -> None:
 		self.value_: typing.Optional[V] = value
@@ -26,15 +26,15 @@ class Result(typing.Generic[V, E]):
 
 	@property
 	def value(self) -> V:
-		assert self.value_ is not None, f"Cannot access the value of a result containing an error: {self.error}"
+		assert (self.value_ is not None), f"Cannot access the value of a result containing an error: {self.error}"
 		return self.value_
 
 	@property
 	def error(self) -> E:
-		assert self.error_ is not None, "Cannot access the error of a result containing a value."
+		assert (self.error_ is not None), "Cannot access the error of a result containing a value."
 		return self.error_
 
 	def __repr__(self) -> str:
 		if bool(self):
-			return f"<Result value=\"{str(self.value)}\">"
-		return f"<Result error=\"{str(self.error)}\">"
+			return f'<Result value="{str(self.value)}">'
+		return f'<Result error="{str(self.error)}">'

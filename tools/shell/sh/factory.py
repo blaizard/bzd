@@ -30,10 +30,12 @@ class Sh(Factory):
 		"""Build the configuration if needed."""
 
 		content = self.renderTemplate(
-		    pathlib.Path("tools/shell/sh/srcs/bashrc.btl"), {
+		    pathlib.Path("tools/shell/sh/srcs/bashrc.btl"),
+		    {
 		        "always": pathlib.Path("tools/shell/sh/srcs/always"),
-		        "interactive": pathlib.Path("tools/shell/sh/srcs/interactive")
-		    })
+		        "interactive": pathlib.Path("tools/shell/sh/srcs/interactive"),
+		    },
+		)
 		self.path = workspace / "tools/shell/sh/bashrc.sh"
 		self.path.write_text(content)
 
@@ -52,11 +54,13 @@ class Sh(Factory):
 		# Update the hook file.
 		content = hookFile.read_text()
 		hook = "# bzd-hook-start\n# This is a generate hook from the bzd monorepo, please do not remove.\nsource ~/.bzd/bashrc.sh\n# bzd-hook-end\n"
-		updateContent = re.sub(r"^#\s*bzd-hook-start[\s\S]*\n#\s*bzd-hook-end\n",
-		                       hook,
-		                       content,
-		                       count=1,
-		                       flags=re.MULTILINE)
+		updateContent = re.sub(
+		    r"^#\s*bzd-hook-start[\s\S]*\n#\s*bzd-hook-end\n",
+		    hook,
+		    content,
+		    count=1,
+		    flags=re.MULTILINE,
+		)
 		if id(content) == id(updateContent):
 			updateContent += "\n" + hook
 		if content != updateContent:

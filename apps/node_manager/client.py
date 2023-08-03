@@ -8,9 +8,9 @@ import urllib.request
 
 
 def checkMAC(mac: str) -> bool:
-	""" Check that a mac address format is correct.
-	It should be: XX:XX:XX:XX:XX:XX
-	"""
+	"""Check that a mac address format is correct.
+    It should be: XX:XX:XX:XX:XX:XX
+    """
 
 	return bool(re.match(r"^([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}$", mac))
 
@@ -19,7 +19,7 @@ def getHostPort(hostport: str) -> typing.Tuple[str, int]:
 	"""Separate the hostname from the port and return it."""
 
 	split = hostport.split(":")
-	assert len(split) == 2, f"The string does not have a correct format, should be 'hostname:port', not '{hostport}'."
+	assert (len(split) == 2), f"The string does not have a correct format, should be 'hostname:port', not '{hostport}'."
 	return split[0], int(split[1])
 
 
@@ -28,7 +28,7 @@ def wakeOnLan(mac: str, broadcast: str) -> None:
 
 	# Pad the synchronization stream.
 	data = "".join(["FFFFFFFFFFFF", mac.replace(":", "") * 20])
-	sendData = b''
+	sendData = b""
 
 	# Split up the hex values and pack.
 	for j in range(0, len(data), 2):
@@ -87,18 +87,30 @@ def commandSuspend(args: argparse.Namespace) -> None:
 
 
 if __name__ == "__main__":
-
 	parser = argparse.ArgumentParser(description="Wake On Lan client.")
 	subparsers = parser.add_subparsers(help="Available sub-commands.", dest="command")
 
 	wolParser = subparsers.add_parser("wol", help="Wake-up a machine from its MAC address.")
-	wolParser.add_argument("-b", "--broadcast", default="255.255.255.255", help="The broadcast address to be used.")
-	wolParser.add_argument("-t", "--timeout", default=60, type=int, help="Timeout in S until which the check returns.")
-	wolParser.add_argument("-w",
-	                       "--wait",
-	                       action="append",
-	                       default=[],
-	                       help="Wait until a specific TCP connection is open.")
+	wolParser.add_argument(
+	    "-b",
+	    "--broadcast",
+	    default="255.255.255.255",
+	    help="The broadcast address to be used.",
+	)
+	wolParser.add_argument(
+	    "-t",
+	    "--timeout",
+	    default=60,
+	    type=int,
+	    help="Timeout in S until which the check returns.",
+	)
+	wolParser.add_argument(
+	    "-w",
+	    "--wait",
+	    action="append",
+	    default=[],
+	    help="Wait until a specific TCP connection is open.",
+	)
 	wolParser.add_argument("mac", help="The mac address for the machine to wake up.")
 
 	shutdownParser = subparsers.add_parser("suspend", help="Suspend a machine running the server.")

@@ -17,4 +17,8 @@ class ContractExecutor(ContractTraits):
 	"""Bind an expression to an executor."""
 
 	def __init__(self) -> None:
-		super().__init__(name="executor", role=Role.Entity | Role.Public, constraint=ExecutorConstraint_)
+		super().__init__(
+		    name="executor",
+		    role=Role.Entity | Role.Public,
+		    constraint=ExecutorConstraint_,
+		)

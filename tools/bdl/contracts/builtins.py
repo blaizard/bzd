@@ -38,7 +38,6 @@ def getValueFromSingleParameter_(resolver: typing.Any, typeFQN: str, value: typi
 class Integer_(Integer):
 
 	def check(self, context: TypeContext) -> None:
-
 		assert "resolver" in context.args
 		context.value = getValueFromSingleParameter_(context.args["resolver"], "Integer", context.value, "0")
 		super().check(context)
@@ -47,7 +46,6 @@ class Integer_(Integer):
 class Float_(Float):
 
 	def check(self, context: TypeContext) -> None:
-
 		assert "resolver" in context.args
 		context.value = getValueFromSingleParameter_(context.args["resolver"], "Float", context.value, "0")
 		super().check(context)
@@ -56,7 +54,6 @@ class Float_(Float):
 class Boolean_(Boolean):
 
 	def check(self, context: TypeContext) -> None:
-
 		assert "resolver" in context.args
 		context.value = getValueFromSingleParameter_(context.args["resolver"], "Boolean", context.value, "false")
 		super().check(context)

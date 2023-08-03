@@ -42,15 +42,17 @@ CATEGORY_TO_ENTITY: typing.Dict[str, typing.Type[EntityType]] = {
     "namespace": Namespace,
     "use": Use,
     "reference": Reference,
-    "extern": Extern
+    "extern": Extern,
 }
 
 
-def elementToEntity(element: Element,
-                    extension: typing.Optional[typing.Dict[str, typing.Type[EntityType]]] = None) -> EntityType:
+def elementToEntity(
+    element: Element,
+    extension: typing.Optional[typing.Dict[str, typing.Type[EntityType]]] = None,
+) -> EntityType:
 	"""
-	Instantiate an entity from an element.
-	"""
+    Instantiate an entity from an element.
+    """
 
 	Error.assertHasAttr(element=element, attr="category")
 	category = element.getAttr("category").value

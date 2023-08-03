@@ -65,5 +65,5 @@ class TestRun(unittest.TestCase):
 			template.validate({"hello": "3.14"})
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 	unittest.main()

@@ -14,7 +14,10 @@ from tools.bdl.entities.impl.fragment.parameters_resolved import ParametersResol
 from tools.bdl.entities.impl.fragment.fqn import FQN
 from tools.bdl.entities.impl.entity import Entity, EntityExpression, Role
 from tools.bdl.entities.impl.types import Category
-from tools.bdl.entities.impl.fragment.expression_fragment import ExpressionFragment, OperatorFragment
+from tools.bdl.entities.impl.fragment.expression_fragment import (
+    ExpressionFragment,
+    OperatorFragment,
+)
 
 if typing.TYPE_CHECKING:
 	from tools.bdl.visitors.symbol_map import Resolver, SymbolMap
@@ -22,38 +25,39 @@ if typing.TYPE_CHECKING:
 
 class Expression(EntityExpression):
 	"""
-	An expression can be:
-		- a variable declaration.
-		- a variable definition.
-		- a method call.
-		- a value.
-	- Attributes:
-		- [type]: The method name or variable type to be used.
-		- [value]: The value this expression represents.
-		- [name]: The resulting symbol name.
-		- [const]: If the expression is constant.
-		- [underlyingValueFQN]: The actual value discovered after resolution.
-		- [symbol]: The interface type if any (might not be set).
-		- [executor]: The executor for which this expression should run.
-	- Sequence:
-		- argument: The list of arguments to pass to the instanciation or method call.
-		- argument_resolved: List of resolved arguments.
-	"""
+    An expression can be:
+            - a variable declaration.
+            - a variable definition.
+            - a method call.
+            - a value.
+    - Attributes:
+            - [type]: The method name or variable type to be used.
+            - [value]: The value this expression represents.
+            - [name]: The resulting symbol name.
+            - [const]: If the expression is constant.
+            - [underlyingValueFQN]: The actual value discovered after resolution.
+            - [symbol]: The interface type if any (might not be set).
+            - [executor]: The executor for which this expression should run.
+    - Sequence:
+            - argument: The list of arguments to pass to the instanciation or method call.
+            - argument_resolved: List of resolved arguments.
+    """
 
 	def __init__(self, element: Element) -> None:
-
 		super().__init__(element, Role.Value)
-		#self.assertTrue(condition=(self.isValue or self.isSymbol),
-		#	message="Expression must represent a symbol or a value.")
+		# self.assertTrue(condition=(self.isValue or self.isSymbol),
+		# 	message="Expression must represent a symbol or a value.")
 
 	@property
 	def typeResolved(self) -> Symbol:
-		return Symbol(element=self.element,
-		              kind="symbol",
-		              underlyingTypeFQN="fqn_type",
-		              template="template_resolved",
-		              const="const",
-		              contract="contract")
+		return Symbol(
+		    element=self.element,
+		    kind="symbol",
+		    underlyingTypeFQN="fqn_type",
+		    template="template_resolved",
+		    const="const",
+		    contract="contract",
+		)
 
 	@property
 	def isInterfaceType(self) -> bool:
@@ -61,13 +65,21 @@ class Expression(EntityExpression):
 
 	@property
 	def interfaceType(self) -> Symbol:
-		return Symbol(element=self.element, kind="interface", underlyingTypeFQN="fqn_interface",
-		              const="const") if self.isInterfaceType else self.symbol
+		return (Symbol(
+		    element=self.element,
+		    kind="interface",
+		    underlyingTypeFQN="fqn_interface",
+		    const="const",
+		) if self.isInterfaceType else self.symbol)
 
 	@property
 	def interfaceTypeResolved(self) -> Symbol:
-		return Symbol(element=self.element, kind="interface", underlyingTypeFQN="fqn_interface",
-		              const="const") if self.isInterfaceType else self.typeResolved
+		return (Symbol(
+		    element=self.element,
+		    kind="interface",
+		    underlyingTypeFQN="fqn_interface",
+		    const="const",
+		) if self.isInterfaceType else self.typeResolved)
 
 	@property
 	def fragments(self) -> typing.List[ExpressionFragment]:
@@ -102,8 +114,10 @@ class Expression(EntityExpression):
 	def resolveFragments(self, resolver: "Resolver") -> None:
 		"""Process fragments to build a value or a symbol."""
 
-		self.assertTrue(condition=self.element.isNestedSequence("fragments"),
-		                message=f"Missing nested sequence 'fragments' for: {self.element}")
+		self.assertTrue(
+		    condition=self.element.isNestedSequence("fragments"),
+		    message=f"Missing nested sequence 'fragments' for: {self.element}",
+		)
 
 		# Resolve all fragments
 		fragments = self.fragments
@@ -117,16 +131,13 @@ class Expression(EntityExpression):
 		]
 
 		for kind, operators in operatorsPrecedence:
-
 			fragmentPrevious: typing.Optional[ExpressionFragment] = None
 			index = 0
 			while index < len(fragments):
-
 				fragment = fragments[index]
-				fragmentNext: typing.Optional[ExpressionFragment] = fragments[index +
-				                                                              1] if index + 1 < len(fragments) else None
-				if isinstance(fragment, OperatorFragment) and fragment.operator in operators:
-
+				fragmentNext: typing.Optional[ExpressionFragment] = (fragments[index + 1] if index +
+				                                                     1 < len(fragments) else None)
+				if (isinstance(fragment, OperatorFragment) and fragment.operator in operators):
 					# Look for operators that are preceded with another operator or at the begining.
 					isUnary = kind == "unary"
 					isUnary &= fragmentPrevious is None or isinstance(fragmentPrevious, OperatorFragment)
@@ -153,17 +164,20 @@ class Expression(EntityExpression):
 				index += 1
 				fragmentPrevious = fragment
 
-		self.assertTrue(condition=len(fragments) == 1, message=f"This expression is malformed: {fragments}")
+		self.assertTrue(
+		    condition=len(fragments) == 1,
+		    message=f"This expression is malformed: {fragments}",
+		)
 		fragments[0].toElement(self.element)
 
 		# TODO: If mark as "mandatory", remove the default value.
 
 	def resolve(self, resolver: "Resolver") -> None:
 		"""Resolve entities.
-		
-		Args:
-			- resolver: The resolver to be used.
-		"""
+
+        Args:
+                - resolver: The resolver to be used.
+        """
 
 		# Resolve the interface associated with this expression.
 		if self.isInterfaceType:
@@ -171,8 +185,10 @@ class Expression(EntityExpression):
 			# TODO: Ensure that the interface is part of the parent type.
 
 		self.resolveFragments(resolver=resolver)
-		self.assertTrue(condition=self.isValue or self.isSymbol or self.isRegexpr,
-		                message=f"Unsupported expression: {self.element}")
+		self.assertTrue(
+		    condition=self.isValue or self.isSymbol or self.isRegexpr,
+		    message=f"Unsupported expression: {self.element}",
+		)
 
 		super().resolve(resolver)
 
@@ -185,16 +201,22 @@ class Expression(EntityExpression):
 	@property
 	def parameters(self) -> Parameters:
 		"""
-		Return the Parameters object if there are parameters. In case the expression
-		is declared with empty parenthesis or without the Parameters object will be empty.
-		"""
+        Return the Parameters object if there are parameters. In case the expression
+        is declared with empty parenthesis or without the Parameters object will be empty.
+        """
 		if self.isParameters:
-			return Parameters(element=self.element, NestedElementType=Expression, nestedKind="argument")
+			return Parameters(
+			    element=self.element,
+			    NestedElementType=Expression,
+			    nestedKind="argument",
+			)
 		return Parameters(element=self.element, NestedElementType=Expression)
 
 	@property
 	def parametersResolved(self) -> ParametersResolved:
-		return ParametersResolved(element=self.element,
-		                          NestedElementType=Expression,
-		                          param="argument_resolved",
-		                          expected="argument_expected")
+		return ParametersResolved(
+		    element=self.element,
+		    NestedElementType=Expression,
+		    param="argument_resolved",
+		    expected="argument_expected",
+		)

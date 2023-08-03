@@ -37,7 +37,6 @@ U = typing.TypeVar("U", bound="Entity")
 
 
 class Entity:
-
 	contractAttr: str = "contract"
 
 	def __init__(self, element: Element, role: int) -> None:
@@ -70,6 +69,7 @@ class Entity:
 		sequence = self.element.getNestedSequence(category)
 		if sequence:
 			from tools.bdl.entities.all import elementToEntity
+
 			return EntitySequence([elementToEntity(element) for element in sequence])
 		return EntitySequence([])
 
@@ -93,24 +93,24 @@ class Entity:
 
 	def getParents(self) -> typing.List[str]:
 		"""
-		Get the current entity direct parents.
-		"""
+        Get the current entity direct parents.
+        """
 		if self.element.isAttr("parents"):
 			return self.element.getAttr("parents").value.split(";")
 		return []
 
 	def getUnderlyingTypeParents(self, resolver: "Resolver") -> typing.List[str]:
 		"""
-		Get the parents of the underlying type or the current entity if not present.
-		"""
+        Get the parents of the underlying type or the current entity if not present.
+        """
 		if self.underlyingTypeFQN is None:
 			return self.getParents()
 		return self.getEntityUnderlyingTypeResolved(resolver=resolver).getParents()
 
 	def addParents(self, fqn: typing.Optional[str], parents: typing.List[str]) -> None:
 		"""
-		Add parents to the current entity.
-		"""
+        Add parents to the current entity.
+        """
 		if fqn is None:
 			updatedParents = {*self.getParents(), *parents}
 		else:
@@ -120,8 +120,8 @@ class Entity:
 	@property
 	def underlyingTypeFQN(self) -> typing.Optional[str]:
 		"""
-		Get the underlying element FQN if available.
-		"""
+        Get the underlying element FQN if available.
+        """
 		return self.element.getAttrValue("fqn_type")
 
 	def _setUnderlyingValueFQN(self, fqn: str) -> None:
@@ -138,8 +138,8 @@ class Entity:
 	@property
 	def underlyingValueFQN(self) -> typing.Optional[str]:
 		"""
-		Get the underlying element FQN that contains the value.
-		"""
+        Get the underlying element FQN that contains the value.
+        """
 		return self.element.getAttrValue("fqn_value")
 
 	@property
@@ -192,15 +192,15 @@ class Entity:
 	@property
 	def literal(self) -> typing.Optional[str]:
 		"""
-		Get the underlying literal value if any.
-		"""
+        Get the underlying literal value if any.
+        """
 		return self.element.getAttrValue("literal")
 
 	@property
 	def literalNative(self) -> typing.Optional[typing.Union[int, float, str, bool]]:
 		"""
-		Get the underlying literal value if any within its native type.
-		"""
+        Get the underlying literal value if any within its native type.
+        """
 
 		literal = self.literal
 		if literal is None:
@@ -209,9 +209,9 @@ class Entity:
 			return True
 		if literal == "false":
 			return False
-		if literal.startswith("\""):
+		if literal.startswith('"'):
 			assert literal.endswith(
-			    "\""), f"If a literal starts with \", it also must end with \", instead received: '{literal}'."
+			    '"'), f"If a literal starts with \", it also must end with \", instead received: '{literal}'."
 			return literal[1:-1]
 		converted = float(literal)
 		if converted.is_integer():
@@ -221,7 +221,10 @@ class Entity:
 	def getEntityUnderlyingTypeResolved(self, resolver: "Resolver") -> "EntityType":
 		"""Get the entity related to type after resolve."""
 
-		self.assertTrue(condition=self.underlyingTypeFQN is not None, message="Underlying type is not available.")
+		self.assertTrue(
+		    condition=self.underlyingTypeFQN is not None,
+		    message="Underlying type is not available.",
+		)
 		assert self.underlyingTypeFQN is not None
 		entity = resolver.getEntityResolved(fqn=self.underlyingTypeFQN).assertValue(element=self.element)
 		assert entity.isRoleType, "The role of this entity must be a type."
@@ -332,12 +335,15 @@ class Entity:
 		"""Get the list of expressions that forms the template types."""
 
 		from tools.bdl.entities.impl.using import Using
+
 		if self.underlyingTypeFQN:
 			underlyingType = resolver.getEntityResolved(fqn=self.underlyingTypeFQN).assertValue(element=self.element)
-			params = Parameters(element=underlyingType.element,
-			                    NestedElementType=Using,
-			                    nestedKind=underlyingType.configAttr,
-			                    filterFct=lambda entity: entity.category == Category.using)
+			params = Parameters(
+			    element=underlyingType.element,
+			    NestedElementType=Using,
+			    nestedKind=underlyingType.configAttr,
+			    filterFct=lambda entity: entity.category == Category.using,
+			)
 			# Resolve the parameters only when used.
 			for entity in params:
 				typing.cast("Using", entity).resolveMemoized(resolver=resolver)
@@ -347,8 +353,8 @@ class Entity:
 
 	def markAsResolved(self) -> None:
 		"""
-		Mark an entity as resolved.
-		"""
+        Mark an entity as resolved.
+        """
 		ElementBuilder.cast(self.element, ElementBuilder).setAttr("resolved", "1")
 
 	@property
@@ -357,10 +363,10 @@ class Entity:
 
 	def resolveMemoized(self, resolver: "Resolver") -> None:
 		"""Resolve the current symbol.
-		
-		Args:
-			- resolver: The resolver for this entity.
-		"""
+
+        Args:
+                - resolver: The resolver for this entity.
+        """
 
 		if self.isResolved:
 			return
@@ -370,10 +376,10 @@ class Entity:
 
 	def resolve(self, resolver: "Resolver") -> None:
 		"""Generic validation for all entities.
-		
-		Args:
-			- resolver: The resolver for this entity.
-		"""
+
+        Args:
+                - resolver: The resolver for this entity.
+        """
 
 		# Validate the contracts.
 		maybeSchema = self.contracts.validationForEntity
@@ -386,33 +392,40 @@ class Entity:
 		for entity in self.configRaw:
 			self.assertTrue(
 			    condition=entity.category in {Category.expression, Category.using},
-			    message=f"Configuration can only contain expressions or using statements, not '{entity.category}'.")
+			    message=f"Configuration can only contain expressions or using statements, not '{entity.category}'.",
+			)
 			# Note, config entities are resolved only later, when used.
 			# This allow symbol discovery at a later stage, only when the element is actually instanciated.
 
 	def error(self, message: str, element: typing.Optional[Element] = None, throw: bool = True) -> AssertionResult:
-		return Error.handleFromElement(element=self.element if element is None else element,
-		                               message=message,
-		                               throw=throw)
+		return Error.handleFromElement(
+		    element=self.element if element is None else element,
+		    message=message,
+		    throw=throw,
+		)
 
-	def assertTrue(self,
-	               condition: bool,
-	               message: str,
-	               element: typing.Optional[Element] = None,
-	               throw: bool = True) -> AssertionResult:
-		return Error.assertTrue(condition=condition,
-		                        element=self.element if element is None else element,
-		                        message=message,
-		                        throw=throw)
+	def assertTrue(
+	    self,
+	    condition: bool,
+	    message: str,
+	    element: typing.Optional[Element] = None,
+	    throw: bool = True,
+	) -> AssertionResult:
+		return Error.assertTrue(
+		    condition=condition,
+		    element=self.element if element is None else element,
+		    message=message,
+		    throw=throw,
+		)
 
 	def toString(self, attrs: typing.MutableMapping[str, typing.Optional[str]] = {}) -> str:
-		entities = ["{}=\"{}\"".format(key, value) for key, value in attrs.items() if value]
+		entities = ['{}="{}"'.format(key, value) for key, value in attrs.items() if value]
 		return "<{}/>".format(" ".join([type(self).__name__] + entities))
 
 	def __repr__(self) -> str:
 		"""
-		Human readable string representation of a result.
-		"""
+        Human readable string representation of a result.
+        """
 		return self.toString()
 
 
@@ -436,11 +449,13 @@ class EntityExpression(Entity):
 
 	@property
 	def symbol(self) -> Symbol:
-		return Symbol(element=self.element,
-		              kind="symbol",
-		              underlyingTypeFQN="fqn_type",
-		              template="template",
-		              const="const")
+		return Symbol(
+		    element=self.element,
+		    kind="symbol",
+		    underlyingTypeFQN="fqn_type",
+		    template="template",
+		    const="const",
+		)
 
 	@property
 	def isValue(self) -> bool:
@@ -457,23 +472,23 @@ class EntityExpression(Entity):
 	@property
 	def isRValue(self) -> bool:
 		"""If the expression represents an RValue, in this context an rvalue is a temporary,
-		but it could be extended to move semantic."""
+        but it could be extended to move semantic."""
 
 		return self.isRoleValue and self.underlyingValueFQN is None
 
 	@property
 	def isLValue(self) -> bool:
 		"""If the expression represents an LValue, in this context an lvalue is
-		a reference to another value."""
+        a reference to another value."""
 
-		return self.isRoleValue and self.isSymbol and self.underlyingValueFQN is not None
+		return (self.isRoleValue and self.isSymbol and self.underlyingValueFQN is not None)
 
 	def toParametersResolvedItem(self, name: typing.Optional[str] = None) -> ParametersResolvedItem:
 		"""Create an item from this expression.
 
-		Args:
-			name: Expected name.
-		"""
+        Args:
+                name: Expected name.
+        """
 		element = ElementBuilder.cast(self.element.copy(), ElementBuilder)
 		if name is not None:
 			element.setAttr("name", name)
@@ -489,7 +504,6 @@ class EntityExpression(Entity):
 		return self.element.getAttrValue("fqn_interface")
 
 	def __repr__(self) -> str:
-
 		return self.toString({
 		    "name": self.name if self.isName else "",
 		    "varArgs": "true" if self.isVarArgs else None,

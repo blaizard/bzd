@@ -15,9 +15,9 @@ class SymbolTree(EntitySequence):
 	@property
 	def sequence(self) -> typing.List[EntityType]:
 		"""
-		Used to enable lazy loading of entities. Only when used they will be resolved.
-		This should speed-up the bdl object merge as the symbol tree is not touch during this process.
-		"""
+        Used to enable lazy loading of entities. Only when used they will be resolved.
+        This should speed-up the bdl object merge as the symbol tree is not touch during this process.
+        """
 		if len(self.fqns_) > len(self.sequence_):
 			self.sequence_ = []
 			for fqn in self.fqns_:
@@ -36,15 +36,15 @@ class SymbolTree(EntitySequence):
 
 	def serialize(self) -> typing.List[str]:
 		"""
-		Return a serialized version of this tree.
-		"""
+        Return a serialized version of this tree.
+        """
 		return [entity.fqn for entity in self.sequence]
 
 	@staticmethod
 	def fromSerialize(data: typing.List[str], symbols: SymbolMap) -> "SymbolTree":
 		"""
-		Create a symbol map from a serialized object.
-		"""
+        Create a symbol map from a serialized object.
+        """
 		tree = SymbolTree(symbols=symbols)
 		# Checks
 		for fqn in data:

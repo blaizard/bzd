@@ -20,16 +20,18 @@ from tools.bdl.entities.impl.use import Use
 
 class ObjectContext:
 
-	def __init__(self,
-	             preprocessFormat: typing.Optional[str] = None,
-	             searchFormats: typing.Optional[typing.List[str]] = None,
-	             resolve: bool = False,
-	             composition: bool = False) -> None:
+	def __init__(
+	    self,
+	    preprocessFormat: typing.Optional[str] = None,
+	    searchFormats: typing.Optional[typing.List[str]] = None,
+	    resolve: bool = False,
+	    composition: bool = False,
+	) -> None:
 		"""
-		Args:
-			resolve: Resolve all symbols.
-			composition: Include composition stage (for testing purpose only).
-		"""
+        Args:
+                resolve: Resolve all symbols.
+                composition: Include composition stage (for testing purpose only).
+        """
 
 		self.preprocessFormat = "{}.o" if preprocessFormat is None else preprocessFormat
 		self.searchFormats = searchFormats if searchFormats else []
@@ -68,7 +70,7 @@ class ObjectContext:
 
 		splitted = source.split("@")
 		assert len(splitted) <= 2, f"The source '{source}' is malformed."
-		return Path(splitted[1]) if len(splitted) > 1 else Path(self.preprocessFormat.format(source))
+		return (Path(splitted[1]) if len(splitted) > 1 else Path(self.preprocessFormat.format(source)))
 
 	def findPreprocess(self, source: str) -> typing.Optional[Path]:
 		"""Search for the preprocessed object file if any."""
@@ -116,15 +118,19 @@ class ObjectContext:
 		payload = json.loads(data)
 		context = Context.fromSerialize(payload["context"])
 		symbols = SymbolMap.fromSerialize(payload["symbols"])
-		return Object(context=context, symbols=symbols, tree=SymbolTree.fromSerialize(payload["tree"], symbols))
+		return Object(
+		    context=context,
+		    symbols=symbols,
+		    tree=SymbolTree.fromSerialize(payload["tree"], symbols),
+		)
 
 	def preprocess(self, source: str, namespace: typing.Optional[typing.List[str]] = None) -> "Object":
 		"""Preprocess a bdl file and save its output, or use the preprocessed file if present.
 
-		Args:
-			source: The source file the be preprocessed.
-			namespace: An optional wrapping namespace to be used for this file.
-		"""
+        Args:
+                source: The source file the be preprocessed.
+                namespace: An optional wrapping namespace to be used for this file.
+        """
 
 		maybePreprocess = self.findPreprocess(source=source)
 		if maybePreprocess:
@@ -158,9 +164,11 @@ class Object:
 		self.tree = tree
 
 	@staticmethod
-	def _makeObject(parser: BaseParser,
-	                objectContext: ObjectContext,
-	                namespace: typing.Optional[typing.List[str]] = None) -> "Object":
+	def _makeObject(
+	    parser: BaseParser,
+	    objectContext: ObjectContext,
+	    namespace: typing.Optional[typing.List[str]] = None,
+	) -> "Object":
 		"""Helper to make an object from a parser."""
 
 		data = parser.parse()
@@ -176,21 +184,28 @@ class Object:
 		# Validation step
 		Validation().visit(data)
 
-		return Object(context=parser.context, symbols=build.getSymbolMap(), tree=build.getSymbolTree())
+		return Object(
+		    context=parser.context,
+		    symbols=build.getSymbolMap(),
+		    tree=build.getSymbolTree(),
+		)
 
 	@staticmethod
 	def fromContent(content: str, objectContext: typing.Optional[ObjectContext] = None) -> "Object":
 		"""Make an object from a the content of a bdl file.
 
-		This is mainly used for testing purpose.
-		"""
+        This is mainly used for testing purpose.
+        """
 
 		parser = Parser(content)
-		return Object._makeObject(parser=parser, objectContext=objectContext if objectContext else ObjectContext())
+		return Object._makeObject(
+		    parser=parser,
+		    objectContext=objectContext if objectContext else ObjectContext(),
+		)
 
 	def entity(self, fqn: str) -> EntityType:
 		"""Convinience function to lookup for an entity based on its FQN and return it.
-		If the symbol does not exists, this will throw."""
+        If the symbol does not exists, this will throw."""
 
 		maybeEntity = self.symbols.getEntity(fqn)
 		assert bool(maybeEntity), maybeEntity.error
@@ -203,9 +218,10 @@ class Object:
 		    {
 		        "context": self.context.serialize(),
 		        "symbols": self.symbols.serialize(),
-		        "tree": self.tree.serialize()
+		        "tree": self.tree.serialize(),
 		    },
-		    separators=(",", ":"))
+		    separators=(",", ":"),
+		)
 
 	def __repr__(self) -> str:
 		"""Print an object (for debug purpose only)."""

@@ -17,11 +17,7 @@ py_binary(
     ),
     args = [
         "--action",
-        "$(location //tools/sanitizer/actions/buildifier)",
-        "--action",
         "$(location //tools/sanitizer/actions/eslint)",
-        "--action",
-        "$(location //tools/sanitizer/actions/structure)",
         "--action",
         "$(location //tools/sanitizer/actions/mypy)",
         "--action",
@@ -31,12 +27,10 @@ py_binary(
     ],
     data = [
         ":config",
-        "//tools/sanitizer/actions/buildifier",
         "//tools/sanitizer/actions/ci",
         "//tools/sanitizer/actions/eslint",
         "//tools/sanitizer/actions/mypy",
         "//tools/sanitizer/actions/shell",
-        "//tools/sanitizer/actions/structure",
     ],
     main = "sanitizer.py",
     deps = [
@@ -56,18 +50,12 @@ py_binary(
         "--action",
         "$(location //tools/sanitizer/actions/prettier)",
         "--action",
-        "$(location //tools/sanitizer/actions/clang_format)",
-        "--action",
-        "$(location //tools/sanitizer/actions/yapf)",
-        "--action",
         "$(location //tools/sanitizer/actions/files)",
     ],
     data = [
         ":config",
-        "//tools/sanitizer/actions/clang_format",
         "//tools/sanitizer/actions/files",
         "//tools/sanitizer/actions/prettier",
-        "//tools/sanitizer/actions/yapf",
     ],
     main = "sanitizer.py",
     deps = [

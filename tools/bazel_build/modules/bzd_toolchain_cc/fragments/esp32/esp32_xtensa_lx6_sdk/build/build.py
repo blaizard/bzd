@@ -50,25 +50,25 @@ class CommandEntry:
 
 
 def copyArtifacts(output: pathlib.Path, gcc: CommandExtractorGcc) -> None:
-
 	copyFiles(output / "ld", [pathlib.Path(f) for f in gcc.linkerScripts])
 	copyFiles(output / "lib", [pathlib.Path(f) for f in gcc.libraries])
-	copyFileTree(output / "include", gcc.includeSearchPaths, r'.*\.h')
+	copyFileTree(output / "include", gcc.includeSearchPaths, r".*\.h")
 
 
 if __name__ == "__main__":
-
 	parser = argparse.ArgumentParser(description="Generate the content of the esp32 SDK from esp-idf.")
-	parser.add_argument("-o",
-	                    "--output",
-	                    type=pathlib.Path,
-	                    default="./output",
-	                    help="Output directory where to store the results.")
+	parser.add_argument(
+	    "-o",
+	    "--output",
+	    type=pathlib.Path,
+	    default="./output",
+	    help="Output directory where to store the results.",
+	)
 
 	args = parser.parse_args()
 
-	assert "IDF_PATH" in os.environ, "The ESP-IDF must be properly installed, make sure you run esp-idf/export.sh"
-	assert "BUILD_WORKSPACE_DIRECTORY" in os.environ, "This script must be run with bazel."
+	assert ("IDF_PATH" in os.environ), "The ESP-IDF must be properly installed, make sure you run esp-idf/export.sh"
+	assert ("BUILD_WORKSPACE_DIRECTORY" in os.environ), "This script must be run with bazel."
 	workspace = pathlib.Path(os.environ["BUILD_WORKSPACE_DIRECTORY"])
 
 	# Create the output directory
@@ -86,7 +86,7 @@ if __name__ == "__main__":
 			shutil.rmtree(outputResolved / name)
 
 	# Cleanup the project
-	projectPath = workspace / "toolchains/cc/fragments/esp32_xtensa_lx6_sdk/build/project"
+	projectPath = (workspace / "toolchains/cc/fragments/esp32_xtensa_lx6_sdk/build/project")
 	(projectPath / "sdkconfig").unlink(missing_ok=True)
 
 	# Create the build directory
@@ -96,7 +96,12 @@ if __name__ == "__main__":
 	buildPath.mkdir()
 
 	# Build the project
-	localCommand(cmds=["cmake", "..", "-G", "Unix Makefiles"], cwd=buildPath, stdout=True, stderr=True)
+	localCommand(
+	    cmds=["cmake", "..", "-G", "Unix Makefiles"],
+	    cwd=buildPath,
+	    stdout=True,
+	    stderr=True,
+	)
 	localCommand(cmds=["make"], cwd=buildPath, stdout=True, stderr=True, timeoutS=300)
 
 	commands = {
@@ -116,7 +121,6 @@ if __name__ == "__main__":
 	commands["link"].command = (workspace / path_linker_command).read_text()
 
 	for name, entry in commands.items():
-
 		print(f"Processing entry '{name}'...")
 
 		gcc = CommandExtractorGcc(cwd=workspace / "toolchains/cc/fragments/esp32_xtensa_lx6_sdk/build/project/build")
@@ -146,7 +150,7 @@ if __name__ == "__main__":
 				argstr = f"{item}"
 
 			for arg in argstr.strip().split():
-				print(f"\"{arg}\",")
+				print(f'"{arg}",')
 		print("=======================================================")
 
 		copyArtifacts(outputResolved, gcc)

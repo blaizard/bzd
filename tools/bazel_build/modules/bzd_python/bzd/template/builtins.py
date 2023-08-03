@@ -8,7 +8,7 @@ class BuiltinsBtl:
 	def merge(*args: typing.Any) -> typing.Any:
 		"""Group multiple container together."""
 
-		assert len(args) > 1, "The builtin function 'merge' requires at least 2 arguments."
+		assert (len(args) > 1), "The builtin function 'merge' requires at least 2 arguments."
 		first = args[0]
 		assert all(
 		    isinstance(i, type(first))
@@ -20,7 +20,7 @@ class BuiltinsBtl:
 		if isinstance(first, dict):
 			return dict(map(dict.popitem, args))
 
-		assert False, f"The builtin function 'merge' cannot take arguments of type '{type(first)}'."
+		assert (False), f"The builtin function 'merge' cannot take arguments of type '{type(first)}'."
 
 	@staticmethod
 	def set(*args: typing.Any) -> typing.Set[typing.Any]:
