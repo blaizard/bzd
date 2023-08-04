@@ -29,7 +29,7 @@ def getFileList(workspace: pathlib.Path, path: pathlib.Path, all: bool) -> typin
 		    ["git", "ls-files", "--other", "--modified", "--exclude-standard", path],
 		    cwd=workspace,
 		)
-	fileList = list(result.getStdout().split("\n"))
+	fileList = list({f for f in result.getStdout().split("\n") if (workspace / f).is_file()})
 
 	# If there are no files, try a diff with the last commit.
 	if len(fileList) == 0:

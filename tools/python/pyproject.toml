@@ -1,4 +1,5 @@
 [tool.yapf]
+based_on_style = "pep8"
 use_tabs = true
 continuation_align_style = "SPACE"
 column_limit = 120
