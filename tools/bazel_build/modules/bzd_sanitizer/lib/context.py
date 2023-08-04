@@ -10,13 +10,13 @@ class _ContextPrintAction:
 
 	def __init__(self, context: "Context", sizeLeft: int) -> None:
 		self.context = context
-		self.sizeLeft = sizeLeft
+		self.whiteSpaces = sizeLeft - 15
 
 	def printStatus(self, isSuccess: bool, elapsedTime: int) -> None:
 		status = (f"{self.context.color('passed')}PASSED{self.context.color()}"
 		          if isSuccess else f"{self.context.color('failed')}FAILED{self.context.color()}")
-		statusString = f" {status} ({elapsedTime:.1f}s)"
-		print(("{:>" + str(self.sizeLeft + self.context.colorSize()) + "}").format(statusString))
+		print(" " * self.whiteSpaces, end="")
+		print(f" {status} ({elapsedTime:.1f}s)")
 
 
 class Context:
