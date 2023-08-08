@@ -1,4 +1,4 @@
-load("@rules_python//python:defs.bzl", "py_library")
+load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 
 py_library(
     name = "factory",
@@ -13,5 +13,19 @@ py_library(
     ],
     deps = [
         "//python/bzd/template",
+    ],
+)
+
+py_binary(
+    name = "generate",
+    srcs = [
+        "generate.py",
+    ],
+    deps = [
+        "//tools/ci/github:factory",
+        "//tools/ci/jenkins:factory",
+        "//tools/ci/quality_gate:factory",
+        "//tools/ci/travis:factory",
+        "@bzd_sanitizer//lib:context",
     ],
 )

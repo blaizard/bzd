@@ -5,9 +5,6 @@ _RULE_NAMES = [
     "bdl",
     "cc",
     "docker",
-    "nodejs",
-    "nodejs_web",
-    "package",
 ]
 
 [stardoc(

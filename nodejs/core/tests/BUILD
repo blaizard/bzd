@@ -1,4 +1,4 @@
-load("//tools/bazel_build/rules:nodejs.bzl", "bzd_nodejs_test")
+load("@bzd_toolchain_nodejs//nodejs:defs.bzl", "bzd_nodejs_test")
 
 test_srcs = glob([
     "*_test.mjs",

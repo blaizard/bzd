@@ -1,5 +1,5 @@
+load("@bzd_toolchain_nodejs//nodejs:defs.bzl", "bzd_nodejs_binary")
 load("@rules_python//python:defs.bzl", "py_binary")
-load("//tools/bazel_build/rules:nodejs.bzl", "bzd_nodejs_binary")
 
 py_binary(
     name = "terminal",

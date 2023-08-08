@@ -16,9 +16,6 @@ py_library(
     srcs = [
         "shell.py",
     ],
-    visibility = [
-        "//tools/sanitizer/actions/shell:__pkg__",
-    ],
     deps = [
         "//python/bzd:env",
         "//tools/shell:factory",
@@ -36,5 +33,16 @@ py_library(
     ],
     deps = [
         "//python/bzd/template",
+    ],
+)
+
+py_binary(
+    name = "generate",
+    srcs = [
+        "generate.py",
+    ],
+    deps = [
+        ":shell",
+        "@bzd_sanitizer//lib:context",
     ],
 )

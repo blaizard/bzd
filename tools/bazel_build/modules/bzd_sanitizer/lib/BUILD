@@ -7,7 +7,7 @@ py_library(
         "filter.py",
     ],
     visibility = [
-        "@bzd_sanitizer//:__subpackages__",
+        "//visibility:public",
     ],
 )
 
