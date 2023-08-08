@@ -20,17 +20,11 @@ py_binary(
         "$(location //tools/sanitizer/actions/eslint)",
         "--action",
         "$(location //tools/sanitizer/actions/mypy)",
-        "--action",
-        "$(location //tools/sanitizer/actions/shell)",
-        "--action",
-        "$(location //tools/sanitizer/actions/ci)",
     ],
     data = [
         ":config",
-        "//tools/sanitizer/actions/ci",
         "//tools/sanitizer/actions/eslint",
         "//tools/sanitizer/actions/mypy",
-        "//tools/sanitizer/actions/shell",
     ],
     main = "sanitizer.py",
     deps = [
@@ -48,14 +42,11 @@ py_binary(
     ),
     args = [
         "--action",
-        "$(location //tools/sanitizer/actions/prettier)",
-        "--action",
         "$(location //tools/sanitizer/actions/files)",
     ],
     data = [
         ":config",
         "//tools/sanitizer/actions/files",
-        "//tools/sanitizer/actions/prettier",
     ],
     main = "sanitizer.py",
     deps = [

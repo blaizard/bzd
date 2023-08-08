@@ -90,7 +90,7 @@ formater and linters for YAML, json and markdown are also available.
 | -------- | ------------ | ----------------------------------- | ------------- | -------------- | ------------- |
 | C++      | clang-format | clang-tidy, asan, lsan, tsan, ubsan | Yes           | Yes            | doxygen-based |
 | Python   | yapf         | mypy                                | Yes           | Yes            |               |
-| Node     | prettier     | eslint                              | Yes           | Yes            |               |
+| Node     | clang-format | eslint                              | Yes           | Yes            |               |
 | Skylark  | buildifier   | buildifier                          |               |                | stardoc       |
 
 ## Naming Convention

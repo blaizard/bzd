@@ -1,6 +1,6 @@
 """Plugins helper for the dashboard."""
 
-load("//tools/bazel_build/rules:nodejs.bzl", "bzd_nodejs_library")
+load("@bzd_toolchain_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 
 PluginInfo = provider(
     doc = "Provider for plugins",

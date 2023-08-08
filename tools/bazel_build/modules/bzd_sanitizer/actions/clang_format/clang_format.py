@@ -26,8 +26,10 @@ def workload(args: typing.Tuple[str, str, bool, str, str], stdout: typing.TextIO
 
 
 if __name__ == "__main__":
-	parser = argparse.ArgumentParser(description="Clang-format.")
+	parser = argparse.ArgumentParser(description="Clang-format for C/C++/Javascript.")
 	parser.add_argument("--clang-format", type=pathlib.Path, help="The path of the clang-format binary.")
+	parser.add_argument("--cc", action="store_true", help="Use clang format for C/C++ files.")
+	parser.add_argument("--js", action="store_true", help="Use clang format for Javascript files.")
 	parser.add_argument(
 	    "--config",
 	    type=str,
@@ -37,9 +39,15 @@ if __name__ == "__main__":
 	parser.add_argument("context", type=pathlib.Path, help="The context file path.")
 	args = parser.parse_args()
 
+	extensions = []
+	if args.cc:
+		extensions += [".c", ".cc", ".cpp", ".h", ".hh", ".hpp"]
+	if args.js:
+		extensions += [".mjs", ".js", ".ts"]
+
 	worker(
 	    args.context,
 	    workload,
 	    args=[str(args.clang_format), args.config],
-	    endswith=[".c", ".cc", ".cpp", ".h", ".hh", ".hpp"],
+	    endswith=extensions,
 	)

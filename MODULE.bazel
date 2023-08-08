@@ -7,8 +7,10 @@ bazel_dep(name = "platforms", version = "0.0.6")
 bazel_dep(name = "bzd_utils", version = "1.0")
 bazel_dep(name = "bzd_rules_doc", version = "1.0")
 bazel_dep(name = "bzd_toolchain_cc", version = "1.0")
+bazel_dep(name = "bzd_toolchain_nodejs", version = "1.0")
 bazel_dep(name = "bzd_platforms", version = "1.0")
 bazel_dep(name = "bzd_sanitizer", version = "1.0")
+bazel_dep(name = "bzd_package", version = "1.0")
 bazel_dep(name = "bazel_skylib", version = "1.4.2")
 bazel_dep(name = "stardoc", version = "0.5.6")
 bazel_dep(name = "bzd_bundle", version = "1.0")
@@ -18,7 +20,7 @@ bazel_dep(name = "rules_python", version = "0.24.0")
 [local_path_override(
     module_name = name,
     path = "tools/bazel_build/modules/" + name,
-) for name in ("bzd_utils", "bzd_rules_doc", "bzd_toolchain_cc", "bzd_bundle", "bzd_platforms", "bzd_python", "bzd_sanitizer")]
+) for name in ("bzd_utils", "bzd_rules_doc", "bzd_toolchain_cc", "bzd_toolchain_nodejs", "bzd_bundle", "bzd_platforms", "bzd_python", "bzd_sanitizer", "bzd_package")]
 
 # Python
 
@@ -61,3 +63,15 @@ toolchain_cc.toolchain(
 use_repo(toolchain_cc, "gcc")
 
 register_toolchains("@gcc//:all")
+
+# NodeJs
+
+toolchain_nodejs = use_extension("@bzd_toolchain_nodejs//:extensions.bzl", "toolchain_nodejs")
+toolchain_nodejs.toolchain(
+    name = "nodejs",
+    default = True,
+    version = "node_14.4.0",
+)
+use_repo(toolchain_nodejs, "nodejs")
+
+register_toolchains("@nodejs//:all")

@@ -1,4 +1,4 @@
-load("//tools/bazel_build/rules:nodejs_web.bzl", "bzd_nodejs_web")
+load("@bzd_toolchain_nodejs//nodejs_web:defs.bzl", "bzd_nodejs_web")
 
 bzd_nodejs_web(
     name = "nodejs_web",

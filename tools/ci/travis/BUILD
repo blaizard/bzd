@@ -9,7 +9,7 @@ py_library(
         ".travis.btl",
     ],
     visibility = [
-        "//tools/sanitizer/actions/ci:__pkg__",
+        "//tools/ci:__pkg__",
     ],
     deps = [
         "//tools/ci:factory",

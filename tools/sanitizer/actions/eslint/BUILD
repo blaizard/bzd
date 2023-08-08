@@ -1,4 +1,4 @@
-load("//tools/bazel_build/rules:nodejs.bzl", "bzd_nodejs_binary")
+load("@bzd_toolchain_nodejs//nodejs:defs.bzl", "bzd_nodejs_binary")
 
 bzd_nodejs_binary(
     name = "eslint",

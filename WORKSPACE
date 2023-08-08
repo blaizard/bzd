@@ -16,12 +16,6 @@ docker_images_register()
 
 docker_execution_platforms(name = "docker_images")
 
-# Toolchains
-
-load("//toolchains:register.bzl", "toolchains_register")
-
-toolchains_register()
-
 # Coverage
 
 load("//tools/coverage:dependencies.bzl", "coverage_load")
