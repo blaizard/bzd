@@ -1,5 +1,1 @@
-export default {
-	type: "visualization",
-	name: "Coverage",
-	icon: "bzd-icon-link",
-};
+export default { type: "visualization", name: "Coverage", icon: "bzd-icon-link" };

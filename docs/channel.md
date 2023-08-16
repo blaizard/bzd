@@ -41,11 +41,12 @@ interface I2CTransport
 using I2CDevice = Adapter<Buffer, I2CTransport>;
 
 composition {
-	tempSensor = I2CDevice(address = 12, addressing = 10/*bit*/, transport = &i2c); 
+	tempSensor = I2CDevice(address = 12, addressing = 10/*bit*/, transport = &i2c);
 }
 ```
 
 The representation of the Channel class in C++ would look like this:
+
 ```C++
 using I2CDevice = Adapter<Data, I2CTransport>;
 

@@ -1,12 +1,11 @@
 load("@bzd_utils//:sh_binary_wrapper.bzl", "sh_binary_wrapper")
 
 sh_binary_wrapper(
-    name = "clang_format",
-    command = "{binary} --clang-format {clang_format} --config {config} --js $@",
+    name = "prettier",
+    command = "{binary} --config {config} --endswith '.mjs' --endswith '.cjs' --endswith '.js' --endswith '.vue' --endswith '.css' --endswith '.scss' $@",
     locations = {
-        ".clang-format": "config",
-        "@bzd_sanitizer//actions/clang_format": "binary",
-        "@clang//:clang_format": "clang_format",
+        ".prettierrc.json": "config",
+        "@bzd_sanitizer//actions/prettier": "binary",
     },
     visibility = ["//visibility:public"],
 )

@@ -264,17 +264,17 @@ def _bzd_nodejs_exec_impl(ctx, is_test):
     # Run the node process
     command = """
     export BZD_RULE=nodejs
-    {{binary}}"""
+    {binary}"""
 
     # Add prefix command to support code coverage
     is_coverage = ctx.configuration.coverage_enabled
     if is_coverage:
-        command += " \"{{root}}/node_modules/c8/bin/c8\" --reporter lcov --reporter text --allowExternal {{binary}}"
+        command += " \"{root}/node_modules/c8/bin/c8\" --reporter lcov --reporter text --allowExternal {binary}"
 
     if is_test:
-        command += " \"{{root}}/node_modules/mocha/bin/mocha\" \"{}\""
+        command += " \"{root}/node_modules/mocha/bin/mocha\" \"{path}\""
     else:
-        command += " \"{}\" $@"
+        command += " \"{path}\" $@"
 
     if is_coverage:
         command += " && cp \"coverage/lcov.info\" \"$COVERAGE_OUTPUT_FILE\""
@@ -285,9 +285,12 @@ def _bzd_nodejs_exec_impl(ctx, is_test):
     result = [
         sh_binary_wrapper_impl(
             ctx = ctx,
-            binary = toolchain_executable.node,
+            locations = {
+                toolchain_executable.node: "binary",
+                ctx.attr.main: "path",
+            },
             output = ctx.outputs.executable,
-            command = command.format(ctx.file.main.path),
+            command = command,
             extra_runfiles = [node_modules, package_json] + srcs + data,
             root_symlinks = {
                 "node_modules": node_modules,
