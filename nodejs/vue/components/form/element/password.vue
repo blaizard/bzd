@@ -11,7 +11,7 @@
 		},
 		computed: {
 			format() {
-				return (value) => [...value].reduce((str) => str + "<i class=\"bzd-icon-password\"></i>", "");
+				return (value) => [...value].reduce((str) => str + '<i class="bzd-icon-password"></i>', "");
 			},
 		},
 	};

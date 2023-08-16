@@ -5,12 +5,14 @@
 		:disable="disable"
 		:description="descriptionDropdown"
 		@directInput="directValue = $event"
-		@key="handleKey">
+		@key="handleKey"
+	>
 		<div
 			v-for="item in displayList"
 			:class="{ 'irform-dropdown-item': true, 'irform-dropdown-item-selected': isSelected(item) }"
 			v-html="formatMenuEntry(item.display)"
-			@mousedown="select(item)"></div>
+			@mousedown="select(item)"
+		></div>
 	</DropdownTemplate>
 </template>
 
@@ -146,8 +148,7 @@
 				try {
 					const list = this.isListFct ? await this.rawList(value) : this.rawList;
 					return this.createMultiValueList(list, this.html);
-				}
-				catch (e) {
+				} catch (e) {
 					console.error("Error while fetching data: " + e);
 				}
 				return [];
@@ -175,15 +176,12 @@
 						if (sentence.charAt(iSentence + 1) == c) {
 							curWeight += 1;
 							iSentence += 1;
-						}
-						else if (sentence.charAt(iSentence + 2) == c) {
+						} else if (sentence.charAt(iSentence + 2) == c) {
 							curWeight += 0.5;
 							iSentence += 2;
-						}
-						else if (sentence.charAt(iSentence - 1) == c) {
+						} else if (sentence.charAt(iSentence - 1) == c) {
 							curWeight += 0.5;
-						}
-						else {
+						} else {
 							++iSentence;
 						}
 					}
@@ -224,8 +222,7 @@
 						if (this.multi) {
 							const curValue = this.curValue.splice(0);
 							this.set(curValue.concat(String(item.value)));
-						}
-						else {
+						} else {
 							this.set(String(item.value));
 						}
 					}, 10);

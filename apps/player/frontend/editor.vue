@@ -5,7 +5,8 @@
 			contenteditable="plaintext-only"
 			spellcheck="false"
 			@keydown="handleKeyDown"
-			@input="handleInput"></code>
+			@input="handleInput"
+		></code>
 	</div>
 </template>
 
@@ -55,8 +56,7 @@
 						if (this.updateRequested) {
 							this.update();
 						}
-					}
-					else if (this.updateRequested) {
+					} else if (this.updateRequested) {
 						this.cancelUpdate();
 					}
 
@@ -95,14 +95,14 @@
 			language() {
 				const ext = this.path.split("/").pop().split(".").pop().toLowerCase();
 				switch (ext) {
-				case "build":
-				case "workspace":
-				case "bzl":
-					return "py";
-				default:
-					if (HighlightJs.getLanguage(ext)) {
-						return ext;
-					}
+					case "build":
+					case "workspace":
+					case "bzl":
+						return "py";
+					default:
+						if (HighlightJs.getLanguage(ext)) {
+							return ext;
+						}
 				}
 				return "";
 			},
@@ -129,12 +129,10 @@
 				try {
 					range.setStart(data.node, data.position);
 					selection.addRange(range);
-				}
-				catch (e) {
+				} catch (e) {
 					if (e.name == "IndexSizeError") {
 						// Ignore.
-					}
-					else {
+					} else {
 						throw e;
 					}
 				}

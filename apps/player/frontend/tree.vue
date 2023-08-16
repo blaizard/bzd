@@ -12,7 +12,8 @@
 					:depth="depth + 1"
 					:selected="selected"
 					class="indent"
-					@selected="$emit('selected', $event)"></TreeDirectory>
+					@selected="$emit('selected', $event)"
+				></TreeDirectory>
 			</div>
 		</template>
 	</div>

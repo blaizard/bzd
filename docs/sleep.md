@@ -20,6 +20,7 @@ Doing it implicitly will move this on the platform side.
 ### Idle task
 
 When the executor has only services tasks running, it would exit and run an idle task.
+
 ```
 while true:
     executor.run();
@@ -29,6 +30,7 @@ while true:
 ```
 
 The idle task is platform dependant and could look like this:
+
 ```
 def idle(executor):
     if executor.sleepRequested():

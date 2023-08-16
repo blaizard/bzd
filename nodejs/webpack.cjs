@@ -18,11 +18,9 @@ class Webpack {
 		for (const key in obj2) {
 			if (key in obj && obj[key] instanceof Array && obj2[key] instanceof Array) {
 				obj[key] = obj[key].concat(obj2[key]);
-			}
-			else if (key in obj && typeof obj[key] == "object" && typeof obj2[key] == "object") {
+			} else if (key in obj && typeof obj[key] == "object" && typeof obj2[key] == "object") {
 				obj[key] = Webpack.merge(obj[key], obj2[key]);
-			}
-			else if (obj2[key] !== undefined) {
+			} else if (obj2[key] !== undefined) {
 				obj[key] = obj2[key];
 			}
 		}
@@ -157,7 +155,7 @@ class Webpack {
 				config.entries[entryId] instanceof Array ? config.entries[entryId] : [config.entries[entryId]];
 			config.entries[entryId] = config.entries[entryId].map((entry) => {
 				if (entry instanceof Template) {
-					console.log("Process template for entry \"" + entryId + "\"");
+					console.log('Process template for entry "' + entryId + '"');
 					const content = entry.process({
 						/**
 						 * The entry identifier currently being used
@@ -193,45 +191,45 @@ class Webpack {
 		// ---- Handle extra config -------------------------------------------
 		let webpackExtraConfig = {};
 		switch (config.type) {
-		case "html":
-			webpackExtraConfig = Webpack.merge(webpackExtraConfig, {
-				entry: config.entries,
-			});
-			break;
+			case "html":
+				webpackExtraConfig = Webpack.merge(webpackExtraConfig, {
+					entry: config.entries,
+				});
+				break;
 
-		case "library":
-			webpackExtraConfig = Webpack.merge(webpackExtraConfig, {
-				entry: config.entries,
-				output: {
-					filename: "[name].js",
-					library: "[name]",
-					libraryTarget: "umd",
-				},
-			});
-			break;
-
-		case "node":
-			webpackExtraConfig = Webpack.merge(webpackExtraConfig, {
-				target: "node",
-				entry: config.entries,
-				output: {
-					filename: "[name].js",
-					library: "[name]",
-					libraryTarget: "commonjs2",
-				},
-				optimization: {
-					runtimeChunk: false,
-					splitChunks: {
-						// This is important, split chunks seems to fail on node library ending up
-						// not being able to load some modules: "TypeError: Cannot read property 'call' of undefined"
-						chunks: "async",
+			case "library":
+				webpackExtraConfig = Webpack.merge(webpackExtraConfig, {
+					entry: config.entries,
+					output: {
+						filename: "[name].js",
+						library: "[name]",
+						libraryTarget: "umd",
 					},
-				},
-			});
-			break;
+				});
+				break;
 
-		default:
-			throw new Error("Unsupported config type \"" + config.type + "\"");
+			case "node":
+				webpackExtraConfig = Webpack.merge(webpackExtraConfig, {
+					target: "node",
+					entry: config.entries,
+					output: {
+						filename: "[name].js",
+						library: "[name]",
+						libraryTarget: "commonjs2",
+					},
+					optimization: {
+						runtimeChunk: false,
+						splitChunks: {
+							// This is important, split chunks seems to fail on node library ending up
+							// not being able to load some modules: "TypeError: Cannot read property 'call' of undefined"
+							chunks: "async",
+						},
+					},
+				});
+				break;
+
+			default:
+				throw new Error('Unsupported config type "' + config.type + '"');
 		}
 
 		// ---- Build webpack config ------------------------------------------
@@ -272,7 +270,7 @@ class Webpack {
 
 			// ---- Remove the content of the directory -----------------------
 			if (config.output) {
-				console.log("Removing content of output directory \"" + config.output + "\"");
+				console.log('Removing content of output directory "' + config.output + '"');
 				rmdirSync(config.output);
 				Webpack.mkdirSync(config.output);
 			}
@@ -285,7 +283,7 @@ class Webpack {
 					const output = "assets/" + type + "/" + Webpack.hash(file) + "." + fileSplit[fileSplit.length - 1];
 					const data = Fs.readFileSync(file);
 					Fs.writeFileSync(Path.resolve(config.output, output), data);
-					console.log("Copy \"" + file + "\" -> \"" + output + "\"");
+					console.log('Copy "' + file + '" -> "' + output + '"');
 					return output;
 				});
 			}
@@ -365,10 +363,10 @@ function getWebpackConfigDefault(isDev, config) {
 						isDev
 							? "vue-style-loader"
 							: {
-								loader: MiniCssExtractPlugin.loader,
-								options: {
-									publicPath: "",
-								},
+									loader: MiniCssExtractPlugin.loader,
+									options: {
+										publicPath: "",
+									},
 							  },
 						{
 							loader: "css-loader",
@@ -464,17 +462,17 @@ function getWebpackConfigDefault(isDev, config) {
 									"<!DOCTYPE html>" +
 									"<html>" +
 									"<head>" +
-									"<meta charset=\"utf-8\" />" +
+									'<meta charset="utf-8" />' +
 									// The 2 following lines will prevent caching on the browser side, ensuring any updates
 									// in the css or js content will be detected.
-									"<meta http-equiv=\"Cache-control\" content=\"no-cache, no-store, must-revalidate\" />" +
-									"<meta http-equiv=\"Pragma\" content=\"no-cache\" />" +
-									"<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />" +
-									"<base href=\"<% html.base %>\" />" +
+									'<meta http-equiv="Cache-control" content="no-cache, no-store, must-revalidate" />' +
+									'<meta http-equiv="Pragma" content="no-cache" />' +
+									'<meta name="viewport" content="width=device-width, initial-scale=1" />' +
+									'<base href="<% html.base %>" />' +
 									"<% html.css %>" +
 									"</head>" +
 									"<body>" +
-									"<div id=\"app\"></div>" +
+									'<div id="app"></div>' +
 									"<% html.js %>" +
 									"</body>" +
 									"</html>",
@@ -508,8 +506,8 @@ function getWebpackConfigDefault(isDev, config) {
 											.filter((entry) => entry && entry != "/")
 											.map((/*entry*/) => "..")
 											.join("/") || "/",
-									css: cssList.map((path) => "<link href=\"" + manifest.path + path + "\" rel=\"stylesheet\"/>").join(""),
-									js: jsList.map((path) => "<script src=\"" + manifest.path + path + "\"></script>").join(""),
+									css: cssList.map((path) => '<link href="' + manifest.path + path + '" rel="stylesheet"/>').join(""),
+									js: jsList.map((path) => '<script src="' + manifest.path + path + '"></script>').join(""),
 								};
 							}
 
@@ -529,13 +527,12 @@ function getWebpackConfigDefault(isDev, config) {
 
 							await writeFileAsync(configTemplate.output, output);
 							console.log(
-								"Generated \"" +
+								'Generated "' +
 									configTemplate.output +
-									"\"" +
-									(configTemplate.entryId === false ? "" : " for entry \"" + configTemplate.entryId + "\"")
+									'"' +
+									(configTemplate.entryId === false ? "" : ' for entry "' + configTemplate.entryId + '"')
 							);
-						}
-						catch (e) {
+						} catch (e) {
 							console.error(e);
 							process.exit(1);
 						}
@@ -545,7 +542,7 @@ function getWebpackConfigDefault(isDev, config) {
 					let updatedManifest = await manifestCreate(config, entrypoints);
 
 					// Write manifest stats
-					console.log("Manifest for \"" + config.output + "\":\n" + manifestToString(config, updatedManifest));
+					console.log('Manifest for "' + config.output + '":\n' + manifestToString(config, updatedManifest));
 
 					// Update the manifest if needed before saving it
 					updatedManifest = await config.hooks.manifest(updatedManifest, config);
@@ -553,7 +550,7 @@ function getWebpackConfigDefault(isDev, config) {
 						Path.resolve(config.output, "manifest.json"),
 						JSON.stringify(updatedManifest, null, "\t")
 					);
-					console.log("Generated \"manifest.json\"");
+					console.log('Generated "manifest.json"');
 
 					// Hook at the end of the process
 					await config.hooks.end(updatedManifest, config);
@@ -575,7 +572,7 @@ function cleanUp(config) {
 			if (e) {
 				// Cannot raise an exception here, otherwise we end up in an infinite loop
 				console.error(e);
-				console.error("Could not delete file \"" + path + "\"");
+				console.error('Could not delete file "' + path + '"');
 			}
 		});
 	});
@@ -723,8 +720,7 @@ function rmdirSync(path) {
 			const curPath = Path.resolve(path, file);
 			if (Fs.lstatSync(curPath).isDirectory()) {
 				rmdirSync(curPath);
-			}
-			else {
+			} else {
 				Fs.unlinkSync(curPath);
 			}
 		});

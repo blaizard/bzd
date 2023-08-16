@@ -5,13 +5,15 @@
 		:config="config"
 		:selected="selected"
 		v-slot:default="slotProps"
-		v-resize="handleResize">
+		v-resize="handleResize"
+	>
 		<svg
 			ref="canvas"
 			:viewBox="svgViewBox"
 			:style="svgStyle"
 			@mousemove.stop="handleMouseMove"
-			@mouseleave.stop="handleMouseLeave">
+			@mouseleave.stop="handleMouseLeave"
+		>
 			<g class="irgraph-plot-labels-y" v-show="configProcessed.showAxisY">
 				<text class="irgraph-hide" ref="labelYReferenceChar">0</text>
 				<template v-for="(item, y) in labelYMap">
@@ -19,7 +21,8 @@
 						v-if="item.show"
 						:x="plotOffsetLeft - tickSize / 2"
 						:y="y - labelYCharSize.height / 2"
-						h-align="right">
+						h-align="right"
+					>
 						{{ item.value }}
 					</PlotText>
 					<line
@@ -27,7 +30,8 @@
 						:x1="plotOffsetLeft - tickSize / 2"
 						:x2="width - plotOffsetRight"
 						:y1="y"
-						:y2="y"></line>
+						:y2="y"
+					></line>
 				</template>
 			</g>
 			<g class="irgraph-plot-labels-x" v-show="configProcessed.showAxisX">
@@ -41,14 +45,16 @@
 						:x1="x"
 						:x2="x"
 						:y1="height - plotOffsetBottom - tickSize / 2"
-						:y2="height - plotOffsetBottom + tickSize / 2"></line>
+						:y2="height - plotOffsetBottom + tickSize / 2"
+					></line>
 				</template>
 				<line
 					class="irgraph-plot-axis-x"
 					:x1="plotOffsetLeft"
 					:x2="width - plotOffsetRight"
 					:y1="height - plotOffsetBottom"
-					:y2="height - plotOffsetBottom"></line>
+					:y2="height - plotOffsetBottom"
+				></line>
 			</g>
 			<!-- Print the points //-->
 			<g class="irgraph-plot-items">
@@ -61,7 +67,8 @@
 					:is="getSerieComponent(serie)"
 					:selected="index == selected ? selectedPoint : -1"
 					:serie="serie"
-					:bounding-box="plotBoundingBox"></component>
+					:bounding-box="plotBoundingBox"
+				></component>
 			</g>
 			<!-- Cursor //-->
 			<g class="irgraph-plot-cursor" v-show="configProcessed.showCursor">
@@ -69,7 +76,8 @@
 					:x1="valueXToCoord(cursorXValue)"
 					:x2="valueXToCoord(cursorXValue)"
 					:y1="plotOffsetTop"
-					:y2="plotOffsetTop + plotHeight"></line>
+					:y2="plotOffsetTop + plotHeight"
+				></line>
 				<text class="irgraph-hide" ref="labelCursorXReferenceChar">0</text>
 				<PlotText :x="valueXToCoord(cursorXValue)" :y="plotOffsetTop + plotHeight + tickSize / 2" h-align="middle">
 					{{ configProcessed.formatX(cursorXValue) }}
@@ -193,8 +201,7 @@
 							valuesMinX = Math.min(valuesMinX, array.values[0][0]);
 							valuesMaxX = Math.max(valuesMaxX, array.values[array.values.length - 1][0]);
 						});
-					}
-					else {
+					} else {
 						valuesMinX = 0;
 						valuesMaxX = 1;
 					}
@@ -562,10 +569,10 @@
 			 */
 			getSerieComponent(serie) {
 				switch (serie.type) {
-				case "line":
-					return RenderLine;
-				case "bar":
-					return RenderBar;
+					case "line":
+						return RenderLine;
+					case "bar":
+						return RenderBar;
 				}
 			},
 			handleResize(/*width, height*/) {
@@ -586,11 +593,9 @@
 					if (xCurrent == x) {
 						index = indexCurrent;
 						break;
-					}
-					else if (xCurrent < x) {
+					} else if (xCurrent < x) {
 						index = indexCurrent + 1;
-					}
-					else {
+					} else {
 						indexEnd = indexCurrent - 1;
 					}
 				}

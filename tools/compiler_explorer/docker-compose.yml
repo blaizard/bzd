@@ -2,8 +2,8 @@ services:
     compiler-explorer:
         image: blaizard/compiler_explorer:latest
         ports:
-        - 10240:10240
+            - 10240:10240
         volumes:
-        - ../../:/bzd:ro
-        - ./c++.local.properties:/compiler-explorer/etc/config/c++.local.properties
-version: '3.0'
+            - ../../:/bzd:ro
+            - ./c++.local.properties:/compiler-explorer/etc/config/c++.local.properties
+version: "3.0"

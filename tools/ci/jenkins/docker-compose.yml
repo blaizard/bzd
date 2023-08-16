@@ -2,9 +2,9 @@ services:
     bzd-ci-jenkins:
         build: .
         command:
-        - /home/1000/run_tests.sh
-        user: '1000'
+            - /home/1000/run_tests.sh
+        user: "1000"
         volumes:
-        - ./run_tests.sh:/home/1000/run_tests.sh
-        - ../../../:/home/1000/sandbox
-version: '3.0'
+            - ./run_tests.sh:/home/1000/run_tests.sh
+            - ../../../:/home/1000/sandbox
+version: "3.0"

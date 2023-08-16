@@ -29,6 +29,6 @@ def worker(contextPath: pathlib.Path,
 				isFailure = True
 				path = str(result.getInput()[1])
 				context.printSection(title=path, level=2)
-				print(result.getOutput(), end="")
+				print(result.getOutput().strip())
 
 	sys.exit(1 if isFailure else 0)
