@@ -389,7 +389,7 @@ def bzd_nodejs_test(name, main, deps = [], visibility = [], tags = [], **kwargs)
 
 # ---- Docker Package ----
 
-def bzd_nodejs_docker(name, deps, cmd, base = "@docker_image_nodejs//image", include_metadata = False, deploy = {}):
+def bzd_nodejs_docker(name, deps, cmd, base = "@docker//:nodejs", include_metadata = False, deploy = {}):
     """Rule for embedding a NodeJs application into Docker.
 
     Args:
