@@ -2,6 +2,7 @@
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bzd_platforms//:defs.bzl", "constraints_from_platform")
+load("@bzd_toolchain_nodejs//pnpm:defs.bzl", "pnpm_install")
 load("@bzd_toolchain_nodejs//yarn:defs.bzl", "yarn")
 
 _repositories = {
@@ -175,6 +176,9 @@ def _toolchain_nodejs_impl(module_ctx):
             version = toolchain.version,
             default = toolchain.default,
         )
+
+    # Install the pnpm repository
+    pnpm_install()
 
 toolchain_nodejs = module_extension(
     implementation = _toolchain_nodejs_impl,

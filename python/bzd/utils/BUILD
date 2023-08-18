@@ -20,15 +20,6 @@ py_library(
 )
 
 py_library(
-    name = "docker",
-    srcs = ["docker.py"],
-    data = [
-        "//tools/docker_images:config.json",
-    ],
-    visibility = ["//visibility:public"],
-)
-
-py_library(
     name = "file",
     srcs = ["file.py"],
     visibility = ["//visibility:public"],

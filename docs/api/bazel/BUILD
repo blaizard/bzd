@@ -4,7 +4,6 @@ load("@stardoc//stardoc:stardoc.bzl", "stardoc")
 _RULE_NAMES = [
     "bdl",
     "cc",
-    "docker",
 ]
 
 [stardoc(

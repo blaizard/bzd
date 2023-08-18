@@ -7,20 +7,10 @@ exports_files([
 ])
 
 bzl_library(
-    name = "docker",
-    srcs = [
-        "docker.bzl",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        "@io_bazel_rules_docker//container",
-    ],
-)
-
-bzl_library(
     name = "cc",
     srcs = [
         "cc.bzl",
+        "@rules_cc//cc:bzl_srcs",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -37,7 +27,6 @@ bzl_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//tools/bazel_build/rules/third_party/cc:bzl",
         "@bazel_skylib//lib:sets",
         "@bazel_skylib//rules:common_settings",
         "@bzd_package//:package",
