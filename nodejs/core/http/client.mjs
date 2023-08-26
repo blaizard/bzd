@@ -120,12 +120,7 @@ export default class HttpClient {
 
 		Object.assign(headers, options.headers);
 
-		let request = null;
-		if (process.env.BZD_RULE === "nodejs_web") {
-			request = (await import(/* webpackMode: "eager" */ "./client/window.fetch.mjs")).default;
-		} else {
-			request = (await import(/* webpackMode: "eager" */ "./client/node.http.mjs")).default;
-		}
+		let request = (await import("./client/backend.mjs")).default;
 
 		Log.debug("{} {} (headers: {:j})", method, url, headers);
 		Log.trace("(body: {})", data);

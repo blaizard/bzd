@@ -7,7 +7,7 @@
 </template>
 
 <script>
-	import Colors from "bzd-style/css/colors.scss";
+	import Colors from "#bzd/nodejs/styles/default/css/colors.scss";
 
 	export default {
 		data: function () {

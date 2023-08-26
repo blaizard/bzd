@@ -1,6 +1,6 @@
 @use "sass:math";
 @use "index.scss" as base;
-@use "input.scss";
+@use "input.scss" as *;
 
 $triangleHeight: math.div(base.$fieldHeight, 5);
 

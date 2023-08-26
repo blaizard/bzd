@@ -18,13 +18,13 @@
 </template>
 
 <script>
-	import Form from "bzd/vue/components/form/form.vue";
-	import Button from "bzd/vue/components/form/element/button.vue";
-	import Colors from "bzd-style/css/colors.scss";
-	import DirectiveLoading from "bzd/vue/directives/loading.mjs";
+	import Form from "#bzd/nodejs/vue/components/form/form.vue";
+	import Button from "#bzd/nodejs/vue/components/form/element/button.vue";
+	import Colors from "#bzd/nodejs/styles/default/css/colors.scss";
+	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.mjs";
 	import Plugins from "../plugins/plugins.frontend.index.mjs";
-	import ExceptionFactory from "bzd/core/exception.mjs";
-	import Component from "bzd/vue/components/layout/component.vue";
+	import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
+	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
 
 	const Exception = ExceptionFactory("config");
 

@@ -1,4 +1,4 @@
-import ExceptionFactory from "bzd/core/exception.mjs";
+import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 const Exception = ExceptionFactory("tooltip");
 
 let current = {

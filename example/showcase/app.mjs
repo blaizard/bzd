@@ -1,5 +1,5 @@
-import Notification from "bzd/vue/notification.mjs";
-import Router from "bzd/vue/router/router.mjs";
+import Notification from "#bzd/nodejs/vue/notification.mjs";
+import Router from "#bzd/nodejs/vue/router/router.mjs";
 import Vue from "vue";
 
 import App from "./app.vue";

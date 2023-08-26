@@ -42,5 +42,5 @@
 </script>
 
 <style lang="scss">
-	@use "bzd-style/css/form/checkbox.scss";
+	//@use "#bzd/nodejs/styles/default/css/form/checkbox.scss" as *;
 </style>

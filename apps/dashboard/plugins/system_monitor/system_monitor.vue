@@ -76,8 +76,8 @@
 </template>
 
 <script>
-	import DirectiveTooltip from "bzd/vue/directives/tooltip.mjs";
-	import { bytesToString, capitalize } from "bzd/utils/to_string.mjs";
+	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
+	import { bytesToString, capitalize } from "#bzd/nodejs/utils/to_string.mjs";
 
 	export default {
 		props: {
@@ -399,7 +399,7 @@
 </script>
 
 <style lang="scss">
-	@use "bzd/icons.scss" with (
+	@use "#bzd/nodejs/icons.scss" as * with (
 		$bzdIconNames: thermometer battery
 	);
 

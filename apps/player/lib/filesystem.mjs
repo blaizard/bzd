@@ -1,4 +1,4 @@
-import ExceptionFactory from "bzd/core/exception.mjs";
+import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import Vue from "vue";
 
 const Exception = ExceptionFactory("filesystem");

@@ -7,7 +7,6 @@ bzd_nodejs_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//nodejs:bzd",
         "//nodejs/core:exception",
     ],
 )
@@ -19,7 +18,6 @@ bzd_nodejs_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//nodejs:bzd",
         "//nodejs/core:format",
     ],
 )
@@ -30,9 +28,6 @@ bzd_nodejs_library(
         "uid.mjs",
     ],
     visibility = ["//visibility:public"],
-    deps = [
-        "//nodejs:bzd",
-    ],
 )
 
 bzd_nodejs_library(
@@ -41,7 +36,4 @@ bzd_nodejs_library(
         "regexpr.mjs",
     ],
     visibility = ["//visibility:public"],
-    deps = [
-        "//nodejs:bzd",
-    ],
 )

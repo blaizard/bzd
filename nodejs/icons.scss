@@ -49,6 +49,6 @@
 $bzdIconNames: [] !default;
 @each $name in $bzdIconNames {
 	.bzd-icon-#{$name} {
-		@include defineIcon("~bzd-style/svg/#{$name}.svg");
+		@include defineIcon("#bzd/nodejs/styles/default/svg/#{$name}.svg");
 	}
 }

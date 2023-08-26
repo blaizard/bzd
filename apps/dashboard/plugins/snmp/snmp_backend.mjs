@@ -1,5 +1,5 @@
-import ExceptionFactory from "bzd/core/exception.mjs";
-import LogFactory from "bzd/core/log.mjs";
+import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
+import LogFactory from "#bzd/nodejs/core/log.mjs";
 import SnmpNative from "net-snmp";
 
 const Exception = ExceptionFactory("snmp");

@@ -96,7 +96,7 @@
 	import RenderLine from "./render/line.vue";
 	import RenderBar from "./render/bar.vue";
 
-	import Colors from "bzd-style/css/colors.scss";
+	import Colors from "#bzd/nodejs/styles/default/css/colors.scss";
 
 	const DEBUG = true;
 
@@ -650,5 +650,5 @@
 </script>
 
 <style lang="scss">
-	@use "bzd-style/css/graph/plot.scss";
+	@use "#bzd/nodejs/styles/default/css/graph/plot.scss" as *;
 </style>

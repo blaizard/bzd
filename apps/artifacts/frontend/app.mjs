@@ -1,14 +1,14 @@
-import Authentication from "bzd/core/authentication/token/client.mjs";
+import Authentication from "#bzd/nodejs/core/authentication/token/client.mjs";
 import Permissions from "bzd/db/storage/permissions.mjs";
-import API from "bzd/vue/api.mjs";
-import AuthenticationPlugin from "bzd/vue/authentication.mjs";
-import CachePlugin from "bzd/vue/cache.mjs";
-import Notification from "bzd/vue/notification.mjs";
-import Router from "bzd/vue/router/router.mjs";
+import API from "#bzd/nodejs/vue/api.mjs";
+import AuthenticationPlugin from "#bzd/nodejs/vue/authentication.mjs";
+import CachePlugin from "#bzd/nodejs/vue/cache.mjs";
+import Notification from "#bzd/nodejs/vue/notification.mjs";
+import Router from "#bzd/nodejs/vue/router/router.mjs";
 import Vue from "vue";
 import AsyncComputed from "vue-async-computed";
 
-import APIv1 from "../api.v1.json";
+import APIv1 from "../api.v1.json" assert { type: "json" };
 
 import App from "./app.vue";
 

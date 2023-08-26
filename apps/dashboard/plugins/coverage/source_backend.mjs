@@ -1,4 +1,4 @@
-import HttpClient from "bzd/core/http/client.mjs";
+import HttpClient from "#bzd/nodejs/core/http/client.mjs";
 
 export default {
 	cache: {

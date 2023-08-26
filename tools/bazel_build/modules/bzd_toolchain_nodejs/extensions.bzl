@@ -3,16 +3,15 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bzd_platforms//:defs.bzl", "constraints_from_platform")
 load("@bzd_toolchain_nodejs//pnpm:defs.bzl", "pnpm_install")
-load("@bzd_toolchain_nodejs//yarn:defs.bzl", "yarn")
 
 _repositories = {
-    "node_14.4.0": {
+    "node_20.5.1": {
         "linux-x86_64": {
             "build_file": "@bzd_toolchain_nodejs//nodejs:linux_x86_64.BUILD",
-            "sha256": "d65a9a8a547bfe67c6c08dae733a3e5a846700d5377c5f150164cc6bb5f6a039",
-            "strip_prefix": "node-v14.4.0-linux-x64",
+            "sha256": "a4a700bbca51ac26538eda2250e449955a9cc49638a45b38d5501e97f5b020b4",
+            "strip_prefix": "node-v20.5.1-linux-x64",
             "urls": [
-                "https://nodejs.org/dist/v14.4.0/node-v14.4.0-linux-x64.tar.xz",
+                "https://nodejs.org/dist/v20.5.1/node-v20.5.1-linux-x64.tar.xz",
             ],
         },
     },
@@ -80,18 +79,18 @@ sh_binary_wrapper(
     name = "{execution}_node",
     binary = "@{repo_name}//:node",
     command = select({{
-        "//conditions:default": "export NODE_ENV=production && {{binary}} --preserve-symlinks --preserve-symlinks-main --experimental-json-modules --use-strict $@",
+        "//conditions:default": "NODE_ENV=production {{binary}} --preserve-symlinks --preserve-symlinks-main --use-strict $@",
     }}),
     visibility = ["//visibility:public"],
 )
 
 sh_binary_wrapper(
-    name = "{execution}_yarn",
+    name = "{execution}_pnpm",
     locations = {{
-        "@yarn-{execution}//:yarn": "binary",
+        "@pnpm//:pnpm": "binary",
         "@{repo_name}//:node": "node"
     }},
-    command = "export PATH=$(dirname {{node}}):$PATH && {{binary}} --color=always --mutex network $@",
+    command = "PATH=$(dirname {{node}}):$PATH {{binary}} --color $@",
     data = [
         "@{repo_name}//:node",
     ],
@@ -100,7 +99,7 @@ sh_binary_wrapper(
 
 nodejs_toolchain(
     name = "{name}_nodejs_toolchain",
-    manager = ":{execution}_yarn",
+    manager = ":{execution}_pnpm",
     node = ":{execution}_node",
 )
 
@@ -151,13 +150,6 @@ def _toolchain_nodejs_impl(module_ctx):
                 version = toolchain.version,
                 default = toolchain.default,
             )
-
-    # Add the yarn repositories.
-    for execution, fetch_info in yarn.items():
-        http_archive(
-            name = "yarn-{}".format(execution),
-            **fetch_info
-        )
 
     # Add the node repositories.
     for name, toolchain in configs.items():

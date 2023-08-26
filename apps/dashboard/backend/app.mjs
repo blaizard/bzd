@@ -1,14 +1,14 @@
-import API from "bzd/core/api/server.mjs";
-import Cache from "bzd/core/cache.mjs";
-import ExceptionFactory from "bzd/core/exception.mjs";
-import HttpServer from "bzd/core/http/server.mjs";
-import LogFactory from "bzd/core/log.mjs";
-import KeyValueStoreDisk from "bzd/db/key_value_store/disk.mjs";
+import API from "#bzd/nodejs/core/api/server.mjs";
+import Cache from "#bzd/nodejs/core/cache.mjs";
+import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
+import HttpServer from "#bzd/nodejs/core/http/server.mjs";
+import LogFactory from "#bzd/nodejs/core/log.mjs";
+import KeyValueStoreDisk from "#bzd/nodejs/db/key_value_store/disk.mjs";
 import { Command } from "commander/esm.mjs";
 import Path from "path";
 
-import APIv1 from "../api.v1.json";
-import Plugins from "../plugins/plugins.backend.index.mjs";
+import APIv1 from "#bzd/apps/dashboard/api.v1.json" assert { type: "json" };
+import Plugins from "#bzd/apps/dashboard/plugins/plugins.backend.index.mjs";
 
 const Exception = ExceptionFactory("backend");
 const Log = LogFactory("backend");

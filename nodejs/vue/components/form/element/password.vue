@@ -18,5 +18,5 @@
 </script>
 
 <style lang="scss">
-	@use "bzd-style/css/form/password.scss";
+	//@use "#bzd/nodejs/styles/default/css/form/password.scss" as *;
 </style>

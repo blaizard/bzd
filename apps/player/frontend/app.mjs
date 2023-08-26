@@ -1,8 +1,8 @@
-import API from "bzd/vue/api.mjs";
-import Router from "bzd/vue/router/router.mjs";
+import API from "#bzd/nodejs/vue/api.mjs";
+import Router from "#bzd/nodejs/vue/router/router.mjs";
 import Vue from "vue";
 
-import APIv1 from "../api.v1.json";
+import APIv1 from "../api.v1.json" assert { type: "json" };
 
 import App from "./app.vue";
 

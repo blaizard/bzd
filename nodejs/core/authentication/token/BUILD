@@ -8,7 +8,6 @@ bzd_nodejs_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//nodejs:bzd",
         "//nodejs/core:exception",
         "//nodejs/core:log",
         "//nodejs/core/authentication:client",
@@ -26,7 +25,6 @@ bzd_nodejs_library(
     },
     visibility = ["//visibility:public"],
     deps = [
-        "//nodejs:bzd",
         "//nodejs/core:exception",
         "//nodejs/core:log",
         "//nodejs/core:validation",

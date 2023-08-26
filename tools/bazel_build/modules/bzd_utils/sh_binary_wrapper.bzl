@@ -1,19 +1,25 @@
 """Bash binary rules."""
 
-def _update_runfiles(ctx, runfiles, binary):
+def _update_runfiles(ctx, runfiles, file):
     """Update the current runfiles and return the executable."""
+
+    if type(file) == "File":
+        runfiles = runfiles.merge_all([ctx.runfiles(
+            files = [file],
+        )])
+        return runfiles, file
 
     # Combine the runfiles and the executable (which is not always captured in the runfiles, especially with files).
     runfiles = runfiles.merge_all([ctx.runfiles(
-        files = [binary.files_to_run.executable],
-    ), binary.default_runfiles])
+        files = [file.files_to_run.executable],
+    ), file.default_runfiles])
 
-    return runfiles, binary.files_to_run.executable
+    return runfiles, file.files_to_run.executable
 
-def _executable_to_path(ctx, executable):
-    """Return the path of the executable."""
+def _file_to_path(ctx, file):
+    """Return the path of the file."""
 
-    runfiles_relative_tool_path = ctx.workspace_name + "/" + executable.short_path
+    runfiles_relative_tool_path = ctx.workspace_name + "/" + file.short_path
     return "$RUNFILES_DIR/{}".format(runfiles_relative_tool_path)
 
 def sh_binary_wrapper_impl(ctx, output, binary = None, locations = {}, extra_runfiles = [], expand_targets = [], symlinks = {}, root_symlinks = {}, files = None, command = "{binary} $@"):
@@ -49,8 +55,8 @@ def sh_binary_wrapper_impl(ctx, output, binary = None, locations = {}, extra_run
     locations_to_key.update({binary: "binary"} if binary else {})
 
     for location, key in locations_to_key.items():
-        runfiles, extra_executable = _update_runfiles(ctx, runfiles, location)
-        extra_substitutions[key] = _executable_to_path(ctx, extra_executable)
+        runfiles, extra_file = _update_runfiles(ctx, runfiles, location)
+        extra_substitutions[key] = _file_to_path(ctx, extra_file)
 
     command_pre = """#!/bin/bash
     set -e

@@ -10,7 +10,7 @@
 // ---- Configuration ----
 
 @use "sass:math";
-@use "bzd-style/css/colors.scss" as colors;
+@use "#bzd/nodejs/styles/default/css/colors.scss" as colors;
 
 $font: "Helvetica";
 

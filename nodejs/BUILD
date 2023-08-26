@@ -1,22 +1,11 @@
 load("@bzd_toolchain_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 
 bzd_nodejs_library(
-    name = "bzd",
-    aliases = {
-        "bzd": "nodejs",
-    },
-    visibility = ["//visibility:public"],
-)
-
-bzd_nodejs_library(
     name = "vue",
     packages = {
         "vue": "2.7.13",
     },
     visibility = ["//visibility:public"],
-    deps = [
-        ":bzd",
-    ],
 )
 
 bzd_nodejs_library(
@@ -25,9 +14,6 @@ bzd_nodejs_library(
         "icons.scss",
     ],
     visibility = ["//visibility:public"],
-    deps = [
-        ":bzd",
-    ],
 )
 
 bzd_nodejs_library(

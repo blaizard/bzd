@@ -233,5 +233,5 @@
 </script>
 
 <style lang="scss">
-	@use "bzd-style/css/form/editor.scss";
+	//@use "#bzd/nodejs/styles/default/css/form/editor.scss" as *;
 </style>

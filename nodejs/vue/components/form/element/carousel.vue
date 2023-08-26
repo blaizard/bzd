@@ -293,5 +293,5 @@
 </script>
 
 <style lang="scss">
-	@use "bzd-style/css/form/carousel.scss";
+	//@use "#bzd/nodejs/styles/default/css/form/carousel.scss" as *;
 </style>

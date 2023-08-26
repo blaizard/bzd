@@ -1,5 +1,6 @@
 import Format from "./format.mjs";
 import LogFactory from "./log.mjs";
+import uncaughtExceptionHandler from "./impl/exception/backend.mjs";
 const Log = LogFactory("exception");
 
 /**
@@ -195,20 +196,6 @@ const ExceptionFactory = (...topics) => {
 const E = ExceptionFactory("exception");
 
 // Register uncaught exception handler
-if (process.env.BZD_RULE === "nodejs_web") {
-	window.addEventListener("error", (e) => {
-		E.fromError(e).print();
-		return false;
-	});
-} else {
-	process.on("uncaughtException", (e) => {
-		E.fromError(e).print("Exception: uncaughtException");
-		process.exit(1);
-	});
-	process.on("unhandledRejection", (reason, promise) => {
-		E.fromError(reason).print("Exception: unhandledRejection, reason: '{}', promise: '{}'", reason, promise);
-		process.exit(2);
-	});
-}
+uncaughtExceptionHandler(E);
 
 export default ExceptionFactory;

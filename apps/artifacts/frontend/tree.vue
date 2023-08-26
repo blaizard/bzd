@@ -29,8 +29,8 @@
 </template>
 
 <script>
-	import Component from "bzd/vue/components/layout/component.vue";
-	import DirectiveLoading from "bzd/vue/directives/loading.mjs";
+	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
+	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.mjs";
 
 	export default {
 		mixins: [Component],
@@ -151,14 +151,14 @@
 </script>
 
 <style lang="scss">
-	@use "bzd/icons.scss" as icons with (
+	@use "#bzd/nodejs/icons.scss" as icons with (
 		$bzdIconNames: configuration folder
 	);
 </style>
 
 <style lang="scss" scoped>
 	@use "sass:math";
-	@use "bzd-style/css/colors.scss" as colors;
+	@use "#bzd/nodejs/styles/default/css/colors.scss" as colors;
 
 	$indent: 20;
 	$arrowSize: 5;

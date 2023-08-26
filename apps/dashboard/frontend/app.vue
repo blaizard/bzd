@@ -2,7 +2,7 @@
 	<Layout>
 		<template #header
 			><RouterLink link="/"><i class="bzd-icon-main"></i> Dashboard</RouterLink></template
-		>
+>
 		<template #actions>
 			<MenuEntry text="Add new tile" icon="bzd-icon-add" link="/new"></MenuEntry>
 			<MenuEntry v-if="!edit" text="Edit" icon="bzd-icon-edit" @click="handleEdit"></MenuEntry>
@@ -16,9 +16,9 @@
 </template>
 
 <script>
-	import DirectiveTooltip from "bzd/vue/directives/tooltip.mjs";
-	import Layout from "bzd/vue/components/layout/layout.vue";
-	import MenuEntry from "bzd/vue/components/menu/entry.vue";
+	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
+	import Layout from "#bzd/nodejs/vue/components/layout/layout.vue";
+	import MenuEntry from "#bzd/nodejs/vue/components/menu/entry.vue";
 
 	export default {
 		components: {
@@ -53,11 +53,11 @@
 </script>
 
 <style lang="scss">
-	@use "bzd-style/css/base.scss";
-	@use "bzd-style/css/tooltip.scss";
-	@use "bzd-style/css/loading.scss";
+	@use "#bzd/nodejs/styles/default/css/base.scss" as *;
+	@use "#bzd/nodejs/styles/default/css/tooltip.scss" as *;
+	@use "#bzd/nodejs/styles/default/css/loading.scss" as *;
 
-	@use "bzd/icons.scss" as icons with (
+	@use "#bzd/nodejs/icons.scss" as icons with (
 		$bzdIconNames: edit add check
 	);
 

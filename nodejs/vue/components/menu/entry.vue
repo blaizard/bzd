@@ -12,7 +12,7 @@
 </template>
 
 <script>
-	import DirectiveTooltip from "bzd/vue/directives/tooltip.mjs";
+	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
 
 	export default {
 		props: {

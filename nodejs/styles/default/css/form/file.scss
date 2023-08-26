@@ -1,6 +1,6 @@
 @use "sass:math";
 @use "index.scss" as base;
-@use "bzd/icons.scss" with (
+@use "#bzd/nodejs/icons.scss" as * with (
 	$bzdIconNames: upload
 );
 
