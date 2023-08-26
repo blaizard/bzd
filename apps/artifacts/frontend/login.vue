@@ -9,8 +9,8 @@
 </template>
 
 <script>
-	import Form from "bzd/vue/components/form/form.vue";
-	import DirectiveLoading from "bzd/vue/directives/loading.mjs";
+	import Form from "#bzd/nodejs/vue/components/form/form.vue";
+	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.mjs";
 
 	export default {
 		components: {
@@ -76,13 +76,13 @@
 </script>
 
 <style lang="scss">
-	@use "bzd/icons.scss" with (
+	@use "#bzd/nodejs/icons.scss" as * with (
 		$bzdIconNames: email lock
 	);
 </style>
 
 <style lang="scss" scoped>
-	@use "bzd-style/css/colors.scss" as colors;
+	@use "#bzd/nodejs/styles/default/css/colors.scss" as colors;
 
 	.login {
 		width: 300px;

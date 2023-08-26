@@ -5,8 +5,8 @@ bzd_nodejs_library(
     srcs = glob([
         "**/*",
     ]),
-    aliases = {
-        "bzd-style": "nodejs/styles/default",
-    },
+    #aliases = {
+    #    "bzd-style": "nodejs/styles/default",
+    #},
     visibility = ["//visibility:public"],
 )

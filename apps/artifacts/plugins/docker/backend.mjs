@@ -1,4 +1,4 @@
-import ExceptionFactory from "bzd/core/exception.mjs";
+import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import StorageDockerV2 from "bzd/db/storage/docker_v2.mjs";
 
 import DockerV2Proxy from "./docker_v2_proxy.mjs";

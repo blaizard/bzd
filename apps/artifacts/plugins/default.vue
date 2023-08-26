@@ -49,10 +49,10 @@
 </template>
 
 <script>
-	import DirectiveTooltip from "bzd/vue/directives/tooltip.mjs";
+	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
 	import Base from "./base.vue";
-	import Button from "bzd/vue/components/form/element/button.vue";
-	import { bytesToString } from "bzd/utils/to_string.mjs";
+	import Button from "#bzd/nodejs/vue/components/form/element/button.vue";
+	import { bytesToString } from "#bzd/nodejs/utils/to_string.mjs";
 
 	export default {
 		mixins: [Base],
@@ -119,7 +119,7 @@
 </script>
 
 <style lang="scss">
-	@use "bzd/icons.scss" as icons with (
+	@use "#bzd/nodejs/icons.scss" as icons with (
 		$bzdIconNames: upload
 	);
 </style>

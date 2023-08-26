@@ -1,16 +1,16 @@
-import API from "bzd/core/api/server.mjs";
-import Authentication from "bzd/core/authentication/token/server.mjs";
-import Cache from "bzd/core/cache.mjs";
-import ExceptionFactory from "bzd/core/exception.mjs";
-import HttpServer from "bzd/core/http/server.mjs";
-import LogFactory from "bzd/core/log.mjs";
+import API from "#bzd/nodejs/core/api/server.mjs";
+import Authentication from "#bzd/nodejs/core/authentication/token/server.mjs";
+import Cache from "#bzd/nodejs/core/cache.mjs";
+import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
+import HttpServer from "#bzd/nodejs/core/http/server.mjs";
+import LogFactory from "#bzd/nodejs/core/log.mjs";
 import KeyValueStoreDisk from "bzd/db/key_value_store/disk.mjs";
 import Permissions from "bzd/db/storage/permissions.mjs";
 import { CollectionPaging } from "bzd/db/utils.mjs";
 import { Command } from "commander/esm.mjs";
 import Path from "path";
 
-import APIv1 from "../api.v1.json";
+import APIv1 from "../api.v1.json" assert { type: "json" };
 import Plugins from "../plugins/backend.mjs";
 
 import Services from "./services.mjs";

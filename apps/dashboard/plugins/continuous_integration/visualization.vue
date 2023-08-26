@@ -33,8 +33,8 @@
 </template>
 
 <script>
-	import Plot from "bzd/vue/components/graph/plot.vue";
-	import DirectiveTooltip from "bzd/vue/directives/tooltip.mjs";
+	import Plot from "#bzd/nodejs/vue/components/graph/plot.vue";
+	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
 
 	export default {
 		components: {
@@ -247,7 +247,7 @@
 </script>
 
 <style lang="scss">
-	@use "bzd/icons.scss" as icons with (
+	@use "#bzd/nodejs/icons.scss" as icons with (
 		$bzdIconNames: status_success status_failure status_in_progress status_abort clock
 	);
 

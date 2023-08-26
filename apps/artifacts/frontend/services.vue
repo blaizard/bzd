@@ -19,8 +19,8 @@
 </template>
 
 <script>
-	import Component from "bzd/vue/components/layout/component.vue";
-	import DirectiveLoading from "bzd/vue/directives/loading.mjs";
+	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
+	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.mjs";
 
 	export default {
 		mixins: [Component],

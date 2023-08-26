@@ -6,9 +6,6 @@ bzd_nodejs_library(
         "countries.mjs",
     ],
     visibility = ["//visibility:public"],
-    deps = [
-        "//nodejs:bzd",
-    ],
 )
 
 bzd_nodejs_library(
@@ -18,7 +15,6 @@ bzd_nodejs_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//nodejs:bzd",
         "//nodejs/core:exception",
     ],
 )
@@ -30,9 +26,6 @@ bzd_nodejs_library(
         "flags_{}.scss".format(size),
     ],
     visibility = ["//visibility:public"],
-    deps = [
-        "//nodejs:bzd",
-    ],
 ) for size in [
     "24x16",
     "32x24",

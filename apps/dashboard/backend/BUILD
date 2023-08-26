@@ -2,9 +2,9 @@ load("@bzd_toolchain_nodejs//nodejs:defs.bzl", "bzd_nodejs_binary")
 
 bzd_nodejs_binary(
     name = "backend",
-    srcs = glob([
-        "*.mjs",
-    ]),
+    srcs = [
+        "app.mjs",
+    ],
     args = [
         "--static",
         "/tmp/bzd/frontend",

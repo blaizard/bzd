@@ -6,9 +6,6 @@ bzd_nodejs_library(
         "user.mjs",
     ],
     visibility = ["//visibility:public"],
-    deps = [
-        "//nodejs:bzd",
-    ],
 )
 
 bzd_nodejs_library(
@@ -18,7 +15,6 @@ bzd_nodejs_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//nodejs:bzd",
         "//nodejs/core:exception",
     ],
 )
@@ -30,7 +26,6 @@ bzd_nodejs_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//nodejs:bzd",
         "//nodejs/core:exception",
     ],
 )

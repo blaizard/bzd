@@ -1,6 +1,6 @@
 @use "sass:math";
 @use "index.scss" as base;
-@use "dropdown.scss";
+@use "dropdown.scss" as *;
 
 .irform-date {
 	display: flex;

@@ -25,8 +25,8 @@
 </template>
 
 <script>
-	import Layout from "bzd/vue/components/layout/layout.vue";
-	import MenuEntry from "bzd/vue/components/menu/entry.vue";
+	import Layout from "#bzd/nodejs/vue/components/layout/layout.vue";
+	import MenuEntry from "#bzd/nodejs/vue/components/menu/entry.vue";
 
 	export default {
 		components: {
@@ -59,7 +59,7 @@
 </script>
 
 <style lang="scss">
-	@use "bzd-style/css/base.scss";
-	@use "bzd-style/css/tooltip.scss";
-	@use "bzd-style/css/loading.scss";
+	@use "#bzd/nodejs/styles/default/css/base.scss" as *;
+	@use "#bzd/nodejs/styles/default/css/tooltip.scss" as *;
+	@use "#bzd/nodejs/styles/default/css/loading.scss" as *;
 </style>

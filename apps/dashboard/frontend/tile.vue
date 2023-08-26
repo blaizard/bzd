@@ -26,12 +26,12 @@
 </template>
 
 <script>
-	import Colors from "bzd-style/css/colors.scss";
-	import DirectiveLoading from "bzd/vue/directives/loading.mjs";
-	import DirectiveTooltip from "bzd/vue/directives/tooltip.mjs";
+	import Colors from "#bzd/nodejs/styles/default/css/colors.scss";
+	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.mjs";
+	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
 	import Plugins from "../plugins/plugins.frontend.index.mjs";
-	import Color from "bzd/utils/color.mjs";
-	import LogFactory from "bzd/core/log.mjs";
+	import Color from "#bzd/nodejs/utils/color.mjs";
+	import LogFactory from "#bzd/nodejs/core/log.mjs";
 
 	const Log = LogFactory("tile");
 
@@ -222,8 +222,8 @@
 </script>
 
 <style lang="scss" scoped>
-	@use "bzd-style/css/clickable.scss";
-	@use "bzd-style/css/colors.scss" as colors;
+	@use "#bzd/nodejs/styles/default/css/clickable.scss" as *;
+	@use "#bzd/nodejs/styles/default/css/colors.scss" as colors;
 
 	$bzdPadding: 10px;
 

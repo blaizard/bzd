@@ -1,4 +1,4 @@
-import LocalStorage from "bzd/core/localstorage.mjs";
+import LocalStorage from "#bzd/nodejs/core/localstorage.mjs";
 
 import ExceptionFactory from "../core/exception.mjs";
 

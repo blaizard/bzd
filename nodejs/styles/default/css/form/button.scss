@@ -1,4 +1,4 @@
-@use "index.scss" as base;
+@use "#bzd/nodejs/styles/default/css/form/index.scss" as base;
 
 .irform-button {
 	@extend %actioner-reset;

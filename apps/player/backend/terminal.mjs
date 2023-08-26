@@ -1,6 +1,6 @@
-import Event from "bzd/core/event.mjs";
-import ExceptionFactory from "bzd/core/exception.mjs";
-import FileSystem from "bzd/core/filesystem.mjs";
+import Event from "#bzd/nodejs/core/event.mjs";
+import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
+import FileSystem from "#bzd/nodejs/core/filesystem.mjs";
 import { spawn } from "child_process";
 import Path from "path";
 

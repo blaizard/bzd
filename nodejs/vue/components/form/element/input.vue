@@ -286,5 +286,5 @@
 </script>
 
 <style lang="scss">
-	@use "bzd-style/css/form/input.scss";
+	//@use "#bzd/nodejs/styles/default/css/form/input.scss" as *;
 </style>

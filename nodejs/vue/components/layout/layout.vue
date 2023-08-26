@@ -68,8 +68,8 @@
 
 <script>
 	import Base from "./base.vue";
-	import LocalStorage from "bzd/core/localstorage.mjs";
-	import DirectiveTooltip from "bzd/vue/directives/tooltip.mjs";
+	import LocalStorage from "#bzd/nodejs/core/localstorage.mjs";
+	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
 
 	export default {
 		mixins: [Base],
@@ -148,7 +148,7 @@
 <style lang="scss">
 	// ---- Configuration
 	@use "sass:math";
-	@use "bzd-style/css/colors.scss" as colors;
+	@use "#bzd/nodejs/styles/default/css/colors.scss" as colors;
 
 	// Global
 
@@ -169,8 +169,8 @@
 
 	// ----
 
-	@use "bzd-style/css/clickable.scss";
-	@use "bzd/icons.scss" with (
+	@use "#bzd/nodejs/styles/default/css/clickable.scss" as *;
+	@use "#bzd/nodejs/icons.scss" as * with (
 		$bzdIconNames: menu dock_on dock_off close
 	);
 

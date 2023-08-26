@@ -30,15 +30,15 @@
 </template>
 
 <script>
-	import Layout from "bzd/vue/components/layout/layout.vue";
+	import Layout from "#bzd/nodejs/vue/components/layout/layout.vue";
 	import Tree from "./tree.vue";
 	import Terminal from "./terminal.vue";
 	import Editor from "./editor.vue";
 	import Camera from "./camera.vue";
 	import Scenario from "../lib/scenario.mjs";
 	import FileSystem from "../lib/filesystem.mjs";
-	import LogFactory from "bzd/core/log.mjs";
-	import ExceptionFactory from "bzd/core/exception.mjs";
+	import LogFactory from "#bzd/nodejs/core/log.mjs";
+	import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 
 	const Log = LogFactory("app");
 	const Exception = ExceptionFactory("app");
@@ -362,7 +362,7 @@
 </script>
 
 <style lang="scss">
-	@use "bzd-style/css/colors.scss" as colors;
+	@use "#bzd/nodejs/styles/default/css/colors.scss" as colors;
 
 	* {
 		box-sizing: border-box;
@@ -405,7 +405,7 @@
 </style>
 
 <style lang="scss" scoped>
-	@use "bzd-style/css/colors.scss" as colors;
+	@use "#bzd/nodejs/styles/default/css/colors.scss" as colors;
 
 	$selectionWidth: 3;
 

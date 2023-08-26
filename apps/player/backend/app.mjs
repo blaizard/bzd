@@ -1,19 +1,19 @@
-import API from "bzd/core/api/server.mjs";
-import FileSystem from "bzd/core/filesystem.mjs";
-import HttpServer from "bzd/core/http/server.mjs";
-import LogFactory from "bzd/core/log.mjs";
-import StorageDisk from "bzd/db/storage/disk.mjs";
-import Permissions from "bzd/db/storage/permissions.mjs";
+import API from "#bzd/nodejs/core/api/server.mjs";
+import FileSystem from "#bzd/nodejs/core/filesystem.mjs";
+import HttpServer from "#bzd/nodejs/core/http/server.mjs";
+import LogFactory from "#bzd/nodejs/core/log.mjs";
+import StorageDisk from "#bzd/nodejs/db/storage/disk.mjs";
+import Permissions from "#bzd/nodejs/db/storage/permissions.mjs";
 import { spawn } from "child_process";
 import { Command } from "commander/esm.mjs";
 import Path from "path";
 import { Readable } from "stream";
 import { WebSocketServer } from "ws";
 
-import APIv1 from "../api.v1.json";
-import Scenario from "../lib/scenario.mjs";
+import APIv1 from "#bzd/apps/player/api.v1.json" assert { type: "json" };
+import Scenario from "#bzd/apps/player/lib/scenario.mjs";
 
-import Terminal from "./terminal.mjs";
+import Terminal from "#bzd/apps/player/backend/terminal.mjs";
 
 const Log = LogFactory("backend");
 

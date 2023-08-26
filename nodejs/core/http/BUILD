@@ -2,12 +2,12 @@ load("@bzd_toolchain_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 
 bzd_nodejs_library(
     name = "client",
-    srcs = glob([
-        "client/*.mjs",
-    ]) + ["client.mjs"],
+    srcs = [
+        "client.mjs",
+        "//nodejs/core/http/client:backend.mjs",
+    ],
     visibility = ["//visibility:public"],
     deps = [
-        "//nodejs:bzd",
         "//nodejs/core:crypto",
         "//nodejs/core:exception",
         "//nodejs/core:log",
@@ -20,6 +20,7 @@ bzd_nodejs_library(
         "server.mjs",
     ],
     packages = {
+        "body-parser": "",
         "compression": "",
         "cookie-parser": "",
         "express": "",
@@ -30,7 +31,6 @@ bzd_nodejs_library(
     },
     visibility = ["//visibility:public"],
     deps = [
-        "//nodejs:bzd",
         "//nodejs/core:event",
         "//nodejs/core:exception",
         "//nodejs/core:filesystem",
@@ -46,7 +46,6 @@ bzd_nodejs_library(
     visibility = ["//visibility:public"],
     deps = [
         ":client",
-        "//nodejs:bzd",
         "//nodejs/core:exception",
         "//nodejs/core:log",
     ],

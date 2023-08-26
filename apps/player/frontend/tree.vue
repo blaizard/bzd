@@ -20,7 +20,7 @@
 </template>
 
 <script>
-	import Component from "bzd/vue/components/layout/component.vue";
+	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
 
 	export default {
 		mixins: [Component],
@@ -92,14 +92,14 @@
 </script>
 
 <style lang="scss">
-	@use "bzd/icons.scss" as icons with (
+	@use "#bzd/nodejs/icons.scss" as icons with (
 		$bzdIconNames: folder
 	);
 </style>
 
 <style lang="scss" scoped>
 	@use "sass:math";
-	@use "bzd-style/css/colors.scss" as colors;
+	@use "#bzd/nodejs/styles/default/css/colors.scss" as colors;
 
 	$indent: 20;
 	$arrowSize: 5;

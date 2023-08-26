@@ -53,7 +53,8 @@ sh_binary_wrapper(
     binary = select({{
         {select}
     }}),
-    command = "XDG_CONFIG_HOME={path} {{binary}} $@"
+    command = "XDG_CONFIG_HOME={path} {{binary}} $@",
+    visibility = ["//visibility:public"],
 )
 """.format(
             select = "\n".join(["\"{}\": \"{}\",".format(k, v) for k, v in select.items()]),
@@ -62,12 +63,15 @@ sh_binary_wrapper(
     )
 
     # Set the configuration, see: https://pnpm.io/cli/config
+    # About shamefully-hoist, see: https://github.com/vaadin/flow/issues/9834
+    # Hoist cannot be used because we use node with preserve-symlinks which make hoisting not working.
     repository_ctx.file(
         "pnpm/rc",
         content = """
 store-dir={store_dir}
+shamefully-hoist=true
         """.format(
-            store_dir = repository_ctx.path("store"),
+            store_dir = "/tmp/store1",  #repository_ctx.path("store"),
         ),
         executable = False,
     )

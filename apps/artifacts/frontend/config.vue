@@ -13,9 +13,9 @@
 
 <script>
 	import Plugins from "../plugins/frontend.mjs";
-	import Form from "bzd/vue/components/form/form.vue";
-	import Component from "bzd/vue/components/layout/component.vue";
-	import DirectiveLoading from "bzd/vue/directives/loading.mjs";
+	import Form from "#bzd/nodejs/vue/components/form/form.vue";
+	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
+	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.mjs";
 
 	export default {
 		props: {

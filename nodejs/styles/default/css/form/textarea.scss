@@ -1,4 +1,4 @@
-@use "index.scss";
+@use "index.scss" as *;
 
 .irform-textarea {
 	@extend %field-reset;

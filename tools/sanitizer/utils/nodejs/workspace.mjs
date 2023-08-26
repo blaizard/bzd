@@ -1,5 +1,5 @@
-import ExceptionFactory from "bzd/core/exception.mjs";
-import FileSystem from "bzd/core/filesystem.mjs";
+import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
+import FileSystem from "#bzd/nodejs/core/filesystem.mjs";
 import Path from "path";
 import { fileURLToPath } from "url";
 

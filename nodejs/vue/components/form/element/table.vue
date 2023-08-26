@@ -196,5 +196,5 @@
 </script>
 
 <style lang="scss">
-	@use "bzd-style/css/form/table.scss";
+	//@use "#bzd/nodejs/styles/default/css/form/table.scss" as *;
 </style>

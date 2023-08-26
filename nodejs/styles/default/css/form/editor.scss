@@ -1,5 +1,5 @@
 @use "index.scss" as base;
-@use "bzd/icons.scss" with (
+@use "#bzd/nodejs/icons.scss" as * with (
 	$bzdIconNames: bold italic underline strike_through undo justify_left justify_center justify_right justify indent
 		unindent ordered_list unordered_list quote clear_format
 );

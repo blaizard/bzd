@@ -6,9 +6,6 @@ bzd_nodejs_library(
         "permissions.mjs",
     ],
     visibility = ["//visibility:public"],
-    deps = [
-        "//nodejs:bzd",
-    ],
 )
 
 bzd_nodejs_library(

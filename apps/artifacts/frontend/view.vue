@@ -13,9 +13,9 @@
 </template>
 
 <script>
-	import Component from "bzd/vue/components/layout/component.vue";
-	import DirectiveLoading from "bzd/vue/directives/loading.mjs";
-	import ExceptionFactory from "bzd/core/exception.mjs";
+	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
+	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.mjs";
+	import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 
 	import Plugins from "../plugins/frontend.mjs";
 
