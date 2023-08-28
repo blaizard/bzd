@@ -28,7 +28,16 @@ COMMON_ATTRS = {
 }
 
 def bzd_nodejs_make_node_modules(ctx, packages, base_dir_name):
-    """Generate a node_modules and a package.json file at the root of `base_dir_name`."""
+    """Generate a node_modules and a package.json file at the root of `base_dir_name`.
+
+    Args:
+        ctx: The context of the rule.
+        packages: The packages to be installed.
+        base_dir_name: The name of the directory where the node_modules should be located.
+
+    Returns:
+        A tupple containing the package.json file and the node_modules directory populated.
+    """
 
     # Outputs of this rule.
     package_json = ctx.actions.declare_file("{}/package.json".format(base_dir_name))
@@ -78,7 +87,17 @@ def bzd_nodejs_make_node_modules(ctx, packages, base_dir_name):
     return [package_json, node_modules]
 
 def bzd_nodejs_transpile(ctx, srcs, runfiles, base_dir_name):
-    """Build a file tree at the root of `base_dir` and transpile the files if needed."""
+    """Build a file tree at the root of `base_dir` and transpile the files if needed.
+
+    Args:
+        ctx: The context of the rule.
+        srcs: The source files.
+        runfiles: Additional files to be included while transpiling.
+        base_dir_name: The name of the directory where the node_modules should be located.
+
+    Returns:
+        A tupple containing the generated files and the transpiled files as a dictionary.
+    """
 
     base_dir_short_path = ctx.label.package + "/" + base_dir_name
     base_dir_path = ctx.genfiles_dir.path + "/" + base_dir_short_path
@@ -139,6 +158,7 @@ def _bzd_nodejs_install_impl(ctx):
 
     # --- Build the runfiles for the execution environment
 
+    #print(deps_provider.data.to_list())
     files = [package_json, node_modules] + srcs + transpiled.values() + deps_provider.data.to_list()
     runfiles = ctx.runfiles(
         symlinks = {f.short_path.removeprefix(ctx.label.package + "/" + base_dir_name + "/"): f for f in files},

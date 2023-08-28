@@ -22,7 +22,7 @@ export default class StripePayment {
 				 */
 				confirmPayment: null,
 			},
-			options
+			options,
 		);
 
 		this.card = null;

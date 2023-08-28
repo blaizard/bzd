@@ -1,6 +1,6 @@
 @use "#bzd/nodejs/styles/default/css/normalize.scss" as *;
 @use "#bzd/nodejs/styles/default/css/clickable.scss" as *;
-@use "#bzd/nodejs/styles/default/css/colors.scss" as colors;
+@use "#bzd/nodejs/styles/default/css/colors.module.scss" as colors;
 
 body {
 	background-color: colors.$bzdGraphColorWhite;

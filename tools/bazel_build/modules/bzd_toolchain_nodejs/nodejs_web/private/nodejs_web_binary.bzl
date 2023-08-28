@@ -1,10 +1,14 @@
+"""NodeJs Web binary rule."""
+
+load("@bzd_package//:defs.bzl", "BzdPackageFragmentInfo")
 load("@bzd_toolchain_nodejs//nodejs:private/nodejs_install.bzl", "bzd_nodejs_install")
 load("@bzd_toolchain_nodejs//nodejs:private/utils.bzl", "BzdNodeJsInstallInfo")
+load("@bzd_utils//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
 
-def _bzd_nodejs_transition_impl(settings, attr):
-    _ignore = (settings, attr)
+def _bzd_nodejs_transition_impl(_settings, _attr):
     return {"@bzd_toolchain_nodejs//:build_type": "nodejs_web"}
 
+# Transition to notify the dependency graph that this is a `nodejs_web` build.
 _bzd_nodejs_transition = transition(
     implementation = _bzd_nodejs_transition_impl,
     inputs = [],
@@ -53,39 +57,26 @@ def _bzd_nodejs_web_exec_impl(ctx):
             "{}/node_modules/vite/bin/vite".format(vite_config.dirname),
             "build",
             "--outDir",
-            bundle.path,
+            "../{}".format(bundle.basename),
             "--config",
             vite_config.path,
         ],
         env = {
             "BZD_ROOT_DIR": vite_config.dirname,
-            "BZD_RULE": "nodejs_web",
             "FORCE_COLOR": "1",
         },
         executable = toolchain_executable.node.files_to_run,
     )
-    """
+
     return [sh_binary_wrapper_impl(
         ctx = ctx,
         locations = {
-            executor: "binary",
-            main: "main",
+            ctx.attr._web_server: "binary",
+            bundle: "bundle",
         },
         output = ctx.outputs.executable,
-        command = "{binary} {main} $@",
-        symlinks = install.runfiles.symlinks,
-    )]
-    """
-
-    ctx.actions.write(
-        output = ctx.outputs.executable,
-        content = "",
-    )
-
-    return DefaultInfo(
-        executable = ctx.outputs.executable,
-        files = depset([bundle]),
-    )
+        command = "{binary} {bundle} $@",
+    ), BzdPackageFragmentInfo()]
 
 _bzd_nodejs_web_binary = rule(
     doc = "NodeJs web application executor.",

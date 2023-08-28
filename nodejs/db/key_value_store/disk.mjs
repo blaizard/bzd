@@ -25,7 +25,7 @@ export default class KeyValueStoreDisk extends KeyValueStore {
 				 */
 				buckets: {},
 			},
-			options
+			options,
 		);
 		// The path where to store the database
 		this.path = path;
@@ -62,7 +62,7 @@ export default class KeyValueStoreDisk extends KeyValueStore {
 						 */
 						savepointIntervalS: 5 * 60,
 					},
-					bucket in this.options.buckets ? this.options.buckets[bucket] : {}
+					bucket in this.options.buckets ? this.options.buckets[bucket] : {},
 				);
 
 				// Load the persistence

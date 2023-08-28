@@ -1,13 +1,10 @@
-load("@bzd_toolchain_nodejs//nodejs:defs.bzl", "bzd_nodejs_binary")
+load("@bzd_toolchain_nodejs//nodejs:defs.bzl", "bzd_nodejs_extern_binary")
 load("@bzd_utils//:sh_binary_wrapper.bzl", "sh_binary_wrapper")
 load("@rules_python//python:defs.bzl", "py_binary")
 
-bzd_nodejs_binary(
+bzd_nodejs_extern_binary(
     name = "prettier_wrapper",
-    srcs = [
-        "prettier_wrapper.mjs",
-    ],
-    main = "prettier_wrapper.mjs",
+    binary = "prettier/bin/prettier.cjs",
     packages = {
         "prettier": "",
     },

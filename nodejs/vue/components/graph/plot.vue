@@ -96,7 +96,7 @@
 	import RenderLine from "./render/line.vue";
 	import RenderBar from "./render/bar.vue";
 
-	import Colors from "#bzd/nodejs/styles/default/css/colors.scss";
+	import Colors from "#bzd/nodejs/styles/default/css/colors.module.scss";
 
 	const DEBUG = true;
 
@@ -224,7 +224,7 @@
 			labelYMaxNbChars() {
 				return Math.max(
 					this.configProcessed.formatY(this.valuesMinY).length,
-					this.configProcessed.formatY(this.valuesMaxY).length
+					this.configProcessed.formatY(this.valuesMaxY).length,
 				);
 			},
 			/**
@@ -287,7 +287,7 @@
 						 */
 						showCursor: true,
 					},
-					this.config
+					this.config,
 				);
 			},
 			/**

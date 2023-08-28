@@ -21,7 +21,7 @@ export default class StorageDockerV2 extends Storage {
 			{
 				authentication: null,
 			},
-			options
+			options,
 		);
 
 		this.url = url;
@@ -56,7 +56,7 @@ export default class StorageDockerV2 extends Storage {
 				{
 					expect: "json",
 				},
-				options
+				options,
 			);
 		});
 
@@ -88,8 +88,8 @@ export default class StorageDockerV2 extends Storage {
 						scope: scope,
 					},
 				},
-				fetchOptions
-			)
+				fetchOptions,
+			),
 		);
 	}
 
@@ -125,8 +125,8 @@ export default class StorageDockerV2 extends Storage {
 					},
 					{
 						list: true,
-					}
-				)
+					},
+				),
 			);
 		});
 	}
@@ -145,10 +145,10 @@ export default class StorageDockerV2 extends Storage {
 						},
 						{
 							list: true,
-						}
-					)
+						},
+					),
 				);
-			}
+			},
 		);
 	}
 
@@ -170,7 +170,7 @@ export default class StorageDockerV2 extends Storage {
 				},
 				{
 					read: true,
-				}
+				},
 			);
 		});
 
@@ -191,8 +191,8 @@ export default class StorageDockerV2 extends Storage {
 				},
 				{
 					read: true,
-				}
-			)
+				},
+			),
 		);
 
 		data.unshift(
@@ -200,7 +200,7 @@ export default class StorageDockerV2 extends Storage {
 				name: ".metadata",
 				type: "metadata",
 				digest: headers["docker-content-digest"],
-			})
+			}),
 		);
 
 		return await CollectionPaging.makeFromList(data, maxOrPaging);

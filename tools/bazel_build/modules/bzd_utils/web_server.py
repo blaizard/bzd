@@ -107,5 +107,5 @@ if __name__ == "__main__":
 		os.chdir(args.root)
 
 	server = WebServer((args.hostname, args.port), handler)
-	print(f"Web server ready, serving '{args.path}' at 'http://{server.hostname}:{server.port}'.")
+	print(f"Web server ready, serving at 'http://{server.hostname}:{server.port}'.")
 	server.run()

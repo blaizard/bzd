@@ -11,7 +11,7 @@ export default {
 						payments: payments,
 					};
 				},
-			})
+			}),
 		);
 	},
 };

@@ -1,4 +1,4 @@
-import StorageWebdav from "bzd/db/storage/webdav.mjs";
+import StorageWebdav from "#bzd/nodejs/db/storage/webdav.mjs";
 
 export default {
 	async storage(params) {

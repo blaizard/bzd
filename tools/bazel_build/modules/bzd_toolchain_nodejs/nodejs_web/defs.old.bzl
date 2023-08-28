@@ -69,7 +69,6 @@ def _bzd_nodejs_web_build_impl(ctx):
             binary = toolchain_executable.node,
             output = ctx.outputs.executable,
             command = """
-            export BZD_RULE=nodejs_web
             {binary} "{root}/node_modules/.bin/webpack" --config "{workspace}/webpack.config.cjs" --output-path ".bzd/output"
             tar -h -cf "$1" -C "{workspace}/.bzd/output" --transform 's,^./,,' .
             """,

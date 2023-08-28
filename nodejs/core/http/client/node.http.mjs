@@ -61,7 +61,7 @@ export default async function request(url, options) {
 						resolve(result);
 					});
 				}
-			}
+			},
 		);
 
 		// A string

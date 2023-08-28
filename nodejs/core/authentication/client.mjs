@@ -13,7 +13,7 @@ export default class AuthenticationClient {
 				onAuthentication: (/*isAuthenticated*/) => {},
 			},
 			defaultOptions,
-			options
+			options,
 		);
 	}
 

@@ -37,7 +37,7 @@ export default {
 
 				const result = await HttpClient.get(
 					baseUrl + "/api/json?&tree=builds[duration,result,id,timestamp,estimatedDuration]{0,100}",
-					options
+					options,
 				);
 
 				return (result.builds || []).map((item) => {
@@ -60,7 +60,7 @@ export default {
 			data["jenkins.build"],
 			data["jenkins.branch"] || "master",
 			data["jenkins.user"],
-			data["jenkins.token"]
+			data["jenkins.token"],
 		);
 		return {
 			builds: builds,

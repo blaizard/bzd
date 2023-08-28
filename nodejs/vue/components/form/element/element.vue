@@ -200,7 +200,7 @@
 									value: item[0],
 									display: item[1],
 									search: (typeof item[2] === "object" ? item[2] : [String(item[2] || item[1])]).map((item) =>
-										item.toLowerCase()
+										item.toLowerCase(),
 									),
 								};
 							}

@@ -22,13 +22,13 @@ export default class Email {
 				// Content to be displayed
 				content: null,
 			},
-			data
+			data,
 		);
 
 		Exception.assert(
 			["text", "html"].includes(dataUpdated.format),
 			"Only 'text' and 'html' are valid formats: {}",
-			dataUpdated.format
+			dataUpdated.format,
 		);
 		Exception.assert(typeof dataUpdated.content == "string", "'content' must be a string: {}", dataUpdated.content);
 

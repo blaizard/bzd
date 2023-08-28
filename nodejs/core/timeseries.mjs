@@ -20,7 +20,7 @@ export default class TimeSeries {
 				 */
 				uniqueMerge: (a /*b, timestamp*/) => a,
 			},
-			options
+			options,
 		);
 
 		// Raw data
@@ -144,7 +144,7 @@ export default class TimeSeries {
 
 		let index = this.find(
 			timestampStart,
-			inclusive ? TimeSeries.FIND_IMMEDIATELY_BEFORE : TimeSeries.FIND_IMMEDIATELY_AFTER
+			inclusive ? TimeSeries.FIND_IMMEDIATELY_BEFORE : TimeSeries.FIND_IMMEDIATELY_AFTER,
 		);
 		index = Math.max(0, index);
 		let prevTimestamp = -Number.MAX_VALUE;
@@ -194,7 +194,7 @@ export default class TimeSeries {
 					this.data[index][1] = this.options.uniqueMerge(
 						this.data[index][1],
 						this.data[index - 1][1],
-						this.data[index][0]
+						this.data[index][0],
 					);
 					indexToDeleteList.push(index - 1);
 				}

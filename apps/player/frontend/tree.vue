@@ -99,7 +99,7 @@
 
 <style lang="scss" scoped>
 	@use "sass:math";
-	@use "#bzd/nodejs/styles/default/css/colors.scss" as colors;
+	@use "#bzd/nodejs/styles/default/css/colors.module.scss" as colors;
 
 	$indent: 20;
 	$arrowSize: 5;

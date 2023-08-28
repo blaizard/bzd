@@ -4,9 +4,9 @@ import Cache from "#bzd/nodejs/core/cache.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import HttpServer from "#bzd/nodejs/core/http/server.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
-import KeyValueStoreDisk from "bzd/db/key_value_store/disk.mjs";
-import Permissions from "bzd/db/storage/permissions.mjs";
-import { CollectionPaging } from "bzd/db/utils.mjs";
+import KeyValueStoreDisk from "#bzd/nodejs/db/key_value_store/disk.mjs";
+import Permissions from "#bzd/nodejs/db/storage/permissions.mjs";
+import { CollectionPaging } from "#bzd/nodejs/db/utils.mjs";
 import { Command } from "commander/esm.mjs";
 import Path from "path";
 
@@ -29,13 +29,13 @@ program
 		"-p, --port <number>",
 		"Port to be used to serve the application, can also be set with the environemnt variable BZD_PORT.",
 		8080,
-		parseInt
+		parseInt,
 	)
 	.option("-s, --static <path>", "Directory to static serve.", ".")
 	.option(
 		"-d, --data <path>",
 		"Where to store the data, can also be set with the environemnt variable BZD_PATH_DATA.",
-		"/bzd/data"
+		"/bzd/data",
 	)
 	.option("--test", "Use test data.")
 	.parse(process.argv);
@@ -52,11 +52,11 @@ program
 
 	Exception.assert(
 		AUTHENTICATION_PRIVATE_KEY !== false,
-		"A valid authentication private key must be set with the environment variable `BZD_AUTHENTICATION_PRIVATE_KEY`."
+		"A valid authentication private key must be set with the environment variable `BZD_AUTHENTICATION_PRIVATE_KEY`.",
 	);
 	Exception.assert(
 		AUTHENTICATION_USERNAME !== false && AUTHENTICATION_PASSWORD !== false,
-		"A valid authentication username and password must be set with the environment variable `AUTHENTICATION_USERNAME` and `AUTHENTICATION_PASSWORD`."
+		"A valid authentication username and password must be set with the environment variable `AUTHENTICATION_USERNAME` and `AUTHENTICATION_PASSWORD`.",
 	);
 	let authentication = new Authentication({
 		privateKey: AUTHENTICATION_PRIVATE_KEY,
@@ -168,7 +168,7 @@ program
 		Exception.assert(
 			pathList.every((path) => Boolean(path)),
 			"Path elements cannot be empty: '{:j}'",
-			pathList
+			pathList,
 		);
 		return { volume: pathList[0], pathList: pathList.slice(1) };
 	}
@@ -241,7 +241,7 @@ program
 					},
 					{
 						list: true,
-					}
+					},
 				);
 			});
 			return {

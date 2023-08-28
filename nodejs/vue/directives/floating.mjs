@@ -19,7 +19,7 @@ function update(el, config) {
 			 */
 			zIndex: 0,
 		},
-		config
+		config,
 	);
 
 	// Set the z-index if needed

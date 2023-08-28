@@ -53,9 +53,12 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 		}
 		if (token && timeoutS && this.options.refreshTokenCallback) {
 			// Refresh automatically the token, set to minimum time of 30s
-			this.interval = setInterval(() => {
-				this.refreshAuthentication();
-			}, Math.max(timeoutS - 60, 30) * 1000);
+			this.interval = setInterval(
+				() => {
+					this.refreshAuthentication();
+				},
+				Math.max(timeoutS - 60, 30) * 1000,
+			);
 		}
 	}
 

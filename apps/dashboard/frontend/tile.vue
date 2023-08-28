@@ -26,7 +26,7 @@
 </template>
 
 <script>
-	import Colors from "#bzd/nodejs/styles/default/css/colors.scss";
+	import Colors from "#bzd/nodejs/styles/default/css/colors.module.scss";
 	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.mjs";
 	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
 	import Plugins from "../plugins/plugins.frontend.index.mjs";
@@ -223,7 +223,7 @@
 
 <style lang="scss" scoped>
 	@use "#bzd/nodejs/styles/default/css/clickable.scss" as *;
-	@use "#bzd/nodejs/styles/default/css/colors.scss" as colors;
+	@use "#bzd/nodejs/styles/default/css/colors.module.scss" as colors;
 
 	$bzdPadding: 10px;
 

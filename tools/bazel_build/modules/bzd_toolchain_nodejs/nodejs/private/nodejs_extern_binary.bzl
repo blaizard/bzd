@@ -4,7 +4,7 @@ load("@bzd_toolchain_nodejs//nodejs:private/nodejs_install.bzl", "bzd_nodejs_mak
 load("@bzd_utils//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
 
 def _bzd_nodejs_extern_binary_impl(ctx):
-    package_json, node_modules = bzd_nodejs_make_node_modules(ctx, ctx.attr.packages, base_dir_name = ctx.label.name + ".install")
+    _package_json, node_modules = bzd_nodejs_make_node_modules(ctx, ctx.attr.packages, base_dir_name = ctx.label.name + ".install")
 
     # Gather toolchain manager
     toolchain_executable = ctx.toolchains["@bzd_toolchain_nodejs//nodejs:toolchain_type"].executable

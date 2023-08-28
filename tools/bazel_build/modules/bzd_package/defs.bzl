@@ -71,7 +71,7 @@ def _bzd_package_impl(ctx):
                     ]
 
         else:
-            fail("Dependencies for this rule requires BzdPackageFragmentInfo provider.")
+            fail("Dependencies for the rule '{}' requires BzdPackageFragmentInfo provider.".format(target.label))
 
     # Build buildstamp
     buildstamp = ctx.actions.declare_file("{}.buildstamp.json".format(ctx.label.name))

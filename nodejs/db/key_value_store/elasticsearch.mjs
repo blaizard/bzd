@@ -20,7 +20,7 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 				key: null,
 				prefix: "kvs_",
 			},
-			options
+			options,
 		);
 
 		let fetchOptions = {
@@ -39,7 +39,7 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 			"Using elasticsearch key value store DB at '{}' (prefix: {}, authentication: {}).",
 			host,
 			this.options.prefix,
-			"authentication" in fetchOptions ? "on" : "off"
+			"authentication" in fetchOptions ? "on" : "off",
 		);
 		this.fetch = new HttpClientFactory(host, fetchOptions);
 	}
@@ -118,7 +118,7 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 		Exception.unreachable(
 			"Too many conflicts have occured with update request ({}, {}), something is wrong, aborting.",
 			bucket,
-			key
+			key,
 		);
 	}
 
@@ -154,7 +154,7 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 					json: {
 						query: query,
 					},
-				}
+				},
 			);
 
 			Exception.assert("hits" in result && "hits" in result.hits, "Result malformed: {:j}", result);
@@ -165,7 +165,7 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 					return obj;
 				}, {}),
 				paging,
-				result.hits.total.value
+				result.hits.total.value,
 			);
 		} catch (e) {
 			if (e instanceof HttpClientException) {

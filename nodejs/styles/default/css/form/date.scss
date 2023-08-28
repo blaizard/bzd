@@ -1,6 +1,6 @@
 @use "sass:math";
-@use "index.scss" as base;
-@use "dropdown.scss" as *;
+@use "#bzd/nodejs/styles/default/css/form/base.scss" as base;
+@use "#bzd/nodejs/styles/default/css/form/dropdown.scss" as *;
 
 .irform-date {
 	display: flex;

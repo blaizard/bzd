@@ -58,7 +58,7 @@ async function getMetadata(filePath) {
 			write: isWrite,
 			delete: isDelete,
 			list: isList,
-		}
+		},
 	);
 }
 
@@ -72,7 +72,7 @@ export default class StorageDisk extends Storage {
 				/// If false, it will attempt to create a directory if it does not exists.
 				mustExists: false,
 			},
-			options
+			options,
 		);
 		this.path = path;
 

@@ -34,9 +34,7 @@
 	}
 }
 
-/**
- * Helper to create and define icons
- */
+/// Helper to create and define icons
 @mixin defineIcon($imageUrl) {
 	--bzd-icon-data: url(#{$imageUrl});
 	background-color: currentColor;
@@ -49,6 +47,6 @@
 $bzdIconNames: [] !default;
 @each $name in $bzdIconNames {
 	.bzd-icon-#{$name} {
-		@include defineIcon("#bzd/nodejs/styles/default/svg/#{$name}.svg");
+		@include defineIcon("@/nodejs/styles/default/svg/#{$name}.svg");
 	}
 }

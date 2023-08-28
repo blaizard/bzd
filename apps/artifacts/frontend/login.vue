@@ -82,7 +82,7 @@
 </style>
 
 <style lang="scss" scoped>
-	@use "#bzd/nodejs/styles/default/css/colors.scss" as colors;
+	@use "#bzd/nodejs/styles/default/css/colors.module.scss" as colors;
 
 	.login {
 		width: 300px;

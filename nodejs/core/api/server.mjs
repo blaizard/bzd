@@ -37,7 +37,7 @@ class Context {
 				maxAge: 7 * 24 * 60 * 60 * 1000, // in ms
 				httpOnly: false,
 			},
-			options
+			options,
 		);
 		this.response.cookie(name, value, options);
 	}
@@ -80,7 +80,7 @@ export default class APIServer extends Base {
 		if (this.schema[endpoint][method].authentication) {
 			Exception.assert(
 				this.options.authentication,
-				"This route has authentication requirement but no authentication object was specified."
+				"This route has authentication requirement but no authentication object was specified.",
 			);
 			authentication = this.options.authentication;
 		}
@@ -89,7 +89,7 @@ export default class APIServer extends Base {
 			"Installing handler for {} {}{}",
 			method,
 			endpoint,
-			authentication === null ? "" : " with authentication"
+			authentication === null ? "" : " with authentication",
 		);
 
 		// Build the web options
@@ -151,7 +151,7 @@ export default class APIServer extends Base {
 						"{} {}: validation is not available for {}.",
 						method,
 						endpoint,
-						requestOptions.type
+						requestOptions.type,
 					);
 					const validation = new Validation(requestOptions.validation);
 					validation.validate(data, {
@@ -166,7 +166,7 @@ export default class APIServer extends Base {
 						responseOptions.type == "json",
 						"{} {}: validation is only available for json type.",
 						method,
-						endpoint
+						endpoint,
 					);
 					const validation = new Validation(responseOptions.validation);
 					validation.validate(result, {
@@ -181,7 +181,7 @@ export default class APIServer extends Base {
 								typeof result == "object",
 								"{} {}: callback result must be a json object.",
 								method,
-								endpoint
+								endpoint,
 							);
 							response.json(result);
 							break;

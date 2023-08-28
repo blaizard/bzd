@@ -57,7 +57,7 @@ export default {
 							if ("status" in result) {
 								builds.push(result);
 							}
-						})()
+						})(),
 					);
 				}
 
@@ -114,7 +114,7 @@ export default {
 			data["github.username"],
 			data["github.repository"],
 			data["github.workflowid"],
-			data["github.token"]
+			data["github.token"],
 		);
 		return {
 			builds: builds,

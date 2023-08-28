@@ -13,7 +13,7 @@ export default class Template {
 				 */
 				path: "",
 			},
-			options
+			options,
 		);
 
 		Exception.assert(typeof template === "string", "The template is not a string");

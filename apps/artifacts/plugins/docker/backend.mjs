@@ -1,5 +1,5 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
-import StorageDockerV2 from "bzd/db/storage/docker_v2.mjs";
+import StorageDockerV2 from "#bzd/nodejs/db/storage/docker_v2.mjs";
 
 import DockerV2Proxy from "./docker_v2_proxy.mjs";
 
@@ -25,7 +25,7 @@ export default {
 				const proxy = DockerV2Proxy.makeFromStorageDockerV2(
 					params["docker.proxy.url"],
 					params["docker.proxy.port"],
-					await context.getVolume()
+					await context.getVolume(),
 				);
 				await proxy.start();
 				return proxy;

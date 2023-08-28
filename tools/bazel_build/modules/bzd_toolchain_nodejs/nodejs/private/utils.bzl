@@ -24,12 +24,19 @@ def bzd_nodejs_make_provider(ctx):
 
     return BzdNodeJsDepsInfo(
         srcs = depset(ctx.files.srcs),
-        data = depset(transitive = tool_depsets + ctx.files.data),
+        data = depset(ctx.files.data, transitive = tool_depsets),
         packages = dict(ctx.attr.packages),
     )
 
 def bzd_nodejs_merge(*providers):
-    """Merge providers of types BzdNodeJsDepsInfo together."""
+    """Merge providers of types BzdNodeJsDepsInfo together.
+
+    Args:
+        *providers: The providers to be merged.
+
+    Returns:
+        A BzdNodeJsDepsInfo provider containing the merged providers.
+    """
 
     provider = BzdNodeJsDepsInfo(
         srcs = depset(transitive = [p.srcs for p in providers]),

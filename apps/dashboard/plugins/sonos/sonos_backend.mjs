@@ -62,7 +62,7 @@ export default {
 						art: null,
 						state: "pause",
 					},
-					(previous || {}).track
+					(previous || {}).track,
 				);
 
 				// Hook on track change event
