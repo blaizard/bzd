@@ -21,13 +21,13 @@ program
 		"-p, --port <number>",
 		"Port to be used to serve the application, can also be set with the environemnt variable BZD_PORT.",
 		8080,
-		parseInt
+		parseInt,
 	)
 	.option("-s, --static <path>", "Directory to static serve.", ".")
 	.option(
 		"-d, --data <path>",
 		"Where to store the data, can also be set with the environemnt variable BZD_PATH_DATA.",
-		"/bzd/data"
+		"/bzd/data",
 	)
 	.parse(process.argv);
 
@@ -64,7 +64,7 @@ async function getData(type, uid, cache) {
 		},
 		{
 			timeout: 60 * 60 * 1000, // 1h
-		}
+		},
 	);
 
 	// Register plugins
@@ -97,7 +97,7 @@ async function getData(type, uid, cache) {
 					Log.debug("Plugin '{}' fetching for '{}'", type, uid);
 					return await plugin.fetch(data, cache);
 				},
-				options
+				options,
 			);
 
 			// Install events
@@ -140,7 +140,7 @@ async function getData(type, uid, cache) {
 			inputs.event in events[inputs.type],
 			"'{}' is not a valid event for '{}'.",
 			inputs.event,
-			inputs.type
+			inputs.type,
 		);
 		const data = await getData(inputs.type, inputs.uid, cache);
 		await events[inputs.type][inputs.event](data, cache, inputs.args);

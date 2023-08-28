@@ -32,7 +32,7 @@ export default class PersistenceMemory {
 					},
 				},
 			},
-			options
+			options,
 		);
 
 		// Make sure that some of the required options are set

@@ -20,7 +20,7 @@ class Cache {
 				garbageCollector: true,
 				garbageCollectorPeriodMs: 10000, // Every 10s
 			},
-			config
+			config,
 		);
 
 		this.data = {
@@ -47,17 +47,17 @@ class Cache {
 		Exception.assert(
 			typeof collection === "string",
 			"register(...) must take a string as first argument: {:j}",
-			collection
+			collection,
 		);
 		Exception.assert(
 			typeof trigger === "function",
 			"register(...) must take a function as second argument: {:j}",
-			trigger
+			trigger,
 		);
 		Exception.assert(
 			collection.match(/^[a-z0-9.-_]+$/i),
 			"Invalid collection name '{}', it must contain only the following characters [a-z0-9.-_].",
-			collection
+			collection,
 		);
 		Exception.assert(!(collection in this.data), "The collection '{}' has already been registered.", collection);
 
@@ -280,7 +280,7 @@ function idsToId(collection, ...ids) {
 	Exception.assert(
 		typeof this.data[collection] === "object",
 		"Cache::get({}) does not exist or is not of type object.",
-		collection
+		collection,
 	);
 
 	return id;
@@ -355,7 +355,7 @@ async function get(instant, collection, ...ids) {
 						"GET {}::{} ({}, instant)",
 						collection,
 						id,
-						timestampFetch ? Cache.getTimestampMs() - timestampFetch + "ms" : "cache"
+						timestampFetch ? Cache.getTimestampMs() - timestampFetch + "ms" : "cache",
 					);
 					return dataId._data;
 				}
@@ -381,7 +381,7 @@ async function get(instant, collection, ...ids) {
 				"GET {}::{} ({})",
 				collection,
 				id,
-				timestampFetch ? Cache.getTimestampMs() - timestampFetch + "ms" : "cache"
+				timestampFetch ? Cache.getTimestampMs() - timestampFetch + "ms" : "cache",
 			);
 			return dataId._data;
 		} else {
@@ -437,7 +437,7 @@ async function triggerUpdate(collection, id, ...ids) {
 		Exception.assert(
 			typeof dataCollection._trigger === "function",
 			"No trigger function associated with collection '{}'",
-			collection
+			collection,
 		);
 
 		// Close the previous data if a close function is available
@@ -453,7 +453,7 @@ async function triggerUpdate(collection, id, ...ids) {
 			this,
 			...ids,
 			/*Previous value if any*/ dataId._data,
-			/*To overwrite options*/ options
+			/*To overwrite options*/ options,
 		);
 
 		if (options.timeout) {
@@ -466,7 +466,7 @@ async function triggerUpdate(collection, id, ...ids) {
 		Exception.assert(
 			typeof dataId._data !== "undefined",
 			"Trigger function returned undefined data type for collection '{}'",
-			collection
+			collection,
 		);
 		dataId._size = dataId._data.size || dataId._data.length || dataCollection._defaultSize || 0;
 		delete dataId._error;
@@ -521,7 +521,7 @@ async function garbageCollector() {
 				"GARBAGE COLLECTION size={}, nbEntries={}: removing entry '{}'",
 				this.data._size,
 				this.data._nbEntries,
-				entry[0]
+				entry[0],
 			);
 
 			// Delete the resource

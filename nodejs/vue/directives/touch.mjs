@@ -46,7 +46,7 @@ if (typeof window === "object") {
 				e.preventDefault();
 			}
 		},
-		{ passive: false }
+		{ passive: false },
 	);
 }
 
@@ -90,7 +90,7 @@ function getCoordinates(e) {
 function getCurrentDistance() {
 	return Math.sqrt(
 		(originalCoord.x - currentCoord.x) * (originalCoord.x - currentCoord.x) +
-			(originalCoord.y - currentCoord.y) * (originalCoord.y - currentCoord.y)
+			(originalCoord.y - currentCoord.y) * (originalCoord.y - currentCoord.y),
 	);
 }
 
@@ -236,7 +236,7 @@ async function dragStart(e) {
 					"margin-left": 0,
 					"margin-top": 0,
 				},
-				curConfig.dragEltCss
+				curConfig.dragEltCss,
 			);
 
 			// Add the class
@@ -385,7 +385,7 @@ function detectDropZone() {
 			},
 			activeReceiverElt.hasAttribute(DRAG_RECEIVER_CONFIG)
 				? JSON.parse(activeReceiverElt.getAttribute(DRAG_RECEIVER_CONFIG))
-				: undefined
+				: undefined,
 		);
 
 		// Identify the active child element
@@ -770,7 +770,7 @@ Touch.prototype.setConfig = function (config) {
 			 */
 			onstopdrag: null,
 		},
-		config
+		config,
 	);
 };
 

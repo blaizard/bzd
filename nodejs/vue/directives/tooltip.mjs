@@ -142,7 +142,7 @@ export function tooltip(elt, options) {
 			data: elt.getAttribute("data-irtooltip"),
 			position: elt.getAttribute("data-irtooltip-position") || defaultPosition,
 		},
-		options
+		options,
 	);
 
 	// Data must be filled.
@@ -233,7 +233,7 @@ export default function (el, binding) {
 			 */
 			position: defaultPosition,
 		},
-		binding.value
+		binding.value,
 	);
 
 	el.addEventListener("mouseenter", tooltipFromEvent, false);

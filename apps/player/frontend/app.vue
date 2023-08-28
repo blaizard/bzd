@@ -279,10 +279,10 @@
 									this.components[id] || {
 										type: type,
 										name: null,
-									}
+									},
 								);
 								return id;
-							})
+							}),
 					);
 				}
 				this.$set(this.configs, configId, {
@@ -362,7 +362,7 @@
 </script>
 
 <style lang="scss">
-	@use "#bzd/nodejs/styles/default/css/colors.scss" as colors;
+	@use "#bzd/nodejs/styles/default/css/colors.module.scss" as colors;
 
 	* {
 		box-sizing: border-box;
@@ -405,7 +405,7 @@
 </style>
 
 <style lang="scss" scoped>
-	@use "#bzd/nodejs/styles/default/css/colors.scss" as colors;
+	@use "#bzd/nodejs/styles/default/css/colors.module.scss" as colors;
 
 	$selectionWidth: 3;
 

@@ -21,14 +21,14 @@ export default class HttpProxy {
 				beforeRequest: (/*request, response*/) => {},
 				afterRequest: (/*request, response*/) => {},
 			},
-			options
+			options,
 		);
 		this.server = null;
 
 		Exception.assert(
 			["http:", "https:"].includes(this.target.protocol),
 			"Protocol not supported '{}'",
-			this.target.protocol
+			this.target.protocol,
 		);
 	}
 

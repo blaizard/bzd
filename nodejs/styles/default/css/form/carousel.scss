@@ -1,5 +1,5 @@
 @use "sass:math";
-@use "index.scss" as base;
+@use "#bzd/nodejs/styles/default/css/form/base.scss" as base;
 
 .irform-carousel {
 	padding: 0;

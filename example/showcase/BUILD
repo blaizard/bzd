@@ -1,13 +1,11 @@
-load("@bzd_toolchain_nodejs//nodejs_web:defs.bzl", "bzd_nodejs_web")
+load("@bzd_toolchain_nodejs//nodejs_web:defs.bzl", "bzd_nodejs_web_binary")
 
-bzd_nodejs_web(
+bzd_nodejs_web_binary(
     name = "showcase",
     srcs = glob([
         "**/*",
     ]),
-    entries = {
-        "app.mjs": "index",
-    },
+    main = "app.mjs",
     packages = {
         "vue": "",
     },

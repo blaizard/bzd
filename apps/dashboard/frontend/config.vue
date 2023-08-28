@@ -20,14 +20,13 @@
 <script>
 	import Form from "#bzd/nodejs/vue/components/form/form.vue";
 	import Button from "#bzd/nodejs/vue/components/form/element/button.vue";
-	import Colors from "#bzd/nodejs/styles/default/css/colors.scss";
+	import Colors from "#bzd/nodejs/styles/default/css/colors.module.scss";
 	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.mjs";
-	import Plugins from "../plugins/plugins.frontend.index.mjs";
+	import Plugins from "#bzd/apps/dashboard/plugins/plugins.frontend.index.mjs";
 	import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
 
 	const Exception = ExceptionFactory("config");
-
 	export default {
 		components: {
 			Form,
@@ -142,7 +141,7 @@
 						},
 						{
 							auto: "Auto",
-						}
+						},
 					);
 			},
 		},
@@ -191,7 +190,7 @@
 					Exception.assert(
 						["source", "visualization"].includes(data.metadata.type),
 						"Unsupported plugin type: '{}'",
-						data.metadata.type
+						data.metadata.type,
 					);
 					data.module = "module" in data ? await data.module() : {}; // Load the frontend plugin to load the icon
 					plugins[data.metadata.type][name] = data;

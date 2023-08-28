@@ -1,4 +1,4 @@
-import StorageDisk from "bzd/db/storage/disk.mjs";
+import StorageDisk from "#bzd/nodejs/db/storage/disk.mjs";
 
 export default {
 	async storage(params) {

@@ -10,7 +10,7 @@
 	import HttpClient from "../../core/http/client.mjs";
 	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.mjs";
 	import Button from "#bzd/nodejs/vue/components/form/element/button.vue";
-	import Colors from "#bzd/nodejs/styles/default/css/colors.scss";
+	import Colors from "#bzd/nodejs/styles/default/css/colors.module.scss";
 
 	export default {
 		props: {
@@ -123,8 +123,8 @@
 </script>
 
 <style lang="scss">
-	@use "nodejs/styles/default/css/form/index.scss" as base;
-	@use "#bzd/nodejs/styles/default/css/colors.scss" as colors;
+	@use "#bzd/nodejs/styles/default/css/form/base.scss" as base;
+	@use "#bzd/nodejs/styles/default/css/colors.module.scss" as colors;
 
 	.bzd-payments {
 		.bzd-payment-stripe-card {

@@ -2,7 +2,7 @@
 	<Layout>
 		<template #header
 			><RouterLink link="/"><i class="bzd-icon-main"></i> Dashboard</RouterLink></template
->
+		>
 		<template #actions>
 			<MenuEntry text="Add new tile" icon="bzd-icon-add" link="/new"></MenuEntry>
 			<MenuEntry v-if="!edit" text="Edit" icon="bzd-icon-edit" @click="handleEdit"></MenuEntry>
@@ -62,7 +62,7 @@
 	);
 
 	.bzd-icon-main {
-		@include icons.defineIcon("icon.svg");
+		@include icons.defineIcon("@/apps/dashboard/frontend/icon.svg");
 	}
 
 	.bzd-content {

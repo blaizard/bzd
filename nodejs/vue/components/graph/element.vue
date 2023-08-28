@@ -50,7 +50,7 @@
 						 */
 						legendPosition: "legend-right", // legend-left
 					},
-					this.config
+					this.config,
 				);
 			},
 			elementClass() {

@@ -2519,7 +2519,7 @@ class Flags {
 				outputCss: "flags.output.css",
 				maxFlagsPerWidth: 16,
 			},
-			config
+			config,
 		);
 
 		const countries = this.data;
@@ -2539,7 +2539,7 @@ class Flags {
 				Object.keys(countries) +
 				" to " +
 				config.outputImage +
-				"..."
+				"...",
 		);
 		let index = 0;
 		let countriesJs = {};

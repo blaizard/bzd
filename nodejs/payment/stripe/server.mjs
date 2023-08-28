@@ -28,7 +28,7 @@ export default class StripePayment {
 				 */
 				intentCallback: (/*amount, metadata*/) => {},
 			},
-			options
+			options,
 		);
 	}
 

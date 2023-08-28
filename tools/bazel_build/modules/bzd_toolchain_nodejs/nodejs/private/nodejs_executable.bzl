@@ -1,3 +1,6 @@
+"""NodeJs executable rules."""
+
+load("@bzd_package//:defs.bzl", "BzdPackageFragmentInfo")
 load("@bzd_toolchain_nodejs//nodejs:private/utils.bzl", "BzdNodeJsInstallInfo")
 load("@bzd_utils//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
 
@@ -22,10 +25,10 @@ COMMON_EXEC_ATTRS = {
     ),
 }
 
-def _bzd_nodejs_transition_impl(settings, attr):
-    _ignore = (settings, attr)
+def _bzd_nodejs_transition_impl(_settings, _attr):
     return {"@bzd_toolchain_nodejs//:build_type": "nodejs"}
 
+# Transition to notify the dependency graph that this is a `nodejs` build.
 _bzd_nodejs_transition = transition(
     implementation = _bzd_nodejs_transition_impl,
     inputs = [],
@@ -49,9 +52,9 @@ def _bzd_nodejs_executable_impl(ctx):
             main: "main",
         },
         output = ctx.outputs.executable,
-        command = "BZD_RULE=nodejs {binary} {main} $@",
+        command = "{binary} {main} $@",
         symlinks = install.runfiles.symlinks,
-    )]
+    ), BzdPackageFragmentInfo()]
 
 bzd_nodejs_binary = rule(
     doc = "NodeJs binary executor.",

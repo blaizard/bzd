@@ -1,4 +1,4 @@
-@use "index.scss" as *;
+@use "#bzd/nodejs/styles/default/css/form/base.scss" as *;
 
 .irform-textarea {
 	@extend %field-reset;

@@ -212,5 +212,5 @@
 </script>
 
 <style lang="scss">
-	//@use "#bzd/nodejs/styles/default/css/form/file.scss" as *;
+	@use "#bzd/nodejs/styles/default/css/form/file.scss" as *;
 </style>

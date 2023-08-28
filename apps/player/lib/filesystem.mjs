@@ -177,7 +177,7 @@ export default class FileSystem {
 				}
 				Vue.set(obj, item.name, data);
 				return obj;
-			}, {})
+			}, {}),
 		);
 	}
 

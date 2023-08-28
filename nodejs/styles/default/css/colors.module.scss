@@ -12,7 +12,7 @@ $bzdGraphColorBrown: #7a5c58;
 $bzdGraphColorBlack: #333333;
 $bzdGraphColorWhite: #ffffff;
 
-// For webpack
+// For vite (also note that the extension .module.scss is necessary, see "CSS modules" with vite).
 :export {
 	red: $bzdGraphColorRed;
 	blue: $bzdGraphColorBlue;

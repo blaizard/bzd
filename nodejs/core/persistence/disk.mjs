@@ -72,7 +72,7 @@ export default class PersistenceDisk {
 				 */
 				maxDeltaB: 1024 * 1024,
 			},
-			options
+			options,
 		);
 
 		// Initialize local variables
@@ -147,14 +147,14 @@ export default class PersistenceDisk {
 							return this.isReady();
 						},
 					},
-					this.options.savepointTask
+					this.options.savepointTask,
 				);
 
 				this.savepointTaskId = TaskManager.register(
 					taskConfig.namespace,
 					taskConfig.name,
 					() => this.taskSavepoint(),
-					taskConfig
+					taskConfig,
 				);
 			}
 		} catch (e) {
@@ -390,7 +390,7 @@ export default class PersistenceDisk {
 				'The operation "' +
 				type +
 				'" is not supported, valid operations are: ' +
-				Object.keys(this.options.operations).join(", ")
+				Object.keys(this.options.operations).join(", "),
 		);
 
 		// This part has to be protected by a mutex in order to make this action atomical
@@ -471,7 +471,7 @@ export default class PersistenceDisk {
 					'The operation "' +
 					type +
 					'" is not supported, valid operations are: ' +
-					Object.keys(this.options.operations).join(", ")
+					Object.keys(this.options.operations).join(", "),
 			);
 
 			// Apply the change
@@ -654,7 +654,7 @@ export default class PersistenceDisk {
 					"Deltas on disk " +
 					JSON.stringify(delta.list) +
 					" differs from deltas in memory" +
-					JSON.stringify(this.delta.list)
+					JSON.stringify(this.delta.list),
 			);
 			Exception.assert(
 				delta.list.every((id, index) => this.delta.list[index] == id),
@@ -662,7 +662,7 @@ export default class PersistenceDisk {
 					"Deltas on disk " +
 					JSON.stringify(delta.list) +
 					" differs from deltas in memory" +
-					JSON.stringify(this.delta.list)
+					JSON.stringify(this.delta.list),
 			);
 
 			{
@@ -673,14 +673,14 @@ export default class PersistenceDisk {
 						prevId = id;
 						return isIncreasing;
 					}),
-					"Delta list is inconsistent"
+					"Delta list is inconsistent",
 				);
 			}
 
 			// Check the dirty flag
 			Exception.assert(
 				this.delta.dirty || delta.dirty == this.delta.dirty,
-				"Dirty flag is wrong: " + JSON.stringify(delta) + ", " + JSON.stringify(this.delta)
+				"Dirty flag is wrong: " + JSON.stringify(delta) + ", " + JSON.stringify(this.delta),
 			);
 		} finally {
 			this.mutex.release();

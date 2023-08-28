@@ -62,7 +62,7 @@ export default class HttpServer {
 					},
 				},
 			},
-			config
+			config,
 		);
 
 		this.event = new Event({
@@ -95,7 +95,7 @@ export default class HttpServer {
 				hsts: this._isSSL(),
 				// and Content-Security-Policy
 				contentSecurityPolicy: this._isSSL(),
-			})
+			}),
 		);
 
 		// Error handler
@@ -110,7 +110,7 @@ export default class HttpServer {
 			this.app.use(
 				Minify({
 					cache: false, // use memory cache
-				})
+				}),
 			);
 		}
 
@@ -175,7 +175,7 @@ export default class HttpServer {
 				Log.info(
 					"Web server serving at http://localhost:{}{}",
 					this.port,
-					configStrList.length ? " (" + configStrList.join(" and ") + ")" : ""
+					configStrList.length ? " (" + configStrList.join(" and ") + ")" : "",
 				);
 				resolve();
 			});
@@ -229,7 +229,7 @@ export default class HttpServer {
 							next();
 						}
 					}
-				)(fallback, { root: absolutePath })
+				)(fallback, { root: absolutePath }),
 			);
 		}
 	}
@@ -258,7 +258,7 @@ export default class HttpServer {
 				 */
 				exceptionGuard: false,
 			},
-			options
+			options,
 		);
 
 		let callbackList = [middlewareErrorHandler];

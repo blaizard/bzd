@@ -234,7 +234,7 @@
 					{
 						path: this.path,
 					},
-					this.imageEdit
+					this.imageEdit,
 				);
 				this.$emit("input", value);
 			},

@@ -79,5 +79,5 @@
 </script>
 
 <style lang="scss">
-	//@use "#bzd/nodejs/styles/default/css/form/button.scss" as *;
+	@use "#bzd/nodejs/styles/default/css/form/button.scss" as *;
 </style>

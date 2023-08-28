@@ -17,6 +17,7 @@ def formatBdl(path: str, stdout: TextIO) -> None:
 	if formattedContent != content:
 		Path(path).write_text(formattedContent, encoding="utf-8")
 
+
 def evaluateFiles(task: Callable[[str, TextIO], Any], workspace: Path, **kwargs: Any) -> bool:
 	files = Files(workspace, useGitignore=True, **kwargs)
 	worker = bzd.utils.worker.Worker(task)

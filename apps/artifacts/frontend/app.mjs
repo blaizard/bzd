@@ -1,5 +1,5 @@
 import Authentication from "#bzd/nodejs/core/authentication/token/client.mjs";
-import Permissions from "bzd/db/storage/permissions.mjs";
+import Permissions from "#bzd/nodejs/db/storage/permissions.mjs";
 import API from "#bzd/nodejs/vue/api.mjs";
 import AuthenticationPlugin from "#bzd/nodejs/vue/authentication.mjs";
 import CachePlugin from "#bzd/nodejs/vue/cache.mjs";
@@ -57,7 +57,7 @@ Vue.use(CachePlugin, {
 					response.data.map((item) => {
 						item.permissions = Permissions.makeFromEntry(item);
 						return item;
-					})
+					}),
 				);
 			} while (next);
 			list.sort((a, b) => Intl.Collator().compare(a.name, b.name));
