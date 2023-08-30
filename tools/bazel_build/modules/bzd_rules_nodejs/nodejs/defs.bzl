@@ -62,15 +62,16 @@ def bzd_nodejs_docker(name, deps, cmd, base = "@docker//:nodejs", include_metada
         deploy: The deploy rules.
     """
 
+    root_directory = "/bzd/bin"
+
     bzd_package(
         name = "{}.package".format(name),
         tags = ["nodejs"],
-        deps = deps,
+        deps = {target: root_directory + "/" + dir_name for target, dir_name in deps.items()},
         include_metadata = include_metadata,
     )
 
-    root_directory = "/bzd/bin"
-    map_to_directory = {dir_name: "{}/{}".format(root_directory, dir_name) for dir_name in deps.values()}
+    map_to_directory = {dir_name: dir_name for dir_name in deps.values()}
 
     oci_image(
         name = name,
