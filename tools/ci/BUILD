@@ -26,6 +26,6 @@ py_binary(
         "//tools/ci/jenkins:factory",
         "//tools/ci/quality_gate:factory",
         "//tools/ci/travis:factory",
-        "@bzd_sanitizer//lib:context",
+        "@bzd_sanitizer//python/bzd_sanitizer:context",
     ],
 )

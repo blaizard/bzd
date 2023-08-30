@@ -1,5 +1,5 @@
+load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper")
 load("@bzd_sanitizer_pip//:requirements.bzl", "requirement")
-load("@bzd_utils//:sh_binary_wrapper.bzl", "sh_binary_wrapper")
 load("@rules_python//python:defs.bzl", "py_binary")
 
 py_binary(
@@ -10,7 +10,7 @@ py_binary(
     main = "cli.py",
     deps = [
         "@bzd_python//bzd/utils:run",
-        "@bzd_sanitizer//lib:worker",
+        "@bzd_sanitizer//python/bzd_sanitizer:worker",
     ],
 )
 

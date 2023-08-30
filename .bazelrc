@@ -5,6 +5,9 @@ try-import .bazelrc.local
 # Add timestamps
 common --show_timestamps
 
+# Ensure the /tmp directory is empty.
+common --sandbox_tmpfs_path=/tmp
+
 # If a command fails, print out the full command line.
 # https://bazel.build/reference/command-line-reference#flag--verbose_failures
 build --verbose_failures
@@ -128,9 +131,9 @@ build:clang-tidy --output_groups=+report
 
 # Development and production build configuration
 build:dev -c dbg
-build:dev --//tools/bazel_build/settings/build=dev
+build:dev --@bzd_lib//settings/build=dev
 build:prod -c opt
-build:prod --//tools/bazel_build/settings/build=prod
+build:prod --@bzd_lib//settings/build=prod
 
 # Executors
 

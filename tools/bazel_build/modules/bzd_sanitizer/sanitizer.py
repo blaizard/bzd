@@ -6,7 +6,7 @@ import typing
 import time
 
 from bzd.utils.run import localCommand, localBazelTarget
-from lib.context import Context
+from bzd_sanitizer.context import Context
 
 
 def getFileList(workspace: pathlib.Path, path: pathlib.Path, all: bool) -> typing.List[str]:

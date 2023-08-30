@@ -2506,9 +2506,7 @@ class Flags {
 		});
 	}
 
-	/**
-	 * Generate the flag map and its metadata
-	 */
+	/// Generate the flag map and its metadata
 	async generate(config) {
 		config = Object.assign(
 			{
@@ -2647,9 +2645,7 @@ class Flags {
 		await Fs.writeFileSync(config.outputCss, countriesCssList.join("\n"));
 	}
 
-	/**
-	 * Nicely print the data to a Javascript format
-	 */
+	/// Nicely print the data to a Javascript format
 	static dataToJs(data) {
 		let lineList = [];
 		for (const countryCode in data) {
@@ -2680,7 +2676,7 @@ const ouptutPath = Path.join(process.env["BUILD_WORKSPACE_DIRECTORY"] || __dirna
 		await flags.generate({
 			width: sizeList[i].width,
 			height: sizeList[i].height,
-			importOutputPath: "~bzd/international",
+			importOutputPath: "@/nodejs/international",
 			outputJs: Path.join(ouptutPath, "countries.mjs"),
 			outputImage: Path.join(ouptutPath, "flags_" + sizeList[i].width + "x" + sizeList[i].height + ".png"),
 			outputCss: Path.join(ouptutPath, "flags_" + sizeList[i].width + "x" + sizeList[i].height + ".scss"),

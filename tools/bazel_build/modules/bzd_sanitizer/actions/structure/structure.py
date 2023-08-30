@@ -3,7 +3,7 @@ import pathlib
 import typing
 import re
 
-from lib.worker import worker
+from bzd_sanitizer.worker import worker
 
 
 def workload(args: typing.Tuple[str, str, bool, str], stdout: typing.TextIO) -> bool:

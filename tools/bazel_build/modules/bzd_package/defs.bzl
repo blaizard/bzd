@@ -1,77 +1,76 @@
 """Package rules."""
 
-BzdPackageFragmentInfo = provider("Provider for a package fragment.", fields = ["root", "files", "files_remap", "tars"])
-BzdPackageMetadataFragmentInfo = provider("Provider for metadata framgnets.", fields = ["manifests"])
-_BzdPackageMetadataInfo = provider("Provider for metadata.", fields = ["manifests"])
-
-# ---- Aspect
-
-def _bzd_package_metadata_aspect_impl(target, ctx):
-    manifests = []
-    if hasattr(ctx.rule.attr, "dep"):
-        manifests += ctx.rule.attr.dep[_BzdPackageMetadataInfo].manifests
-    if BzdPackageMetadataFragmentInfo in target:
-        manifests += target[BzdPackageMetadataFragmentInfo].manifests
-    return [_BzdPackageMetadataInfo(manifests = manifests)]
-
-_bzd_package_metadata_aspect = aspect(
-    doc = "Aspects to gather data from bzd depedencies.",
-    implementation = _bzd_package_metadata_aspect_impl,
-    attr_aspects = ["dep"],
+BzdPackageFragmentInfo = provider(
+    "Provider for a package fragment.",
+    fields = {
+        "files": "A map of depsets which key corresponds to the remapping prefix.",
+    },
 )
+
+BzdPackageMetadataFragmentInfo = provider("Provider for metadata framgents.", fields = ["manifests"])
+
+# ---- Helper
+
+def bzd_package_prefix_from_file(f, depth_from_root = 0):
+    """Create a prefix to be used for the creation of BzdPackageFragmentInfo.
+
+    Args:
+        f: The file to be used as a base.
+        depth_from_root: The depth in the directory tree of this file compared to the root.
+
+    Returns:
+        The prefix.
+    """
+
+    path = f.short_path
+    for _ in range(depth_from_root):
+        last_pkg = path.rfind("/")
+        if last_pkg == -1:
+            fail("The file '{}' does not have {} parent(s).".format(f.short_path, depth_from_root))
+        path = path[:last_pkg]
+    return path + "/"
+
+def bzd_package_to_runfiles(ctx, fragment):
+    """Convert a package fragment into runfiles.
+
+    Args:
+        ctx: The rule context to be used.
+        fragment: The package fragment to be converted.
+
+    Returns:
+        The runfiles.
+    """
+
+    symlinks = {}
+    for prefix, files in fragment.files.items():
+        for f in files.to_list():
+            path = f.short_path.removeprefix(prefix)
+            if path in symlinks:
+                fail("Path '{}' conflicts from the package fragments: {} and {}".format(path, symlinks[path], f))
+            symlinks[path] = f
+
+    return ctx.runfiles(
+        symlinks = symlinks,
+    )
 
 # ---- Packages
 
 def _bzd_package_impl(ctx):
-    package = ctx.actions.declare_file("{}.package.tar".format(ctx.label.name))
-    package_creation_commands = [
-        "tar -h -cf \"{}\" -T /dev/null".format(package.path),
-    ]
-
-    tar_cmd = "tar -h --hard-dereference -f \"{}\"".format(package.path)
+    # Create the manifest.
+    # This is a json dictionary with the remapped file path as keys and the actual file path as values.
+    manifest_data = {}
     inputs = []
-    manifests = []
-    metadata_args = []
     for target, root in ctx.attr.deps.items():
-        if _BzdPackageMetadataInfo in target:
-            manifests += target[_BzdPackageMetadataInfo].manifests
-            for manifest in manifests:
-                metadata_args += ["--input", root, manifest.path]
-
-        if BzdPackageFragmentInfo in target:
-            fragment = target[BzdPackageFragmentInfo]
-
-            if not root:
-                fail("Each package fragment must have a valid root.")
-
-            # Add single files or symlinks
-            if hasattr(fragment, "files"):
-                for f in fragment.files:
-                    inputs.append(f)
-
-                    # Convertion to short_path is needed for generated files
-                    package_creation_commands.append("{} --append \"{}\" --transform 's,^{},{}/{},'".format(tar_cmd, f.path, f.path, root, f.short_path))
-
-            # Remap single files or symlinks
-            if hasattr(fragment, "files_remap"):
-                for path, f in fragment.files_remap.items():
-                    inputs.append(f)
-                    package_creation_commands.append("{} --append \"{}\" --transform 's,^{},{}/{},'".format(tar_cmd, f.path, f.path, root, path))
-
-            # Add tar archive
-            if hasattr(fragment, "tars"):
-                for f in fragment.tars:
-                    inputs.append(f)
-                    package_creation_commands += [
-                        "mkdir -p temp",
-                        "tar -xf \"{}\" -C \"./temp\"".format(f.path),
-                        "tar -cf \"temp.tar\" --transform 's,^temp/,{}/,' --remove-files temp/".format(root),
-                        "tar -f \"temp.tar\" --delete temp/",
-                        "{} --concatenate \"temp.tar\"".format(tar_cmd),
-                    ]
-
-        else:
-            fail("Dependencies for the rule '{}' requires BzdPackageFragmentInfo provider.".format(target.label))
+        info = target[BzdPackageFragmentInfo]
+        for prefix, files in info.files.items():
+            for f in files.to_list():
+                manifest_data[root + "/" + f.short_path.removeprefix(prefix)] = f.path
+            inputs.append(files)
+    manifest = ctx.actions.declare_file("{}.package.manifest".format(ctx.label.name))
+    ctx.actions.write(
+        output = manifest,
+        content = json.encode(manifest_data),
+    )
 
     # Build buildstamp
     buildstamp = ctx.actions.declare_file("{}.buildstamp.json".format(ctx.label.name))
@@ -80,30 +79,27 @@ def _bzd_package_impl(ctx):
         outputs = [buildstamp],
         progress_message = "Generating buildstamp for {}".format(ctx.label),
         arguments = [buildstamp.path],
-        executable = ctx.attr._buildstamp.files_to_run,
+        executable = ctx.executable._buildstamp,
     )
 
-    # Merge all metadata fragments together
+    # Merge all metadata fragments together (TODO)
     metadata = ctx.actions.declare_file("{}.metadata.json".format(ctx.label.name))
     ctx.actions.run(
-        inputs = manifests + [buildstamp],
+        inputs = [buildstamp],
         outputs = [metadata],
-        progress_message = "Generating manifest for {}".format(ctx.label),
-        arguments = metadata_args + ["--input", "", buildstamp.path, metadata.path],
-        executable = ctx.attr._metadata.files_to_run,
+        progress_message = "Generating metadata for {}".format(ctx.label),
+        arguments = ["--input", "", buildstamp.path, metadata.path],
+        executable = ctx.executable._metadata,
     )
 
-    # If the metadata is request, add it to the package
-    if ctx.attr.include_metadata:
-        inputs.append(metadata)
-        package_creation_commands.append("{} --append \"{}\" --transform 's,^{},metadata.json,'".format(tar_cmd, metadata.path, metadata.path))
-
-    # Build the actual package
-    ctx.actions.run_shell(
-        inputs = inputs,
+    # Create the archive.
+    package = ctx.actions.declare_file("{}.package.tar".format(ctx.label.name))
+    ctx.actions.run(
+        inputs = depset([manifest], transitive = inputs),
         outputs = [package],
         progress_message = "Generating package for {}".format(ctx.label),
-        command = "\n".join(package_creation_commands),
+        arguments = ["--output", package.path, manifest.path],
+        executable = ctx.executable._package,
     )
 
     # In addition create an executable rule to manipulate the package
@@ -116,11 +112,10 @@ def _bzd_package_impl(ctx):
         is_executable = True,
     )
 
-    runfiles = ctx.runfiles(files = [package])
     return [
         DefaultInfo(
             executable = ctx.outputs.executable,
-            runfiles = runfiles,
+            runfiles = ctx.runfiles(files = [package]),
             files = depset([package]),
         ),
         OutputGroupInfo(metadata = [metadata]),
@@ -130,7 +125,7 @@ bzd_package = rule(
     implementation = _bzd_package_impl,
     attrs = {
         "deps": attr.label_keyed_string_dict(
-            aspects = [_bzd_package_metadata_aspect],
+            providers = [BzdPackageFragmentInfo],
             doc = "Target or files dependencies to be added to the package.",
         ),
         "include_metadata": attr.bool(
@@ -139,9 +134,16 @@ bzd_package = rule(
         ),
         "_buildstamp": attr.label(
             default = Label("@bzd_package//buildstamp:to_json"),
+            cfg = "exec",
+            executable = True,
         ),
         "_metadata": attr.label(
             default = Label("@bzd_package//metadata"),
+            cfg = "exec",
+            executable = True,
+        ),
+        "_package": attr.label(
+            default = Label("@bzd_package//:package"),
             cfg = "exec",
             executable = True,
         ),

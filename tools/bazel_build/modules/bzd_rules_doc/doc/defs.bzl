@@ -1,6 +1,6 @@
 """Rules for documentation."""
 
-load("@bzd_utils//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
+load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
 
 _DocumentationInfo = provider(
     doc = "Provider for documentation entities.",
@@ -122,7 +122,7 @@ def _doc_binary_impl(ctx):
             binary = ctx.attr._web_server,
             output = ctx.outputs.executable,
             command = "{{binary}} $@ \"{}\"".format(package.short_path),
-            extra_runfiles = [package],
+            data = [package],
         ),
         provider,
     ]
@@ -143,7 +143,7 @@ _doc_binary = rule(
         "_web_server": attr.label(
             executable = True,
             cfg = "target",
-            default = Label("@bzd_utils//:web_server"),
+            default = Label("@bzd_lib//:web_server"),
         ),
     }, **_COMMON_ATTRS),
     doc = "Create a documentation binary.",

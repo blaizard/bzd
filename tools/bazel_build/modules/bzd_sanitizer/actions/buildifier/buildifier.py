@@ -2,7 +2,7 @@ import argparse
 import pathlib
 import typing
 
-from lib.worker import worker
+from bzd_sanitizer.worker import worker
 from bzd.utils.run import localBazelBinary
 
 

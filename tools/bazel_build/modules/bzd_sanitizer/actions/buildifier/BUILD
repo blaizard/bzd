@@ -15,6 +15,6 @@ py_binary(
     visibility = ["//visibility:public"],
     deps = [
         "@bzd_python//bzd/utils:run",
-        "@bzd_sanitizer//lib:worker",
+        "@bzd_sanitizer//python/bzd_sanitizer:worker",
     ],
 )

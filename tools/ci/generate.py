@@ -8,7 +8,7 @@ from tools.ci.jenkins.factory import Jenkins
 from tools.ci.quality_gate.factory import QualityGate
 from tools.ci.travis.factory import Travis
 from tools.ci.github.factory import GitHub
-from lib.context import Context
+from bzd_sanitizer.context import Context
 
 factories: typing.Final[typing.Iterable[typing.Type[Factory]]] = (
     Jenkins,

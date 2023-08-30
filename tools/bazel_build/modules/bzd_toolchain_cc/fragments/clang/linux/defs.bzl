@@ -30,7 +30,7 @@ def linux(_module_ctx, _name):
             "@bzd_toolchain_cc//:fragments/clang/linux/linux.BUILD",
         ],
         "loads": {
-            "@bzd_utils//:sh_binary_wrapper.bzl": ["sh_binary_wrapper"],
+            "@bzd_lib//:sh_binary_wrapper.bzl": ["sh_binary_wrapper"],
         },
         "tools": {
             "clang_format": "clang_format",

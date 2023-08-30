@@ -3,7 +3,7 @@ import pathlib
 import sys
 
 from tools.shell.shell import buildAll
-from lib.context import Context
+from bzd_sanitizer.context import Context
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Tool for generating shell helper files.")

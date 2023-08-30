@@ -1,4 +1,4 @@
-load("@bzd_toolchain_nodejs//nodejs:defs.bzl", "bzd_nodejs_binary")
+load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_binary")
 load("@rules_python//python:defs.bzl", "py_binary")
 
 py_binary(

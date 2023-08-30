@@ -1,5 +1,5 @@
 load("@bzd_package//:defs.bzl", "bzd_package")
-load("@bzd_toolchain_nodejs//nodejs:defs.bzl", "bzd_nodejs_binary")
+load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_binary")
 
 bzd_nodejs_binary(
     name = "nodejs",

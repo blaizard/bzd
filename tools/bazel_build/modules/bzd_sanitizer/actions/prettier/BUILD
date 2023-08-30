@@ -1,9 +1,9 @@
-load("@bzd_toolchain_nodejs//nodejs:defs.bzl", "bzd_nodejs_extern_binary")
-load("@bzd_utils//:sh_binary_wrapper.bzl", "sh_binary_wrapper")
+load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper")
+load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_extern_binary")
 load("@rules_python//python:defs.bzl", "py_binary")
 
 bzd_nodejs_extern_binary(
-    name = "prettier_wrapper",
+    name = "prettier_binary",
     binary = "prettier/bin/prettier.cjs",
     packages = {
         "prettier": "",
@@ -16,10 +16,9 @@ py_binary(
     srcs = [
         "cli.py",
     ],
-    visibility = ["//visibility:public"],
     deps = [
         "@bzd_python//bzd/utils:run",
-        "@bzd_sanitizer//lib:worker",
+        "@bzd_sanitizer//python/bzd_sanitizer:worker",
     ],
 )
 
@@ -28,7 +27,7 @@ sh_binary_wrapper(
     command = "{binary} --prettier {prettier} $@",
     locations = {
         ":cli": "binary",
-        ":prettier_wrapper": "prettier",
+        ":prettier_binary": "prettier",
     },
     visibility = ["//visibility:public"],
 )
