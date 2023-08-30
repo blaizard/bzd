@@ -2,9 +2,9 @@
 
 load("@bazel_skylib//lib:sets.bzl", "sets")
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
-load("@bzd_package//:defs.bzl", "BzdPackageFragmentInfo", "BzdPackageMetadataFragmentInfo")
+load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
+load("@bzd_package//:defs.bzl", "BzdPackageMetadataFragmentInfo")
 load("@bzd_toolchain_cc//cc:defs.bzl", "cc_compile", "cc_link")
-load("@bzd_utils//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
 
 # ---- Providers ----
 
@@ -453,7 +453,7 @@ def _bdl_binary_execution(ctx, binaries):
         ctx = ctx,
         binary = executors_mapping[executor],
         output = ctx.outputs.executable,
-        extra_runfiles = binaries,
+        data = binaries,
         command = "{{binary}} {} $@".format(" ".join(args)),
     ), []
 
@@ -553,9 +553,6 @@ def _bdl_binary_impl(ctx):
 
     return [
         default_info,
-        BzdPackageFragmentInfo(
-            files = binaries,
-        ),
         BzdPackageMetadataFragmentInfo(
             manifests = metadata_files + metadata + build_metadata + execution_metadata,
         ),

@@ -43,6 +43,6 @@ py_binary(
     ],
     deps = [
         ":shell",
-        "@bzd_sanitizer//lib:context",
+        "@bzd_sanitizer//python/bzd_sanitizer:context",
     ],
 )

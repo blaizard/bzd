@@ -1,5 +1,5 @@
+load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper")
 load("@bzd_rules_doc//doc:defs.bzl", "doc_library")
-load("@bzd_utils//:sh_binary_wrapper.bzl", "sh_binary_wrapper")
 
 exports_files([
     ".clang-tidy",

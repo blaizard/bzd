@@ -1,5 +1,5 @@
 load("@bzd_package//:defs.bzl", "bzd_package")
-load("@bzd_toolchain_nodejs//nodejs_web:defs.bzl", "bzd_nodejs_web_binary")
+load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_web_binary")
 
 bzd_nodejs_web_binary(
     name = "frontend",

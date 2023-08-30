@@ -1,4 +1,4 @@
-load("@bzd_utils//:sh_binary_wrapper.bzl", "sh_binary_wrapper")
+load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper")
 
 sh_binary_wrapper(
     name = "clang_format",
