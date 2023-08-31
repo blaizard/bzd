@@ -1,7 +1,6 @@
-"""Registry for docker images used in this repository."""
+"""Access docker images configuration."""
 
-load("@bzd_docker//:images.bzl", "IMAGES")
-load("@rules_oci//oci:pull.bzl", "oci_pull")
+load("@bzd_rules_docker//:private/images.bzl", "IMAGES")
 
 def _bzd_docker_images_config_impl(ctx):
     config_json = ctx.actions.declare_file(ctx.attr.out.name)
@@ -22,18 +21,3 @@ bzd_docker_images_config = rule(
         ),
     },
 )
-
-def bzd_docker_pull(name, image, digest):
-    """Pull a docker image locally.
-
-    Args:
-        name: The name of the bazel target.
-        image: The image name.
-        digest: The digest of the image.
-    """
-
-    oci_pull(
-        name = name,
-        image = image,
-        digest = digest,
-    )

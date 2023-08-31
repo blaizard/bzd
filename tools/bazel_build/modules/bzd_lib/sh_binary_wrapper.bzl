@@ -16,13 +16,13 @@ def _update_runfiles(ctx, runfiles, file):
 
     return runfiles, file.files_to_run.executable
 
-def _file_to_path(ctx, file):
-    """Return the path of the file."""
+def _expand_path(ctx, path):
+    """Return the exapnded path from the rule context."""
 
-    runfiles_relative_tool_path = ctx.workspace_name + "/" + file.short_path
+    runfiles_relative_tool_path = ctx.workspace_name + "/" + path
     return "$RUNFILES_DIR/{}".format(runfiles_relative_tool_path)
 
-def sh_binary_wrapper_impl(ctx, output, binary = None, locations = {}, data = [], extra_runfiles = [], command = "{binary} $@"):
+def sh_binary_wrapper_impl(ctx, output, binary = None, locations = {}, paths = {}, data = [], extra_runfiles = [], command = "{binary} $@"):
     """Bash binary wrapper rule.
 
     Args:
@@ -30,6 +30,7 @@ def sh_binary_wrapper_impl(ctx, output, binary = None, locations = {}, data = []
         output: The output file to be generated.
         binary: The binary file.
         locations: dictionary of locations to be expanded.
+        paths: dictionary of paths to be expanded.
         data: Additional data to be added.
         extra_runfiles: Additional runfiles to be added.
         command: The command to be used.
@@ -49,9 +50,14 @@ def sh_binary_wrapper_impl(ctx, output, binary = None, locations = {}, data = []
     locations_to_key = dict(locations)
     locations_to_key.update({binary: "binary"} if binary else {})
 
+    # Expand locations
     for location, key in locations_to_key.items():
         runfiles, extra_file = _update_runfiles(ctx, runfiles, location)
-        extra_substitutions[key] = _file_to_path(ctx, extra_file)
+        extra_substitutions[key] = _expand_path(ctx, extra_file.short_path)
+
+    # Expand paths
+    for path, key in paths.items():
+        extra_substitutions[key] = _expand_path(ctx, path)
 
     command_pre = """#!/bin/bash
     set -e
@@ -81,6 +87,7 @@ def _sh_binary_wrapper_impl(ctx):
         ctx = ctx,
         binary = ctx.attr.binary,
         locations = ctx.attr.locations,
+        paths = ctx.attr.paths,
         output = ctx.outputs.executable,
         data = ctx.files.data,
         command = ctx.attr.command,
@@ -107,6 +114,9 @@ sh_binary_wrapper = rule(
             allow_files = True,
             cfg = "exec",
             doc = "Executables or files to add to the runfiles and that can be accessed via their associated string.",
+        ),
+        "paths": attr.string_dict(
+            doc = "Short paths that can be accessed via their associated string.",
         ),
     },
     executable = True,

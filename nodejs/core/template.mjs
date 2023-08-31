@@ -57,11 +57,11 @@ export default class Template {
 				curArgs = curArgs[curKey];
 
 				switch (key[index]) {
-					case "[": {
-						const curKey = getNextValueInternal();
-						curArgs = curArgs[curKey];
-						break;
-					}
+				case "[": {
+					const curKey = getNextValueInternal();
+					curArgs = curArgs[curKey];
+					break;
+				}
 				}
 			}
 			return curArgs;

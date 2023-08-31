@@ -9,8 +9,7 @@
 					v-for="(item, index) in value"
 					:key="index"
 					:class="getLegendItemClass(index)"
-					:style="getLegendItemStyle(index, item)"
-				>
+					:style="getLegendItemStyle(index, item)">
 					<span class="irgraph-legend-item-color">&nbsp;</span> {{ item.caption }}
 				</div>
 			</div>

@@ -5,8 +5,7 @@
 			:key="index"
 			:is="componentList[index]"
 			:amount="amount"
-			:metadata="metadata"
-		></component>
+			:metadata="metadata"></component>
 	</div>
 </template>
 

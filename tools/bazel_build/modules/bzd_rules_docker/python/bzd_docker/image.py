@@ -9,7 +9,7 @@ def image(identifier: str) -> str:
         identifier: The identifier of the image.
     """
 
-	config = json.loads((pathlib.Path(__file__).parent.parent / "config.json").read_text())
+	config = json.loads((pathlib.Path(__file__).parent.parent.parent / "config.json").read_text())
 	assert (
 	    identifier in config
 	), f"The identifier '{identifier}' is not registered as a valid docker image, please check 'tools/docker_images/register.bzl'."

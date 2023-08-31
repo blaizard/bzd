@@ -44,14 +44,14 @@
 						name: "uid",
 						caption: "e-mail",
 						validation: "mandatory",
-						pre: { html: '<i class="bzd-icon-email"></i>' },
+						pre: { html: "<i class=\"bzd-icon-email\"></i>" },
 					},
 					{
 						type: "Password",
 						name: "password",
 						validation: "mandatory",
 						caption: "Password",
-						pre: { html: '<i class="bzd-icon-lock"></i>' },
+						pre: { html: "<i class=\"bzd-icon-lock\"></i>" },
 					},
 					{ type: "Checkbox", name: "persistent", caption: "", text: "Stay connected" },
 					{ type: "Button", action: "approve", content: "Login", align: "right" },
@@ -65,9 +65,11 @@
 				try {
 					await this.$api.login(this.login.uid, this.login.password, this.login.persistent);
 					this.$routerDispatch(this.redirect || "/");
-				} catch (e) {
+				}
+				catch (e) {
 					this.error = "Wrong username or password";
-				} finally {
+				}
+				finally {
 					this.loading = false;
 				}
 			},

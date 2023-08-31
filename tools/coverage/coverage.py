@@ -34,11 +34,19 @@ if __name__ == "__main__":
 	reportUpdate = Path("{}.update".format(args.report.as_posix()))
 	with open(args.workspace / args.report, "r") as fin:
 		with open(args.workspace / reportUpdate, "w") as fout:
+			ignore = False
 			for line in fin:
 				if line.startswith("SF:"):
 					data["files"] += 1
-					line = re.sub(r"^.*\.runfiles/__main__/", "SF:", line)
-				fout.write(line)
+					path = Path(line[3:].strip())
+					if (args.workspace / path).is_file():
+						line = f"SF:{path}\n"
+						ignore = False
+					else:
+						ignore = True
+						print(f"Ignoring file {path}")
+				if not ignore:
+					fout.write(line)
 
 	# Generate the HTML output
 	result = localCommand(

@@ -3,8 +3,7 @@
 		:class="containerClass"
 		:description="descriptionDropdown"
 		:value="value"
-		@input="$emit('input', $event)"
-	>
+		@input="$emit('input', $event)">
 	</Autocomplete>
 </template>
 

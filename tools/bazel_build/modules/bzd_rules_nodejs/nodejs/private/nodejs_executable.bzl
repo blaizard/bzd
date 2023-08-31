@@ -50,9 +50,12 @@ def _bzd_nodejs_executable_impl(ctx):
             bzd_package_prefix_from_file(install.package_json, depth_from_root = 1): install.files,
         },
     )
+    runfiles = bzd_package_to_runfiles(ctx, package)
 
     # Look for the entry point.
-    main = install.transpiled[ctx.file.main.short_path] if ctx.file.main.short_path in install.transpiled else ctx.file.main
+    paths = {
+        install.transpiled.get(ctx.file.main.short_path, ctx.file.main.short_path): "main",
+    }
 
     # Gather toolchain executable.
     executor = ctx.attr.executor if ctx.attr.executor else ctx.toolchains["@bzd_rules_nodejs//nodejs:toolchain_type"].executable.node
@@ -62,7 +65,6 @@ def _bzd_nodejs_executable_impl(ctx):
         locations = {
             ctx.attr._coverage_executor: "coverage",
             executor: "executor",
-            main: "main",
         }
         command = "{coverage} {executor} {main} $@ && cp \"coverage/lcov.info\" \"$COVERAGE_OUTPUT_FILE\""
         providers = [
@@ -72,10 +74,10 @@ def _bzd_nodejs_executable_impl(ctx):
                 extensions = ["js", "cjs", "mjs"],
             ),
         ]
+
     else:
         locations = {
             executor: "executor",
-            main: "main",
         }
         command = "{executor} {main} $@"
         providers = []
@@ -83,9 +85,10 @@ def _bzd_nodejs_executable_impl(ctx):
     return [sh_binary_wrapper_impl(
         ctx = ctx,
         locations = locations,
+        paths = paths,
         output = ctx.outputs.executable,
         command = command,
-        extra_runfiles = [bzd_package_to_runfiles(ctx, package)],
+        extra_runfiles = [runfiles],
     ), package] + providers
 
 bzd_nodejs_binary = rule(

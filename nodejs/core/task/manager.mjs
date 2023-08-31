@@ -128,7 +128,8 @@ export default class Manager {
 		let isValid = false;
 		try {
 			isValid = task.isValid;
-		} catch (e) {
+		}
+		catch (e) {
 			Exception.fromError(e).print("Task " + task + " validation failed");
 		}
 
@@ -237,9 +238,11 @@ export default class Manager {
 						++task.iteration;
 						await task.action();
 					}
-				} catch (e) {
+				}
+				catch (e) {
 					Exception.fromError(e).print("Task " + task + " execution error");
-				} finally {
+				}
+				finally {
 					task.status = Task.STATUS_IDLE;
 				}
 
@@ -247,7 +250,8 @@ export default class Manager {
 				// it will not insert the task but unregister it
 				this.scheduleTaskIfValid(task, task.intervalMs, /*triggerTaskScheduler*/ false);
 			}
-		} finally {
+		}
+		finally {
 			// Mark the scheduler as not running anymore
 			this.schedulerInstance = null;
 			this.schedulerRunning = false;
@@ -313,7 +317,8 @@ export default class Manager {
 
 			if (queue[currentIndex].timestamp < task.timestamp) {
 				minIndex = currentIndex + 1;
-			} else if (queue[currentIndex].timestamp > task.timestamp) {
+			}
+			else if (queue[currentIndex].timestamp > task.timestamp) {
 				maxIndex = currentIndex - 1;
 			}
 			// Found exact match. From there look for the exact task
@@ -350,7 +355,8 @@ export default class Manager {
 
 			if (queue[currentIndex].timestamp < task.timestamp) {
 				minIndex = currentIndex + 1;
-			} else if (queue[currentIndex].timestamp > task.timestamp) {
+			}
+			else if (queue[currentIndex].timestamp > task.timestamp) {
 				maxIndex = currentIndex - 1;
 			}
 			// Found value equal

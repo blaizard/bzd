@@ -43,6 +43,7 @@ if __name__ == "__main__":
 
 	args = parser.parse_args()
 
+	isSuccess = True
 	isSuccess &= evaluateFiles(formatBdl, args.workspace, include=["**/*.bdl"])
 
 	sys.exit(0 if isSuccess else 1)

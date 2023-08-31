@@ -21,8 +21,7 @@
 				<div
 					class="bzd-layout-menu-background"
 					@click.stop="hideMenu"
-					v-show="isMenuShow && !isDock && !isMobile"
-				></div>
+					v-show="isMenuShow && !isDock && !isMobile"></div>
 			</transition>
 			<transition name="bzd-translate">
 				<div class="bzd-layout-menu-content" @click.stop="hideMenu" v-show="isMenuShow || (isDock && !isMobile)">
@@ -42,16 +41,14 @@
 					v-for="entry in $notification.entries"
 					:key="entry.key"
 					:class="getNotificationClass(entry)"
-					:style="getNotificationStyle(entry)"
-				>
+					:style="getNotificationStyle(entry)">
 					<div class="bzd-notification-content">{{ entry.message }}</div>
 					<div
 						v-for="(action, index) in entry.actions"
 						:key="index"
 						class="bzd-notification-action"
 						@click="action.callback(entry)"
-						v-html="getActionHtml(action)"
-					></div>
+						v-html="getActionHtml(action)"></div>
 				</div>
 			</template>
 
@@ -104,8 +101,8 @@
 		methods: {
 			getActionHtml(action) {
 				switch (action.id) {
-					case "close":
-						return '<i class="bzd-icon-close"></i>';
+				case "close":
+					return "<i class=\"bzd-icon-close\"></i>";
 				}
 				return action.html;
 			},

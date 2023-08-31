@@ -1,10 +1,11 @@
 load("@rules_python//python:defs.bzl", "py_library")
 
 py_library(
-    name = "python",
-    srcs = ["python.py"],
+    name = "image",
+    srcs = ["image.py"],
     data = [
-        "@bzd_docker//:config.json",
+        "@bzd_rules_docker//:config.json",
     ],
+    imports = [".."],
     visibility = ["//visibility:public"],
 )

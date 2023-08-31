@@ -7,8 +7,7 @@
 			:tabindex="disable ? undefined : 0"
 			:disabled="disable"
 			@focus="setActive"
-			@blur="setInactive"
-		/>
+			@blur="setInactive"/>
 		<label :for="'id-checkbox-' + uid"><slot v-if="text.length == 0"></slot>{{ text }}</label>
 	</span>
 </template>

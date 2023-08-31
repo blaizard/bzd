@@ -140,39 +140,56 @@
 				for (const arg of args) {
 					if (arg == 0) {
 						this.resetTerminalStyle();
-					} else if (arg == 1) {
+					}
+					else if (arg == 1) {
 						this.terminalStyle.fontWeight = "bold";
-					} else if (arg == 3) {
+					}
+					else if (arg == 3) {
 						this.terminalStyle.fontStyle = "italic";
-					} else if (arg == 4) {
+					}
+					else if (arg == 4) {
 						this.terminalStyle.textDecoration = "underline";
-					} else if (arg == 8) {
+					}
+					else if (arg == 8) {
 						this.terminalStyle.display = "none";
-					} else if (arg == 9) {
+					}
+					else if (arg == 9) {
 						this.terminalStyle.textDecoration = "line-through";
-					} else if (arg == 22) {
+					}
+					else if (arg == 22) {
 						this.terminalStyle.fontWeight = "normal";
-					} else if (arg == 23) {
+					}
+					else if (arg == 23) {
 						this.terminalStyle.fontStyle = "normal";
-					} else if (arg == 24) {
+					}
+					else if (arg == 24) {
 						this.terminalStyle.textDecoration = "none";
-					} else if (arg == 28) {
+					}
+					else if (arg == 28) {
 						this.terminalStyle.display = "inline";
-					} else if (arg == 29) {
+					}
+					else if (arg == 29) {
 						this.terminalStyle.textDecoration = "none";
-					} else if (arg >= 30 && arg <= 37) {
+					}
+					else if (arg >= 30 && arg <= 37) {
 						this.terminalStyle.colorText = colors8[arg - 30];
-					} else if (arg == 39) {
+					}
+					else if (arg == 39) {
 						this.terminalStyle.colorText = "inherit";
-					} else if (arg >= 40 && arg <= 47) {
+					}
+					else if (arg >= 40 && arg <= 47) {
 						this.terminalStyle.colorBackground = colors8[arg - 40];
-					} else if (arg == 49) {
+					}
+					else if (arg == 49) {
 						this.terminalStyle.colorText = "transparent";
-					} else if (arg >= 90 && arg <= 97) {
+					}
+					else if (arg >= 90 && arg <= 97) {
 						this.terminalStyle.colorText = colorsBright8[arg - 90];
-					} else if (arg >= 100 && arg <= 107) {
+					}
+					else if (arg >= 100 && arg <= 107) {
 						this.terminalStyle.colorBackground = colorsBright8[arg - 100];
-					} else {
+					}
+					else {
 						return false;
 					}
 				}
@@ -199,14 +216,18 @@
 							++this.y;
 							this.x = 0;
 							break;
-						} else if (c == "\r") {
+						}
+						else if (c == "\r") {
 							this.x = 0;
 							break;
-						} else if (c == "\b") {
+						}
+						else if (c == "\b") {
 							this.x = Math.max(this.x - 1, 0);
-						} else if (c == "\x07") {
+						}
+						else if (c == "\x07") {
 							// Bell character - ignore
-						} else {
+						}
+						else {
 							this.$set(this.content[this.y], this.x, [c, this.styleId]);
 							++this.x;
 						}
@@ -269,7 +290,8 @@
 				// Erase the entire line
 				else if (arg == 2) {
 					this.$set(this.content, this.y, []);
-				} else {
+				}
+				else {
 					return false;
 				}
 				return true;
@@ -292,7 +314,8 @@
 				// Erase saved lines
 				else if (arg == 3) {
 					// Ignore.
-				} else {
+				}
+				else {
 					return false;
 				}
 				return true;

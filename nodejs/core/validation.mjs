@@ -40,18 +40,18 @@ class Constraint {
 	castArgsToType() {
 		for (const i in this.args) {
 			switch (this.entry.type) {
-				case "integer":
-					this.args[i] = Constraint.getAndAssertInteger(this.args[i]);
-					break;
-				case "float":
-					this.args[i] = Constraint.getAndAssertFloat(this.args[i]);
-					break;
-				case "boolean":
-					this.args[i] = Constraint.getAndAssertBoolean(this.args[i]);
-					break;
-				case "string":
-					this.args[i] = String(this.args[i]);
-					break;
+			case "integer":
+				this.args[i] = Constraint.getAndAssertInteger(this.args[i]);
+				break;
+			case "float":
+				this.args[i] = Constraint.getAndAssertFloat(this.args[i]);
+				break;
+			case "boolean":
+				this.args[i] = Constraint.getAndAssertBoolean(this.args[i]);
+				break;
+			case "string":
+				this.args[i] = String(this.args[i]);
+				break;
 			}
 		}
 	}
@@ -152,7 +152,8 @@ export default class Validation {
 						const args = (m[2] || "").split(",").filter((arg) => arg !== "");
 						this._processConstraint(processedSchema, key, name, args);
 					});
-			} else {
+			}
+			else {
 				Exception.unreachable("Constraints type is unsupported: {:j}", constraints);
 			}
 		}
@@ -217,15 +218,15 @@ export default class Validation {
 				if (key in values) {
 					let value = values[key];
 					switch (this.schema[key].type) {
-						case "integer":
-							value = Constraint.getAndAssertInteger(value, result, key);
-							break;
-						case "float":
-							value = Constraint.getAndAssertFloat(value, result, key);
-							break;
-						case "boolean":
-							value = Constraint.getAndAssertBoolean(value, result, key);
-							break;
+					case "integer":
+						value = Constraint.getAndAssertInteger(value, result, key);
+						break;
+					case "float":
+						value = Constraint.getAndAssertFloat(value, result, key);
+						break;
+					case "boolean":
+						value = Constraint.getAndAssertBoolean(value, result, key);
+						break;
 					}
 					if (value !== undefined) {
 						this.schema[key].constraints.forEach((constraint) => constraint(result, value, values));
@@ -242,23 +243,24 @@ export default class Validation {
 		}
 
 		switch (options.output) {
-			case "throw":
-				{
-					const keys = Object.keys(result);
-					if (keys.length == 1) {
-						throw new Exception("'{}' does not validate: {}", keys[0], result[keys[0]].join(", "));
-					} else if (keys.length > 1) {
-						const message = keys.map((key) => {
-							return String(key) + ": (" + result[key].join(", ") + ")";
-						});
-						throw new Exception("Some values do not validate: {}", message.join("; "));
-					}
+		case "throw":
+			{
+				const keys = Object.keys(result);
+				if (keys.length == 1) {
+					throw new Exception("'{}' does not validate: {}", keys[0], result[keys[0]].join(", "));
 				}
-				break;
-			case "return":
-				return result;
-			default:
-				Exception.unreachable("Unsupported output type: '{}'", options.output);
+				else if (keys.length > 1) {
+					const message = keys.map((key) => {
+						return String(key) + ": (" + result[key].join(", ") + ")";
+					});
+					throw new Exception("Some values do not validate: {}", message.join("; "));
+				}
+			}
+			break;
+		case "return":
+			return result;
+		default:
+			Exception.unreachable("Unsupported output type: '{}'", options.output);
 		}
 	}
 
@@ -286,7 +288,8 @@ export default class Validation {
 					return (result, value) => {
 						if (this.args.length == 1) {
 							this.assert(result, this.args.includes(value), "must be equal to {}", this.args[0]);
-						} else {
+						}
+						else {
 							this.assert(result, this.args.includes(value), "must be equal to one of {:j}", this.args);
 						}
 					};
@@ -299,17 +302,17 @@ export default class Validation {
 				install() {
 					this.castArgsToType();
 					switch (this.entry.type) {
-						case "string":
-							return (result, value) => {
-								this.assert(result, value.length >= this.args[0], "at least {} characters", this.args[0]);
-							};
-						case "integer":
-						case "float":
-							return (result, value) => {
-								this.assert(result, value >= this.args[0], "greater or equal to {}", this.args[0]);
-							};
-						default:
-							Exception.unreachable("Unsupported format for 'min': {}", this.entry.type);
+					case "string":
+						return (result, value) => {
+							this.assert(result, value.length >= this.args[0], "at least {} characters", this.args[0]);
+						};
+					case "integer":
+					case "float":
+						return (result, value) => {
+							this.assert(result, value >= this.args[0], "greater or equal to {}", this.args[0]);
+						};
+					default:
+						Exception.unreachable("Unsupported format for 'min': {}", this.entry.type);
 					}
 				}
 			},

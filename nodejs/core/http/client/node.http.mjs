@@ -51,7 +51,8 @@ export default async function request(url, options) {
 				if (options.expect == "stream") {
 					result.data = response;
 					resolve(result);
-				} else {
+				}
+				else {
 					let data = "";
 					response.on("data", (chunk) => {
 						data += chunk;
@@ -72,9 +73,11 @@ export default async function request(url, options) {
 		// A read stream
 		else if (typeof options.data == "object" && typeof options.data.pipe == "function") {
 			options.data.pipe(req, { end: true });
-		} else if (typeof options.data == "undefined") {
+		}
+		else if (typeof options.data == "undefined") {
 			req.end();
-		} else {
+		}
+		else {
 			reject(new Exception("Unsupported data format: {:j}", options.data));
 		}
 

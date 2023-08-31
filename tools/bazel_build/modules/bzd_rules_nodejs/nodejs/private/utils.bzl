@@ -9,11 +9,9 @@ BzdNodeJsDepsInfo = provider("Provider for dependencies information", fields = [
 def bzd_nodejs_make_provider(ctx):
     """Create a provider from a rule context."""
 
-    tool_depsets = [tool[DefaultInfo].default_runfiles.files for tool in ctx.attr.tools]
-
     return BzdNodeJsDepsInfo(
         srcs = depset(ctx.files.srcs),
-        data = depset(ctx.files.data, transitive = tool_depsets),
+        data = depset(ctx.files.data),
         packages = dict(ctx.attr.packages),
     )
 

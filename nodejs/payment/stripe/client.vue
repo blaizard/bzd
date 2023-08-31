@@ -30,7 +30,7 @@
 			const style = {
 				base: {
 					color: Colors.black,
-					fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+					fontFamily: "\"Helvetica Neue\", Helvetica, sans-serif",
 					fontSmoothing: "antialiased",
 					fontSize: "16px",
 					"::placeholder": {
@@ -109,12 +109,14 @@
 
 					if (result.error) {
 						this.setError(result.error.message);
-					} else {
+					}
+					else {
 						if (result.paymentIntent.status === "succeeded") {
 							await this.confirmPayment(intent.id, this.metadata);
 						}
 					}
-				} finally {
+				}
+				finally {
 					this.loading = false;
 				}
 			},

@@ -4,25 +4,19 @@
 		<div class="metadata">
 			<div v-for="key in Object.keys(item || {}).sort(sortStrategy)" class="metadata-entry" :key="key">
 				<span class="metadata-entry-key">{{ key }}</span>
-				<span class="metadata-entry-value"
-					><code>{{ displayValue(key, item[key]) }}</code></span
-				>
+				<span class="metadata-entry-value"><code>{{ displayValue(key, item[key]) }}</code></span>
 			</div>
 		</div>
 		<template v-if="isActions">
 			<h2>Actions</h2>
-			<a v-if="isDownload(item)" :href="downloadLink()" :download="name"
-				><Button action="approve" content="Download"></Button
-			></a>
+			<a v-if="isDownload(item)" :href="downloadLink()" :download="name"><Button action="approve" content="Download"></Button></a>
 		</template>
 		<template v-if="innerItemList">
 			<h2>
 				Contains
-				<small
-					>({{ innerItemList.length }}
+				<small>({{ innerItemList.length }}
 					<template v-if="innerItemList.length > 1">items)</template>
-					<template v-else>item)</template></small
-				>
+					<template v-else>item)</template></small>
 			</h2>
 			<table>
 				<tr>
@@ -39,8 +33,7 @@
 							class="bzd-icon-upload"
 							:href="downloadLink(item)"
 							:download="item.name"
-							v-tooltip="tooltipActionDownload"
-						></a>
+							v-tooltip="tooltipActionDownload"></a>
 					</td>
 				</tr>
 			</table>
@@ -108,10 +101,10 @@
 			},
 			displayValue(key, value) {
 				switch (key) {
-					case "size":
-						return bytesToString(value);
-					default:
-						return value;
+				case "size":
+					return bytesToString(value);
+				default:
+					return value;
 				}
 			},
 		},
