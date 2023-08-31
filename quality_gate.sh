@@ -13,7 +13,7 @@ echo  "==== [normal] clang prod ==============================="
 echo  "==== [normal] gcc prod ==============================="
 ./tools/bazel test ... --output_groups=+metadata --config=gcc --config=prod --config=cc --platform_suffix=gcc-prod $EXTRA_FLAGS
 echo  "==== [normal] esp32 prod ==============================="
-./tools/bazel run tools/docker_images:xtensa_qemu $EXTRA_FLAGS
+./tools/bazel run @docker//:xtensa_qemu.pull $EXTRA_FLAGS
 ./tools/bazel test ... --output_groups=+metadata --config=esp32 --config=prod --config=cc --platform_suffix=esp32-prod $EXTRA_FLAGS
 echo  "==== [stress] dev (100 runs) ==============================="
 ./tools/bazel test ... --build_tests_only --test_tag_filters=stress,-cc-coverage --config=dev --runs_per_test=100 --platform_suffix=stress-dev $EXTRA_FLAGS
