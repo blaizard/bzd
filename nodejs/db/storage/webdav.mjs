@@ -64,7 +64,8 @@ export default class StorageWebdav extends Storage {
 			await this.fetch.request(fullPath, {
 				method: "propfind",
 			});
-		} catch (e) {
+		}
+		catch (e) {
 			if (e instanceof HttpClientException) {
 				if (e.code == 404 /*Not Found*/) {
 					return false;

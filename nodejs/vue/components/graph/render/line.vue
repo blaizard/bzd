@@ -7,8 +7,7 @@
 			:y1="data[1]"
 			:x2="data[0]"
 			:y2="data[1]"
-			:class="getPointClass(index)"
-		/>
+			:class="getPointClass(index)"/>
 	</g>
 </template>
 

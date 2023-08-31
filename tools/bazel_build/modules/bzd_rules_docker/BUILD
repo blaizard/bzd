@@ -1,5 +1,5 @@
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
-load("@bzd_docker//:defs.bzl", "bzd_docker_images_config")
+load("@bzd_rules_docker//:defs.bzl", "bzd_docker_images_config")
 
 exports_files(["defs.bzl"])
 

@@ -46,7 +46,8 @@ export default class Mutex {
 					this.release();
 				});
 			});
-		} else {
+		}
+		else {
 			this.isLock = false;
 		}
 	}

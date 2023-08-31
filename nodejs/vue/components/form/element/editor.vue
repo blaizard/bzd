@@ -12,8 +12,7 @@
 			:contenteditable="!disable"
 			:description="contentDescription"
 			:data-placeholder="placeholder"
-			v-html="get(/*freezeOnEdit*/ true)"
-		>
+			v-html="get(/*freezeOnEdit*/ true)">
 		</ElementTextarea>
 	</div>
 </template>
@@ -70,30 +69,30 @@
 			toolbarElements() {
 				const supportedElements = {
 					separator: {
-						html: '<div class="irform-editor-toolbar-separator"></div>',
+						html: "<div class=\"irform-editor-toolbar-separator\"></div>",
 					},
 					bold: {
-						html: '<i class="bzd-icon-bold"></i>',
+						html: "<i class=\"bzd-icon-bold\"></i>",
 						type: "button",
 						click: () => this.actionOnSelection("bold"),
 					},
 					italic: {
-						html: '<i class="bzd-icon-italic"></i>',
+						html: "<i class=\"bzd-icon-italic\"></i>",
 						type: "button",
 						click: () => this.actionOnSelection("italic"),
 					},
 					underline: {
-						html: '<i class="bzd-icon-underline"></i>',
+						html: "<i class=\"bzd-icon-underline\"></i>",
 						type: "button",
 						click: () => this.actionOnSelection("underline"),
 					},
 					strike: {
-						html: '<i class="bzd-icon-strike_through"></i>',
+						html: "<i class=\"bzd-icon-strike_through\"></i>",
 						type: "button",
 						click: () => this.actionOnSelection("strikeThrough"),
 					},
 					undo: {
-						html: '<i class="bzd-icon-undo"></i>',
+						html: "<i class=\"bzd-icon-undo\"></i>",
 						type: "button",
 						click: () => {
 							if (this.history.length) {
@@ -102,52 +101,52 @@
 						},
 					},
 					justifyLeft: {
-						html: '<i class="bzd-icon-justify_left"></i>',
+						html: "<i class=\"bzd-icon-justify_left\"></i>",
 						type: "button",
 						click: () => this.action("justifyLeft"),
 					},
 					justifyCenter: {
-						html: '<i class="bzd-icon-justify_center"></i>',
+						html: "<i class=\"bzd-icon-justify_center\"></i>",
 						type: "button",
 						click: () => this.action("justifyCenter"),
 					},
 					justifyRight: {
-						html: '<i class="bzd-icon-justify_right"></i>',
+						html: "<i class=\"bzd-icon-justify_right\"></i>",
 						type: "button",
 						click: () => this.action("justifyRight"),
 					},
 					justify: {
-						html: '<i class="bzd-icon-justify"></i>',
+						html: "<i class=\"bzd-icon-justify\"></i>",
 						type: "button",
 						click: () => this.action("justifyFull"),
 					},
 					indent: {
-						html: '<i class="bzd-icon-indent"></i>',
+						html: "<i class=\"bzd-icon-indent\"></i>",
 						type: "button",
 						click: () => this.action("indent"),
 					},
 					unindent: {
-						html: '<i class="bzd-icon-unindent"></i>',
+						html: "<i class=\"bzd-icon-unindent\"></i>",
 						type: "button",
 						click: () => this.action("outdent"),
 					},
 					orderedList: {
-						html: '<i class="bzd-icon-ordered_list"></i>',
+						html: "<i class=\"bzd-icon-ordered_list\"></i>",
 						type: "button",
 						click: () => this.action("insertOrderedList"),
 					},
 					unorderedList: {
-						html: '<i class="bzd-icon-unordered_list"></i>',
+						html: "<i class=\"bzd-icon-unordered_list\"></i>",
 						type: "button",
 						click: () => this.action("insertUnorderedList"),
 					},
 					quote: {
-						html: '<i class="bzd-icon-quote"></i>',
+						html: "<i class=\"bzd-icon-quote\"></i>",
 						type: "button",
 						click: () => this.action("formatBlock", "blockquote"),
 					},
 					clearFormat: {
-						html: '<i class="bzd-icon-clear_format"></i>',
+						html: "<i class=\"bzd-icon-clear_format\"></i>",
 						type: "button",
 						click: () => this.actionRemoveFormat(),
 					},
@@ -177,10 +176,10 @@
 		methods: {
 			generateToolbarElement(element) {
 				switch (element.type) {
-					case "button":
-						return '<div class="irform-editor-toolbar-element">' + element.html + "</div>";
-					default:
-						return element.html;
+				case "button":
+					return "<div class=\"irform-editor-toolbar-element\">" + element.html + "</div>";
+				default:
+					return element.html;
 				}
 			},
 			isTextSelected() {
@@ -210,7 +209,8 @@
 			actionRemoveFormat() {
 				if (this.isTextSelected()) {
 					document.execCommand("removeFormat", false, null);
-				} else {
+				}
+				else {
 					this.contentElement.innerHTML = this.contentElement.innerText;
 					this.contentElement.dispatchEvent(new Event("input"));
 				}

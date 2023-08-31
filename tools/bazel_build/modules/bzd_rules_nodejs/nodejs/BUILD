@@ -36,6 +36,6 @@ bzl_library(
         "@bazel_skylib//rules:common_settings",
         "@bzd_lib//:sh_binary_wrapper",
         "@bzd_package//:defs",
-        "@rules_oci//oci:defs",
+        "@bzd_rules_docker//:defs",
     ],
 )

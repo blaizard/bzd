@@ -38,7 +38,8 @@ export async function* streamChunks(stream) {
 			}
 			yield value;
 		}
-	} finally {
+	}
+	finally {
 		reader.releaseLock();
 	}
 }

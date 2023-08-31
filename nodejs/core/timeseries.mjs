@@ -35,7 +35,8 @@ export default class TimeSeries {
 		try {
 			this.data = data;
 			return await callback(this);
-		} finally {
+		}
+		finally {
 			this.data = dataSaved;
 		}
 	}
@@ -67,7 +68,8 @@ export default class TimeSeries {
 	getTimestamp(index) {
 		if (index >= 0 && index < this.data.length) {
 			return this.data[index][0];
-		} else if (index < 0 && -index <= this.data.length) {
+		}
+		else if (index < 0 && -index <= this.data.length) {
 			return this.data[this.data.length + index][0];
 		}
 		return null;
@@ -95,14 +97,14 @@ export default class TimeSeries {
 		}
 
 		switch (mode) {
-			case TimeSeries.FIND_EXACT_MACTH:
-				return null;
-			case TimeSeries.FIND_IMMEDIATELY_BEFORE:
-				return index - 1;
-			case TimeSeries.FIND_IMMEDIATELY_AFTER:
-				return index;
-			default:
-				Exception.unreachable("Unsupported find mode: '{}'", mode);
+		case TimeSeries.FIND_EXACT_MACTH:
+			return null;
+		case TimeSeries.FIND_IMMEDIATELY_BEFORE:
+			return index - 1;
+		case TimeSeries.FIND_IMMEDIATELY_AFTER:
+			return index;
+		default:
+			Exception.unreachable("Unsupported find mode: '{}'", mode);
 		}
 	}
 
@@ -115,7 +117,8 @@ export default class TimeSeries {
 		if (this.options.unique && index < this.data.length && this.data[index][0] == timestamp) {
 			const newData = this.options.uniqueMerge(this.data[index][1], data, timestamp);
 			this.data[index][1] = newData;
-		} else {
+		}
+		else {
 			this.data.splice(index, 0, [timestamp, data]);
 		}
 	}
@@ -171,7 +174,8 @@ export default class TimeSeries {
 		for (let index = 0; index < this.data.length; ++index) {
 			if (!this.options.unique && curTimestamp > this.data[index][0]) {
 				return false;
-			} else if (this.options.unique && curTimestamp >= this.data[index][0]) {
+			}
+			else if (this.options.unique && curTimestamp >= this.data[index][0]) {
 				return false;
 			}
 			curTimestamp = this.data[index][0];
@@ -222,9 +226,11 @@ export default class TimeSeries {
 			const timestampCurrent = this.data[indexCurrent][0];
 			if (timestampCurrent == timestamp) {
 				return indexCurrent;
-			} else if (timestampCurrent < timestamp) {
+			}
+			else if (timestampCurrent < timestamp) {
 				indexStart = indexCurrent + 1;
-			} else {
+			}
+			else {
 				indexEnd = indexCurrent - 1;
 			}
 		}

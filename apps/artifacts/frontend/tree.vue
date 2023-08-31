@@ -8,8 +8,7 @@
 					<i
 						v-if="depth == 0 && $authentication.isAuthenticated"
 						class="bzd-icon-configuration"
-						@click="handleConfig(item.name)"
-					></i>
+						@click="handleConfig(item.name)"></i>
 				</span>
 			</div>
 			<div v-if="item.name in expanded" :key="item.name + '.expanded'">
@@ -18,8 +17,7 @@
 					:depth="depth + 1"
 					:showPath="showPath"
 					class="indent"
-					@item="handleItemPropagation(item.name, $event)"
-				></TreeDirectory>
+					@item="handleItemPropagation(item.name, $event)"></TreeDirectory>
 			</div>
 		</template>
 		<div v-if="isError" class="error">{{ error }}</div>
@@ -94,7 +92,8 @@
 						});
 						this.updateExpand();
 					}, /*throwOnError*/ true);
-				} catch (e) {
+				}
+				catch (e) {
 					this.error = e;
 				}
 			},
@@ -128,7 +127,8 @@
 				const name = item.name;
 				if (name in this.expanded) {
 					this.$delete(this.expanded, name);
-				} else {
+				}
+				else {
 					// Select the item, only if it is not expanded already.
 					this.$emit("item", {
 						item: item,

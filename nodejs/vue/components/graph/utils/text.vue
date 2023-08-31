@@ -23,12 +23,12 @@
 		computed: {
 			computedHAlign() {
 				switch (this.hAlign) {
-					case "left":
-						return "start";
-					case "middle":
-						return "middle";
-					case "right":
-						return "end";
+				case "left":
+					return "start";
+				case "middle":
+					return "middle";
+				case "right":
+					return "end";
 				}
 			},
 		},

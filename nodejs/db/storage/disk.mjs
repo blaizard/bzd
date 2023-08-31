@@ -26,21 +26,25 @@ async function getMetadata(filePath) {
 	if (stat.isFile()) {
 		isList = false;
 		type = Path.extname(filePath).slice(1);
-	} else if (stat.isDirectory()) {
+	}
+	else if (stat.isDirectory()) {
 		isRead = false;
 		isWrite = false;
 		isDelete = false;
 		type = "directory";
-	} else {
+	}
+	else {
 		isRead = false;
 		isWrite = false;
 		isDelete = false;
 		isList = false;
 		if (stat.isBlockDevice() || stat.isCharacterDevice()) {
 			type = "device";
-		} else if (stat.isFIFO()) {
+		}
+		else if (stat.isFIFO()) {
 			type = "pipe";
-		} else if (stat.isSocket()) {
+		}
+		else if (stat.isSocket()) {
 			type = "socket";
 		}
 	}
@@ -122,7 +126,8 @@ export default class StorageDisk extends Storage {
 						// Try to resolve the actual path.
 						try {
 							filePath = await FileSystem.realpath(filePath);
-						} catch (e) {
+						}
+						catch (e) {
 							// Ignore
 						}
 					}

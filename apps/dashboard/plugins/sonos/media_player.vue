@@ -72,7 +72,8 @@
 			onStateClick() {
 				if (this.metadata.state == "pause") {
 					this.$emit("event", "play");
-				} else {
+				}
+				else {
 					this.$emit("event", "pause");
 				}
 			},

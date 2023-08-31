@@ -87,7 +87,8 @@ export default class TimeseriesElasticsearch extends Timeseries {
 				paging,
 				result.hits.total.value,
 			);
-		} catch (e) {
+		}
+		catch (e) {
 			if (e instanceof HttpClientException) {
 				if (e.code == 404 /*Not Found*/) {
 					return new CollectionPaging([]);

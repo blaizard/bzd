@@ -11,7 +11,7 @@ bazel_dep(name = "bzd_platforms", version = "1.0")
 bazel_dep(name = "bzd_sanitizer", version = "1.0")
 bazel_dep(name = "bzd_package", version = "1.0")
 bazel_dep(name = "bzd_bundle", version = "1.0")
-bazel_dep(name = "bzd_docker", version = "1.0")
+bazel_dep(name = "bzd_rules_docker", version = "1.0")
 bazel_dep(name = "platforms", version = "0.0.6")
 bazel_dep(name = "rules_python", version = "0.24.0")
 bazel_dep(name = "rules_cc", version = "0.0.8")
@@ -32,7 +32,7 @@ bazel_dep(name = "stardoc", version = "0.5.6")
     "bzd_python",
     "bzd_sanitizer",
     "bzd_package",
-    "bzd_docker",
+    "bzd_rules_docker",
 )]
 
 # Python
@@ -91,12 +91,12 @@ register_toolchains("@nodejs//:all")
 
 # Docker
 
-images = use_extension("@bzd_docker//:extensions.bzl", "images")
+images = use_extension("@bzd_rules_docker//:extensions.bzl", "images")
 images.install(
     name = "docker",
 )
 use_repo(images, "docker")
 
 register_execution_platforms(
-    "@bzd_docker//execution_platforms/...",
+    "@bzd_rules_docker//execution_platforms/...",
 )

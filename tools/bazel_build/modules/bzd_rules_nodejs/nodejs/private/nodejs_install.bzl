@@ -19,24 +19,20 @@ BzdNodeJsInstallInfo = provider(
 COMMON_ATTRS = {
     "data": attr.label_list(
         allow_files = True,
-        doc = "Data to be added to the runfile list",
+        doc = "Data to be available at runtime.",
     ),
     "deps": attr.label_list(
         aspects = [bzd_nodejs_deps_aspect],
         allow_files = True,
-        doc = "Dependencies",
+        doc = "Dependencies of this rule.",
     ),
     "packages": attr.string_dict(
         allow_empty = True,
-        doc = "Package dependencies",
+        doc = "Package dependencies.",
     ),
     "srcs": attr.label_list(
         allow_files = True,
-        doc = "Source files",
-    ),
-    "tools": attr.label_list(
-        doc = "Additional tools to be added to the runfile",
-        cfg = "target",
+        doc = "Source files.",
     ),
 }
 
@@ -165,7 +161,7 @@ def bzd_nodejs_transpile(ctx, srcs, runfiles, base_dir_name):
             execution_requirements = {"no-remote": "1"},
         )
 
-    return generated, typescript
+    return generated + typescript.values(), {original: final.short_path.removeprefix(base_dir_short_path + "/") for original, final in typescript.items()}
 
 def _bzd_nodejs_install_impl(ctx):
     rule_provider = bzd_nodejs_make_provider(ctx)

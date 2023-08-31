@@ -201,7 +201,8 @@ export default class FileSystem {
 			currentPathList.push(name);
 			if (name in children) {
 				Exception.assert(FileSystem.isFolder(children[name]), "Folder path conflicts with an existing file: {}", path);
-			} else {
+			}
+			else {
 				Vue.set(children, name, { name: name, path: currentPathList.join("/"), expanded: true, children: {} });
 			}
 			current = this.makeNode_(children[name]);

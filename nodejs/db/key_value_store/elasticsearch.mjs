@@ -80,7 +80,8 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 				return [result._source, result, false];
 			}
 			return result._source;
-		} catch (e) {
+		}
+		catch (e) {
 			if (e instanceof HttpClientException) {
 				if (e.code == 404 /*Not Found*/) {
 					if (includeAll) {
@@ -105,7 +106,8 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 			}
 			try {
 				return await this._setImpl(bucket, key, modifiedValue, query);
-			} catch (e) {
+			}
+			catch (e) {
 				if (e instanceof HttpClientException) {
 					if (e.code == 409 /*Conflict*/ && isDefault) {
 						continue;
@@ -134,7 +136,8 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 			});
 			Exception.assert("count" in result, "Result malformed: {:j}", result);
 			return result.count;
-		} catch (e) {
+		}
+		catch (e) {
 			if (e instanceof HttpClientException) {
 				if (e.code == 404 /*Not Found*/) {
 					return 0;
@@ -167,7 +170,8 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 				paging,
 				result.hits.total.value,
 			);
-		} catch (e) {
+		}
+		catch (e) {
 			if (e instanceof HttpClientException) {
 				if (e.code == 404 /*Not Found*/) {
 					return new CollectionPaging({});

@@ -1,6 +1,6 @@
 """Extension to access docker images."""
 
-load("@bzd_docker//:images.bzl", "IMAGES")
+load("@bzd_rules_docker//:private/images.bzl", "IMAGES")
 load("@rules_oci//oci:pull.bzl", "oci_pull")
 
 def _images_repository_impl(repository_ctx):
