@@ -64,7 +64,7 @@ pipeline
 				{
 					steps
 					{
-						sh "./tools/bazel run tools/docker_images:xtensa_qemu"
+						sh "./tools/bazel run @docker//:xtensa_qemu.pull"
 						sh "./tools/bazel test ... --output_groups=+metadata --config=esp32 --config=prod --config=cc --platform_suffix=esp32-prod"
 					}
 				}

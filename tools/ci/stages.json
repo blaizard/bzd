@@ -32,7 +32,7 @@
         },
         {
             "commands": [
-                "./tools/bazel run tools/docker_images:xtensa_qemu",
+                "./tools/bazel run @docker//:xtensa_qemu.pull",
                 "./tools/bazel test ... --output_groups=+metadata --config=esp32 --config=prod --config=cc --platform_suffix=esp32-prod"
             ],
             "name": "esp32 prod",
