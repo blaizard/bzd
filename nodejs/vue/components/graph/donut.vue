@@ -8,7 +8,8 @@
 				r="25%"
 				cx="50%"
 				cy="50%"
-				:style="style"></circle>
+				:style="style"
+			></circle>
 			<g v-if="text" class="irgraph-donut-center-text">
 				<text x="50%" y="50%">{{ text }}</text>
 			</g>

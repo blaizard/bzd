@@ -28,7 +28,7 @@ def bzd_package_prefix_from_file(f, depth_from_root = 0):
         if last_pkg == -1:
             fail("The file '{}' does not have {} parent(s).".format(f.short_path, depth_from_root))
         path = path[:last_pkg]
-    return path + "/"
+    return path.rstrip("/")
 
 def bzd_package_to_runfiles(ctx, fragment):
     """Convert a package fragment into runfiles.
@@ -44,7 +44,7 @@ def bzd_package_to_runfiles(ctx, fragment):
     symlinks = {}
     for prefix, files in fragment.files.items():
         for f in files.to_list():
-            path = f.short_path.removeprefix(prefix)
+            path = _bzd_remove_prefix(f.short_path, prefix)
             if path in symlinks:
                 fail("Path '{}' conflicts from the package fragments: {} and {}".format(path, symlinks[path], f))
             symlinks[path] = f
@@ -55,6 +55,11 @@ def bzd_package_to_runfiles(ctx, fragment):
 
 # ---- Packages
 
+def _bzd_remove_prefix(path, prefix):
+    """Remove the prefix of a path."""
+
+    return path.removeprefix(prefix).lstrip("/")
+
 def _bzd_package_impl(ctx):
     # Create the manifest.
     # This is a json dictionary with the remapped file path as keys and the actual file path as values.
@@ -64,7 +69,7 @@ def _bzd_package_impl(ctx):
         info = target[BzdPackageFragmentInfo]
         for prefix, files in info.files.items():
             for f in files.to_list():
-                manifest_data[root + "/" + f.short_path.removeprefix(prefix)] = f.path
+                manifest_data[root + "/" + _bzd_remove_prefix(f.short_path, prefix)] = f.path
             inputs.append(files)
     manifest = ctx.actions.declare_file("{}.package.manifest".format(ctx.label.name))
     ctx.actions.write(

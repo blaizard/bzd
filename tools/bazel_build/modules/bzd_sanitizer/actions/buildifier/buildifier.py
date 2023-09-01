@@ -6,23 +6,23 @@ from bzd_sanitizer.worker import worker
 from bzd.utils.run import localBazelBinary
 
 
-def workload(args: typing.Tuple[str, str, bool, str], stdout: typing.TextIO) -> bool:
+def workload(args: typing.Tuple[pathlib.Path, pathlib.Path, bool, str], stdout: typing.TextIO) -> bool:
 	workspace, path, check, buildifier = args
 
 	if not check:
 		result = localBazelBinary(
 		    buildifier,
-		    args=["-lint", "fix", "-warnings=all", workspace / path],
+		    args=["-lint", "fix", "-warnings=all", str(workspace / path)],
 		    ignoreFailure=True,
 		    stdout=stdout,
 		    stderr=stdout,
 		)
-		if result.isFailure():
+		if result.isFailure():  # type: ignore
 			return False
 
 	result = localBazelBinary(
 	    buildifier,
-	    args=["-lint", "warn", "-warnings=all", workspace / path],
+	    args=["-lint", "warn", "-warnings=all", str(workspace / path)],
 	    ignoreFailure=True,
 	    stdout=stdout,
 	    stderr=stdout,

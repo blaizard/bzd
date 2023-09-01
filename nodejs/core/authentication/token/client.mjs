@@ -2,7 +2,7 @@ import ExceptionFactory from "../../exception.mjs";
 import LogFactory from "../../log.mjs";
 import AuthenticationClient from "../client.mjs";
 
-import APISchema from "./api.json";
+import APISchema from "./api.json" assert { type: "json" };
 
 const Exception = ExceptionFactory("authentication", "token");
 const Log = LogFactory("authentication", "token");
@@ -74,8 +74,7 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 					this.setToken(result.token, result.timeout);
 					return true;
 				}
-			}
-			catch (e) {
+			} catch (e) {
 				if (!nothrow && e.code != 401 /*Unauthorized*/) {
 					throw e;
 				}

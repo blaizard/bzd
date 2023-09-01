@@ -205,8 +205,7 @@ class Cache {
 					str += "- " + collection + ": " + this.toString(collection) + "\n";
 				}
 			}
-		}
-		else {
+		} else {
 			const dataCollection = this.data[collection];
 			if ("_timeoutMs" in dataCollection) {
 				str += "timeout=" + dataCollection._timeoutMs + "ms, ";
@@ -385,8 +384,7 @@ async function get(instant, collection, ...ids) {
 				timestampFetch ? Cache.getTimestampMs() - timestampFetch + "ms" : "cache",
 			);
 			return dataId._data;
-		}
-		else {
+		} else {
 			throw new Exception("Invalid state {}::{}, it should never happen.", collection, id);
 		}
 		// Timeout after 30s
@@ -460,8 +458,7 @@ async function triggerUpdate(collection, id, ...ids) {
 
 		if (options.timeout) {
 			dataId._timeout = Cache.getTimestampMs() + Math.max(1, options.timeout);
-		}
-		else {
+		} else {
 			// Delete any timeout, as this is how dirty is set
 			delete dataId._timeout;
 		}
@@ -473,15 +470,13 @@ async function triggerUpdate(collection, id, ...ids) {
 		);
 		dataId._size = dataId._data.size || dataId._data.length || dataCollection._defaultSize || 0;
 		delete dataId._error;
-	}
-	catch (e) {
+	} catch (e) {
 		// Register the error and delete the previous data if any
 		dataId._error = e.message;
 		dataId._timeout = Cache.getTimestampMs() + 100; // Invalid the error after 100ms
 		dataId._size = dataId._error.length || 0;
 		delete dataId._data;
-	}
-	finally {
+	} finally {
 		delete dataId._fetching;
 	}
 
@@ -535,11 +530,9 @@ async function garbageCollector() {
 			// Yield
 			await yieldThread();
 		}
-	}
-	catch (e) {
+	} catch (e) {
 		Exception.fromError(e).print();
-	}
-	finally {
+	} finally {
 		this.interval = setTimeout(() => {
 			garbageCollector.call(this);
 		}, this.config.garbageCollectorPeriodMs);

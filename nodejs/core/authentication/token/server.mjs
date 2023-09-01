@@ -7,7 +7,7 @@ import Validation from "../../validation.mjs";
 import AuthenticationServer from "../server.mjs";
 import User from "../user.mjs";
 
-import APISchema from "./api.json";
+import APISchema from "./api.json" assert { type: "json" };
 
 const Exception = ExceptionFactory("authentication", "token");
 const Log = LogFactory("authentication", "token");
@@ -45,8 +45,7 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 			Jwt.sign(data, this.options.privateKey, { expiresIn: expiresIn }, (e, token) => {
 				if (e) {
 					reject(e);
-				}
-				else {
+				} else {
 					resolve({
 						token: token,
 						timeout: expiresIn,
@@ -106,8 +105,7 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 				// This ensures that a wrongly formatted token will trigger a new token being generated
 				// while still having the error reported. This ensure smooth transition to new token format.
 				authentication.validationRefreshToken.validate(data);
-			}
-			catch (e) {
+			} catch (e) {
 				Exception.fromError(e).print();
 				return this.setStatus(401, "Unauthorized");
 			}
@@ -143,8 +141,7 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 			data = await this.readToken(token);
 			Exception.assert(data && "uid" in data, "Invalid token: {:j}", data);
 			Exception.assert(data && "roles" in data, "Invalid token: {:j}", data);
-		}
-		catch (e) {
+		} catch (e) {
 			return false;
 		}
 		return await verifyCallback(new User(data.uid, data.roles));
@@ -167,8 +164,7 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 			Jwt.verify(token, this.options.publicKey || this.options.privateKey, (e, data) => {
 				if (e) {
 					reject(e);
-				}
-				else {
+				} else {
 					resolve(data);
 				}
 			});

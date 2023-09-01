@@ -6,16 +6,16 @@ from bzd_sanitizer.worker import worker
 from bzd.utils.run import localBazelBinary
 
 
-def workload(args: typing.Tuple[str, str, bool, str, str], stdout: typing.TextIO) -> bool:
+def workload(args: typing.Tuple[pathlib.Path, pathlib.Path, bool, str, str], stdout: typing.TextIO) -> bool:
 	workspace, path, check, black, config = args
 
-	args = []
-	args += ["--check"] if check else []
-	args += ["--config", config] if check else []
+	params = []
+	params += ["--check"] if check else []
+	params += ["--config", config] if check else []
 
 	result = localBazelBinary(
 	    black,
-	    args=args + [workspace / path],
+	    args=params + [str(workspace / path)],
 	    ignoreFailure=True,
 	    stdout=stdout,
 	    stderr=stdout,

@@ -55,8 +55,7 @@ function registerObserver(el, callback) {
 			instance: null,
 		};
 		observers[uid].obj.observe(el);
-	}
-	else {
+	} else {
 		observers[uid] = {
 			obj: setInterval(() => {
 				onResizeProcess(el);
@@ -75,8 +74,7 @@ function unregisterObserver(uid) {
 		clearTimeout(observers[uid].instance);
 		if (typeof ResizeObserver !== "undefined") {
 			observers[uid].obj.disconnect();
-		}
-		else {
+		} else {
 			clearInterval(observers[uid].obj);
 		}
 		delete observers[uid];

@@ -16,7 +16,7 @@ bzd_nodejs_library = bzd_nodejs_library_
 bzd_nodejs_extern_binary = bzd_nodejs_extern_binary_
 bzd_nodejs_web_binary = bzd_nodejs_web_binary_
 
-def bzd_nodejs_binary(name, main, data = [], deps = [], packages = {}, srcs = [], tags = [], **kwargs):
+def bzd_nodejs_binary(name, main, data = [], tools = [], deps = [], packages = {}, srcs = [], tags = [], **kwargs):
     attrs_assert_any_of(kwargs, ATTRS_COMMON_BUILD_RULES, ATTRS_COMMON_BINARY_RULES)
 
     bzd_nodejs_install(
@@ -26,6 +26,7 @@ def bzd_nodejs_binary(name, main, data = [], deps = [], packages = {}, srcs = []
         packages = packages,
         srcs = srcs,
         tags = ["nodejs", "manual"],
+        tools = tools,
     )
 
     bzd_nodejs_binary_(
@@ -36,7 +37,7 @@ def bzd_nodejs_binary(name, main, data = [], deps = [], packages = {}, srcs = []
         **kwargs
     )
 
-def bzd_nodejs_test(name, main, data = [], deps = [], packages = {}, srcs = [], tags = [], **kwargs):
+def bzd_nodejs_test(name, main, data = [], tools = [], deps = [], packages = {}, srcs = [], tags = [], **kwargs):
     attrs_assert_any_of(kwargs, ATTRS_COMMON_BUILD_RULES, ATTRS_COMMON_TEST_RULES)
 
     bzd_nodejs_install(
@@ -46,6 +47,7 @@ def bzd_nodejs_test(name, main, data = [], deps = [], packages = {}, srcs = [], 
         packages = packages,
         srcs = srcs,
         tags = ["nodejs", "manual"],
+        tools = tools,
     )
 
     bzd_nodejs_test_(

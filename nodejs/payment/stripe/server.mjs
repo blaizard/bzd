@@ -2,7 +2,7 @@ import ExceptionFactory from "../../core/exception.mjs";
 import HttpClient from "../../core/http/client.mjs";
 import LogFactory from "../../core/log.mjs";
 
-import APISchema from "./api.json";
+import APISchema from "./api.json" assert { type: "json" };
 
 const Exception = ExceptionFactory("payment", "stripe");
 const Log = LogFactory("payment", "stripe");
@@ -41,11 +41,11 @@ export default class StripePayment {
 
 			let amount = 0;
 			switch (this.options.currency) {
-			case "eur":
-				amount = Math.floor(inputs.amount * 100);
-				break;
-			default:
-				Exception.unreachable("Unsupported currency: {}", this.options.currency);
+				case "eur":
+					amount = Math.floor(inputs.amount * 100);
+					break;
+				default:
+					Exception.unreachable("Unsupported currency: {}", this.options.currency);
 			}
 			Exception.assert(amount, "Amount incorrect: {}", amount);
 

@@ -96,7 +96,3 @@ images.install(
     name = "docker",
 )
 use_repo(images, "docker")
-
-register_execution_platforms(
-    "@bzd_rules_docker//execution_platforms/...",
-)

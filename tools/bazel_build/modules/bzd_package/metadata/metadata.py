@@ -1,5 +1,6 @@
 import argparse
 import json
+import typing
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Information generator rules.")
@@ -14,7 +15,7 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 
 	# Merge all entries together
-	output = {"fragments": {}}
+	output: typing.Dict[str, typing.Any] = {"fragments": {}}
 	for item in args.input:
 		with open(item[1]) as f:
 			fragment = json.load(f)

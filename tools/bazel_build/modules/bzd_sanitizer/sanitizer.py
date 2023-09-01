@@ -5,7 +5,7 @@ import sys
 import typing
 import time
 
-from bzd.utils.run import localCommand, localBazelTarget
+from bzd.utils.run import localCommand, localBazelTarget  # type: ignore
 from bzd_sanitizer.context import Context
 
 
@@ -20,13 +20,14 @@ def getFileList(workspace: pathlib.Path, path: pathlib.Path, all: bool) -> typin
 		        "--other",
 		        "--modified",
 		        "--exclude-standard",
-		        path,
+		        str(path),
 		    ],
 		    cwd=workspace,
 		)
 	else:
 		result = localCommand(
-		    ["git", "ls-files", "--other", "--modified", "--exclude-standard", path],
+		    ["git", "ls-files", "--other", "--modified", "--exclude-standard",
+		     str(path)],
 		    cwd=workspace,
 		)
 	fileList = list({f for f in result.getStdout().split("\n") if (workspace / f).is_file()})
@@ -34,7 +35,8 @@ def getFileList(workspace: pathlib.Path, path: pathlib.Path, all: bool) -> typin
 	# If there are no files, try a diff with the last commit.
 	if len(fileList) == 0:
 		result = localCommand(
-		    ["git", "diff", "--name-only", "--diff-filter=ACMRU", "HEAD~1", path],
+		    ["git", "diff", "--name-only", "--diff-filter=ACMRU", "HEAD~1",
+		     str(path)],
 		    cwd=workspace,
 		)
 		fileList = list(result.getStdout().split("\n"))

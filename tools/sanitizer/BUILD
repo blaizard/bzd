@@ -16,8 +16,9 @@ py_binary(
         ],
     ),
     args = [
-        "--action",
-        "$(location //tools/sanitizer/actions/eslint)",
+        # Disabled because of this: https://github.com/eslint/eslint/discussions/15305
+        #"--action",
+        #"$(location //tools/sanitizer/actions/eslint)",
         "--action",
         "$(location //tools/sanitizer/actions/mypy)",
     ],

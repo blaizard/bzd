@@ -6,6 +6,7 @@ AL_CONSTRAINTS = {
 }
 
 ISA_CONSTRAINTS = {
+    "arm64": "@platforms//cpu:arm64",
     "x86_64": "@platforms//cpu:x86_64",
     "xtensa_lx6": None,
 }
