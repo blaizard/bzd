@@ -9,6 +9,7 @@ import Path from "path";
 
 import APIv1 from "#bzd/apps/dashboard/api.v1.json" assert { type: "json" };
 import Plugins from "#bzd/apps/dashboard/plugins/plugins.backend.index.mjs";
+import { assert } from "console";
 
 const Exception = ExceptionFactory("backend");
 const Log = LogFactory("backend");

@@ -1,10 +1,11 @@
 """NodeJs executable rules."""
 
+load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
 load("@bzd_package//:defs.bzl", "BzdPackageFragmentInfo", "bzd_package_prefix_from_file", "bzd_package_to_runfiles")
 load("@bzd_rules_nodejs//nodejs:private/nodejs_install.bzl", "BzdNodeJsInstallInfo")
 
-COMMON_EXEC_ATTRS = {
+_COMMON_EXEC_ATTRS = {
     "executor": attr.label(
         executable = True,
         cfg = "exec",
@@ -18,6 +19,9 @@ COMMON_EXEC_ATTRS = {
     ),
     "_allowlist_function_transition": attr.label(
         default = "@bazel_tools//tools/allowlists/function_transition_allowlist",
+    ),
+    "_build": attr.label(
+        default = "@bzd_lib//settings/build",
     ),
     "_coverage_executor": attr.label(
         default = Label("@bzd_rules_nodejs//toolchain/c8"),
@@ -60,13 +64,21 @@ def _bzd_nodejs_executable_impl(ctx):
     # Gather toolchain executable.
     executor = ctx.attr.executor if ctx.attr.executor else ctx.toolchains["@bzd_rules_nodejs//nodejs:toolchain_type"].executable.node
 
+    if ctx.attr._build[BuildSettingInfo].value == "prod":
+        command = "export NODE_ENV=production"
+    else:
+        command = "export NODE_ENV=development"
+
     # Handle coverage.
     if ctx.configuration.coverage_enabled:
         locations = {
             ctx.attr._coverage_executor: "coverage",
             executor: "executor",
         }
-        command = "{coverage} {executor} {main} $@ && cp \"coverage/lcov.info\" \"$COVERAGE_OUTPUT_FILE\""
+        command += """
+{coverage} {executor} {main} "$@"
+cp \"coverage/lcov.info\" \"$COVERAGE_OUTPUT_FILE\"
+"""
         providers = [
             coverage_common.instrumented_files_info(
                 ctx,
@@ -79,7 +91,9 @@ def _bzd_nodejs_executable_impl(ctx):
         locations = {
             executor: "executor",
         }
-        command = "{executor} {main} $@"
+        command += """
+{executor} {main} "$@"
+"""
         providers = []
 
     return [sh_binary_wrapper_impl(
@@ -94,7 +108,7 @@ def _bzd_nodejs_executable_impl(ctx):
 bzd_nodejs_binary = rule(
     doc = "NodeJs binary executor.",
     implementation = _bzd_nodejs_executable_impl,
-    attrs = COMMON_EXEC_ATTRS,
+    attrs = _COMMON_EXEC_ATTRS,
     executable = True,
     toolchains = ["@bzd_rules_nodejs//nodejs:toolchain_type"],
     cfg = _bzd_nodejs_transition,
@@ -103,7 +117,7 @@ bzd_nodejs_binary = rule(
 _bzd_nodejs_test = rule(
     doc = "NodeJs test executor.",
     implementation = _bzd_nodejs_executable_impl,
-    attrs = COMMON_EXEC_ATTRS,
+    attrs = _COMMON_EXEC_ATTRS,
     executable = True,
     test = True,
     toolchains = ["@bzd_rules_nodejs//nodejs:toolchain_type"],

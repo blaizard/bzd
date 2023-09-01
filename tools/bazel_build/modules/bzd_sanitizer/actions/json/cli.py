@@ -6,7 +6,7 @@ import json
 from bzd_sanitizer.worker import worker
 
 
-def workload(args: typing.Tuple[str, str, bool], stdout: typing.TextIO) -> bool:
+def workload(args: typing.Tuple[pathlib.Path, pathlib.Path, bool], stdout: typing.TextIO) -> bool:
 	workspace, path, check = args
 
 	original = (workspace / path).read_text()

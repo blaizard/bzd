@@ -26,10 +26,6 @@ build --experimental_platform_in_output_dir
 # Enable bzl modules.
 common --enable_bzlmod
 
-# Limit the resources usage on the host.
-build --local_cpu_resources=HOST_CPUS*.5
-build --local_ram_resources=HOST_RAM*.5
-
 # Global test specific options
 test --test_output=errors
 test --verbose_failures
@@ -53,9 +49,11 @@ build:docker --experimental_docker_verbose
 build:docker --experimental_enable_docker_sandbox
 build:docker --spawn_strategy=docker,sandboxed
 build:docker --config=docker_sandbox
+build:docker --extra_execution_platforms=@bzd_rules_docker//execution_platforms:linux_x86_64
 
 # Remote
 build:remote --remote_executor=grpc://10.10.0.11:8980
+build:remote --extra_execution_platforms=@bzd_rules_docker//execution_platforms:linux_x86_64
 build:remote --jobs=24
 build:remote --dynamic_mode=off
 build:remote --spawn_strategy=remote,sandboxed

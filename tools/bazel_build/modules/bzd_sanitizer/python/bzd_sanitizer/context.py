@@ -106,9 +106,9 @@ class Context:
 
 		for path in self.fileList:
 			# Inclusions
-			isIncluded = not (endswith or include)
-			isIncluded = isIncluded or (endswith and path.lower().endswith(endswith))
-			isIncluded = isIncluded or (include and include.match(path))
+			isIncluded = not bool(endswith or include)
+			isIncluded = isIncluded or bool(endswith and path.lower().endswith(endswith))
+			isIncluded = isIncluded or bool(include and include.match(path))
 
 			# Exclusions
 			isIncluded = isIncluded and not (excludeFile

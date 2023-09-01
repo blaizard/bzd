@@ -28,13 +28,11 @@ export default {
 				_notify(type, message, options = {}) {
 					if (typeof this._tryToString(message) == "string") {
 						this._notifySingle(++this._uid, type, message, options);
-					}
-					else if (typeof message == "object") {
+					} else if (typeof message == "object") {
 						for (const key in message) {
 							this._notifySingle(key, type, message[key], options);
 						}
-					}
-					else {
+					} else {
 						Exception.unreachable("Unsupported message type: {:j}", message);
 					}
 				},
@@ -71,8 +69,7 @@ export default {
 					// If null, delete the entry
 					if (messageStr === null) {
 						this.close(entry);
-					}
-					else if (entry.timeOnScreen > 0) {
+					} else if (entry.timeOnScreen > 0) {
 						setTimeout(() => {
 							this.close(entry);
 						}, entry.timeOnScreen * 1000);

@@ -60,25 +60,25 @@ export default class APIClient extends Base {
 		}
 
 		switch (requestOptions.type) {
-		case "json":
-			// Enforce best practice
-			Exception.assert(
-				method != "get",
-				"{}: Body cannot be set with method '{}', this is against recommendation in the HTTP/1.1 spec, section 4.3",
-				endpoint,
-				method,
-			);
-			Exception.assert(typeof data === "object", "Data must be of type 'object', got '{:j}' instead.", data);
-			fetchOptions.json = data;
-			break;
-		case "query":
-			Exception.assert(typeof data === "object", "Data must be of type 'object', got '{:j}' instead.", data);
-			fetchOptions.query = data;
-			break;
-		case undefined:
-			break;
-		default:
-			Exception.unreachable("{} {}: Unsupported request type '{}'", method, endpoint, requestOptions.type);
+			case "json":
+				// Enforce best practice
+				Exception.assert(
+					method != "get",
+					"{}: Body cannot be set with method '{}', this is against recommendation in the HTTP/1.1 spec, section 4.3",
+					endpoint,
+					method,
+				);
+				Exception.assert(typeof data === "object", "Data must be of type 'object', got '{:j}' instead.", data);
+				fetchOptions.json = data;
+				break;
+			case "query":
+				Exception.assert(typeof data === "object", "Data must be of type 'object', got '{:j}' instead.", data);
+				fetchOptions.query = data;
+				break;
+			case undefined:
+				break;
+			default:
+				Exception.unreachable("{} {}: Unsupported request type '{}'", method, endpoint, requestOptions.type);
 		}
 
 		let retry;
@@ -112,8 +112,7 @@ export default class APIClient extends Base {
 					});
 				}
 				return result;
-			}
-			catch (e) {
+			} catch (e) {
 				if (e instanceof HttpClientException) {
 					if (e.code == 401 /*Unauthorized*/) {
 						if (this.schema[endpoint][method].authentication) {

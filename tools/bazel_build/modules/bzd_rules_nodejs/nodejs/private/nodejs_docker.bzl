@@ -38,7 +38,10 @@ def bzd_nodejs_docker(name, deps, cmd, base = "@docker//:nodejs", include_metada
         ] + [item.format(**map_to_directory_) for item in cmd],
         workdir = ROOT_DIRECTORY_,
         env = {
-            "NODE_ENV": "production",
+            "NODE_ENV": select({
+                "@bzd_lib//settings/build:dev": "development",
+                "@bzd_lib//settings/build:prod": "production",
+            }),
         },
         tags = ["nodejs"],
         tars = [

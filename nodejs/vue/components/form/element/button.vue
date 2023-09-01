@@ -6,7 +6,8 @@
 		@click="handleClick()"
 		:disabled="disable"
 		:tabindex="disable ? undefined : 0"
-		v-html="contentHtml"></button>
+		v-html="contentHtml"
+	></button>
 </template>
 
 <script>

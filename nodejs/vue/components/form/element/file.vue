@@ -10,7 +10,7 @@
 			let templateAdd = [];
 
 			// Add the upload button
-			const uploadContent = this.getOption("uploadContent", "<i class=\"bzd-icon-upload\"></i> Upload");
+			const uploadContent = this.getOption("uploadContent", '<i class="bzd-icon-upload"></i> Upload');
 			templateAdd.push({
 				type: "Button",
 				content: { html: uploadContent },
@@ -78,38 +78,38 @@
 			upload() {
 				return this.isUpload
 					? new Upload({
-						/**
-						 * Upload URL, where to send the file to be uploaded
-						 */
-						url: this.getOption("upload"),
-						max: () => this.nbLeft,
-						filter: this.getOption("filter", null),
-						onInit: (item) => {
-							this.uploadValueList.push(this.makeObjectFromItem(item));
-						},
-						onCancel: (item) => {
-							const index = this.uploadItemToIndex(item);
-							this.uploadValueList.splice(index, 1);
-						},
-						onError: (item, message) => {
-							this.setError(message);
-							console.error(message);
-						},
-						onComplete: (item, response) => {
-							const output = this.uploadResponseHandler(response);
+							/**
+							 * Upload URL, where to send the file to be uploaded
+							 */
+							url: this.getOption("upload"),
+							max: () => this.nbLeft,
+							filter: this.getOption("filter", null),
+							onInit: (item) => {
+								this.uploadValueList.push(this.makeObjectFromItem(item));
+							},
+							onCancel: (item) => {
+								const index = this.uploadItemToIndex(item);
+								this.uploadValueList.splice(index, 1);
+							},
+							onError: (item, message) => {
+								this.setError(message);
+								console.error(message);
+							},
+							onComplete: (item, response) => {
+								const output = this.uploadResponseHandler(response);
 
-							// Delete the current element
-							const index = this.uploadItemToIndex(item);
-							this.uploadValueList.splice(index, 1);
+								// Delete the current element
+								const index = this.uploadItemToIndex(item);
+								this.uploadValueList.splice(index, 1);
 
-							// Add the new item
-							this.itemAdd(output);
-						},
-						onProgress: (item) => {
-							const index = this.uploadItemToIndex(item);
-							this.$set(this.uploadValueList, index, this.makeObjectFromItem(item));
-						},
-					})
+								// Add the new item
+								this.itemAdd(output);
+							},
+							onProgress: (item) => {
+								const index = this.uploadItemToIndex(item);
+								this.$set(this.uploadValueList, index, this.makeObjectFromItem(item));
+							},
+					  })
 					: null;
 			},
 			// Overload internal attributes
@@ -191,8 +191,7 @@
 				if (index >= this.valueList.length) {
 					const indexUpload = index - this.valueList.length;
 					this.uploadValueList[indexUpload].cancel();
-				}
-				else {
+				} else {
 					await ArrayElement.methods.itemDelete.call(this, index);
 				}
 			},

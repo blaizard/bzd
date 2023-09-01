@@ -8,12 +8,12 @@ const Exception = ExceptionFactory("plugins", "docker");
 export default {
 	async storage(params) {
 		switch (params["docker.type"]) {
-		case "v2":
-			return await StorageDockerV2.make(params["docker.url"]);
-		case "gcr":
-			return await StorageDockerV2.makeFromGcr(params["docker.key"], params["docker.service"]);
-		default:
-			Exception.unreachable("Unsupported Docker type '{}'", params["docker.type"]);
+			case "v2":
+				return await StorageDockerV2.make(params["docker.url"]);
+			case "gcr":
+				return await StorageDockerV2.makeFromGcr(params["docker.key"], params["docker.service"]);
+			default:
+				Exception.unreachable("Unsupported Docker type '{}'", params["docker.type"]);
 		}
 	},
 	services: {

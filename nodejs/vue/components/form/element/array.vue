@@ -10,7 +10,8 @@
 					'irform-array-item-draggable': isDraggable(index),
 				}"
 				v-touch="getTouchConfig(index)"
-				@click.stop="itemClick(index)">
+				@click.stop="itemClick(index)"
+			>
 				<div class="irform-array-item-draghandle" v-if="gripHandle">&nbsp;</div>
 
 				<Form
@@ -20,7 +21,8 @@
 					:disable="disable"
 					:value="value"
 					@input="itemUpdate(index, $event)"
-					@active="handleActive">
+					@active="handleActive"
+				>
 				</Form>
 
 				<component
@@ -31,7 +33,8 @@
 					:value="value"
 					:config="templateComponentConfig"
 					@input="itemUpdate(index, $event)"
-					@delete="itemDelete(index)">
+					@delete="itemDelete(index)"
+				>
 				</component>
 
 				<div class="irform-array-item-delete" v-if="allowDelete" @click="itemDelete(index)">x</div>
@@ -40,7 +43,8 @@
 
 		<span
 			v-if="isAddEnabled || !hideAddWhenDisabled"
-			:class="{ 'irform-array-add': true, 'irform-disable': !isAddEnabled }">
+			:class="{ 'irform-array-add': true, 'irform-disable': !isAddEnabled }"
+		>
 			<Form :description="templateAdd" :disable="!isAddEnabled" @active="handleActive" @submit="itemAdd"> </Form>
 		</span>
 	</div>

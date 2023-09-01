@@ -109,12 +109,12 @@ export default class Upload {
 					filterList
 						.map((filter) => {
 							switch (filter) {
-							case "image":
-								return "image/*";
-							case "audio":
-								return "audio/*";
-							case "video":
-								return "video/*";
+								case "image":
+									return "image/*";
+								case "audio":
+									return "audio/*";
+								case "video":
+									return "video/*";
 							}
 							return null;
 						})
@@ -196,8 +196,7 @@ export default class Upload {
 					this.config.onError(item, item.error);
 					if (nothrow) {
 						resolve();
-					}
-					else {
+					} else {
 						reject(new Error(item.error));
 					}
 				};
@@ -225,11 +224,9 @@ export default class Upload {
 						if (xhr.status === 200) {
 							this.config.onComplete(item, xhr.response);
 							resolve();
-						}
-						else if (xhr.status === 0) {
+						} else if (xhr.status === 0) {
 							// Ignore
-						}
-						else {
+						} else {
 							item.error = xhr.statusText + " (" + xhr.status + ")" + ": " + xhr.response;
 							handleError();
 						}
@@ -245,8 +242,7 @@ export default class Upload {
 				const data = new FormData();
 				data.append("file", file);
 				xhr.send(data);
-			}
-			catch (e) {
+			} catch (e) {
 				if (!nothrow) {
 					reject(e);
 				}

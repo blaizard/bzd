@@ -1,6 +1,6 @@
 import LogFactory from "../../core/log.mjs";
 
-import APISchema from "./api.json";
+import APISchema from "./api.json" assert { type: "json" };
 import VueComponent from "./client.vue";
 
 const Log = LogFactory("payment", "stripe");

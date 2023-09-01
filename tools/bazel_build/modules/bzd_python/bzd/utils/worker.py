@@ -57,7 +57,7 @@ class WorkerContextManager:
 	def __enter__(self) -> "WorkerContextManager":
 		return self
 
-	def __exit__(self, exc_type, exc_value, exc_tb) -> None:
+	def __exit__(self, exc_type: Any, exc_value: Any, exc_tb: Any) -> None:
 		for _ in self.data():
 			pass
 		# Stop and join the processes.

@@ -1,7 +1,7 @@
 """NodeJs install rule."""
 
 load("@bzd_package//:defs.bzl", "BzdPackageMetadataFragmentInfo")
-load("@bzd_rules_nodejs//nodejs:private/utils.bzl", "BzdNodeJsDepsInfo", "bzd_nodejs_deps_aspect", "bzd_nodejs_make_provider", "bzd_nodejs_merge")
+load("@bzd_rules_nodejs//nodejs:private/nodejs_library.bzl", "BzdNodeJsDepsInfo", "LIBRARY_ATTRS", "bzd_nodejs_make_provider", "bzd_nodejs_merge")
 
 # ---- Provider
 
@@ -13,28 +13,6 @@ BzdNodeJsInstallInfo = provider(
         "transpiled": "The map of transpiled files.",
     },
 )
-
-# ---- Attributes
-
-COMMON_ATTRS = {
-    "data": attr.label_list(
-        allow_files = True,
-        doc = "Data to be available at runtime.",
-    ),
-    "deps": attr.label_list(
-        aspects = [bzd_nodejs_deps_aspect],
-        allow_files = True,
-        doc = "Dependencies of this rule.",
-    ),
-    "packages": attr.string_dict(
-        allow_empty = True,
-        doc = "Package dependencies.",
-    ),
-    "srcs": attr.label_list(
-        allow_files = True,
-        doc = "Source files.",
-    ),
-}
 
 def bzd_nodejs_make_node_modules(ctx, packages, base_dir_name):
     """Generate a node_modules and a package.json file at the root of `base_dir_name`.
@@ -203,11 +181,8 @@ def _bzd_nodejs_install_impl(ctx):
         ),
     ]
 
-_INSTALL_ATTRS = dict(COMMON_ATTRS)
+_INSTALL_ATTRS = dict(LIBRARY_ATTRS)
 _INSTALL_ATTRS.update({
-    "_cache": attr.label(
-        default = "@bzd_rules_nodejs//nodejs:cache",
-    ),
     "_metadata": attr.label(
         default = Label("@bzd_rules_nodejs//nodejs/metadata"),
         cfg = "exec",

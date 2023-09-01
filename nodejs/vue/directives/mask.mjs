@@ -27,8 +27,7 @@ export function mask(el, className = "") {
 	// Edge does not support prepend, hence use this workaround
 	if (el.firstChild) {
 		el.insertBefore(mask, el.firstChild);
-	}
-	else {
+	} else {
 		el.appendChild(mask);
 	}
 }
@@ -37,8 +36,7 @@ export default function (el, binding) {
 	// If set to true, set the mask
 	if (binding.value) {
 		mask(el);
-	}
-	else {
+	} else {
 		maskRemove(el);
 	}
 }

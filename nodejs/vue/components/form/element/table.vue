@@ -8,7 +8,8 @@
 						v-if="isConditionSatisfied(description)"
 						:key="index"
 						:class="getHeaderClass(description)"
-						@click="handleHeaderClick(description)">
+						@click="handleHeaderClick(description)"
+					>
 						{{ description.caption }}
 					</th>
 				</tr>
@@ -25,7 +26,8 @@
 					:value="row.value"
 					:template="itemTemplate"
 					@input="itemUpdate(row.index, $event)"
-					@active="handleActive">
+					@active="handleActive"
+				>
 				</Form>
 			</tbody>
 		</table>
@@ -112,26 +114,26 @@
 							typeof compare === "function"
 								? compare
 								: (a, b) => {
-									const valueA = a.value[key];
-									const valueB = b.value[key];
+										const valueA = a.value[key];
+										const valueB = b.value[key];
 
-									let result = 0;
-									switch ((this.templateObj[key] || {}).valueType) {
-									case "number": {
-										const numberA = parseFloat(valueA);
-										const numberB = parseFloat(valueB);
-										result =
-											(isNaN(numberA) ? Number.NEGATIVE_INFINITY : numberA) -
-											(isNaN(numberB) ? Number.NEGATIVE_INFINITY : numberB);
-										break;
-									}
+										let result = 0;
+										switch ((this.templateObj[key] || {}).valueType) {
+											case "number": {
+												const numberA = parseFloat(valueA);
+												const numberB = parseFloat(valueB);
+												result =
+													(isNaN(numberA) ? Number.NEGATIVE_INFINITY : numberA) -
+													(isNaN(numberB) ? Number.NEGATIVE_INFINITY : numberB);
+												break;
+											}
 
-									default:
-										result = String(valueA || "").localeCompare(String(valueB || ""));
-									}
+											default:
+												result = String(valueA || "").localeCompare(String(valueB || ""));
+										}
 
-									return compare ? result : -result;
-								},
+										return compare ? result : -result;
+								  },
 						key: key,
 						order: typeof compare === "function" ? "unknown" : compare ? "descending" : "ascending",
 					};

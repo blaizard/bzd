@@ -12,7 +12,8 @@
 		v-text="get(/*freezeOnEdit*/ true)"
 		:disabled="disable"
 		:placeholder="placeholder"
-		:style="{ resize: autoResize ? 'none' : 'vertical' }">
+		:style="{ resize: autoResize ? 'none' : 'vertical' }"
+	>
 	</component>
 </template>
 

@@ -10,7 +10,7 @@ def _bzd_nodejs_extern_binary_impl(ctx):
     toolchain_executable = ctx.toolchains["@bzd_rules_nodejs//nodejs:toolchain_type"].executable
 
     # Build the command
-    command = "NODE_PATH={{node_modules}} {{node}} {{node_modules}}/{} ".format(ctx.attr.binary) + " ".join(ctx.attr.params) + " $@"
+    command = "NODE_ENV=production {{node}} {{node_modules}}/{} ".format(ctx.attr.binary) + " ".join(ctx.attr.params) + " $@"
 
     return [sh_binary_wrapper_impl(
         ctx = ctx,

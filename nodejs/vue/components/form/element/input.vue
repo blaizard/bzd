@@ -21,7 +21,8 @@
 				@input="handleInput($event.target.innerText)"
 				@focus="handleFocus($event)"
 				@blur="handleBlur($event, $event.target.innerText)"
-				@keydown="handleKeyDown($event, $event.target.innerText)">
+				@keydown="handleKeyDown($event, $event.target.innerText)"
+			>
 			</span>
 
 			<span
@@ -34,7 +35,8 @@
 				@focus="handleFocus($event)"
 				@input="handleInputMask()"
 				@blur="handleBlur($event, $event.target.innerText)"
-				@keydown="handleKeyDown($event, $event.target.innerText)">
+				@keydown="handleKeyDown($event, $event.target.innerText)"
+			>
 			</span>
 		</span>
 
@@ -135,21 +137,19 @@
 				if (this.format !== false) {
 					if (typeof this.format == "function") {
 						return this.format(value);
-					}
-					else if (typeof this.format == "string") {
+					} else if (typeof this.format == "string") {
 						let index = 0;
 						return [...this.format].reduce((formatted, c) => {
 							switch (c) {
-							case "*":
-								formatted += value[index++] || "_";
-								break;
-							default:
-								formatted += c;
+								case "*":
+									formatted += value[index++] || "_";
+									break;
+								default:
+									formatted += c;
 							}
 							return formatted;
 						}, "");
-					}
-					else if (typeof this.format == "object") {
+					} else if (typeof this.format == "object") {
 						if (value in this.format) {
 							return this.format[value];
 						}
@@ -174,8 +174,7 @@
 			valueSet(text) {
 				if (this.isValueAcceptable(text)) {
 					this.set(text);
-				}
-				else {
+				} else {
 					this.$refs.input.innerHTML = "";
 					this.$emit("directInput", "");
 					this.set("");
@@ -197,8 +196,7 @@
 					e.preventDefault();
 					if (this.multi) {
 						this.valueListAdd(text);
-					}
-					else {
+					} else {
 						this.valueSet(text);
 						this.$refs.input.blur();
 						this.submit();
@@ -276,8 +274,7 @@
 				if (this.hasChanged) {
 					if (this.multi) {
 						this.valueListAdd(text);
-					}
-					else {
+					} else {
 						this.valueSet(text);
 					}
 					this.hasChanged = false;

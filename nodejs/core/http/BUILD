@@ -27,6 +27,7 @@ bzd_nodejs_library(
         "express-minify": "",
         "helmet": "",
         "http": "",
+        "mime": "^1",
         "multer": "",
     },
     visibility = ["//visibility:public"],

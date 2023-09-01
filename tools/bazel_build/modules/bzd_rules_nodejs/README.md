@@ -3,7 +3,6 @@
 ## TODO
 
 - Fix pnpm store-dir to use a specific or configurable path.
-- Handle dev/prod
 - Remove the warnings with vite
 
 ## Absolute paths

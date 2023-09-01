@@ -1,5 +1,6 @@
 """NodeJs Web binary rule."""
 
+load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
 load("@bzd_package//:defs.bzl", "BzdPackageFragmentInfo", "bzd_package_prefix_from_file")
 load("@bzd_rules_nodejs//nodejs:private/nodejs_install.bzl", "BzdNodeJsInstallInfo", "bzd_nodejs_install")
@@ -65,6 +66,7 @@ def _bzd_nodejs_web_exec_impl(ctx):
         env = {
             "BZD_ROOT_DIR": vite_config.dirname,
             "FORCE_COLOR": "1",
+            "NODE_ENV": "production" if ctx.attr._build[BuildSettingInfo].value == "prod" else "development",
         },
         executable = toolchain_executable.node.files_to_run,
         # node_modules is made of symlinks, this cannot run remotely.
@@ -101,6 +103,9 @@ _bzd_nodejs_web_binary = rule(
         ),
         "_allowlist_function_transition": attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist",
+        ),
+        "_build": attr.label(
+            default = "@bzd_lib//settings/build",
         ),
         "_metadata_json": attr.label(
             default = Label("@bzd_rules_nodejs//nodejs/metadata:metadata_nodejs_web.json"),

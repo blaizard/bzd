@@ -11,14 +11,14 @@ def worker(contextPath: pathlib.Path,
            workload: typing.Callable[[typing.Tuple[str, ...], typing.TextIO], bool],
            args: typing.Optional[typing.List[str]] = None,
            timeoutS: int = 60,
-           **filters) -> bool:
+           **filters: typing.Any) -> bool:
 	"""Execute in parallel multiple workloads and report errors if needed."""
 
 	context = Context.fromFile(contextPath)
-	worker = Worker(workload)
+	utilsWorker = Worker(workload)
 	isFailure = False
 
-	with worker.start(throwOnException=False) as w:
+	with utilsWorker.start(throwOnException=False) as w:  # type: ignore
 		for f in context.data(**filters):
 			w.add(
 			    [context.workspace, f, context.check] + ([] if args is None else args),

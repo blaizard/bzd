@@ -51,8 +51,7 @@ export default class Services {
 						result: result,
 						service: service,
 					};
-				}
-				catch (e) {
+				} catch (e) {
 					Exception.print("{}", Exception.fromError(e));
 				}
 			}
@@ -66,13 +65,11 @@ export default class Services {
 				Log.info("Stopping service '{}' for '{}'", type, name);
 				try {
 					await data.service.stop(data.result);
-				}
-				catch (e) {
+				} catch (e) {
 					Exception.print("{}", Exception.fromError(e));
 				}
 			}
-		}
-		finally {
+		} finally {
 			delete this.instances[name];
 		}
 	}

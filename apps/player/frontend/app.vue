@@ -7,7 +7,8 @@
 			:key="id"
 			:class="setComponentClass(id, component.type)"
 			:style="{ 'grid-area': id }"
-			@click="selectComponents(id)">
+			@click="selectComponents(id)"
+		>
 			<Terminal v-if="component.type == 'terminal'" :ref="id"></Terminal>
 			<Editor
 				v-else-if="component.type == 'editor' && selectedFile"
@@ -15,12 +16,14 @@
 				@input="handleContentUpdate"
 				:path="selectedFile.path"
 				:caret="cursor"
-				:focus="selectedComponents.includes(id)"></Editor>
+				:focus="selectedComponents.includes(id)"
+			></Editor>
 			<Tree
 				v-else-if="component.type == 'tree'"
 				:node="root"
 				:selected="files.selected"
-				@selected="handleTreeSelected"></Tree>
+				@selected="handleTreeSelected"
+			></Tree>
 			<div class="name" v-if="component.name">{{ component.name }}</div>
 		</div>
 	</div>
@@ -116,7 +119,7 @@
 				return ids;
 			},
 			styleLayout() {
-				const areas = this.layout.map((line) => "\"" + line.join(" ") + "\"").join("\n");
+				const areas = this.layout.map((line) => '"' + line.join(" ") + '"').join("\n");
 				return {
 					"grid-template-areas": areas,
 					"grid-template-rows": this.layout.map(() => "1fr").join(" "),
@@ -200,19 +203,19 @@
 				Exception.assert(await this.files.select(path), "The file must exists: '{}'.", path);
 				this.selectedComponents = ["editor-0"];
 				switch (position) {
-				case "begin":
-					this.files.selected.setCursor(0);
-					break;
-				case "after":
-					{
-						await this.files.selected.fetchContent();
-						const position = this.files.selected.content.indexOf(arg);
-						Exception.assert(position != -1, "The file content does not contain: '{}'.", arg);
-						this.files.selected.setCursor(position + arg.length);
-					}
-					break;
-				default:
-					Log.error("Unsupported position '{}'.", position);
+					case "begin":
+						this.files.selected.setCursor(0);
+						break;
+					case "after":
+						{
+							await this.files.selected.fetchContent();
+							const position = this.files.selected.content.indexOf(arg);
+							Exception.assert(position != -1, "The file content does not contain: '{}'.", arg);
+							this.files.selected.setCursor(position + arg.length);
+						}
+						break;
+					default:
+						Log.error("Unsupported position '{}'.", position);
 				}
 			},
 			async executeFileSelect(path) {
@@ -221,8 +224,7 @@
 				if (node.isFile()) {
 					await this.files.selected.fetchContent();
 					this.setSelectionEnd();
-				}
-				else {
+				} else {
 					await this.files.selected.toggleExpand();
 				}
 			},
@@ -307,38 +309,38 @@
 				}
 
 				switch (this.action.type) {
-				case "config.layout":
-					await this.executeConfigLayout(...this.action.args);
-					break;
-				case "config.select":
-					await this.executeConfigSelect(...this.action.args);
-					break;
-				case "config.name":
-					await this.executeConfigName(...this.action.args);
-					break;
-				case "file.create":
-					await this.executeFileCreate(...this.action.args);
-					break;
-				case "file.write":
-					await this.executeFileWrite(...this.action.args);
-					break;
-				case "file.seek":
-					await this.executeFileSeek(...this.action.args);
-					break;
-				case "file.select":
-					await this.executeFileSelect(...this.action.args);
-					break;
-				case "wait":
-					await this.sleep(parseInt(this.action.args[0]) * 1000);
-					break;
-				case "exec":
-					await this.executeExec(...this.action.args);
-					break;
-				case "refresh":
-					await this.executeRefresh(...this.action.args);
-					break;
-				default:
-					console.error("Unsupported command: " + this.action.type);
+					case "config.layout":
+						await this.executeConfigLayout(...this.action.args);
+						break;
+					case "config.select":
+						await this.executeConfigSelect(...this.action.args);
+						break;
+					case "config.name":
+						await this.executeConfigName(...this.action.args);
+						break;
+					case "file.create":
+						await this.executeFileCreate(...this.action.args);
+						break;
+					case "file.write":
+						await this.executeFileWrite(...this.action.args);
+						break;
+					case "file.seek":
+						await this.executeFileSeek(...this.action.args);
+						break;
+					case "file.select":
+						await this.executeFileSelect(...this.action.args);
+						break;
+					case "wait":
+						await this.sleep(parseInt(this.action.args[0]) * 1000);
+						break;
+					case "exec":
+						await this.executeExec(...this.action.args);
+						break;
+					case "refresh":
+						await this.executeRefresh(...this.action.args);
+						break;
+					default:
+						console.error("Unsupported command: " + this.action.type);
 				}
 
 				++this.index;
