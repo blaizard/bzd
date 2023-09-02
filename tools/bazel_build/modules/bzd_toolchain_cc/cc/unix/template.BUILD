@@ -112,10 +112,10 @@ genrule(
         ":all_files",
         ":extra_files"
     ],
-    outs = ["package.tar.xz"],
+    outs = ["%{package_name}.tar.xz"],
     tags = ["manual"],
     cmd = """
-    tar -cJf $@ --dereference --transform 's/^\\./linux_x86_64_17.0.0/' -C "%{repository_path}" .
+    tar -cJf $@ --dereference --transform 's/^\\./%{package_name}/' -C "%{repository_path}" .
     """
 )
 

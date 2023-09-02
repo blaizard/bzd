@@ -52,6 +52,7 @@ def linux_x86_64(module_ctx, name):
             "{}/lib".format(repository_path),
         ],
         "sha256": "1a3a7a8df2ca2dd84358b8202c256ba93789871bd2329ba426337cdfdd9de4ef",
+        "package_name": "linux_x86_64_17.0.0",
         "strip_prefix": "linux_x86_64_17.0.0",
         "system_directories": [
             "{}/include/c++/v1".format(repository_path),

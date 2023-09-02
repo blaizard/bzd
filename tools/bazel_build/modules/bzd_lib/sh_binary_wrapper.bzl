@@ -80,6 +80,8 @@ def sh_binary_wrapper_impl(ctx, output, binary = None, locations = {}, paths = {
     return DefaultInfo(
         executable = output,
         runfiles = runfiles,
+        # Important so that any rules that depends on this one, will get all the files.
+        files = runfiles.files
     )
 
 def _sh_binary_wrapper_impl(ctx):

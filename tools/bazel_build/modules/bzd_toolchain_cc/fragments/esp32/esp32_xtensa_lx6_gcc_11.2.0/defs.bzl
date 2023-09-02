@@ -60,6 +60,7 @@ def linux_x86_64(module_ctx, name):
             "@bzd_toolchain_cc//:fragments/esp32/esp32_xtensa_lx6_gcc_11.2.0/wrapper_cc_start_end_group.patch",
         ],
         "sha256": "698d8407e18275d18feb7d1afdb68800b97904fbe39080422fb8609afa49df30",
+        "package_name": "xtensa-esp32-elf",
         "strip_prefix": "xtensa-esp32-elf",
         "system_directories": [
             "{}/xtensa-esp32-elf/include/c++/11.2.0/xtensa-esp32-elf".format(repository_path),

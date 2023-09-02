@@ -66,7 +66,9 @@ filegroup(
     srcs = [
         ":clang_format",
         ":llvm_symbolizer",
-        ":clang_tidy"
+        ":clang_tidy",
+        ":cov",
+        ":objdump"
     ],
 )
 
