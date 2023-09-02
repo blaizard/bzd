@@ -51,8 +51,9 @@ def linux_arm64(module_ctx, name):
         "linker_dirs": [
             "{}/lib".format(repository_path),
         ],
-        "sha256": "eedad237ef7ab5de8f6d853c0a5dadc27b48ac0ee18d5858ab6ff6e65e0a2ce5",
-        "strip_prefix": "clang+llvm-17.0.0-rc3-aarch64-linux-gnu",
+        "sha256": "d49b50d8d5b9cdec00d15f705be5627488f56c4210437d4d07870bed8c4ab2f2",
+        "package_name": "linux_arm64_17.0.0",
+        "strip_prefix": "linux_arm64_17.0.0",
         "system_directories": [
             "{}/include/c++/v1".format(repository_path),
             "{}/lib/clang/17/include".format(repository_path),
@@ -60,7 +61,7 @@ def linux_arm64(module_ctx, name):
             "/usr/include/aarch64-linux-gnu",
             "/usr/include",
         ],
-        "url": "https://github.com/llvm/llvm-project/releases/download/llvmorg-17.0.0-rc3/clang+llvm-17.0.0-rc3-aarch64-linux-gnu.tar.xz",
+        "url": "http://data.blaizard.com/file/bzd/toolchains/cc/clang/linux_arm64/linux_arm64_17.0.0.tar.xz",
     }
 
     toolchain_definition = toolchain_merge(toolchain_definition, linux(module_ctx, name))
