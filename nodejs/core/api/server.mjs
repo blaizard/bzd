@@ -28,8 +28,8 @@ class Context {
 		return new Url.URL(this.api.getEndpoint(endpoint), this.getHost()).href;
 	}
 
-	getBody() {
-		return this.request.body;
+	getHeader(name) {
+		return this.request.get(name);
 	}
 
 	setHeader(key, value) {
@@ -73,7 +73,6 @@ class Context {
 }
 
 export default class APIServer extends Base {
-
 	constructor(schema, options) {
 		super(schema, options);
 		this._installPlugins();
@@ -133,8 +132,10 @@ export default class APIServer extends Base {
 				}
 
 				let data = {};
-				console.log(request.body);
 				switch (requestOptions.type) {
+					case "raw":
+						data["raw"] = request.body;
+						break;
 					case "json":
 						data = request.body;
 						break;
@@ -147,7 +148,6 @@ export default class APIServer extends Base {
 						});
 						break;
 				}
-
 				// Add any params to the data (if any)
 				Object.assign(data, request.params);
 
@@ -226,15 +226,19 @@ export default class APIServer extends Base {
 		};
 
 		// Update the endpoint to support variables.
-		const updatedEndpoint = "/" + this.parseEndpoint(endpoint).map((fragment) => {
-			if (typeof fragment == "string") {
-				return fragment;
-			}
-			if (fragment.isVarArgs) {
-				return ":" + fragment.name + "(*)";
-			}
-			return ":" + fragment.name;
-		}).join("/");
+		const updatedEndpoint =
+			"/" +
+			this.parseEndpoint(endpoint)
+				.map((fragment) => {
+					if (typeof fragment == "string") {
+						return fragment;
+					}
+					if (fragment.isVarArgs) {
+						return ":" + fragment.name + "(*)";
+					}
+					return ":" + fragment.name;
+				})
+				.join("/");
 
 		Exception.assert(this.options.channel, "Channel is missing");
 		this.options.channel.addRoute(method, this.getEndpoint(updatedEndpoint), handler, webOptions);

@@ -4,14 +4,8 @@
 #
 #    pip-compile --output-file=tools/python/requirements.txt tools/python/requirements.in
 #
-certifi==2023.7.22
-    # via requests
-charset-normalizer==3.2.0
-    # via requests
 gitignore-parser==0.1.2
     # via -r tools/python/requirements.in
-idna==3.4
-    # via requests
 mypy==0.991
     # via -r tools/python/requirements.in
 mypy-extensions==0.4.3
@@ -24,15 +18,11 @@ pyelftools==0.29
     # via -r tools/python/requirements.in
 pyserial==3.5
     # via -r tools/python/requirements.in
-requests==2.31.0
-    # via -r tools/python/requirements.in
 tomli==2.0.1
     # via mypy
 typing-extensions==4.4.0
     # via
     #   -r tools/python/requirements.in
     #   mypy
-urllib3==2.0.4
-    # via requests
 yapf==0.32.0
     # via -r tools/python/requirements.in

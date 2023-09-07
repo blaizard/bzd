@@ -141,37 +141,49 @@ program
 	for (const type in Plugins) {
 		if ("endpoints" in Plugins[type]) {
 			endpoints[type] = {};
-			const endpointsForType = Plugins[type].endpoints
+			const endpointsForType = Plugins[type].endpoints;
 			for (const endpoint in endpointsForType) {
-				const regexprEndpoint = api.parseEndpoint(endpoint).map((fragment) => {
-					if (typeof fragment == "string") {
-						return regexprEscape(fragment);
-					}
-					if (fragment.isVarArgs) {
-						return "(?<" + fragment.name + ">.+)"
-					}
-					return "(?<" + fragment.name + ">[^/]+)"
-				}).join("\\/");
+				const regexprEndpoint = api
+					.parseEndpoint(endpoint)
+					.map((fragment) => {
+						if (typeof fragment == "string") {
+							return regexprEscape(fragment);
+						}
+						if (fragment.isVarArgs) {
+							return "(?<" + fragment.name + ">.+)";
+						}
+						return "(?<" + fragment.name + ">[^/]+)";
+					})
+					.join("\\/");
 				const regexpr = new RegExp(regexprEndpoint, "i");
 				for (const method in endpointsForType[endpoint]) {
-					endpoints[type][method] ??= []
-					endpoints[type][method].push(Object.assign({"regexpr": regexpr}, endpointsForType[endpoint][method]));
-					Exception.assert("handler" in endpointsForType[endpoint][method], "Endpoint is missing handler '{}'", endpoint);
+					endpoints[type][method] ??= [];
+					endpoints[type][method].push(Object.assign({ regexpr: regexpr }, endpointsForType[endpoint][method]));
+					Exception.assert(
+						"handler" in endpointsForType[endpoint][method],
+						"Endpoint is missing handler '{}'",
+						endpoint,
+					);
 				}
 			}
 		}
 	}
 
-	const endpointHandler = async function(method, volume, pathList, inputs) {
+	const endpointHandler = async function (method, volume, pathList, inputs) {
 		const params = await keyValueStore.get("volume", volume, null);
 		Exception.assert(params !== null, "No volume are associated with this id: '{}'", volume);
 		Exception.assert("type" in params, "Unknown type for the volume: '{}'", volume);
 		Exception.assert(params.type in endpoints, "Volume type '{}' does not support endpoints.", params.type);
-		Exception.assert(method in endpoints[params.type], "Volume type '{}' does not support '{}' method endpoint.", params.type, method);
+		Exception.assert(
+			method in endpoints[params.type],
+			"Volume type '{}' does not support '{}' method endpoint.",
+			params.type,
+			method,
+		);
 
 		// Look for a match.
 		const regexprs = endpoints[params.type][method];
-		const path = pathList.map(encodeURIComponent).join("/")
+		const path = pathList.map(encodeURIComponent).join("/");
 		for (const data of regexprs) {
 			const match = data.regexpr.exec(path);
 			if (match) {
@@ -181,7 +193,7 @@ program
 		}
 
 		Exception.error("Unhandled endpoint for /{}", [volume, ...pathList].join("/"));
-	}
+	};
 
 	// Retrieve the storage implementation associated with this volume
 	cache.register("volume", async (volume) => {
@@ -327,10 +339,10 @@ program
 	for (const method of ["get", "post"]) {
 		api.handle(method, "/endpoint/{path:*}", async function (inputs) {
 			const { volume, pathList } = getInternalPathFromString(inputs.path);
+			delete inputs.path;
 			if (method == "get") {
 				return await cache.get("endpoint", volume, ...pathList);
-			}
-			else {
+			} else {
 				return await endpointHandler.call(this, method, volume, pathList, inputs);
 			}
 		});

@@ -1,7 +1,5 @@
 <template>
-	<code>
-		{{ metadata }}
-	</code>
+	<pre><code>{{ formatedMetadata }}</code></pre>
 </template>
 
 <script>
@@ -14,6 +12,11 @@
 			return {
 				metadata: {},
 			};
+		},
+		computed: {
+			formatedMetadata() {
+				return JSON.stringify(this.metadata, null, 4);
+			},
 		},
 		mounted() {
 			this.fetchMetadata();

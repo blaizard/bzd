@@ -43,6 +43,9 @@
         },
         "post": {
             "documentation": "Post data of a specific endpoint.",
+            "request": {
+                "type": "raw"
+            },
             "response": {
                 "type": "raw"
             }
