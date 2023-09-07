@@ -13,13 +13,13 @@ py_binary(
     name = "node",
     srcs = [
         "monitor.py",
+        "node.py",
         "power.py",
         "rest_server.py",
-        "node.py",
     ],
     deps = [
         requirement("psutil"),
-        requirement("requests"),
+        "@bzd_python//bzd/http:client",
     ],
 )
 

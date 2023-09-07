@@ -31,23 +31,39 @@ class Bundler:
 
 			# Create the self extracting output file.
 			with open(output, mode="wb") as fo:
-				fo.write(b"""#!/bin/bash
+				fo.write("""#!/bin/bash
 set -e
-temp=`mktemp -d`
+
+case $1 in
+	--extract)
+		temp="$2"
+		mkdir -p "$temp"
+		shift
+		shift
+		;;
+	*)
+		temp=$(mktemp -d)
+		;;
+esac
+
+temp=$(readlink -f "$temp")
 if [[ ! "$temp" || ! -d "$temp" ]]; then
-  echo "Could not create temporary directory."
-  exit 1
+	echo "Could not create temporary directory."
+	exit 1
 fi
-function cleanup {
+
+function cleanup {{
   rm -rf "$temp"
-}
+}}
 trap cleanup EXIT
-sed '0,/^#EOF#$/d' "$0" | tar -C "$temp" -zx
-cd $temp/""" + str(self.cwd).encode() + b"""
-RUNFILES_DIR="$temp" """ + str(self.executable).encode() + b""";
+
+sed '0,/^#__END_OF_SCRIPT__#$/d' "$0" | tar -C "$temp" -zx
+cd "$temp/{cwd}"
+RUNFILES_DIR="$temp" "{executable}" "$@"
 exit 0;
-#EOF#
-""")
+
+#__END_OF_SCRIPT__#
+""".format(executable=str(self.executable), cwd=str(self.cwd)).encode("utf-8"))
 				fo.write(fd.read())
 
 		# Set permission to executable.
