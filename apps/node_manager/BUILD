@@ -10,20 +10,21 @@ py_binary(
 )
 
 py_binary(
-    name = "server",
+    name = "node",
     srcs = [
         "monitor.py",
         "power.py",
         "rest_server.py",
-        "server.py",
+        "node.py",
     ],
     deps = [
         requirement("psutil"),
+        requirement("requests"),
     ],
 )
 
 bzd_bundle(
     name = "node_manager",
-    binary = ":server",
+    binary = ":node",
     tags = ["manual"],
 )

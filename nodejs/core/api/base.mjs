@@ -27,11 +27,6 @@ export default class API {
 		);
 
 		this.schema = schema;
-
-		// Install all available plugins
-		this.options.plugins.forEach((plugin) => {
-			plugin.installAPI(this);
-		});
 	}
 
 	/**
@@ -51,6 +46,36 @@ export default class API {
 
 	getEndpoint(endpoint) {
 		return "/api/v" + this.options.version + endpoint;
+	}
+
+	/// Parse an endpoint and returns the deconstructed format.
+	///
+	/// Valid schema are as follow:
+	/// /hello/{world}/my/{path:*}
+	parseEndpoint(endpoint) {
+		const endpointSplited = endpoint.split("/").filter(Boolean);
+		return endpointSplited.map((fragment, index) => {
+			const match = fragment.match(/^{([^}:]+)(:([^}]))?}$/);
+			if (!match) {
+				Exception.assert(!(fragment.includes("{") || fragment.includes("}")), "Endpoint string '{}' is malformed, this part: '{}'.", endpoint, fragment);
+				return fragment;
+			}
+			const isVarArgs = match[3] == "*";
+			Exception.assert(!isVarArgs || (index == endpointSplited.length - 1), "The variable argument part of the endpoint '{}' must be the last.", endpoint);
+			return {
+				name: match[1],
+				isVarArgs: isVarArgs
+			};
+		});
+	}
+
+	/// Install all available plugins.
+	///
+	/// \note This needs to run after the constructor is completed.
+	_installPlugins() {
+		this.options.plugins.forEach((plugin) => {
+			plugin.installAPI(this);
+		});
 	}
 
 	/**

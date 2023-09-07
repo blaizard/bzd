@@ -19,35 +19,22 @@ const Exception = ExceptionFactory("http", "server");
 
 export default class HttpServer {
 	constructor(port, config) {
+		Exception.assert(typeof port === "number", "The port '{}' must be a number.", port);
 		this.config = Object.assign(
 			{
-				/**
-				 * \brief Set the upload directory.
-				 */
+				/// \brief Set the upload directory.
 				uploadDir: false,
-				/**
-				 * \brief Set the file transfer limit.
-				 */
+				/// \brief Set the file transfer limit.
 				limit: 1 * 1024 * 1024,
-				/**
-				 * \brief Public key of the SSL certificate.
-				 */
+				/// \brief Public key of the SSL certificate.
 				key: null,
-				/**
-				 * \brief SSL certificate.
-				 */
+				/// \brief SSL certificate.
 				cert: null,
-				/**
-				 * \brief SSL certificate authority.
-				 */
+				/// \brief SSL certificate authority.
 				ca: null,
-				/**
-				 * \brief Use data compression and minfy certain file types.
-				 */
+				/// \brief Use data compression and minfy certain file types.
 				useCompression: true,
-				/**
-				 * Options to be used while serving static files
-				 */
+				/// Options to be used while serving static files
 				staticOptions: {
 					maxAge: 60 * 60 * 1000, // 1h
 					index: "index.html",

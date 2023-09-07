@@ -144,6 +144,15 @@ const ExceptionFactory = (...topics) => {
 		}
 
 		/**
+		 * Error reached
+		 */
+		static error(str = "", ...args) {
+			let combine = new ExceptionCombine("Error");
+			combine.add(str, ...args);
+			throw new Exception(combine);
+		}
+
+		/**
 		 * Flag a line of code unreachable
 		 */
 		static unreachable(str = "", ...args) {

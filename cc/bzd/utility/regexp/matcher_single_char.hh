@@ -43,6 +43,8 @@ public:
 				return MatcherSingleChar{&MatcherSingleChar::matchWord};
 			case 'W':
 				return MatcherSingleChar{&MatcherSingleChar::matchNotWord};
+			default:
+				return MatcherSingleChar{&MatcherSingleChar::matchChar, value};
 			}
 		}
 		else

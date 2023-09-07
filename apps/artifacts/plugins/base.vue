@@ -10,7 +10,7 @@
 			},
 			isExpandable() {
 				if (this.item) {
-					return ["directory", "bucket"].includes(this.item.type);
+					return this.item.permissions.permissions.list;
 				}
 				return false;
 			},
@@ -21,7 +21,7 @@
 				return null;
 			},
 			name() {
-				return this.pathList.slice(-1);
+				return this.pathList.slice(-1)[0];
 			},
 			item() {
 				for (const item of this.itemList) {

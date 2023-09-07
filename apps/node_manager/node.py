@@ -1,5 +1,6 @@
 import argparse
 import json
+import requests
 
 from apps.node_manager.rest_server import RESTServer, RESTServerContext
 from apps.node_manager.power import handlersPower
@@ -21,4 +22,8 @@ if __name__ == "__main__":
 		server.run()
 
 	else:
-		print(json.dumps(monitor(), indent=4))
+		data = monitor()
+		print(json.dumps(data, indent=4))
+
+		response = requests.post("http://localhost:8080/api/v1/endpoint/bzd/UID_TEST2/status", json=data)
+		print(response)

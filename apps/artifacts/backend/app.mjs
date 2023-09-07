@@ -9,6 +9,7 @@ import Permissions from "#bzd/nodejs/db/storage/permissions.mjs";
 import { CollectionPaging } from "#bzd/nodejs/db/utils.mjs";
 import { Command } from "commander/esm.mjs";
 import Path from "path";
+import { regexprEscape } from "#bzd/nodejs/utils/regexpr.mjs";
 
 import APIv1 from "../api.v1.json" assert { type: "json" };
 import Plugins from "../plugins/backend.mjs";
@@ -104,6 +105,12 @@ program
 			"webdav.username": "YsLRkFLLceXbPrB",
 		});
 
+		await keyValueStore.set("volume", "bzd", {
+			type: "bzd",
+			"bzd.path": "/bzd/data",
+			"bzd.server.port": 8888,
+		});
+
 		// await keyValueStore.set("volume", "docker.gcr", {
 		// type: "docker",
 		// "docker.type": "gcr",
@@ -118,16 +125,6 @@ program
 	// Set the cache
 	let cache = new Cache();
 
-	// Retrieve the storage implementation associated with this volume
-	cache.register("volume", async (volume) => {
-		const params = await keyValueStore.get("volume", volume, null);
-		Exception.assert(params !== null, "No volume are associated with this id: '{}'", volume);
-		Exception.assert("type" in params, "Unknown type for the volume: '{}'", volume);
-		Exception.assert(params.type in Plugins, "Volume type unsupported: '{}'", params.type);
-		Exception.assert("storage" in Plugins[params.type], "Storage not supported by plugin '{}'", params.type);
-		return await Plugins[params.type].storage(params);
-	});
-
 	// Creating services
 	let services = new Services({
 		makeContext: (volume) => {
@@ -137,6 +134,70 @@ program
 				},
 			};
 		},
+	});
+
+	// Preprocess endpoints
+	let endpoints = {};
+	for (const type in Plugins) {
+		if ("endpoints" in Plugins[type]) {
+			endpoints[type] = {};
+			const endpointsForType = Plugins[type].endpoints
+			for (const endpoint in endpointsForType) {
+				const regexprEndpoint = api.parseEndpoint(endpoint).map((fragment) => {
+					if (typeof fragment == "string") {
+						return regexprEscape(fragment);
+					}
+					if (fragment.isVarArgs) {
+						return "(?<" + fragment.name + ">.+)"
+					}
+					return "(?<" + fragment.name + ">[^/]+)"
+				}).join("\\/");
+				const regexpr = new RegExp(regexprEndpoint, "i");
+				for (const method in endpointsForType[endpoint]) {
+					endpoints[type][method] ??= []
+					endpoints[type][method].push(Object.assign({"regexpr": regexpr}, endpointsForType[endpoint][method]));
+					Exception.assert("handler" in endpointsForType[endpoint][method], "Endpoint is missing handler '{}'", endpoint);
+				}
+			}
+		}
+	}
+
+	const endpointHandler = async function(method, volume, pathList, inputs) {
+		const params = await keyValueStore.get("volume", volume, null);
+		Exception.assert(params !== null, "No volume are associated with this id: '{}'", volume);
+		Exception.assert("type" in params, "Unknown type for the volume: '{}'", volume);
+		Exception.assert(params.type in endpoints, "Volume type '{}' does not support endpoints.", params.type);
+		Exception.assert(method in endpoints[params.type], "Volume type '{}' does not support '{}' method endpoint.", params.type, method);
+
+		// Look for a match.
+		const regexprs = endpoints[params.type][method];
+		const path = pathList.map(encodeURIComponent).join("/")
+		for (const data of regexprs) {
+			const match = data.regexpr.exec(path);
+			if (match) {
+				const values = Object.assign({}, inputs, match.groups);
+				return await data.handler.call(this, values, services.getActiveFor(volume));
+			}
+		}
+
+		Exception.error("Unhandled endpoint for /{}", [volume, ...pathList].join("/"));
+	}
+
+	// Retrieve the storage implementation associated with this volume
+	cache.register("volume", async (volume) => {
+		const params = await keyValueStore.get("volume", volume, null);
+		Exception.assert(params !== null, "No volume are associated with this id: '{}'", volume);
+		Exception.assert("type" in params, "Unknown type for the volume: '{}'", volume);
+		Exception.assert(params.type in Plugins, "Volume type unsupported: '{}'", params.type);
+		Exception.assert("storage" in Plugins[params.type], "Storage not supported by plugin '{}'", params.type);
+		return await Plugins[params.type].storage(params, services.getActiveFor(volume));
+	});
+
+	// Create the endpoints cache
+	cache.register("endpoint", async (volume, ...pathList) => {
+		pathList.pop(); // options
+		pathList.pop(); // previous value
+		return await endpointHandler("get", volume, pathList, {});
 	});
 
 	// Register all plugns
@@ -262,6 +323,18 @@ program
 	api.handle("get", "/services", async (/*inputs*/) => {
 		return services.getActive();
 	});
+
+	for (const method of ["get", "post"]) {
+		api.handle(method, "/endpoint/{path:*}", async function (inputs) {
+			const { volume, pathList } = getInternalPathFromString(inputs.path);
+			if (method == "get") {
+				return await cache.get("endpoint", volume, ...pathList);
+			}
+			else {
+				return await endpointHandler.call(this, method, volume, pathList, inputs);
+			}
+		});
+	}
 
 	Log.info("Application started");
 	web.addStaticRoute("/", PATH_STATIC, "index.html");
