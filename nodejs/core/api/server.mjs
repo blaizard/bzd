@@ -3,6 +3,7 @@ import Url from "url";
 import ExceptionFactory from "../exception.mjs";
 import LogFactory from "../log.mjs";
 import Validation from "../validation.mjs";
+import { regexprEscape } from "#bzd/nodejs/utils/regexpr.mjs";
 
 import Base from "./base.mjs";
 
@@ -25,6 +26,10 @@ class Context {
 
 	getEndpoint(endpoint) {
 		return new Url.URL(this.api.getEndpoint(endpoint), this.getHost()).href;
+	}
+
+	getBody() {
+		return this.request.body;
 	}
 
 	setHeader(key, value) {
@@ -68,9 +73,13 @@ class Context {
 }
 
 export default class APIServer extends Base {
-	/**
-	 * Register a callback to handle a request
-	 */
+
+	constructor(schema, options) {
+		super(schema, options);
+		this._installPlugins();
+	}
+
+	/// Register a callback to handle a request
 	handle(method, endpoint, callback /*, options = {}*/) {
 		this._sanityCheck(method, endpoint);
 		const requestOptions = this.schema[endpoint][method].request || {};
@@ -99,7 +108,7 @@ export default class APIServer extends Base {
 		}
 
 		// Create a wrapper to the callback
-		const callbackWrapper = async (request, response) => {
+		const handler = async (request, response) => {
 			let context = new Context(request, response, this);
 
 			try {
@@ -124,6 +133,7 @@ export default class APIServer extends Base {
 				}
 
 				let data = {};
+				console.log(request.body);
 				switch (requestOptions.type) {
 					case "json":
 						data = request.body;
@@ -215,13 +225,18 @@ export default class APIServer extends Base {
 			}
 		};
 
-		// Update the endpoint to support variables
-		// Only supports simple syntax:
-		// -> /users/{userId}/books/{bookId} -> /users/:userId/books/:bookId
-		let regexpr = /{([^}:]+)}/;
-		const updatedEndpoint = endpoint.replace(regexpr, ":$1");
+		// Update the endpoint to support variables.
+		const updatedEndpoint = "/" + this.parseEndpoint(endpoint).map((fragment) => {
+			if (typeof fragment == "string") {
+				return fragment;
+			}
+			if (fragment.isVarArgs) {
+				return ":" + fragment.name + "(*)";
+			}
+			return ":" + fragment.name;
+		}).join("/");
 
 		Exception.assert(this.options.channel, "Channel is missing");
-		this.options.channel.addRoute(method, this.getEndpoint(updatedEndpoint), callbackWrapper, webOptions);
+		this.options.channel.addRoute(method, this.getEndpoint(updatedEndpoint), handler, webOptions);
 	}
 }

@@ -64,7 +64,7 @@
 			},
 			viewComponent() {
 				if (this.plugin !== null) {
-					return this.plugin.view;
+					return () => this.plugin.view.apply(this);
 				}
 			},
 		},

@@ -2,12 +2,18 @@ import ExceptionFactory from "../exception.mjs";
 import HttpClient from "../http/client.mjs";
 import { HttpClientException } from "../http/client.mjs";
 import Validation from "../validation.mjs";
+import Format from "#bzd/nodejs/core/format.mjs";
 
 import Base from "./base.mjs";
 
 const Exception = ExceptionFactory("api", "client");
 
 export default class APIClient extends Base {
+	constructor(schema, options) {
+		super(schema, options);
+		this._installPlugins();
+	}
+
 	updateForm(method, endpoint, formDescription) {
 		this._sanityCheck(method, endpoint);
 		const requestOptions = this.schema[endpoint][method].request || {};
@@ -59,6 +65,14 @@ export default class APIClient extends Base {
 			});
 		}
 
+		// Update the endpoint if needed.
+		const updatedEndpoint = "/" + this.parseEndpoint(endpoint).map((fragment) => {
+			if (typeof fragment == "string") {
+				return fragment;
+			}
+			return data[fragment.name];
+		}).join("/");
+
 		switch (requestOptions.type) {
 			case "json":
 				// Enforce best practice
@@ -97,7 +111,8 @@ export default class APIClient extends Base {
 			}
 
 			try {
-				const result = await HttpClient.request(this.getEndpoint(endpoint), fetchOptions);
+				const channel = this.options.channel ? this.options.channel : HttpClient;
+				const result = await channel.request(this.getEndpoint(updatedEndpoint), fetchOptions);
 				if ("validation" in responseOptions) {
 					Exception.assert(
 						["json"].includes(responseOptions.type),

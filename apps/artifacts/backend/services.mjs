@@ -39,6 +39,15 @@ export default class Services {
 		return services;
 	}
 
+	/// Get list of active services for a specific name.
+	getActiveFor(name) {
+		let services = {};
+		for (const type in this.instances[name]) {
+			services[type] = this.instances[name][type].result;
+		}
+		return services;
+	}
+
 	async start(name, namespace, params) {
 		Exception.assert(!(name in this.instances), "Instances for '{}' are already created.", name);
 		for (const [type, service] of this._iterate(namespace)) {

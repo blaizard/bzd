@@ -48,6 +48,8 @@ struct ToString<T>
 				Adapter::assertTrue(!metadata.isPrecision, "Precision option can only be assigned once.");
 				metadata.isPrecision = parseUnsignedInteger(options, metadata.precision);
 				break;
+			default:
+				Adapter::onError("Unsupported option, only the following is supported: [.]");
 			}
 		}
 

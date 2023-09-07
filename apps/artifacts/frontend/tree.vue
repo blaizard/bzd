@@ -1,9 +1,9 @@
 <template>
 	<div class="container" v-loading="loading">
 		<template v-for="item in list">
-			<div :key="item.name" @click="handleClick(item)" :class="getClass(item)">
+			<div :key="item.name" @click="handleExpand(item)" :class="getClass(item)">
 				<i v-if="isPermissionList(item)" class="bzd-icon-folder"></i>
-				{{ item.name }}
+				<span class="name" @click.stop="handleSelect(item)">{{ item.name }}</span>
 				<span class="actions" @click.stop="">
 					<i
 						v-if="depth == 0 && $authentication.isAuthenticated"
@@ -124,12 +124,11 @@
 				const maybeItem = this.list.find((item) => item.name == name);
 				return maybeItem || null;
 			},
-			handleClick(item) {
+			handleExpand(item) {
 				const name = item.name;
 				if (name in this.expanded) {
 					this.$delete(this.expanded, name);
 				} else {
-					// Select the item, only if it is not expanded already.
 					this.$emit("item", {
 						item: item,
 						path: [],
@@ -138,6 +137,18 @@
 						this.$set(this.expanded, name, true);
 					}
 				}
+			},
+			handleSelect(item) {
+				const name = item.name;
+				if (!(name in this.expanded)) {
+					if (this.isPermissionList(item)) {
+						this.$set(this.expanded, name, true);
+					}
+				}
+				this.$emit("item", {
+					item: item,
+					path: [],
+				});
 			},
 			handleConfig(name) {
 				this.$routerDispatch("/config/" + name);
@@ -198,6 +209,17 @@
 			position: relative;
 			padding-left: #{$arrowSize * 2}px;
 			white-space: nowrap;
+			cursor: pointer;
+
+			.name {
+				padding-left: #{$arrowSize}px;
+			}
+
+			&:hover {
+				.name {
+					opacity: 0.7;
+				}
+			}
 
 			.actions {
 				float: right;
@@ -217,8 +239,6 @@
 			}
 
 			&.expandable {
-				cursor: pointer;
-
 				&:before {
 					position: absolute;
 					left: #{math.div(-$arrowSize, 2)}px;

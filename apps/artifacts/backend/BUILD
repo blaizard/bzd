@@ -30,5 +30,6 @@ bzd_nodejs_binary(
         "//nodejs/core/http:server",
         "//nodejs/db:utils",
         "//nodejs/db/key_value_store:disk",
+        "//nodejs/utils:regexpr",
     ],
 )

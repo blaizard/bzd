@@ -34,9 +34,9 @@ The following target platforms are currently supported:
 
 | Name                 | Compiler | Version | Executors   | Debug |
 | -------------------- | -------- | ------- | ----------- | ----- |
-| linux_x86_64_clang\* | clang    | 14.0.6  | host\*      |       |
-| linux_x86_64_gcc     | gcc      | 11.2.0  | host\*      |       |
-| esp32_xtensa_lx6_gcc | gcc      | 11.2.0  | sim\*, uart | x     |
+| linux_x86_64_clang\* | clang    | 17.0.0  | host\*      |       |
+| linux_x86_64_gcc     | gcc      | 13.1.0  | host\*      |       |
+| esp32_xtensa_lx6_gcc | gcc      | 12.2.0  | sim\*, uart | x     |
 
 \* Default.
 
