@@ -36,7 +36,7 @@ function pathToPathList(path) {
 
 (async () => {
 	// Read arguments
-	const PORT = process.env.BZD_PORT || program.opts().port;
+	const PORT = Number(process.env.BZD_PORT || program.opts().port);
 	const PATH_STATIC = program.opts().static;
 	const PATH_SCENARIO = program.args[0];
 	const PATH_DATA = Path.join(Path.dirname(PATH_SCENARIO), ".player");

@@ -67,7 +67,7 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 			// Validate the authentication for this UID and session
 			// and return some arguments to be passed to the access token
 			if (!(await authentication.verifyRefresh(uid, session, refreshToken.timeout))) {
-				return this.setStatus(401, "Unauthorized");
+				return this.sendStatus(401, "Unauthorized");
 			}
 
 			this.setCookie("refresh_token", refreshToken.token, {
@@ -85,7 +85,7 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 			if (userInfo) {
 				return generateTokens.call(this, userInfo.uid, userInfo.roles, inputs.persistent, makeUid(userInfo.uid));
 			}
-			return this.setStatus(401, "Unauthorized");
+			return this.sendStatus(401, "Unauthorized");
 		});
 
 		api.handle("post", "/auth/logout", async function () {
@@ -95,7 +95,7 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 		api.handle("post", "/auth/refresh", async function () {
 			const refreshToken = this.getCookie("refresh_token", null);
 			if (refreshToken == null) {
-				return this.setStatus(401, "Unauthorized");
+				return this.sendStatus(401, "Unauthorized");
 			}
 
 			let data = null;
@@ -107,7 +107,7 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 				authentication.validationRefreshToken.validate(data);
 			} catch (e) {
 				Exception.fromError(e).print();
-				return this.setStatus(401, "Unauthorized");
+				return this.sendStatus(401, "Unauthorized");
 			}
 
 			// Check access here
@@ -115,17 +115,14 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 		});
 	}
 
-	async _verifyImpl(request, callback) {
+	async _verifyImpl(context, callback) {
 		let token = null;
-		if ("authorization" in request.headers) {
-			const data = request.headers["authorization"].split(" ");
-			if (data.length == 2 && data[0].toLowerCase() == "bearer") {
-				token = data[1];
-			}
+		const data = context.getHeader("authorization", "").split(" ");
+		if (data.length == 2 && data[0].toLowerCase() == "bearer") {
+			token = data[1];
 		}
-
-		if ("t" in request.query) {
-			token = request.query.t;
+		else {
+			token = context.getQuery("t");
 		}
 
 		if (token) {

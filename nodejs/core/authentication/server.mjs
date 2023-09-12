@@ -21,8 +21,8 @@ export default class AuthenticationServer {
 		return this._installAPIImpl(api);
 	}
 
-	async verify(request, callback = async (/*user*/) => true) {
-		return this._verifyImpl(request, callback);
+	async verify(context, callback = async (/*user*/) => true) {
+		return this._verifyImpl(context, callback);
 	}
 
 	async verifyIdentity(uid, password) {

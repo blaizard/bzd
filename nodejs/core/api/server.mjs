@@ -3,71 +3,32 @@ import Url from "url";
 import ExceptionFactory from "../exception.mjs";
 import LogFactory from "../log.mjs";
 import Validation from "../validation.mjs";
-import { regexprEscape } from "#bzd/nodejs/utils/regexpr.mjs";
+import HttpServerContext from "#bzd/nodejs/core/http/server_context.mjs";
 
 import Base from "./base.mjs";
 
 const Exception = ExceptionFactory("api", "server");
 const Log = LogFactory("api", "server");
 
-class Context {
-	constructor(request, response, api) {
-		this.request = request;
-		this.response = response;
+class APIServerContext extends HttpServerContext {
+	constructor(context, api) {
+		super(context.request, context.response);
 		this.api = api;
 		this.debug = {};
 		this.manualResponse = false;
 	}
 
-	getHost() {
-		let host = new Url.URL((this.request.secure ? "https://" : "http://") + this.request.get("host"));
-		return host.toString();
-	}
-
 	getEndpoint(endpoint) {
+		Exception.assert(this.api, "API is not set.");
 		return new Url.URL(this.api.getEndpoint(endpoint), this.getHost()).href;
-	}
-
-	getHeader(name) {
-		return this.request.get(name);
-	}
-
-	setHeader(key, value) {
-		this.response.setHeader(key, value);
-	}
-
-	setCookie(name, value, options) {
-		options = Object.assign(
-			{
-				maxAge: 7 * 24 * 60 * 60 * 1000, // in ms
-				httpOnly: false,
-			},
-			options,
-		);
-		this.response.cookie(name, value, options);
-	}
-
-	getCookie(name, defaultValue) {
-		return name in this.request.cookies ? this.request.cookies[name] : defaultValue;
-	}
-
-	deleteCookie(name) {
-		this.response.cookie(name, undefined, {
-			maxAge: 0,
-		});
 	}
 
 	addDebug(name, data) {
 		this.debug[name] = data;
 	}
 
-	setStatus(code, message = null) {
-		this.response.status(code);
-		if (message) {
-			this.response.send(message);
-		} else {
-			this.response.end();
-		}
+	sendStatus(code, message = null) {
+		super.sendStatus(code, message);
 		this.manualResponse = true;
 	}
 }
@@ -108,14 +69,17 @@ export default class APIServer extends Base {
 
 		// Create a wrapper to the callback
 		const handler = async (request, response) => {
-			let context = new Context(request, response, this);
+
+			// TODO: this should come from the params.
+			let serverContext = new HttpServerContext(request, response);
+			let context = new APIServerContext(serverContext, this);
 
 			try {
 				// Check if this is a request that needs authentication
 				let authenticationData = { user: null };
 				if (authentication) {
 					// Check if user is authorized
-					let isAuthorized = await authentication.verify(request, (user) => {
+					let isAuthorized = await authentication.verify(context, (user) => {
 						authenticationData.user = user;
 						return true;
 					});
@@ -127,29 +91,29 @@ export default class APIServer extends Base {
 						}
 					}
 					if (!isAuthorized) {
-						return context.setStatus(401, "Unauthorized");
+						return context.sendStatus(401, "Unauthorized");
 					}
 				}
 
 				let data = {};
 				switch (requestOptions.type) {
 					case "raw":
-						data["raw"] = request.body;
+						data["raw"] = context.getBody();
 						break;
 					case "json":
-						data = request.body;
+						data = context.getBody();
 						break;
 					case "query":
-						data = request.query;
+						data = context.getQueries();
 						break;
 					case "upload":
-						data = Object.assign({}, request.query || {}, {
-							files: Object.keys(request.files || {}).map((key) => request.files[key].path),
+						data = Object.assign({}, context.getQueries() || {}, {
+							files: context.getFiles(),
 						});
 						break;
 				}
 				// Add any params to the data (if any)
-				Object.assign(data, request.params);
+				Object.assign(data, context.getParams());
 
 				// Add debug information
 				context.addDebug("data", data);
@@ -185,34 +149,18 @@ export default class APIServer extends Base {
 				}
 
 				if (!context.manualResponse) {
+					context.setStatus(200);
 					switch (responseOptions.type) {
 						case "json":
-							Exception.assert(
-								typeof result == "object",
-								"{} {}: callback result must be a json object.",
-								method,
-								endpoint,
-							);
-							response.json(result);
+							context.sendJson(result);
 							break;
 						case "stream":
 						case "file":
-							if (typeof result == "string") {
-								response.sendFile(result);
-							} else if ("pipe" in result) {
-								await new Promise((resolve, reject) => {
-									result.on("error", reject).on("end", resolve).on("finish", resolve).pipe(response);
-								});
-								response.end();
-							} else {
-								Exception.unreachable("{} {}: callback result is not of a supported format.", method, endpoint);
-							}
+							await context.sendStream(result);
 							break;
 						case "raw":
-							response.status(200).send(result);
+							context.send(result);
 							break;
-						default:
-							response.sendStatus(200);
 					}
 				}
 			} catch (e) {
@@ -221,7 +169,7 @@ export default class APIServer extends Base {
 				// considered as a formatting string.
 				Exception.print("{}", Exception.fromError(e));
 				Log.error("Context for '{}' {}: {:j}", method, endpoint, context.debug);
-				response.status(500).send(e.message);
+				context.sendStatus(500, e.message);
 			}
 		};
 

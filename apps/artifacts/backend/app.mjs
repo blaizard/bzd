@@ -43,7 +43,7 @@ program
 
 (async () => {
 	// Read arguments
-	const PORT = process.env.BZD_PORT || program.opts().port;
+	const PORT = Number(process.env.BZD_PORT || program.opts().port);
 	const PATH_STATIC = program.opts().static;
 	const PATH_DATA = process.env.BZD_PATH_DATA || program.opts().data;
 	const IS_TEST = Boolean(program.opts().test);
@@ -337,6 +337,16 @@ program
 	});
 
 	for (const method of ["get", "post"]) {
+		web.addRoute("get", "/x/(*)", async (request, response) => {
+			const { volume, pathList } = getInternalPathFromString(request.params[0]);
+			console.log(volume);
+			console.log(pathList);
+			/*if (method == "get") {
+				return await cache.get("endpoint", volume, ...pathList);
+			} else {
+				return await endpointHandler.call(this, method, volume, pathList, inputs);
+			}*/
+		});
 		api.handle(method, "/endpoint/{path:*}", async function (inputs) {
 			const { volume, pathList } = getInternalPathFromString(inputs.path);
 			delete inputs.path;
