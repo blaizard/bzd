@@ -29,6 +29,10 @@ if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="WOL manager.")
 	parser.add_argument("--bind", default="0.0.0.0", help="Address to bind.")
 	parser.add_argument("--port", default=9999, type=int, help="Port to bind.")
+	parser.add_argument("--report-endpoint",
+	                    default="http://data.blaizard.com/x/bzd",
+	                    type=str,
+	                    help="The endpoint to report data.")
 	parser.add_argument("--report-rate",
 	                    default=5,
 	                    type=int,
@@ -42,8 +46,9 @@ if __name__ == "__main__":
 	def monitorWorkload() -> None:
 		data = monitor()
 		try:
-			HttpClient.post(f"http://data.blaizard.com/api/v1/endpoint/bzd/{args.uid}/data", json=data)
+			HttpClient.post(f"{args.report_endpoint}/{args.uid}/data", json=data)
 		except:
+			# Ignore any errors, we don't want to crash if something is wrong on the server side.
 			pass
 
 	monitorThread = TimerThread(monitorWorkload, args.report_rate)

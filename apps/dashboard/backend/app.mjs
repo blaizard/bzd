@@ -42,7 +42,7 @@ async function getData(type, uid, cache) {
 
 (async () => {
 	// Read arguments
-	const PORT = process.env.BZD_PORT || program.opts().port;
+	const PORT = Number(process.env.BZD_PORT || program.opts().port);
 	const PATH_STATIC = program.opts().static;
 	const PATH_DATA = process.env.BZD_PATH_DATA || program.opts().data;
 

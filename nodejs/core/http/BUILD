@@ -18,6 +18,7 @@ bzd_nodejs_library(
     name = "server",
     srcs = [
         "server.mjs",
+        "server_context.mjs",
     ],
     packages = {
         "body-parser": "",
