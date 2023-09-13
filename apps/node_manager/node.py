@@ -1,10 +1,12 @@
 import argparse
 import json
 import threading
+import sys
 
 from apps.node_manager.rest_server import RESTServer, RESTServerContext
 from apps.node_manager.power import handlersPower
 from apps.node_manager.monitor import handlersMonitor, monitor
+from apps.node_manager.singleton import instanceAlreadyRunning
 from bzd.http.client import HttpClient
 
 
@@ -30,7 +32,7 @@ if __name__ == "__main__":
 	parser.add_argument("--bind", default="0.0.0.0", help="Address to bind.")
 	parser.add_argument("--port", default=9999, type=int, help="Port to bind.")
 	parser.add_argument("--report-endpoint",
-	                    default="http://data.blaizard.com/x/bzd",
+	                    default="http://data.master.blaizard.com/x/nodes",
 	                    type=str,
 	                    help="The endpoint to report data.")
 	parser.add_argument("--report-rate",
@@ -41,6 +43,10 @@ if __name__ == "__main__":
 	parser.add_argument("uid", help="The UID of this node.")
 
 	args = parser.parse_args()
+
+	# Ensure only a single instance of this program is running at a time.
+	if instanceAlreadyRunning("node_manager"):
+		sys.exit(0)
 
 	# Start the thread to monitor the node.
 	def monitorWorkload() -> None:

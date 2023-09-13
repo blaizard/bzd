@@ -27,9 +27,9 @@ bzd_nodejs_binary(
         "//nodejs/core:log",
         "//nodejs/core/api:server",
         "//nodejs/core/authentication/token:server",
+        "//nodejs/core/http:endpoint",
         "//nodejs/core/http:server",
         "//nodejs/db:utils",
         "//nodejs/db/key_value_store:disk",
-        "//nodejs/utils:regexpr",
     ],
 )

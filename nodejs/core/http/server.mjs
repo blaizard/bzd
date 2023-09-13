@@ -13,6 +13,8 @@ import Event from "../event.mjs";
 import ExceptionFactory from "../exception.mjs";
 import FileSystem from "../filesystem.mjs";
 import LogFactory from "../log.mjs";
+import Context from "#bzd/nodejs/core/http/server_context.mjs";
+import Endpoint from "#bzd/nodejs/core/http/endpoint.mjs";
 
 const Log = LogFactory("http", "server");
 const Exception = ExceptionFactory("http", "server");
@@ -252,15 +254,19 @@ export default class HttpServer {
 
 		if (options.exceptionGuard) {
 			callbackList.unshift(async function (request, response) {
+				const context = new Context(request, response);
 				try {
-					await callback.call(this, request, response);
+					await callback.call(this, context);
 				} catch (e) {
 					Exception.print("Exception Guard; {}", Exception.fromError(e));
 					response.status(500).send(e.message);
 				}
 			});
 		} else {
-			callbackList.unshift(callback);
+			callbackList.unshift(async function (request, response) {
+				const context = new Context(request, response);
+				await callback.call(this, context);
+			});
 		}
 
 		if (options.type.indexOf("json") != -1) {
@@ -280,27 +286,41 @@ export default class HttpServer {
 			callbackList.unshift(upload.any());
 		}
 
+		const updatedURI =
+			"/" +
+			new Endpoint(uri)
+				.map((fragment) => {
+					if (typeof fragment == "string") {
+						return fragment;
+					}
+					if (fragment.isVarArgs) {
+						return ":" + fragment.name + "(*)";
+					}
+					return ":" + fragment.name;
+				})
+				.join("/");
+
 		switch (type.toLowerCase()) {
 			case "get":
-				this.app.get(uri, ...callbackList);
+				this.app.get(updatedURI, ...callbackList);
 				break;
 			case "post":
-				this.app.post(uri, ...callbackList);
+				this.app.post(updatedURI, ...callbackList);
 				break;
 			case "put":
-				this.app.put(uri, ...callbackList);
+				this.app.put(updatedURI, ...callbackList);
 				break;
 			case "delete":
-				this.app.delete(uri, ...callbackList);
+				this.app.delete(updatedURI, ...callbackList);
 				break;
 			case "head":
-				this.app.head(uri, ...callbackList);
+				this.app.head(updatedURI, ...callbackList);
 				break;
 			case "patch":
-				this.app.patch(uri, ...callbackList);
+				this.app.patch(updatedURI, ...callbackList);
 				break;
 			case "*":
-				this.app.all(uri, ...callbackList);
+				this.app.all(updatedURI, ...callbackList);
 				break;
 			default:
 				throw new Exception("Unknown HTTP type '{}'.", type);

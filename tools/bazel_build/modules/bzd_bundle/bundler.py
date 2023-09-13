@@ -3,6 +3,8 @@ import pathlib
 import tarfile
 import tempfile
 import stat
+import time
+import random
 
 
 class Bundler:
@@ -12,7 +14,12 @@ class Bundler:
 		self.executable = executable
 		self.cwd = cwd
 
+	def stamp(self) -> str:
+		"""Get a unique stamp for this specific build."""
+		return "stamp_{:X}_{}".format(random.getrandbits(64), int(time.time()))
+
 	def process(self, output: pathlib.Path) -> None:
+
 		with tempfile.TemporaryFile(suffix=".tar.gz") as fd:
 			# Create an archive with the files from the manifest.
 			with tarfile.open(fileobj=fd, mode="w:gz") as tar:
@@ -52,18 +59,23 @@ if [[ ! "$temp" || ! -d "$temp" ]]; then
 	exit 1
 fi
 
-function cleanup {{
-  rm -rf "$temp"
-}}
-trap cleanup EXIT
+stamp='{stamp}'
+if [[ ! -f "$temp/$stamp" ]]; then
+	function cleanup {{
+		rm -rf "$temp"
+	}}
+	trap cleanup EXIT
 
-sed '0,/^#__END_OF_SCRIPT__#$/d' "$0" | tar -C "$temp" -zx
+	sed '0,/^#__END_OF_SCRIPT__#$/d' "$0" | tar -C "$temp" -zx
+	touch "$temp/$stamp"
+fi
+
 cd "$temp/{cwd}"
 RUNFILES_DIR="$temp" "{executable}" "$@"
 exit 0;
 
 #__END_OF_SCRIPT__#
-""".format(executable=str(self.executable), cwd=str(self.cwd)).encode("utf-8"))
+""".format(executable=str(self.executable), cwd=str(self.cwd), stamp=self.stamp()).encode("utf-8"))
 				fo.write(fd.read())
 
 		# Set permission to executable.

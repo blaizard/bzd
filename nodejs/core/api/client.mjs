@@ -1,6 +1,7 @@
 import ExceptionFactory from "../exception.mjs";
 import HttpClient from "../http/client.mjs";
 import { HttpClientException } from "../http/client.mjs";
+import HttpEndpoint from "#bzd/nodejs/core/http/endpoint.mjs";
 import Validation from "../validation.mjs";
 
 import Base from "./base.mjs";
@@ -65,12 +66,7 @@ export default class APIClient extends Base {
 		}
 
 		// Update the endpoint if needed.
-		const updatedEndpoint = "/" + this.parseEndpoint(endpoint).map((fragment) => {
-			if (typeof fragment == "string") {
-				return fragment;
-			}
-			return data[fragment.name];
-		}).join("/");
+		const updatedEndpoint = new HttpEndpoint(endpoint).mapValues(data);
 
 		switch (requestOptions.type) {
 			case "json":

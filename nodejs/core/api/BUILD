@@ -12,6 +12,7 @@ bzd_nodejs_library(
         "//nodejs/core:format",
         "//nodejs/core:validation",
         "//nodejs/core/http:client",
+        "//nodejs/core/http:endpoint",
     ],
 )
 
