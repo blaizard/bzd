@@ -16,6 +16,7 @@ py_binary(
         "node.py",
         "power.py",
         "rest_server.py",
+        "singleton.py",
     ],
     deps = [
         requirement("psutil"),

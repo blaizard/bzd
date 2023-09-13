@@ -87,16 +87,16 @@ export default {
 	endpoints: {
 		"/{uid}/{category}": {
 			get: {
-				async handler(inputs, services) {
-					const node = await services.nodes.get(inputs.uid);
-					return await node.get(inputs.category);
+				async handler(params, services) {
+					const node = await services.nodes.get(params.uid);
+					return await node.get(params.category);
 				},
 			},
 			post: {
-				async handler(inputs, services) {
-					const data = rawBodyParse(inputs.raw, (name) => this.getHeader(name));
-					const node = await services.nodes.getOrCreate(inputs.uid);
-					return await node.insert(inputs.category, data);
+				async handler(params, services) {
+					const data = rawBodyParse(this.getBody(), (name) => this.getHeader(name));
+					const node = await services.nodes.getOrCreate(params.uid);
+					return await node.insert(params.category, data);
 				},
 			},
 		},

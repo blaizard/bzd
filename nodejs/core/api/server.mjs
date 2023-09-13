@@ -68,11 +68,8 @@ export default class APIServer extends Base {
 		}
 
 		// Create a wrapper to the callback
-		const handler = async (request, response) => {
-
-			// TODO: this should come from the params.
-			let serverContext = new HttpServerContext(request, response);
-			let context = new APIServerContext(serverContext, this);
+		const handler = async (serverContext) => {
+			const context = new APIServerContext(serverContext, this);
 
 			try {
 				// Check if this is a request that needs authentication
@@ -173,22 +170,7 @@ export default class APIServer extends Base {
 			}
 		};
 
-		// Update the endpoint to support variables.
-		const updatedEndpoint =
-			"/" +
-			this.parseEndpoint(endpoint)
-				.map((fragment) => {
-					if (typeof fragment == "string") {
-						return fragment;
-					}
-					if (fragment.isVarArgs) {
-						return ":" + fragment.name + "(*)";
-					}
-					return ":" + fragment.name;
-				})
-				.join("/");
-
 		Exception.assert(this.options.channel, "Channel is missing");
-		this.options.channel.addRoute(method, this.getEndpoint(updatedEndpoint), handler, webOptions);
+		this.options.channel.addRoute(method, this.getEndpoint(endpoint), handler, webOptions);
 	}
 }

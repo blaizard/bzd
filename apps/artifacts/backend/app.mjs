@@ -3,13 +3,13 @@ import Authentication from "#bzd/nodejs/core/authentication/token/server.mjs";
 import Cache from "#bzd/nodejs/core/cache.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import HttpServer from "#bzd/nodejs/core/http/server.mjs";
+import HttpEndpoint from "#bzd/nodejs/core/http/endpoint.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import KeyValueStoreDisk from "#bzd/nodejs/db/key_value_store/disk.mjs";
 import Permissions from "#bzd/nodejs/db/storage/permissions.mjs";
 import { CollectionPaging } from "#bzd/nodejs/db/utils.mjs";
 import { Command } from "commander/esm.mjs";
 import Path from "path";
-import { regexprEscape } from "#bzd/nodejs/utils/regexpr.mjs";
 
 import APIv1 from "../api.v1.json" assert { type: "json" };
 import Plugins from "../plugins/backend.mjs";
@@ -143,19 +143,7 @@ program
 			endpoints[type] = {};
 			const endpointsForType = Plugins[type].endpoints;
 			for (const endpoint in endpointsForType) {
-				const regexprEndpoint = api
-					.parseEndpoint(endpoint)
-					.map((fragment) => {
-						if (typeof fragment == "string") {
-							return regexprEscape(fragment);
-						}
-						if (fragment.isVarArgs) {
-							return "(?<" + fragment.name + ">.+)";
-						}
-						return "(?<" + fragment.name + ">[^/]+)";
-					})
-					.join("\\/");
-				const regexpr = new RegExp(regexprEndpoint, "i");
+				const regexpr = new HttpEndpoint(endpoint).toRegexp();
 				for (const method in endpointsForType[endpoint]) {
 					endpoints[type][method] ??= [];
 					endpoints[type][method].push(Object.assign({ regexpr: regexpr }, endpointsForType[endpoint][method]));
@@ -169,7 +157,7 @@ program
 		}
 	}
 
-	const endpointHandler = async function (method, volume, pathList, inputs) {
+	const endpointHandler = async function (method, volume, pathList) {
 		const params = await keyValueStore.get("volume", volume, null);
 		Exception.assert(params !== null, "No volume are associated with this id: '{}'", volume);
 		Exception.assert("type" in params, "Unknown type for the volume: '{}'", volume);
@@ -187,7 +175,7 @@ program
 		for (const data of regexprs) {
 			const match = data.regexpr.exec(path);
 			if (match) {
-				const values = Object.assign({}, inputs, match.groups);
+				const values = Object.assign({}, match.groups);
 				return await data.handler.call(this, values, services.getActiveFor(volume));
 			}
 		}
@@ -231,8 +219,8 @@ program
 
 	// Redirect /file/** to /file?path=**
 	// It is needed to do this before the API as it takes precedence.
-	web.addRoute("get", "/file(/*)?", async (request, response) => {
-		response.redirect(api.getEndpoint("/file?path=" + request.params[1]));
+	web.addRoute("get", "/file/{path:*}", async (context) => {
+		context.redirect(api.getEndpoint("/file?path=" + context.getParam("path")));
 	});
 
 	// Adding API handlers.
@@ -337,25 +325,20 @@ program
 	});
 
 	for (const method of ["get", "post"]) {
-		web.addRoute("get", "/x/(*)", async (request, response) => {
-			const { volume, pathList } = getInternalPathFromString(request.params[0]);
-			console.log(volume);
-			console.log(pathList);
-			/*if (method == "get") {
-				return await cache.get("endpoint", volume, ...pathList);
-			} else {
-				return await endpointHandler.call(this, method, volume, pathList, inputs);
-			}*/
-		});
-		api.handle(method, "/endpoint/{path:*}", async function (inputs) {
-			const { volume, pathList } = getInternalPathFromString(inputs.path);
-			delete inputs.path;
-			if (method == "get") {
-				return await cache.get("endpoint", volume, ...pathList);
-			} else {
-				return await endpointHandler.call(this, method, volume, pathList, inputs);
-			}
-		});
+		web.addRoute(
+			method,
+			"/x/{path:*}",
+			async (context) => {
+				const { volume, pathList } = getInternalPathFromString(context.getParam("path"));
+				if (method == "get") {
+					const data = await cache.get("endpoint", volume, ...pathList);
+					context.sendJson(data);
+				} else {
+					await endpointHandler.call(context, method, volume, pathList);
+				}
+			},
+			{ exceptionGuard: true, type: ["raw"] },
+		);
 	}
 
 	Log.info("Application started");

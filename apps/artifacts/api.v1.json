@@ -34,23 +34,6 @@
             }
         }
     },
-    "/endpoint/{path:*}": {
-        "get": {
-            "documentation": "Retreive data of a specific endpoint.",
-            "response": {
-                "type": "json"
-            }
-        },
-        "post": {
-            "documentation": "Post data of a specific endpoint.",
-            "request": {
-                "type": "raw"
-            },
-            "response": {
-                "type": "raw"
-            }
-        }
-    },
     "/file": {
         "get": {
             "documentation": "Retreive the content of a specific file.",
