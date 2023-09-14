@@ -15,7 +15,7 @@ py_binary(
         requirement("mypy"),
         requirement("typing_extensions"),
         requirement("mypy_extensions"),
-        "//python/bzd/utils:worker",
         "//tools/sanitizer/utils/python:workspace",
+        "@bzd_python//bzd/utils:worker",
     ],
 )

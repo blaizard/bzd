@@ -1,6 +1,6 @@
 import unittest
 
-from python.bzd.utils.run import localBazelBinary
+from bzd.utils.run import localBazelBinary
 
 
 class TestRun(unittest.TestCase):
@@ -12,7 +12,7 @@ class TestRun(unittest.TestCase):
 		    stderr=True,
 		    ignoreFailure=True,
 		)
-		self.assertTrue(result.isFailed())
+		self.assertTrue(result.isFailure())
 
 	def testAssertSuccess(self) -> None:
 		result = localBazelBinary(

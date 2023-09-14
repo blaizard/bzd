@@ -6,6 +6,8 @@ set -e
 
 EXTRA_FLAGS="$@"
 
+echo  "==== [normal] python ==============================="
+./tools/bazel test @bzd_python//... --output_groups=+metadata --config=prod --platform_suffix=python $EXTRA_FLAGS
 echo  "==== [normal] clang-tidy ==============================="
 ./tools/bazel test ... --output_groups=+metadata --config=dev --config=clang-tidy --platform_suffix=clang-tidy $EXTRA_FLAGS
 echo  "==== [normal] clang prod ==============================="

@@ -8,9 +8,8 @@ py_library(
     ]),
     visibility = ["//visibility:public"],
     deps = [
-        "//python:bzd",
-        "//python/bzd/utils:dict",
-        "//python/bzd/utils:result",
+        "@bzd_python//bzd/utils:dict",
+        "@bzd_python//bzd/utils:result",
     ],
 )
 
@@ -24,8 +23,7 @@ py_binary(
     ],
     deps = [
         ":parser",
-        "//python/bzd:env",
-        "//python/bzd/utils:file",
+        "@bzd_python//bzd/utils:file",
     ],
 )
 
@@ -34,5 +32,5 @@ doc_library(
     srcs = [
         ("Parser", "README.md"),
     ],
-    visibility = ["//python/bzd:__pkg__"],
+    visibility = ["@bzd_python//:__pkg__"],
 )

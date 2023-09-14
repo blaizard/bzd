@@ -33,6 +33,6 @@ py_test(
         ":success",
     ],
     deps = [
-        "//python/bzd/utils:run",
+        "@bzd_python//bzd/utils:run",
     ],
 )

@@ -1,3 +1,0 @@
-{%- macro goodbye(a) -%}
-Goodbye {{ a }}
-{%- end -%}

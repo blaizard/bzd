@@ -7,7 +7,7 @@ py_library(
     ],
     visibility = [":__subpackages__"],
     deps = [
-        "//python/bzd/parser",
+        "@bzd_python//bzd/parser",
     ],
 )
 
@@ -24,9 +24,9 @@ py_library(
     ],
     visibility = [":__subpackages__"],
     deps = [
-        "//python/bzd/parser",
-        "//python/bzd/utils:decorators",
-        "//python/bzd/validation",
+        "@bzd_python//bzd/parser",
+        "@bzd_python//bzd/utils:decorators",
+        "@bzd_python//bzd/validation",
     ],
 )
 
@@ -41,7 +41,7 @@ py_library(
     visibility = [":__subpackages__"],
     deps = [
         ":visitor",
-        "//python/bzd/template",
+        "@bzd_python//bzd/template",
     ],
 )
 

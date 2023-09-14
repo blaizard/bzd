@@ -17,7 +17,6 @@ py_library(
         "shell.py",
     ],
     deps = [
-        "//python/bzd:env",
         "//tools/shell:factory",
         "//tools/shell/sh:factory",
     ],
@@ -32,7 +31,7 @@ py_library(
         "//tools/shell:__subpackages__",
     ],
     deps = [
-        "//python/bzd/template",
+        "@bzd_python//bzd/template",
     ],
 )
 

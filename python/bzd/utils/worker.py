@@ -16,7 +16,7 @@ class _WorkerResult:
 	def __init__(self, output: Tuple[bool, Any, str, Any]) -> None:
 		self.output = output
 
-	def isSuccess(self) -> bool:
+	def isException(self) -> bool:
 		return self.output[0]
 
 	def getResult(self) -> Any:
@@ -47,6 +47,49 @@ class _Context:
 		self.data: multiprocessing.queues.Queue[_WorkloadContext] = multiprocessing.Queue()
 
 
+class WorkerContextManager:
+
+	def __init__(self, worker: "Worker", throwOnException: bool) -> None:
+		self.worker = worker
+		self.throwOnException = throwOnException
+		self.isException = False
+
+	def __enter__(self) -> "WorkerContextManager":
+		return self
+
+	def __exit__(self, exc_type: Any, exc_value: Any, exc_tb: Any) -> None:
+		for _ in self.data():
+			pass
+		# Stop and join the processes.
+		self.worker.context.stop.value = 1  # type: ignore
+		for worker in self.worker.workerList:
+			worker.join()
+		# Throw.
+		if self.throwOnException and self.isException:
+			raise Exception(f"At least one of the worker failed.")
+
+	def data(self) -> Iterable[_WorkerResult]:
+		while self.worker.expectedData > 0:
+			result = _WorkerResult(self.worker.context.output.get())
+			self.worker.expectedData -= 1
+			if self.throwOnException and result.isException():
+				self.isException = True
+				print(result.getOutput(), end="")
+			yield result
+
+	def add(self, data: Any, timeoutS: int = 0) -> None:
+		"""Add a new workload to processed.
+
+        Args:
+                data: The data to be passed to the workload.
+                timeoutS: The timeout for this workload. By default there is no timeout.
+        """
+		with self.worker.context.count.get_lock():
+			self.worker.context.count.value += 1  # type: ignore
+		self.worker.expectedData += 1
+		self.worker.context.data.put(_WorkloadContext(data, timeoutS))
+
+
 class Worker:
 
 	def __init__(
@@ -75,7 +118,7 @@ class Worker:
 				continue
 
 			# Run the stask
-			isSuccess = True
+			isException = False
 			stdout = StringIO()
 			result = None
 
@@ -92,7 +135,7 @@ class Worker:
 				result = task(workloadContext.data, stdout)
 			except:
 				signal.alarm(0)
-				isSuccess = False
+				isException = True
 				exceptionType, exceptionValue = sys.exc_info()[:2]
 				if isinstance(exceptionType, BaseException):
 					exceptionTypeStr = exceptionType.__name__
@@ -102,31 +145,9 @@ class Worker:
 				    exceptionTypeStr, exceptionValue))
 				stdout.write(traceback.format_exc())
 
-			context.output.put((isSuccess, result, stdout.getvalue(), workloadContext.data))
+			context.output.put((isException, result, stdout.getvalue(), workloadContext.data))
 
-	def add(self, data: Any, timeoutS: int = 0) -> None:
-		"""Add a new workload to processed.
-
-        Args:
-                data: The data to be passed to the workload.
-                timeoutS: The timeout for this workload. By default there is no timeout.
-        """
-		with self.context.count.get_lock():
-			self.context.count.value += 1  # type: ignore
-		self.expectedData += 1
-		self.context.data.put(_WorkloadContext(data, timeoutS))
-
-	def start(self) -> None:
+	def start(self, throwOnException: bool = True) -> WorkerContextManager:
 		for worker in self.workerList:
 			worker.start()
-
-	def data(self) -> Iterable[_WorkerResult]:
-		while self.expectedData > 0:
-			workerResult = _WorkerResult(self.context.output.get())
-			self.expectedData -= 1
-			yield workerResult
-
-	def stop(self) -> None:
-		self.context.stop.value = 1  # type: ignore
-		for worker in self.workerList:
-			worker.join()
+		return WorkerContextManager(self, throwOnException=throwOnException)

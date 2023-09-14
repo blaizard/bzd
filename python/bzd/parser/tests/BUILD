@@ -6,8 +6,8 @@ load("@rules_python//python:defs.bzl", "py_test")
         path,
     ],
     deps = [
-        "//python/bzd/parser",
-        "//python/bzd/parser/tests/support",
+        "@bzd_python//bzd/parser",
+        "@bzd_python//bzd/parser/tests/support",
     ],
 ) for path in glob([
     "*.py",

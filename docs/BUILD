@@ -7,7 +7,7 @@ doc_binary(
         ("BDL", "//tools/bdl/docs"),
         ("Bazel", "//docs/api/bazel"),
         ("C++", "//cc:documentation"),
-        ("Python", "//python/bzd:documentation"),
+        ("Python", "@bzd_python//:documentation"),
     ],
     data = glob([
         "**/*.jpg",

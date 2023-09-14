@@ -12,6 +12,6 @@ py_binary(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//python/bzd/utils:run",
+        "@bzd_python//bzd/utils:run",
     ],
 )

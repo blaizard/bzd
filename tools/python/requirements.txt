@@ -14,8 +14,6 @@ mypy-extensions==0.4.3
     #   mypy
 psutil==5.9.5
     # via -r tools/python/requirements.in
-pyelftools==0.29
-    # via -r tools/python/requirements.in
 pyserial==3.5
     # via -r tools/python/requirements.in
 tomli==2.0.1
@@ -24,5 +22,3 @@ typing-extensions==4.4.0
     # via
     #   -r tools/python/requirements.in
     #   mypy
-yapf==0.32.0
-    # via -r tools/python/requirements.in

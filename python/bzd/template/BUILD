@@ -8,8 +8,7 @@ py_library(
     ]),
     visibility = ["//visibility:public"],
     deps = [
-        "//python:bzd",
-        "//python/bzd/parser",
+        "@bzd_python//bzd/parser",
     ],
 )
 
@@ -18,5 +17,5 @@ doc_library(
     srcs = [
         ("Template", "README.md"),
     ],
-    visibility = ["//python/bzd:__pkg__"],
+    visibility = ["@bzd_python//:__pkg__"],
 )

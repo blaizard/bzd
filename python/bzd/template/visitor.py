@@ -33,7 +33,12 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 	def __init__(
 	    self,
 	    substitutions: typing.Union[SubstitutionsAccessor, SubstitutionWrapper],
-	    includeDirs: typing.Sequence[pathlib.Path] = [pathlib.Path(__file__).parent.parent.parent.parent],
+	    # Default include directories are the module root and the _main within this root.
+	    # This ensures that includes can be found in both locations.
+	    includeDirs: typing.Sequence[pathlib.Path] = [
+	        pathlib.Path(__file__).parent.parent.parent.parent / "_main",
+	        pathlib.Path(__file__).parent.parent.parent
+	    ],
 	    indent: bool = False,
 	) -> None:
 		# Re-use directly substitution wrapper if provided.
@@ -329,8 +334,8 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 		Error.assertTrue(
 		    element=element,
 		    condition=len(paths) > 0,
-		    message="No valid file '{}' within {}".format(includePathStr,
-		                                                  str([f.as_posix() for f in self.includeDirs])),
+		    message="Unable to find '{}' within {}".format(includePathStr,
+		                                                   str([f.as_posix() for f in self.includeDirs])),
 		)
 
 		template = bzd.template.template.Template(

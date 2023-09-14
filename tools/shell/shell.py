@@ -1,4 +1,3 @@
-import bzd.env
 import logging
 import sys
 import os

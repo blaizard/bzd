@@ -6,7 +6,7 @@ py_binary(
         "build.py",
     ],
     deps = [
-        "//python/bzd/command_extractor:gcc",
-        "//python/bzd/utils:run",
+        "@bzd_python//bzd/command_extractor:gcc",
+        "@bzd_python//bzd/utils:run",
     ],
 )

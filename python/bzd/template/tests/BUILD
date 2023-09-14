@@ -9,7 +9,7 @@ load("@rules_python//python:defs.bzl", "py_test")
         "support/*",
     ]),
     deps = [
-        "//python/bzd/template",
+        "@bzd_python//bzd/template",
     ],
 ) for path in glob([
     "*.py",

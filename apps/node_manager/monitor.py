@@ -31,11 +31,26 @@ def monitorTemperatures() -> typing.Any:
 
 
 def monitorCPUs() -> typing.Any:
-	return [*psutil.cpu_percent(interval=1, percpu=True)]
+	return {"main": [*psutil.cpu_percent(interval=1, percpu=True)]}
+
+
+def monitorBatteries() -> typing.Any:
+	return {"main": [psutil.sensors_battery()[0]]}
+
+
+def monitorMemories() -> typing.Any:
+	virtual = psutil.virtual_memory()
+	swap = psutil.swap_memory()
+	return {"ram": [virtual.used, virtual.total], "swap": [swap.used, swap.total]}
 
 
 def monitor() -> typing.Any:
-	return {"cpus": {"main": monitorCPUs()}, "temperatures": monitorTemperatures()}
+	return {
+	    "cpus": monitorCPUs(),
+	    "temperatures": monitorTemperatures(),
+	    "batteries": monitorBatteries(),
+	    "memories": monitorMemories()
+	}
 
 
 def handlerMonitor(context: RESTServerContext) -> None:

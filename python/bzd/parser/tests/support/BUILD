@@ -6,7 +6,4 @@ py_library(
         "*.py",
     ]),
     visibility = ["//visibility:public"],
-    deps = [
-        "//python:bzd",
-    ],
 )
