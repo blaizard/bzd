@@ -12,7 +12,7 @@ py_library(
         "//tools/ci:__subpackages__",
     ],
     deps = [
-        "//python/bzd/template",
+        "@bzd_python//bzd/template",
     ],
 )
 

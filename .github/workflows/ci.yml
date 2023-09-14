@@ -20,6 +20,11 @@ jobs:
         export PATH="${PATH}:${GITHUB_WORKSPACE}/bin"
         ./info.sh
 
+    - name: "[normal] python"
+      run: |
+        ./tools/bazel clean --expunge
+        ./tools/bazel test @bzd_python//... --output_groups=+metadata --config=prod --platform_suffix=python
+
     - name: "[normal] clang-tidy"
       run: |
         ./tools/bazel clean --expunge

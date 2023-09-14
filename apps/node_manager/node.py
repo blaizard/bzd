@@ -40,9 +40,19 @@ if __name__ == "__main__":
 	                    type=int,
 	                    help="The rate (in s) at which status messages are emitted.")
 	parser.add_argument("--power", action="store_true", help="Wether or not the power on this node can be controlled.")
-	parser.add_argument("uid", help="The UID of this node.")
+	parser.add_argument(
+	    "uid",
+	    nargs="?",
+	    default=None,
+	    help=
+	    "The UID of this node. If no UID is provided, the application will report the monitoring on the command line.")
 
 	args = parser.parse_args()
+
+	if args.uid is None:
+		data = monitor()
+		print(json.dumps(data, indent=4))
+		sys.exit(0)
 
 	# Ensure only a single instance of this program is running at a time.
 	if instanceAlreadyRunning("node_manager"):

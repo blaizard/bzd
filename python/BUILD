@@ -1,7 +1,11 @@
-load("@rules_python//python:defs.bzl", "py_library")
+load("@bzd_rules_doc//doc:defs.bzl", "doc_library")
 
-py_library(
-    name = "bzd",
-    imports = ["."],
+doc_library(
+    name = "documentation",
+    srcs = [
+        ("**", "@bzd_python//bzd/parser:documentation"),
+        ("**", "@bzd_python//bzd/template:documentation"),
+        ("**", "@bzd_python//bzd/validation:documentation"),
+    ],
     visibility = ["//visibility:public"],
 )

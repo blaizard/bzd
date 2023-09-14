@@ -2,14 +2,19 @@ import os
 import subprocess
 import sys
 import threading
-from typing import Any, List, Dict, Optional, Tuple
+from typing import Any, List, Dict, Optional, Tuple, TextIO, Union
 from pathlib import Path
 import selectors
 
 
 class _ExecuteResultStreamWriter:
 
-	def __init__(self, stdout: bool = False, stderr: bool = False, maxSize: int = 1000000) -> None:
+	def __init__(
+	    self,
+	    stdout: Union[bool, TextIO] = False,
+	    stderr: Union[bool, TextIO] = False,
+	    maxSize: int = 1000000,
+	) -> None:
 		self.output: List[Tuple[bool, bytes]] = []
 		self.stdout = stdout
 		self.stderr = stderr
@@ -26,16 +31,18 @@ class _ExecuteResultStreamWriter:
 	def addStdout(self, data: bytes) -> None:
 		if data != b"":
 			self._addBuffer(True, data)
-			if self.stdout:
-				sys.stdout.write(data.decode(errors="ignore"))
-				sys.stdout.flush()
+			if self.stdout is not False:
+				output = sys.stdout if isinstance(self.stdout, bool) else self.stdout
+				output.write(data.decode(errors="ignore"))
+				output.flush()
 
 	def addStderr(self, data: bytes) -> None:
 		if data != b"":
 			self._addBuffer(False, data)
-			if self.stderr:
-				sys.stderr.write(data.decode(errors="ignore"))
-				sys.stderr.flush()
+			if self.stderr is not False:
+				output = sys.stderr if isinstance(self.stderr, bool) else self.stderr
+				output.write(data.decode(errors="ignore"))
+				output.flush()
 
 
 class _ExecuteResult:
@@ -63,7 +70,7 @@ class _ExecuteResult:
 	def isSuccess(self) -> bool:
 		return self.returncode == 0
 
-	def isFailed(self) -> bool:
+	def isFailure(self) -> bool:
 		return self.returncode != 0
 
 
@@ -86,8 +93,8 @@ def localCommand(
     env: Optional[Dict[str, str]] = None,
     timeoutS: float = 60.0,
     stdin: bool = False,
-    stdout: bool = False,
-    stderr: bool = False,
+    stdout: Union[bool, TextIO] = False,
+    stderr: Union[bool, TextIO] = False,
     maxOutputSize: int = 1000000,
 ) -> _ExecuteResult:
 	"""Run a process locally.
@@ -152,29 +159,45 @@ def localCommand(
 
 
 def localPython(script: str, args: List[str] = [], **kwargs: Any) -> _ExecuteResult:
-	"""
-    Execute a python script locally.
-    """
+	"""Execute a python script locally."""
+
 	return localCommand([sys.executable, script] + args, **kwargs)
 
 
 def localBash(script: bytes, args: List[str] = [], **kwargs: Any) -> _ExecuteResult:
-	"""
-    Execute a bash script locally.
-    """
+	"""Execute a bash script locally."""
+
 	return localCommand(["bash", "-s", "--"] + args, **kwargs)
 
 
 def localBazelBinary(path: str, args: List[str] = [], env: Dict[str, str] = {}, **kwargs: Any) -> _ExecuteResult:
-	"""
-    Execute a bazel binary locally. The caller must run bazel and all runfiles must be already available.
-    """
+	"""Execute a bazel binary locally. The caller must run bazel and all runfiles must be already available."""
+
 	env["RUNFILES_DIR"] = (os.environ["RUNFILES_DIR"] if "RUNFILES_DIR" in os.environ else os.path.dirname(os.getcwd()))
 	return localCommand([path] + args, env=env, **kwargs)
 
 
-def localDocker(args: List[str] = [], **kwargs: Any) -> _ExecuteResult:
-	"""
-    Execute a docker-compose run service.
+def localBazelTarget(target: str, args: List[str] = [], env: Dict[str, str] = {}, **kwargs: Any) -> _ExecuteResult:
+	"""Execute a bazel target locally.
+
+    Note, the environment variable is passed to ensure the current are not propagated to the environment.
     """
+
+	return localCommand(
+	    [
+	        os.environ.get("BAZEL_REAL", "bazel"),
+	        "run",
+	        "--ui_event_filters=-info,-stdout,-stderr",
+	        "--noshow_progress",
+	        target,
+	        "--",
+	    ] + args,
+	    env=env,
+	    **kwargs,
+	)
+
+
+def localDocker(args: List[str] = [], **kwargs: Any) -> _ExecuteResult:
+	"""Execute a docker-compose run service."""
+
 	return localCommand(["docker"] + args, **kwargs)

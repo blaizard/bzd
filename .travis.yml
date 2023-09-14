@@ -18,6 +18,12 @@ jobs:
       - cp tools/ci/travis/.bazelrc.local .bazelrc.local
       - ./info.sh
 
+    - name: "[normal] python"
+      script:
+      - cp tools/ci/travis/.bazelrc.local .bazelrc.local
+      - ./tools/bazel test @bzd_python//... --output_groups=+metadata --config=prod --platform_suffix=python
+
+
     - name: "[normal] clang-tidy"
       script:
       - cp tools/ci/travis/.bazelrc.local .bazelrc.local

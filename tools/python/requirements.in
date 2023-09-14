@@ -1,7 +1,5 @@
-pyelftools
 mypy
 mypy_extensions
-yapf
 gitignore_parser
 pyserial
 typing_extensions

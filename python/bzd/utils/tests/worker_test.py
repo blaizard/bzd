@@ -20,49 +20,43 @@ class TestWorker(unittest.TestCase):
 
 	def Empty(self) -> None:
 		worker = bzd.utils.worker.Worker(TestWorker.foo)
-		worker.start()
-		result = list(worker.data())
-		worker.stop()
+		with worker.start() as w:
+			result = list(w.data())
 		self.assertEqual(len(result), 0)
 
 	def testSingleWorkload(self) -> None:
 		worker = bzd.utils.worker.Worker(TestWorker.foo)
-		worker.start()
-		worker.add(12)
-		result = list(worker.data())
-		worker.stop()
+		with worker.start() as w:
+			w.add(12)
+			result = list(w.data())
 		self.assertEqual(len(result), 1)
-		self.assertEqual(result[0].isSuccess(), True)
+		self.assertEqual(result[0].isException(), False)
 		self.assertEqual(result[0].getResult(), 12 * 12)
 		self.assertEqual(result[0].getOutput(), "Hello")
 
 	def testMultiWorkload(self) -> None:
 		worker = bzd.utils.worker.Worker(TestWorker.foo)
-		for i in range(100):
-			worker.add(i)
-		self.assertEqual(worker.context.count.value, 100)
-		worker.start()
-		result = list(worker.data())
-		worker.stop()
+		with worker.start() as w:
+			for i in range(100):
+				w.add(i)
+			result = list(w.data())
 		self.assertEqual(len(result), 100)
 
 	def testThrowingWorkload(self) -> None:
 		worker = bzd.utils.worker.Worker(TestWorker.throwWorkload)
-		worker.add(42)
-		worker.start()
-		result = list(worker.data())
-		worker.stop()
+		with worker.start(throwOnException=False) as w:
+			w.add(42)
+			result = list(w.data())
 		self.assertEqual(len(result), 1)
-		self.assertEqual(result[0].isSuccess(), False)
+		self.assertEqual(result[0].isException(), True)
 
 	def testTimeoutWorkload(self) -> None:
 		worker = bzd.utils.worker.Worker(TestWorker.blockingWorkload)
-		worker.add(42, timeoutS=1)
-		worker.start()
-		result = list(worker.data())
-		worker.stop()
+		with worker.start(throwOnException=False) as w:
+			w.add(42, timeoutS=1)
+			result = list(w.data())
 		self.assertEqual(len(result), 1)
-		self.assertEqual(result[0].isSuccess(), False)
+		self.assertEqual(result[0].isException(), True)
 
 
 if __name__ == "__main__":

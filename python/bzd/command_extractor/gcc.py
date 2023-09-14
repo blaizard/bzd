@@ -6,7 +6,7 @@ import re
 import os
 import enum
 
-from bzd.command_extractor.common import (
+from bzd_python.command_extractor.common import (
     CommandExtractor,
     Processor,
     Item,
@@ -38,7 +38,7 @@ class Categories(enum.Enum):
 Result = typing.Sequence[Item]
 
 
-class ItemLibrary(ItemPathOrString):
+class ItemLibrary(ItemPathOrString):  # type: ignore
 
 	@property
 	def name(self) -> str:
@@ -46,7 +46,7 @@ class ItemLibrary(ItemPathOrString):
 		return re.sub(r"lib(.*)\.a", r"\1", pathlib.Path(self.pathOrValue).name)
 
 
-class CommandExtractorGcc(CommandExtractor):
+class CommandExtractorGcc(CommandExtractor):  # type: ignore
 
 	def __init__(
 	    self,
@@ -137,7 +137,7 @@ class CommandExtractorGcc(CommandExtractor):
 			print("Unhandled argument:", arg)
 			self.result.append(factory.make(ItemString, Categories.unhandled, arg))
 
-	def parse(self, cmdString: str) -> None:  # type: ignore
+	def parse(self, cmdString: str) -> None:
 		super().parse(
 		    cmdString,
 		    {

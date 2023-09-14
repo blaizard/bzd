@@ -6,7 +6,7 @@ py_test(
     main = "run_test.py",
     visibility = ["//visibility:public"],
     deps = [
-        "//python/bzd/utils:run",
+        "@bzd_python//bzd/utils:run",
     ],
 )
 
@@ -16,6 +16,6 @@ py_test(
     main = "worker_test.py",
     visibility = ["//visibility:public"],
     deps = [
-        "//python/bzd/utils:worker",
+        "@bzd_python//bzd/utils:worker",
     ],
 )

@@ -29,8 +29,7 @@ py_binary(
     ],
     main = "sanitizer.py",
     deps = [
-        "//python/bzd:env",
-        "//python/bzd/utils:run",
+        "@bzd_python//bzd/utils:run",
     ],
 )
 
@@ -51,7 +50,6 @@ py_binary(
     ],
     main = "sanitizer.py",
     deps = [
-        "//python/bzd:env",
-        "//python/bzd/utils:run",
+        "@bzd_python//bzd/utils:run",
     ],
 )

@@ -39,6 +39,13 @@ pipeline
 		{
 			parallel
 			{
+				stage("[normal] python")
+				{
+					steps
+					{
+						sh "./tools/bazel test @bzd_python//... --output_groups=+metadata --config=prod --platform_suffix=python"
+					}
+				}
 				stage("[normal] clang-tidy")
 				{
 					steps

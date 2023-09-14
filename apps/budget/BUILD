@@ -6,6 +6,6 @@ py_binary(
         "budget.py",
     ],
     deps = [
-        "//python/bzd/validation",
+        "@bzd_python//bzd/validation",
     ],
 )

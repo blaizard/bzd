@@ -9,8 +9,7 @@ py_library(
     ]),
     visibility = ["//visibility:public"],
     deps = [
-        "//python:bzd",
-        "//python/bzd/utils:decorators",
+        "@bzd_python//bzd/utils:decorators",
     ],
 )
 
@@ -19,5 +18,5 @@ doc_library(
     srcs = [
         ("Validation", "README.md"),
     ],
-    visibility = ["//python/bzd:__pkg__"],
+    visibility = ["@bzd_python//:__pkg__"],
 )
