@@ -2,6 +2,8 @@
 
 import typing
 
+from apps.trader_python.exchange.pair import Pair
+
 
 class Exchange(typing.Protocol):
 
@@ -11,5 +13,5 @@ class Exchange(typing.Protocol):
 	def stop(self) -> None:
 		pass
 
-	def getPairs(self) -> typing.List[str]:
-		pass
+	def getPairs(self) -> typing.Iterable[Pair]:
+		"""Get the list of all available pairs for this exchange."""

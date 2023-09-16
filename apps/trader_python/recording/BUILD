@@ -1,10 +1,9 @@
 load("@rules_python//python:defs.bzl", "py_library")
 
 py_library(
-    name = "exchange",
+    name = "recording",
     srcs = [
-        "exchange.py",
-        "pair.py",
+        "recording.py",
     ],
     visibility = ["//apps/trader_python:__subpackages__"],
 )
