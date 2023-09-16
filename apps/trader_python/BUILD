@@ -5,4 +5,8 @@ py_binary(
     srcs = [
         "trader_python.py",
     ],
+    deps = [
+        "//apps/trader_python/exchange/virtual",
+        "//apps/trader_python/recording",
+    ],
 )
