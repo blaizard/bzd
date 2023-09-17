@@ -183,6 +183,12 @@ def localBazelTarget(target: str, args: List[str] = [], env: Dict[str, str] = {}
     Note, the environment variable is passed to ensure the current are not propagated to the environment.
     """
 
+	defaultEnv = {
+	    # PATH env variable is by default passed, this is needed to find tools with rctx.which for example.
+	    "PATH": os.environ.get("PATH", "")
+	}
+	defaultEnv.update(env)
+
 	return localCommand(
 	    [
 	        os.environ.get("BAZEL_REAL", "bazel"),
@@ -192,7 +198,7 @@ def localBazelTarget(target: str, args: List[str] = [], env: Dict[str, str] = {}
 	        target,
 	        "--",
 	    ] + args,
-	    env=env,
+	    env=defaultEnv,
 	    **kwargs,
 	)
 
