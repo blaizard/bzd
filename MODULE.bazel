@@ -12,6 +12,7 @@ bazel_dep(name = "bzd_sanitizer", version = "1.0")
 bazel_dep(name = "bzd_package", version = "1.0")
 bazel_dep(name = "bzd_bundle", version = "1.0")
 bazel_dep(name = "bzd_rules_docker", version = "1.0")
+bazel_dep(name = "bzd_rules_bdl", version = "1.0")
 bazel_dep(name = "bzd_python", version = "1.0")
 bazel_dep(name = "platforms", version = "0.0.6")
 bazel_dep(name = "rules_python", version = "0.25.0")
@@ -28,11 +29,12 @@ bazel_dep(name = "stardoc", version = "0.5.6")
     "bzd_rules_doc",
     "bzd_toolchain_cc",
     "bzd_rules_nodejs",
+    "bzd_rules_bdl",
+    "bzd_rules_docker",
     "bzd_bundle",
     "bzd_platforms",
     "bzd_sanitizer",
     "bzd_package",
-    "bzd_rules_docker",
 )]
 
 local_path_override(
