@@ -4,3 +4,4 @@ gitignore_parser
 pyserial
 typing_extensions
 psutil
+yfinance

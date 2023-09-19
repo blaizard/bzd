@@ -1,0 +1,35 @@
+
+namespace bzd.test;
+
+
+// Simple enum
+enum Error
+{
+	A
+,	B
+,	C
+}
+
+// Simple structure
+struct MyStruct {
+	a = Integer [min(0) max(12)];
+	b = Result<Float>;
+	
+}
+
+// Test list
+using MyList = Vector<Integer>;
+using MyListCapacity = Vector<Integer> [capacity(23)];
+// Simple interface
+interface MyInterfaceA {
+	method hello(world = String);
+	
+}
+
+// Test interface with inheritance
+interface MyInterfaceB : MyInterfaceA {
+	value = Integer;
+	
+}
+
+
