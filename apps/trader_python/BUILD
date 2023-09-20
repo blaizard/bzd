@@ -7,6 +7,6 @@ py_binary(
     ],
     deps = [
         "//apps/trader_python/exchange/virtual",
-        "//apps/trader_python/recording",
+        "//apps/trader_python/recording:recording_from_path",
     ],
 )

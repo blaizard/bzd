@@ -1,8 +1,35 @@
 import pathlib
 
-from apps.trader_python.recording.recording import Recording
+from apps.trader_python.recording.recording import Price, Recording
 from apps.trader_python.recording.recording_from_path import RecordingPairFromPath
 from apps.trader_python.recording.recording_from_data import RecordingPairFromData
+
+
+def _iterateByGroup(iterator, group) -> None:
+	"""Iterate the recording by consecutive groups."""
+
+	try:
+		price = next(iterator)
+	except StopIteration:
+		return
+
+	context = {"iterator": iterator, "price": price, "continue": True}
+
+	while context["continue"]:
+
+		def groupIterator(current, context) -> Price:
+			while True:
+				yield context["price"]
+				try:
+					context["price"] = next(context["iterator"])
+				except StopIteration:
+					context["continue"] = False
+					break
+				if current != group(context["price"]):
+					break
+
+		current = group(context["price"])
+		yield current, groupIterator(current, context)
 
 
 def recordingToPath(recording: Recording, path: pathlib.Path) -> None:
@@ -15,7 +42,7 @@ def recordingToPath(recording: Recording, path: pathlib.Path) -> None:
 		current.mkdir(parents=True, exist_ok=True)
 
 		# Save the prices
-		for key, iterator in pair.iterateByGroup(group=lambda x: x.date.strftime("%Y-%m")):
+		for key, iterator in _iterateByGroup(pair.__iter__(), group=lambda x: x.date.strftime("%Y-%m")):
 			prices = RecordingPairFromData.fromPrices(iterator)
 			filePath = current / f"{key}.csv"
 

@@ -14,7 +14,7 @@ charset-normalizer==3.2.0
     # via requests
 frozendict==2.3.8
     # via yfinance
-gitignore-parser==0.1.2
+gitignore-parser==0.1.6
     # via -r tools/python/requirements.in
 html5lib==1.1
     # via yfinance
@@ -24,9 +24,9 @@ lxml==4.9.3
     # via yfinance
 multitasking==0.0.11
     # via yfinance
-mypy==0.991
+mypy==1.5.1
     # via -r tools/python/requirements.in
-mypy-extensions==0.4.3
+mypy-extensions==1.0.0
     # via
     #   -r tools/python/requirements.in
     #   mypy
@@ -56,13 +56,13 @@ soupsieve==2.5
     # via beautifulsoup4
 tomli==2.0.1
     # via mypy
-typing-extensions==4.4.0
+typing-extensions==4.8.0
     # via
     #   -r tools/python/requirements.in
     #   mypy
 tzdata==2023.3
     # via pandas
-urllib3==2.0.4
+urllib3==2.0.5
     # via requests
 webencodings==0.5.1
     # via html5lib

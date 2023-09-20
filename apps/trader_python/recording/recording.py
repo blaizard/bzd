@@ -35,39 +35,12 @@ class Price:
 class RecordingPair:
 
 	def __init__(self, first: str, second: str) -> None:
-		self.first = first.upper()
-		self.second = second.upper()
+		self.first = first.upper().replace("-", "_")
+		self.second = second.upper().replace("-", "_")
 
 	@property
 	def uid(self) -> str:
 		return f"{self.first}/{self.second}"
-
-	def iterateByGroup(self, group) -> None:
-		"""Iterate the recording by consecutive groups."""
-
-		iterator = self.__iter__()
-		try:
-			price = next(iterator)
-		except StopIteration:
-			return
-
-		context = {"iterator": iterator, "price": price, "continue": True}
-
-		while context["continue"]:
-
-			def groupIterator(current, context) -> Price:
-				while True:
-					yield context["price"]
-					try:
-						context["price"] = next(context["iterator"])
-					except StopIteration:
-						context["continue"] = False
-						break
-					if current != group(context["price"]):
-						break
-
-			current = group(context["price"])
-			yield current, groupIterator(current, context)
 
 	def __repr__(self) -> str:
 		"""String representation of a recording pair."""
@@ -84,12 +57,6 @@ class RecordingPair:
 
 
 class Recording:
-
-	@staticmethod
-	def fromPath(path: pathlib.Path) -> "Recording":
-		"""Read a recording from a file."""
-
-		return Recording()
 
 	def __repr__(self) -> str:
 		"""String representation of a recording."""

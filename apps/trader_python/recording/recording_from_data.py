@@ -51,6 +51,6 @@ class RecordingFromData(Recording):
 		assert recordingPair.uid not in self.pairs, f"The recording pair '{recordingPair.uid}' is already set."
 		self.pairs[recordingPair.uid] = recordingPair
 
-	def __iter__(self) -> typing.Iterator[typing.Tuple[str, RecordingPair]]:
+	def __iter__(self) -> typing.Iterator[RecordingPair]:
 		for pair in self.pairs.values():
 			yield pair
