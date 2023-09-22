@@ -1,4 +1,5 @@
 import pathlib
+import json
 
 from apps.trader_python.recording.recording import Price, Recording
 from apps.trader_python.recording.recording_from_path import RecordingPairFromPath
@@ -41,9 +42,13 @@ def recordingToPath(recording: Recording, path: pathlib.Path) -> None:
 		current = resolvedPath / pair.uid.replace("/", "-")
 		current.mkdir(parents=True, exist_ok=True)
 
+		# Save the info
+		info = json.dumps(pair.info.toDict(), indent=4)
+		(current / "info.json").write_text(info)
+
 		# Save the prices
 		for key, iterator in _iterateByGroup(pair.__iter__(), group=lambda x: x.date.strftime("%Y-%m")):
-			prices = RecordingPairFromData.fromPrices(iterator)
+			prices = RecordingPairFromData.fromPrices(iterator, first="x", second="y")
 			filePath = current / f"{key}.csv"
 
 			# Merge entries with the existing one if any.
@@ -54,4 +59,6 @@ def recordingToPath(recording: Recording, path: pathlib.Path) -> None:
 			# Save the data to a file.
 			with filePath.open(mode="w") as f:
 				for price in prices:
-					f.write(f"{price.timestamp};{price.price};{price.volume}\n")
+					content = f"{price.timestamp};{price.price};{price.volume}"
+					content += "".join([f";{e.kind.value};{e.value}" for e in price.events])
+					f.write(content + "\n")
