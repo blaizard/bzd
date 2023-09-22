@@ -1,7 +1,8 @@
 import typing
 import pathlib
+import json
 
-from apps.trader_python.recording.recording import Price, RecordingPair, Recording
+from apps.trader_python.recording.recording import Info, Event, EventKind, Price, RecordingPair, Recording
 
 
 def _readCSV(path: pathlib.Path, separator: str) -> typing.Iterator[typing.List[str]]:
@@ -20,20 +21,22 @@ class RecordingPairFromPath(RecordingPair):
 	def __init__(self, first: str, second: str, path: pathlib.Path) -> None:
 		super().__init__(first, second)
 		self.path = path
-		self._buildIndex(self.path)
 
-	def _buildIndex(self, path: pathlib.Path) -> None:
-		"""Build the index from the given path."""
+		# Build the index from the given path.
+		assert self.path.is_dir(), f"The path '{self.path}' must point to a directory."
+		self.files = sorted(list(d for d in self.path.iterdir() if d.is_file() and d.name not in ["info.json"]))
 
-		assert path.is_dir(), f"The path '{path}' must point to a directory."
-		self.files = sorted(list(d for d in path.iterdir() if d.is_file()))
+		# Load the info
+		if (self.path / "info.json").is_file():
+			self.info = Info(**json.loads((self.path / "info.json").read_text()))
 
 	@staticmethod
 	def readPriceFromFile(path: pathlib.Path) -> typing.Iterator[Price]:
-		for price in _readCSV(path, separator=";"):
-			if len(price) < 3:
+		for data in _readCSV(path, separator=";"):
+			if len(data) < 3:
 				pass
-			yield Price(timestamp=int(price[0]), price=float(price[1]), volume=float(price[2]))
+			events = [Event(EventKind(data[index]), data[index + 1]) for index in range(3, len(data), 2)]
+			yield Price(timestamp=int(data[0]), price=float(data[1]), volume=float(data[2]), events=events)
 
 	def __iter__(self) -> typing.Iterator[Price]:
 		for f in self.files:

@@ -11,9 +11,9 @@ class Virtual:
 
 	def __init__(self, recording: Recording) -> None:
 		self.recording = recording
+		self.pairs = [VirtualPair(pair) for pair in self.recording]
 
-	def getPairs(self) -> typing.Iterable[Pair]:
+	def getPairs(self) -> typing.Iterator[Pair]:
 
-		pair = Pair("USD", "EUR", VirtualPair())
-
-		return []
+		for pair in self.pairs:
+			yield pair

@@ -6,10 +6,9 @@ from apps.trader_python.recording.recording import Recording, RecordingPair, Eve
 
 class RecordingPairFromData(RecordingPair):
 
-	def __init__(self, first: str = "x", second: str = "y") -> None:
-		super().__init__(first, second)
+	def __init__(self, *args, **kwargs) -> None:
+		super().__init__(*args, **kwargs)
 		self.prices: typing.List[Price] = []
-		self.events: typing.List[Event] = []
 
 	@staticmethod
 	def fromPrices(prices: typing.Iterable[Price], *args, **kwargs) -> "RecordingPairFromData":
@@ -17,24 +16,19 @@ class RecordingPairFromData(RecordingPair):
 		pair.prices = sorted(prices, key=lambda x: x.timestamp)
 		return pair
 
-	def addPrice(self, timestamp: int, price: float, volume: float, ignoreEqual: bool = False) -> None:
+	def addPrice(self, timestamp: int, price: float, volume: float, *events: Event) -> None:
 		"""Add a price entry."""
 
-		self.addPriceObject(Price(timestamp, price, volume), ignoreEqual=ignoreEqual)
+		self.addPriceObject(Price(timestamp, price, volume, [*events]))
 
 	def addPriceObject(self, price: Price, ignoreEqual: bool = False) -> None:
 		"""Add a price object entry."""
 
 		index = bisect.bisect_left(self.prices, price.timestamp, key=lambda x: x.timestamp)
 		if index != len(self.prices) and self.prices[index].timestamp == price.timestamp:
-			assert ignoreEqual, f"The entry {price.date} already exists."
+			assert ignoreEqual, f"The price {price.date} already exists."
 		else:
 			self.prices.insert(index, price)
-
-	def addEvent(self, timestamp: int, kind: EventKind, value: float) -> None:
-		"""Add an event related too this stock."""
-
-		bisect.insort(self.events, Event(timestamp, kind, value), key=lambda x: x.timestamp)
 
 	def __iter__(self) -> typing.Iterator[Price]:
 		for price in self.prices:

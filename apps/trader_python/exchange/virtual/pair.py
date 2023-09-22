@@ -1,2 +1,6 @@
+from apps.trader_python.recording.recording import RecordingPair
+
 class VirtualPair:
-	pass
+	def __init__(self, pair: RecordingPair) -> None:
+		self.pair = pair
+
