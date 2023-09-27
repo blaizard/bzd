@@ -6,6 +6,10 @@ load("@bzd_package//:defs.bzl", "BzdPackageFragmentInfo", "bzd_package_prefix_fr
 load("@bzd_rules_nodejs//nodejs:private/nodejs_install.bzl", "BzdNodeJsInstallInfo")
 
 _COMMON_EXEC_ATTRS = {
+    "data": attr.label_list(
+        allow_files = True,
+        doc = "Data to be available at runtime, this will not add the data as runfiles but is simply used for trget expansion with the args parameter.",
+    ),
     "executor": attr.label(
         executable = True,
         cfg = "exec",

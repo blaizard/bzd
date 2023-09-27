@@ -1,0 +1,47 @@
+{
+    "/user": {
+        "delete": {
+            "authentication": true,
+            "documentation": "Delete current user account",
+            "request": {
+                "type": "json",
+                "validation": {
+                    "password": "mandatory"
+                }
+            }
+        },
+        "get": {
+            "authentication": true,
+            "documentation": "Get current user information",
+            "request": {
+                "type": "query",
+                "validation": {
+                    "uid": ""
+                }
+            },
+            "response": {
+                "type": "json"
+            }
+        },
+        "put": {
+            "authentication": true,
+            "documentation": "Update current user information",
+            "request": {
+                "type": "json",
+                "validation": {
+                    "birthdate": "",
+                    "email": "",
+                    "firstname": "",
+                    "gender": "",
+                    "lastname": "",
+                    "oldpassword": "",
+                    "password": "",
+                    "picture": ""
+                }
+            },
+            "response": {
+                "type": "json"
+            }
+        }
+    }
+}
