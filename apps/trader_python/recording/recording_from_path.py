@@ -2,7 +2,7 @@ import typing
 import pathlib
 import json
 
-from apps.trader_python.recording.recording import Info, Event, EventKind, Price, RecordingPair, Recording
+from apps.trader_python.recording.recording import Info, Event, EventKind, OHLC, RecordingPair, Recording
 
 
 def _readCSV(path: pathlib.Path, separator: str) -> typing.Iterator[typing.List[str]]:
@@ -31,17 +31,23 @@ class RecordingPairFromPath(RecordingPair):
 			self.info = Info(**json.loads((self.path / "info.json").read_text()))
 
 	@staticmethod
-	def readPriceFromFile(path: pathlib.Path) -> typing.Iterator[Price]:
+	def readOHLCFromFile(path: pathlib.Path) -> typing.Iterator[OHLC]:
 		for data in _readCSV(path, separator=";"):
-			if len(data) < 3:
+			if len(data) < 6:
 				pass
-			events = [Event(EventKind(data[index]), data[index + 1]) for index in range(3, len(data), 2)]
-			yield Price(timestamp=int(data[0]), price=float(data[1]), volume=float(data[2]), events=events)
+			events = [Event(EventKind(data[index]), data[index + 1]) for index in range(6, len(data), 2)]
+			yield OHLC(timestamp=int(data[0]),
+			           open=float(data[1]),
+			           high=float(data[2]),
+			           low=float(data[3]),
+			           close=float(data[4]),
+			           volume=float(data[5]),
+			           events=events)
 
-	def __iter__(self) -> typing.Iterator[Price]:
+	def __iter__(self) -> typing.Iterator[OHLC]:
 		for f in self.files:
-			for price in RecordingPairFromPath.readPriceFromFile(f):
-				yield price
+			for ohlc in RecordingPairFromPath.readOHLCFromFile(f):
+				yield ohlc
 
 
 class RecordingFromPath(Recording):

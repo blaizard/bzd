@@ -14,9 +14,8 @@ Date = typing.Union[str, int]
 class Generator:
 	"""Generate recording using yahoo finance data."""
 
-	def __init__(self, ticker: str, spread: float = 0) -> None:
+	def __init__(self, ticker: str) -> None:
 		self.ticker = ticker
-		self.spread = spread
 
 	@staticmethod
 	def dateToDatetime(date: Date) -> datetime.datetime:
@@ -45,6 +44,7 @@ class Generator:
 		    industries=[info["industry"].lower()] if "industry" in info else [],
 		    sectors=[info["sector"].lower()] if "sector" in info else [],
 		    employees=info.get("fullTimeEmployees"),
+		    resolution=60  # 1m
 		)
 
 		pairBid = RecordingPairFromData(currency, self.ticker, info)
@@ -68,7 +68,11 @@ class Generator:
 
 			for index in history.index:
 				timestamp = int(index.timestamp())
-				price = (history.loc[index, "Open"] + history.loc[index, "Close"]) / 2
+				open = history.loc[index, "Open"]
+				high = history.loc[index, "High"]
+				low = history.loc[index, "Low"]
+				close = history.loc[index, "Close"]
+				volume = history.loc[index, "Volume"]
 
 				events = []
 				if history.loc[index, "Dividends"]:
@@ -76,8 +80,20 @@ class Generator:
 				if history.loc[index, "Stock Splits"]:
 					events.append(Event(EventKind.SPLIT, history.loc[index, "Stock Splits"]))
 
-				pairBid.addPrice(timestamp, price + self.spread / 2, history.loc[index, "Volume"], *events)
-				pairAsk.addPrice(timestamp, price - self.spread / 2, history.loc[index, "Volume"], *events)
+				pairBid.addOHLC(timestamp=timestamp,
+				                open=open,
+				                high=high,
+				                low=low,
+				                close=close,
+				                volume=volume,
+				                events=events)
+				pairAsk.addOHLC(timestamp=timestamp,
+				                open=open,
+				                high=high,
+				                low=low,
+				                close=close,
+				                volume=volume,
+				                events=events)
 
 		recording = RecordingFromData()
 		recording.addPair(pairBid)

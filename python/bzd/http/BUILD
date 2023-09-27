@@ -5,3 +5,9 @@ py_library(
     srcs = ["client.py"],
     visibility = ["//visibility:public"],
 )
+
+py_library(
+    name = "server",
+    srcs = ["server.py"],
+    visibility = ["//visibility:public"],
+)

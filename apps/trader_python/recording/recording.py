@@ -17,15 +17,23 @@ class Event:
 
 
 @dataclasses.dataclass
-class Price:
+class OHLC:
 	timestamp: int
-	price: float
+	open: float
+	high: float
+	low: float
+	close: float
 	volume: float
 	events: typing.List[Event]
 
 	@property
+	def price(self) -> float:
+		return (self.open + self.close) / 2.
+
+	@property
 	def date(self) -> datetime.datetime:
 		return datetime.datetime.utcfromtimestamp(self.timestamp)
+
 
 @dataclasses.dataclass
 class Info:
@@ -35,6 +43,7 @@ class Info:
 	industries: typing.List[str] = dataclasses.field(default_factory=lambda: [])
 	sectors: typing.List[str] = dataclasses.field(default_factory=lambda: [])
 	employees: typing.Optional[int] = None
+	resolution: typing.Optional[int] = None
 
 	def toDict(self) -> typing.Dict[str, typing.Any]:
 		return dataclasses.asdict(self)
@@ -54,22 +63,22 @@ class RecordingPair:
 	def __repr__(self) -> str:
 		"""String representation of a recording pair."""
 
-		def priceToStr(price) -> str:
-			content = f"{str(price.date)}\t{price.price:>20}\t{price.volume:>20}"
-			for event in price.events:
+		def ohlcToStr(ohlc) -> str:
+			content = f"{str(ohlc.date)}\t{ohlc.open:>10}\t{ohlc.high:>10}\t{ohlc.low:>10}\t{ohlc.close:>10}\t{ohlc.volume:>20}"
+			for event in ohlc.events:
 				content += f"\t{event.kind:>15}\t{event.value:>20}"
 			return content
 
-		def pricesToStr(prices) -> str:
-			return "\n".join([priceToStr(price) for price in prices])
+		def ohlcsToStr(prices) -> str:
+			return "\n".join([ohlcToStr(price) for price in prices])
 
 		content = self.uid + ":\n"
 		content += "\n".join([f"\t{k} = {str(v)}" for k, v in self.info.toDict().items() if v]) + "\n"
 		data = [*self]
 		if len(data) > 10:
-			content += pricesToStr(data[0:5]) + "\n...\n" + pricesToStr(data[-5:])
+			content += ohlcsToStr(data[0:5]) + "\n...\n" + ohlcsToStr(data[-5:])
 		else:
-			content += pricesToStr(data)
+			content += ohlcsToStr(data)
 		return content
 
 
