@@ -32,6 +32,7 @@ def bzd_nodejs_binary(name, main, data = [], tools = [], deps = [], packages = {
     bzd_nodejs_binary_(
         name = name,
         main = main,
+        data = data,
         install = name + ".install",
         tags = ["nodejs"] + tags,
         **kwargs
@@ -53,6 +54,7 @@ def bzd_nodejs_test(name, main, data = [], tools = [], deps = [], packages = {},
     bzd_nodejs_test_(
         name = name,
         main = main,
+        data = data,
         executor = "@bzd_rules_nodejs//toolchain/mocha",
         install = name + ".install",
         tags = ["nodejs"] + tags,
