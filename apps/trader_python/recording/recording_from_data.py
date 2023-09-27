@@ -1,38 +1,40 @@
 import bisect
 import typing
 
-from apps.trader_python.recording.recording import Recording, RecordingPair, EventKind, Event, Price
+from apps.trader_python.recording.recording import Recording, RecordingPair, EventKind, Event, OHLC
 
 
 class RecordingPairFromData(RecordingPair):
 
 	def __init__(self, *args, **kwargs) -> None:
 		super().__init__(*args, **kwargs)
-		self.prices: typing.List[Price] = []
+		self.prices: typing.List[OHLC] = []
 
 	@staticmethod
-	def fromPrices(prices: typing.Iterable[Price], *args, **kwargs) -> "RecordingPairFromData":
+	def fromPrices(prices: typing.Iterable[OHLC], *args, **kwargs) -> "RecordingPairFromData":
 		pair = RecordingPairFromData(*args, **kwargs)
 		pair.prices = sorted(prices, key=lambda x: x.timestamp)
 		return pair
 
-	def addPrice(self, timestamp: int, price: float, volume: float, *events: Event) -> None:
-		"""Add a price entry."""
+	def addOHLC(self, timestamp: int, open: float, high: float, low: float, close: float, volume: float,
+	            events: typing.Iterable[Event]) -> None:
+		"""Add a OHLC entry."""
 
-		self.addPriceObject(Price(timestamp, price, volume, [*events]))
+		self.addOHLCObject(
+		    OHLC(timestamp=timestamp, open=open, high=high, low=low, close=close, volume=volume, events=[*events]))
 
-	def addPriceObject(self, price: Price, ignoreEqual: bool = False) -> None:
-		"""Add a price object entry."""
+	def addOHLCObject(self, ohlc: OHLC, ignoreEqual: bool = False) -> None:
+		"""Add a OHLC object entry."""
 
-		index = bisect.bisect_left(self.prices, price.timestamp, key=lambda x: x.timestamp)
-		if index != len(self.prices) and self.prices[index].timestamp == price.timestamp:
-			assert ignoreEqual, f"The price {price.date} already exists."
+		index = bisect.bisect_left(self.prices, ohlc.timestamp, key=lambda x: x.timestamp)
+		if index != len(self.prices) and self.prices[index].timestamp == ohlc.timestamp:
+			assert ignoreEqual, f"The OHLC {ohlc.date} already exists."
 		else:
-			self.prices.insert(index, price)
+			self.prices.insert(index, ohlc)
 
-	def __iter__(self) -> typing.Iterator[Price]:
-		for price in self.prices:
-			yield price
+	def __iter__(self) -> typing.Iterator[OHLC]:
+		for ohlc in self.prices:
+			yield ohlc
 
 
 class RecordingFromData(Recording):
