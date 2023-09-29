@@ -23,6 +23,19 @@
                 "type": "json"
             }
         },
+        "post": {
+            "documentation": "Create a new user",
+            "request": {
+                "type": "json",
+                "validation": {
+                    "password": "",
+                    "uid": "mandatory"
+                }
+            },
+            "response": {
+                "type": "json"
+            }
+        },
         "put": {
             "authentication": true,
             "documentation": "Update current user information",

@@ -223,7 +223,7 @@
 
 <style lang="scss" scoped>
 	@use "#bzd/nodejs/styles/default/css/clickable.scss" as *;
-	@use "#bzd/nodejs/styles/default/css/colors.module.scss" as colors;
+	@use "#bzd/config.scss" as config;
 
 	$bzdPadding: 10px;
 
@@ -279,10 +279,10 @@
 				width: 2em;
 				height: 2em;
 				border-radius: 1em;
-				border: 1px solid colors.$bzdGraphColorWhite;
+				border: 1px solid config.$bzdGraphColorWhite;
 				z-index: 1;
-				color: colors.$bzdGraphColorWhite;
-				background-color: colors.$bzdGraphColorRed;
+				color: config.$bzdGraphColorWhite;
+				background-color: config.$bzdGraphColorRed;
 				line-height: 2em;
 				text-align: center;
 			}

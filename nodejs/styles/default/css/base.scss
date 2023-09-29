@@ -1,10 +1,10 @@
 @use "#bzd/nodejs/styles/default/css/normalize.scss" as *;
 @use "#bzd/nodejs/styles/default/css/clickable.scss" as *;
-@use "#bzd/nodejs/styles/default/css/colors.module.scss" as colors;
+@use "#bzd/config.scss" as config;
 
 body {
-	background-color: colors.$bzdGraphColorWhite;
-	color: colors.$bzdGraphColorBlack;
+	background-color: config.$bzdGraphColorWhite;
+	color: config.$bzdGraphColorBlack;
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji",
 		"Segoe UI Emoji", "Segoe UI Symbol";
 	word-wrap: break-word;
@@ -17,8 +17,8 @@ body {
 }
 
 *::selection {
-	background-color: rgba(colors.$bzdGraphColorBlack, 70%);
-	color: colors.$bzdGraphColorWhite;
+	background-color: rgba(config.$bzdGraphColorBlack, 70%);
+	color: config.$bzdGraphColorWhite;
 }
 
 /* Paragraph */
@@ -70,7 +70,7 @@ h3 {
 blockquote {
 	margin-left: 0px;
 	padding-left: 10px;
-	border-left: 2px solid lighten(colors.$bzdGraphColorBlack, 50%);
+	border-left: 2px solid lighten(config.$bzdGraphColorBlack, 50%);
 }
 
 /* Tables */
@@ -83,13 +83,13 @@ table {
 }
 
 table tbody tr:hover {
-	background-color: darken(colors.$bzdGraphColorWhite, 50%);
+	background-color: darken(config.$bzdGraphColorWhite, 50%);
 }
 
 th,
 td {
 	text-align: left;
-	border-bottom: 1px solid darken(colors.$bzdGraphColorWhite, 30%);
+	border-bottom: 1px solid darken(config.$bzdGraphColorWhite, 30%);
 	white-space: nowrap;
 	padding-right: 10px;
 }
@@ -121,13 +121,13 @@ ul li li {
 /* Links */
 
 a {
-	color: colors.$bzdGraphColorBlue;
+	color: config.$bzdGraphColorBlue;
 	text-decoration: none;
 	cursor: pointer;
 }
 
 a:hover {
-	color: colors.$bzdGraphColorBlack;
+	color: config.$bzdGraphColorBlack;
 	text-decoration: none;
 }
 
@@ -135,8 +135,8 @@ a:hover {
 
 code {
 	white-space: nowrap;
-	background: darken(colors.$bzdGraphColorWhite, 20%);
-	border: solid 1px darken(colors.$bzdGraphColorWhite, 10%);
+	background: darken(config.$bzdGraphColorWhite, 20%);
+	border: solid 1px darken(config.$bzdGraphColorWhite, 10%);
 	border-radius: 6px;
 	font-size: 80%;
 	padding: 2px 5px;
@@ -157,9 +157,9 @@ pre {
 	color: rgb(64, 64, 64);
 	margin: 0px;
 	overflow: auto;
-	background: colors.$bzdGraphColorWhite;
+	background: config.$bzdGraphColorWhite;
 	margin: 1px 0px 24px;
-	border: 1px solid darken(colors.$bzdGraphColorWhite, 10%);
+	border: 1px solid darken(config.$bzdGraphColorWhite, 10%);
 }
 
 /* Code blocks */
@@ -172,7 +172,7 @@ pre > code {
 	margin: 0;
 	padding: 0;
 	font-family: "Inconsolata", "Consolata", "Monaco", monospace;
-	color: lighten(colors.$bzdGraphColorBlack, 20%);
+	color: lighten(config.$bzdGraphColorBlack, 20%);
 	overflow-x: auto;
 }
 
@@ -180,7 +180,7 @@ pre > code {
 
 hr {
 	border: none;
-	border-bottom: 1px solid lighten(colors.$bzdGraphColorBlack, 50%);
+	border-bottom: 1px solid lighten(config.$bzdGraphColorBlack, 50%);
 	margin: 20px 0px;
 	padding: 0;
 }
@@ -193,11 +193,11 @@ input[type="reset"],
 button {
 	display: inline-block;
 	margin: 5px;
-	background-color: darken(colors.$bzdGraphColorWhite, 10%);
+	background-color: darken(config.$bzdGraphColorWhite, 10%);
 	padding: 7px 20px;
 	min-width: 50px;
 	border: none;
-	color: colors.$bzdGraphColorBlack;
+	color: config.$bzdGraphColorBlack;
 	cursor: pointer;
 	font: inherit;
 	transition: all 0.2s;
@@ -205,8 +205,8 @@ button {
 	@extend %bzd-clickable;
 
 	&:active {
-		background-color: colors.$bzdGraphColorWhite;
-		color: colors.$bzdGraphColorBlack;
+		background-color: config.$bzdGraphColorWhite;
+		color: config.$bzdGraphColorBlack;
 	}
 
 	&:focus {

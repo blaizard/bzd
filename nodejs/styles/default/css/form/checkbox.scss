@@ -1,4 +1,4 @@
-@use "#bzd/nodejs/styles/default/css/form/base.scss" as base;
+@use "#bzd/nodejs/styles/default/css/form/config.scss" as base;
 
 $switchSize: base.$fieldHeight * 0.6875; //22
 
@@ -16,8 +16,7 @@ $switchSize: base.$fieldHeight * 0.6875; //22
 
 			&:before {
 				content: "";
-				@include base.button(base.$fieldHeight, base.$actionerTextColor, base.$actionerBgColor);
-				@extend %clickable;
+				@include base.button(base.$fieldTextHeight * 1.5, base.$actionerTextColor, base.$actionerBgColor);
 				margin-right: #{base.$fieldPaddingX}px;
 			}
 
@@ -32,7 +31,6 @@ $switchSize: base.$fieldHeight * 0.6875; //22
 			font-size: #{base.$fieldTextHeight * 1.2}px;
 			font-weight: bold;
 			text-align: center;
-			line-height: #{base.$fieldHeight}px;
 		}
 		&:focus + label:before {
 			@extend %focus;

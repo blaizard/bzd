@@ -122,6 +122,8 @@ export default class KeyValueStoreDisk extends KeyValueStore {
 			const modifiedValue = await modifier(key in data ? data[key] : defaultValue);
 			isSuccess = await persistence.writeCompare(version, "set", key, modifiedValue);
 		} while (!isSuccess && maxConflicts--);
+
+		return maxConflicts > 0;
 	}
 
 	/**

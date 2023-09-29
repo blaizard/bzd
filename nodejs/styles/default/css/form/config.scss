@@ -10,62 +10,26 @@
 // ---- Configuration ----
 
 @use "sass:math";
-@use "#bzd/nodejs/styles/default/css/colors.module.scss" as colors;
-
-$font: "Helvetica";
-
-$captionTextColor: #111;
-
-$fieldPaddingX: 6 !default;
-$fieldPaddingY: 0 !default;
-$fieldHeight: 32 !default;
-$fieldTextHeight: 16 !default;
-$fieldTextColor: colors.$bzdGraphColorBlack !default;
-$fieldPlaceholderColor: colors.$bzdGraphColorGray !default;
-$fieldSpecialTextColor: colors.$bzdGraphColorWhite !default;
-$fieldSpecialBgColor: colors.$bzdGraphColorBlue !default;
-$fieldBgColor: colors.$bzdGraphColorWhite !default;
-$fieldBorderThickness: 1 !default;
-$fieldBorderColor: darken(colors.$bzdGraphColorWhite, 20%) !default;
-$fieldBorderRadius: 2 !default;
-$tableBorderColor: darken(colors.$bzdGraphColorWhite, 10%) !default;
-$toolbarHeight: 40 !default;
-
-$actionerTextColor: #333 !default;
-$actionerBgColor: #eee !default;
-
-$focusColor: #ccc !default;
-
-$buttonApproveTextColor: colors.$bzdGraphColorWhite !default;
-$buttonApproveBgColor: colors.$bzdGraphColorOrange !default;
-$buttonCancelTextColor: $actionerTextColor !default;
-$buttonCancelBgColor: $actionerBgColor !default;
-$buttonDangerTextColor: colors.$bzdGraphColorWhite !default;
-$buttonDangerBgColor: colors.$bzdGraphColorRed !default;
-
-$errorColor: colors.$bzdGraphColorRed !default;
-$successColor: colors.$bzdGraphColorGreen !default;
-$disableColor: #ddd !default;
-$disableTextColor: #999 !default;
-$disableBgColor: #eee !default;
+@use "#bzd/config.scss" as config;
+@forward "#bzd/config.scss";
 
 @mixin irform-border {
-	border: #{$fieldBorderThickness}px solid $fieldBorderColor;
-	border-radius: #{$fieldBorderRadius}px;
+	border: #{config.$fieldBorderThickness}px solid config.$fieldBorderColor;
+	border-radius: #{config.$fieldBorderRadius}px;
 }
 
 @mixin irform-focus {
 	border-color: transparent;
-	outline: 1px dashed $focusColor !important;
+	outline: 1px dashed config.$focusColor !important;
 }
 
 // ---- Functions ----
 
 %reset {
-	font-family: $font;
-	font-size: #{$fieldTextHeight}px;
-	min-height: #{$fieldHeight}px;
-	line-height: #{$fieldHeight}px;
+	font-family: config.$font;
+	font-size: #{config.$fieldTextHeight}px;
+	min-height: #{config.$fieldHeight}px;
+	line-height: #{config.$fieldHeight}px;
 	margin: 0;
 	padding: 0;
 	box-sizing: border-box;
@@ -80,17 +44,17 @@ $disableBgColor: #eee !default;
 
 %field-reset {
 	@extend %reset;
-	color: $fieldTextColor;
-	background-color: $fieldBgColor;
+	color: config.$fieldTextColor;
+	background-color: config.$fieldBgColor;
 	width: 100%;
-	padding: #{$fieldPaddingY}px #{$fieldPaddingX}px;
+	padding: #{config.$fieldPaddingY}px #{config.$fieldPaddingX}px;
 }
 
 %actioner-reset {
 	@extend %reset;
-	color: $actionerTextColor;
-	background-color: $actionerBgColor;
-	padding: 0 6px;
+	color: config.$actionerTextColor;
+	background-color: config.$actionerBgColor;
+	padding: #{config.$fieldPaddingY}px #{config.$fieldPaddingX}px;
 }
 
 /**
@@ -99,8 +63,8 @@ $disableBgColor: #eee !default;
 %multi-line {
 	overflow: hidden;
 	height: auto;
-	line-height: #{$fieldTextHeight * 1.1}px;
-	padding-top: #{math.div($fieldHeight - $fieldTextHeight * 1.1, 2)}px;
+	line-height: #{config.$fieldTextHeight * 1.1}px;
+	padding-top: #{math.div(config.$fieldHeight - config.$fieldTextHeight * 1.1, 2)}px;
 }
 
 /**
@@ -130,11 +94,11 @@ $disableBgColor: #eee !default;
 	border: 1px solid transparent !important;
 	box-shadow: none !important;
 	&:hover {
-		box-shadow: 0 0 0 0 $fieldBorderColor !important;
+		box-shadow: 0 0 0 0 config.$fieldBorderColor !important;
 	}
 	&:focus,
 	&:focus-within {
-		box-shadow: 0 0 0 0 $fieldBorderColor !important;
+		box-shadow: 0 0 0 0 config.$fieldBorderColor !important;
 		@extend %focus-reset;
 	}
 	&:active {
@@ -235,7 +199,7 @@ $disableBgColor: #eee !default;
 	&:not(:focus):empty:before,
 	&::placeholder {
 		content: attr(data-placeholder);
-		color: $fieldPlaceholderColor;
+		color: config.$fieldPlaceholderColor;
 		white-space: nowrap;
 	}
 }
@@ -245,11 +209,11 @@ $disableBgColor: #eee !default;
  */
 %scrollbar {
 	&::-webkit-scrollbar {
-		width: #{math.div($fieldTextHeight, 2)}px;
-		background-color: $disableBgColor;
+		width: #{math.div(config.$fieldTextHeight, 2)}px;
+		background-color: config.$disableBgColor;
 	}
 	&::-webkit-scrollbar-thumb {
-		background-color: $disableColor;
+		background-color: config.$disableColor;
 	}
 }
 
@@ -271,7 +235,7 @@ $disableBgColor: #eee !default;
 	line-height: #{$width}px;
 
 	// Background
-	border-radius: #{$width}px;
+	border-radius: #{config.$fieldBorderRadius}px;
 	background-color: $bgColor;
 
 	@extend %clickable;
@@ -327,32 +291,32 @@ $disableBgColor: #eee !default;
  * Error
  */
 %error {
-	color: $errorColor;
+	color: config.$errorColor;
 }
 %error-border {
-	border-color: $errorColor;
+	border-color: config.$errorColor;
 }
 
 /**
  * Success
  */
 %success {
-	color: $successColor;
+	color: config.$successColor;
 }
 %success-border {
-	border-color: $successColor;
+	border-color: config.$successColor;
 }
 
 /**
  * Disable
  */
 %disable {
-	color: $disableTextColor;
+	color: config.$disableTextColor;
 	cursor: not-allowed !important;
 }
 %disable-border {
-	border-color: $disableColor;
-	background-color: $disableBgColor;
+	border-color: config.$disableColor;
+	background-color: config.$disableBgColor;
 	box-shadow: none;
 	outline: none;
 	&:hover,

@@ -3,4 +3,6 @@ export default {
 	password: "password",
 	passwordconfirm: "re-type",
 	passwordforgot: "forgot your password?",
+	persistent: "remember me",
+	signup: "not registered?",
 };

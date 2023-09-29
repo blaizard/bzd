@@ -1,16 +1,4 @@
-// List of 12 basic colors
-$bzdGraphColorRed: #ff6347;
-$bzdGraphColorBlue: #3498db;
-$bzdGraphColorOrange: #f39c12;
-$bzdGraphColorGreen: #2ecc71;
-$bzdGraphColorYellow: #f4d03f;
-$bzdGraphColorGray: #707b7c;
-$bzdGraphColorViolet: #ba55d3;
-$bzdGraphColorPink: #ffb6c1;
-$bzdGraphColorCyan: #009696;
-$bzdGraphColorBrown: #7a5c58;
-$bzdGraphColorBlack: #333333;
-$bzdGraphColorWhite: #ffffff;
+@use "#bzd/config.scss" as *;
 
 // For vite (also note that the extension .module.scss is necessary, see "CSS modules" with vite).
 :export {

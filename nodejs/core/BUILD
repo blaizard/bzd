@@ -113,6 +113,14 @@ bzd_nodejs_library(
 )
 
 bzd_nodejs_library(
+    name = "script",
+    srcs = [
+        "script.mjs",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+bzd_nodejs_library(
     name = "stream",
     srcs = [
         "stream.mjs",

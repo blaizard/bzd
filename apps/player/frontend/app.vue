@@ -362,7 +362,7 @@
 </script>
 
 <style lang="scss">
-	@use "#bzd/nodejs/styles/default/css/colors.module.scss" as colors;
+	@use "#bzd/config.scss" as config;
 
 	* {
 		box-sizing: border-box;
@@ -400,12 +400,12 @@
 
 	::selection {
 		color: #fff;
-		background-color: colors.$bzdGraphColorBlue;
+		background-color: config.$bzdGraphColorBlue;
 	}
 </style>
 
 <style lang="scss" scoped>
-	@use "#bzd/nodejs/styles/default/css/colors.module.scss" as colors;
+	@use "#bzd/config.scss" as config;
 
 	$selectionWidth: 3;
 
@@ -443,7 +443,7 @@
 		}
 
 		> .selected {
-			outline: #{$selectionWidth}px solid colors.$bzdGraphColorBlue !important;
+			outline: #{$selectionWidth}px solid config.$bzdGraphColorBlue !important;
 			z-index: 1;
 		}
 
