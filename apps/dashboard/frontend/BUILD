@@ -8,6 +8,7 @@ bzd_nodejs_web_binary(
         "**/*.svg",
         "**/*.mjs",
     ]),
+    config_scss = "//nodejs/styles:default.scss",
     main = "app.mjs",
     visibility = [
         "//apps/dashboard:__pkg__",

@@ -148,21 +148,21 @@
 <style lang="scss">
 	// ---- Configuration
 	@use "sass:math";
-	@use "#bzd/nodejs/styles/default/css/colors.module.scss" as colors;
+	@use "#bzd/config.scss" as config;
 
 	// Global
 
 	// Header
-	$headerColor: colors.$bzdGraphColorWhite;
-	$headerBgColor: colors.$bzdGraphColorBlue;
+	$headerColor: config.$bzdGraphColorWhite;
+	$headerBgColor: config.$bzdGraphColorBlue;
 	$headerFontSize: 22px;
 	$headerHeight: 56px;
 	$headerPadding: math.div($headerHeight - $headerFontSize, 2);
 	$headerZIndex: 10;
 
 	// Menu
-	$menuColor: colors.$bzdGraphColorBlack;
-	$menuBgColor: colors.$bzdGraphColorWhite;
+	$menuColor: config.$bzdGraphColorBlack;
+	$menuBgColor: config.$bzdGraphColorWhite;
 	$menuWidth: 300px;
 	$menuPadding: 16px;
 	$menuZIndex: 9;
@@ -368,7 +368,7 @@
 						height: 100%;
 						width: 100%;
 						opacity: 0.2;
-						background-color: colors.$bzdGraphColorWhite;
+						background-color: config.$bzdGraphColorWhite;
 						animation-name: bzd-notification-time-animation;
 						animation-duration: var(--bzd-notification-time);
 						animation-timing-function: linear;
@@ -388,16 +388,16 @@
 				}
 
 				&.bzd-info {
-					background-color: colors.$bzdGraphColorYellow;
-					color: colors.$bzdGraphColorBlack;
+					background-color: config.$bzdGraphColorYellow;
+					color: config.$bzdGraphColorBlack;
 				}
 				&.bzd-success {
-					background-color: colors.$bzdGraphColorGreen;
-					color: colors.$bzdGraphColorWhite;
+					background-color: config.$bzdGraphColorGreen;
+					color: config.$bzdGraphColorWhite;
 				}
 				&.bzd-error {
-					background-color: colors.$bzdGraphColorRed;
-					color: colors.$bzdGraphColorWhite;
+					background-color: config.$bzdGraphColorRed;
+					color: config.$bzdGraphColorWhite;
 				}
 			}
 

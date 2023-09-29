@@ -6,6 +6,7 @@ bzd_nodejs_web_binary(
         "app.mjs",
         "app.vue",
     ],
+    config_scss = "//nodejs/styles:default.scss",
     main = "app.mjs",
     deps = [
         "//nodejs:vue",

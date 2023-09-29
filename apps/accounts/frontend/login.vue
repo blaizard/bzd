@@ -1,29 +1,26 @@
 <template>
-	<div class="bzd-login">
-		<div class="logo">
-			<i class="bzd-icon-logo"></i>
+	<Authentication title="LOGIN">
+		<Form v-model="info" :description="formLoginDescription" @submit="handleSubmit"></Form>
+		<div class="reset">
+			<RouterLink link="/reset">{{ $lang.getCapitalized("passwordforgot") }}</RouterLink>
 		</div>
-		<div class="login" v-loading="loading">
-			<h1>LOGIN</h1>
-			<div v-if="error" class="error">{{ error }}</div>
-			<Form v-model="info" :description="formLoginDescription" @submit="handleSubmit"></Form>
+		<div class="signup">
+			<RouterLink link="/register">{{ $lang.getCapitalized("signup") }}</RouterLink>
 		</div>
-		<!--<div class="signup">Not registered yet? <RouterLink link="/signup">Sign-up here</RouterLink></div>//-->
-		<div class="forgot">
-			<RouterLink link="/forgot">{{ $lang.getCapitalized("passwordforgot") }}</RouterLink>
-		</div>
-		<Button content="Login" @click="handleSubmit"></Button>
-	</div>
+		<div class="or">or</div>
+		<Form :description="formLoginTrustedDescription"></Form>
+	</Authentication>
 </template>
 
 <script>
+	import Authentication from "#bzd/apps/accounts/frontend/authentication_base.vue";
 	import Form from "#bzd/nodejs/vue/components/form/form.vue";
-	import Button from "#bzd/nodejs/vue/components/form/element/button.vue";
+	import GoogleClient from "#bzd/nodejs/core/authentication/google/client.mjs";
 
 	export default {
 		components: {
+			Authentication,
 			Form,
-			Button,
 		},
 		data: function () {
 			return {
@@ -31,6 +28,21 @@
 			};
 		},
 		computed: {
+			formLoginTrustedDescription() {
+				return [
+					{
+						type: "Button",
+						content: "Login with Google",
+						fill: true,
+						click: async () => {
+							const client = new GoogleClient(
+								"484561133642-u96s0aq8rlmvj80ca03udqeavcsfvln9.apps.googleusercontent.com",
+							);
+							await client.authenticate();
+						},
+					},
+				];
+			},
 			formLoginDescription() {
 				return [
 					{
@@ -38,13 +50,25 @@
 						name: "email",
 						placeholder: this.$lang.getCapitalized("email"),
 						pre: { html: '<i class="bzd-icon-email"></i>' },
-						validation: "email",
+						validation: "email mandatory",
 					},
 					{
 						type: "Password",
 						name: "password",
 						placeholder: this.$lang.getCapitalized("password"),
 						pre: { html: '<i class="bzd-icon-lock"></i>' },
+						validation: "mandatory",
+					},
+					{
+						type: "Checkbox",
+						name: "persistent",
+						text: this.$lang.getCapitalized("persistent"),
+					},
+					{
+						type: "Button",
+						action: "approve",
+						content: "Login",
+						fill: true,
 					},
 				];
 			},
@@ -57,33 +81,12 @@
 	};
 </script>
 
-<style lang="scss">
-	.bzd-content {
-		display: flex;
-		flex-wrap: wrap;
-		justify-content: center;
-		align-items: center;
-		padding: 15px;
-		background-position: center;
-		background-size: cover;
-		background-repeat: no-repeat;
-	}
-</style>
-
 <style lang="scss" scoped>
-	.bzd-login {
-		width: 500px;
-		padding: 0 55px 37px;
-
-		.logo {
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			font-size: 80px;
-		}
-
-		.forgot {
-			text-align: right;
-		}
+	.reset,
+	.signup {
+		text-align: right;
+	}
+	.or {
+		text-align: center;
 	}
 </style>

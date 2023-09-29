@@ -124,7 +124,7 @@
 
 <style lang="scss">
 	@use "#bzd/nodejs/styles/default/css/form/base.scss" as base;
-	@use "#bzd/nodejs/styles/default/css/colors.module.scss" as colors;
+	@use "#bzd/config.scss" as config;
 
 	.bzd-payments {
 		.bzd-payment-stripe-card {
@@ -137,7 +137,7 @@
 		}
 		.bzd-payment-stripe-error {
 			font-size: 0.8em;
-			color: colors.$bzdGraphColorRed;
+			color: config.$bzdGraphColorRed;
 		}
 	}
 </style>

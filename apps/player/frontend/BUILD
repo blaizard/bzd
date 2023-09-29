@@ -10,6 +10,7 @@ bzd_nodejs_web_binary(
         "**/*.mp3",
         "**/*.wav",
     ]),
+    config_scss = "//nodejs/styles:default.scss",
     main = "app.mjs",
     packages = {
         "highlight.js": "",

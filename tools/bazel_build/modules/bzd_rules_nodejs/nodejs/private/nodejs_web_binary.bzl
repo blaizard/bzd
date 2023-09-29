@@ -37,7 +37,7 @@ def _bzd_nodejs_web_exec_impl(ctx):
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Title</title>
+    {heads}
   </head>
   <body>
     <div id="app"></div>
@@ -45,13 +45,21 @@ def _bzd_nodejs_web_exec_impl(ctx):
   </body>
 </html>
 """.format(
+            heads = "\n".join(ctx.attr.heads),
             main = ctx.file.main.short_path,
         ),
     )
 
+    # Inject the scss config.
+    config_scss = ctx.actions.declare_file("config.scss", sibling = install.package_json)
+    ctx.actions.symlink(
+        output = config_scss,
+        target_file = ctx.file.config_scss,
+    )
+
     bundle = ctx.actions.declare_directory("{}.bundle".format(ctx.label.name))
     ctx.actions.run(
-        inputs = depset([vite_config, index], transitive = [install.files]),
+        inputs = depset([vite_config, index, config_scss], transitive = [install.files]),
         outputs = [bundle],
         arguments = [
             "{}/node_modules/vite/bin/vite".format(vite_config.dirname),
@@ -94,6 +102,13 @@ _bzd_nodejs_web_binary = rule(
     doc = "NodeJs web application executor.",
     implementation = _bzd_nodejs_web_exec_impl,
     attrs = {
+        "config_scss": attr.label(
+            allow_single_file = True,
+            doc = "Create a config.scss file at the root containing the content of this file.",
+        ),
+        "heads": attr.string_list(
+            doc = "elements to add to the <head> tag.",
+        ),
         "install": attr.label(
             mandatory = True,
         ),

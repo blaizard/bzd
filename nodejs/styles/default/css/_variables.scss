@@ -1,0 +1,51 @@
+// List of 12 basic colors
+$bzdGraphColorRed: #ff6347 !default;
+$bzdGraphColorBlue: #3498db !default;
+$bzdGraphColorOrange: #f39c12 !default;
+$bzdGraphColorGreen: #2ecc71 !default;
+$bzdGraphColorYellow: #f4d03f !default;
+$bzdGraphColorGray: #707b7c !default;
+$bzdGraphColorViolet: #ba55d3 !default;
+$bzdGraphColorPink: #ffb6c1 !default;
+$bzdGraphColorCyan: #009696 !default;
+$bzdGraphColorBrown: #7a5c58 !default;
+$bzdGraphColorBlack: #333333 !default;
+$bzdGraphColorWhite: #ffffff !default;
+
+// Font.
+$font: "Helvetica" !default;
+$captionTextColor: #111 !default;
+
+// Form related.
+$fieldPaddingX: 6 !default;
+$fieldPaddingY: 0 !default;
+$fieldHeight: 32 !default;
+$fieldTextHeight: 16 !default;
+$fieldTextColor: $bzdGraphColorBlack !default;
+$fieldPlaceholderColor: $bzdGraphColorGray !default;
+$fieldSpecialTextColor: $bzdGraphColorWhite !default;
+$fieldSpecialBgColor: $bzdGraphColorBlue !default;
+$fieldBgColor: $bzdGraphColorWhite !default;
+$fieldBorderThickness: 1 !default;
+$fieldBorderColor: darken($bzdGraphColorWhite, 20%) !default;
+$fieldBorderRadius: 2 !default;
+$tableBorderColor: darken($bzdGraphColorWhite, 10%) !default;
+$toolbarHeight: 40 !default;
+
+// Action related (buttons...)
+$actionerTextColor: #333 !default;
+$actionerBgColor: #eee !default;
+$buttonApproveTextColor: $bzdGraphColorWhite !default;
+$buttonApproveBgColor: $bzdGraphColorOrange !default;
+$buttonCancelTextColor: $actionerTextColor !default;
+$buttonCancelBgColor: $actionerBgColor !default;
+$buttonDangerTextColor: $bzdGraphColorWhite !default;
+$buttonDangerBgColor: $bzdGraphColorRed !default;
+
+$focusColor: #ccc !default;
+
+$errorColor: $bzdGraphColorRed !default;
+$successColor: $bzdGraphColorGreen !default;
+$disableColor: #ddd !default;
+$disableTextColor: #999 !default;
+$disableBgColor: #eee !default;

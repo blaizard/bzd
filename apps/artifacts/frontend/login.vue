@@ -82,7 +82,7 @@
 </style>
 
 <style lang="scss" scoped>
-	@use "#bzd/nodejs/styles/default/css/colors.module.scss" as colors;
+	@use "#bzd/config.scss" as config;
 
 	.login {
 		width: 300px;
@@ -90,7 +90,7 @@
 
 		.error {
 			text-align: center;
-			color: colors.$bzdGraphColorRed;
+			color: config.$bzdGraphColorRed;
 		}
 	}
 

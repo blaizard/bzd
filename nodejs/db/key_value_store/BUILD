@@ -34,3 +34,17 @@ bzd_nodejs_library(
         "//nodejs/db:utils",
     ],
 )
+
+bzd_nodejs_library(
+    name = "memory",
+    srcs = [
+        "key_value_store.mjs",
+        "memory.mjs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//nodejs/core:log",
+        "//nodejs/db:utils",
+        "//nodejs/utils:uid",
+    ],
+)

@@ -1,0 +1,24 @@
+{
+    "/admin/service": {
+        "post": {
+            "authentication": "admin",
+            "documentation": "Manually trigger a service",
+            "request": {
+                "type": "json",
+                "validation": {
+                    "type": "mandatory",
+                    "uid": ""
+                }
+            }
+        }
+    },
+    "/admin/services": {
+        "get": {
+            "authentication": "admin",
+            "documentation": "List available services",
+            "response": {
+                "type": "json"
+            }
+        }
+    }
+}

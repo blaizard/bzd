@@ -3,11 +3,13 @@ import Path from "path";
 
 import API from "#bzd/nodejs/core/api/server.mjs";
 import APIv1 from "#bzd/apps/accounts/api.v1.json" assert { type: "json" };
-import KeyValueStoreDisk from "#bzd/nodejs/db/key_value_store/disk.mjs";
+import KeyValueStoreMemory from "#bzd/nodejs/db/key_value_store/memory.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import Authentication from "#bzd/nodejs/core/authentication/token/server.mjs";
 import HttpServer from "#bzd/nodejs/core/http/server.mjs";
+import Services from "./services/services.mjs";
+import PendingActions from "./pending_actions/pending_actions.mjs";
 
 const Exception = ExceptionFactory("backend");
 const Log = LogFactory("backend");
@@ -29,12 +31,67 @@ const options = program.opts();
 const PORT = Number(process.env.BZD_PORT || options.port);
 const PATH_DATA = process.env.BZD_PATH_DATA || options.data;
 const PATH_STATIC = options.static;
+const AUTHENTICATION_PRIVATE_KEY = "abcd";
 
 (async () => {
-	const keyValueStore = await KeyValueStoreDisk.make(Path.join(PATH_DATA, "db", "kvs"));
+	const keyValueStore = await KeyValueStoreMemory.make("accounts");
+	const keyValueStoreRegister = await KeyValueStoreMemory.make("register");
 
 	// Set-up the web server
 	const web = new HttpServer(PORT);
+
+	let authentication = new Authentication({
+		privateKey: AUTHENTICATION_PRIVATE_KEY,
+		verifyIdentityCallback: async (uid, password) => {
+			const maybeUser = await keyValueStore.get("user", uid, null);
+			if (maybeUser === null) {
+				return false;
+			}
+			if (maybeUser.password !== password) {
+				return false;
+			}
+			return {
+				roles: user.getRoles(),
+				uid: uid,
+			};
+		},
+		verifyRefreshCallback: async (/*uid, session, timeoutS*/) => {
+			return true;
+		},
+	});
+
+	// Create the pending actions module
+	const pendingActions = new PendingActions(keyValueStoreRegister, {
+		register: {
+			run: async (uid, data) => {
+				console.log("PendingActions register", uid, data);
+				//data.roles = ["users"];
+				//await users.create(data);
+			},
+		},
+	});
+	const services = new Services();
+
+	pendingActions.registerGarbageCollector(services, "register");
+
+	// ---- API ----
+
+	const api = new API(APIv1, {
+		channel: web,
+		plugins: [],
+	});
+
+	api.handle("post", "/user", async (inputs, user) => {
+		const activationCode = await pendingActions.create("group", user.getUid(), inputs);
+		return String(activationCode);
+	});
+
+	pendingActions.installAPI(api);
+	services.installAPI(api);
+
+	// ---- services ----
+
+	services.start();
 
 	web.addStaticRoute("/", PATH_STATIC, "index.html");
 	web.start();

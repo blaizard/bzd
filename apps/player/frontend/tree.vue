@@ -99,14 +99,14 @@
 
 <style lang="scss" scoped>
 	@use "sass:math";
-	@use "#bzd/nodejs/styles/default/css/colors.module.scss" as colors;
+	@use "#bzd/config.scss" as config;
 
 	$indent: 20;
 	$arrowSize: 5;
 	$fontSize: 16;
 	$lineHeight: 24;
 	$arrowOffsetY: math.div($lineHeight, 2);
-	$lineColor: colors.$bzdGraphColorGray;
+	$lineColor: config.$bzdGraphColorGray;
 
 	.indent {
 		padding-left: #{$indent}px;
@@ -126,7 +126,7 @@
 		line-height: #{$lineHeight}px;
 
 		.error {
-			color: colors.$bzdGraphColorRed;
+			color: config.$bzdGraphColorRed;
 			white-space: nowrap;
 			overflow: hidden;
 			text-overflow: ellipsis;
@@ -161,7 +161,7 @@
 					top: #{$arrowOffsetY - $arrowSize}px;
 					width: 0;
 					height: 0;
-					border-left: #{$arrowSize}px solid colors.$bzdGraphColorBlack;
+					border-left: #{$arrowSize}px solid config.$bzdGraphColorBlack;
 					border-right: #{$arrowSize}px solid transparent;
 					border-bottom: #{$arrowSize}px solid transparent;
 					border-top: #{$arrowSize}px solid transparent;
@@ -175,7 +175,7 @@
 			}
 
 			&.selected > .text {
-				background-color: colors.$bzdGraphColorBlue;
+				background-color: config.$bzdGraphColorBlue;
 				color: #fff;
 				padding: 1px 5px;
 			}

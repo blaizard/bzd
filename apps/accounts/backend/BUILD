@@ -18,9 +18,11 @@ bzd_nodejs_binary(
     },
     deps = [
         "//apps/accounts:api",
+        "//apps/accounts/backend/pending_actions",
+        "//apps/accounts/backend/services",
         "//nodejs/core/api:server",
         "//nodejs/core/authentication/token:server",
         "//nodejs/core/http:server",
-        "//nodejs/db/key_value_store:disk",
+        "//nodejs/db/key_value_store:memory",
     ],
 )
