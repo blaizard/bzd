@@ -1,0 +1,79 @@
+{
+    "/admin/user": {
+        "delete": {
+            "authentication": "admin",
+            "documentation": "Delete a specific user",
+            "request": {
+                "type": "json",
+                "validation": {
+                    "uid": "mandatory"
+                }
+            }
+        },
+        "post": {
+            "authentication": "admin",
+            "documentation": "Set user information",
+            "request": {
+                "type": "json",
+                "validation": {
+                    "password": "",
+                    "uid": "mandatory"
+                }
+            }
+        }
+    },
+    "/admin/users": {
+        "post": {
+            "authentication": "admin",
+            "documentation": "List all users",
+            "request": {
+                "type": "json",
+                "validation": {
+                    "paging": ""
+                }
+            },
+            "response": {
+                "type": "json"
+            }
+        }
+    },
+    "/user": {
+        "delete": {
+            "authentication": true,
+            "documentation": "Delete current user account",
+            "request": {
+                "type": "json",
+                "validation": {
+                    "password": "mandatory"
+                }
+            }
+        },
+        "get": {
+            "authentication": true,
+            "documentation": "Get current user information",
+            "request": {
+                "type": "query",
+                "validation": {
+                    "uid": ""
+                }
+            },
+            "response": {
+                "type": "json"
+            }
+        },
+        "put": {
+            "authentication": true,
+            "documentation": "Update current user information",
+            "request": {
+                "type": "json",
+                "validation": {
+                    "oldpassword": "",
+                    "password": ""
+                }
+            },
+            "response": {
+                "type": "json"
+            }
+        }
+    }
+}
