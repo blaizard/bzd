@@ -20,6 +20,8 @@ bzd_nodejs_binary(
         "//apps/accounts:api",
         "//apps/accounts/backend/pending_actions",
         "//apps/accounts/backend/services",
+        "//apps/accounts/backend/tests:test_data",
+        "//apps/accounts/backend/users",
         "//nodejs/core/api:server",
         "//nodejs/core/authentication/token:server",
         "//nodejs/core/http:server",

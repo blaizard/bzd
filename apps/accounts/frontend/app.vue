@@ -15,6 +15,7 @@
 			this.$routerSet({
 				ref: "view",
 				routes: [
+					{ path: "/", component: () => import("./admin/admin.vue") },
 					{ path: "/login", component: () => import("./login.vue") },
 					{ path: "/reset", component: () => import("./reset.vue") },
 					{ path: "/register", component: () => import("./register.vue") },

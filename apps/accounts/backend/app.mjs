@@ -10,6 +10,8 @@ import Authentication from "#bzd/nodejs/core/authentication/token/server.mjs";
 import HttpServer from "#bzd/nodejs/core/http/server.mjs";
 import Services from "./services/services.mjs";
 import PendingActions from "./pending_actions/pending_actions.mjs";
+import Users from "./users/users.mjs";
+import TestData from "./tests/test_data.mjs";
 
 const Exception = ExceptionFactory("backend");
 const Log = LogFactory("backend");
@@ -25,6 +27,7 @@ program
 	)
 	.option("-s, --static <path>", "Directory to static serve.", ".")
 	.option("-d, --data <path>", "Where to store the data, can also be set with BZD_PATH_DATA.", "/tmp/bzd/accounts")
+	.option("--test", "Include test data.")
 	.parse(process.argv);
 
 const options = program.opts();
@@ -37,13 +40,16 @@ const AUTHENTICATION_PRIVATE_KEY = "abcd";
 	const keyValueStore = await KeyValueStoreMemory.make("accounts");
 	const keyValueStoreRegister = await KeyValueStoreMemory.make("register");
 
+	// Users
+	const users = new Users(keyValueStore);
+
 	// Set-up the web server
 	const web = new HttpServer(PORT);
 
 	let authentication = new Authentication({
 		privateKey: AUTHENTICATION_PRIVATE_KEY,
 		verifyIdentityCallback: async (uid, password) => {
-			const maybeUser = await keyValueStore.get("user", uid, null);
+			const maybeUser = await users.get(uid, /*allowNull*/ true);
 			if (maybeUser === null) {
 				return false;
 			}
@@ -51,7 +57,7 @@ const AUTHENTICATION_PRIVATE_KEY = "abcd";
 				return false;
 			}
 			return {
-				roles: user.getRoles(),
+				roles: maybeUser.getRoles(),
 				uid: uid,
 			};
 		},
@@ -77,21 +83,32 @@ const AUTHENTICATION_PRIVATE_KEY = "abcd";
 	// ---- API ----
 
 	const api = new API(APIv1, {
+		authentication: authentication,
 		channel: web,
-		plugins: [],
+		plugins: [authentication],
 	});
 
-	api.handle("post", "/user", async (inputs, user) => {
+	api.handle("post", "/register", async (inputs, user) => {
 		const activationCode = await pendingActions.create("group", user.getUid(), inputs);
 		return String(activationCode);
 	});
 
+	users.installAPI(api);
 	pendingActions.installAPI(api);
 	services.installAPI(api);
 
 	// ---- services ----
 
 	services.start();
+
+	// ---- tests data ----
+
+	if (options.test) {
+		const testData = new TestData(users);
+		await testData.install();
+	}
+
+	// ---- serve ----
 
 	web.addStaticRoute("/", PATH_STATIC, "index.html");
 	web.start();
