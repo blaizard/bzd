@@ -7,3 +7,9 @@ Web application to handle user accounts, authentication, permissions, informatio
 This web application deals with the following:
 
 - Authentication
+
+## Test
+
+```bash
+bazel run //apps/accounts/backend --config=dev -- --test
+```

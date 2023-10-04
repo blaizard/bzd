@@ -7,8 +7,10 @@
 <script>
 	import Authentication from "#bzd/apps/accounts/frontend/authentication_base.vue";
 	import Form from "#bzd/nodejs/vue/components/form/form.vue";
+	import Base from "#bzd/apps/accounts/frontend/base.vue";
 
 	export default {
+		mixins: [Base],
 		components: {
 			Authentication,
 			Form,

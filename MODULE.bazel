@@ -67,7 +67,6 @@ toolchain_cc.toolchain(
     version = "clang_17.0.0",
 )
 use_repo(toolchain_cc, "clang")
-use_repo(toolchain_cc, "clang-linux-arm64-linux-arm64")
 
 register_toolchains("@clang//:all")
 

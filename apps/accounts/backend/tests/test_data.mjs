@@ -13,6 +13,7 @@ export default class TestData {
 		Log.info("Creating admin user 'admin@admin.com'");
 		await this.users.create("admin@admin.com");
 		await this.users.update("admin@admin.com", (user) => {
+			user.setPassword("1234");
 			user.addRole("admin");
 			return user;
 		});

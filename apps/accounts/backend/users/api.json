@@ -10,7 +10,7 @@
                 }
             }
         },
-        "post": {
+        "put": {
             "authentication": "admin",
             "documentation": "Set user information",
             "request": {
@@ -23,7 +23,7 @@
         }
     },
     "/admin/users": {
-        "post": {
+        "get": {
             "authentication": "admin",
             "documentation": "List all users",
             "request": {

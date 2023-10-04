@@ -138,7 +138,7 @@ export default class Users {
 
 		// ---- Admin specific API
 
-		api.handle("post", "/admin/users", async (inputs) => {
+		api.handle("get", "/admin/users", async (inputs) => {
 			const result = await this.keyValueStore.list(this.config.bucket, inputs.paging);
 			return {
 				data: result.data(),
@@ -146,7 +146,7 @@ export default class Users {
 			};
 		});
 
-		api.handle("post", "/admin/user", async (inputs) => {
+		api.handle("put", "/admin/user", async (inputs) => {
 			await this.update(inputs.uid, async (u) => {
 				return this._preprocessAndMerge(inputs, u);
 			});

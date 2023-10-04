@@ -158,6 +158,8 @@ export default class APIServer extends Base {
 						case "raw":
 							context.send(result);
 							break;
+						default:
+							context.send();
 					}
 				}
 			} catch (e) {

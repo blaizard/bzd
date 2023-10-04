@@ -46,8 +46,8 @@ export default class KeyValueStoreMemory extends KeyValueStore {
 	}
 
 	async _updateImpl(bucket, key, modifier, defaultValue, maxConflicts) {
-		const value = modifier(this._getImpl(bucket, key, defaultValue));
-		this._setImpl(bucket, key, value);
+		const value = await modifier(await this._getImpl(bucket, key, defaultValue));
+		await this._setImpl(bucket, key, value);
 		return true;
 	}
 
