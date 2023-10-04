@@ -5,6 +5,7 @@
 				loading: false,
 			};
 		},
+		emits: ["loading"],
 		methods: {
 			handleError(e) {
 				if (e !== false) {
@@ -15,6 +16,7 @@
 			// Set the loading flag during the duration of the action.
 			async handleSubmit(action, throwOnError = false) {
 				this.loading = true;
+				this.$emit("loading", true);
 				try {
 					return await action();
 				} catch (e) {
@@ -24,6 +26,7 @@
 					}
 				} finally {
 					this.loading = false;
+					this.$emit("loading", false);
 				}
 			},
 		},

@@ -1,10 +1,9 @@
 <script>
+	import { HttpClientException } from "#bzd/nodejs/core/http/client.mjs";
+	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
+
 	export default {
-		data: function () {
-			return {
-				loading: false,
-			};
-		},
+		mixins: [Component],
 		computed: {
 			redirect() {
 				return typeof URLSearchParams !== "undefined"
@@ -38,10 +37,19 @@
 		methods: {
 			handleError(e) {
 				if (e !== false) {
-					/*this.$notification.error(e, {
+					// Handle expected errors.
+					if (e instanceof HttpClientException) {
+						if (e.code == 401 /*Unauthorized*/) {
+							Component.methods.handleError.call(this, "Unauthorized");
+							return;
+						}
+					}
+
+					// Unexpected errors.
+					this.$notification.error("message" in e ? e.message : e, {
 						actions: [
 							{
-								html: "<i class=\"bzd-icon-report\"></i> Report",
+								html: '<i class="bzd-icon-report"></i> Report',
 								callback: (entry) => {
 									// Build the message report
 									let message =
@@ -67,19 +75,8 @@
 							},
 							...this.$notification.defaultActions,
 						],
-					});*/
+					});
 					console.error(e);
-				}
-			},
-			async handleSubmit(action) {
-				this.loading = true;
-				try {
-					console.log(action);
-					return await action();
-				} catch (e) {
-					this.handleError(e);
-				} finally {
-					this.loading = false;
 				}
 			},
 		},
