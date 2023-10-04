@@ -17,7 +17,7 @@ def linux_x86_64(module_ctx, name):
     repository_path = get_location(module_ctx, name)
     toolchain_definition = {
         "build_files": [
-            "@bzd_toolchain_cc//:fragments/clang/linux_x86_64_17.0.0/linux_x86_64.BUILD",
+            "@bzd_toolchain_cc//:fragments/clang/linux_x86_64_17.0.2/linux_x86_64.BUILD",
         ],
         "builtin_include_directories": [
             "/usr/include/x86_64-linux-gnu",
@@ -51,9 +51,9 @@ def linux_x86_64(module_ctx, name):
         "linker_dirs": [
             "{}/lib".format(repository_path),
         ],
-        "sha256": "1a3a7a8df2ca2dd84358b8202c256ba93789871bd2329ba426337cdfdd9de4ef",
-        "package_name": "linux_x86_64_17.0.0",
-        "strip_prefix": "linux_x86_64_17.0.0",
+        "package_name": "linux_x86_64_17.0.2",
+        "sha256": "1020f62fe59389a2dff4785e5362117dd2b4fa5641ce7c0f0c9b97e795152452",
+        "strip_prefix": "linux_x86_64_17.0.2",
         "system_directories": [
             "{}/include/c++/v1".format(repository_path),
             "{}/lib/clang/17/include".format(repository_path),
@@ -61,7 +61,7 @@ def linux_x86_64(module_ctx, name):
             "/usr/include/x86_64-linux-gnu",
             "/usr/include",
         ],
-        "url": "http://data.blaizard.com/file/bzd/toolchains/cc/clang/linux_x86_64/linux_x86_64_17.0.0.tar.xz",
+        "url": "http://data.blaizard.com/file/bzd/toolchains/cc/clang/linux_x86_64/linux_x86_64_17.0.2.tar.xz",
     }
 
     toolchain_definition = toolchain_merge(toolchain_definition, linux(module_ctx, name))
@@ -74,6 +74,6 @@ def linux_x86_64(module_ctx, name):
 
     return toolchain_definition
 
-linux_x86_64_17_0_0 = {
+linux_x86_64_17_0_2 = {
     "linux-x86_64": linux_x86_64,
 }

@@ -1,6 +1,6 @@
 <template>
 	<Authentication title="LOGIN">
-		<Form v-model="info" :description="formLoginDescription" @submit="handleSubmit"></Form>
+		<Form v-model="info" :description="formLoginDescription" @submit="handleSubmitLogin"></Form>
 		<div class="reset">
 			<RouterLink link="/reset">{{ $lang.getCapitalized("passwordforgot") }}</RouterLink>
 		</div>
@@ -16,8 +16,10 @@
 	import Authentication from "#bzd/apps/accounts/frontend/authentication_base.vue";
 	import Form from "#bzd/nodejs/vue/components/form/form.vue";
 	import GoogleClient from "#bzd/nodejs/core/authentication/google/client.mjs";
+	import Base from "#bzd/apps/accounts/frontend/base.vue";
 
 	export default {
+		mixins: [Base],
 		components: {
 			Authentication,
 			Form,
@@ -25,7 +27,20 @@
 		data: function () {
 			return {
 				info: {},
+				loggedIn: false,
 			};
+		},
+		watch: {
+			"$authentication.isAuthenticated": {
+				handler(isAuthenticated) {
+					// Do this only if loading is not active to avoid a race when login.
+					if (isAuthenticated && !this.loading) {
+						const route = this.$routerGet();
+						this.$routerDispatch("/logout", route ? { query: { redirect: route } } : {});
+					}
+				},
+				immediate: true,
+			},
 		},
 		computed: {
 			formLoginTrustedDescription() {
@@ -47,7 +62,7 @@
 				return [
 					{
 						type: "Input",
-						name: "email",
+						name: "uid",
 						placeholder: this.$lang.getCapitalized("email"),
 						pre: { html: '<i class="bzd-icon-email"></i>' },
 						validation: "email mandatory",
@@ -74,8 +89,11 @@
 			},
 		},
 		methods: {
-			handleSubmit() {
-				console.log("submit!", this.info);
+			async handleSubmitLogin() {
+				await this.handleSubmit(async () => {
+					await this.$api.login(this.info.uid, this.info.password, this.info.persistent);
+					this.$routerDispatch(this.redirect || "/");
+				});
 			},
 		},
 	};

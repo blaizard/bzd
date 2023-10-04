@@ -123,7 +123,7 @@
 </script>
 
 <style lang="scss">
-	@use "#bzd/nodejs/styles/default/css/form/base.scss" as base;
+	@use "#bzd/nodejs/styles/default/css/form/config.scss" as *;
 	@use "#bzd/config.scss" as config;
 
 	.bzd-payments {

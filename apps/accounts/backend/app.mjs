@@ -53,7 +53,7 @@ const AUTHENTICATION_PRIVATE_KEY = "abcd";
 			if (maybeUser === null) {
 				return false;
 			}
-			if (maybeUser.password !== password) {
+			if (maybeUser.getPassword() !== password) {
 				return false;
 			}
 			return {
