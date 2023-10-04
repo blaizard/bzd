@@ -18,6 +18,7 @@
 				additionalProps: {},
 			};
 		},
+		emits: ["updated"],
 		methods: {
 			componentSet(component, routerId, props) {
 				this.component =
@@ -38,6 +39,7 @@
 						: component;
 				this.routerId = routerId;
 				this.additionalProps = props;
+				this.$emit("updated");
 			},
 		},
 	};
