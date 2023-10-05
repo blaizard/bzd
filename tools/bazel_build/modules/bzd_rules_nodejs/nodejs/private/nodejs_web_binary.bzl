@@ -141,7 +141,7 @@ _bzd_nodejs_web_binary = rule(
     toolchains = ["@bzd_rules_nodejs//nodejs:toolchain_type"],
 )
 
-def bzd_nodejs_web_binary(name, srcs = [], packages = {}, deps = [], **kwargs):
+def bzd_nodejs_web_binary(name, srcs = [], packages = {}, deps = [], apis = [], **kwargs):
     """Create a web application with NodeJs.
 
     Args:
@@ -149,6 +149,7 @@ def bzd_nodejs_web_binary(name, srcs = [], packages = {}, deps = [], **kwargs):
         srcs: The source files.
         packages: The packages to add.
         deps: The dependencies.
+        apis: The API to be used.
         **kwargs: Additional arguments to add to the rule.
     """
 
@@ -156,6 +157,7 @@ def bzd_nodejs_web_binary(name, srcs = [], packages = {}, deps = [], **kwargs):
         name = name + ".install",
         tags = ["manual", "nodejs"],
         srcs = srcs,
+        apis = apis,
         packages = dict({
             "@vitejs/plugin-vue2": "2.2.0",
             "sass": "1.66.1",

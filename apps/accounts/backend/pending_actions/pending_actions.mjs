@@ -1,7 +1,6 @@
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import { CollectionPaging } from "#bzd/nodejs/db/utils.mjs";
-import APISchema from "./api.json" assert { type: "json" };
 
 const Log = LogFactory("pending-actions");
 const Exception = ExceptionFactory("pending-actions");
@@ -140,7 +139,6 @@ export default class PendingActions {
 	installAPI(api) {
 		Log.info("Installing 'PendingActions' API");
 
-		api.addSchema(APISchema);
 		api.handle("get", "/admin/pending_actions/stats", async () => {
 			return await this.getStats();
 		});

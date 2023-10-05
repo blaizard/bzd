@@ -150,6 +150,20 @@ def _bzd_nodejs_install_impl(ctx):
 
     package_json, node_modules = bzd_nodejs_make_node_modules(ctx, deps_provider.packages, base_dir_name = base_dir_name)
 
+    # --- Create the APIs
+
+    api = ctx.actions.declare_file("api.json", sibling = package_json)
+    ctx.actions.run(
+        inputs = deps_provider.apis,
+        outputs = [api],
+        progress_message = "Generating API for {}...".format(ctx.label),
+        arguments = [
+            "--output",
+            api.path,
+        ] + [f.path for f in deps_provider.apis.to_list()],
+        executable = ctx.executable._json_merge,
+    )
+
     # --- Apply transpilers to the sources
 
     srcs, transpiled = bzd_nodejs_transpile(ctx, deps_provider.srcs.to_list(), runfiles = [package_json, node_modules], base_dir_name = base_dir_name)
@@ -158,7 +172,7 @@ def _bzd_nodejs_install_impl(ctx):
 
     metadata = ctx.actions.declare_file("{}.nodejs_install/metadata.json".format(ctx.label.name))
     ctx.actions.run(
-        inputs = [package_json, node_modules],
+        inputs = [package_json, node_modules, api],
         outputs = [metadata],
         progress_message = "Generating manifest for {}".format(ctx.label),
         mnemonic = "NodejsMetadata",
@@ -175,7 +189,7 @@ def _bzd_nodejs_install_impl(ctx):
     return [
         BzdPackageMetadataFragmentInfo(manifests = [metadata]),
         BzdNodeJsInstallInfo(
-            files = depset([package_json, node_modules] + srcs + transpiled.values(), transitive = [deps_provider.data]),
+            files = depset([package_json, node_modules, api] + srcs + transpiled.values(), transitive = [deps_provider.data]),
             package_json = package_json,
             transpiled = transpiled,
         ),
@@ -183,6 +197,11 @@ def _bzd_nodejs_install_impl(ctx):
 
 _INSTALL_ATTRS = dict(LIBRARY_ATTRS)
 _INSTALL_ATTRS.update({
+    "_json_merge": attr.label(
+        default = Label("@bzd_lib//:json_merge"),
+        cfg = "exec",
+        executable = True,
+    ),
     "_metadata": attr.label(
         default = Label("@bzd_rules_nodejs//nodejs/metadata"),
         cfg = "exec",

@@ -3,9 +3,9 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "pending_actions",
     srcs = [
-        "api.json",
         "pending_actions.mjs",
     ],
+    apis = ["api.json"],
     visibility = [
         "//apps/accounts/backend:__subpackages__",
     ],

@@ -7,8 +7,6 @@ import Validation from "../../validation.mjs";
 import AuthenticationServer from "../server.mjs";
 import User from "../user.mjs";
 
-import APISchema from "./api.json" assert { type: "json" };
-
 const Exception = ExceptionFactory("authentication", "token");
 const Log = LogFactory("authentication", "token");
 
@@ -57,7 +55,6 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 
 	_installAPIImpl(api) {
 		Log.debug("Installing token-based authentication API.");
-		api.addSchema(APISchema);
 
 		const authentication = this;
 		const generateTokens = async function (uid, roles, persistent, session) {
@@ -120,8 +117,7 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 		const data = context.getHeader("authorization", "").split(" ");
 		if (data.length == 2 && data[0].toLowerCase() == "bearer") {
 			token = data[1];
-		}
-		else {
+		} else {
 			token = context.getQuery("t");
 		}
 

@@ -16,8 +16,8 @@ export class CollectionPaging {
 		return this._nextPaging;
 	}
 
-	static pagingFromParam(maxOrPaging) {
-		return typeof maxOrPaging == "object" ? maxOrPaging : { page: 0, max: maxOrPaging };
+	static pagingFromParam(maxOrPaging, page = 0) {
+		return typeof maxOrPaging == "object" ? maxOrPaging : { page: page, max: maxOrPaging };
 	}
 
 	static async makeFromList(data, maxOrPaging, callback = (item) => item) {
