@@ -1,12 +1,14 @@
 <template>
-	<div class="bzd-authentication">
-		<div class="logo">
-			<i class="bzd-icon-logo"></i>
-		</div>
-		<div class="login">
-			<h1>{{ title }}</h1>
-			<div v-if="error" class="error">{{ error }}</div>
-			<slot></slot>
+	<div class="bzd-layout-authentication">
+		<div class="bzd-authentication">
+			<div class="logo">
+				<i class="bzd-icon-logo"></i>
+			</div>
+			<div class="login">
+				<h1>{{ title }}</h1>
+				<div v-if="error" class="error">{{ error }}</div>
+				<slot></slot>
+			</div>
 		</div>
 	</div>
 </template>
@@ -20,8 +22,11 @@
 	};
 </script>
 
-<style lang="scss">
-	.bzd-content {
+<style lang="scss" scoped>
+	.bzd-layout-authentication {
+		width: 100%;
+		height: 100%;
+
 		display: flex;
 		flex-wrap: wrap;
 		justify-content: center;
@@ -30,19 +35,17 @@
 		background-position: center;
 		background-size: cover;
 		background-repeat: no-repeat;
-	}
-</style>
 
-<style lang="scss" scoped>
-	.bzd-authentication {
-		width: 500px;
-		padding: 0 55px 37px;
+		.bzd-authentication {
+			width: 500px;
+			padding: 0 55px 37px;
 
-		.logo {
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			font-size: 80px;
+			.logo {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				font-size: 80px;
+			}
 		}
 	}
 </style>

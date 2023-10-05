@@ -15,7 +15,19 @@ export default class TestData {
 		await this.users.update("admin@admin.com", (user) => {
 			user.setPassword("1234");
 			user.addRole("admin");
+			user.addRole("user");
 			return user;
 		});
+
+		Log.info("Creating 5 dummy users");
+		for (let i = 0; i < 5; ++i) {
+			const uid = "dummy-" + i + "@dummy.com";
+			await this.users.create(uid);
+			await this.users.update(uid, (user) => {
+				user.setPassword("1234");
+				user.addRole("user");
+				return user;
+			});
+		}
 	}
 }
