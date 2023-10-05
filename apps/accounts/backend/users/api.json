@@ -27,9 +27,10 @@
             "authentication": "admin",
             "documentation": "List all users",
             "request": {
-                "type": "json",
+                "type": "query",
                 "validation": {
-                    "paging": ""
+                    "max": "mandatory",
+                    "page": "mandatory"
                 }
             },
             "response": {

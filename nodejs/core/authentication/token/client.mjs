@@ -2,8 +2,6 @@ import ExceptionFactory from "../../exception.mjs";
 import LogFactory from "../../log.mjs";
 import AuthenticationClient from "../client.mjs";
 
-import APISchema from "./api.json" assert { type: "json" };
-
 const Exception = ExceptionFactory("authentication", "token");
 const Log = LogFactory("authentication", "token");
 
@@ -30,7 +28,6 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 	_installAPIImpl(api) {
 		Log.debug("Installing token-based authentication API.");
 
-		api.addSchema(APISchema);
 		if (!this.options.refreshTokenCallback) {
 			this.options.refreshTokenCallback = async () => {
 				return await api.request("post", "/auth/refresh");

@@ -5,6 +5,7 @@ bzd_nodejs_binary(
     srcs = [
         "app.mjs",
     ],
+    apis = ["//apps/accounts:api.v1.json"],
     args = [
         "--static",
         "$(rootpath //apps/accounts/frontend).bundle",
@@ -17,7 +18,6 @@ bzd_nodejs_binary(
         "commander": "",
     },
     deps = [
-        "//apps/accounts:api",
         "//apps/accounts/backend/pending_actions",
         "//apps/accounts/backend/services",
         "//apps/accounts/backend/tests:test_data",

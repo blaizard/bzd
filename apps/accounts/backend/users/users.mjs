@@ -1,7 +1,7 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import User from "#bzd/apps/accounts/backend/users/user.mjs";
-import APISchema from "./api.json" assert { type: "json" };
+import { CollectionPaging } from "#bzd/nodejs/db/utils.mjs";
 
 const Exception = ExceptionFactory("users");
 const Log = LogFactory("users");
@@ -117,8 +117,6 @@ export default class Users {
 
 		const users = this;
 
-		api.addSchema(APISchema);
-
 		api.handle("get", "/user", async function (inputs, user) {
 			const tempUser = await users.get(user.getUid());
 			return tempUser.dataPublic();
@@ -139,7 +137,10 @@ export default class Users {
 		// ---- Admin specific API
 
 		api.handle("get", "/admin/users", async (inputs) => {
-			const result = await this.keyValueStore.list(this.config.bucket, inputs.paging);
+			const result = await this.keyValueStore.list(
+				this.config.bucket,
+				CollectionPaging.pagingFromParam(inputs.max, inputs.page),
+			);
 			return {
 				data: result.data(),
 				next: result.getNextPaging(),

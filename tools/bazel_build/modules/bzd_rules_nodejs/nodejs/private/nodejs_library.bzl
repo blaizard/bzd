@@ -5,6 +5,7 @@
 BzdNodeJsDepsInfo = provider(
     "Provider for dependencies information",
     fields = {
+        "apis": "APIs files that these deps implements.",
         "data": "Data to be added at runtime.",
         "packages": "Dictionary of packages and their corresponding version.",
         "srcs": "Sources to be processed.",
@@ -35,6 +36,7 @@ def bzd_nodejs_make_provider(ctx):
         srcs = depset(ctx.files.srcs),
         data = depset(ctx.files.data, transitive = tool_depsets),
         packages = dict(ctx.attr.packages),
+        apis = depset(ctx.files.apis),
     )
 
 def bzd_nodejs_merge(*providers):
@@ -50,6 +52,7 @@ def bzd_nodejs_merge(*providers):
     provider = BzdNodeJsDepsInfo(
         srcs = depset(transitive = [p.srcs for p in providers]),
         data = depset(transitive = [p.data for p in providers]),
+        apis = depset(transitive = [p.apis for p in providers]),
         packages = {},
     )
 
@@ -66,6 +69,10 @@ def bzd_nodejs_merge(*providers):
 # ---- Attributes
 
 LIBRARY_ATTRS = {
+    "apis": attr.label_list(
+        allow_files = True,
+        doc = "APIs files.",
+    ),
     "data": attr.label_list(
         allow_files = True,
         doc = "Data to be available at runtime.",

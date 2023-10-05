@@ -1,8 +1,7 @@
 import { program } from "commander";
-import Path from "path";
 
 import API from "#bzd/nodejs/core/api/server.mjs";
-import APIv1 from "#bzd/apps/accounts/api.v1.json" assert { type: "json" };
+import APIv1 from "#bzd/api.json" assert { type: "json" };
 import KeyValueStoreMemory from "#bzd/nodejs/db/key_value_store/memory.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
@@ -85,17 +84,13 @@ const AUTHENTICATION_PRIVATE_KEY = "abcd";
 	const api = new API(APIv1, {
 		authentication: authentication,
 		channel: web,
-		plugins: [authentication],
+		plugins: [authentication, users, pendingActions, services],
 	});
 
 	api.handle("post", "/register", async (inputs, user) => {
 		const activationCode = await pendingActions.create("group", user.getUid(), inputs);
 		return String(activationCode);
 	});
-
-	users.installAPI(api);
-	pendingActions.installAPI(api);
-	services.installAPI(api);
 
 	// ---- services ----
 

@@ -3,9 +3,9 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "client",
     srcs = [
-        "api.json",
         "client.mjs",
     ],
+    apis = ["api.json"],
     visibility = ["//visibility:public"],
     deps = [
         "//nodejs/core:exception",
@@ -17,9 +17,9 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "server",
     srcs = [
-        "api.json",
         "server.mjs",
     ],
+    apis = ["api.json"],
     packages = {
         "jsonwebtoken": "",
     },

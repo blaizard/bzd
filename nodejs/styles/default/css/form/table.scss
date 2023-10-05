@@ -43,7 +43,9 @@ $triangleHeight: math.div(base.$fieldHeight, 5);
 				color: base.$actionerTextColor;
 				padding: #{base.$fieldPaddingY}px #{base.$fieldPaddingX}px;
 				position: relative;
+				@extend %reset;
 				@extend %clickable;
+				display: table-cell;
 
 				&.irform-table-header-order-ascending {
 					padding-right: #{base.$fieldHeight}px;

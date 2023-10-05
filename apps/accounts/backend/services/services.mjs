@@ -1,6 +1,5 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
-import APISchema from "./api.json" assert { type: "json" };
 
 const Exception = ExceptionFactory("services");
 const Log = LogFactory("services");
@@ -92,8 +91,6 @@ export default class Services {
 		Log.info("Installing 'Services' API");
 
 		// ---- Admin specific API
-
-		api.addSchema(APISchema);
 
 		api.handle("get", "/admin/services", async () => {
 			return Object.keys(this.schema).reduce((obj, type) => {

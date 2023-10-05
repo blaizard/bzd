@@ -7,6 +7,7 @@ bzd_nodejs_web_binary(
         "**/*.vue",
         "**/*.svg",
     ]),
+    apis = ["//apps/accounts:api.v1.json"],
     config_scss = ":config.scss",
     heads = [
         "<title>bzd accounts</title>",
@@ -18,7 +19,7 @@ bzd_nodejs_web_binary(
     },
     visibility = ["//apps/accounts/backend:__pkg__"],
     deps = [
-        "//apps/accounts:api",
+        "//apps/accounts/backend/users:frontend",
         "//nodejs:icons",
         "//nodejs:vue",
         "//nodejs/core/authentication/google:client",
