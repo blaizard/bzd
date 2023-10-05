@@ -1,9 +1,12 @@
 <template>
-	<Layout>
+	<Layout :fullPage="true">
 		<template #content>
-			<div class="bzd-content" v-loading="loading">
-				<RouterComponent ref="view" @loading="handleLoading" @updated="handleUpdated"></RouterComponent>
-			</div>
+			<RouterComponent
+				ref="view"
+				@loading="handleLoading"
+				@updated="handleUpdated"
+				v-loading="loading"
+			></RouterComponent>
 		</template>
 	</Layout>
 </template>
@@ -58,10 +61,5 @@
 
 	.bzd-icon-logo {
 		@include icons.defineIcon("bzd.svg");
-	}
-
-	.bzd-content {
-		width: 100%;
-		height: 100vh;
 	}
 </style>
