@@ -186,10 +186,10 @@
 				}
 				this.sort = [[description.name, direction]];
 			},
-			itemUpdate(index, value) {
+			itemUpdate(rowIndex, value) {
 				let valueList = this.get().slice(0);
-				valueList[index] = value;
-				this.set(valueList, index);
+				valueList[rowIndex] = value;
+				this.set(valueList, rowIndex);
 			},
 		},
 	};

@@ -12,11 +12,11 @@
         },
         "put": {
             "authentication": "admin",
-            "documentation": "Set user information",
+            "documentation": "Update user information",
             "request": {
                 "type": "json",
                 "validation": {
-                    "password": "",
+                    "roles": "",
                     "uid": "mandatory"
                 }
             }

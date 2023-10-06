@@ -79,16 +79,16 @@ export default class Users {
 		return new User(uid, data);
 	}
 
-	_preprocessAndMerge(values, user) {
+	_preprocessAndMergeAdmin(values, user) {
 		Exception.assert(
-			Object.keys(values).every((key) => key in ["password"]),
-			"Some values cannot be changed: {}",
+			Object.keys(values).every((key) => ["roles"].includes(key)),
+			"Some values cannot be changed by the admin: {}",
 			Object.keys(values),
 		);
 
-		// Update password if any.
-		if ("password" in values) {
-			user.setPassword(values.password);
+		// Update roles.
+		if ("roles" in values) {
+			user.setRoles(values.roles);
 		}
 
 		return user;
@@ -96,7 +96,7 @@ export default class Users {
 
 	_preprocessAndMergePublic(values, user) {
 		Exception.assert(
-			Object.keys(values).every((key) => key in ["password", "oldpassword"]),
+			Object.keys(values).every((key) => ["password", "oldpassword"].includes(key)),
 			"Some values cannot be changed: {}",
 			Object.keys(values),
 		);
@@ -148,8 +148,10 @@ export default class Users {
 		});
 
 		api.handle("put", "/admin/user", async (inputs) => {
-			await this.update(inputs.uid, async (u) => {
-				return this._preprocessAndMerge(inputs, u);
+			const uid = inputs.uid;
+			delete inputs.uid;
+			await this.update(uid, async (u) => {
+				return this._preprocessAndMergeAdmin(inputs, u);
 			});
 		});
 

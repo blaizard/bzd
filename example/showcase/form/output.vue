@@ -17,9 +17,14 @@
 		<div class="bzd-showcase-form-element">
 			<div>
 				<h2>Form (diff=true)</h2>
-				<Form v-model="valueDiff" :description="formDescription" :diff="true"></Form>
+				<Form
+					:value="valueDiff"
+					@input="(v) => (valueDiffOutput = v)"
+					:description="formDescription"
+					:diff="true"
+				></Form>
 			</div>
-			<pre>{{ JSON.stringify(valueDiff, null, 4) }}</pre>
+			<pre>{{ JSON.stringify(valueDiffOutput, null, 4) }}</pre>
 		</div>
 	</div>
 </template>
@@ -31,12 +36,19 @@
 		mixins: [Template],
 		data: function () {
 			return {
-				valueDefault: {},
-				valueAll: {},
+				valueDefault: {
+					input: "Hello",
+					input2: "World",
+				},
+				valueAll: {
+					input: "Hello",
+					input2: "World",
+				},
 				valueDiff: {
 					input: "Hello",
 					input2: "World",
 				},
+				valueDiffOutput: {},
 			};
 		},
 		computed: {

@@ -4,6 +4,8 @@ import LogFactory from "#bzd/nodejs/core/log.mjs";
 const Exception = ExceptionFactory("user");
 const Log = LogFactory("user");
 
+const VALID_ROLES_ = ["admin", "user"];
+
 /// Wrapper class around a user.
 export default class User {
 	constructor(uid, value) {
@@ -54,6 +56,7 @@ export default class User {
 	}
 
 	addRole(role) {
+		Exception.assert(VALID_ROLES_.includes(role), "'{}' is not a valid role, valid roles are: {}", role, VALID_ROLES_);
 		this.modified.push("role(+" + role + ")");
 
 		let roles = this.value.roles || [];
@@ -62,6 +65,14 @@ export default class User {
 		}
 		roles.push(role);
 		this.value.roles = roles;
+	}
+
+	setRoles(roles) {
+		this.modified.push("role()");
+		this.value.roles = [];
+		for (const role of roles) {
+			this.addRole(role);
+		}
 	}
 
 	data() {

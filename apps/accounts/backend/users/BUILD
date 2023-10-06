@@ -31,6 +31,7 @@ bzd_nodejs_library(
         "//nodejs/utils:object",
         "//nodejs/vue/components/form",
         "//nodejs/vue/components/layout:component",
+        "//nodejs/vue/components/modal",
         "//nodejs/vue/directives:tooltip",
     ],
 )
