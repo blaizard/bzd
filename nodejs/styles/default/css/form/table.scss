@@ -4,11 +4,6 @@
 $triangleHeight: math.div(base.$fieldHeight, 5);
 
 .irform-table {
-	// Note, this does not work and I have no idea how to fix it.
-	// More detaisl abotu this issue here: https://stackoverflow.com/questions/18135204/setting-overflow-y-causes-overflow-x-to-change-as-well
-	// There is no working workaround
-	overflow-x: auto;
-	overflow-y: visible;
 	width: 100%;
 
 	// Reset any unwanted style

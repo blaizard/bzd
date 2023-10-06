@@ -27,7 +27,10 @@ bzd_nodejs_library(
         "//apps/accounts:__subpackages__",
     ],
     deps = [
+        "//nodejs/db:utils",
+        "//nodejs/utils:object",
         "//nodejs/vue/components/form",
         "//nodejs/vue/components/layout:component",
+        "//nodejs/vue/directives:tooltip",
     ],
 )

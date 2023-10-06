@@ -12,6 +12,14 @@ bzd_nodejs_library(
 )
 
 bzd_nodejs_library(
+    name = "object",
+    srcs = [
+        "object.mjs",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+bzd_nodejs_library(
     name = "to_string",
     srcs = [
         "to_string.mjs",
