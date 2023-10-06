@@ -148,7 +148,7 @@
 			get(freezeOnEdit = false) {
 				return freezeOnEdit ? this.internalValue : this.externalValue;
 			},
-			async set(value) {
+			async set(value, ...onchangeExtraArgs) {
 				if (!this.disable) {
 					let errorList = [];
 
@@ -167,7 +167,7 @@
 						this.$emit("input", value);
 						// Keep it at the end, it must be called once all the propagation of the value is done.
 						// This to give the opportunity to safely update the global value in this callback.
-						this.getOption("onchange", () => {})(value);
+						this.getOption("onchange", () => {})(value, this.value, ...onchangeExtraArgs);
 
 						await this.$nextTick();
 					} else {

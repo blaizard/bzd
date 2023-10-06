@@ -35,6 +35,7 @@
 				valueAll: {},
 				valueDiff: {
 					input: "Hello",
+					input2: "World",
 				},
 			};
 		},
@@ -42,6 +43,7 @@
 			formDescription() {
 				return [
 					{ type: "Input", name: "input", caption: "Input (named)" },
+					{ type: "Input", name: "input2", caption: "Input 2 (named)" },
 					{ type: "Input", caption: "Input (unmaned)" },
 				];
 			},

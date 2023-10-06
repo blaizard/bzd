@@ -189,7 +189,7 @@
 			itemUpdate(index, value) {
 				let valueList = this.get().slice(0);
 				valueList[index] = value;
-				this.set(valueList);
+				this.set(valueList, index);
 			},
 		},
 	};
