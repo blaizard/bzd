@@ -1,6 +1,13 @@
 <template>
 	<div>
-		<Button v-if="hasChanges" :content="changesContent" action="approve" v-tooltip="changesTooltip"></Button>
+		<Form :description="descriptionAdd"></Form>
+		<Button
+			v-if="hasChanges"
+			:content="changesContent"
+			action="approve"
+			v-tooltip="changesTooltip"
+			@click="handleApply"
+		></Button>
 		<Table v-model="users" :description="descriptionTable"></Table>
 	</div>
 </template>
@@ -8,7 +15,9 @@
 <script>
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
 	import Button from "#bzd/nodejs/vue/components/form/element/button.vue";
+	import Form from "#bzd/nodejs/vue/components/form/form.vue";
 	import Table from "#bzd/nodejs/vue/components/form/element/table.vue";
+	import Modal from "#bzd/nodejs/vue/components/modal/modal.vue";
 	import { CollectionPaging } from "#bzd/nodejs/db/utils.mjs";
 	import { objectDifference } from "#bzd/nodejs/utils/object.mjs";
 	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
@@ -18,6 +27,8 @@
 		components: {
 			Button,
 			Table,
+			Form,
+			Modal,
 		},
 		directives: {
 			tooltip: DirectiveTooltip,
@@ -57,8 +68,8 @@
 			descriptionTable() {
 				return {
 					template: [
-						{ type: "Input", caption: "UID", name: "uid", editable: false },
-						{ type: "Date", caption: "Creation", name: "creation" },
+						{ type: "Input", caption: "UID", name: "uid", disable: true },
+						{ type: "Date", caption: "Creation", name: "creation", disable: true },
 						{ type: "Input", caption: "Roles", name: "roles", multi: true },
 						{ type: "Button", content: "Delete", action: "danger" },
 					],
@@ -70,6 +81,12 @@
 						this.$set(this.updates, uid, Object.assign({}, this.updates[uid] || {}, diff));
 					},
 				};
+			},
+			descriptionAdd() {
+				return [
+					{ type: "Input", placeholder: "email", name: "uid", width: 0.9 },
+					{ type: "Button", content: "Create", action: "approve", width: 0.1 },
+				];
 			},
 			changesTooltip() {
 				const deletions = this.hasDeletions
@@ -114,6 +131,20 @@
 			},
 			async handleDelete(uid) {
 				console.log(uid);
+			},
+			async handleApply() {
+				// Process the updates.
+				while (this.hasUpdates) {
+					const [uid, values] = Object.entries(this.updates)[0];
+					await this.handleSubmit(async () => {
+						await this.$api.request("put", "/admin/user", {
+							uid: uid,
+							...values,
+						});
+					});
+					this.$delete(this.updates, uid);
+				}
+				// Process the deletion.
 			},
 		},
 	};
