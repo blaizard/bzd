@@ -147,6 +147,11 @@ export default class Users {
 			};
 		});
 
+		api.handle("post", "/admin/user", async (inputs) => {
+			const uid = inputs.uid;
+			await this.create(uid);
+		});
+
 		api.handle("put", "/admin/user", async (inputs) => {
 			const uid = inputs.uid;
 			delete inputs.uid;

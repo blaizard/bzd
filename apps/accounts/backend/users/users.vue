@@ -1,6 +1,9 @@
 <template>
 	<div>
-		<Form :description="descriptionAdd"></Form>
+		<Modal v-model="showCreate">
+			<Form :description="descriptionAdd" @submit="handleCreate"></Form>
+		</Modal>
+		<Button action="approve" content="Create" @click="showCreate = true"></Button>
 		<Button
 			v-if="hasChanges"
 			:content="changesContent"
@@ -38,6 +41,7 @@
 				users: [],
 				deletions: [],
 				updates: {},
+				showCreate: false,
 			};
 		},
 		props: {
@@ -84,8 +88,8 @@
 			},
 			descriptionAdd() {
 				return [
-					{ type: "Input", placeholder: "email", name: "uid", width: 0.9 },
-					{ type: "Button", content: "Create", action: "approve", width: 0.1 },
+					{ type: "Input", placeholder: "email", name: "uid", validation: "mandatory", width: 0.99 },
+					{ type: "Button", content: "Create", action: "approve", width: 0.01 },
 				];
 			},
 			changesTooltip() {
@@ -129,8 +133,19 @@
 					} while (paging);
 				});
 			},
+			async handleCreate(values) {
+				await this.handleSubmit(async () => {
+					await this.$api.request("post", "/admin/user", values);
+					this.users.push(values);
+					this.showCreate = false;
+				});
+			},
 			async handleDelete(uid) {
-				console.log(uid);
+				this.deletions.push(uid);
+				// Remove existing updates on this UID if any.
+				if (uid in this.updates) {
+					this.$delete(this.updates, uid);
+				}
 			},
 			async handleApply() {
 				// Process the updates.

@@ -10,6 +10,16 @@
                 }
             }
         },
+        "post": {
+            "authentication": "admin",
+            "documentation": "Create a new user",
+            "request": {
+                "type": "json",
+                "validation": {
+                    "uid": "mandatory"
+                }
+            }
+        },
         "put": {
             "authentication": "admin",
             "documentation": "Update user information",
