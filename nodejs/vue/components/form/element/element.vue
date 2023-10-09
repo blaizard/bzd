@@ -135,7 +135,7 @@
 			 * Send a submit signal to the form
 			 */
 			submit() {
-				this.$emit("submit");
+				this.$emit("submit", this.context);
 			},
 			/**
 			 * Get an attribute from the description
