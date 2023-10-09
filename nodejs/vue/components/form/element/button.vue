@@ -72,8 +72,8 @@
 		},
 		methods: {
 			async handleClick() {
-				this.$emit("click");
-				await (this.click || this.attrAction.defaultClick || (() => {}))();
+				this.$emit("click", this.context);
+				await (this.click || this.attrAction.defaultClick || (() => {}))(this.context);
 			},
 		},
 	};

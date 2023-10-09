@@ -22,7 +22,7 @@
 						@submit="handleSubmit(current)"
 						@input-with-context="handleInputWithContext(index, $event)"
 						:description="current"
-						:context="{ index: index, name: getName(current, index) }"
+						:context="{ ...context, index: index, name: getName(current, index) }"
 						:disable="getDisable(current)"
 					>
 					</component>
@@ -98,6 +98,8 @@
 			 * Include elements with no names
 			 */
 			all: { type: Boolean, default: false, required: false },
+			/// Extra context information to be passed to the elements.
+			context: { type: Object, default: {}, required: false },
 		},
 		name: "FormElement",
 		data: function () {
