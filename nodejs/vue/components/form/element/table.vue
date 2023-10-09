@@ -25,7 +25,7 @@
 					:disable="row.disable"
 					:value="row.value"
 					:template="itemTemplate"
-					@input="itemUpdate(row.index, $event)"
+					@input-with-context="itemUpdate(row.index, $event)"
 					@active="handleActive"
 				>
 				</Form>
@@ -46,21 +46,13 @@
 		},
 		data: function () {
 			return {
-				/**
-				 * Sort the table by the columns name
-				 */
+				/// Sort the table by the columns name
 				sort: this.getOption("sort", []),
-				/**
-				 * Return the class associated with a specific row
-				 */
+				/// Return the class associated with a specific row
 				rowClass: this.getOption("rowClass", (/*value, index*/) => ""),
-				/**
-				 * Return whether or not a row should be disabled
-				 */
+				/// Return whether or not a row should be disabled
 				rowDisable: this.getOption("rowDisable", (/*value*/) => false),
-				/**
-				 * The columns to be displayed
-				 */
+				/// The columns to be displayed
 				//template: this.getOption("template", [])
 			};
 		},
@@ -186,10 +178,10 @@
 				}
 				this.sort = [[description.name, direction]];
 			},
-			itemUpdate(rowIndex, value) {
+			itemUpdate(rowIndex, data) {
 				let valueList = this.get().slice(0);
-				valueList[rowIndex] = value;
-				this.set(valueList, rowIndex);
+				valueList[rowIndex] = data.value;
+				this.set(valueList, { ...data.context, row: rowIndex });
 			},
 		},
 	};

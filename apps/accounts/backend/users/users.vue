@@ -22,7 +22,6 @@
 	import Table from "#bzd/nodejs/vue/components/form/element/table.vue";
 	import Modal from "#bzd/nodejs/vue/components/modal/modal.vue";
 	import { CollectionPaging } from "#bzd/nodejs/db/utils.mjs";
-	import { objectDifference } from "#bzd/nodejs/utils/object.mjs";
 	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
 
 	export default {
@@ -77,12 +76,13 @@
 						{ type: "Input", caption: "Roles", name: "roles", multi: true },
 						{ type: "Button", content: "Delete", action: "danger" },
 					],
-					onchange: (value, oldValue, index) => {
-						const rowValue = value[index];
-						const uid = rowValue.uid;
-						// Note the order here is important.
-						const diff = objectDifference(oldValue[index] || {}, rowValue);
-						this.$set(this.updates, uid, Object.assign({}, this.updates[uid] || {}, diff));
+					onchange: (value, context) => {
+						const valueRow = value[context.row];
+						const uid = valueRow.uid;
+						this.$set(this.updates, uid, {
+							...(this.updates[uid] || {}),
+							[context.name]: valueRow[context.name],
+						});
 					},
 				};
 			},

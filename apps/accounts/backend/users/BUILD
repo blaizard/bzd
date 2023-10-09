@@ -28,7 +28,6 @@ bzd_nodejs_library(
     ],
     deps = [
         "//nodejs/db:utils",
-        "//nodejs/utils:object",
         "//nodejs/vue/components/form",
         "//nodejs/vue/components/layout:component",
         "//nodejs/vue/components/modal",

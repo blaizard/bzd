@@ -20,8 +20,9 @@
 						@error="handleError(indexToName[index], $event)"
 						@active="handleActive(index, $event)"
 						@submit="handleSubmit(current)"
-						@input="handleInput(index, $event)"
+						@input-with-context="handleInputWithContext(index, $event)"
 						:description="current"
+						:context="{ index: index, name: getName(current, index) }"
 						:disable="getDisable(current)"
 					>
 					</component>
@@ -165,6 +166,13 @@
 					this.$set(this.unamedValue, name, value);
 				}
 				this.$emit("input", this.returnedValue);
+			},
+			handleInputWithContext(index, data) {
+				this.handleInput(index, data.value);
+				this.$emit("input-with-context", {
+					value: this.returnedValue,
+					context: data.context,
+				});
 			},
 			handleSubmit(/*description*/) {
 				const result = this.validation.validate(this.currentValue, {
