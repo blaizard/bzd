@@ -1,23 +1,24 @@
 <script>
 	import Validation from "../../../../core/validation.mjs";
 
-	/**
-	 * The following must be implement for all elements:
-	 * Events:
-	 * - @active: when the element has the focus
-	 * - @input: when the element has a new value
-	 * - @error: when the element failed
-	 * Props:
-	 * - disable: set the element as disabled
-	 *
-	 * It handles the following keys from the "description" property:
-	 * - validation: syntax compatible with validation module.
-	 * - valueType: a string defining the type of data present. It can be "number", "list" or "any".
-	 */
+	/// The following must be implement for all elements:
+	/// Events:
+	/// - @active: when the element has the focus
+	/// - @input: when the element has a new value
+	/// - @error: when the element failed
+	/// Props:
+	/// - disable: set the element as disabled
+	///
+	/// It handles the following keys from the "description" property:
+	/// - validation: syntax compatible with validation module.
+	/// - valueType: a string defining the type of data present. It can be "number", "list" or "any".
 	export default {
 		props: {
 			description: { type: Object, required: false, default: () => ({}) },
 			disable: { type: Boolean, default: false, required: false },
+			/// The context of the element, used to get extra information about the
+			/// position and surounding of this element.
+			context: { type: Object, default: {}, required: false },
 		},
 		data: function () {
 			return {
@@ -28,6 +29,9 @@
 			};
 		},
 		computed: {
+			hasListenerInputWithContext() {
+				return Boolean(this.$listeners && "input-with-context" in this.$listeners);
+			},
 			valueType() {
 				return this.getOption("valueType", "any");
 			},
@@ -148,7 +152,7 @@
 			get(freezeOnEdit = false) {
 				return freezeOnEdit ? this.internalValue : this.externalValue;
 			},
-			async set(value, ...onchangeExtraArgs) {
+			async set(value, context = {}) {
 				if (!this.disable) {
 					let errorList = [];
 
@@ -164,10 +168,22 @@
 
 					if (!errorList.length) {
 						this.clearError();
-						this.$emit("input", value);
+
+						const updateContext = Object.assign(
+							{
+								previous: this.value,
+							},
+							this.context,
+							context,
+						);
+						if (this.hasListenerInputWithContext) {
+							this.$emit("input-with-context", { value: value, context: updateContext });
+						} else {
+							this.$emit("input", value);
+						}
 						// Keep it at the end, it must be called once all the propagation of the value is done.
 						// This to give the opportunity to safely update the global value in this callback.
-						this.getOption("onchange", () => {})(value, this.value, ...onchangeExtraArgs);
+						this.getOption("onchange", () => {})(value, updateContext);
 
 						await this.$nextTick();
 					} else {
