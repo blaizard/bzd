@@ -16,7 +16,7 @@
 				<template>
 					<component
 						:is="getType(current)"
-						v-model="currentValue[indexToName[index]]"
+						:value="currentValue[indexToName[index]]"
 						@error="handleError(indexToName[index], $event)"
 						@active="handleActive(index, $event)"
 						@submit="handleSubmit(current)"
@@ -162,6 +162,7 @@
 			},
 			handleInput(index, value) {
 				const name = this.indexToName[index];
+				this.currentValue[name] = value;
 				if (this.all || "name" in this.description[index]) {
 					this.$set(this.returnedValue, name, value);
 				} else {
@@ -175,8 +176,10 @@
 					value: this.returnedValue,
 					context: data.context,
 				});
+				console.log("handleInputWithContext", this.returnedValue);
 			},
 			handleSubmit(/*description*/) {
+				console.log(this.currentValue, "CURRNET VALUE");
 				const result = this.validation.validate(this.currentValue, {
 					output: "return",
 					valueExists: (key, value) => {

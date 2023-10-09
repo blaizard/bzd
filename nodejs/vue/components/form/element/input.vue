@@ -199,7 +199,7 @@
 					} else {
 						this.valueSet(text);
 						this.$refs.input.blur();
-						this.submit();
+						this.submit(this.context);
 					}
 				}
 				// If press Backspace

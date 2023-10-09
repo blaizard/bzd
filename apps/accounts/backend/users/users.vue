@@ -44,7 +44,8 @@
 			};
 		},
 		props: {
-			maxPerPage: { mandatory: false, type: String, default: 50 },
+			maxPerPage: { mandatory: false, type: Number, default: 50 },
+			fetchChunk: { mandatory: false, type: Number, default: 1000 },
 		},
 		mounted() {
 			this.handleFetch();
@@ -127,7 +128,7 @@
 		methods: {
 			async handleFetch() {
 				await this.handleSubmit(async () => {
-					let paging = CollectionPaging.pagingFromParam(this.maxPerPage);
+					let paging = CollectionPaging.pagingFromParam(this.fetchChunk);
 					do {
 						const result = await this.$api.request("get", "/admin/users", paging);
 						paging = result.next;
