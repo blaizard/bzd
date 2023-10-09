@@ -74,7 +74,14 @@
 						{ type: "Input", caption: "UID", name: "uid", disable: true },
 						{ type: "Date", caption: "Creation", name: "creation", disable: true },
 						{ type: "Input", caption: "Roles", name: "roles", multi: true },
-						{ type: "Button", content: "Delete", action: "danger" },
+						{
+							type: "Button",
+							content: "Delete",
+							action: "danger",
+							click: (context) => {
+								this.handleDelete(context.row);
+							},
+						},
 					],
 					onchange: (value, context) => {
 						const valueRow = value[context.row];
@@ -140,12 +147,16 @@
 					this.showCreate = false;
 				});
 			},
-			async handleDelete(uid) {
+			async handleDelete(index) {
+				const user = this.users[index];
+				const uid = user.uid;
 				this.deletions.push(uid);
 				// Remove existing updates on this UID if any.
 				if (uid in this.updates) {
 					this.$delete(this.updates, uid);
 				}
+				// Remove the element from the users list.
+				this.users.splice(index, 1);
 			},
 			async handleApply() {
 				// Process the updates.
@@ -160,6 +171,15 @@
 					this.$delete(this.updates, uid);
 				}
 				// Process the deletion.
+				while (this.hasDeletions) {
+					const uid = this.deletions[0];
+					await this.handleSubmit(async () => {
+						await this.$api.request("delete", "/admin/user", {
+							uid: uid,
+						});
+					});
+					this.deletions.shift();
+				}
 			},
 		},
 	};

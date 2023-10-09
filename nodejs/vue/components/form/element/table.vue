@@ -25,6 +25,7 @@
 					:disable="row.disable"
 					:value="row.value"
 					:template="itemTemplate"
+					:context="{ row: row.index }"
 					@input-with-context="itemUpdate(row.index, $event)"
 					@active="handleActive"
 				>
@@ -181,7 +182,7 @@
 			itemUpdate(rowIndex, data) {
 				let valueList = this.get().slice(0);
 				valueList[rowIndex] = data.value;
-				this.set(valueList, { ...data.context, row: rowIndex });
+				this.set(valueList, data.context);
 			},
 		},
 	};
