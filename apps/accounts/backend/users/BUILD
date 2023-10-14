@@ -5,6 +5,7 @@ bzd_nodejs_library(
     srcs = [
         "user.mjs",
         "users.mjs",
+        "subscription.mjs",
     ],
     apis = ["api.json"],
     visibility = [

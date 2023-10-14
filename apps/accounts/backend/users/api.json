@@ -27,6 +27,7 @@
                 "type": "json",
                 "validation": {
                     "roles": "",
+                    "subscriptions": "",
                     "uid": "mandatory"
                 }
             }
