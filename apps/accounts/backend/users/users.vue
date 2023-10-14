@@ -1,6 +1,7 @@
 <template>
 	<div>
 		<Modal v-model="showCreate">
+			<span>Create a new user:</span>
 			<Form :description="descriptionAdd" @submit="handleCreate"></Form>
 		</Modal>
 		<Button action="approve" content="Create" @click="showCreate = true"></Button>
@@ -74,7 +75,14 @@
 					template: [
 						{ type: "Input", caption: "UID", name: "uid", disable: true },
 						{ type: "Date", caption: "Creation", name: "creation", disable: true },
+						{ type: "Date", caption: "Last Login", name: "last_login", disable: true },
 						{ type: "Input", caption: "Roles", name: "roles", multi: true },
+						{ type: "Array", caption: "Subscriptions", name: "subscriptions", template: [
+							{ type: "Dropdown", name: "product", caption: "Product", list: {
+								"screen_recorder": "Screen Recorder"
+							}, width: 0.5},
+							{ type: "Date", caption: "End Date", name: "end", width: 0.5 }
+						]},
 						{
 							type: "Button",
 							content: "Delete",

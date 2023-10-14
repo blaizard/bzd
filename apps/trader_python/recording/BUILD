@@ -11,6 +11,7 @@ py_binary(
         requirement("yfinance"),
         ":recording_from_data",
         ":recording_to_path",
+        "@bzd_python//bzd/utils:worker"
     ],
 )
 

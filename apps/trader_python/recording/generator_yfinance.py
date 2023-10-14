@@ -1,3 +1,6 @@
+import warnings
+warnings.simplefilter(action="ignore", category=FutureWarning)
+
 import yfinance
 import pathlib
 import datetime
@@ -7,6 +10,7 @@ import traceback
 from apps.trader_python.recording.recording_from_data import RecordingFromData, RecordingPairFromData
 from apps.trader_python.recording.recording_to_path import recordingToPath
 from apps.trader_python.recording.recording import Info, Event, EventKind
+from bzd.utils.worker import Worker
 
 Date = typing.Union[str, int]
 
@@ -101,6 +105,18 @@ class Generator:
 
 		return recording
 
+def workload(args: typing.Tuple[str, pathlib.Path], stdout: typing.TextIO) -> bool:
+
+	ticker, path = args
+
+	print(f"Processing '{ticker}'...")
+	try:
+		recording = Generator(ticker).generate()
+		recordingToPath(recording, path)
+	except Exception as e:
+		stdout.write(f"{ticker}:\n")
+		stdout.write(str(e) + "\n")
+		stdout.write(str(traceback.format_exc()))
 
 if __name__ == "__main__":
 
@@ -140,13 +156,12 @@ if __name__ == "__main__":
 	    "WYNN", "XEL", "XYL", "YUM", "ZBRA", "ZBH", "ZION", "ZTS"
 	]
 
-	for index in range(len(tickerList)):
-		ticker = tickerList[index]
-		print(f"Processing '{ticker}' ({index + 1}/{len(tickerList)})...")
-		try:
-			recording = Generator(ticker).generate()
-			recordingToPath(recording, pathlib.Path("~/Documents/recordings/yfinance"))
-		except Exception as e:
-			print("ERROR...")
-			print(e)
-			print(traceback.format_exc())
+	worker = Worker(workload)
+
+	with worker.start() as w:
+		for index in range(len(tickerList)):
+			ticker = tickerList[index]
+			w.add(
+			    [ticker, pathlib.Path("~/Documents/recordings/yfinance")],
+			    timeoutS=60,
+			)

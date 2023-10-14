@@ -1,5 +1,6 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
+import Subscription from "#bzd/apps/accounts/backend/users/subscription.mjs";
 
 const Exception = ExceptionFactory("user");
 const Log = LogFactory("user");
@@ -41,6 +42,12 @@ export default class User {
 		return this.value.password || null;
 	}
 
+	setLastLogin()
+	{
+		this.modified.push("last_login");
+		this.value.last_login = Date.now();
+	}
+
 	setPassword(password) {
 		this.modified.push("password");
 		this.value.password = password;
@@ -51,8 +58,7 @@ export default class User {
 	}
 
 	getRoles() {
-		const roles = this.value.roles || [];
-		return roles;
+		return this.value.roles || [];
 	}
 
 	addRole(role) {
@@ -75,6 +81,37 @@ export default class User {
 		}
 	}
 
+	getSubscriptions() {
+		return this.value.subscriptions || {};
+	}
+
+	/// Get the subscription associated with a specific product.
+	///
+	/// \product The product ID.
+	getSubscription(product) {
+		const subscriptions = this.getSubscriptions();
+		if (product in subscriptions) {
+			return new Subscription(subscriptions[product]);
+		}
+		return null;
+	}
+
+	addSubscription(product, subscription) {
+		this.modified.push("subscription(+" + product + ")");
+
+		if (!("subscriptions" in this.value)) {
+			this.value.subscriptions = {};
+		}
+
+		if (product in subscriptions) {
+			let original = new Subscription(this.value.subscriptions[product]);
+			original.add(subscription);
+		}
+		else {
+			this.value.subscriptions[product] = subscription.data();
+		}
+	}
+
 	data() {
 		return this.value;
 	}
@@ -83,6 +120,7 @@ export default class User {
 		return {
 			email: this.getEmail(),
 			roles: this.getRoles(),
+			subscriptions: this.getSubscriptions(),
 		};
 	}
 }

@@ -55,6 +55,10 @@ const AUTHENTICATION_PRIVATE_KEY = "abcd";
 			if (maybeUser.getPassword() !== password) {
 				return false;
 			}
+			await users.update(uid, (user) => {
+				user.setLastLogin();
+				return user;
+			});
 			return {
 				roles: maybeUser.getRoles(),
 				uid: uid,
