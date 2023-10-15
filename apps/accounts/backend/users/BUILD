@@ -3,9 +3,9 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "users",
     srcs = [
+        "subscription.mjs",
         "user.mjs",
         "users.mjs",
-        "subscription.mjs",
     ],
     apis = ["api.json"],
     visibility = [

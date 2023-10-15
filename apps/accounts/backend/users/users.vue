@@ -77,12 +77,23 @@
 						{ type: "Date", caption: "Creation", name: "creation", disable: true },
 						{ type: "Date", caption: "Last Login", name: "last_login", disable: true },
 						{ type: "Input", caption: "Roles", name: "roles", multi: true },
-						{ type: "Array", caption: "Subscriptions", name: "subscriptions", template: [
-							{ type: "Dropdown", name: "product", caption: "Product", list: {
-								"screen_recorder": "Screen Recorder"
-							}, width: 0.5},
-							{ type: "Date", caption: "End Date", name: "end", width: 0.5 }
-						]},
+						{
+							type: "Array",
+							caption: "Subscriptions",
+							name: "subscriptions",
+							template: [
+								{
+									type: "Dropdown",
+									name: "product",
+									caption: "Product",
+									list: {
+										screen_recorder: "Screen Recorder",
+									},
+									width: 0.5,
+								},
+								{ type: "Date", caption: "End Date", name: "end", width: 0.5 },
+							],
+						},
 						{
 							type: "Button",
 							content: "Delete",

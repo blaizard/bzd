@@ -1,4 +1,5 @@
 import warnings
+
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
 import yfinance
@@ -105,6 +106,7 @@ class Generator:
 
 		return recording
 
+
 def workload(args: typing.Tuple[str, pathlib.Path], stdout: typing.TextIO) -> bool:
 
 	ticker, path = args
@@ -117,6 +119,7 @@ def workload(args: typing.Tuple[str, pathlib.Path], stdout: typing.TextIO) -> bo
 		stdout.write(f"{ticker}:\n")
 		stdout.write(str(e) + "\n")
 		stdout.write(str(traceback.format_exc()))
+
 
 if __name__ == "__main__":
 
