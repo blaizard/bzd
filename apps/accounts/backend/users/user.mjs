@@ -42,8 +42,7 @@ export default class User {
 		return this.value.password || null;
 	}
 
-	setLastLogin()
-	{
+	setLastLogin() {
 		this.modified.push("last_login");
 		this.value.last_login = Date.now();
 	}
@@ -106,8 +105,7 @@ export default class User {
 		if (product in subscriptions) {
 			let original = new Subscription(this.value.subscriptions[product]);
 			original.add(subscription);
-		}
-		else {
+		} else {
 			this.value.subscriptions[product] = subscription.data();
 		}
 	}

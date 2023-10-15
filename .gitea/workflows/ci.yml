@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/setup-java@v1
+      with:
+        java-version: '11.0'
+        architecture: x64
+
+    - name: "Environment"
+      run: |
+        cp tools/ci/github/.bazelrc.local .bazelrc.local
+        export PATH="${PATH}:${GITHUB_WORKSPACE}/bin"
+        ./info.sh
+
+    - name: "[normal] python"
+      run: |
+        ./tools/bazel clean --expunge
+        ./tools/bazel test @bzd_python//... --output_groups=+metadata --config=prod --platform_suffix=python
+
+    - name: "[normal] clang-tidy"
+      run: |
+        ./tools/bazel clean --expunge
+        ./tools/bazel test ... --output_groups=+metadata --config=dev --config=clang-tidy --platform_suffix=clang-tidy
+
+    - name: "[normal] clang prod"
+      run: |
+        ./tools/bazel clean --expunge
+        ./tools/bazel test ... --output_groups=+metadata --config=clang --config=prod --config=cc --platform_suffix=clang-prod
+
+    - name: "[normal] gcc prod"
+      run: |
+        ./tools/bazel clean --expunge
+        ./tools/bazel test ... --output_groups=+metadata --config=gcc --config=prod --config=cc --platform_suffix=gcc-prod
+
+    - name: "[normal] esp32 prod"
+      run: |
+        ./tools/bazel clean --expunge
+        ./tools/bazel run @docker//:xtensa_qemu.pull
+        ./tools/bazel test ... --output_groups=+metadata --config=esp32 --config=prod --config=cc --platform_suffix=esp32-prod
+
+    - name: "[sanitizer] asan/lsan/ubsan"
+      run: |
+        ./tools/bazel clean --expunge
+        ./tools/bazel test ... --config=clang --config=cc --config=sanitizer --config=asan --config=lsan --config=ubsan --platform_suffix=clang-asan-lsan-ubsan
+
+    - name: "[sanitizer] tsan"
+      run: |
+        ./tools/bazel clean --expunge
+        ./tools/bazel test ... --config=clang --config=cc --config=sanitizer --config=tsan --platform_suffix=clang-tsan
+
+    - name: "[sanitizer] sanitizer"
+      run: |
+        ./tools/bazel clean --expunge
+        ./sanitize.sh
+
+    - name: "Info"
+      if: always()
+      run: |
+        ./info.sh
