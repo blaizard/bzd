@@ -24,7 +24,7 @@
 
 .irtooltip-e {
 	.irtooltip-text {
-		margin-left: 12px;
+		left: 12px;
 		&:after {
 			top: calc(50% - 10px);
 			left: -20px;
@@ -35,7 +35,7 @@
 
 .irtooltip-s {
 	.irtooltip-text {
-		margin-top: 12px;
+		top: 12px;
 		&:after {
 			top: -20px;
 			left: calc(50% - 10px);
@@ -46,7 +46,7 @@
 
 .irtooltip-w {
 	.irtooltip-text {
-		margin-left: -12px;
+		left: -12px;
 		&:after {
 			top: calc(50% - 10px);
 			right: -20px;
@@ -57,7 +57,7 @@
 
 .irtooltip-n {
 	.irtooltip-text {
-		margin-top: -12px;
+		top: -12px;
 		&:after {
 			bottom: -20px;
 			left: calc(50% - 10px);
