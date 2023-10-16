@@ -10,6 +10,7 @@ bzd_nodejs_library(
         "//nodejs:vue",
         "//nodejs/core:upload",
         "//nodejs/core:validation",
+        "//nodejs/vue/directives:tooltip",
         "//nodejs/vue/directives:touch",
     ],
 )

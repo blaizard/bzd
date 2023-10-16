@@ -1,30 +1,32 @@
 <template>
 	<Authentication title="LOGOUT">
-		<Button
-			content="Logout"
-			:description="descriptionLogoutButton"
-			action="danger"
-			@click="handleSubmitLogout"
-		></Button>
+		<Form :description="description"></Form>
 	</Authentication>
 </template>
 
 <script>
 	import Authentication from "#bzd/apps/accounts/frontend/authentication_base.vue";
-	import Button from "#bzd/nodejs/vue/components/form/element/button.vue";
+	import Form from "#bzd/nodejs/vue/components/form/form.vue";
 	import Base from "#bzd/apps/accounts/frontend/base.vue";
 
 	export default {
 		mixins: [Base],
 		components: {
 			Authentication,
-			Button,
+			Form,
 		},
 		computed: {
-			descriptionLogoutButton() {
-				return {
-					fill: true,
-				};
+			description() {
+				return [
+					{
+						type: "Button",
+						content: "Logout",
+						action: "danger",
+						fill: true,
+						height: "large",
+						click: this.handleSubmitLogout,
+					},
+				];
 			},
 		},
 		methods: {

@@ -4,6 +4,7 @@
 		<template #menu>
 			<MenuEntry text="Colors" link="/colors"></MenuEntry>
 			<MenuEntry text="Notification" link="/notification"></MenuEntry>
+			<MenuEntry text="Tooltip" link="/tooltip"></MenuEntry>
 			<MenuEntry text="Graph">
 				<MenuEntry text="Plot" link="/graph/plot"></MenuEntry>
 			</MenuEntry>
@@ -52,6 +53,7 @@
 					{ path: "/form/autocomplete", component: () => import("./form/autocomplete.vue") },
 					{ path: "/form/validation", component: () => import("./form/validation.vue") },
 					{ path: "/form/output", component: () => import("./form/output.vue") },
+					{ path: "/tooltip", component: () => import("./tooltip.vue") },
 				],
 			});
 		},

@@ -150,6 +150,10 @@ export default class Users {
 		api.handle("post", "/admin/user", async (inputs) => {
 			const uid = inputs.uid;
 			await this.create(uid);
+			await this.update(uid, async (u) => {
+				u.addRole("user");
+				return u;
+			});
 		});
 
 		api.handle("put", "/admin/user", async (inputs) => {

@@ -4,15 +4,7 @@
 			<span>Create a new user:</span>
 			<Form :description="descriptionAdd" @submit="handleCreate"></Form>
 		</Modal>
-		<Button action="approve" content="Create" @click="showCreate = true"></Button>
-		<Button
-			v-if="hasChanges"
-			:content="changesContent"
-			action="approve"
-			v-tooltip="changesTooltip"
-			@click="handleApply"
-		></Button>
-		<Table v-model="users" :description="descriptionTable"></Table>
+		<Form v-model="form" :description="description"></Form>
 	</div>
 </template>
 
@@ -38,7 +30,9 @@
 		},
 		data: function () {
 			return {
-				users: [],
+				form: {
+					users: [],
+				},
 				deletions: [],
 				updates: {},
 				showCreate: false,
@@ -68,55 +62,79 @@
 				);
 			},
 			changesContent() {
-				return "Apply (" + this.nbChanges + ")";
+				return this.hasChanges > 0 ? "Apply (" + this.nbChanges + ")" : "Apply";
 			},
-			descriptionTable() {
-				return {
-					template: [
-						{ type: "Input", caption: "UID", name: "uid", disable: true },
-						{ type: "Date", caption: "Creation", name: "creation", disable: true },
-						{ type: "Date", caption: "Last Login", name: "last_login", disable: true },
-						{ type: "Input", caption: "Roles", name: "roles", multi: true },
-						{
-							type: "Array",
-							caption: "Subscriptions",
-							name: "subscriptions",
-							template: [
-								{
-									type: "Dropdown",
-									name: "product",
-									caption: "Product",
-									list: {
-										screen_recorder: "Screen Recorder",
-									},
-									width: 0.5,
-								},
-								{ type: "Date", caption: "End Date", name: "end", width: 0.5 },
-							],
+			description() {
+				return [
+					{
+						type: "Button",
+						action: "approve",
+						content: "Create",
+						click: () => {
+							this.showCreate = true;
 						},
-						{
-							type: "Button",
-							content: "Delete",
-							action: "danger",
-							click: (context) => {
-								this.handleDelete(context.row);
-							},
-						},
-					],
-					onchange: (value, context) => {
-						const valueRow = value[context.row];
-						const uid = valueRow.uid;
-						this.$set(this.updates, uid, {
-							...(this.updates[uid] || {}),
-							[context.name]: valueRow[context.name],
-						});
+						align: "right",
+						width: 0.99,
 					},
-				};
+					{
+						type: "Button",
+						action: "danger",
+						content: this.changesContent,
+						disable: !this.hasChanges,
+						click: this.handleApply,
+						tooltip: this.changesTooltip,
+						align: "right",
+						width: 0.01,
+					},
+					{
+						type: "Table",
+						name: "users",
+						template: [
+							{ type: "Input", caption: "UID", name: "uid", disable: true },
+							{ type: "Date", caption: "Creation", name: "creation", disable: true },
+							{ type: "Date", caption: "Last Login", name: "last_login", disable: true },
+							{ type: "Input", caption: "Roles", name: "roles", multi: true },
+							{
+								type: "Array",
+								caption: "Subscriptions",
+								name: "subscriptions",
+								template: [
+									{
+										type: "Dropdown",
+										name: "product",
+										caption: "Product",
+										list: {
+											screen_recorder: "Screen Recorder",
+										},
+										width: 0.5,
+									},
+									{ type: "Date", caption: "End Date", name: "end", width: 0.5 },
+								],
+							},
+							{
+								type: "Button",
+								content: "Delete",
+								action: "danger",
+								click: (context) => {
+									this.handleDelete(context.row);
+								},
+							},
+						],
+						onchange: (value, context) => {
+							const valueRow = value[context.row];
+							const uid = valueRow.uid;
+							this.$set(this.updates, uid, {
+								...(this.updates[uid] || {}),
+								[context.name]: valueRow[context.name],
+							});
+						},
+					},
+				];
 			},
 			descriptionAdd() {
 				return [
 					{ type: "Input", placeholder: "email", name: "uid", validation: "mandatory", width: 0.99 },
-					{ type: "Button", content: "Create", action: "approve", width: 0.01 },
+					{ type: "Button", content: "Create", action: "danger", width: 0.01 },
 				];
 			},
 			changesTooltip() {
@@ -152,7 +170,7 @@
 						const result = await this.$api.request("get", "/admin/users", paging);
 						paging = result.next;
 						for (const [key, value] of Object.entries(result.data)) {
-							this.users.push({
+							this.form.users.push({
 								uid: key,
 								...value,
 							});
@@ -163,12 +181,12 @@
 			async handleCreate(values) {
 				await this.handleSubmit(async () => {
 					await this.$api.request("post", "/admin/user", values);
-					this.users.push(values);
+					this.form.users.push(values);
 					this.showCreate = false;
 				});
 			},
 			async handleDelete(index) {
-				const user = this.users[index];
+				const user = this.form.users[index];
 				const uid = user.uid;
 				this.deletions.push(uid);
 				// Remove existing updates on this UID if any.
@@ -176,7 +194,7 @@
 					this.$delete(this.updates, uid);
 				}
 				// Remove the element from the users list.
-				this.users.splice(index, 1);
+				this.form.users.splice(index, 1);
 			},
 			async handleApply() {
 				// Process the updates.
