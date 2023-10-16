@@ -22,14 +22,15 @@
 		},
 		data: function () {
 			return {
-				/**
-				 * Defines a callback to be triggered the submit button is called
-				 */
+				/// Defines a callback to be triggered the submit button is called
 				click: this.getOption("click", null),
 			};
 		},
 		computed: {
 			attrAction() {
+				if (this.disable) {
+					return {};
+				}
 				const actionToClass = {
 					approve: {
 						defaultClick: this.submit,
@@ -45,9 +46,7 @@
 				};
 				return actionToClass[this.action || this.getOption("action")] || {};
 			},
-			/**
-			 * The content of the button
-			 */
+			// The content of the button
 			buttonClass() {
 				return {
 					"irform-button": true,
@@ -56,9 +55,7 @@
 					[this.getOption("class")]: true,
 				};
 			},
-			/**
-			 * The content of the button
-			 */
+			// The content of the button
 			attrContent() {
 				return this.content || this.getOption("content", "Submit");
 			},

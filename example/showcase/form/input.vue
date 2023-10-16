@@ -12,6 +12,10 @@
 			formDescription() {
 				return [
 					{ type: "Input", caption: "Input" },
+					{ type: "Message", value: "It can be used with different sizes." },
+					{ type: "Input", caption: "Input (small)", height: "small" },
+					{ type: "Input", caption: "Input (normal)", height: "normal" },
+					{ type: "Input", caption: "Input (large)", height: "large" },
 					{ type: "Input", caption: "Input (disabled)", disable: true },
 					{ type: "Input", caption: "Input (placeholder)", placeholder: "Enter text..." },
 					{ type: "Input", caption: "Input (pre)", pre: "$" },

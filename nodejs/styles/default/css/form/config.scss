@@ -42,6 +42,27 @@
 	background-clip: padding-box;
 }
 
+.irform-height-small {
+	%reset {
+		min-height: #{config.$fieldHeightSmall}px;
+		line-height: #{config.$fieldHeightSmall}px;
+	}
+}
+
+.irform-height-normal {
+	%reset {
+		min-height: #{config.$fieldHeightNormal}px;
+		line-height: #{config.$fieldHeightNormal}px;
+	}
+}
+
+.irform-height-large {
+	%reset {
+		min-height: #{config.$fieldHeightLarge}px;
+		line-height: #{config.$fieldHeightLarge}px;
+	}
+}
+
 %field-reset {
 	@extend %reset;
 	color: config.$fieldTextColor;
@@ -57,9 +78,7 @@
 	padding: #{config.$fieldPaddingY}px #{config.$fieldPaddingX}px;
 }
 
-/**
- * Set this attribute if the element is intended to be multiline
- */
+/// Set this attribute if the element is intended to be multiline
 %multi-line {
 	overflow: hidden;
 	height: auto;
@@ -67,9 +86,7 @@
 	padding-top: #{math.div(config.$fieldHeight - config.$fieldTextHeight * 1.1, 2)}px;
 }
 
-/**
- * Generate the field borders
- */
+/// Generate the field borders
 %border {
 	box-shadow: none;
 	outline: none;
@@ -87,9 +104,7 @@
 	@include irform-border;
 }
 
-/**
- * If applied, this rule will cancel the border rules previously set
- */
+/// If applied, this rule will cancel the border rules previously set
 %border-reset {
 	border: 1px solid transparent !important;
 	box-shadow: none !important;
@@ -106,11 +121,9 @@
 	}
 }
 
-/**
- * For fields that are intended to be clickable
- * \note The effect should only affect the background-image to avoid any
- * conflicts with the elements.
- */
+/// For fields that are intended to be clickable
+/// \note The effect should only affect the background-image to avoid any
+/// conflicts with the elements.
 %clickable {
 	cursor: pointer;
 
@@ -176,9 +189,7 @@
 	}
 }
 
-/**
- * For draggable elements
- */
+/// For draggable elements
 %draggable {
 	cursor: move;
 	user-select: none;
@@ -190,9 +201,7 @@
 	-webkit-touch-callout: none;
 }
 
-/**
- * For an element that supports placeholder through the attribute data-placeholder
- */
+/// For an element that supports placeholder through the attribute data-placeholder
 %placeholder {
 	// :not(:focus) is a hack for Firefox, as the caret position on an empty element
 	// have some issues otherwise, see https://bugzilla.mozilla.org/show_bug.cgi?id=904846
@@ -204,9 +213,7 @@
 	}
 }
 
-/**
- * For element that have a scrollbar
- */
+/// For element that have a scrollbar
 %scrollbar {
 	&::-webkit-scrollbar {
 		width: #{math.div(config.$fieldTextHeight, 2)}px;
@@ -217,9 +224,7 @@
 	}
 }
 
-/**
- * Button template
- */
+/// Button template
 @mixin button($width, $color, $bgColor: transparent) {
 	position: relative;
 	width: #{$width}px;
@@ -241,9 +246,7 @@
 	@extend %clickable;
 }
 
-/**
- * Close button
- */
+/// Close button
 @mixin buttonClose($width, $color, $crossWidth: $width, $bgColor: transparent, $crossThickness: 2) {
 	@include button($width, transparent, $bgColor);
 	&:before,
@@ -264,9 +267,7 @@
 	}
 }
 
-/**
- * Arrow button
- */
+/// Arrow button
 @mixin buttonArrow($direction, $width, $color, $eltWidth, $bgColor: transparent, $eltThickness: 2) {
 	@include button($width, transparent, $bgColor);
 	&:before {
@@ -287,9 +288,7 @@
 	}
 }
 
-/**
- * Error
- */
+/// Error
 %error {
 	color: config.$errorColor;
 }
@@ -297,9 +296,7 @@
 	border-color: config.$errorColor;
 }
 
-/**
- * Success
- */
+/// Success
 %success {
 	color: config.$successColor;
 }
@@ -307,9 +304,7 @@
 	border-color: config.$successColor;
 }
 
-/**
- * Disable
- */
+/// Disable
 %disable {
 	color: config.$disableTextColor;
 	cursor: not-allowed !important;
@@ -328,9 +323,7 @@
 	}
 }
 
-/**
- * Class to set when an element hass the focus
- */
+/// Class to set when an element hass the focus
 %focus {
 	@include irform-focus;
 }

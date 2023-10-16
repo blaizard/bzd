@@ -14,9 +14,7 @@ const positionSequences = {
 	s: ["s", "n", "w", "e"],
 };
 
-/**
- * Create a unique tooltip element or get the existing one.
- */
+/// Create a unique tooltip element or get the existing one.
 function getOrCreateTooltip() {
 	// Look for the tooltip
 	const eltList = document.getElementsByClassName("irtooltip");
@@ -41,9 +39,7 @@ function getOrCreateTooltip() {
 	return eltList[0];
 }
 
-/**
- * Hide the curren tooltip
- */
+/// Hide the curren tooltip
 export function tooltipHide() {
 	current.elt = null;
 
@@ -54,9 +50,7 @@ export function tooltipHide() {
 	clearWatcher();
 }
 
-/**
- * Detect if an element is out of screen
- */
+/// Detect if an element is out of screen
 function eltOutOfScreen(elt) {
 	const rect = elt.getBoundingClientRect();
 	return (
@@ -64,10 +58,8 @@ function eltOutOfScreen(elt) {
 	);
 }
 
-/**
- * This function will watch an element and if it disepear,
- * it will hide the tooltip.
- */
+/// This function will watch an element and if it disepear,
+/// it will hide the tooltip.
 function setWatcher(elt) {
 	// Clear current watcher first
 	clearWatcher();
@@ -84,9 +76,7 @@ function setWatcher(elt) {
 	hideFct();
 }
 
-/**
- * Reset and clear the current watcher if any.
- */
+/// Reset and clear the current watcher if any.
 function clearWatcher() {
 	if (current.watcher) {
 		clearInterval(current.watcher);
@@ -94,9 +84,7 @@ function clearWatcher() {
 	}
 }
 
-/**
- * Create and show the tooltip
- */
+/// Create and show the tooltip
 async function tooltipFromEvent(e) {
 	e.stopPropagation();
 
@@ -165,10 +153,10 @@ export function tooltip(elt, options) {
 	// Get element coordinates and update the coordinates
 	const coordElt = elt.getBoundingClientRect();
 	tooltipElt.className = "irtooltip";
-	tooltipElt.style.top = coordElt.top + "px";
-	tooltipElt.style.left = coordElt.left + "px";
-	tooltipElt.style.marginLeft = 0;
-	tooltipElt.style.marginTop = 0;
+	//tooltipElt.style.top = coordElt.top + "px";
+	//tooltipElt.style.left = coordElt.left + "px";
+	//tooltipElt.style.marginLeft = 0;
+	//tooltipElt.style.marginTop = 0;
 	tooltipElt.style.display = "block";
 
 	// Calculate the coordinates of the tooltip
@@ -184,26 +172,30 @@ export function tooltip(elt, options) {
 
 	do {
 		let position = positionList.shift();
+		tooltipElt.style.top = null;
+		tooltipElt.style.left = null;
+		tooltipElt.style.bottom = null;
+		tooltipElt.style.right = null;
 
 		switch (position) {
 			case "e":
-				tooltipElt.style.marginLeft = coordElt.width + "px";
-				tooltipElt.style.marginTop = (coordElt.height - coordTooltip.height) / 2 + "px";
+				tooltipElt.style.top = coordElt.top + (coordElt.height - coordTooltip.height) / 2 + "px";
+				tooltipElt.style.left = coordElt.left + coordElt.width + "px";
 				tooltipElt.className = "irtooltip irtooltip-e";
 				break;
 			case "s":
-				tooltipElt.style.marginLeft = (coordElt.width - coordTooltip.width) / 2 + "px";
-				tooltipElt.style.marginTop = coordElt.height + "px";
+				tooltipElt.style.top = coordElt.top + coordElt.height + "px";
+				tooltipElt.style.left = coordElt.left + (coordElt.width - coordTooltip.width) / 2 + "px";
 				tooltipElt.className = "irtooltip irtooltip-s";
 				break;
 			case "w":
-				tooltipElt.style.marginLeft = -coordTooltip.width + "px";
-				tooltipElt.style.marginTop = (coordElt.height - coordTooltip.height) / 2 + "px";
+				tooltipElt.style.top = coordElt.top + (coordElt.height - coordTooltip.height) / 2 + "px";
+				tooltipElt.style.right = window.innerWidth - coordElt.left + "px";
 				tooltipElt.className = "irtooltip irtooltip-w";
 				break;
 			case "n":
-				tooltipElt.style.marginLeft = (coordElt.width - coordTooltip.width) / 2 + "px";
-				tooltipElt.style.marginTop = -coordTooltip.height + "px";
+				tooltipElt.style.bottom = window.innerHeight - coordElt.top + "px";
+				tooltipElt.style.left = coordElt.left + (coordElt.width - coordTooltip.width) / 2 + "px";
 				tooltipElt.className = "irtooltip irtooltip-n";
 				break;
 		}
@@ -216,21 +208,13 @@ export function tooltip(elt, options) {
 export default function (el, binding) {
 	const config = Object.assign(
 		{
-			/**
-			 * Type of data to be displayed, values are html or text.
-			 */
+			// Type of data to be displayed, values are html or text.
 			type: "html",
-			/**
-			 * The data to be displayed
-			 */
+			// The data to be displayed
 			data: null,
-			/**
-			 * Asynchronous function to be called and resolved when the tooltip shows
-			 */
+			// Asynchronous function to be called and resolved when the tooltip shows
 			async: null,
-			/**
-			 * The position or positions the tooltip can take (by order of priority)
-			 */
+			// The position or positions the tooltip can take (by order of priority)
 			position: defaultPosition,
 		},
 		binding.value,

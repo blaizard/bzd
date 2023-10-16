@@ -8,6 +8,7 @@
 				:caption="current.caption"
 				:align="current.align"
 				:disable="getDisable(current)"
+				:height="current.height"
 				:width="current.width"
 				:active="active == index"
 				:mandatory="isMandatory(index)"
@@ -24,6 +25,7 @@
 						:description="current"
 						:context="{ ...context, index: index, name: getName(current, index) }"
 						:disable="getDisable(current)"
+						v-tooltip="current.tooltip"
 					>
 					</component>
 				</template>
@@ -38,6 +40,7 @@
 <script>
 	import Item from "./item.vue";
 	import Validation from "../../../core/validation.mjs";
+	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
 
 	// Include all the supported elements
 	import ElementInput from "./element/input.vue";
@@ -90,16 +93,15 @@
 			template: { type: Object, default: () => Item, required: false },
 			value: { type: Object, default: () => {}, required: false },
 			disable: { type: Boolean, default: false, required: false },
-			/**
-			 * Only the diff will be returned
-			 */
+			/// Only the diff will be returned
 			diff: { type: Boolean, default: false, required: false },
-			/**
-			 * Include elements with no names
-			 */
+			/// Include elements with no names
 			all: { type: Boolean, default: false, required: false },
 			/// Extra context information to be passed to the elements.
 			context: { type: Object, default: {}, required: false },
+		},
+		directives: {
+			tooltip: DirectiveTooltip,
 		},
 		name: "FormElement",
 		data: function () {

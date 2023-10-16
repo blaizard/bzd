@@ -63,6 +63,7 @@
 					{
 						type: "Input",
 						name: "uid",
+						height: "large",
 						placeholder: this.$lang.getCapitalized("email"),
 						pre: { html: '<i class="bzd-icon-email"></i>' },
 						validation: "email mandatory",
@@ -70,6 +71,7 @@
 					{
 						type: "Password",
 						name: "password",
+						height: "large",
 						placeholder: this.$lang.getCapitalized("password"),
 						pre: { html: '<i class="bzd-icon-lock"></i>' },
 						validation: "mandatory",
@@ -83,6 +85,7 @@
 						type: "Button",
 						action: "approve",
 						content: "Login",
+						height: "large",
 						fill: true,
 					},
 				];
