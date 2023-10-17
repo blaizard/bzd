@@ -1,11 +1,12 @@
 #/bin/bash
 
-BAZEL_RUN='./tools/bazel run --ui_event_filters=-info,-warning,-stdout,-stderr --noshow_progress'
-
 echo "==== user ==============================================================="
 echo "id: `id`"
 echo "==== disk ==============================================================="
 df -h
+echo "==== current working directory =========================================="
+pwd
+ls -lla
 echo "==== environment ========================================================"
 printenv | sort
 echo "==== docker ============================================================="
