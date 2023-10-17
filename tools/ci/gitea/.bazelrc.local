@@ -1,0 +1,18 @@
+# Tweak the output
+build --show_progress_rate_limit=60
+build --noshow_loading_progress
+build --show_timestamps
+
+# Jenkins must have a /cache folder where all cache related artifacts will be stored.
+# Cache.
+#startup --output_user_root=/cache/output
+#build --disk_cache=/cache/bazel
+#build --sandbox_add_mount_pair=/cache
+#build --sandbox_writable_path=/cache
+#build --@bzd_rules_nodejs//nodejs:cache=/cache
+
+# Exclude long and eternal tests.
+test --test_timeout_filters=-long,-eternal
+
+# Use remote execution.
+common --config=remote
