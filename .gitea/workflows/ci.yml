@@ -10,14 +10,14 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    - name: "Enable Remote Execution"
+      run: |
+        ./tools/bazel run //apps/node_manager:client --config=local -- wol --wait 10.10.0.11:8980 --broadcast 10.10.0.255 --timeout 300 08:bf:b8:14:04:b6
+
     - name: "Environment"
       run: |
         cp tools/ci/gitea/.bazelrc.local .bazelrc.local
         ./info.sh
-
-    - name: "Enable Remote Execution"
-      run: |
-        ./tools/bazel run //apps/node_manager:client --config=local -- wol --wait 10.10.0.11:8980 --broadcast 10.10.0.255 --timeout 300 08:bf:b8:14:04:b6
 
     - name: "[normal] python"
       run: |
@@ -60,12 +60,12 @@ jobs:
         ./tools/bazel clean --expunge
         ./sanitize.sh
 
-    - name: "Disable Remote Execution"
-      if: always()
-      run: |
-        ./tools/bazel run //apps/node_manager:client --config=local -- suspend 10.10.0.10:8000
-
     - name: "Info"
       if: always()
       run: |
         ./info.sh
+
+    - name: "Disable Remote Execution"
+      if: always()
+      run: |
+        ./tools/bazel run //apps/node_manager:client --config=local -- suspend 10.10.0.10:8000
