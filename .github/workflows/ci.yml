@@ -59,7 +59,7 @@ jobs:
     - name: "[sanitizer] sanitizer"
       run: |
         ./tools/bazel clean --expunge
-        ./sanitize.sh
+        ./tools/bazel run :sanitizer -- --check --all
 
 
     - name: Build documentation

@@ -30,4 +30,4 @@ echo  "==== [coverage] C++ ==============================="
 echo  "==== [coverage] NodeJs ==============================="
 ./tools/bazel coverage ... --config=nodejs --platform_suffix=coverage-nodejs && ./tools/bazel run tools/coverage --platform_suffix=coverage-nodejs -- --output bazel-out/coverage-nodejs $EXTRA_FLAGS
 echo  "==== [sanitizer] sanitizer ==============================="
-./sanitize.sh $EXTRA_FLAGS
+./tools/bazel run :sanitizer -- --check --all $EXTRA_FLAGS

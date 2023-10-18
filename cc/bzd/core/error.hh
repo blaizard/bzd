@@ -135,10 +135,8 @@ namespace bzd::error {
 template <class... Args>
 struct Failure : public bzd::ResultError<bzd::Error>
 {
-	Failure(Args&&... args, const SourceLocation location = SourceLocation::current()) noexcept : bzd::ResultError<bzd::Error>
-	{
-		location, ErrorType::failure, bzd::forward<Args>(args)...
-	}
+	Failure(Args&&... args, const SourceLocation location = SourceLocation::current()) noexcept :
+		bzd::ResultError<bzd::Error>{location, ErrorType::failure, bzd::forward<Args>(args)...}
 	{
 	}
 };
@@ -149,10 +147,8 @@ Failure(Args&&...) -> Failure<Args...>;
 template <class... Args>
 struct Timeout : public bzd::ResultError<bzd::Error>
 {
-	Timeout(Args&&... args, const SourceLocation location = SourceLocation::current()) noexcept : bzd::ResultError<bzd::Error>
-	{
-		location, ErrorType::timeout, bzd::forward<Args>(args)...
-	}
+	Timeout(Args&&... args, const SourceLocation location = SourceLocation::current()) noexcept :
+		bzd::ResultError<bzd::Error>{location, ErrorType::timeout, bzd::forward<Args>(args)...}
 	{
 	}
 };
@@ -163,10 +159,8 @@ Timeout(Args&&...) -> Timeout<Args...>;
 template <class... Args>
 struct Busy : public bzd::ResultError<bzd::Error>
 {
-	Busy(Args&&... args, const SourceLocation location = SourceLocation::current()) noexcept : bzd::ResultError<bzd::Error>
-	{
-		location, ErrorType::busy, bzd::forward<Args>(args)...
-	}
+	Busy(Args&&... args, const SourceLocation location = SourceLocation::current()) noexcept :
+		bzd::ResultError<bzd::Error>{location, ErrorType::busy, bzd::forward<Args>(args)...}
 	{
 	}
 };
@@ -177,10 +171,8 @@ Busy(Args&&...) -> Busy<Args...>;
 template <class... Args>
 struct Eof : public bzd::ResultError<bzd::Error>
 {
-	Eof(Args&&... args, const SourceLocation location = SourceLocation::current()) noexcept : bzd::ResultError<bzd::Error>
-	{
-		location, ErrorType::eof, bzd::forward<Args>(args)...
-	}
+	Eof(Args&&... args, const SourceLocation location = SourceLocation::current()) noexcept :
+		bzd::ResultError<bzd::Error>{location, ErrorType::eof, bzd::forward<Args>(args)...}
 	{
 	}
 };
@@ -191,10 +183,8 @@ Eof(Args&&...) -> Eof<Args...>;
 template <class... Args>
 struct Data : public bzd::ResultError<bzd::Error>
 {
-	Data(Args&&... args, const SourceLocation location = SourceLocation::current()) noexcept : bzd::ResultError<bzd::Error>
-	{
-		location, ErrorType::data, bzd::forward<Args>(args)...
-	}
+	Data(Args&&... args, const SourceLocation location = SourceLocation::current()) noexcept :
+		bzd::ResultError<bzd::Error>{location, ErrorType::data, bzd::forward<Args>(args)...}
 	{
 	}
 };

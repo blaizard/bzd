@@ -45,8 +45,8 @@ def linux_x86_64(module_ctx, name):
             "{}/lib/gcc/x86_64-pc-linux-gnu/13.1.0".format(repository_path),
             "{}/lib64".format(repository_path),
         ],
-        "sha256": "07f2855d072cb7de1ff1d81612d1d41cf6e548c20f4c16a09d268086e5690166",
         "package_name": "linux_x86_64_13.1.0",
+        "sha256": "07f2855d072cb7de1ff1d81612d1d41cf6e548c20f4c16a09d268086e5690166",
         "strip_prefix": "linux_x86_64_13.1.0",
         "system_directories": [
             "{}/include/c++/13.1.0/x86_64-pc-linux-gnu".format(repository_path),

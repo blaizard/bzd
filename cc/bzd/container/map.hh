@@ -132,9 +132,7 @@ private:
 	using typename interface::Map<K, V, Compare>::Element;
 
 public:
-	constexpr Map() : interface::Map<K, V, Compare> { data_ }
-	{
-	}
+	constexpr Map() : interface::Map<K, V, Compare>{data_} {}
 	constexpr Map(std::initializer_list<Element> list) : interface::Map<K, V, Compare>{data_}, data_{list}
 	{
 		bzd::algorithm::sort(data_.begin(), data_.end());

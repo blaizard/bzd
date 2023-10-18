@@ -6,5 +6,6 @@ build --show_timestamps
 # Exclude long and eternal tests.
 test --test_timeout_filters=-long,-eternal
 
-# Use build remote execution.
+# Use remote execution.
 build --config=remote
+test --config=remote

@@ -244,10 +244,7 @@ public:
 	static constexpr Bool resultTypeIsResult = ResultOfError<ResultType>::value;
 	static constexpr Bool resultTypeIsTupleOfOptionalResultsWithError = TupleOfOptionalResultsOfError<ResultType>::value;
 
-	constexpr Promise() noexcept : impl::Promise<PromiseType>
-	{
-		impl::PromiseBase::SetErrorCallback::toMember<Self, &Self::setError>(*this)
-	}
+	constexpr Promise() noexcept : impl::Promise<PromiseType>{impl::PromiseBase::SetErrorCallback::toMember<Self, &Self::setError>(*this)}
 	{
 	}
 

@@ -6,6 +6,7 @@ const Exception = ExceptionFactory("user");
 const Log = LogFactory("user");
 
 const VALID_ROLES_ = ["admin", "user"];
+const VALID_SUBSCRIPTIONS_ = ["screen_recorder"];
 
 /// Wrapper class around a user.
 export default class User {
@@ -13,6 +14,13 @@ export default class User {
 		this.uid = uid;
 		this.value = value;
 		this.modified = [];
+	}
+
+	static createDummy() {
+		const value = {
+			creation: Date.now(),
+		};
+		return new User(1234, value);
 	}
 
 	static create(uid) {
@@ -96,18 +104,36 @@ export default class User {
 	}
 
 	addSubscription(product, subscription) {
+		Exception.assert(
+			VALID_SUBSCRIPTIONS_.includes(product),
+			"'{}' is not a valid subscription product, valid products are: {}",
+			product,
+			VALID_SUBSCRIPTIONS_,
+		);
 		this.modified.push("subscription(+" + product + ")");
 
 		if (!("subscriptions" in this.value)) {
 			this.value.subscriptions = {};
 		}
 
-		if (product in subscriptions) {
+		if (product in this.value.subscriptions) {
 			let original = new Subscription(this.value.subscriptions[product]);
 			original.add(subscription);
 		} else {
 			this.value.subscriptions[product] = subscription.data();
 		}
+	}
+
+	setSubscriptions(subscriptions) {
+		let user = User.createDummy();
+		for (const [product, data] of Object.entries(subscriptions)) {
+			const subscription = new Subscription(data);
+			user.addSubscription(product, subscription);
+		}
+
+		this.value.subscriptions = user.value.subscriptions;
+		this.modified.push("subscription()");
+		this.modified.push(...user.modified);
 	}
 
 	data() {

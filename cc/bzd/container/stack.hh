@@ -80,12 +80,7 @@ template <bzd::Size stackSize, bzd::Size alignment = 1, StackDirection direction
 class Stack : public interface::Stack<direction>
 {
 public:
-	constexpr Stack() noexcept : interface::Stack<direction>
-	{
-		Span<Byte> { stack_, stackSize }
-	}
-	{
-	}
+	constexpr Stack() noexcept : interface::Stack<direction>{Span<Byte>{stack_, stackSize}} {}
 
 private:
 	alignas(alignment) Byte stack_[stackSize]{};

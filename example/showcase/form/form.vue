@@ -11,6 +11,10 @@
 						{ value: 8, key: "World", price: 4.54 },
 						{ value: -8, key: "Great", price: 0.2 },
 					],
+					map: {
+						Hello: { value: "World" },
+						You: { value: "Too" },
+					},
 				},
 			};
 		},
@@ -36,6 +40,17 @@
 					},
 					{ type: "Array", name: "array", caption: "Array" },
 					{
+						type: "Array",
+						name: "map",
+						caption: "Map",
+						template: [
+							{ type: "Input", caption: "Value", name: "value" },
+							{ type: "Input", caption: "Key", name: "key" },
+						],
+						toInputValue: "map_to_list",
+						toOutputValue: "list_to_map",
+					},
+					{
 						type: "Table",
 						caption: "Table",
 						name: "table",
@@ -46,7 +61,12 @@
 						],
 					},
 					{ type: "File", caption: "File", name: "file", upload: "/dummy" },
-					{ type: "Carousel", caption: "Carousel", name: "carousel", list: ["Hello", "World", "Great"] },
+					{
+						type: "Carousel",
+						caption: "Carousel",
+						name: "carousel",
+						list: ["Hello", "World", "Great", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+					},
 					{ type: "Editor", name: "editor", caption: "Editor" },
 				];
 			},

@@ -45,6 +45,6 @@ jobs:
     - name: "[sanitizer] sanitizer"
       script:
       - cp tools/ci/travis/.bazelrc.local .bazelrc.local
-      - ./sanitize.sh
+      - ./tools/bazel run :sanitizer -- --check --all
 
 

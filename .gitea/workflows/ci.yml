@@ -1,71 +1,63 @@
 name: CI
 
 on:
-  push: {}
+    push: {}
 
 jobs:
-  build:
-    runs-on: linux
+    build:
+        runs-on: linux
 
-    steps:
-    - uses: actions/checkout@v3
+        steps:
+            - uses: actions/checkout@v3
 
-    - name: "Enable Remote Execution"
-      run: |
-        ./tools/bazel run //apps/node_manager:client --config=local -- wol --wait 10.10.0.11:8980 --broadcast 10.10.0.255 --timeout 300 08:bf:b8:14:04:b6
+            - name: "Enable Remote Execution"
+              run: |
+                  ./tools/bazel run //apps/node_manager:client --config=local -- wol --wait 10.10.0.11:8980 --broadcast 10.10.0.255 --timeout 300 08:bf:b8:14:04:b6
 
-    - name: "Environment"
-      run: |
-        cp tools/ci/gitea/.bazelrc.local .bazelrc.local
-        ./info.sh
+            - name: "Environment"
+              run: |
+                  cp tools/ci/gitea/.bazelrc.local .bazelrc.local
+                  ./info.sh
 
-    - name: "[normal] python"
-      run: |
-        ./tools/bazel clean --expunge
-        ./tools/bazel test @bzd_python//... --output_groups=+metadata --config=prod --platform_suffix=python
+            - name: "[normal] python"
+              run: |
+                  ./tools/bazel test @bzd_python//... --output_groups=+metadata --config=prod --platform_suffix=python
 
-    - name: "[normal] clang-tidy"
-      run: |
-        ./tools/bazel clean --expunge
-        ./tools/bazel test ... --output_groups=+metadata --config=dev --config=clang-tidy --platform_suffix=clang-tidy
+            - name: "[normal] clang-tidy"
+              run: |
+                  ./tools/bazel test ... --output_groups=+metadata --config=dev --config=clang-tidy --platform_suffix=clang-tidy
 
-    - name: "[normal] clang prod"
-      run: |
-        ./tools/bazel clean --expunge
-        ./tools/bazel test ... --output_groups=+metadata --config=clang --config=prod --config=cc --platform_suffix=clang-prod
+            - name: "[normal] clang prod"
+              run: |
+                  ./tools/bazel test ... --output_groups=+metadata --config=clang --config=prod --config=cc --platform_suffix=clang-prod
 
-    - name: "[normal] gcc prod"
-      run: |
-        ./tools/bazel clean --expunge
-        ./tools/bazel test ... --output_groups=+metadata --config=gcc --config=prod --config=cc --platform_suffix=gcc-prod
+            - name: "[normal] gcc prod"
+              run: |
+                  ./tools/bazel test ... --output_groups=+metadata --config=gcc --config=prod --config=cc --platform_suffix=gcc-prod
 
-    - name: "[normal] esp32 prod"
-      run: |
-        ./tools/bazel clean --expunge
-        ./tools/bazel run @docker//:xtensa_qemu.pull
-        ./tools/bazel test ... --output_groups=+metadata --config=esp32 --config=prod --config=cc --platform_suffix=esp32-prod
+            - name: "[normal] esp32 prod"
+              run: |
+                  ./tools/bazel run @docker//:xtensa_qemu.pull
+                  ./tools/bazel test ... --output_groups=+metadata --config=esp32 --config=prod --config=cc --platform_suffix=esp32-prod
 
-    - name: "[sanitizer] asan/lsan/ubsan"
-      run: |
-        ./tools/bazel clean --expunge
-        ./tools/bazel test ... --config=clang --config=cc --config=sanitizer --config=asan --config=lsan --config=ubsan --platform_suffix=clang-asan-lsan-ubsan
+            - name: "[sanitizer] asan/lsan/ubsan"
+              run: |
+                  ./tools/bazel test ... --config=clang --config=cc --config=sanitizer --config=asan --config=lsan --config=ubsan --platform_suffix=clang-asan-lsan-ubsan
 
-    - name: "[sanitizer] tsan"
-      run: |
-        ./tools/bazel clean --expunge
-        ./tools/bazel test ... --config=clang --config=cc --config=sanitizer --config=tsan --platform_suffix=clang-tsan
+            - name: "[sanitizer] tsan"
+              run: |
+                  ./tools/bazel test ... --config=clang --config=cc --config=sanitizer --config=tsan --platform_suffix=clang-tsan
 
-    - name: "[sanitizer] sanitizer"
-      run: |
-        ./tools/bazel clean --expunge
-        ./sanitize.sh
+            - name: "[sanitizer] sanitizer"
+              run: |
+                  ./sanitize.sh
 
-    - name: "Info"
-      if: always()
-      run: |
-        ./info.sh
+            - name: "Info"
+              if: always()
+              run: |
+                  ./info.sh
 
-    - name: "Disable Remote Execution"
-      if: always()
-      run: |
-        ./tools/bazel run //apps/node_manager:client --config=local -- suspend 10.10.0.10:8000
+            - name: "Disable Remote Execution"
+              if: always()
+              run: |
+                  ./tools/bazel run //apps/node_manager:client --config=local -- suspend 10.10.0.10:8000
