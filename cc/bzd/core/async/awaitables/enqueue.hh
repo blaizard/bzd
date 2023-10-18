@@ -56,10 +56,9 @@ public: // Traits.
 
 public: // Constructor.
 	template <class... Ts>
-	constexpr EnqueueAll(Ts&&... asyncs) noexcept : Enqueue<Asyncs...>
-	{
-		bzd::async::impl::PromiseBase::OnTerminateCallback::toMember<Self, &Self::onTerminateCallback>(*this), bzd::forward<Ts>(asyncs)...
-	}
+	constexpr EnqueueAll(Ts&&... asyncs) noexcept :
+		Enqueue<Asyncs...>{bzd::async::impl::PromiseBase::OnTerminateCallback::toMember<Self, &Self::onTerminateCallback>(*this),
+						   bzd::forward<Ts>(asyncs)...}
 	{
 	}
 
@@ -109,10 +108,9 @@ public: // Traits.
 
 public: // Constructor.
 	template <class... Ts>
-	constexpr EnqueueAny(Ts&&... asyncs) noexcept : Enqueue<Asyncs...>
-	{
-		bzd::async::impl::PromiseBase::OnTerminateCallback::toMember<Self, &Self::onTerminateCallback>(*this), bzd::forward<Ts>(asyncs)...
-	}
+	constexpr EnqueueAny(Ts&&... asyncs) noexcept :
+		Enqueue<Asyncs...>{bzd::async::impl::PromiseBase::OnTerminateCallback::toMember<Self, &Self::onTerminateCallback>(*this),
+						   bzd::forward<Ts>(asyncs)...}
 	{
 	}
 

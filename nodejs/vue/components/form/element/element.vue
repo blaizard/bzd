@@ -23,8 +23,8 @@
 		data: function () {
 			return {
 				uid: this._uid,
-				internalIsValueFrozen: false,
-				internalFrozenValue: "",
+				isInputFrozenValue: false,
+				inputFrozenValue: "",
 				isActive: false,
 			};
 		},
@@ -33,32 +33,67 @@
 				return Boolean(this.$listeners && "input-with-context" in this.$listeners);
 			},
 			valueType() {
-				return this.getOption("valueType", "any");
+				return "any";
 			},
-			externalValue() {
-				switch (this.valueType) {
-					case "list": {
-						let list = this.value || [];
-						if (!(list instanceof Array)) {
-							this.setError("The value must be an Array");
-							list = [];
-						}
-						return list;
+			/// Return a functor to convert the internal value into external.
+			toOutputValue() {
+				const toOutputValue = this.getOption("toOutputValue", this.valueType);
+				if (typeof toOutputValue == "string") {
+					switch (toOutputValue) {
+						case "list_to_map":
+							return (v) => {
+								return v.reduce((object, value) => {
+									let copyValue = Object.assign({}, value);
+									delete copyValue.key;
+									object[value.key] = copyValue;
+									return object;
+								}, {});
+							};
+						case "any":
+						case "list":
+						case "number":
+							return (v) => v;
+						default:
+							this.setError('Unknown value preset "' + toOutputValue + '"');
 					}
-					case "number":
-					case "any":
-						break;
-					default:
-						this.setError('Unknown value type "' + this.valueType + '"');
+				} else if (typeof toOutputValue == "function") {
+					return toOutputValue;
 				}
-
-				return this.value;
+				this.setError('Unknown output type "' + toOutputValue + '", must be a string or function');
 			},
-			internalValue() {
-				if (this.internalIsValueFrozen) {
-					return this.internalFrozenValue;
+			/// Return a functor to convert the external value into internal.
+			toInputValue() {
+				const toInputValue = this.getOption("toInputValue", this.valueType);
+				if (typeof toInputValue == "string") {
+					switch (toInputValue) {
+						case "list":
+							return (v) => {
+								let list = v || [];
+								if (!(list instanceof Array)) {
+									this.setError("The value must be an Array");
+									list = [];
+								}
+								return list;
+							};
+						case "map_to_list":
+							return (v) => {
+								return Object.entries(v).map(([key, value]) => {
+									return Object.assign({}, value, { key: key });
+								});
+							};
+						case "any":
+						case "number":
+							return (v) => v;
+						default:
+							this.setError('Unknown value preset "' + toInputValue + '"');
+					}
+				} else if (typeof toInputValue == "function") {
+					return toInputValue;
 				}
-				return this.externalValue;
+				this.setError('Unknown input type "' + toInputValue + '", must be a string or function');
+			},
+			inputValue() {
+				return this.toInputValue(this.value);
 			},
 			validation() {
 				if ("validation" in this.description) {
@@ -68,30 +103,22 @@
 			},
 		},
 		methods: {
-			/**
-			 * Escape a string to display special characters as non-html interpreted characters.
-			 * This is similar to the PHP function htmlentities.
-			 */
+			/// Escape a string to display special characters as non-html interpreted characters.
+			/// This is similar to the PHP function htmlentities.
 			toHtmlEntities(str) {
 				return String(str).replace(/[\u00A0-\u9999<>&]/gim, (i) => "&#" + i.charCodeAt(0) + ";");
 			},
-			/**
-			 * Extract the type of a content element. Valid types are:
-			 * - text
-			 * - html
-			 */
+			/// Extract the type of a content element. Valid types are:
+			/// - text
+			/// - html
 			getContentType(element) {
 				return typeof element === "object" ? Object.entries(element)[0][0] : "text";
 			},
-			/**
-			 * Extract the data of a display element
-			 */
+			/// Extract the data of a display element
 			getContentData(element) {
 				return typeof element === "object" ? Object.entries(element)[0][1] : element;
 			},
-			/**
-			 * Set the different status of the item
-			 */
+			/// Set the different status of the item
 			setError(message) {
 				this.$emit("error", message);
 			},
@@ -101,13 +128,13 @@
 			setActive() {
 				if (!this.disable) {
 					// Freeze the value
-					this.internalIsValueFrozen = true;
-					if (this.externalValue instanceof Array) {
-						this.internalFrozenValue = this.externalValue.slice(0);
-					} else if (typeof this.externalValue === "object") {
-						this.internalFrozenValue = Object.assign({}, this.externalValue);
+					this.isInputFrozenValue = true;
+					if (this.inputValue instanceof Array) {
+						this.inputFrozenValue = this.inputValue.slice(0);
+					} else if (typeof this.inputValue === "object") {
+						this.inputFrozenValue = Object.assign({}, this.inputValue);
 					} else {
-						this.internalFrozenValue = this.externalValue;
+						this.inputFrozenValue = this.inputValue;
 					}
 
 					this.isActive = true;
@@ -120,7 +147,7 @@
 			},
 			setInactive() {
 				// Unfreeze the value
-				this.internalIsValueFrozen = false;
+				this.isInputFrozenValue = false;
 				this.isActive = false;
 				this.$emit("active");
 			},
@@ -131,34 +158,34 @@
 					this.setInactive();
 				}
 			},
-			/**
-			 * Send a submit signal to the form
-			 */
+			/// Send a submit signal to the form
 			submit() {
 				this.$emit("submit", this.context);
 			},
-			/**
-			 * Get an attribute from the description
-			 */
+			/// Get an attribute from the description
 			getOption(name, defaultValue) {
 				if (name in this.description) {
 					return this.description[name];
 				}
 				return defaultValue;
 			},
-			/**
-			 * Return the value
-			 */
+			/// Return the value
 			get(freezeOnEdit = false) {
-				return freezeOnEdit ? this.internalValue : this.externalValue;
+				if (freezeOnEdit && this.isInputFrozenValue) {
+					return this.inputFrozenValue;
+				}
+				return this.inputValue;
 			},
 			async set(value, context = {}) {
 				if (!this.disable) {
 					let errorList = [];
 
+					// Update the value
+					const outputValue = this.toOutputValue(value);
+
 					// Validate the value only if it is non-empty
-					if (value !== "" && this.validation) {
-						const result = this.validation.validate(value, {
+					if (outputValue !== "" && this.validation) {
+						const result = this.validation.validate(outputValue, {
 							output: "return",
 						});
 						if ("value" in result) {
@@ -177,13 +204,13 @@
 							context,
 						);
 						if (this.hasListenerInputWithContext) {
-							this.$emit("input-with-context", { value: value, context: updateContext });
+							this.$emit("input-with-context", { value: outputValue, context: updateContext });
 						} else {
-							this.$emit("input", value);
+							this.$emit("input", outputValue);
 						}
 						// Keep it at the end, it must be called once all the propagation of the value is done.
 						// This to give the opportunity to safely update the global value in this callback.
-						this.getOption("onchange", () => {})(value, updateContext);
+						this.getOption("onchange", () => {})(outputValue, updateContext);
 
 						await this.$nextTick();
 					} else {
@@ -193,9 +220,7 @@
 			},
 			// ---- Multi value specific --------------------------------------
 
-			/**
-			 * Returns an array of values containing the keys: value, display and search
-			 */
+			/// Returns an array of values containing the keys: value, display and search
 			createMultiValueList(list, isHtml) {
 				try {
 					// Build the list

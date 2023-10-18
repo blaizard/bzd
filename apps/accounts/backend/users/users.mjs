@@ -81,7 +81,7 @@ export default class Users {
 
 	_preprocessAndMergeAdmin(values, user) {
 		Exception.assert(
-			Object.keys(values).every((key) => ["roles"].includes(key)),
+			Object.keys(values).every((key) => ["roles", "subscriptions"].includes(key)),
 			"Some values cannot be changed by the admin: {}",
 			Object.keys(values),
 		);
@@ -89,6 +89,11 @@ export default class Users {
 		// Update roles.
 		if ("roles" in values) {
 			user.setRoles(values.roles);
+		}
+
+		// Update subscriptions.
+		if ("subscriptions" in values) {
+			user.setSubscriptions(values.subscriptions);
 		}
 
 		return user;

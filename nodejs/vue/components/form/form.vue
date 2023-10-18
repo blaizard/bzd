@@ -178,10 +178,8 @@
 					value: this.returnedValue,
 					context: data.context,
 				});
-				console.log("handleInputWithContext", this.returnedValue);
 			},
 			handleSubmit(/*description*/) {
-				console.log(this.currentValue, "CURRNET VALUE");
 				const result = this.validation.validate(this.currentValue, {
 					output: "return",
 					valueExists: (key, value) => {

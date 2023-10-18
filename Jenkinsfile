@@ -118,7 +118,7 @@ pipeline
 				{
 					steps
 					{
-						sh "./sanitize.sh"
+						sh "./tools/bazel run :sanitizer -- --check --all"
 					}
 				}
 			}

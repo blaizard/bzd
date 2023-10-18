@@ -24,7 +24,7 @@
 	class BZDTEST_CLASS_NAME_(testCaseName, testName) : public ::bzd::test::Test<1>                                                        \
 	{                                                                                                                                      \
 	public:                                                                                                                                \
-		BZDTEST_CLASS_NAME_(testCaseName, testName)() : ::bzd::test::Test<1> { #testCaseName, #testName, __FILE__ }                        \
+		BZDTEST_CLASS_NAME_(testCaseName, testName)() : ::bzd::test::Test<1>{#testCaseName, #testName, __FILE__}                           \
 		{                                                                                                                                  \
 			this->registerTest(::bzd::test::FunctionPointer::toMember<BZDTEST_CLASS_NAME_(testCaseName, testName),                         \
 																	  &BZDTEST_CLASS_NAME_(testCaseName, testName)::test>(*this));         \
@@ -38,7 +38,7 @@
 	class BZDTEST_CLASS_NAME_(testCaseName, testName) : public ::bzd::test::Test<sizeof...(Types)>                                         \
 	{                                                                                                                                      \
 	public:                                                                                                                                \
-		BZDTEST_CLASS_NAME_(testCaseName, testName)() : ::bzd::test::Test<sizeof...(Types)> { #testCaseName, #testName, __FILE__ }         \
+		BZDTEST_CLASS_NAME_(testCaseName, testName)() : ::bzd::test::Test<sizeof...(Types)>{#testCaseName, #testName, __FILE__}            \
 		{                                                                                                                                  \
 			(this->registerTest(::bzd::test::FunctionPointer::toMember<BZDTEST_CLASS_NAME_(testCaseName, testName),                        \
 																	   &BZDTEST_CLASS_NAME_(testCaseName, testName)::test<Types>>(*this),  \

@@ -75,11 +75,11 @@ def _impl(repository_ctx):
         "%{nm}": binaries["nm"],
         "%{objcopy}": binaries["objcopy"],
         "%{objdump}": binaries["objdump"],
+        "%{package_name}": repository_ctx.attr.package_name,
         "%{repository_path}": "external/" + repository_ctx.name,
         "%{strip}": binaries["strip"],
         "%{sysroot}": repository_ctx.attr.sysroot,
         "%{uid}": uid,
-        "%{package_name}": repository_ctx.attr.package_name
     }
 
     # Substitute the BUILD file content.
@@ -131,9 +131,9 @@ _toolchain_maker_linux = repository_rule(
         # Flags
         "link_flags": attr.string_list(),
         "linker_dirs": attr.string_list(),
+        "loads": attr.string_list_dict(),
         # Download.
         "package_name": attr.string(default = "package"),
-        "loads": attr.string_list_dict(),
         "patches": attr.label_list(allow_files = True),
         "sha256": attr.string(),
         "strip_prefix": attr.string(),

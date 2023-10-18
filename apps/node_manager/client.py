@@ -65,13 +65,16 @@ def commandWol(args: argparse.Namespace) -> None:
 	# Wait for services to be ready.
 	for entry in args.wait:
 		host, port = getHostPort(entry)
-		timeLimit = time.perf_counter() + args.timeout
 		connectionOpen = False
-		while time.perf_counter() < timeLimit:
-			if checkConnection(host, port, timeoutS=2):
-				connectionOpen = True
-				break
-			time.sleep(1)
+		startTime = int(time.perf_counter())
+		for timeLimit in range(startTime, startTime + args.timeout, 5):
+			while time.perf_counter() < timeLimit:
+				if checkConnection(host, port, timeoutS=2):
+					connectionOpen = True
+					break
+				time.sleep(1)
+			# Send a new WOL signal every 5s
+			wakeOnLan(args.mac, args.broadcast)
 		assert connectionOpen, f"Connection for {entry} timed out after {args.timeout}s"
 
 

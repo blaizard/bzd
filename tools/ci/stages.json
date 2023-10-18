@@ -125,7 +125,7 @@
         {
             "category": "sanitizer",
             "commands": [
-                "./sanitize.sh"
+                "./tools/bazel run :sanitizer -- --check --all"
             ],
             "name": "sanitizer",
             "tags": []

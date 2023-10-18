@@ -166,7 +166,7 @@
 				return this.valueList;
 			},
 			/**
-			 * Pass specific options to the template if
+			 * Pass specific options to the template
 			 */
 			templateComponentConfig() {
 				return null;

@@ -51,8 +51,8 @@ def linux_arm64(module_ctx, name):
         "linker_dirs": [
             "{}/lib".format(repository_path),
         ],
-        "sha256": "d49b50d8d5b9cdec00d15f705be5627488f56c4210437d4d07870bed8c4ab2f2",
         "package_name": "linux_arm64_17.0.0",
+        "sha256": "d49b50d8d5b9cdec00d15f705be5627488f56c4210437d4d07870bed8c4ab2f2",
         "strip_prefix": "linux_arm64_17.0.0",
         "system_directories": [
             "{}/include/c++/v1".format(repository_path),

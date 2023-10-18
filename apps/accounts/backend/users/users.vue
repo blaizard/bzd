@@ -101,7 +101,7 @@
 								template: [
 									{
 										type: "Dropdown",
-										name: "product",
+										name: "key",
 										caption: "Product",
 										list: {
 											screen_recorder: "Screen Recorder",
@@ -110,6 +110,8 @@
 									},
 									{ type: "Date", caption: "End Date", name: "end", width: 0.5 },
 								],
+								toInputValue: "map_to_list",
+								toOutputValue: "list_to_map",
 							},
 							{
 								type: "Button",

@@ -56,11 +56,11 @@ def linux_x86_64(module_ctx, name):
         "linker_dirs": [
             "{}/xtensa-esp32-elf/lib".format(repository_path),
         ],
+        "package_name": "xtensa-esp32-elf",
         "patches": [
             "@bzd_toolchain_cc//:fragments/esp32/esp32_xtensa_lx6_gcc_12.2.0/wrapper_cc_start_end_group.patch",
         ],
         "sha256": "4d2e02ef47f1a93a4dcfdbaecd486adfaab4c0e26deea2c18d6385527f39f864",
-        "package_name": "xtensa-esp32-elf",
         "strip_prefix": "xtensa-esp32-elf",
         "system_directories": [
             "{}/xtensa-esp32-elf/include/c++/12.2.0/xtensa-esp32-elf".format(repository_path),
