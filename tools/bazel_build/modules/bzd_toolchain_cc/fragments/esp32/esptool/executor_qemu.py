@@ -103,6 +103,9 @@ if __name__ == "__main__":
 
 	print(flashPath.resolve().as_posix())
 	os.system(f"ls -lla {flashPath.resolve().as_posix()}")
+	os.system(f"cp {flashPath.resolve().as_posix()} dummy.bin")
+	os.system(f"ls -lla")
+	print(pathlib.Path.cwd() / "dummy.bin")
 
 	cmds = [
 	    "run",
@@ -111,7 +114,7 @@ if __name__ == "__main__":
 	    "--name",
 	    args.name,
 	    #f"--volume={flashPath.resolve().as_posix()}:/bzd/flash.bin:rw",
-	    "--mount", f"source={flashPath.resolve().as_posix()},target=/bzd/flash.bin,type=bind",
+	    "--mount", f"source={pathlib.Path.cwd() / 'dummy.bin'},target=/bzd/flash.bin,type=bind",
 	    f"--volume={gdbinit.resolve().as_posix()}:/root/.gdbinit:ro",
 	    f"--volume={pathlib.Path(args.elf).resolve().as_posix()}:/bzd/binary.bin:ro",
 	]
