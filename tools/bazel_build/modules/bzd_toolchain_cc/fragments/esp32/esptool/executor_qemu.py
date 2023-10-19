@@ -110,8 +110,8 @@ if __name__ == "__main__":
 	    "--rm",
 	    "--name",
 	    args.name,
-	    f"--volume={flashPath.resolve().as_posix()}:/bzd/flash.bin:rw",
-	    #"--mount", f"source={flashPath.resolve().as_posix()},target=/bzd/flash.bin,type=bind",
+	    #f"--volume={flashPath.resolve().as_posix()}:/bzd/flash.bin:rw",
+	    "--mount", f"source={flashPath.resolve().as_posix()},target=/bzd/flash.bin,type=bind",
 	    f"--volume={gdbinit.resolve().as_posix()}:/root/.gdbinit:ro",
 	    f"--volume={pathlib.Path(args.elf).resolve().as_posix()}:/bzd/binary.bin:ro",
 	]
