@@ -43,7 +43,6 @@ jobs:
     - name: "[normal] esp32 prod"
       run: |
         ./tools/bazel clean --expunge
-        ./tools/bazel run @docker//:xtensa_qemu.pull
         ./tools/bazel test ... --output_groups=+metadata --config=esp32 --config=prod --config=cc --platform_suffix=esp32-prod
 
     - name: "[sanitizer] asan/lsan/ubsan"

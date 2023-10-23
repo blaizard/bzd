@@ -1,0 +1,45 @@
+name: CI
+
+on:
+    push: {}
+
+jobs:
+    build:
+        runs-on: linux
+
+        steps:
+            - uses: actions/checkout@v3
+
+            - name: "Enable Remote Execution"
+              run: |
+                  ./tools/bazel run //apps/node_manager:client --config=local -- wol --wait 10.10.0.11:8980 --broadcast 10.10.0.255 --timeout 300 08:bf:b8:14:04:b6
+
+            - name: "Environment"
+              run: |
+                  cp tools/ci/gitea/.bazelrc.local .bazelrc.local
+                  ./info.sh
+
+{% for stage in stages %}
+            - name: "[{{ stage.category }}] {{ stage.name }}"
+              run: |
+              {% for command in stage.commands %}
+                {{ command }}
+              {% end %}
+
+{% end %}
+
+            - name: "Publish"
+              run: |
+                  ./tools/bazel run apps/dashboard:push
+                  ./tools/bazel run apps/family:push
+                  ./tools/bazel run apps/artifacts:push
+
+            - name: "Info"
+              if: always()
+              run: |
+                  ./info.sh
+
+            - name: "Disable Remote Execution"
+              if: always()
+              run: |
+                  ./tools/bazel run //apps/node_manager:client --config=local -- suspend 10.10.0.10:8000

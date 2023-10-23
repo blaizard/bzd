@@ -3,6 +3,7 @@
 set -e
 
 VERSION=$1
+INSTALL=/usr
 
 # Remove existing openssl
 sudo apt-get purge -y \
@@ -15,10 +16,11 @@ sudo apt-get install -y --no-install-recommends \
     perl \
     zlib1g-dev
 
-curl -kL https://github.com/openssl/openssl/archive/refs/tags/OpenSSL_${VERSION}.tar.gz | tar -xz
-pushd openssl-OpenSSL_${VERSION}
+git clone https://github.com/openssl/openssl.git -b "openssl-$VERSION" openssl
 
-./config --prefix=/usr shared zlib
+pushd openssl
+
+./config --prefix=$INSTALL --openssldir=$INSTALL shared zlib
 make -j$(nproc)
 make install
 

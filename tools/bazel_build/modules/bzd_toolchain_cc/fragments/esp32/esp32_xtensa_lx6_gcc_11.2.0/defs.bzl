@@ -2,7 +2,7 @@
 
 load("@bzd_toolchain_cc//:fragments/esp32/esp32_xtensa_lx6_sdk/defs.bzl", "esp32_xtensa_lx6_sdk")
 load("@bzd_toolchain_cc//cc:toolchain.bzl", "get_location", "toolchain_maker", "toolchain_merge")
-load("@bzd_toolchain_cc//fragments/esp32/esptool:defs.bzl", "esptool")
+load("@bzd_toolchain_cc//fragments/esp32/app_binary/esp32_xtensa_lx6:defs.bzl", "app_binary")
 
 def linux_x86_64(module_ctx, name):
     """Metadata for ESP32 toolchains.
@@ -72,8 +72,8 @@ def linux_x86_64(module_ctx, name):
         "url": "http://data.blaizard.com/file/bzd/toolchains/cc/gcc/esp32_xtensa_lx6/xtensa-esp32-elf-gcc11_2_0-esp-2022r1-linux-amd64.tar.xz",
     }
 
-    toolchain_definition = toolchain_merge(toolchain_definition, esptool(module_ctx))
     toolchain_definition = toolchain_merge(toolchain_definition, esp32_xtensa_lx6_sdk(module_ctx))
+    toolchain_definition = toolchain_merge(toolchain_definition, app_binary(module_ctx))
 
     toolchain_maker(
         name = name,
