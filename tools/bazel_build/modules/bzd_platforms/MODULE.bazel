@@ -3,4 +3,4 @@ module(
     version = "1.0",
 )
 
-bazel_dep(name = "platforms", version = "0.0.6")
+bazel_dep(name = "platforms", version = "0.0.7")

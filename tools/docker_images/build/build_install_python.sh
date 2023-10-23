@@ -17,7 +17,8 @@ VERSION=$1
 
 # Install deps
 sudo apt-get install -y --no-install-recommends \
-    zlib1g-dev
+    zlib1g-dev \
+    libssl-dev
 
 cd /tmp/
 curl https://www.python.org/ftp/python/${VERSION}/Python-${VERSION}.tgz | tar xz

@@ -411,10 +411,10 @@ def _bdl_binary_build(ctx, name, binary_file):
     for index, build in enumerate(binary_toolchain.build):
         build_binary_file = ctx.actions.declare_file("{}.build.{}".format(name, index))
         ctx.actions.run(
-            inputs = [binary_file],
+            inputs = binaries,
             outputs = [build_binary_file],
             tools = build.data_runfiles.files,
-            arguments = [binary_file.path, build_binary_file.path],
+            arguments = [binary.path for binary in binaries] + [build_binary_file.path],
             executable = build.files_to_run,
         )
         binaries.append(build_binary_file)

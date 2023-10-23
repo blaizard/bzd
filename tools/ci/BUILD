@@ -22,6 +22,7 @@ py_binary(
         "generate.py",
     ],
     deps = [
+        "//tools/ci/gitea:factory",
         "//tools/ci/github:factory",
         "//tools/ci/jenkins:factory",
         "//tools/ci/quality_gate:factory",

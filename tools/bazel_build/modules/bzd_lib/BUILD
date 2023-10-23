@@ -13,6 +13,14 @@ py_binary(
 )
 
 bzl_library(
+    name = "multiplatform_repository",
+    srcs = [
+        "multiplatform_repository.bzl",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+bzl_library(
     name = "sh_binary_wrapper",
     srcs = [
         "sh_binary_wrapper.bzl",

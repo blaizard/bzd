@@ -1,5 +1,11 @@
 load("@bzd_python_pip//:requirements.bzl", "requirement")
-load("@rules_python//python:defs.bzl", "py_library")
+load("@rules_python//python:defs.bzl", "py_binary", "py_library")
+
+py_binary(
+    name = "binary_builder",
+    srcs = ["binary_builder.py"],
+    visibility = ["//visibility:public"],
+)
 
 py_library(
     name = "run",
