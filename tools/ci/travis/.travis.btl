@@ -16,14 +16,12 @@ jobs:
           script:
               - cp tools/ci/travis/.bazelrc.local .bazelrc.local
               - ./info.sh
-
 {% for stage in stages %}
+
         - name: "[{{ stage.category }}] {{ stage.name }}"
           script:
               - cp tools/ci/travis/.bazelrc.local .bazelrc.local
       {% for command in stage.commands %}
               - {{ command }}
       {% end %}
-
-
 {% end %}
