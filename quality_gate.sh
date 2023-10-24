@@ -25,8 +25,10 @@ echo  "==== [sanitizer] asan/lsan/ubsan ==============================="
 echo  "==== [sanitizer] tsan ==============================="
 ./tools/bazel test ... --config=clang --config=cc --config=sanitizer --config=tsan --platform_suffix=clang-tsan $EXTRA_FLAGS
 echo  "==== [coverage] C++ ==============================="
-./tools/bazel coverage cc/... --config=gcc --config=cc --platform_suffix=coverage-cc && ./tools/bazel run tools/coverage --platform_suffix=coverage-cc -- --output bazel-out/coverage-cc $EXTRA_FLAGS
+./tools/bazel coverage cc/... --config=gcc --config=cc --platform_suffix=coverage-cc --config=local $EXTRA_FLAGS
+./tools/bazel run tools/coverage --platform_suffix=coverage-cc --config=local -- --output bazel-out/coverage-cc $EXTRA_FLAGS
 echo  "==== [coverage] NodeJs ==============================="
-./tools/bazel coverage ... --config=nodejs --platform_suffix=coverage-nodejs && ./tools/bazel run tools/coverage --platform_suffix=coverage-nodejs -- --output bazel-out/coverage-nodejs $EXTRA_FLAGS
+./tools/bazel coverage ... --config=nodejs --platform_suffix=coverage-nodejs --config=local $EXTRA_FLAGS
+./tools/bazel run tools/coverage --platform_suffix=coverage-nodejs --config=local -- --output bazel-out/coverage-nodejs $EXTRA_FLAGS
 echo  "==== [sanitizer] sanitizer ==============================="
 ./tools/bazel run :sanitizer -- --check --all $EXTRA_FLAGS

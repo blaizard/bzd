@@ -108,7 +108,8 @@ pipeline
 					{
 						lock("coverage")
 						{
-							sh "./tools/bazel coverage ... --config=nodejs --platform_suffix=coverage-nodejs && ./tools/bazel run tools/coverage --platform_suffix=coverage-nodejs -- --output bazel-out/coverage-nodejs"
+							sh "./tools/bazel coverage ... --config=nodejs --platform_suffix=coverage-nodejs --config=local"
+							sh "./tools/bazel run tools/coverage --platform_suffix=coverage-nodejs --config=local -- --output bazel-out/coverage-nodejs"
 						}
 						archiveArtifacts artifacts: "bazel-out/coverage-nodejs/**/*", onlyIfSuccessful: true
 					}

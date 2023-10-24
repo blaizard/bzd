@@ -57,7 +57,8 @@ jobs:
 
             - name: "[coverage] NodeJs"
               run: |
-                ./tools/bazel coverage ... --config=nodejs --platform_suffix=coverage-nodejs && ./tools/bazel run tools/coverage --platform_suffix=coverage-nodejs -- --output bazel-out/coverage-nodejs
+                ./tools/bazel coverage ... --config=nodejs --platform_suffix=coverage-nodejs --config=local
+                ./tools/bazel run tools/coverage --platform_suffix=coverage-nodejs --config=local -- --output bazel-out/coverage-nodejs
 
             - name: "[sanitizer] sanitizer"
               run: |
