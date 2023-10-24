@@ -23,7 +23,7 @@ jobs:
             - name: "[{{ stage.category }}] {{ stage.name }}"
               run: |
               {% for command in stage.commands %}
-                {{ command }}
+                  {{ command }}
               {% end %}
 
 {% end %}

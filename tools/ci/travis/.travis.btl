@@ -1,29 +1,28 @@
 dist: focal
 
 addons:
-  apt:
-    packages:
-      - wget
-      - pkg-config
-      - python
+    apt:
+        packages:
+            - wget
+            - pkg-config
+            - python
 
 git:
-  submodules: false
+    submodules: false
 
 jobs:
-  include:
-
-    - name: "Environment"
-      script:
-      - cp tools/ci/travis/.bazelrc.local .bazelrc.local
-      - ./info.sh
+    include:
+        - name: "Environment"
+          script:
+              - cp tools/ci/travis/.bazelrc.local .bazelrc.local
+              - ./info.sh
 
 {% for stage in stages %}
-    - name: "[{{ stage.category }}] {{ stage.name }}"
-      script:
-      - cp tools/ci/travis/.bazelrc.local .bazelrc.local
+        - name: "[{{ stage.category }}] {{ stage.name }}"
+          script:
+              - cp tools/ci/travis/.bazelrc.local .bazelrc.local
       {% for command in stage.commands %}
-      - {{ command }}
+              - {{ command }}
       {% end %}
 
 

@@ -21,6 +21,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "frontend",
     srcs = [
+        "user.vue",
         "users.vue",
     ],
     apis = ["api.json"],

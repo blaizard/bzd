@@ -64,6 +64,10 @@ export default class User {
 		return this.value.creation || 0;
 	}
 
+	getLastLoginTimestamp() {
+		return this.value.last_login || 0;
+	}
+
 	getRoles() {
 		return this.value.roles || [];
 	}
@@ -143,6 +147,8 @@ export default class User {
 	dataPublic() {
 		return {
 			email: this.getEmail(),
+			creation: this.getCreationTimestamp(),
+			last_login: this.getLastLoginTimestamp(),
 			roles: this.getRoles(),
 			subscriptions: this.getSubscriptions(),
 		};

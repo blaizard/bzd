@@ -60,6 +60,7 @@
 	%reset {
 		min-height: #{config.$fieldHeightLarge}px;
 		line-height: #{config.$fieldHeightLarge}px;
+		padding-left: 5px;
 	}
 }
 

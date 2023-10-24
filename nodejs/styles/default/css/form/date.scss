@@ -1,6 +1,9 @@
 @use "sass:math";
 @use "#bzd/nodejs/styles/default/css/form/config.scss" as base;
 @use "#bzd/nodejs/styles/default/css/form/dropdown.scss" as *;
+@use "#bzd/nodejs/icons.scss" as * with (
+	$bzdIconNames: calendar
+);
 
 .irform-date {
 	display: flex;
