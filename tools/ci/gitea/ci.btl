@@ -27,7 +27,6 @@ jobs:
               {% end %}
 
 {% end %}
-
             - name: "Publish"
               run: |
                   ./tools/bazel run apps/dashboard:push

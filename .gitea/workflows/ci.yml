@@ -64,7 +64,6 @@ jobs:
               run: |
                   ./tools/bazel run :sanitizer -- --check --all
 
-
             - name: "Publish"
               run: |
                   ./tools/bazel run apps/dashboard:push
