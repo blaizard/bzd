@@ -100,7 +100,8 @@
         {
             "category": "coverage",
             "commands": [
-                "./tools/bazel coverage cc/... --config=gcc --config=cc --platform_suffix=coverage-cc && ./tools/bazel run tools/coverage --platform_suffix=coverage-cc -- --output bazel-out/coverage-cc"
+                "./tools/bazel coverage cc/... --config=gcc --config=cc --platform_suffix=coverage-cc --config=local",
+                "./tools/bazel run tools/coverage --platform_suffix=coverage-cc --config=local -- --output bazel-out/coverage-cc"
             ],
             "name": "C++",
             "output": "bazel-out/coverage-cc",
@@ -112,7 +113,8 @@
         {
             "category": "coverage",
             "commands": [
-                "./tools/bazel coverage ... --config=nodejs --platform_suffix=coverage-nodejs && ./tools/bazel run tools/coverage --platform_suffix=coverage-nodejs -- --output bazel-out/coverage-nodejs"
+                "./tools/bazel coverage ... --config=nodejs --platform_suffix=coverage-nodejs --config=local",
+                "./tools/bazel run tools/coverage --platform_suffix=coverage-nodejs --config=local -- --output bazel-out/coverage-nodejs"
             ],
             "name": "NodeJs",
             "output": "bazel-out/coverage-nodejs",
