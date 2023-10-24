@@ -10,9 +10,7 @@
 
 <script>
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
-	import Button from "#bzd/nodejs/vue/components/form/element/button.vue";
 	import Form from "#bzd/nodejs/vue/components/form/form.vue";
-	import Table from "#bzd/nodejs/vue/components/form/element/table.vue";
 	import Modal from "#bzd/nodejs/vue/components/modal/modal.vue";
 	import { CollectionPaging } from "#bzd/nodejs/db/utils.mjs";
 	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
@@ -20,8 +18,6 @@
 	export default {
 		mixins: [Component],
 		components: {
-			Button,
-			Table,
 			Form,
 			Modal,
 		},

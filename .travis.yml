@@ -1,50 +1,49 @@
 dist: focal
 
 addons:
-  apt:
-    packages:
-      - wget
-      - pkg-config
-      - python
+    apt:
+        packages:
+            - wget
+            - pkg-config
+            - python
 
 git:
-  submodules: false
+    submodules: false
 
 jobs:
-  include:
+    include:
+        - name: "Environment"
+          script:
+              - cp tools/ci/travis/.bazelrc.local .bazelrc.local
+              - ./info.sh
 
-    - name: "Environment"
-      script:
-      - cp tools/ci/travis/.bazelrc.local .bazelrc.local
-      - ./info.sh
-
-    - name: "[normal] python"
-      script:
-      - cp tools/ci/travis/.bazelrc.local .bazelrc.local
-      - ./tools/bazel test @bzd_python//... --output_groups=+metadata --config=prod --platform_suffix=python
-
-
-    - name: "[normal] clang-tidy"
-      script:
-      - cp tools/ci/travis/.bazelrc.local .bazelrc.local
-      - ./tools/bazel test ... --output_groups=+metadata --config=dev --config=clang-tidy --platform_suffix=clang-tidy
+        - name: "[normal] python"
+          script:
+              - cp tools/ci/travis/.bazelrc.local .bazelrc.local
+              - ./tools/bazel test @bzd_python//... --output_groups=+metadata --config=prod --platform_suffix=python
 
 
-    - name: "[normal] clang prod"
-      script:
-      - cp tools/ci/travis/.bazelrc.local .bazelrc.local
-      - ./tools/bazel test ... --output_groups=+metadata --config=clang --config=prod --config=cc --platform_suffix=clang-prod
+        - name: "[normal] clang-tidy"
+          script:
+              - cp tools/ci/travis/.bazelrc.local .bazelrc.local
+              - ./tools/bazel test ... --output_groups=+metadata --config=dev --config=clang-tidy --platform_suffix=clang-tidy
 
 
-    - name: "[normal] gcc prod"
-      script:
-      - cp tools/ci/travis/.bazelrc.local .bazelrc.local
-      - ./tools/bazel test ... --output_groups=+metadata --config=gcc --config=prod --config=cc --platform_suffix=gcc-prod
+        - name: "[normal] clang prod"
+          script:
+              - cp tools/ci/travis/.bazelrc.local .bazelrc.local
+              - ./tools/bazel test ... --output_groups=+metadata --config=clang --config=prod --config=cc --platform_suffix=clang-prod
 
 
-    - name: "[sanitizer] sanitizer"
-      script:
-      - cp tools/ci/travis/.bazelrc.local .bazelrc.local
-      - ./tools/bazel run :sanitizer -- --check --all
+        - name: "[normal] gcc prod"
+          script:
+              - cp tools/ci/travis/.bazelrc.local .bazelrc.local
+              - ./tools/bazel test ... --output_groups=+metadata --config=gcc --config=prod --config=cc --platform_suffix=gcc-prod
+
+
+        - name: "[sanitizer] sanitizer"
+          script:
+              - cp tools/ci/travis/.bazelrc.local .bazelrc.local
+              - ./tools/bazel run :sanitizer -- --check --all
 
 

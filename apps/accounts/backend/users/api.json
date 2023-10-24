@@ -63,12 +63,6 @@
         "get": {
             "authentication": true,
             "documentation": "Get current user information",
-            "request": {
-                "type": "query",
-                "validation": {
-                    "uid": ""
-                }
-            },
             "response": {
                 "type": "json"
             }

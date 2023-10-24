@@ -150,6 +150,7 @@
 						return date.toLocaleDateString(undefined, options);
 					},
 					editable: false,
+					pre: { html: "<i class='bzd-icon-calendar'></i>" },
 				});
 			},
 			nbDaysCurMonth() {

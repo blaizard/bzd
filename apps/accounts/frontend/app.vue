@@ -31,9 +31,10 @@
 			this.$routerSet({
 				ref: "view",
 				routes: [
-					{ path: "/", component: () => import("./admin/admin.vue"), authentication: true },
+					{ path: "/", component: () => import("./config.vue"), authentication: true },
+					{ path: "/admin", component: () => import("./admin/admin.vue"), authentication: true },
 					{ path: "/login", component: () => import("./login.vue") },
-					{ path: "/logout", component: () => import("./logout.vue") },
+					{ path: "/logout", component: () => import("./logout.vue"), authentication: true },
 					{ path: "/reset", component: () => import("./reset.vue") },
 					{ path: "/register", component: () => import("./register.vue") },
 				],

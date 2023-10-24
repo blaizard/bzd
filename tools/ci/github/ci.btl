@@ -1,53 +1,53 @@
 name: CI
 
 on:
-  push: {}
+    push: {}
 
 jobs:
-  build:
-    runs-on: ubuntu-20.04
+    build:
+        runs-on: ubuntu-20.04
 
-    steps:
-    - uses: actions/checkout@v1
-    - uses: actions/setup-java@v1
-      with:
-        java-version: '11.0'
-        architecture: x64
+        steps:
+            - uses: actions/checkout@v1
+            - uses: actions/setup-java@v1
+              with:
+                  java-version: '11.0'
+                  architecture: x64
 
-    - name: "Environment"
-      run: |
-        cp tools/ci/github/.bazelrc.local .bazelrc.local
-        export PATH="${PATH}:${GITHUB_WORKSPACE}/bin"
-        ./info.sh
+            - name: "Environment"
+              run: |
+                  cp tools/ci/github/.bazelrc.local .bazelrc.local
+                  export PATH="${PATH}:${GITHUB_WORKSPACE}/bin"
+                  ./info.sh
 
 {% for stage in stages %}
-    - name: "[{{ stage.category }}] {{ stage.name }}"
-      run: |
-        ./tools/bazel clean --expunge
+            - name: "[{{ stage.category }}] {{ stage.name }}"
+              run: |
+                  ./tools/bazel clean --expunge
       {% for command in stage.commands %}
-        {{ command }}
+                  {{ command }}
       {% end %}
 
 {% end %}
 
-    - name: Build documentation
-      run: |
-        ./tools/bazel build docs
-        rm -rfd .dist
-        mkdir -p .dist
-        tar -xf ./bazel-bin/docs/docs.tar -C .dist
-    - uses: cpina/github-action-push-to-another-repository@main
-      env:
-        SSH_DEPLOY_KEY: ${{{ secrets.SSH_DEPLOY_KEY }}
-      with:
-        source-directory: ".dist"
-        destination-github-username: "blaizard"
-        destination-repository-name: "blaizard.github.io"
-        user-email: doc.publish@blaizard.com
-        target-branch: main
-        target-directory: bzd/
+            - name: Build documentation
+              run: |
+                  ./tools/bazel build docs
+                  rm -rfd .dist
+                  mkdir -p .dist
+                  tar -xf ./bazel-bin/docs/docs.tar -C .dist
+            - uses: cpina/github-action-push-to-another-repository@main
+              env:
+                  SSH_DEPLOY_KEY: ${{{ secrets.SSH_DEPLOY_KEY }}
+              with:
+                  source-directory: ".dist"
+                  destination-github-username: "blaizard"
+                  destination-repository-name: "blaizard.github.io"
+                  user-email: doc.publish@blaizard.com
+                  target-branch: main
+                  target-directory: bzd/
 
-    - name: "Info"
-      if: always()
-      run: |
-        ./info.sh
+            - name: "Info"
+              if: always()
+              run: |
+                  ./info.sh
