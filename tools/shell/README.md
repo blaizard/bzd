@@ -1,11 +1,20 @@
 # Shell
 
+## Generate locally
+
+To re-generate the shell, use the following. Note this is also done as part of the sanitizer.
+
+```sh
+bazel run @bzd_sanitizer//:sanitizer -- --use //tools/shell:generate
+```
+
 ## Automatic install
 
 This tool provides helpful commands to enhance the current shell, to install it simply run the following:
 
 ```sh
 bazel run //tools/shell:install
+source ~/.bashrc
 ```
 
 ## Manual install

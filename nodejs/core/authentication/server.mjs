@@ -21,6 +21,11 @@ export default class AuthenticationServer {
 		return this._installAPIImpl(api);
 	}
 
+	/// Called when a request is received on the server side, to verify that the content is properly authorized.
+	/// For example, check that the header contains a valid token.
+	///
+	/// \param context The http context.
+	/// \param callback the function to be called when the verification succeed, it should be populated with the user.
 	async verify(context, callback = async (/*user*/) => true) {
 		return this._verifyImpl(context, callback);
 	}
