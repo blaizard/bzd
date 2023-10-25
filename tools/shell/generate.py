@@ -11,7 +11,6 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 
 	context = Context.fromFile(args.context)
-
 	buildAll(workspace=context.workspace)
 
 	sys.exit(0)

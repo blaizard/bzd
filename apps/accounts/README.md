@@ -13,3 +13,9 @@ This web application deals with the following:
 ```bash
 bazel run //apps/accounts/backend --config=dev -- --test
 ```
+
+Run the client application example.
+
+```bash
+bazel run //apps/accounts/example --config=dev -- --accounts "http://localhost:8080"
+```

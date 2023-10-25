@@ -16,7 +16,6 @@ bzd_nodejs_binary(
     main = "app.mjs",
     packages = {
         "commander": "",
-        "oauth2-server": "",
     },
     deps = [
         "//apps/accounts/backend/pending_actions",
