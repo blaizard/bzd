@@ -5,11 +5,15 @@ bzd_nodejs_binary(
     srcs = glob([
         "*.mjs",
     ]),
+    apis = ["//apps/artifacts:api.v1.json"],
     args = [
         "--static",
-        "/tmp/bzd/frontend",
+        "$(rootpath //apps/artifacts/frontend).bundle",
         "--data",
         "/tmp/bzd/db",
+    ],
+    data = [
+        "//apps/artifacts/frontend",
     ],
     main = "app.mjs",
     packages = {
@@ -19,7 +23,6 @@ bzd_nodejs_binary(
         "//apps/artifacts:__pkg__",
     ],
     deps = [
-        "//apps/artifacts:api",
         "//apps/artifacts/plugins:backend",
         "//nodejs/core:cache",
         "//nodejs/core:exception",

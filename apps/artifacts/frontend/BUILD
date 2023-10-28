@@ -8,16 +8,16 @@ bzd_nodejs_web_binary(
         "**/*.svg",
         "**/*.mjs",
     ]),
+    apis = ["//apps/artifacts:api.v1.json"],
     config_scss = "//nodejs/styles:default.scss",
     main = "app.mjs",
     packages = {
         "vue-async-computed": "",
     },
     visibility = [
-        "//apps/artifacts:__pkg__",
+        "//apps/artifacts:__subpackages__",
     ],
     deps = [
-        "//apps/artifacts:api",
         "//apps/artifacts/plugins:frontend",
         "//nodejs:icons",
         "//nodejs:vue",

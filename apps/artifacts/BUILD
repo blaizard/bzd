@@ -1,8 +1,7 @@
-load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_docker", "bzd_nodejs_library")
+load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_docker")
 
-bzd_nodejs_library(
-    name = "api",
-    srcs = [
+exports_files(
+    [
         "api.v1.json",
     ],
     visibility = [

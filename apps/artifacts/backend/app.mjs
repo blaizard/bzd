@@ -11,7 +11,7 @@ import { CollectionPaging } from "#bzd/nodejs/db/utils.mjs";
 import { Command } from "commander/esm.mjs";
 import Path from "path";
 
-import APIv1 from "../api.v1.json" assert { type: "json" };
+import APIv1 from "#bzd/api.json" assert { type: "json" };
 import Plugins from "../plugins/backend.mjs";
 
 import Services from "./services.mjs";
