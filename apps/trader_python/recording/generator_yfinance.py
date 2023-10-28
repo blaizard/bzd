@@ -119,6 +119,9 @@ def workload(args: typing.Tuple[str, pathlib.Path], stdout: typing.TextIO) -> bo
 		stdout.write(f"{ticker}:\n")
 		stdout.write(str(e) + "\n")
 		stdout.write(str(traceback.format_exc()))
+		return False
+
+	return True
 
 
 if __name__ == "__main__":
@@ -168,3 +171,6 @@ if __name__ == "__main__":
 			    [ticker, pathlib.Path("~/Documents/recordings/yfinance")],
 			    timeoutS=60,
 			)
+		for result in w.data():
+			if (not bool(result.getResult())) or result.isException():
+				print(result.getOutput().strip())

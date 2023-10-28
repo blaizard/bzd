@@ -5,6 +5,7 @@ bzd_nodejs_library(
     srcs = [
         "server.mjs",
     ],
+    apis = ["api.json"],
     visibility = ["//visibility:public"],
     deps = [
         "//nodejs/core:exception",
@@ -12,6 +13,6 @@ bzd_nodejs_library(
         "//nodejs/core:validation",
         "//nodejs/core/authentication:server",
         "//nodejs/core/authentication:user",
-        "//nodejs/utils:uid",
+        "//nodejs/db/key_value_store:memory",
     ],
 )

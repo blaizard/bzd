@@ -1,3 +1,5 @@
+import Crypto from "crypto";
+
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import User from "#bzd/apps/accounts/backend/users/user.mjs";
@@ -17,18 +19,27 @@ export default class Users {
 		);
 	}
 
+	/// Convert an email address into a uid.
+	///
+	/// \param email The email to be converted.
+	_emailToUid(email) {
+		return Crypto.createHash("shake256", { outputLength: 16 }).update(email).digest("hex");
+	}
+
 	/// Create a new user.
-	/// @param uid User ID.
-	async create(uid) {
+	///
+	/// \param email Email address of the user.
+	async create(email) {
+		const uid = this._emailToUid(email);
 		Exception.assert(
 			(await this.get(uid, /*allowNull*/ true)) == null,
 			"A user with this UID '{}' already exists.",
 			uid,
 		);
 
-		Log.info("{}: created.", uid);
-		const user = User.create(uid);
+		const user = User.create(uid, email);
 		await this.keyValueStore.set(this.config.bucket, uid, user.data());
+		Log.info("{}: created ({}).", uid, user.getEmail());
 
 		return user;
 	}
@@ -36,7 +47,7 @@ export default class Users {
 	/// Update user data.
 	/// @param uid User ID.
 	/// @param modifier The modifier callback that takes into argument the user to be modified.
-	async update(uid, modifier) {
+	async update(uid, modifier, silent = false) {
 		let user = null;
 
 		// Update the value atomically
@@ -46,7 +57,9 @@ export default class Users {
 			async (data) => {
 				Exception.assert(data !== null, "User '{}' does not exists.", uid);
 				user = await modifier(new User(uid, data));
-				Log.info("{}: updated {}.", uid, user.getModifiedAsString());
+				if (!silent) {
+					Log.info("{}: updated {}.", uid, user.getModifiedAsString());
+				}
 				return user.data();
 			},
 			null,
@@ -61,15 +74,26 @@ export default class Users {
 	}
 
 	/// Delete an existing user.
-	/// @param uid User ID.
+	///
+	/// \param uid User ID.
 	async delete(uid) {
 		await this.keyValueStore.delete(this.config.bucket, uid);
 		Log.info("User with uid '{}' has been deleted.", uid);
 	}
 
+	/// Get user data from the email address.
+	///
+	/// \param email The user email.
+	/// \param allowNull If no match, it will return null. If unset, it will throw.
+	async getFromEmail(email, allowNull = false) {
+		const uid = this._emailToUid(email);
+		return await this.get(uid, allowNull);
+	}
+
 	/// Get user data.
-	/// @param uid The user UID.
-	/// @param allowNull If no match, it will return null. If unset, it will throw.
+	///
+	/// \param uid The user UID.
+	/// \param allowNull If no match, it will return null. If unset, it will throw.
 	async get(uid, allowNull = false) {
 		const data = await this.keyValueStore.get(this.config.bucket, uid, null);
 		if (data === null) {
@@ -153,9 +177,9 @@ export default class Users {
 		});
 
 		api.handle("post", "/admin/user", async (inputs) => {
-			const uid = inputs.uid;
-			await this.create(uid);
-			await this.update(uid, async (u) => {
+			const email = inputs.email;
+			const user = await this.create(email);
+			await this.update(user.getUid(), async (u) => {
 				u.addRole("user");
 				return u;
 			});

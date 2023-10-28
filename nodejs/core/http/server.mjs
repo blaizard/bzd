@@ -13,7 +13,7 @@ import Event from "../event.mjs";
 import ExceptionFactory from "../exception.mjs";
 import FileSystem from "../filesystem.mjs";
 import LogFactory from "../log.mjs";
-import Context from "#bzd/nodejs/core/http/server_context.mjs";
+import { HttpServerContext, HttpError } from "#bzd/nodejs/core/http/server_context.mjs";
 import Endpoint from "#bzd/nodejs/core/http/endpoint.mjs";
 
 const Log = LogFactory("http", "server");
@@ -252,22 +252,21 @@ export default class HttpServer {
 
 		let callbackList = [middlewareErrorHandler];
 
-		if (options.exceptionGuard) {
-			callbackList.unshift(async function (request, response) {
-				const context = new Context(request, response);
-				try {
-					await callback.call(this, context);
-				} catch (e) {
+		callbackList.unshift(async function (request, response) {
+			const context = new HttpServerContext(request, response);
+			try {
+				await callback.call(this, context);
+			} catch (e) {
+				if (e instanceof HttpError) {
+					response.status(e.code).send(e.message);
+				} else if (options.exceptionGuard) {
 					Exception.print("Exception Guard; {}", Exception.fromError(e));
 					response.status(500).send(e.message);
+				} else {
+					throw e;
 				}
-			});
-		} else {
-			callbackList.unshift(async function (request, response) {
-				const context = new Context(request, response);
-				await callback.call(this, context);
-			});
-		}
+			}
+		});
 
 		if (options.type.indexOf("json") != -1) {
 			callbackList.unshift(BodyParser.urlencoded({ limit: options.limit, extended: true }));

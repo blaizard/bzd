@@ -1,0 +1,39 @@
+{
+    "/auth/login": {
+        "post": {
+            "documentation": "Login API used to exchange credentials for a token.",
+            "request": {
+                "type": "json",
+                "validation": {
+                    "password": "mandatory",
+                    "persistent": "",
+                    "uid": "mandatory"
+                }
+            },
+            "response": {
+                "type": "json",
+                "validation": {
+                    "timeout": "mandatory",
+                    "token": "mandatory"
+                }
+            }
+        }
+    },
+    "/auth/logout": {
+        "post": {
+            "documentation": "Logout API used to invalidate the current session."
+        }
+    },
+    "/auth/refresh": {
+        "post": {
+            "documentation": "Login API used to exchange a refresh token for an access token.",
+            "response": {
+                "type": "json",
+                "validation": {
+                    "timeout": "mandatory",
+                    "token": "mandatory"
+                }
+            }
+        }
+    }
+}

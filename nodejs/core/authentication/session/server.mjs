@@ -1,11 +1,11 @@
 import Crypto from "crypto";
 
-import { makeUid } from "../../../utils/uid.mjs";
 import ExceptionFactory from "../../exception.mjs";
 import LogFactory from "../../log.mjs";
 import Validation from "../../validation.mjs";
 import AuthenticationServer from "../server.mjs";
 import User from "../user.mjs";
+import KeyValueStoreMemory from "#bzd/nodejs/db/key_value_store/memory.mjs";
 
 const Exception = ExceptionFactory("authentication", "session");
 const Log = LogFactory("authentication", "session");
@@ -29,15 +29,15 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 			// Key value store to save the session IDs.
 			// The structure of this KVS looks like this:
 			// <uid-hash>: {
-			//     sessions: [
-			//	      {hash: <hash>, roles: [<role>, ...], expiration: <timestamp>},
-			//	      {hash: <hash>, roles: [<role>, ...], expiration: <timestamp>},
-			//     ],
-			//     uid: <uid>,
+			//     <hash>: {roles: [<role>, ...], expiration: <timestamp>},
+			//	   <hash>: {roles: [<role>, ...], expiration: <timestamp>},
 			// }
 			kvs: null,
 			// The bucket name for the sessions to be stored in the key value store.
 			kvsBucket: "sessions",
+			// Function to save a refresh token somewhere.
+			// Its signature is as follow: async (uid, hash, durationS, rolling) { ... }
+			saveRefreshToken: null,
 			// Maximum session allowed per user.
 			maxSessionsPerUser: 5,
 			// Time in seconds after which the access token will expire.
@@ -48,7 +48,13 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 			tokenRefreshLongTermExpiresIn: 7 * 24 * 60 * 60,
 		});
 
-		Exception.assert(this.options.kvs, "A key-value-store must be set for session authentication, set 'kvs'.");
+		if (this.options.kvs === null) {
+			this.options.kvs = new KeyValueStoreMemory("session-authentication");
+		}
+		Exception.assert(
+			this.options.saveRefreshToken,
+			"The callback to save a refresh token must be set, set 'saveRefreshToken'.",
+		);
 
 		this.validationRefreshToken = new Validation({
 			uid: "mandatory",
@@ -68,11 +74,25 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		// It can be exchanged to an access token with /auth/refresh.
 		api.handle("post", "/auth/login", async function (inputs) {
 			// Verify uid/password pair
-			const userInfo = await authentication.verifyIdentity(inputs.uid, inputs.password);
+			const userInfo = await authentication.options.verifyIdentity(inputs.uid, inputs.password);
 			if (userInfo) {
-				return await this._createRefreshToken(userInfo);
+				// Generate the refresh token.
+				const hash = authentication._makeTokenHash();
+				const timeoutS = inputs.persistent
+					? authentication.options.tokenRefreshLongTermExpiresIn
+					: authentication.options.tokenRefreshShortTermExpiresIn;
+				await authentication.options.saveRefreshToken(userInfo.uid, hash, timeoutS, /*rolling*/ true);
+				const refreshToken = authentication._makeToken(userInfo.uid, hash);
+				this.setCookie("refresh_token", refreshToken, {
+					httpOnly: true,
+					maxAge: timeoutS * 1000,
+				});
+
+				// Generate the access token.
+				return await authentication._makeAccessToken(userInfo);
 			}
-			return this.sendStatus(401, "Unauthorized");
+
+			throw this.httpError(401, "Unauthorized");
 		});
 
 		api.handle("post", "/auth/logout", async function () {
@@ -83,23 +103,19 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		api.handle("post", "/auth/refresh", async function () {
 			const refreshToken = this.getCookie("refresh_token", null);
 			if (refreshToken == null) {
-				return this.sendStatus(401, "Unauthorized");
+				throw this.httpError(401, "Unauthorized");
 			}
 
-			let data = null;
-			try {
-				data = await authentication.readToken(refreshToken);
-
-				// This ensures that a wrongly formatted token will trigger a new token being generated
-				// while still having the error reported. This ensure smooth transition to new token format.
-				authentication.validationRefreshToken.validate(data);
-			} catch (e) {
-				Exception.fromError(e).print();
-				return this.sendStatus(401, "Unauthorized");
+			const [uid, hash] = authentication._readToken(refreshToken);
+			const maybeToken = await authentication.options.refreshToken(uid, hash);
+			if (!maybeToken) {
+				throw this.httpError(401, "Unauthorized");
 			}
 
-			// Check access here
-			return generateTokens.call(this, data.uid, data.roles, data.persistent || false, data.session);
+			// TODO: handle rolling token.
+
+			const userInfo = new User(maybeToken.uid, maybeToken.roles);
+			return await authentication._makeAccessToken(userInfo);
 		});
 	}
 
@@ -107,54 +123,55 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		return Math.floor(Date.now() / 1000);
 	}
 
-	/// Create a refresh token.
-	async _createRefreshToken(user) {}
-
 	/// Create a new session, save it and return the token.
-	async _createSession(uid, roles) {
+	async _makeAccessToken(user) {
+		const hash = this._makeTokenHash();
 		const session = {
-			hash: this._makeTokenHash(),
 			expiration: this._getTimestamp() + this.options.tokenAccessExpiresIn,
-			roles: roles,
+			roles: user.roles,
 		};
 
 		// Insert the new session and return the token.
-		const uidHash = this._makeUidHash(userInfo.uid);
 		await this.options.kvs.update(
 			this.options.kvsBucket,
-			uidHash,
+			user.uid,
 			(data) => {
-				// Remove the number of sessions if too many.
-				while (data.sessions.length >= this.options.maxSessionsPerUser) {
-					data.shift();
+				// Remove the sessions that will expire the first if too many.
+				if (Object.keys(data).length >= this.options.maxSessionsPerUser) {
+					const sorted = Object.entries(data)
+						.map(([key, value]) => [key, value])
+						.sort((a, b) => b[1].expiration - a[1].expiration);
+					data = sorted.slice(0, this.options.maxSessionsPerUser - 1).reduce((obj, entry) => {
+						obj[entry[0]] = entry[1];
+						return obj;
+					}, {});
 				}
-				data.push(session);
+				// Add the new session.
+				data[hash] = session;
 				return data;
 			},
-			{
-				sessions: [],
-				uid: uid,
-			},
+			{},
 		);
 
 		// Return the token
-		return this._makeToken(uidHash, session.hash);
-	}
-
-	_makeUidHash(uid) {
-		return Crypto.createHash("shake256", { outputLength: 16 }).update(uid).digest("hex");
+		return {
+			token: this._makeToken(user.uid, hash),
+			timeout: this.options.tokenAccessExpiresIn,
+		};
 	}
 
 	_makeTokenHash() {
-		return Crypto.createHash("shake256", { outputLength: 64 }).update(Math.random()).digest("hex");
+		return Crypto.createHash("shake256", { outputLength: 32 }).update(Math.random().toString()).digest("hex");
 	}
 
-	_makeToken(uidHash, tokenHash) {
-		return uidHash + tokenHash;
+	_makeToken(uid, tokenHash) {
+		return uid + "_" + tokenHash;
 	}
 
 	/// Read the data embedded inside a token. This data contains a UID + a hash.
-	_readToken(token) {}
+	_readToken(token) {
+		return token.split("_");
+	}
 
 	async _verifyImpl(context, callback) {
 		let token = null;
@@ -173,15 +190,23 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 	}
 
 	async _verifyToken(token, verifyCallback) {
-		const maybeSession = await this.options.kvs.get(this.options.kvsBucket, token, null);
-		// No session.
-		if (maybeSession === null) {
+		const [uid, hash] = this._readToken(token);
+		const maybeSessions = await this.options.kvs.get(this.options.kvsBucket, uid, null);
+		// No session for this user.
+		if (maybeSessions === null) {
 			return false;
 		}
+
+		// Look for the token
+		if (!(hash in maybeSessions)) {
+			return false;
+		}
+		const session = maybeSessions[hash];
+
 		// Expired.
-		if (maybeSession.expiration < Date.now()) {
+		if (session.expiration < this._getTimestamp()) {
 			return false;
 		}
-		return await verifyCallback(new User(maybeSession.uid, maybeSession.roles));
+		return await verifyCallback(new User(uid, session.roles));
 	}
 }
