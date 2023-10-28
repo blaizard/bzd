@@ -8,7 +8,7 @@ import Router from "#bzd/nodejs/vue/router/router.mjs";
 import Vue from "vue";
 import AsyncComputed from "vue-async-computed";
 
-import APIv1 from "../api.v1.json" assert { type: "json" };
+import APIv1 from "#bzd/api.json" assert { type: "json" };
 
 import App from "./app.vue";
 
