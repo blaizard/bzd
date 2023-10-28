@@ -87,6 +87,7 @@
 						name: "users",
 						template: [
 							{ type: "Input", caption: "UID", name: "uid", disable: true },
+							{ type: "Input", caption: "Email", name: "email", disable: true },
 							{ type: "Date", caption: "Creation", name: "creation", disable: true },
 							{ type: "Date", caption: "Last Login", name: "last_login", disable: true },
 							{ type: "Input", caption: "Roles", name: "roles", multi: true },
@@ -131,7 +132,7 @@
 			},
 			descriptionAdd() {
 				return [
-					{ type: "Input", placeholder: "email", name: "uid", validation: "mandatory", width: 0.99 },
+					{ type: "Input", placeholder: "email", name: "email", validation: "mandatory", width: 0.99 },
 					{ type: "Button", content: "Create", action: "danger", width: 0.01 },
 				];
 			},

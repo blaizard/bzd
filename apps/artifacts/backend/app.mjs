@@ -61,7 +61,7 @@ program
 	);
 	let authentication = new Authentication({
 		privateKey: AUTHENTICATION_PRIVATE_KEY,
-		verifyIdentityCallback: async (uid, password) => {
+		verifyIdentity: async (uid, password) => {
 			if (uid !== AUTHENTICATION_USERNAME || password !== AUTHENTICATION_PASSWORD) {
 				return false;
 			}
@@ -70,7 +70,7 @@ program
 				uid: uid,
 			};
 		},
-		verifyRefreshCallback: async (/*uid, session, timeoutS*/) => {
+		refreshToken: async (/*uid, session, timeoutS*/) => {
 			return true;
 		},
 	});

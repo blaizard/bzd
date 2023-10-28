@@ -23,7 +23,7 @@ bzd_nodejs_binary(
         "//apps/accounts/backend/tests:test_data",
         "//apps/accounts/backend/users",
         "//nodejs/core/api:server",
-        "//nodejs/core/authentication/token:server",
+        "//nodejs/core/authentication/session:server",
         "//nodejs/core/http:server",
         "//nodejs/db/key_value_store:memory",
     ],

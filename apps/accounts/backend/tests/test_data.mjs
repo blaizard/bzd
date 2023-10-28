@@ -10,20 +10,18 @@ export default class TestData {
 	async install() {
 		Log.info("Installing test data...");
 
-		Log.info("Creating admin user 'admin@admin.com'");
-		await this.users.create("admin@admin.com");
-		await this.users.update("admin@admin.com", (user) => {
+		const userAdmin = await this.users.create("admin@admin.com");
+		await this.users.update(userAdmin.getUid(), (user) => {
 			user.setPassword("1234");
 			user.addRole("admin");
 			user.addRole("user");
 			return user;
 		});
 
-		Log.info("Creating 5 dummy users");
 		for (let i = 0; i < 5; ++i) {
-			const uid = "dummy-" + i + "@dummy.com";
-			await this.users.create(uid);
-			await this.users.update(uid, (user) => {
+			const email = "dummy-" + i + "@dummy.com";
+			const userDummy = await this.users.create(email);
+			await this.users.update(userDummy.getUid(), (user) => {
 				user.setPassword("1234");
 				user.addRole("user");
 				return user;

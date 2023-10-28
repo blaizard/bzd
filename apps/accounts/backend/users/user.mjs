@@ -1,6 +1,7 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import Subscription from "#bzd/apps/accounts/backend/users/subscription.mjs";
+import TokenInfo from "#bzd/apps/accounts/backend/users/token.mjs";
 
 const Exception = ExceptionFactory("user");
 const Log = LogFactory("user");
@@ -19,13 +20,15 @@ export default class User {
 	static createDummy() {
 		const value = {
 			creation: Date.now(),
+			email: "dummy@dummy.com",
 		};
 		return new User(1234, value);
 	}
 
-	static create(uid) {
+	static create(uid, email) {
 		const value = {
 			creation: Date.now(),
+			email: email,
 		};
 		return new User(uid, value);
 	}
@@ -43,7 +46,7 @@ export default class User {
 	}
 
 	getEmail() {
-		return this.uid;
+		return this.value.email;
 	}
 
 	getPassword() {
@@ -140,6 +143,45 @@ export default class User {
 		this.modified.push(...user.modified);
 	}
 
+	getTokens() {
+		return this.value.tokens || {};
+	}
+
+	/// Add a token to the user.
+	addToken(hash, token) {
+		if (!("tokens" in this.value)) {
+			this.value.tokens = {};
+		}
+		Exception.assert(
+			!(hash in this.value.tokens),
+			"Token with hash '{}' already exists for user '{}'.",
+			hash,
+			this.uid,
+		);
+		Exception.assert(token instanceof TokenInfo, "Token must be of type TokenInfo: '{}'.", token);
+
+		this.modified.push("token(+" + hash.slice(0, 16) + "[...])");
+		this.value.tokens[hash] = token.data();
+	}
+
+	getToken(hash, defaultValue) {
+		if ("tokens" in this.value) {
+			if (hash in this.value.tokens) {
+				return new TokenInfo(this.value.tokens[hash]);
+			}
+		}
+		return defaultValue;
+	}
+
+	removeToken(hash) {
+		if ("tokens" in this.value) {
+			if (hash in this.value.tokens) {
+				this.modified.push("token(-" + hash.slice(0, 16) + "[...])");
+				delete this.value.tokens[hash];
+			}
+		}
+	}
+
 	data() {
 		return this.value;
 	}
@@ -151,6 +193,7 @@ export default class User {
 			last_login: this.getLastLoginTimestamp(),
 			roles: this.getRoles(),
 			subscriptions: this.getSubscriptions(),
+			tokens: this.getTokens(),
 		};
 	}
 }

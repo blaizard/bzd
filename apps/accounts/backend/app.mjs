@@ -5,11 +5,12 @@ import APIv1 from "#bzd/api.json" assert { type: "json" };
 import KeyValueStoreMemory from "#bzd/nodejs/db/key_value_store/memory.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
-import Authentication from "#bzd/nodejs/core/authentication/token/server.mjs";
+import Authentication from "#bzd/nodejs/core/authentication/session/server.mjs";
 import HttpServer from "#bzd/nodejs/core/http/server.mjs";
 import Services from "./services/services.mjs";
 import PendingActions from "./pending_actions/pending_actions.mjs";
 import Users from "./users/users.mjs";
+import TokenInfo from "#bzd/apps/accounts/backend/users/token.mjs";
 import TestData from "./tests/test_data.mjs";
 
 const Exception = ExceptionFactory("backend");
@@ -46,26 +47,56 @@ const AUTHENTICATION_PRIVATE_KEY = "abcd";
 	const web = new HttpServer(PORT);
 
 	let authentication = new Authentication({
-		privateKey: AUTHENTICATION_PRIVATE_KEY,
-		verifyIdentityCallback: async (uid, password) => {
-			const maybeUser = await users.get(uid, /*allowNull*/ true);
+		verifyIdentity: async (email, password) => {
+			const maybeUser = await users.getFromEmail(email, /*allowNull*/ true);
 			if (maybeUser === null) {
 				return false;
 			}
 			if (maybeUser.getPassword() !== password) {
 				return false;
 			}
-			await users.update(uid, (user) => {
-				user.setLastLogin();
-				return user;
-			});
+			await users.update(
+				maybeUser.getUid(),
+				(user) => {
+					user.setLastLogin();
+					return user;
+				},
+				/*silent*/ true,
+			);
 			return {
 				roles: maybeUser.getRoles(),
-				uid: uid,
+				uid: maybeUser.getUid(),
 			};
 		},
-		verifyRefreshCallback: async (/*uid, session, timeoutS*/) => {
-			return true;
+		saveRefreshToken: async (uid, hash, timeoutS, rolling) => {
+			await users.update(uid, (user) => {
+				const token = TokenInfo.make(user.getRoles(), timeoutS, rolling);
+				user.addToken(hash, token);
+				return user;
+			});
+		},
+		refreshToken: async (uid, hash) => {
+			// If there is no user
+			const maybeUser = await users.get(uid, /*allowNull*/ true);
+			if (maybeUser === null) {
+				return false;
+			}
+			// If there is no token
+			const maybeToken = maybeUser.getToken(hash, null);
+			if (!maybeToken) {
+				return false;
+			}
+			// If the token is expired
+			if (maybeToken.isExpired()) {
+				return false;
+			}
+
+			// Todo (rolling if needed)
+
+			return {
+				roles: maybeToken.getRoles(),
+				uid: uid,
+			};
 		},
 	});
 

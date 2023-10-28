@@ -63,7 +63,7 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 
 			// Validate the authentication for this UID and session
 			// and return some arguments to be passed to the access token
-			if (!(await authentication.verifyRefresh(uid, session, refreshToken.timeout))) {
+			if (!(await authentication.options.refreshToken(uid, session, refreshToken.timeout))) {
 				return this.sendStatus(401, "Unauthorized");
 			}
 
@@ -78,7 +78,7 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 
 		api.handle("post", "/auth/login", async function (inputs) {
 			// Verify uid/password pair
-			const userInfo = await authentication.verifyIdentity(inputs.uid, inputs.password);
+			const userInfo = await authentication.options.verifyIdentity(inputs.uid, inputs.password);
 			if (userInfo) {
 				return generateTokens.call(this, userInfo.uid, userInfo.roles, inputs.persistent, makeUid(userInfo.uid));
 			}

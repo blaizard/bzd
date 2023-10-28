@@ -3,7 +3,7 @@ import Url from "url";
 import ExceptionFactory from "../exception.mjs";
 import LogFactory from "../log.mjs";
 import Validation from "../validation.mjs";
-import HttpServerContext from "#bzd/nodejs/core/http/server_context.mjs";
+import { HttpServerContext, HttpError } from "#bzd/nodejs/core/http/server_context.mjs";
 
 import Base from "./base.mjs";
 
@@ -81,7 +81,7 @@ export default class APIServer extends Base {
 						return true;
 					});
 					// Check if use has any of the roles
-					{
+					if (isAuthorized) {
 						const authenticationSchema = this.schema[endpoint][method].authentication;
 						if (typeof authenticationSchema == "string" || Array.isArray(authenticationSchema)) {
 							isAuthorized &= await authenticationData.user.matchAnyRoles(authenticationSchema);
@@ -163,12 +163,16 @@ export default class APIServer extends Base {
 					}
 				}
 			} catch (e) {
-				Exception.print("Exception Guard");
-				// The formatting string is important to ensure that error message is not
-				// considered as a formatting string.
-				Exception.print("{}", Exception.fromError(e));
-				Log.error("Context for '{}' {}: {:j}", method, endpoint, context.debug);
-				context.sendStatus(500, e.message);
+				if (e instanceof HttpError) {
+					context.sendStatus(e.code, e.message);
+				} else {
+					Exception.print("Exception Guard");
+					// The formatting string is important to ensure that error message is not
+					// considered as a formatting string.
+					Exception.print("{}", Exception.fromError(e));
+					Log.error("Context for '{}' {}: {:j}", method, endpoint, context.debug);
+					context.sendStatus(500, e.message);
+				}
 			}
 		};
 

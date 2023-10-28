@@ -16,7 +16,7 @@
             "request": {
                 "type": "json",
                 "validation": {
-                    "uid": "mandatory"
+                    "email": "mandatory"
                 }
             }
         },

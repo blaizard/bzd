@@ -2,8 +2,16 @@ import ExceptionFactory from "../exception.mjs";
 
 const Exception = ExceptionFactory("http", "server", "context");
 
+/// Handler for http errors.
+export class HttpError extends Error {
+	constructor(code, message) {
+		super(message);
+		this.code = code;
+	}
+}
+
 /// Abstraction of the request/response pair of the server.
-export default class HttpServerContext {
+export class HttpServerContext {
 	constructor(request, response) {
 		this.request = request;
 		this.response = response;
@@ -114,5 +122,9 @@ export default class HttpServerContext {
 	redirect(url) {
 		this.response.redirect(url);
 		this.response.end();
+	}
+
+	httpError(code, message) {
+		return new HttpError(code, message);
 	}
 }

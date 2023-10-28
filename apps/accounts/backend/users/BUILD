@@ -4,6 +4,7 @@ bzd_nodejs_library(
     name = "users",
     srcs = [
         "subscription.mjs",
+        "token.mjs",
         "user.mjs",
         "users.mjs",
     ],

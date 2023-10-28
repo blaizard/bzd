@@ -8,7 +8,7 @@ const Log = LogFactory("subscription");
 ///
 /// duration: The duration of the subscription.
 /// end: The time limit.
-/// Note: duration and days cannot live together, when initiated a subscription
+/// Note: duration and end cannot live together, when initiated a subscription
 /// has a duration only and when started, the days will also start.
 export default class Subscription {
 	constructor(value) {
@@ -26,6 +26,14 @@ export default class Subscription {
 
 	isStarted() {
 		return "duration" in this.value;
+	}
+
+	isExpired() {
+		return this.getDuration() == 0;
+	}
+
+	isActive() {
+		return this.isStarted() && !this.isExpired();
 	}
 
 	start() {
