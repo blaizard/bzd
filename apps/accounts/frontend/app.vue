@@ -1,5 +1,14 @@
 <template>
 	<Layout :fullPage="true">
+		<template #header>
+			<RouterLink link="/">Accounts</RouterLink>
+		</template>
+		<template #menu>
+			<template v-if="$authentication.isAuthenticated">
+				<MenuEntry text="Configuration" icon="bzd-icon-images" link="/"></MenuEntry>
+				<MenuEntry text="Admin" icon="bzd-icon-newspaper" link="/admin"></MenuEntry>
+			</template>
+		</template>
 		<template #content>
 			<RouterComponent
 				ref="view"
@@ -14,10 +23,12 @@
 <script>
 	import Layout from "#bzd/nodejs/vue/components/layout/layout.vue";
 	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.mjs";
+	import MenuEntry from "#bzd/nodejs/vue/components/menu/entry.vue";
 
 	export default {
 		components: {
 			Layout,
+			MenuEntry,
 		},
 		directives: {
 			loading: DirectiveLoading,

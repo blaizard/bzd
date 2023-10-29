@@ -32,6 +32,7 @@ bzd_nodejs_web_binary(
         "//nodejs/vue/components/form",
         "//nodejs/vue/components/layout",
         "//nodejs/vue/components/layout:component",
+        "//nodejs/vue/components/menu:entry",
         "//nodejs/vue/directives:loading",
         "//nodejs/vue/directives:tooltip",
         "//nodejs/vue/router",

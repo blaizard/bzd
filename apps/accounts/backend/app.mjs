@@ -75,6 +75,12 @@ const AUTHENTICATION_PRIVATE_KEY = "abcd";
 				return user;
 			});
 		},
+		removeRefreshToken: async (uid, hash) => {
+			await users.update(uid, (user) => {
+				user.removeToken(hash);
+				return user;
+			});
+		},
 		refreshToken: async (uid, hash) => {
 			// If there is no user
 			const maybeUser = await users.get(uid, /*allowNull*/ true);
