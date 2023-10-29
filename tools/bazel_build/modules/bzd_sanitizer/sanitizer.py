@@ -56,9 +56,9 @@ if __name__ == "__main__":
 	    help="Only check if the files need to be sanitized.",
 	)
 	parser.add_argument(
-	    "-n",
-	    "--no-colors",
+	    "--color",
 	    action="store_true",
+	    default=sys.stdout.isatty(),
 	    help="If set, the output will have colors.",
 	)
 	parser.add_argument(
@@ -82,7 +82,7 @@ if __name__ == "__main__":
 	    workspace=args.workspace,
 	    fileList=fileList,
 	    check=args.check,
-	    colors=not args.no_colors,
+	    colors=args.color,
 	)
 	context.toFile(path=contextFilePath)
 

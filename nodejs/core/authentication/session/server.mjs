@@ -29,15 +29,21 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 			// Key value store to save the session IDs.
 			// The structure of this KVS looks like this:
 			// <uid-hash>: {
-			//     <hash>: {roles: [<role>, ...], expiration: <timestamp>},
-			//	   <hash>: {roles: [<role>, ...], expiration: <timestamp>},
+			//     sessions: [
+			//     	    {hash: <hash>, roles: [<role>, ...], expiration: <timestamp>},
+			//	   		{hash: <hash>, roles: [<role>, ...], expiration: <timestamp>},
+			//     ]
 			// }
+			// Ordered from the earliest first.
 			kvs: null,
 			// The bucket name for the sessions to be stored in the key value store.
 			kvsBucket: "sessions",
 			// Function to save a refresh token somewhere.
 			// Its signature is as follow: async (uid, hash, durationS, rolling) { ... }
 			saveRefreshToken: null,
+			// Function to remove an existing refresh token previously saved.
+			// Its signature is as follow: async (uid, hash) { ... }
+			removeRefreshToken: null,
 			// Maximum session allowed per user.
 			maxSessionsPerUser: 5,
 			// Time in seconds after which the access token will expire.
@@ -54,6 +60,10 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		Exception.assert(
 			this.options.saveRefreshToken,
 			"The callback to save a refresh token must be set, set 'saveRefreshToken'.",
+		);
+		Exception.assert(
+			this.options.removeRefreshToken,
+			"The callback to remove a refresh token must be set, set 'removeRefreshToken'.",
 		);
 
 		this.validationRefreshToken = new Validation({
@@ -96,6 +106,13 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		});
 
 		api.handle("post", "/auth/logout", async function () {
+			const refreshToken = this.getCookie("refresh_token", null);
+			if (refreshToken == null) {
+				return;
+			}
+
+			const [uid, hash] = authentication._readToken(refreshToken);
+			await authentication.options.removeRefreshToken(uid, hash);
 			this.deleteCookie("refresh_token");
 		});
 
@@ -125,8 +142,8 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 
 	/// Create a new session, save it and return the token.
 	async _makeAccessToken(user) {
-		const hash = this._makeTokenHash();
 		const session = {
+			hash: this._makeTokenHash(),
 			expiration: this._getTimestamp() + this.options.tokenAccessExpiresIn,
 			roles: user.roles,
 		};
@@ -137,25 +154,19 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 			user.uid,
 			(data) => {
 				// Remove the sessions that will expire the first if too many.
-				if (Object.keys(data).length >= this.options.maxSessionsPerUser) {
-					const sorted = Object.entries(data)
-						.map(([key, value]) => [key, value])
-						.sort((a, b) => b[1].expiration - a[1].expiration);
-					data = sorted.slice(0, this.options.maxSessionsPerUser - 1).reduce((obj, entry) => {
-						obj[entry[0]] = entry[1];
-						return obj;
-					}, {});
+				if (data.length >= this.options.maxSessionsPerUser) {
+					data.sessions = data.sessions.slice(0, this.options.maxSessionsPerUser - 1);
 				}
 				// Add the new session.
-				data[hash] = session;
+				data.sessions.unshift(session);
 				return data;
 			},
-			{},
+			{ sessions: [] },
 		);
 
 		// Return the token
 		return {
-			token: this._makeToken(user.uid, hash),
+			token: this._makeToken(user.uid, session.hash),
 			timeout: this.options.tokenAccessExpiresIn,
 		};
 	}
@@ -173,6 +184,7 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		return token.split("_");
 	}
 
+	/// Verify that a request is authenticated.
 	async _verifyImpl(context, callback) {
 		let token = null;
 		const data = context.getHeader("authorization", "").split(" ");
@@ -182,31 +194,31 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 			token = context.getQuery("t");
 		}
 
-		if (token) {
-			return await this._verifyToken(token, callback);
+		if (!token) {
+			return false;
 		}
 
-		return false;
+		return await this._verifyAccessToken(token, callback);
 	}
 
-	async _verifyToken(token, verifyCallback) {
+	async _verifyAccessToken(token, verifyCallback) {
 		const [uid, hash] = this._readToken(token);
 		const maybeSessions = await this.options.kvs.get(this.options.kvsBucket, uid, null);
 		// No session for this user.
-		if (maybeSessions === null) {
+		if (maybeSessions === null || !("sessions" in maybeSessions)) {
 			return false;
 		}
 
 		// Look for the token
-		if (!(hash in maybeSessions)) {
+		const maybeSession = maybeSessions.sessions.find((session) => session.hash == hash);
+		if (!maybeSession) {
 			return false;
 		}
-		const session = maybeSessions[hash];
 
 		// Expired.
-		if (session.expiration < this._getTimestamp()) {
+		if (maybeSession.expiration < this._getTimestamp()) {
 			return false;
 		}
-		return await verifyCallback(new User(uid, session.roles));
+		return await verifyCallback(new User(uid, maybeSession.roles));
 	}
 }
