@@ -166,29 +166,29 @@
 				const regexpr = "^" + this.multiSeparators + "+|" + this.multiSeparators + "+$";
 				const cleanedValue = text.replace(new RegExp(regexpr, "g"), "");
 				if (cleanedValue && this.isValueAcceptable(cleanedValue)) {
-					this.set(this.valueList.concat(cleanedValue));
+					this.set(this.valueList.concat(cleanedValue), { action: "add" });
 				}
 				this.$refs.input.innerHTML = "";
 				this.$emit("directInput", "");
 			},
 			valueSet(text) {
 				if (this.isValueAcceptable(text)) {
-					this.set(text);
+					this.set(text, { action: "update" });
 				} else {
 					this.$refs.input.innerHTML = "";
 					this.$emit("directInput", "");
-					this.set("");
+					this.set("", { action: "update" });
 				}
 			},
 			valueListRemoveLast() {
 				let valueList = this.valueList.slice(0);
-				valueList.pop();
-				this.set(valueList);
+				const value = valueList.pop();
+				this.set(valueList, { action: "remove", value: value });
 			},
 			valueListRemove(index) {
 				let valueList = this.valueList.slice(0);
-				valueList.splice(index, 1);
-				this.set(valueList);
+				const value = valueList.pop(index);
+				this.set(valueList, { action: "remove", value: value });
 			},
 			handleKeyDown(e, text) {
 				// If press ENTER

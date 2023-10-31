@@ -23,7 +23,7 @@
 						@submit="handleSubmit(current)"
 						@input-with-context="handleInputWithContext(index, $event)"
 						:description="current"
-						:context="{ ...context, index: index, name: getName(current, index) }"
+						:context="{ ...context, name: getName(current, index) }"
 						:disable="getDisable(current)"
 						v-tooltip="current.tooltip"
 					>
@@ -76,10 +76,8 @@
 	};
 
 	export default {
-		/**
-		 * Rename the elements to create custom element names to ensure no conflicts with elements:
-		 * { InputFormElement: Input, ... }
-		 */
+		/// Rename the elements to create custom element names to ensure no conflicts with elements:
+		/// { InputFormElement: Input, ... }
 		components: Object.assign(
 			{ ElementUnknown },
 			Object.keys(elements).reduce((obj, key) => {
@@ -171,12 +169,13 @@
 					this.$set(this.unamedValue, name, value);
 				}
 				this.$emit("input", this.returnedValue);
+				return name;
 			},
 			handleInputWithContext(index, data) {
-				this.handleInput(index, data.value);
+				const name = this.handleInput(index, data.value);
 				this.$emit("input-with-context", {
 					value: this.returnedValue,
-					context: data.context,
+					context: { name: name, index: index, action: "update" },
 				});
 			},
 			handleSubmit(/*description*/) {

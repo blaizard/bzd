@@ -53,7 +53,7 @@
 				}
 			},
 			handleInput(e) {
-				this.set(e.target.value);
+				this.set(e.target.value, { action: "update" });
 				this.resize();
 			},
 		},

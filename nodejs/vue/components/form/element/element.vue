@@ -176,6 +176,10 @@
 				}
 				return this.inputValue;
 			},
+			/// Assign a new value for this element.
+			///
+			/// \param value The new value to be set.
+			/// \param context Extra context to be returned with this.context.
 			async set(value, context = {}) {
 				if (!this.disable) {
 					let errorList = [];
@@ -196,13 +200,7 @@
 					if (!errorList.length) {
 						this.clearError();
 
-						const updateContext = Object.assign(
-							{
-								previous: this.value,
-							},
-							this.context,
-							context,
-						);
+						const updateContext = Object.assign({}, this.context, context);
 						if (this.hasListenerInputWithContext) {
 							this.$emit("input-with-context", { value: outputValue, context: updateContext });
 						} else {

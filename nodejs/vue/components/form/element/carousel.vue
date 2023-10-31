@@ -225,7 +225,7 @@
 					this.$refs.container.focus();
 				}
 
-				this.set(this.list[index].value);
+				this.set(this.list[index].value, { action: "update" });
 			},
 			slideSelectByValue(value) {
 				if (this.list.length && this.list[this.index].value != value) {

@@ -58,7 +58,7 @@
 				);
 			},
 			changesContent() {
-				return this.hasChanges > 0 ? "Apply (" + this.nbChanges + ")" : "Apply";
+				return this.hasChanges ? "Apply (" + this.nbChanges + ")" : "Apply";
 			},
 			description() {
 				return [

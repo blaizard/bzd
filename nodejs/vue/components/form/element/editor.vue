@@ -97,7 +97,7 @@
 						type: "button",
 						click: () => {
 							if (this.history.length) {
-								this.set(this.history.shift());
+								this.set(this.history.shift(), { action: "update" });
 							}
 						},
 					},
@@ -226,7 +226,7 @@
 				// Save the previous value into the history
 				this.pushToHistory(this.get());
 				// Save the value
-				this.set(value);
+				this.set(value, { action: "update" });
 			},
 		},
 	};

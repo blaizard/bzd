@@ -74,7 +74,8 @@
                 "type": "json",
                 "validation": {
                     "oldpassword": "",
-                    "password": ""
+                    "password": "",
+                    "tokens": ""
                 }
             },
             "response": {

@@ -15,34 +15,22 @@
 				<div class="irform-array-item-draghandle" v-if="gripHandle">&nbsp;</div>
 
 				<Form
-					v-if="template instanceof Array"
 					class="irform-array-item-body"
 					:description="template"
 					:disable="disable"
 					:value="value"
-					@input="itemUpdate(index, $event)"
+					:context="{ row: index }"
+					@input-with-context="itemUpdate(index, $event)"
 					@active="handleActive"
 				>
 				</Form>
-
-				<component
-					v-else
-					class="irform-array-item-body"
-					:is="template"
-					:disable="disable"
-					:value="value"
-					:config="templateComponentConfig"
-					@input="itemUpdate(index, $event)"
-					@delete="itemDelete(index)"
-				>
-				</component>
 
 				<div class="irform-array-item-delete" v-if="allowDelete" @click="itemDelete(index)">x</div>
 			</div>
 		</span>
 
 		<span
-			v-if="isAddEnabled || !hideAddWhenDisabled"
+			v-if="allowAdd && (isAddEnabled || !hideAddWhenDisabled)"
 			:class="{ 'irform-array-add': true, 'irform-disable': !isAddEnabled }"
 		>
 			<Form :description="templateAdd" :disable="!isAddEnabled" @active="handleActive" @submit="itemAdd"> </Form>
@@ -84,6 +72,10 @@
 				 * Force the value to have at least one entry
 				 */
 				atLeastOne: this.getOption("atLeastOne", false),
+				/**
+				 * Allow add a new element
+				 */
+				allowAdd: this.getOption("allowAdd", true),
 				/**
 				 * Allow add a new element even if one of the others is empty
 				 */
@@ -195,26 +187,26 @@
 			async itemAdd(content) {
 				if (this.isAddEnabled) {
 					let valueList = this.valueList.slice(0);
-					const values = this.toValues(content || {});
-					valueList.push(values);
-					await this.set(valueList);
+					const value = this.toValues(content || {});
+					valueList.push(value);
+					await this.set(valueList, { action: "add", value: value });
 				}
 			},
-			async itemUpdate(index, value) {
+			async itemUpdate(index, data) {
 				let valueList = this.valueList.slice(0);
-				valueList[index] = value;
-				await this.set(valueList);
+				valueList[index] = data.value;
+				await this.set(valueList, { ...data.context, row: index, action: "update" });
 			},
 			async itemDelete(index) {
 				let valueList = this.valueList.slice(0);
-				valueList.splice(index, 1);
-				await this.set(valueList);
+				const value = valueList.pop(index);
+				await this.set(valueList, { action: "delete", row: index, value: value });
 			},
 			async itemMove(indexFrom, indexTo) {
 				let valueList = this.valueList.slice(0);
 				const elt = valueList.splice(indexFrom, 1)[0];
 				valueList.splice(indexTo, 0, elt);
-				await this.set(valueList);
+				await this.set(valueList, { action: "move", rowFrom: indexFrom, rowTo: indexTo, value: elt });
 			},
 		},
 	};
