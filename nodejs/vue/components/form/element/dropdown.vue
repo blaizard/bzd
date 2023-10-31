@@ -221,9 +221,9 @@
 					setTimeout(() => {
 						if (this.multi) {
 							const curValue = this.curValue.splice(0);
-							this.set(curValue.concat(String(item.value)));
+							this.set(curValue.concat(String(item.value)), { action: "update" });
 						} else {
-							this.set(String(item.value));
+							this.set(String(item.value), { action: "update" });
 						}
 					}, 10);
 				}

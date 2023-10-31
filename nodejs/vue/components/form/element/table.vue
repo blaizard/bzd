@@ -182,7 +182,7 @@
 			itemUpdate(rowIndex, data) {
 				let valueList = this.get().slice(0);
 				valueList[rowIndex] = data.value;
-				this.set(valueList, data.context);
+				this.set(valueList, { ...data.context, row: rowIndex, action: "update" });
 			},
 		},
 	};

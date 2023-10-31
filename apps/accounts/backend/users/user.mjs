@@ -75,6 +75,10 @@ export default class User {
 		return this.value.roles || [];
 	}
 
+	hasRole(role) {
+		return this.getRoles().includes(role);
+	}
+
 	addRole(role) {
 		Exception.assert(VALID_ROLES_.includes(role), "'{}' is not a valid role, valid roles are: {}", role, VALID_ROLES_);
 		this.modified.push("role(+" + role + ")");
@@ -117,7 +121,7 @@ export default class User {
 			product,
 			VALID_SUBSCRIPTIONS_,
 		);
-		this.modified.push("subscription(+" + product + ")");
+		this.modified.push("subscriptions(+" + product + ")");
 
 		if (!("subscriptions" in this.value)) {
 			this.value.subscriptions = {};
@@ -138,13 +142,27 @@ export default class User {
 			user.addSubscription(product, subscription);
 		}
 
-		this.value.subscriptions = user.value.subscriptions;
-		this.modified.push("subscription()");
+		this.value.subscriptions = user.getSubscriptions();
+		this.modified.push("subscriptions()");
 		this.modified.push(...user.modified);
 	}
 
 	getTokens() {
 		return this.value.tokens || {};
+	}
+
+	/// Set all the tokens of a user.
+	setTokens(tokens) {
+		let user = User.createDummy();
+		user.value.roles = this.getRoles();
+		for (const [hash, data] of Object.entries(tokens)) {
+			const token = new TokenInfo(data);
+			user.addToken(hash, token);
+		}
+
+		this.value.tokens = user.getTokens();
+		this.modified.push("tokens()");
+		this.modified.push(...user.modified);
 	}
 
 	/// Add a token to the user.
@@ -159,8 +177,14 @@ export default class User {
 			this.uid,
 		);
 		Exception.assert(token instanceof TokenInfo, "Token must be of type TokenInfo: '{}'.", token);
+		Exception.assert(
+			token.getRoles().every((r) => this.hasRole(r)),
+			"Token roles must be a subset of its user: '{}' vs '{}'.",
+			token.getRoles(),
+			this.getRoles(),
+		);
 
-		this.modified.push("token(+" + hash.slice(0, 16) + "[...])");
+		this.modified.push("tokens(+" + hash.slice(0, 16) + "[...])");
 		this.value.tokens[hash] = token.data();
 	}
 
@@ -176,7 +200,7 @@ export default class User {
 	removeToken(hash) {
 		if ("tokens" in this.value) {
 			if (hash in this.value.tokens) {
-				this.modified.push("token(-" + hash.slice(0, 16) + "[...])");
+				this.modified.push("tokens(-" + hash.slice(0, 16) + "[...])");
 				delete this.value.tokens[hash];
 			}
 		}

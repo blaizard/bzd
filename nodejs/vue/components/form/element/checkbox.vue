@@ -35,7 +35,7 @@
 		methods: {
 			handleClick() {
 				this.$el.firstChild.focus();
-				this.set(!this.get());
+				this.set(!this.get(), { action: "update" });
 			},
 		},
 	};

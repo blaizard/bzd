@@ -125,7 +125,7 @@ export default class Users {
 
 	_preprocessAndMergePublic(values, user) {
 		Exception.assert(
-			Object.keys(values).every((key) => ["password", "oldpassword"].includes(key)),
+			Object.keys(values).every((key) => ["password", "oldpassword", "tokens"].includes(key)),
 			"Some values cannot be changed: {}",
 			Object.keys(values),
 		);
@@ -136,6 +136,11 @@ export default class Users {
 			Exception.assert(user.getPassword() === values.oldpassword, "Old password is different");
 
 			user.setPassword(values.password);
+		}
+
+		// Update tokens if any.
+		if ("tokens" in values) {
+			user.setTokens(values.tokens);
 		}
 
 		return user;

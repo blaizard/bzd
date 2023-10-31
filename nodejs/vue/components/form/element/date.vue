@@ -231,7 +231,7 @@
 				if (date === null) {
 					return;
 				}
-				this.set(date.getTime());
+				this.set(date.getTime(), { action: "update" });
 			},
 			handleKey(/*keyCode*/) {},
 		},
