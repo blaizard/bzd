@@ -7,47 +7,7 @@
 	export default {
 		mixins: [ArrayElement],
 		data: function () {
-			let templateAdd = [];
-
-			// Add the upload button
-			const uploadContent = this.getOption("uploadContent", '<i class="bzd-icon-upload"></i> Upload');
-			templateAdd.push({
-				type: "Button",
-				content: { html: uploadContent },
-				click: this.triggerUpload,
-				align: this.getOption("align", "left"),
-			});
-
-			const allowDelete = this.getOption("allowDelete", true);
-			const templateClass = this.getOption("templateClass", "");
-			const templateEdit = this.getOption("templateEdit", false);
-			const imageFill = this.getOption("imageFill", "cover");
 			return {
-				/**
-				 * Read and parse the upload response. Return the url or path of the file associated.
-				 */
-				uploadResponseHandler: this.getOption("uploadResponseHandler", (response) => response),
-				/**
-				 * Convert the image path to an accessible image url
-				 */
-				imageToUrl: this.getOption("imageToUrl", (/*path*/) => null),
-
-				// ---- Override data from ArrayElement ----
-				template: Vue.extend({
-					mixins: [FileItem],
-					data: function () {
-						return {
-							allowDelete: allowDelete,
-							templateClass: templateClass,
-							templateEdit: templateEdit,
-							imageFill: imageFill,
-						};
-					},
-				}),
-				templateAdd: templateAdd,
-				allowDelete: false,
-				inline: true,
-				gripHandle: false,
 				// To track the current uploads
 				uploadValueList: [],
 			};
@@ -72,6 +32,49 @@
 			}
 		},
 		computed: {
+			/// ---- CONFIG ----------------------------------------
+			/// Read and parse the upload response. Return the url or path of the file associated.
+			uploadResponseHandler() {
+				return this.getOption("uploadResponseHandler", (response) => response);
+			},
+			/// Convert the image path to an accessible image url
+			imageToUrl() {
+				return this.getOption("imageToUrl", (/*path*/) => null);
+			},
+			/// ---- OVERRIDE ArrayElement ---------------
+			template() {
+				return Vue.extend({
+					mixins: [FileItem],
+					data: function () {
+						return {
+							allowDelete: this.getOption("allowDelete", true),
+							templateClass: this.getOption("templateClass", ""),
+							templateEdit: this.getOption("templateEdit", false),
+							imageFill: this.getOption("imageFill", "cover"),
+						};
+					},
+				});
+			},
+			templateAdd() {
+				return [
+					{
+						type: "Button",
+						content: { html: this.getOption("uploadContent", '<i class="bzd-icon-upload"></i> Upload') },
+						click: this.triggerUpload,
+						align: this.getOption("align", "left"),
+					},
+				];
+			},
+			allowDelete() {
+				return false;
+			},
+			inline() {
+				return true;
+			},
+			gripHandle() {
+				return false;
+			},
+			/// ---- IMPLEMENTATION ----------------------------------
 			isUpload() {
 				return this.getOption("upload", false) !== false;
 			},

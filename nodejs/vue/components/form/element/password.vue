@@ -3,13 +3,15 @@
 
 	export default {
 		mixins: [Input],
-		data: function () {
-			return {
-				mask: true,
-				html: true,
-			};
-		},
 		computed: {
+			/// ---- OVERRIDE Input ---------------
+			mask() {
+				return true;
+			},
+			html() {
+				return true;
+			},
+			/// ---- IMPLEMENTATION ----------------------------------
 			format() {
 				return (value) => [...value].reduce((str) => str + "*", "");
 			},

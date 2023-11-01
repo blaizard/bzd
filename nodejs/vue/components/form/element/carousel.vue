@@ -61,31 +61,6 @@
 		},
 		data: function () {
 			return {
-				/**
-				 * Defines how the selected items aligns with the slider.
-				 * Values are "left", "center", "right" or false. False means that the selection
-				 * will not be aligned and slecting a new slide will not affect the scrolling
-				 * of the slider
-				 */
-				alignSelection: this.getOption("alignSelection", "center"),
-				/**
-				 * Maximum number of slides visible at a time. If set to 0, all the slides will be collpased.
-				 */
-				maxVisible: this.getOption("maxVisible", 0),
-				/**
-				 * Margin between the slides
-				 */
-				margin: this.getOption("margin", 0),
-				/**
-				 * Print controls. If auto, it will be print them only if necessary, it "none", it will nto print them,
-				 * if "always", it will always print them.
-				 */
-				controls: this.getOption("controls", "auto"),
-				/**
-				 * Callback when an element is clicked
-				 */
-				click: this.getOption("click", (/*index*/) => {}),
-				// ---- Internal ----
 				// Current slide selected
 				index: 0,
 				interval: null,
@@ -101,6 +76,32 @@
 			},
 		},
 		computed: {
+			/// ---- CONFIG ----------------------------------------
+			/// Defines how the selected items aligns with the slider.
+			/// Values are "left", "center", "right" or false. False means that the selection
+			/// will not be aligned and slecting a new slide will not affect the scrolling
+			/// of the slider
+			alignSelection() {
+				return this.getOption("alignSelection", "center");
+			},
+			/// Maximum number of slides visible at a time. If set to 0, all the slides will be collpased.
+			maxVisible() {
+				return this.getOption("maxVisible", 0);
+			},
+			/// Margin between the slides
+			margin() {
+				return this.getOption("margin", 0);
+			},
+			/// Print controls. If auto, it will be print them only if necessary, it "none", it will nto print them,
+			/// if "always", it will always print them.
+			controls() {
+				return this.getOption("controls", "auto");
+			},
+			/// Callback when an element is clicked
+			click() {
+				return this.getOption("click", (/*index*/) => {});
+			},
+			/// ---- IMPLEMENTATION ----------------------------------
 			containerClass() {
 				return {
 					"irform-carousel": true,

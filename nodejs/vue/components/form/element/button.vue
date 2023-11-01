@@ -20,13 +20,12 @@
 			content: { type: String || Object, optional: true, default: "" },
 			width: { type: Number, optional: true, default: 0 },
 		},
-		data: function () {
-			return {
-				/// Defines a callback to be triggered the submit button is called
-				click: this.getOption("click", null),
-			};
-		},
 		computed: {
+			/// ---- CONFIG ----------------------------------------
+			click() {
+				return this.getOption("click", null);
+			},
+			/// ---- IMPLEMENTATION ----------------------------------
 			attrAction() {
 				if (this.disable) {
 					return {};

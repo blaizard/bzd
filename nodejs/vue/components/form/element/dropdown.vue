@@ -30,24 +30,6 @@
 		},
 		data: function () {
 			return {
-				multi: this.getOption("multi", false),
-				/**
-				 * If the displayed values should be interpreted as HTML or not
-				 */
-				html: this.getOption("html", false),
-				/**
-				 * Filter the list when editing
-				 */
-				filter: this.getOption("filter", !this.isFctWithArg(this.getOption("list"))),
-				/**
-				 * Minimum weight for word matching
-				 */
-				minMatchWeight: this.getOption("minMatchWeight", 0.6),
-				/**
-				 * Maximum number of entries to display. If set to 0, there is no limit.
-				 */
-				max: this.getOption("max", 0),
-				// ---- Internal values ---------------------------------------
 				// The list of values as they should be printed
 				list: [],
 				filteredList: [],
@@ -55,6 +37,27 @@
 			};
 		},
 		computed: {
+			/// ---- CONFIG ----------------------------------------
+			multi() {
+				return this.getOption("multi", false);
+			},
+			/// If the displayed values should be interpreted as HTML or not
+			html() {
+				return this.getOption("html", false);
+			},
+			/// Filter the list when editing
+			filter() {
+				return this.getOption("filter", !this.isFctWithArg(this.getOption("list")));
+			},
+			/// Minimum weight for word matching
+			minMatchWeight() {
+				return this.getOption("minMatchWeight", 0.6);
+			},
+			/// Maximum number of entries to display. If set to 0, there is no limit.
+			max() {
+				return this.getOption("max", 0);
+			},
+			/// ---- IMPLEMENTATION ----------------------------------
 			descriptionDropdown() {
 				return Object.assign({}, this.description, {
 					editable: this.getOption("editable", false),

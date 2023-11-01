@@ -45,31 +45,24 @@
 			// Load asynchronously the form to avoid any circular dependencies
 			Form: () => import("../form.vue"),
 		},
-		data: function () {
-			return {
-				/// Sort the table by the columns name
-				sort: this.getOption("sort", []),
-				/// Return the class associated with a specific row
-				rowClass: this.getOption("rowClass", (/*value, index*/) => ""),
-				/// Return whether or not a row should be disabled
-				rowDisable: this.getOption("rowDisable", (/*value*/) => false),
-				/// The columns to be displayed
-				//template: this.getOption("template", [])
-			};
-		},
 		props: {
 			value: { type: Array, required: false, default: () => [] },
 		},
 		computed: {
-			containerClass() {
-				return {
-					"irform-table": true,
-					[this.getOption("class")]: true,
-				};
+			/// ---- CONFIG ----------------------------------------
+			/// Sort the table by the columns name
+			sort() {
+				return this.getOption("sort", []);
 			},
-			valueType() {
-				return "list";
+			/// Return the class associated with a specific row
+			rowClass() {
+				return this.getOption("rowClass", (/*value, index*/) => "");
 			},
+			/// Return whether or not a row should be disabled
+			rowDisable() {
+				return this.getOption("rowDisable", (/*value*/) => false);
+			},
+			/// The columns to be displayed
 			template() {
 				return this.getOption("template", []).map((item, index) => {
 					// If there is no name associated with the column, create one
@@ -78,6 +71,16 @@
 					}
 					return item;
 				});
+			},
+			/// ---- IMPLEMENTATION ----------------------------------
+			containerClass() {
+				return {
+					"irform-table": true,
+					[this.getOption("class")]: true,
+				};
+			},
+			valueType() {
+				return "list";
 			},
 			templateObj() {
 				return this.template.reduce((obj, template) => {

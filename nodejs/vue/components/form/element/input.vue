@@ -54,56 +54,57 @@
 		},
 		data: function () {
 			return {
-				/**
-				 * If the displayed values should be interpreted as HTML or not
-				 */
-				html: this.getOption("html", false),
-				/**
-				 * Make the content editable
-				 */
-				editable: this.getOption("editable", true),
-				/**
-				 * This option will allow any value. If set to false, it will allow
-				 * only the preset values.
-				 */
-				any: this.getOption("any", true),
-				/**
-				 * Format the displayed value.
-				 * The formatting can be:
-				 * - A string -> mask: ***-***
-				 * - A Function -> format (value) => (...)
-				 * - A Dictionaty -> presets: { "hello" => "<i>hello</i>" }
-				 */
-				//format: this.getOption("format", false),
-				/**
-				 * Set if the real value should be masked
-				 */
-				mask: this.getOption("mask", false),
-				/**
-				 * Placeholder if no value is input
-				 */
-				placeholder: this.getOption("placeholder", ""),
-				/**
-				 * Incorporate a non-editable text preceding the input field
-				 */
-				pre: this.getOption("pre", false),
-				/**
-				 * Incorporate a non-editable text after the input field
-				 */
-				post: this.getOption("post", false),
-				/**
-				 * Multivalue, this will return an array and not a string
-				 */
-				multi: this.getOption("multi", false),
-				/**
-				 * Multivalue separators regular expression
-				 */
-				multiSeparators: this.getOption("multiSeparators", "[\\s,;]"),
-				// ---- Internal ----
 				hasChanged: false,
 			};
 		},
 		computed: {
+			/// ---- CONFIG ----------------------------------------
+			/// If the displayed values should be interpreted as HTML or not
+			html() {
+				return this.getOption("html", false);
+			},
+			/// Make the content editable
+			editable() {
+				return this.getOption("editable", true);
+			},
+			/// This option will allow any value. If set to false, it will allow
+			/// only the preset values.
+			any() {
+				return this.getOption("any", true);
+			},
+			/// Format the displayed value.
+			/// The formatting can be:
+			/// - A string -> mask: ***-***
+			/// - A Function -> format (value) => (...)
+			/// - A Dictionaty -> presets: { "hello" => "<i>hello</i>" }
+			format() {
+				return this.getOption("format", false);
+			},
+			/// Set if the real value should be masked
+			mask() {
+				return this.getOption("mask", false);
+			},
+			/// Placeholder if no value is input
+			placeholder() {
+				return this.getOption("placeholder", "");
+			},
+			/// Incorporate a non-editable text preceding the input field
+			pre() {
+				return this.getOption("pre", false);
+			},
+			/// Incorporate a non-editable text after the input field
+			post() {
+				return this.getOption("post", false);
+			},
+			/// Multivalue, this will return an array and not a string
+			multi() {
+				return this.getOption("multi", false);
+			},
+			/// Multivalue separators regular expression
+			multiSeparators() {
+				return this.getOption("multiSeparators", "[\\s,;]");
+			},
+			/// ---- IMPLEMENTATION ----------------------------------
 			containerClass() {
 				return {
 					"irform-input": true,
@@ -121,9 +122,6 @@
 					return "";
 				}
 				return this.getDisplayValue(this.get(), /*editable*/ true);
-			},
-			format() {
-				return this.getOption("format", false);
 			},
 		},
 		methods: {

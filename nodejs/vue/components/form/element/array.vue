@@ -54,60 +54,58 @@
 		props: {
 			value: { type: Array, required: false, default: () => [] },
 		},
-		data: function () {
-			return {
-				/**
-				 * Form description of the template of one single item
-				 */
-				template: this.getOption("template", [{ type: "Input", name: "text" }]),
-				/**
-				 * Form description of the template of one single item
-				 */
-				templateAdd: this.getOption("templateAdd", [{ type: "Button", content: "Add", action: "approve" }]),
-				/**
-				 * Conversion function to translate to values when add is pressed.
-				 */
-				toValues: this.getOption("toValues", (values) => values),
-				/**
-				 * Force the value to have at least one entry
-				 */
-				atLeastOne: this.getOption("atLeastOne", false),
-				/**
-				 * Allow add a new element
-				 */
-				allowAdd: this.getOption("allowAdd", true),
-				/**
-				 * Allow add a new element even if one of the others is empty
-				 */
-				allowAddIfEmpty: this.getOption("allowAddIfEmpty", false),
-				/**
-				 * Allow items to be deleted
-				 */
-				allowDelete: this.getOption("allowDelete", true),
-				/**
-				 * Allow the elements to be inline
-				 */
-				inline: this.getOption("inline", false),
-				/**
-				 * Display the grip handle
-				 */
-				gripHandle: this.getOption("gripHandle", true),
-				/**
-				 * Hide the add button when it is supposed to be disabled
-				 */
-				hideAddWhenDisabled: this.getOption("hideAddWhenDisabled", false),
-				/**
-				 * Maximum number of items (if set to 0, there is no limit)
-				 */
-				max: this.getOption("max", 0),
-				/**
-				 * Let the component fill the whole available space,
-				 * this should be only used when max = 1
-				 */
-				fill: this.getOption("fill", false),
-			};
-		},
 		computed: {
+			/// ---- CONFIG ----------------------------------------
+			/// Form description of the template of one single item
+			template() {
+				return this.getOption("template", [{ type: "Input", name: "text" }]);
+			},
+			/// Form description of the template of one single item
+			templateAdd() {
+				return this.getOption("templateAdd", [{ type: "Button", content: "Add", action: "approve" }]);
+			},
+			/// Conversion function to translate to values when add is pressed.
+			toValues() {
+				return this.getOption("toValues", (values) => values);
+			},
+			/// Force the value to have at least one entry
+			atLeastOne() {
+				return this.getOption("atLeastOne", false);
+			},
+			/// Allow add a new element
+			allowAdd() {
+				return this.getOption("allowAdd", true);
+			},
+			/// Allow add a new element even if one of the others is empty
+			allowAddIfEmpty() {
+				return this.getOption("allowAddIfEmpty", false);
+			},
+			/// Allow items to be deleted
+			allowDelete() {
+				return this.getOption("allowDelete", true);
+			},
+			/// Allow the elements to be inline
+			inline() {
+				return this.getOption("inline", false);
+			},
+			/// Display the grip handle
+			gripHandle() {
+				return this.getOption("gripHandle", true);
+			},
+			/// Hide the add button when it is supposed to be disabled
+			hideAddWhenDisabled() {
+				return this.getOption("hideAddWhenDisabled", false);
+			},
+			/// Maximum number of items (if set to 0, there is no limit)
+			max() {
+				return this.getOption("max", 0);
+			},
+			/// Let the component fill the whole available space,
+			/// this should be only used when max = 1
+			fill() {
+				return this.getOption("fill", false);
+			},
+			/// ---- IMPLEMENTATION ----------------------------------
 			valueType() {
 				return "list";
 			},

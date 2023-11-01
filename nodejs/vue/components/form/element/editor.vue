@@ -34,7 +34,6 @@
 		},
 		data: function () {
 			return {
-				placeholder: this.getOption("placeholder", ""),
 				toolbar: [
 					"undo",
 					"separator",
@@ -61,6 +60,11 @@
 			};
 		},
 		computed: {
+			/// ---- CONFIG ----------------------------------------
+			placeholder() {
+				return this.getOption("placeholder", "");
+			},
+			/// ---- IMPLEMENTATION ----------------------------------
 			containerClass() {
 				return {
 					"irform-editor": true,
