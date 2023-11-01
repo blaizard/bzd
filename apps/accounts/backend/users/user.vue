@@ -89,7 +89,7 @@
 								caption: "Roles",
 								name: "roles",
 								multi: true,
-								list: [...this.roles, "Hello"],
+								list: this.roles,
 								width: 0.3,
 							},
 						],
