@@ -7,7 +7,7 @@
 			<span class="irform-input-multi" v-for="(value, index) in valueList" :key="index">
 				<span class="irform-input-multi-item">
 					<span v-html="getDisplayValue(value, /*editable*/ false)"></span>
-					<span v-if="editable" class="irform-input-multi-delete" @click.stop="valueListRemove(index)">x</span>
+					<span class="irform-input-multi-delete" @click.stop="valueListRemove(index)">x</span>
 				</span>
 			</span>
 

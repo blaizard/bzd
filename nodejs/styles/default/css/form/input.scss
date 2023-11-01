@@ -47,11 +47,11 @@
 				@extend %clickable;
 
 				.irform-input-multi-delete {
+					margin-left: #{base.$fieldPaddingX}px;
 					@include base.buttonClose(math.div(base.$fieldTextHeight, 1.5), base.$fieldSpecialTextColor);
 				}
 			}
 		}
-
 		.irform-input-body {
 			flex: 1;
 			white-space: nowrap;
