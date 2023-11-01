@@ -23,7 +23,7 @@
 						@submit="handleSubmit(current)"
 						@input-with-context="handleInputWithContext(index, $event)"
 						:description="current"
-						:context="{ ...context, name: getName(current, index) }"
+						:context="context"
 						:disable="getDisable(current)"
 						v-tooltip="current.tooltip"
 					>
