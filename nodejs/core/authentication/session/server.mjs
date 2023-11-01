@@ -118,21 +118,11 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 
 		// Use a refresh token to create an access token.
 		api.handle("post", "/auth/refresh", async function () {
-			const refreshToken = this.getCookie("refresh_token", null);
-			if (refreshToken == null) {
+			const maybeTokenObject = await authentication._getAndRefreshAccessToken(this);
+			if (!maybeTokenObject) {
 				throw this.httpError(401, "Unauthorized");
 			}
-
-			const [uid, hash] = authentication._readToken(refreshToken);
-			const maybeToken = await authentication.options.refreshToken(uid, hash);
-			if (!maybeToken) {
-				throw this.httpError(401, "Unauthorized");
-			}
-
-			// TODO: handle rolling token.
-
-			const userInfo = new User(maybeToken.uid, maybeToken.roles);
-			return await authentication._makeAccessToken(userInfo);
+			return maybeTokenObject;
 		});
 	}
 
@@ -186,22 +176,77 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 
 	/// Verify that a request is authenticated.
 	async _verifyImpl(context, callback) {
+		let maybeUser = await this._getAndVerifyAccessToken(context);
+		if (!maybeUser) {
+			const maybeTokenObject = await this._getAndRefreshAccessToken(context);
+			if (!maybeTokenObject) {
+				return false;
+			}
+			maybeUser = await this._verifyAccessToken(maybeTokenObject.token);
+			if (!maybeUser) {
+				return false;
+			}
+		}
+		return await callback(maybeUser);
+	}
+
+	/// Refresh an access token from a refresh token.
+	async _getAndRefreshAccessToken(context) {
+		const refreshToken = context.getCookie("refresh_token", null);
+		if (refreshToken == null) {
+			return false;
+		}
+
+		const [uid, hash] = this._readToken(refreshToken);
+		const maybeToken = await this.options.refreshToken(uid, hash);
+		if (!maybeToken) {
+			return false;
+		}
+
+		// TODO: handle rolling token.
+
+		// Create the access token.
+		const userInfo = new User(maybeToken.uid, maybeToken.roles);
+		const accessToken = await this._makeAccessToken(userInfo);
+		context.setCookie("access_token", accessToken.token, {
+			httpOnly: true,
+			maxAge: accessToken.timeout * 1000,
+		});
+
+		return accessToken;
+	}
+
+	async _getAndVerifyAccessToken(context) {
+		const maybeToken = this._getAccessToken(context);
+		if (!maybeToken) {
+			return false;
+		}
+		const maybeUser = await this._verifyAccessToken(maybeToken);
+		if (!maybeUser) {
+			return false;
+		}
+		return maybeUser;
+	}
+
+	_getAccessToken(context) {
 		let token = null;
 		const data = context.getHeader("authorization", "").split(" ");
 		if (data.length == 2 && data[0].toLowerCase() == "bearer") {
 			token = data[1];
-		} else {
+		}
+		if (!token) {
 			token = context.getQuery("t");
 		}
-
 		if (!token) {
-			return false;
+			token = this.getCookie("access_token", null);
 		}
-
-		return await this._verifyAccessToken(token, callback);
+		if (!token) {
+			return null;
+		}
+		return token;
 	}
 
-	async _verifyAccessToken(token, verifyCallback) {
+	async _verifyAccessToken(token) {
 		const [uid, hash] = this._readToken(token);
 		const maybeSessions = await this.options.kvs.get(this.options.kvsBucket, uid, null);
 		// No session for this user.
@@ -219,6 +264,7 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		if (maybeSession.expiration < this._getTimestamp()) {
 			return false;
 		}
-		return await verifyCallback(new User(uid, maybeSession.roles));
+
+		return new User(uid, maybeSession.roles);
 	}
 }
