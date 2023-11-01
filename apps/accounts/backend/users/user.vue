@@ -36,6 +36,9 @@
 			changesContent() {
 				return this.hasChanges ? "Apply (" + this.nbChanges + ")" : "Apply";
 			},
+			roles() {
+				return this.user.roles || [];
+			},
 			description() {
 				return [
 					{
@@ -81,7 +84,14 @@
 								width: 0.3,
 							},
 							{ type: "Date", caption: "Expiration", name: "expiration", width: 0.3 },
-							{ type: "Input", caption: "Roles", name: "roles", multi: true, disable: true, width: 0.3 },
+							{
+								type: "Dropdown",
+								caption: "Roles",
+								name: "roles",
+								multi: true,
+								list: [...this.roles, "Hello"],
+								width: 0.3,
+							},
 						],
 						allowAdd: false,
 						toInputValue: "map_to_list",

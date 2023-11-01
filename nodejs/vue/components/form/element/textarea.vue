@@ -25,13 +25,15 @@
 			value: { type: String, required: false, default: "" },
 			tag: { type: String, required: false, default: "textarea" },
 		},
-		data: function () {
-			return {
-				autoResize: this.getOption("auto-resize", true),
-				placeholder: this.getOption("placeholder", ""),
-			};
-		},
 		computed: {
+			/// ---- CONFIG ----------------------------------------
+			autoResize() {
+				return this.getOption("auto-resize", true);
+			},
+			placeholder() {
+				return this.getOption("placeholder", "");
+			},
+			/// ---- IMPLEMENTATION ----------------------------------
 			containerClass() {
 				return {
 					"irform-textarea": true,

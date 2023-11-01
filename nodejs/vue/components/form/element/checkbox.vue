@@ -22,14 +22,16 @@
 			value: { type: Boolean, required: false, default: false },
 		},
 		computed: {
+			/// ---- CONFIG ----------------------------------------
+			text() {
+				return this.getOption("text", "");
+			},
+			/// ---- IMPLEMENTATION ----------------------------------
 			containerClass() {
 				return {
 					"irform-checkbox": true,
 					[this.getOption("class")]: true,
 				};
-			},
-			text() {
-				return this.getOption("text", "");
 			},
 		},
 		methods: {
