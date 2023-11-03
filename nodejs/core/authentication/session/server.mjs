@@ -113,6 +113,22 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 
 		// Use a refresh token to create an access token.
 		api.handle("post", "/auth/refresh", async function () {
+			// Check if there is an access_token
+			const maybeAccessToken = authentication._getAccessToken(this);
+			if (maybeAccessToken) {
+				const result = await authentication._verifyAccessToken(
+					maybeAccessToken,
+					authentication.options.tokenAccessExpiresInReuse,
+				);
+				if (result) {
+					return {
+						token: authentication._makeToken(result.user.getUid(), result.session.hash),
+						timeout: result.session.expiration - authentication._getTimestamp(),
+					};
+				}
+			}
+
+			// If not, refresh the token from the refresh_token.
 			const maybeTokenObject = await authentication._getAndRefreshAccessToken(this);
 			if (!maybeTokenObject) {
 				throw this.httpError(401, "Unauthorized");
@@ -198,11 +214,11 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		if (!maybeToken) {
 			return false;
 		}
-		const maybeUser = await this._verifyAccessToken(maybeToken);
-		if (!maybeUser) {
+		const result = await this._verifyAccessToken(maybeToken);
+		if (!result) {
 			return false;
 		}
-		return await callback(maybeUser);
+		return await callback(result.user);
 	}
 
 	/// Refresh an access token from a refresh token.
@@ -224,12 +240,17 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		const userInfo = new User(maybeToken.uid, maybeToken.roles);
 		const accessToken = await this._makeAccessToken(userInfo);
 		context.setCookie("access_token", accessToken.token, {
+			httpOnly: true,
 			maxAge: accessToken.timeout * 1000,
 		});
 
 		return accessToken;
 	}
 
+	/// Get the access token from an HTTP context.
+	///
+	/// \param context The HTTP context.
+	/// \return The access token if any, null otherwise.
 	_getAccessToken(context) {
 		let token = null;
 		const data = context.getHeader("authorization", "").split(" ");
@@ -240,7 +261,7 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 			token = context.getQuery("t");
 		}
 		if (!token) {
-			token = this.getCookie("access_token", null);
+			token = context.getCookie("access_token", null);
 		}
 		if (!token) {
 			return null;
@@ -248,7 +269,12 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		return token;
 	}
 
-	async _verifyAccessToken(token) {
+	/// Check the status of an access token.
+	///
+	/// \param token The token to be checked.
+	/// \param minTimeoutS Minimum timeout that make this token valid.
+	/// \return A object with a "user" field and a "session" field for the token, false otherwise.
+	async _verifyAccessToken(token, minTimeoutS = 0) {
 		const [uid, hash] = this._readToken(token);
 		const maybeSessions = await this.options.kvs.get(this.options.kvsBucket, uid, null);
 		// No session for this user.
@@ -263,10 +289,13 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		}
 
 		// Expired.
-		if (maybeSession.expiration < this._getTimestamp()) {
+		if (maybeSession.expiration < this._getTimestamp() + minTimeoutS) {
 			return false;
 		}
 
-		return new User(uid, maybeSession.roles);
+		return {
+			user: new User(uid, maybeSession.roles),
+			session: maybeSession,
+		};
 	}
 }
