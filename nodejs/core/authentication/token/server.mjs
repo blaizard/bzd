@@ -53,7 +53,7 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 		});
 	}
 
-	_installAPIImpl(api) {
+	async _installAPIImpl(api) {
 		Log.debug("Installing token-based authentication API.");
 
 		const authentication = this;

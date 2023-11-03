@@ -28,7 +28,7 @@ export default class StripePayment {
 		this.card = null;
 	}
 
-	installAPI(api) {
+	async installAPI(api) {
 		Log.debug("Installing Stripe payment API.");
 		api.addSchema(APISchema);
 		if (!this.options.makePaymentIntent) {

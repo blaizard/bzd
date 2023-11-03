@@ -146,7 +146,7 @@ export default class Users {
 		return user;
 	}
 
-	installAPI(api) {
+	async installAPI(api) {
 		Log.info("Installing 'Users' API");
 
 		const users = this;

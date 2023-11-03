@@ -17,49 +17,37 @@ export default class AuthenticationClient {
 		);
 	}
 
-	installAPI(api) {
-		return this._installAPIImpl(api);
+	async installAPI(api) {
+		await this._installAPIImpl(api);
 	}
 
-	/**
-	 * Return true if the client is authenticated, false otherwise.
-	 */
-	isAuthenticated() {
-		return this._isAuthenticatedImpl();
+	/// Return true if the client is authenticated, false otherwise.
+	async isAuthenticated() {
+		return await this._isAuthenticatedImpl();
 	}
 
-	/**
-	 * Attempt to refresh an authentication
-	 */
+	/// Attempt to refresh an authentication
 	async refreshAuthentication() {
-		return this._refreshAuthenticationImpl();
+		await this._refreshAuthenticationImpl();
 	}
 
-	/**
-	 * Attempt to login
-	 */
+	/// Attempt to login
 	async login(api, uid, password, persistent = false) {
-		return this._loginImpl(api, uid, password, persistent);
+		await this._loginImpl(api, uid, password, persistent);
 	}
 
-	/**
-	 * Attempt to logout
-	 */
+	/// Attempt to logout
 	async logout(api) {
-		return this._logoutImpl(api);
+		await this._logoutImpl(api);
 	}
 
-	/**
-	 * Set authentication information to the fetch request
-	 */
+	/// Set authentication information to the fetch request
 	async setAuthenticationFetch(fetchOptions) {
-		return this._setAuthenticationFetchImpl(fetchOptions);
+		return await this._setAuthenticationFetchImpl(fetchOptions);
 	}
 
-	/**
-	 * Make an authentication URL from a base URL
-	 */
+	/// Make an authentication URL from a base URL
 	async makeAuthenticationURL(url) {
-		return this._makeAuthenticationURLImpl(url);
+		return await this._makeAuthenticationURLImpl(url);
 	}
 }

@@ -32,7 +32,7 @@ export default class StripePayment {
 		);
 	}
 
-	installAPI(api) {
+	async installAPI(api) {
 		Log.debug("Installing Stripe payment API.");
 		api.addSchema(APISchema);
 

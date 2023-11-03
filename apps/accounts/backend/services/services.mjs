@@ -87,7 +87,7 @@ export default class Services {
 		}
 	}
 
-	installAPI(api) {
+	async installAPI(api) {
 		Log.info("Installing 'Services' API");
 
 		// ---- Admin specific API

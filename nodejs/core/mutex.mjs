@@ -41,11 +41,11 @@ export default class Mutex {
 			const callback = this.queue.shift();
 			// Immediatly process the next item with the next tick. This is done in order
 			// to avoid long call stacks.
-			process.nextTick(() => {
+			setTimeout(() => {
 				callback(() => {
 					this.release();
 				});
-			});
+			}, 0);
 		} else {
 			this.isLock = false;
 		}

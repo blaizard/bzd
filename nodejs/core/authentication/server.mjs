@@ -22,8 +22,8 @@ export default class AuthenticationServer {
 		);
 	}
 
-	installAPI(api) {
-		return this._installAPIImpl(api);
+	async installAPI(api) {
+		await this._installAPIImpl(api);
 	}
 
 	/// Called when a request is received on the server side, to verify that the content is properly authorized.

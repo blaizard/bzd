@@ -1,4 +1,5 @@
 import ExceptionFactory from "../exception.mjs";
+import Event from "#bzd/nodejs/core/event.mjs";
 
 const Exception = ExceptionFactory("api");
 
@@ -27,6 +28,17 @@ export default class API {
 		);
 
 		this.schema = schema;
+		this.event = new Event({
+			ready: { proactive: true },
+			error: { proactive: true },
+		});
+	}
+
+	/**
+	 * This function waits until the module is ready
+	 */
+	async waitReady() {
+		return await this.event.waitUntil("ready");
 	}
 
 	/**
@@ -51,10 +63,10 @@ export default class API {
 	/// Install all available plugins.
 	///
 	/// \note This needs to run after the constructor is completed.
-	_installPlugins() {
-		this.options.plugins.forEach((plugin) => {
-			plugin.installAPI(this);
-		});
+	async _installPlugins() {
+		for (const plugin of this.options.plugins) {
+			await plugin.installAPI(this);
+		}
 	}
 
 	/**

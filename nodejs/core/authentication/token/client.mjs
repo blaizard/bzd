@@ -1,6 +1,7 @@
 import ExceptionFactory from "../../exception.mjs";
 import LogFactory from "../../log.mjs";
 import AuthenticationClient from "../client.mjs";
+import Mutex from "#bzd/nodejs/core/mutex.mjs";
 
 const Exception = ExceptionFactory("authentication", "token");
 const Log = LogFactory("authentication", "token");
@@ -8,24 +9,31 @@ const Log = LogFactory("authentication", "token");
 export default class TokenAuthenticationClient extends AuthenticationClient {
 	constructor(options) {
 		super(options, {
-			/**
-			 * Callback to refresh an invalid token.
-			 * Returns a dictionary with the token and refresh_token keys.
-			 * Returns null in case the refresh got invalidated.
-			 */
+			// Callback to refresh an invalid token.
+			// Returns a dictionary with the token and refresh_token keys.
+			// Returns null in case the refresh got invalidated.
 			refreshTokenCallback: null,
 		});
 
 		// Token to be used during this session.
-		this.token = null;
+		this.token = undefined;
+		// Used to set the state of the authentication.
+		this.mutex = new Mutex();
 		this.interval = null;
 	}
 
-	_isAuthenticatedImpl() {
-		return this.token !== null;
+	async _isAuthenticatedImpl() {
+		await this.mutex.lock();
+		if (this.token === undefined) {
+			// Try to refresh the current token if any
+			await this.tryRefreshAuthentication(/*nothrow*/ true);
+		}
+		await this.mutex.release();
+
+		return Boolean(this.token);
 	}
 
-	_installAPIImpl(api) {
+	async _installAPIImpl(api) {
 		Log.debug("Installing token-based authentication API.");
 
 		if (!this.options.refreshTokenCallback) {
@@ -33,17 +41,11 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 				return await api.request("post", "/auth/refresh");
 			};
 		}
-
-		// Try to refresh the current token if any
-		this.tryRefreshAuthentication(/*nothrow*/ true);
 	}
 
 	setToken(token, timeoutS = 0) {
-		const isPreviousAuthenticated = this.isAuthenticated();
 		this.token = token;
-		if (isPreviousAuthenticated != this.isAuthenticated()) {
-			this.options.onAuthentication(this.isAuthenticated());
-		}
+		this.options.onAuthentication(this.token !== null);
 
 		if (this.interval) {
 			clearInterval(this.interval);
@@ -59,19 +61,19 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 		}
 	}
 
-	/**
-	 * Try to refresh the token
-	 */
+	/// Try to refresh the token
 	async tryRefreshAuthentication(nothrow = false) {
 		if (this.options.refreshTokenCallback) {
 			try {
 				const result = await this.options.refreshTokenCallback();
 				if (result) {
 					Exception.assert("token" in result, "Missing token.");
+					Exception.assert("timeout" in result, "Missing timeout.");
 					this.setToken(result.token, result.timeout);
 					return true;
 				}
 			} catch (e) {
+				this.setToken(null);
 				if (!nothrow && e.code != 401 /*Unauthorized*/) {
 					throw e;
 				}
@@ -86,7 +88,6 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 			return;
 		}
 		this.setToken(null);
-		this.options.onAuthentication(false);
 
 		if (this.options.unauthorizedCallback) {
 			await this.options.unauthorizedCallback();
@@ -122,8 +123,9 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 			password: password,
 			persistent: persistent,
 		});
+		Exception.assert("token" in result, "Missing token.");
+		Exception.assert("timeout" in result, "Missing timeout.");
 		this.setToken(result.token, result.timeout);
-		return true;
 	}
 
 	async _logoutImpl(api) {

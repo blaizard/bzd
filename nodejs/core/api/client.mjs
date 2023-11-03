@@ -11,7 +11,9 @@ const Exception = ExceptionFactory("api", "client");
 export default class APIClient extends Base {
 	constructor(schema, options) {
 		super(schema, options);
-		this._installPlugins();
+		this._installPlugins()
+			.then(() => this.event.trigger("ready"))
+			.catch((e) => this.event.trigger("error", e));
 	}
 
 	updateForm(method, endpoint, formDescription) {
@@ -102,6 +104,7 @@ export default class APIClient extends Base {
 					this.isAuthentication(),
 					"This route has authentication requirement but no authentication object was specified.",
 				);
+				Exception.assert(await this.options.authentication.isAuthenticated(), "A user must be authenticated.");
 				await this.options.authentication.setAuthenticationFetch(fetchOptions);
 			}
 

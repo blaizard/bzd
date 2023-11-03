@@ -48,6 +48,8 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 			maxSessionsPerUser: 5,
 			// Time in seconds after which the access token will expire.
 			tokenAccessExpiresIn: 5 * 60,
+			// Reuse token that have x seconds left.
+			tokenAccessExpiresInReuse: 60,
 			// Time in seconds after which the refresh token will expire.
 			tokenRefreshShortTermExpiresIn: 30 * 60,
 			// Time in seconds after which the refresh token will expire.
@@ -65,16 +67,9 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 			this.options.removeRefreshToken,
 			"The callback to remove a refresh token must be set, set 'removeRefreshToken'.",
 		);
-
-		this.validationRefreshToken = new Validation({
-			uid: "mandatory",
-			roles: "mandatory",
-			persistent: "mandatory",
-			session: "mandatory",
-		});
 	}
 
-	_installAPIImpl(api) {
+	async _installAPIImpl(api) {
 		Log.debug("Installing session-based authentication API.");
 
 		const authentication = this;
@@ -132,6 +127,25 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 
 	/// Create a new session, save it and return the token.
 	async _makeAccessToken(user) {
+		// Check if there is an exisitng access token with a valid expiration date that can be re-used.
+		const maybeSessions = await this.options.kvs.get(this.options.kvsBucket, user.uid, null);
+		if (maybeSessions) {
+			for (const [hash, session] of Object.entries(maybeSessions.sessions)) {
+				const timeoutS = session.expiration - this._getTimestamp();
+				// If too old, do not consider anymore, as this array is ordered.
+				if (timeoutS < this.options.tokenAccessExpiresInReuse) {
+					break;
+				}
+				// If the session has the same roles, re-use it1
+				if (user.sameRolesAs(session.roles)) {
+					return {
+						token: this._makeToken(user.uid, session.hash),
+						timeout: timeoutS,
+					};
+				}
+			}
+		}
+
 		const session = {
 			hash: this._makeTokenHash(),
 			expiration: this._getTimestamp() + this.options.tokenAccessExpiresIn,
@@ -175,17 +189,18 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 	}
 
 	/// Verify that a request is authenticated.
+	///
+	/// This verifies the access token.
+	/// \note We cannot refresh the access token as part of this process
+	/// because it needs to live in a query (not cookie) because of of fetch requests.
 	async _verifyImpl(context, callback) {
-		let maybeUser = await this._getAndVerifyAccessToken(context);
+		const maybeToken = this._getAccessToken(context);
+		if (!maybeToken) {
+			return false;
+		}
+		const maybeUser = await this._verifyAccessToken(maybeToken);
 		if (!maybeUser) {
-			const maybeTokenObject = await this._getAndRefreshAccessToken(context);
-			if (!maybeTokenObject) {
-				return false;
-			}
-			maybeUser = await this._verifyAccessToken(maybeTokenObject.token);
-			if (!maybeUser) {
-				return false;
-			}
+			return false;
 		}
 		return await callback(maybeUser);
 	}
@@ -209,23 +224,10 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		const userInfo = new User(maybeToken.uid, maybeToken.roles);
 		const accessToken = await this._makeAccessToken(userInfo);
 		context.setCookie("access_token", accessToken.token, {
-			httpOnly: true,
 			maxAge: accessToken.timeout * 1000,
 		});
 
 		return accessToken;
-	}
-
-	async _getAndVerifyAccessToken(context) {
-		const maybeToken = this._getAccessToken(context);
-		if (!maybeToken) {
-			return false;
-		}
-		const maybeUser = await this._verifyAccessToken(maybeToken);
-		if (!maybeUser) {
-			return false;
-		}
-		return maybeUser;
 	}
 
 	_getAccessToken(context) {

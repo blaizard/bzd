@@ -36,7 +36,9 @@ class APIServerContext extends HttpServerContext {
 export default class APIServer extends Base {
 	constructor(schema, options) {
 		super(schema, options);
-		this._installPlugins();
+		this._installPlugins()
+			.then(() => this.event.trigger("ready"))
+			.catch((e) => this.event.trigger("error", e));
 	}
 
 	/// Register a callback to handle a request
@@ -84,7 +86,7 @@ export default class APIServer extends Base {
 					if (isAuthorized) {
 						const authenticationSchema = this.schema[endpoint][method].authentication;
 						if (typeof authenticationSchema == "string" || Array.isArray(authenticationSchema)) {
-							isAuthorized &= await authenticationData.user.matchAnyRoles(authenticationSchema);
+							isAuthorized &= authenticationData.user.matchAnyRoles(authenticationSchema);
 						}
 					}
 					if (!isAuthorized) {
