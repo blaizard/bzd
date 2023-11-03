@@ -4,6 +4,9 @@ export default {
 			data: {
 				isAuthenticated: false,
 			},
+			async mounted() {
+				this.isAuthenticated = await authentication.isAuthenticated();
+			},
 		});
 
 		Vue.prototype.$makeAuthenticationURL = (url) => authentication.makeAuthenticationURL(url);
