@@ -28,12 +28,12 @@ export default class AuthenticationClient {
 
 	/// Attempt to refresh an authentication
 	async refreshAuthentication() {
-		await this._refreshAuthenticationImpl();
+		return await this._refreshAuthenticationImpl();
 	}
 
 	/// Attempt to login
 	async login(api, uid, password, persistent = false) {
-		await this._loginImpl(api, uid, password, persistent);
+		return await this._loginImpl(api, uid, password, persistent);
 	}
 
 	/// Attempt to logout

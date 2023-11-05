@@ -172,6 +172,17 @@ class RouterManager {
 		);
 	}
 
+	getDefaultQuery() {
+		return window.location.search
+			.replace("?", "")
+			.split("&")
+			.reduce((object, entry) => {
+				const [key, value] = entry.split("=");
+				object[decodeURIComponent(key)] = decodeURIComponent(value);
+				return object;
+			}, {});
+	}
+
 	/**
 	 * Dispatch a new path to the routers
 	 */
@@ -180,13 +191,9 @@ class RouterManager {
 
 		options = Object.assign(
 			{
-				/**
-				 * Query to be added to the URL.
-				 */
-				query: {},
-				/**
-				 * Custom properties that will be added to the component.
-				 */
+				/// Query to be added to the URL.
+				query: "query" in options ? {} : this.getDefaultQuery(),
+				/// Custom properties that will be added to the component.
 				props: {},
 			},
 			options,
