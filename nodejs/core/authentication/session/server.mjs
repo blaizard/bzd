@@ -2,7 +2,6 @@ import Crypto from "crypto";
 
 import ExceptionFactory from "../../exception.mjs";
 import LogFactory from "../../log.mjs";
-import Validation from "../../validation.mjs";
 import AuthenticationServer from "../server.mjs";
 import User from "../user.mjs";
 import KeyValueStoreMemory from "#bzd/nodejs/db/key_value_store/memory.mjs";
@@ -101,14 +100,27 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		});
 
 		api.handle("post", "/auth/logout", async function () {
-			const refreshToken = this.getCookie("refresh_token", null);
-			if (refreshToken == null) {
-				return;
+			// Remove the cookies
+			const maybeAccessToken = authentication._getAccessToken(this);
+			this.deleteCookie("access_token");
+			const maybeRefreshToken = this.getCookie("refresh_token", null);
+			this.deleteCookie("refresh_token");
+
+			if (maybeAccessToken) {
+				const [uid, hash] = authentication._readToken(maybeAccessToken);
+				await authentication.options.kvs.update(authentication.options.kvsBucket, uid, (data) => {
+					return {
+						sessions: data.sessions.filter((session) => {
+							return session.hash != hash;
+						}),
+					};
+				});
 			}
 
-			const [uid, hash] = authentication._readToken(refreshToken);
-			await authentication.options.removeRefreshToken(uid, hash);
-			this.deleteCookie("refresh_token");
+			if (maybeRefreshToken) {
+				const [uid, hash] = authentication._readToken(maybeRefreshToken);
+				await authentication.options.removeRefreshToken(uid, hash);
+			}
 		});
 
 		// Use a refresh token to create an access token.
@@ -137,6 +149,7 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		});
 	}
 
+	/// Get the current timestamp in seconds.
 	_getTimestamp() {
 		return Math.floor(Date.now() / 1000);
 	}

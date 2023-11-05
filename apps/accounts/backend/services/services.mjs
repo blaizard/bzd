@@ -4,6 +4,31 @@ import LogFactory from "#bzd/nodejs/core/log.mjs";
 const Exception = ExceptionFactory("services");
 const Log = LogFactory("services");
 
+class ServiceProvider {
+	constructor() {
+		this.service_ = {
+			instances: {},
+			generator: generator,
+			process: process,
+			options: {},
+		};
+	}
+
+	serviceAdd(name, process) {
+		Exception.assert(!(name in this.service_.instances), "The service name '{}' is already registered.", name);
+		this.service_.instances[name] = process;
+	}
+
+	get service() {
+		return {
+			generator: async () => {
+				return Object.entries(this.instances);
+			},
+			process: async(name, data),
+		};
+	}
+}
+
 export default class Services {
 	constructor() {
 		this.schema = {};
