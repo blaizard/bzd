@@ -70,7 +70,7 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 					Exception.assert("token" in result, "Missing token.");
 					Exception.assert("timeout" in result, "Missing timeout.");
 					this.setToken(result.token, result.timeout);
-					return true;
+					return result;
 				}
 			} catch (e) {
 				this.setToken(null);
@@ -84,8 +84,9 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 
 	async _refreshAuthenticationImpl() {
 		// Try to refresh the token
-		if (await this.tryRefreshAuthentication(/*nothrow*/ false)) {
-			return;
+		const result = await this.tryRefreshAuthentication(/*nothrow*/ false);
+		if (result) {
+			return result;
 		}
 		this.setToken(null);
 
@@ -126,6 +127,7 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 		Exception.assert("token" in result, "Missing token.");
 		Exception.assert("timeout" in result, "Missing timeout.");
 		this.setToken(result.token, result.timeout);
+		return result;
 	}
 
 	async _logoutImpl(api) {
