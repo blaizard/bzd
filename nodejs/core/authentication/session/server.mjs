@@ -80,20 +80,21 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 			// Verify uid/password pair
 			const userInfo = await authentication.options.verifyIdentity(inputs.uid, inputs.password);
 			if (userInfo) {
+				const user = new User(userInfo.uid, userInfo.roles);
 				// Generate the refresh token.
 				const hash = authentication._makeTokenHash();
 				const timeoutS = inputs.persistent
 					? authentication.options.tokenRefreshLongTermExpiresIn
 					: authentication.options.tokenRefreshShortTermExpiresIn;
-				await authentication.options.saveRefreshToken(userInfo.uid, hash, timeoutS, /*rolling*/ true);
-				const refreshToken = authentication._makeToken(userInfo.uid, hash);
+				await authentication.options.saveRefreshToken(user.getUid(), hash, timeoutS, /*rolling*/ true);
+				const refreshToken = authentication._makeToken(user.getUid(), hash);
 				this.setCookie("refresh_token", refreshToken, {
 					httpOnly: true,
 					maxAge: timeoutS * 1000,
 				});
 
 				// Generate the access token.
-				return await authentication._makeAccessToken(userInfo);
+				return await authentication._makeAccessToken(user);
 			}
 
 			throw this.httpError(401, "Unauthorized");
@@ -157,9 +158,9 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 	/// Create a new session, save it and return the token.
 	async _makeAccessToken(user) {
 		// Check if there is an exisitng access token with a valid expiration date that can be re-used.
-		const maybeSessions = await this.options.kvs.get(this.options.kvsBucket, user.uid, null);
+		const maybeSessions = await this.options.kvs.get(this.options.kvsBucket, user.getUid(), null);
 		if (maybeSessions) {
-			for (const [hash, session] of Object.entries(maybeSessions.sessions)) {
+			for (const session of maybeSessions.sessions) {
 				const timeoutS = session.expiration - this._getTimestamp();
 				// If too old, do not consider anymore, as this array is ordered.
 				if (timeoutS < this.options.tokenAccessExpiresInReuse) {
@@ -168,7 +169,7 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 				// If the session has the same roles, re-use it1
 				if (user.sameRolesAs(session.roles)) {
 					return {
-						token: this._makeToken(user.uid, session.hash),
+						token: this._makeToken(user.getUid(), session.hash),
 						timeout: timeoutS,
 					};
 				}
@@ -178,13 +179,13 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		const session = {
 			hash: this._makeTokenHash(),
 			expiration: this._getTimestamp() + this.options.tokenAccessExpiresIn,
-			roles: user.roles,
+			roles: user.getRoles(),
 		};
 
 		// Insert the new session and return the token.
 		await this.options.kvs.update(
 			this.options.kvsBucket,
-			user.uid,
+			user.getUid(),
 			(data) => {
 				// Remove the sessions that will expire the first if too many.
 				if (data.length >= this.options.maxSessionsPerUser) {
@@ -199,7 +200,7 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 
 		// Return the token
 		return {
-			token: this._makeToken(user.uid, session.hash),
+			token: this._makeToken(user.getUid(), session.hash),
 			timeout: this.options.tokenAccessExpiresIn,
 		};
 	}
@@ -250,8 +251,8 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		// TODO: handle rolling token.
 
 		// Create the access token.
-		const userInfo = new User(maybeToken.uid, maybeToken.roles);
-		const accessToken = await this._makeAccessToken(userInfo);
+		const user = new User(maybeToken.uid, maybeToken.roles);
+		const accessToken = await this._makeAccessToken(user);
 		context.setCookie("access_token", accessToken.token, {
 			httpOnly: true,
 			maxAge: accessToken.timeout * 1000,

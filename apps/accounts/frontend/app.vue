@@ -7,6 +7,7 @@
 			<template v-if="$authentication.isAuthenticated">
 				<MenuEntry text="Configuration" icon="bzd-icon-images" link="/"></MenuEntry>
 				<MenuEntry text="Admin" icon="bzd-icon-newspaper" link="/admin"></MenuEntry>
+				<MenuEntry text="Logout" icon="bzd-icon-newspaper" link="/logout"></MenuEntry>
 			</template>
 		</template>
 		<template #content>
