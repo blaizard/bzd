@@ -189,10 +189,3 @@ esac
 fi
 
 _bzd_echo -e "\tdone"
-
-# Load command line fuzzy finder
-if [ -f ~/.fzf.bash ]; then
-	source ~/.fzf.bash
-else
-	_bzd_echo "Command line fuzzy finder (fzf) is not installed."
-fi
