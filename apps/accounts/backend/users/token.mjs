@@ -38,6 +38,18 @@ export default class TokenInfo {
 		return this.value.rolling || false;
 	}
 
+	// Update the minimal duration of this token
+	updateMinDuration(minDuration) {
+		if (this.duration() < minDuration) {
+			this.value.expiration = Date.now() + minDuration * 1000;
+		}
+	}
+
+	// Duration left for this token.
+	duration() {
+		return Math.max((this.value.expiration - Date.now()) / 1000, 0);
+	}
+
 	isExpired() {
 		return Date.now() > this.value.expiration;
 	}
