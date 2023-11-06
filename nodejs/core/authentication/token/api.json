@@ -5,6 +5,7 @@
             "request": {
                 "type": "json",
                 "validation": {
+                    "identifier": "",
                     "password": "mandatory",
                     "persistent": "",
                     "uid": "mandatory"

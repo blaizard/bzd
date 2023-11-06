@@ -32,8 +32,8 @@ export default class AuthenticationClient {
 	}
 
 	/// Attempt to login
-	async login(api, uid, password, persistent = false) {
-		return await this._loginImpl(api, uid, password, persistent);
+	async login(api, uid, password, persistent = false, identifier = "") {
+		return await this._loginImpl(api, uid, password, persistent, identifier);
 	}
 
 	/// Attempt to logout

@@ -38,7 +38,7 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 			// The bucket name for the sessions to be stored in the key value store.
 			kvsBucket: "sessions",
 			// Function to save a refresh token somewhere.
-			// Its signature is as follow: async (uid, hash, durationS, rolling) { ... }
+			// Its signature is as follow: async (uid, hash, durationS, identifier, rolling) { ... }
 			saveRefreshToken: null,
 			// Function to remove an existing refresh token previously saved.
 			// Its signature is as follow: async (uid, hash) { ... }
@@ -86,7 +86,13 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 				const timeoutS = inputs.persistent
 					? authentication.options.tokenRefreshLongTermExpiresIn
 					: authentication.options.tokenRefreshShortTermExpiresIn;
-				await authentication.options.saveRefreshToken(user.getUid(), hash, timeoutS, /*rolling*/ true);
+				await authentication.options.saveRefreshToken(
+					user.getUid(),
+					hash,
+					timeoutS,
+					inputs.identifier,
+					/*rolling*/ true,
+				);
 				const refreshToken = authentication._makeToken(user.getUid(), hash);
 				this.setCookie("refresh_token", refreshToken, {
 					httpOnly: true,
