@@ -15,9 +15,11 @@ export default class TokenInfo {
 		this.value = value;
 	}
 
-	static make(roles, timeoutS, rolling) {
+	static make(identifier, roles, timeoutS, rolling) {
 		return new TokenInfo({
+			identifier: identifier,
 			roles: roles,
+			creation: Date.now(),
 			expiration: Date.now() + timeoutS * 1000,
 			rolling: rolling,
 		});
@@ -25,6 +27,11 @@ export default class TokenInfo {
 
 	data() {
 		return this.value;
+	}
+
+	// Identifer for this token.
+	identifier() {
+		return this.value.identifier || "<no-id>";
 	}
 
 	isRolling() {

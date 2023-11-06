@@ -118,11 +118,12 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 		return url;
 	}
 
-	async _loginImpl(api, uid, password, persistent) {
+	async _loginImpl(api, uid, password, persistent, identifier) {
 		const result = await api.request("post", "/auth/login", {
 			uid: uid,
 			password: password,
 			persistent: persistent,
+			identifier: identifier,
 		});
 		Exception.assert("token" in result, "Missing token.");
 		Exception.assert("timeout" in result, "Missing timeout.");

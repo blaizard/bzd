@@ -30,9 +30,9 @@ export default class APIClient extends Base {
 		});
 	}
 
-	async login(uid, password) {
+	async login(uid, password, persistent = false, identifier = "") {
 		Exception.assert(this.isAuthentication(), "Authentication is not enabled.");
-		return await this.options.authentication.login(this, uid, password);
+		return await this.options.authentication.login(this, uid, password, persistent, identifier);
 	}
 
 	async logout() {
