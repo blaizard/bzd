@@ -81,7 +81,7 @@ const AUTHENTICATION_PRIVATE_KEY = "abcd";
 				return user;
 			});
 		},
-		refreshToken: async (uid, hash) => {
+		refreshToken: async (uid, hash, factoryNewTokenInfo) => {
 			// If there is no user
 			const maybeUser = await users.get(uid, /*allowNull*/ true);
 			if (maybeUser === null) {
@@ -97,12 +97,25 @@ const AUTHENTICATION_PRIVATE_KEY = "abcd";
 				return false;
 			}
 
-			// Todo (rolling if needed)
-
-			return {
+			let result = {
 				roles: maybeToken.getRoles(),
 				uid: uid,
 			};
+
+			// Rolling token
+			if (maybeToken.isRolling()) {
+				const info = factoryNewTokenInfo();
+				let updatedToken = null;
+				await users.update(uid, (user) => {
+					updatedToken = user.rollToken(hash, info.hash);
+					updatedToken.updateMinDuration(info.minDuration);
+					return user;
+				});
+				result.hash = info.hash;
+				result.timeout = updatedToken.duration();
+			}
+
+			return result;
 		},
 	});
 

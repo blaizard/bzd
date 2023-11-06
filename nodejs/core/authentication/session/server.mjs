@@ -249,12 +249,25 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		}
 
 		const [uid, hash] = this._readToken(refreshToken);
-		const maybeToken = await this.options.refreshToken(uid, hash);
+		const maybeToken = await this.options.refreshToken(uid, hash, () => {
+			return {
+				hash: this._makeTokenHash(),
+				minDuration: this.options.tokenAccessExpiresIn,
+			};
+		});
 		if (!maybeToken) {
 			return false;
 		}
 
-		// TODO: handle rolling token.
+		// If the token has a new hash or timeout, update the cookie.
+		if ("hash" in maybeToken || "timeout" in maybeToken) {
+			const newRefreshToken = maybeToken.hash ? this._makeToken(uid, maybeToken.hash) : refreshToken;
+			const newMaxAge = maybeToken.timeout ? maybeToken.timeout * 1000 : undefined;
+			context.setCookie("refresh_token", newRefreshToken, {
+				httpOnly: true,
+				maxAge: newMaxAge,
+			});
+		}
 
 		// Create the access token.
 		const user = new User(maybeToken.uid, maybeToken.roles);

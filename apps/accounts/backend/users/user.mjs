@@ -206,6 +206,18 @@ export default class User {
 		}
 	}
 
+	rollToken(hash, newHash) {
+		const token = this.getToken(hash, null);
+		Exception.assert(token !== null, "There is no token with this hash: '{}'.", hash);
+		Exception.assert(this.getToken(newHash, null) === null, "There is already a token with this hash: '{}'.", newHash);
+
+		this.modified.push("tokens(-" + hash.slice(0, 16) + "[...] +" + newHash.slice(0, 16) + "[...])");
+		delete this.value.tokens[hash];
+		this.value.tokens[newHash] = token.data();
+
+		return token;
+	}
+
 	data() {
 		return this.value;
 	}
