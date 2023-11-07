@@ -2,6 +2,7 @@ import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import Subscription from "#bzd/apps/accounts/backend/users/subscription.mjs";
 import TokenInfo from "#bzd/apps/accounts/backend/users/token.mjs";
+import Roles from "#bzd/apps/accounts/backend/users/roles_scopes.mjs";
 
 const Exception = ExceptionFactory("user");
 const Log = LogFactory("user");
@@ -75,8 +76,17 @@ export default class User {
 		return this.value.roles || [];
 	}
 
+	// Get all the scopes from a user.
+	getScopes() {
+		return Roles.getScopes(...this.getRoles());
+	}
+
 	hasRole(role) {
 		return this.getRoles().includes(role);
+	}
+
+	hasScope(scope) {
+		return this.getScopes().includes(scope);
 	}
 
 	addRole(role) {
@@ -178,10 +188,10 @@ export default class User {
 		);
 		Exception.assert(token instanceof TokenInfo, "Token must be of type TokenInfo: '{}'.", token);
 		Exception.assert(
-			token.getRoles().every((r) => this.hasRole(r)),
-			"Token roles must be a subset of its user: '{}' vs '{}'.",
-			token.getRoles(),
-			this.getRoles(),
+			token.getScopes().every((r) => this.hasScope(r)),
+			"Token scopes must be a subset of its user scopes: '{}' vs '{}'.",
+			token.getScopes(),
+			this.getScopes(),
 		);
 
 		this.modified.push("tokens(+" + hash.slice(0, 16) + "[...])");
@@ -228,6 +238,7 @@ export default class User {
 			creation: this.getCreationTimestamp(),
 			last_login: this.getLastLoginTimestamp(),
 			roles: this.getRoles(),
+			scopes: this.getScopes(),
 			subscriptions: this.getSubscriptions(),
 			tokens: this.getTokens(),
 		};

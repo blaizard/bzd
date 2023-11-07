@@ -6,7 +6,7 @@ const Log = LogFactory("token");
 
 /// A token has the following data:
 ///
-/// roles: The roles associated with this token.
+/// scopes: The scopes associated with this token.
 /// expiration: The expiration date.
 /// rolling: Wether it is a rolling token or not.
 export default class TokenInfo {
@@ -15,10 +15,10 @@ export default class TokenInfo {
 		this.value = value;
 	}
 
-	static make(identifier, roles, timeoutS, rolling) {
+	static make(identifier, scopes, timeoutS, rolling) {
 		return new TokenInfo({
 			identifier: identifier,
-			roles: roles,
+			scopes: scopes,
 			creation: Date.now(),
 			expiration: Date.now() + timeoutS * 1000,
 			rolling: rolling,
@@ -54,7 +54,7 @@ export default class TokenInfo {
 		return Date.now() > this.value.expiration;
 	}
 
-	getRoles() {
-		return this.value.roles || [];
+	getScopes() {
+		return this.value.scopes || [];
 	}
 }

@@ -64,13 +64,13 @@ const AUTHENTICATION_PRIVATE_KEY = "abcd";
 				/*silent*/ true,
 			);
 			return {
-				roles: maybeUser.getRoles(),
+				scopes: maybeUser.getScopes(),
 				uid: maybeUser.getUid(),
 			};
 		},
 		saveRefreshToken: async (uid, hash, timeoutS, identifier, rolling) => {
 			await users.update(uid, (user) => {
-				const token = TokenInfo.make(identifier, user.getRoles(), timeoutS, rolling);
+				const token = TokenInfo.make(identifier, user.getScopes(), timeoutS, rolling);
 				user.addToken(hash, token);
 				return user;
 			});
@@ -98,7 +98,7 @@ const AUTHENTICATION_PRIVATE_KEY = "abcd";
 			}
 
 			let result = {
-				roles: maybeToken.getRoles(),
+				scopes: maybeToken.getScopes(),
 				uid: uid,
 			};
 

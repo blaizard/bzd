@@ -82,11 +82,11 @@ export default class APIServer extends Base {
 						authenticationData.user = user;
 						return true;
 					});
-					// Check if use has any of the roles
+					// Check if the user has any of the scopes
 					if (isAuthorized) {
 						const authenticationSchema = this.schema[endpoint][method].authentication;
 						if (typeof authenticationSchema == "string" || Array.isArray(authenticationSchema)) {
-							isAuthorized &= authenticationData.user.matchAnyRoles(authenticationSchema);
+							isAuthorized &= authenticationData.user.matchAnyScopes(authenticationSchema);
 						}
 					}
 					if (!isAuthorized) {

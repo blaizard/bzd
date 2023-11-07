@@ -1,7 +1,7 @@
 {
     "/admin/user": {
         "delete": {
-            "authentication": "admin",
+            "authentication": "users:w",
             "documentation": "Delete a specific user",
             "request": {
                 "type": "json",
@@ -11,7 +11,7 @@
             }
         },
         "post": {
-            "authentication": "admin",
+            "authentication": "users:w",
             "documentation": "Create a new user",
             "request": {
                 "type": "json",
@@ -21,7 +21,7 @@
             }
         },
         "put": {
-            "authentication": "admin",
+            "authentication": "users:w",
             "documentation": "Update user information",
             "request": {
                 "type": "json",
@@ -35,7 +35,7 @@
     },
     "/admin/users": {
         "get": {
-            "authentication": "admin",
+            "authentication": "users:r",
             "documentation": "List all users",
             "request": {
                 "type": "query",
@@ -51,7 +51,7 @@
     },
     "/user": {
         "delete": {
-            "authentication": true,
+            "authentication": "self-basic:w",
             "documentation": "Delete current user account",
             "request": {
                 "type": "json",
@@ -61,14 +61,14 @@
             }
         },
         "get": {
-            "authentication": true,
+            "authentication": "self-basic:r",
             "documentation": "Get current user information",
             "response": {
                 "type": "json"
             }
         },
         "put": {
-            "authentication": true,
+            "authentication": "self-basic:w",
             "documentation": "Update current user information",
             "request": {
                 "type": "json",

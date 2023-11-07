@@ -36,8 +36,8 @@
 			changesContent() {
 				return this.hasChanges ? "Apply (" + this.nbChanges + ")" : "Apply";
 			},
-			roles() {
-				return this.user.roles || [];
+			scopes() {
+				return this.user.scopes || [];
 			},
 			description() {
 				return [
@@ -94,10 +94,10 @@
 							{ type: "Date", caption: "Expiration", name: "expiration", width: 0.2 },
 							{
 								type: "Dropdown",
-								caption: "Roles",
-								name: "roles",
+								caption: "Scopes",
+								name: "scopes",
 								multi: true,
-								list: this.roles,
+								list: this.scopes,
 								width: 0.2,
 							},
 						],

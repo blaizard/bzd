@@ -29,8 +29,8 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 			// The structure of this KVS looks like this:
 			// <uid-hash>: {
 			//     sessions: [
-			//     	    {hash: <hash>, roles: [<role>, ...], expiration: <timestamp>},
-			//	   		{hash: <hash>, roles: [<role>, ...], expiration: <timestamp>},
+			//     	    {hash: <hash>, scopes: [<scope>, ...], expiration: <timestamp>},
+			//	   		{hash: <hash>, scopes: [<scope>, ...], expiration: <timestamp>},
 			//     ]
 			// }
 			// Ordered from the earliest first.
@@ -80,7 +80,7 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 			// Verify uid/password pair
 			const userInfo = await authentication.options.verifyIdentity(inputs.uid, inputs.password);
 			if (userInfo) {
-				const user = new User(userInfo.uid, userInfo.roles);
+				const user = new User(userInfo.uid, userInfo.scopes);
 				// Generate the refresh token.
 				const hash = authentication._makeTokenHash();
 				const timeoutS = inputs.persistent
@@ -172,8 +172,8 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 				if (timeoutS < this.options.tokenAccessExpiresInReuse) {
 					break;
 				}
-				// If the session has the same roles, re-use it1
-				if (user.sameRolesAs(session.roles)) {
+				// If the session has the same scopes, re-use it1
+				if (user.sameScopesAs(session.scopes)) {
 					return {
 						token: this._makeToken(user.getUid(), session.hash),
 						timeout: timeoutS,
@@ -185,7 +185,7 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		const session = {
 			hash: this._makeTokenHash(),
 			expiration: this._getTimestamp() + this.options.tokenAccessExpiresIn,
-			roles: user.getRoles(),
+			scopes: user.getScopes(),
 		};
 
 		// Insert the new session and return the token.
@@ -270,7 +270,7 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		}
 
 		// Create the access token.
-		const user = new User(maybeToken.uid, maybeToken.roles);
+		const user = new User(maybeToken.uid, maybeToken.scopes);
 		const accessToken = await this._makeAccessToken(user);
 		context.setCookie("access_token", accessToken.token, {
 			httpOnly: true,
@@ -327,7 +327,7 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		}
 
 		return {
-			user: new User(uid, maybeSession.roles),
+			user: new User(uid, maybeSession.scopes),
 			session: maybeSession,
 		};
 	}
