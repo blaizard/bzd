@@ -66,7 +66,7 @@ program
 				return false;
 			}
 			return {
-				roles: [],
+				scopes: [],
 				uid: uid,
 			};
 		},

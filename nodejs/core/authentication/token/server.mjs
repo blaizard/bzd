@@ -80,7 +80,7 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 			// Verify uid/password pair
 			const userInfo = await authentication.options.verifyIdentity(inputs.uid, inputs.password);
 			if (userInfo) {
-				return generateTokens.call(this, userInfo.uid, userInfo.roles, inputs.persistent, makeUid(userInfo.uid));
+				return generateTokens.call(this, userInfo.uid, userInfo.scopes, inputs.persistent, makeUid(userInfo.uid));
 			}
 			return this.sendStatus(401, "Unauthorized");
 		});

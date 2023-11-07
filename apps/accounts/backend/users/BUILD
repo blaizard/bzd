@@ -3,6 +3,7 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "users",
     srcs = [
+        "roles_scopes.mjs",
         "subscription.mjs",
         "token.mjs",
         "user.mjs",

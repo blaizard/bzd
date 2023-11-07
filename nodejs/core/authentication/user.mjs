@@ -1,7 +1,7 @@
 export default class User {
-	constructor(uid, roles) {
+	constructor(uid, scopes) {
 		this.uid = uid;
-		this.roles = new Set(roles);
+		this.scopes = new Set(scopes);
 	}
 
 	/// Get user identifier.
@@ -9,39 +9,34 @@ export default class User {
 		return this.uid;
 	}
 
-	/// Get group associated with this user.
-	getRoles() {
-		return [...this.roles.values()];
+	/// Get scopes associated with this user.
+	getScopes() {
+		return [...this.scopes.values()];
 	}
 
-	/// Check if a single role is present.
-	matchRole(role) {
-		return this.matchAnyRoles(role);
+	/// Ensure that all scopes are associated with this user.
+	matchAllScopes(scopeOrScopes) {
+		const scopeList = Array.isArray(scopeOrScopes) ? scopeOrScopes : [scopeOrScopes];
+		const scopes = this.getScopes();
+		return scopeList.every((scope) => scopes.includes(scope));
 	}
 
-	/// Ensure that all roles are associated with this user.
-	matchAllRoles(roleOrRoles) {
-		const roleList = Array.isArray(roleOrRoles) ? roleOrRoles : [roleOrRoles];
-		const roles = this.getRoles();
-		return roleList.every((role) => roles.includes(role));
+	/// Ensure that at least one scope is associated with this user.
+	matchAnyScopes(scopeOrScopes) {
+		const scopeList = Array.isArray(scopeOrScopes) ? scopeOrScopes : [scopeOrScopes];
+		const scopes = this.getScopes();
+		return scopeList.some((scope) => scopes.includes(scope));
 	}
 
-	/// Ensure that at least one role is associated with this user.
-	matchAnyRoles(roleOrRoles) {
-		const roleList = Array.isArray(roleOrRoles) ? roleOrRoles : [roleOrRoles];
-		const roles = this.getRoles();
-		return roleList.some((role) => roles.includes(role));
-	}
-
-	/// Have exactly the same roles are the ones passed into argument.
-	sameRolesAs(roles) {
-		let rolesToCheck = [...new Set(roles).values()];
-		if (rolesToCheck.length != this.roles.length) {
+	/// Have exactly the same scopes are the ones passed into argument.
+	sameScopesAs(scopes) {
+		let scopesToCheck = [...new Set(scopes).values()];
+		if (scopesToCheck.length != this.scopes.length) {
 			return false;
 		}
-		while (rolesToCheck.length) {
-			const role = rolesToCheck.pop();
-			if (!(role in this.roles)) {
+		while (scopesToCheck.length) {
+			const scope = scopesToCheck.pop();
+			if (!(scope in this.scopes)) {
 				return false;
 			}
 		}
