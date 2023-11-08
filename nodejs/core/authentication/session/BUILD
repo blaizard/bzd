@@ -25,7 +25,7 @@ bzd_nodejs_library(
         "//nodejs/core:exception",
         "//nodejs/core:log",
         "//nodejs/core/authentication:server",
-        "//nodejs/core/authentication:user",
+        "//nodejs/core/authentication:session",
         "//nodejs/db/key_value_store:memory",
     ],
 )

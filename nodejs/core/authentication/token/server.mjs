@@ -5,7 +5,7 @@ import ExceptionFactory from "../../exception.mjs";
 import LogFactory from "../../log.mjs";
 import Validation from "../../validation.mjs";
 import AuthenticationServer from "../server.mjs";
-import User from "../user.mjs";
+import Session from "../session.mjs";
 
 const Exception = ExceptionFactory("authentication", "token");
 const Log = LogFactory("authentication", "token");
@@ -78,9 +78,15 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 
 		api.handle("post", "/auth/login", async function (inputs) {
 			// Verify uid/password pair
-			const userInfo = await authentication.options.verifyIdentity(inputs.uid, inputs.password);
-			if (userInfo) {
-				return generateTokens.call(this, userInfo.uid, userInfo.scopes, inputs.persistent, makeUid(userInfo.uid));
+			const sessionInfo = await authentication.options.verifyIdentity(inputs.uid, inputs.password);
+			if (sessionInfo) {
+				return generateTokens.call(
+					this,
+					sessionInfo.uid,
+					sessionInfo.scopes,
+					inputs.persistent,
+					makeUid(sessionInfo.uid),
+				);
 			}
 			return this.sendStatus(401, "Unauthorized");
 		});
@@ -137,7 +143,7 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 		} catch (e) {
 			return false;
 		}
-		return await verifyCallback(new User(data.uid, data.roles));
+		return await verifyCallback(new Session(data.uid, data.roles));
 	}
 
 	async generateAccessToken(data) {

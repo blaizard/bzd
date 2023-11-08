@@ -30,7 +30,7 @@ bzd_nodejs_library(
         "//nodejs/core:log",
         "//nodejs/core:validation",
         "//nodejs/core/authentication:server",
-        "//nodejs/core/authentication:user",
+        "//nodejs/core/authentication:session",
         "//nodejs/utils:uid",
     ],
 )

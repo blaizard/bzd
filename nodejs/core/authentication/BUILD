@@ -1,9 +1,9 @@
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 
 bzd_nodejs_library(
-    name = "user",
+    name = "session",
     srcs = [
-        "user.mjs",
+        "session.mjs",
     ],
     visibility = ["//visibility:public"],
 )
