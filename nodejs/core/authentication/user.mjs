@@ -29,8 +29,8 @@ export default class User {
 	}
 
 	/// Have exactly the same scopes are the ones passed into argument.
-	sameScopesAs(scopes) {
-		let scopesToCheck = [...new Set(scopes).values()];
+	sameScopesAs(scopeOrScopes) {
+		let scopesToCheck = Array.isArray(scopeOrScopes) ? [...new Set(scopeOrScopes).values()] : [scopeOrScopes];
 		if (scopesToCheck.length != this.scopes.length) {
 			return false;
 		}
@@ -41,5 +41,15 @@ export default class User {
 			}
 		}
 		return true;
+	}
+
+	/// Filter a dictionary with key: [scopes...] pairs.
+	filterByScopes(data, keyScopesMap) {
+		return Object.entries(keyScopesMap).reduce((obj, [key, scopes]) => {
+			if (this.matchAnyScopes(scopes)) {
+				obj[key] = data[key];
+			}
+			return obj;
+		}, {});
 	}
 }

@@ -132,7 +132,12 @@ export default class APIServer extends Base {
 					});
 				}
 
-				const result = await callback.call(context, data, authenticationData.user);
+				if ("scopes" in requestOptions) {
+					Exception.assert(authentication, "'scopes' can only be set with authentication.");
+					data = authenticationData.user.filterByScopes(data, requestOptions.scopes);
+				}
+
+				let result = await callback.call(context, data, authenticationData.user);
 
 				if ("validation" in responseOptions) {
 					Exception.assert(
@@ -145,6 +150,12 @@ export default class APIServer extends Base {
 					validation.validate(result, {
 						all: true,
 					});
+				}
+
+				if ("scopes" in responseOptions) {
+					console.log();
+					Exception.assert(authentication, "'scopes' can only be set with authentication.");
+					result = authenticationData.user.filterByScopes(result, responseOptions.scopes);
 				}
 
 				if (!context.manualResponse) {

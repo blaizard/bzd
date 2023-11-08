@@ -64,6 +64,15 @@
             "authentication": "self-basic:r",
             "documentation": "Get current user information",
             "response": {
+                "scopes": {
+                    "creation": "self-basic:r",
+                    "email": "self-basic:r",
+                    "last_login": "self-basic:r",
+                    "roles": "self-roles:r",
+                    "scopes": "self-roles:r",
+                    "subscriptions": "self-subscriptions:r",
+                    "tokens": "self-tokens:r"
+                },
                 "type": "json"
             }
         },

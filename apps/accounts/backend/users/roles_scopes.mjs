@@ -5,8 +5,8 @@ const Exception = ExceptionFactory("roles-scopes");
 const Log = LogFactory("roles-scopes");
 
 const rolesScopesMap = {
-	admin: new Set(["users:r", "users:w", "subscription:a"]),
-	user: new Set(["self-basic:r", "self-basic:w", "self-subscription:r", "self-subscription:w"]),
+	admin: new Set(["users:r", "users:w", "self-roles:r", "self-roles:w", "self-tokens:w", "self-subscriptions:w"]),
+	user: new Set(["self-basic:r", "self-basic:w", "self-subscriptions:r", "self-tokens:r"]),
 };
 
 export default class Roles {
