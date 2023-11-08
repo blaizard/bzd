@@ -5,7 +5,7 @@ bzd_update()
 	if which wget >/dev/null; then
 		wget -q --no-cache "$url" -O ~/.bzd_update_temp
 	elif which curl >/dev/null; then
-		curl -o ~/.bzd_update_temp "$url"
+		curl -S -s -H "Cache-Control: no-cache, no-store" -H "Pragma: no-cache" -o ~/.bzd_update_temp "$url"
 	else
 		echo "Cannot download, neither wget nor curl is available."
 		return 1
