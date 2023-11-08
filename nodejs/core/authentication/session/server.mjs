@@ -3,7 +3,7 @@ import Crypto from "crypto";
 import ExceptionFactory from "../../exception.mjs";
 import LogFactory from "../../log.mjs";
 import AuthenticationServer from "../server.mjs";
-import User from "../user.mjs";
+import Session from "../session.mjs";
 import KeyValueStoreMemory from "#bzd/nodejs/db/key_value_store/memory.mjs";
 
 const Exception = ExceptionFactory("authentication", "session");
@@ -78,29 +78,29 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		// It can be exchanged to an access token with /auth/refresh.
 		api.handle("post", "/auth/login", async function (inputs) {
 			// Verify uid/password pair
-			const userInfo = await authentication.options.verifyIdentity(inputs.uid, inputs.password);
-			if (userInfo) {
-				const user = new User(userInfo.uid, userInfo.scopes);
+			const sessionInfo = await authentication.options.verifyIdentity(inputs.uid, inputs.password);
+			if (sessionInfo) {
+				const session = new Session(sessionInfo.uid, sessionInfo.scopes);
 				// Generate the refresh token.
 				const hash = authentication._makeTokenHash();
 				const timeoutS = inputs.persistent
 					? authentication.options.tokenRefreshLongTermExpiresIn
 					: authentication.options.tokenRefreshShortTermExpiresIn;
 				await authentication.options.saveRefreshToken(
-					user.getUid(),
+					session.getUid(),
 					hash,
 					timeoutS,
 					inputs.identifier,
 					/*rolling*/ true,
 				);
-				const refreshToken = authentication._makeToken(user.getUid(), hash);
+				const refreshToken = authentication._makeToken(session.getUid(), hash);
 				this.setCookie("refresh_token", refreshToken, {
 					httpOnly: true,
 					maxAge: timeoutS * 1000,
 				});
 
 				// Generate the access token.
-				return await authentication._makeAccessToken(user);
+				return await authentication._makeAccessToken(session);
 			}
 
 			throw this.httpError(401, "Unauthorized");
@@ -141,8 +141,8 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 				);
 				if (result) {
 					return {
-						token: authentication._makeToken(result.user.getUid(), result.session.hash),
-						timeout: result.session.expiration - authentication._getTimestamp(),
+						token: authentication._makeToken(result.session.getUid(), result.data.hash),
+						timeout: result.data.expiration - authentication._getTimestamp(),
 					};
 				}
 			}
@@ -162,43 +162,43 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 	}
 
 	/// Create a new session, save it and return the token.
-	async _makeAccessToken(user) {
+	async _makeAccessToken(session) {
 		// Check if there is an exisitng access token with a valid expiration date that can be re-used.
-		const maybeSessions = await this.options.kvs.get(this.options.kvsBucket, user.getUid(), null);
+		const maybeSessions = await this.options.kvs.get(this.options.kvsBucket, session.getUid(), null);
 		if (maybeSessions) {
-			for (const session of maybeSessions.sessions) {
-				const timeoutS = session.expiration - this._getTimestamp();
+			for (const sessionData of maybeSessions.sessions) {
+				const timeoutS = sessionData.expiration - this._getTimestamp();
 				// If too old, do not consider anymore, as this array is ordered.
 				if (timeoutS < this.options.tokenAccessExpiresInReuse) {
 					break;
 				}
 				// If the session has the same scopes, re-use it1
-				if (user.sameScopesAs(session.scopes)) {
+				if (session.sameScopesAs(sessionData.scopes)) {
 					return {
-						token: this._makeToken(user.getUid(), session.hash),
+						token: this._makeToken(session.getUid(), sessionData.hash),
 						timeout: timeoutS,
 					};
 				}
 			}
 		}
 
-		const session = {
+		const sessionData = {
 			hash: this._makeTokenHash(),
 			expiration: this._getTimestamp() + this.options.tokenAccessExpiresIn,
-			scopes: user.getScopes(),
+			scopes: session.getScopes(),
 		};
 
 		// Insert the new session and return the token.
 		await this.options.kvs.update(
 			this.options.kvsBucket,
-			user.getUid(),
+			session.getUid(),
 			(data) => {
 				// Remove the sessions that will expire the first if too many.
 				if (data.length >= this.options.maxSessionsPerUser) {
 					data.sessions = data.sessions.slice(0, this.options.maxSessionsPerUser - 1);
 				}
 				// Add the new session.
-				data.sessions.unshift(session);
+				data.sessions.unshift(sessionData);
 				return data;
 			},
 			{ sessions: [] },
@@ -206,7 +206,7 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 
 		// Return the token
 		return {
-			token: this._makeToken(user.getUid(), session.hash),
+			token: this._makeToken(session.getUid(), sessionData.hash),
 			timeout: this.options.tokenAccessExpiresIn,
 		};
 	}
@@ -238,7 +238,7 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		if (!result) {
 			return false;
 		}
-		return await callback(result.user);
+		return await callback(result.session);
 	}
 
 	/// Refresh an access token from a refresh token.
@@ -270,8 +270,8 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		}
 
 		// Create the access token.
-		const user = new User(maybeToken.uid, maybeToken.scopes);
-		const accessToken = await this._makeAccessToken(user);
+		const session = new Session(maybeToken.uid, maybeToken.scopes);
+		const accessToken = await this._makeAccessToken(session);
 		context.setCookie("access_token", accessToken.token, {
 			httpOnly: true,
 			maxAge: accessToken.timeout * 1000,
@@ -327,8 +327,8 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		}
 
 		return {
-			user: new User(uid, maybeSession.scopes),
-			session: maybeSession,
+			session: new Session(uid, maybeSession.scopes),
+			data: maybeSession,
 		};
 	}
 }
