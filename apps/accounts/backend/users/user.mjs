@@ -7,7 +7,6 @@ import Roles from "#bzd/apps/accounts/backend/users/roles_scopes.mjs";
 const Exception = ExceptionFactory("user");
 const Log = LogFactory("user");
 
-const VALID_ROLES_ = ["admin", "user"];
 const VALID_SUBSCRIPTIONS_ = ["screen_recorder"];
 
 /// Wrapper class around a user.
@@ -90,7 +89,7 @@ export default class User {
 	}
 
 	addRole(role) {
-		Exception.assert(VALID_ROLES_.includes(role), "'{}' is not a valid role, valid roles are: {}", role, VALID_ROLES_);
+		Exception.assert(Roles.isValid(role), "'{}' is not a valid role, valid roles are: {}", role, Roles.all());
 		this.modified.push("role(+" + role + ")");
 
 		let roles = this.value.roles || [];
