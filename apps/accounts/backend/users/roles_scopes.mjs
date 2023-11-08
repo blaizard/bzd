@@ -10,6 +10,17 @@ const rolesScopesMap = {
 };
 
 export default class Roles {
+	/// Get all roles.
+	static all() {
+		return Object.keys(rolesScopesMap);
+	}
+
+	/// Check if a role is valid.
+	static isValid(role) {
+		return Roles.all().includes(role);
+	}
+
+	/// Get the scopes associated with the roles.
 	static getScopes(...roles) {
 		let scopes = new Set();
 		for (const role of roles) {
