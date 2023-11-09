@@ -94,6 +94,19 @@ const ExceptionFactory = (...topics) => {
 		}
 
 		/**
+		 * Assert that the result passed into argument has a value.
+		 *
+		 * \param expression The result to evaluate.
+		 */
+		static assertResult(result) {
+			if (result.hasError()) {
+				let value = new ExceptionCombine("Assertion failed");
+				value.add(result.error());
+				throw new Exception(value);
+			}
+		}
+
+		/**
 		 * \brief Assert that 2 values are equal.
 		 * This is not a strict assert.
 		 *

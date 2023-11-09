@@ -1,3 +1,5 @@
+import Result from "#bzd/nodejs/utils/result.mjs";
+
 export default class User {
 	constructor(uid, scopes) {
 		this.uid = uid;
@@ -51,5 +53,24 @@ export default class User {
 			}
 			return obj;
 		}, {});
+	}
+
+	/// Check that all dictionary keys matchs the key: [scopes...] pairs.
+	checkAllByScopes(data, keyScopesMap) {
+		const allKeys = new Set([...Object.keys(data), ...Object.keys(keyScopesMap)]);
+		for (const key of allKeys) {
+			if (key in data && key in keyScopesMap) {
+				if (this.matchAnyScopes(keyScopesMap[key])) {
+					return Result.makeErrorString("Key '{}' is not valid for this session scope.", key);
+				}
+			} else if (key in keyScopesMap) {
+				if (!this.matchAnyScopes(keyScopesMap[key])) {
+					return Result.makeErrorString("Key '{}' is expected but expected.", key);
+				}
+			} else {
+				return Result.makeErrorString("Key '{}' is set but not guarded by a session scope.", key);
+			}
+		}
+		return new Result();
 	}
 }

@@ -6,6 +6,9 @@ bzd_nodejs_library(
         "session.mjs",
     ],
     visibility = ["//visibility:public"],
+    deps = [
+        "//nodejs/utils:result",
+    ],
 )
 
 bzd_nodejs_library(
