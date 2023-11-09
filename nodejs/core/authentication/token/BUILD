@@ -11,7 +11,9 @@ bzd_nodejs_library(
         "//nodejs/core:exception",
         "//nodejs/core:log",
         "//nodejs/core:mutex",
+        "//nodejs/core:validation",
         "//nodejs/core/authentication:client",
+        "//nodejs/core/authentication:session",
     ],
 )
 

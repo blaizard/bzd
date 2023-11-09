@@ -31,7 +31,7 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 
 		this.validationRefreshToken = new Validation({
 			uid: "mandatory",
-			roles: "mandatory",
+			scopes: "mandatory",
 			persistent: "mandatory",
 			session: "mandatory",
 		});
@@ -47,6 +47,8 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 					resolve({
 						token: token,
 						timeout: expiresIn,
+						uid: data.uid,
+						scopes: data.scopes,
 					});
 				}
 			});
@@ -57,9 +59,9 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 		Log.debug("Installing token-based authentication API.");
 
 		const authentication = this;
-		const generateTokens = async function (uid, roles, persistent, session) {
+		const generateTokens = async function (uid, scopes, persistent, session) {
 			// Generates the refresh token and set it to a cookie
-			const refreshToken = await authentication.generateRefreshToken(uid, roles, persistent, session);
+			const refreshToken = await authentication.generateRefreshToken(uid, scopes, persistent, session);
 
 			// Validate the authentication for this UID and session
 			// and return some arguments to be passed to the access token
@@ -73,7 +75,7 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 			});
 
 			// Generate the access token
-			return await authentication.generateAccessToken({ uid: uid, roles: roles });
+			return await authentication.generateAccessToken({ uid: uid, scopes: scopes });
 		};
 
 		api.handle("post", "/auth/login", async function (inputs) {
@@ -114,7 +116,7 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 			}
 
 			// Check access here
-			return generateTokens.call(this, data.uid, data.roles, data.persistent || false, data.session);
+			return generateTokens.call(this, data.uid, data.scopes, data.persistent || false, data.session);
 		});
 	}
 
@@ -139,20 +141,20 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 		try {
 			data = await this.readToken(token);
 			Exception.assert(data && "uid" in data, "Invalid token: {:j}", data);
-			Exception.assert(data && "roles" in data, "Invalid token: {:j}", data);
+			Exception.assert(data && "scopes" in data, "Invalid token: {:j}", data);
 		} catch (e) {
 			return false;
 		}
-		return await verifyCallback(new Session(data.uid, data.roles));
+		return await verifyCallback(new Session(data.uid, data.scopes));
 	}
 
 	async generateAccessToken(data) {
 		return await this._generateToken(data, this.options.tokenAccessExpiresIn);
 	}
 
-	async generateRefreshToken(uid, roles, persistent, session) {
+	async generateRefreshToken(uid, scopes, persistent, session) {
 		return await this._generateToken(
-			{ uid: uid, roles: roles, persistent: persistent, session: session },
+			{ uid: uid, scopes: scopes, persistent: persistent, session: session },
 			persistent ? this.options.tokenRefreshLongTermExpiresIn : this.options.tokenRefreshShortTermExpiresIn,
 		);
 	}
