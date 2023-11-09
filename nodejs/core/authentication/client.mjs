@@ -10,7 +10,7 @@ export default class AuthenticationClient {
 				/**
 				 * Callback to be called each time the authentication status changes.
 				 */
-				onAuthentication: (/*isAuthenticated*/) => {},
+				onAuthentication: (/*session or null*/) => {},
 			},
 			defaultOptions,
 			options,
@@ -21,9 +21,14 @@ export default class AuthenticationClient {
 		await this._installAPIImpl(api);
 	}
 
-	/// Return true if the client is authenticated, false otherwise.
+	/// Return the session when authenticated, null otherwise.
 	async isAuthenticated() {
-		return await this._isAuthenticatedImpl();
+		return Boolean(await this._getSessionImpl());
+	}
+
+	/// Return the session when authenticated, null otherwise.
+	async getSession() {
+		return await this._getSessionImpl();
 	}
 
 	/// Attempt to refresh an authentication

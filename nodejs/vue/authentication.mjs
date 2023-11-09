@@ -3,17 +3,18 @@ export default {
 		Vue.prototype.$authentication = new Vue({
 			data: {
 				isAuthenticated: false,
+				session: null,
 			},
 		});
 
 		Vue.prototype.$makeAuthenticationURL = (url) => authentication.makeAuthenticationURL(url);
 
-		authentication.options.onAuthentication = (isAuthenticated) => {
-			Vue.prototype.$authentication.isAuthenticated = isAuthenticated;
+		authentication.options.onAuthentication = (maybeSession) => {
+			Vue.prototype.$authentication.isAuthenticated = Boolean(maybeSession);
+			Vue.prototype.$authentication.session = maybeSession;
 		};
 
-		authentication.isAuthenticated().then((isAuthenticated) => {
-			Vue.prototype.$authentication.isAuthenticated = isAuthenticated;
-		});
+		// Trigger to get the session status.
+		authentication.getSession();
 	},
 };

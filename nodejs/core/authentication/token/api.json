@@ -12,7 +12,13 @@
                 }
             },
             "response": {
-                "type": "json"
+                "type": "json",
+                "validation": {
+                    "scopes": "mandatory",
+                    "timeout": "mandatory",
+                    "token": "mandatory",
+                    "uid": "mandatory"
+                }
             }
         }
     },
@@ -25,7 +31,13 @@
         "post": {
             "documentation": "Login API used to exchange a refresh token for an access token.",
             "response": {
-                "type": "json"
+                "type": "json",
+                "validation": {
+                    "scopes": "mandatory",
+                    "timeout": "mandatory",
+                    "token": "mandatory",
+                    "uid": "mandatory"
+                }
             }
         }
     }

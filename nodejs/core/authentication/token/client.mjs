@@ -2,6 +2,8 @@ import ExceptionFactory from "../../exception.mjs";
 import LogFactory from "../../log.mjs";
 import AuthenticationClient from "../client.mjs";
 import Mutex from "#bzd/nodejs/core/mutex.mjs";
+import Session from "../session.mjs";
+import Validation from "../../validation.mjs";
 
 const Exception = ExceptionFactory("authentication", "token");
 const Log = LogFactory("authentication", "token");
@@ -17,20 +19,17 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 
 		// Token to be used during this session.
 		this.token = undefined;
+		this.session = undefined;
 		// Used to set the state of the authentication.
 		this.mutex = new Mutex();
 		this.interval = null;
-	}
 
-	async _isAuthenticatedImpl() {
-		await this.mutex.lock();
-		if (this.token === undefined) {
-			// Try to refresh the current token if any
-			await this.tryRefreshAuthentication(/*nothrow*/ true);
-		}
-		await this.mutex.release();
-
-		return Boolean(this.token);
+		this.validationResult = new Validation({
+			uid: "mandatory",
+			scopes: "mandatory",
+			token: "mandatory",
+			timeout: "mandatory",
+		});
 	}
 
 	async _installAPIImpl(api) {
@@ -43,21 +42,48 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 		}
 	}
 
-	setToken(token, timeoutS = 0) {
-		this.token = token;
-		this.options.onAuthentication(this.token !== null);
+	/// Get the current session if any.
+	async _getSessionImpl() {
+		await this.mutex.lock();
+		if (this.session === undefined) {
+			// Try to refresh the current token if any
+			await this.tryRefreshAuthentication(/*nothrow*/ true);
+		}
+		await this.mutex.release();
+
+		return this.session ? this.session : null;
+	}
+
+	/// Set a new session from the result of the API.
+	setSession(data) {
+		this.validationResult.validate(data);
+
+		this.token = data.token;
+		this.session = new Session(data.uid, data.scopes);
+		this.options.onAuthentication(this.session);
 
 		if (this.interval) {
 			clearInterval(this.interval);
 		}
-		if (token && timeoutS && this.options.refreshTokenCallback) {
+		if (data.timeout && this.options.refreshTokenCallback) {
 			// Refresh automatically the token, set to minimum time of 30s
 			this.interval = setInterval(
 				() => {
 					this.refreshAuthentication();
 				},
-				Math.max(timeoutS - 60, 30) * 1000,
+				Math.max(data.timeout - 60, 30) * 1000,
 			);
+		}
+	}
+
+	/// Clear a session.
+	clearSession() {
+		this.token = null;
+		this.session = null;
+		this.options.onAuthentication(null);
+
+		if (this.interval) {
+			clearInterval(this.interval);
 		}
 	}
 
@@ -69,11 +95,11 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 				if (result) {
 					Exception.assert("token" in result, "Missing token.");
 					Exception.assert("timeout" in result, "Missing timeout.");
-					this.setToken(result.token, result.timeout);
+					this.setSession(result);
 					return result;
 				}
 			} catch (e) {
-				this.setToken(null);
+				this.clearSession();
 				if (!nothrow && e.code != 401 /*Unauthorized*/) {
 					throw e;
 				}
@@ -88,7 +114,7 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 		if (result) {
 			return result;
 		}
-		this.setToken(null);
+		this.clearSession();
 
 		if (this.options.unauthorizedCallback) {
 			await this.options.unauthorizedCallback();
@@ -98,10 +124,6 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 	}
 
 	async _setAuthenticationFetchImpl(fetchOptions) {
-		if (!this.isAuthenticated()) {
-			await this.refreshAuthentication();
-		}
-
 		// Automatically add authentication information to the request
 		fetchOptions.authentication = {
 			type: "bearer",
@@ -110,10 +132,6 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 	}
 
 	async _makeAuthenticationURLImpl(url) {
-		if (!this.isAuthenticated()) {
-			await this.refreshAuthentication();
-		}
-
 		url += (url.includes("?") ? "&t=" : "?t=") + encodeURIComponent(this.token);
 		return url;
 	}
@@ -127,12 +145,12 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 		});
 		Exception.assert("token" in result, "Missing token.");
 		Exception.assert("timeout" in result, "Missing timeout.");
-		this.setToken(result.token, result.timeout);
+		this.setSession(result);
 		return result;
 	}
 
 	async _logoutImpl(api) {
 		await api.request("post", "/auth/logout");
-		this.setToken(null);
+		this.clearSession();
 	}
 }

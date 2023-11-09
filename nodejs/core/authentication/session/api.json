@@ -14,8 +14,10 @@
             "response": {
                 "type": "json",
                 "validation": {
+                    "scopes": "mandatory",
                     "timeout": "mandatory",
-                    "token": "mandatory"
+                    "token": "mandatory",
+                    "uid": "mandatory"
                 }
             }
         }
@@ -31,8 +33,10 @@
             "response": {
                 "type": "json",
                 "validation": {
+                    "scopes": "mandatory",
                     "timeout": "mandatory",
-                    "token": "mandatory"
+                    "token": "mandatory",
+                    "uid": "mandatory"
                 }
             }
         }

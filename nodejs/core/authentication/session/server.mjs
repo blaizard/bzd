@@ -143,6 +143,8 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 					return {
 						token: authentication._makeToken(result.session.getUid(), result.data.hash),
 						timeout: result.data.expiration - authentication._getTimestamp(),
+						uid: result.session.getUid(),
+						scopes: result.session.getScopes(),
 					};
 				}
 			}
@@ -208,6 +210,8 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		return {
 			token: this._makeToken(session.getUid(), sessionData.hash),
 			timeout: this.options.tokenAccessExpiresIn,
+			uid: session.getUid(),
+			scopes: session.getScopes(),
 		};
 	}
 
