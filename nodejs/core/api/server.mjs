@@ -134,7 +134,7 @@ export default class APIServer extends Base {
 
 				if ("scopes" in requestOptions) {
 					Exception.assert(authentication, "'scopes' can only be set with authentication.");
-					data = authenticationData.user.filterByScopes(data, requestOptions.scopes);
+					Exception.assertResult(authenticationData.user.checkAllByScopes(data, requestOptions.scopes));
 				}
 
 				let result = await callback.call(context, data, authenticationData.user);

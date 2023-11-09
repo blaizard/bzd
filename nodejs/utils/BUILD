@@ -45,3 +45,15 @@ bzd_nodejs_library(
     ],
     visibility = ["//visibility:public"],
 )
+
+bzd_nodejs_library(
+    name = "result",
+    srcs = [
+        "result.mjs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//nodejs/core:exception",
+        "//nodejs/core:format",
+    ],
+)
