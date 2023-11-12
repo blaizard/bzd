@@ -21,7 +21,9 @@ let authentication = new Authentication({
 
 Vue.use(AsyncComputed);
 Vue.use(Notification);
-Vue.use(AuthenticationPlugin, authentication);
+Vue.use(AuthenticationPlugin, {
+	authentication: authentication,
+});
 Vue.use(Router, {
 	hash: false,
 	authentication: authentication,

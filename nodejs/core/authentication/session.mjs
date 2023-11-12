@@ -6,6 +6,17 @@ export default class User {
 		this.scopes = new Set(scopes);
 	}
 
+	/// Check that all the scopes passed into arguments are valid (part of the validScopes).
+	static checkValidScopes(scopes, validScopes) {
+		const validScopesSet = new Set([...validScopes]);
+		for (const scope of scopes) {
+			if (!validScopesSet.has(scope)) {
+				return Result.makeErrorString("Scope '{}' is not valid, must be one of: {}.", scope, [...validScopes]);
+			}
+		}
+		return new Result();
+	}
+
 	/// Get user identifier.
 	getUid() {
 		return this.uid;
