@@ -1,7 +1,7 @@
 {
     "/admin/user": {
         "delete": {
-            "authentication": "users:w",
+            "authentication": "admin-users:w",
             "documentation": "Delete a specific user",
             "request": {
                 "type": "json",
@@ -11,7 +11,7 @@
             }
         },
         "post": {
-            "authentication": "users:w",
+            "authentication": "admin-users:w",
             "documentation": "Create a new user",
             "request": {
                 "type": "json",
@@ -21,7 +21,7 @@
             }
         },
         "put": {
-            "authentication": "users:w",
+            "authentication": "admin-users:w",
             "documentation": "Update user information",
             "request": {
                 "type": "json",
@@ -35,7 +35,7 @@
     },
     "/admin/users": {
         "get": {
-            "authentication": "users:r",
+            "authentication": "admin-users:r",
             "documentation": "List all users",
             "request": {
                 "type": "query",
@@ -91,5 +91,17 @@
                 "type": "json"
             }
         }
+    },
+    "scopes": {
+        "admin-users:r": "Read anything related to users.",
+        "admin-users:w": "Change anything related to users, including creating/deleting users.",
+        "self-basic:r": "Read basic information about the current user.",
+        "self-basic:w": "Change basic information about the current user.",
+        "self-roles:r": "Read the current user roles.",
+        "self-roles:w": "Update the current user roles.",
+        "self-subscriptions:r": "Read the current user subscriptions.",
+        "self-subscriptions:w": "Change the current user subscriptions.",
+        "self-tokens:r": "Read the current user tokens.",
+        "self-tokens:w": "Change the current user tokens."
     }
 }

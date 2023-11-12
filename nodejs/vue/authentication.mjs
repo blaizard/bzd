@@ -1,20 +1,33 @@
 export default {
-	install(Vue, authentication) {
+	install(Vue, args) {
 		Vue.prototype.$authentication = new Vue({
 			data: {
-				isAuthenticated: false,
 				session: null,
+				scopes: {},
+			},
+			computed: {
+				isAuthenticated() {
+					return Boolean(this.session);
+				},
 			},
 		});
 
-		Vue.prototype.$makeAuthenticationURL = (url) => authentication.makeAuthenticationURL(url);
+		Vue.prototype.$makeAuthenticationURL = (url) => args.authentication.makeAuthenticationURL(url);
 
-		authentication.options.onAuthentication = (maybeSession) => {
-			Vue.prototype.$authentication.isAuthenticated = Boolean(maybeSession);
-			Vue.prototype.$authentication.session = maybeSession;
+		args.authentication.options.onAuthentication = (maybeSession) => {
+			if (maybeSession) {
+				Vue.prototype.$authentication.session = maybeSession;
+				Vue.prototype.$authentication.scopes = maybeSession.getScopes().reduce((obj, scope) => {
+					obj[scope] = true;
+					return obj;
+				}, {});
+			} else {
+				Vue.prototype.$authentication.session = null;
+				Vue.prototype.$authentication.scopes = {};
+			}
 		};
 
 		// Trigger to get the session status.
-		authentication.getSession();
+		args.authentication.getSession();
 	},
 };

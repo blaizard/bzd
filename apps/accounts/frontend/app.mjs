@@ -28,7 +28,10 @@ const authentication = new Authentication({
 		Vue.prototype.$routerDispatch("/login", route ? { query: { redirect: route } } : {});
 	},
 });
-Vue.use(AuthenticationPlugin, authentication);
+Vue.use(AuthenticationPlugin, {
+	authentication: authentication,
+	scopes: Object.keys(APIv1.scopes),
+});
 Vue.use(RouterPlugin, {
 	hash: false,
 	authentication: authentication,
