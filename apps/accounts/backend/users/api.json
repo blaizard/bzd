@@ -91,17 +91,5 @@
                 "type": "json"
             }
         }
-    },
-    "scopes": {
-        "admin-users:r": "Read anything related to users.",
-        "admin-users:w": "Change anything related to users, including creating/deleting users.",
-        "self-basic:r": "Read basic information about the current user.",
-        "self-basic:w": "Change basic information about the current user.",
-        "self-roles:r": "Read the current user roles.",
-        "self-roles:w": "Update the current user roles.",
-        "self-subscriptions:r": "Read the current user subscriptions.",
-        "self-subscriptions:w": "Change the current user subscriptions.",
-        "self-tokens:r": "Read the current user tokens.",
-        "self-tokens:w": "Change the current user tokens."
     }
 }

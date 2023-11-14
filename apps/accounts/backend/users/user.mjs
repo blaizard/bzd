@@ -2,7 +2,7 @@ import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import Subscription from "#bzd/apps/accounts/backend/users/subscription.mjs";
 import TokenInfo from "#bzd/apps/accounts/backend/users/token.mjs";
-import Roles from "#bzd/apps/accounts/backend/users/roles_scopes.mjs";
+import Roles from "#bzd/apps/accounts/backend/users/roles.mjs";
 
 const Exception = ExceptionFactory("user");
 const Log = LogFactory("user");

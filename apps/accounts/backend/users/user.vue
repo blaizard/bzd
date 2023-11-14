@@ -8,6 +8,12 @@
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
 	import Form from "#bzd/nodejs/vue/components/form/form.vue";
 	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
+	import {
+		scopeSelfBasicRead,
+		scopeSelfTokensRead,
+		scopeSelfTokensWrite,
+		scopeSelfSubscriptionsRead,
+	} from "#bzd/apps/accounts/backend/users/scopes.mjs";
 
 	export default {
 		mixins: [Component],
@@ -55,7 +61,7 @@
 						caption: "Email",
 						name: "email",
 						disable: true,
-						condition: Boolean(this.$authentication.scopes["self-basic:r"]),
+						condition: Boolean(this.$authentication.scopes[scopeSelfBasicRead]),
 					},
 					{
 						type: "Date",
@@ -63,7 +69,7 @@
 						name: "creation",
 						disable: true,
 						width: 0.3,
-						condition: Boolean(this.$authentication.scopes["self-basic:r"]),
+						condition: Boolean(this.$authentication.scopes[scopeSelfBasicRead]),
 					},
 					{
 						type: "Date",
@@ -71,7 +77,7 @@
 						name: "last_login",
 						disable: true,
 						width: 0.3,
-						condition: Boolean(this.$authentication.scopes["self-basic:r"]),
+						condition: Boolean(this.$authentication.scopes[scopeSelfBasicRead]),
 					},
 					{
 						type: "Input",
@@ -80,7 +86,7 @@
 						multi: true,
 						disable: true,
 						width: 0.4,
-						condition: Boolean(this.$authentication.scopes["self-roles:r"]),
+						condition: Boolean(this.$authentication.scopes[scopeSelfBasicRead]),
 					},
 					{
 						type: "Array",
@@ -98,7 +104,7 @@
 						disable: true,
 						hideAddWhenDisabled: true,
 						toInputValue: "map_to_list",
-						condition: Boolean(this.$authentication.scopes["self-subscriptions:r"]),
+						condition: Boolean(this.$authentication.scopes[scopeSelfSubscriptionsRead]),
 					},
 					{
 						type: "Array",
@@ -125,7 +131,7 @@
 								caption: "Expiration",
 								name: "expiration",
 								width: 0.2,
-								disable: !Boolean(this.$authentication.scopes["self-tokens:w"]),
+								disable: !Boolean(this.$authentication.scopes[scopeSelfTokensWrite]),
 							},
 							{
 								type: "Dropdown",
@@ -134,13 +140,13 @@
 								multi: true,
 								list: this.scopes,
 								width: 0.2,
-								disable: !Boolean(this.$authentication.scopes["self-tokens:w"]),
+								disable: !Boolean(this.$authentication.scopes[scopeSelfTokensWrite]),
 							},
 						],
 						allowAdd: false,
 						toInputValue: "map_to_list",
 						toOutputValue: "list_to_map",
-						condition: Boolean(this.$authentication.scopes["self-tokens:r"]),
+						condition: Boolean(this.$authentication.scopes[scopeSelfTokensRead]),
 					},
 				];
 			},
