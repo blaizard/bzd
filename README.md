@@ -1,7 +1,7 @@
 # bzd Framework
 
 [![Build Status](https://travis-ci.com/blaizard/bzd.svg?branch=master)](https://travis-ci.com/blaizard/bzd)
-[![CI](https://github.com/blaizard/bzd/workflows/CI/badge.svg)](https://github.com/blaizard/bzd/actions)
+[![CI](https://github.com/blaizard/bzd/actions/workflows/ci.yml/badge.svg)](https://github.com/blaizard/bzd/actions)
 
 Access the [rendered version of this documentation](https://blaizard.github.io/bzd).
 
