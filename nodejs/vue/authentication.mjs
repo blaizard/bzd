@@ -3,7 +3,11 @@ export default {
 		Vue.prototype.$authentication = new Vue({
 			data: {
 				session: null,
-				scopes: {},
+			},
+			methods: {
+				hasScope(scope) {
+					return this.isAuthenticated && this.session.matchAnyScopes(scope);
+				},
 			},
 			computed: {
 				isAuthenticated() {
@@ -17,13 +21,8 @@ export default {
 		args.authentication.options.onAuthentication = (maybeSession) => {
 			if (maybeSession) {
 				Vue.prototype.$authentication.session = maybeSession;
-				Vue.prototype.$authentication.scopes = maybeSession.getScopes().reduce((obj, scope) => {
-					obj[scope] = true;
-					return obj;
-				}, {});
 			} else {
 				Vue.prototype.$authentication.session = null;
-				Vue.prototype.$authentication.scopes = {};
 			}
 		};
 

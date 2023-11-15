@@ -1,5 +1,5 @@
 <template>
-	<div class="bzd-menu-entry-wrapper">
+	<div class="bzd-menu-entry-wrapper" v-if="isAuthorized">
 		<div class="bzd-menu-entry" v-tooltip="tooltipObject" @click="handleClick">
 			<i v-if="isIconClass" :class="iconClass"></i>
 			<component v-else-if="isIconComponent" class="bzd-menu-entry-icon" :is="icon"></component>
@@ -20,6 +20,7 @@
 			icon: { type: String | Object, required: false, default: null },
 			tooltip: { type: Object, required: false, default: null },
 			link: { type: String, required: false, default: null },
+			authentication: { type: Boolean | String, required: false, default: false },
 		},
 		directives: {
 			tooltip: DirectiveTooltip,
@@ -37,6 +38,19 @@
 			},
 			tooltipObject() {
 				return this.tooltip ? this.tooltip : { data: this.text };
+			},
+			isAuthorized() {
+				if (!this.authentication) {
+					return true;
+				}
+				// After this, authentication is required.
+				if (typeof this.authentication == "boolean") {
+					return this.$authentication.isAuthenticated;
+				}
+				if (typeof this.authentication == "string") {
+					return this.$authentication.hasScope(this.authentication);
+				}
+				return false;
 			},
 		},
 		methods: {

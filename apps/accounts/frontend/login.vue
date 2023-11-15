@@ -94,12 +94,8 @@
 		methods: {
 			async handleSubmitLogin() {
 				await this.handleSubmit(async () => {
-					const result = await this.$api.login(this.info.uid, this.info.password, this.info.persistent, "accounts");
-					if (this.redirect && this.redirect.startsWith("http")) {
-						window.location.href = this.redirect + "?t=" + result.token + "&timeout=" + result.timeout;
-					} else {
-						this.$routerDispatch(this.redirect || "/");
-					}
+					await this.$api.login(this.info.uid, this.info.password, this.info.persistent, "accounts");
+					this.$routerDispatch(this.redirect || "/");
 				});
 			},
 		},

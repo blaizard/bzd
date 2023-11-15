@@ -1,7 +1,7 @@
-/// Read anything related to users.
-export const scopeAdminUserRead = "admin-users:r";
-/// Change anything related to users, including creating/deleting users.
-export const scopeAdminUserWrite = "admin-users:w";
+/// Read, add and change anything related to users.
+export const scopeAdminUsers = "admin-users";
+/// Read, add and change anything related to applications.
+export const scopeAdminApplications = "admin-applications";
 /// Read basic information about the current user.
 export const scopeSelfBasicRead = "self-basic:r";
 /// Change basic information about the current user.

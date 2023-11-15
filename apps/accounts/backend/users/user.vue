@@ -61,7 +61,7 @@
 						caption: "Email",
 						name: "email",
 						disable: true,
-						condition: Boolean(this.$authentication.scopes[scopeSelfBasicRead]),
+						condition: Boolean(this.$authentication.hasScope(scopeSelfBasicRead)),
 					},
 					{
 						type: "Date",
@@ -69,7 +69,7 @@
 						name: "creation",
 						disable: true,
 						width: 0.3,
-						condition: Boolean(this.$authentication.scopes[scopeSelfBasicRead]),
+						condition: Boolean(this.$authentication.hasScope(scopeSelfBasicRead)),
 					},
 					{
 						type: "Date",
@@ -77,7 +77,7 @@
 						name: "last_login",
 						disable: true,
 						width: 0.3,
-						condition: Boolean(this.$authentication.scopes[scopeSelfBasicRead]),
+						condition: Boolean(this.$authentication.hasScope(scopeSelfBasicRead)),
 					},
 					{
 						type: "Input",
@@ -86,7 +86,7 @@
 						multi: true,
 						disable: true,
 						width: 0.4,
-						condition: Boolean(this.$authentication.scopes[scopeSelfBasicRead]),
+						condition: Boolean(this.$authentication.hasScope(scopeSelfBasicRead)),
 					},
 					{
 						type: "Array",
@@ -104,7 +104,7 @@
 						disable: true,
 						hideAddWhenDisabled: true,
 						toInputValue: "map_to_list",
-						condition: Boolean(this.$authentication.scopes[scopeSelfSubscriptionsRead]),
+						condition: Boolean(this.$authentication.hasScope(scopeSelfSubscriptionsRead)),
 					},
 					{
 						type: "Array",
@@ -131,7 +131,7 @@
 								caption: "Expiration",
 								name: "expiration",
 								width: 0.2,
-								disable: !Boolean(this.$authentication.scopes[scopeSelfTokensWrite]),
+								disable: !Boolean(this.$authentication.hasScope(scopeSelfTokensWrite)),
 							},
 							{
 								type: "Dropdown",
@@ -140,13 +140,13 @@
 								multi: true,
 								list: this.scopes,
 								width: 0.2,
-								disable: !Boolean(this.$authentication.scopes[scopeSelfTokensWrite]),
+								disable: !Boolean(this.$authentication.hasScope(scopeSelfTokensWrite)),
 							},
 						],
 						allowAdd: false,
 						toInputValue: "map_to_list",
 						toOutputValue: "list_to_map",
-						condition: Boolean(this.$authentication.scopes[scopeSelfTokensRead]),
+						condition: Boolean(this.$authentication.hasScope(scopeSelfTokensRead)),
 					},
 				];
 			},

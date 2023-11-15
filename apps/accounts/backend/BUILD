@@ -18,6 +18,7 @@ bzd_nodejs_binary(
         "commander": "",
     },
     deps = [
+        "//apps/accounts/backend/applications",
         "//apps/accounts/backend/pending_actions",
         "//apps/accounts/backend/services",
         "//apps/accounts/backend/tests:test_data",

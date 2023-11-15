@@ -7,11 +7,12 @@ import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import Authentication from "#bzd/nodejs/core/authentication/session/server.mjs";
 import HttpServer from "#bzd/nodejs/core/http/server.mjs";
-import Services from "./services/services.mjs";
-import PendingActions from "./pending_actions/pending_actions.mjs";
-import Users from "./users/users.mjs";
+import Services from "#bzd/apps/accounts/backend/services/services.mjs";
+import PendingActions from "#bzd/apps/accounts/backend/pending_actions/pending_actions.mjs";
+import Users from "#bzd/apps/accounts/backend/users/users.mjs";
+import Applications from "#bzd/apps/accounts/backend/applications/applications.mjs";
 import TokenInfo from "#bzd/apps/accounts/backend/users/token.mjs";
-import TestData from "./tests/test_data.mjs";
+import TestData from "#bzd/apps/accounts/backend/tests/test_data.mjs";
 
 const Exception = ExceptionFactory("backend");
 const Log = LogFactory("backend");
@@ -42,6 +43,9 @@ const AUTHENTICATION_PRIVATE_KEY = "abcd";
 
 	// Users
 	const users = new Users(keyValueStore);
+
+	// Applications
+	const appplications = new Applications(keyValueStore);
 
 	// Set-up the web server
 	const web = new HttpServer(PORT);
@@ -138,7 +142,7 @@ const AUTHENTICATION_PRIVATE_KEY = "abcd";
 	const api = new API(APIv1, {
 		authentication: authentication,
 		channel: web,
-		plugins: [authentication, users, pendingActions, services],
+		plugins: [authentication, users, appplications, pendingActions, services],
 	});
 
 	api.handle("post", "/register", async (inputs, user) => {

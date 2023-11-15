@@ -3,8 +3,8 @@ import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 
 import {
-	scopeAdminUserRead,
-	scopeAdminUserWrite,
+	scopeAdminUsers,
+	scopeAdminApplications,
 	scopeSelfBasicRead,
 	scopeSelfBasicWrite,
 	scopeSelfRolesRead,
@@ -20,8 +20,8 @@ const Log = LogFactory("roles-scopes");
 
 const rolesScopesMap = {
 	admin: new Set([
-		scopeAdminUserRead,
-		scopeAdminUserWrite,
+		scopeAdminUsers,
+		scopeAdminApplications,
 		scopeSelfRolesRead,
 		scopeSelfRolesWrite,
 		scopeSelfTokensWrite,
