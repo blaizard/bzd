@@ -61,6 +61,10 @@ class RouterManager {
 				// if so ensure that we are authenticated
 				if (route.authentication) {
 					Exception.assert(
+						typeof route.authentication == "boolean",
+						"Route authentication must be a boolean for the client side.",
+					);
+					Exception.assert(
 						this.options.authentication,
 						"This route has authentication requirement but no authentication object was specified.",
 					);

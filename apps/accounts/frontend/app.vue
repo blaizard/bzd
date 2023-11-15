@@ -6,7 +6,18 @@
 		<template #menu>
 			<template v-if="$authentication.isAuthenticated">
 				<MenuEntry text="Configuration" icon="bzd-icon-images" link="/"></MenuEntry>
-				<MenuEntry text="Admin" icon="bzd-icon-newspaper" link="/admin"></MenuEntry>
+				<MenuEntry
+					text="Users"
+					icon="bzd-icon-newspaper"
+					link="/admin/users"
+					:authentication="scopeAdminUsers"
+				></MenuEntry>
+				<MenuEntry
+					text="Applications"
+					icon="bzd-icon-newspaper"
+					link="/admin/applications"
+					:authentication="scopeAdminApplications"
+				></MenuEntry>
 				<MenuEntry text="Logout" icon="bzd-icon-newspaper" link="/logout"></MenuEntry>
 			</template>
 		</template>
@@ -25,6 +36,7 @@
 	import Layout from "#bzd/nodejs/vue/components/layout/layout.vue";
 	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.mjs";
 	import MenuEntry from "#bzd/nodejs/vue/components/menu/entry.vue";
+	import { scopeAdminUsers, scopeAdminApplications } from "#bzd/apps/accounts/backend/users/scopes.mjs";
 
 	export default {
 		components: {
@@ -37,6 +49,8 @@
 		data: function () {
 			return {
 				loading: false,
+				scopeAdminUsers,
+				scopeAdminApplications,
 			};
 		},
 		mounted() {
@@ -44,9 +58,11 @@
 				ref: "view",
 				routes: [
 					{ path: "/", component: () => import("./config.vue"), authentication: true },
-					{ path: "/admin", component: () => import("./admin/admin.vue"), authentication: true },
+					{ path: "/admin/users", component: () => import("./admin/users.vue"), authentication: true },
+					{ path: "/admin/applications", component: () => import("./admin/applications.vue"), authentication: true },
 					{ path: "/login", component: () => import("./login.vue") },
 					{ path: "/logout", component: () => import("./logout.vue"), authentication: true },
+					{ path: "/sso", component: () => import("./sso.vue"), authentication: true },
 					{ path: "/reset", component: () => import("./reset.vue") },
 					{ path: "/register", component: () => import("./register.vue") },
 				],

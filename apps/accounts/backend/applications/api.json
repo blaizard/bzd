@@ -1,0 +1,52 @@
+{
+    "/admin/application": {
+        "delete": {
+            "authentication": "admin-applications",
+            "documentation": "Delete an existing application",
+            "request": {
+                "type": "json",
+                "validation": {
+                    "uid": "mandatory"
+                }
+            }
+        },
+        "post": {
+            "authentication": "admin-applications",
+            "documentation": "Create a new application",
+            "request": {
+                "type": "json",
+                "validation": {
+                    "email": "mandatory"
+                }
+            }
+        },
+        "put": {
+            "authentication": "admin-applications",
+            "documentation": "Update application information",
+            "request": {
+                "type": "json",
+                "validation": {
+                    "roles": "",
+                    "subscriptions": "",
+                    "uid": "mandatory"
+                }
+            }
+        }
+    },
+    "/admin/applications": {
+        "get": {
+            "authentication": "admin-applications",
+            "documentation": "List all applications",
+            "request": {
+                "type": "query",
+                "validation": {
+                    "max": "mandatory",
+                    "page": "mandatory"
+                }
+            },
+            "response": {
+                "type": "json"
+            }
+        }
+    }
+}

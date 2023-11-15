@@ -20,7 +20,7 @@ const ACCOUNTS_URL = options.accounts;
 		context.send(
 			'<head><body><a href="' +
 				ACCOUNTS_URL +
-				"/login?product=hello&redirect=http://localhost2:" +
+				"/login?product=hello&redirect=%2Fsso%3Fredirect%3Dhttp%3A%2F%2Flocalhost2%3A" +
 				PORT +
 				'%2Fredirect">Login</a></body></head>',
 		);

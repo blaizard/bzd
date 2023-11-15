@@ -30,7 +30,6 @@ const authentication = new Authentication({
 });
 Vue.use(AuthenticationPlugin, {
 	authentication: authentication,
-	scopes: Object.keys(APIv1.scopes),
 });
 Vue.use(RouterPlugin, {
 	hash: false,
