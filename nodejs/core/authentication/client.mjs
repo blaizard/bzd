@@ -1,15 +1,15 @@
+import ExceptionFactory from "../exception.mjs";
+
+const Exception = ExceptionFactory("authentication");
+
 export default class AuthenticationClient {
 	constructor(options, defaultOptions = {}) {
 		this.options = Object.assign(
 			{
-				/**
-				 * Callback that will be triggered if the user attempt to access
-				 * a route that requires authentication without it.
-				 */
+				// Callback that will be triggered if the user attempt to access
+				// a route that requires authentication without it.
 				unauthorizedCallback: null,
-				/**
-				 * Callback to be called each time the authentication status changes.
-				 */
+				// Callback to be called each time the authentication status changes.
 				onAuthentication: (/*session or null*/) => {},
 			},
 			defaultOptions,
@@ -24,6 +24,29 @@ export default class AuthenticationClient {
 	/// Return the session when authenticated, null otherwise.
 	async isAuthenticated() {
 		return Boolean(await this._getSessionImpl());
+	}
+
+	async unauthorizedCallback_(needAuthentication) {
+		if (this.options.unauthorizedCallback) {
+			await this.options.unauthorizedCallback(needAuthentication);
+		}
+		if (needAuthentication) {
+			Exception.unreachable("Unauthorized (need authentication)");
+		} else {
+			Exception.unreachable("Unauthorized");
+		}
+	}
+
+	/// Ensure that there is either an authentication or at least one scope is associated with this session.
+	async assertScopes(scopeOrScopesOrBoolean) {
+		const maybeSession = await this._getSessionImpl();
+		if (!maybeSession) {
+			await this.unauthorizedCallback_(/*needAuthentication*/ true);
+		} else if (typeof scopeOrScopesOrBoolean == "boolean") {
+			return;
+		} else if (!maybeSession.matchAnyScopes(scopeOrScopesOrBoolean)) {
+			await this.unauthorizedCallback_(/*needAuthentication*/ false);
+		}
 	}
 
 	/// Return the session when authenticated, null otherwise.

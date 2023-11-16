@@ -61,17 +61,14 @@ class RouterManager {
 				// if so ensure that we are authenticated
 				if (route.authentication) {
 					Exception.assert(
-						typeof route.authentication == "boolean",
-						"Route authentication must be a boolean for the client side.",
-					);
-					Exception.assert(
 						this.options.authentication,
 						"This route has authentication requirement but no authentication object was specified.",
 					);
-					await this.options.authentication.refreshAuthentication();
+					await this.options.authentication.assertScopes(route.authentication);
 				}
 
 				if ("component" in route) {
+					console.log("COMPONENT SET", options.ref, route.component);
 					vueElt.$refs[options.ref].componentSet(
 						route.component,
 						this._getUid(vueElt),
@@ -110,6 +107,7 @@ class RouterManager {
 
 		this.routers.set(uid, {
 			router: this._makeRouter(vueElt, options),
+			options: options,
 			children: new Set(),
 			parent: null,
 			path: null,
@@ -155,6 +153,32 @@ class RouterManager {
 		this.routers.delete(uid);
 
 		Log.debug("Unregistered router '{}'", uid);
+	}
+
+	/// Get a route config from an already registered path.
+	/// The path lookup must be on the same component as when it was registered.
+	fromPath(vueElt, path) {
+		// If there is a parent router component, use it to determine the ID.
+		const parent = vueElt.$el.closest("*[data-bzd-router-id]");
+		let configs = [];
+		if (parent) {
+			const parentId = parent.getAttribute("data-bzd-router-id");
+			configs = [...this.routers.get(parentId).children].map((uid) => this.routers.get(uid));
+		}
+		// Else use the top level.
+		else {
+			configs = [...this.routers.values()].filter((config) => config.parent === null);
+		}
+		Exception.assert(configs, "There is no router component associated or preceeding this component.");
+
+		for (const config of configs) {
+			for (const route of config.options.routes) {
+				if (route.path == path) {
+					return route;
+				}
+			}
+		}
+		Exception.assert(false, "The path '{}' does not match any registered path.", path);
 	}
 
 	/**
@@ -303,6 +327,10 @@ export default class {
 
 		Vue.prototype.$routerDispatch = async (path, options = {}) => {
 			await routers.dispatch(path, options);
+		};
+
+		Vue.prototype.$routerFromPath = function (path) {
+			return routers.fromPath(this, path);
 		};
 
 		Vue.prototype.$routerGet = () => {

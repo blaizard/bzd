@@ -17,24 +17,24 @@ export default class User {
 		return new Result();
 	}
 
-	/// Get user identifier.
+	/// Get session identifier.
 	getUid() {
 		return this.uid;
 	}
 
-	/// Get scopes associated with this user.
+	/// Get scopes associated with this session.
 	getScopes() {
 		return [...this.scopes.values()];
 	}
 
-	/// Ensure that all scopes are associated with this user.
+	/// Ensure that all scopes are associated with this session.
 	matchAllScopes(scopeOrScopes) {
 		const scopeList = Array.isArray(scopeOrScopes) ? scopeOrScopes : [scopeOrScopes];
 		const scopes = this.getScopes();
 		return scopeList.every((scope) => scopes.includes(scope));
 	}
 
-	/// Ensure that at least one scope is associated with this user.
+	/// Ensure that at least one scope is associated with this session.
 	matchAnyScopes(scopeOrScopes) {
 		const scopeList = Array.isArray(scopeOrScopes) ? scopeOrScopes : [scopeOrScopes];
 		const scopes = this.getScopes();

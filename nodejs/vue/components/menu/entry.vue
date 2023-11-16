@@ -19,8 +19,7 @@
 			text: { type: String, required: true },
 			icon: { type: String | Object, required: false, default: null },
 			tooltip: { type: Object, required: false, default: null },
-			link: { type: String, required: false, default: null },
-			authentication: { type: Boolean | String, required: false, default: false },
+			link: { type: String | Object, required: false, default: null },
 		},
 		directives: {
 			tooltip: DirectiveTooltip,
@@ -39,6 +38,12 @@
 			tooltipObject() {
 				return this.tooltip ? this.tooltip : { data: this.text };
 			},
+			authentication() {
+				return typeof this.link == "object" ? this.link.authentication || false : false;
+			},
+			path() {
+				return typeof this.link == "object" ? this.link.path : this.link;
+			},
 			isAuthorized() {
 				if (!this.authentication) {
 					return true;
@@ -56,8 +61,8 @@
 		methods: {
 			handleClick() {
 				this.$emit("click");
-				if (this.link) {
-					this.$routerDispatch(this.link);
+				if (this.path) {
+					this.$routerDispatch(this.path);
 				}
 			},
 		},
