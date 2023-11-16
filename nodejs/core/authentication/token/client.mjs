@@ -115,12 +115,7 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 			return result;
 		}
 		this.clearSession();
-
-		if (this.options.unauthorizedCallback) {
-			await this.options.unauthorizedCallback();
-		}
-
-		Exception.unreachable("Unauthorized");
+		await this.unauthorizedCallback_(/*needAuthentication*/ true);
 	}
 
 	async _setAuthenticationFetchImpl(fetchOptions) {

@@ -6,17 +6,11 @@
 		<template #menu>
 			<template v-if="$authentication.isAuthenticated">
 				<MenuEntry text="Configuration" icon="bzd-icon-images" link="/"></MenuEntry>
-				<MenuEntry
-					text="Users"
-					icon="bzd-icon-newspaper"
-					link="/admin/users"
-					:authentication="scopeAdminUsers"
-				></MenuEntry>
+				<MenuEntry text="Users" icon="bzd-icon-newspaper" :link="$routerFromPath('/admin/users')"></MenuEntry>
 				<MenuEntry
 					text="Applications"
 					icon="bzd-icon-newspaper"
-					link="/admin/applications"
-					:authentication="scopeAdminApplications"
+					:link="$routerFromPath('/admin/applications')"
 				></MenuEntry>
 				<MenuEntry text="Logout" icon="bzd-icon-newspaper" link="/logout"></MenuEntry>
 			</template>
@@ -49,8 +43,6 @@
 		data: function () {
 			return {
 				loading: false,
-				scopeAdminUsers,
-				scopeAdminApplications,
 			};
 		},
 		mounted() {
@@ -58,8 +50,12 @@
 				ref: "view",
 				routes: [
 					{ path: "/", component: () => import("./config.vue"), authentication: true },
-					{ path: "/admin/users", component: () => import("./admin/users.vue"), authentication: true },
-					{ path: "/admin/applications", component: () => import("./admin/applications.vue"), authentication: true },
+					{ path: "/admin/users", component: () => import("./admin/users.vue"), authentication: scopeAdminUsers },
+					{
+						path: "/admin/applications",
+						component: () => import("./admin/applications.vue"),
+						authentication: scopeAdminApplications,
+					},
 					{ path: "/login", component: () => import("./login.vue") },
 					{ path: "/logout", component: () => import("./logout.vue"), authentication: true },
 					{ path: "/sso", component: () => import("./sso.vue"), authentication: true },

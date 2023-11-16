@@ -23,9 +23,13 @@ Vue.use(Notification);
 // ---- Authentication ----
 
 const authentication = new Authentication({
-	unauthorizedCallback: () => {
-		const route = Vue.prototype.$routerGet();
-		Vue.prototype.$routerDispatch("/login", route ? { query: { redirect: route } } : {});
+	unauthorizedCallback: async (needAuthentication) => {
+		if (needAuthentication) {
+			const route = Vue.prototype.$routerGet();
+			await Vue.prototype.$routerDispatch("/login", route ? { query: { redirect: route } } : {});
+		} else {
+			await Vue.prototype.$routerDispatch("/404");
+		}
 	},
 });
 Vue.use(AuthenticationPlugin, {
