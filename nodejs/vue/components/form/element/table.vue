@@ -26,7 +26,7 @@
 					:value="row.value"
 					:template="itemTemplate"
 					:context="{ row: row.index }"
-					@input-with-context="itemUpdate(row.index, $event)"
+					@update-with-context="itemUpdate(row.index, $event)"
 					@active="handleActive"
 				>
 				</Form>
@@ -38,22 +38,22 @@
 <script>
 	import Element from "./element.vue";
 	import TableItem from "./table_item.vue";
+	import { defineAsyncComponent } from "vue";
 
 	export default {
 		mixins: [Element],
 		components: {
 			// Load asynchronously the form to avoid any circular dependencies
-			Form: () => import("../form.vue"),
+			Form: defineAsyncComponent(() => import("../form.vue")),
 		},
-		props: {
-			value: { type: Array, required: false, default: () => [] },
+		data: function () {
+			return {
+				/// Sort the table by the columns name
+				sort: this.getOption("sort", []),
+			};
 		},
 		computed: {
 			/// ---- CONFIG ----------------------------------------
-			/// Sort the table by the columns name
-			sort() {
-				return this.getOption("sort", []);
-			},
 			/// Return the class associated with a specific row
 			rowClass() {
 				return this.getOption("rowClass", (/*value, index*/) => "");

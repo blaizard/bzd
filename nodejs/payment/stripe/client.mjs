@@ -59,8 +59,7 @@ export default class StripePayment {
 		const makePaymentIntent = this.options.makePaymentIntent;
 		const confirmPayment = this.options.confirmPayment;
 
-		return Vue.extend({
-			mixins: [VueComponent],
+		return VueComponent.extend({
 			methods: {
 				async makePaymentIntent(amount, metadata) {
 					return await makePaymentIntent(amount, metadata);

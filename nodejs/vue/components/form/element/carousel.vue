@@ -36,9 +36,6 @@
 		directives: {
 			touch: Touch,
 		},
-		props: {
-			value: { type: String | Number, required: false, default: "" },
-		},
 		mounted() {
 			this.fetchList(this.getOption("list", []));
 
@@ -54,7 +51,7 @@
 				this.interval = setInterval(this.computeSlidePosition, 1000);
 			}
 		},
-		beforeDestroy() {
+		beforeUnmount() {
 			if (this.interval) {
 				clearInterval(this.interval);
 			}

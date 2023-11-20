@@ -4,7 +4,7 @@
 			window.addEventListener("resize", this.handleResize, false);
 			this.handleResize();
 		},
-		beforeDestroy() {
+		beforeUnmount() {
 			window.removeEventListener("resize", this.handleResize, false);
 		},
 		data: function () {

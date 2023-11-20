@@ -17,9 +17,9 @@
 	export default {
 		props: {
 			text: { type: String, required: true },
-			icon: { type: String | Object, required: false, default: null },
+			icon: { type: String || Object, required: false, default: null },
 			tooltip: { type: Object, required: false, default: null },
-			link: { type: String | Object, required: false, default: null },
+			link: { type: String || Object, required: false, default: null },
 		},
 		directives: {
 			tooltip: DirectiveTooltip,
@@ -39,7 +39,10 @@
 				return this.tooltip ? this.tooltip : { data: this.text };
 			},
 			authentication() {
-				return typeof this.link == "object" ? this.link.authentication || false : false;
+				if (this.link) {
+					return typeof this.link == "object" ? this.link.authentication || false : false;
+				}
+				return false;
 			},
 			path() {
 				return typeof this.link == "object" ? this.link.path : this.link;

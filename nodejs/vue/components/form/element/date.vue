@@ -3,7 +3,7 @@
 		:class="containerClass"
 		ref="dropdown"
 		:value="get()"
-		@input="set"
+		@update:value="set"
 		@key="handleKey"
 		:disable="disable"
 		:description="descriptionDropdown"
@@ -84,15 +84,15 @@
 		components: {
 			DropdownTemplate,
 		},
-		props: {
-			value: { type: Number, required: false, default: 0 },
-		},
 		data: function () {
 			return {
 				select: "day",
 			};
 		},
 		computed: {
+			valueType() {
+				return "number";
+			},
 			containerClass() {
 				return {
 					"irform-date": true,

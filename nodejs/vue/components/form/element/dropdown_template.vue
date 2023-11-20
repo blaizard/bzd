@@ -5,7 +5,7 @@
 			:description="inputDescription"
 			:disable="disable"
 			:value="curValue"
-			@input="set"
+			@update:value="set"
 			@directInput="handleDirectInput"
 			@active="handleActive"
 			@key="handleKey"
@@ -25,9 +25,6 @@
 		mixins: [Element],
 		components: {
 			ElementInput,
-		},
-		props: {
-			value: { type: String | Array, required: true },
 		},
 		data: function () {
 			return {

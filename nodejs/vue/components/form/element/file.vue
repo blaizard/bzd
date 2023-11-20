@@ -1,5 +1,4 @@
 <script>
-	import Vue from "vue";
 	import Upload from "../../../../core/upload.mjs";
 	import ArrayElement from "./array.vue";
 	import FileItem from "./file_item.vue";
@@ -24,7 +23,7 @@
 				document.addEventListener("dragleave", this.dragLeave, false);
 			}
 		},
-		beforeDestroy() {
+		beforeUnmount() {
 			if (this.isUpload) {
 				// Remove global drag event
 				document.removeEventListener("dragenter", this.globalStartDrag, false);
@@ -43,8 +42,7 @@
 			},
 			/// ---- OVERRIDE ArrayElement ---------------
 			template() {
-				return Vue.extend({
-					mixins: [FileItem],
+				return FileItem.extend({
 					data: function () {
 						return {
 							allowDelete: this.getOption("allowDelete", true),
@@ -110,7 +108,7 @@
 							},
 							onProgress: (item) => {
 								const index = this.uploadItemToIndex(item);
-								this.$set(this.uploadValueList, index, this.makeObjectFromItem(item));
+								this.uploadValueList[index] = this.makeObjectFromItem(item);
 							},
 					  })
 					: null;

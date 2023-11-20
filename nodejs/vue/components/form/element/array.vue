@@ -20,7 +20,7 @@
 					:disable="disable"
 					:value="value"
 					:context="{ row: index }"
-					@input-with-context="itemUpdate(index, $event)"
+					@update-with-context="itemUpdate(index, $event)"
 					@active="handleActive"
 				>
 				</Form>
@@ -41,18 +41,16 @@
 <script>
 	import Element from "./element.vue";
 	import Touch from "../../../directives/touch.mjs";
+	import { defineAsyncComponent } from "vue";
 
 	export default {
 		mixins: [Element],
 		components: {
 			// Load asynchronously the form to avoid any circular dependencies
-			Form: () => import("../form.vue"),
+			Form: defineAsyncComponent(() => import("../form.vue")),
 		},
 		directives: {
 			touch: Touch,
-		},
-		props: {
-			value: { type: Array, required: false, default: () => [] },
 		},
 		computed: {
 			/// ---- CONFIG ----------------------------------------

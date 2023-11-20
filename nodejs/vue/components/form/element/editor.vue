@@ -7,7 +7,7 @@
 			tag="div"
 			ref="content"
 			@active="handleActive"
-			@input="handleInput"
+			@update:value="handleUpdate"
 			:disable="disable"
 			:contenteditable="!disable"
 			:description="contentDescription"
@@ -28,9 +28,6 @@
 		components: {
 			ElementCarousel,
 			ElementTextarea,
-		},
-		props: {
-			value: { type: String, required: false, default: "" },
 		},
 		data: function () {
 			return {
@@ -65,6 +62,9 @@
 				return this.getOption("placeholder", "");
 			},
 			/// ---- IMPLEMENTATION ----------------------------------
+			valueType() {
+				return "string";
+			},
 			containerClass() {
 				return {
 					"irform-editor": true,
@@ -203,7 +203,7 @@
 			},
 			action(actionStr, value) {
 				document.execCommand(actionStr, false, value || null);
-				this.contentElement.dispatchEvent(new Event("input"));
+				this.contentElement.dispatchEvent(new Event("update:value"));
 			},
 			actionOnSelection(actionStr, value) {
 				const isSelected = this.isTextSelected();
@@ -216,7 +216,7 @@
 					document.execCommand("removeFormat", false, null);
 				} else {
 					this.contentElement.innerHTML = this.contentElement.innerText;
-					this.contentElement.dispatchEvent(new Event("input"));
+					this.contentElement.dispatchEvent(new Event("update:value"));
 				}
 			},
 			pushToHistory(value) {
@@ -225,7 +225,7 @@
 					this.history.length = Math.min(this.history.length, this.historyMax);
 				}
 			},
-			handleInput() {
+			handleUpdate() {
 				const value = this.contentElement.innerHTML;
 				// Save the previous value into the history
 				this.pushToHistory(this.get());

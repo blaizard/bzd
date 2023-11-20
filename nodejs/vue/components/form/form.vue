@@ -14,21 +14,19 @@
 				:mandatory="isMandatory(index)"
 				:error="getError(current, index)"
 			>
-				<template>
-					<component
-						:is="getType(current)"
-						:value="currentValue[indexToName[index]]"
-						@error="handleError(indexToName[index], $event)"
-						@active="handleActive(index, $event)"
-						@submit="handleSubmit(current)"
-						@input-with-context="handleInputWithContext(index, $event)"
-						:description="current"
-						:context="context"
-						:disable="getDisable(current)"
-						v-tooltip="current.tooltip"
-					>
-					</component>
-				</template>
+				<component
+					:is="getType(current)"
+					:value="currentValue[indexToName[index]]"
+					@error="handleError(indexToName[index], $event)"
+					@active="handleActive(index, $event)"
+					@submit="handleSubmit(current)"
+					@update-with-context="handleUpdateWithContext(index, $event)"
+					:description="current"
+					:context="context"
+					:disable="getDisable(current)"
+					v-tooltip="current.tooltip"
+				>
+				</component>
 			</component>
 
 			<div v-if="isLineBreakNeeded(current, index)" :key="index + '-break'" class="irform-linebreak"></div>
@@ -164,16 +162,16 @@
 				const name = this.indexToName[index];
 				this.currentValue[name] = value;
 				if (this.all || "name" in this.description[index]) {
-					this.$set(this.returnedValue, name, value);
+					this.returnedValue[name] = value;
 				} else {
-					this.$set(this.unamedValue, name, value);
+					this.unamedValue[name] = value;
 				}
-				this.$emit("input", this.returnedValue);
+				this.$emit("update:value", this.returnedValue);
 				return name;
 			},
-			handleInputWithContext(index, data) {
+			handleUpdateWithContext(index, data) {
 				const name = this.handleInput(index, data.value);
-				this.$emit("input-with-context", {
+				this.$emit("update-with-context", {
 					value: this.returnedValue,
 					context: { name: name, index: index, action: "update" },
 				});
@@ -206,9 +204,9 @@
 			},
 			handleError(name, messageList) {
 				if (messageList) {
-					this.$set(this.errors, name, Array.isArray(messageList) ? messageList : [messageList]);
+					this.errors[name] = Array.isArray(messageList) ? messageList : [messageList];
 				} else {
-					this.$delete(this.errors, name);
+					delete this.errors[name];
 				}
 			},
 			isMandatory(index) {
@@ -234,7 +232,7 @@
 			getName(description, index) {
 				let name = description.name || "key-" + index;
 				if (!(name in this.currentValue)) {
-					this.$set(this.currentValue, name, undefined);
+					this.currentValue[name] = undefined;
 				}
 				return name;
 			},
