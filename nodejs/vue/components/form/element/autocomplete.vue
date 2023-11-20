@@ -3,7 +3,7 @@
 		:class="containerClass"
 		:description="descriptionDropdown"
 		:value="value"
-		@input="$emit('input', $event)"
+		@update:value="$emit('update:value', $event)"
 	>
 	</Autocomplete>
 </template>
@@ -31,14 +31,14 @@
 			Autocomplete,
 		},
 		props: {
-			value: { type: String, required: false, default: "" },
+			value: { required: false, default: "" },
 			description: { type: Object, required: false, default: () => ({}) },
 		},
 		computed: {
 			containerClass() {
 				return {
 					"irform-autocomplete": true,
-					[this.getOption("class")]: true,
+					[this.description["class"]]: true,
 				};
 			},
 			descriptionDropdown() {

@@ -12,6 +12,9 @@
 				return true;
 			},
 			/// ---- IMPLEMENTATION ----------------------------------
+			valueType() {
+				return "string";
+			},
 			format() {
 				return (value) => [...value].reduce((str) => str + "*", "");
 			},

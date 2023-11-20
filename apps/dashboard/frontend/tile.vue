@@ -72,7 +72,7 @@
 			}
 			this.fetchIcon();
 		},
-		beforeDestroy() {
+		beforeUnmount() {
 			if (this.handleTimeout) {
 				clearTimeout(this.handleTimeout);
 			}

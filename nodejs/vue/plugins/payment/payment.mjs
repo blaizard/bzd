@@ -4,8 +4,7 @@ export default {
 	install(Vue, payments) {
 		Vue.component(
 			"Payment",
-			Vue.extend({
-				mixins: [Payment],
+			Payment.extend({
 				data() {
 					return {
 						payments: payments,

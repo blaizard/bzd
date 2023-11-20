@@ -1,6 +1,6 @@
 <template>
 	<td :class="cellClass" @click="selectItem">
-		<slot :setError="setError"></slot>
+		<slot></slot>
 	</td>
 </template>
 

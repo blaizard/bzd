@@ -18,15 +18,15 @@
 
 	export default {
 		mixins: [Element],
-		props: {
-			value: { type: Boolean, required: false, default: false },
-		},
 		computed: {
 			/// ---- CONFIG ----------------------------------------
 			text() {
 				return this.getOption("text", "");
 			},
 			/// ---- IMPLEMENTATION ----------------------------------
+			valueType() {
+				return "boolean";
+			},
 			containerClass() {
 				return {
 					"irform-checkbox": true,

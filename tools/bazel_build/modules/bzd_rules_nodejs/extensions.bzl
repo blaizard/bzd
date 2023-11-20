@@ -78,9 +78,7 @@ platform(
 sh_binary_wrapper(
     name = "{execution}_node",
     binary = "@{repo_name}//:node",
-    command = select({{
-        "//conditions:default": "NODE_ENV=production {{binary}} --preserve-symlinks --preserve-symlinks-main --use-strict $@",
-    }}),
+    command = "{{binary}} --preserve-symlinks --preserve-symlinks-main --use-strict $@",
     visibility = ["//visibility:public"],
 )
 

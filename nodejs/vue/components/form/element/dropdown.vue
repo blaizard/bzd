@@ -1,7 +1,7 @@
 <template>
 	<DropdownTemplate
 		:value="get()"
-		@input="set"
+		@update:value="set"
 		:disable="disable"
 		:description="descriptionDropdown"
 		@directInput="directValue = $event"
@@ -24,9 +24,6 @@
 		mixins: [Element],
 		components: {
 			DropdownTemplate,
-		},
-		props: {
-			value: { type: String | Array, required: false, default: "" },
 		},
 		data: function () {
 			return {

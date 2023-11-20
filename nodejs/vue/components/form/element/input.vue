@@ -49,9 +49,6 @@
 	import Element from "./element.vue";
 	export default {
 		mixins: [Element],
-		props: {
-			value: { type: String | Array, required: false, default: "" },
-		},
 		data: function () {
 			return {
 				hasChanged: false,
@@ -105,6 +102,9 @@
 				return this.getOption("multiSeparators", "[\\s,;]");
 			},
 			/// ---- IMPLEMENTATION ----------------------------------
+			valueType() {
+				return this.multi ? "list" : this.getOption("valueType", "string");
+			},
 			containerClass() {
 				return {
 					"irform-input": true,

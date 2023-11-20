@@ -13,7 +13,7 @@
 		},
 		methods: {
 			handleCancel() {
-				this.$emit("input", false);
+				this.$emit("update:value", false);
 			},
 		},
 	};

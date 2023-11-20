@@ -16,10 +16,10 @@
 		},
 		computed: {
 			hasListenerLoading() {
-				return Boolean(this.$listeners && this.$listeners.loading);
+				return Boolean(this.$attrs && this.$attrs.onLoading);
 			},
 			hasListenerError() {
-				return Boolean(this.$listeners && this.$listeners.error);
+				return Boolean(this.$attrs && this.$attrs.onError);
 			},
 			hasGlobalNotification() {
 				return Boolean(this.$notification);

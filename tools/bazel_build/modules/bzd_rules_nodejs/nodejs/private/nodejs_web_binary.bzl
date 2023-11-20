@@ -159,7 +159,7 @@ def bzd_nodejs_web_binary(name, srcs = [], packages = {}, deps = [], apis = [], 
         srcs = srcs,
         apis = apis,
         packages = dict({
-            "@vitejs/plugin-vue2": "2.2.0",
+            "@vitejs/plugin-vue": "4.5.0",
             "sass": "1.66.1",
             "typescript": "5.1.6",
             "vite": "4.4.9",

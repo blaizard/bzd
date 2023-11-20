@@ -3,6 +3,7 @@
 		<template #header><RouterLink link="/">Showcase</RouterLink></template>
 		<template #menu>
 			<MenuEntry text="Colors" link="/colors"></MenuEntry>
+			<MenuEntry text="Router" link="/router"></MenuEntry>
 			<MenuEntry text="Notification" link="/notification"></MenuEntry>
 			<MenuEntry text="Tooltip" link="/tooltip"></MenuEntry>
 			<MenuEntry text="Graph">
@@ -42,6 +43,7 @@
 				ref: "view",
 				routes: [
 					{ path: "/colors", component: () => import("./colors.vue") },
+					{ path: "/router", component: () => import("./router.vue") },
 					{ path: "/notification", component: () => import("./notification.vue") },
 					{ path: "/graph/plot", component: () => import("./graph_plot.vue") },
 					{ path: "/form", component: () => import("./form/form.vue") },

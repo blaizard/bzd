@@ -26,10 +26,10 @@ export default {
 
 					// If data does not exists, create it
 					if (!(collection in this.content)) {
-						this.$set(this.content, collection, {});
+						this.content[collection] = {};
 					}
 					if (!(id in this.content[collection])) {
-						this.$set(this.content[collection], id, options[collection].default || "");
+						this.content[collection][id] = options[collection].default || "";
 					}
 
 					cache.get(collection, ...ids).then((value) => {

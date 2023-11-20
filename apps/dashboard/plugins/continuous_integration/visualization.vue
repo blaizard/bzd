@@ -52,7 +52,7 @@
 				this.timestamp = Date.now();
 			}, 1000);
 		},
-		beforeDestroy() {
+		beforeUnmount() {
 			clearInterval(this.instanceInterval);
 		},
 		data: function () {

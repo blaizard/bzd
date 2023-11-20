@@ -27,7 +27,7 @@
 		},
 		props: {
 			value: { type: Array, required: false, default: () => [] },
-			text: { type: String | Number, required: false, default: false },
+			text: { type: String || Number, required: false, default: false },
 		},
 		directives: {
 			"hover-children": HoverChildren,

@@ -55,9 +55,9 @@
 						caption: "Table",
 						name: "table",
 						template: [
-							{ type: "Input", caption: "Value", name: "value" },
+							{ type: "Input", caption: "Value", name: "value", valueType: "number" },
 							{ type: "Input", caption: "Key", name: "key" },
-							{ type: "Input", caption: "Price", name: "price" },
+							{ type: "Input", caption: "Price", name: "price", valueType: "number" },
 						],
 					},
 					{ type: "File", caption: "File", name: "file", upload: "/dummy" },
@@ -68,6 +68,7 @@
 						list: ["Hello", "World", "Great", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
 					},
 					{ type: "Editor", name: "editor", caption: "Editor" },
+					{ type: "Date", name: "date", caption: "Date" },
 				];
 			},
 		},

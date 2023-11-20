@@ -3,7 +3,7 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "vue",
     packages = {
-        "vue": "2.7.13",
+        "vue": "3.3.8",
     },
     visibility = ["//visibility:public"],
 )

@@ -38,7 +38,7 @@
 
 	export default {
 		props: {
-			value: { type: Object | String, required: true, default: () => ({}) },
+			value: { required: true, default: () => ({}) },
 			disable: { type: Boolean, required: false, default: false },
 			config: { type: Object, required: true, default: () => ({}) },
 		},
@@ -236,7 +236,7 @@
 					},
 					this.imageEdit,
 				);
-				this.$emit("input", value);
+				this.$emit("update:value", value);
 			},
 		},
 	};

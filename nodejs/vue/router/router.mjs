@@ -1,6 +1,7 @@
 import ExceptionFactory from "../../core/exception.mjs";
 import LogFactory from "../../core/log.mjs";
 import Router from "../../core/router.mjs";
+import { onBeforeUnmount, getCurrentInstance } from "vue";
 
 import RouterComponent from "./router_component.vue";
 import RouterLink from "./router_link.vue";
@@ -18,17 +19,21 @@ async function delayMs(time) {
 	});
 }
 
+/// Vue Router
+///
+/// Every routes have the following arguments:
+/// TODO: implement the following behavior:
+/// - path: The path to reach this route.
+///         If absolute, it starts from the root, even for nested router.
+///         If relative, it starts from the root if non-nested. If nested, it continues
+///         the parent router path.
 class RouterManager {
 	constructor(options) {
 		this.options = Object.assign(
 			{
-				/**
-				 * Hash mode
-				 */
+				// Hash mode
 				hash: true,
-				/**
-				 * Authentication object to be used with this router.
-				 */
+				// Authentication object to be used with this router.
 				authentication: null,
 			},
 			options,
@@ -41,14 +46,10 @@ class RouterManager {
 		);
 	}
 
-	_getUid(vueElt) {
-		return String(vueElt._uid);
-	}
-
 	/**
 	 * Create a new router
 	 */
-	_makeRouter(vueElt, options) {
+	_makeRouter(uid, vueElt, options) {
 		let router = new Router({
 			fallback: (path) => {
 				Log.error("Route '{}' not found", path);
@@ -67,13 +68,8 @@ class RouterManager {
 					await this.options.authentication.assertScopes(route.authentication);
 				}
 
-				if ("component" in route) {
-					console.log("COMPONENT SET", options.ref, route.component);
-					vueElt.$refs[options.ref].componentSet(
-						route.component,
-						this._getUid(vueElt),
-						Object.assign({}, args, routerOptions.props),
-					);
+				if (route.component) {
+					vueElt.$refs[options.ref].componentSet(route.component, uid, Object.assign({}, args, routerOptions.props));
 				}
 				if (route.handler) {
 					route.handler(path, routerOptions, args);
@@ -100,13 +96,11 @@ class RouterManager {
 	/**
 	 * Register a new router
 	 */
-	async registerRouter(vueElt, options) {
-		const uid = this._getUid(vueElt);
-
+	async registerRouter(uid, vueElt, options) {
 		Exception.assert(!this.routers.has(uid), "A router '{}' is already registered for this element", uid);
 
 		this.routers.set(uid, {
-			router: this._makeRouter(vueElt, options),
+			router: this._makeRouter(uid, vueElt, options),
 			options: options,
 			children: new Set(),
 			parent: null,
@@ -307,36 +301,35 @@ class RouterManager {
 	}
 }
 
-export default class {
-	static install(Vue, options) {
-		Vue.component("RouterComponent", RouterComponent);
-		Vue.component("RouterLink", RouterLink);
+export default {
+	install: (app, options) => {
+		app.component("RouterComponent", RouterComponent);
+		app.component("RouterLink", RouterLink);
 
 		let routers = new RouterManager(options);
 
-		Vue.prototype.$routerSet = async function (routeOptions) {
-			// Register hook
-			// https://vuejs.org/v2/guide/components-edge-cases.html#Programmatic-Event-Listeners
-			this.$once("hook:beforeDestroy", () => {
-				const uid = routers._getUid(this);
+		app.config.globalProperties.$routerSet = async function (routeOptions) {
+			const instance = getCurrentInstance();
+			const uid = String(instance.uid);
+
+			onBeforeUnmount(() => {
 				routers.unregisterRouter(uid);
 			});
-
-			await routers.registerRouter(this, routeOptions);
+			await routers.registerRouter(uid, this, routeOptions);
 		};
 
-		Vue.prototype.$routerDispatch = async (path, options = {}) => {
+		app.config.globalProperties.$routerDispatch = async (path, options = {}) => {
 			await routers.dispatch(path, options);
 		};
 
-		Vue.prototype.$routerFromPath = function (path) {
+		app.config.globalProperties.$routerFromPath = function (path) {
 			return routers.fromPath(this, path);
 		};
 
-		Vue.prototype.$routerGet = () => {
+		app.config.globalProperties.$routerGet = () => {
 			return routers.getRoute();
 		};
 
 		routers.dispatch();
-	}
-}
+	},
+};

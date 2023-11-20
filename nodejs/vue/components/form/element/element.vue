@@ -1,10 +1,13 @@
 <script>
 	import Validation from "../../../../core/validation.mjs";
+	import ExceptionFactory from "../../../../core/exception.mjs";
+
+	const Exception = ExceptionFactory("form");
 
 	/// The following must be implement for all elements:
 	/// Events:
 	/// - @active: when the element has the focus
-	/// - @input: when the element has a new value
+	/// - @update:value: when the element has a new value
 	/// - @error: when the element failed
 	/// Props:
 	/// - disable: set the element as disabled
@@ -14,6 +17,7 @@
 	/// - valueType: a string defining the type of data present. It can be "number", "list" or "any".
 	export default {
 		props: {
+			value: { required: false, default: null },
 			description: { type: Object, required: false, default: () => ({}) },
 			disable: { type: Boolean, default: false, required: false },
 			/// The context of the element, used to get extra information about the
@@ -30,7 +34,7 @@
 		},
 		computed: {
 			hasListenerInputWithContext() {
-				return Boolean(this.$listeners && "input-with-context" in this.$listeners);
+				return Boolean(this.$attrs && "onUpdateWithContext" in this.$attrs);
 			},
 			valueType() {
 				return "any";
@@ -51,8 +55,12 @@
 							};
 						case "any":
 						case "list":
-						case "number":
+						case "string":
 							return (v) => v;
+						case "boolean":
+							return (v) => Boolean(v);
+						case "number":
+							return (v) => Number(v) || 0;
 						default:
 							this.setError('Unknown value preset "' + toOutputValue + '"');
 					}
@@ -66,15 +74,6 @@
 				const toInputValue = this.getOption("toInputValue", this.valueType);
 				if (typeof toInputValue == "string") {
 					switch (toInputValue) {
-						case "list":
-							return (v) => {
-								let list = v || [];
-								if (!(list instanceof Array)) {
-									this.setError("The value must be an Array");
-									list = [];
-								}
-								return list;
-							};
 						case "map_to_list":
 							return (v) => {
 								return Object.entries(v).map(([key, value]) => {
@@ -82,8 +81,15 @@
 								});
 							};
 						case "any":
-						case "number":
 							return (v) => v;
+						case "number":
+							return (v) => v || 0;
+						case "string":
+							return (v) => v || "";
+						case "boolean":
+							return (v) => v || false;
+						case "list":
+							return (v) => v || [];
 						default:
 							this.setError('Unknown value preset "' + toInputValue + '"');
 					}
@@ -93,7 +99,29 @@
 				this.setError('Unknown input type "' + toInputValue + '", must be a string or function');
 			},
 			inputValue() {
-				return this.toInputValue(this.value);
+				const value = this.toInputValue(this.value);
+				const errorMessage = [
+					"The value must be of type '{}', instead value is '{}' of type '{}'.",
+					this.valueType,
+					value,
+					typeof value,
+				];
+				switch (this.valueType) {
+					case "list":
+						Exception.assert(value instanceof Array, ...errorMessage);
+						break;
+					case "string":
+						Exception.assert(typeof value == "string", ...errorMessage);
+						break;
+					case "number":
+						Exception.assert(typeof value == "number", ...errorMessage);
+						break;
+					case "boolean":
+						Exception.assert(typeof value == "boolean", ...errorMessage);
+						break;
+					default:
+				}
+				return value;
 			},
 			validation() {
 				if ("validation" in this.description) {
@@ -202,9 +230,9 @@
 
 						const updateContext = Object.assign({}, this.context, context);
 						if (this.hasListenerInputWithContext) {
-							this.$emit("input-with-context", { value: outputValue, context: updateContext });
+							this.$emit("update-with-context", { value: outputValue, context: updateContext });
 						} else {
-							this.$emit("input", outputValue);
+							this.$emit("update:value", outputValue);
 						}
 						// Keep it at the end, it must be called once all the propagation of the value is done.
 						// This to give the opportunity to safely update the global value in this callback.

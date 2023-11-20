@@ -1,13 +1,12 @@
 import Notification from "#bzd/nodejs/vue/notification.mjs";
 import Router from "#bzd/nodejs/vue/router/router.mjs";
-import Vue from "vue";
+import { createApp } from "vue";
 
 import App from "./app.vue";
 
-Vue.use(Router);
-Vue.use(Notification);
+const app = createApp(App);
 
-new Vue({
-	el: "#app",
-	render: (h) => h(App),
-});
+app.use(Router);
+app.use(Notification);
+
+app.mount("#app");
