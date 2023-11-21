@@ -23,7 +23,7 @@
 					:description="template"
 					:class="rowClass(row.value, index)"
 					:disable="row.disable"
-					:value="row.value"
+					:model-value="row.value"
 					:template="itemTemplate"
 					:context="{ row: row.index }"
 					@update-with-context="itemUpdate(row.index, $event)"

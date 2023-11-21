@@ -33,7 +33,7 @@
 			<pre>{{ JSON.stringify(array) }}</pre>
 		</div>
 		<div class="bzd-showcase-form-element">
-			<Table v-model="table"></Table>
+			<Table v-model="table" :description="{ template: [{type: 'Input', name: 'text'}, {type: 'Input', name: 'other'}] }"></Table>
 			<pre>{{ JSON.stringify(table) }}</pre>
 		</div>
 		<div class="bzd-showcase-form-element">
@@ -102,7 +102,7 @@
 				editor: "Hello, I am <b>bold!</b>",
 				carousel: 0,
 				array: [],
-				table: [],
+				table: [{text: "Hello", other: "USA"}, {text: "Ni Hao", other: "China"}],
 				checkbox: false,
 			};
 		},

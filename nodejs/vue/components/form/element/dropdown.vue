@@ -1,7 +1,7 @@
 <template>
 	<DropdownTemplate
-		:value="get()"
-		@update:value="set"
+		:model-value="get()"
+		@update:model-value="set"
 		:disable="disable"
 		:description="descriptionDropdown"
 		@directInput="directValue = $event"
@@ -70,7 +70,7 @@
 			},
 			curValue() {
 				if (this.multi) {
-					return this.value instanceof Array ? this.value : [];
+					return this.modelValue instanceof Array ? this.modelValue : [];
 				}
 				return String(this.get() || "");
 			},

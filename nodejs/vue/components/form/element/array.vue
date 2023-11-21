@@ -18,7 +18,7 @@
 					class="irform-array-item-body"
 					:description="template"
 					:disable="disable"
-					:value="value"
+					:model-value="value"
 					:context="{ row: index }"
 					@update-with-context="itemUpdate(index, $event)"
 					@active="handleActive"

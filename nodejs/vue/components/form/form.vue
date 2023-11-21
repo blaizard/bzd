@@ -16,7 +16,7 @@
 			>
 				<component
 					:is="getType(current)"
-					:value="currentValue[indexToName[index]]"
+					:model-value="currentValue[indexToName[index]]"
 					@error="handleError(indexToName[index], $event)"
 					@active="handleActive(index, $event)"
 					@submit="handleSubmit(current)"
@@ -87,7 +87,7 @@
 			description: { type: Array, required: true },
 			tag: { type: String, default: "div", required: false },
 			template: { type: Object, default: () => Item, required: false },
-			value: { type: Object, default: () => {}, required: false },
+			modelValue: { type: Object, default: () => {}, required: false },
 			disable: { type: Boolean, default: false, required: false },
 			/// Only the diff will be returned
 			diff: { type: Boolean, default: false, required: false },
@@ -141,7 +141,7 @@
 			},
 		},
 		watch: {
-			value: {
+			modelValue: {
 				immediate: true,
 				handler(value) {
 					// Copy of the current value
@@ -166,7 +166,7 @@
 				} else {
 					this.unamedValue[name] = value;
 				}
-				this.$emit("update:value", this.returnedValue);
+				this.$emit("update:model-value", this.returnedValue);
 				return name;
 			},
 			handleUpdateWithContext(index, data) {

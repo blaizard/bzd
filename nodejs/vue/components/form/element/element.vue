@@ -7,7 +7,7 @@
 	/// The following must be implement for all elements:
 	/// Events:
 	/// - @active: when the element has the focus
-	/// - @update:value: when the element has a new value
+	/// - @update:model-value: when the element has a new value
 	/// - @error: when the element failed
 	/// Props:
 	/// - disable: set the element as disabled
@@ -17,13 +17,15 @@
 	/// - valueType: a string defining the type of data present. It can be "number", "list" or "any".
 	export default {
 		props: {
-			value: { required: false, default: null },
+			modelValue: { required: false, default: null },
 			description: { type: Object, required: false, default: () => ({}) },
 			disable: { type: Boolean, default: false, required: false },
 			/// The context of the element, used to get extra information about the
 			/// position and surounding of this element.
 			context: { type: Object, default: {}, required: false },
+			onUpdateWithContext: { default: false, required: false },
 		},
+		emits: ["error", "active", "submit", "update-with-context", "update:model-value"],
 		data: function () {
 			return {
 				uid: this._uid,
@@ -34,7 +36,7 @@
 		},
 		computed: {
 			hasListenerInputWithContext() {
-				return Boolean(this.$attrs && "onUpdateWithContext" in this.$attrs);
+				return Boolean(this.onUpdateWithContext);
 			},
 			valueType() {
 				return "any";
@@ -99,7 +101,7 @@
 				this.setError('Unknown input type "' + toInputValue + '", must be a string or function');
 			},
 			inputValue() {
-				const value = this.toInputValue(this.value);
+				const value = this.toInputValue(this.modelValue);
 				const errorMessage = [
 					"The value must be of type '{}', instead value is '{}' of type '{}'.",
 					this.valueType,
@@ -232,7 +234,7 @@
 						if (this.hasListenerInputWithContext) {
 							this.$emit("update-with-context", { value: outputValue, context: updateContext });
 						} else {
-							this.$emit("update:value", outputValue);
+							this.$emit("update:model-value", outputValue);
 						}
 						// Keep it at the end, it must be called once all the propagation of the value is done.
 						// This to give the opportunity to safely update the global value in this callback.
