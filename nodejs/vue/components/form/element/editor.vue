@@ -7,7 +7,7 @@
 			tag="div"
 			ref="content"
 			@active="handleActive"
-			@update:value="handleUpdate"
+			@update:model-value="handleUpdate"
 			:disable="disable"
 			:contenteditable="!disable"
 			:description="contentDescription"
@@ -203,7 +203,7 @@
 			},
 			action(actionStr, value) {
 				document.execCommand(actionStr, false, value || null);
-				this.contentElement.dispatchEvent(new Event("update:value"));
+				this.contentElement.dispatchEvent(new Event("update:model-value"));
 			},
 			actionOnSelection(actionStr, value) {
 				const isSelected = this.isTextSelected();
@@ -216,7 +216,7 @@
 					document.execCommand("removeFormat", false, null);
 				} else {
 					this.contentElement.innerHTML = this.contentElement.innerText;
-					this.contentElement.dispatchEvent(new Event("update:value"));
+					this.contentElement.dispatchEvent(new Event("update:model-value"));
 				}
 			},
 			pushToHistory(value) {

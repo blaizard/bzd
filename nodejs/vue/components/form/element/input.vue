@@ -49,6 +49,7 @@
 	import Element from "./element.vue";
 	export default {
 		mixins: [Element],
+		emits: ["directInput", "key"],
 		data: function () {
 			return {
 				hasChanged: false,

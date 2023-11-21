@@ -2,8 +2,8 @@
 	<DropdownTemplate
 		:class="containerClass"
 		ref="dropdown"
-		:value="get()"
-		@update:value="set"
+		:model-value="get()"
+		@update:model-value="set"
 		@key="handleKey"
 		:disable="disable"
 		:description="descriptionDropdown"
@@ -149,6 +149,7 @@
 						const options = { year: "numeric", month: "long", day: "numeric" };
 						return date.toLocaleDateString(undefined, options);
 					},
+					valueType: "number",
 					editable: false,
 					pre: { html: "<i class='bzd-icon-calendar'></i>" },
 				});

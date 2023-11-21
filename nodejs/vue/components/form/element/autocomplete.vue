@@ -2,8 +2,8 @@
 	<Autocomplete
 		:class="containerClass"
 		:description="descriptionDropdown"
-		:value="value"
-		@update:value="$emit('update:value', $event)"
+		:model-value="modelValue"
+		@update:model-value="$emit('update:model-value', $event)"
 	>
 	</Autocomplete>
 </template>
@@ -31,7 +31,7 @@
 			Autocomplete,
 		},
 		props: {
-			value: { required: false, default: "" },
+			modelValue: { required: false, default: "" },
 			description: { type: Object, required: false, default: () => ({}) },
 		},
 		computed: {

@@ -20,6 +20,7 @@
 			content: { type: String || Object, optional: true, default: "" },
 			width: { type: Number, optional: true, default: 0 },
 		},
+		emits: ["click"],
 		computed: {
 			/// ---- CONFIG ----------------------------------------
 			click() {

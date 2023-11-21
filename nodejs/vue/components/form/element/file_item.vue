@@ -42,6 +42,7 @@
 			disable: { type: Boolean, required: false, default: false },
 			config: { type: Object, required: true, default: () => ({}) },
 		},
+		emits: ["delete", "update:model-value"],
 		directives: {
 			touch: Touch,
 		},
@@ -236,7 +237,7 @@
 					},
 					this.imageEdit,
 				);
-				this.$emit("update:value", value);
+				this.$emit("update:model-value", value);
 			},
 		},
 	};

@@ -4,8 +4,8 @@
 			:class="{ 'irform-dropdown-select': true, active: isActive }"
 			:description="inputDescription"
 			:disable="disable"
-			:value="curValue"
-			@update:value="set"
+			:model-value="get()"
+			@update:model-value="set"
 			@directInput="handleDirectInput"
 			@active="handleActive"
 			@key="handleKey"
@@ -26,6 +26,7 @@
 		components: {
 			ElementInput,
 		},
+		emits: ["directInput", "key"],
 		data: function () {
 			return {
 				// Value that is typed in the control
@@ -47,12 +48,6 @@
 			},
 			delay() {
 				return this.getOption("delay", 1);
-			},
-			curValue() {
-				if (this.getOption("multi", false)) {
-					return this.value instanceof Array ? this.value : [];
-				}
-				return String(this.get() || "");
 			},
 			inputDescription() {
 				return Object.assign({}, this.description, {
