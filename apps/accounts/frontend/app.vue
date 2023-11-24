@@ -4,7 +4,7 @@
 			<RouterLink link="/">Accounts</RouterLink>
 		</template>
 		<template #menu>
-			<template v-if="$authentication.isAuthenticated">
+			<div v-if="$authentication.isAuthenticated">
 				<MenuEntry text="Configuration" icon="bzd-icon-images" link="/"></MenuEntry>
 				<MenuEntry text="Users" icon="bzd-icon-newspaper" :link="$routerFromPath('/admin/users')"></MenuEntry>
 				<MenuEntry
@@ -13,7 +13,7 @@
 					:link="$routerFromPath('/admin/applications')"
 				></MenuEntry>
 				<MenuEntry text="Logout" icon="bzd-icon-newspaper" link="/logout"></MenuEntry>
-			</template>
+			</div>
 		</template>
 		<template #content>
 			<RouterComponent

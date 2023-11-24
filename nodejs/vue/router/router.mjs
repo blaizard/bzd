@@ -49,7 +49,7 @@ class RouterManager {
 	/**
 	 * Create a new router
 	 */
-	_makeRouter(uid, vueElt, options) {
+	_makeRouter(uid, vueInstance, options) {
 		let router = new Router({
 			fallback: (path) => {
 				Log.error("Route '{}' not found", path);
@@ -69,7 +69,14 @@ class RouterManager {
 				}
 
 				if (route.component) {
-					vueElt.$refs[options.ref].componentSet(route.component, uid, Object.assign({}, args, routerOptions.props));
+					// TODO rework the router, it is terrible...
+					// use vue-router instead?
+					await delayMs(1);
+					vueInstance.refs[options.ref].componentSet(
+						route.component,
+						uid,
+						Object.assign({}, args, routerOptions.props),
+					);
 				}
 				if (route.handler) {
 					route.handler(path, routerOptions, args);
@@ -96,11 +103,11 @@ class RouterManager {
 	/**
 	 * Register a new router
 	 */
-	async registerRouter(uid, vueElt, options) {
+	async registerRouter(uid, vueInstance, options) {
 		Exception.assert(!this.routers.has(uid), "A router '{}' is already registered for this element", uid);
 
 		this.routers.set(uid, {
-			router: this._makeRouter(uid, vueElt, options),
+			router: this._makeRouter(uid, vueInstance, options),
 			options: options,
 			children: new Set(),
 			parent: null,
@@ -108,13 +115,14 @@ class RouterManager {
 			pathPropagate: null,
 		});
 
-		// Build component hierarchy
-		const parent = vueElt.$el.closest("*[data-bzd-router-id]");
+		// Build component hierarchy.
+		// TODO: to be fixed, doesn't work now.
+		/*const parent = (vueElt && vueElt.closest) ? vueElt.closest("*[data-bzd-router-id]") : null;
 		if (parent) {
 			const parentId = parent.getAttribute("data-bzd-router-id");
 			this.routers.get(parentId).children.add(uid);
 			this.routers.get(uid).parent = parentId;
-		}
+		}*/
 
 		Log.debug(
 			"Registered router '{}' with parent '{}' (nb routers: {})",
@@ -153,7 +161,7 @@ class RouterManager {
 	/// The path lookup must be on the same component as when it was registered.
 	fromPath(vueElt, path) {
 		// If there is a parent router component, use it to determine the ID.
-		const parent = vueElt.$el.closest("*[data-bzd-router-id]");
+		const parent = vueElt && vueElt.closest ? vueElt.closest("*[data-bzd-router-id]") : null;
 		let configs = [];
 		if (parent) {
 			const parentId = parent.getAttribute("data-bzd-router-id");
@@ -315,7 +323,7 @@ export default {
 			onBeforeUnmount(() => {
 				routers.unregisterRouter(uid);
 			});
-			await routers.registerRouter(uid, this, routeOptions);
+			await routers.registerRouter(uid, instance, routeOptions);
 		};
 
 		app.config.globalProperties.$routerDispatch = async (path, options = {}) => {
@@ -323,7 +331,7 @@ export default {
 		};
 
 		app.config.globalProperties.$routerFromPath = function (path) {
-			return routers.fromPath(this, path);
+			return routers.fromPath(this.$el, path);
 		};
 
 		app.config.globalProperties.$routerGet = () => {

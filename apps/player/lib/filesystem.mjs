@@ -1,5 +1,4 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
-import Vue from "vue";
 
 const Exception = ExceptionFactory("filesystem");
 
@@ -166,19 +165,15 @@ export default class FileSystem {
 		} while (next);
 
 		const previous = node.children || {};
-		Vue.set(
-			node,
-			"children",
-			list.reduce((obj, item) => {
-				let data = { name: item.name, path: path + "/" + item.name };
-				if (item.type == "directory") {
-					data["expanded"] = (previous[item.name] || { expanded: false }).expanded;
-					data["children"] = null;
-				}
-				Vue.set(obj, item.name, data);
-				return obj;
-			}, {}),
-		);
+		node["children"] = list.reduce((obj, item) => {
+			let data = { name: item.name, path: path + "/" + item.name };
+			if (item.type == "directory") {
+				data["expanded"] = (previous[item.name] || { expanded: false }).expanded;
+				data["children"] = null;
+			}
+			obj[item.name] = data;
+			return obj;
+		}, {});
 	}
 
 	/// Create a new file at a given path.
@@ -187,7 +182,7 @@ export default class FileSystem {
 		const basename = FileSystem.basename(path);
 		const current = await this.createFolder(dirname);
 		let children = await current.getChildren();
-		Vue.set(children, basename, { name: initialName === null ? basename : initialName, path: path });
+		children[basename] = { name: initialName === null ? basename : initialName, path: path };
 		await this.api.request("post", "/file/content", { path: path });
 		this.selected = this.makeNode_(children[basename]);
 	}
@@ -202,7 +197,7 @@ export default class FileSystem {
 			if (name in children) {
 				Exception.assert(FileSystem.isFolder(children[name]), "Folder path conflicts with an existing file: {}", path);
 			} else {
-				Vue.set(children, name, { name: name, path: currentPathList.join("/"), expanded: true, children: {} });
+				children[name] = { name: name, path: currentPathList.join("/"), expanded: true, children: {} };
 			}
 			current = this.makeNode_(children[name]);
 		}

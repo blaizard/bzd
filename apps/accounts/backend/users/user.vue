@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<Form v-model="user" :description="description" @input-with-context="handleChange"></Form>
+		<Form v-model="user" :description="description" @update-with-context="handleChange"></Form>
 	</div>
 </template>
 
@@ -164,7 +164,7 @@
 			},
 			handleChange(data) {
 				const name = data.context.name;
-				this.$set(this.updates, name, this.user[name]);
+				this.updates[name] = this.user[name];
 			},
 			async handleApply() {
 				await this.handleSubmit(async () => {

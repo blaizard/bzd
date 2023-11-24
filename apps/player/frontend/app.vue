@@ -127,8 +127,7 @@
 				};
 			},
 		},
-		async mounted() {
-			this.scenario = new Scenario(await this.$api.request("get", "/scenario"));
+		mounted() {
 			this.$routerSet({
 				ref: "view",
 				routes: [
@@ -141,6 +140,9 @@
 						},
 					},
 				],
+			});
+			this.$api.request("get", "/scenario").then((data) => {
+				this.scenario = new Scenario(data);
 			});
 		},
 		methods: {
@@ -273,21 +275,17 @@
 									}
 								}
 								// Register the component.
-								this.$set(
-									this.components,
-									id,
-									this.components[id] || {
-										type: type,
-										name: null,
-									},
-								);
+								this.components[id] = this.components[id] || {
+									type: type,
+									name: null,
+								};
 								return id;
 							}),
 					);
 				}
-				this.$set(this.configs, configId, {
+				this.configs[configId] = {
 					layout: layout,
-				});
+				};
 				this.configId = configId;
 			},
 			async executeConfigName(id, name) {

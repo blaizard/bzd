@@ -1,4 +1,3 @@
-load("@bzd_package//:defs.bzl", "bzd_package")
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_web_binary")
 
 bzd_nodejs_web_binary(
@@ -17,6 +16,7 @@ bzd_nodejs_web_binary(
     },
     visibility = [
         "//apps/player:__pkg__",
+        "//apps/player/backend:__pkg__",
     ],
     deps = [
         "//apps/player:api",
@@ -29,14 +29,4 @@ bzd_nodejs_web_binary(
         "//nodejs/vue/components/layout:component",
         "//nodejs/vue/router",
     ],
-)
-
-bzd_package(
-    name = "local",
-    args = ["/tmp/bzd"],
-    include_metadata = True,
-    tags = ["nodejs"],
-    deps = {
-        ":frontend": "frontend",
-    },
 )

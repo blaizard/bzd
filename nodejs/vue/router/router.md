@@ -14,14 +14,14 @@ The motivations to create a new router instead of using the official Vue router 
 First of all the router is a Vue plugin and must be installed before being able to access its fuctionality:
 
 ```js
-import Vue from "vue"
+import { createApp } from "vue"
 import Router from "bzd/vue/router/router.mjs"
 
-Vue.use(Router);
+const app = createApp(...);
 
-new Vue({
-    ...
-});
+app.use(Router);
+
+app.mount(...);
 ```
 
 The router must be set in the mounted lifecycle hook of the component, for example:

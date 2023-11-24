@@ -17,7 +17,7 @@
 		mixins: [Element],
 		props: {
 			action: { type: String, optional: true, default: "" },
-			content: { type: String || Object, optional: true, default: "" },
+			content: { type: [String, Object], optional: true, default: "" },
 			width: { type: Number, optional: true, default: 0 },
 		},
 		emits: ["click"],

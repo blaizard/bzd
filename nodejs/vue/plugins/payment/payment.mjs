@@ -1,8 +1,8 @@
 import Payment from "./payment.vue";
 
 export default {
-	install(Vue, payments) {
-		Vue.component(
+	install(app, payments) {
+		app.component(
 			"Payment",
 			Payment.extend({
 				data() {

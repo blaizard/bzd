@@ -15,7 +15,10 @@ bzd_nodejs_binary(
     ]),
     args = [
         "--static",
-        "/tmp/bzd/frontend",
+        "$(rootpath //apps/player/frontend).bundle",
+    ],
+    data = [
+        "//apps/player/frontend",
     ],
     main = "app.mjs",
     packages = {

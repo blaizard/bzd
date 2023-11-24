@@ -122,10 +122,10 @@
 						onchange: (value, context) => {
 							const valueRow = value[context.row];
 							const uid = valueRow.uid;
-							this.$set(this.updates, uid, {
+							this.updates[uid] = {
 								...(this.updates[uid] || {}),
 								[context.name]: valueRow[context.name],
-							});
+							};
 						},
 					},
 				];

@@ -15,9 +15,12 @@ bzd_nodejs_binary(
     ],
     args = [
         "--static",
-        "/tmp/bzd/frontend",
+        "$(rootpath //apps/dashboard/frontend).bundle",
         "--data",
         "/tmp/bzd/db",
+    ],
+    data = [
+        "//apps/dashboard/frontend",
     ],
     main = "app.mjs",
     packages = {

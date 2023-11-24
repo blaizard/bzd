@@ -1,32 +1,32 @@
+import { reactive, computed } from "vue";
+
 export default {
-	install(Vue, args) {
-		Vue.prototype.$authentication = new Vue({
-			data: {
-				session: null,
-			},
-			methods: {
-				hasScope(scope) {
-					return this.isAuthenticated && this.session.matchAnyScopes(scope);
-				},
-			},
-			computed: {
-				isAuthenticated() {
-					return Boolean(this.session);
-				},
-			},
+	install(app, options) {
+		const state = reactive({
+			session: null,
+			isAuthenticated: computed(() => Boolean(state.session)),
 		});
 
-		Vue.prototype.$makeAuthenticationURL = (url) => args.authentication.makeAuthenticationURL(url);
-
-		args.authentication.options.onAuthentication = (maybeSession) => {
+		// Setup
+		options.authentication.options.onAuthentication = (maybeSession) => {
 			if (maybeSession) {
-				Vue.prototype.$authentication.session = maybeSession;
+				state.session = maybeSession;
 			} else {
-				Vue.prototype.$authentication.session = null;
+				state.session = null;
 			}
 		};
 
 		// Trigger to get the session status.
-		args.authentication.getSession();
+		options.authentication.getSession();
+
+		// API
+		const $authentication = reactive({
+			isAuthenticated: computed(() => state.isAuthenticated),
+			hasScope: (scope) => state.isAuthenticated && state.session.matchAnyScopes(scope),
+			makeUrl: (url) => options.authentication.makeAuthenticationURL(url),
+		});
+
+		app.config.globalProperties.$authentication = $authentication;
+		app.provide("$authentication", $authentication);
 	},
 };

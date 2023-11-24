@@ -139,6 +139,9 @@ export default class APIServer extends Base {
 
 				let result = await callback.call(context, data, authenticationData.user);
 
+				// Add debug information
+				context.addDebug("result", result);
+
 				if ("validation" in responseOptions) {
 					Exception.assert(
 						responseOptions.type == "json",
