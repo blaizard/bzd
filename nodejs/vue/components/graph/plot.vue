@@ -37,7 +37,7 @@
 			<g class="irgraph-plot-labels-x" v-show="configProcessed.showAxisX">
 				<text class="irgraph-hide" ref="labelXReferenceChar">0</text>
 				<template v-for="(item, x) in labelXMap">
-					<PlotText v-if="item.show" :x="x" :y="height - plotOffsetBottom + tickSize / 2" h-align="middle">
+					<PlotText v-if="item.show" :x="parseInt(x)" :y="height - plotOffsetBottom + tickSize / 2" h-align="middle">
 						{{ item.value }}
 					</PlotText>
 					<line
@@ -173,6 +173,7 @@
 					width: rect.width || 16,
 				};
 			}
+			this.handleResize();
 		},
 		watch: {
 			value: {

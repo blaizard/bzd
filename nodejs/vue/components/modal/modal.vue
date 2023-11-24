@@ -1,5 +1,5 @@
 <template>
-	<div class="bzd-modal-wrapper" @click="handleCancel" v-if="value">
+	<div class="bzd-modal-wrapper" @click="handleCancel" v-if="modelValue">
 		<div class="bzd-modal" @click.stop="">
 			<slot></slot>
 		</div>
@@ -9,7 +9,8 @@
 <script>
 	export default {
 		props: {
-			value: { type: Boolean, required: true },
+			// Used to show/hide the modal.
+			modelValue: { type: Boolean, required: true },
 		},
 		methods: {
 			handleCancel() {

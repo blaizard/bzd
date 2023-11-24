@@ -32,6 +32,7 @@
 	import Plugins from "../plugins/plugins.frontend.index.mjs";
 	import Color from "#bzd/nodejs/utils/color.mjs";
 	import LogFactory from "#bzd/nodejs/core/log.mjs";
+	import { defineAsyncComponent } from "vue";
 
 	const Log = LogFactory("tile");
 
@@ -127,7 +128,7 @@
 					Log.error("Unsupported plugin '{}'", this.visualizationType);
 					return null;
 				}
-				return Plugins[this.visualizationType].module;
+				return defineAsyncComponent(() => Plugins[this.visualizationType].module());
 			},
 			tileClass() {
 				return {

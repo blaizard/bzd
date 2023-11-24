@@ -1,19 +1,18 @@
 import API from "#bzd/nodejs/vue/api.mjs";
 import Router from "#bzd/nodejs/vue/router/router.mjs";
-import Vue from "vue";
+import { createApp } from "vue";
 
 import APIv1 from "../api.v1.json" assert { type: "json" };
 
 import App from "./app.vue";
 
-Vue.use(Router, {
+const app = createApp(App);
+
+app.use(Router, {
 	hash: false,
 });
-Vue.use(API, {
+app.use(API, {
 	schema: APIv1,
 });
 
-new Vue({
-	el: "#app",
-	render: (h) => h(App),
-});
+app.mount("#app");

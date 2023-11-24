@@ -1,8 +1,8 @@
 <template>
 	<div class="container">
 		<div v-if="empty" class="entry child">[empty]</div>
-		<template v-else v-for="node in orderedList">
-			<div :key="node.name" :class="getClass(node)" @click="handleClick(node)">
+		<template v-else v-for="node in orderedList" :key="node.name">
+			<div :class="getClass(node)" @click="handleClick(node)">
 				<i v-if="node.isFolder()" class="bzd-icon-folder"></i>
 				<span class="text">{{ node.name }}</span>
 			</div>
@@ -35,6 +35,7 @@
 				list: [],
 			};
 		},
+		emits: ["selected"],
 		watch: {
 			node: {
 				async handler() {

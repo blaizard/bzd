@@ -66,7 +66,7 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 			// Validate the authentication for this UID and session
 			// and return some arguments to be passed to the access token
 			if (!(await authentication.options.refreshToken(uid, session, refreshToken.timeout))) {
-				return this.sendStatus(401, "Unauthorized");
+				throw this.httpError(401, "Unauthorized");
 			}
 
 			this.setCookie("refresh_token", refreshToken.token, {
@@ -90,7 +90,7 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 					makeUid(sessionInfo.uid),
 				);
 			}
-			return this.sendStatus(401, "Unauthorized");
+			throw this.httpError(401, "Unauthorized");
 		});
 
 		api.handle("post", "/auth/logout", async function () {
@@ -100,7 +100,7 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 		api.handle("post", "/auth/refresh", async function () {
 			const refreshToken = this.getCookie("refresh_token", null);
 			if (refreshToken == null) {
-				return this.sendStatus(401, "Unauthorized");
+				throw this.httpError(401, "Unauthorized");
 			}
 
 			let data = null;
@@ -112,7 +112,7 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 				authentication.validationRefreshToken.validate(data);
 			} catch (e) {
 				Exception.fromError(e).print();
-				return this.sendStatus(401, "Unauthorized");
+				throw this.httpError(401, "Unauthorized");
 			}
 
 			// Check access here

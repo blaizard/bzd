@@ -7,7 +7,7 @@
 				<th>Type</th>
 				<th>Status</th>
 			</tr>
-			<template v-for="(service, volume) in services">
+			<template v-for="(service, volume) in services" :key="volume">
 				<tr v-for="(type, index) in service" :key="index">
 					<td>{{ volume }}</td>
 					<td>{{ type }}</td>

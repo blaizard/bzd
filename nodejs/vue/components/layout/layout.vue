@@ -70,6 +70,7 @@
 	import Base from "./base.vue";
 	import LocalStorage from "#bzd/nodejs/core/localstorage.mjs";
 	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
+	import { Comment, Fragment, Text } from "vue";
 
 	export default {
 		mixins: [Base],
@@ -98,10 +99,26 @@
 				};
 			},
 			isMenu() {
-				return Boolean(this.$slots.menu) || (this.isMobile && Boolean(this.$slots.actions));
+				return this.hasSlotContent(this.$slots.menu) || (this.isMobile && Boolean(this.$slots.actions));
 			},
 		},
 		methods: {
+			vNodeIsEmpty(vnodes) {
+				return vnodes.every((node) => {
+					if (node.type === Comment) return true;
+					if (node.type === Text && !node.children.trim()) return true;
+					if (node.type === Fragment && this.vNodeIsEmpty(node.children)) {
+						return true;
+					}
+					return false;
+				});
+			},
+			hasSlotContent(slot) {
+				if (!slot) {
+					return false;
+				}
+				return !this.vNodeIsEmpty(slot());
+			},
 			getActionHtml(action) {
 				switch (action.id) {
 					case "close":

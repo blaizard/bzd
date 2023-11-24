@@ -11,8 +11,8 @@
 	 */
 	export default {
 		props: {
-			x: { type: String || Number, required: true },
-			y: { type: String || Number, required: true },
+			x: { type: Number, required: true },
+			y: { type: Number, required: true },
 			hAlign: { type: String, required: false, default: "left" },
 		},
 		data: function () {

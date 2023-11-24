@@ -78,7 +78,7 @@
 					switch (toInputValue) {
 						case "map_to_list":
 							return (v) => {
-								return Object.entries(v).map(([key, value]) => {
+								return Object.entries(v || {}).map(([key, value]) => {
 									return Object.assign({}, value, { key: key });
 								});
 							};

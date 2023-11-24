@@ -107,6 +107,7 @@
 				return "";
 			},
 		},
+		emits: ["input"],
 		methods: {
 			getCaretPosition() {
 				const selection = window.getSelection();

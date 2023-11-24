@@ -1,3 +1,5 @@
+import { createApp } from "vue";
+
 import Authentication from "#bzd/nodejs/core/authentication/token/client.mjs";
 import Permissions from "#bzd/nodejs/db/storage/permissions.mjs";
 import API from "#bzd/nodejs/vue/api.mjs";
@@ -5,36 +7,37 @@ import AuthenticationPlugin from "#bzd/nodejs/vue/authentication.mjs";
 import CachePlugin from "#bzd/nodejs/vue/cache.mjs";
 import Notification from "#bzd/nodejs/vue/notification.mjs";
 import Router from "#bzd/nodejs/vue/router/router.mjs";
-import Vue from "vue";
 import AsyncComputed from "vue-async-computed";
 
 import APIv1 from "#bzd/api.json" assert { type: "json" };
 
 import App from "./app.vue";
 
+const app = createApp(App);
+
 let authentication = new Authentication({
 	unauthorizedCallback: () => {
-		const route = Vue.prototype.$routerGet();
-		Vue.prototype.$routerDispatch("/login", route ? { query: { redirect: route } } : {});
+		const route = app.config.globalProperties.$routerGet();
+		app.config.globalProperties.$routerDispatch("/login", route ? { query: { redirect: route } } : {});
 	},
 });
 
-Vue.use(AsyncComputed);
-Vue.use(Notification);
-Vue.use(AuthenticationPlugin, {
+app.use(AsyncComputed);
+app.use(Notification);
+app.use(AuthenticationPlugin, {
 	authentication: authentication,
 });
-Vue.use(Router, {
+app.use(Router, {
 	hash: false,
 	authentication: authentication,
 });
-Vue.use(API, {
+app.use(API, {
 	schema: APIv1,
 	authentication: authentication,
 	plugins: [authentication],
 });
 
-Vue.use(CachePlugin, {
+app.use(CachePlugin, {
 	list: {
 		cache: async (...pathList) => {
 			// The following 3 statements need to be fixed, not clean
@@ -50,7 +53,7 @@ Vue.use(CachePlugin, {
 			let list = [];
 
 			do {
-				const response = await Vue.prototype.$api.request("post", "/list", {
+				const response = await app.config.globalProperties.$api.request("post", "/list", {
 					path: pathList,
 					paging: next,
 				});
@@ -74,7 +77,4 @@ Vue.use(CachePlugin, {
 	},
 });
 
-new Vue({
-	el: "#app",
-	render: (h) => h(App),
-});
+app.mount("#app");

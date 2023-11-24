@@ -1,4 +1,4 @@
-import Vue from "vue";
+import { createApp } from "vue";
 
 import App from "#bzd/apps/accounts/frontend/app.vue";
 import APIPlugin from "#bzd/nodejs/vue/api.mjs";
@@ -9,46 +9,45 @@ import Authentication from "#bzd/nodejs/core/authentication/token/client.mjs";
 import AuthenticationPlugin from "#bzd/nodejs/vue/authentication.mjs";
 import Notification from "#bzd/nodejs/vue/notification.mjs";
 
+const app = createApp(App);
+
 // ---- Languages ----
 
-Vue.use(LangPlugin, {
+app.use(LangPlugin, {
 	gb: () => import("./lang/gb.mjs"),
 	fr: () => import("./lang/fr.mjs"),
 });
 
 // ---- Notifications ----
 
-Vue.use(Notification);
+app.use(Notification);
 
 // ---- Authentication ----
 
 const authentication = new Authentication({
 	unauthorizedCallback: async (needAuthentication) => {
 		if (needAuthentication) {
-			const route = Vue.prototype.$routerGet();
-			await Vue.prototype.$routerDispatch("/login", route ? { query: { redirect: route } } : {});
+			const route = app.config.globalProperties.$routerGet();
+			await app.config.globalProperties.$routerDispatch("/login", route ? { query: { redirect: route } } : {});
 		} else {
-			await Vue.prototype.$routerDispatch("/404");
+			await app.config.globalProperties.$routerDispatch("/404");
 		}
 	},
 });
-Vue.use(AuthenticationPlugin, {
+app.use(AuthenticationPlugin, {
 	authentication: authentication,
 });
-Vue.use(RouterPlugin, {
+app.use(RouterPlugin, {
 	hash: false,
 	authentication: authentication,
 });
 
 // ---- API ----
 
-Vue.use(APIPlugin, {
+app.use(APIPlugin, {
 	schema: APIv1,
 	authentication: authentication,
 	plugins: [authentication],
 });
 
-new Vue({
-	el: "#app",
-	render: (h) => h(App),
-});
+app.mount("#app");

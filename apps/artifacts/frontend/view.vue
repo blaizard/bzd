@@ -1,9 +1,9 @@
 <template>
 	<div v-loading="loading" class="view">
 		<div class="view-path">
-			<template v-for="(segment, index) in pathList">
-				<span class="view-path-separator" :key="index + '.sep'"> / </span>
-				<code class="view-path-segment" :key="index">
+			<template v-for="(segment, index) in pathList" :key="index">
+				<span class="view-path-separator"> / </span>
+				<code class="view-path-segment">
 					<RouterLink :link="getLink(index)">{{ segment }}</RouterLink>
 				</code>
 			</template>
@@ -16,6 +16,7 @@
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
 	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.mjs";
 	import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
+	import { defineAsyncComponent } from "vue";
 
 	import Plugins from "../plugins/frontend.mjs";
 
@@ -38,6 +39,7 @@
 		mounted() {
 			this.fetchConfig();
 		},
+		emits: ["show"],
 		watch: {
 			path: {
 				handler() {
@@ -64,7 +66,7 @@
 			},
 			viewComponent() {
 				if (this.plugin !== null) {
-					return () => this.plugin.view.apply(this);
+					return defineAsyncComponent(() => this.plugin.view.apply(this));
 				}
 			},
 		},

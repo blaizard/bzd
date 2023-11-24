@@ -15,7 +15,7 @@
 	export default {
 		props: {
 			align: { type: String, required: false, default: "top left" },
-			caption: { type: String || Object, required: false, default: null },
+			caption: { type: [String, Object], required: false, default: null },
 			disable: { type: Boolean, default: false, required: false },
 			height: { validator: (v) => ["small", "normal", "large"].includes(v), default: "normal", required: false },
 			/// Set the width of the element.
@@ -24,7 +24,7 @@
 			/// - > 0 and  < 1, elements will be inlined with a ratio equal to the number.
 			/// - 0, elements are inlined.
 			/// A string sets a fixed width for the element (eg. 75%, 100px, ...), but elements are not inlined.
-			width: { type: Number || String, default: 1, required: false },
+			width: { type: [Number, String], default: 1, required: false },
 			mandatory: { type: Boolean, default: false, required: false },
 			error: { type: Array, default: [], required: false },
 		},

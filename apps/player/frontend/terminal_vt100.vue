@@ -39,6 +39,7 @@
 		props: {
 			stream: { type: Array, mandatory: false, default: () => [] },
 		},
+		emits: ["processed"],
 		watch: {
 			stream: {
 				handler() {
@@ -186,7 +187,7 @@
 				do {
 					// If the row does not exists, create it. The loop need to cover this.y, hence the <= sign.
 					for (let y = this.content.length; y <= this.y; ++y) {
-						this.$set(this.content, y, []);
+						this.content[y] = [];
 					}
 					// If the column does not exists, create it. The loop does not need to cover this.x because this will be done when writing.
 					for (let x = this.content[this.y].length; x < this.x; ++x) {
@@ -207,7 +208,7 @@
 						} else if (c == "\x07") {
 							// Bell character - ignore
 						} else {
-							this.$set(this.content[this.y], this.x, [c, this.styleId]);
+							this.content[this.y][this.x] = [c, this.styleId];
 							++this.x;
 						}
 					}
@@ -263,12 +264,12 @@
 				// Erase start of line to the cursor
 				else if (arg == 1) {
 					for (let x = 0; x < this.x; ++x) {
-						this.$set(this.content[this.y], x, [" ", 0]);
+						this.content[this.y][x] = [" ", 0];
 					}
 				}
 				// Erase the entire line
 				else if (arg == 2) {
-					this.$set(this.content, this.y, []);
+					this.content[this.y] = [];
 				} else {
 					return false;
 				}

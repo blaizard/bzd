@@ -1,7 +1,7 @@
 <template>
 	<div class="container" v-loading="loading">
-		<template v-for="item in list">
-			<div :key="item.name" @click="handleExpand(item)" :class="getClass(item)">
+		<template v-for="item in list" :key="item.name">
+			<div @click="handleExpand(item)" :class="getClass(item)">
 				<i v-if="isPermissionList(item)" class="bzd-icon-folder"></i>
 				<span class="name" @click.stop="handleSelect(item)">{{ item.name }}</span>
 				<span class="actions" @click.stop="">
@@ -43,6 +43,7 @@
 		directives: {
 			loading: DirectiveLoading,
 		},
+		emits: ["item"],
 		data: function () {
 			return {
 				list: [],
@@ -116,7 +117,7 @@
 				if (this.nameToExpand) {
 					const maybeItem = this.nameToItem(this.nameToExpand);
 					if (maybeItem && this.isPermissionList(maybeItem)) {
-						this.$set(this.expanded, this.nameToExpand, true);
+						this.expanded[this.nameToExpand] = true;
 					}
 				}
 			},
@@ -127,14 +128,14 @@
 			handleExpand(item) {
 				const name = item.name;
 				if (name in this.expanded) {
-					this.$delete(this.expanded, name);
+					delete this.expanded[name];
 				} else {
 					this.$emit("item", {
 						item: item,
 						path: [],
 					});
 					if (this.isPermissionList(item)) {
-						this.$set(this.expanded, name, true);
+						this.expanded[name] = true;
 					}
 				}
 			},
@@ -142,7 +143,7 @@
 				const name = item.name;
 				if (!(name in this.expanded)) {
 					if (this.isPermissionList(item)) {
-						this.$set(this.expanded, name, true);
+						this.expanded[name] = true;
 					}
 				}
 				this.$emit("item", {
