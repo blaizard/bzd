@@ -19,6 +19,7 @@ bzd_nodejs_web_binary(
     },
     visibility = ["//apps/accounts/backend:__pkg__"],
     deps = [
+        "//apps/accounts/backend/applications:frontend",
         "//apps/accounts/backend/users:frontend",
         "//nodejs:icons",
         "//nodejs:vue",

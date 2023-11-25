@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<Modal v-model="showCreate">
-			<span>Create a new user:</span>
+			<span>Create a new application:</span>
 			<Form :description="descriptionAdd" @submit="handleCreate"></Form>
 		</Modal>
 		<Form v-model="form" :description="description"></Form>
@@ -27,10 +27,9 @@
 		data: function () {
 			return {
 				form: {
-					users: [],
+					applications: [],
 				},
 				deletions: [],
-				updates: {},
 				showCreate: false,
 			};
 		},
@@ -42,20 +41,14 @@
 			this.handleFetch();
 		},
 		computed: {
-			hasUpdates() {
-				return Object.keys(this.updates).length > 0;
-			},
 			hasDeletions() {
 				return this.deletions.length > 0;
 			},
 			hasChanges() {
-				return this.hasUpdates || this.hasDeletions;
+				return this.hasDeletions;
 			},
 			nbChanges() {
-				return (
-					Object.values(this.updates).reduce((value, data) => value + Object.keys(data).length, 0) +
-					this.deletions.length
-				);
+				return this.deletions.length;
 			},
 			changesContent() {
 				return this.hasChanges ? "Apply (" + this.nbChanges + ")" : "Apply";
@@ -84,32 +77,11 @@
 					},
 					{
 						type: "Table",
-						name: "users",
+						name: "applications",
 						template: [
 							{ type: "Input", caption: "UID", name: "uid", disable: true },
-							{ type: "Input", caption: "Email", name: "email", disable: true },
 							{ type: "Date", caption: "Creation", name: "creation", disable: true },
-							{ type: "Date", caption: "Last Login", name: "last_login", disable: true },
-							{ type: "Input", caption: "Roles", name: "roles", multi: true },
-							{
-								type: "Array",
-								caption: "Subscriptions",
-								name: "subscriptions",
-								template: [
-									{
-										type: "Dropdown",
-										name: "key",
-										caption: "Product",
-										list: {
-											screen_recorder: "Screen Recorder",
-										},
-										width: 0.5,
-									},
-									{ type: "Date", caption: "End Date", name: "end", width: 0.5 },
-								],
-								toInputValue: "map_to_list",
-								toOutputValue: "list_to_map",
-							},
+							{ type: "Input", caption: "Redirect", name: "redirect", disable: true },
 							{
 								type: "Button",
 								content: "Delete",
@@ -132,8 +104,9 @@
 			},
 			descriptionAdd() {
 				return [
-					{ type: "Input", placeholder: "email", name: "email", validation: "mandatory", width: 0.99 },
-					{ type: "Button", content: "Create", action: "danger", width: 0.01 },
+					{ type: "Input", placeholder: "Identifier", name: "uid", validation: "mandatory", width: 0.5 },
+					{ type: "Input", placeholder: "Redirect URL", name: "redirect", validation: "mandatory", width: 0.5 },
+					{ type: "Button", content: "Create", action: "danger" },
 				];
 			},
 			changesTooltip() {
@@ -146,18 +119,8 @@
 							.join("<br/>")
 					: "";
 
-				const updates = this.hasUpdates
-					? "<h3>Update</h3>" +
-					  Object.entries(this.updates)
-							.map((entry) => {
-								const [uid, data] = entry;
-								return "<b>" + uid + "</b>: " + Object.keys(data);
-							})
-							.join("<br/>")
-					: "";
-
 				return {
-					data: deletions + updates,
+					data: deletions,
 				};
 			},
 		},
@@ -166,10 +129,10 @@
 				await this.handleSubmit(async () => {
 					let paging = CollectionPaging.pagingFromParam(this.fetchChunk);
 					do {
-						const result = await this.$api.request("get", "/admin/users", paging);
+						const result = await this.$api.request("get", "/admin/applications", paging);
 						paging = result.next;
 						for (const [key, value] of Object.entries(result.data)) {
-							this.form.users.push({
+							this.form.applications.push({
 								uid: key,
 								...value,
 							});
@@ -179,39 +142,23 @@
 			},
 			async handleCreate(values) {
 				await this.handleSubmit(async () => {
-					await this.$api.request("post", "/admin/user", values);
-					this.form.users.push(values);
+					await this.$api.request("post", "/admin/application", values);
+					this.form.applications.push(values);
 					this.showCreate = false;
 				});
 			},
 			async handleDelete(index) {
-				const user = this.form.users[index];
-				const uid = user.uid;
+				const application = this.form.applications[index];
+				const uid = application.uid;
 				this.deletions.push(uid);
-				// Remove existing updates on this UID if any.
-				if (uid in this.updates) {
-					delete this.updates[uid];
-				}
-				// Remove the element from the users list.
-				this.form.users.splice(index, 1);
+				this.form.applications.splice(index, 1);
 			},
 			async handleApply() {
-				// Process the updates.
-				while (this.hasUpdates) {
-					const [uid, values] = Object.entries(this.updates)[0];
-					await this.handleSubmit(async () => {
-						await this.$api.request("put", "/admin/user", {
-							uid: uid,
-							...values,
-						});
-					});
-					this.$delete(this.updates, uid);
-				}
 				// Process the deletion.
 				while (this.hasDeletions) {
 					const uid = this.deletions[0];
 					await this.handleSubmit(async () => {
-						await this.$api.request("delete", "/admin/user", {
+						await this.$api.request("delete", "/admin/application", {
 							uid: uid,
 						});
 					});

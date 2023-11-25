@@ -3,8 +3,9 @@ import LogFactory from "#bzd/nodejs/core/log.mjs";
 const Log = LogFactory("test", "data");
 
 export default class TestData {
-	constructor(users) {
+	constructor(users, applications) {
 		this.users = users;
+		this.applications = applications;
 	}
 
 	async install() {
@@ -27,5 +28,7 @@ export default class TestData {
 				return user;
 			});
 		}
+
+		await this.applications.create("localhost", "http://localhost:8081/redirect");
 	}
 }

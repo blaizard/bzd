@@ -16,18 +16,7 @@
             "request": {
                 "type": "json",
                 "validation": {
-                    "email": "mandatory"
-                }
-            }
-        },
-        "put": {
-            "authentication": "admin-applications",
-            "documentation": "Update application information",
-            "request": {
-                "type": "json",
-                "validation": {
-                    "roles": "",
-                    "subscriptions": "",
+                    "redirect": "mandatory",
                     "uid": "mandatory"
                 }
             }
