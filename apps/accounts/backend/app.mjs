@@ -157,7 +157,7 @@ const AUTHENTICATION_PRIVATE_KEY = "abcd";
 	// ---- tests data ----
 
 	if (options.test) {
-		const testData = new TestData(users);
+		const testData = new TestData(users, appplications);
 		await testData.install();
 	}
 

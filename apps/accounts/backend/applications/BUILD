@@ -16,3 +16,21 @@ bzd_nodejs_library(
         "//nodejs/db:utils",
     ],
 )
+
+bzd_nodejs_library(
+    name = "frontend",
+    srcs = [
+        "applications.vue",
+    ],
+    apis = ["api.json"],
+    visibility = [
+        "//apps/accounts:__subpackages__",
+    ],
+    deps = [
+        "//nodejs/db:utils",
+        "//nodejs/vue/components/form",
+        "//nodejs/vue/components/layout:component",
+        "//nodejs/vue/components/modal",
+        "//nodejs/vue/directives:tooltip",
+    ],
+)
