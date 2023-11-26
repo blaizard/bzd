@@ -72,9 +72,9 @@ const AUTHENTICATION_PRIVATE_KEY = "abcd";
 				uid: maybeUser.getUid(),
 			};
 		},
-		saveRefreshToken: async (uid, hash, timeoutS, identifier, rolling) => {
-			await users.update(uid, (user) => {
-				const token = TokenInfo.make(identifier, user.getScopes(), timeoutS, rolling);
+		saveRefreshToken: async (session, hash, timeoutS, identifier, rolling) => {
+			await users.update(session.getUid(), (user) => {
+				const token = TokenInfo.make(identifier, session.getScopes(), timeoutS, rolling);
 				user.addToken(hash, token);
 				return user;
 			});
@@ -145,8 +145,34 @@ const AUTHENTICATION_PRIVATE_KEY = "abcd";
 		plugins: [authentication, users, appplications, pendingActions, services],
 	});
 
-	api.handle("post", "/register", async (inputs, user) => {
-		const activationCode = await pendingActions.create("group", user.getUid(), inputs);
+	/*
+	// Redirect /sso/** to /sso?product=**
+	web.addRoute("get", "/sso/{path:*}", async (context) => {
+
+		// If not authenticated, redirect to login.
+
+
+		// Redirect 
+		context.redirect(api.getEndpoint("/sso?product=" + context.getParam("")));
+	});
+	*/
+
+	api.handle("get", "/sso", async function (inputs, session) {
+		Exception.assertPrecondition(session, "Must be authenticated.");
+
+		// Get that the application exists.
+		const application = await appplications.get(inputs.application, /*allowNull*/ true);
+		Exception.assertPrecondition(application, "Application '{}' does not exists.", inputs.application);
+
+		// Get the SSO token.
+		const query = await authentication.makeSSOQuery(inputs.application, session, inputs.application.scopes);
+		console.log(query);
+
+		this.redirect(application.getRedirect());
+	});
+
+	api.handle("post", "/register", async (inputs, session) => {
+		const activationCode = await pendingActions.create("group", session.getUid(), inputs);
 		return String(activationCode);
 	});
 

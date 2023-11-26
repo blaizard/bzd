@@ -6,17 +6,6 @@ export default class User {
 		this.scopes = new Set(scopes);
 	}
 
-	/// Check that all the scopes passed into arguments are valid (part of the validScopes).
-	static checkValidScopes(scopes, validScopes) {
-		const validScopesSet = new Set([...validScopes]);
-		for (const scope of scopes) {
-			if (!validScopesSet.has(scope)) {
-				return Result.makeErrorString("Scope '{}' is not valid, must be one of: {}.", scope, [...validScopes]);
-			}
-		}
-		return new Result();
-	}
-
 	/// Get session identifier.
 	getUid() {
 		return this.uid;
@@ -83,5 +72,20 @@ export default class User {
 			}
 		}
 		return new Result();
+	}
+
+	/// Check that all the scopes passed into arguments are valid (part of this session scope).
+	checkValidScopes(scopes) {
+		for (const scope of scopes) {
+			if (!this.scopes.has(scope)) {
+				return Result.makeErrorString("Scope '{}' is not valid, must be one of: {}.", scope, [...this.scopes]);
+			}
+		}
+		return new Result();
+	}
+
+	intersectScopes(scopes) {
+		const instersect = new Set([...scopes].filter((scope) => this.scopes.has(scope)));
+		return [...instersect.values()];
 	}
 }

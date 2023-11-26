@@ -34,4 +34,13 @@ export default class AuthenticationServer {
 	async verify(context, callback = async (/*user*/) => true) {
 		return this._verifyImpl(context, callback);
 	}
+
+	/// Create a single sign on query.
+	///
+	/// \param identifier The identifier name associated with this session.
+	/// \param session The user session.
+	/// \param scopes The scopes requested.
+	async makeSSOQuery(identifier, session, scopes) {
+		return this._makeSSOQueryImpl(identifier, session, session.intersectScopes(scopes));
+	}
 }

@@ -13,5 +13,16 @@
                 "type": "json"
             }
         }
+    },
+    "/sso": {
+        "get": {
+            "documentation": "Get SSO for a specific application.",
+            "request": {
+                "type": "query",
+                "validation": {
+                    "application": "mandatory"
+                }
+            }
+        }
     }
 }

@@ -95,7 +95,11 @@
 			async handleSubmitLogin() {
 				await this.handleSubmit(async () => {
 					await this.$api.login(this.info.uid, this.info.password, this.info.persistent, "accounts");
-					this.$routerDispatch(this.redirect || "/");
+					if (this.redirect) {
+						window.location.href = this.redirect;
+					} else {
+						this.$routerDispatch("/");
+					}
 				});
 			},
 		},

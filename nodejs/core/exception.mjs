@@ -3,6 +3,21 @@ import LogFactory from "./log.mjs";
 import uncaughtExceptionHandler from "./impl/exception/backend.mjs";
 const Log = LogFactory("exception");
 
+export class ExceptionPrecondition extends Error {
+	constructor(exception) {
+		super();
+		this.exception = exception;
+	}
+
+	get message() {
+		return this.exception.message;
+	}
+
+	toString() {
+		return String(this.exception);
+	}
+}
+
 /**
  * Private class to combine exception elements
  */
@@ -22,7 +37,7 @@ class ExceptionCombine {
 	}
 }
 
-const ExceptionFactory = (...topics) => {
+export const ExceptionFactory = (...topics) => {
 	return class Exception extends Error {
 		constructor(str = "", ...args) {
 			// This should capture a callstack
@@ -60,6 +75,11 @@ const ExceptionFactory = (...topics) => {
 			return String(str);
 		}
 
+		static makePreconditionException(str = "", ...args) {
+			const exception = new Exception(str, ...args);
+			return new ExceptionPrecondition(exception);
+		}
+
 		/**
 		 * Convert an Error into an Exception
 		 */
@@ -94,6 +114,21 @@ const ExceptionFactory = (...topics) => {
 		}
 
 		/**
+		 * \brief Assert that a precondition is statisfied.
+		 *
+		 * \param expression The expression to evaluate.
+		 * \param str (optional) The message to display if the assertion fails.
+		 * \param ...args (optional) Arguments to add to the message.
+		 */
+		static assertPrecondition(expression, str = "", ...args) {
+			if (!expression) {
+				let value = new ExceptionCombine("Precondition failed");
+				value.add(str, ...args);
+				throw this.makePreconditionException(value);
+			}
+		}
+
+		/**
 		 * Assert that the result passed into argument has a value.
 		 *
 		 * \param expression The result to evaluate.
@@ -103,6 +138,19 @@ const ExceptionFactory = (...topics) => {
 				let value = new ExceptionCombine("Assertion failed");
 				value.add(result.error());
 				throw new Exception(value);
+			}
+		}
+
+		/**
+		 * Assert that the result passed into argument has a value.
+		 *
+		 * \param expression The result to evaluate.
+		 */
+		static assertPreconditionResult(result) {
+			if (result.hasError()) {
+				let value = new ExceptionCombine("Precondition failed");
+				value.add(result.error());
+				throw this.makePreconditionException(value);
 			}
 		}
 
