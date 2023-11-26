@@ -27,8 +27,7 @@ app.use(Notification);
 const authentication = new Authentication({
 	unauthorizedCallback: async (needAuthentication) => {
 		if (needAuthentication) {
-			const route = app.config.globalProperties.$routerGet();
-			await app.config.globalProperties.$routerDispatch("/login", route ? { query: { redirect: route } } : {});
+			await app.config.globalProperties.$routerDispatch("/login", { query: { redirect: window.location.href } });
 		} else {
 			await app.config.globalProperties.$routerDispatch("/404");
 		}

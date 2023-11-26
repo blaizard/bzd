@@ -31,7 +31,7 @@ export default class Users {
 	/// \param email Email address of the user.
 	async create(email) {
 		const uid = this._emailToUid(email);
-		Exception.assert(
+		Exception.assertPrecondition(
 			(await this.get(uid, /*allowNull*/ true)) == null,
 			"A user with this UID '{}' already exists.",
 			uid,
@@ -55,7 +55,7 @@ export default class Users {
 			this.config.bucket,
 			uid,
 			async (data) => {
-				Exception.assert(data !== null, "User '{}' does not exists.", uid);
+				Exception.assertPrecondition(data !== null, "User '{}' does not exists.", uid);
 				user = await modifier(new User(uid, data));
 				if (!silent) {
 					Log.info("{}: updated {}.", uid, user.getModifiedAsString());
@@ -97,14 +97,14 @@ export default class Users {
 	async get(uid, allowNull = false) {
 		const data = await this.keyValueStore.get(this.config.bucket, uid, null);
 		if (data === null) {
-			Exception.assert(allowNull, "User '{}' does not exists.", uid);
+			Exception.assertPrecondition(allowNull, "User '{}' does not exists.", uid);
 			return null;
 		}
 		return new User(uid, data);
 	}
 
 	_preprocessAndMergeAdmin(values, user) {
-		Exception.assert(
+		Exception.assertPrecondition(
 			Object.keys(values).every((key) => ["roles", "subscriptions"].includes(key)),
 			"Some values cannot be changed by the admin: {}",
 			Object.keys(values),
@@ -124,7 +124,7 @@ export default class Users {
 	}
 
 	_preprocessAndMergePublic(values, user) {
-		Exception.assert(
+		Exception.assertPrecondition(
 			Object.keys(values).every((key) => ["password", "oldpassword", "tokens"].includes(key)),
 			"Some values cannot be changed: {}",
 			Object.keys(values),
@@ -132,8 +132,8 @@ export default class Users {
 
 		// Update password if any.
 		if ("password" in values) {
-			Exception.assert("oldpassword" in values, "Missing old password: '{:j}'", values);
-			Exception.assert(user.getPassword() === values.oldpassword, "Old password is different");
+			Exception.assertPrecondition("oldpassword" in values, "Missing old password: '{:j}'", values);
+			Exception.assertPrecondition(user.getPassword() === values.oldpassword, "Old password is different");
 
 			user.setPassword(values.password);
 		}

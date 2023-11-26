@@ -1,6 +1,6 @@
 import Url from "url";
 
-import ExceptionFactory from "../exception.mjs";
+import { ExceptionFactory, ExceptionPrecondition } from "../exception.mjs";
 import LogFactory from "../log.mjs";
 import Validation from "../validation.mjs";
 import { HttpServerContext, HttpError } from "#bzd/nodejs/core/http/server_context.mjs";
@@ -181,6 +181,8 @@ export default class APIServer extends Base {
 			} catch (e) {
 				if (e instanceof HttpError) {
 					context.sendStatus(e.code, e.message);
+				} else if (e instanceof ExceptionPrecondition) {
+					context.sendStatus(400, e.message);
 				} else {
 					Exception.print("Exception Guard");
 					// The formatting string is important to ensure that error message is not

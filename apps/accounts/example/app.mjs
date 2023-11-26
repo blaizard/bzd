@@ -17,13 +17,7 @@ const ACCOUNTS_URL = options.accounts;
 	const web = new HttpServer(PORT);
 
 	web.addRoute("GET", "/", (context) => {
-		context.send(
-			'<head><body><a href="' +
-				ACCOUNTS_URL +
-				"/login?product=hello&redirect=%2Fsso%3Fredirect%3Dhttp%3A%2F%2Flocalhost2%3A" +
-				PORT +
-				'%2Fredirect">Login</a></body></head>',
-		);
+		context.send('<head><body><a href="' + ACCOUNTS_URL + '/api/v1/sso?application=localhost">Login</a></body></head>');
 	});
 
 	// Get the refresh token
