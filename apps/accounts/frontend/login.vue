@@ -1,14 +1,19 @@
 <template>
 	<Authentication title="LOGIN">
-		<Form v-model="info" :description="formLoginDescription" @submit="handleSubmitLogin"></Form>
-		<div class="reset">
-			<RouterLink link="/reset">{{ $lang.getCapitalized("passwordforgot") }}</RouterLink>
-		</div>
-		<div class="signup">
-			<RouterLink link="/register">{{ $lang.getCapitalized("signup") }}</RouterLink>
-		</div>
-		<div class="or">or</div>
-		<Form :description="formLoginTrustedDescription"></Form>
+		<template v-if="!$authentication.isAuthenticated">
+			<Form v-model="info" :description="formLoginDescription" @submit="handleSubmitLogin"></Form>
+			<div class="reset">
+				<RouterLink link="/reset">{{ $lang.getCapitalized("passwordforgot") }}</RouterLink>
+			</div>
+			<div class="signup">
+				<RouterLink link="/register">{{ $lang.getCapitalized("signup") }}</RouterLink>
+			</div>
+			<div class="or">or</div>
+			<Form :description="formLoginTrustedDescription"></Form>
+		</template>
+		<template v-else>
+			<span class="logged-in-message">Already logged-in</span>
+		</template>
 	</Authentication>
 </template>
 
@@ -32,17 +37,23 @@
 		},
 		watch: {
 			"$authentication.isAuthenticated": {
-				handler(isAuthenticated) {
+				async handler(isAuthenticated) {
 					// Do this only if loading is not active to avoid a race when login.
 					if (isAuthenticated && !this.loading) {
-						const route = this.$routerGet();
-						this.$routerDispatch("/logout", route ? { query: { redirect: route } } : {});
+						await this.afterLogin();
+						//const route = this.$routerGet();
+						//this.$routerDispatch("/logout", route ? { query: { redirect: route } } : {});
 					}
 				},
 				immediate: true,
 			},
 		},
 		computed: {
+			application() {
+				return typeof URLSearchParams !== "undefined"
+					? new URLSearchParams(window.location.search).get("application")
+					: null;
+			},
 			formLoginTrustedDescription() {
 				return [
 					{
@@ -92,14 +103,20 @@
 			},
 		},
 		methods: {
+			async afterLogin() {
+				if (this.application) {
+					const data = await this.$api.request("get", "/sso", { application: this.application });
+					window.location.href = data.redirect + "?sso=" + encodeURIComponent(data.token);
+				} else if (this.redirect) {
+					window.location.href = this.redirect;
+				} else {
+					this.$routerDispatch("/");
+				}
+			},
 			async handleSubmitLogin() {
 				await this.handleSubmit(async () => {
 					await this.$api.login(this.info.uid, this.info.password, this.info.persistent, "accounts");
-					if (this.redirect) {
-						window.location.href = this.redirect;
-					} else {
-						this.$routerDispatch("/");
-					}
+					await this.afterLogin();
 				});
 			},
 		},
@@ -112,6 +129,10 @@
 		text-align: right;
 	}
 	.or {
+		text-align: center;
+	}
+	.logged-in-message {
+		display: block;
 		text-align: center;
 	}
 </style>

@@ -10,7 +10,7 @@ bzd_nodejs_web_binary(
     apis = ["//apps/accounts:api.v1.json"],
     config_scss = ":config.scss",
     heads = [
-        "<title>bzd accounts</title>",
+        "<title>Accounts</title>",
     ],
     main = "app.mjs",
     packages = {

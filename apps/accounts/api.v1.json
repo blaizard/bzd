@@ -16,11 +16,19 @@
     },
     "/sso": {
         "get": {
+            "authentication": true,
             "documentation": "Get SSO for a specific application.",
             "request": {
                 "type": "query",
                 "validation": {
                     "application": "mandatory"
+                }
+            },
+            "response": {
+                "type": "json",
+                "validation": {
+                    "redirect": "mandatory",
+                    "token": "mandatory"
                 }
             }
         }

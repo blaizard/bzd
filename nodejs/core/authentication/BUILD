@@ -7,7 +7,7 @@ bzd_nodejs_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//nodejs/utils:result",
+        ":scopes",
     ],
 )
 
@@ -19,6 +19,17 @@ bzd_nodejs_library(
     visibility = ["//visibility:public"],
     deps = [
         "//nodejs/core:exception",
+    ],
+)
+
+bzd_nodejs_library(
+    name = "scopes",
+    srcs = [
+        "scopes.mjs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//nodejs/utils:result",
     ],
 )
 

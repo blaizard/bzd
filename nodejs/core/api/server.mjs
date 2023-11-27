@@ -75,18 +75,18 @@ export default class APIServer extends Base {
 
 			try {
 				// Check if this is a request that needs authentication
-				let authenticationData = { user: null };
+				let authenticationData = { session: null };
 				if (authentication) {
-					// Check if user is authorized
-					let isAuthorized = await authentication.verify(context, (user) => {
-						authenticationData.user = user;
+					// Check if session is authorized
+					let isAuthorized = await authentication.verify(context, (session) => {
+						authenticationData.session = session;
 						return true;
 					});
-					// Check if the user has any of the scopes
+					// Check if the session has any of the scopes
 					if (isAuthorized) {
 						const authenticationSchema = this.schema[endpoint][method].authentication;
 						if (typeof authenticationSchema == "string" || Array.isArray(authenticationSchema)) {
-							isAuthorized &= authenticationData.user.matchAnyScopes(authenticationSchema);
+							isAuthorized &= authenticationData.session.getScopes().matchAny(authenticationSchema);
 						}
 					}
 					if (!isAuthorized) {
@@ -116,7 +116,7 @@ export default class APIServer extends Base {
 
 				// Add debug information
 				context.addDebug("data", data);
-				context.addDebug("user", authenticationData.user);
+				context.addDebug("session", authenticationData.session);
 
 				if ("validation" in requestOptions) {
 					Exception.assert(
@@ -134,10 +134,10 @@ export default class APIServer extends Base {
 
 				if ("scopes" in requestOptions) {
 					Exception.assert(authentication, "'scopes' can only be set with authentication.");
-					Exception.assertResult(authenticationData.user.checkAllByScopes(data, requestOptions.scopes));
+					Exception.assertResult(authenticationData.session.getScopes().checkDictionary(data, requestOptions.scopes));
 				}
 
-				let result = await callback.call(context, data, authenticationData.user);
+				let result = await callback.call(context, data, authenticationData.session);
 
 				// Add debug information
 				context.addDebug("result", result);
@@ -158,7 +158,7 @@ export default class APIServer extends Base {
 				if ("scopes" in responseOptions) {
 					console.log();
 					Exception.assert(authentication, "'scopes' can only be set with authentication.");
-					result = authenticationData.user.filterByScopes(result, responseOptions.scopes);
+					result = authenticationData.session.getScopes().filterDictionary(result, responseOptions.scopes);
 				}
 
 				if (!context.manualResponse) {

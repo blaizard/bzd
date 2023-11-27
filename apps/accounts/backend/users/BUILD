@@ -18,6 +18,7 @@ bzd_nodejs_library(
     deps = [
         "//nodejs/core:exception",
         "//nodejs/core:log",
+        "//nodejs/core/authentication:scopes",
         "//nodejs/db:utils",
     ],
 )
@@ -34,6 +35,7 @@ bzd_nodejs_library(
         "//apps/accounts:__subpackages__",
     ],
     deps = [
+        "//nodejs/core/authentication:scopes",
         "//nodejs/db:utils",
         "//nodejs/vue/components/form",
         "//nodejs/vue/components/layout:component",

@@ -1,6 +1,6 @@
-import API from "#bzd/apps/accounts/backend/users/api.json" assert { type: "json" };
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
+import Scopes from "#bzd/nodejs/core/authentication/scopes.mjs";
 
 import {
 	scopeAdminUsers,
@@ -43,12 +43,12 @@ export default class Roles {
 
 	/// Get the scopes associated with the roles.
 	static getScopes(...roles) {
-		let scopes = new Set();
+		let scopes = [];
 		for (const role of roles) {
 			Exception.assert(role in rolesScopesMap, "There is no role named '{}'.", role);
-			scopes = new Set([...scopes, ...rolesScopesMap[role]]);
+			scopes = [...scopes, ...rolesScopesMap[role]];
 		}
 
-		return [...scopes];
+		return new Scopes(scopes);
 	}
 }

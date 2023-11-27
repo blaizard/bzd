@@ -21,6 +21,7 @@
 				@loading="handleLoading"
 				@updated="handleUpdated"
 				v-loading="loading"
+				class="bzd-accounts-content"
 			></RouterComponent>
 		</template>
 	</Layout>
@@ -87,5 +88,11 @@
 
 	.bzd-icon-logo {
 		@include icons.defineIcon("bzd.svg");
+	}
+</style>
+
+<style lang="scss" scoped>
+	.bzd-accounts-content {
+		padding: 20px;
 	}
 </style>

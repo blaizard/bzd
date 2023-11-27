@@ -1,3 +1,5 @@
+import Scopes from "#bzd/nodejs/core/authentication/scopes.mjs";
+
 /// Read, add and change anything related to users.
 export const scopeAdminUsers = "admin-users";
 /// Read, add and change anything related to applications.
@@ -18,3 +20,17 @@ export const scopeSelfTokensWrite = "self-tokens:w";
 export const scopeSelfSubscriptionsRead = "self-subscriptions:r";
 /// Change the current user subscriptions.
 export const scopeSelfSubscriptionsWrite = "self-subscriptions:w";
+
+/// All the scopes available
+export const allScopes = new Scopes([
+	scopeAdminUsers,
+	scopeAdminApplications,
+	scopeSelfBasicRead,
+	scopeSelfBasicWrite,
+	scopeSelfRolesRead,
+	scopeSelfRolesWrite,
+	scopeSelfTokensRead,
+	scopeSelfTokensWrite,
+	scopeSelfSubscriptionsRead,
+	scopeSelfSubscriptionsWrite,
+]);

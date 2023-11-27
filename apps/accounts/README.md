@@ -17,5 +17,7 @@ bazel run //apps/accounts/backend --config=dev -- --test
 Run the client application example.
 
 ```bash
-bazel run //apps/accounts/example --config=dev -- --accounts "http://localhost:8080"
+bazel run //apps/accounts/example --config=dev -- --accounts "http://127.0.0.1:8080"
 ```
+
+Note by using `127.0.0.1` instead of `localhost`, the cookies between this example and the accounts app are not shared, this is a trick that can be used for testing locally.
