@@ -1,5 +1,6 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
+import Scopes from "#bzd/nodejs/core/authentication/scopes.mjs";
 
 const Exception = ExceptionFactory("token");
 const Log = LogFactory("token");
@@ -55,6 +56,6 @@ export default class TokenInfo {
 	}
 
 	getScopes() {
-		return this.value.scopes || [];
+		return new Scopes(this.value.scopes || []);
 	}
 }

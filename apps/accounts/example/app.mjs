@@ -17,7 +17,7 @@ const ACCOUNTS_URL = options.accounts;
 	const web = new HttpServer(PORT);
 
 	web.addRoute("GET", "/", (context) => {
-		context.send('<head><body><a href="' + ACCOUNTS_URL + '/api/v1/sso?application=localhost">Login</a></body></head>');
+		context.send('<head><body><a href="' + ACCOUNTS_URL + '/login?application=localhost">Login</a></body></head>');
 	});
 
 	// Get the refresh token
@@ -26,7 +26,7 @@ const ACCOUNTS_URL = options.accounts;
 	// 2. Password will be stored in server logs (which is obviously bad)
 	// 3. History caches in browsers
 	// To mitigate this, the refersh token is immediatly exchanged to a new refresh token.
-	web.addRoute("GET", "/redirect", (context) => {
+	web.addRoute("GET", "/redirect", async (context) => {
 		// context.temp_code
 		// await post(ACCOUNTS_URL/auth/refresh?refresh_token=asaas&rolling=??)
 

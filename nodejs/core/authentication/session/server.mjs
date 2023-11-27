@@ -83,13 +83,12 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 			const sessionInfo = await authentication.options.verifyIdentity(inputs.uid, inputs.password);
 			if (sessionInfo) {
 				const session = new Session(sessionInfo.uid, sessionInfo.scopes);
-				// Generate the refresh token.
-				const hash = authentication._makeTokenHash();
+
 				const timeoutS = inputs.persistent
 					? authentication.options.tokenRefreshLongTermExpiresIn
 					: authentication.options.tokenRefreshShortTermExpiresIn;
-				await authentication.options.saveRefreshToken(session, hash, timeoutS, inputs.identifier, /*rolling*/ true);
-				const refreshToken = authentication._makeToken(session.getUid(), hash);
+				const refreshToken = await authentication._makeRefreshToken(inputs.identifier, session, timeoutS);
+
 				this.setCookie("refresh_token", refreshToken, {
 					httpOnly: true,
 					maxAge: timeoutS * 1000,
@@ -140,7 +139,7 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 						token: authentication._makeToken(result.session.getUid(), result.data.hash),
 						timeout: result.data.expiration - authentication._getTimestamp(),
 						uid: result.session.getUid(),
-						scopes: result.session.getScopes(),
+						scopes: result.session.getScopes().toList(),
 					};
 				}
 			}
@@ -154,14 +153,14 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		});
 	}
 
-	async _makeSSOQueryImpl(identifier, uid, scopes) {
-		const session = new Session(uid, scopes);
-		// Generate the refresh token.
-		const hash = authentication._makeTokenHash();
-		const timeoutS = authentication.options.tokenRefreshSSOExpiresIn;
-		await authentication.options.saveRefreshToken(session, hash, timeoutS, identifier, /*rolling*/ true);
-		const refreshToken = authentication._makeToken(uid, hash);
-		return refreshToken;
+	async _makeSSOTokenImpl(identifier, session) {
+		return await this._makeRefreshToken(identifier, session, this.options.tokenRefreshSSOExpiresIn);
+	}
+
+	async _makeRefreshToken(identifier, session, timeoutS) {
+		const hash = this._makeTokenHash();
+		await this.options.saveRefreshToken(session, hash, timeoutS, identifier, /*rolling*/ true);
+		return this._makeToken(session.getUid(), hash);
 	}
 
 	/// Get the current timestamp in seconds.
@@ -181,7 +180,7 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 					break;
 				}
 				// If the session has the same scopes, re-use it1
-				if (session.sameScopesAs(sessionData.scopes)) {
+				if (session.getScopes().sameAs(sessionData.scopes)) {
 					return {
 						token: this._makeToken(session.getUid(), sessionData.hash),
 						timeout: timeoutS,
@@ -193,7 +192,7 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		const sessionData = {
 			hash: this._makeTokenHash(),
 			expiration: this._getTimestamp() + this.options.tokenAccessExpiresIn,
-			scopes: session.getScopes(),
+			scopes: session.getScopes().toList(),
 		};
 
 		// Insert the new session and return the token.
@@ -217,7 +216,7 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 			token: this._makeToken(session.getUid(), sessionData.hash),
 			timeout: this.options.tokenAccessExpiresIn,
 			uid: session.getUid(),
-			scopes: session.getScopes(),
+			scopes: session.getScopes().toList(),
 		};
 	}
 

@@ -44,7 +44,7 @@ export default class AuthenticationClient {
 			await this.unauthorizedCallback_(/*needAuthentication*/ true);
 		} else if (typeof scopeOrScopesOrBoolean == "boolean") {
 			return;
-		} else if (!maybeSession.matchAnyScopes(scopeOrScopesOrBoolean)) {
+		} else if (!maybeSession.getScopes().matchAny(scopeOrScopesOrBoolean)) {
 			await this.unauthorizedCallback_(/*needAuthentication*/ false);
 		}
 	}

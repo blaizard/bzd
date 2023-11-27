@@ -68,13 +68,13 @@ const AUTHENTICATION_PRIVATE_KEY = "abcd";
 				/*silent*/ true,
 			);
 			return {
-				scopes: maybeUser.getScopes(),
+				scopes: maybeUser.getScopes().toList(),
 				uid: maybeUser.getUid(),
 			};
 		},
 		saveRefreshToken: async (session, hash, timeoutS, identifier, rolling) => {
 			await users.update(session.getUid(), (user) => {
-				const token = TokenInfo.make(identifier, session.getScopes(), timeoutS, rolling);
+				const token = TokenInfo.make(identifier, session.getScopes().toList(), timeoutS, rolling);
 				user.addToken(hash, token);
 				return user;
 			});
@@ -102,7 +102,7 @@ const AUTHENTICATION_PRIVATE_KEY = "abcd";
 			}
 
 			let result = {
-				scopes: maybeToken.getScopes(),
+				scopes: maybeToken.getScopes().toList(),
 				uid: uid,
 			};
 
@@ -158,17 +158,18 @@ const AUTHENTICATION_PRIVATE_KEY = "abcd";
 	*/
 
 	api.handle("get", "/sso", async function (inputs, session) {
-		Exception.assertPrecondition(session, "Must be authenticated.");
-
 		// Get that the application exists.
 		const application = await appplications.get(inputs.application, /*allowNull*/ true);
 		Exception.assertPrecondition(application, "Application '{}' does not exists.", inputs.application);
 
 		// Get the SSO token.
-		const query = await authentication.makeSSOQuery(inputs.application, session, inputs.application.scopes);
-		console.log(query);
+		const token = await authentication.makeSSOToken(inputs.application, session, application.getScopes().toList());
 
-		this.redirect(application.getRedirect());
+		return {
+			token: token,
+			redirect: application.getRedirect(),
+		};
+		//this.redirect(application.getRedirect());
 	});
 
 	api.handle("post", "/register", async (inputs, session) => {

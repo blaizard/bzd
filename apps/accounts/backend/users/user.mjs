@@ -85,7 +85,7 @@ export default class User {
 	}
 
 	hasScope(scope) {
-		return this.getScopes().includes(scope);
+		return this.getScopes().contains(scope);
 	}
 
 	addRole(role) {
@@ -186,12 +186,7 @@ export default class User {
 			this.uid,
 		);
 		Exception.assert(token instanceof TokenInfo, "Token must be of type TokenInfo: '{}'.", token);
-		Exception.assert(
-			token.getScopes().every((r) => this.hasScope(r)),
-			"Token scopes must be a subset of its user scopes: '{}' vs '{}'.",
-			token.getScopes(),
-			this.getScopes(),
-		);
+		Exception.assertResult(this.getScopes().checkValid(token.getScopes().toList()));
 
 		this.modified.push("tokens(+" + hash.slice(0, 16) + "[...])");
 		this.value.tokens[hash] = token.data();
@@ -237,7 +232,7 @@ export default class User {
 			creation: this.getCreationTimestamp(),
 			last_login: this.getLastLoginTimestamp(),
 			roles: this.getRoles(),
-			scopes: this.getScopes(),
+			scopes: this.getScopes().toList(),
 			subscriptions: this.getSubscriptions(),
 			tokens: this.getTokens(),
 		};

@@ -23,14 +23,14 @@ export default class Applications {
 	/// \param redirect The redirect URL for this application.
 	///
 	/// \return The application.
-	async create(uid, redirect) {
+	async create(uid, redirect, scopes) {
 		Exception.assert(
 			(await this.get(uid, /*allowNull*/ true)) == null,
 			"An application with this UID '{}' already exists.",
 			uid,
 		);
 
-		const application = Application.create(uid, redirect);
+		const application = Application.create(uid, redirect, scopes);
 		await this.keyValueStore.set(this.config.bucket, uid, application.data());
 		Log.info("{}: created.", uid);
 

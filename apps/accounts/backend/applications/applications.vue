@@ -14,6 +14,7 @@
 	import Modal from "#bzd/nodejs/vue/components/modal/modal.vue";
 	import { CollectionPaging } from "#bzd/nodejs/db/utils.mjs";
 	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
+	import { allScopes } from "#bzd/apps/accounts/backend/users/scopes.mjs";
 
 	export default {
 		mixins: [Component],
@@ -83,6 +84,13 @@
 							{ type: "Date", caption: "Creation", name: "creation", disable: true },
 							{ type: "Input", caption: "Redirect", name: "redirect", disable: true },
 							{
+								type: "Dropdown",
+								caption: "Scopes",
+								name: "scopes",
+								multi: true,
+								disable: true,
+							},
+							{
 								type: "Button",
 								content: "Delete",
 								action: "danger",
@@ -104,8 +112,16 @@
 			},
 			descriptionAdd() {
 				return [
-					{ type: "Input", placeholder: "Identifier", name: "uid", validation: "mandatory", width: 0.5 },
-					{ type: "Input", placeholder: "Redirect URL", name: "redirect", validation: "mandatory", width: 0.5 },
+					{ type: "Input", placeholder: "Identifier", name: "uid", validation: "mandatory", width: 0.3 },
+					{ type: "Input", placeholder: "Redirect URL", name: "redirect", validation: "mandatory", width: 0.4 },
+					{
+						type: "Dropdown",
+						placeholder: "Scopes",
+						name: "scopes",
+						multi: true,
+						list: allScopes.toList(),
+						width: 0.3,
+					},
 					{ type: "Button", content: "Create", action: "danger" },
 				];
 			},

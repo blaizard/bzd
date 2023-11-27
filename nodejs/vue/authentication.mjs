@@ -22,7 +22,7 @@ export default {
 		// API
 		const $authentication = reactive({
 			isAuthenticated: computed(() => state.isAuthenticated),
-			hasScope: (scope) => state.isAuthenticated && state.session.matchAnyScopes(scope),
+			hasScope: (scope) => state.isAuthenticated && state.session.getScopes().matchAny(scope),
 			makeUrl: (url) => options.authentication.makeAuthenticationURL(url),
 		});
 

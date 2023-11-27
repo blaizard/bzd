@@ -1,4 +1,5 @@
 import ExceptionFactory from "../exception.mjs";
+import Session from "./session.mjs";
 
 const Exception = ExceptionFactory("authentication", "server");
 
@@ -35,12 +36,14 @@ export default class AuthenticationServer {
 		return this._verifyImpl(context, callback);
 	}
 
-	/// Create a single sign on query.
+	/// Create a single sign on token.
 	///
 	/// \param identifier The identifier name associated with this session.
-	/// \param session The user session.
+	/// \param session The current session.
 	/// \param scopes The scopes requested.
-	async makeSSOQuery(identifier, session, scopes) {
-		return this._makeSSOQueryImpl(identifier, session, session.intersectScopes(scopes));
+	async makeSSOToken(identifier, session, scopes) {
+		Exception.assertPreconditionResult(session.getScopes().checkValid(scopes));
+		const ssoSession = new Session(session.getUid(), scopes);
+		return this._makeSSOTokenImpl(identifier, ssoSession);
 	}
 }
