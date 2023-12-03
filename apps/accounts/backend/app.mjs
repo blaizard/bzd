@@ -169,7 +169,6 @@ const AUTHENTICATION_PRIVATE_KEY = "abcd";
 			token: token,
 			redirect: application.getRedirect(),
 		};
-		//this.redirect(application.getRedirect());
 	});
 
 	api.handle("post", "/register", async (inputs, session) => {

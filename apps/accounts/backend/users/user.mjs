@@ -188,7 +188,7 @@ export default class User {
 		Exception.assert(token instanceof TokenInfo, "Token must be of type TokenInfo: '{}'.", token);
 		Exception.assertResult(this.getScopes().checkValid(token.getScopes().toList()));
 
-		this.modified.push("tokens(+" + hash.slice(0, 16) + "[...])");
+		this.modified.push("tokens(" + token.identifier() + " +" + hash.slice(0, 16) + "[...])");
 		this.value.tokens[hash] = token.data();
 	}
 
@@ -204,7 +204,9 @@ export default class User {
 	removeToken(hash) {
 		if ("tokens" in this.value) {
 			if (hash in this.value.tokens) {
-				this.modified.push("tokens(-" + hash.slice(0, 16) + "[...])");
+				const token = this.getToken(hash, null);
+				Exception.assert(token !== null, "There is no token with this hash: '{}'.", hash);
+				this.modified.push("tokens(" + token.identifier() + " -" + hash.slice(0, 16) + "[...])");
 				delete this.value.tokens[hash];
 			}
 		}
@@ -215,7 +217,9 @@ export default class User {
 		Exception.assert(token !== null, "There is no token with this hash: '{}'.", hash);
 		Exception.assert(this.getToken(newHash, null) === null, "There is already a token with this hash: '{}'.", newHash);
 
-		this.modified.push("tokens(-" + hash.slice(0, 16) + "[...] +" + newHash.slice(0, 16) + "[...])");
+		this.modified.push(
+			"tokens(" + token.identifier() + " -" + hash.slice(0, 16) + "[...] +" + newHash.slice(0, 16) + "[...])",
+		);
 		delete this.value.tokens[hash];
 		this.value.tokens[newHash] = token.data();
 

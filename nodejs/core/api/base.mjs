@@ -7,21 +7,15 @@ export default class API {
 	constructor(schema, options) {
 		this.options = Object.assign(
 			{
-				/**
-				 * Authentication object to be used with this API.
-				 */
+				/// The host to be used, if null, the current host is used.
+				host: null,
+				/// Authentication object to be used with this API.
 				authentication: null,
-				/**
-				 * Version of the API to be used.
-				 */
+				/// Version of the API to be used.
 				version: 1,
-				/**
-				 * Channel to be used as a transportation mean for this API
-				 */
+				/// Channel to be used as a transportation mean for this API
 				channel: null,
-				/**
-				 * Include additional plugins if any
-				 */
+				/// Include additional plugins if any
 				plugins: [],
 			},
 			options,
@@ -42,14 +36,6 @@ export default class API {
 	}
 
 	/**
-	 * Add a schema to the existing schema.
-	 * Note this only update high level routes and do not deep merge.
-	 */
-	addSchema(schema) {
-		Object.assign(this.schema, schema);
-	}
-
-	/**
 	 * If authentication is supported
 	 */
 	isAuthentication() {
@@ -57,7 +43,7 @@ export default class API {
 	}
 
 	getEndpoint(endpoint) {
-		return "/api/v" + this.options.version + endpoint;
+		return (this.options.host ? this.options.host : "") + "/api/v" + this.options.version + endpoint;
 	}
 
 	/// Install all available plugins.
