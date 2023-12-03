@@ -30,7 +30,7 @@ export default class StripePayment {
 
 	async installAPI(api) {
 		Log.debug("Installing Stripe payment API.");
-		api.addSchema(APISchema);
+
 		if (!this.options.makePaymentIntent) {
 			this.options.makePaymentIntent = async (amount, metadata) => {
 				return await api.request("post", "/payment/stripe/intent", {

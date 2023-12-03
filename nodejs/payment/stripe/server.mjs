@@ -34,7 +34,6 @@ export default class StripePayment {
 
 	async installAPI(api) {
 		Log.debug("Installing Stripe payment API.");
-		api.addSchema(APISchema);
 
 		api.handle("post", "/payment/stripe/intent", async (inputs /*, uid*/) => {
 			this.options.intentCallback(inputs.amount, inputs.metadata);

@@ -8,8 +8,8 @@ bazel run apps/dashboard/backend --config=dev
 
 Restart either frontend/backend to rebuild and inject any update.
 
-## Build the docker image
+## Push the docker image
 
 ```bash
-bazel build apps/dashboard
+bazel run apps/dashboard:push
 ```

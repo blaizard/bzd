@@ -26,6 +26,7 @@ export default class AuthenticationClient {
 		return Boolean(await this._getSessionImpl());
 	}
 
+	/// Internal helper to call unauthorizedCallback.
 	async unauthorizedCallback_(needAuthentication) {
 		if (this.options.unauthorizedCallback) {
 			await this.options.unauthorizedCallback(needAuthentication);
@@ -52,11 +53,6 @@ export default class AuthenticationClient {
 	/// Return the session when authenticated, null otherwise.
 	async getSession() {
 		return await this._getSessionImpl();
-	}
-
-	/// Attempt to refresh an authentication
-	async refreshAuthentication() {
-		return await this._refreshAuthenticationImpl();
 	}
 
 	/// Attempt to login

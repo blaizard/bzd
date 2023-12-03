@@ -126,8 +126,18 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		});
 
 		// Use a refresh token to create an access token.
-		api.handle("post", "/auth/refresh", async function () {
-			// Check if there is an access_token
+		api.handle("post", "/auth/refresh", async function (inputs) {
+			this.setHeader("Access-Control-Allow-Origin", "http://localhost:8081");
+			this.setHeader("Access-Control-Allow-Credentials", "true");
+			this.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+			this.setHeader("Access-Control-Allow-Headers", "Origin, Content-Type, Accept");
+
+			console.log("REFRESH!", this.getCookie("refresh_token"));
+
+			const maybeRefreshToken = "refresh_token" in inputs ? inputs.refresh_token : null;
+			let maybeTokenObject = false;
+
+			// Check if there is an access token and that it is still valid.
 			const maybeAccessToken = authentication._getAccessToken(this);
 			if (maybeAccessToken) {
 				const result = await authentication._verifyAccessToken(
@@ -135,7 +145,7 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 					authentication.options.tokenAccessExpiresInReuse,
 				);
 				if (result) {
-					return {
+					maybeTokenObject = {
 						token: authentication._makeToken(result.session.getUid(), result.data.hash),
 						timeout: result.data.expiration - authentication._getTimestamp(),
 						uid: result.session.getUid(),
@@ -145,10 +155,33 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 			}
 
 			// If not, refresh the token from the refresh_token.
-			const maybeTokenObject = await authentication._getAndRefreshAccessToken(this);
+			if (!maybeTokenObject) {
+				maybeTokenObject = await authentication._getAndRefreshAccessToken(this, maybeRefreshToken);
+			}
+
 			if (!maybeTokenObject) {
 				throw this.httpError(401, "Unauthorized");
 			}
+
+			// Set the access token.
+			this.setCookie("access_token", maybeTokenObject.token, {
+				httpOnly: true,
+				maxAge: maybeTokenObject.timeout * 1000,
+			});
+
+			// Set the refresh token (if needed).
+			if ("refresh_token" in maybeTokenObject) {
+				// Add the refresh token only if it was provided as input.
+				if (!maybeRefreshToken) {
+					this.setCookie("refresh_token", maybeTokenObject.refresh_token, {
+						httpOnly: true,
+						newMaxAge: maybeTokenObject.refresh_timeout ? maybeTokenObject.refresh_timeout * 1000 : undefined,
+					});
+					delete maybeTokenObject.refresh_token;
+					delete maybeTokenObject.refresh_timeout;
+				}
+			}
+
 			return maybeTokenObject;
 		});
 	}
@@ -184,6 +217,8 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 					return {
 						token: this._makeToken(session.getUid(), sessionData.hash),
 						timeout: timeoutS,
+						uid: session.getUid(),
+						scopes: session.getScopes().toList(),
 					};
 				}
 			}
@@ -251,8 +286,8 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 	}
 
 	/// Refresh an access token from a refresh token.
-	async _getAndRefreshAccessToken(context) {
-		const refreshToken = context.getCookie("refresh_token", null);
+	async _getAndRefreshAccessToken(context, maybeRefreshToken = null) {
+		const refreshToken = maybeRefreshToken ? maybeRefreshToken : context.getCookie("refresh_token", null);
 		if (refreshToken == null) {
 			return false;
 		}
@@ -280,13 +315,17 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 
 		// Create the access token.
 		const session = new Session(maybeToken.uid, maybeToken.scopes);
-		const accessToken = await this._makeAccessToken(session);
-		context.setCookie("access_token", accessToken.token, {
-			httpOnly: true,
-			maxAge: accessToken.timeout * 1000,
-		});
+		let maybeAccessToken = await this._makeAccessToken(session);
 
-		return accessToken;
+		// If the token has a new hash or timeout, update the cookie.
+		if (maybeAccessToken && ("hash" in maybeToken || "timeout" in maybeToken)) {
+			Object.assign(maybeAccessToken, {
+				refresh_token: maybeToken.hash ? this._makeToken(uid, maybeToken.hash) : refreshToken,
+				refresh_timeout: maybeToken.timeout,
+			});
+		}
+
+		return maybeAccessToken;
 	}
 
 	/// Get the access token from an HTTP context.

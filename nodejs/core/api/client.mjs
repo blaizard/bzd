@@ -92,51 +92,31 @@ export default class APIClient extends Base {
 				Exception.unreachable("{} {}: Unsupported request type '{}'", method, endpoint, requestOptions.type);
 		}
 
-		let retry;
-		let retryCounter = 0;
-		do {
-			++retryCounter;
-			retry = false;
+		// Check if this is a request that needs authentication
+		if (this.schema[endpoint][method].authentication) {
+			Exception.assert(
+				this.isAuthentication(),
+				"This route has authentication requirement but no authentication object was specified.",
+			);
+			Exception.assert(await this.options.authentication.isAuthenticated(), "A user must be authenticated.");
+			await this.options.authentication.setAuthenticationFetch(fetchOptions);
+		}
 
-			// Check if this is a request that needs authentication
-			if (this.schema[endpoint][method].authentication) {
-				Exception.assert(
-					this.isAuthentication(),
-					"This route has authentication requirement but no authentication object was specified.",
-				);
-				Exception.assert(await this.options.authentication.isAuthenticated(), "A user must be authenticated.");
-				await this.options.authentication.setAuthenticationFetch(fetchOptions);
-			}
-
-			try {
-				const channel = this.options.channel ? this.options.channel : HttpClient;
-				const result = await channel.request(this.getEndpoint(updatedEndpoint), fetchOptions);
-				if ("validation" in responseOptions) {
-					Exception.assert(
-						["json"].includes(responseOptions.type),
-						"{} {}: validation is not available for {}.",
-						method,
-						endpoint,
-						responseOptions.type,
-					);
-					const validation = new Validation(responseOptions.validation);
-					validation.validate(result, {
-						all: true,
-					});
-				}
-				return result;
-			} catch (e) {
-				if (e instanceof HttpClientException) {
-					if (e.code == 401 /*Unauthorized*/) {
-						if (this.schema[endpoint][method].authentication) {
-							await this.options.authentication.refreshAuthentication();
-							retry = true;
-							continue;
-						}
-					}
-				}
-				throw e;
-			}
-		} while (retry && retryCounter <= 1);
+		const channel = this.options.channel ? this.options.channel : HttpClient;
+		const result = await channel.request(this.getEndpoint(updatedEndpoint), fetchOptions);
+		if ("validation" in responseOptions) {
+			Exception.assert(
+				["json"].includes(responseOptions.type),
+				"{} {}: validation is not available for {}.",
+				method,
+				endpoint,
+				responseOptions.type,
+			);
+			const validation = new Validation(responseOptions.validation);
+			validation.validate(result, {
+				all: true,
+			});
+		}
+		return result;
 	}
 }
