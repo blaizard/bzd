@@ -106,7 +106,7 @@
 			async afterLogin() {
 				if (this.application) {
 					const data = await this.$api.request("get", "/sso", { application: this.application });
-					window.location.href = data.redirect + "?t=" + encodeURIComponent(data.token);
+					window.location.href = data.redirect + "?sso_token=" + encodeURIComponent(data.token);
 				} else if (this.redirect) {
 					window.location.href = this.redirect;
 				} else {

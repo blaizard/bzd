@@ -16,9 +16,6 @@ export default {
 			}
 		};
 
-		// Trigger to get the session status.
-		options.authentication.getSession();
-
 		// API
 		const $authentication = reactive({
 			isAuthenticated: computed(() => state.isAuthenticated),

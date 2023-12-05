@@ -1,0 +1,13 @@
+{
+    "/auth/google": {
+        "post": {
+            "documentation": "Login with Google.",
+            "request": {
+                "type": "json",
+                "validation": {
+                    "token_id": "mandatory"
+                }
+            }
+        }
+    }
+}
