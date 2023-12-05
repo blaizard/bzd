@@ -9,7 +9,6 @@ export default {
 		const data = reactive({
 			entries: [],
 		});
-		const dataReadOnly = readonly(data);
 		let _uid = 0;
 		const defaultActions = [{ id: "close", callback: (entry) => notificationClose(entry) }];
 		const tryToString = (message) => {
@@ -108,7 +107,8 @@ export default {
 			error,
 			success,
 			close: notificationClose,
-			entries: dataReadOnly.entries,
+			entries: readonly(data).entries,
+			defaultActions: readonly(defaultActions),
 		};
 	},
 };

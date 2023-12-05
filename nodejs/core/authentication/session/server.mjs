@@ -91,6 +91,7 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 
 				this.setCookie("refresh_token", refreshToken, {
 					httpOnly: true,
+					sameSite: "strict",
 					maxAge: timeoutS * 1000,
 				});
 
@@ -126,15 +127,20 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		});
 
 		// Use a refresh token to create an access token.
+		api.handle("options", "/auth/refresh", async function () {
+			this.setHeader("Access-Control-Allow-Origin", "*");
+			this.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+			this.setHeader("Access-Control-Allow-Headers", "Origin, Content-Type, Accept");
+		});
+
+		/// Use a refresh token to create an access token.
+		///
+		/// If refresh_token is given as an argument, return the tokens by values, if not, return it from the cookies.
 		api.handle("post", "/auth/refresh", async function (inputs) {
-			this.setHeader("Access-Control-Allow-Origin", "http://localhost:8081");
-			this.setHeader("Access-Control-Allow-Credentials", "true");
-			this.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+			this.setHeader("Access-Control-Allow-Origin", "*");
+			this.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
 			this.setHeader("Access-Control-Allow-Headers", "Origin, Content-Type, Accept");
 
-			console.log("REFRESH!", this.getCookie("refresh_token"));
-
-			const maybeRefreshToken = "refresh_token" in inputs ? inputs.refresh_token : null;
 			let maybeTokenObject = false;
 
 			// Check if there is an access token and that it is still valid.
@@ -156,6 +162,8 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 
 			// If not, refresh the token from the refresh_token.
 			if (!maybeTokenObject) {
+				const maybeRefreshToken =
+					"refresh_token" in inputs ? inputs.refresh_token : this.getCookie("refresh_token", null);
 				maybeTokenObject = await authentication._getAndRefreshAccessToken(this, maybeRefreshToken);
 			}
 
@@ -163,18 +171,20 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 				throw this.httpError(401, "Unauthorized");
 			}
 
-			// Set the access token.
-			this.setCookie("access_token", maybeTokenObject.token, {
-				httpOnly: true,
-				maxAge: maybeTokenObject.timeout * 1000,
-			});
+			// If refresh token is coming from the cookie, set cookies as well.
+			if (!("refresh_token" in inputs)) {
+				// Set the access token.
+				this.setCookie("access_token", maybeTokenObject.token, {
+					httpOnly: true,
+					sameSite: "strict",
+					maxAge: maybeTokenObject.timeout * 1000,
+				});
 
-			// Set the refresh token (if needed).
-			if ("refresh_token" in maybeTokenObject) {
-				// Add the refresh token only if it was provided as input.
-				if (!maybeRefreshToken) {
+				// Set the refresh token (if needed).
+				if ("refresh_token" in maybeTokenObject) {
 					this.setCookie("refresh_token", maybeTokenObject.refresh_token, {
 						httpOnly: true,
+						sameSite: "strict",
 						newMaxAge: maybeTokenObject.refresh_timeout ? maybeTokenObject.refresh_timeout * 1000 : undefined,
 					});
 					delete maybeTokenObject.refresh_token;
@@ -287,12 +297,11 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 
 	/// Refresh an access token from a refresh token.
 	async _getAndRefreshAccessToken(context, maybeRefreshToken = null) {
-		const refreshToken = maybeRefreshToken ? maybeRefreshToken : context.getCookie("refresh_token", null);
-		if (refreshToken == null) {
+		if (maybeRefreshToken == null) {
 			return false;
 		}
 
-		const [uid, hash] = this._readToken(refreshToken);
+		const [uid, hash] = this._readToken(maybeRefreshToken);
 		const maybeToken = await this.options.refreshToken(uid, hash, () => {
 			return {
 				hash: this._makeTokenHash(),
@@ -303,16 +312,6 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 			return false;
 		}
 
-		// If the token has a new hash or timeout, update the cookie.
-		if ("hash" in maybeToken || "timeout" in maybeToken) {
-			const newRefreshToken = maybeToken.hash ? this._makeToken(uid, maybeToken.hash) : refreshToken;
-			const newMaxAge = maybeToken.timeout ? maybeToken.timeout * 1000 : undefined;
-			context.setCookie("refresh_token", newRefreshToken, {
-				httpOnly: true,
-				maxAge: newMaxAge,
-			});
-		}
-
 		// Create the access token.
 		const session = new Session(maybeToken.uid, maybeToken.scopes);
 		let maybeAccessToken = await this._makeAccessToken(session);
@@ -320,7 +319,7 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		// If the token has a new hash or timeout, update the cookie.
 		if (maybeAccessToken && ("hash" in maybeToken || "timeout" in maybeToken)) {
 			Object.assign(maybeAccessToken, {
-				refresh_token: maybeToken.hash ? this._makeToken(uid, maybeToken.hash) : refreshToken,
+				refresh_token: maybeToken.hash ? this._makeToken(uid, maybeToken.hash) : maybeRefreshToken,
 				refresh_timeout: maybeToken.timeout,
 			});
 		}

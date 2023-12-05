@@ -8,6 +8,7 @@ bzd_nodejs_library(
     apis = ["api.json"],
     visibility = ["//visibility:public"],
     deps = [
+        "//nodejs/core:cookie",
         "//nodejs/core:exception",
         "//nodejs/core:log",
         "//nodejs/core:mutex",

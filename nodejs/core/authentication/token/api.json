@@ -28,11 +28,22 @@
         }
     },
     "/auth/refresh": {
+        "options": {
+            "documentation": "Pre-flight request used for CORS."
+        },
         "post": {
-            "documentation": "Login API used to exchange a refresh token for an access token.",
+            "documentation": "Exchange a refresh token for an access token.",
+            "request": {
+                "type": "json",
+                "validation": {
+                    "refresh_token": ""
+                }
+            },
             "response": {
                 "type": "json",
                 "validation": {
+                    "refresh_timeout": "",
+                    "refresh_token": "",
                     "scopes": "mandatory",
                     "timeout": "mandatory",
                     "token": "mandatory",

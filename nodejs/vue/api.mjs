@@ -4,5 +4,6 @@ export default {
 	install(app, options) {
 		const api = new API(options.schema, options);
 		app.config.globalProperties.$api = api;
+		app.provide("$api", api);
 	},
 };

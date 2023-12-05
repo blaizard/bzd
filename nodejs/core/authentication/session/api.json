@@ -28,6 +28,9 @@
         }
     },
     "/auth/refresh": {
+        "options": {
+            "documentation": "Pre-flight request used for CORS."
+        },
         "post": {
             "documentation": "Exchange a refresh token for an access token.",
             "request": {

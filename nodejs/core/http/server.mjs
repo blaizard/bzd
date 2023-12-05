@@ -318,6 +318,9 @@ export default class HttpServer {
 			case "patch":
 				this.app.patch(updatedURI, ...callbackList);
 				break;
+			case "options":
+				this.app.options(updatedURI, ...callbackList);
+				break;
 			case "*":
 				this.app.all(updatedURI, ...callbackList);
 				break;

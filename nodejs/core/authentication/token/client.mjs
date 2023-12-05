@@ -4,6 +4,7 @@ import AuthenticationClient from "../client.mjs";
 import Mutex from "#bzd/nodejs/core/mutex.mjs";
 import Session from "../session.mjs";
 import Validation from "../../validation.mjs";
+import Cookie from "#bzd/nodejs/core/cookie.mjs";
 
 const Exception = ExceptionFactory("authentication", "token");
 const Log = LogFactory("authentication", "token");
@@ -37,19 +38,36 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 
 		if (!this.options.refreshTokenCallback) {
 			this.options.refreshTokenCallback = async () => {
-				return await api.request("post", "/auth/refresh");
+				const maybeRefreshToken = this.getRefreshToken();
+				const data = maybeRefreshToken ? { refresh_token: maybeRefreshToken } : {};
+				return await api.request("post", "/auth/refresh", data);
 			};
+			await this.tryRefreshAuthentication(/*nothrow*/ true);
 		}
+	}
+
+	getRefreshToken() {
+		return Cookie.get("refresh_token_local", null);
+	}
+
+	setRefreshToken(token, timeoutS = 0) {
+		Cookie.set(
+			"refresh_token_local",
+			token,
+			timeoutS
+				? {
+						maxAge: timeoutS * 1000,
+				  }
+				: {},
+		);
 	}
 
 	/// Get the current session if any.
 	async _getSessionImpl() {
-		await this.mutex.lock();
 		if (this.session === undefined) {
 			// Try to refresh the current token if any
 			await this.tryRefreshAuthentication(/*nothrow*/ true);
 		}
-		await this.mutex.release();
 
 		return this.session ? this.session : null;
 	}
@@ -59,6 +77,10 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 		this.validationResult.validate(data);
 
 		this.token = data.token;
+		if ("refresh_token" in data) {
+			this.setRefreshToken(data.refresh_token, data.refresh_timeout);
+		}
+
 		this.session = new Session(data.uid, data.scopes);
 		this.options.onAuthentication(this.session);
 
@@ -80,6 +102,7 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 	clearSession() {
 		this.token = null;
 		this.session = null;
+		Cookie.remove("refresh_token_local");
 		this.options.onAuthentication(null);
 
 		if (this.interval) {
@@ -91,6 +114,7 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 	async tryRefreshAuthentication(nothrow = false) {
 		if (this.options.refreshTokenCallback) {
 			try {
+				await this.mutex.lock();
 				const result = await this.options.refreshTokenCallback();
 				if (result) {
 					Exception.assert("token" in result, "Missing token.");
@@ -103,6 +127,8 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 				if (!nothrow && e.code != 401 /*Unauthorized*/) {
 					throw e;
 				}
+			} finally {
+				await this.mutex.release();
 			}
 		}
 		return false;
@@ -142,6 +168,12 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 		Exception.assert("timeout" in result, "Missing timeout.");
 		this.setSession(result);
 		return result;
+	}
+
+	async _loginWithSSOImpl(api, ssoToken) {
+		Cookie.removeAll();
+		this.setRefreshToken(ssoToken);
+		await this._refreshAuthenticationImpl();
 	}
 
 	async _logoutImpl(api) {

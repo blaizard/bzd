@@ -65,6 +65,14 @@ bzd_nodejs_library(
 )
 
 bzd_nodejs_library(
+    name = "cookie",
+    srcs = [
+        "cookie.mjs",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+bzd_nodejs_library(
     name = "crypto",
     srcs = [
         "crypto.mjs",

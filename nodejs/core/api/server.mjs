@@ -156,7 +156,6 @@ export default class APIServer extends Base {
 				}
 
 				if ("scopes" in responseOptions) {
-					console.log();
 					Exception.assert(authentication, "'scopes' can only be set with authentication.");
 					result = authenticationData.session.getScopes().filterDictionary(result, responseOptions.scopes);
 				}

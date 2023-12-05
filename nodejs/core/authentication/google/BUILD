@@ -10,3 +10,18 @@ bzd_nodejs_library(
         "//nodejs/core:script",
     ],
 )
+
+bzd_nodejs_library(
+    name = "server",
+    srcs = [
+        "server.mjs",
+    ],
+    apis = ["api.json"],
+    packages = {
+        "google-auth-library": "",
+    },
+    visibility = ["//visibility:public"],
+    deps = [
+        "//nodejs/core:script",
+    ],
+)

@@ -60,6 +60,11 @@ export default class AuthenticationClient {
 		return await this._loginImpl(api, uid, password, persistent, identifier);
 	}
 
+	/// Attempt to login with a SSO token
+	async loginWithSSO(api, ssoToken) {
+		return await this._loginWithSSOImpl(api, ssoToken);
+	}
+
 	/// Attempt to logout
 	async logout(api) {
 		await this._logoutImpl(api);
