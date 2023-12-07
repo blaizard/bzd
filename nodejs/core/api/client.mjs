@@ -11,6 +11,7 @@ const Exception = ExceptionFactory("api", "client");
 export default class APIClient extends Base {
 	constructor(schema, options) {
 		super(schema, options);
+		this.providers = {};
 		this._installPlugins()
 			.then(() => this.event.trigger("ready"))
 			.catch((e) => this.event.trigger("error", e));
@@ -28,6 +29,18 @@ export default class APIClient extends Base {
 			}
 			return description;
 		});
+	}
+
+	/// Register a new provider.
+	provide(key, action) {
+		Exception.assert(!(key in this.providers), "The provider '{}' is already registered.", key);
+		this.providers[key] = action;
+	}
+
+	/// Invoke a provider previously registered.
+	async invoke(key, ...args) {
+		Exception.assert(key in this.providers, "The provider '{}' is not registered.", key);
+		return await this.providers[key](...args);
 	}
 
 	async login(uid, password, persistent = false, identifier = "") {

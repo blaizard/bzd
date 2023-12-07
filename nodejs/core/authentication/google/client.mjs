@@ -1,33 +1,42 @@
 import loadScript from "#bzd/nodejs/core/script.mjs";
 
+async function triggerAuthentication(clientId) {
+	await loadScript("https://accounts.google.com/gsi/client");
+
+	return new Promise((resolve, reject) => {
+		window.google.accounts.id.initialize({
+			client_id: clientId,
+			callback: (data) => {
+				resolve(data);
+			},
+			error_callback: (err) => {
+				reject(err);
+			},
+		});
+		window.google.accounts.id.prompt((notification) => {
+			if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+				// Needed to force google to reset its settings.
+				document.cookie = "g_state=;path=/;expires=Thu, 01 Jan 1970 00:00:01 GMT";
+				window.google.accounts.id.prompt();
+			}
+		});
+	});
+}
+
 export default class Google {
 	constructor(clientId) {
 		this.clientId = clientId;
+		this.api = null;
+	}
+
+	async installAPI(api) {
+		api.provide("google-authenticate", async () => await this.authenticate());
+		this.api = api;
 	}
 
 	// https://developers.google.com/identity/gsi/web/guides/overview
-	// Using https://developers.google.com/identity/oauth2/web/guides/use-token-model
 	async authenticate() {
-		await loadScript("https://accounts.google.com/gsi/client");
-
-		return new Promise((resolve, reject) => {
-			//google.accounts.id.initialize({
-			//	client_id: "YOUR_GOOGLE_CLIENT_ID",
-			//	callback: handleCredentialResponse
-			//});
-
-			const client = google.accounts.oauth2.initTokenClient({
-				client_id: this.clientId,
-				scope: "https://www.googleapis.com/auth/cloud-platform.read-only",
-				callback: (tokenResponse) => {
-					resolve(tokenResponse);
-				},
-				error_callback: (err) => {
-					reject(err);
-				},
-			});
-
-			client.requestAccessToken();
-		});
+		const result = await triggerAuthentication(this.clientId);
+		console.log("authenticated", result);
 	}
 }
