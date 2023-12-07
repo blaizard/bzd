@@ -4,6 +4,7 @@ bzd_nodejs_binary(
     name = "backend",
     srcs = [
         "app.mjs",
+        "//apps/accounts:config.json",
     ],
     apis = ["//apps/accounts:api.v1.json"],
     args = [
@@ -24,6 +25,7 @@ bzd_nodejs_binary(
         "//apps/accounts/backend/tests:test_data",
         "//apps/accounts/backend/users",
         "//nodejs/core/api:server",
+        "//nodejs/core/authentication/google:server",
         "//nodejs/core/authentication/session:server",
         "//nodejs/core/http:server",
         "//nodejs/db/key_value_store:memory",

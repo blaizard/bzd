@@ -6,6 +6,7 @@ import KeyValueStoreMemory from "#bzd/nodejs/db/key_value_store/memory.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import Authentication from "#bzd/nodejs/core/authentication/session/server.mjs";
+import AuthenticationGoogle from "#bzd/nodejs/core/authentication/google/server.mjs";
 import HttpServer from "#bzd/nodejs/core/http/server.mjs";
 import Services from "#bzd/apps/accounts/backend/services/services.mjs";
 import PendingActions from "#bzd/apps/accounts/backend/pending_actions/pending_actions.mjs";
@@ -13,6 +14,7 @@ import Users from "#bzd/apps/accounts/backend/users/users.mjs";
 import Applications from "#bzd/apps/accounts/backend/applications/applications.mjs";
 import TokenInfo from "#bzd/apps/accounts/backend/users/token.mjs";
 import TestData from "#bzd/apps/accounts/backend/tests/test_data.mjs";
+import Config from "#bzd/apps/accounts/config.json" assert { type: "json" };
 
 const Exception = ExceptionFactory("backend");
 const Log = LogFactory("backend");
@@ -123,6 +125,10 @@ const AUTHENTICATION_PRIVATE_KEY = "abcd";
 		},
 	});
 
+	const authenticationGoogle = new AuthenticationGoogle({
+		clientId: Config.googleClientId,
+	});
+
 	// Create the pending actions module
 	const pendingActions = new PendingActions(keyValueStoreRegister, {
 		register: {
@@ -142,7 +148,7 @@ const AUTHENTICATION_PRIVATE_KEY = "abcd";
 	const api = new API(APIv1, {
 		authentication: authentication,
 		channel: web,
-		plugins: [authentication, users, appplications, pendingActions, services],
+		plugins: [authentication, authenticationGoogle, users, appplications, pendingActions, services],
 	});
 
 	/*

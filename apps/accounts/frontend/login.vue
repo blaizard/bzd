@@ -20,7 +20,6 @@
 <script>
 	import Authentication from "#bzd/apps/accounts/frontend/authentication_base.vue";
 	import Form from "#bzd/nodejs/vue/components/form/form.vue";
-	import GoogleClient from "#bzd/nodejs/core/authentication/google/client.mjs";
 	import Base from "#bzd/apps/accounts/frontend/base.vue";
 
 	export default {
@@ -61,10 +60,7 @@
 						content: "Login with Google",
 						fill: true,
 						click: async () => {
-							const client = new GoogleClient(
-								"484561133642-u96s0aq8rlmvj80ca03udqeavcsfvln9.apps.googleusercontent.com",
-							);
-							await client.authenticate();
+							await this.$api.invoke("google-authenticate");
 						},
 					},
 				];

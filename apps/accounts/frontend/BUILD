@@ -6,17 +6,14 @@ bzd_nodejs_web_binary(
         "**/*.mjs",
         "**/*.vue",
         "**/*.svg",
-    ]),
+    ]) + ["//apps/accounts:config.json"],
     apis = ["//apps/accounts:api.v1.json"],
     config_scss = ":config.scss",
     heads = [
         "<title>Accounts</title>",
+        "<meta name=\"referrer\" content=\"no-referrer-when-downgrade\" />",
     ],
     main = "app.mjs",
-    packages = {
-        "passport": "",
-        "passport-google-oidc": "",
-    },
     visibility = ["//apps/accounts/backend:__pkg__"],
     deps = [
         "//apps/accounts/backend/applications:frontend",

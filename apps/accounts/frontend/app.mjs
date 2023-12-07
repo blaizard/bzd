@@ -6,8 +6,10 @@ import APIv1 from "#bzd/api.json" assert { type: "json" };
 import RouterPlugin from "#bzd/nodejs/vue/router/router.mjs";
 import LangPlugin from "#bzd/nodejs/vue/lang.mjs";
 import Authentication from "#bzd/nodejs/core/authentication/token/client.mjs";
+import AuthenticationGoogle from "#bzd/nodejs/core/authentication/google/client.mjs";
 import AuthenticationPlugin from "#bzd/nodejs/vue/authentication.mjs";
 import Notification from "#bzd/nodejs/vue/notification.mjs";
+import Config from "#bzd/apps/accounts/config.json" assert { type: "json" };
 
 const app = createApp(App);
 
@@ -33,6 +35,8 @@ const authentication = new Authentication({
 		}
 	},
 });
+const authenticationGoogle = new AuthenticationGoogle(Config.googleClientId);
+
 app.use(AuthenticationPlugin, {
 	authentication: authentication,
 });
@@ -46,7 +50,7 @@ app.use(RouterPlugin, {
 app.use(APIPlugin, {
 	schema: APIv1,
 	authentication: authentication,
-	plugins: [authentication],
+	plugins: [authentication, authenticationGoogle],
 });
 
 app.mount("#app");
