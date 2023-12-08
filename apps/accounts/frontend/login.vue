@@ -109,7 +109,6 @@
 			},
 			async handleSubmitLogin() {
 				await this.handleSubmit(async () => {
-					const password = this.info.password;
 					await this.$api.login(this.info.uid, this.info.password, this.info.persistent, "accounts");
 					await this.afterLogin();
 				});

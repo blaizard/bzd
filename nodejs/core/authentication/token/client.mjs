@@ -117,8 +117,6 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 				await this.mutex.lock();
 				const result = await this.options.refreshTokenCallback();
 				if (result) {
-					Exception.assert("token" in result, "Missing token.");
-					Exception.assert("timeout" in result, "Missing timeout.");
 					this.setSession(result);
 					return result;
 				}
@@ -164,9 +162,7 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 			persistent: persistent,
 			identifier: identifier,
 		});
-		Exception.assert("token" in result, "Missing token.");
-		Exception.assert("timeout" in result, "Missing timeout.");
-		this.setSession(result);
+		await this._loginWithDetailsImpl(result);
 		return result;
 	}
 
@@ -174,6 +170,10 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 		Cookie.removeAll();
 		this.setRefreshToken(ssoToken);
 		await this._refreshAuthenticationImpl();
+	}
+
+	async _loginWithDetailsImpl(api, details) {
+		this.setSession(details);
 	}
 
 	async _logoutImpl(api) {

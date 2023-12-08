@@ -22,7 +22,7 @@ app.use(AuthenticationPlugin, {
 // ---- API ----
 
 app.use(APIPlugin, {
-	host: "http://127.0.0.1:8080",
+	host: "http://localhost:8080",
 	schema: APIv1,
 	authentication: authentication,
 	plugins: [authentication],

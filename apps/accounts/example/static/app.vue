@@ -6,7 +6,7 @@
 <script setup>
 	import { onMounted, inject } from "vue";
 
-	const ACCOUNTS_URL = "http://127.0.0.1:8080";
+	const ACCOUNTS_URL = "http://localhost:8080";
 	const api = inject("$api");
 
 	const onClickLogin = () => {

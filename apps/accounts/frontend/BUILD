@@ -14,7 +14,10 @@ bzd_nodejs_web_binary(
         "<meta name=\"referrer\" content=\"no-referrer-when-downgrade\" />",
     ],
     main = "app.mjs",
-    visibility = ["//apps/accounts/backend:__pkg__"],
+    visibility = [
+        "//apps/accounts:__pkg__",
+        "//apps/accounts/backend:__pkg__",
+    ],
     deps = [
         "//apps/accounts/backend/applications:frontend",
         "//apps/accounts/backend/users:frontend",

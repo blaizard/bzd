@@ -53,6 +53,11 @@ export default class APIClient extends Base {
 		return await this.options.authentication.loginWithSSO(this, ssoToken);
 	}
 
+	async loginWithDetails(details) {
+		Exception.assert(this.isAuthentication(), "Authentication is not enabled.");
+		return await this.options.authentication.loginWithDetails(this, details);
+	}
+
 	async logout() {
 		Exception.assert(this.isAuthentication(), "Authentication is not enabled.");
 		return await this.options.authentication.logout(this);

@@ -32,7 +32,7 @@ export default class GoogleIdentityServer {
 			}
 
 			Exception.assert(email, "The email cannot be null: {}", email);
-			await api.loginWithUID(this, email, "google", /*persistent*/ false);
+			return await api.loginWithUID(this, email, "google", /*persistent*/ false);
 		});
 	}
 }

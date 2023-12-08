@@ -29,15 +29,12 @@ program
 		parseInt,
 	)
 	.option("-s, --static <path>", "Directory to static serve.", ".")
-	.option("-d, --data <path>", "Where to store the data, can also be set with BZD_PATH_DATA.", "/tmp/bzd/accounts")
 	.option("--test", "Include test data.")
 	.parse(process.argv);
 
 const options = program.opts();
 const PORT = Number(process.env.BZD_PORT || options.port);
-const PATH_DATA = process.env.BZD_PATH_DATA || options.data;
 const PATH_STATIC = options.static;
-const AUTHENTICATION_PRIVATE_KEY = "abcd";
 
 (async () => {
 	const keyValueStore = await KeyValueStoreMemory.make("accounts");
@@ -154,18 +151,6 @@ const AUTHENTICATION_PRIVATE_KEY = "abcd";
 		channel: web,
 		plugins: [authentication, authenticationGoogle, users, appplications, pendingActions, services],
 	});
-
-	/*
-	// Redirect /sso/** to /sso?product=**
-	web.addRoute("get", "/sso/{path:*}", async (context) => {
-
-		// If not authenticated, redirect to login.
-
-
-		// Redirect 
-		context.redirect(api.getEndpoint("/sso?product=" + context.getParam("")));
-	});
-	*/
 
 	api.handle("get", "/sso", async function (inputs, session) {
 		// Get that the application exists.
