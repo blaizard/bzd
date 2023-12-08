@@ -13,8 +13,8 @@ export default class TestData {
 		Log.info("Installing test data...");
 
 		const userAdmin = await this.users.create("admin@admin.com");
-		await this.users.update(userAdmin.getUid(), (user) => {
-			user.setPassword("1234");
+		await this.users.update(userAdmin.getUid(), async (user) => {
+			await user.setPassword("1234");
 			user.addRole("admin");
 			user.addRole("user");
 			return user;
@@ -23,8 +23,8 @@ export default class TestData {
 		for (let i = 0; i < 5; ++i) {
 			const email = "dummy-" + i + "@dummy.com";
 			const userDummy = await this.users.create(email);
-			await this.users.update(userDummy.getUid(), (user) => {
-				user.setPassword("1234");
+			await this.users.update(userDummy.getUid(), async (user) => {
+				await user.setPassword("1234");
 				user.addRole("user");
 				return user;
 			});

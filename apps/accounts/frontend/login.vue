@@ -37,8 +37,6 @@
 					// Do this only if loading is not active to avoid a race when login.
 					if (isAuthenticated && !this.loading) {
 						await this.afterLogin();
-						//const route = this.$routerGet();
-						//this.$routerDispatch("/logout", route ? { query: { redirect: route } } : {});
 					}
 				},
 				immediate: true,
@@ -111,6 +109,7 @@
 			},
 			async handleSubmitLogin() {
 				await this.handleSubmit(async () => {
+					const password = this.info.password;
 					await this.$api.login(this.info.uid, this.info.password, this.info.persistent, "accounts");
 					await this.afterLogin();
 				});

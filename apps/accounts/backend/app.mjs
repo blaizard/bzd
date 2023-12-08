@@ -58,8 +58,12 @@ const AUTHENTICATION_PRIVATE_KEY = "abcd";
 			if (maybeUser === null) {
 				return false;
 			}
-			if (password !== null && maybeUser.getPassword() !== password) {
-				return false;
+			// Check the password if provided.
+			if (password !== null) {
+				const isEqual = await maybeUser.isPasswordEqual(password);
+				if (!isEqual) {
+					return false;
+				}
 			}
 			await users.update(
 				maybeUser.getUid(),
