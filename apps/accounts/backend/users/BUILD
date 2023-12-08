@@ -19,6 +19,7 @@ bzd_nodejs_library(
         "//nodejs/core:exception",
         "//nodejs/core:log",
         "//nodejs/core/authentication:scopes",
+        "//nodejs/core/cryptography:bcrypt",
         "//nodejs/db:utils",
     ],
 )

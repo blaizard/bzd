@@ -123,7 +123,7 @@ export default class Users {
 		return user;
 	}
 
-	_preprocessAndMergePublic(values, user) {
+	async _preprocessAndMergePublic(values, user) {
 		Exception.assertPrecondition(
 			Object.keys(values).every((key) => ["password", "oldpassword", "tokens"].includes(key)),
 			"Some values cannot be changed: {}",
@@ -135,7 +135,7 @@ export default class Users {
 			Exception.assertPrecondition("oldpassword" in values, "Missing old password: '{:j}'", values);
 			Exception.assertPrecondition(user.getPassword() === values.oldpassword, "Old password is different");
 
-			user.setPassword(values.password);
+			await user.setPassword(values.password);
 		}
 
 		// Update tokens if any.
@@ -159,7 +159,7 @@ export default class Users {
 		api.handle("put", "/user", async (inputs, user) => {
 			const uid = user.getUid();
 			const tempUser = await this.update(uid, async (u) => {
-				return this._preprocessAndMergePublic(inputs, u);
+				return await this._preprocessAndMergePublic(inputs, u);
 			});
 			return tempUser.dataPublic();
 		});

@@ -3,6 +3,7 @@ import LogFactory from "#bzd/nodejs/core/log.mjs";
 import Subscription from "#bzd/apps/accounts/backend/users/subscription.mjs";
 import TokenInfo from "#bzd/apps/accounts/backend/users/token.mjs";
 import Roles from "#bzd/apps/accounts/backend/users/roles.mjs";
+import Bcrypt from "#bzd/nodejs/core/cryptography/bcrypt.mjs";
 
 const Exception = ExceptionFactory("user");
 const Log = LogFactory("user");
@@ -58,9 +59,14 @@ export default class User {
 		this.value.last_login = Date.now();
 	}
 
-	setPassword(password) {
+	async setPassword(password) {
 		this.modified.push("password");
-		this.value.password = password;
+		const hash = await Bcrypt.hash(password);
+		this.value.password = hash;
+	}
+
+	async isPasswordEqual(password) {
+		return await Bcrypt.compare(this.value.password, password);
 	}
 
 	getCreationTimestamp() {
