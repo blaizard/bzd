@@ -80,26 +80,8 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		// It can be exchanged to an access token with /auth/refresh.
 		api.handle("post", "/auth/login", async function (inputs) {
 			// Verify uid/password pair
-			const sessionInfo = await authentication.options.verifyIdentity(inputs.uid, inputs.password);
-			if (sessionInfo) {
-				const session = new Session(sessionInfo.uid, sessionInfo.scopes);
-
-				const timeoutS = inputs.persistent
-					? authentication.options.tokenRefreshLongTermExpiresIn
-					: authentication.options.tokenRefreshShortTermExpiresIn;
-				const refreshToken = await authentication._makeRefreshToken(inputs.identifier, session, timeoutS);
-
-				this.setCookie("refresh_token", refreshToken, {
-					httpOnly: true,
-					sameSite: "strict",
-					maxAge: timeoutS * 1000,
-				});
-
-				// Generate the access token.
-				return await authentication._makeAccessToken(session);
-			}
-
-			throw this.httpError(401, "Unauthorized");
+			Exception.assertPrecondition(inputs.password, "Missing password");
+			return await authentication._login(this, inputs.identifier, inputs.persistent, inputs.uid, inputs.password);
 		});
 
 		api.handle("post", "/auth/logout", async function () {
@@ -194,6 +176,33 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 
 			return maybeTokenObject;
 		});
+	}
+
+	async _loginWithUIDImpl(context, uid, identifier, persistent) {
+		return await this._login(context, identifier, persistent, uid);
+	}
+
+	async _login(context, identifier, persistent, uid, password = undefined) {
+		const sessionInfo = await this.options.verifyIdentity(uid, password);
+		if (sessionInfo) {
+			const session = new Session(sessionInfo.uid, sessionInfo.scopes);
+
+			const timeoutS = persistent
+				? this.options.tokenRefreshLongTermExpiresIn
+				: this.options.tokenRefreshShortTermExpiresIn;
+			const refreshToken = await this._makeRefreshToken(identifier, session, timeoutS);
+
+			context.setCookie("refresh_token", refreshToken, {
+				httpOnly: true,
+				sameSite: "strict",
+				maxAge: timeoutS * 1000,
+			});
+
+			// Generate the access token.
+			return await this._makeAccessToken(session);
+		}
+
+		throw context.httpError(401, "Unauthorized");
 	}
 
 	async _makeSSOTokenImpl(identifier, session) {

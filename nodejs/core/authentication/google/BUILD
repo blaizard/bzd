@@ -5,6 +5,7 @@ bzd_nodejs_library(
     srcs = [
         "client.mjs",
     ],
+    apis = ["api.json"],
     visibility = ["//visibility:public"],
     deps = [
         "//nodejs/core:script",

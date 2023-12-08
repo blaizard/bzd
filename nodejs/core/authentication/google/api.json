@@ -5,7 +5,7 @@
             "request": {
                 "type": "json",
                 "validation": {
-                    "token_id": "mandatory"
+                    "idToken": "mandatory"
                 }
             }
         }
