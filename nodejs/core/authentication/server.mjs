@@ -7,12 +7,13 @@ export default class AuthenticationServer {
 	constructor(options, defaultOptions = {}) {
 		this.options = Object.assign(
 			{
-				/// Callback to verify once identiy, mathing uid and password pair.
-				/// In return on success, it will return the UID to be used and roles as a dictionary.
+				/// Callback to verify once identiy, mathing uid and password pair if provided.
+				/// This function can be called with only the uid, this case must be taken into account.
+				/// In return on success, it will return the UID to be used and scopes as a dictionary.
 				/// Otherwise, false should be returned.
 				/// The signature of this function is `async (uid, password)`.
 				/// It should return false if it doesn't verify. Otherwise, it should return a dict
-				/// containing the `uid` and `roles` as key.
+				/// containing the `uid` and `scopes` as key.
 				verifyIdentity: null,
 				/// Refresh and verify a token. Returns true in case of success, false otherwise or
 				/// a string corresponding to the new token in case of rolling tokens.
@@ -27,12 +28,23 @@ export default class AuthenticationServer {
 		await this._installAPIImpl(api);
 	}
 
+	/// Attempt to login with a UID only.
+	///
+	/// \param context The http context.
+	/// \param uid The uid to be used for login.
+	/// \param identifier The identifier corresponding to this connection.
+	/// \param persistent If the connection should be persistent or not.
+	/// \return the same data as login.
+	async loginWithUID(context, uid, identifier, persistent) {
+		return await this._loginWithUIDImpl(context, uid, identifier, persistent);
+	}
+
 	/// Called when a request is received on the server side, to verify that the content is properly authorized.
 	/// For example, check that the header contains a valid token.
 	///
 	/// \param context The http context.
-	/// \param callback the function to be called when the verification succeed, it should be populated with the user.
-	async verify(context, callback = async (/*user*/) => true) {
+	/// \param callback the function to be called when the verification succeed, it should be populated with the session.
+	async verify(context, callback = async (/*session*/) => true) {
 		return this._verifyImpl(context, callback);
 	}
 

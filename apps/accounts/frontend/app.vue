@@ -61,7 +61,6 @@
 					{ path: "/logout", component: () => import("./logout.vue"), authentication: true },
 					{ path: "/sso", component: () => import("./sso.vue"), authentication: true },
 					{ path: "/reset", component: () => import("./reset.vue") },
-					{ path: "/register", component: () => import("./register.vue") },
 				],
 				fallback: { component: () => import("./404.vue") },
 			});

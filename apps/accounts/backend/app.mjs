@@ -53,12 +53,12 @@ const AUTHENTICATION_PRIVATE_KEY = "abcd";
 	const web = new HttpServer(PORT);
 
 	let authentication = new Authentication({
-		verifyIdentity: async (email, password) => {
+		verifyIdentity: async (email, password = null) => {
 			const maybeUser = await users.getFromEmail(email, /*allowNull*/ true);
 			if (maybeUser === null) {
 				return false;
 			}
-			if (maybeUser.getPassword() !== password) {
+			if (password !== null && maybeUser.getPassword() !== password) {
 				return false;
 			}
 			await users.update(

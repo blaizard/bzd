@@ -41,6 +41,12 @@ export default class APIServer extends Base {
 			.catch((e) => this.event.trigger("error", e));
 	}
 
+	/// Login a user based on his UID.
+	async loginWithUID(context, uid, identifier, persistent) {
+		Exception.assert(this.options.authentication, "Authentication is not enabled.");
+		return await this.options.authentication.loginWithUID(context, uid, identifier, persistent);
+	}
+
 	/// Register a callback to handle a request
 	handle(method, endpoint, callback /*, options = {}*/) {
 		this._sanityCheck(method, endpoint);

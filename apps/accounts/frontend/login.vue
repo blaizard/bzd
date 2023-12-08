@@ -5,9 +5,6 @@
 			<div class="reset">
 				<RouterLink link="/reset">{{ $lang.getCapitalized("passwordforgot") }}</RouterLink>
 			</div>
-			<div class="signup">
-				<RouterLink link="/register">{{ $lang.getCapitalized("signup") }}</RouterLink>
-			</div>
 			<div class="or">or</div>
 			<Form :description="formLoginTrustedDescription"></Form>
 		</template>
@@ -60,7 +57,10 @@
 						content: "Login with Google",
 						fill: true,
 						click: async () => {
-							await this.$api.invoke("google-authenticate");
+							await this.handleSubmit(async () => {
+								await this.$api.invoke("google-authenticate");
+								await this.afterLogin();
+							});
 						},
 					},
 				];

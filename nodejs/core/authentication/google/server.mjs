@@ -2,6 +2,12 @@
 
 import { OAuth2Client } from "google-auth-library";
 
+import ExceptionFactory from "../../exception.mjs";
+import LogFactory from "../../log.mjs";
+
+const Exception = ExceptionFactory("authentication", "google");
+const Log = LogFactory("authentication", "google");
+
 export default class GoogleIdentityServer {
 	constructor(clientId) {
 		this.clientId = clientId;
@@ -10,18 +16,23 @@ export default class GoogleIdentityServer {
 	async installAPI(api) {
 		api.handle("post", "/auth/google", async function (inputs) {
 			const client = new OAuth2Client();
+			let email = null;
 			try {
 				const ticket = await client.verifyIdToken({
-					idToken: inputs.token_id,
+					idToken: inputs.idToken,
 					audience: this.clientId,
 				});
 				const payload = ticket.getPayload();
-				console.log(payload);
+				if (!payload.email_verified) {
+					throw this.httpError(401, "Unauthorized");
+				}
+				email = payload.email;
 			} catch (e) {
 				throw this.httpError(401, "Unauthorized");
 			}
 
-			//const userid = payload.email;
+			Exception.assert(email, "The email cannot be null: {}", email);
+			await api.loginWithUID(this, email, "google", /*persistent*/ false);
 		});
 	}
 }
