@@ -65,6 +65,11 @@ export default class AuthenticationClient {
 		return await this._loginWithSSOImpl(api, ssoToken);
 	}
 
+	/// Attempt to login with internal data.
+	async loginWithDetails(api, details) {
+		return await this._loginWithDetailsImpl(api, details);
+	}
+
 	/// Attempt to logout
 	async logout(api) {
 		await this._logoutImpl(api);

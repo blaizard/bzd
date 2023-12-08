@@ -18,6 +18,9 @@ bzd_nodejs_binary(
     packages = {
         "commander": "",
     },
+    visibility = [
+        "//apps/accounts:__pkg__",
+    ],
     deps = [
         "//apps/accounts/backend/applications",
         "//apps/accounts/backend/pending_actions",

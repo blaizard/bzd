@@ -7,6 +7,9 @@
                 "validation": {
                     "idToken": "mandatory"
                 }
+            },
+            "response": {
+                "type": "json"
             }
         }
     }

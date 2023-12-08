@@ -20,4 +20,8 @@ Run the client application example.
 bazel run //apps/accounts/example/static --config=dev -- --port 8081
 ```
 
-Note by using `127.0.0.1` instead of `localhost`, the cookies between this example and the accounts app are not shared, this is a trick that can be used for testing locally.
+## Push the docker image
+
+```bash
+bazel run apps/accounts:push --config=prod
+```
