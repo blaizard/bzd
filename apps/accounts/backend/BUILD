@@ -1,9 +1,18 @@
+load("@bzd_lib//config:defs.bzl", "bzd_config")
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_binary")
+
+bzd_config(
+    name = "config",
+    srcs = [
+        "config.default.json",
+    ],
+)
 
 bzd_nodejs_binary(
     name = "backend",
     srcs = [
         "app.mjs",
+        ":config.json",
         "//apps/accounts:config.json",
     ],
     apis = ["//apps/accounts:api.v1.json"],

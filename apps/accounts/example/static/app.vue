@@ -5,12 +5,12 @@
 
 <script setup>
 	import { onMounted, inject } from "vue";
+	import Config from "#bzd/apps/accounts/example/static/config.json";
 
-	const ACCOUNTS_URL = "http://localhost:8080";
 	const api = inject("$api");
 
 	const onClickLogin = () => {
-		window.location.href = ACCOUNTS_URL + "/login?application=localhost";
+		window.location.href = Config.accounts + "/login?application=localhost";
 	};
 
 	onMounted(async () => {

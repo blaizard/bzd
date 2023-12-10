@@ -43,9 +43,8 @@ export default class Google {
 	// https://developers.google.com/identity/gsi/web/guides/overview
 	async authenticate() {
 		const result = await triggerAuthentication(this.clientId);
-		const details = await this.api.request("post", "/auth/google", {
+		await this.api.loginWithAPI("post", "/auth/google", {
 			idToken: result.credential,
 		});
-		await this.api.loginWithDetails(details);
 	}
 }

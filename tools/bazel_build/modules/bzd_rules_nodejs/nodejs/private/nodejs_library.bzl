@@ -12,20 +12,6 @@ BzdNodeJsDepsInfo = provider(
     },
 )
 
-# ---- Aspect
-
-def _bzd_nodejs_deps_aspect_impl(_target, ctx):
-    if ctx.rule.kind == "bzd_nodejs_library":
-        return []
-    provider = bzd_nodejs_merge(*[d[BzdNodeJsDepsInfo] for d in ctx.rule.attr.deps])
-    return [provider]
-
-bzd_nodejs_deps_aspect = aspect(
-    doc = "Aspects to gather data from bzd depedencies.",
-    implementation = _bzd_nodejs_deps_aspect_impl,
-    attr_aspects = ["deps"],
-)
-
 # ---- Utils
 
 def bzd_nodejs_make_provider(ctx):
@@ -78,7 +64,6 @@ LIBRARY_ATTRS = {
         doc = "Data to be available at runtime.",
     ),
     "deps": attr.label_list(
-        aspects = [bzd_nodejs_deps_aspect],
         allow_files = True,
         doc = "Dependencies of this rule.",
     ),
@@ -98,10 +83,12 @@ LIBRARY_ATTRS = {
 
 # ---- Rule
 
-def _bzd_nodejs_library_impl(ctx):
+def bzd_nodejs_library_get_provider(ctx):
     rule_provider = bzd_nodejs_make_provider(ctx)
-    provider = bzd_nodejs_merge(rule_provider, *[d[BzdNodeJsDepsInfo] for d in ctx.attr.deps])
+    return bzd_nodejs_merge(rule_provider, *[d[BzdNodeJsDepsInfo] for d in ctx.attr.deps])
 
+def _bzd_nodejs_library_impl(ctx):
+    provider = bzd_nodejs_library_get_provider(ctx)
     return [DefaultInfo(), provider]
 
 bzd_nodejs_library = rule(

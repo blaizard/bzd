@@ -53,9 +53,9 @@ export default class APIClient extends Base {
 		return await this.options.authentication.loginWithSSO(this, ssoToken);
 	}
 
-	async loginWithDetails(details) {
+	async loginWithAPI(method, path, data) {
 		Exception.assert(this.isAuthentication(), "Authentication is not enabled.");
-		return await this.options.authentication.loginWithDetails(this, details);
+		return await this.options.authentication.loginWithAPI(this, method, path, data);
 	}
 
 	async logout() {
