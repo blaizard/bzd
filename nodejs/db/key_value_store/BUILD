@@ -1,6 +1,20 @@
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 
 bzd_nodejs_library(
+    name = "make_from_config",
+    srcs = [
+        "make_from_config.mjs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":disk",
+        ":elasticsearch",
+        ":memory",
+        "//nodejs/core:validation",
+    ],
+)
+
+bzd_nodejs_library(
     name = "disk",
     srcs = [
         "disk.mjs",

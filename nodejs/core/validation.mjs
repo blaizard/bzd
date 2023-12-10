@@ -1,5 +1,6 @@
 import ExceptionFactory from "./exception.mjs";
 import Format from "./format.mjs";
+import Result from "#bzd/nodejs/utils/result.mjs";
 
 const Exception = ExceptionFactory("validation");
 
@@ -165,10 +166,22 @@ export default class Validation {
 		return processedSchema;
 	}
 
-	/**
-	 * Validate the specific value passed into argument.
-	 * Value must be a dictionary.
-	 */
+	/// Create a string from the result object.
+	static resultToString(result) {
+		const keys = Object.keys(result);
+		if (keys.length == 1) {
+			return Format("'{}' does not validate: {}", keys[0], result[keys[0]].join(", "));
+		} else if (keys.length > 1) {
+			const message = keys.map((key) => {
+				return String(key) + ": (" + result[key].join(", ") + ")";
+			});
+			return Format("Some values do not validate: {}", message.join("; "));
+		}
+		return null;
+	}
+
+	/// Validate the specific value passed into argument.
+	/// Value must be a dictionary.
 	validate(values, options) {
 		// Convert the value into a dictionary
 		if (this.singleValue) {
@@ -180,23 +193,15 @@ export default class Validation {
 
 		options = Object.assign(
 			{
-				/**
-				 * Output type, can be either "throw" or "return"
-				 */
+				/// Output type, can be either "throw", "result" or "return"
 				output: "throw",
-				/**
-				 * Callback deciding whether or not a valid is conisdered as existent
-				 */
+				/// Callback deciding whether or not a valid is conisdered as existent
 				valueExists: (key, value) => {
 					return value !== undefined;
 				},
-				/**
-				 * Ensure that all keys of values are present in the schema.
-				 */
+				/// Ensure that all keys of values are present in the schema.
 				all: false,
-				/**
-				 * This forces all values to be considered as mandatory.
-				 */
+				/// This forces all values to be considered as mandatory.
 				allMandatory: false,
 			},
 			options,
@@ -244,17 +249,19 @@ export default class Validation {
 		switch (options.output) {
 			case "throw":
 				{
-					const keys = Object.keys(result);
-					if (keys.length == 1) {
-						throw new Exception("'{}' does not validate: {}", keys[0], result[keys[0]].join(", "));
-					} else if (keys.length > 1) {
-						const message = keys.map((key) => {
-							return String(key) + ": (" + result[key].join(", ") + ")";
-						});
-						throw new Exception("Some values do not validate: {}", message.join("; "));
+					const maybeMessage = Validation.resultToString(result);
+					if (maybeMessage) {
+						throw new Exception(maybeMessage);
 					}
 				}
 				break;
+			case "result": {
+				const maybeMessage = Validation.resultToString(result);
+				if (maybeMessage) {
+					return Result.makeError(maybeMessage);
+				}
+				return new Result();
+			}
 			case "return":
 				return result;
 			default:

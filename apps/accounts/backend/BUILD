@@ -40,6 +40,6 @@ bzd_nodejs_binary(
         "//nodejs/core/authentication/google:server",
         "//nodejs/core/authentication/session:server",
         "//nodejs/core/http:server",
-        "//nodejs/db/key_value_store:memory",
+        "//nodejs/db/key_value_store:make_from_config",
     ],
 )
