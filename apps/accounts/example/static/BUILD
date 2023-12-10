@@ -1,10 +1,19 @@
+load("@bzd_lib//config:defs.bzl", "bzd_config")
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_web_binary")
+
+bzd_config(
+    name = "config",
+    srcs = [
+        "config.default.json",
+    ],
+)
 
 bzd_nodejs_web_binary(
     name = "static",
     srcs = [
         "app.mjs",
         "app.vue",
+        ":config.json",
     ],
     config_scss = "//nodejs/styles:default.scss",
     main = "app.mjs",

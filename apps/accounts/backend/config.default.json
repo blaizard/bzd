@@ -1,0 +1,10 @@
+{
+    "kvs": {
+        "accounts": {
+            "type": "memory"
+        },
+        "register": {
+            "type": "memory"
+        }
+    }
+}

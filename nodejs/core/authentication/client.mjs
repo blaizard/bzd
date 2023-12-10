@@ -66,8 +66,9 @@ export default class AuthenticationClient {
 	}
 
 	/// Attempt to login with internal data.
-	async loginWithDetails(api, details) {
-		return await this._loginWithDetailsImpl(api, details);
+	async loginWithAPI(api, method, path, data) {
+		const result = await api.request(method, path, data);
+		return await this._loginWithAPIImpl(result);
 	}
 
 	/// Attempt to logout

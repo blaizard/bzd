@@ -156,13 +156,12 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 	}
 
 	async _loginImpl(api, uid, password, persistent, identifier) {
-		const result = await api.request("post", "/auth/login", {
+		const result = await this.loginWithAPI(api, "post", "/auth/login", {
 			uid: uid,
 			password: password,
 			persistent: persistent,
 			identifier: identifier,
 		});
-		await this._loginWithDetailsImpl(result);
 		return result;
 	}
 
@@ -172,8 +171,8 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 		await this._refreshAuthenticationImpl();
 	}
 
-	async _loginWithDetailsImpl(api, details) {
-		this.setSession(details);
+	async _loginWithAPIImpl(result) {
+		this.setSession(result);
 	}
 
 	async _logoutImpl(api) {

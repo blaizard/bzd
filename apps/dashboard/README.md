@@ -11,5 +11,5 @@ Restart either frontend/backend to rebuild and inject any update.
 ## Push the docker image
 
 ```bash
-bazel run apps/dashboard:push
+bazel run apps/dashboard:push --config=prod
 ```

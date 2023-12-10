@@ -1,7 +1,7 @@
 """NodeJs install rule."""
 
 load("@bzd_package//:defs.bzl", "BzdPackageMetadataFragmentInfo")
-load("@bzd_rules_nodejs//nodejs:private/nodejs_library.bzl", "BzdNodeJsDepsInfo", "LIBRARY_ATTRS", "bzd_nodejs_make_provider", "bzd_nodejs_merge")
+load("@bzd_rules_nodejs//nodejs:private/nodejs_library.bzl", "LIBRARY_ATTRS", "bzd_nodejs_library_get_provider")
 
 # ---- Provider
 
@@ -142,31 +142,30 @@ def bzd_nodejs_transpile(ctx, srcs, runfiles, base_dir_name):
     return generated + typescript.values(), {original: final.short_path.removeprefix(base_dir_short_path + "/") for original, final in typescript.items()}
 
 def _bzd_nodejs_install_impl(ctx):
-    rule_provider = bzd_nodejs_make_provider(ctx)
-    deps_provider = bzd_nodejs_merge(rule_provider, *[d[BzdNodeJsDepsInfo] for d in ctx.attr.deps])
+    providers = bzd_nodejs_library_get_provider(ctx)
     base_dir_name = ctx.label.name
 
     # --- Generate the package.json and node_modules files
 
-    package_json, node_modules = bzd_nodejs_make_node_modules(ctx, deps_provider.packages, base_dir_name = base_dir_name)
+    package_json, node_modules = bzd_nodejs_make_node_modules(ctx, providers.packages, base_dir_name = base_dir_name)
 
     # --- Create the APIs
 
     api = ctx.actions.declare_file("api.json", sibling = package_json)
     ctx.actions.run(
-        inputs = deps_provider.apis,
+        inputs = providers.apis,
         outputs = [api],
         progress_message = "Generating API for {}...".format(ctx.label),
         arguments = [
             "--output",
             api.path,
-        ] + [f.path for f in deps_provider.apis.to_list()],
+        ] + [f.path for f in providers.apis.to_list()],
         executable = ctx.executable._json_merge,
     )
 
     # --- Apply transpilers to the sources
 
-    srcs, transpiled = bzd_nodejs_transpile(ctx, deps_provider.srcs.to_list(), runfiles = [package_json, node_modules], base_dir_name = base_dir_name)
+    srcs, transpiled = bzd_nodejs_transpile(ctx, providers.srcs.to_list(), runfiles = [package_json, node_modules], base_dir_name = base_dir_name)
 
     # --- Fill in the metadata
 
@@ -185,11 +184,11 @@ def _bzd_nodejs_install_impl(ctx):
         execution_requirements = {"no-remote": "1"},
     )
 
-    # Return the provides (including outputs and dependencies)
+    # Return the providers (including outputs and dependencies)
     return [
         BzdPackageMetadataFragmentInfo(manifests = [metadata]),
         BzdNodeJsInstallInfo(
-            files = depset([package_json, node_modules, api] + srcs + transpiled.values(), transitive = [deps_provider.data]),
+            files = depset([package_json, node_modules, api] + srcs + transpiled.values(), transitive = [providers.data]),
             package_json = package_json,
             transpiled = transpiled,
         ),
