@@ -2,7 +2,7 @@ import { program } from "commander";
 
 import API from "#bzd/nodejs/core/api/server.mjs";
 import APIv1 from "#bzd/api.json" assert { type: "json" };
-import KeyValueStoreMemory from "#bzd/nodejs/db/key_value_store/memory.mjs";
+import kvsMakeFromConfig from "#bzd/nodejs/db/key_value_store/make_from_config.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import Authentication from "#bzd/nodejs/core/authentication/session/server.mjs";
@@ -15,6 +15,7 @@ import Applications from "#bzd/apps/accounts/backend/applications/applications.m
 import TokenInfo from "#bzd/apps/accounts/backend/users/token.mjs";
 import TestData from "#bzd/apps/accounts/backend/tests/test_data.mjs";
 import Config from "#bzd/apps/accounts/config.json" assert { type: "json" };
+import ConfigBackend from "#bzd/apps/accounts/backend/config.json" assert { type: "json" };
 
 const Exception = ExceptionFactory("backend");
 const Log = LogFactory("backend");
@@ -37,8 +38,8 @@ const PORT = Number(process.env.BZD_PORT || options.port);
 const PATH_STATIC = options.static;
 
 (async () => {
-	const keyValueStore = await KeyValueStoreMemory.make("accounts");
-	const keyValueStoreRegister = await KeyValueStoreMemory.make("register");
+	const keyValueStore = await kvsMakeFromConfig(ConfigBackend.kvs.accounts);
+	const keyValueStoreRegister = await kvsMakeFromConfig(ConfigBackend.kvs.register);
 
 	// Users
 	const users = new Users(keyValueStore);

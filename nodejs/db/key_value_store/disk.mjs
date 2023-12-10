@@ -11,18 +11,14 @@ import KeyValueStore from "./key_value_store.mjs";
 
 const Log = LogFactory("db", "kvs", "disk");
 
-/**
- * Key value store for low demanding application, that presists on the local disk.
- */
+/// Key value store for low demanding application, that presists on the local disk.
 export default class KeyValueStoreDisk extends KeyValueStore {
 	constructor(path, options) {
 		super();
 
 		this.options = Object.assign(
 			{
-				/**
-				 * Bucket specific options
-				 */
+				// Bucket specific options
 				buckets: {},
 			},
 			options,
@@ -38,18 +34,14 @@ export default class KeyValueStoreDisk extends KeyValueStore {
 		Log.info("Using disk key value store DB at '{}'.", this.path);
 	}
 
-	/**
-	 * Initialization of the class
-	 */
+	/// Initialization of the class
 	async _initialize() {
 		// Create the directory if it does not exists
 		await FileSystem.mkdir(this.path);
 		this.cache = new Cache();
 	}
 
-	/**
-	 * Return the persistence associated with a specific bucket and, if needed, create it and load it.
-	 */
+	/// Return the persistence associated with a specific bucket and, if needed, create it and load it.
 	async _getPersistence(bucket) {
 		if (!this.cache.isCollection(bucket)) {
 			// Register this bucket in the cache
@@ -86,9 +78,7 @@ export default class KeyValueStoreDisk extends KeyValueStore {
 		return persistence;
 	}
 
-	/**
-	 * This function waits until the key value store database is ready
-	 */
+	/// This function waits until the key value store database is ready
 	async waitReady() {
 		return this.event.waitUntil("ready");
 	}
@@ -126,25 +116,21 @@ export default class KeyValueStoreDisk extends KeyValueStore {
 		return maxConflicts > 0;
 	}
 
-	/**
-	 * List all key/value pairs from this bucket.
-	 * \param bucket The bucket to be used.
-	 * \param maxOrPaging Paging information.
-	 */
+	/// List all key/value pairs from this bucket.
+	/// \param bucket The bucket to be used.
+	/// \param maxOrPaging Paging information.
 	async _listImpl(bucket, maxOrPaging) {
 		let persistence = await this._getPersistence(bucket);
 		const data = await persistence.get();
 		return await CollectionPaging.makeFromObject(data, maxOrPaging);
 	}
 
-	/**
-	 * List all key/value pairs from this bucket which subkey matches the value (or any of the values).
-	 * \param bucket The bucket to be used.
-	 * \param subKey The subkey for the match.
-	 * \param value The value of values (if a list) to match.
-	 * \param maxOrPaging Paging information.
-	 * \return An object contianing the data and the information about paging and how to get the rest of the data.
-	 */
+	/// List all key/value pairs from this bucket which subkey matches the value (or any of the values).
+	/// \param bucket The bucket to be used.
+	/// \param subKey The subkey for the match.
+	/// \param value The value of values (if a list) to match.
+	/// \param maxOrPaging Paging information.
+	/// \return An object contianing the data and the information about paging and how to get the rest of the data.
 	async _listMatchImpl(bucket, subKey, value, maxOrPaging) {
 		let persistence = await this._getPersistence(bucket);
 		const data = await persistence.get();

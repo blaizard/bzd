@@ -8,9 +8,7 @@ import KeyValueStore from "./key_value_store.mjs";
 const Exception = ExceptionFactory("db", "kvs", "elasticsearch");
 const Log = LogFactory("db", "kvs", "elasticsearch");
 
-/**
- * Kay valud store adapater to elastic search DB
- */
+/// Key value store adapater to elastic search DB
 export default class KeyValueStoreElasticsearch extends KeyValueStore {
 	constructor(host, options) {
 		super();

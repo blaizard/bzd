@@ -176,5 +176,6 @@ bzd_nodejs_library(
     deps = [
         ":exception",
         ":format",
+        "//nodejs/utils:result",
     ],
 )
