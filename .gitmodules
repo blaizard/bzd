@@ -5,6 +5,7 @@
 [submodule "apps/family"]
 	path = apps/family
 	url = https://git.blaizard.com/blaise/family.git
+	branch = master
 [submodule "deployment"]
 	path = deployment
 	url = https://git.blaizard.com/blaise/deployment.git

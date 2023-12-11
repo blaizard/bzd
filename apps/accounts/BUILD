@@ -22,10 +22,10 @@ bzd_nodejs_docker(
         "--static",
         "{frontend}",
     ],
-    deploy = {
-        "push": "docker.blaizard.com/apps/accounts",
-    },
     include_metadata = True,
+    visibility = [
+        "//deployment:__subpackages__",
+    ],
     deps = {
         "//apps/accounts/backend": "backend",
         "//apps/accounts/frontend": "frontend",

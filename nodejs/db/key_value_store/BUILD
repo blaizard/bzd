@@ -10,6 +10,7 @@ bzd_nodejs_library(
         ":disk",
         ":elasticsearch",
         ":memory",
+        ":mongodb",
         "//nodejs/core:validation",
     ],
 )
@@ -60,5 +61,22 @@ bzd_nodejs_library(
         "//nodejs/core:log",
         "//nodejs/db:utils",
         "//nodejs/utils:uid",
+    ],
+)
+
+bzd_nodejs_library(
+    name = "mongodb",
+    srcs = [
+        "key_value_store.mjs",
+        "mongodb.mjs",
+    ],
+    packages = {
+        "mongodb": "6.3.0",
+    },
+    visibility = ["//visibility:public"],
+    deps = [
+        "//nodejs/core:exception",
+        "//nodejs/core:log",
+        "//nodejs/db:utils",
     ],
 )
