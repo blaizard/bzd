@@ -12,10 +12,6 @@ jobs:
               with:
                   submodules: "true"
 
-            - name: "Environment"
-              run: |
-                  cp tools/ci/gitea/.bazelrc.local .bazelrc.local
-
             - name: "Deploy"
               uses: https://git.blaizard.com/blaise/deployment@main
               with:
