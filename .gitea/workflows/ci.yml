@@ -17,7 +17,7 @@ jobs:
                   cp tools/ci/gitea/.bazelrc.local .bazelrc.local
 
             - name: "Custom action"
-              uses: https://git.blaizard.com/blaise/bzd/.gitea/actions/hello
+              uses: https://git.blaizard.com/blaise/bzd/.gitea/actions/hello@master
 
             - name: "Info"
               if: always()
