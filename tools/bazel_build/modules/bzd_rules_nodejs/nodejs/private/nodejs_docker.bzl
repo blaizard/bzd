@@ -2,11 +2,11 @@
 
 load("@bzd_lib//lib:attrs.bzl", "ATTRS_COMMON_BUILD_RULES", "attrs_assert_any_of")
 load("@bzd_package//:defs.bzl", "bzd_package")
-load("@bzd_rules_docker//:defs.bzl", "bzd_docker_image", "bzd_docker_push")
+load("@bzd_rules_docker//:defs.bzl", "bzd_docker_image")
 
 ROOT_DIRECTORY_ = "/bzd/bin"
 
-def bzd_nodejs_docker(name, deps, cmd, base = "@docker//:nodejs", include_metadata = False, deploy = {}, **kwargs):
+def bzd_nodejs_docker(name, deps, cmd, base = "@docker//:nodejs", include_metadata = False, **kwargs):
     """Rule for embedding a NodeJs application into Docker.
 
     Args:
@@ -15,7 +15,6 @@ def bzd_nodejs_docker(name, deps, cmd, base = "@docker//:nodejs", include_metada
         cmd: The command to be used.
         base: The base image.
         include_metadata: Wether metadata shall be included.
-        deploy: The deploy rules.
         **kwargs: Extra arguments common to all build rules.
     """
 
@@ -49,15 +48,3 @@ def bzd_nodejs_docker(name, deps, cmd, base = "@docker//:nodejs", include_metada
         ],
         **kwargs
     )
-
-    # Add deploy rules if any
-    for rule_name, url in deploy.items():
-        bzd_docker_push(
-            name = rule_name,
-            image = ":{}".format(name),
-            repository = url,
-            remote_tags = ["latest"],
-            tags = [
-                "docker",
-            ],
-        )

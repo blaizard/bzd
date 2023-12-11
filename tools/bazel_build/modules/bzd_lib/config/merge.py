@@ -25,11 +25,10 @@ class Config:
 
 		keys = set()
 		for key, value in data.items():
+			keys.add(key)
 			if isinstance(value, dict):
 				for nestedKeys in Config._processKeys(value):
 					keys.add(f"{key}.{nestedKeys}")
-			else:
-				keys.add(key)
 		return keys
 
 	def setValue(self, key: str, value: typing.Any) -> None:
@@ -44,22 +43,35 @@ class Config:
 			current = current[segment]
 		current[segments[-1]] = value
 
-	def update(self, data: typing.Dict[str, typing.Any]) -> None:
-		"""Update the current configuration with another dictionary."""
-
-		try:
-			updateDeep(self.data, data, policy=UpdatePolicy.raiseOnNonConflict)
-		except KeyError as e:
-			self.fatal(f"The key {e} from '{f}' is not present in the base configuration.")
-
 	def fatal(self, message: str) -> None:
 		"""Error message."""
 
 		print(message, file=sys.stderr)
 		print("Available configuration keys are:", file=sys.stderr)
-		for key in self.keys:
+		for key in sorted(self.keys):
 			print(f"  - {key}", file=sys.stderr)
 		sys.exit(1)
+
+
+class ConfigValues:
+
+	def __init__(self) -> None:
+		self.data: typing.Dict[str, typing.Any] = {}
+
+	def add(self, key: str, value: typing.Dict[str, typing.Any]) -> None:
+		if key in self.data:
+			fatal(f"The key '{key}' is manually set twice.")
+
+		# Check there are conflcit between parent/child keys. For example, setting `kvs.hello`` and `kvs.hello.world`.
+		for existingKey in self.data.keys():
+			if (key in existingKey) or (existingKey in key):
+				fatal(f"The keys '{key}' and '{existingKey}' are setting twice the same value.")
+
+		self.data[key] = value
+
+	def apply(self, config: Config) -> None:
+		for key, value in self.data.items():
+			config.setValue(key, value)
 
 
 if __name__ == "__main__":
@@ -103,20 +115,21 @@ if __name__ == "__main__":
 			fatal(f"The key {e} from '{f}' was already defined by another base configuration.")
 
 	config = Config(output)
+	values = ConfigValues()
 
 	# Apply the files.
 	for f in args.files:
 		data = json.loads(f.read_text())
-		config.update(data)
+		for key, value in data.items():
+			values.add(key, value)
 
 	# Apply the key value pairs.
-	processedKeys = set()
 	for keyValue in args.sets:
 		key, value = keyValue.strip().split("=", 1)
-		if key in processedKeys:
-			fatal(f"The key '{key}' is manually set twice.")
-		processedKeys.add(key)
-		config.setValue(key, value)
+		values.add(key, value)
+
+	# Process the values
+	values.apply(config)
 
 	outputJson = json.dumps(output, indent=4)
 
