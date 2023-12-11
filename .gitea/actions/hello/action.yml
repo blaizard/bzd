@@ -8,4 +8,4 @@ runs:
       run: |
         echo "Hello world!"
     - name: "Call another action"
-      uses: https://git.blaizard.com/blaise/bzd/.gitea/actions/hello@master
+      uses: https://git.blaizard.com/blaise/bzd/.gitea/actions/another@master
