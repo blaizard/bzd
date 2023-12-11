@@ -29,12 +29,10 @@ jobs:
               {% end %}
 
 {% end %}
-
-            - uses: ./deployment/docker.blaizard.com
-
-            - uses: ./deployment/accounts.blaizard.com
+            - name: "Deploy"
+              uses: https://git.blaizard.com/blaise/deployment@main
               with:
-                docker_api_token: ${{{ secrets.BZD_DIGITALOCEAN_API_TOKEN }}
+                digitalocean_api_token: ${{{ secrets.BZD_DIGITALOCEAN_API_TOKEN }}
 
             - name: "Info"
               if: always()

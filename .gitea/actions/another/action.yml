@@ -1,9 +1,0 @@
-name: "A nested"
-description: "A simple Gitea action written in go"
-runs:
-  using: composite
-  steps:
-    - name: "Push Dashboard"
-      shell: bash
-      run: |
-        echo "It works and is composed!"
