@@ -15,7 +15,7 @@ jobs:
             - name: "Deploy"
               uses: https://git.blaizard.com/blaise/deployment@main
               secrets:
-                digitalocean_api_token: ${{ secrets.BZD_DIGITALOCEAN_API_TOKEN }}
+                  digitalocean_api_token: ${{ secrets.BZD_DIGITALOCEAN_API_TOKEN }}
 
             - name: "Info"
               if: always()
