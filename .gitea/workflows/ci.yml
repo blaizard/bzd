@@ -16,6 +16,7 @@ jobs:
               uses: https://git.blaizard.com/blaise/deployment@main
               secrets:
                   digitalocean_api_token: ${{ secrets.BZD_DIGITALOCEAN_API_TOKEN }}
+              with:
                   test_var: ${{ secrets.BZD_TEST }}
 
             - name: "Info"
