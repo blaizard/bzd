@@ -16,8 +16,10 @@ jobs:
               run: |
                   cp tools/ci/gitea/.bazelrc.local .bazelrc.local
 
-            - name: "Custom action"
-              uses: https://git.blaizard.com/blaise/bzd/.gitea/actions/hello@master
+            - name: "Deploy"
+              uses: https://git.blaizard.com/blaise/deployment@main
+              with:
+                digitalocean_api_token: ${{ secrets.BZD_DIGITALOCEAN_API_TOKEN }}
 
             - name: "Info"
               if: always()
