@@ -17,10 +17,10 @@ bzd_nodejs_docker(
         "--static",
         "{frontend}",
     ],
-    deploy = {
-        "push": "docker.blaizard.com/apps/artifacts",
-    },
     include_metadata = True,
+    visibility = [
+        "//deployment:__subpackages__",
+    ],
     deps = {
         "//apps/artifacts/backend": "backend",
         "//apps/artifacts/frontend": "frontend",

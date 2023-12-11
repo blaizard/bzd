@@ -18,10 +18,10 @@ bzd_nodejs_docker(
         "--static",
         "{frontend}",
     ],
-    deploy = {
-        "push": "docker.blaizard.com/apps/dashboard",
-    },
     include_metadata = True,
+    visibility = [
+        "//deployment:__subpackages__",
+    ],
     deps = {
         "//apps/dashboard/backend": "backend",
         "//apps/dashboard/frontend": "frontend",

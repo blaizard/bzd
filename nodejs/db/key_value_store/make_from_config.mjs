@@ -1,6 +1,7 @@
 import KeyValueStoreDisk from "#bzd/nodejs/db/key_value_store/disk.mjs";
 import KeyValueStoreElasticsearch from "#bzd/nodejs/db/key_value_store/elasticsearch.mjs";
 import KeyValueStoreMemory from "#bzd/nodejs/db/key_value_store/memory.mjs";
+import KeyValueStoreMongodb from "#bzd/nodejs/db/key_value_store/mongodb.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import Validation from "#bzd/nodejs/core/validation.mjs";
 
@@ -44,6 +45,16 @@ export default async function makeFromConfig(config) {
 				config,
 			);
 			return await KeyValueStoreElasticsearch.make(config.host, config.options);
+		case "mongodb":
+			validateConfig(
+				{
+					type: "mandatory",
+					uri: "mandatory",
+					options: "",
+				},
+				config,
+			);
+			return await KeyValueStoreMongodb.make(config.uri, config.options);
 		default:
 			Exception.unreachable("Unsupported key value store type: '{}'.", type);
 	}
