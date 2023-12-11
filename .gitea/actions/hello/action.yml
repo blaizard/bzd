@@ -3,7 +3,9 @@ description: "A simple Gitea action written in go"
 runs:
   using: composite
   steps:
-    - name: "Push Dashboard"
+    - name: "One message"
       shell: bash
       run: |
-        echo "It works!"
+        echo "Hello world!"
+    - name: "Call another action"
+      uses: https://git.blaizard.com/blaise/bzd/.gitea/actions/hello@master
