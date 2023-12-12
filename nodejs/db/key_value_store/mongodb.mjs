@@ -21,6 +21,8 @@ export default class KeyValueStoreMongodb extends KeyValueStore {
 			},
 			options,
 		);
+
+		Log.info("Using mongodb as a key value store DB with collection '{}'.", this.options.name);
 	}
 
 	/// Initialization of the class
@@ -28,7 +30,6 @@ export default class KeyValueStoreMongodb extends KeyValueStore {
 		const client = new MongoClient(this.uri);
 		await client.connect();
 		this.db = client.db(this.options.name);
-		//await this.db.createIndex({ key: 1 }, { unique: true } )
 	}
 
 	async _setImpl(bucket, key, value) {

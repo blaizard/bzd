@@ -35,7 +35,7 @@ bdl_target(
     compositions = [
         "composition.bdl",
     ],
-    platform = "//platform:linux_x86_6registry4_clang",
+    platform = "//platform:linux_x86_64_clang",
     language = "cc",
     deps = [
         ":lib",

@@ -14,6 +14,7 @@ __pycache__/
 bazel-*
 .bazelrc.local
 !/tools/**/.bazelrc.local
+MODULE.bazel.lock
 
 # Editors
 .vscode/
