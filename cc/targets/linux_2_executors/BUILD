@@ -37,7 +37,7 @@ bdl_target(
 
 bdl_target_platform(
     name = "x86_64_gcc",
-    platform = "@gcc//:platform",
+    platform = "@gcc//:platform-linux-x86_64",
     target = ":auto",
     visibility = [
         "//visibility:public",
@@ -46,7 +46,7 @@ bdl_target_platform(
 
 bdl_target_platform(
     name = "x86_64_clang",
-    platform = "@clang//:platform",
+    platform = "@clang//:platform-linux-x86_64",
     target = ":auto",
     visibility = [
         "//visibility:public",

@@ -30,6 +30,9 @@ async function triggerAuthentication(clientId) {
 }
 
 export default class Google {
+	/// Create a client from Google identity
+	///
+	/// \param clientId The Google client ID, which can be created here: https://console.cloud.google.com/apis/credentials
 	constructor(clientId) {
 		this.clientId = clientId;
 		this.api = null;
