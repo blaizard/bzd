@@ -24,7 +24,7 @@ build --nolegacy_external_runfiles
 build --experimental_platform_in_output_dir 
 
 # Needed for the rule transition to work, for example, running bazel build cc/targets/linux/...
-# To investigate further.
+# To investigate further, see https://github.com/bazelbuild/bazel/commit/293646c85a718686ce1d7a7ff6d1dd76256cb9bb
 common --noexperimental_use_platforms_in_output_dir_legacy_heuristic
 
 # Global test specific options
@@ -117,6 +117,7 @@ coverage:gcc --experimental_fetch_all_coverage_outputs
 build:esp32 --platforms="@esp32//:platform-esp32-xtensa_lx6"
 build:esp32 --features=-supports_dynamic_linker
 build:esp32 --platform_suffix=esp32-xtensa_lx6-gcc
+test:esp32 --strategy=TestRunner=sandboxed
 
 # clang-tidy
 build:clang-tidy --aspects=//tools/clang_tidy:defs.bzl%clang_tidy_aspect
