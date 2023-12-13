@@ -152,7 +152,7 @@
 				});
 			},
 			handleConfig(name) {
-				this.$routerDispatch("/config/" + name);
+				this.$router.dispatch("/config/" + name);
 			},
 			handleItemPropagation(name, item) {
 				item.path.unshift(name);

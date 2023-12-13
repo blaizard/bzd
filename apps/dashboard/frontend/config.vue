@@ -155,21 +155,21 @@
 				this.handleSubmit(async () => {
 					await this.$api.request("post", "/tile", { value: this.value });
 					this.$notification.success("New tile created");
-					await this.$routerDispatch("/");
+					await this.$router.dispatch("/");
 				});
 			},
 			async handleUpdate() {
 				this.handleSubmit(async () => {
 					await this.$api.request("put", "/tile", { uid: this.uid, value: this.value });
 					this.$notification.success("Tile updated");
-					await this.$routerDispatch("/");
+					await this.$router.dispatch("/");
 				});
 			},
 			async handleDelete() {
 				this.handleSubmit(async () => {
 					await this.$api.request("delete", "/tile", { uid: this.uid });
 					this.$notification.success("Tile deleted");
-					await this.$routerDispatch("/");
+					await this.$router.dispatch("/");
 				});
 			},
 			/**
