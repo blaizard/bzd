@@ -113,7 +113,7 @@
 							ondrag: this.onDrag,
 							onstopdrag: this.onStopDrag,
 							allowClickThrough: true,
-					  };
+						};
 			},
 			slidesStyle() {
 				return {

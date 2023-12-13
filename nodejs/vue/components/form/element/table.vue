@@ -129,7 +129,7 @@
 										}
 
 										return compare ? result : -result;
-								  },
+									},
 						key: key,
 						order: typeof compare === "function" ? "unknown" : compare ? "descending" : "ascending",
 					};

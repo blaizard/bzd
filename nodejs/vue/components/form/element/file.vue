@@ -110,7 +110,7 @@
 								const index = this.uploadItemToIndex(item);
 								this.uploadValueList[index] = this.makeObjectFromItem(item);
 							},
-					  })
+						})
 					: null;
 			},
 			// Overload internal attributes

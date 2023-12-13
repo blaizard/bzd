@@ -111,7 +111,7 @@ export default class StorageGoogleCloudStorage extends Base {
 								write: true,
 								delete: true,
 							},
-					  )
+						)
 					: name,
 			);
 		}

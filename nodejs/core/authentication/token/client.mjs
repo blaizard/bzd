@@ -57,7 +57,7 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 			timeoutS
 				? {
 						maxAge: timeoutS * 1000,
-				  }
+					}
 				: {},
 		);
 	}

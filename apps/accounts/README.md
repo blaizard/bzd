@@ -25,4 +25,3 @@ bazel run //apps/accounts/example/static --config=dev -- --port 8081
 ```bash
 bazel run apps/accounts:push --config=prod
 ```
-
