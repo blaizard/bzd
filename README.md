@@ -107,3 +107,7 @@ The code in this repository follows several principle regarding naming conventio
 
 All classes offered by this library have the same objective to have a fixed memory size. Their footprint or maximum size
 is determined at compile time, ensuring no memory allocation at runtime, making this library ideal for any safety-critical application.
+
+## TODO
+
+- Fix this test: //cc/bzd/core/async/tests:multithread (it hangs from time to time with clang prod).

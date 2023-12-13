@@ -23,8 +23,9 @@ build --nolegacy_external_runfiles
 # https://bazel.build/reference/command-line-reference#flag--experimental_platform_in_output_dir
 build --experimental_platform_in_output_dir 
 
-# Enable bzl modules.
-common --enable_bzlmod
+# Needed for the rule transition to work, for example, running bazel build cc/targets/linux/...
+# To investigate further.
+common --noexperimental_use_platforms_in_output_dir_legacy_heuristic
 
 # Global test specific options
 test --test_output=errors
@@ -42,12 +43,12 @@ coverage --instrument_test_targets
 coverage --collect_code_coverage
 
 # Docker sandbox
-build:docker_sandbox --strategy=NodejsUpdate=sandboxed
+build:docker_sandbox --strategy=NodejsUpdate=worker,sandboxed
 
 # Docker
 build:docker --experimental_docker_verbose
 build:docker --experimental_enable_docker_sandbox
-build:docker --spawn_strategy=docker,sandboxed
+build:docker --spawn_strategy=docker,worker,sandboxed,local
 build:docker --config=docker_sandbox
 build:docker --extra_execution_platforms=@bzd_rules_docker//execution_platforms:linux_x86_64
 
@@ -56,7 +57,7 @@ build:remote --remote_executor=grpc://10.10.0.11:8980
 build:remote --extra_execution_platforms=@bzd_rules_docker//execution_platforms:linux_x86_64
 build:remote --jobs=24
 build:remote --dynamic_mode=off
-build:remote --spawn_strategy=remote,sandboxed
+build:remote --spawn_strategy=remote,worker,sandboxed,local
 build:remote --remote_download_minimal
 build:remote --disk_cache=
 build:remote --define=EXECUTOR=remote
@@ -86,14 +87,10 @@ build:nodejs --build_tag_filters=nodejs
 test:nodejs --test_tag_filters=nodejs
 coverage:nodejs --test_env=LCOV_MERGER=/bin/true
 
-# Prevent building twice tools used for host and target, for nodejs rules for example.
-build --nodistinct_host_configuration
-
 # Add stamping
 build --workspace_status_command tools/bazel_build/buildstamp/stamp.sh
 
 # Enforce strict checks.
-build --incompatible_force_strict_header_check_from_starlark
 build --strict_filesets
 build --strict_system_includes
 
@@ -104,7 +101,6 @@ common --repo_env=BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN=1
 build --incompatible_strict_action_env=true
 
 # Use platforms to select toolchains
-build --incompatible_enable_cc_toolchain_resolution=true
 build --incompatible_use_cc_configure_from_rules_cc=true
 
 # clang
@@ -121,7 +117,6 @@ coverage:gcc --experimental_fetch_all_coverage_outputs
 build:esp32 --platforms="@esp32//:platform-esp32-xtensa_lx6"
 build:esp32 --features=-supports_dynamic_linker
 build:esp32 --platform_suffix=esp32-xtensa_lx6-gcc
-test:esp32 --strategy=TestRunner=sandboxed
 
 # clang-tidy
 build:clang-tidy --aspects=//tools/clang_tidy:defs.bzl%clang_tidy_aspect
