@@ -10,7 +10,7 @@
 		</template>
 		<template #menu> </template>
 		<template #content>
-			<RouterComponent ref="view" :edit="edit" class="bzd-content"></RouterComponent>
+			<RouterComponent name="view" :edit="edit" class="bzd-content"></RouterComponent>
 		</template>
 	</Layout>
 </template>
@@ -34,8 +34,8 @@
 			};
 		},
 		mounted() {
-			this.$routerSet({
-				ref: "view",
+			this.$router.set({
+				component: "view",
 				routes: [
 					{ path: "/", component: () => import("./tiles.vue") },
 					{ path: "/new", component: () => import("./config.vue") },

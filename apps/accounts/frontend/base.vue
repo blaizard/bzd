@@ -63,7 +63,7 @@
 									message += this.userLogStr + "\n";
 									message += this.navigatorLogStr + "\n";
 
-									this.$routerDispatch("/support", {
+									this.$router.dispatch("/support", {
 										props: {
 											category: "technical",
 											message: message,

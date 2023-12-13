@@ -8,13 +8,9 @@ export default class Router {
 	constructor(config) {
 		this.config = Object.assign(
 			{
-				/**
-				 * \brief If set, the route match will differentiate with upper and lower case.
-				 */
+				/// If set, the route match will differentiate with upper and lower case.
 				caseSensitive: false,
-				/**
-				 * \brief Callback if no routes are matching.
-				 */
+				/// Callback if no routes are matching.
 				fallback: (path) => {
 					throw new Exception("Route not found for '{}'.", path);
 				},
@@ -26,14 +22,12 @@ export default class Router {
 		this.data = null;
 	}
 
-	/**
-	 * \brief Associate a new route with a handler (callback).
-	 * It supports the following format:
-	 *	/api/robots
-	 *	/api/robots/search/{name} // match the next segment of the path (until the next slash)
-	 *	/api/robots/{id:i}        // match integer
-	 *  /api/robots/{rest:*}      // match all the rest of the path (including slashes)
-	 */
+	/// \brief Associate a new route with a handler (callback).
+	/// It supports the following format:
+	///	/api/robots
+	///	/api/robots/search/{name} // match the next segment of the path (until the next slash)
+	///	/api/robots/{id:i}        // match integer
+	/// /api/robots/{rest:*}      // match all the rest of the path (including slashes)
 	add(path, handler, args = {}) {
 		Exception.assert(handler !== undefined, "You must define a handler for the route '{}'.", path);
 
@@ -44,9 +38,7 @@ export default class Router {
 		this.dirty = true;
 	}
 
-	/**
-	 * Try to match the given path
-	 */
+	/// Try to match the given path
 	match(path) {
 		// Compile the routes once
 		if (this.dirty) {
@@ -85,9 +77,7 @@ export default class Router {
 		};
 	}
 
-	/**
-	 * \brief Handle the current request, with routes previously added.
-	 */
+	/// \brief Handle the current request, with routes previously added.
 	async dispatch(path, ...args) {
 		const match = this.match(path);
 		if (match) {
@@ -108,9 +98,7 @@ export default class Router {
 	}
 }
 
-/**
- * \brief Pre-process routes before being used.
- */
+/// \brief Pre-process routes before being used.
 function compileRoutes(routes, config) {
 	// Create the master regexpr, to optimize the search speed
 	let routeData = [];

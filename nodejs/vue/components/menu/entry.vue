@@ -65,7 +65,7 @@
 			handleClick() {
 				this.$emit("click");
 				if (this.path) {
-					this.$routerDispatch(this.path);
+					this.$router.dispatch(this.path);
 				}
 			},
 		},

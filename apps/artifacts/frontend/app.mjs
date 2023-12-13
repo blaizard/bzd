@@ -17,8 +17,8 @@ const app = createApp(App);
 
 let authentication = new Authentication({
 	unauthorizedCallback: () => {
-		const route = app.config.globalProperties.$routerGet();
-		app.config.globalProperties.$routerDispatch("/login", route ? { query: { redirect: route } } : {});
+		const route = app.config.globalProperties.$router.get();
+		app.config.globalProperties.$router.dispatch("/login", route ? { query: { redirect: route } } : {});
 	},
 });
 

@@ -21,7 +21,7 @@
 			</MenuEntry>
 		</template>
 		<template #content>
-			<RouterComponent ref="view"></RouterComponent>
+			<RouterComponent name="view"></RouterComponent>
 		</template>
 	</Layout>
 </template>
@@ -39,8 +39,8 @@
 			return {};
 		},
 		mounted() {
-			this.$routerSet({
-				ref: "view",
+			this.$router.set({
+				component: "view",
 				routes: [
 					{ path: "/colors", component: () => import("./colors.vue") },
 					{ path: "/router", component: () => import("./router.vue") },
@@ -57,6 +57,7 @@
 					{ path: "/form/output", component: () => import("./form/output.vue") },
 					{ path: "/tooltip", component: () => import("./tooltip.vue") },
 				],
+				fallback: { component: () => import("./404.vue") },
 			});
 		},
 	};

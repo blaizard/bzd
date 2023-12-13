@@ -186,7 +186,7 @@
 			},
 			handleClick() {
 				if (this.edit) {
-					this.$routerDispatch("/update/" + this.uid);
+					this.$router.dispatch("/update/" + this.uid);
 				} else if (this.link) {
 					window.open(this.link);
 				}

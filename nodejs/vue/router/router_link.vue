@@ -11,7 +11,7 @@
 		},
 		methods: {
 			handleClick() {
-				this.$routerDispatch(this.link);
+				this.$router.dispatch(this.link);
 			},
 		},
 	};

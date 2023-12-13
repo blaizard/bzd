@@ -19,7 +19,7 @@
 					<Tree :key="refreshCounter" @item="handleItem" :show-path="showPath"></Tree>
 				</div>
 				<div class="content">
-					<RouterComponent ref="view" class="bzd-content" @show="handleShowPath"></RouterComponent>
+					<RouterComponent name="view" class="bzd-content" @show="handleShowPath"></RouterComponent>
 				</div>
 			</div>
 		</template>
@@ -49,15 +49,15 @@
 			};
 		},
 		mounted() {
-			this.$routerSet({
-				ref: "view",
+			this.$router.set({
+				component: "view",
 				routes: [
 					{ path: "/", component: null },
 					{
 						path: "/refresh",
 						handler: () => {
 							++this.refreshCounter;
-							this.$routerDispatch("/");
+							this.$router.dispatch("/");
 						},
 					},
 					{ path: "/config/{volume}", authentication: true, component: () => import("./config.vue") },
@@ -71,17 +71,17 @@
 		methods: {
 			handleItem(item) {
 				const path = item.path.concat([item.item.name]);
-				this.$routerDispatch("/view/" + path.map((c) => encodeURIComponent(c)).join("/"));
+				this.$router.dispatch("/view/" + path.map((c) => encodeURIComponent(c)).join("/"));
 			},
 			handleShowPath(path) {
 				this.showPath = path;
 			},
 			async handleLogout() {
 				await this.$api.logout();
-				this.$routerDispatch("/");
+				this.$router.dispatch("/");
 			},
 			handleHeader() {
-				this.$routerDispatch("/");
+				this.$router.dispatch("/");
 			},
 		},
 	};

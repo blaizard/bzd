@@ -1,198 +1,27 @@
-import ExceptionFactory from "../../core/exception.mjs";
-import LogFactory from "../../core/log.mjs";
-import Router from "../../core/router.mjs";
-import { onBeforeUnmount, getCurrentInstance } from "vue";
+import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
+import LogFactory from "#bzd/nodejs/core/log.mjs";
+import Router from "#bzd/nodejs/core/router.mjs";
 
-import RouterComponent from "./router_component.vue";
-import RouterLink from "./router_link.vue";
+import RouterComponent from "#bzd/nodejs/vue/router/router_component.vue";
+import RouterLink from "#bzd/nodejs/vue/router/router_link.vue";
+import Registry from "#bzd/nodejs/vue/router/registry.mjs";
+import { onBeforeUnmount } from "vue";
 
 const Log = LogFactory("router");
 const Exception = ExceptionFactory("router");
 
-Log.setLevel("debug");
-
-async function delayMs(time) {
-	return new Promise((resolve) => {
-		setTimeout(() => {
-			resolve();
-		}, time);
-	});
-}
-
-/// Vue Router
-///
-/// Every routes have the following arguments:
-/// TODO: implement the following behavior:
-/// - path: The path to reach this route.
-///         If absolute, it starts from the root, even for nested router.
-///         If relative, it starts from the root if non-nested. If nested, it continues
-///         the parent router path.
-class RouterManager {
-	constructor(options) {
-		this.options = Object.assign(
-			{
-				// Hash mode
-				hash: true,
-				// Authentication object to be used with this router.
-				authentication: null,
-			},
-			options,
-		);
-
-		this.routers = new Map();
-		this.path = "/";
-		this.regexMatchPath = new RegExp(
-			this.options.hash ? "^[^#]+(?:#([^?]+))?(?:\\?.*)?$" : "^.*://[^/]+/([^?#]*)(?:[?#].*)?$",
-		);
+class Path {
+	constructor(route) {
+		this.route = Path.clean(route);
+		this.remaining = this.route;
+		this.processed = "";
 	}
 
-	/**
-	 * Create a new router
-	 */
-	_makeRouter(uid, vueInstance, options) {
-		let router = new Router({
-			fallback: (path) => {
-				Log.error("Route '{}' not found", path);
-			},
-		});
-
-		options.routes.forEach((route) => {
-			const handler = async (route, args, path, routerOptions) => {
-				// Check if the route requires authentication,
-				// if so ensure that we are authenticated
-				if (route.authentication) {
-					Exception.assert(
-						this.options.authentication,
-						"This route has authentication requirement but no authentication object was specified.",
-					);
-					await this.options.authentication.assertScopes(route.authentication);
-				}
-
-				if (route.component) {
-					// TODO rework the router, it is terrible...
-					// use vue-router instead?
-					await delayMs(1);
-					vueInstance.refs[options.ref].componentSet(
-						route.component,
-						uid,
-						Object.assign({}, args, routerOptions.props),
-					);
-				}
-				if (route.handler) {
-					route.handler(path, routerOptions, args);
-				}
-			};
-
-			router.add(route.path, (args, routerOptions) => {
-				handler(route, args, "/", routerOptions);
-			});
-
-			// To handle nested components
-			if (route.nested) {
-				router.add(route.path + "/{bzd.core.router.rest:.*}", (args) => {
-					const rest = args["bzd.core.router.rest"];
-					delete args["bzd.core.router.rest"];
-					handler(route, args, "/" + rest);
-				});
-			}
-		});
-
-		return router;
+	static makeFromLocation(hash) {
+		return new Path(Path.getLocation(hash));
 	}
 
-	/**
-	 * Register a new router
-	 */
-	async registerRouter(uid, vueInstance, options) {
-		Exception.assert(!this.routers.has(uid), "A router '{}' is already registered for this element", uid);
-
-		this.routers.set(uid, {
-			router: this._makeRouter(uid, vueInstance, options),
-			options: options,
-			children: new Set(),
-			parent: null,
-			path: null,
-			pathPropagate: null,
-		});
-
-		// Build component hierarchy.
-		// TODO: to be fixed, doesn't work now.
-		/*const parent = (vueElt && vueElt.closest) ? vueElt.closest("*[data-bzd-router-id]") : null;
-		if (parent) {
-			const parentId = parent.getAttribute("data-bzd-router-id");
-			this.routers.get(parentId).children.add(uid);
-			this.routers.get(uid).parent = parentId;
-		}*/
-
-		Log.debug(
-			"Registered router '{}' with parent '{}' (nb routers: {})",
-			uid,
-			this.routers.get(uid).parent,
-			this.routers.size,
-		);
-
-		await this._propagate(uid);
-	}
-
-	/**
-	 * Unregister a previously registered router
-	 */
-	unregisterRouter(uid) {
-		// Unregister all the children (note, the list must be copied as elements will be deleted)
-		const children = new Set(this.routers.get(uid).children);
-		children.forEach((childUid) => {
-			this.unregisterRouter(childUid);
-		});
-		if (this.routers.get(uid).parent) {
-			let parent = this.routers.get(this.routers.get(uid).parent);
-			Exception.assert(
-				parent.children.delete(uid),
-				"Child '{}' was not registered in parent '{}'",
-				uid,
-				this.routers.get(uid).parent,
-			);
-		}
-		this.routers.delete(uid);
-
-		Log.debug("Unregistered router '{}'", uid);
-	}
-
-	/// Get a route config from an already registered path.
-	/// The path lookup must be on the same component as when it was registered.
-	fromPath(vueElt, path) {
-		// If there is a parent router component, use it to determine the ID.
-		const parent = vueElt && vueElt.closest ? vueElt.closest("*[data-bzd-router-id]") : null;
-		let configs = [];
-		if (parent) {
-			const parentId = parent.getAttribute("data-bzd-router-id");
-			configs = [...this.routers.get(parentId).children].map((uid) => this.routers.get(uid));
-		}
-		// Else use the top level.
-		else {
-			configs = [...this.routers.values()].filter((config) => config.parent === null);
-		}
-		Exception.assert(configs, "There is no router component associated or preceeding this component.");
-
-		for (const config of configs) {
-			for (const route of config.options.routes) {
-				if (route.path == path) {
-					return route;
-				}
-			}
-		}
-		Exception.assert(false, "The path '{}' does not match any registered path.", path);
-	}
-
-	/**
-	 * Get the current route or return null if none is detected
-	 */
-	getRoute(path = null) {
-		if (path === null) {
-			const match = window.location.href.match(this.regexMatchPath);
-			if (match) {
-				path = match[1];
-			}
-		}
+	static clean(path) {
 		return (
 			"/" +
 			(path || "")
@@ -202,7 +31,18 @@ class RouterManager {
 		);
 	}
 
-	getDefaultQuery() {
+	static getLocation(hash) {
+		const regexMatchPath = new RegExp(hash ? "^[^#]+(?:#([^?]+))?(?:\\?.*)?$" : "^.*://[^/]+/([^?#]*)(?:[?#].*)?$");
+
+		let path = "";
+		const match = window.location.href.match(regexMatchPath);
+		if (match) {
+			path = match[1];
+		}
+		return path;
+	}
+
+	static getQuery() {
 		return window.location.search
 			.replace("?", "")
 			.split("&")
@@ -214,98 +54,170 @@ class RouterManager {
 			}, {});
 	}
 
-	/**
-	 * Dispatch a new path to the routers
-	 */
-	async dispatch(path = null, options = {}) {
-		this.path = this.getRoute(path);
+	/// The path has remaining route to be processed.
+	hasRemaining() {
+		return Boolean(this.remaining);
+	}
 
-		options = Object.assign(
+	/// Get the remaining part of the path to be processed.
+	getRemaining() {
+		return this.remaining;
+	}
+
+	setRemaining(route) {
+		this.remaining = route;
+	}
+
+	/// Get the route that was triggered.
+	getRoute() {
+		return this.route;
+	}
+}
+
+class RouterManager {
+	constructor(registry, options) {
+		this.registry = registry;
+		this.options = Object.assign(
 			{
-				/// Query to be added to the URL.
-				query: "query" in options ? {} : this.getDefaultQuery(),
-				/// Custom properties that will be added to the component.
-				props: {},
+				// Hash mode
+				hash: true,
+				// Authentication object to be used with this router.
+				authentication: null,
 			},
 			options,
 		);
 
-		// Update the url
-		const queryStr = Object.keys(options.query).length
-			? "?" +
-			  Object.keys(options.query)
-					.map((key) => key + "=" + encodeURIComponent(options.query[key]))
-					.join("&")
-			: "";
-		history.pushState(null, null, this.options.hash ? queryStr + "#" + this.path : this.path + queryStr);
-
-		// Clear all previously processed path
-		for (const [, /*uid*/ config] of this.routers.entries()) {
-			config.path = null;
-			config.pathPropagate = null;
-		}
-
-		Log.debug("Dispatching path '{}'", this.path);
-
-		// Propagate dispatched request to all top level routers
-		let promiseList = [];
-		for (const [uid, config] of this.routers.entries()) {
-			if (config.parent == null) {
-				promiseList.push(this._propagate(uid, options));
-			}
-		}
-		await Promise.all(promiseList);
+		this.routers = {};
+		this.path = Path.makeFromLocation(this.options.hash);
+		this.uid = 0;
 	}
 
-	/**
-	 * Propagate a dispatch request to the routers
-	 */
-	async _propagate(uid, options = {}) {
-		let router = this.routers.get(uid);
+	registerRouter(configuration) {
+		const handler = async (route, args, dispatchOptions) => {
+			// Check if the route requires authentication,
+			// if so ensure that we are authenticated
+			if (route.authentication) {
+				Exception.assert(
+					this.options.authentication,
+					"This route has authentication requirement but no authentication object was specified.",
+				);
+				await this.options.authentication.assertScopes(route.authentication);
+			}
 
-		// If this router is already processed, do nothing
-		if (router.path !== null) {
-			return;
-		}
+			if (route.component) {
+				await this.registry.setComponent(
+					configuration.component,
+					route.component,
+					Object.assign({}, args, dispatchOptions.props),
+				);
+			}
 
-		let data = null;
-		// If this is a top level router
-		if (router.parent === null) {
-			data = await router.router.dispatch(this.path, options);
-		}
-		// Otherwise it must be a nested router
-		else {
-			const parent = this.routers.get(router.parent);
-			Exception.assert(parent, "Router '{}' is set as nested but has an invalid parent '{}'", uid, router.parent);
-			Exception.assert(parent.pathPropagate !== null, "Propagated path from parent '{}' is null", router.parent);
-			data = await router.router.dispatch(parent.pathPropagate, options);
-		}
+			if (route.handler) {
+				await route.handler(path, dispatchOptions, args);
+			}
+		};
 
-		Exception.assert(data !== null, "Dispatched information is empty.");
-
-		// Update the path of the router
-		router.pathPropagate = "/" + (data.vars["bzd.core.router.rest"] || "");
-		router.path = data.path.substr(
-			0,
-			data.path.length - router.pathPropagate.length + (router.pathPropagate == "/" ? 1 : 0),
-		);
-
-		Log.debug(
-			"Router '{}' processed path '{}' (with vars {:j}) and propagate path '{}'",
-			uid,
-			router.path,
-			data.vars,
-			router.pathPropagate,
-		);
-
-		// Propagate to nested routers.
-		// Timeout is to ensure routers are unregisters in the mean time.
-		await delayMs(1);
-
-		let promiseList = Array.from(router.children).map(async (childUid) => {
-			await this._propagate(childUid, options);
+		let router = new Router({
+			fallback: async (path) => {
+				Log.error("Route '{}' not found", path);
+				if (configuration.fallback) {
+					await handler(configuration.fallback, {}, {});
+				}
+			},
 		});
-		await Promise.all(promiseList);
+
+		configuration.routes.forEach((route) => {
+			const metadata = {
+				authentication: route.authentication || false,
+			};
+
+			// TODO: add support for nested routes.
+			//router.add(route.path + "/{bzd.core.router.rest:*}", (args, dispatchOptions) => {
+			//    this.path.setRemaining("/" + args["bzd.core.router.rest"]);
+			//    console.log("NESTED!", route.path, "/" + args["bzd.core.router.rest"]);
+			//    delete args["bzd.core.router.rest"];
+			//}, metadata);
+
+			router.add(
+				route.path,
+				async (args, dispatchOptions) => {
+					this.path.setRemaining("");
+					await handler(route, args, dispatchOptions);
+				},
+				metadata,
+			);
+		});
+
+		// Register the router
+		const uid = ++this.uid;
+		this.routers[uid] = router;
+		return uid;
+	}
+
+	/// Trigger a specific router to try.
+	async trigger(uid) {
+		if (this.path.hasRemaining()) {
+			Exception.assert(uid in this.routers, "This router is not registered.");
+			await this.routers[uid].dispatch(this.path.getRemaining(), {});
+		}
+	}
+
+	async unregisterRouter(uid) {
+		delete this.routers[uid];
+	}
+
+	async dispatch(path = null, dispatchOptions = {}) {
+		// Clear current actions if any.
+		this.registry.reset();
+		this.path = path ? new Path(path) : Path.makeFromLocation(this.options.hash);
+
+		// Update the options.
+		dispatchOptions = Object.assign(
+			{
+				/// Query to be added to the URL.
+				query: "query" in dispatchOptions ? {} : Path.getQuery(),
+				/// Custom properties that will be added to the component.
+				props: {},
+			},
+			dispatchOptions,
+		);
+
+		// Update the url
+		const queryStr = Object.keys(dispatchOptions.query).length
+			? "?" +
+				Object.keys(dispatchOptions.query)
+					.map((key) => key + "=" + encodeURIComponent(dispatchOptions.query[key]))
+					.join("&")
+			: "";
+		const state = this.options.hash ? queryStr + "#" + this.path.route : this.path.route + queryStr;
+		history.pushState(null, null, state);
+
+		// Loop through the routers and dispatch.
+		for (const router of Object.values(this.routers)) {
+			if (!this.path.hasRemaining()) {
+				break;
+			}
+			await router.dispatch(this.path.getRemaining(), dispatchOptions);
+		}
+	}
+
+	/// Return meta-information about this route.
+	///
+	/// \param path The path to be checked.
+	/// \return The information associated to the path, null if the path does not exists.
+	getInfoFromPath(path) {
+		for (const router of Object.values(this.routers)) {
+			const match = router.match(path);
+			if (match) {
+				return Object.assign({ path: path }, match.args);
+			}
+		}
+		return null;
+	}
+
+	/// Get the route that was triggered.
+	getRoute() {
+		return this.path.getRoute();
 	}
 }
 
@@ -314,30 +226,41 @@ export default {
 		app.component("RouterComponent", RouterComponent);
 		app.component("RouterLink", RouterLink);
 
-		let routers = new RouterManager(options);
+		let registry = new Registry();
+		let routers = new RouterManager(registry, options);
 
-		app.config.globalProperties.$routerSet = async function (routeOptions) {
-			const instance = getCurrentInstance();
-			const uid = String(instance.uid);
-
-			onBeforeUnmount(() => {
-				routers.unregisterRouter(uid);
-			});
-			await routers.registerRouter(uid, instance, routeOptions);
+		const api = {
+			/// Register new routes.
+			///
+			/// It should be called from setup or onMounted.
+			///
+			/// \param configuration The configuration to set the routes.
+			async set(configuration) {
+				const uid = routers.registerRouter(configuration);
+				onBeforeUnmount(() => {
+					routers.unregisterRouter(uid);
+				});
+				await routers.trigger(uid);
+			},
+			/// Dispatch a specific path.
+			///
+			/// \param path The path to be dispatched onto the router.
+			/// \param options The options to be passed.
+			async dispatch(path, options = {}) {
+				await routers.dispatch(path, options);
+			},
+			/// Get the current route.
+			get() {
+				return routers.getRoute();
+			},
+			/// Get the information about a certain path.
+			fromPath(path) {
+				return routers.getInfoFromPath(path);
+			},
 		};
 
-		app.config.globalProperties.$routerDispatch = async (path, options = {}) => {
-			await routers.dispatch(path, options);
-		};
-
-		app.config.globalProperties.$routerFromPath = function (path) {
-			return routers.fromPath(this.$el, path);
-		};
-
-		app.config.globalProperties.$routerGet = () => {
-			return routers.getRoute();
-		};
-
-		routers.dispatch();
+		app.config.globalProperties.$router = api;
+		app.provide("$router", api);
+		app.provide("$routerRegistry", registry);
 	},
 };

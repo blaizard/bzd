@@ -104,7 +104,7 @@
 				} else if (this.redirect) {
 					window.location.href = this.redirect;
 				} else {
-					this.$routerDispatch("/");
+					this.$router.dispatch("/");
 				}
 			},
 			async handleSubmitLogin() {

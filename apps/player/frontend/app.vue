@@ -128,8 +128,7 @@
 			},
 		},
 		mounted() {
-			this.$routerSet({
-				ref: "view",
+			this.$router.set({
 				routes: [
 					{ path: "/", handler: this.execute },
 					{
@@ -342,7 +341,7 @@
 				}
 
 				++this.index;
-				this.$routerDispatch("/" + this.index);
+				this.$router.dispatch("/" + this.index);
 			},
 			async handleTreeSelected(path) {
 				await this.executeFileSelect(path);

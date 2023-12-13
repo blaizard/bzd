@@ -6,18 +6,18 @@
 		<template #menu>
 			<div v-if="$authentication.isAuthenticated">
 				<MenuEntry text="Configuration" icon="bzd-icon-images" link="/"></MenuEntry>
-				<MenuEntry text="Users" icon="bzd-icon-newspaper" :link="$routerFromPath('/admin/users')"></MenuEntry>
+				<MenuEntry text="Users" icon="bzd-icon-newspaper" :link="$router.fromPath('/admin/users')"></MenuEntry>
 				<MenuEntry
 					text="Applications"
 					icon="bzd-icon-newspaper"
-					:link="$routerFromPath('/admin/applications')"
+					:link="$router.fromPath('/admin/applications')"
 				></MenuEntry>
 				<MenuEntry text="Logout" icon="bzd-icon-newspaper" link="/logout"></MenuEntry>
 			</div>
 		</template>
 		<template #content>
 			<RouterComponent
-				ref="view"
+				name="view"
 				@loading="handleLoading"
 				@updated="handleUpdated"
 				v-loading="loading"
@@ -47,8 +47,8 @@
 			};
 		},
 		mounted() {
-			this.$routerSet({
-				ref: "view",
+			this.$router.set({
+				component: "view",
 				routes: [
 					{ path: "/", component: () => import("./config.vue"), authentication: true },
 					{ path: "/admin/users", component: () => import("./admin/users.vue"), authentication: scopeAdminUsers },

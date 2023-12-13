@@ -96,7 +96,7 @@
 						volume: this.volume,
 						config: this.config,
 					});
-					this.$routerDispatch("/refresh");
+					this.$router.dispatch("/refresh");
 				});
 			},
 			async handleDelete() {
@@ -104,7 +104,7 @@
 					await this.$api.request("delete", "/config", {
 						volume: this.volume,
 					});
-					this.$routerDispatch("/refresh");
+					this.$router.dispatch("/refresh");
 				});
 			},
 		},

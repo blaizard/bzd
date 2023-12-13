@@ -64,7 +64,7 @@
 				this.loading = true;
 				try {
 					await this.$api.login(this.login.uid, this.login.password, this.login.persistent);
-					this.$routerDispatch(this.redirect || "/");
+					this.$router.dispatch(this.redirect || "/");
 				} catch (e) {
 					this.error = "Wrong username or password";
 				} finally {

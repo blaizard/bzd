@@ -1,7 +1,6 @@
 <template>
 	<div class="router">
 		<div>Clicked on: {{ clicked }}</div>
-		<div><a href="#/link1">href link -> /link1</a></div>
 		<RouterLink link="/link1">RouterLink -> /link1</RouterLink>
 	</div>
 </template>
@@ -14,13 +13,16 @@
 			};
 		},
 		mounted() {
-			this.$routerSet({
+			this.$router.set({
 				routes: [
 					{
 						path: "/link1",
 						handler: () => {
 							this.clicked = "/link1";
 						},
+					},
+					{
+						path: "/hello",
 					},
 				],
 			});
