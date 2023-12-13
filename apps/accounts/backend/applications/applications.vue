@@ -128,7 +128,7 @@
 			changesTooltip() {
 				const deletions = this.hasDeletions
 					? "<h3>Delete</h3>" +
-					  this.deletions
+						this.deletions
 							.map((uid) => {
 								return "<b>" + uid + "</b>";
 							})

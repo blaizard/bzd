@@ -139,7 +139,7 @@
 			changesTooltip() {
 				const deletions = this.hasDeletions
 					? "<h3>Delete</h3>" +
-					  this.deletions
+						this.deletions
 							.map((uid) => {
 								return "<b>" + uid + "</b>";
 							})
@@ -148,7 +148,7 @@
 
 				const updates = this.hasUpdates
 					? "<h3>Update</h3>" +
-					  Object.entries(this.updates)
+						Object.entries(this.updates)
 							.map((entry) => {
 								const [uid, data] = entry;
 								return "<b>" + uid + "</b>: " + Object.keys(data);
