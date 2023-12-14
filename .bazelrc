@@ -117,6 +117,7 @@ coverage:gcc --experimental_fetch_all_coverage_outputs
 build:esp32 --platforms="@esp32//:platform-esp32-xtensa_lx6"
 build:esp32 --features=-supports_dynamic_linker
 build:esp32 --platform_suffix=esp32-xtensa_lx6-gcc
+# TODO: check why this is needed. It fails without this when using --config=remote
 test:esp32 --strategy=TestRunner=sandboxed
 
 # clang-tidy

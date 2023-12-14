@@ -1,5 +1,9 @@
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 
+exports_files([
+    "api.json",
+])
+
 bzd_nodejs_library(
     name = "users",
     srcs = [

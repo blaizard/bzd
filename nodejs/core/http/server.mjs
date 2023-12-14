@@ -36,20 +36,6 @@ export default class HttpServer {
 				ca: null,
 				/// \brief Use data compression and minfy certain file types.
 				useCompression: true,
-				/// Options to be used while serving static files
-				staticOptions: {
-					maxAge: 60 * 60 * 1000, // 1h
-					index: "index.html",
-					setHeaders: (res, path) => {
-						// Do not cache the index.html
-						// this is usefull when the application updates.
-						if (path.endsWith("index.html")) {
-							res.header("Cache-Control", "private, no-cache, no-store, must-revalidate");
-							res.header("Expires", "-1");
-							res.header("Pragma", "no-cache");
-						}
-					},
-				},
 			},
 			config,
 		);
@@ -196,29 +182,56 @@ export default class HttpServer {
 	 *
 	 * \param uri The uri to which the request should match.
 	 * \param path The path to which the static files will be served.
-	 * \param fallback (optional) Serve a specific file if nothing else can be served.
+	 * \param options (optional) To be used by the static route
 	 */
-	async addStaticRoute(uri, path, fallback) {
+	async addStaticRoute(uri, path, options) {
 		const absolutePath = Path.resolve(path);
 		Exception.assert(absolutePath, "Absolute pat for path '{}' is empty.", path);
 		Exception.assert(await FileSystem.exists(absolutePath), "No file are present at path '{}'.", absolutePath);
 
-		this.app.use(uri, Express.static(absolutePath, this.config.staticOptions));
+		options = Object.assign(
+			{
+				maxAge: 60 * 60 * 1000, // 1h
+				index: "index.html",
+				fallback: "index.html",
+				headers: {},
+			},
+			options,
+		);
+
+		// Create the Epxress options
+		const optionsExpress = {
+			maxAge: options.maxAge,
+			index: options.index,
+			setHeaders: (res, path) => {
+				// Do not cache the entry point
+				// this is usefull when the application updates.
+				if (path.endsWith(options.index)) {
+					res.header("Cache-Control", "private, no-cache, no-store, must-revalidate");
+					res.header("Expires", "-1");
+					res.header("Pragma", "no-cache");
+				}
+				Object.entries(options.headers).forEach(([key, value]) => {
+					res.header(key, value);
+				});
+			},
+		};
+		this.app.use(uri, Express.static(absolutePath, optionsExpress));
 
 		// If there is a fallback file
-		if (fallback) {
+		if (options.fallback) {
 			this.app.use(
 				uri,
 				(
 					(...args) =>
 					(req, res, next) => {
 						if ((req.method === "GET" || req.method === "HEAD") && req.accepts("html")) {
-							(res.sendFile || res.sendfile).call(res, ...args, (err) => err && next());
+							res.sendFile.call(res, ...args, (err) => err && next());
 						} else {
 							next();
 						}
 					}
-				)(fallback, { root: absolutePath }),
+				)(options.fallback, { root: absolutePath }),
 			);
 		}
 	}

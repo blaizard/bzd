@@ -36,9 +36,31 @@ class APIServerContext extends HttpServerContext {
 export default class APIServer extends Base {
 	constructor(schema, options) {
 		super(schema, options);
-		this._installPlugins()
+		this._installPluginsServer()
 			.then(() => this.event.trigger("ready"))
 			.catch((e) => this.event.trigger("error", e));
+	}
+
+	async _installPluginsServer() {
+		await this._installPlugins();
+
+		// Install the CORS preflight endpoints.
+		for (const endpoint in this.schema) {
+			const cors = Object.entries(this.schema[endpoint]).reduce((cors, [method, options]) => {
+				if (options.cors) {
+					cors.push(method);
+				}
+				return cors;
+			}, []);
+			if (cors) {
+				this.options.channel.addRoute("options", this.getEndpoint(endpoint), (serverContext) => {
+					serverContext.setHeader("Access-Control-Allow-Origin", "*");
+					serverContext.setHeader("Access-Control-Allow-Methods", [...cors, "options"].join(", "));
+					serverContext.setHeader("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization");
+					serverContext.sendStatus(200, "OK");
+				});
+			}
+		}
 	}
 
 	/// Login a user based on his UID.
@@ -50,11 +72,12 @@ export default class APIServer extends Base {
 	/// Register a callback to handle a request
 	handle(method, endpoint, callback /*, options = {}*/) {
 		this._sanityCheck(method, endpoint);
-		const requestOptions = this.schema[endpoint][method].request || {};
-		const responseOptions = this.schema[endpoint][method].response || {};
+		const endpointOptions = this.schema[endpoint][method] || {};
+		const requestOptions = endpointOptions.request || {};
+		const responseOptions = endpointOptions.response || {};
 
 		let authentication = null;
-		if (this.schema[endpoint][method].authentication) {
+		if (endpointOptions.authentication) {
 			Exception.assert(
 				this.options.authentication,
 				"This route has authentication requirement but no authentication object was specified.",
@@ -80,6 +103,14 @@ export default class APIServer extends Base {
 			const context = new APIServerContext(serverContext, this);
 
 			try {
+				// Set the CORS access control before the authorization check, because the latter can fail
+				// and these headers need to be there regardless.
+				if (endpointOptions.cors) {
+					context.setHeader("Access-Control-Allow-Origin", "*");
+					context.setHeader("Access-Control-Allow-Methods", method + ", options");
+					context.setHeader("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization");
+				}
+
 				// Check if this is a request that needs authentication
 				let authenticationData = { session: null };
 				if (authentication) {
@@ -90,7 +121,7 @@ export default class APIServer extends Base {
 					});
 					// Check if the session has any of the scopes
 					if (isAuthorized) {
-						const authenticationSchema = this.schema[endpoint][method].authentication;
+						const authenticationSchema = endpointOptions.authentication;
 						if (typeof authenticationSchema == "string" || Array.isArray(authenticationSchema)) {
 							isAuthorized &= authenticationData.session.getScopes().matchAny(authenticationSchema);
 						}

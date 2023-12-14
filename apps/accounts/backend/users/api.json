@@ -62,6 +62,7 @@
         },
         "get": {
             "authentication": "self-basic:r",
+            "cors": true,
             "documentation": "Get current user information",
             "response": {
                 "scopes": {

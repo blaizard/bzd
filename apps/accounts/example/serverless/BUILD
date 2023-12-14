@@ -9,11 +9,14 @@ bzd_config(
 )
 
 bzd_nodejs_web_binary(
-    name = "static",
+    name = "serverless",
     srcs = [
         "app.mjs",
         "app.vue",
         ":config.json",
+    ],
+    apis = [
+        "//apps/accounts/backend/users:api.json",
     ],
     config_scss = "//nodejs/styles:default.scss",
     main = "app.mjs",

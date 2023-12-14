@@ -48,7 +48,7 @@ async function getData(type, uid, cache) {
 
 	// Set-up the web server
 	let web = new HttpServer(PORT);
-	web.addStaticRoute("/", PATH_STATIC, "index.html");
+	web.addStaticRoute("/", PATH_STATIC);
 
 	let keyValueStore = await KeyValueStoreDisk.make(Path.join(PATH_DATA, "db"));
 
