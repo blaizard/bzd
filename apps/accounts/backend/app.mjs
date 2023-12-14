@@ -185,6 +185,11 @@ const PATH_STATIC = options.static;
 
 	// ---- serve ----
 
-	web.addStaticRoute("/", PATH_STATIC, "index.html");
+	web.addStaticRoute("/", PATH_STATIC, {
+		headers: {
+			// Needed for Google authentication.
+			"Cross-Origin-Opener-Policy": "same-origin-allow-popups",
+		},
+	});
 	web.start();
 })();

@@ -14,10 +14,13 @@ This web application deals with the following:
 bazel run //apps/accounts/backend --config=dev -- --test
 ```
 
-Run the client application example.
+### Serverless
+
+This demonstrates server-less authentication.
+Run the application example.
 
 ```bash
-bazel run //apps/accounts/example/static --config=dev -- --port 8081
+bazel run //apps/accounts/example/serverless --config=dev -- --port 8081
 ```
 
 ## Push the docker image

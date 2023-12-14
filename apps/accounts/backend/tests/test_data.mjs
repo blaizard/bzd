@@ -1,5 +1,5 @@
 import LogFactory from "#bzd/nodejs/core/log.mjs";
-import { scopeAdminUsers } from "#bzd/apps/accounts/backend/users/scopes.mjs";
+import { scopeSelfBasicRead } from "#bzd/apps/accounts/backend/users/scopes.mjs";
 
 const Log = LogFactory("test", "data");
 
@@ -30,6 +30,6 @@ export default class TestData {
 			});
 		}
 
-		await this.applications.create("localhost", "http://localhost:8081/", [scopeAdminUsers]);
+		await this.applications.create("localhost", "http://localhost:8081/", [scopeSelfBasicRead]);
 	}
 }

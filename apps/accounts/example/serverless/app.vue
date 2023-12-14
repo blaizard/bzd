@@ -1,13 +1,15 @@
 <template>
 	<button @click="onClickLogin">Login!</button>
-	<div>Authenticated: {{ $authentication.isAuthenticated }}</div>
+	<div>Authenticated: {{ authentication.isAuthenticated }}</div>
+	<div>User: {{ user }}</div>
 </template>
 
 <script setup>
-	import { onMounted, inject } from "vue";
-	import Config from "#bzd/apps/accounts/example/static/config.json";
+	import { onMounted, inject, watch, ref } from "vue";
+	import Config from "#bzd/apps/accounts/example/serverless/config.json";
 
 	const api = inject("$api");
+	const authentication = inject("$authentication");
 
 	const onClickLogin = () => {
 		window.location.href = Config.accounts + "/login?application=localhost";
@@ -20,4 +22,13 @@
 			await api.loginWithSSO(maybeRefreshToken);
 		}
 	});
+
+	// Fetch user data when authenticated.
+	const user = ref({});
+	watch(
+		() => authentication.isAuthenticated,
+		async () => {
+			user.value = await api.request("get", "/user");
+		},
+	);
 </script>

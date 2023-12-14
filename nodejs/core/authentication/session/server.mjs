@@ -108,21 +108,10 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 			}
 		});
 
-		// Use a refresh token to create an access token.
-		api.handle("options", "/auth/refresh", async function () {
-			this.setHeader("Access-Control-Allow-Origin", "*");
-			this.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-			this.setHeader("Access-Control-Allow-Headers", "Origin, Content-Type, Accept");
-		});
-
 		/// Use a refresh token to create an access token.
 		///
 		/// If refresh_token is given as an argument, return the tokens by values, if not, return it from the cookies.
 		api.handle("post", "/auth/refresh", async function (inputs) {
-			this.setHeader("Access-Control-Allow-Origin", "*");
-			this.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-			this.setHeader("Access-Control-Allow-Headers", "Origin, Content-Type, Accept");
-
 			let maybeTokenObject = false;
 
 			// Check if there is an access token and that it is still valid.

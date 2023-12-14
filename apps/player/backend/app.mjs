@@ -148,6 +148,6 @@ function pathToPathList(path) {
 	});
 
 	Log.info("Application started");
-	web.addStaticRoute("/", PATH_STATIC, "index.html");
+	web.addStaticRoute("/", PATH_STATIC);
 	web.start();
 })();
