@@ -271,6 +271,9 @@
 			},
 			handleBlur(e, text) {
 				if (this.hasChanged) {
+					// Safari uses '\n' when the user removed everything with backspace.
+					// This keep a consistent behavior with other browsers.
+					text = text.trim();
 					if (this.multi) {
 						this.valueListAdd(text);
 					} else {
