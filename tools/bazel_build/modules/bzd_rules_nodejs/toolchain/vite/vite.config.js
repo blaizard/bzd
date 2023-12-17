@@ -17,7 +17,9 @@ export default defineConfig({
 		preserveSymlinks: true,
 	},
 	build: {
-		minify: isProduction ? "esbuild" : false,
+		// Note, there is a but in javascript core that affects Safari only, this doesn't seem to be fixed in esbuild,
+		// but in terser yes, see: https://bugs.webkit.org/show_bug.cgi?id=223533
+		minify: isProduction ? "terser" : false,
 		assetsDir: "assets",
 		emptyOutDir: true,
 		rollupOptions: {
@@ -25,5 +27,5 @@ export default defineConfig({
 				index: "/index.html",
 			},
 		},
-	},
+	}
 });

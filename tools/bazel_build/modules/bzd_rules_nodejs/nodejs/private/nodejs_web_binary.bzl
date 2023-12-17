@@ -162,7 +162,8 @@ def bzd_nodejs_web_binary(name, srcs = [], packages = {}, deps = [], apis = [], 
             "@vitejs/plugin-vue": "4.5.0",
             "sass": "1.66.1",
             "typescript": "5.1.6",
-            "vite": "5.0.4",
+            "vite": "5.0.10",
+            "terser": "5.26.0"
         }, **packages),
         deps = deps,
     )
