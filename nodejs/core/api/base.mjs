@@ -15,8 +15,6 @@ export default class API {
 				version: 1,
 				/// Channel to be used as a transportation mean for this API
 				channel: null,
-				/// Include additional plugins if any
-				plugins: [],
 			},
 			options,
 		);
@@ -46,13 +44,12 @@ export default class API {
 		return (this.options.host ? this.options.host : "") + "/api/v" + this.options.version + endpoint;
 	}
 
-	/// Install all available plugins.
-	///
-	/// \note This needs to run after the constructor is completed.
-	async _installPlugins() {
-		for (const plugin of this.options.plugins) {
+	/// Install all given plugins..
+	async installPlugins(...plugins) {
+		for (const plugin of plugins) {
 			await plugin.installAPI(this);
 		}
+		this.event.trigger("ready");
 	}
 
 	/**

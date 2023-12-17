@@ -2,7 +2,6 @@
 	<button @click="onClickLogout" v-if="authentication.isAuthenticated">Logout</button>
 	<button @click="onClickLogin" v-else>Login</button>
 	<div>Authenticated: {{ authentication.isAuthenticated }}</div>
-	<div>User: {{ user }}</div>
 </template>
 
 <script setup>
@@ -24,16 +23,8 @@
 		const maybeRefreshToken = new URLSearchParams(window.location.search).get("sso_token");
 		if (maybeRefreshToken) {
 			window.history.pushState(null, null, "/");
+			// POST this server
 			await api.loginWithSSO(maybeRefreshToken);
 		}
 	});
-
-	// Fetch user data when authenticated.
-	const user = ref({});
-	watch(
-		() => authentication.isAuthenticated,
-		async () => {
-			user.value = await api.request("get", "/user");
-		},
-	);
 </script>

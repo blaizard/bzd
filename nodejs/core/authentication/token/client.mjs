@@ -47,12 +47,12 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 	}
 
 	getRefreshToken() {
-		return Cookie.get("refresh_token_local", null);
+		return Cookie.get("local_refresh_token", null);
 	}
 
 	setRefreshToken(token, timeoutS = 0) {
 		Cookie.set(
-			"refresh_token_local",
+			"local_refresh_token",
 			token,
 			timeoutS
 				? {
@@ -102,7 +102,7 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 	clearSession() {
 		this.token = null;
 		this.session = null;
-		Cookie.remove("refresh_token_local");
+		Cookie.remove("local_refresh_token");
 		this.options.onAuthentication(null);
 
 		if (this.interval) {
@@ -176,7 +176,11 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 	}
 
 	async _logoutImpl(api) {
-		await api.request("post", "/auth/logout");
-		this.clearSession();
+		try {
+			await api.request("post", "/auth/logout");
+		} finally {
+			/// Clear in all cases the session. The API might fail on serverless use case for example.
+			this.clearSession();
+		}
 	}
 }

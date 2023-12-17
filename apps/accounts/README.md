@@ -17,10 +17,20 @@ bazel run //apps/accounts/backend --config=dev -- --test
 ### Serverless
 
 This demonstrates server-less authentication.
+
 Run the application example.
 
 ```bash
 bazel run //apps/accounts/example/serverless --config=dev -- --port 8081
+```
+
+### Server
+
+This demonstrates a typical frontend/backend application authentication.
+Run the application example.
+
+```bash
+bazel run //apps/accounts/example/server --config=dev
 ```
 
 ## Push the docker image

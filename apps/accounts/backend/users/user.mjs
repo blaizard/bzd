@@ -66,6 +66,9 @@ export default class User {
 	}
 
 	async isPasswordEqual(password) {
+		if (!this.value.password || !password) {
+			return false;
+		}
 		return await Bcrypt.compare(this.value.password, password);
 	}
 

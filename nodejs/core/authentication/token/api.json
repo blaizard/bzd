@@ -24,6 +24,7 @@
     },
     "/auth/logout": {
         "post": {
+            "cors": true,
             "documentation": "Logout API used to invalidate the current session."
         }
     },

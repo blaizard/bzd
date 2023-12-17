@@ -12,9 +12,6 @@ export default class APIClient extends Base {
 	constructor(schema, options) {
 		super(schema, options);
 		this.providers = {};
-		this._installPlugins()
-			.then(() => this.event.trigger("ready"))
-			.catch((e) => this.event.trigger("error", e));
 	}
 
 	updateForm(method, endpoint, formDescription) {

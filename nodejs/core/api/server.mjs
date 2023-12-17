@@ -36,14 +36,10 @@ class APIServerContext extends HttpServerContext {
 export default class APIServer extends Base {
 	constructor(schema, options) {
 		super(schema, options);
-		this._installPluginsServer()
-			.then(() => this.event.trigger("ready"))
-			.catch((e) => this.event.trigger("error", e));
+		this.initCORS();
 	}
 
-	async _installPluginsServer() {
-		await this._installPlugins();
-
+	initCORS() {
 		// Install the CORS preflight endpoints.
 		for (const endpoint in this.schema) {
 			const cors = Object.entries(this.schema[endpoint]).reduce((cors, [method, options]) => {

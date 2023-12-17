@@ -60,6 +60,9 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		if (this.options.kvs === null) {
 			this.options.kvs = new KeyValueStoreMemory("session-authentication");
 		}
+	}
+
+	async _installAPIImpl(api) {
 		Exception.assert(
 			this.options.saveRefreshToken,
 			"The callback to save a refresh token must be set, set 'saveRefreshToken'.",
@@ -68,10 +71,8 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 			this.options.removeRefreshToken,
 			"The callback to remove a refresh token must be set, set 'removeRefreshToken'.",
 		);
-	}
 
-	async _installAPIImpl(api) {
-		Log.debug("Installing session-based authentication API.");
+		Log.info("Installing session-based authentication API.");
 
 		const authentication = this;
 
@@ -85,27 +86,7 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		});
 
 		api.handle("post", "/auth/logout", async function () {
-			// Remove the cookies
-			const maybeAccessToken = authentication._getAccessToken(this);
-			this.deleteCookie("access_token");
-			const maybeRefreshToken = this.getCookie("refresh_token", null);
-			this.deleteCookie("refresh_token");
-
-			if (maybeAccessToken) {
-				const [uid, hash] = authentication._readToken(maybeAccessToken);
-				await authentication.options.kvs.update(authentication.options.kvsBucket, uid, (data) => {
-					return {
-						sessions: data.sessions.filter((session) => {
-							return session.hash != hash;
-						}),
-					};
-				});
-			}
-
-			if (maybeRefreshToken) {
-				const [uid, hash] = authentication._readToken(maybeRefreshToken);
-				await authentication.options.removeRefreshToken(uid, hash);
-			}
+			authentication.clearSession(this);
 		});
 
 		/// Use a refresh token to create an access token.
@@ -165,6 +146,31 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 
 			return maybeTokenObject;
 		});
+	}
+
+	async clearSession(context) {
+		// Remove the cookies
+		const maybeAccessToken = this._getAccessToken(context);
+		context.deleteCookie("access_token");
+		const maybeRefreshToken = context.getCookie("refresh_token", null);
+		context.deleteCookie("refresh_token");
+		context.deleteCookie("local_refresh_token");
+
+		if (maybeAccessToken) {
+			const [uid, hash] = this._readToken(maybeAccessToken);
+			await this.options.kvs.update(this.options.kvsBucket, uid, (data) => {
+				return {
+					sessions: data.sessions.filter((session) => {
+						return session.hash != hash;
+					}),
+				};
+			});
+		}
+
+		if (maybeRefreshToken && this.options.removeRefreshToken) {
+			const [uid, hash] = this._readToken(maybeRefreshToken);
+			await this.options.removeRefreshToken(uid, hash);
+		}
 	}
 
 	async _loginWithUIDImpl(context, uid, identifier, persistent) {

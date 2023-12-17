@@ -150,8 +150,8 @@ const PATH_STATIC = options.static;
 	const api = new API(APIv1, {
 		authentication: authentication,
 		channel: web,
-		plugins: [authentication, authenticationGoogle, users, appplications, pendingActions, services],
 	});
+	await api.installPlugins(authentication, authenticationGoogle, users, appplications, pendingActions, services);
 
 	api.handle("get", "/sso", async function (inputs, session) {
 		// Get that the application exists.

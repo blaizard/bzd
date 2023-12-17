@@ -15,9 +15,22 @@ bzd_nodejs_library(
 )
 
 bzd_nodejs_library(
+    name = "server_proxy",
+    srcs = [
+        "server_proxy.mjs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":server",
+        "//nodejs/core/api:client",
+    ],
+)
+
+bzd_nodejs_library(
     name = "server",
     srcs = [
         "server.mjs",
+        ":api.json",
     ],
     apis = ["api.json"],
     visibility = ["//visibility:public"],
