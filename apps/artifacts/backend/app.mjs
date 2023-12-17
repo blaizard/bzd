@@ -81,8 +81,8 @@ program
 	let api = new API(APIv1, {
 		authentication: authentication,
 		channel: web,
-		plugins: [authentication],
 	});
+	await api.installPlugins(authentication);
 
 	let keyValueStore = await KeyValueStoreDisk.make(Path.join(PATH_DATA, "db"));
 
