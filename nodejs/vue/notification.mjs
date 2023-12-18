@@ -21,12 +21,12 @@ export default {
 			}
 			return message;
 		};
-		const notify = (type, message, options = {}) => {
+		const notify = (type, message, options = {}, callback = () => {}) => {
 			if (typeof tryToString(message) == "string") {
-				notifySingle(++_uid, type, message, options);
+				notifySingle(++_uid, type, message, options, callback);
 			} else if (typeof message == "object") {
 				for (const key in message) {
-					notifySingle(key, type, message[key], options);
+					notifySingle(key, type, message[key], options, callback);
 				}
 			} else {
 				Exception.unreachable("Unsupported message type: {:j}", message);
@@ -41,7 +41,7 @@ export default {
 			}
 			return -1;
 		};
-		const notifySingle = (key, type, message, options) => {
+		const notifySingle = (key, type, message, options, callback) => {
 			const messageStr = tryToString(message);
 
 			// If the entry does not exists, create it
@@ -67,6 +67,9 @@ export default {
 			});
 			data.entries.splice(index, 1, entry);
 
+			// Call the callback if any.
+			callback(message);
+
 			// If null, delete the entry
 			if (messageStr === null) {
 				notificationClose(entry);
@@ -78,7 +81,9 @@ export default {
 		};
 
 		const info = (message, options) => {
-			notify("info", message, options);
+			notify("info", message, options, (m) => {
+				console.log("[info]", m);
+			});
 		};
 		const error = (message, options) => {
 			notify(
@@ -90,10 +95,15 @@ export default {
 					},
 					options,
 				),
+				(m) => {
+					console.error("[error]", m);
+				},
 			);
 		};
 		const success = (message, options) => {
-			notify("success", message, options);
+			notify("success", message, options, (m) => {
+				console.log("[success]", m);
+			});
 		};
 		const notificationClose = (entry) => {
 			const index = data.entries.indexOf(entry);

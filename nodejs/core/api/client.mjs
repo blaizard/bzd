@@ -1,6 +1,5 @@
 import ExceptionFactory from "../exception.mjs";
 import HttpClient from "../http/client.mjs";
-import { HttpClientException } from "../http/client.mjs";
 import HttpEndpoint from "#bzd/nodejs/core/http/endpoint.mjs";
 import Validation from "../validation.mjs";
 

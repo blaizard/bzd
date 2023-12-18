@@ -12,9 +12,10 @@
 			// Used to show/hide the modal.
 			modelValue: { type: Boolean, required: true },
 		},
+		emits: ["update:model-value"],
 		methods: {
 			handleCancel() {
-				this.$emit("update:value", false);
+				this.$emit("update:model-value", false);
 			},
 		},
 	};
