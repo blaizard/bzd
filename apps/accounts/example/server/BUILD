@@ -13,7 +13,7 @@ bzd_nodejs_web_binary(
     config_scss = "//nodejs/styles:default.scss",
     main = "frontend.mjs",
     deps = [
-        "//nodejs/core/authentication/token:client",
+        "//apps/accounts/authentication:client",
         "//nodejs/vue:api",
         "//nodejs/vue:authentication",
     ],

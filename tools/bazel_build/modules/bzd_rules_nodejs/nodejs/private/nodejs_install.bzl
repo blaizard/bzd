@@ -38,7 +38,7 @@ def bzd_nodejs_make_node_modules(ctx, packages, base_dir_name):
         content = """
 {{
 	"name": "{name}",
-	"version": "1.0.0",
+	"version": "0.0.0",
 	"license": "UNLICENSED",
 	"private": true,
 	"type": "module",

@@ -113,7 +113,7 @@ class RouterManager {
 			}
 
 			if (route.handler) {
-				await route.handler(path, dispatchOptions, args);
+				await route.handler(route.path, dispatchOptions, args);
 			}
 		};
 

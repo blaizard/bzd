@@ -77,7 +77,7 @@ export default class Applications {
 		});
 
 		api.handle("post", "/admin/application", async (inputs) => {
-			const application = await this.create(inputs.uid, inputs.redirect);
+			const application = await this.create(inputs.uid, inputs.redirect, inputs.scopes);
 			return application.dataPublic();
 		});
 

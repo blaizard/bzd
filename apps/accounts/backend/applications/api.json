@@ -17,6 +17,7 @@
                 "type": "json",
                 "validation": {
                     "redirect": "mandatory",
+                    "scopes": "mandatory",
                     "uid": "mandatory"
                 }
             }
