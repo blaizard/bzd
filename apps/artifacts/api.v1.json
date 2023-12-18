@@ -1,7 +1,7 @@
 {
     "/config": {
         "delete": {
-            "authentication": true,
+            "authentication": "admin-users",
             "documentation": "Delete a volume and its configuration.",
             "request": {
                 "type": "json",
@@ -23,7 +23,7 @@
             }
         },
         "post": {
-            "authentication": true,
+            "authentication": "admin-users",
             "documentation": "Set the configuration of a volume.",
             "request": {
                 "type": "json",

@@ -1,5 +1,6 @@
 import API from "#bzd/nodejs/core/api/server.mjs";
-import Authentication from "#bzd/nodejs/core/authentication/token/server.mjs";
+import AuthenticationProxy from "#bzd/nodejs/core/authentication/session/server_proxy.mjs";
+
 import Cache from "#bzd/nodejs/core/cache.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import HttpServer from "#bzd/nodejs/core/http/server.mjs";
@@ -13,6 +14,7 @@ import Path from "path";
 
 import APIv1 from "#bzd/api.json" assert { type: "json" };
 import Plugins from "../plugins/backend.mjs";
+import Config from "#bzd/apps/artifacts/config.json" assert { type: "json" };
 
 import Services from "./services.mjs";
 
@@ -47,32 +49,9 @@ program
 	const PATH_STATIC = program.opts().static;
 	const PATH_DATA = process.env.BZD_PATH_DATA || program.opts().data;
 	const IS_TEST = Boolean(program.opts().test);
-	const AUTHENTICATION_PRIVATE_KEY = process.env.BZD_AUTHENTICATION_PRIVATE_KEY || (IS_TEST ? "dummy" : false);
-	const AUTHENTICATION_USERNAME = process.env.BZD_AUTHENTICATION_USERNAME || (IS_TEST ? "admin" : false);
-	const AUTHENTICATION_PASSWORD = process.env.BZD_AUTHENTICATION_PASSWORD || (IS_TEST ? "1234" : false);
 
-	Exception.assert(
-		AUTHENTICATION_PRIVATE_KEY !== false,
-		"A valid authentication private key must be set with the environment variable `BZD_AUTHENTICATION_PRIVATE_KEY`.",
-	);
-	Exception.assert(
-		AUTHENTICATION_USERNAME !== false && AUTHENTICATION_PASSWORD !== false,
-		"A valid authentication username and password must be set with the environment variable `AUTHENTICATION_USERNAME` and `AUTHENTICATION_PASSWORD`.",
-	);
-	let authentication = new Authentication({
-		privateKey: AUTHENTICATION_PRIVATE_KEY,
-		verifyIdentity: async (uid, password) => {
-			if (uid !== AUTHENTICATION_USERNAME || password !== AUTHENTICATION_PASSWORD) {
-				return false;
-			}
-			return {
-				scopes: [],
-				uid: uid,
-			};
-		},
-		refreshToken: async (/*uid, session, timeoutS*/) => {
-			return true;
-		},
+	let authentication = new AuthenticationProxy({
+		remote: Config.accounts,
 	});
 
 	// Set-up the web server

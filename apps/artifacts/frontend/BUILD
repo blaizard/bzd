@@ -6,7 +6,9 @@ bzd_nodejs_web_binary(
         "**/*.vue",
         "**/*.svg",
         "**/*.mjs",
-    ]),
+    ]) + [
+        "//apps/artifacts:config.json",
+    ],
     apis = ["//apps/artifacts:api.v1.json"],
     config_scss = "//nodejs/styles:default.scss",
     main = "app.mjs",
@@ -17,10 +19,10 @@ bzd_nodejs_web_binary(
         "//apps/artifacts:__subpackages__",
     ],
     deps = [
+        "//apps/accounts/authentication:client",
         "//apps/artifacts/plugins:frontend",
         "//nodejs:icons",
         "//nodejs:vue",
-        "//nodejs/core/authentication/token:client",
         "//nodejs/db/storage:permissions",
         "//nodejs/styles/default",
         "//nodejs/vue:api",

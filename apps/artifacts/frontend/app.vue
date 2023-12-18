@@ -64,7 +64,12 @@
 					{ path: "/config", authentication: true, component: () => import("./config.vue") },
 					{ path: "/view/{path:*}", component: () => import("./view.vue") },
 					{ path: "/services", component: () => import("./services.vue") },
-					{ path: "/login", component: () => import("./login.vue") },
+					{
+						path: "/login",
+						handler: () => {
+							this.$api.invoke("login", "artifacts");
+						},
+					},
 				],
 			});
 		},

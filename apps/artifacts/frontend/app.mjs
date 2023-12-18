@@ -1,6 +1,6 @@
 import { createApp } from "vue";
 
-import Authentication from "#bzd/nodejs/core/authentication/token/client.mjs";
+import Authentication from "#bzd/apps/accounts/authentication/client.mjs";
 import Permissions from "#bzd/nodejs/db/storage/permissions.mjs";
 import API from "#bzd/nodejs/vue/api.mjs";
 import AuthenticationPlugin from "#bzd/nodejs/vue/authentication.mjs";
@@ -8,6 +8,7 @@ import CachePlugin from "#bzd/nodejs/vue/cache.mjs";
 import Notification from "#bzd/nodejs/vue/notification.mjs";
 import Router from "#bzd/nodejs/vue/router/router.mjs";
 import AsyncComputed from "vue-async-computed";
+import Config from "#bzd/apps/artifacts/config.json" assert { type: "json" };
 
 import APIv1 from "#bzd/api.json" assert { type: "json" };
 
@@ -16,6 +17,7 @@ import App from "./app.vue";
 const app = createApp(App);
 
 let authentication = new Authentication({
+	accounts: Config.accounts,
 	unauthorizedCallback: () => {
 		const route = app.config.globalProperties.$router.get();
 		app.config.globalProperties.$router.dispatch("/login", route ? { query: { redirect: route } } : {});
