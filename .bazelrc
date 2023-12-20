@@ -8,6 +8,18 @@ common --show_timestamps
 # Ensure the /tmp directory is empty.
 common --sandbox_tmpfs_path=/tmp
 
+# Prepare for next releases.
+# Documented here: https://github.com/bazelbuild/bazel/releases/tag/7.0.0
+#common --incompatible_auto_exec_groups
+common --incompatible_disable_non_executable_java_binary
+#common --incompatible_disallow_struct_provider_syntax
+common --incompatible_disable_target_provider_fields
+common --incompatible_struct_has_no_methods
+#common --incompatible_stop_exporting_language_modules
+common --incompatible_disallow_empty_glob
+common --incompatible_disable_starlark_host_transitions
+common --incompatible_config_setting_private_default_visibility
+
 # If a command fails, print out the full command line.
 # https://bazel.build/reference/command-line-reference#flag--verbose_failures
 build --verbose_failures
