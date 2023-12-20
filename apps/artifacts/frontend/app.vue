@@ -66,8 +66,8 @@
 					{ path: "/services", component: () => import("./services.vue") },
 					{
 						path: "/login",
-						handler: () => {
-							this.$api.invoke("login", "artifacts");
+						handler: async () => {
+							await this.$api.invoke("login", "artifacts");
 						},
 					},
 				],

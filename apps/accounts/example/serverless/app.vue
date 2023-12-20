@@ -11,8 +11,8 @@
 	const api = inject("$api");
 	const authentication = inject("$authentication");
 
-	const onClickLogin = () => {
-		api.invoke("login", "localhost");
+	const onClickLogin = async () => {
+		await api.invoke("login", "localhost");
 	};
 
 	const onClickLogout = async () => {
