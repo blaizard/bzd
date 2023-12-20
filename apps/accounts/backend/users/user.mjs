@@ -221,6 +221,16 @@ export default class User {
 		}
 	}
 
+	/// Only keep non-expired tokens.
+	sanitizedTokens() {
+		this.value.tokens = Object.fromEntries(
+			Object.entries(this.getTokens()).filter(([hash, data]) => {
+				const token = new TokenInfo(data);
+				return !token.isExpired();
+			}),
+		);
+	}
+
 	rollToken(hash, newHash) {
 		const token = this.getToken(hash, null);
 		Exception.assert(token !== null, "There is no token with this hash: '{}'.", hash);

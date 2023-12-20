@@ -10,7 +10,6 @@ doc_binary(
         ("Python", "@bzd_python//:documentation"),
     ],
     data = glob([
-        "**/*.jpg",
         "**/*.png",
     ]),
 )

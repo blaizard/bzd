@@ -80,6 +80,7 @@ const PATH_STATIC = options.static;
 			await users.update(session.getUid(), (user) => {
 				const token = TokenInfo.make(identifier, session.getScopes().toList(), timeoutS, rolling);
 				user.addToken(hash, token);
+				user.sanitizedTokens();
 				return user;
 			});
 		},
