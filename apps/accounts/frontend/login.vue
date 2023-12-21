@@ -6,7 +6,9 @@
 				<RouterLink link="/reset">{{ $lang.getCapitalized("passwordforgot") }}</RouterLink>
 			</div>
 			<div class="or">or</div>
-			<Form :description="formLoginTrustedDescription"></Form>
+			<button @click="loginWithGoogle" class="login-trusted">
+				<img src="@/nodejs/core/authentication/google/google.svg" /> Google
+			</button>
 		</template>
 		<template v-else>
 			<span class="logged-in-message">Already logged-in</span>
@@ -47,21 +49,6 @@
 				return typeof URLSearchParams !== "undefined"
 					? new URLSearchParams(window.location.search).get("application")
 					: null;
-			},
-			formLoginTrustedDescription() {
-				return [
-					{
-						type: "Button",
-						content: "Login with Google",
-						fill: true,
-						click: async () => {
-							await this.handleSubmit(async () => {
-								await this.$api.invoke("google-authenticate");
-								await this.afterLogin();
-							});
-						},
-					},
-				];
 			},
 			formLoginDescription() {
 				return [
@@ -113,6 +100,12 @@
 					await this.afterLogin();
 				});
 			},
+			async loginWithGoogle() {
+				await this.handleSubmit(async () => {
+					await this.$api.invoke("google-authenticate");
+					await this.afterLogin();
+				});
+			},
 		},
 	};
 </script>
@@ -128,5 +121,8 @@
 	.logged-in-message {
 		display: block;
 		text-align: center;
+	}
+	.login-trusted {
+		width: 100px;
 	}
 </style>

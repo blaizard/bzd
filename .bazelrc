@@ -11,7 +11,16 @@ common --sandbox_tmpfs_path=/tmp
 # Prepare for next releases.
 # Documented here: https://github.com/bazelbuild/bazel/releases/tag/7.0.0
 #common --incompatible_auto_exec_groups
-common --incompatible_disable_non_executable_java_binary
+# This triggers the error: (seems to be because of stardoc)
+# (10:21:37) ERROR: external/rules_jvm_external~5.2/private/tools/java/com/github/bazelbuild/rules_jvm_external/jar/BUILD:3:12: in java_binary rule @@rules_jvm_external~5.2//private/tools/java/com/github/bazelbuild/rules_jvm_external/jar:AddJarManifestEntry: 
+# Traceback (most recent call last):
+#         File "/virtual_builtins_bzl/bazel/java/bazel_java_binary.bzl", line 25, column 35, in _bazel_java_binary_impl
+#         File "/virtual_builtins_bzl/bazel/java/bazel_java_binary.bzl", line 31, column 40, in _bazel_base_binary_impl
+#         File "/virtual_builtins_bzl/bazel/java/bazel_java_binary.bzl", line 121, column 43, in _collect_all_targets_as_deps
+#         File "/virtual_builtins_bzl/common/java/java_helper.bzl", line 265, column 16, in _get_test_support
+# Error: No attribute 'create_executable' in attr. Make sure you declared a rule attribute with this name.
+# Available attributes: _action_listener, _cc_toolchain, _config_dependencies, _is_executable, _java_plugins, _java_toolchain, _java_toolchain_type, _launche
+#common --incompatible_disable_non_executable_java_binary
 #common --incompatible_disallow_struct_provider_syntax
 common --incompatible_disable_target_provider_fields
 common --incompatible_struct_has_no_methods
@@ -87,6 +96,8 @@ build:cc --build_tag_filters=cc,-cc-coverage
 test:cc --test_tag_filters=cc,-cc-coverage
 coverage:cc --test_tag_filters=-cc,cc-coverage
 coverage:cc --action_env=COVERAGE_GCOV_OPTIONS=--branch-probabilities
+# To build some external dependencies
+build --host_copt=-Wno-error
 
 # Select only Python targets
 build:py --build_tests_only

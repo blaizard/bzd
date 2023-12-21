@@ -66,6 +66,9 @@ def _impl(repository_ctx):
         "%{cov}": binaries["cov"],
         "%{cpp}": binaries["cpp"],
         "%{cpu}": repository_ctx.attr.cpu,
+        "%{cxx_flags}": "\n".join(
+            ["'{}',".format(t) for t in repository_ctx.attr.cxx_flags],
+        ),
         "%{ld}": binaries["ld"],
         "%{link_flags}": "\n".join(
             ["'-L{}',".format(t) for t in repository_ctx.attr.linker_dirs] +
@@ -127,6 +130,7 @@ _toolchain_maker_linux = repository_rule(
         "coverage_compile_flags": attr.string_list(),
         "coverage_link_flags": attr.string_list(),
         "cpu": attr.string(default = "unknown"),
+        "cxx_flags": attr.string_list(),
         "default": attr.bool(default = False, doc = "Make this compiler the default one, it will be automatically selected when no compiler is given."),
         # Flags
         "link_flags": attr.string_list(),
