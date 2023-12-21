@@ -24,13 +24,12 @@ def linux_x86_64(module_ctx, name):
             "/usr/include",
         ],
         "compile_flags": [
-
-            # Use C++20
-            "-std=c++20",
-
             # Standard includes, this is needed to avoid indefined include complain from Bazel.
             "-nostdinc",
             "--no-standard-includes",
+        ],
+        "cxx_flags": [
+            "-std=c++20",
         ],
         "link_flags": [
             # Use the lld llvm linker.

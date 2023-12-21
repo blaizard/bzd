@@ -1,5 +1,5 @@
 import API from "#bzd/nodejs/core/api/server.mjs";
-import AuthenticationProxy from "#bzd/nodejs/core/authentication/session/server_proxy.mjs";
+import Authentication from "#bzd/apps/accounts/authentication/server.mjs";
 
 import Cache from "#bzd/nodejs/core/cache.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
@@ -50,8 +50,8 @@ program
 	const PATH_DATA = process.env.BZD_PATH_DATA || program.opts().data;
 	const IS_TEST = Boolean(program.opts().test);
 
-	let authentication = new AuthenticationProxy({
-		remote: Config.accounts,
+	let authentication = new Authentication({
+		accounts: Config.accounts,
 	});
 
 	// Set-up the web server

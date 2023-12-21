@@ -24,13 +24,12 @@ def linux_x86_64(module_ctx, name):
             "/usr/include",
         ],
         "compile_flags": [
-
-            # Use C++20.
-            "-std=c++20",
-            "-fcoroutines",
-
             # There is a bug with coroutines
             "-Wno-unused-value",
+        ],
+        "cxx_flags": [
+            "-std=c++20",
+            "-fcoroutines",
         ],
         "link_flags": [
             "-Wl,--disable-new-dtags",

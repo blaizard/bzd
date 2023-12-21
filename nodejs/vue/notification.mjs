@@ -1,8 +1,10 @@
 import { reactive, readonly } from "vue";
 
 import ExceptionFactory from "../core/exception.mjs";
+import LoggerFactory from "../core/log.mjs";
 
 const Exception = ExceptionFactory("notification");
+const Log = LoggerFactory("notification");
 
 export default {
 	install: (app) => {
@@ -82,7 +84,7 @@ export default {
 
 		const info = (message, options) => {
 			notify("info", message, options, (m) => {
-				console.log("[info]", m);
+				Log.info("{}", m);
 			});
 		};
 		const error = (message, options) => {
@@ -96,13 +98,13 @@ export default {
 					options,
 				),
 				(m) => {
-					console.error("[error]", m);
+					Log.error("{}", m);
 				},
 			);
 		};
 		const success = (message, options) => {
 			notify("success", message, options, (m) => {
-				console.log("[success]", m);
+				Log.info("{}", m);
 			});
 		};
 		const notificationClose = (entry) => {

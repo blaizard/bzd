@@ -14,11 +14,11 @@ bazel_dep(name = "bzd_bundle", version = "1.0")
 bazel_dep(name = "bzd_rules_docker", version = "1.0")
 bazel_dep(name = "bzd_rules_bdl", version = "1.0")
 bazel_dep(name = "bzd_python", version = "1.0")
-bazel_dep(name = "platforms", version = "0.0.7")
+bazel_dep(name = "platforms", version = "0.0.8")
 bazel_dep(name = "rules_python", version = "0.27.1")
 bazel_dep(name = "rules_cc", version = "0.0.9")
-bazel_dep(name = "bazel_skylib", version = "1.4.2")
-bazel_dep(name = "stardoc", version = "0.5.6")
+bazel_dep(name = "bazel_skylib", version = "1.5.0")
+bazel_dep(name = "stardoc", version = "0.6.2")
 
 # Override some of the modules that are local.
 [local_path_override(

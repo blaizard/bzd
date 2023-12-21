@@ -29,9 +29,6 @@ def linux_x86_64(module_ctx, name):
             "@bzd_toolchain_cc//:fragments/esp32/esp32_xtensa_lx6_gcc_11.2.0/linux_x86_64.BUILD",
         ],
         "compile_flags": [
-            # Use C++20.
-            "-std=c++20",
-
             # Do not link or re-order inclusion files
             "-nostdinc",
             "-nostdinc++",
@@ -39,6 +36,9 @@ def linux_x86_64(module_ctx, name):
 
             # Allow long calls
             "-mlongcalls",
+        ],
+        "cxx_flags": [
+            "-std=c++20",
         ],
         "link_flags": [
             # No standard libraries

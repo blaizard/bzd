@@ -10,3 +10,14 @@ bzd_nodejs_library(
         "//nodejs/core/authentication/token:client",
     ],
 )
+
+bzd_nodejs_library(
+    name = "server",
+    srcs = [
+        "server.mjs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//nodejs/core/authentication/session:server_proxy",
+    ],
+)

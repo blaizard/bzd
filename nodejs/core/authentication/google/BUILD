@@ -4,6 +4,7 @@ bzd_nodejs_library(
     name = "client",
     srcs = [
         "client.mjs",
+        "google.svg",
     ],
     apis = ["api.json"],
     visibility = ["//visibility:public"],

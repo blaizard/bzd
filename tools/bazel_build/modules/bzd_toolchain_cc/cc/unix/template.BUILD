@@ -57,7 +57,9 @@ cc_toolchain_config(
     opt_compile_flags = [
         %{compile_prod_flags}
     ],
-    cxx_flags = [],
+    cxx_flags = [
+        %{cxx_flags}
+    ],
     link_flags = [
         %{link_flags}
     ],

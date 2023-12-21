@@ -11,52 +11,72 @@ class Performance {
 	}
 }
 
+function consoleProcessor(date, level, topics, str = "", ...args) {
+	let message = Format("[{}] [{}] ", date.toISOString().replace("Z", "").replace("T", " "), level);
+	if (topics) {
+		message += Format("[{}] ", topics.join("::"));
+	}
+	message += Format(String(str), ...args);
+	({
+		error: console.error,
+		warning: console.warn,
+		info: console.info,
+		debug: console.log,
+		trace: console.trace,
+	})[level](message);
+}
+
 class Logger {
-	constructor(config) {
-		this.config = Object.assign(
-			{
-				level: Logger.levels.info.level,
-			},
-			config,
-		);
+	constructor() {
+		this.processors = {};
+		this.addBackend("console", consoleProcessor);
 	}
 
 	static get levels() {
 		return {
-			// eslint-disable-next-line no-console
-			trace: { level: 5, text: "trace", fct: console.log },
-			// eslint-disable-next-line no-console
-			debug: { level: 4, text: "debug", fct: console.log },
-			// eslint-disable-next-line no-console
-			info: { level: 3, text: "info", fct: console.info },
-			// eslint-disable-next-line no-console
-			warning: { level: 2, text: "warning", fct: console.warn },
-			// eslint-disable-next-line no-console
-			error: { level: 1, text: "error", fct: console.error },
+			trace: 5,
+			debug: 4,
+			info: 3,
+			warning: 4,
+			error: 1,
 		};
 	}
 
-	// Configuration options
-	setLevel(level) {
-		this.config.level = Logger.levels[level].level;
-	}
-
-	getLevel() {
-		return this.config.level;
+	get config() {
+		return Object.fromEntries(
+			Object.entries(this.processors).map(([name, data]) => {
+				return [
+					name,
+					{
+						setLevel: (level) => {
+							data.level = Logger.levels[level];
+						},
+						mute: (level) => {
+							data.level = Logger.levels["error"];
+						},
+					},
+				];
+			}),
+		);
 	}
 
 	// Support traces
-	print(level, topics, str = "", ...args) {
-		const log = Logger.levels[level];
-		if (log.level <= this.config.level) {
-			const date = new Date().toISOString();
-			let message = Format("[{}] [{}] ", date.replace("Z", "").replace("T", " "), log.text);
-			if (topics) {
-				message += Format("[{}] ", topics.join("::"));
+	process(level, topics, str = "", ...args) {
+		const date = new Date();
+		const logLevel = Logger.levels[level];
+		for (const processor of Object.values(this.processors)) {
+			if (logLevel <= processor.level) {
+				processor.process(date, level, topics, str, ...args);
 			}
-			message += Format(String(str), ...args);
-			log.fct(message);
 		}
+	}
+
+	/// Add a new backend to the logger.
+	addBackend(name, processor, level = "info") {
+		this.processors[name] = {
+			level: Logger.levels[level],
+			process: processor,
+		};
 	}
 }
 
@@ -66,7 +86,7 @@ let logger = new Logger({
 });
 
 const custom = (config, ...msgs) => {
-	logger.print(config.level, config.topics, ...msgs);
+	logger.process(config.level, config.topics, ...msgs);
 };
 
 const LoggerFactory = (...topics) => {
@@ -77,17 +97,14 @@ const LoggerFactory = (...topics) => {
 		warning: (...msgs) => custom({ level: "warning", topics: topics }, ...msgs),
 		error: (...msgs) => custom({ level: "error", topics: topics }, ...msgs),
 		custom: (...args) => custom(...args),
-		setLevel(level) {
-			logger.setLevel(level);
-		},
-		getLevel() {
-			return logger.getLevel();
-		},
-		mute() {
-			logger.setLevel("error");
+		get config() {
+			return logger.config;
 		},
 		performance() {
 			return new Performance();
+		},
+		addBackend(name, level, processor) {
+			logger.addBackend(name, level, processor);
 		},
 	};
 };
