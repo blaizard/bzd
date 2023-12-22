@@ -12,6 +12,7 @@
 					icon="bzd-icon-newspaper"
 					:link="$router.fromPath('/admin/applications')"
 				></MenuEntry>
+				<MenuEntry text="Logs" icon="bzd-icon-newspaper" :link="$router.fromPath('/admin/logs')"></MenuEntry>
 				<MenuEntry text="Logout" icon="bzd-icon-newspaper" link="/logout"></MenuEntry>
 			</div>
 		</template>
@@ -55,6 +56,11 @@
 					{
 						path: "/admin/applications",
 						component: () => import("./admin/applications.vue"),
+						authentication: scopeAdminApplications,
+					},
+					{
+						path: "/admin/logs",
+						component: () => import("./admin/logs.vue"),
 						authentication: scopeAdminApplications,
 					},
 					{ path: "/login", component: () => import("./login.vue") },

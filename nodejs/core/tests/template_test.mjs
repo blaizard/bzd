@@ -5,7 +5,7 @@ import Template from "../template.mjs";
 const Log = LogFactory("test", "template");
 const Exception = ExceptionFactory("test", "template");
 
-Log.mute();
+Log.config.console.mute();
 
 describe("Template", () => {
 	describe("Simple", () => {

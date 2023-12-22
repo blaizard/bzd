@@ -16,6 +16,7 @@ import TokenInfo from "#bzd/apps/accounts/backend/users/token.mjs";
 import TestData from "#bzd/apps/accounts/backend/tests/test_data.mjs";
 import Config from "#bzd/apps/accounts/config.json" assert { type: "json" };
 import ConfigBackend from "#bzd/apps/accounts/backend/config.json" assert { type: "json" };
+import MemoryLogger from "#bzd/apps/accounts/backend/logger/memory/memory.mjs";
 
 const Exception = ExceptionFactory("backend");
 const Log = LogFactory("backend");
@@ -38,6 +39,8 @@ const PORT = Number(process.env.BZD_PORT || options.port);
 const PATH_STATIC = options.static;
 
 (async () => {
+	const memoryLogger = new MemoryLogger();
+
 	const keyValueStore = await kvsMakeFromConfig(ConfigBackend.kvs.accounts);
 	const keyValueStoreRegister = await kvsMakeFromConfig(ConfigBackend.kvs.register);
 
@@ -152,7 +155,15 @@ const PATH_STATIC = options.static;
 		authentication: authentication,
 		channel: web,
 	});
-	await api.installPlugins(authentication, authenticationGoogle, users, appplications, pendingActions, services);
+	await api.installPlugins(
+		authentication,
+		authenticationGoogle,
+		users,
+		appplications,
+		pendingActions,
+		services,
+		memoryLogger,
+	);
 
 	api.handle("get", "/sso", async function (inputs, session) {
 		// Get that the application exists.
