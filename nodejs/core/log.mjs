@@ -11,19 +11,19 @@ class Performance {
 	}
 }
 
-function consoleProcessor(date, level, topics, str = "", ...args) {
-	let message = Format("[{}] [{}] ", date.toISOString().replace("Z", "").replace("T", " "), level);
+function consoleProcessor(date, level, topics, message) {
+	let content = Format("[{}] [{}] ", date.toISOString().replace("Z", "").replace("T", " "), level);
 	if (topics) {
-		message += Format("[{}] ", topics.join("::"));
+		content += Format("[{}] ", topics.join("::"));
 	}
-	message += Format(String(str), ...args);
+	content += message;
 	({
 		error: console.error,
 		warning: console.warn,
 		info: console.info,
 		debug: console.log,
 		trace: console.trace,
-	})[level](message);
+	})[level](content);
 }
 
 class Logger {
@@ -64,9 +64,13 @@ class Logger {
 	process(level, topics, str = "", ...args) {
 		const date = new Date();
 		const logLevel = Logger.levels[level];
+		let message = null;
 		for (const processor of Object.values(this.processors)) {
 			if (logLevel <= processor.level) {
-				processor.process(date, level, topics, str, ...args);
+				if (message === null) {
+					message = Format(String(str), ...args);
+				}
+				processor.process(date, level, topics, message);
 			}
 		}
 	}

@@ -22,7 +22,7 @@ const Log = LogFactory("backend");
 const Exception = ExceptionFactory("backend");
 
 // For debugging purposes.
-// Log.setLevel("debug");
+// Log.config.console.setLevel("debug");
 
 const program = new Command();
 program

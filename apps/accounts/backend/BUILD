@@ -32,6 +32,7 @@ bzd_nodejs_binary(
     ],
     deps = [
         "//apps/accounts/backend/applications",
+        "//apps/accounts/backend/logger/memory",
         "//apps/accounts/backend/pending_actions",
         "//apps/accounts/backend/services",
         "//apps/accounts/backend/tests:test_data",

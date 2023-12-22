@@ -8,7 +8,7 @@ import PersistenceTimeSeries from "../persistence/timeseries.mjs";
 
 const Exception = ExceptionFactory("test", "persistence-timestamp");
 
-// Log.mute();
+// Log.config.console.mute();
 
 const tempDirPath = Fs.mkdtempSync(Path.join(Os.tmpdir(), "persistence-timeseries-"));
 const persistenceOptions = {
