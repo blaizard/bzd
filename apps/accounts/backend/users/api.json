@@ -68,6 +68,7 @@
                 "scopes": {
                     "creation": "self-basic:r",
                     "email": "self-basic:r",
+                    "last_failed_login": "self-basic:r",
                     "last_login": "self-basic:r",
                     "roles": "self-roles:r",
                     "scopes": "self-roles:r",

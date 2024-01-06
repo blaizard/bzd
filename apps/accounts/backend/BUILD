@@ -42,5 +42,6 @@ bzd_nodejs_binary(
         "//nodejs/core/authentication/session:server",
         "//nodejs/core/http:server",
         "//nodejs/db/key_value_store:make_from_config",
+        "//nodejs/utils:result",
     ],
 )

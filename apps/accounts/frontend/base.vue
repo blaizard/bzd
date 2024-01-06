@@ -43,6 +43,10 @@
 							Component.methods.handleError.call(this, "Unauthorized");
 							return;
 						}
+						if (e.code == 429 /*Too Many Requests*/) {
+							Component.methods.handleError.call(this, "Too Many Requests");
+							return;
+						}
 					}
 
 					// Unexpected errors.

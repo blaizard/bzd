@@ -3,31 +3,34 @@ import Format from "#bzd/nodejs/core/format.mjs";
 
 const Exception = ExceptionFactory("result");
 
+// Unique value when no value is needed.
+const emptyValue_ = Symbol("result-empty-value");
+
 export default class Result {
 	/// A default constructor will create a result holding a value.
 	constructor(value = true) {
 		this.value_ = value;
-		this.error_ = undefined;
+		this.error_ = emptyValue_;
 	}
 
 	static makeError(error) {
-		let result = new Result(undefined);
+		let result = new Result(emptyValue_);
 		result.error_ = error;
 		return result;
 	}
 
 	static makeErrorString(str = "", ...args) {
-		let result = new Result(undefined);
+		let result = new Result(emptyValue_);
 		result.error_ = Format(str, ...args);
 		return result;
 	}
 
 	hasValue() {
-		return this.value_ !== undefined;
+		return this.value_ !== emptyValue_;
 	}
 
 	hasError() {
-		return this.error_ !== undefined;
+		return this.error_ !== emptyValue_;
 	}
 
 	value() {

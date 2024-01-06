@@ -7,6 +7,7 @@ import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import Authentication from "#bzd/nodejs/core/authentication/session/server.mjs";
 import AuthenticationGoogle from "#bzd/nodejs/core/authentication/google/server.mjs";
+import Result from "#bzd/nodejs/utils/result.mjs";
 import HttpServer from "#bzd/nodejs/core/http/server.mjs";
 import Services from "#bzd/apps/accounts/backend/services/services.mjs";
 import PendingActions from "#bzd/apps/accounts/backend/pending_actions/pending_actions.mjs";
@@ -57,13 +58,25 @@ const PATH_STATIC = options.static;
 		verifyIdentity: async (email, password = null) => {
 			const maybeUser = await users.getFromEmail(email, /*allowNull*/ true);
 			if (maybeUser === null) {
-				return false;
+				return Result.makeError(Authentication.ErrorVerifyIdentity.unauthorized);
+			}
+			// Limit the number of login attempt against brute forcing for an interval of 2s.
+			if (maybeUser.getLastFailedLoginTimestamp() + 2000 > Date.now()) {
+				return Result.makeError(Authentication.ErrorVerifyIdentity.tooManyAttempts);
 			}
 			// Check the password if provided.
 			if (password !== null) {
 				const isEqual = await maybeUser.isPasswordEqual(password);
 				if (!isEqual) {
-					return false;
+					await users.update(
+						maybeUser.getUid(),
+						(user) => {
+							user.setLastFailedLogin();
+							return user;
+						},
+						/*silent*/ true,
+					);
+					return Result.makeError(Authentication.ErrorVerifyIdentity.unauthorized);
 				}
 			}
 			await users.update(
@@ -74,10 +87,10 @@ const PATH_STATIC = options.static;
 				},
 				/*silent*/ true,
 			);
-			return {
+			return new Result({
 				scopes: maybeUser.getScopes().toList(),
 				uid: maybeUser.getUid(),
-			};
+			});
 		},
 		saveRefreshToken: async (session, hash, timeoutS, identifier, rolling) => {
 			await users.update(session.getUid(), (user) => {
