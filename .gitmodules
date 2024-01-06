@@ -10,3 +10,7 @@
 	path = deployment
 	url = https://git.blaizard.com/blaise/deployment.git
 	branch = main
+[submodule "apps/screen_recorder"]
+	path = apps/screen_recorder
+	url = https://git.blaizard.com/blaise/screen_recorder.git
+	branch = main

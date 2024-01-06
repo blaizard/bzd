@@ -73,13 +73,13 @@ To enable this configuration, run bazel with `--config=docker`.
 All supported languages come with their set of code quality related tools.
 To run all static sanity checks at once, code formatters and documentation generators, run the following command:
 
-```
-./sanitize.sh
+```bash
+bazel run //:sanitizer
 ```
 
 To run all tests, run the following command:
 
-```
+```bash
 ./quality_gate.sh
 ```
 
