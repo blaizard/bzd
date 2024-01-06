@@ -9,8 +9,11 @@ from bzd.utils.run import localCommand, localBazelTarget  # type: ignore
 from bzd_sanitizer.context import Context
 
 
-def getFileListFromResult(result, workspace: pathlib.Path) -> typing.List[str]:
+def getFileListFromResult(result: typing.Any, workspace: pathlib.Path) -> typing.List[str]:
+	"""Get a result and returns a list of exisitng files."""
+
 	return list({f for f in result.getStdout().split("\n") if (workspace / f).is_file()})
+
 
 def getFileListFromRecursiveGit(workspace: pathlib.Path, path: pathlib.Path, command: typing.List[str]):
 	"""Execute a git command to get a list of files and searching within submodules as well."""
@@ -25,12 +28,17 @@ def getFileListFromRecursiveGit(workspace: pathlib.Path, path: pathlib.Path, com
 
 	result = localCommand(["git", "submodule", "--quiet", "foreach", " ".join(command) + " | sed \"s|^|$path/|\""],
 	                      cwd=workspace)
-	output += [f for f in getFileListFromResult(result, workspace=workspace) if (workspace / f).is_relative_to(workspace / path)]
+	output += [
+	    f for f in getFileListFromResult(result, workspace=workspace)
+	    if (workspace / f).is_relative_to(workspace / path)
+	]
 
 	return output
 
 
 def getFileList(workspace: pathlib.Path, path: pathlib.Path, all: bool) -> typing.List[str]:
+	"""Get the file list to process."""
+
 	# Compute the list of files to sanitize.
 	if all:
 		fileList = getFileListFromRecursiveGit(
