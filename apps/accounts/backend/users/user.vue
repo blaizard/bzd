@@ -68,7 +68,7 @@
 						caption: "Creation",
 						name: "creation",
 						disable: true,
-						width: 0.3,
+						width: 0.2,
 						condition: Boolean(this.$authentication.hasScope(scopeSelfBasicRead)),
 					},
 					{
@@ -76,7 +76,15 @@
 						caption: "Last Login",
 						name: "last_login",
 						disable: true,
-						width: 0.3,
+						width: 0.2,
+						condition: Boolean(this.$authentication.hasScope(scopeSelfBasicRead)),
+					},
+					{
+						type: "Date",
+						caption: "Last Failed Login",
+						name: "last_failed_login",
+						disable: true,
+						width: 0.2,
 						condition: Boolean(this.$authentication.hasScope(scopeSelfBasicRead)),
 					},
 					{

@@ -4,16 +4,23 @@ import Session from "./session.mjs";
 const Exception = ExceptionFactory("authentication", "server");
 
 export default class AuthenticationServer {
+	/// Error type for verifyIdentity callback.
+	/// Emulation of an enum type.
+	static ErrorVerifyIdentity = Object.freeze({
+		unauthorized: "unauthorized",
+		tooManyAttempts: "tooManyAttempts",
+	});
+
 	constructor(options, defaultOptions = {}) {
 		this.options = Object.assign(
 			{
 				/// Callback to verify once identiy, mathing uid and password pair if provided.
 				/// This function can be called with only the uid, this case must be taken into account.
 				/// In return on success, it will return the UID to be used and scopes as a dictionary.
-				/// Otherwise, false should be returned.
+				/// Otherwise, an error Result with a code from ErrorVerifyIdentity should be returned.
 				/// The signature of this function is `async (uid, password)`.
-				/// It should return false if it doesn't verify. Otherwise, it should return a dict
-				/// containing the `uid` and `scopes` as key.
+				/// It should return an error Result if it doesn't verify. Otherwise, it should return a Result of
+				/// a dict containing the `uid` and `scopes` as key.
 				verifyIdentity: null,
 				/// Refresh and verify a token. Returns true in case of success, false otherwise or
 				/// a string corresponding to the new token in case of rolling tokens.

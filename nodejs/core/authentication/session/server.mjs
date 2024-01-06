@@ -178,9 +178,9 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 	}
 
 	async _login(context, identifier, persistent, uid, password = undefined) {
-		const sessionInfo = await this.options.verifyIdentity(uid, password);
-		if (sessionInfo) {
-			const session = new Session(sessionInfo.uid, sessionInfo.scopes);
+		const sessionInfoResult = await this.options.verifyIdentity(uid, password);
+		if (sessionInfoResult.hasValue()) {
+			const session = new Session(sessionInfoResult.value().uid, sessionInfoResult.value().scopes);
 
 			const timeoutS = persistent
 				? this.options.tokenRefreshLongTermExpiresIn
@@ -197,7 +197,13 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 			return await this._makeAccessToken(session);
 		}
 
-		throw context.httpError(401, "Unauthorized");
+		switch (sessionInfoResult.error()) {
+			case AuthenticationServer.ErrorVerifyIdentity.tooManyAttempts:
+				throw context.httpError(429, "Too Many Requests");
+			case AuthenticationServer.ErrorVerifyIdentity.unauthorized:
+			default:
+				throw context.httpError(401, "Unauthorized");
+		}
 	}
 
 	async _makeSSOTokenImpl(identifier, session) {

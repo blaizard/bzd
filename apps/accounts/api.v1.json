@@ -1,6 +1,7 @@
 {
     "/register": {
         "post": {
+            "authentication": true,
             "documentation": "Register a new user.",
             "request": {
                 "type": "json",

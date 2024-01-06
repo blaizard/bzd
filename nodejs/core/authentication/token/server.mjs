@@ -80,17 +80,23 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 
 		api.handle("post", "/auth/login", async function (inputs) {
 			// Verify uid/password pair
-			const sessionInfo = await authentication.options.verifyIdentity(inputs.uid, inputs.password);
-			if (sessionInfo) {
+			const sessionInfoResult = await authentication.options.verifyIdentity(inputs.uid, inputs.password);
+			if (sessionInfoResult.hasValue()) {
 				return generateTokens.call(
 					this,
-					sessionInfo.uid,
-					sessionInfo.scopes,
+					sessionInfoResult.value().uid,
+					sessionInfoResult.value().scopes,
 					inputs.persistent,
-					makeUid(sessionInfo.uid),
+					makeUid(sessionInfoResult.value().uid),
 				);
 			}
-			throw this.httpError(401, "Unauthorized");
+			switch (sessionInfoResult.error()) {
+				case AuthenticationServer.ErrorVerifyIdentity.tooManyAttempts:
+					throw context.httpError(429, "Too Many Requests");
+				case AuthenticationServer.ErrorVerifyIdentity.unauthorized:
+				default:
+					throw context.httpError(401, "Unauthorized");
+			}
 		});
 
 		api.handle("post", "/auth/logout", async function () {
