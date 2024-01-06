@@ -9,28 +9,37 @@ from bzd.utils.run import localCommand, localBazelTarget  # type: ignore
 from bzd_sanitizer.context import Context
 
 
+def getFileListFromResult(result, workspace: pathlib.Path) -> typing.List[str]:
+	return list({f for f in result.getStdout().split("\n") if (workspace / f).is_file()})
+
+def getFileListFromRecursiveGit(workspace: pathlib.Path, path: pathlib.Path, command: typing.List[str]):
+	"""Execute a git command to get a list of files and searching within submodules as well."""
+
+	result = localCommand(
+	    command + [
+	        str(path),
+	    ],
+	    cwd=workspace,
+	)
+	output = getFileListFromResult(result, workspace=workspace)
+
+	result = localCommand(["git", "submodule", "--quiet", "foreach", " ".join(command) + " | sed \"s|^|$path/|\""],
+	                      cwd=workspace)
+	output += [f for f in getFileListFromResult(result, workspace=workspace) if (workspace / f).is_relative_to(workspace / path)]
+
+	return output
+
+
 def getFileList(workspace: pathlib.Path, path: pathlib.Path, all: bool) -> typing.List[str]:
 	# Compute the list of files to sanitize.
 	if all:
-		result = localCommand(
-		    [
-		        "git",
-		        "ls-files",
-		        "--cached",
-		        "--other",
-		        "--modified",
-		        "--exclude-standard",
-		        str(path),
-		    ],
-		    cwd=workspace,
-		)
+		fileList = getFileListFromRecursiveGit(
+		    workspace=workspace,
+		    path=path,
+		    command=["git", "ls-files", "--cached", "--other", "--modified", "--exclude-standard"])
 	else:
-		result = localCommand(
-		    ["git", "ls-files", "--other", "--modified", "--exclude-standard",
-		     str(path)],
-		    cwd=workspace,
-		)
-	fileList = list({f for f in result.getStdout().split("\n") if (workspace / f).is_file()})
+		fileList = getFileListFromRecursiveGit(
+		    workspace=workspace, path=path, command=["git", "ls-files", "--other", "--modified", "--exclude-standard"])
 
 	# If there are no files, try a diff with the last commit.
 	if len(fileList) == 0:
@@ -39,10 +48,9 @@ def getFileList(workspace: pathlib.Path, path: pathlib.Path, all: bool) -> typin
 		     str(path)],
 		    cwd=workspace,
 		)
-		fileList = list(result.getStdout().split("\n"))
+		fileList = getFileListFromResult(result, workspace=workspace)
 
-	# Only keep existing files.
-	return list({f for f in fileList if (workspace / f).is_file()})
+	return fileList
 
 
 if __name__ == "__main__":
