@@ -7,6 +7,7 @@ bzd_nodejs_library(
     ]),
     visibility = ["//visibility:public"],
     deps = [
+        "//nodejs:icons",
         "//nodejs:vue",
         "//nodejs/core:upload",
         "//nodejs/core:validation",
