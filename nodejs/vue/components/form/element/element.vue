@@ -3,6 +3,7 @@
 	import ExceptionFactory from "../../../../core/exception.mjs";
 
 	const Exception = ExceptionFactory("form");
+	let uidCounter = 0;
 
 	/// The following must be implement for all elements:
 	/// Events:
@@ -28,7 +29,7 @@
 		emits: ["error", "active", "submit", "update-with-context", "update:model-value"],
 		data: function () {
 			return {
-				uid: this._uid,
+				uid: "irform-element-" + ++uidCounter,
 				isInputFrozenValue: false,
 				inputFrozenValue: "",
 				isActive: false,
