@@ -1,6 +1,7 @@
 common --announce_rc
 
 try-import .bazelrc.local
+try-import deployment/.bazelrc
 
 # Add timestamps
 common --show_timestamps
@@ -74,7 +75,6 @@ build:docker --config=docker_sandbox
 build:docker --extra_execution_platforms=@bzd_rules_docker//execution_platforms:linux_x86_64
 
 # Remote
-build:remote --remote_executor=grpc://10.10.0.11:8980
 build:remote --extra_execution_platforms=@bzd_rules_docker//execution_platforms:linux_x86_64
 build:remote --jobs=24
 build:remote --dynamic_mode=off

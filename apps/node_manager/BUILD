@@ -7,6 +7,9 @@ py_binary(
     srcs = [
         "client.py",
     ],
+    visibility = [
+        "//visibility:public",
+    ],
 )
 
 py_binary(
