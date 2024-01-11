@@ -302,6 +302,8 @@ constexpr auto make(const Pattern&, Args&&... args) noexcept
 {
 	constexpr auto context = parse<Adapter<ConstexprAssert, Schema>, Pattern, Args...>();
 	static_assert(context.size() >= 0, "Compile-time string format check failed.");
+	// TODO: remove the use of args here and propagate it at a later stage so that this function
+	// can be consteval. This would make this code fully compile time and maybe better error message?
 	auto processor = Processor<Range, Adapter<RuntimeAssert, Schema>>::make(args...);
 
 	return bzd::makeTuple(bzd::move(context), bzd::move(processor));
