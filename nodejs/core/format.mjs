@@ -30,6 +30,11 @@ export default function (str, ...args) {
 					output += String(value);
 					break;
 				default:
+					if (format.type.startsWith(".")) {
+						const precision = parseInt(format.type.substring(1));
+						output += String(value.toFixed(precision));
+						break;
+					}
 					throw new Error("Unsupported formatting type: " + format.type);
 			}
 
