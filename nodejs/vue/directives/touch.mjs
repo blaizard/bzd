@@ -129,6 +129,11 @@ function activateTouch(e, el, config) {
 	currentCoord = originalCoord = getCoordinates(e);
 	originalTime = new Date().getTime();
 
+	// Call the start drag callback
+	if (curConfig.ontouchdown) {
+		curConfig.ontouchdown(originalCoord.x, originalCoord.y);
+	}
+
 	// Setup handler
 	document.addEventListener("touchend", dragStop, eventListenerOptions);
 	document.addEventListener("touchmove", dragMove, eventListenerOptions);
@@ -488,7 +493,12 @@ function dragMove(e) {
 
 		// Call the callback if set
 		if (curConfig.ondrag) {
-			curConfig.ondrag(currentCoord.x - originalCoord.x, currentCoord.y - originalCoord.y);
+			curConfig.ondrag(
+				currentCoord.x - originalCoord.x,
+				currentCoord.y - originalCoord.y,
+				currentCoord.x,
+				currentCoord.y,
+			);
 		}
 
 		// Move the element if drag
@@ -652,144 +662,165 @@ function dragStop(e) {
 }
 
 // Constructor of the Touch object
-function Touch(el, config) {
-	this.setConfig(config);
-	this.el = el;
+export class Touch {
+	constructor(el, config) {
+		this.setConfig(config);
+		this.el = el;
+	}
+
+	static make(elt, config = {}) {
+		const touch = new Touch(elt, config);
+
+		// Get the list of recievers
+		elt.addEventListener("mousedown", touch, eventListenerOptions);
+		elt.addEventListener("touchstart", touch, eventListenerOptions);
+
+		return touch;
+	}
+
+	setConfig(config) {
+		this.config = Object.assign(
+			{
+				/**
+				 * Kill switch, must be set to true in order to enable the following events
+				 */
+				enable: true,
+				/**
+				 * Boolean to set the drag as enabled or not
+				 */
+				drag: false,
+				/**
+				 * The iframe selector. If set, it will asssume that the selector
+				 * is within the iframe.
+				 */
+				selectorIFrame: null,
+				/**
+				 * The receiver selector. If the selector is null,
+				 * the parent element will be used.
+				 */
+				selectorReceiver: null,
+				/**
+				 * Class set once the draggin is active. This class is set on the body
+				 * of the document. If null, no class will be set.
+				 */
+				bodyDragClass: "drag-active",
+				/**
+				 * Can be either null (will generate an empty div),
+				 * set to "clone", will clone the original element and its CSS,
+				 * set to "cloneNode", will clone the original element only,
+				 * set to a callback that will create the element.
+				 */
+				placeholder: "clone",
+				/**
+				 * The class to add to the placeholder element
+				 */
+				placeholderClass: null,
+				/**
+				 * The css to add to the placeholder element
+				 */
+				placeholderCss: {},
+				/**
+				 * Can be either null (will generate an empty div),
+				 * set to "clone", will clone the original element and its CSS,
+				 * set to "cloneNode", will clone the original element only,
+				 * set to a callback that will create the element.
+				 */
+				dragElt: "clone",
+				/**
+				 * The class to add to dragging element
+				 */
+				dragEltClass: null,
+				/**
+				 * The css to add to dragging element
+				 */
+				dragEltCss: {},
+				/**
+				 * Set to true, if the original element should be moved or cloned
+				 */
+				move: true,
+				/**
+				 * Do not perform any operation
+				 */
+				nop: false,
+				/**
+				 * Let the click events go through
+				 */
+				allowClickThrough: false,
+				/**
+				 * Trigger the event drop, if null, no event is triggered
+				 */
+				triggerEvent: "drop",
+				/**
+				 * Keep the last drop location even if it is out of a drop zone.
+				 */
+				keepLastDrop: !config.selectorReceiver,
+				/**
+				 * Tolerance to be allowed on the receiver to be active.
+				 * It will define an invisible margin around the receivers that will
+				 * be used to detect whether or not the cursor is within the area.
+				 */
+				toleranceReceiverMargin: 50,
+				/**
+				 * Disable all pointer events while dragging (including selections, scrolling...)
+				 */
+				disablePointerEvents: true,
+				/**
+				 * Arguments to be passed to the callback
+				 */
+				args: null,
+				/**
+				 * Detect swipe event and call the associated callback
+				 */
+				onswipe: null,
+				/**
+				 * Callback that will be fired each time the mouse moves while dragging
+				 */
+				ondrag: null,
+				/**
+				 * Callback fired when a successfull drop happened.
+				 * It gets into arguments an object including the index of the child of the container,
+				 * the container and the arguments.
+				 */
+				ondrop: null,
+				/**
+				 * Will be called when a mouse down or touch down happen.
+				 */
+				ontouchdown: null,
+				/**
+				 * Will be called at the begining of the drag operation
+				 */
+				onstartdrag: null,
+				/**
+				 * Will be called at the end of the drag operation
+				 */
+				onstopdrag: null,
+			},
+			config,
+		);
+	}
+
+	handleEvent(e) {
+		activateTouch(e, this.el, this.config);
+	}
+
+	static getElementRect(element) {
+		const rect = element.getBoundingClientRect();
+		return {
+			x: rect.left + scrollOffsetX(),
+			y: rect.top + scrollOffsetY(),
+			width: rect.width,
+			height: rect.height,
+		};
+	}
 }
-
-Touch.prototype.setConfig = function (config) {
-	this.config = Object.assign(
-		{
-			/**
-			 * Kill switch, must be set to true in order to enable the following events
-			 */
-			enable: true,
-			/**
-			 * Boolean to set the drag as enabled or not
-			 */
-			drag: false,
-			/**
-			 * The iframe selector. If set, it will asssume that the selector
-			 * is within the iframe.
-			 */
-			selectorIFrame: null,
-			/**
-			 * The receiver selector. If the selector is null,
-			 * the parent element will be used.
-			 */
-			selectorReceiver: null,
-			/**
-			 * Class set once the draggin is active. This class is set on the body
-			 * of the document. If null, no class will be set.
-			 */
-			bodyDragClass: "drag-active",
-			/**
-			 * Can be either null (will generate an empty div),
-			 * set to "clone", will clone the original element and its CSS,
-			 * set to "cloneNode", will clone the original element only,
-			 * set to a callback that will create the element.
-			 */
-			placeholder: "clone",
-			/**
-			 * The class to add to the placeholder element
-			 */
-			placeholderClass: null,
-			/**
-			 * The css to add to the placeholder element
-			 */
-			placeholderCss: {},
-			/**
-			 * Can be either null (will generate an empty div),
-			 * set to "clone", will clone the original element and its CSS,
-			 * set to "cloneNode", will clone the original element only,
-			 * set to a callback that will create the element.
-			 */
-			dragElt: "clone",
-			/**
-			 * The class to add to dragging element
-			 */
-			dragEltClass: null,
-			/**
-			 * The css to add to dragging element
-			 */
-			dragEltCss: {},
-			/**
-			 * Set to true, if the original element should be moved or cloned
-			 */
-			move: true,
-			/**
-			 * Do not perform any operation
-			 */
-			nop: false,
-			/**
-			 * Let the click events go through
-			 */
-			allowClickThrough: false,
-			/**
-			 * Trigger the event drop, if null, no event is triggered
-			 */
-			triggerEvent: "drop",
-			/**
-			 * Keep the last drop location even if it is out of a drop zone.
-			 */
-			keepLastDrop: !config.selectorReceiver,
-			/**
-			 * Tolerance to be allowed on the receiver to be active.
-			 * It will define an invisible margin around the receivers that will
-			 * be used to detect whether or not the cursor is within the area.
-			 */
-			toleranceReceiverMargin: 50,
-			/**
-			 * Disable all pointer events while dragging (including selections, scrolling...)
-			 */
-			disablePointerEvents: true,
-			/**
-			 * Arguments to be passed to the callback
-			 */
-			args: null,
-			/**
-			 * Detect swipe event and call the associated callback
-			 */
-			onswipe: null,
-			/**
-			 * Callback that will be fired each time the mouse moves while dragging
-			 */
-			ondrag: null,
-			/**
-			 * Callback fired when a successfull drop happened.
-			 * It gets into arguments an object including the index of the child of the container,
-			 * the container and the arguments.
-			 */
-			ondrop: null,
-			/**
-			 * Will be called at the begining of the drag operation
-			 */
-			onstartdrag: null,
-			/**
-			 * Will be called at the end of the drag operation
-			 */
-			onstopdrag: null,
-		},
-		config,
-	);
-};
-
-Touch.prototype.handleEvent = function (e) {
-	activateTouch(e, this.el, this.config);
-};
 
 export default function (el, binding) {
 	const config = binding && binding.value ? binding.value : binding;
 
 	if (!el.directiveTouchInstance) {
-		const touch = new Touch(el, config);
-
+		const touch = Touch.make(el, config);
 		// Associate the object to the element for update
 		el.directiveTouchInstance = touch;
-
-		// Get the list of recievers
-		el.addEventListener("mousedown", touch, eventListenerOptions);
-		el.addEventListener("touchstart", touch, eventListenerOptions);
 	} else {
 		let touch = el.directiveTouchInstance;
 		touch.setConfig(config);

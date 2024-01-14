@@ -2,6 +2,7 @@
 **/*.BUILD
 **WORKSPACE
 **README.md
+**LICENSE.md
 **Jenkinsfile
 **Dockerfile
 **docker-compose.yml
