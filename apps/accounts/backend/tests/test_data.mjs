@@ -32,5 +32,6 @@ export default class TestData {
 
 		await this.applications.create("localhost", "http://localhost:8081/", [scopeSelfBasicRead]);
 		await this.applications.create("artifacts", "http://localhost:8081/", [scopeSelfBasicRead]);
+		await this.applications.create("screen_recorder", "http://localhost:8081/", [scopeSelfBasicRead]);
 	}
 }
