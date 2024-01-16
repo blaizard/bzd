@@ -8,6 +8,7 @@ bazel_dep(name = "bzd_rules_doc", version = "1.0")
 bazel_dep(name = "bzd_toolchain_cc", version = "1.0")
 bazel_dep(name = "bzd_rules_nodejs", version = "1.0")
 bazel_dep(name = "bzd_platforms", version = "1.0")
+bazel_dep(name = "bzd_octodns", version = "1.0")
 bazel_dep(name = "bzd_sanitizer", version = "1.0")
 bazel_dep(name = "bzd_package", version = "1.0")
 bazel_dep(name = "bzd_bundle", version = "1.0")
@@ -35,6 +36,7 @@ bazel_dep(name = "stardoc", version = "0.6.2")
     "bzd_platforms",
     "bzd_sanitizer",
     "bzd_package",
+    "bzd_octodns",
 )]
 
 local_path_override(
