@@ -64,6 +64,15 @@ export default async function request(url, options) {
 			},
 		);
 
+		req.on("timeout", () => {
+			req.destroy();
+			reject(exceptionTimeout);
+		});
+
+		req.on("error", (e) => {
+			reject(e);
+		});
+
 		// A string
 		if (typeof options.data == "string") {
 			req.write(options.data);
@@ -77,14 +86,5 @@ export default async function request(url, options) {
 		} else {
 			reject(new Exception("Unsupported data format: {:j}", options.data));
 		}
-
-		req.on("timeout", () => {
-			req.abort();
-			reject(exceptionTimeout);
-		});
-
-		req.on("error", (e) => {
-			reject(e);
-		});
 	});
 }
