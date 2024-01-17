@@ -1,5 +1,5 @@
 import Fs from "fs";
-
+import FileSystem from "#bzd/nodejs/core/filesystem.mjs";
 import ExceptionFactory from "./exception.mjs";
 
 const Exception = ExceptionFactory("template");
@@ -22,11 +22,10 @@ export default class Template {
 		this.pattern = new RegExp("<%(.+?(?=%>))%>", "g");
 	}
 
-	/**
-	 * Open a template from a path
-	 */
-	static fromFileSync(path) {
-		return new Template(Fs.readFileSync(path).toString(), {
+	/// Open a template from a path
+	static async fromFile(path) {
+		const data = await FileSystem.readFile(path);
+		return new Template(data, {
 			path: path,
 		});
 	}

@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 USER root
 
@@ -20,5 +20,5 @@ RUN sed -i '/GatewayPorts/c\GatewayPorts yes' /etc/ssh/sshd_config
 EXPOSE 22
 EXPOSE 1194
 
-COPY executor.sh executor.sh
-CMD ./executor.sh
+# Run the SSH daemon
+ENTRYPOINT ["/usr/sbin/sshd", "-D"]

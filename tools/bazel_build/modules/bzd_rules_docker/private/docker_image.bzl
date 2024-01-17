@@ -3,7 +3,7 @@
 load("@bzd_lib//lib:attrs.bzl", "ATTRS_COMMON_BUILD_RULES", "attrs_assert_any_of")
 load("@rules_oci//oci:defs.bzl", "oci_image")
 
-def bzd_docker_image(name, base = None, cmd = [], workdir = None, env = {}, tars = [], **kwargs):
+def bzd_docker_image(name, base = None, cmd = [], workdir = None, env = {}, tars = [], entrypoint = [], **kwargs):
     """Build a container image.
 
     Args:
@@ -13,6 +13,7 @@ def bzd_docker_image(name, base = None, cmd = [], workdir = None, env = {}, tars
         workdir: Sets the current working directory of the entrypoint process in the container.
         env: Environment variables provisioned by default to the running container.
         tars: List of tar files to add to the image as layers.
+        entrypoint: Entrypoint of the container.
         **kwargs: Extra arguments common to all build rules.
     """
 
@@ -25,5 +26,6 @@ def bzd_docker_image(name, base = None, cmd = [], workdir = None, env = {}, tars
         workdir = workdir,
         env = env,
         tars = tars,
+        entrypoint = entrypoint,
         **kwargs
     )

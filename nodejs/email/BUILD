@@ -1,6 +1,18 @@
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 
 bzd_nodejs_library(
+    name = "nodemailer",
+    srcs = [
+        "email.mjs",
+        "nodemailer.mjs",
+    ],
+    packages = {
+        "nodemailer": "",
+    },
+    visibility = ["//visibility:public"],
+)
+
+bzd_nodejs_library(
     name = "sendgrid",
     srcs = [
         "email.mjs",

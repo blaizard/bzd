@@ -1,4 +1,11 @@
 {
+    "email": {
+        "from": "hello@dummy.com",
+        "password": "1234",
+        "port": 587,
+        "smtp": "smtp.dummy.com",
+        "user": "hello"
+    },
     "kvs": {
         "accounts": {
             "name": "accounts",
@@ -8,5 +15,6 @@
             "name": "register",
             "type": "memory"
         }
-    }
+    },
+    "url": "http://localhost:8080"
 }

@@ -1,6 +1,6 @@
 <template>
 	<Authentication title="RESET">
-		<Form v-model="info" :description="formResetDescription" @submit="handleSubmit"></Form>
+		<Form v-model="info" :description="formResetDescription" @submit="handleSubmitReset"></Form>
 	</Authentication>
 </template>
 
@@ -18,30 +18,44 @@
 		data: function () {
 			return {
 				info: {},
+				sent: false,
 			};
 		},
 		computed: {
 			formResetDescription() {
 				return [
 					{
+						type: "Message",
+						value:
+							"If we found an eligible account associated with that email, we've sent password reset instructions to this email address.",
+						condition: () => this.sent,
+					},
+					{
 						type: "Input",
-						name: "email",
+						name: "uid",
 						placeholder: this.$lang.getCapitalized("email"),
 						pre: { html: '<i class="bzd-icon-email"></i>' },
 						validation: "email mandatory",
+						height: "large",
+						disable: this.sent,
 					},
 					{
 						type: "Button",
 						action: "approve",
-						content: "Reset Password",
+						content: "Request Password Reset",
+						height: "large",
 						fill: true,
+						disable: this.sent,
 					},
 				];
 			},
 		},
 		methods: {
-			handleSubmit() {
-				console.log("submit!", this.info);
+			async handleSubmitReset() {
+				await this.handleSubmit(async () => {
+					await this.$api.request("post", "/reset/request", this.info);
+					this.sent = true;
+				});
 			},
 		},
 	};

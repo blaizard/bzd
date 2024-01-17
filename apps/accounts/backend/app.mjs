@@ -9,8 +9,6 @@ import Authentication from "#bzd/nodejs/core/authentication/session/server.mjs";
 import AuthenticationGoogle from "#bzd/nodejs/core/authentication/google/server.mjs";
 import Result from "#bzd/nodejs/utils/result.mjs";
 import HttpServer from "#bzd/nodejs/core/http/server.mjs";
-import Services from "#bzd/apps/accounts/backend/services/services.mjs";
-import PendingActions from "#bzd/apps/accounts/backend/pending_actions/pending_actions.mjs";
 import Users from "#bzd/apps/accounts/backend/users/users.mjs";
 import Applications from "#bzd/apps/accounts/backend/applications/applications.mjs";
 import TokenInfo from "#bzd/apps/accounts/backend/users/token.mjs";
@@ -18,6 +16,9 @@ import TestData from "#bzd/apps/accounts/backend/tests/test_data.mjs";
 import Config from "#bzd/apps/accounts/config.json" assert { type: "json" };
 import ConfigBackend from "#bzd/apps/accounts/backend/config.json" assert { type: "json" };
 import MemoryLogger from "#bzd/apps/accounts/backend/logger/memory/memory.mjs";
+import NodeMailer from "#bzd/nodejs/email/nodemailer.mjs";
+import Template from "#bzd/nodejs/core/template.mjs";
+import TemplateResetPassword from "#bzd/apps/accounts/backend/emails/reset_password.mjs";
 
 const Exception = ExceptionFactory("backend");
 const Log = LogFactory("backend");
@@ -44,6 +45,16 @@ const PATH_STATIC = options.static;
 
 	const keyValueStore = await kvsMakeFromConfig(ConfigBackend.kvs.accounts);
 	const keyValueStoreRegister = await kvsMakeFromConfig(ConfigBackend.kvs.register);
+
+	// Set-up the mail object
+	const mail = new NodeMailer(ConfigBackend.email.from, {
+		host: ConfigBackend.email.smtp,
+		port: ConfigBackend.email.port,
+		auth: {
+			user: ConfigBackend.email.user,
+			pass: ConfigBackend.email.password,
+		},
+	});
 
 	// Users
 	const users = new Users(keyValueStore);
@@ -148,35 +159,13 @@ const PATH_STATIC = options.static;
 		clientId: Config.googleClientId,
 	});
 
-	// Create the pending actions module
-	const pendingActions = new PendingActions(keyValueStoreRegister, {
-		register: {
-			run: async (uid, data) => {
-				console.log("PendingActions register", uid, data);
-				//data.roles = ["users"];
-				//await users.create(data);
-			},
-		},
-	});
-	const services = new Services();
-
-	pendingActions.registerGarbageCollector(services, "register");
-
 	// ---- API ----
 
 	const api = new API(APIv1, {
 		authentication: authentication,
 		channel: web,
 	});
-	await api.installPlugins(
-		authentication,
-		authenticationGoogle,
-		users,
-		appplications,
-		pendingActions,
-		services,
-		memoryLogger,
-	);
+	await api.installPlugins(authentication, authenticationGoogle, users, appplications, memoryLogger);
 
 	api.handle("get", "/sso", async function (inputs, session) {
 		// Get that the application exists.
@@ -192,14 +181,48 @@ const PATH_STATIC = options.static;
 		};
 	});
 
-	api.handle("post", "/register", async (inputs, session) => {
-		const activationCode = await pendingActions.create("group", session.getUid(), inputs);
-		return String(activationCode);
+	api.handle("post", "/reset/request", async (inputs) => {
+		const maybeUser = await users.getFromEmail(inputs.uid, /*allowNull*/ true);
+		if (maybeUser === null) {
+			// Don't return any error code if the account does not exists.
+			return;
+		}
+
+		// Check if there is a valid password, if not create a random one.
+		let maybePassword = maybeUser.getPassword();
+		if (!maybePassword) {
+			maybeUser.setPassword(Math.random().toString());
+			maybePassword = maybeUser.getPassword();
+		}
+		Exception.assert(maybePassword, "At that point there must be a valid password.");
+
+		const template = new Template(TemplateResetPassword);
+		const content = template.process({
+			url: ConfigBackend.url,
+			link:
+				ConfigBackend.url +
+				"/reset/" +
+				encodeURIComponent(maybeUser.getUid()) +
+				"/" +
+				encodeURIComponent(maybePassword),
+		});
+
+		await mail.send(inputs.uid, "Password Reset", {
+			format: "html",
+			content: content,
+		});
 	});
 
-	// ---- services ----
-
-	services.start();
+	api.handle("post", "/reset/password", async function (inputs) {
+		const maybeUser = await users.get(inputs.uid, /*allowNull*/ true);
+		if (maybeUser === null) {
+			throw this.httpError(401, "Unauthorized");
+		}
+		if (!inputs.token || maybeUser.getPassword() !== inputs.token) {
+			throw this.httpError(401, "Unauthorized");
+		}
+		await maybeUser.setPassword(inputs.password);
+	});
 
 	// ---- tests data ----
 

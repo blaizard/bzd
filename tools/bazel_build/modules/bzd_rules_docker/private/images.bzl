@@ -2,7 +2,7 @@
 
 IMAGES = {
     "bridge": struct(
-        digest = "sha256:5b6a59e0c6a28e4dedef5ac2e8a44e2c1327927ede53ae5425923950ac9d99df",
+        digest = "sha256:1eccb9cf3a0a75be2e723d9bbda8da38b9e9dc463c143db0bb767f605b90b6e4",
         image = "index.docker.io/blaizard/bridge",
         tag = "latest",
     ),
