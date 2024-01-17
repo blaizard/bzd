@@ -5,22 +5,17 @@ import Email from "./email.mjs";
 
 const Exception = ExceptionFactory("email", "sendgrid");
 
-/**
- * Email module
- */
 export default class Sendgrid extends Email {
 	constructor(options) {
 		super();
 
-		Exception.assert("key" in options, "API key must be sent.");
-		Exception.assert("from" in options, "From address must be sent.");
+		Exception.assert("key" in options, "API key must be set.");
+		Exception.assert("from" in options, "From address must be set.");
 		this.key = options.key;
 		this.from = options.from;
 	}
 
-	/**
-	 * Send an email
-	 */
+	/// Send an email
 	async _sendImpl(toList, subject, data) {
 		await HttpClient.request("https://api.sendgrid.com/v3/mail/send", {
 			method: "post",

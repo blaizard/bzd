@@ -1,17 +1,25 @@
 {
-    "/register": {
+    "/reset/password": {
         "post": {
-            "authentication": true,
-            "documentation": "Register a new user.",
+            "documentation": "Reset the user's password.",
             "request": {
                 "type": "json",
                 "validation": {
-                    "password": "",
+                    "password": "mandatory",
+                    "token": "mandatory",
                     "uid": "mandatory"
                 }
-            },
-            "response": {
-                "type": "json"
+            }
+        }
+    },
+    "/reset/request": {
+        "post": {
+            "documentation": "Perform a request for reseting a password.",
+            "request": {
+                "type": "json",
+                "validation": {
+                    "uid": "mandatory"
+                }
             }
         }
     },

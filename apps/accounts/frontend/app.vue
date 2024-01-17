@@ -66,7 +66,8 @@
 					{ path: "/login", component: () => import("./login.vue") },
 					{ path: "/logout", component: () => import("./logout.vue"), authentication: true },
 					{ path: "/sso", component: () => import("./sso.vue"), authentication: true },
-					{ path: "/reset", component: () => import("./reset.vue") },
+					{ path: "/reset/{uid}/{token}", component: () => import("./reset_password.vue") },
+					{ path: "/reset", component: () => import("./reset_request.vue") },
 				],
 				fallback: { component: () => import("./404.vue") },
 			});
