@@ -198,7 +198,6 @@ const PATH_STATIC = options.static;
 
 		const template = new Template(TemplateResetPassword);
 		const content = template.process({
-			url: ConfigBackend.url,
 			link:
 				ConfigBackend.url +
 				"/reset/" +
