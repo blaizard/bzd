@@ -19,7 +19,7 @@ export default class Template {
 		Exception.assert(typeof template === "string", "The template is not a string");
 		this.template = template;
 
-		this.pattern = new RegExp("<%(.+?(?=%>))%>", "g");
+		this.pattern = new RegExp("{{(.+?(?=}}))}}", "g");
 	}
 
 	/// Open a template from a path
