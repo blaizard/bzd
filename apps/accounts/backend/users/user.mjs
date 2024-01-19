@@ -64,6 +64,11 @@ export default class User {
 		this.value.last_failed_login = Date.now();
 	}
 
+	setLastPasswordReset() {
+		this.modified.push("last_password_reset");
+		this.value.last_password_reset = Date.now();
+	}
+
 	async setPassword(password) {
 		this.modified.push("password");
 		const hash = await Bcrypt.hash(password);
@@ -87,6 +92,10 @@ export default class User {
 
 	getLastFailedLoginTimestamp() {
 		return this.value.last_failed_login || 0;
+	}
+
+	getLastPasswordResetTimestamp() {
+		return this.value.last_password_reset || 0;
 	}
 
 	getRoles() {
@@ -264,6 +273,7 @@ export default class User {
 			creation: this.getCreationTimestamp(),
 			last_login: this.getLastLoginTimestamp(),
 			last_failed_login: this.getLastFailedLoginTimestamp(),
+			last_password_reset: this.getLastPasswordResetTimestamp(),
 			roles: this.getRoles(),
 			scopes: this.getScopes().toList(),
 			subscriptions: this.getSubscriptions(),

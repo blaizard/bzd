@@ -1,7 +1,7 @@
 {
-    "/reset/password": {
+    "/password-change": {
         "post": {
-            "documentation": "Reset the user's password.",
+            "documentation": "Change the user's password.",
             "request": {
                 "type": "json",
                 "validation": {
@@ -12,9 +12,9 @@
             }
         }
     },
-    "/reset/request": {
+    "/password-reset": {
         "post": {
-            "documentation": "Perform a request for reseting a password.",
+            "documentation": "Perform a reset request of a password.",
             "request": {
                 "type": "json",
                 "validation": {

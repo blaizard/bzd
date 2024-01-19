@@ -15,10 +15,6 @@
 			Authentication,
 			Form,
 		},
-		props: {
-			uid: { type: String, required: true },
-			token: { type: String, required: true },
-		},
 		data: function () {
 			return {
 				info: {},
@@ -30,30 +26,23 @@
 				return [
 					{
 						type: "Message",
-						value: "Your password has been successfully reset, you will now be redirected to the login page...",
+						value:
+							"If we found an eligible account associated with that email, we've sent password reset instructions to this email address.",
 						condition: () => this.sent,
 					},
 					{
-						type: "Password",
-						name: "password",
+						type: "Input",
+						name: "uid",
+						placeholder: this.$lang.getCapitalized("email"),
+						pre: { html: '<i class="bzd-icon-email"></i>' },
+						validation: "email mandatory",
 						height: "large",
-						placeholder: this.$lang.getCapitalized("password"),
-						pre: { html: '<i class="bzd-icon-lock"></i>' },
-						validation: "mandatory",
-						condition: () => !this.sent,
-					},
-					{
-						type: "Password",
-						height: "large",
-						placeholder: this.$lang.getCapitalized("passwordconfirm"),
-						pre: { html: '<i class="bzd-icon-lock"></i>' },
-						validation: "mandatory same(password)",
-						condition: () => !this.sent,
+						disable: this.sent,
 					},
 					{
 						type: "Button",
 						action: "approve",
-						content: "Reset Password",
+						content: "Request Password Reset",
 						height: "large",
 						fill: true,
 						condition: () => !this.sent,
@@ -64,15 +53,8 @@
 		methods: {
 			async handleSubmitReset() {
 				await this.handleSubmit(async () => {
-					await this.$api.request("post", "/reset/password", {
-						password: this.info.password,
-						uid: this.uid,
-						token: this.token,
-					});
+					await this.$api.request("post", "/password-reset", this.info);
 					this.sent = true;
-					setTimeout(() => {
-						this.$router.dispatch("/login");
-					}, 3000);
 				});
 			},
 		},

@@ -16,5 +16,10 @@
             "type": "memory"
         }
     },
+    "payment": {
+        "secretEndpoint": "",
+        "secretKey": "",
+        "type": "stripe"
+    },
     "url": "http://localhost:8080"
 }

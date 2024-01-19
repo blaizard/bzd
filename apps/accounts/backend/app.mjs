@@ -16,9 +16,8 @@ import TestData from "#bzd/apps/accounts/backend/tests/test_data.mjs";
 import Config from "#bzd/apps/accounts/config.json" assert { type: "json" };
 import ConfigBackend from "#bzd/apps/accounts/backend/config.json" assert { type: "json" };
 import MemoryLogger from "#bzd/apps/accounts/backend/logger/memory/memory.mjs";
-import NodeMailer from "#bzd/nodejs/email/nodemailer.mjs";
-import Template from "#bzd/nodejs/core/template.mjs";
-import TemplateResetPassword from "#bzd/apps/accounts/backend/emails/reset_password.mjs";
+import StripePaymentWebhook from "#bzd/nodejs/payment/stripe/webhook.mjs";
+import EmailsManager from "#bzd/apps/accounts/backend/emails/manager.mjs";
 
 const Exception = ExceptionFactory("backend");
 const Log = LogFactory("backend");
@@ -47,14 +46,7 @@ const PATH_STATIC = options.static;
 	const keyValueStoreRegister = await kvsMakeFromConfig(ConfigBackend.kvs.register);
 
 	// Set-up the mail object
-	const mail = new NodeMailer(ConfigBackend.email.from, {
-		host: ConfigBackend.email.smtp,
-		port: ConfigBackend.email.port,
-		auth: {
-			user: ConfigBackend.email.user,
-			pass: ConfigBackend.email.password,
-		},
-	});
+	const emails = new EmailsManager(ConfigBackend.email.from, ConfigBackend.email, options.test);
 
 	// Users
 	const users = new Users(keyValueStore);
@@ -64,6 +56,8 @@ const PATH_STATIC = options.static;
 
 	// Set-up the web server
 	const web = new HttpServer(PORT);
+
+	// ---- Authentication ----
 
 	let authentication = new Authentication({
 		verifyIdentity: async (email, password = null) => {
@@ -159,13 +153,39 @@ const PATH_STATIC = options.static;
 		clientId: Config.googleClientId,
 	});
 
+	// ---- Payment ----
+
+	const payment = new StripePaymentWebhook({
+		secretKey: ConfigBackend.payment.secretKey,
+		secretEndpoint: ConfigBackend.payment.secretEndpoint,
+		callbackPayment: async (reference, email, products, maybeSubscription = null) => {
+			// if (reference already processed) return;
+
+			// if (email account exist)
+			//		create one;
+			//		send welcome email and change password instructions;
+
+			// check product, make sure valid and get subscription time.
+			// increase subscription
+			// associate subscription reference if any.
+
+			console.log({
+				reference,
+				email,
+				products,
+				maybeSubscription,
+			});
+		},
+	});
+	// await payment.trigger(24 * 3600);
+
 	// ---- API ----
 
 	const api = new API(APIv1, {
 		authentication: authentication,
 		channel: web,
 	});
-	await api.installPlugins(authentication, authenticationGoogle, users, appplications, memoryLogger);
+	await api.installPlugins(authentication, authenticationGoogle, users, appplications, memoryLogger, payment);
 
 	api.handle("get", "/sso", async function (inputs, session) {
 		// Get that the application exists.
@@ -181,12 +201,26 @@ const PATH_STATIC = options.static;
 		};
 	});
 
-	api.handle("post", "/reset/request", async (inputs) => {
+	api.handle("post", "/password-reset", async (inputs) => {
 		const maybeUser = await users.getFromEmail(inputs.uid, /*allowNull*/ true);
 		if (maybeUser === null) {
 			// Don't return any error code if the account does not exists.
 			return;
 		}
+
+		// Limit the number of password reset attempt for an interval of 1h.
+		if (maybeUser.getLastPasswordResetTimestamp() + 1 * 3600 * 1000 > Date.now()) {
+			return;
+		}
+
+		await users.update(
+			maybeUser.getUid(),
+			(user) => {
+				user.setLastPasswordReset();
+				return user;
+			},
+			/*silent*/ true,
+		);
 
 		// Check if there is a valid password, if not create a random one.
 		let maybePassword = maybeUser.getPassword();
@@ -196,8 +230,7 @@ const PATH_STATIC = options.static;
 		}
 		Exception.assert(maybePassword, "At that point there must be a valid password.");
 
-		const template = new Template(TemplateResetPassword);
-		const content = template.process({
+		await emails.sendResetPassword(inputs.uid, {
 			link:
 				ConfigBackend.url +
 				"/reset/" +
@@ -205,14 +238,9 @@ const PATH_STATIC = options.static;
 				"/" +
 				encodeURIComponent(maybePassword),
 		});
-
-		await mail.send(inputs.uid, "Password Reset", {
-			format: "html",
-			content: content,
-		});
 	});
 
-	api.handle("post", "/reset/password", async function (inputs) {
+	api.handle("post", "/password-change", async function (inputs) {
 		const maybeUser = await users.get(inputs.uid, /*allowNull*/ true);
 		if (maybeUser === null) {
 			throw this.httpError(401, "Unauthorized");

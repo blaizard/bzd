@@ -1,32 +1,18 @@
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 
 bzd_nodejs_library(
-    name = "server",
+    name = "webhook",
     srcs = [
-        "api.json",
-        "server.mjs",
+        "webhook.mjs",
     ],
+    apis = ["api.json"],
+    packages = {
+        "stripe": "14.12.0",
+    },
     visibility = ["//visibility:public"],
     deps = [
         "//nodejs/core:exception",
         "//nodejs/core:log",
         "//nodejs/core/http:client",
-    ],
-)
-
-bzd_nodejs_library(
-    name = "client",
-    srcs = [
-        "api.json",
-        "client.mjs",
-        "client.vue",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//nodejs:vue",
-        "//nodejs/core:exception",
-        "//nodejs/core:log",
-        "//nodejs/vue/components/form",
-        "//nodejs/vue/directives:loading",
     ],
 )
