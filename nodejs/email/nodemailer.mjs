@@ -12,7 +12,7 @@ export default class NodeMailerEmail extends Email {
 		this.from = from;
 		this.transporter = NodeMailer.createTransport(transportOptions);
 
-		Log.info("Using nodemailer for {} with host: {}.", from, transportOptions.host);
+		Log.info("Using nodemailer for '{}' with host '{}'.", from, transportOptions.host);
 	}
 
 	/// Send an email

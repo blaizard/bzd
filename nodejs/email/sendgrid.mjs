@@ -15,7 +15,7 @@ export default class Sendgrid extends Email {
 		this.key = options.key;
 		this.from = from;
 
-		Log.info("Using sendgrid for {}.", from);
+		Log.info("Using sendgrid for '{}'.", from);
 	}
 
 	/// Send an email

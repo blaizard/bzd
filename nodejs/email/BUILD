@@ -9,6 +9,7 @@ bzd_nodejs_library(
     deps = [
         ":nodemailer",
         ":sendgrid",
+        ":stub",
         "//nodejs/core:validation",
     ],
 )
@@ -39,5 +40,17 @@ bzd_nodejs_library(
         "//nodejs/core:exception",
         "//nodejs/core:log",
         "//nodejs/core/http:client",
+    ],
+)
+
+bzd_nodejs_library(
+    name = "stub",
+    srcs = [
+        "email.mjs",
+        "stub.mjs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//nodejs/core:log",
     ],
 )
