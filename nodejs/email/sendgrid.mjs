@@ -1,18 +1,21 @@
-import ExceptionFactory from "../core/exception.mjs";
-import HttpClient from "../core/http/client.mjs";
+import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
+import LogFactory from "#bzd/nodejs/core/log.mjs";
+import HttpClient from "#bzd/nodejs/core/http/client.mjs";
 
 import Email from "./email.mjs";
 
 const Exception = ExceptionFactory("email", "sendgrid");
+const Log = LogFactory("email", "sendgrid");
 
 export default class Sendgrid extends Email {
-	constructor(options) {
+	constructor(from, options) {
 		super();
 
 		Exception.assert("key" in options, "API key must be set.");
-		Exception.assert("from" in options, "From address must be set.");
 		this.key = options.key;
-		this.from = options.from;
+		this.from = from;
+
+		Log.info("Using sendgrid for {}.", from);
 	}
 
 	/// Send an email

@@ -1,10 +1,13 @@
 {
     "email": {
         "from": "hello@dummy.com",
-        "password": "1234",
-        "port": 587,
-        "smtp": "smtp.dummy.com",
-        "user": "hello"
+        "options": {
+            "password": "1234",
+            "port": 587,
+            "smtp": "smtp.dummy.com",
+            "user": "hello"
+        },
+        "type": "nodemailer"
     },
     "kvs": {
         "accounts": {

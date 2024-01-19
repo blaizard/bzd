@@ -1,6 +1,19 @@
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 
 bzd_nodejs_library(
+    name = "make_from_config",
+    srcs = [
+        "make_from_config.mjs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":nodemailer",
+        ":sendgrid",
+        "//nodejs/core:validation",
+    ],
+)
+
+bzd_nodejs_library(
     name = "nodemailer",
     srcs = [
         "email.mjs",
@@ -10,6 +23,9 @@ bzd_nodejs_library(
         "nodemailer": "",
     },
     visibility = ["//visibility:public"],
+    deps = [
+        "//nodejs/core:log",
+    ],
 )
 
 bzd_nodejs_library(

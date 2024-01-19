@@ -3,6 +3,7 @@ import { program } from "commander";
 import API from "#bzd/nodejs/core/api/server.mjs";
 import APIv1 from "#bzd/api.json" assert { type: "json" };
 import kvsMakeFromConfig from "#bzd/nodejs/db/key_value_store/make_from_config.mjs";
+import emailMakeFromConfig from "#bzd/nodejs/email/make_from_config.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import Authentication from "#bzd/nodejs/core/authentication/session/server.mjs";
@@ -17,7 +18,7 @@ import Config from "#bzd/apps/accounts/config.json" assert { type: "json" };
 import ConfigBackend from "#bzd/apps/accounts/backend/config.json" assert { type: "json" };
 import MemoryLogger from "#bzd/apps/accounts/backend/logger/memory/memory.mjs";
 import StripePaymentWebhook from "#bzd/nodejs/payment/stripe/webhook.mjs";
-import EmailsManager from "#bzd/apps/accounts/backend/emails/manager.mjs";
+import EmailManager from "#bzd/apps/accounts/backend/email/manager.mjs";
 
 const Exception = ExceptionFactory("backend");
 const Log = LogFactory("backend");
@@ -44,9 +45,10 @@ const PATH_STATIC = options.static;
 
 	const keyValueStore = await kvsMakeFromConfig(ConfigBackend.kvs.accounts);
 	const keyValueStoreRegister = await kvsMakeFromConfig(ConfigBackend.kvs.register);
+	const email = await emailMakeFromConfig(ConfigBackend.email);
 
 	// Set-up the mail object
-	const emails = new EmailsManager(ConfigBackend.email.from, ConfigBackend.email, options.test);
+	const emails = new EmailManager(email);
 
 	// Users
 	const users = new Users(keyValueStore);

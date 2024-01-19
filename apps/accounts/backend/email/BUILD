@@ -2,7 +2,7 @@ load("@bzd_lib//embed:defs.bzl", "bzd_embed")
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 
 bzd_nodejs_library(
-    name = "emails",
+    name = "email",
     srcs = [
         "manager.mjs",
         ":reset_password",
@@ -14,7 +14,6 @@ bzd_nodejs_library(
         "//nodejs/core:exception",
         "//nodejs/core:log",
         "//nodejs/core:template",
-        "//nodejs/email:nodemailer",
     ],
 )
 

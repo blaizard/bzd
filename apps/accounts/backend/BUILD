@@ -32,7 +32,7 @@ bzd_nodejs_binary(
     ],
     deps = [
         "//apps/accounts/backend/applications",
-        "//apps/accounts/backend/emails",
+        "//apps/accounts/backend/email",
         "//apps/accounts/backend/logger/memory",
         "//apps/accounts/backend/tests:test_data",
         "//apps/accounts/backend/users",
@@ -41,6 +41,7 @@ bzd_nodejs_binary(
         "//nodejs/core/authentication/session:server",
         "//nodejs/core/http:server",
         "//nodejs/db/key_value_store:make_from_config",
+        "//nodejs/email:make_from_config",
         "//nodejs/payment/stripe:webhook",
         "//nodejs/utils:result",
     ],
