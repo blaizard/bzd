@@ -56,6 +56,6 @@ export default async function makeFromConfig(config) {
 			);
 			return await KeyValueStoreMongodb.make(config.uri, config.options);
 		default:
-			Exception.unreachable("Unsupported key value store type: '{}'.", type);
+			Exception.unreachable("Unsupported key value store type: '{}'.", config.type);
 	}
 }
