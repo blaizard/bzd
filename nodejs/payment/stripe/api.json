@@ -1,46 +1,9 @@
 {
-    "/payment/stripe/confirm": {
+    "/stripe": {
         "post": {
-            "authentication": true,
-            "documentation": "Confirm payment.",
+            "documentation": "Webhook for payment intent.",
             "request": {
-                "type": "json",
-                "validation": {
-                    "id": "mandatory",
-                    "metadata": ""
-                }
-            }
-        }
-    },
-    "/payment/stripe/intent": {
-        "post": {
-            "authentication": true,
-            "documentation": "Make a payment intent.",
-            "request": {
-                "type": "json",
-                "validation": {
-                    "amount": "mandatory",
-                    "metadata": ""
-                }
-            },
-            "response": {
-                "type": "json",
-                "validation": {
-                    "id": "mandatory",
-                    "secret": "mandatory"
-                }
-            }
-        }
-    },
-    "/payment/stripe/metadata": {
-        "get": {
-            "documentation": "Get the public key.",
-            "response": {
-                "type": "json",
-                "validation": {
-                    "currency": "mandatory",
-                    "pubkey": "mandatory"
-                }
+                "type": "raw"
             }
         }
     }

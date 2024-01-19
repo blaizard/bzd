@@ -14,6 +14,14 @@ This web application deals with the following:
 bazel run //apps/accounts/backend --config=dev -- --test
 ```
 
+### Test Stripe
+
+```bash
+stripe listen --forward-to http://localhost:8080/api/v1/stripe
+stripe trigger payment_intent.succeeded
+stripe trigger checkout.session.completed
+```
+
 ### Serverless
 
 This demonstrates server-less authentication.
