@@ -1,5 +1,6 @@
 import NodeMailer from "#bzd/nodejs/email/nodemailer.mjs";
 import SendGrid from "#bzd/nodejs/email/sendgrid.mjs";
+import Stub from "#bzd/nodejs/email/stub.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import Validation from "#bzd/nodejs/core/validation.mjs";
 
@@ -23,16 +24,26 @@ export default async function makeFromConfig(config) {
 				config,
 			);
 			return new NodeMailer(config.from, config.options);
-		case "sendgrid":
-			validateConfig(
-				{
-					type: "mandatory",
-					from: "mandatory",
-					options: "",
-				},
-				config,
-			);
-			return new SendGrid(config.from, config.options);
+			case "sendgrid":
+				validateConfig(
+					{
+						type: "mandatory",
+						from: "mandatory",
+						options: "",
+					},
+					config,
+				);
+				return new SendGrid(config.from, config.options);
+				case "stub":
+					validateConfig(
+						{
+							type: "mandatory",
+							from: "mandatory",
+							options: "",
+						},
+						config,
+					);
+					return new Stub(config.from, config.options);
 		default:
 			Exception.unreachable("Unsupported email type: '{}'.", config.type);
 	}

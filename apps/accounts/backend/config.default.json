@@ -1,13 +1,7 @@
 {
     "email": {
         "from": "hello@dummy.com",
-        "options": {
-            "password": "1234",
-            "port": 587,
-            "smtp": "smtp.dummy.com",
-            "user": "hello"
-        },
-        "type": "nodemailer"
+        "type": "stub"
     },
     "kvs": {
         "accounts": {
@@ -20,8 +14,8 @@
         }
     },
     "payment": {
-        "secretEndpoint": "",
-        "secretKey": "",
+        "secretEndpoint": "1234",
+        "secretKey": "abc",
         "type": "stripe"
     },
     "url": "http://localhost:8080"
