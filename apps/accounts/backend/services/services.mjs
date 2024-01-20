@@ -37,49 +37,14 @@ export default class Services {
 	}
 
 	/// Create the service UID from the name and the service provider.
-	static _makeServiceUid(name, serviceProvider) {
-		return serviceProvider.namespace.join(".") + "." + name;
-	}
-
-	/// Run a process and return a log.
-	static async _runProcess(uid, name, process) {
-		const timestampStart = Services._getTimestamp();
-		let error = null;
-		try {
-			Log.info("Running '{}.{}'...", uid, name);
-			await process();
-			Log.info("Completed '{}.{}'.", uid, name);
-		} catch (e) {
-			Log.error("Error '{}.{}': {}.", uid, name, e);
-			error = e;
+	_makeServiceUid(name, provider) {
+		if (name === null) {
+			let counter = 0;
+			do {
+				name = (++counter).toString();
+			} while (this._makeServiceUid(name, provider) in this.services);
 		}
-
-		return {
-			error: error,
-			timestampStart: timestampStart,
-			timestampStop: Services._getTimestamp(),
-		};
-	}
-
-	static _saveProcessRecord(service, name, processResult) {
-		/// Check the maximum number of logs for this enty.
-		const maxLogs = service.provider.processes[name].options.maxLogs;
-		Exception.assert(typeof maxLogs == "number", "Maxlogs must be a number, instead: {}.", maxLogs);
-
-		service.records[name] ??= {
-			executions: 0,
-			errors: 0,
-			logs: [],
-		};
-
-		++service.records[name].executions;
-		if (processResult.error) {
-			++service.records[name].errors;
-		}
-		service.records[name].logs.unshift(processResult);
-		if (service.records[name].logs.length > maxLogs) {
-			service.records[name].logs.splice(maxLogs);
-		}
+		return provider.namespace.join(".") + "." + name;
 	}
 
 	/// Run a certain process and save the logs.
@@ -88,19 +53,84 @@ export default class Services {
 	/// \param name The name of the process.
 	/// \return true if succeed, false otherwise.
 	async runProcess(uid, name) {
-		const object = this.services[uid].provider.processes[name];
-		const processResult = await Services._runProcess(uid, name, object.process);
-		Services._saveProcessRecord(this.services[uid], name, processResult);
-		return processResult.error === null;
+		const service = this.services[uid];
+		const object = service.provider.processes[name];
+		service.records[name] ??= {
+			executions: 0,
+			errors: 0,
+			status: Services.Status.idle,
+			logs: [],
+		};
+		const record = service.records[name];
+
+		let log = {
+			error: null,
+			timestampStart: Services._getTimestamp(),
+			timestampStop: 0,
+		};
+
+		// Check the maximum number of logs for this enty.
+		const maxLogs = object.options.maxLogs;
+		Exception.assert(typeof maxLogs == "number", "Maxlogs must be a number, instead: {}.", maxLogs);
+
+		// Insert the new log already.
+		record.logs.unshift(log);
+		if (record.logs.length > maxLogs) {
+			record.logs.splice(maxLogs);
+		}
+
+		try {
+			Log.debug("Running '{}.{}'...", uid, name);
+			++record.executions;
+			record.status = Services.Status.running;
+			await object.process();
+			record.status = Services.Status.idle;
+			Log.debug("Completed '{}.{}'.", uid, name);
+		} catch (e) {
+			Log.error("Error '{}.{}': {}.", uid, name, e);
+			++record.errors;
+			record.status = Services.Status.error;
+			log.error = e;
+		} finally {
+			log.timestampStop = Services._getTimestamp();
+		}
+
+		return log.error === null;
+	}
+
+	/// Run a time triggered process.
+	///
+	/// \param uid The uid corresponding to the service.
+	/// \param name The name of the process.
+	/// \param periodS The recurrency period.
+	async runTimeTriggeredProcess(uid, name, periodS) {
+		const service = this.services[uid];
+		const object = service.provider.processes[name];
+
+		if (!(await this.runProcess(uid, name))) {
+			switch (object.options.policy) {
+				case Services.Policy.ignore:
+					break;
+				case Services.Policy.restart:
+					break;
+			}
+		}
+
+		// Re-run, if name is not present it means that the service was stopped.
+		if (name in service.instances) {
+			service.instances[name] = setTimeout(async () => {
+				await this.runTimeTriggeredProcess(uid, name, periodS);
+			}, periodS * 1000);
+		}
 	}
 
 	/// Register a service.
 	///
-	/// \param name The name of the service.
 	/// \param provider The service provider for this service.
+	/// \param name The name of the service.
 	/// \return The UID of the service.
-	register(name, provider) {
-		const uid = Services._makeServiceUid(name, provider);
+	register(provider, name = null) {
+		const uid = this._makeServiceUid(name, provider);
 		Exception.assert(!(uid in this.services), "Service '{}' is already registered.", uid);
 
 		this.services[uid] = {
@@ -110,6 +140,7 @@ export default class Services {
 			//	 <name>: {
 			//      executions: 0,
 			//      errors: 0,
+			//      status: Services.Status.idle,
 			//      logs: [],
 			//   }
 			// }
@@ -142,6 +173,7 @@ export default class Services {
 			uid,
 			Object.keys(service.instances),
 		);
+		Log.info("Starting '{}'.", uid);
 
 		service.state.timestampStart = Services._getTimestamp();
 		service.state.status = Services.Status.starting;
@@ -162,23 +194,46 @@ export default class Services {
 			Log.info("Starting '{}.{}' every {}s with a delay of {}s.", uid, name, object.options.periodS, delayS);
 
 			service.instances[name] = setTimeout(async () => {
-				if (!(await this.runProcess(uid, name))) {
-					switch (object.options.policy) {
-						case Services.Policy.ignore:
-							break;
-						case Services.Policy.restart:
-							break;
-					}
-				}
+				await this.runTimeTriggeredProcess(uid, name, object.options.periodS);
 			}, delayS * 1000);
 		}
 
 		service.state.status = Services.Status.running;
+		return true;
 	}
 
+	/// Stop a specific service.
+	async stopService(uid) {
+		const service = this.services[uid];
+		service.state.status = Services.Status.stopping;
+		for (const [name, instance] of Object.entries(service.instances)) {
+			clearTimeout(instance);
+			Log.info("Stopped '{}.{}'.", uid, name);
+		}
+		service.instances = {};
+
+		// Start the stop processes if any.
+		for (const [name, _] of service.provider.getStopProcesses()) {
+			await this.runProcess(uid, name);
+		}
+
+		service.state.timestampStop = Services._getTimestamp();
+		service.state.status = Services.Status.idle;
+
+		Log.info("Stopped '{}'.", uid);
+	}
+
+	/// Start all services.
 	async start() {
 		for (const uid of Object.keys(this.services)) {
 			await this.startService(uid);
+		}
+	}
+
+	/// Stop all services.
+	async stop() {
+		for (const uid of Object.keys(this.services)) {
+			await this.stopService(uid);
 		}
 	}
 
@@ -193,10 +248,42 @@ export default class Services {
 
 	/// Get a specific service given it's UID.
 	///
+	/// \param uid The service UID.
 	/// \return The service state.
 	getService(uid) {
 		Exception.assert(uid in this.services, "The service '{}' is not registered.", uid);
 		return this.services[uid].state;
+	}
+
+	/// Get all the processes of a specific service.
+	///
+	/// \param uid The service UID.
+	/// \return A tuple of process name and record.
+	*getProcesses(uid) {
+		Exception.assert(uid in this.services, "The service '{}' is not registered.", uid);
+		for (const [name, record] of Object.entries(this.services[uid].records)) {
+			yield [name, record];
+		}
+	}
+
+	/// Get a specific process record.
+	///
+	/// \param uid The service UID.
+	/// \param name The process name.
+	/// \return The process record.
+	getProcess(uid, name) {
+		Exception.assert(uid in this.services, "The service '{}' is not registered.", uid);
+		Exception.assert(name in this.services[uid].records, "The process '{}' is part of service '{}'.", name, uid);
+		return this.services[uid].records[name];
+	}
+
+	/// Install services from all the objects passed into argument.
+	async installServices(...objects) {
+		for (const object of objects) {
+			if (typeof object.installService == "function") {
+				await object.installService(this);
+			}
+		}
 	}
 
 	async installAPI(api) {

@@ -19,6 +19,7 @@ import ConfigBackend from "#bzd/apps/accounts/backend/config.json" assert { type
 import MemoryLogger from "#bzd/apps/accounts/backend/logger/memory/memory.mjs";
 import StripePaymentWebhook from "#bzd/nodejs/payment/stripe/webhook.mjs";
 import EmailManager from "#bzd/apps/accounts/backend/email/manager.mjs";
+import Services from "#bzd/apps/accounts/backend/services/services.mjs";
 
 const Exception = ExceptionFactory("backend");
 const Log = LogFactory("backend");
@@ -58,6 +59,9 @@ const PATH_STATIC = options.static;
 
 	// Set-up the web server
 	const web = new HttpServer(PORT);
+
+	// Services
+	const services = new Services();
 
 	// ---- Authentication ----
 
@@ -259,6 +263,11 @@ const PATH_STATIC = options.static;
 		const testData = new TestData(users, appplications);
 		await testData.install();
 	}
+
+	// ---- start services ----
+
+	await services.installServices(payment);
+	await services.start();
 
 	// ---- serve ----
 
