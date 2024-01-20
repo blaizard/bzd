@@ -34,6 +34,7 @@ bzd_nodejs_binary(
         "//apps/accounts/backend/applications",
         "//apps/accounts/backend/email",
         "//apps/accounts/backend/logger/memory",
+        "//apps/accounts/backend/services",
         "//apps/accounts/backend/tests:test_data",
         "//apps/accounts/backend/users",
         "//nodejs/core/api:server",

@@ -7,9 +7,7 @@ bzd_nodejs_library(
         "services.mjs",
     ],
     apis = ["api.json"],
-    visibility = [
-        "//apps/accounts/backend:__subpackages__",
-    ],
+    visibility = ["//visibility:public"],
     deps = [
         "//nodejs/core:exception",
         "//nodejs/core:log",

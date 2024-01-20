@@ -4,6 +4,26 @@ import Services from "#bzd/apps/accounts/backend/services/services.mjs";
 
 const Exception = ExceptionFactory("test", "services");
 
+async function waitFor(callback, timeoutS = 5) {
+	return new Promise((resolve, reject) => {
+		let instances = {
+			valid: null,
+			invalid: null,
+		};
+		instances.valid = setInterval(() => {
+			if (callback()) {
+				clearTimeout(instances.valid);
+				clearTimeout(instances.invalid);
+				resolve();
+			}
+		}, 1);
+		instances.invalid = setTimeout(() => {
+			clearTimeout(instances.valid);
+			reject("Timeout");
+		}, timeoutS * 1000);
+	});
+}
+
 describe("Services", () => {
 	let startCounter = 0;
 	let stopCounter = 0;
@@ -82,10 +102,27 @@ describe("Services", () => {
 			await services.start();
 			const state = services.getService(uid);
 			Exception.assertEqual(state.status, Services.Status.running);
+			Exception.assertEqual(startCounter, 1);
+			Exception.assertEqual(stopCounter, 0);
 		});
 
-		//it("wait for execution", async () => {
-		//    await services.start();
-		//});
+		it("wait for execution", async () => {
+			await waitFor(() => {
+				return timeTriggeredCounter1 > 1 && timeTriggeredCounter2 > 0;
+			});
+			const record1 = services.getProcess(uid, "1");
+			Exception.assert(record1.executions >= 1);
+			Exception.assertEqual(record1.errors, 0);
+
+			const record2 = services.getProcess(uid, "2");
+			Exception.assert(record2.executions >= 1);
+			Exception.assert(record2.errors >= 1);
+		});
+
+		it("stop", async () => {
+			await services.stop();
+			Exception.assertEqual(startCounter, 1);
+			Exception.assertEqual(stopCounter, 1);
+		});
 	});
 });

@@ -1,6 +1,7 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import Stripe from "stripe";
+import ServiceProvider from "#bzd/apps/accounts/backend/services/provider.mjs";
 
 const Exception = ExceptionFactory("payment", "stripe");
 const Log = LogFactory("payment", "stripe");
@@ -22,6 +23,8 @@ export default class StripePaymentWebhook {
 				secretEndpoint: null,
 				/// callbackPayment(ref, email, products, maybeSubscription: Subscription = null)
 				callbackPayment: null,
+				/// Period to perform a sync with the server.
+				syncPeriodS: 6 * 3600,
 			},
 			options,
 		);
@@ -64,6 +67,24 @@ export default class StripePaymentWebhook {
 				// Ignore.
 			}
 		});
+	}
+
+	async installService(service) {
+		Log.info("Installing 'Stripe' service");
+
+		const provider = new ServiceProvider("payment", "stripe");
+		provider.addTimeTriggeredProcess(
+			"sync",
+			async () => {
+				await this.sync(this.options.syncPeriodS * 2);
+			},
+			{
+				periodS: this.options.syncPeriodS,
+				// It must start at the very begining to minimize the delay when the server restarts.
+				delayS: 0,
+			},
+		);
+		service.register(provider);
 	}
 
 	async getProduct(productId) {
@@ -154,7 +175,7 @@ export default class StripePaymentWebhook {
 	}
 
 	/// Trigger all non-processed payment, if any since a certain period in second until now.
-	async trigger(periodS) {
+	async sync(periodS) {
 		const now = Math.floor(Date.now() / 1000);
 		const since = now - periodS;
 
