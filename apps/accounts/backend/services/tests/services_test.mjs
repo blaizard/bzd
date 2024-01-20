@@ -83,7 +83,7 @@ describe("Services", () => {
 		});
 
 		it("register", () => {
-			services.register("myservice", provider);
+			services.register(provider);
 		});
 	});
 
