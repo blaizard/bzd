@@ -24,26 +24,26 @@ export default async function makeFromConfig(config) {
 				config,
 			);
 			return new NodeMailer(config.from, config.options);
-			case "sendgrid":
-				validateConfig(
-					{
-						type: "mandatory",
-						from: "mandatory",
-						options: "",
-					},
-					config,
-				);
-				return new SendGrid(config.from, config.options);
-				case "stub":
-					validateConfig(
-						{
-							type: "mandatory",
-							from: "mandatory",
-							options: "",
-						},
-						config,
-					);
-					return new Stub(config.from, config.options);
+		case "sendgrid":
+			validateConfig(
+				{
+					type: "mandatory",
+					from: "mandatory",
+					options: "",
+				},
+				config,
+			);
+			return new SendGrid(config.from, config.options);
+		case "stub":
+			validateConfig(
+				{
+					type: "mandatory",
+					from: "mandatory",
+					options: "",
+				},
+				config,
+			);
+			return new Stub(config.from, config.options);
 		default:
 			Exception.unreachable("Unsupported email type: '{}'.", config.type);
 	}

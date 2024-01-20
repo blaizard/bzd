@@ -11,6 +11,6 @@ export default class StubEmail extends Email {
 	}
 
 	async _sendImpl(toList, subject, data) {
-        Log.info("Sending email '{}' to {}", subject, toList.join(", "));
+		Log.info("Sending email '{}' to {}", subject, toList.join(", "));
 	}
 }
