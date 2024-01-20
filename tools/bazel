@@ -51,13 +51,13 @@ if __name__== "__main__":
 	# Build the full path of bazelisk
 	bazelDirectory = os.path.dirname(os.path.realpath(__file__))
 	workspaceDirectory = os.path.dirname(bazelDirectory)
-	bazeliskPath = os.path.join(bazelDirectory, "bazelisk")
+	osAndArchitecture = getOSAndArchitecture()
+	bazeliskPath = os.path.join(bazelDirectory, f"bazelisk_{osAndArchitecture}")
 
 	# If bazel is not installed / available
 	if not os.path.exists(bazeliskPath):
 
 		# Check the bazename of bazelisk
-		OSAndArchitecture = getOSAndArchitecture()
 		OSAndArchitectureToBasename = {
 			"darwin_x86_64": "bazelisk-darwin-amd64",
 			"darwin_arm64": "bazelisk-darwin-arm64",
@@ -65,9 +65,9 @@ if __name__== "__main__":
 			"linux_arm64": "bazelisk-linux-arm64",
 			"windows_x86_64": "bazelisk-windows-amd64.exe"
 		}
-		basename = OSAndArchitectureToBasename[OSAndArchitecture]
+		basename = OSAndArchitectureToBasename[osAndArchitecture]
 
-		url = "https://github.com/bazelbuild/bazelisk/releases/download/v1.15.0/{}".format(basename)
+		url = "https://github.com/bazelbuild/bazelisk/releases/download/v1.19.0/{}".format(basename)
 		print(f"No bazel binary detected, downloading bazelisk from {url}...", flush=True)
 		with urllib.request.urlopen(url) as response, open(bazeliskPath, "wb") as f:
 			shutil.copyfileobj(response, f)
