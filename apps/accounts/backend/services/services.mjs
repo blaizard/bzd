@@ -4,112 +4,199 @@ import LogFactory from "#bzd/nodejs/core/log.mjs";
 const Exception = ExceptionFactory("services");
 const Log = LogFactory("services");
 
-class ServiceProvider {
-	constructor() {
-		this.service_ = {
-			instances: {},
-			generator: generator,
-			process: process,
-			options: {},
-		};
-	}
-
-	serviceAdd(name, process) {
-		Exception.assert(!(name in this.service_.instances), "The service name '{}' is already registered.", name);
-		this.service_.instances[name] = process;
-	}
-
-	get service() {
-		return {
-			generator: async () => {
-				return Object.entries(this.instances);
-			},
-			process: async(name, data),
-		};
-	}
-}
-
+/// This class is a manager of service, that start, stop and schedule them.
+///
+/// A service is an entity that has a start, stop and one or more time triggered methods.
 export default class Services {
+	/// Status of a service.
+	/// Emulation of an enum type.
+	static Status = Object.freeze({
+		idle: "idle",
+		starting: "starting",
+		running: "running",
+		stoping: "stoping",
+		error: "error",
+	});
+
+	/// Type of polcies, what action is triggered in case of error.
+	/// Emulation of an enum type.
+	static Policy = Object.freeze({
+		/// No operation.
+		ignore: "ignore",
+		/// Restart the whole
+		restart: "restart",
+	});
+
 	constructor() {
-		this.schema = {};
-		this.metadata = {};
-		this.instances = {};
+		this.services = {};
 	}
 
-	register(type, generator, process, options = {}) {
-		Exception.assert(!(type in this.schema), "Service type '{}' is already registered.", type);
-
-		this.schema[type] = {
-			generator: generator,
-			process: process,
-			options: Object.assign(
-				{
-					/// Period in s at which this service should run
-					periodS: 24 * 3600,
-				},
-				options,
-			),
-		};
-
-		this.metadata[type] = {
-			status: "not started",
-			lastErrors: 0,
-			lastStarted: 0,
-			lastDuration: 0,
-			lastProcessed: 0,
-		};
-
-		Log.info("Registering service '{}'.", type);
+	/// Get the current timestamp in ms.
+	static _getTimestamp() {
+		return Date.now();
 	}
 
-	start() {
-		for (const type in this.schema) {
-			Exception.assert(!(type in this.instances), "Service '{}' already started.", type);
-
-			this.instances[type] = setTimeout(
-				async () => {
-					await this._process(type);
-				},
-				Math.random() * this.schema[type].options.periodS * 1000,
-			);
-
-			Log.info("Starting service '{}' every {}s", type, this.schema[type].options.periodS);
-		}
+	/// Create the service UID from the name and the service provider.
+	static _makeServiceUid(name, serviceProvider) {
+		return serviceProvider.namespace.join(".") + "." + name;
 	}
 
-	async _process(type) {
-		let metadata = this.metadata[type];
-		metadata.status = "running";
-		metadata.lastErrors = 0;
-		metadata.lastProcessed = 0;
-		metadata.lastStarted = Date.now();
-
+	/// Run a process and return a log.
+	static async _runProcess(uid, name, process) {
+		const timestampStart = Services._getTimestamp();
+		let error = null;
 		try {
-			Log.info("Running service '{}'...", type);
-
-			let it = await this.schema[type].generator();
-			for await (const [name, data] of it) {
-				try {
-					if (await this.schema[type].process(name, data)) {
-						++metadata.lastProcessed;
-					}
-				} catch (e) {
-					Exception.fromError(e).print();
-					++metadata.lastErrors;
-				}
-			}
+			Log.info("Running '{}.{}'...", uid, name);
+			await process();
+			Log.info("Completed '{}.{}'.", uid, name);
 		} catch (e) {
-			Exception.fromError(e).print();
-			++metadata.lastErrors;
-		} finally {
-			metadata.status = "stopped";
-			metadata.lastDuration = Date.now() - metadata.lastStarted;
-			Log.info("Service '{}' completed.", type);
-
-			this.instances[type] = setTimeout(async () => {
-				await this._process(type);
-			}, this.schema[type].options.periodS * 1000);
+			Log.error("Error '{}.{}': {}.", uid, name, e);
+			error = e;
 		}
+
+		return {
+			error: error,
+			timestampStart: timestampStart,
+			timestampStop: Services._getTimestamp(),
+		};
+	}
+
+	static _saveProcessRecord(service, name, processResult) {
+		/// Check the maximum number of logs for this enty.
+		const maxLogs = service.provider.processes[name].options.maxLogs;
+		Exception.assert(typeof maxLogs == "number", "Maxlogs must be a number, instead: {}.", maxLogs);
+
+		service.records[name] ??= {
+			executions: 0,
+			errors: 0,
+			logs: [],
+		};
+
+		++service.records[name].executions;
+		if (processResult.error) {
+			++service.records[name].errors;
+		}
+		service.records[name].logs.unshift(processResult);
+		if (service.records[name].logs.length > maxLogs) {
+			service.records[name].logs.splice(maxLogs);
+		}
+	}
+
+	/// Run a certain process and save the logs.
+	///
+	/// \param uid The uid corresponding to the service.
+	/// \param name The name of the process.
+	/// \return true if succeed, false otherwise.
+	async runProcess(uid, name) {
+		const object = this.services[uid].provider.processes[name];
+		const processResult = await Services._runProcess(uid, name, object.process);
+		Services._saveProcessRecord(this.services[uid], name, processResult);
+		return processResult.error === null;
+	}
+
+	/// Register a service.
+	///
+	/// \param name The name of the service.
+	/// \param provider The service provider for this service.
+	/// \return The UID of the service.
+	register(name, provider) {
+		const uid = Services._makeServiceUid(name, provider);
+		Exception.assert(!(uid in this.services), "Service '{}' is already registered.", uid);
+
+		this.services[uid] = {
+			provider: provider,
+			instances: {},
+			// {
+			//	 <name>: {
+			//      executions: 0,
+			//      errors: 0,
+			//      logs: [],
+			//   }
+			// }
+			records: {},
+			state: {
+				status: Services.Status.idle,
+				/// Timestamp of the last start.
+				timestampStart: 0,
+				/// Timestamp of the last stop.
+				timestampStop: 0,
+			},
+		};
+
+		Log.info("Registering service '{}'.", uid);
+		return uid;
+	}
+
+	/// Start a specific service.
+	async startService(uid) {
+		const service = this.services[uid];
+		Exception.assert(
+			service.state.status === Services.Status.idle,
+			"Service '{}' already started, status: '{}'.",
+			uid,
+			service.state.status,
+		);
+		Exception.assert(
+			!service.instances.length,
+			"Some processes from '{}' are already started: {}.",
+			uid,
+			Object.keys(service.instances),
+		);
+
+		service.state.timestampStart = Services._getTimestamp();
+		service.state.status = Services.Status.starting;
+
+		// Start the start processes if any.
+		for (const [name, _] of service.provider.getStartProcesses()) {
+			if (!(await this.runProcess(uid, name))) {
+				service.state.timestampStop = Services._getTimestamp();
+				service.state.status = Services.Status.error;
+				return false;
+			}
+		}
+
+		// Start the time triggered processes if any.
+		for (const [name, object] of service.provider.getTimeTriggeredProcesses()) {
+			const delayS =
+				object.options.delayS === null ? Math.floor(Math.random() * object.options.periodS) : object.options.delayS;
+			Log.info("Starting '{}.{}' every {}s with a delay of {}s.", uid, name, object.options.periodS, delayS);
+
+			service.instances[name] = setTimeout(async () => {
+				if (!(await this.runProcess(uid, name))) {
+					switch (object.options.policy) {
+						case Services.Policy.ignore:
+							break;
+						case Services.Policy.restart:
+							break;
+					}
+				}
+			}, delayS * 1000);
+		}
+
+		service.state.status = Services.Status.running;
+	}
+
+	async start() {
+		for (const uid of Object.keys(this.services)) {
+			await this.startService(uid);
+		}
+	}
+
+	/// List all the services available and their states.
+	///
+	/// \return A tuple of the UID and the state.
+	*getServices() {
+		for (const [uid, service] of Object.entries(this.services)) {
+			yield [uid, service.state];
+		}
+	}
+
+	/// Get a specific service given it's UID.
+	///
+	/// \return The service state.
+	getService(uid) {
+		Exception.assert(uid in this.services, "The service '{}' is not registered.", uid);
+		return this.services[uid].state;
 	}
 
 	async installAPI(api) {
