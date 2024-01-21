@@ -22,6 +22,7 @@ export default class StripePaymentWebhook {
 				/// The endpoint secret.
 				secretEndpoint: null,
 				/// callbackPayment(ref, email, products, maybeSubscription: Subscription = null)
+				/// \return true if it was processed, false otherwise.
 				callbackPayment: null,
 				/// Period to perform a sync with the server.
 				syncPeriodS: 6 * 3600,
@@ -76,7 +77,7 @@ export default class StripePaymentWebhook {
 		provider.addTimeTriggeredProcess(
 			"sync",
 			async () => {
-				await this.sync(this.options.syncPeriodS * 2);
+				return await this.sync(this.options.syncPeriodS * 2);
 			},
 			{
 				periodS: this.options.syncPeriodS,
@@ -96,17 +97,20 @@ export default class StripePaymentWebhook {
 		return product;
 	}
 
+	/// Process a given checkout session.
+	///
+	/// Return true if it was processed, false otherwise.
 	async processCheckoutSession(checkoutSession) {
 		// Ignore if there is an invoice, it will be handled by the invoice instead.
 		if (checkoutSession.invoice) {
-			return;
+			return false;
 		}
 
 		const reference = checkoutSession.payment_intent;
 
 		/// If it is already processed, ignore.
 		if (this.processed.has(reference)) {
-			return;
+			return false;
 		}
 
 		const email = checkoutSession.customer_details.email;
@@ -122,17 +126,20 @@ export default class StripePaymentWebhook {
 			products.push(product);
 		}
 
-		await this.options.callbackPayment(reference, email, products);
+		const isProcessed = await this.options.callbackPayment(reference, email, products);
 		this.processed.add(reference);
+		return isProcessed;
 	}
 
 	/// Process a given invoice, and retrieve its email, product list and recurrency.
+	///
+	/// Return true if it was processed, false otherwise.
 	async processInvoice(invoice) {
 		const reference = invoice.payment_intent;
 
 		/// If it is already processed, ignore.
 		if (this.processed.has(reference)) {
-			return;
+			return false;
 		}
 
 		const email = invoice.customer_email;
@@ -147,8 +154,9 @@ export default class StripePaymentWebhook {
 			products.push(product);
 		}
 
-		await this.options.callbackPayment(reference, email, products, maybeSubscription);
+		const isProcessed = await this.options.callbackPayment(reference, email, products, maybeSubscription);
 		this.processed.add(reference);
+		return isProcessed;
 	}
 
 	/// Loop through all items of a specific list from the stripe API.
@@ -180,6 +188,7 @@ export default class StripePaymentWebhook {
 		const since = now - periodS;
 
 		// Loop through all invoices first as they contain more data.
+		let invoices = 0;
 		await this._forEachSearch(
 			async (page) => {
 				return await this.stripe.invoices.search({
@@ -187,10 +196,15 @@ export default class StripePaymentWebhook {
 					page: page,
 				});
 			},
-			async (invoice) => await this.processInvoice(invoice),
+			async (invoice) => {
+				if (await this.processInvoice(invoice)) {
+					++invoices;
+				}
+			},
 		);
 
 		// Loop through all checkout sessions.
+		let checkouts = 0;
 		await this._forEachList(
 			async (startingAfter) => {
 				return await this.stripe.checkout.sessions.list({
@@ -201,7 +215,13 @@ export default class StripePaymentWebhook {
 					starting_after: startingAfter,
 				});
 			},
-			async (checkoutSession) => await this.processCheckoutSession(checkoutSession),
+			async (checkoutSession) => {
+				if (await this.processCheckoutSession(checkoutSession)) {
+					++checkouts;
+				}
+			},
 		);
+
+		return { invoices, checkouts };
 	}
 }
