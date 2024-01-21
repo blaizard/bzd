@@ -42,6 +42,12 @@ export default class StripePaymentWebhook {
 		Log.debug("Installing Stripe webhook API.");
 
 		const self = this;
+
+		/// This webhook must be setup in https://dashboard.stripe.com/webhooks
+		///
+		/// The following events must be setup:
+		/// - checkout.session.completed
+		/// - invoice.payment_succeeded
 		api.handle("post", "/stripe", async function (inputs) {
 			// See: https://stripe.com/docs/payments/handling-payment-events
 			const signature = this.getHeader("stripe-signature");
