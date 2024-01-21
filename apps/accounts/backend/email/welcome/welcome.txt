@@ -1,0 +1,10 @@
+Welcome!
+
+Thanks for choosing us! We are happy to see you on board.
+
+To get started, you first need to set-up your account by creating a new password: {{ link }}
+
+If you need some help to get started, please contact our support at {{ support }}.
+
+Best regards,
+bzd.

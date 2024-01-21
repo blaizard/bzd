@@ -108,7 +108,7 @@ class RouterManager {
 				await this.registry.setComponent(
 					configuration.component,
 					route.component,
-					Object.assign({}, args, dispatchOptions.props),
+					Object.assign({}, args, dispatchOptions.props, route.props),
 				);
 			}
 

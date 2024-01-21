@@ -63,6 +63,37 @@ const PATH_STATIC = options.static;
 	// Services
 	const services = new Services();
 
+	// ---- Helpers ----
+
+	/// Generate a reset password like for a specific user.
+	async function createResetPasswordLink(user, newPassword = false) {
+		// Set a password if there is none and timestamp the operation.
+		user = await users.update(
+			maybeUser.getUid(),
+			async (user) => {
+				user.setLastPasswordReset();
+				if (!user.getPassword()) {
+					await user.setRandomPassword();
+				}
+				return user;
+			},
+			/*silent*/ true,
+		);
+
+		const password = user.getPassword();
+		Exception.assert(password, "The user must have a valid password.");
+
+		return (
+			ConfigBackend.url +
+			"/" +
+			(newPassword ? "new" : "reset") +
+			"/" +
+			encodeURIComponent(user.getUid()) +
+			"/" +
+			encodeURIComponent(password)
+		);
+	}
+
 	// ---- Authentication ----
 
 	let authentication = new Authentication({
@@ -161,22 +192,50 @@ const PATH_STATIC = options.static;
 
 	// ---- Payment ----
 
+	/// All products must define in Stripe the following metadata:
+	/// - application: "screen_recorder"
+	/// - duration: <days>
 	const payment = new StripePaymentWebhook(
 		Object.assign(
 			{
-				callbackPayment: async (reference, email, products, maybeSubscription = null) => {
-					// if (reference already processed) return;
+				callbackPayment: async (uid, email, products, maybeSubscription = null) => {
+					// Check the product, make sure valid and get subscription time.
+					let applications = [];
+					for (const product of products) {
+						const application = await appplications.get(product.application);
+						applications.push(application);
+					}
+
+					// Check if email account exists, if not create one.
+					let maybeUser = await users.getFromEmail(email, /*allowNull*/ true);
+					if (maybeUser === null) {
+						maybeUser = await users.create(email);
+						maybeUser = await users.update(maybeUser.getUid(), async (user) => {
+							user.addRole("user");
+							return user;
+						});
+
+						const link = await createResetPasswordLink(maybeUser, /*newPassword*/ true);
+
+						Log.info("Welcome email sent to: {}.", email);
+						await emails.sendWelcome(email, {
+							email: email,
+							support: ConfigBackend.emailSupport,
+							link: link,
+						});
+					}
+
+					// if (uid already processed) return;
 
 					// if (email account exist)
 					//		create one;
 					//		send welcome email and change password instructions;
 
-					// check product, make sure valid and get subscription time.
 					// increase subscription
-					// associate subscription reference if any.
+					// associate subscription uid if any.
 
 					console.log({
-						reference,
+						uid,
 						email,
 						products,
 						maybeSubscription,
@@ -223,28 +282,13 @@ const PATH_STATIC = options.static;
 			return;
 		}
 
-		// Set a password if there is none and timestamp the operation.
-		const user = await users.update(
-			maybeUser.getUid(),
-			async (user) => {
-				user.setLastPasswordReset();
-				if (!user.getPassword()) {
-					await user.setPassword(Math.random().toString());
-				}
-				return user;
-			},
-			/*silent*/ true,
-		);
-
-		// Check if there is a valid password, if not create a random one.
-		const password = user.getPassword();
-		Exception.assert(password, "At that point there must be a valid password.");
+		const link = await createResetPasswordLink(maybeUser);
 
 		Log.info("Reset password email sent to: {}.", inputs.uid);
 		await emails.sendResetPassword(inputs.uid, {
 			email: inputs.uid,
 			support: ConfigBackend.emailSupport,
-			link: ConfigBackend.url + "/reset/" + encodeURIComponent(user.getUid()) + "/" + encodeURIComponent(password),
+			link: link,
 		});
 	});
 

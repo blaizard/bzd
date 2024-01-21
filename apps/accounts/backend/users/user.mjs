@@ -8,8 +8,6 @@ import Bcrypt from "#bzd/nodejs/core/cryptography/bcrypt.mjs";
 const Exception = ExceptionFactory("user");
 const Log = LogFactory("user");
 
-const VALID_SUBSCRIPTIONS_ = ["screen_recorder"];
-
 /// Wrapper class around a user.
 export default class User {
 	constructor(uid, value) {
@@ -73,6 +71,10 @@ export default class User {
 		this.modified.push("password");
 		const hash = await Bcrypt.hash(password);
 		this.value.password = hash;
+	}
+
+	async setRandomPassword() {
+		await this.setPassword(Math.random().toString());
 	}
 
 	async isPasswordEqual(password) {
@@ -139,43 +141,37 @@ export default class User {
 		return this.value.subscriptions || {};
 	}
 
-	/// Get the subscription associated with a specific product.
+	/// Get the subscription associated with a specific application.
 	///
-	/// \product The product ID.
-	getSubscription(product) {
+	/// \param The application UID.
+	getSubscription(application) {
 		const subscriptions = this.getSubscriptions();
-		if (product in subscriptions) {
-			return new Subscription(subscriptions[product]);
+		if (application in subscriptions) {
+			return new Subscription(subscriptions[application]);
 		}
 		return null;
 	}
 
-	addSubscription(product, subscription) {
-		Exception.assert(
-			VALID_SUBSCRIPTIONS_.includes(product),
-			"'{}' is not a valid subscription product, valid products are: {}",
-			product,
-			VALID_SUBSCRIPTIONS_,
-		);
-		this.modified.push("subscriptions(+" + product + ")");
+	addSubscription(application, subscription) {
+		this.modified.push("subscriptions(+" + application + ")");
 
 		if (!("subscriptions" in this.value)) {
 			this.value.subscriptions = {};
 		}
 
-		if (product in this.value.subscriptions) {
-			let original = new Subscription(this.value.subscriptions[product]);
+		if (application in this.value.subscriptions) {
+			let original = new Subscription(this.value.subscriptions[application]);
 			original.add(subscription);
 		} else {
-			this.value.subscriptions[product] = subscription.data();
+			this.value.subscriptions[application] = subscription.data();
 		}
 	}
 
 	setSubscriptions(subscriptions) {
 		let user = User.createDummy();
-		for (const [product, data] of Object.entries(subscriptions)) {
+		for (const [application, data] of Object.entries(subscriptions)) {
 			const subscription = new Subscription(data);
-			user.addSubscription(product, subscription);
+			user.addSubscription(application, subscription);
 		}
 
 		this.value.subscriptions = user.getSubscriptions();
