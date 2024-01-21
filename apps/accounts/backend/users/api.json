@@ -70,6 +70,7 @@
                     "email": "self-basic:r",
                     "last_failed_login": "self-basic:r",
                     "last_login": "self-basic:r",
+                    "last_password_reset": "self-basic:r",
                     "roles": "self-roles:r",
                     "scopes": "self-roles:r",
                     "subscriptions": "self-subscriptions:r",

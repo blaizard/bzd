@@ -88,6 +88,14 @@
 						condition: Boolean(this.$authentication.hasScope(scopeSelfBasicRead)),
 					},
 					{
+						type: "Date",
+						caption: "Last Password Reset Request",
+						name: "last_password_reset",
+						disable: true,
+						width: 0.2,
+						condition: Boolean(this.$authentication.hasScope(scopeSelfBasicRead)),
+					},
+					{
 						type: "Input",
 						caption: "Roles",
 						name: "roles",
