@@ -21,7 +21,12 @@ export default class StripePaymentWebhook {
 				secretKey: null,
 				/// The endpoint secret.
 				secretEndpoint: null,
-				/// callbackPayment(ref, email, products, maybeSubscription: Subscription = null)
+				/// callbackPayment(uid, email, products, maybeSubscription: Subscription = null)
+				///
+				/// \param uid The unique identifier corresponding to this payment.
+				/// \param products The list of products associated with this payment. All products
+				///                 have a 'uid' field which is a unique identifier for the product
+				///                 at the payment provider side.
 				/// \return true if it was processed, false otherwise.
 				callbackPayment: null,
 				/// Period to perform a sync with the server.
@@ -34,7 +39,7 @@ export default class StripePaymentWebhook {
 		this.stripe = Stripe(this.options.secretKey);
 		// Map containing the matching between product identifier and the actual product.
 		this.products = {};
-		// Contain all already processed payments.
+		// Contain all already processed payment uids .
 		this.processed = new Set();
 	}
 
@@ -94,13 +99,19 @@ export default class StripePaymentWebhook {
 		service.register(provider);
 	}
 
+	/// A product is mapped with the metadata field in stripe.
 	async getProduct(productId) {
 		if (productId in this.products) {
 			return this.products[productId];
 		}
 		const product = await this.stripe.products.retrieve(productId);
-		this.products[productId] = product;
-		return product;
+		this.products[productId] = Object.assign(
+			{
+				uid: productId,
+			},
+			product.metadata,
+		);
+		return this.products[productId];
 	}
 
 	/// Process a given checkout session.
@@ -112,10 +123,10 @@ export default class StripePaymentWebhook {
 			return false;
 		}
 
-		const reference = checkoutSession.payment_intent;
+		const uid = checkoutSession.payment_intent;
 
 		/// If it is already processed, ignore.
-		if (this.processed.has(reference)) {
+		if (this.processed.has(uid)) {
 			return false;
 		}
 
@@ -132,8 +143,8 @@ export default class StripePaymentWebhook {
 			products.push(product);
 		}
 
-		const isProcessed = await this.options.callbackPayment(reference, email, products);
-		this.processed.add(reference);
+		const isProcessed = await this.options.callbackPayment(uid, email, products);
+		this.processed.add(uid);
 		return isProcessed;
 	}
 
@@ -141,10 +152,10 @@ export default class StripePaymentWebhook {
 	///
 	/// Return true if it was processed, false otherwise.
 	async processInvoice(invoice) {
-		const reference = invoice.payment_intent;
+		const uid = invoice.payment_intent;
 
 		/// If it is already processed, ignore.
-		if (this.processed.has(reference)) {
+		if (this.processed.has(uid)) {
 			return false;
 		}
 
@@ -160,8 +171,8 @@ export default class StripePaymentWebhook {
 			products.push(product);
 		}
 
-		const isProcessed = await this.options.callbackPayment(reference, email, products, maybeSubscription);
-		this.processed.add(reference);
+		const isProcessed = await this.options.callbackPayment(uid, email, products, maybeSubscription);
+		this.processed.add(uid);
 		return isProcessed;
 	}
 

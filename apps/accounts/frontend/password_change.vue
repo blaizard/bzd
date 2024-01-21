@@ -1,5 +1,5 @@
 <template>
-	<Authentication title="RESET">
+	<Authentication :title="title">
 		<Form v-model="info" :description="formResetDescription" @submit="handleSubmitReset"></Form>
 	</Authentication>
 </template>
@@ -18,6 +18,7 @@
 		props: {
 			uid: { type: String, required: true },
 			token: { type: String, required: true },
+			first: { type: Boolean, required: false, default: false },
 		},
 		data: function () {
 			return {
@@ -26,11 +27,17 @@
 			};
 		},
 		computed: {
+			title() {
+				return this.first ? "NEW PASSWORD" : "RESET";
+			},
 			formResetDescription() {
 				return [
 					{
 						type: "Message",
-						value: "Your password has been successfully reset, you will now be redirected to the login page...",
+						value:
+							"Your password has been successfully " +
+							(this.first ? "set" : "reset") +
+							", you will now be redirected to the login page...",
 						condition: () => this.sent,
 					},
 					{
@@ -53,7 +60,7 @@
 					{
 						type: "Button",
 						action: "approve",
-						content: "Reset Password",
+						content: this.first ? "Set Password" : "Reset Password",
 						height: "large",
 						fill: true,
 						condition: () => !this.sent,

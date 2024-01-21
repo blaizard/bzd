@@ -52,6 +52,17 @@ export default class Applications {
 		return new Application(uid, data);
 	}
 
+	/// List all available applications UID.
+	async list() {
+		let uids = [];
+		for await (const [uid, _] of CollectionPaging.makeIterator(async (maxOrPaging) => {
+			return await this.keyValueStore.list(this.config.bucket, maxOrPaging);
+		}, 50)) {
+			uids.push(uid);
+		}
+		return uids;
+	}
+
 	/// Delete an existing application.
 	///
 	/// \param uid User ID.

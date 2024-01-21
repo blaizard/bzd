@@ -10,6 +10,7 @@ bzd_nodejs_library(
     ],
     deps = [
         "//apps/accounts/backend/email/reset_password",
+        "//apps/accounts/backend/email/welcome",
         "//nodejs/core:exception",
         "//nodejs/core:log",
     ],
