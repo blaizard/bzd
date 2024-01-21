@@ -181,6 +181,8 @@ const PATH_STATIC = options.static;
 				products,
 				maybeSubscription,
 			});
+
+			return true;
 		},
 	});
 	// await payment.trigger(24 * 3600);
