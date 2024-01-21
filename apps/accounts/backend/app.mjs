@@ -224,7 +224,7 @@ const PATH_STATIC = options.static;
 		}
 
 		// Set a password if there is none and timestamp the operation.
-		await users.update(
+		const user = await users.update(
 			maybeUser.getUid(),
 			async (user) => {
 				user.setLastPasswordReset();
@@ -237,18 +237,13 @@ const PATH_STATIC = options.static;
 		);
 
 		// Check if there is a valid password, if not create a random one.
-		const maybePassword = maybeUser.getPassword();
-		Exception.assert(maybePassword, "At that point there must be a valid password.");
+		const password = user.getPassword();
+		Exception.assert(password, "At that point there must be a valid password.");
 
 		await emails.sendResetPassword(inputs.uid, {
 			email: inputs.uid,
 			support: ConfigBackend.emailSupport,
-			link:
-				ConfigBackend.url +
-				"/reset/" +
-				encodeURIComponent(maybeUser.getUid()) +
-				"/" +
-				encodeURIComponent(maybePassword),
+			link: ConfigBackend.url + "/reset/" + encodeURIComponent(user.getUid()) + "/" + encodeURIComponent(password),
 		});
 	});
 
