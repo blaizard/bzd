@@ -47,7 +47,9 @@ export default class API {
 	/// Install all given plugins..
 	async installPlugins(...plugins) {
 		for (const plugin of plugins) {
-			await plugin.installAPI(this);
+			if (typeof plugin.installAPI == "function") {
+				await plugin.installAPI(this);
+			}
 		}
 		this.event.trigger("ready");
 	}

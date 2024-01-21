@@ -1,20 +1,14 @@
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 
 bzd_nodejs_library(
-    name = "webhook",
+    name = "payment",
     srcs = [
-        "webhook.mjs",
+        "payment.mjs",
     ],
-    apis = ["api.json"],
-    packages = {
-        "stripe": "14.12.0",
-    },
     visibility = ["//visibility:public"],
     deps = [
-        "//apps/accounts/backend/services",
         "//nodejs/core:exception",
         "//nodejs/core:log",
-        "//nodejs/core/http:client",
         "//nodejs/payment",
     ],
 )

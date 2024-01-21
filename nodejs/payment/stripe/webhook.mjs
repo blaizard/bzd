@@ -2,33 +2,20 @@ import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import Stripe from "stripe";
 import ServiceProvider from "#bzd/apps/accounts/backend/services/provider.mjs";
+import { PaymentInterface, Subscription } from "#bzd/nodejs/payment/payment.mjs";
 
 const Exception = ExceptionFactory("payment", "stripe");
 const Log = LogFactory("payment", "stripe");
 
-class Subscription {
-	constructor(reference, end) {
-		this.reference = reference;
-		this.end = end;
-	}
-}
-
-export default class StripePaymentWebhook {
-	constructor(options) {
+export default class StripePaymentWebhook extends PaymentInterface {
+	constructor(callbackPayment, options) {
+		super(callbackPayment);
 		this.options = Object.assign(
 			{
 				/// You API secret Key.
 				secretKey: null,
 				/// The endpoint secret.
 				secretEndpoint: null,
-				/// callbackPayment(uid, email, products, maybeSubscription: Subscription = null)
-				///
-				/// \param uid The unique identifier corresponding to this payment.
-				/// \param products The list of products associated with this payment. All products
-				///                 have a 'uid' field which is a unique identifier for the product
-				///                 at the payment provider side.
-				/// \return true if it was processed, false otherwise.
-				callbackPayment: null,
 				/// Period to perform a sync with the server.
 				syncPeriodS: 6 * 3600,
 			},
@@ -143,7 +130,7 @@ export default class StripePaymentWebhook {
 			products.push(product);
 		}
 
-		const isProcessed = await this.options.callbackPayment(uid, email, products);
+		const isProcessed = await this.callbackPayment(uid, email, products);
 		this.processed.add(uid);
 		return isProcessed;
 	}
@@ -171,7 +158,7 @@ export default class StripePaymentWebhook {
 			products.push(product);
 		}
 
-		const isProcessed = await this.options.callbackPayment(uid, email, products, maybeSubscription);
+		const isProcessed = await this.callbackPayment(uid, email, products, maybeSubscription);
 		this.processed.add(uid);
 		return isProcessed;
 	}

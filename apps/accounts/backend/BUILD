@@ -43,7 +43,7 @@ bzd_nodejs_binary(
         "//nodejs/core/http:server",
         "//nodejs/db/key_value_store:make_from_config",
         "//nodejs/email:make_from_config",
-        "//nodejs/payment/stripe:webhook",
+        "//nodejs/payment:make_from_config",
         "//nodejs/utils:result",
     ],
 )
