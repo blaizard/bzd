@@ -32,10 +32,17 @@ export default class KeyValueStoreMemory extends KeyValueStore {
 	}
 
 	async _getImpl(bucket, key, defaultValue) {
-		if (!(bucket in this.buckets)) {
-			return defaultValue;
+		if (bucket in this.buckets) {
+			if (key in this.buckets[bucket]) {
+				// Create a copy of this key, this is to emulate the same behavior as with a normal database.
+				// To ensure that changes made to this copy are not propagated to the real element.
+				if (typeof this.buckets[bucket][key] === "object") {
+					return Object.assign({}, this.buckets[bucket][key]);
+				}
+				return this.buckets[bucket][key];
+			}
 		}
-		return key in this.buckets[bucket] ? this.buckets[bucket][key] : defaultValue;
+		return defaultValue;
 	}
 
 	async _countImpl(bucket) {
