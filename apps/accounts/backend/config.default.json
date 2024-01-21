@@ -3,6 +3,7 @@
         "from": "hello@dummy.com",
         "type": "stub"
     },
+    "emailSupport": "support@dummy.com",
     "kvs": {
         "accounts": {
             "name": "accounts",

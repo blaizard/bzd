@@ -20,6 +20,20 @@ export default class Sendgrid extends Email {
 
 	/// Send an email
 	async _sendImpl(toList, subject, data) {
+		let content = [];
+		if (data.html) {
+			content.push({
+				type: "text/html",
+				value: data.html,
+			});
+		}
+		if (data.text) {
+			content.push({
+				type: "text/plain",
+				value: data.text,
+			});
+		}
+
 		await HttpClient.request("https://api.sendgrid.com/v3/mail/send", {
 			method: "post",
 			authentication: {
@@ -36,12 +50,7 @@ export default class Sendgrid extends Email {
 				from: {
 					email: this.from,
 				},
-				content: [
-					{
-						type: data.format == "text" ? "text/plain" : "text/html",
-						value: data.content,
-					},
-				],
+				content: content,
 			},
 		});
 	}
