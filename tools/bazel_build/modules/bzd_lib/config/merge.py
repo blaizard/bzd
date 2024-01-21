@@ -64,8 +64,10 @@ class ConfigValues:
 
 		# Check there are conflcit between parent/child keys. For example, setting `kvs.hello`` and `kvs.hello.world`.
 		for existingKey in self.data.keys():
-			if (key in existingKey) or (existingKey in key):
-				fatal(f"The keys '{key}' and '{existingKey}' are setting twice the same value.")
+			if f"{key}." in existingKey:
+				fatal(f"Cannot set a key '{key}' and a nested key '{existingKey}' at the same time.")
+			if f"{existingKey}." in key:
+				fatal(f"Cannot set a key '{existingKey}' and a nested key '{key}' at the same time.")
 
 		self.data[key] = value
 
