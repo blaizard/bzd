@@ -161,31 +161,33 @@ const PATH_STATIC = options.static;
 
 	// ---- Payment ----
 
-	const payment = new StripePaymentWebhook({
-		secretKey: ConfigBackend.payment.secretKey,
-		secretEndpoint: ConfigBackend.payment.secretEndpoint,
-		callbackPayment: async (reference, email, products, maybeSubscription = null) => {
-			// if (reference already processed) return;
+	const payment = new StripePaymentWebhook(
+		Object.assign(
+			{
+				callbackPayment: async (reference, email, products, maybeSubscription = null) => {
+					// if (reference already processed) return;
 
-			// if (email account exist)
-			//		create one;
-			//		send welcome email and change password instructions;
+					// if (email account exist)
+					//		create one;
+					//		send welcome email and change password instructions;
 
-			// check product, make sure valid and get subscription time.
-			// increase subscription
-			// associate subscription reference if any.
+					// check product, make sure valid and get subscription time.
+					// increase subscription
+					// associate subscription reference if any.
 
-			console.log({
-				reference,
-				email,
-				products,
-				maybeSubscription,
-			});
+					console.log({
+						reference,
+						email,
+						products,
+						maybeSubscription,
+					});
 
-			return true;
-		},
-	});
-	// await payment.trigger(24 * 3600);
+					return true;
+				},
+			},
+			ConfigBackend.payment.options,
+		),
+	);
 
 	// ---- API ----
 
@@ -221,21 +223,21 @@ const PATH_STATIC = options.static;
 			return;
 		}
 
+		// Set a password if there is none and timestamp the operation.
 		await users.update(
 			maybeUser.getUid(),
-			(user) => {
+			async (user) => {
 				user.setLastPasswordReset();
+				if (!user.getPassword()) {
+					await user.setPassword(Math.random().toString());
+				}
 				return user;
 			},
 			/*silent*/ true,
 		);
 
 		// Check if there is a valid password, if not create a random one.
-		let maybePassword = maybeUser.getPassword();
-		if (!maybePassword) {
-			maybeUser.setPassword(Math.random().toString());
-			maybePassword = maybeUser.getPassword();
-		}
+		const maybePassword = maybeUser.getPassword();
 		Exception.assert(maybePassword, "At that point there must be a valid password.");
 
 		await emails.sendResetPassword(inputs.uid, {
