@@ -241,6 +241,8 @@ const PATH_STATIC = options.static;
 		Exception.assert(maybePassword, "At that point there must be a valid password.");
 
 		await emails.sendResetPassword(inputs.uid, {
+			email: inputs.uid,
+			support: ConfigBackend.emailSupport,
 			link:
 				ConfigBackend.url +
 				"/reset/" +

@@ -1,25 +1,16 @@
-load("@bzd_lib//embed:defs.bzl", "bzd_embed")
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 
 bzd_nodejs_library(
     name = "email",
     srcs = [
         "manager.mjs",
-        ":reset_password",
     ],
     visibility = [
         "//apps/accounts/backend:__subpackages__",
     ],
     deps = [
+        "//apps/accounts/backend/email/reset_password",
         "//nodejs/core:exception",
         "//nodejs/core:log",
-        "//nodejs/core:template",
     ],
-)
-
-bzd_embed(
-    name = "reset_password",
-    format = "mjs-text",
-    input = "reset_password.html",
-    output = "reset_password.mjs",
 )

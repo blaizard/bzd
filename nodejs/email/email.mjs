@@ -17,20 +17,11 @@ export default class Email {
 
 		const dataUpdated = Object.assign(
 			{
-				// Content format
-				format: "text",
-				// Content to be displayed
-				content: null,
+				html: null,
+				text: null,
 			},
 			data,
 		);
-
-		Exception.assert(
-			["text", "html"].includes(dataUpdated.format),
-			"Only 'text' and 'html' are valid formats: {}",
-			dataUpdated.format,
-		);
-		Exception.assert(typeof dataUpdated.content == "string", "'content' must be a string: {}", dataUpdated.content);
 
 		await this._sendImpl(toList, subject, dataUpdated);
 	}

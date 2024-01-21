@@ -21,8 +21,8 @@ export default class NodeMailerEmail extends Email {
 			from: this.from,
 			to: toList.join(", "),
 			subject: subject,
-			text: data.format == "text" ? data.content : undefined,
-			html: data.format == "html" ? data.content : undefined,
+			text: data.text,
+			html: data.html,
 		});
 	}
 }
