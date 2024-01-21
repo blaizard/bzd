@@ -21,6 +21,7 @@ bzd_nodejs_web_binary(
     deps = [
         "//apps/accounts/backend/applications:frontend",
         "//apps/accounts/backend/logger/memory:frontend",
+        "//apps/accounts/backend/services:frontend",
         "//apps/accounts/backend/users:frontend",
         "//nodejs:icons",
         "//nodejs:vue",

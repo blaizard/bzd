@@ -66,6 +66,10 @@ export function dateToString(format, timestamp) {
 	});
 }
 
+export function dateToDefaultString(timestamp) {
+	return dateToString("{y}-{m}-{d} {h}:{min}:{s}.{ms}", timestamp);
+}
+
 export function capitalize(string) {
 	return string.charAt(0).toUpperCase() + string.slice(1);
 }
