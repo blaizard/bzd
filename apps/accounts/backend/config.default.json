@@ -15,11 +15,7 @@
         }
     },
     "payment": {
-        "options": {
-            "secretEndpoint": "1234",
-            "secretKey": "abc"
-        },
-        "type": "stripe"
+        "type": "mock"
     },
     "url": "http://localhost:8080"
 }

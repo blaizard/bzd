@@ -17,7 +17,7 @@ import TestData from "#bzd/apps/accounts/backend/tests/test_data.mjs";
 import Config from "#bzd/apps/accounts/config.json" assert { type: "json" };
 import ConfigBackend from "#bzd/apps/accounts/backend/config.json" assert { type: "json" };
 import MemoryLogger from "#bzd/apps/accounts/backend/logger/memory/memory.mjs";
-import StripePaymentWebhook from "#bzd/nodejs/payment/stripe/webhook.mjs";
+import paymentMakeFromConfig from "#bzd/nodejs/payment/make_from_config.mjs";
 import EmailManager from "#bzd/apps/accounts/backend/email/manager.mjs";
 import Services from "#bzd/apps/accounts/backend/services/services.mjs";
 
@@ -69,7 +69,7 @@ const PATH_STATIC = options.static;
 	async function createResetPasswordLink(user, newPassword = false) {
 		// Set a password if there is none and timestamp the operation.
 		user = await users.update(
-			maybeUser.getUid(),
+			user.getUid(),
 			async (user) => {
 				user.setLastPasswordReset();
 				if (!user.getPassword()) {
@@ -195,58 +195,51 @@ const PATH_STATIC = options.static;
 	/// All products must define in Stripe the following metadata:
 	/// - application: "screen_recorder"
 	/// - duration: <days>
-	const payment = new StripePaymentWebhook(
-		Object.assign(
-			{
-				callbackPayment: async (uid, email, products, maybeSubscription = null) => {
-					// Check the products, make sure they are valid and retrieve the subscription time.
-					let applications = [];
-					for (const product of products) {
-						const application = await appplications.get(product.application);
-						applications.push(application);
-					}
+	const payment = await paymentMakeFromConfig(async (uid, email, products, maybeSubscription = null) => {
+		// Check the products, make sure they are valid and retrieve the subscription time.
+		let applications = [];
+		for (const product of products) {
+			const application = await appplications.get(product.application);
+			applications.push(application);
+		}
 
-					// Check if email account exists, if not create one.
-					let maybeUser = await users.getFromEmail(email, /*allowNull*/ true);
-					if (maybeUser === null) {
-						maybeUser = await users.create(email);
-						maybeUser = await users.update(maybeUser.getUid(), async (user) => {
-							user.addRole("user");
-							return user;
-						});
+		// Check if email account exists, if not create one.
+		let maybeUser = await users.getFromEmail(email, /*allowNull*/ true);
+		if (maybeUser === null) {
+			maybeUser = await users.create(email);
+			maybeUser = await users.update(maybeUser.getUid(), async (user) => {
+				user.addRole("user");
+				return user;
+			});
 
-						const link = await createResetPasswordLink(maybeUser, /*newPassword*/ true);
+			const link = await createResetPasswordLink(maybeUser, /*newPassword*/ true);
 
-						Log.info("Welcome email sent to: {}.", email);
-						await emails.sendWelcome(email, {
-							email: email,
-							support: ConfigBackend.emailSupport,
-							link: link,
-						});
-					}
+			Log.info("Welcome email sent to: {}.", email);
+			await emails.sendWelcome(email, {
+				email: email,
+				support: ConfigBackend.emailSupport,
+				link: link,
+			});
+		}
 
-					// if (uid already processed) return;
+		// if (uid already processed) return;
 
-					// if (email account exist)
-					//		create one;
-					//		send welcome email and change password instructions;
+		// if (email account exist)
+		//		create one;
+		//		send welcome email and change password instructions;
 
-					// increase subscription
-					// associate subscription uid if any.
+		// increase subscription
+		// associate subscription uid if any.
 
-					console.log({
-						uid,
-						email,
-						products,
-						maybeSubscription,
-					});
+		console.log({
+			uid,
+			email,
+			products,
+			maybeSubscription,
+		});
 
-					return true;
-				},
-			},
-			ConfigBackend.payment.options,
-		),
-	);
+		return true;
+	}, ConfigBackend.payment);
 
 	// ---- API ----
 
@@ -306,17 +299,18 @@ const PATH_STATIC = options.static;
 		});
 	});
 
-	// ---- tests data ----
-
-	if (options.test) {
-		const testData = new TestData(users, appplications);
-		await testData.install();
-	}
-
 	// ---- start services ----
 
 	await services.installServices(payment);
 	await services.start();
+
+	// ---- tests data ----
+
+	if (options.test) {
+		const testData = new TestData(users, appplications, payment);
+		await testData.install();
+		await testData.run();
+	}
 
 	// ---- serve ----
 
