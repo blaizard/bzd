@@ -191,7 +191,7 @@ const PATH_STATIC = options.static;
 		authentication: authentication,
 		channel: web,
 	});
-	await api.installPlugins(authentication, authenticationGoogle, users, appplications, memoryLogger, payment);
+	await api.installPlugins(authentication, authenticationGoogle, users, appplications, services, memoryLogger, payment);
 
 	api.handle("get", "/sso", async function (inputs, session) {
 		// Get that the application exists.

@@ -58,6 +58,9 @@ export default class Services {
 		service.records[name] ??= {
 			executions: 0,
 			errors: 0,
+			durationMin: 0,
+			durationMax: 0,
+			durationAvg: 0,
 			status: Services.Status.idle,
 			logs: [],
 		};
@@ -67,6 +70,7 @@ export default class Services {
 			error: null,
 			timestampStart: Services._getTimestamp(),
 			timestampStop: 0,
+			result: null,
 		};
 
 		// Check the maximum number of logs for this enty.
@@ -83,7 +87,7 @@ export default class Services {
 			Log.debug("Running '{}.{}'...", uid, name);
 			++record.executions;
 			record.status = Services.Status.running;
-			await object.process();
+			log.result = await object.process();
 			record.status = Services.Status.idle;
 			Log.debug("Completed '{}.{}'.", uid, name);
 		} catch (e) {
@@ -94,6 +98,11 @@ export default class Services {
 		} finally {
 			log.timestampStop = Services._getTimestamp();
 		}
+
+		const duration = (log.timestampStop - log.timestampStart) / 1000;
+		record.durationMin = Math.min(record.durationMin || duration, duration);
+		record.durationMax = Math.max(record.durationMax, duration);
+		record.durationAvg = (record.durationAvg * (record.executions - 1) + duration) / record.executions;
 
 		return log.error === null;
 	}
@@ -141,6 +150,9 @@ export default class Services {
 			//      executions: 0,
 			//      errors: 0,
 			//      status: Services.Status.idle,
+			//      durationMin: 0,
+			//      durationMax: 0,
+			//      durationAvg: 0,
 			//      logs: [],
 			//   }
 			// }
@@ -251,7 +263,7 @@ export default class Services {
 	/// \param uid The service UID.
 	/// \return The service state.
 	getService(uid) {
-		Exception.assert(uid in this.services, "The service '{}' is not registered.", uid);
+		Exception.assertPrecondition(uid in this.services, "The service '{}' is not registered.", uid);
 		return this.services[uid].state;
 	}
 
@@ -260,7 +272,7 @@ export default class Services {
 	/// \param uid The service UID.
 	/// \return A tuple of process name and record.
 	*getProcesses(uid) {
-		Exception.assert(uid in this.services, "The service '{}' is not registered.", uid);
+		Exception.assertPrecondition(uid in this.services, "The service '{}' is not registered.", uid);
 		for (const [name, record] of Object.entries(this.services[uid].records)) {
 			yield [name, record];
 		}
@@ -272,8 +284,13 @@ export default class Services {
 	/// \param name The process name.
 	/// \return The process record.
 	getProcess(uid, name) {
-		Exception.assert(uid in this.services, "The service '{}' is not registered.", uid);
-		Exception.assert(name in this.services[uid].records, "The process '{}' is part of service '{}'.", name, uid);
+		Exception.assertPrecondition(uid in this.services, "The service '{}' is not registered.", uid);
+		Exception.assertPrecondition(
+			name in this.services[uid].records,
+			"The process '{}' is part of service '{}'.",
+			name,
+			uid,
+		);
 		return this.services[uid].records[name];
 	}
 
@@ -291,19 +308,50 @@ export default class Services {
 
 		// ---- Admin specific API
 
+		/// Return the following:
+		///
+		/// services: {
+		///     uid: {
+		///	       state: { ... },
+		///        processes: {
+		///	          name: {
+		///	             status: ...
+		///              ...
+		///           }
+		///        }
+		///     },
+		///     ...
+		/// }
 		api.handle("get", "/admin/services", async () => {
-			return Object.keys(this.schema).reduce((obj, type) => {
-				obj[type] = this.metadata[type];
-				return obj;
-			}, {});
+			let services = {};
+			for (const [uid, state] of this.getServices()) {
+				let processes = {};
+				for (const [name, record] of this.getProcesses(uid)) {
+					processes[name] = Object.assign({}, record, {
+						logs: null,
+					});
+				}
+				services[uid] = {
+					state: state,
+					processes: processes,
+				};
+			}
+
+			return {
+				services: services,
+				timestamp: Services._getTimestamp(),
+			};
 		});
 
-		api.handle("post", "/admin/service", async (inputs) => {
-			if (inputs.uid) {
-				await this.schema[inputs.type].process(inputs.uid);
-			} else {
-				this._process(inputs.type);
-			}
+		api.handle("get", "/admin/service/logs", async (inputs) => {
+			const record = this.getProcess(inputs.uid, inputs.name);
+			return {
+				logs: record.logs,
+			};
+		});
+
+		api.handle("post", "/admin/service/trigger", async (inputs) => {
+			await this.runProcess(inputs.uid, inputs.name);
 		});
 	}
 }
