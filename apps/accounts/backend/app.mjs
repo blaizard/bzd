@@ -199,7 +199,7 @@ const PATH_STATIC = options.static;
 		Object.assign(
 			{
 				callbackPayment: async (uid, email, products, maybeSubscription = null) => {
-					// Check the product, make sure valid and get subscription time.
+					// Check the products, make sure they are valid and retrieve the subscription time.
 					let applications = [];
 					for (const product of products) {
 						const application = await appplications.get(product.application);
@@ -300,7 +300,10 @@ const PATH_STATIC = options.static;
 		if (!inputs.token || maybeUser.getPassword() !== inputs.token) {
 			throw this.httpError(401, "Unauthorized");
 		}
-		await maybeUser.setPassword(inputs.password);
+		await users.update(maybeUser.getUid(), async (user) => {
+			await user.setPassword(inputs.password);
+			return user;
+		});
 	});
 
 	// ---- tests data ----
