@@ -130,9 +130,14 @@ export default class StripePaymentWebhook extends PaymentInterface {
 			products.push(product);
 		}
 
-		const isProcessed = await this.callbackPayment(uid, email, products);
-		this.processed.add(uid);
-		return isProcessed;
+		try {
+			const isProcessed = await this.callbackPayment(uid, email, products);
+			this.processed.add(uid);
+			return isProcessed;
+		} catch (e) {
+			Log.error("Checkout Session: {:j}", checkoutSession);
+			throw e;
+		}
 	}
 
 	/// Process a given invoice, and retrieve its email, product list and recurrency.
@@ -158,9 +163,14 @@ export default class StripePaymentWebhook extends PaymentInterface {
 			products.push(product);
 		}
 
-		const isProcessed = await this.callbackPayment(uid, email, products, maybeSubscription);
-		this.processed.add(uid);
-		return isProcessed;
+		try {
+			const isProcessed = await this.callbackPayment(uid, email, products, maybeSubscription);
+			this.processed.add(uid);
+			return isProcessed;
+		} catch (e) {
+			Log.error("Invoice: {:j}", invoice);
+			throw e;
+		}
 	}
 
 	/// Loop through all items of a specific list from the stripe API.

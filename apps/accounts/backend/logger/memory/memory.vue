@@ -66,7 +66,10 @@
 		},
 		methods: {
 			formatTopics(topics) {
-				return topics.join("::");
+				if (Array.isArray(topics)) {
+					return topics.join("::");
+				}
+				return "-";
 			},
 			filterLogs(logs) {
 				return logs.filter((log) => {
