@@ -20,6 +20,7 @@ import MemoryLogger from "#bzd/apps/accounts/backend/logger/memory/memory.mjs";
 import paymentMakeFromConfig from "#bzd/nodejs/payment/make_from_config.mjs";
 import EmailManager from "#bzd/apps/accounts/backend/email/manager.mjs";
 import Services from "#bzd/apps/accounts/backend/services/services.mjs";
+import Subscription from "#bzd/apps/accounts/backend/users/subscription.mjs";
 
 const Exception = ExceptionFactory("backend");
 const Log = LogFactory("backend");
@@ -194,15 +195,8 @@ const PATH_STATIC = options.static;
 
 	/// All products must define in Stripe the following metadata:
 	/// - application: "screen_recorder"
-	/// - duration: <days>
+	/// - duration: <seconds>
 	const payment = await paymentMakeFromConfig(async (uid, email, products, maybeSubscription = null) => {
-		// Check the products, make sure they are valid and retrieve the subscription time.
-		let applications = [];
-		for (const product of products) {
-			const application = await appplications.get(product.application);
-			applications.push(application);
-		}
-
 		// Check if email account exists, if not create one.
 		let maybeUser = await users.getFromEmail(email, /*allowNull*/ true);
 		if (maybeUser === null) {
@@ -221,21 +215,45 @@ const PATH_STATIC = options.static;
 				link: link,
 			});
 		}
+		Exception.assert(maybeUser, "The user is not defined.");
 
-		// if (uid already processed) return;
+		// Check if the payment uid is already processed, if so ignore the rest.
+		if (maybeUser.hasPayment(uid)) {
+			return false;
+		}
 
-		// if (email account exist)
-		//		create one;
-		//		send welcome email and change password instructions;
+		// Check the products, make sure they are valid and retrieve the subscription time.
+		let subscriptions = [];
+		for (const product of products) {
+			// Make sure this application exists.
+			await appplications.get(product.application, /*allowNull*/ false);
+			let subscription = null;
+			if (maybeSubscription && maybeSubscription.timestampEndMs) {
+				subscription = Subscription.makeFromTimestamp(maybeSubscription.timestampEndMs);
+			} else {
+				const duration = parseInt(product.duration);
+				Exception.assert(duration > 0, "The product must embed a duration value in seconds: '{}'.", product.duration);
+				subscription = Subscription.makeFromDuration(duration * 1000);
+			}
 
-		// increase subscription
-		// associate subscription uid if any.
+			subscriptions.push({
+				application: product.application,
+				subscription: subscription,
+			});
+		}
 
-		console.log({
-			uid,
-			email,
-			products,
-			maybeSubscription,
+		// Register the payment t ensure it will not be processed again.
+		maybeUser = await users.update(maybeUser.getUid(), async (user) => {
+			// Update the subscription of the application(s) and make sure it is started.
+			for (const subscription of subscriptions) {
+				user.addSubscription(subscription.application, subscription.subscription);
+				user.getSubscription(subscription.application).start();
+			}
+
+			// Register the payment.
+			user.registerPayment(uid);
+
+			return user;
 		});
 
 		return true;

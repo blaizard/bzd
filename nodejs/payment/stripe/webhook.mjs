@@ -149,7 +149,7 @@ export default class StripePaymentWebhook extends PaymentInterface {
 		const email = invoice.customer_email;
 		let maybeSubscription = null;
 		if (invoice.subscription) {
-			maybeSubscription = new Subscription(invoice.subscription, invoice.period_end);
+			maybeSubscription = new Subscription(invoice.subscription, invoice.period_end * 1000);
 		}
 
 		let products = [];
