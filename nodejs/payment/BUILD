@@ -20,4 +20,7 @@ bzd_nodejs_library(
         "payment.mjs",
     ],
     visibility = ["//nodejs/payment:__subpackages__"],
+    deps = [
+        "//nodejs/core:exception",
+    ],
 )

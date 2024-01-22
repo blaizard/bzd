@@ -137,18 +137,41 @@ export default class User {
 		}
 	}
 
+	/// Get all the payment references already processed for this user.
+	getPayments() {
+		return this.value.payments || [];
+	}
+
+	/// Check if a specific payment has been processed.
+	hasPayment(uid) {
+		return this.getPayments().includes(uid);
+	}
+
+	/// Register a payment reference processed by this user.
+	///
+	/// Those are payment already done, that do not need further processing.
+	registerPayment(uid) {
+		Exception.assert(!this.hasPayment(uid), "The payment '{}' was already registered.", uid);
+		if (!("payments" in this.value)) {
+			this.value.payments = [];
+		}
+		this.value.payments.push(uid);
+	}
+
 	getSubscriptions() {
 		return this.value.subscriptions || {};
 	}
 
 	/// Get the subscription associated with a specific application.
 	///
-	/// \param The application UID.
-	getSubscription(application) {
+	/// \param application The application UID.
+	/// \param allowNull If the result can be null or not.
+	getSubscription(application, allowNull = false) {
 		const subscriptions = this.getSubscriptions();
 		if (application in subscriptions) {
 			return new Subscription(subscriptions[application]);
 		}
+		Exception.assert(allowNull, "The subscription for application '{}' is not present.", application);
 		return null;
 	}
 
@@ -270,6 +293,7 @@ export default class User {
 			last_login: this.getLastLoginTimestamp(),
 			last_failed_login: this.getLastFailedLoginTimestamp(),
 			last_password_reset: this.getLastPasswordResetTimestamp(),
+			payments: this.getPayments(),
 			roles: this.getRoles(),
 			scopes: this.getScopes().toList(),
 			subscriptions: this.getSubscriptions(),

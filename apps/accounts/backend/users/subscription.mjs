@@ -20,12 +20,24 @@ export default class Subscription {
 		this.value = value;
 	}
 
+	/// Create an active subscription.
+	static makeFromTimestamp(timestampMs) {
+		const subscription = new Subscription({ end: timestampMs });
+		return subscription;
+	}
+
+	/// Create an active subscription.
+	static makeFromDuration(durationMs) {
+		const subscription = new Subscription({ duration: durationMs });
+		return subscription;
+	}
+
 	data() {
 		return this.value;
 	}
 
 	isStarted() {
-		return "duration" in this.value;
+		return "end" in this.value;
 	}
 
 	isExpired() {
@@ -37,22 +49,24 @@ export default class Subscription {
 	}
 
 	start() {
-		Exception.assert(!this.isStarted(), "This subscription is already started.");
-		this.value.end = Date.now() + this.value.duration;
-		delete this.value.duration;
+		if (!this.isStarted()) {
+			this.value.end = Date.now() + this.value.duration;
+			delete this.value.duration;
+		}
 	}
 
 	stop() {
-		Exception.assert(this.isStarted(), "This subscription is not started.");
-		this.value.duration = this.getDuration();
-		delete this.value.end;
+		if (this.isStarted()) {
+			this.value.duration = this.getDuration();
+			delete this.value.end;
+		}
 	}
 
 	getDuration() {
 		if (this.isStarted()) {
-			return this.value.duration;
+			return Math.min(this.value.end - Date.now(), 0);
 		}
-		return Math.min(this.value.end - Date.now(), 0);
+		return this.value.duration;
 	}
 
 	add(subscription) {

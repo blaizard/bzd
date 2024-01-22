@@ -40,15 +40,21 @@ export default class TestData {
 
 	async run() {
 		Exception.assert(
-			await this.payment.triggerPayment("10001", "admin@admin.com", [{ uid: 1, application: "localhost", period: 1 }]),
+			await this.payment.triggerPayment("10001", "admin@admin.com", [
+				{ uid: 1, application: "localhost", duration: 24 * 3600 },
+			]),
 		);
 		Exception.assert(
-			await this.payment.triggerPayment("10001", "admin@admin.com", [{ uid: 1, application: "localhost", period: 1 }]),
+			!(await this.payment.triggerPayment("10001", "admin@admin.com", [
+				{ uid: 1, application: "localhost", duration: 24 * 3600 },
+			])),
 			"2 payments with the same id should not be processed.",
 		);
 		Exception.assertThrows(
 			async () =>
-				await this.payment.triggerPayment("10001", "admin@admin.com", [{ uid: 2, application: "unknown", period: 1 }]),
+				await this.payment.triggerPayment("10002", "admin@admin.com", [
+					{ uid: 2, application: "unknown", duration: 24 * 3600 },
+				]),
 			"payment with unknown application should fail.",
 		);
 	}
