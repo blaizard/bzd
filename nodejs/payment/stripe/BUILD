@@ -16,5 +16,6 @@ bzd_nodejs_library(
         "//nodejs/core:log",
         "//nodejs/core/http:client",
         "//nodejs/payment",
+        "//nodejs/utils:result",
     ],
 )

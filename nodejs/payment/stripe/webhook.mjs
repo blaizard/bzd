@@ -3,6 +3,7 @@ import LogFactory from "#bzd/nodejs/core/log.mjs";
 import Stripe from "stripe";
 import ServiceProvider from "#bzd/apps/accounts/backend/services/provider.mjs";
 import { PaymentInterface, Subscription } from "#bzd/nodejs/payment/payment.mjs";
+import Result from "#bzd/nodejs/utils/result.mjs";
 
 const Exception = ExceptionFactory("payment", "stripe");
 const Log = LogFactory("payment", "stripe");
@@ -177,23 +178,43 @@ export default class StripePaymentWebhook extends PaymentInterface {
 	async _forEachList(stripeListApi, callback) {
 		let lastItem = null;
 		let object = null;
+		let errors = [];
 		do {
 			object = await stripeListApi(lastItem ? lastItem.id : undefined);
 			for (lastItem of object.data) {
-				await callback(lastItem);
+				try {
+					await callback(lastItem);
+				} catch (e) {
+					errors.push(String(e));
+				}
 			}
 		} while (object.data.length > 0);
+
+		if (errors.length) {
+			return Result.makeError(errors);
+		}
+		return new Result();
 	}
 
 	async _forEachSearch(stripeSearchApi, callback) {
 		let page = null;
+		let errors = [];
 		do {
 			const object = await stripeSearchApi(page ? page : undefined);
 			for (const item of object.data) {
-				await callback(item);
+				try {
+					await callback(item);
+				} catch (e) {
+					errors.push(String(e));
+				}
 			}
 			page = object.next_page;
 		} while (page);
+
+		if (errors.length) {
+			return Result.makeError(errors);
+		}
+		return new Result();
 	}
 
 	/// Trigger all non-processed payment, if any since a certain period in second until now.
@@ -202,8 +223,8 @@ export default class StripePaymentWebhook extends PaymentInterface {
 		const since = now - periodS;
 
 		// Loop through all invoices first as they contain more data.
-		let invoices = 0;
-		await this._forEachSearch(
+		let invoices = [0, 0];
+		const resultInvoices = await this._forEachSearch(
 			async (page) => {
 				return await this.stripe.invoices.search({
 					query: "created>" + since + " AND status:'paid'",
@@ -211,15 +232,16 @@ export default class StripePaymentWebhook extends PaymentInterface {
 				});
 			},
 			async (invoice) => {
+				++invoices[1];
 				if (await this.processInvoice(invoice)) {
-					++invoices;
+					++invoices[0];
 				}
 			},
 		);
 
 		// Loop through all checkout sessions.
-		let checkouts = 0;
-		await this._forEachList(
+		let checkouts = [0, 0];
+		const resultCheckout = await this._forEachList(
 			async (startingAfter) => {
 				return await this.stripe.checkout.sessions.list({
 					status: "complete",
@@ -230,11 +252,21 @@ export default class StripePaymentWebhook extends PaymentInterface {
 				});
 			},
 			async (checkoutSession) => {
+				++checkouts[1];
 				if (await this.processCheckoutSession(checkoutSession)) {
-					++checkouts;
+					++checkouts[0];
 				}
 			},
 		);
+
+		let errors = [];
+		if (resultInvoices.hasError()) {
+			errors = [...errors, resultInvoices.error()];
+		}
+		if (resultCheckout.hasError()) {
+			errors = [...errors, resultCheckout.error()];
+		}
+		Exception.assert(errors.length == 0, "{} error(s): {}", errors.length, errors.join("\n"));
 
 		return { invoices, checkouts };
 	}
