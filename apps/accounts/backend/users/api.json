@@ -64,6 +64,12 @@
             "authentication": "self-basic:r",
             "cors": true,
             "documentation": "Get current user information",
+            "request": {
+                "scopes": {
+                    "uid": "admin-users"
+                },
+                "type": "query"
+            },
             "response": {
                 "scopes": {
                     "creation": "self-basic:r",
@@ -83,11 +89,18 @@
             "authentication": "self-basic:w",
             "documentation": "Update current user information",
             "request": {
+                "scopes": {
+                    "oldpassword": "self-basic:w",
+                    "password": "self-basic:w",
+                    "tokens": "self-tokens:w",
+                    "uid": "admin-users"
+                },
                 "type": "json",
                 "validation": {
                     "oldpassword": "",
                     "password": "",
-                    "tokens": ""
+                    "tokens": "",
+                    "uid": ""
                 }
             },
             "response": {

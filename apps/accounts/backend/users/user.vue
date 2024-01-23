@@ -23,6 +23,9 @@
 		directives: {
 			tooltip: DirectiveTooltip,
 		},
+		props: {
+			uid: { type: String, mandatory: false, default: null },
+		},
 		data: function () {
 			return {
 				user: {},
@@ -175,7 +178,7 @@
 		methods: {
 			async handleFetch() {
 				await this.handleSubmit(async () => {
-					this.user = await this.$api.request("get", "/user");
+					this.user = await this.$api.request("get", "/user", this.uid ? { uid: this.uid } : {});
 				});
 			},
 			handleChange(data) {
@@ -186,6 +189,7 @@
 				await this.handleSubmit(async () => {
 					await this.$api.request("put", "/user", {
 						...this.updates,
+						...(this.uid ? { uid: this.uid } : {}),
 					});
 				});
 				this.updates = {};
