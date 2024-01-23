@@ -11,7 +11,13 @@
 			@key="handleKey"
 		>
 		</ElementInput>
-		<div :class="{ 'irform-dropdown-menu': true, 'irform-dropdown-menu-loading': loading }" ref="menu">
+		<div
+			:class="{ 'irform-dropdown-menu': true, 'irform-dropdown-menu-loading': loading }"
+			ref="menu"
+			@mousedown.stop=""
+			@click.stop=""
+			@touch.stop=""
+		>
 			<slot></slot>
 		</div>
 	</div>
