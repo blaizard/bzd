@@ -85,15 +85,13 @@ export const ExceptionFactory = (...topics) => {
 		 */
 		static fromError(e) {
 			let exception = new Exception();
-			if (e) {
-				exception.message = e.message || String(e);
-				exception.stack = e.stack;
-				if ("topics" in e) {
-					exception.topics = e.topics;
-				}
-				if ("nestedErrorList" in e) {
-					exception.nestedErrorList = e.nestedErrorList;
-				}
+			exception.message = e.message || String(e);
+			exception.stack = e.stack;
+			if ("topics" in e) {
+				exception.topics = e.topics;
+			}
+			if ("nestedErrorList" in e) {
+				exception.nestedErrorList = e.nestedErrorList;
 			}
 			return exception;
 		}
@@ -239,9 +237,11 @@ export const ExceptionFactory = (...topics) => {
 		 * \brief Print a formated exception message
 		 */
 		print(...args) {
-			if (args) {
+			if (args.length) {
 				Exception.print(...args);
 			}
+			// We need a custom print to not print twice the topics.
+			// Topics are printed because 'this' is an exception as well.
 			Log.custom({ level: "error" }, this);
 		}
 

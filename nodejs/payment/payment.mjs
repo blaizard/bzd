@@ -29,14 +29,16 @@ export class PaymentInterface {
 			Exception.assert(products.length > 0, "There must be at least one product: {}", products);
 			return await this._callbackPayment(uid, email, products, maybeSubscription);
 		} catch (e) {
-			Exception.fromError(e).print(
-				"Error with callbackPayment({}, {}, {}, {})",
+			const error = Exception.fromError(e);
+			error.print();
+			throw new Exception(
+				"Error with callbackPayment({}, {}, {}, {}): {}",
 				uid,
 				email,
 				JSON.stringify(products),
 				maybeSubscription,
+				error.message,
 			);
-			throw e;
 		}
 	}
 }
