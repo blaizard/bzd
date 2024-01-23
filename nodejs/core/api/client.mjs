@@ -59,7 +59,7 @@ export default class APIClient extends Base {
 		return await this.options.authentication.logout(this);
 	}
 
-	async request(method, endpoint, data) {
+	async request(method, endpoint, data = {}) {
 		this._sanityCheck(method, endpoint);
 		const requestOptions = this.schema[endpoint][method].request || {};
 		const responseOptions = this.schema[endpoint][method].response || {};

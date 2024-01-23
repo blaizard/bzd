@@ -4,6 +4,7 @@
 			<span>Create a new user:</span>
 			<Form :description="descriptionAdd" @submit="handleCreate"></Form>
 		</Modal>
+		<User v-if="uid" :uid="uid"></User>
 		<Form v-model="form" :description="description"></Form>
 	</div>
 </template>
@@ -14,12 +15,14 @@
 	import Modal from "#bzd/nodejs/vue/components/modal/modal.vue";
 	import { CollectionPaging } from "#bzd/nodejs/db/utils.mjs";
 	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
+	import User from "#bzd/apps/accounts/backend/users/user.vue";
 
 	export default {
 		mixins: [Component],
 		components: {
 			Form,
 			Modal,
+			User,
 		},
 		directives: {
 			tooltip: DirectiveTooltip,
@@ -32,6 +35,7 @@
 				deletions: [],
 				updates: {},
 				showCreate: false,
+				uid: null,
 			};
 		},
 		props: {
@@ -109,6 +113,13 @@
 								],
 								toInputValue: "map_to_list",
 								toOutputValue: "list_to_map",
+							},
+							{
+								type: "Button",
+								content: "View",
+								click: (context) => {
+									this.handleView(context.row);
+								},
 							},
 							{
 								type: "Button",
@@ -194,6 +205,10 @@
 				}
 				// Remove the element from the users list.
 				this.form.users.splice(index, 1);
+			},
+			async handleView(index) {
+				const user = this.form.users[index];
+				this.uid = user.uid;
 			},
 			async handleApply() {
 				// Process the updates.

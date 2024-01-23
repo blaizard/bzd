@@ -60,12 +60,12 @@ export default class Scopes {
 		const allKeys = new Set([...Object.keys(data), ...Object.keys(keyScopesMap)]);
 		for (const key of allKeys) {
 			if (key in data && key in keyScopesMap) {
-				if (this.matchAny(keyScopesMap[key])) {
+				if (!this.matchAny(keyScopesMap[key])) {
 					return Result.makeErrorString("Key '{}' is not valid for this scope.", key);
 				}
 			} else if (key in keyScopesMap) {
 				if (!this.matchAny(keyScopesMap[key])) {
-					return Result.makeErrorString("Key '{}' is expected but expected.", key);
+					return Result.makeErrorString("Key '{}' is expected but not present.", key);
 				}
 			} else {
 				return Result.makeErrorString("Key '{}' is set but not guarded by a scope.", key);

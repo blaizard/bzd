@@ -152,12 +152,14 @@ export default class Users {
 		const users = this;
 
 		api.handle("get", "/user", async function (inputs, user) {
-			const tempUser = await users.get(user.getUid());
+			const uid = inputs.uid ? inputs.uid : user.getUid();
+			const tempUser = await users.get(uid);
 			return tempUser.dataPublic();
 		});
 
 		api.handle("put", "/user", async (inputs, user) => {
-			const uid = user.getUid();
+			const uid = inputs.uid ? inputs.uid : user.getUid();
+			delete inputs.uid;
 			const tempUser = await this.update(uid, async (u) => {
 				return await this._preprocessAndMergePublic(inputs, u);
 			});
