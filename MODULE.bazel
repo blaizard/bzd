@@ -95,7 +95,7 @@ toolchain_nodejs = use_extension("@bzd_rules_nodejs//:extensions.bzl", "toolchai
 toolchain_nodejs.toolchain(
     name = "nodejs",
     default = True,
-    version = "node_20.5.1",
+    version = "node_20.11.0",
 )
 use_repo(toolchain_nodejs, "nodejs")
 

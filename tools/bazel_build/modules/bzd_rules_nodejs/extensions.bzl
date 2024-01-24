@@ -5,6 +5,16 @@ load("@bzd_platforms//:defs.bzl", "constraints_from_platform")
 load("@bzd_rules_nodejs//toolchain/pnpm:defs.bzl", "pnpm_install")
 
 _repositories = {
+    "node_20.11.0": {
+        "linux-x86_64": {
+            "build_file": "@bzd_rules_nodejs//nodejs:linux_x86_64.BUILD",
+            "integrity": "sha256-gieANp0Oownn0hjkHeu9GgP4zfNU6/ikQg6J85zC5hI=",
+            "strip_prefix": "node-v20.11.0-linux-x64",
+            "urls": [
+                "https://nodejs.org/dist/v20.11.0/node-v20.11.0-linux-x64.tar.xz",
+            ],
+        },
+    },
     "node_20.5.1": {
         "linux-x86_64": {
             "build_file": "@bzd_rules_nodejs//nodejs:linux_x86_64.BUILD",

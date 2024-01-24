@@ -220,7 +220,7 @@ export default class APIServer extends Base {
 					// The formatting string is important to ensure that error message is not
 					// considered as a formatting string.
 					Exception.print("{}", Exception.fromError(e));
-					Log.error("Context for '{}' {}: {:j}", method, endpoint, context.debug);
+					Log.error("Context for '{}' {}: {:j}", method, this.getEndpoint(endpoint), context.debug);
 					context.sendStatus(500, e.message);
 				}
 			}
