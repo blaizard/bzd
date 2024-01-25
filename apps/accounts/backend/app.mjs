@@ -21,6 +21,7 @@ import paymentMakeFromConfig from "#bzd/nodejs/payment/make_from_config.mjs";
 import EmailManager from "#bzd/apps/accounts/backend/email/manager.mjs";
 import Services from "#bzd/apps/accounts/backend/services/services.mjs";
 import Subscription from "#bzd/apps/accounts/backend/users/subscription.mjs";
+import { delayMs } from "#bzd/nodejs/utils/delay.mjs";
 
 const Exception = ExceptionFactory("backend");
 const Log = LogFactory("backend");
@@ -285,11 +286,13 @@ const PATH_STATIC = options.static;
 		const maybeUser = await users.getFromEmail(inputs.uid, /*allowNull*/ true);
 		if (maybeUser === null) {
 			// Don't return any error code if the account does not exists.
+			await this.delayMs(Math.random() * 2000);
 			return;
 		}
 
 		// Limit the number of password reset attempt for an interval of 1h.
 		if (maybeUser.getLastPasswordResetTimestamp() + 1 * 3600 * 1000 > Date.now()) {
+			await this.delayMs(Math.random() * 2000);
 			return;
 		}
 
