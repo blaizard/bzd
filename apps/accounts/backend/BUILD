@@ -44,6 +44,7 @@ bzd_nodejs_binary(
         "//nodejs/db/key_value_store:make_from_config",
         "//nodejs/email:make_from_config",
         "//nodejs/payment:make_from_config",
+        "//nodejs/utils:delay",
         "//nodejs/utils:result",
     ],
 )

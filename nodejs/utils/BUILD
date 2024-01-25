@@ -12,6 +12,14 @@ bzd_nodejs_library(
 )
 
 bzd_nodejs_library(
+    name = "delay",
+    srcs = [
+        "delay.mjs",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+bzd_nodejs_library(
     name = "object",
     srcs = [
         "object.mjs",
