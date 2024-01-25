@@ -170,6 +170,20 @@ export default class Users {
 			await this.delete(user.getUid());
 		});
 
+		api.handle("get", "/subscription", async function (inputs, user) {
+			const uid = user.getUid();
+			const tempUser = await users.get(uid);
+			const maybeSubscription = tempUser.getSubscription(inputs.application, /*allowNull*/ true);
+			Exception.assertPrecondition(
+				maybeSubscription,
+				"There is no subscription for application '{}'.",
+				inputs.application,
+			);
+			return {
+				active: maybeSubscription.isActive(),
+			};
+		});
+
 		// ---- Admin specific API
 
 		api.handle("get", "/admin/users", async (inputs) => {

@@ -49,6 +49,25 @@
             }
         }
     },
+    "/subscription": {
+        "get": {
+            "authentication": "self-subscriptions:r",
+            "cors": true,
+            "documentation": "Check if a subscription is active",
+            "request": {
+                "type": "query",
+                "validation": {
+                    "application": "mandatory"
+                }
+            },
+            "response": {
+                "type": "json",
+                "validation": {
+                    "active": "mandatory"
+                }
+            }
+        }
+    },
     "/user": {
         "delete": {
             "authentication": "self-basic:w",
