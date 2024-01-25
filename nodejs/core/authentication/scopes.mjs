@@ -64,9 +64,7 @@ export default class Scopes {
 					return Result.makeErrorString("Key '{}' is not valid for this scope.", key);
 				}
 			} else if (key in keyScopesMap) {
-				if (!this.matchAny(keyScopesMap[key])) {
-					return Result.makeErrorString("Key '{}' is expected but not present.", key);
-				}
+				// ignore, no need to handle keys that are only set by the scopes map and not in the actual data.
 			} else {
 				return Result.makeErrorString("Key '{}' is set but not guarded by a scope.", key);
 			}

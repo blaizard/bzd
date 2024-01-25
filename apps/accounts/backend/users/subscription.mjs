@@ -64,7 +64,7 @@ export default class Subscription {
 
 	getDuration() {
 		if (this.isStarted()) {
-			return Math.min(this.value.end - Date.now(), 0);
+			return Math.max(this.value.end - Date.now(), 0);
 		}
 		return this.value.duration;
 	}

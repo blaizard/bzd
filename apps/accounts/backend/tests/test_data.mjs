@@ -1,6 +1,6 @@
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
-import { scopeSelfBasicRead } from "#bzd/apps/accounts/backend/users/scopes.mjs";
+import { scopeSelfBasicRead, scopeSelfSubscriptionsRead } from "#bzd/apps/accounts/backend/users/scopes.mjs";
 
 const Log = LogFactory("test", "data");
 const Exception = ExceptionFactory("test", "data");
@@ -35,18 +35,18 @@ export default class TestData {
 
 		await this.applications.create("localhost", "http://localhost:8081/", [scopeSelfBasicRead]);
 		await this.applications.create("artifacts", "http://localhost:8081/", [scopeSelfBasicRead]);
-		await this.applications.create("screen-recorder", "http://localhost:8081/", [scopeSelfBasicRead]);
+		await this.applications.create("screen-recorder", "http://localhost:8081/", [scopeSelfSubscriptionsRead]);
 	}
 
 	async run() {
 		Exception.assert(
 			await this.payment.triggerPayment("10001", "admin@admin.com", [
-				{ uid: 1, application: "localhost", duration: 24 * 3600 },
+				{ uid: 1, application: "screen-recorder", duration: 7 * 24 * 3600 },
 			]),
 		);
 		Exception.assert(
 			!(await this.payment.triggerPayment("10001", "admin@admin.com", [
-				{ uid: 1, application: "localhost", duration: 24 * 3600 },
+				{ uid: 1, application: "screen-recorder", duration: 24 * 3600 },
 			])),
 			"2 payments with the same id should not be processed.",
 		);
