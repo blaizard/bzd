@@ -30,9 +30,16 @@ export default function (str, ...args) {
 					output += String(value);
 					break;
 				default:
+					// Round the float with a specific precision.
 					if (format.type.startsWith(".")) {
 						const precision = parseInt(format.type.substring(1));
 						output += String(value.toFixed(precision));
+						break;
+					}
+					// Pad the number with leading zeros.
+					else if (format.type.startsWith("0")) {
+						const number = parseInt(format.type.substring(1));
+						output += String(value).padStart(number, "0");
 						break;
 					}
 					throw new Error("Unsupported formatting type: " + format.type);
