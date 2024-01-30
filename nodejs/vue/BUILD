@@ -50,6 +50,19 @@ bzd_nodejs_library(
 )
 
 bzd_nodejs_library(
+    name = "metadata",
+    srcs = [
+        "metadata.mjs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//nodejs:vue",
+        "//nodejs/core:exception",
+        "//nodejs/core:validation",
+    ],
+)
+
+bzd_nodejs_library(
     name = "notification",
     srcs = [
         "notification.mjs",

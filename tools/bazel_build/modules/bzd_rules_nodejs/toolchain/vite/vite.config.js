@@ -17,7 +17,7 @@ export default defineConfig({
 		preserveSymlinks: true,
 	},
 	build: {
-		// Note, there is a but in javascript core that affects Safari only, this doesn't seem to be fixed in esbuild,
+		// Note, there is a bug in javascript core that affects Safari only, this doesn't seem to be fixed in esbuild,
 		// but in terser yes, see: https://bugs.webkit.org/show_bug.cgi?id=223533
 		// To test run apps/accounts with --config=prod on Safari (bug seen on v17).
 		minify: isProduction ? "terser" : false,
