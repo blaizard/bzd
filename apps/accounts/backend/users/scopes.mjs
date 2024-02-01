@@ -20,6 +20,8 @@ export const scopeSelfTokensWrite = "self-tokens:w";
 export const scopeSelfSubscriptionsRead = "self-subscriptions:r";
 /// Change the current user subscriptions.
 export const scopeSelfSubscriptionsWrite = "self-subscriptions:w";
+/// Cancel the current user subscriptions.
+export const scopeSelfSubscriptionsCancel = "self-subscriptions:cancel";
 
 /// All the scopes available
 export const allScopes = new Scopes([

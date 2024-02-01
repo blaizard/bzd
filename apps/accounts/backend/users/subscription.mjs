@@ -26,7 +26,7 @@ export default class Subscription {
 		return subscription;
 	}
 
-	/// Create an active subscription.
+	/// Create an inactive subscription.
 	static makeFromDuration(durationMs) {
 		const subscription = new Subscription({ duration: durationMs });
 		return subscription;
@@ -75,5 +75,30 @@ export default class Subscription {
 		} else {
 			this.value.duration += subscription.getDuration();
 		}
+		// Add the recurring subscriptions.
+		this.value.recurring = Object.assign(this.value.recurring || {}, subscription.getRecurringSubscriptions());
+		this.sanitize();
+	}
+
+	/// Set or overwrite a recurring subscription.
+	addRecurringSubscription(uid, endMs) {
+		if (!("recurring" in this.value)) {
+			this.value.recurring = {};
+		}
+		this.value.recurring[uid] = endMs;
+	}
+
+	getRecurringSubscriptions() {
+		return this.value.recurring || {};
+	}
+
+	/// Clear all expired recurring subscriptions.
+	sanitize() {
+		this.value.recurring = Object.entries(this.getRecurringSubscriptions()).reduce((recurring, [uid, endMs]) => {
+			if (endMs > Date.now()) {
+				recurring[uid] = endMs;
+			}
+			return recurring;
+		}, {});
 	}
 }

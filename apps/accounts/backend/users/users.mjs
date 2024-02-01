@@ -174,13 +174,8 @@ export default class Users {
 			const uid = user.getUid();
 			const tempUser = await users.get(uid);
 			const maybeSubscription = tempUser.getSubscription(inputs.application, /*allowNull*/ true);
-			Exception.assertPrecondition(
-				maybeSubscription,
-				"There is no subscription for application '{}'.",
-				inputs.application,
-			);
 			return {
-				active: maybeSubscription.isActive(),
+				active: maybeSubscription && maybeSubscription.isActive(),
 			};
 		});
 

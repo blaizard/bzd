@@ -1,6 +1,7 @@
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import { scopeSelfBasicRead, scopeSelfSubscriptionsRead } from "#bzd/apps/accounts/backend/users/scopes.mjs";
+import { Subscription } from "#bzd/nodejs/payment/payment.mjs";
 
 const Log = LogFactory("test", "data");
 const Exception = ExceptionFactory("test", "data");
@@ -56,6 +57,20 @@ export default class TestData {
 					{ uid: 2, application: "unknown", duration: 24 * 3600 },
 				]),
 			"payment with unknown application should fail.",
+		);
+		Exception.assert(
+			await this.payment.triggerPayment(
+				"10002",
+				"admin@admin.com",
+				[{ uid: 1, application: "screen-recorder", duration: 7 * 24 * 3600 }],
+				new Subscription("abc", Date.now() + 3600 * 1000),
+			),
+			"Recurring subscription",
+		);
+		Exception.assert(
+			await this.payment.triggerPayment("10001", "dummy-1@dummy.com", [
+				{ uid: 1, application: "screen-recorder", duration: 7 * 24 * 3600 },
+			]),
 		);
 	}
 }

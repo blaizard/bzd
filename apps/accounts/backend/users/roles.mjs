@@ -13,6 +13,7 @@ import {
 	scopeSelfTokensWrite,
 	scopeSelfSubscriptionsRead,
 	scopeSelfSubscriptionsWrite,
+	scopeSelfSubscriptionsCancel,
 } from "#bzd/apps/accounts/backend/users/scopes.mjs";
 
 const Exception = ExceptionFactory("roles-scopes");
@@ -24,10 +25,11 @@ const rolesScopesMap = {
 		scopeAdminApplications,
 		scopeSelfRolesRead,
 		scopeSelfRolesWrite,
+		scopeSelfTokensRead,
 		scopeSelfTokensWrite,
 		scopeSelfSubscriptionsWrite,
 	]),
-	user: new Set([scopeSelfBasicRead, scopeSelfBasicWrite, scopeSelfSubscriptionsRead, scopeSelfTokensRead]),
+	user: new Set([scopeSelfBasicRead, scopeSelfBasicWrite, scopeSelfSubscriptionsRead, scopeSelfSubscriptionsCancel]),
 };
 
 export default class Roles {

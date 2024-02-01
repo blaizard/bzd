@@ -231,6 +231,7 @@ const PATH_STATIC = options.static;
 			let subscription = null;
 			if (maybeSubscription && maybeSubscription.timestampEndMs) {
 				subscription = Subscription.makeFromTimestamp(maybeSubscription.timestampEndMs);
+				subscription.addRecurringSubscription(maybeSubscription.uid, maybeSubscription.timestampEndMs);
 			} else {
 				const duration = parseInt(product.duration);
 				Exception.assert(duration > 0, "The product must embed a duration value in seconds: '{}'.", product.duration);
