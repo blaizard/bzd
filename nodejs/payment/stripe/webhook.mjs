@@ -63,6 +63,10 @@ export default class StripePaymentWebhook extends PaymentInterface {
 					await self.processInvoice(event.data.object);
 					break;
 
+				case "customer.subscription.deleted":
+					// Handle deleted subscriptions here.
+					break;
+
 				default:
 				// Ignore.
 			}
