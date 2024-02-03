@@ -13,6 +13,8 @@ export default class StripePaymentWebhook extends PaymentInterface {
 		super(callbackPayment);
 		this.options = Object.assign(
 			{
+				/// Test mode.
+				test: false,
 				/// You API secret Key.
 				secretKey: null,
 				/// The endpoint secret.
@@ -22,9 +24,9 @@ export default class StripePaymentWebhook extends PaymentInterface {
 			},
 			options,
 		);
-		Exception.assert(this.options.secretKey, "'secretKey' is missing.");
-		Exception.assert(this.options.secretEndpoint, "'secretEndpoint' is missing.");
-		this.stripe = Stripe(this.options.secretKey);
+		Exception.assert(this.options.test || this.options.secretKey, "'secretKey' is missing.");
+		Exception.assert(this.options.test || this.options.secretEndpoint, "'secretEndpoint' is missing.");
+		this.stripe = this.options.test ? null : Stripe(this.options.secretKey);
 		// Map containing the matching between product identifier and the actual product.
 		this.products = {};
 		// Contain all already processed payment uids .
@@ -96,7 +98,9 @@ export default class StripePaymentWebhook extends PaymentInterface {
 		if (productId in this.products) {
 			return this.products[productId];
 		}
-		const product = await this.stripe.products.retrieve(productId);
+		const product = this.options.test
+			? { metadata: { dummy: "test" } }
+			: await this.stripe.products.retrieve(productId);
 		this.products[productId] = Object.assign(
 			{
 				uid: productId,
@@ -157,15 +161,18 @@ export default class StripePaymentWebhook extends PaymentInterface {
 		}
 
 		const email = invoice.customer_email;
-		let maybeSubscription = null;
-		if (invoice.subscription) {
-			maybeSubscription = new Subscription(invoice.subscription, invoice.period_end * 1000);
-		}
 
 		let products = [];
+		let perdiodEnd = 0;
 		for (const item of invoice.lines.data) {
 			const product = await this.getProduct(item.price.product);
 			products.push(product);
+			perdiodEnd = Math.max(perdiodEnd, item.period.end);
+		}
+
+		let maybeSubscription = null;
+		if (invoice.subscription && perdiodEnd) {
+			maybeSubscription = new Subscription(invoice.subscription, perdiodEnd * 1000);
 		}
 
 		try {
