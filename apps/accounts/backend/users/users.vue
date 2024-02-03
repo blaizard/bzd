@@ -220,7 +220,7 @@
 							...values,
 						});
 					});
-					this.$delete(this.updates, uid);
+					delete this.updates[uid];
 				}
 				// Process the deletion.
 				while (this.hasDeletions) {
