@@ -35,7 +35,7 @@
 						caption: "Your e-mail",
 						fill: true,
 						validation: "mandatory email",
-						condition: () => !this.sent,
+						condition: () => !this.sent && !this.$authentication.isAuthenticated,
 					},
 					{
 						name: "subject",
@@ -77,7 +77,11 @@
 		methods: {
 			async handleSubmitContact() {
 				await this.handleSubmit(async () => {
-					await this.$api.request("post", "/contact", this.info);
+					if (this.$authentication.isAuthenticated) {
+						await this.$api.request("post", "/contact-authenticated", this.info);
+					} else {
+						await this.$api.request("post", "/contact", this.info);
+					}
 					this.sent = true;
 				});
 			},

@@ -322,18 +322,27 @@ const PATH_STATIC = options.static;
 		});
 	});
 
-	api.handle("post", "/contact", async function (inputs) {
+	const sendContactMessage = async (captcha, from, subject, content) => {
 		const response = await HttpClient.post("https://www.google.com/recaptcha/api/siteverify", {
 			query: {
 				secret: ConfigBackend.googleCaptchaSecretKey,
-				response: inputs.captcha,
+				response: captcha,
 			},
 		});
 		const data = JSON.parse(response);
 		Exception.assertPrecondition(data.success, "The captcha token is invalid: {:j}", data["error-codes"]);
-		await email.send(ConfigBackend.emailSupport, "[contact] " + inputs.subject, {
-			text: "From: " + inputs.email + "\n\n" + inputs.content,
+		await email.send(ConfigBackend.emailSupport, "[contact] " + subject, {
+			text: "From: " + from + "\n\n" + content,
 		});
+	};
+
+	api.handle("post", "/contact", async (inputs) => {
+		await sendContactMessage(inputs.captcha, inputs.email, inputs.subject, inputs.content);
+	});
+
+	api.handle("post", "/contact-authenticated", async (inputs, session) => {
+		const user = await users.get(session.getUid());
+		await sendContactMessage(inputs.captcha, user.getEmail(), inputs.subject, inputs.content);
 	});
 
 	// ---- start services ----

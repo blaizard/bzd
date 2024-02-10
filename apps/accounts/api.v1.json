@@ -13,6 +13,21 @@
             }
         }
     },
+    "/contact-authenticated": {
+        "post": {
+            "authentication": true,
+            "documentation": "Send a message to the support channel.",
+            "request": {
+                "type": "json",
+                "validation": {
+                    "captcha": "mandatory",
+                    "content": "mandatory",
+                    "email": "",
+                    "subject": "mandatory"
+                }
+            }
+        }
+    },
     "/password-change": {
         "post": {
             "documentation": "Change the user's password.",
