@@ -13,8 +13,6 @@ export default class StripePaymentWebhook extends PaymentInterface {
 		super(callbackPayment);
 		this.options = Object.assign(
 			{
-				/// Test mode.
-				test: false,
 				/// You API secret Key.
 				secretKey: null,
 				/// The endpoint secret.
@@ -24,13 +22,19 @@ export default class StripePaymentWebhook extends PaymentInterface {
 			},
 			options,
 		);
-		Exception.assert(this.options.test || this.options.secretKey, "'secretKey' is missing.");
-		Exception.assert(this.options.test || this.options.secretEndpoint, "'secretEndpoint' is missing.");
-		this.stripe = this.options.test ? null : Stripe(this.options.secretKey);
+
+		this._init();
 		// Map containing the matching between product identifier and the actual product.
 		this.products = {};
 		// Contain all already processed payment uids .
 		this.processed = new Set();
+	}
+
+	/// Create the stripe object.
+	_init() {
+		Exception.assert(this.options.test || this.options.secretKey, "'secretKey' is missing.");
+		Exception.assert(this.options.test || this.options.secretEndpoint, "'secretEndpoint' is missing.");
+		this.stripe = Stripe(this.options.secretKey);
 	}
 
 	async installAPI(api) {
