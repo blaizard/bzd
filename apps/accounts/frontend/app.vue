@@ -6,6 +6,7 @@
 		<template #menu>
 			<div v-if="$authentication.isAuthenticated">
 				<MenuEntry text="Configuration" icon="bzd-icon-images" link="/"></MenuEntry>
+				<MenuEntry text="Contact" icon="bzd-icon-images" link="/contact"></MenuEntry>
 				<MenuEntry text="Users" icon="bzd-icon-newspaper" :link="$router.fromPath('/admin/users')"></MenuEntry>
 				<MenuEntry
 					text="Applications"
