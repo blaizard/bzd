@@ -75,6 +75,7 @@
 					{ path: "/reset/{uid}/{token}", component: () => import("./password_change.vue") },
 					{ path: "/new/{uid}/{token}", component: () => import("./password_change.vue"), props: { first: true } },
 					{ path: "/reset", component: () => import("./password_reset.vue") },
+					{ path: "/contact", component: () => import("./contact.vue") },
 				],
 				fallback: { component: () => import("./404.vue") },
 			});

@@ -4,6 +4,7 @@
         "type": "stub"
     },
     "emailSupport": "support@dummy.com",
+    "googleCaptchaSecretKey": "6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe",
     "kvs": {
         "accounts": {
             "name": "accounts",

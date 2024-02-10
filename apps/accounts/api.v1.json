@@ -1,4 +1,18 @@
 {
+    "/contact": {
+        "post": {
+            "documentation": "Send a message to the support channel.",
+            "request": {
+                "type": "json",
+                "validation": {
+                    "captcha": "mandatory",
+                    "content": "mandatory",
+                    "email": "mandatory",
+                    "subject": "mandatory"
+                }
+            }
+        }
+    },
     "/password-change": {
         "post": {
             "documentation": "Change the user's password.",

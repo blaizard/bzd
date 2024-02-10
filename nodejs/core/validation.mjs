@@ -327,7 +327,11 @@ export default class Validation {
 				install() {
 					Exception.assert(this.entry.type == "string", "Email is only compatible with string type");
 					return (result, value) => {
-						this.assert(result, value.match(/^([a-zA-Z0-9_\-.]+)@([a-zA-Z0-9_\-.]+)\.([a-zA-Z]{2,5})$/), "email");
+						this.assert(
+							result,
+							String(value).match(/^([a-zA-Z0-9_\-.]+)@([a-zA-Z0-9_\-.]+)\.([a-zA-Z]{2,5})$/),
+							"email",
+						);
 					};
 				}
 			},

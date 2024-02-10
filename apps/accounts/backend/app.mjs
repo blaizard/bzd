@@ -10,6 +10,7 @@ import Authentication from "#bzd/nodejs/core/authentication/session/server.mjs";
 import AuthenticationGoogle from "#bzd/nodejs/core/authentication/google/server.mjs";
 import Result from "#bzd/nodejs/utils/result.mjs";
 import HttpServer from "#bzd/nodejs/core/http/server.mjs";
+import HttpClient from "#bzd/nodejs/core/http/client.mjs";
 import Users from "#bzd/apps/accounts/backend/users/users.mjs";
 import Applications from "#bzd/apps/accounts/backend/applications/applications.mjs";
 import TokenInfo from "#bzd/apps/accounts/backend/users/token.mjs";
@@ -287,13 +288,13 @@ const PATH_STATIC = options.static;
 		const maybeUser = await users.getFromEmail(inputs.uid, /*allowNull*/ true);
 		if (maybeUser === null) {
 			// Don't return any error code if the account does not exists.
-			await this.delayMs(Math.random() * 2000);
+			await delayMs(Math.random() * 2000);
 			return;
 		}
 
 		// Limit the number of password reset attempt for an interval of 1h.
 		if (maybeUser.getLastPasswordResetTimestamp() + 1 * 3600 * 1000 > Date.now()) {
-			await this.delayMs(Math.random() * 2000);
+			await delayMs(Math.random() * 2000);
 			return;
 		}
 
@@ -318,6 +319,20 @@ const PATH_STATIC = options.static;
 		await users.update(maybeUser.getUid(), async (user) => {
 			await user.setPassword(inputs.password);
 			return user;
+		});
+	});
+
+	api.handle("post", "/contact", async function (inputs) {
+		const response = await HttpClient.post("https://www.google.com/recaptcha/api/siteverify", {
+			query: {
+				secret: ConfigBackend.googleCaptchaSecretKey,
+				response: inputs.captcha,
+			},
+		});
+		const data = JSON.parse(response);
+		Exception.assertPrecondition(data.success, "The captcha token is invalid: {:j}", data["error-codes"]);
+		await email.send(ConfigBackend.emailSupport, "[contact] " + inputs.subject, {
+			text: "From: " + inputs.email + "\n\n" + inputs.content,
 		});
 	});
 
