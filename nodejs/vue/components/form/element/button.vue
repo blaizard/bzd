@@ -12,6 +12,7 @@
 
 <script>
 	import Element from "./element.vue";
+	import loadScript from "#bzd/nodejs/core/script.mjs";
 
 	export default {
 		mixins: [Element],
@@ -21,10 +22,18 @@
 			width: { type: Number, optional: true, default: 0 },
 		},
 		emits: ["click"],
+		async mounted() {
+			if (this.googleCaptcha) {
+				await loadScript("https://www.google.com/recaptcha/api.js?render=" + encodeURIComponent(this.googleCaptcha));
+			}
+		},
 		computed: {
 			/// ---- CONFIG ----------------------------------------
 			click() {
 				return this.getOption("click", null);
+			},
+			googleCaptcha() {
+				return this.getOption("googleCaptcha", null);
 			},
 			/// ---- IMPLEMENTATION ----------------------------------
 			attrAction() {
@@ -69,8 +78,21 @@
 		},
 		methods: {
 			async handleClick() {
+				if (this.googleCaptcha) {
+					const token = await this.getGoogleCaptchaToken();
+					await this.set(token);
+				}
 				this.$emit("click", this.context);
 				await (this.click || this.attrAction.defaultClick || (() => {}))(this.context);
+			},
+			async getGoogleCaptchaToken() {
+				return new Promise((resolve, reject) => {
+					grecaptcha.ready(() => {
+						grecaptcha.execute(this.googleCaptcha, { action: "submit" }).then((token) => {
+							resolve(token);
+						});
+					});
+				});
 			},
 		},
 	};
