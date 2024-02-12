@@ -3,7 +3,6 @@
         "from": "hello@dummy.com",
         "type": "stub"
     },
-    "emailSupport": "support@dummy.com",
     "googleCaptchaSecretKey": "6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe",
     "kvs": {
         "accounts": {
@@ -18,5 +17,6 @@
     "payment": {
         "type": "mock"
     },
+    "supportURL": "mailto:support@dummy.com",
     "url": "http://localhost:8080"
 }

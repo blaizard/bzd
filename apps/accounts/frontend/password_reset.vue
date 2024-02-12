@@ -27,7 +27,8 @@
 					{
 						type: "Message",
 						value:
-							"If we found an eligible account associated with that email, we've sent password reset instructions to this email address.",
+							"If we found an eligible account associated with that email, we've sent password reset instructions to this email address." +
+							" Please note that it might take few minutes for the email to reach your mailbox.",
 						condition: () => this.sent,
 					},
 					{

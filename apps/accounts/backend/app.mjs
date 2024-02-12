@@ -198,69 +198,88 @@ const PATH_STATIC = options.static;
 	/// All products must define in Stripe the following metadata:
 	/// - application: "screen_recorder"
 	/// - duration: <seconds>
-	const payment = await paymentMakeFromConfig(async (uid, email, products, maybeSubscription = null) => {
-		// Check if email account exists, if not create one.
-		let maybeUser = await users.getFromEmail(email, /*allowNull*/ true);
-		if (maybeUser === null) {
-			maybeUser = await users.create(email);
+	const payment = await paymentMakeFromConfig(
+		async (uid, email, products, maybeRecurrency = null) => {
+			// Check if email account exists, if not create one.
+			let maybeUser = await users.getFromEmail(email, /*allowNull*/ true);
+			if (maybeUser === null) {
+				maybeUser = await users.create(email);
+				maybeUser = await users.update(maybeUser.getUid(), async (user) => {
+					user.addRole("user");
+					return user;
+				});
+
+				const link = await createResetPasswordLink(maybeUser, /*newPassword*/ true);
+
+				Log.info("Welcome email sent to: {}.", email);
+				await emails.sendWelcome(email, {
+					email: email,
+					support: ConfigBackend.supportURL,
+					link: link,
+				});
+			}
+			Exception.assert(maybeUser, "The user is not defined.");
+
+			// Check if the payment uid is already processed, if so ignore the rest.
+			if (maybeUser.hasPayment(uid)) {
+				return false;
+			}
+
+			// Check the products, make sure they are valid and retrieve the subscription time.
+			let subscriptions = [];
+			for (const product of products) {
+				// Make sure this application exists.
+				await appplications.get(product.application, /*allowNull*/ false);
+				let subscription = null;
+				if (maybeRecurrency && maybeRecurrency.timestampEndMs) {
+					subscription = Subscription.makeFromTimestamp(maybeRecurrency.timestampEndMs);
+					subscription.addRecurringSubscription(maybeRecurrency.uid, maybeRecurrency.timestampEndMs);
+				} else {
+					const duration = parseInt(product.duration);
+					Exception.assert(duration > 0, "The product must embed a duration value in seconds: '{}'.", product.duration);
+					subscription = Subscription.makeFromDuration(duration * 1000);
+				}
+
+				subscriptions.push({
+					application: product.application,
+					subscription: subscription,
+				});
+			}
+
+			// Register the payment to ensure it will not be processed again.
 			maybeUser = await users.update(maybeUser.getUid(), async (user) => {
-				user.addRole("user");
+				// Update the subscription of the application(s) and make sure it is started.
+				for (const subscription of subscriptions) {
+					user.addSubscription(subscription.application, subscription.subscription);
+					user.getSubscription(subscription.application).start();
+				}
+
+				// Register the payment.
+				user.registerPayment(uid);
+
 				return user;
 			});
 
-			const link = await createResetPasswordLink(maybeUser, /*newPassword*/ true);
-
-			Log.info("Welcome email sent to: {}.", email);
-			await emails.sendWelcome(email, {
-				email: email,
-				support: ConfigBackend.emailSupport,
-				link: link,
-			});
-		}
-		Exception.assert(maybeUser, "The user is not defined.");
-
-		// Check if the payment uid is already processed, if so ignore the rest.
-		if (maybeUser.hasPayment(uid)) {
-			return false;
-		}
-
-		// Check the products, make sure they are valid and retrieve the subscription time.
-		let subscriptions = [];
-		for (const product of products) {
-			// Make sure this application exists.
-			await appplications.get(product.application, /*allowNull*/ false);
-			let subscription = null;
-			if (maybeSubscription && maybeSubscription.timestampEndMs) {
-				subscription = Subscription.makeFromTimestamp(maybeSubscription.timestampEndMs);
-				subscription.addRecurringSubscription(maybeSubscription.uid, maybeSubscription.timestampEndMs);
-			} else {
-				const duration = parseInt(product.duration);
-				Exception.assert(duration > 0, "The product must embed a duration value in seconds: '{}'.", product.duration);
-				subscription = Subscription.makeFromDuration(duration * 1000);
+			return true;
+		},
+		async (uid, email) => {
+			let maybeUser = await users.getFromEmail(email, /*allowNull*/ true);
+			if (maybeUser === null) {
+				Log.warning(
+					"A notification for deletion of recurrent payment '{}' for user '{}' was made, but the user does not exists.",
+					uid,
+					email,
+				);
+				return true;
 			}
-
-			subscriptions.push({
-				application: product.application,
-				subscription: subscription,
+			await users.update(maybeUser.getUid(), async (user) => {
+				user.stopRecurringSubscription(uid);
+				return user;
 			});
-		}
-
-		// Register the payment t ensure it will not be processed again.
-		maybeUser = await users.update(maybeUser.getUid(), async (user) => {
-			// Update the subscription of the application(s) and make sure it is started.
-			for (const subscription of subscriptions) {
-				user.addSubscription(subscription.application, subscription.subscription);
-				user.getSubscription(subscription.application).start();
-			}
-
-			// Register the payment.
-			user.registerPayment(uid);
-
-			return user;
-		});
-
-		return true;
-	}, ConfigBackend.payment);
+			return true;
+		},
+		ConfigBackend.payment,
+	);
 
 	// ---- API ----
 
@@ -303,7 +322,7 @@ const PATH_STATIC = options.static;
 		Log.info("Reset password email sent to: {}.", inputs.uid);
 		await emails.sendResetPassword(inputs.uid, {
 			email: inputs.uid,
-			support: ConfigBackend.emailSupport,
+			support: ConfigBackend.supportURL,
 			link: link,
 		});
 	});
@@ -331,9 +350,26 @@ const PATH_STATIC = options.static;
 		});
 		const data = JSON.parse(response);
 		Exception.assertPrecondition(data.success, "The captcha token is invalid: {:j}", data["error-codes"]);
-		await email.send(ConfigBackend.emailSupport, "[contact] " + subject, {
-			text: "From: " + from + "\n\n" + content,
-		});
+		await email.send(
+			[ConfigBackend.email.from, from],
+			"[contact-" + Math.floor(Math.random() * 10000) + "] " + subject,
+			{
+				text:
+					"==== Contact form " +
+					ConfigBackend.url +
+					" ====\n" +
+					"Created: " +
+					new Date().toUTCString() +
+					"\n" +
+					"From: " +
+					from +
+					"\n" +
+					"Subject: " +
+					subject +
+					"\n\n" +
+					content,
+			},
+		);
 	};
 
 	api.handle("post", "/contact", async (inputs) => {

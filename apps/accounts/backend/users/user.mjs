@@ -202,6 +202,15 @@ export default class User {
 		this.modified.push(...user.modified);
 	}
 
+	stopRecurringSubscription(uid) {
+		for (const [application, data] of Object.entries(this.getSubscriptions())) {
+			const subscription = new Subscription(data);
+			if (subscription.stopRecurringSubscription(uid)) {
+				this.modified.push("subscriptions(" + application + ":-recurring)");
+			}
+		}
+	}
+
 	getTokens() {
 		return this.value.tokens || {};
 	}

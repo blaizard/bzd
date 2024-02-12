@@ -2,15 +2,15 @@ import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import Stripe from "stripe";
 import ServiceProvider from "#bzd/apps/accounts/backend/services/provider.mjs";
-import { PaymentInterface, Subscription } from "#bzd/nodejs/payment/payment.mjs";
+import { PaymentInterface, PaymentRecurrency } from "#bzd/nodejs/payment/payment.mjs";
 import Result from "#bzd/nodejs/utils/result.mjs";
 
 const Exception = ExceptionFactory("payment", "stripe");
 const Log = LogFactory("payment", "stripe");
 
 export default class StripePaymentWebhook extends PaymentInterface {
-	constructor(callbackPayment, options) {
-		super(callbackPayment);
+	constructor(callbackPayment, callbackCancelRecurrency, options) {
+		super(callbackPayment, callbackCancelRecurrency);
 		this.options = Object.assign(
 			{
 				/// You API secret Key.
@@ -26,8 +26,11 @@ export default class StripePaymentWebhook extends PaymentInterface {
 		this._init();
 		// Map containing the matching between product identifier and the actual product.
 		this.products = {};
-		// Contain all already processed payment uids .
-		this.processed = new Set();
+		// Map containing the matching between customer identifier and their email.
+		this.customers = {};
+		// Contain all already processed uids .
+		this.processedPayments = new Set();
+		this.processedDeletedSubscriptions = new Set();
 	}
 
 	/// Create the stripe object.
@@ -70,7 +73,7 @@ export default class StripePaymentWebhook extends PaymentInterface {
 					break;
 
 				case "customer.subscription.deleted":
-					// Handle deleted subscriptions here.
+					await self.processSubscriptionDeleted(event.data.object);
 					break;
 
 				default:
@@ -102,9 +105,7 @@ export default class StripePaymentWebhook extends PaymentInterface {
 		if (productId in this.products) {
 			return this.products[productId];
 		}
-		const product = this.options.test
-			? { metadata: { dummy: "test" } }
-			: await this.stripe.products.retrieve(productId);
+		const product = await this.stripe.products.retrieve(productId);
 		this.products[productId] = Object.assign(
 			{
 				uid: productId,
@@ -112,6 +113,36 @@ export default class StripePaymentWebhook extends PaymentInterface {
 			product.metadata,
 		);
 		return this.products[productId];
+	}
+
+	/// Return the email associated with a customer from its ID.
+	async getCustomerEmail(customerId) {
+		if (customerId in this.customers) {
+			return this.customers[customerId];
+		}
+		const customer = await this.stripe.customers.retrieve(customer);
+		this.customers[customerId] = customer.email;
+		return this.customers[customerId];
+	}
+
+	/// Process a deleted subscription event.
+	async processSubscriptionDeleted(subscription) {
+		const uid = subscription.id;
+
+		if (this.processedDeletedSubscriptions.has(uid)) {
+			return;
+		}
+
+		const email = await this.getCustomerEmail(subscription.customer);
+
+		try {
+			const isProcessed = await this.callbackCancelRecurrency(uid, email);
+			this.processedDeletedSubscriptions.add(uid);
+			return isProcessed;
+		} catch (e) {
+			Log.error("Cancel Recurrency: {:j}", subscription);
+			throw e;
+		}
 	}
 
 	/// Process a given checkout session.
@@ -126,7 +157,7 @@ export default class StripePaymentWebhook extends PaymentInterface {
 		const uid = checkoutSession.payment_intent;
 
 		/// If it is already processed, ignore.
-		if (this.processed.has(uid)) {
+		if (this.processedPayments.has(uid)) {
 			return false;
 		}
 
@@ -145,7 +176,7 @@ export default class StripePaymentWebhook extends PaymentInterface {
 
 		try {
 			const isProcessed = await this.callbackPayment(uid, email, products);
-			this.processed.add(uid);
+			this.processedPayments.add(uid);
 			return isProcessed;
 		} catch (e) {
 			Log.error("Checkout Session: {:j}", checkoutSession);
@@ -160,7 +191,7 @@ export default class StripePaymentWebhook extends PaymentInterface {
 		const uid = invoice.payment_intent;
 
 		/// If it is already processed, ignore.
-		if (this.processed.has(uid)) {
+		if (this.processedPayments.has(uid)) {
 			return false;
 		}
 
@@ -174,14 +205,14 @@ export default class StripePaymentWebhook extends PaymentInterface {
 			perdiodEnd = Math.max(perdiodEnd, item.period.end);
 		}
 
-		let maybeSubscription = null;
+		let maybeRecurrency = null;
 		if (invoice.subscription && perdiodEnd) {
-			maybeSubscription = new Subscription(invoice.subscription, perdiodEnd * 1000);
+			maybeRecurrency = new PaymentRecurrency(invoice.subscription, perdiodEnd * 1000);
 		}
 
 		try {
-			const isProcessed = await this.callbackPayment(uid, email, products, maybeSubscription);
-			this.processed.add(uid);
+			const isProcessed = await this.callbackPayment(uid, email, products, maybeRecurrency);
+			this.processedPayments.add(uid);
 			return isProcessed;
 		} catch (e) {
 			Log.error("Invoice: {:j}", invoice);
@@ -274,6 +305,23 @@ export default class StripePaymentWebhook extends PaymentInterface {
 			},
 		);
 
+		// Loop through all cancelled subscriptions.
+		let subscriptions = [0, 0];
+		const resultSubscriptions = await this._forEachSearch(
+			async (page) => {
+				return await this.stripe.subscriptions.search({
+					query: "created>" + since + " AND status:'canceled'",
+					page: page,
+				});
+			},
+			async (subscription) => {
+				++subscriptions[1];
+				if (await this.processSubscriptionDeleted(subscription)) {
+					++subscriptions[0];
+				}
+			},
+		);
+
 		let errors = [];
 		if (resultInvoices.hasError()) {
 			errors = [...errors, resultInvoices.error()];
@@ -281,8 +329,16 @@ export default class StripePaymentWebhook extends PaymentInterface {
 		if (resultCheckout.hasError()) {
 			errors = [...errors, resultCheckout.error()];
 		}
+		if (resultSubscriptions.hasError()) {
+			errors = [...errors, resultSubscriptions.error()];
+		}
 		Exception.assert(errors.length == 0, "{} error(s): {}", errors.length, errors.join("\n"));
 
-		return { invoices, checkouts };
+		return { invoices, checkouts, subscriptions };
+	}
+
+	/// Cancel an existing payment recurrency.
+	async _cancelRecurrency(uid, email) {
+		await this.stripe.subscriptions.cancel(uid);
 	}
 }

@@ -1,6 +1,7 @@
 import Stripe from "#bzd/nodejs/payment/stripe/webhook.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import testDataInvoicePaymentSucceeded1 from "#bzd/nodejs/payment/stripe/tests/invoice.payment_succeeded.json" assert { type: "json" };
+import testDataCustomerSubscriptionDeleted1 from "#bzd/nodejs/payment/stripe/tests/customer.subscription.deleted.json" assert { type: "json" };
 
 const Exception = ExceptionFactory("test", "stripe");
 
@@ -10,17 +11,14 @@ class StripeForTest extends Stripe {
 	}
 
 	async getProduct(productId) {
-		if (productId in this.products) {
-			return this.products[productId];
-		}
-		const product = { metadata: { dummy: "test" } };
-		this.products[productId] = Object.assign(
-			{
-				uid: productId,
-			},
-			product.metadata,
-		);
-		return this.products[productId];
+		return {
+			uid: productId,
+			metadata: { dummy: "test" },
+		};
+	}
+
+	async getCustomerEmail(customerId) {
+		return customerId + "@dummy.com";
 	}
 }
 
@@ -39,6 +37,22 @@ describe("Stripe", () => {
 				++callbackCalled;
 			});
 			await stripe.processInvoice(testDataInvoicePaymentSucceeded1);
+			Exception.assert(callbackCalled == 1);
+		});
+	});
+
+	describe("customer.subscription.deleted", () => {
+		it("1", async () => {
+			let callbackCalled = 0;
+			const stripe = new StripeForTest(
+				(uid, email, products, maybeSubscription) => {},
+				(uid, email) => {
+					Exception.assertEqual(uid, "sub_1Oj1KWFcRmSNTPwAe4FbkOMn");
+					Exception.assertEqual(email, "cus_PY7ZxKt5nLDwU2@dummy.com");
+					++callbackCalled;
+				},
+			);
+			await stripe.processSubscriptionDeleted(testDataCustomerSubscriptionDeleted1);
 			Exception.assert(callbackCalled == 1);
 		});
 	});
