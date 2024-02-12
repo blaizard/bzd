@@ -26,7 +26,8 @@
 				return [
 					{
 						type: "Message",
-						value: "Your message has been successfully sent.",
+						value:
+							"Thank you for your message, it has been successfully sent. Our team will reply to you as soon as possible.",
 						condition: () => this.sent,
 					},
 					{

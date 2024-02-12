@@ -92,6 +92,14 @@ export default class Subscription {
 		return this.value.recurring || {};
 	}
 
+	stopRecurringSubscription(uid) {
+		if (uid in this.getRecurringSubscriptions()) {
+			delete this.value.recurring[uid];
+			return true;
+		}
+		return false;
+	}
+
 	/// Clear all expired recurring subscriptions.
 	sanitize() {
 		this.value.recurring = Object.entries(this.getRecurringSubscriptions()).reduce((recurring, [uid, endMs]) => {

@@ -20,6 +20,7 @@ bazel run //apps/accounts/backend --config=dev -- --test
 stripe listen --forward-to http://localhost:8080/api/v1/stripe
 stripe trigger payment_intent.succeeded
 stripe trigger checkout.session.completed
+stripe trigger customer.subscription.deleted
 ```
 
 ### Serverless

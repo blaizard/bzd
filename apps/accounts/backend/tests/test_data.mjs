@@ -1,7 +1,7 @@
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import { scopeSelfBasicRead, scopeSelfSubscriptionsRead } from "#bzd/apps/accounts/backend/users/scopes.mjs";
-import { Subscription } from "#bzd/nodejs/payment/payment.mjs";
+import { PaymentRecurrency } from "#bzd/nodejs/payment/payment.mjs";
 
 const Log = LogFactory("test", "data");
 const Exception = ExceptionFactory("test", "data");
@@ -11,12 +11,13 @@ export default class TestData {
 		this.users = users;
 		this.applications = applications;
 		this.payment = payment;
+		this.adminEmail = "admin@admin.com";
 	}
 
 	async install() {
 		Log.info("Installing test data...");
 
-		const userAdmin = await this.users.create("admin@admin.com");
+		const userAdmin = await this.users.create(this.adminEmail);
 		await this.users.update(userAdmin.getUid(), async (user) => {
 			await user.setPassword("1234");
 			user.addRole("admin");
@@ -41,19 +42,19 @@ export default class TestData {
 
 	async run() {
 		Exception.assert(
-			await this.payment.triggerPayment("10001", "admin@admin.com", [
+			await this.payment.triggerPayment("10001", this.adminEmail, [
 				{ uid: 1, application: "screen-recorder", duration: 7 * 24 * 3600 },
 			]),
 		);
 		Exception.assert(
-			!(await this.payment.triggerPayment("10001", "admin@admin.com", [
+			!(await this.payment.triggerPayment("10001", this.adminEmail, [
 				{ uid: 1, application: "screen-recorder", duration: 24 * 3600 },
 			])),
 			"2 payments with the same id should not be processed.",
 		);
 		Exception.assertThrows(
 			async () =>
-				await this.payment.triggerPayment("10002", "admin@admin.com", [
+				await this.payment.triggerPayment("10002", this.adminEmail, [
 					{ uid: 2, application: "unknown", duration: 24 * 3600 },
 				]),
 			"payment with unknown application should fail.",
@@ -61,11 +62,11 @@ export default class TestData {
 		Exception.assert(
 			await this.payment.triggerPayment(
 				"10002",
-				"admin@admin.com",
+				this.adminEmail,
 				[{ uid: 1, application: "screen-recorder", duration: 7 * 24 * 3600 }],
-				new Subscription("abc", Date.now() + 3600 * 1000),
+				new PaymentRecurrency("abc", Date.now() + 3600 * 1000),
 			),
-			"Recurring subscription",
+			"Recurring payment",
 		);
 		Exception.assert(
 			await this.payment.triggerPayment("10001", "dummy-1@dummy.com", [

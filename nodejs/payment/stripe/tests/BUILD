@@ -3,6 +3,7 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_test")
 bzd_nodejs_test(
     name = "webhook_test",
     srcs = [
+        "customer.subscription.deleted.json",
         "invoice.payment_succeeded.json",
         "webhook_test.mjs",
     ],
