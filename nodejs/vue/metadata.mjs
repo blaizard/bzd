@@ -1,7 +1,8 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import Validation from "#bzd/nodejs/core/validation.mjs";
+import { reactive, watch } from "vue";
 
-const Exception = ExceptionFactory("meta");
+const Exception = ExceptionFactory("metadata");
 
 function setTitle(title) {
 	let element = document.querySelector("title") || document.createElement("title");
@@ -24,27 +25,77 @@ function setMeta(name, content) {
 	document.getElementsByTagName("head")[0].appendChild(meta);
 }
 
+function setCanonical(url) {
+	let link = document.querySelector("link[rel='canonical']") || document.createElement("link");
+	link.rel = "canonical";
+	link.href = url;
+	document.getElementsByTagName("head")[0].appendChild(link);
+}
+
+function getBase() {
+	return window.location.protocol + "//" + window.location.host;
+}
+
 export default {
-	install: (app, meta = {}) => {
+	install: (app, values = {}) => {
+		const data = reactive({
+			icon: "",
+			description: "",
+			keywords: [],
+			title: "",
+			base: "",
+			route: "",
+		});
+
+		watch(
+			() => data.icon,
+			(value) => {
+				setIcon(value);
+			},
+		);
+		watch(
+			() => data.description,
+			(value) => {
+				setMeta("description", value);
+			},
+		);
+		watch(
+			() => data.keywords,
+			(value) => {
+				setMeta("keywords", value.join(", "));
+			},
+		);
+		watch(
+			() => data.title,
+			(value) => {
+				setTitle(value);
+			},
+		);
+		watch(
+			() => [data.base, data.route],
+			([base, route]) => {
+				const value = base.replace(/\/*$/g, "") + "/" + route.replace(/^\/*/g, "");
+				setCanonical(value);
+			},
+		);
+
 		const validation = new Validation({
 			icon: "",
 			description: "",
 			keywords: "",
 			title: "",
+			base: "",
+			route: "",
 		});
-		validation.validate(meta, { all: true });
+		validation.validate(values, { all: true });
+		Object.assign(
+			data,
+			{
+				base: getBase(),
+			},
+			values,
+		);
 
-		if ("icon" in meta) {
-			setIcon(meta.icon);
-		}
-		if ("description" in meta) {
-			setMeta("description", meta.description);
-		}
-		if ("keywords" in meta) {
-			setMeta("keywords", meta.keywords.join(", "));
-		}
-		if ("title" in meta) {
-			setTitle(meta.title);
-		}
+		app.config.globalProperties.$metadata = data;
 	},
 };

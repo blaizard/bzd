@@ -11,7 +11,7 @@ function validateConfig(schema, config) {
 	Exception.assertResult(result);
 }
 
-export default async function makeFromConfig(callbackPayment, config) {
+export default async function makeFromConfig(callbackPayment, callbackCancelRecurrency, config) {
 	validateConfig(
 		{
 			type: "mandatory",
@@ -22,9 +22,9 @@ export default async function makeFromConfig(callbackPayment, config) {
 
 	switch (config.type) {
 		case "stripe":
-			return new PaymentStripe(callbackPayment, config.options);
+			return new PaymentStripe(callbackPayment, callbackCancelRecurrency, config.options);
 		case "mock":
-			return new PaymentMock(callbackPayment, config.options);
+			return new PaymentMock(callbackPayment, callbackCancelRecurrency, config.options);
 		default:
 			Exception.unreachable("Unsupported payment type: '{}'.", config.type);
 	}

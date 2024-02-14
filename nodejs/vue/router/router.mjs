@@ -83,6 +83,8 @@ class RouterManager {
 				hash: true,
 				// Authentication object to be used with this router.
 				authentication: null,
+				// Called each time a new route is processed.
+				onRouteUpdate: (route) => {},
 			},
 			options,
 		);
@@ -90,6 +92,7 @@ class RouterManager {
 		this.routers = {};
 		this.path = Path.makeFromLocation(this.options.hash);
 		this.uid = 0;
+		this.updateState(Path.getQuery());
 	}
 
 	registerRouter(configuration) {
@@ -166,31 +169,28 @@ class RouterManager {
 		delete this.routers[uid];
 	}
 
+	updateState(query) {
+		// Update the url
+		const queryStr = Object.keys(query).length
+			? "?" +
+				Object.keys(query)
+					.map((key) => key + "=" + encodeURIComponent(query[key]))
+					.join("&")
+			: "";
+		const state = this.options.hash ? queryStr + "#" + this.path.route : this.path.route + queryStr;
+		history.pushState(null, null, state);
+
+		// Call the hook.
+		this.options.onRouteUpdate(this.path.route);
+	}
+
 	async dispatch(path = null, dispatchOptions = {}) {
 		// Clear current actions if any.
 		this.registry.reset();
 		this.path = path ? new Path(path) : Path.makeFromLocation(this.options.hash);
 
-		// Update the options.
-		dispatchOptions = Object.assign(
-			{
-				/// Query to be added to the URL.
-				query: "query" in dispatchOptions ? {} : Path.getQuery(),
-				/// Custom properties that will be added to the component.
-				props: {},
-			},
-			dispatchOptions,
-		);
-
-		// Update the url
-		const queryStr = Object.keys(dispatchOptions.query).length
-			? "?" +
-				Object.keys(dispatchOptions.query)
-					.map((key) => key + "=" + encodeURIComponent(dispatchOptions.query[key]))
-					.join("&")
-			: "";
-		const state = this.options.hash ? queryStr + "#" + this.path.route : this.path.route + queryStr;
-		history.pushState(null, null, state);
+		// Update the url.
+		this.updateState(dispatchOptions.query || Path.getQuery());
 
 		// Loop through the routers and dispatch.
 		for (const router of Object.values(this.routers)) {
