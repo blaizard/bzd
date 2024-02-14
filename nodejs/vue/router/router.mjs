@@ -118,6 +118,10 @@ class RouterManager {
 			if (route.handler) {
 				await route.handler(route.path, dispatchOptions, args);
 			}
+
+			if (route.redirect) {
+				await this.dispatch(route.redirect);
+			}
 		};
 
 		let router = new Router({
