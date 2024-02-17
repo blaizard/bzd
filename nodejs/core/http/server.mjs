@@ -194,7 +194,9 @@ export default class HttpServer {
 				maxAge: 60 * 60 * 1000, // 1h
 				index: "index.html",
 				fallback: "index.html",
-				headers: {},
+				headers: {
+					"Cache-Control": process.env.NODE_ENV == "development" ? "private, max-age=0" : "private, max-age=300",
+				},
 			},
 			options,
 		);
@@ -204,13 +206,6 @@ export default class HttpServer {
 			maxAge: options.maxAge,
 			index: options.index,
 			setHeaders: (res, path) => {
-				// Do not cache the entry point
-				// this is usefull when the application updates.
-				if (path.endsWith(options.index)) {
-					res.header("Cache-Control", "private, no-cache, no-store, must-revalidate");
-					res.header("Expires", "-1");
-					res.header("Pragma", "no-cache");
-				}
 				Object.entries(options.headers).forEach(([key, value]) => {
 					res.header(key, value);
 				});

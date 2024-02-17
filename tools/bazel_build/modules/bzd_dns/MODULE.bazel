@@ -1,5 +1,5 @@
 module(
-    name = "bzd_octodns",
+    name = "bzd_dns",
     version = "1.0",
 )
 
@@ -7,8 +7,8 @@ bazel_dep(name = "rules_python", version = "0.28.0")
 
 pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
 pip.parse(
-    hub_name = "bzd_octodns_pip",
+    hub_name = "bzd_dns_pip",
     python_version = "3.11",
-    requirements_lock = "@bzd_octodns//:requirements.txt",
+    requirements_lock = "@bzd_dns//:requirements.txt",
 )
-use_repo(pip, "bzd_octodns_pip")
+use_repo(pip, "bzd_dns_pip")

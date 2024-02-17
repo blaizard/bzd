@@ -202,6 +202,7 @@
 			margin-right: 3ch;
 			color: #999;
 			user-select: none;
+			-webkit-user-select: none;
 		}
 	}
 </style>

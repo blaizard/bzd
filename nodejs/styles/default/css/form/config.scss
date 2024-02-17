@@ -134,6 +134,7 @@
 	background-size: 100% 100%;
 
 	user-select: none;
+	-webkit-user-select: none;
 
 	@keyframes clickableAnimation {
 		0% {
@@ -194,9 +195,7 @@
 %draggable {
 	cursor: move;
 	user-select: none;
-	-moz-user-select: none;
 	-webkit-user-select: none;
-	-ms-user-select: none;
 	-webkit-user-drag: none;
 	user-drag: none;
 	-webkit-touch-callout: none;
@@ -233,6 +232,7 @@
 	cursor: pointer;
 	color: $color;
 	user-select: none;
+	-webkit-user-select: none;
 	opacity: 0.5;
 	display: inline-block;
 	vertical-align: middle;
