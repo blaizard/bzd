@@ -24,3 +24,7 @@ class Zones:
 		"""Convert a zones structure into its json representation."""
 
 		return {subdomain: [record.data for record in records] for subdomain, records in self.data.items()}
+
+	def items(self) -> typing.Iterator[typing.Tuple[str, typing.List[Record]]]:
+		for subdomain, records in self.data.items():
+			yield subdomain, records

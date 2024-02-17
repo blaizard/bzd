@@ -23,6 +23,7 @@ py_console_script_binary(
 py_library(
     name = "lib",
     srcs = [
+        "octodns.py",
         "record.py",
         "zones.py",
     ],

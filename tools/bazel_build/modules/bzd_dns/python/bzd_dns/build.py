@@ -3,6 +3,9 @@ import pathlib
 import typing
 import json
 
+from bzd_dns.zones import Zones
+from bzd_dns.octodns import Octodns
+
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="DNS provider builder.")
 	parser.add_argument("--output", default=None, type=pathlib.Path, help="Output directory.")
@@ -18,5 +21,14 @@ if __name__ == "__main__":
 
 	args = parser.parse_args()
 
-	print(args.inputs)
+	# Build up the domains zones.
+	domains = {}
+	for domain, path in args.inputs:
+		dataStr = pathlib.Path(path).read_text()
+		data = json.loads(dataStr)
+		domains.setdefault(domain, Zones()).add(data)
+
+	provider = Octodns(output=pathlib.Path(args.output))
+	provider.process(domains)
+
 	sys.exit(1)

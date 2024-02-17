@@ -36,6 +36,11 @@ class Record:
 		                ]), f"There can be only a single record {self} for the subdomain '{subdomain}'."
 		zone.append(self)
 
+	def visit(self, visitor: typing.Any) -> None:
+		methodName = "visit" + type(self).__name__
+		assert hasattr(visitor, methodName), f"The visitor is missing a method named '{methodName}'."
+		getattr(visitor, methodName)(self)
+
 	def __repr__(self) -> str:
 		content = f"<{type(self).__name__} "
 		content += " ".join([f"{k}=\"{v}\"" for k, v in self.data.items() if k != "type"])
