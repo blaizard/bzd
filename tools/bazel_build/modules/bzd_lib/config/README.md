@@ -9,6 +9,18 @@ bzd_config(
 )
 ```
 
+or
+
+```py
+bzd_config(
+    name = "config",
+    values = {
+      "hello": "world",
+      "nested.key": "1"
+    },
+)
+```
+
 To update the configuration from a file, use the following syntax:
 
 ```sh

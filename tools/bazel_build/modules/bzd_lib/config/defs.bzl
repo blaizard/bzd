@@ -14,9 +14,21 @@ def _bzd_config_impl(ctx):
     key_values = [keyValue for keyValue in ctx.attr.set_flag[BuildSettingInfo].value if keyValue]
     files = ctx.files.file_flag
 
+    input_files = []
+    input_files += ctx.files.srcs
+
+    # If there are inline values, create an additional input file.
+    if ctx.attr.values:
+        values_file = ctx.actions.declare_file(ctx.label.name + ".values.json")
+        ctx.actions.write(
+            output = values_file,
+            content = json.encode(ctx.attr.values),
+        )
+        input_files.append(values_file)
+
     # Build the default configuration.
     ctx.actions.run(
-        inputs = ctx.files.srcs + files,
+        inputs = input_files + files,
         outputs = [ctx.outputs.output_json],
         progress_message = "Generating default configuration for {}...".format(ctx.label),
         arguments = [
@@ -26,7 +38,7 @@ def _bzd_config_impl(ctx):
                     ] +
                     ["--set=" + key_value for key_value in key_values] +
                     ["--file=" + f.path for f in files] +
-                    [f.path for f in ctx.files.srcs],
+                    [f.path for f in input_files],
         executable = ctx.executable._config_merge,
     )
 
@@ -48,8 +60,10 @@ _bzd_config = rule(
         ),
         "srcs": attr.label_list(
             allow_files = [".json"],
-            mandatory = True,
             doc = "Configuration files.",
+        ),
+        "values": attr.string_dict(
+            doc = "Inline configuration values.",
         ),
         "_config_merge": attr.label(
             default = Label("@bzd_lib//config:merge"),

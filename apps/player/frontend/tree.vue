@@ -141,6 +141,7 @@
 			padding-left: #{$arrowSize * 2}px;
 			white-space: nowrap;
 			user-select: none;
+			-webkit-user-select: none;
 
 			&.clickable {
 				cursor: pointer;

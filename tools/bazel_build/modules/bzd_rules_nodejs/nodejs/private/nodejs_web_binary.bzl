@@ -28,6 +28,20 @@ def _bzd_nodejs_web_exec_impl(ctx):
         target_file = ctx.file._vite_config,
     )
 
+    # Add static files, all files under "/public" are copied into the bundle.
+    statics = []
+    for static, path in ctx.attr.static.items():
+        files_to_link = static[DefaultInfo].files.to_list()
+        if len(files_to_link) != 1:
+            fail("There can be only a single file for {}".format(static))
+        symlink = ctx.actions.declare_file("public/" + path, sibling = install.package_json)
+        ctx.actions.symlink(
+            output = symlink,
+            target_file = files_to_link[0],
+        )
+        statics.append(symlink)
+
+    # Create the index.html
     index = ctx.actions.declare_file("index.html", sibling = install.package_json)
     ctx.actions.write(
         output = index,
@@ -59,7 +73,7 @@ def _bzd_nodejs_web_exec_impl(ctx):
 
     bundle = ctx.actions.declare_directory("{}.bundle".format(ctx.label.name))
     ctx.actions.run(
-        inputs = depset([vite_config, index, config_scss], transitive = [install.files]),
+        inputs = depset([vite_config, index, config_scss] + statics, transitive = [install.files]),
         outputs = [bundle],
         arguments = [
             "{}/node_modules/vite/bin/vite".format(vite_config.dirname),
@@ -115,6 +129,13 @@ _bzd_nodejs_web_binary = rule(
         "main": attr.label(
             mandatory = True,
             allow_single_file = True,
+        ),
+        "static": attr.label_keyed_string_dict(
+            doc = "Static files to be added to the bundle.",
+            default = {
+                "@bzd_rules_nodejs//nodejs/metadata:default_robots.txt": "robots.txt",
+            },
+            allow_files = True,
         ),
         "_allowlist_function_transition": attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist",

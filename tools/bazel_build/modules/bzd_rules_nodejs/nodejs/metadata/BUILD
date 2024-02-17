@@ -3,6 +3,7 @@ load("@rules_python//python:defs.bzl", "py_binary")
 exports_files([
     "metadata_nodejs.json",
     "metadata_nodejs_web.json",
+    "default_robots.txt",
 ])
 
 py_binary(
