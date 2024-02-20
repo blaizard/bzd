@@ -1,71 +1,120 @@
 import pathlib
 import typing
 
+import yaml
+
 from bzd_dns.zones import Zones
 from bzd_dns.record import Record
+
+
+class Builder:
+
+	def __init__(self, record: Record) -> None:
+		self.record = record
+		self.data = {}
+
+	def add(self, attribute: str, yaml: typing.Optional[str] = None, formatStr: str = "{}") -> "Builder":
+		if attribute in self.record.data:
+			self.data[yaml if yaml else attribute] = formatStr.format(self.record.data[attribute])
+		return self
+
+	def addBuilder(self, attribute: str, builder: "Builder") -> "Builder":
+		self.data[attribute] = builder.data
+		return self
 
 
 class Visitor:
 
 	def __init__(self) -> None:
-		self.content = ""
+		self.content = {}
 
-	def setLine(self, record: Record, attribute: str, yaml: typing.Optional[str] = None) -> None:
-		if attribute in record.data:
-			self.content += f"    {yaml if yaml else attribute}: {record.data[attribute]}\n"
+	@staticmethod
+	def insertKV(data: typing.Dict[str, typing.Any], key: str, value: typing.Optional[typing.Any] = None) -> None:
+		if value is not None:
+			if data.get(key) is not None:
+				assert value == data.get(key), f"Value for '{key}' conflicts between '{value}' and '{data.get(key)}'."
+			data[key] = value
 
-	def setCommon(self, record: Record) -> None:
-		self.content += f"  - type: {record.data['type'].upper()}\n"
-		self.setLine(record, "ttl")
+	def add(self, record: Record, value: typing.Any) -> None:
+		key = record.data["type"].upper()
+		data = self.content.setdefault(key, {"value": None})
+		Visitor.insertKV(data, "ttl", record.get("ttl"))
+		if "value" in data:
+			if data["value"] is None:
+				data["value"] = value
+			else:
+				data["values"] = [data["value"]]
+				del data["value"]
+		if "values" in data:
+			data["values"].append(value)
 
 	def visitRecordA(self, record: Record) -> None:
-		self.setCommon(record)
-		self.setLine(record, "value")
+		self.add(record, record.get("value"))
 
 	def visitRecordAAAA(self, record: Record) -> None:
-		self.setCommon(record)
-		self.setLine(record, "value")
+		self.add(record, record.get("value"))
+
+	def visitRecordCNAME(self, record: Record) -> None:
+		self.add(record, record.get("value") + ".")
+
+	def visitRecordTXT(self, record: Record) -> None:
+		# ';' must be escaped as they correspond to comments.
+		self.add(record, record.get("value").replace(";", "\\;"))
+
+	def visitRecordMX(self, record: Record) -> None:
+		value = Builder(record).add("priority", "preference").add("value", "exchange", "{}.").data
+		self.add(record, value)
+
+	def get(self) -> str:
+		return [v | {"type": k} for k, v in self.content.items()]
 
 
 class Octodns:
 
-	def __init__(self, output: pathlib.Path) -> None:
+	def __init__(self, output: pathlib.Path, relative: pathlib.Path, config: typing.Dict[str, str]) -> None:
 		self.output = output
+		self.relative = relative
+		self.config = config
 		self.zones = output / "zones"
 		self.zones.mkdir(parents=True, exist_ok=True)
 
 	def process(self, domains: typing.Dict[str, Zones]) -> None:
 
 		for domain, zones in domains.items():
-			content = "---\n"
+			content = {}
 			for subdomain, records in zones.items():
-				content += f"'{subdomain}':\n"
+				visitor = Visitor()
 				for record in records:
-					visitor = Visitor()
 					record.visit(visitor)
-					content += visitor.content
-			(self.zones / f"{domain}.yaml").write_text(content)
+				content[subdomain] = visitor.get()
+			contentStr = yaml.dump(content)
+			(self.zones / f"{domain}.yaml").write_text(contentStr)
 
 		self.makeConfig(domains.keys())
 
 	def makeConfig(self, domains: typing.Sequence[str]) -> None:
 
-		content = "---\n"
-		content += "providers:\n"
-		content += "  config:\n"
-		content += "    class: octodns.provider.yaml.YamlProvider\n"
-		content += f"    directory: {self.zones}\n"
-		content += "    default_ttl: 300\n"
-		content += "    enforce_order: true\n"
-		content += "  provider:\n"
-		content += "    class: octodns_digitalocean.DigitalOceanProvider\n"
-		content += "    token: abc\n"
-		content += "zones:\n"
-		for domain in domains:
-			content += f"  {domain}.:\n"
-			content += "    sources:\n"
-			content += "      - config\n"
-			content += "    targets:\n"
-			content += "      - provider\n"
+		if self.config["provider"] == "digitalocean":
+			provider = {"class": "octodns_digitalocean.DigitalOceanProvider", "token": self.config['token']}
+		else:
+			assert False, f"Unsupported provider: '{self.config['provider']}'."
 
-		(self.output / "config.yaml").write_text(content)
+		zones = {}
+		for domain in domains:
+			zones[f"{domain}."] = {"sources": ["config"], "targets": ["provider"]}
+
+		content = {
+		    "providers": {
+		        "config": {
+		            "class": "octodns.provider.yaml.YamlProvider",
+		            "directory": f"{self.relative}/zones",
+		            "default_ttl": 300,
+		            "enforce_order": True
+		        },
+		        "provider": provider
+		    },
+		    "zones": zones
+		}
+
+		contentStr = yaml.dump(content)
+		(self.output / "config.yaml").write_text(contentStr)
