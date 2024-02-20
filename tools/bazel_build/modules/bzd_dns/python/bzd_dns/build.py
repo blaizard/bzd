@@ -8,7 +8,8 @@ from bzd_dns.octodns import Octodns
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="DNS provider builder.")
-	parser.add_argument("--output", default=None, type=pathlib.Path, help="Output directory.")
+	parser.add_argument("--output", type=pathlib.Path, help="Output directory.")
+	parser.add_argument("--relative", type=pathlib.Path, help="Relative path when executed.")
 	parser.add_argument("--config", default=None, type=pathlib.Path, help="Configuration used for the provider.")
 	parser.add_argument(
 	    "--input",
@@ -17,6 +18,11 @@ if __name__ == "__main__":
 	    metavar=("domain", "path"),
 	    action="append",
 	    help="Input pair of zone files and their domain.",
+	)
+	parser.add_argument(
+	    "config",
+	    type=pathlib.Path,
+	    help="Path of the provider configuration.",
 	)
 
 	args = parser.parse_args()
@@ -28,7 +34,8 @@ if __name__ == "__main__":
 		data = json.loads(dataStr)
 		domains.setdefault(domain, Zones()).add(data)
 
-	provider = Octodns(output=pathlib.Path(args.output))
-	provider.process(domains)
+	# Read the configuration
+	config = json.loads(args.config.read_text())
 
-	sys.exit(1)
+	provider = Octodns(output=args.output, relative=args.relative, config=config)
+	provider.process(domains)

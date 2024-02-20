@@ -1,5 +1,7 @@
 """DNS bazel rules."""
 
+load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
+
 def _bzd_dns_zones_impl(ctx):
     output = ctx.outputs.output_json
     if not output:
@@ -55,21 +57,32 @@ def _bzd_dns_binary_impl(ctx):
 
     args = ctx.actions.args()
     args.add("--output", output.path)
+    args.add("--relative", output.short_path)
     for target, domains in ctx.attr.srcs.items():
         for domain in domains.split(","):
             for f in target[DefaultInfo].files.to_list():
                 args.add_all("--input", [domain, f])
+    args.add(ctx.file.config)
 
     # Generate the file structure under output.
     ctx.actions.run(
-        inputs = ctx.files.srcs,
+        inputs = ctx.files.srcs + [ctx.file.config],
         outputs = [output],
-        progress_message = "Preparing DNS zones for {}...".format(ctx.label),
+        progress_message = "Generating DNS zones for {}...".format(ctx.label),
         arguments = [args],
         executable = ctx.executable._build,
     )
 
-    return [DefaultInfo(files = depset([output]))]
+    # Run octodns.
+    return sh_binary_wrapper_impl(
+        ctx = ctx,
+        locations = {
+            ctx.attr._octodns: "octodns",
+            output: "output",
+        },
+        output = ctx.outputs.executable,
+        command = "{octodns} --config={output}/config.yaml --quiet --doit",
+    )
 
 bzd_dns_binary = rule(
     implementation = _bzd_dns_binary_impl,
@@ -78,11 +91,7 @@ bzd_dns_binary = rule(
         "config": attr.label(
             doc = "Configuration for the provider.",
             allow_single_file = [".json"],
-        ),
-        "provider": attr.string(
             mandatory = True,
-            values = ["digitalocean"],
-            doc = "Supported providers.",
         ),
         "srcs": attr.label_keyed_string_dict(
             mandatory = True,
@@ -94,6 +103,11 @@ bzd_dns_binary = rule(
             cfg = "exec",
             executable = True,
         ),
+        "_octodns": attr.label(
+            default = Label("@bzd_dns//python/bzd_dns:octodns-sync"),
+            cfg = "exec",
+            executable = True,
+        ),
     },
-    #executable = True
+    executable = True,
 )

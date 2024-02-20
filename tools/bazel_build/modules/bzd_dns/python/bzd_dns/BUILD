@@ -28,6 +28,9 @@ py_library(
         "zones.py",
     ],
     imports = [".."],
+    deps = [
+        requirement("pyyaml"),
+    ],
 )
 
 py_binary(

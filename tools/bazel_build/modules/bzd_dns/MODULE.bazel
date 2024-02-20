@@ -4,6 +4,7 @@ module(
 )
 
 bazel_dep(name = "rules_python", version = "0.28.0")
+bazel_dep(name = "bzd_lib", version = "1.0")
 
 pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
 pip.parse(
