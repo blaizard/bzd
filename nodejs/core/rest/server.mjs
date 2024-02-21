@@ -7,20 +7,20 @@ import { HttpServerContext, HttpError } from "#bzd/nodejs/core/http/server_conte
 
 import Base from "./base.mjs";
 
-const Exception = ExceptionFactory("api", "server");
-const Log = LogFactory("api", "server");
+const Exception = ExceptionFactory("rest", "server");
+const Log = LogFactory("rest", "server");
 
-class APIServerContext extends HttpServerContext {
-	constructor(context, api) {
+class RestServerContext extends HttpServerContext {
+	constructor(context, rest) {
 		super(context.request, context.response);
-		this.api = api;
+		this.rest = rest;
 		this.debug = {};
 		this.manualResponse = false;
 	}
 
 	getEndpoint(endpoint) {
-		Exception.assert(this.api, "API is not set.");
-		return new Url.URL(this.api.getEndpoint(endpoint), this.getHost()).href;
+		Exception.assert(this.rest, "Rest is not set.");
+		return new Url.URL(this.rest.getEndpoint(endpoint), this.getHost()).href;
 	}
 
 	addDebug(name, data) {
@@ -33,7 +33,7 @@ class APIServerContext extends HttpServerContext {
 	}
 }
 
-export default class APIServer extends Base {
+export default class RestServer extends Base {
 	constructor(schema, options) {
 		super(schema, options);
 		this.initCORS();
@@ -96,7 +96,7 @@ export default class APIServer extends Base {
 
 		// Create a wrapper to the callback
 		const handler = async (serverContext) => {
-			const context = new APIServerContext(serverContext, this);
+			const context = new RestServerContext(serverContext, this);
 
 			try {
 				// Set the CORS access control before the authorization check, because the latter can fail

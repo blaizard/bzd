@@ -62,7 +62,7 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		}
 	}
 
-	async _installAPIImpl(api) {
+	async _installRestImpl(rest) {
 		Exception.assert(
 			this.options.saveRefreshToken,
 			"The callback to save a refresh token must be set, set 'saveRefreshToken'.",
@@ -72,27 +72,27 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 			"The callback to remove a refresh token must be set, set 'removeRefreshToken'.",
 		);
 
-		Log.info("Installing session-based authentication API.");
+		Log.info("Installing session-based authentication REST.");
 
 		const authentication = this;
 
 		// This endpoint returns a refresh token.
 		// A refresh token is stored in the user database and is similar to a OAuth token.
 		// It can be exchanged to an access token with /auth/refresh.
-		api.handle("post", "/auth/login", async function (inputs) {
+		rest.handle("post", "/auth/login", async function (inputs) {
 			// Verify uid/password pair
 			Exception.assertPrecondition(inputs.password, "Missing password");
 			return await authentication._login(this, inputs.identifier, inputs.persistent, inputs.uid, inputs.password);
 		});
 
-		api.handle("post", "/auth/logout", async function () {
+		rest.handle("post", "/auth/logout", async function () {
 			authentication.clearSession(this);
 		});
 
 		/// Use a refresh token to create an access token.
 		///
 		/// If refresh_token is given as an argument, return the tokens by values, if not, return it from the cookies.
-		api.handle("post", "/auth/refresh", async function (inputs) {
+		rest.handle("post", "/auth/refresh", async function (inputs) {
 			let maybeTokenObject = false;
 
 			// Check if there is an access token and that it is still valid.

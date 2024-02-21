@@ -1,6 +1,6 @@
 import HttpServer from "#bzd/nodejs/core/http/server.mjs";
 import APIv1 from "#bzd/api.json" assert { type: "json" };
-import API from "#bzd/nodejs/core/api/server.mjs";
+import RestServer from "#bzd/nodejs/core/rest/server.mjs";
 import Authentication from "#bzd/apps/accounts/authentication/server.mjs";
 import Config from "#bzd/apps/accounts/example/config.json" assert { type: "json" };
 
@@ -11,7 +11,7 @@ import Config from "#bzd/apps/accounts/example/config.json" assert { type: "json
 		accounts: Config.accounts,
 	});
 
-	const api = new API(APIv1, {
+	const api = new RestServer(APIv1, {
 		authentication: authentication,
 		channel: web,
 	});

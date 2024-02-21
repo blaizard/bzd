@@ -34,7 +34,7 @@ bzd_nodejs_binary(
     main = "backend.mjs",
     deps = [
         "//apps/accounts/authentication:server",
-        "//nodejs/core/api:server",
         "//nodejs/core/http:server",
+        "//nodejs/core/rest:server",
     ],
 )

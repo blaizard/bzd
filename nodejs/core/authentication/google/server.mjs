@@ -13,8 +13,8 @@ export default class GoogleIdentityServer {
 		this.clientId = clientId;
 	}
 
-	async installAPI(api) {
-		api.handle("post", "/auth/google", async function (inputs) {
+	async installRest(rest) {
+		rest.handle("post", "/auth/google", async function (inputs) {
 			const client = new OAuth2Client();
 			let email = null;
 			try {
@@ -32,7 +32,7 @@ export default class GoogleIdentityServer {
 			}
 
 			Exception.assert(email, "The email cannot be null: {}", email);
-			return await api.loginWithUID(this, email, "google", /*persistent*/ false);
+			return await rest.loginWithUID(this, email, "google", /*persistent*/ false);
 		});
 	}
 }

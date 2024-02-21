@@ -8,7 +8,7 @@ bzd_nodejs_library(
     visibility = ["//visibility:public"],
     deps = [
         "//nodejs:vue",
-        "//nodejs/core/api:client",
+        "//nodejs/core/rest:client",
     ],
 )
 

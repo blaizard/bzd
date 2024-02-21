@@ -303,8 +303,8 @@ export default class Services {
 		}
 	}
 
-	async installAPI(api) {
-		Log.info("Installing 'Services' API");
+	async installRest(api) {
+		Log.info("Installing 'Services' REST");
 
 		// ---- Admin specific API
 

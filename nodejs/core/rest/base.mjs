@@ -1,19 +1,19 @@
 import ExceptionFactory from "../exception.mjs";
 import Event from "#bzd/nodejs/core/event.mjs";
 
-const Exception = ExceptionFactory("api");
+const Exception = ExceptionFactory("rest");
 
-export default class API {
+export default class Rest {
 	constructor(schema, options) {
 		this.options = Object.assign(
 			{
 				/// The host to be used, if null, the current host is used.
 				host: null,
-				/// Authentication object to be used with this API.
+				/// Authentication object to be used with this REST API.
 				authentication: null,
 				/// Version of the API to be used.
 				version: 1,
-				/// Channel to be used as a transportation mean for this API
+				/// Channel to be used as a transportation mean for this REST API
 				channel: null,
 			},
 			options,
@@ -47,8 +47,8 @@ export default class API {
 	/// Install all given plugins..
 	async installPlugins(...plugins) {
 		for (const plugin of plugins) {
-			if (typeof plugin.installAPI == "function") {
-				await plugin.installAPI(this);
+			if (typeof plugin.installRest == "function") {
+				await plugin.installRest(this);
 			}
 		}
 		this.event.trigger("ready");

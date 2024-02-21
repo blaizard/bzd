@@ -38,8 +38,8 @@ bzd_nodejs_binary(
         "//nodejs/core:exception",
         "//nodejs/core:filesystem",
         "//nodejs/core:log",
-        "//nodejs/core/api:server",
         "//nodejs/core/http:server",
+        "//nodejs/core/rest:server",
         "//nodejs/db/storage:disk",
     ],
 )

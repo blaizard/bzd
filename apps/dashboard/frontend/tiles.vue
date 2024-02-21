@@ -25,7 +25,7 @@
 		},
 		methods: {
 			async getTiles() {
-				this.tiles = await this.$api.request("get", "/tiles");
+				this.tiles = await this.$rest.request("get", "/tiles");
 			},
 		},
 	};

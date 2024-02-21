@@ -148,26 +148,26 @@
 		methods: {
 			async fetchValue() {
 				this.handleSubmit(async () => {
-					this.value = Object.assign({}, this.value, await this.$api.request("get", "/tile", { uid: this.uid }));
+					this.value = Object.assign({}, this.value, await this.$rest.request("get", "/tile", { uid: this.uid }));
 				});
 			},
 			async handleCreate() {
 				this.handleSubmit(async () => {
-					await this.$api.request("post", "/tile", { value: this.value });
+					await this.$rest.request("post", "/tile", { value: this.value });
 					this.$notification.success("New tile created");
 					await this.$router.dispatch("/");
 				});
 			},
 			async handleUpdate() {
 				this.handleSubmit(async () => {
-					await this.$api.request("put", "/tile", { uid: this.uid, value: this.value });
+					await this.$rest.request("put", "/tile", { uid: this.uid, value: this.value });
 					this.$notification.success("Tile updated");
 					await this.$router.dispatch("/");
 				});
 			},
 			async handleDelete() {
 				this.handleSubmit(async () => {
-					await this.$api.request("delete", "/tile", { uid: this.uid });
+					await this.$rest.request("delete", "/tile", { uid: this.uid });
 					this.$notification.success("Tile deleted");
 					await this.$router.dispatch("/");
 				});

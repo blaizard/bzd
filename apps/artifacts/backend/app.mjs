@@ -1,4 +1,4 @@
-import API from "#bzd/nodejs/core/api/server.mjs";
+import RestServer from "#bzd/nodejs/core/rest/server.mjs";
 import Authentication from "#bzd/apps/accounts/authentication/server.mjs";
 
 import Cache from "#bzd/nodejs/core/cache.mjs";
@@ -56,8 +56,8 @@ program
 
 	// Set-up the web server
 	let web = new HttpServer(PORT);
-	// Install the APIs
-	let api = new API(APIv1, {
+	// Install the RestServer
+	let api = new RestServer(APIv1, {
 		authentication: authentication,
 		channel: web,
 	});

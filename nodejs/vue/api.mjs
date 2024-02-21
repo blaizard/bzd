@@ -1,10 +1,10 @@
-import API from "../core/api/client.mjs";
+import Rest from "../core/rest/client.mjs";
 
 export default {
 	install(app, options) {
-		const api = new API(options.schema, options);
-		api.installPlugins(...options.plugins).catch((e) => console.error(e));
-		app.config.globalProperties.$api = api;
-		app.provide("$api", api);
+		const rest = new Rest(options.schema, options);
+		rest.installPlugins(...options.plugins).catch((e) => console.error(e));
+		app.config.globalProperties.$rest = rest;
+		app.provide("$rest", rest);
 	},
 };

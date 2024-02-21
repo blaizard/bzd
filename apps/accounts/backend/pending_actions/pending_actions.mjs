@@ -136,8 +136,8 @@ export default class PendingActions {
 		);
 	}
 
-	async installAPI(api) {
-		Log.info("Installing 'PendingActions' API");
+	async installRest(api) {
+		Log.info("Installing 'PendingActions' REST");
 
 		api.handle("get", "/admin/pending_actions/stats", async () => {
 			return await this.getStats();

@@ -7,14 +7,14 @@
 <script setup>
 	import { inject } from "vue";
 
-	const api = inject("$api");
+	const rest = inject("$rest");
 	const authentication = inject("$authentication");
 
 	const onClickLogin = async () => {
-		await api.invoke("login", "localhost");
+		await rest.invoke("login", "localhost");
 	};
 
 	const onClickLogout = async () => {
-		await api.logout();
+		await rest.logout();
 	};
 </script>

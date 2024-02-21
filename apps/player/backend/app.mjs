@@ -1,4 +1,4 @@
-import API from "#bzd/nodejs/core/api/server.mjs";
+import RestServer from "#bzd/nodejs/core/rest/server.mjs";
 import FileSystem from "#bzd/nodejs/core/filesystem.mjs";
 import HttpServer from "#bzd/nodejs/core/http/server.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
@@ -86,7 +86,7 @@ function pathToPathList(path) {
 	// Set-up the web server
 	let web = new HttpServer(PORT);
 	// Install the APIs
-	let api = new API(APIv1, {
+	let api = new RestServer(APIv1, {
 		channel: web,
 	});
 

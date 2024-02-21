@@ -79,9 +79,9 @@
 			async handleSubmitContact() {
 				await this.handleSubmit(async () => {
 					if (this.$authentication.isAuthenticated) {
-						await this.$api.request("post", "/contact-authenticated", this.info);
+						await this.$rest.request("post", "/contact-authenticated", this.info);
 					} else {
-						await this.$api.request("post", "/contact", this.info);
+						await this.$rest.request("post", "/contact", this.info);
 					}
 					this.sent = true;
 				});

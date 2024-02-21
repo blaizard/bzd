@@ -84,7 +84,7 @@
 		methods: {
 			async fetchConfig() {
 				await this.handleSubmit(async () => {
-					this.config = await this.$api.request("get", "/config", {
+					this.config = await this.$rest.request("get", "/config", {
 						volume: this.volume,
 					});
 					this.config.volume = this.volume;
@@ -92,7 +92,7 @@
 			},
 			async handleSubmitConfig() {
 				await this.handleSubmit(async () => {
-					await this.$api.request("post", "/config", {
+					await this.$rest.request("post", "/config", {
 						volume: this.volume,
 						config: this.config,
 					});
@@ -101,7 +101,7 @@
 			},
 			async handleDelete() {
 				await this.handleSubmit(async () => {
-					await this.$api.request("delete", "/config", {
+					await this.$rest.request("delete", "/config", {
 						volume: this.volume,
 					});
 					this.$router.dispatch("/refresh");

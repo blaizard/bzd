@@ -55,7 +55,7 @@ app.use(CachePlugin, {
 			let list = [];
 
 			do {
-				const response = await app.config.globalProperties.$api.request("post", "/list", {
+				const response = await app.config.globalProperties.$rest.request("post", "/list", {
 					path: pathList,
 					paging: next,
 				});

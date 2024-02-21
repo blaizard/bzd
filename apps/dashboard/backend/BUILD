@@ -34,8 +34,8 @@ bzd_nodejs_binary(
         "//apps/dashboard/plugins:plugins.backend",
         "//nodejs/core:cache",
         "//nodejs/core:filesystem",
-        "//nodejs/core/api:server",
         "//nodejs/core/http:server",
+        "//nodejs/core/rest:server",
         "//nodejs/db/key_value_store:disk",
     ],
 )

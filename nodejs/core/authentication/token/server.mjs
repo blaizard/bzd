@@ -55,8 +55,8 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 		});
 	}
 
-	async _installAPIImpl(api) {
-		Log.debug("Installing token-based authentication API.");
+	async _installRestImpl(rest) {
+		Log.debug("Installing token-based authentication REST.");
 
 		const authentication = this;
 		const generateTokens = async function (uid, scopes, persistent, session) {
@@ -78,7 +78,7 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 			return await authentication.generateAccessToken({ uid: uid, scopes: scopes });
 		};
 
-		api.handle("post", "/auth/login", async function (inputs) {
+		rest.handle("post", "/auth/login", async function (inputs) {
 			// Verify uid/password pair
 			const sessionInfoResult = await authentication.options.verifyIdentity(inputs.uid, inputs.password);
 			if (sessionInfoResult.hasValue()) {
@@ -99,11 +99,11 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 			}
 		});
 
-		api.handle("post", "/auth/logout", async function () {
+		rest.handle("post", "/auth/logout", async function () {
 			this.deleteCookie("refresh_token");
 		});
 
-		api.handle("post", "/auth/refresh", async function () {
+		rest.handle("post", "/auth/refresh", async function () {
 			const refreshToken = this.getCookie("refresh_token", null);
 			if (refreshToken == null) {
 				throw this.httpError(401, "Unauthorized");

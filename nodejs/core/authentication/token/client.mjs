@@ -33,14 +33,14 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 		});
 	}
 
-	async _installAPIImpl(api) {
-		Log.debug("Installing token-based authentication API.");
+	async _installRestImpl(rest) {
+		Log.debug("Installing token-based authentication REST.");
 
 		if (!this.options.refreshTokenCallback) {
 			this.options.refreshTokenCallback = async () => {
 				const maybeRefreshToken = this.getRefreshToken();
 				const data = maybeRefreshToken ? { refresh_token: maybeRefreshToken } : {};
-				return await api.request("post", "/auth/refresh", data);
+				return await rest.request("post", "/auth/refresh", data);
 			};
 			await this.tryRefreshAuthentication(/*nothrow*/ true);
 		}
@@ -155,8 +155,8 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 		return url;
 	}
 
-	async _loginImpl(api, uid, password, persistent, identifier) {
-		const result = await this.loginWithAPI(api, "post", "/auth/login", {
+	async _loginImpl(rest, uid, password, persistent, identifier) {
+		const result = await this.loginWithRest(rest, "post", "/auth/login", {
 			uid: uid,
 			password: password,
 			persistent: persistent,
@@ -165,19 +165,19 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 		return result;
 	}
 
-	async _loginWithSSOImpl(api, ssoToken) {
+	async _loginWithSSOImpl(rest, ssoToken) {
 		Cookie.removeAll();
 		this.setRefreshToken(ssoToken);
 		await this._refreshAuthenticationImpl();
 	}
 
-	async _loginWithAPIImpl(result) {
+	async _loginWithRestImpl(result) {
 		this.setSession(result);
 	}
 
-	async _logoutImpl(api) {
+	async _logoutImpl(rest) {
 		try {
-			await api.request("post", "/auth/logout");
+			await rest.request("post", "/auth/logout");
 		} finally {
 			/// Clear in all cases the session. The API might fail on serverless use case for example.
 			this.clearSession();

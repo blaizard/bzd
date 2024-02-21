@@ -146,8 +146,8 @@ export default class Users {
 		return user;
 	}
 
-	async installAPI(api) {
-		Log.info("Installing 'Users' API");
+	async installRest(api) {
+		Log.info("Installing 'Users' REST");
 
 		const users = this;
 
