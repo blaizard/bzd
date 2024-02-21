@@ -1,6 +1,6 @@
 import { createApp } from "vue";
 
-import API from "#bzd/nodejs/vue/api.mjs";
+import RestPlugin from "#bzd/nodejs/vue/rest.mjs";
 import Notification from "#bzd/nodejs/vue/notification.mjs";
 import Router from "#bzd/nodejs/vue/router/router.mjs";
 
@@ -13,8 +13,8 @@ const app = createApp(App);
 app.use(Router, {
 	hash: false,
 });
-app.use(API, {
-	schema: APIv1,
+app.use(RestPlugin, {
+	schema: APIv1.rest,
 });
 app.use(Notification);
 

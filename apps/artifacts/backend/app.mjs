@@ -57,7 +57,7 @@ program
 	// Set-up the web server
 	let web = new HttpServer(PORT);
 	// Install the RestServer
-	let api = new RestServer(APIv1, {
+	let api = new RestServer(APIv1.rest, {
 		authentication: authentication,
 		channel: web,
 	});

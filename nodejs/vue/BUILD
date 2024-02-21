@@ -1,9 +1,9 @@
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 
 bzd_nodejs_library(
-    name = "api",
+    name = "rest",
     srcs = [
-        "api.mjs",
+        "rest.mjs",
     ],
     visibility = ["//visibility:public"],
     deps = [

@@ -21,7 +21,7 @@ bzd_nodejs_web_binary(
         "//apps/player/lib:scenario",
         "//nodejs:vue",
         "//nodejs/styles/default",
-        "//nodejs/vue:api",
+        "//nodejs/vue:rest",
         "//nodejs/vue/components/layout",
         "//nodejs/vue/components/layout:component",
         "//nodejs/vue/router",

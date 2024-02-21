@@ -1,41 +1,43 @@
 {
-    "/admin/application": {
-        "delete": {
-            "authentication": "admin-applications",
-            "documentation": "Delete an existing application",
-            "request": {
-                "type": "json",
-                "validation": {
-                    "uid": "mandatory"
+    "rest": {
+        "/admin/application": {
+            "delete": {
+                "authentication": "admin-applications",
+                "documentation": "Delete an existing application",
+                "request": {
+                    "type": "json",
+                    "validation": {
+                        "uid": "mandatory"
+                    }
+                }
+            },
+            "post": {
+                "authentication": "admin-applications",
+                "documentation": "Create a new application",
+                "request": {
+                    "type": "json",
+                    "validation": {
+                        "redirect": "mandatory",
+                        "scopes": "mandatory",
+                        "uid": "mandatory"
+                    }
                 }
             }
         },
-        "post": {
-            "authentication": "admin-applications",
-            "documentation": "Create a new application",
-            "request": {
-                "type": "json",
-                "validation": {
-                    "redirect": "mandatory",
-                    "scopes": "mandatory",
-                    "uid": "mandatory"
+        "/admin/applications": {
+            "get": {
+                "authentication": "admin-applications",
+                "documentation": "List all applications",
+                "request": {
+                    "type": "query",
+                    "validation": {
+                        "max": "mandatory",
+                        "page": "mandatory"
+                    }
+                },
+                "response": {
+                    "type": "json"
                 }
-            }
-        }
-    },
-    "/admin/applications": {
-        "get": {
-            "authentication": "admin-applications",
-            "documentation": "List all applications",
-            "request": {
-                "type": "query",
-                "validation": {
-                    "max": "mandatory",
-                    "page": "mandatory"
-                }
-            },
-            "response": {
-                "type": "json"
             }
         }
     }

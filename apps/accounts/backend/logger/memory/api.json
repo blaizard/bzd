@@ -1,13 +1,15 @@
 {
-    "/admin/logger/memory": {
-        "get": {
-            "authentication": "admin-applications",
-            "documentation": "Get all logs",
-            "response": {
-                "type": "json",
-                "validation": {
-                    "errors": "",
-                    "logs": ""
+    "rest": {
+        "/admin/logger/memory": {
+            "get": {
+                "authentication": "admin-applications",
+                "documentation": "Get all logs",
+                "response": {
+                    "type": "json",
+                    "validation": {
+                        "errors": "",
+                        "logs": ""
+                    }
                 }
             }
         }

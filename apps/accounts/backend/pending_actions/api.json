@@ -1,10 +1,12 @@
 {
-    "/admin/pending_actions/stats": {
-        "get": {
-            "authentication": "admin",
-            "documentation": "Get current statistics about pending actions",
-            "response": {
-                "type": "json"
+    "rest": {
+        "/admin/pending_actions/stats": {
+            "get": {
+                "authentication": "admin",
+                "documentation": "Get current statistics about pending actions",
+                "response": {
+                    "type": "json"
+                }
             }
         }
     }

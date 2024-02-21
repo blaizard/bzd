@@ -110,7 +110,7 @@ async function getData(type, uid, cache) {
 
 	// Install the APIs
 
-	let api = new RestServer(APIv1, {
+	let api = new RestServer(APIv1.rest, {
 		channel: web,
 	});
 	api.handle("get", "/tiles", async () => {

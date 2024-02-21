@@ -1,78 +1,80 @@
 {
-    "/exec": {
-        "post": {
-            "documentation": "Execute a process child.",
-            "request": {
-                "type": "json",
-                "validation": {
-                    "cmds": "mandatory"
+    "rest": {
+        "/exec": {
+            "post": {
+                "documentation": "Execute a process child.",
+                "request": {
+                    "type": "json",
+                    "validation": {
+                        "cmds": "mandatory"
+                    }
+                },
+                "response": {
+                    "type": "stream"
                 }
-            },
-            "response": {
-                "type": "stream"
-            }
-        }
-    },
-    "/file/content": {
-        "get": {
-            "documentation": "Read the content of a file.",
-            "request": {
-                "type": "query",
-                "validation": {
-                    "path": "mandatory"
-                }
-            },
-            "response": {
-                "type": "file"
             }
         },
-        "post": {
-            "documentation": "Set the content of a file.",
-            "request": {
-                "type": "query",
-                "validation": {
-                    "content": "",
-                    "path": "mandatory"
-                }
-            }
-        }
-    },
-    "/file/executable": {
-        "post": {
-            "documentation": "Make a file executable",
-            "request": {
-                "type": "query",
-                "validation": {
-                    "path": "mandatory"
-                }
-            }
-        }
-    },
-    "/file/list": {
-        "get": {
-            "documentation": "List the content of a folder at a given path.",
-            "request": {
-                "type": "query",
-                "validation": {
-                    "paging": "",
-                    "path": "mandatory"
+        "/file/content": {
+            "get": {
+                "documentation": "Read the content of a file.",
+                "request": {
+                    "type": "query",
+                    "validation": {
+                        "path": "mandatory"
+                    }
+                },
+                "response": {
+                    "type": "file"
                 }
             },
-            "response": {
-                "type": "json",
-                "validation": {
-                    "data": "mandatory",
-                    "next": "mandatory"
+            "post": {
+                "documentation": "Set the content of a file.",
+                "request": {
+                    "type": "query",
+                    "validation": {
+                        "content": "",
+                        "path": "mandatory"
+                    }
                 }
             }
-        }
-    },
-    "/scenario": {
-        "get": {
-            "documentation": "Get the next element from a scenario.",
-            "request": {},
-            "response": {
-                "type": "json"
+        },
+        "/file/executable": {
+            "post": {
+                "documentation": "Make a file executable",
+                "request": {
+                    "type": "query",
+                    "validation": {
+                        "path": "mandatory"
+                    }
+                }
+            }
+        },
+        "/file/list": {
+            "get": {
+                "documentation": "List the content of a folder at a given path.",
+                "request": {
+                    "type": "query",
+                    "validation": {
+                        "paging": "",
+                        "path": "mandatory"
+                    }
+                },
+                "response": {
+                    "type": "json",
+                    "validation": {
+                        "data": "mandatory",
+                        "next": "mandatory"
+                    }
+                }
+            }
+        },
+        "/scenario": {
+            "get": {
+                "documentation": "Get the next element from a scenario.",
+                "request": {},
+                "response": {
+                    "type": "json"
+                }
             }
         }
     }

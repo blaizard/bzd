@@ -86,7 +86,7 @@ function pathToPathList(path) {
 	// Set-up the web server
 	let web = new HttpServer(PORT);
 	// Install the APIs
-	let api = new RestServer(APIv1, {
+	let api = new RestServer(APIv1.rest, {
 		channel: web,
 	});
 

@@ -20,7 +20,7 @@ export default class SessionAuthenticationServerProxy extends SessionAuthenticat
 			),
 		);
 
-		this.restRemote = new RestClient(APISchemaRemote, {
+		this.restRemote = new RestClient(APISchemaRemote.rest, {
 			host: this.options.remote,
 			authentication: this,
 		});

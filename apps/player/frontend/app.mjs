@@ -1,4 +1,4 @@
-import API from "#bzd/nodejs/vue/api.mjs";
+import RestPlugin from "#bzd/nodejs/vue/rest.mjs";
 import Router from "#bzd/nodejs/vue/router/router.mjs";
 import { createApp } from "vue";
 
@@ -11,8 +11,8 @@ const app = createApp(App);
 app.use(Router, {
 	hash: false,
 });
-app.use(API, {
-	schema: APIv1,
+app.use(RestPlugin, {
+	schema: APIv1.rest,
 });
 
 app.mount("#app");

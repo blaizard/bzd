@@ -1,15 +1,17 @@
 {
-    "/auth/google": {
-        "post": {
-            "documentation": "Login with Google.",
-            "request": {
-                "type": "json",
-                "validation": {
-                    "idToken": "mandatory"
+    "rest": {
+        "/auth/google": {
+            "post": {
+                "documentation": "Login with Google.",
+                "request": {
+                    "type": "json",
+                    "validation": {
+                        "idToken": "mandatory"
+                    }
+                },
+                "response": {
+                    "type": "json"
                 }
-            },
-            "response": {
-                "type": "json"
             }
         }
     }

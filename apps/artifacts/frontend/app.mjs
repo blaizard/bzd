@@ -2,7 +2,7 @@ import { createApp } from "vue";
 
 import Authentication from "#bzd/apps/accounts/authentication/client.mjs";
 import Permissions from "#bzd/nodejs/db/storage/permissions.mjs";
-import API from "#bzd/nodejs/vue/api.mjs";
+import RestPlugin from "#bzd/nodejs/vue/rest.mjs";
 import AuthenticationPlugin from "#bzd/nodejs/vue/authentication.mjs";
 import CachePlugin from "#bzd/nodejs/vue/cache.mjs";
 import Notification from "#bzd/nodejs/vue/notification.mjs";
@@ -33,8 +33,8 @@ app.use(Router, {
 	hash: false,
 	authentication: authentication,
 });
-app.use(API, {
-	schema: APIv1,
+app.use(RestPlugin, {
+	schema: APIv1.rest,
 	authentication: authentication,
 	plugins: [authentication],
 });

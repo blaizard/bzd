@@ -14,7 +14,7 @@ bzd_nodejs_web_binary(
     main = "app.mjs",
     deps = [
         "//apps/accounts/authentication:client",
-        "//nodejs/vue:api",
         "//nodejs/vue:authentication",
+        "//nodejs/vue:rest",
     ],
 )

@@ -1,129 +1,131 @@
 {
-    "/admin/user": {
-        "delete": {
-            "authentication": "admin-users",
-            "documentation": "Delete a specific user",
-            "request": {
-                "type": "json",
-                "validation": {
-                    "uid": "mandatory"
-                }
-            }
-        },
-        "post": {
-            "authentication": "admin-users",
-            "documentation": "Create a new user",
-            "request": {
-                "type": "json",
-                "validation": {
-                    "email": "mandatory"
-                }
-            }
-        },
-        "put": {
-            "authentication": "admin-users",
-            "documentation": "Update user information",
-            "request": {
-                "type": "json",
-                "validation": {
-                    "roles": "",
-                    "subscriptions": "",
-                    "uid": "mandatory"
-                }
-            }
-        }
-    },
-    "/admin/users": {
-        "get": {
-            "authentication": "admin-users",
-            "documentation": "List all users",
-            "request": {
-                "type": "query",
-                "validation": {
-                    "max": "mandatory",
-                    "page": "mandatory"
+    "rest": {
+        "/admin/user": {
+            "delete": {
+                "authentication": "admin-users",
+                "documentation": "Delete a specific user",
+                "request": {
+                    "type": "json",
+                    "validation": {
+                        "uid": "mandatory"
+                    }
                 }
             },
-            "response": {
-                "type": "json"
-            }
-        }
-    },
-    "/subscription": {
-        "get": {
-            "authentication": "self-subscriptions:r",
-            "cors": true,
-            "documentation": "Check if a subscription is active",
-            "request": {
-                "type": "query",
-                "validation": {
-                    "application": "mandatory"
+            "post": {
+                "authentication": "admin-users",
+                "documentation": "Create a new user",
+                "request": {
+                    "type": "json",
+                    "validation": {
+                        "email": "mandatory"
+                    }
                 }
             },
-            "response": {
-                "type": "json",
-                "validation": {
-                    "active": "mandatory"
-                }
-            }
-        }
-    },
-    "/user": {
-        "delete": {
-            "authentication": "self-basic:w",
-            "documentation": "Delete current user account",
-            "request": {
-                "type": "json",
-                "validation": {
-                    "password": "mandatory"
+            "put": {
+                "authentication": "admin-users",
+                "documentation": "Update user information",
+                "request": {
+                    "type": "json",
+                    "validation": {
+                        "roles": "",
+                        "subscriptions": "",
+                        "uid": "mandatory"
+                    }
                 }
             }
         },
-        "get": {
-            "authentication": "self-basic:r",
-            "cors": true,
-            "documentation": "Get current user information",
-            "request": {
-                "scopes": {
-                    "uid": "admin-users"
+        "/admin/users": {
+            "get": {
+                "authentication": "admin-users",
+                "documentation": "List all users",
+                "request": {
+                    "type": "query",
+                    "validation": {
+                        "max": "mandatory",
+                        "page": "mandatory"
+                    }
                 },
-                "type": "query"
-            },
-            "response": {
-                "scopes": {
-                    "creation": "self-basic:r",
-                    "email": "self-basic:r",
-                    "last_failed_login": "self-basic:r",
-                    "last_login": "self-basic:r",
-                    "last_password_reset": "self-basic:r",
-                    "roles": "self-roles:r",
-                    "scopes": "self-roles:r",
-                    "subscriptions": "self-subscriptions:r",
-                    "tokens": "self-tokens:r"
-                },
-                "type": "json"
+                "response": {
+                    "type": "json"
+                }
             }
         },
-        "put": {
-            "authentication": "self-basic:w",
-            "documentation": "Update current user information",
-            "request": {
-                "scopes": {
-                    "oldpassword": "self-basic:w",
-                    "password": "self-basic:w",
-                    "tokens": "self-tokens:w",
-                    "uid": "admin-users"
+        "/subscription": {
+            "get": {
+                "authentication": "self-subscriptions:r",
+                "cors": true,
+                "documentation": "Check if a subscription is active",
+                "request": {
+                    "type": "query",
+                    "validation": {
+                        "application": "mandatory"
+                    }
                 },
-                "type": "json",
-                "validation": {
-                    "oldpassword": "",
-                    "password": "",
-                    "tokens": "",
-                    "uid": ""
+                "response": {
+                    "type": "json",
+                    "validation": {
+                        "active": "mandatory"
+                    }
+                }
+            }
+        },
+        "/user": {
+            "delete": {
+                "authentication": "self-basic:w",
+                "documentation": "Delete current user account",
+                "request": {
+                    "type": "json",
+                    "validation": {
+                        "password": "mandatory"
+                    }
                 }
             },
-            "response": {
-                "type": "json"
+            "get": {
+                "authentication": "self-basic:r",
+                "cors": true,
+                "documentation": "Get current user information",
+                "request": {
+                    "scopes": {
+                        "uid": "admin-users"
+                    },
+                    "type": "query"
+                },
+                "response": {
+                    "scopes": {
+                        "creation": "self-basic:r",
+                        "email": "self-basic:r",
+                        "last_failed_login": "self-basic:r",
+                        "last_login": "self-basic:r",
+                        "last_password_reset": "self-basic:r",
+                        "roles": "self-roles:r",
+                        "scopes": "self-roles:r",
+                        "subscriptions": "self-subscriptions:r",
+                        "tokens": "self-tokens:r"
+                    },
+                    "type": "json"
+                }
+            },
+            "put": {
+                "authentication": "self-basic:w",
+                "documentation": "Update current user information",
+                "request": {
+                    "scopes": {
+                        "oldpassword": "self-basic:w",
+                        "password": "self-basic:w",
+                        "tokens": "self-tokens:w",
+                        "uid": "admin-users"
+                    },
+                    "type": "json",
+                    "validation": {
+                        "oldpassword": "",
+                        "password": "",
+                        "tokens": "",
+                        "uid": ""
+                    }
+                },
+                "response": {
+                    "type": "json"
+                }
             }
         }
     }
