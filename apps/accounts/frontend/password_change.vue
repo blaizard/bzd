@@ -71,7 +71,7 @@
 		methods: {
 			async handleSubmitReset() {
 				await this.handleSubmit(async () => {
-					await this.$api.request("post", "/password-change", {
+					await this.$rest.request("post", "/password-change", {
 						password: this.info.password,
 						uid: this.uid,
 						token: this.token,

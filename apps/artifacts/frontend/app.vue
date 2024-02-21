@@ -67,7 +67,7 @@
 					{
 						path: "/login",
 						handler: async () => {
-							await this.$api.invoke("login", "artifacts");
+							await this.$rest.invoke("login", "artifacts");
 						},
 					},
 				],
@@ -82,7 +82,7 @@
 				this.showPath = path;
 			},
 			async handleLogout() {
-				await this.$api.logout();
+				await this.$rest.logout();
 				this.$router.dispatch("/");
 			},
 			handleHeader() {

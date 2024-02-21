@@ -1,6 +1,6 @@
 import { program } from "commander";
 
-import API from "#bzd/nodejs/core/api/server.mjs";
+import RestServer from "#bzd/nodejs/core/rest/server.mjs";
 import APIv1 from "#bzd/api.json" assert { type: "json" };
 import kvsMakeFromConfig from "#bzd/nodejs/db/key_value_store/make_from_config.mjs";
 import emailMakeFromConfig from "#bzd/nodejs/email/make_from_config.mjs";
@@ -283,7 +283,7 @@ const PATH_STATIC = options.static;
 
 	// ---- API ----
 
-	const api = new API(APIv1, {
+	const api = new RestServer(APIv1, {
 		authentication: authentication,
 		channel: web,
 	});

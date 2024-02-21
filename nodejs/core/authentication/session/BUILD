@@ -22,7 +22,7 @@ bzd_nodejs_library(
     visibility = ["//visibility:public"],
     deps = [
         ":server",
-        "//nodejs/core/api:client",
+        "//nodejs/core/rest:client",
     ],
 )
 

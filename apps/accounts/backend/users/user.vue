@@ -178,7 +178,7 @@
 		methods: {
 			async handleFetch() {
 				await this.handleSubmit(async () => {
-					this.user = await this.$api.request("get", "/user", this.uid ? { uid: this.uid } : {});
+					this.user = await this.$rest.request("get", "/user", this.uid ? { uid: this.uid } : {});
 				});
 			},
 			handleChange(data) {
@@ -187,7 +187,7 @@
 			},
 			async handleApply() {
 				await this.handleSubmit(async () => {
-					await this.$api.request("put", "/user", {
+					await this.$rest.request("put", "/user", {
 						...this.updates,
 						...(this.uid ? { uid: this.uid } : {}),
 					});

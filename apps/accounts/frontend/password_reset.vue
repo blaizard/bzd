@@ -54,7 +54,7 @@
 		methods: {
 			async handleSubmitReset() {
 				await this.handleSubmit(async () => {
-					await this.$api.request("post", "/password-reset", this.info);
+					await this.$rest.request("post", "/password-reset", this.info);
 					this.sent = true;
 				});
 			},

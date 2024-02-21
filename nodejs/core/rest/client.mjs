@@ -5,9 +5,9 @@ import Validation from "../validation.mjs";
 
 import Base from "./base.mjs";
 
-const Exception = ExceptionFactory("api", "client");
+const Exception = ExceptionFactory("rest", "client");
 
-export default class APIClient extends Base {
+export default class RestClient extends Base {
 	constructor(schema, options) {
 		super(schema, options);
 		this.providers = {};
@@ -49,9 +49,9 @@ export default class APIClient extends Base {
 		return await this.options.authentication.loginWithSSO(this, ssoToken);
 	}
 
-	async loginWithAPI(method, path, data) {
+	async loginWithRest(method, path, data) {
 		Exception.assert(this.isAuthentication(), "Authentication is not enabled.");
-		return await this.options.authentication.loginWithAPI(this, method, path, data);
+		return await this.options.authentication.loginWithRest(this, method, path, data);
 	}
 
 	async logout() {

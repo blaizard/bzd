@@ -116,14 +116,14 @@
 			},
 			async handleFetch() {
 				await this.handleSubmit(async () => {
-					const result = await this.$api.request("get", "/admin/services");
+					const result = await this.$rest.request("get", "/admin/services");
 					this.timestamp = result.timestamp;
 					this.services = result.services;
 				});
 			},
 			async processShowLogs(uid, name) {
 				await this.handleSubmit(async () => {
-					const result = await this.$api.request("get", "/admin/service/logs", { uid, name });
+					const result = await this.$rest.request("get", "/admin/service/logs", { uid, name });
 					this.logs = {
 						uid: uid,
 						name: name,
@@ -133,7 +133,7 @@
 			},
 			async processTrigger(uid, name) {
 				await this.handleSubmit(async () => {
-					await this.$api.request("post", "/admin/service/trigger", { uid, name });
+					await this.$rest.request("post", "/admin/service/trigger", { uid, name });
 				});
 			},
 		},

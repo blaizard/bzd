@@ -32,7 +32,7 @@
 		methods: {
 			async handleSubmitLogout() {
 				await this.handleSubmit(async () => {
-					await this.$api.logout();
+					await this.$rest.logout();
 					this.$router.dispatch(this.redirect || "/");
 				});
 			},

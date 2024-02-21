@@ -40,8 +40,8 @@ export default class StripePaymentWebhook extends PaymentInterface {
 		this.stripe = Stripe(this.options.secretKey);
 	}
 
-	async installAPI(api) {
-		Log.debug("Installing Stripe webhook API.");
+	async installRest(rest) {
+		Log.debug("Installing Stripe webhook REST.");
 
 		const self = this;
 
@@ -50,7 +50,7 @@ export default class StripePaymentWebhook extends PaymentInterface {
 		/// The following events must be setup:
 		/// - checkout.session.completed
 		/// - invoice.payment_succeeded
-		api.handle("post", "/stripe", async function (inputs) {
+		rest.handle("post", "/stripe", async function (inputs) {
 			// See: https://stripe.com/docs/payments/handling-payment-events
 			const signature = this.getHeader("stripe-signature");
 

@@ -1,4 +1,11 @@
-""" Create a bundle with a binary, a self contained, self extractable binary that can run on various hosts."""
+"""Create a bundle with a binary, a self contained, self extractable binary that can run on various hosts."""
+
+def _runfiles_to_files(runfiles):
+    """Gather all files from a runfiles."""
+
+    symlinks_files = [symlink.target_file for symlink in runfiles.symlinks.to_list()]
+    root_symlinks_files = [symlink.target_file for symlink in runfiles.root_symlinks.to_list()]
+    return depset(symlinks_files + root_symlinks_files, transitive = [runfiles.files])
 
 def _bzd_bundle_impl(ctx):
     binary = ctx.attr.binary
@@ -10,20 +17,20 @@ def _bzd_bundle_impl(ctx):
 
     if binary.default_runfiles == None:
         fail("The binary target '{}' must have a default_runfiles".format(binary))
-    inputs = binary.default_runfiles.files
+    inputs = _runfiles_to_files(binary.default_runfiles)
 
-    output = ctx.actions.declare_file(ctx.label.name)
     ctx.actions.run(
-        inputs = [manifest] + inputs.to_list(),
-        outputs = [output],
+        inputs = depset([manifest], transitive = [inputs]),
+        outputs = [ctx.outputs.executable],
         progress_message = "Bundling {}...".format(str(binary.label)),
-        arguments = ["--output", output.path, "--cwd", workspace, manifest.path, executable.short_path],
+        arguments = ["--output", ctx.outputs.executable.path, "--cwd", workspace, manifest.path, executable.short_path],
         executable = ctx.executable._bundler,
     )
 
     return [
         DefaultInfo(
-            files = depset([output]),
+            executable = ctx.outputs.executable,
+            files = depset([ctx.outputs.executable]),
         ),
     ]
 
@@ -42,4 +49,5 @@ bzd_bundle = rule(
             executable = True,
         ),
     },
+    executable = True,
 )

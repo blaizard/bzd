@@ -13,8 +13,8 @@ export default class AccountsAuthenticationClient extends TokenAuthenticationCli
 		Exception.assert(this.options.accounts, "No accounts URL was specified.");
 	}
 
-	async _installAPIImpl(api) {
-		await super._installAPIImpl(api);
+	async _installRestImpl(api) {
+		await super._installRestImpl(api);
 
 		// Check if login from a SSO token can be done.
 		const url = new URL(window.location.href);

@@ -39,7 +39,7 @@
 		methods: {
 			async fetchServices() {
 				await this.handleSubmit(async () => {
-					this.services = await this.$api.request("get", "/services");
+					this.services = await this.$rest.request("get", "/services");
 				});
 			},
 		},

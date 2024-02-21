@@ -1,5 +1,5 @@
 import SessionAuthenticationServer from "#bzd/nodejs/core/authentication/session/server.mjs";
-import APIClient from "#bzd/nodejs/core/api/client.mjs";
+import RestClient from "#bzd/nodejs/core/rest/client.mjs";
 import APISchemaRemote from "#bzd/nodejs/core/authentication/session/api.json" assert { type: "json" };
 import { HttpClientException } from "#bzd/nodejs/core/http/client.mjs";
 import ExceptionFactory from "../../exception.mjs";
@@ -20,20 +20,20 @@ export default class SessionAuthenticationServerProxy extends SessionAuthenticat
 			),
 		);
 
-		this.apiRemote = new APIClient(APISchemaRemote, {
+		this.restRemote = new RestClient(APISchemaRemote, {
 			host: this.options.remote,
 			authentication: this,
 		});
 	}
 
-	async _installAPIImpl(api) {
+	async _installRestImpl(rest) {
 		Exception.assert(this.options.remote, "The remote server option 'remote' must be set.");
 
-		Log.info("Installing session-based authentication API with proxy toward {}.", this.options.remote);
+		Log.info("Installing session-based authentication REST with proxy toward {}.", this.options.remote);
 
-		const apiRemote = this.apiRemote;
+		const restRemote = this.restRemote;
 		const authentication = this;
-		api.handle("post", "/auth/refresh", async function (inputs) {
+		rest.handle("post", "/auth/refresh", async function (inputs) {
 			/// Make sure the input is set and not implicitly coming from the cookie.
 			if (!inputs.refresh_token) {
 				const maybeRefreshToken = this.getCookie("refresh_token", null);
@@ -43,7 +43,7 @@ export default class SessionAuthenticationServerProxy extends SessionAuthenticat
 			}
 
 			try {
-				const result = await apiRemote.request("post", "/auth/refresh", inputs);
+				const result = await restRemote.request("post", "/auth/refresh", inputs);
 
 				/// Make sure the local cookie is not used again.
 				this.deleteCookie("local_refresh_token");
@@ -65,7 +65,7 @@ export default class SessionAuthenticationServerProxy extends SessionAuthenticat
 			}
 		});
 
-		api.handle("post", "/auth/logout", async function () {
+		rest.handle("post", "/auth/logout", async function () {
 			authentication.clearSession(this);
 		});
 	}

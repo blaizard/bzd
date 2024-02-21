@@ -86,7 +86,7 @@
 		methods: {
 			async afterLogin() {
 				if (this.application) {
-					const data = await this.$api.request("get", "/sso", { application: this.application });
+					const data = await this.$rest.request("get", "/sso", { application: this.application });
 					window.location.href = data.redirect + "?sso_token=" + encodeURIComponent(data.token);
 				} else if (this.redirect) {
 					window.location.href = this.redirect;
@@ -96,13 +96,13 @@
 			},
 			async handleSubmitLogin() {
 				await this.handleSubmit(async () => {
-					await this.$api.login(this.info.uid, this.info.password, this.info.persistent, "accounts");
+					await this.$rest.login(this.info.uid, this.info.password, this.info.persistent, "accounts");
 					await this.afterLogin();
 				});
 			},
 			async loginWithGoogle() {
 				await this.handleSubmit(async () => {
-					await this.$api.invoke("google-authenticate");
+					await this.$rest.invoke("google-authenticate");
 					await this.afterLogin();
 				});
 			},

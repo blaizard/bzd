@@ -1,4 +1,4 @@
-import API from "#bzd/nodejs/core/api/server.mjs";
+import RestServer from "#bzd/nodejs/core/rest/server.mjs";
 import Cache from "#bzd/nodejs/core/cache.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import HttpServer from "#bzd/nodejs/core/http/server.mjs";
@@ -9,7 +9,6 @@ import Path from "path";
 
 import APIv1 from "#bzd/apps/dashboard/api.v1.json" assert { type: "json" };
 import Plugins from "#bzd/apps/dashboard/plugins/plugins.backend.index.mjs";
-import { assert } from "console";
 
 const Exception = ExceptionFactory("backend");
 const Log = LogFactory("backend");
@@ -111,7 +110,7 @@ async function getData(type, uid, cache) {
 
 	// Install the APIs
 
-	let api = new API(APIv1, {
+	let api = new RestServer(APIv1, {
 		channel: web,
 	});
 	api.handle("get", "/tiles", async () => {

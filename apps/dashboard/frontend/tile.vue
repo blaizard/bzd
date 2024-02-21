@@ -164,7 +164,7 @@
 			async fetch() {
 				this.handleTimeout = null;
 				try {
-					this.metadata = await this.$api.request("get", "/data", {
+					this.metadata = await this.$rest.request("get", "/data", {
 						uid: this.uid,
 						type: this.sourceType,
 					});
@@ -208,7 +208,7 @@
 			},
 			async handleEvent(type) {
 				try {
-					this.metadata = await this.$api.request("post", "/event", {
+					this.metadata = await this.$rest.request("post", "/event", {
 						uid: this.uid,
 						type: this.sourceType,
 						event: type,

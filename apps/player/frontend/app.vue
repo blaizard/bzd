@@ -56,7 +56,7 @@
 				start: 0,
 				index: 0,
 				scenario: new Scenario(),
-				files: new FileSystem(this.$api),
+				files: new FileSystem(this.$rest),
 				selectedComponents: [],
 				cursor: 0,
 				configs: {
@@ -140,7 +140,7 @@
 					},
 				],
 			});
-			this.$api.request("get", "/scenario").then((data) => {
+			this.$rest.request("get", "/scenario").then((data) => {
 				this.scenario = new Scenario(data);
 			});
 		},

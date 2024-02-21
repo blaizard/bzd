@@ -17,8 +17,8 @@ export default class AuthenticationClient {
 		);
 	}
 
-	async installAPI(api) {
-		await this._installAPIImpl(api);
+	async installRest(rest) {
+		await this._installRestImpl(rest);
 	}
 
 	/// Return the session when authenticated, null otherwise.
@@ -66,9 +66,9 @@ export default class AuthenticationClient {
 	}
 
 	/// Attempt to login with internal data.
-	async loginWithAPI(api, method, path, data) {
+	async loginWithRest(api, method, path, data) {
 		const result = await api.request(method, path, data);
-		return await this._loginWithAPIImpl(result);
+		return await this._loginWithRestImpl(result);
 	}
 
 	/// Attempt to logout

@@ -177,7 +177,7 @@
 				await this.handleSubmit(async () => {
 					let paging = CollectionPaging.pagingFromParam(this.fetchChunk);
 					do {
-						const result = await this.$api.request("get", "/admin/users", paging);
+						const result = await this.$rest.request("get", "/admin/users", paging);
 						paging = result.next;
 						for (const [key, value] of Object.entries(result.data)) {
 							this.form.users.push({
@@ -190,7 +190,7 @@
 			},
 			async handleCreate(values) {
 				await this.handleSubmit(async () => {
-					await this.$api.request("post", "/admin/user", values);
+					await this.$rest.request("post", "/admin/user", values);
 					this.form.users.push(values);
 					this.showCreate = false;
 				});
@@ -215,7 +215,7 @@
 				while (this.hasUpdates) {
 					const [uid, values] = Object.entries(this.updates)[0];
 					await this.handleSubmit(async () => {
-						await this.$api.request("put", "/admin/user", {
+						await this.$rest.request("put", "/admin/user", {
 							uid: uid,
 							...values,
 						});
@@ -226,7 +226,7 @@
 				while (this.hasDeletions) {
 					const uid = this.deletions[0];
 					await this.handleSubmit(async () => {
-						await this.$api.request("delete", "/admin/user", {
+						await this.$rest.request("delete", "/admin/user", {
 							uid: uid,
 						});
 					});

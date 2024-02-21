@@ -35,18 +35,18 @@ export default class Google {
 	/// \param clientId The Google client ID, which can be created here: https://console.cloud.google.com/apis/credentials
 	constructor(clientId) {
 		this.clientId = clientId;
-		this.api = null;
+		this.rest = null;
 	}
 
-	async installAPI(api) {
-		api.provide("google-authenticate", async () => await this.authenticate());
-		this.api = api;
+	async installRest(rest) {
+		rest.provide("google-authenticate", async () => await this.authenticate());
+		this.rest = rest;
 	}
 
 	// https://developers.google.com/identity/gsi/web/guides/overview
 	async authenticate() {
 		const result = await triggerAuthentication(this.clientId);
-		await this.api.loginWithAPI("post", "/auth/google", {
+		await this.rest.loginWithRest("post", "/auth/google", {
 			idToken: result.credential,
 		});
 	}

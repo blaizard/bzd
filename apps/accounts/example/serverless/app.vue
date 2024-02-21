@@ -8,15 +8,15 @@
 <script setup>
 	import { inject, watch, ref } from "vue";
 
-	const api = inject("$api");
+	const rest = inject("$rest");
 	const authentication = inject("$authentication");
 
 	const onClickLogin = async () => {
-		await api.invoke("login", "localhost");
+		await rest.invoke("login", "localhost");
 	};
 
 	const onClickLogout = async () => {
-		await api.logout();
+		await rest.logout();
 	};
 
 	// Fetch user data when authenticated.
@@ -24,7 +24,7 @@
 	watch(
 		() => authentication.isAuthenticated,
 		async () => {
-			user.value = await api.request("get", "/user");
+			user.value = await rest.request("get", "/user");
 		},
 	);
 </script>

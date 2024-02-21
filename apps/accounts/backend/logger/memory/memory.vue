@@ -78,7 +78,7 @@
 			},
 			async handleFetch() {
 				await this.handleSubmit(async () => {
-					const result = await this.$api.request("get", "/admin/logger/memory");
+					const result = await this.$rest.request("get", "/admin/logger/memory");
 					this.errors = result.errors;
 					this.logs = result.logs;
 				});
