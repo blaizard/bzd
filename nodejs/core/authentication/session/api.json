@@ -1,52 +1,54 @@
 {
-    "/auth/login": {
-        "post": {
-            "documentation": "Login API used to exchange credentials for a token.",
-            "request": {
-                "type": "json",
-                "validation": {
-                    "identifier": "",
-                    "password": "mandatory",
-                    "persistent": "",
-                    "uid": "mandatory"
-                }
-            },
-            "response": {
-                "type": "json",
-                "validation": {
-                    "scopes": "mandatory",
-                    "timeout": "mandatory",
-                    "token": "mandatory",
-                    "uid": "mandatory"
+    "rest": {
+        "/auth/login": {
+            "post": {
+                "documentation": "Login API used to exchange credentials for a token.",
+                "request": {
+                    "type": "json",
+                    "validation": {
+                        "identifier": "",
+                        "password": "mandatory",
+                        "persistent": "",
+                        "uid": "mandatory"
+                    }
+                },
+                "response": {
+                    "type": "json",
+                    "validation": {
+                        "scopes": "mandatory",
+                        "timeout": "mandatory",
+                        "token": "mandatory",
+                        "uid": "mandatory"
+                    }
                 }
             }
-        }
-    },
-    "/auth/logout": {
-        "post": {
-            "cors": true,
-            "documentation": "Logout API used to invalidate the current session."
-        }
-    },
-    "/auth/refresh": {
-        "post": {
-            "cors": true,
-            "documentation": "Exchange a refresh token for an access token.",
-            "request": {
-                "type": "json",
-                "validation": {
-                    "refresh_token": ""
-                }
-            },
-            "response": {
-                "type": "json",
-                "validation": {
-                    "refresh_timeout": "",
-                    "refresh_token": "",
-                    "scopes": "mandatory",
-                    "timeout": "mandatory",
-                    "token": "mandatory",
-                    "uid": "mandatory"
+        },
+        "/auth/logout": {
+            "post": {
+                "cors": true,
+                "documentation": "Logout API used to invalidate the current session."
+            }
+        },
+        "/auth/refresh": {
+            "post": {
+                "cors": true,
+                "documentation": "Exchange a refresh token for an access token.",
+                "request": {
+                    "type": "json",
+                    "validation": {
+                        "refresh_token": ""
+                    }
+                },
+                "response": {
+                    "type": "json",
+                    "validation": {
+                        "refresh_timeout": "",
+                        "refresh_token": "",
+                        "scopes": "mandatory",
+                        "timeout": "mandatory",
+                        "token": "mandatory",
+                        "uid": "mandatory"
+                    }
                 }
             }
         }

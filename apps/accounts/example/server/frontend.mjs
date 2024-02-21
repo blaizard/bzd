@@ -1,7 +1,7 @@
 import { createApp } from "vue";
 
 import App from "#bzd/apps/accounts/example/server/frontend.vue";
-import APIPlugin from "#bzd/nodejs/vue/api.mjs";
+import RestPlugin from "#bzd/nodejs/vue/rest.mjs";
 import APIv1 from "#bzd/api.json" assert { type: "json" };
 import Authentication from "#bzd/apps/accounts/authentication/client.mjs";
 import AuthenticationPlugin from "#bzd/nodejs/vue/authentication.mjs";
@@ -21,10 +21,10 @@ app.use(AuthenticationPlugin, {
 	authentication: authentication,
 });
 
-// ---- API ----
+// ---- REST ----
 
-app.use(APIPlugin, {
-	schema: APIv1,
+app.use(RestPlugin, {
+	schema: APIv1.rest,
 	authentication: authentication,
 	plugins: [authentication],
 });

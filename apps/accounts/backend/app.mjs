@@ -283,7 +283,7 @@ const PATH_STATIC = options.static;
 
 	// ---- API ----
 
-	const api = new RestServer(APIv1, {
+	const api = new RestServer(APIv1.rest, {
 		authentication: authentication,
 		channel: web,
 	});

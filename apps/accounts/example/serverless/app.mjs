@@ -1,7 +1,7 @@
 import { createApp } from "vue";
 
 import App from "#bzd/apps/accounts/example/serverless/app.vue";
-import APIPlugin from "#bzd/nodejs/vue/api.mjs";
+import RestPlugin from "#bzd/nodejs/vue/rest.mjs";
 import APIv1 from "#bzd/api.json" assert { type: "json" };
 import Authentication from "#bzd/apps/accounts/authentication/client.mjs";
 import AuthenticationPlugin from "#bzd/nodejs/vue/authentication.mjs";
@@ -21,11 +21,11 @@ app.use(AuthenticationPlugin, {
 	authentication: authentication,
 });
 
-// ---- API ----
+// ---- REST ----
 
-app.use(APIPlugin, {
+app.use(RestPlugin, {
 	host: Config.accounts,
-	schema: APIv1,
+	schema: APIv1.rest,
 	authentication: authentication,
 	plugins: [authentication],
 });

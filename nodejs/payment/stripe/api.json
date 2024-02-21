@@ -1,9 +1,11 @@
 {
-    "/stripe": {
-        "post": {
-            "documentation": "Webhook for payment intent.",
-            "request": {
-                "type": "raw"
+    "rest": {
+        "/stripe": {
+            "post": {
+                "documentation": "Webhook for payment intent.",
+                "request": {
+                    "type": "raw"
+                }
             }
         }
     }

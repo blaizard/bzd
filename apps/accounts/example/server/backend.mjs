@@ -11,7 +11,7 @@ import Config from "#bzd/apps/accounts/example/config.json" assert { type: "json
 		accounts: Config.accounts,
 	});
 
-	const api = new RestServer(APIv1, {
+	const api = new RestServer(APIv1.rest, {
 		authentication: authentication,
 		channel: web,
 	});

@@ -1,45 +1,47 @@
 {
-    "/admin/service/logs": {
-        "get": {
-            "authentication": "admin-applications",
-            "documentation": "Get the logs for a specific service/process",
-            "request": {
-                "type": "query",
-                "validation": {
-                    "name": "mandatory",
-                    "uid": "mandatory"
-                }
-            },
-            "response": {
-                "type": "json",
-                "validation": {
-                    "logs": "mandatory"
-                }
-            }
-        }
-    },
-    "/admin/service/trigger": {
-        "post": {
-            "authentication": "admin-applications",
-            "documentation": "Manually trigger a service",
-            "request": {
-                "type": "json",
-                "validation": {
-                    "name": "mandatory",
-                    "uid": "mandatory"
+    "rest": {
+        "/admin/service/logs": {
+            "get": {
+                "authentication": "admin-applications",
+                "documentation": "Get the logs for a specific service/process",
+                "request": {
+                    "type": "query",
+                    "validation": {
+                        "name": "mandatory",
+                        "uid": "mandatory"
+                    }
+                },
+                "response": {
+                    "type": "json",
+                    "validation": {
+                        "logs": "mandatory"
+                    }
                 }
             }
-        }
-    },
-    "/admin/services": {
-        "get": {
-            "authentication": "admin-applications",
-            "documentation": "List available services",
-            "response": {
-                "type": "json",
-                "validation": {
-                    "services": "mandatory",
-                    "timestamp": "mandatory"
+        },
+        "/admin/service/trigger": {
+            "post": {
+                "authentication": "admin-applications",
+                "documentation": "Manually trigger a service",
+                "request": {
+                    "type": "json",
+                    "validation": {
+                        "name": "mandatory",
+                        "uid": "mandatory"
+                    }
+                }
+            }
+        },
+        "/admin/services": {
+            "get": {
+                "authentication": "admin-applications",
+                "documentation": "List available services",
+                "response": {
+                    "type": "json",
+                    "validation": {
+                        "services": "mandatory",
+                        "timestamp": "mandatory"
+                    }
                 }
             }
         }
