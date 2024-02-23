@@ -1,5 +1,5 @@
 /// Load a script programmatically.
-export default function (url, type = "text/javascript") {
+export default function loadScript(url, type = "text/javascript") {
 	return new Promise((resolve, reject) => {
 		try {
 			const script = document.createElement("script");

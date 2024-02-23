@@ -38,7 +38,7 @@ class Bundler:
 
 			# Create the self extracting output file.
 			with open(output, mode="wb") as fo:
-				fo.write("""#!/bin/bash
+				fo.write("""#!/usr/bin/env bash
 set -e
 
 case $1 in

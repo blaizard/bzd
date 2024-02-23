@@ -125,6 +125,7 @@ _bzd_nodejs_web_binary = rule(
         ),
         "install": attr.label(
             mandatory = True,
+            providers = [BzdNodeJsInstallInfo],
         ),
         "main": attr.label(
             mandatory = True,

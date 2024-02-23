@@ -17,6 +17,14 @@ py_binary(
     ],
 )
 
+py_binary(
+    name = "reader",
+    srcs = [
+        "reader.py",
+    ],
+    visibility = ["//visibility:public"],
+)
+
 bzl_library(
     name = "defs",
     srcs = [

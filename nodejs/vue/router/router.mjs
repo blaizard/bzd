@@ -83,6 +83,8 @@ class RouterManager {
 				hash: true,
 				// Authentication object to be used with this router.
 				authentication: null,
+				// The available routes, if set all added routes must match, otherwise this is ignored.
+				schema: null,
 				// Called each time a new route is processed.
 				onRouteUpdate: (route) => {},
 			},
@@ -134,6 +136,12 @@ class RouterManager {
 		});
 
 		configuration.routes.forEach((route) => {
+			Exception.assert(route.path, "This route is missing a path: {:j}", route);
+			if (this.options.schema !== null) {
+				Exception.assert(route.path in this.options.schema, "The route '{}' is missing from the schema.", route.path);
+				route = Object.assign({}, route, this.options.schema[route.path]);
+			}
+
 			const metadata = {
 				authentication: route.authentication || false,
 			};

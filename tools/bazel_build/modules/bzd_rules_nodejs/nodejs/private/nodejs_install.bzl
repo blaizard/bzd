@@ -8,6 +8,7 @@ load("@bzd_rules_nodejs//nodejs:private/nodejs_library.bzl", "LIBRARY_ATTRS", "b
 BzdNodeJsInstallInfo = provider(
     "Provider for installation information.",
     fields = {
+        "api": "The interface metadata.",
         "files": "All the files of the installation.",
         "package_json": "The package.json file located at the root.",
         "transpiled": "The map of transpiled files.",
@@ -188,6 +189,7 @@ def _bzd_nodejs_install_impl(ctx):
     return [
         BzdPackageMetadataFragmentInfo(manifests = [metadata]),
         BzdNodeJsInstallInfo(
+            api = api,
             files = depset([package_json, node_modules, api] + srcs + transpiled.values(), transitive = [providers.data]),
             package_json = package_json,
             transpiled = transpiled,

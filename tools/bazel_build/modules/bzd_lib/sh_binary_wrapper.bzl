@@ -17,7 +17,7 @@ def _update_runfiles(ctx, runfiles, file):
     return runfiles, file.files_to_run.executable
 
 def _expand_path(ctx, path):
-    """Return the exapnded path from the rule context."""
+    """Return the expanded path from the rule context."""
 
     runfiles_relative_tool_path = ctx.workspace_name + "/" + path
     return "$RUNFILES_DIR/{}".format(runfiles_relative_tool_path)
@@ -59,7 +59,7 @@ def sh_binary_wrapper_impl(ctx, output, binary = None, locations = {}, paths = {
     for path, key in paths.items():
         extra_substitutions[key] = _expand_path(ctx, path)
 
-    command_pre = """#!/bin/bash
+    command_pre = """#!/usr/bin/env bash
     set -e
     if [ -z "$RUNFILES_DIR" ]; then
         export RUNFILES_DIR="$0.runfiles"
