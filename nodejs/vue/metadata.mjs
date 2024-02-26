@@ -32,6 +32,15 @@ function setCanonical(url) {
 	document.getElementsByTagName("head")[0].appendChild(link);
 }
 
+function setSitemap(sitemap) {
+	let link = document.querySelector("link[rel='sitemap']") || document.createElement("link");
+	link.rel = "sitemap";
+	link.type = "application/xml";
+	link.title = "Sitemap";
+	link.href = sitemap;
+	document.getElementsByTagName("head")[0].appendChild(link);
+}
+
 function getBase() {
 	return window.location.protocol + "//" + window.location.host;
 }
@@ -45,6 +54,7 @@ export default {
 			title: "",
 			base: "",
 			route: "",
+			sitemap: "",
 		});
 
 		watch(
@@ -72,6 +82,12 @@ export default {
 			},
 		);
 		watch(
+			() => data.sitemap,
+			(value) => {
+				setSitemap(value);
+			},
+		);
+		watch(
 			() => [data.base, data.route],
 			([base, route]) => {
 				const value = base.replace(/\/*$/g, "") + "/" + route.replace(/^\/*/g, "");
@@ -86,6 +102,7 @@ export default {
 			title: "",
 			base: "",
 			route: "",
+			sitemap: "",
 		});
 		validation.validate(values, { all: true });
 		Object.assign(
