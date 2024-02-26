@@ -62,7 +62,7 @@ def _bzd_nodejs_executable_impl(ctx):
 
     # Look for the entry point.
     paths = {
-        install.transpiled.get(ctx.file.main.short_path): "main",
+        install.transpiled.get(ctx.file.main.short_path, ctx.file.main.short_path): "main",
     }
 
     # Gather toolchain executable.

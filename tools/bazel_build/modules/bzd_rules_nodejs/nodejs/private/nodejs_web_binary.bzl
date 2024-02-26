@@ -134,7 +134,7 @@ _bzd_nodejs_web_binary = rule(
         "static": attr.label_keyed_string_dict(
             doc = "Static files to be added to the bundle.",
             default = {
-                "@bzd_rules_nodejs//nodejs/metadata:default_robots.txt": "robots.txt",
+                "@bzd_rules_nodejs//nodejs/static:robots.txt": "robots.txt",
             },
             allow_files = True,
         ),
