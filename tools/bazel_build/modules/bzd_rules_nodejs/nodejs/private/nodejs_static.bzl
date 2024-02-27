@@ -2,49 +2,55 @@
 
 load("@bzd_rules_nodejs//nodejs:private/nodejs_install.bzl", "BzdNodeJsInstallInfo")
 
-def _update_argument(arg):
+def _update_argument(arg, reader, config, **kwargs):
     if arg.startswith("{config:"):
-        return "\"$(config {})\"".format(arg[8:-1])
-    return arg.replace(" ", "\\ ")
+        return "{reader} {config} {arg}".format(
+            reader = reader,
+            config = config,
+            arg = arg[8:-1],
+        )
+    return "echo " + arg.format(**kwargs)
 
 def _bzd_nodejs_static_impl(ctx):
-    wrapper = ctx.actions.declare_file("{}.wrapper".format(ctx.label.name))
     output = ctx.actions.declare_file(ctx.label.name)
 
     # Convert arguments into a command string.
-    args = []
+    params = []
     for arg in ctx.attr.args:
-        arg = _update_argument(arg).format(
+        arg = _update_argument(
+            arg,
+            reader = ctx.executable._config_reader.path,
+            config = ctx.file.config.path,
             api = ctx.attr.install[BzdNodeJsInstallInfo].api.path,
             output = output.path,
         )
-        args.append(arg)
+        params.append(arg)
 
-    ctx.actions.write(
-        output = wrapper,
-        is_executable = True,
-        content = """#!/usr/bin/env bash
-set -o errexit
-config () {{
-    {reader} {config} "$1"
-}}
-{script} {args}
-""".format(
-            script = ctx.executable.script.path,
-            reader = ctx.executable._config_reader.path,
-            config = ctx.file.config.path,
-            args = " ".join(args),
-        ),
+    # Create the param file.
+    param_file = ctx.actions.declare_file(ctx.label.name + ".param")
+    ctx.actions.run_shell(
+        outputs = [param_file],
+        tools = [
+            ctx.executable._config_reader,
+            ctx.file.config,
+        ],
+        command = "set -o errexit\n" + "\n".join([arg + " >> " + param_file.path for arg in params]),
     )
 
-    ctx.actions.run(
+    # Read and call the script with the arguments unpacked.
+    ctx.actions.run_shell(
         outputs = [output],
-        executable = wrapper,
+        command = """
+mapfile -t < {params}
+{script} "${{MAPFILE[@]}}"
+""".format(
+            script = ctx.executable.script.path,
+            params = param_file.path,
+        ),
         tools = [
             ctx.executable.script,
-            ctx.executable._config_reader,
             ctx.attr.install[BzdNodeJsInstallInfo].api,
-            ctx.file.config,
+            param_file,
         ],
     )
 
