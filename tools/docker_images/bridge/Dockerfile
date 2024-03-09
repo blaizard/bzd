@@ -13,9 +13,13 @@ RUN apt-get install -y openssh-server net-tools wget \
 
 # Set SSH
 RUN mkdir -p /var/run/sshd
-RUN mkdir -p ~/.ssh
-COPY .ssh/config ~/.ssh/config
+COPY .ssh/config /root/.ssh/config
 RUN sed -i '/GatewayPorts/c\GatewayPorts yes' /etc/ssh/sshd_config
+RUN sed -i '/PubkeyAuthentication/c\PubkeyAuthentication yes' /etc/ssh/sshd_config
+# Disallow password login
+RUN sed -i '/PasswordAuthentication/c\PasswordAuthentication no' /etc/ssh/sshd_config
+RUN sed -i '/PermitRootLogin/c\PermitRootLogin prohibit-password' /etc/ssh/sshd_config
+RUN sed -i '/KbdInteractiveAuthentication/c\KbdInteractiveAuthentication no' /etc/ssh/sshd_config
 
 EXPOSE 22
 EXPOSE 1194
