@@ -8,6 +8,7 @@ py_console_script_binary(
     visibility = ["//visibility:public"],
     deps = [
         requirement("octodns_digitalocean"),
+        requirement("octodns_bind"),
     ],
 )
 
@@ -17,6 +18,7 @@ py_console_script_binary(
     visibility = ["//visibility:public"],
     deps = [
         requirement("octodns_digitalocean"),
+        requirement("octodns_bind"),
     ],
 )
 

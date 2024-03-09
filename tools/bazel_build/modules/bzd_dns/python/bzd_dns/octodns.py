@@ -95,7 +95,18 @@ class Octodns:
 	def makeConfig(self, domains: typing.Sequence[str]) -> None:
 
 		if self.config["provider"] == "digitalocean":
-			provider = {"class": "octodns_digitalocean.DigitalOceanProvider", "token": self.config['token']}
+			provider = {
+				"class": "octodns_digitalocean.DigitalOceanProvider",
+				"token": self.config['token']
+			}
+		elif self.config["provider"] == "bind9":
+			provider = {
+				"class": "octodns_bind.Rfc2136Provider",
+				"host": self.config["host"],
+				"key_name": self.config["name"],
+				"key_secret": self.config["secret"],
+				"key_algorithm": self.config.get("algorithm", "hmac-sha512")
+			}
 		else:
 			assert False, f"Unsupported provider: '{self.config['provider']}'."
 
