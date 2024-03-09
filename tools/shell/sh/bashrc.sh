@@ -177,9 +177,17 @@ _bzd_parse_git_branch()
 	fi
 }
 
+_bzd_last_non_zero_return_code()
+{
+	return_code="$?"
+	if [ $return_code != 0 ]; then
+		echo -en "\033[31mx\033[00m "
+	fi
+}
+
 case "$TERM" in
 xterm*|rxvt*|konsole*)
-	PS1="\u@\h \[\033[32m\]\w\[\033[33m\]\$(_bzd_parse_git_branch)\[\033[00m\] $ "
+	PS1="\$(_bzd_last_non_zero_return_code)\u@\h \[\033[32m\]\w\[\033[33m\]\$(_bzd_parse_git_branch)\[\033[00m\] $ "
 	;;
 *)
 	;;
