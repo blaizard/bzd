@@ -1,5 +1,4 @@
 import RestServer from "#bzd/nodejs/core/rest/server.mjs";
-import Authentication from "#bzd/apps/accounts/authentication/server.mjs";
 
 import Cache from "#bzd/nodejs/core/cache.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
@@ -14,7 +13,7 @@ import Path from "path";
 
 import APIv1 from "#bzd/api.json" assert { type: "json" };
 import Plugins from "../plugins/backend.mjs";
-import Config from "#bzd/apps/artifacts/config.json" assert { type: "json" };
+import config from "#bzd/apps/artifacts/backend/config.json" assert { type: "json" };
 
 import Services from "./services.mjs";
 
@@ -40,7 +39,6 @@ program
 		"Where to store the data, can also be set with the environemnt variable BZD_PATH_DATA.",
 		"/bzd/data",
 	)
-	.option("--test", "Use test data.")
 	.parse(process.argv);
 
 (async () => {
@@ -48,59 +46,32 @@ program
 	const PORT = Number(process.env.BZD_PORT || program.opts().port);
 	const PATH_STATIC = program.opts().static;
 	const PATH_DATA = process.env.BZD_PATH_DATA || program.opts().data;
-	const IS_TEST = Boolean(program.opts().test);
-
-	let authentication = new Authentication({
-		accounts: Config.accounts,
-	});
 
 	// Set-up the web server
 	let web = new HttpServer(PORT);
-	// Install the RestServer
 	let api = new RestServer(APIv1.rest, {
-		authentication: authentication,
 		channel: web,
 	});
-	await api.installPlugins(authentication);
 
 	let keyValueStore = await KeyValueStoreDisk.make(Path.join(PATH_DATA, "db"));
 
-	// Test data
-	if (IS_TEST) {
-		await keyValueStore.set("volume", "disk", {
-			type: "fs",
-			"fs.root": "/",
-		});
-
-		await keyValueStore.set("volume", "docker.blaizard.com", {
-			type: "docker",
-			"docker.type": "v2",
-			"docker.url": "https://docker.blaizard.com",
-		});
-
-		await keyValueStore.set("volume", "webdav", {
-			type: "webdav",
-			"webdav.url": "https://cloud.leviia.com//public.php/webdav",
-			"webdav.username": "YsLRkFLLceXbPrB",
-		});
-
-		await keyValueStore.set("volume", "bzd", {
-			type: "bzd",
-			"bzd.path": "/bzd/data",
-			"bzd.server.port": 8888,
-		});
-
-		// await keyValueStore.set("volume", "docker.gcr", {
-		// type: "docker",
-		// "docker.type": "gcr",
-		// "docker.key": "",
-		// "docker.service": "gcr.io",
-		// "docker.url": "https://docker.blaizard.com",
-		// "docker.proxy": true,
-		// "docker.proxy.url": "http://127.0.0.1:5050",
-		// "docker.proxy.port": 5051,
-		// });
+	// Add initial volumes.
+	for (const [name, data] of Object.entries(config.volumes)) {
+		await keyValueStore.set("volume", name, data);
 	}
+
+	// Docker GCR example
+	// await keyValueStore.set("volume", "docker.gcr", {
+	// type: "docker",
+	// "docker.type": "gcr",
+	// "docker.key": "",
+	// "docker.service": "gcr.io",
+	// "docker.url": "https://docker.blaizard.com",
+	// "docker.proxy": true,
+	// "docker.proxy.url": "http://127.0.0.1:5050",
+	// "docker.proxy.port": 5051,
+	// });
+
 	// Set the cache
 	let cache = new Cache();
 
@@ -226,43 +197,6 @@ program
 		}
 		this.setHeader("Content-Disposition", 'attachment; filename="' + metadata.name + '"');
 		return await storage.read(pathList);
-	});
-
-	api.handle("get", "/config", async (inputs) => {
-		return await keyValueStore.get("volume", inputs.volume, {});
-	});
-
-	api.handle("post", "/config", async (inputs) => {
-		// Delete all keys that do not start with <inputs.config.type>.
-		Exception.assert("type" in inputs.config, "Configuration type is missing.");
-		let params = {
-			type: inputs.config.type,
-		};
-		for (const name in inputs.config) {
-			if (name.startsWith(params.type + ".")) {
-				params[name] = inputs.config[name];
-			}
-		}
-
-		// Check if it needs to be renamed
-		const volume = inputs.config.volume;
-		delete inputs.config.volume;
-
-		// Stop all services related to this config
-		await services.stop(inputs.volume);
-
-		await keyValueStore.set("volume", volume, params);
-		await cache.setDirty("volume", inputs.volume);
-		if (volume != inputs.volume) {
-			await keyValueStore.delete("volume", inputs.volume);
-		}
-
-		await services.start(volume, params.type, params);
-	});
-
-	api.handle("delete", "/config", async (inputs) => {
-		await services.stop(inputs.volume);
-		return await keyValueStore.delete("volume", inputs.volume);
 	});
 
 	api.handle("post", "/list", async (inputs) => {

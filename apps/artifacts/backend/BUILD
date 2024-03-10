@@ -1,11 +1,24 @@
+load("@bzd_lib//config:defs.bzl", "bzd_config")
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_binary")
+
+exports_files([
+    "config.test.json",
+    "config.default.json",
+])
+
+bzd_config(
+    name = "config",
+    srcs = [
+        "config.default.json",
+    ],
+)
 
 bzd_nodejs_binary(
     name = "backend",
     srcs = glob([
         "*.mjs",
     ]) + [
-        "//apps/artifacts:config.json",
+        ":config.json",
     ],
     apis = ["//apps/artifacts:api.v1.json"],
     args = [
@@ -25,7 +38,6 @@ bzd_nodejs_binary(
         "//apps/artifacts:__pkg__",
     ],
     deps = [
-        "//apps/accounts/authentication:server",
         "//apps/artifacts/plugins:backend",
         "//nodejs/core:cache",
         "//nodejs/core:exception",
