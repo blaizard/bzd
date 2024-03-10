@@ -4,13 +4,7 @@
 			<div @click="handleExpand(item)" :class="getClass(item)">
 				<i v-if="isPermissionList(item)" class="bzd-icon-folder"></i>
 				<span class="name" @click.stop="handleSelect(item)">{{ item.name }}</span>
-				<span class="actions" @click.stop="">
-					<i
-						v-if="depth == 0 && $authentication.isAuthenticated"
-						class="bzd-icon-configuration"
-						@click="handleConfig(item.name)"
-					></i>
-				</span>
+				<span class="actions" @click.stop=""> </span>
 			</div>
 			<div v-if="item.name in expanded" :key="item.name + '.expanded'">
 				<TreeDirectory
@@ -150,9 +144,6 @@
 					item: item,
 					path: [],
 				});
-			},
-			handleConfig(name) {
-				this.$router.dispatch("/config/" + name);
 			},
 			handleItemPropagation(name, item) {
 				item.path.unshift(name);

@@ -5,13 +5,6 @@
 		</template>
 		<template #actions>
 			<MenuEntry text="Services" icon="bzd-icon-tile" link="/services"></MenuEntry>
-			<template v-if="$authentication.isAuthenticated">
-				<MenuEntry text="Add" icon="bzd-icon-add" link="/config"></MenuEntry>
-				<MenuEntry text="Logout" icon="bzd-icon-close" @click="handleLogout"></MenuEntry>
-			</template>
-			<template v-else>
-				<MenuEntry text="Login" icon="bzd-icon-user" link="/login"></MenuEntry>
-			</template>
 		</template>
 		<template #content>
 			<div class="layout">
@@ -60,8 +53,6 @@
 							this.$router.dispatch("/");
 						},
 					},
-					{ path: "/config/{volume}", authentication: true, component: () => import("./config.vue") },
-					{ path: "/config", authentication: true, component: () => import("./config.vue") },
 					{ path: "/view/{path:*}", component: () => import("./view.vue") },
 					{ path: "/services", component: () => import("./services.vue") },
 					{

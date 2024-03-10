@@ -1,14 +1,11 @@
 import { createApp } from "vue";
 
-import Authentication from "#bzd/apps/accounts/authentication/client.mjs";
 import Permissions from "#bzd/nodejs/db/storage/permissions.mjs";
 import RestPlugin from "#bzd/nodejs/vue/rest.mjs";
-import AuthenticationPlugin from "#bzd/nodejs/vue/authentication.mjs";
 import CachePlugin from "#bzd/nodejs/vue/cache.mjs";
 import Notification from "#bzd/nodejs/vue/notification.mjs";
 import Router from "#bzd/nodejs/vue/router/router.mjs";
 import AsyncComputed from "vue-async-computed";
-import Config from "#bzd/apps/artifacts/config.json" assert { type: "json" };
 
 import APIv1 from "#bzd/api.json" assert { type: "json" };
 
@@ -16,27 +13,13 @@ import App from "./app.vue";
 
 const app = createApp(App);
 
-let authentication = new Authentication({
-	accounts: Config.accounts,
-	unauthorizedCallback: () => {
-		const route = app.config.globalProperties.$router.get();
-		app.config.globalProperties.$router.dispatch("/login", route ? { query: { redirect: route } } : {});
-	},
-});
-
 app.use(AsyncComputed);
 app.use(Notification);
-app.use(AuthenticationPlugin, {
-	authentication: authentication,
-});
 app.use(Router, {
 	hash: false,
-	authentication: authentication,
 });
 app.use(RestPlugin, {
 	schema: APIv1.rest,
-	authentication: authentication,
-	plugins: [authentication],
 });
 
 app.use(CachePlugin, {
