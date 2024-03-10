@@ -1,11 +1,6 @@
 load("@bzd_lib//config:defs.bzl", "bzd_config")
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_binary")
 
-exports_files([
-    "config.test.json",
-    "config.default.json",
-])
-
 bzd_config(
     name = "config",
     srcs = [
