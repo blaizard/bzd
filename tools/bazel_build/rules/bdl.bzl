@@ -4,7 +4,12 @@ load("@bazel_skylib//lib:sets.bzl", "sets")
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
 load("@bzd_package//:defs.bzl", "BzdPackageMetadataFragmentInfo")
-load("@bzd_toolchain_cc//cc:defs.bzl", "cc_compile", "cc_link")
+load("@bzd_toolchain_cc//cc:defs.bzl", "cc_link")
+load("//tools/bazel_build/rules/extensions:cc.bzl", extension_cc = "extension")
+
+# ---- Extensions ----
+
+_library_extensions = {} | extension_cc
 
 # ---- Providers ----
 
@@ -213,16 +218,6 @@ def _precompile_bdl(ctx, srcs, deps, output_dir = None, namespace = None):
     return _BdlInfo(sources = sources, files = files, search_formats = search_formats), metadata
 
 def _bdl_library_impl(ctx):
-    _FORMATS = {
-        "cc": {
-            "display": "C++",
-            "outputs": ["{}.hh"],
-        },
-    }
-
-    # Generated outputs
-    generated = {fmt: [] for fmt in _FORMATS.keys()}
-
     # Pre-compile the BDLs into their language agnostics format.
     bdl_provider, metadata = _precompile_bdl(
         ctx = ctx,
@@ -230,7 +225,8 @@ def _bdl_library_impl(ctx):
         deps = ctx.attr.deps,
     )
 
-    # Generate the format specific outputs
+    # Generate the fdata files per metadata
+    bdl_data = []
     for bdl in metadata:
         # Create the language specific data file.
         language_specific_data = _make_bdl_data_file(includes_per_target = {"": [f for dep in ctx.attr.deps for f in _get_cc_public_header(dep)]})
@@ -241,8 +237,13 @@ def _bdl_library_impl(ctx):
             output = data_file,
             content = json.encode(language_specific_data),
         )
+        bdl_data.append([bdl, data_file])
 
-        for fmt, data in _FORMATS.items():
+    # Generate the various providers
+    providers = []
+    for fmt, data in _library_extensions.items():
+        generated = []
+        for bdl, data_file in bdl_data:
             # Generate the output
             outputs = [ctx.actions.declare_file(output.format(bdl["relative_name"])) for output in data["outputs"]]
             ctx.actions.run(
@@ -260,18 +261,15 @@ def _bdl_library_impl(ctx):
                 ),
                 executable = ctx.attr._bdl.files_to_run,
             )
+            generated += outputs
 
-            # Save the outputs
-            generated[fmt] += outputs
-
-    # Generate the various providers
-    cc_info_provider = cc_compile(ctx = ctx, hdrs = generated["cc"], deps = ctx.attr._deps_cc + ctx.attr.deps)
+        # Generate the various providers
+        providers.append(data["make_library_provider"](ctx = ctx, generated = generated))
 
     return [
         bdl_provider,
         _BdlTagInfo(),
-        cc_info_provider,
-    ]
+    ] + providers
 
 bdl_library = rule(
     implementation = _bdl_library_impl,
