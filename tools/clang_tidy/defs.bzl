@@ -89,9 +89,6 @@ clang_tidy_aspect = aspect(
     implementation = _clang_tidy_aspect_impl,
     fragments = ["cpp"],
     attrs = {
-        "_cc_toolchain": attr.label(
-            default = Label("@bazel_tools//tools/cpp:current_cc_toolchain"),
-        ),
         "_clang_tidy": attr.label(
             doc = "Clang-tidy binary to be used.",
             default = Label("//tools/clang_tidy"),

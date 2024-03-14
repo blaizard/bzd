@@ -264,7 +264,7 @@ def _bdl_library_impl(ctx):
             generated += outputs
 
         # Generate the various providers
-        providers.append(data["make_library_provider"](ctx = ctx, generated = generated))
+        providers.extend(data["library_providers"](ctx = ctx, generated = generated))
 
     return [
         bdl_provider,
@@ -293,13 +293,9 @@ bdl_library = rule(
             cfg = "exec",
             executable = True,
         ),
-        "_cc_toolchain": attr.label(
-            default = Label("@rules_cc//cc:current_cc_toolchain"),
-        ),
-        "_deps_cc": attr.label_list(
-            default = [Label("//tools/bdl/generators/cc/adapter:types")],
-        ),
-    },
+    } | { ("_deps_" + name): (attr.label_list(
+            default = data["library_deps"],
+        )) for name, data in _library_extensions.items() if "library_deps" in data },
     toolchains = [
         "@rules_cc//cc:toolchain_type",
     ],
@@ -515,9 +511,6 @@ _bdl_system = rule(
             default = Label("//tools/bdl"),
             cfg = "exec",
             executable = True,
-        ),
-        "_cc_toolchain": attr.label(
-            default = Label("@rules_cc//cc:current_cc_toolchain"),
         ),
         "_deps_cc": attr.label_list(
             default = [Label("//tools/bdl/generators/cc/adapter:context")],
