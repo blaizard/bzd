@@ -1,6 +1,13 @@
 load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper")
-load("@bzd_sanitizer_pip//:requirements.bzl", "requirement")
 load("@rules_python//python:defs.bzl", "py_binary")
+load("@rules_python//python/entry_points:py_console_script_binary.bzl", "py_console_script_binary")
+
+py_console_script_binary(
+    name = "codespell_binary",
+    pkg = "@bzd_sanitizer_pip//codespell",
+    script = "codespell",
+    visibility = ["//visibility:public"],
+)
 
 py_binary(
     name = "cli",
@@ -14,23 +21,12 @@ py_binary(
     ],
 )
 
-py_binary(
-    name = "black_binary",
-    srcs = [
-        "black_binary.py",
-    ],
-    deps = [
-        requirement("black"),
-        requirement("typing-extensions"),
-    ],
-)
-
 sh_binary_wrapper(
-    name = "black",
-    command = "{binary} --black {black} $@",
+    name = "codespell",
+    command = "{binary} --codespell {codespell} $@",
     locations = {
-        ":black_binary": "black",
         ":cli": "binary",
+        ":codespell_binary": "codespell",
     },
     visibility = ["//visibility:public"],
 )

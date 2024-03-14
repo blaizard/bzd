@@ -8,6 +8,8 @@ black==23.7.0
     # via -r tools/bazel_build/modules/bzd_sanitizer/requirements.in
 click==8.1.6
     # via black
+codespell==2.2.6
+    # via -r tools/bazel_build/modules/bzd_sanitizer/requirements.in
 importlib-metadata==6.8.0
     # via yapf
 mypy-extensions==1.0.0
