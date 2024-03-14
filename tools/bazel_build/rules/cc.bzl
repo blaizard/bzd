@@ -141,7 +141,6 @@ _bzd_cc_library = rule(
             doc = "C++ source files",
             allow_files = True,
         ),
-        "_cc_toolchain": attr.label(default = Label("@rules_cc//cc:current_cc_toolchain")),
     },
     toolchains = [
         "@rules_cc//cc:toolchain_type",
