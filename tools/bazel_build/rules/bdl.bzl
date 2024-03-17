@@ -293,9 +293,9 @@ bdl_library = rule(
             cfg = "exec",
             executable = True,
         ),
-    } | { ("_deps_" + name): (attr.label_list(
-            default = data["library_deps"],
-        )) for name, data in _library_extensions.items() if "library_deps" in data },
+    } | {("_deps_" + name): (attr.label_list(
+        default = data["library_deps"],
+    )) for name, data in _library_extensions.items() if "library_deps" in data},
     toolchains = [
         "@rules_cc//cc:toolchain_type",
     ],

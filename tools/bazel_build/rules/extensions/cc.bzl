@@ -8,10 +8,10 @@ def _library_providers(ctx, generated):
 extension = {
     "cc": {
         "display": "C++",
-        "library_providers": _library_providers,
         "library_deps": [
-            Label("//tools/bdl/generators/cc/adapter:types")
+            Label("//tools/bdl/generators/cc/adapter:types"),
         ],
+        "library_providers": _library_providers,
         "outputs": ["{}.hh"],
     },
 }
