@@ -225,25 +225,23 @@ def _bdl_library_impl(ctx):
         deps = ctx.attr.deps,
     )
 
-    # Generate the fdata files per metadata
-    bdl_data = []
-    for bdl in metadata:
-        # Create the language specific data file.
-        language_specific_data = _make_bdl_data_file(includes_per_target = {"": [f for dep in ctx.attr.deps for f in _get_cc_public_header(dep)]})
+    # Generate the data for the data file for the bdl constructor.
+    language_specific_data = {}
+    for fmt, data in _library_extensions.items():
+        language_specific_data[fmt] = data["library_data"](ctx.attr.deps)
 
-        # Write the language specific data file.
-        data_file = ctx.actions.declare_file("{}.data.json".format(ctx.label.name, "{}.data.json".format(bdl["relative_name"])))
-        ctx.actions.write(
-            output = data_file,
-            content = json.encode(language_specific_data),
-        )
-        bdl_data.append([bdl, data_file])
+    # Write the language specific data file.
+    data_file = ctx.actions.declare_file("{}.data.json".format(ctx.label.name))
+    ctx.actions.write(
+        output = data_file,
+        content = json.encode(language_specific_data),
+    )
 
     # Generate the various providers
     providers = []
     for fmt, data in _library_extensions.items():
         generated = []
-        for bdl, data_file in bdl_data:
+        for bdl in metadata:
             # Generate the output
             outputs = [ctx.actions.declare_file(output.format(bdl["relative_name"])) for output in data["outputs"]]
             ctx.actions.run(
@@ -295,7 +293,7 @@ bdl_library = rule(
         ),
     } | {("_deps_" + name): (attr.label_list(
         default = data["library_deps"],
-    )) for name, data in _library_extensions.items() if "library_deps" in data},
+    )) for name, data in _library_extensions.items()},
     toolchains = [
         "@rules_cc//cc:toolchain_type",
     ],
