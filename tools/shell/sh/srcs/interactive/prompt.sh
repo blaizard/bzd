@@ -26,9 +26,14 @@ _bzd_last_non_zero_return_code()
 	fi
 }
 
+_bzd_prepend()
+{
+	[[ ! -v IN_NIX_SHELL ]] || echo -n "(nix-shell) "
+}
+
 case "$TERM" in
 xterm*|rxvt*|konsole*)
-	PS1="\$(_bzd_last_non_zero_return_code)\u@\h \[\033[32m\]\w\[\033[33m\]\$(_bzd_parse_git_branch)\[\033[00m\] $ "
+	PS1="\$(_bzd_last_non_zero_return_code)\$(_bzd_prepend)\u@\h \[\033[32m\]\w\[\033[33m\]\$(_bzd_parse_git_branch)\[\033[00m\] $ "
 	;;
 *)
 	;;
