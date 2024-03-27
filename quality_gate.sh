@@ -17,9 +17,9 @@ echo  "==== [normal] gcc prod ==============================="
 echo  "==== [normal] esp32 prod ==============================="
 ./tools/bazel test ... --output_groups=+metadata --config=esp32 --config=prod --config=cc --platform_suffix=esp32-prod $EXTRA_FLAGS
 echo  "==== [stress] dev (100 runs) ==============================="
-./tools/bazel test ... --build_tests_only --test_tag_filters=stress,-cc-coverage --config=dev --runs_per_test=100 --platform_suffix=stress-dev $EXTRA_FLAGS
+./tools/bazel test ... --build_tests_only --test_tag_filters=stress,-cc-coverage --config=dev --runs_per_test=100 --local_test_jobs=1 --platform_suffix=stress-dev $EXTRA_FLAGS
 echo  "==== [stress] prod (100 runs) ==============================="
-./tools/bazel test ... --build_tests_only --test_tag_filters=stress,-cc-coverage --config=prod --runs_per_test=100 --platform_suffix=stress-prod $EXTRA_FLAGS
+./tools/bazel test ... --build_tests_only --test_tag_filters=stress,-cc-coverage --config=prod --runs_per_test=100 --local_test_jobs=1 --platform_suffix=stress-prod $EXTRA_FLAGS
 echo  "==== [sanitizer] asan/lsan/ubsan ==============================="
 ./tools/bazel test ... --config=clang --config=cc --config=sanitizer --config=asan --config=lsan --config=ubsan --platform_suffix=clang-asan-lsan-ubsan $EXTRA_FLAGS
 echo  "==== [sanitizer] tsan ==============================="

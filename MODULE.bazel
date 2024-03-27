@@ -112,8 +112,8 @@ use_repo(images, "docker")
 # Fix for NixOS, this is a workaround until this open issue is solved:
 # https://github.com/NixOS/nixpkgs/issues/289505
 single_version_override(
-     module_name = "rules_oci",
-     patches = [
+    module_name = "rules_oci",
+    patches = [
         "//tools/bazel_build:workaround_nixos_usr_bin_env.patch",
-     ]
+    ],
 )

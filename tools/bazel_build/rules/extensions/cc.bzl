@@ -18,11 +18,11 @@ def _library_data(deps):
 extension = {
     "cc": {
         "display": "C++",
+        "library_data": _library_data,
         "library_deps": [
             Label("//tools/bdl/generators/cc/adapter:types"),
         ],
         "library_providers": _library_providers,
-        "library_data": _library_data,
         "outputs": ["{}.hh"],
     },
 }

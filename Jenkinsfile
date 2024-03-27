@@ -78,14 +78,14 @@ pipeline
 				{
 					steps
 					{
-						sh "./tools/bazel test ... --build_tests_only --test_tag_filters=stress,-cc-coverage --config=dev --runs_per_test=10 --platform_suffix=stress-dev"
+						sh "./tools/bazel test ... --build_tests_only --test_tag_filters=stress,-cc-coverage --config=dev --runs_per_test=10 --local_test_jobs=1 --platform_suffix=stress-dev"
 					}
 				}
 				stage("[stress] prod (10 runs)")
 				{
 					steps
 					{
-						sh "./tools/bazel test ... --build_tests_only --test_tag_filters=stress,-cc-coverage --config=prod --runs_per_test=10 --platform_suffix=stress-prod"
+						sh "./tools/bazel test ... --build_tests_only --test_tag_filters=stress,-cc-coverage --config=prod --runs_per_test=10 --local_test_jobs=1 --platform_suffix=stress-prod"
 					}
 				}
 				stage("[sanitizer] asan/lsan/ubsan")

@@ -58,6 +58,7 @@ This will build locally, it will fetch all tools needed to build on your machine
 ### On NixOs
 
 Use the following user environemt:
+
 ```bash
 nix-shell --pure ./tools/bazel.nix
 ```
