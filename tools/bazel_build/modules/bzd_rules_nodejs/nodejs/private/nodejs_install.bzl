@@ -77,6 +77,8 @@ def bzd_nodejs_make_node_modules(ctx, packages, base_dir_name):
         progress_message = "Updating package(s) for {}".format(ctx.label),
         arguments = manager_args,
         mnemonic = "NodejsUpdate",
+        # Used to propagate the PATH environment to the script.
+        use_default_shell_env = True,
         executable = toolchain_executable.manager.files_to_run,
         # Because of symlinks to the node_modules folder, this should not run remotely.
         execution_requirements = {"no-remote": "1"},

@@ -60,7 +60,8 @@ def sh_binary_wrapper_impl(ctx, output, binary = None, locations = {}, paths = {
         extra_substitutions[key] = _expand_path(ctx, path)
 
     command_pre = """#!/usr/bin/env bash
-    set -e
+    set -o pipefail -o errexit
+
     if [ -z "$RUNFILES_DIR" ]; then
         export RUNFILES_DIR="$0.runfiles"
     fi

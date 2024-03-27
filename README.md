@@ -55,6 +55,13 @@ bazel test //...
 
 This will build locally, it will fetch all tools needed to build on your machine.
 
+### On NixOs
+
+Use the following user environemt:
+```bash
+nix-shell --pure ./tools/bazel.nix
+```
+
 ### Remote
 
 Remote execution is also supported and is enabled by first deploying on a server the predefined Buildbarn configuration:

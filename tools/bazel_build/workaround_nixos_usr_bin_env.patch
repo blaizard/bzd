@@ -1,0 +1,21 @@
+diff --git oci/private/image.sh oci/private/image.sh
+index 47ea79f..3b9b6ca 100644
+--- oci/private/image.sh
++++ oci/private/image.sh
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env bash
++#!/bin/bash
+ set -o pipefail -o errexit -o nounset
+ 
+ # Constants
+
+diff --git oci/private/tarball.sh.tpl oci/private//tarball.sh.tpl
+index 47ea79f..3b9b6ca 100644
+--- oci/private//tarball.sh.tpl
++++ oci/private//tarball.sh.tpl
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env bash
++#!/bin/bash
+ set -o pipefail -o errexit -o nounset
+
+ readonly FORMAT="{{format}}"
