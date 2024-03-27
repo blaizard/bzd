@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 set -eu
 
 REVISION=$(git rev-parse HEAD | tr -d '\n\r')
