@@ -13,14 +13,6 @@
      gcc
      stdenv.cc.cc
      stdenv.cc.libc
-     #glibc
-     #glibc.dev
-     #gcc
-     #
-     #stdenv.cc.cc
-     #stdenv.cc.libc
-     #mktemp
-     #which
    ];
    runScript = "bash";
  }).env

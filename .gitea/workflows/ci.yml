@@ -43,11 +43,11 @@ jobs:
 
             - name: "[stress] dev (10 runs)"
               run: |
-                  ./tools/bazel test ... --build_tests_only --test_tag_filters=stress,-cc-coverage --config=dev --runs_per_test=10 --platform_suffix=stress-dev
+                  ./tools/bazel test ... --build_tests_only --test_tag_filters=stress,-cc-coverage --config=dev --runs_per_test=10 --local_test_jobs=1 --platform_suffix=stress-dev
 
             - name: "[stress] prod (10 runs)"
               run: |
-                  ./tools/bazel test ... --build_tests_only --test_tag_filters=stress,-cc-coverage --config=prod --runs_per_test=10 --platform_suffix=stress-prod
+                  ./tools/bazel test ... --build_tests_only --test_tag_filters=stress,-cc-coverage --config=prod --runs_per_test=10 --local_test_jobs=1 --platform_suffix=stress-prod
 
             - name: "[sanitizer] asan/lsan/ubsan"
               run: |
