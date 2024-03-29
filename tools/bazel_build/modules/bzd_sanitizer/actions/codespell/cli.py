@@ -10,8 +10,8 @@ def workload(args: typing.Tuple[pathlib.Path, pathlib.Path, bool, str, str], std
 	workspace, path, check, codespell, config = args
 
 	params = []
-	#params += ["--check"] if check else []
-	#params += ["--config", config] if check else []
+	params += [] if check else ["--write-changes"]
+	params += ["--config", config] if check else []
 
 	result = localBazelBinary(
 	    codespell,
