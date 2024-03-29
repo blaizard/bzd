@@ -34,7 +34,7 @@ class Cache {
 			error: { proactive: true },
 		});
 
-		// Run the garbage collector asynchrounsly
+		// Run the garbage collector asynchronously
 		if (this.config.garbageCollector) {
 			garbageCollector.call(this);
 		}
@@ -123,7 +123,7 @@ class Cache {
 	}
 
 	/**
-	 * \brief Check if the ressource is dirty
+	 * \brief Check if the resource is dirty
 	 */
 	isDirty(collection, ...ids) {
 		return isDirty.call(this, collection, ...ids);
@@ -301,7 +301,7 @@ function getObject(collection, ...ids) {
 }
 
 /**
- * Check if the ressource is dirty
+ * Check if the resource is dirty
  */
 function isDirty(collection, ...ids) {
 	const id = idsToId.call(this, collection, ...ids);
@@ -310,7 +310,7 @@ function isDirty(collection, ...ids) {
 }
 
 /**
- * Check if the ressource is currently fetching
+ * Check if the resource is currently fetching
  */
 function isFetching(collection, ...ids) {
 	const id = idsToId.call(this, collection, ...ids);
@@ -332,7 +332,7 @@ async function get(instant, collection, ...ids) {
 	let timestampFetch = false;
 	const id = idsToId.call(this, collection, ...ids);
 
-	// Register the access of this ressource
+	// Register the access of this resource
 	touchResource.call(this, collection, id);
 
 	// Time base for the timeout
@@ -394,7 +394,7 @@ async function get(instant, collection, ...ids) {
 }
 
 /**
- * Register the access of a ressource
+ * Register the access of a resource
  */
 function touchResource(collection, id) {
 	this.resourceMap[collection + "/" + id] = Cache.getTimestampMs();

@@ -45,7 +45,7 @@ public:
 	constexpr NonOwningRingSpin() noexcept { dummy_.next_ = &dummy_; }
 
 public:
-	/// Push an element at the back of the ring, it will be the last to be poped.
+	/// Push an element at the back of the ring, it will be the last to be popped.
 	constexpr void pushBack(ElementType& element) noexcept
 	{
 		const auto lock = makeSyncLockGuard(mutex_);

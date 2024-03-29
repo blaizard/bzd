@@ -59,7 +59,7 @@ public: // API.
 
 				if (bzd::algorithm::find(separators_, c) != separators_.end())
 				{
-					// Ignore separators at the begining of the data.
+					// Ignore separators at the beginning of the data.
 					if (!index)
 					{
 						continue;
@@ -103,7 +103,7 @@ public: // API.
 		co_return Key{};
 	}
 
-	/// Reset the internal buffer, loosing the currently stored data if any.
+	/// Reset the internal buffer, losing the currently stored data if any.
 	constexpr void clear() noexcept { buffer_.clear(); }
 
 private:

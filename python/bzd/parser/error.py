@@ -183,7 +183,7 @@ class Error:
 			return Error.handleFromElement(
 			    element=element,
 			    attr=None,
-			    message="Mising mandatory attribute '{}'.".format(attr),
+			    message="Missing mandatory attribute '{}'.".format(attr),
 			    throw=throw,
 			)
 		return AssertionResult()
@@ -198,7 +198,7 @@ class Error:
 			return Error.handleFromElement(
 			    element=element,
 			    attr=None,
-			    message="Mising mandatory sequence '{}'.".format(sequence),
+			    message="Missing mandatory sequence '{}'.".format(sequence),
 			    throw=throw,
 			)
 		return AssertionResult()

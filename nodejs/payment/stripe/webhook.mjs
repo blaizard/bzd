@@ -93,7 +93,7 @@ export default class StripePaymentWebhook extends PaymentInterface {
 			},
 			{
 				periodS: this.options.syncPeriodS,
-				// It must start at the very begining to minimize the delay when the server restarts.
+				// It must start at the very beginning to minimize the delay when the server restarts.
 				delayS: 0,
 			},
 		);

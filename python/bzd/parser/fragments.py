@@ -111,7 +111,7 @@ class FragmentComment(Fragment):
 
 	def merge(self, attrs: Attributes) -> None:
 		for key, value in self.attrs.items():
-			# Remove empty lines at the begining and end
+			# Remove empty lines at the beginning and end
 			value = re.sub(r"^(\s*\n)+", "", value)
 			value = re.sub(r"(\n\s*)+$", "", value)
 

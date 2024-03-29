@@ -124,7 +124,7 @@ export default class TimeSeries {
 	 * Loop through the data.
 	 *
 	 * \param callback The function to be called for each entry.
-	 * \param timestampStart The starting timestamp. If omitted, it will start at the begining
+	 * \param timestampStart The starting timestamp. If omitted, it will start at the beginning
 	 * \param timestampEnd The ending timestamp. If omitted, it will go until the end.
 	 * \param inclusive Used only if the timestamps do not match anything. If set to true, previous
 	 * and next timestamp will be included. Otherwise not.

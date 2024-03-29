@@ -18,7 +18,7 @@
 		</template>
 		<div v-if="isError" class="error">{{ error }}</div>
 		<div v-if="loading" class="loading">&nbsp;</div>
-		<div v-else-if="isEmpty">&lt;emtpy&gt;</div>
+		<div v-else-if="isEmpty">&lt;empty&gt;</div>
 	</div>
 </template>
 

@@ -35,7 +35,7 @@ TEST_ASYNC(ChannelReader, ReadUntil)
 		EXPECT_EQ(output.value(), "wo"_sv);
 	}
 
-	// The buffer reached the border, it is splited.
+	// The buffer reached the border, it is split.
 	{
 		auto generator = reader.readUntil('d');
 		const auto output1 = co_await generator;

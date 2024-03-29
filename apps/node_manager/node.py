@@ -39,7 +39,7 @@ if __name__ == "__main__":
 	                    default=5,
 	                    type=int,
 	                    help="The rate (in s) at which status messages are emitted.")
-	parser.add_argument("--power", action="store_true", help="Wether or not the power on this node can be controlled.")
+	parser.add_argument("--power", action="store_true", help="Whether or not the power on this node can be controlled.")
 	parser.add_argument(
 	    "uid",
 	    nargs="?",

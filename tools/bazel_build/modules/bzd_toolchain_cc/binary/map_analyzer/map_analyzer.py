@@ -17,7 +17,7 @@ AggregateConfigType = typing.Dict[str, typing.List[str]]
 def generateBerkeleyConfig(
     filePath: pathlib.Path, ) -> typing.Optional[typing.Tuple[FilterConfigType, AggregateConfigType]]:
 	"""
-    Classify sections to match berkeley respresentation:
+    Classify sections to match berkeley representation:
             remove: !SEC_ALLOC
             text: SEC_CODE || SEC_READONLY
             data: SEC_HAS_CONTENTS

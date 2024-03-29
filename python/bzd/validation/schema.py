@@ -52,7 +52,7 @@ class Constraint:
 
 	def install(self, processedSchema: "ProcessedSchema", args: typing.List[str]) -> None:
 		"""
-        Install a contraint.
+        Install a constraint.
         """
 		assert False, "Constraint missing 'install' overload."
 

@@ -9,7 +9,7 @@ function rawBodyParse(body, headersFunc, forceContentType = null, forceCharset =
 			.filter(Boolean),
 	);
 
-	// Idendify the contentType
+	// Identify the contentType
 	let contentType = null;
 	if (forceContentType || "type" in contentTypeHeader) {
 		switch (forceContentType || contentTypeHeader.type) {
@@ -29,7 +29,7 @@ function rawBodyParse(body, headersFunc, forceContentType = null, forceCharset =
 		}
 	}
 
-	// Idendify the charset
+	// Identify the charset
 	let charset = "latin1";
 	if (forceCharset || "charset" in contentTypeHeader) {
 		// 'ascii', 'utf8', 'utf16le'/'ucs2', 'base64', 'base64url', 'latin1'/'binary', 'hex'

@@ -101,8 +101,8 @@ export default class FileSystem {
 		this.api = api;
 		// Internal structure of the file tree, it looks like this:
 		// {
-		//     uid: {name: "diplay name", expanded: true, path: "", children: { ... }}, <- for a folder
-		//     uid: {name: "diplay name", path: "", content: ""}, <- for a file
+		//     uid: {name: "display name", expanded: true, path: "", children: { ... }}, <- for a folder
+		//     uid: {name: "display name", path: "", content: ""}, <- for a file
 		//     ...
 		// }
 		this.tree = { path: "/", children: null };
@@ -211,7 +211,7 @@ export default class FileSystem {
 		await this.api.request("post", "/file/executable", { path: path });
 	}
 
-	/// Get a node refered at a specified path.
+	/// Get a node referred at a specified path.
 	async select(path, select = true) {
 		let current = this.makeNode_(this.tree);
 		for (const name of FileSystem.toPathList(path)) {

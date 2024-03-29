@@ -102,7 +102,7 @@ class Context:
 			element = context.parent
 			assert element
 			context = element.context  # type: ignore
-			assert context not in previous, "Inifinite loop between context."
+			assert context not in previous, "Infinite loop between context."
 			previous.add(context)
 
 		return context, start, end

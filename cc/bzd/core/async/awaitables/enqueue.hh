@@ -149,7 +149,7 @@ private:
 	{
 		// Atomically count the number of async completed
 		auto current = ++counter_;
-		// Only trigger the token uppon the first entry in this lambda.
+		// Only trigger the token upon the first entry in this lambda.
 		if (current == 1U)
 		{
 			token_.trigger();

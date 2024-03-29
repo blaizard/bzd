@@ -78,7 +78,7 @@ public:
 
 	/// Get the number of elements currently held by this container.
 	///
-	/// \return The number of elments.
+	/// \return The number of elements.
 	[[nodiscard]] constexpr Size size() const noexcept { return size_.load(); }
 
 	/// Tells if the list is empty.
@@ -97,7 +97,7 @@ public:
 	/// | R | --------> | A |
 	/// |   |  | B | -> |   |
 	///
-	/// Then update R next pointer to B, if it fails restart from the begining.
+	/// Then update R next pointer to B, if it fails restart from the beginning.
 	/// | R | -> | B | -> | A |
 	///
 	/// \param element Element to be inserted.
@@ -180,7 +180,7 @@ public:
 	[[nodiscard]] constexpr Result<void> pop(ElementType& element) noexcept
 	{
 		// Add deletion mark, this must be done in 2 parts.
-		// First set a temporary mark and check wether or not this element
+		// First set a temporary mark and check whether or not this element
 		// is part of this list. If not, remove the mark and return, otherwise
 		// replace the mark with the deletion mark.
 		if constexpr (ElementType::supportMultiContainer)
@@ -324,7 +324,7 @@ public:
 
 			bzd::test::InjectPoint<bzd::test::InjectPoint5, Args...>();
 
-			// Element is completly out of the chain
+			// Element is completely out of the chain
 			element.next_.store(nullptr);
 			break;
 		}
@@ -335,7 +335,7 @@ public:
 		return nullresult;
 	}
 
-	/// Remove an element from the queue. Unlike pop, the element can be immediatly discarded.
+	/// Remove an element from the queue. Unlike pop, the element can be immediately discarded.
 	///
 	/// Calling this function ensures that no user of the list is currently pointing to this element,
 	/// which could lead to a sigfault situation.

@@ -4,7 +4,7 @@
 
 ### Sleep manager task
 
-Use a service task to monitor wether an executor should sleep.
+Use a service task to monitor whether an executor should sleep.
 
 The problem with this design is that the task would run all the time, even in heavy load operation,
 stealing some cycles.
@@ -29,7 +29,7 @@ while true:
     idle(executor);
 ```
 
-The idle task is platform dependant and could look like this:
+The idle task is platform dependent and could look like this:
 
 ```
 def idle(executor):

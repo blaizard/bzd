@@ -44,7 +44,7 @@ export default class Scopes {
 	/// Filter a dictionary with key: [scopes...] pairs.
 	///
 	/// \param data The dictionary.
-	/// \param keyScopesMap A dictionary key to scope correspondance map.
+	/// \param keyScopesMap A dictionary key to scope correspondence map.
 	/// \return The filtered dictionary.
 	filterDictionary(data, keyScopesMap) {
 		return Object.entries(keyScopesMap).reduce((obj, [key, scopes]) => {

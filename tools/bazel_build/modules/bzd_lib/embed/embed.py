@@ -4,7 +4,7 @@ import pathlib
 import mimetypes
 
 if __name__ == "__main__":
-	parser = argparse.ArgumentParser(description="Convert a file into an embeded string.")
+	parser = argparse.ArgumentParser(description="Convert a file into an embedded string.")
 	parser.add_argument("--output", default="output.txt", type=pathlib.Path, help="The output file path.")
 	parser.add_argument("--format", choices=["mjs-base64", "mjs-text"], help="The format of the output.")
 	parser.add_argument("input", type=pathlib.Path, help="The input file to embed.")

@@ -192,7 +192,7 @@
 				// Normalize the result and make the result exponential to add importance on full matches
 				weight /= word.length;
 
-				// Add a penalty on word size to ensure that an exact match alwasy get more weight than a substring match
+				// Add a penalty on word size to ensure that an exact match always get more weight than a substring match
 				weight = word.length == sentence.length ? weight : weight * 0.9;
 
 				return !minMatch || weight > minMatch ? weight : 0;

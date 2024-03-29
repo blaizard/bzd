@@ -9,7 +9,7 @@ const Log = LogFactory("token");
 ///
 /// scopes: The scopes associated with this token.
 /// expiration: The expiration date.
-/// rolling: Wether it is a rolling token or not.
+/// rolling: Whether it is a rolling token or not.
 export default class TokenInfo {
 	constructor(value) {
 		Exception.assert("expiration" in value, "A token must have 'expiration' in its attributes: {}", value);
@@ -30,7 +30,7 @@ export default class TokenInfo {
 		return this.value;
 	}
 
-	// Identifer for this token.
+	// Identifier for this token.
 	identifier() {
 		return this.value.identifier || "<no-id>";
 	}

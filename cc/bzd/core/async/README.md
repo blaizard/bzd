@@ -166,7 +166,7 @@ const auto value = co_await !myFunc();
 ```
 
 The value is directly returned from the coroutine, any error is propagate to the caller of this coroutine. This piece of code
-is equivalent to the follwing:
+is equivalent to the following:
 
 ```c++
 auto result = co_await myFunc();
@@ -192,7 +192,7 @@ const auto value = co_await bzd::async::any(timeout(1_s), myFunc()).assertHasVal
 
 Suspending the execution of an async can be done with `bzd::async::suspend(...)`. This function takes 2 callables as arguments,
 the first, that is guaranteed to be called, contains a movable-only suspended executable object as argument.
-The user needs to dispose it within this callback. Once the callback is completed, the suspended executbale object
+The user needs to dispose it within this callback. Once the callback is completed, the suspended executable object
 cannot be moved anymore.
 It is also guaranteed that no cancellation can occur during the lifetime of this callback.
 

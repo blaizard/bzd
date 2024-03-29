@@ -124,7 +124,7 @@ function compileRoutes(routes, config) {
 					pathRegexpr += "([^/]+)";
 					break;
 				case "*":
-					// No cast here, a raw string should be used here to differenciate between slashes and components.
+					// No cast here, a raw string should be used here to differentiate between slashes and components.
 					pathRegexpr += "(.+)";
 					break;
 				case "i":

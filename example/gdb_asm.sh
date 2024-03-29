@@ -2,7 +2,7 @@
 
 gdb -tui -iex "layout asm" -iex "layout regs" -ex "b main" -ex "r" "$1"
 
-# Usefull commands
+# Useful commands
 
 # Show 10x 64-bit elements from the stack
 #x/10xg $sp

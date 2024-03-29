@@ -8,7 +8,7 @@ classDiagram
    Executor "1" --> "*" Core
 ```
 
-Cores can be assigned with a maximum load or other specific attributes (to be implementated).
+Cores can be assigned with a maximum load or other specific attributes (to be implemented).
 
 ```bdl
 // A workload will run on either core0 or core1.
@@ -31,7 +31,7 @@ composition
 }
 ```
 
-Multiple executors can be created and deployed on the same process/binary, this can be usefull to have different task priorities for example.
+Multiple executors can be created and deployed on the same process/binary, this can be useful to have different task priorities for example.
 
 ## Default executor
 
@@ -41,7 +41,7 @@ When the system only has a single executor, it is automatically assigned to all 
 
 If the system contains multiple executor, however, it is necessary to define where workloads are running.
 
-This can be done in 2 different ways. By either specifying it at component instanciation, This is done with the `executor` contract.
+This can be done in 2 different ways. By either specifying it at component instantiation, This is done with the `executor` contract.
 
 ```bdl
 composition
@@ -50,7 +50,7 @@ composition
 }
 ```
 
-or separatly from the component, using the builtin function `bind`, to bind a fqn or a regular expression to an executor, for example:
+or separately from the component, using the builtin function `bind`, to bind a fqn or a regular expression to an executor, for example:
 
 ```bdl
 composition

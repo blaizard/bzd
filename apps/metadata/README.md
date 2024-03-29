@@ -1,4 +1,4 @@
-# Vizualize metadata information
+# Visualize metadata information
 
 Show metadata information of a bazel target.
 

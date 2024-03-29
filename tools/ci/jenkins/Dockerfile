@@ -5,7 +5,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Load dependencies
 # Note:
-# - python - required to run python files, eventhough a python toolchain is installed,
+# - python - required to run python files, even though a python toolchain is installed,
 #            to run a script using this python toolchain, a startup python script needs
 #            to be executed to discover binaries.
 # - gpgv - needed add the key to apt.

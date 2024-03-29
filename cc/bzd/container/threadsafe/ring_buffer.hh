@@ -181,7 +181,7 @@ public: // Access.
 	///
 	/// \param count The number of element to include the output range. If null, all available elements are returned.
 	/// \param first If set, the range will start from the first element inserted, otherwise from the latest.
-	/// \param start Starting from a specific index, in other word, excluing every entries oldest that this.
+	/// \param start Starting from a specific index, in other word, excluding every entries oldest that this.
 	[[nodiscard]] constexpr RingBufferResult<bzd::Spans<const T, 2u>> asSpansForReading(const Index count = 0u,
 																						const Index first = true,
 																						const Index start = 0u) noexcept

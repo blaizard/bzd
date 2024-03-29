@@ -37,7 +37,7 @@ export default class PersistenceTimeSeries {
 					intervalMs: 5000 * 60, // 5min by default
 				},
 				/**
-				 * Maximum number of entries before spliting files
+				 * Maximum number of entries before splitting files
 				 */
 				maxEntriesPerFile: 100,
 			},
@@ -118,7 +118,7 @@ export default class PersistenceTimeSeries {
 	 * Loop through the data.
 	 *
 	 * \param callback The function to be called for each entry.
-	 * \param timestampStart The starting timestamp. If omitted, it will start at the begining
+	 * \param timestampStart The starting timestamp. If omitted, it will start at the beginning
 	 * \param timestampEnd The ending timestamp. If omitted, it will go until the end.
 	 * \param inclusive Used only if the timestamps do not match anything. If set to true, previous
 	 * and next timestamp will be included. Otherwise not.
@@ -153,7 +153,7 @@ export default class PersistenceTimeSeries {
 				return timeseries.getTimestamp(-1);
 			});
 			// Check if it needs to continue.
-			// Note +1 is important as it ensure that the timestamp is not exisiting in the current list, hence
+			// Note +1 is important as it ensure that the timestamp is not existing in the current list, hence
 			// avoid an infinity loop situation.
 			timestamp = timestampEnd > lastValidTimestamp ? lastValidTimestamp + 1 : null;
 		} while (timestamp != null);
@@ -338,7 +338,7 @@ export default class PersistenceTimeSeries {
 		const metadata = await this.getMetadata(timestamp, forWrite, mode);
 		Exception.assert(metadata, "Metadata returned for " + timestamp + " is evaluating to false");
 
-		// Load the persistence if not alreay loaded
+		// Load the persistence if not already loaded
 		if (!(metadata.path in this.persistenceCache)) {
 			Log.info("Loading time series from {}", metadata.path);
 
@@ -465,7 +465,7 @@ export default class PersistenceTimeSeries {
 			}
 
 			return {
-				// The timestamp of the file (the one that can be retreived by the index)
+				// The timestamp of the file (the one that can be retrieved by the index)
 				timestamp: timestamp,
 				// The path of the data file
 				path: metadata.path,

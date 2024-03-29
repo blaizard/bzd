@@ -22,7 +22,7 @@ Then it's up to the implementation to deal with the data. All this is done durin
 The use of a class here is to allow partial specialization.
 Also function overloading cannot be used here because the definition order will matter,
 as those can be used in a recursive way. This would lead to error such as:
-"specialization of [...] after instanciation".
+"specialization of [...] after instantiation".
 Some article on the matter: http://www.gotw.ca/publications/mill17.htm
 
 ### How to use it?

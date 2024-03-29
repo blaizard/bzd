@@ -78,9 +78,9 @@ class Connections:
 
 		# Make sure the endpoints exists.
 		assert (source in self.endpoints
-		        ), f"The source '{source}' is not registered, only the followings are: {list(self.endpoints.keys())}."
+		        ), f"The source '{source}' is not registered, only the following are: {list(self.endpoints.keys())}."
 		assert (sink in self.endpoints
-		        ), f"The sink '{sink}' is not registered, only the followings are: {list(self.endpoints.keys())}."
+		        ), f"The sink '{sink}' is not registered, only the following are: {list(self.endpoints.keys())}."
 
 		# Check const correctness.
 		assert self.endpoints[source].isSource, f"The source '{source}' must not be marked as const."

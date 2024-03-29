@@ -39,7 +39,7 @@ function getOrCreateTooltip() {
 	return eltList[0];
 }
 
-/// Hide the curren tooltip
+/// Hide the current tooltip
 export function tooltipHide() {
 	current.elt = null;
 

@@ -44,7 +44,7 @@ if __name__ == "__main__":
 	                    nargs=2,
 	                    action="append",
 	                    default=[],
-	                    help="Device identifers to be used for auto-detection (VID + PID).")
+	                    help="Device identifiers to be used for auto-detection (VID + PID).")
 	parser.add_argument("--baud_rate", type=int, default=115200, help="Baudrate of the communication.")
 	parser.add_argument("--data_bits", type=int, default=8, help="Data bits.")
 	parser.add_argument(

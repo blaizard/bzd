@@ -100,7 +100,7 @@ export default class Manager {
 	}
 
 	/**
-	 * Check if a task is alredy registered.
+	 * Check if a task is already registered.
 	 *
 	 * \param taskId The task identifier.
 	 *
@@ -224,7 +224,7 @@ export default class Manager {
 	 * Run current tasks and trigger the next one
 	 */
 	async taskScheduler() {
-		// This should never happen, otherwise somethign is wrong in the logic
+		// This should never happen, otherwise something is wrong in the logic
 		Exception.assert(this.schedulerRunning === false, "Task scheduler is already running");
 		this.schedulerRunning = true;
 

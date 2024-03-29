@@ -67,7 +67,7 @@ class DependencyGroup:
 class EntryType(enum.Flag):
 	# Items that are part of the registry, should be created before running any asyncs.
 	registry = enum.auto()
-	# Worload type of asyncs, define the lifetime of the application.
+	# Workload type of asyncs, define the lifetime of the application.
 	workload = enum.auto()
 	# Service type of asyncs, are stopped when no workloads are running.
 	service = enum.auto()
@@ -138,7 +138,7 @@ class Components:
 		self.map: typing.Dict[str, typing.Dict[Context, ExpressionEntry]] = {}
 		# Flag flipped when the data is resolved.
 		self.isResolved = False
-		# Ordered view of the map, commputed only after close.
+		# Ordered view of the map, computed only after close.
 		self.resolved: typing.Dict[Context, typing.List[ExpressionEntry]] = {}
 
 	@property
@@ -150,7 +150,7 @@ class Components:
 
 	@property
 	def all(self) -> typing.Dict[Context, typing.List[ExpressionEntry]]:
-		"""Collection of all expression entites available in this instance."""
+		"""Collection of all expression entities available in this instance."""
 
 		assert self.isResolved
 		return self.resolved
@@ -229,7 +229,7 @@ class Components:
 			self.map[identifier] = {}
 		entries = self.map[identifier]
 
-		# Ensure that only a workload can superseed an existing expression with the same id/context.
+		# Ensure that only a workload can supersede an existing expression with the same id/context.
 		if context in entries:
 
 			def isOverwritable(entryTypeFrom: EntryType, entryTypeTo: EntryType) -> bool:
@@ -238,7 +238,7 @@ class Components:
 			# If it has the same type.
 			if entries[context].entryType == entryType:
 				return None
-			# If it is already overwitten.
+			# If it is already overwritten.
 			if isOverwritable(entryType, entries[context].entryType):
 				return None
 			expression.assertTrue(
@@ -247,7 +247,7 @@ class Components:
 			    f"An expression of role '{entryType}' cannot overwrite an expression of role '{entries[context].entryType}'.",
 			)
 
-		# Note, it is important to do a copy of the expression, as multilpe expression will co-exist with different
+		# Note, it is important to do a copy of the expression, as multiple expression will co-exist with different
 		# arguments, for example when used with `target.out`.
 		entries[context] = ExpressionEntry(expression=expression.deepCopy(), entryType=entryType)
 		return entries[context]

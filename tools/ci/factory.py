@@ -9,7 +9,7 @@ from bzd.template.template import Template
 
 @dataclass
 class ConfigBase_:
-	"""Common configuration accross all specialization."""
+	"""Common configuration across all specialization."""
 
 	exclude: typing.Set[str] = field(default_factory=set)
 

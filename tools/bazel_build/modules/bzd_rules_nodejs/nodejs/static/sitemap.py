@@ -48,9 +48,9 @@ if __name__ == "__main__":
 	data = getSitemap(api)
 
 	if args.format == "xml":
-		conent = formatXML(data, args)
+		content = formatXML(data, args)
 
 	else:
 		assert False, f"Unsupported format '{args.format}'."
 
-	args.output.write_text(conent)
+	args.output.write_text(content)

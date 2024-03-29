@@ -112,7 +112,7 @@ class SequenceBuilder(Sequence):
 		return self
 
 	def pushFrontElement(self: T, element: "Element") -> T:
-		"""Add an element to the sequence at the begining of the list."""
+		"""Add an element to the sequence at the beginning of the list."""
 
 		element.context.setParent(self)  # type: ignore
 		self.list.insert(0, element)
@@ -142,7 +142,7 @@ class SequenceParser(Sequence):
 	def makeElement(self, grammar: typing.Optional[Grammar] = None) -> "ElementParser":
 		"""Create a new element in the sequence.
 		Params:
-		- grammar: Optionaly provides a grammar to the new element or reuse existing one.
+		- grammar: Optionally provides a grammar to the new element or reuse existing one.
 		"""
 		element = ElementParser(
 		    context=Context(parent=self),  # type: ignore
@@ -182,7 +182,7 @@ class Element:
 		return e
 
 	def isEmpty(self) -> bool:
-		"""Check wether or not an element is empty. Empty means with no data."""
+		"""Check whether or not an element is empty. Empty means with no data."""
 
 		return (len(self.attrs.keys()) + len(self.sequences.keys())) == 0
 
@@ -281,7 +281,7 @@ class Element:
 		if attr is not None and self.isAttr(attr):
 			return self.getAttr(attr).index, self.getAttr(attr).end
 
-		# Use the begining and the end of the element.
+		# Use the beginning and the end of the element.
 		start = sys.maxsize
 		end = 0
 		for key, attrObj in self.getAttrs().items():
@@ -367,13 +367,13 @@ class ElementBuilder(Element):
 		return self
 
 	def updateAttr(self: U, key: str, value: str) -> U:
-		"""Update the value of an exsiting attribute."""
+		"""Update the value of an existing attribute."""
 
 		self.attrs[key].setValue(value)
 		return self
 
 	def setNestedSequence(self: U, kind: str, sequence: Sequence) -> U:
-		"""Set a nested sequence and overwrite exsiting one."""
+		"""Set a nested sequence and overwrite existing one."""
 
 		sequence.context.setParent(self)  # type: ignore
 		self.sequences[kind] = sequence

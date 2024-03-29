@@ -5,7 +5,7 @@
 
 namespace bzd::meta::impl {
 
-// Class delcaration.
+// Class declaration.
 template <Size index, class... Ts>
 class Tuple;
 

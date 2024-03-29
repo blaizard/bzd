@@ -41,9 +41,9 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 	    ],
 	    indent: bool = False,
 	) -> None:
-		# Re-use directly substitution wrapper if provided.
+		# Reuse directly substitution wrapper if provided.
 		# This is needed by the include control block, as we want macros (for example) to be executed
-		# with the current substition object and not a copy at a given time.
+		# with the current substitution object and not a copy at a given time.
 		self.substitutions = (substitutions
 		                      if isinstance(substitutions, SubstitutionWrapper) else SubstitutionWrapper(substitutions))
 		self.includeDirs = includeDirs
@@ -118,7 +118,7 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 								key = self.resolveExpression(symbol.getNestedSequenceAssert("array"))
 								value = substitute(value, key)
 							else:
-								assert False, f"Unknwon symbol type '{symbolType}'."
+								assert False, f"Unknown symbol type '{symbolType}'."
 
 					elif elementType == "string":
 						value = element.getAttr("value").value
@@ -167,13 +167,12 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 
 		# Save the output
 		assert isinstance(
-		    value,
-		    (int, float, str, pathlib.Path
-		     )), f"The resulting substitued value must be a number, a string or a path, instead received {type(value)}."
+		    value, (int, float, str, pathlib.Path)
+		), f"The resulting substituted value must be a number, a string or a path, instead received {type(value)}."
 		self.appendSubstitution(element=element, result=result, string=str(value))
 
 	def getIndentation(self, result: ResultType) -> str:
-		"""Calculate the current identation."""
+		"""Calculate the current indentation."""
 
 		string = ""
 		for element in reversed(result):

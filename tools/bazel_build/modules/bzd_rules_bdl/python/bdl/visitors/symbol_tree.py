@@ -31,7 +31,7 @@ class SymbolTree(EntitySequence):
 		self.sequence_.append(entity)
 
 	def entity(self, fqn: str) -> EntityType:
-		"""Get the entity refered to the given fqn."""
+		"""Get the entity referred to the given fqn."""
 		return self.symbols.getEntityResolved(fqn=fqn).value
 
 	def serialize(self) -> typing.List[str]:

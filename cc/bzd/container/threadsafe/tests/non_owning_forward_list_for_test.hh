@@ -96,7 +96,7 @@ public:
 		}
 
 		// Element count should be equal.
-		bzd::assert::isTrue(Self::size() == counter, "Counter ({}) mistmatch with actual size ({})"_csv, counter, Self::size());
+		bzd::assert::isTrue(Self::size() == counter, "Counter ({}) mismatch with actual size ({})"_csv, counter, Self::size());
 
 		return counter;
 	}

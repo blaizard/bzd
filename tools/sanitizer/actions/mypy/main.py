@@ -51,7 +51,7 @@ if __name__ == "__main__":
 	includeFullPaths = [args.workspace.as_posix()] + ["{}/{}".format(args.workspace, path) for path in includePaths]
 	os.environ["MYPYPATH"] = ":".join(includeFullPaths)
 
-	# Process the varous files
+	# Process the various files
 	worker = bzd.utils.worker.Worker(mypyWorker)
 	worker.start()
 	for path in files.data(relative=True):

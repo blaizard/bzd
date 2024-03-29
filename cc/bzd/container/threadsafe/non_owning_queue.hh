@@ -184,7 +184,7 @@ public:
 			return bzd::nullopt;
 		}
 		bzd::test::InjectPoint<bzd::test::InjectPoint0, Args...>();
-		// If the head is the same as the element we just poped, we need to set the head to nullptr.
+		// If the head is the same as the element we just popped, we need to set the head to nullptr.
 		// If not we can just ignore the result as it means there are more elements.
 		{
 			auto expected{element};

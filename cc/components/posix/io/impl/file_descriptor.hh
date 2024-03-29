@@ -4,7 +4,7 @@
 
 namespace bzd::components::posix {
 
-/// The file descriptor object, non owning, that can be passsed around.
+/// The file descriptor object, non owning, that can be passed around.
 class FileDescriptor
 {
 protected:

@@ -55,7 +55,7 @@ class CompositionView:
 		return target == self.target
 
 	def entity(self, fqn: str) -> Entity:
-		"""Get the entity refered to the given fqn."""
+		"""Get the entity referred to the given fqn."""
 
 		return self.symbols.getEntity(fqn=fqn).value
 

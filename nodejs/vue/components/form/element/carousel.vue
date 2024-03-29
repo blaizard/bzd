@@ -40,7 +40,7 @@
 			this.fetchList(this.getOption("list", []));
 
 			// Recalculate the position as if the slide geometry changed,
-			// its alignement will be different. This can happen while loading images
+			// its alignment will be different. This can happen while loading images
 			// or other asynchronous operations.
 			if (typeof ResizeObserver !== "undefined") {
 				const myObserver = new ResizeObserver((/*entries*/) => {
@@ -76,12 +76,12 @@
 			/// ---- CONFIG ----------------------------------------
 			/// Defines how the selected items aligns with the slider.
 			/// Values are "left", "center", "right" or false. False means that the selection
-			/// will not be aligned and slecting a new slide will not affect the scrolling
+			/// will not be aligned and selecting a new slide will not affect the scrolling
 			/// of the slider
 			alignSelection() {
 				return this.getOption("alignSelection", "center");
 			},
-			/// Maximum number of slides visible at a time. If set to 0, all the slides will be collpased.
+			/// Maximum number of slides visible at a time. If set to 0, all the slides will be collapsed.
 			maxVisible() {
 				return this.getOption("maxVisible", 0);
 			},

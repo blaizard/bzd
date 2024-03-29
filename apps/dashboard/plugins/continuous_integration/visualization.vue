@@ -14,7 +14,7 @@
 		</div>
 		<div class="metrics">
 			<div v-if="isValid" v-tooltip="tooltipBuilds">
-				<div class="name">Buids</div>
+				<div class="name">Builds</div>
 				<div class="value">{{ buildPerWeek }}<small>/week</small></div>
 			</div>
 			<div v-if="isValid" v-tooltip="tooltipReliability">

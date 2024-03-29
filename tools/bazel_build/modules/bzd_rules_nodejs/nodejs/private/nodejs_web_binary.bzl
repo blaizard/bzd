@@ -29,7 +29,7 @@ def _bzd_nodejs_web_exec_impl(ctx):
     )
 
     # Add static files, all files under "/public" are copied into the bundle.
-    statics = []
+    statistics = []
     for static, path in ctx.attr.static.items():
         files_to_link = static[DefaultInfo].files.to_list()
         if len(files_to_link) != 1:
@@ -39,7 +39,7 @@ def _bzd_nodejs_web_exec_impl(ctx):
             output = symlink,
             target_file = files_to_link[0],
         )
-        statics.append(symlink)
+        statistics.append(symlink)
 
     # Create the index.html
     index = ctx.actions.declare_file("index.html", sibling = install.package_json)
@@ -73,7 +73,7 @@ def _bzd_nodejs_web_exec_impl(ctx):
 
     bundle = ctx.actions.declare_directory("{}.bundle".format(ctx.label.name))
     ctx.actions.run(
-        inputs = depset([vite_config, index, config_scss] + statics, transitive = [install.files]),
+        inputs = depset([vite_config, index, config_scss] + statistics, transitive = [install.files]),
         outputs = [bundle],
         arguments = [
             "{}/node_modules/vite/bin/vite".format(vite_config.dirname),

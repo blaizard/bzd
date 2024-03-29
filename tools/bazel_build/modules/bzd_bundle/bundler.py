@@ -24,21 +24,21 @@ class Bundler:
 			# Create an archive with the files from the manifest.
 			with tarfile.open(fileobj=fd, mode="w:gz") as tar:
 				for line in self.path.read_text().split("\n"):
-					splited = line.split()
+					split = line.split()
 					# Empty line
-					if len(splited) < 2:
+					if len(split) < 2:
 						continue
-					elif len(splited) > 2:
+					elif len(split) > 2:
 						raise RuntimeError("Manifest seems to use white spaces which is not supported.")
-					target, path = splited
+					target, path = split
 					if pathlib.Path(path).is_file():
 						tar.add(path, arcname=target)
 			fd.flush()
 			fd.seek(0)
 
 			# Create the self extracting output file.
-			with open(output, mode="wb") as fo:
-				fo.write("""#!/usr/bin/env bash
+			with open(output, mode="wb") as fileOut:
+				fileOut.write("""#!/usr/bin/env bash
 set -e
 
 case $1 in
@@ -76,7 +76,7 @@ exit 0;
 
 #__END_OF_SCRIPT__#
 """.format(executable=str(self.executable), cwd=str(self.cwd), stamp=self.stamp()).encode("utf-8"))
-				fo.write(fd.read())
+				fileOut.write(fd.read())
 
 		# Set permission to executable.
 		output.chmod(output.stat().st_mode | stat.S_IEXEC)

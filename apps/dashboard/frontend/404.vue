@@ -2,7 +2,7 @@
 	<div>
 		<span class="bzd-404-oops">Oops!</span>
 		404 Page not found.<br />
-		Sorry an error has occured, requested page not found!
+		Sorry an error has occurred, requested page not found!
 	</div>
 </template>
 

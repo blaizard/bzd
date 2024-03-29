@@ -126,7 +126,7 @@
 				});
 			},
 			/**
-			 * Tells how many remaning items can be added
+			 * Tells how many remaining items can be added
 			 */
 			nbLeft() {
 				return this.max === 0 ? Number.MAX_SAFE_INTEGER : Math.max(this.max - this.valueListToDisplay.length, 0);

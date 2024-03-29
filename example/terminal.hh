@@ -18,7 +18,7 @@ public:
 	bzd::Promise<bzd::Size> write(bzd::Span<const bzd::Byte>&& data) noexcept = delete;
 	bzd::Promise<bzd::Size> write(bzd::Span<bzd::Byte>&& data) noexcept = delete;
 
-	/// Block until at least one character is available and return it immediatly.
+	/// Block until at least one character is available and return it immediately.
 	[[nodiscard]] bzd::Promise<bzd::Size> read(const bzd::Span<bzd::Byte>& data) noexcept;
 	bzd::Promise<bzd::Size> read(bzd::Span<bzd::Byte>&& data) noexcept = delete;
 };

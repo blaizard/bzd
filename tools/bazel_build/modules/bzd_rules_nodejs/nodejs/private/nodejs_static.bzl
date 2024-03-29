@@ -61,7 +61,7 @@ bzd_nodejs_static = rule(
     implementation = _bzd_nodejs_static_impl,
     attrs = {
         "args": attr.string_list(
-            doc = "Arguments to be passsed to the script, accepts the followng subsitution: '{config:<key>}', '{output}', '{api}'",
+            doc = "Arguments to be passed to the script, accepts the following substitution: '{config:<key>}', '{output}', '{api}'",
         ),
         "config": attr.label(
             allow_single_file = True,

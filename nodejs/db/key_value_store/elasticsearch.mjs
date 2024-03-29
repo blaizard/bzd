@@ -8,7 +8,7 @@ import KeyValueStore from "./key_value_store.mjs";
 const Exception = ExceptionFactory("db", "kvs", "elasticsearch");
 const Log = LogFactory("db", "kvs", "elasticsearch");
 
-/// Key value store adapater to elastic search DB
+/// Key value store adapter to elastic search DB
 export default class KeyValueStoreElasticsearch extends KeyValueStore {
 	constructor(host, options) {
 		super();
@@ -114,7 +114,7 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 		} while (maxConflicts--);
 
 		Exception.unreachable(
-			"Too many conflicts have occured with update request ({}, {}), something is wrong, aborting.",
+			"Too many conflicts have occurred with update request ({}, {}), something is wrong, aborting.",
 			bucket,
 			key,
 		);

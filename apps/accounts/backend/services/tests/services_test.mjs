@@ -35,7 +35,7 @@ describe("Services", () => {
 	describe("Provider", () => {
 		const provider = new ServiceProvider("test", "services");
 
-		it("Inital state", () => {
+		it("Initial state", () => {
 			Exception.assertEqual([...provider.getStartProcesses()].length, 0);
 			Exception.assertEqual([...provider.getStopProcesses()].length, 0);
 			Exception.assertEqual([...provider.getTimeTriggeredProcesses()].length, 0);

@@ -406,12 +406,12 @@ class TestRun(unittest.TestCase):
 		assert isinstance(val1, Expression)
 		self.assertTrue(val1.isRValue)
 
-		# Mispelled value key
+		# Misspelled value key
 		with self.assertRaisesRegex(Exception, r"not expected"):
 			Object.fromContent(
 			    content="""
 				component Test { config: value = Integer; }
-				composition MyComposition { val1 = Test(vaue=1); }
+				composition MyComposition { val1 = Test(value=1); }
 				""",
 			    objectContext=ObjectContext(resolve=True, composition=True),
 			)

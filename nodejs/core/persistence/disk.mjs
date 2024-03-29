@@ -85,7 +85,7 @@ export default class PersistenceDisk {
 		});
 		// The estimated size of the structure
 		this.estimatedSize = 0;
-		// The version is to ensure consitency while creating the savepoint
+		// The version is to ensure consistency while creating the savepoint
 		this.savepointVersion = 0;
 		// Task ID of the periodic savepoint if any
 		this.savepointTaskId = null;
@@ -114,7 +114,7 @@ export default class PersistenceDisk {
 	 */
 	async _initialize(ignoreErrors) {
 		// Lock the mutex to make sure no data is accessed while
-		// initializing both the deltas and the datas.
+		// initializing both the deltas and the data.
 		await this.mutex.lock();
 
 		Exception.assert(!this.savepointTaskId, "A task ID of the periodic task is already created.");
@@ -256,10 +256,10 @@ export default class PersistenceDisk {
 	}
 
 	/**
-	 * \brief Reset the entire persistence to the inital value or a predefined value.
+	 * \brief Reset the entire persistence to the initial value or a predefined value.
 	 */
 	async reset(data) {
-		// Use the inital value if data is unset
+		// Use the initial value if data is unset
 		const setData = typeof data === "undefined" ? this.options.initial : data;
 
 		// Acquire the lock before performing any operation
@@ -393,7 +393,7 @@ export default class PersistenceDisk {
 				Object.keys(this.options.operations).join(", "),
 		);
 
-		// This part has to be protected by a mutex in order to make this action atomical
+		// This part has to be protected by a mutex in order to make this action atomic
 		await this.mutex.lock();
 
 		let data = null;
@@ -404,11 +404,11 @@ export default class PersistenceDisk {
 			let deltaPath = await this.getDeltaPath();
 
 			// Get the size of the file before appending the data,
-			// this is used to recover the file if an error occured.
+			// this is used to recover the file if an error occurred.
 			const stats = await FileSystem.stat(deltaPath);
 			let fileSize = stats.size;
 
-			// If the size exceed the maxium size, create a new delta file,
+			// If the size exceed the maximum size, create a new delta file,
 			// use it and reset the filesize.
 			if (fileSize > this.options.maxDeltaB) {
 				await this.createDeltaNoLock();
@@ -428,7 +428,7 @@ export default class PersistenceDisk {
 			try {
 				await this.options.operations[type].call(this, this.data, ...args);
 
-				// Increment the version number uppon success
+				// Increment the version number upon success
 				++this.version;
 
 				// If success set the flag to dirty

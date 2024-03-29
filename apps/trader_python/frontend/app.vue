@@ -35,11 +35,11 @@
 				++this.counter;
 				this.values = [
 					{
-						caption: "Serie 1",
+						caption: "Series 1",
 						values: this.generateSin(),
 					},
 					{
-						caption: "Serie 2",
+						caption: "Series 2",
 						values: this.generateRandom(),
 					},
 				];

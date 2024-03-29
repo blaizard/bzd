@@ -29,7 +29,7 @@ interface MyInterface {
 }
 ```
 
-The implementation can access the followings:
+The implementation can access the following:
 
 ```c++
 #include "bzd/example/interface.hh" // Auto-generated from bdl.
@@ -53,7 +53,7 @@ to benefit from some features that are not available in the BDL language.
 
 Note, doing so, limits the interface to the composition only. Such interface cannot be accessed from the overall system.
 
-To define such interface, simply do the followng:
+To define such interface, simply do the following:
 
 ```bdl
 namespace bzd.example;

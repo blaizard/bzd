@@ -12,7 +12,7 @@ namespace bzd::test {
 
 enum class IChannelMode
 {
-	/// Copy the data into the buffer passed into argument. It iwll try to fill it as much as possible.
+	/// Copy the data into the buffer passed into argument. It will try to fill it as much as possible.
 	none = 0,
 	/// Simulate zero-copy by returning the internal buffer instead of the one passed into argument.
 	zeroCopy = 1,

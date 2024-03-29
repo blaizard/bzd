@@ -38,7 +38,7 @@ class ParserGcc(Parser):
 			if not table:
 				return False
 
-			# Go back to the begining
+			# Go back to the beginning
 			f.seek(0)
 			self._goto(f, re.compile(r"^.*memory map$", re.IGNORECASE))
 

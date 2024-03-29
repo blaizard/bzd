@@ -3,12 +3,12 @@
 The motivations to create a new router instead of using the official Vue router are the following:
 
 - Low memory footprint
-- Integrate wtih authentication concept.
+- Integrate with authentication concept.
 - Support for nested routers (to be implemented).
 
 ## Getting Started
 
-First of all the router is a Vue plugin and must be installed before being able to access its fuctionality:
+First of all the router is a Vue plugin and must be installed before being able to access its functionality:
 
 ```js
 import { createApp } from "vue"

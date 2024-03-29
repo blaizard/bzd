@@ -27,7 +27,7 @@ constexpr T trunc(const T value) noexcept
 	{
 		return static_cast<Int64>(value);
 	}
-	// The difficulty with the implementation is to handle extremly large numbers.
+	// The difficulty with the implementation is to handle extremely large numbers.
 	return std::trunc(value);
 }
 

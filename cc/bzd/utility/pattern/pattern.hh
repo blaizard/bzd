@@ -226,7 +226,7 @@ constexpr auto parse() noexcept
 		{
 			usedAtLeastOnce |= (result.isMetadata && result.index == index);
 		}
-		Adapter::assertTrue(usedAtLeastOnce, "At least one argument is not being used by the formating string");
+		Adapter::assertTrue(usedAtLeastOnce, "At least one argument is not being used by the formatting string");
 	}
 
 	return results;

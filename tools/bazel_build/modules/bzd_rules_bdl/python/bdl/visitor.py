@@ -216,7 +216,7 @@ class Visitor(VisitorBase[T, T]):
 
 				self.visitNamespace(entity, result)
 
-				# Update the current namespace. This is not a popable element, hence insert at the begining.
+				# Update the current namespace. This is not a popable element, hence insert at the beginning.
 				self.parents.append(Parent(entity=entity))
 
 			# Handle use

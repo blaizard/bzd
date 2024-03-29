@@ -14,7 +14,7 @@ export default class AuthenticationServer {
 	constructor(options, defaultOptions = {}) {
 		this.options = Object.assign(
 			{
-				/// Callback to verify once identiy, mathing uid and password pair if provided.
+				/// Callback to verify once identity, matching uid and password pair if provided.
 				/// This function can be called with only the uid, this case must be taken into account.
 				/// In return on success, it will return the UID to be used and scopes as a dictionary.
 				/// Otherwise, an error Result with a code from ErrorVerifyIdentity should be returned.

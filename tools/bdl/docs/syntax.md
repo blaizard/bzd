@@ -93,8 +93,8 @@ method <name>(<expression1>, ...) [-> <type>] [[<contracts>...]];
 
 ## Interfaces
 
-Interfaces are used by components to expose their public interfaces, they are defined with the keywork `interface`.
-Note that the defintition does not imply a specific interface implementation.
+Interfaces are used by components to expose their public interfaces, they are defined with the keyword `interface`.
+Note that the definition does not imply a specific interface implementation.
 
 ## Components
 
@@ -115,7 +115,7 @@ config:
 }
 ```
 
-The composition will then instanciate this component by requiring a string as its `channel` argument and an optional `capacity` argument.
+The composition will then instantiate this component by requiring a string as its `channel` argument and an optional `capacity` argument.
 
 ```bdl
 composition {

@@ -31,7 +31,7 @@ def constraints_from_platform(platform):
         platform: The platform name.
 
     Returns:
-        A list containing the constraints to statisfy for this platform.
+        A list containing the constraints to satisfy for this platform.
     """
 
     constraints = []

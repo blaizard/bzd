@@ -28,7 +28,7 @@ enum class SocketType
 	reliable = SOCK_RDM,
 };
 
-/// The followings are bitwise OR options.
+/// The following are bitwise OR options.
 enum class SocketTypeOption
 {
 	/// Set the O_NONBLOCK file status flag on the open file

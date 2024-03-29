@@ -13,7 +13,7 @@ namespace bzd::algorithm {
 ///
 /// \param[in] first The beginning of the first range of elements to be moved.
 /// \param[in] last The ending of the first range of elements to be moved.
-/// \param[out] result The begining of the second range of elements to moved to.
+/// \param[out] result The beginning of the second range of elements to moved to.
 ///
 /// \return Output iterator to the element past the last element moved (result + (last - first)).
 template <concepts::forwardIterator Iterator1, concepts::sentinelFor<Iterator1> Sentinel1, concepts::outputIterator Iterator2>

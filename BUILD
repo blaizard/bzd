@@ -25,6 +25,8 @@ sh_binary_wrapper(
         "--use",
         "@bzd_sanitizer//actions/structure",
         "--use",
+        "@bzd_sanitizer//actions/codespell",
+        "--use",
         "@bzd_sanitizer//actions/buildifier",
         "--use",
         "//tools/cc:clang_format",

@@ -339,7 +339,7 @@ function detectDropZone() {
 		let newActiveReveiverElt = null;
 		let newActiveReceiverEltWithTolerance = null;
 
-		// Idenfity the active receiver
+		// Identify the active receiver
 		for (const i in receiverEltList) {
 			const elt = receiverEltList[i];
 			if (isVisible(elt)) {
@@ -364,7 +364,7 @@ function detectDropZone() {
 			newActiveReveiverElt = newActiveReceiverEltWithTolerance;
 		}
 
-		// Set or unset the active reciever
+		// Set or unset the active receiver
 		if (newActiveReveiverElt && activeReceiverElt !== newActiveReveiverElt) {
 			activeReceiverElt = newActiveReveiverElt;
 			removeAllClass(DRAG_OVER_ACTIVE);
@@ -375,7 +375,7 @@ function detectDropZone() {
 		}
 	}
 
-	// If there is an active reciever, update it
+	// If there is an active receiver, update it
 	if (activeReceiverElt) {
 		let newActiveChildElt = null;
 		let isPlaceHolderBefore = false;
@@ -671,7 +671,7 @@ export class Touch {
 	static make(elt, config = {}) {
 		const touch = new Touch(elt, config);
 
-		// Get the list of recievers
+		// Get the list of receivers
 		elt.addEventListener("mousedown", touch, eventListenerOptions);
 		elt.addEventListener("touchstart", touch, eventListenerOptions);
 
@@ -690,7 +690,7 @@ export class Touch {
 				 */
 				drag: false,
 				/**
-				 * The iframe selector. If set, it will asssume that the selector
+				 * The iframe selector. If set, it will assume that the selector
 				 * is within the iframe.
 				 */
 				selectorIFrame: null,
@@ -777,7 +777,7 @@ export class Touch {
 				 */
 				ondrag: null,
 				/**
-				 * Callback fired when a successfull drop happened.
+				 * Callback fired when a successful drop happened.
 				 * It gets into arguments an object including the index of the child of the container,
 				 * the container and the arguments.
 				 */
@@ -787,7 +787,7 @@ export class Touch {
 				 */
 				ontouchdown: null,
 				/**
-				 * Will be called at the begining of the drag operation
+				 * Will be called at the beginning of the drag operation
 				 */
 				onstartdrag: null,
 				/**

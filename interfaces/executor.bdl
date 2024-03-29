@@ -9,7 +9,7 @@ interface Executor {
 	method start() -> Result<Void>;
 	// Wait for all execution workload to be completed and terminates.
 	method stop() -> Result<Void>;
-	// Retreive all cores associated with this executor.
+	// Retrieve all cores associated with this executor.
 	// There is no guaranty that this list remains, it is up the implementation to decide.
 	method getCores();
 	

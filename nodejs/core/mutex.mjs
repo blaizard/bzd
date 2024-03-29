@@ -8,7 +8,7 @@ export default class Mutex {
 	}
 
 	/**
-	 * Lock the ressource and call the callback once the ressource is under the lock.
+	 * Lock the resource and call the callback once the resource is under the lock.
 	 */
 	lock(callback) {
 		// Use promises if the callback is not set
@@ -39,7 +39,7 @@ export default class Mutex {
 		// If there are pending lock in the queue
 		if (this.queue.length > 0) {
 			const callback = this.queue.shift();
-			// Immediatly process the next item with the next tick. This is done in order
+			// Immediately process the next item with the next tick. This is done in order
 			// to avoid long call stacks.
 			setTimeout(() => {
 				callback(() => {

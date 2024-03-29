@@ -101,7 +101,7 @@ def localCommand(
 
     Args:
             cmds: The list of commands to be executed.
-            ignoreFailure: If set to True, uppon failure (return code != 0), it will throw.
+            ignoreFailure: If set to True, upon failure (return code != 0), it will throw.
             cwd: The current working directory.
             env: The set of environment variable to be injected to the process.
             timeoutS: The timeout in seconds until when the command terminates.
