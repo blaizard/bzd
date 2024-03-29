@@ -23,7 +23,7 @@ program
 	.usage("[OPTIONS]...")
 	.option(
 		"-p, --port <number>",
-		"Port to be used to serve the application, can also be set with the environemnt variable BZD_PORT.",
+		"Port to be used to serve the application, can also be set with the environment variable BZD_PORT.",
 		8080,
 		parseInt,
 	)

@@ -105,7 +105,7 @@ public: // Modifiers.
 
 	/// Create an assigner range object to assign elements to this container.
 	///
-	/// \return a range to assign new data to the container. Only uppon destruction
+	/// \return a range to assign new data to the container. Only upon destruction
 	/// of this object, the range is validated.
 	constexpr AppenderScope assigner() noexcept
 	{

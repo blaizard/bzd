@@ -8,7 +8,7 @@
 namespace bzd {
 
 /// Create an input channel reader implementation.
-/// It provide usefull functionality for reading data from an input channel.
+/// It provide useful functionality for reading data from an input channel.
 ///
 /// \tparam capacity The maximal capacity of the buffer.
 template <class T, Size capacity>
@@ -78,7 +78,7 @@ private:
 				continue;
 			}
 
-			// To avoid unecessary processing, only keep the first span and `minSize` of the second span.
+			// To avoid unnecessary processing, only keep the first span and `minSize` of the second span.
 			// This will avoid having the callback processing extra data that will be re-processed in the second call.
 			const auto [firstSpan, secondSpan] = readFromBuffer.spans();
 			const bzd::Spans<const T, 2u> spans{bzd::inPlace,

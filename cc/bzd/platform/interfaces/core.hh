@@ -16,7 +16,7 @@ public:
 	virtual ~Core() = default;
 
 public:
-	// Start a workload on the core and return immediatly.
+	// Start a workload on the core and return immediately.
 	[[nodiscard]] virtual bzd::Result<void, bzd::Error> start(const bzd::FunctionRef<void(Core&)> workload) noexcept = 0;
 
 	// Initialize the core.

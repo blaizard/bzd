@@ -60,13 +60,13 @@
 			<g class="irgraph-plot-items">
 				<!-- v-hover-children="selected"> //-->
 				<component
-					v-for="(serie, index) in series"
+					v-for="(series, index) in series"
 					:class="getItemClass(index)"
-					:style="getItemStyle(index, serie)"
+					:style="getItemStyle(index, series)"
 					:key="index"
-					:is="getSerieComponent(serie)"
+					:is="getSerieComponent(series)"
 					:selected="index == selected ? selectedPoint : -1"
-					:serie="serie"
+					:series="series"
 					:bounding-box="plotBoundingBox"
 				></component>
 			</g>
@@ -424,7 +424,7 @@
 				const series = this.valueSorted.map((item, index) => {
 					const tooltipFormater = item.tooltip || ((x, y) => "Value: " + y);
 
-					let serie = {
+					let series = {
 						caption: item.caption || "",
 						color: this.selectColorValue(index, item.color),
 						type: item.type || "line",
@@ -433,7 +433,7 @@
 						path: "",
 						tooltip: (elt) => {
 							if (index == this.selected) {
-								const value = serie.values[this.selectedPoint];
+								const value = series.values[this.selectedPoint];
 								tooltip(elt, {
 									type: "html",
 									data: tooltipFormater(value[0], value[1]),
@@ -444,7 +444,7 @@
 
 					// Prevent non-sense
 					if (!this.valuesValid) {
-						return serie;
+						return series;
 					}
 
 					// Display only a maximum number of entries to improve performance
@@ -456,10 +456,10 @@
 						const valueY = item.values[~~(i + 0.5)][1];
 						const x = this.valuesXOffset + valueX * this.valuesXRatio;
 						const y = this.valuesYOffset + valueY * this.valuesYRatio;
-						serie.coords.push([x, y]);
-						serie.values.push([valueX, valueY]);
+						series.coords.push([x, y]);
+						series.values.push([valueX, valueY]);
 					}
-					return serie;
+					return series;
 				});
 				if (DEBUG) {
 					console.timeEnd("plot render");
@@ -562,14 +562,14 @@
 					"irgraph-plot-item-selected": this.selected == -1 ? true : this.selected == index,
 				};
 			},
-			getItemStyle(index, serie) {
-				return "--bzd-graph-color: " + serie.color + ";";
+			getItemStyle(index, series) {
+				return "--bzd-graph-color: " + series.color + ";";
 			},
 			/**
-			 * Get the component associated with a serie, based on its type
+			 * Get the component associated with a series, based on its type
 			 */
-			getSerieComponent(serie) {
-				switch (serie.type) {
+			getSerieComponent(series) {
+				switch (series.type) {
 					case "line":
 						return RenderLine;
 					case "bar":

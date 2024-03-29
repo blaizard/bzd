@@ -58,7 +58,7 @@ const PATH_STATIC = options.static;
 	const users = new Users(keyValueStore);
 
 	// Applications
-	const appplications = new Applications(keyValueStore);
+	const applications = new Applications(keyValueStore);
 
 	// Set-up the web server
 	const web = new HttpServer(PORT);
@@ -229,7 +229,7 @@ const PATH_STATIC = options.static;
 			let subscriptions = [];
 			for (const product of products) {
 				// Make sure this application exists.
-				await appplications.get(product.application, /*allowNull*/ false);
+				await applications.get(product.application, /*allowNull*/ false);
 				let subscription = null;
 				if (maybeRecurrency && maybeRecurrency.timestampEndMs) {
 					subscription = Subscription.makeFromTimestamp(maybeRecurrency.timestampEndMs);
@@ -287,11 +287,11 @@ const PATH_STATIC = options.static;
 		authentication: authentication,
 		channel: web,
 	});
-	await api.installPlugins(authentication, authenticationGoogle, users, appplications, services, memoryLogger, payment);
+	await api.installPlugins(authentication, authenticationGoogle, users, applications, services, memoryLogger, payment);
 
 	api.handle("get", "/sso", async function (inputs, session) {
 		// Get that the application exists.
-		const application = await appplications.get(inputs.application, /*allowNull*/ true);
+		const application = await applications.get(inputs.application, /*allowNull*/ true);
 		Exception.assertPrecondition(application, "Application '{}' does not exists.", inputs.application);
 
 		// Get the SSO token.
@@ -389,7 +389,7 @@ const PATH_STATIC = options.static;
 	// ---- tests data ----
 
 	if (options.test) {
-		const testData = new TestData(users, appplications, payment);
+		const testData = new TestData(users, applications, payment);
 		await testData.install();
 		await testData.run();
 	}

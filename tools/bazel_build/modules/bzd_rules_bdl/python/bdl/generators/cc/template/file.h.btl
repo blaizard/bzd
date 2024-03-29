@@ -1,4 +1,4 @@
-{#- Re-usable macros -#}
+{#- Reusable macros -#}
 {%- include "tools/bdl/generators/cc/template/declarations.h.btl" -%}
 
 {#- Contract assertion -#}

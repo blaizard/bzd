@@ -24,7 +24,7 @@ Bzd templating language (`btl`) library that supports:
 - Support arrays and nested arrays, ex: `{{ a[b.c[d]].u }}`
 - Support a combination of all of this.
 
-Piped data can be of arbitrary type but the final substitued value must be either a number or a string.
+Piped data can be of arbitrary type but the final substituted value must be either a number or a string.
 
 ### For loops
 

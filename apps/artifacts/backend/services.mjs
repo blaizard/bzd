@@ -9,7 +9,7 @@ export default class Services {
 		this.options = Object.assign(
 			{
 				/// Generate context based on the current name.
-				/// Contet are passed to the start function.
+				/// Context are passed to the start function.
 				makeContext: (/*name*/) => ({}),
 			},
 			options,

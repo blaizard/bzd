@@ -33,7 +33,7 @@ public: // Constructors
 		current_.c_lflag &= ~ECHO;
 		::tcsetattr(in_.native(), TCSANOW, &current_);
 
-		// Stream properly initalized.
+		// Stream properly initialized.
 		init_ = true;
 	}
 

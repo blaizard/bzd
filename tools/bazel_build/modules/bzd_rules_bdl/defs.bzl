@@ -16,7 +16,7 @@ _BdlTagInfo = provider(
 _BdlInfo = provider(
     doc = "Provider for bdl files.",
     fields = {
-        "files": "All files, containts the same set of files as in `sources`, but uses a different format for convenience.",
+        "files": "All files, contains the same set of files as in `sources`, but uses a different format for convenience.",
         "search_formats": "Set of search formats string to locate the preprocessed object files.",
         "sources": "Pair of input and preprocessed bdl files.",
     },
@@ -39,7 +39,7 @@ _BdlSystemInfo = provider(
 )
 
 _BdlCcInfo = provider(
-    doc = "Files used to commpile a CC binary.",
+    doc = "Files used to compile a CC binary.",
     fields = {
         "deps": "Dependencies.",
         "srcs": "Source files.",
@@ -63,7 +63,7 @@ def _get_cc_public_header(target):
     return target[CcInfo].compilation_context.direct_public_headers
 
 def _aspect_bdl_providers_impl(target, ctx):
-    """Aspects to gather all bdl depedency outputs."""
+    """Aspects to gather all bdl dependency outputs."""
 
     # Are considered composition public headers when the target is not a BDL library but has a bdl library as a diret dependency.
     # Then it means it relies on a BDL interface.
@@ -91,7 +91,7 @@ _aspect_bdl_providers = aspect(
     attr_aspects = ["deps"],
 )
 
-# ---- Transisitions ----
+# ---- Transitions ----
 
 def _transition_platform_impl(_settings, attr):
     if not hasattr(attr, "platform"):
@@ -314,13 +314,13 @@ def _make_composition_language_providers(ctx, name, deps, target_deps = None, ta
     Args:
         ctx: The context of the action running the composition.
         name: The name of the generated output.
-        deps: The dependencies associated with this action, it shall contain _BdlInfo and lannguage specific providers
+        deps: The dependencies associated with this action, it shall contain _BdlInfo and language specific providers
               such as CcInfo, etc.
         target_deps: Dictionary keyed by target name of the dependencies.
         target_bdl_providers: Dictionary keyed by target of extra _BdlInfo to be added.
     """
 
-    # Set the defaulf value for optional arguments.
+    # Set the default value for optional arguments.
     target_deps = target_deps if target_deps else {}
     target_bdl_providers = target_bdl_providers if target_bdl_providers else {}
 
@@ -442,7 +442,7 @@ def _bdl_binary_execution(ctx, binaries):
     executor = ctx.attr._executor[BuildSettingInfo].value
     executors_mapping = {value: key for key, values in binary_toolchain.executors.items() for value in values.split(",")}
     if executor not in executors_mapping:
-        fail("This platform does not support the '{}' executor, only the followings are supported: {}.".format(executor, executors_mapping.keys()))
+        fail("This platform does not support the '{}' executor, only the following are supported: {}.".format(executor, executors_mapping.keys()))
 
     args = []
     if ctx.attr._debug[BuildSettingInfo].value:

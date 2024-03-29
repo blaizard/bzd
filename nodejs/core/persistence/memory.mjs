@@ -67,10 +67,10 @@ export default class PersistenceMemory {
 	}
 
 	/**
-	 * \brief Reset the entire persistence to the inital value or a predefined value.
+	 * \brief Reset the entire persistence to the initial value or a predefined value.
 	 */
 	async reset(data) {
-		// Use the inital value if data is unset
+		// Use the initial value if data is unset
 		const setData = typeof data === "undefined" ? this.options.initial : data;
 
 		// Initialize the data

@@ -41,7 +41,7 @@ private:
 	T* resource_;
 };
 
-/// Class providing ownership to a ressource.
+/// Class providing ownership to a resource.
 ///
 /// It can borrow its resources to others and must ensure that all resources
 /// have been returned before being destroyed.

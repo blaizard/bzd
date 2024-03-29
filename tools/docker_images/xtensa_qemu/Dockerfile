@@ -55,7 +55,7 @@ RUN apt-get install -y --no-install-recommends \
 # Option 1 -----------------
 # The following is to build GDB from source, however this doesn't work
 # Install GDB, note this version already integrates the patch needed by previous version
-# to avoid the "Remote 'g' packet reply is too long." error mesage.
+# to avoid the "Remote 'g' packet reply is too long." error message.
 # Follow: https://github.com/Ebiroll/qemu_esp32#building-gdb-81-for-qemu
 #RUN git clone --depth 1 --branch esp-2021r2-gdb https://github.com/espressif/binutils-gdb.git
 

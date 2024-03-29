@@ -22,7 +22,7 @@ class Data:
 	name: typing.Optional[str]
 	# The entity of this element.
 	entity: "EntityExpression"
-	# If this value is the default value, or one assigned during instanciation.
+	# If this value is the default value, or one assigned during instantiation.
 	default: bool = False
 	# A number that corresponds to the order in which the parameter appears, given that
 	# the collection is sorted by ascending order.
@@ -77,7 +77,7 @@ class ParametersCommon:
 	@property
 	def isNamed(self) -> typing.Optional[bool]:
 		"""
-        Wether or not a parameter pack contains named parameters or not.
+        Whether or not a parameter pack contains named parameters or not.
         Returns None if it contains no parameters.
         """
 		if not self.empty():
@@ -87,7 +87,7 @@ class ParametersCommon:
 	@property
 	def isVarArgs(self) -> typing.Optional[bool]:
 		"""
-        Wether or not the last parameter is a var args.
+        Whether or not the last parameter is a var args.
         """
 		if not self.empty():
 			return self.at(-1).isVarArgs
@@ -111,7 +111,7 @@ class ParametersCommon:
 		)
 		# Add the element.
 		self.list.append(Data(name=name, entity=entity, **kwargs))
-		# This is about having only named or only unamed parameters. Either:
+		# This is about having only named or only unnamed parameters. Either:
 		# (name1 = 0, name2 = 2, ...) or (0, 2, ...)
 		entity.assertTrue(
 		    condition=allowMix or self.isNamed == entity.isName,

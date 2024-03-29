@@ -70,7 +70,7 @@ export default class Task {
 	 *
 	 * \param task The task to be compared with this one.
 	 *
-	 * \return true if equal, fasle otherwise.
+	 * \return true if equal, false otherwise.
 	 */
 	isEqual(task) {
 		return this.id.isEqual(task.id);

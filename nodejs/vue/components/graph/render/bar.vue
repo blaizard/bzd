@@ -1,7 +1,7 @@
 <template>
 	<g ref="container">
 		<rect
-			v-for="(data, key) in serie.coords"
+			v-for="(data, key) in series.coords"
 			:class="getPointClass(key)"
 			:x="data[0] - barWidth / 2"
 			:y="data[1]"
@@ -14,7 +14,7 @@
 <script>
 	export default {
 		props: {
-			serie: { type: Object, required: true },
+			series: { type: Object, required: true },
 			boundingBox: { type: Object, required: true },
 			selected: { type: Number, required: true },
 		},
@@ -24,7 +24,7 @@
 				handler(value) {
 					if (value != -1) {
 						const elt = this.$refs.container.childNodes[value];
-						this.serie.tooltip(elt);
+						this.series.tooltip(elt);
 					}
 				},
 			},
@@ -32,9 +32,9 @@
 		computed: {
 			barWidth() {
 				let minDiffX = this.boundingBox.right - this.boundingBox.left;
-				let prevX = this.serie.coords[0][0];
-				for (let i = 1; i < this.serie.coords.length; ++i) {
-					minDiffX = Math.min(minDiffX, this.serie.coords[i][0] - prevX);
+				let prevX = this.series.coords[0][0];
+				for (let i = 1; i < this.series.coords.length; ++i) {
+					minDiffX = Math.min(minDiffX, this.series.coords[i][0] - prevX);
 				}
 				return Math.max(minDiffX - 2, 1);
 			},

@@ -164,7 +164,7 @@
 		watch: {
 			isImage: {
 				// Important to ensure that it is triggered even if the value does not change
-				// (is already set to true at the begining)
+				// (is already set to true at the beginning)
 				immediate: true,
 				handler: function () {
 					if (this.isImage) {

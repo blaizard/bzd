@@ -3,7 +3,7 @@ import ExceptionFactory from "../../core/exception.mjs";
 
 const Exception = ExceptionFactory("db", "kvs");
 
-/// Key value store for low demanding application, that presists on the local disk.
+/// Key value store for low demanding application, that persists on the local disk.
 export default class KeyValueStore extends AsyncInitialize {
 	constructor() {
 		super();
@@ -48,7 +48,7 @@ export default class KeyValueStore extends AsyncInitialize {
 	/// \param subKey The subkey for the match.
 	/// \param value The value of values (if a list) to match.
 	/// \param maxOrPaging Paging information.
-	/// \return An object contianing the data and the information about paging and how to get the rest of the data.
+	/// \return An object containing the data and the information about paging and how to get the rest of the data.
 	async listMatch(bucket, subKey, value, maxOrPaging = 20) {
 		return this._listMatchImpl(bucket, subKey, value, maxOrPaging);
 	}

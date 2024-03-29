@@ -92,7 +92,7 @@ def _bzd_nodejs_library_impl(ctx):
     return [DefaultInfo(), provider]
 
 bzd_nodejs_library = rule(
-    doc = "A library contains all depdencies used for this target.",
+    doc = "A library contains all dependencies used for this target.",
     implementation = _bzd_nodejs_library_impl,
     attrs = LIBRARY_ATTRS,
 )

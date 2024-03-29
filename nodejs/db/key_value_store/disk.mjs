@@ -11,7 +11,7 @@ import KeyValueStore from "./key_value_store.mjs";
 
 const Log = LogFactory("db", "kvs", "disk");
 
-/// Key value store for low demanding application, that presists on the local disk.
+/// Key value store for low demanding application, that persists on the local disk.
 export default class KeyValueStoreDisk extends KeyValueStore {
 	constructor(path, options) {
 		super();
@@ -130,7 +130,7 @@ export default class KeyValueStoreDisk extends KeyValueStore {
 	/// \param subKey The subkey for the match.
 	/// \param value The value of values (if a list) to match.
 	/// \param maxOrPaging Paging information.
-	/// \return An object contianing the data and the information about paging and how to get the rest of the data.
+	/// \return An object containing the data and the information about paging and how to get the rest of the data.
 	async _listMatchImpl(bucket, subKey, value, maxOrPaging) {
 		let persistence = await this._getPersistence(bucket);
 		const data = await persistence.get();

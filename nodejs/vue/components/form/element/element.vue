@@ -22,7 +22,7 @@
 			description: { type: Object, required: false, default: () => ({}) },
 			disable: { type: Boolean, default: false, required: false },
 			/// The context of the element, used to get extra information about the
-			/// position and surounding of this element.
+			/// position and surrounding of this element.
 			context: { type: Object, default: {}, required: false },
 			onUpdateWithContext: { default: false, required: false },
 		},

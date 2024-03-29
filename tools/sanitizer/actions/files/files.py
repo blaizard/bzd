@@ -38,7 +38,7 @@ def evaluateFiles(task: Callable[[str, TextIO], Any], workspace: Path, **kwargs:
 
 
 if __name__ == "__main__":
-	parser = argparse.ArgumentParser(description="Tool checking and formating json files.")
+	parser = argparse.ArgumentParser(description="Tool checking and formatting json files.")
 	parser.add_argument("workspace", type=Path, help="Workspace to be processed.")
 
 	args = parser.parse_args()

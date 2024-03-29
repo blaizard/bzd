@@ -14,7 +14,7 @@ def bzd_nodejs_docker(name, deps, cmd, base = "@docker//:nodejs", include_metada
         deps: The dependencies.
         cmd: The command to be used.
         base: The base image.
-        include_metadata: Wether metadata shall be included.
+        include_metadata: Whether metadata shall be included.
         **kwargs: Extra arguments common to all build rules.
     """
 

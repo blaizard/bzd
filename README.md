@@ -18,15 +18,15 @@ This framework is built to run on all sort of embedded platforms, from bare meta
 It is made to remove any dependencies from STL, but provide a similar set of components and utilities to develop applications in an
 efficient and safe manner.
 
-It features the followings:
+It features the following:
 
 - No dynamic allocations. All storage is declared either at compile time or on the stack.
 - The core library is self contained, no reliance on third-party, only on the freestanding STL.
 - Flexible error handling model.
 - Based on C++ coroutines.
-- Compile-time string formating tool.
+- Compile-time string formatting tool.
 - Lightweight.
-- Usefull set of containers.
+- Useful set of containers.
 
 ## Platforms
 
@@ -57,7 +57,7 @@ This will build locally, it will fetch all tools needed to build on your machine
 
 ### On NixOs
 
-Use the following user environemt:
+Use the following user environment:
 
 ```bash
 nix-shell --pure ./tools/bazel.nix
@@ -92,7 +92,7 @@ To run all tests, run the following command:
 ```
 
 This is a non-exhaustive list of languages and their supported tools. In addition to that
-formater and linters for YAML, json and markdown are also available.
+formatter and linters for YAML, json and markdown are also available.
 
 | Language | Formatters   | Code Analyzers                      | Code Coverage | Test Framework | Documentation |
 | -------- | ------------ | ----------------------------------- | ------------- | -------------- | ------------- |
@@ -109,7 +109,7 @@ The code in this repository follows several principle regarding naming conventio
 - Variables, constants, functions, concepts, namespaces are named in `camelCase`.
 - All types are named in `PascalCase`.
 - Non-public members (variables, functions...) are appended with a `_` character.
-- All namings try to avoid abreviations.
+- All namings try to avoid abbreviations.
 
 ## Memory Footprint
 

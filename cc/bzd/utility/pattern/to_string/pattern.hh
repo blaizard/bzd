@@ -11,9 +11,9 @@ template <concepts::constexprStringView Pattern>
 struct ToString<Pattern>
 {
 public:
-	/// \brief String formating.
+	/// \brief String formatting.
 	///
-	/// Lightweight and compilation time checking string formating utility.
+	/// Lightweight and compilation time checking string formatting utility.
 	/// The syntax is compatible with Python format with some limitations.
 	///
 	/// \code
@@ -33,7 +33,7 @@ public:
 	///
 	/// This is an after text
 	///
-	/// \param out Output stream where the formating string will be written to.
+	/// \param out Output stream where the formatting string will be written to.
 	/// \param str run-time or compile-time string containing the format.
 	/// \param args Arguments to be passed for the format.
 	template <bzd::concepts::outputByteCopyableRange Range, class... Args>

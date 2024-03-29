@@ -10,7 +10,7 @@ from bzd_sanitizer.context import Context
 
 
 def getFileListFromResult(result: typing.Any, workspace: pathlib.Path) -> typing.List[str]:
-	"""Get a result and returns a list of exisitng files."""
+	"""Get a result and returns a list of existing files."""
 
 	return list({f for f in result.getStdout().split("\n") if (workspace / f).is_file()})
 

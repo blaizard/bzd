@@ -7,8 +7,8 @@ BDL or (Bzd Description Language) is a DSL (Domain Specific Language) for the bz
 | Name        | Description                                                                                                 |
 | ----------- | ----------------------------------------------------------------------------------------------------------- |
 | Application | A runnable, typically a method. Its lifetime dictates the lifetimme of the overall application.             |
-| Service     | Simmilar to a service but it's lifetime is not affecting the rest of the application.                       |
-| Worload     | An application or a service.                                                                                |
+| Service     | Similar to a service but it's lifetime is not affecting the rest of the application.                        |
+| Workload    | An application or a service.                                                                                |
 | Core        | A unit of execution, one or multiple cores that share the same memory compose an executor.                  |
 | Executor    | This is the minimal scheduling unit, it maybe contain multiple workloads and may execute on multiple cores. |
 | Platform    | Implicit dependencies that a binary relies on.                                                              |
@@ -21,6 +21,6 @@ BDL or (Bzd Description Language) is a DSL (Domain Specific Language) for the bz
 
 The following use cases are covered by this language:
 
-- Provide a language to discribe distributed systems, regardless of the hardware.
-- Reduce boiler plate code for interfaces while keep options to the user wihtout compromising on performance.
-- Enfore input/output constraints (contracts).
+- Provide a language to describe distributed systems, regardless of the hardware.
+- Reduce boiler plate code for interfaces while keep options to the user without compromising on performance.
+- Enforce input/output constraints (contracts).

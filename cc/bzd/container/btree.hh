@@ -38,8 +38,8 @@ public:
 	 *
 	 * Inserting into a B-Tree of order M is done as follow:
 	 * 1. Find the leaf node where the item should be inserted.
-	 * 2. If the leaf node can accomodate another item (it has no more than M - 1
-	 * items), insert the itme into the correct location in the node.
+	 * 2. If the leaf node can accommodate another item (it has no more than M - 1
+	 * items), insert the item into the correct location in the node.
 	 * 3. If the leaf node is full, split the node in 2, with the smaller half of
 	 * the items in one node and the larger half in the other. "Promote" the
 	 * median item to the parent node. If the parent node is full, split and

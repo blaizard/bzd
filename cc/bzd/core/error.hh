@@ -19,7 +19,7 @@ enum class ErrorType : bzd::UInt8
 	/// Happens when a timeout occurs, it could provide information to the handler
 	/// that either the timeout was too short or the input was too slow.
 	timeout,
-	/// Happens while accessing a busy ressource for example,
+	/// Happens while accessing a busy resource for example,
 	/// this type of error notifies the handler that it can be retried if necessary.
 	busy,
 	/// Happens when a stream reaches the end of its channel for example.

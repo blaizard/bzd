@@ -45,11 +45,11 @@ class TestRun(unittest.TestCase):
 	def testPipeSubsitution(self) -> None:
 		template = Template("{{str | lowerCase | capitalize }}")
 		result = template.render({
-		    "str": "ThIs IS SOMEhting MesSy",
+		    "str": "ThIs IS something MesSy",
 		    "lowerCase": lambda x: x.lower(),
 		    "capitalize": lambda x: x.capitalize(),
 		})
-		self.assertEqual("This is somehting messy", result)
+		self.assertEqual("This is something messy", result)
 
 	def testNoStrip(self) -> None:
 		template = Template("   Hello {{world}}    I am   happy ")
@@ -57,9 +57,9 @@ class TestRun(unittest.TestCase):
 		self.assertEqual("   Hello World    I am   happy ", result)
 
 	def testStripLeft(self) -> None:
-		template = Template("Hel {{-world}}")
+		template = Template("Hello {{-world}}")
 		result = template.render({"world": "lo"})
-		self.assertEqual("Hello", result)
+		self.assertEqual("Hellolo", result)
 
 	def testStripRight(self) -> None:
 		template = Template("{{world -}} ld")

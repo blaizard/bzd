@@ -20,7 +20,7 @@ class TestRun(unittest.TestCase):
 		template.validate({"test": "2.0"})
 		template.validate({"test": "-73"})
 		with self.assertRaisesRegex(ExceptionValidation, r"expects.*float"):
-			template.validate({"test": "hsi"})
+			template.validate({"test": "his"})
 
 	def testString(self) -> None:
 		template = Validation({"test": "string"})

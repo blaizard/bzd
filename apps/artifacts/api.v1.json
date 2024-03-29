@@ -2,7 +2,7 @@
     "rest": {
         "/file": {
             "get": {
-                "documentation": "Retreive the content of a specific file.",
+                "documentation": "Retrieve the content of a specific file.",
                 "request": {
                     "type": "query",
                     "validation": {

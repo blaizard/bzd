@@ -32,7 +32,7 @@ from bdl.generators.cc.fqn import (
 Use cases:
 
 Interfaces: (abstract notion)
-- component name : inteface {}  <- Should be set as a normal type.
+- component name : interface {}  <- Should be set as a normal type.
 - var = interface&              <- When used it should always be as a reference.
 
 Expressions:
@@ -174,7 +174,7 @@ class Transform:
 		"""
         normal           -> int myvar{value}
         no default value -> int myvar
-        unamed           -> int{value}
+        unnamed           -> int{value}
         """
 		output = ""
 		values = (self.paramsDeclarationToList_(

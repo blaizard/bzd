@@ -37,7 +37,7 @@ export default {
 				return (result.builds || []).map((item) => {
 					const status = _getStatus(item);
 					return {
-						// Duration attribute is not correct as it includes accumulated duration from the jobs eventhough they
+						// Duration attribute is not correct as it includes accumulated duration from the jobs even though they
 						// run in parallel. So we use the actual run time instead.
 						duration: Date.parse(item.finished_at) - Date.parse(item.started_at),
 						timestamp:

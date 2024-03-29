@@ -104,7 +104,7 @@ private:
 	}
 
 public:
-	// Need to handle different endianess
+	// Need to handle different endianness
 	static constexpr const Type get(const bzd::Span<const bzd::Byte> data)
 	{
 		typename SignalInternals::ExtractedType extracted;

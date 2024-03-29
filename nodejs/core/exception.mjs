@@ -112,7 +112,7 @@ export const ExceptionFactory = (...topics) => {
 		}
 
 		/**
-		 * \brief Assert that a precondition is statisfied.
+		 * \brief Assert that a precondition is satisfied.
 		 *
 		 * \param expression The expression to evaluate.
 		 * \param str (optional) The message to display if the assertion fails.
@@ -221,7 +221,7 @@ export const ExceptionFactory = (...topics) => {
 		}
 
 		/**
-		 * \brief Print a formated exception message
+		 * \brief Print a formatted exception message
 		 */
 		static print(...args) {
 			Log.custom(
@@ -234,7 +234,7 @@ export const ExceptionFactory = (...topics) => {
 		}
 
 		/**
-		 * \brief Print a formated exception message
+		 * \brief Print a formatted exception message
 		 */
 		print(...args) {
 			if (args.length) {
@@ -255,7 +255,7 @@ export const ExceptionFactory = (...topics) => {
 				"] " +
 				this.name +
 				(this.message ? " with message: " + String(this.message) : "") +
-				// Remove the first line of the stack to avoid poluting the output
+				// Remove the first line of the stack to avoid polluting the output
 				(this.stack ? "; Callstack:\n" + String(this.stack).split("\n").slice(1).join("\n") : "");
 			message += this.nestedErrorList.map((e) => "\nFrom: " + String(e));
 			return message;

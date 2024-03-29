@@ -6,7 +6,7 @@ import KeyValueStore from "./key_value_store.mjs";
 
 const Log = LogFactory("db", "kvs", "memory");
 
-/// Key value store for testing purposes, that presists in memory.
+/// Key value store for testing purposes, that persists in memory.
 export default class KeyValueStoreMemory extends KeyValueStore {
 	constructor(name, options) {
 		super();

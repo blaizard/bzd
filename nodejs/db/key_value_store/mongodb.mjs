@@ -8,7 +8,7 @@ import { MongoClient } from "mongodb";
 const Exception = ExceptionFactory("db", "kvs", "mongodb");
 const Log = LogFactory("db", "kvs", "mongodb");
 
-/// Key value store adapater to elastic search DB
+/// Key value store adapter to elastic search DB
 export default class KeyValueStoreMongodb extends KeyValueStore {
 	constructor(uri, options) {
 		super();

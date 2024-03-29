@@ -24,16 +24,16 @@ export default class Terminal {
 		// Process what needs to be changed.
 		// Check if the dimension changed.
 		let resize = false;
-		if ("cols" in config && config.cols != this.condig.cols) {
+		if ("cols" in config && config.cols != this.config.cols) {
 			this.config.cols = config.cols;
 			resize = true;
 		}
-		if ("rows" in config && config.rows != this.condig.rows) {
+		if ("rows" in config && config.rows != this.config.rows) {
 			this.config.rows = config.rows;
 			resize = true;
 		}
 		let prompt = false;
-		if ("prompt" in config && config.prompt != this.condig.prompt) {
+		if ("prompt" in config && config.prompt != this.config.prompt) {
 			this.config.prompt = config.prompt;
 			prompt = true;
 		}

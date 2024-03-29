@@ -5,7 +5,7 @@ It can be used as a communication mean through local buses (I2C, UART...), share
 
 A channel consists of 2 layers, the adapter and the transport layer.
 The adapter layer has the role to serialize/deserialize the data as well as consistency/errors checks at the data level.
-The tranport layer has the role to transport data blobs via a bus, in addition to a blob, on specific buses it needs inputs
+The transport layer has the role to transport data blobs via a bus, in addition to a blob, on specific buses it needs inputs
 such as destination address, etc.
 
 When configuring a channel, the transport can only be configured once (durign initialization), while the adapter
@@ -17,7 +17,7 @@ monitor and control the transport component (transport).
 Note, at compile time a channel is fully defined, makind this composition between the 2 layers a constant expression
 exposing a Channel<Data> interface.
 
-Some buses might have a Channel interface as well, buses like UART for example, which do not need adapters in betweeen and
+Some buses might have a Channel interface as well, buses like UART for example, which do not need adapters in between and
 can be used directly as is.
 Also a channel can be made on top of another channel, by making one part of the transport interface, this allow nestiing channels
 for complex schemes.
@@ -108,7 +108,7 @@ interface I2CDevice {
 }
 ```
 
-or a more complex adpater could be defined as follow:
+or a more complex adapter could be defined as follow:
 
 ```
 interface I2CDevice {

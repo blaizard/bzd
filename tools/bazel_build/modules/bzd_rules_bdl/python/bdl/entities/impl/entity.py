@@ -395,7 +395,7 @@ class Entity:
 			    message=f"Configuration can only contain expressions or using statements, not '{entity.category}'.",
 			)
 			# Note, config entities are resolved only later, when used.
-			# This allow symbol discovery at a later stage, only when the element is actually instanciated.
+			# This allow symbol discovery at a later stage, only when the element is actually instantiated.
 
 	def error(self, message: str, element: typing.Optional[Element] = None, throw: bool = True) -> AssertionResult:
 		return Error.handleFromElement(

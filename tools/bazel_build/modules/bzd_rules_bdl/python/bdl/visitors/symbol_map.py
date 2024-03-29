@@ -174,14 +174,14 @@ class SymbolMap:
      - bzd.nested.Struct: <nested>
                               <reference "bzd.nested.Struct.a">
                               <reference "bzd.nested.Struct.b">
-                              <expression> <- unamed expression
+                              <expression> <- unnamed expression
      - bzd.nested.Struct.a: <expression "a">
      - bzd.nested.Struct.b: <expression "b">
      - bzd.Child: <nested>
                      <reference "bzd.Child.c">
      - bzd.Child.c: <expression "c">
-     - _0~: <nested>                                  <- unamed top level element
-     - 321332-323-3~: <expression>                    <- unamed composition expression
+     - _0~: <nested>                                  <- unnamed top level element
+     - 321332-323-3~: <expression>                    <- unnamed composition expression
     """
 
 	def __init__(self) -> None:
@@ -206,7 +206,7 @@ class SymbolMap:
 		"""
         Insert a builtin entry to the mix.
         """
-		# Resolve builtins before instering them.
+		# Resolve builtins before inserting them.
 		entity.resolveMemoized(resolver=self.makeResolver())
 		ElementBuilder.cast(entity.element, ElementBuilder).setAttr("fqn", name)
 		self.builtins[name] = {
@@ -224,7 +224,7 @@ class SymbolMap:
 
 	def _get(self, fqn: str, exclude: typing.Optional[typing.List[Group]] = None) -> typing.Optional[typing.Any]:
 		"""
-        Return the raw data if it exsits.
+        Return the raw data if it exists.
         """
 		if fqn in self.map:
 			data = self.map[fqn]
@@ -243,7 +243,7 @@ class SymbolMap:
 	          startsWith: str = "",
 	          depth: int = 0) -> typing.Iterator[typing.Tuple[str, EntityType]]:
 		"""
-        Iterate through entities optionaly filtered by their groups.
+        Iterate through entities optionally filtered by their groups.
 
         Args:
                 groups: Groups to be returned.
@@ -378,7 +378,7 @@ class SymbolMap:
 								fqnNested = nestedElement.getAttr("fqn").value
 								# Remove private FQNs and keep them nested.
 								# This is needed because when merging nested structure, some config
-								# for example have unamed elements and need to be copied with the rest.
+								# for example have unnamed elements and need to be copied with the rest.
 								if FQN.isPrivate(fqnNested):
 									removeFQNs.add(fqnNested)
 									ElementBuilder.cast(nestedElement, ElementBuilder).removeAttr("fqn")

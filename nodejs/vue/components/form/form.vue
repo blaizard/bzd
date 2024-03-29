@@ -104,7 +104,7 @@
 			return {
 				currentValue: {},
 				returnedValue: {},
-				// Contains only the unamed elements
+				// Contains only the unnamed elements
 				unamedValue: {},
 				active: -1,
 				errors: {},

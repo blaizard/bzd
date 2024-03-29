@@ -108,7 +108,7 @@ template <class T, typeTraits::IteratorCategory category>
 concept iteratorCategory = ((typeTraits::iteratorCategory<T> & category) == category);
 
 /// An input or output iterator must satisfy the following operations:
-/// - *x : retreive the value.
+/// - *x : retrieve the value.
 /// - ++x : increment
 template <class T>
 concept inputOrOutputIterator = iterator<T> && requires(T t) {

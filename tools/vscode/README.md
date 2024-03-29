@@ -1,6 +1,6 @@
 # VSCode extension for bdl language
 
-Adds syntax highlighting for `.bdl` and `.btl` extenstions.
+Adds syntax highlighting for `.bdl` and `.btl` extensions.
 
 ## Install
 

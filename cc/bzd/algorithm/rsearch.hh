@@ -11,7 +11,7 @@
 
 namespace bzd::algorithm {
 
-/// Search for the last occurence of the sequence of elements [first2, last2[ in the range [first1, last1[.
+/// Search for the last occurrence of the sequence of elements [first2, last2[ in the range [first1, last1[.
 ///
 /// \param[in] first1 The beginning of the range of elements to examine.
 /// \param[in] last1 The ending of the range of elements to examine.

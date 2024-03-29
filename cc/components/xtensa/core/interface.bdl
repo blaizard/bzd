@@ -12,7 +12,7 @@ config:
 	name = String;
 	// CPU to which this core should be pinned to.
 	cpu = Integer [min(0) max(1)];
-	// Priority of the task in percent (0 beeing the lowest, 100 the highest).
+	// Priority of the task in percent (0 being the lowest, 100 the highest).
 	priority = Integer [min(0) max(100)];
 	
 interface:

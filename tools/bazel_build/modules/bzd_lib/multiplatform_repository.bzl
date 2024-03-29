@@ -40,7 +40,7 @@ _multiplatform_repository = repository_rule(
 def multiplatform_repository(name, repositories, expose):
     """Multi-platform repository.
 
-    Creates a respository that exposes several target which point to target specific underlying repositories.
+    Creates a repository that exposes several target which point to target specific underlying repositories.
     This function can be used as follow in a module context:
     ```
     multiplatform_repository(

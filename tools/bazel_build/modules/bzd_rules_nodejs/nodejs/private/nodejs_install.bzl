@@ -24,7 +24,7 @@ def bzd_nodejs_make_node_modules(ctx, packages, base_dir_name):
         base_dir_name: The name of the directory where the node_modules should be located.
 
     Returns:
-        A tupple containing the package.json file and the node_modules directory populated.
+        A tuple containing the package.json file and the node_modules directory populated.
     """
 
     # Outputs of this rule.
@@ -96,7 +96,7 @@ def bzd_nodejs_transpile(ctx, srcs, runfiles, base_dir_name):
         base_dir_name: The name of the directory where the node_modules should be located.
 
     Returns:
-        A tupple containing the generated files and the transpiled files as a dictionary.
+        A tuple containing the generated files and the transpiled files as a dictionary.
     """
 
     base_dir_short_path = ctx.label.package + "/" + base_dir_name

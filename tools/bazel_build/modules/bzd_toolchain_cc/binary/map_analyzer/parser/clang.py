@@ -19,7 +19,7 @@ class ParserClang(Parser):
         """
 
 		with open(self.path, "r") as f:
-			# First line corresponds to the formating.
+			# First line corresponds to the formatting.
 			table = FixedTable.fromHeader(
 			    header=f.readline().lower(),
 			    schema={

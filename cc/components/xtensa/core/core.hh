@@ -34,7 +34,7 @@ public:
 		{
 			return bzd::error::Failure("xSemaphoreCreateBinaryStatic"_csv);
 		}
-		// Create the task and make sure the operation is successful. This will immediatly run the task.
+		// Create the task and make sure the operation is successful. This will immediately run the task.
 		handle_ = xTaskCreateStaticPinnedToCore(workloadWrapper,
 												Context::Config::name.data(),
 												stack_.size() / sizeof(StackType_t),

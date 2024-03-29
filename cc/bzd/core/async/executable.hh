@@ -50,7 +50,7 @@ public: // Types.
 		service
 	};
 
-	/// Contains the flags associated with the executbale.
+	/// Contains the flags associated with the executable.
 	enum class Flags : bzd::UInt8
 	{
 		none = 0,
@@ -186,7 +186,7 @@ protected:
 ///
 /// This class provides helpers to access the associated executor.
 ///
-/// \tparam T The child class, this is a CRTP desgin pattern.
+/// \tparam T The child class, this is a CRTP design pattern.
 template <class T>
 class Executable : public bzd::threadsafe::NonOwningRingSpinElement
 {

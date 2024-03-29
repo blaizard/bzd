@@ -19,7 +19,7 @@ class _Row:
 
         Args:
                 identifier: The cell position identifier within the row.
-                strip: Wether stripped output is needed or not.
+                strip: Whether stripped output is needed or not.
 
         Returns:
                 The element, or None if no element is present.
@@ -56,7 +56,7 @@ class _Row:
 
 class FixedTable:
 	"""
-    A fixed table is a table which columns have a fixed width accross the rows.
+    A fixed table is a table which columns have a fixed width across the rows.
     """
 
 	def __init__(
@@ -95,7 +95,7 @@ class FixedTable:
                 schema: A schema describing the columns.
 
         Returns:
-                A FixedTable instance in case of succes, None otherwise.
+                A FixedTable instance in case of success, None otherwise.
         """
 
 		separations = [0]
@@ -131,7 +131,7 @@ class FixedTable:
                 regexpr: The regular expression where each capture element corresponds to a cell.
 
         Returns:
-                A FixedTable instance in case of succes, None otherwise.
+                A FixedTable instance in case of success, None otherwise.
         """
 
 		m = regexpr.match(line)

@@ -14,11 +14,11 @@ export default class Services {
 		idle: "idle",
 		starting: "starting",
 		running: "running",
-		stoping: "stoping",
+		stopping: "stopping",
 		error: "error",
 	});
 
-	/// Type of polcies, what action is triggered in case of error.
+	/// Type of policies, what action is triggered in case of error.
 	/// Emulation of an enum type.
 	static Policy = Object.freeze({
 		/// No operation.

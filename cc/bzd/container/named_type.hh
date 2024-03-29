@@ -8,7 +8,7 @@
 #include "cc/bzd/utility/ratio.hh"
 
 namespace bzd::impl {
-/// Curiously Recuring Template Pattern
+/// Curiously Recurring Template Pattern
 template <typename T, template <class> class crtpType>
 class NamedTypeCRTP
 {

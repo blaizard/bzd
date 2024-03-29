@@ -5,7 +5,7 @@
 
 namespace bzd::test {
 
-/// Create custome range of various types.
+/// Create custom range of various types.
 template <typeTraits::IteratorCategory iteratorCategory, class T = bzd::Int32, Size capacity = 42u>
 class Range
 {

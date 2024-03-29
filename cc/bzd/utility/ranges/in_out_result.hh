@@ -2,7 +2,7 @@
 
 namespace bzd::ranges {
 
-/// Results used to associate an intput with its output.
+/// Results used to associate an input with its output.
 /// This is mainly used by the algorithm library.
 template <class In, class Out>
 struct InOutResult

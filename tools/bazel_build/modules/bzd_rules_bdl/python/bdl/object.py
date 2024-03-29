@@ -61,16 +61,16 @@ class ObjectContext:
 	def getPathFromSource(self, source: str) -> Path:
 		"""Extract the path name from the source."""
 
-		splitted = source.split("@")
-		assert len(splitted) <= 2, f"The source '{source}' is malformed."
-		return Path(splitted[0])
+		split = source.split("@")
+		assert len(split) <= 2, f"The source '{source}' is malformed."
+		return Path(split[0])
 
 	def getPreprocessedPathFromSource(self, source: str) -> Path:
 		"""Extract the preprocess path name from the source."""
 
-		splitted = source.split("@")
-		assert len(splitted) <= 2, f"The source '{source}' is malformed."
-		return (Path(splitted[1]) if len(splitted) > 1 else Path(self.preprocessFormat.format(source)))
+		split = source.split("@")
+		assert len(split) <= 2, f"The source '{source}' is malformed."
+		return (Path(split[1]) if len(split) > 1 else Path(self.preprocessFormat.format(source)))
 
 	def findPreprocess(self, source: str) -> typing.Optional[Path]:
 		"""Search for the preprocessed object file if any."""
@@ -145,7 +145,7 @@ class ObjectContext:
 		bdl = Object._makeObject(parser=parser, namespace=namespace, objectContext=self)
 
 		# Save the preprocessed payload to a file.
-		# Do not save when ignoring dependencies, as this creates un-complete views.
+		# Do not save when ignoring dependencies, as this creates incomplete views.
 		if self.resolve:
 			self.savePreprocess(source=source, object=bdl)
 
@@ -204,7 +204,7 @@ class Object:
 		)
 
 	def entity(self, fqn: str) -> EntityType:
-		"""Convinience function to lookup for an entity based on its FQN and return it.
+		"""Convenience function to lookup for an entity based on its FQN and return it.
         If the symbol does not exists, this will throw."""
 
 		maybeEntity = self.symbols.getEntity(fqn)

@@ -29,11 +29,11 @@ public: // Traits.
 public:
 	constexpr ExecutorContext() noexcept : id_{makeUId()} {}
 
-	/// Get the unique identifier of this context accross this executor.
+	/// Get the unique identifier of this context across this executor.
 	[[nodiscard]] constexpr IdType getUId() const noexcept { return id_; }
 	/// Get the current tick for this executor.
 	[[nodiscard]] constexpr TickType getTick() const noexcept { return tick_; }
-	/// Provide an executable to be enqued sequentially, after the execution of the current exectuable.
+	/// Provide an executable to be enqued sequentially, after the execution of the current executable.
 	constexpr void setContinuation(Continuation&& continuation) noexcept
 	{
 		bzd::assert::isTrue(continuation_.template is<bzd::Monostate>());
@@ -75,7 +75,7 @@ private:
 
 /// The executor concept is a workload scheduler that owns several executables
 /// and executes them.
-/// An executor is thread-safe and can be shared betweeen multiple threads or cores.
+/// An executor is thread-safe and can be shared between multiple threads or cores.
 template <class Executable>
 class Executor
 {
@@ -147,7 +147,7 @@ public:
 				}
 
 				// Execute the continuation if any, this instead of enqueuing it,
-				// as it will speed up execution by avoiding unecessary atomic operations,
+				// as it will speed up execution by avoiding unnecessary atomic operations,
 				// keeping continuation running on the same core to please caching
 				// and reduce the number of spin locks required to update the queue.
 				maybeExecutable = context.popContinuation();
@@ -248,7 +248,7 @@ private:
 	{
 		if (increment)
 		{
-			// It is important to update the counters before being pushed, otherwise the exectuable might be
+			// It is important to update the counters before being pushed, otherwise the executable might be
 			// popped before the counters are increases, leaving them in an incoherent state.
 			incrementCounters(executable);
 		}
@@ -276,7 +276,7 @@ private:
 
 	[[nodiscard]] bzd::Optional<Executable&> pop() noexcept
 	{
-		auto maybeExecutable = queue_.popFront([](auto& exectuable) { return !exectuable.isSkipped(); });
+		auto maybeExecutable = queue_.popFront([](auto& executable) { return !executable.isSkipped(); });
 		if (maybeExecutable)
 		{
 			// Show the stack usage
@@ -306,11 +306,11 @@ private:
 
 	/// List of pending workload waiting to be scheduled.
 	bzd::threadsafe::NonOwningRingSpin<Executable> queue_{};
-	/// Keep contexts about the current runnning scheduler.
+	/// Keep contexts about the current running scheduler.
 	bzd::threadsafe::NonOwningForwardList<ExecutorContext<Executable>> context_{};
 	/// Mutex to protect access over the context queue.
 	bzd::SpinSharedMutex contextMutex_{};
-	/// Maxium concurrent scheduler running at the same time.
+	/// Maximum concurrent scheduler running at the same time.
 	bzd::Atomic<Size> maxRunningCount_{0u};
 	/// Current status of the executor.
 	bzd::Atomic<Status> status_{Status::idle};

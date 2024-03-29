@@ -77,7 +77,7 @@ def _clang_tidy_aspect_impl(target, ctx):
         )
         outputs.append(output)
 
-    # Get the outpus from the dependencies.
+    # Get the outputs from the dependencies.
     for dep in ctx.rule.attr.deps:
         outputs += dep[OutputGroupInfo].report.to_list()
 

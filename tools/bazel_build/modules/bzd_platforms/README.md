@@ -1,6 +1,6 @@
 # Bzd Platforms
 
-Platforms are a set of constraints. Their string representation is the contraints stringified separated by a dash `-`.
+Platforms are a set of constraints. Their string representation is the constraints stringified separated by a dash `-`.
 
 A compiler platform is typically defined as a pair of 2 constraints: `<AL>-<ISA>`.
 

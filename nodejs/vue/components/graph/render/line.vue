@@ -2,7 +2,7 @@
 	<g>
 		<path :d="path" class="path" fill="transparent" />
 		<line
-			v-for="(data, index) in serie.coords"
+			v-for="(data, index) in series.coords"
 			:x1="data[0]"
 			:y1="data[1]"
 			:x2="data[0]"
@@ -15,15 +15,15 @@
 <script>
 	export default {
 		props: {
-			serie: { type: Object, required: true },
+			series: { type: Object, required: true },
 			selected: { type: Number, required: true },
 		},
 		computed: {
 			path() {
 				let path = "";
-				for (let i = 0; i < this.serie.coords.length; ++i) {
-					const x = this.serie.coords[i];
-					const y = this.serie.coords[i];
+				for (let i = 0; i < this.series.coords.length; ++i) {
+					const x = this.series.coords[i];
+					const y = this.series.coords[i];
 
 					path += i == 0 ? "M " + x + " " + y : " L " + x + " " + y;
 				}

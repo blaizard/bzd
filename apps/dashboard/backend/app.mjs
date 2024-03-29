@@ -19,14 +19,14 @@ program
 	.usage("[OPTIONS]...")
 	.option(
 		"-p, --port <number>",
-		"Port to be used to serve the application, can also be set with the environemnt variable BZD_PORT.",
+		"Port to be used to serve the application, can also be set with the environment variable BZD_PORT.",
 		8080,
 		parseInt,
 	)
 	.option("-s, --static <path>", "Directory to static serve.", ".")
 	.option(
 		"-d, --data <path>",
-		"Where to store the data, can also be set with the environemnt variable BZD_PATH_DATA.",
+		"Where to store the data, can also be set with the environment variable BZD_PATH_DATA.",
 		"/bzd/data",
 	)
 	.parse(process.argv);

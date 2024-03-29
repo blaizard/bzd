@@ -9,7 +9,7 @@ def bzd_docker_tarball(name, image, repository, remote_tags, **kwargs):
     Args:
         name: The name of the bazel target.
         image: The image name.
-        repository: Respository of the image.
+        repository: Repository of the image.
         remote_tags: Tags to used.
         **kwargs: Extra arguments common to all build rules.
     """

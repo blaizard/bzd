@@ -39,7 +39,7 @@ export default class Registry {
 		}
 	}
 
-	/// Wait until a specific UID is present or return immediatly if available.
+	/// Wait until a specific UID is present or return immediately if available.
 	async waitFor(uid) {
 		return new Promise((resolve, reject) => {
 			if (uid in this.registry) {

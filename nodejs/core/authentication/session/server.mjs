@@ -223,7 +223,7 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 
 	/// Create a new session, save it and return the token.
 	async _makeAccessToken(session) {
-		// Check if there is an exisitng access token with a valid expiration date that can be re-used.
+		// Check if there is an existing access token with a valid expiration date that can be re-used.
 		const maybeSessions = await this.options.kvs.get(this.options.kvsBucket, session.getUid(), null);
 		if (maybeSessions) {
 			for (const sessionData of maybeSessions.sessions) {
@@ -232,7 +232,7 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 				if (timeoutS < this.options.tokenAccessExpiresInReuse) {
 					break;
 				}
-				// If the session has the same scopes, re-use it1
+				// If the session has the same scopes, reuse it1
 				if (session.getScopes().sameAs(sessionData.scopes)) {
 					return {
 						token: this._makeToken(session.getUid(), sessionData.hash),

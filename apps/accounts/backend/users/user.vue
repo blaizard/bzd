@@ -133,7 +133,7 @@
 							{
 								type: "Input",
 								name: "identifier",
-								caption: "Identifer",
+								caption: "Identifier",
 								disable: true,
 								width: 0.2,
 							},

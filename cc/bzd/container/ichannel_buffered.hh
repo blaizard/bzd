@@ -14,7 +14,7 @@
 namespace bzd {
 
 /// Create a buffered input channel.
-/// It provide usefull functionality for reading data from an input channel.
+/// It provide useful functionality for reading data from an input channel.
 ///
 /// \tparam T The type of the channel.
 /// \tparam capacity The maximal capacity of the buffer.
@@ -95,7 +95,7 @@ private:
 public:
 	/// A generator to read from the input channel.
 	///
-	/// \note Uppon destruction of the range, the data consumed will "unconsumed" from the buffer range,
+	/// \note Upon destruction of the range, the data consumed will "unconsumed" from the buffer range,
 	/// this feature allow zero copy when possible.
 	bzd::Generator<ReaderRange> reader() noexcept
 	{
@@ -130,7 +130,7 @@ public:
 
 	/// Read at least `count` bytes and return a Stream range.
 	///
-	/// \note Uppon destruction of the range, the data consumed will be removed from the buffer ring.
+	/// \note Upon destruction of the range, the data consumed will be removed from the buffer ring.
 	/*bzd::Async<ReadScope> read(const bzd::Size count) noexcept
 	{
 		// Span to hold freshly read buffer.
@@ -252,7 +252,7 @@ private:
 				continue;
 			}
 
-			// To avoid unecessary processing, only keep the first span and `minSize` of the second span.
+			// To avoid unnecessary processing, only keep the first span and `minSize` of the second span.
 			// This will avoid having the callback processing extra data that will be re-processed in the second call.
 			const auto [firstSpan, secondSpan] = readFromBuffer.spans();
 			const bzd::Spans<const T, 2u> spans{bzd::inPlace,

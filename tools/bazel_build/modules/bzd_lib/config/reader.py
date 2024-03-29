@@ -25,7 +25,7 @@ if __name__ == "__main__":
 	    "keys",
 	    nargs="*",
 	    type=str,
-	    help="Keys to be read, the result outpus 1 value per line in the same order.",
+	    help="Keys to be read, the result outputs 1 value per line in the same order.",
 	)
 	args = parser.parse_args()
 
