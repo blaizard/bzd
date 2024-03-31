@@ -15,14 +15,20 @@ def _library_providers(ctx, generated):
 def _library_data(deps):
     return {"includes": {"": [f.short_path for dep in deps for f in _get_cc_public_header(dep)]}}
 
+def _aspect_files(target):
+    return _get_cc_public_header(target)
+
 extension = {
     "cc": {
+        "aspect_files": {
+            "hdrs": _aspect_files,
+        },
         "display": "C++",
         "library_data": _library_data,
         "library_deps": [
             Label("//tools/bdl/generators/cc/adapter:types"),
         ],
+        "library_outputs": ["{}.hh"],
         "library_providers": _library_providers,
-        "outputs": ["{}.hh"],
     },
 }

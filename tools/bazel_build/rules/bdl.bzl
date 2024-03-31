@@ -51,33 +51,27 @@ _BdlCcInfo = provider(
     },
 )
 
-_BdlCcCompositionInfo = provider(
-    doc = "Provider to gather public header files from cc rules.",
+_BdlCompositionInfo = provider(
+    doc = "Provider to gather language specific data for composition.",
     fields = {
-        "hdrs": "list of public header files.",
+        "data": "Data specific for each extension.",
     },
 )
 
 # ---- Aspects ----
 
-def _get_cc_public_header(target):
-    """Get all the direct public headers from a target."""
-
-    if CcInfo not in target:
-        return []
-    return target[CcInfo].compilation_context.direct_public_headers
-
 def _aspect_bdl_providers_impl(target, ctx):
     """Aspects to gather all bdl dependency outputs."""
 
-    # Are considered composition public headers when the target is not a BDL library but has a bdl library as a diret dependency.
+    # Are considered composition public headers when the target is not a BDL library but has a bdl library as a direct dependency.
     # Then it means it relies on a BDL interface.
-    cc_hdrs = []
-    if _BdlTagInfo not in target:
-        if any([dep for dep in ctx.rule.attr.deps if _BdlTagInfo in dep]):
-            cc_hdrs = _get_cc_public_header(target)
-
-    cc_composition_provider = _BdlCcCompositionInfo(hdrs = depset(cc_hdrs, transitive = [dep[_BdlCcCompositionInfo].hdrs for dep in ctx.rule.attr.deps if _BdlCcCompositionInfo in dep]))
+    is_direct = (_BdlTagInfo not in target) and (any([dep for dep in ctx.rule.attr.deps if _BdlTagInfo in dep]))
+    transitive_composition = [dep[_BdlCompositionInfo] for dep in ctx.rule.attr.deps if _BdlCompositionInfo in dep]
+    provider_data = {fmt: {} for fmt in _library_extensions.keys()}
+    for fmt, data in _library_extensions.items():
+        for key, aspect in data["aspect_files"].items():
+            data = aspect(target) if is_direct else []
+            provider_data[fmt][key] = depset(data, transitive = [t.data[fmt].get(key, depset()) for t in transitive_composition])
 
     if _BdlInfo not in target:
         return [
@@ -86,10 +80,10 @@ def _aspect_bdl_providers_impl(target, ctx):
                 files = depset(transitive = [dep[_BdlInfo].files for dep in ctx.rule.attr.deps if _BdlInfo in dep]),
                 search_formats = sets.to_list(sets.make([d for dep in ctx.rule.attr.deps if _BdlInfo in dep for d in dep[_BdlInfo].search_formats])),
             ),
-            cc_composition_provider,
+            _BdlCompositionInfo(data = provider_data),
         ]
 
-    return [cc_composition_provider]
+    return [_BdlCompositionInfo(data = provider_data)]
 
 _aspect_bdl_providers = aspect(
     implementation = _aspect_bdl_providers_impl,
@@ -243,7 +237,7 @@ def _bdl_library_impl(ctx):
         generated = []
         for bdl in metadata:
             # Generate the output
-            outputs = [ctx.actions.declare_file(output.format(bdl["relative_name"])) for output in data["outputs"]]
+            outputs = [ctx.actions.declare_file(output.format(bdl["relative_name"])) for output in data["library_outputs"]]
             ctx.actions.run(
                 inputs = depset([data_file], transitive = [bdl_provider.files]),
                 outputs = outputs,
@@ -340,7 +334,7 @@ def _make_composition_language_providers(ctx, name, deps, target_deps = None, ta
 
     # Create the language specific data file.
     def deps_to_cc_hdrs(deps):
-        return [f for dep in deps if _BdlCcCompositionInfo in dep for f in dep[_BdlCcCompositionInfo].hdrs.to_list()]
+        return [f for dep in deps if _BdlCompositionInfo in dep for f in dep[_BdlCompositionInfo].data["cc"]["hdrs"].to_list()]
 
     language_specific_data = _make_bdl_data_file(
         includes_per_target = dict({
