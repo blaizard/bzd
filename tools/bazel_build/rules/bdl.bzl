@@ -5,10 +5,11 @@ load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
 load("@bzd_package//:defs.bzl", "BzdPackageMetadataFragmentInfo")
 load("//tools/bazel_build/rules/extensions:cc.bzl", extension_cc = "extension")
+load("//tools/bazel_build/rules/extensions:json.bzl", extension_json = "extension")
 
 # ---- Extensions ----
 
-_library_extensions = {} | extension_cc
+_library_extensions = {} | extension_cc | extension_json
 
 # ---- Providers ----
 
@@ -56,15 +57,17 @@ def _aspect_bdl_providers_impl(target, ctx):
 
     # Are considered composition public headers when the target is not a BDL library but has a bdl library as a direct dependency.
     # Then it means it relies on a BDL interface.
-    is_direct = (_BdlTagInfo not in target) and (any([dep for dep in ctx.rule.attr.deps if _BdlTagInfo in dep]))
-    transitive_composition = [dep[_BdlCompositionInfo] for dep in ctx.rule.attr.deps if _BdlCompositionInfo in dep]
+    has_deps = hasattr(ctx.rule.attr, "deps")
+    is_direct = (_BdlTagInfo not in target) and has_deps and (any([dep for dep in ctx.rule.attr.deps if _BdlTagInfo in dep]))
+    transitive_composition = [dep[_BdlCompositionInfo] for dep in ctx.rule.attr.deps if _BdlCompositionInfo in dep] if has_deps else []
     provider_data = {fmt: {} for fmt in _library_extensions.keys()}
     for fmt, data in _library_extensions.items():
-        for key, aspect in data["aspect_files"].items():
-            data = aspect(target) if is_direct else []
-            provider_data[fmt][key] = depset(data, transitive = [t.data[fmt].get(key, depset()) for t in transitive_composition])
+        if "aspect_files" in data:
+            for key, aspect in data["aspect_files"].items():
+                data = aspect(target) if is_direct else []
+                provider_data[fmt][key] = depset(data, transitive = [t.data[fmt].get(key, depset()) for t in transitive_composition])
 
-    if _BdlInfo not in target:
+    if _BdlInfo not in target and has_deps:
         return [
             _BdlInfo(
                 sources = depset(transitive = [dep[_BdlInfo].sources for dep in ctx.rule.attr.deps if _BdlInfo in dep]),
@@ -202,7 +205,8 @@ def _bdl_library_impl(ctx):
     # Generate the data for the data file for the bdl constructor.
     language_specific_data = {}
     for fmt, data in _library_extensions.items():
-        language_specific_data[fmt] = data["library_data"](ctx.attr.deps)
+        if "library" in data:
+            language_specific_data[fmt] = data["library"]["data"](ctx.attr.deps)
 
     # Write the language specific data file.
     data_file = ctx.actions.declare_file("{}.data.json".format(ctx.label.name))
@@ -214,29 +218,30 @@ def _bdl_library_impl(ctx):
     # Generate the various providers
     providers = []
     for fmt, data in _library_extensions.items():
-        generated = []
-        for bdl in metadata:
-            # Generate the output
-            outputs = [ctx.actions.declare_file(output.format(name = bdl["relative_name"])) for output in data["library_outputs"]]
-            ctx.actions.run(
-                inputs = depset([data_file], transitive = [bdl_provider.files]),
-                outputs = outputs,
-                progress_message = "Generating {} build files from manifest {}".format(data["display"], bdl["input"].short_path),
-                arguments = _make_bdl_arguments(
-                    ctx = ctx,
-                    stage = "generate",
-                    search_formats = bdl_provider.search_formats,
-                    format = fmt,
-                    output = outputs[0].path,
-                    data = data_file,
-                    args = [bdl["input"].path],
-                ),
-                executable = ctx.attr._bdl.files_to_run,
-            )
-            generated += outputs
+        if "library" in data:
+            generated = []
+            for bdl in metadata:
+                # Generate the output
+                outputs = [ctx.actions.declare_file(output.format(name = bdl["relative_name"])) for output in data["library"]["outputs"]]
+                ctx.actions.run(
+                    inputs = depset([data_file], transitive = [bdl_provider.files]),
+                    outputs = outputs,
+                    progress_message = "Generating {} build files from manifest {}".format(data["display"], bdl["input"].short_path),
+                    arguments = _make_bdl_arguments(
+                        ctx = ctx,
+                        stage = "generate",
+                        search_formats = bdl_provider.search_formats,
+                        format = fmt,
+                        output = outputs[0].path,
+                        data = data_file,
+                        args = [bdl["input"].path],
+                    ),
+                    executable = ctx.attr._bdl.files_to_run,
+                )
+                generated += outputs
 
-        # Generate the various providers
-        providers.extend(data["library_providers"](ctx = ctx, generated = generated))
+            # Generate the various providers
+            providers.extend(data["library"]["providers"](ctx = ctx, generated = generated))
 
     return [
         bdl_provider,
@@ -266,8 +271,8 @@ bdl_library = rule(
             executable = True,
         ),
     } | {("_deps_" + name): (attr.label_list(
-        default = data["library_deps"],
-    )) for name, data in _library_extensions.items()},
+        default = data["library"]["deps"],
+    )) for name, data in _library_extensions.items() if "library" in data},
     toolchains = [
         "@rules_cc//cc:toolchain_type",
     ],
@@ -314,11 +319,12 @@ def _make_composition_language_providers(ctx, name, deps, target_deps = None, ta
 
     # Create the language specific data file.
     def deps_to_info(fmt, deps):
-        return [dep[_BdlCompositionInfo].data[fmt] for dep in deps if _BdlCompositionInfo in dep]
+        return [dep[_BdlCompositionInfo].data.get(fmt, {}) for dep in deps if _BdlCompositionInfo in dep]
 
     language_specific_data = {}
     for fmt, data in _library_extensions.items():
-        language_specific_data[fmt] = data["composition_data"](deps_to_info(fmt, deps), {target: deps_to_info(fmt, deps) for target, deps in target_deps.items()})
+        if "composition" in data:
+            language_specific_data[fmt] = data["composition"]["data"](deps_to_info(fmt, deps), {target: deps_to_info(fmt, deps) for target, deps in target_deps.items()})
 
     # Write the language specific data file.
     data_file = ctx.actions.declare_file("{}.data.json".format(name))
@@ -329,29 +335,30 @@ def _make_composition_language_providers(ctx, name, deps, target_deps = None, ta
 
     system_providers = {}
     for fmt, data in _library_extensions.items():
-        # Generate the expected output files.
-        outputs = {target: ctx.actions.declare_file(data["composition_output"].format(name = name, target = target)) for target in (targets if targets else ["all"])}
+        if "composition" in data:
+            # Generate the expected output files.
+            outputs = {target: ctx.actions.declare_file(data["composition"]["output"].format(name = name, target = target)) for target in (targets if targets else ["all"])}
 
-        ctx.actions.run(
-            # files also needs to be passed into argument for debugging purpose, in order to display a nice error message.
-            inputs = depset([data_file], transitive = [files]),
-            outputs = outputs.values(),
-            progress_message = "Generating {} composition for {}".format(data["display"], ctx.label),
-            arguments = _make_bdl_arguments(
-                ctx = ctx,
-                stage = "compose",
-                format = fmt,
-                search_formats = search_formats,
-                targets = targets,
-                output = "{}/{}.composition".format(outputs.values()[0].dirname, name),
-                data = data_file,
-                args = sources,
-            ),
-            executable = ctx.attr._bdl.files_to_run,
-        )
+            ctx.actions.run(
+                # files also needs to be passed into argument for debugging purpose, in order to display a nice error message.
+                inputs = depset([data_file], transitive = [files]),
+                outputs = outputs.values(),
+                progress_message = "Generating {} composition for {}".format(data["display"], ctx.label),
+                arguments = _make_bdl_arguments(
+                    ctx = ctx,
+                    stage = "compose",
+                    format = fmt,
+                    search_formats = search_formats,
+                    targets = targets,
+                    output = "{}/{}.composition".format(outputs.values()[0].dirname, name),
+                    data = data_file,
+                    args = sources,
+                ),
+                executable = ctx.attr._bdl.files_to_run,
+            )
 
-        deps = combined_deps["all"] + ctx.attr._deps_cc
-        system_providers[fmt] = {target: data["composition_providers"](ctx, output, deps + ([] if target == "all" else combined_deps.get(target, []))) for target, output in outputs.items()}
+            deps = combined_deps["all"] + ctx.attr._deps_cc
+            system_providers[fmt] = {target: data["composition"]["providers"](ctx, output, deps + ([] if target == "all" else combined_deps.get(target, []))) for target, output in outputs.items()}
 
     return system_providers
 
@@ -483,8 +490,8 @@ _bdl_system = rule(
             executable = True,
         ),
     } | {("_deps_" + name): (attr.label_list(
-        default = data["composition_deps"],
-    )) for name, data in _library_extensions.items()},
+        default = data["composition"]["deps"],
+    )) for name, data in _library_extensions.items() if "composition" in data},
 )
 
 def _bdl_binary_impl(ctx):
@@ -494,8 +501,11 @@ def _bdl_binary_impl(ctx):
 
     fmt = target_provider.language
     if fmt in _library_extensions:
-        provider = system.data[fmt][ctx.attr.target_name]
-        binary_file, metadata, extra_providers = _library_extensions[fmt]["binary"](ctx, name, provider)
+        if "binary" in _library_extensions[fmt]:
+            provider = system.data[fmt][ctx.attr.target_name]
+            binary_file, metadata, extra_providers = _library_extensions[fmt]["binary"]["build"](ctx, name, provider)
+        else:
+            fail("No binary builder associated with target language '{}'.".format(fmt))
 
     else:
         fail("Unsupported target language '{}'.".format(fmt))
@@ -552,8 +562,8 @@ def _bzd_binary_generic(is_test):
                 default = Label("@bzd_toolchain_cc//binary/map_analyzer"),
             ),
         } | {("_metadata_" + name): (attr.label_list(
-            default = data["binary_metadata"],
-        )) for name, data in _library_extensions.items()},
+            default = data["binary"]["metadata"],
+        )) for name, data in _library_extensions.items() if "binary" in data},
         toolchains = [
             "@rules_cc//cc:toolchain_type",
             "@bzd_toolchain_cc//binary:toolchain_type",
@@ -644,8 +654,8 @@ _bdl_target = rule(
         ),
         "language": attr.string(
             mandatory = True,
-            doc = "Compilation language for this rule.",
-            values = ["cc"],
+            doc = "Language associated with this target.",
+            values = _library_extensions.keys(),
         ),
     },
 )

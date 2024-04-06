@@ -358,7 +358,6 @@ class Entities:
 
 	def processEntry(self, expression: Expression, isDepedency: bool, context: Context) -> None:
 		"""Resolve the dependencies for a specific expression."""
-
 		resolver = context.makeResolver(symbols=self.symbols, expression=expression)
 
 		# Find the symbol underlying type.

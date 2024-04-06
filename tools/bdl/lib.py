@@ -6,10 +6,11 @@ from bzd.parser.error import Error
 from tools.bdl.visitors.composition.visitor import Composition
 from tools.bdl.generators.bdl.visitor import formatBdl
 from tools.bdl.generators.cc.visitor import formatCc, compositionCc
+from tools.bdl.generators.json.visitor import formatJson, compositionJson
 from tools.bdl.object import Object, ObjectContext
 
-formatters = {"bdl": formatBdl, "cc": formatCc}
-compositions_ = {"cc": compositionCc}
+formatters = {"bdl": formatBdl, "cc": formatCc, "json": formatJson}
+compositions_ = {"cc": compositionCc, "json": compositionJson}
 
 
 def preprocess(

@@ -32,7 +32,7 @@ from tools.bdl.generators.cc.fqn import (
 Use cases:
 
 Interfaces: (abstract notion)
-- component name : inteface {}  <- Should be set as a normal type.
+- component name : interface {}  <- Should be set as a normal type.
 - var = interface&              <- When used it should always be as a reference.
 
 Expressions:
@@ -174,7 +174,7 @@ class Transform:
 		"""
         normal           -> int myvar{value}
         no default value -> int myvar
-        unamed           -> int{value}
+        unnamed           -> int{value}
         """
 		output = ""
 		values = (self.paramsDeclarationToList_(
@@ -299,5 +299,6 @@ def compositionCc(
 	template = Template.fromPath(Path(__file__).parent / "template/composition.cc.btl", indent=True)
 
 	for target, composition in compositions.items():
+		print(composition)
 		content = template.render(composition, Transform(composition=composition, data=data))
 		(output.parent / f"{output.name}.{target}.cc").write_text(content)
