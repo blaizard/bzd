@@ -67,6 +67,9 @@ class CompositionView:
 	def uids(self) -> typing.Dict[str, int]:
 		return self.composition.uids
 
+	def __str__(self) -> str:
+		return f"==== Target ====\n\t" + self.target + "\n" + str(self.composition)
+
 
 class Composition:
 
