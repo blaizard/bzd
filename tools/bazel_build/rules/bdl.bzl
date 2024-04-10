@@ -1,8 +1,6 @@
 """BDL rules."""
 
 load("@bazel_skylib//lib:sets.bzl", "sets")
-load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
-load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
 load("@bzd_package//:defs.bzl", "BzdPackageMetadataFragmentInfo")
 load("//tools/bazel_build/rules/extensions:cc.bzl", extension_cc = "extension")
 load("//tools/bazel_build/rules/extensions:json.bzl", extension_json = "extension")
@@ -30,6 +28,7 @@ _BdlInfo = provider(
 _BdlTargetInfo = provider(
     doc = "Provider for a target.",
     fields = {
+        "builder": "Binary target generator.",
         "composition": "List of composition files for this target.",
         "deps": "List of dependencies for this target.",
         "language": "Language used for this target.",
@@ -362,72 +361,6 @@ def _make_composition_language_providers(ctx, name, deps, target_deps = None, ta
 
     return system_providers
 
-def _bdl_binary_build(ctx, name, binary_file):
-    """Prepare the binary for the execution stage.
-
-    Args:
-        ctx: The context of the action.
-        name: The name of the output.
-        binary_file: The binary of language-specific rule.
-
-    Returns:
-        A list of binaries and metadatas
-    """
-
-    binary_toolchain = ctx.toolchains["@bzd_toolchain_cc//binary:toolchain_type"].info
-    binaries = [binary_file]
-    metadatas = []
-
-    # Run the build steps
-    for index, build in enumerate(binary_toolchain.build):
-        build_binary_file = ctx.actions.declare_file("{}.build.{}".format(name, index))
-        ctx.actions.run(
-            inputs = binaries,
-            outputs = [build_binary_file],
-            tools = build.data_runfiles.files,
-            arguments = [binary.path for binary in binaries] + [build_binary_file.path],
-            executable = build.files_to_run,
-        )
-        binaries.append(build_binary_file)
-
-    # Run the metadata steps
-    for index, metadata in enumerate(binary_toolchain.metadata):
-        metadata_file = ctx.actions.declare_file("{}.metadata.{}".format(name, index))
-        ctx.actions.run(
-            inputs = binaries,
-            outputs = [metadata_file],
-            tools = metadata.default_runfiles.files,
-            arguments = [b.path for b in binaries] + [metadata_file.path],
-            executable = metadata.files_to_run,
-        )
-        metadatas.append(metadata_file)
-
-    return binaries, metadatas
-
-def _bdl_binary_execution(ctx, binaries):
-    """Build the executor provider."""
-
-    binary_toolchain = ctx.toolchains["@bzd_toolchain_cc//binary:toolchain_type"].info
-
-    # Identify the executor
-    executor = ctx.attr._executor[BuildSettingInfo].value
-    executors_mapping = {value: key for key, values in binary_toolchain.executors.items() for value in values.split(",")}
-    if executor not in executors_mapping:
-        fail("This platform does not support the '{}' executor, only the following are supported: {}.".format(executor, executors_mapping.keys()))
-
-    args = []
-    if ctx.attr._debug[BuildSettingInfo].value:
-        args.append("--debug")
-    args += [binary.short_path for binary in binaries]
-
-    return sh_binary_wrapper_impl(
-        ctx = ctx,
-        binary = executors_mapping[executor],
-        output = ctx.outputs.executable,
-        data = binaries,
-        command = "{{binary}} {} $@".format(" ".join(args)),
-    ), []
-
 def _bdl_system_impl(ctx):
     # Compose the target and their name into a dictionary.
     targets = {}
@@ -501,28 +434,37 @@ def _bdl_binary_impl(ctx):
 
     fmt = target_provider.language
     if fmt in _library_extensions:
-        if "binary" in _library_extensions[fmt]:
-            provider = system.data[fmt][ctx.attr.target_name]
-            binary_file, metadata, extra_providers = _library_extensions[fmt]["binary"]["build"](ctx, name, provider)
+        provider = system.data[fmt][ctx.attr.target_name]
+        builder = target_provider.builder
+        if builder:
+            binary_file = ctx.actions.declare_file(ctx.label.name + ".binary")
+            args = ctx.actions.args()
+            args.add_all(provider.values())
+            ctx.actions.run(
+                outputs = [binary_file],
+                inputs = provider.values(),
+                arguments = ["--output", binary_file.path, args],
+                executable = builder,
+                progress_message = "Generating binary for {}...".format(str(ctx.label)),
+            )
+            providers = [
+                DefaultInfo(executable = binary_file),
+            ]
+            metadata = []
+        elif "binary" in _library_extensions[fmt]:
+            providers, metadata = _library_extensions[fmt]["binary"]["build"](ctx, name, provider)
         else:
             fail("No binary builder associated with target language '{}'.".format(fmt))
 
     else:
         fail("Unsupported target language '{}'.".format(fmt))
 
-    # Build the binaries.
-    binaries, build_metadata = _bdl_binary_build(ctx = ctx, name = name, binary_file = binary_file)
-
-    # Add the execution wrapper.
-    default_info, execution_metadata = _bdl_binary_execution(ctx = ctx, binaries = binaries)
-
     return [
-        default_info,
         BzdPackageMetadataFragmentInfo(
-            manifests = metadata + build_metadata + execution_metadata,
+            manifests = metadata,
         ),
-        OutputGroupInfo(metadata = metadata + build_metadata + execution_metadata),
-    ] + extra_providers
+        OutputGroupInfo(metadata = metadata),
+    ] + providers
 
 def _bzd_binary_generic(is_test):
     return rule(
@@ -637,12 +579,18 @@ def _bdl_target_impl(ctx):
         composition = ctx.files.composition,
         deps = ctx.attr.deps,
         language = ctx.attr.language,
+        builder = ctx.attr.builder[DefaultInfo].files_to_run if ctx.attr.builder else None,
     )
 
 _bdl_target = rule(
     implementation = _bdl_target_impl,
     doc = """Target definition for the bzd framework.""",
     attrs = {
+        "builder": attr.label(
+            cfg = "exec",
+            executable = True,
+            doc = "Executable to generate the binary target.",
+        ),
         "composition": attr.label_list(
             mandatory = True,
             allow_files = [".bdl"],
@@ -653,11 +601,12 @@ _bdl_target = rule(
             aspects = [_aspect_bdl_providers],
         ),
         "language": attr.string(
-            mandatory = True,
             doc = "Language associated with this target.",
             values = _library_extensions.keys(),
+            mandatory = True,
         ),
     },
+    provides = [_BdlTargetInfo],
 )
 
 def bdl_target(name, **kwargs):

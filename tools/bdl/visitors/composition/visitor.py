@@ -33,19 +33,19 @@ class CompositionView:
 
 	@property
 	def registry(self) -> typing.Dict[Context, typing.Dict[str, ExpressionEntry]]:
-		return self.composition.registry
+		return {context: data for context, data in self.composition.registry.items() if context in self.contexts}
 
 	@property
 	def services(self) -> typing.Dict[Context, typing.List[ExpressionEntry]]:
-		return self.composition.services
+		return {context: data for context, data in self.composition.services.items() if context in self.contexts}
 
 	@property
 	def workloads(self) -> typing.Dict[Context, typing.List[ExpressionEntry]]:
-		return self.composition.workloads
+		return {context: data for context, data in self.composition.workloads.items() if context in self.contexts}
 
 	@property
 	def ios(self) -> typing.Dict[Context, typing.List[typing.Dict[str, typing.Any]]]:
-		return self.composition.ios
+		return {context: data for context, data in self.composition.ios.items() if context in self.contexts}
 
 	@property
 	def iosRegistry(self) -> typing.Dict[str, typing.Dict[str, typing.Any]]:
