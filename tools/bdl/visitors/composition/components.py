@@ -165,10 +165,13 @@ class Components:
 		    message="Only expressions with symbol can be part of the 'Components' list.",
 		)
 
-		if expression.isName:
-			identifier = expression.fqn
-		else:
-			identifier = str(expression.symbol)
+		identifier = expression.fqn
+
+		#if expression.isName:
+		#	identifier = expression.fqn
+		#else:
+		#   # This doesn't work for function with different arguments for example.
+		#	identifier = str(expression.symbol)
 		return identifier
 
 	def resolve(self) -> None:

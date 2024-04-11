@@ -299,6 +299,5 @@ def compositionCc(
 	template = Template.fromPath(Path(__file__).parent / "template/composition.cc.btl", indent=True)
 
 	for target, composition in compositions.items():
-		print(composition)
 		content = template.render(composition, Transform(composition=composition, data=data))
 		(output.parent / f"{output.name}.{target}.cc").write_text(content)

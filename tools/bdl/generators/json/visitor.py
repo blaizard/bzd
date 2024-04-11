@@ -1,6 +1,7 @@
 import json
 import typing
-from pathlib import Path
+import ast
+import pathlib
 
 from tools.bdl.object import Object
 from tools.bdl.visitors.composition.visitor import CompositionView
@@ -11,14 +12,28 @@ from tools.bdl.entities.impl.fragment.parameters_resolved import ParametersResol
 Json = typing.Dict[str, typing.Any]
 
 
-def formatJson(bdl: Object, data: typing.Optional[Path] = None) -> str:
+def formatJson(bdl: Object, data: typing.Optional[pathlib.Path] = None) -> str:
 	return ""
+
+
+def valueToPython(valueType: str, value: typing.Any) -> typing.Any:
+	"""Convert a builtin value into python type."""
+	if valueType == "String":
+		return ast.literal_eval(value)
+	if valueType == "Integer":
+		return int(value)
+	if valueType == "Float":
+		return float(value)
+	return value
 
 
 def parametersToJson(parameters: ParametersResolved) -> Json:
 	expressions = []
 	for parameter in parameters:
-		expressions.append(expressionToJson(parameter.expected) | expressionToJson(parameter.param))
+		data = expressionToJson(parameter.expected) | expressionToJson(parameter.param)
+		if "value" in data:
+			data["value"] = valueToPython(data.get("symbol"), data["value"])
+		expressions.append(data)
 	return expressions
 
 
@@ -47,8 +62,8 @@ def expressionEntryToJson(entry: ExpressionEntry) -> Json:
 
 def compositionJson(
     compositions: typing.Dict[str, CompositionView],
-    output: Path,
-    data: typing.Optional[Path] = None,
+    output: pathlib.Path,
+    data: typing.Optional[pathlib.Path] = None,
 ) -> None:
 
 	for target, composition in compositions.items():
