@@ -33,5 +33,6 @@ bzl_library(
         "@bazel_skylib//rules:common_settings",
         "@bzd_lib//:sh_binary_wrapper",
         "@bzd_package//:defs",
+        "@bzd_toolchain_cc//cc:defs",
     ],
 )

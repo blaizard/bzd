@@ -439,11 +439,13 @@ def _bdl_binary_impl(ctx):
         if builder:
             binary_file = ctx.actions.declare_file(ctx.label.name + ".binary")
             args = ctx.actions.args()
-            args.add_all(provider.values())
+            for key, value in provider.items():
+                args.add("--" + key, value)
+            args.add(binary_file)
             ctx.actions.run(
                 outputs = [binary_file],
                 inputs = provider.values(),
-                arguments = ["--output", binary_file.path, args],
+                arguments = [args],
                 executable = builder,
                 progress_message = "Generating binary for {}...".format(str(ctx.label)),
             )
