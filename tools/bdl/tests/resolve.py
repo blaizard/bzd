@@ -406,12 +406,12 @@ class TestRun(unittest.TestCase):
 		assert isinstance(val1, Expression)
 		self.assertTrue(val1.isRValue)
 
-		# Mispelled value key
+		# Misspelled value key
 		with self.assertRaisesRegex(Exception, r"not expected"):
 			Object.fromContent(
 			    content="""
 				component Test { config: value = Integer; }
-				composition MyComposition { val1 = Test(vaue=1); }
+				composition MyComposition { val1 = Test(value=1); }
 				""",
 			    objectContext=ObjectContext(resolve=True, composition=True),
 			)
@@ -721,6 +721,34 @@ class TestRun(unittest.TestCase):
 		vector = bdl.entity("MyComposition.vector")
 		assert isinstance(vector, Expression)
 		self.assertTrue(vector.isRValue)
+
+	def testDefaultValuesMethods(self) -> None:
+
+		bdl = Object.fromContent(
+		    content="""
+				method hello(a = Integer(1), b = Boolean(true));
+				composition MyComposition
+				{
+					a = hello(a = 34);
+					b = hello(b = false);
+				}
+				""",
+		    objectContext=ObjectContext(resolve=True, composition=True),
+		)
+
+		a = bdl.entity("MyComposition.a")
+		assert len(a.parametersResolved) == 2
+		self.assertEqual(a.parametersResolved[0].param.literal, "34")
+		self.assertEqual(a.parametersResolved[0].expected.literal, "1")
+		self.assertEqual(a.parametersResolved[1].param.literal, "true")
+		self.assertEqual(a.parametersResolved[1].expected.literal, "true")
+
+		b = bdl.entity("MyComposition.b")
+		assert len(b.parametersResolved) == 2
+		self.assertEqual(b.parametersResolved[0].param.literal, "1")
+		self.assertEqual(b.parametersResolved[0].expected.literal, "1")
+		self.assertEqual(b.parametersResolved[1].param.literal, "false")
+		self.assertEqual(b.parametersResolved[1].expected.literal, "true")
 
 	def testInstanceWithParameters(self) -> None:
 		Object.fromContent(
