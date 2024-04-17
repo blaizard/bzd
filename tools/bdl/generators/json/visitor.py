@@ -24,6 +24,8 @@ def valueToPython(valueType: str, value: typing.Any) -> typing.Any:
 		return int(value)
 	if valueType == "Float":
 		return float(value)
+	if valueType == "Boolean":
+		return (value == "true")
 	return value
 
 
@@ -43,9 +45,11 @@ def expressionToJson(expression: Expression) -> Json:
 		data["name"] = expression.name
 	if expression.isSymbol:
 		data["symbol"] = str(expression.symbol)
-	if expression.isValue:
+	if expression.isLiteral:
+		data["value"] = str(expression.literal)
+	elif expression.isValue:
 		data["value"] = str(expression.value)
-	if expression.isParameters:
+	elif expression.isParameters:
 		data["parameters"] = parametersToJson(expression.parametersResolved)
 	return data
 
@@ -76,4 +80,5 @@ def compositionJson(
 			contexts.append({"workloads": workloads, "services": services})
 
 		data = json.dumps({"contexts": contexts}, indent=4)
+		print(data)
 		(output.parent / f"{output.name}.{target}.json").write_text(data)

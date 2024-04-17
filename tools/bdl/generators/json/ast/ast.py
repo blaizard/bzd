@@ -14,6 +14,12 @@ class Parameters:
 				return param.get("value", default)
 		return default
 
+	def __getattr__(self, name: str) -> typing.Any:
+		for param in self.data:
+			if param.get("name") == name and "value" in param:
+				return param["value"]
+		raise KeyError(f"Unknown attribute '{name}'.")
+
 
 class Expression:
 
