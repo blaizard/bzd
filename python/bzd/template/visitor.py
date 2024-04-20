@@ -210,7 +210,7 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 		value2 = element.getAttrValue("value2")
 
 		sequence = element.getNestedSequence(kind="nested")
-		assert sequence
+		assert sequence, "Empty loop body"
 
 		block: ResultType = []
 

@@ -1,0 +1,4 @@
+namespace traefik;
+
+// Declare a docker image to be used via traefik.
+method docker(image = String, host = String, port = Integer);

@@ -1,0 +1,61 @@
+version: "3.3"
+
+services:
+    traefik:
+        image: "traefik:v2.10"
+        container_name: "traefik"
+
+        command:
+            #- "--log.level=DEBUG"
+            - "--providers.docker=true"
+            - "--providers.docker.exposedbydefault=false"
+            - "--entrypoints.web.address=:80"
+            - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+            - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+            - "--entrypoints.websecure.address=:443"
+            - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
+            - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
+            #- "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+            - "--certificatesresolvers.myresolver.acme.email=postmaster@blaizard.com"
+            - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+
+        labels:
+            traefik.enable: "true"
+
+            # Middleware to redirect www.mysite.com -> mysite.com
+            traefik.http.middlewares.redirect-www.redirectRegex.regex: "^https?://www\\.(.+)"
+            traefik.http.middlewares.redirect-www.redirectRegex.replacement: "https://$${1}"
+            traefik.http.middlewares.redirect-www.redirectRegex.permanent: "true"
+
+        ports:
+            - "80:80"
+            - "443:443"
+
+        volumes:
+            - "./letsencrypt:/letsencrypt"
+            - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+        networks:
+            traefik:
+                aliases:
+                {% for docker in dockers %}
+                    - {{ docker.host }}
+                {% end %}
+
+    {% for docker in dockers %}
+    {{ hostToName(docker.host) }}:
+        image: "{{ docker.image }}"
+        container_name: "{{ hostToName(docker.host) }}"
+        labels:
+            traefik.enable: "true"
+            traefik.http.routers.{{ hostToName(docker.host) }}.rule: Host(`{{ docker.host }}`) || Host(`www.{{ docker.host }}`)
+            traefik.http.routers.{{ hostToName(docker.host) }}.entrypoints: websecure
+            traefik.http.routers.{{ hostToName(docker.host) }}.tls.certresolver: myresolver
+            traefik.http.routers.{{ hostToName(docker.host) }}.middlewares: redirect-www
+            traefik.http.services.{{ hostToName(docker.host) }}.loadbalancer.server.port: {{ docker.port }}
+        networks:
+            - traefik
+
+    {% end %}
+networks:
+    traefik:

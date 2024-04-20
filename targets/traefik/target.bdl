@@ -1,0 +1,8 @@
+use "interfaces/executor.bdl"
+
+component Executor : bzd.Executor {
+}
+
+composition {
+    executor = Executor() [executor];
+}

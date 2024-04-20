@@ -70,3 +70,15 @@ class Ast:
 	def contexts(self) -> typing.Iterator[Context]:
 		for context in self.data.get("contexts", []):
 			yield Context(context)
+
+	@property
+	def workloads(self) -> typing.Iterator[ExpressionEntry]:
+		for context in self.contexts:
+			for workload in context.workloads:
+				yield workload
+
+	@property
+	def services(self) -> typing.Iterator[ExpressionEntry]:
+		for context in self.contexts:
+			for service in context.services:
+				yield service
