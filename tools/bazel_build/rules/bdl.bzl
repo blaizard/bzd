@@ -444,7 +444,7 @@ def _bdl_binary_impl(ctx):
             ctx.actions.write(
                 is_executable = True,
                 output = binary_file,
-                content = "{executable} {args}".format(
+                content = "{executable} {args} \"$@\"".format(
                     executable = binary[DefaultInfo].files_to_run.executable.short_path,
                     args = " ".join(["--{}='{}'".format(key, value.short_path) for key, value in provider.items()]),
                 ),
