@@ -45,7 +45,7 @@ class _ExecuteResultStreamWriter:
 				output.flush()
 
 
-class _ExecuteResult:
+class ExecuteResult:
 
 	def __init__(
 	        self,
@@ -96,7 +96,7 @@ def localCommand(
     stdout: Union[bool, TextIO] = False,
     stderr: Union[bool, TextIO] = False,
     maxOutputSize: int = 1000000,
-) -> _ExecuteResult:
+) -> ExecuteResult:
 	"""Run a process locally.
 
     Args:
@@ -151,33 +151,40 @@ def localCommand(
 	finally:
 		timer.cancel()
 
-	result = _ExecuteResult(stream=stream, returncode=returnCode)
+	result = ExecuteResult(stream=stream, returncode=returnCode)
 
 	assert (ignoreFailure or returnCode == 0), f"Return code {result.getReturnCode()}\n{result.getOutput()}"
 
 	return result
 
 
-def localPython(script: str, args: List[str] = [], **kwargs: Any) -> _ExecuteResult:
+def localPython(script: str, args: Optional[List[str]] = None, **kwargs: Any) -> ExecuteResult:
 	"""Execute a python script locally."""
 
-	return localCommand([sys.executable, script] + args, **kwargs)
+	return localCommand([sys.executable, script] + (args or []), **kwargs)
 
 
-def localBash(script: bytes, args: List[str] = [], **kwargs: Any) -> _ExecuteResult:
+def localBash(script: bytes, args: Optional[List[str]] = None, **kwargs: Any) -> ExecuteResult:
 	"""Execute a bash script locally."""
 
-	return localCommand(["bash", "-s", "--"] + args, **kwargs)
+	return localCommand(["bash", "-s", "--"] + (args or []), **kwargs)
 
 
-def localBazelBinary(path: str, args: List[str] = [], env: Dict[str, str] = {}, **kwargs: Any) -> _ExecuteResult:
+def localBazelBinary(path: str,
+                     args: Optional[List[str]] = None,
+                     env: Optional[Dict[str, str]] = None,
+                     **kwargs: Any) -> ExecuteResult:
 	"""Execute a bazel binary locally. The caller must run bazel and all runfiles must be already available."""
 
+	env = env or {}
 	env["RUNFILES_DIR"] = (os.environ["RUNFILES_DIR"] if "RUNFILES_DIR" in os.environ else os.path.dirname(os.getcwd()))
-	return localCommand([path] + args, env=env, **kwargs)
+	return localCommand([path] + (args or []), env=env, **kwargs)
 
 
-def localBazelTarget(target: str, args: List[str] = [], env: Dict[str, str] = {}, **kwargs: Any) -> _ExecuteResult:
+def localBazelTarget(target: str,
+                     args: Optional[List[str]] = None,
+                     env: Optional[Dict[str, str]] = None,
+                     **kwargs: Any) -> ExecuteResult:
 	"""Execute a bazel target locally.
 
     Note, the environment variable is passed to ensure the current are not propagated to the environment.
@@ -187,7 +194,7 @@ def localBazelTarget(target: str, args: List[str] = [], env: Dict[str, str] = {}
 	    # PATH env variable is by default passed, this is needed to find tools with rctx.which for example.
 	    "PATH": os.environ.get("PATH", "")
 	}
-	defaultEnv.update(env)
+	defaultEnv.update(env or {})
 
 	return localCommand(
 	    [
@@ -197,13 +204,13 @@ def localBazelTarget(target: str, args: List[str] = [], env: Dict[str, str] = {}
 	        "--noshow_progress",
 	        target,
 	        "--",
-	    ] + args,
+	    ] + (args or []),
 	    env=defaultEnv,
 	    **kwargs,
 	)
 
 
-def localDocker(args: List[str] = [], **kwargs: Any) -> _ExecuteResult:
-	"""Execute a docker-compose run service."""
+def localDocker(args: Optional[List[str]] = None, **kwargs: Any) -> ExecuteResult:
+	"""Execute a command via docker."""
 
-	return localCommand(["docker"] + args, **kwargs)
+	return localCommand(["docker"] + (args or []), **kwargs)

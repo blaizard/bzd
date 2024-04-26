@@ -1,6 +1,14 @@
 version: "3.3"
 
 services:
+    registry:
+        image: "registry"
+        container_name: "registry"
+        ports:
+            - 55555:5000
+        volumes:
+            - ./registry:/var/lib/registry:rw
+
     traefik:
         image: "traefik:v2.10"
         container_name: "traefik"
@@ -44,7 +52,7 @@ services:
 
     {% for docker in dockers %}
     {{ hostToName(docker.host) }}:
-        image: "{{ docker.image }}"
+        image: "localhost:55555/{{ docker.image }}"
         container_name: "{{ hostToName(docker.host) }}"
         labels:
             traefik.enable: "true"

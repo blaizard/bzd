@@ -1,0 +1,5 @@
+# This file was auto-generated.
+
+{% for key, value in data %}
+{{ key | toSubsetChar }} = {{ value | toJson }}
+{% end %}

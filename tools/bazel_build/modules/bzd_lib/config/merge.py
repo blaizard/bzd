@@ -2,7 +2,6 @@ import argparse
 import pathlib
 import typing
 import json
-import typing
 import sys
 
 from bzd.utils.dict import updateDeep, UpdatePolicy

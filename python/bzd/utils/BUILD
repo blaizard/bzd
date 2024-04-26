@@ -14,6 +14,17 @@ py_library(
 )
 
 py_library(
+    name = "ssh",
+    srcs = ["ssh.py"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":run",
+        "//bzd:bin",
+        "//bzd/http:client",
+    ],
+)
+
+py_library(
     name = "worker",
     srcs = ["worker.py"],
     visibility = ["//visibility:public"],

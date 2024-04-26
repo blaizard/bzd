@@ -10,6 +10,7 @@ py_binary(
     deps = [
         "//tools/bdl/generators/json/ast",
         "@bzd_python//bzd/template",
+        "@bzd_python//bzd/utils:ssh",
     ],
 )
 

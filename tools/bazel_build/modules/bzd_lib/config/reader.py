@@ -11,7 +11,7 @@ def processKeyValues(data: typing.Dict[str, typing.Any]) -> typing.Dict[str, typ
 	values = {}
 	for key, value in data.items():
 		if isinstance(value, dict):
-			for nestedKey, nestedValue in Config.processKeyValues(value).items():
+			for nestedKey, nestedValue in processKeyValues(value).items():
 				values[f"{key}.{nestedKey}"] = nestedValue
 		else:
 			values[key] = value
