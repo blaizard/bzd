@@ -6,6 +6,11 @@ filegroup(
     visibility = ["//visibility:public"],
 )
 
+exports_files(
+    ["template_py.btl"],
+    visibility = ["//config:__subpackages__"],
+)
+
 py_binary(
     name = "merge",
     srcs = [
@@ -23,6 +28,18 @@ py_binary(
         "reader.py",
     ],
     visibility = ["//visibility:public"],
+)
+
+py_binary(
+    name = "template",
+    srcs = [
+        "template.py",
+    ],
+    visibility = ["//config:__subpackages__"],
+    deps = [
+        "@bzd_lib//config:reader",
+        "@bzd_python//bzd/template",
+    ],
 )
 
 bzl_library(

@@ -4,9 +4,13 @@ import pathlib
 import typing
 import sys
 import re
+import dataclasses
+import os
+import time
 
 from tools.bdl.generators.json.ast.ast import Ast, Parameters
 from bzd.template.template import Template
+from bzd.utils.ssh import SSH
 
 
 class Getter:
@@ -26,17 +30,25 @@ class Getter:
 		return re.sub(r"[^a-zA-Z0-9]+", '_', host)
 
 
+@dataclasses.dataclass
+class ConnectionSSH:
+	host: str
+	port: int
+	username: typing.Optional[str] = None
+	password: typing.Optional[str] = None
+
+
 class DeploySSH:
 
 	def __init__(self, string: str) -> None:
 		self.connection = DeploySSH.fromString(string)
 
 	@staticmethod
-	def fromString(string: str) -> None:
+	def fromString(string: str) -> ConnectionSSH:
 		"""Decompose a SSH string and gets its components.
 		
 		A SSH string must have the following format:
-		<username>:<password>@<url>:<port>, where only <url> is mandatory.
+		<username>:<password>@<host>:<port>, where only <host> is mandatory.
 		"""
 
 		def splitLocation(location: str) -> typing.Tuple[str, int]:
@@ -58,20 +70,38 @@ class DeploySSH:
 		items = string.split("@")
 		try:
 			if len(items) == 1:
-				url, port = splitLocation(items[0])
+				host, port = splitLocation(items[0])
+				return ConnectionSSH(host=host, port=port)
 			elif len(items) == 2:
 				username, password = splitAuthentication(items[0])
-				url, port = splitLocation(items[1])
+				host, port = splitLocation(items[1])
+				return ConnectionSSH(host=host, port=port, username=username, password=password)
 			raise Exception("String parsing error")
 		except Exception as e:
 			raise Exception(
-			    f"{str(e)}: SSH string must have the following format: '<username>:<password>@<url>:<port>', not '{string}'."
+			    f"{str(e)}: SSH string must have the following format: '<username>:<password>@<host>:<port>', not '{string}'."
 			)
+
+
+def waitForTCP(url: str, retries: int = 20, delay: int = 1.0) -> None:
+	for _ in range(retries):
+		time.sleep(delay)
+
+		try:
+			response = urllib2.urlopen(url, timeout=5)
+		except (socket.error, urllib2.URLError, httplib.BadStatusLine):
+			continue
+
+		if response.getcode() == 200:
+			return True
+
+	return False
 
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Traefik deployment.")
 	parser.add_argument("--json", type=pathlib.Path, help="Path of the manifest.")
+	parser.add_argument("deploy", type=str, help="Location where to deploy the target.")
 	args = parser.parse_args()
 
 	data = json.loads(args.json.read_text())
@@ -80,4 +110,28 @@ if __name__ == "__main__":
 	template = Template.fromPath(pathlib.Path(__file__).parent / "docker_compose.yml.btl")
 	content = template.render(Getter(ast))
 
+	# This script should:
+	# 1. Connect to the client and make sure a registry is running, if not, run it.
+	# 2. Push the image to the local registry.
+	# 3. Update docker-compose.yml file
+	# 4. pull
+	# 5. run
+	# See: https://stackoverflow.com/questions/31575546/docker-image-push-over-ssh-distributed
+
 	print(content)
+
+	sshArgs = DeploySSH.fromString(args.deploy)
+	ssh = SSH(host=sshArgs.host, username=sshArgs.username)
+	"""
+	ssh.command(["mkdir", "-p", "bzd-deployment"])
+	ssh.copyContent(content, "./bzd-deployment/docker-compose.yml")
+	ssh.command(["docker", "compose", "-f", "./bzd-deployment/docker-compose.yml", "up", "-d", "registry"])
+	"""
+
+	with ssh.forwardPort(55555, waitHTTP=f"http://localhost:55555/v2/"):
+		# Push the images...
+		# docker push localhost:55555/image:latest
+		print("FORWARD!")
+		time.sleep(1)
+
+	sys.exit(0)

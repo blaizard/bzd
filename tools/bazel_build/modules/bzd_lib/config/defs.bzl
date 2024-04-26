@@ -42,7 +42,27 @@ def _bzd_config_impl(ctx):
         executable = ctx.executable._config_merge,
     )
 
-    return [DefaultInfo(files = depset([ctx.outputs.output_json]))]
+    # Create a python output
+    output_py = ctx.actions.declare_file(ctx.label.name + ".py")
+    ctx.actions.run(
+        inputs = [ctx.outputs.output_json, ctx.file._template_py],
+        outputs = [output_py],
+        arguments = [
+            "--output",
+            output_py.path,
+            "--json",
+            ctx.outputs.output_json.path,
+            ctx.file._template_py.path,
+        ],
+        executable = ctx.executable._config_template,
+    )
+
+    return [
+        DefaultInfo(files = depset([ctx.outputs.output_json]), runfiles = ctx.runfiles(files = [output_py])),
+        PyInfo(
+            transitive_sources = depset([output_py]),
+        ),
+    ]
 
 _bzd_config = rule(
     implementation = _bzd_config_impl,
@@ -70,7 +90,17 @@ _bzd_config = rule(
             cfg = "exec",
             executable = True,
         ),
+        "_config_template": attr.label(
+            default = Label("@bzd_lib//config:template"),
+            cfg = "exec",
+            executable = True,
+        ),
+        "_template_py": attr.label(
+            default = Label("@bzd_lib//config:template_py.btl"),
+            allow_single_file = True,
+        ),
     },
+    provides = [DefaultInfo, PyInfo],
 )
 
 def bzd_config(name, **kwargs):
