@@ -19,7 +19,7 @@ py_library(
     visibility = ["//visibility:public"],
     deps = [
         ":run",
-        "//bzd:bin",
+        "//bzd:bin_external",
         "//bzd/http:client",
     ],
 )
