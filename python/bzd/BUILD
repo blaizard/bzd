@@ -1,5 +1,5 @@
 load("@bzd_lib//config:defs.bzl", "bzd_config")
-load(":defs.bzl", "bzd_py_binary_library")
+load("//bzd:defs.bzl", "bzd_py_binary_library")
 
 bzd_config(
     name = "bin_external",
@@ -13,7 +13,7 @@ bzd_config(
 bzd_py_binary_library(
     name = "bin",
     executables = {
-        "@bzd_rules_docker//:crane": "crane",
+        "@bzd_rules_oci//:crane": "crane",
     },
     visibility = ["//bzd:__subpackages__"],
 )

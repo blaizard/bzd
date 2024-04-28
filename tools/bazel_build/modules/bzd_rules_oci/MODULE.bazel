@@ -1,5 +1,5 @@
 module(
-    name = "bzd_rules_docker",
+    name = "bzd_rules_oci",
     version = "1.0",
 )
 

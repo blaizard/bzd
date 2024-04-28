@@ -12,7 +12,7 @@ bazel_dep(name = "bzd_dns", version = "1.0")
 bazel_dep(name = "bzd_sanitizer", version = "1.0")
 bazel_dep(name = "bzd_package", version = "1.0")
 bazel_dep(name = "bzd_bundle", version = "1.0")
-bazel_dep(name = "bzd_rules_docker", version = "1.0")
+bazel_dep(name = "bzd_rules_oci", version = "1.0")
 bazel_dep(name = "bzd_rules_bdl", version = "1.0")
 bazel_dep(name = "bzd_python", version = "1.0")
 bazel_dep(name = "platforms", version = "0.0.8")
@@ -32,7 +32,7 @@ bazel_dep(name = "rules_pkg", version = "0.9.1")
     "bzd_toolchain_cc",
     "bzd_rules_nodejs",
     "bzd_rules_bdl",
-    "bzd_rules_docker",
+    "bzd_rules_oci",
     "bzd_bundle",
     "bzd_platforms",
     "bzd_sanitizer",
@@ -103,7 +103,7 @@ register_toolchains("@nodejs//:all")
 
 # Docker
 
-images = use_extension("@bzd_rules_docker//:extensions.bzl", "images")
+images = use_extension("@bzd_rules_oci//:extensions.bzl", "images")
 images.install(
     name = "docker",
 )

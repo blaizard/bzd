@@ -2,7 +2,7 @@
 
 load("@bzd_lib//lib:attrs.bzl", "ATTRS_COMMON_BUILD_RULES", "attrs_assert_any_of")
 load("@bzd_package//:defs.bzl", "bzd_package")
-load("@bzd_rules_docker//:defs.bzl", "bzd_docker_image")
+load("@bzd_rules_oci//:defs.bzl", "bzd_oci_image")
 
 ROOT_DIRECTORY_ = "/bzd/bin"
 
@@ -28,7 +28,7 @@ def bzd_nodejs_docker(name, deps, cmd, base = "@docker//:nodejs", include_metada
     )
 
     map_to_directory_ = {dir_name: dir_name for dir_name in deps.values()}
-    bzd_docker_image(
+    bzd_oci_image(
         name = name,
         base = base,
         cmd = [
