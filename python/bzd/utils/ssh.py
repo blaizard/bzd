@@ -5,7 +5,7 @@ import time
 from contextlib import contextmanager
 
 from bzd.utils.run import localCommand, ExecuteResult
-from bzd.bin_external import ssh, scp
+from bzd.bin import ssh, scp
 from bzd.http.client import HttpClient
 
 
