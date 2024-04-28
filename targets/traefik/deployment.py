@@ -11,6 +11,7 @@ import time
 from tools.bdl.generators.json.ast.ast import Ast, Parameters
 from bzd.template.template import Template
 from bzd.utils.ssh import SSH
+from bzd_oci.run import ociPush
 
 
 class Getter:
@@ -127,6 +128,8 @@ if __name__ == "__main__":
 	ssh.copyContent(content, "./bzd-deployment/docker-compose.yml")
 	ssh.command(["docker", "compose", "-f", "./bzd-deployment/docker-compose.yml", "up", "-d", "registry"])
 	"""
+
+	ociPush("--help", "ssa", stdout=True, stderr=True)
 
 	with ssh.forwardPort(55555, waitHTTP=f"http://localhost:55555/v2/"):
 		# Push the images...

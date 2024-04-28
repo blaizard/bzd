@@ -11,6 +11,7 @@ py_binary(
         "//tools/bdl/generators/json/ast",
         "@bzd_python//bzd/template",
         "@bzd_python//bzd/utils:ssh",
+        "@bzd_rules_oci//python/bzd_oci:run",
     ],
 )
 
