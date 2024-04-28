@@ -6,7 +6,7 @@ load("@bzd_rules_oci//:defs.bzl", "bzd_oci_image")
 
 ROOT_DIRECTORY_ = "/bzd/bin"
 
-def bzd_nodejs_docker(name, deps, cmd, base = "@docker//:nodejs", include_metadata = False, **kwargs):
+def bzd_nodejs_oci(name, deps, cmd, base = "@docker//:nodejs", include_metadata = False, **kwargs):
     """Rule for embedding a NodeJs application into Docker.
 
     Args:

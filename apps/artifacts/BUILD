@@ -1,4 +1,4 @@
-load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_docker")
+load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_oci")
 
 exports_files(
     [
@@ -10,7 +10,7 @@ exports_files(
     ],
 )
 
-bzd_nodejs_docker(
+bzd_nodejs_oci(
     name = "artifacts",
     cmd = [
         "{backend}/apps/artifacts/backend/app.mjs",
