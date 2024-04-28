@@ -1,5 +1,5 @@
 load("@bzd_lib//config:defs.bzl", "bzd_config")
-load("//bzd:defs.bzl", "bzd_py_binary_library")
+load("//:defs.bzl", "bzd_py_binary_library")
 
 bzd_config(
     name = "bin_external",

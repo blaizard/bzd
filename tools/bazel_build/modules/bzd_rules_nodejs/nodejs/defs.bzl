@@ -1,7 +1,7 @@
 """Rules for NodeJs."""
 
 load("@bzd_lib//lib:attrs.bzl", "ATTRS_COMMON_BINARY_RULES", "ATTRS_COMMON_BUILD_RULES", "ATTRS_COMMON_TEST_RULES", "attrs_assert_any_of")
-load("@bzd_rules_nodejs//nodejs:private/nodejs_docker.bzl", bzd_nodejs_oci_ = "bzd_nodejs_oci")
+load("@bzd_rules_nodejs//nodejs:private/nodejs_oci.bzl", bzd_nodejs_oci_ = "bzd_nodejs_oci")
 load("@bzd_rules_nodejs//nodejs:private/nodejs_executable.bzl", bzd_nodejs_binary_ = "bzd_nodejs_binary", bzd_nodejs_test_ = "bzd_nodejs_test")
 load("@bzd_rules_nodejs//nodejs:private/nodejs_extern_binary.bzl", bzd_nodejs_extern_binary_ = "bzd_nodejs_extern_binary")
 load("@bzd_rules_nodejs//nodejs:private/nodejs_install.bzl", bzd_nodejs_install_ = "bzd_nodejs_install")
