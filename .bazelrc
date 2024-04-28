@@ -73,10 +73,10 @@ build:docker --experimental_docker_verbose
 build:docker --experimental_enable_docker_sandbox
 build:docker --spawn_strategy=docker,worker,sandboxed,local
 build:docker --config=docker_sandbox
-build:docker --extra_execution_platforms=@bzd_rules_docker//execution_platforms:linux_x86_64
+build:docker --extra_execution_platforms=@bzd_rules_oci//execution_platforms:linux_x86_64
 
 # Remote
-build:remote --extra_execution_platforms=@bzd_rules_docker//execution_platforms:linux_x86_64
+build:remote --extra_execution_platforms=@bzd_rules_oci//execution_platforms:linux_x86_64
 build:remote --jobs=24
 build:remote --dynamic_mode=off
 build:remote --spawn_strategy=remote,worker,sandboxed,local

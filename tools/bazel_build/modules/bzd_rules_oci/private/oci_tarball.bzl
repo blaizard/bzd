@@ -3,7 +3,7 @@
 load("@bzd_lib//lib:attrs.bzl", "ATTRS_COMMON_BUILD_RULES", "attrs_assert_any_of")
 load("@rules_oci//oci:defs.bzl", "oci_tarball")
 
-def bzd_docker_tarball(name, image, repository, remote_tags, **kwargs):
+def bzd_oci_tarball(name, image, repository, remote_tags, **kwargs):
     """Create a docker image tarball locally.
 
     Args:
