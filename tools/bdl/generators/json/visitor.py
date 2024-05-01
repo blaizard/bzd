@@ -16,29 +16,10 @@ def formatJson(bdl: Object, data: typing.Optional[pathlib.Path] = None) -> str:
 	return ""
 
 
-def valueToPython(valueType: str, value: typing.Any) -> typing.Any:
-	"""Convert a builtin value into python type."""
-	if valueType == "String":
-		return ast.literal_eval(value)
-	if valueType == "Integer":
-		return int(value)
-	if valueType == "Float":
-		return float(value)
-	if valueType == "Boolean":
-		return (value == "true")
-	return value
-
-
 def parametersToJson(parameters: ParametersResolved) -> Json:
 	expressions = []
 	for parameter in parameters:
-		expected = expressionToJson(parameter.expected)
-		data = expected | expressionToJson(parameter.param)
-		# Symbol from the expected has priority
-		# TODO: this should be fixed during resolution, all literals should resolve and propagate.
-		data["symbol"] = expected.get("symbol") or data.get("symbol")
-		if "value" in data:
-			data["value"] = valueToPython(data.get("symbol"), data["value"])
+		data = expressionToJson(parameter.expected) | expressionToJson(parameter.param)
 		expressions.append(data)
 	return expressions
 
@@ -50,7 +31,7 @@ def expressionToJson(expression: Expression) -> Json:
 	if expression.isSymbol:
 		data["symbol"] = str(expression.symbol)
 	if expression.isLiteral:
-		data["value"] = str(expression.literal)
+		data["value"] = expression.literalNative
 	elif expression.isValue:
 		data["value"] = str(expression.value)
 	elif expression.isParameters:
