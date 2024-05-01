@@ -394,7 +394,10 @@ class Entities:
 			dep = resolver.getEntityResolved(fqn=fqn).assertValue(element=expression.element)
 			if isinstance(dep, Expression):
 				dep.resolveMemoized(resolver=resolver.make(expression=dep))
-				entry.deps.push(dep)
+				# Non-literal deps needs to be treated as dependencies to be later resolved.
+				# Literal ones can be used directly.
+				if not dep.isLiteral:
+					entry.deps.push(dep)
 
 		# Check if there are pre/post-requisites (init/shutdown functions)
 		if underlyingType.isInterface:

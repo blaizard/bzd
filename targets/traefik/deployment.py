@@ -31,59 +31,6 @@ class Getter:
 		return re.sub(r"[^a-zA-Z0-9]+", '_', host)
 
 
-@dataclasses.dataclass
-class ConnectionSSH:
-	host: str
-	port: int
-	username: typing.Optional[str] = None
-	password: typing.Optional[str] = None
-
-
-class DeploySSH:
-
-	def __init__(self, string: str) -> None:
-		self.connection = DeploySSH.fromString(string)
-
-	@staticmethod
-	def fromString(string: str) -> ConnectionSSH:
-		"""Decompose a SSH string and gets its components.
-		
-		A SSH string must have the following format:
-		<username>:<password>@<host>:<port>, where only <host> is mandatory.
-		"""
-
-		def splitLocation(location: str) -> typing.Tuple[str, int]:
-			items = location.split(":")
-			if len(items) == 1:
-				return items[0], 22
-			elif len(items) == 2:
-				return items[0], int(items[1])
-			raise Exception("Location parsing error")
-
-		def splitAuthentication(authentication: str) -> typing.Tuple[str, typing.Optional[str]]:
-			items = authentication.split(":")
-			if len(items) == 1:
-				return items[0], None
-			elif len(items) == 2:
-				return items[0], items[1]
-			raise Exception("Authentication parsing error")
-
-		items = string.split("@")
-		try:
-			if len(items) == 1:
-				host, port = splitLocation(items[0])
-				return ConnectionSSH(host=host, port=port)
-			elif len(items) == 2:
-				username, password = splitAuthentication(items[0])
-				host, port = splitLocation(items[1])
-				return ConnectionSSH(host=host, port=port, username=username, password=password)
-			raise Exception("String parsing error")
-		except Exception as e:
-			raise Exception(
-			    f"{str(e)}: SSH string must have the following format: '<username>:<password>@<host>:<port>', not '{string}'."
-			)
-
-
 def waitForTCP(url: str, retries: int = 20, delay: int = 1.0) -> None:
 	for _ in range(retries):
 		time.sleep(delay)
@@ -102,6 +49,7 @@ def waitForTCP(url: str, retries: int = 20, delay: int = 1.0) -> None:
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Traefik deployment.")
 	parser.add_argument("--json", type=pathlib.Path, help="Path of the manifest.")
+	parser.add_argument("--directory", default="bzd-deployment-traefik", help="The name of the directory to be used.")
 	parser.add_argument("deploy", type=str, help="Location where to deploy the target.")
 	args = parser.parse_args()
 
@@ -121,12 +69,11 @@ if __name__ == "__main__":
 
 	print(content)
 
-	sshArgs = DeploySSH.fromString(args.deploy)
-	ssh = SSH(host=sshArgs.host, username=sshArgs.username)
+	ssh = SSH.fromString(args.deploy)
 	"""
-	ssh.command(["mkdir", "-p", "bzd-deployment"])
-	ssh.copyContent(content, "./bzd-deployment/docker-compose.yml")
-	ssh.command(["docker", "compose", "-f", "./bzd-deployment/docker-compose.yml", "up", "-d", "registry"])
+	ssh.command(["mkdir", "-p", args.directory])
+	ssh.copyContent(content, f"{args.directory}/docker-compose.yml")
+	ssh.command(["docker", "compose", "-f", f"{args.directory}/docker-compose.yml", "up", "-d", "registry"])
 	"""
 
 	ociPush("--help", "ssa", stdout=True, stderr=True)
