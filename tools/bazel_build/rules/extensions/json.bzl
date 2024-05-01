@@ -3,9 +3,15 @@
 def _composition_data(_info, _info_per_target):
     return {}
 
-def _composition_providers(_ctx, output, _deps):
+def _composition_providers(ctx, output, _deps):
+    runfiles = ctx.runfiles().merge_all([dep[DefaultInfo].default_runfiles for dep in ctx.attr.deps])
     return {
-        "json": output,
+        # runfiles will be added as runfiles to the binary.
+        "runfiles": runfiles,
+        # files will be added in the runfiles.
+        "files": {
+            "json": output,
+        },
     }
 
 extension = {

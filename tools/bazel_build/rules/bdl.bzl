@@ -288,6 +288,25 @@ def _make_composition_language_providers(ctx, name, deps, target_deps = None, ta
               such as CcInfo, etc.
         target_deps: Dictionary keyed by target name of the dependencies.
         target_bdl_providers: Dictionary keyed by target of extra _BdlInfo to be added.
+
+    Returns:
+        Returns provider per format and target in the following form:
+        {
+            fmt: {
+                target: {
+                    str1: ...,
+                    str2: ....
+                }
+            }
+        }
+        for example:
+        {
+            json: {
+                machine1: {
+                    hello: file1
+                }
+            }
+        }
     """
 
     # Set the default value for optional arguments.
@@ -440,14 +459,16 @@ def _bdl_binary_impl(ctx):
         if binary:
             binary_file = ctx.actions.declare_file(ctx.label.name + ".binary")
             runfiles = ctx.runfiles(
-                files = provider.values(),
+                files = provider.get("files", {}).values(),
             ).merge(binary[DefaultInfo].default_runfiles)
+            if "runfiles" in provider:
+                runfiles = runfiles.merge(provider["runfiles"])
             ctx.actions.write(
                 is_executable = True,
                 output = binary_file,
                 content = "{executable} {args} \"$@\"".format(
                     executable = binary[DefaultInfo].files_to_run.executable.short_path,
-                    args = " ".join(["--{}='{}'".format(key, value.short_path) for key, value in provider.items()]),
+                    args = " ".join(["--{}='{}'".format(key, value.short_path) for key, value in provider.get("files", {}).items()]),
                 ),
             )
             providers = [
@@ -674,7 +695,7 @@ namespace {namespace};
 oci_directory = String("{oci_directory}");
 """.format(
             namespace = namespace,
-            oci_directory = oci_directory.path,
+            oci_directory = oci_directory.short_path,
         ),
     )
 
