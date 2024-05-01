@@ -136,7 +136,7 @@ def _precompile_bdl(ctx, srcs, deps, output_dir = None, namespace = None):
         ctx: The context used for this action.
         srcs: The set of bdls to be precompiled.
         deps: The dependencies associated with these bdls, must have a `_BdlInfo`.
-        output_dir: The output directory where the precompiled objects show be stored,
+        output_dir: The output directory where the precompiled objects should be stored,
                     if not specified, it will be stored in the same directory as the source file.
         namespace: The namespace in which the bdls files should be compiled.
     """
@@ -154,7 +154,7 @@ def _precompile_bdl(ctx, srcs, deps, output_dir = None, namespace = None):
         if output_dir == None:
             # Build the relative path of the input file from the BUILD file
             build_root_path = ctx.build_file_path.rsplit("/", 1)[0] + "/"
-            relative_name = input_file.path.replace(build_root_path, "").replace(".bdl", "")
+            relative_name = input_file.short_path.replace(build_root_path, "").replace(".bdl", "")
         else:
             relative_name = "{}/{}/{}".format(output_dir, input_file.dirname, input_file.basename.replace(".bdl", ""))
 
@@ -255,7 +255,7 @@ bdl_library = rule(
     """,
     attrs = {
         "deps": attr.label_list(
-            providers = [_BdlInfo, CcInfo],
+            providers = [_BdlInfo],
             aspects = [_aspect_bdl_providers],
             doc = "List of bdl dependencies. Language specific dependencies will have their public interface included in the generated file.",
         ),
@@ -409,6 +409,7 @@ _bdl_system = rule(
     attrs = {
         "deps": attr.label_list(
             mandatory = True,
+            allow_files = True,
             doc = "List of dependencies.",
             aspects = [_aspect_bdl_providers],
         ),
@@ -661,3 +662,40 @@ def bdl_target_platform(name, target, platform, visibility = None, tags = None):
         visibility = visibility,
         tags = tags,
     )
+
+def _bdl_application_impl(ctx):
+    namespace = ".".join(ctx.label.package.split("/") + [ctx.label.name])
+    oci_directory = ctx.attr.target[DefaultInfo].files.to_list()[0]
+    bdl = ctx.actions.declare_file(ctx.label.name + ".bdl")
+    ctx.actions.write(
+        output = bdl,
+        content = """
+namespace {namespace};
+oci_directory = String("{oci_directory}");
+""".format(
+            namespace = namespace,
+            oci_directory = oci_directory.path,
+        ),
+    )
+
+    bdl_provider, _ = _precompile_bdl(ctx, srcs = [bdl], deps = [])
+
+    return [bdl_provider, DefaultInfo(runfiles = ctx.runfiles(
+        files = ctx.attr.target[DefaultInfo].files.to_list(),
+    ))]
+
+bdl_application = rule(
+    implementation = _bdl_application_impl,
+    doc = "Wrapper for an application and add bdl information.",
+    attrs = {
+        "target": attr.label(
+            mandatory = True,
+            doc = "The target associated with this application.",
+        ),
+        "_bdl": attr.label(
+            default = Label("//tools/bdl"),
+            cfg = "exec",
+            executable = True,
+        ),
+    },
+)

@@ -32,7 +32,11 @@ def valueToPython(valueType: str, value: typing.Any) -> typing.Any:
 def parametersToJson(parameters: ParametersResolved) -> Json:
 	expressions = []
 	for parameter in parameters:
-		data = expressionToJson(parameter.expected) | expressionToJson(parameter.param)
+		expected = expressionToJson(parameter.expected)
+		data = expected | expressionToJson(parameter.param)
+		# Symbol from the expected has priority
+		# TODO: this should be fixed during resolution, all literals should resolve and propagate.
+		data["symbol"] = expected.get("symbol") or data.get("symbol")
 		if "value" in data:
 			data["value"] = valueToPython(data.get("symbol"), data["value"])
 		expressions.append(data)
@@ -80,5 +84,4 @@ def compositionJson(
 			contexts.append({"workloads": workloads, "services": services})
 
 		data = json.dumps({"contexts": contexts}, indent=4)
-		print(data)
 		(output.parent / f"{output.name}.{target}.json").write_text(data)

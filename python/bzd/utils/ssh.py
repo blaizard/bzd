@@ -24,6 +24,36 @@ class SSH:
 		if identity is not None:
 			self.commonCommands += ["-i", str(identity)]
 
+	@staticmethod
+	def fromString(string: str) -> "SSH":
+		"""Decompose a SSH string and gets its components.
+		
+		A SSH string must have the following format:
+		<username>@<host>:<port>, where only <host> is mandatory.
+		"""
+
+		def splitLocation(location: str) -> typing.Tuple[str, int]:
+			items = location.split(":")
+			if len(items) == 1:
+				return items[0], 22
+			elif len(items) == 2:
+				return items[0], int(items[1])
+			raise Exception("Location parsing error")
+
+		items = string.split("@")
+		try:
+			if len(items) == 1:
+				host, port = splitLocation(items[0])
+				return SSH(host=host, port=port)
+			elif len(items) == 2:
+				username = items[0]
+				host, port = splitLocation(items[1])
+				return SSH(host=host, port=port, username=username)
+			raise Exception("String parsing error")
+		except Exception as e:
+			raise Exception(
+			    f"{str(e)}: SSH string must have the following format: '<username>@<host>:<port>', not '{string}'.")
+
 	def command(self,
 	            args: typing.Optional[typing.List[str]] = None,
 	            sshArgs: typing.Optional[typing.List[str]] = None,
