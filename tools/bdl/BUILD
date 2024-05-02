@@ -26,6 +26,7 @@ py_library(
     deps = [
         "@bzd_python//bzd/parser",
         "@bzd_python//bzd/utils:decorators",
+        "@bzd_python//bzd/utils:match",
         "@bzd_python//bzd/validation",
     ],
 )

@@ -4,6 +4,7 @@ from pathlib import Path
 from bzd.parser.error import Error, Result
 from bzd.parser.element import Element, SequenceBuilder
 from bzd.parser.context import Context
+from bzd.utils.match import sortMatchingWeight
 
 from tools.bdl.visitor import Visitor, Group, NestedSequence
 from tools.bdl.builtins import Builtins
@@ -146,7 +147,7 @@ class Resolver:
 					fqn = potentialFQN
 					break
 			if fqn is None:
-				ending = self.symbols._terminateErrorMessageSimilarFQN(fqn=nextName)
+				ending = self.symbols._terminateErrorMessageSimilarFQN(fqn=name)
 				return ResolveFQNResult.makeError(
 				    f"Symbol '{nextName}' from '{name}' in namespace '{'.'.join(self.namespace)}' could not be resolved{ending}"
 				    if self.namespace else f"Symbol '{nextName}' from '{name}' could not be resolved{ending}")
@@ -422,15 +423,18 @@ class SymbolMap:
 		"""Find a related FQN that has similar name that the one in argument."""
 
 		all_fqns = [k for k in [*self.map.keys(), *self.builtins.keys()] if not k.endswith("~")]
-		similar = [f for f in all_fqns if fqn in f]
-		similar.sort()
+		similar = sortMatchingWeight(fqn, all_fqns)
 		return similar if len(similar) <= 5 else [*similar[:5], "..."]
 
 	def _terminateErrorMessageSimilarFQN(self, fqn: str) -> str:
 		"""Create a string to be added to terminate an error message."""
 
 		similar = self.similarFQN(fqn=fqn)
-		return f", did you mean {', '.join(similar)}?" if similar else "."
+		if len(similar) == 1:
+			return f", did you mean {similar[0]}."
+		elif len(similar) > 1:
+			return f", did you mean:\n" + "\n".join([f"\t- {w}" for w in similar])
+		return "."
 
 	def getEntityResolved(self, fqn: str, exclude: typing.Optional[typing.List[Group]] = None) -> Result[EntityType]:
 		"""
