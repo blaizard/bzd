@@ -11,6 +11,16 @@ py_test(
 )
 
 py_test(
+    name = "match",
+    srcs = ["match_test.py"],
+    main = "match_test.py",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@bzd_python//bzd/utils:match",
+    ],
+)
+
+py_test(
     name = "run",
     srcs = ["run_test.py"],
     main = "run_test.py",

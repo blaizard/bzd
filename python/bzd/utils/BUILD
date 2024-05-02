@@ -55,6 +55,12 @@ py_library(
 )
 
 py_library(
+    name = "match",
+    srcs = ["match.py"],
+    visibility = ["//visibility:public"],
+)
+
+py_library(
     name = "result",
     srcs = ["result.py"],
     visibility = ["//visibility:public"],

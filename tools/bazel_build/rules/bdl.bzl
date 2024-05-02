@@ -684,39 +684,47 @@ def bdl_target_platform(name, target, platform, visibility = None, tags = None):
         tags = tags,
     )
 
-def _bdl_application_impl(ctx):
-    namespace = ".".join(ctx.label.package.split("/") + [ctx.label.name])
+def bdl_application_factory_impl(ctx, bdl, namespace):
     oci_directory = ctx.attr.target[DefaultInfo].files.to_list()[0]
-    bdl = ctx.actions.declare_file(ctx.label.name + ".bdl")
     ctx.actions.write(
         output = bdl,
         content = """
-namespace {namespace};
-oci_directory = String("{oci_directory}");
-""".format(
+    namespace {namespace};
+    image = String("{oci_directory}");
+    """.format(
             namespace = namespace,
             oci_directory = oci_directory.short_path,
         ),
     )
 
-    bdl_provider, _ = _precompile_bdl(ctx, srcs = [bdl], deps = [])
-
-    return [bdl_provider, DefaultInfo(runfiles = ctx.runfiles(
+    return [DefaultInfo(runfiles = ctx.runfiles(
         files = ctx.attr.target[DefaultInfo].files.to_list(),
     ))]
 
-bdl_application = rule(
-    implementation = _bdl_application_impl,
-    doc = "Wrapper for an application and add bdl information.",
-    attrs = {
-        "target": attr.label(
-            mandatory = True,
-            doc = "The target associated with this application.",
-        ),
-        "_bdl": attr.label(
-            default = Label("//tools/bdl"),
-            cfg = "exec",
-            executable = True,
-        ),
-    },
-)
+def bdl_application_factory(implementation):
+    def _bdl_application_factory_impl(ctx):
+        bdl = ctx.actions.declare_file(ctx.label.name + ".bdl")
+        namespace = ".".join(ctx.label.package.split("/") + [ctx.label.name])
+        providers = implementation(ctx, bdl, namespace)
+
+        bdl_provider, _ = _precompile_bdl(ctx, srcs = [bdl], deps = [])
+
+        return [bdl_provider] + providers
+
+    return rule(
+        implementation = _bdl_application_factory_impl,
+        doc = "Wrapper for an application and add bdl information.",
+        attrs = {
+            "target": attr.label(
+                mandatory = True,
+                doc = "The target associated with this application.",
+            ),
+            "_bdl": attr.label(
+                default = Label("//tools/bdl"),
+                cfg = "exec",
+                executable = True,
+            ),
+        },
+    )
+
+bdl_application_oci = bdl_application_factory(bdl_application_factory_impl)

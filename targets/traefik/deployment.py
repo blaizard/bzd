@@ -55,9 +55,10 @@ if __name__ == "__main__":
 
 	data = json.loads(args.json.read_text())
 	ast = Ast(data)
+	accessor = Getter(ast)
 
 	template = Template.fromPath(pathlib.Path(__file__).parent / "docker_compose.yml.btl")
-	content = template.render(Getter(ast))
+	content = template.render(accessor)
 
 	# This script should:
 	# 1. Connect to the client and make sure a registry is running, if not, run it.
@@ -67,21 +68,25 @@ if __name__ == "__main__":
 	# 5. run
 	# See: https://stackoverflow.com/questions/31575546/docker-image-push-over-ssh-distributed
 
-	print(content)
-
 	ssh = SSH.fromString(args.deploy)
-	"""
+
+	print(f"Copying {args.directory}/docker-compose.yml")
 	ssh.command(["mkdir", "-p", args.directory])
 	ssh.copyContent(content, f"{args.directory}/docker-compose.yml")
+	print(f"Starting docker registry")
 	ssh.command(["docker", "compose", "-f", f"{args.directory}/docker-compose.yml", "up", "-d", "registry"])
-	"""
-
-	ociPush("--help", "ssa", stdout=True, stderr=True)
 
 	with ssh.forwardPort(55555, waitHTTP=f"http://localhost:55555/v2/"):
-		# Push the images...
-		# docker push localhost:55555/image:latest
-		print("FORWARD!")
-		time.sleep(1)
+		for docker in accessor.dockers:
+			print(f"Pushing {docker.image}...")
+			ociPush(docker.image, f"localhost:55555/{docker.image}", stdout=True, stderr=True, timeoutS=600)
+
+	print(f"Pulling new images...")
+	ssh.command(["docker", "compose", "-f", f"{args.directory}/docker-compose.yml", "pull"],
+	            stdout=True,
+	            stderr=True,
+	            timeoutS=600)
+	print(f"Restarting containers...")
+	ssh.command(["docker", "compose", "-f", f"{args.directory}/docker-compose.yml", "up", "-d"])
 
 	sys.exit(0)
