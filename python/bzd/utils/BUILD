@@ -21,6 +21,7 @@ py_library(
         ":run",
         "//bzd:bin",
         "//bzd/http:client",
+        requirement("paramiko"),
     ],
 )
 
