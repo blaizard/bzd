@@ -7,7 +7,7 @@ from pathlib import Path
 import selectors
 
 
-class _ExecuteResultStreamWriter:
+class ExecuteResultStreamWriter:
 
 	def __init__(
 	    self,
@@ -48,9 +48,9 @@ class _ExecuteResultStreamWriter:
 class ExecuteResult:
 
 	def __init__(
-	        self,
-	        stream: _ExecuteResultStreamWriter = _ExecuteResultStreamWriter(),
-	        returncode: int = 1,
+	    self,
+	    stream: ExecuteResultStreamWriter,
+	    returncode: int = 1,
 	) -> None:
 		self.output = stream.output
 		self.returncode = returncode
@@ -72,6 +72,9 @@ class ExecuteResult:
 
 	def isFailure(self) -> bool:
 		return self.returncode != 0
+
+	def __repr__(self) -> str:
+		return f"==== return code: {self.getReturnCode()}, output:\n" + self.getOutput()
 
 
 class _NoopTimer:
@@ -113,7 +116,7 @@ def localCommand(
     """
 
 	sel = selectors.DefaultSelector()
-	stream = _ExecuteResultStreamWriter(stdout, stderr, maxOutputSize)
+	stream = ExecuteResultStreamWriter(stdout, stderr, maxOutputSize)
 	proc = subprocess.Popen(
 	    cmds,
 	    cwd=cwd,
