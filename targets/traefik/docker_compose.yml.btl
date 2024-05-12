@@ -5,7 +5,7 @@ services:
         image: "registry"
         container_name: "registry"
         ports:
-            - 55555:5000
+            - {{ port }}:5000
         volumes:
             - ./registry:/var/lib/registry:rw
 
@@ -52,7 +52,7 @@ services:
 
     {% for docker in dockers %}
     {{ hostToName(docker.host) }}:
-        image: "localhost:55555/{{ docker.image }}"
+        image: "localhost:{{ port }}/{{ docker.image }}"
         container_name: "{{ hostToName(docker.host) }}"
         labels:
             traefik.enable: "true"
