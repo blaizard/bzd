@@ -50,6 +50,7 @@ if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Traefik deployment.")
 	parser.add_argument("--json", type=pathlib.Path, help="Path of the manifest.")
 	parser.add_argument("--directory", default="bzd-deployment-traefik", help="The name of the directory to be used.")
+	parser.add_argument("--registry-port", type=int, default=55555, help="Port for the registry.")
 	parser.add_argument("deploy", type=str, help="Location where to deploy the target.")
 	args = parser.parse_args()
 
@@ -58,21 +59,25 @@ if __name__ == "__main__":
 	accessor = Getter(ast)
 
 	template = Template.fromPath(pathlib.Path(__file__).parent / "docker_compose.yml.btl")
-	content = template.render(accessor)
+	content = template.render(accessor, {"port": args.registry_port})
 
 	ssh = SSH.fromString(args.deploy)
 
 	with ssh.interactive() as handle:
 		print(f"Copying '{args.directory}/docker-compose.yml'.")
 		handle.command(["mkdir", "-p", args.directory])
-		handle.copyContent(content, f"{args.directory}/docker-compose.yml")
+		handle.uploadContent(content, f"{args.directory}/docker-compose.yml")
 		print(f"Starting docker registry.")
 		handle.command(["docker", "compose", "-f", f"{args.directory}/docker-compose.yml", "up", "-d", "registry"])
 
-		with ssh.forwardPort(55555, waitHTTP=f"http://localhost:55555/v2/"):
+		with ssh.forwardPort(args.registry_port, waitHTTP=f"http://localhost:{args.registry_port}/v2/"):
 			for docker in accessor.dockers:
 				print(f"Pushing {docker.image}...")
-				ociPush(docker.image, f"localhost:55555/{docker.image}", stdout=True, stderr=True, timeoutS=600)
+				ociPush(docker.image,
+				        f"localhost:{args.registry_port}/{docker.image}",
+				        stdout=True,
+				        stderr=True,
+				        timeoutS=600)
 
 		print(f"Pulling new images.")
 		handle.command(["docker", "compose", "-f", f"{args.directory}/docker-compose.yml", "pull"])

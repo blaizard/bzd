@@ -52,15 +52,15 @@ class _SSHInteractiveHandle:
 
 		return result
 
-	def copyContent(self, content: str, destination: pathlib.Path) -> None:
+	def uploadContent(self, content: str, destination: pathlib.Path) -> None:
 		"""Copy the content of a file to the remote."""
 
 		with tempfile.NamedTemporaryFile() as f:
 			f.write(content.encode())
 			f.flush()
-			self.copy(f.name, destination)
+			self.upload(f.name, destination)
 
-	def copy(self, source: pathlib.Path, destination: pathlib.Path) -> None:
+	def upload(self, source: pathlib.Path, destination: pathlib.Path) -> None:
 		"""Copy a file to the remote."""
 
 		client = self.transport.open_sftp_client()
@@ -146,15 +146,15 @@ class SSH:
 		    sshArgs or []) + ["-p", str(self.port), "-o", "LogLevel=ERROR", f"{self.username}@{self.host}"]
 		return localCommand(command + (args or []), **kwargs)
 
-	def copyContent(self, content: str, destination: pathlib.Path) -> None:
+	def uploadContent(self, content: str, destination: pathlib.Path) -> None:
 		"""Copy the content of a file to the remote."""
 
 		with tempfile.NamedTemporaryFile() as f:
 			f.write(content.encode())
 			f.flush()
-			self.copy(f.name, destination)
+			self.upload(f.name, destination)
 
-	def copy(self, source: pathlib.Path, destination: pathlib.Path) -> None:
+	def upload(self, source: pathlib.Path, destination: pathlib.Path) -> None:
 		"""Copy a file to the remote."""
 
 		command = [scp] + self.commonCommands + [
