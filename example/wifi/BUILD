@@ -1,4 +1,4 @@
-load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_binary")
+load("//cc/bdl:cc.bzl", "bzd_cc_binary")
 
 bzd_cc_binary(
     name = "wifi",

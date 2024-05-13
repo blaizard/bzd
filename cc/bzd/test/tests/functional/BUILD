@@ -1,5 +1,5 @@
 load("@rules_python//python:defs.bzl", "py_test")
-load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_test")
+load("//cc/bdl:cc.bzl", "bzd_cc_test")
 
 bzd_cc_test(
     name = "failure",

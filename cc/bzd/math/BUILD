@@ -1,5 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
-load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_library")
+load("//cc/bdl:cc.bzl", "bzd_cc_library")
 
 bzd_cc_library(
     name = "math",

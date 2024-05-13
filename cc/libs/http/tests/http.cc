@@ -1,8 +1,8 @@
 #include "cc/libs/http/http.hh"
 
+#include "cc/bdl/generator/impl/adapter/context.hh"
 #include "cc/bzd/test/test.hh"
 #include "cc/components/generic/network/tcp/client.hh"
-#include "tools/bdl/generators/cc/adapter/context.hh"
 
 namespace bzd::http {
 

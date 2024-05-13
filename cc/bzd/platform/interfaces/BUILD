@@ -9,9 +9,9 @@ cc_library(
         "//interfaces:__pkg__",
     ],
     deps = [
+        "//cc/bdl/generator/impl/adapter:types",
         "//cc/bzd/core:units",
         "//cc/bzd/core/async",
-        "//tools/bdl/generators/cc/adapter:types",
     ],
 )
 
@@ -24,8 +24,8 @@ cc_library(
         "//interfaces:__pkg__",
     ],
     deps = [
+        "//cc/bdl/generator/impl/adapter:types",
         "//cc/bzd/container:string_view",
-        "//tools/bdl/generators/cc/adapter:types",
     ],
 )
 
@@ -38,8 +38,8 @@ cc_library(
         "//interfaces:__pkg__",
     ],
     deps = [
+        "//cc/bdl/generator/impl/adapter:types",
         "//cc/bzd/core/async",
-        "//tools/bdl/generators/cc/adapter:types",
     ],
 )
 
@@ -52,9 +52,9 @@ cc_library(
         "//interfaces:__pkg__",
     ],
     deps = [
+        "//cc/bdl/generator/impl/adapter:types",
         "//cc/bzd/container:string_view",
         "//cc/bzd/core/async",
-        "//tools/bdl/generators/cc/adapter:types",
     ],
 )
 
@@ -67,8 +67,8 @@ cc_library(
         "//interfaces:__pkg__",
     ],
     deps = [
+        "//cc/bdl/generator/impl/adapter:types",
         "//cc/bzd/core:units",
         "//cc/bzd/core/async",
-        "//tools/bdl/generators/cc/adapter:types",
     ],
 )
