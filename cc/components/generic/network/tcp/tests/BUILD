@@ -1,4 +1,4 @@
-load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_test")
+load("//cc/bdl:cc.bzl", "bzd_cc_test")
 
 bzd_cc_test(
     name = "tests",
@@ -7,8 +7,8 @@ bzd_cc_test(
     ],
     deps = [
         "//cc:bzd",
+        "//cc/bdl/generator/impl/adapter:context",
         "//cc/bzd/test",
         "//cc/components/generic/network/tcp:client",
-        "//tools/bdl/generators/cc/adapter:context",
     ],
 )

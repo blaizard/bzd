@@ -1,4 +1,4 @@
-{#- Re-usable macros -#}
+{#- Reusable macros -#}
 {%- include "cc/bdl/generator/impl/template/declarations.h.btl" -%}
 
 {#- Contract assertion -#}
@@ -20,7 +20,7 @@ assert(value <= {{ contract.value }});
 
 #include <cassert>
 
-#include "tools/bdl/generators/cc/adapter/types.hh"
+#include "cc/bdl/generator/impl/adapter/types.hh"
 
 // **** Dependencies ****
 {% for taregt, includes in data.cc.includes %}

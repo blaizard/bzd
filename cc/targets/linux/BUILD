@@ -1,5 +1,5 @@
+load("@bzd_bdl//:defs.bzl", "bdl_target", "bdl_target_platform")
 load("@rules_cc//cc:defs.bzl", "cc_library")
-load("//tools/bazel_build/rules:bdl.bzl", "bdl_target", "bdl_target_platform")
 
 filegroup(
     name = "composition",

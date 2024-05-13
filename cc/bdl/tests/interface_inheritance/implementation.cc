@@ -1,5 +1,5 @@
+#include "cc/bdl/tests/interface_inheritance/interface.hh"
 #include "cc/bzd/test/test.hh"
-#include "tools/bdl/generators/tests/interface_inheritance/interface.hh"
 
 namespace bzd::test {
 

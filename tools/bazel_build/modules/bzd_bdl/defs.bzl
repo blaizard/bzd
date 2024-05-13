@@ -1,8 +1,8 @@
 """BDL rules."""
 
 load("@bazel_skylib//lib:sets.bzl", "sets")
+load("@bdl_extension//:extensions.bzl", "extensions")
 load("@bzd_package//:defs.bzl", "BzdPackageMetadataFragmentInfo")
-load("@bdl_extension//:extensions.bzl", extensions = "extensions")
 load("//extensions:json.bzl", extension_json = "extension")
 
 # ---- Extensions ----
@@ -514,13 +514,13 @@ def _bzd_binary_generic(is_test):
                 doc = "The name of the target.",
             ),
             "_allowlist_function_transition": attr.label(
-                default = "@bazel_tools//tools/allowlists/function_transition_allowlist",
+                default = Label("@bazel_tools//tools/allowlists/function_transition_allowlist"),
             ),
             "_debug": attr.label(
-                default = "//tools/bazel_build/settings/debug",
+                default = Label("@@//tools/bazel_build/settings/debug"),
             ),
             "_executor": attr.label(
-                default = "//tools/bazel_build/settings/executor",
+                default = Label("@@//tools/bazel_build/settings/executor"),
             ),
             "_map_analyzer_script": attr.label(
                 executable = True,

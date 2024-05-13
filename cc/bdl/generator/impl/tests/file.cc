@@ -1,5 +1,5 @@
+#include "cc/bdl/generator/impl/tests/manifest.hh"
 #include "cc/bzd/test/test.hh"
-#include "tools/bdl/generators/cc/tests/manifest.hh"
 
 TEST(File, Compile)
 {

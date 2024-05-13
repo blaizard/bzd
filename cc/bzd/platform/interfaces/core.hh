@@ -1,7 +1,7 @@
 #pragma once
 
+#include "cc/bdl/generator/impl/adapter/types.hh"
 #include "cc/bzd/platform/types.hh"
-#include "tools/bdl/generators/cc/adapter/types.hh"
 
 namespace bzd {
 

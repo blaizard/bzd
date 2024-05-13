@@ -1,7 +1,7 @@
+load("@bzd_bdl//:defs.bzl", "bdl_library")
 load("@bzd_package//:defs.bzl", "bzd_package")
 load("@rules_cc//cc:defs.bzl", "cc_library")
-load("//tools/bazel_build/rules:bdl.bzl", "bdl_library")
-load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_binary")
+load("//cc/bdl:cc.bzl", "bzd_cc_binary")
 
 bdl_library(
     name = "composition",

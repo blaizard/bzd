@@ -2,10 +2,12 @@ import unittest
 import typing
 from functools import cached_property
 
-from tools.bdl.object import Object, ObjectContext
-from tools.bdl.generators.cc.visitor import Transform
 from bzd.template.template import Template
-from tools.bdl.visitors.composition.visitor import Composition
+
+from bdl.object import Object, ObjectContext
+from bdl.visitors.composition.visitor import Composition
+
+from cc.bdl.generator.impl.visitor import Transform
 
 
 class TestRun(unittest.TestCase):
@@ -46,7 +48,7 @@ class TestRun(unittest.TestCase):
 
 	def render(self, template: str) -> str:
 		composition = self.composition.view(target="default")
-		return Template("""{%- include "tools/bdl/generators/cc/template/declarations.h.btl" -%}""" + template).render(
+		return Template("""{%- include "cc/bdl/generator/impl/template/declarations.h.btl" -%}""" + template).render(
 		    composition, Transform(composition=composition))
 
 	def testSymbolToStr(self) -> None:

@@ -1,6 +1,6 @@
+load("@bzd_bdl//:defs.bzl", "bdl_library")
 load("@rules_python//python:defs.bzl", "py_test")
-load("//tools/bazel_build/rules:bdl.bzl", "bdl_library")
-load("//tools/bazel_build/rules:cc.bzl", "bzd_cc_test")
+load("//cc/bdl:cc.bzl", "bzd_cc_test")
 
 bdl_library(
     name = "interface",

@@ -1,6 +1,6 @@
+load("@bzd_bdl//:defs.bzl", "bdl_library")
 load("@rules_cc//cc:defs.bzl", "cc_library")
-load("//:defs.bzl", "bdl_library")
-load("//:cc.bzl", "bzd_cc_test")
+load("//cc/bdl:cc.bzl", "bzd_cc_test")
 
 bdl_library(
     name = "interface",
@@ -18,8 +18,8 @@ cc_library(
         "interface_cc.hh",
     ],
     deps = [
+        "//cc/bdl/generator/impl/adapter:types",
         "//cc/bzd/platform:types",
-        "//bdl/generators/cc/adapter:types",
     ],
 )
 
