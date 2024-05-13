@@ -119,7 +119,7 @@ extension = {
         "binary": {
             "build": _binary_build,
             "metadata": [
-                Label("//tools/bazel_build/rules/assets/cc:metadata_json"),
+                Label("//cc/bdl/assets:metadata_json"),
             ],
         },
         "composition": {

@@ -8,7 +8,7 @@ import dataclasses
 import os
 import time
 
-from tools.bdl.generators.json.ast.ast import Ast, Parameters
+from bdl.generators.json.ast.ast import Ast, Parameters
 from bzd.template.template import Template
 from bzd.utils.ssh import SSH
 from bzd_oci.run import ociPush

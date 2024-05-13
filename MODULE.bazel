@@ -14,7 +14,6 @@ bazel_dep(name = "bzd_sanitizer", version = "1.0")
 bazel_dep(name = "bzd_package", version = "1.0")
 bazel_dep(name = "bzd_bundle", version = "1.0")
 bazel_dep(name = "bzd_rules_oci", version = "1.0")
-bazel_dep(name = "bzd_rules_bdl", version = "1.0")
 bazel_dep(name = "bzd_python", version = "1.0")
 bazel_dep(name = "platforms", version = "0.0.8")
 bazel_dep(name = "rules_python", version = "0.27.1")
@@ -33,7 +32,6 @@ bazel_dep(name = "rules_pkg", version = "0.9.1")
     "bzd_rules_doc",
     "bzd_toolchain_cc",
     "bzd_rules_nodejs",
-    "bzd_rules_bdl",
     "bzd_rules_oci",
     "bzd_bundle",
     "bzd_platforms",
