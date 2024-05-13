@@ -1,0 +1,6 @@
+namespace a;
+
+struct Hello {
+    value1 = Integer(1);
+    value2 = String;
+}
