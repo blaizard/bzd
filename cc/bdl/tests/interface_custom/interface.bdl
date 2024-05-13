@@ -1,0 +1,6 @@
+
+namespace bzd.test;
+
+extern interface MyInterface;
+
+
