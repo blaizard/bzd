@@ -7,6 +7,7 @@ def _target_to_py_module(target):
 def _bdl_extension_impl(module_ctx):
     extensions = {}
     deps = sets.make()
+    deps_extensions = []
     extensions_content = ""
     py_content_imports = ""
     py_formatters = []
@@ -34,15 +35,27 @@ def _bdl_extension_impl(module_ctx):
                 target = register.extension,
                 name = register.name
             )
+            deps_extensions.append(register.extension)
 
     extensions_content += """extensions = {}\n""".format(" | ".join(extensions.keys()))
-
-    print(py_content_imports)
 
     generate_repository(
         name = "bdl_extension",
         files = {
             "BUILD": """
+load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+
+bzl_library(
+    name = "extensions",
+    srcs = [
+        "extensions.bzl",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        {deps_extensions}
+    ],
+)
+
 py_library(
     name = "bdl_extension",
     srcs = ["bdl_extension.py"],
@@ -52,6 +65,7 @@ py_library(
     ]
 )
 """.format(
+    deps_extensions = ",\n".join(["\"" + str(e) + "\"" for e in deps_extensions]),
     deps = ",\n".join(["\"" + str(e) + "\"" for e in sets.to_list(deps)])
 ),
             "extensions.bzl": extensions_content,

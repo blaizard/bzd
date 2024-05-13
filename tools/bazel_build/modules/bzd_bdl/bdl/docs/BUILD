@@ -12,7 +12,7 @@ doc_library(
         ("Gateway", "gateway.md"),
         ("System", "system.md"),
     ],
-    visibility = ["//docs:__pkg__"],
+    visibility = ["//visibility:public"],
 )
 
 doc_library(

@@ -1,5 +1,5 @@
 load("@rules_python//python:defs.bzl", "py_binary")
-load("//tools/bazel_build/rules:bdl.bzl", "bdl_library", "bdl_target")
+load("@bzd_bdl//:defs.bzl", "bdl_library", "bdl_target")
 
 py_binary(
     name = "deployment",
@@ -8,7 +8,7 @@ py_binary(
         "docker_compose.yml.btl",
     ],
     deps = [
-        "//tools/bdl/generators/json/ast",
+        "@bzd_bdl//bdl/generators/json/ast",
         "@bzd_python//bzd/template",
         "@bzd_python//bzd/utils:ssh",
         "@bzd_rules_oci//python/bzd_oci:run",
