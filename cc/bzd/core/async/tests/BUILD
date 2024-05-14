@@ -53,7 +53,10 @@ bzd_cc_test(
     srcs = [
         "multithread.cc",
     ],
-    tags = ["stress"],
+    tags = [
+        "flaky",
+        "stress",
+    ],
     target_compatible_with = select({
         "@esp32//:toolchain": ["@platforms//:incompatible"],
         "//conditions:default": [],

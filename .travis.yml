@@ -17,25 +17,20 @@ jobs:
               - cp tools/ci/travis/.bazelrc.local .bazelrc.local
               - ./info.sh
 
-        - name: "[normal] python"
+        - name: "[normal] static analysis"
           script:
               - cp tools/ci/travis/.bazelrc.local .bazelrc.local
-              - ./tools/bazel test @bzd_python//... --output_groups=+metadata --config=prod --platform_suffix=python
-
-        - name: "[normal] clang-tidy"
-          script:
-              - cp tools/ci/travis/.bazelrc.local .bazelrc.local
-              - ./tools/bazel test ... --output_groups=+metadata --config=dev --config=clang-tidy --platform_suffix=clang-tidy
+              - ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=dev --config=clang-tidy --platform_suffix=clang-tidy
 
         - name: "[normal] clang prod"
           script:
               - cp tools/ci/travis/.bazelrc.local .bazelrc.local
-              - ./tools/bazel test ... --output_groups=+metadata --config=clang --config=prod --config=cc --platform_suffix=clang-prod
+              - ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=clang --config=prod --config=cc --platform_suffix=clang-prod
 
         - name: "[normal] gcc prod"
           script:
               - cp tools/ci/travis/.bazelrc.local .bazelrc.local
-              - ./tools/bazel test ... --output_groups=+metadata --config=gcc --config=prod --config=cc --platform_suffix=gcc-prod
+              - ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=gcc --config=prod --config=cc --platform_suffix=gcc-prod
 
         - name: "[sanitizer] sanitizer"
           script:

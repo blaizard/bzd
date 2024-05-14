@@ -39,67 +39,60 @@ pipeline
 		{
 			parallel
 			{
-				stage("[normal] python")
+				stage("[normal] static analysis")
 				{
 					steps
 					{
-						sh "./tools/bazel test @bzd_python//... --output_groups=+metadata --config=prod --platform_suffix=python"
-					}
-				}
-				stage("[normal] clang-tidy")
-				{
-					steps
-					{
-						sh "./tools/bazel test ... --output_groups=+metadata --config=dev --config=clang-tidy --platform_suffix=clang-tidy"
+						sh "./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=dev --config=clang-tidy --platform_suffix=clang-tidy"
 					}
 				}
 				stage("[normal] clang prod")
 				{
 					steps
 					{
-						sh "./tools/bazel test ... --output_groups=+metadata --config=clang --config=prod --config=cc --platform_suffix=clang-prod"
+						sh "./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=clang --config=prod --config=cc --platform_suffix=clang-prod"
 					}
 				}
 				stage("[normal] gcc prod")
 				{
 					steps
 					{
-						sh "./tools/bazel test ... --output_groups=+metadata --config=gcc --config=prod --config=cc --platform_suffix=gcc-prod"
+						sh "./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=gcc --config=prod --config=cc --platform_suffix=gcc-prod"
 					}
 				}
 				stage("[normal] esp32 prod")
 				{
 					steps
 					{
-						sh "./tools/bazel test ... --output_groups=+metadata --config=esp32 --config=prod --config=cc --platform_suffix=esp32-prod"
+						sh "./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=esp32 --config=prod --config=cc --platform_suffix=esp32-prod"
 					}
 				}
 				stage("[stress] dev (10 runs)")
 				{
 					steps
 					{
-						sh "./tools/bazel test ... --build_tests_only --test_tag_filters=stress,-cc-coverage --config=dev --runs_per_test=10 --local_test_jobs=1 --platform_suffix=stress-dev"
+						sh "./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --build_tests_only --test_tag_filters=stress,-cc-coverage --config=dev --runs_per_test=10 --local_test_jobs=1 --platform_suffix=stress-dev"
 					}
 				}
 				stage("[stress] prod (10 runs)")
 				{
 					steps
 					{
-						sh "./tools/bazel test ... --build_tests_only --test_tag_filters=stress,-cc-coverage --config=prod --runs_per_test=10 --local_test_jobs=1 --platform_suffix=stress-prod"
+						sh "./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --build_tests_only --test_tag_filters=stress,-cc-coverage --config=prod --runs_per_test=10 --local_test_jobs=1 --platform_suffix=stress-prod"
 					}
 				}
 				stage("[sanitizer] asan/lsan/ubsan")
 				{
 					steps
 					{
-						sh "./tools/bazel test ... --config=clang --config=cc --config=sanitizer --config=asan --config=lsan --config=ubsan --platform_suffix=clang-asan-lsan-ubsan"
+						sh "./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --config=clang --config=cc --config=sanitizer --config=asan --config=lsan --config=ubsan --platform_suffix=clang-asan-lsan-ubsan"
 					}
 				}
 				stage("[sanitizer] tsan")
 				{
 					steps
 					{
-						sh "./tools/bazel test ... --config=clang --config=cc --config=sanitizer --config=tsan --platform_suffix=clang-tsan"
+						sh "./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --config=clang --config=cc --config=sanitizer --config=tsan --platform_suffix=clang-tsan"
 					}
 				}
 				stage("[coverage] NodeJs")

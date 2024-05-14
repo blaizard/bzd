@@ -2,18 +2,9 @@
     "stages": [
         {
             "commands": [
-                "./tools/bazel test @bzd_python//... --output_groups=+metadata --config=prod --platform_suffix=python"
+                "./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=dev --config=clang-tidy --platform_suffix=clang-tidy"
             ],
-            "name": "python",
-            "tags": [
-                "python"
-            ]
-        },
-        {
-            "commands": [
-                "./tools/bazel test ... --output_groups=+metadata --config=dev --config=clang-tidy --platform_suffix=clang-tidy"
-            ],
-            "name": "clang-tidy",
+            "name": "static analysis",
             "tags": [
                 "x86_64",
                 "clang"
@@ -21,7 +12,7 @@
         },
         {
             "commands": [
-                "./tools/bazel test ... --output_groups=+metadata --config=clang --config=prod --config=cc --platform_suffix=clang-prod"
+                "./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=clang --config=prod --config=cc --platform_suffix=clang-prod"
             ],
             "name": "clang prod",
             "tags": [
@@ -31,7 +22,7 @@
         },
         {
             "commands": [
-                "./tools/bazel test ... --output_groups=+metadata --config=gcc --config=prod --config=cc --platform_suffix=gcc-prod"
+                "./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=gcc --config=prod --config=cc --platform_suffix=gcc-prod"
             ],
             "name": "gcc prod",
             "tags": [
@@ -41,7 +32,7 @@
         },
         {
             "commands": [
-                "./tools/bazel test ... --output_groups=+metadata --config=esp32 --config=prod --config=cc --platform_suffix=esp32-prod"
+                "./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=esp32 --config=prod --config=cc --platform_suffix=esp32-prod"
             ],
             "name": "esp32 prod",
             "tags": [
@@ -52,7 +43,7 @@
         {
             "category": "stress",
             "commands": [
-                "./tools/bazel test ... --build_tests_only --test_tag_filters=stress,-cc-coverage --config=dev --runs_per_test={runs} --local_test_jobs=1 --platform_suffix=stress-dev"
+                "./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --build_tests_only --test_tag_filters=stress,-cc-coverage --config=dev --runs_per_test={runs} --local_test_jobs=1 --platform_suffix=stress-dev"
             ],
             "name": "dev ({runs} runs)",
             "tags": [
@@ -64,7 +55,7 @@
         {
             "category": "stress",
             "commands": [
-                "./tools/bazel test ... --build_tests_only --test_tag_filters=stress,-cc-coverage --config=prod --runs_per_test={runs} --local_test_jobs=1 --platform_suffix=stress-prod"
+                "./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --build_tests_only --test_tag_filters=stress,-cc-coverage --config=prod --runs_per_test={runs} --local_test_jobs=1 --platform_suffix=stress-prod"
             ],
             "name": "prod ({runs} runs)",
             "tags": [
@@ -76,7 +67,7 @@
         {
             "category": "sanitizer",
             "commands": [
-                "./tools/bazel test ... --config=clang --config=cc --config=sanitizer --config=asan --config=lsan --config=ubsan --platform_suffix=clang-asan-lsan-ubsan"
+                "./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --config=clang --config=cc --config=sanitizer --config=asan --config=lsan --config=ubsan --platform_suffix=clang-asan-lsan-ubsan"
             ],
             "name": "asan/lsan/ubsan",
             "tags": [
@@ -88,7 +79,7 @@
         {
             "category": "sanitizer",
             "commands": [
-                "./tools/bazel test ... --config=clang --config=cc --config=sanitizer --config=tsan --platform_suffix=clang-tsan"
+                "./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --config=clang --config=cc --config=sanitizer --config=tsan --platform_suffix=clang-tsan"
             ],
             "name": "tsan",
             "tags": [
