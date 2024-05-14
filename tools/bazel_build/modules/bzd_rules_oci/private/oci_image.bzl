@@ -1,4 +1,4 @@
-"""NodeJs docker rule."""
+"""OCI image rule."""
 
 load("@bzd_lib//lib:attrs.bzl", "ATTRS_COMMON_BUILD_RULES", "attrs_assert_any_of")
 load("@rules_oci//oci:defs.bzl", "oci_image")

@@ -684,23 +684,6 @@ def bdl_target_platform(name, target, platform, visibility = None, tags = None):
         tags = tags,
     )
 
-def bdl_application_factory_impl(ctx, bdl, namespace):
-    oci_directory = ctx.attr.target[DefaultInfo].files.to_list()[0]
-    ctx.actions.write(
-        output = bdl,
-        content = """
-    namespace {namespace};
-    image = String("{oci_directory}");
-    """.format(
-            namespace = namespace,
-            oci_directory = oci_directory.short_path,
-        ),
-    )
-
-    return [DefaultInfo(runfiles = ctx.runfiles(
-        files = ctx.attr.target[DefaultInfo].files.to_list(),
-    ))]
-
 def bdl_application_factory(implementation):
     def _bdl_application_factory_impl(ctx):
         bdl = ctx.actions.declare_file(ctx.label.name + ".bdl")
@@ -726,5 +709,3 @@ def bdl_application_factory(implementation):
             ),
         },
     )
-
-bdl_application_oci = bdl_application_factory(bdl_application_factory_impl)
