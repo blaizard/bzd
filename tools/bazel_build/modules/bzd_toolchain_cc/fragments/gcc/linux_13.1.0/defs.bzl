@@ -55,7 +55,7 @@ def linux_x86_64(module_ctx, name):
             "/usr/include/x86_64-linux-gnu",
             "/usr/include",
         ],
-        "url": "http://data.blaizard.com/file/bzd/toolchains/cc/gcc/linux_x86_64/linux_x86_64_13.1.0.tar.xz",
+        "url": "https://data.blaizard.com/file/bzd/toolchains/cc/gcc/linux_x86_64/linux_x86_64_13.1.0.tar.xz",
     }
 
     toolchain_definition = toolchain_merge(toolchain_definition, linux(module_ctx, name))

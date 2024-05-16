@@ -115,6 +115,10 @@ might be needed for an ethernet-based gateway.
 This can be done via composition using the contract `override` to tell that this symbol is overriding an existing symbol.
 Not adding this contract will result into a symbol conflict and raise an error.
 
+Note, parameters are only overritable at composition stage. This information is passed top down to the component via its
+configuration. This is different form Bazel build settings mechanism for example where such variant is passed through the
+build tree and available at all stages of the build.
+
 ```bd
 // How it might be defined.
 composition gateway.ethernet {

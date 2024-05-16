@@ -11,7 +11,8 @@ bzd_config(
         "config.default.json",
     ],
     visibility = [
-        "//apps/accounts:__subpackages__",
+        "//deployment:__subpackages__",
+        ":__subpackages__",
     ],
 )
 
