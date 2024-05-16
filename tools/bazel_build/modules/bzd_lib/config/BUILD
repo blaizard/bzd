@@ -51,6 +51,12 @@ bzl_library(
     name = "defs",
     srcs = [
         "defs.bzl",
+        "private/common.bzl",
+        "private/config.bzl",
+        "private/config_override.bzl",
     ],
     visibility = ["//visibility:public"],
+    deps = [
+        "//lib:attrs",
+    ],
 )
