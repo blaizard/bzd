@@ -18,7 +18,7 @@ def esp32_qemu(_module_ctx):
             ],
             "sha256": "df996467865470dbf7c6a80b1d921ffe23eba7be477c165c41192b4343c42d21",
             "strip_prefix": "linux_x86_64_8.1.2",
-            "url": "http://data.blaizard.com/file/bzd/qemu/esp32/linux_x86_64_8.1.2.tar.xz",
+            "url": "https://data.blaizard.com/file/bzd/qemu/esp32/linux_x86_64_8.1.2.tar.xz",
         }],
         expose = {
             "qemu": "qemu",

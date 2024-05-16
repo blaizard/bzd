@@ -3,7 +3,7 @@
 load("@bzd_lib//lib:attrs.bzl", "ATTRS_COMMON_BUILD_RULES", "attrs_assert_any_of")
 load("@rules_oci//oci:defs.bzl", "oci_image")
 
-def bzd_oci_image(name, base = None, cmd = [], workdir = None, env = {}, tars = [], entrypoint = [], **kwargs):
+def bzd_oci_image(name, base = None, cmd = None, workdir = None, env = None, tars = None, entrypoint = None, **kwargs):
     """Build a container image.
 
     Args:
@@ -22,10 +22,10 @@ def bzd_oci_image(name, base = None, cmd = [], workdir = None, env = {}, tars = 
     oci_image(
         name = name,
         base = base,
-        cmd = cmd,
+        cmd = cmd or [],
         workdir = workdir,
-        env = env,
-        tars = tars,
-        entrypoint = entrypoint,
+        env = env or {},
+        tars = tars or [],
+        entrypoint = entrypoint or [],
         **kwargs
     )

@@ -11,6 +11,11 @@ exports_files(
     visibility = ["//config:__subpackages__"],
 )
 
+label_flag(
+    name = "override",
+    build_setting_default = ":empty",
+)
+
 py_binary(
     name = "merge",
     srcs = [

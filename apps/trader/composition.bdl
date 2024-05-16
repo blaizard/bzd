@@ -2,7 +2,6 @@ use "interfaces/tcp.bdl"
 
 namespace trader;
 
-
 component Trader {
 config:
 	out = {out};
@@ -17,7 +16,5 @@ interface:
 composition {
 	trader = Trader();
 	trader.run();
-	
+
 }
-
-

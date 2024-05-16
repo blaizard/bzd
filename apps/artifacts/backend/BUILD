@@ -6,6 +6,9 @@ bzd_config(
     srcs = [
         "config.default.json",
     ],
+    visibility = [
+        "//deployment:__subpackages__",
+    ],
 )
 
 bzd_nodejs_binary(
