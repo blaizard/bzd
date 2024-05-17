@@ -1,4 +1,14 @@
-namespace traefik;
+namespace docker;
 
 // Declare a docker image to be used via traefik.
-method docker(image = String [mandatory], host = String [mandatory], port = Integer [mandatory]);
+component Traefik {
+interface:
+    method add(image = String [mandatory], host = String [mandatory], port = Integer [mandatory]);
+}
+
+component Compose {
+config:
+    path = String;
+interface:
+    method image(service = String [mandatory], image = String [mandatory]);
+}

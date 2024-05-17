@@ -1,20 +1,11 @@
 version: "3.3"
 
 services:
-    registry:
-        image: "registry"
-        container_name: "registry"
-        ports:
-            - {{ port }}:5000
-        volumes:
-            - ./registry:/var/lib/registry:rw
-
     traefik:
-        image: "traefik:v2.10"
+        image: "traefik:v3.0"
         container_name: "traefik"
 
         command:
-            #- "--log.level=DEBUG"
             - "--providers.docker=true"
             - "--providers.docker.exposedbydefault=false"
             - "--entrypoints.web.address=:80"
@@ -23,7 +14,6 @@ services:
             - "--entrypoints.websecure.address=:443"
             - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
             - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
-            #- "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
             - "--certificatesresolvers.myresolver.acme.email=postmaster@blaizard.com"
             - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
 

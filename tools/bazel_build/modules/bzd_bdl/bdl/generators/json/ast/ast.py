@@ -51,6 +51,10 @@ class Context:
 		self.data = data
 
 	@property
+	def registry(self) -> typing.Dict[str, ExpressionEntry]:
+		return {fqn: ExpressionEntry(data) for fqn, data in self.data.get("registry", {}).items()}
+
+	@property
 	def workloads(self) -> typing.Iterator[ExpressionEntry]:
 		for workload in self.data.get("workloads", []):
 			yield ExpressionEntry(workload)
@@ -70,6 +74,13 @@ class Ast:
 	def contexts(self) -> typing.Iterator[Context]:
 		for context in self.data.get("contexts", []):
 			yield Context(context)
+
+	@property
+	def registry(self) -> typing.Dict[str, ExpressionEntry]:
+		output = {}
+		for context in self.contexts:
+			output |= context.registry
+		return output
 
 	@property
 	def workloads(self) -> typing.Iterator[ExpressionEntry]:
