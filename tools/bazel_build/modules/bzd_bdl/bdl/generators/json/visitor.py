@@ -28,6 +28,8 @@ def expressionToJson(expression: Expression) -> Json:
 	data = {}
 	if expression.isName:
 		data["name"] = expression.name
+	if expression.isName and expression.isFQN:
+		data["fqn"] = expression.fqn
 	if expression.isSymbol:
 		data["symbol"] = str(expression.symbol)
 	if expression.isLiteral:
@@ -39,13 +41,19 @@ def expressionToJson(expression: Expression) -> Json:
 	return data
 
 
+def expressionToFQN(expression: Expression) -> str:
+	assert expression.isFQN, f"Expression '{expression}' must have a FQN."
+	assert expression.isName, f"Expression '{expression}' must have a name."
+	return expression.fqn
+
+
 def expressionEntryToJson(entry: ExpressionEntry) -> Json:
 	return {
 	    "expression": expressionToJson(entry.expression),
-	    "init": [expressionEntryToJson(expression) for expression in entry.init],
-	    "intra": [expressionEntryToJson(expression) for expression in entry.intra],
-	    "shutdown": [expressionEntryToJson(expression) for expression in entry.shutdown],
-	    "deps": [expressionEntryToJson(expression) for expression in entry.deps],
+	    "init": [expressionToJson(expression) for expression in entry.init],
+	    "intra": [expressionToJson(expression) for expression in entry.intra],
+	    "shutdown": [expressionToJson(expression) for expression in entry.shutdown],
+	    "deps": [expressionToFQN(expression) for expression in entry.deps],
 	}
 
 
@@ -60,9 +68,13 @@ def compositionJson(
 		contexts = []
 
 		for index, context in enumerate(composition.contexts):
+			registry = {
+			    uid: expressionEntryToJson(registry)
+			    for uid, registry in composition.registry.get(context, {}).items()
+			}
 			workloads = [expressionEntryToJson(workload) for workload in composition.workloads.get(context, [])]
 			services = [expressionEntryToJson(service) for service in composition.services.get(context, [])]
-			contexts.append({"workloads": workloads, "services": services})
+			contexts.append({"registry": registry, "workloads": workloads, "services": services})
 
 		data = json.dumps({"contexts": contexts}, indent=4)
 		(output.parent / f"{output.name}.{target}.json").write_text(data)

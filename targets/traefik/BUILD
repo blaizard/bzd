@@ -1,11 +1,12 @@
-load("@rules_python//python:defs.bzl", "py_binary")
 load("@bzd_bdl//:defs.bzl", "bdl_library", "bdl_target")
+load("@rules_python//python:defs.bzl", "py_binary")
 
 py_binary(
     name = "deployment",
     srcs = ["deployment.py"],
     data = [
-        "docker_compose.yml.btl",
+        "registry.yml.btl",
+        "traefik.yml.btl",
     ],
     deps = [
         "@bzd_bdl//bdl/generators/json/ast",
