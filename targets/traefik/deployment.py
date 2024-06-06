@@ -7,6 +7,7 @@ import re
 import dataclasses
 import os
 import time
+import yaml
 
 from bdl.generators.json.ast.ast import Ast, Parameters, Expression
 from bzd.template.template import Template
@@ -19,10 +20,22 @@ class CommonParameters:
 	def __init__(self, port: int) -> None:
 		self.port = port
 
+	def imageResolve(self, image: str) -> str:
+		"""Convert an image name into its resolve url pointing to the registry."""
+		return f"localhost:{self.port}/{image}"
+
 	@staticmethod
 	def hostToName(host: str) -> str:
 		"""Convert a hostname into a sanitized name."""
 		return re.sub(r"[^a-zA-Z0-9]+", '_', host)
+
+	@staticmethod
+	def needsWWWRedirect(hostname: str) -> bool:
+		"""If the docker service needs to redirect the www.<hostname> to <hostname>.
+		
+		This is needed in case of a hostname with 2 parts <1>.<2> only.
+		"""
+		return len(hostname.split(".")) == 2
 
 
 def waitForTCP(url: str, retries: int = 20, delay: int = 1.0) -> None:
@@ -71,6 +84,11 @@ class Docker:
 		    if workload.expression.symbol == f"{fqn}.{interface}"
 		]
 
+	def getConfig(self, fqn: str) -> Parameters:
+		"""Gather object configuration."""
+
+		return self.ast.registry[fqn].expression.parameters
+
 
 class DockerTraefik(Docker):
 
@@ -93,7 +111,19 @@ class DockerCompose(Docker):
 
 	def makeDockerCompose(self, fqn: str, expression: Parameters) -> typing.Tuple[str, typing.Set[str]]:
 		dockers = self.getInterfaces(fqn, "image")
-		return "", set([docker.image for docker in dockers])
+		path = self.getConfig(fqn).path
+		content = pathlib.Path(path).read_text()
+
+		# Update the docker compose file with the images
+		data = yaml.safe_load(content)
+		for docker in dockers:
+			if docker.service in data["services"]:
+				data["services"][docker.service]["image"] = self.common.imageResolve(docker.image)
+			else:
+				raise KeyError(f"Service '{docker.service}' is not present in '{path}'.")
+		content = yaml.dump(data)
+
+		return content, set([docker.image for docker in dockers])
 
 
 if __name__ == "__main__":
@@ -115,7 +145,7 @@ if __name__ == "__main__":
 	# Generate docker compose content
 	traefikDockerCompose, traefikImages = DockerTraefik(ast=ast, common=common).makeDockerComposeForAllInstances()
 	composeDockerCompose, composeImages = DockerCompose(ast=ast, common=common).makeDockerComposeForAllInstances()
-	dockerCompose = traefikDockerCompose  #| composeDockerCompose
+	dockerCompose = traefikDockerCompose | composeDockerCompose
 	images = traefikImages | composeImages
 
 	ssh = SSH.fromString(args.transport)
@@ -138,7 +168,7 @@ if __name__ == "__main__":
 		print(f"Starting docker registry.")
 		handle.command(["docker", "compose", "-f", f"{args.directory}/docker-compose.yml", "up", "-d", "registry"])
 
-		# Updating images
+		# Push the new images
 		with ssh.forwardPort(args.registry_port, waitHTTP=f"http://localhost:{args.registry_port}/v2/"):
 			for image in images:
 				print(f"Pushing {image}...")

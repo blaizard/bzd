@@ -3,6 +3,11 @@ namespace docker;
 // Declare a docker image to be used via traefik.
 component Traefik {
 interface:
+    // Add a new docker image to be exposed via Traeifk proxy.
+    //
+    // \param image The docker image to be used.
+    // \param host The hostname to be used for this service.
+    // \param port The port exposed by this image to be served.
     method add(image = String [mandatory], host = String [mandatory], port = Integer [mandatory]);
 }
 

@@ -2,8 +2,9 @@ version: "3.3"
 
 services:
     traefik:
-        image: "traefik:v3.0"
-        container_name: "traefik"
+        image: traefik:v3.0
+        container_name: traefik
+        restart: unless-stopped
 
         command:
             - "--providers.docker=true"
@@ -16,6 +17,8 @@ services:
             - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
             - "--certificatesresolvers.myresolver.acme.email=postmaster@blaizard.com"
             - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+            - "--log.level=INFO"
+            - "--log.filePath=/logs/traefik.log"
 
         labels:
             traefik.enable: "true"
@@ -30,7 +33,10 @@ services:
             - "443:443"
 
         volumes:
+            - "/etc/timezone:/etc/timezone:ro"
+            - "/etc/localtime:/etc/localtime:ro"
             - "./letsencrypt:/letsencrypt"
+            - "./logs:/logs"
             - "/var/run/docker.sock:/var/run/docker.sock:ro"
 
         networks:
@@ -42,14 +48,19 @@ services:
 
     {% for docker in dockers %}
     {{ hostToName(docker.host) }}:
-        image: "localhost:{{ port }}/{{ docker.image }}"
+        image: "{{ docker.image | imageResolve }}"
         container_name: "{{ hostToName(docker.host) }}"
         labels:
             traefik.enable: "true"
+            {% if needsWWWRedirect(docker.host) %}
             traefik.http.routers.{{ hostToName(docker.host) }}.rule: Host(`{{ docker.host }}`) || Host(`www.{{ docker.host }}`)
-            traefik.http.routers.{{ hostToName(docker.host) }}.entrypoints: websecure
-            traefik.http.routers.{{ hostToName(docker.host) }}.tls.certresolver: myresolver
             traefik.http.routers.{{ hostToName(docker.host) }}.middlewares: redirect-www
+            {% else %}
+            traefik.http.routers.{{ hostToName(docker.host) }}.rule: Host(`{{ docker.host }}`)
+            {% end %}
+            traefik.http.routers.{{ hostToName(docker.host) }}.entrypoints: websecure
+            traefik.http.routers.{{ hostToName(docker.host) }}.tls: true
+            traefik.http.routers.{{ hostToName(docker.host) }}.tls.certresolver: myresolver
             traefik.http.services.{{ hostToName(docker.host) }}.loadbalancer.server.port: {{ docker.port }}
         networks:
             - traefik

@@ -5,3 +5,4 @@ pyserial
 typing_extensions
 psutil
 yfinance
+pyyaml
