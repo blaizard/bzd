@@ -46,6 +46,8 @@ pytz==2023.3.post1
     # via
     #   pandas
     #   yfinance
+pyyaml==6.0.1
+    # via -r tools/python/requirements.in
 requests==2.31.0
     # via yfinance
 six==1.16.0

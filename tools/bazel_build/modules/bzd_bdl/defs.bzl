@@ -460,7 +460,7 @@ def _bdl_binary_impl(ctx):
         if binary:
             binary_file = ctx.actions.declare_file(ctx.label.name + ".binary")
             runfiles = ctx.runfiles(
-                files = provider.get("files", {}).values(),
+                files = provider.get("files", {}).values() + ctx.files.data,
             ).merge(binary[DefaultInfo].default_runfiles)
             if "runfiles" in provider:
                 runfiles = runfiles.merge(provider["runfiles"])
@@ -496,6 +496,10 @@ def _bzd_binary_generic(is_test):
         implementation = _bdl_binary_impl,
         doc = """Create a binary from a system rule.""",
         attrs = {
+            "data": attr.label_list(
+                allow_files = True,
+                doc = "Files to be added to the runfiles.",
+            ),
             "platform": attr.label(
                 default = None,
                 doc = "The platform used for the transition of this rule.",
