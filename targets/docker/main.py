@@ -16,6 +16,7 @@ from bzd_oci.run import ociPush
 from targets.docker.deployment.compose import DockerCompose
 from targets.docker.deployment.traefik import DockerTraefik
 
+
 class CommonParameters:
 
 	def __init__(self, port: int) -> None:
@@ -37,6 +38,7 @@ class CommonParameters:
 		This is needed in case of a hostname with 2 parts <1>.<2> only.
 		"""
 		return len(hostname.split(".")) == 2
+
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Traefik deployment.")

@@ -5,6 +5,7 @@ from targets.docker.deployment.base import Docker
 from bdl.generators.json.ast.ast import Ast, Parameters
 from bzd.template.template import Template
 
+
 class DockerTraefik(Docker):
 
 	def __init__(self, ast: Ast, common: typing.Any) -> None:

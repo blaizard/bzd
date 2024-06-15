@@ -8,12 +8,12 @@ py_binary(
         "registry.yml.btl",
     ],
     deps = [
+        "//targets/docker/deployment:compose",
+        "//targets/docker/deployment:traefik",
         "@bzd_bdl//bdl/generators/json/ast",
         "@bzd_python//bzd/template",
         "@bzd_python//bzd/utils:ssh",
         "@bzd_rules_oci//python/bzd_oci:run",
-        "//targets/docker/deployment:compose",
-        "//targets/docker/deployment:traefik",
     ],
 )
 
