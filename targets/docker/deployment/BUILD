@@ -1,4 +1,5 @@
 load("@pip//:requirements.bzl", "requirement")
+load("@rules_python//python:defs.bzl", "py_library")
 
 py_library(
     name = "base",
@@ -7,7 +8,7 @@ py_library(
     ],
     deps = [
         "@bzd_bdl//bdl/generators/json/ast",
-    ]
+    ],
 )
 
 py_library(
@@ -19,7 +20,7 @@ py_library(
     deps = [
         ":base",
         requirement("pyyaml"),
-    ]
+    ],
 )
 
 py_library(
@@ -34,5 +35,5 @@ py_library(
     deps = [
         ":base",
         "@bzd_python//bzd/template",
-    ]
+    ],
 )

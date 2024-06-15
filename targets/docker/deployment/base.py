@@ -2,6 +2,7 @@ import typing
 
 from bdl.generators.json.ast.ast import Ast, Parameters
 
+
 class Docker:
 
 	def __init__(self, ast: Ast, symbol: str) -> None:
@@ -37,4 +38,3 @@ class Docker:
 		"""Gather object configuration."""
 
 		return self.ast.registry[fqn].expression.parameters
-
