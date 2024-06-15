@@ -1,21 +1,31 @@
 import argparse
 import pathlib
 import typing
+import re
 
-from bzd_sanitizer.worker import worker
+from bzd_sanitizer.worker import chunkWorker, OutputWithPath
 from bzd.utils.run import localBazelBinary
 
 
+def stdoutParser(stdout: str, workspace: pathlib.Path) -> typing.Iterable[OutputWithPath]:
+	"""Extract errors from the stdout."""
+
+	for line in stdout.split("\n"):
+		m = re.match(r"([^:]+):", line)
+		if m:
+			yield OutputWithPath(path=pathlib.Path(m.group(1)).relative_to(workspace), output=line)
+
+
 def workload(args: typing.Tuple[pathlib.Path, pathlib.Path, bool, str, str], stdout: typing.TextIO) -> bool:
-	workspace, path, check, codespell, config = args
+	workspace, paths, check, codespell, config = args
 
 	params = []
 	params += [] if check else ["--write-changes"]
-	params += ["--config", config] if check else []
+	params += ["--config", config] if config else []
 
 	result = localBazelBinary(
 	    codespell,
-	    args=params + [str(workspace / path)],
+	    args=params + [str(workspace / path) for path in paths],
 	    ignoreFailure=True,
 	    stdout=stdout,
 	    stderr=stdout,
@@ -35,8 +45,9 @@ if __name__ == "__main__":
 	parser.add_argument("context", type=pathlib.Path, help="The context file path.")
 	args = parser.parse_args()
 
-	worker(
+	chunkWorker(
 	    args.context,
 	    workload,
+	    stdoutParser=stdoutParser,
 	    args=[str(args.codespell), str(args.config)],
 	)
