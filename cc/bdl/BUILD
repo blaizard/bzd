@@ -13,8 +13,8 @@ bzl_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "@bzd_bdl//:defs",
         "@bazel_skylib//lib:sets",
+        "@bzd_bdl//:defs",
         "@bzd_toolchain_cc//cc:defs",
     ],
 )

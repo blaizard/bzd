@@ -244,7 +244,7 @@ class SymbolFragment(ExpressionFragment):
 
 	def _resolveAndValidateParameters(self, resolver: "Resolver", resolvedTypeEntity: Entity,
 	                                  parameters: Parameters) -> None:
-		"""Resolve and validate tthe parameters passed into argument."""
+		"""Resolve and validate the parameters passed into argument."""
 
 		# Make the resolved parameters before the validation is completed. This is because
 		# it might make use of the parametersResolved.

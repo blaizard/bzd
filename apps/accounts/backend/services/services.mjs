@@ -73,7 +73,7 @@ export default class Services {
 			result: null,
 		};
 
-		// Check the maximum number of logs for this enty.
+		// Check the maximum number of logs for this entry.
 		const maxLogs = object.options.maxLogs;
 		Exception.assert(typeof maxLogs == "number", "Maxlogs must be a number, instead: {}.", maxLogs);
 

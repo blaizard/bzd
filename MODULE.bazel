@@ -94,9 +94,9 @@ register_toolchains("@gcc//:all")
 bdl_extension = use_extension("@bzd_bdl//:extensions.bzl", "bdl_extension")
 bdl_extension.register(
     name = "cc",
+    composition = "//cc/bdl/generator:composition",
     extension = "//cc/bdl:extension.bzl",
     format = "//cc/bdl/generator:format",
-    composition = "//cc/bdl/generator:composition",
 )
 
 # NodeJs

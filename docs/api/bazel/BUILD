@@ -25,7 +25,7 @@ doc_library(
     name = "bazel",
     srcs = [
         "bdl.md",
-        "cc.md"
+        "cc.md",
     ],
     visibility = ["//docs:__pkg__"],
 )

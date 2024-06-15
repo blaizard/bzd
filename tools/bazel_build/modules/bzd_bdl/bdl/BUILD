@@ -56,7 +56,7 @@ py_library(
         ":generators",
         ":grammar",
         ":visitor",
-        "@bdl_extension"
+        "@bdl_extension",
     ],
 )
 

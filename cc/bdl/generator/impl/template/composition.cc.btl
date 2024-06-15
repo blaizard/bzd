@@ -1,4 +1,4 @@
-{#- Re-usable macros. -#}
+{#- Reusable macros. -#}
 {%- include "cc/bdl/generator/impl/template/declarations.h.btl" -%}
 
 {#- Generate calls for all init members associated with an expression. -#}

@@ -50,4 +50,5 @@ if __name__ == "__main__":
 	    workload,
 	    stdoutParser=stdoutParser,
 	    args=[str(args.codespell), str(args.config)],
+	    excludeFile=".codespellignore",
 	)

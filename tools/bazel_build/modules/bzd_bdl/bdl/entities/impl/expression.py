@@ -39,7 +39,7 @@ class Expression(EntityExpression):
             - [symbol]: The interface type if any (might not be set).
             - [executor]: The executor for which this expression should run.
     - Sequence:
-            - argument: The list of arguments to pass to the instanciation or method call.
+            - argument: The list of arguments to pass to the instantiation or method call.
             - argument_resolved: List of resolved arguments.
     """
 
@@ -138,7 +138,7 @@ class Expression(EntityExpression):
 				fragmentNext: typing.Optional[ExpressionFragment] = (fragments[index + 1] if index +
 				                                                     1 < len(fragments) else None)
 				if (isinstance(fragment, OperatorFragment) and fragment.operator in operators):
-					# Look for operators that are preceded with another operator or at the begining.
+					# Look for operators that are preceded with another operator or at the beginning.
 					isUnary = kind == "unary"
 					isUnary &= fragmentPrevious is None or isinstance(fragmentPrevious, OperatorFragment)
 					isUnary &= fragmentNext is not None and not isinstance(fragmentNext, OperatorFragment)
