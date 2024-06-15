@@ -15,8 +15,8 @@ class TestRun(unittest.TestCase):
 		result = bzd.utils.run.localCommand(["sleep", "5"], ignoreFailure=True, timeoutS=0.1)
 		self.assertNotEqual(result.getReturnCode(), 0)
 		self.assertEqual(result.getStdout().strip(), "")
-		self.assertIn("timed out", result.getStderr()) # codespell:ignore
-		self.assertIn("timed out", result.getOutput()) # codespell:ignore
+		self.assertIn("timed out", result.getStderr())  # codespell:ignore
+		self.assertIn("timed out", result.getOutput())  # codespell:ignore
 
 	def testLocalCommandException(self) -> None:
 		with self.assertRaises(Exception):

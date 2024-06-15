@@ -11,6 +11,7 @@ from cc.bdl.generator.impl.comments import commentEmbeddedToStr
 from cc.bdl.generator.impl.fqn import fqnToNameStr
 from cc.bdl.generator.impl.builtins import builtins
 
+
 class _VisitorSymbol(Visitor):
 	"""Visitor to print a type."""
 
