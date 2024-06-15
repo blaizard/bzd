@@ -1,3 +1,5 @@
+"""Register a new extension."""
+
 load("@bazel_skylib//lib:sets.bzl", "sets")
 load("@bzd_lib//:repository.bzl", "generate_repository")
 

@@ -131,7 +131,7 @@ if __name__ == "__main__":
 	    "AOS",
 	    "ABT",
 	    "ABBV",
-	    "ACN",
+	    "ACN",  # codespell:ignore
 	    "ATVI",
 	    "ADM",
 	    "ADBE",
@@ -141,12 +141,12 @@ if __name__ == "__main__":
 	    "A",
 	    "ABNB",
 	    "APD",
-	    "AKAM",  # codespell:ignore
+	    "AKAM",
 	    "ALK",
 	    "ALB",
 	    "ARE",
 	    "ALGN",
-	    "ALLE",
+	    "ALLE",  # codespell:ignore
 	    "LNT",
 	    "ALL",
 	    "GOOGL",
@@ -156,7 +156,7 @@ if __name__ == "__main__":
 	    "AMCR",
 	    "AMD",
 	    "AEE",
-	    "AAL",  # codespell:ignore
+	    "AAL",
 	    "AEP",
 	    "AXP",
 	    "AIG",
@@ -255,7 +255,7 @@ if __name__ == "__main__":
 	    "ED",
 	    "STZ",
 	    "CEG",
-	    "COO",
+	    "COO",  # codespell:ignore
 	    "CPRT",
 	    "GLW",
 	    "CTVA",
@@ -263,7 +263,7 @@ if __name__ == "__main__":
 	    "COST",
 	    "CTRA",
 	    "CCI",
-	    "CSX",  # codespell:ignore
+	    "CSX",
 	    "CMI",
 	    "CVS",
 	    "DHI",

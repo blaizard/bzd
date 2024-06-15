@@ -13,7 +13,7 @@ def stdoutParser(stdout: str, workspace: pathlib.Path) -> typing.Iterable[Output
 	for line in stdout.split("\n"):
 		m = re.match(r"([^:]+):", line)
 		if m:
-			yield OutputWithPath(path=pathlib.Path(m.group(1)).relative_to(workspace), output=line)
+			yield OutputWithPath(path=pathlib.Path(m.group(1)), output=line)
 
 
 def workload(args: typing.Tuple[pathlib.Path, pathlib.Path, bool, str, str], stdout: typing.TextIO) -> bool:
