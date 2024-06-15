@@ -7,13 +7,14 @@ import re
 import dataclasses
 import os
 import time
-import yaml
 
-from bdl.generators.json.ast.ast import Ast, Parameters, Expression
+from bdl.generators.json.ast.ast import Ast
 from bzd.template.template import Template
 from bzd.utils.ssh import SSH
 from bzd_oci.run import ociPush
 
+from targets.docker.deployment.compose import DockerCompose
+from targets.docker.deployment.traefik import DockerTraefik
 
 class CommonParameters:
 
@@ -37,95 +38,6 @@ class CommonParameters:
 		"""
 		return len(hostname.split(".")) == 2
 
-
-def waitForTCP(url: str, retries: int = 20, delay: int = 1.0) -> None:
-	for _ in range(retries):
-		time.sleep(delay)
-
-		try:
-			response = urllib2.urlopen(url, timeout=5)
-		except (socket.error, urllib2.URLError, httplib.BadStatusLine):
-			continue
-
-		if response.getcode() == 200:
-			return True
-
-	return False
-
-
-class Docker:
-
-	def __init__(self, ast: Ast, symbol: str) -> None:
-		self.ast = ast
-		self.expressions = {
-		    fqn: entity.expression.parameters
-		    for fqn, entity in ast.registry.items() if entity.expression.symbol == symbol
-		}
-
-	def makeDockerComposeForAllInstances(self) -> typing.Tuple[typing.Dict[str, str], typing.Set[str]]:
-		"""Generate content for the docker compose files.
-		
-		This includes the docker compose yaml content as string keyed per instance and a set
-		containing all images.
-		"""
-		dockerComposeFiles = {}
-		images = set()
-		for fqn, expression in self.expressions.items():
-			currentDockerCompose, currentImages = self.makeDockerCompose(fqn, expression)
-			dockerComposeFiles[fqn] = currentDockerCompose
-			images.update(currentImages)
-		return dockerComposeFiles, images
-
-	def getInterfaces(self, fqn: str, interface: str) -> typing.List[Parameters]:
-		"""Gather object instances of a specific type."""
-
-		return [
-		    workload.expression.parameters for workload in self.ast.workloads
-		    if workload.expression.symbol == f"{fqn}.{interface}"
-		]
-
-	def getConfig(self, fqn: str) -> Parameters:
-		"""Gather object configuration."""
-
-		return self.ast.registry[fqn].expression.parameters
-
-
-class DockerTraefik(Docker):
-
-	def __init__(self, ast: Ast, common: CommonParameters) -> None:
-		super().__init__(ast=ast, symbol="docker.Traefik")
-		self.common = common
-
-	def makeDockerCompose(self, fqn: str, expression: Parameters) -> typing.Tuple[str, typing.Set[str]]:
-		dockers = self.getInterfaces(fqn, "add")
-		template = Template.fromPath(pathlib.Path(__file__).parent / "traefik.yml.btl")
-		content = template.render({"dockers": dockers}, self.common)
-		return content, set([docker.image for docker in dockers])
-
-
-class DockerCompose(Docker):
-
-	def __init__(self, ast: Ast, common: CommonParameters) -> None:
-		super().__init__(ast=ast, symbol="docker.Compose")
-		self.common = common
-
-	def makeDockerCompose(self, fqn: str, expression: Parameters) -> typing.Tuple[str, typing.Set[str]]:
-		dockers = self.getInterfaces(fqn, "image")
-		path = self.getConfig(fqn).path
-		content = pathlib.Path(path).read_text()
-
-		# Update the docker compose file with the images
-		data = yaml.safe_load(content)
-		for docker in dockers:
-			if docker.service in data["services"]:
-				data["services"][docker.service]["image"] = self.common.imageResolve(docker.image)
-			else:
-				raise KeyError(f"Service '{docker.service}' is not present in '{path}'.")
-		content = yaml.dump(data)
-
-		return content, set([docker.image for docker in dockers])
-
-
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Traefik deployment.")
 	parser.add_argument("--json", type=pathlib.Path, help="Path of the manifest.")
@@ -148,16 +60,10 @@ if __name__ == "__main__":
 	dockerCompose = traefikDockerCompose | composeDockerCompose
 	images = traefikImages | composeImages
 
-	ssh = SSH.fromString(args.transport)
-
-	# Variants are:
-	# transport: none, ssh
-	# type: traefik, docker-compose, docker-registry
-
 	registry = Template.fromPath(pathlib.Path(__file__).parent / "registry.yml.btl").render(common)
-
 	applicationsDirectory = args.directory / "apps"
 
+	ssh = SSH.fromString(args.transport)
 	with ssh.interactive() as handle:
 
 		handle.command(["mkdir", "-p", str(applicationsDirectory)])
