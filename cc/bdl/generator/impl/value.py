@@ -9,6 +9,7 @@ from cc.bdl.generator.impl.symbol import symbolToStr
 from cc.bdl.generator.impl.fqn import fqnToNameStr
 from cc.bdl.generator.impl.comments import commentParametersResolvedToStr
 
+
 def valueToStr(
     item: ParametersResolvedItem,
     symbols: typing.Optional[SymbolMap] = None,

@@ -68,7 +68,6 @@ py_library(
                 deps_extensions = ",\n".join(["\"" + str(e) + "\"" for e in deps_extensions]),
                 deps = ",\n".join(["\"" + str(e) + "\"" for e in sets.to_list(deps)]),
             ),
-            "extensions.bzl": extensions_content,
             "bdl_extension.py": py_content_imports + """
 
 formatters = {{}} | {formatters}
@@ -77,6 +76,7 @@ compositions = {{}} | {compositions}
                 formatters = " | ".join(py_formatters),
                 compositions = " | ".join(py_compositions),
             ),
+            "extensions.bzl": extensions_content,
         },
     )
 
@@ -85,10 +85,10 @@ bdl_extension = module_extension(
     tag_classes = {
         "register": tag_class(
             attrs = {
-                "name": attr.string(mandatory = True),
+                "composition": attr.label(),
                 "extension": attr.label(mandatory = True),
                 "format": attr.label(),
-                "composition": attr.label(),
+                "name": attr.string(mandatory = True),
             },
         ),
     },

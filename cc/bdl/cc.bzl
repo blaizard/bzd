@@ -1,9 +1,9 @@
 """Rules for CC."""
 
 load("@bazel_skylib//lib:sets.bzl", "sets")
+load("@bzd_bdl//:defs.bzl", "bdl_library", "bdl_system", "bdl_system_test")
 load("@bzd_toolchain_cc//cc:defs.bzl", "cc_compile")
 load("@rules_cc//cc:defs.bzl", "cc_library")
-load("@bzd_bdl//:defs.bzl", "bdl_library", "bdl_system", "bdl_system_test")
 
 def bzd_cc_binary(name, target = "//cc/targets:auto", tags = [], bdls = [], hdrs = [], srcs = [], deps = [], testonly = False, **kwargs):
     """Rule that defines a bzd C++ binary.
