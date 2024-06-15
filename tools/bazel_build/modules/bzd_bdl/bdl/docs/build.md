@@ -42,7 +42,7 @@ word, in `hello = my.fund(a = 1);`, the name `hello` is registered but the funct
 be declared later on.
 
 In a `config` section, nothing is resolved, this is because config names are not part of the id tree, they are virtual
-entities that do not concretly translate into code. Parameters in `config` are only resolve when the corresponding
+entities that do not concretely translate into code. Parameters in `config` are only resolve when the corresponding
 entity is instantiated.
 
 ## Composition

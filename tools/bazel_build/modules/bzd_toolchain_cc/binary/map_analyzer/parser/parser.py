@@ -222,7 +222,7 @@ class Parser:
         Add aggregation mapping.
 
         Args:
-                name: Aggregate categroy name.
+                name: Aggregate category name.
                 patternList: List of pattern to map with the name provided.
         """
 

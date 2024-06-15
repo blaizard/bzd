@@ -60,7 +60,7 @@ public:
 			}
 			stack_.emplace(Span<Byte>{static_cast<Byte*>(memory), actualSize});
 
-			// Taint the stack to montior its usage.
+			// Taint the stack to monitor its usage.
 			stack_->taint();
 		}
 
