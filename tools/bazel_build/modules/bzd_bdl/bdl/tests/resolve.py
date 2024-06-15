@@ -411,7 +411,7 @@ class TestRun(unittest.TestCase):
 			Object.fromContent(
 			    content="""
 				component Test { config: value = Integer; }
-				composition MyComposition { val1 = Test(vaue=1); }
+				composition MyComposition { val1 = Test(hello=1); }
 				""",
 			    objectContext=ObjectContext(resolve=True, composition=True),
 			)

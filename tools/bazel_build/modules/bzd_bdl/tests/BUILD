@@ -3,8 +3,8 @@ load("//:defs.bzl", "bdl_library")
 bdl_library(
     name = "a",
     srcs = [
-        "a.bdl"
+        "a.bdl",
     ],
     # TODO: fix
-    tags = ["manual"]
+    tags = ["manual"],
 )

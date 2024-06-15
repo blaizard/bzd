@@ -21,19 +21,19 @@ def _bdl_extension_impl(module_ctx):
                 sets.insert(deps, register.format)
                 py_content_imports += """from {module} import format as format_{name}\n""".format(
                     module = _target_to_py_module(register.format),
-                    name = register.name
+                    name = register.name,
                 )
                 py_formatters.append("format_{name}".format(name = register.name))
             if register.composition:
                 sets.insert(deps, register.composition)
                 py_content_imports += """from {module} import composition as composition_{name}\n""".format(
                     module = _target_to_py_module(register.composition),
-                    name = register.name
+                    name = register.name,
                 )
                 py_compositions.append("composition_{name}".format(name = register.name))
             extensions_content += """load("{target}", {name} = "extension")\n""".format(
                 target = register.extension,
-                name = register.name
+                name = register.name,
             )
             deps_extensions.append(register.extension)
 
@@ -65,19 +65,19 @@ py_library(
     ]
 )
 """.format(
-    deps_extensions = ",\n".join(["\"" + str(e) + "\"" for e in deps_extensions]),
-    deps = ",\n".join(["\"" + str(e) + "\"" for e in sets.to_list(deps)])
-),
+                deps_extensions = ",\n".join(["\"" + str(e) + "\"" for e in deps_extensions]),
+                deps = ",\n".join(["\"" + str(e) + "\"" for e in sets.to_list(deps)]),
+            ),
             "extensions.bzl": extensions_content,
             "bdl_extension.py": py_content_imports + """
 
 formatters = {{}} | {formatters}
 compositions = {{}} | {compositions}
 """.format(
-    formatters = " | ".join(py_formatters),
-    compositions = " | ".join(py_compositions)
-)
-        }
+                formatters = " | ".join(py_formatters),
+                compositions = " | ".join(py_compositions),
+            ),
+        },
     )
 
 bdl_extension = module_extension(

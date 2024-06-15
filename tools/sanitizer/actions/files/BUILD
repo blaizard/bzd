@@ -9,8 +9,8 @@ py_binary(
     ),
     visibility = ["//tools/sanitizer:__pkg__"],
     deps = [
-        "@bzd_bdl//bdl:lib",
         "//tools/sanitizer/utils/python:workspace",
+        "@bzd_bdl//bdl:lib",
         "@bzd_python//bzd/utils:worker",
     ],
 )

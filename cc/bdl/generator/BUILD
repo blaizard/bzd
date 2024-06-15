@@ -3,10 +3,10 @@ py_library(
     srcs = [
         "format.py",
     ],
+    visibility = ["//visibility:public"],
     deps = [
-        "//cc/bdl/generator/impl:visitor"
+        "//cc/bdl/generator/impl:visitor",
     ],
-    visibility = ["//visibility:public"]
 )
 
 py_library(
@@ -14,8 +14,8 @@ py_library(
     srcs = [
         "composition.py",
     ],
+    visibility = ["//visibility:public"],
     deps = [
-        "//cc/bdl/generator/impl:visitor"
+        "//cc/bdl/generator/impl:visitor",
     ],
-    visibility = ["//visibility:public"]
 )

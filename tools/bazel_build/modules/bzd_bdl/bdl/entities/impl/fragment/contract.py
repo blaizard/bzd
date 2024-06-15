@@ -10,7 +10,7 @@ from bdl.contracts.all import AllContracts
 
 class Contracts:
 	"""
-    A contract is an unsorted sequence of types associated with an optional value and/or commment.
+    A contract is an unsorted sequence of types associated with an optional value and/or comment.
     """
 
 	def __init__(self, element: Element, sequenceKind: typing.Optional[str] = None) -> None:

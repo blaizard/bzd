@@ -8,8 +8,8 @@ class TestRun(unittest.TestCase):
 
 	def testMethod(self) -> None:
 		with self.assertRaisesRegex(Exception, r"duplicated"):
-			Object.fromContent(content="method hello(a = Integer(), a = Interger());")
-		Object.fromContent(content="method hello(a = Integer(), b = Interger());")
+			Object.fromContent(content="method hello(a = Integer(), a = Integer());")
+		Object.fromContent(content="method hello(a = Integer(), b = Integer());")
 
 	def testContracts(self) -> None:
 		with self.assertRaisesRegex(Exception, r"'you'.*not supported"):

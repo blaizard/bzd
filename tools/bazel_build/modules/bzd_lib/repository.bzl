@@ -7,7 +7,7 @@ generate_repository = repository_rule(
     doc = "Generate a repository.",
     attrs = {
         "files": attr.string_dict(
-            doc = "Files to be added to the repository with their content. The key is the file name, the value is the content."
+            doc = "Files to be added to the repository with their content. The key is the file name, the value is the content.",
         ),
     },
 )

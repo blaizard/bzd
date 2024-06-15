@@ -19,7 +19,7 @@ The following is what an epxression looks like:
 name : interface = Type<template>(parameters) [contracts]
 ```
 
-Expressions instanciate and/or assign a value to a variable (`name`). Therefore they only hold values, they can instantiate a new value from a type
+Expressions instantiate and/or assign a value to a variable (`name`). Therefore they only hold values, they can instantiate a new value from a type
 or copy an existing value.
 
 _name_: This is the name of the instance. It is used to refer to this object locally or globally.
