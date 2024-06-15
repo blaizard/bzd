@@ -1,3 +1,5 @@
+"""Helper to generate a repository made of some files."""
+
 def _generate_repository_impl(repository_ctx):
     for path, content in repository_ctx.attr.files.items():
         repository_ctx.file(path, content)

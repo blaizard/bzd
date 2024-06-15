@@ -47,8 +47,12 @@ def chunkWorker(contextPath: pathlib.Path,
 				for item in [*stdoutParser(output, context.workspace)]:
 					outputsByPath.setdefault(item.path, []).append(item.output)
 			for path, outputs in sorted(outputsByPath.items(), key=lambda x: x[0]):
-				context.printSection(title=str(path), level=2)
-				print("\n".join(outputs))
+				try:
+					actualPath = path.resolve(strict=True).relative_to(context.workspace)
+					context.printSection(title=str(actualPath), level=2)
+					print("\n".join(outputs))
+				except:
+					pass
 		else:
 			for output in failureOutputs:
 				print(output)
