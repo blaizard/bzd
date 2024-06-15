@@ -2,16 +2,6 @@
 
 bzd_is_shell=`echo "$-" | grep i > /dev/null`
 
-_bzd_echo()
-{
-    # Only output to interactive shell. This is important as some commands might need a clean stdout, for example rsync...
-	if ${bzd_is_shell}; then
-		echo "$@"
-	fi
-}
-
-_bzd_echo -n "Setting-up bzd environment..."
-
 {% for name, content in always %}
 # ---- Content from {{ name }}
 {{ content }}
@@ -26,5 +16,3 @@ if ${bzd_is_shell}; then
 {% end %}
 
 fi
-
-_bzd_echo -e "\tdone"

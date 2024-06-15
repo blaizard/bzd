@@ -2,16 +2,6 @@
 
 bzd_is_shell=`echo "$-" | grep i > /dev/null`
 
-_bzd_echo()
-{
-    # Only output to interactive shell. This is important as some commands might need a clean stdout, for example rsync...
-	if ${bzd_is_shell}; then
-		echo "$@"
-	fi
-}
-
-_bzd_echo -n "Setting-up bzd environment..."
-
 # ---- Content from aliases.sh
 # --- ls ----------------------------------------------------------------------
 alias ls='ls --color=auto -h'
@@ -200,5 +190,3 @@ EOF
 
 
 fi
-
-_bzd_echo -e "\tdone"
