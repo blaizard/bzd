@@ -4,17 +4,15 @@ import pathlib
 import typing
 import sys
 import re
-import dataclasses
-import os
-import time
 
 from bdl.generators.json.ast.ast import Ast
 from bzd.template.template import Template
-from bzd.utils.ssh import SSH
 from bzd_oci.run import ociPush
 
 from targets.docker.deployment.compose import DockerCompose
 from targets.docker.deployment.traefik import DockerTraefik
+
+from targets.docker.transport.ssh import TransportSSH
 
 
 class CommonParameters:
@@ -65,8 +63,15 @@ if __name__ == "__main__":
 	registry = Template.fromPath(pathlib.Path(__file__).parent / "registry.yml.btl").render(common)
 	applicationsDirectory = args.directory / "apps"
 
-	ssh = SSH.fromString(args.transport)
-	with ssh.interactive() as handle:
+	if args.transport.startswith("ssh://"):
+		connection = args.transport[6:]
+		print(f"Transport SSH at {connection}")
+		transport = TransportSSH(connection)
+
+	else:
+		raise Exception(f"Unknown transport type for '{args.transport}'.")
+
+	with transport.session() as handle:
 
 		handle.command(["mkdir", "-p", str(applicationsDirectory)])
 
@@ -74,10 +79,10 @@ if __name__ == "__main__":
 		handle.uploadContent(registry, f"{args.directory}/docker-compose.yml")
 
 		print(f"Starting docker registry.")
-		handle.command(["docker", "compose", "-f", f"{args.directory}/docker-compose.yml", "up", "-d", "registry"])
+		handle.command(["docker", "compose", "--file", f"{args.directory}/docker-compose.yml", "up", "-d", "registry"])
 
 		# Push the new images
-		with ssh.forwardPort(args.registry_port, waitHTTP=f"http://localhost:{args.registry_port}/v2/"):
+		with handle.forwardPort(args.registry_port, waitHTTP=f"http://localhost:{args.registry_port}/v2/"):
 			for image in images:
 				print(f"Pushing {image}...")
 				ociPush(image, f"localhost:{args.registry_port}/{image}", stdout=True, stderr=True, timeoutS=600)
@@ -94,7 +99,8 @@ if __name__ == "__main__":
 		for application in removeApplications:
 			directory = f"{applicationsDirectory}/{application}"
 			print(f"Stopping '{directory}'...")
-			handle.command(["docker", "compose", "-f", f"{directory}/docker-compose.yml", "down"], ignoreFailure=True)
+			handle.command(["docker", "compose", "--file", f"{directory}/docker-compose.yml", "down"],
+			               ignoreFailure=True)
 			handle.command(["rm", "-rfd", f"{directory}"])
 
 		# Start applications
@@ -104,8 +110,8 @@ if __name__ == "__main__":
 			handle.command(["mkdir", "-p", directory])
 			handle.uploadContent(content, f"{directory}/docker-compose.yml")
 			print(f"Pulling new images.")
-			handle.command(["docker", "compose", "-f", f"{directory}/docker-compose.yml", "pull"])
+			handle.command(["docker", "compose", "--file", f"{directory}/docker-compose.yml", "pull"])
 			print(f"Restarting containers.")
-			handle.command(["docker", "compose", "-f", f"{directory}/docker-compose.yml", "up", "-d"])
+			handle.command(["docker", "compose", "--file", f"{directory}/docker-compose.yml", "up", "-d"])
 
 	sys.exit(0)
