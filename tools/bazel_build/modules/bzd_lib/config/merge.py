@@ -61,7 +61,7 @@ class ConfigValues:
 		if key in self.data:
 			fatal(f"The key '{key}' is manually set twice.")
 
-		# Check there are conflcit between parent/child keys. For example, setting `kvs.hello`` and `kvs.hello.world`.
+		# Check there are conflict between parent/child keys. For example, setting `kvs.hello`` and `kvs.hello.world`.
 		for existingKey in self.data.keys():
 			if f"{key}." in existingKey:
 				fatal(f"Cannot set a key '{key}' and a nested key '{existingKey}' at the same time.")

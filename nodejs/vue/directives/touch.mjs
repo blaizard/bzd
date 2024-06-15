@@ -700,7 +700,7 @@ export class Touch {
 				 */
 				selectorReceiver: null,
 				/**
-				 * Class set once the draggin is active. This class is set on the body
+				 * Class set once the dragging is active. This class is set on the body
 				 * of the document. If null, no class will be set.
 				 */
 				bodyDragClass: "drag-active",
