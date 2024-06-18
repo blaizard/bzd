@@ -8,7 +8,7 @@ bzd_nodejs_library(
         "storage.mjs",
     ],
     visibility = [
-        "//apps/artifacts/plugins:__pkg__",
+        "//apps/artifacts/plugins:__subpackages__",
     ],
     deps = [
         "//nodejs/core:exception",

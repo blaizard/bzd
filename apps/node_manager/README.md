@@ -21,7 +21,7 @@ Description=bzd Node Manager
 After=network.service
 
 [Service]
-ExecStart=$(pwd)/node_manager
+ExecStart=$(pwd)/node_manager accounts
 
 [Install]
 WantedBy=multi-user.target
