@@ -1,5 +1,8 @@
 <template>
-	<pre><code>{{ formatedMetadata }}</code></pre>
+	<div v-for="[path, value] of pathValues">
+		<span>{{ path }} ({{ value["timestamp"] }})</span>
+		<pre><code>{{ value["value"] }}</code></pre>
+	</div>
 </template>
 
 <script>
@@ -15,6 +18,9 @@
 			};
 		},
 		computed: {
+			pathValues() {
+				return Object.entries(this.metadata).sort((a, b) => a[0].localeCompare(b[0]));
+			},
 			formatedMetadata() {
 				return JSON.stringify(this.metadata, null, 4);
 			},

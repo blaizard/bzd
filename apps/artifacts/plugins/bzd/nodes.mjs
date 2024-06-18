@@ -36,7 +36,7 @@ class Node {
 		let data = await this.get(category);
 
 		// Identify the path of the fragments and their values.
-		for (const [path, value] in Object.entries(this.getAllPathAndValues(fragment))) {
+		for (const [path, value] of Object.entries(this.getAllPathAndValues(fragment))) {
 			data[path] = {
 				timestamp: timestamp,
 				value: value,

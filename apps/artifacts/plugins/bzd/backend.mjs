@@ -79,6 +79,10 @@ export default {
 			},
 			async start(params, context) {
 				const nodes = new Nodes(params["bzd.path"]);
+				for (const [uid, data] of Object.entries(params["bzd.data"])) {
+					const node = await nodes.getOrCreate(uid);
+					await node.insert("data", data);
+				}
 				return nodes;
 			},
 			async stop(server) {},
