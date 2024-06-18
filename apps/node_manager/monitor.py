@@ -35,7 +35,11 @@ def monitorCPUs() -> typing.Any:
 
 
 def monitorBatteries() -> typing.Any:
-	return {"main": [psutil.sensors_battery()[0]]}
+	maybeBattery = psutil.sensors_battery()
+	if maybeBattery is None:
+		return []
+	else:
+		return {"main": [maybeBattery[0]]}
 
 
 def monitorMemories() -> typing.Any:
@@ -44,12 +48,22 @@ def monitorMemories() -> typing.Any:
 	return {"ram": [virtual.used, virtual.total], "swap": [swap.used, swap.total]}
 
 
+def monitorDisks() -> typing.Any:
+	disks = {}
+	for partition in psutil.disk_partitions():
+		if partition.device not in disks:
+			usage = psutil.disk_usage(partition.mountpoint)
+			disks[partition.device] = [usage.used, usage.total]
+	return disks
+
+
 def monitor() -> typing.Any:
 	return {
 	    "cpus": monitorCPUs(),
 	    "temperatures": monitorTemperatures(),
 	    "batteries": monitorBatteries(),
-	    "memories": monitorMemories()
+	    "memories": monitorMemories(),
+	    "disks": monitorDisks()
 	}
 
 

@@ -32,7 +32,7 @@ if __name__ == "__main__":
 	parser.add_argument("--bind", default="0.0.0.0", help="Address to bind.")
 	parser.add_argument("--port", default=9999, type=int, help="Port to bind.")
 	parser.add_argument("--report-endpoint",
-	                    default="http://data.master.blaizard.com/x/nodes",
+	                    default="https://data.blaizard.com/x/nodes",
 	                    type=str,
 	                    help="The endpoint to report data.")
 	parser.add_argument("--report-rate",
