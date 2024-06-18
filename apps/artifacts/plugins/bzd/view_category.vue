@@ -1,7 +1,9 @@
 <template>
-	<div v-for="[path, value] of pathValues">
-		<span>{{ path }} ({{ value["timestamp"] }})</span>
-		<pre><code>{{ value["value"] }}</code></pre>
+	<div class="data">
+		<div class="entry" v-for="[path, value] of pathValues">
+			<span class="path">{{ path }} ({{ value["timestamp"] }})</span>
+			<span>{{ formatValue(value["value"]) }}</span>
+		</div>
 	</div>
 </template>
 
@@ -21,14 +23,14 @@
 			pathValues() {
 				return Object.entries(this.metadata).sort((a, b) => a[0].localeCompare(b[0]));
 			},
-			formatedMetadata() {
-				return JSON.stringify(this.metadata, null, 4);
-			},
 		},
 		mounted() {
 			this.fetchMetadata();
 		},
 		methods: {
+			formatValue(value) {
+				return JSON.stringify(value, null, 4);
+			},
 			async fetchMetadata() {
 				await this.handleSubmit(async () => {
 					const endpoint = "/x/" + this.pathList.map(encodeURIComponent).join("/");
@@ -40,3 +42,19 @@
 		},
 	};
 </script>
+
+<style lang="scss" scoped>
+	.data {
+		display: flex;
+		flex-direction: column;
+
+		.entry {
+			display: flex;
+			flex-direction: row;
+
+			.path {
+				font-weight: bold;
+			}
+		}
+	}
+</style>
