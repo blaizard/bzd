@@ -5,6 +5,80 @@ import LogFactory from "./log.mjs";
 const Log = LogFactory("cache");
 const Exception = ExceptionFactory("cache");
 
+class CacheCollectionAccessor {
+	constructor(cache, collection) {
+		this.cache = cache;
+		this.collection = collection;
+	}
+
+	/**
+	 * \brief Get the data requested. Wait until it is available.
+	 *
+	 * \param ids The identifier of the data
+	 *
+	 * \return The data or a promise that will return the data.
+	 */
+	async get(...ids) {
+		return this.cache.get(this.collection, ...ids);
+	}
+
+	/**
+	 * \brief Get the data requested.
+	 * Return the old data if available while trigger the update of the new.
+	 *
+	 * \param ids The identifier of the data
+	 *
+	 * \return The data or a promise that will return the data.
+	 */
+	async getInstant(...ids) {
+		return this.cache.getInstant(this.collection, ...ids);
+	}
+
+	/**
+	 * \brief Check if the resource is dirty
+	 */
+	isDirty(...ids) {
+		return this.cache.isDirty(this.collection, ...ids);
+	}
+
+	/**
+	 * \brief Get the size of the data at the specific location.
+	 * If not data, return 0.
+	 *
+	 * \param ids The identifier of the data
+	 *
+	 * \return The size of the data.
+	 */
+	getSize(...ids) {
+		return this.cache.getSize(this.collection, ...ids);
+	}
+
+	/**
+	 * \brief Delete a specific resource from the cache.
+	 *
+	 * \param ids The identifier of the data
+	 */
+	async delete(...ids) {
+		return this.cache.delete(this.collection, ...ids);
+	}
+
+	/**
+	 * Mark the current data as invalidated (out of date) so it will be reloaded at the next access.
+	 *
+	 * \param ids The identifier of the data
+	 */
+	setDirty(...ids) {
+		return this.cache.setDirty(this.collection, ...ids);
+	}
+
+	/**
+	 * Show a visual representation of the current state of the cache
+	 */
+	toString() {
+		return this.cache.toString(this.collection);
+	}
+}
+
 /**
  * Cache a collection of data.
  * A collection is a dictionary of data that obey to the same rules (same trigger functions, timeout, etc).
@@ -38,6 +112,13 @@ class Cache {
 		if (this.config.garbageCollector) {
 			garbageCollector.call(this);
 		}
+	}
+
+	/**
+	 * \brief Get an accessor for a specific collection.
+	 */
+	getAccessor(collection) {
+		return new CacheCollectionAccessor(this, collection);
 	}
 
 	/**

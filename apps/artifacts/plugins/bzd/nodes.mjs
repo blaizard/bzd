@@ -1,4 +1,6 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
+import { CollectionPaging } from "#bzd/nodejs/db/utils.mjs";
+import Cache from "#bzd/nodejs/core/cache.mjs";
 
 const Exception = ExceptionFactory("apps", "plugin", "bzd");
 
@@ -7,9 +9,10 @@ const Exception = ExceptionFactory("apps", "plugin", "bzd");
 /// Data are denominated by a path, each data can be set at various interval.
 /// Data have a validity time that is adjusted automatically.
 class Node {
-	constructor() {
-		this.data = {};
-		this.pending = [];
+	constructor(storage, cache, uid) {
+		this.storage = storage;
+		this.cache = cache;
+		this.uid = uid;
 	}
 
 	/// Identify the path of the fragments that are being set.
@@ -31,51 +34,85 @@ class Node {
 		return paths;
 	}
 
-	async insert(category, fragment) {
+	async insert(fragment, ...paths) {
 		const timestamp = Date.now();
-		let data = await this.get(category);
+		const pathToString = paths.join(".");
 
-		// Identify the path of the fragments and their values.
-		for (const [path, value] of Object.entries(this.getAllPathAndValues(fragment))) {
-			data[path] = {
-				timestamp: timestamp,
-				value: value,
-			};
-		}
+		await this.storage.update(
+			this.uid,
+			async (data) => {
+				data["timestamp"] = timestamp;
+				if (!("data" in data)) {
+					data["data"] = {};
+				}
+
+				// Identify the path of the fragments and their values.
+				for (const [subPath, value] of Object.entries(this.getAllPathAndValues(fragment))) {
+					data["data"][pathToString + "." + subPath] = {
+						timestamp: timestamp,
+						value: value,
+					};
+				}
+
+				return data;
+			},
+			{},
+		);
+
+		// Invalidate the cache.
+		this.cache.setDirty(this.uid);
 	}
 
-	async getCategories() {
-		return ["data", "pending"];
-	}
-
-	async get(category) {
-		switch (category) {
-			case "pending":
-				return this.pending;
-			case "data":
-				return this.data;
-		}
-		Exception.error("Invalid category '{}'", category);
+	async get(...paths) {
+		const data = await this.cache.get(this.uid);
+		const reducedData = paths.reduce((r, segment) => {
+			return r[segment];
+		}, data.data);
+		return {
+			timestampServer: Date.now(),
+			timestamp: data.timestamp,
+			data: reducedData,
+		};
 	}
 }
 
 export default class Nodes {
-	constructor(path) {
-		this.nodes = {};
+	constructor(storage) {
+		this.storage = storage.getAccessor("data");
+		const cache = new Cache();
+		cache.register("data", async (uid) => {
+			// Convert data into a tree.
+			const data = await this.storage.get(uid);
+			let tree = {};
+			for (const [path, value] of Object.entries(data.data || {})) {
+				const paths = path.split(".");
+				const lastSegment = paths.pop();
+				const object = paths.reduce((r, segment) => {
+					if (!r[segment]) {
+						r[segment] = {};
+					}
+					return r[segment];
+				}, tree);
+				object[lastSegment] = value.value;
+			}
+			return {
+				timestamp: data.timestamp || 0,
+				data: tree,
+			};
+		});
+		this.cache = cache.getAccessor("data");
 	}
 
 	async *getNodes() {
-		for (const uid in this.nodes) {
-			yield uid;
+		const it = CollectionPaging.makeIterator(async (maxOrPaging) => {
+			return await this.storage.list(maxOrPaging);
+		}, 50);
+		for await (const [name, _] of it) {
+			yield name;
 		}
 	}
 
-	async getOrCreate(uid) {
-		this.nodes[uid] ??= new Node();
-		return this.nodes[uid];
-	}
-
 	async get(uid) {
-		return await this.nodes[uid];
+		return new Node(this.storage, this.cache, uid);
 	}
 }

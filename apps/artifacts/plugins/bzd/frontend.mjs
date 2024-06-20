@@ -7,11 +7,12 @@ export default {
 	],
 	view: function () {
 		switch (this.pathList.length) {
+			case 1:
+				return import("#bzd/apps/artifacts/plugins/default.vue");
 			case 2:
 				return import("#bzd/apps/artifacts/plugins/bzd/view_node.vue");
-			case 3:
+			default:
 				return import("#bzd/apps/artifacts/plugins/bzd/view_category.vue");
 		}
-		return import("#bzd/apps/artifacts/plugins/default.vue");
 	},
 };
