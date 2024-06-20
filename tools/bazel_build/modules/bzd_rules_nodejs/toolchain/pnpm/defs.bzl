@@ -2,8 +2,8 @@
 
 _BINARIES = {
     "pnpm-linux-x86": struct(
-        url = "https://github.com/pnpm/pnpm/releases/download/v8.6.12/pnpm-linuxstatic-x64",
-        sha256 = "7e47fa9c8b442d6bb7574b850fad1b77dbdfc8bd7821ee85957dafbe77497f23",
+        url = "https://github.com/pnpm/pnpm/releases/download/v9.4.0/pnpm-linuxstatic-x64",
+        sha256 = "7f8d71ff5d64cbb03a45b7ecb42b573a8fc40864327a028f93e2a37d893c172a",
         platforms = [
             "linux-x86_64",
         ],
