@@ -7,7 +7,7 @@ describe("Nodes", () => {
 	describe("Node", () => {
 		it("getAllPathAndValues", async () => {
 			let nodes = new Nodes();
-			let node = await nodes.getOrCreate("node");
+			let node = await nodes.get("node");
 			const result = node.getAllPathAndValues({
 				a: {
 					b: { c: 12, e: [], f: null },

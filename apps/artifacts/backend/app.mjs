@@ -143,13 +143,6 @@ program
 		return await Plugins[params.type].storage(params, services.getActiveFor(volume));
 	});
 
-	// Create the endpoints cache
-	cache.register("endpoint", async (volume, ...pathList) => {
-		pathList.pop(); // options
-		pathList.pop(); // previous value
-		return await endpointHandler("get", volume, pathList, {});
-	});
-
 	// Register all plugns
 	Log.info("Using plugins: {}", Object.keys(Plugins).join(", "));
 	for (const type in Plugins) {
@@ -244,7 +237,7 @@ program
 			async (context) => {
 				const { volume, pathList } = getInternalPathFromString(context.getParam("path"));
 				if (method == "get") {
-					const data = await cache.get("endpoint", volume, ...pathList);
+					const data = await endpointHandler.call(context, method, volume, pathList);
 					context.sendJson(data);
 				} else {
 					await endpointHandler.call(context, method, volume, pathList);

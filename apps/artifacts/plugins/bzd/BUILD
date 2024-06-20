@@ -11,9 +11,11 @@ bzd_nodejs_library(
         "//apps/artifacts/plugins:__subpackages__",
     ],
     deps = [
+        "//nodejs/core:cache",
         "//nodejs/core:exception",
         "//nodejs/core:log",
         "//nodejs/db:utils",
+        "//nodejs/db/key_value_store:make_from_config",
         "//nodejs/db/storage",
     ],
 )
@@ -43,5 +45,6 @@ bzd_nodejs_library(
     ],
     deps = [
         "//apps/artifacts/plugins:default",
+        "//nodejs/utils:to_string",
     ],
 )

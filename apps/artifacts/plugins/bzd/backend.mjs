@@ -1,5 +1,6 @@
 import StorageBzd from "#bzd/apps/artifacts/plugins/bzd/storage.mjs";
 import Nodes from "#bzd/apps/artifacts/plugins/bzd/nodes.mjs";
+import makeStorageFromConfig from "#bzd/nodejs/db/key_value_store/make_from_config.mjs";
 
 function rawBodyParse(body, headersFunc, forceContentType = null, forceCharset = null) {
 	const contentTypeHeader = Object.fromEntries(
@@ -78,10 +79,14 @@ export default {
 				return true;
 			},
 			async start(params, context) {
-				const nodes = new Nodes(params["bzd.path"]);
+				const storage = await makeStorageFromConfig({
+					type: "memory",
+					name: "nodes",
+				});
+				const nodes = new Nodes(storage);
 				for (const [uid, data] of Object.entries(params["bzd.data"])) {
-					const node = await nodes.getOrCreate(uid);
-					await node.insert("data", data);
+					const node = await nodes.get(uid);
+					await node.insert(data, "data");
 				}
 				return nodes;
 			},
@@ -89,18 +94,18 @@ export default {
 		},
 	},
 	endpoints: {
-		"/{uid}/{category}": {
+		"/{uid}/{path:*}": {
 			get: {
 				async handler(params, services) {
 					const node = await services.nodes.get(params.uid);
-					return await node.get(params.category);
+					return await node.get(...params.path.split("/"));
 				},
 			},
 			post: {
 				async handler(params, services) {
 					const data = rawBodyParse(this.getBody(), (name) => this.getHeader(name));
-					const node = await services.nodes.getOrCreate(params.uid);
-					return await node.insert(params.category, data);
+					const node = await services.nodes.get(params.uid);
+					return await node.insert(data, ...params.path);
 				},
 			},
 		},

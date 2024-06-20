@@ -29,14 +29,15 @@ export default class StorageBzd extends Storage {
 		});
 	}
 
-	async _listCategories(uid, maxOrPaging) {
+	async _listCategories(uid, paths, maxOrPaging) {
 		const node = await this.nodes.get(uid);
-		return await CollectionPaging.makeFromList(await node.getCategories(), maxOrPaging, (name) => {
+		const data = (await node.get(...paths)).data;
+		return await CollectionPaging.makeFromList(Object.keys(data), maxOrPaging, (name) => {
 			return Permissions.makeEntry(
 				{
 					name: name,
 				},
-				{ read: true },
+				{ read: true, list: data[name] && data[name].constructor == Object },
 			);
 		});
 	}
@@ -44,10 +45,7 @@ export default class StorageBzd extends Storage {
 	async _listImpl(pathList, maxOrPaging, includeMetadata) {
 		if (pathList.length == 0) {
 			return await this._listNodes(maxOrPaging);
-		} else if (pathList.length == 1) {
-			return await this._listCategories(pathList[0], maxOrPaging);
 		}
-
-		return new CollectionPaging([]);
+		return await this._listCategories(pathList[0], pathList.slice(1), maxOrPaging);
 	}
 }

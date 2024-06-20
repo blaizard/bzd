@@ -3,6 +3,60 @@ import ExceptionFactory from "../../core/exception.mjs";
 
 const Exception = ExceptionFactory("db", "kvs");
 
+class KeyValueStoreBucketAccessor {
+	constructor(storage, bucket) {
+		this.storage = storage;
+		this.bucket = bucket;
+	}
+
+	/// Set a key/value pair.
+	///
+	/// If key is set to null, a unique key is automatically generated.
+	async set(key, value) {
+		return this.storage._setImpl(this.bucket, key, value);
+	}
+
+	/// Retrieve a value from a given key, or return the default value if it does not exists.
+	async get(key, defaultValue = undefined) {
+		return this.storage._getImpl(this.bucket, key, defaultValue);
+	}
+
+	/// Atomic operation that consists of a read, modify and write operation.
+	async update(key, modifier = async (value) => value, defaultValue = undefined, maxConflicts = 100) {
+		return this.storage._updateImpl(this.bucket, key, modifier, defaultValue, maxConflicts);
+	}
+
+	/// Check if a key exists.
+	async is(key) {
+		return this.storage.is(this.bucket, key);
+	}
+
+	/// Return the number of entries in this bucket.
+	async count() {
+		return this.storage._countImpl(this.bucket);
+	}
+
+	/// List all key/value pairs from this bucket.
+	/// \param maxOrPaging Paging information.
+	async list(maxOrPaging = 20) {
+		return this.storage._listImpl(this.bucket, maxOrPaging);
+	}
+
+	/// List all key/value pairs from this bucket which subkey matches the value (or any of the values).
+	/// \param subKey The subkey for the match.
+	/// \param value The value of values (if a list) to match.
+	/// \param maxOrPaging Paging information.
+	/// \return An object containing the data and the information about paging and how to get the rest of the data.
+	async listMatch(subKey, value, maxOrPaging = 20) {
+		return this.storage._listMatchImpl(this.bucket, subKey, value, maxOrPaging);
+	}
+
+	/// Delete an existing key/value pair.
+	async delete(key) {
+		return this.storage._deleteImpl(this.bucket, key);
+	}
+}
+
 /// Key value store for low demanding application, that persists on the local disk.
 export default class KeyValueStore extends AsyncInitialize {
 	constructor() {
@@ -56,6 +110,12 @@ export default class KeyValueStore extends AsyncInitialize {
 	/// Delete an existing key/value pair.
 	async delete(bucket, key) {
 		return this._deleteImpl(bucket, key);
+	}
+
+	/// Create an accessor for a specific bucket.
+	/// \param bucket The bucket to be used.
+	getAccessor(bucket) {
+		return new KeyValueStoreBucketAccessor(this, bucket);
 	}
 
 	/// Run a suite of validation tests.
