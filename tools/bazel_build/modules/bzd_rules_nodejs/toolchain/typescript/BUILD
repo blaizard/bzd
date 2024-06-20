@@ -6,8 +6,8 @@ bzd_nodejs_extern_binary(
     name = "tsc",
     binary = "typescript/bin/tsc",
     packages = {
-        "@types/node": "^20.5.3",
-        "typescript": "^5.1.6",
+        "@types/node": "^20.14.6",
+        "typescript": "^5.5.2",
     },
     params = [
         "--typeRoots",

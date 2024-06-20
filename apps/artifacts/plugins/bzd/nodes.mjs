@@ -79,7 +79,9 @@ class Node {
 export default class Nodes {
 	constructor(storage) {
 		this.storage = storage.getAccessor("data");
-		const cache = new Cache();
+		const cache = new Cache({
+			garbageCollector: false,
+		});
 		cache.register("data", async (uid) => {
 			// Convert data into a tree.
 			const data = await this.storage.get(uid);

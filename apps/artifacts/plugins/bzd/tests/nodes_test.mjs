@@ -1,12 +1,17 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import Nodes from "#bzd/apps/artifacts/plugins/bzd/nodes.mjs";
+import makeStorageFromConfig from "#bzd/nodejs/db/key_value_store/make_from_config.mjs";
 
 const Exception = ExceptionFactory("test", "artifacts", "plugins", "bzd");
 
 describe("Nodes", () => {
 	describe("Node", () => {
 		it("getAllPathAndValues", async () => {
-			let nodes = new Nodes();
+			const storage = await makeStorageFromConfig({
+				type: "memory",
+				name: "nodes",
+			});
+			let nodes = new Nodes(storage);
 			let node = await nodes.get("node");
 			const result = node.getAllPathAndValues({
 				a: {
