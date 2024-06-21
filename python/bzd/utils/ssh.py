@@ -169,9 +169,9 @@ class SSH:
 		socketName = f"bzd-forward-port-{time.time()}"
 		try:
 			self.command(sshArgs=["-M", "-S", socketName, "-fnNT", "-L", f"{port}:{self.host}:{port}"])
-			if waitHTTP:
-				# TODO: loop until timeout here.
-				HttpClient.get(waitHTTP)
+			#if waitHTTP:
+			#	# TODO: loop until timeout here.
+			#	HttpClient.get(waitHTTP)
 			yield
 		finally:
 			self.command(sshArgs=["-S", socketName, "-O", "exit"])
