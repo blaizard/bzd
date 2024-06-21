@@ -42,21 +42,26 @@ class Node {
 			this.uid,
 			async (data) => {
 				data["timestamp"] = timestamp;
-				if (!("data" in data)) {
-					data["data"] = {};
-				}
 
 				// Identify the path of the fragments and their values.
 				for (const [subPath, value] of Object.entries(this.getAllPathAndValues(fragment))) {
-					data["data"][pathToString + "." + subPath] = {
-						timestamp: timestamp,
-						value: value,
-					};
+					const path = pathToString + "." + subPath;
+					// Prepend the new value and the timestamp to the values array.
+					// And ensure there are maximum 10 elements.
+					data["data"][path] ??= { values: [] };
+					const values = data["data"][path].values;
+					values.unshift([timestamp, value]);
+					while (values.length > 10) {
+						values.pop();
+					}
 				}
 
 				return data;
 			},
-			{},
+			{
+				timestamp: 0,
+				data: {},
+			},
 		);
 
 		// Invalidate the cache.
@@ -67,10 +72,9 @@ class Node {
 		const data = await this.cache.get(this.uid);
 		const reducedData = paths.reduce((r, segment) => {
 			return r[segment];
-		}, data.data);
+		}, data);
 		return {
 			timestampServer: Date.now(),
-			timestamp: data.timestamp,
 			data: reducedData,
 		};
 	}
@@ -84,9 +88,17 @@ export default class Nodes {
 		});
 		cache.register("data", async (uid) => {
 			// Convert data into a tree.
-			const data = await this.storage.get(uid);
+			let data = await this.storage.get(uid, {});
+			// This ensure that existing schema will be updated.
+			data = Object.assign(
+				{
+					data: {},
+					timestamp: 0,
+				},
+				data,
+			);
 			let tree = {};
-			for (const [path, value] of Object.entries(data.data || {})) {
+			for (const [path, value] of Object.entries(data.data)) {
 				const paths = path.split(".");
 				const lastSegment = paths.pop();
 				const object = paths.reduce((r, segment) => {
@@ -95,12 +107,9 @@ export default class Nodes {
 					}
 					return r[segment];
 				}, tree);
-				object[lastSegment] = value.value;
+				object[lastSegment] = value.values[0];
 			}
-			return {
-				timestamp: data.timestamp || 0,
-				data: tree,
-			};
+			return tree;
 		});
 		this.cache = cache.getAccessor("data");
 	}

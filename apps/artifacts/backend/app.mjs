@@ -241,6 +241,7 @@ program
 					context.sendJson(data);
 				} else {
 					await endpointHandler.call(context, method, volume, pathList);
+					context.sendStatus(200);
 				}
 			},
 			{ exceptionGuard: true, type: ["raw"] },

@@ -258,10 +258,26 @@ export default class HttpServer {
 			options,
 		);
 
+		const endpoint = new Endpoint(uri);
+		const maybeRegexprPath = endpoint.isVarArgs() ? endpoint.toRegexp() : null;
+
 		let callbackList = [middlewareErrorHandler];
 
 		callbackList.unshift(async function (request, response) {
 			const context = new HttpServerContext(request, response);
+			// Override the params if there is a regexpr.
+			// This is needed because Express apply a urldecode operation to the params which is not
+			// wanted with variable arguments. Because we need to differentiate between / and %2F.
+			if (maybeRegexprPath) {
+				const match = maybeRegexprPath.exec(request.path);
+				Exception.assert(
+					match,
+					"There must be a match with the path ({}) and its regular expression ({}).",
+					request.path,
+					maybeRegexprPath,
+				);
+				request.params = match.groups;
+			}
 			try {
 				await callback.call(this, context);
 			} catch (e) {
@@ -295,7 +311,7 @@ export default class HttpServer {
 
 		const updatedURI =
 			"/" +
-			new Endpoint(uri)
+			endpoint
 				.map((fragment) => {
 					if (typeof fragment == "string") {
 						return fragment;

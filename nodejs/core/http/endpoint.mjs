@@ -34,6 +34,13 @@ export default class HttpEndpoint {
 		});
 	}
 
+	/// Check if this endpoint has a variable argument.
+	///
+	/// Note, the variable argument must be last.
+	isVarArgs() {
+		return this.fragments[this.fragments.length - 1].isVarArgs;
+	}
+
 	map(callback) {
 		return this.fragments.map(callback);
 	}
