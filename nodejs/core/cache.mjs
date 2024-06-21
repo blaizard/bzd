@@ -7,6 +7,7 @@ const Exception = ExceptionFactory("cache");
 
 class CacheCollectionAccessor {
 	constructor(cache, collection) {
+		Exception.assert(typeof collection == "string", "Collection must be a string, not '{}'.", collection);
 		this.cache = cache;
 		this.collection = collection;
 	}

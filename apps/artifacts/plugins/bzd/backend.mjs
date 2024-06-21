@@ -57,6 +57,10 @@ function rawBodyParse(body, headersFunc, forceContentType = null, forceCharset =
 	return body;
 }
 
+function paramPathToPaths(paramPath) {
+	return paramPath.split("/").map((x) => decodeURIComponent(x));
+}
+
 /// Data structure of bzd nodes is as follow:
 /// The following is key-ed by UID:
 /// 	pending: [] // an ordered list of pending actions.
@@ -84,7 +88,7 @@ export default {
 					name: "nodes",
 				});
 				const nodes = new Nodes(storage);
-				for (const [uid, data] of Object.entries(params["bzd.data"])) {
+				for (const [uid, data] of Object.entries(params["bzd.data"] || {})) {
 					const node = await nodes.get(uid);
 					await node.insert(data, "data");
 				}
@@ -98,14 +102,14 @@ export default {
 			get: {
 				async handler(params, services) {
 					const node = await services.nodes.get(params.uid);
-					return await node.get(...params.path.split("/"));
+					return await node.get(...paramPathToPaths(params.path));
 				},
 			},
 			post: {
 				async handler(params, services) {
 					const data = rawBodyParse(this.getBody(), (name) => this.getHeader(name));
 					const node = await services.nodes.get(params.uid);
-					return await node.insert(data, ...params.path);
+					return await node.insert(data, ...paramPathToPaths(params.path));
 				},
 			},
 		},
