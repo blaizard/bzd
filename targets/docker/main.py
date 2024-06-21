@@ -81,33 +81,34 @@ if __name__ == "__main__":
 		raise Exception(f"Unknown transport type for '{args.transport}'.")
 
 	with transport.session() as handle:
+		print("Command mkdir", flush=True)
 
 		handle.command(["mkdir", "-p", str(applicationsDirectory)])
 
-		print(f"Copying '{args.directory}/docker-compose.yml'.")
+		print(f"Copying '{args.directory}/docker-compose.yml'.", flush=True)
 		handle.uploadContent(registry, f"{args.directory}/docker-compose.yml")
 
-		print(f"Starting docker registry.")
+		print("Starting docker registry.", flush=True)
 		handle.command(["docker", "compose", "--file", f"{args.directory}/docker-compose.yml", "up", "-d", "registry"])
 
 		# Push the new images
 		with handle.forwardPort(args.registry_port, waitHTTP=f"http://localhost:{args.registry_port}/v2/"):
 			for image in images:
-				print(f"Pushing {image}...")
+				print(f"Pushing {image}...", flush=True)
 				ociPush(image, f"localhost:{args.registry_port}/{image}", stdout=True, stderr=True, timeoutS=600)
 
 		# Find all applications.
 		applications = set(dockerCompose.keys())
 		result = handle.command(["find", str(applicationsDirectory), "-maxdepth", "1", "-type", "d"])
 		currentApplications = set(filter(bool, [d.strip().split("/")[-1] for d in result.getOutput().split("\n")][1:]))
-		print(f"Applications currently deployed: {', '.join(currentApplications)}")
-		print(f"Applications: {', '.join(applications)}")
+		print(f"Applications currently deployed: {', '.join(currentApplications)}", flush=True)
+		print(f"Applications: {', '.join(applications)}", flush=True)
 
 		# Remove applications that are currently present but not needed anymore.
 		removeApplications = currentApplications - applications
 		for application in removeApplications:
 			directory = f"{applicationsDirectory}/{application}"
-			print(f"Stopping '{directory}'...")
+			print(f"Stopping '{directory}'...", flush=True)
 			handle.command(["docker", "compose", "--file", f"{directory}/docker-compose.yml", "down"],
 			               ignoreFailure=True)
 			handle.command(["rm", "-rfd", f"{directory}"])
@@ -115,12 +116,12 @@ if __name__ == "__main__":
 		# Start applications
 		for application, content in dockerCompose.items():
 			directory = f"{applicationsDirectory}/{application}"
-			print(f"Copying '{directory}/docker-compose.yml'.")
+			print(f"Copying '{directory}/docker-compose.yml'.", flush=True)
 			handle.command(["mkdir", "-p", directory])
 			handle.uploadContent(content, f"{directory}/docker-compose.yml")
-			print(f"Pulling new images.")
+			print(f"Pulling new images.", flush=True)
 			handle.command(["docker", "compose", "--file", f"{directory}/docker-compose.yml", "pull"])
-			print(f"Restarting containers.")
+			print(f"Restarting containers.", flush=True)
 			handle.command(["docker", "compose", "--file", f"{directory}/docker-compose.yml", "up", "-d"])
 
 	sys.exit(0)
