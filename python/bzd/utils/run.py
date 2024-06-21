@@ -115,6 +115,8 @@ def localCommand(
             maxOutputSize: The maximum size of the output, if larger, only the most recent output will be kept.
     """
 
+	print(f"Executing {' '.join(cmds)}", flush=True)
+
 	sel = selectors.DefaultSelector()
 	stream = ExecuteResultStreamWriter(stdout, stderr, maxOutputSize)
 	proc = subprocess.Popen(
@@ -138,6 +140,7 @@ def localCommand(
 				data = key.fileobj.read1(128)  # type: ignore
 				if not data:
 					isRunning = False
+				print(data.decode(errors="ignore"), end="", flush=True)
 				(stream.addStdout if key.fileobj is proc.stdout else stream.addStderr)(data)
 		remainingStdout, remainingStderr = proc.communicate()
 		stream.addStdout(remainingStdout)
