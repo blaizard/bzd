@@ -81,7 +81,6 @@ if __name__ == "__main__":
 		raise Exception(f"Unknown transport type for '{args.transport}'.")
 
 	with transport.session() as handle:
-		print("Command mkdir", flush=True)
 
 		handle.command(["mkdir", "-p", str(applicationsDirectory)])
 
@@ -92,6 +91,7 @@ if __name__ == "__main__":
 		handle.command(["docker", "compose", "--file", f"{args.directory}/docker-compose.yml", "up", "-d", "registry"])
 
 		# Push the new images
+		print(f"Forwarding port {args.registry_port}...", flush=True)
 		with handle.forwardPort(args.registry_port, waitHTTP=f"http://localhost:{args.registry_port}/v2/"):
 			for image in images:
 				print(f"Pushing {image}...", flush=True)
