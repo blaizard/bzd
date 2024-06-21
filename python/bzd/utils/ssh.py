@@ -142,8 +142,10 @@ class SSH:
 	            **kwargs: typing.Any) -> ExecuteResult:
 		"""Execute a remote command via SSH."""
 
+		localCommand([ssh] + self.commonCommands + ["-p", str(self.port), f"{self.username}@{self.host}", "ls"])
+
 		command = [ssh] + self.commonCommands + (
-		    sshArgs or []) + ["-p", str(self.port), "-o", "LogLevel=ERROR", f"{self.username}@{self.host}"]
+		    sshArgs or []) + ["-p", str(self.port), f"{self.username}@{self.host}"]
 		return localCommand(command + (args or []), **kwargs)
 
 	def uploadContent(self, content: str, destination: pathlib.Path) -> None:
