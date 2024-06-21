@@ -79,7 +79,7 @@ class SSH:
 		self.username = username
 		self.port = port
 
-		self.commonCommands = ["-o", "StrictHostKeyChecking=no", "-o", "UserKnownHostsFile=/dev/null"]
+		self.commonCommands = ["-o", "StrictHostKeyChecking=accept-new", "-o", "UserKnownHostsFile=/dev/null"]
 		if identity is not None:
 			self.commonCommands += ["-i", str(identity)]
 
@@ -145,7 +145,7 @@ class SSH:
 		localCommand([ssh] + self.commonCommands + ["-p", str(self.port), f"{self.username}@{self.host}", "ls"])
 
 		command = [ssh] + self.commonCommands + (
-		    sshArgs or []) + ["-p", str(self.port), f"{self.username}@{self.host}"]
+		    sshArgs or []) + ["-vvv", "-p", str(self.port), f"{self.username}@{self.host}"]
 		return localCommand(command + (args or []), **kwargs)
 
 	def uploadContent(self, content: str, destination: pathlib.Path) -> None:
