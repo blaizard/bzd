@@ -25,6 +25,9 @@ class TransportSSH:
 	def __init__(self, connection: str) -> None:
 		self.ssh = SSH.fromString(connection)
 
+	def forwardPort(self, *args: typing.Any, **kwargs: typing.Any) -> None:
+		return self.ssh.forwardPort(*args, **kwargs)
+
 	@contextmanager
 	def session(self) -> None:
 		with self.ssh.interactive() as handle:

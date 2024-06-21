@@ -13,6 +13,7 @@ from targets.docker.deployment.compose import DockerCompose
 from targets.docker.deployment.traefik import DockerTraefik
 
 from targets.docker.transport.ssh import TransportSSH
+from bzd.utils.ssh import SSH
 
 
 class CommonParameters:
@@ -79,6 +80,13 @@ if __name__ == "__main__":
 	else:
 		print("Error", flush=True)
 		raise Exception(f"Unknown transport type for '{args.transport}'.")
+
+	# Push the new images
+	print(f"Forwarding port {args.registry_port}...", flush=True)
+	with transport.forwardPort(args.registry_port):
+		for image in images:
+			print(f"Pushing {image}...", flush=True)
+			ociPush(image, f"localhost:{args.registry_port}/{image}", stdout=True, stderr=True, timeoutS=600)
 
 	with transport.session() as handle:
 
