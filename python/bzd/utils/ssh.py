@@ -142,11 +142,9 @@ class SSH:
 	            **kwargs: typing.Any) -> ExecuteResult:
 		"""Execute a remote command via SSH."""
 
-		localCommand([ssh] + self.commonCommands + ["-p", str(self.port), f"{self.username}@{self.host}", "ls"])
-
 		command = [ssh] + self.commonCommands + (
-		    sshArgs or []) + ["-vvv", "-p", str(self.port), f"{self.username}@{self.host}"]
-		return localCommand(command + (args or []), **kwargs)
+		    sshArgs or []) + ["-p", str(self.port), f"{self.username}@{self.host}"]
+		return localCommand(command + (args or []), detach=True, **kwargs)
 
 	def uploadContent(self, content: str, destination: pathlib.Path) -> None:
 		"""Copy the content of a file to the remote."""
@@ -171,6 +169,8 @@ class SSH:
 		socketName = f"bzd-forward-port-{time.time()}"
 		try:
 			self.command(sshArgs=["-M", "-S", socketName, "-fnNT", "-L", f"{port}:{self.host}:{port}"])
+			print("Waiting for 5s..", flush=True)
+			time.sleep(5)
 			#if waitHTTP:
 			#	# TODO: loop until timeout here.
 			#	HttpClient.get(waitHTTP)
