@@ -144,7 +144,7 @@ class SSH:
 
 		command = [ssh] + self.commonCommands + (
 		    sshArgs or []) + ["-p", str(self.port), "-o", "LogLevel=ERROR", f"{self.username}@{self.host}"]
-		return localCommand(command + (args or []), **kwargs)
+		return localCommand(command + (args or []), stdout=True, stderr=True, **kwargs)
 
 	def uploadContent(self, content: str, destination: pathlib.Path) -> None:
 		"""Copy the content of a file to the remote."""
