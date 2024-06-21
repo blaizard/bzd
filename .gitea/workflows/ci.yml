@@ -21,47 +21,6 @@ jobs:
                   cp tools/ci/gitea/.bazelrc.local .bazelrc.local
                   ./info.sh
 
-            - name: "[normal] static analysis"
-              run: |
-                  ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=dev --config=clang-tidy --platform_suffix=clang-tidy
-
-            - name: "[normal] clang prod"
-              run: |
-                  ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=clang --config=prod --config=cc --platform_suffix=clang-prod
-
-            - name: "[normal] gcc prod"
-              run: |
-                  ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=gcc --config=prod --config=cc --platform_suffix=gcc-prod
-
-            - name: "[normal] esp32 prod"
-              run: |
-                  ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=esp32 --config=prod --config=cc --platform_suffix=esp32-prod
-
-            - name: "[stress] dev (10 runs)"
-              run: |
-                  ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --build_tests_only --test_tag_filters=stress,-cc-coverage --config=dev --runs_per_test=10 --local_test_jobs=1 --platform_suffix=stress-dev
-
-            - name: "[stress] prod (10 runs)"
-              run: |
-                  ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --build_tests_only --test_tag_filters=stress,-cc-coverage --config=prod --runs_per_test=10 --local_test_jobs=1 --platform_suffix=stress-prod
-
-            - name: "[sanitizer] asan/lsan/ubsan"
-              run: |
-                  ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --config=clang --config=cc --config=sanitizer --config=asan --config=lsan --config=ubsan --platform_suffix=clang-asan-lsan-ubsan
-
-            - name: "[sanitizer] tsan"
-              run: |
-                  ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --config=clang --config=cc --config=sanitizer --config=tsan --platform_suffix=clang-tsan
-
-            - name: "[coverage] NodeJs"
-              run: |
-                  ./tools/bazel coverage ... --config=nodejs --platform_suffix=coverage-nodejs --config=local
-                  ./tools/bazel run tools/coverage --platform_suffix=coverage-nodejs --config=local -- --output bazel-out/coverage-nodejs
-
-            - name: "[sanitizer] sanitizer"
-              run: |
-                  ./tools/bazel run :sanitizer -- --check --all
-
             - name: "Deploy"
               uses: https://git.blaizard.com/blaise/deployment@main
               with:

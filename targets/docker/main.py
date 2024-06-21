@@ -49,26 +49,35 @@ if __name__ == "__main__":
 	parser.add_argument("transport", type=str, help="Location where to deploy the target.")
 	args = parser.parse_args()
 
+	print("Loading json", flush=True)
 	data = json.loads(args.json.read_text())
+	print("Loading ast", flush=True)
 	ast = Ast(data)
 
+	print("CommonParameters", flush=True)
 	common = CommonParameters(port=args.registry_port)
 
 	# Generate docker compose content
+	print("DockerTraefik", flush=True)
 	traefikDockerCompose, traefikImages = DockerTraefik(ast=ast, common=common).makeDockerComposeForAllInstances()
+	print("DockerCompose", flush=True)
 	composeDockerCompose, composeImages = DockerCompose(ast=ast, common=common).makeDockerComposeForAllInstances()
 	dockerCompose = traefikDockerCompose | composeDockerCompose
 	images = traefikImages | composeImages
 
+	print("Template", flush=True)
 	registry = Template.fromPath(pathlib.Path(__file__).parent / "registry.yml.btl").render(common)
 	applicationsDirectory = args.directory / "apps"
 
+	print("Transport", flush=True)
 	if args.transport.startswith("ssh://"):
 		connection = args.transport[6:]
-		print(f"Transport SSH at {connection}")
+		print(f"Transport SSH at {connection}", flush=True)
 		transport = TransportSSH(connection)
+		print("done", flush=True)
 
 	else:
+		print("Error", flush=True)
 		raise Exception(f"Unknown transport type for '{args.transport}'.")
 
 	with transport.session() as handle:
