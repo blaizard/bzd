@@ -99,6 +99,7 @@ def localCommand(
     stdout: Union[bool, TextIO] = False,
     stderr: Union[bool, TextIO] = False,
     maxOutputSize: int = 1000000,
+	detach: bool = False
 ) -> ExecuteResult:
 	"""Run a process locally.
 
@@ -126,6 +127,7 @@ def localCommand(
 	    stdin=None if stdin else subprocess.PIPE,
 	    stderr=subprocess.PIPE,
 	    env=env,
+		start_new_session=detach
 	)
 	timer: threading.Timer = threading.Timer(timeoutS, proc.kill) if timeoutS > 0.0 else _NoopTimer()  # type: ignore
 	sel.register(proc.stdout, events=selectors.EVENT_READ)  # type: ignore
