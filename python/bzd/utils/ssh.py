@@ -145,7 +145,7 @@ class SSH:
 
 		command = [ssh] + self.commonCommands + (
 		    sshArgs or []) + ["-p", str(self.port), f"{self.username}@{self.host}"]
-		return localCommand(command + (args or []), detach=True, **kwargs)
+		return localCommand(command + (args or []), **kwargs)
 
 	def uploadContent(self, content: str, destination: pathlib.Path) -> None:
 		"""Copy the content of a file to the remote."""
@@ -164,20 +164,21 @@ class SSH:
 		localCommand(command)
 
 	@contextmanager
-	def forwardPort(self, port: int, waitHTTP: typing.Optional[str] = None, waitTimeoutS: int = 20) -> None:
+	def forwardPort(self, port: int, waitS: typing.Optional[int] = None, waitHTTP: typing.Optional[str] = None, waitTimeoutS: int = 20) -> None:
 		"""Forward a port."""
 
 		socketName = f"bzd-forward-port-{time.time()}"
 		sshThread = threading.Thread(target=self.command, kwargs={
-			"sshArgs": ["-M", "-S", socketName, "-nNT", "-L", f"{port}:{self.host}:{port}"]
+			"sshArgs": ["-M", "-S", socketName, "-nNT", "-L", f"{port}:{self.host}:{port}"],
+			"ignoreFailure": True
 		})
 		try:
 			sshThread.start()
-			print("Waiting for 5s..", flush=True)
-			time.sleep(5)
-			#if waitHTTP:
-			#	# TODO: loop until timeout here.
-			#	HttpClient.get(waitHTTP)
+			if waitS:
+				time.sleep(waitS)
+			if waitHTTP:
+				# TODO: loop until timeout here.
+				HttpClient.get(waitHTTP)
 			yield
 		finally:
 			self.command(sshArgs=["-S", socketName, "-O", "exit"])
