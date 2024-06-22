@@ -169,7 +169,7 @@ class SSH:
 
 		socketName = f"bzd-forward-port-{time.time()}"
 		sshThread = threading.Thread(target=self.command, kwargs={
-			"sshArgs": ["-M", "-S", socketName, "-nNT", "-L", f"{port}:{self.host}:{port}"],
+			"sshArgs": ["-M", "-S", socketName, "-fnNT", "-L", f"{port}:{self.host}:{port}"],
 			"ignoreFailure": True
 		})
 		try:
