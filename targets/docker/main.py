@@ -8,6 +8,7 @@ import re
 from bdl.generators.json.ast.ast import Ast
 from bzd.template.template import Template
 from bzd_oci.run import ociPush
+from bzd.http.client import HttpClient
 
 from targets.docker.deployment.compose import DockerCompose
 from targets.docker.deployment.traefik import DockerTraefik
@@ -75,6 +76,9 @@ if __name__ == "__main__":
 
 	with transport.session() as handle:
 
+		#handle.command(["docker", "exec", "registry", "/bin/registry", "garbage-collect", "--delete-untagged", "/etc/docker/registry/config.yml"], stdout=True, stderr=True)
+		#handle.command(["df", "-H"], stdout=True, stderr=True)
+
 		handle.command(["mkdir", "-p", str(applicationsDirectory)])
 
 		print(f"Copying '{args.directory}/docker-compose.yml'.", flush=True)
@@ -85,7 +89,7 @@ if __name__ == "__main__":
 
 		# Push the new images
 		print(f"Forwarding port {args.registry_port}...", flush=True)
-		with handle.forwardPort(args.registry_port, waitS=5, waitHTTP=f"http://localhost:{args.registry_port}/v2/"):
+		with handle.forwardPort(args.registry_port, waitHTTP=f"http://localhost:{args.registry_port}/v2/"):
 			for image in images:
 				print(f"Pushing {image}...", flush=True)
 				ociPush(image, f"localhost:{args.registry_port}/{image}", stdout=True, stderr=True, timeoutS=600)

@@ -3,6 +3,7 @@ import pathlib
 import tempfile
 import threading
 import time
+import math
 from contextlib import contextmanager
 import paramiko
 import shlex
@@ -164,7 +165,7 @@ class SSH:
 		localCommand(command)
 
 	@contextmanager
-	def forwardPort(self, port: int, waitS: typing.Optional[int] = None, waitHTTP: typing.Optional[str] = None, waitTimeoutS: int = 20) -> None:
+	def forwardPort(self, port: int, waitHTTP: typing.Optional[str] = None, waitTimeoutS: int = 20) -> None:
 		"""Forward a port."""
 
 		socketName = f"bzd-forward-port-{time.time()}"
@@ -174,13 +175,19 @@ class SSH:
 		})
 		try:
 			sshThread.start()
-			if waitS:
-				time.sleep(waitS)
-			if waitHTTP:
-				# TODO: loop until timeout here.
-				HttpClient.get(waitHTTP)
+			startS = time.time()
+			while True:
+				timeLeftS = waitTimeoutS - (time.time() - startS)
+				if timeLeftS <= 0:
+					raise TimeoutError(f"Port forwarding timed-out with {waitTimeoutS}s.")
+				if waitHTTP:
+					result = HttpClient.get(waitHTTP, timeoutS=math.ceil(timeLeftS))
+					if result.status == 200:
+						break
+				else:
+					time.sleep(1)
 			yield
 		finally:
-			self.command(sshArgs=["-S", socketName, "-O", "exit"])
+			self.command(sshArgs=["-S", socketName, "-O", "exit"], ignoreFailure=True)
 			sshThread.join()
 

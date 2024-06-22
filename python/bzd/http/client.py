@@ -19,7 +19,7 @@ class Response:
 
 	@property
 	def text(self):
-		return self.content().decode(self.encoding)
+		return self.content.decode(self.encoding)
 
 	def getHeader(self, name):
 		return self.response.getheader(name, None)
@@ -36,7 +36,7 @@ class HttpClient:
 		return HttpClient._any("post", *args, **kwargs)
 
 	@staticmethod
-	def _any(method: str, url: str, json: typing.Optional[typing.Dict[str, typing.Any]] = None) -> Response:
+	def _any(method: str, url: str, json: typing.Optional[typing.Dict[str, typing.Any]] = None, timeoutS: int = 60) -> Response:
 
 		body = None
 		headers = {}
@@ -47,6 +47,6 @@ class HttpClient:
 			headers["content-length"] = len(body)
 
 		request = urllib.request.Request(url, data=body, headers=headers)
-		response = urllib.request.urlopen(request)
+		response = urllib.request.urlopen(request, timeout=timeoutS)
 
 		return Response(response)
