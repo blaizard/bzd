@@ -99,7 +99,6 @@ def localCommand(
     stdout: Union[bool, TextIO] = False,
     stderr: Union[bool, TextIO] = False,
     maxOutputSize: int = 1000000,
-	detach: bool = False
 ) -> ExecuteResult:
 	"""Run a process locally.
 
@@ -116,8 +115,6 @@ def localCommand(
             maxOutputSize: The maximum size of the output, if larger, only the most recent output will be kept.
     """
 
-	print(f"Executing {' '.join(cmds)}", flush=True)
-
 	sel = selectors.DefaultSelector()
 	stream = ExecuteResultStreamWriter(stdout, stderr, maxOutputSize)
 	proc = subprocess.Popen(
@@ -127,7 +124,6 @@ def localCommand(
 	    stdin=None if stdin else subprocess.PIPE,
 	    stderr=subprocess.PIPE,
 	    env=env,
-		start_new_session=detach
 	)
 	timer: threading.Timer = threading.Timer(timeoutS, proc.kill) if timeoutS > 0.0 else _NoopTimer()  # type: ignore
 	sel.register(proc.stdout, events=selectors.EVENT_READ)  # type: ignore
@@ -142,7 +138,6 @@ def localCommand(
 				data = key.fileobj.read1(128)  # type: ignore
 				if not data:
 					isRunning = False
-				print(data.decode(errors="ignore"), end="", flush=True)
 				(stream.addStdout if key.fileobj is proc.stdout else stream.addStderr)(data)
 		remainingStdout, remainingStderr = proc.communicate()
 		stream.addStdout(remainingStdout)
