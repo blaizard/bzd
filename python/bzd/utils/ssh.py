@@ -1,6 +1,7 @@
 import typing
 import pathlib
 import tempfile
+import threading
 import time
 from contextlib import contextmanager
 import paramiko
@@ -167,8 +168,11 @@ class SSH:
 		"""Forward a port."""
 
 		socketName = f"bzd-forward-port-{time.time()}"
+		sshThread = threading.Thread(target=self.command, kwargs={
+			"sshArgs": ["-M", "-S", socketName, "-nNT", "-L", f"{port}:{self.host}:{port}"]
+		})
 		try:
-			self.command(sshArgs=["-M", "-S", socketName, "-fnNT", "-L", f"{port}:{self.host}:{port}"])
+			sshThread.start()
 			print("Waiting for 5s..", flush=True)
 			time.sleep(5)
 			#if waitHTTP:
@@ -177,3 +181,5 @@ class SSH:
 			yield
 		finally:
 			self.command(sshArgs=["-S", socketName, "-O", "exit"])
+			sshThread.join()
+
