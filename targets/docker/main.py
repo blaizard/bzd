@@ -117,7 +117,10 @@ if __name__ == "__main__":
 
 		# Cleanup docker register and docker
 		print(f"Cleaning up dangling images...", flush=True)
-		handle.command(["docker", "exec", "registry", "/bin/registry", "garbage-collect", "--delete-untagged", "/etc/docker/registry/config.yml"])
+		handle.command([
+		    "docker", "exec", "registry", "/bin/registry", "garbage-collect", "--delete-untagged",
+		    "/etc/docker/registry/config.yml"
+		])
 		handle.command(["docker", "image", "prune", "--force"])
 
 	sys.exit(0)
