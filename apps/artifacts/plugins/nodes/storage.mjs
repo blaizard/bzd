@@ -4,7 +4,7 @@ import LogFactory from "#bzd/nodejs/core/log.mjs";
 import { CollectionPaging } from "#bzd/nodejs/db/utils.mjs";
 import Permissions from "#bzd/nodejs/db/storage/permissions.mjs";
 
-const Log = LogFactory("apps", "plugin", "bzd");
+const Log = LogFactory("apps", "plugin", "nodes");
 
 export default class StorageBzd extends Storage {
 	constructor(nodes) {
