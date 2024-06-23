@@ -21,7 +21,7 @@ Description=bzd Node Manager
 After=network.service
 
 [Service]
-ExecStart=$(pwd)/node_manager accounts
+ExecStart=$(pwd)/node_manager <node UID>
 
 [Install]
 WantedBy=multi-user.target
@@ -31,4 +31,15 @@ systemctl daemon-reload
 systemctl enable bzd.service
 systemctl start bzd.service
 systemctl status bzd.service
+```
+
+To remove the service if needed:
+
+```bash
+systemctl stop bzd.service
+systemctl disable bzd.service
+rm /etc/systemd/system/bzd.service
+rm /usr/lib/systemd/system/bzd.service
+systemctl daemon-reload
+systemctl reset-failed
 ```
