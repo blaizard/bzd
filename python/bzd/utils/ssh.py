@@ -179,11 +179,15 @@ class SSH:
 			while True:
 				timeLeftS = waitTimeoutS - (time.time() - startS)
 				if timeLeftS <= 0:
-					raise TimeoutError(f"Port forwarding timed-out with {waitTimeoutS}s.")
+					raise TimeoutError(f"Port forwarding timed-out within {waitTimeoutS}s.")
 				if waitHTTP:
-					result = HttpClient.get(waitHTTP, timeoutS=math.ceil(timeLeftS))
-					if result.status == 200:
-						break
+					try:
+						result = HttpClient.get(waitHTTP, timeoutS=math.ceil(timeLeftS))
+						if result.status == 200:
+							break
+					except:
+						time.sleep(1)
+						pass
 				else:
 					time.sleep(1)
 			yield

@@ -71,7 +71,6 @@ if __name__ == "__main__":
 		transport = TransportSSH(connection)
 
 	else:
-		print("Error", flush=True)
 		raise Exception(f"Unknown transport type for '{args.transport}'.")
 
 	with transport.session() as handle:
