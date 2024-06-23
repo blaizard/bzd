@@ -9,7 +9,7 @@
 
 <script>
 	import Base from "#bzd/apps/artifacts/plugins/base.vue";
-	import ViewCategory from "#bzd/apps/artifacts/plugins/bzd/view_category.vue";
+	import ViewCategory from "#bzd/apps/artifacts/plugins/nodes/view_category.vue";
 
 	export default {
 		mixins: [Base],

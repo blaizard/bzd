@@ -1,5 +1,5 @@
-import StorageBzd from "#bzd/apps/artifacts/plugins/bzd/storage.mjs";
-import Nodes from "#bzd/apps/artifacts/plugins/bzd/nodes.mjs";
+import StorageBzd from "#bzd/apps/artifacts/plugins/nodes/storage.mjs";
+import Nodes from "#bzd/apps/artifacts/plugins/nodes/nodes.mjs";
 import makeStorageFromConfig from "#bzd/nodejs/db/key_value_store/make_from_config.mjs";
 
 function rawBodyParse(body, headersFunc, forceContentType = null, forceCharset = null) {
@@ -88,7 +88,7 @@ export default {
 					name: "nodes",
 				});
 				const nodes = new Nodes(storage);
-				for (const [uid, data] of Object.entries(params["bzd.data"] || {})) {
+				for (const [uid, data] of Object.entries(params["nodes.data"] || {})) {
 					const node = await nodes.get(uid);
 					await node.insert(data, "data");
 				}

@@ -4,7 +4,7 @@ _PLUGINS = [
     "fs",
     "docker",
     "webdav",
-    "bzd",
+    "nodes",
 ]
 
 bzd_nodejs_library(

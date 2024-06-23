@@ -5,7 +5,7 @@ bzd_nodejs_test(
     srcs = ["nodes_test.mjs"],
     main = "nodes_test.mjs",
     deps = [
-        "//apps/artifacts/plugins/bzd:backend",
+        "//apps/artifacts/plugins/nodes:backend",
         "//nodejs/core:exception",
     ],
 )

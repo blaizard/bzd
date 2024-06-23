@@ -1,8 +1,8 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
-import Nodes from "#bzd/apps/artifacts/plugins/bzd/nodes.mjs";
+import Nodes from "#bzd/apps/artifacts/plugins/nodes/nodes.mjs";
 import makeStorageFromConfig from "#bzd/nodejs/db/key_value_store/make_from_config.mjs";
 
-const Exception = ExceptionFactory("test", "artifacts", "plugins", "bzd");
+const Exception = ExceptionFactory("test", "artifacts", "plugins", "nodes");
 
 describe("Nodes", () => {
 	describe("Node", () => {
