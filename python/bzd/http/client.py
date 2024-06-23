@@ -36,7 +36,10 @@ class HttpClient:
 		return HttpClient._any("post", *args, **kwargs)
 
 	@staticmethod
-	def _any(method: str, url: str, json: typing.Optional[typing.Dict[str, typing.Any]] = None, timeoutS: int = 60) -> Response:
+	def _any(method: str,
+	         url: str,
+	         json: typing.Optional[typing.Dict[str, typing.Any]] = None,
+	         timeoutS: int = 60) -> Response:
 
 		body = None
 		headers = {}

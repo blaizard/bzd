@@ -144,8 +144,7 @@ class SSH:
 	            **kwargs: typing.Any) -> ExecuteResult:
 		"""Execute a remote command via SSH."""
 
-		command = [ssh] + self.commonCommands + (
-		    sshArgs or []) + ["-p", str(self.port), f"{self.username}@{self.host}"]
+		command = [ssh] + self.commonCommands + (sshArgs or []) + ["-p", str(self.port), f"{self.username}@{self.host}"]
 		return localCommand(command + (args or []), **kwargs)
 
 	def uploadContent(self, content: str, destination: pathlib.Path) -> None:
@@ -169,10 +168,12 @@ class SSH:
 		"""Forward a port."""
 
 		socketName = f"bzd-forward-port-{time.time()}"
-		sshThread = threading.Thread(target=self.command, kwargs={
-			"sshArgs": ["-M", "-S", socketName, "-fnNT", "-L", f"{port}:{self.host}:{port}"],
-			"ignoreFailure": True
-		})
+		sshThread = threading.Thread(
+		    target=self.command,
+		    kwargs={
+		        "sshArgs": ["-M", "-S", socketName, "-fnNT", "-L", f"{port}:{self.host}:{port}"],
+		        "ignoreFailure": True
+		    })
 		try:
 			sshThread.start()
 			startS = time.time()
@@ -194,4 +195,3 @@ class SSH:
 		finally:
 			self.command(sshArgs=["-S", socketName, "-O", "exit"], ignoreFailure=True)
 			sshThread.join()
-
