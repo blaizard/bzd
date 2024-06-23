@@ -8,13 +8,11 @@ import re
 from bdl.generators.json.ast.ast import Ast
 from bzd.template.template import Template
 from bzd_oci.run import ociPush
-from bzd.http.client import HttpClient
 
 from targets.docker.deployment.compose import DockerCompose
 from targets.docker.deployment.traefik import DockerTraefik
 
 from targets.docker.transport.ssh import TransportSSH
-from bzd.utils.ssh import SSH
 
 
 class CommonParameters:
@@ -75,9 +73,6 @@ if __name__ == "__main__":
 
 	with transport.session() as handle:
 
-		#handle.command(["docker", "exec", "registry", "/bin/registry", "garbage-collect", "--delete-untagged", "/etc/docker/registry/config.yml"], stdout=True, stderr=True)
-		#handle.command(["df", "-H"], stdout=True, stderr=True)
-
 		handle.command(["mkdir", "-p", str(applicationsDirectory)])
 
 		print(f"Copying '{args.directory}/docker-compose.yml'.", flush=True)
@@ -119,5 +114,10 @@ if __name__ == "__main__":
 			handle.command(["docker", "compose", "--file", f"{directory}/docker-compose.yml", "pull"])
 			print(f"Restarting containers.", flush=True)
 			handle.command(["docker", "compose", "--file", f"{directory}/docker-compose.yml", "up", "-d"])
+
+		# Cleanup docker register and docker
+		print(f"Cleaning up dangling images...", flush=True)
+		handle.command(["docker", "exec", "registry", "/bin/registry", "garbage-collect", "--delete-untagged", "/etc/docker/registry/config.yml"])
+		handle.command(["docker", "image", "prune", "--force"])
 
 	sys.exit(0)

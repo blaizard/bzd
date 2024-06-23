@@ -13,7 +13,6 @@ py_binary(
         "//targets/docker/transport:ssh",
         "@bzd_bdl//bdl/generators/json/ast",
         "@bzd_python//bzd/template",
-        "@bzd_python//bzd/http:client",
         "@bzd_rules_oci//python/bzd_oci:run",
     ],
 )
