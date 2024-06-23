@@ -52,7 +52,8 @@ export default class HttpEndpoint {
 					return regexprEscape(fragment);
 				}
 				if (fragment.isVarArgs) {
-					return "(?<" + fragment.name + ">.+)";
+					// Can be empty.
+					return "(?<" + fragment.name + ">.*)";
 				}
 				return "(?<" + fragment.name + ">[^/]+)";
 			})
