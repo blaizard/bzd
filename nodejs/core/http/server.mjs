@@ -10,7 +10,7 @@ import Multer from "multer";
 import Path from "path";
 
 import Event from "../event.mjs";
-import ExceptionFactory from "../exception.mjs";
+import { ExceptionFactory, ExceptionPrecondition } from "../exception.mjs";
 import FileSystem from "../filesystem.mjs";
 import LogFactory from "../log.mjs";
 import { HttpServerContext, HttpError } from "#bzd/nodejs/core/http/server_context.mjs";
@@ -283,6 +283,8 @@ export default class HttpServer {
 			} catch (e) {
 				if (e instanceof HttpError) {
 					response.status(e.code).send(e.message);
+				} else if (e instanceof ExceptionPrecondition) {
+					response.status(400).send(e.message);
 				} else if (options.exceptionGuard) {
 					Exception.print("Exception Guard; {}", Exception.fromError(e));
 					response.status(500).send(e.message);

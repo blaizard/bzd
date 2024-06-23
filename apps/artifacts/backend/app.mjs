@@ -130,7 +130,7 @@ program
 			}
 		}
 
-		Exception.error("Unhandled endpoint for /{}", [volume, ...pathList].join("/"));
+		Exception.assertPrecondition(false, "Unhandled endpoint for /{}", [volume, ...pathList].join("/"));
 	};
 
 	// Retrieve the storage implementation associated with this volume
@@ -169,11 +169,7 @@ program
 	// Adding API handlers.
 	function getInternalPath(pathList) {
 		Exception.assert(Array.isArray(pathList), "Path must be an array: '{:j}'", pathList);
-		Exception.assert(
-			pathList.every((path) => Boolean(path)),
-			"Path elements cannot be empty: '{:j}'",
-			pathList,
-		);
+		pathList = pathList.filter((path) => Boolean(path));
 		return { volume: pathList[0], pathList: pathList.slice(1) };
 	}
 
@@ -183,6 +179,7 @@ program
 
 	api.handle("get", "/file", async function (inputs) {
 		const { volume, pathList } = getInternalPathFromString(inputs.path);
+		Exception.assertPrecondition(volume, "There is no volume associated with this path: '{}'.", inputs.path);
 		const storage = await cache.get("volume", volume);
 		const metadata = await storage.metadata(pathList);
 		if (metadata.size) {
@@ -235,7 +232,9 @@ program
 			method,
 			"/x/{path:*}",
 			async (context) => {
-				const { volume, pathList } = getInternalPathFromString(context.getParam("path"));
+				const path = context.getParam("path");
+				const { volume, pathList } = getInternalPathFromString(path);
+				Exception.assertPrecondition(volume, "There is no volume associated with this path: '{}'.", path);
 				if (method == "get") {
 					const data = await endpointHandler.call(context, method, volume, pathList);
 					context.sendJson(data);
