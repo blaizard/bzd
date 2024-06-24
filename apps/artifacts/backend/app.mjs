@@ -11,6 +11,8 @@ import { CollectionPaging } from "#bzd/nodejs/db/utils.mjs";
 import { Command } from "commander/esm.mjs";
 import Path from "path";
 import Services2 from "#bzd/nodejs/core/services/services.mjs";
+import ServiceProvider from "#bzd/nodejs/core/services/provider.mjs";
+import Storage from "#bzd/nodejs/db/storage/storage.mjs";
 
 import APIv1 from "#bzd/api.json" assert { type: "json" };
 import Plugins from "#bzd/apps/artifacts/plugins/backend.mjs";
@@ -50,16 +52,52 @@ program
 
 	// Set-up the web server
 	let web = new HttpServer(PORT);
-	let api = new RestServer(APIv1.rest, {
+	let rest = new RestServer(APIv1.rest, {
 		channel: web,
 	});
 
-	let keyValueStore = await KeyValueStoreDisk.make(Path.join(PATH_DATA, "db"));
+	const volumes = {};
+
+	// Set the cache
+	const cache = new Cache();
+
+	// Services
+	const services2 = new Services2();
 
 	// Add initial volumes.
-	for (const [name, data] of Object.entries(config.volumes)) {
-		await keyValueStore.set("volume", name, data);
+	for (const [volume, options] of Object.entries(config.volumes)) {
+		Exception.assert("type" in options, "Volume options must have a type: '{}'.", volume);
+		const type = options.type;
+		Exception.assert(type in Plugins, "No plugins of type '{}', requested by '{}'.", type, volume);
+
+		const provider = new ServiceProvider(volume);
+		provider.addStopProcess(() => {
+			cache.setDirty("volume", volume);
+		});
+		const instance = new Plugins[type](volume, options, provider);
+		services2.register(provider, type);
+
+		volumes[volume] = {
+			options: options,
+			instance: instance,
+		};
 	}
+
+	// Retrieve the storage implementation associated with this volume
+	cache.register("volume", async (volume) => {
+		Exception.assert(volume in volumes, "No volume are associated with this id: '{}'", volume);
+		const instance = volumes[volume].instance;
+		Exception.assert(instance.storage, "No storage associated with this volume: '{}'", volume);
+		Exception.assert(
+			instance.storage instanceof Storage,
+			"The storage class of volume '{}' must be of type Storage.",
+			volume,
+		);
+		return instance.storage;
+	});
+
+	// Start all the services.
+	await services2.start();
 
 	// Docker GCR example
 	// await keyValueStore.set("volume", "docker.gcr", {
@@ -73,23 +111,7 @@ program
 	// "docker.proxy.port": 5051,
 	// });
 
-	// Set the cache
-	let cache = new Cache();
-
-	// Services
-	const services2 = new Services2();
-
-	// Creating services
-	let services = new Services({
-		makeContext: (volume) => {
-			return {
-				async getVolume() {
-					return await cache.get("volume", volume);
-				},
-			};
-		},
-	});
-
+	/*
 	// Preprocess endpoints
 	let endpoints = {};
 	for (const type in Plugins) {
@@ -136,41 +158,15 @@ program
 
 		Exception.assertPrecondition(false, "Unhandled endpoint for /{}", [volume, ...pathList].join("/"));
 	};
-
-	// Retrieve the storage implementation associated with this volume
-	cache.register("volume", async (volume) => {
-		const params = await keyValueStore.get("volume", volume, null);
-		Exception.assert(params !== null, "No volume are associated with this id: '{}'", volume);
-		Exception.assert("type" in params, "Unknown type for the volume: '{}'", volume);
-		Exception.assert(params.type in Plugins, "Volume type unsupported: '{}'", params.type);
-		Exception.assert("storage" in Plugins[params.type], "Storage not supported by plugin '{}'", params.type);
-		return await Plugins[params.type].storage(params, services.getActiveFor(volume));
-	});
-
-	// Register all plugns
-	Log.info("Using plugins: {}", Object.keys(Plugins).join(", "));
-	for (const type in Plugins) {
-		const pluginServices = Plugins[type].services || {};
-		for (const serviceName in pluginServices) {
-			services.register(type, serviceName, pluginServices[serviceName]);
-		}
-	}
-
-	// Start all services
-	let it = CollectionPaging.makeIterator(async (maxOrPaging) => {
-		return await keyValueStore.list("volume", maxOrPaging);
-	}, 50);
-	for await (const [name, params] of it) {
-		await services.start(name, params.type, params);
-	}
+	*/
 
 	// Redirect /file/** to /file?path=**
-	// It is needed to do this before the API as it takes precedence.
+	// It is needed to do this before the REST API as it takes precedence.
 	web.addRoute("get", "/file/{path:*}", async (context) => {
-		context.redirect(api.getEndpoint("/file?path=" + context.getParam("path")));
+		context.redirect(rest.getEndpoint("/file?path=" + context.getParam("path")));
 	});
 
-	// Adding API handlers.
+	// Adding REST handlers.
 	function getInternalPath(pathList) {
 		Exception.assert(Array.isArray(pathList), "Path must be an array: '{:j}'", pathList);
 		pathList = pathList.filter((path) => Boolean(path));
@@ -181,7 +177,7 @@ program
 		return getInternalPath(path.split("/").map(decodeURIComponent));
 	}
 
-	api.handle("get", "/file", async function (inputs) {
+	rest.handle("get", "/file", async function (inputs) {
 		const { volume, pathList } = getInternalPathFromString(inputs.path);
 		Exception.assertPrecondition(volume, "There is no volume associated with this path: '{}'.", inputs.path);
 		const storage = await cache.get("volume", volume);
@@ -193,19 +189,18 @@ program
 		return await storage.read(pathList);
 	});
 
-	api.handle("post", "/list", async (inputs) => {
+	rest.handle("post", "/list", async (inputs) => {
 		const { volume, pathList } = getInternalPath(inputs.path);
 		const maxOrPaging = "paging" in inputs ? inputs.paging : 50;
 
 		if (!volume) {
-			const volumes = await keyValueStore.list("volume", maxOrPaging);
-			const data = Object.entries(volumes.data());
-			const result = await CollectionPaging.makeFromList(data, data.length, (item) => {
+			const volumeNames = Object.keys(volumes);
+			const result = await CollectionPaging.makeFromList(volumeNames, volumeNames.length, (volume) => {
 				return Permissions.makeEntry(
 					{
-						name: item[0],
+						name: volume,
 						type: "bucket",
-						plugin: item[1].type,
+						plugin: volumes[volume].options.type,
 					},
 					{
 						list: true,
@@ -214,7 +209,7 @@ program
 			});
 			return {
 				data: result.data(),
-				next: volumes.getNextPaging(),
+				next: null,
 			};
 		}
 
@@ -227,7 +222,7 @@ program
 		};
 	});
 
-	api.handle("get", "/services", async (/*inputs*/) => {
+	rest.handle("get", "/services", async (/*inputs*/) => {
 		return services.getActive();
 	});
 

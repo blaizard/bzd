@@ -77,42 +77,36 @@ function paramPathToPaths(paramPath) {
 ///
 /// Questions:
 /// - What to do with firmware and firmware metadata?
-/*
+
 class PluginBase {
-	constructor(volume, options, cache) {
+	constructor(volume, options) {
 		this.volume = volume;
 		this.options = options;
 		this.storage = null;
-		this.provider = new ServiceProvider(this.volume);
-		this.provider.addStopProcess(() => {
-			cache.setDirty("volume", this.volume);
-		});
-	}
-};
-
-export default class Plugin extends PluginBase {
-	constructor(...args) {
-		super(...args);
-		this.nodes = null;
-		this.provider.addStartProcess(
-			async () => {
-				const storage = await makeStorageFromConfig({
-					type: "memory",
-					name: "nodes",
-				});
-				this.nodes = new Nodes(storage);
-				for (const [uid, data] of Object.entries(this.options["nodes.data"] || {})) {
-					const node = await this.nodes.get(uid);
-					await node.insert(data, "data");
-				}
-
-				this.storage = await StorageBzd.make(this.nodes);
-			},
-		);
 	}
 }
-*/
 
+export default class Plugin extends PluginBase {
+	constructor(volume, options, provider) {
+		super(volume, options);
+		this.nodes = null;
+		provider.addStartProcess(async () => {
+			const storage = await makeStorageFromConfig({
+				type: "memory",
+				name: "nodes",
+			});
+			this.nodes = new Nodes(storage);
+			for (const [uid, data] of Object.entries(this.options["nodes.data"] || {})) {
+				const node = await this.nodes.get(uid);
+				await node.insert(data, "data");
+			}
+
+			this.storage = await StorageBzd.make(this.nodes);
+		});
+	}
+}
+
+/*
 export default {
 	services: {
 		nodes: {
@@ -155,3 +149,4 @@ export default {
 		return await StorageBzd.make(services.nodes);
 	},
 };
+*/
