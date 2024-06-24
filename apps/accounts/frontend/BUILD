@@ -21,12 +21,12 @@ bzd_nodejs_web_binary(
     deps = [
         "//apps/accounts/backend/applications:frontend",
         "//apps/accounts/backend/logger/memory:frontend",
-        "//apps/accounts/backend/services:frontend",
         "//apps/accounts/backend/users:frontend",
         "//nodejs:icons",
         "//nodejs:vue",
         "//nodejs/core/authentication/google:client",
         "//nodejs/core/authentication/token:client",
+        "//nodejs/core/services:frontend",
         "//nodejs/styles/default",
         "//nodejs/vue:authentication",
         "//nodejs/vue:lang",

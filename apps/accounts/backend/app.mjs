@@ -20,7 +20,7 @@ import ConfigBackend from "#bzd/apps/accounts/backend/config.json" assert { type
 import MemoryLogger from "#bzd/apps/accounts/backend/logger/memory/memory.mjs";
 import paymentMakeFromConfig from "#bzd/nodejs/payment/make_from_config.mjs";
 import EmailManager from "#bzd/apps/accounts/backend/email/manager.mjs";
-import Services from "#bzd/apps/accounts/backend/services/services.mjs";
+import Services from "#bzd/nodejs/core/services/services.mjs";
 import Subscription from "#bzd/apps/accounts/backend/users/subscription.mjs";
 import { delayMs } from "#bzd/nodejs/utils/delay.mjs";
 

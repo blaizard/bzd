@@ -1,17 +1,21 @@
-load("@bzd_package//:defs.bzl", "bzd_package")
+load("@bzd_lib//config:defs.bzl", "bzd_config")
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_binary")
 
-bzd_package(
-    name = "package",
-    deps = {
-        ":backend": "hello",
-    },
+bzd_config(
+    name = "config",
+    srcs = [
+        "config.default.json",
+    ],
+    visibility = [
+        "//deployment:__subpackages__",
+    ],
 )
 
 bzd_nodejs_binary(
     name = "backend",
     srcs = [
         "app.mjs",
+        ":config.json",
     ],
     args = [
         "--static",
@@ -36,6 +40,6 @@ bzd_nodejs_binary(
         "//nodejs/core:filesystem",
         "//nodejs/core/http:server",
         "//nodejs/core/rest:server",
-        "//nodejs/db/key_value_store:disk",
+        "//nodejs/utils:uid",
     ],
 )

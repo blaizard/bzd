@@ -6,7 +6,7 @@
 </template>
 
 <script>
-	import Services from "#bzd/apps/accounts/backend/services/services.vue";
+	import Services from "#bzd/nodejs/core/services/services.vue";
 
 	export default {
 		components: {

@@ -1,7 +1,7 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import Stripe from "stripe";
-import ServiceProvider from "#bzd/apps/accounts/backend/services/provider.mjs";
+import ServiceProvider from "#bzd/nodejs/core/services/provider.mjs";
 import { PaymentInterface, PaymentRecurrency } from "#bzd/nodejs/payment/payment.mjs";
 import Result from "#bzd/nodejs/utils/result.mjs";
 

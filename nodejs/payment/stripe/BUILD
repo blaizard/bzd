@@ -11,10 +11,10 @@ bzd_nodejs_library(
     },
     visibility = ["//visibility:public"],
     deps = [
-        "//apps/accounts/backend/services",
         "//nodejs/core:exception",
         "//nodejs/core:log",
         "//nodejs/core/http:client",
+        "//nodejs/core/services",
         "//nodejs/payment",
         "//nodejs/utils:result",
     ],
