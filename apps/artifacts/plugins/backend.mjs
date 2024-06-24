@@ -4,8 +4,8 @@ import Webdav from "./webdav/backend.mjs";
 import Nodes from "./nodes/backend.mjs";
 
 export default {
-	fs: Fs,
-	docker: Docker,
-	webdav: Webdav,
+	//fs: Fs,
+	//docker: Docker,
+	//webdav: Webdav,
 	nodes: Nodes,
 };
