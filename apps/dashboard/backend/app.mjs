@@ -3,10 +3,9 @@ import Cache from "#bzd/nodejs/core/cache.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import HttpServer from "#bzd/nodejs/core/http/server.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
-import KeyValueStoreDisk from "#bzd/nodejs/db/key_value_store/disk.mjs";
 import { Command } from "commander/esm.mjs";
-import Path from "path";
-
+import config from "#bzd/apps/dashboard/backend/config.json" assert { type: "json" };
+import { makeUid } from "#bzd/nodejs/utils/uid.mjs";
 import APIv1 from "#bzd/apps/dashboard/api.v1.json" assert { type: "json" };
 import Plugins from "#bzd/apps/dashboard/plugins/plugins.backend.index.mjs";
 
@@ -49,7 +48,16 @@ async function getData(type, uid, cache) {
 	let web = new HttpServer(PORT);
 	web.addStaticRoute("/", PATH_STATIC);
 
-	let keyValueStore = await KeyValueStoreDisk.make(Path.join(PATH_DATA, "db"));
+	// Read the tiles configuration
+	let [tiles, tilesOrder] = config.tiles.reduce(
+		(object, tile) => {
+			const uid = makeUid();
+			object[0][uid] = tile;
+			object[1].push(uid);
+			return object;
+		},
+		[{}, []],
+	);
 
 	let cache = new Cache();
 	let events = {};
@@ -58,7 +66,7 @@ async function getData(type, uid, cache) {
 	cache.register(
 		"data",
 		async (uid) => {
-			let data = await keyValueStore.get("tiles", uid, null);
+			let data = tiles[uid] || null;
 			Exception.assert(data !== null, "There is no data associated with UID '{}'.", uid);
 			return data;
 		},
@@ -114,22 +122,23 @@ async function getData(type, uid, cache) {
 		channel: web,
 	});
 	api.handle("get", "/tiles", async () => {
-		const result = await keyValueStore.list("tiles");
-		return result.data();
+		console.log(tiles);
+		return tiles;
 	});
 	api.handle("get", "/tile", async (inputs) => {
-		return await keyValueStore.get("tiles", inputs.uid);
+		return tiles[inputs.uid];
 	});
 	api.handle("post", "/tile", async (inputs) => {
-		await keyValueStore.set("tiles", null, inputs.value);
+		Exception.error("nnnnoooo");
+		//await keyValueStore.set("tiles", null, inputs.value);
 		await cache.setDirty("data", inputs.uid);
 	});
 	api.handle("put", "/tile", async (inputs) => {
-		await keyValueStore.set("tiles", inputs.uid, inputs.value);
+		tiles[inputs.uid] = inputs.value;
 		await cache.setDirty("data", inputs.uid);
 	});
 	api.handle("delete", "/tile", async (inputs) => {
-		await keyValueStore.delete("tiles", inputs.uid);
+		delete tiles[inputs.uid];
 	});
 	api.handle("get", "/data", async (inputs) => {
 		return await cache.get(inputs.type, inputs.uid);

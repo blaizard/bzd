@@ -1,6 +1,6 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
-import ServiceProvider from "#bzd/apps/accounts/backend/services/provider.mjs";
-import Services from "#bzd/apps/accounts/backend/services/services.mjs";
+import ServiceProvider from "#bzd/nodejs/core/services/provider.mjs";
+import Services from "#bzd/nodejs/core/services/services.mjs";
 
 const Exception = ExceptionFactory("test", "services");
 

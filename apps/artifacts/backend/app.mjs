@@ -10,9 +10,10 @@ import Permissions from "#bzd/nodejs/db/storage/permissions.mjs";
 import { CollectionPaging } from "#bzd/nodejs/db/utils.mjs";
 import { Command } from "commander/esm.mjs";
 import Path from "path";
+import Services2 from "#bzd/nodejs/core/services/services.mjs";
 
 import APIv1 from "#bzd/api.json" assert { type: "json" };
-import Plugins from "../plugins/backend.mjs";
+import Plugins from "#bzd/apps/artifacts/plugins/backend.mjs";
 import config from "#bzd/apps/artifacts/backend/config.json" assert { type: "json" };
 
 import Services from "./services.mjs";
@@ -74,6 +75,9 @@ program
 
 	// Set the cache
 	let cache = new Cache();
+
+	// Services
+	const services2 = new Services2();
 
 	// Creating services
 	let services = new Services({

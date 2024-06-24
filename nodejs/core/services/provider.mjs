@@ -1,6 +1,6 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
-import Services from "#bzd/apps/accounts/backend/services/services.mjs";
+import Services from "#bzd/nodejs/core/services/services.mjs";
 
 const Exception = ExceptionFactory("services", "provider");
 const Log = LogFactory("services", "provider");

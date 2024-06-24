@@ -1,6 +1,7 @@
 import StorageBzd from "#bzd/apps/artifacts/plugins/nodes/storage.mjs";
 import Nodes from "#bzd/apps/artifacts/plugins/nodes/nodes.mjs";
 import makeStorageFromConfig from "#bzd/nodejs/db/key_value_store/make_from_config.mjs";
+import ServiceProvider from "#bzd/nodejs/core/services/provider.mjs";
 
 function rawBodyParse(body, headersFunc, forceContentType = null, forceCharset = null) {
 	const contentTypeHeader = Object.fromEntries(
@@ -76,6 +77,42 @@ function paramPathToPaths(paramPath) {
 ///
 /// Questions:
 /// - What to do with firmware and firmware metadata?
+/*
+class PluginBase {
+	constructor(volume, options, cache) {
+		this.volume = volume;
+		this.options = options;
+		this.storage = null;
+		this.provider = new ServiceProvider(this.volume);
+		this.provider.addStopProcess(() => {
+			cache.setDirty("volume", this.volume);
+		});
+	}
+};
+
+export default class Plugin extends PluginBase {
+	constructor(...args) {
+		super(...args);
+		this.nodes = null;
+		this.provider.addStartProcess(
+			async () => {
+				const storage = await makeStorageFromConfig({
+					type: "memory",
+					name: "nodes",
+				});
+				this.nodes = new Nodes(storage);
+				for (const [uid, data] of Object.entries(this.options["nodes.data"] || {})) {
+					const node = await this.nodes.get(uid);
+					await node.insert(data, "data");
+				}
+
+				this.storage = await StorageBzd.make(this.nodes);
+			},
+		);
+	}
+}
+*/
+
 export default {
 	services: {
 		nodes: {

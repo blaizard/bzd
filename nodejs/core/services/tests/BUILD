@@ -7,7 +7,7 @@ bzd_nodejs_test(
     ],
     main = "services_test.mjs",
     deps = [
-        "//apps/accounts/backend/services",
         "//nodejs/core:exception",
+        "//nodejs/core/services",
     ],
 )

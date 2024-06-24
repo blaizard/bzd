@@ -44,6 +44,7 @@ bzd_nodejs_binary(
         "//nodejs/core/http:endpoint",
         "//nodejs/core/http:server",
         "//nodejs/core/rest:server",
+        "//nodejs/core/services",
         "//nodejs/db:utils",
         "//nodejs/db/key_value_store:disk",
     ],
