@@ -10,6 +10,7 @@ bzd_nodejs_library(
         "//apps/artifacts/plugins:__pkg__",
     ],
     deps = [
+        "//apps/artifacts/backend:plugin",
         "//nodejs/core:exception",
         "//nodejs/core:log",
         "//nodejs/core/http:proxy",

@@ -9,10 +9,9 @@ import { CollectionPaging } from "#bzd/nodejs/db/utils.mjs";
 import { Command } from "commander/esm.mjs";
 import Services from "#bzd/nodejs/core/services/services.mjs";
 import ServiceProvider from "#bzd/nodejs/core/services/provider.mjs";
-import Storage from "#bzd/nodejs/db/storage/storage.mjs";
 import EndpointsFactory from "#bzd/apps/artifacts/backend/endpoints_factory.mjs";
 import Authentication from "#bzd/apps/accounts/authentication/server.mjs";
-
+import Plugin from "#bzd/apps/artifacts/backend/plugin.mjs";
 import APIv1 from "#bzd/api.json" assert { type: "json" };
 import Plugins from "#bzd/apps/artifacts/plugins/backend.mjs";
 import config from "#bzd/apps/artifacts/backend/config.json" assert { type: "json" };
@@ -67,13 +66,16 @@ program
 		Exception.assert("type" in options, "Volume options must have a type: '{}'.", volume);
 		const type = options.type;
 		Exception.assert(type in Plugins, "No plugins of type '{}', requested by '{}'.", type, volume);
+		Exception.assert(Plugins[type].prototype instanceof Plugin, "The plugin '{}' must derive from class Plugin.", type);
 
 		const provider = new ServiceProvider(volume);
-		provider.addStopProcess(() => {
-			cache.setDirty("volume", volume);
-		});
 		const endpoints = new EndpointsFactory();
 		const instance = new Plugins[type](volume, options, provider, endpoints);
+		provider.addStopProcess(() => {
+			// This stop process will be executed at last.
+			cache.setDirty("volume", volume);
+			instance.resetStorage();
+		});
 		services.register(provider, type);
 
 		volumes[volume] = {
@@ -87,13 +89,7 @@ program
 	cache.register("volume", async (volume) => {
 		Exception.assert(volume in volumes, "No volume are associated with this id: '{}'", volume);
 		const instance = volumes[volume].instance;
-		Exception.assert(instance.storage, "No storage associated with this volume: '{}'", volume);
-		Exception.assert(
-			instance.storage instanceof Storage,
-			"The storage class of volume '{}' must be of type Storage.",
-			volume,
-		);
-		return instance.storage;
+		return instance.getStorage();
 	});
 
 	// Start all the services.
