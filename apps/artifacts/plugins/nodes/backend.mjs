@@ -1,6 +1,7 @@
 import StorageBzd from "#bzd/apps/artifacts/plugins/nodes/storage.mjs";
 import Nodes from "#bzd/apps/artifacts/plugins/nodes/nodes.mjs";
 import makeStorageFromConfig from "#bzd/nodejs/db/key_value_store/make_from_config.mjs";
+import PluginBase from "#bzd/apps/artifacts/backend/plugin.mjs";
 
 function rawBodyParse(body, headersFunc, forceContentType = null, forceCharset = null) {
 	const contentTypeHeader = Object.fromEntries(
@@ -57,10 +58,6 @@ function rawBodyParse(body, headersFunc, forceContentType = null, forceCharset =
 	return body;
 }
 
-function paramPathToPaths(paramPath) {
-	return paramPath.split("/").map((x) => decodeURIComponent(x));
-}
-
 /// Data structure of bzd nodes is as follow:
 /// The following is key-ed by UID:
 /// 	pending: [] // an ordered list of pending actions.
@@ -77,14 +74,6 @@ function paramPathToPaths(paramPath) {
 /// Questions:
 /// - What to do with firmware and firmware metadata?
 
-class PluginBase {
-	constructor(volume, options) {
-		this.volume = volume;
-		this.options = options;
-		this.storage = null;
-	}
-}
-
 export default class Plugin extends PluginBase {
 	constructor(volume, options, provider, endpoints) {
 		super(volume, options);
@@ -95,70 +84,29 @@ export default class Plugin extends PluginBase {
 				name: "nodes",
 			});
 			this.nodes = new Nodes(storage);
-			for (const [uid, data] of Object.entries(this.options["nodes.data"] || {})) {
+			for (const [uid, data] of Object.entries(options["nodes.data"] || {})) {
 				const node = await this.nodes.get(uid);
 				await node.insert(data, "data");
 			}
 
-			this.storage = await StorageBzd.make(this.nodes);
+			this.setStorage(await StorageBzd.make(this.nodes));
 		});
 
 		const plugin = this;
 
 		endpoints.register("get", "/{uid}/{path:*}", async function (params) {
 			const node = await plugin.nodes.get(params.uid);
-			return await node.get(...paramPathToPaths(params.path));
+			return await node.get(...Plugin.paramPathToPaths(params.path));
 		});
 
 		endpoints.register("post", "/{uid}/{path:*}", async function (params) {
 			const data = rawBodyParse(this.getBody(), (name) => this.getHeader(name));
 			const node = await plugin.nodes.get(params.uid);
-			return await node.insert(data, ...paramPathToPaths(params.path));
+			return await node.insert(data, ...Plugin.paramPathToPaths(params.path));
 		});
 	}
-}
 
-/*
-export default {
-	services: {
-		nodes: {
-			async is(params) {
-				return true;
-			},
-			async start(params, context) {
-				const storage = await makeStorageFromConfig({
-					type: "memory",
-					name: "nodes",
-				});
-				const nodes = new Nodes(storage);
-				for (const [uid, data] of Object.entries(params["nodes.data"] || {})) {
-					const node = await nodes.get(uid);
-					await node.insert(data, "data");
-				}
-				return nodes;
-			},
-			async stop(server) {},
-		},
-	},
-	endpoints: {
-		"/{uid}/{path:*}": {
-			get: {
-				async handler(params, services) {
-					const node = await services.nodes.get(params.uid);
-					return await node.get(...paramPathToPaths(params.path));
-				},
-			},
-			post: {
-				async handler(params, services) {
-					const data = rawBodyParse(this.getBody(), (name) => this.getHeader(name));
-					const node = await services.nodes.get(params.uid);
-					return await node.insert(data, ...paramPathToPaths(params.path));
-				},
-			},
-		},
-	},
-	async storage(params, services) {
-		return await StorageBzd.make(services.nodes);
-	},
-};
-*/
+	static paramPathToPaths(paramPath) {
+		return paramPath.split("/").map((x) => decodeURIComponent(x));
+	}
+}

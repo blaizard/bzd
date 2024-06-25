@@ -11,6 +11,7 @@ bzd_nodejs_library(
         "//apps/artifacts/plugins:__subpackages__",
     ],
     deps = [
+        "//apps/artifacts/backend:plugin",
         "//nodejs/core:cache",
         "//nodejs/core:exception",
         "//nodejs/core:log",

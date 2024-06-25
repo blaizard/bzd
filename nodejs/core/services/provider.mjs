@@ -11,6 +11,8 @@ const Log = LogFactory("services", "provider");
 export default class Provider {
 	constructor(...namespace) {
 		this.namespace = namespace;
+		this.processesStart = [];
+		this.processesStop = [];
 		this.processes = {};
 	}
 
@@ -29,18 +31,18 @@ export default class Provider {
 
 	/// Helpers to return certain types of processes.
 	*getStartProcesses() {
-		if ("start" in this.processes) {
-			yield ["start", this.processes["start"]];
+		for (const name of this.processesStart) {
+			yield [name, this.processes[name]];
 		}
 	}
 	*getStopProcesses() {
-		if ("stop" in this.processes) {
-			yield ["stop", this.processes["stop"]];
+		for (const name of this.processesStop) {
+			yield [name, this.processes[name]];
 		}
 	}
 	*getTimeTriggeredProcesses() {
 		for (const [name, object] of Object.entries(this.processes)) {
-			if (!["start", "stop"].includes(name)) {
+			if (!this.processesStart.includes(name) && !this.processesStop.includes(name)) {
 				yield [name, object];
 			}
 		}
@@ -56,15 +58,23 @@ export default class Provider {
 	}
 
 	addStartProcess(process, options = {}) {
-		this._addProcess("start", process, Object.assign(this.commongOptions, options));
+		const name = "start." + (this.processesStart.length + 1);
+		this.processesStart.push(name);
+		this._addProcess(name, process, Object.assign(this.commongOptions, options));
 	}
 
 	addStopProcess(process, options = {}) {
-		this._addProcess("stop", process, Object.assign(this.commongOptions, options));
+		const name = "stop." + (this.processesStop.length + 1);
+		this.processesStop.push(name);
+		this._addProcess(name, process, Object.assign(this.commongOptions, options));
 	}
 
 	addTimeTriggeredProcess(name, process, options = {}) {
-		Exception.assert(!["start", "stop"].includes(name), "The process name '{}' cannot be used.", name);
+		Exception.assert(
+			!name.startsWith("start.") && !name.startsWith("stop."),
+			"The process name '{}' cannot be used.",
+			name,
+		);
 		this._addProcess(
 			name,
 			process,

@@ -1,5 +1,5 @@
 load("@bzd_lib//config:defs.bzl", "bzd_config")
-load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_binary")
+load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_binary", "bzd_nodejs_library")
 
 bzd_config(
     name = "config",
@@ -11,11 +11,25 @@ bzd_config(
     ],
 )
 
+bzd_nodejs_library(
+    name = "plugin",
+    srcs = [
+        "plugin.mjs",
+    ],
+    visibility = [
+        "//apps/artifacts/plugins:__subpackages__",
+    ],
+    deps = [
+        "//nodejs/core:exception",
+        "//nodejs/db/storage",
+    ],
+)
+
 bzd_nodejs_binary(
     name = "backend",
-    srcs = glob([
-        "*.mjs",
-    ]) + [
+    srcs = [
+        "app.mjs",
+        "endpoints_factory.mjs",
         ":config.json",
         "//apps/artifacts:config.json",
     ],
@@ -35,6 +49,7 @@ bzd_nodejs_binary(
         "//apps/artifacts:__pkg__",
     ],
     deps = [
+        ":plugin",
         "//apps/accounts/authentication:server",
         "//apps/artifacts/plugins:backend",
         "//nodejs/core:cache",
@@ -47,6 +62,5 @@ bzd_nodejs_binary(
         "//nodejs/core/services",
         "//nodejs/db:utils",
         "//nodejs/db/key_value_store:disk",
-        "//nodejs/db/storage",
     ],
 )
