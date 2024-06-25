@@ -17,13 +17,12 @@ bzd_nodejs_binary(
         "*.mjs",
     ]) + [
         ":config.json",
+        "//apps/artifacts:config.json",
     ],
     apis = ["//apps/artifacts:api.v1.json"],
     args = [
         "--static",
         "$(rootpath //apps/artifacts/frontend).bundle",
-        "--data",
-        "/tmp/bzd/db",
     ],
     data = [
         "//apps/artifacts/frontend",
@@ -36,6 +35,7 @@ bzd_nodejs_binary(
         "//apps/artifacts:__pkg__",
     ],
     deps = [
+        "//apps/accounts/authentication:server",
         "//apps/artifacts/plugins:backend",
         "//nodejs/core:cache",
         "//nodejs/core:exception",

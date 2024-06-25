@@ -16,6 +16,7 @@
 		data: function () {
 			return {
 				metadata: null,
+				timeout: null,
 			};
 		},
 		computed: {
@@ -37,6 +38,9 @@
 		},
 		mounted() {
 			this.fetchMetadata();
+		},
+		beforeUnmount() {
+			clearTimeout(this.timeout);
 		},
 		methods: {
 			/// Iterate through the metadata and return a copy of it.
@@ -69,7 +73,7 @@
 						expect: "json",
 					});
 				});
-				setTimeout(this.fetchMetadata, 1000);
+				this.timeout = setTimeout(this.fetchMetadata, 1000);
 			},
 		},
 	};

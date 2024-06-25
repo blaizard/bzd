@@ -76,7 +76,9 @@ export default class RestServer extends Base {
 		if (endpointOptions.authentication) {
 			Exception.assert(
 				this.options.authentication,
-				"This route has authentication requirement but no authentication object was specified.",
+				"This route '{}' with method '{}' has authentication requirement but no authentication object was specified.",
+				endpoint,
+				method,
 			);
 			authentication = this.options.authentication;
 		}
