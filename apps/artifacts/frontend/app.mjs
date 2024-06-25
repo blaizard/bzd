@@ -6,12 +6,29 @@ import CachePlugin from "#bzd/nodejs/vue/cache.mjs";
 import Notification from "#bzd/nodejs/vue/notification.mjs";
 import Router from "#bzd/nodejs/vue/router/router.mjs";
 import AsyncComputed from "vue-async-computed";
+import Authentication from "#bzd/apps/accounts/authentication/client.mjs";
+import AuthenticationPlugin from "#bzd/nodejs/vue/authentication.mjs";
+import configGlobal from "#bzd/apps/artifacts/config.json" assert { type: "json" };
 
 import APIv1 from "#bzd/api.json" assert { type: "json" };
 
 import App from "./app.vue";
 
 const app = createApp(App);
+
+// ---- Authentication ----
+
+const authentication = new Authentication({
+	accounts: configGlobal.accounts,
+	unauthorizedCallback: async (needAuthentication) => {
+		console.log("Unauthorized!", needAuthentication);
+	},
+});
+app.use(AuthenticationPlugin, {
+	authentication: authentication,
+});
+
+// ---- REST ----
 
 app.use(AsyncComputed);
 app.use(Notification);
@@ -20,6 +37,7 @@ app.use(Router, {
 });
 app.use(RestPlugin, {
 	schema: APIv1.rest,
+	authentication: authentication,
 });
 
 app.use(CachePlugin, {

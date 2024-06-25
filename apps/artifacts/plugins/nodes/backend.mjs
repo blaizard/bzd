@@ -1,7 +1,6 @@
 import StorageBzd from "#bzd/apps/artifacts/plugins/nodes/storage.mjs";
 import Nodes from "#bzd/apps/artifacts/plugins/nodes/nodes.mjs";
 import makeStorageFromConfig from "#bzd/nodejs/db/key_value_store/make_from_config.mjs";
-import ServiceProvider from "#bzd/nodejs/core/services/provider.mjs";
 
 function rawBodyParse(body, headersFunc, forceContentType = null, forceCharset = null) {
 	const contentTypeHeader = Object.fromEntries(
@@ -87,7 +86,7 @@ class PluginBase {
 }
 
 export default class Plugin extends PluginBase {
-	constructor(volume, options, provider) {
+	constructor(volume, options, provider, endpoints) {
 		super(volume, options);
 		this.nodes = null;
 		provider.addStartProcess(async () => {
@@ -102,6 +101,19 @@ export default class Plugin extends PluginBase {
 			}
 
 			this.storage = await StorageBzd.make(this.nodes);
+		});
+
+		const plugin = this;
+
+		endpoints.register("get", "/{uid}/{path:*}", async function (params) {
+			const node = await plugin.nodes.get(params.uid);
+			return await node.get(...paramPathToPaths(params.path));
+		});
+
+		endpoints.register("post", "/{uid}/{path:*}", async function (params) {
+			const data = rawBodyParse(this.getBody(), (name) => this.getHeader(name));
+			const node = await plugin.nodes.get(params.uid);
+			return await node.insert(data, ...paramPathToPaths(params.path));
 		});
 	}
 }
