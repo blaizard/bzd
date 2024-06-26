@@ -46,7 +46,7 @@ describe("Services", () => {
 
 			const processes = [...provider.getStartProcesses()];
 			Exception.assertEqual(processes.length, 1);
-			Exception.assertEqual(processes[0][0], "start");
+			Exception.assertEqual(processes[0][0], "start.1");
 			Exception.assert("options" in processes[0][1]);
 		});
 
@@ -55,7 +55,7 @@ describe("Services", () => {
 
 			const processes = [...provider.getStopProcesses()];
 			Exception.assertEqual(processes.length, 1);
-			Exception.assertEqual(processes[0][0], "stop");
+			Exception.assertEqual(processes[0][0], "stop.1");
 			Exception.assert("options" in processes[0][1]);
 		});
 
