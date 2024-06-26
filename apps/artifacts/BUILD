@@ -18,6 +18,7 @@ bzd_config(
     ],
     visibility = [
         "//apps/artifacts:__subpackages__",
+        "//deployment:__subpackages__",
     ],
 )
 
