@@ -4,7 +4,13 @@
 			<a @click="handleHeader"><i class="bzd-icon-artifact"></i> Artifacts</a>
 		</template>
 		<template #actions>
-			<MenuEntry text="Services" icon="bzd-icon-tile" link="/services"></MenuEntry>
+			<template v-if="$authentication.isAuthenticated">
+				<MenuEntry text="Services" icon="bzd-icon-tile" link="/services"></MenuEntry>
+				<MenuEntry text="Logout" icon="bzd-icon-close" link="/logout"></MenuEntry>
+			</template>
+			<template v-else>
+				<MenuEntry text="Login" icon="bzd-icon-user" link="/login"></MenuEntry>
+			</template>
 		</template>
 		<template #content>
 			<div class="layout">
@@ -61,6 +67,12 @@
 							await this.$rest.invoke("login", "artifacts");
 						},
 					},
+					{
+						path: "/logout",
+						handler: async () => {
+							await this.$rest.logout();
+						},
+					},
 				],
 			});
 		},
@@ -89,7 +101,7 @@
 	@use "#bzd/nodejs/styles/default/css/loading.scss" as *;
 
 	@use "#bzd/nodejs/icons.scss" as icons with (
-		$bzdIconNames: add tile user close
+		$bzdIconNames: add tile user close user
 	);
 
 	.bzd-icon-artifact {

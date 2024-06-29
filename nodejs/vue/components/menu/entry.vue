@@ -40,12 +40,12 @@
 			},
 			authentication() {
 				if (this.link) {
-					return typeof this.link == "object" ? this.link.authentication || false : false;
+					return this.link && typeof this.link == "object" ? this.link.authentication || false : false;
 				}
 				return false;
 			},
 			path() {
-				return typeof this.link == "object" ? this.link.path : this.link;
+				return this.link && typeof this.link == "object" ? this.link.path : this.link;
 			},
 			isAuthorized() {
 				if (!this.authentication) {

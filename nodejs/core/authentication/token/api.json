@@ -38,6 +38,7 @@
                 "request": {
                     "type": "json",
                     "validation": {
+                        "origin": "",
                         "refresh_token": ""
                     }
                 },
