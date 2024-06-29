@@ -34,10 +34,12 @@ app.use(AsyncComputed);
 app.use(Notification);
 app.use(Router, {
 	hash: false,
+	authentication: authentication,
 });
 app.use(RestPlugin, {
 	schema: APIv1.rest,
 	authentication: authentication,
+	plugins: [authentication],
 });
 
 app.use(CachePlugin, {

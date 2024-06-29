@@ -54,6 +54,7 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 		let options = {
 			// Set the cookie valid for all path and sub-path of the website.
 			path: "/",
+			sameSite: "strict",
 		};
 		if (timeoutS) {
 			options.maxAge = timeoutS * 1000;

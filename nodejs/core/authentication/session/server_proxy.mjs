@@ -42,6 +42,14 @@ export default class SessionAuthenticationServerProxy extends SessionAuthenticat
 				}
 			}
 
+			// The inputs.origin is only used to detect if the proxy is not pointing to itself.
+			Exception.assert(
+				!inputs.origin || inputs.origin != authentication.options.remote,
+				"The proxy appears to be wrongly configured and is pointing to itself: {}",
+				authentication.options.remote,
+			);
+			inputs.origin = authentication.options.remote;
+
 			try {
 				const result = await restRemote.request("post", "/auth/refresh", inputs);
 
