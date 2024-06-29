@@ -4,10 +4,12 @@ import APISchemaRemote from "#bzd/nodejs/core/authentication/session/api.json" a
 import { HttpClientException } from "#bzd/nodejs/core/http/client.mjs";
 import ExceptionFactory from "../../exception.mjs";
 import LogFactory from "../../log.mjs";
+import Session from "../session.mjs";
 
 const Exception = ExceptionFactory("authentication", "session-proxy");
 const Log = LogFactory("authentication", "session-proxy");
 
+/// A server proxy authentication, only proxies the token to the authentication remote server.
 export default class SessionAuthenticationServerProxy extends SessionAuthenticationServer {
 	constructor(options) {
 		super(
@@ -24,6 +26,19 @@ export default class SessionAuthenticationServerProxy extends SessionAuthenticat
 			host: this.options.remote,
 			authentication: this,
 		});
+	}
+
+	/// Perform a request to the remote.
+	async _requestRemote(context, ...args) {
+		try {
+			return await this.restRemote.request(...args);
+		} catch (e) {
+			// Propagate the error to the caller.
+			if (e instanceof HttpClientException) {
+				throw context.httpError(e.code, e.message);
+			}
+			throw e;
+		}
 	}
 
 	async _installRestImpl(rest) {
@@ -50,31 +65,39 @@ export default class SessionAuthenticationServerProxy extends SessionAuthenticat
 			);
 			inputs.origin = authentication.options.remote;
 
-			try {
-				const result = await restRemote.request("post", "/auth/refresh", inputs);
+			const result = await authentication._requestRemote(this, "post", "/auth/refresh", inputs);
 
-				/// Make sure the local cookie is not used again.
-				this.deleteCookie("local_refresh_token");
-				this.setCookie("refresh_token", result.refresh_token, {
-					httpOnly: true,
-					sameSite: "strict",
-					newMaxAge: result.refresh_timeout ? result.refresh_timeout * 1000 : undefined,
-				});
+			/// Make sure the local cookie is not used again.
+			this.deleteCookie("local_refresh_token");
+			this.setCookie("refresh_token", result.refresh_token, {
+				httpOnly: true,
+				sameSite: "strict",
+				newMaxAge: result.refresh_timeout ? result.refresh_timeout * 1000 : undefined,
+			});
 
-				delete result.refresh_token;
-				delete result.refresh_timeout;
-				return result;
-			} catch (e) {
-				// Propagate the error to the caller.
-				if (e instanceof HttpClientException) {
-					throw this.httpError(e.code, e.message);
-				}
-				throw e;
-			}
+			delete result.refresh_token;
+			delete result.refresh_timeout;
+			return result;
 		});
 
 		rest.handle("post", "/auth/logout", async function () {
 			authentication.clearSession(this);
 		});
+	}
+
+	async _verifyImpl(context, callback) {
+		const maybeToken = this._getAccessToken(context);
+		if (!maybeToken) {
+			return false;
+		}
+
+		const result = await this._requestRemote(context, "post", "/auth/verify", {
+			token: maybeToken,
+		});
+
+		// TODO: implement caching (store the result into a database and reuse super()._verifyImpl(...))
+
+		const session = new Session(result.uid, result.scopes);
+		return await callback(session);
 	}
 }

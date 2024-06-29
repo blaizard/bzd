@@ -52,6 +52,27 @@
                     }
                 }
             }
+        },
+        "/auth/verify": {
+            "post": {
+                "cors": true,
+                "documentation": "Verify a token information.",
+                "request": {
+                    "type": "json",
+                    "validation": {
+                        "token": "mandatory"
+                    }
+                },
+                "response": {
+                    "type": "json",
+                    "validation": {
+                        "hash": "mandatory",
+                        "scopes": "mandatory",
+                        "timeout": "mandatory",
+                        "uid": "mandatory"
+                    }
+                }
+            }
         }
     }
 }
