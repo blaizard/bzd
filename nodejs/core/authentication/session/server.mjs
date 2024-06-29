@@ -146,6 +146,20 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 
 			return maybeTokenObject;
 		});
+
+		// Verify a token, this is useful with the server proxy.
+		rest.handle("post", "/auth/verify", async function (inputs) {
+			const result = await authentication._verifyAccessToken(inputs.token);
+			if (!result) {
+				throw this.httpError(401, "Unauthorized");
+			}
+			return {
+				uid: result.session.getUid(),
+				scopes: result.data.scopes,
+				hash: result.data.hash,
+				timeout: result.data.expiration - authentication._getTimestamp(),
+			};
+		});
 	}
 
 	async clearSession(context) {
@@ -159,6 +173,9 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		if (maybeAccessToken) {
 			const [uid, hash] = this._readToken(maybeAccessToken);
 			await this.options.kvs.update(this.options.kvsBucket, uid, (data) => {
+				if (!data.sessions) {
+					return { sessions: [] };
+				}
 				return {
 					sessions: data.sessions.filter((session) => {
 						return session.hash != hash;

@@ -1,6 +1,10 @@
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
-import { scopeSelfBasicRead, scopeSelfSubscriptionsRead } from "#bzd/apps/accounts/backend/users/scopes.mjs";
+import {
+	scopeSelfBasicRead,
+	scopeSelfSubscriptionsRead,
+	scopeAdminApplications,
+} from "#bzd/apps/accounts/backend/users/scopes.mjs";
 import { PaymentRecurrency } from "#bzd/nodejs/payment/payment.mjs";
 
 const Log = LogFactory("test", "data");
@@ -36,7 +40,7 @@ export default class TestData {
 		}
 
 		await this.applications.create("localhost", "http://localhost:8081/", [scopeSelfBasicRead]);
-		await this.applications.create("artifacts", "http://localhost:8081/", [scopeSelfBasicRead]);
+		await this.applications.create("artifacts", "http://localhost:8081/", [scopeSelfBasicRead, scopeAdminApplications]);
 		await this.applications.create("screen-recorder", "http://localhost:8081/", [scopeSelfSubscriptionsRead]);
 	}
 

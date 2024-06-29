@@ -15,9 +15,4 @@ export default class User {
 	getScopes() {
 		return this.scopes;
 	}
-
-	intersectScopes(scopes) {
-		const instersect = new Set([...scopes].filter((scope) => this.scopes.has(scope)));
-		return [...instersect.values()];
-	}
 }
