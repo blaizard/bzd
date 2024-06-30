@@ -49,8 +49,11 @@
 						}
 					}
 
+					// Read the actual message.
+					const message = e && typeof e == "object" && "message" in e ? e.message : e;
+
 					// Unexpected errors.
-					this.$notification.error("message" in e ? e.message : e, {
+					this.$notification.error(message, {
 						actions: [
 							{
 								html: '<i class="bzd-icon-report"></i> Report',

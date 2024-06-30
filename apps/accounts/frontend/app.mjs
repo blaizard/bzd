@@ -7,6 +7,7 @@ import RouterPlugin from "#bzd/nodejs/vue/router/router.mjs";
 import LangPlugin from "#bzd/nodejs/vue/lang.mjs";
 import Authentication from "#bzd/nodejs/core/authentication/token/client.mjs";
 import AuthenticationGoogle from "#bzd/nodejs/core/authentication/google/client.mjs";
+import AuthenticationFacebook from "#bzd/nodejs/core/authentication/facebook/client.mjs";
 import AuthenticationPlugin from "#bzd/nodejs/vue/authentication.mjs";
 import Notification from "#bzd/nodejs/vue/notification.mjs";
 import Config from "#bzd/apps/accounts/config.json" assert { type: "json" };
@@ -36,6 +37,7 @@ const authentication = new Authentication({
 	},
 });
 const authenticationGoogle = new AuthenticationGoogle(Config.googleClientId);
+const authenticationFacebook = new AuthenticationFacebook(Config.facebookAppId);
 
 app.use(AuthenticationPlugin, {
 	authentication: authentication,
@@ -50,7 +52,7 @@ app.use(RouterPlugin, {
 app.use(RestPlugin, {
 	schema: APIv1.rest,
 	authentication: authentication,
-	plugins: [authentication, authenticationGoogle],
+	plugins: [authentication, authenticationGoogle, authenticationFacebook],
 });
 
 app.mount("#app");

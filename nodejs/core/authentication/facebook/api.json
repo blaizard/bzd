@@ -1,0 +1,18 @@
+{
+    "rest": {
+        "/auth/facebook": {
+            "post": {
+                "documentation": "Login with Facebook.",
+                "request": {
+                    "type": "json",
+                    "validation": {
+                        "authResponse": "mandatory"
+                    }
+                },
+                "response": {
+                    "type": "json"
+                }
+            }
+        }
+    }
+}

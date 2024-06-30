@@ -24,6 +24,7 @@ bzd_nodejs_web_binary(
         "//apps/accounts/backend/users:frontend",
         "//nodejs:icons",
         "//nodejs:vue",
+        "//nodejs/core/authentication/facebook:client",
         "//nodejs/core/authentication/google:client",
         "//nodejs/core/authentication/token:client",
         "//nodejs/core/services:frontend",

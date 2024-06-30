@@ -7,7 +7,10 @@
 			</div>
 			<div class="or">or</div>
 			<button @click="loginWithGoogle" class="login-trusted">
-				<img src="@/nodejs/core/authentication/google/google.svg" /> Google
+				<img src="@/nodejs/core/authentication/google/google.svg" /><span>Google</span>
+			</button>
+			<button @click="loginWithFacebook" class="login-trusted">
+				<img src="@/nodejs/core/authentication/facebook/facebook.svg" /><span>Facebook</span>
 			</button>
 		</template>
 		<template v-else>
@@ -106,6 +109,12 @@
 					await this.afterLogin();
 				});
 			},
+			async loginWithFacebook() {
+				await this.handleSubmit(async () => {
+					await this.$rest.invoke("facebook-authenticate");
+					await this.afterLogin();
+				});
+			},
 		},
 	};
 </script>
@@ -124,5 +133,16 @@
 	}
 	.login-trusted {
 		width: 100px;
+		text-align: center;
+		padding: 10px;
+
+		img {
+			width: 70%;
+			margin-bottom: 5px;
+		}
+
+		span {
+			white-space: nowrap;
+		}
 	}
 </style>

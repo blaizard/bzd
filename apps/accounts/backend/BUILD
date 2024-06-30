@@ -39,6 +39,7 @@ bzd_nodejs_binary(
         "//apps/accounts/backend/logger/memory",
         "//apps/accounts/backend/tests:test_data",
         "//apps/accounts/backend/users",
+        "//nodejs/core/authentication/facebook:server",
         "//nodejs/core/authentication/google:server",
         "//nodejs/core/authentication/session:server",
         "//nodejs/core/http:client",
