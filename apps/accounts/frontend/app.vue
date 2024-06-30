@@ -70,6 +70,7 @@
 						component: () => import("./admin/logs.vue"),
 						authentication: scopeAdminApplications,
 					},
+					{ path: "/privacy", component: () => import("./privacy.vue") },
 					{ path: "/login", component: () => import("./login.vue") },
 					{ path: "/logout", component: () => import("./logout.vue"), authentication: true },
 					{ path: "/sso", component: () => import("./sso.vue"), authentication: true },

@@ -8,6 +8,7 @@ import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import Authentication from "#bzd/nodejs/core/authentication/session/server.mjs";
 import AuthenticationGoogle from "#bzd/nodejs/core/authentication/google/server.mjs";
+import AuthenticationFacebook from "#bzd/nodejs/core/authentication/facebook/server.mjs";
 import Result from "#bzd/nodejs/utils/result.mjs";
 import HttpServer from "#bzd/nodejs/core/http/server.mjs";
 import HttpClient from "#bzd/nodejs/core/http/client.mjs";
@@ -192,6 +193,7 @@ const PATH_STATIC = options.static;
 	const authenticationGoogle = new AuthenticationGoogle({
 		clientId: Config.googleClientId,
 	});
+	const authenticationFacebook = new AuthenticationFacebook();
 
 	// ---- Payment ----
 
@@ -287,7 +289,16 @@ const PATH_STATIC = options.static;
 		authentication: authentication,
 		channel: web,
 	});
-	await api.installPlugins(authentication, authenticationGoogle, users, applications, services, memoryLogger, payment);
+	await api.installPlugins(
+		authentication,
+		authenticationGoogle,
+		authenticationFacebook,
+		users,
+		applications,
+		services,
+		memoryLogger,
+		payment,
+	);
 
 	api.handle("get", "/sso", async function (inputs, session) {
 		// Get that the application exists.

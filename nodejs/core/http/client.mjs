@@ -109,7 +109,7 @@ export default class HttpClient {
 		}
 
 		// Sanity checks
-		const method = String(options.method).toLowerCase();
+		const method = options.method ? String(options.method).toLowerCase() : "get";
 
 		// Handle expected type
 		switch (options.expect) {
