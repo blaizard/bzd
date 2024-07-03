@@ -11,7 +11,6 @@ bzd_nodejs_web_binary(
     config_scss = ":config.scss",
     heads = [
         "<title>Accounts</title>",
-        "<meta name=\"referrer\" content=\"no-referrer-when-downgrade\" />",
     ],
     main = "app.mjs",
     visibility = [
