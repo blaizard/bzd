@@ -397,21 +397,27 @@ const PATH_STATIC = options.static;
 	await services.installServices(payment);
 	await services.start();
 
+	// ---- Headers to be used ----
+
+	let headers = {
+		// Needed for Google authentication.
+		"Cross-Origin-Opener-Policy": "same-origin-allow-popups",
+	};
+
 	// ---- tests data ----
 
 	if (options.test) {
 		const testData = new TestData(users, applications, payment);
 		await testData.install();
 		await testData.run();
+		// This allow http and https interoperability.
+		headers["Referrer-Policy"] = "no-referrer-when-downgrade";
 	}
 
 	// ---- serve ----
 
 	web.addStaticRoute("/", PATH_STATIC, {
-		headers: {
-			// Needed for Google authentication.
-			"Cross-Origin-Opener-Policy": "same-origin-allow-popups",
-		},
+		headers: headers,
 	});
 	web.start();
 })();
