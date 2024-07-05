@@ -41,7 +41,7 @@ export default class SessionAuthenticationServerProxy extends SessionAuthenticat
 		}
 	}
 
-	async _installRestImpl(rest) {
+	_installRestImpl(rest) {
 		Exception.assert(this.options.remote, "The remote server option 'remote' must be set.");
 
 		Log.info("Installing session-based authentication REST with proxy toward {}.", this.options.remote);

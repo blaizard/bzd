@@ -13,13 +13,13 @@ export default class AccountsAuthenticationClient extends TokenAuthenticationCli
 		Exception.assert(this.options.accounts, "No accounts URL was specified.");
 	}
 
-	async _installRestImpl(rest) {
+	_installRestImpl(rest) {
 		// Register the hook to login
 		rest.provide("login", (application) => {
 			window.location.href = this.options.accounts + "/login?application=" + application;
 		});
 
-		await super._installRestImpl(rest);
+		super._installRestImpl(rest);
 
 		// Check if login from a SSO token can be done.
 		const url = new URL(window.location.href);
@@ -27,7 +27,7 @@ export default class AccountsAuthenticationClient extends TokenAuthenticationCli
 		if (maybeSSOToken) {
 			url.searchParams.delete("sso_token");
 			window.history.replaceState({}, null, url.href);
-			await rest.loginWithSSO(maybeSSOToken);
+			rest.loginWithSSO(maybeSSOToken).catch((e) => Exception.error(e));
 		}
 	}
 }

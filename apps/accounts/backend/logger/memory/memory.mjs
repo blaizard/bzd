@@ -37,7 +37,7 @@ export default class LoggerMemory {
 		}
 	}
 
-	async installRest(api) {
+	installRest(api) {
 		Log.info("Installing 'Logger' REST");
 
 		api.handle("get", "/admin/logger/memory", async (inputs, user) => {

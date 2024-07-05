@@ -6,6 +6,7 @@ import RouterComponent from "#bzd/nodejs/vue/router/router_component.vue";
 import RouterLink from "#bzd/nodejs/vue/router/router_link.vue";
 import Registry from "#bzd/nodejs/vue/router/registry.mjs";
 import { onBeforeUnmount } from "vue";
+import { getQueryAsDict } from "#bzd/nodejs/utils/query.mjs";
 
 const Log = LogFactory("router");
 const Exception = ExceptionFactory("router");
@@ -42,18 +43,6 @@ class Path {
 		return path;
 	}
 
-	static getQuery() {
-		return window.location.search
-			.replace("?", "")
-			.split("&")
-			.filter(Boolean)
-			.reduce((object, entry) => {
-				const [key, value] = entry.split("=");
-				object[decodeURIComponent(key)] = decodeURIComponent(value);
-				return object;
-			}, {});
-	}
-
 	/// The path has remaining route to be processed.
 	hasRemaining() {
 		return Boolean(this.remaining);
@@ -87,18 +76,31 @@ class RouterManager {
 				schema: null,
 				// Called each time a new route is processed.
 				onRouteUpdate: (route) => {},
+				// List of plugins to be installed.
+				plugins: [],
 			},
 			options,
 		);
 
 		this.routers = {};
 		this.path = Path.makeFromLocation(this.options.hash);
+		this.fallback = null;
 		this.uid = 0;
-		this.updateState(Path.getQuery());
+		this.updateState(getQueryAsDict());
+		this.installPlugins(...options.plugins);
+	}
+
+	/// Install all given plugins
+	installPlugins(...plugins) {
+		for (const plugin of plugins) {
+			if (typeof plugin.installRouter == "function") {
+				plugin.installRouter(this);
+			}
+		}
 	}
 
 	registerRouter(configuration) {
-		const handler = async (route, args, dispatchOptions) => {
+		const handler = async (route, args, dispatchOptions, component) => {
 			// Check if the route requires authentication,
 			// if so ensure that we are authenticated
 			if (route.authentication) {
@@ -111,7 +113,7 @@ class RouterManager {
 
 			if (route.component) {
 				await this.registry.setComponent(
-					configuration.component,
+					component,
 					route.component,
 					Object.assign({}, args, dispatchOptions.props, route.props),
 				);
@@ -126,14 +128,17 @@ class RouterManager {
 			}
 		};
 
-		let router = new Router({
-			fallback: async (path) => {
-				Log.error("Route '{}' not found", path);
-				if (configuration.fallback) {
-					await handler(configuration.fallback, {}, {});
-				}
-			},
-		});
+		if (configuration.fallback) {
+			Exception.assert(
+				this.fallback === null,
+				"There can be only a single fallback configuration, one was already set previously.",
+			);
+			this.fallback = async () => {
+				await handler(configuration.fallback, {}, {}, configuration.component);
+			};
+		}
+
+		let router = new Router();
 
 		configuration.routes.forEach((route) => {
 			Exception.assert(route.path, "This route is missing a path: {:j}", route);
@@ -157,7 +162,7 @@ class RouterManager {
 				route.path,
 				async (args, dispatchOptions) => {
 					this.path.setRemaining("");
-					await handler(route, args, dispatchOptions);
+					await handler(route, args, dispatchOptions, configuration.component);
 				},
 				metadata,
 			);
@@ -169,12 +174,9 @@ class RouterManager {
 		return uid;
 	}
 
-	/// Trigger a specific router to try.
-	async trigger(uid) {
-		if (this.path.hasRemaining()) {
-			Exception.assert(uid in this.routers, "This router is not registered.");
-			await this.routers[uid].dispatch(this.path.getRemaining(), {});
-		}
+	/// Trigger the dispatch process.
+	trigger() {
+		this.dispatch().catch((e) => Exception.error(e));
 	}
 
 	async unregisterRouter(uid) {
@@ -202,14 +204,25 @@ class RouterManager {
 		this.path = path ? new Path(path) : Path.makeFromLocation(this.options.hash);
 
 		// Update the url.
-		this.updateState(dispatchOptions.query || Path.getQuery());
+		this.updateState(dispatchOptions.query || getQueryAsDict());
 
 		// Loop through the routers and dispatch.
 		for (const router of Object.values(this.routers)) {
 			if (!this.path.hasRemaining()) {
 				break;
 			}
-			await router.dispatch(this.path.getRemaining(), dispatchOptions);
+			const result = await router.dispatch(this.path.getRemaining(), dispatchOptions);
+			if (result) {
+				this.path.setRemaining("");
+			}
+		}
+
+		// If there are still
+		if (this.path.hasRemaining()) {
+			Log.error("Route '{}' not found", this.path.getRoute());
+			if (this.fallback) {
+				await this.fallback();
+			}
 		}
 	}
 
@@ -247,12 +260,15 @@ export default {
 			/// It should be called from setup or onMounted.
 			///
 			/// \param configuration The configuration to set the routes.
-			async set(configuration) {
+			/// \param trigger Trigger the router.
+			set(configuration, trigger = true) {
 				const uid = routers.registerRouter(configuration);
 				onBeforeUnmount(() => {
 					routers.unregisterRouter(uid);
 				});
-				await routers.trigger(uid);
+				if (trigger) {
+					routers.trigger();
+				}
 			},
 			/// Dispatch a specific path.
 			///

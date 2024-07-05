@@ -16,8 +16,8 @@ import Users from "#bzd/apps/accounts/backend/users/users.mjs";
 import Applications from "#bzd/apps/accounts/backend/applications/applications.mjs";
 import TokenInfo from "#bzd/apps/accounts/backend/users/token.mjs";
 import TestData from "#bzd/apps/accounts/backend/tests/test_data.mjs";
-import Config from "#bzd/apps/accounts/config.json" assert { type: "json" };
-import ConfigBackend from "#bzd/apps/accounts/backend/config.json" assert { type: "json" };
+import config from "#bzd/apps/accounts/config.json" assert { type: "json" };
+import configBackend from "#bzd/apps/accounts/backend/config.json" assert { type: "json" };
 import MemoryLogger from "#bzd/apps/accounts/backend/logger/memory/memory.mjs";
 import paymentMakeFromConfig from "#bzd/nodejs/payment/make_from_config.mjs";
 import EmailManager from "#bzd/apps/accounts/backend/email/manager.mjs";
@@ -48,9 +48,9 @@ const PATH_STATIC = options.static;
 (async () => {
 	const memoryLogger = new MemoryLogger();
 
-	const keyValueStore = await kvsMakeFromConfig(ConfigBackend.kvs.accounts);
-	const keyValueStoreRegister = await kvsMakeFromConfig(ConfigBackend.kvs.register);
-	const email = await emailMakeFromConfig(ConfigBackend.email);
+	const keyValueStore = await kvsMakeFromConfig(configBackend.kvs.accounts);
+	const keyValueStoreRegister = await kvsMakeFromConfig(configBackend.kvs.register);
+	const email = await emailMakeFromConfig(configBackend.email);
 
 	// Set-up the mail object
 	const emails = new EmailManager(email);
@@ -88,7 +88,7 @@ const PATH_STATIC = options.static;
 		Exception.assert(password, "The user must have a valid password.");
 
 		return (
-			ConfigBackend.url +
+			config.url +
 			"/" +
 			(newPassword ? "new" : "reset") +
 			"/" +
@@ -190,9 +190,11 @@ const PATH_STATIC = options.static;
 		},
 	});
 
-	const authenticationGoogle = new AuthenticationGoogle({
-		clientId: Config.googleClientId,
-	});
+	const authenticationGoogle = new AuthenticationGoogle(
+		config.googleClientId,
+		configBackend.googleClientSecret,
+		config.url,
+	);
 	const authenticationFacebook = new AuthenticationFacebook();
 
 	// ---- Payment ----
@@ -216,7 +218,7 @@ const PATH_STATIC = options.static;
 				Log.info("Welcome email sent to: {}.", email);
 				await emails.sendWelcome(email, {
 					email: email,
-					support: ConfigBackend.supportURL,
+					support: configBackend.supportURL,
 					link: link,
 				});
 			}
@@ -280,7 +282,7 @@ const PATH_STATIC = options.static;
 			});
 			return true;
 		},
-		ConfigBackend.payment,
+		configBackend.payment,
 	);
 
 	// ---- API ----
@@ -289,7 +291,7 @@ const PATH_STATIC = options.static;
 		authentication: authentication,
 		channel: web,
 	});
-	await api.installPlugins(
+	api.installPlugins(
 		authentication,
 		authenticationGoogle,
 		authenticationFacebook,
@@ -333,7 +335,7 @@ const PATH_STATIC = options.static;
 		Log.info("Reset password email sent to: {}.", inputs.uid);
 		await emails.sendResetPassword(inputs.uid, {
 			email: inputs.uid,
-			support: ConfigBackend.supportURL,
+			support: configBackend.supportURL,
 			link: link,
 		});
 	});
@@ -355,19 +357,19 @@ const PATH_STATIC = options.static;
 	const sendContactMessage = async (captcha, from, subject, content) => {
 		const response = await HttpClient.post("https://www.google.com/recaptcha/api/siteverify", {
 			query: {
-				secret: ConfigBackend.googleCaptchaSecretKey,
+				secret: configBackend.googleCaptchaSecretKey,
 				response: captcha,
 			},
 		});
 		const data = JSON.parse(response);
 		Exception.assertPrecondition(data.success, "The captcha token is invalid: {:j}", data["error-codes"]);
 		await email.send(
-			[ConfigBackend.email.from, from],
+			[configBackend.email.from, from],
 			"[contact-" + Math.floor(Math.random() * 10000) + "] " + subject,
 			{
 				text:
 					"==== Contact form " +
-					ConfigBackend.url +
+					config.url +
 					" ====\n" +
 					"Created: " +
 					new Date().toUTCString() +

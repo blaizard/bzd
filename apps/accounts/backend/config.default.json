@@ -4,6 +4,7 @@
         "type": "stub"
     },
     "googleCaptchaSecretKey": "6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe",
+    "googleClientSecret": "",
     "kvs": {
         "accounts": {
             "name": "accounts",
@@ -17,6 +18,5 @@
     "payment": {
         "type": "mock"
     },
-    "supportURL": "mailto:support@dummy.com",
-    "url": "http://localhost:8080"
+    "supportURL": "mailto:support@dummy.com"
 }

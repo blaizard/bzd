@@ -71,7 +71,7 @@ export default class Applications {
 		Log.info("Application with uid '{}' has been deleted.", uid);
 	}
 
-	async installRest(api) {
+	installRest(api) {
 		Log.info("Installing 'Applications' REST");
 
 		// ---- Admin specific API

@@ -11,6 +11,7 @@ bzd_nodejs_library(
     deps = [
         "//nodejs/core:cookie",
         "//nodejs/core:script",
+        "//nodejs/utils:query",
     ],
 )
 

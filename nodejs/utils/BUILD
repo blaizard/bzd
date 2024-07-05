@@ -28,6 +28,14 @@ bzd_nodejs_library(
 )
 
 bzd_nodejs_library(
+    name = "query",
+    srcs = [
+        "query.mjs",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+bzd_nodejs_library(
     name = "to_string",
     srcs = [
         "to_string.mjs",

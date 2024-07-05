@@ -47,18 +47,21 @@ export default class Facebook {
 		this.rest = null;
 	}
 
-	async installRest(rest) {
+	installRest(rest) {
 		rest.provide("facebook-authenticate", async () => await this.authenticate());
 		this.rest = rest;
 
-		await loadScript("https://connect.facebook.net/en_US/sdk.js#version=v20.0");
-		window.fbAsyncInit = () => {
-			FB.init({
-				appId: this.appId,
-				status: true,
-				version: "v2.8",
-			});
-		};
+		loadScript("https://connect.facebook.net/en_US/sdk.js#version=v20.0")
+			.then(() => {
+				window.fbAsyncInit = () => {
+					FB.init({
+						appId: this.appId,
+						status: true,
+						version: "v2.8",
+					});
+				};
+			})
+			.catch((e) => Exception.error(e));
 	}
 
 	async authenticate() {

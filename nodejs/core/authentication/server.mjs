@@ -31,8 +31,8 @@ export default class AuthenticationServer {
 		);
 	}
 
-	async installRest(rest) {
-		await this._installRestImpl(rest);
+	installRest(rest) {
+		this._installRestImpl(rest);
 	}
 
 	/// Attempt to login with a UID only.

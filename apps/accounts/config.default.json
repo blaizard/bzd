@@ -1,5 +1,6 @@
 {
     "facebookAppId": "1007491104270695",
     "googleCaptchaSiteKey": "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI",
-    "googleClientId": "484561133642-u96s0aq8rlmvj80ca03udqeavcsfvln9.apps.googleusercontent.com"
+    "googleClientId": "484561133642-u96s0aq8rlmvj80ca03udqeavcsfvln9.apps.googleusercontent.com",
+    "url": "http://localhost:8080"
 }

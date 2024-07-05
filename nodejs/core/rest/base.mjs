@@ -45,10 +45,10 @@ export default class Rest {
 	}
 
 	/// Install all given plugins..
-	async installPlugins(...plugins) {
+	installPlugins(...plugins) {
 		for (const plugin of plugins) {
 			if (typeof plugin.installRest == "function") {
-				await plugin.installRest(this);
+				plugin.installRest(this);
 			}
 		}
 		this.event.trigger("ready");

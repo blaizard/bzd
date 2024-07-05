@@ -33,7 +33,7 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 		});
 	}
 
-	async _installRestImpl(rest) {
+	_installRestImpl(rest) {
 		Log.debug("Installing token-based authentication REST.");
 
 		if (!this.options.refreshTokenCallback) {
@@ -42,7 +42,7 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 				const data = maybeRefreshToken ? { refresh_token: maybeRefreshToken } : {};
 				return await rest.request("post", "/auth/refresh", data);
 			};
-			await this.tryRefreshAuthentication(/*nothrow*/ true);
+			this.tryRefreshAuthentication(/*nothrow*/ true).catch((e) => Exception.error(e));
 		}
 	}
 

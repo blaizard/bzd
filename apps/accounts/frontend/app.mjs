@@ -10,7 +10,7 @@ import AuthenticationGoogle from "#bzd/nodejs/core/authentication/google/client.
 import AuthenticationFacebook from "#bzd/nodejs/core/authentication/facebook/client.mjs";
 import AuthenticationPlugin from "#bzd/nodejs/vue/authentication.mjs";
 import Notification from "#bzd/nodejs/vue/notification.mjs";
-import Config from "#bzd/apps/accounts/config.json" assert { type: "json" };
+import config from "#bzd/apps/accounts/config.json" assert { type: "json" };
 
 const app = createApp(App);
 
@@ -36,8 +36,9 @@ const authentication = new Authentication({
 		}
 	},
 });
-const authenticationGoogle = new AuthenticationGoogle(Config.googleClientId);
-const authenticationFacebook = new AuthenticationFacebook(Config.facebookAppId);
+
+const authenticationGoogle = new AuthenticationGoogle(config.googleClientId, config.url);
+const authenticationFacebook = new AuthenticationFacebook(config.facebookAppId);
 
 app.use(AuthenticationPlugin, {
 	authentication: authentication,
@@ -45,6 +46,7 @@ app.use(AuthenticationPlugin, {
 app.use(RouterPlugin, {
 	hash: false,
 	authentication: authentication,
+	plugins: [authentication, authenticationGoogle, authenticationFacebook],
 });
 
 // ---- REST ----

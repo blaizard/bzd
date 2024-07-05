@@ -9,7 +9,7 @@ export default {
 			options,
 		);
 		const rest = new Rest(options.schema, options);
-		rest.installPlugins(...options.plugins).catch((e) => console.error(e));
+		rest.installPlugins(...options.plugins);
 		app.config.globalProperties.$rest = rest;
 		app.provide("$rest", rest);
 	},

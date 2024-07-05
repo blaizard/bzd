@@ -15,7 +15,7 @@ import Config from "#bzd/apps/accounts/example/config.json" assert { type: "json
 		authentication: authentication,
 		channel: web,
 	});
-	await api.installPlugins(authentication);
+	api.installPlugins(authentication);
 
 	web.addStaticRoute("/", process.argv[2]);
 	web.start();

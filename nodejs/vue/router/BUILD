@@ -15,6 +15,7 @@ bzd_nodejs_library(
         "//nodejs/core:exception",
         "//nodejs/core:log",
         "//nodejs/core:router",
+        "//nodejs/utils:query",
         "//nodejs/vue/directives:loading",
     ],
 )
