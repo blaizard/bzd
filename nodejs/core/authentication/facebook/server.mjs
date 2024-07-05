@@ -6,7 +6,7 @@ const Exception = ExceptionFactory("authentication", "facebook");
 const Log = LogFactory("authentication", "facebook");
 
 export default class FacebookIdentityServer {
-	async installRest(rest) {
+	installRest(rest) {
 		rest.handle("post", "/auth/facebook", async function (inputs) {
 			let email = null;
 			try {

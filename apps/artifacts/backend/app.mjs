@@ -59,7 +59,7 @@ program
 		authentication: authentication,
 		channel: web,
 	});
-	await rest.installPlugins(authentication, services);
+	rest.installPlugins(authentication, services);
 
 	// Add initial volumes.
 	for (const [volume, options] of Object.entries(config.volumes)) {

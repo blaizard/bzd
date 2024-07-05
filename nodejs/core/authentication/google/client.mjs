@@ -1,35 +1,24 @@
 import loadScript from "#bzd/nodejs/core/script.mjs";
 import ExceptionFactory from "../../exception.mjs";
 import LogFactory from "../../log.mjs";
-import Cookie from "#bzd/nodejs/core/cookie.mjs";
+import { getQueryAsDict } from "#bzd/nodejs/utils/query.mjs";
 
 const Exception = ExceptionFactory("authentication", "google");
 const Log = LogFactory("authentication", "google");
 
-async function triggerAuthentication(clientId) {
+async function triggerAuthentication(clientId, url) {
 	await loadScript("https://accounts.google.com/gsi/client");
 
-	return new Promise((resolve, reject) => {
-		window.google.accounts.id.initialize({
+	return new Promise(async (resolve, reject) => {
+		// Using https://developers.google.com/identity/oauth2/web/guides/use-code-model
+		const client = google.accounts.oauth2.initCodeClient({
 			client_id: clientId,
-			callback: (data) => {
-				resolve(data);
-			},
-			error_callback: (err) => {
-				reject(err);
-			},
-			use_fedcm_for_prompt: true,
+			scope: "https://www.googleapis.com/auth/userinfo.email",
+			ux_mode: "redirect",
+			redirect_uri: url + "/authentication/google",
 		});
-		// Note, with Safari or Edge it doesn't seem to work, see https://dev.to/intricatecloud/passwordless-sign-in-with-google-one-tap-for-web-4l51
-		// on "Limitations of the One Tap Sign-In button"
-		window.google.accounts.id.prompt((notification) => {
-			Log.info("Google prompt notification: {}", JSON.stringify(notification));
-			if (notification.isSkippedMoment()) {
-				// Needed to force google to reset its settings.
-				Cookie.remove("g_state");
-				window.google.accounts.id.prompt();
-			}
-		});
+
+		client.requestCode();
 	});
 }
 
@@ -37,21 +26,36 @@ export default class Google {
 	/// Create a client from Google identity
 	///
 	/// \param clientId The Google client ID, which can be created here: https://console.cloud.google.com/apis/credentials
-	constructor(clientId) {
+	/// \param url The URL of the website to compute the redirect_uri.
+	constructor(clientId, url) {
 		this.clientId = clientId;
+		this.url = url;
 		this.rest = null;
 	}
 
-	async installRest(rest) {
+	installRest(rest) {
 		rest.provide("google-authenticate", async () => await this.authenticate());
 		this.rest = rest;
 	}
 
+	installRouter(router) {
+		router.registerRouter({
+			routes: [
+				{
+					path: "/authentication/google",
+					handler: async () => {
+						const query = getQueryAsDict();
+						await this.rest.loginWithRest("post", "/auth/google", {
+							code: query.code,
+						});
+					},
+				},
+			],
+		});
+	}
+
 	// https://developers.google.com/identity/gsi/web/guides/overview
 	async authenticate() {
-		const result = await triggerAuthentication(this.clientId);
-		await this.rest.loginWithRest("post", "/auth/google", {
-			idToken: result.credential,
-		});
+		await triggerAuthentication(this.clientId, this.url);
 	}
 }

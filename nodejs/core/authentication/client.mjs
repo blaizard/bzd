@@ -17,8 +17,8 @@ export default class AuthenticationClient {
 		);
 	}
 
-	async installRest(rest) {
-		await this._installRestImpl(rest);
+	installRest(rest) {
+		this._installRestImpl(rest);
 	}
 
 	/// Return the session when authenticated, null otherwise.

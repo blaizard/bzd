@@ -6,7 +6,7 @@
                 "request": {
                     "type": "json",
                     "validation": {
-                        "idToken": "mandatory"
+                        "code": "mandatory"
                     }
                 },
                 "response": {

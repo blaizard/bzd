@@ -9,18 +9,23 @@ const Exception = ExceptionFactory("authentication", "google");
 const Log = LogFactory("authentication", "google");
 
 export default class GoogleIdentityServer {
-	constructor(clientId) {
+	constructor(clientId, clientSecret, url) {
 		this.clientId = clientId;
+		this.clientSecret = clientSecret;
+		this.url = url;
 	}
 
-	async installRest(rest) {
+	installRest(rest) {
+		const self = this;
 		rest.handle("post", "/auth/google", async function (inputs) {
-			const client = new OAuth2Client();
+			const client = new OAuth2Client(self.clientId, self.clientSecret, this.url + "/authentication/google");
 			let email = null;
 			try {
+				// Exchange code for tokens
+				const { tokens } = await client.getToken(inputs.code);
 				const ticket = await client.verifyIdToken({
-					idToken: inputs.idToken,
-					audience: this.clientId,
+					idToken: tokens.id_token,
+					audience: self.clientId,
 				});
 				const payload = ticket.getPayload();
 				if (!payload.email_verified) {

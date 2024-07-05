@@ -40,7 +40,7 @@ export default class StripePaymentWebhook extends PaymentInterface {
 		this.stripe = Stripe(this.options.secretKey);
 	}
 
-	async installRest(rest) {
+	installRest(rest) {
 		Log.debug("Installing Stripe webhook REST.");
 
 		const self = this;

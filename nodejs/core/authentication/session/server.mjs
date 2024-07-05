@@ -62,7 +62,7 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		}
 	}
 
-	async _installRestImpl(rest) {
+	_installRestImpl(rest) {
 		Exception.assert(
 			this.options.saveRefreshToken,
 			"The callback to save a refresh token must be set, set 'saveRefreshToken'.",

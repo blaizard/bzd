@@ -55,7 +55,7 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 		});
 	}
 
-	async _installRestImpl(rest) {
+	_installRestImpl(rest) {
 		Log.debug("Installing token-based authentication REST.");
 
 		const authentication = this;

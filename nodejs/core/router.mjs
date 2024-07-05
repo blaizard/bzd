@@ -11,9 +11,7 @@ export default class Router {
 				/// If set, the route match will differentiate with upper and lower case.
 				caseSensitive: false,
 				/// Callback if no routes are matching.
-				fallback: (path) => {
-					throw new Exception("Route not found for '{}'.", path);
-				},
+				fallback: null,
 			},
 			config,
 		);
@@ -89,12 +87,10 @@ export default class Router {
 			};
 		}
 
-		await this.config.fallback(path, ...args);
-		return {
-			matched: false,
-			path: path,
-			vars: {},
-		};
+		if (this.config.fallback) {
+			await this.config.fallback(path, ...args);
+		}
+		return false;
 	}
 }
 
