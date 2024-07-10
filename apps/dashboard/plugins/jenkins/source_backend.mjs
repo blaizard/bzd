@@ -1,4 +1,7 @@
 import HttpClient from "#bzd/nodejs/core/http/client.mjs";
+import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
+
+const Exception = ExceptionFactory("plugin", "jenkins");
 
 function _getStatus(item) {
 	if (item.result == "SUCCESS") {
@@ -16,10 +19,15 @@ function _getStatus(item) {
 	return "unknown";
 }
 
-export default {
-	cache: {
-		"jenkins.builds": {
-			fetch: async (url, build, branch, user, token) => {
+export default class Jenkins {
+	constructor(config) {
+		this.config = config;
+	}
+
+	static register(cache) {
+		cache.register(
+			"jenkins.builds",
+			async (url, build, branch, user, token) => {
 				// Build the URL
 				const baseUrl = url + "/job/" + build + "/job/" + branch;
 				let options = {
@@ -35,10 +43,15 @@ export default {
 					};
 				}
 
-				const result = await HttpClient.get(
-					baseUrl + "/api/json?&tree=builds[duration,result,id,timestamp,estimatedDuration]{0,100}",
-					options,
-				);
+				let result = null;
+				try {
+					result = await HttpClient.get(
+						baseUrl + "/api/json?&tree=builds[duration,result,id,timestamp,estimatedDuration]{0,100}",
+						options,
+					);
+				} catch (e) {
+					Exception.errorPrecondition(e);
+				}
 
 				return (result.builds || []).map((item) => {
 					const status = _getStatus(item);
@@ -50,20 +63,21 @@ export default {
 					};
 				});
 			},
-			timeout: 10 * 1000,
-		},
-	},
-	fetch: async (data, cache) => {
+			{ timeout: 10 * 1000 },
+		);
+	}
+
+	async fetch(cache) {
 		const builds = await cache.get(
 			"jenkins.builds",
-			data["jenkins.url"],
-			data["jenkins.build"],
-			data["jenkins.branch"] || "master",
-			data["jenkins.user"],
-			data["jenkins.token"],
+			this.config["jenkins.url"],
+			this.config["jenkins.build"],
+			this.config["jenkins.branch"] || "master",
+			this.config["jenkins.user"],
+			this.config["jenkins.token"],
 		);
 		return {
 			builds: builds,
 		};
-	},
-};
+	}
+}

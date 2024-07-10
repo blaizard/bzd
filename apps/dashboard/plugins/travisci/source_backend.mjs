@@ -16,10 +16,15 @@ function _getStatus(item) {
 	return "unknown";
 }
 
-export default {
-	cache: {
-		"travisci.builds": {
-			fetch: async (endpoint, repositorySlug, token) => {
+export default class TravisCI {
+	constructor(config) {
+		this.config = config;
+	}
+
+	static register(cache) {
+		cache.register(
+			"travisci.builds",
+			async (endpoint, repositorySlug, token) => {
 				// Build the URL
 				const url = "https://api." + endpoint + "/repo/" + encodeURIComponent(repositorySlug) + "/builds?limit=50";
 				let options = {
@@ -47,18 +52,19 @@ export default {
 					};
 				});
 			},
-			timeout: 10 * 1000,
-		},
-	},
-	fetch: async (data, cache) => {
+			{ timeout: 10 * 1000 },
+		);
+	}
+
+	async fetch(cache) {
 		const builds = await cache.get(
 			"travisci.builds",
-			data["travisci.endpoint"],
-			data["travisci.repository"],
-			data["travisci.token"],
+			this.config["travisci.endpoint"],
+			this.config["travisci.repository"],
+			this.config["travisci.token"],
 		);
 		return {
 			builds: builds,
 		};
-	},
-};
+	}
+}

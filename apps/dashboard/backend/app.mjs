@@ -30,12 +30,18 @@ program
 	)
 	.parse(process.argv);
 
-async function getData(type, uid, cache) {
-	const data = await cache.get("data", uid);
+class EventsFactory {
+	constructor(events, uid) {
+		Exception.assert(!(uid in events), "Events for '{}' are already registered.", uid);
+		events[uid] = {};
+		this.uid = uid;
+		this.events = events[uid];
+	}
 
-	// Check that the UID is of the right type
-	Exception.assert(data["source.type"] == type, "Data type mismatch, stored '{}' vs requested '{}'.", data.type, type);
-	return data;
+	register(name, callback) {
+		Exception.assert(!(name in this.events), "The event '{}' for '{}' is already registered.", name, this.uid);
+		this.events[name] = callback;
+	}
 }
 
 (async () => {
@@ -48,72 +54,70 @@ async function getData(type, uid, cache) {
 	let web = new HttpServer(PORT);
 	web.addStaticRoute("/", PATH_STATIC);
 
-	// Read the tiles configuration
-	let [tiles, tilesOrder] = config.tiles.reduce(
-		(object, tile) => {
-			const uid = makeUid();
-			object[0][uid] = tile;
-			object[1].push(uid);
-			return object;
-		},
-		[{}, []],
-	);
-
 	let cache = new Cache();
+	let plugins = {};
+	let pluginClasses = {};
 	let events = {};
 
-	// Register constructors
-	cache.register(
-		"data",
-		async (uid) => {
-			let data = tiles[uid] || null;
-			Exception.assert(data !== null, "There is no data associated with UID '{}'.", uid);
-			return data;
-		},
-		{
-			timeout: 60 * 60 * 1000, // 1h
-		},
-	);
+	// Get the plugin type of an UID.
+	const uidToType = (uid) => {
+		Exception.assertPrecondition(uid in plugins, "The plugin '{}' does not exists.", uid);
+		Exception.assert(
+			"source.type" in plugins[uid].config,
+			"The plugin '{}' configuration {:j} is missing a 'source.type'.",
+			uid,
+			plugins[uid].config,
+		);
+		return plugins[uid].config["source.type"];
+	};
 
-	// Register plugins
-	for (const type in Plugins) {
-		if ("module" in Plugins[type]) {
-			Log.info("Register plugin '{}'", type);
-			const plugin = (await Plugins[type].module()).default;
+	// Register plugins.
+	for (const [type, data] of Object.entries(Plugins)) {
+		// Only handle backend modules.
+		if ("module" in data) {
+			const PluginClass = (await data.module()).default;
+			pluginClasses[type] = PluginClass;
 
-			// Install plugin specific cache entries
-			Object.entries(plugin.cache || {}).forEach((entry) => {
-				const [collection, metadata] = entry;
-				Exception.assert(collection, "Cache collection must be set.");
-				Exception.assert(typeof metadata.fetch === "function", "Cache fetch must be a function.");
-				let options = {};
-				if ("timeout" in metadata) {
-					options.timeout = metadata.timeout;
-				}
-				cache.register(collection, metadata.fetch, options);
-			});
+			// Register cache entries.
+			PluginClass.register(cache);
 
-			// Install plugin
+			// Register cache for the plugins.
 			let options = {};
-			if ("timeout" in Plugins[type].metadata) {
-				options.timeout = Plugins[type].metadata.timeout;
+			if ("timeout" in data.metadata) {
+				options.timeout = data.metadata.timeout;
 			}
 			cache.register(
 				type,
 				async (uid) => {
-					const data = await getData(type, uid, cache);
 					Log.debug("Plugin '{}' fetching for '{}'", type, uid);
-					return await plugin.fetch(data, cache);
+					Exception.assert(uid in plugins, "Plugin '{}' does not exists.", uid);
+					return await plugins[uid].instance.fetch(cache);
 				},
 				options,
 			);
-
-			// Install events
-			if ("events" in plugin) {
-				Log.info("Register events for '{}'", type);
-				events[type] = plugin.events;
-			}
 		}
+	}
+
+	// Register plugin instances.
+	for (const data of config.tiles) {
+		const uid = makeUid();
+
+		// Set the structure.
+		plugins[uid] = {
+			instance: null,
+			config: data,
+		};
+
+		// Identify the plugin type.
+		const pluginType = uidToType(uid);
+		Exception.assert(pluginType in pluginClasses, "The plugin of type {} does not exists.", pluginType);
+		Log.info("Creating '{}' from plugin '{}'.", uid, pluginType);
+
+		// Event factory.
+		const eventsFactory = new EventsFactory(events, uid);
+
+		// Instantiate the plugin.
+		plugins[uid].instance = new pluginClasses[pluginType](data, eventsFactory);
 	}
 
 	// Install the APIs
@@ -122,11 +126,13 @@ async function getData(type, uid, cache) {
 		channel: web,
 	});
 	api.handle("get", "/tiles", async () => {
-		console.log(tiles);
-		return tiles;
+		return Object.entries(plugins).reduce((object, [uid, data]) => {
+			object[uid] = data.config;
+			return object;
+		}, {});
 	});
 	api.handle("get", "/tile", async (inputs) => {
-		return tiles[inputs.uid];
+		return plugins[inputs.uid].config;
 	});
 	api.handle("post", "/tile", async (inputs) => {
 		Exception.error("nnnnoooo");
@@ -141,22 +147,24 @@ async function getData(type, uid, cache) {
 		delete tiles[inputs.uid];
 	});
 	api.handle("get", "/data", async (inputs) => {
-		return await cache.get(inputs.type, inputs.uid);
+		const pluginType = uidToType(inputs.uid);
+		return await cache.get(pluginType, inputs.uid);
 	});
 	api.handle("post", "/event", async (inputs) => {
-		Exception.assert(inputs.type in events, "No event associated with '{}'.", inputs.type);
+		Exception.assert(inputs.uid in events, "No event associated with '{}'.", inputs.uid);
 		Exception.assert(
-			inputs.event in events[inputs.type],
+			inputs.event in events[inputs.uid],
 			"'{}' is not a valid event for '{}'.",
 			inputs.event,
-			inputs.type,
+			inputs.uid,
 		);
-		const data = await getData(inputs.type, inputs.uid, cache);
-		await events[inputs.type][inputs.event](data, cache, inputs.args);
+		const pluginType = uidToType(inputs.uid);
+
+		await events[inputs.uid][inputs.event](cache, inputs.args);
 
 		// Invalidates the cache
-		await cache.setDirty(inputs.type, inputs.uid);
-		return await cache.get(inputs.type, inputs.uid);
+		await cache.setDirty(pluginType, inputs.uid);
+		return await cache.get(pluginType, inputs.uid);
 	});
 
 	web.start();

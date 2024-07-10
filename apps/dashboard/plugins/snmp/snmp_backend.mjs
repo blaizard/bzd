@@ -99,20 +99,24 @@ class Snmp {
 	}
 }
 
-export default {
-	cache: {
-		"snmp.oid": {
-			fetch: async (host, version, community, oids, ttl, previous, options) => {
-				// Update the time in ms.
-				options.timeout = ttl * 1000;
+export default class SNMP {
+	constructor(config) {
+		this.config = config;
+	}
 
-				// Get the data
-				const snmp = new Snmp(host, version, community);
-				return await snmp.getAndClose(oids);
-			},
-		},
-		"snmp.oidsByTtl": {
-			fetch: async (snmpArray) => {
+	static register(cache) {
+		cache.register("snmp.oid", async (host, version, community, oids, ttl, previous, options) => {
+			// Update the time in ms.
+			options.timeout = ttl * 1000;
+
+			// Get the data
+			const snmp = new Snmp(host, version, community);
+			return await snmp.getAndClose(oids);
+		});
+
+		cache.register(
+			"snmp.oidsByTtl",
+			async (snmpArray) => {
 				const updateObj = (obj, oid, ttl) => {
 					oid = Snmp.normalizeOid(oid);
 					obj[oid] = Math.min(obj[oid] || Number.MAX_VALUE, ttl);
@@ -137,16 +141,24 @@ export default {
 					return obj;
 				}, {});
 			},
-			timeout: 60 * 60 * 1000, // 1h
-		},
-	},
-	fetch: async (data, cache) => {
-		const oidsByTtl = await cache.get("snmp.oidsByTtl", data["snmp.array"] || []);
+			{ timeout: 60 * 60 * 1000 }, // 1h
+		);
+	}
+
+	async fetch(cache) {
+		const oidsByTtl = await cache.get("snmp.oidsByTtl", this.config["snmp.array"] || []);
 
 		let promises = [];
 		for (const ttl in oidsByTtl) {
 			const oids = oidsByTtl[ttl];
-			const promise = cache.get("snmp.oid", data["snmp.host"], data["snmp.version"], data["snmp.community"], oids, ttl);
+			const promise = cache.get(
+				"snmp.oid",
+				this.config["snmp.host"],
+				this.config["snmp.version"],
+				this.config["snmp.community"],
+				oids,
+				ttl,
+			);
 			promises.push(promise);
 		}
 
@@ -155,7 +167,7 @@ export default {
 		}, {});
 
 		// Map oids to name and perform the operations
-		const results = (data["snmp.array"] || []).map((item) => {
+		const results = (this.config["snmp.array"] || []).map((item) => {
 			const oid = Snmp.normalizeOid(item.oid);
 			let result = {
 				id: item.id || "unknown",
@@ -186,5 +198,5 @@ export default {
 		});
 
 		return results;
-	},
-};
+	}
+}

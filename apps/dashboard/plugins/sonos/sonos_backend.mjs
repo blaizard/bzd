@@ -1,4 +1,7 @@
 import Sonos from "sonos";
+import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
+
+const Exception = ExceptionFactory("plugin", "sonos");
 
 function _getState(state) {
 	if (state == "playing" || state == "transitioning") {
@@ -7,11 +10,10 @@ function _getState(state) {
 	if (state == "stopped") {
 		return "pause";
 	}
-	console.log(state);
 	return "unknown";
 }
 
-async function _next(data, cache, increment) {
+async function _next(cache, increment) {
 	const device = await cache.get("sonos.device");
 	let counter = device.playlist.length;
 
@@ -36,12 +38,38 @@ async function _next(data, cache, increment) {
 	}
 }
 
-export default {
-	cache: {
-		"sonos.device": {
-			fetch: async (previous) => {
+export default class SonosBackend {
+	constructor(config, events) {
+		this.config = config;
+		events.register("play", async (cache) => {
+			let device = await cache.get("sonos.device");
+			await device.instance.play();
+			device.track.state = "play";
+		});
+		events.register("pause", async (cache) => {
+			let device = await cache.get("sonos.device");
+			await device.instance.pause();
+			device.track.state = "pause";
+		});
+		events.register("next", async (cache) => {
+			await _next(cache, 1);
+		});
+		events.register("previous", async (cache) => {
+			await _next(cache, -1);
+		});
+	}
+
+	static register(cache) {
+		cache.register(
+			"sonos.device",
+			async (previous) => {
 				let discovery = new Sonos.AsyncDeviceDiscovery();
-				const instance = await discovery.discover();
+				let instance = null;
+				try {
+					instance = await discovery.discover();
+				} catch (e) {
+					Exception.errorPrecondition(e);
+				}
 				const description = await instance.deviceDescription();
 
 				// Build the playlist
@@ -88,12 +116,12 @@ export default {
 					playlist: playlist,
 				};
 			},
-			timeout: 60 * 1000 * 30,
-		},
-	},
-	fetch: async (data, cache) => {
-		const device = await cache.get("sonos.device");
+			{ timeout: 60 * 1000 * 30 },
+		);
+	}
 
+	async fetch(cache) {
+		const device = await cache.get("sonos.device");
 		return {
 			title: device.track.title,
 			artist: device.track.artist,
@@ -101,23 +129,5 @@ export default {
 			name: device.name,
 			state: device.track.state,
 		};
-	},
-	events: {
-		async play(data, cache) {
-			let device = await cache.get("sonos.device");
-			await device.instance.play();
-			device.track.state = "play";
-		},
-		async pause(data, cache) {
-			let device = await cache.get("sonos.device");
-			await device.instance.pause();
-			device.track.state = "pause";
-		},
-		async next(data, cache) {
-			await _next(data, cache, 1);
-		},
-		async previous(data, cache) {
-			await _next(data, cache, -1);
-		},
-	},
-};
+	}
+}
