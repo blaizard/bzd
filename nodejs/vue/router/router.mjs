@@ -87,7 +87,7 @@ class RouterManager {
 		this.fallback = null;
 		this.uid = 0;
 		this.updateState(getQueryAsDict());
-		this.installPlugins(...options.plugins);
+		this.installPlugins(...this.options.plugins);
 	}
 
 	/// Install all given plugins

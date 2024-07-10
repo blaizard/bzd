@@ -23,7 +23,12 @@
             "post": {
                 "documentation": "Get data from a tile",
                 "request": {
-                    "type": "json"
+                    "type": "json",
+                    "validation": {
+                        "args": "",
+                        "event": "mandatory",
+                        "uid": "mandatory"
+                    }
                 },
                 "response": {
                     "type": "json"

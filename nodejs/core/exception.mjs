@@ -212,6 +212,15 @@ export const ExceptionFactory = (...topics) => {
 		}
 
 		/**
+		 * Error reached
+		 */
+		static errorPrecondition(str = "", ...args) {
+			let combine = new ExceptionCombine("Error");
+			combine.add(str, ...args);
+			throw this.makePreconditionException(combine);
+		}
+
+		/**
 		 * Flag a line of code unreachable
 		 */
 		static unreachable(str = "", ...args) {

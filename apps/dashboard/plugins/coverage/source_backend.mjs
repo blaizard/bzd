@@ -1,23 +1,36 @@
 import HttpClient from "#bzd/nodejs/core/http/client.mjs";
+import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 
-export default {
-	cache: {
-		"coverage.report": {
-			fetch: async (reportUrl, authentication) => {
-				return await HttpClient.get(reportUrl, {
-					expect: "json",
-					authentication: authentication,
-				});
+const Exception = ExceptionFactory("plugin", "coverage");
+
+export default class Coverage {
+	constructor(config) {
+		this.config = config;
+	}
+
+	static register(cache) {
+		cache.register(
+			"coverage.report",
+			async (reportUrl, authentication) => {
+				try {
+					return await HttpClient.get(reportUrl, {
+						expect: "json",
+						authentication: authentication,
+					});
+				} catch (e) {
+					Exception.errorPrecondition(e);
+				}
 			},
-			timeout: 60 * 1000,
-		},
-	},
-	fetch: async (data, cache) => {
+			{ timeout: 60 * 1000 },
+		);
+	}
+
+	async fetch(cache) {
 		const authentication = {
-			type: data["coverage.authentication"],
-			username: data["coverage.user"],
-			password: data["coverage.token"],
+			type: this.config["coverage.authentication"],
+			username: this.config["coverage.user"],
+			password: this.config["coverage.token"],
 		};
-		return await cache.get("coverage.report", data["coverage.url"], authentication);
-	},
-};
+		return await cache.get("coverage.report", this.config["coverage.url"], authentication);
+	}
+}

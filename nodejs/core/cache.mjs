@@ -428,8 +428,7 @@ async function get(instant, collection, ...ids) {
 			// If instant and there are previous data, return it
 			if (instant) {
 				if ("_error" in dataId) {
-					Log.error("GET ERROR {}::{}: {}", collection, id, dataId._error);
-					throw new Exception(dataId._error);
+					throw dataId._error;
 				}
 				// isData
 				else if ("_data" in dataId) {
@@ -454,8 +453,7 @@ async function get(instant, collection, ...ids) {
 		}
 		// isError
 		else if ("_error" in dataId) {
-			Log.error("GET ERROR {}::{}: {}", collection, id, dataId._error);
-			throw new Exception(dataId._error);
+			throw dataId._error;
 		}
 		// isData
 		else if ("_data" in dataId) {
@@ -554,9 +552,9 @@ async function triggerUpdate(collection, id, ...ids) {
 		delete dataId._error;
 	} catch (e) {
 		// Register the error and delete the previous data if any
-		dataId._error = e.message;
+		dataId._error = e;
 		dataId._timeout = Cache.getTimestampMs() + 100; // Invalid the error after 100ms
-		dataId._size = dataId._error.length || 0;
+		dataId._size = 0;
 		delete dataId._data;
 	} finally {
 		delete dataId._fetching;

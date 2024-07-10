@@ -36,10 +36,15 @@ function getFetchOptions(username, token) {
 	return options;
 }
 
-export default {
-	cache: {
-		"github.builds": {
-			fetch: async function (username, repository, workflowId, token) {
+export default class Github {
+	constructor(config) {
+		this.config = config;
+	}
+
+	static register(cache) {
+		cache.register(
+			"github.builds",
+			async function (username, repository, workflowId, token) {
 				// Build the URL
 				const baseUrl =
 					"https://api.github.com/repos/" + encodeURIComponent(username) + "/" + encodeURIComponent(repository);
@@ -64,60 +69,60 @@ export default {
 				await Promise.all(promises);
 				return builds;
 			},
-			timeout: 60 * 1000,
-		},
-		"github.jobs": {
-			fetch: async (url, username, token, prevValue, cacheOptions) => {
-				const resultJobs = await HttpClient.get(url, getFetchOptions(username, token));
+			{ timeout: 60 * 1000 },
+		);
 
-				// Filter out empty jobs
-				if (resultJobs.jobs.length == 0) {
-					return {};
+		cache.register("github.jobs", async (url, username, token, prevValue, cacheOptions) => {
+			const resultJobs = await HttpClient.get(url, getFetchOptions(username, token));
+
+			// Filter out empty jobs
+			if (resultJobs.jobs.length == 0) {
+				return {};
+			}
+
+			let dateStart = Date.now();
+			let dateEnd = 0;
+			let status = "unknown";
+			let link = null;
+			for (const job of resultJobs.jobs) {
+				dateStart = Math.min(dateStart, Date.parse(job.started_at) || Date.now());
+				dateEnd = Math.max(dateEnd, Date.parse(job.completed_at) || 0);
+				const jobStatus = _getStatus(job);
+				if (jobStatus == "in-progress") {
+					status = jobStatus;
+				} else if (jobStatus == "failure") {
+					status = jobStatus;
+				} else if (jobStatus == "success" && status == "unknown") {
+					status = jobStatus;
+				} else if (jobStatus == "abort" && ["unknown", "success"].indexOf(status) != -1) {
+					status = jobStatus;
 				}
+				link = job.html_url;
+			}
 
-				let dateStart = Date.now();
-				let dateEnd = 0;
-				let status = "unknown";
-				let link = null;
-				for (const job of resultJobs.jobs) {
-					dateStart = Math.min(dateStart, Date.parse(job.started_at) || Date.now());
-					dateEnd = Math.max(dateEnd, Date.parse(job.completed_at) || 0);
-					const jobStatus = _getStatus(job);
-					if (jobStatus == "in-progress") {
-						status = jobStatus;
-					} else if (jobStatus == "failure") {
-						status = jobStatus;
-					} else if (jobStatus == "success" && status == "unknown") {
-						status = jobStatus;
-					} else if (jobStatus == "abort" && ["unknown", "success"].indexOf(status) != -1) {
-						status = jobStatus;
-					}
-					link = job.html_url;
-				}
+			if (status == "in-progress") {
+				cacheOptions.timeout = 60 * 1000; // Refresh every minutes
+			}
 
-				if (status == "in-progress") {
-					cacheOptions.timeout = 60 * 1000; // Refresh every minutes
-				}
+			return {
+				duration: dateEnd - dateStart || 0,
+				timestamp: dateStart || Date.now(),
+				status: status,
+				link: link,
+			};
+		});
+	}
 
-				return {
-					duration: dateEnd - dateStart || 0,
-					timestamp: dateStart || Date.now(),
-					status: status,
-					link: link,
-				};
-			},
-		},
-	},
-	fetch: async (data, cache) => {
+	async fetch(cache) {
 		const builds = await cache.get(
 			"github.builds",
-			data["github.username"],
-			data["github.repository"],
-			data["github.workflowid"],
-			data["github.token"],
+			this.config["github.username"],
+			this.config["github.repository"],
+			this.config["github.workflowid"],
+			this.config["github.token"],
 		);
 		return {
 			builds: builds,
 		};
-	},
-};
+	}
+}
