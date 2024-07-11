@@ -5,12 +5,13 @@
 	@extend %clickable;
 
 	padding: 0 10px !important;
-	&:active {
-		transform: translateY(2px);
-	}
 
 	text-align: center;
 	white-space: nowrap;
+
+	&:active {
+		transform: translateY(2px);
+	}
 
 	&.irform-button-approve {
 		color: base.$buttonApproveTextColor;

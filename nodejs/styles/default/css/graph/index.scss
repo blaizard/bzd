@@ -46,6 +46,7 @@ $font-size: 16;
 			.irgraph-legend-item {
 				white-space: nowrap;
 				cursor: pointer;
+				overflow: hidden;
 
 				&.irgraph-selected {
 					@extend %selected;
@@ -58,8 +59,6 @@ $font-size: 16;
 					vertical-align: middle;
 					background-color: var(--bzd-graph-color);
 				}
-
-				overflow: hidden;
 			}
 		}
 	}

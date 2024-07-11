@@ -8,11 +8,11 @@ $borderWidth: 5;
 $height: 150;
 
 body.irform-file-drag .irform-array-file {
+	border: #{base.$fieldBorderThickness}px dashed base.$fieldBorderColor;
+	position: relative;
 	* {
 		opacity: 0;
 	}
-	border: #{base.$fieldBorderThickness}px dashed base.$fieldBorderColor;
-	position: relative;
 	&:before {
 		color: base.$fieldBorderColor;
 		content: "Drag & drop here";

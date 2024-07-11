@@ -89,11 +89,14 @@ $triangleHeight: math.div(base.$fieldHeight, 5);
 					opacity: 0.5;
 				}
 
-				// Set the borders
-				border-top: 1px solid base.$tableBorderColor;
-				border-right: 1px solid base.$tableBorderColor;
-				border-bottom: 1px solid transparent;
-				border-left: 1px solid base.$tableBorderColor;
+				& {
+					// Set the borders
+					border-top: 1px solid base.$tableBorderColor;
+					border-right: 1px solid base.$tableBorderColor;
+					border-bottom: 1px solid transparent;
+					border-left: 1px solid base.$tableBorderColor;
+				}
+
 				+ .irform-table-cell {
 					border-left: 1px solid transparent;
 				}
