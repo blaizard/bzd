@@ -239,16 +239,16 @@
 		background-position: center;
 
 		.container {
-			&.clickable {
-				@extend %bzd-clickable;
-			}
-
 			width: 300px;
 			height: 300px;
 
 			border-width: 1px;
 			border-style: solid;
 			position: relative;
+
+			&.clickable {
+				@extend %bzd-clickable;
+			}
 
 			&.edit {
 				border-style: dashed;

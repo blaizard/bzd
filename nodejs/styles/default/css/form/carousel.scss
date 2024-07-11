@@ -48,6 +48,7 @@
 	}
 
 	.irform-carousel-prev {
+		margin-left: 4px;
 		@include base.buttonArrow(
 			left,
 			base.$fieldHeight,
@@ -56,9 +57,9 @@
 			base.$actionerBgColor,
 			4
 		);
-		margin-left: 4px;
 	}
 	.irform-carousel-next {
+		margin-right: 4px;
 		@include base.buttonArrow(
 			right,
 			base.$fieldHeight,
@@ -67,7 +68,6 @@
 			base.$actionerBgColor,
 			4
 		);
-		margin-right: 4px;
 	}
 }
 

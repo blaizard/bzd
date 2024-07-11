@@ -2,6 +2,9 @@
 @use "#bzd/nodejs/styles/default/css/form/config.scss" as base;
 
 .irform-array {
+	width: 100%;
+	padding: 0;
+
 	&.irform-fill {
 		width: 100%;
 		height: 100%;
@@ -87,9 +90,6 @@
 			}
 		}
 	}
-
-	width: 100%;
-	padding: 0;
 }
 
 // Disable

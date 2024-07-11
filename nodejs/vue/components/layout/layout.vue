@@ -276,6 +276,9 @@
 		}
 
 		.bzd-layout-menu {
+			position: fixed;
+			z-index: $menuZIndex;
+
 			// --- Transitions
 
 			// Fade
@@ -299,9 +302,6 @@
 			}
 
 			// ----
-
-			position: fixed;
-			z-index: $menuZIndex;
 
 			.bzd-layout-menu-background {
 				position: fixed;

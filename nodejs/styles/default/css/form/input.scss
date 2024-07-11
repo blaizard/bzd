@@ -5,6 +5,10 @@
 	display: flex;
 	overflow: hidden;
 
+	padding: 0;
+	@extend %field-reset;
+	@extend %border;
+
 	.irform-input-pre,
 	.irform-input-post,
 	.irform-input-data,
@@ -59,10 +63,6 @@
 			@extend %placeholder;
 		}
 	}
-
-	padding: 0;
-	@extend %field-reset;
-	@extend %border;
 }
 
 // Error
