@@ -1,26 +1,28 @@
 <template>
-	<div class="bzd-dashboard-tile" :style="tileStyle">
-		<div :class="tileClass" :style="containerStyle" @click="handleClick" v-loading="!(initialized || edit)">
-			<div v-if="isError" class="error" v-tooltip="tooltipErrorConfig">{{ errorList.length }}</div>
-			<component
-				v-if="showComponent"
-				class="content"
-				:is="component"
-				:description="description"
-				:metadata="metadata"
-				:color="colorForeground"
-				:background-color="colorBackground"
-				@color="handleColor"
-				@link="handleLink"
-				@error="handleError"
-				@clickable="handleClickable"
-				@event="handleEvent"
-				@name="handleName"
-				@image="handleImage"
-			>
-			</component>
-			<div v-else-if="isError" class="content">Fatal error</div>
-			<div class="name"><i :class="icon"></i> {{ name }}</div>
+	<div class="bzd-dashboard-tile-group">
+		<div class="bzd-dashboard-tile" v-for="(tile, key) in tiles" :style="getStyle(key)" :key="uid + '-' + key">
+			<div :class="getTileClass(key)" :style="containerStyle" @click="handleClick(key)">
+				<div v-if="getNbErrors(key) > 0" class="error" v-tooltip="tooltipErrorConfig(key)">{{ getNbErrors(key) }}</div>
+				<component
+					v-else
+					class="content"
+					:is="component"
+					:description="description"
+					:metadata="tile.data"
+					:color="colorForeground"
+					:background-color="colorBackground"
+					@color="handleColor(key, $event)"
+					@link="handleLink(key, $event)"
+					@error="handleError(key, $event)"
+					@clickable="handleClickable(key, $event)"
+					@event="handleEvent(key, $event)"
+					@name="handleName(key, $event)"
+					@image="handleImage(key, $event)"
+				>
+				</component>
+				<!--<div v-else-if="isError" class="content">Fatal error</div>//-->
+				<div class="name"><i :class="icon"></i> {{ getName(key) }}</div>
+			</div>
 		</div>
 	</div>
 </template>
@@ -32,15 +34,16 @@
 	import Plugins from "../plugins/plugins.frontend.index.mjs";
 	import Color from "#bzd/nodejs/utils/color.mjs";
 	import LogFactory from "#bzd/nodejs/core/log.mjs";
+	import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 	import { defineAsyncComponent } from "vue";
 
-	const Log = LogFactory("tile");
+	const Log = LogFactory("instance");
+	const Exception = ExceptionFactory("instance");
 
 	export default {
 		props: {
 			description: { type: Object, mandatory: true },
 			uid: { type: String, mandatory: true },
-			edit: { type: Boolean, mandatory: false, default: false },
 		},
 		directives: {
 			loading: DirectiveLoading,
@@ -48,27 +51,15 @@
 		},
 		data: function () {
 			return {
-				initialized: true,
-				showComponent: true,
-				metadata: {},
+				tiles: {},
 				handleTimeout: null,
-				errorList: [],
 				color: null,
 				icon: null,
-				link: null,
-				clickable: false,
-				manualName: null,
-				image: null,
 			};
 		},
 		mounted() {
 			// Set the default link if any
-			if ("link.url" in this.description) {
-				this.link = this.description["link.url"];
-			}
 			if (this.sourceType) {
-				this.initialized = false;
-				this.showComponent = false;
 				this.fetch();
 			}
 			this.fetchIcon();
@@ -79,15 +70,6 @@
 			}
 		},
 		computed: {
-			isError() {
-				return this.errorList.length > 0;
-			},
-			tooltipErrorConfig() {
-				return {
-					type: "text",
-					data: this.errorList.map((e) => String(e)).join(", "),
-				};
-			},
 			colorAuto() {
 				const index = Array.from(this.uid).reduce((acc, c) => acc + parseInt(c.charCodeAt(0)), 0);
 				const colorList = Object.keys(Colors);
@@ -108,9 +90,6 @@
 					}[this.colorBackground] || "white"
 				);
 			},
-			name() {
-				return this.description.name || this.manualName || this.sourceType || this.visualizationType;
-			},
 			visualizationColor() {
 				return this.description["visualization.color"] || "auto";
 			},
@@ -121,7 +100,7 @@
 				return this.description["source.type"] || null;
 			},
 			timeout() {
-				return Plugins[this.sourceType].metadata.timeout || 0;
+				return Plugins[this.sourceType].metadata.timeout || 60;
 			},
 			component() {
 				if (!(this.visualizationType in Plugins)) {
@@ -130,20 +109,10 @@
 				}
 				return defineAsyncComponent(() => Plugins[this.visualizationType].module());
 			},
-			tileClass() {
-				return {
-					container: true,
-					edit: this.edit,
-					clickable: Boolean(this.clickable) || Boolean(this.link) || this.edit,
-				};
-			},
-			tileStyle() {
-				return 'background-image: url("' + this.image + '");';
-			},
 			containerStyle() {
 				let color = new Color(Colors[this.colorBackground]);
 				color.setAlpha(0.6);
-				const backgroundColor = this.image ? color.toString() : Colors[this.colorBackground];
+				const backgroundColor = Colors[this.colorBackground];
 				return (
 					"background-color: " +
 					backgroundColor +
@@ -158,23 +127,71 @@
 			},
 		},
 		methods: {
-			handleError(e) {
-				this.errorList.push(e);
+			getName(key) {
+				return this.description.name || this.tiles[key].name || this.sourceType || this.visualizationType;
+			},
+			getTileClass(key) {
+				return {
+					container: true,
+					clickable: Boolean(this.tiles[key].clickable) || Boolean(this.tiles[key].link),
+				};
+			},
+			getStyle(key) {
+				let style = {};
+				if (this.tiles[key].image) {
+					style["background-image"] = "url('" + this.tiles[key].image + "')";
+				}
+				return style;
+			},
+			tooltipErrorConfig(key) {
+				return {
+					type: "text",
+					data: this.tiles[key].errors.map((e) => String(e)).join(", "),
+				};
+			},
+			getNbErrors(key) {
+				return (this.tiles[key].errors || []).length;
+			},
+			handleInstanceError(e) {
+				Log.error(e);
+			},
+			handleError(key, e) {
+				this.tiles[key].errors ??= [];
+				this.tiles[key].errors.push(e);
+			},
+			// Assign the new tiles.
+			assignTilesData(data) {
+				for (const [key, tile] of Object.entries(data)) {
+					this.tiles[key] = {
+						data: tile,
+						timestamp: Date.now(),
+					};
+				}
 			},
 			async fetch() {
 				this.handleTimeout = null;
 				try {
-					this.metadata = await this.$rest.request("get", "/data", {
+					const data = await this.$rest.request("get", "/data", {
 						uid: this.uid,
-						type: this.sourceType,
 					});
-					this.showComponent = true;
+
+					if (Array.isArray(data)) {
+						const tiles = data.reduce((tiles, tile, index) => {
+							const key = tile.key | index;
+							Exception.assert(!(key in tiles), "At least 2 tiles have the same key.");
+							tiles[key] = tile;
+							return tiles;
+						}, {});
+						this.assignTilesData(tiles);
+					} else {
+						const tiles = {
+							default: data,
+						};
+						this.assignTilesData(tiles);
+					}
 					this.handleTimeout = setTimeout(this.fetch, this.timeout);
 				} catch (e) {
-					this.handleError("Error while fetching data: " + String(e));
-					this.handleColor("red");
-				} finally {
-					this.initialized = true;
+					this.handleInstanceError("Error while fetching data: " + String(e));
 				}
 			},
 			async fetchIcon() {
@@ -184,38 +201,36 @@
 					this.icon = plugin.metadata.icon || "";
 				}
 			},
-			handleClick() {
-				if (this.edit) {
-					this.$router.dispatch("/update/" + this.uid);
-				} else if (this.link) {
-					window.open(this.link);
+			handleClick(key) {
+				if (this.tiles[key].link) {
+					window.open(this.tiles[key].link);
 				}
 			},
-			handleColor(color) {
-				this.color = color;
+			handleColor(key, color) {
+				this.tiles[key].color = color;
 			},
-			handleLink(link) {
-				this.link = link;
+			handleLink(key, link) {
+				this.tiles[key].link = link;
 			},
-			handleClickable(clickable) {
-				this.clickable = clickable;
+			handleClickable(key, clickable) {
+				this.tiles[key].clickable = clickable;
 			},
-			handleName(name) {
-				this.manualName = name;
+			handleName(key, name) {
+				this.tiles[key].name = name;
 			},
-			handleImage(image) {
-				this.image = image;
+			handleImage(key, image) {
+				this.tiles[key].image = image;
 			},
-			async handleEvent(type) {
+			async handleEvent(key, type) {
 				try {
-					this.metadata = await this.$rest.request("post", "/event", {
+					await this.$rest.request("post", "/event", {
 						uid: this.uid,
-						type: this.sourceType,
+						key: key,
 						event: type,
 					});
 				} catch (e) {
-					this.handleError("Error while triggering event: " + String(e));
-					this.handleColor("red");
+					this.handleError(key, "Error while triggering event: " + String(e));
+					this.handleColor(key, "red");
 				}
 			},
 		},
@@ -248,11 +263,6 @@
 
 			&.clickable {
 				@extend %bzd-clickable;
-			}
-
-			&.edit {
-				border-style: dashed;
-				border-width: 2px;
 			}
 
 			.name {

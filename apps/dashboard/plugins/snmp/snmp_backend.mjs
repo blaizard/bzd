@@ -197,6 +197,6 @@ export default class SNMP {
 			return result;
 		});
 
-		return results;
+		return [results];
 	}
 }
