@@ -50,6 +50,7 @@ services:
     {{ hostToName(docker.host) }}:
         image: "{{ docker.image | imageResolve }}"
         container_name: "{{ hostToName(docker.host) }}"
+        restart: always
         labels:
             traefik.enable: "true"
             {% if needsWWWRedirect(docker.host) %}
