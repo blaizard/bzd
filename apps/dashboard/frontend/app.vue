@@ -1,16 +1,11 @@
 <template>
 	<Layout>
 		<template #header
-			><RouterLink link="/"><i class="bzd-icon-main"></i> Dashboard</RouterLink></template
-		>
-		<template #actions>
-			<MenuEntry text="Add new tile" icon="bzd-icon-add" link="/new"></MenuEntry>
-			<MenuEntry v-if="!edit" text="Edit" icon="bzd-icon-edit" @click="handleEdit"></MenuEntry>
-			<MenuEntry v-else text="OK" icon="bzd-icon-check" @click="handleEdit"></MenuEntry>
+			><RouterLink link="/"><i class="bzd-icon-main"></i> Dashboard</RouterLink>
 		</template>
 		<template #menu> </template>
 		<template #content>
-			<RouterComponent name="view" :edit="edit" class="bzd-content"></RouterComponent>
+			<RouterComponent name="view" class="bzd-content"></RouterComponent>
 		</template>
 	</Layout>
 </template>
@@ -29,25 +24,14 @@
 			tooltip: DirectiveTooltip,
 		},
 		data: function () {
-			return {
-				edit: false,
-			};
+			return {};
 		},
 		mounted() {
 			this.$router.set({
 				component: "view",
-				routes: [
-					{ path: "/", component: () => import("./tiles.vue") },
-					{ path: "/new", component: () => import("./config.vue") },
-					{ path: "/update/{uid}", component: () => import("./config.vue") },
-				],
+				routes: [{ path: "/", component: () => import("./instances.vue") }],
 				fallback: { component: () => import("./404.vue") },
 			});
-		},
-		methods: {
-			handleEdit() {
-				this.edit = !this.edit;
-			},
 		},
 	};
 </script>
@@ -58,7 +42,7 @@
 	@use "#bzd/nodejs/styles/default/css/loading.scss" as *;
 
 	@use "#bzd/nodejs/icons.scss" as icons with (
-		$bzdIconNames: edit add check
+		$bzdIconNames: add check
 	);
 
 	.bzd-icon-main {

@@ -125,26 +125,14 @@ class EventsFactory {
 	let api = new RestServer(APIv1.rest, {
 		channel: web,
 	});
-	api.handle("get", "/tiles", async () => {
+	api.handle("get", "/instances", async () => {
 		return Object.entries(plugins).reduce((object, [uid, data]) => {
 			object[uid] = data.config;
 			return object;
 		}, {});
 	});
-	api.handle("get", "/tile", async (inputs) => {
+	api.handle("get", "/instance", async (inputs) => {
 		return plugins[inputs.uid].config;
-	});
-	api.handle("post", "/tile", async (inputs) => {
-		Exception.error("nnnnoooo");
-		//await keyValueStore.set("tiles", null, inputs.value);
-		await cache.setDirty("data", inputs.uid);
-	});
-	api.handle("put", "/tile", async (inputs) => {
-		tiles[inputs.uid] = inputs.value;
-		await cache.setDirty("data", inputs.uid);
-	});
-	api.handle("delete", "/tile", async (inputs) => {
-		delete tiles[inputs.uid];
 	});
 	api.handle("get", "/data", async (inputs) => {
 		const pluginType = uidToType(inputs.uid);

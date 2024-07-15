@@ -35,18 +35,9 @@
                 }
             }
         },
-        "/tile": {
-            "delete": {
-                "documentation": "Delete an existing tile",
-                "request": {
-                    "type": "json",
-                    "validation": {
-                        "uid": "mandatory"
-                    }
-                }
-            },
+        "/instance": {
             "get": {
-                "documentation": "Get a specific tile configuration",
+                "documentation": "Get a specific instance configuration",
                 "request": {
                     "type": "query",
                     "validation": {
@@ -56,30 +47,11 @@
                 "response": {
                     "type": "json"
                 }
-            },
-            "post": {
-                "documentation": "Create a new tile",
-                "request": {
-                    "type": "json",
-                    "validation": {
-                        "value": "mandatory"
-                    }
-                }
-            },
-            "put": {
-                "documentation": "Update an existing tile",
-                "request": {
-                    "type": "json",
-                    "validation": {
-                        "uid": "mandatory",
-                        "value": "mandatory"
-                    }
-                }
             }
         },
-        "/tiles": {
+        "/instances": {
             "get": {
-                "documentation": "List all tiles and their configuration",
+                "documentation": "List all instance and their configuration",
                 "response": {
                     "type": "json"
                 }

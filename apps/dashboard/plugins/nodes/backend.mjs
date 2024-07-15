@@ -35,6 +35,11 @@ export default class Nodes {
 	}
 
 	async fetch(cache) {
-		return await cache.get("nodes.list", this.config["nodes.url"], this.config["nodes.volume"]);
+		const nodes = await cache.get("nodes.list", this.config["nodes.url"], this.config["nodes.volume"]);
+		return nodes.map((node) => {
+			return {
+				key: node,
+			};
+		});
 	}
 }
