@@ -33,24 +33,31 @@
 					</div>
 				</div>
 			</div>
-			<div v-if="isMemory" class="gauge" v-tooltip="memoryTooltip">
-				<div class="name">Memory</div>
-				<div class="values">
-					<div class="value">
-						<div class="bar" :style="memoryStyle"></div>
-						<div class="overlay">{{ memoryPercent.toFixed(1) }}%</div>
+
+			<!-- memory //-->
+			<template v-if="Object.keys(memories).length < 3" v-for="(memory, name) in memories">
+				<div class="gauge" v-tooltip="makeTooltipSingle('Memory', name, memory)">
+					<div class="name">{{ name.toUpperCase() }}</div>
+					<div class="values">
+						<div class="value">
+							<div class="bar" :style="gaugeStyle(memory.ratio)"></div>
+							<div class="overlay">{{ (memory.ratio * 100).toFixed(1) }}%</div>
+						</div>
 					</div>
 				</div>
-			</div>
-			<div v-if="isSwap" class="gauge" v-tooltip="swapTooltip">
-				<div class="name">Swap</div>
-				<div class="values">
-					<div class="value">
-						<div class="bar" :style="swapStyle"></div>
-						<div class="overlay">{{ swapPercent.toFixed(1) }}%</div>
+			</template>
+			<template v-else>
+				<div class="gauge" v-tooltip="makeTooltipMulti('Memory', memories)">
+					<div class="name">MEMORY</div>
+					<div class="values">
+						<div class="value">
+							<div class="bar" :style="gaugeStyle(memoriesRatio)"></div>
+							<div class="overlay">{{ (memoriesRatio * 100).toFixed(1) }}%</div>
+						</div>
 					</div>
 				</div>
-			</div>
+			</template>
+
 			<div v-if="isIO" class="gauge" v-tooltip="ioTooltip">
 				<div class="name">IO</div>
 				<div class="values">
@@ -92,48 +99,34 @@
 			};
 		},
 		computed: {
-			isMemory() {
-				return this.has("memory.free") && this.has("memory.total");
+			// Memory
+			memoryTypes() {
+				return Object.keys(this.metadata.memory || {});
 			},
-			memory() {
-				return this.makeMemoryMap("memory");
+			memories() {
+				let memories = {};
+				for (const [name, memory] of Object.entries(this.metadata.memory || {})) {
+					const [used, total] = memory;
+					const free = total - used;
+					memories[name] = {
+						ratio: used / total,
+						display:
+							bytesToString(free) + " free / " + bytesToString(total) + " (" + ((free / total) * 100).toFixed(1) + "%)",
+					};
+				}
+				return memories;
 			},
-			memoryPercent() {
-				return this.makeMemoryPercent(this.memory);
+			memoriesRatio() {
+				const values = Object.values(this.memories);
+				const ratioSum = values.reduce((ratioSum, memory) => ratioSum + memory.ratio, 0);
+				return ratioSum / values.length;
 			},
-			memoryStyle() {
-				return {
-					width: this.memoryPercent + "%",
-				};
-			},
-			memoryTooltip() {
-				return this.makeMemoryTooltip("Memory", this.memory);
-			},
-			isSwap() {
-				return this.has("swap.free") && this.has("swap.total");
-			},
-			swap() {
-				return this.makeMemoryMap("swap");
-			},
-			swapPercent() {
-				return this.makeMemoryPercent(this.swap);
-			},
-			swapStyle() {
-				return {
-					width: this.swapPercent + "%",
-				};
-			},
-			swapTooltip() {
-				return this.makeMemoryTooltip("Swap", this.swap);
-			},
+			// CPU
 			isCpu() {
-				return this.has("cpu.load");
-			},
-			cpu() {
-				return this.makeCpuMap("cpu");
+				return "cpu" in this.metadata;
 			},
 			cpuPercent() {
-				return this.makeCpuPercent(this.cpu);
+				return this.makeCpuPercent(this.metadata.cpu);
 			},
 			cpuStyle() {
 				return {
@@ -141,16 +134,14 @@
 				};
 			},
 			cpuTooltip() {
-				return this.makeCpuTooltip("CPU", this.cpu);
+				return this.makeCpuTooltip("CPU", this.metadata.cpu);
 			},
+			// GPU
 			isGpu() {
-				return this.has("gpu.load");
-			},
-			gpu() {
-				return this.makeCpuMap("gpu");
+				return "gpu" in this.metadata;
 			},
 			gpuPercent() {
-				return this.makeCpuPercent(this.gpu);
+				return this.makeCpuPercent(this.metadata.gpu);
 			},
 			gpuStyle() {
 				return {
@@ -158,10 +149,11 @@
 				};
 			},
 			gpuTooltip() {
-				return this.makeCpuTooltip("GPU", this.gpu);
+				return this.makeCpuTooltip("GPU", this.metadata.gpu);
 			},
+			// Temperature
 			isTemperature() {
-				return this.has("temperature");
+				return false; //this.has("temperature");
 			},
 			temperature() {
 				return this.getItems("temperature").reduce((obj, item) => {
@@ -178,7 +170,7 @@
 			},
 			// Battery
 			isBattery() {
-				return this.has("ups.charge");
+				return false; //this.has("ups.charge");
 			},
 			batteryPercent() {
 				return this.getItems("ups.charge").reduce((value, item) => Math.min(value, item.value), 1) * 100;
@@ -195,7 +187,7 @@
 			},
 			// IO
 			isIO() {
-				return this.has("io.total.in") || this.has("io.total.out");
+				return false; //this.has("io.total.in") || this.has("io.total.out");
 			},
 			ioRate() {
 				return this.getRate("io", this.makeIOMap("io"));
@@ -221,7 +213,7 @@
 			},
 			// Network
 			isNetwork() {
-				return this.has("network.total.in") || this.has("network.total.out");
+				return false; //this.has("network.total.in") || this.has("network.total.out");
 			},
 			networkRate() {
 				return this.getRate("network", this.makeIOMap("network"));
@@ -247,66 +239,61 @@
 			},
 		},
 		methods: {
-			has(id) {
-				for (const i in this.metadata) {
-					if (this.metadata[i].id.startsWith(id)) {
-						return true;
-					}
-				}
-				return false;
+			// Utilities
+			maxArray(array) {
+				return array.reduce(Math.max, 0);
 			},
-			/**
-			 * Get an iterable of all values matching a certain id.
-			 */
-			getItems(id) {
-				return this.metadata.filter((item) => item.id.startsWith(id));
+			sumArray(array) {
+				return array.reduce((a, b) => a + b, 0);
+			},
+			avgArray(array) {
+				return this.sumArray(array) / array.length;
+			},
+			avgMapOfArrays(map) {
+				const [sum, size] = Object.values(map).reduce(
+					(value, array) => {
+						value[0] += this.sumArray(array);
+						value[1] += array.length;
+						return value;
+					},
+					[0, 0],
+				);
+				return sum / size;
+			},
+			// Gauge
+			gaugeStyle(ratio) {
+				return {
+					width: ratio * 100 + "%",
+				};
 			},
 			// CPU
-			makeCpuMap(name) {
-				return this.getItems(name + ".load").reduce((obj, item) => {
-					const id = item.id.substring((name + ".load").length + 1) || "undefined";
-					obj[id] = obj[id] || { load: 0 };
-					obj[id].load = Math.max(obj[id].load, item.value);
-					return obj;
-				}, {});
-			},
 			makeCpuPercent(map) {
-				const loadSum = Object.keys(map).reduce((value, key) => value + map[key].load, 0);
-				return (loadSum / Object.keys(map).length) * 100;
+				return this.avgMapOfArrays(map) * 100;
 			},
 			makeCpuTooltip(displayName, map) {
-				return this.makeTooltip(displayName, map, (item) => {
-					return (item.load * 100).toFixed(1) + "% load";
+				return this.makeTooltip(displayName, map, (array) => {
+					return (this.avgArray(array) * 100).toFixed(1) + "% load";
 				});
 			},
 			// Memory
-			makeMemoryMap(name) {
-				let map = this.getItems(name + ".free").reduce((obj, item) => {
-					const id = item.id.substring((name + ".free").length + 1) || "undefined";
-					obj[id] = obj[id] || { free: 0, total: 0 };
-					obj[id].free += item.value;
-					return obj;
-				}, {});
-				this.getItems(name + ".total").forEach((item) => {
-					const id = item.id.substring((name + ".total").length + 1) || "undefined";
-					map[id].total += item.value;
-				});
-				return map;
+			memoryTooltip(memory) {
+				return this.makeMemoryTooltip("Memory", { [memory]: this.metadata.memory[memory] });
 			},
-			makeMemoryPercent(map) {
-				const free = Object.keys(map).reduce((value, key) => value + map[key].free, 0);
-				const total = Object.keys(map).reduce((value, key) => value + map[key].total, 0);
-				return (1 - free / total) * 100;
+			memoryPercent(memory) {
+				const [used, total] = this.metadata.memory[memory];
+				return (used / total) * 100;
+			},
+			memoryStyle(memory) {
+				return {
+					width: this.memoryPercent(memory) + "%",
+				};
 			},
 			makeMemoryTooltip(displayName, map) {
 				return this.makeTooltip(displayName, map, (item) => {
+					const total = item[1];
+					const free = total - item[0];
 					return (
-						bytesToString(item.free) +
-						" free / " +
-						bytesToString(item.total) +
-						" (" +
-						((item.free / item.total) * 100).toFixed(1) +
-						"%)"
+						bytesToString(free) + " free / " + bytesToString(total) + " (" + ((free / total) * 100).toFixed(1) + "%)"
 					);
 				});
 			},
@@ -381,6 +368,15 @@
 			},
 			formatBytesRate(rate) {
 				return bytesToString(rate) + "/s";
+			},
+			makeTooltipSingle(displayName, name, data) {
+				return this.makeTooltipMulti(displayName, { [name]: data });
+			},
+			makeTooltipMulti(displayName, map) {
+				const messageList = Object.entries(map).map(([name, data]) => {
+					return "<li>" + capitalize(name) + ": " + data.display + "</li>";
+				});
+				return { data: displayName + "<ul>" + messageList.join("\n") + "</ul>" };
 			},
 			makeTooltip(displayName, map, callback) {
 				const messageList = Object.keys(map).map((key) => {

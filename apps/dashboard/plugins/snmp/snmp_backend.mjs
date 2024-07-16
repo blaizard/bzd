@@ -51,7 +51,7 @@ class Snmp {
 				}
 				break;
 		}
-		Log.error("Unsupported value type '{}': {:j}", data.type, data);
+		Log.error("Unsupported value type '{}' ({}): {:j}", data.type, SnmpNative.ObjectType[data.type], data);
 		return "unsupported";
 	}
 
@@ -145,6 +145,63 @@ export default class SNMP {
 		);
 	}
 
+	// Create a dictionary from the result object.
+	resultToObject(results) {
+		let object = {};
+		let memory = {};
+
+		for (const [id, value] of results) {
+			const [category, ...rest] = id.split(".");
+			object[category] ??= {};
+			if (category in { cpu: "", temperature: "", battery: "" }) {
+				const [name] = rest;
+				object[category][name] ??= [];
+				object[category][name].push(parseFloat(value));
+			} else if (category == "memory") {
+				const [name, type] = rest;
+				memory[name] ??= {};
+				switch (type) {
+					case "total":
+						memory[name].total = parseInt(value);
+						break;
+					case "used":
+						memory[name].used = parseInt(value);
+						break;
+					case "free":
+						memory[name].free = parseInt(value);
+						break;
+					default:
+						Exception.error("Unsupported id '{}'.", id);
+				}
+			} else if (category in { io: "", network: "" }) {
+				const [name, type] = rest;
+				object[category][name] ??= [0, 0];
+				switch (type) {
+					case "in":
+						object[category][name][0] = parseInt(value);
+						break;
+					case "out":
+						object[category][name][1] = parseInt(value);
+						break;
+					default:
+						Exception.error("Unsupported id '{}'.", id);
+				}
+			} else {
+				Exception.error("Unsupported id '{}'.", id);
+			}
+		}
+
+		// Assemble memory.
+		for (const [name, data] of Object.entries(memory)) {
+			object["memory"][name] ??= [0, 0];
+			Exception.assert("total" in data, "Memory is missing total");
+			object["memory"][name][1] = data.total;
+			object["memory"][name][0] = data.used || object["memory"][name][1] - data.free;
+		}
+
+		return object;
+	}
+
 	async fetch(cache) {
 		const oidsByTtl = await cache.get("snmp.oidsByTtl", this.config["snmp.array"] || []);
 
@@ -169,34 +226,32 @@ export default class SNMP {
 		// Map oids to name and perform the operations
 		const results = (this.config["snmp.array"] || []).map((item) => {
 			const oid = Snmp.normalizeOid(item.oid);
-			let result = {
-				id: item.id || "unknown",
-				value: values[oid],
-			};
+			const id = item.id || "unknown";
+			let value = values[oid];
 
 			(item.ops || []).forEach((operation) => {
 				const opValue = Snmp.isOid(operation.value) ? values[Snmp.normalizeOid(operation.value)] : operation.value;
 				switch (operation.type) {
 					case "mul":
-						result.value *= opValue;
+						value *= opValue;
 						break;
 					case "div":
-						result.value /= opValue;
+						value /= opValue;
 						break;
 					case "add":
-						result.value += opValue;
+						value += opValue;
 						break;
 					case "sub":
-						result.value -= opValue;
+						value -= opValue;
 						break;
 					default:
 						Exception.unreachable("Unsupported operation type: '{}'", operation.type);
 				}
 			});
 
-			return result;
+			return [id, value];
 		});
 
-		return [results];
+		return this.resultToObject(results);
 	}
 }
