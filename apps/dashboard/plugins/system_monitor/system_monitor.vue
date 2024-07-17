@@ -15,48 +15,14 @@
 
 		<!-- Gauges //-->
 		<div class="gauges">
-			<div v-if="isCpu" class="gauge" v-tooltip="cpuTooltip">
-				<div class="name">CPU</div>
-				<div class="values">
-					<div class="value">
-						<div class="bar" :style="cpuStyle"></div>
-						<div class="overlay">{{ cpuPercent.toFixed(1) }}%</div>
-					</div>
-				</div>
-			</div>
-			<div v-if="isGpu" class="gauge" v-tooltip="gpuTooltip">
-				<div class="name">GPU</div>
-				<div class="values">
-					<div class="value">
-						<div class="bar" :style="gpuStyle"></div>
-						<div class="overlay">{{ gpuPercent.toFixed(1) }}%</div>
-					</div>
-				</div>
-			</div>
-
-			<!-- memory //-->
-			<template v-if="Object.keys(memories).length < 3" v-for="(memory, name) in memories">
-				<div class="gauge" v-tooltip="makeTooltipSingle('Memory', name, memory)">
-					<div class="name">{{ name.toUpperCase() }}</div>
-					<div class="values">
-						<div class="value">
-							<div class="bar" :style="gaugeStyle(memory.ratio)"></div>
-							<div class="overlay">{{ (memory.ratio * 100).toFixed(1) }}%</div>
-						</div>
-					</div>
-				</div>
-			</template>
-			<template v-else>
-				<div class="gauge" v-tooltip="makeTooltipMulti('Memory', memories)">
-					<div class="name">MEMORY</div>
-					<div class="values">
-						<div class="value">
-							<div class="bar" :style="gaugeStyle(memoriesRatio)"></div>
-							<div class="overlay">{{ (memoriesRatio * 100).toFixed(1) }}%</div>
-						</div>
-					</div>
-				</div>
-			</template>
+			<Gauge name="CPU" :ratios="cpus.ratios" policy="max" v-tooltip="makeTooltipMulti('CPU', cpus.tooltips)"></Gauge>
+			<Gauge name="GPU" :ratios="gpus.ratios" policy="max" v-tooltip="makeTooltipMulti('GPU', gpus.tooltips)"></Gauge>
+			<Gauge
+				name="MEMORY"
+				:ratios="memories.ratios"
+				policy="average"
+				v-tooltip="makeTooltipMulti('Memory', memories.tooltips)"
+			></Gauge>
 
 			<div v-if="isIO" class="gauge" v-tooltip="ioTooltip">
 				<div class="name">IO</div>
@@ -85,10 +51,14 @@
 <script>
 	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
 	import { bytesToString, capitalize } from "#bzd/nodejs/utils/to_string.mjs";
+	import Gauge from "#bzd/apps/dashboard/plugins/system_monitor/gauge.vue";
 
 	export default {
 		props: {
 			metadata: { type: Object, mandatory: true },
+		},
+		components: {
+			Gauge,
 		},
 		directives: {
 			tooltip: DirectiveTooltip,
@@ -100,26 +70,44 @@
 		},
 		computed: {
 			// Memory
-			memoryTypes() {
-				return Object.keys(this.metadata.memory || {});
-			},
 			memories() {
-				let memories = {};
+				let ratios = {};
+				let tooltips = {};
 				for (const [name, memory] of Object.entries(this.metadata.memory || {})) {
 					const [used, total] = memory;
 					const free = total - used;
-					memories[name] = {
-						ratio: used / total,
-						display:
-							bytesToString(free) + " free / " + bytesToString(total) + " (" + ((free / total) * 100).toFixed(1) + "%)",
-					};
+					tooltips[name] =
+						bytesToString(free) + " free / " + bytesToString(total) + " (" + ((free / total) * 100).toFixed(1) + "%)";
+					ratios[name] = used / total;
 				}
-				return memories;
+				return {
+					ratios,
+					tooltips,
+				};
 			},
-			memoriesRatio() {
-				const values = Object.values(this.memories);
-				const ratioSum = values.reduce((ratioSum, memory) => ratioSum + memory.ratio, 0);
-				return ratioSum / values.length;
+			cpus() {
+				let ratios = {};
+				let tooltips = {};
+				for (const [name, data] of Object.entries(this.metadata.cpu || {})) {
+					tooltips[name] = (this.avgArray(data) * 100).toFixed(1) + "% load";
+					ratios[name] = data;
+				}
+				return {
+					ratios,
+					tooltips,
+				};
+			},
+			gpus() {
+				let ratios = {};
+				let tooltips = {};
+				for (const [name, data] of Object.entries(this.metadata.gpu || {})) {
+					tooltips[name] = (this.avgArray(data) * 100).toFixed(1) + "% load";
+					ratios[name] = data;
+				}
+				return {
+					ratios,
+					tooltips,
+				};
 			},
 			// CPU
 			isCpu() {
@@ -374,7 +362,7 @@
 			},
 			makeTooltipMulti(displayName, map) {
 				const messageList = Object.entries(map).map(([name, data]) => {
-					return "<li>" + capitalize(name) + ": " + data.display + "</li>";
+					return "<li>" + name + ": " + data + "</li>";
 				});
 				return { data: displayName + "<ul>" + messageList.join("\n") + "</ul>" };
 			},

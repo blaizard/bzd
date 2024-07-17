@@ -5,7 +5,11 @@ bzd_plugin(
     frontend_deps = [
         "//nodejs/vue/directives:tooltip",
         "//nodejs/utils:to_string",
+        "//nodejs/core:exception",
     ],
     frontend_entry_point = "system_monitor.vue",
+    frontend_srcs = [
+        "gauge.vue",
+    ],
     metadata = "plugin.mjs",
 )
