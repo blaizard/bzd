@@ -10,6 +10,7 @@ bzd_plugin(
     frontend_entry_point = "system_monitor.vue",
     frontend_srcs = [
         "gauge.vue",
+        "gauge_rate.vue",
     ],
     metadata = "plugin.mjs",
 )

@@ -2,48 +2,58 @@
 	<div class="system-monitor">
 		<!-- Header //-->
 		<div class="header">
-			<span v-if="isTemperature" class="entry" v-tooltip="temperatureTooltip">
+			<span
+				v-if="!isMapEmpty(metadata.temperature)"
+				class="entry"
+				v-tooltip="makeTooltipMulti('Max Temperature', temperatures.tooltips)"
+			>
 				<i class="bzd-icon-thermometer"></i>
-				<span class="value">{{ temperatureMax.toFixed(0) }}°C</span>
+				<span class="value">{{ temperatures.max }}°C</span>
 			</span>
 
-			<span v-if="isBattery" class="entry" v-tooltip="batteryTooltip">
+			<span
+				v-if="!isMapEmpty(metadata.battery)"
+				class="entry"
+				v-tooltip="makeTooltipMulti('Battery', batteries.tooltips)"
+			>
 				<i class="bzd-icon-battery"></i>
-				<span class="value">{{ batteryPercent.toFixed(0) }}%</span>
+				<span class="value">{{ (batteries.min * 100).toFixed(1) }}%</span>
 			</span>
 		</div>
 
 		<!-- Gauges //-->
 		<div class="gauges">
-			<Gauge name="CPU" :ratios="cpus.ratios" policy="max" v-tooltip="makeTooltipMulti('CPU', cpus.tooltips)"></Gauge>
-			<Gauge name="GPU" :ratios="gpus.ratios" policy="max" v-tooltip="makeTooltipMulti('GPU', gpus.tooltips)"></Gauge>
+			<Gauge
+				name="CPU"
+				:input="cpus.ratios"
+				policy="average"
+				v-tooltip="makeTooltipMulti('CPU', cpus.tooltips)"
+			></Gauge>
+			<Gauge
+				name="GPU"
+				:input="gpus.ratios"
+				policy="average"
+				v-tooltip="makeTooltipMulti('GPU', gpus.tooltips)"
+			></Gauge>
 			<Gauge
 				name="MEMORY"
-				:ratios="memories.ratios"
+				:input="memories.ratios"
 				policy="average"
 				v-tooltip="makeTooltipMulti('Memory', memories.tooltips)"
 			></Gauge>
-
-			<div v-if="isIO" class="gauge" v-tooltip="ioTooltip">
-				<div class="name">IO</div>
-				<div class="values">
-					<div class="value">
-						<div class="bar fit-2" :style="ioReadStyle"></div>
-						<div class="bar fit-2" :style="ioWriteStyle"></div>
-						<div class="overlay">{{ formatBytesRate(ioRateRead + ioRateWrite) }}</div>
-					</div>
-				</div>
-			</div>
-			<div v-if="isNetwork" class="gauge" v-tooltip="networkTooltip">
-				<div class="name">Network</div>
-				<div class="values">
-					<div class="value">
-						<div class="bar fit-2" :style="networkReadStyle"></div>
-						<div class="bar fit-2" :style="networkWriteStyle"></div>
-						<div class="overlay">{{ formatBytesRate(networkRateRead + networkRateWrite) }}</div>
-					</div>
-				</div>
-			</div>
+			<Gauge
+				name="DISK"
+				:input="disks.ratios"
+				policy="average"
+				v-tooltip="makeTooltipMulti('Disk', disks.tooltips)"
+			></Gauge>
+			<GaugeRate name="IO" :input="ios.rates" policy="sum" v-tooltip="makeTooltipMulti('IO', ios.tooltips)"></GaugeRate>
+			<GaugeRate
+				name="NETWORK"
+				:input="networks.rates"
+				policy="sum"
+				v-tooltip="makeTooltipMulti('Network', networks.tooltips)"
+			></GaugeRate>
 		</div>
 	</div>
 </template>
@@ -52,6 +62,7 @@
 	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
 	import { bytesToString, capitalize } from "#bzd/nodejs/utils/to_string.mjs";
 	import Gauge from "#bzd/apps/dashboard/plugins/system_monitor/gauge.vue";
+	import GaugeRate from "#bzd/apps/dashboard/plugins/system_monitor/gauge_rate.vue";
 
 	export default {
 		props: {
@@ -59,13 +70,15 @@
 		},
 		components: {
 			Gauge,
+			GaugeRate,
 		},
 		directives: {
 			tooltip: DirectiveTooltip,
 		},
 		data: function () {
 			return {
-				history: {},
+				ratesIO: {},
+				ratesNetwork: {},
 			};
 		},
 		computed: {
@@ -78,7 +91,32 @@
 					const free = total - used;
 					tooltips[name] =
 						bytesToString(free) + " free / " + bytesToString(total) + " (" + ((free / total) * 100).toFixed(1) + "%)";
-					ratios[name] = used / total;
+					ratios[name] = [
+						{
+							ratio: used / total,
+							weight: used,
+						},
+					];
+				}
+				return {
+					ratios,
+					tooltips,
+				};
+			},
+			disks() {
+				let ratios = {};
+				let tooltips = {};
+				for (const [name, disk] of Object.entries(this.metadata.disk || {})) {
+					const [used, total] = disk;
+					const free = total - used;
+					tooltips[name] =
+						bytesToString(free) + " free / " + bytesToString(total) + " (" + ((free / total) * 100).toFixed(1) + "%)";
+					ratios[name] = [
+						{
+							ratio: used / total,
+							weight: used,
+						},
+					];
 				}
 				return {
 					ratios,
@@ -109,127 +147,68 @@
 					tooltips,
 				};
 			},
-			// CPU
-			isCpu() {
-				return "cpu" in this.metadata;
-			},
-			cpuPercent() {
-				return this.makeCpuPercent(this.metadata.cpu);
-			},
-			cpuStyle() {
-				return {
-					width: this.cpuPercent + "%",
-				};
-			},
-			cpuTooltip() {
-				return this.makeCpuTooltip("CPU", this.metadata.cpu);
-			},
-			// GPU
-			isGpu() {
-				return "gpu" in this.metadata;
-			},
-			gpuPercent() {
-				return this.makeCpuPercent(this.metadata.gpu);
-			},
-			gpuStyle() {
-				return {
-					width: this.gpuPercent + "%",
-				};
-			},
-			gpuTooltip() {
-				return this.makeCpuTooltip("GPU", this.metadata.gpu);
-			},
-			// Temperature
-			isTemperature() {
-				return false; //this.has("temperature");
-			},
-			temperature() {
-				return this.getItems("temperature").reduce((obj, item) => {
-					const id = item.id.substring("temperature".length + 1) || "undefined";
-					obj[id] = Math.max(obj[id] || 0, item.value);
-					return obj;
-				}, {});
-			},
-			temperatureMax() {
-				return Object.keys(this.temperature).reduce((value, key) => Math.max(value, this.temperature[key]), 0);
-			},
-			temperatureTooltip() {
-				return this.makeTooltip("Max Temperature", this.temperature, (temperature) => temperature.toFixed(0) + "°C");
-			},
-			// Battery
-			isBattery() {
-				return false; //this.has("ups.charge");
-			},
-			batteryPercent() {
-				return this.getItems("ups.charge").reduce((value, item) => Math.min(value, item.value), 1) * 100;
-			},
-			batteryTooltip() {
-				if (!this.getItems("ups.name")) {
-					return null;
+			ios() {
+				let tooltips = {};
+				for (const [name, io] of Object.entries(this.metadata.io || {})) {
+					const [ioCounterIn, ioCounterOut] = io;
+					const rates = this.updateInOutCountersToRates(this.ratesIO, name, ioCounterIn, ioCounterOut);
+					tooltips[name] = "read: " + this.formatBytesRate(rates.in) + ", write: " + this.formatBytesRate(rates.out);
 				}
 				return {
-					data: this.getItems("ups.name")
-						.map((item) => item.value)
-						.join(", "),
+					rates: this.ratesIO,
+					tooltips,
 				};
 			},
-			// IO
-			isIO() {
-				return false; //this.has("io.total.in") || this.has("io.total.out");
-			},
-			ioRate() {
-				return this.getRate("io", this.makeIOMap("io"));
-			},
-			ioRateRead() {
-				return Object.values(this.ioRate).reduce((sum, obj) => sum + (obj.in || 0), 0);
-			},
-			ioRateWrite() {
-				return Object.values(this.ioRate).reduce((sum, obj) => sum + (obj.out || 0), 0);
-			},
-			ioReadStyle() {
+			networks() {
+				let rates = {};
+				let tooltips = {};
+				for (const [name, network] of Object.entries(this.metadata.network || {})) {
+					const [ioCounterIn, ioCounterOut] = network;
+					const rates = this.updateInOutCountersToRates(this.ratesNetwork, name, ioCounterIn, ioCounterOut);
+					tooltips[name] = "recv: " + this.formatBytesRate(rates.in) + ", send: " + this.formatBytesRate(rates.out);
+				}
 				return {
-					width: this.makeRate(this.ioRateRead / 20000) * 100 + "%",
+					rates: this.ratesNetwork,
+					tooltips,
 				};
 			},
-			ioWriteStyle() {
+			temperatures() {
+				let max = -Infinity;
+				let tooltips = {};
+				for (const [name, data] of Object.entries(this.metadata.temperature || {})) {
+					const temperatureMax = this.maxArray(data);
+					tooltips[name] = temperatureMax.toFixed(1) + "°C";
+					max = Math.max(max, temperatureMax);
+				}
 				return {
-					width: this.makeRate(this.ioRateWrite / 20000) * 100 + "%",
+					max,
+					tooltips,
 				};
 			},
-			ioTooltip() {
-				return this.makeRateTooltip("IO", this.ioRate, { in: "read", out: "write" });
-			},
-			// Network
-			isNetwork() {
-				return false; //this.has("network.total.in") || this.has("network.total.out");
-			},
-			networkRate() {
-				return this.getRate("network", this.makeIOMap("network"));
-			},
-			networkRateRead() {
-				return Object.values(this.networkRate).reduce((sum, obj) => sum + (obj.in || 0), 0);
-			},
-			networkRateWrite() {
-				return Object.values(this.networkRate).reduce((sum, obj) => sum + (obj.out || 0), 0);
-			},
-			networkReadStyle() {
+			batteries() {
+				let min = Infinity;
+				let tooltips = {};
+				for (const [name, data] of Object.entries(this.metadata.battery || {})) {
+					const batteryMin = this.minArray(data);
+					tooltips[name] = (batteryMin * 100).toFixed(1) + "%";
+					min = Math.min(min, batteryMin);
+				}
 				return {
-					width: this.makeRate(this.networkRateRead / 20000) * 100 + "%",
+					min,
+					tooltips,
 				};
-			},
-			networkWriteStyle() {
-				return {
-					width: this.makeRate(this.networkRateWrite / 20000) * 100 + "%",
-				};
-			},
-			networkTooltip() {
-				return this.makeRateTooltip("Network", this.networkRate, { in: "recv", out: "sent" });
 			},
 		},
 		methods: {
 			// Utilities
+			isMapEmpty(map) {
+				return Object.keys(map).length === 0;
+			},
 			maxArray(array) {
-				return array.reduce(Math.max, 0);
+				return array.reduce((m, v) => Math.max(m, v), -Infinity);
+			},
+			minArray(array) {
+				return array.reduce((m, v) => Math.min(m, v), Infinity);
 			},
 			sumArray(array) {
 				return array.reduce((a, b) => a + b, 0);
@@ -237,128 +216,8 @@
 			avgArray(array) {
 				return this.sumArray(array) / array.length;
 			},
-			avgMapOfArrays(map) {
-				const [sum, size] = Object.values(map).reduce(
-					(value, array) => {
-						value[0] += this.sumArray(array);
-						value[1] += array.length;
-						return value;
-					},
-					[0, 0],
-				);
-				return sum / size;
-			},
-			// Gauge
-			gaugeStyle(ratio) {
-				return {
-					width: ratio * 100 + "%",
-				};
-			},
-			// CPU
-			makeCpuPercent(map) {
-				return this.avgMapOfArrays(map) * 100;
-			},
-			makeCpuTooltip(displayName, map) {
-				return this.makeTooltip(displayName, map, (array) => {
-					return (this.avgArray(array) * 100).toFixed(1) + "% load";
-				});
-			},
-			// Memory
-			memoryTooltip(memory) {
-				return this.makeMemoryTooltip("Memory", { [memory]: this.metadata.memory[memory] });
-			},
-			memoryPercent(memory) {
-				const [used, total] = this.metadata.memory[memory];
-				return (used / total) * 100;
-			},
-			memoryStyle(memory) {
-				return {
-					width: this.memoryPercent(memory) + "%",
-				};
-			},
-			makeMemoryTooltip(displayName, map) {
-				return this.makeTooltip(displayName, map, (item) => {
-					const total = item[1];
-					const free = total - item[0];
-					return (
-						bytesToString(free) + " free / " + bytesToString(total) + " (" + ((free / total) * 100).toFixed(1) + "%)"
-					);
-				});
-			},
-			// IO
-			makeIOMap(name) {
-				let map = this.getItems(name + ".total.in").reduce((obj, item) => {
-					const id = item.id.substring((name + ".total.in").length + 1) || "undefined";
-					obj[id] = obj[id] || { in: 0, out: 0 };
-					obj[id].in += item.value;
-					return obj;
-				}, {});
-				this.getItems(name + ".total.out").forEach((item) => {
-					const id = item.id.substring((name + ".total.out").length + 1) || "undefined";
-					map[id] = map[id] || { in: 0, out: 0 };
-					map[id].out += item.value;
-				});
-				return map;
-			},
-			addHistory(name, map) {
-				this.history[name] = this.history[name] || [];
-				// Find the insertion timestamp of the last element
-				let lastTimestamp = 0;
-				if (this.history[name].length) {
-					lastTimestamp = this.history[name][0].timestamp;
-				}
-
-				// Add a new element every 6 seconds
-				if (Date.now() - lastTimestamp > 6000) {
-					this.history[name].unshift({
-						timestamp: Date.now(),
-						value: JSON.parse(JSON.stringify(map)),
-					});
-					// Keep max 10 elements (1 min of data)
-					this.history[name] = this.history[name].slice(0, 10);
-				}
-
-				let previous = null;
-				for (const entry of Object.values(this.history[name])) {
-					if (previous !== null) {
-						if (JSON.stringify(previous.value) != JSON.stringify(entry.value)) {
-							return entry;
-						}
-					}
-					previous = entry;
-				}
-
-				return this.history[name][this.history[name].length - 1];
-			},
-			getRate(name, map) {
-				const previous = this.addHistory(name, map);
-
-				let diff = {};
-				const delayS = (Date.now() - previous.timestamp) / 1000;
-				for (const id in map) {
-					diff[id] = {};
-					for (const key in map[id]) {
-						diff[id][key] = (map[id][key] - ((previous.value[id] || {})[key] || 0)) / delayS;
-					}
-				}
-
-				return diff;
-			},
-			makeRateTooltip(displayName, map, mapping) {
-				return this.makeTooltip(displayName, map, (item) => {
-					const output = Object.keys(mapping)
-						.filter((key) => key in item)
-						.map((key) => {
-							return mapping[key] + ": " + this.formatBytesRate(item[key]);
-						});
-					return output.join(", ");
-				});
-			},
 			formatBytesRate(rate) {
 				return bytesToString(rate) + "/s";
-			},
-			makeTooltipSingle(displayName, name, data) {
-				return this.makeTooltipMulti(displayName, { [name]: data });
 			},
 			makeTooltipMulti(displayName, map) {
 				const messageList = Object.entries(map).map(([name, data]) => {
@@ -366,17 +225,25 @@
 				});
 				return { data: displayName + "<ul>" + messageList.join("\n") + "</ul>" };
 			},
-			makeTooltip(displayName, map, callback) {
-				const messageList = Object.keys(map).map((key) => {
-					return "<li>" + (key != "undefined" ? capitalize(key) + ": " : "") + callback(map[key]) + "</li>";
-				});
-				return { data: displayName + "<ul>" + messageList.join("\n") + "</ul>" };
-			},
-			/**
-			 * From a positive value, return a rate from 0 to 1.
-			 */
-			makeRate(x) {
-				return -1 / Math.log(x + Math.exp(1)) + 1;
+			updateInOutCountersToRates(map, name, counterIn, counterOut) {
+				const timestampMs = Date.now();
+				let rateIn = 0;
+				let rateOut = 0;
+				if (name in map) {
+					const previousCounterIn = map[name].counterIn;
+					const previousCounterOut = map[name].counterOut;
+					const previousTimestampMs = map[name].timestampMs;
+					rateIn = ((counterIn - previousCounterIn) / (timestampMs - previousTimestampMs)) * 1000;
+					rateOut = ((counterOut - previousCounterOut) / (timestampMs - previousTimestampMs)) * 1000;
+				}
+				map[name] = {
+					counterIn,
+					counterOut,
+					timestampMs,
+					in: rateIn,
+					out: rateOut,
+				};
+				return map[name];
 			},
 		},
 	};
@@ -399,72 +266,6 @@
 		.gauges {
 			width: 100%;
 			padding-right: 10px;
-
-			.gauge {
-				width: 100%;
-				display: flex;
-				flex-direction: row;
-				flex-wrap: nowrap;
-				font-size: 0.8em;
-				margin-bottom: 5px;
-
-				.name {
-					width: 30%;
-					text-align: right;
-					padding-right: 10px;
-				}
-				.values {
-					flex: 1;
-					.value {
-						overflow: hidden;
-						white-space: nowrap;
-						position: relative;
-						isolation: isolate;
-						height: 1.5em;
-						line-height: 1.5em;
-
-						&:before {
-							content: " ";
-							position: absolute;
-							left: 0;
-							top: 0;
-							bottom: 0;
-							right: 0;
-							background-color: currentColor;
-							opacity: 0.1;
-						}
-
-						&:after {
-							content: " ";
-						}
-
-						.bar {
-							position: absolute;
-							top: 0;
-							left: 0;
-							bottom: 0;
-							background-color: currentColor;
-							transition: width 0.5s;
-							mix-blend-mode: difference;
-
-							&.fit-2 {
-								position: relative;
-								height: calc(50% - 1px);
-								margin: 1px 0;
-							}
-						}
-
-						.overlay {
-							position: absolute;
-							top: 0;
-							width: 100%;
-							mix-blend-mode: difference;
-							text-align: right;
-							padding: 0 4px;
-						}
-					}
-				}
-			}
 		}
 	}
 </style>

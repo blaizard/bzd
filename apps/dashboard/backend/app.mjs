@@ -99,7 +99,7 @@ class EventsFactory {
 	}
 
 	// Register plugin instances.
-	for (const data of config.tiles) {
+	for (const data of config.instances) {
 		const uid = makeUid();
 
 		// Set the structure.
