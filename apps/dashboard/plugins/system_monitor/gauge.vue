@@ -1,12 +1,14 @@
 <template>
-	<div>
-		<template v-if="Object.keys(ratios).length <= max" v-for="(ratio, name) in ratios">
-			<div class="gauge">
-				<div class="name">{{ name.toUpperCase() }}</div>
+	<div v-if="nbObjects > 0">
+		<template v-if="nbObjects <= max">
+			<div class="gauge" v-for="(ratio, inputName) in input">
+				<div class="name">
+					<span class="small">{{ name.substring(0, 3) }}.</span>{{ inputName.toUpperCase() }}
+				</div>
 				<div class="values">
 					<div class="value">
-						<div class="bar" :style="gaugeStyle(sanitize(ratio))"></div>
-						<div class="overlay">{{ (sanitize(ratio) * 100).toFixed(1) }}%</div>
+						<div class="bar" :style="gaugeStyle(sanitize(ratio).ratio)"></div>
+						<div class="overlay">{{ (sanitize(ratio).ratio * 100).toFixed(1) }}%</div>
 					</div>
 				</div>
 			</div>
@@ -16,8 +18,8 @@
 				<div class="name">{{ name }}</div>
 				<div class="values">
 					<div class="value">
-						<div class="bar" :style="gaugeStyle(ratio)"></div>
-						<div class="overlay">{{ (ratio * 100).toFixed(1) }}%</div>
+						<div class="bar" :style="gaugeStyle(aggregatedRatio)"></div>
+						<div class="overlay">{{ (aggregatedRatio * 100).toFixed(1) }}%</div>
 					</div>
 				</div>
 			</div>
@@ -28,35 +30,71 @@
 <script>
 	import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 
-	const Exception = ExceptionFactory("plugin", "system_monitor");
+	const Exception = ExceptionFactory("plugin", "system_monitor", "gauge");
 
 	export default {
 		props: {
-			ratios: { type: Object, mandatory: true },
+			input: { type: Object, mandatory: true },
 			name: { type: String, mandatory: true },
 			policy: { type: String, mandatory: true },
 			max: { type: Number, default: 2 },
 		},
 		computed: {
-			// Convert list of ratios into one.
-			sanitizedRatios() {},
-			ratio() {
-				return this.sanitize(Object.values(this.ratios).map(this.sanitize));
+			nbObjects() {
+				return Object.keys(this.input).length;
+			},
+			aggregatedRatio() {
+				return this.sanitize(Object.values(this.input).map(this.sanitize)).ratio;
 			},
 		},
 		methods: {
-			// Take a list or a number and returns a number.
+			// Take a list or a number and returns an object.
+			//
+			// It supports the following:
+			// - 0.5
+			// - [0.2, 0.3, 0.6]
+			// - [{ratio:0.2}, {ratio:0.5}]
+			// - [{ratio:0.2, weight:23}, {ratio:0.5, weight:65}]
 			sanitize(ratiosOrRatio) {
+				// Helper function.
+				const getWeightedRatio = (obj) => {
+					if (typeof obj == "number") {
+						return [obj, 0];
+					}
+					if (obj.weight) {
+						return [obj.ratio * obj.weight, obj.weight];
+					}
+					return [obj.ratio, 0];
+				};
+
 				if (typeof ratiosOrRatio == "number") {
-					return ratiosOrRatio;
+					return {
+						ratio: ratiosOrRatio,
+					};
 				}
+
 				switch (this.policy) {
 					case "average":
-						const ratioSum = ratiosOrRatio.reduce((ratioSum, ratio) => ratioSum + ratio, 0);
-						return ratioSum / ratiosOrRatio.length;
-						break;
+						const [ratioSum, weights] = ratiosOrRatio.reduce(
+							(obj, data) => {
+								const [weightedRatio, weight] = getWeightedRatio(data);
+								return [obj[0] + weightedRatio, obj[1] + weight];
+							},
+							[0, 0],
+						);
+						if (weights == 0) {
+							return {
+								ratio: ratioSum / ratiosOrRatio.length,
+							};
+						}
+						return {
+							ratio: ratioSum / weights,
+							weight: weights,
+						};
 					case "max":
-						return ratiosOrRatio.reduce(Math.max, 0);
+						return {
+							ratio: ratiosOrRatio.reduce(Math.max, 0),
+						};
 					default:
 						Exception.error("Unsupported policy '{}'.", this.policy);
 				}
@@ -83,6 +121,12 @@
 			width: 30%;
 			text-align: right;
 			padding-right: 10px;
+			overflow: hidden;
+			height: 1.5em;
+
+			.small {
+				font-size: 0.6em;
+			}
 		}
 		.values {
 			flex: 1;
