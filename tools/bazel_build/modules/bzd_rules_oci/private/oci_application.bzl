@@ -1,7 +1,7 @@
 """OCI application rule."""
 
 load("@bzd_bdl//:defs.bzl", "bdl_application_factory")
-load("@bzd_lib//config:defs.bzl", "bzd_config_override")
+load("@bzd_lib//config:defs.bzl", "bzd_config_apply")
 
 def _bzd_oci_application_impl(ctx, target, bdl, namespace):
     oci_directory = target[DefaultInfo].files.to_list()[0]
@@ -22,21 +22,23 @@ def _bzd_oci_application_impl(ctx, target, bdl, namespace):
 
 _bzd_oci_application = bdl_application_factory(_bzd_oci_application_impl)
 
-def bzd_oci_application(name, configs = None, **kwargs):
+def bzd_oci_application(name, target, configs = None, **kwargs):
     if configs:
-        bzd_config_override(
-            name = "{}.config_override".format(name),
+        bzd_config_apply(
+            name = "{}.config_apply".format(name),
+            target = target,
             configs = configs,
         )
 
         _bzd_oci_application(
             name = name,
-            config_override = "{}.config_override".format(name),
+            target = "{}.config_apply".format(name),
             **kwargs
         )
 
     else:
         _bzd_oci_application(
             name = name,
+            target = target,
             **kwargs
         )

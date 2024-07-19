@@ -2,7 +2,6 @@
 
 load("@bazel_skylib//lib:sets.bzl", "sets")
 load("@bdl_extension//:extensions.bzl", "extensions")
-load("@bzd_lib//config:defs.bzl", "ConfigOverrideInfo", "bzd_transition_config_override")
 load("@bzd_package//:defs.bzl", "BzdPackageMetadataFragmentInfo")
 load("//extensions:json.bzl", extension_json = "extension")
 
@@ -693,7 +692,7 @@ def bdl_application_factory(implementation):
     def _bdl_application_factory_impl(ctx):
         bdl = ctx.actions.declare_file(ctx.label.name + ".bdl")
         namespace = ".".join(ctx.label.package.split("/") + [ctx.label.name])
-        providers = implementation(ctx, ctx.attr.target[0], bdl, namespace)
+        providers = implementation(ctx, ctx.attr.target, bdl, namespace)
 
         bdl_provider, _ = _precompile_bdl(ctx, srcs = [bdl], deps = [])
 
@@ -703,14 +702,9 @@ def bdl_application_factory(implementation):
         implementation = _bdl_application_factory_impl,
         doc = "Wrapper for an application and add bdl information.",
         attrs = {
-            "config_override": attr.label(
-                doc = "Configuration to be overridden.",
-                providers = [ConfigOverrideInfo],
-            ),
             "target": attr.label(
                 mandatory = True,
                 doc = "The target associated with this application.",
-                cfg = bzd_transition_config_override,
             ),
             "_bdl": attr.label(
                 default = Label("//bdl"),

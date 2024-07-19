@@ -72,7 +72,7 @@ _bzd_config_override_check = rule(
     },
 )
 
-def bzd_config_override(name, configs, **kwargs):
+def _bzd_config_override_macro(name, configs, **kwargs):
     """Override a configuration and provide a target that can be used with //config:override.
 
     Args:
@@ -107,7 +107,7 @@ def _bzd_transition_config_override_impl(_settings, attr):
         "//config:override": str(attr.config_override),
     }
 
-bzd_transition_config_override = transition(
+_bzd_transition_config_override = transition(
     implementation = _bzd_transition_config_override_impl,
     inputs = [],
     outputs = [
@@ -131,7 +131,9 @@ def make_bzd_config_apply(name = None, providers = None, executable = False, tes
     """
 
     def _bzd_config_apply_impl(ctx):
-        all_providers = [ctx.attr.target[provider] for provider in (_DEFAULT_PROVIDERS + (providers or [])) if provider in ctx.attr.target]
+        # Due to the transition, the target becomes an array.
+        target = ctx.attr.target[0]
+        all_providers = [target[provider] for provider in (_DEFAULT_PROVIDERS + (providers or [])) if provider in target]
         return all_providers
 
     _bzd_config_apply_rule = rule(
@@ -145,7 +147,7 @@ def make_bzd_config_apply(name = None, providers = None, executable = False, tes
             "target": attr.label(
                 mandatory = True,
                 doc = "The target associated with this application.",
-                cfg = bzd_transition_config_override,
+                cfg = _bzd_transition_config_override,
             ),
         },
         executable = executable,
@@ -161,10 +163,11 @@ def make_bzd_config_apply(name = None, providers = None, executable = False, tes
             **kwargs: Extra arguments to be propagated to the rule.
         """
 
-        bzd_config_override(
+        _bzd_config_override_macro(
             name = "{}.config_override".format(name),
             configs = configs,
             tags = ["manual"],
+            visibility = ["//visibility:private"],
         )
 
         _bzd_config_apply_rule(
