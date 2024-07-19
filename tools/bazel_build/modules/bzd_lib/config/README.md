@@ -49,16 +49,15 @@ or
 bazel build --//path:config.set=key1=value1 --//path:config.set=key2=value2 ...
 ```
 
-Additionally, the configuration can be updated with a single well defined build setting //config:override, this helps with transitions for example.
+Additionally, the configuration can be applied to a rule with `bzd_config_apply` or its variants, as follow for example.
 
 ```
-bzd_config_override(
-  name = "values",
+bzd_config_apply(
+  name = "my_target_with_config",
   configs = {
     "//path:my_config": ":config.json",
     "//other/path:my_config": ":config2.json",
-  }
+  },
+  target = "//:my_target"
 )
 ```
-
-This ensures that `//path:my_config` and `//other/path:my_config` are existing `bzd_config` rules and using `--//config:override=//:values` will override the values.
