@@ -3,6 +3,32 @@
 load("//config:private/common.bzl", "ConfigInfo", "ConfigOverrideInfo", "label_to_key")
 load("//lib:attrs.bzl", "ATTRS_COMMON_BUILD_RULES", "attrs_assert_any_of")
 
+# This list was taken from here: https://github.com/fmeum/with_cfg.bzl/blob/main/with_cfg/private/rule_defaults.bzl
+_DEFAULT_PROVIDERS = [
+    AnalysisTestResultInfo,
+    CcInfo,
+    CcToolchainConfigInfo,
+    DebugPackageInfo,
+    DefaultInfo,
+    JavaInfo,
+    JavaPluginInfo,
+    OutputGroupInfo,
+    PyInfo,
+    PyRuntimeInfo,
+    apple_common.AppleDebugOutputs,
+    apple_common.AppleDynamicFramework,
+    apple_common.AppleExecutableBinary,
+    apple_common.Objc,
+    apple_common.XcodeProperties,
+    apple_common.XcodeVersionConfig,
+    config_common.FeatureFlagInfo,
+    java_common.BootClassPathInfo,
+    java_common.JavaRuntimeInfo,
+    java_common.JavaToolchainInfo,
+    platform_common.TemplateVariableInfo,
+    platform_common.ToolchainInfo,
+]
+
 def _bzd_config_override_impl(ctx):
     if len(ctx.attr.configs) != len(ctx.files.files):
         fail("Some files are not actual files.")
@@ -88,3 +114,69 @@ bzd_transition_config_override = transition(
         "//config:override",
     ],
 )
+
+# ---- Factory ----
+
+def make_bzd_config_apply(name = None, providers = None, executable = False, test = False):
+    """Factory function to create a bzd_config_apply, to apply a configuration to a target.
+
+    Args:
+        name: Ignored argument to make sanitizer happy.
+        providers: A list of providers to be forwarded from the target.
+        executable: If the rule is executable or not.
+        test: If the rule is a test or not.
+
+    Returns:
+        A tuple containing the macro to be used and an internal rule, the latter should not be used.
+    """
+
+    def _bzd_config_apply_impl(ctx):
+        all_providers = [ctx.attr.target[provider] for provider in (_DEFAULT_PROVIDERS + (providers or [])) if provider in ctx.attr.target]
+        return all_providers
+
+    _bzd_config_apply_rule = rule(
+        doc = "Apply a specific configuration to a target.",
+        implementation = _bzd_config_apply_impl,
+        attrs = {
+            "config_override": attr.label(
+                doc = "Configuration to be overridden.",
+                providers = [ConfigOverrideInfo],
+            ),
+            "target": attr.label(
+                mandatory = True,
+                doc = "The target associated with this application.",
+                cfg = bzd_transition_config_override,
+            ),
+        },
+        executable = executable,
+        test = test,
+    )
+
+    def _bzd_config_apply_macro(name, configs, **kwargs):
+        """Apply a configuration to the specified target.
+
+        Args:
+            name: The name of the target.
+            configs: The configuration to be applied.
+            **kwargs: Extra arguments to be propagated to the rule.
+        """
+
+        bzd_config_override(
+            name = "{}.config_override".format(name),
+            configs = configs,
+            tags = ["manual"],
+        )
+
+        _bzd_config_apply_rule(
+            name = name,
+            config_override = "{}.config_override".format(name),
+            **kwargs
+        )
+
+    return _bzd_config_apply_macro, _bzd_config_apply_rule
+
+# ---- Rules ----
+
+bzd_config_apply, _library = make_bzd_config_apply()
+bzd_config_apply_binary, _binary = make_bzd_config_apply(executable = True)
+bzd_config_apply_test, _test = make_bzd_config_apply(executable = True, test = True)
