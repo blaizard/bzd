@@ -7,11 +7,11 @@ from apps.node_manager.rest_server import RESTServerContext
 
 ```json
 {
-    "temperatures": {
+    "temperature": {
         "cpu": [60, 56],
         "gpu": [67, 63, 57, 59]
     },
-    "cpus": {
+    "cpu": {
 		"main": [12.1, 0, 4, 34.5]
 	}
 }
@@ -59,11 +59,11 @@ def monitorDisks() -> typing.Any:
 
 def monitor() -> typing.Any:
 	return {
-	    "cpus": monitorCPUs(),
-	    "temperatures": monitorTemperatures(),
-	    "batteries": monitorBatteries(),
-	    "memories": monitorMemories(),
-	    "disks": monitorDisks()
+	    "cpu": monitorCPUs(),
+	    "temperature": monitorTemperatures(),
+	    "battery": monitorBatteries(),
+	    "memory": monitorMemories(),
+	    "disk": monitorDisks()
 	}
 
 
