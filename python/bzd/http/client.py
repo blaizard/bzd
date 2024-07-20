@@ -1,6 +1,9 @@
 import json as JsonLibrary
 import urllib.request
+import urllib.MultipartEncoder
 import typing
+import pathlib
+import mimetypes
 
 
 class Response:
@@ -36,9 +39,15 @@ class HttpClient:
 		return HttpClient._any("post", *args, **kwargs)
 
 	@staticmethod
+	def put(*args, **kwargs) -> Response:
+		return HttpClient._any("post", *args, **kwargs)
+
+	@staticmethod
 	def _any(method: str,
 	         url: str,
 	         json: typing.Optional[typing.Dict[str, typing.Any]] = None,
+	         file: typing.Optional[pathlib.Path] = None,
+	         mimetype: typing.Optional[str] = None,
 	         timeoutS: int = 60) -> Response:
 
 		body = None
@@ -47,6 +56,11 @@ class HttpClient:
 		if json is not None:
 			body = JsonLibrary.dumps(json).encode("utf8")
 			headers["content-type"] = "application/json; charset=utf-8"
+			headers["content-length"] = len(body)
+
+		if file is not None:
+			body = file.read_bytes()
+			headers["content-type"] = mimetype or mimetypes.guess_type(file.name)[0] or "application/octet-stream"
 			headers["content-length"] = len(body)
 
 		request = urllib.request.Request(url, data=body, headers=headers)
