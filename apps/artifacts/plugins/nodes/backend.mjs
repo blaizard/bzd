@@ -92,17 +92,15 @@ export default class Plugin extends PluginBase {
 			this.setStorage(await StorageBzd.make(this.nodes));
 		});
 
-		const plugin = this;
-
-		endpoints.register("get", "/{uid}/{path:*}", async function (params) {
-			const node = await plugin.nodes.get(params.uid);
-			return await node.get(...Plugin.paramPathToPaths(params.path));
+		endpoints.register("get", "/{uid}/{path:*}", async (context) => {
+			const node = await this.nodes.get(context.getParam("uid"));
+			return await node.get(...Plugin.paramPathToPaths(context.getParam("path")));
 		});
 
-		endpoints.register("post", "/{uid}/{path:*}", async function (params) {
-			const data = rawBodyParse(this.getBody(), (name) => this.getHeader(name));
-			const node = await plugin.nodes.get(params.uid);
-			return await node.insert(data, ...Plugin.paramPathToPaths(params.path));
+		endpoints.register("post", "/{uid}/{path:*}", async (context) => {
+			const data = rawBodyParse(context.getBody(), (name) => context.getHeader(name));
+			const node = await this.nodes.get(context.getParam("uid"));
+			return await node.insert(data, ...Plugin.paramPathToPaths(context.getParam("path")));
 		});
 	}
 

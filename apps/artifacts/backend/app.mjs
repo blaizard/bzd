@@ -107,25 +107,6 @@ program
 	// "docker.proxy.port": 5051,
 	// });
 
-	const endpointHandler = async function (method, volume, pathList) {
-		Exception.assertPrecondition(volume, "There is no volume associated with this path: '{}'.", pathList.join("/"));
-		Exception.assertPrecondition(volume in volumes, "No volume are associated with this id: '{}'", volume);
-		const endpoints = volumes[volume].endpoints;
-
-		// Look for a match.
-		const regexprs = endpoints[method];
-		const path = pathList.map(encodeURIComponent).join("/");
-		for (const data of regexprs) {
-			const match = data.regexpr.exec(path);
-			if (match) {
-				const values = Object.assign({}, match.groups);
-				return await data.handler.call(this, values);
-			}
-		}
-
-		Exception.assertPrecondition(false, "Unhandled endpoint for /{}", [volume, ...pathList].join("/"));
-	};
-
 	// Redirect /file/** to /file?path=**
 	// It is needed to do this before the REST API as it takes precedence.
 	web.addRoute("get", "/file/{path:*}", async (context) => {
@@ -188,23 +169,27 @@ program
 		};
 	});
 
-	for (const method of ["get", "post"]) {
-		web.addRoute(
-			method,
-			"/x/{path:*}",
-			async (context) => {
-				const path = context.getParam("path");
-				const { volume, pathList } = getInternalPathFromString(path);
-				if (method == "get") {
-					const data = await endpointHandler.call(context, method, volume, pathList);
-					context.sendJson(data);
-				} else {
-					await endpointHandler.call(context, method, volume, pathList);
-					context.sendStatus(200);
-				}
-			},
-			{ exceptionGuard: true, type: ["raw"] },
-		);
+	for (const [volume, data] of Object.entries(volumes)) {
+		for (const [method, endpoints] of Object.entries(data.endpoints)) {
+			for (const endpoint of endpoints) {
+				const route = "/x/" + volume + endpoint.path;
+				Log.info("Adding route {}::{}", method, route);
+				web.addRoute(
+					method,
+					route,
+					async (context) => {
+						if (method == "get") {
+							const data = await endpoint.handler(context);
+							context.sendJson(data);
+						} else {
+							await endpoint.handler(context);
+							context.sendStatus(200);
+						}
+					},
+					Object.assign({ exceptionGuard: true, type: ["raw"] }, endpoint.options),
+				);
+			}
+		}
 	}
 
 	Log.info("Application started");

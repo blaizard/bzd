@@ -5,12 +5,12 @@ export default class EndpointsFactory {
 		this.data = {};
 	}
 
-	register(method, endpoint, handler) {
-		const regexpr = new HttpEndpoint(endpoint).toRegexp();
+	register(method, endpoint, handler, options = {}) {
 		this.data[method] ??= [];
 		this.data[method].push({
-			regexpr: regexpr,
+			path: endpoint,
 			handler: handler,
+			options: options,
 		});
 	}
 
