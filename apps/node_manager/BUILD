@@ -31,4 +31,5 @@ bzd_bundle(
     name = "node_manager",
     binary = ":node",
     tags = ["manual"],
+    visibility = ["//deployment:__subpackages__"],
 )

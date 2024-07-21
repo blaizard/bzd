@@ -1,9 +1,10 @@
 import json as JsonLibrary
 import urllib.request
-import urllib.MultipartEncoder
 import typing
 import pathlib
 import mimetypes
+import certifi
+import ssl
 
 
 class Response:
@@ -32,15 +33,15 @@ class HttpClient:
 
 	@staticmethod
 	def get(*args, **kwargs) -> Response:
-		return HttpClient._any("get", *args, **kwargs)
+		return HttpClient._any("GET", *args, **kwargs)
 
 	@staticmethod
 	def post(*args, **kwargs) -> Response:
-		return HttpClient._any("post", *args, **kwargs)
+		return HttpClient._any("POST", *args, **kwargs)
 
 	@staticmethod
 	def put(*args, **kwargs) -> Response:
-		return HttpClient._any("post", *args, **kwargs)
+		return HttpClient._any("PUT", *args, **kwargs)
 
 	@staticmethod
 	def _any(method: str,
@@ -48,10 +49,11 @@ class HttpClient:
 	         json: typing.Optional[typing.Dict[str, typing.Any]] = None,
 	         file: typing.Optional[pathlib.Path] = None,
 	         mimetype: typing.Optional[str] = None,
-	         timeoutS: int = 60) -> Response:
+	         timeoutS: int = 60,
+	         headers: typing.Optional[typing.Dict[str, str]] = None) -> Response:
 
 		body = None
-		headers = {}
+		headers = headers or {}
 
 		if json is not None:
 			body = JsonLibrary.dumps(json).encode("utf8")
@@ -63,7 +65,8 @@ class HttpClient:
 			headers["content-type"] = mimetype or mimetypes.guess_type(file.name)[0] or "application/octet-stream"
 			headers["content-length"] = len(body)
 
-		request = urllib.request.Request(url, data=body, headers=headers)
-		response = urllib.request.urlopen(request, timeout=timeoutS)
+		context = ssl.create_default_context(cafile=certifi.where())
+		request = urllib.request.Request(url, data=body, headers=headers, method=method)
+		response = urllib.request.urlopen(request, timeout=timeoutS, context=context)
 
 		return Response(response)

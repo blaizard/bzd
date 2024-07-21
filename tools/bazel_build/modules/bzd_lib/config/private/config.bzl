@@ -17,6 +17,7 @@ def _bzd_config_impl(ctx):
 
     input_files = [] + ctx.files.srcs
     override_files = [] + ctx.files.file_flag
+    workspace_status_files = []
 
     # If there are inline values, create an additional input file.
     if ctx.attr.values:
@@ -27,6 +28,10 @@ def _bzd_config_impl(ctx):
         )
         input_files.append(values_file)
 
+    if ctx.attr.include_workspace_status:
+        workspace_status_files.append(ctx.info_file)
+        workspace_status_files.append(ctx.version_file)
+
     if ConfigOverrideInfo in ctx.attr._override_flag:
         overrides = ctx.attr._override_flag[ConfigOverrideInfo].files
         label_key = label_to_key(ctx.label)
@@ -35,7 +40,7 @@ def _bzd_config_impl(ctx):
 
     # Build the default configuration.
     ctx.actions.run(
-        inputs = input_files + override_files,
+        inputs = input_files + override_files + workspace_status_files,
         outputs = [ctx.outputs.output_json],
         progress_message = "Generating default configuration for {}...".format(ctx.label),
         arguments = [
@@ -45,6 +50,8 @@ def _bzd_config_impl(ctx):
                     ] +
                     ["--set=" + key_value for key_value in key_values] +
                     ["--file=" + f.path for f in override_files] +
+                    ["--workspace-status-file=" + f.path for f in workspace_status_files] +
+                    ["--workspace-status-key=" + key for key in ctx.attr.include_workspace_status] +
                     [f.path for f in input_files],
         executable = ctx.executable._config_merge,
     )
@@ -78,6 +85,9 @@ _bzd_config = rule(
         "file_flag": attr.label(
             doc = "Build settings to modify the configuration using files.",
             allow_files = True,
+        ),
+        "include_workspace_status": attr.string_list(
+            doc = "Include the key/value pairs from the status information about the workspace, see --workspace_status_command.",
         ),
         "output_json": attr.output(
             doc = "Create a json configuration.",
@@ -115,13 +125,14 @@ _bzd_config = rule(
     provides = [DefaultInfo, ConfigInfo, PyInfo],
 )
 
-def bzd_config(name, srcs = None, values = None, **kwargs):
+def bzd_config(name, srcs = None, values = None, include_workspace_status = None, **kwargs):
     """Create a default configuration.
 
     Args:
         name: The name of the rule.
         srcs: Configuration files to be used to update the values.
         values: Inline configuration values.
+        include_workspace_status: Include workspace status data.
         **kwargs: extra common build rules attributes.
     """
 
@@ -146,5 +157,6 @@ def bzd_config(name, srcs = None, values = None, **kwargs):
         output_json = "{}.json".format(name),
         srcs = srcs or [],
         values = values or {},
+        include_workspace_status = include_workspace_status or [],
         **kwargs
     )
