@@ -3,11 +3,11 @@
 set -eu
 
 REVISION=$(git rev-parse HEAD | tr -d '\n\r')
+TIMESTAMP=$(git show --no-patch --format=%ct ${REVISION})
 NB_DIFFS=$(git status --porcelain 2>/dev/null | wc -l)
+VERSION="${TIMESTAMP}-${REVISION}"
 if [ "$NB_DIFFS" -ne "0" ]; then
-    REVISION="${REVISION}-dirty"
+    VERSION="${VERSION}-dirty"
 fi
 
-echo "BZD_BUILD_REVISION ${REVISION}"
-echo "BZD_BUILD_DATE_ISO8601 $(date --iso-8601=seconds --utc)"
-echo "BZD_BUILD_TIMESTAMP $(date +%s --utc)"
+echo "BZD_BUILD_VERSION ${VERSION}"

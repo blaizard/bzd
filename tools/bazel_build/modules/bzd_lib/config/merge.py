@@ -94,6 +94,18 @@ if __name__ == "__main__":
 	                    action="append",
 	                    type=str,
 	                    help="Key/value pair to be used for updating the config, uses the format key=value.")
+	parser.add_argument("--workspace-status-file",
+	                    dest="workspaceStatusFiles",
+	                    default=[],
+	                    action="append",
+	                    type=pathlib.Path,
+	                    help="Key/value pair from a bazel workspace status.")
+	parser.add_argument("--workspace-status-key",
+	                    dest="workspaceStatusKeys",
+	                    default=[],
+	                    action="append",
+	                    type=str,
+	                    help="Keys to add to the configuration.")
 
 	parser.add_argument(
 	    "inputs",
@@ -104,8 +116,19 @@ if __name__ == "__main__":
 
 	args = parser.parse_args()
 
+	# Compute the workspace status files.
+	workspaceStatus = {}
+	for workspaceStatusFile in args.workspaceStatusFiles:
+		for line in workspaceStatusFile.read_text().split("\n"):
+			try:
+				[key, value] = line.split(" ", 1)
+				workspaceStatus[key.strip()] = value.strip()
+			except ValueError:
+				pass
+	# Keep only specific keys.
+	output = {key: workspaceStatus[key] for key in args.workspaceStatusKeys}
+
 	# Compute the unmodified output.
-	output = {}
 	for f in args.inputs:
 		data = json.loads(f.read_text())
 		try:
