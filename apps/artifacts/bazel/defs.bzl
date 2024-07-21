@@ -51,13 +51,13 @@ _bzd_artifacts_release = rule(
 def bzd_artifacts_release(name, **kwargs):
     bzd_config(
         name = "{}.config".format(name),
-        include_workspace_status = ["BZD_BUILD_VERSION"],
+        include_workspace_status = ["STABLE_VERSION"],
         visibility = ["//visibility:private"],
     )
 
     _bzd_artifacts_release(
         name = name,
         config = "{}.config".format(name),
-        config_version = "BZD_BUILD_VERSION",
+        config_version = "STABLE_VERSION",
         **kwargs
     )
