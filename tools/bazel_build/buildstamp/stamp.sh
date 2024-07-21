@@ -10,4 +10,4 @@ if [ "$NB_DIFFS" -ne "0" ]; then
     VERSION="${VERSION}-dirty"
 fi
 
-echo "BZD_BUILD_VERSION ${VERSION}"
+echo "STABLE_VERSION ${VERSION}"
