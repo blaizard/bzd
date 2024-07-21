@@ -104,7 +104,7 @@
 				if (pos2 == -1) {
 					return -1;
 				}
-				return pos1 < pos2;
+				return pos1 < pos2 ? -1 : 1;
 			},
 			displayValue(key, value) {
 				switch (key) {
