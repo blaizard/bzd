@@ -16,6 +16,16 @@ label_flag(
     build_setting_default = ":empty",
 )
 
+genrule(
+    name = "depend_on_workspace_status",
+    outs = ["depend_on_workspace_status.json"],
+    cmd = "echo '{}' >> $@",
+    # Undocumented attr to depend on workspace status files.
+    # https://github.com/bazelbuild/bazel/issues/4942
+    stamp = 1,
+    visibility = ["//visibility:public"],
+)
+
 py_binary(
     name = "merge",
     srcs = [
