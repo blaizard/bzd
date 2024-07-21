@@ -155,7 +155,7 @@ def bzd_config(name, srcs = None, values = None, include_workspace_status = None
         set_flag = ":{}.set".format(name),
         file_flag = ":{}.file".format(name),
         output_json = "{}.json".format(name),
-        srcs = srcs or [] + [Label("//config:depend_on_workspace_status.json")],
+        srcs = srcs or [],
         values = values or {},
         include_workspace_status = include_workspace_status or [],
         **kwargs
