@@ -3,8 +3,7 @@ import pathlib
 import tarfile
 import tempfile
 import stat
-import time
-import random
+import hashlib
 
 
 class Bundler:
@@ -13,10 +12,6 @@ class Bundler:
 		self.path = path
 		self.executable = executable
 		self.cwd = cwd
-
-	def stamp(self) -> str:
-		"""Get a unique stamp for this specific build."""
-		return "stamp_{:X}_{}".format(random.getrandbits(64), int(time.time()))
 
 	def process(self, output: pathlib.Path) -> None:
 
@@ -34,6 +29,10 @@ class Bundler:
 					if pathlib.Path(path).is_file():
 						tar.add(path, arcname=target)
 			fd.flush()
+			fd.seek(0)
+
+			# Compute the checksum, this ensure reproductibility over builds.
+			stamp = hashlib.md5(fd.read()).hexdigest()
 			fd.seek(0)
 
 			# Create the self extracting output file.
@@ -59,15 +58,14 @@ if [[ ! "$temp" || ! -d "$temp" ]]; then
 	exit 1
 fi
 
-stamp='{stamp}'
-if [[ ! -f "$temp/$stamp" ]]; then
+if [[ ! -f "$temp/{stamp}" ]]; then
 	function cleanup {{
 		rm -rf "$temp"
 	}}
 	trap cleanup EXIT
 
 	sed '0,/^#__END_OF_SCRIPT__#$/d' "$0" | tar -C "$temp" -zx
-	touch "$temp/$stamp"
+	touch "$temp/{stamp}"
 fi
 
 cd "$temp/{cwd}"
@@ -75,7 +73,7 @@ RUNFILES_DIR="$temp" "{executable}" "$@"
 exit 0;
 
 #__END_OF_SCRIPT__#
-""".format(executable=str(self.executable), cwd=str(self.cwd), stamp=self.stamp()).encode("utf-8"))
+""".format(executable=str(self.executable), cwd=str(self.cwd), stamp=stamp).encode("utf-8"))
 				fileOut.write(fd.read())
 
 		# Set permission to executable.
