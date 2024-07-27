@@ -94,7 +94,7 @@ def localCommand(
     ignoreFailure: bool = False,
     cwd: Optional[Path] = None,
     env: Optional[Dict[str, str]] = None,
-    timeoutS: float = 60.0,
+    timeoutS: Optional[float] = 60.0,
     stdin: bool = False,
     stdout: Union[bool, TextIO] = False,
     stderr: Union[bool, TextIO] = False,
@@ -108,7 +108,7 @@ def localCommand(
             cwd: The current working directory.
             env: The set of environment variable to be injected to the process.
             timeoutS: The timeout in seconds until when the command terminates.
-                      A value of 0, give an unlimited timeout.
+                      A value of None, give an unlimited timeout.
             stdin: If set to True, the input stream will also be streamed to stdin.
             stdout: If set to True, the output will also be streamed to stdout.
             stderr: If set to True, the errors will also be streamed to stderr.
@@ -125,7 +125,8 @@ def localCommand(
 	    stderr=subprocess.PIPE,
 	    env=env,
 	)
-	timer: threading.Timer = threading.Timer(timeoutS, proc.kill) if timeoutS > 0.0 else _NoopTimer()  # type: ignore
+	timer: threading.Timer = threading.Timer(timeoutS,
+	                                         proc.kill) if timeoutS is not None else _NoopTimer()  # type: ignore
 	sel.register(proc.stdout, events=selectors.EVENT_READ)  # type: ignore
 	sel.register(proc.stderr, events=selectors.EVENT_READ)  # type: ignore
 
