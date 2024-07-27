@@ -1,7 +1,6 @@
 import argparse
 import pathlib
 import json
-import ssl
 
 from bzd.http.client import HttpClient
 
@@ -11,11 +10,13 @@ if __name__ == "__main__":
 	parser.add_argument(
 	    "--config",
 	    type=pathlib.Path,
+	    required=True,
 	    help="The configuration in json format.",
 	)
 	parser.add_argument(
 	    "--config-version",
 	    type=str,
+	    required=True,
 	    help="The key of the version field within the configuration.",
 	)
 	parser.add_argument(
@@ -31,11 +32,9 @@ if __name__ == "__main__":
 
 	args = parser.parse_args()
 
-	fileName = args.artifact.name
-	if args.config:
-		configDict = json.loads(args.config.read_text())
-		if args.config_version:
-			fileName = f"{configDict[args.config_version]}-{fileName}"
+	# Generate the filename.
+	configDict = json.loads(args.config.read_text())
+	fileName = f"{configDict[args.config_version]}-{args.artifact.name}"
 
 	url = args.url + "/" + fileName
 

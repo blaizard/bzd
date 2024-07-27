@@ -94,13 +94,16 @@ export default class Plugin extends PluginBase {
 
 		endpoints.register("get", "/{uid}/{path:*}", async (context) => {
 			const node = await this.nodes.get(context.getParam("uid"));
-			return await node.get(...Plugin.paramPathToPaths(context.getParam("path")));
+			const data = await node.get(...Plugin.paramPathToPaths(context.getParam("path")));
+			context.sendJson(data);
+			context.sendStatus(200);
 		});
 
 		endpoints.register("post", "/{uid}/{path:*}", async (context) => {
 			const data = rawBodyParse(context.getBody(), (name) => context.getHeader(name));
 			const node = await this.nodes.get(context.getParam("uid"));
-			return await node.insert(data, ...Plugin.paramPathToPaths(context.getParam("path")));
+			await node.insert(data, ...Plugin.paramPathToPaths(context.getParam("path")));
+			context.sendStatus(200);
 		});
 	}
 

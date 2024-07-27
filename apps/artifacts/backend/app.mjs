@@ -178,13 +178,7 @@ program
 					method,
 					route,
 					async (context) => {
-						if (method == "get") {
-							const data = await endpoint.handler(context);
-							context.sendJson(data);
-						} else {
-							await endpoint.handler(context);
-							context.sendStatus(200);
-						}
+						await endpoint.handler(context);
 					},
 					Object.assign({ exceptionGuard: true, type: ["raw"] }, endpoint.options),
 				);

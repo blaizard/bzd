@@ -40,7 +40,7 @@ _bzd_artifacts_release = rule(
             mandatory = True,
         ),
         "_release": attr.label(
-            default = Label("//apps/artifacts/bazel:release"),
+            default = Label("//apps/artifacts/plugins/fs/release/bazel:release"),
             cfg = "exec",
             executable = True,
         ),
