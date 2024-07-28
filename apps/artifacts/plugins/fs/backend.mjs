@@ -3,6 +3,7 @@ import PluginBase from "#bzd/apps/artifacts/backend/plugin.mjs";
 import pathlib from "#bzd/nodejs/utils/pathlib.mjs";
 import format from "#bzd/nodejs/core/format.mjs";
 import { CollectionPaging } from "#bzd/nodejs/db/utils.mjs";
+import Permissions from "#bzd/nodejs/db/storage/permissions.mjs";
 
 /// The FileSystem plugin support the following features:
 ///
@@ -59,7 +60,8 @@ export default class Plugin extends PluginBase {
 		for (const [path, _] of Object.entries(options["fs.release"] || {})) {
 			endpoints.register("get", path + "/{path:*}", async (context) => {
 				const storage = this.getStorage();
-				const directory = pathlib.path(path).joinPath(context.getParam("path")).parts.slice(1);
+				const root = pathlib.path(path).joinPath(context.getParam("path")).parts.slice(1);
+				const directory = this.getDirectoryFromPlatform(root, context.getQuery("al"), context.getQuery("isa"));
 				const files = await this.listAllFiles(storage, directory);
 				console.log(files);
 				const maybePreviousFile = context.getQuery("after");
@@ -80,13 +82,48 @@ export default class Plugin extends PluginBase {
 		}
 	}
 
+	/// Get the directory given the platform.
+	async getDirectoryFromPlatform(root, al, isa) {
+		// Check if a subdirectory matches the platform
+		const directories = await this.listAllDirectories(storage, directory);
+		if (directories.length > 0) {
+			// Build the platform name if any.
+			const platform = [(al || "").toLowerCase(), (isa || "").toLowerCase()].filter(Boolean);
+			for (const platformStr of [platform.join("-"), platform.join("_"), al, isa]) {
+				for (const directory of directories) {
+					if (directory.name.toLowerCase() == platformStr) {
+						return [...root, directory.name];
+					}
+				}
+			}
+		}
+		return root;
+	}
+
+	/// List all directories from a directory.
+	async listAllDirectories(storage, directory) {
+		let files = [];
+		for await (const [_, data] of CollectionPaging.makeIterator(async (maxOrPaging) => {
+			return await storage.list(directory, maxOrPaging, /*includeMetadata*/ true);
+		}, 50)) {
+			const permissions = Permissions.makeFromEntry(data);
+			if (permissions.isList()) {
+				files.push(data);
+			}
+		}
+		return files;
+	}
+
 	/// List all files from a directory.
 	async listAllFiles(storage, directory) {
 		let files = [];
 		for await (const [_, data] of CollectionPaging.makeIterator(async (maxOrPaging) => {
 			return await storage.list(directory, maxOrPaging, /*includeMetadata*/ true);
 		}, 50)) {
-			files.push(data);
+			const permissions = Permissions.makeFromEntry(data);
+			if (!permissions.isList()) {
+				files.push(data);
+			}
 		}
 		return files;
 	}

@@ -13,6 +13,7 @@ bzd_nodejs_library(
         "//nodejs/core:format",
         "//nodejs/db:utils",
         "//nodejs/db/storage:disk",
+        "//nodejs/db/storage:permissions",
         "//nodejs/utils:pathlib",
     ],
 )
