@@ -46,6 +46,32 @@ class Release:
 		self.endpoint = endpoint
 		self.uid = uid
 
+	@staticmethod
+	def getAlIsa() -> str:
+		"""Get the abstraction layer and the isa."""
+
+		# Identify the bit width.
+		bitSize = str(8 * struct.calcsize("P"))
+
+		# Identify the instruction set architecture.
+		isa = None
+		machineStr = platform.machine().lower()
+		if any(x in machineStr for x in ("amd", "x86", "i386", "i486", "i586", "i686")):
+			isa = f"x86_{bitSize}"
+		elif any(x in machineStr for x in ("aarch", "arm")):
+			isa = f"arm_{bitSize}"
+
+		# Identify the abstraction layer.
+		al = None
+		if sys.platform.startswith("linux"):
+			al = "linux"
+		elif sys.platform.startswith("win") or sys.platform.startswith("cygwin"):
+			al = "windows"
+		elif sys.platform.startswith("darwin"):
+			al = "darwin"
+
+		return al, isa
+
 	def fetch(self, after: typing.Optional[str] = None) -> typing.Optional[Update]:
 		"""Check if there is an update available.
 
@@ -53,7 +79,10 @@ class Release:
             after: The update must be after this last update filename.
         """
 
-		response = HttpClient.get(self.endpoint + "/", query={"after": after, "uid": self.uid})
+		# Identify the platform
+		al, isa = Release.getAlIsa()
+
+		response = HttpClient.get(self.endpoint + "/", query={"after": after, "uid": self.uid, "al": al, "isa": isa})
 
 		# No update available
 		if response.status == 204:
