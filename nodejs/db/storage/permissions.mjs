@@ -3,15 +3,19 @@ export default class Permissions {
 		this.permissions = permissions;
 	}
 
+	static makeFromString(permissions) {
+		return new Permissions({
+			read: permissions.includes("r"),
+			write: permissions.includes("w"),
+			delete: permissions.includes("d"),
+			list: permissions.includes("l"),
+			executable: permissions.includes("x"),
+		});
+	}
+
 	static makeFromEntry(entry) {
 		const permissionsStr = entry.permissions || "";
-		return new Permissions({
-			read: permissionsStr.includes("r"),
-			write: permissionsStr.includes("w"),
-			delete: permissionsStr.includes("d"),
-			list: permissionsStr.includes("l"),
-			executable: permissionsStr.includes("x"),
-		});
+		return Permissions.makeFromString(permissionsStr);
 	}
 
 	/// Helper to add capabilities to entries.
