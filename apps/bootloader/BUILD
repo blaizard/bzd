@@ -14,10 +14,12 @@ py_binary(
     srcs = [
         "bootloader.py",
         "manifest.py",
+        "mutex.py",
         "singleton.py",
     ],
     deps = [
         ":config",
+        "//apps/artifacts/plugins/fs/release/python:mock",
         "//apps/artifacts/plugins/fs/release/python:release",
         "@bzd_python//bzd/utils:logging",
         "@bzd_python//bzd/utils:run",
