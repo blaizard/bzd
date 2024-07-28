@@ -1,6 +1,7 @@
 import pathlib
 import typing
 import json
+from contextlib import contextmanager
 
 
 class Manifest:
@@ -19,72 +20,74 @@ class Manifest:
 
 	def __init__(self, path: pathlib.Path) -> None:
 		self.path = path
-		self.data = self.load()
+		self.path.parent.mkdir(parents=True, exist_ok=True)
 
-	def setBinary(self, path: typing.Optional[pathlib.Path]) -> None:
+	def setBinary(self, uid: str, path: typing.Optional[pathlib.Path]) -> None:
 		"""Set the new binary."""
 
-		self.data["binary"] = path
-		self.save()
+		with self.modify() as data:
+			data.setdefault(uid, {})
+			data[uid]["binary"] = None if path is None else str(path)
 
-	def setStable(self) -> None:
+	def setStable(self, uid: str) -> None:
 		"""Mark the current binary as stable."""
 
-		# The binary must be set.
-		binary = self.data["binary"]
-		self.data["stable"] = str(binary)
-		self.save()
+		with self.modify() as data:
+			data.setdefault(uid, {})
+			maybeBinary = data[uid].get("binary", None)
+			data[uid]["stable"] = maybeBinary
 
-	def setUnstable(self) -> None:
-		"""Mark the current binary as unstable."""
-
-		# The binary must be set.
-		binary = self.data["binary"]
-		self.data["unstable"] = str(binary)
-		self.save()
-
-	def setUpdate(self, path: pathlib.Path, timestamp: int) -> None:
+	def setUpdate(self, uid: str, path: pathlib.Path, timestamp: int) -> None:
 		"""Set the current successful update information."""
 
-		self.data["update"] = {"last": path, "timestamp": timestamp}
-		self.save()
+		with self.modify() as data:
+			data.setdefault(uid, {})
+			data[uid]["update"] = {"last": str(path), "timestamp": timestamp}
+
+	def clean(self, uid: str) -> None:
+		"""Clean a certain record."""
+
+		with self.modify() as data:
+			if uid in data:
+				del data[uid]
 
 	def load(self) -> typing.Any:
 		"""Load the content of the manifest and return it."""
 
-		self.path.parent.mkdir(parents=True, exist_ok=True)
 		if self.path.exists():
 			data = self.path.read_text()
 			return json.loads(data)
 		return {}
 
-	def save(self) -> None:
-		data = json.dumps(self.data, indent=4)
-		self.path.write_text(data)
+	@contextmanager
+	def modify(self):
+		"""Modify the content of the manifest."""
 
-	@property
-	def maybeBinary(self) -> typing.Optional[pathlib.Path]:
+		data = self.load()
+		yield data
+		serialized = json.dumps(data, indent=4)
+		self.path.write_text(serialized)
+
+	def getBinary(self, uid: str) -> typing.Optional[pathlib.Path]:
 		"""Getter for the current binary."""
 
-		binary = self.data.get("binary", None)
+		binary = self.load().get(uid, {}).get("binary", None)
 		if not binary:
 			return None
-		return binary
+		return pathlib.Path(binary)
 
-	@property
-	def maybeStable(self) -> typing.Optional[pathlib.Path]:
+	def getStableBinary(self, uid: str) -> typing.Optional[pathlib.Path]:
 		"""Getter for the stable binary."""
 
-		binary = self.data.get("stable", None)
+		binary = self.load().get(uid, {}).get("stable", None)
 		if not binary:
 			return None
-		return binary
+		return pathlib.Path(binary)
 
-	@property
-	def maybeLastUpdate(self) -> typing.Optional[pathlib.Path]:
+	def getLastUpdate(self, uid: str) -> typing.Optional[pathlib.Path]:
 		"""Getter for the path of the last binary acquired from an update."""
 
-		binary = self.data.get("update", {}).get("last", None)
+		binary = self.load().get(uid, {}).get("update", {}).get("last", None)
 		if not binary:
 			return None
-		return binary
+		return pathlib.Path(binary)

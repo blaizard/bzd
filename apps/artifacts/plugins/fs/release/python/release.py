@@ -4,7 +4,6 @@ import re
 from datetime import datetime
 
 from bzd.http.client import HttpClient
-from apps.artifacts.plugins.fs.release.python.config import STABLE_VERSION
 
 
 class Update:
