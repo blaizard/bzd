@@ -26,7 +26,8 @@ common --sandbox_tmpfs_path=/tmp
 common --incompatible_disable_target_provider_fields
 common --incompatible_struct_has_no_methods
 #common --incompatible_stop_exporting_language_modules
-common --incompatible_disallow_empty_glob
+# Because of stardoc
+#common --incompatible_disallow_empty_glob
 common --incompatible_disable_starlark_host_transitions
 common --incompatible_config_setting_private_default_visibility
 #common --enable_workspace=false
