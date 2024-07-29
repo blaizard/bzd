@@ -1,9 +1,15 @@
 import typing
 import pathlib
+import struct
 import re
+import platform
+import sys
 from datetime import datetime
 
 from bzd.http.client import HttpClient
+from apps.artifacts.plugins.fs.release.config import urls
+
+assert len(urls) > 0, f"'urls' from the config cannot be empty."
 
 
 class Update:
@@ -42,10 +48,6 @@ class Update:
 
 class Release:
 
-	def __init__(self, endpoint: str, uid: str) -> None:
-		self.endpoint = endpoint
-		self.uid = uid
-
 	@staticmethod
 	def getAlIsa() -> str:
 		"""Get the abstraction layer and the isa."""
@@ -72,23 +74,37 @@ class Release:
 
 		return al, isa
 
-	def fetch(self, after: typing.Optional[str] = None) -> typing.Optional[Update]:
+	def fetch(self, path: str, uid: str, after: typing.Optional[str] = None) -> typing.Optional[Update]:
 		"""Check if there is an update available.
 
         Args:
+			path: The path to fetch.
+			uid: The unique identifier of the called.
             after: The update must be after this last update filename.
         """
 
 		# Identify the platform
 		al, isa = Release.getAlIsa()
 
-		response = HttpClient.get(self.endpoint + "/", query={"after": after, "uid": self.uid, "al": al, "isa": isa})
+		update = None
+		for url in urls:
+			fullUrl = f"{url}/x/{path}/"
 
-		# No update available
-		if response.status == 204:
+			try:
+				response = HttpClient.get(fullUrl, query={"after": after, "uid": uid, "al": al, "isa": isa})
+			except Exception as e:
+				print(f"Exception while fetching {fullUrl} with error: {e}")
+			else:
+				# No update available
+				if response.status == 204:
+					continue
+
+				# An update was found
+				update = Update(response)
+				break
+
+		if update is None:
 			return None
-
-		update = Update(response)
 
 		assert update.name is not None, f"Every update must have a name."
 		assert update.lastModified is not None, f"Every update must have a last modification date."

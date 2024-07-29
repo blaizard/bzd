@@ -25,43 +25,42 @@ class Response:
 
 class ReleaseMock:
 
-	def __init__(self, uid: str, data: TestData) -> None:
+	def __init__(self, data: TestData) -> None:
 		"""Args:
-			uid: The unique identifier of the caller.
 			data: Mocking data with the following format:
 			{
-				<app>: [
+				<path>: [
 					{name: "first", binary: <binary>}, // will be returned first
 					{name: "second", binary: <binary>} // then this one if it's called with the previous one, etc.
 				]
 			}
 		"""
-		self.uid = uid
 		self.data = data
 
-	def fetch(self, app: str, after: typing.Optional[str] = None) -> typing.Optional[Update]:
+	def fetch(self, path: str, uid: str, after: typing.Optional[str] = None) -> typing.Optional[Update]:
 		"""Check if there is an update available.
 
 		Args:
-			app: The application to be fetched.
+			path: The path to be fetched.
+			uid: The unique identifier of the called.
 			after: The update must be after this last update filename.
 		"""
 
-		# No data for this app.
-		if (app not in self.data) or (len(self.data[app]) == 0):
+		# No data for this path.
+		if (path not in self.data) or (len(self.data[path]) == 0):
 			return None
 
-		appData = self.data[app]
+		pathData = self.data[path]
 
 		# No argument provided.
 		if after is None:
-			response = Response(appData[0])
+			response = Response(pathData[0])
 
 		# Argument provided.
 		else:
-			index = next((i for i, d in enumerate(appData) if d["name"] == after), None)
-			if (index is None) or (index + 1 >= len(appData)):
+			index = next((i for i, d in enumerate(pathData) if d["name"] == after), None)
+			if (index is None) or (index + 1 >= len(pathData)):
 				return None
-			response = Response(appData[index + 1])
+			response = Response(pathData[index + 1])
 
 		return Update(response)
