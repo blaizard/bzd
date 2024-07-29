@@ -87,14 +87,27 @@ export default class Plugin extends PluginBase {
 		// Check if a subdirectory matches the platform
 		const directories = await this.listAllDirectories(storage, directory);
 		if (directories.length > 0) {
-			// Build the platform name if any.
-			const platform = [(al || "").toLowerCase(), (isa || "").toLowerCase()].filter(Boolean);
-			for (const platformStr of [platform.join("-"), platform.join("_"), al, isa]) {
-				for (const directory of directories) {
-					if (directory.name.toLowerCase() == platformStr) {
-						return [...root, directory.name];
-					}
+			// Build a map of platform segments to directory name.
+			let mapPlatformDirectory = {};
+			for (const directory in directories) {
+				const normalizedDirectoryName = directory.name.toLowerCase();
+				const segments = [...normalizedDirectoryName.split("-"), ...normalizedDirectoryName.split("_")];
+				for (const segment in segments) {
+					mapPlatformDirectory[segment] ??= new Set();
+					mapPlatformDirectory[segment].add(directory.name);
 				}
+			}
+
+			// Assess which directory is the most relevant.
+			const alSet = mapPlatformDirectory[al] || new Set();
+			const isaSet = mapPlatformDirectory[isa] || new Set();
+			const mapOccurences = [...alSet, ...isaSet].reduce((counter, key) => {
+				counter[key] = 1 + counter[key] || 1;
+				return counter;
+			}, {});
+			const occurenceSorted = Object.entries(mapOccurences).sort((a, b) => b[1] - a[1]);
+			if (occurenceSorted.length > 0) {
+				return [...root, occurenceSorted[0][0]];
 			}
 		}
 		return root;

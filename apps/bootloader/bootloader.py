@@ -7,7 +7,6 @@ import threading
 import stat
 import enum
 
-from apps.bootloader.config import endpoint, uid
 from apps.artifacts.plugins.fs.release.python.release import Release, Update
 from apps.artifacts.plugins.fs.release.python.mock import ReleaseMock
 from apps.bootloader.manifest import Manifest
@@ -29,7 +28,7 @@ class Bootloader:
 		self.root = root
 		self.manifest = Manifest(root / "manifest.json")
 		self.mutex = Mutex(root / "mutex.lock")
-		self.release = Release(endpoint=endpoint, uid=uid)
+		self.release = Release()
 
 	@staticmethod
 	def _getBinaryDirectory(uid: str) -> pathlib.Path:
@@ -89,7 +88,7 @@ class Bootloader:
 
 		# Perform the update
 		maybeLastUpdate = self.manifest.getLastUpdate(uid)
-		maybeUpdate = self.release.fetch(app=app, after=maybeLastUpdate.name if maybeLastUpdate else None)
+		maybeUpdate = self.release.fetch(path=app, uid=uid, after=maybeLastUpdate.name if maybeLastUpdate else None)
 		if not maybeUpdate:
 			return None
 
@@ -149,7 +148,7 @@ class BootloaderForTest(Bootloader):
 
 	def __init__(self, root: pathlib.Path, data: typing.Any) -> None:
 		super().__init__(root)
-		self.release = ReleaseMock(uid=uid, data=data)
+		self.release = ReleaseMock(data=data)
 
 
 def selfTests(cache) -> None:

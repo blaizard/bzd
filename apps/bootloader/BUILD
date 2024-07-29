@@ -30,4 +30,5 @@ bzd_bundle(
     name = "bundle",
     binary = ":bootloader",
     tags = ["manual"],
+    visibility = ["//deployment:__subpackages__"],
 )
