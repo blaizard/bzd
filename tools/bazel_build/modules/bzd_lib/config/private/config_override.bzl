@@ -133,8 +133,25 @@ def make_bzd_config_apply(name = None, providers = None, executable = False, tes
     def _bzd_config_apply_impl(ctx):
         # Due to the transition, the target becomes an array.
         target = ctx.attr.target[0]
-        all_providers = [target[provider] for provider in (_DEFAULT_PROVIDERS + (providers or [])) if provider in target]
-        return all_providers
+        ignore_providers = []
+        extra_providers = []
+
+        # An executable rule must create its executable.
+        if executable:
+            ctx.actions.symlink(
+                output = ctx.outputs.executable,
+                target_file = ctx.executable.target,
+                is_executable = True,
+            )
+            default_info_provider = DefaultInfo(
+                executable = ctx.outputs.executable,
+                runfiles = target[DefaultInfo].default_runfiles,
+            )
+            ignore_providers.append(DefaultInfo)
+            extra_providers.append(default_info_provider)
+
+        all_providers = [target[provider] for provider in (_DEFAULT_PROVIDERS + (providers or [])) if (provider in target) and (provider not in ignore_providers)]
+        return all_providers + extra_providers
 
     _bzd_config_apply_rule = rule(
         doc = "Apply a specific configuration to a target.",
@@ -146,6 +163,7 @@ def make_bzd_config_apply(name = None, providers = None, executable = False, tes
             ),
             "target": attr.label(
                 mandatory = True,
+                executable = executable,
                 doc = "The target associated with this application.",
                 cfg = _bzd_transition_config_override,
             ),
