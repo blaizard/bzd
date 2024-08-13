@@ -2,13 +2,14 @@
 
 import argparse
 import os
-import sys
-import subprocess
-import urllib.request
-import stat
-import shutil
+import pathlib
 import platform
+import urllib.request
+import shutil
+import stat
 import struct
+import subprocess
+import sys
 
 def processRun(args) -> None:
 	"""Execute a process and exit if it fails."""
@@ -49,13 +50,12 @@ if __name__== "__main__":
 	args, unknown = parser.parse_known_args()
 
 	# Build the full path of bazelisk
-	bazelDirectory = os.path.dirname(os.path.realpath(__file__))
-	workspaceDirectory = os.path.dirname(bazelDirectory)
 	osAndArchitecture = getOSAndArchitecture()
-	bazeliskPath = os.path.join(bazelDirectory, f"bazelisk_{osAndArchitecture}")
+	bazelDirectory = pathlib.Path(__file__).resolve().parent
+	bazeliskPath = bazelDirectory / f"bazelisk_{osAndArchitecture}"
 
 	# If bazel is not installed / available
-	if not os.path.exists(bazeliskPath):
+	if not bazeliskPath.exists():
 
 		# Check the bazename of bazelisk
 		OSAndArchitectureToBasename = {
@@ -67,14 +67,14 @@ if __name__== "__main__":
 		}
 		basename = OSAndArchitectureToBasename[osAndArchitecture]
 
-		url = "https://github.com/bazelbuild/bazelisk/releases/download/v1.19.0/{}".format(basename)
+		url = "https://github.com/bazelbuild/bazelisk/releases/download/v1.20.0/{}".format(basename)
 		print(f"No bazel binary detected, downloading bazelisk from {url}...", flush=True)
 		with urllib.request.urlopen(url) as response, open(bazeliskPath, "wb") as f:
 			shutil.copyfileobj(response, f)
 
 		# Set permissions and update bazel binary path
-		st = os.stat(bazeliskPath)
-		os.chmod(bazeliskPath, st.st_mode | stat.S_IEXEC)
+		st = bazeliskPath.stat()
+		bazeliskPath.chmod(st.st_mode | stat.S_IEXEC)
 
 	try:
 		# Forward commands to the real bazel

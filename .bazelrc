@@ -30,6 +30,7 @@ common --incompatible_struct_has_no_methods
 #common --incompatible_disallow_empty_glob
 common --incompatible_disable_starlark_host_transitions
 common --incompatible_config_setting_private_default_visibility
+common --incompatible_use_plus_in_repo_names
 #common --enable_workspace=false
 
 # If a command fails, print out the full command line.
