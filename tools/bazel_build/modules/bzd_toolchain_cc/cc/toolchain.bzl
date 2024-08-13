@@ -5,7 +5,7 @@ load("@bzd_toolchain_cc//cc:flags.bzl", "COPTS_CLANG", "COPTS_CLANG_COVERAGE", "
 
 def _impl(repository_ctx):
     # Create a UID
-    uid = repository_ctx.name.replace("~", "-")
+    uid = repository_ctx.name.replace("~", "-").replace("+", "-")
 
     # Create the loads statements.
     loads = []
