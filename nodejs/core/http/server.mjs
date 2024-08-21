@@ -28,6 +28,8 @@ export default class HttpServer {
 				uploadDir: false,
 				/// \brief Set the file transfer limit.
 				limit: 1 * 1024 * 1024,
+				/// \brief Default request timeout.
+				timeoutS: 2 * 60,
 				/// \brief Public key of the SSL certificate.
 				key: null,
 				/// \brief SSL certificate.
@@ -39,6 +41,7 @@ export default class HttpServer {
 			},
 			config,
 		);
+		this.maxTimeoutS = this.config.timeoutS;
 
 		this.event = new Event({
 			ready: { proactive: true },
@@ -143,6 +146,10 @@ export default class HttpServer {
 		if (this.config.useCompression) {
 			configStrList.push("compression");
 		}
+
+		// This can only be set at server level.
+		// Adds 1 min to make sure the proper timeout handler is triggered before the connection is closed.
+		this.server.requestTimeout = (this.maxTimeoutS + 60) * 1000;
 
 		return new Promise((resolve, reject) => {
 			this.server.listen(this.port, undefined, undefined, () => {
@@ -250,6 +257,7 @@ export default class HttpServer {
 				type: [],
 				limit: this.config.limit,
 				path: null,
+				timeoutS: this.config.timeoutS,
 				/**
 				 * Add guards to unhandled exceptions. This adds a callstack layer.
 				 */
@@ -257,6 +265,7 @@ export default class HttpServer {
 			},
 			options,
 		);
+		this.maxTimeoutS = Math.max(this.maxTimeoutS, options.timeoutS);
 
 		const endpoint = new Endpoint(uri);
 		const maybeRegexprPath = endpoint.isVarArgs() ? endpoint.toRegexp() : null;
@@ -264,6 +273,7 @@ export default class HttpServer {
 		let callbackList = [middlewareErrorHandler];
 
 		callbackList.unshift(async function (request, response) {
+			// Create the context.
 			const context = new HttpServerContext(request, response);
 			// Override the params if there is a regexpr.
 			// This is needed because Express apply a urldecode operation to the params which is not
@@ -310,6 +320,13 @@ export default class HttpServer {
 			});
 			callbackList.unshift(upload.any());
 		}
+
+		// Set specific options at the begining to ensure they are processed before the following layer.
+		callbackList.unshift((request, response, next) => {
+			request.setTimeout(options.timeoutS * 1000);
+			response.setTimeout(options.timeoutS * 1000);
+			next();
+		});
 
 		const updatedURI =
 			"/" +

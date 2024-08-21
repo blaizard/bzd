@@ -52,6 +52,7 @@ export default class Plugin extends PluginBase {
 				},
 				{
 					limit: uploadOptions.limit || 20 * 1024 * 1024, // 20 MB
+					timeoutS: 30 * 60, // 30 min
 				},
 			);
 		}

@@ -79,7 +79,7 @@ class Release:
 
         Args:
 			path: The path to fetch.
-			uid: The unique identifier of the called.
+			uid: The unique identifier of the caller.
             after: The update must be after this last update filename.
         """
 

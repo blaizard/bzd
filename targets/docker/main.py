@@ -86,7 +86,7 @@ if __name__ == "__main__":
 		with handle.forwardPort(args.registry_port, waitHTTP=f"http://localhost:{args.registry_port}/v2/"):
 			for image in images:
 				print(f"Pushing {image}...", flush=True)
-				ociPush(image, f"localhost:{args.registry_port}/{image}", stdout=True, stderr=True, timeoutS=600)
+				ociPush(image, f"localhost:{args.registry_port}/{image}", stdout=True, stderr=True, timeoutS=30 * 60)
 
 		# Find all applications.
 		applications = set(dockerCompose.keys())
