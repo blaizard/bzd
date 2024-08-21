@@ -15,5 +15,12 @@ component Compose {
 config:
     path = String;
 interface:
+    // Add a custom image to a docker compose file.
+    //
+    // \param service The service to which this image corresponds.
+    // \param image The image identifier.
     method image(service = String [mandatory], image = String [mandatory]);
+
+    // Use this image, only needed if image(...) is not called.
+    method nop();
 }

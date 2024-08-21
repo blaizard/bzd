@@ -431,7 +431,7 @@ class SymbolMap:
 
 		similar = self.similarFQN(fqn=fqn)
 		if len(similar) == 1:
-			return f", did you mean {similar[0]}."
+			return f", did you mean '{similar[0]}'?"
 		elif len(similar) > 1:
 			return f", did you mean:\n" + "\n".join([f"\t- {w}" for w in similar])
 		return "."
