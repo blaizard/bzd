@@ -8,6 +8,7 @@ import tempfile
 
 from apps.bootloader.binary import Binary, BinaryForTest, StablePolicy, ExceptionBinaryAbort
 from apps.bootloader.singleton import Singleton
+from apps.bootloader.config import bootloaderDefault
 from bzd.utils.logging import Logger
 
 
@@ -86,6 +87,7 @@ if __name__ == "__main__":
 	                    type=pathlib.Path,
 	                    default=pathlib.Path(tempfile.gettempdir()) / f".{pathlib.Path(__file__).name}",
 	                    help="Cache directory.")
+	parser.add_argument("--bootloader", type=str, default=bootloaderDefault, help="Bootloader application.")
 	parser.add_argument("uid", type=str, help="The unique identifier of this instance.")
 	parser.add_argument("app", type=str, nargs="?", default=None, help="The identifier of the application.")
 
@@ -99,7 +101,7 @@ if __name__ == "__main__":
 
 	selfTests(args.cache)
 
-	bootloader = Binary(uid="_bootloader", app="bzd/apps/bootloader", root=args.cache)
+	bootloader = Binary(uid="_bootloader", app=args.bootloader, root=args.cache)
 	binary = Binary(uid=args.uid, app=args.app, root=args.cache)
 	fecthApplication(binary)
 	#checkBootloaderUpdate()

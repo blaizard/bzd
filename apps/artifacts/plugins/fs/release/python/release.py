@@ -20,9 +20,9 @@ class Update:
 	@property
 	def name(self) -> typing.Optional[str]:
 		regexpr = re.compile(r"^.*filename\s*=[\s\"']*(.+?)[\s\"']*$")
-		maybeContent = self.response.getHeader("Content-Disposition").lower()
+		maybeContent = self.response.getHeader("Content-Disposition")
 		if maybeContent:
-			m = regexpr.match(maybeContent)
+			m = regexpr.match(maybeContent.lower())
 			if m:
 				return m.group(1)
 		return None
@@ -106,6 +106,6 @@ class Release:
 		if update is None:
 			return None
 
-		assert update.name is not None, f"Every update must have a name."
-		assert update.lastModified is not None, f"Every update must have a last modification date."
+		assert update.name is not None, "Every update must have a name."
+		assert update.lastModified is not None, "Every update must have a last modification date."
 		return update
