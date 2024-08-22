@@ -12,6 +12,7 @@ bzd_config(
 py_binary(
     name = "bootloader",
     srcs = [
+        "binary.py",
         "bootloader.py",
         "manifest.py",
         "mutex.py",
