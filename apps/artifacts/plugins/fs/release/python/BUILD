@@ -9,6 +9,7 @@ py_library(
     deps = [
         "//apps/artifacts/plugins/fs/release:config",
         "@bzd_python//bzd/http:client",
+        "@bzd_python//bzd/utils:logging",
     ],
 )
 

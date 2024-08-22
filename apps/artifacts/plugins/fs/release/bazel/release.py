@@ -42,6 +42,6 @@ if __name__ == "__main__":
 	HttpClient.put(
 	    url=args.url + "/" + fileName,
 	    file=args.artifact,
-		timeoutS=30 * 60 # 30min
+	    timeoutS=30 * 60  # 30min
 	)
 	print(" done.")

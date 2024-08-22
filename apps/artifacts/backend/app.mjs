@@ -185,6 +185,8 @@ program
 			}
 		}
 	}
+	// Catch all to return 404 in case a wrong path is given.
+	web.addRoute("*", "/x/{all:*}", (context) => context.sendStatus(404, "File Not Found"));
 
 	Log.info("Application started");
 	web.addStaticRoute("/", PATH_STATIC);
