@@ -230,4 +230,4 @@ def toolchain_merge(data1, data2):
 def get_location(module_ctx, name):
     """Return the full name of the repository on disk."""
 
-    return "external/" + module_ctx.path(".").basename + "~" + name
+    return "external/" + module_ctx.path(".").basename + "+" + name
