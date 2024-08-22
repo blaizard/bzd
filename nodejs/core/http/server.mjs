@@ -321,7 +321,7 @@ export default class HttpServer {
 			callbackList.unshift(upload.any());
 		}
 
-		// Set specific options at the begining to ensure they are processed before the following layer.
+		// Set specific options at the beginning to ensure they are processed before the following layer.
 		callbackList.unshift((request, response, next) => {
 			request.setTimeout(options.timeoutS * 1000);
 			response.setTimeout(options.timeoutS * 1000);

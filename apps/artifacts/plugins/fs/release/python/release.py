@@ -7,6 +7,7 @@ import sys
 from datetime import datetime
 
 from bzd.http.client import HttpClient
+from bzd.utils.logging import Logger
 from apps.artifacts.plugins.fs.release.config import urls
 
 assert len(urls) > 0, f"'urls' from the config cannot be empty."
@@ -86,14 +87,13 @@ class Release:
 		# Identify the platform
 		al, isa = Release.getAlIsa()
 
-		update = None
 		for url in urls:
 			fullUrl = f"{url}/x/{path}/"
 
 			try:
 				response = HttpClient.get(fullUrl, query={"after": after, "uid": uid, "al": al, "isa": isa})
 			except Exception as e:
-				print(f"Exception while fetching {fullUrl} with error: {e}")
+				Logger.error(f"Exception while fetching {fullUrl} with error: {e}")
 			else:
 				# No update available
 				if response.status == 204:
@@ -101,11 +101,13 @@ class Release:
 
 				# An update was found
 				update = Update(response)
-				break
+				if update.name is None:
+					Logger.error(f"Every update must have a name, the one from {fullUrl} doesn't, ignoring.")
+					continue
+				if update.lastModified is None:
+					Logger.error(
+					    f"Every update must have a last modification date, the one from {fullUrl} doesn't, ignoring.")
+					continue
+				return update
 
-		if update is None:
-			return None
-
-		assert update.name is not None, "Every update must have a name."
-		assert update.lastModified is not None, "Every update must have a last modification date."
-		return update
+		return None
