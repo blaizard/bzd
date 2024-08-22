@@ -29,13 +29,19 @@ class Manifest:
 			data.setdefault(uid, {})
 			data[uid]["binary"] = None if path is None else str(path)
 
-	def setStable(self, uid: str) -> None:
-		"""Mark the current binary as stable."""
+	def setStable(self, uid: str) -> bool:
+		"""Mark the current binary as stable.
+		
+		Returns:
+			True if the value is changes, False if the value is the same as before.
+		"""
 
 		with self.modify() as data:
 			data.setdefault(uid, {})
 			maybeBinary = data[uid].get("binary", None)
+			previousStableBinary = data[uid].get("stable", None)
 			data[uid]["stable"] = maybeBinary
+			return previousStableBinary != maybeBinary
 
 	def setUpdate(self, uid: str, path: pathlib.Path, timestamp: int) -> None:
 		"""Set the current successful update information."""
