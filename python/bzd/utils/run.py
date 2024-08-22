@@ -1,6 +1,7 @@
 import os
 import subprocess
 import sys
+import time
 import threading
 from typing import Any, List, Dict, Optional, Tuple, TextIO, Union
 from pathlib import Path
@@ -89,6 +90,43 @@ class _NoopTimer:
 		pass
 
 
+class Cancellation:
+	"""Cancel the given process."""
+
+	def __init__(self, timeBeforeKillS: float = 5.) -> None:
+		self.mutex = threading.Lock()
+		self.triggered = False
+		self.timeBeforeKillS = timeBeforeKillS
+		self.reset()
+
+	def reset(self, proc: Optional[subprocess.Popen] = None) -> None:
+		"""Reset the cancellation state."""
+
+		with self.mutex:
+			self.proc = proc
+			if self.proc and self.triggered:
+				self._cancel()
+			else:
+				self.triggered = False
+
+	def cancel(self) -> None:
+		"""Cancel the current process."""
+
+		with self.mutex:
+			self._cancel()
+
+	def _cancel(self) -> None:
+		self.triggered = True
+		if self.proc:
+			self.proc.terminate()
+			# Wait until the process terminates
+			timeStart = time.time()
+			while self.proc.poll() is None:
+				if time.time() - timeStart > self.timeBeforeKillS:
+					self.proc.kill()
+				time.sleep(0.1)
+
+
 def localCommand(
     cmds: List[str],
     ignoreFailure: bool = False,
@@ -99,6 +137,7 @@ def localCommand(
     stdout: Union[bool, TextIO] = False,
     stderr: Union[bool, TextIO] = False,
     maxOutputSize: int = 1000000,
+    cancellation: Optional[Cancellation] = None,
 ) -> ExecuteResult:
 	"""Run a process locally.
 
@@ -125,6 +164,8 @@ def localCommand(
 	    stderr=subprocess.PIPE,
 	    env=env,
 	)
+	if cancellation:
+		cancellation.reset(proc)
 	timer: threading.Timer = threading.Timer(timeoutS,
 	                                         proc.kill) if timeoutS is not None else _NoopTimer()  # type: ignore
 	sel.register(proc.stdout, events=selectors.EVENT_READ)  # type: ignore
@@ -151,6 +192,8 @@ def localCommand(
 			returnCode = proc.returncode
 			if returnCode == None:
 				stream.addStderr(b"Process did not complete.\n")
+			if cancellation and cancellation.triggered:
+				stream.addStderr(b"Process was cancelled.\n")
 
 	finally:
 		timer.cancel()
