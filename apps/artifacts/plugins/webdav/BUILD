@@ -10,6 +10,7 @@ bzd_nodejs_library(
     ],
     deps = [
         "//apps/artifacts/backend:plugin",
+        "//apps/artifacts/plugins/extension/release",
         "//nodejs/db/storage:webdav",
     ],
 )
