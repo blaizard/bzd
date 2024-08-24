@@ -1,4 +1,16 @@
+load("@bzd_lib//config:defs.bzl", "bzd_config")
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
+
+bzd_config(
+    name = "config",
+    srcs = [
+        "config.default.json",
+    ],
+    visibility = [
+        "//apps/artifacts/plugins/extension/release:__subpackages__",
+        "//deployment:__subpackages__",
+    ],
+)
 
 bzd_nodejs_library(
     name = "release",

@@ -5,8 +5,8 @@ import threading
 import stat
 import enum
 
-from apps.artifacts.plugins.fs.release.python.release import Release
-from apps.artifacts.plugins.fs.release.python.mock import ReleaseMock
+from apps.artifacts.plugins.extension.release.python.release import Release
+from apps.artifacts.plugins.extension.release.python.mock import ReleaseMock
 from apps.bootloader.manifest import Manifest
 from apps.bootloader.mutex import Mutex
 from bzd.utils.logging import Logger

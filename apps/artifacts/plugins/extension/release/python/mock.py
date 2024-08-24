@@ -1,6 +1,6 @@
 import typing
 
-from apps.artifacts.plugins.fs.release.python.release import Update
+from apps.artifacts.plugins.extension.release.python.release import Update
 
 BinaryData = typing.Dict[str, typing.Any]
 TestData = typing.Dict[str, typing.List[BinaryData]]
