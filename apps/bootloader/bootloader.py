@@ -131,8 +131,7 @@ if __name__ == "__main__":
 			continue
 		except Exception as e:
 			Logger.error(e)
-			if binary.rollback():
-				Logger.error("Rollback to previous stable version.")
+			binary.rollback()
 
 		currentTime = time.time()
 		timeDiffSinceLastFailure = currentTime - lastFailure

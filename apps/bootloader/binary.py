@@ -71,9 +71,10 @@ class Binary:
 
 		with self.mutex:
 			maybeStable = self.manifest.getStableBinary(self.uid)
-			self.manifest.setBinary(self.uid, maybeStable)
-			Logger.info(f"Rollback to {maybeStable}")
-			return True if maybeStable else False
+			if self.manifest.setBinary(self.uid, maybeStable):
+				Logger.info(f"Rollback to {maybeStable}")
+				return True
+			return False
 
 	def clean(self) -> None:
 		"""Clean the cache for a specific UID."""
