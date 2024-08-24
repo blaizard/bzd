@@ -8,7 +8,7 @@ from datetime import datetime
 
 from bzd.http.client import HttpClient
 from bzd.utils.logging import Logger
-from apps.artifacts.plugins.fs.release.config import urls
+from apps.artifacts.plugins.extension.release.config import urls
 
 assert len(urls) > 0, f"'urls' from the config cannot be empty."
 

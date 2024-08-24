@@ -20,8 +20,8 @@ py_binary(
     ],
     deps = [
         ":config",
-        "//apps/artifacts/plugins/fs/release/python:mock",
-        "//apps/artifacts/plugins/fs/release/python:release",
+        "//apps/artifacts/plugins/extension/release/python:mock",
+        "//apps/artifacts/plugins/extension/release/python:release",
         "@bzd_python//bzd/utils:logging",
         "@bzd_python//bzd/utils:run",
     ],

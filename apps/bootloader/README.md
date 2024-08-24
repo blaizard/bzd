@@ -11,5 +11,5 @@ The bootloader covers the following functionalities:
 ## Starting
 
 ```bash
-bazel run //apps/bootloader --//apps/artifacts/plugins/fs/release:config.set=urls=hello -- instance0 apps/test
+bazel run //apps/bootloader --//apps.artifacts.plugins.extension.release:config.set=urls=hello -- instance0 apps/test
 ```
