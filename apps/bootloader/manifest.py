@@ -22,18 +22,24 @@ class Manifest:
 		self.path = path
 		self.path.parent.mkdir(parents=True, exist_ok=True)
 
-	def setBinary(self, uid: str, path: typing.Optional[pathlib.Path]) -> None:
-		"""Set the new binary."""
+	def setBinary(self, uid: str, path: typing.Optional[pathlib.Path]) -> bool:
+		"""Set the new binary.
+
+		Returns:
+			True if the value is changed, False if the value is the same as before.
+		"""
 
 		with self.modify() as data:
 			data.setdefault(uid, {})
+			previousBinary = data[uid].get("binary", None)
 			data[uid]["binary"] = None if path is None else str(path)
+			return previousBinary != data[uid]["binary"]
 
 	def setStable(self, uid: str) -> bool:
 		"""Mark the current binary as stable.
 		
 		Returns:
-			True if the value is changes, False if the value is the same as before.
+			True if the value is changed, False if the value is the same as before.
 		"""
 
 		with self.modify() as data:
