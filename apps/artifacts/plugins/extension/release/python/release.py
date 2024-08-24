@@ -86,19 +86,23 @@ class Release:
 
 		# Identify the platform
 		al, isa = Release.getAlIsa()
+		query = {"after": after, "uid": uid, "al": al, "isa": isa}
+		successfullFetch = False
+		errors = {}
+
+		def queryToString():
+			return "&".join([f"{k}={v}" for k, v in query.items() if v is not None])
 
 		for url in urls:
 			fullUrl = f"{url}/x/{path}/"
-			query = {"after": after, "uid": uid, "al": al, "isa": isa}
-
-			def queryToString():
-				return "&".join([f"{k}={v}" for k, v in query.items() if v is not None])
 
 			try:
-				response = HttpClient.get(fullUrl, query=query)
+				response = HttpClient.get(fullUrl, query=query, timeoutS=5)
 			except Exception as e:
-				Logger.error(f"Exception while fetching {fullUrl}?{queryToString()} with error: {e}")
+				errors[fullUrl] = str(e)
 			else:
+				successfullFetch = True
+
 				# No update available
 				if response.status == 204:
 					continue
@@ -115,5 +119,9 @@ class Release:
 					)
 					continue
 				return update
+
+		if not successfullFetch:
+			Logger.error(f"None of the release remotes are accessible with the query {queryToString()}: \n" +
+			             "\n".join([f"- {url}: {message}" for url, message in errors.items()]))
 
 		return None
