@@ -89,11 +89,15 @@ class Release:
 
 		for url in urls:
 			fullUrl = f"{url}/x/{path}/"
+			query = {"after": after, "uid": uid, "al": al, "isa": isa}
+
+			def queryToString():
+				return "&".join([f"{k}={v}" for k, v in query.items() if v is not None])
 
 			try:
-				response = HttpClient.get(fullUrl, query={"after": after, "uid": uid, "al": al, "isa": isa})
+				response = HttpClient.get(fullUrl, query=query)
 			except Exception as e:
-				Logger.error(f"Exception while fetching {fullUrl} with error: {e}")
+				Logger.error(f"Exception while fetching {fullUrl}?{queryToString()} with error: {e}")
 			else:
 				# No update available
 				if response.status == 204:
@@ -102,11 +106,13 @@ class Release:
 				# An update was found
 				update = Update(response)
 				if update.name is None:
-					Logger.error(f"Every update must have a name, the one from {fullUrl} doesn't, ignoring.")
+					Logger.error(
+					    f"Every update must have a name, the one from {fullUrl}?{queryToString()} doesn't, ignoring.")
 					continue
 				if update.lastModified is None:
 					Logger.error(
-					    f"Every update must have a last modification date, the one from {fullUrl} doesn't, ignoring.")
+					    f"Every update must have a last modification date, the one from {fullUrl}?{queryToString()} doesn't, ignoring."
+					)
 					continue
 				return update
 

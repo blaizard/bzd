@@ -4,6 +4,7 @@ import pathlib from "#bzd/nodejs/utils/pathlib.mjs";
 import format from "#bzd/nodejs/core/format.mjs";
 import { CollectionPaging } from "#bzd/nodejs/db/utils.mjs";
 import Permissions from "#bzd/nodejs/db/storage/permissions.mjs";
+import extensionRelease from "#bzd/apps/artifacts/plugins/extension/release/release.mjs";
 
 /// The FileSystem plugin support the following features:
 ///
@@ -57,75 +58,7 @@ export default class Plugin extends PluginBase {
 			);
 		}
 
-		// Set release endpoints
-		for (const [path, _] of Object.entries(options["fs.release"] || {})) {
-			endpoints.register("get", path + "/{path:*}", async (context) => {
-				const storage = this.getStorage();
-				const root = pathlib.path(path).joinPath(context.getParam("path")).parts.slice(1);
-				const directory = this.getDirectoryFromPlatform(root, context.getQuery("al"), context.getQuery("isa"));
-				const files = await this.listAllFiles(storage, directory);
-				console.log(files);
-				const maybePreviousFile = context.getQuery("after");
-				console.log(context.getQuery("uid"));
-				if (files.length) {
-					const file = files[0];
-					const fileName = file.name;
-					const stream = await storage.read([...directory, fileName]);
-					context.setHeader("Content-Length", file.size);
-					context.setHeader("Content-Disposition", 'attachment; filename="' + fileName + '"');
-					context.setHeader("Last-Modified", file.modified.toUTCString());
-					await context.sendStream(stream);
-					context.sendStatus(200);
-				} else {
-					context.sendStatus(204);
-				}
-			});
-		}
-	}
-
-	/// Get the directory given the platform.
-	async getDirectoryFromPlatform(root, al, isa) {
-		// Check if a subdirectory matches the platform
-		const directories = await this.listAllDirectories(storage, directory);
-		if (directories.length > 0) {
-			// Build a map of platform segments to directory name.
-			let mapPlatformDirectory = {};
-			for (const directory in directories) {
-				const normalizedDirectoryName = directory.name.toLowerCase();
-				const segments = [...normalizedDirectoryName.split("-"), ...normalizedDirectoryName.split("_")];
-				for (const segment in segments) {
-					mapPlatformDirectory[segment] ??= new Set();
-					mapPlatformDirectory[segment].add(directory.name);
-				}
-			}
-
-			// Assess which directory is the most relevant.
-			const alSet = mapPlatformDirectory[al] || new Set();
-			const isaSet = mapPlatformDirectory[isa] || new Set();
-			const mapOccurences = [...alSet, ...isaSet].reduce((counter, key) => {
-				counter[key] = 1 + counter[key] || 1;
-				return counter;
-			}, {});
-			const occurenceSorted = Object.entries(mapOccurences).sort((a, b) => b[1] - a[1]);
-			if (occurenceSorted.length > 0) {
-				return [...root, occurenceSorted[0][0]];
-			}
-		}
-		return root;
-	}
-
-	/// List all directories from a directory.
-	async listAllDirectories(storage, directory) {
-		let files = [];
-		for await (const [_, data] of CollectionPaging.makeIterator(async (maxOrPaging) => {
-			return await storage.list(directory, maxOrPaging, /*includeMetadata*/ true);
-		}, 50)) {
-			const permissions = Permissions.makeFromEntry(data);
-			if (permissions.isList()) {
-				files.push(data);
-			}
-		}
-		return files;
+		extensionRelease(this, options, provider, endpoints);
 	}
 
 	/// List all files from a directory.
