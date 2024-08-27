@@ -76,6 +76,10 @@ class Manifest:
 		"""Modify the content of the manifest."""
 
 		data = self.load()
+		# Here migrate the config from version A to version B if there is a mismatch.
+		if data.get("version", 1) != 1:
+			pass
+		data["version"] = 1
 		yield data
 		serialized = json.dumps(data, indent=4)
 		self.path.write_text(serialized)

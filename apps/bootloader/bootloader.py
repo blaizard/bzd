@@ -9,13 +9,14 @@ import tempfile
 from apps.bootloader.binary import Binary, BinaryForTest, StablePolicy, ExceptionBinaryAbort
 from apps.bootloader.singleton import Singleton
 from apps.bootloader.config import bootloaderDefault
+from apps.bootloader.scheduler import Scheduler
 from bzd.utils.logging import Logger
 
 
 def selfTests(cache) -> None:
 	"""Perform a sequence of self tests."""
 
-	uid = "binary_self_test"
+	uid = "_binary_self_test"
 	app = "test"
 
 	binary = BinaryForTest(
@@ -46,6 +47,8 @@ def selfTests(cache) -> None:
 		assert (name is not None) or (maybeUpdate is None), f"Got '{maybeUpdate.name}' but expected no update"
 		assert (name is None) or (maybeUpdate.name == name), f"Expected '{name}' but got instead '{maybeUpdate.name}'"
 
+	assert binary.get() is None
+	binary.update()
 	binary.run()
 	assertBinary("first")
 	assertUpdate(binary.update(), "second")
@@ -66,16 +69,9 @@ def selfTests(cache) -> None:
 	assertBinary("second")
 
 
-def checkBootloaderUpdate(args):
+def autoUpdateApplication(binary) -> None:
+	"""Check if there is an update available."""
 
-	# if bootloader?
-	# run it: bootloader.run(app="apps/bootloader", args=[args.uid])
-	# If succeed
-
-	threading.Timer(10, checkBootloaderUpdate, args=args).start()
-
-
-def fecthApplication(binary) -> None:
 	maybeBinary = binary.update()
 	if maybeBinary:
 		binary.abort()
@@ -88,6 +84,7 @@ if __name__ == "__main__":
 	                    default=pathlib.Path(tempfile.gettempdir()) / f".{pathlib.Path(__file__).name}",
 	                    help="Cache directory.")
 	parser.add_argument("--bootloader", type=str, default=bootloaderDefault, help="Bootloader application.")
+	parser.add_argument("--interval", type=float, default=3600, help="Application and bootloader update interval in seconds.")
 	parser.add_argument("uid", type=str, help="The unique identifier of this instance.")
 	parser.add_argument("app", type=str, nargs="?", default=None, help="The identifier of the application.")
 
@@ -101,18 +98,12 @@ if __name__ == "__main__":
 
 	selfTests(args.cache)
 
-	bootloader = Binary(uid="_bootloader", app=args.bootloader, root=args.cache)
 	binary = Binary(uid=args.uid, app=args.app, root=args.cache)
-	fecthApplication(binary)
-	#checkBootloaderUpdate()
+	#bootloader = Binary(uid="_bootloader", app=args.bootloader, root=args.cache)
 
-	# Launch update thread.
-	"""
-	threadUpdateInstance = threading.Thread(target=threadUpdate, kwargs = {
-		"uid": uid,
-		"app": app
-	})
-	"""
+	scheduler = Scheduler()
+	scheduler.add("application", args.interval, autoUpdateApplication, args=[binary], immediate=True)
+	scheduler.start()
 
 	# Exit if no app is intended to run.
 	if args.app is None:
@@ -120,6 +111,8 @@ if __name__ == "__main__":
 
 	lastFailure = 0
 	while True:
+		binary.wait()
+
 		try:
 			binary.run(args=[], stablePolicy=StablePolicy.runningPast1h)
 			sys.exit(0)

@@ -30,29 +30,39 @@ export default function extensionRelease(plugin, options, provider, endpoints) {
 	}
 }
 
+/// Check if a fileName1 corresponds to a newer release than fileName2.
+///
+/// \param fileName1 The file to be compared.
+/// \param fileName2 The file to compare.
+/// \return The result can be 3 values:
+///         1: if the fileName1 is newer than fileName2.
+///         -1: if the fileName1 is older than fileName2.
+///         0: if they are equal.
+function isNewer(fileName1, fileName2) {
+	if (fileName1 > fileName2) {
+		return 1;
+	}
+	if (fileName1 < fileName2) {
+		return -1;
+	}
+	return 0;
+}
+
 /// Get the file expected to be sent from a list of files.
 function getFile(files, context) {
 	if (files.length == 0) {
 		return null;
 	}
 
-	// Sort alphabetcally in reverse order to have the latest file first.
-	const filesSorted = files.sort((a, b) => {
-		if (a.name > b.name) {
-			return -1;
-		}
-		if (a.name < b.name) {
-			return 1;
-		}
-		return 0;
-	});
+	// Sort with newest file first.
+	const filesSorted = files.sort((a, b) => -isNewer(a.name, b.name));
 	const file = filesSorted[0];
 	const fileName = file.name;
 
-	// If 'after' is provided, check if the file is not this one.
+	// If 'after' is provided, check if the file is newer that this one.
 	const maybePreviousFile = context.getQuery("after");
 	if (maybePreviousFile) {
-		if (fileName == pathlib.path(maybePreviousFile).name) {
+		if (isNewer(fileName, pathlib.path(maybePreviousFile).name) != 1) {
 			return null;
 		}
 	}

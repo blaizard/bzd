@@ -8,9 +8,7 @@ from datetime import datetime
 
 from bzd.http.client import HttpClient
 from bzd.utils.logging import Logger
-from apps.artifacts.plugins.extension.release.config import urls
-
-assert len(urls) > 0, f"'urls' from the config cannot be empty."
+from apps.artifacts.api.python.common import ArtifactsBase
 
 
 class Update:
@@ -47,7 +45,7 @@ class Update:
 		path.write_bytes(self.response.content)
 
 
-class Release:
+class Release(ArtifactsBase):
 
 	@staticmethod
 	def getAlIsa() -> str:
@@ -87,41 +85,34 @@ class Release:
 		# Identify the platform
 		al, isa = Release.getAlIsa()
 		query = {"after": after, "uid": uid, "al": al, "isa": isa}
-		successfullFetch = False
-		errors = {}
 
 		def queryToString():
 			return "&".join([f"{k}={v}" for k, v in query.items() if v is not None])
 
-		for url in urls:
-			fullUrl = f"{url}/x/{path}/"
+		for remote in self.remotes:
+			fullUrl = f"{remote}/x/{path}/"
 
 			try:
-				response = HttpClient.get(fullUrl, query=query, timeoutS=5)
+				response = HttpClient.get(fullUrl, query=query)
 			except Exception as e:
-				errors[fullUrl] = str(e)
-			else:
-				successfullFetch = True
+				Logger.error(f"Exception while fetching {fullUrl}?{queryToString()}: {str(e)}")
+				continue
 
-				# No update available
-				if response.status == 204:
-					continue
+			# No update available
+			if response.status == 204:
+				return None
 
-				# An update was found
-				update = Update(response)
-				if update.name is None:
-					Logger.error(
-					    f"Every update must have a name, the one from {fullUrl}?{queryToString()} doesn't, ignoring.")
-					continue
-				if update.lastModified is None:
-					Logger.error(
-					    f"Every update must have a last modification date, the one from {fullUrl}?{queryToString()} doesn't, ignoring."
-					)
-					continue
-				return update
-
-		if not successfullFetch:
-			Logger.error(f"None of the release remotes are accessible with the query {queryToString()}: \n" +
-			             "\n".join([f"- {url}: {message}" for url, message in errors.items()]))
+			# An update was found
+			update = Update(response)
+			if update.name is None:
+				Logger.error(
+				    f"Every update must have a name, the one from {fullUrl}?{queryToString()} doesn't, ignoring.")
+				continue
+			if update.lastModified is None:
+				Logger.error(
+				    f"Every update must have a last modification date, the one from {fullUrl}?{queryToString()} doesn't, ignoring."
+				)
+				continue
+			return update
 
 		return None
