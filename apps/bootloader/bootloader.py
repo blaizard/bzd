@@ -83,8 +83,12 @@ if __name__ == "__main__":
 	                    type=pathlib.Path,
 	                    default=pathlib.Path(tempfile.gettempdir()) / f".{pathlib.Path(__file__).name}",
 	                    help="Cache directory.")
+	parser.add_argument("--clean", action="store_true", help="Clean the cache before starting.")
 	parser.add_argument("--bootloader", type=str, default=bootloaderDefault, help="Bootloader application.")
-	parser.add_argument("--interval", type=float, default=3600, help="Application and bootloader update interval in seconds.")
+	parser.add_argument("--interval",
+	                    type=float,
+	                    default=3600,
+	                    help="Application and bootloader update interval in seconds.")
 	parser.add_argument("uid", type=str, help="The unique identifier of this instance.")
 	parser.add_argument("app", type=str, nargs="?", default=None, help="The identifier of the application.")
 
@@ -99,6 +103,8 @@ if __name__ == "__main__":
 	selfTests(args.cache)
 
 	binary = Binary(uid=args.uid, app=args.app, root=args.cache)
+	if args.clean:
+		binary.clean()
 	#bootloader = Binary(uid="_bootloader", app=args.bootloader, root=args.cache)
 
 	scheduler = Scheduler()

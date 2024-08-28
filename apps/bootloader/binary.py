@@ -99,12 +99,21 @@ class Binary:
 
 		with self.mutex:
 
-			# Perform the update
+			# Perform the update.
 			maybeLastUpdate = self.manifest.getLastUpdate(self.uid)
-			maybeUpdate = self.release.fetch(path=self.app,
-			                                 uid=self.uid,
-			                                 after=maybeLastUpdate.name if maybeLastUpdate else None)
-			if not maybeUpdate:
+
+		# Check for updates, this can take up to several minutes.
+		maybeUpdate = self.release.fetch(path=self.app,
+		                                 uid=self.uid,
+		                                 after=maybeLastUpdate.name if maybeLastUpdate else None)
+		if not maybeUpdate:
+			return None
+
+		with self.mutex:
+
+			# A concurrent update was made.
+			maybeLastUpdateAfter = self.manifest.getLastUpdate(self.uid)
+			if maybeLastUpdate != maybeLastUpdateAfter:
 				return None
 
 			# Set the binary.
@@ -125,7 +134,7 @@ class Binary:
 					except Exception as e:
 						Logger.error(f"Cannot delete file {f}")
 
-			# Notify that a binary is available
+			# Notify that a binary is available.
 			self.binaryAvailableEvent.set()
 
 			return path
