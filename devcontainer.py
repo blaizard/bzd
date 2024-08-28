@@ -116,7 +116,7 @@ RUN echo "PS1=\\"(devcontainer) \$PS1\\"" >> {self.home}/.bashrc
 			    "--hostname",
 			    self.imageName,
 			    "-v",
-			    f"{self.workspace}:{self.workspace}:rw",
+			    f"{self.workspace}:{self.workspace}",
 			    "-v",
 			    f"{self.homeHost}/.bash_history:{self.home}/.bash_history",
 			    "--workdir",
