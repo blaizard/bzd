@@ -80,7 +80,7 @@ async function getDirectoryFromPlatform(storage, root, al, isa) {
 		for (const directory of directories) {
 			const normalizedDirectoryName = directory.name.toLowerCase();
 			const segments = [...normalizedDirectoryName.split("-"), ...normalizedDirectoryName.split("_")];
-			for (const segment in segments) {
+			for (const segment of segments) {
 				mapPlatformDirectory[segment] ??= new Set();
 				mapPlatformDirectory[segment].add(directory.name);
 			}
@@ -93,6 +93,7 @@ async function getDirectoryFromPlatform(storage, root, al, isa) {
 			counter[key] = 1 + counter[key] || 1;
 			return counter;
 		}, {});
+
 		const occurenceSorted = Object.entries(mapOccurences).sort((a, b) => b[1] - a[1]);
 		if (occurenceSorted.length > 0) {
 			return [...root, occurenceSorted[0][0]];

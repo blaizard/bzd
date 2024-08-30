@@ -24,6 +24,7 @@ py_binary(
     deps = [
         requirement("psutil"),
         "@bzd_python//bzd/http:client",
+        "@bzd_python//bzd/utils:scheduler",
     ],
 )
 

@@ -8,6 +8,7 @@ from apps.node_manager.power import handlersPower
 from apps.node_manager.monitor import handlersMonitor, monitor
 from apps.node_manager.singleton import instanceAlreadyRunning
 from bzd.http.client import HttpClient
+from bzd.utils.scheduler import Scheduler
 
 
 class TimerThread(threading.Thread):
@@ -67,8 +68,9 @@ if __name__ == "__main__":
 			# Ignore any errors, we don't want to crash if something is wrong on the server side.
 			pass
 
-	monitorThread = TimerThread(monitorWorkload, args.report_rate)
-	monitorThread.start()
+	scheduler = Scheduler()
+	scheduler.add("monitor", args.report_rate, monitorWorkload)
+	scheduler.start()
 
 	try:
 		handlers = {**handlersMonitor}
@@ -80,4 +82,4 @@ if __name__ == "__main__":
 		server.run()
 
 	finally:
-		monitorThread.stop()
+		scheduler.stop()

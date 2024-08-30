@@ -69,6 +69,7 @@ if [[ ! -f "$temp/{stamp}" ]]; then
 fi
 
 cd "$temp/{cwd}"
+unset PYTHONPATH # Seems to conflict when called another bundle. To be investigated.
 RUNFILES_DIR="$temp" "{executable}" "$@"
 exit 0;
 

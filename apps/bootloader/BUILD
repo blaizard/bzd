@@ -16,7 +16,6 @@ py_binary(
         "bootloader.py",
         "manifest.py",
         "mutex.py",
-        "scheduler.py",
         "singleton.py",
     ],
     deps = [
@@ -25,6 +24,7 @@ py_binary(
         "//apps/artifacts/api/python/release:mock",
         "@bzd_python//bzd/utils:logging",
         "@bzd_python//bzd/utils:run",
+        "@bzd_python//bzd/utils:scheduler",
     ],
 )
 

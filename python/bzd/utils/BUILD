@@ -68,6 +68,15 @@ py_library(
 )
 
 py_library(
+    name = "scheduler",
+    srcs = ["scheduler.py"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":logging",
+    ],
+)
+
+py_library(
     name = "uart",
     srcs = ["uart.py"],
     visibility = ["//visibility:public"],
