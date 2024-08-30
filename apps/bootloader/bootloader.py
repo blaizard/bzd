@@ -9,7 +9,7 @@ import tempfile
 from apps.bootloader.binary import Binary, BinaryForTest, StablePolicy, ExceptionBinaryAbort
 from apps.bootloader.singleton import Singleton
 from apps.bootloader.config import bootloaderDefault
-from apps.bootloader.scheduler import Scheduler
+from bzd.utils.scheduler import Scheduler
 from bzd.utils.logging import Logger
 
 
@@ -76,6 +76,15 @@ def autoUpdateApplication(binary) -> None:
 	if maybeBinary:
 		binary.abort()
 
+def autoUpdateBootloader(bootloader) -> None:
+	"""Check if there is an update available."""
+
+	maybeBootloader = bootloader.update()
+	if maybeBootloader:
+		try:
+			bootloader.run(args=["hello"], stablePolicy=StablePolicy.returnCodeZero)
+		except Exception as e:
+			Logger.error(f"New bootloader '{maybeBootloader}' failed with error: {str(e)}, ignoring.")
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Bootloader.")
@@ -102,12 +111,14 @@ if __name__ == "__main__":
 
 	selfTests(args.cache)
 
+	bootloader = Binary(uid="_bootloader", app=args.bootloader, root=args.cache)
 	binary = Binary(uid=args.uid, app=args.app, root=args.cache)
 	if args.clean:
 		binary.clean()
-	#bootloader = Binary(uid="_bootloader", app=args.bootloader, root=args.cache)
+		bootloader.clean()
 
 	scheduler = Scheduler()
+	#scheduler.add("bootloader", args.interval, autoUpdateBootloader, args=[bootloader], immediate=True)
 	scheduler.add("application", args.interval, autoUpdateApplication, args=[binary], immediate=True)
 	scheduler.start()
 

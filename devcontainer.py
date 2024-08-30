@@ -60,19 +60,19 @@ RUN apt install -y \
 	wget \
 	sudo
 
-# Add convenience links.
 RUN ln -s {self.workspace}/tools/bazel /usr/local/bin/bazel
 """
 
 		if not self.rootless:
+			# Add a new user.
 			dockerFile += f"""
 RUN groupadd -o --gid {self.gid} {self.user}
 RUN useradd --create-home --no-log-init --uid {self.uid} --gid {self.gid} {self.user}
 USER {self.user}
 """
 
+		# Set the environment.
 		dockerFile += f"""
-# Set the environment.
 COPY ./tools/shell/sh/bashrc.sh {self.home}/.bashrc
 RUN echo "PS1=\\"(devcontainer) \$PS1\\"" >> {self.home}/.bashrc
 """
@@ -101,9 +101,7 @@ RUN echo "PS1=\\"(devcontainer) \$PS1\\"" >> {self.home}/.bashrc
 		elif status == "paused":
 			print("Container paused, unpausing.")
 			subprocess.run(["docker", "unpause", self.imageName], capture_output=True, check=True)
-		elif status == "running":
-			pass
-		else:
+		elif status != "running":
 			print(f"Container in '{status}' state, spawning a clean instance.")
 			self.stop()
 			subprocess.run([
