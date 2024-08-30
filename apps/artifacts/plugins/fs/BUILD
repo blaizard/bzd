@@ -11,11 +11,8 @@ bzd_nodejs_library(
     deps = [
         "//apps/artifacts/backend:plugin",
         "//apps/artifacts/plugins/extension/release",
-        "//nodejs/core:format",
-        "//nodejs/db:utils",
+        "//apps/artifacts/plugins/extension/upload",
         "//nodejs/db/storage:disk",
-        "//nodejs/db/storage:permissions",
-        "//nodejs/utils:pathlib",
     ],
 )
 

@@ -8,7 +8,7 @@ const Exception = ExceptionFactory("plugins", "docker");
 
 export default class Plugin extends PluginBase {
 	constructor(volume, options, provider, endpoints) {
-		super(volume, options);
+		super(volume, options, provider, endpoints);
 
 		provider.addStartProcess(async () => {
 			let storage = null;

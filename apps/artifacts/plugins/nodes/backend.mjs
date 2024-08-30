@@ -76,7 +76,7 @@ function rawBodyParse(body, headersFunc, forceContentType = null, forceCharset =
 
 export default class Plugin extends PluginBase {
 	constructor(volume, options, provider, endpoints) {
-		super(volume, options);
+		super(volume, options, provider, endpoints);
 		this.nodes = null;
 		provider.addStartProcess(async () => {
 			const storage = await makeStorageFromConfig({
