@@ -3,10 +3,10 @@
 load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
 load("@bzd_lib//config:defs.bzl", "bzd_config")
 
-def _bzd_artifacts_release_impl(ctx):
+def _bzd_artifacts_upload_impl(ctx):
     return [sh_binary_wrapper_impl(
         ctx = ctx,
-        binary = ctx.attr._release,
+        binary = ctx.attr._upload,
         output = ctx.outputs.executable,
         command = "{{binary}} --config \"{config}\" --config-version {version} \"{artifact}\" \"{url}\"".format(
             config = ctx.file.config.short_path,
@@ -17,8 +17,8 @@ def _bzd_artifacts_release_impl(ctx):
         data = [ctx.file.target, ctx.file.config],
     )]
 
-_bzd_artifacts_release = rule(
-    implementation = _bzd_artifacts_release_impl,
+_bzd_artifacts_upload = rule(
+    implementation = _bzd_artifacts_upload_impl,
     attrs = {
         "config": attr.label(
             doc = "The configuration to extract the version.",
@@ -39,8 +39,8 @@ _bzd_artifacts_release = rule(
             doc = "The url to publish to.",
             mandatory = True,
         ),
-        "_release": attr.label(
-            default = Label("//apps/artifacts/plugins/fs/release/bazel:release"),
+        "_upload": attr.label(
+            default = Label("//apps/artifacts/api/bazel/upload"),
             cfg = "exec",
             executable = True,
         ),
@@ -48,7 +48,7 @@ _bzd_artifacts_release = rule(
     executable = True,
 )
 
-def bzd_artifacts_release(name, **kwargs):
+def bzd_artifacts_upload(name, **kwargs):
     bzd_config(
         name = "{}.config".format(name),
         # Note, STABLE_VERSION name was chosen to have it part of of the stable-info.txt file
@@ -58,7 +58,7 @@ def bzd_artifacts_release(name, **kwargs):
         visibility = ["//visibility:private"],
     )
 
-    _bzd_artifacts_release(
+    _bzd_artifacts_upload(
         name = name,
         config = "{}.config".format(name),
         config_version = "STABLE_VERSION",

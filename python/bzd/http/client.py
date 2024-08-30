@@ -70,9 +70,7 @@ class HttpClient:
 			queries = []
 			for key, value in query.items():
 				if value is not None:
-					key = urllib.parse.quote(key)
-					value = urllib.parse.quote(value)
-					queries.append(f"{key}={value}")
+					queries.append(f"{urllib.parse.quote(key)}={urllib.parse.quote(value)}")
 			url += "?" + "&".join(queries)
 
 		context = ssl.create_default_context(cafile=certifi.where())

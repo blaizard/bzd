@@ -4,10 +4,15 @@ import Storage from "#bzd/nodejs/db/storage/storage.mjs";
 const Exception = ExceptionFactory("plugin");
 
 export default class PluginBase {
-	constructor(volume, options) {
+	constructor(volume, options, provider, endpoints, extensions = []) {
 		this.volume = volume;
 		this.options = options;
 		this.storage = null;
+
+		// Register extensions.
+		for (const extension of extensions) {
+			extension(this, options, provider, endpoints);
+		}
 	}
 
 	setStorage(storage) {

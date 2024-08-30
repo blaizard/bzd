@@ -29,6 +29,7 @@ class Binary:
 		self.uid = uid
 		self.app = app
 		self.root = root
+		self.args = []
 		self.manifest = Manifest(root / "manifest.json")
 		self.mutex = Mutex(root / "mutex.lock", timeoutS=3600)
 		self.release = Release()
@@ -139,6 +140,11 @@ class Binary:
 
 			return path
 
+	def bind(self, args: typing.Optional[typing.List[str]]) -> None:
+		"""Bind some arguments to the binary."""
+
+		self.args += args
+
 	def run(self,
 	        args: typing.Optional[typing.List[str]] = None,
 	        stablePolicy: typing.Optional[StablePolicy] = None) -> None:
@@ -164,7 +170,7 @@ class Binary:
 			timer.start()
 
 		try:
-			localCommand(cmds=[binary] + (args or []),
+			localCommand(cmds=[binary] + self.args + (args or []),
 			             timeoutS=None,
 			             stdout=True,
 			             stderr=True,
@@ -184,6 +190,7 @@ class Binary:
 		"""Abort the current running binary if any."""
 
 		self.cancellation.cancel()
+		self.binaryAvailableEvent.set()
 
 
 class BinaryForTest(Binary):

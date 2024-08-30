@@ -76,15 +76,32 @@ def autoUpdateApplication(binary) -> None:
 	if maybeBinary:
 		binary.abort()
 
-def autoUpdateBootloader(bootloader) -> None:
+
+def autoUpdateBootloader(bootloader, lifetime) -> None:
 	"""Check if there is an update available."""
 
 	maybeBootloader = bootloader.update()
 	if maybeBootloader:
 		try:
-			bootloader.run(args=["hello"], stablePolicy=StablePolicy.returnCodeZero)
+			# Run the self tests
+			bootloader.run(stablePolicy=StablePolicy.returnCodeZero)
+			lifetime.abort()
 		except Exception as e:
 			Logger.error(f"New bootloader '{maybeBootloader}' failed with error: {str(e)}, ignoring.")
+
+		lifetime.abort()
+
+
+class Lifetime:
+
+	def __init__(self, binary: Binary) -> None:
+		self.running = True
+		self.binary = binary
+
+	def abort(self) -> None:
+		self.running = False
+		self.binary.abort()
+
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Bootloader.")
@@ -98,7 +115,7 @@ if __name__ == "__main__":
 	                    type=float,
 	                    default=3600,
 	                    help="Application and bootloader update interval in seconds.")
-	parser.add_argument("uid", type=str, help="The unique identifier of this instance.")
+	parser.add_argument("uid", type=str, default=None, help="The unique identifier of this instance.")
 	parser.add_argument("app", type=str, nargs="?", default=None, help="The identifier of the application.")
 
 	args = parser.parse_args()
@@ -111,33 +128,36 @@ if __name__ == "__main__":
 
 	selfTests(args.cache)
 
+	# Exit if no app is intended to run.
+	if args.app is None:
+		sys.exit(0)
+
 	bootloader = Binary(uid="_bootloader", app=args.bootloader, root=args.cache)
 	binary = Binary(uid=args.uid, app=args.app, root=args.cache)
 	if args.clean:
 		binary.clean()
 		bootloader.clean()
+	bootloader.bind(args=["--cache", args.cache])
+
+	lifetime = Lifetime(binary)
 
 	scheduler = Scheduler()
-	#scheduler.add("bootloader", args.interval, autoUpdateBootloader, args=[bootloader], immediate=True)
+	scheduler.add("bootloader", args.interval, autoUpdateBootloader, args=[bootloader, lifetime], immediate=True)
 	scheduler.add("application", args.interval, autoUpdateApplication, args=[binary], immediate=True)
 	scheduler.start()
 
-	# Exit if no app is intended to run.
-	if args.app is None:
-		sys.exit(0)
-
 	lastFailure = 0
-	while True:
-		binary.wait()
+	while lifetime.running:
 
 		try:
+			binary.wait()
 			binary.run(args=[], stablePolicy=StablePolicy.runningPast1h)
 			sys.exit(0)
 		except KeyboardInterrupt:
 			Logger.info("<<< Keyboard interrupt >>>")
 			sys.exit(130)
 		except ExceptionBinaryAbort:
-			Logger.info("Application aborted, restart.")
+			Logger.info("Application aborted.")
 			continue
 		except Exception as e:
 			Logger.error(e)
@@ -151,3 +171,5 @@ if __name__ == "__main__":
 			Logger.error("Retrying in 1h.")
 			time.sleep(3600)
 		lastFailure = currentTime
+
+	Logger.info("Application stopped.")

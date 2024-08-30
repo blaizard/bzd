@@ -1,9 +1,9 @@
 load("@rules_python//python:defs.bzl", "py_binary")
 
 py_binary(
-    name = "release",
+    name = "upload",
     srcs = [
-        "release.py",
+        "upload.py",
     ],
     deps = [
         "@bzd_python//bzd/http:client",

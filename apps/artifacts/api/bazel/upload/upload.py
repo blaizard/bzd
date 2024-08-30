@@ -6,7 +6,7 @@ from bzd.http.client import HttpClient
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(
-	    description="Release an artifact. The artifact will be uploaded with the filename <version>-<name>")
+	    description="Upload an artifact. The artifact will be uploaded with the filename <version>-<name>")
 	parser.add_argument(
 	    "--config",
 	    type=pathlib.Path,
