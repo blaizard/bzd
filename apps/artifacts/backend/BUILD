@@ -1,7 +1,7 @@
-load("@bzd_lib//config:defs.bzl", "bzd_config")
+load("@bzd_lib//config:defs.bzl", "bzd_config_default")
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_binary", "bzd_nodejs_library")
 
-bzd_config(
+bzd_config_default(
     name = "config",
     srcs = [
         "config.default.json",

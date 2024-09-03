@@ -37,13 +37,13 @@ class ReleaseMock:
 		"""
 		self.data = data
 
-	def fetch(self, path: str, uid: str, after: typing.Optional[str] = None) -> typing.Optional[Update]:
+	def fetch(self, path: str, uid: str, ignore: typing.Optional[str] = None) -> typing.Optional[Update]:
 		"""Check if there is an update available.
 
 		Args:
 			path: The path to be fetched.
 			uid: The unique identifier of the caller.
-			after: The update must be after this last update filename.
+            ignore: The update must ignore a file that contains the provided string.
 		"""
 
 		# No data for this path.
@@ -53,12 +53,12 @@ class ReleaseMock:
 		pathData = self.data[path]
 
 		# No argument provided.
-		if after is None:
+		if ignore is None:
 			response = Response(pathData[0])
 
 		# Argument provided.
 		else:
-			index = next((i for i, d in enumerate(pathData) if d["name"] == after), None)
+			index = next((i for i, d in enumerate(pathData) if ignore in d["name"]), None)
 			if (index is None) or (index + 1 >= len(pathData)):
 				return None
 			response = Response(pathData[index + 1])
