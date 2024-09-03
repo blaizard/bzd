@@ -59,10 +59,10 @@ function getFile(files, context) {
 	const file = filesSorted[0];
 	const fileName = file.name;
 
-	// If 'after' is provided, check if the file is newer that this one.
-	const maybePreviousFile = context.getQuery("after");
-	if (maybePreviousFile) {
-		if (isNewer(fileName, pathlib.path(maybePreviousFile).name) != 1) {
+	// If 'ignore' is provided, ignore a file if it matches.
+	const ignoreString = context.getQuery("ignore");
+	if (ignoreString) {
+		if (fileName.includes(ignoreString)) {
 			return null;
 		}
 	}

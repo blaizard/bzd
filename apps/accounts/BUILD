@@ -1,11 +1,11 @@
-load("@bzd_lib//config:defs.bzl", "bzd_config")
+load("@bzd_lib//config:defs.bzl", "bzd_config_default")
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_oci")
 
 exports_files([
     "api.v1.json",
 ])
 
-bzd_config(
+bzd_config_default(
     name = "config",
     srcs = [
         "config.default.json",

@@ -73,18 +73,18 @@ class Release(ArtifactsBase):
 
 		return al, isa
 
-	def fetch(self, path: str, uid: str, after: typing.Optional[str] = None) -> typing.Optional[Update]:
+	def fetch(self, path: str, uid: str, ignore: typing.Optional[str] = None) -> typing.Optional[Update]:
 		"""Check if there is an update available.
 
         Args:
 			path: The path to fetch.
 			uid: The unique identifier of the caller.
-            after: The update must be after this last update filename.
+            ignore: The update must ignore a file that contains the provided string.
         """
 
 		# Identify the platform
 		al, isa = Release.getAlIsa()
-		query = {"after": after, "uid": uid, "al": al, "isa": isa}
+		query = {"ignore": ignore, "uid": uid, "al": al, "isa": isa}
 
 		def queryToString():
 			return "&".join([f"{k}={v}" for k, v in query.items() if v is not None])

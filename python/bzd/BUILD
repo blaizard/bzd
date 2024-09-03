@@ -1,6 +1,6 @@
-load("@bzd_lib//config:defs.bzl", "bzd_config")
+load("@bzd_lib//config:defs.bzl", "bzd_config_default")
 
-bzd_config(
+bzd_config_default(
     name = "bin",
     values = {
         "scp": "scp",

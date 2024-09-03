@@ -1,6 +1,6 @@
 """Configuration rules."""
 
-load("//config:private/config.bzl", _bzd_config = "bzd_config")
+load("//config:private/config.bzl", _bzd_config = "bzd_config", _bzd_config_default = "bzd_config_default")
 load(
     "//config:private/config_override.bzl",
     _bzd_config_apply = "bzd_config_apply",
@@ -10,6 +10,7 @@ load(
 )
 
 bzd_config = _bzd_config
+bzd_config_default = _bzd_config_default
 bzd_config_apply = _bzd_config_apply
 bzd_config_apply_binary = _bzd_config_apply_binary
 bzd_config_apply_test = _bzd_config_apply_test

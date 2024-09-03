@@ -1,12 +1,12 @@
-load("@bzd_bundle//:defs.bzl", "bzd_bundle")
-load("@bzd_lib//config:defs.bzl", "bzd_config")
+load("@bzd_lib//config:defs.bzl", "bzd_config_default")
 load("@rules_python//python:defs.bzl", "py_binary")
 
-bzd_config(
+bzd_config_default(
     name = "config",
     srcs = [
         "config.default.json",
     ],
+    include_workspace_status = ["STABLE_VERSION"],
 )
 
 py_binary(
@@ -18,6 +18,10 @@ py_binary(
         "mutex.py",
         "singleton.py",
     ],
+    data = [
+        ":config",
+    ],
+    visibility = ["//visibility:public"],
     deps = [
         ":config",
         "//apps/artifacts/api/python/release",
@@ -26,11 +30,4 @@ py_binary(
         "@bzd_python//bzd/utils:run",
         "@bzd_python//bzd/utils:scheduler",
     ],
-)
-
-bzd_bundle(
-    name = "bundle",
-    binary = ":bootloader",
-    tags = ["manual"],
-    visibility = ["//deployment:__subpackages__"],
 )

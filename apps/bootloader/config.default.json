@@ -1,3 +1,5 @@
 {
-    "bootloaderDefault": "bzd/apps/bootloader"
+    "application": "",
+    "updatePath": "",
+    "updatePolicy": "runningPast1h"
 }
