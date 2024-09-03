@@ -22,5 +22,6 @@ def label_to_key(label):
     return (label.repo_name + "." + ".".join(label.package.split("/")) + "." + label.name).strip(".")
 
 # Number of possible overrides for a target to be used.
+# This is a workaround until we have string_list_flag: https://github.com/bazelbuild/bazel/issues/17828
 NB_OVERRIDE_TARGETS = 10
 override_targets = ["//config:override" + str(i) for i in range(0, NB_OVERRIDE_TARGETS)]
