@@ -381,6 +381,7 @@
 	}
 
 	.selection {
+		display: none;
 		&:after {
 			content: " ";
 			background: #999;
@@ -388,7 +389,6 @@
 			vertical-align: bottom;
 			animation: selection-blink 1s steps(1) infinite;
 		}
-		display: none;
 	}
 
 	.selected .selection {
