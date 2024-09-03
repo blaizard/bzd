@@ -7,6 +7,7 @@ bzd_config_default(
         "config.default.json",
     ],
     include_workspace_status = ["STABLE_VERSION"],
+    visibility = ["//visibility:public"],
 )
 
 py_binary(
