@@ -52,8 +52,10 @@ class Binary:
 
 		return path
 
-	def run(self, args: typing.Optional[typing.List[str]], stablePolicy: typing.Optional[StablePolicy],
-	        stableCallback: typing.Callable[[], None]) -> None:
+	def run(self,
+	        args: typing.Optional[typing.List[str]],
+	        stablePolicy: typing.Optional[StablePolicy] = None,
+	        stableCallback: typing.Optional[typing.Callable[[], None]] = None) -> None:
 		"""Run the binary."""
 
 		self.logger.info(f"Running {self.binary} {' '.join(args or [])}")

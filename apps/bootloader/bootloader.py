@@ -126,7 +126,7 @@ class ContextForTest(Context):
 
 	def __init__(self) -> None:
 		super().__init__()
-		self.release = ReleaseMock(data={"a": [{"name": "first", "binary": b""}]})
+		self.release = ReleaseMock(data={"a": [{"name": "first", "binary": b"#!/bin/bash\nexit 0"}]})
 		self.stableBinary: typing.Optional[pathlib.Path] = None
 
 	def setStableBinary(self, path: pathlib.Path, stablePath: pathlib.Path) -> None:
@@ -142,15 +142,18 @@ def autoUpdateApplication(context: Context, path: pathlib.Path, uid: str) -> Non
 	# Check for updates, this can take up to several minutes.
 	maybeUpdate = context.release.fetch(path=str(path), uid=uid, ignore=STABLE_VERSION)
 	if maybeUpdate:
-		updateFile = tempfile.NamedTemporaryFile(delete=False)
-		updatePath = pathlib.Path(updateFile.name)
+		with tempfile.NamedTemporaryFile(delete=False) as updateFile:
+			updatePath = pathlib.Path(updateFile.name)
 		maybeUpdate.toFile(updatePath)
 		context.logger.error(f"Update written to '{updatePath}'.")
 
 		# Set execution permission.
-		Binary.setPermissions(updatePath)
-
-		context.changeBinary(updatePath)
+		binary = Binary(binary=updatePath)
+		try:
+			binary.run(args=["self-test"])
+			context.changeBinary(updatePath)
+		except Exception as e:
+			context.logger.error(f"Invalid update failed with error: {e}")
 
 
 def bootloader(context: Context, args: typing.List[str]) -> int:
@@ -161,6 +164,9 @@ def bootloader(context: Context, args: typing.List[str]) -> int:
 	"""
 
 	config = BootloaderConfig(args)
+	if config.application == "self-test":
+		return 0
+
 	binary = Binary(binary=config.application)
 	context.registerBinary(binary=binary)
 
