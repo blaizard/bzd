@@ -82,7 +82,7 @@ build:remote --extra_execution_platforms=@bzd_rules_oci//execution_platforms:lin
 build:remote --jobs=24
 build:remote --dynamic_mode=off
 build:remote --spawn_strategy=remote,worker,sandboxed,local
-build:remote --remote_download_minimal
+#build:remote --remote_download_minimal
 build:remote --disk_cache=
 build:remote --define=EXECUTOR=remote
 build:remote --config=docker_sandbox
