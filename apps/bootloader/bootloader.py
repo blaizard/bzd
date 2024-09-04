@@ -6,6 +6,7 @@ import sys
 import time
 import threading
 import tempfile
+import stat
 import itertools
 
 from apps.bootloader.binary import Binary, StablePolicy, ExceptionBinaryAbort
@@ -145,6 +146,10 @@ def autoUpdateApplication(context: Context, path: pathlib.Path, uid: str) -> Non
 		updatePath = pathlib.Path(updateFile.name)
 		maybeUpdate.toFile(updatePath)
 		context.logger.error(f"Update written to '{updatePath}'.")
+
+		# Set execution permission.
+		Binary.setPermissions(updatePath)
+
 		context.changeBinary(updatePath)
 
 
