@@ -29,6 +29,16 @@ class Binary:
 		self.logger = logger or Logger("binary")
 
 	@staticmethod
+	def setPermissions(path: pathlib.Path) -> None:
+		"""Set proper permission to a binary path."""
+
+		# Set execution permission.
+		permissions = path.stat().st_mode
+		path.chmod(permissions | stat.S_IEXEC)
+		permissionsUpdated = path.stat().st_mode
+		assert permissionsUpdated & stat.S_IEXEC, f"Binary '{path}' permissions couldn't be set to +x: {permissionsUpdated}"
+
+	@staticmethod
 	def _validateBinaryPath(path: pathlib.Path) -> pathlib.Path:
 		"""Get the path of a binary to run.
 
@@ -38,11 +48,7 @@ class Binary:
 		if not path.is_file():
 			raise Exception(f"The path '{path}' must point to an existing file.")
 
-		# Set execution permission.
-		permissions = path.stat().st_mode
-		path.chmod(permissions | stat.S_IEXEC)
-		permissionsUpdated = path.stat().st_mode
-		assert permissionsUpdated & stat.S_IEXEC, f"Binary '{path}' permissions couldn't be set to +x: {permissionsUpdated}"
+		Binary.setPermissions(path)
 
 		return path
 
