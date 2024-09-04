@@ -1,7 +1,6 @@
 import typing
 
 from apps.artifacts.api.config import remotes
-from bzd.utils.logging import Logger
 
 assert len(remotes) > 0, f"'remotes' from the API config cannot be empty."
 

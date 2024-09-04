@@ -12,64 +12,9 @@ from apps.bootloader.binary import Binary, StablePolicy, ExceptionBinaryAbort
 from apps.bootloader.singleton import Singleton
 from apps.bootloader.config import STABLE_VERSION, application, updatePath, updatePolicy
 from apps.artifacts.api.python.release.release import Release
+from apps.artifacts.api.python.release.mock import ReleaseMock
 from bzd.utils.scheduler import Scheduler
 from bzd.utils.logging import Logger
-
-
-def selfTests(cache) -> None:
-	"""Perform a sequence of self tests."""
-
-	uid = "_binary_self_test"
-	app = "test"
-
-	binary = BinaryForTest(
-	    uid, app, cache, {
-	        app: [
-	            {
-	                "name": "first",
-	                "binary": b"#!/usr/bin/env bash\nexit 0"
-	            },
-	            {
-	                "name": "second",
-	                "binary": b"#!/usr/bin/env bash\nexit 0"
-	            },
-	            {
-	                "name": "third",
-	                "binary": b"#!/usr/bin/env bash\nexit 1"
-	            },
-	        ]
-	    })
-	binary.clean()
-
-	def assertBinary(name: str) -> None:
-		binaryName = binary.get().name
-		assert binaryName == name, f"Wrong binary expected, received '{binaryName}' instead of '{name}'"
-
-	def assertUpdate(maybeUpdate: typing.Optional[pathlib.Path], name: typing.Optional[str]) -> None:
-		assert (maybeUpdate is not None) or (name is None), f"Expected '{name}' but got no update"
-		assert (name is not None) or (maybeUpdate is None), f"Got '{maybeUpdate.name}' but expected no update"
-		assert (name is None) or (maybeUpdate.name == name), f"Expected '{name}' but got instead '{maybeUpdate.name}'"
-
-	assert binary.get() is None
-	binary.update()
-	binary.run()
-	assertBinary("first")
-	assertUpdate(binary.update(), "second")
-	binary.run(stablePolicy=StablePolicy.returnCodeZero)
-	assertBinary("second")
-	assertUpdate(binary.update(), "third")
-	hasFailed = False
-	try:
-		binary.run()
-	except:
-		hasFailed = True
-	assertBinary("third")
-	assert hasFailed, f"The last binary must have failed."
-	binary.rollback()
-	binary.run()
-	assertBinary("second")
-	assertUpdate(binary.update(), None)
-	assertBinary("second")
 
 
 class BootloaderConfig:
@@ -85,8 +30,8 @@ class BootloaderConfig:
 		parser = argparse.ArgumentParser(description="Bootloader.")
 		parser.add_argument("--update-interval", type=float, help="Application update interval in seconds.")
 		parser.add_argument("--update-policy",
-		                    type=str,
-		                    choices=list(map(lambda c: c.value, StablePolicy)),
+		                    type=StablePolicy,
+		                    choices=[e.value for e in StablePolicy],
 		                    help="Update policy to decide if the application is valid.")
 		parser.add_argument("--update-path", type=pathlib.Path, help="Path to get the update form remote.")
 		parser.add_argument("--self-path",
@@ -152,33 +97,58 @@ class BootloaderConfig:
 		return args
 
 
-class Lifetime:
+class Context:
 
-	def __init__(self, binary: Binary) -> None:
+	def __init__(self) -> None:
 		self.running = True
-		self.binary = binary
+		self.binary: typing.Optional[Binary] = None
 		self.newBinary: typing.Optional[pathlib.Path] = None
+		self.logger = Logger("bootloader")
+		self.release = Release()
+
+	def registerBinary(self, binary: Binary) -> None:
+		self.binary = binary
 
 	def changeBinary(self, newBinary: pathlib.Path) -> None:
 		self.newBinary = newBinary
 		self.running = False
 		self.binary.abort()
 
+	def setStableBinary(self, path: pathlib.Path, stablePath: pathlib.Path) -> None:
+		os.replace(path, stablePath)
 
-def autoUpdateApplication(release, config, lifetime) -> None:
+	def switchProcessToBinary(self, path: pathlib.Path, args: typing.List[str]) -> None:
+		os.execv(path, args)
+
+
+class ContextForTest(Context):
+
+	def __init__(self) -> None:
+		super().__init__()
+		self.release = ReleaseMock(data={"a": [{"name": "first", "binary": b""}]})
+		self.stableBinary: typing.Optional[pathlib.Path] = None
+
+	def setStableBinary(self, path: pathlib.Path, stablePath: pathlib.Path) -> None:
+		self.stableBinary = path
+
+	def switchProcessToBinary(self, path: pathlib.Path, args: typing.List[str]) -> None:
+		pass
+
+
+def autoUpdateApplication(context: Context, path: pathlib.Path, uid: str) -> None:
 	"""Check if there is an update available."""
 
 	# Check for updates, this can take up to several minutes.
-	maybeUpdate = release.fetch(path=config.update_path, uid=config.uid, ignore=STABLE_VERSION)
+	maybeUpdate = context.release.fetch(path=str(path), uid=uid, ignore=STABLE_VERSION)
 	if maybeUpdate:
 		updateFile = tempfile.NamedTemporaryFile(delete=False)
 		updatePath = pathlib.Path(updateFile.name)
 		maybeUpdate.toFile(updatePath)
-		Logger.error(f"Update downloaded to '{updatePath}'.")
-		lifetime.changeBinary(updatePath)
+		context.logger.error(f"Update written to '{updatePath}'.")
+		context.changeBinary(updatePath)
 
 
-def bootloader(args: typing.List[str]) -> int:
+def bootloader(context: Context, args: typing.List[str]) -> int:
 	"""Run the bootloader.
 	
 	Returns:
@@ -187,9 +157,9 @@ def bootloader(args: typing.List[str]) -> int:
 
 	config = BootloaderConfig(args)
 	binary = Binary(binary=config.application)
-	lifetime = Lifetime(binary=binary)
+	context.registerBinary(binary=binary)
 
-	Logger.info(f"Bootloader version {STABLE_VERSION} for {config.application}")
+	context.logger.info(f"Bootloader version {STABLE_VERSION} for {config.application}")
 
 	# Make sure only one instance of the bootloader is running at a time.
 	#singleton = Singleton(args.cache / "singleton.lock")
@@ -201,7 +171,7 @@ def bootloader(args: typing.List[str]) -> int:
 		scheduler.add("application",
 		              config.update_interval,
 		              autoUpdateApplication,
-		              args=[Release(), config, lifetime],
+		              args=[context, config.update_path, config.uid],
 		              immediate=True)
 		scheduler.start()
 
@@ -210,50 +180,79 @@ def bootloader(args: typing.List[str]) -> int:
 		if config.stable_path:
 			assert config.self_path, "Path of the current binary is not provided."
 			if config.stable_path != config.self_path:
-				Logger.info("Updating stable binary.")
-				os.replace(config.self_path, config.stable_path)
+				context.logger.info("Updating stable binary.")
+				context.setStableBinary(config.self_path, config.stable_path)
 
 	lastFailure = 0
-	while lifetime.running:
+	while context.running:
 
 		try:
-			binary.run(args=config.argsRest, stablePolicy=StablePolicy.runningPast1h, stableCallback=stableCallback)
+			binary.run(args=config.argsRest, stablePolicy=config.update_policy, stableCallback=stableCallback)
 			return 0
 		except KeyboardInterrupt:
-			Logger.info("<<< Keyboard interrupt >>>")
+			context.logger.info("<<< Keyboard interrupt >>>")
 			return 130
 		except ExceptionBinaryAbort:
-			Logger.info("Application aborted.")
+			context.logger.info("Application aborted.")
 			continue
 		except Exception as e:
-			Logger.error(e)
+			context.logger.error(e)
 			if config.can_rollback:
-				Logger.info("Rolling back to a stable binary.")
-				lifetime.changeBinary(args.stable_path)
+				context.logger.info("Rolling back to a stable binary.")
+				context.changeBinary(config.stable_path)
 				continue
 
 		currentTime = time.time()
 		timeDiffSinceLastFailure = currentTime - lastFailure
 		if timeDiffSinceLastFailure > 3600 * 2:
-			Logger.error("Retrying immediately.")
+			context.logger.error("Retrying immediately.")
 		else:
-			Logger.error("Retrying in 1h.")
+			context.logger.error("Retrying in 1h.")
 			time.sleep(3600)
 		lastFailure = currentTime
 
-	assert lifetime.newBinary, "Only new binary request must exit the while loop."
+	assert context.newBinary, "Only new binary request must exit the while loop."
 
-	args = config.argsForBinary(lifetime.newBinary)
-	Logger.info(f"Running {lifetime.newBinary} {' '.join(args)}")
-	os.execv(lifetime.newBinary, args)
+	args = config.argsForBinary(context.newBinary)
+	context.logger.info(f"Switch process to {context.newBinary} {' '.join(args)}")
+	context.switchProcessToBinary(context.newBinary, args)
 
-	assert False, f"Nothing should runs past this."
 	return 1
 
 
 if __name__ == "__main__":
 
-	bootloader(args=["--", "--help"])
+	# Test happy path.
+	context = ContextForTest()
+	echoBinary = str(pathlib.Path(__file__).parent / "tests/echo")
+	assert bootloader(context, args=[echoBinary, "--", "hello"]) == 0, "Happy path test failed."
 
-	returnCode = bootloader(sys.argv[1:])
+	# Test rollback.
+	context = ContextForTest()
+	errorBinary = str(pathlib.Path(__file__).parent / "tests/error")
+	assert bootloader(context, args=["--self-path", "a", "--stable-path", "b",
+	                                 errorBinary]) == 1, "Error path test failed."
+	assert context.newBinary is not None
+	assert context.newBinary.name == "b"
+
+	# Test stable binary.
+	context = ContextForTest()
+	assert bootloader(
+	    context,
+	    args=["--update-policy", "returnCodeZero", "--self-path", "a", "--stable-path", "b", echoBinary, "--",
+	          "hello"]) == 0, "Error path test failed."
+	assert context.stableBinary is not None
+	assert context.stableBinary.name == "a"
+
+	# Test update.
+	context = ContextForTest()
+	sleepBinary = str(pathlib.Path(__file__).parent / "tests/sleep")
+	scheduler = Scheduler()
+	scheduler.add("application", 1, autoUpdateApplication, args=[context, pathlib.Path("a"), "uid"])
+	scheduler.start()
+	assert bootloader(context, args=[sleepBinary, "--", "3600"]) == 1, "Update test failed."
+	assert context.newBinary is not None
+	scheduler.stop()
+
+	returnCode = bootloader(Context(), sys.argv[1:])
 	sys.exit(returnCode)

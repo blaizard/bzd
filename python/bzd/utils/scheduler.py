@@ -5,6 +5,8 @@ import time
 
 from bzd.utils.logging import Logger
 
+logger = Logger("scheduler")
+
 
 @dataclasses.dataclass
 class Workload:
@@ -88,7 +90,7 @@ class Scheduler:
 			try:
 				workload.callback(*workload.args, **workload.kwargs)
 			except Exception as e:
-				Logger.error(f"Workload '{workload.name}' failed with error: {str(e)}")
+				logger.error(f"Workload '{workload.name}' failed with error: {str(e)}")
 			finally:
 				self._enqueue(workload, time.time())
 

@@ -10,6 +10,8 @@ from bzd.http.client import HttpClient
 from bzd.utils.logging import Logger
 from apps.artifacts.api.python.common import ArtifactsBase
 
+logger = Logger("release")
+
 
 class Update:
 
@@ -95,7 +97,7 @@ class Release(ArtifactsBase):
 			try:
 				response = HttpClient.get(fullUrl, query=query)
 			except Exception as e:
-				Logger.error(f"Exception while fetching {fullUrl}?{queryToString()}: {str(e)}")
+				logger.error(f"Exception while fetching {fullUrl}?{queryToString()}: {str(e)}")
 				continue
 
 			# No update available
@@ -105,11 +107,11 @@ class Release(ArtifactsBase):
 			# An update was found
 			update = Update(response)
 			if update.name is None:
-				Logger.error(
+				logger.error(
 				    f"Every update must have a name, the one from {fullUrl}?{queryToString()} doesn't, ignoring.")
 				continue
 			if update.lastModified is None:
-				Logger.error(
+				logger.error(
 				    f"Every update must have a last modification date, the one from {fullUrl}?{queryToString()} doesn't, ignoring."
 				)
 				continue

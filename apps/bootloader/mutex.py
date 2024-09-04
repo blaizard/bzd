@@ -7,6 +7,8 @@ import time
 
 from bzd.utils.logging import Logger
 
+logger = Logger("mutex")
+
 
 def _flockNonBlocking(lockFile):
 	try:
@@ -43,7 +45,7 @@ class Mutex:
 			time.sleep(0.1)
 			if time.time() > timestampEnd:
 				# Timeout was raised.
-				Logger.error(f"The mutex {self.path} timed out after {self.timeoutS}s, resetting the lock.")
+				logger.error(f"The mutex {self.path} timed out after {self.timeoutS}s, resetting the lock.")
 				os.close(lockFile)
 				os.remove(self.path)
 				lockFile, timestampEnd = createLockFileTimestamp()
