@@ -8,6 +8,8 @@ from bzd.utils.run import localPython
 from bzd.utils.logging import Logger
 from bzd.utils.binary_builder import makeBinary
 
+logger = Logger("uart")
+
 
 def getDevice(vidPids: typing.List[typing.Tuple[int, int]], device=typing.Optional[Device]) -> Device:
 	"""Search for the most suitable device to program the target."""
@@ -21,18 +23,18 @@ def getDevice(vidPids: typing.List[typing.Tuple[int, int]], device=typing.Option
 		if not filteredDevices.empty():
 			accessibleDevices = filteredDevices.filterByAccess()
 			if accessibleDevices.empty():
-				Logger.error(
+				logger.error(
 				    f"The device(s) {str(filteredDevices.get())} is(are) a match, but you don't have the necessary permission for access."
 				)
-				Logger.error("Use the following command and reboot: sudo usermod -a -G dialout $USER")
+				logger.error("Use the following command and reboot: sudo usermod -a -G dialout $USER")
 				sys.exit(1)
 			return accessibleDevices.get()[0]
 
-		Logger.info(f"No device compatible, please use one from the following list:")
+		logger.info(f"No device compatible, please use one from the following list:")
 		for device, description in devices.getInfo().items():
-			Logger.info(f"- {device}: {description}")
+			logger.info(f"- {device}: {description}")
 		sys.exit(1)
-	Logger.error(f"No device found.")
+	logger.error(f"No device found.")
 	sys.exit(1)
 
 
@@ -79,7 +81,7 @@ if __name__ == "__main__":
 	binary = makeBinary(chunks=args.chunks, size=args.size)
 	device = getDevice(vidPids=[[int(vid, 0), int(pid, 0)] for vid, pid in args.deviceIds], device=args.device)
 
-	Logger.info(f"Programming target through device {device}...")
+	logger.info(f"Programming target through device {device}...")
 
 	esptoolArgs = ["--port", device] + esptoolArgs
 	for chunk in binary.chunks:
@@ -94,9 +96,9 @@ if __name__ == "__main__":
 	)
 
 	if result.getReturnCode() != 0:
-		Logger.error(f"Operation failed with return code {result.getReturnCode()}.")
-		Logger.info("Troubleshooting:")
-		Logger.info("- Connection failed `Timed out waiting for packet header`: try to press the BOOT button.")
+		logger.error(f"Operation failed with return code {result.getReturnCode()}.")
+		logger.info("Troubleshooting:")
+		logger.info("- Connection failed `Timed out waiting for packet header`: try to press the BOOT button.")
 		sys.exit(1)
 
 	uart = Uart(

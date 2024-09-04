@@ -1,3 +1,5 @@
 {
-    "remotes": []
+    "remotes": [
+        "http://localhost:8081"
+    ]
 }

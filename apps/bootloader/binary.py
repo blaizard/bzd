@@ -10,7 +10,7 @@ from bzd.utils.logging import Logger
 from bzd.utils.run import localCommand, Cancellation
 
 
-class StablePolicy(enum.Enum):
+class StablePolicy(str, enum.Enum):
 	returnCodeZero = "returnCodeZero"
 	runningPast10s = "runningPast10s"
 	runningPast1h = "runningPast1h"
@@ -22,10 +22,11 @@ class ExceptionBinaryAbort(Exception):
 
 class Binary:
 
-	def __init__(self, binary: pathlib.Path) -> None:
+	def __init__(self, binary: pathlib.Path, logger: typing.Optional[Logger] = None) -> None:
 		self.binary = Binary._validateBinaryPath(binary)
 		self.cancellation = Cancellation()
 		self.binaryAvailableEvent = threading.Event()
+		self.logger = logger or Logger("binary")
 
 	@staticmethod
 	def _validateBinaryPath(path: pathlib.Path) -> pathlib.Path:
@@ -49,7 +50,7 @@ class Binary:
 	        stableCallback: typing.Callable[[], None]) -> None:
 		"""Run the binary."""
 
-		Logger.info(f"Running {self.binary} {' '.join(args or [])}")
+		self.logger.info(f"Running {self.binary} {' '.join(args or [])}")
 
 		# Timer to set the binary as stable.
 		if stablePolicy == StablePolicy.runningPast10s:

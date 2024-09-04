@@ -47,7 +47,7 @@ class ReleaseMock:
 		"""
 
 		# No data for this path.
-		if (path not in self.data) or (len(self.data[path]) == 0):
+		if len(self.data.get(path, [])) == 0:
 			return None
 
 		pathData = self.data[path]
@@ -58,9 +58,9 @@ class ReleaseMock:
 
 		# Argument provided.
 		else:
-			index = next((i for i, d in enumerate(pathData) if ignore in d["name"]), None)
-			if (index is None) or (index + 1 >= len(pathData)):
+			maybeData = next((data for data in pathData if ignore not in data["name"]), None)
+			if maybeData is None:
 				return None
-			response = Response(pathData[index + 1])
+			response = Response(maybeData)
 
 		return Update(response)
