@@ -22,11 +22,11 @@ class ExceptionBinaryAbort(Exception):
 
 class Binary:
 
-	def __init__(self, binary: pathlib.Path, logger: typing.Optional[Logger] = None) -> None:
+	def __init__(self, binary: pathlib.Path, logger: Logger) -> None:
 		self.binary = Binary._validateBinaryPath(binary)
 		self.cancellation = Cancellation()
 		self.binaryAvailableEvent = threading.Event()
-		self.logger = logger or Logger("binary")
+		self.logger = logger
 
 	@staticmethod
 	def setPermissions(path: pathlib.Path) -> None:

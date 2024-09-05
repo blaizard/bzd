@@ -21,8 +21,8 @@ py_binary(
     ],
     data = [
         ":config",
-        "//apps/bootloader/tests:echo",
         "//apps/bootloader/tests:error",
+        "//apps/bootloader/tests:noop",
         "//apps/bootloader/tests:sleep",
     ],
     visibility = ["//visibility:public"],
