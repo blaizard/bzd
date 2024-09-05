@@ -1,9 +1,9 @@
 load("@rules_python//python:defs.bzl", "py_binary")
 
 py_binary(
-    name = "echo",
+    name = "noop",
     srcs = [
-        "echo.py",
+        "noop.py",
     ],
     visibility = ["//apps/bootloader:__pkg__"],
 )
