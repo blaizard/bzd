@@ -14,6 +14,7 @@ jobs:
 
             - name: "Enable Remote Execution"
               run: |
+                  ./tools/bazel build //deployment/apps/node_manager --config=prod
                   ./tools/bazel run //deployment:remote_wol --config=local
 
             - name: "Environment"
@@ -23,6 +24,7 @@ jobs:
 
             - name: "[normal] static analysis"
               run: |
+                  ./tools/bazel build //deployment/apps/node_manager --config=prod
                   ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=dev --config=clang-tidy --platform_suffix=clang-tidy
 
             - name: "[normal] clang prod"
