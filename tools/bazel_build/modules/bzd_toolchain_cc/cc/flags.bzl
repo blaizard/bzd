@@ -1,15 +1,7 @@
 """CC flags."""
 
 _COPTS_COMMON = [
-    # Warnings.
-    "-Wall",
-    "-Werror",
-    "-Wextra",
-    "-Wpedantic",
-    "-Wvla",
-    "-Wextra-semi",
-    "-Wnull-dereference",
-    "-Wswitch-enum",
+    # Warnings are handled at the repo level, to avoid having warnings for external projects.
 
     # Add debug symbols, will be removed at the postprocessing stage.
     "-ggdb3",

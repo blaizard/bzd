@@ -102,8 +102,16 @@ build:cc --build_tag_filters=cc,-cc-coverage
 test:cc --test_tag_filters=cc,-cc-coverage
 coverage:cc --test_tag_filters=-cc,cc-coverage
 coverage:cc --action_env=COVERAGE_GCOV_OPTIONS=--branch-probabilities
-# To build some external dependencies
-build --host_copt=-Wno-error
+
+# Enable warnings, this applies only to the code within this repository.
+build --copt=-Wall
+build --copt=-Werror
+build --copt=-Wextra
+build --copt=-Wpedantic
+build --copt=-Wvla
+build --copt=-Wextra-semi
+build --copt=-Wnull-dereference
+build --copt=-Wswitch-enum
 
 # Select only Python targets
 build:py --build_tests_only
