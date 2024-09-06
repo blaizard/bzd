@@ -28,7 +28,12 @@ class Bundler:
 					target, path = split
 					if pathlib.Path(path).is_file():
 						tar.add(path, arcname=target)
+						print(target)
 			fd.flush()
+
+			# File size
+			print(fd.seek(0, 2))
+
 			fd.seek(0)
 
 			# Compute the checksum, this ensure reproductibility over builds.
@@ -75,6 +80,7 @@ exit 0;
 #__END_OF_SCRIPT__#
 """.format(executable=str(self.executable), cwd=str(self.cwd), stamp=stamp).encode("utf-8"))
 				fileOut.write(fd.read())
+				fileOut.flush()
 
 		# Set permission to executable.
 		output.chmod(output.stat().st_mode | stat.S_IEXEC)
