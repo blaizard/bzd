@@ -13,11 +13,16 @@ class Bundler:
 		self.executable = executable
 		self.cwd = cwd
 
+		os.system(f"ls -lla {self.path.parent}")
+		print(self.path)
+
 	def process(self, output: pathlib.Path) -> None:
 
 		with tempfile.TemporaryFile(suffix=".tar.gz") as fd:
+
 			# Create an archive with the files from the manifest.
 			with tarfile.open(fileobj=fd, mode="w:gz") as tar:
+				nbFiles = 0
 				for line in self.path.read_text().split("\n"):
 					split = line.split()
 					# Empty line
@@ -28,7 +33,9 @@ class Bundler:
 					target, path = split
 					if pathlib.Path(path).is_file():
 						tar.add(path, arcname=target)
+						nbFiles += 1
 						print(target)
+				assert nbFiles > 0, f"There are no file referenced in the manfest: {self.path}"
 
 			fd.flush()
 			fd.seek(0)
