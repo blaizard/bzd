@@ -34,8 +34,7 @@ class Bundler:
 					if pathlib.Path(path).is_file():
 						tar.add(path, arcname=target)
 						nbFiles += 1
-						print(target)
-				assert nbFiles > 0, f"There are no file referenced in the manfest: {self.path}"
+				assert nbFiles > 0, f"There are no file referenced in the manfest: {self.path}, content:\n{self.path.read_text()}"
 
 			fd.flush()
 			fd.seek(0)
