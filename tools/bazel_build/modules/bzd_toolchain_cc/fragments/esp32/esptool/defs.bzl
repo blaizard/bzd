@@ -21,7 +21,7 @@ def esptool(_module_ctx):
             "urls": [
                 "https://datalocal.blaizard.com/file/bzd/esptool/esptool-4.3.zip",
                 "https://data.blaizard.com/file/bzd/esptool/esptool-4.3.zip",
-            ]
+            ],
         }],
         expose = {
             "esptool": "esptool_binary",

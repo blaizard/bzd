@@ -67,7 +67,7 @@ def multiplatform_repository(name, repositories, expose):
     platform_mapping = {}
     for repository in repositories:
         repository_name = "{}_{}".format(name, "_".join(repository.get("platforms", [])))
-        kwargs = {k: v for k, v in repository.items() if k != "platforms"} 
+        kwargs = {k: v for k, v in repository.items() if k != "platforms"}
         http_archive(
             name = repository_name,
             **kwargs
