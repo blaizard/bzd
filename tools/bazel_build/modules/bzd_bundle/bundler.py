@@ -28,11 +28,12 @@ class Bundler:
 					target, path = split
 					if pathlib.Path(path).is_file():
 						tar.add(path, arcname=target)
+						print(target)
 
 			fd.flush()
 			fd.seek(0)
 
-			print(fd.seek(0,2))
+			print("SIZE:", fd.seek(0,2))
 			fd.seek(0)
 
 			# Compute the checksum, this ensure reproductibility over builds.
