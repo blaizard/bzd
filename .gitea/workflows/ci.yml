@@ -16,6 +16,7 @@ jobs:
               run: |
                   ./tools/bazel build //deployment/apps/node_manager --config=prod
                   ls -lla $(readlink -f bazel-bin/deployment/apps/node_manager/node_manager)
+                  ./tools/bazel run //deployment/apps/node_manager --config=prod
                   ./tools/bazel run //deployment/apps/node_manager:linux_x86_64 --config=prod
                   exit 1
                   ./tools/bazel run //deployment:remote_wol --config=local
