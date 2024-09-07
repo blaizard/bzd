@@ -39,7 +39,7 @@ bzd_bundle = rule(
     attrs = {
         "binary": attr.label(
             mandatory = True,
-            cfg = "exec",
+            cfg = "target",
             executable = True,
             doc = "The binnary target to bundle.",
         ),
