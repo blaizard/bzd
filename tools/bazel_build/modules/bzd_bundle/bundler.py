@@ -4,7 +4,7 @@ import tarfile
 import tempfile
 import stat
 import hashlib
-import os
+
 
 class Bundler:
 
@@ -12,9 +12,6 @@ class Bundler:
 		self.path = path
 		self.executable = executable
 		self.cwd = cwd
-
-		os.system(f"ls -lla {self.path.parent}")
-		print(self.path)
 
 	def process(self, output: pathlib.Path) -> None:
 
@@ -27,23 +24,18 @@ class Bundler:
 					split = list(filter(str.strip, line.split()))
 					if len(split) == 0:
 						continue
-					elif len(split) == 1:
+					elif len(split) <= 2:
 						target = split[0]
-						path = split[0]
-					elif len(split) == 2:
-						target = split[0]
-						path = split[1]
+						path = self.path.parent / split[0]
 					else:
 						raise RuntimeError("Manifest seems to use white spaces which is not supported.")
-					if pathlib.Path(path).is_file():
+					if path.is_file():
 						tar.add(path, arcname=target)
 						nbFiles += 1
-				assert nbFiles > 0, f"There are no file referenced in the manfest: {self.path}, content:\n{self.path.read_text()}"
+
+				assert nbFiles > 0, f"There are no file referenced in the manifest: {self.path}, content:\n{self.path.read_text()[:100]}[...]"
 
 			fd.flush()
-			fd.seek(0)
-
-			print("SIZE:", fd.seek(0,2))
 			fd.seek(0)
 
 			# Compute the checksum, this ensure reproductibility over builds.
@@ -94,7 +86,6 @@ exit 0;
 		# Set permission to executable.
 		output.chmod(output.stat().st_mode | stat.S_IEXEC)
 
-		os.system(f"ls -lla {output}")
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Bundler.")

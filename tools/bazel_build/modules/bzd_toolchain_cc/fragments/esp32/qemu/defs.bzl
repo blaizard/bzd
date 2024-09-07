@@ -21,7 +21,7 @@ def esp32_qemu(_module_ctx):
             "urls": [
                 "https://datalocal.blaizard.com/file/bzd/qemu/esp32/linux_x86_64_8.1.2.tar.xz",
                 "https://data.blaizard.com/file/bzd/qemu/esp32/linux_x86_64_8.1.2.tar.xz",
-            ]
+            ],
         }],
         expose = {
             "qemu": "qemu",
