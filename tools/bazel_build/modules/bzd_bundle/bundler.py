@@ -4,7 +4,7 @@ import tarfile
 import tempfile
 import stat
 import hashlib
-
+import os
 
 class Bundler:
 
@@ -30,6 +30,9 @@ class Bundler:
 						tar.add(path, arcname=target)
 
 			fd.flush()
+			fd.seek(0)
+
+			print(fd.seek(0,2))
 			fd.seek(0)
 
 			# Compute the checksum, this ensure reproductibility over builds.
@@ -80,6 +83,7 @@ exit 0;
 		# Set permission to executable.
 		output.chmod(output.stat().st_mode | stat.S_IEXEC)
 
+		os.system(f"ls -lla {output}")
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Bundler.")
