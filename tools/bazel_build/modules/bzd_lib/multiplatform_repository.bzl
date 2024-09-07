@@ -67,14 +67,10 @@ def multiplatform_repository(name, repositories, expose):
     platform_mapping = {}
     for repository in repositories:
         repository_name = "{}_{}".format(name, "_".join(repository.get("platforms", [])))
+        kwargs = {k: v for k, v in repository.items() if k != "platforms"} 
         http_archive(
             name = repository_name,
-            urls = [
-                repository.get("url"),
-            ],
-            sha256 = repository.get("sha256"),
-            strip_prefix = repository.get("strip_prefix"),
-            build_file = repository.get("build_file"),
+            **kwargs
         )
         for platform in repository.get("platforms", []):
             platform_target = "@bzd_platforms//al_isa:{}".format(platform)

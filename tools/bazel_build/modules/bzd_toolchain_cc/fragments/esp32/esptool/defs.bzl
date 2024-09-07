@@ -18,7 +18,10 @@ def esptool(_module_ctx):
             ],
             "sha256": "b317ce2a532c15eb55a70e290169b9bf25a514fbdb52dce43a3bd5c86fd4a49c",
             "strip_prefix": "esptool-4.3",
-            "url": "https://data.blaizard.com/file/bzd/esptool/esptool-4.3.zip",
+            "urls": [
+                "https://datalocal.blaizard.com/file/bzd/esptool/esptool-4.3.zip",
+                "https://data.blaizard.com/file/bzd/esptool/esptool-4.3.zip",
+            ]
         }],
         expose = {
             "esptool": "esptool_binary",

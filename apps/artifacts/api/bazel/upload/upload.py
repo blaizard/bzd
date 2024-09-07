@@ -38,7 +38,7 @@ if __name__ == "__main__":
 
 	url = args.url + "/" + fileName
 
-	print(f"Uploading {url}...", flush=True, end="")
+	print(f"Uploading {url} ({args.artifact.stat().st_size} bytes)...", flush=True, end="")
 	HttpClient.put(
 	    url=args.url + "/" + fileName,
 	    file=args.artifact,
