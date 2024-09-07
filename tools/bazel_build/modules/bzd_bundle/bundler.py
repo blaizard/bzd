@@ -24,13 +24,17 @@ class Bundler:
 			with tarfile.open(fileobj=fd, mode="w:gz") as tar:
 				nbFiles = 0
 				for line in self.path.read_text().split("\n"):
-					split = line.split()
-					# Empty line
-					if len(split) < 2:
+					split = list(filter(str.strip, line.split()))
+					if len(split) == 0:
 						continue
-					elif len(split) > 2:
+					elif len(split) == 1:
+						target = split[0]
+						path = split[0]
+					elif len(split) == 2:
+						target = split[0]
+						path = split[1]
+					else:
 						raise RuntimeError("Manifest seems to use white spaces which is not supported.")
-					target, path = split
 					if pathlib.Path(path).is_file():
 						tar.add(path, arcname=target)
 						nbFiles += 1
