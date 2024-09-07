@@ -15,7 +15,7 @@ jobs:
             - name: "Enable Remote Execution"
               run: |
                   ./tools/bazel run //deployment:remote_wol --config=local
-                  ./tools/bazel run //deployment/apps/node_manager --config=prod
+                  ./tools/bazel build //deployment/apps/node_manager --config=prod
                   ls -lla $(readlink -f bazel-bin/deployment/apps/node_manager/node_manager) || echo "XXXXXXXX"
 
             - name: "Environment"
