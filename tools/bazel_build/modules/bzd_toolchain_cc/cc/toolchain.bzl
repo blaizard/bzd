@@ -98,7 +98,7 @@ def _impl(repository_ctx):
 
     # Download the data.
     repository_ctx.download_and_extract(
-        url = repository_ctx.attr.url,
+        url = repository_ctx.attr.urls,
         sha256 = repository_ctx.attr.sha256,
         stripPrefix = repository_ctx.attr.strip_prefix,
     )
@@ -144,7 +144,7 @@ _toolchain_maker_linux = repository_rule(
         "sysroot": attr.string(),
         "system_directories": attr.string_list(),
         "tools": attr.string_dict(),
-        "url": attr.string(mandatory = True),
+        "urls": attr.string_list(mandatory = True),
     },
 )
 
