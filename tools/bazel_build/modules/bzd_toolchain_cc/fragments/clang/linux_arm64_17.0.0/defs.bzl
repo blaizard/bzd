@@ -60,7 +60,10 @@ def linux_arm64(module_ctx, name):
             "/usr/include/aarch64-linux-gnu",
             "/usr/include",
         ],
-        "url": "https://data.blaizard.com/file/bzd/toolchains/cc/clang/linux_arm64/linux_arm64_17.0.0.tar.xz",
+        "urls": [
+            "https://datalocal.blaizard.com/file/bzd/toolchains/cc/clang/linux_arm64/linux_arm64_17.0.0.tar.xz",
+            "https://data.blaizard.com/file/bzd/toolchains/cc/clang/linux_arm64/linux_arm64_17.0.0.tar.xz",
+        ],
     }
 
     toolchain_definition = toolchain_merge(toolchain_definition, linux(module_ctx, name))

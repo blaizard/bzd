@@ -69,7 +69,10 @@ def linux_x86_64(module_ctx, name):
             "{}/lib/gcc/xtensa-esp32-elf/12.2.0/include".format(repository_path),
             "{}/lib/gcc/xtensa-esp32-elf/12.2.0/include-fixed".format(repository_path),
         ],
-        "url": "https://data.blaizard.com/file/bzd/toolchains/cc/gcc/esp32_xtensa_lx6/xtensa-esp32-elf-12.2.0_20230208-x86_64-linux-gnu.tar.xz",
+        "urls": [
+            "https://datalocal.blaizard.com/file/bzd/toolchains/cc/gcc/esp32_xtensa_lx6/xtensa-esp32-elf-12.2.0_20230208-x86_64-linux-gnu.tar.xz",
+            "https://data.blaizard.com/file/bzd/toolchains/cc/gcc/esp32_xtensa_lx6/xtensa-esp32-elf-12.2.0_20230208-x86_64-linux-gnu.tar.xz",
+        ],
     }
 
     toolchain_definition = toolchain_merge(toolchain_definition, esp32_xtensa_lx6_sdk(module_ctx))
