@@ -17,11 +17,11 @@ if [ $? -eq 0 ]; then
 	# Vim as default
 	alias vi=vim
 	alias edit='vim'
-	git config --global core.editor "vim"
+	git config --global core.editor "vim" 2> /dev/null
 else
 	# Vi as default
 	alias edit='vi'
-	git config --global core.editor "vi"
+	git config --global core.editor "vi" 2> /dev/null
 fi
 
 # Reload the configuration if needed
