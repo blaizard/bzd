@@ -32,10 +32,11 @@ class Binary:
 	def setPermissions(path: pathlib.Path) -> None:
 		"""Set proper permission to a binary path."""
 
-		# Set execution permission.
-		path.chmod(path.stat().st_mode | stat.S_IEXEC)
-		assert path.stat(
-		).st_mode & stat.S_IEXEC, f"Binary '{path}' permissions couldn't be set to +x: {permissionsUpdated}"
+		# Set execution permission if needed.
+		if path.stat().st_mode & stat.S_IEXEC == 0:
+			path.chmod(path.stat().st_mode | stat.S_IEXEC)
+			assert path.stat(
+			).st_mode & stat.S_IEXEC, f"Binary '{path}' permissions couldn't be set to +x: {permissionsUpdated}"
 
 	@staticmethod
 	def _validateBinaryPath(path: pathlib.Path) -> pathlib.Path:
