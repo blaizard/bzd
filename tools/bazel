@@ -10,6 +10,7 @@ import stat
 import struct
 import subprocess
 import sys
+import ssl
 
 def processRun(args) -> None:
 	"""Execute a process and exit if it fails."""
@@ -69,7 +70,10 @@ if __name__== "__main__":
 
 		url = "https://github.com/bazelbuild/bazelisk/releases/download/v1.20.0/{}".format(basename)
 		print(f"No bazel binary detected, downloading bazelisk from {url}...", flush=True)
-		with urllib.request.urlopen(url) as response, open(bazeliskPath, "wb") as f:
+		ctx = ssl.create_default_context()
+		ctx.check_hostname = False
+		ctx.verify_mode = ssl.CERT_NONE
+		with urllib.request.urlopen(url, context=ctx) as response, open(bazeliskPath, "wb") as f:
 			shutil.copyfileobj(response, f)
 
 		# Set permissions and update bazel binary path

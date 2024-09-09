@@ -1,6 +1,8 @@
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 load("@rules_python//python:defs.bzl", "py_binary")
 
+exports_files(["executable_test.py"])
+
 py_binary(
     name = "json_merge",
     srcs = [

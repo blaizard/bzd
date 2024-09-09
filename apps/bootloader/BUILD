@@ -1,3 +1,4 @@
+load("@bzd_lib//:executable_test.bzl", "bzd_executable_test")
 load("@bzd_lib//config:defs.bzl", "bzd_config_default")
 load("@rules_python//python:defs.bzl", "py_binary")
 
@@ -34,4 +35,10 @@ py_binary(
         "@bzd_python//bzd/utils:run",
         "@bzd_python//bzd/utils:scheduler",
     ],
+)
+
+bzd_executable_test(
+    name = "test",
+    executable = ":bootloader",
+    expected_output = "Nothing to run",
 )
