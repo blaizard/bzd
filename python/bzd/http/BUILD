@@ -15,3 +15,9 @@ py_library(
     srcs = ["server.py"],
     visibility = ["//visibility:public"],
 )
+
+py_library(
+    name = "utils",
+    srcs = ["utils.py"],
+    visibility = ["//visibility:public"],
+)
