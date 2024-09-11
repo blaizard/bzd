@@ -9,6 +9,7 @@ from apps.node_manager.monitor import handlersMonitor, monitor
 from apps.node_manager.singleton import instanceAlreadyRunning
 from bzd.http.client import HttpClient
 from bzd.utils.scheduler import Scheduler
+from apps.artifacts.api.python.node.node import Node
 
 
 class TimerThread(threading.Thread):
@@ -32,10 +33,6 @@ if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="WOL manager.")
 	parser.add_argument("--bind", default="0.0.0.0", help="Address to bind.")
 	parser.add_argument("--port", default=9999, type=int, help="Port to bind.")
-	parser.add_argument("--report-endpoint",
-	                    default="https://data.blaizard.com/x/nodes",
-	                    type=str,
-	                    help="The endpoint to report data.")
 	parser.add_argument("--report-rate",
 	                    default=5,
 	                    type=int,
@@ -57,13 +54,16 @@ if __name__ == "__main__":
 
 	# Ensure only a single instance of this program is running at a time.
 	if instanceAlreadyRunning("node_manager"):
+		print("Another instance of 'node_manager' is already running, aborting.")
 		sys.exit(0)
+
+	node = Node()
 
 	# Start the thread to monitor the node.
 	def monitorWorkload() -> None:
 		data = monitor()
 		try:
-			HttpClient.post(f"{args.report_endpoint}/{args.uid}/data", json=data)
+			node.publish(uid=args.uid, data=data)
 		except:
 			# Ignore any errors, we don't want to crash if something is wrong on the server side.
 			pass

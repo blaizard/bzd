@@ -3,6 +3,7 @@ import subprocess
 import sys
 import time
 import threading
+import signal
 from typing import Any, List, Dict, Optional, Tuple, TextIO, Union
 from pathlib import Path
 import selectors
@@ -115,16 +116,33 @@ class Cancellation:
 		with self.mutex:
 			self._cancel()
 
+	@staticmethod
+	def killall(gid: int, sig: signal, timeoutS: float = 5.) -> bool:
+		"""Try to kill all process from the given group.
+
+		Args:
+			gid: Group identifier.
+			sig: The signal to be sent.
+			timeoutS: The timeout in seconds.
+
+		Returns:
+			True if all processes have been killed, False otherwise.
+		"""
+
+		timeStart = time.time()
+		while time.time() - timeStart <= timeoutS:
+			try:
+				os.killpg(gid, sig)
+			except:
+				return True
+		return False
+
 	def _cancel(self) -> None:
 		self.triggered = True
 		if self.proc:
-			self.proc.terminate()
-			# Wait until the process terminates
-			timeStart = time.time()
-			while self.proc.poll() is None:
-				if time.time() - timeStart > self.timeBeforeKillS:
-					self.proc.kill()
-				time.sleep(0.1)
+			gid = os.getpgid(self.proc.pid)
+			if not Cancellation.killall(gid, signal.SIGTERM):
+				Cancellation.killall(gid, signal.SIGKILL)
 
 
 def localCommand(
@@ -156,14 +174,14 @@ def localCommand(
 
 	sel = selectors.DefaultSelector()
 	stream = ExecuteResultStreamWriter(stdout, stderr, maxOutputSize)
-	proc = subprocess.Popen(
-	    cmds,
-	    cwd=cwd,
-	    stdout=subprocess.PIPE,
-	    stdin=None if stdin else subprocess.PIPE,
-	    stderr=subprocess.PIPE,
-	    env=env,
-	)
+	proc = subprocess.Popen(cmds,
+	                        cwd=cwd,
+	                        stdout=subprocess.PIPE,
+	                        stdin=None if stdin else subprocess.PIPE,
+	                        stderr=subprocess.PIPE,
+	                        env=env,
+	                        start_new_session=True)
+	gid = os.getpgid(proc.pid)
 	if cancellation:
 		cancellation.reset(proc)
 	timer: threading.Timer = threading.Timer(timeoutS,
@@ -197,6 +215,7 @@ def localCommand(
 
 	finally:
 		timer.cancel()
+		Cancellation.killall(gid, signal.SIGKILL)
 
 	result = ExecuteResult(stream=stream, returncode=returnCode)
 

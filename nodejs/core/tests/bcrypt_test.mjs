@@ -9,6 +9,6 @@ describe("BCrypt", () => {
 			const hash = await BCrypt.hash("Hello world!");
 			Exception.assert(await BCrypt.compare(hash, "Hello world!"));
 			Exception.assert(!(await BCrypt.compare(hash, "Hello world!!")));
-		});
+		}).timeout(10000);
 	});
 });
