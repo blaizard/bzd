@@ -21,6 +21,7 @@ from bzd.utils.logging import Logger, InMemoryLogger, StubLogger
 class Context:
 
 	def __init__(self, args: typing.List[str], logger: Logger) -> None:
+		self.args = args
 		self.values, self.rest = Context.parse(args)
 		self.running = True
 		self.binary: typing.Optional[Binary] = None
@@ -130,7 +131,7 @@ class Context:
 		self.updateIgnoreOverride = ignore
 
 	def switchProcessToBinary(self, path: pathlib.Path, args: typing.List[str]) -> None:
-		os.execv(path, args)
+		os.execv(path, [str(path), *args])
 
 
 class ContextForTest(Context):
@@ -166,7 +167,7 @@ def autoUpdateApplication(context: Context, path: pathlib.Path, uid: str) -> Non
 		with tempfile.NamedTemporaryFile(delete=False) as updateFile:
 			updatePath = pathlib.Path(updateFile.name)
 		maybeUpdate.toFile(updatePath)
-		context.logger.error(f"Update written to '{updatePath}'.")
+		context.logger.info(f"Update written to '{updatePath}'.")
 
 		# Set execution permission.
 		binary = Binary(binary=updatePath, logger=StubLogger("binary"))
@@ -192,7 +193,9 @@ def bootloader(context: Context) -> int:
 	binary = Binary(binary=context.application, logger=context.logger)
 	context.registerBinary(binary=binary)
 
-	context.logger.info(f"Bootloader version {STABLE_VERSION} for {context.application}")
+	context.logger.info(
+	    f"Bootloader version {STABLE_VERSION} for application {context.application} with given args: {' '.join(context.args)}"
+	)
 
 	# Make sure only one instance of the bootloader is running at a time.
 	#singleton = Singleton(args.cache / "singleton.lock")

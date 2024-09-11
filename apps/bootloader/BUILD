@@ -16,7 +16,6 @@ py_binary(
     srcs = [
         "binary.py",
         "bootloader.py",
-        "manifest.py",
         "mutex.py",
         "singleton.py",
     ],

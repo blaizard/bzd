@@ -1,4 +1,5 @@
 {
+    "defaultNodeVolume": "dummy",
     "remotes": [
         "http://localhost:8081"
     ]

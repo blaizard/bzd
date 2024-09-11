@@ -7,6 +7,7 @@ py_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        "//apps/artifacts/api:config",
         "//apps/artifacts/api/python:common",
         "@bzd_python//bzd/http:client",
         "@bzd_python//bzd/http:utils",

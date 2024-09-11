@@ -128,3 +128,23 @@ single_version_override(
         "//tools/bazel_build:workaround_nixos_usr_bin_env.patch",
     ],
 )
+
+# Config
+
+config = use_extension("@bzd_lib//config:extensions.bzl", "config")
+
+# Use: bazel query 'kind("_bzd_config_flag", //...)'
+# and remove the .set prefix to get the list of targets.
+config.register(
+    defaults = [
+        "//apps/accounts:config",
+        "//apps/accounts/backend:config",
+        "//apps/accounts/example:config",
+        "//apps/artifacts:config",
+        "//apps/artifacts/api:config",
+        "//apps/artifacts/backend:config",
+        "//apps/bootloader:config",
+        "//apps/dashboard/backend:config",
+        "//apps/screen_recorder:config",
+    ],
+)

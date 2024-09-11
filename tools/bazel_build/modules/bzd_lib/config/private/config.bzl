@@ -1,7 +1,7 @@
 """Configuration rules."""
 
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
-load("//config:private/common.bzl", "ConfigInfo", "ConfigOverrideInfo", "label_to_key", "override_targets")
+load("//config:private/common.bzl", "ConfigInfo")
 load("//lib:attrs.bzl", "ATTRS_COMMON_BUILD_RULES", "attrs_assert_any_of")
 
 def _bzd_config_flag_impl(ctx):
@@ -31,8 +31,8 @@ def _target_to_runfiles(ctx, target):
 def _bzd_config_impl(ctx):
     key_values = [keyValue for keyValue in ctx.attr.set_flag[BuildSettingInfo].value if keyValue] if ctx.attr.set_flag else []
 
-    input_files = [] + ctx.files.srcs
-    override_files = [] + ctx.files.file_flag
+    input_files = depset(ctx.files.srcs)
+    override_files = depset()
     workspace_status_files = []
     runfiles = ctx.runfiles().merge_all([_target_to_runfiles(ctx, target) for target in ctx.attr.data])
 
@@ -46,26 +46,26 @@ def _bzd_config_impl(ctx):
             output = values_file,
             content = json.encode(expanded_values),
         )
-        input_files.append(values_file)
+        input_files = depset([values_file], transitive = [input_files])
 
     if ctx.attr.include_workspace_status:
         workspace_status_files.append(ctx.info_file)
         workspace_status_files.append(ctx.version_file)
 
-    # Override config and runfiles from ConfigOverrideInfo.
-    for override_flag in ctx.attr.override_flag_list:
-        if ConfigOverrideInfo in override_flag:
-            label_key = label_to_key(ctx.label)
-            config_override_files = override_flag[ConfigOverrideInfo].files
-            if label_key in config_override_files:
-                override_files.append(config_override_files[label_key])
-            config_override_runfiles = override_flag[ConfigOverrideInfo].runfiles
-            if label_key in config_override_runfiles:
-                runfiles = runfiles.merge(config_override_runfiles[label_key])
+    if ctx.attr.file_flag:
+        if ctx.attr.file_flag.label == Label("//config:empty"):
+            pass
+        elif ConfigInfo in ctx.attr.file_flag:
+            override_files = depset([ctx.attr.file_flag[ConfigInfo].json], transitive = [override_files])
+            runfiles = runfiles.merge(ctx.attr.file_flag[ConfigInfo].runfiles)
+        elif ctx.files.file_flag:
+            override_files = depset(ctx.files.file_flag, transitive = [override_files])
+        else:
+            fail("Invalid config override target type: {} {}".format(ctx.attr.file_flag.label))
 
     # Build the default configuration.
     ctx.actions.run(
-        inputs = input_files + override_files + workspace_status_files,
+        inputs = depset(workspace_status_files, transitive = [input_files, override_files]),
         outputs = [ctx.outputs.output_json],
         progress_message = "Generating default configuration for {}...".format(ctx.label),
         arguments = [
@@ -74,10 +74,10 @@ def _bzd_config_impl(ctx):
                         ctx.outputs.output_json.path,
                     ] +
                     ["--set=" + key_value for key_value in key_values] +
-                    ["--file=" + f.path for f in override_files] +
+                    ["--file=" + f.path for f in override_files.to_list()] +
                     ["--workspace-status-file=" + f.path for f in workspace_status_files] +
                     ["--workspace-status-key=" + key for key in ctx.attr.include_workspace_status] +
-                    [f.path for f in input_files],
+                    [f.path for f in input_files.to_list()],
         executable = ctx.executable._config_merge,
     )
 
@@ -122,9 +122,6 @@ _bzd_config = rule(
         ),
         "output_json": attr.output(
             doc = "Create a json configuration.",
-        ),
-        "override_flag_list": attr.label_list(
-            doc = "Override the configuration if needed with these flags.",
         ),
         "set_flag": attr.label(
             doc = "Build settings to modify the configuration using key/value pair.",
@@ -210,7 +207,6 @@ def bzd_config_default(name, srcs = None, values = None, include_workspace_statu
         set_flag = ":{}.set".format(name),
         file_flag = ":{}.file".format(name),
         output_json = "{}.json".format(name),
-        override_flag_list = [Label(target) for target in override_targets],
         srcs = srcs or [],
         values = values or {},
         include_workspace_status = include_workspace_status or [],

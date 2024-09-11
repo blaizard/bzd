@@ -4,6 +4,7 @@ import time
 import threading
 import stat
 import enum
+import io
 
 from apps.artifacts.api.python.release.release import Release
 from bzd.utils.logging import Logger
@@ -18,6 +19,15 @@ class StablePolicy(str, enum.Enum):
 
 class ExceptionBinaryAbort(Exception):
 	pass
+
+
+class OutputToLogger(io.StringIO):
+
+	def __init__(self, logger: Logger) -> None:
+		self.logger = logger
+
+	def write(self, text: str) -> None:
+		self.logger.info(text)
 
 
 class Binary:
@@ -73,8 +83,8 @@ class Binary:
 		try:
 			localCommand(cmds=[self.binary] + (args or []),
 			             timeoutS=None,
-			             stdout=True,
-			             stderr=True,
+			             stdout=OutputToLogger(self.logger),
+			             stderr=OutputToLogger(self.logger),
 			             cancellation=self.cancellation)
 			if stablePolicy == StablePolicy.returnCodeZero:
 				stableCallback()

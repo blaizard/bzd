@@ -26,7 +26,7 @@ class Bundler:
 						continue
 					elif len(split) <= 2:
 						target = split[0]
-						path = self.path.parent / split[0]
+						path = (self.path.parent / split[0]).resolve()
 					else:
 						raise RuntimeError("Manifest seems to use white spaces which is not supported.")
 					if path.is_file():
@@ -76,8 +76,9 @@ if [[ ! -f "$temp/{stamp}" ]]; then
 fi
 
 cd "$temp/{cwd}"
-BZD_BUNDLE="$0" RUNFILES_DIR="$temp" "{executable}" "$@"
-exit 0;
+export BZD_BUNDLE="$0"
+export RUNFILES_DIR="$temp"
+exec "{executable}" "$@"
 
 #__END_OF_SCRIPT__#
 """.format(executable=str(self.executable), cwd=str(self.cwd), stamp=stamp).encode("utf-8"))

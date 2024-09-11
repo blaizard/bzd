@@ -1,6 +1,6 @@
 """Configuration override rules."""
 
-load("//config:private/common.bzl", "ConfigInfo", "ConfigOverrideInfo", "label_to_key", "override_targets")
+load("@config_defaults//:defs.bzl", "CONFIG_DEFAULTS")
 load("//lib:attrs.bzl", "ATTRS_COMMON_BUILD_RULES", "attrs_assert_any_of")
 
 # This list was taken from here: https://github.com/fmeum/with_cfg.bzl/blob/main/with_cfg/private/rule_defaults.bzl
@@ -29,113 +29,40 @@ _DEFAULT_PROVIDERS = [
     platform_common.ToolchainInfo,
 ]
 
-def _bzd_config_override_impl(ctx):
-    if len(ctx.attr.configs) != len(ctx.attr.targets):
-        fail("The number of configs must match the number of targets.")
-
-    files = {}
-    runfiles = {}
-    for config, target in zip(ctx.attr.configs, ctx.attr.targets):
-        if ConfigInfo in target:
-            files[config] = target[ConfigInfo].json
-            runfiles[config] = target[ConfigInfo].runfiles
-        elif DefaultInfo in target:
-            target_files = target[DefaultInfo].files.to_list()
-            if len(target_files) != 1:
-                fail("There must be exactly 1 file associated with the target {} for overriding config '{}', not {}.".format(target, config, len(target_files)))
-            files[config] = target_files[0]
-        else:
-            fail("Unsupported target {} for overriding config '{}'.".format(target, config))
-
-    return [ConfigOverrideInfo(
-        files = files,
-        runfiles = runfiles,
-    )]
-
-_bzd_config_override = rule(
-    doc = "Apply a configuration to its dependencies.",
-    implementation = _bzd_config_override_impl,
-    attrs = {
-        "configs": attr.string_list(
-            doc = "Configurations targets to be updated.",
-            mandatory = True,
-        ),
-        "targets": attr.label_list(
-            doc = "Configurations values to be applied.",
-            mandatory = True,
-            allow_files = True,
-        ),
-    },
-    provides = [ConfigOverrideInfo],
-)
-
-def _bzd_config_override_check_impl(ctx):
-    return [DefaultInfo(
-        files = depset([config[ConfigInfo].json for config in ctx.attr.configs]),
-    )]
-
-_bzd_config_override_check = rule(
-    doc = "Checks that the config is pointing to a bzd_config rule.",
-    implementation = _bzd_config_override_check_impl,
-    attrs = {
-        "configs": attr.label_list(
-            doc = "Configurations targets to be updated.",
-            providers = [ConfigInfo],
-            mandatory = True,
-        ),
-    },
-)
-
-def _bzd_config_override_macro(name, configs, **kwargs):
-    """Override a configuration and provide a target that can be used with //config:override.
-
-    Args:
-        name: The name of the target.
-        configs: A dictionary which keys are the ConfigInfo targets and values are the value files.
-        **kwargs: extra common build rules attributes.
-    """
-
-    attrs_assert_any_of(kwargs, ATTRS_COMMON_BUILD_RULES)
-
-    _bzd_config_override_check(
-        name = "{}.check".format(name),
-        configs = configs.keys(),
-        visibility = ["//visibility:private"],
-    )
-
-    _bzd_config_override(
-        name = name,
-        configs = [label_to_key(native.package_relative_label(config)) for config in configs.keys()],
-        targets = configs.values(),
-        **kwargs
-    )
-
 # ---- Transitions ----
 
 def _bzd_transition_config_override_impl(settings, attr):
-    if not hasattr(attr, "config_override"):
-        fail("This rule does not contain a config_override attribute.")
-    if not attr.config_override:
-        return {}
+    for key in ["config_overrides", "config_values"]:
+        if not hasattr(attr, key):
+            fail("The rule '{}' is used as a transition but does not contain a '{}' attribute.".format(attr, key))
 
-    # Check that there are remaining spots.
-    if settings[override_targets[-1]] != Label("//config:empty"):
-        fail("Override conflict for {}, cannot override more than {} values:\n{}".format(
-            attr.target,
-            len(override_targets),
-            "\n".join(["- " + str(settings[t]) for t in override_targets] + ["- " + str(attr.config_override)]),
-        ))
+    if len(attr.config_overrides) != len(attr.config_values):
+        fail("There must be as many config_overrides as config_values: {} vs {}".format(len(attr.config_overrides), len(attr.config_values)))
 
-    # Shift the overrides and set the new one.
-    output = {k: settings[target] for k, target in zip(override_targets[1:], override_targets)}
-    output[override_targets[0]] = str(attr.config_override)
+    # Make a copy.
+    outputs = dict(settings.items())
 
-    return output
+    # Apply the transitions and do some checks.
+    for override, value in zip(attr.config_overrides, attr.config_values):
+        label = override.same_package_label("{}.file".format(override.name))
+        label_str = str(label)
+        if label_str not in CONFIG_DEFAULTS:
+            fail(
+                "The config target '{}' is not registered as a valid override, only the following are:\n{}\nPlease register the default config with the extension.".format(
+                    label_str,
+                    ",\n".join(["- " + s for s in CONFIG_DEFAULTS]),
+                ),
+            )
+        if outputs[label_str] != Label("//config:empty"):
+            fail("The configuration '{}' is overwritten twice.".format(label_str))
+        outputs[label_str] = value
+
+    return outputs
 
 _bzd_transition_config_override = transition(
     implementation = _bzd_transition_config_override_impl,
-    inputs = override_targets,
-    outputs = override_targets,
+    inputs = CONFIG_DEFAULTS,
+    outputs = CONFIG_DEFAULTS,
 )
 
 # ---- Factory ----
@@ -180,9 +107,14 @@ def make_bzd_config_apply(name = None, providers = None, executable = False, tes
         doc = "Apply a specific configuration to a target.",
         implementation = _bzd_config_apply_impl,
         attrs = {
-            "config_override": attr.label(
-                doc = "Configuration to be overridden.",
-                providers = [ConfigOverrideInfo],
+            "config_overrides": attr.label_list(
+                doc = "Configuration to be overritten.",
+                mandatory = True,
+            ),
+            "config_values": attr.label_list(
+                doc = "Configurations values to be applied.",
+                mandatory = True,
+                allow_files = True,
             ),
             "target": attr.label(
                 mandatory = True,
@@ -195,25 +127,23 @@ def make_bzd_config_apply(name = None, providers = None, executable = False, tes
         test = test,
     )
 
-    def _bzd_config_apply_macro(name, configs, **kwargs):
+    def _bzd_config_apply_macro(name, target, configs, **kwargs):
         """Apply a configuration to the specified target.
 
         Args:
             name: The name of the target.
+            target: The target associated with this application.
             configs: The configuration to be applied.
             **kwargs: Extra arguments to be propagated to the rule.
         """
 
-        _bzd_config_override_macro(
-            name = "{}.config_override".format(name),
-            configs = configs,
-            tags = ["manual"],
-            visibility = ["//visibility:private"],
-        )
+        attrs_assert_any_of(kwargs, ATTRS_COMMON_BUILD_RULES)
 
         _bzd_config_apply_rule(
             name = name,
-            config_override = "{}.config_override".format(name),
+            target = target,
+            config_overrides = configs.keys(),
+            config_values = configs.values(),
             **kwargs
         )
 
