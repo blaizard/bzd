@@ -111,3 +111,5 @@ is determined at compile time, ensuring no memory allocation at runtime, making 
 ## TODO
 
 - Fix this test: //cc/bzd/core/async/tests:multithread (it hangs from time to time with clang prod).
+- Move .clang-tidy to tools/cc/.clang-tidy (use root symlink).
+- Make mypy an aspects in bzd_sanitizer module.
