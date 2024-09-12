@@ -91,7 +91,7 @@ clang_tidy_aspect = aspect(
     attrs = {
         "_clang_tidy": attr.label(
             doc = "Clang-tidy binary to be used.",
-            default = Label("//tools/clang_tidy"),
+            default = Label("//aspects/clang_tidy"),
         ),
     },
     attr_aspects = ["deps"],

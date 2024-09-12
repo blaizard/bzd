@@ -171,12 +171,14 @@ def autoUpdateApplication(context: Context, path: pathlib.Path, uid: str) -> Non
 
 		# Set execution permission.
 		binary = Binary(binary=updatePath, logger=StubLogger("binary"))
+		context.registerBinary(binary=binary)
 		try:
 			binary.run(args=["."])
-			context.changeBinary(updatePath)
 		except Exception as e:
 			context.logger.error(f"Invalid update failed with error: {e}")
 			context.setUpdateIgnore(maybeUpdate.name)
+		else:
+			context.changeBinary(updatePath)
 
 
 def bootloader(context: Context) -> int:

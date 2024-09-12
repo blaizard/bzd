@@ -158,7 +158,7 @@ build:esp32 --platform_suffix=esp32-xtensa_lx6-gcc
 test:esp32 --strategy=TestRunner=sandboxed
 
 # clang-tidy
-build:clang-tidy --aspects=//tools/clang_tidy:defs.bzl%clang_tidy_aspect
+build:clang-tidy --aspects="@bzd_sanitizer//aspects/clang_tidy:defs.bzl%clang_tidy_aspect"
 build:clang-tidy --output_groups=+report
 
 # Development and production build configuration

@@ -21,13 +21,49 @@ class ExceptionBinaryAbort(Exception):
 	pass
 
 
-class OutputToLogger(io.StringIO):
+class StdOutputToLogger(io.TextIOBase):
+	"""Proxy the standard output to a logger.
+	
+	It also buffers the output to ensure the content is properly displayed.
+	"""
 
-	def __init__(self, logger: Logger) -> None:
+	def __init__(self, logger: Logger, bufferTimeS: float = 1., maxBufferSize: int = 10000) -> None:
+		super().__init__()
+		self.buffer = ""
+		self.bufferTimeS = bufferTimeS
+		self.maxBufferSize = maxBufferSize
 		self.logger = logger
+		self.stopRequested = False
+		self.timeEvent = threading.Event()
+		self.worker = threading.Thread(target=self.collector)
+
+	def collector(self) -> None:
+
+		while not self.stopRequested:
+			if self.timeEvent.wait(timeout=self.bufferTimeS):
+				self.timeEvent.set()
+			elif len(self.buffer) > 0:
+				self.flush()
+			if len(self.buffer) > self.maxBufferSize:
+				self.flush()
+		self.flush()
 
 	def write(self, text: str) -> None:
-		self.logger.info(text)
+		self.buffer += text
+		self.timeEvent.set()
+
+	def __enter__(self) -> "StdOutputToLogger":
+		self.worker.start()
+		return self
+
+	def __exit__(self, *_: typing.Any) -> None:
+		self.stopRequested = True
+		self.timeEvent.set()
+		self.worker.join()
+
+	def flush(self) -> None:
+		self.logger.info(self.buffer)
+		self.buffer = ""
 
 
 class Binary:
@@ -35,7 +71,6 @@ class Binary:
 	def __init__(self, binary: pathlib.Path, logger: Logger) -> None:
 		self.binary = Binary._validateBinaryPath(binary)
 		self.cancellation = Cancellation()
-		self.binaryAvailableEvent = threading.Event()
 		self.logger = logger
 
 	@staticmethod
@@ -80,25 +115,25 @@ class Binary:
 		if timer:
 			timer.start()
 
-		try:
-			localCommand(cmds=[self.binary] + (args or []),
-			             timeoutS=None,
-			             stdout=OutputToLogger(self.logger),
-			             stderr=OutputToLogger(self.logger),
-			             cancellation=self.cancellation)
-			if stablePolicy == StablePolicy.returnCodeZero:
-				stableCallback()
-		except Exception as e:
-			if self.cancellation.triggered:
-				raise ExceptionBinaryAbort()
-			raise
-		finally:
-			self.cancellation.reset()
-			if timer:
-				timer.cancel()
+		with StdOutputToLogger(self.logger) as stdOutput:
+			try:
+				localCommand(cmds=[self.binary] + (args or []),
+				             timeoutS=None,
+				             stdout=stdOutput,
+				             stderr=stdOutput,
+				             cancellation=self.cancellation)
+				if stablePolicy == StablePolicy.returnCodeZero:
+					stableCallback()
+			except Exception as e:
+				if self.cancellation.triggered:
+					raise ExceptionBinaryAbort()
+				raise
+			finally:
+				self.cancellation.reset()
+				if timer:
+					timer.cancel()
 
 	def abort(self) -> None:
 		"""Abort the current running binary if any."""
 
 		self.cancellation.cancel()
-		self.binaryAvailableEvent.set()
