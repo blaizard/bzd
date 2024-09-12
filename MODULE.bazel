@@ -120,31 +120,18 @@ images.install(
 )
 use_repo(images, "docker")
 
+# Sanitizer
+
+sanitizer = use_extension("@bzd_sanitizer//:extensions.bzl", "sanitizer")
+sanitizer.clang_tidy(
+    binary = "//:clang_tidy",
+)
+
 # Fix for NixOS, this is a workaround until this open issue is solved:
 # https://github.com/NixOS/nixpkgs/issues/289505
 single_version_override(
     module_name = "rules_oci",
     patches = [
         "//tools/bazel_build:workaround_nixos_usr_bin_env.patch",
-    ],
-)
-
-# Config
-
-config = use_extension("@bzd_lib//config:extensions.bzl", "config")
-
-# Use: bazel query 'kind("_bzd_config_flag", //...)'
-# and remove the .set prefix to get the list of targets.
-config.register(
-    defaults = [
-        "//apps/accounts:config",
-        "//apps/accounts/backend:config",
-        "//apps/accounts/example:config",
-        "//apps/artifacts:config",
-        "//apps/artifacts/api:config",
-        "//apps/artifacts/backend:config",
-        "//apps/bootloader:config",
-        "//apps/dashboard/backend:config",
-        "//apps/screen_recorder:config",
     ],
 )

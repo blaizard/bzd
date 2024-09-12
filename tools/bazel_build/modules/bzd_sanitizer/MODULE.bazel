@@ -9,6 +9,13 @@ bazel_dep(name = "bzd_python", version = "1.0")
 bazel_dep(name = "bzd_rules_nodejs", version = "1.0")
 bazel_dep(name = "buildifier_prebuilt", version = "6.4.0")
 
+# Configuration
+
+sanitizer = use_extension("//:extensions.bzl", "sanitizer")
+use_repo(sanitizer, "bzd_sanitizer_config")
+
+# Python
+
 pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
 pip.parse(
     hub_name = "bzd_sanitizer_pip",

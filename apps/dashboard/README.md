@@ -3,7 +3,7 @@
 ## Test Locally
 
 ```bash
-bazel run apps/dashboard/backend --config=dev --//apps/dashboard/backend:config.file=//deployment/apps/dashboard_blaizard_com:config.test.json
+bazel run deployment/apps/dashboard:test --config=dev
 ```
 
 Restart either frontend/backend to rebuild and inject any update.

@@ -1,7 +1,8 @@
 load("@bzd_bundle//:defs.bzl", "bzd_bundle")
-load("@bzd_lib//config:defs.bzl", "bzd_config", "bzd_config_apply_binary")
+load("@bzd_lib//config:defs.bzl", "bzd_config")
 load("@pip//:requirements.bzl", "requirement")
 load("@rules_python//python:defs.bzl", "py_binary")
+load("//apps/bootloader:defs.bzl", "bzd_bootloader_binary")
 
 py_binary(
     name = "client",
@@ -41,12 +42,11 @@ bzd_config(
     },
 )
 
-bzd_config_apply_binary(
+bzd_bootloader_binary(
     name = "with_bootloader",
     configs = {
         "//apps/bootloader:config": ":bootloader_config",
     },
-    target = "//apps/bootloader",
 )
 
 bzd_bundle(
