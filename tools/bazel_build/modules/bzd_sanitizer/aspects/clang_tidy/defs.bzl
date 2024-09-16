@@ -1,4 +1,4 @@
-"""clang_tidy aspect rule."""
+"""clang-tidy aspect rule."""
 
 load("@bazel_tools//tools/build_defs/cc:action_names.bzl", "ACTION_NAMES")
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
@@ -82,7 +82,7 @@ def _clang_tidy_aspect_impl(target, ctx):
         outputs += dep[OutputGroupInfo].report.to_list()
 
     return [
-        OutputGroupInfo(report = depset(direct = outputs)),
+        OutputGroupInfo(clang_tidy = depset(direct = outputs)),
     ]
 
 clang_tidy_aspect = aspect(
@@ -91,6 +91,8 @@ clang_tidy_aspect = aspect(
     attrs = {
         "_clang_tidy": attr.label(
             doc = "Clang-tidy binary to be used.",
+            executable = True,
+            cfg = "exec",
             default = Label("//aspects/clang_tidy"),
         ),
     },

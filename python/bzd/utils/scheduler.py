@@ -14,7 +14,7 @@ class Workload:
 
 	name: str
 	intervalS: float
-	callback: typing.Callable[[...], None]
+	callback: typing.Callable[..., None]
 	args: typing.List[typing.Any]
 	kwargs: typing.Dict[str, typing.Any]
 	# The workload should start immediately.
@@ -26,8 +26,8 @@ class Workload:
 class Scheduler:
 
 	def __init__(self) -> None:
-		self.workloads = []
-		self.queue = []
+		self.workloads: typing.List[Workload] = []
+		self.queue: typing.List[Workload] = []
 		self.worker = threading.Thread(target=self._process, daemon=True)
 		self.triggerStop = threading.Event()
 
@@ -50,7 +50,7 @@ class Scheduler:
 	def add(self,
 	        name: str,
 	        intervalS: float,
-	        callback: typing.Callable[[...], None],
+	        callback: typing.Callable[..., None],
 	        immediate: bool = False,
 	        args: typing.Optional[typing.List[typing.Any]] = None,
 	        kwargs: typing.Optional[typing.Dict[str, typing.Any]] = None) -> None:

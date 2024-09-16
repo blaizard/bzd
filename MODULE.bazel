@@ -126,6 +126,10 @@ sanitizer = use_extension("@bzd_sanitizer//:extensions.bzl", "sanitizer")
 sanitizer.clang_tidy(
     binary = "//tools/cc:clang_tidy",
 )
+sanitizer.mypy(
+    binary = "//tools/python:mypy",
+    config = "//tools/python:mypy.ini",
+)
 
 # Fix for NixOS, this is a workaround until this open issue is solved:
 # https://github.com/NixOS/nixpkgs/issues/289505

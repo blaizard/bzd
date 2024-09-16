@@ -24,18 +24,18 @@ CPU loads are in percent.
 
 def monitorTemperatures() -> typing.Any:
 	data = {}
-	temperatures = psutil.sensors_temperatures()
+	temperatures = psutil.sensors_temperatures()  # type: ignore
 	for name, group in temperatures.items():
 		data[name] = [item.current for item in group]
 	return data
 
 
 def monitorCPUs() -> typing.Any:
-	return {"main": [*psutil.cpu_percent(interval=1, percpu=True)]}
+	return {"main": [*psutil.cpu_percent(interval=1, percpu=True)]}  # type: ignore
 
 
 def monitorBatteries() -> typing.Any:
-	maybeBattery = psutil.sensors_battery()
+	maybeBattery = psutil.sensors_battery()  # type: ignore
 	if maybeBattery is None:
 		return []
 	else:
@@ -43,16 +43,16 @@ def monitorBatteries() -> typing.Any:
 
 
 def monitorMemories() -> typing.Any:
-	virtual = psutil.virtual_memory()
-	swap = psutil.swap_memory()
+	virtual = psutil.virtual_memory()  # type: ignore
+	swap = psutil.swap_memory()  # type: ignore
 	return {"ram": [virtual.used, virtual.total], "swap": [swap.used, swap.total]}
 
 
 def monitorDisks() -> typing.Any:
 	disks = {}
-	for partition in psutil.disk_partitions():
+	for partition in psutil.disk_partitions():  # type: ignore
 		if partition.device not in disks:
-			usage = psutil.disk_usage(partition.mountpoint)
+			usage = psutil.disk_usage(partition.mountpoint)  # type: ignore
 			disks[partition.device] = [usage.used, usage.total]
 	return disks
 

@@ -14,15 +14,15 @@ class Logger:
 		self.logger = logging.getLogger(name)
 
 	@property
-	def info(self):
+	def info(self) -> typing.Callable[[str], None]:
 		return self.logger.info
 
 	@property
-	def warning(self):
+	def warning(self) -> typing.Callable[[str], None]:
 		return self.logger.warning
 
 	@property
-	def error(self):
+	def error(self) -> typing.Callable[[str], None]:
 		return self.logger.error
 
 
@@ -40,7 +40,7 @@ class CallbackHandler(logging.Handler):
 		super().__init__()
 		self.callback = callback
 
-	def emit(self, record) -> None:
+	def emit(self, record: typing.Any) -> None:
 		msg = self.format(record)
 		self.callback(msg)
 
