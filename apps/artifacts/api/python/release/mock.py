@@ -13,7 +13,7 @@ class Response:
 
 	@property
 	def content(self) -> bytes:
-		return self.data["binary"]
+		return typing.cast(bytes, self.data["binary"])
 
 	def getHeader(self, key: str) -> typing.Optional[str]:
 		headers = {

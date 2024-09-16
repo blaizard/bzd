@@ -106,9 +106,9 @@ class Binary:
 		self.logger.info(f"Running {self.binary} {' '.join(args or [])}")
 
 		# Timer to set the binary as stable.
-		if stablePolicy == StablePolicy.runningPast10s:
+		if stableCallback and stablePolicy == StablePolicy.runningPast10s:
 			timer = threading.Timer(10, stableCallback)
-		elif stablePolicy == StablePolicy.runningPast1h:
+		elif stableCallback and stablePolicy == StablePolicy.runningPast1h:
 			timer = threading.Timer(3600, stableCallback)
 		else:
 			timer = None
@@ -122,7 +122,7 @@ class Binary:
 				             stdout=stdOutput,
 				             stderr=stdOutput,
 				             cancellation=self.cancellation)
-				if stablePolicy == StablePolicy.returnCodeZero:
+				if stableCallback and stablePolicy == StablePolicy.returnCodeZero:
 					stableCallback()
 			except Exception as e:
 				if self.cancellation.triggered:

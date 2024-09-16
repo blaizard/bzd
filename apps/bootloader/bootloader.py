@@ -65,8 +65,8 @@ class Context:
 		return self.values.bootloader_application or pathlib.Path(application)
 
 	@property
-	def updatePolicy(self) -> str:
-		return self.values.bootloader_update_policy or updatePolicy
+	def updatePolicy(self) -> StablePolicy:
+		return StablePolicy(self.values.bootloader_update_policy or updatePolicy)
 
 	@property
 	def updateInterval(self) -> float:
@@ -74,30 +74,26 @@ class Context:
 
 	@property
 	def updatePath(self) -> typing.Optional[pathlib.Path]:
-		return self.values.bootloader_update_path or updatePath
+		return typing.cast(typing.Optional[pathlib.Path],
+		                   self.values.bootloader_update_path) or pathlib.Path(updatePath)
 
 	@property
-	def updateIgnore(self) -> str:
-		return self.updateIgnoreOverride or self.values.bootloader_update_ignore
+	def updateIgnore(self) -> typing.Optional[str]:
+		return self.updateIgnoreOverride or typing.cast(typing.Optional[str], self.values.bootloader_update_ignore)
 
 	@property
 	def stablePath(self) -> typing.Optional[pathlib.Path]:
-		return self.values.bootloader_stable_path
+		return typing.cast(typing.Optional[pathlib.Path], self.values.bootloader_stable_path)
 
 	@property
 	def selfPath(self) -> typing.Optional[pathlib.Path]:
-		return self.values.bootloader_self_path
+		return typing.cast(typing.Optional[pathlib.Path], self.values.bootloader_self_path)
 
 	@property
 	def uid(self) -> typing.Optional[str]:
-		return self.values.bootloader_uid
+		return typing.cast(typing.Optional[str], self.values.bootloader_uid)
 
-	@property
-	def canRollback(self) -> bool:
-		"""If the current binary can rollback to a stable binary."""
-		return self.stablePath and self.stablePath != self.selfPath
-
-	def argsForBinary(self, binary: pathlib.Path) -> None:
+	def argsForBinary(self, binary: pathlib.Path) -> typing.List[str]:
 		"""Recreate the command line."""
 
 		args = ["--bootloader-self-path", str(binary)]
@@ -122,6 +118,7 @@ class Context:
 	def changeBinary(self, newBinary: pathlib.Path) -> None:
 		self.newBinary = newBinary
 		self.running = False
+		assert self.binary is not None
 		self.binary.abort()
 
 	def setStableBinary(self, path: pathlib.Path, stablePath: pathlib.Path) -> None:
@@ -176,7 +173,8 @@ def autoUpdateApplication(context: Context, path: pathlib.Path, uid: str) -> Non
 			binary.run(args=["."])
 		except Exception as e:
 			context.logger.error(f"Invalid update failed with error: {e}")
-			context.setUpdateIgnore(maybeUpdate.name)
+			if maybeUpdate.name:
+				context.setUpdateIgnore(maybeUpdate.name)
 		else:
 			context.changeBinary(updatePath)
 
@@ -221,7 +219,7 @@ def bootloader(context: Context) -> int:
 				context.logger.info("Updating stable binary.")
 				context.setStableBinary(context.selfPath, context.stablePath)
 
-	lastFailure = 0
+	lastFailure = 0.
 	while context.running:
 
 		try:
@@ -234,8 +232,8 @@ def bootloader(context: Context) -> int:
 			context.logger.info("Application aborted.")
 			continue
 		except Exception as e:
-			context.logger.error(e)
-			if context.canRollback:
+			context.logger.error(str(e))
+			if context.stablePath and context.stablePath != context.selfPath:
 				context.logger.info("Rolling back to a stable binary.")
 				context.changeBinary(context.stablePath)
 				continue
@@ -258,7 +256,7 @@ def bootloader(context: Context) -> int:
 	return 1
 
 
-def runSelfTests(logger) -> None:
+def runSelfTests(logger: Logger) -> None:
 	"""Running all the self tests."""
 
 	noopBinary = str(pathlib.Path(__file__).parent / "tests/noop")
