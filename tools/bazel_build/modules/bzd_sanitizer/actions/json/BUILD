@@ -8,6 +8,6 @@ py_binary(
     main = "cli.py",
     visibility = ["//visibility:public"],
     deps = [
-        "@bzd_sanitizer//python/bzd_sanitizer:worker",
+        "//python/bzd_sanitizer:worker",
     ],
 )

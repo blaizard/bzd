@@ -18,7 +18,7 @@ py_library(
         "worker.py",
     ],
     visibility = [
-        "@bzd_sanitizer//:__subpackages__",
+        "//:__subpackages__",
     ],
     deps = [
         ":context",
