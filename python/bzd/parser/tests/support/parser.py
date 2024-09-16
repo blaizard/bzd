@@ -63,7 +63,7 @@ _grammarFunctionDeclaration = [
 _grammar: Grammar = _grammarVariableDeclaration + _grammarFunctionDeclaration
 
 
-class TestParser(Parser):  # type: ignore
+class TestParser(Parser):
 
 	def __init__(self, content: str) -> None:
 		super().__init__(

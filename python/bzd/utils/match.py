@@ -13,7 +13,7 @@ def getMatchingWeight(word: str, compareWith: str) -> float:
 
 	firstChar = word[0]
 	start = -1
-	weight = 0
+	weight: float = 0.
 
 	def compareWithGetCharAtOrNone(index: int) -> typing.Optional[str]:
 		return compareWith[index] if index < len(compareWith) else None
@@ -23,13 +23,13 @@ def getMatchingWeight(word: str, compareWith: str) -> float:
 		if start == -1:
 			break
 		# If this is the first character of a word, add a weight to prioritize this word
-		curWeight = 1 if start == 0 else 0.9
+		curWeight = 1. if start == 0 else 0.9
 		iSentence = start
 		# Check if the word is +/- 1 character far away
 		for i in range(1, len(word)):
 			c = word[i]
 			if compareWithGetCharAtOrNone(iSentence + 1) == c:
-				curWeight += 1
+				curWeight += 1.
 				iSentence += 1
 			elif compareWithGetCharAtOrNone(iSentence + 2) == c:
 				curWeight += 0.5
@@ -50,7 +50,7 @@ def getMatchingWeight(word: str, compareWith: str) -> float:
 	return weight
 
 
-def sortMatchingWeight(word: str, compareWithList: typing.List[str], minWeight: int = 0.5) -> typing.List[str]:
+def sortMatchingWeight(word: str, compareWithList: typing.List[str], minWeight: float = 0.5) -> typing.List[str]:
 	weightList = [(
 	    compareWith,
 	    getMatchingWeight(word, compareWith),

@@ -58,6 +58,12 @@ def _mypy_aspect_impl(target, ctx):
         # Build the list of root path.
         roots.append(src.root.path or ".")
 
+    mypy_info = MyPyInfo(transitive_sources = depset(mypy_srcs, transitive = [mypy_transitive_srcs]))
+
+    # If there are no files, do nothing.
+    if len(mypy_srcs) == 0:
+        return [mypy_info]
+
     args = ctx.actions.args()
 
     # This flag tells mypy that top-level packages will be based in either the
@@ -94,7 +100,7 @@ def _mypy_aspect_impl(target, ctx):
 
     return [
         OutputGroupInfo(mypy = depset(direct = [output])),
-        MyPyInfo(transitive_sources = depset(mypy_srcs, transitive = [mypy_transitive_srcs])),
+        mypy_info,
     ]
 
 mypy_aspect = aspect(

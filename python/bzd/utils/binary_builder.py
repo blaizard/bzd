@@ -35,6 +35,7 @@ class Binary:
 
 			# Create the full file.
 			if self.isSize:
+				assert self.size is not None
 				fout.seek(self.size - 1)
 				fout.write(b"\0")
 
@@ -44,6 +45,7 @@ class Binary:
 					fout.seek(chunk.address)
 					fout.write(fin.read())
 					if chunk.isMaxSize:
+						assert chunk.maxSize is not None
 						assert fin.tell(
 						) <= chunk.maxSize, f"The chunk '{chunk}' is too large ({fin.tell()}) to fit into the binary."
 
@@ -90,24 +92,24 @@ def makeBinary(chunks: typing.Iterable[str], size: typing.Optional[str] = None) 
 	# Update the max size.
 	nextChunkIndex = 0
 	for nextChunkIndex in range(1, len(binary.chunks)):
-		chunk = binary.chunks[nextChunkIndex - 1]
+		chunkObject = binary.chunks[nextChunkIndex - 1]
 		nextChunk = binary.chunks[nextChunkIndex]
 
-		availableSize = nextChunk.address - chunk.address
-		if chunk.isMaxSize:
-			assert chunk.isMaxSize <= availableSize, f"The maximum size defined for {chunk}, is larger the available size ({availableSize}) between chunks (next chunk starts at address {nextChunk.address})."
+		availableSize = nextChunk.address - chunkObject.address
+		if chunkObject.isMaxSize:
+			assert chunkObject.isMaxSize <= availableSize, f"The maximum size defined for {chunkObject}, is larger the available size ({availableSize}) between chunks (next chunk starts at address {nextChunk.address})."
 		else:
-			chunk.maxSize = availableSize
+			chunkObject.maxSize = availableSize
 
 	# Compare the last chunk size with the maxSize if defined.
 	if len(binary.chunks) > 0 and binary.isSize:
-		chunk = binary.chunks[nextChunkIndex]
-		availableSize = binary.size - chunk.address
+		chunkObject = binary.chunks[nextChunkIndex]
+		availableSize = binary.size - chunkObject.address
 		assert availableSize > 0, f"There is no size available for the last chunk: {availableSize} given the size constraint of {binary.size}."
-		if chunk.isMaxSize:
-			assert chunk.isMaxSize <= availableSize, f"The maximum size defined for {chunk}, is larger the available size ({availableSize}) for the last chunk given the size constraint of {binary.size}."
+		if chunkObject.isMaxSize:
+			assert chunkObject.isMaxSize <= availableSize, f"The maximum size defined for {chunkObject}, is larger the available size ({availableSize}) for the last chunk given the size constraint of {binary.size}."
 		else:
-			chunk.maxSize = availableSize
+			chunkObject.maxSize = availableSize
 
 	return binary
 
