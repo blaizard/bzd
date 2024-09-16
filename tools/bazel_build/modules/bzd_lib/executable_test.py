@@ -30,7 +30,7 @@ if __name__ == "__main__":
 	)
 	args = parser.parse_args()
 
-	result = localCommand(cmds=[args.executable] + args.rest, ignoreFailure=True)
+	result = localCommand(cmds=[str(args.executable)] + args.rest, ignoreFailure=True)
 
 	nbChecks = 0
 

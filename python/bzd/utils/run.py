@@ -31,26 +31,26 @@ class ExecuteResultStreamWriter:
 			self.output.pop(0)
 
 	@staticmethod
-	def stdout(message: str) -> None:
+	def _printToStdout(message: str) -> None:
 		print(message, flush=True, end="", file=sys.stdout)
 
 	@staticmethod
-	def stderr(message: str) -> None:
+	def _printToStderr(message: str) -> None:
 		print(message, flush=True, end="", file=sys.stderr)
 
 	def addStdout(self, data: bytes) -> None:
 		if data != b"":
 			self._addBuffer(True, data)
 			if self.stdout is not False:
-				write = ExecuteResultStreamWriter.stdout if isinstance(self.stdout, bool) else self.stdout.write
-				write(data.decode(errors="ignore"))
+				write = ExecuteResultStreamWriter._printToStdout if isinstance(self.stdout, bool) else self.stdout.write
+				write(data.decode(errors="ignore"))  # type: ignore
 
 	def addStderr(self, data: bytes) -> None:
 		if data != b"":
 			self._addBuffer(False, data)
 			if self.stderr is not False:
-				write = ExecuteResultStreamWriter.stderr if isinstance(self.stderr, bool) else self.stderr.write
-				write(data.decode(errors="ignore"))
+				write = ExecuteResultStreamWriter._printToStderr if isinstance(self.stderr, bool) else self.stderr.write
+				write(data.decode(errors="ignore"))  # type: ignore
 
 
 class ExecuteResult:
@@ -123,7 +123,7 @@ class Cancellation:
 			self._cancel()
 
 	@staticmethod
-	def killall(gid: int, sig: signal, timeoutS: float = 5.) -> bool:
+	def killall(gid: int, sig: signal.Signals, timeoutS: float = 5.) -> bool:
 		"""Try to kill all process from the given group.
 
 		Args:
