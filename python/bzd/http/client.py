@@ -5,11 +5,12 @@ import pathlib
 import mimetypes
 import certifi
 import ssl
+import http.client
 
 
 class Response:
 
-	def __init__(self, response) -> None:
+	def __init__(self, response: http.client.HTTPResponse) -> None:
 		self.response = response
 		self.encoding = "utf8"
 
@@ -18,7 +19,7 @@ class Response:
 		return self.response.status
 
 	@property
-	def content(self):
+	def content(self) -> bytes:
 		return self.response.read()
 
 	@property
@@ -32,15 +33,15 @@ class Response:
 class HttpClient:
 
 	@staticmethod
-	def get(*args, **kwargs) -> Response:
+	def get(*args: typing.Any, **kwargs: typing.Any) -> Response:
 		return HttpClient._any("GET", *args, **kwargs)
 
 	@staticmethod
-	def post(*args, **kwargs) -> Response:
+	def post(*args: typing.Any, **kwargs: typing.Any) -> Response:
 		return HttpClient._any("POST", *args, **kwargs)
 
 	@staticmethod
-	def put(*args, **kwargs) -> Response:
+	def put(*args: typing.Any, **kwargs: typing.Any) -> Response:
 		return HttpClient._any("PUT", *args, **kwargs)
 
 	@staticmethod
@@ -59,12 +60,12 @@ class HttpClient:
 		if json is not None:
 			body = JsonLibrary.dumps(json).encode("utf8")
 			headers["content-type"] = "application/json; charset=utf-8"
-			headers["content-length"] = len(body)
+			headers["content-length"] = str(len(body))
 
 		if file is not None:
 			body = file.read_bytes()
 			headers["content-type"] = mimetype or mimetypes.guess_type(file.name)[0] or "application/octet-stream"
-			headers["content-length"] = len(body)
+			headers["content-length"] = str(len(body))
 
 		if query:
 			queries = []

@@ -11,24 +11,6 @@ from bzd.http.client import HttpClient
 from bzd.utils.scheduler import Scheduler
 from apps.artifacts.api.python.node.node import Node
 
-
-class TimerThread(threading.Thread):
-
-	def __init__(self, workload, periodS: float) -> None:
-		super().__init__(daemon=True)
-		self.periodS = periodS
-		self.event = threading.Event()
-		self.workload = workload
-
-	def run(self) -> None:
-		while not self.event.wait(self.periodS):
-			self.workload()
-
-	def stop(self) -> None:
-		self.event.set()
-		self.join()
-
-
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="WOL manager.")
 	parser.add_argument("--bind", default="0.0.0.0", help="Address to bind.")

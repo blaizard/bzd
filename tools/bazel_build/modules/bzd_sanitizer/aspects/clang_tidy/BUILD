@@ -8,7 +8,7 @@ sh_binary_wrapper(
             echo "$error"
             exit 1
         fi
-        echo '1' > "$1"
+        echo "1" > "$1"
     """,
     visibility = ["//visibility:public"],
 )
