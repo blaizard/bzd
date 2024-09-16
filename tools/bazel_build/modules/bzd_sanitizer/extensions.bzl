@@ -4,15 +4,27 @@ load("@bzd_lib//:repository.bzl", "generate_repository")
 
 def _make_clang_tidy_config(clang_tidy_config):
     return """
+genrule(
+    name = "clang_tidy_defaults",
+    srcs = [],
+    outs = ["no_clang_tidy"],
+    cmd = "echo 'No binary were configured for clang-tidy, please use the module extensions.bzl to configure clang-tidy.'; echo 'exit 1' > $@",
+)
 alias(
     name = "clang_tidy",
     actual = "{}",
     visibility = ["//visibility:public"],
 )
-""".format(clang_tidy_config.binary)
+""".format(clang_tidy_config.binary if clang_tidy_config else ":no_clang_tidy")
 
 def _make_mypy_config(mypy_config):
     return """
+genrule(
+    name = "mypy_defaults",
+    srcs = [],
+    outs = ["no_mypy"],
+    cmd = "echo 'No binary were configured for mypy, please use the module extensions.bzl to configure mypy.'; echo 'exit 1' > $@",
+)
 alias(
     name = "mypy",
     actual = "{}",
@@ -23,7 +35,7 @@ alias(
     actual = "{}",
     visibility = ["//visibility:public"],
 )
-""".format(mypy_config.binary, mypy_config.config)
+""".format(mypy_config.binary if mypy_config else ":no_mypy", mypy_config.config if mypy_config else ":no_mypy")
 
 def _sanitizer_impl(module_ctx):
     clang_tidy_config = None
