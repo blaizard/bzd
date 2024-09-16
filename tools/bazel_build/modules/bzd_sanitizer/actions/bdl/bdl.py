@@ -10,7 +10,7 @@ def workload(args: typing.Tuple[pathlib.Path, pathlib.Path, bool], stdout: typin
 	workspace, path, check = args
 
 	original = (workspace / path).read_text()
-	formatted = bdlFormatter(formatType="bdl", source=original)
+	formatted = bdlFormatter(formatType="bdl", source=str(workspace / path))
 
 	if original != formatted:
 		if check:

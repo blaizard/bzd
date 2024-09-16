@@ -1,26 +1,32 @@
+
 namespace docker;
+
 
 // Declare a docker image to be used via traefik.
 component Traefik {
 interface:
-    // Add a new docker image to be exposed via Traeifk proxy.
-    //
-    // \param image The docker image to be used.
-    // \param host The hostname to be used for this service.
-    // \param port The port exposed by this image to be served.
-    method add(image = String [mandatory], host = String [mandatory], port = Integer [mandatory]);
+	// Add a new docker image to be exposed via Traeifk proxy.
+	// 
+	// \param image The docker image to be used.
+	// \param host The hostname to be used for this service.
+	// \param port The port exposed by this image to be served.
+	method add(image = String [mandatory], host = String [mandatory], port = Integer [mandatory]);
+	
 }
 
 component Compose {
 config:
-    path = String;
+	path = String;
+	
 interface:
-    // Add a custom image to a docker compose file.
-    //
-    // \param service The service to which this image corresponds.
-    // \param image The image identifier.
-    method image(service = String [mandatory], image = String [mandatory]);
-
-    // Use this image, only needed if image(...) is not called.
-    method nop();
+	// Add a custom image to a docker compose file.
+	// 
+	// \param service The service to which this image corresponds.
+	// \param image The image identifier.
+	method image(service = String [mandatory], image = String [mandatory]);
+	// Use this image, only needed if image(...) is not called.
+	method nop();
+	
 }
+
+
