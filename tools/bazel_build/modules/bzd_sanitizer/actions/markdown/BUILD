@@ -5,7 +5,7 @@ sh_binary_wrapper(
     command = "{binary} --config {config} --endswith '.md' $@",
     locations = {
         ".prettierrc.json": "config",
-        "@bzd_sanitizer//actions/prettier": "binary",
+        "//actions/prettier": "binary",
     },
     visibility = ["//visibility:public"],
 )

@@ -17,6 +17,8 @@ sh_binary_wrapper(
     name = "sanitizer",
     args = [
         "--use",
+        "@bzd_sanitizer//actions/bdl",
+        "--use",
         "@bzd_sanitizer//actions/markdown",
         "--use",
         "@bzd_sanitizer//actions/yaml",

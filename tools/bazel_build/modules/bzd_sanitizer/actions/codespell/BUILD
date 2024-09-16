@@ -16,8 +16,8 @@ py_binary(
     ],
     main = "cli.py",
     deps = [
+        "//python/bzd_sanitizer:worker",
         "@bzd_python//bzd/utils:run",
-        "@bzd_sanitizer//python/bzd_sanitizer:worker",
     ],
 )
 

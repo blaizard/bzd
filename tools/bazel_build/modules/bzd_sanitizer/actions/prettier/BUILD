@@ -8,7 +8,7 @@ bzd_nodejs_extern_binary(
     packages = {
         "prettier": "",
     },
-    visibility = ["@bzd_sanitizer//actions:__subpackages__"],
+    visibility = ["//actions:__subpackages__"],
 )
 
 py_binary(
@@ -17,8 +17,8 @@ py_binary(
         "cli.py",
     ],
     deps = [
+        "//python/bzd_sanitizer:worker",
         "@bzd_python//bzd/utils:run",
-        "@bzd_sanitizer//python/bzd_sanitizer:worker",
     ],
 )
 

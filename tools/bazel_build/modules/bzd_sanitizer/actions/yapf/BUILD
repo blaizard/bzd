@@ -10,6 +10,6 @@ py_binary(
     visibility = ["//visibility:public"],
     deps = [
         requirement("yapf"),
-        "@bzd_sanitizer//python/bzd_sanitizer:worker",
+        "//python/bzd_sanitizer:worker",
     ],
 )

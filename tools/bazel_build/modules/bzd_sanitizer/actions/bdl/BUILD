@@ -1,13 +1,13 @@
 load("@rules_python//python:defs.bzl", "py_binary")
 
 py_binary(
-    name = "sanitizer",
+    name = "bdl",
     srcs = [
-        "sanitizer.py",
+        "bdl.py",
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//python/bzd_sanitizer:context",
-        "@bzd_python//bzd/utils:run",
+        "//python/bzd_sanitizer:worker",
+        "@bzd_bdl//bdl:lib",
     ],
 )

@@ -1,16 +1,16 @@
 import argparse
 import pathlib
 import typing
-import json
 
 from bzd_sanitizer.worker import worker
+from bdl.lib import main as bdlFormatter
 
 
 def workload(args: typing.Tuple[pathlib.Path, pathlib.Path, bool], stdout: typing.TextIO) -> bool:
 	workspace, path, check = args
 
 	original = (workspace / path).read_text()
-	formatted = json.dumps(json.loads(original), indent=4, sort_keys=True)
+	formatted = bdlFormatter(formatType="bdl", source=original)
 
 	if original != formatted:
 		if check:
@@ -23,8 +23,8 @@ def workload(args: typing.Tuple[pathlib.Path, pathlib.Path, bool], stdout: typin
 
 
 if __name__ == "__main__":
-	parser = argparse.ArgumentParser(description="Json formatter/linter.")
+	parser = argparse.ArgumentParser(description="Bdl formatter/linter.")
 	parser.add_argument("context", type=pathlib.Path, help="The context file path.")
 	args = parser.parse_args()
 
-	worker(args.context, workload, endswith=[".json"])
+	worker(args.context, workload, endswith=[".bdl"])

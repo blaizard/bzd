@@ -9,6 +9,7 @@ bazel_dep(name = "bzd_python", version = "1.0")
 bazel_dep(name = "bzd_rules_nodejs", version = "1.0")
 bazel_dep(name = "bazel_skylib", version = "1.5.0")
 bazel_dep(name = "buildifier_prebuilt", version = "6.4.0")
+bazel_dep(name = "bzd_bdl", version = "1.0")
 
 # Configuration
 
@@ -21,6 +22,6 @@ pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
 pip.parse(
     hub_name = "bzd_sanitizer_pip",
     python_version = "3.11",
-    requirements_lock = "@bzd_sanitizer//:requirements.txt",
+    requirements_lock = "//:requirements.txt",
 )
 use_repo(pip, "bzd_sanitizer_pip")
