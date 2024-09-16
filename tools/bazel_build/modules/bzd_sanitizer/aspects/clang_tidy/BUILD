@@ -10,5 +10,8 @@ sh_binary_wrapper(
         fi
         echo "1" > "$1"
     """,
+    root_symlinks = {
+        "@bzd_sanitizer_config//:clang_tidy_config": ".clang-tidy",
+    },
     visibility = ["//visibility:public"],
 )

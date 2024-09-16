@@ -15,7 +15,12 @@ alias(
     actual = "{}",
     visibility = ["//visibility:public"],
 )
-""".format(clang_tidy_config.binary if clang_tidy_config else ":no_clang_tidy")
+alias(
+    name = "clang_tidy_config",
+    actual = "{}",
+    visibility = ["//visibility:public"],
+)
+""".format(clang_tidy_config.binary if clang_tidy_config else ":no_clang_tidy", clang_tidy_config.config if clang_tidy_config else ":no_clang_tidy")
 
 def _make_mypy_config(mypy_config):
     return """
@@ -46,6 +51,7 @@ def _sanitizer_impl(module_ctx):
                 fail("The clang-tidy config is set twice.")
             clang_tidy_config = struct(
                 binary = clang_tidy.binary,
+                config = clang_tidy.config,
             )
         for mypy in mod.tags.mypy:
             if mypy_config != None:
@@ -76,6 +82,10 @@ sanitizer = module_extension(
                     cfg = "exec",
                     executable = True,
                     doc = "The clang-tidy binary, this must be the same as the one running the test to ensure that include path are correct.",
+                ),
+                "config": attr.label(
+                    mandatory = True,
+                    doc = "The .clang-tidy configuration.",
                 ),
             },
         ),

@@ -22,7 +22,7 @@ def _expand_path(ctx, path):
     runfiles_relative_tool_path = ctx.workspace_name + "/" + path
     return "$RUNFILES_DIR/{}".format(runfiles_relative_tool_path)
 
-def sh_binary_wrapper_impl(ctx, output, binary = None, locations = {}, paths = {}, data = [], extra_runfiles = [], command = "{binary} $@"):
+def sh_binary_wrapper_impl(ctx, output, binary = None, locations = {}, paths = {}, data = [], extra_runfiles = [], command = "{binary} $@", root_symlinks = None, symlinks = None):
     """Bash binary wrapper rule.
 
     Args:
@@ -34,6 +34,10 @@ def sh_binary_wrapper_impl(ctx, output, binary = None, locations = {}, paths = {
         data: Additional data to be added.
         extra_runfiles: Additional runfiles to be added.
         command: The command to be used.
+        root_symlinks: A dictionary mapping paths to files, where the paths are relative to the root
+                       of the runfiles directory.
+        symlinks: A dictionary mapping paths to files, where paths are implicitly prefixed with the
+                  name of the main workspace.
 
     Returns:
         A DefaultInfo provider pointing to the new binary rule.
@@ -42,6 +46,8 @@ def sh_binary_wrapper_impl(ctx, output, binary = None, locations = {}, paths = {
     # Prepare the runfiles for the execution
     runfiles = ctx.runfiles(
         files = data,
+        root_symlinks = root_symlinks or {},
+        symlinks = symlinks or {},
     ).merge_all(extra_runfiles)
 
     # Add binaries
@@ -94,6 +100,8 @@ def _sh_binary_wrapper_impl(ctx):
         output = ctx.outputs.executable,
         data = ctx.files.data,
         command = ctx.attr.command,
+        symlinks = {v: k.files.to_list()[0] for k, v in ctx.attr.symlinks.items()},
+        root_symlinks = {v: k.files.to_list()[0] for k, v in ctx.attr.root_symlinks.items()},
     )
 
 sh_binary_wrapper = rule(
@@ -120,6 +128,16 @@ sh_binary_wrapper = rule(
         ),
         "paths": attr.string_dict(
             doc = "Short paths that can be accessed via their associated string.",
+        ),
+        "root_symlinks": attr.label_keyed_string_dict(
+            allow_files = True,
+            cfg = "exec",
+            doc = "A dictionary mapping paths to files, where the paths are relative to the root of the runfiles directory.",
+        ),
+        "symlinks": attr.label_keyed_string_dict(
+            allow_files = True,
+            cfg = "exec",
+            doc = "A dictionary mapping paths to files, where paths are implicitly prefixed with the name of the main workspace.",
         ),
     },
     executable = True,
