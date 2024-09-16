@@ -107,14 +107,14 @@ class SequenceBuilder(Sequence):
 	def pushBackElement(self: T, element: "Element") -> T:
 		"""Add an element to the sequence at the end of the list."""
 
-		element.context.setParent(self)  # type: ignore
+		element.context.setParent(self)
 		self.list.append(element)
 		return self
 
 	def pushFrontElement(self: T, element: "Element") -> T:
 		"""Add an element to the sequence at the beginning of the list."""
 
-		element.context.setParent(self)  # type: ignore
+		element.context.setParent(self)
 		self.list.insert(0, element)
 		return self
 
@@ -145,7 +145,7 @@ class SequenceParser(Sequence):
 		- grammar: Optionally provides a grammar to the new element or reuse existing one.
 		"""
 		element = ElementParser(
-		    context=Context(parent=self),  # type: ignore
+		    context=Context(parent=self),
 		    grammar=self.grammar if grammar is None else grammar,
 		    parent=self,
 		)
@@ -297,7 +297,7 @@ class Element:
 		return IGNORE_INDEX_VALUE, 0
 
 	def makeContext(self, attr: typing.Optional[str] = None) -> typing.Tuple[Context, int, int]:
-		return self.context.resolve(element=self, attr=attr)  # type: ignore
+		return self.context.resolve(element=self, attr=attr)
 
 	def __eq__(self, other: object) -> bool:
 		if not isinstance(other, Element):
@@ -375,7 +375,7 @@ class ElementBuilder(Element):
 	def setNestedSequence(self: U, kind: str, sequence: Sequence) -> U:
 		"""Set a nested sequence and overwrite existing one."""
 
-		sequence.context.setParent(self)  # type: ignore
+		sequence.context.setParent(self)
 		self.sequences[kind] = sequence
 		return self
 
@@ -389,7 +389,7 @@ class ElementBuilder(Element):
 		"""Add an element to a new or existing nested sequence."""
 
 		if kind not in self.sequences:
-			self.sequences[kind] = Sequence(context=Context(parent=self))  # type: ignore
+			self.sequences[kind] = Sequence(context=Context(parent=self))
 		SequenceBuilder.cast(self.sequences[kind], SequenceBuilder).pushBackElement(element)
 		return self
 
@@ -397,7 +397,7 @@ class ElementBuilder(Element):
 		"""Add an element to a new or existing nested sequence."""
 
 		if kind not in self.sequences:
-			self.sequences[kind] = Sequence(context=Context(parent=self))  # type: ignore
+			self.sequences[kind] = Sequence(context=Context(parent=self))
 		SequenceBuilder.cast(self.sequences[kind], SequenceBuilder).pushFrontElement(element)
 		return self
 
@@ -441,7 +441,7 @@ class ElementParser(Element):
 	def makeElement(self, kind: str, grammar: Grammar) -> "ElementParser":
 		if kind not in self.sequences:
 			self.sequences[kind] = SequenceParser(
-			    context=Context(parent=self),  # type: ignore
+			    context=Context(parent=self),
 			    grammar=grammar,
 			    parent=self,
 			)

@@ -52,6 +52,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 					self.wfile.write(f.read())
 
 				return True
+		return False
 
 	def _notFound(self) -> None:
 		self.send_response(HTTPStatus.NOT_FOUND)

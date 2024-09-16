@@ -101,7 +101,7 @@ class Context:
 				break
 			element = context.parent
 			assert element
-			context = element.context  # type: ignore
+			context = element.context
 			assert context not in previous, "Infinite loop between context."
 			previous.add(context)
 
