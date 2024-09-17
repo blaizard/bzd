@@ -12,12 +12,3 @@ sh_binary_wrapper(
     },
     visibility = ["//visibility:public"],
 )
-
-sh_binary_wrapper(
-    name = "clang_tidy",
-    binary = "@clang//:clang_tidy",
-    data = [
-        "//:.clang-tidy",
-    ],
-    visibility = ["//visibility:public"],
-)
