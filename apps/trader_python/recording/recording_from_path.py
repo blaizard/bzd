@@ -35,7 +35,8 @@ class RecordingPairFromPath(RecordingPair):
 		for data in _readCSV(path, separator=";"):
 			if len(data) < 6:
 				pass
-			events = [Event(EventKind(data[index]), data[index + 1]) for index in range(6, len(data), 2)]
+			events = [Event(EventKind(data[index]), data[index + 1])
+			          for index in range(6, len(data), 2)]  # type: ignore
 			yield OHLC(timestamp=int(data[0]),
 			           open=float(data[1]),
 			           high=float(data[2]),

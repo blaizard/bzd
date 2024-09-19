@@ -6,12 +6,12 @@ from apps.trader_python.recording.recording import Recording, RecordingPair, Eve
 
 class RecordingPairFromData(RecordingPair):
 
-	def __init__(self, *args, **kwargs) -> None:
+	def __init__(self, *args: typing.Any, **kwargs: typing.Any) -> None:
 		super().__init__(*args, **kwargs)
 		self.prices: typing.List[OHLC] = []
 
 	@staticmethod
-	def fromPrices(prices: typing.Iterable[OHLC], *args, **kwargs) -> "RecordingPairFromData":
+	def fromPrices(prices: typing.Iterable[OHLC], *args: typing.Any, **kwargs: typing.Any) -> "RecordingPairFromData":
 		pair = RecordingPairFromData(*args, **kwargs)
 		pair.prices = sorted(prices, key=lambda x: x.timestamp)
 		return pair

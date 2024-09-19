@@ -7,7 +7,7 @@ from http import HTTPStatus
 from functools import partial
 
 Handlers = typing.Mapping[str, typing.Mapping[str, typing.Callable[["RESTServerContext"], None]]]
-StaticRoutes = typing.Mapping[str, pathlib.Path]
+StaticRoutes = typing.Dict[str, pathlib.Path]
 
 METHODS_ = {"get", "post", "put", "delete", "head", "patch"}
 
@@ -23,7 +23,7 @@ class RESTServerContext:
 
 	def write(self, data: typing.Any) -> None:
 		if isinstance(data, str):
-			data = data.encode()
+			data = data.encode("utf8")
 		self.data.append(data)
 
 
@@ -67,7 +67,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 			except Exception as e:
 				self.send_response(HTTPStatus.INTERNAL_SERVER_ERROR)
 				self.end_headers()
-				self.wfile.write(str(e))
+				self.wfile.write(str(e).encode("utf8"))
 				return True
 
 			# Write the response.
@@ -117,7 +117,7 @@ class HttpServer(socketserver.TCPServer):
 	def __init__(self, port: int = 0, bind: str = "0.0.0.0") -> None:
 		self.port = port
 		self.bind = bind
-		self.handlers = {method: {} for method in METHODS_}
+		self.handlers: typing.Dict[str, typing.Dict[str, Handlers]] = {method: {} for method in METHODS_}
 		self.staticRoutes: StaticRoutes = {}
 		super().__init__((bind, port), partial(Handler, self.handlers, self.staticRoutes))
 
@@ -141,7 +141,7 @@ class HttpServer(socketserver.TCPServer):
 
 	def start(self) -> None:
 		try:
-			print(f"Serving http://{self.bind}:{self.port}")
+			print(f"Serving http://{self.bind}:{self.port}", flush=True)
 			self.serve_forever()
 		except KeyboardInterrupt:
 			print("\r<Keyboard interrupt>")

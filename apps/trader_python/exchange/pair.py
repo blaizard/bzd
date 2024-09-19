@@ -29,8 +29,10 @@ class Pair:
 		self.isShort = isinstance(impl, PairShortImpl)
 		self.isLong = isinstance(impl, PairLongImpl)
 
-	def makeLong(self, *args, **kwargs) -> None:
-		return self.impl.makeLong(*args, **kwargs)
+	def makeLong(self, *args: typing.Any, **kwargs: typing.Any) -> None:
+		assert isinstance(self.impl, PairLongImpl)
+		self.impl.makeLong(*args, **kwargs)
 
-	def makeShort(self) -> None:
-		return self.impl.makeShort(*args, **kwargs)
+	def makeShort(self, *args: typing.Any, **kwargs: typing.Any) -> None:
+		assert isinstance(self.impl, PairShortImpl)
+		self.impl.makeShort(*args, **kwargs)

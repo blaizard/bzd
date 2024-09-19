@@ -16,4 +16,4 @@ class Virtual:
 	def getPairs(self) -> typing.Iterator[Pair]:
 
 		for pair in self.pairs:
-			yield pair
+			yield typing.cast(Pair, pair)
