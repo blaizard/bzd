@@ -135,17 +135,19 @@ class ContextForTest(Context):
 
 	def __init__(self, *args: typing.Any, **kwargs: typing.Any) -> None:
 		super().__init__(*args, **kwargs)
-		self.release = ReleaseMock(
-		    data={
-		        "noop": [{
-		            "name": "first",
-		            "binary": b"#!/bin/bash\nexit 0"
-		        }],
-		        "error": [{
-		            "name": "first",
-		            "binary": b"#!/bin/bash\nexit 1"
-		        }]
-		    })
+		self.release = typing.cast(
+		    Release,
+		    ReleaseMock(
+		        data={
+		            "noop": [{
+		                "name": "first",
+		                "binary": b"#!/bin/bash\nexit 0"
+		            }],
+		            "error": [{
+		                "name": "first",
+		                "binary": b"#!/bin/bash\nexit 1"
+		            }]
+		        }))
 		self.stableBinary: typing.Optional[pathlib.Path] = None
 
 	def setStableBinary(self, path: pathlib.Path, stablePath: pathlib.Path) -> None:
