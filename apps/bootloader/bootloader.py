@@ -163,8 +163,8 @@ def autoUpdateApplication(context: Context, path: pathlib.Path, uid: str) -> Non
 	if maybeUpdate:
 		with tempfile.NamedTemporaryFile(delete=False) as updateFile:
 			updatePath = pathlib.Path(updateFile.name)
+		context.logger.info(f"Update found, writing to '{updatePath}'.")
 		maybeUpdate.toFile(updatePath)
-		context.logger.info(f"Update written to '{updatePath}'.")
 
 		# Set execution permission.
 		binary = Binary(binary=updatePath, logger=StubLogger("binary"))
