@@ -60,16 +60,19 @@ class RecordingPair:
 	def uid(self) -> str:
 		return f"{self.first}/{self.second}"
 
+	def __iter__(self) -> typing.Iterator[OHLC]:
+		raise Exception("Implement __iter__.")
+
 	def __repr__(self) -> str:
 		"""String representation of a recording pair."""
 
-		def ohlcToStr(ohlc) -> str:
+		def ohlcToStr(ohlc: OHLC) -> str:
 			content = f"{str(ohlc.date)}\t{ohlc.open:>10}\t{ohlc.high:>10}\t{ohlc.low:>10}\t{ohlc.close:>10}\t{ohlc.volume:>20}"
 			for event in ohlc.events:
 				content += f"\t{event.kind:>15}\t{event.value:>20}"
 			return content
 
-		def ohlcsToStr(prices) -> str:
+		def ohlcsToStr(prices: typing.List[OHLC]) -> str:
 			return "\n".join([ohlcToStr(price) for price in prices])
 
 		content = self.uid + ":\n"
@@ -83,6 +86,9 @@ class RecordingPair:
 
 
 class Recording:
+
+	def __iter__(self) -> typing.Iterator[RecordingPair]:
+		raise Exception("Implement __iter__.")
 
 	def __repr__(self) -> str:
 		"""String representation of a recording."""
