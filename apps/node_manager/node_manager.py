@@ -60,7 +60,7 @@ if __name__ == "__main__":
 			handlers.update(**handlersPower)
 
 		server = RESTServer(args.bind, args.port, handlers)
-		print(f"Server started at http://{args.bind}:{args.port}")
+		print(f"Server started at http://{args.bind}:{args.port}", flush=True)
 		server.run()
 
 	finally:
