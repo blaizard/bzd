@@ -50,9 +50,10 @@ class StdOutputToLogger(io.TextIOBase):
 				self.flush()
 		self.flush()
 
-	def write(self, text: str) -> None:
+	def write(self, text: str) -> int:
 		self.buffer += text
 		self.timeEvent.set()
+		return len(text)
 
 	def __enter__(self) -> "StdOutputToLogger":
 		self.worker.start()
@@ -83,7 +84,7 @@ class Binary:
 		if path.stat().st_mode & stat.S_IEXEC == 0:
 			path.chmod(path.stat().st_mode | stat.S_IEXEC)
 			assert path.stat(
-			).st_mode & stat.S_IEXEC, f"Binary '{path}' permissions couldn't be set to +x: {permissionsUpdated}"
+			).st_mode & stat.S_IEXEC, f"Binary '{path}' permissions couldn't be set to +x: {path.stat().st_mode}"
 
 	@staticmethod
 	def _validateBinaryPath(path: pathlib.Path) -> pathlib.Path:
@@ -119,11 +120,12 @@ class Binary:
 
 		with StdOutputToLogger(self.logger) as stdOutput:
 			try:
-				localCommand(cmds=[self.binary] + (args or []),
-				             timeoutS=None,
-				             stdout=stdOutput,
-				             stderr=stdOutput,
-				             cancellation=self.cancellation)
+				localCommand(
+				    cmds=[str(self.binary)] + (args or []),
+				    timeoutS=None,
+				    stdout=stdOutput,  # type: ignore
+				    stderr=stdOutput,  # type: ignore
+				    cancellation=self.cancellation)
 				if stableCallback and stablePolicy == StablePolicy.returnCodeZero:
 					stableCallback()
 			except Exception as e:

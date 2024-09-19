@@ -4,6 +4,7 @@ import struct
 import re
 import platform
 import sys
+import typing
 from datetime import datetime
 
 from bzd.http.client import HttpClient
@@ -15,7 +16,7 @@ logger = Logger("release")
 
 class Update:
 
-	def __init__(self, response) -> None:
+	def __init__(self, response: typing.Any) -> None:
 		self.response = response
 
 	@property
@@ -40,7 +41,7 @@ class Update:
 
 	@property
 	def lastModifiedAsString(self) -> typing.Optional[str]:
-		return self.response.getHeader("Last-Modified")
+		return self.response.getHeader("Last-Modified")  # type: ignore
 
 	def toFile(self, path: pathlib.Path) -> None:
 		path.parent.mkdir(parents=True, exist_ok=True)
@@ -50,7 +51,7 @@ class Update:
 class Release(ArtifactsBase):
 
 	@staticmethod
-	def getAlIsa() -> str:
+	def getAlIsa() -> typing.Tuple[typing.Optional[str], typing.Optional[str]]:
 		"""Get the abstraction layer and the isa."""
 
 		# Identify the bit width.
@@ -88,7 +89,7 @@ class Release(ArtifactsBase):
 		al, isa = Release.getAlIsa()
 		query = {"ignore": ignore, "uid": uid, "al": al, "isa": isa}
 
-		def queryToString():
+		def queryToString() -> str:
 			return "&".join([f"{k}={v}" for k, v in query.items() if v is not None])
 
 		for remote in self.remotes:
