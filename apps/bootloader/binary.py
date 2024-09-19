@@ -40,8 +40,10 @@ class StdOutputToLogger(io.TextIOBase):
 	def collector(self) -> None:
 
 		while not self.stopRequested:
+			# If set is called, reset the timer.
 			if self.timeEvent.wait(timeout=self.bufferTimeS):
-				self.timeEvent.set()
+				self.timeEvent.clear()
+			# The timeout kicked and there are data in the buffer.
 			elif len(self.buffer) > 0:
 				self.flush()
 			if len(self.buffer) > self.maxBufferSize:
@@ -62,7 +64,7 @@ class StdOutputToLogger(io.TextIOBase):
 		self.worker.join()
 
 	def flush(self) -> None:
-		self.logger.info(self.buffer)
+		self.logger.info(self.buffer.strip())
 		self.buffer = ""
 
 

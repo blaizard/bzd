@@ -106,7 +106,7 @@ class Cancellation:
 		self.timeBeforeKillS = timeBeforeKillS
 		self.reset()
 
-	def reset(self, proc: Optional[subprocess.Popen] = None) -> None:
+	def reset(self, proc: Optional[subprocess.Popen[bytes]] = None) -> None:
 		"""Reset the cancellation state."""
 
 		with self.mutex:
