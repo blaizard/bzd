@@ -6,7 +6,7 @@ import re
 import os
 import enum
 
-from bzd_python.command_extractor.common import (
+from bzd.command_extractor.common import (
     CommandExtractor,
     Processor,
     Item,

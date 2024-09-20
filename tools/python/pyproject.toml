@@ -5,3 +5,29 @@ continuation_align_style = "SPACE"
 column_limit = 120
 blank_line_before_nested_class_or_def = true
 indent_dictionary_value = true
+
+[tool.mypy]
+python_version = "3.11"
+
+[[tool.mypy.overrides]]
+module = [
+    "psutil.*",
+    "yfinance.*",
+    "requests.*",
+    "pandas.*",
+    "bs4.*",
+    "soupsieve.*",
+    "numpy.*",
+    "html5lib.*",
+    "urllib3.*",
+    "multitasking.*",
+    "dateutil.*",
+    "lxml.*",
+    "pytz.*",
+    "six.*",
+    "frozendict.*",
+    "webencodings.*",
+    "appdirs.*",
+    "charset_normalizer.*"
+]
+ignore_errors = true

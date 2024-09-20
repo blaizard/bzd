@@ -37,18 +37,17 @@ class Generator:
 		start = (today - datetime.timedelta(days=30)) if startTime is None else Generator.dateToDatetime(startTime)
 		end = today if endTime is None else Generator.dateToDatetime(endTime)
 
-		obj = yfinance.Ticker(self.ticker)
-		info = obj.info
-		currency = info["financialCurrency"]
+		obj = yfinance.Ticker(self.ticker)  # type: ignore
+		currency = obj.info["financialCurrency"]
 
 		# Set info
 		info = Info(
-		    name=info.get("longName"),
-		    timeZone=info.get("timeZoneShortName"),
-		    countryHQ=info.get("country"),
-		    industries=[info["industry"].lower()] if "industry" in info else [],
-		    sectors=[info["sector"].lower()] if "sector" in info else [],
-		    employees=info.get("fullTimeEmployees"),
+		    name=obj.info.get("longName"),
+		    timeZone=obj.info.get("timeZoneShortName"),
+		    countryHQ=obj.info.get("country"),
+		    industries=[obj.info["industry"].lower()] if "industry" in obj.info else [],
+		    sectors=[obj.info["sector"].lower()] if "sector" in obj.info else [],
+		    employees=obj.info.get("fullTimeEmployees"),
 		    resolution=60  # 1m
 		)
 
