@@ -27,7 +27,7 @@ class TestRun(unittest.TestCase):
 	def testLocalCommandCancellation(self) -> None:
 		cancellation = bzd.utils.run.Cancellation()
 
-		def threadCancel():
+		def threadCancel() -> None:
 			cancellation.cancel()
 
 		threading.Thread(target=threadCancel).start()

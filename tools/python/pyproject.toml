@@ -28,6 +28,11 @@ module = [
     "frozendict.*",
     "webencodings.*",
     "appdirs.*",
-    "charset_normalizer.*"
+    "charset_normalizer.*",
+    "serial.*",
+    "paramiko.*",
+    "cryptography.*",
+    "nacl.*",
+    "bcrypt.*",
 ]
 ignore_errors = true
