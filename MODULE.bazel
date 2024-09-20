@@ -129,7 +129,7 @@ sanitizer.clang_tidy(
 )
 sanitizer.mypy(
     binary = "//tools/python:mypy",
-    config = "//tools/python:mypy.ini",
+    config = "//tools/python:pyproject.toml",
 )
 
 # Fix for NixOS, this is a workaround until this open issue is solved:

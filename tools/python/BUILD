@@ -4,7 +4,7 @@ load("@rules_python//python/entry_points:py_console_script_binary.bzl", "py_cons
 
 exports_files([
     "requirements.txt",
-    "mypy.ini",
+    "pyproject.toml",
 ])
 
 sh_binary_wrapper(
