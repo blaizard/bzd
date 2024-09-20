@@ -103,6 +103,7 @@ def makeBinary(chunks: typing.Iterable[str], size: typing.Optional[str] = None) 
 
 	# Compare the last chunk size with the maxSize if defined.
 	if len(binary.chunks) > 0 and binary.isSize:
+		assert binary.size is not None
 		chunkObject = binary.chunks[nextChunkIndex]
 		availableSize = binary.size - chunkObject.address
 		assert availableSize > 0, f"There is no size available for the last chunk: {availableSize} given the size constraint of {binary.size}."

@@ -6,4 +6,7 @@ py_library(
         "*.py",
     ]),
     visibility = ["//visibility:public"],
+    deps = [
+        "@bzd_python//bzd/parser",
+    ],
 )

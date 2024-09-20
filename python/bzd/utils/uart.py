@@ -11,7 +11,7 @@ class Devices:
 	"""List and filter the available serial devices."""
 
 	def __init__(self, devices: typing.Optional[typing.List[typing.Any]] = None) -> None:
-		self.devices = (sorted(serial.tools.list_ports.comports()) if devices is None else devices)
+		self.devices = (sorted(serial.tools.list_ports.comports()) if devices is None else devices)  # type: ignore
 
 	def filterByVidPids(self, vidPids: typing.Sequence[typing.Tuple[int, int]]) -> "Devices":
 		"""Filter ports by VIDs and PIDs."""
@@ -74,7 +74,7 @@ class Uart:
 		assert parity in self.parityMapping, f"Unsupported parity: {parity}"
 		assert (controlFlow in self.controlFlowMapping), f"Unsupported control flow: {controlFlow}"
 
-		self.serial = serial.Serial(
+		self.serial = serial.Serial(  # type: ignore
 		    port=device,
 		    baudrate=baudrate,
 		    bytesize=self.dataBitsMapping[dataBits],

@@ -1,21 +1,22 @@
 import unittest
 import bzd.utils.worker
 import time
+import typing
 
 
 class TestWorker(unittest.TestCase):
 
 	@staticmethod
-	def foo(x, stdout):
+	def foo(x: int, stdout: typing.TextIO) -> int:
 		stdout.write("Hello")
 		return x * x
 
 	@staticmethod
-	def throwWorkload(x, stdout):
+	def throwWorkload(x: int, stdout: typing.TextIO) -> None:
 		raise Exception("dummy")
 
 	@staticmethod
-	def blockingWorkload(x, stdout):
+	def blockingWorkload(x: int, stdout: typing.TextIO) -> None:
 		time.sleep(10000)
 
 	def Empty(self) -> None:

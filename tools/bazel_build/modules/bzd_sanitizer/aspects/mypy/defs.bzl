@@ -14,15 +14,24 @@ def _get_mypy_transitive_sources(deps):
 
     return depset(transitive = [dep[MyPyInfo].transitive_sources for dep in deps if MyPyInfo in dep])
 
-def _is_external(file):
-    """Check if a file is part of an external dependency."""
+def _get_external(file):
+    """Return the external repository name if any."""
 
-    return file.path.startswith("external/")
+    if file.root.path:
+        path = file.path[len(file.root.path) + 1:]
+    else:
+        path = file.path
+    if path.startswith("external/"):
+        return path.split("/")[1]
+    return None
 
-def _to_external(path):
+def _to_external(path, root = None):
     """Convert a path into an external path."""
 
-    return "external/" + path
+    path = "external/" + path
+    if root:
+        return root + "/" + path
+    return path
 
 def _mypy_aspect_impl(target, ctx):
     """Run mypy on the target."""
@@ -52,8 +61,9 @@ def _mypy_aspect_impl(target, ctx):
                 mypy_srcs.append(src)
 
         # Build the list of available repositories.
-        if _is_external(src):
-            repositories.append(_to_external(src.path.split("/")[1]))
+        maybe_repository = _get_external(src)
+        if maybe_repository:
+            repositories.append(_to_external(maybe_repository, src.root.path))
 
         # Build the list of root path.
         roots.append(src.root.path or ".")
