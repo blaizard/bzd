@@ -2,11 +2,13 @@ import typing
 import pathlib
 import tempfile
 import threading
+import typing
 import time
 import math
 from contextlib import contextmanager
 import paramiko
 import shlex
+import sys
 
 from bzd.utils.run import localCommand, ExecuteResult, ExecuteResultStreamWriter
 from bzd.bin import ssh, scp
@@ -16,7 +18,7 @@ from bzd.http.client import HttpClient
 class _SSHInteractiveHandle:
 	"""Handler to be used with the interactive shell."""
 
-	def __init__(self, transport) -> None:
+	def __init__(self, transport: typing.Any) -> None:
 		self.transport = transport
 
 	def command(
@@ -60,7 +62,7 @@ class _SSHInteractiveHandle:
 		with tempfile.NamedTemporaryFile() as f:
 			f.write(content.encode())
 			f.flush()
-			self.upload(f.name, destination)
+			self.upload(pathlib.Path(f.name), destination)
 
 	def upload(self, source: pathlib.Path, destination: pathlib.Path) -> None:
 		"""Copy a file to the remote."""
@@ -103,10 +105,7 @@ class SSH:
 
 		items = string.split("@")
 		try:
-			if len(items) == 1:
-				host, port = splitLocation(items[0])
-				return SSH(host=host, port=port)
-			elif len(items) == 2:
+			if len(items) == 2:
 				username = items[0]
 				host, port = splitLocation(items[1])
 				return SSH(host=host, port=port, username=username)
@@ -116,27 +115,27 @@ class SSH:
 			    f"{str(e)}: SSH string must have the following format: '<username>@<host>:<port>', not '{string}'.")
 
 	@contextmanager
-	def interactive(self) -> None:
+	def interactive(self) -> typing.Generator[_SSHInteractiveHandle, None, None]:
 		"""Spawn an interactive connection."""
 
-		client = paramiko.SSHClient()
-		client.load_system_host_keys()
-		client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-		client.connect(hostname=self.host, port=self.port, username=self.username)
+		client = paramiko.SSHClient()  # type: ignore
+		client.load_system_host_keys()  # type: ignore
+		client.set_missing_host_key_policy(paramiko.AutoAddPolicy())  # type: ignore
+		client.connect(hostname=self.host, port=self.port, username=self.username)  # type: ignore
 
-		transport = client.get_transport()
+		transport = client.get_transport()  # type: ignore
 		if transport.is_active():
 			try:
 				transport.send_ignore()
 			except Exception as _e:
-				sys.stdout.write(_e)
+				sys.stdout.write(str(_e))
 				sys.exit(1)
 		else:
 			sys.exit(1)
 
 		yield _SSHInteractiveHandle(transport)
 
-		client.close()
+		client.close()  # type: ignore
 
 	def command(self,
 	            args: typing.Optional[typing.List[str]] = None,
@@ -153,7 +152,7 @@ class SSH:
 		with tempfile.NamedTemporaryFile() as f:
 			f.write(content.encode())
 			f.flush()
-			self.upload(f.name, destination)
+			self.upload(pathlib.Path(f.name), destination)
 
 	def upload(self, source: pathlib.Path, destination: pathlib.Path) -> None:
 		"""Copy a file to the remote."""
@@ -164,7 +163,10 @@ class SSH:
 		localCommand(command)
 
 	@contextmanager
-	def forwardPort(self, port: int, waitHTTP: typing.Optional[str] = None, waitTimeoutS: int = 20) -> None:
+	def forwardPort(self,
+	                port: int,
+	                waitHTTP: typing.Optional[str] = None,
+	                waitTimeoutS: int = 20) -> typing.Generator[None, None, None]:
 		"""Forward a port."""
 
 		socketName = f"bzd-forward-port-{time.time()}"
