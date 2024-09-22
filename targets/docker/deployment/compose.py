@@ -18,12 +18,12 @@ class DockerCompose(Docker):
 		content = pathlib.Path(path).read_text()
 
 		# Update the docker compose file with the images
-		data = yaml.safe_load(content)
+		data = yaml.safe_load(content)  # type: ignore
 		for docker in dockers:
 			if docker.service in data["services"]:
 				data["services"][docker.service]["image"] = self.common.imageResolve(docker.image)
 			else:
 				raise KeyError(f"Service '{docker.service}' is not present in '{path}'.")
-		content = yaml.dump(data)
+		content = yaml.dump(data)  # type: ignore
 
 		return content, set([docker.image for docker in dockers])

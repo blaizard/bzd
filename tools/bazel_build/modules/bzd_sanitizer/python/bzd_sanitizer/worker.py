@@ -42,7 +42,7 @@ def chunkWorker(contextPath: pathlib.Path,
 	# Print the error if any
 	if isFailure:
 		if stdoutParser:
-			outputsByPath = {}
+			outputsByPath: typing.Dict[pathlib.Path, typing.List[str]] = {}
 			for output in failureOutputs:
 				for item in [*stdoutParser(output, context.workspace)]:
 					outputsByPath.setdefault(item.path, []).append(item.output)

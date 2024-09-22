@@ -10,13 +10,13 @@ class TransportSSHHandle:
 		self.handle = handle
 		self.ssh = ssh
 
-	def command(self, *args: typing.Any, **kwargs: typing.Any) -> None:
+	def command(self, *args: typing.Any, **kwargs: typing.Any) -> typing.Any:
 		return self.handle.command(*args, **kwargs)
 
-	def uploadContent(self, *args: typing.Any, **kwargs: typing.Any) -> None:
+	def uploadContent(self, *args: typing.Any, **kwargs: typing.Any) -> typing.Any:
 		return self.handle.uploadContent(*args, **kwargs)
 
-	def forwardPort(self, *args: typing.Any, **kwargs: typing.Any) -> None:
+	def forwardPort(self, *args: typing.Any, **kwargs: typing.Any) -> typing.Any:
 		return self.ssh.forwardPort(*args, **kwargs)
 
 
@@ -26,6 +26,6 @@ class TransportSSH:
 		self.ssh = SSH.fromString(connection)
 
 	@contextmanager
-	def session(self) -> None:
+	def session(self) -> typing.Generator[TransportSSHHandle, None, None]:
 		with self.ssh.interactive() as handle:
 			yield TransportSSHHandle(handle, self.ssh)
