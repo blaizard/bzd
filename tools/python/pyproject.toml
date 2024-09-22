@@ -36,5 +36,6 @@ module = [
     "bcrypt.*",
     "codespell.*",
     "chardet.*",
+    "elftools.*",
 ]
 ignore_errors = true

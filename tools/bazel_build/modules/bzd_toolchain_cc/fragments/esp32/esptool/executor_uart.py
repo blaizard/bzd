@@ -79,7 +79,10 @@ if __name__ == "__main__":
 	assert pathlib.Path(args.esptool).is_file(), f"Invalid path for esptool: {args.esptool}"
 
 	binary = makeBinary(chunks=args.chunks, size=args.size)
-	device = getDevice(vidPids=[[int(vid, 0), int(pid, 0)] for vid, pid in args.deviceIds], device=args.device)
+	device = getDevice(vidPids=[(
+	    int(vid, 0),
+	    int(pid, 0),
+	) for vid, pid in args.deviceIds], device=args.device)
 
 	logger.info(f"Programming target through device {device}...")
 

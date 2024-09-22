@@ -46,8 +46,8 @@ def generateBerkeleyConfig(
 	FLAG_SHF_EXECINSTR = 0x4
 
 	with open(filePath, "rb") as f:
-		elffile = ELFFile(f)
-		for section in elffile.iter_sections():
+		elffile = ELFFile(f)  # type: ignore
+		for section in elffile.iter_sections():  # type: ignore
 			if not section.name:
 				continue
 
@@ -94,7 +94,7 @@ def analyze(data: Parser) -> None:
 			    "section": section,
 			}
 	sortedByAddresses: typing.List[typing.Dict[str, typing.Any]] = sorted([obj for address, obj in byAddresses.items()],
-	                                                                      key=lambda x: x["address"])  # type: ignore
+	                                                                      key=lambda x: x["address"])
 
 	# Ensure there is no overlaps
 	addressEnd = 0
