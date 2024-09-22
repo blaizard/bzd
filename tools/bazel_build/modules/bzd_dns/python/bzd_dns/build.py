@@ -28,7 +28,7 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 
 	# Build up the domains zones.
-	domains = {}
+	domains: typing.Dict[str, Zones] = {}
 	for domain, path in args.inputs:
 		dataStr = pathlib.Path(path).read_text()
 		data = json.loads(dataStr)

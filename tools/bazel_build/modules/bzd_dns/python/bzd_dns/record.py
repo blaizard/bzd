@@ -1,6 +1,6 @@
 import typing
 
-RecordsJson = typing.Dict[str, str]
+RecordsJson = typing.Mapping[str, str]
 
 
 class Record:
@@ -26,7 +26,7 @@ class Record:
 			assert attribute in checked, f"The attribute '{attribute}' is not valid for {self}."
 
 	@staticmethod
-	def make(data) -> "Record":
+	def make(data: RecordsJson) -> "Record":
 		typesToClass = {
 		    "a": RecordA,
 		    "aaaa": RecordAAAA,

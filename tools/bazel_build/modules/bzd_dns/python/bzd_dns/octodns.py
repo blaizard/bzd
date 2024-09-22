@@ -11,7 +11,7 @@ class Builder:
 
 	def __init__(self, record: Record) -> None:
 		self.record = record
-		self.data = {}
+		self.data: typing.Dict[str, typing.Any] = {}
 
 	def add(self, attribute: str, yaml: typing.Optional[str] = None, formatStr: str = "{}") -> "Builder":
 		if attribute in self.record.data:
@@ -26,7 +26,7 @@ class Builder:
 class Visitor:
 
 	def __init__(self) -> None:
-		self.content = {}
+		self.content: typing.Dict[str, typing.Dict[str, typing.Any]] = {}
 
 	@staticmethod
 	def insertKV(data: typing.Dict[str, typing.Any], key: str, value: typing.Optional[typing.Any] = None) -> None:
@@ -65,7 +65,7 @@ class Visitor:
 		value = Builder(record).add("priority", "preference").add("value", "exchange", "{}.").data
 		self.add(record, value)
 
-	def get(self) -> str:
+	def get(self) -> typing.Sequence[typing.Mapping[str, typing.Any]]:
 		return [v | {"type": k} for k, v in self.content.items()]
 
 
@@ -87,10 +87,10 @@ class Octodns:
 				for record in records:
 					record.visit(visitor)
 				content[subdomain] = visitor.get()
-			contentStr = yaml.dump(content)
+			contentStr = yaml.dump(content)  # type: ignore
 			(self.zones / f"{domain}.yaml").write_text(contentStr)
 
-		self.makeConfig(domains.keys())
+		self.makeConfig(list(domains.keys()))
 
 	def makeConfig(self, domains: typing.Sequence[str]) -> None:
 
@@ -124,5 +124,5 @@ class Octodns:
 		    "zones": zones
 		}
 
-		contentStr = yaml.dump(content)
+		contentStr = yaml.dump(content)  # type: ignore
 		(self.output / "config.yaml").write_text(contentStr)

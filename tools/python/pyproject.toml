@@ -8,6 +8,9 @@ indent_dictionary_value = true
 
 [tool.mypy]
 python_version = "3.11"
+exclude = [
+    "rules_python_entry_point_*.py",
+]
 
 [[tool.mypy.overrides]]
 module = [
@@ -37,5 +40,10 @@ module = [
     "codespell.*",
     "chardet.*",
     "elftools.*",
+    "yaml.*",
+    "octodns.*",
+    "idna.*",
+    "natsort.*",
+    "fqdn.*",
 ]
 ignore_errors = true
