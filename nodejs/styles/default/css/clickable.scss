@@ -3,15 +3,16 @@
  * \note The effect should only affect the background-image to avoid any conflicts with the elements.
  */
 @use "sass:math";
+@use "sass:color";
 
 %bzd-clickable {
 	// Configuration
 	$bzdColor: #000 !default;
 	$bzdOpacity: 0.32 !default;
 
-	$bzdColorRed: red($bzdColor);
-	$bzdColorGreen: green($bzdColor);
-	$bzdColorBlue: blue($bzdColor);
+	$bzdColorRed: color.channel($bzdColor, "red", $space: rgb);
+	$bzdColorGreen: color.channel($bzdColor, "green", $space: rgb);
+	$bzdColorBlue: color.channel($bzdColor, "blue", $space: rgb);
 
 	cursor: pointer;
 

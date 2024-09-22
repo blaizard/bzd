@@ -1,6 +1,7 @@
 @use "#bzd/nodejs/styles/default/css/normalize.scss" as *;
 @use "#bzd/nodejs/styles/default/css/clickable.scss" as *;
 @use "#bzd/config.scss" as config;
+@use "sass:color";
 
 body {
 	background-color: config.$bzdGraphColorWhite;
@@ -83,13 +84,13 @@ table {
 }
 
 table tbody tr:hover {
-	background-color: darken(config.$bzdGraphColorWhite, 50%);
+	background-color: color.adjust($bzdGraphColorWhite, $lightness: -50%);
 }
 
 th,
 td {
 	text-align: left;
-	border-bottom: 1px solid darken(config.$bzdGraphColorWhite, 30%);
+	border-bottom: 1px solid color.adjust(config.$bzdGraphColorWhite, $lightness: -30%);
 	white-space: nowrap;
 	padding-right: 10px;
 }
@@ -135,8 +136,8 @@ a:hover {
 
 code {
 	white-space: nowrap;
-	background: darken(config.$bzdGraphColorWhite, 20%);
-	border: solid 1px darken(config.$bzdGraphColorWhite, 10%);
+	background: color.adjust(config.$bzdGraphColorWhite, $lightness: -20%);
+	border: solid 1px color.adjust(config.$bzdGraphColorWhite, $lightness: -10%);
 	border-radius: 6px;
 	font-size: 80%;
 	padding: 2px 5px;
@@ -159,7 +160,7 @@ pre {
 	overflow: auto;
 	background: config.$bzdGraphColorWhite;
 	margin: 1px 0px 24px;
-	border: 1px solid darken(config.$bzdGraphColorWhite, 10%);
+	border: 1px solid color.adjust(config.$bzdGraphColorWhite, $lightness: -10%);
 }
 
 /* Code blocks */
@@ -193,7 +194,7 @@ input[type="reset"],
 button {
 	display: inline-block;
 	margin: 5px;
-	background-color: darken(config.$bzdGraphColorWhite, 10%);
+	background-color: color.adjust(config.$bzdGraphColorWhite, $lightness: -10%);
 	padding: 7px 20px;
 	min-width: 50px;
 	border: none;
