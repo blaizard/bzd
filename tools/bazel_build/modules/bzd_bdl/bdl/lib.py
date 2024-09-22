@@ -5,11 +5,11 @@ from bzd.parser.error import Error
 
 from bdl.visitors.composition.visitor import Composition
 from bdl.generators.bdl.visitor import formatBdl
-from bdl_extension import formatters, compositions
+from bdl_extension import formatters as formattersOriginal, compositions
 from bdl.generators.json.visitor import formatJson, compositionJson
 from bdl.object import Object, ObjectContext
 
-formatters = {"bdl": formatBdl, "json": formatJson} | formatters
+formatters = {"bdl": formatBdl, "json": formatJson} | formattersOriginal
 compositions_ = {"json": compositionJson} | compositions
 
 

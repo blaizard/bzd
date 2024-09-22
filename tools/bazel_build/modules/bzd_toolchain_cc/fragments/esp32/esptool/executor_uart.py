@@ -11,7 +11,7 @@ from bzd.utils.binary_builder import makeBinary
 logger = Logger("uart")
 
 
-def getDevice(vidPids: typing.List[typing.Tuple[int, int]], device=typing.Optional[Device]) -> Device:
+def getDevice(vidPids: typing.List[typing.Tuple[int, int]], device: typing.Optional[Device]) -> Device:
 	"""Search for the most suitable device to program the target."""
 
 	if device is not None:

@@ -7,8 +7,8 @@ class Record:
 	"""Base class for records."""
 
 	multiple = False
-	mandatory = []
-	optional = []
+	mandatory: typing.List[str] = []
+	optional: typing.List[str] = []
 
 	def __init__(self, data: RecordsJson) -> None:
 		self.data = data

@@ -28,7 +28,7 @@ class Expression:
 
 	@property
 	def symbol(self) -> str:
-		return self.data["symbol"]
+		return str(self.data["symbol"])
 
 	@property
 	def parameters(self) -> Parameters:
@@ -77,7 +77,7 @@ class Ast:
 
 	@property
 	def registry(self) -> typing.Dict[str, ExpressionEntry]:
-		output = {}
+		output: typing.Dict[str, ExpressionEntry] = {}
 		for context in self.contexts:
 			output |= context.registry
 		return output

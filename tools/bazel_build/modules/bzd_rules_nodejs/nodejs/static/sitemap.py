@@ -4,7 +4,7 @@ import typing
 import json
 
 
-def getSitemap(api) -> typing.Dict[str, typing.Any]:
+def getSitemap(api: typing.Mapping[str, typing.Mapping[str, typing.Any]]) -> typing.Dict[str, typing.Any]:
 	maps = {}
 	for path, data in api.get("routes", {}).items():
 		# Filter out entries that are not to be seen.

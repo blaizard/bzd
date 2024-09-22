@@ -17,7 +17,7 @@ if __name__ == "__main__":
 
 	args = parser.parse_args()
 
-	output = {}
+	output: typing.Dict[str, typing.Any] = {}
 	for f in args.inputs:
 		data = json.loads(f.read_text())
 		updateDeep(output, data)

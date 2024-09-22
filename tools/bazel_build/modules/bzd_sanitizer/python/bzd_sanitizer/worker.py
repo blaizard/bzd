@@ -34,7 +34,7 @@ def chunkWorker(contextPath: pathlib.Path,
 	for i in range(0, len(queue), maxFiles):
 		paths = queue[i:i + maxFiles]
 		stdout = io.StringIO()
-		if not workload([context.workspace, paths, context.check] + (args or []), stdout):
+		if not workload([str(context.workspace), paths, context.check] + (args or []), stdout):
 			isFailure = True
 			stdout.seek(0)
 			failureOutputs.append(stdout.read().strip())

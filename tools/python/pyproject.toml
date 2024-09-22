@@ -34,5 +34,7 @@ module = [
     "cryptography.*",
     "nacl.*",
     "bcrypt.*",
+    "codespell.*",
+    "chardet.*",
 ]
 ignore_errors = true
