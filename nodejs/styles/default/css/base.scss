@@ -71,7 +71,7 @@ h3 {
 blockquote {
 	margin-left: 0px;
 	padding-left: 10px;
-	border-left: 2px solid lighten(config.$bzdGraphColorBlack, 50%);
+	border-left: 2px solid color.adjust(config.$bzdGraphColorBlack, $lightness: 50%);
 }
 
 /* Tables */
@@ -173,7 +173,7 @@ pre > code {
 	margin: 0;
 	padding: 0;
 	font-family: "Inconsolata", "Consolata", "Monaco", monospace;
-	color: lighten(config.$bzdGraphColorBlack, 20%);
+	color: color.adjust(config.$bzdGraphColorBlack, $lightness: 20%);
 	overflow-x: auto;
 }
 
@@ -181,7 +181,7 @@ pre > code {
 
 hr {
 	border: none;
-	border-bottom: 1px solid lighten(config.$bzdGraphColorBlack, 50%);
+	border-bottom: 1px solid color.adjust(config.$bzdGraphColorBlack, $lightness: 50%);
 	margin: 20px 0px;
 	padding: 0;
 }
