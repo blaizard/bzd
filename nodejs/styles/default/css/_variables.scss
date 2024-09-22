@@ -1,3 +1,5 @@
+@use "sass:color";
+
 // List of 12 basic colors
 $bzdGraphColorRed: #ff6347 !default;
 $bzdGraphColorBlue: #3498db !default;
@@ -30,9 +32,9 @@ $fieldSpecialTextColor: $bzdGraphColorWhite !default;
 $fieldSpecialBgColor: $bzdGraphColorBlue !default;
 $fieldBgColor: $bzdGraphColorWhite !default;
 $fieldBorderThickness: 1 !default;
-$fieldBorderColor: darken($bzdGraphColorWhite, 20%) !default;
+$fieldBorderColor: color.adjust($bzdGraphColorWhite, $lightness: -20%) !default;
 $fieldBorderRadius: 2 !default;
-$tableBorderColor: darken($bzdGraphColorWhite, 10%) !default;
+$tableBorderColor: color.adjust($bzdGraphColorWhite, $lightness: -10%) !default;
 $toolbarHeight: 40 !default;
 
 // Action related (buttons...)
