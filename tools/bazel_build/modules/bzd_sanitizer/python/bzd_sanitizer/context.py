@@ -76,7 +76,7 @@ class Context:
 	    self,
 	    path: pathlib.Path,
 	    excludeFile: str,
-	    cache: typing.Dict[pathlib.Path, Filter],
+	    cache: typing.Dict[pathlib.Path, typing.Optional[Filter]],
 	) -> bool:
 		"""Check if a file is excluded from the search."""
 
@@ -101,14 +101,14 @@ class Context:
 	    excludeFile: typing.Optional[str] = None,
 	) -> typing.Iterable[pathlib.Path]:
 		endswith = tuple(s.lower() for s in endswith) if endswith else None
-		include = Filter(include) if include else None
-		excludeFileCache: typing.Dict[pathlib.Path, Filter] = {}
+		includeFilter = Filter(include) if include else None
+		excludeFileCache: typing.Dict[pathlib.Path, typing.Optional[Filter]] = {}
 
 		for path in self.fileList:
 			# Inclusions
-			isIncluded = not bool(endswith or include)
+			isIncluded = not bool(endswith or includeFilter)
 			isIncluded = isIncluded or bool(endswith and path.lower().endswith(endswith))
-			isIncluded = isIncluded or bool(include and include.match(path))
+			isIncluded = isIncluded or bool(includeFilter and includeFilter.match(path))
 
 			# Exclusions
 			isIncluded = isIncluded and not (excludeFile

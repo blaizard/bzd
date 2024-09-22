@@ -43,7 +43,7 @@ pipeline
 				{
 					steps
 					{
-						sh "./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=dev --config=clang-tidy --platform_suffix=clang-tidy"
+						sh "./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=dev --config=clang-tidy --config=mypy --platform_suffix=static_analysis"
 					}
 				}
 				stage("[normal] clang prod")

@@ -30,5 +30,6 @@ py_console_script_binary(
     name = "mypy",
     pkg = "@pip//mypy",
     script = "mypy",
+    tags = ["manual"],
     visibility = ["//visibility:public"],
 )
