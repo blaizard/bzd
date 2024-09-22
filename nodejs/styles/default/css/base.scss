@@ -84,7 +84,7 @@ table {
 }
 
 table tbody tr:hover {
-	background-color: color.adjust($bzdGraphColorWhite, $lightness: -50%);
+	background-color: color.adjust(config.$bzdGraphColorWhite, $lightness: -50%);
 }
 
 th,
