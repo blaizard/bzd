@@ -16,16 +16,17 @@ def formatJson(bdl: Object, data: typing.Optional[pathlib.Path] = None) -> str:
 	return ""
 
 
-def parametersToJson(parameters: ParametersResolved) -> Json:
+def parametersToJson(parameters: ParametersResolved) -> typing.Sequence[Json]:
 	expressions = []
 	for parameter in parameters:
-		data = expressionToJson(parameter.expected) | expressionToJson(parameter.param)
+		data = expressionToJson(typing.cast(Expression, parameter.expected)) | expressionToJson(
+		    typing.cast(Expression, parameter.param))
 		expressions.append(data)
 	return expressions
 
 
 def expressionToJson(expression: Expression) -> Json:
-	data = {}
+	data: Json = {}
 	if expression.isName:
 		data["name"] = expression.name
 	if expression.isName and expression.isFQN:
@@ -76,5 +77,5 @@ def compositionJson(
 			services = [expressionEntryToJson(service) for service in composition.services.get(context, [])]
 			contexts.append({"registry": registry, "workloads": workloads, "services": services})
 
-		data = json.dumps({"contexts": contexts}, indent=4)
-		(output.parent / f"{output.name}.{target}.json").write_text(data)
+		jsonData = json.dumps({"contexts": contexts}, indent=4)
+		(output.parent / f"{output.name}.{target}.json").write_text(jsonData)

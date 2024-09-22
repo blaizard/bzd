@@ -737,6 +737,7 @@ class TestRun(unittest.TestCase):
 		)
 
 		a = bdl.entity("MyComposition.a")
+		assert isinstance(a, Expression)
 		assert len(a.parametersResolved) == 2
 		self.assertEqual(a.parametersResolved[0].param.literal, "34")
 		self.assertEqual(a.parametersResolved[0].expected.literal, "1")
@@ -744,6 +745,7 @@ class TestRun(unittest.TestCase):
 		self.assertEqual(a.parametersResolved[1].expected.literal, "true")
 
 		b = bdl.entity("MyComposition.b")
+		assert isinstance(b, Expression)
 		assert len(b.parametersResolved) == 2
 		self.assertEqual(b.parametersResolved[0].param.literal, "1")
 		self.assertEqual(b.parametersResolved[0].expected.literal, "1")

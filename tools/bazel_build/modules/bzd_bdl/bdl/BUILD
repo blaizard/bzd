@@ -24,6 +24,7 @@ py_library(
     ],
     visibility = [":__subpackages__"],
     deps = [
+        ":grammar",
         "@bzd_python//bzd/parser",
         "@bzd_python//bzd/utils:decorators",
         "@bzd_python//bzd/utils:match",
