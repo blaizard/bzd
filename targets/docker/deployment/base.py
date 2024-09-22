@@ -12,6 +12,9 @@ class Docker:
 		    for fqn, entity in ast.registry.items() if entity.expression.symbol == symbol
 		}
 
+	def makeDockerCompose(self, fqn: str, expression: Parameters) -> typing.Tuple[str, typing.Set[str]]:
+		raise Exception("Unimplemented")
+
 	def makeDockerComposeForAllInstances(self) -> typing.Tuple[typing.Dict[str, str], typing.Set[str]]:
 		"""Generate content for the docker compose files.
 
