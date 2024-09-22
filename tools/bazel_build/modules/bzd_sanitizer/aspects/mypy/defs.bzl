@@ -1,5 +1,7 @@
 """mypy aspect rule."""
 
+load("@bazel_skylib//lib:sets.bzl", "sets")
+
 _PYTHON_EXTENSIONS = ["py", "pyi"]
 
 MyPyInfo = provider(
@@ -25,10 +27,14 @@ def _get_external(file):
         return path.split("/")[1]
     return None
 
-def _to_external(path, root = None):
+def _to_external(path):
     """Convert a path into an external path."""
 
-    path = "external/" + path
+    return "external/" + path
+
+def _apply_root(path, root):
+    """Apply a root to an existing path."""
+
     if root:
         return root + "/" + path
     return path
@@ -52,21 +58,23 @@ def _mypy_aspect_impl(target, ctx):
     mypy_transitive_srcs = _get_mypy_transitive_sources(py_rule.attr.deps) if hasattr(py_rule.attr, "deps") else depset()
 
     mypy_srcs = []
-    repositories = []
-    roots = []
+    repositories = {}
+    roots = sets.make()
     for src in all_srcs.to_list():
         # Build the list of files to check with mypy.
         if src not in mypy_transitive_srcs.to_list():
             if src.extension in _PYTHON_EXTENSIONS:
                 mypy_srcs.append(src)
 
-        # Build the list of available repositories.
+        # Build a mapping between all available repositories and their root path.
         maybe_repository = _get_external(src)
         if maybe_repository:
-            repositories.append(_to_external(maybe_repository, src.root.path))
+            repositories.setdefault(maybe_repository, sets.make())
+            sets.insert(repositories[maybe_repository], src.root.path if src.root.path else None)
+            #sets.insert(repositories, _to_external(maybe_repository, src.root.path))
 
         # Build the list of root path.
-        roots.append(src.root.path or ".")
+        sets.insert(roots, src.root.path or ".")
 
     mypy_info = MyPyInfo(transitive_sources = depset(mypy_srcs, transitive = [mypy_transitive_srcs]))
 
@@ -93,7 +101,28 @@ def _mypy_aspect_impl(target, ctx):
     # MYPYPATH = imports
     #          += root directory trees (current directory + other roots)
     #          += get repositories imports (list all top directories in external)
-    mypy_path = depset([_to_external(path) for path in imports.to_list()] + roots + repositories)
+
+    # Build the import paths (external or not depending if this corresponds to a repository).
+    # and apply the import to all root paths.
+    imports_paths = []
+    for path in imports.to_list():
+        # Check if the import corresponds to a repository
+        maybe_repository = path.split("/")[0]
+        if maybe_repository in repositories:
+            for root_path in sets.to_list(repositories[maybe_repository]):
+                imports_paths.append(_apply_root(_to_external(path), root_path))
+        else:
+            for root_path in sets.to_list(roots):
+                imports_paths.append(_apply_root(path, root_path))
+
+    # Build the repositories path including all root paths.
+    repositories_paths = []
+    for repository, root_paths in repositories.items():
+        for root_path in sets.to_list(root_paths):
+            repositories_paths.append(_apply_root(_to_external(repository), root_path))
+
+    # Combine all the path together.
+    mypy_path = depset(imports_paths + sets.to_list(roots) + repositories_paths)
 
     output = ctx.actions.declare_file("{}.mypy".format(ctx.label.name))
     ctx.actions.run(

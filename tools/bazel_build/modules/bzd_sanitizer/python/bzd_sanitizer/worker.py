@@ -18,7 +18,7 @@ class OutputWithPath:
 
 
 def chunkWorker(contextPath: pathlib.Path,
-                workload: typing.Callable[[typing.Tuple[str, ...], typing.TextIO], bool],
+                workload: typing.Callable[[typing.Sequence[str], typing.TextIO], bool],
                 args: typing.Optional[typing.List[str]] = None,
                 timeoutS: int = 60,
                 maxFiles: int = 256,

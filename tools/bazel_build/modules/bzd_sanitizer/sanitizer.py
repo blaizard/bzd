@@ -5,7 +5,7 @@ import sys
 import typing
 import time
 
-from bzd.utils.run import localCommand, localBazelTarget  # type: ignore
+from bzd.utils.run import localCommand, localBazelTarget
 from bzd_sanitizer.context import Context
 
 
