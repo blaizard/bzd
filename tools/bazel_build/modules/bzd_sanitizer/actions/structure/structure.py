@@ -27,7 +27,7 @@ if __name__ == "__main__":
 
 	worker(
 	    args.context,
-	    workload,
+	    workload,  # type: ignore
 	    args=[re.compile(args.regexpr)],
 	    excludeFile=".structureignore",
 	)

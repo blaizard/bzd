@@ -17,7 +17,7 @@ def workload(args: typing.Tuple[pathlib.Path, pathlib.Path, bool, str], stdout: 
 		    stdout=stdout,
 		    stderr=stdout,
 		)
-		if result.isFailure():  # type: ignore
+		if result.isFailure():
 			return False
 
 	result = localBazelBinary(
@@ -44,7 +44,7 @@ if __name__ == "__main__":
 
 	worker(
 	    args.context,
-	    workload,
+	    workload,  # type: ignore
 	    args=[str(args.buildifier)],
 	    endswith=[".bazel", ".bzl"],
 	    include=["**BUILD", "**WORKSPACE"],

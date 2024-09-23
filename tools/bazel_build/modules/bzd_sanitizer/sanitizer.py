@@ -15,7 +15,8 @@ def getFileListFromResult(result: typing.Any, workspace: pathlib.Path) -> typing
 	return list({f for f in result.getStdout().split("\n") if (workspace / f).is_file()})
 
 
-def getFileListFromRecursiveGit(workspace: pathlib.Path, path: pathlib.Path, command: typing.List[str]):
+def getFileListFromRecursiveGit(workspace: pathlib.Path, path: pathlib.Path,
+                                command: typing.List[str]) -> typing.Sequence[str]:
 	"""Execute a git command to get a list of files and searching within submodules as well."""
 
 	result = localCommand(
@@ -36,7 +37,7 @@ def getFileListFromRecursiveGit(workspace: pathlib.Path, path: pathlib.Path, com
 	return output
 
 
-def getFileList(workspace: pathlib.Path, path: pathlib.Path, all: bool) -> typing.List[str]:
+def getFileList(workspace: pathlib.Path, path: pathlib.Path, all: bool) -> typing.Sequence[str]:
 	"""Get the file list to process."""
 
 	# Compute the list of files to sanitize.

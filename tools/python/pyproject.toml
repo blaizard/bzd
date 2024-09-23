@@ -45,5 +45,10 @@ module = [
     "idna.*",
     "natsort.*",
     "fqdn.*",
+    "yapf.*",
+    "yapf_third_party.*",
+    "importlib_metadata.*",
+    "zipp.*",
+    "platformdirs.*",
 ]
 ignore_errors = true

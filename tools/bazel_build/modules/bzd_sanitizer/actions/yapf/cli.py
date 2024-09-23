@@ -9,10 +9,11 @@ from yapf.yapflib.yapf_api import FormatFile
 def workload(args: typing.Tuple[pathlib.Path, pathlib.Path, bool, str], stdout: typing.TextIO) -> bool:
 	workspace, path, check, config = args
 
-	_, _, has_change = FormatFile(workspace / path,
-	                              in_place=not check,
-	                              style_config=config if config else None,
-	                              logger=stdout)
+	_, _, has_change = FormatFile(
+	    workspace / path,  # type: ignore
+	    in_place=not check,
+	    style_config=config if config else None,
+	    logger=stdout)
 
 	if check and has_change:
 		stdout.write("This file requires formatting.\n")
@@ -33,7 +34,7 @@ if __name__ == "__main__":
 
 	worker(
 	    args.context,
-	    workload,
+	    workload,  # type: ignore
 	    args=[str(args.config)],
 	    endswith=[".py", ".pyi"],
 	)
