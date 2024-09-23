@@ -90,7 +90,6 @@ def _mypy_aspect_impl(target, ctx):
         if maybe_repository:
             repositories.setdefault(maybe_repository, sets.make())
             sets.insert(repositories[maybe_repository], src.root.path if src.root.path else None)
-            #sets.insert(repositories, _to_external(maybe_repository, src.root.path))
 
         # Build the list of root path.
         sets.insert(roots, src.root.path or ".")
