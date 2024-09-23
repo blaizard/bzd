@@ -18,11 +18,13 @@ class OutputWithPath:
 
 
 def chunkWorker(contextPath: pathlib.Path,
-                workload: typing.Callable[[typing.Sequence[typing.Any], typing.TextIO], bool],
-                args: typing.Optional[typing.List[str]] = None,
+                workload: typing.Callable[
+                    [typing.Tuple[pathlib.Path, typing.Sequence[pathlib.Path], bool], typing.TextIO], bool],
+                args: typing.Optional[typing.Sequence[str]] = None,
                 timeoutS: int = 60,
                 maxFiles: int = 256,
-                stdoutParser: typing.Optional[typing.Callable[[str, pathlib.Path], typing.List[OutputWithPath]]] = None,
+                stdoutParser: typing.Optional[typing.Callable[[str, pathlib.Path],
+                                                              typing.Iterator[OutputWithPath]]] = None,
                 **filters: typing.Any) -> bool:
 	"""Execute a single workload at a time with multiple files and report errors if needed."""
 
@@ -34,7 +36,7 @@ def chunkWorker(contextPath: pathlib.Path,
 	for i in range(0, len(queue), maxFiles):
 		paths = queue[i:i + maxFiles]
 		stdout = io.StringIO()
-		if not workload([str(context.workspace), paths, context.check] + (args or []), stdout):
+		if not workload([context.workspace, paths, context.check] + list(args or []), stdout):  # type: ignore
 			isFailure = True
 			stdout.seek(0)
 			failureOutputs.append(stdout.read().strip())
@@ -61,8 +63,8 @@ def chunkWorker(contextPath: pathlib.Path,
 
 
 def worker(contextPath: pathlib.Path,
-           workload: typing.Callable[[typing.Tuple[str, ...], typing.TextIO], bool],
-           args: typing.Optional[typing.List[str]] = None,
+           workload: typing.Callable[[typing.Tuple[pathlib.Path, pathlib.Path, bool], typing.TextIO], bool],
+           args: typing.Optional[typing.Sequence[typing.Any]] = None,
            timeoutS: int = 60,
            **filters: typing.Any) -> bool:
 	"""Execute in parallel multiple workloads and report errors if needed."""
@@ -71,10 +73,10 @@ def worker(contextPath: pathlib.Path,
 	utilsWorker = Worker(workload)
 	isFailure = False
 
-	with utilsWorker.start(throwOnException=False) as w:  # type: ignore
+	with utilsWorker.start(throwOnException=False) as w:
 		for f in context.data(**filters):
 			w.add(
-			    [context.workspace, f, context.check] + (args or []),
+			    data=[context.workspace, f, context.check] + list(args or []),
 			    timeoutS=timeoutS,
 			)
 		for result in w.data():

@@ -12,7 +12,7 @@ class _ContextPrintAction:
 		self.context = context
 		self.whiteSpaces = sizeLeft - 15
 
-	def printStatus(self, isSuccess: bool, elapsedTime: int) -> None:
+	def printStatus(self, isSuccess: bool, elapsedTime: float) -> None:
 		status = (f"{self.context.color('passed')}PASSED{self.context.color()}"
 		          if isSuccess else f"{self.context.color('failed')}FAILED{self.context.color()}")
 		print(" " * self.whiteSpaces, end="")
@@ -25,7 +25,7 @@ class Context:
 	def __init__(
 	    self,
 	    workspace: pathlib.Path,
-	    fileList: typing.List[str],
+	    fileList: typing.Sequence[str],
 	    check: bool,
 	    colors: bool,
 	) -> None:

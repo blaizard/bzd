@@ -7,7 +7,7 @@ from bzd_sanitizer.worker import chunkWorker, OutputWithPath
 from bzd.utils.run import localBazelBinary
 
 
-def stdoutParser(stdout: str, workspace: pathlib.Path) -> typing.Iterable[OutputWithPath]:
+def stdoutParser(stdout: str, workspace: pathlib.Path) -> typing.Generator[OutputWithPath, None, None]:
 	"""Extract errors from the stdout."""
 
 	for line in stdout.split("\n"):
@@ -16,7 +16,8 @@ def stdoutParser(stdout: str, workspace: pathlib.Path) -> typing.Iterable[Output
 			yield OutputWithPath(path=pathlib.Path(m.group(1)), output=line)
 
 
-def workload(args: typing.Tuple[pathlib.Path, pathlib.Path, bool, str, str], stdout: typing.TextIO) -> bool:
+def workload(args: typing.Tuple[pathlib.Path, typing.Sequence[pathlib.Path], bool, str, str],
+             stdout: typing.TextIO) -> bool:
 	workspace, paths, check, codespell, config = args
 
 	params = []
@@ -47,7 +48,7 @@ if __name__ == "__main__":
 
 	chunkWorker(
 	    args.context,
-	    workload,
+	    workload,  # type: ignore
 	    stdoutParser=stdoutParser,
 	    args=[str(args.codespell), str(args.config)],
 	    excludeFile=".codespellignore",
