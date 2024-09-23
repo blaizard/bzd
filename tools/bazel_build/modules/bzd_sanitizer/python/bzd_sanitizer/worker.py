@@ -8,6 +8,8 @@ import dataclasses
 from bzd_sanitizer.context import Context
 from bzd.utils.worker import Worker
 
+Ts = typing.TypeVarTuple("Ts")
+
 
 @dataclasses.dataclass
 class OutputWithPath:
@@ -19,8 +21,8 @@ class OutputWithPath:
 
 def chunkWorker(contextPath: pathlib.Path,
                 workload: typing.Callable[
-                    [typing.Tuple[pathlib.Path, typing.Sequence[pathlib.Path], bool], typing.TextIO], bool],
-                args: typing.Optional[typing.Sequence[str]] = None,
+                    [typing.Tuple[pathlib.Path, typing.Sequence[pathlib.Path], bool, *Ts], typing.TextIO], bool],
+                args: typing.Optional[typing.Tuple[*Ts]] = None,
                 timeoutS: int = 60,
                 maxFiles: int = 256,
                 stdoutParser: typing.Optional[typing.Callable[[str, pathlib.Path],
@@ -63,8 +65,8 @@ def chunkWorker(contextPath: pathlib.Path,
 
 
 def worker(contextPath: pathlib.Path,
-           workload: typing.Callable[[typing.Tuple[pathlib.Path, pathlib.Path, bool], typing.TextIO], bool],
-           args: typing.Optional[typing.Sequence[typing.Any]] = None,
+           workload: typing.Callable[[typing.Tuple[pathlib.Path, pathlib.Path, bool, *Ts], typing.TextIO], bool],
+           args: typing.Optional[typing.Tuple[*Ts]] = None,
            timeoutS: int = 60,
            **filters: typing.Any) -> bool:
 	"""Execute in parallel multiple workloads and report errors if needed."""
@@ -76,7 +78,7 @@ def worker(contextPath: pathlib.Path,
 	with utilsWorker.start(throwOnException=False) as w:
 		for f in context.data(**filters):
 			w.add(
-			    data=[context.workspace, f, context.check] + list(args or []),
+			    data=[context.workspace, f, context.check] + list(args or []),  # type: ignore
 			    timeoutS=timeoutS,
 			)
 		for result in w.data():

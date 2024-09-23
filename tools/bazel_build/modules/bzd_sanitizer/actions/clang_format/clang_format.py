@@ -47,7 +47,10 @@ if __name__ == "__main__":
 
 	worker(
 	    args.context,
-	    workload,  # type: ignore
-	    args=[str(args.clang_format), args.config],
+	    workload,
+	    args=(
+	        str(args.clang_format),
+	        args.config,
+	    ),
 	    endswith=extensions,
 	)

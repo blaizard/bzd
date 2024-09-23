@@ -19,7 +19,7 @@ if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Structure checker.")
 	parser.add_argument(
 	    "--regexpr",
-	    default="^[a-z0-9_/.]+(\.S)?$",
+	    default=r"^[a-z0-9_/.]+(\.S)?$",
 	    help="Regular expression to be used for the matching.",
 	)
 	parser.add_argument("context", type=pathlib.Path, help="The context file path.")
@@ -27,7 +27,7 @@ if __name__ == "__main__":
 
 	worker(
 	    args.context,
-	    workload,  # type: ignore
-	    args=[re.compile(args.regexpr)],
+	    workload,
+	    args=(re.compile(args.regexpr), ),
 	    excludeFile=".structureignore",
 	)
