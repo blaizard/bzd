@@ -50,5 +50,6 @@ module = [
     "importlib_metadata.*",
     "zipp.*",
     "platformdirs.*",
+    "peewee.*",
 ]
 ignore_errors = true

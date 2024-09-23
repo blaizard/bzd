@@ -6,6 +6,7 @@ py_binary(
     srcs = [
         "generator_yfinance.py",
     ],
+    tags = ["manual"],
     visibility = ["//apps/trader_python:__subpackages__"],
     deps = [
         requirement("yfinance"),
