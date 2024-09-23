@@ -30,4 +30,13 @@ export default defineConfig({
 			},
 		},
 	},
+	css: {
+		preprocessorOptions: {
+			scss: {
+				// TODO: this should be changed to "modern-compiler" or "modern",
+				// see: https://sass-lang.com/documentation/breaking-changes/legacy-js-api/#bundlers
+				api: "legacy",
+			},
+		},
+	},
 });
