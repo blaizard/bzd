@@ -1,6 +1,6 @@
 load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper")
-load("@bzd_sanitizer_pip//:requirements.bzl", "requirement")
 load("@rules_python//python:defs.bzl", "py_binary")
+load("@rules_python//python/entry_points:py_console_script_binary.bzl", "py_console_script_binary")
 
 py_binary(
     name = "cli",
@@ -14,15 +14,12 @@ py_binary(
     ],
 )
 
-py_binary(
+py_console_script_binary(
     name = "black_binary",
-    srcs = [
-        "black_binary.py",
-    ],
-    deps = [
-        requirement("black"),
-        requirement("typing-extensions"),
-    ],
+    pkg = "@bzd_sanitizer_pip//black",
+    script = "black",
+    tags = ["manual"],
+    visibility = ["//visibility:public"],
 )
 
 sh_binary_wrapper(
