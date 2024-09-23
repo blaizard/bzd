@@ -22,7 +22,7 @@ py_library(
         "object.py",
         "visitor.py",
     ],
-    visibility = [":__subpackages__"],
+    visibility = ["//visibility:public"],
     deps = [
         ":grammar",
         "@bzd_python//bzd/parser",
