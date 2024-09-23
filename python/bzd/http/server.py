@@ -6,7 +6,8 @@ import mimetypes
 from http import HTTPStatus
 from functools import partial
 
-Handlers = typing.Mapping[str, typing.Mapping[str, typing.Callable[["RESTServerContext"], None]]]
+HandlerCallback = typing.Callable[["RESTServerContext"], None]
+Handlers = typing.Dict[str, typing.Dict[str, HandlerCallback]]
 StaticRoutes = typing.Dict[str, pathlib.Path]
 
 METHODS_ = {"get", "post", "put", "delete", "head", "patch"}
@@ -117,7 +118,7 @@ class HttpServer(socketserver.TCPServer):
 	def __init__(self, port: int = 0, bind: str = "0.0.0.0") -> None:
 		self.port = port
 		self.bind = bind
-		self.handlers: typing.Dict[str, typing.Dict[str, Handlers]] = {method: {} for method in METHODS_}
+		self.handlers: Handlers = {method: {} for method in METHODS_}
 		self.staticRoutes: StaticRoutes = {}
 		super().__init__((bind, port), partial(Handler, self.handlers, self.staticRoutes))
 
@@ -127,7 +128,7 @@ class HttpServer(socketserver.TCPServer):
 		super().server_bind()
 		self.bind, self.port = self.socket.getsockname()
 
-	def addRoute(self, method: str, uri: str, handler: Handlers) -> None:
+	def addRoute(self, method: str, uri: str, handler: HandlerCallback) -> None:
 		method = method.lower()
 		assert method in self.handlers, f"The route method {method} is not valid, expected any of {str(self.handlers.keys())}."
 		assert uri not in self.handlers[method], f"The route '{uri}' is already set for '{method}'."
