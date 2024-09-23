@@ -26,21 +26,21 @@ _regexprString = r"\"(?P<value>.*?)\""
 # Match regular expression: /.*/
 _regexprRegexpr = r"/(?P<regexpr>[^\s]+)/"
 # Match preset: {abc.def}
-_regexprPreset = (r"\{(?P<preset>" + _regexprBaseName + r"(?:\." + _regexprBaseName + ")*)\}")
+_regexprPreset = (r"\{(?P<preset>" + _regexprBaseName + r"(?:\." + _regexprBaseName + r")*)\}")
 # Match operator: + or - or \ or *
 _regexprOperator = r"(?P<operator>[\+\-\\\*])"
 
 
 # Match any type of symbol except protected types
 def _makeRegexprFQN(name: str) -> str:
-	return (r"(?P<" + name + r">" + _regexprBaseName + r"(?:\." + _regexprBaseName + ")*)")
+	return (r"(?P<" + name + r">" + _regexprBaseName + r"(?:\." + _regexprBaseName + r")*)")
 
 
 class FragmentBlockComment(FragmentComment):
 
 	def process(self, match: typing.Match[str]) -> None:
 		assert "comment" in self.attrs, "Missing comment attribute."
-		self.attrs["comment"] = re.sub(re.compile("^(\s*\*)+", re.MULTILINE), "", self.attrs["comment"])
+		self.attrs["comment"] = re.sub(re.compile(r"^(\s*\*)+", re.MULTILINE), "", self.attrs["comment"])
 
 
 def makeGrammarNested(
@@ -249,7 +249,7 @@ def makeGrammarExpressionFragment(finalGrammar: Grammar = [GrammarItem(r";", Fra
 
 		return grammarWrapper
 
-	nestedGrammar = makeGrammar([GrammarItem(",", FragmentNewElement), GrammarItem("\)", FragmentParentElement)])
+	nestedGrammar = makeGrammar([GrammarItem(",", FragmentNewElement), GrammarItem(r"\)", FragmentParentElement)])
 	return makeGrammar([makeGrammarContracts(), finalGrammar], nestedGrammar)
 
 

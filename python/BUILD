@@ -17,4 +17,5 @@ compile_pip_requirements(
     generate_hashes = False,
     requirements_in = ":requirements.in",
     requirements_txt = ":requirements.txt",
+    tags = ["manual"],
 )
