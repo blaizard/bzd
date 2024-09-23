@@ -61,7 +61,7 @@ class WorkerContextManager:
 		for _ in self.data():
 			pass
 		# Stop and join the processes.
-		self.worker.context.stop.value = 1  # type: ignore
+		self.worker.context.stop.value = 1
 		for worker in self.worker.workerList:
 			worker.join()
 		# Throw.
@@ -85,7 +85,7 @@ class WorkerContextManager:
                 timeoutS: The timeout for this workload. By default there is no timeout.
         """
 		with self.worker.context.count.get_lock():
-			self.worker.context.count.value += 1  # type: ignore
+			self.worker.context.count.value += 1
 		self.worker.expectedData += 1
 		self.worker.context.data.put(_WorkloadContext(data, timeoutS))
 
@@ -107,12 +107,12 @@ class Worker:
 	@staticmethod
 	def _taskWrapper(task: Callable[[Any, TextIO], Any], context: _Context) -> None:
 		# Loop unless the workers are notified to be stopped by the master process
-		while context.count.value > 0 or context.stop.value == 0:  # type: ignore
+		while context.count.value > 0 or context.stop.value == 0:
 			# Wait until there is data available or stop is raised
 			try:
 				workloadContext = context.data.get_nowait()
 				with context.count.get_lock():
-					context.count.value -= 1  # type: ignore
+					context.count.value -= 1
 			except queue.Empty:
 				time.sleep(0.001)
 				continue

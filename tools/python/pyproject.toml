@@ -7,7 +7,7 @@ blank_line_before_nested_class_or_def = true
 indent_dictionary_value = true
 
 [tool.mypy]
-python_version = "3.11"
+python_version = "3.12"
 exclude = [
     "rules_python_entry_point_*.py",
 ]
