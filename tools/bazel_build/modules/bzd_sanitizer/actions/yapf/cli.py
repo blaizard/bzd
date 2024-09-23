@@ -34,7 +34,7 @@ if __name__ == "__main__":
 
 	worker(
 	    args.context,
-	    workload,  # type: ignore
-	    args=[str(args.config)],
+	    workload,
+	    args=(str(args.config), ),
 	    endswith=[".py", ".pyi"],
 	)

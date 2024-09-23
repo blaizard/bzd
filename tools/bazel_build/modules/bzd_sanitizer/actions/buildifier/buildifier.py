@@ -44,8 +44,8 @@ if __name__ == "__main__":
 
 	worker(
 	    args.context,
-	    workload,  # type: ignore
-	    args=[str(args.buildifier)],
+	    workload,
+	    args=(str(args.buildifier), ),
 	    endswith=[".bazel", ".bzl"],
 	    include=["**BUILD", "**WORKSPACE"],
 	)

@@ -48,8 +48,11 @@ if __name__ == "__main__":
 
 	chunkWorker(
 	    args.context,
-	    workload,  # type: ignore
+	    workload,
 	    stdoutParser=stdoutParser,
-	    args=[str(args.codespell), str(args.config)],
+	    args=(
+	        str(args.codespell),
+	        str(args.config),
+	    ),
 	    excludeFile=".codespellignore",
 	)
