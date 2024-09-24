@@ -7,6 +7,8 @@ from bzd.utils.logging import Logger
 
 logger = Logger("scheduler")
 
+Ts = typing.TypeVarTuple("Ts")
+
 
 @dataclasses.dataclass
 class Workload:
@@ -50,9 +52,9 @@ class Scheduler:
 	def add(self,
 	        name: str,
 	        intervalS: float,
-	        callback: typing.Callable[..., None],
+	        callback: typing.Callable[[*Ts], None],
 	        immediate: bool = False,
-	        args: typing.Optional[typing.List[typing.Any]] = None,
+	        args: typing.Optional[typing.Tuple[*Ts]] = None,
 	        kwargs: typing.Optional[typing.Dict[str, typing.Any]] = None) -> None:
 		"""Add a new workload to be scheduled."""
 
@@ -61,7 +63,7 @@ class Scheduler:
 		                    intervalS=intervalS,
 		                    callback=callback,
 		                    immediate=immediate,
-		                    args=args or [],
+		                    args=list(args or []),
 		                    kwargs=kwargs or {})
 		self.workloads.append(workload)
 
