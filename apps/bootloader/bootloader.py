@@ -10,7 +10,6 @@ import stat
 import itertools
 
 from apps.bootloader.binary import Binary, StablePolicy, ExceptionBinaryAbort
-from apps.bootloader.singleton import Singleton
 from apps.bootloader.config import STABLE_VERSION, application, updatePath, updatePolicy
 from apps.artifacts.api.python.release.release import Release
 from apps.artifacts.api.python.release.mock import ReleaseMock

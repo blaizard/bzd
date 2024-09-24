@@ -16,8 +16,6 @@ py_binary(
     srcs = [
         "binary.py",
         "bootloader.py",
-        "mutex.py",
-        "singleton.py",
     ],
     data = [
         ":config",

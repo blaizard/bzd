@@ -1,12 +1,19 @@
 import fcntl
 import os
 import pathlib
+import tempfile
 
 
 class Singleton:
 
 	def __init__(self, path: pathlib.Path) -> None:
 		self.path = path
+
+	@staticmethod
+	def makeFromName(name: str) -> "Singleton":
+		"""Create a singleton given a name."""
+
+		return Singleton(pathlib.Path(tempfile.gettempdir()) / f"singleton_{name}.lock")
 
 	def lock(self) -> bool:
 		"""Detect if an an instance with the label is already running, globally
