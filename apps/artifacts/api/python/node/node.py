@@ -12,25 +12,28 @@ logger = Logger("node")
 class Node(ArtifactsBase):
 
 	def publish(self,
-	            uid: str,
 	            data: typing.Dict[str, typing.Any],
+	            uid: typing.Optional[str] = None,
 	            volume: str = defaultNodeVolume,
 	            path: str = "") -> None:
 		"""Publish data to a remote.
 
 		Args:
-			uid: The unique identifier of the node.
 			data: The data to be published.
+			uid: The unique identifier of the node.
 			volume: The volume to which the data should be sent.
 			path: The dotted path to publish to.
 		"""
+
+		actualUid = uid or self.uid
+		assert actualUid is not None, f"No UID were specified."
 
 		# Cleanup and encode the dotted path if needed.
 		subPath = "/".join([encodeURIComponent(s) for s in filter(len, path.split("."))])
 
 		for remote in self.remotes:
 
-			url = f"{remote}/x/{volume}/{uid}/data" + (f"/{subPath}" if subPath else "")
+			url = f"{remote}/x/{volume}/{actualUid}/data" + (f"/{subPath}" if subPath else "")
 			try:
 				HttpClient.post(url, json=data)
 				return

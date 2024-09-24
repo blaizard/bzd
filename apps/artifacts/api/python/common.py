@@ -8,7 +8,14 @@ assert len(remotes) > 0, f"'remotes' from the API config cannot be empty."
 class ArtifactsBase:
 	"""Common libraries for the Artifacts API library."""
 
-	def __init__(self) -> None:
+	def __init__(self, uid: typing.Optional[str] = None) -> None:
+		"""Construct the Artifacts API object.
+
+		Args:
+			uid: The unique identifier of the caller.
+		"""
+
+		self.uid = uid
 		self.remote: typing.Optional[str] = None
 
 	@property

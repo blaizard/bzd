@@ -39,13 +39,13 @@ if __name__ == "__main__":
 		print("Another instance of 'node_manager' is already running, aborting.")
 		sys.exit(0)
 
-	node = Node()
+	node = Node(uid=args.uid)
 
 	# Start the thread to monitor the node.
 	def monitorWorkload() -> None:
 		data = monitor()
 		try:
-			node.publish(uid=args.uid, data=data)
+			node.publish(data=data)
 		except:
 			# Ignore any errors, we don't want to crash if something is wrong on the server side.
 			pass

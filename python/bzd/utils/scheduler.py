@@ -34,7 +34,7 @@ class Scheduler:
 	def start(self) -> None:
 		"""Start the scheduler."""
 
-		assert len(self.workloads) > 0, "There are no workloads registered."
+		assert self.nbWorkloads > 0, "There are no workloads registered."
 		assert not self.worker.is_alive(), "The scheduler is already running."
 
 		self.worker.start()
@@ -64,6 +64,10 @@ class Scheduler:
 		                    args=args or [],
 		                    kwargs=kwargs or {})
 		self.workloads.append(workload)
+
+	@property
+	def nbWorkloads(self) -> int:
+		return len(self.workloads)
 
 	def _enqueue(self, workload: Workload, timestampS: float) -> None:
 		"""Push back an element to the queue."""
