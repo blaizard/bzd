@@ -76,7 +76,10 @@ class Release(ArtifactsBase):
 
 		return al, isa
 
-	def fetch(self, path: str, uid: str, ignore: typing.Optional[str] = None) -> typing.Optional[Update]:
+	def fetch(self,
+	          path: str,
+	          uid: typing.Optional[str] = None,
+	          ignore: typing.Optional[str] = None) -> typing.Optional[Update]:
 		"""Check if there is an update available.
 
         Args:
@@ -87,7 +90,7 @@ class Release(ArtifactsBase):
 
 		# Identify the platform
 		al, isa = Release.getAlIsa()
-		query = {"ignore": ignore, "uid": uid, "al": al, "isa": isa}
+		query = {"ignore": ignore, "uid": uid or self.uid, "al": al, "isa": isa}
 
 		def queryToString() -> str:
 			return "&".join([f"{k}={v}" for k, v in query.items() if v is not None])

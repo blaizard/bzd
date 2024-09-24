@@ -14,6 +14,7 @@ from apps.bootloader.singleton import Singleton
 from apps.bootloader.config import STABLE_VERSION, application, updatePath, updatePolicy
 from apps.artifacts.api.python.release.release import Release
 from apps.artifacts.api.python.release.mock import ReleaseMock
+from apps.artifacts.api.python.node.node import Node
 from bzd.utils.scheduler import Scheduler
 from bzd.utils.logging import Logger, InMemoryLogger, StubLogger
 
@@ -28,7 +29,7 @@ class Context:
 		self.newBinary: typing.Optional[pathlib.Path] = None
 		self.updateIgnoreOverride: typing.Optional[str] = None
 		self.logger = logger
-		self.release = Release()
+		self.release = Release(uid=self.uid)
 
 	@staticmethod
 	def parse(args: typing.List[str]) -> typing.Tuple[argparse.Namespace, typing.List[str]]:
@@ -181,6 +182,16 @@ def autoUpdateApplication(context: Context, path: pathlib.Path, uid: str) -> Non
 			context.changeBinary(updatePath)
 
 
+def updateInfo(node: Node) -> None:
+	"""Update long standing information."""
+
+	try:
+		node.publish(data={"version": {"bootloader": STABLE_VERSION}})
+	except:
+		# Ignore any errors, we don't want to crash if something is wrong.
+		pass
+
+
 def bootloader(context: Context) -> int:
 	"""Run the bootloader.
 	
@@ -194,6 +205,7 @@ def bootloader(context: Context) -> int:
 
 	binary = Binary(binary=context.application, logger=context.logger)
 	context.registerBinary(binary=binary)
+	scheduler = Scheduler()
 
 	context.logger.info(
 	    f"Bootloader version {STABLE_VERSION} for application {context.application} with given args: {' '.join(context.args)}"
@@ -204,13 +216,18 @@ def bootloader(context: Context) -> int:
 	#if not singleton.lock():
 	#	sys.exit(0)
 
+	if context.uid:
+		node = Node(uid=context.uid)
+		scheduler.add("info", 3600, updateInfo, args=[node], immediate=True)
+
 	if context.updatePath:
-		scheduler = Scheduler()
 		scheduler.add("application",
 		              context.updateInterval,
 		              autoUpdateApplication,
 		              args=[context, context.updatePath, context.uid],
 		              immediate=True)
+
+	if scheduler.nbWorkloads > 0:
 		scheduler.start()
 
 	def stableCallback() -> None:

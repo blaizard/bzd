@@ -28,6 +28,7 @@ py_binary(
     visibility = ["//visibility:public"],
     deps = [
         ":config",
+        "//apps/artifacts/api/python/node",
         "//apps/artifacts/api/python/release",
         "//apps/artifacts/api/python/release:mock",
         "@bzd_python//bzd/utils:logging",

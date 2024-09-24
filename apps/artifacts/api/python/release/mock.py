@@ -37,7 +37,10 @@ class ReleaseMock:
 		"""
 		self.data = data
 
-	def fetch(self, path: str, uid: str, ignore: typing.Optional[str] = None) -> typing.Optional[Update]:
+	def fetch(self,
+	          path: str,
+	          uid: typing.Optional[str] = None,
+	          ignore: typing.Optional[str] = None) -> typing.Optional[Update]:
 		"""Check if there is an update available.
 
 		Args:
