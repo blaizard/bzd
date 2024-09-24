@@ -5,6 +5,7 @@ import os
 import fcntl
 import time
 import typing
+import tempfile
 
 from bzd.utils.logging import Logger
 
@@ -25,6 +26,12 @@ class Mutex:
 		self.path = path
 		self.timeoutS = timeoutS
 		self.path.parent.mkdir(parents=True, exist_ok=True)
+
+	@staticmethod
+	def makeFromName(name: str, timeoutS: float = 3600) -> "Mutex":
+		"""Create a mutex given a name."""
+
+		return Mutex(path=pathlib.Path(tempfile.gettempdir()) / f"mutex_{name}.lock")
 
 	def __enter__(self) -> None:
 		"""Implementation of a mutex.

@@ -21,12 +21,12 @@ py_binary(
         "node_manager.py",
         "power.py",
         "rest_server.py",
-        "singleton.py",
     ],
     deps = [
         requirement("psutil"),
         "//apps/artifacts/api/python/node",
         "@bzd_python//bzd/http:client",
+        "@bzd_python//bzd/sync:singleton",
         "@bzd_python//bzd/utils:scheduler",
     ],
 )

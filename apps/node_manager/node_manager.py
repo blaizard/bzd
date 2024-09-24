@@ -6,9 +6,9 @@ import sys
 from apps.node_manager.rest_server import RESTServer, RESTServerContext
 from apps.node_manager.power import handlersPower
 from apps.node_manager.monitor import handlersMonitor, monitor
-from apps.node_manager.singleton import instanceAlreadyRunning
 from bzd.http.client import HttpClient
 from bzd.utils.scheduler import Scheduler
+from bzd.sync.singleton import Singleton
 from apps.artifacts.api.python.node.node import Node
 
 if __name__ == "__main__":
@@ -35,7 +35,8 @@ if __name__ == "__main__":
 		sys.exit(0)
 
 	# Ensure only a single instance of this program is running at a time.
-	if instanceAlreadyRunning("node_manager"):
+	singleton = Singleton.makeFromName("node_manager")
+	if not singleton.lock():
 		print("Another instance of 'node_manager' is already running, aborting.")
 		sys.exit(0)
 
