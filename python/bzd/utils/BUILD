@@ -62,23 +62,8 @@ py_library(
 )
 
 py_library(
-    name = "mutex",
-    srcs = ["mutex.py"],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":logging",
-    ],
-)
-
-py_library(
     name = "result",
     srcs = ["result.py"],
-    visibility = ["//visibility:public"],
-)
-
-py_library(
-    name = "singleton",
-    srcs = ["singleton.py"],
     visibility = ["//visibility:public"],
 )
 
