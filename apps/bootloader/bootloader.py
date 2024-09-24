@@ -158,11 +158,11 @@ class ContextForTest(Context):
 		pass
 
 
-def autoUpdateApplication(context: Context, path: pathlib.Path, uid: str) -> None:
+def autoUpdateApplication(context: Context, path: pathlib.Path) -> None:
 	"""Check if there is an update available."""
 
 	# Check for updates, this can take up to several minutes.
-	maybeUpdate = context.release.fetch(path=str(path), uid=uid, ignore=context.updateIgnore)
+	maybeUpdate = context.release.fetch(path=str(path), ignore=context.updateIgnore)
 	if maybeUpdate:
 		with tempfile.NamedTemporaryFile(delete=False) as updateFile:
 			updatePath = pathlib.Path(updateFile.name)
@@ -218,13 +218,16 @@ def bootloader(context: Context) -> int:
 
 	if context.uid:
 		node = Node(uid=context.uid)
-		scheduler.add("info", 3600, updateInfo, args=[node], immediate=True)
+		scheduler.add("info", 3600, updateInfo, args=(node, ), immediate=True)
 
 	if context.updatePath:
 		scheduler.add("application",
 		              context.updateInterval,
 		              autoUpdateApplication,
-		              args=[context, context.updatePath, context.uid],
+		              args=(
+		                  context,
+		                  context.updatePath,
+		              ),
 		              immediate=True)
 
 	if scheduler.nbWorkloads > 0:
@@ -305,14 +308,14 @@ def runSelfTests(logger: Logger) -> None:
 
 	# Test update.
 	context = ContextForTest(["--bootloader-application", sleepBinary, "3600"], logger)
-	autoUpdateApplication(context, pathlib.Path("noop"), "uid")
+	autoUpdateApplication(context, pathlib.Path("noop"))
 	assert bootloader(context) == 1, "Update test failed."
 	assert context.newBinary is not None
 
 	# Test failed update.
 	context = ContextForTest(["--bootloader-application", noopBinary, "hello"], logger)
 	sleepBinary = str(pathlib.Path(__file__).parent / "tests/sleep")
-	autoUpdateApplication(context, pathlib.Path("error"), "uid")
+	autoUpdateApplication(context, pathlib.Path("error"))
 	assert bootloader(context) == 0, "Failed update test failed."
 	assert context.updateIgnore == "first"
 
