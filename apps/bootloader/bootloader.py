@@ -178,6 +178,7 @@ def autoUpdateApplication(context: Context, path: pathlib.Path) -> None:
 			if maybeUpdate.name:
 				context.setUpdateIgnore(maybeUpdate.name)
 		else:
+			context.logger.info(f"Update validated, switching to '{updatePath}'.")
 			context.changeBinary(updatePath)
 
 
