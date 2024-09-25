@@ -78,7 +78,7 @@ fi
 cd "$temp/{cwd}"
 export BZD_BUNDLE="$0"
 export RUNFILES_DIR="$temp"
-exec "{executable}" "$@"
+"{executable}" "$@" # No exec to activate trap EXIT
 
 #__END_OF_SCRIPT__#
 """.format(executable=str(self.executable), cwd=str(self.cwd), stamp=stamp).encode("utf-8"))
