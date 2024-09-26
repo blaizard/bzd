@@ -161,7 +161,7 @@ def autoUpdateApplication(context: Context, path: pathlib.Path, uid: str) -> Non
 	maybeUpdate = context.release.fetch(path=str(path), uid=uid, ignore=context.updateIgnore)
 	if maybeUpdate:
 		# Create a directory with the uid to fetch the last update.
-		updatePath = RollingNamedTemporaryFile(namespace=f"bootloader_{uid}", maxFiles=5).get()
+		updatePath = RollingNamedTemporaryFile(namespace=f"bootloader_{uid}", maxFiles=2).get()
 		context.logger.info(f"Update found, writing to '{updatePath}'.")
 		maybeUpdate.toFile(updatePath)
 
@@ -305,14 +305,14 @@ def runSelfTests(logger: Logger) -> None:
 
 	# Test update.
 	context = ContextForTest(["--bootloader-application", sleepBinary, "3600"], logger)
-	autoUpdateApplication(context, pathlib.Path("noop"), "uid")
+	autoUpdateApplication(context, pathlib.Path("noop"), "test_uid")
 	assert bootloader(context) == 1, "Update test failed."
 	assert context.newBinary is not None
 
 	# Test failed update.
 	context = ContextForTest(["--bootloader-application", noopBinary, "hello"], logger)
 	sleepBinary = str(pathlib.Path(__file__).parent / "tests/sleep")
-	autoUpdateApplication(context, pathlib.Path("error"), "uid")
+	autoUpdateApplication(context, pathlib.Path("error"), "test_uid")
 	assert bootloader(context) == 0, "Failed update test failed."
 	assert context.updateIgnore == "first"
 
