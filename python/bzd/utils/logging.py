@@ -15,8 +15,9 @@ class _CallbackHandler(logging.Handler):
 		self.callback = callback
 
 	def emit(self, record: typing.Any) -> None:
-		msg = self.format(record)
-		self.callback(msg)
+		msg = self.format(record).strip()
+		if msg:
+			self.callback(msg)
 
 
 class LoggerBackend:
@@ -33,21 +34,47 @@ class LoggerBackendStub(LoggerBackend):
 
 
 class LoggerBackendInMemory(LoggerBackend):
-	"""Log the content in-memory.
-	
-	The logs are then available via the 'data' attribute.
-	"""
+	"""Log the content in-memory."""
 
-	def __init__(self, name: str, maxLogs: int = 100) -> None:
-		self.maxLogs = maxLogs
-		self.data: typing.List[str] = []
+	def __init__(self, maxBufferSize: int = 10000) -> None:
+		self.maxBufferSize = maxBufferSize
+		self.size = 0
+		self.records: typing.List[typing.Tuple[int, str]] = []
 
 	def install(self, logger: logging.Logger) -> None:
 		logger.addHandler(_CallbackHandler(self._log))
 
 	def _log(self, message: str) -> None:
-		self.data.append(message)
-		self.data = self.data[-self.maxLogs:]
+		self.size += len(message)
+		self.records.append((
+		    len(message),
+		    message,
+		))
+
+		# Resize the buffer.
+		while self.size > self.maxBufferSize:
+			sizeToBeRemoved = self.size - self.maxBufferSize
+			sizeNextEntry = self.records[0][0]
+			sizeRemove = min(sizeNextEntry, sizeToBeRemoved)
+			self.size -= sizeRemove
+			self.records[0] = (
+			    sizeNextEntry - sizeRemove,
+			    self.records[0][1][sizeRemove:],
+			)
+			if len(self.records[0][1]) == 0:
+				self.records.pop(0)
+
+	def data(self) -> typing.List[str]:
+		"""Accessor for the in-memory data."""
+
+		return [record[1] for record in self.records]
+
+
+class LoggerBackendBuffered(LoggerBackend):
+	"""Buffer the logs in memory before calling a callback."""
+
+	def __init__(self, bufferTimeS: float = 1., maxBufferSize: int = 10000) -> None:
+		pass
 
 
 class Logger:
@@ -75,10 +102,3 @@ class Logger:
 	@property
 	def error(self) -> typing.Callable[[str], None]:
 		return self.logger.error
-
-
-class BufferLogger(Logger):
-	"""Buffer the logs in memory before being emitted."""
-
-	def __init__(self, name: str, bufferTimeS: float = 1., maxBufferSize: int = 10000) -> None:
-		super().__init__(name)

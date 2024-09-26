@@ -322,11 +322,11 @@ if __name__ == "__main__":
 	logger = Logger("bootloader")
 
 	logger.info("Self testing...")
-	inMemoryBackend = LoggerBackendInMemory("self-tests")
+	inMemoryBackend = LoggerBackendInMemory()
 	try:
 		runSelfTests(Logger("self-tests").backend(inMemoryBackend))
 	except:
-		logger.error("\n".join(inMemoryBackend.data))
+		logger.error("\n".join(inMemoryBackend.data()))
 		raise
 
 	returnCode = bootloader(Context(sys.argv[1:], logger))
