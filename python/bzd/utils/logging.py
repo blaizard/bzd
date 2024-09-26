@@ -34,7 +34,7 @@ class StubLogger(Logger):
 		self.logger.addHandler(logging.NullHandler())
 
 
-class CallbackHandler(logging.Handler):
+class _CallbackHandler(logging.Handler):
 
 	def __init__(self, callback: typing.Callable[[str], None]) -> None:
 		super().__init__()
@@ -46,14 +46,25 @@ class CallbackHandler(logging.Handler):
 
 
 class InMemoryLogger(Logger):
+	"""Log the content in-memory.
+	
+	The logs are then available via the 'data' attribute.
+	"""
 
 	def __init__(self, name: str, maxLogs: int = 100) -> None:
 		super().__init__(name)
 		self.maxLogs = maxLogs
 		self.logger.propagate = False
-		self.logger.addHandler(CallbackHandler(self.log))
+		self.logger.addHandler(_CallbackHandler(self._log))
 		self.data: typing.List[str] = []
 
-	def log(self, message: str) -> None:
+	def _log(self, message: str) -> None:
 		self.data.append(message)
 		self.data = self.data[-self.maxLogs:]
+
+
+class BufferLogger(Logger):
+	"""Buffer the logs in memory before being emitted."""
+
+	def __init__(self, name: str, bufferTimeS: float = 1., maxBufferSize: int = 10000) -> None:
+		super().__init__(name)
