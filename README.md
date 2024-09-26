@@ -110,4 +110,6 @@ is determined at compile time, ensuring no memory allocation at runtime, making 
 
 ## TODO
 
-- Fix this test: //cc/bzd/core/async/tests:multithread (it hangs from time to time with clang prod).
+- Fix these tests (hangs from time to time with asan/lsan/ubsan):
+  - //cc/bzd/core/async/tests:multithread
+  - //cc/libs/timer/tests/std:tests
