@@ -4,9 +4,6 @@ import argparse
 import os
 import sys
 import time
-import threading
-import stat
-import itertools
 
 from apps.bootloader.binary import Binary, StablePolicy, ExceptionBinaryAbort
 from apps.bootloader.config import STABLE_VERSION, application, updatePath, updatePolicy
@@ -15,7 +12,7 @@ from apps.artifacts.api.python.release.release import Release
 from apps.artifacts.api.python.release.mock import ReleaseMock
 from apps.artifacts.api.python.node.node import Node
 from bzd.utils.scheduler import Scheduler
-from bzd.utils.logging import Logger, InMemoryLogger, StubLogger
+from bzd.utils.logging import Logger, LoggerBackendInMemory, LoggerBackendStub
 
 
 class Context:
@@ -168,7 +165,7 @@ def autoUpdateApplication(context: Context, path: pathlib.Path, uid: str) -> Non
 		context.logger.info(f"Update found, writing to '{updatePath}'.")
 		maybeUpdate.toFile(updatePath)
 
-		binary = Binary(binary=updatePath, logger=StubLogger("binary"))
+		binary = Binary(binary=updatePath, logger=Logger("binary").backend(LoggerBackendStub()))
 		context.registerBinary(binary=binary)
 		try:
 			binary.run(args=["."])
@@ -325,11 +322,11 @@ if __name__ == "__main__":
 	logger = Logger("bootloader")
 
 	logger.info("Self testing...")
-	loggerSelfTests = InMemoryLogger("self-tests")
+	inMemoryBackend = LoggerBackendInMemory("self-tests")
 	try:
-		runSelfTests(loggerSelfTests)
+		runSelfTests(Logger("self-tests").backend(inMemoryBackend))
 	except:
-		print("\n".join(loggerSelfTests.data))
+		logger.error("\n".join(inMemoryBackend.data))
 		raise
 
 	returnCode = bootloader(Context(sys.argv[1:], logger))
