@@ -1,6 +1,6 @@
 load("@bzd_lib//:executable_test.bzl", "bzd_executable_test")
 load("@bzd_lib//config:defs.bzl", "bzd_config_default")
-load("@rules_python//python:defs.bzl", "py_binary")
+load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 
 bzd_config_default(
     name = "config",
@@ -9,6 +9,14 @@ bzd_config_default(
     ],
     include_workspace_status = ["STABLE_VERSION"],
     visibility = ["//visibility:public"],
+)
+
+py_library(
+    name = "utils",
+    srcs = [
+        "utils.py",
+    ],
+    visibility = [":__subpackages__"],
 )
 
 py_binary(
@@ -26,6 +34,7 @@ py_binary(
     visibility = ["//visibility:public"],
     deps = [
         ":config",
+        ":utils",
         "//apps/artifacts/api/python/node",
         "//apps/artifacts/api/python/release",
         "//apps/artifacts/api/python/release:mock",

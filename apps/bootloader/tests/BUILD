@@ -1,4 +1,4 @@
-load("@rules_python//python:defs.bzl", "py_binary")
+load("@rules_python//python:defs.bzl", "py_binary", "py_test")
 
 py_binary(
     name = "noop",
@@ -22,4 +22,12 @@ py_binary(
         "sleep.py",
     ],
     visibility = ["//apps/bootloader:__pkg__"],
+)
+
+py_test(
+    name = "utils_test",
+    srcs = ["utils_test.py"],
+    deps = [
+        "//apps/bootloader:utils",
+    ],
 )

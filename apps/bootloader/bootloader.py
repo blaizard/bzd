@@ -5,12 +5,12 @@ import os
 import sys
 import time
 import threading
-import tempfile
 import stat
 import itertools
 
 from apps.bootloader.binary import Binary, StablePolicy, ExceptionBinaryAbort
 from apps.bootloader.config import STABLE_VERSION, application, updatePath, updatePolicy
+from apps.bootloader.utils import RollingNamedTemporaryFile
 from apps.artifacts.api.python.release.release import Release
 from apps.artifacts.api.python.release.mock import ReleaseMock
 from apps.artifacts.api.python.node.node import Node
@@ -157,18 +157,17 @@ class ContextForTest(Context):
 		pass
 
 
-def autoUpdateApplication(context: Context, path: pathlib.Path) -> None:
+def autoUpdateApplication(context: Context, path: pathlib.Path, uid: str) -> None:
 	"""Check if there is an update available."""
 
 	# Check for updates, this can take up to several minutes.
-	maybeUpdate = context.release.fetch(path=str(path), ignore=context.updateIgnore)
+	maybeUpdate = context.release.fetch(path=str(path), uid=uid, ignore=context.updateIgnore)
 	if maybeUpdate:
-		with tempfile.NamedTemporaryFile(delete=False) as updateFile:
-			updatePath = pathlib.Path(updateFile.name)
+		# Create a directory with the uid to fetch the last update.
+		updatePath = RollingNamedTemporaryFile(namespace=f"bootloader_{uid}", maxFiles=5).get()
 		context.logger.info(f"Update found, writing to '{updatePath}'.")
 		maybeUpdate.toFile(updatePath)
 
-		# Set execution permission.
 		binary = Binary(binary=updatePath, logger=StubLogger("binary"))
 		context.registerBinary(binary=binary)
 		try:
@@ -220,13 +219,14 @@ def bootloader(context: Context) -> int:
 		node = Node(uid=context.uid)
 		scheduler.add("info", 3600, updateInfo, args=(node, ), immediate=True)
 
-	if context.updatePath:
+	if context.uid and context.updatePath:
 		scheduler.add("application",
 		              context.updateInterval,
 		              autoUpdateApplication,
 		              args=(
 		                  context,
 		                  context.updatePath,
+		                  context.uid,
 		              ),
 		              immediate=True)
 
@@ -308,14 +308,14 @@ def runSelfTests(logger: Logger) -> None:
 
 	# Test update.
 	context = ContextForTest(["--bootloader-application", sleepBinary, "3600"], logger)
-	autoUpdateApplication(context, pathlib.Path("noop"))
+	autoUpdateApplication(context, pathlib.Path("noop"), "uid")
 	assert bootloader(context) == 1, "Update test failed."
 	assert context.newBinary is not None
 
 	# Test failed update.
 	context = ContextForTest(["--bootloader-application", noopBinary, "hello"], logger)
 	sleepBinary = str(pathlib.Path(__file__).parent / "tests/sleep")
-	autoUpdateApplication(context, pathlib.Path("error"))
+	autoUpdateApplication(context, pathlib.Path("error"), "uid")
 	assert bootloader(context) == 0, "Failed update test failed."
 	assert context.updateIgnore == "first"
 
