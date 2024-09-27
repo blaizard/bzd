@@ -1,5 +1,19 @@
 import logging
 import typing
+import dataclasses
+import time
+
+
+@dataclasses.dataclass
+class Log:
+	# The timestamp of the log entry.
+	timestamp: float
+	# The message from the log.
+	message: str
+
+
+HandlerData = typing.List[Log]
+HandlerResult = typing.Optional[HandlerData]
 
 # Default logger
 logging.basicConfig(
@@ -10,86 +24,86 @@ logging.basicConfig(
 
 class _CallbackHandler(logging.Handler):
 
-	def __init__(self, callback: typing.Callable[[str], None]) -> None:
+	def __init__(self, callback: typing.Callable[[Log], None]) -> None:
 		super().__init__()
 		self.callback = callback
 
 	def emit(self, record: typing.Any) -> None:
 		msg = self.format(record).strip()
 		if msg:
-			self.callback(msg)
+			self.callback(Log(timestamp=time.time(), message=msg))
 
 
-class LoggerBackend:
+class LoggerHandler:
 
-	def install(self, logger: logging.Logger) -> None:
-		pass
-
-
-class LoggerBackendStub(LoggerBackend):
-	"""Stub that does nothing."""
-
-	def install(self, logger: logging.Logger) -> None:
-		logger.addHandler(logging.NullHandler())
+	def handler(self, data: HandlerData) -> HandlerResult:
+		raise Exception("Not implemented")
 
 
-class LoggerBackendInMemory(LoggerBackend):
+class LoggerHandlerStub(LoggerHandler):
+	"""Stub that outputs nothing."""
+
+	def handler(self, data: HandlerData) -> HandlerResult:
+		return None
+
+
+class LoggerHandlerInMemory(LoggerHandler):
 	"""Log the content in-memory."""
 
 	def __init__(self, maxBufferSize: int = 10000) -> None:
 		self.maxBufferSize = maxBufferSize
 		self.size = 0
-		self.records: typing.List[typing.Tuple[int, str]] = []
+		self.records: typing.List[Log] = []
 
-	def install(self, logger: logging.Logger) -> None:
-		logger.addHandler(_CallbackHandler(self._log))
+	def handler(self, data: HandlerData) -> HandlerResult:
 
-	def _log(self, message: str) -> None:
-		self.size += len(message)
-		self.records.append((
-		    len(message),
-		    message,
-		))
+		for log in data:
+			self.size += len(log.message)
+			self.records.append(log)
 
 		# Resize the buffer.
 		while self.size > self.maxBufferSize:
 			sizeToBeRemoved = self.size - self.maxBufferSize
-			sizeNextEntry = self.records[0][0]
+			sizeNextEntry = len(self.records[0].message)
 			sizeRemove = min(sizeNextEntry, sizeToBeRemoved)
 			self.size -= sizeRemove
-			self.records[0] = (
-			    sizeNextEntry - sizeRemove,
-			    self.records[0][1][sizeRemove:],
-			)
-			if len(self.records[0][1]) == 0:
+			self.records[0].message = self.records[0].message[sizeRemove:]
+			if len(self.records[0].message) == 0:
 				self.records.pop(0)
 
-	def data(self) -> typing.List[str]:
+		return data
+
+	def __iter__(self) -> typing.Iterator[Log]:
 		"""Accessor for the in-memory data."""
 
-		return [record[1] for record in self.records]
-
-
-class LoggerBackendBuffered(LoggerBackend):
-	"""Buffer the logs in memory before calling a callback."""
-
-	def __init__(self, bufferTimeS: float = 1., maxBufferSize: int = 10000) -> None:
-		pass
+		for log in self.records:
+			yield log
 
 
 class Logger:
 
 	def __init__(self, name: str) -> None:
 		self.logger = logging.getLogger(name)
+		self._handlers: typing.List[LoggerHandler] = []
 
-	def backend(self, *backends: LoggerBackend) -> "Logger":
-		"""Set one of more bachends to this logger, disabling the default backend."""
+	def handlers(self, *handlers: LoggerHandler) -> "Logger":
+		"""Register handlers to the current logger, this action disables the default backend."""
 
 		self.logger.propagate = False
-		for backend in backends:
-			backend.install(logger=self.logger)
+		self.logger.addHandler(_CallbackHandler(self._callback))
+		self._handlers += handlers
 
 		return self
+
+	def _callback(self, log: Log) -> None:
+		"""Calls all handlers sequentially."""
+
+		data = [log]
+		for handler in self._handlers:
+			maybeData = handler.handler(data)
+			if maybeData is None:
+				break
+			data = maybeData
 
 	@property
 	def info(self) -> typing.Callable[[str], None]:
