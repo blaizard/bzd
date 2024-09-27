@@ -12,7 +12,7 @@ from apps.artifacts.api.python.release.release import Release
 from apps.artifacts.api.python.release.mock import ReleaseMock
 from apps.artifacts.api.python.node.node import Node
 from bzd.utils.scheduler import Scheduler
-from bzd.utils.logging import Logger, LoggerBackendInMemory, LoggerBackendStub
+from bzd.utils.logging import Logger, LoggerHandlerInMemory, LoggerHandlerStub
 
 
 class Context:
@@ -165,7 +165,7 @@ def autoUpdateApplication(context: Context, path: pathlib.Path, uid: str) -> Non
 		context.logger.info(f"Update found, writing to '{updatePath}'.")
 		maybeUpdate.toFile(updatePath)
 
-		binary = Binary(binary=updatePath, logger=Logger("binary").backend(LoggerBackendStub()))
+		binary = Binary(binary=updatePath, logger=Logger("binary").handlers(LoggerHandlerStub()))
 		context.registerBinary(binary=binary)
 		try:
 			binary.run(args=["."])
@@ -322,11 +322,11 @@ if __name__ == "__main__":
 	logger = Logger("bootloader")
 
 	logger.info("Self testing...")
-	inMemoryBackend = LoggerBackendInMemory()
+	inMemoryBackend = LoggerHandlerInMemory()
 	try:
-		runSelfTests(Logger("self-tests").backend(inMemoryBackend))
+		runSelfTests(Logger("self-tests").handlers(inMemoryBackend))
 	except:
-		logger.error("\n".join(inMemoryBackend.data()))
+		logger.error("\n".join([log.message for log in inMemoryBackend]))
 		raise
 
 	returnCode = bootloader(Context(sys.argv[1:], logger))
