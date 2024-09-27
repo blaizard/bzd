@@ -323,8 +323,9 @@ def runSelfTests(logger: Logger) -> None:
 
 if __name__ == "__main__":
 
-	with LoggerHandlerBuffered() as buffered:
-		logger = Logger("bootloader").handlers(LoggerHandlerStdout()).handlers(buffered)  #, LoggerHandlerHTTP())
+	logger = Logger("bootloader").handlers(LoggerHandlerStdout())
+
+	with logger.handlersScope(LoggerHandlerBuffered()):  #, LoggerHandlerHTTP()):
 
 		logger.info("Self testing...")
 		inMemoryBackend = LoggerHandlerInMemory()
@@ -335,4 +336,5 @@ if __name__ == "__main__":
 			raise
 
 		returnCode = bootloader(Context(sys.argv[1:], logger))
+
 	sys.exit(returnCode)
