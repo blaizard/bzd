@@ -5,10 +5,18 @@ import dataclasses
 
 @dataclasses.dataclass
 class Log:
+	# The name of the logger.
+	name: str
 	# The timestamp of the log entry.
 	timestamp: float
 	# The message from the log.
 	message: str
+	# The name of the level.
+	level: str
+	# Filename portion of the path.
+	filename: str
+	# Source line number where the logging call was issued.
+	line: int
 
 
 LoggerHandlerData = typing.List[Log]
@@ -18,13 +26,13 @@ LoggerHandlerCallback = typing.Callable[[LoggerHandlerData, "LoggerHandlerFlow"]
 class LoggerHandler:
 
 	def handler(self, data: LoggerHandlerData, flow: "LoggerHandlerFlow") -> None:
-		raise Exception("Not implemented")
+		raise NotImplementedError("Not implemented")
 
 
 class LoggerHandlerScope:
 
 	def handler(self, data: LoggerHandlerData, flow: "LoggerHandlerFlow") -> None:
-		raise Exception("Not implemented")
+		raise NotImplementedError("Not implemented")
 
 	def constructor(self) -> None:
 		pass
