@@ -7,7 +7,7 @@ import enum
 import io
 
 from apps.artifacts.api.python.release.release import Release
-from bzd.utils.logging import Logger
+from bzd.logging import Logger
 from bzd.utils.run import localCommand, Cancellation
 
 

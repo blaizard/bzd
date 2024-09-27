@@ -3,7 +3,7 @@ import threading
 import dataclasses
 import time
 
-from bzd.utils.logging import Logger
+from bzd.logging import Logger
 
 logger = Logger("scheduler")
 

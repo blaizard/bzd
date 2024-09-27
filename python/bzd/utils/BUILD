@@ -50,12 +50,6 @@ py_library(
 )
 
 py_library(
-    name = "logging",
-    srcs = ["logging.py"],
-    visibility = ["//visibility:public"],
-)
-
-py_library(
     name = "match",
     srcs = ["match.py"],
     visibility = ["//visibility:public"],
@@ -72,7 +66,7 @@ py_library(
     srcs = ["scheduler.py"],
     visibility = ["//visibility:public"],
     deps = [
-        ":logging",
+        "//bzd/logging",
     ],
 )
 

@@ -5,7 +5,7 @@ import pathlib
 
 from bzd.utils.uart import Devices, Device, Uart
 from bzd.utils.run import localPython
-from bzd.utils.logging import Logger
+from bzd.logging import Logger
 from bzd.utils.binary_builder import makeBinary
 
 logger = Logger("uart")

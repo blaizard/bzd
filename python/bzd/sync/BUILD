@@ -5,7 +5,7 @@ py_library(
     srcs = ["mutex.py"],
     visibility = ["//visibility:public"],
     deps = [
-        "//bzd/utils:logging",
+        "//bzd/logging",
     ],
 )
 
