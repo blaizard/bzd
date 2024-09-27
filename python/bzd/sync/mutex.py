@@ -7,7 +7,7 @@ import time
 import typing
 import tempfile
 
-from bzd.utils.logging import Logger
+from bzd.logging import Logger
 
 logger = Logger("mutex")
 

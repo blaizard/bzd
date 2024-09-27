@@ -8,7 +8,7 @@ import typing
 from datetime import datetime
 
 from bzd.http.client import HttpClient
-from bzd.utils.logging import Logger
+from bzd.logging import Logger
 from apps.artifacts.api.python.common import ArtifactsBase
 
 logger = Logger("release")

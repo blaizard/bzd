@@ -12,7 +12,7 @@ from apps.artifacts.api.python.release.release import Release
 from apps.artifacts.api.python.release.mock import ReleaseMock
 from apps.artifacts.api.python.node.node import Node
 from bzd.utils.scheduler import Scheduler
-from bzd.utils.logging import Logger, LoggerHandlerInMemory, LoggerHandlerStub
+from bzd.logging import Logger, LoggerHandlerInMemory, LoggerHandlerStub
 
 
 class Context:

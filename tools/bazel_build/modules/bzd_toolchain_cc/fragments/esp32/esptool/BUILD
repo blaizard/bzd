@@ -8,8 +8,8 @@ py_binary(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        "@bzd_python//bzd/logging",
         "@bzd_python//bzd/utils:binary_builder",
-        "@bzd_python//bzd/utils:logging",
         "@bzd_python//bzd/utils:run",
         "@bzd_python//bzd/utils:uart",
     ],

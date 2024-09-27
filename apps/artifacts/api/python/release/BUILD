@@ -9,7 +9,7 @@ py_library(
     deps = [
         "//apps/artifacts/api/python:common",
         "@bzd_python//bzd/http:client",
-        "@bzd_python//bzd/utils:logging",
+        "@bzd_python//bzd/logging",
     ],
 )
 
