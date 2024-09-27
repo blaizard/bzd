@@ -1,10 +1,10 @@
 import threading
 import typing
 
-from bzd.logging.handler import Log, LoggerHandler, LoggerHandlerData, LoggerHandlerFlow
+from bzd.logging.handler import Log, LoggerHandlerScope, LoggerHandlerData, LoggerHandlerFlow
 
 
-class LoggerHandlerBuffered(LoggerHandler):
+class LoggerHandlerBuffered(LoggerHandlerScope):
 	"""Buffers the log entries."""
 
 	def __init__(self, bufferTimeS: float = 1., maxBufferSize: int = 10000) -> None:
@@ -15,7 +15,7 @@ class LoggerHandlerBuffered(LoggerHandler):
 		self.maxBufferSize = maxBufferSize
 		self.stopRequested = False
 		self.timeEvent = threading.Event()
-		self.worker = threading.Thread(target=self.collector)
+		self.worker: typing.Optional[threading.Thread] = None
 
 	def handler(self, data: LoggerHandlerData, flow: LoggerHandlerFlow) -> None:
 		self.data += data
@@ -41,11 +41,12 @@ class LoggerHandlerBuffered(LoggerHandler):
 			self.data = []
 			self.size = 0
 
-	def __enter__(self) -> "LoggerHandlerBuffered":
+	def constructor(self) -> None:
+		self.worker = threading.Thread(target=self.collector)
 		self.worker.start()
-		return self
 
-	def __exit__(self, *_: typing.Any) -> None:
+	def destructor(self) -> None:
 		self.stopRequested = True
 		self.timeEvent.set()
+		assert self.worker
 		self.worker.join()
