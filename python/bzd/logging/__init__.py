@@ -27,22 +27,23 @@ class Logger:
 
 	def __init__(self, name: str) -> None:
 		self.logger = logging.getLogger(name)
-		self._handlers: typing.List[LoggerHandler] = []
+		self._handlers: typing.List[typing.List[LoggerHandler]] = []
+		self.logger.addHandler(_CallbackHandler(self._callback))
 
 	def handlers(self, *handlers: LoggerHandler) -> "Logger":
 		"""Register handlers to the current logger, this action disables the default backend."""
 
 		self.logger.propagate = False
-		self.logger.addHandler(_CallbackHandler(self._callback))
-		self._handlers += handlers
+		self._handlers.append([*handlers])
 
 		return self
 
 	def _callback(self, log: Log) -> None:
 		"""Calls all handlers sequentially."""
 
-		flow = LoggerHandlerFlow([*self._handlers])
-		flow.next(data=[log])
+		for handlers in self._handlers:
+			flow = LoggerHandlerFlow([*handlers])
+			flow.next(data=[log])
 
 	@property
 	def info(self) -> typing.Callable[[str], None]:

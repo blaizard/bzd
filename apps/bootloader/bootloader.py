@@ -324,7 +324,7 @@ def runSelfTests(logger: Logger) -> None:
 if __name__ == "__main__":
 
 	with LoggerHandlerBuffered() as buffered:
-		logger = Logger("bootloader").handlers(buffered, LoggerHandlerStdout())
+		logger = Logger("bootloader").handlers(LoggerHandlerStdout()).handlers(buffered)  #, LoggerHandlerHTTP())
 
 		logger.info("Self testing...")
 		inMemoryBackend = LoggerHandlerInMemory()
