@@ -11,9 +11,35 @@ py_library(
 )
 
 py_library(
+    name = "buffered",
+    srcs = [
+        "buffered.py",
+    ],
+    visibility = [
+        "//visibility:public",
+    ],
+    deps = [
+        ":handler",
+    ],
+)
+
+py_library(
     name = "in_memory",
     srcs = [
         "in_memory.py",
+    ],
+    visibility = [
+        "//visibility:public",
+    ],
+    deps = [
+        ":handler",
+    ],
+)
+
+py_library(
+    name = "stdout",
+    srcs = [
+        "stdout.py",
     ],
     visibility = [
         "//visibility:public",

@@ -1,8 +1,12 @@
 from bzd.logging.handler import LoggerHandler, LoggerHandlerData, LoggerHandlerFlow
 
 
-class LoggerHandlerStub(LoggerHandler):
-	"""Stub that outputs nothing."""
+class LoggerHandlerStdout(LoggerHandler):
+	"""Print to stdout."""
 
 	def handler(self, data: LoggerHandlerData, flow: LoggerHandlerFlow) -> None:
-		return
+
+		for log in data:
+			print(log.message)
+
+		flow.next(data=data)

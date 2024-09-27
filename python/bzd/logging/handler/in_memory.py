@@ -1,6 +1,6 @@
 import typing
 
-from bzd.logging.handler import LoggerHandler, HandlerData, HandlerResult, Log
+from bzd.logging.handler import LoggerHandler, LoggerHandlerData, LoggerHandlerFlow, Log
 
 
 class LoggerHandlerInMemory(LoggerHandler):
@@ -11,7 +11,7 @@ class LoggerHandlerInMemory(LoggerHandler):
 		self.size = 0
 		self.records: typing.List[Log] = []
 
-	def handler(self, data: HandlerData) -> HandlerResult:
+	def handler(self, data: LoggerHandlerData, flow: LoggerHandlerFlow) -> None:
 
 		for log in data:
 			self.size += len(log.message)
@@ -27,7 +27,7 @@ class LoggerHandlerInMemory(LoggerHandler):
 			if len(self.records[0].message) == 0:
 				self.records.pop(0)
 
-		return data
+		flow.next(data=data)
 
 	def __iter__(self) -> typing.Iterator[Log]:
 		"""Accessor for the in-memory data."""
