@@ -15,6 +15,8 @@ from bzd.utils.scheduler import Scheduler
 from bzd.logging import Logger
 from bzd.logging.handler.in_memory import LoggerHandlerInMemory
 from bzd.logging.handler.stub import LoggerHandlerStub
+from bzd.logging.handler.buffered import LoggerHandlerBuffered
+from bzd.logging.handler.stdout import LoggerHandlerStdout
 
 
 class Context:
@@ -321,15 +323,16 @@ def runSelfTests(logger: Logger) -> None:
 
 if __name__ == "__main__":
 
-	logger = Logger("bootloader")
+	with LoggerHandlerBuffered() as buffered:
+		logger = Logger("bootloader").handlers(buffered, LoggerHandlerStdout())
 
-	logger.info("Self testing...")
-	inMemoryBackend = LoggerHandlerInMemory()
-	try:
-		runSelfTests(Logger("self-tests").handlers(inMemoryBackend))
-	except:
-		logger.error("\n".join([log.message for log in inMemoryBackend]))
-		raise
+		logger.info("Self testing...")
+		inMemoryBackend = LoggerHandlerInMemory()
+		try:
+			runSelfTests(Logger("self-tests").handlers(inMemoryBackend))
+		except:
+			logger.error("\n".join([log.message for log in inMemoryBackend]))
+			raise
 
-	returnCode = bootloader(Context(sys.argv[1:], logger))
+		returnCode = bootloader(Context(sys.argv[1:], logger))
 	sys.exit(returnCode)

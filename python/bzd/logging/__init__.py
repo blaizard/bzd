@@ -2,7 +2,7 @@ import logging
 import typing
 import time
 
-from bzd.logging.handler import Log, LoggerHandler
+from bzd.logging.handler import Log, LoggerHandler, LoggerHandlerFlow
 
 # Default logger
 logging.basicConfig(
@@ -41,12 +41,8 @@ class Logger:
 	def _callback(self, log: Log) -> None:
 		"""Calls all handlers sequentially."""
 
-		data = [log]
-		for handler in self._handlers:
-			maybeData = handler.handler(data)
-			if maybeData is None:
-				break
-			data = maybeData
+		flow = LoggerHandlerFlow([*self._handlers])
+		flow.next(data=[log])
 
 	@property
 	def info(self) -> typing.Callable[[str], None]:

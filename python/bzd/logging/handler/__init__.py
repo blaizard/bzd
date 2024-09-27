@@ -11,11 +11,21 @@ class Log:
 	message: str
 
 
-HandlerData = typing.List[Log]
-HandlerResult = typing.Optional[HandlerData]
+LoggerHandlerData = typing.List[Log]
 
 
 class LoggerHandler:
 
-	def handler(self, data: HandlerData) -> HandlerResult:
+	def handler(self, data: LoggerHandlerData, flow: "LoggerHandlerFlow") -> None:
 		raise Exception("Not implemented")
+
+
+class LoggerHandlerFlow:
+
+	def __init__(self, handlers: typing.List[LoggerHandler]) -> None:
+		self._handlers = handlers
+
+	def next(self, data: LoggerHandlerData) -> None:
+		if len(self._handlers) > 0:
+			handler = self._handlers.pop(0)
+			handler.handler(data=data, flow=self)
