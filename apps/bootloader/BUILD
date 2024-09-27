@@ -39,6 +39,8 @@ py_binary(
         "//apps/artifacts/api/python/release",
         "//apps/artifacts/api/python/release:mock",
         "@bzd_python//bzd/logging",
+        "@bzd_python//bzd/logging/handler:in_memory",
+        "@bzd_python//bzd/logging/handler:stub",
         "@bzd_python//bzd/utils:run",
         "@bzd_python//bzd/utils:scheduler",
     ],
