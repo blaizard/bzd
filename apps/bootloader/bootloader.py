@@ -30,7 +30,7 @@ class Context:
 		self.updateIgnoreOverride: typing.Optional[str] = None
 		self.logger = logger
 		self.release = Release(uid=self.uid)
-		self.node = Node(uid=self.uid)
+		self.node = Node(uid=self.uid, logger=logger)
 
 	@staticmethod
 	def parse(args: typing.List[str]) -> typing.Tuple[argparse.Namespace, typing.List[str]]:

@@ -1,6 +1,7 @@
 import typing
 
 from apps.artifacts.api.config import remotes
+from bzd.logging import Logger
 
 assert len(remotes) > 0, f"'remotes' from the API config cannot be empty."
 
@@ -8,7 +9,7 @@ assert len(remotes) > 0, f"'remotes' from the API config cannot be empty."
 class ArtifactsBase:
 	"""Common libraries for the Artifacts API library."""
 
-	def __init__(self, uid: typing.Optional[str] = None) -> None:
+	def __init__(self, uid: typing.Optional[str] = None, logger: Logger = Logger("artifacts.api")) -> None:
 		"""Construct the Artifacts API object.
 
 		Args:
@@ -16,6 +17,7 @@ class ArtifactsBase:
 		"""
 
 		self.uid = uid
+		self.logger = logger
 		self.remote: typing.Optional[str] = None
 
 	@property

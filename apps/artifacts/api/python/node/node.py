@@ -2,12 +2,13 @@ import typing
 
 from bzd.http.client import HttpClient
 from bzd.http.utils import encodeURIComponent
-from bzd.logging import Logger
 from bzd.logging.handler import Log, LoggerHandler, LoggerHandlerData, LoggerHandlerFlow
 from apps.artifacts.api.python.common import ArtifactsBase
 from apps.artifacts.api.config import defaultNodeVolume
 
-logger = Logger("node")
+
+class NodePublishNoRemote(RuntimeError):
+	pass
 
 
 class Node(ArtifactsBase):
@@ -38,10 +39,10 @@ class Node(ArtifactsBase):
 				HttpClient.post(url, json=data)
 				return
 			except Exception as e:
-				logger.error(f"Exception while publishing {url}: {str(e)}")
+				self.logger.error(f"Exception while publishing {url}: {str(e)}")
 				pass
 
-		raise RuntimeError("Unable to publish to any of the remotes.")
+		raise NodePublishNoRemote("Unable to publish to any of the remotes.")
 
 	def makeLoggerHandler(self) -> "LoggerHandlerNode":
 		"""Create a logger handler that sends data to the node."""
@@ -66,15 +67,20 @@ class LoggerHandlerNode(LoggerHandler):
 
 	def handler(self, data: LoggerHandlerData, flow: LoggerHandlerFlow) -> None:
 		assert self.name
-		self.node.publish(data={
-		    "log": {
-		        self.name: [{
-		            "name": log.name,
-		            "timestamp": log.timestamp,
-		            "level": log.level,
-		            "source": f"{log.filename}:{log.line}",
-		            "message": log.message,
-		        } for log in data],
-		    }
-		}, )
+		try:
+			self.node.publish(
+			    path=["log"],
+			    data={
+			        self.name: [{
+			            "name": log.name,
+			            "timestamp": log.timestamp,
+			            "level": log.level,
+			            "source": f"{log.filename}:{log.line}",
+			            "message": log.message,
+			        } for log in data],
+			    },
+			)
+		except NodePublishNoRemote as e:
+			self.node.logger.error(str(e))
+
 		flow.next(data=data)
