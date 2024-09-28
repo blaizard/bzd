@@ -36,8 +36,8 @@ class LoggerHandlerAsyncBuffered(LoggerHandlerScope):
 		self.flush()
 
 	def flush(self) -> None:
-		if self.flow:
-			self.flow.next(self.data[:])
+		if self.flow and len(self.data):
+			self.flow.next([*self.data])
 			self.data = []
 			self.size = 0
 

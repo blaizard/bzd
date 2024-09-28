@@ -65,7 +65,16 @@ class LoggerHandlerNode(LoggerHandler):
 		self.name = name
 
 	def handler(self, data: LoggerHandlerData, flow: LoggerHandlerFlow) -> None:
-
 		assert self.name
-		self.node.publish(data={"log": {self.name: [log.message for log in data], }}, )
+		self.node.publish(data={
+		    "log": {
+		        self.name: [{
+		            "name": log.name,
+		            "timestamp": log.timestamp,
+		            "level": log.level,
+		            "source": f"{log.filename}:{log.line}",
+		            "message": log.message,
+		        } for log in data],
+		    }
+		}, )
 		flow.next(data=data)
