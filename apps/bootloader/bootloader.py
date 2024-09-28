@@ -332,7 +332,7 @@ if __name__ == "__main__":
 		try:
 			runSelfTests(Logger("self-tests").handlers(inMemoryBackend))
 		except:
-			logger.error("\n".join([log.message for log in inMemoryBackend]))
+			logger.fromLogs(*inMemoryBackend)
 			raise
 
 		returnCode = bootloader(Context(sys.argv[1:], logger))
