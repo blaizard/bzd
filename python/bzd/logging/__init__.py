@@ -31,6 +31,7 @@ class _CallbackHandler(logging.Handler):
 class Logger:
 
 	def __init__(self, name: str) -> None:
+		self.name = name
 		self.logger = logging.getLogger(name)
 		self._handlers: typing.List[typing.List[LoggerHandlerCallback]] = []
 		self.logger.propagate = False
@@ -50,7 +51,7 @@ class Logger:
 
 		for handler in handlers:
 			if isinstance(handler, LoggerHandlerScope):
-				handler.constructor()
+				handler.constructor(name=self.name)
 
 		index = len(self._handlers)
 		self._handlers.append([handler.handler for handler in handlers])

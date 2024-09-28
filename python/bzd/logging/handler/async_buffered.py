@@ -4,7 +4,7 @@ import typing
 from bzd.logging.handler import Log, LoggerHandlerScope, LoggerHandlerData, LoggerHandlerFlow
 
 
-class LoggerHandlerBuffered(LoggerHandlerScope):
+class LoggerHandlerAsyncBuffered(LoggerHandlerScope):
 	"""Buffers the log entries."""
 
 	def __init__(self, bufferTimeS: float = 1., maxBufferSize: int = 10000) -> None:
@@ -41,7 +41,7 @@ class LoggerHandlerBuffered(LoggerHandlerScope):
 			self.data = []
 			self.size = 0
 
-	def constructor(self) -> None:
+	def constructor(self, name: str) -> None:
 		self.worker = threading.Thread(target=self.collector)
 		self.worker.start()
 

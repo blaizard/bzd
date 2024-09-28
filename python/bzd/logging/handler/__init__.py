@@ -23,19 +23,20 @@ LoggerHandlerData = typing.List[Log]
 LoggerHandlerCallback = typing.Callable[[LoggerHandlerData, "LoggerHandlerFlow"], None]
 
 
-class LoggerHandler:
+class _LoggerHandlerCommon:
 
-	def handler(self, data: LoggerHandlerData, flow: "LoggerHandlerFlow") -> None:
-		raise NotImplementedError("Not implemented")
-
-
-class LoggerHandlerScope:
-
-	def handler(self, data: LoggerHandlerData, flow: "LoggerHandlerFlow") -> None:
-		raise NotImplementedError("Not implemented")
-
-	def constructor(self) -> None:
+	def constructor(self, name: str) -> None:
 		pass
+
+	def handler(self, data: LoggerHandlerData, flow: "LoggerHandlerFlow") -> None:
+		raise NotImplementedError("Not implemented")
+
+
+class LoggerHandler(_LoggerHandlerCommon):
+	pass
+
+
+class LoggerHandlerScope(_LoggerHandlerCommon):
 
 	def destructor(self) -> None:
 		pass
