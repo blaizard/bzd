@@ -15,7 +15,7 @@ from bzd.utils.scheduler import Scheduler
 from bzd.logging import Logger
 from bzd.logging.handler.in_memory import LoggerHandlerInMemory
 from bzd.logging.handler.stub import LoggerHandlerStub
-from bzd.logging.handler.buffered import LoggerHandlerBuffered
+from bzd.logging.handler.async_buffered import LoggerHandlerAsyncBuffered
 from bzd.logging.handler.stdout import LoggerHandlerStdout
 
 
@@ -325,7 +325,7 @@ if __name__ == "__main__":
 
 	logger = Logger("bootloader").handlers(LoggerHandlerStdout())
 
-	with logger.handlersScope(LoggerHandlerBuffered()):  #, LoggerHandlerHTTP()):
+	with logger.handlersScope(LoggerHandlerAsyncBuffered()):  #, LoggerHandlerHTTP()):
 
 		logger.info("Self testing...")
 		inMemoryBackend = LoggerHandlerInMemory()

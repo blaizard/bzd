@@ -39,7 +39,7 @@ py_binary(
         "//apps/artifacts/api/python/release",
         "//apps/artifacts/api/python/release:mock",
         "@bzd_python//bzd/logging",
-        "@bzd_python//bzd/logging/handler:buffered",
+        "@bzd_python//bzd/logging/handler:async_buffered",
         "@bzd_python//bzd/logging/handler:in_memory",
         "@bzd_python//bzd/logging/handler:stdout",
         "@bzd_python//bzd/logging/handler:stub",

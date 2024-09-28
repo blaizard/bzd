@@ -6,14 +6,14 @@ py_library(
         "__init__.py",
     ],
     visibility = [
-        "//bzd/logging:__subpackages__",
+        "//visibility:public",
     ],
 )
 
 py_library(
-    name = "buffered",
+    name = "async_buffered",
     srcs = [
-        "buffered.py",
+        "async_buffered.py",
     ],
     visibility = [
         "//visibility:public",

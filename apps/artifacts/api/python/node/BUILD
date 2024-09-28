@@ -12,5 +12,6 @@ py_library(
         "@bzd_python//bzd/http:client",
         "@bzd_python//bzd/http:utils",
         "@bzd_python//bzd/logging",
+        "@bzd_python//bzd/logging/handler",
     ],
 )
