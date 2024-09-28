@@ -40,6 +40,9 @@ class Logger:
 	def handlers(self, *handlers: LoggerHandler) -> "Logger":
 		"""Register handlers to the current logger, this action disables the default backend."""
 
+		for handler in handlers:
+			handler.constructor(name=self.name)
+
 		self._handlers.append([handler.handler for handler in handlers])
 
 		return self
@@ -50,8 +53,7 @@ class Logger:
 		"""Register scoped handlers."""
 
 		for handler in handlers:
-			if isinstance(handler, LoggerHandlerScope):
-				handler.constructor(name=self.name)
+			handler.constructor(name=self.name)
 
 		index = len(self._handlers)
 		self._handlers.append([handler.handler for handler in handlers])

@@ -30,6 +30,7 @@ class Context:
 		self.updateIgnoreOverride: typing.Optional[str] = None
 		self.logger = logger
 		self.release = Release(uid=self.uid)
+		self.node = Node(uid=self.uid)
 
 	@staticmethod
 	def parse(args: typing.List[str]) -> typing.Tuple[argparse.Namespace, typing.List[str]]:
@@ -217,8 +218,7 @@ def bootloader(context: Context) -> int:
 	#	sys.exit(0)
 
 	if context.uid:
-		node = Node(uid=context.uid)
-		scheduler.add("info", 3600, updateInfo, args=(node, ), immediate=True)
+		scheduler.add("info", 3600, updateInfo, args=(context.node, ), immediate=True)
 
 	if context.uid and context.updatePath:
 		scheduler.add("application",
@@ -325,16 +325,19 @@ if __name__ == "__main__":
 
 	logger = Logger("bootloader").handlers(LoggerHandlerStdout())
 
-	with logger.handlersScope(LoggerHandlerAsyncBuffered()):  #, LoggerHandlerHTTP()):
+	logger.info("Self testing...")
+	inMemoryBackend = LoggerHandlerInMemory()
+	try:
+		runSelfTests(Logger("self-tests").handlers(inMemoryBackend))
+	except:
+		logger.fromLogs(*inMemoryBackend)
+		raise
 
-		logger.info("Self testing...")
-		inMemoryBackend = LoggerHandlerInMemory()
-		try:
-			runSelfTests(Logger("self-tests").handlers(inMemoryBackend))
-		except:
-			logger.fromLogs(*inMemoryBackend)
-			raise
-
-		returnCode = bootloader(Context(sys.argv[1:], logger))
+	context = Context(sys.argv[1:], logger)
+	if context.uid:
+		with logger.handlersScope(LoggerHandlerAsyncBuffered(), context.node.makeLoggerHandler()):
+			returnCode = bootloader(context)
+	else:
+		returnCode = bootloader(context)
 
 	sys.exit(returnCode)
