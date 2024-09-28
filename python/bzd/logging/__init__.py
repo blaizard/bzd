@@ -70,6 +70,12 @@ class Logger:
 			flow = LoggerHandlerFlow([*handlers])
 			flow.next(data=[log])
 
+	def fromLogs(self, *logs: Log) -> None:
+		"""Process raw logs."""
+
+		for log in logs:
+			self._callback(log)
+
 	@property
 	def info(self) -> typing.Callable[[str], None]:
 		return self.logger.info
