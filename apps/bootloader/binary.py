@@ -140,4 +140,5 @@ class Binary:
 	def abort(self) -> None:
 		"""Abort the current running binary if any."""
 
+		self.logger.info(f"Aborting '{self.binary}'...")
 		self.cancellation.cancel()
