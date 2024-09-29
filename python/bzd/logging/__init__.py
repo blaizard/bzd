@@ -85,7 +85,7 @@ class Logger:
 		It inherits all the handlers and cannot set new ones.
 		"""
 		# To be implemented.
-		pass
+		return self
 
 	@property
 	def info(self) -> typing.Callable[[str], None]:
