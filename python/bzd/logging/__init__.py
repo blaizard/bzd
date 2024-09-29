@@ -3,11 +3,11 @@ import typing
 from contextlib import contextmanager
 
 from bzd.logging.handler import Log, LoggerHandler, LoggerHandlerScope, LoggerHandlerFlow, LoggerHandlerCallback
-from bzd.logging.handler.stdout import LoggerHandlerStdout
+from bzd.logging.handler.stderr import LoggerHandlerStderr
 
 # Default logger
 logging.basicConfig(level=logging.INFO)
-_defaultHandlers = [[LoggerHandlerStdout().handler]]
+_defaultHandlers = [[LoggerHandlerStderr().handler]]
 
 
 class _CallbackHandler(logging.Handler):
@@ -78,6 +78,14 @@ class Logger:
 
 		for log in logs:
 			self._callback(log)
+
+	def child(self, name: str) -> "Logger":
+		"""Create a child logger.
+		
+		It inherits all the handlers and cannot set new ones.
+		"""
+		# To be implemented.
+		pass
 
 	@property
 	def info(self) -> typing.Callable[[str], None]:

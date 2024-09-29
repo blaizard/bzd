@@ -41,7 +41,7 @@ py_binary(
         "@bzd_python//bzd/logging",
         "@bzd_python//bzd/logging/handler:async_buffered",
         "@bzd_python//bzd/logging/handler:in_memory",
-        "@bzd_python//bzd/logging/handler:stdout",
+        "@bzd_python//bzd/logging/handler:stderr",
         "@bzd_python//bzd/logging/handler:stub",
         "@bzd_python//bzd/utils:run",
         "@bzd_python//bzd/utils:scheduler",
