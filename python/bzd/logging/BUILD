@@ -8,6 +8,6 @@ py_library(
     visibility = ["//visibility:public"],
     deps = [
         "//bzd/logging/handler",
-        "//bzd/logging/handler:stdout",
+        "//bzd/logging/handler:stderr",
     ],
 )

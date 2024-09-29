@@ -37,9 +37,9 @@ py_library(
 )
 
 py_library(
-    name = "stdout",
+    name = "stderr",
     srcs = [
-        "stdout.py",
+        "stderr.py",
     ],
     visibility = [
         "//visibility:public",
