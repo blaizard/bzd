@@ -101,7 +101,7 @@ class Binary:
 		return path
 
 	def run(self,
-	        args: typing.Optional[typing.List[str]],
+	        args: typing.Optional[typing.List[str]] = None,
 	        stablePolicy: typing.Optional[StablePolicy] = None,
 	        stableCallback: typing.Optional[typing.Callable[[], None]] = None) -> None:
 		"""Run the binary."""
