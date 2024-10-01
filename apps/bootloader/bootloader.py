@@ -25,12 +25,12 @@ class Context:
 		self.args = args
 		self.values, self.rest = Context.parse(args)
 		self.running = True
-		self.binary: typing.Optional[Binary] = None
 		self.newBinary: typing.Optional[pathlib.Path] = None
 		self.updateIgnoreOverride: typing.Optional[str] = None
 		self.logger = logger
 		self.release = Release(uid=self.uid)
 		self.node = Node(uid=self.uid, logger=logger)
+		self.binary = Binary(binary=self.application, logger=self.logger)
 
 	@staticmethod
 	def parse(args: typing.List[str]) -> typing.Tuple[argparse.Namespace, typing.List[str]]:
@@ -58,7 +58,8 @@ class Context:
 		parser.add_argument("--bootloader-uid", type=str, help="The unique identifier of this instance.")
 		parser.add_argument("--bootloader-application",
 		                    type=pathlib.Path,
-		                    help="The application to be called by the bootloader.")
+		                    help="The application to be called by the bootloader.",
+		                    default=pathlib.Path(__file__).parent / "tests/noop")
 
 		return parser.parse_known_args(args)
 
@@ -114,13 +115,9 @@ class Context:
 		args += self.rest
 		return args
 
-	def registerBinary(self, binary: Binary) -> None:
-		self.binary = binary
-
 	def changeBinary(self, newBinary: pathlib.Path) -> None:
 		self.newBinary = newBinary
 		self.running = False
-		assert self.binary is not None
 		self.binary.abort()
 
 	def setStableBinary(self, path: pathlib.Path, stablePath: pathlib.Path) -> None:
@@ -135,21 +132,9 @@ class Context:
 
 class ContextForTest(Context):
 
-	def __init__(self, *args: typing.Any, **kwargs: typing.Any) -> None:
-		super().__init__(*args, **kwargs)
-		self.release = typing.cast(
-		    Release,
-		    ReleaseMock(
-		        data={
-		            "noop": [{
-		                "name": "first",
-		                "binary": b"#!/bin/bash\nexit 0"
-		            }],
-		            "error": [{
-		                "name": "first",
-		                "binary": b"#!/bin/bash\nexit 1"
-		            }]
-		        }))
+	def __init__(self, args: typing.List[str], logger: Logger, release: typing.Any = None) -> None:
+		super().__init__(args=args, logger=logger)
+		self.release = typing.cast(Release, ReleaseMock(data=release))
 		self.stableBinary: typing.Optional[pathlib.Path] = None
 
 	def setStableBinary(self, path: pathlib.Path, stablePath: pathlib.Path) -> None:
@@ -171,9 +156,8 @@ def autoUpdateApplication(context: Context, path: pathlib.Path, uid: str) -> Non
 		maybeUpdate.toFile(updatePath)
 
 		binary = Binary(binary=updatePath, logger=Logger("binary").handlers(LoggerHandlerStub()))
-		context.registerBinary(binary=binary)
 		try:
-			binary.run(args=["."])
+			binary.run()
 		except Exception as e:
 			context.logger.error(f"Invalid update failed with error: {e}")
 			if maybeUpdate.name:
@@ -199,13 +183,6 @@ def bootloader(context: Context) -> int:
 	Returns:
 		The return code.
 	"""
-
-	if context.application == pathlib.Path("."):
-		context.logger.info("Nothing to run.")
-		return 0
-
-	binary = Binary(binary=context.application, logger=context.logger)
-	context.registerBinary(binary=binary)
 	scheduler = Scheduler()
 
 	context.logger.info(
@@ -246,7 +223,7 @@ def bootloader(context: Context) -> int:
 	while context.running:
 
 		try:
-			binary.run(args=context.rest, stablePolicy=context.updatePolicy, stableCallback=stableCallback)
+			context.binary.run(args=context.rest, stablePolicy=context.updatePolicy, stableCallback=stableCallback)
 			return 0
 		except KeyboardInterrupt:
 			context.logger.info("<<< Keyboard interrupt >>>")
@@ -285,37 +262,47 @@ def runSelfTests(logger: Logger) -> None:
 	noopBinary = str(pathlib.Path(__file__).parent / "tests/noop")
 	errorBinary = str(pathlib.Path(__file__).parent / "tests/error")
 	sleepBinary = str(pathlib.Path(__file__).parent / "tests/sleep")
+	release = {
+	    "noop": [{
+	        "name": "first",
+	        "binary": b"#!/bin/bash\nexit 0"
+	    }],
+	    "error": [{
+	        "name": "first",
+	        "binary": b"#!/bin/bash\nexit 1"
+	    }]
+	}
 
 	# Test happy path.
-	context = ContextForTest(["--bootloader-application", noopBinary, "hello"], logger)
+	context = ContextForTest(args=["--bootloader-application", noopBinary, "hello"], logger=logger)
 	assert bootloader(context) == 0, "Happy path test failed."
 
 	# Test rollback.
 	context = ContextForTest(
-	    ["--bootloader-self-path", "a", "--bootloader-stable-path", "b", "--bootloader-application", errorBinary],
-	    logger)
+	    args=["--bootloader-self-path", "a", "--bootloader-stable-path", "b", "--bootloader-application", errorBinary],
+	    logger=logger)
 	assert bootloader(context) == 1, "Error path test failed."
 	assert context.newBinary is not None
 	assert context.newBinary.name == "b"
 
 	# Test stable binary.
-	context = ContextForTest([
+	context = ContextForTest(args=[
 	    "--bootloader-update-policy", "returnCodeZero", "--bootloader-self-path", "a", "--bootloader-stable-path", "b",
 	    "--bootloader-application", noopBinary, "hello"
-	], logger)
+	],
+	                         logger=logger)
 	assert bootloader(context) == 0, "Error path test failed."
 	assert context.stableBinary is not None
 	assert context.stableBinary.name == "a"
 
 	# Test update.
-	context = ContextForTest(["--bootloader-application", sleepBinary, "3600"], logger)
+	context = ContextForTest(release=release, args=["--bootloader-application", sleepBinary, "3600"], logger=logger)
 	autoUpdateApplication(context, pathlib.Path("noop"), "test_uid")
 	assert bootloader(context) == 1, "Update test failed."
 	assert context.newBinary is not None
 
 	# Test failed update.
-	context = ContextForTest(["--bootloader-application", noopBinary, "hello"], logger)
-	sleepBinary = str(pathlib.Path(__file__).parent / "tests/sleep")
+	context = ContextForTest(release=release, args=["--bootloader-application", noopBinary, "hello"], logger=logger)
 	autoUpdateApplication(context, pathlib.Path("error"), "test_uid")
 	assert bootloader(context) == 0, "Failed update test failed."
 	assert context.updateIgnore == "first"

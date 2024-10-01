@@ -51,5 +51,6 @@ py_binary(
 bzd_executable_test(
     name = "test",
     executable = ":bootloader",
-    expected_output = "Nothing to run",
+    expected_output = "Running",
+    expected_returncode = 0,
 )

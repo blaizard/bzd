@@ -23,7 +23,7 @@ def bzd_executable_test(name, executable, args = None, expected_returncode = Non
         srcs = [
             Label("//:executable_test.py"),
         ],
-        args = ([] if expected_returncode == None else ["--expected-returncode", expected_returncode]) +
+        args = ([] if expected_returncode == None else ["--expected-returncode", str(expected_returncode)]) +
                ([] if expected_output == None else ["--expected-output", "'{}'".format(expected_output)]) +
                ["$(rootpath {})".format(executable), "--"] +
                (args or []),
