@@ -25,6 +25,14 @@ py_binary(
     visibility = ["//apps/bootloader:__pkg__"],
 )
 
+py_binary(
+    name = "square",
+    srcs = [
+        "square.py",
+    ],
+    visibility = ["//apps/bootloader:__pkg__"],
+)
+
 py_test(
     name = "utils_test",
     srcs = ["utils_test.py"],
