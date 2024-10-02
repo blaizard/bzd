@@ -42,7 +42,7 @@ if __name__ == "__main__":
 	if args.expected_output is not None:
 		nbChecks += 1
 		assert args.expected_output in result.getStdout() or args.expected_output in result.getStderr(
-		), f"The string '{args.expected_output}' cannot be found in the output of the executable:\n{result.getOutput()}"
+		), f"The string '{args.expected_output}' cannot be found in the output of the executable."
 
 	assert nbChecks > 0, f"Please set at least one of the attributes 'expected_returncode' or 'expected_output'."
 

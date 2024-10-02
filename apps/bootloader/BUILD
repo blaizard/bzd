@@ -1,6 +1,7 @@
 load("@bzd_lib//:executable_test.bzl", "bzd_executable_test")
-load("@bzd_lib//config:defs.bzl", "bzd_config_default")
+load("@bzd_lib//config:defs.bzl", "bzd_config", "bzd_config_default")
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
+load("//apps/bootloader:defs.bzl", "bzd_bootloader_binary")
 
 bzd_config_default(
     name = "config",
@@ -49,8 +50,33 @@ py_binary(
 )
 
 bzd_executable_test(
-    name = "test",
+    name = "noop_test",
     executable = ":bootloader",
     expected_output = "Running",
+    expected_returncode = 0,
+)
+
+bzd_config(
+    name = "bootloader_config",
+    data = [
+        "//apps/bootloader/tests:square",
+    ],
+    values = {
+        "application": "apps/bootloader/tests/square",
+    },
+)
+
+bzd_bootloader_binary(
+    name = "with_application",
+    configs = {
+        ":config": ":bootloader_config",
+    },
+)
+
+bzd_executable_test(
+    name = "application_test",
+    args = ["12"],
+    executable = ":with_application",
+    expected_output = "144",
     expected_returncode = 0,
 )
