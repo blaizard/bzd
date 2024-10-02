@@ -59,13 +59,14 @@ class Context:
 		parser.add_argument("--bootloader-application",
 		                    type=pathlib.Path,
 		                    help="The application to be called by the bootloader.",
-		                    default=pathlib.Path(__file__).parent / "tests/noop")
+		                    default=pathlib.Path(application) if application else
+		                    (pathlib.Path(__file__).parent / "tests/noop"))
 
 		return parser.parse_known_args(args)
 
 	@property
 	def application(self) -> pathlib.Path:
-		return self.values.bootloader_application or pathlib.Path(application)
+		return pathlib.Path(self.values.bootloader_application)
 
 	@property
 	def updatePolicy(self) -> StablePolicy:
