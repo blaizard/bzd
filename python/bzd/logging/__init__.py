@@ -31,7 +31,6 @@ class _CallbackHandler(logging.Handler):
 class Logger:
 
 	def __init__(self, name: str) -> None:
-		self.name = name
 		self.logger = logging.getLogger(name)
 		self._handlers: typing.List[typing.List[LoggerHandlerCallback]] = []
 		self.logger.propagate = False
@@ -41,7 +40,7 @@ class Logger:
 		"""Register handlers to the current logger, this action disables the default backend."""
 
 		for handler in handlers:
-			handler.constructor(name=self.name)
+			handler.constructor(name=self.logger.name)
 
 		self._handlers.append([handler.handler for handler in handlers])
 
@@ -53,7 +52,7 @@ class Logger:
 		"""Register scoped handlers."""
 
 		for handler in handlers:
-			handler.constructor(name=self.name)
+			handler.constructor(name=self.logger.name)
 
 		index = len(self._handlers)
 		self._handlers.append([handler.handler for handler in handlers])
@@ -78,14 +77,6 @@ class Logger:
 
 		for log in logs:
 			self._callback(log)
-
-	def child(self, name: str) -> "Logger":
-		"""Create a child logger.
-		
-		It inherits all the handlers and cannot set new ones.
-		"""
-		# To be implemented.
-		return self
 
 	@property
 	def info(self) -> typing.Callable[[str], None]:
