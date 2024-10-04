@@ -156,13 +156,15 @@ def autoUpdateApplication(context: Context, path: pathlib.Path, uid: str) -> Non
 		context.logger.info(f"Update found, writing to '{updatePath}'.")
 		maybeUpdate.toFile(updatePath)
 
+		# Set the ignore name.
+		if maybeUpdate.name:
+			context.setUpdateIgnore(maybeUpdate.name)
+
 		binary = Binary(binary=updatePath, logger=Logger("binary").handlers(LoggerHandlerStub()))
 		try:
 			binary.run()
 		except Exception as e:
 			context.logger.error(f"Invalid update failed with error: {e}")
-			if maybeUpdate.name:
-				context.setUpdateIgnore(maybeUpdate.name)
 		else:
 			context.logger.info(f"Update validated, switching to '{updatePath}'.")
 			context.changeBinary(updatePath)
