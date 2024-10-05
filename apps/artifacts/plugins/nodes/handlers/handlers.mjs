@@ -16,14 +16,18 @@ const availableHandlersWithGroup = Object.entries(availableHandlers)
 	.map(([name, _]) => name);
 
 export default class Handlers {
-	constructor(handlers) {
-		this.handlers = handlers;
+	constructor(configuration) {
+		this.configuration = Object.fromEntries(
+			Object.entries(configuration).map(([root, handlers]) => {
+				return [KeyMapping.pathToInternal(root), handlers];
+			}),
+		);
 	}
 
 	/// Get the handlers associated with an internal path.
 	*getHandlers(internal) {
-		for (const [root, handlers] of Object.entries(this.handlers)) {
-			if (KeyMapping.internalStartsWithKey(internal, root.split("/").filter(Boolean))) {
+		for (const [root, handlers] of Object.entries(this.configuration)) {
+			if (KeyMapping.internalStartsWith(internal, root)) {
 				for (const [handler, options] of Object.entries(handlers)) {
 					yield [handler, options];
 				}
@@ -53,11 +57,11 @@ export default class Handlers {
 						Exception.assert(
 							keepEntry,
 							"The path {} has been processed by 2 handlers.",
-							KeyMapping.internalToKey(internal).join("/"),
+							KeyMapping.internalToPath(internal),
 						);
 						const path = KeyMapping.internalToKey(internal);
 						const name = path.pop();
-						const parent = KeyMapping.keyToInternal(...path);
+						const parent = KeyMapping.keyToInternal(path);
 						groups[handler][parent] ??= {
 							options: options,
 							data: {},
@@ -72,6 +76,7 @@ export default class Handlers {
 		return [fragmentsRest, groups];
 	}
 
+	/// Process the fragments before being inserted.
 	processBeforeInsert(fragments) {
 		const [fragmentsRest, groups] = this.groupByHandler(fragments, availableHandlersWithGroup);
 
@@ -87,7 +92,7 @@ export default class Handlers {
 						Exception.unreachable("Missing group handler.");
 					}
 				} catch (e) {
-					Log.error("Error while handling path {}: {}", KeyMapping.internalToKey(internal).join("/"), e.toString());
+					Log.error("Error while handling path {}: {}", KeyMapping.internalToPath(internal), e.toString());
 					fragmentsGroup.push({ [internal]: data["data"] });
 				}
 			}
