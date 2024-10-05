@@ -83,7 +83,7 @@ export default class Plugin extends PluginBase {
 				type: "memory",
 				name: "nodes",
 			});
-			this.nodes = new Nodes(storage);
+			this.nodes = new Nodes(storage, options["nodes.handlers"] || {});
 			for (const [uid, data] of Object.entries(options["nodes.data"] || {})) {
 				const node = await this.nodes.get(uid);
 				await node.insert(data, "data");
@@ -94,9 +94,13 @@ export default class Plugin extends PluginBase {
 
 		endpoints.register("get", "/{uid}/{path:*}", async (context) => {
 			const node = await this.nodes.get(context.getParam("uid"));
-			const data = await node.get(...Plugin.paramPathToPaths(context.getParam("path")));
-			context.sendJson(data);
-			context.sendStatus(200);
+			try {
+				const data = await node.get(...Plugin.paramPathToPaths(context.getParam("path")));
+				context.sendJson(data);
+				context.sendStatus(200);
+			} catch (e) {
+				context.sendStatus(404);
+			}
 		});
 
 		endpoints.register("post", "/{uid}/{path:*}", async (context) => {

@@ -68,18 +68,19 @@ class LoggerHandlerNode(LoggerHandler):
 	def handler(self, data: LoggerHandlerData, flow: LoggerHandlerFlow) -> None:
 		assert self.name
 		try:
-			self.node.publish(
-			    path=["log"],
-			    data={
-			        self.name: [{
-			            "name": log.name,
-			            "timestamp": log.timestamp,
-			            "level": log.level,
-			            "source": f"{log.filename}:{log.line}",
-			            "message": log.message,
-			        } for log in data],
-			    },
-			)
+			for log in data:
+				self.node.publish(
+				    path=["log"],
+				    data={
+				        self.name: {
+				            "name": log.name,
+				            "timestamp": log.timestamp,
+				            "level": log.level,
+				            "source": f"{log.filename}:{log.line}",
+				            "message": log.message,
+				        },
+				    },
+				)
 		except NodePublishNoRemote as e:
 			self.node.logger.error(str(e))
 

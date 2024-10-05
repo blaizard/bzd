@@ -43,3 +43,7 @@ rm /usr/lib/systemd/system/bzd.service
 systemctl daemon-reload
 systemctl reset-failed
 ```
+
+## Run
+
+bazel run apps/node_manager:with_bootloader -- --bootloader-uid hello hello

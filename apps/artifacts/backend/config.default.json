@@ -1,3 +1,14 @@
 {
-    "volumes": {}
+    "volumes": {
+        "nodes": {
+            "nodes.handlers": {
+                "/data/log": {
+                    "toString": "[{level}] [{name}] [{source}] {message}"
+                }
+            },
+            "nodes.path": "/bzd/data",
+            "nodes.server.port": 8888,
+            "type": "nodes"
+        }
+    }
 }
