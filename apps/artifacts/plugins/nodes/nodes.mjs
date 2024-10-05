@@ -2,14 +2,11 @@ import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import { CollectionPaging } from "#bzd/nodejs/db/utils.mjs";
 import Cache from "#bzd/nodejs/core/cache.mjs";
-import toString from "#bzd/apps/artifacts/plugins/nodes/handlers/to_string.mjs";
+import KeyMapping from "#bzd/apps/artifacts/plugins/nodes/key_mapping.mjs";
+import Handlers from "#bzd/apps/artifacts/plugins/nodes/handlers/handlers.mjs";
 
 const Exception = ExceptionFactory("apps", "plugin", "nodes");
 const Log = LogFactory("apps", "plugin", "nodes");
-
-const availableHandlers = {
-	toString: toString,
-};
 
 /// A node is a collection of data.
 ///
@@ -23,30 +20,6 @@ export class Node {
 		this.handlers = handlers;
 	}
 
-	/// Hash a array of strings.
-	static keyToInternal(...internalsOrKeys) {
-		return internalsOrKeys.join("\x01");
-	}
-
-	/// Unhash a array of strings.
-	static internalToKey(internal) {
-		return internal.split("\x01");
-	}
-
-	/// Check if a hash starts with a specific key.
-	static internalStartsWithKey(internal, key) {
-		const hash = key.join("\x01");
-		if (internal.startsWith(hash)) {
-			if (internal.length == hash.length) {
-				return true;
-			}
-			if (internal[hash.length] == "\x01") {
-				return true;
-			}
-		}
-		return false;
-	}
-
 	/// Identify the path of the fragments that are being set.
 	///
 	/// A path is determined by the full path up to a value or a list.
@@ -57,95 +30,20 @@ export class Node {
 		for (const [key, value] of Object.entries(fragment)) {
 			if (value && value.constructor == Object) {
 				for (const [subKey, subValue] of Object.entries(this.getAllPathAndValues(value))) {
-					paths[Node.keyToInternal(...rootPath, key, subKey)] = subValue;
+					paths[KeyMapping.keyToInternal(...rootPath, key, subKey)] = subValue;
 				}
 			} else {
-				paths[Node.keyToInternal(...rootPath, key)] = value;
+				paths[KeyMapping.keyToInternal(...rootPath, key)] = value;
 			}
 		}
 		return paths;
-	}
-
-	/// Get the handlers associated with this internal path.
-	*getHandlers(internal) {
-		for (const [root, handlers] of Object.entries(this.handlers)) {
-			if (Node.internalStartsWithKey(internal, root.split("/").filter(Boolean))) {
-				for (const [handler, options] of Object.entries(handlers)) {
-					yield [handler, options];
-				}
-			}
-		}
-	}
-
-	/// Create groups by handlers.
-	///
-	/// Each group of fragment created will be removed from the fragments and returned separately with the following format,
-	/// example using a.b.c.d = 12;
-	/// {
-	///    [handler]: {
-	///        a.b.c: {
-	///           options: [handlerOptions],
-	///           data: { d: 12 },
-	///        }
-	///    }
-	/// }
-	groupByHandler(fragments, handlers) {
-		let groups = Object.fromEntries([...handlers].map((key) => [key, {}]));
-		const fragmentsRest = Object.fromEntries(
-			Object.entries(fragments).filter(([internal, value]) => {
-				let keepEntry = true;
-				for (const [handler, options] of this.getHandlers(internal)) {
-					if (handler in groups) {
-						Exception.assert(
-							keepEntry,
-							"The path {} has been processed by 2 handlers.",
-							Node.internalToKey(internal).join("/"),
-						);
-						const path = Node.internalToKey(internal);
-						const name = path.pop();
-						const parent = Node.keyToInternal(...path);
-						groups[handler][parent] ??= {
-							options: options,
-							data: {},
-						};
-						groups[handler][parent]["data"][name] = value;
-						keepEntry = false;
-					}
-				}
-				return keepEntry;
-			}),
-		);
-		return [fragmentsRest, groups];
 	}
 
 	async insert(fragment, ...paths) {
 		const timestamp = Date.now();
 
 		let fragments = this.getAllPathAndValues(fragment, paths);
-		const handlersWithGroup = Object.entries(availableHandlers)
-			.filter(([_, data]) => "group" in data)
-			.map(([name, _]) => name);
-		const [fragmentsRest, groups] = this.groupByHandler(fragments, handlersWithGroup);
-
-		/// Process the formatting with handlers.
-		let fragmentsGroup = [];
-		for (const [handlerName, groupByPath] of Object.entries(groups)) {
-			const groupOptions = availableHandlers[handlerName].group;
-			for (const [internal, data] of Object.entries(groupByPath)) {
-				try {
-					if ("format" in groupOptions) {
-						fragmentsGroup.push({ [internal]: groupOptions.format(data["data"], data["options"]) });
-					} else {
-						Exception.unreachable("Missing group handler.");
-					}
-				} catch (e) {
-					Log.error("Error while handling path {}: {}", Node.internalToKey(internal).join("/"), e.toString());
-					fragmentsGroup.push({ [internal]: data["data"] });
-				}
-			}
-		}
-
-		fragments = Object.assign(fragmentsRest, ...fragmentsGroup);
+		fragments = this.handlers.processBeforeInsert(fragments);
 
 		await this.storage.update(
 			this.uid,
@@ -191,7 +89,7 @@ export class Node {
 export class Nodes {
 	constructor(storage, handlers) {
 		this.storage = storage.getAccessor("data");
-		this.handlers = handlers;
+		this.handlers = new Handlers(handlers);
 		const cache = new Cache({
 			garbageCollector: false,
 		});
@@ -208,7 +106,7 @@ export class Nodes {
 			);
 			let tree = {};
 			for (const [internal, value] of Object.entries(data.data)) {
-				const paths = Node.internalToKey(internal);
+				const paths = KeyMapping.internalToKey(internal);
 				const lastSegment = paths.pop();
 				const object = paths.reduce((r, segment) => {
 					if (!r[segment]) {
