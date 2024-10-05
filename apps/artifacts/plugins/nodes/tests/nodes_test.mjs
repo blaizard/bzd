@@ -1,5 +1,5 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
-import Nodes from "#bzd/apps/artifacts/plugins/nodes/nodes.mjs";
+import { Nodes, Node } from "#bzd/apps/artifacts/plugins/nodes/nodes.mjs";
 import makeStorageFromConfig from "#bzd/nodejs/db/key_value_store/make_from_config.mjs";
 
 const Exception = ExceptionFactory("test", "artifacts", "plugins", "nodes");
@@ -20,10 +20,10 @@ describe("Nodes", () => {
 				},
 			});
 			Exception.assertEqual(result, {
-				"a\u0001b\u0001c": 12,
-				"a\u0001b\u0001e": [],
-				"a\u0001b\u0001f": null,
-				"a\u0001d": [12, 3],
+				[Node.keyToInternal("a", "b", "c")]: 12,
+				[Node.keyToInternal("a", "b", "e")]: [],
+				[Node.keyToInternal("a", "b", "f")]: null,
+				[Node.keyToInternal("a", "d")]: [12, 3],
 			});
 		});
 	});

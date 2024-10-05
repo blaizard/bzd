@@ -12,9 +12,9 @@ bzd_nodejs_library(
     ],
     deps = [
         "//apps/artifacts/backend:plugin",
+        "//apps/artifacts/plugins/nodes/handlers:to_string",
         "//nodejs/core:cache",
         "//nodejs/core:exception",
-        "//nodejs/core:format",
         "//nodejs/core:log",
         "//nodejs/db:utils",
         "//nodejs/db/key_value_store:make_from_config",
