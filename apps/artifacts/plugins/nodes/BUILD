@@ -14,6 +14,7 @@ bzd_nodejs_library(
         "//apps/artifacts/backend:plugin",
         "//nodejs/core:cache",
         "//nodejs/core:exception",
+        "//nodejs/core:format",
         "//nodejs/core:log",
         "//nodejs/db:utils",
         "//nodejs/db/key_value_store:make_from_config",

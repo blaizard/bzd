@@ -11,7 +11,7 @@ describe("Nodes", () => {
 				type: "memory",
 				name: "nodes",
 			});
-			let nodes = new Nodes(storage);
+			let nodes = new Nodes(storage, {});
 			let node = await nodes.get("node");
 			const result = node.getAllPathAndValues({
 				a: {
@@ -19,7 +19,12 @@ describe("Nodes", () => {
 					d: [12, 3],
 				},
 			});
-			Exception.assertEqual(result, { "a.b.c": 12, "a.b.e": [], "a.b.f": null, "a.d": [12, 3] });
+			Exception.assertEqual(result, {
+				"a\u0001b\u0001c": 12,
+				"a\u0001b\u0001e": [],
+				"a\u0001b\u0001f": null,
+				"a\u0001d": [12, 3],
+			});
 		});
 	});
 });
