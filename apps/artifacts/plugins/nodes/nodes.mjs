@@ -30,10 +30,10 @@ export class Node {
 		for (const [key, value] of Object.entries(fragment)) {
 			if (value && value.constructor == Object) {
 				for (const [subKey, subValue] of Object.entries(this.getAllPathAndValues(value))) {
-					paths[KeyMapping.keyToInternal(...rootPath, key, subKey)] = subValue;
+					paths[KeyMapping.keyToInternal([...rootPath, key, subKey])] = subValue;
 				}
 			} else {
-				paths[KeyMapping.keyToInternal(...rootPath, key)] = value;
+				paths[KeyMapping.keyToInternal([...rootPath, key])] = value;
 			}
 		}
 		return paths;

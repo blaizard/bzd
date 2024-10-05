@@ -1,7 +1,7 @@
 /// Set of utility to manage dictionary keys from array of string.
-export default {
+const KeyMapping = {
 	/// Hash a array of strings.
-	keyToInternal(...internalsOrKeys) {
+	keyToInternal(internalsOrKeys) {
 		return internalsOrKeys.join("\x01");
 	},
 
@@ -11,16 +11,37 @@ export default {
 	},
 
 	/// Check if a hash starts with a specific key.
-	internalStartsWithKey(internal, key) {
-		const hash = key.join("\x01");
-		if (internal.startsWith(hash)) {
-			if (internal.length == hash.length) {
+	internalStartsWith(internal, root) {
+		if (internal.startsWith(root)) {
+			if (internal.length == root.length) {
 				return true;
 			}
-			if (internal[hash.length] == "\x01") {
+			if (internal[root.length] == "\x01") {
 				return true;
 			}
 		}
 		return false;
 	},
+
+	/// Convert /hello/you -> ["hello", "you"]
+	pathToKey(path) {
+		return path.split("/").filter(Boolean);
+	},
+
+	/// Convert /hello/you -> "hello\x01you"
+	pathToInternal(path) {
+		return KeyMapping.keyToInternal(KeyMapping.pathToKey(path));
+	},
+
+	/// Convert ["hello", "you"] -> /hello/you
+	keyToPath(key) {
+		return "/" + key.join("/");
+	},
+
+	/// Convert "hello\0x01you" -> /hello/you
+	internalToPath(internal) {
+		return KeyMapping.keyToPath(KeyMapping.internalToKey(internal));
+	},
 };
+
+export default KeyMapping;
