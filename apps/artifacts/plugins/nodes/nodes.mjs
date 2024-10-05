@@ -1,15 +1,21 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
+import LogFactory from "#bzd/nodejs/core/log.mjs";
 import { CollectionPaging } from "#bzd/nodejs/db/utils.mjs";
 import Cache from "#bzd/nodejs/core/cache.mjs";
-import format from "#bzd/nodejs/core/format.mjs";
+import toString from "#bzd/apps/artifacts/plugins/nodes/handlers/to_string.mjs";
 
 const Exception = ExceptionFactory("apps", "plugin", "nodes");
+const Log = LogFactory("apps", "plugin", "nodes");
+
+const availableHandlers = {
+	toString: toString,
+};
 
 /// A node is a collection of data.
 ///
 /// Data are denominated by a path, each data can be set at various interval.
 /// Data have a validity time that is adjusted automatically.
-class Node {
+export class Node {
 	constructor(storage, cache, uid, handlers) {
 		this.storage = storage;
 		this.cache = cache;
@@ -87,8 +93,14 @@ class Node {
 		let groups = Object.fromEntries([...handlers].map((key) => [key, {}]));
 		const fragmentsRest = Object.fromEntries(
 			Object.entries(fragments).filter(([internal, value]) => {
+				let keepEntry = true;
 				for (const [handler, options] of this.getHandlers(internal)) {
 					if (handler in groups) {
+						Exception.assert(
+							keepEntry,
+							"The path {} has been processed by 2 handlers.",
+							Node.internalToKey(internal).join("/"),
+						);
 						const path = Node.internalToKey(internal);
 						const name = path.pop();
 						const parent = Node.keyToInternal(...path);
@@ -97,10 +109,10 @@ class Node {
 							data: {},
 						};
 						groups[handler][parent]["data"][name] = value;
-						return false;
+						keepEntry = false;
 					}
 				}
-				return true;
+				return keepEntry;
 			}),
 		);
 		return [fragmentsRest, groups];
@@ -110,16 +122,30 @@ class Node {
 		const timestamp = Date.now();
 
 		let fragments = this.getAllPathAndValues(fragment, paths);
-		const [fragmentsRest, groups] = this.groupByHandler(fragments, ["toString"]);
+		const handlersWithGroup = Object.entries(availableHandlers)
+			.filter(([_, data]) => "group" in data)
+			.map(([name, _]) => name);
+		const [fragmentsRest, groups] = this.groupByHandler(fragments, handlersWithGroup);
 
-		/// Process the toString handler.
-		const toString = Object.fromEntries(
-			Object.entries(groups["toString"]).map(([internal, data]) => {
-				return [internal, format(data["options"], data["data"])];
-			}),
-		);
+		/// Process the formatting with handlers.
+		let fragmentsGroup = [];
+		for (const [handlerName, groupByPath] of Object.entries(groups)) {
+			const groupOptions = availableHandlers[handlerName].group;
+			for (const [internal, data] of Object.entries(groupByPath)) {
+				try {
+					if ("format" in groupOptions) {
+						fragmentsGroup.push({ [internal]: groupOptions.format(data["data"], data["options"]) });
+					} else {
+						Exception.unreachable("Missing group handler.");
+					}
+				} catch (e) {
+					Log.error("Error while handling path {}: {}", Node.internalToKey(internal).join("/"), e.toString());
+					fragmentsGroup.push({ [internal]: data["data"] });
+				}
+			}
+		}
 
-		fragments = Object.assign(fragmentsRest, toString);
+		fragments = Object.assign(fragmentsRest, ...fragmentsGroup);
 
 		await this.storage.update(
 			this.uid,
@@ -162,7 +188,7 @@ class Node {
 	}
 }
 
-export default class Nodes {
+export class Nodes {
 	constructor(storage, handlers) {
 		this.storage = storage.getAccessor("data");
 		this.handlers = handlers;

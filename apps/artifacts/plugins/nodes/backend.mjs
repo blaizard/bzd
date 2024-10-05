@@ -1,5 +1,5 @@
 import StorageBzd from "#bzd/apps/artifacts/plugins/nodes/storage.mjs";
-import Nodes from "#bzd/apps/artifacts/plugins/nodes/nodes.mjs";
+import { Nodes } from "#bzd/apps/artifacts/plugins/nodes/nodes.mjs";
 import makeStorageFromConfig from "#bzd/nodejs/db/key_value_store/make_from_config.mjs";
 import PluginBase from "#bzd/apps/artifacts/backend/plugin.mjs";
 
