@@ -11,14 +11,25 @@ bzd_nodejs_library(
         "//apps/artifacts/plugins:__subpackages__",
     ],
     deps = [
+        ":key_mapping",
         "//apps/artifacts/backend:plugin",
-        "//apps/artifacts/plugins/nodes/handlers:to_string",
+        "//apps/artifacts/plugins/nodes/handlers",
         "//nodejs/core:cache",
         "//nodejs/core:exception",
         "//nodejs/core:log",
         "//nodejs/db:utils",
         "//nodejs/db/key_value_store:make_from_config",
         "//nodejs/db/storage",
+    ],
+)
+
+bzd_nodejs_library(
+    name = "key_mapping",
+    srcs = [
+        "key_mapping.mjs",
+    ],
+    visibility = [
+        "//apps/artifacts/plugins:__subpackages__",
     ],
 )
 

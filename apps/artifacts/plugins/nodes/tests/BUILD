@@ -6,6 +6,7 @@ bzd_nodejs_test(
     main = "nodes_test.mjs",
     deps = [
         "//apps/artifacts/plugins/nodes:backend",
+        "//apps/artifacts/plugins/nodes:key_mapping",
         "//nodejs/core:exception",
     ],
 )
