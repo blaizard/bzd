@@ -15,6 +15,12 @@ class Helpers:
 		return json.dumps(data)
 
 	@staticmethod
+	def toPython(data: typing.Any) -> typing.Any:
+		if data is None:
+			return "None"
+		return json.dumps(data)
+
+	@staticmethod
 	def toSubsetChar(name: str) -> str:
 		return re.sub(r"[^a-zA-Z0-9_]+", "_", name)
 
