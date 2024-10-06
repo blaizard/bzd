@@ -101,7 +101,7 @@ class Release(ArtifactsBase):
 			try:
 				response = HttpClient.get(fullUrl, query=query)
 			except Exception as e:
-				logger.error(f"Exception while fetching {fullUrl}?{queryToString()}: {str(e)}")
+				logger.warning(f"Exception while fetching {fullUrl}?{queryToString()}: {str(e)}")
 				continue
 
 			# No update available

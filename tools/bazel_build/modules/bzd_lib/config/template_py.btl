@@ -1,5 +1,6 @@
 # This file was auto-generated.
+# mypy: ignore-errors
 
 {% for key, value in data %}
-{{ key | toSubsetChar }} = {{ value | toJson }}
+{{ key | toSubsetChar }} = {{ value | toPython }}
 {% end %}

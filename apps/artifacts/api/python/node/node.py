@@ -39,7 +39,7 @@ class Node(ArtifactsBase):
 				HttpClient.post(url, json=data)
 				return
 			except Exception as e:
-				self.logger.error(f"Exception while publishing {url}: {str(e)}")
+				self.logger.warning(f"Exception while publishing {url}: {str(e)}")
 				pass
 
 		raise NodePublishNoRemote("Unable to publish to any of the remotes.")
