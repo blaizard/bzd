@@ -4,13 +4,13 @@
 			>{<br />
 			<div v-for="(subValue, key) in value" class="indent">
 				<span>{{ key }}</span
-				>: <Value :value="subValue"></Value>,
+				>: <Value :value="subValue" :path-list="pathList + [key]"></Value>,
 			</div>
 			}</template
 		>
 		<template v-else-if="isArray"
 			>[
-			<div v-for="subValue in value" class="inline"><Value :value="subValue"></Value>,</div>
+			<div v-for="subValue in value" class="inline"><Value :value="subValue" :path-list="pathList"></Value>,</div>
 			]</template
 		>
 		<template v-else>
@@ -26,6 +26,7 @@
 		name: "Value",
 		props: {
 			value: { mandatory: false, type: Object },
+			pathList: { mandatory: false, type: Array },
 		},
 		computed: {
 			isObject() {
