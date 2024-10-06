@@ -1,7 +1,7 @@
 <template>
 	<div class="data" v-if="metadata">
 		<div>Updated: {{ durationString }} ago</div>
-		<pre><code>{{ formatValue(processedData) }}</code></pre>
+		<Value :value="processedData"></Value>
 	</div>
 </template>
 
@@ -9,10 +9,14 @@
 	import Base from "#bzd/apps/artifacts/plugins/base.vue";
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
 	import HttpClient from "#bzd/nodejs/core/http/client.mjs";
+	import Value from "#bzd/apps/artifacts/plugins/nodes/value.vue";
 	import { timeMsToString } from "#bzd/nodejs/utils/to_string.mjs";
 
 	export default {
 		mixins: [Base, Component],
+		components: {
+			Value,
+		},
 		data: function () {
 			return {
 				metadata: null,
@@ -62,9 +66,6 @@
 					return callback(object[0], object[1]);
 				}
 				return recursive(object, callback);
-			},
-			formatValue(value) {
-				return JSON.stringify(value, null, 4);
 			},
 			async fetchMetadata() {
 				await this.handleSubmit(async () => {
