@@ -1,7 +1,7 @@
 <template>
 	<div class="data" v-if="metadata">
 		<div>Updated: {{ durationString }} ago</div>
-		<Value :value="processedData"></Value>
+		<Value :value="processedData" :path-list="pathList"></Value>
 	</div>
 </template>
 
