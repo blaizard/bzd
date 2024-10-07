@@ -3,5 +3,5 @@
 ## Run
 
 ```bash
-bazel run apps/artifacts/backend --config=prod -- --port 8081
+bazel run apps/artifacts/backend --config=dev -- --port 8081
 ```

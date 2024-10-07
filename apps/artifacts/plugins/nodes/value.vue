@@ -4,7 +4,7 @@
 			>{<br />
 			<div v-for="(subValue, key) in value" class="indent">
 				<span>{{ key }}</span
-				>: <Value :value="subValue" :path-list="pathList + [key]"></Value>,
+				>: <Value :value="subValue" :path-list="[...pathList, key]"></Value>,
 			</div>
 			}</template
 		>
@@ -25,7 +25,7 @@
 	export default {
 		name: "Value",
 		props: {
-			value: { mandatory: false, type: Object },
+			value: { mandatory: false },
 			pathList: { mandatory: false, type: Array },
 		},
 		computed: {
