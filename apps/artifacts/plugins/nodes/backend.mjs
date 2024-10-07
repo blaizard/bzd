@@ -86,16 +86,18 @@ export default class Plugin extends PluginBase {
 			this.nodes = new Nodes(storage, options["nodes.handlers"] || {});
 			for (const [uid, data] of Object.entries(options["nodes.data"] || {})) {
 				const node = await this.nodes.get(uid);
-				await node.insert(data, "data");
+				await node.insert(["data"], data);
 			}
 
 			this.setStorage(await StorageBzd.make(this.nodes));
 		});
 
 		endpoints.register("get", "/{uid}/{path:*}", async (context) => {
+			const isMetadata = context.getQuery("metadata", false);
+			const maybeLast = context.getQuery("last", null);
 			const node = await this.nodes.get(context.getParam("uid"));
 			try {
-				const data = await node.get(...Plugin.paramPathToPaths(context.getParam("path")));
+				const data = await node.get(Plugin.paramPathToPaths(context.getParam("path")), isMetadata);
 				context.sendJson(data);
 				context.sendStatus(200);
 			} catch (e) {
@@ -106,7 +108,7 @@ export default class Plugin extends PluginBase {
 		endpoints.register("post", "/{uid}/{path:*}", async (context) => {
 			const data = rawBodyParse(context.getBody(), (name) => context.getHeader(name));
 			const node = await this.nodes.get(context.getParam("uid"));
-			await node.insert(data, ...Plugin.paramPathToPaths(context.getParam("path")));
+			await node.insert(Plugin.paramPathToPaths(context.getParam("path")), data);
 			context.sendStatus(200);
 		});
 	}
