@@ -18,7 +18,15 @@ class Helpers:
 	def toPython(data: typing.Any) -> typing.Any:
 		if data is None:
 			return "None"
-		return json.dumps(data)
+		if isinstance(data, str):
+			return f"\"{data}\""
+		if isinstance(data, dict):
+			content = ", ".join([f"\"{k}\": {Helpers.toPython(v)}" for k, v in data.items()])
+			return f"{{ {content} }}"
+		if isinstance(data, list):
+			content = ", ".join([Helpers.toPython(v) for v in data])
+			return f"[ {content} ]"
+		return str(data)
 
 	@staticmethod
 	def toSubsetChar(name: str) -> str:
