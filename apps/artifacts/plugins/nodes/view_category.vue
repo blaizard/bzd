@@ -1,7 +1,11 @@
 <template>
 	<div class="data" v-if="metadata">
 		<div>Updated: {{ durationString }} ago</div>
-		<Value :value="processedData" :path-list="pathList"></Value>
+		<Serialize class="value" :value="metadata.data" :path-list="pathList" v-slot="serializeSlotProps">
+			<Value :value="serializeSlotProps.value" :path-list="serializeSlotProps.pathList" v-slot="valueSlotProps">
+				<Serialize :value="valueSlotProps.value"></Serialize>
+			</Value>
+		</Serialize>
 	</div>
 </template>
 
@@ -10,12 +14,14 @@
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
 	import HttpClient from "#bzd/nodejs/core/http/client.mjs";
 	import Value from "#bzd/apps/artifacts/plugins/nodes/value.vue";
+	import Serialize from "#bzd/apps/artifacts/plugins/nodes/serialize.vue";
 	import { timeMsToString } from "#bzd/nodejs/utils/to_string.mjs";
 
 	export default {
 		mixins: [Base, Component],
 		components: {
 			Value,
+			Serialize,
 		},
 		data: function () {
 			return {
@@ -84,5 +90,10 @@
 	.data {
 		display: flex;
 		flex-direction: column;
+
+		.value {
+			border: 1px solid #eee;
+			padding: 10px;
+		}
 	}
 </style>
