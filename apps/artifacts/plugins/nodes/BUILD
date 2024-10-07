@@ -61,5 +61,6 @@ bzd_nodejs_library(
     deps = [
         "//apps/artifacts/plugins:default",
         "//nodejs/utils:to_string",
+        "//nodejs/vue/directives:tooltip",
     ],
 )
