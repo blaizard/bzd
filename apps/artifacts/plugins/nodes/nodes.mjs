@@ -39,7 +39,7 @@ export class Node {
 		return paths;
 	}
 
-	async insert(fragment, ...paths) {
+	async insert(paths, fragment) {
 		const timestamp = Date.now();
 
 		let fragments = this.getAllPathAndValues(fragment, paths);
@@ -74,16 +74,22 @@ export class Node {
 		this.cache.setDirty(this.uid);
 	}
 
-	async get(...paths) {
-		const data = await this.cache.get(this.uid);
+	/// Get the tree with single values.
+	async get(paths, isMetadata = false) {
+		const data = await this.cache.get(this.uid, isMetadata);
 		const reducedData = paths.reduce((r, segment) => {
 			return r[segment];
 		}, data);
-		return {
-			timestampServer: Date.now(),
-			data: reducedData,
-		};
+		return isMetadata
+			? {
+					timestampServer: Date.now(),
+					data: reducedData,
+				}
+			: reducedData;
 	}
+
+	/// Get a specific value at a given path.
+	async getValue(paths) {}
 }
 
 export class Nodes {
@@ -93,7 +99,7 @@ export class Nodes {
 		const cache = new Cache({
 			garbageCollector: false,
 		});
-		cache.register("data", async (uid) => {
+		cache.register("data", async (uid, isMetadata) => {
 			// Convert data into a tree.
 			let data = await this.storage.get(uid, {});
 			// This ensure that existing schema will be updated.
@@ -114,7 +120,7 @@ export class Nodes {
 					}
 					return r[segment];
 				}, tree);
-				object[lastSegment] = value.values[0];
+				object[lastSegment] = isMetadata ? value.values[0] : value.values[0][1];
 			}
 			return tree;
 		});

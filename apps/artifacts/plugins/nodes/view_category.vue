@@ -6,6 +6,17 @@
 				<Serialize :value="valueSlotProps.value"></Serialize>
 			</Value>
 		</Serialize>
+		<div>
+			Accessors:
+			<ul>
+				<li>
+					<a :href="endpoint">{{ endpoint }}</a>
+				</li>
+				<li>
+					<a :href="endpoint + '?metadata=1'">{{ endpoint }}?metadata=1</a>
+				</li>
+			</ul>
+		</div>
 	</div>
 </template>
 
@@ -45,6 +56,9 @@
 			durationString() {
 				return timeMsToString(this.metadata.timestampServer - this.timestamp);
 			},
+			endpoint() {
+				return "/x/" + this.pathList.map(encodeURIComponent).join("/");
+			},
 		},
 		mounted() {
 			this.fetchMetadata();
@@ -75,8 +89,8 @@
 			},
 			async fetchMetadata() {
 				await this.handleSubmit(async () => {
-					const endpoint = "/x/" + this.pathList.map(encodeURIComponent).join("/");
-					this.metadata = await HttpClient.get(endpoint, {
+					this.metadata = await HttpClient.get(this.endpoint, {
+						query: { metadata: 1 },
 						expect: "json",
 					});
 				});

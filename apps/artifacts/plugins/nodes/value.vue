@@ -1,6 +1,6 @@
 <template>
 	<div class="value-container">
-		<a class="more" @click="dsd" v-tooltip="tooltipActionMore">...</a>
+		<a class="more" @click="viewMore" v-tooltip="tooltipActionMore">...</a>
 		<div class="value-grid">
 			<div v-for="[t, v] in valueTimestampList" class="item">
 				<span class="timestamp">{{ timestampToString(t) }}</span
@@ -13,8 +13,11 @@
 <script>
 	import { dateToString } from "#bzd/nodejs/utils/to_string.mjs";
 	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
+	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
+	import HttpClient from "#bzd/nodejs/core/http/client.mjs";
 
 	export default {
+		mixins: [Component],
 		props: {
 			value: { mandatory: true },
 			pathList: { mandatory: true, type: Array },
@@ -22,8 +25,21 @@
 		directives: {
 			tooltip: DirectiveTooltip,
 		},
+		data: function () {
+			return {
+				count: 1,
+				timeout: null,
+				metadata: null,
+			};
+		},
+		beforeUnmount() {
+			clearTimeout(this.timeout);
+		},
 		computed: {
 			valueTimestampList() {
+				if (this.metadata) {
+					return [this.metadata.data];
+				}
 				return [this.value];
 			},
 			tooltipActionMore() {
@@ -34,8 +50,26 @@
 			},
 		},
 		methods: {
+			async viewMore() {
+				this.count = Math.max(5, this.count * 2);
+				await this.fetchMetadata();
+			},
 			timestampToString(timestamp) {
 				return dateToString("{y}-{m}-{d} {h}:{min}:{s}", timestamp);
+			},
+			async fetchMetadata() {
+				if (this.count > 1) {
+					await this.handleSubmit(async () => {
+						const endpoint = "/x/" + this.pathList.map(encodeURIComponent).join("/");
+						this.metadata = await HttpClient.get(endpoint, {
+							query: {
+								last: this.count,
+							},
+							expect: "json",
+						});
+					});
+					this.timeout = setTimeout(this.fetchMetadata, 1000);
+				}
 			},
 		},
 	};
