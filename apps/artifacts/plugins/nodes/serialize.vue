@@ -2,10 +2,10 @@
 	<div class="serialize-container">
 		<template v-if="isObject"
 			>{<br />
-			<div v-for="(subValue, key, index) in value" class="indent">
+			<div v-for="(key, index) in Object.keys(value).sort()" class="indent">
 				<span>{{ key }}</span
 				>:
-				<Serialize :value="subValue" :path-list="pathListAppendKey(key)" v-slot="slotProps">
+				<Serialize :value="value[key]" :path-list="pathListAppendKey(key)" v-slot="slotProps">
 					<slot :value="slotProps.value" :path-list="slotProps.pathList"></slot>
 				</Serialize>
 				<span v-if="index != Object.keys(value).length - 1">, </span>
