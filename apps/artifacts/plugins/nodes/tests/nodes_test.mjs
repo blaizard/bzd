@@ -14,7 +14,7 @@ describe("Nodes", () => {
 			});
 			let nodes = new Nodes(storage, {});
 			let node = await nodes.get("node");
-			const result = node.getAllPathAndValues({
+			const result = Node.getAllPathAndValues({
 				a: {
 					b: { c: 12, e: [], f: null },
 					d: [12, 3],

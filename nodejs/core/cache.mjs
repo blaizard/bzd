@@ -357,7 +357,7 @@ export default Cache;
  * \brief Return the id from an id list and perform some simple sanity checks.
  */
 function idsToId(collection, ...ids) {
-	const id = ids.length ? ids.reduce((id, currentId) => id + currentId, "") : "default";
+	const id = ids.length ? ids.reduce((id, currentId) => id + "." + currentId, "") : "default";
 	Exception.assert(id[0] != "_", "Cache::get({}, {}), ids starting with '_' are protected.", collection, id);
 	Exception.assert(
 		typeof this.data[collection] === "object",

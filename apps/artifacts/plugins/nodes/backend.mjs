@@ -93,7 +93,7 @@ export default class Plugin extends PluginBase {
 		});
 
 		endpoints.register("get", "/{uid}/{path:*}", async (context) => {
-			const isMetadata = context.getQuery("metadata", false);
+			const isMetadata = Boolean(context.getQuery("metadata", false));
 			const maybeLast = context.getQuery("last", null);
 			const node = await this.nodes.get(context.getParam("uid"));
 			try {
