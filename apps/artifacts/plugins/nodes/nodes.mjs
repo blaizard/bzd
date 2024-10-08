@@ -102,7 +102,9 @@ export class Node {
 					timestampServer: Date.now(),
 					data: reducedData,
 				}
-			: Node.mapData(reducedData, (v) => v[1]);
+			: {
+					data: Node.mapData(reducedData, (v) => v[1]),
+				};
 	}
 
 	/// Get a specific value at a given path.

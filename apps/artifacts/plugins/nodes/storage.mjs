@@ -31,7 +31,7 @@ export default class StorageBzd extends Storage {
 
 	async _listCategories(uid, paths, maxOrPaging) {
 		const node = await this.nodes.get(uid);
-		const data = await node.get(paths);
+		const data = (await node.get(paths)).data;
 		return await CollectionPaging.makeFromList(Object.keys(data), maxOrPaging, (name) => {
 			return Permissions.makeEntry(
 				{
