@@ -25,11 +25,11 @@ export class Node {
 	/// A path is determined by the full path up to a value or a list.
 	///
 	/// \return A dictionary of paths and values. Each path is hashed using keyToInternal(...).
-	getAllPathAndValues(fragment, rootPath = []) {
+	static getAllPathAndValues(fragment, rootPath = []) {
 		let paths = {};
 		for (const [key, value] of Object.entries(fragment)) {
 			if (value && value.constructor == Object) {
-				for (const [subKey, subValue] of Object.entries(this.getAllPathAndValues(value))) {
+				for (const [subKey, subValue] of Object.entries(Node.getAllPathAndValues(value))) {
 					paths[KeyMapping.keyToInternal([...rootPath, key, subKey])] = subValue;
 				}
 			} else {
@@ -39,10 +39,23 @@ export class Node {
 		return paths;
 	}
 
+	/// Create a copy of the data and call a callback on all values before creating it.
+	static mapData(data, callback) {
+		if (Array.isArray(data)) {
+			return callback(data);
+		}
+		return Object.fromEntries(
+			Object.entries(data).map(([k, v]) => {
+				return [k, Node.mapData(v, callback)];
+			}),
+		);
+	}
+
+	/// Insert new data at a given path.
 	async insert(paths, fragment) {
 		const timestamp = Date.now();
 
-		let fragments = this.getAllPathAndValues(fragment, paths);
+		let fragments = Node.getAllPathAndValues(fragment, paths);
 		fragments = this.handlers.processBeforeInsert(fragments);
 
 		await this.storage.update(
@@ -75,8 +88,12 @@ export class Node {
 	}
 
 	/// Get the tree with single values.
+	///
+	/// \param paths The path to be used.
+	/// \param isMetadata Whether metadata should be returned or not.
+	///        If false, the raw latest value is returned.
 	async get(paths, isMetadata = false) {
-		const data = await this.cache.get(this.uid, isMetadata);
+		const data = await this.cache.get(this.uid);
 		const reducedData = paths.reduce((r, segment) => {
 			return r[segment];
 		}, data);
@@ -85,7 +102,7 @@ export class Node {
 					timestampServer: Date.now(),
 					data: reducedData,
 				}
-			: reducedData;
+			: Node.mapData(reducedData, (v) => v[1]);
 	}
 
 	/// Get a specific value at a given path.
@@ -99,7 +116,7 @@ export class Nodes {
 		const cache = new Cache({
 			garbageCollector: false,
 		});
-		cache.register("data", async (uid, isMetadata) => {
+		cache.register("data", async (uid) => {
 			// Convert data into a tree.
 			let data = await this.storage.get(uid, {});
 			// This ensure that existing schema will be updated.
@@ -120,7 +137,7 @@ export class Nodes {
 					}
 					return r[segment];
 				}, tree);
-				object[lastSegment] = isMetadata ? value.values[0] : value.values[0][1];
+				object[lastSegment] = value.values[0];
 			}
 			return tree;
 		});
