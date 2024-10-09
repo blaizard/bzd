@@ -67,7 +67,7 @@ export function dateToString(format, timestamp) {
 }
 
 export function dateToDefaultString(timestamp) {
-	return dateToString("{y}-{m}-{d} {h}:{min}:{s}.{ms}", timestamp);
+	return dateToString("{y:04}-{m:02}-{d:02} {h:02}:{min:02}:{s:02}.{ms}", timestamp);
 }
 
 export function capitalize(string) {
