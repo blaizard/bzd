@@ -120,6 +120,7 @@
 
 				.value {
 					align-self: baseline;
+					white-space: pre;
 				}
 			}
 		}
