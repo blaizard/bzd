@@ -4,6 +4,7 @@ import { CollectionPaging } from "#bzd/nodejs/db/utils.mjs";
 import Cache from "#bzd/nodejs/core/cache.mjs";
 import KeyMapping from "#bzd/apps/artifacts/plugins/nodes/key_mapping.mjs";
 import Handlers from "#bzd/apps/artifacts/plugins/nodes/handlers/handlers.mjs";
+import Optional from "#bzd/nodejs/utils/optional.mjs";
 
 const Exception = ExceptionFactory("apps", "plugin", "nodes");
 const Log = LogFactory("apps", "plugin", "nodes");
@@ -92,19 +93,23 @@ export class Node {
 	/// \param key The key to locate the data to be returned.
 	/// \param isMetadata Whether metadata should be returned or not.
 	///        If false, the raw latest value is returned.
+	///
+	/// \return An optional with a value if success, empty if the key points to an unknown record.
 	async get(key, isMetadata = false) {
 		const data = await this.cache.get(this.uid);
 		const reducedData = key.reduce((r, segment) => {
 			return r[segment];
 		}, data);
-		return isMetadata ? reducedData : Node.mapData(reducedData, (v) => v[1]);
+		return new Optional(isMetadata ? reducedData : Node.mapData(reducedData, (v) => v[1]));
 	}
 
 	/// Get a specific value at a given path.
 	///
 	/// \param key The path to which the value is requested.
 	/// \param count The number of values to be obtained.
-	async getValue(key, count) {}
+	async getValue(key, count) {
+		const internal = KeyMapping.keyToInternal(key);
+	}
 }
 
 export class Nodes {
