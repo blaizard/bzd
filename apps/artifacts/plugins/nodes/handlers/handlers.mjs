@@ -1,6 +1,7 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import toString from "#bzd/apps/artifacts/plugins/nodes/handlers/to_string.mjs";
+import history from "#bzd/apps/artifacts/plugins/nodes/handlers/history.mjs";
 import KeyMapping from "#bzd/apps/artifacts/plugins/nodes/key_mapping.mjs";
 
 const Exception = ExceptionFactory("apps", "plugin", "nodes", "handlers");
@@ -8,6 +9,7 @@ const Log = LogFactory("apps", "plugin", "nodes", "handlers");
 
 const availableHandlers = {
 	toString: toString,
+	history: history,
 };
 
 // Gather all the fragments that need to be processed by a handler group.
@@ -98,5 +100,17 @@ export default class Handlers {
 			}
 		}
 		return Object.assign(fragmentsRest, ...fragmentsGroup);
+	}
+
+	/// Process a handler.
+	///
+	/// \param The name of the handler.
+	/// \param The internal path.
+	process(name, internal, ...args) {
+		Exception.assert(name in availableHandlers, "The handler '{}' is not registered.", name);
+		const options = [...this.getHandlers(internal)]
+			.filter(([handler, _]) => handler == name)
+			.map(([_, options]) => options);
+		return availableHandlers[name].process(options, ...args);
 	}
 }
