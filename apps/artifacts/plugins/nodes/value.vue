@@ -15,11 +15,14 @@
 	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
 	import HttpClient from "#bzd/nodejs/core/http/client.mjs";
+	import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
+
+	const Exception = ExceptionFactory("apps", "plugin", "nodes");
 
 	export default {
 		mixins: [Component],
 		props: {
-			value: { mandatory: true },
+			value: { mandatory: true, type: Array },
 			pathList: { mandatory: true, type: Array },
 		},
 		directives: {
@@ -38,7 +41,7 @@
 		computed: {
 			valueTimestampList() {
 				if (this.metadata) {
-					return [this.metadata.data];
+					return this.metadata.data.reverse();
 				}
 				return [this.value];
 			},
@@ -61,12 +64,18 @@
 				if (this.count > 1) {
 					await this.handleSubmit(async () => {
 						const endpoint = "/x/" + this.pathList.map(encodeURIComponent).join("/");
-						this.metadata = await HttpClient.get(endpoint, {
+						const values = await HttpClient.get(endpoint, {
 							query: {
 								count: this.count,
 							},
 							expect: "json",
 						});
+						Exception.assert(
+							"data" in values && Array.isArray(values.data),
+							"Malformed response for requested values: {:j}",
+							values,
+						);
+						this.metadata = values;
 					});
 					this.timeout = setTimeout(this.fetchMetadata, 1000);
 				}
