@@ -65,11 +65,11 @@ export class Node {
 				// Identify the path of the fragments and their values.
 				for (const [internal, value] of Object.entries(fragments)) {
 					// Prepend the new value and the timestamp to the values array.
-					// And ensure there are maximum 10 elements.
+					// And ensure there are maximum X elements.
 					data[internal] ??= { values: [] };
 					const values = data[internal].values;
 					values.unshift([timestamp, value]);
-					while (values.length > 10) {
+					while (values.length > this.handlers.process("history", internal)) {
 						values.pop();
 					}
 				}

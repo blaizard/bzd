@@ -26,6 +26,7 @@
             },
             "nodes.handlers": {
                 "/data/log": {
+                    "history": 100,
                     "toString": "[{level}] [{name}] [{source}] {message}"
                 }
             },

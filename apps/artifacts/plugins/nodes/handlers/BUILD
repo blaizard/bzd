@@ -9,6 +9,7 @@ bzd_nodejs_library(
         "//apps/artifacts/plugins:__subpackages__",
     ],
     deps = [
+        ":history",
         ":to_string",
         "//apps/artifacts/plugins/nodes:key_mapping",
         "//nodejs/core:exception",
@@ -17,12 +18,16 @@ bzd_nodejs_library(
 )
 
 bzd_nodejs_library(
+    name = "history",
+    srcs = [
+        "history.mjs",
+    ],
+)
+
+bzd_nodejs_library(
     name = "to_string",
     srcs = [
         "to_string.mjs",
-    ],
-    visibility = [
-        "//apps/artifacts/plugins:__subpackages__",
     ],
     deps = [
         "//nodejs/core:format",
