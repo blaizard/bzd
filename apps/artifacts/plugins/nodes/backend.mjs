@@ -106,8 +106,8 @@ export default class Plugin extends PluginBase {
 
 			const maybeData =
 				maybeCount === null
-					? await node.get(Plugin.paramPathToPaths(context.getParam("path")), isMetadata)
-					: await node.getValues(Plugin.paramPathToPaths(context.getParam("path")), maybeCount);
+					? await node.get(Plugin.paramPathToKey(context.getParam("path")), isMetadata)
+					: await node.getValues(Plugin.paramPathToKey(context.getParam("path")), maybeCount);
 			if (maybeData.isEmpty()) {
 				context.sendStatus(404);
 				return;
@@ -123,12 +123,15 @@ export default class Plugin extends PluginBase {
 		endpoints.register("post", "/{uid}/{path:*}", async (context) => {
 			const data = rawBodyParse(context.getBody(), (name) => context.getHeader(name));
 			const node = await this.nodes.get(context.getParam("uid"));
-			await node.insert(Plugin.paramPathToPaths(context.getParam("path")), data);
+			await node.insert(Plugin.paramPathToKey(context.getParam("path")), data);
 			context.sendStatus(200);
 		});
 	}
 
-	static paramPathToPaths(paramPath) {
-		return paramPath.split("/").map((x) => decodeURIComponent(x));
+	static paramPathToKey(paramPath) {
+		return paramPath
+			.split("/")
+			.filter(Boolean)
+			.map((x) => decodeURIComponent(x));
 	}
 }
