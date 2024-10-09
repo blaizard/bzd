@@ -62,14 +62,12 @@ export class Node {
 		await this.storage.update(
 			this.uid,
 			async (data) => {
-				data["timestamp"] = timestamp;
-
 				// Identify the path of the fragments and their values.
 				for (const [internal, value] of Object.entries(fragments)) {
 					// Prepend the new value and the timestamp to the values array.
 					// And ensure there are maximum 10 elements.
-					data["data"][internal] ??= { values: [] };
-					const values = data["data"][internal].values;
+					data[internal] ??= { values: [] };
+					const values = data[internal].values;
 					values.unshift([timestamp, value]);
 					while (values.length > 10) {
 						values.pop();
@@ -78,10 +76,7 @@ export class Node {
 
 				return data;
 			},
-			{
-				timestamp: 0,
-				data: {},
-			},
+			{},
 		);
 
 		// Invalidate the cache.
@@ -113,8 +108,15 @@ export class Node {
 	///
 	/// \param key The path to which the value is requested.
 	/// \param count The number of values to be obtained.
-	async getValue(key, count) {
+	async getValues(key, count) {
 		const internal = KeyMapping.keyToInternal(key);
+
+		const data = await this.storage.get(this.uid, {});
+		if (!(internal in data)) {
+			return new Optional();
+		}
+		const value = data[internal];
+		return new Optional(value.values.slice(0, count));
 	}
 }
 
@@ -127,23 +129,13 @@ export class Nodes {
 		});
 		cache.register("data", async (uid) => {
 			// Convert data into a tree.
-			let data = await this.storage.get(uid, {});
-			// This ensure that existing schema will be updated.
-			data = Object.assign(
-				{
-					data: {},
-					timestamp: 0,
-				},
-				data,
-			);
+			const data = await this.storage.get(uid, {});
 			let tree = {};
-			for (const [internal, value] of Object.entries(data.data)) {
+			for (const [internal, value] of Object.entries(data)) {
 				const paths = KeyMapping.internalToKey(internal);
 				const lastSegment = paths.pop();
 				const object = paths.reduce((r, segment) => {
-					if (!r[segment]) {
-						r[segment] = {};
-					}
+					r[segment] ??= {};
 					return r[segment];
 				}, tree);
 				object[lastSegment] = value.values[0];
