@@ -25,15 +25,15 @@ export class Node {
 	/// A path is determined by the full path up to a value or a list.
 	///
 	/// \return A dictionary of paths and values. Each path is hashed using keyToInternal(...).
-	static getAllPathAndValues(fragment, rootPath = []) {
+	static getAllPathAndValues(fragment, rootKey = []) {
 		let paths = {};
 		for (const [key, value] of Object.entries(fragment)) {
 			if (value && value.constructor == Object) {
 				for (const [subKey, subValue] of Object.entries(Node.getAllPathAndValues(value))) {
-					paths[KeyMapping.keyToInternal([...rootPath, key, subKey])] = subValue;
+					paths[KeyMapping.keyToInternal([...rootKey, key, subKey])] = subValue;
 				}
 			} else {
-				paths[KeyMapping.keyToInternal([...rootPath, key])] = value;
+				paths[KeyMapping.keyToInternal([...rootKey, key])] = value;
 			}
 		}
 		return paths;
@@ -52,10 +52,10 @@ export class Node {
 	}
 
 	/// Insert new data at a given path.
-	async insert(paths, fragment) {
+	async insert(key, fragment) {
 		const timestamp = Date.now();
 
-		let fragments = Node.getAllPathAndValues(fragment, paths);
+		let fragments = Node.getAllPathAndValues(fragment, key);
 		fragments = this.handlers.processBeforeInsert(fragments);
 
 		await this.storage.update(
@@ -89,12 +89,12 @@ export class Node {
 
 	/// Get the tree with single values.
 	///
-	/// \param paths The path to be used.
+	/// \param key The key to locate the data to be returned.
 	/// \param isMetadata Whether metadata should be returned or not.
 	///        If false, the raw latest value is returned.
-	async get(paths, isMetadata = false) {
+	async get(key, isMetadata = false) {
 		const data = await this.cache.get(this.uid);
-		const reducedData = paths.reduce((r, segment) => {
+		const reducedData = key.reduce((r, segment) => {
 			return r[segment];
 		}, data);
 		return isMetadata ? reducedData : Node.mapData(reducedData, (v) => v[1]);
@@ -102,9 +102,9 @@ export class Node {
 
 	/// Get a specific value at a given path.
 	///
-	/// \param paths The path to which the value is requested.
+	/// \param key The path to which the value is requested.
 	/// \param count The number of values to be obtained.
-	async getValue(paths, count) {}
+	async getValue(key, count) {}
 }
 
 export class Nodes {
