@@ -28,6 +28,17 @@ bzd_nodejs_library(
 )
 
 bzd_nodejs_library(
+    name = "optional",
+    srcs = [
+        "optional.mjs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//nodejs/core:exception",
+    ],
+)
+
+bzd_nodejs_library(
     name = "query",
     srcs = [
         "query.mjs",

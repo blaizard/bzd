@@ -104,18 +104,20 @@ export default class Plugin extends PluginBase {
 				});
 			}
 
-			try {
-				output = Object.assign(output, {
-					data:
-						maybeCount === null
-							? await node.get(Plugin.paramPathToPaths(context.getParam("path")), isMetadata)
-							: await node.getValues(Plugin.paramPathToPaths(context.getParam("path")), maybeCount),
-				});
-				context.sendJson(output);
-				context.sendStatus(200);
-			} catch (e) {
+			const maybeData =
+				maybeCount === null
+					? await node.get(Plugin.paramPathToPaths(context.getParam("path")), isMetadata)
+					: await node.getValues(Plugin.paramPathToPaths(context.getParam("path")), maybeCount);
+			if (maybeData.isEmpty()) {
 				context.sendStatus(404);
+				return;
 			}
+
+			output = Object.assign(output, {
+				data: maybeData.value(),
+			});
+			context.sendJson(output);
+			context.sendStatus(200);
 		});
 
 		endpoints.register("post", "/{uid}/{path:*}", async (context) => {
