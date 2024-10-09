@@ -98,8 +98,14 @@ export class Node {
 	async get(key, isMetadata = false) {
 		const data = await this.cache.get(this.uid);
 		const reducedData = key.reduce((r, segment) => {
+			if (r === null || !(segment in r)) {
+				return null;
+			}
 			return r[segment];
 		}, data);
+		if (reducedData === null) {
+			return new Optional();
+		}
 		return new Optional(isMetadata ? reducedData : Node.mapData(reducedData, (v) => v[1]));
 	}
 
