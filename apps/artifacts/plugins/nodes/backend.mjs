@@ -94,11 +94,24 @@ export default class Plugin extends PluginBase {
 
 		endpoints.register("get", "/{uid}/{path:*}", async (context) => {
 			const isMetadata = Boolean(context.getQuery("metadata", false));
-			const maybeLast = context.getQuery("last", null);
+			const maybeCount = context.getQuery("count", null);
 			const node = await this.nodes.get(context.getParam("uid"));
+
+			let output = {};
+			if (isMetadata) {
+				output = Object.assign(output, {
+					timestampServer: Date.now(),
+				});
+			}
+
 			try {
-				const data = await node.get(Plugin.paramPathToPaths(context.getParam("path")), isMetadata);
-				context.sendJson(data);
+				output = Object.assign(output, {
+					data:
+						maybeCount === null
+							? await node.get(Plugin.paramPathToPaths(context.getParam("path")), isMetadata)
+							: await node.getValues(Plugin.paramPathToPaths(context.getParam("path")), maybeCount),
+				});
+				context.sendJson(output);
 				context.sendStatus(200);
 			} catch (e) {
 				context.sendStatus(404);
