@@ -97,18 +97,14 @@ export class Node {
 		const reducedData = paths.reduce((r, segment) => {
 			return r[segment];
 		}, data);
-		return isMetadata
-			? {
-					timestampServer: Date.now(),
-					data: reducedData,
-				}
-			: {
-					data: Node.mapData(reducedData, (v) => v[1]),
-				};
+		return isMetadata ? reducedData : Node.mapData(reducedData, (v) => v[1]);
 	}
 
 	/// Get a specific value at a given path.
-	async getValue(paths) {}
+	///
+	/// \param paths The path to which the value is requested.
+	/// \param count The number of values to be obtained.
+	async getValue(paths, count) {}
 }
 
 export class Nodes {
