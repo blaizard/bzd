@@ -208,7 +208,8 @@ class Cache {
 	 * \brief Check if the resource is dirty
 	 */
 	isDirty(collection, ...ids) {
-		return isDirty.call(this, collection, ...ids);
+		const id = idsToId.call(this, collection, ...ids);
+		return isDirty.call(this, collection, id);
 	}
 
 	/**
@@ -357,7 +358,7 @@ export default Cache;
  * \brief Return the id from an id list and perform some simple sanity checks.
  */
 function idsToId(collection, ...ids) {
-	const id = ids.length ? ids.reduce((id, currentId) => id + "." + currentId, "") : "default";
+	const id = ids.length ? ids.reduce((id, currentId) => id + "\x01" + currentId, "") : "default";
 	Exception.assert(id[0] != "_", "Cache::get({}, {}), ids starting with '_' are protected.", collection, id);
 	Exception.assert(
 		typeof this.data[collection] === "object",
@@ -385,8 +386,7 @@ function getObject(collection, ...ids) {
 /**
  * Check if the resource is dirty
  */
-function isDirty(collection, ...ids) {
-	const id = idsToId.call(this, collection, ...ids);
+function isDirty(collection, id) {
 	const dataId = this.data[collection][id];
 	return typeof dataId !== "object" || ("_timeout" in dataId && dataId._timeout < Cache.getTimestampMs());
 }
@@ -394,8 +394,7 @@ function isDirty(collection, ...ids) {
 /**
  * Check if the resource is currently fetching
  */
-function isFetching(collection, ...ids) {
-	const id = idsToId.call(this, collection, ...ids);
+function isFetching(collection, id) {
 	const dataId = this.data[collection][id];
 	return typeof dataId === "object" && "_fetching" in dataId;
 }
@@ -424,7 +423,7 @@ async function get(instant, collection, ...ids) {
 		const dataId = this.data[collection][id];
 
 		// isFetching
-		if (isFetching.call(this, collection, ...ids)) {
+		if (isFetching.call(this, collection, id)) {
 			// If instant and there are previous data, return it
 			if (instant) {
 				if ("_error" in dataId) {
@@ -447,7 +446,7 @@ async function get(instant, collection, ...ids) {
 			}
 		}
 		// isDirty
-		else if (isDirty.call(this, collection, ...ids)) {
+		else if (isDirty.call(this, collection, id)) {
 			timestampFetch = Cache.getTimestampMs();
 			triggerUpdate.call(this, collection, id, ...ids);
 		}
