@@ -10,3 +10,14 @@ bzd_nodejs_test(
         "//nodejs/core:exception",
     ],
 )
+
+bzd_nodejs_test(
+    name = "data",
+    srcs = ["data_test.mjs"],
+    main = "data_test.mjs",
+    deps = [
+        "//apps/artifacts/plugins/nodes:data",
+        "//nodejs/core:exception",
+        "//nodejs/db/key_value_store:make_from_config",
+    ],
+)
