@@ -25,6 +25,23 @@ bzd_nodejs_library(
 )
 
 bzd_nodejs_library(
+    name = "data",
+    srcs = [
+        "data.mjs",
+    ],
+    visibility = [
+        "//apps/artifacts/plugins:__subpackages__",
+    ],
+    deps = [
+        ":key_mapping",
+        "//nodejs/core:cache",
+        "//nodejs/core:exception",
+        "//nodejs/core:log",
+        "//nodejs/utils:optional",
+    ],
+)
+
+bzd_nodejs_library(
     name = "key_mapping",
     srcs = [
         "key_mapping.mjs",

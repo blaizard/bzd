@@ -92,6 +92,31 @@ export default class Plugin extends PluginBase {
 			this.setStorage(await StorageBzd.make(this.nodes));
 		});
 
+		/// API:
+		/// <path>?include=path1,path2
+		/// <path>?exclude=path1,path2
+		///
+		/// <path>?metadata
+		/// {
+		///   a: [ <- value
+		///      timestamp, value
+		///   ]
+		/// }
+		/// or
+		/// {
+		///   timestamp: X, <- server timestamp (special field doesn't start with '/')
+		///   /data/a: [[timestamp, value]], <- list of values
+		///   /data/a/average: [[timestamp, 12]] <- computed values (are child of a parent value)
+		/// }
+		///
+		/// <path> : raw value
+		/// {
+		///   /data/a: value, <- single value
+		///   /data/a/average: 12 <- single value
+		/// }
+		///
+		/// <path>?after=timestamp
+		/// only show entries after a specific timestamp (not including)
 		endpoints.register("get", "/{uid}/{path:*}", async (context) => {
 			const isMetadata = Boolean(context.getQuery("metadata", false));
 			const maybeCount = context.getQuery("count", null);
