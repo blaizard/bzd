@@ -7,16 +7,15 @@
 			</Value>
 		</Serialize>
 		<div>
-			<span v-if="isValue(value)">Accessors for {{ pathList.join("/") }}:</span>
-			<span v-else>Accessors:</span>
+			<span>Accessors:</span>
 			<ul>
 				<li>
-					<a :href="endpoint">{{ endpoint }}</a>
+					<a :href="endpoint + '?children=1'">{{ endpoint }}?children=1</a>
 				</li>
 				<li>
 					<a :href="endpoint + '?metadata=1'">{{ endpoint }}?metadata=1</a>
 				</li>
-				<li v-if="isValue(value)">
+				<li>
 					<a :href="endpoint + '?count=5'">{{ endpoint }}?count=5</a>
 				</li>
 			</ul>
