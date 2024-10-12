@@ -57,8 +57,8 @@ describe("Nodes", () => {
 				const result = await data.get("hello", ["a", "c"], /*metadata*/ false, /*children*/ true);
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), [
-					[["a", "c", "e"], 1],
-					[["a", "c", "d"], 13],
+					[["e"], 1],
+					[["d"], 13],
 				]);
 			}
 
@@ -67,9 +67,15 @@ describe("Nodes", () => {
 				const result = await data.get("hello", ["a", "b"], /*metadata*/ false, /*children*/ true);
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), [
-					[["a", "b"], 12],
-					[["a", "b", "d"], -3],
+					[[], 12],
+					[["d"], -3],
 				]);
+			}
+
+			// get w/children wrong key
+			{
+				const result = await data.get("hello", ["a", "u"], /*metadata*/ false, /*children*/ true);
+				Exception.assert(!result.hasValue());
 			}
 		});
 

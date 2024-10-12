@@ -1,7 +1,7 @@
 <template>
 	<div class="data" v-if="metadata">
 		<div>Updated: {{ durationString }} ago</div>
-		<Serialize class="value" :value="metadata.data" :path-list="pathList" v-slot="serializeSlotProps">
+		<Serialize class="value" :value="metadataTree" :path-list="pathList" v-slot="serializeSlotProps">
 			<Value :value="serializeSlotProps.value" :path-list="serializeSlotProps.pathList" v-slot="valueSlotProps">
 				<Serialize :value="valueSlotProps.value"></Serialize>
 			</Value>
@@ -45,17 +45,26 @@
 			};
 		},
 		computed: {
+			metadataTree() {
+				if (!this.metadata) {
+					return {};
+				}
+				let tree = {};
+				for (const [key, value] of this.metadata.data) {
+					const object = key.reduce((r, segment) => {
+						r[segment] ??= {};
+						return r[segment];
+					}, tree);
+					object["_"] = value;
+				}
+				return tree;
+			},
 			timestamp() {
 				let timestamp = 0;
 				this.iterateMetadata((t, v) => {
 					timestamp = Math.max(timestamp, t);
 				});
 				return timestamp;
-			},
-			processedData() {
-				return this.iterateMetadata((t, v) => {
-					return v;
-				});
 			},
 			durationString() {
 				return timeMsToString(this.metadata.timestampServer - this.timestamp);
@@ -79,21 +88,11 @@
 			},
 			/// Iterate through the metadata and return a copy of it.
 			iterateMetadata(callback) {
-				const recursive = (object, callback) => {
-					let updatedObject = {};
-					Object.entries(object).forEach(([key, data]) => {
-						if (this.isValue(data)) {
-							updatedObject[key] = callback(data[0], data[1]);
-						} else if (data && typeof data === "object") {
-							updatedObject[key] = recursive(data, callback);
-						}
-					});
-					return updatedObject;
-				};
-				if (this.isValue(this.value)) {
-					return callback(this.value[0], this.value[1]);
+				if (this.metadata) {
+					for (const [key, data] of this.metadata.data) {
+						callback(data[0], data[1]);
+					}
 				}
-				return recursive(this.value, callback);
 			},
 			async fetchMetadata() {
 				await this.handleSubmit(async () => {

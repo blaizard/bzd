@@ -43,8 +43,11 @@ export default class Data {
 		return Date.now();
 	}
 
-	/// Get the set of keys for this specific entry, which are equal and children of `key`.
-	async getKeys(uid, key) {
+	/// Get the tree at a given key.
+	///
+	/// \return the sub-tree which root is the key if this key is part of the tree,
+	///         or null otherwise.
+	async getTree(uid, key) {
 		const data = await this.tree.get(uid);
 		const reducedData = key.reduce((r, segment) => {
 			if (r === null || !(segment in r)) {
@@ -52,7 +55,13 @@ export default class Data {
 			}
 			return r[segment];
 		}, data);
-		if (reducedData === null) {
+		return reducedData;
+	}
+
+	/// Get the set of keys for this specific entry, which are equal and children of `key`.
+	async getKeys(uid, key) {
+		const data = await this.getTree(uid, key);
+		if (data === null) {
 			return null;
 		}
 
@@ -66,7 +75,7 @@ export default class Data {
 				});
 			}
 		};
-		treeToKeys(reducedData);
+		treeToKeys(data);
 
 		return keys;
 	}
@@ -88,16 +97,19 @@ export default class Data {
 		// Get the list of keys.
 		if (children) {
 			const keys = await this.getKeys(uid, key);
-			const values = Object.entries(data)
-				.filter(([k, _]) => keys.has(k))
-				.map(([k, v]) => [KeyMapping.internalToKey(k), processValue(v)]);
-			return new Optional(values);
+			if (keys !== null) {
+				const values = Object.entries(data)
+					.filter(([k, _]) => keys.has(k))
+					.map(([k, v]) => [KeyMapping.internalToKey(k).slice(key.length), processValue(v)]);
+				return new Optional(values);
+			}
 		}
-
 		// Get the value directly.
-		const internal = KeyMapping.keyToInternal(key);
-		if (internal in data) {
-			return new Optional(processValue(data[internal]));
+		else {
+			const internal = KeyMapping.keyToInternal(key);
+			if (internal in data) {
+				return new Optional(processValue(data[internal]));
+			}
 		}
 
 		return new Optional();
@@ -116,9 +128,12 @@ export default class Data {
 				// Identify the path of the fragments and their values.
 				for (const [key, value] of fragments) {
 					const internal = KeyMapping.keyToInternal(key);
+					if (!(internal in data)) {
+						data[internal] = [];
+						this.tree.setDirty(this.uid);
+					}
 					// Prepend the new value and the timestamp to the values array.
 					// And ensure there are maximum X elements.
-					data[internal] ??= [];
 					data[internal].unshift([timestamp, value]);
 					while (data[internal].length > 10) {
 						//this.handlers.process("history", internal)) {
@@ -131,8 +146,26 @@ export default class Data {
 			{},
 		);
 
-		this.tree.setDirty(this.uid);
-
 		return true;
+	}
+
+	/// Get direct children of a given key.
+	///
+	/// \return A dictionary which keys are the name of the children and value a boolean describing if
+	///         the data is nested of a leaf.
+	async getChildren(uid, key) {
+		const data = await this.getTree(uid, key);
+		if (data === null) {
+			return new Optional();
+		}
+
+		const children = Object.keys(data)
+			.filter((v) => v != "_")
+			.map((v) => {
+				const keys = Object.keys(data[v]);
+				return [v, !(keys.length == 1 && keys[0] == "_")];
+			});
+
+		return new Optional(Object.fromEntries(children));
 	}
 }

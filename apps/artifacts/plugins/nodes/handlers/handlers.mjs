@@ -21,7 +21,7 @@ export default class Handlers {
 	constructor(configuration) {
 		this.configuration = Object.fromEntries(
 			Object.entries(configuration).map(([root, handlers]) => {
-				return [KeyMapping.pathToInternal(root), handlers];
+				return [KeyMapping.pathToKey(root), handlers];
 			}),
 		);
 	}
@@ -40,14 +40,11 @@ export default class Handlers {
 	/// Create groups by handlers.
 	///
 	/// Each group of fragment created will be removed from the fragments and returned separately with the following format,
-	/// example using a.b.c.d = 12;
+	/// example using [["a", "b", "c", "d"], 12];
 	/// {
-	///    [handler]: {
-	///        a.b.c: {
-	///           options: [handlerOptions],
-	///           data: { d: 12 },
-	///        }
-	///    }
+	///    [handler]: [
+	///        [["a", "b", "c", "d"], 12, options],
+	///    ]
 	/// }
 	groupByHandler(fragments, handlers) {
 		let groups = Object.fromEntries([...handlers].map((key) => [key, {}]));

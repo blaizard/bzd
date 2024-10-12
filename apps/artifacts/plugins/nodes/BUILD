@@ -11,6 +11,7 @@ bzd_nodejs_library(
         "//apps/artifacts/plugins:__subpackages__",
     ],
     deps = [
+        ":data",
         ":key_mapping",
         "//apps/artifacts/backend:plugin",
         "//apps/artifacts/plugins/nodes/handlers",
