@@ -20,12 +20,15 @@ describe("Nodes", () => {
 					d: [12, 3],
 				},
 			});
-			Exception.assertEqual(result, {
-				[KeyMapping.keyToInternal(["a", "b", "c"])]: 12,
-				[KeyMapping.keyToInternal(["a", "b", "e"])]: [],
-				[KeyMapping.keyToInternal(["a", "b", "f"])]: null,
-				[KeyMapping.keyToInternal(["a", "d"])]: [12, 3],
-			});
+			Exception.assertEqual(result, [
+				[["a", "b", "c"], 12],
+				[["a", "b", "e"], []],
+				[["a", "b", "f"], null],
+				[
+					["a", "d"],
+					[12, 3],
+				],
+			]);
 		});
 	});
 });

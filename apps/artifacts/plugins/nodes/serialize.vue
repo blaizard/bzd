@@ -1,17 +1,13 @@
 <template>
 	<div class="serialize-container">
-		<template v-if="isObject"
-			>{<br />
+		<template v-if="isObject">
 			<div v-for="(key, index) in Object.keys(value).sort()" class="indent">
-				<span>{{ key }}</span
-				>:
+				<span v-if="key != '_'">{{ key }}:</span>
 				<Serialize :value="value[key]" :path-list="pathListAppendKey(key)" v-slot="slotProps">
 					<slot :value="slotProps.value" :path-list="slotProps.pathList"></slot>
 				</Serialize>
-				<span v-if="index != Object.keys(value).length - 1">, </span>
 			</div>
-			}</template
-		>
+		</template>
 		<template v-else-if="isArray">
 			<template v-if="isPathList">
 				<slot :value="value" :path-list="pathList"></slot>

@@ -5,6 +5,7 @@ import Cache from "#bzd/nodejs/core/cache.mjs";
 import KeyMapping from "#bzd/apps/artifacts/plugins/nodes/key_mapping.mjs";
 import Handlers from "#bzd/apps/artifacts/plugins/nodes/handlers/handlers.mjs";
 import Optional from "#bzd/nodejs/utils/optional.mjs";
+import Data from "#bzd/apps/artifacts/plugins/nodes/data.mjs";
 
 const Exception = ExceptionFactory("apps", "plugin", "nodes");
 const Log = LogFactory("apps", "plugin", "nodes");
@@ -14,9 +15,8 @@ const Log = LogFactory("apps", "plugin", "nodes");
 /// Data are denominated by a path, each data can be set at various interval.
 /// Data have a validity time that is adjusted automatically.
 export class Node {
-	constructor(storage, cache, uid, handlers) {
-		this.storage = storage;
-		this.cache = cache;
+	constructor(data, uid, handlers) {
+		this.data = data;
 		this.uid = uid;
 		this.handlers = handlers;
 	}
@@ -25,16 +25,16 @@ export class Node {
 	///
 	/// A path is determined by the full path up to a value or a list.
 	///
-	/// \return A dictionary of paths and values. Each path is hashed using keyToInternal(...).
+	/// \return A list of paths and values.
 	static getAllPathAndValues(fragment, rootKey = []) {
-		let paths = {};
+		let paths = [];
 		for (const [key, value] of Object.entries(fragment)) {
 			if (value && value.constructor == Object) {
-				for (const [subKey, subValue] of Object.entries(Node.getAllPathAndValues(value))) {
-					paths[KeyMapping.keyToInternal([...rootKey, key, subKey])] = subValue;
+				for (const [subKey, subValue] of Node.getAllPathAndValues(value)) {
+					paths.push([[...rootKey, key, ...subKey], subValue]);
 				}
 			} else {
-				paths[KeyMapping.keyToInternal([...rootKey, key])] = value;
+				paths.push([[...rootKey, key], value]);
 			}
 		}
 		return paths;
@@ -54,69 +54,29 @@ export class Node {
 
 	/// Insert new data at a given path.
 	async insert(key, fragment) {
-		const timestamp = Date.now();
-
 		let fragments = Node.getAllPathAndValues(fragment, key);
-		fragments = this.handlers.processBeforeInsert(fragments);
+		// TODO: to fix
+		//fragments = this.handlers.processBeforeInsert(fragments);
 
-		await this.storage.update(
-			this.uid,
-			async (data) => {
-				// Identify the path of the fragments and their values.
-				for (const [internal, value] of Object.entries(fragments)) {
-					// Prepend the new value and the timestamp to the values array.
-					// And ensure there are maximum X elements.
-					data[internal] ??= { values: [] };
-					const values = data[internal].values;
-					values.unshift([timestamp, value]);
-					while (values.length > this.handlers.process("history", internal)) {
-						values.pop();
-					}
-				}
-
-				return data;
-			},
-			{},
-		);
-
-		// Invalidate the cache.
-		this.cache.setDirty(this.uid);
+		await this.data.insert(this.uid, fragments);
 	}
 
 	/// Get the tree with single values.
 	///
 	/// \param key The key to locate the data to be returned.
-	/// \param isMetadata Whether metadata should be returned or not.
-	///        If false, the raw latest value is returned.
+	/// \param metadata Whether metadata should be returned or not.
+	///        If false, the raw value is returned.
 	///
 	/// \return An optional with a value if success, empty if the key points to an unknown record.
-	async get(key, isMetadata = false) {
-		const data = await this.cache.get(this.uid);
-		const reducedData = key.reduce((r, segment) => {
-			if (r === null || !(segment in r)) {
-				return null;
-			}
-			return r[segment];
-		}, data);
-		if (reducedData === null) {
-			return new Optional();
-		}
-		return new Optional(isMetadata ? reducedData : Node.mapData(reducedData, (v) => v[1]));
+	async get(key, metadata = false, count = null) {
+		return await this.data.get(this.uid, key, metadata, /*children*/ true, count);
 	}
 
-	/// Get a specific value at a given path.
+	/// Get direct children of a given key.
 	///
-	/// \param key The path to which the value is requested.
-	/// \param count The number of values to be obtained.
-	async getValues(key, count) {
-		const internal = KeyMapping.keyToInternal(key);
-
-		const data = await this.storage.get(this.uid, {});
-		if (!(internal in data)) {
-			return new Optional();
-		}
-		const value = data[internal];
-		return new Optional(value.values.slice(0, count));
+	/// TODO: this should not be needed.
+	async getChildren(key) {
+		return await this.data.getChildren(this.uid, key);
 	}
 }
 
@@ -124,25 +84,7 @@ export class Nodes {
 	constructor(storage, handlers) {
 		this.storage = storage.getAccessor("data");
 		this.handlers = new Handlers(handlers);
-		const cache = new Cache({
-			garbageCollector: false,
-		});
-		cache.register("data", async (uid) => {
-			// Convert data into a tree.
-			const data = await this.storage.get(uid, {});
-			let tree = {};
-			for (const [internal, value] of Object.entries(data)) {
-				const paths = KeyMapping.internalToKey(internal);
-				const lastSegment = paths.pop();
-				const object = paths.reduce((r, segment) => {
-					r[segment] ??= {};
-					return r[segment];
-				}, tree);
-				object[lastSegment] = value.values[0];
-			}
-			return tree;
-		});
-		this.cache = cache.getAccessor("data");
+		this.data = new Data(this.storage);
 	}
 
 	async *getNodes() {
@@ -155,6 +97,6 @@ export class Nodes {
 	}
 
 	async get(uid) {
-		return new Node(this.storage, this.cache, uid, this.handlers);
+		return new Node(this.data, uid, this.handlers);
 	}
 }

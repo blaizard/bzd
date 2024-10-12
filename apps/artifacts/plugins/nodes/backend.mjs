@@ -118,21 +118,18 @@ export default class Plugin extends PluginBase {
 		/// <path>?after=timestamp
 		/// only show entries after a specific timestamp (not including)
 		endpoints.register("get", "/{uid}/{path:*}", async (context) => {
-			const isMetadata = Boolean(context.getQuery("metadata", false));
+			const metadata = Boolean(context.getQuery("metadata", false));
 			const maybeCount = context.getQuery("count", null);
 			const node = await this.nodes.get(context.getParam("uid"));
 
 			let output = {};
-			if (isMetadata) {
+			if (metadata) {
 				output = Object.assign(output, {
 					timestampServer: Date.now(),
 				});
 			}
 
-			const maybeData =
-				maybeCount === null
-					? await node.get(Plugin.paramPathToKey(context.getParam("path")), isMetadata)
-					: await node.getValues(Plugin.paramPathToKey(context.getParam("path")), maybeCount);
+			const maybeData = await node.get(Plugin.paramPathToKey(context.getParam("path")), metadata, maybeCount);
 			if (maybeData.isEmpty()) {
 				context.sendStatus(404);
 				return;

@@ -31,7 +31,7 @@ export default class StorageBzd extends Storage {
 
 	async _listCategories(uid, paths, maxOrPaging) {
 		const node = await this.nodes.get(uid);
-		const maybeData = await node.get(paths);
+		const maybeData = await node.getChildren(paths);
 		if (maybeData.isEmpty()) {
 			return [];
 		}
@@ -41,7 +41,7 @@ export default class StorageBzd extends Storage {
 				{
 					name: name,
 				},
-				{ read: true, list: data[name] && data[name].constructor == Object },
+				{ read: true, list: data[name] },
 			);
 		});
 	}
