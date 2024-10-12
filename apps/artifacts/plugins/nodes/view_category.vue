@@ -97,7 +97,7 @@
 			async fetchMetadata() {
 				await this.handleSubmit(async () => {
 					this.metadata = await HttpClient.get(this.endpoint, {
-						query: { metadata: 1 },
+						query: { metadata: 1, children: 1 },
 						expect: "json",
 					});
 				});

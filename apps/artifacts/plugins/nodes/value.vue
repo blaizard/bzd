@@ -66,6 +66,7 @@
 						const endpoint = "/x/" + this.pathList.map(encodeURIComponent).join("/");
 						const values = await HttpClient.get(endpoint, {
 							query: {
+								metadata: 1,
 								count: this.count,
 							},
 							expect: "json",

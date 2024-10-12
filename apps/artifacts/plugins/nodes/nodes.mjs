@@ -68,8 +68,8 @@ export class Node {
 	///        If false, the raw value is returned.
 	///
 	/// \return An optional with a value if success, empty if the key points to an unknown record.
-	async get(key, metadata = false, count = null) {
-		return await this.data.get(this.uid, key, metadata, /*children*/ true, count);
+	async get(key, metadata = false, children = false, count = null) {
+		return await this.data.get(this.uid, key, metadata, children, count);
 	}
 
 	/// Get direct children of a given key.

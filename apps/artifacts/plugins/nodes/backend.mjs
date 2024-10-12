@@ -119,6 +119,7 @@ export default class Plugin extends PluginBase {
 		/// only show entries after a specific timestamp (not including)
 		endpoints.register("get", "/{uid}/{path:*}", async (context) => {
 			const metadata = Boolean(context.getQuery("metadata", false));
+			const children = Boolean(context.getQuery("children", false));
 			const maybeCount = context.getQuery("count", null);
 			const node = await this.nodes.get(context.getParam("uid"));
 
@@ -129,7 +130,7 @@ export default class Plugin extends PluginBase {
 				});
 			}
 
-			const maybeData = await node.get(Plugin.paramPathToKey(context.getParam("path")), metadata, maybeCount);
+			const maybeData = await node.get(Plugin.paramPathToKey(context.getParam("path")), metadata, children, maybeCount);
 			if (maybeData.isEmpty()) {
 				context.sendStatus(404);
 				return;
