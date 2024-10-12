@@ -19,17 +19,15 @@ const availableHandlersWithGroup = Object.entries(availableHandlers)
 
 export default class Handlers {
 	constructor(configuration) {
-		this.configuration = Object.fromEntries(
-			Object.entries(configuration).map(([root, handlers]) => {
-				return [KeyMapping.pathToKey(root), handlers];
-			}),
-		);
+		this.configuration = Object.entries(configuration).map(([root, handlers]) => {
+			return [KeyMapping.pathToKey(root), handlers];
+		});
 	}
 
 	/// Get the handlers associated with an internal path.
-	*getHandlers(internal) {
-		for (const [root, handlers] of Object.entries(this.configuration)) {
-			if (KeyMapping.internalStartsWith(internal, root)) {
+	*getHandlers(key) {
+		for (const [root, handlers] of this.configuration) {
+			if (KeyMapping.keyStartsWith(key, root)) {
 				for (const [handler, options] of Object.entries(handlers)) {
 					yield [handler, options];
 				}
@@ -48,30 +46,24 @@ export default class Handlers {
 	/// }
 	groupByHandler(fragments, handlers) {
 		let groups = Object.fromEntries([...handlers].map((key) => [key, {}]));
-		const fragmentsRest = Object.fromEntries(
-			Object.entries(fragments).filter(([internal, value]) => {
-				let keepEntry = true;
-				for (const [handler, options] of this.getHandlers(internal)) {
-					if (handler in groups) {
-						Exception.assert(
-							keepEntry,
-							"The path {} has been processed by 2 handlers.",
-							KeyMapping.internalToPath(internal),
-						);
-						const path = KeyMapping.internalToKey(internal);
-						const name = path.pop();
-						const parent = KeyMapping.keyToInternal(path);
-						groups[handler][parent] ??= {
-							options: options,
-							data: {},
-						};
-						groups[handler][parent]["data"][name] = value;
-						keepEntry = false;
-					}
+		const fragmentsRest = fragments.filter(([key, value]) => {
+			let keepEntry = true;
+			for (const [handler, options] of this.getHandlers(key)) {
+				if (handler in groups) {
+					Exception.assert(keepEntry, "The path {} has been processed by 2 handlers.", KeyMapping.keyToPath(key));
+					const name = key.pop();
+					const parent = KeyMapping.keyToInternal(key);
+					groups[handler][parent] ??= {
+						key: key,
+						options: options,
+						data: {},
+					};
+					groups[handler][parent]["data"][name] = value;
+					keepEntry = false;
 				}
-				return keepEntry;
-			}),
-		);
+			}
+			return keepEntry;
+		});
 		return [fragmentsRest, groups];
 	}
 
@@ -83,20 +75,21 @@ export default class Handlers {
 		let fragmentsGroup = [];
 		for (const [handlerName, groupByPath] of Object.entries(groups)) {
 			const groupOptions = availableHandlers[handlerName].group;
-			for (const [internal, data] of Object.entries(groupByPath)) {
+			for (const data of Object.values(groupByPath)) {
 				try {
 					if ("format" in groupOptions) {
-						fragmentsGroup.push({ [internal]: groupOptions.format(data["data"], data["options"]) });
+						fragmentsGroup.push([data.key, groupOptions.format(data["data"], data["options"])]);
 					} else {
 						Exception.unreachable("Missing group handler.");
 					}
 				} catch (e) {
 					Log.error("Error while handling path {}: {}", KeyMapping.internalToPath(internal), e.toString());
-					fragmentsGroup.push({ [internal]: data["data"] });
+					fragmentsGroup.push([data.key, data["data"]]);
 				}
 			}
 		}
-		return Object.assign(fragmentsRest, ...fragmentsGroup);
+
+		return [...fragmentsRest, ...fragmentsGroup];
 	}
 
 	/// Process a handler.

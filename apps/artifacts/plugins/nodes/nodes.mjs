@@ -55,8 +55,7 @@ export class Node {
 	/// Insert new data at a given path.
 	async insert(key, fragment) {
 		let fragments = Node.getAllPathAndValues(fragment, key);
-		// TODO: to fix
-		//fragments = this.handlers.processBeforeInsert(fragments);
+		fragments = this.handlers.processBeforeInsert(fragments);
 
 		await this.data.insert(this.uid, fragments);
 	}

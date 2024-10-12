@@ -11,16 +11,8 @@ const KeyMapping = {
 	},
 
 	/// Check if a hash starts with a specific key.
-	internalStartsWith(internal, root) {
-		if (internal.startsWith(root)) {
-			if (internal.length == root.length) {
-				return true;
-			}
-			if (internal[root.length] == "\x01") {
-				return true;
-			}
-		}
-		return false;
+	keyStartsWith(key, root) {
+		return key.slice(0, root.length).toString() == root.toString();
 	},
 
 	/// Convert /hello/you -> ["hello", "you"]
