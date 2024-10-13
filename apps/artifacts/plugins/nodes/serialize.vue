@@ -5,7 +5,7 @@
 		</template>
 		<template v-else-if="isObject">
 			<div v-for="key in Object.keys(value).sort()" class="indent">
-				<span v-if="key != '_'">{{ key }}</span>
+				<a v-if="key != '_'" :href="keyToUrl(key)">{{ key }}</a>
 				<Serialize class="child" :value="value[key]" :path-list="pathListAppendKey(key)" v-slot="slotProps">
 					<slot :value="slotProps.value" :path-list="slotProps.pathList"></slot>
 				</Serialize>
@@ -48,6 +48,9 @@
 			},
 		},
 		methods: {
+			keyToUrl(key) {
+				return "/view/" + [...this.pathList, key].map(encodeURIComponent).join("/");
+			},
 			pathListAppendKey(key) {
 				if (this.pathList === null) {
 					return null;
@@ -83,6 +86,10 @@
 			padding-left: #{$indent}px;
 			position: relative;
 			border-left: 1px dotted config.$bzdGraphColorGray;
+
+			&:not(:hover) > a {
+				color: config.$captionTextColor;
+			}
 		}
 
 		.child:after {
