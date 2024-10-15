@@ -1,11 +1,11 @@
 <template>
 	<div class="data" v-if="metadata">
 		<div>Updated: {{ durationString }} ago</div>
-		<Serialize class="value" :value="metadataTree" :path-list="pathList" v-slot="serializeSlotProps">
+		<Keys class="value" :value="metadataTree" :path-list="pathList" v-slot="serializeSlotProps" @select="onSelect">
 			<Value :value="serializeSlotProps.value" :path-list="serializeSlotProps.pathList" v-slot="valueSlotProps">
-				<Serialize :value="valueSlotProps.value"></Serialize>
+				<code class="json">{{ JSON.stringify(valueSlotProps.value) }}</code>
 			</Value>
-		</Serialize>
+		</Keys>
 		<div>
 			<span>Accessors:</span>
 			<ul>
@@ -28,14 +28,14 @@
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
 	import HttpClient from "#bzd/nodejs/core/http/client.mjs";
 	import Value from "#bzd/apps/artifacts/plugins/nodes/value.vue";
-	import Serialize from "#bzd/apps/artifacts/plugins/nodes/serialize.vue";
+	import Keys from "#bzd/apps/artifacts/plugins/nodes/keys.vue";
 	import { timeMsToString } from "#bzd/nodejs/utils/to_string.mjs";
 
 	export default {
 		mixins: [Base, Component],
 		components: {
 			Value,
-			Serialize,
+			Keys,
 		},
 		data: function () {
 			return {
@@ -102,6 +102,10 @@
 				});
 				this.timeout = setTimeout(this.fetchMetadata, 1000);
 			},
+			onSelect(pathList) {
+				const url = "/view/" + pathList.map(encodeURIComponent).join("/");
+				this.$router.dispatch(url);
+			},
 		},
 	};
 </script>
@@ -114,6 +118,10 @@
 		.value {
 			border: 1px solid #eee;
 			padding: 10px;
+
+			.json {
+				background-color: transparent;
+			}
 		}
 	}
 </style>
