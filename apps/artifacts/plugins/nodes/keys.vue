@@ -1,0 +1,85 @@
+<template>
+	<div class="keys-container">
+		<template v-if="isObject">
+			<div v-for="key in Object.keys(value).sort()" class="indent" @click.stop="onClick(key)">
+				<span v-if="key != '_'">{{ key }}</span>
+				<Keys
+					class="child"
+					:value="value[key]"
+					:path-list="pathListAppendKey(key)"
+					v-slot="slotProps"
+					@select="propagateSelect"
+				>
+					<slot :value="slotProps.value" :path-list="slotProps.pathList"></slot>
+				</Keys>
+			</div>
+		</template>
+		<template v-else>
+			<slot :value="value" :path-list="pathList"></slot>
+		</template>
+	</div>
+</template>
+
+<script>
+	export default {
+		name: "Keys",
+		props: {
+			value: { mandatory: true },
+			pathList: { mandatory: false, default: null, type: Array || null },
+		},
+		computed: {
+			isObject() {
+				return !!this.value && this.value.constructor === Object;
+			},
+		},
+		methods: {
+			pathListAppendKey(key) {
+				return [...this.pathList, key];
+			},
+			onClick(key) {
+				if (key == "_") {
+					this.$emit("select", this.pathList);
+				} else {
+					this.$emit("select", [...this.pathList, key]);
+				}
+			},
+			propagateSelect(e) {
+				this.$emit("select", e);
+			},
+		},
+	};
+</script>
+
+<style lang="scss" scoped>
+	@use "#bzd/config.scss" as config;
+
+	$indent: 20;
+
+	.keys-container {
+		display: inline;
+
+		.inline {
+			display: inline;
+		}
+
+		.indent {
+			padding-left: #{$indent}px;
+			position: relative;
+			border-left: 1px dotted config.$bzdGraphColorGray;
+			cursor: pointer;
+
+			&:hover > span {
+				text-shadow: 1px 0 #000;
+			}
+		}
+
+		.child:after {
+			position: absolute;
+			content: "";
+			border-top: 1px dotted config.$bzdGraphColorGray;
+			left: 0;
+			top: 14px;
+			width: 14px;
+		}
+	}
+</style>

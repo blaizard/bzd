@@ -14,7 +14,16 @@
                         "d": {
                             "e": null,
                             "f": []
-                        }
+                        },
+                        "dict": [
+                            {
+                                "hello": "world",
+                                "test": 1
+                            },
+                            {
+                                "complex": "yes"
+                            }
+                        ]
                     },
                     "path.with.dots": {
                         "nested": "a simple string"

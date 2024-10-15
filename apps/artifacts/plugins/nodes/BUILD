@@ -69,7 +69,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "view",
     srcs = [
-        "serialize.vue",
+        "keys.vue",
         "value.vue",
         "view_category.vue",
         "view_node.vue",
