@@ -1,7 +1,7 @@
 <template>
-	<div class="value-container">
-		<a class="more" @click="viewMore" v-tooltip="tooltipActionMore">...</a>
-		<div class="value-grid">
+	<div class="value-container" @click.stop="">
+		<a v-if="enableViewAll" class="more" @click="setViewAll" v-tooltip="tooltipActionMore">...</a>
+		<div class="value-grid" @click.stop="onClick">
 			<div v-for="[t, v] in valueDisplay" class="item">
 				<span class="timestamp">{{ timestampToString(t) }}</span
 				><span class="value"><slot :value="v"></slot></span>
@@ -23,24 +23,43 @@
 		props: {
 			value: { mandatory: true, type: Array },
 			view: { default: 1, type: Number },
+			pathList: { mandatory: true, type: Array },
 		},
 		directives: {
 			tooltip: DirectiveTooltip,
 		},
+		emits: ["select"],
+		data: function () {
+			return {
+				viewAll: false,
+			};
+		},
 		computed: {
+			enableViewAll() {
+				return this.nbDisplay !== 0 && this.value.length > this.nbDisplay;
+			},
+			nbDisplay() {
+				return this.viewAll ? 0 : this.view;
+			},
 			tooltipActionMore() {
 				return {
 					type: "text",
-					data: "View more...",
+					data: "View all...",
 				};
 			},
 			valueDisplay() {
-				return this.view == 0 ? this.value : this.value.slice(-this.view);
+				return this.nbDisplay == 0 ? this.value : this.value.slice(-this.nbDisplay);
 			},
 		},
 		methods: {
+			setViewAll() {
+				this.viewAll = true;
+			},
 			timestampToString(timestamp) {
 				return dateToString("{y:04}-{m:02}-{d:02} {h:02}:{min:02}:{s:02}", timestamp);
+			},
+			onClick() {
+				this.$emit("select", this.pathList);
 			},
 		},
 	};

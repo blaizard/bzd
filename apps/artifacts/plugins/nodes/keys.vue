@@ -10,12 +10,12 @@
 					v-slot="slotProps"
 					@select="propagateSelect"
 				>
-					<slot :value="slotProps.value" :path-list="slotProps.pathList"></slot>
+					<slot :value="slotProps.value" :path-list="slotProps.pathList" @select="propagateSelect"></slot>
 				</Keys>
 			</div>
 		</template>
 		<template v-else>
-			<slot :value="value" :path-list="pathList"></slot>
+			<slot :value="value" :path-list="pathList.slice(0, -1)" @select="propagateSelect"></slot>
 		</template>
 	</div>
 </template>
@@ -25,7 +25,7 @@
 		name: "Keys",
 		props: {
 			value: { mandatory: true },
-			pathList: { mandatory: false, default: null, type: Array || null },
+			pathList: { mandatory: true, type: Array },
 		},
 		computed: {
 			isObject() {
