@@ -118,9 +118,12 @@ export default class Plugin extends PluginBase {
 		/// <path>?after=timestamp
 		/// only show entries after a specific timestamp (not including)
 		endpoints.register("get", "/{uid}/{path:*}", async (context) => {
-			const metadata = Boolean(context.getQuery("metadata", false));
-			const children = Boolean(context.getQuery("children", false));
-			const maybeCount = context.getQuery("count", null);
+			const metadata = context.getQuery("metadata", false, Boolean);
+			const children = context.getQuery("children", false, Boolean);
+			const maybeCount = context.getQuery("count", null, parseInt);
+			const after = context.getQuery("after", null, parseInt);
+			const before = context.getQuery("before", null, parseInt);
+
 			const node = await this.nodes.get(context.getParam("uid"));
 
 			let output = {};
@@ -130,7 +133,14 @@ export default class Plugin extends PluginBase {
 				});
 			}
 
-			const maybeData = await node.get(Plugin.paramPathToKey(context.getParam("path")), metadata, children, maybeCount);
+			const maybeData = await node.get(
+				Plugin.paramPathToKey(context.getParam("path")),
+				metadata,
+				children,
+				maybeCount,
+				after,
+				before,
+			);
 			if (maybeData.isEmpty()) {
 				context.sendStatus(404);
 				return;

@@ -67,8 +67,8 @@ export class HttpServerContext {
 		return this.request.query;
 	}
 
-	getQuery(name, defaultValue = null) {
-		return name in this.request.query ? this.request.query[name] : defaultValue;
+	getQuery(name, defaultValue = null, cast = (v) => v) {
+		return name in this.request.query ? cast(this.request.query[name]) : defaultValue;
 	}
 
 	getFiles() {

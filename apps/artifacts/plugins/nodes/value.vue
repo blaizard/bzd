@@ -2,7 +2,7 @@
 	<div class="value-container">
 		<a class="more" @click="viewMore" v-tooltip="tooltipActionMore">...</a>
 		<div class="value-grid">
-			<div v-for="[t, v] in valueTimestampList" class="item">
+			<div v-for="[t, v] in valueDisplay" class="item">
 				<span class="timestamp">{{ timestampToString(t) }}</span
 				><span class="value"><slot :value="v"></slot></span>
 			</div>
@@ -14,7 +14,6 @@
 	import { dateToString } from "#bzd/nodejs/utils/to_string.mjs";
 	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
-	import HttpClient from "#bzd/nodejs/core/http/client.mjs";
 	import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 
 	const Exception = ExceptionFactory("apps", "plugin", "nodes");
@@ -23,63 +22,25 @@
 		mixins: [Component],
 		props: {
 			value: { mandatory: true, type: Array },
-			pathList: { mandatory: true, type: Array },
+			view: { default: 1, type: Number },
 		},
 		directives: {
 			tooltip: DirectiveTooltip,
 		},
-		data: function () {
-			return {
-				count: 1,
-				timeout: null,
-				metadata: null,
-			};
-		},
-		beforeUnmount() {
-			clearTimeout(this.timeout);
-		},
 		computed: {
-			valueTimestampList() {
-				if (this.metadata) {
-					return this.metadata.data.reverse();
-				}
-				return [this.value];
-			},
 			tooltipActionMore() {
 				return {
 					type: "text",
 					data: "View more...",
 				};
 			},
+			valueDisplay() {
+				return this.view == 0 ? this.value : this.value.slice(-this.view);
+			},
 		},
 		methods: {
-			async viewMore() {
-				this.count = Math.max(5, this.count * 2);
-				await this.fetchMetadata();
-			},
 			timestampToString(timestamp) {
 				return dateToString("{y:04}-{m:02}-{d:02} {h:02}:{min:02}:{s:02}", timestamp);
-			},
-			async fetchMetadata() {
-				if (this.count > 1) {
-					await this.handleSubmit(async () => {
-						const endpoint = "/x/" + this.pathList.map(encodeURIComponent).join("/");
-						const values = await HttpClient.get(endpoint, {
-							query: {
-								metadata: 1,
-								count: this.count,
-							},
-							expect: "json",
-						});
-						Exception.assert(
-							"data" in values && Array.isArray(values.data),
-							"Malformed response for requested values: {:j}",
-							values,
-						);
-						this.metadata = values;
-					});
-					this.timeout = setTimeout(this.fetchMetadata, 1000);
-				}
 			},
 		},
 	};

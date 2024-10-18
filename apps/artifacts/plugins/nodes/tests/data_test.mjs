@@ -77,6 +77,12 @@ describe("Nodes", () => {
 				const result = await data.get("hello", ["a", "u"], /*metadata*/ false, /*children*/ true);
 				Exception.assert(!result.hasValue());
 			}
+
+			// get w/children wrong key '_'
+			{
+				const result = await data.get("hello", ["a", "b", "_"], /*metadata*/ false, /*children*/ true);
+				Exception.assert(!result.hasValue());
+			}
 		});
 
 		it("count", async () => {
@@ -120,6 +126,113 @@ describe("Nodes", () => {
 			{
 				const result = await data.get("hello", ["a", "c"], /*metadata*/ false, /*children*/ false, /*count*/ 2);
 				Exception.assert(result.isEmpty());
+			}
+		});
+
+		it("timestamp", async () => {
+			const storage = await makeStorageFromConfig({
+				type: "memory",
+				name: "nodes",
+			});
+			const data = new Data(storage.getAccessor("data"));
+
+			await data.insert("hello", [[["a", "b"], 1]], 1);
+			await data.insert("hello", [[["a", "b"], 10]], 10);
+			await data.insert("hello", [[["a", "b"], 2]], 2);
+			await data.insert("hello", [[["a", "b"], 0]], 0);
+
+			// read all
+			{
+				const result = await data.get("hello", ["a", "b"], /*metadata*/ false, /*children*/ false, /*count*/ 10);
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value(), [10, 2, 1, 0]);
+			}
+
+			// read all after 2
+			{
+				const result = await data.get(
+					"hello",
+					["a", "b"],
+					/*metadata*/ false,
+					/*children*/ false,
+					/*count*/ 10,
+					/*after*/ 2,
+				);
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value(), [10]);
+			}
+
+			// read 2 entries after 2
+			{
+				const result = await data.get(
+					"hello",
+					["a", "b"],
+					/*metadata*/ false,
+					/*children*/ false,
+					/*count*/ 2,
+					/*after*/ 0,
+				);
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value(), [2, 1]);
+			}
+
+			// read all entries after 10
+			{
+				const result = await data.get(
+					"hello",
+					["a", "b"],
+					/*metadata*/ false,
+					/*children*/ false,
+					/*count*/ 2,
+					/*after*/ 10,
+				);
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value(), []);
+			}
+
+			// read all before 2
+			{
+				const result = await data.get(
+					"hello",
+					["a", "b"],
+					/*metadata*/ false,
+					/*children*/ false,
+					/*count*/ 10,
+					/*after*/ null,
+					/*before*/ 2,
+				);
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value(), [1, 0]);
+			}
+
+			// read 2 entries before 10
+			{
+				const result = await data.get(
+					"hello",
+					["a", "b"],
+					/*metadata*/ false,
+					/*children*/ false,
+					/*count*/ 2,
+					/*after*/ null,
+					/*before*/ 10,
+				);
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value(), [2, 1]);
+			}
+
+			// read all entries before 0
+			{
+				const result = await data.get(
+					"hello",
+					["a", "b"],
+					/*metadata*/ false,
+					/*children*/ false,
+					/*count*/ 2,
+					/*after*/ null,
+					/*before*/ 0,
+				);
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value(), []);
 			}
 		});
 	});

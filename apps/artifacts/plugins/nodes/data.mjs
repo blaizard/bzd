@@ -7,6 +7,8 @@ import Optional from "#bzd/nodejs/utils/optional.mjs";
 /// Use to facilitate access to the data by keys
 /// and reduce storage access.
 
+const SPECIAL_KEY_FOR_VALUE = "\x01";
+
 export default class Data {
 	constructor(storage) {
 		this.storage = storage;
@@ -17,11 +19,11 @@ export default class Data {
 		cache.register("tree", async (uid) => {
 			// Convert data into a tree with leaf being the internal key.
 			// {
-			//    a: {"_": "a"},
-			//    b: { c: { "_": "b.c", "d": { "_": "b.c.d" } }},
-			//    a.average: {"_": "a.average"},
+			//    a: {SPECIAL_KEY_FOR_VALUE: "a"},
+			//    b: { c: { SPECIAL_KEY_FOR_VALUE: "b.c", "d": { SPECIAL_KEY_FOR_VALUE: "b.c.d" } }},
+			//    a.average: {SPECIAL_KEY_FOR_VALUE: "a.average"},
 			// }
-			// Using '_' for the key, enables nested keys form leaf nodes.
+			// Using SPECIAL_KEY_FOR_VALUE for the key, enables nested keys form leaf nodes.
 			//
 			const data = await this.storage.get(uid, {});
 			let tree = {};
@@ -31,7 +33,7 @@ export default class Data {
 					r[segment] ??= {};
 					return r[segment];
 				}, tree);
-				object["_"] = internal;
+				object[SPECIAL_KEY_FOR_VALUE] = internal;
 			}
 			return tree;
 		});
@@ -50,7 +52,7 @@ export default class Data {
 	async getTree(uid, key) {
 		const data = await this.tree.get(uid);
 		const reducedData = key.reduce((r, segment) => {
-			if (r === null || !(segment in r)) {
+			if (r === null || !(segment in r) || segment == SPECIAL_KEY_FOR_VALUE) {
 				return null;
 			}
 			return r[segment];
@@ -81,11 +83,32 @@ export default class Data {
 	}
 
 	///  Get all keys/value pair children of key.
-	async get(uid, key, metadata = false, children = false, count = null) {
+	async get(uid, key, metadata = false, children = false, count = null, after = null, before = null) {
 		const data = await this.storage.get(uid, {});
 
+		const getStartEnd = (value) => {
+			if (after !== null) {
+				const end = value.findLastIndex((d) => d[0] > after);
+				if (end == -1) {
+					return [0, 0];
+				}
+				return [Math.max(end - (count || 1) + 1, 0), end + 1];
+			}
+
+			if (before !== null) {
+				const start = value.findIndex((d) => d[0] < before);
+				if (start == -1) {
+					return [0, 0];
+				}
+				return [start, start + (count || 1)];
+			}
+
+			return [0, count || 1];
+		};
+
 		const processValue = (value) => {
-			const values = value.slice(0, count || 1).map(([t, v]) => {
+			const [start, end] = getStartEnd(value);
+			const values = value.slice(start, end).map(([t, v]) => {
 				if (metadata) {
 					return [t, v];
 				}
@@ -119,8 +142,9 @@ export default class Data {
 	///
 	/// \param uid The uid to update.
 	/// \param fragments An iterable of tuples, which first element is the absolute key and second the value to be inserted.
-	async insert(uid, fragments) {
-		const timestamp = Data.getTimestamp();
+	/// \param timestamp The timestamp to be used.
+	async insert(uid, fragments, timestamp = null) {
+		timestamp = timestamp === null ? Data.getTimestamp() : timestamp;
 
 		await this.storage.update(
 			uid,
@@ -128,13 +152,21 @@ export default class Data {
 				// Identify the path of the fragments and their values.
 				for (const [key, value] of fragments) {
 					const internal = KeyMapping.keyToInternal(key);
+					let index = 0;
 					if (!(internal in data)) {
 						data[internal] = [];
-						this.tree.setDirty(this.uid);
+						this.tree.setDirty(uid);
+					}
+					// If the timestamp of the last entry added is newer than the current one.
+					else if (data[internal][0][0] > timestamp) {
+						index = data[internal].findIndex((d) => d[0] <= timestamp);
+						if (index == -1) {
+							index = data[internal].length;
+						}
 					}
 					// Prepend the new value and the timestamp to the values array.
 					// And ensure there are maximum X elements.
-					data[internal].unshift([timestamp, value]);
+					data[internal].splice(index, 0, [timestamp, value]);
 					while (data[internal].length > 10) {
 						//this.handlers.process("history", internal)) {
 						data[internal].pop();
@@ -160,10 +192,10 @@ export default class Data {
 		}
 
 		const children = Object.keys(data)
-			.filter((v) => v != "_")
+			.filter((v) => v != SPECIAL_KEY_FOR_VALUE)
 			.map((v) => {
 				const keys = Object.keys(data[v]);
-				return [v, !(keys.length == 1 && keys[0] == "_")];
+				return [v, !(keys.length == 1 && keys[0] == SPECIAL_KEY_FOR_VALUE)];
 			});
 
 		return new Optional(Object.fromEntries(children));

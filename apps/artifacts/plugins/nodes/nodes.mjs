@@ -40,18 +40,6 @@ export class Node {
 		return paths;
 	}
 
-	/// Create a copy of the data and call a callback on all values before creating it.
-	static mapData(data, callback) {
-		if (Array.isArray(data)) {
-			return callback(data);
-		}
-		return Object.fromEntries(
-			Object.entries(data).map(([k, v]) => {
-				return [k, Node.mapData(v, callback)];
-			}),
-		);
-	}
-
 	/// Insert new data at a given path.
 	async insert(key, fragment) {
 		let fragments = Node.getAllPathAndValues(fragment, key);
@@ -65,10 +53,14 @@ export class Node {
 	/// \param key The key to locate the data to be returned.
 	/// \param metadata Whether metadata should be returned or not.
 	///        If false, the raw value is returned.
+	/// \param children Whether children should be returned as well.
+	/// \param count Maximal number of values to be returned per entry.
+	/// \param after Only return values after this timestamp.
+	/// \param before Only return values before this timestamp.
 	///
 	/// \return An optional with a value if success, empty if the key points to an unknown record.
-	async get(key, metadata = false, children = false, count = null) {
-		return await this.data.get(this.uid, key, metadata, children, count);
+	async get(key, metadata = false, children = false, count = null, after = null, before = null) {
+		return await this.data.get(this.uid, key, metadata, children, count, after, before);
 	}
 
 	/// Get direct children of a given key.
