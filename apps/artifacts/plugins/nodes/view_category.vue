@@ -1,12 +1,14 @@
 <template>
 	<div class="data" v-if="metadata">
 		<div>Updated: {{ durationString }} ago</div>
-		<Keys class="keys" :value="tree" :path-list="pathList" v-slot="serializeSlotProps" @select="onSelect($event)">
+		<Keys class="keys" :value="tree" :path-list="pathList" v-slot="serializeSlotProps" @select="onSelect">
 			<Value
 				class="value"
 				:value="serializeSlotProps.value"
 				:view="isPathListValue(serializeSlotProps.pathList) ? 0 : 1"
+				:path-list="serializeSlotProps.pathList"
 				v-slot="valueSlotProps"
+				@select="onSelect"
 			>
 				<code class="json">{{ JSON.stringify(valueSlotProps.value) }}</code>
 			</Value>
@@ -75,8 +77,9 @@
 		},
 		methods: {
 			isPathListValue(pathList) {
-				const mustMatch = [...this.pathList, "_"];
-				return mustMatch.length === pathList.length && mustMatch.every((entry, index) => entry == pathList[index]);
+				return (
+					this.pathList.length === pathList.length && this.pathList.every((entry, index) => entry == pathList[index])
+				);
 			},
 			updateTree(key, values) {
 				// Update the tree.
@@ -140,10 +143,6 @@
 			padding: 10px;
 
 			.value {
-				&:hover {
-					text-shadow: 1px 0 #000;
-				}
-
 				.json {
 					background-color: transparent;
 				}
