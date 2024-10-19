@@ -1,10 +1,13 @@
 <template>
 	<div class="value-container" @click.stop="">
-		<a v-if="enableViewAll" class="more" @click="setViewAll" v-tooltip="tooltipActionMore">...</a>
+		<a v-if="enableViewAll" class="action" @click="setViewAll" v-tooltip="tooltipActionMore">+</a>
+		<a v-else-if="enableViewOriginal" class="action" @click="setViewOriginal" v-tooltip="tooltipActionLess">-</a>
 		<div class="value-grid" @click.stop="onClick">
 			<div v-for="[t, v] in valueDisplay" class="item">
 				<span class="timestamp">{{ timestampToString(t) }}</span
-				><span class="value"><slot :value="v"></slot></span>
+				><span class="value">
+					<code class="json">{{ JSON.stringify(v) }}</code>
+				</span>
 			</div>
 		</div>
 	</div>
@@ -23,7 +26,6 @@
 		props: {
 			value: { mandatory: true, type: Array },
 			view: { default: 1, type: Number },
-			pathList: { mandatory: true, type: Array },
 		},
 		directives: {
 			tooltip: DirectiveTooltip,
@@ -38,13 +40,22 @@
 			enableViewAll() {
 				return this.nbDisplay !== 0 && this.value.length > this.nbDisplay;
 			},
+			enableViewOriginal() {
+				return this.viewAll === true && this.view !== 0;
+			},
 			nbDisplay() {
 				return this.viewAll ? 0 : this.view;
 			},
 			tooltipActionMore() {
 				return {
 					type: "text",
-					data: "View all...",
+					data: "View all values captured since the page opened.",
+				};
+			},
+			tooltipActionLess() {
+				return {
+					type: "text",
+					data: "Reduce the view.",
 				};
 			},
 			valueDisplay() {
@@ -55,11 +66,14 @@
 			setViewAll() {
 				this.viewAll = true;
 			},
+			setViewOriginal() {
+				this.viewAll = false;
+			},
 			timestampToString(timestamp) {
 				return dateToString("{y:04}-{m:02}-{d:02} {h:02}:{min:02}:{s:02}", timestamp);
 			},
 			onClick() {
-				this.$emit("select", this.pathList);
+				this.$emit("select");
 			},
 		},
 	};
@@ -69,7 +83,7 @@
 	.value-container {
 		display: inline-flex;
 
-		a.more {
+		a.action {
 			background-color: #eee;
 			border: solid 1px rgb(229.5, 229.5, 229.5);
 			border-radius: 6px;
@@ -102,6 +116,10 @@
 				.value {
 					align-self: baseline;
 					white-space: pre;
+
+					.json {
+						background-color: transparent;
+					}
 				}
 			}
 		}
