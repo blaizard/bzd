@@ -2,16 +2,8 @@
 	<div class="data" v-if="metadata">
 		<div>Updated: {{ durationString }} ago</div>
 		<Keys class="keys" :value="tree" :path-list="pathList" v-slot="serializeSlotProps" @select="onSelect">
-			<Value
-				class="value"
-				:value="serializeSlotProps.value"
-				:view="isPathListValue(serializeSlotProps.pathList) ? 0 : 1"
-				:path-list="serializeSlotProps.pathList"
-				v-slot="valueSlotProps"
-				@select="onSelect"
-			>
-				<code class="json">{{ JSON.stringify(valueSlotProps.value) }}</code>
-			</Value>
+			<Value v-if="isPathListValue(serializeSlotProps.pathList)" :value="serializeSlotProps.value" :view="0"></Value>
+			<Value v-else :value="serializeSlotProps.value" :view="1" @select="onSelect(serializeSlotProps.pathList)"></Value>
 		</Keys>
 		<div>
 			<span>Accessors:</span>
@@ -141,12 +133,6 @@
 		.keys {
 			border: 1px solid #eee;
 			padding: 10px;
-
-			.value {
-				.json {
-					background-color: transparent;
-				}
-			}
 		}
 	}
 </style>
