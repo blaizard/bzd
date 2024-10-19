@@ -8,14 +8,8 @@
 		<div>
 			<span>Accessors:</span>
 			<ul>
-				<li>
-					<a :href="endpoint + '?children=1'">{{ endpoint }}?children=1</a>
-				</li>
-				<li>
-					<a :href="endpoint + '?metadata=1'">{{ endpoint }}?metadata=1</a>
-				</li>
-				<li>
-					<a :href="endpoint + '?count=5'">{{ endpoint }}?count=5</a>
+				<li v-for="query in endpointsQueryAccessors">
+					<a :href="endpoint + query">{{ endpoint }}{{ query }}</a>
 				</li>
 			</ul>
 		</div>
@@ -54,11 +48,28 @@
 			isValue() {
 				return "_" in this.tree;
 			},
+			isChildren() {
+				for (const key of Object.keys(this.tree)) {
+					if (key != "_") {
+						return true;
+					}
+				}
+				return false;
+			},
 			value() {
 				return this.tree["_"] || [];
 			},
 			valueOldestTimestamp() {
 				return this.value[0][0];
+			},
+			endpointsQueryAccessors() {
+				if (this.isValue) {
+					if (this.isChildren) {
+						return ["?children=1", "?metadata=1", "?count=5"];
+					}
+					return ["?metadata=1", "?count=5"];
+				}
+				return ["?children=1", "?children=1&metadata=1", "?children=1&count=5"];
 			},
 		},
 		mounted() {
