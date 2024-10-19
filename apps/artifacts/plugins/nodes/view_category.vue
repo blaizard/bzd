@@ -85,6 +85,10 @@
 					return a[0] > b[0] ? 1 : -1;
 				});
 
+				// Keep only the last X values depending if root value or not.
+				const keepLastN = key.length === 0 ? 100 : 10;
+				object["_"] = object["_"].slice(-keepLastN);
+
 				// Update the timestamp.
 				const last = object["_"].slice(-1)[0];
 				this.timestamp = Math.max(this.timestamp, last[0]);
