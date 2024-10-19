@@ -94,7 +94,6 @@ export default class Plugin extends PluginBase {
 
 		/// API:
 		/// <path>?include=path1,path2
-		/// <path>?exclude=path1,path2
 		///
 		/// <path>?metadata
 		/// {
@@ -123,6 +122,12 @@ export default class Plugin extends PluginBase {
 			const maybeCount = context.getQuery("count", null, parseInt);
 			const after = context.getQuery("after", null, parseInt);
 			const before = context.getQuery("before", null, parseInt);
+			const include = context.getQuery("include", null, (v) =>
+				v
+					.split(",")
+					.filter(Boolean)
+					.map((p) => Plugin.paramPathToKey(p)),
+			);
 
 			const node = await this.nodes.get(context.getParam("uid"));
 
@@ -140,6 +145,7 @@ export default class Plugin extends PluginBase {
 				maybeCount,
 				after,
 				before,
+				include,
 			);
 			if (maybeData.isEmpty()) {
 				context.sendStatus(404);

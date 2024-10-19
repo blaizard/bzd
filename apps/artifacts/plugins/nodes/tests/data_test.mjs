@@ -4,6 +4,19 @@ import makeStorageFromConfig from "#bzd/nodejs/db/key_value_store/make_from_conf
 
 const Exception = ExceptionFactory("test", "artifacts", "plugins", "data");
 
+async function get(data, uid, key, options = {}) {
+	return await data.get(
+		uid,
+		key,
+		"metadata" in options ? options.metadata : false,
+		"children" in options ? options.children : false,
+		"count" in options ? options.count : null,
+		"after" in options ? options.after : null,
+		"before" in options ? options.before : null,
+		"include" in options ? options.include : null,
+	);
+}
+
 describe("Nodes", () => {
 	describe("Data", () => {
 		it("basic", async () => {
@@ -25,28 +38,28 @@ describe("Nodes", () => {
 
 			// get w/no options.
 			{
-				const result = await data.get("hello", ["a", "b"]);
+				const result = await get(data, "hello", ["a", "b"]);
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), 12);
 			}
 
 			// get wrong key.
 			{
-				const result1 = await data.get("hello", ["a"]);
+				const result1 = await get(data, "hello", ["a"]);
 				Exception.assert(result1.isEmpty());
-				const result2 = await data.get("hello", ["a", "b", "c"]);
+				const result2 = await get(data, "hello", ["a", "b", "c"]);
 				Exception.assert(result2.isEmpty());
-				const result3 = await data.get("hello", ["a", "c"]);
+				const result3 = await get(data, "hello", ["a", "c"]);
 				Exception.assert(result3.isEmpty());
-				const result4 = await data.get("hello", []);
+				const result4 = await get(data, "hello", []);
 				Exception.assert(result4.isEmpty());
-				const result5 = await data.get("hellop", ["a", "b"]);
+				const result5 = await get(data, "hellop", ["a", "b"]);
 				Exception.assert(result5.isEmpty());
 			}
 
 			// get w/metadata
 			{
-				const result = await data.get("hello", ["a", "b"], /*metadata*/ true);
+				const result = await get(data, "hello", ["a", "b"], { metadata: true });
 				Exception.assert(result.hasValue());
 				Exception.assert(typeof result.value()[0] == "number");
 				Exception.assertEqual(result.value()[1], 12);
@@ -54,7 +67,7 @@ describe("Nodes", () => {
 
 			// get w/children
 			{
-				const result = await data.get("hello", ["a", "c"], /*metadata*/ false, /*children*/ true);
+				const result = await get(data, "hello", ["a", "c"], { children: true });
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), [
 					[["e"], 1],
@@ -64,7 +77,7 @@ describe("Nodes", () => {
 
 			// get w/children from leaf
 			{
-				const result = await data.get("hello", ["a", "b"], /*metadata*/ false, /*children*/ true);
+				const result = await get(data, "hello", ["a", "b"], { children: true });
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), [
 					[[], 12],
@@ -74,13 +87,13 @@ describe("Nodes", () => {
 
 			// get w/children wrong key
 			{
-				const result = await data.get("hello", ["a", "u"], /*metadata*/ false, /*children*/ true);
+				const result = await get(data, "hello", ["a", "u"], { children: true });
 				Exception.assert(!result.hasValue());
 			}
 
 			// get w/children wrong key '_'
 			{
-				const result = await data.get("hello", ["a", "b", "_"], /*metadata*/ false, /*children*/ true);
+				const result = await get(data, "hello", ["a", "b", "_"], { children: true });
 				Exception.assert(!result.hasValue());
 			}
 		});
@@ -97,34 +110,34 @@ describe("Nodes", () => {
 
 			// get w/no options.
 			{
-				const result = await data.get("hello", ["a", "b"]);
+				const result = await get(data, "hello", ["a", "b"]);
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), 2);
 			}
 
 			// count of 1 should return an array
 			{
-				const result = await data.get("hello", ["a", "b"], /*metadata*/ false, /*children*/ false, /*count*/ 1);
+				const result = await get(data, "hello", ["a", "b"], { count: 1 });
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), [2]);
 			}
 
 			{
-				const result = await data.get("hello", ["a", "b"], /*metadata*/ false, /*children*/ false, /*count*/ 2);
+				const result = await get(data, "hello", ["a", "b"], { count: 2 });
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), [2, 1]);
 			}
 
 			// count greater than data
 			{
-				const result = await data.get("hello", ["a", "b"], /*metadata*/ false, /*children*/ false, /*count*/ 3);
+				const result = await get(data, "hello", ["a", "b"], { count: 3 });
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), [2, 1]);
 			}
 
 			// wrong key
 			{
-				const result = await data.get("hello", ["a", "c"], /*metadata*/ false, /*children*/ false, /*count*/ 2);
+				const result = await get(data, "hello", ["a", "c"], { count: 2 });
 				Exception.assert(result.isEmpty());
 			}
 		});
@@ -143,96 +156,124 @@ describe("Nodes", () => {
 
 			// read all
 			{
-				const result = await data.get("hello", ["a", "b"], /*metadata*/ false, /*children*/ false, /*count*/ 10);
+				const result = await get(data, "hello", ["a", "b"], { count: 10 });
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), [10, 2, 1, 0]);
 			}
 
 			// read all after 2
 			{
-				const result = await data.get(
-					"hello",
-					["a", "b"],
-					/*metadata*/ false,
-					/*children*/ false,
-					/*count*/ 10,
-					/*after*/ 2,
-				);
+				const result = await get(data, "hello", ["a", "b"], { count: 10, after: 2 });
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), [10]);
 			}
 
 			// read 2 entries after 2
 			{
-				const result = await data.get(
-					"hello",
-					["a", "b"],
-					/*metadata*/ false,
-					/*children*/ false,
-					/*count*/ 2,
-					/*after*/ 0,
-				);
+				const result = await get(data, "hello", ["a", "b"], { count: 2, after: 0 });
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), [2, 1]);
 			}
 
 			// read all entries after 10
 			{
-				const result = await data.get(
-					"hello",
-					["a", "b"],
-					/*metadata*/ false,
-					/*children*/ false,
-					/*count*/ 2,
-					/*after*/ 10,
-				);
+				const result = await get(data, "hello", ["a", "b"], { count: 10, after: 10 });
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), []);
 			}
 
 			// read all before 2
 			{
-				const result = await data.get(
-					"hello",
-					["a", "b"],
-					/*metadata*/ false,
-					/*children*/ false,
-					/*count*/ 10,
-					/*after*/ null,
-					/*before*/ 2,
-				);
+				const result = await get(data, "hello", ["a", "b"], { count: 10, before: 2 });
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), [1, 0]);
 			}
 
 			// read 2 entries before 10
 			{
-				const result = await data.get(
-					"hello",
-					["a", "b"],
-					/*metadata*/ false,
-					/*children*/ false,
-					/*count*/ 2,
-					/*after*/ null,
-					/*before*/ 10,
-				);
+				const result = await get(data, "hello", ["a", "b"], { count: 2, before: 10 });
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), [2, 1]);
 			}
 
 			// read all entries before 0
 			{
-				const result = await data.get(
-					"hello",
-					["a", "b"],
-					/*metadata*/ false,
-					/*children*/ false,
-					/*count*/ 2,
-					/*after*/ null,
-					/*before*/ 0,
-				);
+				const result = await get(data, "hello", ["a", "b"], { count: 10, before: 0 });
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), []);
+			}
+		});
+
+		it("include", async () => {
+			const storage = await makeStorageFromConfig({
+				type: "memory",
+				name: "nodes",
+			});
+			const data = new Data(storage.getAccessor("data"));
+
+			await data.insert("hello", [[["a", "b"], 1]]);
+			await data.insert("hello", [[["a", "b", "c"], 10]]);
+			await data.insert("hello", [[["a"], 2]]);
+			await data.insert("hello", [[["a", "b", "d"], 0]]);
+
+			// absolute
+			{
+				const result = await get(data, "hello", [], { include: [["a", "b"]] });
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value(), [[["a", "b"], 1]]);
+			}
+
+			// multi values
+			{
+				const result = await get(data, "hello", ["a"], {
+					include: [
+						["b", "c"],
+						["b", "d"],
+					],
+				});
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value(), [
+					[["b", "c"], 10],
+					[["b", "d"], 0],
+				]);
+			}
+
+			// include empty path
+			{
+				const result = await get(data, "hello", ["a"], { include: [["b", "c"], []] });
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value(), [
+					[["b", "c"], 10],
+					[[], 2],
+				]);
+			}
+
+			// non existing path
+			{
+				const result = await get(data, "hello", ["a"], { include: [["abc"], ["hello"]] });
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value(), []);
+			}
+
+			// absolute children
+			{
+				const result = await get(data, "hello", [], { include: [["a", "b"]], children: true });
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value(), [
+					[["a", "b"], 1],
+					[["a", "b", "c"], 10],
+					[["a", "b", "d"], 0],
+				]);
+			}
+
+			// children
+			{
+				const result = await get(data, "hello", ["a", "b"], { include: [["c"], ["d"]], children: true });
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value(), [
+					[["c"], 10],
+					[["d"], 0],
+				]);
 			}
 		});
 	});

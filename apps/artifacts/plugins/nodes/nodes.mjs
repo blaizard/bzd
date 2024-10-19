@@ -57,10 +57,11 @@ export class Node {
 	/// \param count Maximal number of values to be returned per entry.
 	/// \param after Only return values after this timestamp.
 	/// \param before Only return values before this timestamp.
+	/// \param include Include the given path to the result.
 	///
 	/// \return An optional with a value if success, empty if the key points to an unknown record.
-	async get(key, metadata = false, children = false, count = null, after = null, before = null) {
-		return await this.data.get(this.uid, key, metadata, children, count, after, before);
+	async get(key, metadata = false, children = false, count = null, after = null, before = null, include = null) {
+		return await this.data.get(this.uid, key, metadata, children, count, after, before, include);
 	}
 
 	/// Get direct children of a given key.

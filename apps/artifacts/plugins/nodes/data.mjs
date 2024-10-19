@@ -83,7 +83,7 @@ export default class Data {
 	}
 
 	///  Get all keys/value pair children of key.
-	async get(uid, key, metadata = false, children = false, count = null, after = null, before = null) {
+	async get(uid, key, metadata = false, children = false, count = null, after = null, before = null, include = null) {
 		const data = await this.storage.get(uid, {});
 
 		const getStartEnd = (value) => {
@@ -118,12 +118,27 @@ export default class Data {
 		};
 
 		// Get the list of keys.
-		if (children) {
-			const keys = await this.getKeys(uid, key);
+		if (children || include) {
+			let keys = null;
+			if (children && include) {
+				const arrayOfSets = await Promise.all(
+					include.map(async (subKey) => await this.getKeys(uid, [...key, ...subKey])),
+				);
+				keys = new Set(arrayOfSets.filter((a) => a !== null).reduce((a, c) => a.concat([...c]), []));
+			} else if (include) {
+				keys = new Set(include.map((relative) => KeyMapping.keyToInternal([...key, ...relative])));
+			} else {
+				keys = await this.getKeys(uid, key);
+			}
+
 			if (keys !== null) {
 				const values = Object.entries(data)
+					// Only includes the children keys.
 					.filter(([k, _]) => keys.has(k))
-					.map(([k, v]) => [KeyMapping.internalToKey(k).slice(key.length), processValue(v)]);
+					// Get the values.
+					.map(([k, v]) => [KeyMapping.internalToKey(k).slice(key.length), processValue(v)])
+					// Filter out entries that are empty.
+					.filter(([_, v]) => count === null || v.length > 0);
 				return new Optional(values);
 			}
 		}
