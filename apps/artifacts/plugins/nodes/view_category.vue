@@ -65,11 +65,11 @@
 			endpointsQueryAccessors() {
 				if (this.isValue) {
 					if (this.isChildren) {
-						return ["?children=1", "?metadata=1", "?count=5"];
+						return ["?children=99", "?metadata=1", "?count=5"];
 					}
 					return ["?metadata=1", "?count=5"];
 				}
-				return ["?children=1", "?children=1&metadata=1", "?children=1&count=5"];
+				return ["?children=99", "?children=99&metadata=1", "?children=99&count=5"];
 			},
 		},
 		mounted() {
@@ -106,7 +106,7 @@
 			},
 			async fetchMetadata() {
 				await this.handleSubmit(async () => {
-					let query = { metadata: 1, children: 1, count: 1 };
+					let query = { metadata: 1, children: 99, count: 1 };
 					if (this.timestamp) {
 						query.after = this.timestamp;
 						query.count = 5;

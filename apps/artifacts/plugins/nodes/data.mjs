@@ -61,29 +61,31 @@ export default class Data {
 	}
 
 	/// Get the set of keys for this specific entry, which are equal and children of `key`.
-	async getKeys(uid, key) {
+	async getKeys(uid, key, children) {
 		const data = await this.getTree(uid, key);
 		if (data === null) {
 			return null;
 		}
 
 		const keys = new Set();
-		const treeToKeys = (tree) => {
+		const treeToKeys = (tree, children) => {
 			if (typeof tree === "string") {
 				keys.add(tree);
 			} else {
-				Object.entries(tree).forEach(([_, v]) => {
-					treeToKeys(v);
-				});
+				if (children > 0) {
+					Object.entries(tree).forEach(([_, v]) => {
+						treeToKeys(v, children - 1);
+					});
+				}
 			}
 		};
-		treeToKeys(data);
+		treeToKeys(data, children + 1); // +1 for '_'.
 
 		return keys;
 	}
 
 	///  Get all keys/value pair children of key.
-	async get(uid, key, metadata = false, children = false, count = null, after = null, before = null, include = null) {
+	async get(uid, key, metadata = false, children = 0, count = null, after = null, before = null, include = null) {
 		const data = await this.storage.get(uid, {});
 
 		const getStartEnd = (value) => {
@@ -122,13 +124,13 @@ export default class Data {
 			let keys = null;
 			if (children && include) {
 				const arrayOfSets = await Promise.all(
-					include.map(async (subKey) => await this.getKeys(uid, [...key, ...subKey])),
+					include.map(async (subKey) => await this.getKeys(uid, [...key, ...subKey], children)),
 				);
 				keys = new Set(arrayOfSets.filter((a) => a !== null).reduce((a, c) => a.concat([...c]), []));
 			} else if (include) {
 				keys = new Set(include.map((relative) => KeyMapping.keyToInternal([...key, ...relative])));
 			} else {
-				keys = await this.getKeys(uid, key);
+				keys = await this.getKeys(uid, key, children);
 			}
 
 			if (keys !== null) {

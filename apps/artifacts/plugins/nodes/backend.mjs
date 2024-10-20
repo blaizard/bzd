@@ -114,7 +114,7 @@ export default class Plugin extends PluginBase {
 		///   ]
 		/// }```
 		///
-		/// GET <endpoint>/<uid>/<path:*>?children=1
+		/// GET <endpoint>/<uid>/<path:*>?children=3
 		/// ```{
 		///   data: [
 		///      [["a", "b"], <value1>],       # The latest value for /<path>/a/b.
@@ -133,7 +133,7 @@ export default class Plugin extends PluginBase {
 		///
 		endpoints.register("get", "/{uid}/{path:*}", async (context) => {
 			const metadata = context.getQuery("metadata", false, Boolean);
-			const children = context.getQuery("children", false, Boolean);
+			const children = context.getQuery("children", 0, parseInt);
 			const maybeCount = context.getQuery("count", null, parseInt);
 			const after = context.getQuery("after", null, parseInt);
 			const before = context.getQuery("before", null, parseInt);

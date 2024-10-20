@@ -9,7 +9,7 @@ async function get(data, uid, key, options = {}) {
 		uid,
 		key,
 		"metadata" in options ? options.metadata : false,
-		"children" in options ? options.children : false,
+		"children" in options ? options.children : 0,
 		"count" in options ? options.count : null,
 		"after" in options ? options.after : null,
 		"before" in options ? options.before : null,
@@ -32,6 +32,7 @@ describe("Nodes", () => {
 			await data.insert("hello", [
 				[["a", "c", "e"], 1],
 				[["a", "c", "d"], 13],
+				[["a", "c", "d", "f"], 4],
 			]);
 			// Insert child entry of another leaf.
 			await data.insert("hello", [[["a", "b", "d"], -3]]);
@@ -67,7 +68,7 @@ describe("Nodes", () => {
 
 			// get w/children
 			{
-				const result = await get(data, "hello", ["a", "c"], { children: true });
+				const result = await get(data, "hello", ["a", "c"], { children: 1 });
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), [
 					[["e"], 1],
@@ -75,9 +76,20 @@ describe("Nodes", () => {
 				]);
 			}
 
+			// get w/children with level 2
+			{
+				const result = await get(data, "hello", ["a", "c"], { children: 2 });
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value(), [
+					[["e"], 1],
+					[["d"], 13],
+					[["d", "f"], 4],
+				]);
+			}
+
 			// get w/children from leaf
 			{
-				const result = await get(data, "hello", ["a", "b"], { children: true });
+				const result = await get(data, "hello", ["a", "b"], { children: 1 });
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), [
 					[[], 12],
@@ -87,13 +99,13 @@ describe("Nodes", () => {
 
 			// get w/children wrong key
 			{
-				const result = await get(data, "hello", ["a", "u"], { children: true });
+				const result = await get(data, "hello", ["a", "u"], { children: 1 });
 				Exception.assert(!result.hasValue());
 			}
 
 			// get w/children wrong key '_'
 			{
-				const result = await get(data, "hello", ["a", "b", "_"], { children: true });
+				const result = await get(data, "hello", ["a", "b", "_"], { children: 1 });
 				Exception.assert(!result.hasValue());
 			}
 		});
@@ -257,7 +269,7 @@ describe("Nodes", () => {
 
 			// absolute children
 			{
-				const result = await get(data, "hello", [], { include: [["a", "b"]], children: true });
+				const result = await get(data, "hello", [], { include: [["a", "b"]], children: 1 });
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), [
 					[["a", "b"], 1],
@@ -268,7 +280,7 @@ describe("Nodes", () => {
 
 			// children
 			{
-				const result = await get(data, "hello", ["a", "b"], { include: [["c"], ["d"]], children: true });
+				const result = await get(data, "hello", ["a", "b"], { include: [["c"], ["d"]], children: 1 });
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), [
 					[["c"], 10],
