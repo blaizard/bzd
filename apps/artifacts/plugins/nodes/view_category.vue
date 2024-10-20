@@ -36,6 +36,7 @@
 				tree: {},
 				timestamp: 0,
 				timeout: null,
+				isDestroyed: false,
 			};
 		},
 		computed: {
@@ -76,6 +77,7 @@
 			this.fetchMetadata();
 		},
 		beforeUnmount() {
+			this.isDestroyed = true;
 			clearTimeout(this.timeout);
 		},
 		methods: {
@@ -130,7 +132,9 @@
 					});
 				}
 
-				this.timeout = setTimeout(this.fetchMetadata, 1000);
+				if (!this.isDestroyed) {
+					this.timeout = setTimeout(this.fetchMetadata, 1000);
+				}
 			},
 			onSelect(pathList) {
 				const url = "/view/" + pathList.map(encodeURIComponent).join("/");
