@@ -2,6 +2,9 @@ import StorageBzd from "#bzd/apps/artifacts/plugins/nodes/storage.mjs";
 import { Nodes } from "#bzd/apps/artifacts/plugins/nodes/nodes.mjs";
 import makeStorageFromConfig from "#bzd/nodejs/db/key_value_store/make_from_config.mjs";
 import PluginBase from "#bzd/apps/artifacts/backend/plugin.mjs";
+import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
+
+const Exception = ExceptionFactory("apps", "plugin", "nodes");
 
 function rawBodyParse(body, headersFunc, forceContentType = null, forceCharset = null) {
 	const contentTypeHeader = Object.fromEntries(
@@ -92,41 +95,53 @@ export default class Plugin extends PluginBase {
 			this.setStorage(await StorageBzd.make(this.nodes));
 		});
 
-		/// API:
-		/// <path>?include=path1,path2
+		/// Retrieve values from the store.
 		///
-		/// <path>?metadata
-		/// {
-		///   a: [ <- value
-		///      timestamp, value
+		/// GET <endpoint>/<uid>/<path:*>
+		/// ```{data: <value>}``` -> Return the raw value at the given path.
+		///
+		/// GET <endpoint>/<uid>/<path:*>?metadata=1
+		/// ```{
+		///   timestamp: <timestamp>, # The current server timestamp for reference,
+		///   data: [<timestamp>, <value>] # The latest value and its timestamp.
+		/// }```
+		///
+		/// GET <endpoint>/<uid>/<path:*>?count=2
+		/// ```{
+		///   data: [
+		///      <value1>, # The latest value.
+		///      <value2>  # Another value.
 		///   ]
-		/// }
-		/// or
-		/// {
-		///   timestamp: X, <- server timestamp (special field doesn't start with '/')
-		///   /data/a: [[timestamp, value]], <- list of values
-		///   /data/a/average: [[timestamp, 12]] <- computed values (are child of a parent value)
-		/// }
+		/// }```
 		///
-		/// <path> : raw value
-		/// {
-		///   /data/a: value, <- single value
-		///   /data/a/average: 12 <- single value
-		/// }
+		/// GET <endpoint>/<uid>/<path:*>?children=1
+		/// ```{
+		///   data: [
+		///      [["a", "b"], <value1>],       # The latest value for /<path>/a/b.
+		///      [["a", "d", "e"], <value2>]   # The latest value for /<path>/a/d/e.
+		///   ]
+		/// }```
 		///
-		/// <path>?after=timestamp
-		/// only show entries after a specific timestamp (not including)
+		/// GET <endpoint>/<uid>/<path:*>?after=<timestamp>
+		/// Only show entries after a specific timestamp (not including)
+		///
+		/// GET <endpoint>/<uid>/<path:*>?before=<timestamp>
+		/// Only show entries before a specific timestamp (not including)
+		///
+		/// GET <endpoint>/<uid>/<path:*>?include=/a/b,/a/d/e
+		/// Only show the path /a/b and /a/d/e
+		///
 		endpoints.register("get", "/{uid}/{path:*}", async (context) => {
 			const metadata = context.getQuery("metadata", false, Boolean);
 			const children = context.getQuery("children", false, Boolean);
 			const maybeCount = context.getQuery("count", null, parseInt);
 			const after = context.getQuery("after", null, parseInt);
 			const before = context.getQuery("before", null, parseInt);
-			const include = context.getQuery("include", null, (v) =>
-				v
+			const include = context.getQuery("include", null, (value) =>
+				value
 					.split(",")
 					.filter(Boolean)
-					.map((p) => Plugin.paramPathToKey(p)),
+					.map((path) => Plugin.paramPathToKey(path)),
 			);
 
 			const node = await this.nodes.get(context.getParam("uid"));
@@ -134,7 +149,7 @@ export default class Plugin extends PluginBase {
 			let output = {};
 			if (metadata) {
 				output = Object.assign(output, {
-					timestampServer: Date.now(),
+					timestamp: Date.now(),
 				});
 			}
 
@@ -159,10 +174,45 @@ export default class Plugin extends PluginBase {
 			context.sendStatus(200);
 		});
 
+		/// Insert one or multiple entries.
+		///
+		/// POST <endpoint>/<uid>/<path:*>
+		/// ```<value>``` -> stores a new value to the path at the server timestamp.
+		///
+		/// POST <endpoint>/<uid>/<path:*>?bulk=1
+		/// ```{
+		///    timestamp: xxx,             # node current timestamp for reference.
+		///    data: [
+		///      [<timestamp1>, <value1>], # Store a new value with timestamp1
+		///      [<timestamp2>, <value2>]  # Store another value with timestamp2
+		///    ]
+		/// }```
 		endpoints.register("post", "/{uid}/{path:*}", async (context) => {
+			const bulk = context.getQuery("bulk", false, Boolean);
 			const data = rawBodyParse(context.getBody(), (name) => context.getHeader(name));
+
 			const node = await this.nodes.get(context.getParam("uid"));
-			await node.insert(Plugin.paramPathToKey(context.getParam("path")), data);
+			const key = Plugin.paramPathToKey(context.getParam("path"));
+
+			if (bulk) {
+				Exception.assertPrecondition(
+					typeof data.timestamp == "number",
+					"The timestamp given is not a number {}.",
+					data.timestamp,
+				);
+				for (const [timestamp, value] of data.data) {
+					Exception.assertPrecondition(
+						typeof timestamp == "number",
+						"The timestamp given for value '{:j}' is not a number {}.",
+						value,
+						timestamp,
+					);
+					await node.insert(key, value, timestamp - data.timestamp);
+				}
+			} else {
+				await node.insert(key, data);
+			}
+
 			context.sendStatus(200);
 		});
 	}
