@@ -40,7 +40,7 @@
 		},
 		computed: {
 			durationString() {
-				return timeMsToString(this.metadata.timestampServer - this.timestamp);
+				return timeMsToString(this.metadata.timestamp - this.timestamp);
 			},
 			endpoint() {
 				return "/x/" + this.pathList.map(encodeURIComponent).join("/");

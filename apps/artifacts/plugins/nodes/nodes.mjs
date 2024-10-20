@@ -38,11 +38,11 @@ export class Node {
 	}
 
 	/// Insert new data at a given path.
-	async insert(key, fragment) {
+	async insert(key, fragment, timestampDelta = 0) {
 		let fragments = Node.getAllPathAndValues(fragment, key);
 		fragments = this.handlers.processBeforeInsert(fragments);
 
-		await this.data.insert(this.uid, fragments);
+		await this.data.insert(this.uid, fragments, Data.getTimestamp() + timestampDelta);
 	}
 
 	/// Get the tree with single values.

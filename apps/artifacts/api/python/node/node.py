@@ -1,4 +1,5 @@
 import typing
+from contextlib import contextmanager
 
 from bzd.http.client import HttpClient
 from bzd.http.utils import encodeURIComponent
@@ -17,7 +18,8 @@ class Node(ArtifactsBase):
 	            data: typing.Dict[str, typing.Any],
 	            uid: typing.Optional[str] = None,
 	            volume: str = defaultNodeVolume,
-	            path: typing.Optional[typing.List[str]] = None) -> None:
+	            path: typing.Optional[typing.List[str]] = None,
+	            query: typing.Optional[typing.Dict[str, str]] = None) -> None:
 		"""Publish data to a remote.
 
 		Args:
@@ -25,6 +27,7 @@ class Node(ArtifactsBase):
 			uid: The unique identifier of the node.
 			volume: The volume to which the data should be sent.
 			path: The path to publish to.
+			query: Query URL to be used while posting.
 		"""
 
 		actualUid = uid or self.uid
@@ -36,13 +39,45 @@ class Node(ArtifactsBase):
 
 			url = f"{remote}/x/{volume}/{actualUid}/data" + (f"/{subPath}" if subPath else "")
 			try:
-				HttpClient.post(url, json=data)
+				HttpClient.post(url, json=data, query=query)
 				return
 			except Exception as e:
 				self.logger.warning(f"Exception while publishing {url}: {str(e)}")
 				pass
 
 		raise NodePublishNoRemote("Unable to publish to any of the remotes.")
+
+	@contextmanager
+	def publishBulk(
+	    self,
+	    uid: typing.Optional[str] = None,
+	    volume: str = defaultNodeVolume,
+	    path: typing.Optional[typing.List[str]] = None,
+	    timestamp: typing.Optional[float] = None
+	) -> typing.Generator[typing.Callable[[float, typing.Dict[str, typing.Any]], None], None, None]:
+		"""Publish a bulk of data to remote."""
+
+		bulk: typing.List[typing.Tuple[float, typing.Any]] = []
+
+		def publisher(timestamp: float, data: typing.Dict[str, typing.Any]) -> None:
+			bulk.append((
+			    timestamp,
+			    data,
+			))
+
+		yield publisher
+
+		# Calculate the timestamp.
+		timestamp = max([t for [t, _] in bulk]) if timestamp is None else timestamp
+
+		self.publish(data={
+		    "timestamp": timestamp,
+		    "data": bulk
+		},
+		             uid=uid,
+		             volume=volume,
+		             path=path,
+		             query={"bulk": "1"})
 
 	def makeLoggerHandler(self) -> "LoggerHandlerNode":
 		"""Create a logger handler that sends data to the node."""
@@ -68,19 +103,19 @@ class LoggerHandlerNode(LoggerHandler):
 	def handler(self, data: LoggerHandlerData, flow: LoggerHandlerFlow) -> None:
 		assert self.name
 		try:
-			for log in data:
-				self.node.publish(
-				    path=["log"],
-				    data={
-				        self.name: {
-				            "name": log.name,
-				            "timestamp": log.timestamp,
-				            "level": log.level,
-				            "source": f"{log.filename}:{log.line}",
-				            "message": log.message,
-				        },
-				    },
-				)
+			with self.node.publishBulk(path=["log"]) as publisher:
+				for log in data:
+					publisher(
+					    log.timestamp,
+					    {
+					        self.name: {
+					            "name": log.name,
+					            "level": log.level,
+					            "source": f"{log.filename}:{log.line}",
+					            "message": log.message,
+					        },
+					    },
+					)
 		except NodePublishNoRemote as e:
 			self.node.logger.error(str(e))
 
