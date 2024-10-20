@@ -89,18 +89,27 @@ export default class Handlers {
 			}
 		}
 
-		return [...fragmentsRest, ...fragmentsGroup];
+		let updatedFragments = [];
+		for (const [key, value, options] of [...fragmentsRest, ...fragmentsGroup]) {
+			const updatedOptions = Object.assign(
+				{
+					history: this.process("history", key),
+				},
+				options,
+			);
+			updatedFragments.push([key, value, updatedOptions]);
+		}
+
+		return updatedFragments;
 	}
 
 	/// Process a handler.
 	///
 	/// \param The name of the handler.
-	/// \param The internal path.
-	process(name, internal, ...args) {
+	/// \param The key path.
+	process(name, key, ...args) {
 		Exception.assert(name in availableHandlers, "The handler '{}' is not registered.", name);
-		const options = [...this.getHandlers(internal)]
-			.filter(([handler, _]) => handler == name)
-			.map(([_, options]) => options);
+		const options = [...this.getHandlers(key)].filter(([handler, _]) => handler == name).map(([_, options]) => options);
 		return availableHandlers[name].process(options, ...args);
 	}
 }

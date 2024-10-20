@@ -165,7 +165,15 @@ export default class Data {
 			uid,
 			async (data) => {
 				// Identify the path of the fragments and their values.
-				for (const [key, value] of fragments) {
+				for (const [key, value, options] of fragments) {
+					const config = Object.assign(
+						{
+							// The number of values to be kept as history.
+							history: 10,
+						},
+						options,
+					);
+
 					const internal = KeyMapping.keyToInternal(key);
 					let index = 0;
 					if (!(internal in data)) {
@@ -182,8 +190,7 @@ export default class Data {
 					// Prepend the new value and the timestamp to the values array.
 					// And ensure there are maximum X elements.
 					data[internal].splice(index, 0, [timestamp, value]);
-					while (data[internal].length > 10) {
-						//this.handlers.process("history", internal)) {
+					while (data[internal].length > config.history) {
 						data[internal].pop();
 					}
 				}
