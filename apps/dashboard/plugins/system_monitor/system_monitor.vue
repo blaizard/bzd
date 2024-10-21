@@ -3,7 +3,7 @@
 		<!-- Header //-->
 		<div class="header">
 			<span
-				v-if="!isMapEmpty(metadata.temperature)"
+				v-if="!isMapEmpty(metadata.temperature || {})"
 				class="entry"
 				v-tooltip="makeTooltipMulti('Max Temperature', temperatures.tooltips)"
 			>
@@ -12,7 +12,7 @@
 			</span>
 
 			<span
-				v-if="!isMapEmpty(metadata.battery)"
+				v-if="!isMapEmpty(metadata.battery || {})"
 				class="entry"
 				v-tooltip="makeTooltipMulti('Battery', batteries.tooltips)"
 			>

@@ -128,7 +128,17 @@
 		},
 		methods: {
 			getName(key) {
-				return this.description.name || this.tiles[key].name || this.sourceType || this.visualizationType;
+				if (this.tiles[key].name) {
+					return this.tiles[key].name;
+				}
+				let names = [];
+				if (this.description.name) {
+					names.push(this.description.name);
+				}
+				if (key) {
+					names.push(key);
+				}
+				return names.join(".");
 			},
 			getTileClass(key) {
 				return {
@@ -177,7 +187,7 @@
 
 					if (Array.isArray(data)) {
 						const tiles = data.reduce((tiles, tile, index) => {
-							const key = tile.key | index;
+							const key = tile.key || index;
 							Exception.assert(!(key in tiles), "At least 2 tiles have the same key.");
 							tiles[key] = tile;
 							return tiles;
@@ -185,7 +195,7 @@
 						this.assignTilesData(tiles);
 					} else {
 						const tiles = {
-							default: data,
+							"": data,
 						};
 						this.assignTilesData(tiles);
 					}

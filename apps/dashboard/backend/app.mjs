@@ -155,5 +155,6 @@ class EventsFactory {
 		return await cache.get(pluginType, inputs.uid);
 	});
 
+	Log.info("Serving static content from '{}'.", PATH_STATIC);
 	web.start();
 })();
