@@ -520,7 +520,12 @@ async function triggerUpdate(collection, id, ...ids) {
 		);
 
 		// Close the previous data if a close function is available
-		if ("_data" in dataId && typeof dataId._data.close === "function") {
+		if (
+			"_data" in dataId &&
+			typeof dataId._data === "object" &&
+			dataId._data !== null &&
+			typeof dataId._data.close === "function"
+		) {
 			await dataId._data.close();
 		}
 
@@ -547,7 +552,10 @@ async function triggerUpdate(collection, id, ...ids) {
 			"Trigger function returned undefined data type for collection '{}'",
 			collection,
 		);
-		dataId._size = dataId._data.size || dataId._data.length || dataCollection._defaultSize || 0;
+		dataId._size = 0;
+		if (typeof dataId._data === "object" && dataId._data !== null) {
+			dataId._size = dataId._data.size || dataId._data.length || dataCollection._defaultSize || 0;
+		}
 		delete dataId._error;
 	} catch (e) {
 		// Register the error and delete the previous data if any

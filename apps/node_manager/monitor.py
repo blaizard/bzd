@@ -31,7 +31,7 @@ def monitorTemperatures() -> typing.Any:
 
 
 def monitorCPUs() -> typing.Any:
-	return {"main": [*psutil.cpu_percent(interval=1, percpu=True)]}  # type: ignore
+	return {"main": [cpu / 100. for cpu in psutil.cpu_percent(interval=1, percpu=True)]}  # type: ignore
 
 
 def monitorBatteries() -> typing.Any:
@@ -39,7 +39,7 @@ def monitorBatteries() -> typing.Any:
 	if maybeBattery is None:
 		return []
 	else:
-		return {"main": [maybeBattery[0]]}
+		return {"main": [maybeBattery[0] / 100.]}
 
 
 def monitorMemories() -> typing.Any:

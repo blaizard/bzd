@@ -61,7 +61,7 @@
 		</div>
 
 		<div class="bzd-layout-footer">
-			<slot name="footer"></slot>
+			<slot name="footer">version: {{ version }}</slot>
 		</div>
 	</div>
 </template>
@@ -71,6 +71,7 @@
 	import LocalStorage from "#bzd/nodejs/core/localstorage.mjs";
 	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
 	import { Comment, Fragment, Text } from "vue";
+	import config from "#bzd/nodejs/vue/components/layout/config.json";
 
 	export default {
 		mixins: [Base],
@@ -87,6 +88,9 @@
 			};
 		},
 		computed: {
+			version() {
+				return config.STABLE_VERSION;
+			},
 			isNotification() {
 				return typeof this.$notification == "object";
 			},
@@ -421,6 +425,13 @@
 			.bzd-layout-content {
 				padding: 0;
 			}
+		}
+
+		.bzd-layout-footer {
+			padding: 20px;
+			background-color: #eee;
+			color: #444;
+			font-size: 0.9em;
 		}
 
 		&.bzd-dock {
