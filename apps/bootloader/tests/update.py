@@ -1,7 +1,7 @@
 import pathlib
 import sys
 
-from apps.bootloader.bootloader import bootloader, ContextForTest
+from apps.bootloader.bootloader import bootloader, ContextCustomRelease
 from bzd.logging import Logger
 
 if __name__ == "__main__":
@@ -12,16 +12,16 @@ if __name__ == "__main__":
 	release = {
 	    "print": [{
 	        "name": "first",
-	        "binary": b"#!/bin/bash\necho $@\nexit 0"
+	        "binary": b"#!/bin/bash\necho SUCCESS!\nexit 0"
 	    }],
 	}
 
-	context = ContextForTest(release=release,
-	                         args=[
-	                             "--bootloader-application", sleepBinary, "--bootloader-update-path", "print",
-	                             "--bootloader-uid", "test_uid", "3600"
-	                         ],
-	                         logger=logger)
+	context = ContextCustomRelease(release=release,
+	                               args=[
+	                                   "--bootloader-application", sleepBinary, "--bootloader-update-path", "print",
+	                                   "--bootloader-uid", "test_uid", "3600"
+	                               ],
+	                               logger=logger)
 
-	returnCode = bootloader(context)
-	sys.exit(returnCode)
+	bootloader(context)
+	raise Exception("Program should not go here.")
