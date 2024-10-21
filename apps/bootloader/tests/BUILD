@@ -55,8 +55,8 @@ py_binary(
 bzd_executable_test(
     name = "update_test",
     executable = ":update",
-    expected_output = "Switch process to",
-    expected_returncode = 1,
+    expected_output = "SUCCESS!",
+    expected_returncode = 0,
 )
 
 bzd_executable_test(

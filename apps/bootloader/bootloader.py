@@ -130,12 +130,16 @@ class Context:
 	def switchProcessToBinary(self, path: pathlib.Path, args: typing.List[str]) -> None:
 		os.execv(path, [str(path), *args])
 
-
-class ContextForTest(Context):
+class ContextCustomRelease(Context):
 
 	def __init__(self, args: typing.List[str], logger: Logger, release: typing.Any = None) -> None:
 		super().__init__(args=args, logger=logger)
 		self.release = typing.cast(Release, ReleaseMock(data=release))
+
+class ContextForTest(ContextCustomRelease):
+
+	def __init__(self, args: typing.List[str], logger: Logger, release: typing.Any = None) -> None:
+		super().__init__(args=args, logger=logger, release=release)
 		self.stableBinary: typing.Optional[pathlib.Path] = None
 
 	def setStableBinary(self, path: pathlib.Path, stablePath: pathlib.Path) -> None:
