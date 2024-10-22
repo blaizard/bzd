@@ -128,13 +128,18 @@ class Context:
 		self.updateIgnoreOverride = ignore
 
 	def switchProcessToBinary(self, path: pathlib.Path, args: typing.List[str]) -> None:
-		os.execv(path, [str(path), *args])
+		# Forking is needed to properly exit the current process (any cleanup step will be performed if needed)
+		# while moving the parent process to use the new executable.
+		if os.fork() > 0:
+			os.execv(path, [str(path), *args])
+
 
 class ContextCustomRelease(Context):
 
 	def __init__(self, args: typing.List[str], logger: Logger, release: typing.Any = None) -> None:
 		super().__init__(args=args, logger=logger)
 		self.release = typing.cast(Release, ReleaseMock(data=release))
+
 
 class ContextForTest(ContextCustomRelease):
 

@@ -24,4 +24,3 @@ if __name__ == "__main__":
 	                               logger=logger)
 
 	bootloader(context)
-	raise Exception("Program should not go here.")
