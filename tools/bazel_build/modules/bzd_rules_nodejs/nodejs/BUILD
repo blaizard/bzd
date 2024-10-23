@@ -1,4 +1,5 @@
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+load("//nodejs:toolchain.bzl", "nodejs_manager_binary")
 
 exports_files([
     "defs.bzl",
@@ -21,4 +22,9 @@ bzl_library(
         "@bzd_package//:defs",
         "@bzd_rules_oci//:defs",
     ],
+)
+
+nodejs_manager_binary(
+    name = "pnpm",
+    visibility = ["//visibility:public"],
 )

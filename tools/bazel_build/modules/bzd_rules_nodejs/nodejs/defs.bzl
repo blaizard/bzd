@@ -6,12 +6,14 @@ load("@bzd_rules_nodejs//nodejs:private/nodejs_extern_binary.bzl", bzd_nodejs_ex
 load("@bzd_rules_nodejs//nodejs:private/nodejs_install.bzl", bzd_nodejs_install_ = "bzd_nodejs_install")
 load("@bzd_rules_nodejs//nodejs:private/nodejs_library.bzl", bzd_nodejs_library_ = "bzd_nodejs_library")
 load("@bzd_rules_nodejs//nodejs:private/nodejs_oci.bzl", bzd_nodejs_oci_ = "bzd_nodejs_oci")
+load("@bzd_rules_nodejs//nodejs:private/nodejs_requirements_compile.bzl", bzd_nodejs_requirements_compile_ = "bzd_nodejs_requirements_compile")
 load("@bzd_rules_nodejs//nodejs:private/nodejs_static.bzl", bzd_nodejs_static_ = "bzd_nodejs_static")
 load("@bzd_rules_nodejs//nodejs:private/nodejs_web_binary.bzl", bzd_nodejs_web_binary_ = "bzd_nodejs_web_binary")
 load("@bzd_rules_nodejs//nodejs/static:defs.bzl", bzd_nodejs_static_sitemap_ = "bzd_nodejs_static_sitemap")
 
 # Public API.
 
+bzd_nodejs_requirements_compile = bzd_nodejs_requirements_compile_
 bzd_nodejs_oci = bzd_nodejs_oci_
 bzd_nodejs_install = bzd_nodejs_install_
 bzd_nodejs_library = bzd_nodejs_library_
