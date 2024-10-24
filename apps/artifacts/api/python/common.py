@@ -30,12 +30,12 @@ class ArtifactsBase:
 		# There is a valid remote, use it.
 		if self.remote:
 			for i in range(3):  # Retries.
-				yield self.remote
+				yield self.remote, i, 2
 
 		# No valid remote, test the potential ones.
 		for remote in remotes:
 			self.remote = remote
-			yield self.remote
+			yield self.remote, 0, 0
 
 		# No remote was valid.
 		self.remote = None

@@ -35,14 +35,15 @@ class Node(ArtifactsBase):
 
 		subPath = "/".join([encodeURIComponent(s) for s in path or []])
 
-		for remote in self.remotes:
+		for remote, retry, nbRetries in self.remotes:
 
 			url = f"{remote}/x/{volume}/{actualUid}/data" + (f"/{subPath}" if subPath else "")
 			try:
 				HttpClient.post(url, json=data, query=query)
 				return
 			except Exception as e:
-				self.logger.warning(f"Exception while publishing {url}: {str(e)}")
+				if retry == nbRetries:
+					self.logger.warning(f"Exception while publishing {url} after {nbRetries} retry: {str(e)}")
 				pass
 
 		raise NodePublishNoRemote("Unable to publish to any of the remotes.")
