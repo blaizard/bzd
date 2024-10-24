@@ -48,22 +48,40 @@ def makePackageJson(requirements: Requirements) -> str:
 def makeRequirementsJsonFromPnpmLock(pnpmLock: str) -> str:
 	"""Generate the requirements.json."""
 
-	output = {"importers": {}, "packages": {}}
+	data = yaml.safe_load(pnpmLock)  # type: ignore
+
+	# Build a make with packages and their dependencies.
+	# {mocha@10.0.0: {integrity: <>, dependencies: ["hello@1.0.2", ...]}}
+	packages: typing.Dict[str, typing.Any] = {}
 
 	def packageToString(name: str, version: str) -> str:
+		"""Clean-up a name/version."""
+
 		[cleanedVersion, *_] = version.split("(", maxsplit=1)
 		return f"{name}@{cleanedVersion}"
 
 	def assertPackage(package: str) -> None:
-		assert package in output["packages"], f"The package {package} does not exists."
+		"""Assert that a package exists."""
+		assert package in packages, f"The package {package} does not exists."
 
-	data = yaml.safe_load(pnpmLock)
+	def getDependencies(package: str) -> typing.Dict[str, str]:
+		"""Get all dependencies and their integrity of a package (including self)."""
+
+		output = {}
+		queue = [package]
+		while len(queue) > 0:
+			current = queue.pop()
+			if current in output:
+				continue
+			output[current] = packages[current]["integrity"]
+			queue += packages[current]["dependencies"]
+		return output
 
 	# Get all packages and their version.
 	# Note their can be multiple version of the same package.
 	for package, metadata in data.get("packages").items():
 		integrity = metadata.get("resolution", {}).get("integrity", None)
-		output["packages"][package] = {"integrity": integrity, "dependencies": []}
+		packages[package] = {"integrity": integrity, "dependencies": []}
 
 	# Populate the dependencies.
 	for package, metadata in data.get("snapshots").items():
@@ -77,15 +95,16 @@ def makeRequirementsJsonFromPnpmLock(pnpmLock: str) -> str:
 		for name, version in metadata.get("dependencies", {}).items():
 			dependency = packageToString(name, version)
 			assertPackage(dependency)
-			output["packages"][package]["dependencies"].append(dependency)
+			packages[package]["dependencies"].append(dependency)
 
-	# Add top level.
+	# Generate the output.
+	output = {}
 	for importer in data.get("importers").values():
 		for name, metadata in importer.get("dependencies", {}).items():
 			version = metadata["version"]
 			package = packageToString(name, version)
 			assertPackage(package)
-			output["importers"][name] = package
+			output[name] = getDependencies(package)
 
 	return json.dumps(output, indent=4)
 
