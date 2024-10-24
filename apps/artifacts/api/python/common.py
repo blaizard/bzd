@@ -21,7 +21,7 @@ class ArtifactsBase:
 		self.remote: typing.Optional[str] = None
 
 	@property
-	def remotes(self) -> typing.Generator[str, None, None]:
+	def remotes(self) -> typing.Generator[typing.Tuple[str, int, int], None, None]:
 		"""Generator for the remotes.
 		
 		The usage pattern expects the user to exit the generator at the first valid remote.
