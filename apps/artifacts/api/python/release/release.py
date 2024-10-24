@@ -95,13 +95,15 @@ class Release(ArtifactsBase):
 		def queryToString() -> str:
 			return "&".join([f"{k}={v}" for k, v in query.items() if v is not None])
 
-		for remote in self.remotes:
+		for remote, retry, nbRetries in self.remotes:
 			fullUrl = f"{remote}/x/{path}/"
 
 			try:
 				response = HttpClient.get(fullUrl, query=query)
 			except Exception as e:
-				logger.warning(f"Exception while fetching {fullUrl}?{queryToString()}: {str(e)}")
+				if retry == nbRetries:
+					logger.warning(
+					    f"Exception while fetching {fullUrl}?{queryToString()} after {retry} retry: {str(e)}")
 				continue
 
 			# No update available

@@ -248,7 +248,7 @@ def localBazelBinary(path: str,
                      **kwargs: Any) -> ExecuteResult:
 	"""Execute a bazel binary locally. The caller must run bazel and all runfiles must be already available."""
 
-	env = env or os.environ
+	env = env or dict(os.environ)
 	env["RUNFILES_DIR"] = (os.environ["RUNFILES_DIR"] if "RUNFILES_DIR" in os.environ else Path.cwd().parent.as_posix())
 	return localCommand([path] + (args or []), env=env, **kwargs)
 
