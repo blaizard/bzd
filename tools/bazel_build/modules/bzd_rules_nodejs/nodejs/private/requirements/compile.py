@@ -87,7 +87,7 @@ def makeRequirementsJsonFromPnpmLock(pnpmLock: str) -> str:
 	for package, metadata in data.get("snapshots").items():
 
 		# Get the package.
-		[name, version] = package.split("@", maxsplit=1)
+		[name, version] = package.rsplit("@", maxsplit=1)
 		package = packageToString(name, version)
 		assertPackage(package)
 
