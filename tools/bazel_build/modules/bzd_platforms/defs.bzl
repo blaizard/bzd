@@ -11,6 +11,14 @@ ISA_CONSTRAINTS = {
     "xtensa_lx6": None,
 }
 
+_AL_CONSTRAINTS_SYNONYMS = {
+}
+
+_ISA_CONSTRAINTS_SYNONYMS = {
+    "arm64": ("aarch64",),
+    "x86_64": ("x86-64", "amd64"),
+}
+
 def _constraint_target(kind, name):
     """Create the constraint target string.
 
@@ -48,3 +56,53 @@ def constraints_from_platform(platform):
         fail("Instruction set architecture '{}' not supported.".format(isa))
 
     return constraints
+
+def to_isa(isa):
+    """Convert the given string into a known isa.
+
+    Args:
+        isa: A string containing the ISA.
+
+    Returns:
+        The ISA or None if it cannot be matched.
+    """
+
+    isa_cleaned = isa.lower().strip()
+
+    for name in ISA_CONSTRAINTS.keys():
+        if isa_cleaned == name or isa_cleaned in _ISA_CONSTRAINTS_SYNONYMS.get(name, {}):
+            return name
+    return None
+
+def to_al(al):
+    """Convert the given string into a known al.
+
+    Args:
+        al: A string containing the AL.
+
+    Returns:
+        The AL or None if it cannot be matched.
+    """
+
+    al_cleaned = al.lower().strip()
+
+    for name in AL_CONSTRAINTS.keys():
+        if al_cleaned == name or al_cleaned in _AL_CONSTRAINTS_SYNONYMS.get(name, {}):
+            return name
+    return None
+
+def get_repository_platform(repository_ctx):
+    """Get the current platform from a repository context
+
+    Args:
+        repository_ctx: The repository context.
+
+    Returns:
+        A string corresponding to the current platform or None if no match.
+    """
+
+    maybe_al = to_al(repository_ctx.os.name)
+    maybe_isa = to_isa(repository_ctx.os.arch)
+    if maybe_isa and maybe_al:
+        return maybe_al + "-" + maybe_isa
+    return None
