@@ -1,7 +1,7 @@
 """Register a new extension."""
 
 load("@bazel_skylib//lib:sets.bzl", "sets")
-load("@bzd_lib//:repository.bzl", "generate_repository")
+load("@bzd_lib//:repository_maker.bzl", "repository_maker")
 
 def _target_to_py_module(target):
     return target.package.replace("/", ".") + "." + target.name
@@ -41,9 +41,9 @@ def _bdl_extension_impl(module_ctx):
 
     extensions_content += """extensions = {}\n""".format(" | ".join(extensions.keys()))
 
-    generate_repository(
+    repository_maker(
         name = "bdl_extension",
-        files = {
+        create = {
             "BUILD": """
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 
