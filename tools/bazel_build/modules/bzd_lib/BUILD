@@ -15,9 +15,9 @@ py_binary(
 )
 
 bzl_library(
-    name = "multiplatform_repository",
+    name = "repository_multiplatform_maker",
     srcs = [
-        "multiplatform_repository.bzl",
+        "repository_multiplatform_maker.bzl",
     ],
     visibility = ["//visibility:public"],
 )
