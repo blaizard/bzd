@@ -2,13 +2,13 @@
 
 load("@bzd_lib//:repository_multiplatform_maker.bzl", "repository_multiplatform_maker")
 
-def pnpm_install():
+def pnpm_install(name):
     """Install the pnpm tool.
 
     Make it available at @pnpm//:pnpm
     """
     repository_multiplatform_maker(
-        name = "pnpm",
+        name = name,
         repositories = [{
             "build_file": Label("//toolchain/pnpm:pnpm.BUILD"),
             "files": {
