@@ -1,42 +1,10 @@
 """Module extension for NodeJs toolchains."""
 
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-load("@bzd_platforms//:defs.bzl", "constraints_from_platform")
+load("@bzd_lib//:repository_maker.bzl", "repository_maker")
+load("@bzd_rules_nodejs//toolchain/node:defs.bzl", "node_install", "node_versions")
 load("@bzd_rules_nodejs//toolchain/pnpm:defs.bzl", "pnpm_install")
 
-_repositories = {
-    "node_20.11.0": {
-        "linux-x86_64": {
-            "build_file": "@bzd_rules_nodejs//nodejs:linux_x86_64.BUILD",
-            "integrity": "sha256-gieANp0Oownn0hjkHeu9GgP4zfNU6/ikQg6J85zC5hI=",
-            "strip_prefix": "node-v20.11.0-linux-x64",
-            "urls": [
-                "https://nodejs.org/dist/v20.11.0/node-v20.11.0-linux-x64.tar.xz",
-            ],
-        },
-    },
-    "node_20.5.1": {
-        "linux-x86_64": {
-            "build_file": "@bzd_rules_nodejs//nodejs:linux_x86_64.BUILD",
-            "sha256": "a4a700bbca51ac26538eda2250e449955a9cc49638a45b38d5501e97f5b020b4",
-            "strip_prefix": "node-v20.5.1-linux-x64",
-            "urls": [
-                "https://nodejs.org/dist/v20.5.1/node-v20.5.1-linux-x64.tar.xz",
-            ],
-        },
-    },
-}
-
-def _make_configs(name, version):
-    configs = {}
-    for execution, fetch_info in _repositories[version].items():
-        configs["{}-{}".format(name, execution)] = struct(
-            fetch = fetch_info,
-            execution = execution,
-        )
-    return configs
-
-def _toolchain_repository_impl(repository_ctx):
+def _toolchain_repository_build_content(node, pnpm, default):
     build_content = """load("@bzd_rules_nodejs//nodejs:toolchain.bzl", "nodejs_toolchain")
 load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper")
 
@@ -44,7 +12,7 @@ load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper")
 """
 
     # Generate the constraint value for the toolchain.
-    if repository_ctx.attr.default:
+    if default:
         build_content += """
 alias(
     name = "toolchain",
@@ -75,76 +43,47 @@ platform(
 )
 
 # ---- Toolchains
-"""
-
-    # Add the nodejs toolchains.
-    configs = _make_configs(repository_ctx.attr.repo_name, repository_ctx.attr.version)
-    for repo_name, config in configs.items():
-        execution_constraints = constraints_from_platform(config.execution)
-
-        build_content += """
-# -------- {comment}
 
 sh_binary_wrapper(
-    name = "{execution}_node",
-    binary = "@{repo_name}//:node",
+    name = "node",
+    binary = "{node}",
     command = "{{binary}} --preserve-symlinks --preserve-symlinks-main --use-strict $@",
     visibility = ["//visibility:public"],
 )
 
 sh_binary_wrapper(
-    name = "{execution}_pnpm",
+    name = "pnpm",
     locations = {{
-        "@pnpm//:pnpm": "binary",
-        "@{repo_name}//:node": "node"
+        "{pnpm}": "binary",
+        "{node}": "node_binary"
     }},
-    command = "PATH=$(dirname {{node}}):$PATH {{binary}} --shamefully-hoist --store-dir=/tmp/pnpm --color $@",
+    command = "PATH=$(dirname {{node_binary}}):$PATH {{binary}} --shamefully-hoist --store-dir=/tmp/pnpm --color $@",
     data = [
-        "@{repo_name}//:node",
+        "{node}",
     ],
     visibility = ["//visibility:public"],
 )
 
 nodejs_toolchain(
-    name = "{name}_nodejs_toolchain",
-    manager = ":{execution}_pnpm",
-    node = ":{execution}_node",
+    name = "nodejs_toolchain_specific",
+    manager = ":pnpm",
+    node = ":node",
 )
 
 toolchain(
-    name = "{name}",
-    exec_compatible_with = [
-        {execution_constraints}
-    ],
+    name = "nodejs_toolchain",
     target_compatible_with = [
         ":toolchain",
-        {execution_constraints}
     ],
-    toolchain = ":{name}_nodejs_toolchain",
+    toolchain = ":nodejs_toolchain_specific",
     toolchain_type = "@bzd_rules_nodejs//nodejs:toolchain_type",
 )
 """.format(
-            comment = config.execution,
-            name = config.execution,
-            repo_name = repo_name,
-            execution = config.execution,
-            execution_constraints = "\n".join(["\"{}\",".format(c) for c in execution_constraints]),
-        )
-
-    repository_ctx.file(
-        "BUILD",
-        executable = False,
-        content = build_content,
+        node = node,
+        pnpm = pnpm,
     )
 
-toolchain_repository = repository_rule(
-    implementation = _toolchain_repository_impl,
-    attrs = {
-        "default": attr.bool(mandatory = True),
-        "repo_name": attr.string(mandatory = True),
-        "version": attr.string(values = _repositories.keys(), mandatory = True),
-    },
-)
+    return build_content
 
 def _toolchain_nodejs_impl(module_ctx):
     # Gather all the toolchains registered.
@@ -161,24 +100,27 @@ def _toolchain_nodejs_impl(module_ctx):
 
     # Add the node repositories.
     for name, toolchain in configs.items():
-        # Create execution specific repositories.
-        configs = _make_configs(name, toolchain.version)
-        for repo_name, config in configs.items():
-            http_archive(
-                name = repo_name,
-                **config.fetch
-            )
+        node_install(
+            name = "node-" + toolchain.version,
+            version = toolchain.version,
+        )
 
         # Create the main repository.
-        toolchain_repository(
+        repository_maker(
             name = name,
-            repo_name = name,
-            version = toolchain.version,
-            default = toolchain.default,
+            create = {
+                "BUILD": _toolchain_repository_build_content(
+                    node = "@node-" + toolchain.version + "//:node",
+                    pnpm = "@pnpm//:pnpm",
+                    default = toolchain.default,
+                ),
+            },
         )
 
     # Install the pnpm repository
-    pnpm_install()
+    pnpm_install(
+        name = "pnpm",
+    )
 
 toolchain_nodejs = module_extension(
     implementation = _toolchain_nodejs_impl,
@@ -187,7 +129,7 @@ toolchain_nodejs = module_extension(
             attrs = {
                 "default": attr.bool(default = False),
                 "name": attr.string(mandatory = True),
-                "version": attr.string(values = _repositories.keys(), mandatory = True),
+                "version": attr.string(values = node_versions, mandatory = True),
             },
         ),
     },

@@ -31,14 +31,17 @@ _repositories = {
     }],
 }
 
-def node_install(version):
+# All the versions available.
+node_versions = _repositories.keys()
+
+def node_install(name, version):
     """Install the node tool.
 
     Make it available at @node-<version>//:node
     """
 
     repository_multiplatform_maker(
-        name = "node-" + version,
+        name = name,
         repositories = _repositories[version],
         expose = {
             "node": "node",
