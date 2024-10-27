@@ -130,7 +130,7 @@ class Context:
 	def switchProcessToBinary(self, path: pathlib.Path, args: typing.List[str]) -> None:
 		# Forking is needed to properly exit the current process (any cleanup step will be performed if needed)
 		# while moving the parent process to use the new executable.
-		if os.fork() == 0:
+		if os.fork() > 0:
 			os.execv(path, [str(path), *args])
 
 
