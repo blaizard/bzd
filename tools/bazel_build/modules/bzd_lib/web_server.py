@@ -9,6 +9,8 @@ import mimetypes
 import functools
 import typing
 
+from urllib.parse import unquote
+
 
 class WebServer(socketserver.TCPServer):
 	allow_reuse_address = True
@@ -42,6 +44,7 @@ class ArchiveRequestHandler(http.server.SimpleHTTPRequestHandler):
 		path = pathlib.Path("/index.html" if self.path == "/" else self.path)
 		fullPathInArchive = self.prefix + str(path.relative_to("/"))
 		pathInArchive = fullPathInArchive.split("?", 1)[0]
+		pathInArchive = unquote(pathInArchive)
 
 		try:
 			reader = self.archive.extractfile(pathInArchive)
