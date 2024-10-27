@@ -7,7 +7,8 @@ import tarfile
 import subprocess
 
 
-def navigationToMkDocsList(root: pathlib.Path, navigation: typing.List[typing.Tuple[str, typing.Any]]) -> typing.List[str]:
+def navigationToMkDocsList(root: pathlib.Path, navigation: typing.List[typing.Tuple[str,
+                                                                                    typing.Any]]) -> typing.List[str]:
 	content = []
 	for name, path in navigation:
 		if isinstance(path, list):
