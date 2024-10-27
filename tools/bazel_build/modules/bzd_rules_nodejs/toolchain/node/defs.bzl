@@ -45,5 +45,6 @@ def node_install(name, version):
         repositories = _repositories[version],
         expose = {
             "node": "node",
+            "node_binary": "bin/node",
         },
     )
