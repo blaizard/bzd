@@ -19,6 +19,7 @@ bzl_library(
     deps = [
         "@bazel_skylib//rules:common_settings",
         "@bzd_lib//:sh_binary_wrapper",
+        "@bzd_lib//lib:attrs",
         "@bzd_package//:defs",
         "@bzd_rules_oci//:defs",
     ],
