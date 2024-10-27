@@ -7,14 +7,14 @@ import tarfile
 import subprocess
 
 
-def navigationToMkDocsList(navigation: typing.List[typing.Tuple[str, typing.Any]]) -> typing.List[str]:
+def navigationToMkDocsList(root: pathlib.Path, navigation: typing.List[typing.Tuple[str, typing.Any]]) -> typing.List[str]:
 	content = []
 	for name, path in navigation:
 		if isinstance(path, list):
 			content.append(f"- {name}:")
-			content.extend(navigationToMkDocsList(path))
+			content.extend(navigationToMkDocsList(root=root, navigation=path))
 		else:
-			content.append(f"- {name}: {path}")
+			content.append(f"- {name}: {pathlib.Path(path).relative_to(root)}")
 	return [f"  {line}" for line in content]
 
 
@@ -37,7 +37,7 @@ if __name__ == "__main__":
 	# Create the mkdocs.yml file.
 	template = (pathlib.Path(__file__).parent / "mkdocs.yml.template").read_text()
 	output = template.format(
-	    navigation="\n".join(navigationToMkDocsList(navigation)),
+	    navigation="\n".join(navigationToMkDocsList(root=args.root, navigation=navigation)),
 	    root=args.root.as_posix(),
 	)
 	pathlib.Path("./mkdocs.yml").write_text(output)

@@ -57,16 +57,18 @@ This will build locally, it will fetch all tools needed to build on your machine
 
 ### Remote
 
-Remote execution is also supported and is enabled by first deploying on a server the predefined Buildbarn configuration:
-
-```bash
-./tools/buildbarn/run.sh
-```
-
-Then to build bazel targets simply run bazel appended with `--config=remote`.
+To build bazel targets simply run bazel appended with `--config=remote`.
 
 For debugging purposes, toolchains can be run locally in a docker sandbox which is very similar to what runs on remote execution.
 To enable this configuration, run bazel with `--config=docker`.
+
+## Documentation
+
+To build the full project documentation, run:
+
+```bash
+bazel run //docs
+```
 
 ## Code Quality
 
