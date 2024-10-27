@@ -88,21 +88,33 @@ toolchain(
 def _toolchain_nodejs_impl(module_ctx):
     # Gather all the toolchains registered.
     configs = {}
+    default_toolchain = None
     for mod in module_ctx.modules:
         for toolchain in mod.tags.toolchain:
             # No need to check the version, it is already enforced in the attribute.
             if toolchain.name in configs:
                 fail("A toolchain with the name '{}' already exists.".format(toolchain.name))
-            configs[toolchain.name] = struct(
-                version = toolchain.version,
-                default = toolchain.default,
-            )
+            configs[toolchain.name] = {
+                "default": toolchain.default,
+                "version": toolchain.version,
+            }
+            if toolchain.default:
+                if default_toolchain != None:
+                    fail("There can be only one default toolchain: {} and {}".format(default_toolchain, toolchain.name))
+                default_toolchain = configs[toolchain.name]
+
+    # Set the default toolchain if none is defined.
+    if default_toolchain == None:
+        for name, toolchain in configs.items():
+            default_toolchain = toolchain
+            toolchain["default"] = True
+            break
 
     # Add the node repositories.
     for name, toolchain in configs.items():
         node_install(
-            name = "node-" + toolchain.version,
-            version = toolchain.version,
+            name = "node-" + toolchain["version"],
+            version = toolchain["version"],
         )
 
         # Create the main repository.
@@ -110,12 +122,21 @@ def _toolchain_nodejs_impl(module_ctx):
             name = name,
             create = {
                 "BUILD": _toolchain_repository_build_content(
-                    node = "@node-" + toolchain.version + "//:node",
+                    node = "@node-" + toolchain["version"] + "//:node",
                     pnpm = "@pnpm//:pnpm",
-                    default = toolchain.default,
+                    default = toolchain["default"],
                 ),
             },
         )
+
+    # Create the default node repository.
+    repository_maker(
+        name = "node",
+        copy = {
+            "BUILD": "@node-" + default_toolchain["version"] + "//:BUILD",
+            "defs.bzl": "@node-" + default_toolchain["version"] + "//:defs.bzl",
+        },
+    )
 
     # Install the pnpm repository
     pnpm_install(
