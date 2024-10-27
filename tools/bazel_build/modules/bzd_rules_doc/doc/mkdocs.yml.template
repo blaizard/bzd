@@ -17,7 +17,6 @@ plugins:
   - offline
   - exclude:
       glob:
-        - external/*
         - bazel-out/**/*.runfiles/*
         - bazel-out/**/tools/bazel_build/rules/assets/documentation/builder
         - bazel-out/**/tools/bazel_build/rules/assets/documentation/mkdocs_wrapper

@@ -82,7 +82,7 @@ def _doc_library_impl(ctx):
                 if not name:
                     name = f.basename[:-(len(f.extension) + 1)]
                 markdown = _doc_preprocess(ctx, f, ctx.files.data)
-                navigation.append((name, markdown.short_path))
+                navigation.append((name, markdown.path))
                 markdowns.append(markdown)
         else:
             fail("Input source file '{}', not supported.".format(src))
@@ -113,6 +113,7 @@ def _doc_binary_impl(ctx):
         outputs = [package],
         tools = [ctx.executable._builder, ctx.executable._mkdocs],
         executable = ctx.executable._builder,
+        progress_message = "Documentation for {}...".format(ctx.label),
         arguments = ["--navigation", json.encode(provider.navigation), "--root", ctx.bin_dir.path, "--mkdocs", ctx.executable._mkdocs.path, package.path],
     )
 
