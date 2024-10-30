@@ -14,6 +14,12 @@ py_library(
 )
 
 py_library(
+    name = "semver",
+    srcs = ["semver.py"],
+    visibility = ["//visibility:public"],
+)
+
+py_library(
     name = "ssh",
     srcs = ["ssh.py"],
     visibility = ["//visibility:public"],
