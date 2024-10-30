@@ -57,7 +57,7 @@ sh_binary_wrapper(
         "{pnpm}": "binary",
         "{node}": "node_binary"
     }},
-    command = "PATH=$(dirname {{node_binary}}):$PATH {{binary}} --shamefully-hoist --store-dir=/tmp/pnpm --color $@",
+    command = "PATH={{node_binary}}/..:$PATH {{binary}} --shamefully-hoist --store-dir=/tmp/pnpm --color $@",
     data = [
         "{node}",
     ],

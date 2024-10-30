@@ -100,6 +100,10 @@ class Semver:
 			version += "-" + self.build
 		return version
 
+	def __hash__(self) -> int:
+		# Do not include self.build, see: https://semver.org/spec/v2.0.0-rc.2.html#spec-item-10
+		return hash(self.core + self.preRelease)
+
 	def __repr__(self) -> str:
 		return f"<Semver {str(self)}>"
 
@@ -245,6 +249,14 @@ class SemverConstraint:
 			return matcherMap[self.operator](version=version)
 		return self._matchVersion(version=version)
 
+	def __repr__(self) -> str:
+		version = f"{self.operator}{self.major}.{self.minor}.{self.patch}"
+		if self.preRelease:
+			version += "-" + self.preRelease
+		if self.build:
+			version += "-" + self.build
+		return version
+
 
 class SemverMatcher:
 	"""Match a string with a semver."""
@@ -253,13 +265,14 @@ class SemverMatcher:
 		self.constraints = [SemverConstraint(string)]
 
 	def match(self, version: Semver) -> bool:
+		"""Match the given version."""
 
 		for constraint in self.constraints:
 			return constraint.match(version)
 
 		return False
 
-	def matchLatest(self, versions: typing.List[Semver]) -> typing.Optional[Semver]:
+	def matchLatest(self, versions: typing.Iterable[Semver]) -> typing.Optional[Semver]:
 		"""Match the latest version from the list."""
 
 		sortedVersions = sorted(versions, reverse=True)
@@ -267,3 +280,6 @@ class SemverMatcher:
 			if self.match(version=version):
 				return version
 		return None
+
+	def __repr__(self) -> str:
+		return f"<SemverMatcher {self.constraints}>"

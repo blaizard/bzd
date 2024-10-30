@@ -46,5 +46,7 @@ def node_install(name, version):
         expose = {
             "node": "node",
             "node_binary": "bin/node",
+            "npm": "npm",
+            "npm_binary": "bin/npm",
         },
     )
