@@ -5,11 +5,14 @@ import json
 import tempfile
 import subprocess
 import os
+import re
 
-import yaml
 from bzd.utils.run import localBazelBinary
+from bzd.utils.semver import Semver, SemverMatcher
+from dataclasses import dataclass
 
 Requirements = typing.Dict[str, typing.Optional[str]]
+Json = typing.Dict[str, typing.Any]
 
 
 def parseRequirements(requirements: str) -> Requirements:
@@ -45,74 +48,154 @@ def makePackageJson(requirements: Requirements) -> str:
 	return json.dumps(content, indent=4)
 
 
-def makeRequirementsJsonFromPnpmLock(pnpmLock: str) -> str:
-	"""Generate the requirements.json."""
+@dataclass
+class Package:
+	"""Description of a package."""
 
-	data = yaml.safe_load(pnpmLock)  # type: ignore
+	name: str
+	version: Semver
+	integrity: str
+	dependencies: typing.Set["Package"]
 
-	# Build a make with packages and their dependencies.
-	# {mocha@10.0.0: {integrity: <>, dependencies: ["hello@1.0.2", ...]}}
-	packages: typing.Dict[str, typing.Any] = {}
+	@property
+	def package(self) -> str:
+		return f"{self.name}@{str(self.version)}"
 
-	def packageToString(name: str, version: str) -> str:
-		"""Clean-up a name/version."""
+	def __str__(self) -> str:
+		return self.package
 
-		[cleanedVersion, *_] = version.split("(", maxsplit=1)
-		return f"{name}@{cleanedVersion}"
+	# Overloads needed for set __hash__, __eq__ and __ne__
 
-	def assertPackage(package: str) -> None:
-		"""Assert that a package exists."""
-		assert package in packages, f"The package {package} does not exists."
+	def __hash__(self) -> int:
+		return hash(str(self))
 
-	def getDependencies(package: str) -> typing.Dict[str, str]:
-		"""Get all dependencies and their integrity of a package (including self)."""
+	def __eq__(self, other: object) -> bool:
+		if not isinstance(other, Package):
+			return NotImplemented
+		return str(self) == str(other)
 
-		output = {}
+	def __ne__(self, other: object) -> bool:
+		return self != other
+
+	def __repr__(self) -> str:
+		return f"<Package {str(self)}>"
+
+
+class Packages:
+	"""Data structure to access packages."""
+
+	def __init__(self) -> None:
+		self.packages: typing.Dict[str, Package] = {}
+		self.packagesByName: typing.Dict[str, typing.Dict[Semver, Package]] = {}
+
+	def add(self, package: Package) -> None:
+		assert package.package not in self.packages, f"Package '{package.package}' is already added to the dictionary."
+		self.packages[package.package] = package
+		self.packagesByName.setdefault(package.name, {})
+		self.packagesByName[package.name][package.version] = package
+
+	def get(self, package: str) -> Package:
+		return self.packages[package]
+
+	def getMatching(self, name: str, constraints: str) -> Package:
+		matcher = SemverMatcher("*" if constraints == "latest" else constraints)
+		possibleVersions = self.packagesByName[name].keys()
+		maybeVersion = matcher.matchLatest(possibleVersions)
+		assert maybeVersion is not None, f"Couldn't find a matching version for {name} with {matcher} and {possibleVersions}."
+		return self.packagesByName[name][maybeVersion]
+
+
+class RequirementsFactory:
+
+	def __init__(self, packageLock: Json) -> None:
+		self.packageLock = packageLock
+		self.packages = self.packagesParser()
+
+	def packagesParser(self) -> Packages:
+		return self.packagesParserV3(self.packageLock)
+
+	@staticmethod
+	def packagesParserV3(packageLock: Json) -> Packages:
+		"""Parse v3 of packages-lock.json."""
+
+		packagesByName: typing.Dict[str, typing.Dict[Package, typing.Dict[str, SemverMatcher]]] = {}
+		for path, data in packageLock["packages"].items():
+			name = path.split("node_modules/")[-1]
+			if not name:
+				continue
+			packagesByName.setdefault(name, {})
+			package = Package(name=name,
+			                  version=Semver.fromString(data["version"]),
+			                  integrity=data["integrity"],
+			                  dependencies=set())
+			packagesByName[name][package] = {k: SemverMatcher(v) for k, v in data.get("dependencies", {}).items()}
+
+		# Resolve the dependencies.
+		packages = Packages()
+		for name, packageVersions in packagesByName.items():
+			for package, dependencies in packageVersions.items():
+				for dependency, versionMatcher in dependencies.items():
+					assert dependency in packagesByName, f"The dependency '{dependency}' from package '{package}' is not found."
+					versionsPackages = {p.version: p for p in packagesByName[dependency]}
+					maybeVersion = versionMatcher.matchLatest(versionsPackages.keys())
+					assert maybeVersion is not None, f"Couldn't find a matching version for {package} with {versionMatcher} and {versionsPackages.keys()}."
+					package.dependencies.add(versionsPackages[maybeVersion])
+				packages.add(package)
+
+		return packages
+
+	@property
+	def version(self) -> int:
+		return int(self.packageLock["lockfileVersion"])
+
+	@staticmethod
+	def getDependencies(package: Package) -> typing.Set[Package]:
+		"""Get all dependencies of a package (including self)."""
+
+		output = set()
 		queue = [package]
 		while len(queue) > 0:
 			current = queue.pop()
 			if current in output:
 				continue
-			output[current] = packages[current]["integrity"]
-			queue += packages[current]["dependencies"]
+			output.add(current)
+			queue += current.dependencies
 		return output
 
-	# Get all packages and their version.
-	# Note their can be multiple version of the same package.
-	for package, metadata in data.get("packages").items():
-		integrity = metadata.get("resolution", {}).get("integrity", None)
-		packages[package] = {"integrity": integrity, "dependencies": []}
+	def make(self, requirements: Requirements) -> typing.Dict[str, typing.Any]:
+		"""Build the content of the requirements file.
+		
+		Format is as follow:
+			"express-minify": {
+				"dependencies": {
+					"clean-css@4.2.4": "sha512-EJUDT7nDVFDvaQgAo2G/PJvxmp1o/c6iXLbswsBbUFXi1Nr+AjA2cKmfbKDMjMvzEe75g3P6JkaDDAKk96A85A==",
+					...
+				},
+				"name": "express-minify",
+				"version": "1.0.0"
+			},
+		"""
 
-	# Populate the dependencies.
-	for package, metadata in data.get("snapshots").items():
-
-		# Get the package.
-		[name, version] = package.rsplit("@", maxsplit=1)
-		package = packageToString(name, version)
-		assertPackage(package)
-
-		# Fill in the dependencies.
-		for name, version in metadata.get("dependencies", {}).items():
-			dependency = packageToString(name, version)
-			assertPackage(dependency)
-			packages[package]["dependencies"].append(dependency)
-
-	# Generate the output.
-	output = {}
-	for importer in data.get("importers").values():
-		for name, metadata in importer.get("dependencies", {}).items():
-			version = metadata["version"]
-			package = packageToString(name, version)
-			assertPackage(package)
-			output[name] = getDependencies(package)
-
-	return json.dumps(output, indent=4)
+		output = {}
+		for name, maybeConstraints in requirements.items():
+			package = self.packages.getMatching(name=name,
+			                                    constraints=maybeConstraints if maybeConstraints else "latest")
+			packages = self.getDependencies(package)
+			output[name] = {
+			    "name": name,
+			    "version": str(package.version),
+			    "dependencies": {
+			        dependency.package: dependency.integrity
+			        for dependency in packages
+			    }
+			}
+		return output
 
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Compile requiments into a deps lock file.")
 	parser.add_argument("--output", type=pathlib.Path, help="The output path for the generated file.", required=True)
-	parser.add_argument("--pnpm", type=pathlib.Path, help="The path of the pnpm tool.", required=True)
+	parser.add_argument("--npm", type=pathlib.Path, help="The path of the pnpm tool.", required=True)
 	parser.add_argument("srcs", type=pathlib.Path, nargs="+", help="Requirement inputs.")
 
 	args = parser.parse_args()
@@ -126,15 +209,17 @@ if __name__ == "__main__":
 	with tempfile.TemporaryDirectory() as tmpDirname:
 		(pathlib.Path(tmpDirname) / "package.json").write_text(packageJson)
 
-		# Run pnpm to generate the dependency lock file.
-		localBazelBinary(str(args.pnpm), ["install", "--color", "--lockfile-only", "--dir", tmpDirname],
+		# Run npm to generate the dependency lock file.
+		localBazelBinary(str(args.npm), ["install", "--package-lock-only", "--prefix", tmpDirname, tmpDirname],
 		                 stdout=True,
 		                 stderr=True)
-		pnpmLock = (pathlib.Path(tmpDirname) / "pnpm-lock.yaml").read_text()
+		packageLock = (pathlib.Path(tmpDirname) / "package-lock.json").read_text()
 
-	requimentsJson = makeRequirementsJsonFromPnpmLock(pnpmLock)
+	requimentsJson = RequirementsFactory(json.loads(packageLock))
+	result = requimentsJson.make(requirements)
+	serialized = json.dumps(result, indent=4)
 
 	[repoName, *path] = pathlib.Path(args.output).parts
 	output = pathlib.Path(os.environ["BUILD_WORKSPACE_DIRECTORY"]) / pathlib.Path(*path)
 
-	output.write_text(requimentsJson)
+	output.write_text(serialized)

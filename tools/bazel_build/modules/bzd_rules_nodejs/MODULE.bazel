@@ -11,10 +11,5 @@ bazel_dep(name = "bzd_python", version = "1.0")
 bazel_dep(name = "bazel_skylib", version = "1.5.0")
 bazel_dep(name = "rules_python", version = "0.35.0")
 
-pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
-pip.parse(
-    hub_name = "bzd_rules_nodejs_pip",
-    python_version = "3.12",
-    requirements_lock = "//python:requirements.txt",
-)
-use_repo(pip, "bzd_rules_nodejs_pip")
+toolchain_nodejs = use_extension(":extensions.bzl", "toolchain_nodejs")
+use_repo(toolchain_nodejs, "node", "pnpm")
