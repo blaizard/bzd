@@ -1,6 +1,6 @@
 """Access docker images configuration."""
 
-load("@bzd_rules_oci//:private/images.bzl", "IMAGES")
+load("//:private/images.bzl", "IMAGES")
 
 def _bzd_oci_images_config_impl(ctx):
     config_json = ctx.actions.declare_file(ctx.attr.out.name)

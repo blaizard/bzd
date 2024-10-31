@@ -1,7 +1,7 @@
 """Metadata for Linux toolchains."""
 
-load("@bzd_toolchain_cc//:fragments/gcc/linux/defs.bzl", "linux")
-load("@bzd_toolchain_cc//cc:toolchain.bzl", "get_location", "toolchain_maker", "toolchain_merge")
+load("//:fragments/gcc/linux/defs.bzl", "linux")
+load("//cc:toolchain.bzl", "get_location", "toolchain_maker", "toolchain_merge")
 
 def linux_x86_64(module_ctx, name):
     """Metadata for Linux toolchains.

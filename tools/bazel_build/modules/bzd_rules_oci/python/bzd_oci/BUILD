@@ -16,7 +16,7 @@ py_library(
     name = "image",
     srcs = ["image.py"],
     data = [
-        "@bzd_rules_oci//:config.json",
+        "//:config.json",
     ],
     imports = [".."],
     visibility = ["//visibility:public"],

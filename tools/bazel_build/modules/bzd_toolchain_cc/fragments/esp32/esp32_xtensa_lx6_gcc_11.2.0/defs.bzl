@@ -1,8 +1,8 @@
 """Metadata for ESP32 toolchains."""
 
-load("@bzd_toolchain_cc//:fragments/esp32/esp32_xtensa_lx6_sdk/defs.bzl", "esp32_xtensa_lx6_sdk")
-load("@bzd_toolchain_cc//cc:toolchain.bzl", "get_location", "toolchain_maker", "toolchain_merge")
-load("@bzd_toolchain_cc//fragments/esp32/app_binary/esp32_xtensa_lx6:defs.bzl", "app_binary")
+load("//:fragments/esp32/esp32_xtensa_lx6_sdk/defs.bzl", "esp32_xtensa_lx6_sdk")
+load("//cc:toolchain.bzl", "get_location", "toolchain_maker", "toolchain_merge")
+load("//fragments/esp32/app_binary/esp32_xtensa_lx6:defs.bzl", "app_binary")
 
 def linux_x86_64(module_ctx, name):
     """Metadata for ESP32 toolchains.

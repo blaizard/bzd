@@ -1,13 +1,13 @@
 """Metadata for ESP32 toolchains."""
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-load("@bzd_toolchain_cc//cc:toolchain.bzl", "get_location")
+load("//cc:toolchain.bzl", "get_location")
 
 def esp32_xtensa_lx6_sdk(module_ctx, name = "esp32_xtensa_lx6_sdk"):
     version = "5dabe9f8a000131b0d72294f415332d8ef640126"
     http_archive(
         name = name,
-        build_file = "@bzd_toolchain_cc//:fragments/esp32/esp32_xtensa_lx6_sdk/esp32_xtensa_lx6_sdk.BUILD",
+        build_file = Label("//:fragments/esp32/esp32_xtensa_lx6_sdk/esp32_xtensa_lx6_sdk.BUILD"),
         urls = [
             "https://github.com/blaizard/bzd-esp32-xtensa-sdk/archive/{}.zip".format(version),
         ],
