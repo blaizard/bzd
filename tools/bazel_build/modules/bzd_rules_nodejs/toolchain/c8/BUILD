@@ -4,7 +4,7 @@ bzd_nodejs_extern_binary(
     name = "c8",
     binary = "c8/bin/c8.js",
     packages = [
-        "@bzd_rules_nodejs_deps//:c8",
+        "@nodejs_deps//:c8",
     ],
     params = [
         "--reporter",
