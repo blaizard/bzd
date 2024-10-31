@@ -67,14 +67,10 @@ coverage --nocache_test_results
 coverage --instrument_test_targets
 coverage --collect_code_coverage
 
-# Docker sandbox
-build:docker_sandbox --strategy=NodejsUpdate=worker,sandboxed
-
 # Docker
 build:docker --experimental_docker_verbose
 build:docker --experimental_enable_docker_sandbox
 build:docker --spawn_strategy=docker,worker,sandboxed,local
-build:docker --config=docker_sandbox
 build:docker --extra_execution_platforms=@bzd_rules_oci//execution_platforms:linux_x86_64
 
 # Remote
@@ -89,7 +85,6 @@ build:remote --experimental_remote_cache_eviction_retries=3
 build:remote --remote_retries=5
 build:remote --disk_cache=
 build:remote --define=EXECUTOR=remote
-build:remote --config=docker_sandbox
 
 # local
 build:local --remote_executor=

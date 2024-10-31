@@ -118,7 +118,7 @@ bzd_nodejs_binary = rule(
     cfg = _bzd_nodejs_transition,
 )
 
-_bzd_nodejs_test = rule(
+bzd_nodejs_test = rule(
     doc = "NodeJs test executor.",
     implementation = _bzd_nodejs_executable_impl,
     attrs = _COMMON_EXEC_ATTRS,
@@ -127,11 +127,3 @@ _bzd_nodejs_test = rule(
     toolchains = ["//nodejs:toolchain_type"],
     cfg = _bzd_nodejs_transition,
 )
-
-def bzd_nodejs_test(name, tags = [], **kwargs):
-    _bzd_nodejs_test(
-        name = name,
-        # Test rules cannot run outside of the host because of the symlinks in node_modules.
-        tags = tags + ["no-remote"],
-        **kwargs
-    )

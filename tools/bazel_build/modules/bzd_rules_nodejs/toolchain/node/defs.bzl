@@ -29,6 +29,19 @@ _repositories = {
             "linux-x86_64",
         ],
     }],
+    "23.1.0": [{
+        "archive": {
+            "build_file": Label("//toolchain/node:node.BUILD"),
+            "integrity": "sha256-zKz/TzLjw3KfUJTSDkCJoWo7jxOB6XMLGfHBb3z2Tak=",
+            "strip_prefix": "node-v23.1.0-linux-x64",
+            "urls": [
+                "https://nodejs.org/dist/v23.1.0/node-v23.1.0-linux-x64.tar.xz",
+            ],
+        },
+        "platforms": [
+            "linux-x86_64",
+        ],
+    }],
 }
 
 # All the versions available.

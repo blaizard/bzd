@@ -172,7 +172,6 @@ def bzd_nodejs_transpile(ctx, srcs, runfiles, base_dir_name):
                 base_dir_path,
             ],
             executable = ctx.executable._tsc,
-            execution_requirements = {"no-remote": "1"},
         )
 
     return generated + typescript.values(), {original: final.short_path.removeprefix(base_dir_short_path + "/") for original, final in typescript.items()}
@@ -217,7 +216,6 @@ def _bzd_nodejs_install_impl(ctx):
             metadata.path,
         ],
         executable = ctx.attr._metadata.files_to_run,
-        execution_requirements = {"no-remote": "1"},
     )
 
     # Return the providers (including outputs and dependencies)
