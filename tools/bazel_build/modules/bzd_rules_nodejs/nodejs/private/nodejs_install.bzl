@@ -114,8 +114,8 @@ def bzd_nodejs_make_node_modules(ctx, packages, base_dir_name):
             "--dir",
             package_json.dirname,
             "install",
-            "-prod",
-            "--silent",
+            "--prod",
+            "--quiet",  # Note: --slient is better but it hangs: https://github.com/pnpm/pnpm/issues/7839
             "--ignore-scripts",
             "--offline",
         ],
