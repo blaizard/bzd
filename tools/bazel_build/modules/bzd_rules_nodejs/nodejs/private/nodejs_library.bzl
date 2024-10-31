@@ -1,5 +1,7 @@
 """NodeJs library rule."""
 
+load("//nodejs:private/nodejs_package.bzl", "BzdNodeJsPackageInfo")
+
 # ---- Providers
 
 BzdNodeJsDepsInfo = provider(
@@ -9,15 +11,6 @@ BzdNodeJsDepsInfo = provider(
         "data": "Data to be added at runtime.",
         "packages": "Packages to be used.",
         "srcs": "Sources to be processed.",
-    },
-)
-
-BzdNodeJsPackageInfo = provider(
-    "Provider for node packages",
-    fields = {
-        "package": "The package name.",
-        "packages": "Overrides for the package names and their corresponding tarball files.",
-        "version": "The package version.",
     },
 )
 
