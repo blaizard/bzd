@@ -56,7 +56,7 @@ class Package:
 	version: Semver
 	integrity: str
 	dependencies: typing.Set["Package"]
-	alias: str = None
+	alias: typing.Optional[str] = None
 
 	def makeAlias(self, alias: str) -> "Package":
 		"""Create a clone of this package that is an alias."""

@@ -1,7 +1,7 @@
 """NodeJs install rule."""
 
 load("@bzd_package//:defs.bzl", "BzdPackageMetadataFragmentInfo")
-load("@bzd_rules_nodejs//nodejs:private/nodejs_library.bzl", "BzdNodeJsPackageInfo", "LIBRARY_ATTRS", "bzd_nodejs_library_get_provider")
+load("//nodejs:private/nodejs_library.bzl", "BzdNodeJsPackageInfo", "LIBRARY_ATTRS", "bzd_nodejs_library_get_provider")
 
 # ---- Provider
 
@@ -72,7 +72,7 @@ def bzd_nodejs_make_node_modules(ctx, packages, base_dir_name):
     node_modules = ctx.actions.declare_directory("{}/node_modules".format(base_dir_name))
 
     # Gather toolchain manager
-    toolchain_executable = ctx.toolchains["@bzd_rules_nodejs//nodejs:toolchain_type"].executable
+    toolchain_executable = ctx.toolchains["//nodejs:toolchain_type"].executable
 
     package_providers = [package[BzdNodeJsPackageInfo] for package in packages]
     overrides = {}
@@ -264,5 +264,5 @@ and the installation of the actual packages.
             allow_single_file = True,
         ),
     } | LIBRARY_ATTRS,
-    toolchains = ["@bzd_rules_nodejs//nodejs:toolchain_type"],
+    toolchains = ["//nodejs:toolchain_type"],
 )

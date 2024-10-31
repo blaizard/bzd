@@ -1,8 +1,8 @@
 """Module extension for NodeJs toolchains."""
 
 load("@bzd_lib//:repository_maker.bzl", "repository_maker")
-load("@bzd_rules_nodejs//toolchain/node:defs.bzl", "node_install", "node_versions")
-load("@bzd_rules_nodejs//toolchain/pnpm:defs.bzl", "pnpm_install")
+load("//toolchain/node:defs.bzl", "node_install", "node_versions")
+load("//toolchain/pnpm:defs.bzl", "pnpm_install")
 
 def _toolchain_repository_build_content(node, pnpm, default):
     build_content = """load("@bzd_rules_nodejs//nodejs:toolchain.bzl", "nodejs_toolchain")
