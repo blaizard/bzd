@@ -112,6 +112,13 @@ use_repo(toolchain_nodejs, "nodejs")
 
 register_toolchains("@nodejs//:all")
 
+requirements_nodejs = use_extension("@bzd_rules_nodejs//:requirements.bzl", "requirements_nodejs")
+requirements_nodejs.parse(
+    name = "nodejs_deps",
+    requirements = "//tools/nodejs:requirements.json",
+)
+use_repo(requirements_nodejs, "nodejs_deps")
+
 # Docker
 
 images = use_extension("@bzd_rules_oci//:extensions.bzl", "images")

@@ -20,9 +20,9 @@ bzd_nodejs_library(
         "email.mjs",
         "nodemailer.mjs",
     ],
-    packages = {
-        "nodemailer": "",
-    },
+    packages = [
+        "@nodejs_deps//:nodemailer",
+    ],
     visibility = ["//visibility:public"],
     deps = [
         "//nodejs/core:log",

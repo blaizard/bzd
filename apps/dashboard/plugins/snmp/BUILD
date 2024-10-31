@@ -7,8 +7,8 @@ bzd_plugin(
         "//nodejs/core:log",
     ],
     backend_entry_point = "snmp_backend.mjs",
-    backend_packages = {
-        "net-snmp": "",
-    },
+    backend_packages = [
+        "@nodejs_deps//:net-snmp",
+    ],
     metadata = "plugin.mjs",
 )

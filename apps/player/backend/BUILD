@@ -21,10 +21,10 @@ bzd_nodejs_binary(
         "//apps/player/frontend",
     ],
     main = "app.mjs",
-    packages = {
-        "commander": "",
-        "ws": "",
-    },
+    packages = [
+        "@nodejs_deps//:commander",
+        "@nodejs_deps//:ws",
+    ],
     tools = [
         ":terminal",
     ],

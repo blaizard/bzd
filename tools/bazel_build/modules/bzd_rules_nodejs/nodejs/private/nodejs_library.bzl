@@ -7,8 +7,17 @@ BzdNodeJsDepsInfo = provider(
     fields = {
         "apis": "APIs files that these deps implements.",
         "data": "Data to be added at runtime.",
-        "packages": "Dictionary of packages and their corresponding version.",
+        "packages": "Packages to be used.",
         "srcs": "Sources to be processed.",
+    },
+)
+
+BzdNodeJsPackageInfo = provider(
+    "Provider for node packages",
+    fields = {
+        "package": "The package name.",
+        "packages": "Overrides for the package names and their corresponding tarball files.",
+        "version": "The package version.",
     },
 )
 
@@ -21,7 +30,7 @@ def bzd_nodejs_make_provider(ctx):
     return BzdNodeJsDepsInfo(
         srcs = depset(ctx.files.srcs),
         data = depset(ctx.files.data, transitive = tool_depsets),
-        packages = dict(ctx.attr.packages),
+        packages = depset(ctx.attr.packages),
         apis = depset(ctx.files.apis),
     )
 
@@ -39,16 +48,8 @@ def bzd_nodejs_merge(*providers):
         srcs = depset(transitive = [p.srcs for p in providers]),
         data = depset(transitive = [p.data for p in providers]),
         apis = depset(transitive = [p.apis for p in providers]),
-        packages = {},
+        packages = depset(transitive = [p.packages for p in providers]),
     )
-
-    for p in providers:
-        # Merge packages
-        for name, version in p.packages.items():
-            # If the version already stored is different
-            if name in provider.packages and provider.packages[name] and version and provider.packages[name] != version:
-                fail("Version conflict for package '{}': '{}' vs '{}'".format(name, version, provider.packages[name]))
-            provider.packages[name] = version
 
     return provider
 
@@ -66,10 +67,11 @@ LIBRARY_ATTRS = {
     "deps": attr.label_list(
         allow_files = True,
         doc = "Dependencies of this rule.",
+        providers = [BzdNodeJsDepsInfo],
     ),
-    "packages": attr.string_dict(
-        allow_empty = True,
+    "packages": attr.label_list(
         doc = "Package dependencies.",
+        providers = [BzdNodeJsPackageInfo],
     ),
     "srcs": attr.label_list(
         allow_files = True,
@@ -89,10 +91,38 @@ def bzd_nodejs_library_get_provider(ctx):
 
 def _bzd_nodejs_library_impl(ctx):
     provider = bzd_nodejs_library_get_provider(ctx)
-    return [DefaultInfo(), provider]
+    return provider
 
 bzd_nodejs_library = rule(
     doc = "A library contains all dependencies used for this target.",
     implementation = _bzd_nodejs_library_impl,
     attrs = LIBRARY_ATTRS,
+    provides = [BzdNodeJsDepsInfo],
+)
+
+def _bzd_nodejs_package_impl(ctx):
+    return BzdNodeJsPackageInfo(
+        package = ctx.attr.package,
+        version = ctx.attr.version,
+        packages = {name: target[DefaultInfo].files.to_list()[0] for name, target in ctx.attr.packages.items()},
+    )
+
+bzd_nodejs_package = rule(
+    doc = "Package implementation.",
+    implementation = _bzd_nodejs_package_impl,
+    attrs = {
+        "package": attr.string(
+            mandatory = True,
+            doc = "The package name.",
+        ),
+        "packages": attr.string_keyed_label_dict(
+            allow_files = [".tgz"],
+            doc = "Overrides for the package names and their corresponding tarball files.",
+        ),
+        "version": attr.string(
+            mandatory = True,
+            doc = "The package version.",
+        ),
+    },
+    provides = [BzdNodeJsPackageInfo],
 )

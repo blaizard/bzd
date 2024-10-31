@@ -19,11 +19,11 @@ express
 express-minify
 helmet
 http
-mime
+mime=^1
 multer
-mongodb
+mongodb=6.3.0
 @google-cloud/storage
 nodemailer
 jimp
 svg2img
-stripe
+stripe=14.12.0

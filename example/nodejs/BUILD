@@ -7,9 +7,9 @@ bzd_nodejs_binary(
         "app.mjs",
     ],
     main = "app.mjs",
-    packages = {
-        "mustache": "",
-    },
+    packages = [
+        "@nodejs_deps//:mustache",
+    ],
     visibility = [
         "//apps/dashboard:__pkg__",
     ],

@@ -2,6 +2,7 @@
 
 load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
 load("@bzd_rules_nodejs//nodejs:private/nodejs_install.bzl", "bzd_nodejs_make_node_modules")
+load("//nodejs:private/nodejs_library.bzl", "BzdNodeJsPackageInfo")
 
 def _bzd_nodejs_extern_binary_impl(ctx):
     _package_json, node_modules = bzd_nodejs_make_node_modules(ctx, ctx.attr.packages, base_dir_name = ctx.label.name + ".install")
@@ -31,9 +32,9 @@ bzd_nodejs_extern_binary = rule(
             mandatory = True,
             doc = "The binary name to be executed.",
         ),
-        "packages": attr.string_dict(
-            allow_empty = True,
-            doc = "Package dependencies",
+        "packages": attr.label_list(
+            doc = "Package dependencies.",
+            providers = [BzdNodeJsPackageInfo],
         ),
         "params": attr.string_list(
             doc = "Arguments as a string.",

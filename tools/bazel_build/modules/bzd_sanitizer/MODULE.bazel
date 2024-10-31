@@ -22,6 +22,15 @@ pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
 pip.parse(
     hub_name = "bzd_sanitizer_pip",
     python_version = "3.12",
-    requirements_lock = "//:requirements.txt",
+    requirements_lock = "//python:requirements.txt",
 )
 use_repo(pip, "bzd_sanitizer_pip")
+
+# Nodejs
+
+requirements_nodejs = use_extension("@bzd_rules_nodejs//:requirements.bzl", "requirements_nodejs")
+requirements_nodejs.parse(
+    name = "bzd_sanitizer_nodejs_deps",
+    requirements = "//nodejs:requirements.json",
+)
+use_repo(requirements_nodejs, "bzd_sanitizer_nodejs_deps")

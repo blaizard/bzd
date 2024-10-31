@@ -5,10 +5,10 @@ exports_files(["tsconfig.json"])
 bzd_nodejs_extern_binary(
     name = "tsc",
     binary = "typescript/bin/tsc",
-    packages = {
-        "@types/node": "^20.14.6",
-        "typescript": "^5.5.2",
-    },
+    packages = [
+        "@bzd_rules_nodejs_deps//:typescript",
+        "@bzd_rules_nodejs_deps//:typesnode",
+    ],
     params = [
         "--typeRoots",
         "{node_modules}/@types",

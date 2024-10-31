@@ -5,9 +5,10 @@ from dataclasses import dataclass
 _REGEXPR_SEMVER = re.compile(
     r"(?P<major>[0-9]+)(?:\.(?P<minor>[0-9]+)(?:\.(?P<patch>[0-9]+))?)?(?:\-(?P<preRelease>[^\s+]+))?(?:\+(?P<build>\S+))?"
 )
-_REGEXPR_CONSTRAINT = re.compile(
-    r"(?P<operator>\^|~|=|!=|>|>=|<|<=)?\s*(?P<major>[0-9xX*]+)(?:\.(?P<minor>[0-9xX*]+)(?:\.(?P<patch>[0-9xX*]+))?)?(?:\-(?P<preRelease>[^\s+]+))?(?:\+(?P<build>\S+))?"
+_REGEXPR_CONSTRAINT_FROM_BEGINING = re.compile(
+    r"^(?P<operator>\^|~|=|!=|>|>=|<|<=)?\s*(?P<major>[0-9xX*]+)(?:\.(?P<minor>[0-9xX*]+)(?:\.(?P<patch>[0-9xX*]+))?)?(?:\-(?P<preRelease>[^\s+]+))?(?:\+(?P<build>\S+))?"
 )
+_REGEXPR_OPERATOR_FROM_BEGINING = re.compile(r"^(?P<operator>\|\|)")
 _MAX_VERSION_INT = 999999999999
 
 
@@ -108,17 +109,29 @@ class Semver:
 		return f"<Semver {str(self)}>"
 
 
-class SemverConstraint:
+@dataclass
+class _SemverConstraint:
 
-	def __init__(self, string: str) -> None:
-		m = _REGEXPR_CONSTRAINT.match(string.strip())
+	operator: str
+	major: str
+	minor: str
+	patch: str
+	preRelease: str
+	build: str
+
+	@staticmethod
+	def fromString(string: str) -> typing.Tuple["_SemverConstraint", str]:
+		"""Build a _SemverConstraint object from a string and return the rest of the string that did not match."""
+
+		m = _REGEXPR_CONSTRAINT_FROM_BEGINING.match(string.strip())
 		assert m is not None, f"The version constraint is malformed: '{string}'."
-		self.operator = m.group("operator") or ""
-		self.major = m.group("major") or "x"
-		self.minor = m.group("minor") or "x"
-		self.patch = m.group("patch") or "x"
-		self.preRelease = m.group("preRelease") or ""
-		self.build = m.group("build") or ""
+
+		return _SemverConstraint(operator=m.group("operator") or "",
+		                         major=m.group("major") or "x",
+		                         minor=m.group("minor") or "x",
+		                         patch=m.group("patch") or "x",
+		                         preRelease=m.group("preRelease") or "",
+		                         build=m.group("build") or ""), string[m.end():]
 
 	@staticmethod
 	def isWildcard(value: str) -> bool:
@@ -130,7 +143,7 @@ class SemverConstraint:
 
 	@staticmethod
 	def setIfWildcard(value: str, wildcard: int) -> int:
-		if SemverConstraint.isWildcard(value):
+		if _SemverConstraint.isWildcard(value):
 			return wildcard
 		return int(value)
 
@@ -262,15 +275,52 @@ class SemverMatcher:
 	"""Match a string with a semver."""
 
 	def __init__(self, string: str) -> None:
-		self.constraints = [SemverConstraint(string)]
+
+		self.string = string
+		# Parse the string.
+		constraints: typing.List[typing.Union[_SemverConstraint, str]] = []
+		while string:
+			constraint, string = _SemverConstraint.fromString(string)
+			constraints.append(constraint)
+			string = string.strip()
+			if string:
+				m = _REGEXPR_OPERATOR_FROM_BEGINING.match(string)
+				if m:
+					constraints.append(m.group("operator"))
+					string = string[m.end():].strip()
+				else:
+					constraints.append("&&")
+
+		self.constraints = constraints
 
 	def match(self, version: Semver) -> bool:
 		"""Match the given version."""
 
-		for constraint in self.constraints:
-			return constraint.match(version)
+		binaryOperators: typing.Dict[str, typing.Callable[[bool, bool], bool]] = {
+		    "||": lambda a, b: a or b,
+		    "&&": lambda a, b: a and b,
+		}
 
-		return False
+		stack = []
+		constraints = self.constraints.copy()
+		while len(constraints) > 0:
+			constraint = constraints.pop(0)
+			if isinstance(constraint, _SemverConstraint):
+				stack.append(constraint.match(version))
+			elif constraint in binaryOperators:
+				assert len(stack) >= 1, f"The binary operator {constraint} is missing its first argument."
+				assert len(constraints) >= 1, f"The binary operator {constraint} is missing its second argument."
+				secondArgument = constraints.pop(0)
+				assert isinstance(
+				    secondArgument,
+				    _SemverConstraint), f"Compositions can only be used with constraints, not {secondArgument}"
+				result = binaryOperators[constraint](stack.pop(), secondArgument.match(version))
+				stack.append(result)
+			else:
+				raise NotImplementedError(f"Operator '{constraint}'.")
+
+		assert len(stack) == 1, f"There should be a single data in the stack: {stack}, constraint: '{self.string}'"
+		return stack[0]
 
 	def matchLatest(self, versions: typing.Iterable[Semver]) -> typing.Optional[Semver]:
 		"""Match the latest version from the list."""

@@ -3,8 +3,8 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_extern_binary")
 bzd_nodejs_extern_binary(
     name = "mocha",
     binary = "mocha/bin/mocha.js",
-    packages = {
-        "mocha": "^10.4.0",
-    },
+    packages = [
+        "@bzd_rules_nodejs_deps//:mocha",
+    ],
     visibility = ["//visibility:public"],
 )

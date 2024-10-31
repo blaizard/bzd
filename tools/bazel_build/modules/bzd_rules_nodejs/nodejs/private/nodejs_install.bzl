@@ -1,7 +1,7 @@
 """NodeJs install rule."""
 
 load("@bzd_package//:defs.bzl", "BzdPackageMetadataFragmentInfo")
-load("@bzd_rules_nodejs//nodejs:private/nodejs_library.bzl", "LIBRARY_ATTRS", "bzd_nodejs_library_get_provider")
+load("@bzd_rules_nodejs//nodejs:private/nodejs_library.bzl", "BzdNodeJsPackageInfo", "LIBRARY_ATTRS", "bzd_nodejs_library_get_provider")
 
 # ---- Provider
 
@@ -14,6 +14,46 @@ BzdNodeJsInstallInfo = provider(
         "transpiled": "The map of transpiled files.",
     },
 )
+
+def path_clean(path):
+    """Clean a path and make it relative by removing any leading '/'.
+
+    Args:
+        path: The path to cleanup.
+
+    Returns:
+        The cleaned-up path.
+    """
+
+    cleaned = []
+    for segment in path.split("/"):
+        if not segment:
+            continue
+        if segment == "..":
+            if len(segment) == 0:
+                fail("Missing ")
+            cleaned.pop()
+        else:
+            cleaned.append(segment)
+
+    return "/".join(cleaned)
+
+def path_relative_to(path, relative_to):
+    """Return the path relative to a given directory.
+
+    This assumes that both path start from the same root directory.
+
+    Args:
+        path: The path to process.
+        relative_to: `path` should be relative to this given path.
+
+    Returns:
+        The path made relative to `relative_to`.
+    """
+
+    nb_segments_relative_to = len(path_clean(relative_to).split("/"))
+    to_root = "/".join([".."] * nb_segments_relative_to)
+    return to_root + "/" + path_clean(path)
 
 def bzd_nodejs_make_node_modules(ctx, packages, base_dir_name):
     """Generate a node_modules and a package.json file at the root of `base_dir_name`.
@@ -31,57 +71,56 @@ def bzd_nodejs_make_node_modules(ctx, packages, base_dir_name):
     package_json = ctx.actions.declare_file("{}/package.json".format(base_dir_name))
     node_modules = ctx.actions.declare_directory("{}/node_modules".format(base_dir_name))
 
-    # Build the dependencies template replacement string
-    dependencies = ",\n".join(["\"{}\": \"{}\"".format(name, version if version else "latest") for name, version in packages.items()])
-
-    ctx.actions.write(
-        output = package_json,
-        content = """
-{{
-	"name": "{name}",
-	"version": "0.0.0",
-	"license": "UNLICENSED",
-	"private": true,
-	"type": "module",
-    "imports": {{
-        "#bzd/*": "./*"
-    }},
-	"dependencies": {{
-		{dependencies}
-	}}
-}}
-""".format(
-            dependencies = dependencies,
-            name = "{}.{}".format(ctx.label.package.replace("/", "."), ctx.attr.name),
-        ),
-    )
-
-    # --- Fetch and install the packages
-
-    manager_args = [
-        "--dir",
-        package_json.dirname,
-        "install",
-        "--fetch-timeout=300000000",
-        "--ignore-scripts",
-        "--prefer-offline",
-        "--silent",
-    ]
-
     # Gather toolchain manager
     toolchain_executable = ctx.toolchains["@bzd_rules_nodejs//nodejs:toolchain_type"].executable
 
+    package_providers = [package[BzdNodeJsPackageInfo] for package in packages]
+    overrides = {}
+    for package in package_providers:
+        overrides |= package.packages
+
+    package_json_content = {
+        "dependencies": {package.package: package.version for package in package_providers},
+        "imports": {
+            "#bzd/*": "./*",
+        },
+        "license": "UNLICENSED",
+        "name": "{}.{}".format(ctx.label.package.replace("/", "."), ctx.attr.name),
+        "pnpm": {
+            "overrides": {name: path_relative_to(file.path, package_json.dirname) for name, file in overrides.items()},
+        },
+        "private": True,
+        "type": "module",
+        "version": "0.0.0",
+    }
+
+    ctx.actions.write(
+        output = package_json,
+        content = json.encode_indent(package_json_content),
+    )
+
+    args = ctx.actions.args()
+    args.add("--dir", package_json.dirname)
+    args.add("install")
+    args.add("-prod")
+    args.add("--ignore-scripts")
+    args.add("--offline")
+
     ctx.actions.run(
-        inputs = [package_json],
+        inputs = depset([package_json] + overrides.values()),
         outputs = [node_modules],
-        progress_message = "Updating package(s) for {}".format(ctx.label),
-        arguments = manager_args,
+        arguments = [
+            "--dir",
+            package_json.dirname,
+            "install",
+            "-prod",
+            "--silent",
+            "--ignore-scripts",
+            "--offline",
+        ],
+        progress_message = "Installing package(s) for {}".format(ctx.label),
         mnemonic = "NodejsUpdate",
-        # Used to propagate the PATH environment to the script.
-        use_default_shell_env = True,
         executable = toolchain_executable.manager.files_to_run,
-        # Because of symlinks to the node_modules folder, this should not run remotely.
-        execution_requirements = {"no-remote": "1"},
     )
 
     return [package_json, node_modules]
@@ -150,7 +189,7 @@ def _bzd_nodejs_install_impl(ctx):
 
     # --- Generate the package.json and node_modules files
 
-    package_json, node_modules = bzd_nodejs_make_node_modules(ctx, providers.packages, base_dir_name = base_dir_name)
+    package_json, node_modules = bzd_nodejs_make_node_modules(ctx, providers.packages.to_list(), base_dir_name = base_dir_name)
 
     # --- Create the APIs
 
@@ -198,35 +237,32 @@ def _bzd_nodejs_install_impl(ctx):
         ),
     ]
 
-_INSTALL_ATTRS = dict(LIBRARY_ATTRS)
-_INSTALL_ATTRS.update({
-    "_json_merge": attr.label(
-        default = Label("@bzd_lib//:json_merge"),
-        cfg = "exec",
-        executable = True,
-    ),
-    "_metadata": attr.label(
-        default = Label("@bzd_rules_nodejs//nodejs/metadata"),
-        cfg = "exec",
-        executable = True,
-    ),
-    "_tsc": attr.label(
-        default = Label("@bzd_rules_nodejs//toolchain/typescript:tsc"),
-        cfg = "exec",
-        executable = True,
-    ),
-    "_tsconfig": attr.label(
-        default = Label("@bzd_rules_nodejs//toolchain/typescript:tsconfig.json"),
-        allow_single_file = True,
-    ),
-})
-
 bzd_nodejs_install = rule(
     doc = """
 Install a NodeJs environment, dealing with the creation of the package.json
 and the installation of the actual packages.
 """,
     implementation = _bzd_nodejs_install_impl,
-    attrs = _INSTALL_ATTRS,
+    attrs = {
+        "_json_merge": attr.label(
+            default = Label("@bzd_lib//:json_merge"),
+            cfg = "exec",
+            executable = True,
+        ),
+        "_metadata": attr.label(
+            default = Label("//nodejs/metadata"),
+            cfg = "exec",
+            executable = True,
+        ),
+        "_tsc": attr.label(
+            default = Label("//toolchain/typescript:tsc"),
+            cfg = "exec",
+            executable = True,
+        ),
+        "_tsconfig": attr.label(
+            default = Label("//toolchain/typescript:tsconfig.json"),
+            allow_single_file = True,
+        ),
+    } | LIBRARY_ATTRS,
     toolchains = ["@bzd_rules_nodejs//nodejs:toolchain_type"],
 )

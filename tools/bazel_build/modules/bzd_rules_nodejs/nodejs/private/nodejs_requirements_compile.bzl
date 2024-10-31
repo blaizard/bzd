@@ -2,10 +2,10 @@
 
 load("@rules_python//python:defs.bzl", "py_binary")
 
-def bzd_nodejs_requirements_compile(name, srcs, output):
+def bzd_nodejs_requirements_compile(name, srcs, output = None):
     """Compile the requirements files into a json format including dependencies."""
 
-    compile_py = Label("//nodejs/private/requirements:compile.py")
+    compile_py = Label("//nodejs/requirements:compile.py")
     npm = Label("@node//:npm")
 
     py_binary(
@@ -14,13 +14,14 @@ def bzd_nodejs_requirements_compile(name, srcs, output):
         srcs = [
             compile_py,
         ],
-        args = [
+        args = ([
             "--output",
             "$(rlocationpath {})".format(output),
+        ] if output else []) + [
             "--npm",
             "$(rootpath {})".format(npm),
         ] + ["$(rootpath {})".format(src) for src in srcs],
-        data = srcs + [output, npm],
+        data = srcs + [npm] + ([output] if output else []),
         deps = [
             "@bzd_python//bzd/utils:run",
             "@bzd_python//bzd/utils:semver",

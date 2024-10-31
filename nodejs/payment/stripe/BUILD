@@ -6,9 +6,9 @@ bzd_nodejs_library(
         "webhook.mjs",
     ],
     apis = ["api.json"],
-    packages = {
-        "stripe": "14.12.0",
-    },
+    packages = [
+        "@nodejs_deps//:stripe",
+    ],
     visibility = ["//visibility:public"],
     deps = [
         "//nodejs/core:exception",

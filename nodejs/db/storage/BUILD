@@ -46,9 +46,9 @@ bzd_nodejs_library(
     srcs = [
         "google_cloud_storage.mjs",
     ],
-    packages = {
-        "@google-cloud/storage": "",
-    },
+    packages = [
+        "@nodejs_deps//:google-cloudstorage",
+    ],
     visibility = ["//visibility:public"],
     deps = [
         ":storage",

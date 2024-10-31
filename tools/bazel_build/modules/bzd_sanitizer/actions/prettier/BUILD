@@ -5,9 +5,9 @@ load("@rules_python//python:defs.bzl", "py_binary")
 bzd_nodejs_extern_binary(
     name = "prettier_binary",
     binary = "prettier/bin/prettier.cjs",
-    packages = {
-        "prettier": "",
-    },
+    packages = [
+        "@bzd_sanitizer_nodejs_deps//:prettier",
+    ],
     visibility = ["//actions:__subpackages__"],
 )
 

@@ -141,6 +141,26 @@ class TestSemver(unittest.TestCase):
 		self.assertTrue(SemverMatcher("*").match(Semver.fromString("0")))
 		self.assertTrue(SemverMatcher("*").match(Semver.fromString("99999999")))
 
+	def testSemverMatcherMultiple(self) -> None:
+
+		# or operator.
+		self.assertTrue(SemverMatcher("1.1 || 1.2").match(Semver.fromString("1.2.0")))
+		self.assertTrue(SemverMatcher("1.1 || 1.2 || 3.4 || 1.5").match(Semver.fromString("3.4")))
+		self.assertFalse(SemverMatcher("1.1 || 1.2").match(Semver.fromString("3.4")))
+
+		# and operator.
+		self.assertTrue(SemverMatcher(">=1.1 <=1.2").match(Semver.fromString("1.2.0")))
+		self.assertFalse(SemverMatcher(">=1.1 <=1.2").match(Semver.fromString("1.3")))
+		self.assertTrue(SemverMatcher(">=1.1 <=3.4").match(Semver.fromString("2.1")))
+
+		# Reuse the same instance.
+		matcher = SemverMatcher(">=1.1 <=1.2")
+		self.assertTrue(matcher.match(Semver.fromString("1.2.0")))
+		self.assertTrue(matcher.match(Semver.fromString("1.1.0")))
+		self.assertTrue(matcher.match(Semver.fromString("1.1.2")))
+		self.assertFalse(matcher.match(Semver.fromString("1.0.2")))
+		self.assertFalse(matcher.match(Semver.fromString("1.3.2")))
+
 
 if __name__ == "__main__":
 	unittest.main()
