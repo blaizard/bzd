@@ -1,6 +1,6 @@
 """Macros to generate static files."""
 
-load("@bzd_rules_nodejs//nodejs:private/nodejs_static.bzl", "bzd_nodejs_static")
+load("//nodejs:private/nodejs_static.bzl", "bzd_nodejs_static")
 
 def bzd_nodejs_static_sitemap(name, config, config_attr, install, format):
     bzd_nodejs_static(
@@ -16,5 +16,5 @@ def bzd_nodejs_static_sitemap(name, config, config_attr, install, format):
         ],
         config = config,
         install = install,
-        script = "@bzd_rules_nodejs//nodejs/static:sitemap",
+        script = Label("//nodejs/static:sitemap"),
     )

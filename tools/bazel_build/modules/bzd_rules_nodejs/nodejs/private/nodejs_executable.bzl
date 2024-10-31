@@ -3,7 +3,7 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
 load("@bzd_package//:defs.bzl", "BzdPackageFragmentInfo", "bzd_package_prefix_from_file", "bzd_package_to_runfiles")
-load("@bzd_rules_nodejs//nodejs:private/nodejs_install.bzl", "BzdNodeJsInstallInfo")
+load("//nodejs:private/nodejs_install.bzl", "BzdNodeJsInstallInfo")
 
 _COMMON_EXEC_ATTRS = {
     "data": attr.label_list(
@@ -28,24 +28,24 @@ _COMMON_EXEC_ATTRS = {
         default = "@bzd_lib//settings/build",
     ),
     "_coverage_executor": attr.label(
-        default = Label("@bzd_rules_nodejs//toolchain/c8"),
+        default = Label("//toolchain/c8"),
         executable = True,
         cfg = "exec",
     ),
     "_metadata_json": attr.label(
-        default = Label("@bzd_rules_nodejs//nodejs/metadata:metadata_nodejs.json"),
+        default = Label("//nodejs/metadata:metadata_nodejs.json"),
         allow_single_file = True,
     ),
 }
 
 def _bzd_nodejs_transition_impl(_settings, _attr):
-    return {"@bzd_rules_nodejs//:build_type": "nodejs"}
+    return {"//:build_type": "nodejs"}
 
 # Transition to notify the dependency graph that this is a `nodejs` build.
 _bzd_nodejs_transition = transition(
     implementation = _bzd_nodejs_transition_impl,
     inputs = [],
-    outputs = ["@bzd_rules_nodejs//:build_type"],
+    outputs = ["//:build_type"],
 )
 
 def _bzd_nodejs_executable_impl(ctx):
@@ -66,7 +66,7 @@ def _bzd_nodejs_executable_impl(ctx):
     }
 
     # Gather toolchain executable.
-    executor = ctx.attr.executor if ctx.attr.executor else ctx.toolchains["@bzd_rules_nodejs//nodejs:toolchain_type"].executable.node
+    executor = ctx.attr.executor if ctx.attr.executor else ctx.toolchains["//nodejs:toolchain_type"].executable.node
 
     if ctx.attr._build[BuildSettingInfo].value == "prod":
         command = "export NODE_ENV=production"
@@ -114,7 +114,7 @@ bzd_nodejs_binary = rule(
     implementation = _bzd_nodejs_executable_impl,
     attrs = _COMMON_EXEC_ATTRS,
     executable = True,
-    toolchains = ["@bzd_rules_nodejs//nodejs:toolchain_type"],
+    toolchains = ["//nodejs:toolchain_type"],
     cfg = _bzd_nodejs_transition,
 )
 
@@ -124,7 +124,7 @@ _bzd_nodejs_test = rule(
     attrs = _COMMON_EXEC_ATTRS,
     executable = True,
     test = True,
-    toolchains = ["@bzd_rules_nodejs//nodejs:toolchain_type"],
+    toolchains = ["//nodejs:toolchain_type"],
     cfg = _bzd_nodejs_transition,
 )
 

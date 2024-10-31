@@ -3,16 +3,16 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
 load("@bzd_package//:defs.bzl", "BzdPackageFragmentInfo", "bzd_package_prefix_from_file")
-load("@bzd_rules_nodejs//nodejs:private/nodejs_install.bzl", "BzdNodeJsInstallInfo", "bzd_nodejs_install")
+load("//nodejs:private/nodejs_install.bzl", "BzdNodeJsInstallInfo", "bzd_nodejs_install")
 
 def _bzd_nodejs_transition_impl(_settings, _attr):
-    return {"@bzd_rules_nodejs//:build_type": "nodejs_web"}
+    return {"//:build_type": "nodejs_web"}
 
 # Transition to notify the dependency graph that this is a `nodejs_web` build.
 _bzd_nodejs_transition = transition(
     implementation = _bzd_nodejs_transition_impl,
     inputs = [],
-    outputs = ["@bzd_rules_nodejs//:build_type"],
+    outputs = ["//:build_type"],
 )
 
 def _bzd_nodejs_web_exec_impl(ctx):
@@ -20,7 +20,7 @@ def _bzd_nodejs_web_exec_impl(ctx):
     install = ctx.attr.install[BzdNodeJsInstallInfo]
 
     # Gather toolchain manager
-    toolchain_executable = ctx.toolchains["@bzd_rules_nodejs//nodejs:toolchain_type"].executable
+    toolchain_executable = ctx.toolchains["//nodejs:toolchain_type"].executable
 
     vite_config = ctx.actions.declare_file("vite.config.mjs", sibling = install.package_json)
     ctx.actions.symlink(
@@ -133,7 +133,7 @@ _bzd_nodejs_web_binary = rule(
         "static": attr.label_keyed_string_dict(
             doc = "Static files to be added to the bundle.",
             default = {
-                "@bzd_rules_nodejs//nodejs/static:robots.txt": "robots.txt",
+                "//nodejs/static:robots.txt": "robots.txt",
             },
             allow_files = True,
         ),
@@ -144,11 +144,11 @@ _bzd_nodejs_web_binary = rule(
             default = "@bzd_lib//settings/build",
         ),
         "_metadata_json": attr.label(
-            default = Label("@bzd_rules_nodejs//nodejs/metadata:metadata_nodejs_web.json"),
+            default = Label("//nodejs/metadata:metadata_nodejs_web.json"),
             allow_single_file = True,
         ),
         "_vite_config": attr.label(
-            default = Label("@bzd_rules_nodejs//toolchain/vite:vite.config.js"),
+            default = Label("//toolchain/vite:vite.config.js"),
             allow_single_file = True,
         ),
         "_web_server": attr.label(
@@ -159,7 +159,7 @@ _bzd_nodejs_web_binary = rule(
     },
     cfg = _bzd_nodejs_transition,
     executable = True,
-    toolchains = ["@bzd_rules_nodejs//nodejs:toolchain_type"],
+    toolchains = ["//nodejs:toolchain_type"],
 )
 
 def bzd_nodejs_web_binary(name, srcs = [], packages = [], deps = [], apis = [], **kwargs):

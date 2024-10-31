@@ -1,6 +1,6 @@
 """Static file generator from a user provided script."""
 
-load("@bzd_rules_nodejs//nodejs:private/nodejs_install.bzl", "BzdNodeJsInstallInfo")
+load("//nodejs:private/nodejs_install.bzl", "BzdNodeJsInstallInfo")
 
 def _update_argument(arg, reader, config, **kwargs):
     if arg.startswith("{config:"):

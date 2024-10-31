@@ -50,7 +50,7 @@ bzd_nodejs_package(
     visibility = ["//visibility:public"],
 )
 """.format(
-            defs = Label("@bzd_rules_nodejs//nodejs:defs.bzl"),
+            defs = Label("//nodejs:defs.bzl"),
             package = repository_ctx.attr.package,
             version = repository_ctx.attr.version,
             packages = ",\n".join(["\"{}\": \":packages/{}\"".format(name, path) for name, path in packages_to_filename.items()]),
