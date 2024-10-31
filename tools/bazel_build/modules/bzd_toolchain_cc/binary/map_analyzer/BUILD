@@ -7,6 +7,6 @@ py_binary(
     visibility = ["//visibility:public"],
     deps = [
         requirement("pyelftools"),
-        "@bzd_toolchain_cc//binary/map_analyzer/parser",
+        "//binary/map_analyzer/parser",
     ],
 )

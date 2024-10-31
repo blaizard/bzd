@@ -21,8 +21,8 @@ sh_binary_wrapper(
         {profiler} --groups {profile_groups} "$@"
     """,
     locations = {
-        "@bzd_toolchain_cc//binary/elf:profiler": "profiler",
-        "@bzd_toolchain_cc//fragments/esp32/esptool:profile_groups.json": "profile_groups",
+        "//binary/elf:profiler": "profiler",
+        "//fragments/esp32/esptool:profile_groups.json": "profile_groups",
     },
     visibility = ["//visibility:public"],
 )

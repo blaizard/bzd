@@ -1,9 +1,9 @@
 """Module extension for CC toolchains."""
 
 load("@bzd_platforms//:defs.bzl", "constraints_from_platform")
-load("@bzd_toolchain_cc//:fragments/clang/defs.bzl", "clang")
-load("@bzd_toolchain_cc//:fragments/esp32/defs.bzl", "esp32")
-load("@bzd_toolchain_cc//:fragments/gcc/defs.bzl", "gcc")
+load("//:fragments/clang/defs.bzl", "clang")
+load("//:fragments/esp32/defs.bzl", "esp32")
+load("//:fragments/gcc/defs.bzl", "gcc")
 
 _repositories = dict(**clang)
 _repositories.update(esp32)

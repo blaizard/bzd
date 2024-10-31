@@ -1,7 +1,7 @@
 """Application binary functor."""
 
-load("@bzd_toolchain_cc//fragments/esp32/esptool:defs.bzl", "esptool")
-load("@bzd_toolchain_cc//fragments/esp32/qemu:defs.bzl", "esp32_qemu")
+load("//fragments/esp32/esptool:defs.bzl", "esptool")
+load("//fragments/esp32/qemu:defs.bzl", "esp32_qemu")
 
 def app_binary(module_ctx):
     """Application binary factory function.

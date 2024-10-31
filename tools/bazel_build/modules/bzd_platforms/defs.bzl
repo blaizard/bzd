@@ -30,7 +30,7 @@ def _constraint_target(kind, name):
         A string corresponding to the constraint target.
     """
 
-    return "@bzd_platforms//{}:{}".format(kind, name)
+    return Label("//{}:{}".format(kind, name))
 
 def constraints_from_platform(platform):
     """Return the set of constraints from a platform name.

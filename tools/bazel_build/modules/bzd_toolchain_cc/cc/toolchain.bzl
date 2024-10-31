@@ -1,7 +1,7 @@
 """CC Toolchains."""
 
 load("@bazel_skylib//lib:sets.bzl", "sets")
-load("@bzd_toolchain_cc//cc:flags.bzl", "COPTS_CLANG", "COPTS_CLANG_COVERAGE", "COPTS_CLANG_DEV", "COPTS_CLANG_PROD", "COPTS_GCC", "COPTS_GCC_COVERAGE", "COPTS_GCC_DEV", "COPTS_GCC_PROD", "LINKOPTS_CLANG", "LINKOPTS_CLANG_COVERAGE", "LINKOPTS_GCC", "LINKOPTS_GCC_COVERAGE")
+load("//cc:flags.bzl", "COPTS_CLANG", "COPTS_CLANG_COVERAGE", "COPTS_CLANG_DEV", "COPTS_CLANG_PROD", "COPTS_GCC", "COPTS_GCC_COVERAGE", "COPTS_GCC_DEV", "COPTS_GCC_PROD", "LINKOPTS_CLANG", "LINKOPTS_CLANG_COVERAGE", "LINKOPTS_GCC", "LINKOPTS_GCC_COVERAGE")
 
 def _impl(repository_ctx):
     # Create a UID
@@ -86,7 +86,7 @@ def _impl(repository_ctx):
     }
 
     # Substitute the BUILD file content.
-    template = repository_ctx.read(Label("@bzd_toolchain_cc//cc:unix/template.BUILD"))
+    template = repository_ctx.read(Label("//cc:unix/template.BUILD"))
     for key, value in build_substitutions.items():
         template = template.replace(key, value)
 

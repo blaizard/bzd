@@ -26,7 +26,7 @@ _COMMON_ATTRS = {
     "_preprocessor": attr.label(
         executable = True,
         cfg = "exec",
-        default = Label("@bzd_rules_doc//doc:preprocessor"),
+        default = Label("//doc:preprocessor"),
     ),
 }
 
@@ -134,12 +134,12 @@ _doc_binary = rule(
         "_builder": attr.label(
             executable = True,
             cfg = "exec",
-            default = Label("@bzd_rules_doc//doc:builder"),
+            default = Label("//doc:builder"),
         ),
         "_mkdocs": attr.label(
             executable = True,
             cfg = "exec",
-            default = Label("@bzd_rules_doc//doc:mkdocs_wrapper"),
+            default = Label("//doc:mkdocs_wrapper"),
         ),
         "_web_server": attr.label(
             executable = True,
