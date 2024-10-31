@@ -24,9 +24,9 @@ bzd_nodejs_library(
         "server.mjs",
     ],
     apis = ["api.json"],
-    packages = {
-        "jsonwebtoken": "",
-    },
+    packages = [
+        "@nodejs_deps//:jsonwebtoken",
+    ],
     visibility = ["//visibility:public"],
     deps = [
         "//nodejs/core:exception",

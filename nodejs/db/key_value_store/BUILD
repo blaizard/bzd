@@ -70,9 +70,9 @@ bzd_nodejs_library(
         "key_value_store.mjs",
         "mongodb.mjs",
     ],
-    packages = {
-        "mongodb": "6.3.0",
-    },
+    packages = [
+        "@nodejs_deps//:mongodb",
+    ],
     visibility = ["//visibility:public"],
     deps = [
         "//nodejs/core:exception",

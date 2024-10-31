@@ -92,8 +92,6 @@ def _bzd_nodejs_web_exec_impl(ctx):
             "NODE_ENV": "production" if ctx.attr._build[BuildSettingInfo].value == "prod" else "development",
         },
         executable = toolchain_executable.node.files_to_run,
-        # node_modules is made of symlinks, this cannot run remotely.
-        execution_requirements = {"no-remote": "1"},
     )
 
     return [
@@ -164,7 +162,7 @@ _bzd_nodejs_web_binary = rule(
     toolchains = ["@bzd_rules_nodejs//nodejs:toolchain_type"],
 )
 
-def bzd_nodejs_web_binary(name, srcs = [], packages = {}, deps = [], apis = [], **kwargs):
+def bzd_nodejs_web_binary(name, srcs = [], packages = [], deps = [], apis = [], **kwargs):
     """Create a web application with NodeJs.
 
     Args:
@@ -181,12 +179,12 @@ def bzd_nodejs_web_binary(name, srcs = [], packages = {}, deps = [], apis = [], 
         tags = ["manual", "nodejs"],
         srcs = srcs,
         apis = apis,
-        packages = dict({
-            "@vitejs/plugin-vue": "^5.0.5",
-            "sass": "^1.77.6",
-            "terser": "^5.31.1",
-            "vite": "^5.3.1",
-        }, **packages),
+        packages = [
+            Label("@bzd_rules_nodejs_deps//:vitejsplugin-vue"),
+            Label("@bzd_rules_nodejs_deps//:sass"),
+            Label("@bzd_rules_nodejs_deps//:terser"),
+            Label("@bzd_rules_nodejs_deps//:vite"),
+        ] + packages,
         deps = deps,
     )
 

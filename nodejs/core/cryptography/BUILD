@@ -5,8 +5,8 @@ bzd_nodejs_library(
     srcs = [
         "bcrypt.mjs",
     ],
-    packages = {
-        "bcryptjs": "",
-    },
+    packages = [
+        "@nodejs_deps//:bcryptjs",
+    ],
     visibility = ["//visibility:public"],
 )

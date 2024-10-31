@@ -56,9 +56,23 @@ class Package:
 	version: Semver
 	integrity: str
 	dependencies: typing.Set["Package"]
+	alias: str = None
+
+	def makeAlias(self, alias: str) -> "Package":
+		"""Create a clone of this package that is an alias."""
+
+		return Package(
+		    name=self.name,
+		    version=self.version,
+		    integrity=self.integrity,
+		    dependencies=self.dependencies,
+		    alias=alias,
+		)
 
 	@property
 	def package(self) -> str:
+		if self.alias:
+			return f"{self.alias}@npm:{self.name}@{str(self.version)}"
 		return f"{self.name}@{str(self.version)}"
 
 	def __str__(self) -> str:
@@ -118,7 +132,7 @@ class RequirementsFactory:
 	def packagesParserV3(packageLock: Json) -> Packages:
 		"""Parse v3 of packages-lock.json."""
 
-		packagesByName: typing.Dict[str, typing.Dict[Package, typing.Dict[str, SemverMatcher]]] = {}
+		packagesByName: typing.Dict[str, typing.Dict[Package, typing.List[typing.Dict[str, typing.Any]]]] = {}
 		for path, data in packageLock["packages"].items():
 			name = path.split("node_modules/")[-1]
 			if not name:
@@ -128,18 +142,40 @@ class RequirementsFactory:
 			                  version=Semver.fromString(data["version"]),
 			                  integrity=data["integrity"],
 			                  dependencies=set())
-			packagesByName[name][package] = {k: SemverMatcher(v) for k, v in data.get("dependencies", {}).items()}
+			packagesByName[name][package] = []
+			# We take optional dependencies because of `rollup` which declares some of the things as optional.
+			# It is fine, be we should filter everything by platform/cpu as well.
+			dependencies = data.get("dependencies", {}) | data.get("optionalDependencies", {})
+			for alias, matchData in dependencies.items():
+				# Packages may have aliases in the form: case-1.5.3@npm:case@1.5.3
+				if matchData.startswith("npm:"):
+					packageName, constraint = matchData[4:].rsplit("@", maxsplit=1)
+					packagesByName[name][package].append({
+					    "alias": alias,
+					    "name": packageName,
+					    "matcher": SemverMatcher(constraint)
+					})
+				else:
+					packagesByName[name][package].append({
+					    "alias": None,
+					    "name": alias,
+					    "matcher": SemverMatcher(matchData)
+					})
 
 		# Resolve the dependencies.
 		packages = Packages()
 		for name, packageVersions in packagesByName.items():
 			for package, dependencies in packageVersions.items():
-				for dependency, versionMatcher in dependencies.items():
-					assert dependency in packagesByName, f"The dependency '{dependency}' from package '{package}' is not found."
-					versionsPackages = {p.version: p for p in packagesByName[dependency]}
-					maybeVersion = versionMatcher.matchLatest(versionsPackages.keys())
-					assert maybeVersion is not None, f"Couldn't find a matching version for {package} with {versionMatcher} and {versionsPackages.keys()}."
-					package.dependencies.add(versionsPackages[maybeVersion])
+				for dependency in dependencies:
+					assert dependency[
+					    "name"] in packagesByName, f"The dependency '{dependency['name']}' from package '{package}' is not found."
+					versionsPackages = {p.version: p for p in packagesByName[dependency["name"]].keys()}
+					maybeVersion = dependency["matcher"].matchLatest(versionsPackages.keys())
+					assert maybeVersion is not None, f"Couldn't find a matching version for '{dependency['name']}' with {dependency['matcher']} and {versionsPackages.keys()}."
+					if dependency["alias"]:
+						package.dependencies.add(versionsPackages[maybeVersion].makeAlias(alias=dependency["alias"]))
+					else:
+						package.dependencies.add(versionsPackages[maybeVersion])
 				packages.add(package)
 
 		return packages
@@ -194,7 +230,7 @@ class RequirementsFactory:
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Compile requiments into a deps lock file.")
-	parser.add_argument("--output", type=pathlib.Path, help="The output path for the generated file.", required=True)
+	parser.add_argument("--output", type=pathlib.Path, help="The output path for the generated file.")
 	parser.add_argument("--npm", type=pathlib.Path, help="The path of the pnpm tool.", required=True)
 	parser.add_argument("srcs", type=pathlib.Path, nargs="+", help="Requirement inputs.")
 
@@ -210,16 +246,20 @@ if __name__ == "__main__":
 		(pathlib.Path(tmpDirname) / "package.json").write_text(packageJson)
 
 		# Run npm to generate the dependency lock file.
-		localBazelBinary(str(args.npm), ["install", "--package-lock-only", "--prefix", tmpDirname, tmpDirname],
-		                 stdout=True,
-		                 stderr=True)
+		localBazelBinary(
+		    str(args.npm),
+		    ["install", "--silent", "--package-lock-only", "--include=optional", "--prefix", tmpDirname, tmpDirname],
+		    stdout=True,
+		    stderr=True)
 		packageLock = (pathlib.Path(tmpDirname) / "package-lock.json").read_text()
 
 	requimentsJson = RequirementsFactory(json.loads(packageLock))
 	result = requimentsJson.make(requirements)
 	serialized = json.dumps(result, indent=4)
 
-	[repoName, *path] = pathlib.Path(args.output).parts
-	output = pathlib.Path(os.environ["BUILD_WORKSPACE_DIRECTORY"]) / pathlib.Path(*path)
-
-	output.write_text(serialized)
+	if args.output:
+		[repoName, *path] = pathlib.Path(args.output).parts
+		output = pathlib.Path(os.environ["BUILD_WORKSPACE_DIRECTORY"]) / pathlib.Path(*path)
+		output.write_text(serialized)
+	else:
+		print(serialized)

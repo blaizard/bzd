@@ -3,10 +3,10 @@ load("//apps/dashboard/plugins:defs.bzl", "bzd_plugin")
 bzd_plugin(
     name = "sonos",
     backend_entry_point = "sonos_backend.mjs",
-    backend_packages = {
-        "chromecast-api": "",
-        "sonos": "",
-    },
+    backend_packages = [
+        "@nodejs_deps//:chromecast-api",
+        "@nodejs_deps//:sonos",
+    ],
     frontend_entry_point = "sonos_frontend.vue",
     frontend_srcs = [
         "sonos.svg",

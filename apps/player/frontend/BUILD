@@ -8,9 +8,9 @@ bzd_nodejs_web_binary(
     ]),
     config_scss = "//nodejs/styles:default.scss",
     main = "app.mjs",
-    packages = {
-        "highlight.js": "",
-    },
+    packages = [
+        "@nodejs_deps//:highlight.js",
+    ],
     visibility = [
         "//apps/player:__pkg__",
         "//apps/player/backend:__pkg__",

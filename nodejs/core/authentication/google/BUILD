@@ -21,9 +21,9 @@ bzd_nodejs_library(
         "server.mjs",
     ],
     apis = ["api.json"],
-    packages = {
-        "google-auth-library": "",
-    },
+    packages = [
+        "@nodejs_deps//:google-auth-library",
+    ],
     visibility = ["//visibility:public"],
     deps = [
         "//nodejs/core:script",

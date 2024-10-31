@@ -12,9 +12,9 @@ bzd_nodejs_web_binary(
     apis = ["//apps/artifacts:api.v1.json"],
     config_scss = "//nodejs/styles:default.scss",
     main = "app.mjs",
-    packages = {
-        "vue-async-computed": "",
-    },
+    packages = [
+        "@nodejs_deps//:vue-async-computed",
+    ],
     visibility = [
         "//apps/artifacts:__subpackages__",
     ],

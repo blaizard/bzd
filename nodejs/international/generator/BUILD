@@ -9,10 +9,10 @@ bzd_nodejs_binary(
         "flags/*.svg",
     ]),
     main = "generator.mjs",
-    packages = {
-        "jimp": "",
-        "svg2img": "",
-    },
+    packages = [
+        "@nodejs_deps//:jimp",
+        "@nodejs_deps//:svg2img",
+    ],
     # Somehow this fails from time to time in CI.
     tags = ["manual"],
 )

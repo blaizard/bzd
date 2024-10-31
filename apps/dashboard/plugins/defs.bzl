@@ -32,7 +32,7 @@ _bzd_plugin = rule(
     },
 )
 
-def bzd_plugin(name, metadata, frontend_entry_point = None, frontend_srcs = [], frontend_deps = [], frontend_packages = {}, backend_entry_point = None, backend_srcs = [], backend_deps = [], backend_packages = {}):
+def bzd_plugin(name, metadata, frontend_entry_point = None, frontend_srcs = [], frontend_deps = [], frontend_packages = [], backend_entry_point = None, backend_srcs = [], backend_deps = [], backend_packages = []):
     bzd_nodejs_library(
         name = "{}.frontend.library".format(name),
         srcs = frontend_srcs + [metadata] + ([frontend_entry_point] if frontend_entry_point else []),
