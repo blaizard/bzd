@@ -1,5 +1,5 @@
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
-load("@bzd_toolchain_cc_pip//:requirements.bzl", "requirement")
+load("@pip//:requirements.bzl", "requirement")
 
 py_binary(
     name = "esptool_binary",

@@ -19,4 +19,4 @@ requirements_nodejs.parse(
     name = "bzd_rules_nodejs_deps",
     requirements = "//nodejs/requirements:requirements.json",
 )
-use_repo(requirements_nodejs, "bzd_rules_nodejs_deps")
+use_repo(requirements_nodejs, nodejs_deps = "bzd_rules_nodejs_deps")

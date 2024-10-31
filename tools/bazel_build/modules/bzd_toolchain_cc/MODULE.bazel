@@ -16,4 +16,4 @@ pip.parse(
     python_version = "3.12",
     requirements_lock = "//:python/requirements.txt",
 )
-use_repo(pip, "bzd_toolchain_cc_pip")
+use_repo(pip, pip = "bzd_toolchain_cc_pip")

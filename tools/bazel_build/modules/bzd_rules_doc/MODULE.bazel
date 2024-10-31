@@ -12,4 +12,4 @@ pip.parse(
     python_version = "3.12",
     requirements_lock = "//doc:requirements.txt",
 )
-use_repo(pip, "bzd_rules_doc_pip")
+use_repo(pip, pip = "bzd_rules_doc_pip")

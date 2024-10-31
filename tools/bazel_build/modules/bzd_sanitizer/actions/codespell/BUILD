@@ -4,7 +4,7 @@ load("@rules_python//python/entry_points:py_console_script_binary.bzl", "py_cons
 
 py_console_script_binary(
     name = "codespell_binary",
-    pkg = "@bzd_sanitizer_pip//codespell",
+    pkg = "@pip//codespell",
     script = "codespell",
     visibility = ["//visibility:public"],
 )

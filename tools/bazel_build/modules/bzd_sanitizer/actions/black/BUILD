@@ -16,7 +16,7 @@ py_binary(
 
 py_console_script_binary(
     name = "black_binary",
-    pkg = "@bzd_sanitizer_pip//black",
+    pkg = "@pip//black",
     script = "black",
     tags = ["manual"],
     visibility = ["//visibility:public"],
