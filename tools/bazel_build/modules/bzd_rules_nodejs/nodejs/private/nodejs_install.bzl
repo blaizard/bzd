@@ -100,13 +100,6 @@ def bzd_nodejs_make_node_modules(ctx, packages, base_dir_name):
         content = json.encode_indent(package_json_content),
     )
 
-    args = ctx.actions.args()
-    args.add("--dir", package_json.dirname)
-    args.add("install")
-    args.add("-prod")
-    args.add("--ignore-scripts")
-    args.add("--offline")
-
     ctx.actions.run(
         inputs = depset([package_json] + overrides.values()),
         outputs = [node_modules],
