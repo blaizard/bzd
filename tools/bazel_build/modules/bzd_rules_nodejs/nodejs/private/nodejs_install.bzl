@@ -1,7 +1,8 @@
 """NodeJs install rule."""
 
 load("@bzd_package//:defs.bzl", "BzdPackageMetadataFragmentInfo")
-load("//nodejs:private/nodejs_library.bzl", "BzdNodeJsPackageInfo", "LIBRARY_ATTRS", "bzd_nodejs_library_get_provider")
+load("//nodejs:private/nodejs_library.bzl", "LIBRARY_ATTRS", "bzd_nodejs_library_get_provider")
+load("//nodejs:private/nodejs_package.bzl", "BzdNodeJsPackageInfo")
 
 # ---- Provider
 

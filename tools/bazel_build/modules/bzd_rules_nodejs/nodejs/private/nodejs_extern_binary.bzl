@@ -2,7 +2,7 @@
 
 load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
 load("//nodejs:private/nodejs_install.bzl", "bzd_nodejs_make_node_modules")
-load("//nodejs:private/nodejs_library.bzl", "BzdNodeJsPackageInfo")
+load("//nodejs:private/nodejs_package.bzl", "BzdNodeJsPackageInfo")
 
 def _bzd_nodejs_extern_binary_impl(ctx):
     _package_json, node_modules = bzd_nodejs_make_node_modules(ctx, ctx.attr.packages, base_dir_name = ctx.label.name + ".install")
