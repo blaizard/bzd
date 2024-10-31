@@ -66,7 +66,7 @@ interface MyFy {
 
 composition {
 	var1 = 12 + ab.int32;
-	regexpr1 = /12/-/da\.ds.*/;
+	regexpr1 = /12/-/da\\.ds.*/;
 }"""),
 		)
 

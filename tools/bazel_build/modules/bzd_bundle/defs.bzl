@@ -37,7 +37,7 @@ bzd_bundle = rule(
             doc = "The binnary target to bundle.",
         ),
         "_bundler": attr.label(
-            default = Label("@bzd_bundle//:bundler"),
+            default = Label("//:bundler"),
             cfg = "exec",
             executable = True,
         ),

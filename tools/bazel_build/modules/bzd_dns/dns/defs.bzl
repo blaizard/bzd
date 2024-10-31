@@ -45,7 +45,7 @@ bzd_dns_zones = rule(
             allow_files = [".json"],
         ),
         "_aggregator": attr.label(
-            default = Label("@bzd_dns//python/bzd_dns:aggregator"),
+            default = Label("//python/bzd_dns:aggregator"),
             cfg = "exec",
             executable = True,
         ),
@@ -99,12 +99,12 @@ bzd_dns_binary = rule(
             allow_files = [".json"],
         ),
         "_build": attr.label(
-            default = Label("@bzd_dns//python/bzd_dns:build"),
+            default = Label("//python/bzd_dns:build"),
             cfg = "exec",
             executable = True,
         ),
         "_octodns": attr.label(
-            default = Label("@bzd_dns//python/bzd_dns:octodns-sync"),
+            default = Label("//python/bzd_dns:octodns-sync"),
             cfg = "exec",
             executable = True,
         ),

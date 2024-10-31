@@ -1,4 +1,4 @@
-load("@bzd_platforms//:defs.bzl", "AL_CONSTRAINTS")
+load("//:defs.bzl", "AL_CONSTRAINTS")
 
 package(default_visibility = ["//visibility:public"])
 

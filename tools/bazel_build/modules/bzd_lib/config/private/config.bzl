@@ -198,7 +198,7 @@ def bzd_config_default(name, srcs = None, values = None, include_workspace_statu
 
     native.label_flag(
         name = name + ".file",
-        build_setting_default = "@bzd_lib//config:empty",
+        build_setting_default = Label("//config:empty"),
         visibility = ["//visibility:private"],
     )
 
