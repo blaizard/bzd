@@ -37,7 +37,7 @@ py_binary(
     ],
     visibility = ["//config:__subpackages__"],
     deps = [
-        "@bzd_lib//config:reader",
+        "//config:reader",
         "@bzd_python//bzd/template",
     ],
 )

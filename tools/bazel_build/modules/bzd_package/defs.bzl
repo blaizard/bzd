@@ -138,17 +138,17 @@ bzd_package = rule(
             doc = "Include the metadata as part of the package.",
         ),
         "_buildstamp": attr.label(
-            default = Label("@bzd_package//buildstamp:to_json"),
+            default = Label("//buildstamp:to_json"),
             cfg = "exec",
             executable = True,
         ),
         "_metadata": attr.label(
-            default = Label("@bzd_package//metadata"),
+            default = Label("//metadata"),
             cfg = "exec",
             executable = True,
         ),
         "_package": attr.label(
-            default = Label("@bzd_package//:package"),
+            default = Label("//:package"),
             cfg = "exec",
             executable = True,
         ),

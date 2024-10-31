@@ -34,7 +34,7 @@ bzd_embed = rule(
             doc = "The resulting embedable file.",
         ),
         "_embed": attr.label(
-            default = Label("@bzd_lib//embed:embed"),
+            default = Label("//embed:embed"),
             cfg = "exec",
             executable = True,
         ),

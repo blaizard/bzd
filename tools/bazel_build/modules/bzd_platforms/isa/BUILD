@@ -1,4 +1,4 @@
-load("@bzd_platforms//:defs.bzl", "ISA_CONSTRAINTS")
+load("//:defs.bzl", "ISA_CONSTRAINTS")
 
 package(default_visibility = ["//visibility:public"])
 

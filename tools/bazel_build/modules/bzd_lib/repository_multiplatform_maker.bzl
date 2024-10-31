@@ -1,7 +1,7 @@
 """Expose target from a multi-platform repository."""
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-load("@bzd_lib//:repository_maker.bzl", "repository_maker")
+load("//:repository_maker.bzl", "repository_maker")
 
 def _repository_multiplatform_maker_impl(repository_ctx):
     build_content = ""
