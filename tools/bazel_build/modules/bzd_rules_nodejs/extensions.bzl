@@ -47,7 +47,7 @@ platform(
 sh_binary_wrapper(
     name = "node",
     binary = "{node}",
-    command = "{{binary}}  --use-strict $@",
+    command = "{{binary}} --preserve-symlinks --preserve-symlinks-main --use-strict $@",
     visibility = ["//visibility:public"],
 )
 
