@@ -104,24 +104,28 @@ RUN echo "PS1=\\"(devcontainer) \$PS1\\"" >> {self.home}/.bashrc
 		elif status != "running":
 			print(f"Container in '{status}' state, spawning a clean instance.")
 			self.stop()
-			subprocess.run([
-			    "docker",
-			    "run",
-			    "--detach",
-			    "-it",
-			    "--name",
-			    self.imageName,
-			    "--hostname",
-			    self.imageName,
-			    "-v",
-			    f"{self.workspace}:{self.workspace}",
-			    "-v",
-			    f"{self.homeHost}/.bash_history:{self.home}/.bash_history",
-			    "--workdir",
-			    self.workspace,
-			    f"bzd/{self.imageName}",
-			],
-			               check=True)
+			subprocess.run(
+			    [
+			        "docker",
+			        "run",
+			        "--detach",
+			        "-it",
+			        "--name",
+			        self.imageName,
+			        "--hostname",
+			        self.imageName,
+			        "-v",
+			        f"{self.workspace}:{self.workspace}",
+			        "-v",
+			        f"{self.homeHost}/.bash_history:{self.home}/.bash_history",
+			        # To access bazel cache.
+			        "-v",
+			        f"{self.homeHost}/.cache:{self.homeHost}/.cache",
+			        "--workdir",
+			        self.workspace,
+			        f"bzd/{self.imageName}",
+			    ],
+			    check=True)
 
 		subprocess.run(["docker", "exec", "-it", self.imageName, "/bin/bash"])
 
