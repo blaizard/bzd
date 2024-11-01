@@ -1,5 +1,5 @@
 @vitejs/plugin-vue
-sass
+sass-embedded
 terser
 vite
 c8=^10.1.2

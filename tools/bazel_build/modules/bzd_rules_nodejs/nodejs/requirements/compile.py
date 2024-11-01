@@ -256,7 +256,7 @@ if __name__ == "__main__":
 
 	requimentsJson = RequirementsFactory(json.loads(packageLock))
 	result = requimentsJson.make(requirements)
-	serialized = json.dumps(result, indent=4)
+	serialized = json.dumps(result, sort_keys=True, indent=4)
 
 	if args.output:
 		[repoName, *path] = pathlib.Path(args.output).parts
