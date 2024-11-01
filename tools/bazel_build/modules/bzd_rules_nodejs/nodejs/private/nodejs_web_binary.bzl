@@ -181,7 +181,7 @@ def bzd_nodejs_web_binary(name, srcs = [], packages = [], deps = [], apis = [], 
         apis = apis,
         packages = [
             Label("@nodejs_deps//:vitejs-plugin-vue"),
-            Label("@nodejs_deps//:sass"),
+            Label("@nodejs_deps//:sass-embedded"),
             Label("@nodejs_deps//:terser"),
             Label("@nodejs_deps//:vite"),
         ] + packages,
