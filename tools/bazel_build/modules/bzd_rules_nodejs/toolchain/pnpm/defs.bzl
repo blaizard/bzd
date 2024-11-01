@@ -14,8 +14,8 @@ def pnpm_install(name):
             "files": {
                 "pnpm": {
                     "executable": True,
-                    "sha256": "7f8d71ff5d64cbb03a45b7ecb42b573a8fc40864327a028f93e2a37d893c172a",
-                    "url": "https://github.com/pnpm/pnpm/releases/download/v9.4.0/pnpm-linuxstatic-x64",
+                    "sha256": "",
+                    "url": "https://github.com/pnpm/pnpm/releases/download/v9.12.3/pnpm-linuxstatic-x64",
                 },
             },
             "platforms": [
@@ -27,7 +27,7 @@ def pnpm_install(name):
                 "pnpm": {
                     "executable": True,
                     "sha256": "",
-                    "url": "https://github.com/pnpm/pnpm/releases/download/v9.4.0/pnpm-linuxstatic-arm64",
+                    "url": "https://github.com/pnpm/pnpm/releases/download/v9.12.3/pnpm-linuxstatic-arm64",
                 },
             },
             "platforms": [

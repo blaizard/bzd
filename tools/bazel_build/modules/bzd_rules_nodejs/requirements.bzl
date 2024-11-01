@@ -16,6 +16,17 @@ def _execute(repository_ctx, args, environment = {}):
         fail("Unable to fetch {}: Error executing '{}': {}{}".format(repository_ctx.name, args, result.stdout, result.stderr))
     return result.stdout or result.stderr
 
+def _package_to_alias(package):
+    """Convert a package name into an alias.
+
+    For example, mocha@1.0 -> mocha@1.0
+    but momo@npm:mocha@1.0 -> momo
+    """
+
+    if "@npm:" in package:
+        return package.split("@npm:")[0]
+    return package
+
 def _requirement_repository_impl(repository_ctx):
     maybe_platform = get_repository_platform(repository_ctx)
     node_path = repository_ctx.path(node_binary[maybe_platform])
@@ -33,7 +44,7 @@ def _requirement_repository_impl(repository_ctx):
         integrity_actual = npm_data["integrity"]
         if integrity_expected and integrity_expected != integrity_actual:
             fail("The package '{}' doesn't have the expected integrity '{}' vs '{}'.".format(package, integrity_expected, integrity_actual))
-        packages_to_filename[package] = npm_data["filename"]
+        packages_to_filename[_package_to_alias(package)] = npm_data["filename"]
 
     repository_ctx.file(
         "BUILD",
