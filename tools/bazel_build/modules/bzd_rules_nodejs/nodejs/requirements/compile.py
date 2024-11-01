@@ -248,7 +248,8 @@ if __name__ == "__main__":
 		# Run npm to generate the dependency lock file.
 		localBazelBinary(
 		    str(args.npm),
-		    ["install", "--silent", "--package-lock-only", "--include=optional", "--prefix", tmpDirname, tmpDirname],
+		    # --slient seem to make the command hang sometimes.
+		    ["install", "--quiet", "--package-lock-only", "--include=optional", "--prefix", tmpDirname, tmpDirname],
 		    stdout=True,
 		    stderr=True)
 		packageLock = (pathlib.Path(tmpDirname) / "package-lock.json").read_text()
