@@ -1,11 +1,11 @@
 """Create a wrapper for crane binary."""
 
 def _bzd_crane_binary_impl(ctx):
-    toolchain = ctx.toolchains["@rules_oci//oci:registry_toolchain_type"]
+    toolchain = ctx.toolchains["@rules_oci//oci:crane_toolchain_type"]
     executable = ctx.actions.declare_file(ctx.label.name)
     ctx.actions.symlink(
         output = executable,
-        target_file = toolchain.registry_info.registry,
+        target_file = toolchain.crane_info.binary,
         is_executable = True,
     )
 
@@ -19,7 +19,7 @@ bzd_crane_binary = rule(
     implementation = _bzd_crane_binary_impl,
     provides = [DefaultInfo],
     toolchains = [
-        "@rules_oci//oci:registry_toolchain_type",
+        "@rules_oci//oci:crane_toolchain_type",
     ],
     executable = True,
 )
