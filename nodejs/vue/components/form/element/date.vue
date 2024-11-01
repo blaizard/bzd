@@ -240,5 +240,5 @@
 </script>
 
 <style lang="scss">
-	@use "#bzd/nodejs/styles/default/css/form/date.scss" as *;
+	@use "@/nodejs/styles/default/css/form/date.scss" as *;
 </style>

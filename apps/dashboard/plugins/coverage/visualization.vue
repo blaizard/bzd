@@ -65,7 +65,7 @@
 </script>
 
 <style lang="scss">
-	@use "#bzd/nodejs/icons.scss" as icons with (
+	@use "@/nodejs/icons.scss" as icons with (
 		$bzdIconNames: link
 	);
 

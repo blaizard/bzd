@@ -169,7 +169,7 @@
 <style lang="scss">
 	// ---- Configuration
 	@use "sass:math";
-	@use "#bzd/config.scss" as config;
+	@use "@/config.scss" as config;
 
 	// Global
 
@@ -190,8 +190,8 @@
 
 	// ----
 
-	@use "#bzd/nodejs/styles/default/css/clickable.scss" as *;
-	@use "#bzd/nodejs/icons.scss" as * with (
+	@use "@/nodejs/styles/default/css/clickable.scss" as *;
+	@use "@/nodejs/icons.scss" as * with (
 		$bzdIconNames: menu dock_on dock_off close
 	);
 

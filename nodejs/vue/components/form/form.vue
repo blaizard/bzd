@@ -257,5 +257,5 @@
 </script>
 
 <style lang="scss">
-	@use "#bzd/nodejs/styles/default/css/form/layout.scss" as *;
+	@use "@/nodejs/styles/default/css/form/layout.scss" as *;
 </style>

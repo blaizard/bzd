@@ -3,7 +3,7 @@
 </script>
 
 <style lang="scss">
-	@use "#bzd/nodejs/icons.scss" as icons;
+	@use "@/nodejs/icons.scss" as icons;
 
 	.bzd-icon-jenkins {
 		@include icons.defineIcon("jenkins.svg");

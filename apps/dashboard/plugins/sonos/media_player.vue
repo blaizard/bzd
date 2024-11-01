@@ -93,7 +93,7 @@
 </script>
 
 <style lang="scss">
-	@use "#bzd/nodejs/icons.scss" as * with (
+	@use "@/nodejs/icons.scss" as * with (
 		$bzdIconNames: play pause stop next previous
 	);
 

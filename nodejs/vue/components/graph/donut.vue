@@ -90,5 +90,5 @@
 </script>
 
 <style lang="scss">
-	@use "#bzd/nodejs/styles/default/css/graph/donut.scss" as *;
+	@use "@/nodejs/styles/default/css/graph/donut.scss" as *;
 </style>

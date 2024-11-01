@@ -51,5 +51,5 @@
 </script>
 
 <style lang="scss">
-	@use "#bzd/nodejs/styles/default/css/form/autocomplete.scss" as *;
+	@use "@/nodejs/styles/default/css/form/autocomplete.scss" as *;
 </style>

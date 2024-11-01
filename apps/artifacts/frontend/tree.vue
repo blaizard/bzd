@@ -154,14 +154,14 @@
 </script>
 
 <style lang="scss">
-	@use "#bzd/nodejs/icons.scss" as icons with (
+	@use "@/nodejs/icons.scss" as icons with (
 		$bzdIconNames: configuration folder
 	);
 </style>
 
 <style lang="scss" scoped>
 	@use "sass:math";
-	@use "#bzd/config.scss" as config;
+	@use "@/config.scss" as config;
 
 	$indent: 20;
 	$arrowSize: 5;

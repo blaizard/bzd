@@ -1,4 +1,4 @@
-@use "#bzd/config.scss" as config;
+@use "@/config.scss" as config;
 
 .bzd-loading {
 	background-color: rgba(config.$bzdGraphColorWhite, 0.5);

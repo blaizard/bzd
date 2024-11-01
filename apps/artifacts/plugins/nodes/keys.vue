@@ -51,7 +51,7 @@
 </script>
 
 <style lang="scss" scoped>
-	@use "#bzd/config.scss" as config;
+	@use "@/config.scss" as config;
 
 	$indent: 20;
 

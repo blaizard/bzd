@@ -1,6 +1,6 @@
 @use "sass:math";
-@use "#bzd/nodejs/styles/default/css/form/config.scss" as base;
-@use "#bzd/nodejs/styles/default/css/form/input.scss" as *;
+@use "@/nodejs/styles/default/css/form/config.scss" as base;
+@use "@/nodejs/styles/default/css/form/input.scss" as *;
 
 $triangleHeight: math.div(base.$fieldHeight, 5);
 

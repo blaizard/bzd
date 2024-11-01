@@ -10,8 +10,8 @@
 // ---- Configuration ----
 
 @use "sass:math";
-@use "#bzd/config.scss" as config;
-@forward "#bzd/config.scss";
+@use "@/config.scss" as config;
+@forward "@/config.scss";
 
 @mixin irform-border {
 	border: #{config.$fieldBorderThickness}px solid config.$fieldBorderColor;
