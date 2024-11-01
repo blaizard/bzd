@@ -4,25 +4,17 @@ load("@rules_oci//oci:pull.bzl", "oci_pull")
 load("//:private/images.bzl", "IMAGES")
 
 def _images_repository_impl(repository_ctx):
-    build_content = """load("@rules_oci//oci:defs.bzl", "oci_tarball")
-"""
-    for name, data in IMAGES.items():
+    build_content = ""
+
+    for name in IMAGES.keys():
         build_content += """
 alias(
     name = "{name}",
     actual = "@{name}//:{name}",
     visibility = ["//visibility:public"],
 )
-
-oci_tarball(
-    name = "{name}.pull",
-    image = ":{name}",
-    repo_tags = ["{image}:{tag}"],
-)
 """.format(
             name = name,
-            tag = data.tag,
-            image = "/".join(data.image.split("/")[1:]),
         )
 
     repository_ctx.file(
@@ -41,8 +33,7 @@ def _images_impl(module_ctx):
     for name, data in IMAGES.items():
         oci_pull(
             name = name,
-            image = data.image,
-            digest = data.digest,
+            **data
         )
 
     for mod in module_ctx.modules:

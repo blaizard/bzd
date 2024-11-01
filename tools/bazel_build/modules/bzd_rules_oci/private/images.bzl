@@ -1,29 +1,27 @@
 """Docker images."""
 
 IMAGES = {
-    "bridge": struct(
-        digest = "sha256:3ae86fc21f2a6e5b1b7d26018bdecc8f1801919d7c23d56e93c9311c6a051d40",
-        image = "index.docker.io/blaizard/bridge",
-        tag = "latest",
-    ),
-    "compiler_explorer": struct(
-        digest = "sha256:d61369a460589987fa292f7a083720c4057e4b3170cc08e265c6b5cfc6c2eb50",
-        image = "index.docker.io/blaizard/compiler_explorer",
-        tag = "latest",
-    ),
-    "nodejs": struct(
-        digest = "sha256:254989045b0555ee411cd8fe7bd8e3ae306fef34b4c9d5dfd020bdda86cdad97",
-        image = "index.docker.io/library/node",
-        tag = "20-alpine",
-    ),
-    "nodejs_puppeteer": struct(
-        digest = "sha256:68c92c4b27229e1a3ab27e359fb5474a6edc8cfb572e9b2d46fefc230ead7f65",
-        image = "index.docker.io/blaizard/nodejs_puppeteer",
-        tag = "latest",
-    ),
-    "xtensa_qemu": struct(
-        digest = "sha256:c6060b4cfba287f7ca7cb0290d27a8b5f6884d34c744742b5fc9672ed02a81dc",
-        image = "index.docker.io/blaizard/xtensa_qemu",
-        tag = "latest",
-    ),
+    "bridge": {
+        "digest": "sha256:3ae86fc21f2a6e5b1b7d26018bdecc8f1801919d7c23d56e93c9311c6a051d40",
+        "image": "index.docker.io/blaizard/bridge",
+    },
+    "compiler_explorer": {
+        "digest": "sha256:d61369a460589987fa292f7a083720c4057e4b3170cc08e265c6b5cfc6c2eb50",
+        "image": "index.docker.io/blaizard/compiler_explorer",
+    },
+    "nodejs": {
+        "digest": "sha256:1467ea23cce893347696b155b9e00e7f0ac7d21555eb6f27236f1328212e045e",  # 23-alpine
+        "image": "index.docker.io/library/node",
+        "platforms": [
+            "linux/amd64",
+        ],
+    },
+    "nodejs_puppeteer": {
+        "digest": "sha256:68c92c4b27229e1a3ab27e359fb5474a6edc8cfb572e9b2d46fefc230ead7f65",
+        "image": "index.docker.io/blaizard/nodejs_puppeteer",
+    },
+    "xtensa_qemu": {
+        "digest": "sha256:c6060b4cfba287f7ca7cb0290d27a8b5f6884d34c744742b5fc9672ed02a81dc",
+        "image": "index.docker.io/blaizard/xtensa_qemu",
+    },
 }
