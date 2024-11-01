@@ -1,7 +1,7 @@
 import Stripe from "#bzd/nodejs/payment/stripe/webhook.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
-import testDataInvoicePaymentSucceeded1 from "#bzd/nodejs/payment/stripe/tests/invoice.payment_succeeded.json" assert { type: "json" };
-import testDataCustomerSubscriptionDeleted1 from "#bzd/nodejs/payment/stripe/tests/customer.subscription.deleted.json" assert { type: "json" };
+import testDataInvoicePaymentSucceeded1 from "#bzd/nodejs/payment/stripe/tests/invoice.payment_succeeded.json" with { type: "json" };
+import testDataCustomerSubscriptionDeleted1 from "#bzd/nodejs/payment/stripe/tests/customer.subscription.deleted.json" with { type: "json" };
 
 const Exception = ExceptionFactory("test", "stripe");
 

@@ -10,7 +10,7 @@ import Path from "path";
 import { Readable } from "stream";
 import { WebSocketServer } from "ws";
 
-import APIv1 from "#bzd/apps/player/api.v1.json" assert { type: "json" };
+import APIv1 from "#bzd/apps/player/api.v1.json" with { type: "json" };
 import Scenario from "#bzd/apps/player/lib/scenario.mjs";
 
 import Terminal from "#bzd/apps/player/backend/terminal.mjs";

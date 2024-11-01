@@ -1,4 +1,4 @@
-import config from "#bzd/apps/artifacts/api/config.json" assert { type: "json" };
+import config from "#bzd/apps/artifacts/api/config.json" with { type: "json" };
 import HttpClient from "#bzd/nodejs/core/http/client.mjs";
 import { CollectionPaging } from "#bzd/nodejs/db/utils.mjs";
 

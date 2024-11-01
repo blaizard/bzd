@@ -1,7 +1,7 @@
 import { program } from "commander";
 
 import RestServer from "#bzd/nodejs/core/rest/server.mjs";
-import APIv1 from "#bzd/api.json" assert { type: "json" };
+import APIv1 from "#bzd/api.json" with { type: "json" };
 import kvsMakeFromConfig from "#bzd/nodejs/db/key_value_store/make_from_config.mjs";
 import emailMakeFromConfig from "#bzd/nodejs/email/make_from_config.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
@@ -16,8 +16,8 @@ import Users from "#bzd/apps/accounts/backend/users/users.mjs";
 import Applications from "#bzd/apps/accounts/backend/applications/applications.mjs";
 import TokenInfo from "#bzd/apps/accounts/backend/users/token.mjs";
 import TestData from "#bzd/apps/accounts/backend/tests/test_data.mjs";
-import config from "#bzd/apps/accounts/config.json" assert { type: "json" };
-import configBackend from "#bzd/apps/accounts/backend/config.json" assert { type: "json" };
+import config from "#bzd/apps/accounts/config.json" with { type: "json" };
+import configBackend from "#bzd/apps/accounts/backend/config.json" with { type: "json" };
 import MemoryLogger from "#bzd/apps/accounts/backend/logger/memory/memory.mjs";
 import paymentMakeFromConfig from "#bzd/nodejs/payment/make_from_config.mjs";
 import EmailManager from "#bzd/apps/accounts/backend/email/manager.mjs";

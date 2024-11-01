@@ -4,9 +4,9 @@ import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import HttpServer from "#bzd/nodejs/core/http/server.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import { Command } from "commander/esm.mjs";
-import config from "#bzd/apps/dashboard/backend/config.json" assert { type: "json" };
+import config from "#bzd/apps/dashboard/backend/config.json" with { type: "json" };
 import { makeUid } from "#bzd/nodejs/utils/uid.mjs";
-import APIv1 from "#bzd/apps/dashboard/api.v1.json" assert { type: "json" };
+import APIv1 from "#bzd/apps/dashboard/api.v1.json" with { type: "json" };
 import Plugins from "#bzd/apps/dashboard/plugins/plugins.backend.index.mjs";
 
 const Exception = ExceptionFactory("backend");
