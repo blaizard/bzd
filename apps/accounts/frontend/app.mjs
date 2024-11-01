@@ -2,7 +2,7 @@ import { createApp } from "vue";
 
 import App from "#bzd/apps/accounts/frontend/app.vue";
 import RestPlugin from "#bzd/nodejs/vue/rest.mjs";
-import APIv1 from "#bzd/api.json" assert { type: "json" };
+import APIv1 from "#bzd/api.json" with { type: "json" };
 import RouterPlugin from "#bzd/nodejs/vue/router/router.mjs";
 import LangPlugin from "#bzd/nodejs/vue/lang.mjs";
 import Authentication from "#bzd/nodejs/core/authentication/token/client.mjs";
@@ -10,7 +10,7 @@ import AuthenticationGoogle from "#bzd/nodejs/core/authentication/google/client.
 import AuthenticationFacebook from "#bzd/nodejs/core/authentication/facebook/client.mjs";
 import AuthenticationPlugin from "#bzd/nodejs/vue/authentication.mjs";
 import Notification from "#bzd/nodejs/vue/notification.mjs";
-import config from "#bzd/apps/accounts/config.json" assert { type: "json" };
+import config from "#bzd/apps/accounts/config.json" with { type: "json" };
 
 const app = createApp(App);
 

@@ -1,6 +1,6 @@
 import SessionAuthenticationServer from "#bzd/nodejs/core/authentication/session/server.mjs";
 import RestClient from "#bzd/nodejs/core/rest/client.mjs";
-import APISchemaRemote from "#bzd/nodejs/core/authentication/session/api.json" assert { type: "json" };
+import APISchemaRemote from "#bzd/nodejs/core/authentication/session/api.json" with { type: "json" };
 import { HttpClientException } from "#bzd/nodejs/core/http/client.mjs";
 import ExceptionFactory from "../../exception.mjs";
 import LogFactory from "../../log.mjs";

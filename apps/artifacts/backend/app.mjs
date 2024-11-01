@@ -12,10 +12,10 @@ import ServiceProvider from "#bzd/nodejs/core/services/provider.mjs";
 import EndpointsFactory from "#bzd/apps/artifacts/backend/endpoints_factory.mjs";
 import Authentication from "#bzd/apps/accounts/authentication/server.mjs";
 import Plugin from "#bzd/apps/artifacts/backend/plugin.mjs";
-import APIv1 from "#bzd/api.json" assert { type: "json" };
+import APIv1 from "#bzd/api.json" with { type: "json" };
 import Plugins from "#bzd/apps/artifacts/plugins/backend.mjs";
-import config from "#bzd/apps/artifacts/backend/config.json" assert { type: "json" };
-import configGlobal from "#bzd/apps/artifacts/config.json" assert { type: "json" };
+import config from "#bzd/apps/artifacts/backend/config.json" with { type: "json" };
+import configGlobal from "#bzd/apps/artifacts/config.json" with { type: "json" };
 
 const Log = LogFactory("backend");
 const Exception = ExceptionFactory("backend");

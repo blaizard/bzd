@@ -8,9 +8,9 @@ import Router from "#bzd/nodejs/vue/router/router.mjs";
 import AsyncComputed from "vue-async-computed";
 import Authentication from "#bzd/apps/accounts/authentication/client.mjs";
 import AuthenticationPlugin from "#bzd/nodejs/vue/authentication.mjs";
-import configGlobal from "#bzd/apps/artifacts/config.json" assert { type: "json" };
+import configGlobal from "#bzd/apps/artifacts/config.json" with { type: "json" };
 
-import APIv1 from "#bzd/api.json" assert { type: "json" };
+import APIv1 from "#bzd/api.json" with { type: "json" };
 
 import App from "./app.vue";
 
