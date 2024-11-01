@@ -11,7 +11,6 @@ export default defineConfig({
 	root: root,
 	resolve: {
 		alias: {
-			"#bzd": root,
 			"@": root,
 		},
 		preserveSymlinks: true,
@@ -33,9 +32,7 @@ export default defineConfig({
 	css: {
 		preprocessorOptions: {
 			scss: {
-				// TODO: this should be changed to "modern-compiler" or "modern",
-				// see: https://sass-lang.com/documentation/breaking-changes/legacy-js-api/#bundlers
-				api: "legacy",
+				api: "modern-compiler",
 			},
 		},
 	},
