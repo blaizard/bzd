@@ -1,4 +1,4 @@
-load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_extern_binary")
+load("//nodejs:defs.bzl", "bzd_nodejs_extern_binary")
 
 bzd_nodejs_extern_binary(
     name = "c8",

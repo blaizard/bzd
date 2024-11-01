@@ -5,7 +5,7 @@ load("@bzd_platforms//:defs.bzl", "get_repository_platform")
 load("@node//:defs.bzl", "node_binary", "npm_binary")
 
 def _sanitize_repository_name(name):
-    return name.replace("@", "").replace("/", "")
+    return "".join([c if c.isalnum() else "-" for c in name.elems()]).strip("-")
 
 def _execute(repository_ctx, args, environment = {}):
     result = repository_ctx.execute(
@@ -86,6 +86,7 @@ def _requirements_nodejs_impl(module_ctx):
                 requirements[parse.name] = []
             requirements[parse.name].append(parse.requirements)
 
+    already_generated = {}
     for name, data in requirements.items():
         # Merge all requirements into one.
         merged_requirements = dict()
@@ -98,19 +99,24 @@ def _requirements_nodejs_impl(module_ctx):
 
         # Create repositories for each requirement.
         for requirement_name, packages in merged_requirements.items():
-            repository_name = _sanitize_repository_name(requirement_name)
-            requirement_repository(
-                name = repository_name,
-                package = packages["name"],
-                version = packages["version"],
-                packages = packages["dependencies"],
-            )
+            repository_name = _sanitize_repository_name("package_{}_{}".format(packages["name"], packages["version"]))
+            if not repository_name in already_generated:
+                requirement_repository(
+                    name = repository_name,
+                    package = packages["name"],
+                    version = packages["version"],
+                    packages = packages["dependencies"],
+                )
+            already_generated[repository_name] = True
             build_file += """alias(
-    name = "{repository_name}",
+    name = "{alias_name}",
     actual = "@{repository_name}//:package",
     visibility = ["//visibility:public"],
 )
-""".format(repository_name = repository_name)
+""".format(
+                alias_name = _sanitize_repository_name(requirement_name),
+                repository_name = repository_name,
+            )
 
         repository_maker(
             name = name,
