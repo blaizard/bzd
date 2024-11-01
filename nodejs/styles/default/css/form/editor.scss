@@ -1,5 +1,5 @@
-@use "#bzd/nodejs/styles/default/css/form/config.scss" as base;
-@use "#bzd/nodejs/icons.scss" as * with (
+@use "@/nodejs/styles/default/css/form/config.scss" as base;
+@use "@/nodejs/icons.scss" as * with (
 	$bzdIconNames: bold italic underline strike_through undo justify_left justify_center justify_right justify indent
 		unindent ordered_list unordered_list quote clear_format
 );

@@ -65,5 +65,5 @@
 </script>
 
 <style lang="scss">
-	@use "#bzd/nodejs/styles/default/css/form/textarea.scss" as *;
+	@use "@/nodejs/styles/default/css/form/textarea.scss" as *;
 </style>

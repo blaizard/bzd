@@ -96,11 +96,11 @@
 </script>
 
 <style lang="scss">
-	@use "#bzd/nodejs/styles/default/css/base.scss" as *;
-	@use "#bzd/nodejs/styles/default/css/tooltip.scss" as *;
-	@use "#bzd/nodejs/styles/default/css/loading.scss" as *;
+	@use "@/nodejs/styles/default/css/base.scss" as *;
+	@use "@/nodejs/styles/default/css/tooltip.scss" as *;
+	@use "@/nodejs/styles/default/css/loading.scss" as *;
 
-	@use "#bzd/nodejs/icons.scss" as icons with (
+	@use "@/nodejs/icons.scss" as icons with (
 		$bzdIconNames: add tile user close user
 	);
 

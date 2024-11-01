@@ -248,8 +248,8 @@
 </script>
 
 <style lang="scss" scoped>
-	@use "#bzd/nodejs/styles/default/css/clickable.scss" as *;
-	@use "#bzd/config.scss" as config;
+	@use "@/nodejs/styles/default/css/clickable.scss" as *;
+	@use "@/config.scss" as config;
 
 	$bzdPadding: 10px;
 

@@ -247,7 +247,7 @@
 </script>
 
 <style lang="scss">
-	@use "#bzd/nodejs/icons.scss" as icons with (
+	@use "@/nodejs/icons.scss" as icons with (
 		$bzdIconNames: status_success status_failure status_in_progress status_abort clock
 	);
 

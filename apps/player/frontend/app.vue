@@ -359,7 +359,7 @@
 </script>
 
 <style lang="scss">
-	@use "#bzd/config.scss" as config;
+	@use "@/config.scss" as config;
 
 	* {
 		box-sizing: border-box;
@@ -402,7 +402,7 @@
 </style>
 
 <style lang="scss" scoped>
-	@use "#bzd/config.scss" as config;
+	@use "@/config.scss" as config;
 
 	$selectionWidth: 3;
 

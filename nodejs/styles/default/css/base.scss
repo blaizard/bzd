@@ -1,6 +1,6 @@
-@use "#bzd/nodejs/styles/default/css/normalize.scss" as *;
-@use "#bzd/nodejs/styles/default/css/clickable.scss" as *;
-@use "#bzd/config.scss" as config;
+@use "@/nodejs/styles/default/css/normalize.scss" as *;
+@use "@/nodejs/styles/default/css/clickable.scss" as *;
+@use "@/config.scss" as config;
 @use "sass:color";
 
 body {
