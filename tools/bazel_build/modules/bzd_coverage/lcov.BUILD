@@ -1,7 +1,7 @@
 sh_binary(
     name = "genhtml",
     srcs = [
-        "bin/genhtml",
+        "bin/genhtml"
     ],
     visibility = ["//visibility:public"],
 )

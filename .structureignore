@@ -1,6 +1,6 @@
 **BUILD
 **/*.BUILD
-**WORKSPACE
+**WORKSPACE.bazel
 **README.md
 **LICENSE.md
 **Jenkinsfile
