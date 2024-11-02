@@ -30,49 +30,100 @@ class Config:
 					keys.add(f"{key}.{nestedKeys}")
 		return keys
 
-	def setValue(self, key: str, value: typing.Any) -> None:
+	def overrideValue(self, key: str, value: typing.Any, source: str) -> None:
 		"""Set a specific value in the configuration."""
 
-		if key not in self.keys:
-			self.fatal(f"The key '{key}' manually set is not present in the base configuration.")
+		try:
+			assert key in self.keys, f"The key '{key}' is not present in the base configuration."
 
-		segments = key.split(".")
-		current = self.data
-		for segment in segments[:-1]:
-			current = current[segment]
-		current[segments[-1]] = value
+			segments = key.split(".")
+			current = self.data
+			for segment in segments[:-1]:
+				current = current[segment]
+			previousValue = current[segments[-1]]
+
+			# If the override is a list, the original value MUST be a list.
+			if isinstance(value, list):
+				assert isinstance(
+				    previousValue, list
+				), f"Trying to assign a value of type 'list' to the key '{key}' that is not a list but a '{type(previousValue)}'."
+
+			# If the original value is a list, adjust the override to be a list.
+			if isinstance(previousValue, list):
+				if not isinstance(value, list):
+					value = [value]
+
+			current[segments[-1]] = value
+
+		except AssertionError as e:
+			self.fatal(f"[{source}] {str(e)}")
+
+	def override(self, *overrides: "ConfigOverride") -> None:
+		"""Override multiple config."""
+
+		# Merge all config together and check for conflicts
+		data: typing.Dict[str, typing.Tuple[str, typing.Any]] = {}
+		for override in overrides:
+			for key, value in override.data.items():
+				if key in data:
+					fatal(f"The key '{key}' is manually set twice by '{data[key][0]}' and '{override.source}'.")
+
+				# Check there are conflict between parent/child keys. For example, setting `kvs.hello`` and `kvs.hello.world`.
+				for existingKey in data.keys():
+					if f"{key}." in existingKey:
+						fatal(
+						    f"Cannot set a key '{key}' (from '{override.source}') and a nested key '{existingKey}' (from '{data[key][0]}') at the same time."
+						)
+					if f"{existingKey}." in key:
+						fatal(
+						    f"Cannot set a key '{existingKey}' (from '{data[key][0]}') and a nested key '{key}' (from '{override.source}') at the same time."
+						)
+
+				data[key] = (
+				    override.source,
+				    value,
+				)
+
+		# Set the values.
+		for key, value in data.items():
+			config.overrideValue(key, value[1], value[0])
 
 	def fatal(self, message: str) -> None:
 		"""Error message."""
 
-		print(message, file=sys.stderr)
-		print("Available configuration keys are:", file=sys.stderr)
+		content: typing.List[str] = []
+		content.append(message)
+		content.append("Available configuration keys are:")
 		for key in sorted(self.keys):
-			print(f"  - {key}", file=sys.stderr)
-		sys.exit(1)
+			content.append(f"  - {key}")
+		fatal("\n".join(content))
 
 
-class ConfigValues:
+class ConfigOverride:
 
-	def __init__(self) -> None:
+	def __init__(self, source: str) -> None:
+		self.source = source
 		self.data: typing.Dict[str, typing.Any] = {}
 
 	def add(self, key: str, value: typing.Dict[str, typing.Any]) -> None:
+		# Create a list if the data is set multiple times.
 		if key in self.data:
-			fatal(f"The key '{key}' is manually set twice.")
+			if not isinstance(self.data[key], list):
+				self.data[key] = [self.data[key]]
+			self.data[key].append(value)
 
-		# Check there are conflict between parent/child keys. For example, setting `kvs.hello`` and `kvs.hello.world`.
-		for existingKey in self.data.keys():
-			if f"{key}." in existingKey:
-				fatal(f"Cannot set a key '{key}' and a nested key '{existingKey}' at the same time.")
-			if f"{existingKey}." in key:
-				fatal(f"Cannot set a key '{existingKey}' and a nested key '{key}' at the same time.")
-
-		self.data[key] = value
+		# Otherwise just assign it.
+		else:
+			self.data[key] = value
 
 	def apply(self, config: Config) -> None:
 		for key, value in self.data.items():
-			config.setValue(key, value)
+			config.overrideValue(key, value, self.source)
+
+	def fatal(self, message: str) -> None:
+		"""Error message."""
+
+		fatal(f"{self.source} {message}")
 
 
 if __name__ == "__main__":
@@ -139,21 +190,25 @@ if __name__ == "__main__":
 			fatal(f"The key {e} from '{f}' was already defined by another base configuration.")
 
 	config = Config(output)
-	values = ConfigValues()
+	overrides: typing.List[ConfigOverride] = []
 
 	# Apply the files.
 	for f in args.files:
+		override = ConfigOverride(str(f))
 		data = json.loads(f.read_text())
 		for key, value in data.items():
-			values.add(key, value)
+			override.add(key, value)
+		overrides.append(override)
 
 	# Apply the key value pairs.
+	override = ConfigOverride("command line")
 	for keyValue in args.sets:
 		key, value = keyValue.strip().split("=", 1)
-		values.add(key, value)
+		override.add(key, value)
+	overrides.append(override)
 
 	# Process the values
-	values.apply(config)
+	config.override(*overrides)
 
 	outputJson = json.dumps(output, indent=4)
 
