@@ -20,46 +20,52 @@ jobs:
                   export PATH="${PATH}:${GITHUB_WORKSPACE}/bin"
                   ./info.sh
 
+            - name: "Build Tools"
+              run: |
+                  mkdir bin
+                  ./tools/bazel build //tools/ci:timeit
+                  cp bazel-bin/tools/ci/timeit bin/timeit
+
             - name: "[normal] static analysis"
               run: |
                   ./tools/bazel clean --expunge
-                  ./tools/bazel run apps/artifacts/api/python/node:binary -- --uid ci --path github/static_analysis timeit \
+                  ./bin/timeit --path github/static_analysis \
                   ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=dev --config=clang-tidy --config=mypy --platform_suffix=static_analysis
 
             - name: "[normal] clang prod"
               run: |
                   ./tools/bazel clean --expunge
-                  ./tools/bazel run apps/artifacts/api/python/node:binary -- --uid ci --path github/clang_prod timeit \
+                  ./bin/timeit --path github/clang_prod \
                   ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=clang --config=prod --config=cc --platform_suffix=clang-prod
 
             - name: "[normal] gcc prod"
               run: |
                   ./tools/bazel clean --expunge
-                  ./tools/bazel run apps/artifacts/api/python/node:binary -- --uid ci --path github/gcc_prod timeit \
+                  ./bin/timeit --path github/gcc_prod \
                   ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=gcc --config=prod --config=cc --platform_suffix=gcc-prod
 
             - name: "[normal] esp32 prod"
               run: |
                   ./tools/bazel clean --expunge
-                  ./tools/bazel run apps/artifacts/api/python/node:binary -- --uid ci --path github/esp32_prod timeit \
+                  ./bin/timeit --path github/esp32_prod \
                   ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=esp32 --config=prod --config=cc --platform_suffix=esp32-prod
 
             - name: "[sanitizer] asan/lsan/ubsan"
               run: |
                   ./tools/bazel clean --expunge
-                  ./tools/bazel run apps/artifacts/api/python/node:binary -- --uid ci --path github/asan_lsan_ubsan timeit \
+                  ./bin/timeit --path github/asan_lsan_ubsan \
                   ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --config=clang --config=cc --config=sanitizer --config=asan --config=lsan --config=ubsan --platform_suffix=clang-asan-lsan-ubsan
 
             - name: "[sanitizer] tsan"
               run: |
                   ./tools/bazel clean --expunge
-                  ./tools/bazel run apps/artifacts/api/python/node:binary -- --uid ci --path github/tsan timeit \
+                  ./bin/timeit --path github/tsan \
                   ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --config=clang --config=cc --config=sanitizer --config=tsan --platform_suffix=clang-tsan
 
             - name: "[sanitizer] sanitizer"
               run: |
                   ./tools/bazel clean --expunge
-                  ./tools/bazel run apps/artifacts/api/python/node:binary -- --uid ci --path github/sanitizer timeit \
+                  ./bin/timeit --path github/sanitizer \
                   ./tools/bazel run :sanitizer -- --check --all
 
             - name: Build documentation

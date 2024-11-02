@@ -8,5 +8,6 @@ bzd_config_default(
     visibility = [
         "//apps/artifacts/api:__subpackages__",
         "//deployment:__subpackages__",
+        "//tools/ci:__subpackages__",
     ],
 )

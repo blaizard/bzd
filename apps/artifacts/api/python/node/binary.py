@@ -26,7 +26,7 @@ def cleanPathToList(data: str) -> typing.List[str]:
 def publish(node: Node, args: argparse.Namespace) -> None:
 	"""Publish some data to a remote node."""
 
-	pathData = cleanPathToList(args.path + "/" + args.data)
+	pathData = cleanPathToList(args.data)
 	assert len(pathData) > 0, f"There is no data to publish, the data given '{args.data}' evaluates to '.'"
 	node.publish(data=pathData[-1], path=pathData[:-1])
 	print(f"Published to node {args.uid}:{'/'.join(pathData[:-1])}: {pathData[-1]}")
@@ -47,13 +47,13 @@ def timeit(node: Node, args: argparse.Namespace) -> None:
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Node binary.")
 	parser.add_argument("--uid", help="The UID of this node.", required=True)
-	parser.add_argument("--path", help="Path of the data to access.", default=".")
 	subparsers = parser.add_subparsers(dest="command", help="Commands to be executed.")
 
 	parserPublish = subparsers.add_parser("publish", help="Publish a data point to a node remote.")
 	parserPublish.add_argument("data", help="The path + data to publish separated by slashes.")
 
 	parserTimeit = subparsers.add_parser("timeit", help="Time the given command and publish the result to the remote.")
+	parserTimeit.add_argument("--path", help="Path of the data to access.", default=".")
 	parserTimeit.add_argument("rest", nargs="*")
 
 	args = parser.parse_args()

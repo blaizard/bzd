@@ -20,12 +20,18 @@ jobs:
                   export PATH="${PATH}:${GITHUB_WORKSPACE}/bin"
                   ./info.sh
 
+            - name: "Build Tools"
+              run: |
+                  mkdir bin
+                  ./tools/bazel build //tools/ci:timeit
+                  cp bazel-bin/tools/ci/timeit bin/timeit
+
 {% for stage in stages %}
             - name: "[{{ stage.category }}] {{ stage.name }}"
               run: |
                   ./tools/bazel clean --expunge
       {% for command in stage.commands %}
-                  ./tools/bazel run apps/artifacts/api/python/node:binary -- --uid ci --path github/{{ stage.name | normalizeIdentifier }} timeit \
+                  ./bin/timeit --path github/{{ stage.name | normalizeIdentifier }} \
                   {{ command }}
       {% end %}
 
