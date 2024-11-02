@@ -1,5 +1,6 @@
 load("@bzd_bundle//:defs.bzl", "bzd_bundle")
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
+load("//apps/artifacts/api/python/node:defs.bzl", "node_binary")
 
 py_library(
     name = "factory",
@@ -32,12 +33,20 @@ py_binary(
     ],
 )
 
+node_binary(
+    name = "node",
+    configs = {
+        "//apps/artifacts/api:config": ":config.artifacts.api.json",
+    },
+)
+
 bzd_bundle(
     name = "timeit",
     arguments = [
         "--uid",
         "ci",
+        "timeit",
     ],
-    binary = "//apps/artifacts/api/python/node:binary",
+    binary = ":node",
     tags = ["manual"],
 )
