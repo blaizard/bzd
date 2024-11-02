@@ -42,7 +42,9 @@ def _requirement_repository_impl(repository_ctx):
     packages_to_filename = {}
     for npm_data, package, integrity_expected in zip(json.decode(output), repository_ctx.attr.packages.keys(), repository_ctx.attr.packages.values()):
         integrity_actual = npm_data["integrity"]
-        if integrity_expected and integrity_expected != integrity_actual:
+        if not integrity_expected:
+            print("The integrity for '{}' is {}", package, integrity_actual)  # buildifier: disable=print
+        elif integrity_expected != integrity_actual:
             fail("The package '{}' doesn't have the expected integrity '{}' vs '{}'.".format(package, integrity_expected, integrity_actual))
         packages_to_filename[_package_to_alias(package)] = npm_data["filename"]
 
