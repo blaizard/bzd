@@ -1,4 +1,4 @@
-load("//:defs.bzl", "AL_CONSTRAINTS")
+load("//:constraints.bzl", "AL_CONSTRAINTS")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -9,10 +9,10 @@ alias(
 
 [alias(
     name = al,
-    actual = actual,
-) for al, actual in AL_CONSTRAINTS.items() if actual]
+    actual = data["alias"],
+) for al, data in AL_CONSTRAINTS.items() if data.get("alias") != None]
 
 [constraint_value(
     name = al,
     constraint_setting = ":al",
-) for al, actual in AL_CONSTRAINTS.items() if not actual]
+) for al, data in AL_CONSTRAINTS.items() if data.get("alias") == None]

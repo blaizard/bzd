@@ -56,6 +56,8 @@ class Package:
 	version: Semver
 	integrity: str
 	dependencies: typing.Set["Package"]
+	os: typing.Optional[typing.List[str]] = None
+	cpu: typing.Optional[typing.List[str]] = None
 	alias: typing.Optional[str] = None
 
 	def makeAlias(self, alias: str) -> "Package":
@@ -141,6 +143,8 @@ class RequirementsFactory:
 			package = Package(name=name,
 			                  version=Semver.fromString(data["version"]),
 			                  integrity=data["integrity"],
+			                  os=data.get("os"),
+			                  cpu=data.get("cpu"),
 			                  dependencies=set())
 			packagesByName[name][package] = []
 			# We take optional dependencies because of `rollup` which declares some of the things as optional.
@@ -204,7 +208,11 @@ class RequirementsFactory:
 		Format is as follow:
 			"express-minify": {
 				"dependencies": {
-					"clean-css@4.2.4": "sha512-EJUDT7nDVFDvaQgAo2G/PJvxmp1o/c6iXLbswsBbUFXi1Nr+AjA2cKmfbKDMjMvzEe75g3P6JkaDDAKk96A85A==",
+					"clean-css@4.2.4": {
+						"integrity": "sha512-EJUDT7nDVFDvaQgAo2G/PJvxmp1o/c6iXLbswsBbUFXi1Nr+AjA2cKmfbKDMjMvzEe75g3P6JkaDDAKk96A85A==",
+						"os": ["linux"], // optional
+						"cpu": ["arm64"] // optional
+					}
 					...
 				},
 				"name": "express-minify",
@@ -217,14 +225,19 @@ class RequirementsFactory:
 			package = self.packages.getMatching(name=name,
 			                                    constraints=maybeConstraints if maybeConstraints else "latest")
 			packages = self.getDependencies(package)
-			output[name] = {
-			    "name": name,
-			    "version": str(package.version),
-			    "dependencies": {
-			        dependency.package: dependency.integrity
-			        for dependency in packages
-			    }
-			}
+
+			# Build the dependencies
+			dependencies = {}
+			for d in packages:
+				dependencies[d.package] = {
+				    "integrity": d.integrity
+				} | ({} if d.os is None else {
+				    "os": d.os
+				}) | ({} if d.cpu is None else {
+				    "cpu": d.cpu
+				})
+
+			output[name] = {"name": name, "version": str(package.version), "dependencies": dependencies}
 		return output
 
 
@@ -249,7 +262,7 @@ if __name__ == "__main__":
 		localBazelBinary(
 		    str(args.npm),
 		    # --slient seem to make the command hang sometimes.
-		    ["install", "--quiet", "--package-lock-only", "--include=optional", "--prefix", tmpDirname, tmpDirname],
+		    ["install", "--package-lock-only", "--include=optional", "--prefix", tmpDirname, tmpDirname],
 		    stdout=True,
 		    stderr=True)
 		packageLock = (pathlib.Path(tmpDirname) / "package-lock.json").read_text()
