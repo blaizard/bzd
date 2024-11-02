@@ -1,4 +1,14 @@
-load("@rules_python//python:defs.bzl", "py_library")
+load("@rules_python//python:defs.bzl", "py_binary", "py_library")
+
+py_binary(
+    name = "binary",
+    srcs = [
+        "binary.py",
+    ],
+    deps = [
+        ":node",
+    ],
+)
 
 py_library(
     name = "node",
