@@ -52,7 +52,8 @@ class _SSHInteractiveHandle:
 		session.close()
 
 		result = ExecuteResult(stream=stream, returncode=session.recv_exit_status())
-		assert (ignoreFailure or result.isSuccess()), f"Return code {result.getReturnCode()}\n{result.getOutput()}"
+		assert (ignoreFailure or result.isSuccess()
+		        ), f"While executing {' '.join(cmds)}\nReturn code {result.getReturnCode()}\n{result.getOutput()}"
 
 		return result
 

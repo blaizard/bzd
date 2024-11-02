@@ -30,8 +30,8 @@ jobs:
             - name: "[{{ stage.category }}] {{ stage.name }}"
               run: |
                   ./tools/bazel clean --expunge
-      {% for command in stage.commands %}
-                  ./bin/timeit --path github/{{ stage.name | normalizeIdentifier }} \
+      {% for index, command in stage.commands %}
+                  ./bin/timeit --path github/{{ stage.name | normalizeIdentifier }}/{{ index }} \
                   {{ command }}
       {% end %}
 
