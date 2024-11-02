@@ -37,9 +37,9 @@ class Node(ArtifactsBase):
 
 		for remote, retry, nbRetries in self.remotes:
 
-			url = f"{remote}/x/{volume}/{actualUid}/data" + (f"/{subPath}" if subPath else "")
+			url = f"{remote}/x/{volume}/{actualUid}" + (f"/{subPath}" if subPath else "") + "/"
 			try:
-				HttpClient.post(url, json=data, query=query)
+				HttpClient.post(url, json={"data": data}, query=query)
 				return
 			except Exception as e:
 				if retry == nbRetries:

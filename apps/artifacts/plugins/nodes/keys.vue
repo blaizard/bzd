@@ -1,7 +1,7 @@
 <template>
 	<div class="keys-container">
 		<template v-if="isObject">
-			<div v-for="key in Object.keys(value).sort()" class="indent" @click.stop="onClick(key)">
+			<div v-for="key in keys" class="indent" @click.stop="onClick(key)">
 				<span v-if="key != '_'">{{ key }}</span>
 				<Keys
 					class="child"
@@ -30,6 +30,14 @@
 		computed: {
 			isObject() {
 				return !!this.value && this.value.constructor === Object;
+			},
+			keys() {
+				// Sort lexically, except '_' should always be first.
+				return Object.keys(this.value).sort((a, b) => {
+					if (a === "_") return -1;
+					if (b === "_") return 1;
+					return a.localeCompare(b);
+				});
 			},
 		},
 		methods: {
