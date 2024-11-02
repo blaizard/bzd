@@ -54,7 +54,7 @@ if __name__ == "__main__":
 
 	parserTimeit = subparsers.add_parser("timeit", help="Time the given command and publish the result to the remote.")
 	parserTimeit.add_argument("--path", help="Path of the data to access.", default=".")
-	parserTimeit.add_argument("rest", nargs="*")
+	parserTimeit.add_argument("rest", nargs=argparse.REMAINDER)
 
 	args = parser.parse_args()
 
