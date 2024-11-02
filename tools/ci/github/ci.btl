@@ -23,8 +23,8 @@ jobs:
 {% for stage in stages %}
             - name: "[{{ stage.category }}] {{ stage.name }}"
               run: |
-                  ./tools/bazel clean --expunge
       {% for command in stage.commands %}
+                  ./tools/bazel run apps/artifacts/api/python/node:binary -- --uid ci --path github/{{ stage.name }} timeit \
                   {{ command }}
       {% end %}
 
