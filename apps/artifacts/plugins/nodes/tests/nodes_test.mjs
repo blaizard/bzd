@@ -8,12 +8,6 @@ const Exception = ExceptionFactory("test", "artifacts", "plugins", "nodes");
 describe("Nodes", () => {
 	describe("Node", () => {
 		it("getAllPathAndValues", async () => {
-			const storage = await makeStorageFromConfig({
-				type: "memory",
-				name: "nodes",
-			});
-			let nodes = new Nodes(storage, {});
-			let node = await nodes.get("node");
 			const result = Node.getAllPathAndValues({
 				a: {
 					b: { c: 12, e: [], f: null },
@@ -29,6 +23,21 @@ describe("Nodes", () => {
 					[12, 3],
 				],
 			]);
+		});
+
+		it("string", async () => {
+			const result = Node.getAllPathAndValues("hello");
+			Exception.assertEqual(result, [[[], "hello"]]);
+		});
+
+		it("array", async () => {
+			const result = Node.getAllPathAndValues(["a", "b", { c: 1 }]);
+			Exception.assertEqual(result, [[[], ["a", "b", { c: 1 }]]]);
+		});
+
+		it("null", async () => {
+			const result = Node.getAllPathAndValues(null);
+			Exception.assertEqual(result, [[[], null]]);
 		});
 	});
 });

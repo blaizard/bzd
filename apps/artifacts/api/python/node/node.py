@@ -15,7 +15,7 @@ class NodePublishNoRemote(RuntimeError):
 class Node(ArtifactsBase):
 
 	def publish(self,
-	            data: typing.Dict[str, typing.Any],
+	            data: typing.Any,
 	            uid: typing.Optional[str] = None,
 	            volume: str = defaultNodeVolume,
 	            path: typing.Optional[typing.List[str]] = None,
@@ -37,9 +37,9 @@ class Node(ArtifactsBase):
 
 		for remote, retry, nbRetries in self.remotes:
 
-			url = f"{remote}/x/{volume}/{actualUid}" + (f"/{subPath}" if subPath else "") + "/"
+			url = f"{remote}/x/{volume}/{actualUid}/data" + (f"/{subPath}" if subPath else "") + "/"
 			try:
-				HttpClient.post(url, json={"data": data}, query=query)
+				HttpClient.post(url, json=data, query=query)
 				return
 			except Exception as e:
 				if retry == nbRetries:
