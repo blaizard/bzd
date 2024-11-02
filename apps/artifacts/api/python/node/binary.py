@@ -41,7 +41,7 @@ def timeit(node: Node, args: argparse.Namespace) -> None:
 
 	path = cleanPathToList(args.path)
 	node.publish(path=path, data=duration)
-	print(f"Time elpased {duration}s published to node {args.uid}:{'/'.join(path)}")
+	print(f"Time elapsed {duration}s published to node {args.uid}:{'/'.join(path)}")
 
 
 if __name__ == "__main__":

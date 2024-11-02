@@ -115,7 +115,10 @@ if __name__ == "__main__":
 			handle.command(["mkdir", "-p", directory])
 			handle.uploadContent(content, f"{directory}/docker-compose.yml")
 			print(f"Pulling new images.", flush=True)
-			handle.command(["docker", "compose", "--file", f"{directory}/docker-compose.yml", "pull"])
+			# Note --ignore-pull-failures: if there is no need for updating a certain image, it can be that it is not in the registry.
+			# not having --ignore-pull-failures will result in a failure.
+			handle.command(
+			    ["docker", "compose", "--file", f"{directory}/docker-compose.yml", "pull", "--ignore-pull-failures"])
 			print(f"Restarting containers.", flush=True)
 			handle.command(["docker", "compose", "--file", f"{directory}/docker-compose.yml", "up", "-d"])
 
