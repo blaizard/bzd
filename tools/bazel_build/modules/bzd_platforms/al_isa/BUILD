@@ -1,4 +1,4 @@
-load("//:defs.bzl", "AL_CONSTRAINTS", "ISA_CONSTRAINTS")
+load("//:constraints.bzl", "AL_CONSTRAINTS", "ISA_CONSTRAINTS")
 
 package(default_visibility = ["//visibility:public"])
 

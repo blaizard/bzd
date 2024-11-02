@@ -1,4 +1,4 @@
-load("//:defs.bzl", "ISA_CONSTRAINTS")
+load("//:constraints.bzl", "ISA_CONSTRAINTS")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -10,10 +10,10 @@ alias(
 
 [alias(
     name = isa,
-    actual = actual,
-) for isa, actual in ISA_CONSTRAINTS.items() if actual]
+    actual = data["alias"],
+) for isa, data in ISA_CONSTRAINTS.items() if data.get("alias") != None]
 
 [constraint_value(
     name = isa,
     constraint_setting = ":isa",
-) for isa, actual in ISA_CONSTRAINTS.items() if not actual]
+) for isa, data in ISA_CONSTRAINTS.items() if data.get("alias") == None]

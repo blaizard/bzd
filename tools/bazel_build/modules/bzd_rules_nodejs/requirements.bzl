@@ -1,7 +1,7 @@
 """Module extension for NodeJs toolchains."""
 
 load("@bzd_lib//:repository_maker.bzl", "repository_maker")
-load("@bzd_platforms//:defs.bzl", "get_repository_platform")
+load("@bzd_platforms//:defs.bzl", "get_platform_from_os", "to_al", "to_isa")
 load("@node//:defs.bzl", "node_binary", "npm_binary")
 
 def _sanitize_repository_name(name):
@@ -28,7 +28,7 @@ def _package_to_alias(package):
     return package
 
 def _requirement_repository_impl(repository_ctx):
-    maybe_platform = get_repository_platform(repository_ctx)
+    maybe_platform = get_platform_from_os(repository_ctx.os)
     node_path = repository_ctx.path(node_binary[maybe_platform])
     npm_path = repository_ctx.path(npm_binary[maybe_platform])
 
@@ -77,6 +77,19 @@ requirement_repository = repository_rule(
     },
 )
 
+def _is_valid_dependency(module_ctx, dependency):
+    """Check if a dependency is valid for this platform."""
+
+    if "os" in dependency:
+        os_expected = to_al(module_ctx.os.name)
+        if not any([True for os in dependency["os"] if to_al(os) == os_expected]):
+            return False
+    if "cpu" in dependency:
+        cpu_expected = to_isa(module_ctx.os.arch)
+        if not any([True for cpu in dependency["cpu"] if to_isa(cpu) == cpu_expected]):
+            return False
+    return True
+
 def _requirements_nodejs_impl(module_ctx):
     # Gather all the requirements.
     requirements = {}
@@ -105,7 +118,11 @@ def _requirements_nodejs_impl(module_ctx):
                     name = repository_name,
                     package = packages["name"],
                     version = packages["version"],
-                    packages = packages["dependencies"],
+                    packages = {
+                        dependency_name: dependency["integrity"]
+                        for dependency_name, dependency in packages["dependencies"].items()
+                        if _is_valid_dependency(module_ctx, dependency)
+                    },
                 )
             already_generated[repository_name] = True
             build_file += """alias(
