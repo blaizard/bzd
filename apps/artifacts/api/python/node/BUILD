@@ -5,6 +5,7 @@ py_binary(
     srcs = [
         "binary.py",
     ],
+    visibility = ["//visibility:public"],
     deps = [
         ":node",
     ],

@@ -15,7 +15,17 @@ def _bzd_bundle_impl(ctx):
         inputs = [manifest],
         outputs = [ctx.outputs.executable],
         progress_message = "Bundling {}...".format(str(binary.label)),
-        arguments = ["--output", ctx.outputs.executable.path, "--cwd", workspace, manifest.path, executable.short_path],
+        arguments = [
+            "--output",
+            ctx.outputs.executable.path,
+            "--cwd",
+            workspace,
+            "--manifest",
+            manifest.path,
+            "--executable",
+            executable.short_path,
+            "--",
+        ] + ctx.attr.arguments,
         executable = ctx.executable._bundler,
         tools = [binary.files_to_run],
     )
@@ -30,6 +40,9 @@ def _bzd_bundle_impl(ctx):
 bzd_bundle = rule(
     implementation = _bzd_bundle_impl,
     attrs = {
+        "arguments": attr.string_list(
+            doc = "A list of arguments to embed in the bundler to be used to call the binary.",
+        ),
         "binary": attr.label(
             mandatory = True,
             cfg = "target",

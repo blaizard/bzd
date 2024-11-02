@@ -1,3 +1,4 @@
+load("@bzd_bundle//:defs.bzl", "bzd_bundle")
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 
 py_library(
@@ -29,4 +30,14 @@ py_binary(
         "//tools/ci/travis:factory",
         "@bzd_sanitizer//python/bzd_sanitizer:context",
     ],
+)
+
+bzd_bundle(
+    name = "timeit",
+    arguments = [
+        "--uid",
+        "ci",
+    ],
+    binary = "//apps/artifacts/api/python/node:binary",
+    tags = ["manual"],
 )
