@@ -4,6 +4,7 @@ import tarfile
 import tempfile
 import stat
 import hashlib
+import typing
 
 
 class Bundler:
@@ -13,7 +14,7 @@ class Bundler:
 		self.executable = executable
 		self.cwd = cwd
 
-	def process(self, output: pathlib.Path) -> None:
+	def process(self, output: pathlib.Path, args: typing.List[str]) -> None:
 
 		with tempfile.TemporaryFile(suffix=".tar.gz") as fd:
 
@@ -75,14 +76,15 @@ if [[ ! -f "$temp/{stamp}" ]]; then
 	touch "$temp/{stamp}"
 fi
 
-cd "$temp/{cwd}"
 export BZD_BUNDLE="$0"
+export BUILD_WORKSPACE_DIRECTORY="$(pwd)"
 export RUNFILES_DIR="$temp"
-"{executable}" "$@" # No exec to activate trap EXIT
+cd "$temp/{cwd}"
+"{executable}" {args} "$@" # No exec to activate trap EXIT
 exit 0
 
 #__END_OF_SCRIPT__#
-""".format(executable=str(self.executable), cwd=str(self.cwd), stamp=stamp).encode("utf-8"))
+""".format(executable=str(self.executable), cwd=str(self.cwd), stamp=stamp, args=" ".join(args)).encode("utf-8"))
 				fileOut.write(fd.read())
 
 		# Set permission to executable.
@@ -103,8 +105,9 @@ if __name__ == "__main__":
 	    default=".",
 	    help="The relative directory where the execution takes place.",
 	)
-	parser.add_argument("manifest", help="The path of the manifest to be used.")
-	parser.add_argument("executable", help="The path of the executable within the archive.")
+	parser.add_argument("--manifest", help="The path of the manifest to be used.", required=True)
+	parser.add_argument("--executable", help="The path of the executable within the archive.", required=True)
+	parser.add_argument("rest", nargs="*")
 
 	args = parser.parse_args()
 
@@ -113,4 +116,4 @@ if __name__ == "__main__":
 	    pathlib.Path(args.executable),
 	    pathlib.Path(args.cwd),
 	)
-	bundler.process(pathlib.Path(args.output))
+	bundler.process(output=pathlib.Path(args.output), args=args.rest)

@@ -54,7 +54,7 @@ if __name__ == "__main__":
 	parserPublish.add_argument("data", help="The path + data to publish separated by slashes.")
 
 	parserTimeit = subparsers.add_parser("timeit", help="Time the given command and publish the result to the remote.")
-	parserTimeit.add_argument("rest", nargs=argparse.REMAINDER)
+	parserTimeit.add_argument("rest", nargs="*")
 
 	args = parser.parse_args()
 
