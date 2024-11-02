@@ -1,6 +1,7 @@
 import pathlib
 import typing
 import json
+import re
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, asdict, field
 
@@ -80,6 +81,10 @@ class Factory(ABC):
 		"""Return the configuration associated with sanitizer tests."""
 		pass
 
+	@staticmethod
+	def normalizeIdentifier(string: str) -> str:
+		return re.sub(r"[^a-zA-Z0-9_]+", "_", string)
+
 	def renderTemplate(self, templatePath: pathlib.Path) -> str:
 		"""Render a template."""
 
@@ -111,4 +116,4 @@ class Factory(ABC):
 				data.append(item)
 
 		template = Template.fromPath(templatePath)
-		return template.render({"stages": data})
+		return template.render({"stages": data, "normalizeIdentifier": Factory.normalizeIdentifier})
