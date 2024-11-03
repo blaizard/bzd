@@ -44,7 +44,9 @@
 					:class="getNotificationClass(entry)"
 					:style="getNotificationStyle(entry)"
 				>
-					<div class="bzd-notification-content">{{ entry.message }}</div>
+					<div class="bzd-notification-content">
+						<Accordion>{{ entry.message }}</Accordion>
+					</div>
 					<div
 						v-for="(action, index) in entry.actions"
 						:key="index"
@@ -72,6 +74,7 @@
 	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
 	import { Comment, Fragment, Text } from "vue";
 	import config from "#bzd/nodejs/vue/components/layout/config.json";
+	import Accordion from "#bzd/nodejs/vue/components/layout/accordion.vue";
 
 	export default {
 		mixins: [Base],
@@ -80,6 +83,9 @@
 		},
 		props: {
 			fullPage: { required: false, default: false, type: Boolean },
+		},
+		components: {
+			Accordion,
 		},
 		data: function () {
 			return {
@@ -403,9 +409,11 @@
 				}
 				.bzd-notification-content {
 					flex: 1;
+					white-space: pre;
 				}
 				.bzd-notification-action {
 					@extend %bzd-clickable;
+					align-self: baseline;
 				}
 
 				&.bzd-info {
