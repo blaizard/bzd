@@ -31,7 +31,7 @@ jobs:
             - name: "[{{ stage.category }}] {{ stage.name }}"
               run: |
               {% for index, command in stage.commands %}
-                  ./bin/timeit --path gitea/{{ stage.name | normalizeIdentifier }}/command-{{ index }} \
+                  ./bin/timeit --path gitea/{{ stage.category | normalizeIdentifier }}_{{ stage.name | normalizeIdentifier }}/command-{{ index }} \
                   {{ command }}
               {% end %}
 
