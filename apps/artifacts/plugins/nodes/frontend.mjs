@@ -1,10 +1,7 @@
 export default {
 	name: "Nodes",
 	icon: "bzd-icon-link",
-	form: [
-		{ type: "Input", name: "nodes.path", caption: "The path where to save the data.", mandatory: true },
-		{ type: "Input", name: "nodes.server.port", caption: "The port on which the server listen to.", mandatory: true },
-	],
+	form: [],
 	view: function () {
 		switch (this.pathList.length) {
 			case 1:
