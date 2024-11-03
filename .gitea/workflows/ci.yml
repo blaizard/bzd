@@ -24,7 +24,7 @@ jobs:
             - name: "Build Tools"
               run: |
                   mkdir bin
-                  ./tools/bazel build //tools/ci:timeit --//apps/artifacts/api:config.set=remotes=https://localdata.blaizard.com
+                  ./tools/bazel build //tools/ci:timeit --//apps/artifacts/api:config.set=remotes=https://localdata.blaizard.com --remote_download_toplevel
                   ls -ll || echo 0;
                   ls -ll bazel-bin/ || echo 0;
                   ls -ll bazel-bin/tools/ci/ || echo 0;
