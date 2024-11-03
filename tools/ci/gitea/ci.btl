@@ -21,10 +21,17 @@ jobs:
                   cp tools/ci/gitea/.bazelrc.local .bazelrc.local
                   ./info.sh
 
+            - name: "Build Tools"
+              run: |
+                  mkdir bin
+                  ./tools/bazel build //tools/ci:timeit --//apps/artifacts/api:config.set=remotes=https://data.blaizard.com
+                  cp bazel-bin/tools/ci/timeit bin/timeit
+
 {% for stage in stages %}
             - name: "[{{ stage.category }}] {{ stage.name }}"
               run: |
-              {% for command in stage.commands %}
+              {% for index, command in stage.commands %}
+                  ./bin/timeit --path gitea/{{ stage.name | normalizeIdentifier }}/command-{{ index }} \
                   {{ command }}
               {% end %}
 
