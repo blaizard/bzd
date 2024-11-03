@@ -124,8 +124,23 @@ program
 		return getInternalPath(path.split("/").map(decodeURIComponent));
 	}
 
+	function isAuthorizedVolume(volume) {
+		if ("tokens" in volumes[volume].options) {
+			return false;
+		}
+		return true;
+	}
+
+	function assertAuthorizedVolume(context, volume) {
+		if (!isAuthorizedVolume(volume)) {
+			throw context.httpError(401, "Unauthorized");
+		}
+	}
+
 	rest.handle("get", "/file", async function (inputs) {
 		const { volume, pathList } = getInternalPathFromString(inputs.path);
+		assertAuthorizedVolume(this, volume);
+
 		Exception.assertPrecondition(volume, "There is no volume associated with this path: '{}'.", inputs.path);
 		const storage = await cache.get("volume", volume);
 		const metadata = await storage.metadata(pathList);
@@ -136,7 +151,7 @@ program
 		return await storage.read(pathList);
 	});
 
-	rest.handle("post", "/list", async (inputs) => {
+	rest.handle("post", "/list", async function (inputs) {
 		const { volume, pathList } = getInternalPath(inputs.path);
 		const maxOrPaging = "paging" in inputs ? inputs.paging : 50;
 
@@ -148,6 +163,7 @@ program
 						name: volume,
 						type: "bucket",
 						plugin: volumes[volume].options.type,
+						authorized: isAuthorizedVolume(volume),
 					},
 					{
 						list: true,
@@ -159,6 +175,8 @@ program
 				next: null,
 			};
 		}
+
+		assertAuthorizedVolume(this, volume);
 
 		const storage = await cache.get("volume", volume);
 		const result = await storage.list(pathList, maxOrPaging, /*includeMetadata*/ true);
@@ -178,6 +196,7 @@ program
 					method,
 					route,
 					async (context) => {
+						assertAuthorizedVolume(context, volume);
 						await endpoint.handler(context);
 					},
 					Object.assign({ exceptionGuard: true, type: ["raw"] }, endpoint.options),

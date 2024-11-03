@@ -1,12 +1,13 @@
 <template>
 	<div class="container" v-loading="loading">
 		<template v-for="item in list" :key="item.name">
-			<div @click="handleExpand(item)" :class="getClass(item)">
-				<i v-if="isPermissionList(item)" class="bzd-icon-folder"></i>
-				<span class="name" @click.stop="handleSelect(item)">{{ item.name }}</span>
+			<div @click="isAuthorized(item) && handleExpand(item)" :class="getClass(item)">
+				<i v-if="!isAuthorized(item)" class="bzd-icon-lock icon"></i>
+				<i v-if="isPermissionList(item)" class="bzd-icon-folder icon"></i>
+				<span class="name" @click.stop="isAuthorized(item) && handleSelect(item)">{{ item.name }}</span>
 				<span class="actions" @click.stop=""> </span>
 			</div>
-			<div v-if="item.name in expanded" :key="item.name + '.expanded'">
+			<div v-if="item.name in expanded && isAuthorized(item)" :key="item.name + '.expanded'">
 				<TreeDirectory
 					:path="makePath(item)"
 					:depth="depth + 1"
@@ -104,6 +105,12 @@
 			isPermissionList(item) {
 				return item.permissions.isList();
 			},
+			isAuthorized(item) {
+				if ("authorized" in item) {
+					return item.authorized;
+				}
+				return true;
+			},
 			makePath(item) {
 				return this.path.concat([item.name]);
 			},
@@ -155,7 +162,7 @@
 
 <style lang="scss">
 	@use "@/nodejs/icons.scss" as icons with (
-		$bzdIconNames: configuration folder
+		$bzdIconNames: configuration folder lock
 	);
 </style>
 
@@ -203,8 +210,8 @@
 			white-space: nowrap;
 			cursor: pointer;
 
-			.name {
-				padding-left: #{$arrowSize}px;
+			.icon {
+				margin-right: #{$arrowSize}px;
 			}
 
 			&:hover {

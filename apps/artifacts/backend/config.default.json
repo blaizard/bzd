@@ -39,6 +39,12 @@
                     "toString": "[{level}] [{name}] [{source}] {message}"
                 }
             },
+            "tokens": [
+                "hello"
+            ],
+            "type": "nodes"
+        },
+        "nodes2": {
             "type": "nodes"
         }
     }
