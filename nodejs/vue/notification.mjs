@@ -15,11 +15,7 @@ export default {
 		const defaultActions = [{ id: "close", callback: (entry) => notificationClose(entry) }];
 		const tryToString = (message) => {
 			if (message instanceof Error) {
-				const splittedMessage = String(message).split("\n");
-				message = splittedMessage[0] || "";
-				if (splittedMessage.length > 1) {
-					message += "...";
-				}
+				return String(message);
 			}
 			return message;
 		};
@@ -113,6 +109,14 @@ export default {
 				data.entries.splice(index, 1);
 			}
 		};
+
+		window.addEventListener("error", (e) => {
+			error(e.error);
+		});
+
+		window.addEventListener("unhandledrejection", (e) => {
+			error(e.reason);
+		});
 
 		app.config.globalProperties.$notification = {
 			info,

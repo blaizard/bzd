@@ -27,13 +27,19 @@ export default class GoogleIdentityServer {
 					idToken: tokens.id_token,
 					audience: self.clientId,
 				});
+
 				const payload = ticket.getPayload();
 				if (!payload.email_verified) {
 					throw this.httpError(401, "Unauthorized");
 				}
 				email = payload.email;
 			} catch (e) {
-				throw this.httpError(401, "Unauthorized");
+				let message = e.toString();
+				const maybeAdditionalMessage = e?.response?.data?.error_description;
+				if (maybeAdditionalMessage) {
+					message += "\n" + maybeAdditionalMessage;
+				}
+				throw this.httpError(401, "Unauthorized\n\n" + message);
 			}
 
 			Exception.assert(email, "The email cannot be null: {}", email);

@@ -9,6 +9,7 @@ bzd_config(
 bzd_nodejs_library(
     name = "layout",
     srcs = [
+        "accordion.vue",
         "base.vue",
         "layout.vue",
         ":config.json",
