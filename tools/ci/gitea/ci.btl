@@ -25,7 +25,7 @@ jobs:
               run: |
                   mkdir bin
                   ./tools/bazel build //tools/ci:timeit --//apps/artifacts/api:config.set=remotes=https://localdata.blaizard.com
-                  cp $(./tools/bazel cquery --output=files //tools/ci:timeit) bin/timeit
+                  cp bazel-bin/tools/ci/timeit bin/timeit
 
 {% for stage in stages %}
             - name: "[{{ stage.category }}] {{ stage.name }}"

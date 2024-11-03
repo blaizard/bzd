@@ -78,8 +78,8 @@ build:remote --extra_execution_platforms=@bzd_rules_oci//execution_platforms:lin
 build:remote --jobs=24
 build:remote --dynamic_mode=off
 build:remote --spawn_strategy=remote,worker,sandboxed,local
-# This somehow gives "missing digest" issues in CI, it should be solved with the line below.
-build:remote --remote_download_minimal
+# We want to the top level target to be available, this is usefull in CI for example to create tools.
+build:remote --remote_download_outputs=toplevel
 # See https://blog.bazel.build/2023/10/06/bwob-in-bazel-7.html#handle-remote-cache-eviction
 build:remote --experimental_remote_cache_eviction_retries=3
 build:remote --remote_retries=5
