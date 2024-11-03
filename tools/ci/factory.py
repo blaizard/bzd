@@ -83,7 +83,7 @@ class Factory(ABC):
 
 	@staticmethod
 	def normalizeIdentifier(string: str) -> str:
-		return re.sub(r"[^a-zA-Z0-9_]+", "_", string)
+		return re.sub(r"[^a-zA-Z0-9_]+", "_", string).strip("_")
 
 	def renderTemplate(self, templatePath: pathlib.Path) -> str:
 		"""Render a template."""
