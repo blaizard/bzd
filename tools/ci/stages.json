@@ -94,7 +94,7 @@
                 "./tools/bazel coverage cc/... --config=gcc --config=cc --platform_suffix=coverage-cc --config=local",
                 "./tools/bazel run @bzd_coverage//:coverage --platform_suffix=coverage-cc --config=local -- --output bazel-out/coverage-cc"
             ],
-            "name": "C++",
+            "name": "cc",
             "output": "bazel-out/coverage-cc",
             "tags": [
                 "x86_64",
@@ -107,7 +107,7 @@
                 "./tools/bazel coverage ... --config=nodejs --platform_suffix=coverage-nodejs --config=local",
                 "./tools/bazel run @bzd_coverage//:coverage --platform_suffix=coverage-nodejs --config=local -- --output bazel-out/coverage-nodejs"
             ],
-            "name": "NodeJs",
+            "name": "nodejs",
             "output": "bazel-out/coverage-nodejs",
             "tags": [
                 "x86_64",

@@ -95,7 +95,7 @@ pipeline
 						sh "./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --config=clang --config=cc --config=sanitizer --config=tsan --platform_suffix=clang-tsan"
 					}
 				}
-				stage("[coverage] NodeJs")
+				stage("[coverage] nodejs")
 				{
 					steps
 					{

@@ -67,11 +67,11 @@ jobs:
                   ./bin/timeit --path gitea/sanitizer_tsan/command-0 \
                   ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --config=clang --config=cc --config=sanitizer --config=tsan --platform_suffix=clang-tsan
 
-            - name: "[coverage] NodeJs"
+            - name: "[coverage] nodejs"
               run: |
-                  ./bin/timeit --path gitea/coverage_NodeJs/command-0 \
+                  ./bin/timeit --path gitea/coverage_nodejs/command-0 \
                   ./tools/bazel coverage ... --config=nodejs --platform_suffix=coverage-nodejs --config=local
-                  ./bin/timeit --path gitea/coverage_NodeJs/command-1 \
+                  ./bin/timeit --path gitea/coverage_nodejs/command-1 \
                   ./tools/bazel run @bzd_coverage//:coverage --platform_suffix=coverage-nodejs --config=local -- --output bazel-out/coverage-nodejs
 
             - name: "[sanitizer] sanitizer"

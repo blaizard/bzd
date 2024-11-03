@@ -22,10 +22,10 @@ echo  "==== [sanitizer] asan/lsan/ubsan ==============================="
 ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --config=clang --config=cc --config=sanitizer --config=asan --config=lsan --config=ubsan --platform_suffix=clang-asan-lsan-ubsan $EXTRA_FLAGS
 echo  "==== [sanitizer] tsan ==============================="
 ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --config=clang --config=cc --config=sanitizer --config=tsan --platform_suffix=clang-tsan $EXTRA_FLAGS
-echo  "==== [coverage] C++ ==============================="
+echo  "==== [coverage] cc ==============================="
 ./tools/bazel coverage cc/... --config=gcc --config=cc --platform_suffix=coverage-cc --config=local $EXTRA_FLAGS
 ./tools/bazel run @bzd_coverage//:coverage --platform_suffix=coverage-cc --config=local -- --output bazel-out/coverage-cc $EXTRA_FLAGS
-echo  "==== [coverage] NodeJs ==============================="
+echo  "==== [coverage] nodejs ==============================="
 ./tools/bazel coverage ... --config=nodejs --platform_suffix=coverage-nodejs --config=local $EXTRA_FLAGS
 ./tools/bazel run @bzd_coverage//:coverage --platform_suffix=coverage-nodejs --config=local -- --output bazel-out/coverage-nodejs $EXTRA_FLAGS
 echo  "==== [sanitizer] sanitizer ==============================="
