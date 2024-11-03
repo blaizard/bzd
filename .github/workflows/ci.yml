@@ -24,7 +24,7 @@ jobs:
               run: |
                   mkdir bin
                   ./tools/bazel build //tools/ci:timeit --//apps/artifacts/api:config.set=remotes=https://data.blaizard.com
-                  cp bazel-bin/tools/ci/timeit bin/timeit
+                  cp $(./tools/bazel cquery --output=files //tools/ci:timeit) bin/timeit
 
             - name: "[normal] static analysis"
               run: |
