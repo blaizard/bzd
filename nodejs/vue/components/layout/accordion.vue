@@ -1,16 +1,40 @@
 <template>
-	<div :class="{ accordion: true, show: state.show }">
-		<i class="bzd-icon-arrow_up action" @click="state.show = false" v-if="state.show"></i>
-		<i class="bzd-icon-arrow_down action" @click="state.show = true" v-else></i>
-		<span class="content"><slot></slot></span>
+	<div :class="{ accordion: true, show: state.showContent }">
+		<template v-if="state.showAction">
+			<i class="bzd-icon-arrow_up action" @click="state.showContent = false" v-if="state.showContent"></i>
+			<i class="bzd-icon-arrow_down action" @click="state.showContent = true" v-else></i>
+		</template>
+		<span class="content" ref="content" @click="isOverflow"><slot></slot></span>
 	</div>
 </template>
 
 <script setup>
-	import { reactive } from "vue";
+	import { ref, reactive, onMounted, onUnmounted } from "vue";
+
 	const state = reactive({
-		show: false,
+		showContent: false,
+		showAction: false,
 	});
+	const content = ref(null);
+	let observer = null;
+
+	onMounted(() => {
+		observer = new ResizeObserver((e) => {
+			if (!state.showContent) {
+				state.showAction = isOverflow(e[0].target);
+			}
+		}).observe(content.value);
+	});
+
+	onUnmounted(() => {
+		if (observer) {
+			observer.unobserve(content.value);
+		}
+	});
+
+	const isOverflow = (element) => {
+		return element.scrollHeight > element.offsetHeight;
+	};
 </script>
 
 <style lang="scss">
