@@ -20,7 +20,8 @@ export default {
 		const $authentication = reactive({
 			isAuthenticated: computed(() => state.isAuthenticated),
 			hasScope: (scope) => state.isAuthenticated && state.session.getScopes().matchAny(scope),
-			makeUrl: (url) => options.authentication.makeAuthenticationURL(url),
+			updateUrl: (url) => options.authentication.updateAuthenticationURL(url),
+			updateFetch: (optionsFetch) => options.authentication.updateAuthenticationFetch(optionsFetch),
 		});
 
 		app.config.globalProperties.$authentication = $authentication;

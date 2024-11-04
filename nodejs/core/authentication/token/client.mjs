@@ -143,7 +143,7 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 		await this.unauthorizedCallback_(/*needAuthentication*/ true);
 	}
 
-	async _setAuthenticationFetchImpl(fetchOptions) {
+	async _updateAuthenticationFetchImpl(fetchOptions) {
 		// Automatically add authentication information to the request
 		fetchOptions.authentication = {
 			type: "bearer",
@@ -151,7 +151,7 @@ export default class TokenAuthenticationClient extends AuthenticationClient {
 		};
 	}
 
-	async _makeAuthenticationURLImpl(url) {
+	async _updateAuthenticationURLImpl(url) {
 		url += (url.includes("?") ? "&t=" : "?t=") + encodeURIComponent(this.token);
 		return url;
 	}

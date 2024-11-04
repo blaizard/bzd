@@ -113,18 +113,19 @@ export default class RestServer extends Base {
 				let authenticationData = { session: null };
 				if (authentication) {
 					// Check if session is authorized
-					let isAuthorized = await authentication.verify(context, (session) => {
-						authenticationData.session = session;
-						return true;
-					});
-					// Check if the session has any of the scopes
-					if (isAuthorized) {
-						const authenticationSchema = endpointOptions.authentication;
-						if (typeof authenticationSchema == "string" || Array.isArray(authenticationSchema)) {
-							isAuthorized &= authenticationData.session.getScopes().matchAny(authenticationSchema);
-						}
-					}
-					if (!isAuthorized) {
+					const authenticationSchema = endpointOptions.authentication;
+					authenticationData.session = await authentication.verify(
+						context,
+						Array.isArray(authenticationSchema) ? authenticationSchema : null,
+					);
+					if (typeof authenticationSchema == "string") {
+						Exception.assert(
+							authenticationSchema == "optional",
+							"Only 'optional' is a valid option, not '{}'.",
+							authenticationSchema,
+						);
+						// Ignore validation.
+					} else if (!authenticationData.session) {
 						return context.sendStatus(401, "Unauthorized");
 					}
 				}

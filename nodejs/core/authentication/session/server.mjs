@@ -310,7 +310,7 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 	/// This verifies the access token.
 	/// \note We cannot refresh the access token as part of this process
 	/// because it needs to live in a query (not cookie) because of of fetch requests.
-	async _verifyImpl(context, callback) {
+	async _verifyImpl(context) {
 		const maybeToken = this._getAccessToken(context);
 		if (!maybeToken) {
 			return false;
@@ -319,7 +319,7 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		if (!result) {
 			return false;
 		}
-		return await callback(result.session);
+		return result.session;
 	}
 
 	/// Refresh an access token from a refresh token.

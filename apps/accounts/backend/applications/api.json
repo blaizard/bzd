@@ -2,7 +2,9 @@
     "rest": {
         "/admin/application": {
             "delete": {
-                "authentication": "admin-applications",
+                "authentication": [
+                    "admin-applications"
+                ],
                 "documentation": "Delete an existing application",
                 "request": {
                     "type": "json",
@@ -12,7 +14,9 @@
                 }
             },
             "post": {
-                "authentication": "admin-applications",
+                "authentication": [
+                    "admin-applications"
+                ],
                 "documentation": "Create a new application",
                 "request": {
                     "type": "json",
@@ -26,7 +30,9 @@
         },
         "/admin/applications": {
             "get": {
-                "authentication": "admin-applications",
+                "authentication": [
+                    "admin-applications"
+                ],
                 "documentation": "List all applications",
                 "request": {
                     "type": "query",

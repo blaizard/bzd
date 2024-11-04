@@ -126,7 +126,7 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 		});
 	}
 
-	async _verifyImpl(context, callback) {
+	async _verifyImpl(context) {
 		let token = null;
 		const data = context.getHeader("authorization", "").split(" ");
 		if (data.length == 2 && data[0].toLowerCase() == "bearer") {
@@ -136,13 +136,13 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 		}
 
 		if (token) {
-			return await this.verifyToken(token, callback);
+			return await this.verifyToken(token);
 		}
 
 		return false;
 	}
 
-	async verifyToken(token, verifyCallback) {
+	async verifyToken(token) {
 		let data = null;
 		try {
 			data = await this.readToken(token);
@@ -151,7 +151,7 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 		} catch (e) {
 			return false;
 		}
-		return await verifyCallback(new Session(data.uid, data.scopes));
+		return new Session(data.uid, data.scopes);
 	}
 
 	async generateAccessToken(data) {

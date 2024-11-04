@@ -2,7 +2,9 @@
     "rest": {
         "/admin/logger/memory": {
             "get": {
-                "authentication": "admin-applications",
+                "authentication": [
+                    "admin-applications"
+                ],
                 "documentation": "Get all logs",
                 "response": {
                     "type": "json",
