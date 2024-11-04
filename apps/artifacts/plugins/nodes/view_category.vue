@@ -19,7 +19,6 @@
 <script>
 	import Base from "#bzd/apps/artifacts/plugins/base.vue";
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
-	import HttpClient from "#bzd/nodejs/core/http/client.mjs";
 	import Value from "#bzd/apps/artifacts/plugins/nodes/value.vue";
 	import Keys from "#bzd/apps/artifacts/plugins/nodes/keys.vue";
 	import { timeMsToString } from "#bzd/nodejs/utils/to_string.mjs";
@@ -113,7 +112,8 @@
 						query.after = this.timestamp;
 						query.count = 5;
 					}
-					this.metadata = await HttpClient.get(this.endpoint, {
+					this.metadata = await this.requestBackend(this.endpoint, {
+						method: "get",
 						query: query,
 						expect: "json",
 					});
@@ -124,7 +124,8 @@
 
 				if (this.isValue) {
 					await this.handleSubmit(async () => {
-						const value = await HttpClient.get(this.endpoint, {
+						const value = await this.requestBackend(this.endpoint, {
+							method: "get",
 							query: { metadata: 1, count: 10, before: this.valueOldestTimestamp },
 							expect: "json",
 						});

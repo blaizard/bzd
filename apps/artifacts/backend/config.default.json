@@ -39,9 +39,12 @@
                     "toString": "[{level}] [{name}] [{source}] {message}"
                 }
             },
-            "tokens": [
-                "hello"
-            ],
+            "private": {
+                "tokens": {
+                    "dlasldasjdkajd": "/",
+                    "wkpkwlqkwq": "/nodes"
+                }
+            },
             "type": "nodes"
         },
         "nodes2": {

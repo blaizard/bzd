@@ -2,7 +2,9 @@
     "rest": {
         "/admin/pending_actions/stats": {
             "get": {
-                "authentication": "admin",
+                "authentication": [
+                    "admin"
+                ],
                 "documentation": "Get current statistics about pending actions",
                 "response": {
                     "type": "json"

@@ -124,22 +124,25 @@ program
 		return getInternalPath(path.split("/").map(decodeURIComponent));
 	}
 
-	function isAuthorizedVolume(volume) {
-		if ("tokens" in volumes[volume].options) {
-			return false;
+	async function isAuthorizedVolume(context, volume) {
+		if ("private" in volumes[volume].options) {
+			const maybeSession = await authentication.verify(context);
+			if (!maybeSession) {
+				return false;
+			}
 		}
 		return true;
 	}
 
-	function assertAuthorizedVolume(context, volume) {
-		if (!isAuthorizedVolume(volume)) {
+	async function assertAuthorizedVolume(context, volume) {
+		if (!(await isAuthorizedVolume(context, volume))) {
 			throw context.httpError(401, "Unauthorized");
 		}
 	}
 
 	rest.handle("get", "/file", async function (inputs) {
 		const { volume, pathList } = getInternalPathFromString(inputs.path);
-		assertAuthorizedVolume(this, volume);
+		await assertAuthorizedVolume(this, volume);
 
 		Exception.assertPrecondition(volume, "There is no volume associated with this path: '{}'.", inputs.path);
 		const storage = await cache.get("volume", volume);
@@ -157,13 +160,13 @@ program
 
 		if (!volume) {
 			const volumeNames = Object.keys(volumes);
-			const result = await CollectionPaging.makeFromList(volumeNames, volumeNames.length, (volume) => {
+			const result = await CollectionPaging.makeFromList(volumeNames, volumeNames.length, async (volume) => {
 				return Permissions.makeEntry(
 					{
 						name: volume,
 						type: "bucket",
 						plugin: volumes[volume].options.type,
-						authorized: isAuthorizedVolume(volume),
+						authorized: await isAuthorizedVolume(this, volume),
 					},
 					{
 						list: true,
@@ -176,7 +179,7 @@ program
 			};
 		}
 
-		assertAuthorizedVolume(this, volume);
+		await assertAuthorizedVolume(this, volume);
 
 		const storage = await cache.get("volume", volume);
 		const result = await storage.list(pathList, maxOrPaging, /*includeMetadata*/ true);
@@ -196,7 +199,7 @@ program
 					method,
 					route,
 					async (context) => {
-						assertAuthorizedVolume(context, volume);
+						await assertAuthorizedVolume(context, volume);
 						await endpoint.handler(context);
 					},
 					Object.assign({ exceptionGuard: true, type: ["raw"] }, endpoint.options),

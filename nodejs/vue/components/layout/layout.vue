@@ -409,7 +409,7 @@
 				}
 				.bzd-notification-content {
 					flex: 1;
-					white-space: pre;
+					white-space: pre-wrap;
 				}
 				.bzd-notification-action {
 					@extend %bzd-clickable;

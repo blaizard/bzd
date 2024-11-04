@@ -2,7 +2,9 @@
     "rest": {
         "/admin/service/logs": {
             "get": {
-                "authentication": "admin-applications",
+                "authentication": [
+                    "admin-applications"
+                ],
                 "documentation": "Get the logs for a specific service/process",
                 "request": {
                     "type": "query",
@@ -21,7 +23,9 @@
         },
         "/admin/service/trigger": {
             "post": {
-                "authentication": "admin-applications",
+                "authentication": [
+                    "admin-applications"
+                ],
                 "documentation": "Manually trigger a service",
                 "request": {
                     "type": "json",
@@ -34,7 +38,9 @@
         },
         "/admin/services": {
             "get": {
-                "authentication": "admin-applications",
+                "authentication": [
+                    "admin-applications"
+                ],
                 "documentation": "List available services",
                 "response": {
                     "type": "json",

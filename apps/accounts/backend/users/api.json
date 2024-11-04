@@ -2,7 +2,9 @@
     "rest": {
         "/admin/user": {
             "delete": {
-                "authentication": "admin-users",
+                "authentication": [
+                    "admin-users"
+                ],
                 "documentation": "Delete a specific user",
                 "request": {
                     "type": "json",
@@ -12,7 +14,9 @@
                 }
             },
             "post": {
-                "authentication": "admin-users",
+                "authentication": [
+                    "admin-users"
+                ],
                 "documentation": "Create a new user",
                 "request": {
                     "type": "json",
@@ -22,7 +26,9 @@
                 }
             },
             "put": {
-                "authentication": "admin-users",
+                "authentication": [
+                    "admin-users"
+                ],
                 "documentation": "Update user information",
                 "request": {
                     "type": "json",
@@ -36,7 +42,9 @@
         },
         "/admin/users": {
             "get": {
-                "authentication": "admin-users",
+                "authentication": [
+                    "admin-users"
+                ],
                 "documentation": "List all users",
                 "request": {
                     "type": "query",
@@ -52,7 +60,9 @@
         },
         "/subscription": {
             "get": {
-                "authentication": "self-subscriptions:r",
+                "authentication": [
+                    "self-subscriptions:r"
+                ],
                 "cors": true,
                 "documentation": "Check if a subscription is active",
                 "request": {
@@ -71,7 +81,9 @@
         },
         "/user": {
             "delete": {
-                "authentication": "self-basic:w",
+                "authentication": [
+                    "self-basic:w"
+                ],
                 "documentation": "Delete current user account",
                 "request": {
                     "type": "json",
@@ -81,7 +93,9 @@
                 }
             },
             "get": {
-                "authentication": "self-basic:r",
+                "authentication": [
+                    "self-basic:r"
+                ],
                 "cors": true,
                 "documentation": "Get current user information",
                 "request": {
@@ -106,7 +120,9 @@
                 }
             },
             "put": {
-                "authentication": "self-basic:w",
+                "authentication": [
+                    "self-basic:w"
+                ],
                 "documentation": "Update current user information",
                 "request": {
                     "scopes": {

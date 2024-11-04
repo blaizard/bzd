@@ -76,13 +76,24 @@ export default class AuthenticationClient {
 		await this._logoutImpl(api);
 	}
 
-	/// Set authentication information to the fetch request
-	async setAuthenticationFetch(fetchOptions) {
-		return await this._setAuthenticationFetchImpl(fetchOptions);
+	/// Set authentication information to the fetch request if authenticated.
+	///
+	/// \return true if success, false if not authenticated.
+	async updateAuthenticationFetch(fetchOptions) {
+		if (await this.isAuthenticated()) {
+			await this._updateAuthenticationFetchImpl(fetchOptions);
+			return true;
+		}
+		return false;
 	}
 
-	/// Make an authentication URL from a base URL
-	async makeAuthenticationURL(url) {
-		return await this._makeAuthenticationURLImpl(url);
+	/// Make an authentication URL from a base URL if authenticated.
+	///
+	/// \return the URL updated or not.
+	async updateAuthenticationURL(url) {
+		if (await this.isAuthenticated()) {
+			return await this._updateAuthenticationURLImpl(url);
+		}
+		return url;
 	}
 }

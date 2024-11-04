@@ -85,7 +85,7 @@ export default class SessionAuthenticationServerProxy extends SessionAuthenticat
 		});
 	}
 
-	async _verifyImpl(context, callback) {
+	async _verifyImpl(context) {
 		const maybeToken = this._getAccessToken(context);
 		if (!maybeToken) {
 			return false;
@@ -97,7 +97,6 @@ export default class SessionAuthenticationServerProxy extends SessionAuthenticat
 
 		// TODO: implement caching (store the result into a database and reuse super()._verifyImpl(...))
 
-		const session = new Session(result.uid, result.scopes);
-		return await callback(session);
+		return new Session(result.uid, result.scopes);
 	}
 }

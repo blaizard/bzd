@@ -40,5 +40,6 @@ bzd_nodejs_library(
         "//nodejs/core/authentication:server",
         "//nodejs/core/authentication:session",
         "//nodejs/db/key_value_store:memory",
+        "//nodejs/utils:optional",
     ],
 )

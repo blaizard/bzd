@@ -1,4 +1,6 @@
 <script>
+	import HttpClient from "#bzd/nodejs/core/http/client.mjs";
+
 	export default {
 		props: {
 			pathList: { mandatory: true, type: Array },
@@ -30,6 +32,15 @@
 					}
 				}
 				return null;
+			},
+		},
+		methods: {
+			/// Request the backend server.
+			///
+			/// This method deals with authentication if needed.
+			async requestBackend(endpoint, options = {}) {
+				await this.$authentication.updateFetch(options);
+				return await HttpClient.request(endpoint, options);
 			},
 		},
 	};

@@ -111,14 +111,21 @@ export default class RestClient extends Base {
 				Exception.unreachable("{} {}: Unsupported request type '{}'", method, endpoint, requestOptions.type);
 		}
 
-		// Check if this is a request that needs authentication
-		if (this.schema[endpoint][method].authentication) {
-			Exception.assert(
-				this.isAuthentication(),
-				"This route has authentication requirement but no authentication object was specified.",
-			);
-			Exception.assert(await this.options.authentication.isAuthenticated(), "A user must be authenticated.");
-			await this.options.authentication.setAuthenticationFetch(fetchOptions);
+		// Set the authentication if any.
+		const authenticationSchema = this.schema[endpoint][method].authentication;
+		if (authenticationSchema) {
+			const maybeAuthentication = this.getAuthentication();
+			if (maybeAuthentication) {
+				await maybeAuthentication.updateAuthenticationFetch(fetchOptions);
+			}
+			// Check if this is a request that needs authentication
+			if (authenticationSchema != "optional") {
+				Exception.assert(
+					maybeAuthentication,
+					"This route has authentication requirement but no authentication object was specified.",
+				);
+				Exception.assert(await maybeAuthentication.isAuthenticated(), "A user must be authenticated for this route.");
+			}
 		}
 
 		const channel = this.options.channel ? this.options.channel : HttpClient;

@@ -50,9 +50,20 @@ export default class AuthenticationServer {
 	/// For example, check that the header contains a valid token.
 	///
 	/// \param context The http context.
-	/// \param callback the function to be called when the verification succeed, it should be populated with the session.
-	async verify(context, callback = async (/*session*/) => true) {
-		return this._verifyImpl(context, callback);
+	/// \param scopes Scopes to be in the session.
+	///
+	/// \return The session in case of success, false otherwise.
+	async verify(context, scopes = null) {
+		const maybeSession = await this._verifyImpl(context);
+		if (!maybeSession) {
+			return false;
+		}
+		if (scopes) {
+			if (!maybeSession.getScopes().matchAny(scopes)) {
+				return false;
+			}
+		}
+		return maybeSession;
 	}
 
 	/// Create a single sign on token.

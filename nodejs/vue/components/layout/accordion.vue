@@ -1,10 +1,10 @@
 <template>
 	<div :class="{ accordion: true, show: state.showContent }">
 		<template v-if="state.showAction">
-			<i class="bzd-icon-arrow_up action" @click="state.showContent = false" v-if="state.showContent"></i>
-			<i class="bzd-icon-arrow_down action" @click="state.showContent = true" v-else></i>
+			<i class="arrow arrow-down" @click="state.showContent = false" v-if="state.showContent"></i>
+			<i class="arrow arrow-left" @click="state.showContent = true" v-else></i>
 		</template>
-		<span class="content" ref="content" @click="isOverflow"><slot></slot></span>
+		<span class="content" ref="content"><slot></slot></span>
 	</div>
 </template>
 
@@ -37,24 +37,30 @@
 	};
 </script>
 
-<style lang="scss">
-	@use "@/nodejs/icons.scss" as * with (
-		$bzdIconNames: arrow_down arrow_up
-	);
-</style>
-
 <style lang="scss" scoped>
-	@use "@/nodejs/styles/default/css/clickable.scss" as *;
-
 	.accordion {
 		display: flex;
 		flex-direction: row;
 		align-items: baseline;
-		gap: 10px;
 
-		.action {
-			@extend %bzd-clickable;
-			font-weight: bold;
+		.arrow {
+			cursor: pointer;
+
+			&:before {
+				display: inline-block;
+				width: 0;
+				height: 0;
+				border-left: 0.5em solid currentColor;
+				border-right: 0.5em solid transparent;
+				border-bottom: 0.5em solid transparent;
+				border-top: 0.5em solid transparent;
+				content: "";
+				transition: transform 0.5s;
+			}
+
+			&.arrow-down:before {
+				transform: rotate(90deg) translateY(0.25em) translateX(0.25em);
+			}
 		}
 
 		.content {
@@ -62,7 +68,6 @@
 			-webkit-box-orient: vertical;
 			overflow: hidden;
 			-webkit-line-clamp: 1;
-			white-space: pre;
 		}
 
 		&.show {

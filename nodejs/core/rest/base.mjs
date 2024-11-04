@@ -26,18 +26,19 @@ export default class Rest {
 		});
 	}
 
-	/**
-	 * This function waits until the module is ready
-	 */
+	/// This function waits until the module is ready
 	async waitReady() {
 		return await this.event.waitUntil("ready");
 	}
 
-	/**
-	 * If authentication is supported
-	 */
+	/// If authentication is supported
 	isAuthentication() {
 		return this.options.authentication !== null;
+	}
+
+	/// Get the authentication object if any.
+	getAuthentication() {
+		return this.options.authentication || null;
 	}
 
 	getEndpoint(endpoint) {
