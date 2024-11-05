@@ -45,7 +45,12 @@ def monitorBatteries() -> typing.Any:
 def monitorMemories() -> typing.Any:
 	virtual = psutil.virtual_memory()  # type: ignore
 	swap = psutil.swap_memory()  # type: ignore
-	return {"ram": [virtual.used, virtual.total], "swap": [swap.used, swap.total]}
+	memories = {}
+	if virtual.total:
+		memories["ram"] = [virtual.used, virtual.total]
+	if swap.total:
+		memories["swap"] = [swap.used, swap.total]
+	return memories
 
 
 def monitorDisks() -> typing.Any:
