@@ -19,6 +19,9 @@
 				<MenuEntry text="Validation" link="/form/validation"></MenuEntry>
 				<MenuEntry text="Output" link="/form/output"></MenuEntry>
 			</MenuEntry>
+			<MenuEntry text="Components" link="/components">
+				<MenuEntry text="Accordion" link="/components/accordion"></MenuEntry>
+			</MenuEntry>
 		</template>
 		<template #content>
 			<RouterComponent name="view"></RouterComponent>
@@ -55,6 +58,7 @@
 					{ path: "/form/autocomplete", component: () => import("./form/autocomplete.vue") },
 					{ path: "/form/validation", component: () => import("./form/validation.vue") },
 					{ path: "/form/output", component: () => import("./form/output.vue") },
+					{ path: "/components/accordion", component: () => import("./components/accordion.vue") },
 					{ path: "/tooltip", component: () => import("./tooltip.vue") },
 				],
 				fallback: { component: () => import("./404.vue") },

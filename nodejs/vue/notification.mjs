@@ -22,12 +22,12 @@ export default {
 		const notify = (type, message, options = {}, callback = () => {}) => {
 			if (typeof tryToString(message) == "string") {
 				notifySingle(++_uid, type, message, options, callback);
-			} else if (typeof message == "object") {
+			} else if (message && typeof message == "object") {
 				for (const key in message) {
 					notifySingle(key, type, message[key], options, callback);
 				}
 			} else {
-				Exception.unreachable("Unsupported message type: {:j}", message);
+				notifySingle(++_uid, type, String(message), options, callback);
 			}
 		};
 		// Find en entry with this key
@@ -111,11 +111,11 @@ export default {
 		};
 
 		window.addEventListener("error", (e) => {
-			error(e.error);
+			error(String(e.message));
 		});
 
 		window.addEventListener("unhandledrejection", (e) => {
-			error(e.reason);
+			error(String(e.reason));
 		});
 
 		app.config.globalProperties.$notification = {

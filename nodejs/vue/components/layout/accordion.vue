@@ -1,8 +1,12 @@
 <template>
-	<div :class="{ accordion: true, show: state.showContent }">
+	<div
+		:class="{ accordion: true, show: state.showContent, overflow: state.overflow }"
+		:style="{ '--nb-lines': props.lines }"
+		@click="click"
+	>
 		<template v-if="state.showAction">
 			<i class="arrow arrow-down" @click="state.showContent = false" v-if="state.showContent"></i>
-			<i class="arrow arrow-left" @click="state.showContent = true" v-else></i>
+			<i class="arrow arrow-left" v-else></i>
 		</template>
 		<span class="content" ref="content"><slot></slot></span>
 	</div>
@@ -11,18 +15,29 @@
 <script setup>
 	import { ref, reactive, onMounted, onUnmounted } from "vue";
 
+	const props = defineProps({
+		lines: {
+			type: Number,
+			default: 1,
+		},
+	});
 	const state = reactive({
 		showContent: false,
 		showAction: false,
+		overflow: false,
 	});
 	const content = ref(null);
 	let observer = null;
 
 	onMounted(() => {
 		observer = new ResizeObserver((e) => {
-			if (!state.showContent) {
-				state.showAction = isOverflow(e[0].target);
-			}
+			// Debounce to avoid infinite loop.
+			setTimeout(() => {
+				state.overflow = isOverflow(e[0].target);
+				if (!state.showContent) {
+					state.showAction = state.overflow;
+				}
+			}, 1);
 		}).observe(content.value);
 	});
 
@@ -31,6 +46,12 @@
 			observer.unobserve(content.value);
 		}
 	});
+
+	const click = () => {
+		if (state.overflow) {
+			state.showContent = !state.showContent;
+		}
+	};
 
 	const isOverflow = (element) => {
 		return element.scrollHeight > element.offsetHeight;
@@ -42,6 +63,10 @@
 		display: flex;
 		flex-direction: row;
 		align-items: baseline;
+
+		&.overflow {
+			cursor: pointer;
+		}
 
 		.arrow {
 			cursor: pointer;
@@ -67,7 +92,7 @@
 			display: -webkit-box;
 			-webkit-box-orient: vertical;
 			overflow: hidden;
-			-webkit-line-clamp: 1;
+			-webkit-line-clamp: var(--nb-lines);
 		}
 
 		&.show {

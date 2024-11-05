@@ -9,18 +9,26 @@ bzd_config(
 bzd_nodejs_library(
     name = "layout",
     srcs = [
-        "accordion.vue",
         "base.vue",
         "layout.vue",
         ":config.json",
     ],
     visibility = ["//visibility:public"],
     deps = [
+        ":accordion",
         "//nodejs:icons",
         "//nodejs:vue",
         "//nodejs/core:localstorage",
         "//nodejs/vue/directives:tooltip",
     ],
+)
+
+bzd_nodejs_library(
+    name = "accordion",
+    srcs = [
+        "accordion.vue",
+    ],
+    visibility = ["//visibility:public"],
 )
 
 bzd_nodejs_library(
