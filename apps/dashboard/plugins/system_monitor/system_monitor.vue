@@ -88,9 +88,8 @@
 				let tooltips = {};
 				for (const [name, memory] of Object.entries(this.metadata.memory || {})) {
 					const [used, total] = memory;
-					const free = total - used;
 					tooltips[name] =
-						bytesToString(free) + " free / " + bytesToString(total) + " (" + ((free / total) * 100).toFixed(1) + "%)";
+						bytesToString(used) + " used / " + bytesToString(total) + " (" + ((used / total) * 100).toFixed(1) + "%)";
 					ratios[name] = [
 						{
 							ratio: used / total,
@@ -108,9 +107,8 @@
 				let tooltips = {};
 				for (const [name, disk] of Object.entries(this.metadata.disk || {})) {
 					const [used, total] = disk;
-					const free = total - used;
 					tooltips[name] =
-						bytesToString(free) + " free / " + bytesToString(total) + " (" + ((free / total) * 100).toFixed(1) + "%)";
+						bytesToString(used) + " used / " + bytesToString(total) + " (" + ((used / total) * 100).toFixed(1) + "%)";
 					ratios[name] = [
 						{
 							ratio: used / total,
