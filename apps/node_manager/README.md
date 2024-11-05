@@ -22,6 +22,8 @@ After=network.service
 
 [Service]
 ExecStart=$(pwd)/node_manager <node UID>
+Restart=always
+RuntimeMaxSec=1d
 
 [Install]
 WantedBy=multi-user.target
