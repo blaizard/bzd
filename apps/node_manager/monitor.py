@@ -37,9 +37,8 @@ def monitorCPUs() -> typing.Any:
 def monitorBatteries() -> typing.Any:
 	maybeBattery = psutil.sensors_battery()  # type: ignore
 	if maybeBattery is None:
-		return []
-	else:
-		return {"main": [maybeBattery[0] / 100.]}
+		return None
+	return {"main": [maybeBattery[0] / 100.]}
 
 
 def monitorMemories() -> typing.Any:
@@ -63,13 +62,20 @@ def monitorDisks() -> typing.Any:
 
 
 def monitor() -> typing.Any:
-	return {
-	    "cpu": monitorCPUs(),
-	    "temperature": monitorTemperatures(),
-	    "battery": monitorBatteries(),
-	    "memory": monitorMemories(),
-	    "disk": monitorDisks()
-	}
+
+	content = {}
+
+	def assignIfSet(key: str, value: typing.Any) -> None:
+		if value:
+			content[key] = value
+
+	assignIfSet("cpu", monitorCPUs())
+	assignIfSet("temperature", monitorTemperatures())
+	assignIfSet("battery", monitorBatteries())
+	assignIfSet("memory", monitorMemories())
+	assignIfSet("disk", monitorDisks())
+
+	return content
 
 
 def handlerMonitor(context: RESTServerContext) -> None:
