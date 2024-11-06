@@ -203,10 +203,8 @@
 				}
 				return 0;
 			},
-			/**
-			 * Look at the success rate over the last 30 days.
-			 * Integer expressed in percent.
-			 */
+			/// Look at the success rate over the last 30 days.
+			/// Integer expressed in percent.
 			buildReliability() {
 				const buildsLast30Days = this.getLastBuilds(30);
 				const nbSuccessfullBuilds = buildsLast30Days.reduce((total, build) => {

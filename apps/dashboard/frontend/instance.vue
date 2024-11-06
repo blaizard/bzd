@@ -253,59 +253,64 @@
 
 	$bzdPadding: 10px;
 
-	.bzd-dashboard-tile {
-		width: 300px;
-		height: 300px;
-		margin: 1px;
-		padding: 0px;
+	.bzd-dashboard-tile-group {
+		display: flex;
+		flex-direction: row;
 
-		background-repeat: no-repeat;
-		background-size: contain;
-		background-position: center;
-
-		.container {
+		.bzd-dashboard-tile {
 			width: 300px;
 			height: 300px;
+			margin: 1px;
+			padding: 0px;
 
-			border-width: 1px;
-			border-style: solid;
-			position: relative;
+			background-repeat: no-repeat;
+			background-size: contain;
+			background-position: center;
 
-			&.clickable {
-				@extend %bzd-clickable;
-			}
+			.container {
+				width: 300px;
+				height: 300px;
 
-			.name {
-				position: absolute;
-				bottom: $bzdPadding;
-				left: $bzdPadding;
-				right: $bzdPadding;
-				overflow: hidden;
-				line-height: 2em;
-			}
+				border-width: 1px;
+				border-style: solid;
+				position: relative;
 
-			.content {
-				position: absolute;
-				top: $bzdPadding;
-				bottom: calc(#{$bzdPadding * 2} + 2em);
-				left: $bzdPadding;
-				right: $bzdPadding;
-				overflow: hidden;
-			}
+				&.clickable {
+					@extend %bzd-clickable;
+				}
 
-			.error {
-				position: absolute;
-				right: -1em;
-				top: -1em;
-				width: 2em;
-				height: 2em;
-				border-radius: 1em;
-				border: 1px solid config.$bzdGraphColorWhite;
-				z-index: 1;
-				color: config.$bzdGraphColorWhite;
-				background-color: config.$bzdGraphColorRed;
-				line-height: 2em;
-				text-align: center;
+				.name {
+					position: absolute;
+					bottom: $bzdPadding;
+					left: $bzdPadding;
+					right: $bzdPadding;
+					overflow: hidden;
+					line-height: 2em;
+				}
+
+				.content {
+					position: absolute;
+					top: $bzdPadding;
+					bottom: calc(#{$bzdPadding * 2} + 2em);
+					left: $bzdPadding;
+					right: $bzdPadding;
+					overflow: hidden;
+				}
+
+				.error {
+					position: absolute;
+					right: -1em;
+					top: -1em;
+					width: 2em;
+					height: 2em;
+					border-radius: 1em;
+					border: 1px solid config.$bzdGraphColorWhite;
+					z-index: 1;
+					color: config.$bzdGraphColorWhite;
+					background-color: config.$bzdGraphColorRed;
+					line-height: 2em;
+					text-align: center;
+				}
 			}
 		}
 	}

@@ -219,7 +219,7 @@
 			},
 			makeTooltipMulti(displayName, map) {
 				const messageList = Object.entries(map).map(([name, data]) => {
-					return "<li>" + name + ": " + data + "</li>";
+					return '<li style="white-space: nowrap;">' + name + ": " + data + "</li>";
 				});
 				return { data: displayName + "<ul>" + messageList.join("\n") + "</ul>" };
 			},
