@@ -63,7 +63,7 @@ def monitorDisks() -> typing.Any:
 
 
 def upTime() -> float:
-	return time.time() - psutil.boot_time()
+	return time.time() - psutil.boot_time()  # type: ignore
 
 
 def monitor() -> typing.Any:
