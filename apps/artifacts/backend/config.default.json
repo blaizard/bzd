@@ -1,4 +1,11 @@
 {
+    "tokens": {
+        "dwqdwdfesadfsfdsfd": {
+            "doc": "For the dashboard",
+            "scopes": []
+        },
+        "jisjsjiajsiodasds": {}
+    },
     "volumes": {
         "nodes": {
             "nodes.data": {
@@ -39,16 +46,7 @@
                     "toString": "[{level}] [{name}] [{source}] {message}"
                 }
             },
-            "private": {
-                "tokens": {
-                    "dwqdwdfesadfsfdsfd": [
-                        "/ci:w"
-                    ],
-                    "jisjsjiajsiodasds": [
-                        "/:r"
-                    ]
-                }
-            },
+            "private": true,
             "type": "nodes"
         },
         "nodes2": {

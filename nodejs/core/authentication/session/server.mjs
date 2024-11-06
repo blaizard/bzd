@@ -28,10 +28,10 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 			// Key value store to save the session IDs.
 			// The structure of this KVS looks like this:
 			// <uid-hash>: {
-			//     sessions: [
-			//     	    {hash: <hash>, scopes: [<scope>, ...], expiration: <timestamp>},
-			//	   		{hash: <hash>, scopes: [<scope>, ...], expiration: <timestamp>},
-			//     ]
+			//     sessions: {
+			//     	    <hash>: {scopes: [<scope>, ...], expiration: <timestamp>},
+			//	   		<hash>: {scopes: [<scope>, ...], expiration: <timestamp>},
+			//     }
 			// }
 			// Ordered from the earliest first.
 			kvs: null,
@@ -104,8 +104,8 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 				);
 				if (result) {
 					maybeTokenObject = {
-						token: authentication._makeToken(result.session.getUid(), result.data.hash),
-						timeout: result.data.expiration - authentication._getTimestamp(),
+						token: authentication._makeToken(result.session.getUid(), result.hash),
+						timeout: result.expiration - authentication._getTimestamp(),
 						uid: result.session.getUid(),
 						scopes: result.session.getScopes().toList(),
 					};
@@ -155,9 +155,9 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 			}
 			return {
 				uid: result.session.getUid(),
-				scopes: result.data.scopes,
-				hash: result.data.hash,
-				timeout: result.data.expiration - authentication._getTimestamp(),
+				scopes: result.scopes,
+				hash: result.hash,
+				timeout: result.expiration - authentication._getTimestamp(),
 			};
 		});
 	}
@@ -174,13 +174,12 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 			const [uid, hash] = this._readToken(maybeAccessToken);
 			await this.options.kvs.update(this.options.kvsBucket, uid, (data) => {
 				if (!data.sessions) {
-					return { sessions: [] };
+					return { sessions: {} };
 				}
-				return {
-					sessions: data.sessions.filter((session) => {
-						return session.hash != hash;
-					}),
-				};
+				if (hash in data.sessions) {
+					delete data.sessions[hash];
+				}
+				return data;
 			});
 		}
 
@@ -243,26 +242,25 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		// Check if there is an existing access token with a valid expiration date that can be re-used.
 		const maybeSessions = await this.options.kvs.get(this.options.kvsBucket, session.getUid(), null);
 		if (maybeSessions) {
-			for (const sessionData of maybeSessions.sessions) {
+			for (const [hash, sessionData] of Object.entries(maybeSessions.sessions)) {
 				const timeoutS = sessionData.expiration - this._getTimestamp();
 				// If too old, do not consider anymore, as this array is ordered.
-				if (timeoutS < this.options.tokenAccessExpiresInReuse) {
-					break;
-				}
-				// If the session has the same scopes, reuse it1
-				if (session.getScopes().sameAs(sessionData.scopes)) {
-					return {
-						token: this._makeToken(session.getUid(), sessionData.hash),
-						timeout: timeoutS,
-						uid: session.getUid(),
-						scopes: session.getScopes().toList(),
-					};
+				if (timeoutS >= this.options.tokenAccessExpiresInReuse) {
+					// If the session has the same scopes, reuse it1
+					if (session.getScopes().sameAs(sessionData.scopes)) {
+						return {
+							token: this._makeToken(session.getUid(), hash),
+							timeout: timeoutS,
+							uid: session.getUid(),
+							scopes: session.getScopes().toList(),
+						};
+					}
 				}
 			}
 		}
 
+		const hash = this._makeTokenHash();
 		const sessionData = {
-			hash: this._makeTokenHash(),
 			expiration: this._getTimestamp() + this.options.tokenAccessExpiresIn,
 			scopes: session.getScopes().toList(),
 		};
@@ -273,19 +271,21 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 			session.getUid(),
 			(data) => {
 				// Remove the sessions that will expire the first if too many.
-				if (data.length >= this.options.maxSessionsPerUser) {
-					data.sessions = data.sessions.slice(0, this.options.maxSessionsPerUser - 1);
+				// This operation should not be frequent, hence the sorting is not expensive.
+				if (Object.keys(data.sessions).length >= this.options.maxSessionsPerUser) {
+					const sortedSessions = Object.entries(data.sessions).sort((a, b) => b.expiration - a.expiration);
+					data.sessions = Object.fromEntries(sortedSessions.slice(0, this.options.maxSessionsPerUser - 1));
 				}
 				// Add the new session.
-				data.sessions.unshift(sessionData);
+				data.sessions[hash] = sessionData;
 				return data;
 			},
-			{ sessions: [] },
+			{ sessions: {} },
 		);
 
 		// Return the token
 		return {
-			token: this._makeToken(session.getUid(), sessionData.hash),
+			token: this._makeToken(session.getUid(), hash),
 			timeout: this.options.tokenAccessExpiresIn,
 			uid: session.getUid(),
 			scopes: session.getScopes().toList(),
@@ -390,7 +390,7 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		}
 
 		// Look for the token
-		const maybeSession = maybeSessions.sessions.find((session) => session.hash == hash);
+		const maybeSession = maybeSessions.sessions[hash];
 		if (!maybeSession) {
 			return false;
 		}
@@ -402,7 +402,9 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 
 		return {
 			session: new Session(uid, maybeSession.scopes),
-			data: maybeSession,
+			hash: hash,
+			expiration: maybeSession.expiration,
+			scopes: maybeSession.scopes,
 		};
 	}
 }
