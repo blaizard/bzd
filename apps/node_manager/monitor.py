@@ -1,6 +1,7 @@
 import psutil
 import typing
 import json
+import time
 
 from apps.node_manager.rest_server import RESTServerContext
 """Data format output:
@@ -61,6 +62,10 @@ def monitorDisks() -> typing.Any:
 	return disks
 
 
+def upTime() -> float:
+	return time.time() - psutil.boot_time()
+
+
 def monitor() -> typing.Any:
 
 	content = {}
@@ -74,6 +79,7 @@ def monitor() -> typing.Any:
 	assignIfSet("battery", monitorBatteries())
 	assignIfSet("memory", monitorMemories())
 	assignIfSet("disk", monitorDisks())
+	assignIfSet("uptime", upTime())
 
 	return content
 
