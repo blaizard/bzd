@@ -103,7 +103,8 @@ class Binary:
 	def run(self,
 	        args: typing.Optional[typing.List[str]] = None,
 	        stablePolicy: typing.Optional[StablePolicy] = None,
-	        stableCallback: typing.Optional[typing.Callable[[], None]] = None) -> None:
+	        stableCallback: typing.Optional[typing.Callable[[], None]] = None,
+	        env: typing.Optional[typing.Dict[str, str]] = None) -> None:
 		"""Run the binary."""
 
 		self.logger.info(f"Running {self.binary} {' '.join(args or [])}")
@@ -125,6 +126,7 @@ class Binary:
 				    timeoutS=None,
 				    stdout=stdOutput,  # type: ignore
 				    stderr=stdOutput,  # type: ignore
+				    env=env,
 				    cancellation=self.cancellation)
 				if stableCallback and stablePolicy == StablePolicy.returnCodeZero:
 					stableCallback()
