@@ -2,6 +2,7 @@ import argparse
 import json
 import threading
 import sys
+import os
 
 from apps.node_manager.rest_server import RESTServer, RESTServerContext
 from apps.node_manager.power import handlersPower
@@ -20,10 +21,14 @@ if __name__ == "__main__":
 	                    type=int,
 	                    help="The rate (in s) at which status messages are emitted.")
 	parser.add_argument("--power", action="store_true", help="Whether or not the power on this node can be controlled.")
+	parser.add_argument("--node-token",
+	                    type=str,
+	                    default=os.environ.get("BZD_NODE_TOKEN"),
+	                    help="A token to be used to access the node server.")
 	parser.add_argument(
 	    "uid",
 	    nargs="?",
-	    default=None,
+	    default=os.environ.get("BZD_NODE_UID"),
 	    help=
 	    "The UID of this node. If no UID is provided, the application will report the monitoring on the command line.")
 
@@ -40,7 +45,7 @@ if __name__ == "__main__":
 		print("Another instance of 'node_manager' is already running, aborting.")
 		sys.exit(0)
 
-	node = Node(uid=args.uid)
+	node = Node(uid=args.uid, token=args.node_token)
 
 	# Start the thread to monitor the node.
 	def monitorWorkload() -> None:

@@ -53,22 +53,25 @@
                 }
             }
         },
-        "/auth/verify": {
+        "/auth/refresh_token": {
             "post": {
                 "cors": true,
-                "documentation": "Verify a token information.",
+                "documentation": "Refresh a refresh token.",
                 "request": {
                     "type": "json",
                     "validation": {
-                        "token": "mandatory"
+                        "hash": "mandatory",
+                        "next": "mandatory",
+                        "timeout": "mandatory",
+                        "uid": "mandatory"
                     }
                 },
                 "response": {
                     "type": "json",
                     "validation": {
-                        "hash": "mandatory",
+                        "hash": "",
                         "scopes": "mandatory",
-                        "timeout": "mandatory",
+                        "timeout": "",
                         "uid": "mandatory"
                     }
                 }

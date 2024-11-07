@@ -52,6 +52,10 @@ program
 	const authentication = new Authentication({
 		accounts: configGlobal.accounts,
 	});
+	for (const [token, options] of Object.entries(config["tokens"] || {})) {
+		await authentication.preloadApplicationToken(token, options["scopes"]);
+	}
+	Log.info("Preloaded {} application token(s).", Object.keys(config["tokens"] || {}).length);
 
 	// Set-up the web server
 	let web = new HttpServer(PORT);

@@ -28,8 +28,8 @@ class Context:
 		self.newBinary: typing.Optional[pathlib.Path] = None
 		self.updateIgnoreOverride: typing.Optional[str] = None
 		self.logger = logger
-		self.release = Release(uid=self.uid)
-		self.node = Node(uid=self.uid, logger=logger)
+		self.release = Release(uid=self.uid, token=self.token)
+		self.node = Node(uid=self.uid, token=self.token, logger=logger)
 		self.binary = Binary(binary=self.application, logger=self.logger)
 
 	@staticmethod
@@ -55,6 +55,7 @@ class Context:
 		    type=pathlib.Path,
 		    default=os.environ.get("BZD_BUNDLE"),
 		    help="Path of the stable binary, it will be replaced with this one when it is considered stable.")
+		parser.add_argument("--bootloader-token", type=str, help="The node application token to be used.")
 		parser.add_argument("--bootloader-uid", type=str, help="The unique identifier of this instance.")
 		parser.add_argument("--bootloader-application",
 		                    type=pathlib.Path,
@@ -97,6 +98,10 @@ class Context:
 	def uid(self) -> typing.Optional[str]:
 		return typing.cast(typing.Optional[str], self.values.bootloader_uid)
 
+	@property
+	def token(self) -> typing.Optional[str]:
+		return typing.cast(typing.Optional[str], self.values.bootloader_token)
+
 	def argsForBinary(self, binary: pathlib.Path) -> typing.List[str]:
 		"""Recreate the command line."""
 
@@ -109,6 +114,8 @@ class Context:
 			args += ["--bootloader-update-path", str(self.values.bootloader_update_path)]
 		if self.values.bootloader_stable_path:
 			args += ["--bootloader-stable-path", str(self.values.bootloader_stable_path)]
+		if self.values.bootloader_token:
+			args += ["--bootloader-token", str(self.values.bootloader_token)]
 		if self.values.bootloader_uid:
 			args += ["--bootloader-uid", str(self.values.bootloader_uid)]
 		if self.values.bootloader_application:

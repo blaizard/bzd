@@ -35,9 +35,14 @@ class Node(ArtifactsBase):
 
 		subPath = "/".join([encodeURIComponent(s) for s in path or []])
 
+		query = query or {}
+		if self.token:
+			query["t"] = self.token
+
 		for remote, retry, nbRetries in self.remotes:
 
 			url = f"{remote}/x/{volume}/{actualUid}/data" + (f"/{subPath}" if subPath else "") + "/"
+
 			try:
 				HttpClient.post(url, json=data, query=query)
 				return
