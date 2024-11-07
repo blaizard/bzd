@@ -16,7 +16,7 @@ const Log = LogFactory("authentication", "session");
 ///                  term token (than the access) that is stored on the database along side
 ///                  the user data. User can revoke the access at any time. It can be used
 ///                  by a 3rd party to access user specific info.
-///                  This token does not changed when refreshed, only its expiration date changes.
+///                  This token does not change when refreshed, only its expiration date changes.
 ///                  The sole purpose of the refresh token is to convert it into an access token.
 /// -  access token: This is the one used to authorized request to access specific information.
 ///                  It is short-lived and resides in a cache (or any fast access memory). It has
@@ -93,73 +93,74 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		///
 		/// If refresh_token is given as an argument, return the tokens by values, if not, return it from the cookies.
 		rest.handle("post", "/auth/refresh", async function (inputs) {
-			let maybeTokenObject = false;
+			return await authentication.refresh(this, inputs.refresh_token);
+		});
 
-			// Check if there is an access token and that it is still valid.
-			const maybeAccessToken = authentication._getAccessToken(this);
-			if (maybeAccessToken) {
-				const result = await authentication._verifyAccessToken(
-					maybeAccessToken,
-					authentication.options.tokenAccessExpiresInReuse,
-				);
-				if (result) {
-					maybeTokenObject = {
-						token: authentication._makeToken(result.session.getUid(), result.hash),
-						timeout: result.expiration - authentication._getTimestamp(),
-						uid: result.session.getUid(),
-						scopes: result.session.getScopes().toList(),
-					};
-				}
-			}
-
-			// If not, refresh the token from the refresh_token.
-			if (!maybeTokenObject) {
-				const maybeRefreshToken =
-					"refresh_token" in inputs ? inputs.refresh_token : this.getCookie("refresh_token", null);
-				maybeTokenObject = await authentication._getAndRefreshAccessToken(this, maybeRefreshToken);
-			}
-
-			if (!maybeTokenObject) {
+		// Refresh a token, this is useful with the server proxy.
+		rest.handle("post", "/auth/refresh_token", async function (inputs) {
+			const maybeToken = await authentication.options.refreshToken.call(
+				this,
+				inputs.uid,
+				inputs.hash,
+				inputs.timeout,
+				inputs.next,
+			);
+			if (!maybeToken) {
 				throw this.httpError(401, "Unauthorized");
 			}
+			return maybeToken;
+		});
+	}
 
-			// If refresh token is coming from the cookie, set cookies as well.
-			if (!("refresh_token" in inputs)) {
-				// Set the access token.
-				this.setCookie("access_token", maybeTokenObject.token, {
+	async refresh(context, refreshToken) {
+		let maybeTokenObject = false;
+
+		// Check if there is an access token and that it is still valid.
+		const maybeAccessToken = this._getAccessToken(context);
+		if (maybeAccessToken) {
+			const result = await this._verifyAccessToken(maybeAccessToken, this.options.tokenAccessExpiresInReuse);
+			if (result) {
+				maybeTokenObject = {
+					token: this._makeToken(result.session.getUid(), result.hash),
+					timeout: result.expiration - this._getTimestamp(),
+					uid: result.session.getUid(),
+					scopes: result.session.getScopes().toList(),
+				};
+			}
+		}
+
+		// If not, refresh the token from the refresh_token.
+		if (!maybeTokenObject) {
+			const maybeRefreshToken = refreshToken || context.getCookie("refresh_token", null);
+			maybeTokenObject = await this._getAndRefreshAccessToken(context, maybeRefreshToken);
+		}
+
+		if (!maybeTokenObject) {
+			throw context.httpError(401, "Unauthorized");
+		}
+
+		// If refresh token is coming from the cookie, set cookies as well.
+		if (!refreshToken) {
+			// Set the access token.
+			context.setCookie("access_token", maybeTokenObject.token, {
+				httpOnly: true,
+				sameSite: "strict",
+				maxAge: maybeTokenObject.timeout * 1000,
+			});
+
+			// Set the refresh token (if needed).
+			if ("refresh_token" in maybeTokenObject) {
+				context.setCookie("refresh_token", maybeTokenObject.refresh_token, {
 					httpOnly: true,
 					sameSite: "strict",
-					maxAge: maybeTokenObject.timeout * 1000,
+					newMaxAge: maybeTokenObject.refresh_timeout ? maybeTokenObject.refresh_timeout * 1000 : undefined,
 				});
-
-				// Set the refresh token (if needed).
-				if ("refresh_token" in maybeTokenObject) {
-					this.setCookie("refresh_token", maybeTokenObject.refresh_token, {
-						httpOnly: true,
-						sameSite: "strict",
-						newMaxAge: maybeTokenObject.refresh_timeout ? maybeTokenObject.refresh_timeout * 1000 : undefined,
-					});
-					delete maybeTokenObject.refresh_token;
-					delete maybeTokenObject.refresh_timeout;
-				}
+				delete maybeTokenObject.refresh_token;
+				delete maybeTokenObject.refresh_timeout;
 			}
+		}
 
-			return maybeTokenObject;
-		});
-
-		// Verify a token, this is useful with the server proxy.
-		rest.handle("post", "/auth/verify", async function (inputs) {
-			const result = await authentication._verifyAccessToken(inputs.token);
-			if (!result) {
-				throw this.httpError(401, "Unauthorized");
-			}
-			return {
-				uid: result.session.getUid(),
-				scopes: result.scopes,
-				hash: result.hash,
-				timeout: result.expiration - authentication._getTimestamp(),
-			};
-		});
+		return maybeTokenObject;
 	}
 
 	async clearSession(context) {
@@ -302,7 +303,14 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 
 	/// Read the data embedded inside a token. This data contains a UID + a hash.
 	_readToken(token) {
-		return token.split("_");
+		const split = token.split("_");
+		if (split.length == 2) {
+			return split;
+		}
+		if (split.length == 1) {
+			return ["_app", split[0]];
+		}
+		return ["invalid", "invalid"];
 	}
 
 	/// Verify that a request is authenticated.
@@ -322,6 +330,35 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		return result.session;
 	}
 
+	/// Preload an application token.
+	///
+	/// An application token is a token given to a third-party application to access resources.
+	/// Unlike normal access tokens, it does not resolve to a UID, but does provide a scope.
+	///
+	/// \param token The token to be preloaded.
+	/// \param scopes The scopes to be assigned to this token.
+	async _preloadApplicationTokenImpl(token, scopes) {
+		Exception.assert(!token.includes("_"), "Application tokens do not have '_' characters: {}", token);
+		const [uid, hash] = this._readToken(token);
+
+		const sessionData = {
+			expiration: Number.MAX_VALUE,
+			scopes: scopes || [],
+		};
+
+		// Insert the new token.
+		await this.options.kvs.update(
+			this.options.kvsBucket,
+			uid,
+			(data) => {
+				Exception.assert(!(hash in data.sessions), "The application token '{}' is registered twice.", hash);
+				data.sessions[hash] = sessionData;
+				return data;
+			},
+			{ sessions: {} },
+		);
+	}
+
 	/// Refresh an access token from a refresh token.
 	async _getAndRefreshAccessToken(context, maybeRefreshToken = null) {
 		if (maybeRefreshToken == null) {
@@ -329,12 +366,14 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		}
 
 		const [uid, hash] = this._readToken(maybeRefreshToken);
-		const maybeToken = await this.options.refreshToken(uid, hash, () => {
-			return {
-				hash: this._makeTokenHash(),
-				minDuration: this.options.tokenAccessExpiresIn,
-			};
-		});
+		const hashNext = this._makeTokenHash();
+		const maybeToken = await this.options.refreshToken.call(
+			context,
+			uid,
+			hash,
+			this.options.tokenAccessExpiresIn,
+			hashNext,
+		);
 		if (!maybeToken) {
 			return false;
 		}

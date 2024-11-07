@@ -152,7 +152,7 @@ const PATH_STATIC = options.static;
 				return user;
 			});
 		},
-		refreshToken: async (uid, hash, factoryNewTokenInfo) => {
+		refreshToken: async (uid, hash, minDuration, hashNext) => {
 			// If there is no user
 			const maybeUser = await users.get(uid, /*allowNull*/ true);
 			if (maybeUser === null) {
@@ -175,14 +175,13 @@ const PATH_STATIC = options.static;
 
 			// Rolling token
 			if (maybeToken.isRolling()) {
-				const info = factoryNewTokenInfo();
 				let updatedToken = null;
 				await users.update(uid, (user) => {
-					updatedToken = user.rollToken(hash, info.hash);
-					updatedToken.updateMinDuration(info.minDuration);
+					updatedToken = user.rollToken(hash, hashNext);
+					updatedToken.updateMinDuration(minDuration);
 					return user;
 				});
-				result.hash = info.hash;
+				result.hash = hashNext;
 				result.timeout = updatedToken.duration();
 			}
 

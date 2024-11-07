@@ -91,6 +91,8 @@ class Release(ArtifactsBase):
 		# Identify the platform
 		al, isa = Release.getAlIsa()
 		query = {"ignore": ignore, "uid": uid or self.uid, "al": al, "isa": isa}
+		if self.token:
+			query["t"] = self.token
 
 		def queryToString() -> str:
 			return "&".join([f"{k}={v}" for k, v in query.items() if v is not None])

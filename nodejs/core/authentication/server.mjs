@@ -74,6 +74,17 @@ export default class AuthenticationServer {
 	async makeSSOToken(identifier, session, scopes) {
 		Exception.assertPreconditionResult(session.getScopes().checkValid(scopes));
 		const ssoSession = new Session(session.getUid(), scopes);
-		return this._makeSSOTokenImpl(identifier, ssoSession);
+		return await this._makeSSOTokenImpl(identifier, ssoSession);
+	}
+
+	/// Preload an application token.
+	///
+	/// An application token is a token given to a third-party application to access resources.
+	/// Unlike normal access tokens, it does not resolve to a UID, but does provide a scope.
+	///
+	/// \param token The token to be preloaded.
+	/// \param scopes The scopes to be assigned to this token.
+	async preloadApplicationToken(token, scopes = null) {
+		return await this._preloadApplicationTokenImpl(token, scopes);
 	}
 }

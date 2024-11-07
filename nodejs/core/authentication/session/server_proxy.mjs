@@ -26,6 +26,19 @@ export default class SessionAuthenticationServerProxy extends SessionAuthenticat
 			host: this.options.remote,
 			authentication: this,
 		});
+
+		const authentication = this;
+		// The refreshToken calls directly the server.
+		// Note, this assignation cannot be done before, because 'super()' needs to be called before we
+		// can access 'this'.
+		this.options.refreshToken = async function (uid, hash, timeout, hashNext) {
+			return await authentication._requestRemote(this, "post", "/auth/refresh_token", {
+				uid: uid,
+				hash: hash,
+				timeout: timeout,
+				next: hashNext,
+			});
+		};
 	}
 
 	/// Perform a request to the remote.
@@ -46,57 +59,13 @@ export default class SessionAuthenticationServerProxy extends SessionAuthenticat
 
 		Log.info("Installing session-based authentication REST with proxy toward {}.", this.options.remote);
 
-		const restRemote = this.restRemote;
 		const authentication = this;
 		rest.handle("post", "/auth/refresh", async function (inputs) {
-			/// Make sure the input is set and not implicitly coming from the cookie.
-			if (!inputs.refresh_token) {
-				const maybeRefreshToken = this.getCookie("refresh_token", null);
-				if (maybeRefreshToken) {
-					inputs.refresh_token = maybeRefreshToken;
-				}
-			}
-
-			// The inputs.origin is only used to detect if the proxy is not pointing to itself.
-			Exception.assert(
-				!inputs.origin || inputs.origin != authentication.options.remote,
-				"The proxy appears to be wrongly configured and is pointing to itself: {}",
-				authentication.options.remote,
-			);
-			inputs.origin = authentication.options.remote;
-
-			const result = await authentication._requestRemote(this, "post", "/auth/refresh", inputs);
-
-			/// Make sure the local cookie is not used again.
-			this.deleteCookie("local_refresh_token");
-			this.setCookie("refresh_token", result.refresh_token, {
-				httpOnly: true,
-				sameSite: "strict",
-				newMaxAge: result.refresh_timeout ? result.refresh_timeout * 1000 : undefined,
-			});
-
-			delete result.refresh_token;
-			delete result.refresh_timeout;
-			return result;
+			return await authentication.refresh(this, inputs.refresh_token);
 		});
 
 		rest.handle("post", "/auth/logout", async function () {
 			authentication.clearSession(this);
 		});
-	}
-
-	async _verifyImpl(context) {
-		const maybeToken = this._getAccessToken(context);
-		if (!maybeToken) {
-			return false;
-		}
-
-		const result = await this._requestRemote(context, "post", "/auth/verify", {
-			token: maybeToken,
-		});
-
-		// TODO: implement caching (store the result into a database and reuse super()._verifyImpl(...))
-
-		return new Session(result.uid, result.scopes);
 	}
 }
