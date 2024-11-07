@@ -102,6 +102,15 @@ class Context:
 	def token(self) -> typing.Optional[str]:
 		return typing.cast(typing.Optional[str], self.values.bootloader_token)
 
+	@property
+	def env(self) -> typing.Dict[str, str]:
+		env = dict(os.environ)
+		if self.uid:
+			env["BZD_NODE_UID"] = self.uid
+		if self.token:
+			env["BZD_NODE_TOKEN"] = self.token
+		return env
+
 	def argsForBinary(self, binary: pathlib.Path) -> typing.List[str]:
 		"""Recreate the command line."""
 
@@ -239,7 +248,10 @@ def bootloader(context: Context) -> int:
 	while context.running:
 
 		try:
-			context.binary.run(args=context.rest, stablePolicy=context.updatePolicy, stableCallback=stableCallback)
+			context.binary.run(args=context.rest,
+			                   env=context.env,
+			                   stablePolicy=context.updatePolicy,
+			                   stableCallback=stableCallback)
 			return 0
 		except KeyboardInterrupt:
 			context.logger.info("<<< Keyboard interrupt >>>")
