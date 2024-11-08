@@ -9,10 +9,6 @@
         "accounts": {
             "name": "accounts",
             "type": "memory"
-        },
-        "register": {
-            "name": "register",
-            "type": "memory"
         }
     },
     "payment": {

@@ -35,9 +35,9 @@ services:
         volumes:
             - "/etc/timezone:/etc/timezone:ro"
             - "/etc/localtime:/etc/localtime:ro"
+            - "/var/run/docker.sock:/var/run/docker.sock:ro"
             - "./letsencrypt:/letsencrypt"
             - "./logs:/logs"
-            - "/var/run/docker.sock:/var/run/docker.sock:ro"
 
         networks:
             traefik:
@@ -51,6 +51,8 @@ services:
         image: "{{ docker.image | imageResolve }}"
         container_name: "{{ hostToName(docker.host) }}"
         restart: always
+        volumes:
+            - "./data/{{ hostToName(docker.host) }}:/bzd/data"
         labels:
             traefik.enable: "true"
             {% if needsWWWRedirect(docker.host) %}

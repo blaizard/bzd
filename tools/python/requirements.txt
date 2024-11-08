@@ -32,6 +32,8 @@ numpy==2.1.1
     # via
     #   pandas
     #   yfinance
+nvidia-ml-py==12.560.30
+    # via -r tools/python/requirements.in
 pandas==2.2.3
     # via yfinance
 peewee==3.17.6

@@ -6,3 +6,4 @@ typing_extensions
 psutil
 yfinance
 pyyaml
+nvidia-ml-py

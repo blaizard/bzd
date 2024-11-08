@@ -19,11 +19,13 @@ py_binary(
     srcs = [
         "monitor.py",
         "node_manager.py",
+        "nvidia.py",
         "power.py",
         "rest_server.py",
     ],
     deps = [
         requirement("psutil"),
+        requirement("nvidia-ml-py"),
         "//apps/artifacts/api/python/node",
         "@bzd_python//bzd/http:client",
         "@bzd_python//bzd/sync:singleton",

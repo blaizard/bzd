@@ -23,6 +23,7 @@ import paymentMakeFromConfig from "#bzd/nodejs/payment/make_from_config.mjs";
 import EmailManager from "#bzd/apps/accounts/backend/email/manager.mjs";
 import Services from "#bzd/nodejs/core/services/services.mjs";
 import Subscription from "#bzd/apps/accounts/backend/users/subscription.mjs";
+import FileSystem from "#bzd/nodejs/core/filesystem.mjs";
 import { delayMs } from "#bzd/nodejs/utils/delay.mjs";
 
 const Exception = ExceptionFactory("backend");
@@ -38,6 +39,7 @@ program
 		parseInt,
 	)
 	.option("-s, --static <path>", "Directory to static serve.", ".")
+	.option("--dump <path>", "Dump the database to a specific path.")
 	.option("--test", "Include test data.")
 	.parse(process.argv);
 
@@ -49,7 +51,6 @@ const PATH_STATIC = options.static;
 	const memoryLogger = new MemoryLogger();
 
 	const keyValueStore = await kvsMakeFromConfig(configBackend.kvs.accounts);
-	const keyValueStoreRegister = await kvsMakeFromConfig(configBackend.kvs.register);
 	const email = await emailMakeFromConfig(configBackend.email);
 
 	// Set-up the mail object
@@ -413,6 +414,18 @@ const PATH_STATIC = options.static;
 		await testData.run();
 		// This allow http and https interoperability.
 		headers["Referrer-Policy"] = "no-referrer-when-downgrade";
+	}
+
+	// ---- dump -----
+
+	if (options.dump) {
+		Log.info("Dumping content to {}...", options.dump);
+		const usersData = await users.dump();
+		const applicationsData = await applications.dump();
+
+		await FileSystem.mkdir(options.dump);
+		await FileSystem.writeFile(options.dump + "/users.json", JSON.stringify(usersData, null, 2));
+		await FileSystem.writeFile(options.dump + "/applications.json", JSON.stringify(applicationsData, null, 2));
 	}
 
 	// ---- serve ----
