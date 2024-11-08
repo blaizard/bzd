@@ -34,10 +34,16 @@ class _Monitor:
 		temperatures = psutil.sensors_temperatures()  # type: ignore
 		for name, group in temperatures.items():
 			data[name] = [item.current for item in group]
+		data.update(self.nvidia.temperatures())
 		return data
 
 	def cpus(self) -> typing.Any:
 		return {"main": [cpu / 100. for cpu in psutil.cpu_percent(interval=1, percpu=True)]}  # type: ignore
+
+	def gpus(self) -> typing.Any:
+		data = {}
+		data.update(self.nvidia.gpus())
+		return data
 
 	def batteries(self) -> typing.Any:
 		maybeBattery = psutil.sensors_battery()  # type: ignore
@@ -76,6 +82,7 @@ class _Monitor:
 				content[key] = value
 
 		assignIfSet("cpu", self.cpus())
+		assignIfSet("gpu", self.gpus())
 		assignIfSet("temperature", self.temperatures())
 		assignIfSet("battery", self.batteries())
 		assignIfSet("memory", self.memories())
