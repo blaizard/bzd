@@ -17,22 +17,23 @@ export default class Nodes {
 
 		cache.register(
 			"nodes.list",
-			async function (url, volume) {
-				return await node.list({ remote: url, volume: volume });
+			async function (url, token, volume) {
+				return await node.list({ remote: url, volume: volume, token: token });
 			},
 			{ timeout: 60 * 1000 },
 		);
 
 		cache.register(
 			"nodes.data",
-			async (url, volume, uid) => {
+			async (url, token, volume, uid) => {
 				const result = await node.getAsTree({
 					remote: url,
 					uid: uid,
 					volume: volume,
+					token: token,
 					path: ["data"],
 					children: 2,
-					include: [["battery"], ["cpu"], ["disk"], ["memory"], ["temperature"]],
+					include: [["battery"], ["cpu"], ["gpu"], ["disk"], ["memory"], ["temperature"]],
 				});
 
 				if (Object.keys(result.data).length == 0) {
@@ -51,12 +52,15 @@ export default class Nodes {
 	}
 
 	async fetch(cache) {
-		const nodes = await cache.get("nodes.list", this.config["nodes.url"], this.config["nodes.volume"]);
-
-		let result = [];
+		const nodes = await cache.get(
+			"nodes.list",
+			this.config["nodes.url"],
+			this.config["nodes.token"],
+			this.config["nodes.volume"],
+		);
 
 		const promises = nodes.map((node) =>
-			cache.get("nodes.data", this.config["nodes.url"], this.config["nodes.volume"], node),
+			cache.get("nodes.data", this.config["nodes.url"], this.config["nodes.token"], this.config["nodes.volume"], node),
 		);
 		const results = await Promise.all([...promises]);
 

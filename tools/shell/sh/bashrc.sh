@@ -78,65 +78,17 @@ xterm*|rxvt*|konsole*)
 	;;
 esac
 
-# ---- Content from google_chrome.sh
-bzd_google_chrome() {
-    # Start chrome in an isolated sandbox and it will not affect the main chrome profile.
-    google-chrome --disable-site-isolation-trials --disable-web-security --allow-file-access-from-files --user-data-dir=/tmp
-}
-
-# ---- Content from update.sh
-# Auto update script 
-bzd_update()
-{
-    url="https://raw.githubusercontent.com/blaizard/cpp-async/master/tools/shell/sh/bashrc.sh"
-	if which wget >/dev/null; then
-		wget -q --no-cache "$url" -O ~/.bzd_update_temp
-	elif which curl >/dev/null; then
-		curl -S -s -H "Cache-Control: no-cache, no-store" -H "Pragma: no-cache" -o ~/.bzd_update_temp "$url"
-	else
-		echo "Cannot download, neither wget nor curl is available."
-		return 1
-	fi
-	rm -rfd ~/.bzd && mkdir -p ~/.bzd && mv ~/.bzd_update_temp ~/.bzd/bashrc.sh
-	bzd_reload
-}
-
-# ---- Content from clean.sh
-_bzd_free_size_kb()
-{
-    total_free=0;
-    for i in $(df -k 2> /dev/null | egrep '^/dev' | awk '{print $4}'); do
-        total_free=$(($total_free + $i));
-    done
-    echo ${total_free}
-}
-
-# Remove unused files from the computer, such as cache etc.
-bzd_clean_disk()
-{
-    total_free_begin=$(_bzd_free_size_kb)
-
-    echo "---- Clean docker images."
-    docker system prune -af
-
-    bazel_workspaces=$(find / -name '.*' -prune -false -o -name 'WORKSPACE' 2>/dev/null)
-    for workspace in ${bazel_workspaces}; do
-        path=$(dirname "${workspace}")
-        echo "---- Clean bazel workspace ${path}."
-        cd "${path}"
-        bazel clean --ui_event_filters=-info,-stdout,-stderr --noshow_progress --expunge
-    done
-
-    total_free_end=$(_bzd_free_size_kb)
-    total_free_saved=$(($total_free_end - $total_free_begin))
-    echo "---- Saved ${total_free_saved}K bytes."
-}
-
 # ---- Content from math.sh
 # simple math extension to calculate from the command line
 bzd_math() {
     py_code="from math import *; print(${@})"
     python -c "${py_code}"
+}
+
+# ---- Content from google_chrome.sh
+bzd_google_chrome() {
+    # Start chrome in an isolated sandbox and it will not affect the main chrome profile.
+    google-chrome --disable-site-isolation-trials --disable-web-security --allow-file-access-from-files --user-data-dir=/tmp
 }
 
 # ---- Content from git.sh
@@ -186,6 +138,54 @@ EOF
     git bisect run bash "${tmpFile}"
     echo "== Summary ====================================================================="
     git bisect log
+}
+
+# ---- Content from update.sh
+# Auto update script 
+bzd_update()
+{
+    url="https://raw.githubusercontent.com/blaizard/cpp-async/master/tools/shell/sh/bashrc.sh"
+	if which wget >/dev/null; then
+		wget -q --no-cache "$url" -O ~/.bzd_update_temp
+	elif which curl >/dev/null; then
+		curl -S -s -H "Cache-Control: no-cache, no-store" -H "Pragma: no-cache" -o ~/.bzd_update_temp "$url"
+	else
+		echo "Cannot download, neither wget nor curl is available."
+		return 1
+	fi
+	rm -rfd ~/.bzd && mkdir -p ~/.bzd && mv ~/.bzd_update_temp ~/.bzd/bashrc.sh
+	bzd_reload
+}
+
+# ---- Content from clean.sh
+_bzd_free_size_kb()
+{
+    total_free=0;
+    for i in $(df -k 2> /dev/null | egrep '^/dev' | awk '{print $4}'); do
+        total_free=$(($total_free + $i));
+    done
+    echo ${total_free}
+}
+
+# Remove unused files from the computer, such as cache etc.
+bzd_clean_disk()
+{
+    total_free_begin=$(_bzd_free_size_kb)
+
+    echo "---- Clean docker images."
+    docker system prune -af
+
+    bazel_workspaces=$(find / -name '.*' -prune -false -o -name 'WORKSPACE' 2>/dev/null)
+    for workspace in ${bazel_workspaces}; do
+        path=$(dirname "${workspace}")
+        echo "---- Clean bazel workspace ${path}."
+        cd "${path}"
+        bazel clean --ui_event_filters=-info,-stdout,-stderr --noshow_progress --expunge
+    done
+
+    total_free_end=$(_bzd_free_size_kb)
+    total_free_saved=$(($total_free_end - $total_free_begin))
+    echo "---- Saved ${total_free_saved}K bytes."
 }
 
 

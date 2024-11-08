@@ -1,10 +1,11 @@
 {
     "tokens": {
-        "dwqdwdfesadfsfdsfd": {
-            "doc": "For the dashboard",
-            "scopes": []
-        },
-        "jisjsjiajsiodasds": {}
+        "iamatoken": {
+            "doc": "Some useful documentation",
+            "scopes": [
+                "scope1"
+            ]
+        }
     },
     "volumes": {
         "nodes": {
@@ -46,10 +47,10 @@
                     "toString": "[{level}] [{name}] [{source}] {message}"
                 }
             },
-            "private": true,
             "type": "nodes"
         },
-        "nodes2": {
+        "nodes_private": {
+            "private": true,
             "type": "nodes"
         }
     }
