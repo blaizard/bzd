@@ -7,14 +7,19 @@ export class Node {
 	///
 	/// \param remote The url of the remote.
 	/// \param volume The name of the volume to be used.
-	async list({ remote, volume = config.defaultNodeVolume }) {
+	async list({ remote, token = null, volume = config.defaultNodeVolume }) {
 		let nodes = [];
+		let query = {};
+		if (token) {
+			query.t = token;
+		}
 		for await (const [_, data] of CollectionPaging.makeIterator(async (maxOrPaging) => {
 			const result = await HttpClient.post(remote + "/api/v1/list", {
 				json: {
 					path: [volume],
 					paging: maxOrPaging,
 				},
+				query: query,
 				expect: "json",
 			});
 			return new CollectionPaging(result.data, result.next);
@@ -32,13 +37,24 @@ export class Node {
 	/// \param path The path to be used. This must be a list of path segments.
 	/// \param children The number of children depth level to be included.
 	/// \param include The given path to be included. A list of list of path segments.
-	async get({ remote, uid, volume = config.defaultNodeVolume, path = null, children = 0, include = null }) {
+	async get({
+		remote,
+		uid,
+		token = null,
+		volume = config.defaultNodeVolume,
+		path = null,
+		children = 0,
+		include = null,
+	}) {
 		let query = {};
 		if (children) {
 			query.children = children;
 		}
 		if (include) {
 			query.include = include.map((paths) => paths.map(encodeURIComponent).join("/")).join(",");
+		}
+		if (token) {
+			query.t = token;
 		}
 
 		const pathUrl = (path || []).map(encodeURIComponent).join("/");
