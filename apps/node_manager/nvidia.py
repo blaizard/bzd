@@ -18,7 +18,7 @@ class Nvidia:
 		deviceCount = pynvml.nvmlDeviceGetCount()  # type: ignore
 		for i in range(deviceCount):
 			handle = pynvml.nvmlDeviceGetHandleByIndex(i)  # type: ignore
-			name = pynvml.nvmlDeviceGetName(handle)
+			name = pynvml.nvmlDeviceGetName(handle).lower()
 			yield name, handle
 
 	def memories(self) -> typing.Any:
