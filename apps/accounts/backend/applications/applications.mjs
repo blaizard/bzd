@@ -71,6 +71,10 @@ export default class Applications {
 		Log.info("Application with uid '{}' has been deleted.", uid);
 	}
 
+	async dump() {
+		return await this.keyValueStore.dump(this.config.bucket);
+	}
+
 	installRest(api) {
 		Log.info("Installing 'Applications' REST");
 

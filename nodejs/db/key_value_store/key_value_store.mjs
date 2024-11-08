@@ -1,5 +1,6 @@
 import { AsyncInitialize } from "../utils.mjs";
 import ExceptionFactory from "../../core/exception.mjs";
+import { CollectionPaging } from "#bzd/nodejs/db/utils.mjs";
 
 const Exception = ExceptionFactory("db", "kvs");
 
@@ -110,6 +111,17 @@ export default class KeyValueStore extends AsyncInitialize {
 	/// Delete an existing key/value pair.
 	async delete(bucket, key) {
 		return this._deleteImpl(bucket, key);
+	}
+
+	/// Create a dictionary of all the data from a bucket.
+	async dump(bucket) {
+		let result = {};
+		for await (const [key, value] of CollectionPaging.makeIterator(async (maxOrPaging) => {
+			return await this.list(bucket, maxOrPaging);
+		}, 50)) {
+			result[key] = value;
+		}
+		return result;
 	}
 
 	/// Create an accessor for a specific bucket.

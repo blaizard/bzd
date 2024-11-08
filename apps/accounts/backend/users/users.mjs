@@ -146,6 +146,10 @@ export default class Users {
 		return user;
 	}
 
+	async dump() {
+		return await this.keyValueStore.dump(this.config.bucket);
+	}
+
 	installRest(api) {
 		Log.info("Installing 'Users' REST");
 

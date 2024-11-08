@@ -35,7 +35,7 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 
 	if args.uid is None:
-		data = monitor()
+		data = monitor.all()
 		print(json.dumps(data, indent=4))
 		sys.exit(0)
 
@@ -49,7 +49,7 @@ if __name__ == "__main__":
 
 	# Start the thread to monitor the node.
 	def monitorWorkload() -> None:
-		data = monitor()
+		data = monitor.all()
 		try:
 			node.publish(data=data)
 		except:
