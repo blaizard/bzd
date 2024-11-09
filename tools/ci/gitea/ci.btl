@@ -24,7 +24,7 @@ jobs:
             - name: "Build Tools"
               run: |
                   mkdir bin
-                  ./tools/bazel build //tools/ci:timeit --//apps/artifacts/api:config.set=remotes=https://datalocal.blaizard.com
+                  ./tools/bazel build //tools/ci:timeit --remote_download_toplevel --//apps/artifacts/api:config.set=remotes=https://datalocal.blaizard.com
                   cp bazel-bin/tools/ci/timeit bin/timeit
 
 {% for stage in stages %}
