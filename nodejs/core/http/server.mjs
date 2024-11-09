@@ -212,8 +212,8 @@ export default class HttpServer {
 			maxAge: options.maxAge,
 			index: options.index,
 			setHeaders: (res, path) => {
-				// Add specific headers for the index.
-				if (path == indexAbsolute) {
+				// Disable caching of the index and during development.
+				if (path == indexAbsolute || process.env.NODE_ENV == "development") {
 					res.header("Cache-Control", "max-age=0, no-cache, no-store, must-revalidate");
 					res.header("Pragma", "no-cache");
 					res.header("Expires", "0");
