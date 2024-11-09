@@ -56,8 +56,8 @@ export class Node {
 	/// \param include Include the given path to the result.
 	///
 	/// \return An optional with a value if success, empty if the key points to an unknown record.
-	async get(key, metadata = false, children = 0, count = null, after = null, before = null, include = null) {
-		return await this.data.get(this.uid, key, metadata, children, count, after, before, include);
+	async get({ key, metadata = false, children = 0, count = null, after = null, before = null, include = null }) {
+		return await this.data.get({ uid: this.uid, key, metadata, children, count, after, before, include });
 	}
 
 	/// Get direct children of a given key.

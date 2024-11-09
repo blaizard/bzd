@@ -85,7 +85,7 @@ export default class Data {
 	}
 
 	///  Get all keys/value pair children of key.
-	async get(uid, key, metadata = false, children = 0, count = null, after = null, before = null, include = null) {
+	async get({ uid, key, metadata = false, children = 0, count = null, after = null, before = null, include = null }) {
 		const data = await this.storage.get(uid, {});
 
 		const getStartEnd = (value) => {
