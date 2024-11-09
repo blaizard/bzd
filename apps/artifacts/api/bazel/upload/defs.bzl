@@ -3,6 +3,17 @@
 load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
 load("@bzd_lib//config:defs.bzl", "bzd_config")
 
+def _platform_transition_impl(_settings, attr):
+    if attr.platform:
+        return {"//command_line_option:platforms": str(attr.platform)}
+    return None
+
+platform_transition = transition(
+    implementation = _platform_transition_impl,
+    inputs = [],
+    outputs = ["//command_line_option:platforms"],
+)
+
 def _bzd_artifacts_upload_impl(ctx):
     return [sh_binary_wrapper_impl(
         ctx = ctx,
@@ -29,11 +40,14 @@ _bzd_artifacts_upload = rule(
             doc = "The key in the config corresponding to the version, it will be used as filename.",
             mandatory = True,
         ),
+        "platform": attr.label(
+            doc = "The platform to be used.",
+        ),
         "target": attr.label(
             doc = "The target to be released.",
             allow_single_file = True,
             mandatory = True,
-            cfg = "target",
+            cfg = platform_transition,
         ),
         "url": attr.string(
             doc = "The url to publish to.",
