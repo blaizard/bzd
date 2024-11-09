@@ -23,6 +23,7 @@ describe("Cache", () => {
 			const result2 = await cache.get("test", "world");
 			Exception.assertEqual(argRead, "world");
 			Exception.assertEqual(result2, "return.world");
+
 			await Exception.assertThrows(async () => {
 				await cache.get("tefst", "world");
 			});
