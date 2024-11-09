@@ -2,8 +2,15 @@
 export default function loadScript(url, type = "text/javascript") {
 	return new Promise((resolve, reject) => {
 		try {
+			const id = "loadScript_" + url.replace(/[^a-zA-Z0-9]+/g, "_");
+			if (document.getElementById(id)) {
+				resolve();
+				return;
+			}
+
 			const script = document.createElement("script");
 			script.type = type;
+			script.id = id;
 			script.src = url;
 			script.async = true;
 

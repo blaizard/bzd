@@ -19,7 +19,7 @@ export default class FacebookIdentityServer {
 				});
 				email = response.email;
 			} catch (e) {
-				throw this.httpError(401, "Unauthorized");
+				throw this.httpError(401, "Unauthorized\n" + String(e));
 			}
 
 			Exception.assert(email, "The email cannot be null: {}", email);

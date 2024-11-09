@@ -6,28 +6,29 @@ import LoggerFactory from "../core/log.mjs";
 const Exception = ExceptionFactory("notification");
 const Log = LoggerFactory("notification");
 
+function hashCode(str) {
+	let hash = 0;
+	for (let i = 0, len = str.length; i < len; i++) {
+		let chr = str.charCodeAt(i);
+		hash = (hash << 5) - hash + chr;
+		hash |= 0; // Convert to 32bit integer
+	}
+	return hash;
+}
+
 export default {
 	install: (app) => {
 		const data = reactive({
 			entries: [],
 		});
-		let _uid = 0;
 		const defaultActions = [{ id: "close", callback: (entry) => notificationClose(entry) }];
-		const tryToString = (message) => {
-			if (message instanceof Error) {
-				return String(message);
-			}
-			return message;
-		};
 		const notify = (type, message, options = {}, callback = () => {}) => {
-			if (typeof tryToString(message) == "string") {
-				notifySingle(++_uid, type, message, options, callback);
-			} else if (message && typeof message == "object") {
+			if (message && typeof message == "object") {
 				for (const key in message) {
 					notifySingle(key, type, message[key], options, callback);
 				}
 			} else {
-				notifySingle(++_uid, type, String(message), options, callback);
+				notifySingle(null, type, message, options, callback);
 			}
 		};
 		// Find en entry with this key
@@ -40,7 +41,10 @@ export default {
 			return -1;
 		};
 		const notifySingle = (key, type, message, options, callback) => {
-			const messageStr = tryToString(message);
+			const messageStr = String(message);
+			if (key === null) {
+				key = hashCode(messageStr);
+			}
 
 			// If the entry does not exists, create it
 			let index = entryFind(key);
@@ -48,6 +52,8 @@ export default {
 				data.entries.push({
 					// Time to display this item on the screen (in seconds)
 					timeOnScreen: 5,
+					// Number of occurrences this notification happen.
+					occurrences: 0,
 					// Actions associated with this action, if empty no action will be shown.
 					// An action is an html key (which represents the text associated with this action)
 					// and a callback.
@@ -63,6 +69,7 @@ export default {
 				raw: message,
 				key: key,
 			});
+			++data.entries[index].occurrences;
 			data.entries.splice(index, 1, entry);
 
 			// Call the callback if any.
