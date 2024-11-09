@@ -18,177 +18,138 @@ export class ExceptionPrecondition extends Error {
 	}
 }
 
-/**
- * Private class to combine exception elements
- */
-class ExceptionCombine {
-	constructor(...args) {
-		this.list = [args];
-	}
-	add(str, ...args) {
-		if (str instanceof ExceptionCombine) {
-			this.list = this.list.concat(str.list);
-		} else {
-			this.list.push([str, ...args]);
-		}
-	}
-	[Symbol.iterator]() {
-		return this.list.values();
+/// Private class that contains the exception information.
+class _ExceptionFragment {
+	constructor(message, stack) {
+		this.message = message;
+		this.stack = stack;
 	}
 }
 
 export const ExceptionFactory = (...topics) => {
 	return class Exception extends Error {
-		constructor(str = "", ...args) {
+		constructor(messageOrException, ...args) {
 			// This should capture a callstack
 			super();
 
-			// Nested exceptions (previous exception that have been merged with this one)
-			this.nestedErrorList = [];
+			// All the errors this exception carries. The first in the list being the earliest.
+			this.e = [];
 			// Topics associated with this object
 			this.topics = topics;
 
-			// Set the message
-			if (str instanceof ExceptionCombine) {
-				let messageList = [];
-				for (const a of str) {
-					messageList.push(this._init(a[0], ...a.slice(1)));
-				}
-				this.message = messageList.filter((item) => item).join("; ");
+			if (messageOrException instanceof Exception) {
+				this.e.unshift(...messageOrException.e);
+			} else if (messageOrException instanceof Error) {
+				this.e.push(new _ExceptionFragment(messageOrException.message, messageOrException.stack));
+			} else if (typeof messageOrException == "string") {
+				this.e.push(new _ExceptionFragment(Format(messageOrException, ...args), this.stack));
 			} else {
-				this.message = this._init(str, ...args);
+				this.e.push(new _ExceptionFragment(String(messageOrException) + args.map(String).join("; "), this.stack));
 			}
 		}
 
-		_init(str, ...args) {
-			if (typeof str == "string") {
-				return Format(str, ...args);
-			}
-			if (typeof str == "function") {
-				return str();
-			}
-			if (str instanceof Error) {
-				this.nestedErrorList.push(str instanceof Exception ? str : Exception.fromError(str));
-				this.nestedErrorList = this.nestedErrorList.concat(str.nestedErrorList || []);
-				return "";
-			}
-			return String(str);
-		}
-
-		static makePreconditionException(str = "", ...args) {
-			const exception = new Exception(str, ...args);
-			return new ExceptionPrecondition(exception);
-		}
-
-		/**
-		 * Convert an Error into an Exception
-		 */
-		static fromError(e) {
+		/// Clone the current exception instance.
+		clone() {
 			let exception = new Exception();
-			exception.message = e.message || String(e);
-			exception.stack = e.stack;
-			if ("topics" in e) {
-				exception.topics = e.topics;
-			}
-			if ("nestedErrorList" in e) {
-				exception.nestedErrorList = e.nestedErrorList;
-			}
+			exception.e = [...this.e];
+			exception.topics = topics;
 			return exception;
 		}
 
-		/**
-		 * \brief Assert that expression evaluates to true.
-		 *
-		 * \param expression The expression to evaluate.
-		 * \param str (optional) The message to display if the assertion fails.
-		 * \param ...args (optional) Arguments to add to the message.
-		 */
-		static assert(expression, str = "", ...args) {
-			if (!expression) {
-				let value = new ExceptionCombine("Assertion failed");
-				value.add(str, ...args);
-				throw new Exception(value);
+		/// Combine multiple exceptions to this one.
+		combine(...exceptions) {
+			for (const exception of exceptions) {
+				this.e.push(...exception.e);
 			}
 		}
 
-		/**
-		 * \brief Assert that a precondition is satisfied.
-		 *
-		 * \param expression The expression to evaluate.
-		 * \param str (optional) The message to display if the assertion fails.
-		 * \param ...args (optional) Arguments to add to the message.
-		 */
-		static assertPrecondition(expression, str = "", ...args) {
+		static makePreconditionException(messageOrException, ...args) {
+			const exception = new Exception(messageOrException, ...args);
+			return new ExceptionPrecondition(exception);
+		}
+
+		/// Convert an Error into an Exception
+		static fromError(e) {
+			return new Exception(e);
+		}
+
+		/// \brief Assert that expression evaluates to true.
+		///
+		/// \param expression The expression to evaluate.
+		/// \param str (optional) The message to display if the assertion fails.
+		/// \param ...args (optional) Arguments to add to the message.
+		static assert(expression, message = "", ...args) {
 			if (!expression) {
-				let value = new ExceptionCombine("Precondition failed");
-				value.add(str, ...args);
-				throw this.makePreconditionException(value);
+				throw new Exception("Assertion failed" + (message ? "; " + message : ""), ...args);
 			}
 		}
 
-		/**
-		 * Assert that the result passed into argument has a value.
-		 *
-		 * \param expression The result to evaluate.
-		 */
+		/// \brief Assert that a precondition is satisfied.
+		///
+		/// \param expression The expression to evaluate.
+		/// \param str (optional) The message to display if the assertion fails.
+		/// \param ...args (optional) Arguments to add to the message.
+		static assertPrecondition(expression, message = "", ...args) {
+			if (!expression) {
+				throw this.makePreconditionException("Precondition failed" + (message ? "; " + message : ""), ...args);
+			}
+		}
+
+		/// Assert that the result passed into argument has a value.
+		///
+		// \param expression The result to evaluate.
 		static assertResult(result) {
 			if (result.hasError()) {
-				let value = new ExceptionCombine("Assertion failed");
-				value.add(result.error());
-				throw new Exception(value);
+				throw new Exception("Assertion failed; " + result.error(), ...args);
 			}
 		}
 
-		/**
-		 * Assert that the result passed into argument has a value.
-		 *
-		 * \param expression The result to evaluate.
-		 */
+		/// Assert that the result passed into argument has a value.
+		///
+		/// \param expression The result to evaluate.
 		static assertPreconditionResult(result) {
 			if (result.hasError()) {
-				let value = new ExceptionCombine("Precondition failed");
-				value.add(result.error());
-				throw this.makePreconditionException(value);
+				throw this.makePreconditionException("Precondition failed; " + result.error());
 			}
 		}
 
-		/**
-		 * \brief Assert that 2 values are equal.
-		 * This is not a strict assert.
-		 *
-		 * \param value1 The first value.
-		 * \param value2 The second value.
-		 * \param str (optional) The message to display if the assertion fails.
-		 * \param ...args (optional) Arguments to add to the message.
-		 */
-		static assertEqual(value1, value2, str = "", ...args) {
-			const assertEqualInternal = (value1, value2, combine) => {
+		/// \brief Assert that 2 values are equal.
+		/// This is not a strict assert.
+		///
+		/// \param value1 The first value.
+		/// \param value2 The second value.
+		/// \param message (optional) The message to display if the assertion fails.
+		/// \param ...args (optional) Arguments to add to the message.
+		static assertEqual(value1, value2, message = "", ...args) {
+			const assertEqualInternal = (value1, value2, exception) => {
 				if (typeof value1 === "object" && value1 !== null && typeof value2 === "object" && value2 !== null) {
 					if (value1 instanceof Array && value2 instanceof Array) {
-						Exception.assert(value1.length === value2.length, combine);
+						Exception.assert(value1.length === value2.length, exception);
 						value1.forEach((subValue1, index) => {
-							assertEqualInternal(subValue1, value2[index], combine);
+							assertEqualInternal(subValue1, value2[index], exception);
 						});
 					} else {
-						assertEqualInternal(Object.keys(value1), Object.keys(value2), combine);
+						assertEqualInternal(Object.keys(value1), Object.keys(value2), exception);
 						Object.keys(value1).forEach((key) => {
-							assertEqualInternal(value1[key], value2[key], combine);
+							assertEqualInternal(value1[key], value2[key], exception);
 						});
 					}
 				} else {
-					Exception.assert(value1 == value2, combine);
+					Exception.assert(value1 == value2, exception);
 				}
 			};
 
-			let combine = new ExceptionCombine("Values are not equal, value1={:j}, value2={:j}", value1, value2);
-			combine.add(str, ...args);
-			assertEqualInternal(value1, value2, combine);
+			const exception = new Exception(
+				"Values are not equal, value1={:j}, value2={:j}" + (message ? "; " + message : ""),
+				value1,
+				value2,
+				...args,
+			);
+			assertEqualInternal(value1, value2, exception);
 		}
 
-		/**
-		 * Ensures that a specific block of code throws an exception
-		 */
-		static async assertThrows(block, str = "", ...args) {
+		/// Ensures that a specific block of code throws an exception
+		static async assertThrows(block, message = "", ...args) {
 			let hasThrown = false;
 
 			try {
@@ -196,42 +157,26 @@ export const ExceptionFactory = (...topics) => {
 			} catch (e) {
 				hasThrown = true;
 			} finally {
-				let combine = new ExceptionCombine("Code block did not throw");
-				combine.add(str, ...args);
-				Exception.assert(hasThrown, combine);
+				Exception.assert(hasThrown, "Code block did not throw" + (message ? "; " + message : ""), ...args);
 			}
 		}
 
-		/**
-		 * Error reached
-		 */
-		static error(str = "", ...args) {
-			let combine = new ExceptionCombine("Error");
-			combine.add(str, ...args);
-			throw new Exception(combine);
+		/// Error reached
+		static error(message, ...args) {
+			throw new Exception("Error; " + message, ...args);
 		}
 
-		/**
-		 * Error reached
-		 */
-		static errorPrecondition(str = "", ...args) {
-			let combine = new ExceptionCombine("Error");
-			combine.add(str, ...args);
-			throw this.makePreconditionException(combine);
+		/// Error reached
+		static errorPrecondition(message, ...args) {
+			throw this.makePreconditionException("Error; " + message, ...args);
 		}
 
-		/**
-		 * Flag a line of code unreachable
-		 */
-		static unreachable(str = "", ...args) {
-			let combine = new ExceptionCombine("Code unreachable");
-			combine.add(str, ...args);
-			throw new Exception(combine);
+		/// Flag a line of code unreachable
+		static unreachable(message, ...args) {
+			throw new Exception("Code unreachable; " + message, ...args);
 		}
 
-		/**
-		 * \brief Print a formatted exception message
-		 */
+		/// Print a formatted exception message
 		static print(...args) {
 			Log.custom(
 				{
@@ -242,32 +187,23 @@ export const ExceptionFactory = (...topics) => {
 			);
 		}
 
-		/**
-		 * \brief Print a formatted exception message
-		 */
+		//// Print a formatted exception message
 		print(...args) {
+			let exception = this;
 			if (args.length) {
-				Exception.print(...args);
+				exception = this.clone();
+				exception.combine(new Exception(...args));
 			}
-			// We need a custom print to not print twice the topics.
-			// Topics are printed because 'this' is an exception as well.
-			Log.custom({ level: "error" }, this);
+			Log.custom({ level: "error", topics: exception.topics }, String(exception));
 		}
 
-		/**
-		 * \brief Print the current exception object
-		 */
+		get message() {
+			return this.e.map((e) => e.message).join("\n");
+		}
+
+		/// Print the current exception object
 		toString() {
-			let message =
-				"[" +
-				this.topics.join("::") +
-				"] " +
-				this.name +
-				(this.message ? " with message: " + String(this.message) : "") +
-				// Remove the first line of the stack to avoid polluting the output
-				(this.stack ? "; Callstack:\n" + String(this.stack).split("\n").slice(1).join("\n") : "");
-			message += this.nestedErrorList.map((e) => "\nFrom: " + String(e));
-			return message;
+			return this.message + (this.e.length > 0 ? "\n\n" + String(this.e[0].stack) : "");
 		}
 	};
 };
