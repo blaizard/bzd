@@ -23,7 +23,7 @@ jobs:
             - name: "Build Tools"
               run: |
                   mkdir bin
-                  ./tools/bazel build //tools/ci:timeit --//apps/artifacts/api:config.set=remotes=https://data.blaizard.com --//apps/artifacts/api:config.set=token=${{{ secrets.BZD_NODE_TOKEN }}
+                  ./tools/bazel build //tools/ci:timeit --remote_download_toplevel --//apps/artifacts/api:config.set=remotes=https://data.blaizard.com --//apps/artifacts/api:config.set=token=${{{ secrets.BZD_NODE_TOKEN }}
                   cp bazel-bin/tools/ci/timeit bin/timeit
 
 {% for stage in stages %}
