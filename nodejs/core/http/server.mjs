@@ -201,18 +201,23 @@ export default class HttpServer {
 				maxAge: 60 * 60 * 1000, // 1h
 				index: "index.html",
 				fallback: "index.html",
-				headers: {
-					"Cache-Control": process.env.NODE_ENV == "development" ? "private, max-age=0" : "private, max-age=300",
-				},
+				headers: {},
 			},
 			options,
 		);
 
 		// Create the Epxress options
+		const indexAbsolute = Path.join(absolutePath, options.index);
 		const optionsExpress = {
 			maxAge: options.maxAge,
 			index: options.index,
 			setHeaders: (res, path) => {
+				// Add specific headers for the index.
+				if (path == indexAbsolute) {
+					res.header("Cache-Control", "max-age=0, no-cache, no-store, must-revalidate");
+					res.header("Pragma", "no-cache");
+					res.header("Expires", "0");
+				}
 				Object.entries(options.headers).forEach(([key, value]) => {
 					res.header(key, value);
 				});
@@ -222,19 +227,16 @@ export default class HttpServer {
 
 		// If there is a fallback file
 		if (options.fallback) {
-			this.app.use(
-				uri,
-				(
-					(...args) =>
-					(req, res, next) => {
-						if ((req.method === "GET" || req.method === "HEAD") && req.accepts("html")) {
-							res.sendFile.call(res, ...args, (err) => err && next());
-						} else {
-							next();
-						}
-					}
-				)(options.fallback, { root: absolutePath }),
-			);
+			const fallback = Path.join(absolutePath, options.fallback);
+			Exception.assert(await FileSystem.exists(fallback), "The fallback is not present at path '{}'.", fallback);
+			this.app.use(uri, (req, res, next) => {
+				if ((req.method === "GET" || req.method === "HEAD") && req.accepts("html")) {
+					optionsExpress.setHeaders(res, fallback);
+					res.sendFile.call(res, fallback, {}, (err) => err && next());
+				} else {
+					next();
+				}
+			});
 		}
 	}
 
