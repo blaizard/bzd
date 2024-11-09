@@ -134,7 +134,7 @@ export default class Plugin extends PluginBase {
 		endpoints.register("get", "/{uid}/{path:*}", async (context) => {
 			const metadata = context.getQuery("metadata", false, Boolean);
 			const children = context.getQuery("children", 0, parseInt);
-			const maybeCount = context.getQuery("count", null, parseInt);
+			const count = context.getQuery("count", null, parseInt);
 			const after = context.getQuery("after", null, parseInt);
 			const before = context.getQuery("before", null, parseInt);
 			const include = context.getQuery("include", null, (value) =>
@@ -153,15 +153,15 @@ export default class Plugin extends PluginBase {
 				});
 			}
 
-			const maybeData = await node.get(
-				Plugin.paramPathToKey(context.getParam("path")),
+			const maybeData = await node.get({
+				key: Plugin.paramPathToKey(context.getParam("path")),
 				metadata,
 				children,
-				maybeCount,
+				count,
 				after,
 				before,
 				include,
-			);
+			});
 			if (maybeData.isEmpty()) {
 				context.sendStatus(404);
 				return;

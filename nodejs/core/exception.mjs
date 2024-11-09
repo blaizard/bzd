@@ -203,7 +203,11 @@ export const ExceptionFactory = (...topics) => {
 
 		/// Print the current exception object
 		toString() {
-			return this.message + (this.e.length > 0 ? "\n\n" + String(this.e[0].stack) : "");
+			let content = [this.message];
+			if (this.e.length > 0) {
+				content.push(String(this.e[0].stack));
+			}
+			return content.join("\n");
 		}
 	};
 };
