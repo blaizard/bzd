@@ -1,5 +1,6 @@
 **BUILD
 **/*.BUILD
+**/*.LICENSE
 **WORKSPACE.bazel
 **README.md
 **LICENSE.md
