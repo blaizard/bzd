@@ -7,13 +7,15 @@ import os
 import pathlib
 import tempfile
 import subprocess
+import typing
 
 
 class DevelopmentContainer:
 
-	def __init__(self) -> None:
+	def __init__(self, platform: typing.Optional[str] = None) -> None:
 		self.workspace = pathlib.Path(__file__).resolve().parent
 		self.homeHost = pathlib.Path.home()
+		self.platform = platform
 		self.rootless = DevelopmentContainer.isRootless()
 
 		if self.rootless:
@@ -25,6 +27,9 @@ class DevelopmentContainer:
 			self.home = f"/home/{self.user}"
 			self.uid = os.getuid()
 			self.gid = os.getgid()
+
+		if self.platform:
+			self.startEmulation()
 
 	@staticmethod
 	def isRootless() -> bool:
@@ -43,8 +48,19 @@ class DevelopmentContainer:
 		return "missing"
 
 	@property
+	def dockerPlatformArgs(self) -> typing.List[str]:
+		if self.platform == "amd64":
+			return ["--platform", "linux/amd64"]
+		if self.platform == "arm64":
+			return ["--platform", "linux/arm64"]
+		raise []
+
+	@property
 	def imageName(self) -> str:
-		return f"devcontainer-{self.user}"
+		name = f"devcontainer-{self.user}"
+		if self.platform:
+			name += f"-{self.platform}"
+		return name
 
 	@property
 	def dockerFile(self) -> bytes:
@@ -79,14 +95,24 @@ RUN echo "PS1=\\"(devcontainer) \$PS1\\"" >> {self.home}/.bashrc
 
 		return dockerFile.encode()
 
+	def startEmulation(self) -> None:
+		# See: https://stackoverflow.com/questions/72444103/what-does-running-the-multiarch-qemu-user-static-does-before-building-a-containe
+		if self.isRootless:
+			subprocess.run(["sudo", "systemctl", "start", "docker"])
+			subprocess.run(
+			    ["sudo", "docker", "run", "--rm", "--privileged", "multiarch/qemu-user-static", "--reset", "-p", "yes"])
+		else:
+			subprocess.run(
+			    ["docker", "run", "--rm", "--privileged", "multiarch/qemu-user-static", "--reset", "-p", "yes"])
+
 	def build(self) -> None:
 		self.stop()
 		with tempfile.NamedTemporaryFile() as dockerFile:
 			dockerFile.write(self.dockerFile)
 			dockerFile.flush()
-			subprocess.run(
-			    ["docker", "build", "--pull", "-f", dockerFile.name, "-t", f"bzd/{self.imageName}", self.workspace],
-			    check=True)
+			subprocess.run(["docker", "build", "--pull", "-f", dockerFile.name, "-t", f"bzd/{self.imageName}"] +
+			               self.dockerPlatformArgs + [self.workspace],
+			               check=True)
 
 	def stop(self) -> None:
 		subprocess.run(["docker", "kill", self.imageName], capture_output=True)
@@ -114,6 +140,7 @@ RUN echo "PS1=\\"(devcontainer) \$PS1\\"" >> {self.home}/.bashrc
 			        self.imageName,
 			        "--hostname",
 			        self.imageName,
+			    ] + self.dockerPlatformArgs + [
 			        "-v",
 			        f"{self.workspace}:{self.workspace}",
 			        "-v",
@@ -134,9 +161,16 @@ if __name__ == "__main__":
 
 	parser = argparse.ArgumentParser(description="Development container.")
 	parser.add_argument("-b", "--build", action="store_true", help="Re-build the container if set.")
+	parser.add_argument("-p",
+	                    "--platform",
+	                    choices=(
+	                        "amd64",
+	                        "arm64",
+	                    ),
+	                    help="The architecture on which the docker should run.")
 	args = parser.parse_args()
 
-	devContainer = DevelopmentContainer()
+	devContainer = DevelopmentContainer(args.platform)
 	if args.build:
 		devContainer.build()
 	devContainer.run()
