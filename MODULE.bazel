@@ -17,7 +17,7 @@ bazel_dep(name = "bzd_bundle", version = "1.0")
 bazel_dep(name = "bzd_rules_oci", version = "1.0")
 bazel_dep(name = "bzd_python", version = "1.0")
 bazel_dep(name = "platforms", version = "0.0.8")
-bazel_dep(name = "rules_python", version = "0.35.0")
+bazel_dep(name = "rules_python", version = "0.38.0")
 bazel_dep(name = "rules_cc", version = "0.0.9")
 bazel_dep(name = "bazel_skylib", version = "1.5.0")
 bazel_dep(name = "stardoc", version = "0.7.1")
@@ -56,13 +56,28 @@ python.toolchain(
     python_version = "3.12",
 )
 
+pip_platforms = {
+    "pip_linux_arm64": "manylinux2014_aarch64",
+    "pip_linux_x86_64": "manylinux2014_x86_64",
+}
+
 pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
-pip.parse(
-    hub_name = "pip",
-    python_version = "3.12",
-    requirements_lock = "//tools/python:requirements.txt",
-)
-use_repo(pip, "pip")
+
+[
+    pip.parse(
+        download_only = True,
+        extra_pip_args = [
+            "--platform",
+            platform,
+        ],
+        hub_name = name,
+        python_version = "3.12",
+        requirements_lock = "//tools/python:requirements.txt",
+    )
+    for name, platform in pip_platforms.items()
+]
+
+[use_repo(pip, name) for name in pip_platforms.keys()]
 
 # C++
 

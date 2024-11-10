@@ -1,6 +1,6 @@
 load("@bzd_bundle//:defs.bzl", "bzd_bundle")
 load("@bzd_lib//config:defs.bzl", "bzd_config")
-load("@pip//:requirements.bzl", "requirement")
+load("@bzd_python//:requirements.bzl", "requirement")
 load("@rules_python//python:defs.bzl", "py_binary")
 load("//apps/bootloader:defs.bzl", "bzd_bootloader_binary")
 
@@ -24,13 +24,11 @@ py_binary(
         "rest_server.py",
     ],
     deps = [
-        requirement("psutil"),
-        requirement("nvidia-ml-py"),
         "//apps/artifacts/api/python/node",
         "@bzd_python//bzd/http:client",
         "@bzd_python//bzd/sync:singleton",
         "@bzd_python//bzd/utils:scheduler",
-    ],
+    ] + requirement("psutil") + requirement("nvidia-ml-py"),
 )
 
 bzd_config(
