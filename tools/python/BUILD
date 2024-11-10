@@ -29,7 +29,7 @@ compile_pip_requirements(
 
 py_console_script_binary(
     name = "mypy",
-    pkg = "@pip//mypy",
+    pkg = "@pip_linux_x86_64//mypy",
     script = "mypy",
     tags = ["manual"],
     visibility = ["//visibility:public"],

@@ -1,4 +1,4 @@
-load("@pip//:requirements.bzl", "requirement")
+load("@bzd_python//:requirements.bzl", "requirement")
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 
 py_binary(
@@ -9,11 +9,10 @@ py_binary(
     tags = ["manual"],
     visibility = ["//apps/trader_python:__subpackages__"],
     deps = [
-        requirement("yfinance"),
         ":recording_from_data",
         ":recording_to_path",
         "@bzd_python//bzd/utils:worker",
-    ],
+    ] + requirement("yfinance"),
 )
 
 py_library(

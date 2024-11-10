@@ -21,7 +21,7 @@ Description=bzd Node Manager
 After=network.service
 
 [Service]
-ExecStart=$(pwd)/node_manager --bootloader-uid beast.docker beast.docker
+ExecStart=$(pwd)/node_manager --bootloader-uid udm
 Restart=always
 RuntimeMaxSec=1d
 
@@ -34,6 +34,9 @@ systemctl enable bzd.service
 systemctl start bzd.service
 systemctl status bzd.service
 ```
+
+To check that the service uses Restart feature which is available in systemd version >= 229,
+`systemctl show bzd.service | grep RuntimeMax`
 
 To remove the service if needed:
 
