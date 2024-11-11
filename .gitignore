@@ -21,6 +21,7 @@ MODULE.bazel.lock
 
 # Backup/temporary files
 *~
+~*
 *.bkp
 
 # Eagle
