@@ -917,11 +917,15 @@
 					(unit 1)
 				)
 				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de/43aea751-1fc6-4075-9193-a13eb3863f75"
-					(reference "D6")
+					(reference "D5")
 					(unit 1)
 				)
 				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de/3a66d781-42b7-4b76-8d30-12ea9505af6f"
 					(reference "D1")
+					(unit 1)
+				)
+				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de/6df1d7af-6a61-40dc-873d-bf2ce60a7ec1"
+					(reference "D6")
 					(unit 1)
 				)
 			)
