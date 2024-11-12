@@ -1193,6 +1193,16 @@
 	)
 	(wire
 		(pts
+			(xy 186.69 116.84) (xy 186.69 119.38)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b8e21894-68d7-43ae-81f9-f4104d4d5202")
+	)
+	(wire
+		(pts
 			(xy 123.19 119.38) (xy 125.73 119.38)
 		)
 		(stroke
@@ -3334,6 +3344,73 @@
 			(project "jardinier2000"
 				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de/15995d97-9fbc-45b6-beff-997848733b0c"
 					(reference "J2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector_Generic:Conn_01x01")
+		(at 186.69 111.76 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "c3400a63-d17c-4e81-81f4-144323f03951")
+		(property "Reference" "J8"
+			(at 189.23 110.4899 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Value" "5V"
+			(at 189.23 113.0299 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" "Connector_PinHeader_1.00mm:PinHeader_1x01_P1.00mm_Vertical"
+			(at 186.69 111.76 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 186.69 111.76 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x01, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 186.69 111.76 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "76a71fa1-9250-4520-980b-f7ef6a998e2d")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de/15995d97-9fbc-45b6-beff-997848733b0c"
+					(reference "J8")
 					(unit 1)
 				)
 			)
