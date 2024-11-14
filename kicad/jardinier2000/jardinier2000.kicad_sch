@@ -1097,6 +1097,151 @@
 				)
 			)
 		)
+		(symbol "Switch:SW_Push"
+			(pin_numbers hide)
+			(pin_names
+				(offset 1.016) hide)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "SW"
+				(at 1.27 2.54 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Value" "SW_Push"
+				(at 0 -1.524 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 5.08 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 5.08 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Push button switch, generic, two pins"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "switch normally-open pushbutton push-button"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "SW_Push_0_1"
+				(circle
+					(center -2.032 0)
+					(radius 0.508)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 1.27) (xy 0 3.048)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 2.54 1.27) (xy -2.54 1.27)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(circle
+					(center 2.032 0)
+					(radius 0.508)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(pin passive line
+					(at -5.08 0 0)
+					(length 2.54)
+					(name "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 5.08 0 180)
+					(length 2.54)
+					(name "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+		)
 		(symbol "bzd:ESP32_DevKit_V1_DOIT"
 			(exclude_from_sim no)
 			(in_bom yes)
@@ -1826,6 +1971,12 @@
 		(uuid "18ffb901-2d56-4a1b-95b0-9294864577b4")
 	)
 	(junction
+		(at 208.28 99.06)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "20a1a428-0af5-4662-8995-1ffd8e0a5752")
+	)
+	(junction
 		(at 170.18 72.39)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -1862,10 +2013,16 @@
 		(uuid "93debb84-f86f-4802-a9c8-19df5aba7c16")
 	)
 	(junction
-		(at 119.38 87.63)
+		(at 119.38 90.17)
 		(diameter 0)
 		(color 0 0 0 0)
-		(uuid "c359694b-46e0-459b-8eb8-512cdeae6480")
+		(uuid "9e9ef78f-c521-466b-baf6-60b025de00f2")
+	)
+	(junction
+		(at 208.28 114.3)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "bd492c0b-1a17-455d-bb85-7d30e406304c")
 	)
 	(junction
 		(at 241.3 64.77)
@@ -1878,6 +2035,16 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "f9c915c1-fc06-445f-b4bf-2342cf74f469")
+	)
+	(wire
+		(pts
+			(xy 208.28 99.06) (xy 214.63 99.06)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "045ea487-e9c0-41a9-bd05-797c98c3ed68")
 	)
 	(wire
 		(pts
@@ -1931,6 +2098,16 @@
 	)
 	(wire
 		(pts
+			(xy 208.28 114.3) (xy 214.63 114.3)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0fd894d0-742b-4854-b1c8-171730108e10")
+	)
+	(wire
+		(pts
 			(xy 234.95 53.34) (xy 241.3 53.34)
 		)
 		(stroke
@@ -1938,6 +2115,26 @@
 			(type default)
 		)
 		(uuid "10bfad96-a8f8-4f5a-81ed-6cdd3079bb83")
+	)
+	(wire
+		(pts
+			(xy 95.25 54.61) (xy 95.25 59.69)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1182b296-4129-4479-91be-3ce1546de97d")
+	)
+	(wire
+		(pts
+			(xy 208.28 102.87) (xy 208.28 104.14)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "14afbf67-1848-4155-b60a-17bb67afb3b0")
 	)
 	(wire
 		(pts
@@ -1971,6 +2168,16 @@
 	)
 	(wire
 		(pts
+			(xy 227.33 99.06) (xy 227.33 101.6)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "19206964-54a4-4663-b51a-21469e465002")
+	)
+	(wire
+		(pts
 			(xy 110.49 113.03) (xy 130.81 113.03)
 		)
 		(stroke
@@ -1978,6 +2185,16 @@
 			(type default)
 		)
 		(uuid "1c123a1b-debb-482c-bcf8-2f1dc37d3366")
+	)
+	(wire
+		(pts
+			(xy 208.28 99.06) (xy 208.28 95.25)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1d32f35e-1369-4de6-a783-d873fa4ff202")
 	)
 	(wire
 		(pts
@@ -2021,13 +2238,23 @@
 	)
 	(wire
 		(pts
-			(xy 119.38 90.17) (xy 119.38 87.63)
+			(xy 119.38 91.44) (xy 119.38 90.17)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "2b67b1d5-f5c6-40de-aad9-1429f3917fb2")
+	)
+	(wire
+		(pts
+			(xy 224.79 99.06) (xy 227.33 99.06)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2d3705e7-638c-4c27-8a7e-67bcd5a83700")
 	)
 	(wire
 		(pts
@@ -2051,6 +2278,16 @@
 	)
 	(wire
 		(pts
+			(xy 110.49 87.63) (xy 115.57 87.63)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "41732205-508d-4d80-af41-65fd5650d770")
+	)
+	(wire
+		(pts
 			(xy 130.81 110.49) (xy 130.81 113.03)
 		)
 		(stroke
@@ -2058,6 +2295,16 @@
 			(type default)
 		)
 		(uuid "43ee36e4-1018-4b14-9c18-c91fab86d636")
+	)
+	(wire
+		(pts
+			(xy 241.3 46.99) (xy 241.3 53.34)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "468feaa2-3406-4dae-bf9b-345c4fb0609b")
 	)
 	(wire
 		(pts
@@ -2121,7 +2368,7 @@
 	)
 	(wire
 		(pts
-			(xy 125.73 97.79) (xy 125.73 102.87)
+			(xy 125.73 99.06) (xy 125.73 102.87)
 		)
 		(stroke
 			(width 0)
@@ -2148,6 +2395,16 @@
 			(type default)
 		)
 		(uuid "5872d453-8c20-492c-9b72-5bedb8f482f1")
+	)
+	(wire
+		(pts
+			(xy 224.79 114.3) (xy 227.33 114.3)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5a2b7802-1bd9-424c-806c-edea36c1f449")
 	)
 	(wire
 		(pts
@@ -2188,16 +2445,6 @@
 			(type default)
 		)
 		(uuid "60b763c6-957c-4080-b7d5-4db9034d9146")
-	)
-	(wire
-		(pts
-			(xy 110.49 110.49) (xy 116.84 110.49)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "60c88c14-14b0-477c-9a23-3fa408a24abd")
 	)
 	(wire
 		(pts
@@ -2251,7 +2498,17 @@
 	)
 	(wire
 		(pts
-			(xy 115.57 87.63) (xy 119.38 87.63)
+			(xy 227.33 114.3) (xy 227.33 116.84)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "79679d38-0c1d-4527-b097-b0258aebdce9")
+	)
+	(wire
+		(pts
+			(xy 115.57 90.17) (xy 119.38 90.17)
 		)
 		(stroke
 			(width 0)
@@ -2261,7 +2518,7 @@
 	)
 	(wire
 		(pts
-			(xy 119.38 87.63) (xy 125.73 87.63)
+			(xy 119.38 90.17) (xy 125.73 90.17)
 		)
 		(stroke
 			(width 0)
@@ -2421,6 +2678,16 @@
 	)
 	(wire
 		(pts
+			(xy 208.28 114.3) (xy 208.28 111.76)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9851c745-228c-4900-88d1-583a3e3070e2")
+	)
+	(wire
+		(pts
 			(xy 237.49 59.69) (xy 237.49 64.77)
 		)
 		(stroke
@@ -2438,6 +2705,16 @@
 			(type default)
 		)
 		(uuid "9e456b13-9162-4ec0-8789-c02c89f4b327")
+	)
+	(wire
+		(pts
+			(xy 196.85 99.06) (xy 208.28 99.06)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9ee2d4f6-e446-4b8d-972e-85da97ec8553")
 	)
 	(wire
 		(pts
@@ -2631,7 +2908,7 @@
 	)
 	(wire
 		(pts
-			(xy 119.38 97.79) (xy 119.38 100.33)
+			(xy 119.38 99.06) (xy 119.38 100.33)
 		)
 		(stroke
 			(width 0)
@@ -2661,6 +2938,16 @@
 	)
 	(wire
 		(pts
+			(xy 196.85 114.3) (xy 208.28 114.3)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "cd8470b8-3108-488c-a74a-c9d6b0a40fb4")
+	)
+	(wire
+		(pts
 			(xy 170.18 123.19) (xy 170.18 127)
 		)
 		(stroke
@@ -2671,7 +2958,7 @@
 	)
 	(wire
 		(pts
-			(xy 125.73 87.63) (xy 125.73 90.17)
+			(xy 125.73 90.17) (xy 125.73 91.44)
 		)
 		(stroke
 			(width 0)
@@ -2748,6 +3035,16 @@
 			(type default)
 		)
 		(uuid "e2f2713e-29b6-40d4-813c-2fb2c7cbaadc")
+	)
+	(wire
+		(pts
+			(xy 208.28 86.36) (xy 208.28 87.63)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e967fd29-5319-49fa-86a8-8f36aa040c9e")
 	)
 	(wire
 		(pts
@@ -2899,28 +3196,6 @@
 		)
 		(uuid "ff35a02f-07f0-426f-98a1-07f8db04a9cd")
 	)
-	(label "VDD_5_30V"
-		(at 170.18 123.19 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "010dbf5d-a255-49aa-8be9-0b10d1c45756")
-	)
-	(label "5V"
-		(at 170.18 68.58 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "035f719d-91e2-4f5d-8ac5-3ff7b6b2af71")
-	)
 	(label "SDA"
 		(at 120.65 160.02 0)
 		(fields_autoplaced yes)
@@ -2965,8 +3240,8 @@
 		)
 		(uuid "18982edd-1bfe-4ccb-938e-485df786dde3")
 	)
-	(label "Trigger_3V3"
-		(at 116.84 110.49 0)
+	(label "VDD_5_30V"
+		(at 170.18 68.58 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -2974,7 +3249,18 @@
 			)
 			(justify left bottom)
 		)
-		(uuid "21df8808-2bdd-47f9-a029-ca419d0df0c3")
+		(uuid "1c90e6e1-086f-4132-b290-2a2878401359")
+	)
+	(label "5V"
+		(at 170.18 123.19 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "1f8fafac-65d9-4c27-bacb-bf56b971cc13")
 	)
 	(label "5V"
 		(at 170.18 86.36 0)
@@ -2999,7 +3285,7 @@
 		(uuid "232e40c7-b269-42ed-9e45-685281d55073")
 	)
 	(label "3V3"
-		(at 115.57 87.63 0)
+		(at 115.57 90.17 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -3008,6 +3294,17 @@
 			(justify left bottom)
 		)
 		(uuid "24a6a72b-ab33-4e52-8977-891e4b58fc54")
+	)
+	(label "ESP32_3V3"
+		(at 208.28 102.87 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "5a327408-fbfe-47e9-95c8-094d2e7952c0")
 	)
 	(label "SCL"
 		(at 128.27 102.87 0)
@@ -3030,6 +3327,17 @@
 			(justify left bottom)
 		)
 		(uuid "741e3841-e65d-4785-bfc9-5f3dbcf2a5d2")
+	)
+	(label "5V"
+		(at 241.3 46.99 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "842d3043-07fc-4742-8ea8-e6da8521a183")
 	)
 	(label "3V3"
 		(at 270.51 53.34 0)
@@ -3130,6 +3438,17 @@
 		)
 		(uuid "de805f74-96b7-478d-b5c9-7f5f234d7d78")
 	)
+	(label "ESP32_3V3"
+		(at 95.25 54.61 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "e0dd2ffc-73da-40c4-be45-f90be5154a49")
+	)
 	(label "5V"
 		(at 92.71 52.07 0)
 		(fields_autoplaced yes)
@@ -3174,6 +3493,28 @@
 		)
 		(uuid "e6f50efa-78bf-40c9-9822-5339e306dd1a")
 	)
+	(label "Trigger_3V3"
+		(at 115.57 87.63 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "f074b4a8-c319-4c04-9243-4cc4a374d4a6")
+	)
+	(label "ESP32_3V3"
+		(at 208.28 86.36 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "fc913cd1-2e6c-4984-ae35-9eb8adddb03b")
+	)
 	(label "5V"
 		(at 170.18 102.87 0)
 		(fields_autoplaced yes)
@@ -3195,6 +3536,72 @@
 			(justify left bottom)
 		)
 		(uuid "fec69d7a-318c-4e51-b80c-cb527527e4cb")
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 227.33 101.6 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "02ca3d85-6628-4b3c-a1c1-ec21775aa387")
+		(property "Reference" "#PWR030"
+			(at 227.33 107.95 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 227.33 106.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 227.33 101.6 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 227.33 101.6 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 227.33 101.6 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "fadd43f8-e8c2-402b-bc37-c5547aa2e339")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de"
+					(reference "#PWR030")
+					(unit 1)
+				)
+			)
+		)
 	)
 	(symbol
 		(lib_id "Device:C")
@@ -3261,6 +3668,82 @@
 			(project "jardinier2000"
 				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de"
 					(reference "C4")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector:Screw_Terminal_01x04")
+		(at 148.59 157.48 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "07a281d0-b529-415c-bc2a-5ebaf5d1b8f3")
+		(property "Reference" "J10"
+			(at 151.13 157.4799 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "I2C"
+			(at 151.13 160.0199 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Connector_JST:JST_XH_B4B-XH-AM_1x04_P2.50mm_Vertical"
+			(at 148.59 157.48 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 148.59 157.48 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Generic screw terminal, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 148.59 157.48 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "3"
+			(uuid "3bdb71ef-491f-4510-92fb-bc56027aec2c")
+		)
+		(pin "4"
+			(uuid "0239acad-e5c2-4b06-945a-8f1f5484a108")
+		)
+		(pin "1"
+			(uuid "04dd949c-883a-43e2-aded-71cfa712007c")
+		)
+		(pin "2"
+			(uuid "fe67881f-106e-4ca1-8f59-7064ea907356")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de"
+					(reference "J10")
 					(unit 1)
 				)
 			)
@@ -3405,7 +3888,7 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 125.73 93.98 0)
+		(at 125.73 95.25 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -3414,7 +3897,7 @@
 		(fields_autoplaced yes)
 		(uuid "392f475b-e498-4817-9623-37a4fb349abb")
 		(property "Reference" "R15"
-			(at 128.27 92.7099 0)
+			(at 128.27 93.9799 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3423,7 +3906,7 @@
 			)
 		)
 		(property "Value" "10K"
-			(at 128.27 95.2499 0)
+			(at 128.27 96.5199 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3432,7 +3915,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
-			(at 123.952 93.98 90)
+			(at 123.952 95.25 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3441,7 +3924,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 125.73 93.98 0)
+			(at 125.73 95.25 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3450,7 +3933,7 @@
 			)
 		)
 		(property "Description" "Resistor"
-			(at 125.73 93.98 0)
+			(at 125.73 95.25 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3492,7 +3975,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "5_30V"
+		(property "Value" "5V"
 			(at 181.61 129.5399 0)
 			(effects
 				(font
@@ -3608,6 +4091,150 @@
 			(project "jardinier2000"
 				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de"
 					(reference "C3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector:Screw_Terminal_01x04")
+		(at 130.81 157.48 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "4ee4c588-c147-4dd9-ab9e-151c1b459f1d")
+		(property "Reference" "J9"
+			(at 133.35 157.4799 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "I2C"
+			(at 133.35 160.0199 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Connector_JST:JST_XH_B4B-XH-AM_1x04_P2.50mm_Vertical"
+			(at 130.81 157.48 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 130.81 157.48 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Generic screw terminal, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 130.81 157.48 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "3"
+			(uuid "c7f8c310-fec7-4608-a588-a5695f8b7702")
+		)
+		(pin "4"
+			(uuid "08ba36c0-d9bd-439a-a15c-3b4b19ec1f99")
+		)
+		(pin "1"
+			(uuid "2ebb730f-b19a-4386-a754-a7d9cd94d737")
+		)
+		(pin "2"
+			(uuid "30d8754c-376d-464e-9f22-0ae0590ffb78")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de"
+					(reference "J9")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Switch:SW_Push")
+		(at 219.71 114.3 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "4f2deba5-11db-4d33-9aa4-45474d84f267")
+		(property "Reference" "SW2"
+			(at 219.71 106.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "SW_Push"
+			(at 219.71 109.22 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Button_Switch_THT:SW_PUSH_6mm"
+			(at 219.71 109.22 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 219.71 109.22 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Push button switch, generic, two pins"
+			(at 219.71 114.3 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "58fbdaa1-bee2-4f45-a179-787d34c2c8b6")
+		)
+		(pin "1"
+			(uuid "2c637ad2-2b18-4803-9d3c-be1be0dfd1c7")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de"
+					(reference "SW2")
 					(unit 1)
 				)
 			)
@@ -3821,158 +4448,6 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector:Screw_Terminal_01x04")
-		(at 113.03 157.48 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "7188326f-8f9e-4755-bc16-398b592c120b")
-		(property "Reference" "J7"
-			(at 115.57 157.4799 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "I2C"
-			(at 115.57 160.0199 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-4-5.08_1x04_P5.08mm_Horizontal"
-			(at 113.03 157.48 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 113.03 157.48 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Generic screw terminal, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 113.03 157.48 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "3"
-			(uuid "6de14978-32bc-4656-bb4a-ca2a4091a140")
-		)
-		(pin "4"
-			(uuid "f2264ddb-9327-4a8e-865e-acb0db136384")
-		)
-		(pin "1"
-			(uuid "bc493c3a-cf52-46fa-be06-48c8b310bef6")
-		)
-		(pin "2"
-			(uuid "f531bb86-4fd2-432a-b29e-aeffdcdaf952")
-		)
-		(instances
-			(project "jardinier2000"
-				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de"
-					(reference "J7")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Connector:Screw_Terminal_01x04")
-		(at 148.59 157.48 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "7a637bd2-6f69-4e4a-8bda-08d38173da22")
-		(property "Reference" "J10"
-			(at 151.13 157.4799 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "I2C"
-			(at 151.13 160.0199 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-4-5.08_1x04_P5.08mm_Horizontal"
-			(at 148.59 157.48 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 148.59 157.48 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Generic screw terminal, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 148.59 157.48 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "3"
-			(uuid "6ab53434-435d-41fe-bad3-207cc22db1df")
-		)
-		(pin "4"
-			(uuid "298fd3b5-c18f-4997-a16f-8e77b7ac63b8")
-		)
-		(pin "1"
-			(uuid "260e9953-8524-4f31-becd-129a52bb3d51")
-		)
-		(pin "2"
-			(uuid "a8b67331-4c87-4c2e-827f-f4c689a502cc")
-		)
-		(instances
-			(project "jardinier2000"
-				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de"
-					(reference "J10")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "power:GND")
 		(at 87.63 148.59 0)
 		(unit 1)
@@ -4039,6 +4514,76 @@
 		)
 	)
 	(symbol
+		(lib_id "Device:R")
+		(at 208.28 107.95 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "8f4325bd-663e-4d13-bedd-97b93f0a9b63")
+		(property "Reference" "R19"
+			(at 210.82 106.6799 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "10K"
+			(at 210.82 109.2199 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
+			(at 206.502 107.95 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 208.28 107.95 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 208.28 107.95 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "e386904a-7c6f-4fed-a9bd-c70fcc615bed")
+		)
+		(pin "1"
+			(uuid "2bbc74ef-7401-4e28-ab77-9dbd65bbb47b")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de"
+					(reference "R19")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Connector:Screw_Terminal_01x02")
 		(at 180.34 72.39 0)
 		(unit 1)
@@ -4057,7 +4602,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "5V"
+		(property "Value" "5_30V"
 			(at 182.88 74.9299 0)
 			(effects
 				(font
@@ -4373,82 +4918,6 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector:Screw_Terminal_01x04")
-		(at 130.81 157.48 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "bd68ac21-8868-4123-9edb-b9541e88b856")
-		(property "Reference" "J9"
-			(at 133.35 157.4799 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "I2C"
-			(at 133.35 160.0199 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-4-5.08_1x04_P5.08mm_Horizontal"
-			(at 130.81 157.48 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 130.81 157.48 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Generic screw terminal, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 130.81 157.48 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "3"
-			(uuid "289da6bd-5221-4065-8d69-eabe4b4e8fff")
-		)
-		(pin "4"
-			(uuid "971c9dda-6e82-4de7-946c-aa4ccb5de1c2")
-		)
-		(pin "1"
-			(uuid "01eff1d7-4cca-4405-8076-94513b1e5dc4")
-		)
-		(pin "2"
-			(uuid "b85907b8-76dc-43c7-903e-4ee3f25c6cad")
-		)
-		(instances
-			(project "jardinier2000"
-				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de"
-					(reference "J9")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Connector:Screw_Terminal_01x02")
 		(at 180.34 54.61 0)
 		(unit 1)
@@ -4519,17 +4988,17 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R")
-		(at 119.38 93.98 0)
+		(lib_id "Connector:Screw_Terminal_01x04")
+		(at 113.03 157.48 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "d65545f9-1355-4b9e-83d9-5caf499feacc")
-		(property "Reference" "R14"
-			(at 121.92 92.7099 0)
+		(uuid "c9daff85-2b68-4f87-9b5e-20b807564632")
+		(property "Reference" "J7"
+			(at 115.57 157.4799 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4537,8 +5006,8 @@
 				(justify left)
 			)
 		)
-		(property "Value" "10K"
-			(at 121.92 95.2499 0)
+		(property "Value" "I2C"
+			(at 115.57 160.0199 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4546,8 +5015,8 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
-			(at 117.602 93.98 90)
+		(property "Footprint" "Connector_JST:JST_XH_B4B-XH-AM_1x04_P2.50mm_Vertical"
+			(at 113.03 157.48 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4556,7 +5025,83 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 119.38 93.98 0)
+			(at 113.03 157.48 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Generic screw terminal, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 113.03 157.48 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "3"
+			(uuid "0a6a81e9-855a-4969-9c9d-116b0362c45c")
+		)
+		(pin "4"
+			(uuid "4e46cd3f-d4b2-4569-a773-ad17f0b64371")
+		)
+		(pin "1"
+			(uuid "3a46c4a9-555d-41ed-97ef-29ec638ca8ad")
+		)
+		(pin "2"
+			(uuid "d70f25b9-d87d-4f80-8013-53fd00306208")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de"
+					(reference "J7")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 208.28 91.44 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "d1d2bec0-33a3-4812-ad49-725bc332af50")
+		(property "Reference" "R18"
+			(at 210.82 90.1699 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "10K"
+			(at 210.82 92.7099 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
+			(at 206.502 91.44 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 208.28 91.44 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4565,7 +5110,77 @@
 			)
 		)
 		(property "Description" "Resistor"
-			(at 119.38 93.98 0)
+			(at 208.28 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "fe937aea-e849-4048-9f5a-e4b85b2c66e3")
+		)
+		(pin "1"
+			(uuid "75bb0af6-43cd-4944-8a62-860549505304")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de"
+					(reference "R18")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 119.38 95.25 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "d65545f9-1355-4b9e-83d9-5caf499feacc")
+		(property "Reference" "R14"
+			(at 121.92 93.9799 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "10K"
+			(at 121.92 96.5199 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
+			(at 117.602 95.25 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 119.38 95.25 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 119.38 95.25 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4583,6 +5198,72 @@
 			(project "jardinier2000"
 				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de"
 					(reference "R14")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 227.33 116.84 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "e33274fe-2a50-4a0d-9cc1-72affa6872b0")
+		(property "Reference" "#PWR031"
+			(at 227.33 123.19 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 227.33 121.92 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 227.33 116.84 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 227.33 116.84 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 227.33 116.84 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "65a541aa-afec-49c7-a649-bce61b8fa58e")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de"
+					(reference "#PWR031")
 					(unit 1)
 				)
 			)
@@ -4616,7 +5297,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-4-5.08_1x04_P5.08mm_Horizontal"
+		(property "Footprint" "Connector_JST:JST_XH_B4B-XH-AM_1x04_P2.50mm_Vertical"
 			(at 95.25 157.48 0)
 			(effects
 				(font
@@ -4659,6 +5340,74 @@
 			(project "jardinier2000"
 				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de"
 					(reference "J11")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Switch:SW_Push")
+		(at 219.71 99.06 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "ea23c1a2-daa4-4f30-8794-fbc717e69b79")
+		(property "Reference" "SW1"
+			(at 219.71 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "SW_Push"
+			(at 219.71 93.98 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Button_Switch_THT:SW_PUSH_6mm"
+			(at 219.71 93.98 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 219.71 93.98 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Push button switch, generic, two pins"
+			(at 219.71 99.06 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "25fa31e3-56f1-4860-8f9b-68cf3fd5eb66")
+		)
+		(pin "1"
+			(uuid "06322d32-f098-4584-a6b7-82cb5e1bd0fc")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de"
+					(reference "SW1")
 					(unit 1)
 				)
 			)
