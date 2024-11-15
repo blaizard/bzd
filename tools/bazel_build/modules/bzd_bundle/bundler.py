@@ -21,7 +21,7 @@ class Bundler:
 			# Create an archive with the files from the manifest.
 			with tarfile.open(fileobj=fd, mode="w:gz") as tar:
 				# Find all the files.
-				files = {}
+				files: typing.Dict[pathlib.Path, typing.List[str]] = {}
 				for line in self.path.read_text().split("\n"):
 					split = list(filter(str.strip, line.split()))
 					if len(split) == 0:
