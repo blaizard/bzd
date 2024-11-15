@@ -20,7 +20,8 @@ class Bundler:
 
 			# Create an archive with the files from the manifest.
 			with tarfile.open(fileobj=fd, mode="w:gz") as tar:
-				nbFiles = 0
+				# Find all the files.
+				files = {}
 				for line in self.path.read_text().split("\n"):
 					split = list(filter(str.strip, line.split()))
 					if len(split) == 0:
@@ -31,10 +32,23 @@ class Bundler:
 					else:
 						raise RuntimeError("Manifest seems to use white spaces which is not supported.")
 					if path.is_file():
-						tar.add(path, arcname=target)
-						nbFiles += 1
+						files.setdefault(path, [])
+						files[path].append(target)
 
-				assert nbFiles > 0, f"There are no file referenced in the manifest: {self.path}, content:\n{self.path.read_text()[:100]}[...]"
+				assert len(
+				    files.keys()
+				) > 0, f"There are no file referenced in the manifest: {self.path}, content:\n{self.path.read_text()[:100]}[...]"
+
+				# Copy all the files and create symlinks for the duplicates.
+				for path, targets in files.items():
+					target, *symlinks = targets
+					tar.add(path, arcname=target)
+					for symlink in symlinks:
+						with tempfile.TemporaryDirectory() as tmp:
+							relativePath = pathlib.Path(target).relative_to(pathlib.Path(symlink).parent, walk_up=True)
+							symlinkPath = pathlib.Path(tmp) / "symlink"
+							symlinkPath.symlink_to(relativePath)
+							tar.add(symlinkPath, arcname=symlink)
 
 			fd.flush()
 			fd.seek(0)
