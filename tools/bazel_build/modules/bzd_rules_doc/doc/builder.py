@@ -5,6 +5,7 @@ import typing
 import tempfile
 import tarfile
 import subprocess
+import sys
 
 
 def navigationToMkDocsList(root: pathlib.Path, navigation: typing.List[typing.Tuple[str,
@@ -17,6 +18,15 @@ def navigationToMkDocsList(root: pathlib.Path, navigation: typing.List[typing.Tu
 		else:
 			content.append(f"- {name}: {pathlib.Path(path).relative_to(root)}")
 	return [f"  {line}" for line in content]
+
+
+def runCommand(command: typing.List[str]) -> None:
+	try:
+		subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, check=True)
+	except subprocess.CalledProcessError as e:
+		print(f"Command {e.cmd} failed with return code {e.returncode}")
+		print(e.output.decode())
+		sys.exit(e.returncode)
 
 
 if __name__ == "__main__":
@@ -45,18 +55,16 @@ if __name__ == "__main__":
 
 	# Generate the site with mkdocs and package everything.
 	with tempfile.TemporaryDirectory() as path:
-		subprocess.run(
-		    [
-		        args.mkdocs,
-		        "--",
-		        "build",
-		        "--strict",
-		        "--config-file",
-		        "mkdocs.yml",
-		        "--site-dir",
-		        path,
-		    ],
-		    capture_output=True,
-		)
+		runCommand([
+		    args.mkdocs,
+		    "--",
+		    "build",
+		    "--strict",
+		    "--config-file",
+		    "mkdocs.yml",
+		    "--site-dir",
+		    path,
+		])
+
 		with tarfile.open(args.output, "w:") as package:
 			package.add(path, arcname="./")

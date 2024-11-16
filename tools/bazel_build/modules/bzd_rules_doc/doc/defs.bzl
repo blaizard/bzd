@@ -139,7 +139,7 @@ _doc_binary = rule(
         "_mkdocs": attr.label(
             executable = True,
             cfg = "exec",
-            default = Label("//doc:mkdocs_wrapper"),
+            default = Label("//doc:mkdocs"),
         ),
         "_web_server": attr.label(
             executable = True,
