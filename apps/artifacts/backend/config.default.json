@@ -8,6 +8,10 @@
         }
     },
     "volumes": {
+        "disk": {
+            "fs.root": "/",
+            "type": "fs"
+        },
         "nodes": {
             "nodes.data": {
                 "testnode": {

@@ -1,5 +1,6 @@
 load("@pip//:requirements.bzl", "requirement")
 load("@rules_python//python:defs.bzl", "py_binary")
+load("@rules_python//python/entry_points:py_console_script_binary.bzl", "py_console_script_binary")
 
 py_binary(
     name = "builder",
@@ -12,14 +13,10 @@ py_binary(
     visibility = ["//visibility:public"],
 )
 
-py_binary(
-    name = "mkdocs_wrapper",
-    srcs = [
-        "mkdocs_wrapper.py",
-    ],
-    visibility = [
-        "//visibility:public",
-    ],
+py_console_script_binary(
+    name = "mkdocs",
+    pkg = "@pip//mkdocs",
+    visibility = ["//visibility:public"],
     deps = [
         requirement("mkdocs"),
         requirement("mkdocs-material"),
