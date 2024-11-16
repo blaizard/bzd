@@ -40,7 +40,6 @@ bzd_nodejs_library(
         "@nodejs_deps//:express-minify",
         "@nodejs_deps//:helmet",
         "@nodejs_deps//:http",
-        "@nodejs_deps//:mime",
         "@nodejs_deps//:multer",
     ],
     visibility = ["//visibility:public"],
