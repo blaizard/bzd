@@ -1,6 +1,8 @@
 #pragma once
 
 #include "cc/bzd/type_traits/iterator.hh"
+#include "cc/bzd/type_traits/range.hh"
+#include "cc/bzd/utility/move.hh"
 
 namespace bzd::ranges {
 

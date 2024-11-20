@@ -27,6 +27,8 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/type_traits:iterator",
+        "//cc/bzd/type_traits:range",
+        "//cc/bzd/utility:move",
     ],
 )
 
