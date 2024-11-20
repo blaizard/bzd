@@ -8,6 +8,7 @@ bzd_cc_library(
         ":adaptor",
         ":all",
         ":drop",
+        ":filter",
         ":join",
         ":owning",
         ":reverse",
@@ -17,6 +18,17 @@ bzd_cc_library(
 )
 
 # ---- Individual items ----
+
+cc_library(
+    name = "adaptor_iterator",
+    hdrs = [
+        "adaptor_iterator.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/type_traits:iterator",
+    ],
+)
 
 cc_library(
     name = "adaptor",
@@ -56,6 +68,22 @@ cc_library(
         "//cc/bzd/container:wrapper",
         "//cc/bzd/core/async:forward",
         "//cc/bzd/utility/iterators:advance",
+        "//cc/bzd/utility/ranges:view_interface",
+    ],
+)
+
+cc_library(
+    name = "filter",
+    hdrs = [
+        "filter.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":adaptor",
+        ":adaptor_iterator",
+        "//cc/bzd/algorithm:find_if",
+        "//cc/bzd/container:wrapper",
+        "//cc/bzd/type_traits:predicate",
         "//cc/bzd/utility/ranges:view_interface",
     ],
 )
@@ -127,6 +155,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":adaptor",
+        ":adaptor_iterator",
         "//cc/bzd/container:wrapper",
         "//cc/bzd/utility/iterators:advance",
         "//cc/bzd/utility/ranges:view_interface",

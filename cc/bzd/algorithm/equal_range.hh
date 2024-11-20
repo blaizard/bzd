@@ -27,8 +27,7 @@ namespace bzd::algorithm {
 template <concepts::forwardIterator Iterator,
 		  concepts::sentinelFor<Iterator> Sentinel,
 		  class T,
-		  concepts::predicate<typeTraits::IteratorValue<Iterator>, typeTraits::IteratorValue<T>> Compare =
-			  bzd::Less<typeTraits::IteratorValue<Iterator>>>
+		  concepts::predicate<typeTraits::IteratorValue<Iterator>, T> Compare = bzd::Less<typeTraits::IteratorValue<Iterator>>>
 constexpr bzd::Tuple<Iterator, Iterator> equalRange(Iterator first, Sentinel last, const T& value, Compare comparison = Compare{})
 {
 	return bzd::makeTuple(bzd::algorithm::lowerBound(first, last, value, comparison),
