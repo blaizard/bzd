@@ -1100,6 +1100,15 @@
         "name": "jsonwebtoken",
         "version": "9.0.2"
     },
+    "mime": {
+        "dependencies": {
+            "mime@1.6.0": {
+                "integrity": "sha512-x0Vn8spI+wuJ1O6S7gnbaQg8Pxh4NNHb7KSINmEWKiPE4RKOplvijn+NkmYmmRgP68mc70j2EbeTFRsrswaQeg=="
+            }
+        },
+        "name": "mime",
+        "version": "1.6.0"
+    },
     "mongodb": {
         "dependencies": {
             "@mongodb-js/saslprep@1.1.9": {
@@ -1111,8 +1120,8 @@
             "@types/whatwg-url@11.0.5": {
                 "integrity": "sha512-coYR071JRaHa+xoEvvYqvnIHaVqaYrLPbsufM9BF63HkwI5Lgmy2QR8Q5K/lYDYo5AK82wOvSOS0UsLTpTG7uQ=="
             },
-            "bson@6.9.0": {
-                "integrity": "sha512-X9hJeyeM0//Fus+0pc5dSUMhhrrmWwQUtdavaQeF3Ta6m69matZkGWV/MrBcnwUeLC8W9kwwc2hfkZgUuCX3Ig=="
+            "bson@6.10.0": {
+                "integrity": "sha512-ROchNosXMJD2cbQGm84KoP7vOGPO6/bOAW0veMMbzhXLqoZptcaYRVLitwvuhwhjjpU1qP4YZRWLhgETdgqUQw=="
             },
             "memory-pager@1.5.0": {
                 "integrity": "sha512-ZS4Bp4r/Zoeq6+NLJpP+0Zzm0pR8whtGPf1XExKLJBAczGMnSi3It14OiNCStjQjM6NU1okjQGSxgEZN8eBYKg=="
@@ -2107,8 +2116,8 @@
             "estree-walker@2.0.2": {
                 "integrity": "sha512-Rfkk/Mp/DL7JVje3u18FxFujQlTNR2q6QfMSMB7AvCBx91NGj/ba3kCfza0f6dVDbw7YlRf/nDrn7pQrCCyQ/w=="
             },
-            "magic-string@0.30.12": {
-                "integrity": "sha512-Ea8I3sQMVXr8JhN4z+H/d8zwo+tYDgHE9+5G4Wnrwhs0gaK9fXTKx0Tw5Xwsd/bCPTTZNRAdpyzvoeORe9LYpw=="
+            "magic-string@0.30.13": {
+                "integrity": "sha512-8rYBO+MsWkgjDSOvLomYnzhdwEG51olQ4zL5KXnNJWV5MNmrb4rTZdrtkhxjnD/QyZUqR/Z/XDsUs/4ej2nx0g=="
             },
             "nanoid@3.3.7": {
                 "integrity": "sha512-eSRppjcPIatRIMC1U6UngP8XFcz8MQWGQdt1MTBQ7NaAmvXDfvNxbvWV3x2y6CdEUciCSsDHDQZbhYaB8QEo2g=="
