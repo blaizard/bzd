@@ -19,6 +19,7 @@ express
 express-minify
 helmet
 http
+mime=^1
 multer
 mongodb=6.3.0
 @google-cloud/storage
