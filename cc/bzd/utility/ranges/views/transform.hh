@@ -5,6 +5,7 @@
 #include "cc/bzd/utility/iterators/advance.hh"
 #include "cc/bzd/utility/ranges/view_interface.hh"
 #include "cc/bzd/utility/ranges/views/adaptor.hh"
+#include "cc/bzd/utility/ranges/views/adaptor_iterator.hh"
 
 namespace bzd::ranges {
 
@@ -12,14 +13,13 @@ template <concepts::borrowedRange Range, class Function>
 class Transform : public ViewInterface<Transform<Range, Function>>
 {
 private: // Traits.
-	using IteratorBase = typeTraits::RangeIterator<Range>;
-	class Iterator : public IteratorBase
+	class Iterator : public AdapatorForwardIterator<Range, Iterator>
 	{
 	public:
-		constexpr Iterator(IteratorBase&& it, const Function& func) noexcept : IteratorBase{bzd::move(it)}, func_{func} {}
-
-		constexpr auto operator*() const noexcept { return func_.get()(IteratorBase::operator*()); }
-		// TODO: add overloads for all accessors
+		constexpr Iterator(auto&& it, const Function& func) noexcept : AdapatorForwardIterator<Range, Iterator>{bzd::move(it)}, func_{func}
+		{
+		}
+		constexpr auto get(const auto& it) const noexcept { return func_.get()(*it); }
 
 	private:
 		bzd::ReferenceWrapper<const Function> func_;

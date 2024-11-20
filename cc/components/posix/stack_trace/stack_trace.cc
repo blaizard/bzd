@@ -118,7 +118,9 @@ bzd::StringView exec(const char* cmd)
 	static char result[maxSize + 1];
 	::std::memset(result, 0, sizeof(result));
 
-	::std::unique_ptr<FILE, decltype(&pclose)> pipe(::popen(cmd, "r"), ::pclose);
+	// Using "int(*)(FILE*)" instead of "decltype(&pclose)" because of this (on nixos):
+	// https://stackoverflow.com/questions/76867698/what-does-ignoring-attributes-on-template-argument-mean-in-this-context
+	::std::unique_ptr<FILE, int (*)(FILE*)> pipe(::popen(cmd, "r"), ::pclose);
 	if (!pipe)
 	{
 		return nullptr;

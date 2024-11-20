@@ -122,3 +122,16 @@ TEST(Views, Join)
 	helperTestCopy(bzd::ranges::Join{bzd::inPlace, container}, "Hello World"_sv);
 	helperTestMove(bzd::ranges::Join{bzd::inPlace, container}, "Hello World"_sv);
 }
+
+TEST(Views, Filter)
+{
+	const auto container = {2, 3, -3, 1, 0, -20, -1, 2};
+	const auto predicate = [](const auto value) { return value > 0; };
+	bzd::ranges::Filter view{bzd::inPlace, container, predicate};
+
+	const auto expected = {2, 3, 1, 2};
+	EXPECT_EQ_RANGE(view, expected);
+
+	helperTestCopy(bzd::ranges::Filter{bzd::inPlace, container, predicate}, expected);
+	helperTestMove(bzd::ranges::Filter{bzd::inPlace, container, predicate}, expected);
+}
