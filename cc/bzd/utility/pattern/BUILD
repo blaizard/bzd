@@ -36,8 +36,9 @@ bzd_cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/utility/pattern/from_string:integral",
-        "//cc/bzd/utility/pattern/from_string:output_range",
         "//cc/bzd/utility/pattern/from_string:pattern",
+        "//cc/bzd/utility/pattern/from_string:range",
+        "//cc/bzd/utility/pattern/from_string:range_of_ranges",
     ],
 )
 
@@ -46,8 +47,9 @@ bzd_cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/utility/pattern/from_stream:integral",
-        "//cc/bzd/utility/pattern/from_stream:output_range",
         "//cc/bzd/utility/pattern/from_stream:pattern",
+        "//cc/bzd/utility/pattern/from_stream:range",
+        "//cc/bzd/utility/pattern/from_stream:range_of_ranges",
     ],
 )
 

@@ -132,6 +132,9 @@ template <class T>
 concept outputByteCopyableRange = byteCopyableRange<T> && outputRange<T>;
 
 template <class T>
+concept randomAccessByteCopyableRange = byteCopyableRange<T> && randomAccessRange<T>;
+
+template <class T>
 concept borrowedRange = range<T> && (typeTraits::isLValueReference<T> || typeTraits::enableBorrowedRange<typeTraits::RemoveCVRef<T>>);
 
 template <class T>

@@ -7,54 +7,6 @@
 
 namespace bzd {
 
-template <concepts::generatorInputByteCopyableRange Generator, class Callback>
-bzd::Async<Size> forEach(Generator&& generator, Callback&& callback) noexcept
-{
-	auto result = co_await generator;
-	if (!result)
-	{
-		co_return bzd::move(result).propagate();
-	}
-	auto it = bzd::begin(result.valueMutable());
-	auto end = bzd::end(result.valueMutable());
-	Size count{0u};
-	while (!generator.isCompleted())
-	{
-		if (it == end)
-		{
-			result = co_await generator;
-			if (result)
-			{
-				it = bzd::begin(result.valueMutable());
-				end = bzd::end(result.valueMutable());
-				// If there are still no input after fetching new data.
-				if (it == end)
-				{
-					break;
-				}
-			}
-			else if (result.error().getType() == bzd::ErrorType::eof)
-			{
-				break;
-			}
-			else
-			{
-				co_return bzd::move(result).propagate();
-			}
-		}
-
-		if (!callback(*it))
-		{
-			break;
-		}
-
-		++count;
-		++it;
-	}
-
-	co_return count;
-}
-
 template <concepts::integral T>
 struct FromStream<T> : public FromString<T>
 {
@@ -69,7 +21,7 @@ struct FromStream<T> : public FromString<T>
 
 		if constexpr (concepts::isSigned<typeTraits::RemoveReference<T>>)
 		{
-			co_await !forEach(generator, [&](const auto input) -> Bool {
+			co_await !impl::fromStreamforEach(generator, [&](const auto input) -> Bool {
 				const char c = static_cast<char>(input);
 				if (c == '-')
 				{
@@ -83,7 +35,7 @@ struct FromStream<T> : public FromString<T>
 		switch (metadata.format)
 		{
 		case Metadata::Format::binary:
-			count = co_await !forEach(bzd::forward<Generator>(generator), [&](const auto input) -> Bool {
+			count = co_await !impl::fromStreamforEach(bzd::forward<Generator>(generator), [&](const auto input) -> Bool {
 				const char c = static_cast<char>(input);
 				if (c >= '0' && c <= '1')
 				{
@@ -94,7 +46,7 @@ struct FromStream<T> : public FromString<T>
 			});
 			break;
 		case Metadata::Format::octal:
-			count = co_await !forEach(bzd::forward<Generator>(generator), [&](const auto input) -> Bool {
+			count = co_await !impl::fromStreamforEach(bzd::forward<Generator>(generator), [&](const auto input) -> Bool {
 				const char c = static_cast<char>(input);
 				if (c >= '0' && c <= '7')
 				{
@@ -105,7 +57,7 @@ struct FromStream<T> : public FromString<T>
 			});
 			break;
 		case Metadata::Format::decimal:
-			count = co_await !forEach(bzd::forward<Generator>(generator), [&](const auto input) -> Bool {
+			count = co_await !impl::fromStreamforEach(bzd::forward<Generator>(generator), [&](const auto input) -> Bool {
 				const char c = static_cast<char>(input);
 				if (c >= '0' && c <= '9')
 				{
@@ -116,7 +68,7 @@ struct FromStream<T> : public FromString<T>
 			});
 			break;
 		case Metadata::Format::hexadecimalLower:
-			count = co_await !forEach(bzd::forward<Generator>(generator), [&](const auto input) -> Bool {
+			count = co_await !impl::fromStreamforEach(bzd::forward<Generator>(generator), [&](const auto input) -> Bool {
 				const char c = static_cast<char>(input);
 				if (c >= '0' && c <= '9')
 				{
@@ -132,7 +84,7 @@ struct FromStream<T> : public FromString<T>
 			});
 			break;
 		case Metadata::Format::hexadecimalUpper:
-			count = co_await !forEach(bzd::forward<Generator>(generator), [&](const auto input) -> Bool {
+			count = co_await !impl::fromStreamforEach(bzd::forward<Generator>(generator), [&](const auto input) -> Bool {
 				const char c = static_cast<char>(input);
 				if (c >= '0' && c <= '9')
 				{

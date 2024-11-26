@@ -2,7 +2,7 @@
 
 #include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/utility/pattern/from_stream/base.hh"
-#include "cc/bzd/utility/pattern/from_string/output_range.hh"
+#include "cc/bzd/utility/pattern/from_string/range.hh"
 #include "cc/bzd/utility/regexp/async.hh"
 
 namespace bzd {

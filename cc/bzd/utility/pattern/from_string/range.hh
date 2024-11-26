@@ -15,7 +15,7 @@ struct FromString<Output>
 	};
 
 	template <bzd::concepts::inputByteCopyableRange Range, class T>
-	static constexpr Optional<Size> process(Range&& range, T&& output, const Metadata metadata = Metadata{}) noexcept
+	static constexpr Optional<Size> process(Range&& range, T& output, const Metadata metadata = Metadata{}) noexcept
 	{
 		bzd::Regexp regexp{metadata.regexp};
 		if (const auto result = regexp.capture(range, output); result)

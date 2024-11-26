@@ -28,15 +28,28 @@ cc_library(
 )
 
 cc_library(
-    name = "output_range",
+    name = "range_of_ranges",
     hdrs = [
-        "output_range.hh",
+        "range_of_ranges.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
         ":base",
         "//cc/bzd/type_traits:range",
-        "//cc/bzd/utility/pattern/from_string:output_range",
+        "//cc/bzd/utility/pattern/from_string:range_of_ranges",
+    ],
+)
+
+cc_library(
+    name = "range",
+    hdrs = [
+        "range.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":base",
+        "//cc/bzd/type_traits:range",
+        "//cc/bzd/utility/pattern/from_string:range",
         "//cc/bzd/utility/regexp:async",
     ],
 )
