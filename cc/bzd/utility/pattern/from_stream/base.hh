@@ -35,3 +35,55 @@ bzd::Async<Size> fromStream(Generator&& generator, Args&&... args) noexcept
 }
 
 } // namespace bzd
+
+namespace bzd::impl {
+
+template <concepts::generatorInputByteCopyableRange Generator, class Callback>
+bzd::Async<Size> fromStreamforEach(Generator&& generator, Callback&& callback) noexcept
+{
+	auto result = co_await generator;
+	if (!result)
+	{
+		co_return bzd::move(result).propagate();
+	}
+	auto it = bzd::begin(result.valueMutable());
+	auto end = bzd::end(result.valueMutable());
+	Size count{0u};
+	while (!generator.isCompleted())
+	{
+		if (it == end)
+		{
+			result = co_await generator;
+			if (result)
+			{
+				it = bzd::begin(result.valueMutable());
+				end = bzd::end(result.valueMutable());
+				// If there are still no input after fetching new data.
+				if (it == end)
+				{
+					break;
+				}
+			}
+			else if (result.error().getType() == bzd::ErrorType::eof)
+			{
+				break;
+			}
+			else
+			{
+				co_return bzd::move(result).propagate();
+			}
+		}
+
+		if (!callback(*it))
+		{
+			break;
+		}
+
+		++count;
+		++it;
+	}
+
+	co_return count;
+}
+
+} // namespace bzd::impl

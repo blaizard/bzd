@@ -5,6 +5,7 @@ bzd_cc_test(
     srcs = [
         "integral.cc",
         "pattern.cc",
+        "range_of_ranges.cc",
     ],
     deps = [
         "//cc/bzd/container:ichannel_buffered",

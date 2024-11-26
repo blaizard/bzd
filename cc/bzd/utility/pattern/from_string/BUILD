@@ -38,9 +38,24 @@ cc_library(
 )
 
 cc_library(
-    name = "output_range",
+    name = "range_of_ranges",
     hdrs = [
-        "output_range.hh",
+        "range_of_ranges.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":base",
+        "//cc/bzd/algorithm:equal_range",
+        "//cc/bzd/container:map",
+        "//cc/bzd/type_traits:is_same_template",
+        "//cc/bzd/type_traits:range",
+    ],
+)
+
+cc_library(
+    name = "range",
+    hdrs = [
+        "range.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
