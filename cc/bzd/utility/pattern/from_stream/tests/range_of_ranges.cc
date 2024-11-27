@@ -13,6 +13,8 @@ using TestIChannelZeroCopyChunks = bzd::test::IChannel<char, 32u, bzd::test::ICh
 TEST_ASYNC(PatternFromStream, RangeOdRanges, AllTestIChannel)
 {
 	const auto keywords = {
+		"ba"_sv,
+		"eba"_sv,
 		"h"_sv,
 		"hello"_sv,
 		"info"_sv,
@@ -27,10 +29,29 @@ TEST_ASYNC(PatternFromStream, RangeOdRanges, AllTestIChannel)
 	for (const auto& exactMatch : keywords)
 	{
 		in << exactMatch;
-		bzd::ToRangeOfRanges wrapper{keywords};
-		const auto size = co_await !bzd::fromStream(channel.reader(), wrapper);
+		bzd::ToSortedRangeOfRanges wrapper{keywords};
+		using Metadata = typename bzd::FromString<decltype(wrapper)>::Metadata;
+		const auto size = co_await !bzd::fromStream(channel.reader(), wrapper, Metadata{Metadata::Mode::greedy});
 		EXPECT_EQ(size, bzd::size(exactMatch));
+		EXPECT_STREQ(wrapper.output.value()->data(), exactMatch.data());
 	}
+
+	{
+		in << "heba";
+		bzd::ToSortedRangeOfRanges wrapper{keywords};
+		const auto size = co_await !bzd::fromStream(channel.reader(), wrapper);
+		EXPECT_EQ(size, 1u);
+		EXPECT_STREQ(wrapper.output.value()->data(), "h");
+	}
+	// The 'e' is consumed by the previous invocation because it uses a greedy algorithm.
+	/*
+	{
+		bzd::ToSortedRangeOfRanges wrapper{keywords};
+		const auto size = co_await !bzd::fromStream(channel.reader(), wrapper);
+		EXPECT_EQ(size, 3u);
+		EXPECT_STREQ(wrapper.output.value()->data(), "ba");
+	}
+	*/
 
 	co_return {};
 }

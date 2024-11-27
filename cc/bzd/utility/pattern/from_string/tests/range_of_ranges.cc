@@ -17,25 +17,48 @@ TEST(RangeOfRangesFromString, SortedRange)
 	// Exact matches.
 	for (const auto& exactMatch : keywords)
 	{
-		bzd::ToRangeOfRanges wrapper{keywords};
-		const auto result = bzd::fromString(exactMatch, wrapper);
+		bzd::ToSortedRangeOfRanges wrapper{keywords};
+		using Metadata = typename bzd::FromString<decltype(wrapper)>::Metadata;
+		const auto result = bzd::fromString(exactMatch, wrapper, Metadata{Metadata::Mode::greedy});
 		EXPECT_TRUE(result);
 		EXPECT_EQ(result.value(), bzd::size(exactMatch));
+		EXPECT_STREQ(wrapper.output.value()->data(), exactMatch.data());
 	}
 
 	// no match.
 	{
-		bzd::ToRangeOfRanges wrapper{keywords};
+		bzd::ToSortedRangeOfRanges wrapper{keywords};
 		const auto result = bzd::fromString("false"_sv, wrapper);
 		EXPECT_FALSE(result);
 	}
 
 	// match a longer string.
 	{
-		bzd::ToRangeOfRanges wrapper{keywords};
+		bzd::ToSortedRangeOfRanges wrapper{keywords};
 		const auto result = bzd::fromString("infotabil"_sv, wrapper);
 		EXPECT_TRUE(result);
 		EXPECT_EQ(result.value(), 4u);
+		EXPECT_STREQ(wrapper.output.value()->data(), "info");
+	}
+
+	// lazy.
+	{
+		bzd::ToSortedRangeOfRanges wrapper{keywords};
+		using Metadata = typename bzd::FromString<decltype(wrapper)>::Metadata;
+		const auto result = bzd::fromString("hello"_sv, wrapper, Metadata{Metadata::Mode::lazy});
+		EXPECT_TRUE(result);
+		EXPECT_EQ(result.value(), 1u);
+		EXPECT_STREQ(wrapper.output.value()->data(), "h");
+	}
+
+	// greedy.
+	{
+		bzd::ToSortedRangeOfRanges wrapper{keywords};
+		using Metadata = typename bzd::FromString<decltype(wrapper)>::Metadata;
+		const auto result = bzd::fromString("hello"_sv, wrapper, Metadata{Metadata::Mode::greedy});
+		EXPECT_TRUE(result);
+		EXPECT_EQ(result.value(), 5u);
+		EXPECT_STREQ(wrapper.output.value()->data(), "hello");
 	}
 }
 
@@ -45,14 +68,14 @@ TEST(RangeOfRangesFromString, CornerCases)
 
 	// empty string is not tested.
 	{
-		bzd::ToRangeOfRanges wrapper{keywords};
+		bzd::ToSortedRangeOfRanges wrapper{keywords};
 		const auto result = bzd::fromString("hello"_sv, wrapper);
 		EXPECT_FALSE(result);
 	}
 
 	// empty keywords.
 	{
-		bzd::ToRangeOfRanges wrapper{bzd::ranges::SubRange{bzd::end(keywords), bzd::end(keywords)}};
+		bzd::ToSortedRangeOfRanges wrapper{bzd::ranges::SubRange{bzd::end(keywords), bzd::end(keywords)}};
 		const auto result = bzd::fromString("hello"_sv, wrapper);
 		EXPECT_FALSE(result);
 	}
