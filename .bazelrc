@@ -188,6 +188,7 @@ build:sanitizer --strip never
 # Address Sanitizer
 build:asan --copt -fsanitize=address
 build:asan --linkopt -fsanitize=address
+build:asan --copt -fno-omit-frame-pointer # In order to have non-truncated stack traces.
 test:asan --test_env=ASAN_OPTIONS=print_stacktrace=1
 
 # Leak Sanitizer`

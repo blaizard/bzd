@@ -46,8 +46,8 @@ cc_library(
     deps = [
         ":base",
         "//cc/bzd/algorithm:equal_range",
-        "//cc/bzd/container:map",
         "//cc/bzd/container:result",
+        "//cc/bzd/container:wrapper",
         "//cc/bzd/type_traits:is_same_template",
         "//cc/bzd/type_traits:range",
     ],
