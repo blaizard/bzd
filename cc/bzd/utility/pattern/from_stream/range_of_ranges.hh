@@ -10,15 +10,13 @@ template <concepts::sameTemplate<ToSortedRangeOfRanges> Output>
 struct FromStream<Output> : public bzd::FromString<Output>
 {
 	using Metadata = typename bzd::FromString<Output>::Metadata;
-	template <class T>
-	using Comparison = typename bzd::FromString<Output>::template Comparison<T>;
+	template <class T, class Accessor>
+	using Comparison = bzd::FromString<Output>::template Comparison<T, Accessor>;
 
 	template <concepts::generatorInputByteCopyableRange Generator, class T>
-	static bzd::Async<Size> process(Generator&& generator,
-									ToSortedRangeOfRanges<T>& sortedRange,
-									const Metadata metadata = Metadata{}) noexcept
+	static bzd::Async<Size> process(Generator&& generator, T& sortedRange, const Metadata metadata = Metadata{}) noexcept
 	{
-		Comparison<T> comparison{sortedRange.input};
+		auto comparison = Comparison<decltype(sortedRange.input), decltype(sortedRange.accessor)>{sortedRange.input, sortedRange.accessor};
 
 		co_await !impl::fromStreamforEach(generator, [&](const auto c) -> Bool {
 			const auto maybeResult = comparison.process(static_cast<bzd::Byte>(c));

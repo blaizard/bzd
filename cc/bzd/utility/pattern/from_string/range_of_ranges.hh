@@ -4,6 +4,7 @@
 #include "cc/bzd/container/map.hh"
 #include "cc/bzd/container/result.hh"
 #include "cc/bzd/type_traits/is_same_template.hh"
+#include "cc/bzd/type_traits/predicate.hh"
 #include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/utility/pattern/from_string/base.hh"
 
@@ -12,12 +13,22 @@ namespace bzd {
 namespace concepts {
 template <class T>
 concept rangeOfRandomAccessByteCopyableRanges = bzd::concepts::randomAccessByteCopyableRange<typeTraits::RangeValue<T>>;
-}
+} // namespace concepts
 
-template <concepts::rangeOfRandomAccessByteCopyableRanges T>
+namespace impl::pattern {
+struct AccessorNoop
+{
+	constexpr auto operator()(const auto& element) const noexcept { return element; }
+};
+} // namespace impl::pattern
+
+template <concepts::rangeOfRandomAccessByteCopyableRanges T, class Accessor = impl::pattern::AccessorNoop>
 struct ToSortedRangeOfRanges
 {
+	constexpr ToSortedRangeOfRanges(const T& input_, const Accessor accessor_ = Accessor{}) noexcept : input{input_}, accessor{accessor_} {}
+
 	const T& input;
+	const Accessor accessor;
 	bzd::Optional<bzd::typeTraits::RangeIterator<T>> output{};
 };
 
@@ -25,31 +36,36 @@ template <concepts::sameTemplate<ToSortedRangeOfRanges> Output>
 struct FromString<Output>
 {
 protected:
-	template <class T>
+	template <class T, class Accessor>
 	class Comparison
 	{
 	public:
 		using Iterator = bzd::typeTraits::RangeIterator<T>;
 
 	public:
-		constexpr Comparison(const T& range) noexcept : first_{bzd::begin(range)}, last_{bzd::end(range)} {}
-
-		bool operator()(const typeTraits::RangeValue<T>& element, const bzd::Byte c) const noexcept
+		constexpr Comparison(const T& range, const Accessor& accessor) noexcept :
+			first_{bzd::begin(range)}, last_{bzd::end(range)}, accessor_{accessor}
 		{
-			if (index_ >= bzd::size(element))
+		}
+
+		constexpr bool operator()(const typeTraits::RangeValue<T>& element, const bzd::Byte c) const noexcept
+		{
+			const auto actualElement = accessor_(element);
+			if (index_ >= bzd::size(actualElement))
 			{
 				return true;
 			}
-			return element.at(index_) < static_cast<char>(c);
+			return actualElement.at(index_) < static_cast<char>(c);
 		}
 
-		bool operator()(const bzd::Byte c, const typeTraits::RangeValue<T>& element) const noexcept
+		constexpr bool operator()(const bzd::Byte c, const typeTraits::RangeValue<T>& element) const noexcept
 		{
-			if (index_ >= bzd::size(element))
+			const auto actualElement = accessor_(element);
+			if (index_ >= bzd::size(actualElement))
 			{
 				return false;
 			}
-			return static_cast<char>(c) < element.at(index_);
+			return static_cast<char>(c) < actualElement.at(index_);
 		}
 
 		/// Process a new character.
@@ -57,7 +73,7 @@ protected:
 		/// \return An error result if there is no match.
 		///         An empty result if there are matched but no full match.
 		///         An iterator if there is a full match.
-		bzd::Result<bzd::Optional<Iterator>> process(const bzd::Byte c) noexcept
+		constexpr bzd::Result<bzd::Optional<Iterator>> process(const bzd::Byte c) noexcept
 		{
 			auto [it, lastUpdated] = bzd::algorithm::equalRange(first_, last_, c, *this);
 			++index_;
@@ -86,6 +102,7 @@ protected:
 	private:
 		Iterator first_;
 		Iterator last_;
+		const Accessor accessor_;
 		bzd::Size index_{0};
 	};
 
@@ -102,11 +119,9 @@ public:
 	};
 
 	template <bzd::concepts::inputByteCopyableRange Range, class T>
-	static constexpr Optional<Size> process(Range&& range,
-											ToSortedRangeOfRanges<T>& sortedRange,
-											const Metadata metadata = Metadata{}) noexcept
+	static constexpr Optional<Size> process(Range&& range, T& sortedRange, const Metadata metadata = Metadata{}) noexcept
 	{
-		Comparison<T> comparison{sortedRange.input};
+		auto comparison = Comparison<decltype(sortedRange.input), decltype(sortedRange.accessor)>{sortedRange.input, sortedRange.accessor};
 		for (const auto c : range)
 		{
 			const auto maybeResult = comparison.process(static_cast<bzd::Byte>(c));
