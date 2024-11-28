@@ -98,14 +98,15 @@ export LLVM_SYMBOLIZER_PATH="{llvm_symbolizer}"
     visibility = ["//visibility:public"],
 )
 
+# Note, setting LLVM_SYMBOLIZER_PATH doesn't seem to work anymore.
 sh_binary_wrapper(
     name = "executor_host",
     locations = {
         ":llvm_symbolizer": "llvm_symbolizer"
     },
     command = """
-export LLVM_SYMBOLIZER_PATH="{llvm_symbolizer}"
-$@
+export PATH=$(dirname {llvm_symbolizer}):$PATH
+"$@"
     """,
     visibility = ["//visibility:public"],
 )

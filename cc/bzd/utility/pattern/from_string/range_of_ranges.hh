@@ -1,10 +1,9 @@
 #pragma once
 
 #include "cc/bzd/algorithm/equal_range.hh"
-#include "cc/bzd/container/map.hh"
 #include "cc/bzd/container/result.hh"
+#include "cc/bzd/container/wrapper.hh"
 #include "cc/bzd/type_traits/is_same_template.hh"
-#include "cc/bzd/type_traits/predicate.hh"
 #include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/utility/pattern/from_string/base.hh"
 
@@ -22,15 +21,20 @@ struct AccessorNoop
 };
 } // namespace impl::pattern
 
-template <concepts::rangeOfRandomAccessByteCopyableRanges T, class Accessor = impl::pattern::AccessorNoop>
+template <concepts::rangeOfRandomAccessByteCopyableRanges T, class Accessor>
 struct ToSortedRangeOfRanges
 {
-	constexpr ToSortedRangeOfRanges(const T& input_, const Accessor accessor_ = Accessor{}) noexcept : input{input_}, accessor{accessor_} {}
+	constexpr ToSortedRangeOfRanges(auto&& input_, const Accessor accessor_ = Accessor{}) noexcept :
+		input{bzd::forward<decltype(input_)>(input_)}, accessor{accessor_}
+	{
+	}
 
-	const T& input;
+	bzd::Wrapper<T> input;
 	const Accessor accessor;
 	bzd::Optional<bzd::typeTraits::RangeIterator<T>> output{};
 };
+template <class T>
+ToSortedRangeOfRanges(T&&) -> ToSortedRangeOfRanges<T, impl::pattern::AccessorNoop>;
 
 template <concepts::sameTemplate<ToSortedRangeOfRanges> Output>
 struct FromString<Output>
@@ -102,7 +106,7 @@ protected:
 	private:
 		Iterator first_;
 		Iterator last_;
-		const Accessor accessor_;
+		const typeTraits::RemoveCVRef<Accessor> accessor_;
 		bzd::Size index_{0};
 	};
 
@@ -121,7 +125,8 @@ public:
 	template <bzd::concepts::inputByteCopyableRange Range, class T>
 	static constexpr Optional<Size> process(Range&& range, T& sortedRange, const Metadata metadata = Metadata{}) noexcept
 	{
-		auto comparison = Comparison<decltype(sortedRange.input), decltype(sortedRange.accessor)>{sortedRange.input, sortedRange.accessor};
+		auto comparison =
+			Comparison<decltype(sortedRange.input.get()), decltype(sortedRange.accessor)>{sortedRange.input.get(), sortedRange.accessor};
 		for (const auto c : range)
 		{
 			const auto maybeResult = comparison.process(static_cast<bzd::Byte>(c));

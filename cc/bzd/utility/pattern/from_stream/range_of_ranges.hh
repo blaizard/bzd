@@ -16,7 +16,8 @@ struct FromStream<Output> : public bzd::FromString<Output>
 	template <concepts::generatorInputByteCopyableRange Generator, class T>
 	static bzd::Async<Size> process(Generator&& generator, T& sortedRange, const Metadata metadata = Metadata{}) noexcept
 	{
-		auto comparison = Comparison<decltype(sortedRange.input), decltype(sortedRange.accessor)>{sortedRange.input, sortedRange.accessor};
+		auto comparison =
+			Comparison<decltype(sortedRange.input.get()), decltype(sortedRange.accessor)>{sortedRange.input.get(), sortedRange.accessor};
 
 		co_await !impl::fromStreamforEach(generator, [&](const auto c) -> Bool {
 			const auto maybeResult = comparison.process(static_cast<bzd::Byte>(c));
