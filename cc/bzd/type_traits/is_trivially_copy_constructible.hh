@@ -10,3 +10,10 @@ template <class T>
 inline constexpr bool isTriviallyCopyConstructible = IsTriviallyCopyConstructible<T>::value;
 
 } // namespace bzd::typeTraits
+
+namespace bzd::concepts {
+
+template <class T>
+concept triviallyCopyConstructible = bzd::typeTraits::isTriviallyCopyConstructible<T>;
+
+}

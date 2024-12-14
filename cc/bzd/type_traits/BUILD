@@ -49,6 +49,7 @@ bzd_cc_library(
         ":is_trivially_copy_assignable",
         ":is_trivially_copy_constructible",
         ":is_trivially_copyable",
+        ":is_trivially_default_constructible",
         ":is_trivially_destructible",
         ":is_trivially_move_assignable",
         ":is_trivially_move_constructible",
@@ -593,6 +594,14 @@ cc_library(
     name = "is_trivially_copyable",
     hdrs = [
         "is_trivially_copyable.hh",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "is_trivially_default_constructible",
+    hdrs = [
+        "is_trivially_default_constructible.hh",
     ],
     visibility = ["//visibility:public"],
 )

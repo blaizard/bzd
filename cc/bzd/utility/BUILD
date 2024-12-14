@@ -5,11 +5,15 @@ bzd_cc_library(
     name = "utility",
     visibility = ["//visibility:public"],
     deps = [
+        ":address_of",
         ":align_down",
         ":align_up",
         ":apply",
+        ":bit_cast",
         ":constexpr_for",
+        ":construct_at",
         ":container_of",
+        ":destroy_at",
         ":forward",
         ":ignore",
         ":in_place",
@@ -36,6 +40,14 @@ bzd_cc_library(
 )
 
 # ---- Individual items ----
+
+cc_library(
+    name = "address_of",
+    hdrs = [
+        "address_of.hh",
+    ],
+    visibility = ["//visibility:public"],
+)
 
 cc_library(
     name = "align_down",
@@ -74,6 +86,14 @@ cc_library(
 )
 
 cc_library(
+    name = "bit_cast",
+    hdrs = [
+        "bit_cast.hh",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
     name = "constexpr_for",
     hdrs = [
         "constexpr_for.hh",
@@ -89,6 +109,17 @@ cc_library(
 )
 
 cc_library(
+    name = "construct_at",
+    hdrs = [
+        "construct_at.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":forward",
+    ],
+)
+
+cc_library(
     name = "container_of",
     hdrs = [
         "container_of.hh",
@@ -97,6 +128,14 @@ cc_library(
     deps = [
         ":offset_of",
     ],
+)
+
+cc_library(
+    name = "destroy_at",
+    hdrs = [
+        "destroy_at.hh",
+    ],
+    visibility = ["//visibility:public"],
 )
 
 cc_library(

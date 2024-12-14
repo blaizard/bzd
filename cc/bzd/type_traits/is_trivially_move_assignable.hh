@@ -10,3 +10,10 @@ template <class T>
 inline constexpr bool isTriviallyMoveAssignable = IsTriviallyMoveAssignable<T>::value;
 
 } // namespace bzd::typeTraits
+
+namespace bzd::concepts {
+
+template <class T>
+concept triviallyMoveAssignable = bzd::typeTraits::isTriviallyMoveAssignable<T>;
+
+}
