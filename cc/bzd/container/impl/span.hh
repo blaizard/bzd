@@ -11,6 +11,8 @@
 #include "cc/bzd/type_traits/is_const.hh"
 #include "cc/bzd/type_traits/iterator.hh"
 #include "cc/bzd/type_traits/remove_const.hh"
+#include "cc/bzd/utility/construct_at.hh"
+#include "cc/bzd/utility/destroy_at.hh"
 #include "cc/bzd/utility/forward.hh"
 #include "cc/bzd/utility/iterators/contiguous.hh"
 #include "cc/bzd/utility/iterators/distance.hh"
@@ -150,8 +152,8 @@ public: // Modifiers
 	template <class... Args>
 	constexpr void emplace(ConstIterator position, Args&&... args) noexcept
 	{
-		position->~ValueType();
-		::new (&(*position)) ValueType{bzd::forward<Args>(args)...};
+		bzd::destroyAt(&(*position));
+		bzd::constructAt(&(*position), bzd::forward<Args>(args)...);
 	}
 
 public: // Find

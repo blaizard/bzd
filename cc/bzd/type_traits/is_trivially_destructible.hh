@@ -11,3 +11,10 @@ template <class T>
 inline constexpr bool isTriviallyDestructible = IsTriviallyDestructible<T>::value;
 
 } // namespace bzd::typeTraits
+
+namespace bzd::concepts {
+
+template <class T>
+concept triviallyDestructible = bzd::typeTraits::isTriviallyDestructible<T>;
+
+}

@@ -41,6 +41,8 @@ cc_library(
         "//cc/bzd/type_traits:enable_if",
         "//cc/bzd/type_traits:is_const",
         "//cc/bzd/type_traits:iterator",
+        "//cc/bzd/utility:construct_at",
+        "//cc/bzd/utility:destroy_at",
         "//cc/bzd/utility:forward",
         "//cc/bzd/utility:move",
         "//cc/bzd/utility/iterators:contiguous",

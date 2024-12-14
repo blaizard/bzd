@@ -88,6 +88,20 @@ public: // Modifiers.
 	constexpr void resize(const Size n) noexcept
 	{
 		const auto newSize = (n < capacity_) ? n : capacity_;
+		const int nbNew = newSize - this->storage_.size();
+		auto it = this->end();
+		// Create new elements.
+		for (int n = 0; n < nbNew; ++n)
+		{
+			bzd::constructAt(&(*it));
+			++it;
+		}
+		// Destroy existing elements.
+		for (int n = 0; n > nbNew; n--)
+		{
+			--it;
+			bzd::destroyAt(&(*it));
+		}
 		this->storage_.sizeMutable() = newSize;
 		Policies::post(*this);
 	}
@@ -123,14 +137,14 @@ public: // Modifiers.
 	template <concepts::convertible<T> U>
 	constexpr Size append(U&& value) noexcept
 	{
-		return appendInternal(bzd::forward<U>(value));
+		return emplaceBack(bzd::forward<U>(value));
 	}
 
 	/// Trivially copyable objects of 1 byte size can be directly constructed from bytes.
 	constexpr Size append(const Byte value) noexcept
 	requires(concepts::byteCopyableRange<Parent>)
 	{
-		return appendInternal(reinterpret_cast<const T&>(value));
+		return emplaceBack(reinterpret_cast<const T&>(value));
 	}
 
 	template <concepts::forwardIterator Iterator, concepts::sentinelFor<Iterator> Sentinel>
@@ -160,13 +174,13 @@ public: // Modifiers.
 	{
 		if (full())
 		{
-			return 1u;
+			return 0u;
 		}
 		auto it = this->end();
-		this->emplace(it, bzd::forward<Args>(args)...);
+		bzd::constructAt(&(*it), bzd::forward<Args>(args)...);
 		++this->storage_.sizeMutable();
 		Policies::post(*this);
-		return 0u;
+		return 1u;
 	}
 
 public: // Operators.
@@ -182,22 +196,6 @@ public: // Operators.
 	{
 		append(bzd::forward<U>(data));
 		return *this;
-	}
-
-private:
-	template <class U>
-	constexpr Size appendInternal(U&& value) noexcept
-	{
-		if (full())
-		{
-			return 0u;
-		}
-		// Using the copy/move assignment operator is necessary here as it is
-		// allowed in a constexpr expression unlike placement new (at least in c++20).
-		this->at(this->size()) = bzd::forward<U>(value);
-		++this->storage_.sizeMutable();
-		Policies::post(*this);
-		return 1u;
 	}
 
 protected:

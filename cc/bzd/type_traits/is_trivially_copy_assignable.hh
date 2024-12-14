@@ -10,3 +10,10 @@ template <class T>
 inline constexpr bool isTriviallyCopyAssignable = IsTriviallyCopyAssignable<T>::value;
 
 } // namespace bzd::typeTraits
+
+namespace bzd::concepts {
+
+template <class T>
+concept triviallyCopyAssignable = bzd::typeTraits::isTriviallyCopyAssignable<T>;
+
+}
