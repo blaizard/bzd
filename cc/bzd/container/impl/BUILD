@@ -60,6 +60,8 @@ cc_library(
         ":span",
         "//cc/bzd/type_traits:is_convertible",
         "//cc/bzd/type_traits:is_trivially_copyable",
+        "//cc/bzd/type_traits:is_trivially_default_constructible",
+        "//cc/bzd/type_traits:is_trivially_destructible",
         "//cc/bzd/type_traits:sentinel_for",
         "//cc/bzd/utility/iterators:input_or_output_reference",
         "//cc/bzd/utility/ranges:stream",
