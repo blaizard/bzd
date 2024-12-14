@@ -3,12 +3,12 @@
 #include "cc/bzd/container/impl/span.hh"
 #include "cc/bzd/type_traits/is_convertible.hh"
 #include "cc/bzd/type_traits/is_trivially_copyable.hh"
+#include "cc/bzd/type_traits/is_trivially_default_constructible.hh"
+#include "cc/bzd/type_traits/is_trivially_destructible.hh"
 #include "cc/bzd/type_traits/sentinel_for.hh"
 #include "cc/bzd/utility/iterators/input_or_output_reference.hh"
 #include "cc/bzd/utility/ranges/stream.hh"
 #include "cc/bzd/utility/ranges/subrange.hh"
-
-#include <new> // Required for placement new.
 
 namespace bzd::impl {
 
@@ -90,17 +90,23 @@ public: // Modifiers.
 		const auto newSize = (n < capacity_) ? n : capacity_;
 		const int nbNew = newSize - this->storage_.size();
 		auto it = this->end();
-		// Create new elements.
-		for (int n = 0; n < nbNew; ++n)
+		if constexpr (!concepts::triviallyDefaultConstructible<T>)
 		{
-			bzd::constructAt(&(*it));
-			++it;
+			// Create new elements.
+			for (int n = 0; n < nbNew; ++n)
+			{
+				bzd::constructAt(&(*it));
+				++it;
+			}
 		}
-		// Destroy existing elements.
-		for (int n = 0; n > nbNew; n--)
+		if constexpr (!concepts::triviallyDestructible<T>)
 		{
-			--it;
-			bzd::destroyAt(&(*it));
+			// Destroy existing elements.
+			for (int n = 0; n > nbNew; n--)
+			{
+				--it;
+				bzd::destroyAt(&(*it));
+			}
 		}
 		this->storage_.sizeMutable() = newSize;
 		Policies::post(*this);
@@ -122,13 +128,18 @@ public: // Modifiers.
 	/// \return a range to assign new data to the container. Only upon destruction
 	/// of this object, the range is validated.
 	constexpr AppenderScope assigner() noexcept
+	requires(concepts::triviallyDefaultConstructible<T>)
 	{
 		clear();
 		return appender();
 	}
 
 	/// Create an appender range object to append elements to this container.
-	constexpr AppenderScope appender() noexcept { return AppenderScope{*this}; }
+	constexpr AppenderScope appender() noexcept
+	requires(concepts::triviallyDefaultConstructible<T>)
+	{
+		return AppenderScope{*this};
+	}
 
 	/// Adds a new element at the end of the container, after its current last element.
 	/// The content of `value` is copied (or moved) to the new element.

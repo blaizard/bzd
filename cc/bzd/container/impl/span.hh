@@ -18,8 +18,6 @@
 #include "cc/bzd/utility/iterators/distance.hh"
 #include "cc/bzd/utility/move.hh"
 
-#include <new> // operator new for "placement new"
-
 namespace bzd {
 template <class T>
 class Span;
