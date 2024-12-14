@@ -9,6 +9,7 @@
 #include "cc/bzd/container/vector.hh"
 #include "cc/bzd/core/assert/minimal.hh"
 #include "cc/bzd/platform/types.hh"
+#include "cc/bzd/type_traits/is_same_template.hh"
 #include "cc/bzd/utility/comparison/less.hh"
 
 #include <initializer_list>
@@ -153,4 +154,30 @@ public:
 protected:
 	bzd::Vector<Element, N> data_;
 }; // namespace bzd
+
+namespace typeTraits {
+template <class T>
+struct IsMap
+{
+	static constexpr bool value = false;
+};
+template <class K, class V, Size N, class Compare>
+struct IsMap<bzd::Map<K, V, N, Compare>>
+{
+	static constexpr bool value = true;
+};
+template <class K, class V, class Compare>
+struct IsMap<bzd::interface::Map<K, V, Compare>>
+{
+	static constexpr bool value = true;
+};
+template <class T>
+inline constexpr bool isMap = IsMap<typeTraits::RemoveCVRef<T>>::value;
+} // namespace typeTraits
+
+namespace concepts {
+template <class T>
+concept map = typeTraits::isMap<T>;
+}
+
 } // namespace bzd
