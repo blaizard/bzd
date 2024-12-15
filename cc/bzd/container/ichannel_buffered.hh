@@ -109,7 +109,20 @@ public:
 			else
 			{
 				auto writeToBuffer = buffer_.asSpanForWriting();
-				data = co_await !in_.read(bzd::move(writeToBuffer));
+				while (true)
+				{
+					// Don't propagate the error, otherwise if read twice, it will read an empty promise.
+					auto maybeData = co_await in_.read(bzd::move(writeToBuffer));
+					if (!maybeData)
+					{
+						co_yield bzd::move(maybeData).propagate();
+					}
+					else
+					{
+						data = bzd::move(maybeData.valueMutable());
+						break;
+					}
+				}
 				buffer_.produce(data.size());
 				buffer_.consume(data.size());
 			}
