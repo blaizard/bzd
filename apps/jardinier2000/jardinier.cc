@@ -7,7 +7,7 @@
 
 namespace jardinier {
 
-constexpr gpio_num_t waterPumpPin{GPIO_NUM_23};
+constexpr gpio_num_t waterPumpPin{GPIO_NUM_13};
 
 bzd::Async<> water(bzd::Timer& timer, bzd::OStream& out, bzd::Size wateringTimeS, bzd::UInt64 wakeUpPeriodS)
 {
