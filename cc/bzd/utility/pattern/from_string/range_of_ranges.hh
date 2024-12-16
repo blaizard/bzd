@@ -1,9 +1,9 @@
 #pragma once
 
 #include "cc/bzd/algorithm/equal_range.hh"
+#include "cc/bzd/container/map.hh"
 #include "cc/bzd/container/result.hh"
 #include "cc/bzd/container/wrapper.hh"
-#include "cc/bzd/type_traits/is_same_template.hh"
 #include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/utility/pattern/from_string/base.hh"
 
@@ -19,9 +19,13 @@ struct AccessorNoop
 {
 	constexpr auto operator()(const auto& element) const noexcept { return element; }
 };
+struct AccessorMap
+{
+	constexpr auto operator()(const auto& element) const noexcept { return element.first; }
+};
 } // namespace impl::pattern
 
-template <concepts::rangeOfRandomAccessByteCopyableRanges T, class Accessor>
+template <class T, class Accessor>
 struct ToSortedRangeOfRanges
 {
 	constexpr ToSortedRangeOfRanges(auto&& input_, const Accessor accessor_ = Accessor{}) noexcept :
@@ -33,8 +37,10 @@ struct ToSortedRangeOfRanges
 	const Accessor accessor;
 	bzd::Optional<bzd::typeTraits::RangeIterator<T>> output{};
 };
-template <class T>
+template <concepts::rangeOfRandomAccessByteCopyableRanges T>
 ToSortedRangeOfRanges(T&&) -> ToSortedRangeOfRanges<T, impl::pattern::AccessorNoop>;
+template <concepts::map T>
+ToSortedRangeOfRanges(T&&) -> ToSortedRangeOfRanges<T&, impl::pattern::AccessorMap>;
 
 template <concepts::sameTemplate<ToSortedRangeOfRanges> Output>
 struct FromString<Output>
@@ -93,7 +99,7 @@ protected:
 			// Check if there is a match and return it.
 			while (it != lastUpdated)
 			{
-				if (bzd::size(*it) == index_)
+				if (bzd::size(accessor_(*it)) == index_)
 				{
 					return it;
 				}
@@ -125,6 +131,7 @@ public:
 	template <bzd::concepts::inputByteCopyableRange Range, class T>
 	static constexpr Optional<Size> process(Range&& range, T& sortedRange, const Metadata metadata = Metadata{}) noexcept
 	{
+		sortedRange.output.reset();
 		auto comparison =
 			Comparison<decltype(sortedRange.input.get()), decltype(sortedRange.accessor)>{sortedRange.input.get(), sortedRange.accessor};
 		for (const auto c : range)
@@ -151,7 +158,7 @@ public:
 		// Check if there was a match.
 		if (sortedRange.output.hasValue())
 		{
-			return bzd::size(*(sortedRange.output.value()));
+			return bzd::size(sortedRange.accessor(*(sortedRange.output.value())));
 		}
 		return bzd::nullopt;
 	}

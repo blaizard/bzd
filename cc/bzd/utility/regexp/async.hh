@@ -99,6 +99,10 @@ private:
 			auto value = result.valueMutable();
 			co_yield InputStreamCaptureRange<typename Generator::ResultType::Value, Capture>{value, capture, overflow};
 		}
+		while (true)
+		{
+			co_yield bzd::error::Eof("No more data available."_csv);
+		}
 	}
 };
 

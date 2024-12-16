@@ -60,6 +60,19 @@ TEST(RangeOfRangesFromString, SortedRange)
 		EXPECT_EQ(result.value(), 5u);
 		EXPECT_STREQ(wrapper.output.value()->data(), "hello");
 	}
+
+	// re-using wrapper.
+	{
+		bzd::ToSortedRangeOfRanges wrapper{keywords};
+		const auto result1 = bzd::fromString("hello"_sv, wrapper);
+		EXPECT_TRUE(result1);
+		EXPECT_EQ(result1.value(), 5u);
+		const auto result2 = bzd::fromString("infobar"_sv, wrapper);
+		EXPECT_TRUE(result2);
+		EXPECT_EQ(result2.value(), 7u);
+		const auto result3 = bzd::fromString("notpreset"_sv, wrapper);
+		EXPECT_FALSE(result3);
+	}
 }
 
 TEST(RangeOfRangesFromString, CornerCases)

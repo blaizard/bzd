@@ -10,7 +10,7 @@ using TestIChannelZeroCopyChunks = bzd::test::IChannel<char, 32u, bzd::test::ICh
 
 #define AllTestIChannel (TestIChannel, TestIChannelZeroCopy, TestIChannelChunks, TestIChannelZeroCopyChunks)
 
-TEST_ASYNC(PatternFromStream, RangeOdRanges, AllTestIChannel)
+TEST_ASYNC(PatternFromStream, RangeOfRanges, AllTestIChannel)
 {
 	const auto keywords = {
 		"ba"_sv,
@@ -52,6 +52,36 @@ TEST_ASYNC(PatternFromStream, RangeOdRanges, AllTestIChannel)
 		EXPECT_STREQ(wrapper.output.value()->data(), "ba");
 	}
 	*/
+
+	co_return {};
+}
+
+TEST_ASYNC(PatternFromStream, RangeOfRangesReusing, AllTestIChannel)
+{
+	const auto keywords = {
+		"ba"_sv,
+		"eba"_sv,
+		"h"_sv,
+		"hello"_sv,
+		"info"_sv,
+		"infobar"_sv,
+		"information"_sv,
+		"noooo"_sv,
+	};
+	TestType in{};
+	bzd::IChannelBuffered<char, 16u> channel{in};
+
+	// re-using wrapper.
+	{
+		in << "helloinfobar";
+		bzd::ToSortedRangeOfRanges wrapper{keywords};
+		const auto result1 = co_await bzd::fromStream(channel.reader(), wrapper);
+		EXPECT_TRUE(result1);
+		EXPECT_EQ(result1.value(), 5u);
+		const auto result2 = co_await bzd::fromStream(channel.reader(), wrapper);
+		EXPECT_TRUE(result2);
+		EXPECT_EQ(result2.value(), 7u);
+	}
 
 	co_return {};
 }
