@@ -16,6 +16,7 @@ struct FromStream<Output> : public bzd::FromString<Output>
 	template <concepts::generatorInputByteCopyableRange Generator, class T>
 	static bzd::Async<Size> process(Generator&& generator, T& sortedRange, const Metadata metadata = Metadata{}) noexcept
 	{
+		sortedRange.output.reset();
 		auto comparison =
 			Comparison<decltype(sortedRange.input.get()), decltype(sortedRange.accessor)>{sortedRange.input.get(), sortedRange.accessor};
 
@@ -44,7 +45,7 @@ struct FromStream<Output> : public bzd::FromString<Output>
 		// Check if there was a match.
 		if (sortedRange.output.hasValue())
 		{
-			co_return bzd::size(*(sortedRange.output.value()));
+			co_return bzd::size(sortedRange.accessor(*(sortedRange.output.value())));
 		}
 		co_return bzd::error::Failure{"No match"};
 	}
