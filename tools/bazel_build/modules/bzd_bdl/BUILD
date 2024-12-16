@@ -19,5 +19,6 @@ bzl_library(
         "@bzd_lib//config:defs",
         "@bzd_package//:defs",
         "@bzd_toolchain_cc//cc:defs",
+        "@rules_cc//cc:find_cc_toolchain.bzl",
     ],
 )
