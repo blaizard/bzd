@@ -99,6 +99,11 @@ auto&& awaiter = get_awaiter(static_cast<decltype(awaitable)>(awaitable));
 
 ## Async implementation
 
+### To be aware
+
+- Coroutine in C++ together with lambda capture is nasty, better not use it: https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#Rcoro-capture
+- Generators should not use the error propagation syntax, otherwise the generator async is consudered as terminated, while it might be re-used.
+
 ### Task
 
 `bzd::Async` is the task-coroutine type of this framework.

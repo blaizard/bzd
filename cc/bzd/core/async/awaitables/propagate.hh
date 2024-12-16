@@ -19,7 +19,7 @@ public:
 		if constexpr (PromiseType::resultTypeIsResult)
 		{
 			auto result{this->async_.moveResultOut()};
-			bzd::assert::isTrue(result.hasValue());
+			bzd::assert::isTrue(result.hasValue()); // The result has most likely already been used.
 			return bzd::move(result.valueMutable());
 		}
 		else if constexpr (PromiseType::resultTypeIsTupleOfOptionalResultsWithError)
