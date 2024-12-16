@@ -3,6 +3,7 @@
 #include "cc/bdl/generator/impl/adapter/context.hh"
 #include "cc/bzd/test/test.hh"
 #include "cc/components/generic/network/tcp/client.hh"
+#include "cc/libs/http/tests/data/request_http1.1_chunked.hh"
 
 namespace bzd::http {
 
@@ -16,7 +17,7 @@ struct Config
 TEST_ASYNC(Http, Simple)
 {
 	auto context = bzd::generator::makeContext(
-		Config{.read = [](const auto&&) { return "HTTP/1.1 200 OK\r\n"_sv.asBytes(); }, .write = [](const auto) {}});
+		Config{.read = [](const auto&&) { return "HTTP/1.1 200 OK\r\n\r\n"_sv.asBytes(); }, .write = [](const auto) {}});
 
 	bzd::components::generic::network::tcp::Client network{context};
 	bzd::http::Client client{network, test.timer(), "", 1234u};

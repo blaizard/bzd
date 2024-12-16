@@ -4,6 +4,7 @@ bzd_cc_test(
     name = "tests",
     srcs = [
         "http.cc",
+        "//cc/libs/http/tests/data:request_http1.1_chunked.hh",
     ],
     deps = [
         "//cc:bzd",
