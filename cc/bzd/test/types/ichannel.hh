@@ -51,6 +51,8 @@ public:
 		return *this;
 	}
 
+	void clear() noexcept { buffer_.clear(); }
+
 	bzd::Async<bzd::Span<const T>> read(bzd::Span<T>&& data) noexcept override
 	{
 		if (buffer_.empty())
