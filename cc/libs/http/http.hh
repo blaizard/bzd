@@ -63,7 +63,44 @@ public:
 			co_await !error(reader, "Code {}: {}"_csv, code);
 		}
 
-		::std::cout << "[-> " << code << " <-]" << std::endl;
+		::std::cout << "[CODE: " << code << "]" << std::endl;
+
+		// Note, when using lambda with capture by reference, it somehow fails.
+		// I believe this is because the reference from the lambda is not valid anymore. <- This is still
+		// strange, to be investigated further.
+		// https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#Rcoro-capture
+		using HeaderReader = bzd::FunctionRef<bzd::Async<void>(decltype(reader)&)>;
+		const bzd::Map<bzd::StringView, HeaderReader, 1> headers{
+			{"Transfer-Encoding"_sv, HeaderReader::template toMember<Response, &Response::readHeaderTransferEncoding>(*this)}};
+
+		// Read the headers of interest (only).
+		while (true)
+		{
+			// If this is an empty line, break.
+			if (const auto maybeEnd = co_await bzd::fromStream(reader, "[ \r\t]*\n"_csv))
+			{
+				break;
+			}
+
+			bzd::ToSortedRangeOfRanges wrapper{headers};
+			const auto maybeResult = co_await bzd::fromStream(reader, "[ \t]*{}[ \t]*:"_csv, wrapper);
+			if (maybeResult.hasValue())
+			{
+				::std::cout << "FOUND! " << wrapper.output.value()->first.data() << std::endl;
+				auto promise = wrapper.output.value()->second;
+				const auto maybeResult = co_await promise(reader);
+				(void)maybeResult;
+			}
+			else
+			{
+				// Ignore header.
+			}
+
+			// Consume the rest of the line.
+			co_await !bzd::fromStream(reader, "[^\n]*\n"_csv);
+		}
+
+		::std::cout << "END" << std::endl;
 
 		const auto read = co_await !stream_.read(bzd::move(data));
 		co_return read;
@@ -75,6 +112,18 @@ private:
 		bzd::String<3> version{};
 		UInt16 code{};
 	};
+
+	bzd::Async<void> readHeaderTransferEncoding(auto& reader) noexcept
+	{
+		const bzd::Map<bzd::StringView, int, 4> headers{{"chunked", 0}, {"compress", 1}, {"deflate", 2}, {"gzip", 3}};
+		bzd::ToSortedRangeOfRanges wrapper{headers};
+		while (const auto maybeValue = co_await bzd::fromStream(reader, "[ \t,]*{}"_csv, wrapper))
+		{
+			::std::cout << wrapper.output.value()->first.data() << std::endl;
+		}
+
+		co_return {};
+	}
 
 	/// Read the first line that should look like this.
 	/// HTTP/1.1 200 OK
