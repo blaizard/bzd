@@ -22,5 +22,6 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":tcp",
+        "//cc/bzd/core/assert",
     ],
 )

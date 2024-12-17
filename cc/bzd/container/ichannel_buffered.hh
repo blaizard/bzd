@@ -112,6 +112,7 @@ public:
 				while (true)
 				{
 					// Don't propagate the error, otherwise if read twice, it will read an empty promise.
+					const auto maximumSize = writeToBuffer.size();
 					auto maybeData = co_await in_.read(bzd::move(writeToBuffer));
 					if (!maybeData)
 					{
@@ -120,6 +121,7 @@ public:
 					else
 					{
 						data = bzd::move(maybeData.valueMutable());
+						bzd::assert::isTrue(data.size() <= maximumSize, "read too much data");
 						break;
 					}
 				}

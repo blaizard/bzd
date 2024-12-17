@@ -195,16 +195,14 @@ TEST(RingBuffer, AssignSpan)
 	{
 		bzd::Array<int, 4> array{bzd::inPlace, 0, 1, 2, 3};
 		ring.assign(array.asSpan());
-		const auto isEqual = bzd::algorithm::equal(ring.asSpanForReading(), array);
-		EXPECT_TRUE(isEqual);
+		EXPECT_EQ_RANGE(ring.asSpanForReading(), array);
 		EXPECT_FALSE(ring.overrun());
 	}
 	{
 		bzd::Array<int, 32> array{bzd::inPlace, 0,	1,	2,	3,	4,	5,	6,	7,	8,	9,	10, 11, 12, 13, 14, 15,
 								  16,			17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31};
 		ring.assign(array.asSpan());
-		const auto isEqual = bzd::algorithm::equal(ring.asSpanForReading(), array.asSpan().subSpan(16, 16));
-		EXPECT_TRUE(isEqual);
+		EXPECT_EQ_RANGE(ring.asSpanForReading(), array.asSpan().subSpan(16, 16));
 		EXPECT_TRUE(ring.overrun());
 		EXPECT_TRUE(ring.full());
 	}
@@ -225,24 +223,24 @@ TEST(RingBuffer, Unconsume)
 	const bzd::Span<const int> all{a};
 	ring.assign(all);
 	{
-		EXPECT_TRUE(bzd::algorithm::equal(ring.asSpans(), bzd::makeArray(0, 1, 2, 3, 4, 5, 6, 7)));
+		EXPECT_EQ_RANGE(ring.asSpans(), bzd::makeArray(0, 1, 2, 3, 4, 5, 6, 7));
 	}
 	ring.consume(4u);
 	{
-		EXPECT_TRUE(bzd::algorithm::equal(ring.asSpans(), bzd::makeArray(4, 5, 6, 7)));
+		EXPECT_EQ_RANGE(ring.asSpans(), bzd::makeArray(4, 5, 6, 7));
 	}
 	EXPECT_EQ(ring.unconsume(all.first(4u)), 4u);
 	{
-		EXPECT_TRUE(bzd::algorithm::equal(ring.asSpans(), bzd::makeArray(0, 1, 2, 3, 4, 5, 6, 7)));
+		EXPECT_EQ_RANGE(ring.asSpans(), bzd::makeArray(0, 1, 2, 3, 4, 5, 6, 7));
 	}
 	ring.produce(all.last(2u));
 	EXPECT_TRUE(ring.overrun());
 	{
-		EXPECT_TRUE(bzd::algorithm::equal(ring.asSpans(), bzd::makeArray(2, 3, 4, 5, 6, 7, 6, 7)));
+		EXPECT_EQ_RANGE(ring.asSpans(), bzd::makeArray(2, 3, 4, 5, 6, 7, 6, 7));
 	}
 	ring.consume(0u);
 	{
-		EXPECT_TRUE(bzd::algorithm::equal(ring.asSpans(), bzd::makeArray(2, 3, 4, 5, 6, 7, 6, 7)));
+		EXPECT_EQ_RANGE(ring.asSpans(), bzd::makeArray(2, 3, 4, 5, 6, 7, 6, 7));
 	}
 }
 
@@ -250,14 +248,14 @@ TEST(RingBuffer, Produce)
 {
 	bzd::RingBuffer<int, 8> ring;
 	ring.produce(bzd::makeArray(0, 1, 2, 3, 4, 5, 6).asSpan());
-	EXPECT_TRUE(bzd::algorithm::equal(ring.asSpans(), bzd::makeArray(0, 1, 2, 3, 4, 5, 6)));
+	EXPECT_EQ_RANGE(ring.asSpans(), bzd::makeArray(0, 1, 2, 3, 4, 5, 6));
 	ring.consume(3u);
-	EXPECT_TRUE(bzd::algorithm::equal(ring.asSpans(), bzd::makeArray(3, 4, 5, 6)));
+	EXPECT_EQ_RANGE(ring.asSpans(), bzd::makeArray(3, 4, 5, 6));
 	ring.produce(bzd::makeArray(7, 8, 9).asSpan());
-	EXPECT_TRUE(bzd::algorithm::equal(ring.asSpans(), bzd::makeArray(3, 4, 5, 6, 7, 8, 9)));
+	EXPECT_EQ_RANGE(ring.asSpans(), bzd::makeArray(3, 4, 5, 6, 7, 8, 9));
 	EXPECT_FALSE(ring.overrun());
 	ring.produce(bzd::makeArray(10, 11, 12).asSpan());
-	EXPECT_TRUE(bzd::algorithm::equal(ring.asSpans(), bzd::makeArray(5, 6, 7, 8, 9, 10, 11, 12)));
+	EXPECT_EQ_RANGE(ring.asSpans(), bzd::makeArray(5, 6, 7, 8, 9, 10, 11, 12));
 	EXPECT_TRUE(ring.overrun());
 }
 

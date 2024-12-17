@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cc/bzd/core/assert.hh"
 #include "cc/bzd/core/async.hh"
 #include "cc/bzd/core/channel.hh"
 #include "cc/bzd/core/logger.hh"
@@ -57,6 +58,7 @@ struct ClientTraits<bzd::components::generic::network::tcp::Client<Context>>
 		bzd::Async<bzd::Span<const Byte>> read(bzd::Span<Byte>&& data) noexcept override
 		{
 			co_await bzd::async::yield();
+			const auto maximumSize = data.size();
 			struct
 			{
 				const bzd::Span<Byte> data;
@@ -65,6 +67,10 @@ struct ClientTraits<bzd::components::generic::network::tcp::Client<Context>>
 				const bzd::UInt32 index;
 			} context{bzd::move(data), hostname_, port_, indexRead_++};
 			const auto output = context_.config.read(bzd::move(context));
+			bzd::assert::isTrue(output.size() <= maximumSize,
+								"config.read() returned too much data: {} vs {}"_csv,
+								output.size(),
+								maximumSize);
 			co_return output;
 		}
 
