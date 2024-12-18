@@ -1,24 +1,12 @@
-#include "cc/components/generic/network/tcp/client.hh"
-
 #include "cc/bdl/generator/impl/adapter/context.hh"
 #include "cc/bzd/test/test.hh"
+#include "cc/components/generic/network/tcp/tests/mock.hh"
 
 namespace bzd::components::generic::network {
 
-template <class Read, class Write>
-struct Config
-{
-	Read read;
-	Write write;
-};
-
 TEST_ASYNC(Client, Simple)
 {
-	auto context =
-		bzd::generator::makeContext(Config{.read = [](const auto&&) { return "Hello"_sv.asBytes(); },
-										   .write = [](const auto context) { EXPECT_EQ_RANGE(context.data, "World"_sv.asBytes()); }});
-
-	tcp::Client client{context};
+	tcp::MockClientWithString client{"Hello"_sv.asBytes(), "World"_sv.asBytes()};
 
 	auto stream = co_await !client.connect("", 12);
 
