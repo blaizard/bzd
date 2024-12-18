@@ -5,7 +5,7 @@ namespace jardinier;
 
 method water(timer = {timer}, out = {out}, wateringTimeS = Integer, wakeUpPeriodS = Integer);
 composition {
-	water(wateringTimeS = 5, wakeUpPeriodS = 12 * 3600);
+	water(wateringTimeS = 60, wakeUpPeriodS = 12 * 3600);
 	
 }
 

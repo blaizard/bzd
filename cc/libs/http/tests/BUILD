@@ -8,9 +8,8 @@ bzd_cc_test(
     ],
     deps = [
         "//cc:bzd",
-        "//cc/bdl/generator/impl/adapter:context",
         "//cc/bzd/test",
-        "//cc/components/generic/network/tcp:client",
+        "//cc/components/generic/network/tcp/tests:mock",
         "//cc/libs/http",
     ],
 )

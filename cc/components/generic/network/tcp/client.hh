@@ -13,17 +13,19 @@ class Client
 {
 public:
 	using Stream = typename bzd::network::tcp::ClientTraits<Client>::Stream;
+	using Metadata = typename bzd::network::tcp::ClientTraits<Client>::Metadata;
 
 public:
-	explicit Client(Context& context) noexcept : context_{context} {}
+	virtual ~Client() = default;
 
 	bzd::Async<Stream> connect(const StringView hostname, const bzd::network::PortType port) noexcept
 	{
-		co_return Stream{context_, hostname, port};
+		co_return Stream{*this, hostname, port};
 	}
 
-private:
-	Context& context_;
+	virtual bzd::Span<const bzd::Byte> read(bzd::Span<Byte>&&, Metadata&) noexcept { return {}; }
+
+	virtual void write(const bzd::Span<const Byte>, Metadata&) noexcept {}
 };
 
 } // namespace bzd::components::generic::network::tcp
@@ -32,11 +34,21 @@ namespace bzd::network::tcp {
 template <class Context>
 struct ClientTraits<bzd::components::generic::network::tcp::Client<Context>>
 {
+	struct Metadata
+	{
+		const StringView hostname;
+		const bzd::network::PortType port;
+		bzd::UInt32& index;
+	};
+
 	class Stream : public bzd::IOStream
 	{
 	public:
-		explicit constexpr Stream(Context& context, const StringView hostname, const bzd::network::PortType port) noexcept :
-			context_{context}, hostname_{hostname}, port_{port}
+		explicit constexpr Stream(bzd::components::generic::network::tcp::Client<Context>& client,
+								  const StringView hostname,
+								  const bzd::network::PortType port) noexcept :
+			client_{client},
+			hostname_{hostname}, port_{port}
 		{
 		}
 
@@ -44,14 +56,8 @@ struct ClientTraits<bzd::components::generic::network::tcp::Client<Context>>
 		bzd::Async<> write(const bzd::Span<const Byte> data) noexcept override
 		{
 			co_await bzd::async::yield();
-			struct
-			{
-				const bzd::Span<const Byte> data;
-				const StringView hostname;
-				const bzd::network::PortType port;
-				const bzd::UInt32 index;
-			} context{data, hostname_, port_, indexWrite_++};
-			context_.config.write(context);
+			Metadata metadata{hostname_, port_, indexWrite_};
+			client_.write(data, metadata);
 			co_return {};
 		}
 
@@ -59,14 +65,8 @@ struct ClientTraits<bzd::components::generic::network::tcp::Client<Context>>
 		{
 			co_await bzd::async::yield();
 			const auto maximumSize = data.size();
-			struct
-			{
-				const bzd::Span<Byte> data;
-				const StringView hostname;
-				const bzd::network::PortType port;
-				const bzd::UInt32 index;
-			} context{bzd::move(data), hostname_, port_, indexRead_++};
-			const auto output = context_.config.read(bzd::move(context));
+			Metadata metadata{hostname_, port_, indexRead_};
+			const auto output = client_.read(bzd::move(data), metadata);
 			bzd::assert::isTrue(output.size() <= maximumSize,
 								"config.read() returned too much data: {} vs {}"_csv,
 								output.size(),
@@ -75,7 +75,7 @@ struct ClientTraits<bzd::components::generic::network::tcp::Client<Context>>
 		}
 
 	private:
-		Context& context_;
+		bzd::components::generic::network::tcp::Client<Context>& client_;
 		StringView hostname_;
 		bzd::network::PortType port_;
 		bzd::UInt32 indexRead_{0u};
