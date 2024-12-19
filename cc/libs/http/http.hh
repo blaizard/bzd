@@ -43,67 +43,55 @@ public:
 			co_return bzd::error::Failure("Session expired.");
 		}
 
-		auto reader = stream_.reader();
-
-		// Transfer-Encoding
-		const auto [version, code] = co_await !readStatus(reader);
-
-		switch (version)
+		if (state_ == State::init)
 		{
-		case "1.0"_s:
-			[[fallthrough]];
-		case "1.1"_s:
-			break;
-		default:
-			co_return bzd::error::Failure("Version '{}' not supported."_csv, version);
-		}
+			auto reader = stream_.reader();
 
-		if (code != 200)
-		{
-			co_await !error(reader, "Code {}: {}"_csv, code);
-		}
-
-		::std::cout << "[CODE: " << code << "]" << std::endl;
-
-		// Note, when using lambda with capture by reference, it somehow fails.
-		// I believe this is because the reference from the lambda is not valid anymore. <- This is still
-		// strange, to be investigated further.
-		// https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#Rcoro-capture
-		using HeaderReader = bzd::FunctionRef<bzd::Async<void>(decltype(reader)&)>;
-		const bzd::Map<bzd::StringView, HeaderReader, 1> headers{
-			{"Transfer-Encoding"_sv, HeaderReader::template toMember<Response, &Response::readHeaderTransferEncoding>(*this)}};
-
-		// Read the headers of interest (only).
-		while (true)
-		{
-			// If this is an empty line, break.
-			if (const auto maybeEnd = co_await bzd::fromStream(reader, "[ \r\t]*\n"_csv))
+			// Read the status.
+			const auto [version, code] = co_await !readStatus(reader);
+			switch (version)
 			{
+			case "1.0"_s:
+				[[fallthrough]];
+			case "1.1"_s:
 				break;
+			default:
+				co_return bzd::error::Failure("Version '{}' not supported."_csv, version);
+			}
+			if (code != 200)
+			{
+				co_await !error(reader, "Code {}: {}"_csv, code);
 			}
 
-			bzd::ToSortedRangeOfRanges wrapper{headers};
-			const auto maybeResult = co_await bzd::fromStream(reader, "[ \t]*{}[ \t]*:"_csv, wrapper);
-			if (maybeResult.hasValue())
-			{
-				::std::cout << "FOUND! " << wrapper.output.value()->first.data() << std::endl;
-				auto promise = wrapper.output.value()->second;
-				const auto maybeResult = co_await promise(reader);
-				(void)maybeResult;
-			}
-			else
-			{
-				// Ignore header.
-			}
-
-			// Consume the rest of the line.
-			co_await !bzd::fromStream(reader, "[^\n]*\n"_csv);
+			// Read the headers.
+			co_await !readHeaders(reader, options_);
+			state_ = State::body;
 		}
 
-		::std::cout << "END" << std::endl;
+		switch (options_.transferMode)
+		{
+		case Options::TransferMode::normal:
+			co_return co_await !stream_.read(bzd::move(data));
+		case Options::TransferMode::chunked:
+		{
+			if (options_.contentLength == 0u)
+			{
+				co_await !bzd::fromStream(stream_.reader(), "\\s*{:x}\r\n"_csv, options_.contentLength);
+			}
+			if (options_.contentLength == 0u)
+			{
+				co_return bzd::error::Eof{};
+			}
 
-		const auto read = co_await !stream_.read(bzd::move(data));
-		co_return read;
+			data = data.first(bzd::min(data.size(), options_.contentLength));
+			const auto dataRead = co_await !stream_.read(bzd::move(data));
+			::std::cout << dataRead.size() << ::std::endl;
+			options_.contentLength -= dataRead.size();
+			co_return dataRead;
+		}
+		}
+
+		co_return bzd::error::Failure("Nooo."_csv);
 	}
 
 private:
@@ -113,13 +101,45 @@ private:
 		UInt16 code{};
 	};
 
-	bzd::Async<void> readHeaderTransferEncoding(auto& reader) noexcept
+	struct Options
 	{
-		const bzd::Map<bzd::StringView, int, 4> headers{{"chunked", 0}, {"compress", 1}, {"deflate", 2}, {"gzip", 3}};
+		/// The type of compression for the body.
+		enum class Compression
+		{
+			none,
+			lzw,
+			zlib,
+			lz77
+		} compression{Compression::none};
+
+		/// The mode of transfer for the body to be used.
+		enum class TransferMode
+		{
+			normal,
+			chunked,
+		} transferMode{TransferMode::normal};
+
+		/// The expected size of the body.
+		Size contentLength{0u};
+	};
+
+	enum class State
+	{
+		init,
+		body,
+	};
+
+	bzd::Async<void> readHeaderTransferEncoding(auto& reader, Options& options) noexcept
+	{
+		const bzd::Map<bzd::StringView, bzd::FunctionRef<void(Options&)>, 4> headers{
+			{"chunked", [](Options& options) { options.transferMode = Options::TransferMode::chunked; }},
+			{"compress", [](Options& options) { options.compression = Options::Compression::lzw; }},
+			{"deflate", [](Options& options) { options.compression = Options::Compression::zlib; }},
+			{"gzip", [](Options& options) { options.compression = Options::Compression::lz77; }}};
 		bzd::ToSortedRangeOfRanges wrapper{headers};
 		while (const auto maybeValue = co_await bzd::fromStream(reader, "[ \t,]*{}"_csv, wrapper))
 		{
-			::std::cout << wrapper.output.value()->first.data() << std::endl;
+			wrapper.value()->second(options);
 		}
 
 		co_return {};
@@ -139,6 +159,47 @@ private:
 		co_return status;
 	}
 
+	/// Read headers.
+	bzd::Async<void> readHeaders(auto& reader, Options& options) noexcept
+	{
+		// Note, when using lambda with capture by reference, it somehow fails.
+		// I believe this is because the reference from the lambda is not valid anymore. <- This is still
+		// strange, to be investigated further.
+		// https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#Rcoro-capture
+		using HeaderReader = bzd::FunctionRef<bzd::Async<void>(decltype(reader)&, Options&)>;
+		const bzd::Map<bzd::StringView, HeaderReader, 1> headers{
+			{"Transfer-Encoding"_sv, HeaderReader::template toMember<Response, &Response::readHeaderTransferEncoding>(*this)}};
+		// Content-Length
+		// Content-Encoding
+
+		// Read the headers of interest (only).
+		while (true)
+		{
+			// If this is an empty line, break.
+			if (const auto maybeEnd = co_await bzd::fromStream(reader, "[ \r\t]*\n"_csv))
+			{
+				break;
+			}
+
+			bzd::ToSortedRangeOfRanges wrapper{headers};
+			const auto maybeResult = co_await bzd::fromStream(reader, "[ \t]*{}[ \t]*:"_csv, wrapper);
+			if (maybeResult.hasValue())
+			{
+				::std::cout << "FOUND! " << wrapper.value()->first.data() << std::endl;
+				const auto maybeResult = co_await wrapper.value()->second(reader, options);
+				(void)maybeResult;
+			}
+			else
+			{
+				// Ignore header.
+			}
+
+			// Consume the rest of the line.
+			co_await !bzd::fromStream(reader, "[^\n]*\n"_csv);
+		}
+		co_return {};
+	}
+
 	template <class... Args>
 	bzd::Async<> error(auto& reader, Args&&... args) noexcept
 	{
@@ -152,6 +213,8 @@ private:
 	Client& client_;
 	Size connectCounter_;
 	bzd::IStreamBuffered<bufferCapacity> stream_;
+	Options options_{};
+	State state_{State::init};
 };
 
 template <class Client, Size capacityHeaders = 1u>

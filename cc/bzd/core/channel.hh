@@ -111,6 +111,33 @@ public:
 		bzd::algorithm::copy(dataRead, data);
 		co_return data.first(dataRead.size());
 	}
+
+	/// Read all data from an input channel until eof or an error occurs.
+	///
+	/// Any read after completion of the generator is UB.
+	///
+	/// \param[in] data A buffer to contain the data to be read.
+	/// \return an asynchronous generator containing the data read.
+	bzd::Generator<bzd::Span<ValueConstType>> readAll(bzd::Span<T>&& data) noexcept
+	{
+		while (true)
+		{
+			auto copy = data;
+			auto maybeData = co_await read(bzd::move(copy));
+			if (!maybeData)
+			{
+				if (maybeData.error().getType() == bzd::ErrorType::eof)
+				{
+					break;
+				}
+				co_yield bzd::move(maybeData).propagate();
+			}
+			else
+			{
+				co_yield maybeData.value();
+			}
+		}
+	}
 };
 
 template <class T>
