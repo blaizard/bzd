@@ -33,6 +33,16 @@ struct ToSortedRangeOfRanges
 	{
 	}
 
+	/// Accessor for the constant output.
+	///
+	/// The output is expected to exist.
+	constexpr const bzd::typeTraits::RangeIterator<T>& value() const noexcept { return output.value(); }
+
+	/// Accessor for the mutable output.
+	///
+	/// The output is expected to exist.
+	constexpr bzd::typeTraits::RangeIterator<T>& valueMutable() noexcept { return output.valueMutable(); }
+
 	bzd::Wrapper<T> input;
 	const Accessor accessor;
 	bzd::Optional<bzd::typeTraits::RangeIterator<T>> output{};
