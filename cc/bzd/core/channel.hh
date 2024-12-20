@@ -76,9 +76,8 @@ public:
 public:
 	/// Read data from an input channel.
 	///
-	/// This function returns only if there is data, i.e. an empty span cannot be returned.
-	/// In case the channel is empty and there are no other data to be generated, the channel
-	/// must return an error with the \c ErrorType::eof error type.
+	/// This function must returns data if more data is is also expected. In otherword,
+	/// a completion of the channel is defined by this function returning an empty span.
 	///
 	/// It is also important that the user relies on the returned buffer to read the data,
 	/// as the input buffer might not be used to avoid unnecessary copies. This provides an interface
@@ -118,24 +117,14 @@ public:
 	///
 	/// \param[in] data A buffer to contain the data to be read.
 	/// \return an asynchronous generator containing the data read.
-	bzd::Generator<bzd::Span<ValueConstType>> readAll(bzd::Span<T>&& data) noexcept
+	bzd::Generator<bzd::Span<ValueConstType>> reader(bzd::Span<T>&& data) noexcept
 	{
-		while (true)
+		auto copy = data;
+		bzd::Span<ValueConstType> dataRead{};
+		while (dataRead = co_await !read(bzd::move(copy)), !dataRead.empty())
 		{
-			auto copy = data;
-			auto maybeData = co_await read(bzd::move(copy));
-			if (!maybeData)
-			{
-				if (maybeData.error().getType() == bzd::ErrorType::eof)
-				{
-					break;
-				}
-				co_yield bzd::move(maybeData).propagate();
-			}
-			else
-			{
-				co_yield maybeData.value();
-			}
+			co_yield dataRead;
+			copy = data;
 		}
 	}
 };

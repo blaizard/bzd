@@ -4,8 +4,6 @@
 #include "cc/bzd/type_traits/invoke_result.hh"
 #include "cc/bzd/utility/regexp/regexp.hh"
 
-#include <iostream>
-
 namespace bzd {
 
 class RegexpAsync : public bzd::Regexp
@@ -24,30 +22,20 @@ public:
 			while (result.loop())
 			{
 				Context::ResultProcess resultProcess{};
-				do
-				{
-					auto maybeRange = co_await generator;
-					if (!maybeRange)
-					{
-						if (maybeRange.error().getType() == bzd::ErrorType::eof)
-						{
-							resultProcess.maybeError = regexp::Error::noMoreInput;
-							break;
-						}
-						co_return bzd::move(maybeRange).propagate();
-					}
 
-					auto it = bzd::begin(maybeRange.valueMutable());
-					auto end = bzd::end(maybeRange.valueMutable());
+				co_await !bzd::async::forEach(generator, [&](auto& range) -> bool {
+					auto it = bzd::begin(range);
+					auto end = bzd::end(range);
 					// If there are still no input after fetching new data.
 					if (it == end)
 					{
 						resultProcess.maybeError = regexp::Error::noMoreInput;
-						break;
+						return false;
 					}
-
 					resultProcess = result.valueMutable().process(it, end, resultProcess);
-				} while (resultProcess.maybeError && resultProcess.maybeError.value() == regexp::Error::noMoreInput);
+					return resultProcess.maybeError && resultProcess.maybeError.value() == regexp::Error::noMoreInput;
+				});
+
 				result.update(resultProcess);
 			}
 			if (!result)
@@ -88,20 +76,11 @@ private:
 																													Capture& capture,
 																													Bool& overflow) noexcept
 	{
-		while (!generator.isCompleted())
+		auto it = co_await !generator.begin();
+		while (it != generator.end())
 		{
-			auto result = co_await generator;
-			if (!result)
-			{
-				co_yield bzd::move(result).propagate();
-				break;
-			}
-			auto value = result.valueMutable();
-			co_yield InputStreamCaptureRange<typename Generator::ResultType::Value, Capture>{value, capture, overflow};
-		}
-		while (true)
-		{
-			co_yield bzd::error::Eof("No more data available."_csv);
+			co_yield InputStreamCaptureRange<typename Generator::ResultType::Value, Capture>{*it, capture, overflow};
+			co_await !++it;
 		}
 	}
 };

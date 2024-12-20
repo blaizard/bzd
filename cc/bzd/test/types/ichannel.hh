@@ -57,7 +57,7 @@ public:
 	{
 		if (buffer_.empty())
 		{
-			co_return bzd::error::Eof("No more data available."_csv);
+			co_return bzd::Span<const T>{};
 		}
 		if (data.empty())
 		{
