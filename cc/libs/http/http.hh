@@ -80,7 +80,7 @@ public:
 			}
 			if (options_.contentLength == 0u)
 			{
-				co_return bzd::error::Eof{};
+				co_return bzd::Span<const bzd::Byte>{};
 			}
 
 			data = data.first(bzd::min(data.size(), options_.contentLength));

@@ -172,7 +172,7 @@ public:
 				// This should be covered by the IChannel already.
 				if (dataRead.empty())
 				{
-					co_return bzd::error::Eof{};
+					co_return {};
 				}
 				// If there are enough data, exit the loop.
 				else if ((buffer.size() + dataRead.size()) >= count)

@@ -18,8 +18,9 @@ TEST_ASYNC(IChannelBuffered, Reader, (TestIChannel, TestIChannelZeroCopy))
 	// Empty ichannel
 	{
 		auto generator = channel.reader();
-		auto maybeSuccess = co_await generator;
-		EXPECT_FALSE(maybeSuccess);
+		auto maybeRange = co_await generator;
+		EXPECT_TRUE(maybeRange);
+		EXPECT_EQ(maybeRange->begin(), maybeRange->end());
 		EXPECT_EQ(channel.size(), 0u);
 	}
 

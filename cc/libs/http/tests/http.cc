@@ -26,7 +26,7 @@ TEST_ASYNC(Http, Chunked)
 
 	auto response = co_await !client.get("/").send();
 	bzd::Array<char, 100u> data;
-	bzd::ignore = co_await !response.read(data.asBytesMutable());
+	bzd::ignore = co_await response.read(data.asBytesMutable());
 
 	co_return {};
 }
