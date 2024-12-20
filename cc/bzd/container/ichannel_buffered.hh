@@ -109,22 +109,9 @@ public:
 			else
 			{
 				auto writeToBuffer = buffer_.asSpanForWriting();
-				while (true)
-				{
-					// Don't propagate the error, otherwise if read twice, it will read an empty promise.
-					const auto maximumSize = writeToBuffer.size();
-					auto maybeData = co_await in_.read(bzd::move(writeToBuffer));
-					if (!maybeData)
-					{
-						co_yield bzd::move(maybeData).propagate();
-					}
-					else
-					{
-						data = bzd::move(maybeData.valueMutable());
-						bzd::assert::isTrue(data.size() <= maximumSize, "read too much data");
-						break;
-					}
-				}
+				const auto maximumSize = writeToBuffer.size();
+				data = co_await !in_.read(bzd::move(writeToBuffer));
+				bzd::assert::isTrue(data.size() <= maximumSize, "read too much data");
 				buffer_.produce(data.size());
 				buffer_.consume(data.size());
 			}
