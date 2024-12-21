@@ -14,16 +14,18 @@ public:
 	static bzd::Async<Size> process(bzd::OStream& stream, Generator& generator, Metadata metadata = Metadata{}) noexcept
 	{
 		bzd::Size count{0u};
-		co_await !bzd::async::forEach(generator, [&](const auto& data) -> bzd::Async<Bool> {
-			const auto size = co_await !bzd::toStream(stream, data, metadata);
+		auto it = co_await !generator.begin();
+		while (it != generator.end())
+		{
+			const auto size = co_await !bzd::toStream(stream, *it, metadata);
 			count += size;
 			if (metadata.precision <= size)
 			{
-				co_return false;
+				break;
 			}
 			metadata.precision -= size;
-			co_return true;
-		});
+			co_await !++it;
+		}
 		co_return count;
 	}
 };

@@ -140,8 +140,16 @@ TEST_ASYNC(Generator, Iterator)
 TEST_ASYNC(Generator, Empty)
 {
 	auto async = generator(0u);
-	auto it = co_await !async.begin();
-	EXPECT_EQ(it, async.end());
+
+	{
+		auto it = co_await !async.begin();
+		EXPECT_EQ(it, async.end());
+	}
+
+	{
+		auto it = co_await !async.begin();
+		EXPECT_EQ(it, async.end());
+	}
 
 	co_return {};
 }
