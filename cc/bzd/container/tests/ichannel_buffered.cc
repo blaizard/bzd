@@ -229,16 +229,19 @@ TEST_ASYNC(IChannelBuffered,
 		++it;
 	}
 
-	// TODO: to be investigated.
-	/*
-		auto newGenerator = bzd::move(generator);
+	auto newGenerator = bzd::move(generator);
 
+	{
+		auto itGenerator = co_await !newGenerator.begin();
+		// With bzd::test::IChannelMode::chunks, the span will be empty.
+		if (itGenerator->empty())
 		{
-			auto itGenerator = co_await !newGenerator.begin();
-			auto it = bzd::begin(*itGenerator);
-			EXPECT_EQ(*it, 1);
-			++it;
+			co_await !++itGenerator;
 		}
-	*/
+		auto it = itGenerator->begin();
+		EXPECT_EQ(*it, 1);
+		++it;
+	}
+
 	co_return {};
 }
