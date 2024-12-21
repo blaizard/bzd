@@ -18,7 +18,9 @@
 #include "cc/bzd/core/error.hh"
 #include "cc/bzd/meta/always_false.hh"
 #include "cc/bzd/type_traits/async.hh"
+#include "cc/bzd/type_traits/invoke_result.hh"
 #include "cc/bzd/type_traits/is_lvalue_reference.hh"
+#include "cc/bzd/type_traits/is_same_class.hh"
 #include "cc/bzd/type_traits/is_same_template.hh"
 #include "cc/bzd/type_traits/remove_reference.hh"
 #include "cc/bzd/utility/ignore.hh"
@@ -370,18 +372,41 @@ bzd::Async<> forEach(T&& generator, Callable&& callable) noexcept
 	auto it = co_await !generator.begin();
 	while (it != generator.end())
 	{
+		using CallableReturnType = typeTraits::InvokeResult<Callable, decltype(*it)>;
 		if constexpr (concepts::asyncCallable<Callable, decltype(*it)>)
 		{
-			if (!(co_await !callable(*it)))
+			if constexpr (concepts::sameClassAs<CallableReturnType, bzd::Async<>>)
 			{
-				break;
+				co_await !callable(*it);
+			}
+			else if constexpr (concepts::sameClassAs<CallableReturnType, bzd::Async<bool>>)
+			{
+				if (!(co_await !callable(*it)))
+				{
+					break;
+				}
+			}
+			else
+			{
+				static_assert(false, "Callback return type not supported, only bzd::Async<> or bzd::Async<bool> is supported.");
 			}
 		}
 		else
 		{
-			if (!callable(*it))
+			if constexpr (concepts::sameClassAs<CallableReturnType, void>)
 			{
-				break;
+				callable(*it);
+			}
+			else if constexpr (concepts::sameClassAs<CallableReturnType, bool>)
+			{
+				if (!callable(*it))
+				{
+					break;
+				}
+			}
+			else
+			{
+				static_assert(false, "Callback return type not supported, only void or bool is supported.");
 			}
 		}
 		co_await !++it;
