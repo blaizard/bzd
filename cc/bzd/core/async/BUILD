@@ -16,6 +16,7 @@ cc_library(
         "awaitables/enqueue.hh",
         "awaitables/get_executable.hh",
         "awaitables/get_executor.hh",
+        "awaitables/no_return.hh",
         "awaitables/propagate.hh",
         "awaitables/suspend.hh",
         "awaitables/yield.hh",

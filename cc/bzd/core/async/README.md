@@ -122,7 +122,7 @@ bzd::Async<int> myFunc() { ... }
 
 ### Generator
 
-`bzd::Generator` is the generator-coroutine type of this framework.
+`bzd::Generator` is the asynchronous generator-coroutine type of this framework.
 
 A `void` generator is declared as follow:
 
@@ -134,6 +134,17 @@ A non-`void` coroutine is declared as follow:
 
 ```c++
 bzd::Generator<int> myFunc() { ... }
+```
+
+Generator are not intended to be used directly with `co_await`. Instead, they should be used as ranges using the following pattern:
+
+```c++
+auto it = co_await !myFunc.begin();
+while (it != myFunc.end()) {
+    auto value = *it;
+    // do something with value.
+    co_await !++it;
+}
 ```
 
 ### Composition

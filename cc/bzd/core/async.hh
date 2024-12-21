@@ -7,6 +7,7 @@
 #include "cc/bzd/core/async/awaitables/enqueue.hh"
 #include "cc/bzd/core/async/awaitables/get_executable.hh"
 #include "cc/bzd/core/async/awaitables/get_executor.hh"
+#include "cc/bzd/core/async/awaitables/no_return.hh"
 #include "cc/bzd/core/async/awaitables/propagate.hh"
 #include "cc/bzd/core/async/awaitables/suspend.hh"
 #include "cc/bzd/core/async/awaitables/yield.hh"
@@ -301,10 +302,13 @@ public: // Constructors
 public: // API
 	bzd::Async<> operator++() noexcept
 	{
-		auto result = co_await generator_;
-		if (!result)
+		co_await generator_;
+		if (generator_.hasResult())
 		{
-			co_return bzd::move(result).propagate();
+			if (generator_.result().hasError())
+			{
+				co_return bzd::move(generator_.moveResultOut()).propagate();
+			}
 		}
 		co_return {};
 	}
@@ -334,15 +338,26 @@ public:
 	using Error = E;
 	using Iterator = bzd::iterator::Generator<Generator<V, E>>;
 
+public: // coroutine specific
+	constexpr auto operator co_await() noexcept { return bzd::async::awaitable::AwaiterNoReturn<Generator>(*this); }
+
 public:
 	bzd::Async<Iterator> begin() noexcept
 	{
 		Iterator it{*this};
-		co_await !++it;
+		// Only the first time, process the coroutine to reach the first suspension point (either a co_yield or a co_return)
+		if (first_)
+		{
+			co_await !++it;
+			first_ = false;
+		}
 		co_return it;
 	}
 
 	constexpr typename Iterator::Sentinel end() const noexcept { return {}; }
+
+private:
+	bool first_{true};
 };
 
 } // namespace bzd
