@@ -15,7 +15,7 @@ public:
 
 	bzd::Span<const bzd::Byte> read(bzd::Span<Byte>&& data, Metadata& metadata) noexcept override
 	{
-		const auto outputSize = bzd::min(data.size(), read_.size() - metadata.index);
+		const auto outputSize = bzd::min(data.size(), static_cast<Size>(read_.size() - metadata.index));
 		const auto output = read_.subSpan(metadata.index, outputSize);
 		metadata.index += output.size();
 		return output;
@@ -25,7 +25,7 @@ public:
 	{
 		if (write_)
 		{
-			const auto writeSize = bzd::min(data.size(), write_->size() - metadata.index);
+			const auto writeSize = bzd::min(data.size(), static_cast<Size>(write_->size() - metadata.index));
 			const auto write = write_->subSpan(metadata.index, writeSize);
 			EXPECT_EQ_RANGE(write, data);
 			metadata.index += write.size();
