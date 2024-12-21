@@ -15,11 +15,10 @@ bzd::Generator<bzd::Size> generator(bzd::Size count)
 TEST_ASYNC(Generator, OneCall)
 {
 	auto async = generator(10);
-	{
-		const auto result = co_await async;
-		EXPECT_TRUE(result);
-		EXPECT_EQ(result.value(), static_cast<bzd::Size>(0));
-	}
+
+	auto maybeIt = co_await async.begin();
+	EXPECT_TRUE(maybeIt);
+	EXPECT_EQ(*maybeIt.value(), static_cast<bzd::Size>(0));
 
 	co_return {};
 }
@@ -27,16 +26,14 @@ TEST_ASYNC(Generator, OneCall)
 TEST_ASYNC(Generator, TwoCalls)
 {
 	auto async = generator(10);
-	{
-		const auto result = co_await async;
-		EXPECT_TRUE(result);
-		EXPECT_EQ(result.value(), static_cast<bzd::Size>(0));
-	}
-	{
-		const auto result = co_await async;
-		EXPECT_TRUE(result);
-		EXPECT_EQ(result.value(), static_cast<bzd::Size>(1));
-	}
+
+	auto maybeIt = co_await async.begin();
+	EXPECT_TRUE(maybeIt);
+	auto it = maybeIt.valueMutable();
+
+	EXPECT_EQ(*it, static_cast<bzd::Size>(0));
+	EXPECT_TRUE(co_await ++it);
+	EXPECT_EQ(*it, static_cast<bzd::Size>(1));
 
 	co_return {};
 }
@@ -54,16 +51,14 @@ bzd::Generator<bzd::Size> generatorWithAwaitable(bzd::Size count)
 TEST_ASYNC(Generator, WithAwaitable)
 {
 	auto async = generatorWithAwaitable(10);
-	{
-		const auto result = co_await async;
-		EXPECT_TRUE(result);
-		EXPECT_EQ(result.value(), static_cast<bzd::Size>(0));
-	}
-	{
-		const auto result = co_await async;
-		EXPECT_TRUE(result);
-		EXPECT_EQ(result.value(), static_cast<bzd::Size>(1));
-	}
+
+	auto maybeIt = co_await async.begin();
+	EXPECT_TRUE(maybeIt);
+	auto it = maybeIt.valueMutable();
+
+	EXPECT_EQ(*it, static_cast<bzd::Size>(0));
+	EXPECT_TRUE(co_await ++it);
+	EXPECT_EQ(*it, static_cast<bzd::Size>(1));
 
 	co_return {};
 }
@@ -71,25 +66,24 @@ TEST_ASYNC(Generator, WithAwaitable)
 bzd::Generator<bzd::Size> generatorNested(bzd::Size count)
 {
 	auto async = generator(count);
+	auto it = co_await !async.begin();
 	for (bzd::Size i = 0; i < count; ++i)
 	{
-		co_yield co_await async;
+		co_yield *it;
+		co_await !++it;
 	}
 }
 
 TEST_ASYNC(Generator, NestedGenerator)
 {
 	auto async = generatorNested(10);
-	{
-		const auto result = co_await async;
-		EXPECT_TRUE(result);
-		EXPECT_EQ(result.value(), static_cast<bzd::Size>(0));
-	}
-	{
-		const auto result = co_await async;
-		EXPECT_TRUE(result);
-		EXPECT_EQ(result.value(), static_cast<bzd::Size>(1));
-	}
+	auto maybeIt = co_await async.begin();
+	EXPECT_TRUE(maybeIt);
+	auto it = maybeIt.valueMutable();
+
+	EXPECT_EQ(*it, static_cast<bzd::Size>(0));
+	EXPECT_TRUE(co_await ++it);
+	EXPECT_EQ(*it, static_cast<bzd::Size>(1));
 
 	co_return {};
 }
@@ -108,10 +102,8 @@ bzd::Generator<bzd::Size> generatorError(bzd::Size count)
 TEST_ASYNC(Generator, ErrorPropagationWithinGenerator)
 {
 	auto async = generatorError(10);
-	{
-		const auto result = co_await async;
-		EXPECT_FALSE(result);
-	}
+	auto maybeIt = co_await async.begin();
+	EXPECT_FALSE(maybeIt);
 
 	co_return {};
 }
@@ -141,6 +133,15 @@ TEST_ASYNC(Generator, Iterator)
 		co_await !++it;
 	}
 	EXPECT_EQ(expected, 10u);
+
+	co_return {};
+}
+
+TEST_ASYNC(Generator, Empty)
+{
+	auto async = generator(0u);
+	auto it = co_await !async.begin();
+	EXPECT_EQ(it, async.end());
 
 	co_return {};
 }

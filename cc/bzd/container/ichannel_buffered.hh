@@ -111,6 +111,10 @@ public:
 				auto writeToBuffer = buffer_.asSpanForWriting();
 				const auto maximumSize = writeToBuffer.size();
 				data = co_await !in_.read(bzd::move(writeToBuffer));
+				if (data.empty())
+				{
+					break; // no more data, exit.
+				}
 				bzd::assert::isTrue(data.size() <= maximumSize, "read too much data");
 				buffer_.produce(data.size());
 				buffer_.consume(data.size());

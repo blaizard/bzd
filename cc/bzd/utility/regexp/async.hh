@@ -22,16 +22,16 @@ public:
 			while (result.loop())
 			{
 				Context::ResultProcess resultProcess{};
+				resultProcess.maybeError = regexp::Error::noMoreInput;
 
 				co_await !bzd::async::forEach(generator, [&](auto& range) -> bool {
 					auto it = bzd::begin(range);
 					auto end = bzd::end(range);
-					// If there are still no input after fetching new data.
 					if (it == end)
 					{
-						resultProcess.maybeError = regexp::Error::noMoreInput;
-						return false;
+						return true; // no more data, fetch another buffer.
 					}
+					resultProcess.maybeError.reset();
 					resultProcess = result.valueMutable().process(it, end, resultProcess);
 					return resultProcess.maybeError && resultProcess.maybeError.value() == regexp::Error::noMoreInput;
 				});

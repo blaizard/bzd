@@ -49,8 +49,9 @@ TEST_ASYNC(RegexpAsync, String, AllTestIChannel)
 	}
 	in << "jkl";
 	{
-		const auto size = co_await !bzd::RegexpAsync{"ijkl"}.match(channel.reader());
-		EXPECT_EQ(size, 4u);
+		const auto maybeSize = co_await bzd::RegexpAsync{"ijkl"}.match(channel.reader());
+		ASSERT_ASYNC_TRUE(maybeSize);
+		EXPECT_EQ(maybeSize.value(), 4u);
 	}
 	in << "mno";
 	{
