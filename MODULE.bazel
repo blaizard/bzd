@@ -101,7 +101,7 @@ register_toolchains("@esp32//:all")
 
 toolchain_cc.toolchain(
     name = "gcc",
-    version = "gcc_13.1.0",
+    version = "gcc_14.2.0",
 )
 use_repo(toolchain_cc, "gcc")
 

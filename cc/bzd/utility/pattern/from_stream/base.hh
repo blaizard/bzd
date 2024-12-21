@@ -45,10 +45,6 @@ bzd::Async<Size> fromStreamforEach(Generator&& generator, Callback&& callback) n
 	co_await !bzd::async::forEach(bzd::forward<Generator>(generator), [&](auto& range) -> bool {
 		auto it = bzd::begin(range);
 		auto end = bzd::end(range);
-		if (it == end)
-		{
-			return false;
-		}
 		while (it != end)
 		{
 			if (!callback(*it))
