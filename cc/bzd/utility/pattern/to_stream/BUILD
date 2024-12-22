@@ -50,9 +50,9 @@ cc_library(
 )
 
 cc_library(
-    name = "generator_input_range",
+    name = "generator",
     hdrs = [
-        "generator_input_range.hh",
+        "generator.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [

@@ -28,35 +28,10 @@ struct FromStream : ::bzd::FromStream<typeTraits::RemoveCVRef<T>>
 /// \param generator The input to be read from.
 /// \param args The value(s) to be read.
 /// \return The number of bytes read in case of success, otherwise an empty result.
-template <concepts::generatorInputByteCopyableRange Generator, class... Args>
+template <concepts::byteCopyableGenerator Generator, class... Args>
 bzd::Async<Size> fromStream(Generator&& generator, Args&&... args) noexcept
 {
 	co_return co_await ::bzd::typeTraits::FromStream<Args...>::process(bzd::forward<Generator>(generator), bzd::forward<Args>(args)...);
 }
 
 } // namespace bzd
-
-namespace bzd::impl {
-
-template <concepts::generatorInputByteCopyableRange Generator, class Callback>
-bzd::Async<Size> fromStreamforEach(Generator&& generator, Callback&& callback) noexcept
-{
-	Size count{0u};
-	co_await !bzd::async::forEach(bzd::forward<Generator>(generator), [&](auto& range) -> bool {
-		auto it = bzd::begin(range);
-		auto end = bzd::end(range);
-		while (it != end)
-		{
-			if (!callback(*it))
-			{
-				return false;
-			}
-			++count;
-			++it;
-		}
-		return true;
-	});
-	co_return count;
-}
-
-} // namespace bzd::impl

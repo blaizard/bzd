@@ -165,6 +165,8 @@ cc_library(
     deps = [
         ":is_same_class",
         ":is_same_template",
+        ":is_trivially_copyable",
+        ":remove_cvref",
     ],
 )
 

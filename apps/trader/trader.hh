@@ -23,10 +23,7 @@ public:
 		co_await !logger_.info("Receiving..."_csv);
 
 		bzd::Array<bzd::Byte, 1000u> data;
-		co_await !bzd::async::forEach(response.reader(data.asBytesMutable()), [this](auto data) -> bzd::Async<> {
-			co_await !logger_.info(bzd::StringView{reinterpret_cast<const char*>(data.data()), data.size()});
-			co_return {};
-		});
+		co_await !logger_.info("Output: {}"_csv, response.reader(data.asBytesMutable()));
 
 		co_return {};
 	}
