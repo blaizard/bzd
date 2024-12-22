@@ -85,19 +85,12 @@ public:
 		co_return readFromBuffer.first(count);
 	}
 
-private:
-	using ReaderRangeBegin =
-		iterator::InputOrOutputReference<typename bzd::Span<const T>::Iterator,
-										 iterator::InputOrOutputReferencePolicies<typeTraits::IteratorCategory::input>>;
-	using ReaderRangeEnd = typename bzd::Span<const T>::ConstIterator;
-	using ReaderRange = ranges::SubRange<ReaderRangeBegin, ReaderRangeEnd>;
-
 public:
 	/// A generator to read from the input channel.
 	///
 	/// \note Upon destruction of the range, the data consumed will "unconsumed" from the buffer range,
 	/// this feature allow zero copy when possible.
-	bzd::Generator<T> reader() noexcept
+	bzd::Generator<bzd::Span<const T>> readerAsSpan() noexcept
 	{
 		while (true)
 		{
@@ -120,18 +113,34 @@ public:
 				buffer_.consume(data.size());
 			}
 
-			auto it = bzd::begin(data);
-			const auto end = bzd::end(data);
+			co_yield data;
+		}
+	}
 
-			auto scope = bzd::ScopeGuard{[this, &it, &end]() {
-				const auto left = bzd::Span<const T>{it, end};
+	/// A generator to read from the input channel.
+	///
+	/// \note Upon destruction of the range, the data consumed will "unconsumed" from the buffer range,
+	/// this feature allow zero copy when possible.
+	bzd::Generator<const T&> reader() noexcept
+	{
+		auto generator = readerAsSpan();
+		auto it = co_await !generator.begin();
+		while (it != generator.end())
+		{
+			auto itData = bzd::begin(*it);
+			const auto endData = bzd::end(*it);
+
+			auto scope = bzd::ScopeGuard{[this, &itData, &endData]() {
+				const auto left = bzd::Span<const T>{itData, endData};
 				buffer_.unconsume(left);
 			}};
-			while (it != end)
+			while (itData != endData)
 			{
-				co_yield *it;
-				++it;
+				co_yield *itData;
+				++itData;
 			}
+
+			co_await !++it;
 		}
 	}
 

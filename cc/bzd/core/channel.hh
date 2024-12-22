@@ -113,21 +113,34 @@ public:
 
 	/// Read all data from an input channel until eof or an error occurs.
 	///
-	/// Any read after completion of the generator is UB.
-	///
 	/// \param[in] data A buffer to contain the data to be read.
 	/// \return an asynchronous generator containing the data read.
-	bzd::Generator<const T&> reader(bzd::Span<T>&& data) noexcept
+	bzd::Generator<bzd::Span<ValueConstType>> readerAsSpan(bzd::Span<T>&& data) noexcept
 	{
 		auto copy = data;
 		bzd::Span<ValueConstType> dataRead{};
 		while (dataRead = co_await !read(bzd::move(copy)), !dataRead.empty())
 		{
-			for (const auto& c : dataRead)
+			co_yield dataRead;
+			copy = data;
+		}
+	}
+
+	/// Read all data from an input channel until eof or an error occurs.
+	///
+	/// \param[in] data A buffer to contain the data to be read.
+	/// \return an asynchronous generator containing the data read.
+	bzd::Generator<ValueConstType&> reader(bzd::Span<T>&& data) noexcept
+	{
+		auto generator = readerAsSpan(bzd::move(data));
+		auto it = co_await !generator.begin();
+		while (it != generator.end())
+		{
+			for (const auto& c : *it)
 			{
 				co_yield c;
 			}
-			copy = data;
+			co_await !++it;
 		}
 	}
 };
