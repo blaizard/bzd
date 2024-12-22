@@ -138,6 +138,10 @@ template <class T>
 concept borrowedRange = range<T> && (typeTraits::isLValueReference<T> || typeTraits::enableBorrowedRange<typeTraits::RemoveCVRef<T>>);
 
 template <class T>
+concept generatorInputByteCopyableRange =
+	concepts::asyncGenerator<T> && inputByteCopyableRange<typename typeTraits::RemoveCVRef<T>::ResultType::Value>;
+
+template <class T>
 concept asyncRange2 = inputOrOutputRange<T> && requires(T&& t) {
 	{
 		t.next()

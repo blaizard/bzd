@@ -5,13 +5,36 @@
 
 namespace bzd {
 
-template <concepts::byteCopyableGenerator Generator>
+template <concepts::asyncGenerator Generator>
 struct ToStream<Generator> : ToStream<bzd::StringView>
 {
 public:
 	using Metadata = typename ToStream<bzd::StringView>::Metadata;
 
-	static bzd::Async<Size> process(bzd::OStream& stream, Generator& generator, Metadata metadata = Metadata{}) noexcept
+	template <concepts::generatorInputByteCopyableRange T>
+	static bzd::Async<Size> process(bzd::OStream& stream, T& generator, Metadata metadata = Metadata{}) noexcept
+	{
+		bzd::Size count{0u};
+		auto it = co_await !generator.begin();
+		while (it != generator.end())
+		{
+			const auto size = co_await !bzd::toStream(stream, *it, metadata);
+			count += size;
+			if (metadata.isPrecision)
+			{
+				if (metadata.precision <= size)
+				{
+					break;
+				}
+				metadata.precision -= size;
+			}
+			co_await !++it;
+		}
+		co_return count;
+	}
+
+	template <concepts::byteCopyableGenerator T>
+	static bzd::Async<Size> process(bzd::OStream& stream, T& generator, Metadata metadata = Metadata{}) noexcept
 	{
 		bzd::Size count{0u};
 		auto it = co_await !generator.begin();
