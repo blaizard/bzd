@@ -15,7 +15,15 @@ TEST_ASYNC(IChannelBuffered, Reader, (TestIChannel, TestIChannelZeroCopy))
 	bzd::IChannelBuffered<char, 16u> channel{in};
 	EXPECT_EQ(channel.size(), 0u);
 
-	// Empty ichannel
+	// Empty ichannel reader()
+	{
+		auto generator = channel.readerAsRange();
+		auto it = co_await !generator.begin();
+		EXPECT_EQ(it, generator.end());
+		EXPECT_EQ(channel.size(), 0u);
+	}
+
+	// Empty ichannel readerAsSpan()
 	{
 		auto generator = channel.reader();
 		auto it = co_await !generator.begin();
@@ -26,7 +34,7 @@ TEST_ASYNC(IChannelBuffered, Reader, (TestIChannel, TestIChannelZeroCopy))
 	// Add content to ichannel
 	in << "abcdef";
 	{
-		auto generator = channel.reader();
+		auto generator = channel.readerAsRange();
 		auto itGenerator = co_await !generator.begin();
 		EXPECT_EQ(channel.size(), 0u);
 		auto it = itGenerator->begin();
@@ -40,7 +48,7 @@ TEST_ASYNC(IChannelBuffered, Reader, (TestIChannel, TestIChannelZeroCopy))
 
 	// Consume from the inner buffer
 	{
-		auto generator = channel.reader();
+		auto generator = channel.readerAsRange();
 		auto itGenerator = co_await !generator.begin();
 		EXPECT_EQ(channel.size(), 0u);
 		auto it = itGenerator->begin();
@@ -54,7 +62,7 @@ TEST_ASYNC(IChannelBuffered, Reader, (TestIChannel, TestIChannelZeroCopy))
 
 	// Consume from the inner buffer
 	{
-		auto generator = channel.reader();
+		auto generator = channel.readerAsRange();
 		auto itGenerator = co_await !generator.begin();
 		EXPECT_EQ(channel.size(), 0u);
 		auto it = itGenerator->begin();
@@ -69,7 +77,7 @@ TEST_ASYNC(IChannelBuffered, Reader, (TestIChannel, TestIChannelZeroCopy))
 	// Consume from the new buffer
 	in << "ghi";
 	{
-		auto generator = channel.reader();
+		auto generator = channel.readerAsRange();
 		auto itGenerator = co_await !generator.begin();
 		EXPECT_EQ(channel.size(), 0u);
 		auto it = itGenerator->begin();
@@ -197,7 +205,7 @@ TEST_ASYNC(IChannelBuffered,
 	TestType in{0};
 	bzd::IChannelBuffered<bzd::Int32, 16u> channel{in};
 
-	auto generator = channel.reader();
+	auto generator = channel.readerAsRange();
 	auto it = co_await !generator.begin();
 
 	for (bzd::Int32 expected = 0; expected < 1000;)
@@ -220,7 +228,7 @@ TEST_ASYNC(IChannelBuffered,
 	TestType in{0};
 	bzd::IChannelBuffered<bzd::Int32, 16u> channel{in};
 
-	auto generator = channel.reader();
+	auto generator = channel.readerAsRange();
 
 	{
 		auto itGenerator = co_await !generator.begin();
