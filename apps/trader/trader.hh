@@ -23,7 +23,7 @@ public:
 		co_await !logger_.info("Receiving..."_csv);
 
 		bzd::Array<bzd::Byte, 1000u> data;
-		co_await !logger_.info("Output: {}"_csv, response.reader(data.asBytesMutable()));
+		co_await !logger_.info("Output: {}"_csv, response.readerAsRange(data.asBytesMutable()));
 
 		co_return {};
 	}
