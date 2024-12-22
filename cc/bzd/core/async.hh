@@ -388,7 +388,8 @@ bzd::Async<> forEach(T&& generator, Callable&& callable) noexcept
 			}
 			else
 			{
-				static_assert(false, "Callback return type not supported, only bzd::Async<> or bzd::Async<bool> is supported.");
+				static_assert(bzd::meta::alwaysFalse<T>,
+							  "Callback return type not supported, only bzd::Async<> or bzd::Async<bool> is supported.");
 			}
 		}
 		else
@@ -406,7 +407,7 @@ bzd::Async<> forEach(T&& generator, Callable&& callable) noexcept
 			}
 			else
 			{
-				static_assert(false, "Callback return type not supported, only void or bool is supported.");
+				static_assert(bzd::meta::alwaysFalse<T>, "Callback return type not supported, only void or bool is supported.");
 			}
 		}
 		co_await !++it;
