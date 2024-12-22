@@ -12,7 +12,7 @@ struct FromStream<Output> : public bzd::FromString<Output>
 {
 	using Metadata = typename bzd::FromString<Output>::Metadata;
 
-	template <concepts::byteCopyableGenerator Generator, class T>
+	template <concepts::asyncGeneratorByteCopyable Generator, class T>
 	static bzd::Async<Size> process(Generator&& generator, T&& output, const Metadata metadata = Metadata{}) noexcept
 	{
 		bzd::RegexpAsync regexp{metadata.regexp};

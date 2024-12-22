@@ -13,7 +13,7 @@ struct FromStream<Output> : public bzd::FromString<Output>
 	template <class T, class Accessor>
 	using Comparison = bzd::FromString<Output>::template Comparison<T, Accessor>;
 
-	template <concepts::byteCopyableGenerator Generator, class T>
+	template <concepts::asyncGeneratorByteCopyable Generator, class T>
 	static bzd::Async<Size> process(Generator&& generator, T& sortedRange, const Metadata metadata = Metadata{}) noexcept
 	{
 		sortedRange.output.reset();

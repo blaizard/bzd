@@ -12,7 +12,7 @@ public:
 	using bzd::Regexp::Regexp;
 
 public:
-	template <concepts::byteCopyableGenerator Generator>
+	template <concepts::asyncGeneratorByteCopyable Generator>
 	bzd::Async<Size> match(Generator&& generator) noexcept
 	{
 		auto it = co_await !generator.begin();
@@ -53,7 +53,7 @@ public:
 		co_return context.counter;
 	}
 
-	template <concepts::byteCopyableGenerator Generator, bzd::concepts::outputByteCopyableRange Output>
+	template <concepts::asyncGeneratorByteCopyable Generator, bzd::concepts::outputByteCopyableRange Output>
 	bzd::Async<Size> capture(Generator&& generator, Output&& output) noexcept
 	{
 		bzd::ranges::Stream oStream{bzd::inPlace, output};
@@ -68,7 +68,7 @@ public:
 	}
 
 private:
-	template <concepts::byteCopyableGenerator Generator, bzd::concepts::outputByteCopyableRange Capture>
+	template <concepts::asyncGeneratorByteCopyable Generator, bzd::concepts::outputByteCopyableRange Capture>
 	bzd::Generator<typeTraits::AsyncValue<Generator>> generatorCaptureWrapper(Generator& generator,
 																			  Capture& capture,
 																			  Bool& overflow) noexcept
