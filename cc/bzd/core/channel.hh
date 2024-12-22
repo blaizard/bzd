@@ -115,7 +115,7 @@ public:
 	///
 	/// \param[in] data A buffer to contain the data to be read.
 	/// \return an asynchronous generator containing the data read.
-	bzd::Generator<bzd::Span<ValueConstType>> readerAsSpan(bzd::Span<T>&& data) noexcept
+	bzd::Generator<bzd::Span<ValueConstType>> readerAsRange(bzd::Span<T>&& data) noexcept
 	{
 		auto copy = data;
 		bzd::Span<ValueConstType> dataRead{};
@@ -132,7 +132,7 @@ public:
 	/// \return an asynchronous generator containing the data read.
 	bzd::Generator<ValueConstType&> reader(bzd::Span<T>&& data) noexcept
 	{
-		auto generator = readerAsSpan(bzd::move(data));
+		auto generator = readerAsRange(bzd::move(data));
 		auto it = co_await !generator.begin();
 		while (it != generator.end())
 		{
