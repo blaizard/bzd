@@ -44,7 +44,7 @@ concept asyncCallable = requires(T t, Args... args) {
 };
 
 template <class T>
-concept byteCopyableGenerator = concepts::asyncGenerator<T> && sizeof(typeTraits::RemoveCVRef<typeTraits::AsyncValue<T>>) == 1u &&
-								concepts::triviallyCopyable<typeTraits::RemoveCVRef<typeTraits::AsyncValue<T>>>;
+concept asyncGeneratorByteCopyable = concepts::asyncGenerator<T> && sizeof(typeTraits::RemoveCVRef<typeTraits::AsyncValue<T>>) == 1u &&
+									 concepts::triviallyCopyable<typeTraits::RemoveCVRef<typeTraits::AsyncValue<T>>>;
 
 } // namespace bzd::concepts

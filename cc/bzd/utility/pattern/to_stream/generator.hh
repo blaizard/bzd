@@ -11,7 +11,7 @@ struct ToStream<Generator> : ToStream<bzd::StringView>
 public:
 	using Metadata = typename ToStream<bzd::StringView>::Metadata;
 
-	template <concepts::generatorInputByteCopyableRange T>
+	template <concepts::asyncGeneratorInputByteCopyableRange T>
 	static bzd::Async<Size> process(bzd::OStream& stream, T& generator, Metadata metadata = Metadata{}) noexcept
 	{
 		bzd::Size count{0u};
@@ -33,7 +33,7 @@ public:
 		co_return count;
 	}
 
-	template <concepts::byteCopyableGenerator T>
+	template <concepts::asyncGeneratorByteCopyable T>
 	static bzd::Async<Size> process(bzd::OStream& stream, T& generator, Metadata metadata = Metadata{}) noexcept
 	{
 		bzd::Size count{0u};
