@@ -23,7 +23,7 @@ bzd_cc_library(
         "//cc/bzd/utility/pattern/to_stream:boolean",
         "//cc/bzd/utility/pattern/to_stream:byte",
         "//cc/bzd/utility/pattern/to_stream:floating_point",
-        "//cc/bzd/utility/pattern/to_stream:generator_input_range",
+        "//cc/bzd/utility/pattern/to_stream:generator",
         "//cc/bzd/utility/pattern/to_stream:input_range",
         "//cc/bzd/utility/pattern/to_stream:integral",
         "//cc/bzd/utility/pattern/to_stream:pattern",

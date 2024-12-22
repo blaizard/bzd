@@ -12,9 +12,12 @@ public:
 	using bzd::Regexp::Regexp;
 
 public:
-	template <concepts::generatorInputByteCopyableRange Generator>
+	template <concepts::byteCopyableGenerator Generator>
 	bzd::Async<Size> match(Generator&& generator) noexcept
 	{
+		auto it = co_await !generator.begin();
+		const auto end = generator.end();
+
 		Context context{regexp_};
 		while (!context.regexp.empty())
 		{
@@ -22,20 +25,14 @@ public:
 			while (result.loop())
 			{
 				Context::ResultProcess resultProcess{};
-				resultProcess.maybeError = regexp::Error::noMoreInput;
-
-				co_await !bzd::async::forEach(generator, [&](auto& range) -> bool {
-					auto it = bzd::begin(range);
-					auto end = bzd::end(range);
-					if (it == end)
+				while (resultProcess.loop(it != end))
+				{
+					if (!result.valueMutable().process2(*it, resultProcess))
 					{
-						return true; // no more data, fetch another buffer.
+						break;
 					}
-					resultProcess.maybeError.reset();
-					resultProcess = result.valueMutable().process(it, end, resultProcess);
-					return resultProcess.maybeError && resultProcess.maybeError.value() == regexp::Error::noMoreInput;
-				});
-
+					co_await !++it;
+				}
 				result.update(resultProcess);
 			}
 			if (!result)
@@ -56,7 +53,7 @@ public:
 		co_return context.counter;
 	}
 
-	template <concepts::generatorInputByteCopyableRange Generator, bzd::concepts::outputByteCopyableRange Output>
+	template <concepts::byteCopyableGenerator Generator, bzd::concepts::outputByteCopyableRange Output>
 	bzd::Async<Size> capture(Generator&& generator, Output&& output) noexcept
 	{
 		bzd::ranges::Stream oStream{bzd::inPlace, output};
@@ -71,15 +68,28 @@ public:
 	}
 
 private:
-	template <concepts::generatorInputByteCopyableRange Generator, bzd::concepts::outputByteCopyableRange Capture>
-	bzd::Generator<InputStreamCaptureRange<typename Generator::ResultType::Value, Capture>> generatorCaptureWrapper(Generator& generator,
-																													Capture& capture,
-																													Bool& overflow) noexcept
+	template <concepts::byteCopyableGenerator Generator, bzd::concepts::outputByteCopyableRange Capture>
+	bzd::Generator<typeTraits::AsyncValue<Generator>> generatorCaptureWrapper(Generator& generator,
+																			  Capture& capture,
+																			  Bool& overflow) noexcept
 	{
 		auto it = co_await !generator.begin();
 		while (it != generator.end())
 		{
-			co_yield InputStreamCaptureRange<typename Generator::ResultType::Value, Capture>{*it, capture, overflow};
+			co_yield *it;
+
+			// Capture.
+			auto itCapture = capture.begin();
+			if (itCapture != capture.end())
+			{
+				*itCapture = static_cast<bzd::typeTraits::RangeValue<Capture>>(*it);
+				++itCapture;
+			}
+			else
+			{
+				overflow = true;
+			}
+
 			co_await !++it;
 		}
 	}

@@ -13,14 +13,14 @@ struct FromStream<Output> : public bzd::FromString<Output>
 	template <class T, class Accessor>
 	using Comparison = bzd::FromString<Output>::template Comparison<T, Accessor>;
 
-	template <concepts::generatorInputByteCopyableRange Generator, class T>
+	template <concepts::byteCopyableGenerator Generator, class T>
 	static bzd::Async<Size> process(Generator&& generator, T& sortedRange, const Metadata metadata = Metadata{}) noexcept
 	{
 		sortedRange.output.reset();
 		auto comparison =
 			Comparison<decltype(sortedRange.input.get()), decltype(sortedRange.accessor)>{sortedRange.input.get(), sortedRange.accessor};
 
-		co_await !impl::fromStreamforEach(generator, [&](const auto c) -> Bool {
+		co_await !bzd::async::forEach(generator, [&](const auto c) -> Bool {
 			const auto maybeResult = comparison.process(static_cast<bzd::Byte>(c));
 
 			if (maybeResult.hasError())

@@ -97,7 +97,7 @@ public:
 	///
 	/// \note Upon destruction of the range, the data consumed will "unconsumed" from the buffer range,
 	/// this feature allow zero copy when possible.
-	bzd::Generator<ReaderRange> reader() noexcept
+	bzd::Generator<T> reader() noexcept
 	{
 		while (true)
 		{
@@ -122,15 +122,16 @@ public:
 
 			auto it = bzd::begin(data);
 			const auto end = bzd::end(data);
+
 			auto scope = bzd::ScopeGuard{[this, &it, &end]() {
 				const auto left = bzd::Span<const T>{it, end};
 				buffer_.unconsume(left);
 			}};
-
-			do
+			while (it != end)
 			{
-				co_yield ReaderRange{ReaderRangeBegin{it}, end};
-			} while (it != end);
+				co_yield *it;
+				++it;
+			}
 		}
 	}
 

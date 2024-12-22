@@ -5,7 +5,7 @@
 
 namespace bzd {
 
-template <concepts::generatorInputByteCopyableRange Generator>
+template <concepts::byteCopyableGenerator Generator>
 struct ToStream<Generator> : ToStream<bzd::StringView>
 {
 public:
@@ -15,17 +15,25 @@ public:
 	{
 		bzd::Size count{0u};
 		auto it = co_await !generator.begin();
-		while (it != generator.end())
+		if (metadata.isPrecision)
 		{
-			const auto size = co_await !bzd::toStream(stream, *it, metadata);
-			count += size;
-			if (metadata.precision <= size)
+			while (it != generator.end() && metadata.precision <= count)
 			{
-				break;
+				co_await !stream.write(bzd::Span<const bzd::Byte>{reinterpret_cast<const bzd::Byte*>(&(*it)), 1u});
+				++count;
+				co_await !++it;
 			}
-			metadata.precision -= size;
-			co_await !++it;
 		}
+		else
+		{
+			while (it != generator.end())
+			{
+				co_await !stream.write(bzd::Span<const bzd::Byte>{reinterpret_cast<const bzd::Byte*>(&(*it)), 1u});
+				++count;
+				co_await !++it;
+			}
+		}
+
 		co_return count;
 	}
 };
