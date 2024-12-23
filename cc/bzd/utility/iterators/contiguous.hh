@@ -14,7 +14,6 @@ private:
 public: // Traits
 	using Self = typename Traits::Self;
 	using Parent = typename Traits::Parent;
-	using IndexType = typename Policies::IndexType;
 	using DifferenceType = typename Policies::DifferenceType;
 	using ValueType = typename Policies::ValueType;
 	static constexpr auto category = typeTraits::IteratorCategory::contiguous;

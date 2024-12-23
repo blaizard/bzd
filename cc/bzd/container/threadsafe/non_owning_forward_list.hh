@@ -551,7 +551,6 @@ public:
 	{
 	public: // Traits
 		using Self = NonOwningForwardListIterator<U>;
-		using IndexType = bzd::Size;
 		using DifferenceType = bzd::Int32;
 		using ValueType = U;
 		static constexpr auto category = bzd::typeTraits::IteratorCategory::forward;

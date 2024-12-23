@@ -291,7 +291,7 @@ class Generator : public typeTraits::IteratorBase
 public: // Traits.
 	using ValueType = typename T::Value;
 	using DifferenceType = bzd::Int32;
-	static constexpr auto category = typeTraits::IteratorCategory::output;
+	static constexpr auto category = typeTraits::IteratorCategory::input;
 	struct Sentinel
 	{
 		[[nodiscard]] constexpr Bool operator==(const Generator other) const noexcept { return other == *this; }

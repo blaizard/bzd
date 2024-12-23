@@ -13,12 +13,6 @@ enum class AsyncType
 	generator
 };
 
-template <class T>
-using AsyncValue = typename typeTraits::RemoveCVRef<T>::Value;
-
-template <class T>
-using AsyncError = typename typeTraits::RemoveCVRef<T>::Error;
-
 } // namespace bzd::typeTraits
 
 namespace bzd::concepts {
@@ -42,9 +36,5 @@ concept asyncCallable = requires(T t, Args... args) {
 		t(args...)
 	} -> async;
 };
-
-template <class T>
-concept asyncGeneratorByteCopyable = concepts::asyncGenerator<T> && sizeof(typeTraits::RemoveCVRef<typeTraits::AsyncValue<T>>) == 1u &&
-									 concepts::triviallyCopyable<typeTraits::RemoveCVRef<typeTraits::AsyncValue<T>>>;
 
 } // namespace bzd::concepts

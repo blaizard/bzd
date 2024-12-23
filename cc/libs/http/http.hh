@@ -35,6 +35,20 @@ public:
 	{
 	}
 
+	/*
+	bzd::Generator<bzd::Span<const bzd::Byte>> reader(bzd::Span<bzd::Byte>&& data) noexcept override
+	{
+		auto generator = stream_.reader(bzd::move(data));
+
+		auto reader = generator | ranges::join();
+		co_await readStatus(reader);
+		co_await readHeaders(reader);
+
+
+		co_yield *generator
+	}
+	*/
+
 	bzd::Async<bzd::Span<const bzd::Byte>> read(bzd::Span<bzd::Byte>&& data) noexcept override
 	{
 		// A new connection has been sent, the response object is invalid.
