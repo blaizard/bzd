@@ -28,7 +28,7 @@ struct FromStream : ::bzd::FromStream<typeTraits::RemoveCVRef<T>>
 /// \param generator The input to be read from.
 /// \param args The value(s) to be read.
 /// \return The number of bytes read in case of success, otherwise an empty result.
-template <concepts::asyncGeneratorByteCopyable Generator, class... Args>
+template <concepts::asyncInputByteCopyableRange Generator, class... Args>
 bzd::Async<Size> fromStream(Generator&& generator, Args&&... args) noexcept
 {
 	co_return co_await ::bzd::typeTraits::FromStream<Args...>::process(bzd::forward<Generator>(generator), bzd::forward<Args>(args)...);

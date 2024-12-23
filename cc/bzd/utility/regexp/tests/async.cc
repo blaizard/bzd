@@ -3,6 +3,7 @@
 #include "cc/bzd/container/ichannel_buffered.hh"
 #include "cc/bzd/test/test.hh"
 #include "cc/bzd/test/types/ichannel.hh"
+#include "cc/bzd/utility/ranges/views_async/views_async.hh"
 
 using TestIChannel = bzd::test::IChannel<char, 32u>;
 using TestIChannelZeroCopy = bzd::test::IChannel<char, 32u, bzd::test::IChannelMode::zeroCopy>;
@@ -18,6 +19,8 @@ TEST_ASYNC(RegexpAsync, String, AllTestIChannel)
 	in << "abcdef";
 
 	{
+		// auto generator = channel.readerAsRange();
+		// const auto size = co_await !bzd::RegexpAsync{"abc"}.match(generator | bzd::ranges::join());
 		const auto size = co_await !bzd::RegexpAsync{"abc"}.match(channel.reader());
 		EXPECT_EQ(size, 3u);
 	}

@@ -90,6 +90,8 @@ using RangeDifference = typename Range<T>::DifferenceType;
 template <class T>
 inline constexpr IteratorCategory rangeCategory = Range<T>::category;
 
+/// The concept borrowed_range defines the requirements of a range such that a function can take it by value
+/// and return iterators obtained from it without danger of dangling.
 template <class T>
 inline constexpr bzd::Bool enableBorrowedRange = false;
 
@@ -138,20 +140,16 @@ template <class T>
 concept borrowedRange = range<T> && (typeTraits::isLValueReference<T> || typeTraits::enableBorrowedRange<typeTraits::RemoveCVRef<T>>);
 
 template <class T>
-concept asyncGeneratorInputByteCopyableRange =
-	concepts::asyncGenerator<T> && inputByteCopyableRange<typename typeTraits::RemoveCVRef<T>::ResultType::Value>;
+concept asyncByteCopyableRange =
+	asyncRange<T> && sizeof(typeTraits::RangeValue<T>) == 1u && triviallyCopyable<typeTraits::RemoveCVRef<typeTraits::RangeValue<T>>>;
 
 template <class T>
-concept asyncRange2 = inputOrOutputRange<T> && requires(T&& t) {
-	{
-		t.next()
-	} -> concepts::async;
-};
+concept asyncInputByteCopyableRange = asyncByteCopyableRange<T> && inputRange<T>;
 
 template <class T>
-concept asyncInputByteCopyableRange = inputByteCopyableRange<T> && asyncRange2<T>;
+concept asyncOutputByteCopyableRange = asyncByteCopyableRange<T> && outputRange<T>;
 
 template <class T>
-concept asyncOutputByteCopyableRange = outputByteCopyableRange<T> && asyncRange2<T>;
+concept asyncInputByteCopyableRangeOfRanges = asyncRange<T> && inputByteCopyableRange<typeTraits::RangeValue<T>>;
 
 } // namespace bzd::concepts

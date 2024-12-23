@@ -17,7 +17,6 @@ public: // Traits.
 	using Self = ContainerOfIterables<Iterator, Sentinel>;
 	using ContainerValueType = typeTraits::IteratorValue<Iterator>;
 	using NestedIterator = typeTraits::RangeIterator<ContainerValueType>;
-	using IndexType = typename NestedIterator::IndexType;
 	using DifferenceType = typeTraits::IteratorDifference<NestedIterator>;
 	using ValueType = typeTraits::IteratorValue<NestedIterator>;
 	static constexpr auto category = typeTraits::IteratorCategory::forward;

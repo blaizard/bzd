@@ -27,7 +27,6 @@ struct DefaultPolicies
 {
 	using ValueType = T;
 	using StorageValueType = T;
-	using IndexType = bzd::Size;
 	using DifferenceType = bzd::Int32;
 
 	static constexpr void increment(auto*& data) noexcept { ++data; }
@@ -49,7 +48,6 @@ private:
 public: // Traits
 	using Self = typename Traits::Self;
 	using ActualSelf = typename Traits::ActualSelf;
-	using IndexType = typename Policies::IndexType;
 	using DifferenceType = typename Policies::DifferenceType;
 	using ValueType = typename Policies::ValueType;
 	static constexpr auto category = typeTraits::IteratorCategory::forward;

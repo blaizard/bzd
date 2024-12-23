@@ -12,7 +12,6 @@ class Tuple
 {
 public: // Traits
 	using Self = Tuple<ContainerType, Ts...>;
-	using IndexType = bzd::Size;
 	using DifferenceType = bzd::Int32;
 	using ValueType = bzd::Variant<bzd::typeTraits::AddReference<Ts>...>;
 	static constexpr auto category = typeTraits::IteratorCategory::randomAccess;
