@@ -11,6 +11,7 @@ bzd_cc_library(
         ":filter",
         ":join",
         ":owning",
+        ":ref",
         ":reverse",
         ":take",
         ":transform",
@@ -42,6 +43,7 @@ cc_library(
         "//cc/bzd/type_traits:range",
         "//cc/bzd/utility:forward",
         "//cc/bzd/utility:in_place",
+        "//cc/bzd/utility:move",
     ],
 )
 
@@ -53,7 +55,11 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":adaptor",
+        ":owning",
+        ":ref",
         "//cc/bzd/container:wrapper",
+        "//cc/bzd/type_traits:conditional",
+        "//cc/bzd/type_traits:is_lvalue_reference",
         "//cc/bzd/type_traits:is_same_class",
         "//cc/bzd/utility/ranges:view_interface",
     ],
@@ -67,6 +73,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":adaptor",
+        ":all",
         "//cc/bzd/container:wrapper",
         "//cc/bzd/core/async:forward",
         "//cc/bzd/utility/iterators:advance",
@@ -83,6 +90,7 @@ cc_library(
     deps = [
         ":adaptor",
         ":adaptor_iterator",
+        ":all",
         "//cc/bzd/algorithm:find_if",
         "//cc/bzd/container:wrapper",
         "//cc/bzd/type_traits:predicate",
@@ -98,6 +106,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":adaptor",
+        ":all",
         "//cc/bzd/container:wrapper",
         "//cc/bzd/type_traits:is_same_class",
         "//cc/bzd/utility:apply",
@@ -121,6 +130,20 @@ cc_library(
 )
 
 cc_library(
+    name = "ref",
+    hdrs = [
+        "ref.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":adaptor",
+        "//cc/bzd/container:wrapper",
+        "//cc/bzd/type_traits:is_same_class",
+        "//cc/bzd/utility/ranges:view_interface",
+    ],
+)
+
+cc_library(
     name = "reverse",
     hdrs = [
         "reverse.hh",
@@ -128,6 +151,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":adaptor",
+        ":all",
         "//cc/bzd/container:wrapper",
         "//cc/bzd/type_traits:is_same_class",
         "//cc/bzd/utility/iterators:reverse",
@@ -143,6 +167,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":adaptor",
+        ":all",
         "//cc/bzd/container:wrapper",
         "//cc/bzd/utility/iterators:advance",
         "//cc/bzd/utility/ranges:view_interface",
@@ -158,6 +183,7 @@ cc_library(
     deps = [
         ":adaptor",
         ":adaptor_iterator",
+        ":all",
         "//cc/bzd/container:wrapper",
         "//cc/bzd/utility/iterators:advance",
         "//cc/bzd/utility/ranges:view_interface",

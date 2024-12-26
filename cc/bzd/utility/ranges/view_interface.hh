@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cc/bzd/type_traits/conditional.hh"
+#include "cc/bzd/type_traits/is_base_of.hh"
 #include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/type_traits/sized_sentinel_for.hh"
 
@@ -60,3 +61,10 @@ private:
 };
 
 } // namespace bzd::ranges
+
+namespace bzd::concepts {
+
+template <class T>
+concept view = typeTraits::isBaseOf<bzd::ranges::ViewInterface<typeTraits::RemoveCVRef<T>>, typeTraits::RemoveCVRef<T>>;
+
+}

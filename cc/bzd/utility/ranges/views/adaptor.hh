@@ -3,6 +3,7 @@
 #include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/utility/forward.hh"
 #include "cc/bzd/utility/in_place.hh"
+#include "cc/bzd/utility/move.hh"
 
 namespace bzd::ranges {
 

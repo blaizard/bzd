@@ -6,12 +6,12 @@
 
 namespace bzd::ranges {
 
-template <concepts::borrowedRange Range>
+template <concepts::view Range>
 bzd::Async<typename Join<Range>::Iterator> Join<Range>::begin() const noexcept
 requires(concepts::asyncRange<Range>)
 {
-	auto begin = co_await !bzd::begin(range_.get());
-	Iterator it{begin, bzd::end(range_.get())};
+	auto begin = co_await !bzd::begin(range_);
+	Iterator it{begin, bzd::end(range_)};
 	co_await !(++it);
 	co_return it;
 }

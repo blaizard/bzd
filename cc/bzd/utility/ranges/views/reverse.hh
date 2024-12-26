@@ -6,26 +6,27 @@
 #include "cc/bzd/utility/iterators/reverse.hh"
 #include "cc/bzd/utility/ranges/view_interface.hh"
 #include "cc/bzd/utility/ranges/views/adaptor.hh"
+#include "cc/bzd/utility/ranges/views/all.hh"
 
 namespace bzd::ranges {
 
-template <concepts::bidirectionalRange Range>
-requires concepts::borrowedRange<Range>
+template <concepts::view Range>
+requires(concepts::bidirectionalRange<Range>)
 class Reverse : public ViewInterface<Reverse<Range>>
 {
 public:
-	constexpr explicit Reverse(bzd::InPlace, auto&& range) noexcept : range_{bzd::forward<decltype(range)>(range)} {}
+	constexpr explicit Reverse(bzd::InPlace, auto&& range) noexcept : range_{bzd::move(range)} {}
 
 public:
-	constexpr auto begin() const noexcept { return bzd::iterator::Reverse{bzd::end(range_.get())}; }
-	constexpr auto end() const noexcept { return bzd::iterator::Reverse{bzd::begin(range_.get())}; }
+	constexpr auto begin() const noexcept { return bzd::iterator::Reverse{bzd::end(range_)}; }
+	constexpr auto end() const noexcept { return bzd::iterator::Reverse{bzd::begin(range_)}; }
 
 private:
-	bzd::Wrapper<Range> range_;
+	Range range_;
 };
 
 template <class Range>
-Reverse(bzd::InPlace, Range&&) -> Reverse<Range&&>;
+Reverse(bzd::InPlace, Range&&) -> Reverse<All<Range&&>>;
 
 inline constexpr Adaptor<Reverse> reverse;
 

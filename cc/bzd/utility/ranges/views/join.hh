@@ -7,23 +7,24 @@
 #include "cc/bzd/utility/iterators/container_of_iterables.hh"
 #include "cc/bzd/utility/ranges/view_interface.hh"
 #include "cc/bzd/utility/ranges/views/adaptor.hh"
+#include "cc/bzd/utility/ranges/views/all.hh"
 
 namespace bzd::ranges {
 
-template <concepts::borrowedRange Range>
+template <concepts::view Range>
 class Join : public ViewInterface<Join<Range>>
 {
 private:
 	using Iterator = bzd::iterator::ContainerOfIterables<bzd::typeTraits::RangeIterator<Range>, bzd::typeTraits::RangeSentinel<Range>>;
 
 public:
-	constexpr explicit Join(bzd::InPlace, auto&& range) noexcept : range_{bzd::forward<decltype(range)>(range)} {}
+	constexpr explicit Join(bzd::InPlace, auto&& range) noexcept : range_{bzd::move(range)} {}
 
 public:
 	constexpr auto begin() const noexcept
 	requires(concepts::syncRange<Range>)
 	{
-		Iterator it{bzd::begin(range_.get()), bzd::end(range_.get())};
+		Iterator it{bzd::begin(range_), bzd::end(range_)};
 		++it;
 		return it;
 	}
@@ -37,7 +38,7 @@ public:
 	requires(concepts::sizedRange<Range>)
 	{
 		bzd::Size size{0u};
-		for (const auto& range : range_.get())
+		for (const auto& range : range_)
 		{
 			size += range.size();
 		}
@@ -47,15 +48,15 @@ public:
 	[[nodiscard]] constexpr Size size() const noexcept
 	requires(concepts::staticSizedRange<Range>)
 	{
-		return bzd::apply([](const auto&... range) { return (range.size() + ...); }, range_.get());
+		return bzd::apply([](const auto&... range) { return (range.size() + ...); }, range_);
 	}
 
 private:
-	bzd::Wrapper<Range> range_;
+	Range range_;
 };
 
 template <class Range>
-Join(bzd::InPlace, Range&&) -> Join<Range&&>;
+Join(bzd::InPlace, Range&&) -> Join<All<Range&&>>;
 
 inline constexpr Adaptor<Join> join;
 

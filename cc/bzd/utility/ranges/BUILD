@@ -96,6 +96,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/type_traits:conditional",
+        "//cc/bzd/type_traits:is_base_of",
         "//cc/bzd/type_traits:range",
         "//cc/bzd/type_traits:sized_sentinel_for",
     ],

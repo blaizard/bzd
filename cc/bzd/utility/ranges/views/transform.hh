@@ -6,10 +6,11 @@
 #include "cc/bzd/utility/ranges/view_interface.hh"
 #include "cc/bzd/utility/ranges/views/adaptor.hh"
 #include "cc/bzd/utility/ranges/views/adaptor_iterator.hh"
+#include "cc/bzd/utility/ranges/views/all.hh"
 
 namespace bzd::ranges {
 
-template <concepts::borrowedRange Range, class Function>
+template <concepts::view Range, class Function>
 class Transform : public ViewInterface<Transform<Range, Function>>
 {
 private: // Traits.
@@ -26,22 +27,19 @@ private: // Traits.
 	};
 
 public:
-	constexpr Transform(bzd::InPlace, auto&& range, const Function& func) noexcept :
-		range_{bzd::forward<decltype(range)>(range)}, func_{func}
-	{
-	}
+	constexpr Transform(bzd::InPlace, auto&& range, const Function& func) noexcept : range_{bzd::move(range)}, func_{func} {}
 
 public:
-	constexpr auto begin() const noexcept { return Iterator{bzd::begin(range_.get()), func_}; }
-	constexpr auto end() const noexcept { return bzd::end(range_.get()); }
+	constexpr auto begin() const noexcept { return Iterator{bzd::begin(range_), func_}; }
+	constexpr auto end() const noexcept { return bzd::end(range_); }
 
 private:
-	bzd::Wrapper<Range> range_;
+	Range range_;
 	Function func_;
 };
 
 template <class Range, class Function>
-Transform(bzd::InPlace, Range&&, Function) -> Transform<Range&&, typeTraits::RemoveReference<Function>>;
+Transform(bzd::InPlace, Range&&, Function) -> Transform<All<Range&&>, typeTraits::RemoveReference<Function>>;
 
 inline constexpr Adaptor<Transform> transform;
 

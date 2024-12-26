@@ -7,11 +7,11 @@
 namespace bzd::ranges {
 
 /// An Owning object is a view that has unique ownership of a range. It is move-only and stores that range within it.
-template <concepts::borrowedRange Range>
+template <class Range>
 class Owning : public ViewInterface<Owning<Range>>
 {
 public:
-	constexpr Owning(bzd::InPlace, Range&& range) noexcept : range_{bzd::move(range)} {}
+	constexpr Owning(Range&& range) noexcept : range_{bzd::move(range)} {}
 	Owning(const Owning&) = delete;
 	Owning& operator=(const Owning&) = delete;
 	Owning(Owning&&) = default;

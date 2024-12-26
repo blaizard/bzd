@@ -32,11 +32,7 @@ public:
 	}
 	[[nodiscard]] constexpr Bool operator==(const auto& it) const noexcept { return it_ == it; }
 	[[nodiscard]] constexpr Bool operator!=(const auto& it) const noexcept { return it_ != it; }
-	constexpr auto operator*() const noexcept
-	{
-		return static_cast<const CRTP*>(this)->get(it_);
-		;
-	}
+	constexpr auto operator*() const noexcept { return static_cast<const CRTP*>(this)->get(it_); }
 
 public: // Overwritable API.
 	constexpr void next(auto& it) noexcept { ++it; }

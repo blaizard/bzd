@@ -7,10 +7,11 @@
 #include "cc/bzd/utility/ranges/view_interface.hh"
 #include "cc/bzd/utility/ranges/views/adaptor.hh"
 #include "cc/bzd/utility/ranges/views/adaptor_iterator.hh"
+#include "cc/bzd/utility/ranges/views/all.hh"
 
 namespace bzd::ranges {
 
-template <concepts::borrowedRange Range, concepts::predicate<typeTraits::RangeValue<Range>> UnaryPredicate>
+template <concepts::view Range, concepts::predicate<typeTraits::RangeValue<Range>> UnaryPredicate>
 class Filter : public ViewInterface<Filter<Range, UnaryPredicate>>
 {
 private: // Traits.
@@ -28,26 +29,25 @@ private: // Traits.
 	};
 
 public:
-	constexpr Filter(bzd::InPlace, auto&& range, const UnaryPredicate& predicate) noexcept :
-		range_{bzd::forward<decltype(range)>(range)}, predicate_{predicate}
+	constexpr Filter(bzd::InPlace, auto&& range, const UnaryPredicate& predicate) noexcept : range_{bzd::move(range)}, predicate_{predicate}
 	{
 	}
 
 public:
 	constexpr auto begin() const noexcept
 	{
-		auto it = bzd::algorithm::findIf(bzd::begin(range_.get()), bzd::end(range_.get()), predicate_);
+		auto it = bzd::algorithm::findIf(bzd::begin(range_), bzd::end(range_), predicate_);
 		return Iterator{bzd::move(it), *this};
 	}
-	constexpr auto end() const noexcept { return bzd::end(range_.get()); }
+	constexpr auto end() const noexcept { return bzd::end(range_); }
 
 private:
-	bzd::Wrapper<Range> range_;
+	Range range_;
 	UnaryPredicate predicate_;
 };
 
 template <class Range, class UnaryPredicate>
-Filter(bzd::InPlace, Range&&, UnaryPredicate) -> Filter<Range&&, typeTraits::RemoveReference<UnaryPredicate>>;
+Filter(bzd::InPlace, Range&&, UnaryPredicate) -> Filter<All<Range&&>, typeTraits::RemoveReference<UnaryPredicate>>;
 
 inline constexpr Adaptor<Filter> filter;
 

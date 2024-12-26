@@ -5,10 +5,11 @@
 #include "cc/bzd/utility/iterators/advance.hh"
 #include "cc/bzd/utility/ranges/view_interface.hh"
 #include "cc/bzd/utility/ranges/views/adaptor.hh"
+#include "cc/bzd/utility/ranges/views/all.hh"
 
 namespace bzd::ranges {
 
-template <concepts::borrowedRange Range>
+template <concepts::view Range>
 class Take : public ViewInterface<Take<Range>>
 {
 private: // Traits.
@@ -16,27 +17,24 @@ private: // Traits.
 	using DifferenceType = typeTraits::IteratorDifference<Iterator>;
 
 public:
-	constexpr Take(bzd::InPlace, auto&& range, const DifferenceType count) noexcept :
-		range_{bzd::forward<decltype(range)>(range)}, count_{count}
-	{
-	}
+	constexpr Take(bzd::InPlace, auto&& range, const DifferenceType count) noexcept : range_{bzd::move(range)}, count_{count} {}
 
 public:
-	constexpr auto begin() const noexcept { return bzd::begin(range_.get()); }
+	constexpr auto begin() const noexcept { return bzd::begin(range_); }
 	constexpr auto end() const noexcept
 	{
 		auto end = begin();
-		bzd::advance(end, count_, bzd::end(range_.get()));
+		bzd::advance(end, count_, bzd::end(range_));
 		return end;
 	}
 
 private:
-	bzd::Wrapper<Range> range_;
+	Range range_;
 	DifferenceType count_;
 };
 
 template <class Range>
-Take(bzd::InPlace, Range&&, const auto) -> Take<Range&&>;
+Take(bzd::InPlace, Range&&, const auto) -> Take<All<Range&&>>;
 
 inline constexpr Adaptor<Take> take;
 

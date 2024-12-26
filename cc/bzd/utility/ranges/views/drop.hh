@@ -6,10 +6,11 @@
 #include "cc/bzd/utility/iterators/advance.hh"
 #include "cc/bzd/utility/ranges/view_interface.hh"
 #include "cc/bzd/utility/ranges/views/adaptor.hh"
+#include "cc/bzd/utility/ranges/views/all.hh"
 
 namespace bzd::ranges {
 
-template <concepts::borrowedRange Range>
+template <concepts::view Range>
 class Drop : public ViewInterface<Drop<Range>>
 {
 private: // Traits.
@@ -17,16 +18,13 @@ private: // Traits.
 	using DifferenceType = typeTraits::IteratorDifference<Iterator>;
 
 public:
-	constexpr Drop(bzd::InPlace, auto&& range, const DifferenceType count) noexcept :
-		range_{bzd::forward<decltype(range)>(range)}, count_{count}
-	{
-	}
+	constexpr Drop(bzd::InPlace, auto&& range, const DifferenceType count) noexcept : range_{bzd::move(range)}, count_{count} {}
 
 public:
 	constexpr auto begin() const noexcept
 	requires(concepts::syncRange<Range>)
 	{
-		auto begin = bzd::begin(range_.get());
+		auto begin = bzd::begin(range_);
 		bzd::advance(begin, count_, end());
 		return begin;
 	}
@@ -34,15 +32,15 @@ public:
 	bzd::Async<Iterator> begin() const noexcept
 	requires(concepts::asyncRange<Range>);
 
-	constexpr auto end() const noexcept { return bzd::end(range_.get()); }
+	constexpr auto end() const noexcept { return bzd::end(range_); }
 
 private:
-	bzd::Wrapper<Range> range_;
+	Range range_;
 	DifferenceType count_;
 };
 
 template <class Range>
-Drop(bzd::InPlace, Range&&, const auto) -> Drop<Range&&>;
+Drop(bzd::InPlace, Range&&, const auto) -> Drop<All<Range&&>>;
 
 inline constexpr Adaptor<Drop> drop;
 
