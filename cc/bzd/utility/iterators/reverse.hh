@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cc/bzd/type_traits/iterator.hh"
+#include "cc/bzd/utility/in_place.hh"
 #include "cc/bzd/utility/iterators/prev.hh"
 
 namespace bzd::iterator {

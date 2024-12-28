@@ -41,38 +41,39 @@ void helperTestMove(Range&& range, Expected&& expected)
 
 TEST(Views, All)
 {
-	const bzd::Array<int, 100> data{};
+	bzd::Array<int, 100> data{};
 	EXPECT_FALSE(bzd::concepts::view<decltype(data)>);
 
 	// This view is a reference of the data.
 	auto viewRef = data | bzd::ranges::all();
-	static_assert(bzd::typeTraits::isSame<decltype(viewRef), bzd::ranges::Ref<const bzd::Array<int, 100>>>);
+	static_assert(bzd::typeTraits::isSame<decltype(viewRef), bzd::ranges::Ref<bzd::Array<int, 100>>>);
 	EXPECT_LT(sizeof(viewRef), 100u);
 	EXPECT_TRUE(bzd::concepts::view<decltype(viewRef)>);
 	EXPECT_TRUE(bzd::concepts::borrowedRange<decltype(viewRef)>);
 
 	// This view owns the data.
 	auto viewOwning = bzd::move(data) | bzd::ranges::all();
-	static_assert(bzd::typeTraits::isSame<decltype(viewOwning), bzd::ranges::Owning<const bzd::Array<int, 100>>>);
+	static_assert(bzd::typeTraits::isSame<decltype(viewOwning), bzd::ranges::Owning<bzd::Array<int, 100>>>);
 	EXPECT_GT(sizeof(viewOwning), 100u);
 	EXPECT_TRUE(bzd::concepts::view<decltype(viewOwning)>);
 	EXPECT_FALSE(bzd::concepts::borrowedRange<decltype(viewOwning)>);
 
 	// This view::all of a view::all is the same view.
 	auto viewRefNested = viewRef | bzd::ranges::all() | bzd::ranges::all() | bzd::ranges::all();
-	static_assert(bzd::typeTraits::isSame<decltype(viewRefNested), bzd::ranges::Ref<const bzd::Array<int, 100>>>);
+	static_assert(bzd::typeTraits::isSame<decltype(viewRefNested), bzd::ranges::Ref<bzd::Array<int, 100>>>);
 	EXPECT_LT(sizeof(viewRefNested), 100u);
 	EXPECT_TRUE(bzd::concepts::view<decltype(viewRefNested)>);
 	EXPECT_TRUE(bzd::concepts::borrowedRange<decltype(viewRefNested)>);
 
 	// This view::all of a view::all is the same view.
 	auto viewOwningNested = viewOwning | bzd::ranges::all() | bzd::ranges::all() | bzd::ranges::all();
-	static_assert(bzd::typeTraits::isSame<decltype(viewOwningNested), bzd::ranges::Owning<const bzd::Array<int, 100>>>);
+	static_assert(bzd::typeTraits::isSame<decltype(viewOwningNested), bzd::ranges::Owning<bzd::Array<int, 100>>>);
 	EXPECT_GT(sizeof(viewOwningNested), 100u);
 	EXPECT_TRUE(bzd::concepts::view<decltype(viewOwningNested)>);
 	EXPECT_FALSE(bzd::concepts::borrowedRange<decltype(viewOwningNested)>);
 
 	helperTestCopy(viewRefNested, data);
+	helperTestMove(bzd::move(viewOwningNested), data);
 }
 
 TEST(Views, Owning)
