@@ -11,7 +11,11 @@ template <class Range>
 class Owning : public ViewInterface<Owning<Range>>
 {
 public:
-	constexpr Owning(Range&& range) noexcept : range_{bzd::move(range)} {}
+	constexpr Owning(Range&& range) noexcept
+	requires(!concepts::view<Range>)
+		: range_{bzd::move(range)}
+	{
+	}
 	Owning(const Owning&) = delete;
 	Owning& operator=(const Owning&) = delete;
 	Owning(Owning&&) = default;

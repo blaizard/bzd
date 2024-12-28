@@ -17,6 +17,7 @@ public: // Traits.
 public: // Constructors.
 	Reverse() = default;
 	constexpr explicit Reverse(const Iterator& it) noexcept : it_(it) {}
+	constexpr Reverse(bzd::InPlace, const Iterator& it) noexcept : it_(it) {}
 
 public: // Copy/move constructors/assignments
 	Reverse(const Reverse&) = default;
@@ -26,7 +27,7 @@ public: // Copy/move constructors/assignments
 	~Reverse() = default;
 
 public: // API.
-	[[nodiscard]] constexpr auto operator*() const noexcept { return *bzd::prev(it_); }
+	[[nodiscard]] constexpr auto& operator*() const noexcept { return *bzd::prev(it_); }
 
 	constexpr Reverse& operator++() noexcept
 	{

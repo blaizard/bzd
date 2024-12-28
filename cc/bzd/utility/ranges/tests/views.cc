@@ -5,6 +5,7 @@
 #include "cc/bzd/test/test.hh"
 #include "cc/bzd/test/types/move_only.hh"
 #include "cc/bzd/test/types/range.hh"
+
 /*
 TEST(Views, Borrowed)
 {
@@ -49,7 +50,6 @@ TEST(Views, All)
 	EXPECT_LT(sizeof(viewRef), 100u);
 	EXPECT_TRUE(bzd::concepts::view<decltype(viewRef)>);
 	EXPECT_TRUE(bzd::concepts::borrowedRange<decltype(viewRef)>);
-	helperTestCopy(viewRef, data);
 
 	// This view owns the data.
 	auto viewOwning = bzd::move(data) | bzd::ranges::all();
@@ -71,6 +71,8 @@ TEST(Views, All)
 	EXPECT_GT(sizeof(viewOwningNested), 100u);
 	EXPECT_TRUE(bzd::concepts::view<decltype(viewOwningNested)>);
 	EXPECT_FALSE(bzd::concepts::borrowedRange<decltype(viewOwningNested)>);
+
+	helperTestCopy(viewRefNested, data);
 }
 
 TEST(Views, Owning)
@@ -88,6 +90,7 @@ TEST(Views, Drop)
 {
 	bzd::test::Range<bzd::typeTraits::IteratorCategory::forward, int, 5> range{0, 1, 2, 3, 4};
 	auto view = range | bzd::ranges::drop(2);
+	static_assert(bzd::typeTraits::isSame<decltype(view), bzd::ranges::Drop<bzd::ranges::Ref<decltype(range)>>>);
 
 	const auto expected = {2, 3, 4};
 	EXPECT_EQ_RANGE(view, expected);
@@ -111,6 +114,7 @@ TEST(Views, Take)
 {
 	bzd::test::Range<bzd::typeTraits::IteratorCategory::forward, int, 5> range{0, 1, 2, 3, 4};
 	auto view = range | bzd::ranges::take(2);
+	static_assert(bzd::typeTraits::isSame<decltype(view), bzd::ranges::Take<bzd::ranges::Ref<decltype(range)>>>);
 
 	const auto expected = {0, 1};
 	EXPECT_EQ_RANGE(view, expected);
@@ -141,9 +145,13 @@ TEST(Views, Reverse)
 {
 	bzd::test::Range<bzd::typeTraits::IteratorCategory::bidirectional, int, 5> range{0, 1, 2, 3, 4};
 	auto view = range | bzd::ranges::reverse();
+	static_assert(bzd::typeTraits::isSame<decltype(view), bzd::ranges::Reverse<bzd::ranges::Ref<decltype(range)>>>);
 
-	const auto expected = {4, 3, 2, 1, 0};
-	EXPECT_EQ_RANGE(view, expected);
+	const auto expected1 = {4, 3, 2, 1, 0};
+	EXPECT_EQ_RANGE(view, expected1);
+
+	const auto expected2 = {0, 1, 2, 3, 4};
+	EXPECT_EQ_RANGE(range | bzd::ranges::reverse() | bzd::ranges::reverse(), expected2);
 
 	const auto data = "012345"_sv;
 	helperTestCopy(data | bzd::ranges::reverse(), "543210"_sv);
@@ -155,6 +163,7 @@ TEST(Views, Join)
 	const auto container = {"Hello"_sv, " "_sv, "World"_sv};
 	auto view = container | bzd::ranges::join();
 	EXPECT_EQ(view.size(), 11u);
+	static_assert(bzd::typeTraits::isSame<decltype(view), bzd::ranges::Join<bzd::ranges::Ref<decltype(container)>>>);
 
 	EXPECT_EQ_RANGE(view, "Hello World"_sv);
 
@@ -165,8 +174,9 @@ TEST(Views, Join)
 TEST(Views, Filter)
 {
 	const auto container = {2, 3, -3, 1, 0, -20, -1, 2};
-	const auto predicate = [](const auto value) { return value > 0; };
+	auto predicate = [](const auto value) { return value > 0; };
 	auto view = container | bzd::ranges::filter(predicate);
+	static_assert(bzd::typeTraits::isSame<decltype(view), bzd::ranges::Filter<bzd::ranges::Ref<decltype(container)>, decltype(predicate)>>);
 
 	const auto expected = {2, 3, 1, 2};
 	EXPECT_EQ_RANGE(view, expected);

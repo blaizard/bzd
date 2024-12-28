@@ -47,7 +47,7 @@ private:
 };
 
 template <class Range, class UnaryPredicate>
-Filter(bzd::InPlace, Range&&, UnaryPredicate) -> Filter<All<Range&&>, typeTraits::RemoveReference<UnaryPredicate>>;
+Filter(bzd::InPlace, Range&&, UnaryPredicate) -> Filter<All<Range>, typeTraits::RemoveReference<UnaryPredicate>>;
 
 inline constexpr Adaptor<Filter> filter;
 

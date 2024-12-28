@@ -34,7 +34,7 @@ private:
 };
 
 template <class Range>
-Take(bzd::InPlace, Range&&, const auto) -> Take<All<Range&&>>;
+Take(bzd::InPlace, Range&&, const auto) -> Take<All<Range>>;
 
 inline constexpr Adaptor<Take> take;
 

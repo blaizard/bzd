@@ -12,7 +12,11 @@ template <class Range>
 class Ref : public ViewInterface<Ref<Range>>
 {
 public:
-	constexpr explicit Ref(Range&& range) noexcept : range_{range} {}
+	constexpr explicit Ref(Range&& range) noexcept
+	requires(!concepts::view<Range>)
+		: range_{range}
+	{
+	}
 
 public:
 	constexpr auto begin() const noexcept { return bzd::begin(range_.get()); }

@@ -39,7 +39,7 @@ private:
 };
 
 template <class Range, class Function>
-Transform(bzd::InPlace, Range&&, Function) -> Transform<All<Range&&>, typeTraits::RemoveReference<Function>>;
+Transform(bzd::InPlace, Range&&, Function) -> Transform<All<Range>, typeTraits::RemoveReference<Function>>;
 
 inline constexpr Adaptor<Transform> transform;
 

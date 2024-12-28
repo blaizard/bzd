@@ -40,7 +40,7 @@ private:
 };
 
 template <class Range>
-Drop(bzd::InPlace, Range&&, const auto) -> Drop<All<Range&&>>;
+Drop(bzd::InPlace, Range&&, const auto) -> Drop<All<Range>>;
 
 inline constexpr Adaptor<Drop> drop;
 

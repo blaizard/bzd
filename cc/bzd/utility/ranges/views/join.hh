@@ -56,7 +56,7 @@ private:
 };
 
 template <class Range>
-Join(bzd::InPlace, Range&&) -> Join<All<Range&&>>;
+Join(bzd::InPlace, Range&&) -> Join<All<Range>>;
 
 inline constexpr Adaptor<Join> join;
 
