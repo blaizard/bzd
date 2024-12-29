@@ -897,10 +897,10 @@
 			)
 		)
 		(pin "2"
-			(uuid "e4153851-460a-4af7-b5d1-b4799963e4b8")
+			(uuid "e4f3ba37-eeda-4953-a68b-230ccd89777a")
 		)
 		(pin "1"
-			(uuid "5ac7ebfe-156a-4bcb-a4ab-6dc783a3c956")
+			(uuid "244f21e6-e628-4114-8ca1-d7645f526e77")
 		)
 		(instances
 			(project "jardinier2000"
@@ -912,20 +912,12 @@
 					(reference "D3")
 					(unit 1)
 				)
-				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de/adcb2a16-93f2-40cf-bed2-66b782e54f18"
-					(reference "D4")
-					(unit 1)
-				)
-				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de/43aea751-1fc6-4075-9193-a13eb3863f75"
-					(reference "D5")
-					(unit 1)
-				)
-				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de/3a66d781-42b7-4b76-8d30-12ea9505af6f"
-					(reference "D1")
-					(unit 1)
-				)
 				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de/6df1d7af-6a61-40dc-873d-bf2ce60a7ec1"
 					(reference "D6")
+					(unit 1)
+				)
+				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de/108e12c4-912c-4c8d-a1b4-726c95881366"
+					(reference "D4")
 					(unit 1)
 				)
 			)
@@ -987,10 +979,10 @@
 			)
 		)
 		(pin "1"
-			(uuid "06545497-b694-4ffe-87d2-046b370996db")
+			(uuid "870c8364-1a86-4ab0-9fa9-2e12cf8763a3")
 		)
 		(pin "2"
-			(uuid "82ba8a05-f7b9-46a1-9785-8571da32d76e")
+			(uuid "2677172d-812f-4b2b-ba2a-d922e24841f6")
 		)
 		(instances
 			(project "jardinier2000"
@@ -1006,16 +998,8 @@
 					(reference "R5")
 					(unit 1)
 				)
-				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de/adcb2a16-93f2-40cf-bed2-66b782e54f18"
-					(reference "R10")
-					(unit 1)
-				)
-				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de/43aea751-1fc6-4075-9193-a13eb3863f75"
-					(reference "R12")
-					(unit 1)
-				)
-				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de/3a66d781-42b7-4b76-8d30-12ea9505af6f"
-					(reference "R16")
+				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de/108e12c4-912c-4c8d-a1b4-726c95881366"
+					(reference "R7")
 					(unit 1)
 				)
 			)
@@ -1076,7 +1060,7 @@
 			)
 		)
 		(pin "1"
-			(uuid "23051853-ed8f-4cda-a0e5-9e6e69747202")
+			(uuid "66e72095-3ba0-4dd6-8904-40a081c85d39")
 		)
 		(instances
 			(project "jardinier2000"
@@ -1092,16 +1076,8 @@
 					(reference "#PWR08")
 					(unit 1)
 				)
-				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de/adcb2a16-93f2-40cf-bed2-66b782e54f18"
-					(reference "#PWR010")
-					(unit 1)
-				)
-				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de/43aea751-1fc6-4075-9193-a13eb3863f75"
-					(reference "#PWR012")
-					(unit 1)
-				)
-				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de/3a66d781-42b7-4b76-8d30-12ea9505af6f"
-					(reference "#PWR025")
+				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de/108e12c4-912c-4c8d-a1b4-726c95881366"
+					(reference "#PWR021")
 					(unit 1)
 				)
 			)
@@ -1162,7 +1138,7 @@
 			)
 		)
 		(pin "1"
-			(uuid "0142699c-46b5-4644-b7e3-79e1d7629460")
+			(uuid "61d532fb-0efe-4856-a4ee-14775df5dea3")
 		)
 		(instances
 			(project "jardinier2000"
@@ -1178,16 +1154,8 @@
 					(reference "#PWR07")
 					(unit 1)
 				)
-				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de/adcb2a16-93f2-40cf-bed2-66b782e54f18"
-					(reference "#PWR09")
-					(unit 1)
-				)
-				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de/43aea751-1fc6-4075-9193-a13eb3863f75"
-					(reference "#PWR011")
-					(unit 1)
-				)
-				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de/3a66d781-42b7-4b76-8d30-12ea9505af6f"
-					(reference "#PWR024")
+				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de/108e12c4-912c-4c8d-a1b4-726c95881366"
+					(reference "#PWR020")
 					(unit 1)
 				)
 			)
@@ -1247,10 +1215,10 @@
 			)
 		)
 		(pin "1"
-			(uuid "6468d2d1-4a2d-44ad-8b91-35e4648a012a")
+			(uuid "3c8fae63-d185-40cd-8211-6ea8e9dbef51")
 		)
 		(pin "2"
-			(uuid "b4fac7bd-ed91-404c-9778-af91e138cf95")
+			(uuid "e25b0a20-24df-4a79-b002-a0fc91630e1d")
 		)
 		(instances
 			(project "jardinier2000"
@@ -1266,16 +1234,8 @@
 					(reference "R9")
 					(unit 1)
 				)
-				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de/adcb2a16-93f2-40cf-bed2-66b782e54f18"
-					(reference "R11")
-					(unit 1)
-				)
-				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de/43aea751-1fc6-4075-9193-a13eb3863f75"
-					(reference "R13")
-					(unit 1)
-				)
-				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de/3a66d781-42b7-4b76-8d30-12ea9505af6f"
-					(reference "R17")
+				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de/108e12c4-912c-4c8d-a1b4-726c95881366"
+					(reference "R8")
 					(unit 1)
 				)
 			)
@@ -1340,13 +1300,13 @@
 			)
 		)
 		(pin "1"
-			(uuid "8d20ae90-563b-4f44-b899-72c7ff397b46")
+			(uuid "60116b73-996a-41ad-bb52-de47375cbab5")
 		)
 		(pin "2"
-			(uuid "5b475984-3355-420e-965b-0ecc504820a5")
+			(uuid "e9fecdb5-2751-4664-aa57-0e9dfbd1dcf9")
 		)
 		(pin "3"
-			(uuid "6a19b668-a229-4993-bce3-689b65dffd31")
+			(uuid "f1440b54-7bea-48d0-afa2-a10c6c2dd327")
 		)
 		(instances
 			(project "jardinier2000"
@@ -1362,16 +1322,8 @@
 					(reference "Q3")
 					(unit 1)
 				)
-				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de/adcb2a16-93f2-40cf-bed2-66b782e54f18"
+				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de/108e12c4-912c-4c8d-a1b4-726c95881366"
 					(reference "Q4")
-					(unit 1)
-				)
-				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de/43aea751-1fc6-4075-9193-a13eb3863f75"
-					(reference "Q5")
-					(unit 1)
-				)
-				(path "/c98a1727-68a2-4147-9061-b7cb623ac6de/3a66d781-42b7-4b76-8d30-12ea9505af6f"
-					(reference "Q6")
 					(unit 1)
 				)
 			)

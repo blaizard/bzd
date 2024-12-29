@@ -19,7 +19,9 @@ public:
 	}
 
 public:
+	constexpr auto begin() noexcept { return bzd::begin(range_.get()); }
 	constexpr auto begin() const noexcept { return bzd::begin(range_.get()); }
+	constexpr auto end() noexcept { return bzd::end(range_.get()); }
 	constexpr auto end() const noexcept { return bzd::end(range_.get()); }
 
 private:

@@ -606,16 +606,8 @@
       "MOSFET 3A2"
     ],
     [
-      "adcb2a16-93f2-40cf-bed2-66b782e54f18",
+      "108e12c4-912c-4c8d-a1b4-726c95881366",
       "MOSFET 3A3"
-    ],
-    [
-      "43aea751-1fc6-4075-9193-a13eb3863f75",
-      "MOSFET 3A4"
-    ],
-    [
-      "3a66d781-42b7-4b76-8d30-12ea9505af6f",
-      "MOSFET 3A5"
     ]
   ],
   "text_variables": {}
