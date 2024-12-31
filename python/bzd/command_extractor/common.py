@@ -108,29 +108,37 @@ class CommandExtractor:
 	def parse(self, cmdString: str, schema: Schema, fallback: Fallback) -> None:
 		activeSchema: typing.Optional[Processor] = None
 		factory: typing.Optional[ItemFactory] = None
-		for arg in shlex.split(cmdString):
-			remmainder = arg
-			if activeSchema is None:
-				isMatch = False
-				for keys, entry in schema.items():
-					if re.match(r"^" + keys, arg):
-						assert not isMatch, f"There are more than one match: {keys}"
-						isMatch = True
-						activeSchema = entry
-						factory = ItemFactory()
-						remmainder = re.sub(r"^" + keys + "=?", "", arg)
+		matchArgs: typing.Set[str] = set()
 
-				if not isMatch:
-					fallback(ItemFactory(original=[arg]), arg)
+		# Process schemas by order of priority.
+		for schemaIndex, schemaDict in enumerate(schema):
+			isLastSchema = schemaIndex == (len(schema) - 1)
 
-			if activeSchema:
-				assert factory, "Must be set with activeSchema."
-				if remmainder:
-					factory.args.append(remmainder)
-				factory.original.append(arg)
-				if len(factory.args) == activeSchema.count:
-					activeSchema.processor(factory, *factory.args)
-					activeSchema = None
+			for arg in shlex.split(cmdString):
+				remmainder = arg
+				if activeSchema is None:
+					isMatch = False
+					for keys, entry in schemaDict.items():
+						if re.match(r"^" + keys, arg):
+							assert not isMatch, f"There are more than one match: {keys}"
+							isMatch = True
+							activeSchema = entry
+							factory = ItemFactory()
+							remmainder = re.sub(r"^" + keys + "=?", "", arg)
+
+					if isMatch:
+						matchArgs.add(arg)
+					elif isLastSchema and arg not in matchArgs:
+						fallback(ItemFactory(original=[arg]), arg)
+
+				if activeSchema:
+					assert factory, "Must be set with activeSchema."
+					if remmainder:
+						factory.args.append(remmainder)
+					factory.original.append(arg)
+					if len(factory.args) == activeSchema.count:
+						activeSchema.processor(factory, *factory.args)
+						activeSchema = None
 
 	def values(self, exclude: typing.Dict[enum.Enum, typing.Optional[typing.Set[str]]] = {}) -> typing.Iterable[Item]:
 		for value in self.result:

@@ -140,21 +140,22 @@ class CommandExtractorGcc(CommandExtractor):
 	def parse(self, cmdString: str) -> None:  # type: ignore
 		super().parse(
 		    cmdString,
-		    {
+		    [{
 		        r"-L":
 		            Processor(
 		                1,
 		                lambda factory, x: self.addSearchPath(Categories.librarySearchPath, pathlib.Path(x), factory),
 		            ),
-		        r"-l":
-		            Processor(1, lambda factory, x: self.addLibrary(x, factory)),
-		        r"-T":
-		            Processor(1, lambda factory, x: self.addLinkerScript(x, factory)),
 		        r"-I":
 		            Processor(
 		                1,
 		                lambda factory, x: self.addSearchPath(Categories.includeSearchPath, pathlib.Path(x), factory),
 		            ),
+		    }, {
+		        r"-l":
+		            Processor(1, lambda factory, x: self.addLibrary(x, factory)),
+		        r"-T":
+		            Processor(1, lambda factory, x: self.addLinkerScript(x, factory)),
 		        r"-o":
 		            Processor(1, lambda factory, x: self.addOutputPath(x, factory)),
 		        **self.generateItemString({
@@ -168,6 +169,6 @@ class CommandExtractorGcc(CommandExtractor):
 		            r"-std": Categories.standard,
 		        }),
 		        **self.generateItem({r"-c": Categories.compileOnly}),
-		    },
+		    }],
 		    self._fallback,
 		)

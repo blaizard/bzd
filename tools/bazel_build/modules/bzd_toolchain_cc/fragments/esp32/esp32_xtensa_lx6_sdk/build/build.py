@@ -54,8 +54,8 @@ def copyArtifacts(output: pathlib.Path, gcc: CommandExtractorGcc) -> None:
 	copyFileTree(output / "include", gcc.includeSearchPaths, r".*\.h")
 
 
-def envToDict(env) -> typing.Dict[str, str]:
-	result = {}
+def envToDict(env: str) -> typing.Dict[str, str]:
+	result: typing.Dict[str, str] = {}
 	for line in env.split("\n"):
 		key, value = line.split("=", maxsplit=1)
 		result[key.strip()] = value.strip()
