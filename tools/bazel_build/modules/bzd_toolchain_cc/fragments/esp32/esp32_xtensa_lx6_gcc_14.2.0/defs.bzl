@@ -45,6 +45,9 @@ def linux_x86_64(module_ctx, name):
             "-std=c++20",
         ],
         "link_flags": [
+            # Do not link with the stdlib
+            "-nostdlib",
+
             # Link little-endian objects
             "-Wl,-EL",
 

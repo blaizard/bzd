@@ -15,6 +15,9 @@ _COPTS_COMMON = [
     # dependencies.
     "-no-canonical-prefixes",
 
+    # Add color to the output.
+    "-fdiagnostics-color=always",
+
     # Removal of unused code and data at link time.
     "-ffunction-sections",
     "-fdata-sections",
