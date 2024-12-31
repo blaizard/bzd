@@ -81,7 +81,7 @@ def _impl(repository_ctx):
         "%{package_name}": repository_ctx.attr.package_name,
         "%{repository_path}": "external/" + repository_ctx.name,
         "%{strip}": binaries["strip"],
-        "%{sysroot}": str(repository_ctx.path(".")),
+        "%{sysroot}": str(repository_ctx.path(".")) if repository_ctx.attr.sysroot else "",
         "%{uid}": uid,
     }
 
@@ -141,6 +141,7 @@ _toolchain_maker_linux = repository_rule(
         "patches": attr.label_list(allow_files = True),
         "sha256": attr.string(),
         "strip_prefix": attr.string(),
+        "sysroot": attr.bool(),
         "system_directories": attr.string_list(),
         "tools": attr.string_dict(),
         "urls": attr.string_list(mandatory = True),

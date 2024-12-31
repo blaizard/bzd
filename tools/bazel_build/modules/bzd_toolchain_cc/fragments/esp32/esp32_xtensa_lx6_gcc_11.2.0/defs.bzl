@@ -58,6 +58,7 @@ def linux_x86_64(module_ctx, name):
         ],
         "sha256": "698d8407e18275d18feb7d1afdb68800b97904fbe39080422fb8609afa49df30",
         "strip_prefix": "xtensa-esp32-elf",
+        "sysroot": True,
         "urls": [
             "https://datalocal.blaizard.com/file/bzd/toolchains/cc/gcc/esp32_xtensa_lx6/xtensa-esp32-elf-gcc11_2_0-esp-2022r1-linux-amd64.tar.xz",
             "https://data.blaizard.com/file/bzd/toolchains/cc/gcc/esp32_xtensa_lx6/xtensa-esp32-elf-gcc11_2_0-esp-2022r1-linux-amd64.tar.xz",

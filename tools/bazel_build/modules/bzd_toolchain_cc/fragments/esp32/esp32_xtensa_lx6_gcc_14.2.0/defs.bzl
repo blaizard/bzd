@@ -60,6 +60,7 @@ def linux_x86_64(module_ctx, name):
         ],
         "sha256": "e3e6dcf3d275c3c9ab0e4c8a9d93fd10e7efc035d435460576c9d95b4140c676",
         "strip_prefix": "xtensa-esp-elf",
+        "sysroot": True,
         "urls": [
             "https://datalocal.blaizard.com/file/bzd/toolchains/cc/gcc/esp32_xtensa_lx6/xtensa-esp-elf-14.2.0_20241119-x86_64-linux-gnu.tar.xz",
             "https://data.blaizard.com/file/bzd/toolchains/cc/gcc/esp32_xtensa_lx6/xtensa-esp-elf-14.2.0_20241119-x86_64-linux-gnu.tar.xz",
