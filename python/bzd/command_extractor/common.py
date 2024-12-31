@@ -105,7 +105,7 @@ class CommandExtractor:
 			)
 		return output
 
-	def parse(self, cmdString: str, schema: Schema, fallback: Fallback) -> None:
+	def parse(self, cmdString: str, schema: typing.List[Schema], fallback: Fallback) -> None:
 		activeSchema: typing.Optional[Processor] = None
 		factory: typing.Optional[ItemFactory] = None
 		matchArgs: typing.Set[str] = set()

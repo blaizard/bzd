@@ -74,8 +74,6 @@ filegroup(
     srcs = glob([
         "lib/gcc/xtensa-esp-elf/14.2.0/include/**",
         "lib/gcc/xtensa-esp-elf/14.2.0/include-fixed/**",
-        "xtensa-esp-elf/include/c++/14.2.0/xtensa-esp-elf/**",
-        "xtensa-esp-elf/include/c++/14.2.0/**",
         "xtensa-esp-elf/include/**",
     ])
 )

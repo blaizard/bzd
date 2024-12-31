@@ -93,7 +93,7 @@ register_toolchains("@clang//:all")
 
 toolchain_cc.toolchain(
     name = "esp32",
-    version = "esp32_gcc_12.2.0",
+    version = "esp32_gcc_14.2.0",
 )
 use_repo(toolchain_cc, "esp32")
 
