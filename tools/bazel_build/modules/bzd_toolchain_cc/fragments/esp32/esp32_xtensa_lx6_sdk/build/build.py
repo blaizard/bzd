@@ -10,11 +10,6 @@ import dataclasses
 from bzd.utils.run import localCommand
 from bzd.command_extractor.gcc import CommandExtractorGcc, Categories, ItemLibrary
 
-path_compile_commands = pathlib.Path(
-    "toolchains/cc/fragments/esp32_xtensa_lx6_sdk/build/project/build/compile_commands.json")
-path_linker_command = pathlib.Path(
-    "toolchains/cc/fragments/esp32_xtensa_lx6_sdk/build/project/build/CMakeFiles/bzd.elf.dir/link.txt")
-
 
 def copyFiles(output: pathlib.Path, paths: typing.Iterable[pathlib.Path]) -> None:
 	if not output.is_dir():
@@ -39,6 +34,10 @@ def copyFileTree(output: pathlib.Path, paths: typing.Iterable[pathlib.Path], pat
 					shutil.copyfile(path.as_posix(), dst.as_posix())
 
 
+def copyDirectory(output: pathlib.Path, directory: pathlib.Path) -> None:
+	copyFileTree(output, [directory], ".*")
+
+
 @dataclasses.dataclass
 class CommandEntry:
 	destination: str
@@ -55,14 +54,36 @@ def copyArtifacts(output: pathlib.Path, gcc: CommandExtractorGcc) -> None:
 	copyFileTree(output / "include", gcc.includeSearchPaths, r".*\.h")
 
 
+def envToDict(env) -> typing.Dict[str, str]:
+	result = {}
+	for line in env.split("\n"):
+		key, value = line.split("=", maxsplit=1)
+		result[key.strip()] = value.strip()
+	return result
+
+
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Generate the content of the esp32 SDK from esp-idf.")
 	parser.add_argument(
-	    "-o",
 	    "--output",
 	    type=pathlib.Path,
 	    default="./output",
 	    help="Output directory where to store the results.",
+	)
+	parser.add_argument(
+	    "--project",
+	    type=pathlib.Path,
+	    default=pathlib.Path(__file__).parent / "project",
+	    help="The project path.",
+	)
+	parser.add_argument(
+	    "--env",
+	    help="Environment variables of the host.",
+	)
+	parser.add_argument(
+	    "--rebuild",
+	    action="store_true",
+	    help="Rebuild the whole project from scratch.",
 	)
 
 	args = parser.parse_args()
@@ -85,24 +106,23 @@ if __name__ == "__main__":
 		if (outputResolved / name).is_dir():
 			shutil.rmtree(outputResolved / name)
 
-	# Cleanup the project
-	projectPath = (workspace / "toolchains/cc/fragments/esp32_xtensa_lx6_sdk/build/project")
-	(projectPath / "sdkconfig").unlink(missing_ok=True)
+	# Copy the important files to the output dir.
+	project = outputResolved / "project"
+	buildPath = project / "build"
+	copyDirectory(project, args.project)
 
-	# Create the build directory
-	buildPath = projectPath / "build"
-	if buildPath.is_dir():
-		shutil.rmtree(buildPath)
-	buildPath.mkdir()
+	# Cleanup the project
+	if args.rebuild:
+		if buildPath.is_dir():
+			shutil.rmtree(buildPath)
+		buildPath = project / "build"
+
+	buildPath.mkdir(exist_ok=True)
 
 	# Build the project
-	localCommand(
-	    cmds=["cmake", "..", "-G", "Unix Makefiles"],
-	    cwd=buildPath,
-	    stdout=True,
-	    stderr=True,
-	)
-	localCommand(cmds=["make"], cwd=buildPath, stdout=True, stderr=True, timeoutS=300)
+	env = envToDict(args.env)
+	localCommand(cmds=["cmake", "..", "-G", "Unix Makefiles"], cwd=buildPath, stdout=True, stderr=True, env=env)
+	localCommand(cmds=["make"], cwd=buildPath, stdout=True, stderr=True, env=env, timeoutS=300)
 
 	commands = {
 	    "compile": CommandEntry("compile_flags"),
@@ -110,20 +130,20 @@ if __name__ == "__main__":
 	}
 
 	# Look for the compile command of the main.
-	compile_commands = json.loads((workspace / path_compile_commands).read_text())
+	compile_commands = json.loads((project / "build/compile_commands.json").read_text())
 	for entry in compile_commands:
-		if entry["file"].endswith("toolchains/cc/fragments/esp32_xtensa_lx6_sdk/build/project/main/main.cc"):
+		if pathlib.Path(entry["file"]) == project / "main/main.cc":
 			assert not commands["compile"].isDiscovered, "The compile command has been discovered twice."
 			commands["compile"].command = entry["command"]
 	assert commands["compile"].isDiscovered, "The compile command was not discovered."
 
 	# Look for the linker command
-	commands["link"].command = (workspace / path_linker_command).read_text()
+	commands["link"].command = (project / "build/CMakeFiles/bzd.elf.dir/link.txt").read_text()
 
 	for name, entry in commands.items():
 		print(f"Processing entry '{name}'...")
 
-		gcc = CommandExtractorGcc(cwd=workspace / "toolchains/cc/fragments/esp32_xtensa_lx6_sdk/build/project/build")
+		gcc = CommandExtractorGcc(cwd=project / "build")
 		gcc.parse(entry.command)
 		result = gcc.values(
 		    exclude={

@@ -5,8 +5,16 @@ py_binary(
     srcs = [
         "build.py",
     ],
+    data = [
+        ":project",
+    ],
     deps = [
         "@bzd_python//bzd/command_extractor:gcc",
         "@bzd_python//bzd/utils:run",
     ],
+)
+
+filegroup(
+    name = "project",
+    srcs = glob(["project/**"]),
 )

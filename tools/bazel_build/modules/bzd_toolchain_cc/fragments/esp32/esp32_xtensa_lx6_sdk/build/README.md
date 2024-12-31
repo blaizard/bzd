@@ -10,13 +10,12 @@ git clone --recursive https://github.com/espressif/esp-idf.git
 
 2. Build
 
-Run the build command with the optional output argument.
+Run the build command.
 
 ```bash
-rm -f toolchains/cc/fragments/esp32_xtensa_lx6_sdk/build/project/sdkconfig
-bazel run toolchains/cc/fragments/esp32_xtensa_lx6_sdk/build -- --output ~/sandbox/bzd-esp32-xtensa-sdk/
+bazel run @bzd_toolchain_cc//fragments/esp32/esp32_xtensa_lx6_sdk/build -- --output $(pwd)/dist/esp32_xtensa_lx6_sdk --rebuild --env "$(env)"
 ```
 
 3. Copy the options
 
-Do what the command line output says, and update the file `toolchains/cc/fragments/esp32_xtensa_lx6_sdk/defs.bzl`.
+Do what the command line output says, and update the file `tools/bazel_build/modules/bzd_toolchain_cc/fragments/esp32/esp32_xtensa_lx6_sdk/defs.bzl`.

@@ -33,9 +33,9 @@ MODULE.bazel.lock
 # OpenSCAD
 *.stl
 
+# ESP-IDF
+esp-idf/
+
 # Generated in CI
 bin/
-
-# Build directory for generating esp32_xtensa_lx6_sdk
-toolchains/cc/fragments/esp32_xtensa_lx6_sdk/build/project/build/
-toolchains/cc/fragments/esp32_xtensa_lx6_sdk/build/project/sdkconfig
+dist/
