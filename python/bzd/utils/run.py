@@ -254,6 +254,12 @@ def localBazelBinary(path: str,
 	return localCommand([path] + (args or []), env=env, **kwargs)
 
 
+def localBazel(cmds: List[str], **kwargs: Any) -> ExecuteResult:
+	"""Execute a bazel command locally."""
+
+	return localCommand([os.environ.get("BAZEL_REAL", "bazel")] + cmds, **kwargs)
+
+
 def localBazelTarget(target: str,
                      args: Optional[List[str]] = None,
                      env: Optional[Dict[str, str]] = None,
@@ -269,9 +275,8 @@ def localBazelTarget(target: str,
 	}
 	defaultEnv.update(env or {})
 
-	return localCommand(
+	return localBazel(
 	    [
-	        os.environ.get("BAZEL_REAL", "bazel"),
 	        "run",
 	        "--ui_event_filters=-info,-stdout,-stderr",
 	        "--noshow_progress",

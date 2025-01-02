@@ -4,6 +4,7 @@
 # C/C++
 *.o
 *.d
+compile_commands.json
 
 # Python
 __pycache__/
