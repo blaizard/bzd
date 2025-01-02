@@ -25,7 +25,8 @@ def _clang_tidy_aspect_impl(target, ctx):
 
     # Get the outputs from the dependencies.
     for dep in ctx.rule.attr.deps:
-        outputs += dep[OutputGroupInfo].clang_tidy.to_list()
+        if hasattr(dep[OutputGroupInfo], "clang_tidy"):
+            outputs += dep[OutputGroupInfo].clang_tidy.to_list()
 
     return [
         OutputGroupInfo(clang_tidy = depset(direct = outputs)),
