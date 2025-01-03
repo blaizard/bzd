@@ -19,8 +19,10 @@ filegroup(
         ":cpp",
         ":header_files",
         "bin/xtensa-esp32-elf-gcc",
+        "bin/xtensa-esp-elf-gcc",
         "@esp32_xtensa_lx6_sdk//:compiler_files",
     ] + glob([
+        "lib/**",
         "libexec/gcc/xtensa-esp-elf/14.2.0/*",
         "xtensa-esp-elf/bin/*",
     ])
@@ -35,7 +37,9 @@ filegroup(
         ":static_libraries_files",
         "@esp32_xtensa_lx6_sdk//:linker_files",
         "bin/xtensa-esp32-elf-gcc",
+        "bin/xtensa-esp-elf-gcc",
     ] + glob([
+        "lib/**",
         "libexec/gcc/xtensa-esp-elf/14.2.0/*",
         "lib/gcc/xtensa-esp-elf/14.2.0/*"
     ])
