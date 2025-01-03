@@ -31,6 +31,7 @@ class CompileCommands:
 
 	def insert(self, fragment: typing.Dict[str, str]) -> None:
 		file = fragment["file"]
+		assert self.compile_commands is not None
 		index = next((i for i, x in enumerate(self.compile_commands) if file == x["file"]), -1)
 		if index == -1:
 			self.compile_commands.append(fragment)
@@ -76,7 +77,7 @@ class SocketServer:
 			connection, _ = self.socket.accept()
 			try:
 				data = connection.recv(1024)
-				self.add(pathlib.Path(data))
+				self.add(pathlib.Path(data.decode("utf-8")))
 			finally:
 				connection.close()
 
