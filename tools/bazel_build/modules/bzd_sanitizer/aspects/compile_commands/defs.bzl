@@ -13,19 +13,48 @@ CompileCommandsInfo = provider(
     },
 )
 
+ATTR_ASPECTS = ["deps", "system"]  # To support bdl_* rules
+
+def get_ouput_group_files_from_attrs(ctx, name, additional_files = None):
+    """Get all output_group from attributes.
+
+    Args:
+        ctx: the context of the action.
+        name: The output group info name.
+        additional_files: additional files to be added.
+
+    Returns:
+        A depset containing all the files.
+    """
+
+    transitive = []
+    for attr in ATTR_ASPECTS:
+        if hasattr(ctx.rule.attr, attr):
+            value = getattr(ctx.rule.attr, attr)
+            deps = value if type(value) == "list" else [value]
+            for dep in deps:
+                if type(dep) != "Target":
+                    continue
+                if OutputGroupInfo in dep and hasattr(dep[OutputGroupInfo], name):
+                    transitive.append(getattr(dep[OutputGroupInfo], name))
+    return depset(additional_files or [], transitive = transitive)
+
 def _get_sources(ctx):
     """Get all the sources associated with this target."""
 
-    srcs = []
+    srcs_c = []
+    srcs_cc = []
     if hasattr(ctx.rule.attr, "srcs"):
         for src in ctx.rule.attr.srcs:
-            srcs += [f for f in src.files.to_list() if f.basename.endswith((".cc", ".c", ".cpp"))]
+            srcs_c += [f for f in src.files.to_list() if f.extension.lower() in ("c",)]
+            srcs_cc += [f for f in src.files.to_list() if f.extension.lower() in ("cc", "cpp", "c++", "cxx")]
     if hasattr(ctx.rule.attr, "hdrs"):
         for hrd in ctx.rule.attr.hdrs:
-            srcs += [f for f in hrd.files.to_list() if f.basename.endswith((".hh", ".h", ".hpp"))]
-    return srcs
+            srcs_c += [f for f in hrd.files.to_list() if f.extension.lower() in ("h",)]
+            srcs_cc += [f for f in hrd.files.to_list() if f.extension.lower() in ("hh", "hpp", "h++", "hxx")]
+    return srcs_c, srcs_cc
 
-def _get_flags(ctx):
+def _get_flags(ctx, action_name, user_compile_flags, compilation_contexts):
     """Get the current flags from the toolchain."""
 
     cc_toolchain = find_cpp_toolchain(ctx)
@@ -36,14 +65,22 @@ def _get_flags(ctx):
     compile_variables = cc_common.create_compile_variables(
         feature_configuration = feature_configuration,
         cc_toolchain = cc_toolchain,
-        user_compile_flags = ctx.fragments.cpp.cxxopts + ctx.fragments.cpp.copts,
+        user_compile_flags = user_compile_flags,
+        include_directories = depset(transitive = [compilation_context.includes for compilation_context in compilation_contexts]),
+        quote_include_directories = depset(transitive = [compilation_context.quote_includes for compilation_context in compilation_contexts]),
+        system_include_directories = depset(transitive = [compilation_context.system_includes for compilation_context in compilation_contexts]),
+        framework_include_directories = depset(transitive = [compilation_context.framework_includes for compilation_context in compilation_contexts]),
+        preprocessor_defines = depset(transitive = [compilation_context.defines for compilation_context in compilation_contexts] + [compilation_context.local_defines for compilation_context in compilation_contexts]),
     )
     flags = cc_common.get_memory_inefficient_command_line(
         feature_configuration = feature_configuration,
-        action_name = ACTION_NAMES.cpp_compile,
+        action_name = action_name,
         variables = compile_variables,
     )
-    return flags
+
+    # Flags to ignore
+    ignore = ("-fno-canonical-system-headers",)
+    return [f for f in flags if not (f in ignore)]
 
 def _get_compiler(ctx):
     """Get the interpreter and the dependency files."""
@@ -63,70 +100,64 @@ def make_compile_commands(target, ctx):
     """
 
     # Only deal with C/C++ targets
-    if not CcInfo in target:
-        return None
+    if not (CcInfo in target or "cc_" in ctx.rule.kind):
+        return []
 
     # Sources
-    srcs = _get_sources(ctx)
+    srcs_c, srcs_cc = _get_sources(ctx)
     compiler, compiler_deps = _get_compiler(ctx)
-    files = depset(direct = srcs, transitive = [compiler_deps, target[CcInfo].compilation_context.headers])
-    args = []
+    compilation_contexts = [target[CcInfo].compilation_context] if CcInfo in target else []
+    if hasattr(ctx.rule.attr, "deps"):
+        compilation_contexts += [dep[CcInfo].compilation_context for dep in ctx.rule.attr.deps if CcInfo in dep]
+    files = depset(direct = srcs_c + srcs_cc, transitive = [compiler_deps] + [compilation_context.headers for compilation_context in compilation_contexts])
+    user_compile_flags = ctx.rule.attr.copts if hasattr(ctx.rule.attr, "copts") else []
 
-    if not srcs:
-        return None
+    providers = []
+    if srcs_c:
+        args = _get_flags(
+            ctx = ctx,
+            action_name = ACTION_NAMES.c_compile,
+            user_compile_flags = user_compile_flags + ctx.fragments.cpp.copts,
+            compilation_contexts = compilation_contexts,
+        )
+        providers.append(CompileCommandsInfo(compiler = compiler, srcs = srcs_c, args = args, files = files))
+    if srcs_cc:
+        args = _get_flags(
+            ctx = ctx,
+            action_name = ACTION_NAMES.cpp_compile,
+            user_compile_flags = user_compile_flags + ctx.fragments.cpp.cxxopts + ctx.fragments.cpp.copts,
+            compilation_contexts = compilation_contexts,
+        )
+        providers.append(CompileCommandsInfo(compiler = compiler, srcs = srcs_cc, args = args, files = files))
 
-    # Compiler flags
-    args += _get_flags(ctx)
-
-    # Rule flags
-    args += ctx.rule.attr.copts if hasattr(ctx.rule.attr, "copts") else []
-
-    # Includes
-    args += ["-F" + s for s in target[CcInfo].compilation_context.framework_includes.to_list()]
-    args += ["-I" + s for s in target[CcInfo].compilation_context.includes.to_list()]
-    args += [segment for s in target[CcInfo].compilation_context.quote_includes.to_list() for segment in ["-iquote", s]]
-    args += [segment for s in target[CcInfo].compilation_context.system_includes.to_list() for segment in ["-isystem", s]]
-
-    # Defines
-    args += ["-D" + s for s in target[CcInfo].compilation_context.defines.to_list()]
-    args += ["-D" + s for s in target[CcInfo].compilation_context.local_defines.to_list()]
-
-    return CompileCommandsInfo(compiler = compiler, srcs = srcs, args = args, files = files)
+    return providers
 
 def _compile_commands_aspect_impl(target, ctx):
     """Generate a compile_command.json file for all C/C++ targets."""
 
-    maybe_compile_commands = make_compile_commands(target, ctx)
-    if not maybe_compile_commands:
-        return []
+    compile_commands_list = make_compile_commands(target, ctx)
+    if not compile_commands_list:
+        return [OutputGroupInfo(compile_commands = get_ouput_group_files_from_attrs(ctx, "compile_commands"))]
 
-    compile_command = []
-    for src in maybe_compile_commands.srcs:
-        compile_command.append({
-            "command": maybe_compile_commands.compiler + " " + " ".join(maybe_compile_commands.args) + " -c " + src.path,
-            "directory": ".",
-            "file": src.path,
-        })
+    compile_commands_files = []
+    for index, compile_commands in enumerate(compile_commands_list):
+        output = ctx.actions.declare_file("{}.{}.compile_commands.json".format(ctx.label.name, index))
+        ctx.actions.run(
+            inputs = compile_commands.files,
+            outputs = [output],
+            executable = ctx.attr._client.files_to_run,
+            arguments = [output.path] + [f.path for f in compile_commands.srcs] + ["--", compile_commands.compiler] + compile_commands.args,
+            mnemonic = "CompileCommands",
+            progress_message = "Generating compile commands for {}".format(ctx.label),
+        )
+        compile_commands_files.append(output)
 
-    output = ctx.actions.declare_file("{}.compile_commands.json".format(ctx.label.name))
-    ctx.actions.run(
-        inputs = maybe_compile_commands.files,
-        outputs = [output],
-        executable = ctx.attr._client.files_to_run,
-        arguments = [output.path] + [f.path for f in maybe_compile_commands.srcs] + ["--", maybe_compile_commands.compiler] + maybe_compile_commands.args,
-        mnemonic = "CompileCommands",
-        progress_message = "Generating compile commands for {}".format(ctx.label),
-    )
-
-    return [
-        maybe_compile_commands,
-        OutputGroupInfo(compile_commands = depset([output])),
-    ]
+    return [OutputGroupInfo(compile_commands = get_ouput_group_files_from_attrs(ctx, "compile_commands", compile_commands_files))]
 
 compile_commands_aspect = aspect(
     implementation = _compile_commands_aspect_impl,
     fragments = ["cpp"],
-    attr_aspects = ["deps"],
+    attr_aspects = ATTR_ASPECTS,
     attrs = {
         "_client": attr.label(
             doc = "Compile command binary to be used.",

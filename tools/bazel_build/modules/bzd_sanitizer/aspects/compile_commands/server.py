@@ -12,11 +12,6 @@ from bzd.utils.run import localBazel, localCommand
 CompileCommandsType = typing.List[typing.Dict[str, str]]
 
 
-def getExternalPath(workspace: pathlib.Path) -> pathlib.Path:
-	result = localBazel(["info", "output_base"], cwd=workspace)
-	return pathlib.Path(result.getStdout().strip()) / "external"
-
-
 class CompileCommands:
 
 	def __init__(self, compile_commands_path: pathlib.Path) -> None:
@@ -88,13 +83,19 @@ class SocketServer:
 
 class Manager:
 
-	def __init__(self, workspace_path: pathlib.Path, external_path: pathlib.Path,
-	             compile_commands_path: pathlib.Path) -> None:
+	def __init__(self, workspace_path: pathlib.Path, compile_commands_path: pathlib.Path) -> None:
 		self.workspace_path = workspace_path
-		self.external_path = external_path
+		self.output_base = Manager.getOuptutBasePath(workspace_path)
+		self.external_path = self.output_base / "external"
+		self.bazel_out_path = self.output_base / "execroot" / "_main" / "bazel-out"
 		self.compile_commands_path = compile_commands_path
 		self.queue = Queue(trigger=self.trigger)
 		self.event = threading.Event()
+
+	@staticmethod
+	def getOuptutBasePath(workspace: pathlib.Path) -> pathlib.Path:
+		result = localBazel(["info", "output_base"], cwd=workspace)
+		return pathlib.Path(result.getStdout().strip())
 
 	def add(self, file: pathlib.Path) -> None:
 		self.queue.add(file)
@@ -109,6 +110,8 @@ class Manager:
 			if segment:
 				if segment.startswith("external/"):
 					segment = segment.replace("external", str(self.external_path), 1)
+				elif segment.startswith("bazel-out/"):
+					segment = segment.replace("bazel-out", str(self.bazel_out_path), 1)
 				command.append(segment)
 		fragment["command"] = " ".join(command)
 
@@ -142,14 +145,11 @@ if __name__ == "__main__":
 
 	workspace_path = pathlib.Path(os.environ["BUILD_WORKING_DIRECTORY"])
 	compile_commands_path = workspace_path / "compile_commands.json"
-	external_path = getExternalPath(workspace_path)
 
 	result = localCommand(["find", "-L", "bazel-bin", "-name", "*compile_commands.json"], cwd=workspace_path)
 	files = [pathlib.Path(f.strip()) for f in result.getOutput().split("\n") if f.strip()]
 
-	manager = Manager(workspace_path=workspace_path,
-	                  external_path=external_path,
-	                  compile_commands_path=compile_commands_path)
+	manager = Manager(workspace_path=workspace_path, compile_commands_path=compile_commands_path)
 
 	for file in files:
 		manager.add(file)
