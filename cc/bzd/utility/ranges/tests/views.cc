@@ -28,14 +28,14 @@ void helperTestCopy(Range&& range, Expected&& expected)
 }
 
 template <class Range, class Expected>
-void helperTestMove(Range&& range, Expected&& expected)
+void helperTestMove(Range&& range1, Range&& range2, Expected&& expected)
 {
 	// Move constructor.
-	auto move{bzd::move(range)};
+	auto move{bzd::move(range1)};
 	EXPECT_EQ_RANGE(move, expected);
 
 	// Move assignment.
-	move = bzd::move(range);
+	move = bzd::move(range2);
 	EXPECT_EQ_RANGE(move, expected);
 }
 
@@ -73,7 +73,8 @@ TEST(Views, All)
 	EXPECT_FALSE(bzd::concepts::borrowedRange<decltype(viewOwningNested)>);
 
 	helperTestCopy(viewRefNested, data);
-	helperTestMove(bzd::move(viewOwningNested), data);
+	auto viewOwning2 = bzd::Array<int, 100>{} | bzd::ranges::all();
+	helperTestMove(bzd::move(viewOwningNested), bzd::move(viewOwning2), data);
 }
 
 TEST(Views, Owning)
@@ -84,7 +85,7 @@ TEST(Views, Owning)
 
 	EXPECT_EQ_RANGE(myOwningView, "Hello World"_sv);
 
-	helperTestMove(bzd::ranges::Owning{"012345"_sv}, "012345"_sv);
+	helperTestMove(bzd::ranges::Owning{"012345"_sv}, bzd::ranges::Owning{"012345"_sv}, "012345"_sv);
 }
 
 TEST(Views, Drop)
@@ -108,7 +109,7 @@ TEST(Views, Drop)
 
 	const auto data = "012345"_sv;
 	helperTestCopy(data | bzd::ranges::drop(2), "2345"_sv);
-	helperTestMove("012345"_sv | bzd::ranges::drop(2), "2345"_sv);
+	helperTestMove("012345"_sv | bzd::ranges::drop(2), "012345"_sv | bzd::ranges::drop(2), "2345"_sv);
 }
 
 TEST(Views, Take)
@@ -126,7 +127,7 @@ TEST(Views, Take)
 
 	const auto data = "012345"_sv;
 	helperTestCopy(data | bzd::ranges::take(2), "01"_sv);
-	helperTestMove("012345"_sv | bzd::ranges::take(2), "01"_sv);
+	helperTestMove("012345"_sv | bzd::ranges::take(2), "012345"_sv | bzd::ranges::take(2), "01"_sv);
 }
 
 TEST(Views, Transform)
@@ -138,8 +139,9 @@ TEST(Views, Transform)
 	EXPECT_EQ_RANGE(view, expected);
 
 	const auto data = "ABC"_sv;
-	helperTestCopy(data | bzd::ranges::transform([](const char c) { return c + ('a' - 'A'); }), "abc"_sv);
-	helperTestMove("ABC"_sv | bzd::ranges::transform([](const char c) { return c + ('a' - 'A'); }), "abc"_sv);
+	const auto transformFct = [](const char c) { return c + ('a' - 'A'); };
+	helperTestCopy(data | bzd::ranges::transform(transformFct), "abc"_sv);
+	helperTestMove("ABC"_sv | bzd::ranges::transform(transformFct), "ABC"_sv | bzd::ranges::transform(transformFct), "abc"_sv);
 }
 
 TEST(Views, Reverse)
@@ -156,7 +158,7 @@ TEST(Views, Reverse)
 
 	const auto data = "012345"_sv;
 	helperTestCopy(data | bzd::ranges::reverse(), "543210"_sv);
-	helperTestMove("012345"_sv | bzd::ranges::reverse(), "543210"_sv);
+	helperTestMove("012345"_sv | bzd::ranges::reverse(), "012345"_sv | bzd::ranges::reverse(), "543210"_sv);
 }
 
 TEST(Views, Join)
@@ -169,7 +171,7 @@ TEST(Views, Join)
 	EXPECT_EQ_RANGE(view, "Hello World"_sv);
 
 	helperTestCopy(container | bzd::ranges::join(), "Hello World"_sv);
-	helperTestMove(container | bzd::ranges::join(), "Hello World"_sv);
+	helperTestMove(container | bzd::ranges::join(), container | bzd::ranges::join(), "Hello World"_sv);
 }
 
 TEST(Views, Filter)
@@ -183,5 +185,5 @@ TEST(Views, Filter)
 	EXPECT_EQ_RANGE(view, expected);
 
 	helperTestCopy(container | bzd::ranges::filter(predicate), expected);
-	helperTestMove(container | bzd::ranges::filter(predicate), expected);
+	helperTestMove(container | bzd::ranges::filter(predicate), container | bzd::ranges::filter(predicate), expected);
 }

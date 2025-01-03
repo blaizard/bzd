@@ -453,6 +453,7 @@ private:
 		::bzd::toString(string_.appender(), "[Binary ({} bytes)] "_csv, sizeof(U));
 		for (bzd::UInt32 i = 0; i < 8u && i < sizeof(U); ++i)
 		{
+			// NOLINTNEXTLINE(clang-analyzer-core.CallAndMessage)
 			valueToString(data[i]);
 			string_ += " "_sv;
 		}
