@@ -79,7 +79,7 @@ def _get_flags(ctx, action_name, user_compile_flags, compilation_contexts):
     )
 
     # Flags to ignore
-    ignore = ("-fno-canonical-system-headers", "-mlongcalls", "-fno-tree-switch-conversion")
+    ignore = ("-fno-canonical-system-headers", "-mlongcalls", "-fno-tree-switch-conversion", "-fstrict-volatile-bitfields", "-freorder-blocks")
     return [f for f in flags if not (f in ignore)]
 
 def _get_compiler(ctx):
