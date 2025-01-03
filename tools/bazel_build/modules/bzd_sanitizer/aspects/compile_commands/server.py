@@ -125,6 +125,7 @@ class Manager:
 					while not self.queue.empty():
 						f = self.queue.next()
 						try:
+							assert f is not None
 							fragments = json.loads((self.workspace_path / f).read_text())
 						except:
 							continue
