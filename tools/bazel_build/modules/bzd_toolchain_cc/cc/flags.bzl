@@ -53,7 +53,9 @@ _COPTS_COMMON_COVERAGE = [
 
 COPTS_GCC_DEV = _COPTS_COMMON_DEV
 COPTS_GCC_PROD = _COPTS_COMMON_PROD
-COPTS_GCC = _COPTS_COMMON
+COPTS_GCC = _COPTS_COMMON + [
+    "-fno-canonical-system-headers",
+]
 COPTS_GCC_COVERAGE = _COPTS_COMMON_COVERAGE + [
     "-fno-inline-small-functions",
     "-fno-default-inline",
@@ -94,7 +96,9 @@ _LINKOPTS_COMMON_COVERAGE = [
     "-fprofile-arcs",
 ]
 
-LINKOPTS_GCC = _LINKOPTS_COMMON
+LINKOPTS_GCC = _LINKOPTS_COMMON + [
+    "-fno-canonical-system-headers",
+]
 LINKOPTS_GCC_COVERAGE = _LINKOPTS_COMMON_COVERAGE
 
 LINKOPTS_CLANG = _LINKOPTS_COMMON + [
