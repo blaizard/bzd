@@ -19,5 +19,6 @@ bzd_cc_binary(
     ],
     deps = [
         ":composition",
+        "//cc/bzd/core:print",
     ],
 )
