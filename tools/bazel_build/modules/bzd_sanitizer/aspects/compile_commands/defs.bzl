@@ -168,20 +168,19 @@ def _compile_commands_aspect_impl(target, ctx):
     if not compile_commands_list:
         return [OutputGroupInfo(compile_commands = get_ouput_group_files_from_attrs(ctx, "compile_commands"))]
 
-    compile_commands_files = []
-    for index, compile_commands in enumerate(compile_commands_list):
-        output = ctx.actions.declare_file("{}.{}.compile_commands.json".format(ctx.label.name, index))
-        ctx.actions.run(
-            inputs = compile_commands.files,
-            outputs = [output],
-            executable = ctx.attr._client.files_to_run,
-            arguments = [output.path] + [f.path for f in compile_commands.srcs] + ["--", compile_commands.compiler] + compile_commands.args,
-            mnemonic = "CompileCommands",
-            progress_message = "Generating compile commands for {}".format(ctx.label),
-        )
-        compile_commands_files.append(output)
+    compile_commands_content = []
+    for compile_commands in compile_commands_list:
+        for src in compile_commands.srcs:
+            compile_commands_content.append({
+                "command": "{} {} -c {}".format(compile_commands.compiler, " ".join(compile_commands.args), src.path),
+                "directory": ".",
+                "file": src.path,
+            })
 
-    return [OutputGroupInfo(compile_commands = get_ouput_group_files_from_attrs(ctx, "compile_commands", compile_commands_files))]
+    output = ctx.actions.declare_file("{}.compile_commands.json".format(ctx.label.name))
+    ctx.actions.write(output, content = json.encode(compile_commands_content))
+
+    return [OutputGroupInfo(compile_commands = get_ouput_group_files_from_attrs(ctx, "compile_commands", [output]))]
 
 compile_commands_aspect = aspect(
     implementation = _compile_commands_aspect_impl,
