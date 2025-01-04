@@ -54,8 +54,38 @@ def _get_sources(ctx):
             srcs_cc += [f for f in hrd.files.to_list() if f.extension.lower() in ("hh", "hpp", "h++", "hxx")]
     return srcs_c, srcs_cc
 
-def _get_flags(ctx, action_name, user_compile_flags, compilation_contexts):
-    """Get the current flags from the toolchain."""
+def _get_minimal_parameters(parameters):
+    """Cleanup the parameter list and only keep the parameters useful for a minimal build."""
+
+    to_keep = (
+        "-std",
+        "-I",
+        "-iquote",
+        "-isystem",
+        "-idirafter",
+        "-iprefix",
+        "-iwithprefix",
+        "-iwithprefixbefore",
+        "-isysroot",
+        "-imultilib",
+        "-nostdinc",
+        "-nostdinc++",
+        "--embed-dir",
+        "-L",
+        "-B",
+        "--sysroot",
+        "-D",
+        "-U",
+    )
+
+    updated_parameters = []
+    for param in parameters:
+        if param.startswith(to_keep) or not param.startswith("-"):
+            updated_parameters.append(param)
+    return updated_parameters
+
+def _get_parameters(ctx, action_name, user_compile_flags, compilation_contexts):
+    """Get the current parameters from the toolchain."""
 
     cc_toolchain = find_cpp_toolchain(ctx)
     feature_configuration = cc_common.configure_features(
@@ -72,15 +102,13 @@ def _get_flags(ctx, action_name, user_compile_flags, compilation_contexts):
         framework_include_directories = depset(transitive = [compilation_context.framework_includes for compilation_context in compilation_contexts]),
         preprocessor_defines = depset(transitive = [compilation_context.defines for compilation_context in compilation_contexts] + [compilation_context.local_defines for compilation_context in compilation_contexts]),
     )
-    flags = cc_common.get_memory_inefficient_command_line(
+    parameters = cc_common.get_memory_inefficient_command_line(
         feature_configuration = feature_configuration,
         action_name = action_name,
         variables = compile_variables,
     )
 
-    # Flags to ignore
-    ignore = ("-fno-canonical-system-headers", "-mlongcalls", "-fno-tree-switch-conversion", "-fstrict-volatile-bitfields", "-freorder-blocks")
-    return [f for f in flags if not (f in ignore)]
+    return _get_minimal_parameters(parameters)
 
 def _get_compiler(ctx):
     """Get the interpreter and the dependency files."""
@@ -114,7 +142,7 @@ def make_compile_commands(target, ctx):
 
     providers = []
     if srcs_c:
-        args = _get_flags(
+        args = _get_parameters(
             ctx = ctx,
             action_name = ACTION_NAMES.c_compile,
             user_compile_flags = user_compile_flags + ctx.fragments.cpp.copts,
@@ -122,7 +150,7 @@ def make_compile_commands(target, ctx):
         )
         providers.append(CompileCommandsInfo(compiler = compiler, srcs = srcs_c, args = args, files = files))
     if srcs_cc:
-        args = _get_flags(
+        args = _get_parameters(
             ctx = ctx,
             action_name = ACTION_NAMES.cpp_compile,
             user_compile_flags = user_compile_flags + ctx.fragments.cpp.cxxopts + ctx.fragments.cpp.copts,
