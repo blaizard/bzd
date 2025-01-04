@@ -76,6 +76,7 @@ def _get_minimal_parameters(parameters):
         "--sysroot",
         "-D",
         "-U",
+        "-W",
     )
 
     updated_parameters = []
