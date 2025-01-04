@@ -1,7 +1,7 @@
 """Metadata for ESP32 toolchains."""
 
 load("//:fragments/esp32/esp32_xtensa_lx6_sdk/defs.bzl", "esp32_xtensa_lx6_sdk")
-load("//cc:toolchain.bzl", "get_location", "toolchain_maker", "toolchain_merge")
+load("//cc:toolchain.bzl", "toolchain_maker", "toolchain_merge")
 load("//fragments/esp32/app_binary/esp32_xtensa_lx6:defs.bzl", "app_binary")
 
 def linux_x86_64(module_ctx, name):
@@ -12,7 +12,6 @@ def linux_x86_64(module_ctx, name):
         name: The name of the toolchain.
     """
 
-    repository_path = get_location(module_ctx, name)
     toolchain_definition = {
         "binaries": {
             "ar": "xtensa-esp32-elf/bin/ar",
@@ -29,11 +28,11 @@ def linux_x86_64(module_ctx, name):
             "@bzd_toolchain_cc//:fragments/esp32/esp32_xtensa_lx6_gcc_11.2.0/linux_x86_64.BUILD",
         ],
         "builtin_include_directories": [
-            "%sysroot%/xtensa-esp32-elf/include/c++/11.2.0/xtensa-esp32-elf",
-            "%sysroot%/xtensa-esp32-elf/include/c++/11.2.0",
-            "%sysroot%/xtensa-esp32-elf/sys-include",
-            "%sysroot%/lib/gcc/xtensa-esp32-elf/11.2.0/include",
-            "%sysroot%/lib/gcc/xtensa-esp32-elf/11.2.0/include-fixed",
+            "@{}//xtensa-esp32-elf/include/c++/11.2.0/xtensa-esp32-elf".format(name),
+            "@{}//xtensa-esp32-elf/include/c++/11.2.0".format(name),
+            "@{}//xtensa-esp32-elf/sys-include".format(name),
+            "@{}//lib/gcc/xtensa-esp32-elf/11.2.0/include".format(name),
+            "@{}//lib/gcc/xtensa-esp32-elf/11.2.0/include-fixed".format(name),
         ],
         "compile_flags": [
             # Allow long calls
@@ -53,7 +52,7 @@ def linux_x86_64(module_ctx, name):
             "-Wl,-static",
         ],
         "linker_dirs": [
-            "{}/xtensa-esp32-elf/lib".format(repository_path),
+            "@{}//xtensa-esp32-elf/lib".format(name),
         ],
         "package_name": "xtensa-esp32-elf",
         "patches": [
@@ -61,15 +60,16 @@ def linux_x86_64(module_ctx, name):
         ],
         "sha256": "698d8407e18275d18feb7d1afdb68800b97904fbe39080422fb8609afa49df30",
         "strip_prefix": "xtensa-esp32-elf",
-        "sysroot": True,
         "urls": [
             "https://datalocal.blaizard.com/file/bzd/toolchains/cc/gcc/esp32_xtensa_lx6/xtensa-esp32-elf-gcc11_2_0-esp-2022r1-linux-amd64.tar.xz",
             "https://data.blaizard.com/file/bzd/toolchains/cc/gcc/esp32_xtensa_lx6/xtensa-esp32-elf-gcc11_2_0-esp-2022r1-linux-amd64.tar.xz",
         ],
     }
 
-    toolchain_definition = toolchain_merge(toolchain_definition, esp32_xtensa_lx6_sdk(module_ctx))
-    toolchain_definition = toolchain_merge(toolchain_definition, app_binary(module_ctx))
+    # Note, the order is important here. We want the definition of the SDK to have precedence over the
+    # toolchain: includes from the SDK should have higher priority than the ones from the toolchain.
+    toolchain_definition = toolchain_merge(esp32_xtensa_lx6_sdk(module_ctx), toolchain_definition)
+    toolchain_definition = toolchain_merge(app_binary(module_ctx), toolchain_definition)
 
     toolchain_maker(
         name = name,

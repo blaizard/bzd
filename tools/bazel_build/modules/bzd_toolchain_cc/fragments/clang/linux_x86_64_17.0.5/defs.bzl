@@ -1,7 +1,7 @@
 """Metadata for Linux toolchains."""
 
 load("//:fragments/clang/linux/defs.bzl", "linux")
-load("//cc:toolchain.bzl", "get_location", "toolchain_maker", "toolchain_merge")
+load("//cc:toolchain.bzl", "toolchain_maker", "toolchain_merge")
 
 def linux_x86_64(module_ctx, name):
     """Metadata for Linux toolchains.
@@ -14,7 +14,6 @@ def linux_x86_64(module_ctx, name):
         The toolchain definition.
     """
 
-    repository_path = get_location(module_ctx, name)
     toolchain_definition = {
         "build_files": [
             "@bzd_toolchain_cc//:fragments/clang/linux_x86_64_17.0.5/linux_x86_64.BUILD",
@@ -30,6 +29,10 @@ def linux_x86_64(module_ctx, name):
         ],
         "cxx_flags": [
             "-std=c++20",
+        ],
+        "host_system_directories": [
+            "/usr/include/x86_64-linux-gnu",
+            "/usr/include",
         ],
         "link_flags": [
             # Use the lld llvm linker.
@@ -48,17 +51,15 @@ def linux_x86_64(module_ctx, name):
             "-Wl,--hash-style=gnu",
         ],
         "linker_dirs": [
-            "{}/lib".format(repository_path),
+            "@{}//lib".format(name),
         ],
         "package_name": "linux_x86_64_17.0.5",
         "sha256": "2b5349015ace198776fe233b6c1ce5a69b2e22da85633ffe24757f20a1c87650",
         "strip_prefix": "linux_x86_64_17.0.5",
         "system_directories": [
-            "{}/include/c++/v1".format(repository_path),
-            "{}/lib/clang/17/include".format(repository_path),
-            "{}/include/x86_64-unknown-linux-gnu/c++/v1".format(repository_path),
-            "/usr/include/x86_64-linux-gnu",
-            "/usr/include",
+            "@{}//include/c++/v1".format(name),
+            "@{}//lib/clang/17/include".format(name),
+            "@{}//include/x86_64-unknown-linux-gnu/c++/v1".format(name),
         ],
         "urls": [
             "https://datalocal.blaizard.com/file/bzd/toolchains/cc/clang/linux_x86_64/linux_x86_64_17.0.5.tar.xz",

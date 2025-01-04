@@ -1,9 +1,8 @@
 """Metadata for ESP32 toolchains."""
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-load("//cc:toolchain.bzl", "get_location")
 
-def esp32_xtensa_lx6_sdk(module_ctx, name = "esp32_xtensa_lx6_sdk"):
+def esp32_xtensa_lx6_sdk(_, name = "esp32_xtensa_lx6_sdk"):
     version = "5dabe9f8a000131b0d72294f415332d8ef640126"
     http_archive(
         name = name,
@@ -15,7 +14,6 @@ def esp32_xtensa_lx6_sdk(module_ctx, name = "esp32_xtensa_lx6_sdk"):
         sha256 = "2ca96a491b2c6c136132fe39b713afccc2a17dc163e62c26991105854a690e5e",
     )
 
-    repository_path = get_location(module_ctx, name)
     return {
         "compile_flags": [
             "-DMBEDTLS_CONFIG_FILE=\"mbedtls/esp_config.h\"",
@@ -463,10 +461,10 @@ def esp32_xtensa_lx6_sdk(module_ctx, name = "esp32_xtensa_lx6_sdk"):
             "vfs_include_syscalls_impl",
         ],
         "linker_dirs": [
-            "{}/ld".format(repository_path),
-            "{}/lib".format(repository_path),
+            "@{}//ld".format(name),
+            "@{}//lib".format(name),
         ],
         "system_directories": [
-            "{}/include".format(repository_path),
+            "@{}//include".format(name),
         ],
     }

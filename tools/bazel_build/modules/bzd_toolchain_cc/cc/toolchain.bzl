@@ -3,6 +3,14 @@
 load("@bazel_skylib//lib:sets.bzl", "sets")
 load("//cc:flags.bzl", "COPTS_CLANG", "COPTS_CLANG_COVERAGE", "COPTS_CLANG_DEV", "COPTS_CLANG_PROD", "COPTS_GCC", "COPTS_GCC_COVERAGE", "COPTS_GCC_DEV", "COPTS_GCC_PROD", "LINKOPTS_CLANG", "LINKOPTS_CLANG_COVERAGE", "LINKOPTS_GCC", "LINKOPTS_GCC_COVERAGE")
 
+def package_path_from_label(name):
+    """Convert the given label name its its package path."""
+
+    label = Label(name)
+    if label.workspace_root:
+        return label.workspace_root + "/" + label.package
+    return label.package
+
 def _impl(repository_ctx):
     # Create a UID
     uid = repository_ctx.name.replace("~", "-").replace("+", "-")
@@ -54,7 +62,8 @@ def _impl(repository_ctx):
             ["'{}',".format(t) for t in repository_ctx.attr.compile_dev_flags],
         ),
         "%{compile_flags}": "\n".join(
-            ["'-isystem', '{}',".format(t) for t in repository_ctx.attr.system_directories] +
+            ["'-isystem', '{}',".format(package_path_from_label(t)) for t in repository_ctx.attr.system_directories] +
+            ["'-isystem', '{}',".format(t) for t in repository_ctx.attr.host_system_directories] +
             ["'{}',".format(t) for t in repository_ctx.attr.compile_flags],
         ),
         "%{compile_prod_flags}": "\n".join(
@@ -71,7 +80,7 @@ def _impl(repository_ctx):
         ),
         "%{ld}": binaries["ld"],
         "%{link_flags}": "\n".join(
-            ["'-L{}',".format(t) for t in repository_ctx.attr.linker_dirs] +
+            ["'-L{}',".format(package_path_from_label(t)) for t in repository_ctx.attr.linker_dirs] +
             ["'{}',".format(t) for t in repository_ctx.attr.link_flags],
         ),
         "%{loads}": "\n".join(loads),
@@ -81,7 +90,7 @@ def _impl(repository_ctx):
         "%{package_name}": repository_ctx.attr.package_name,
         "%{repository_path}": "external/" + repository_ctx.name,
         "%{strip}": binaries["strip"],
-        "%{sysroot}": str(repository_ctx.path(".")) if repository_ctx.attr.sysroot else "",
+        "%{sysroot}": package_path_from_label(repository_ctx.attr.sysroot) if repository_ctx.attr.sysroot else "",
         "%{uid}": uid,
     }
 
@@ -132,17 +141,18 @@ _toolchain_maker_linux = repository_rule(
         "cpu": attr.string(default = "unknown"),
         "cxx_flags": attr.string_list(),
         "default": attr.bool(default = False, doc = "Make this compiler the default one, it will be automatically selected when no compiler is given."),
+        "host_system_directories": attr.string_list(),
         # Flags
         "link_flags": attr.string_list(),
-        "linker_dirs": attr.string_list(),
+        "linker_dirs": attr.label_list(),
         "loads": attr.string_list_dict(),
         # Download.
         "package_name": attr.string(default = "package"),
         "patches": attr.label_list(allow_files = True),
         "sha256": attr.string(),
         "strip_prefix": attr.string(),
-        "sysroot": attr.bool(),
-        "system_directories": attr.string_list(),
+        "sysroot": attr.label(),
+        "system_directories": attr.label_list(),
         "tools": attr.string_dict(),
         "urls": attr.string_list(mandatory = True),
     },
@@ -226,8 +236,3 @@ def toolchain_merge(data1, data2):
             result[key2] = value2
 
     return result
-
-def get_location(module_ctx, name):
-    """Return the full name of the repository on disk."""
-
-    return "external/" + module_ctx.path(".").basename + "+" + name
