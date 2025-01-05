@@ -1,10 +1,15 @@
 """Constraints."""
 
 AL_CONSTRAINTS = {
-    "esp32": {},
-    "esp32s3": {},
+    "esp32": {
+        "isa": ["xtensa_lx6"],
+    },
+    "esp32s3": {
+        "isa": ["xtensa_lx7"],
+    },
     "linux": {
         "alias": Label("@platforms//os:linux"),
+        "isa": ["arm64", "x86_64"],
     },
 }
 

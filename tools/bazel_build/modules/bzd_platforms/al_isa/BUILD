@@ -1,4 +1,4 @@
-load("//:constraints.bzl", "AL_CONSTRAINTS", "ISA_CONSTRAINTS")
+load("//:constraints.bzl", "AL_CONSTRAINTS")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -8,4 +8,4 @@ package(default_visibility = ["//visibility:public"])
         "//al:{}".format(al),
         "//isa:{}".format(isa),
     ],
-) for al in AL_CONSTRAINTS.keys() for isa in ISA_CONSTRAINTS.keys()]
+) for al, constraints in AL_CONSTRAINTS.items() for isa in constraints["isa"]]
