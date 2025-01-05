@@ -94,8 +94,10 @@ if __name__ == "__main__":
 
 	# Create the output directory
 	outputResolved = args.output.expanduser().resolve()
-	if not outputResolved.is_dir():
-		os.makedirs(outputResolved)
+	outputSDK = outputResolved / "esp32_xtensa_lx6_sdk"
+	project = outputResolved / "project"
+	buildPath = project / "build"
+	outputSDK.mkdir(parents=True, exist_ok=True)
 
 	# Cleanup the sub-directories that will be generated
 	for name in (
@@ -103,12 +105,10 @@ if __name__ == "__main__":
 	    "lib",
 	    "include",
 	):
-		if (outputResolved / name).is_dir():
-			shutil.rmtree(outputResolved / name)
+		if (outputSDK / name).is_dir():
+			shutil.rmtree(outputSDK / name)
 
 	# Copy the important files to the output dir.
-	project = outputResolved / "project"
-	buildPath = project / "build"
 	copyDirectory(project, args.project)
 
 	# Cleanup the project
@@ -173,6 +173,6 @@ if __name__ == "__main__":
 				print(f'"{arg}",')
 		print("=======================================================")
 
-		copyArtifacts(outputResolved, gcc)
+		copyArtifacts(outputSDK, gcc)
 
-	print(f"Artifacts copied to: {outputResolved}")
+	print(f"Artifacts copied to: {outputSDK}")

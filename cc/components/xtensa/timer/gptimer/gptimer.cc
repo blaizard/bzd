@@ -15,11 +15,12 @@ static bool gptimerCallback(::gptimer_handle_t, const ::gptimer_alarm_event_data
 
 bzd::Async<> GPTimer::init() noexcept
 {
-	const ::gptimer_config_t config{.clk_src = GPTIMER_CLK_SRC_APB,
-									.direction = GPTIMER_COUNT_UP,
-									// Note: to avoid an assert, (counter_src_hz / resolution_hz) must be >= 2 && <= 65536
-									.resolution_hz = 10 * 1000, // 0.1ms
-									.flags = {.intr_shared = false}};
+	::gptimer_config_t config{};
+	config.clk_src = GPTIMER_CLK_SRC_APB;
+	config.direction = GPTIMER_COUNT_UP;
+	// Note: to avoid an assert, (counter_src_hz / resolution_hz) must be >= 2 && <= 65536
+	config.resolution_hz = 10 * 1000; // 0.1ms
+	config.flags.intr_shared = false; // Not mark the timer interrupt source as a shared one.
 
 	if (const auto result = ::gptimer_new_timer(&config, &gptimer_); result != ESP_OK)
 	{

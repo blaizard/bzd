@@ -16,8 +16,8 @@ sh_binary_wrapper(
     locations = {
         "@esp32_qemu//:qemu": "qemu",
         "@bzd_python//bzd/utils:binary_builder": "builder",
-        "@bzd_toolchain_cc//fragments/esp32/app_binary/esp32_xtensa_lx6:bootloader.bin": "bootloader",
-        "@bzd_toolchain_cc//fragments/esp32/app_binary/esp32_xtensa_lx6:partitions_singleapp.bin": "partitions",
+        "@esp32_xtensa_lx6_sdk//:bin/bootloader.bin": "bootloader",
+        "@esp32_xtensa_lx6_sdk//:bin/partition-table.bin": "partitions",
     },
     command = """
         {builder} --size 4MB --chunk {bootloader},0x1000 --chunk {partitions},0x8000 --chunk $2,0x10000 qemu_flash.bin
