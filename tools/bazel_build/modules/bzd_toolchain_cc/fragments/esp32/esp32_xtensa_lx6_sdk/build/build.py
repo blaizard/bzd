@@ -62,6 +62,8 @@ def envToDict(env: str) -> typing.Dict[str, str]:
 	return result
 
 
+_TARGETS = {"esp32": "esp32_xtensa_lx6_sdk", "esp32s3": "esp32s3_xtensa_lx7_sdk"}
+
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Generate the content of the esp32 SDK from esp-idf.")
 	parser.add_argument(
@@ -85,6 +87,11 @@ if __name__ == "__main__":
 	    action="store_true",
 	    help="Rebuild the whole project from scratch.",
 	)
+	parser.add_argument(
+	    "target",
+	    choices=_TARGETS.keys(),
+	    help="Target chip (esp32, esp32s3, ...).",
+	)
 
 	args = parser.parse_args()
 
@@ -94,34 +101,30 @@ if __name__ == "__main__":
 
 	# Create the output directory
 	outputResolved = args.output.expanduser().resolve()
-	outputSDK = outputResolved / "esp32_xtensa_lx6_sdk"
+	outputSDK = outputResolved / _TARGETS[args.target]
 	project = outputResolved / "project"
 	buildPath = project / "build"
+	if outputSDK.is_dir():
+		shutil.rmtree(outputSDK)
 	outputSDK.mkdir(parents=True, exist_ok=True)
-
-	# Cleanup the sub-directories that will be generated
-	for name in (
-	    "ld",
-	    "lib",
-	    "include",
-	):
-		if (outputSDK / name).is_dir():
-			shutil.rmtree(outputSDK / name)
-
-	# Copy the important files to the output dir.
-	copyDirectory(project, args.project)
 
 	# Cleanup the project
 	if args.rebuild:
-		if buildPath.is_dir():
-			shutil.rmtree(buildPath)
-		buildPath = project / "build"
+		if project.is_dir():
+			shutil.rmtree(project)
+
+	# Copy the important files to the output dir.
+	copyDirectory(project, args.project)
 
 	buildPath.mkdir(exist_ok=True)
 
 	# Build the project
 	env = envToDict(args.env)
-	localCommand(cmds=["cmake", "..", "-G", "Unix Makefiles"], cwd=buildPath, stdout=True, stderr=True, env=env)
+	localCommand(cmds=["cmake", "..", f"-DIDF_TARGET={args.target}", "-G", "Unix Makefiles"],
+	             cwd=buildPath,
+	             stdout=True,
+	             stderr=True,
+	             env=env)
 	localCommand(cmds=["make"], cwd=buildPath, stdout=True, stderr=True, env=env, timeoutS=300)
 
 	commands = {
@@ -174,5 +177,7 @@ if __name__ == "__main__":
 		print("=======================================================")
 
 		copyArtifacts(outputSDK, gcc)
+	copyFiles(outputSDK / "bin",
+	          [buildPath / "bootloader" / "bootloader.bin", buildPath / "partition_table" / "partition-table.bin"])
 
 	print(f"Artifacts copied to: {outputSDK}")

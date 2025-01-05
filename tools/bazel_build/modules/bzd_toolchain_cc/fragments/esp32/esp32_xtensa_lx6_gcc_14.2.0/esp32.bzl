@@ -1,6 +1,6 @@
 """Metadata for ESP32 toolchains."""
 
-load("//:fragments/esp32/esp32_xtensa_lx6_sdk/defs.bzl", "esp32_xtensa_lx6_sdk")
+load("//:fragments/esp32/esp32_xtensa_lx6_sdk/esp32.bzl", "esp32_xtensa_lx6_sdk")
 load("//cc:toolchain.bzl", "toolchain_maker", "toolchain_merge")
 load("//fragments/esp32/app_binary/esp32_xtensa_lx6:defs.bzl", "app_binary")
 
@@ -14,29 +14,25 @@ def linux_x86_64(module_ctx, name):
 
     toolchain_definition = {
         "binaries": {
-            "ar": "xtensa-esp32-elf/bin/ar",
-            "as": "xtensa-esp32-elf/bin/as",
+            "ar": "xtensa-esp-elf/bin/ar",
+            "as": "xtensa-esp-elf/bin/as",
             "cc": "bin/wrapper_cc_start_end_group",
             "cov": "bin/xtensa-esp32-elf-gcov",
             "cpp": "bin/xtensa-esp32-elf-gcc",
-            "ld": "xtensa-esp32-elf/bin/ld",
-            "objcopy": "xtensa-esp32-elf/bin/objcopy",
-            "objdump": "xtensa-esp32-elf/bin/objdump",
-            "strip": "xtensa-esp32-elf/bin/strip",
+            "ld": "xtensa-esp-elf/bin/ld",
+            "objcopy": "xtensa-esp-elf/bin/objcopy",
+            "objdump": "xtensa-esp-elf/bin/objdump",
+            "strip": "xtensa-esp-elf/bin/strip",
         },
         "build_files": [
-            "@bzd_toolchain_cc//:fragments/esp32/esp32_xtensa_lx6_gcc_11.2.0/linux_x86_64.BUILD",
-        ],
-        "builtin_include_directories": [
-            "@{}//xtensa-esp32-elf/include/c++/11.2.0/xtensa-esp32-elf".format(name),
-            "@{}//xtensa-esp32-elf/include/c++/11.2.0".format(name),
-            "@{}//xtensa-esp32-elf/sys-include".format(name),
-            "@{}//lib/gcc/xtensa-esp32-elf/11.2.0/include".format(name),
-            "@{}//lib/gcc/xtensa-esp32-elf/11.2.0/include-fixed".format(name),
+            "@bzd_toolchain_cc//:fragments/esp32/esp32_xtensa_lx6_gcc_14.2.0/linux_x86_64.BUILD",
         ],
         "compile_flags": [
             # Allow long calls
             "-mlongcalls",
+            # Standard includes, this is needed to avoid indefined include complain from Bazel.
+            "-nostdinc",
+            "--no-standard-includes",
         ],
         "cxx_flags": [
             "-std=c++20",
@@ -56,13 +52,21 @@ def linux_x86_64(module_ctx, name):
         ],
         "package_name": "xtensa-esp32-elf",
         "patches": [
-            "@bzd_toolchain_cc//:fragments/esp32/esp32_xtensa_lx6_gcc_11.2.0/wrapper_cc_start_end_group.patch",
+            "@bzd_toolchain_cc//:fragments/esp32/esp32_xtensa_lx6_gcc_14.2.0/wrapper_cc_start_end_group.patch",
         ],
-        "sha256": "698d8407e18275d18feb7d1afdb68800b97904fbe39080422fb8609afa49df30",
-        "strip_prefix": "xtensa-esp32-elf",
+        "sha256": "e3e6dcf3d275c3c9ab0e4c8a9d93fd10e7efc035d435460576c9d95b4140c676",
+        "strip_prefix": "xtensa-esp-elf",
+        "system_directories": [
+            "@{}//xtensa-esp-elf/include/c++/14.2.0".format(name),
+            "@{}//xtensa-esp-elf/include/c++/14.2.0/xtensa-esp-elf/esp32".format(name),
+            "@{}//xtensa-esp-elf/include/c++/14.2.0/backward".format(name),
+            "@{}//lib/gcc/xtensa-esp-elf/14.2.0/include".format(name),
+            "@{}//lib/gcc/xtensa-esp-elf/14.2.0/include-fixed".format(name),
+            "@{}//xtensa-esp-elf/include".format(name),
+        ],
         "urls": [
-            "https://datalocal.blaizard.com/file/bzd/toolchains/cc/gcc/esp32_xtensa_lx6/xtensa-esp32-elf-gcc11_2_0-esp-2022r1-linux-amd64.tar.xz",
-            "https://data.blaizard.com/file/bzd/toolchains/cc/gcc/esp32_xtensa_lx6/xtensa-esp32-elf-gcc11_2_0-esp-2022r1-linux-amd64.tar.xz",
+            "https://datalocal.blaizard.com/file/bzd/toolchains/cc/gcc/esp32_xtensa_lx6/xtensa-esp-elf-14.2.0_20241119-x86_64-linux-gnu.tar.xz",
+            "https://data.blaizard.com/file/bzd/toolchains/cc/gcc/esp32_xtensa_lx6/xtensa-esp-elf-14.2.0_20241119-x86_64-linux-gnu.tar.xz",
         ],
     }
 
@@ -77,6 +81,6 @@ def linux_x86_64(module_ctx, name):
         definition = toolchain_definition,
     )
 
-esp32_xtensa_lx6_gcc_11_2_0 = {
+esp32_xtensa_lx6_gcc_14_2_0 = {
     "linux-x86_64": linux_x86_64,
 }

@@ -13,7 +13,7 @@ git clone --recursive --branch "release/v5.4" https://github.com/espressif/esp-i
 Run the build command.
 
 ```bash
-bazel run @bzd_toolchain_cc//fragments/esp32/esp32_xtensa_lx6_sdk/build -- --output $(pwd)/dist/esp32_xtensa_lx6_sdk --rebuild --env "$(env)"
+bazel run @bzd_toolchain_cc//fragments/esp32/esp32_xtensa_lx6_sdk/build -- --output $(pwd)/dist/esp32_xtensa_lx6_sdk --rebuild --env "$(env)" esp32
 ```
 
 3. Copy the options
