@@ -13,7 +13,7 @@ def esptool(_module_ctx):
         name = "esptool",
         repositories = [{
             "archive": {
-                "build_file": "@bzd_toolchain_cc//:fragments/esp32/esptool/esptool.BUILD",
+                "build_file": "@bzd_toolchain_cc//:fragments/esp_idf/esptool/esptool.BUILD",
                 "sha256": "b317ce2a532c15eb55a70e290169b9bf25a514fbdb52dce43a3bd5c86fd4a49c",
                 "strip_prefix": "esptool-4.3",
                 "urls": [

@@ -2,11 +2,12 @@
 
 load("@bzd_platforms//:defs.bzl", "constraints_from_platform")
 load("//:fragments/clang/defs.bzl", "clang")
-load("//:fragments/esp32/defs.bzl", "esp32")
+load("//:fragments/esp_idf/defs.bzl", "esp32", "esp32s3")
 load("//:fragments/gcc/defs.bzl", "gcc")
 
 _repositories = dict(**clang)
 _repositories.update(esp32)
+_repositories.update(esp32s3)
 _repositories.update(gcc)
 
 def _make_configs(name, version):

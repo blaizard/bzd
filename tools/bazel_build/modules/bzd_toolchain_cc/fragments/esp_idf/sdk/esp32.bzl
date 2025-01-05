@@ -2,10 +2,10 @@
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-def esp32_xtensa_lx6_sdk(_, name = "esp32_xtensa_lx6_sdk"):
+def sdk(_, name = "esp32_xtensa_lx6_sdk"):
     http_archive(
         name = name,
-        build_file = Label("//:fragments/esp32/esp32_xtensa_lx6_sdk/esp32_xtensa_lx6_sdk.BUILD"),
+        build_file = Label("//:fragments/esp_idf/sdk/sdk.BUILD"),
         urls = [
             "https://datalocal.blaizard.com/file/bzd/sdk/esp32/esp32_xtensa_lx6_sdk_v5.4.tar.xz",
             "https://data.blaizard.com/file/bzd/sdk/esp32/esp32_xtensa_lx6_sdk_v5.4.tar.xz",

@@ -2,16 +2,16 @@
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-def esp32_xtensa_lx6_sdk(_, name = "esp32_xtensa_lx6_sdk"):
+def sdk(_, name = "esp32s3_xtensa_lx7_sdk"):
     http_archive(
         name = name,
-        build_file = Label("//:fragments/esp32/esp32_xtensa_lx6_sdk/esp32_xtensa_lx6_sdk.BUILD"),
+        build_file = Label("//:fragments/esp_idf/sdk/sdk.BUILD"),
         urls = [
-            "https://datalocal.blaizard.com/file/bzd/sdk/esp32s3/esp32s3_xtensa_lx7_sdk_v5.4.tar.xz",
-            "https://data.blaizard.com/file/bzd/sdk/esp32s3/esp32s3_xtensa_lx7_sdk_v5.4.tar.xz",
+            "https://datalocal.blaizard.com/file/bzd/sdk/esp32s3/esp32s3_xtensa_lx7_sdk.tar.xz",
+            "https://data.blaizard.com/file/bzd/sdk/esp32s3/esp32s3_xtensa_lx7_sdk.tar.xz",
         ],
         strip_prefix = "esp32_xtensa_lx6_sdk",
-        sha256 = "e0577241108d942f1ff1a4e0f3ef8c23685a8f2ca3cfa8328c6b69fadced4df8",
+        sha256 = "ebcfd902bd5896b9e33c46a819ee19bdd365ab34e50fc6f9f3127efe43fc769d",
     )
 
     return {
@@ -39,7 +39,7 @@ def esp32_xtensa_lx6_sdk(_, name = "esp32_xtensa_lx6_sdk"):
             "-fstrict-volatile-bitfields",
             "-fno-jump-tables",
             "-fno-tree-switch-conversion",
-            "-fno-exceptions",
+            #"-fno-exceptions",
             "-fno-rtti",
             "-fuse-cxa-atexit",
         ],

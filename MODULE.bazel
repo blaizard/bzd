@@ -99,6 +99,13 @@ use_repo(toolchain_cc, "esp32")
 
 register_toolchains("@esp32//:all")
 
+#toolchain_cc.toolchain(
+#    name = "esp32s3",
+#    version = "esp32s3_gcc_14.2.0",
+#)
+#use_repo(toolchain_cc, "esp32s3")
+#register_toolchains("@esp32s3//:all")
+
 toolchain_cc.toolchain(
     name = "gcc",
     version = "gcc_14.2.0",

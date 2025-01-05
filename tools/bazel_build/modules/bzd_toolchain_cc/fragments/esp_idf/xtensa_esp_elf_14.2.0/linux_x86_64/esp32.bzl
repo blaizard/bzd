@@ -1,10 +1,10 @@
 """Metadata for ESP32 toolchains."""
 
-load("//:fragments/esp32/esp32_xtensa_lx6_sdk/esp32.bzl", "esp32_xtensa_lx6_sdk")
+load("//:fragments/esp_idf/sdk/esp32.bzl", "sdk")
 load("//cc:toolchain.bzl", "toolchain_maker", "toolchain_merge")
-load("//fragments/esp32/app_binary/esp32_xtensa_lx6:defs.bzl", "app_binary")
+load("//fragments/esp_idf/app_binary:esp32.bzl", "app_binary")
 
-def linux_x86_64(module_ctx, name):
+def esp32_linux_x86_64(module_ctx, name):
     """Metadata for ESP32 toolchains.
 
     Args:
@@ -25,7 +25,7 @@ def linux_x86_64(module_ctx, name):
             "strip": "xtensa-esp-elf/bin/strip",
         },
         "build_files": [
-            Label("//:fragments/esp32/esp32_xtensa_lx6_gcc_14.2.0/linux_x86_64.BUILD"),
+            Label("//:fragments/esp_idf/xtensa_esp_elf_14.2.0/linux_x86_64/esp32.BUILD"),
         ],
         "compile_flags": [
             # Allow long calls
@@ -47,12 +47,9 @@ def linux_x86_64(module_ctx, name):
             # Do not link with shared libraries
             "-Wl,-static",
         ],
-        "linker_dirs": [
-            "@{}//xtensa-esp32-elf/lib".format(name),
-        ],
         "package_name": "xtensa-esp32-elf",
         "patches": [
-            Label("//:fragments/esp32/esp32_xtensa_lx6_gcc_14.2.0/wrapper_cc_start_end_group.patch"),
+            Label("//:fragments/esp_idf/xtensa_esp_elf_14.2.0/linux_x86_64/esp32_wrapper_cc_start_end_group.patch"),
         ],
         "sha256": "e3e6dcf3d275c3c9ab0e4c8a9d93fd10e7efc035d435460576c9d95b4140c676",
         "strip_prefix": "xtensa-esp-elf",
@@ -72,7 +69,7 @@ def linux_x86_64(module_ctx, name):
 
     # Note, the order is important here. We want the definition of the SDK to have precedence over the
     # toolchain: includes from the SDK should have higher priority than the ones from the toolchain.
-    toolchain_definition = toolchain_merge(esp32_xtensa_lx6_sdk(module_ctx), toolchain_definition)
+    toolchain_definition = toolchain_merge(sdk(module_ctx), toolchain_definition)
     toolchain_definition = toolchain_merge(app_binary(module_ctx), toolchain_definition)
 
     toolchain_maker(
@@ -80,7 +77,3 @@ def linux_x86_64(module_ctx, name):
         implementation = "linux_gcc",
         definition = toolchain_definition,
     )
-
-esp32_xtensa_lx6_gcc_14_2_0 = {
-    "linux-x86_64": linux_x86_64,
-}

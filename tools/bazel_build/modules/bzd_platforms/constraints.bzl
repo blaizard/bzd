@@ -2,6 +2,7 @@
 
 AL_CONSTRAINTS = {
     "esp32": {},
+    "esp32s3": {},
     "linux": {
         "alias": Label("@platforms//os:linux"),
     },
@@ -17,4 +18,5 @@ ISA_CONSTRAINTS = {
         "synonyms": ("x86-64", "x64", "amd64"),
     },
     "xtensa_lx6": {},
+    "xtensa_lx7": {},
 }

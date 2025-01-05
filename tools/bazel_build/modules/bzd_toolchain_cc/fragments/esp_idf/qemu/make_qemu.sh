@@ -2,7 +2,7 @@
 
 set -e
 
-VERSION="8.1.2"
+VERSION="9.0.0"
 HOST=linux_x86_64
 PACKAGE=${HOST}_${VERSION}
 INSTALL=$(pwd)/${PACKAGE}
@@ -21,7 +21,7 @@ sudo apt install -y \
 
 # ---- Setup ----
 
-git clone https://github.com/espressif/qemu.git -b "esp-develop" qemu
+git clone https://github.com/espressif/qemu.git --branch "esp-develop-9.0.0-20240606" qemu
 
 # ---- QEMU ----
 

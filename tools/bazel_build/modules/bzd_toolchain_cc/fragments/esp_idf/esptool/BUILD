@@ -16,13 +16,13 @@ py_binary(
 )
 
 sh_binary_wrapper(
-    name = "esp32_metadata",
+    name = "metadata",
     command = """
         {profiler} --groups {profile_groups} "$@"
     """,
     locations = {
         "//binary/elf:profiler": "profiler",
-        "//fragments/esp32/esptool:profile_groups.json": "profile_groups",
+        "//fragments/esp_idf/esptool:profile_groups.json": "profile_groups",
     },
     visibility = ["//visibility:public"],
 )

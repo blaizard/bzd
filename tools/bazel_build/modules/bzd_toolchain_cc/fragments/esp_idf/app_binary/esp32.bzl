@@ -1,7 +1,7 @@
 """Application binary functor."""
 
-load("//fragments/esp32/esptool:defs.bzl", "esptool")
-load("//fragments/esp32/qemu:defs.bzl", "esp32_qemu")
+load("//fragments/esp_idf/esptool:defs.bzl", "esptool")
+load("//fragments/esp_idf/qemu:defs.bzl", "esp32_qemu")
 
 def app_binary(module_ctx):
     """Application binary factory function.
@@ -22,9 +22,9 @@ def app_binary(module_ctx):
             ":app_executor_uart": "uart",
         },
         "app_metadata": [
-            Label("//fragments/esp32/esptool:esp32_metadata"),
+            Label("//fragments/esp_idf/esptool:metadata"),
         ],
         "build_files": [
-            Label("//fragments/esp32/app_binary/esp32_xtensa_lx6:esp32_xtensa_lx6.BUILD"),
+            Label("//fragments/esp_idf/app_binary:esp32.BUILD"),
         ],
     }

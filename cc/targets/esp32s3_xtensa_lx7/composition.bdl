@@ -1,0 +1,27 @@
+use "cc/components/std/stream/out/interface.bdl"
+use "cc/components/generic/stream/stub/interface.bdl"
+use "cc/components/xtensa/timer/gptimer/interface.bdl"
+use "cc/components/generic/clock/null/interface.bdl"
+use "cc/components/xtensa/core/interface.bdl"
+use "interfaces/stream.bdl"
+
+
+
+composition {
+	// Core 0 is considered the "Protocol CPU", it runs most of ESP IDF services.
+	core0 = bzd.components.esp32.Core(stackSize = 16000, name = "core[0]", cpu = 0, priority = 50);
+	// Core 1 is the "application CPU", hence it should have the highest priority.
+	core1 = bzd.components.esp32.Core(stackSize = 16000, name = "core[1]", cpu = 1, priority = 100);
+	executor = bzd.components.generic.Executor(cores = list(core0, core1)) [executor];
+	
+}
+
+composition {
+	out: bzd.OStream = bzd.components.std.Out();
+	in: bzd.IStream = bzd.components.generic.stream.Stub();
+	timer: bzd.Timer = bzd.components.esp32.timer.GPTimer();
+	clock: bzd.Clock = bzd.components.generic.clock.Null();
+	
+}
+
+
