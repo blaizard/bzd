@@ -132,7 +132,7 @@ _toolchain_maker_linux = repository_rule(
         # Execution
         "app_build": attr.string_list(),
         "app_executors": attr.string_dict(),
-        "app_metadata": attr.string_list(),
+        "app_metadata": attr.label_list(),
         # Tools
         "binaries": attr.string_dict(),
         "build_files": attr.label_list(),

@@ -25,7 +25,7 @@ def linux_x86_64(module_ctx, name):
             "strip": "xtensa-esp-elf/bin/strip",
         },
         "build_files": [
-            "@bzd_toolchain_cc//:fragments/esp32/esp32_xtensa_lx6_gcc_14.2.0/linux_x86_64.BUILD",
+            Label("//:fragments/esp32/esp32_xtensa_lx6_gcc_14.2.0/linux_x86_64.BUILD"),
         ],
         "compile_flags": [
             # Allow long calls
@@ -52,7 +52,7 @@ def linux_x86_64(module_ctx, name):
         ],
         "package_name": "xtensa-esp32-elf",
         "patches": [
-            "@bzd_toolchain_cc//:fragments/esp32/esp32_xtensa_lx6_gcc_14.2.0/wrapper_cc_start_end_group.patch",
+            Label("//:fragments/esp32/esp32_xtensa_lx6_gcc_14.2.0/wrapper_cc_start_end_group.patch"),
         ],
         "sha256": "e3e6dcf3d275c3c9ab0e4c8a9d93fd10e7efc035d435460576c9d95b4140c676",
         "strip_prefix": "xtensa-esp-elf",

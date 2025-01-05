@@ -31,8 +31,8 @@ sh_binary_wrapper(
     locations = {
         "@bzd_toolchain_cc//fragments/esp32/esptool:executor_uart": "executor_uart",
         "@esptool//:esptool": "esptool",
-        "@bzd_toolchain_cc//fragments/esp32/app_binary/esp32_xtensa_lx6:bootloader.bin": "bootloader",
-        "@bzd_toolchain_cc//fragments/esp32/app_binary/esp32_xtensa_lx6:partitions_singleapp.bin": "partitions",
+        "@esp32_xtensa_lx6_sdk//:bin/bootloader.bin": "bootloader",
+        "@esp32_xtensa_lx6_sdk//:bin/partition-table.bin": "partitions",
     },
     command = """
         {executor_uart} \
