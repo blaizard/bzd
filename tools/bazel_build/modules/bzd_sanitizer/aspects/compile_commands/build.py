@@ -3,7 +3,6 @@ import os
 import pathlib
 import typing
 import json
-import socket
 import threading
 import time
 
@@ -46,9 +45,14 @@ class Queue:
 		self.compile_commands_files: typing.Set[pathlib.Path] = set()
 
 	def empty(self) -> bool:
-		"""Check if the queue is empty or not."""
+		"""Check if the queue is empty."""
 
 		return len(self.compile_commands_files) == 0
+
+	def notEmpty(self) -> bool:
+		"""Check if the queue is not empty."""
+
+		return not self.empty()
 
 	def next(self) -> typing.Optional[pathlib.Path]:
 		"""Get the next file to process."""
@@ -62,26 +66,6 @@ class Queue:
 		self.trigger()
 
 
-class SocketServer:
-
-	def __init__(self, add: typing.Callable[[pathlib.Path], None], port: int) -> None:
-		self.add = add
-		self.port = port
-		self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-	def start(self) -> None:
-		self.socket.bind(("localhost", self.port))
-		self.socket.listen(10)
-
-		while True:
-			connection, _ = self.socket.accept()
-			try:
-				data = connection.recv(1024)
-				self.add(pathlib.Path(data.decode("utf-8")))
-			finally:
-				connection.close()
-
-
 class Manager:
 
 	def __init__(self, workspace_path: pathlib.Path, compile_commands_path: pathlib.Path) -> None:
@@ -91,7 +75,8 @@ class Manager:
 		self.bazel_out_path = self.output_base / "execroot" / "_main" / "bazel-out"
 		self.compile_commands_path = compile_commands_path
 		self.queue = Queue(trigger=self.trigger)
-		self.event = threading.Event()
+		self.cv = threading.Condition()
+		self.requestStop = False
 
 	@staticmethod
 	def getOuptutBasePath(workspace: pathlib.Path) -> pathlib.Path:
@@ -117,12 +102,14 @@ class Manager:
 		fragment["command"] = " ".join(command)
 
 	def start(self) -> None:
+		"""Generate the compile_commands.json file."""
+
 		while True:
-			self.event.wait(timeout=1)
-			if not self.queue.empty():
-				print("START")
+			with self.cv:
+				self.cv.wait_for(lambda: self.queue.notEmpty() or self.requestStop)
+			if self.queue.notEmpty():
 				with CompileCommands(self.compile_commands_path) as compile_commands:
-					while not self.queue.empty():
+					while self.queue.notEmpty():
 						f = self.queue.next()
 						try:
 							assert f is not None
@@ -132,12 +119,20 @@ class Manager:
 						for fragment in fragments:
 							self.updateFragment(fragment)
 							compile_commands.insert(fragment)
-				print("STOP")
-			self.event.clear()
+			if self.requestStop:
+				break
+
+	def stop(self) -> None:
+		"""Stop the manager."""
+
+		self.requestStop = True
+		self.trigger()
 
 	def trigger(self) -> None:
 		"""Called each time a new data is inserted in the queue."""
-		self.event.set()
+
+		with self.cv:
+			self.cv.notify()
 
 
 if __name__ == "__main__":
@@ -148,7 +143,9 @@ if __name__ == "__main__":
 	workspace_path = pathlib.Path(os.environ["BUILD_WORKING_DIRECTORY"])
 	compile_commands_path = workspace_path / "compile_commands.json"
 
-	result = localCommand(["find", "-L", "bazel-bin", "-name", "*compile_commands.json"], cwd=workspace_path)
+	result = localCommand(
+	    ["find", "-L", "bazel-bin", "-name", "*compile_commands.json", "-type", "f", "-not", "-path", "*.runfiles/*"],
+	    cwd=workspace_path)
 	files = [pathlib.Path(f.strip()) for f in result.getOutput().split("\n") if f.strip()]
 
 	manager = Manager(workspace_path=workspace_path, compile_commands_path=compile_commands_path)
@@ -156,9 +153,7 @@ if __name__ == "__main__":
 	for file in files:
 		manager.add(file)
 
-	server = SocketServer(add=manager.add, port=8089)
-	thread = threading.Thread(target=server.start)
+	thread = threading.Thread(target=manager.start)
 	thread.start()
-	manager.start()
-
+	manager.stop()
 	thread.join()

@@ -1,9 +1,9 @@
 load("@rules_python//python:defs.bzl", "py_binary")
 
 py_binary(
-    name = "server",
+    name = "build",
     srcs = [
-        "server.py",
+        "build.py",
     ],
     visibility = ["//visibility:public"],
     deps = [
