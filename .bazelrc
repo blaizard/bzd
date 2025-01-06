@@ -136,9 +136,9 @@ build:clang-tidy --output_groups=+clang_tidy
 build:mypy --aspects="@bzd_sanitizer//aspects/mypy:defs.bzl%mypy_aspect"
 build:mypy --output_groups=+mypy
 
-# compile command
-build:compile-commands --aspects="@bzd_sanitizer//aspects/compile_commands:defs.bzl%compile_commands_aspect"
-build:compile-commands --output_groups=+compile_commands
+# always generate compile command (cost is neglectable)
+build --aspects="@bzd_sanitizer//aspects/compile_commands:defs.bzl%compile_commands_aspect"
+build --output_groups=+compile_commands
 
 # Development and production build configuration
 build:dev -c dbg

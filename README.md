@@ -32,11 +32,12 @@ It features the following:
 
 The following target platforms are currently supported:
 
-| Name                 | Compiler | Version | Executors   | Debug |
-| -------------------- | -------- | ------- | ----------- | ----- |
-| linux_x86_64_clang\* | clang    | 17.0.2  | host\*      |       |
-| linux_x86_64_gcc     | gcc      | 13.1.0  | host\*      |       |
-| esp32_xtensa_lx6_gcc | gcc      | 12.2.0  | sim\*, uart | x     |
+| Name                   | Compiler | Version | Executors   | Debug |
+| ---------------------- | -------- | ------- | ----------- | ----- |
+| linux_x86_64_clang\*   | clang    | 17.0.2  | host\*      |       |
+| linux_x86_64_gcc       | gcc      | 14.2.0  | host\*      |       |
+| esp32_xtensa_lx6_gcc   | gcc      | 14.2.0  | sim\*, uart | x     |
+| esp32s3_xtensa_lx7_gcc | gcc      | 14.2.0  | sim\*, uart | x     |
 
 \* Default.
 
@@ -94,6 +95,12 @@ formatter and linters for YAML, json and markdown are also available.
 | Python   | yapf         | mypy                                | Yes           | Yes            |               |
 | Node     | prettier     | eslint                              | Yes           | Yes            |               |
 | Skylark  | buildifier   | buildifier                          |               |                | stardoc       |
+
+To generate the compile_commands.json file:
+
+```bash
+bazel run @bzd_sanitizer//aspects/compile_commands:build
+```
 
 ## Naming Convention
 

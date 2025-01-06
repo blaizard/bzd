@@ -186,13 +186,5 @@ compile_commands_aspect = aspect(
     implementation = _compile_commands_aspect_impl,
     fragments = ["cpp"],
     attr_aspects = ATTR_ASPECTS,
-    attrs = {
-        "_client": attr.label(
-            doc = "Compile command binary to be used.",
-            executable = True,
-            cfg = "exec",
-            default = Label("//aspects/compile_commands:client"),
-        ),
-    },
     toolchains = ["@bazel_tools//tools/cpp:toolchain_type"],
 )
