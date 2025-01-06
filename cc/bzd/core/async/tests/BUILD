@@ -23,11 +23,9 @@ bzd_cc_test(
         "suspend.cc",
     ],
     tags = ["stress"],
-    target_compatible_with = select({
-        "@esp32//:toolchain": ["@platforms//:incompatible"],
-        "@esp32s3//:toolchain": ["@platforms//:incompatible"],
-        "//conditions:default": [],
-    }),
+    target_compatible_with = [
+        "@bzd_platforms//al:linux",
+    ],
     deps = [
         "//cc/bzd/core/async",
         "//cc/bzd/test:multithread",
@@ -58,11 +56,9 @@ bzd_cc_test(
         "flaky",
         "stress",
     ],
-    target_compatible_with = select({
-        "@esp32//:toolchain": ["@platforms//:incompatible"],
-        "@esp32s3//:toolchain": ["@platforms//:incompatible"],
-        "//conditions:default": [],
-    }),
+    target_compatible_with = [
+        "@bzd_platforms//al:linux",
+    ],
     deps = [
         "//cc/bzd/core/async",
         "//cc/bzd/test:multithread",

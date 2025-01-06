@@ -20,11 +20,9 @@ cc_library(
     hdrs = [
         "jardinier.hh",
     ],
-    target_compatible_with = select({
-        "@esp32//:toolchain": [],
-        "@esp32s3//:toolchain": [],
-        "//conditions:default": ["@platforms//:incompatible"],
-    }),
+    target_compatible_with = [
+        "@bzd_platforms//al:esp_idf",
+    ],
     deps = [
         ":composition",
         "//cc:bzd",

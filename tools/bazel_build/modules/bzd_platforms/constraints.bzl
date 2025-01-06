@@ -15,6 +15,10 @@ AL_CONSTRAINTS = {
         "alias": Label("@platforms//os:linux"),
         "isa": ["arm64", "x86_64"],
     },
+    "posix": {
+        "children": ["linux"],
+        "isa": [],
+    },
 }
 
 ISA_CONSTRAINTS = {

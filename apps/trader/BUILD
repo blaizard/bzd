@@ -17,11 +17,9 @@ cc_library(
     hdrs = [
         "trader.hh",
     ],
-    target_compatible_with = select({
-        "@esp32//:toolchain": ["@platforms//:incompatible"],
-        "@esp32s3//:toolchain": ["@platforms//:incompatible"],
-        "//conditions:default": [],
-    }),
+    target_compatible_with = [
+        "@bzd_platforms//al:linux",
+    ],
     deps = [
         ":composition",
         "//cc:bzd",

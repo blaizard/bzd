@@ -6,10 +6,8 @@ cc_library(
         "-lpthread",
         "-pthread",
     ],
-    target_compatible_with = select({
-        "@esp32//:toolchain": ["@platforms//:incompatible"],
-        "@esp32s3//:toolchain": ["@platforms//:incompatible"],
-        "//conditions:default": [],
-    }),
+    target_compatible_with = [
+        "@bzd_platforms//al:posix",
+    ],
     visibility = ["//visibility:public"],
 )
