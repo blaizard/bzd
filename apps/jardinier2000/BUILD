@@ -22,6 +22,7 @@ cc_library(
     ],
     target_compatible_with = select({
         "@esp32//:toolchain": [],
+        "@esp32s3//:toolchain": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
     deps = [

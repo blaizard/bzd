@@ -25,6 +25,7 @@ bzd_cc_test(
     tags = ["stress"],
     target_compatible_with = select({
         "@esp32//:toolchain": ["@platforms//:incompatible"],
+        "@esp32s3//:toolchain": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
     deps = [
@@ -59,6 +60,7 @@ bzd_cc_test(
     ],
     target_compatible_with = select({
         "@esp32//:toolchain": ["@platforms//:incompatible"],
+        "@esp32s3//:toolchain": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
     deps = [
