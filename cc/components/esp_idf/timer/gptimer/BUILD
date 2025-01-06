@@ -19,17 +19,15 @@ cc_library(
     hdrs = [
         "gptimer.hh",
     ],
-    target_compatible_with = select({
-        "@bzd_platforms//isa:xtensa_lx6": [],
-        "@bzd_platforms//isa:xtensa_lx7": [],
-        "//conditions:default": ["@platforms//:incompatible"],
-    }),
+    target_compatible_with = [
+        "@bzd_platforms//al:esp_idf",
+    ],
     visibility = ["//visibility:public"],
     deps = [
         ":bdl",
         "//cc/bzd/core:print",
         "//cc/bzd/core/async",
-        "//cc/components/xtensa:error",
+        "//cc/components/esp_idf:error",
         "//cc/libs/timer:timer_isr",
     ],
 )

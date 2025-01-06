@@ -1,8 +1,8 @@
 use "cc/components/std/stream/out/interface.bdl"
 use "cc/components/generic/stream/stub/interface.bdl"
-use "cc/components/xtensa/timer/gptimer/interface.bdl"
+use "cc/components/esp_idf/timer/gptimer/interface.bdl"
 use "cc/components/generic/clock/null/interface.bdl"
-use "cc/components/xtensa/core/interface.bdl"
+use "cc/components/esp_idf/core/interface.bdl"
 use "interfaces/stream.bdl"
 
 

@@ -4,7 +4,7 @@
 #include "cc/bzd/container/result.hh"
 #include "cc/bzd/container/stack.hh"
 #include "cc/bzd/core/error.hh"
-#include "cc/components/xtensa/core/interface.hh"
+#include "cc/components/esp_idf/core/interface.hh"
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>

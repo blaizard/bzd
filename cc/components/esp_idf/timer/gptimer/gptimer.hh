@@ -1,7 +1,7 @@
 #pragma once
 
 #include "cc/bzd/core/async.hh"
-#include "cc/components/xtensa/timer/gptimer/interface.hh"
+#include "cc/components/esp_idf/timer/gptimer/interface.hh"
 #include "cc/libs/timer/timer_isr.hh"
 #include "driver/gptimer.h"
 

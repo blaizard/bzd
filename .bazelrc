@@ -120,13 +120,13 @@ build:gcc --platform_suffix=gcc
 coverage:gcc --experimental_split_coverage_postprocessing
 coverage:gcc --experimental_fetch_all_coverage_outputs
 
-# esp32-xtensa_lx6-gcc
-build:esp32 --platforms="@esp32//:platform-esp32-xtensa_lx6"
+# esp32_idf-xtensa_lx6-gcc
+build:esp32 --platforms="@esp32//:platform-esp32_idf-xtensa_lx6"
 build:esp32 --platform_suffix=esp32-xtensa_lx6-gcc
 
 # esp32s3-xtensa_lx7-gcc
-build:esp32s3 --platforms="@esp32s3//:platform-esp32s3-xtensa_lx7"
-build:esp32s3 --platform_suffix=esp32s3-xtensa_lx7-gcc
+build:esp32s3 --platforms="@esp32s3//:platform-esp32s3_idf-xtensa_lx7"
+build:esp32s3 --platform_suffix=esp32s3_idf-xtensa_lx7-gcc
 
 # clang-tidy
 build:clang-tidy --aspects="@bzd_sanitizer//aspects/clang_tidy:defs.bzl%clang_tidy_aspect"

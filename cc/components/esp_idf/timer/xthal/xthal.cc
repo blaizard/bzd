@@ -1,4 +1,4 @@
-#include "cc/components/xtensa/timer/xthal/xthal.hh"
+#include "cc/components/esp_idf/timer/xthal/xthal.hh"
 
 #include "sdkconfig.h"
 #include "xtensa/core-macros.h"

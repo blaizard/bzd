@@ -11,7 +11,7 @@ Defining a system is done with Bazel through a rule, as follow:
 bdl_system(
     nae = "application",
     targets = {
-        "esp32": "//cc/targets/esp32_xtensa_lx6",
+        "esp32": "//cc/targets/esp32_idf_xtensa_lx6",
         "hpc": "//cc/targets/linux:x86_64_clang",
         "script": "//python/targets/linux",
     },
@@ -21,7 +21,7 @@ bdl_system(
 )
 ```
 
-This tells that this system contains 3 binaries, the first one runs on a C++ `esp32_xtensa_lx6` target platform and which
+This tells that this system contains 3 binaries, the first one runs on a C++ `esp32_idf_xtensa_lx6` target platform and which
 executors are referred under the namespace `esp32`. Similarly the second one runs on a C++ `linux` platform and is defined
 under the namespace `hpc`. The third one, is a python binary that runs under `linux` and defined under `script` namespace.
 

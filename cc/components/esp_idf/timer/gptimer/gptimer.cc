@@ -1,6 +1,6 @@
-#include "cc/components/xtensa/timer/gptimer/gptimer.hh"
+#include "cc/components/esp_idf/timer/gptimer/gptimer.hh"
 
-#include "cc/components/xtensa/error.hh"
+#include "cc/components/esp_idf/error.hh"
 #include "sdkconfig.h"
 
 namespace bzd::components::esp32::timer {

@@ -15,12 +15,12 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/platform:panic",
+        "//cc/components/esp_idf/core",
+        "//cc/components/esp_idf/timer/gptimer",
         "//cc/components/generic/clock/null",
         "//cc/components/generic/executor",
         "//cc/components/generic/stream/stub",
         "//cc/components/std/stream/out",
-        "//cc/components/xtensa/core",
-        "//cc/components/xtensa/timer/gptimer",
         "//interfaces:stream",
     ],
 )
@@ -41,7 +41,7 @@ bdl_target(
 
 bdl_target_platform(
     name = "gcc",
-    platform = "@esp32//:platform-esp32-xtensa_lx6",
+    platform = "@esp32//:platform-esp32_idf-xtensa_lx6",
     target = ":auto",
     visibility = [
         "//visibility:public",

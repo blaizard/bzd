@@ -5,11 +5,9 @@ cc_library(
     hdrs = [
         "error.hh",
     ],
-    target_compatible_with = select({
-        "@bzd_platforms//isa:xtensa_lx6": [],
-        "@bzd_platforms//isa:xtensa_lx7": [],
-        "//conditions:default": ["@platforms//:incompatible"],
-    }),
+    target_compatible_with = [
+        "@bzd_platforms//al:esp_idf",
+    ],
     visibility = [
         "//visibility:public",
     ],
