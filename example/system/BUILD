@@ -22,7 +22,7 @@ cc_library(
 bdl_system(
     name = "system",
     targets = {
-        "esp32": "@@//cc/targets/esp32_idf_xtensa_lx6:gcc",
+        "esp32": "@@//cc/targets/esp32_idf:gcc",
         "hpc": "@@//cc/targets/linux:x86_64_clang",
     },
     deps = [
