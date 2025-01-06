@@ -2,7 +2,7 @@
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-def sdk(_, name = "esp32_xtensa_lx6_sdk"):
+def sdk(name = "esp32_xtensa_lx6_sdk"):
     http_archive(
         name = name,
         build_file = Label("//:fragments/esp_idf/sdk/sdk.BUILD"),
@@ -14,7 +14,7 @@ def sdk(_, name = "esp32_xtensa_lx6_sdk"):
         sha256 = "e0577241108d945f1ff1a4e0f3ef8c23685a8f2ca3cfa8328c6b69fadced4df8",
     )
 
-    return {
+    return name, {
         "compile_flags": [
             "-DESP_PLATFORM",
             "-DIDF_VER=\"v5.4-1-g6b7b8ea3d2\"",

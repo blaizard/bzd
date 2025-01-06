@@ -3,14 +3,21 @@
 load("//:fragments/esp_idf/sdk/esp32s3.bzl", "sdk")
 load("//cc:toolchain.bzl", "toolchain_maker", "toolchain_merge")
 load("//fragments/esp_idf/app_binary:esp32s3.bzl", "app_binary")
+load("//fragments/esp_idf/esptool:defs.bzl", "esptool")
+load("//fragments/esp_idf/qemu:defs.bzl", "esp32_qemu")
 
-def esp32s3_linux_x86_64(module_ctx, name):
+def esp32s3_linux_x86_64(name, use_fragment):
     """Metadata for ESP32S3 toolchains.
 
     Args:
-        module_ctx: The module context.
         name: The name of the toolchain.
+        use_fragment: Factory to make use of a fragment.
     """
+
+    use_fragment(esptool)
+    use_fragment(esp32_qemu)
+    _sdk_name, sdk_toolchain_definition = use_fragment(sdk)
+    _app_binary_name, app_binary_toolchain_definition = use_fragment(app_binary)
 
     toolchain_definition = {
         "binaries": {
@@ -69,8 +76,8 @@ def esp32s3_linux_x86_64(module_ctx, name):
 
     # Note, the order is important here. We want the definition of the SDK to have precedence over the
     # toolchain: includes from the SDK should have higher priority than the ones from the toolchain.
-    toolchain_definition = toolchain_merge(sdk(module_ctx), toolchain_definition)
-    toolchain_definition = toolchain_merge(app_binary(module_ctx), toolchain_definition)
+    toolchain_definition = toolchain_merge(sdk_toolchain_definition, toolchain_definition)
+    toolchain_definition = toolchain_merge(app_binary_toolchain_definition, toolchain_definition)
 
     toolchain_maker(
         name = name,

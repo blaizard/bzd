@@ -1,17 +1,13 @@
 """Metadata for Linux toolchains."""
 
-def linux(_module_ctx, _name):
+def linux():
     """Metadata for Linux toolchains.
-
-    Args:
-        _module_ctx: The module context.
-        _name: The name of the toolchain.
 
     Returns:
         The toolchain metadata.
     """
 
-    return {
+    return None, {
         "app_executors": {
             "@bzd_toolchain_cc//cc:executor_host": "default,host",
         },

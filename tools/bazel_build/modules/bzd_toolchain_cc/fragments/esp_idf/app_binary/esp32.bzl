@@ -1,19 +1,9 @@
 """Application binary functor."""
 
-load("//fragments/esp_idf/esptool:defs.bzl", "esptool")
-load("//fragments/esp_idf/qemu:defs.bzl", "esp32_qemu")
+def app_binary():
+    """Application binary factory function."""
 
-def app_binary(module_ctx):
-    """Application binary factory function.
-
-    Args:
-        module_ctx: The module context.
-    """
-
-    esp32_qemu(module_ctx)
-    esptool(module_ctx)
-
-    return {
+    return None, {
         "app_build": [
             ":app_build_to_image",
         ],

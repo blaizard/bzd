@@ -3,16 +3,18 @@
 load("//:fragments/clang/linux/defs.bzl", "linux")
 load("//cc:toolchain.bzl", "toolchain_maker", "toolchain_merge")
 
-def linux_arm64(module_ctx, name):
+def linux_arm64(name, use_fragment):
     """Metadata for Linux toolchains.
 
     Args:
-        module_ctx: The module context.
         name: The name of the toolchain.
+        use_fragment: Factory to make use of a fragment.
 
     Returns:
         The toolchain definition.
     """
+
+    _linux_name, linux_toolchain_definition = use_fragment(linux)
 
     toolchain_definition = {
         "build_files": [
@@ -67,7 +69,7 @@ def linux_arm64(module_ctx, name):
         ],
     }
 
-    toolchain_definition = toolchain_merge(toolchain_definition, linux(module_ctx, name))
+    toolchain_definition = toolchain_merge(toolchain_definition, linux_toolchain_definition)
 
     toolchain_maker(
         name = name,

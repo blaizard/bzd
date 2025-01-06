@@ -2,15 +2,11 @@
 
 load("@bzd_lib//:repository_multiplatform_maker.bzl", "repository_multiplatform_maker")
 
-def esp32_qemu(_module_ctx):
-    """ESP32 QEMU factory function.
-
-    Args:
-        _module_ctx: The module context.
-    """
+def esp32_qemu(name = "esp32_qemu"):
+    """ESP32 QEMU factory function."""
 
     repository_multiplatform_maker(
-        name = "esp32_qemu",
+        name = name,
         repositories = [{
             "archive": {
                 "build_file": "@bzd_toolchain_cc//:fragments/esp_idf/qemu/linux_x86_64.BUILD",
@@ -29,3 +25,5 @@ def esp32_qemu(_module_ctx):
             "qemu": "qemu",
         },
     )
+
+    return name, {}

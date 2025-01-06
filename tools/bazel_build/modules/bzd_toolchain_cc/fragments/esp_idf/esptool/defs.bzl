@@ -2,15 +2,11 @@
 
 load("@bzd_lib//:repository_multiplatform_maker.bzl", "repository_multiplatform_maker")
 
-def esptool(_module_ctx):
-    """esptool factory function.
-
-    Args:
-        _module_ctx: The module context.
-    """
+def esptool(name = "esptool"):
+    """esptool factory function."""
 
     repository_multiplatform_maker(
-        name = "esptool",
+        name = name,
         repositories = [{
             "archive": {
                 "build_file": "@bzd_toolchain_cc//:fragments/esp_idf/esptool/esptool.BUILD",
@@ -29,3 +25,5 @@ def esptool(_module_ctx):
             "esptool": "esptool_binary",
         },
     )
+
+    return name, {}

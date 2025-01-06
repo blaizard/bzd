@@ -161,13 +161,21 @@ def _toolchain_cc_impl(module_ctx):
                 default = toolchain.default,
             )
 
+    fragments = {}
+
+    def use_fragment(fragment, **kwargs):
+        if fragment not in fragments:
+            result = fragment(**kwargs)
+            fragments[fragment] = result
+        return fragments[fragment]
+
     # Build the repositories.
     for name, toolchain in configs.items():
         # Create execution/target specific repositories.
         configs = _make_configs(name, toolchain.version)
         tools = {}
         for repo_name, config in configs.items():
-            result = config.factory(module_ctx, repo_name)
+            result = config.factory(repo_name, use_fragment)
             if result:
                 for target, actual in result.setdefault("tools", {}).items():
                     tools.setdefault(target, {})["@bzd_platforms//al_isa:{}".format(config.execution)] = "@{}//:{}".format(repo_name, actual)
