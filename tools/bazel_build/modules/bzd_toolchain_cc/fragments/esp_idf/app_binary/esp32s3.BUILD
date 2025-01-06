@@ -14,7 +14,7 @@ sh_binary_wrapper(
 sh_binary_wrapper(
     name = "app_executor_qemu",
     locations = {
-        "@esp32_qemu//:qemu": "qemu",
+        "@esp32_qemu//:qemu-system-xtensa": "qemu",
         "@bzd_python//bzd/utils:binary_builder": "builder",
         "@esp32s3_xtensa_lx7_sdk//:bin/bootloader.bin": "bootloader",
         "@esp32s3_xtensa_lx7_sdk//:bin/partition-table.bin": "partitions",
