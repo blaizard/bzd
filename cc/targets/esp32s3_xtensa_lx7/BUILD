@@ -39,11 +39,11 @@ bdl_target(
     ],
 )
 
-#bdl_target_platform(
-#    name = "gcc",
-#    platform = "@esp32s3//:platform-esp32s3-xtensa_lx7",
-#    target = ":auto",
-#    visibility = [
-#        "//visibility:public",
-#    ],
-#)
+bdl_target_platform(
+    name = "gcc",
+    platform = "@esp32s3//:platform-esp32s3-xtensa_lx7",
+    target = ":auto",
+    visibility = [
+        "//visibility:public",
+    ],
+)

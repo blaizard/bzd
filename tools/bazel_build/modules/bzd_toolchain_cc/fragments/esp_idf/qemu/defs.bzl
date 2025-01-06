@@ -22,7 +22,7 @@ def esp32_qemu(name = "esp32_qemu"):
             ],
         }],
         expose = {
-            "qemu": "qemu",
+            "qemu-system-xtensa": "qemu-system-xtensa",
         },
     )
 

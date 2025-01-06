@@ -14,14 +14,14 @@ sh_binary_wrapper(
 sh_binary_wrapper(
     name = "app_executor_qemu",
     locations = {
-        "@esp32_qemu//:qemu": "qemu",
+        "@esp32_qemu//:qemu-system-xtensa": "qemu",
         "@bzd_python//bzd/utils:binary_builder": "builder",
         "@esp32_xtensa_lx6_sdk//:bin/bootloader.bin": "bootloader",
         "@esp32_xtensa_lx6_sdk//:bin/partition-table.bin": "partitions",
     },
     command = """
         {builder} --size 4MB --chunk {bootloader},0x1000 --chunk {partitions},0x8000 --chunk $2,0x10000 qemu_flash.bin
-        {qemu} -no-reboot -nographic -machine esp32 -m 4 -drive file=qemu_flash.bin,if=mtd,format=raw
+        {qemu} -machine esp32 -m 4M -drive file=qemu_flash.bin,if=mtd,format=raw -no-reboot -nographic
     """,
     visibility = ["//visibility:public"],
 )

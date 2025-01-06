@@ -6,7 +6,7 @@ sh_binary_wrapper(
         "@esptool//:esptool": "esptool",
     },
     command = """
-        {esptool} --chip esp32s3 elf2image --flash_mode "dio" --flash_freq "40m" --flash_size "4MB" --min-rev 0 --elf-sha256-offset 0xb0 -o "$2" "$1" > /dev/null
+        {esptool} --chip ESP32-S3 elf2image -o "$2" "$1" > /dev/null
     """,
     visibility = ["//visibility:public"],
 )
@@ -21,7 +21,7 @@ sh_binary_wrapper(
     },
     command = """
         {builder} --size 4MB --chunk {bootloader},0x1000 --chunk {partitions},0x8000 --chunk $2,0x10000 qemu_flash.bin
-        {qemu} -no-reboot -nographic -machine esp32s3 -m 4 -drive file=qemu_flash.bin,if=mtd,format=raw
+        {qemu} -machine esp32s3 -m 4M -drive file=qemu_flash.bin,if=mtd,format=raw -no-reboot -nographic
     """,
     visibility = ["//visibility:public"],
 )
