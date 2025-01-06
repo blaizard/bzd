@@ -32,6 +32,11 @@ jobs:
               - cp tools/ci/travis/.bazelrc.local .bazelrc.local
               - ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=gcc --config=prod --config=cc --platform_suffix=gcc-prod
 
+        - name: "[normal] esp32s3 prod"
+          script:
+              - cp tools/ci/travis/.bazelrc.local .bazelrc.local
+              - ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=esp32s3 --config=prod --config=cc --platform_suffix=esp32s3-prod
+
         - name: "[sanitizer] sanitizer"
           script:
               - cp tools/ci/travis/.bazelrc.local .bazelrc.local

@@ -67,6 +67,13 @@ pipeline
 						sh "./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=esp32 --config=prod --config=cc --platform_suffix=esp32-prod"
 					}
 				}
+				stage("[normal] esp32s3 prod")
+				{
+					steps
+					{
+						sh "./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=esp32s3 --config=prod --config=cc --platform_suffix=esp32s3-prod"
+					}
+				}
 				stage("[stress] dev (10 runs)")
 				{
 					steps

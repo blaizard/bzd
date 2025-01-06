@@ -50,6 +50,12 @@ jobs:
                   ./bin/timeit --path github/normal_esp32_prod/command-0 \
                   ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=esp32 --config=prod --config=cc --platform_suffix=esp32-prod
 
+            - name: "[normal] esp32s3 prod"
+              run: |
+                  ./tools/bazel clean --expunge
+                  ./bin/timeit --path github/normal_esp32s3_prod/command-0 \
+                  ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=esp32s3 --config=prod --config=cc --platform_suffix=esp32s3-prod
+
             - name: "[sanitizer] asan/lsan/ubsan"
               run: |
                   ./tools/bazel clean --expunge

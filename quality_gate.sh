@@ -14,6 +14,8 @@ echo  "==== [normal] gcc prod ==============================="
 ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=gcc --config=prod --config=cc --platform_suffix=gcc-prod $EXTRA_FLAGS
 echo  "==== [normal] esp32 prod ==============================="
 ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=esp32 --config=prod --config=cc --platform_suffix=esp32-prod $EXTRA_FLAGS
+echo  "==== [normal] esp32s3 prod ==============================="
+./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=esp32s3 --config=prod --config=cc --platform_suffix=esp32s3-prod $EXTRA_FLAGS
 echo  "==== [stress] dev (100 runs) ==============================="
 ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --build_tests_only --test_tag_filters=stress,-cc-coverage --config=dev --runs_per_test=100 --local_test_jobs=1 --platform_suffix=stress-dev $EXTRA_FLAGS
 echo  "==== [stress] prod (100 runs) ==============================="

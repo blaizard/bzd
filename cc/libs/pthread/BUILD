@@ -8,6 +8,7 @@ cc_library(
     ],
     target_compatible_with = select({
         "@esp32//:toolchain": ["@platforms//:incompatible"],
+        "@esp32s3//:toolchain": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
     visibility = ["//visibility:public"],
