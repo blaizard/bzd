@@ -1,4 +1,4 @@
-load("@bzd_bdl//:defs.bzl", "bdl_target")
+load("@bzd_bdl//:defs.bzl", "bdl_target", "bdl_target_platform")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(

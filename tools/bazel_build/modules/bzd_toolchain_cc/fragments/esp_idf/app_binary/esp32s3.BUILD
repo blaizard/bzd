@@ -37,10 +37,10 @@ sh_binary_wrapper(
     command = """
         {executor_uart} \
                 --esptool {esptool} \
-                --device_vid_pid 0x10C4 0xEA60 \
-                --size 4MB --chunk {bootloader},0x1000 --chunk {partitions},0x8000 --chunk $2,0x10000 \
+                --device_vid_pid 0x303A 0x1001 \
+                --size 4MB --chunk {bootloader},0x0 --chunk {partitions},0x8000 --chunk $2,0x10000 \
                 -- \
-                --chip esp32s3 --baud 460800 --before default_reset --after hard_reset write_flash --flash_mode dio --flash_freq 40m --flash_size detect
+                --chip esp32s3 --baud 460800 --before default_reset --after hard_reset write_flash --flash_mode dio --flash_freq 80m --flash_size 4MB
     """,
     visibility = ["//visibility:public"],
 )
