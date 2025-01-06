@@ -122,14 +122,12 @@ coverage:gcc --experimental_fetch_all_coverage_outputs
 
 # esp32-xtensa_lx6-gcc
 build:esp32 --platforms="@esp32//:platform-esp32-xtensa_lx6"
-build:esp32 --features=-supports_dynamic_linker
 build:esp32 --platform_suffix=esp32-xtensa_lx6-gcc
 # TODO: check why this is needed. It fails without this when using --config=remote
 test:esp32 --strategy=TestRunner=sandboxed
 
 # esp32s3-xtensa_lx7-gcc
 build:esp32s3 --platforms="@esp32s3//:platform-esp32s3-xtensa_lx7"
-build:esp32s3 --features=-supports_dynamic_linker
 build:esp32s3 --platform_suffix=esp32s3-xtensa_lx7-gcc
 # TODO: check why this is needed. It fails without this when using --config=remote
 test:esp32s3 --strategy=TestRunner=sandboxed
