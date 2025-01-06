@@ -20,7 +20,7 @@ sh_binary_wrapper(
         "@esp32s3_xtensa_lx7_sdk//:bin/partition-table.bin": "partitions",
     },
     command = """
-        {builder} --size 4MB --chunk {bootloader},0x1000 --chunk {partitions},0x8000 --chunk $2,0x10000 qemu_flash.bin
+        {builder} --size 4MB --chunk {bootloader},0x0 --chunk {partitions},0x8000 --chunk $2,0x10000 qemu_flash.bin
         {qemu} -machine esp32s3 -m 4M -drive file=qemu_flash.bin,if=mtd,format=raw -no-reboot -nographic
     """,
     visibility = ["//visibility:public"],
