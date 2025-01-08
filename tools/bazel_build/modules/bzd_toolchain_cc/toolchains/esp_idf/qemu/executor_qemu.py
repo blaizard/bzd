@@ -16,7 +16,7 @@ def tryDecodeBacktrace(binary: pathlib.Path, output: str) -> None:
 		output: The output string.
 	"""
 
-	def findStackTrace(output):
+	def findStackTrace(output: str) -> typing.Optional[typing.List[str]]:
 		for line in output.split("\n"):
 			if line.strip().startswith("Backtrace: "):
 				return line.strip().split(" ")[1:]
@@ -37,7 +37,7 @@ def tryDecodeBacktrace(binary: pathlib.Path, output: str) -> None:
 		print(f"#{index} {address} in {symbol} {source}", flush=True)
 
 
-def splitEndOfOptionsMarker(args: typing.List[str]):
+def splitEndOfOptionsMarker(args: typing.List[str]) -> typing.Tuple[typing.List[str], typing.List[str]]:
 	"""Split the given argument list at the end-of-options marker if any."""
 	try:
 		index = args.index("--")
