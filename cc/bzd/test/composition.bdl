@@ -1,13 +1,12 @@
-use "interfaces/stream.bdl"
-use "interfaces/timer.bdl"
+use "cc/bzd/test/runner.bdl"
 
 namespace bzd.test;
 
 
 // Test suite runner.
-method run(out = {out}, timer = {timer});
 composition {
-	run();
+	runner = Runner();
+	runner.run();
 	
 }
 

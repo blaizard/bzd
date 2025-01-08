@@ -21,7 +21,7 @@ sh_binary_wrapper(
     },
     command = """
         {builder} --size 4MB --chunk {bootloader},0x0 --chunk {partitions},0x8000 --chunk $2,0x10000 qemu_flash.bin
-        {qemu} -machine esp32s3 -m 4M -drive file=qemu_flash.bin,if=mtd,format=raw -no-reboot -nographic
+        {qemu} --binary $1 -- -machine esp32s3 -m 4M -drive file=qemu_flash.bin,if=mtd,format=raw -no-reboot -nographic
     """,
     visibility = ["//visibility:public"],
 )

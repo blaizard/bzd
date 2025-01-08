@@ -1,0 +1,18 @@
+use "cc/bzd/test/runner.bdl"
+
+namespace tests;
+
+
+component CustomRunner : bzd.test.Runner {
+config:
+	timer = {timer};
+	
+}
+
+composition {
+	runner = CustomRunner();
+	runner.run();
+	
+}
+
+

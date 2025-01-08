@@ -39,36 +39,43 @@ void Manager::failInternals(
 	::bzd::printNoLock(out, "Assertion failed.\n").sync();
 }
 
-bool bzd::test::Manager::run(bzd::OStream& out, bzd::Timer& timer)
+bzd::Async<bool> bzd::test::Manager::run(bzd::OStream& out, bzd::Timer& timer, bzd::test::Runner& runner)
 {
 	bzd::Size nbFailedTests{0};
 	auto* node = &nodeRoot;
 
-	::bzd::print(out, "[==========] Running test(s)\n"_csv).sync();
+	co_await !bzd::print(out, "[==========] Running test(s)\n"_csv);
 	if (!node->info)
 	{
-		::bzd::print(out, "[   FAILED ] Empty test suite is considered a failed test.\n"_csv).sync();
-		return false;
+		co_await !bzd::print(out, "[   FAILED ] Empty test suite is considered a failed test.\n"_csv);
+		co_return false;
 	}
 
 	::maybeOut = &out;
 	while (node->isValid())
 	{
 		const auto seed = node->info->getSeed();
-		bzd::test::Context context{seed, timer};
+		bzd::test::Context context{seed, timer, runner};
 
-		::bzd::print(out, "[ RUN      ] {}.{}"_csv, node->info->testCaseName, node->info->testName).sync();
+		co_await !::bzd::print(out, "[ RUN      ] {}.{}"_csv, node->info->testCaseName, node->info->testName);
 		if (node->variant.size())
 		{
-			::bzd::print(out, ".{}"_csv, node->variant).sync();
+			co_await !::bzd::print(out, ".{}"_csv, node->variant);
 		}
-		::bzd::print(out, " (seed={})\n"_csv, seed).sync();
+		co_await !::bzd::print(out, " (seed={})\n"_csv, seed);
 
 		currentTestFailed_ = false;
 		const auto maybeTimeStart = timer.getTime();
 		try
 		{
-			node->function(context);
+			if (node->function.isAsync())
+			{
+				co_await !node->function.runAsync(context);
+			}
+			else
+			{
+				node->function.run(context);
+			}
 		}
 		catch (...)
 		{
@@ -81,27 +88,18 @@ bool bzd::test::Manager::run(bzd::OStream& out, bzd::Timer& timer)
 		if (currentTestFailed_)
 		{
 			++nbFailedTests;
-			::bzd::print(out, "[   FAILED ] ({}ms)\n"_csv, timeDiffMs).sync();
+			co_await !::bzd::print(out, "[   FAILED ] ({}ms)\n"_csv, timeDiffMs);
 		}
 		else
 		{
-			::bzd::print(out, "[       OK ] ({}ms)\n"_csv, timeDiffMs).sync();
+			co_await !::bzd::print(out, "[       OK ] ({}ms)\n"_csv, timeDiffMs);
 		}
 
 		node = node->next;
 	}
 	::maybeOut = nullptr;
 
-	return (nbFailedTests == 0);
-}
-
-bzd::Async<bool> run(bzd::OStream& out, bzd::Timer& timer)
-{
-	if (::bzd::test::Manager::getInstance().run(out, timer))
-	{
-		co_return true;
-	}
-	co_return ::bzd::error::Failure("Test failed."_csv);
+	co_return (nbFailedTests == 0);
 }
 
 } // namespace bzd::test

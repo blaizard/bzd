@@ -4,13 +4,24 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 package(default_testonly = True)
 
 bdl_library(
+    name = "runner",
+    srcs = [
+        "runner.bdl",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//interfaces:stream",
+        "//interfaces:timer",
+    ],
+)
+
+bdl_library(
     name = "composition",
     srcs = [
         "composition.bdl",
     ],
     deps = [
-        "//interfaces:stream",
-        "//interfaces:timer",
+        ":runner",
     ],
 )
 
@@ -27,7 +38,7 @@ cc_library(
 )
 
 cc_library(
-    name = "test",
+    name = "test_without_composition",
     srcs = [
         "test.cc",
     ],
@@ -37,7 +48,7 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        ":composition",
+        ":runner",
         "//cc/bzd/container:ring_buffer",
         "//cc/bzd/core:print",
         "//cc/bzd/core/async",
@@ -50,6 +61,22 @@ cc_library(
         "//cc/bzd/utility/ranges:begin",
         "//cc/bzd/utility/ranges:end",
         "//interfaces:timer",
+    ],
+)
+
+cc_library(
+    name = "test",
+    srcs = [
+        "test.cc",
+    ],
+    hdrs = [
+        "test.hh",
+        "test_internal.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":composition",
+        ":test_without_composition",
     ],
 )
 

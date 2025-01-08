@@ -3,7 +3,7 @@
 #include "cc/bzd/container/ring_buffer.hh"
 #include "cc/bzd/core/async.hh"
 #include "cc/bzd/meta/macro.hh"
-#include "cc/bzd/test/composition.hh"
+#include "cc/bzd/test/runner.hh"
 #include "cc/bzd/type_traits/is_same_class.hh"
 #include "cc/bzd/type_traits/remove_cvref.hh"
 #include "cc/bzd/utility/numeric_limits.hh"
@@ -20,7 +20,7 @@
 #define BZDTEST_REGISTER_NAME_(testCaseName, testName) registerBzdTest_##testCaseName##_##testName##_
 #define BZDTEST_COMPILE_TIME_FCT_NAME_(testCaseName, testName) compileTimeFunctionBzdTest_##testCaseName##_##testName
 
-#define BZDTEST_REGISTER_(testCaseName, testName)                                                                                          \
+#define BZDTEST_REGISTER_(testCaseName, testName, returnType)                                                                              \
 	class BZDTEST_CLASS_NAME_(testCaseName, testName) : public ::bzd::test::Test<1>                                                        \
 	{                                                                                                                                      \
 	public:                                                                                                                                \
@@ -29,11 +29,11 @@
 			this->registerTest(::bzd::test::FunctionPointer::toMember<BZDTEST_CLASS_NAME_(testCaseName, testName),                         \
 																	  &BZDTEST_CLASS_NAME_(testCaseName, testName)::test>(*this));         \
 		}                                                                                                                                  \
-		void test([[maybe_unused]] auto& test) const;                                                                                      \
+		returnType test([[maybe_unused]] auto& test) const;                                                                                \
 	};                                                                                                                                     \
 	static BZDTEST_CLASS_NAME_(testCaseName, testName) BZDTEST_REGISTER_NAME_(testCaseName, testName){};
 
-#define BZDTEST_TEMPLATE_REGISTER_(testCaseName, testName, typeList)                                                                       \
+#define BZDTEST_TEMPLATE_REGISTER_(testCaseName, testName, typeList, returnType)                                                           \
 	template <class... Types>                                                                                                              \
 	class BZDTEST_CLASS_NAME_(testCaseName, testName) : public ::bzd::test::Test<sizeof...(Types)>                                         \
 	{                                                                                                                                      \
@@ -46,52 +46,54 @@
 			 ...);                                                                                                                         \
 		}                                                                                                                                  \
 		template <class TestType>                                                                                                          \
-		void test([[maybe_unused]] auto& test) const;                                                                                      \
+		returnType test([[maybe_unused]] auto& test) const;                                                                                \
 	};                                                                                                                                     \
 	static BZDTEST_CLASS_NAME_(testCaseName, testName)<BZD_REMOVE_PARENTHESIS(typeList)> BZDTEST_REGISTER_NAME_(testCaseName, testName){};
 
 #define BZDTEST_2(testCaseName, testName)                                                                                                  \
-	BZDTEST_REGISTER_(testCaseName, testName)                                                                                              \
+	BZDTEST_REGISTER_(testCaseName, testName, void)                                                                                        \
 	void BZDTEST_CLASS_NAME_(testCaseName, testName)::test([[maybe_unused]] auto& test) const
 
 #define BZDTEST_3(testCaseName, testName, typeList)                                                                                        \
-	BZDTEST_TEMPLATE_REGISTER_(testCaseName, testName, typeList)                                                                           \
+	BZDTEST_TEMPLATE_REGISTER_(testCaseName, testName, typeList, void)                                                                     \
 	template <class... Types>                                                                                                              \
 	template <class TestType>                                                                                                              \
 	void BZDTEST_CLASS_NAME_(testCaseName, testName)<Types...>::test([[maybe_unused]] auto& test) const
 
 #define BZDTEST_ASYNC_2(testCaseName, testName)                                                                                            \
-	BZDTEST_REGISTER_(testCaseName, testName)                                                                                              \
+	BZDTEST_REGISTER_(testCaseName, testName, ::bzd::Async<>)                                                                              \
 	::bzd::Async<> BZDTEST_FCT_NAME_(testCaseName, testName)(auto&);                                                                       \
-	void BZDTEST_CLASS_NAME_(testCaseName, testName)::test(auto& test) const                                                               \
+	::bzd::Async<> BZDTEST_CLASS_NAME_(testCaseName, testName)::test(auto& test) const                                                     \
 	{                                                                                                                                      \
-		const auto result = BZDTEST_FCT_NAME_(testCaseName, testName)(test).sync();                                                        \
+		const auto result = co_await BZDTEST_FCT_NAME_(testCaseName, testName)(test);                                                      \
 		if (!static_cast<bool>(result))                                                                                                    \
 		{                                                                                                                                  \
 			BZDTEST_FAIL_MESSAGE_("Failure\nUnhandled failure from async.", result.error().getMessage().data());                           \
 		}                                                                                                                                  \
+		co_return {};                                                                                                                      \
 	}                                                                                                                                      \
 	::bzd::Async<> BZDTEST_FCT_NAME_(testCaseName, testName)([[maybe_unused]] auto& test)
 
 #define BZDTEST_ASYNC_3(testCaseName, testName, typeList)                                                                                  \
-	BZDTEST_TEMPLATE_REGISTER_(testCaseName, testName, typeList)                                                                           \
+	BZDTEST_TEMPLATE_REGISTER_(testCaseName, testName, typeList, ::bzd::Async<>)                                                           \
 	template <class TestType>                                                                                                              \
 	::bzd::Async<> BZDTEST_FCT_NAME_(testCaseName, testName)(auto&);                                                                       \
 	template <class... Types>                                                                                                              \
 	template <class TestType>                                                                                                              \
-	void BZDTEST_CLASS_NAME_(testCaseName, testName)<Types...>::test(auto& test) const                                                     \
+	::bzd::Async<> BZDTEST_CLASS_NAME_(testCaseName, testName)<Types...>::test(auto& test) const                                           \
 	{                                                                                                                                      \
-		const auto result = BZDTEST_FCT_NAME_(testCaseName, testName)<TestType>(test).sync();                                              \
+		const auto result = co_await BZDTEST_FCT_NAME_(testCaseName, testName)<TestType>(test);                                            \
 		if (!static_cast<bool>(result))                                                                                                    \
 		{                                                                                                                                  \
 			BZDTEST_FAIL_MESSAGE_("Failure\nUnhandled failure from async.", result.error().getMessage().data());                           \
 		}                                                                                                                                  \
+		co_return {};                                                                                                                      \
 	}                                                                                                                                      \
 	template <class TestType>                                                                                                              \
 	::bzd::Async<> BZDTEST_FCT_NAME_(testCaseName, testName)([[maybe_unused]] auto& test)
 
 #define BZDTEST_ASYNC_MULTITHREAD_(testCaseName, testName, nbThreads)                                                                      \
-	BZDTEST_REGISTER_(testCaseName, testName)                                                                                              \
+	BZDTEST_REGISTER_(testCaseName, testName, void)                                                                                        \
 	::bzd::Async<> BZDTEST_FCT_NAME_(testCaseName, testName)(auto&);                                                                       \
 	void BZDTEST_CLASS_NAME_(testCaseName, testName)::test(auto& test) const                                                               \
 	{                                                                                                                                      \
@@ -128,7 +130,7 @@
 	::bzd::Async<> BZDTEST_FCT_NAME_(testCaseName, testName)([[maybe_unused]] auto& test)
 
 #define BZDTEST_CONSTEXPR_BEGIN_(testCaseName, testName)                                                                                   \
-	BZDTEST_REGISTER_(testCaseName, testName)                                                                                              \
+	BZDTEST_REGISTER_(testCaseName, testName, void)                                                                                        \
 	constexpr void BZDTEST_FCT_NAME_(testCaseName, testName)(auto&);                                                                       \
 	constexpr void BZDTEST_COMPILE_TIME_FCT_NAME_(testCaseName, testName)();                                                               \
 	void BZDTEST_CLASS_NAME_(testCaseName, testName)::test(auto& test) const                                                               \
@@ -478,6 +480,9 @@ class Test
 } // namespace bzd
 
 namespace bzd::test {
+
+class Runner;
+
 class Context
 {
 public:
@@ -485,7 +490,10 @@ public:
 
 public:
 	Context() = default;
-	constexpr explicit Context(const SeedType seed, bzd::Timer& timer) noexcept : generator_{seed}, timer_{&timer} {}
+	constexpr explicit Context(const SeedType seed, bzd::Timer& timer, bzd::test::Runner& runner) noexcept :
+		generator_{seed}, timer_{&timer}, runner_{&runner}
+	{
+	}
 
 	template <class T, T min = NumericLimits<T>::min(), T max = NumericLimits<T>::max()>
 	requires(concepts::integral<T> && !concepts::sameClassAs<T, Bool>)
@@ -513,9 +521,16 @@ public:
 
 	bzd::Timer& timer() noexcept { return *timer_; }
 
+	template <class T>
+	T& getRunner() noexcept
+	{
+		return static_cast<T&>(*runner_);
+	}
+
 private:
 	bzd::XorwowEngine generator_{53267};
 	bzd::Timer* timer_{nullptr};
+	bzd::test::Runner* runner_{nullptr};
 };
 
 /// Convert a type into a string view at compile type.
@@ -584,7 +599,19 @@ struct FunctionPointer
 		return pointer;
 	}
 
-	constexpr void operator()(::bzd::test::Context& context) { return function_(object_, context); }
+	template <class Object, ::bzd::Async<> (Object::*memberPtr)(::bzd::test::Context&) const>
+	static constexpr auto toMember(Object& object) noexcept
+	{
+		FunctionPointer pointer;
+		pointer.functionAsync_ = wrapper<Object, memberPtr>;
+		pointer.object_ = static_cast<void*>(&object);
+		return pointer;
+	}
+
+	constexpr bool isAsync() const noexcept { return function_ == nullptr; }
+
+	constexpr void run(::bzd::test::Context& context) { return function_(object_, context); }
+	::bzd::Async<> runAsync(::bzd::test::Context& context) { co_return co_await functionAsync_(object_, context); }
 
 private:
 	template <class Object, void (Object::*memberPtr)(::bzd::test::Context&) const>
@@ -594,8 +621,17 @@ private:
 		return (object->*memberPtr)(context);
 	}
 
+	template <class Object, ::bzd::Async<> (Object::*memberPtr)(::bzd::test::Context&) const>
+	static ::bzd::Async<> wrapper(const void* objectErased, ::bzd::test::Context& context)
+	{
+		const auto object = static_cast<const Object*>(objectErased);
+		co_return co_await (object->*memberPtr)(context);
+	}
+
 	using Pointer = void (*)(const void*, ::bzd::test::Context&);
 	Pointer function_{nullptr};
+	using PointerAsync = ::bzd::Async<> (*)(const void*, ::bzd::test::Context&);
+	PointerAsync functionAsync_{nullptr};
 	void* object_{nullptr};
 };
 
@@ -650,7 +686,7 @@ public:
 	Manager(Manager const&) = delete;
 	void operator=(Manager const&) = delete;
 
-	bool run(bzd::OStream& out, bzd::Timer& timer);
+	bzd::Async<bool> run(bzd::OStream& out, bzd::Timer& timer, bzd::test::Runner& runner);
 
 	template <class Value1, class Value2>
 	void fail(const char* const file, const bzd::Int32 line, const char* const message, Value1&& value1, Value2&& value2)
@@ -681,6 +717,20 @@ private:
 	bool currentTestFailed_ = false;
 };
 
-bzd::Async<bool> run(bzd::OStream& out, bzd::Timer& timer);
+class Runner
+{
+public:
+	Runner() = default;
+	constexpr Runner(auto&&) noexcept {}
+
+	bzd::Async<bool> run(bzd::OStream& out, bzd::Timer& timer)
+	{
+		if (co_await !::bzd::test::Manager::getInstance().run(out, timer, *this))
+		{
+			co_return true;
+		}
+		co_return ::bzd::error::Failure("Test failed."_csv);
+	}
+};
 
 } // namespace bzd::test

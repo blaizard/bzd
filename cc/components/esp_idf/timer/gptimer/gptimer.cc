@@ -5,7 +5,7 @@
 
 namespace bzd::components::esp32::timer {
 
-static bool gptimerCallback(::gptimer_handle_t, const ::gptimer_alarm_event_data_t*, void* userCtx)
+static bool gptimerCallbackISR(::gptimer_handle_t, const ::gptimer_alarm_event_data_t*, void* userCtx)
 {
 	GPTimer& timer = *static_cast<GPTimer*>(userCtx);
 	timer.triggerForISR();
@@ -26,7 +26,7 @@ bzd::Async<> GPTimer::init() noexcept
 	{
 		co_return bzd::error::EspErr("gptimer_new_timer", result);
 	}
-	const ::gptimer_event_callbacks_t callback{.on_alarm = gptimerCallback};
+	const ::gptimer_event_callbacks_t callback{.on_alarm = gptimerCallbackISR};
 	if (const auto result = ::gptimer_register_event_callbacks(gptimer_, &callback, this); result != ESP_OK)
 	{
 		co_return bzd::error::EspErr("gptimer_register_event_callbacks", result);
@@ -39,7 +39,6 @@ bzd::Async<> GPTimer::init() noexcept
 	{
 		co_return bzd::error::EspErr("gptimer_start", result);
 	}
-
 	co_return {};
 }
 
@@ -57,7 +56,6 @@ bzd::Async<> GPTimer::shutdown() noexcept
 	{
 		co_return bzd::error::EspErr("gptimer_del_timer", result);
 	}
-
 	co_return {};
 }
 
