@@ -1,6 +1,7 @@
 load("@bzd_bdl//:defs.bzl", "bdl_library")
+load("@bzd_lib//:executable_test.bzl", "bzd_executable_test")
 load("@rules_cc//cc:defs.bzl", "cc_library")
-load("//cc/bdl:cc.bzl", "bzd_cc_test")
+load("//cc/bdl:cc.bzl", "bzd_cc_binary", "bzd_cc_test")
 
 package(default_testonly = True)
 
@@ -16,9 +17,9 @@ bdl_library(
 )
 
 cc_library(
-    name = "lib",
+    name = "runner",
     hdrs = [
-        "timer.hh",
+        "runner.hh",
     ],
     deps = [
         ":composition",
@@ -28,11 +29,28 @@ cc_library(
 )
 
 bzd_cc_test(
-    name = "tests",
+    name = "timer",
     srcs = [
         "timer.cc",
     ],
     deps = [
-        ":lib",
+        ":runner",
     ],
+)
+
+bzd_cc_binary(
+    name = "duration_binary",
+    testonly = True,
+    srcs = [
+        "duration.cc",
+    ],
+    deps = [
+        ":runner",
+    ],
+)
+
+bzd_executable_test(
+    name = "duration",
+    executable = ":duration_binary",
+    min_duration = 0.8,
 )

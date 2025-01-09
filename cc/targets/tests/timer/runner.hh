@@ -2,7 +2,7 @@
 
 #include "cc/bzd.hh"
 #include "cc/bzd/test/test.hh"
-#include "cc/targets/tests/composition.hh"
+#include "cc/targets/tests/timer/composition.hh"
 
 namespace tests {
 

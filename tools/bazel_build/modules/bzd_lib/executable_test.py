@@ -2,6 +2,7 @@ import argparse
 import pathlib
 import typing
 import sys
+import time
 
 from bzd.utils.run import localCommand
 
@@ -18,6 +19,16 @@ if __name__ == "__main__":
 	    help="The executable outputs the given string.",
 	)
 	parser.add_argument(
+	    "--min-duration",
+	    type=float,
+	    help="The minimum execution duration in seconds of the executable.",
+	)
+	parser.add_argument(
+	    "--max-duration",
+	    type=float,
+	    help="The maximum execution duration in seconds of the executable.",
+	)
+	parser.add_argument(
 	    "executable",
 	    type=pathlib.Path,
 	    help="The executable to be tested.",
@@ -30,7 +41,9 @@ if __name__ == "__main__":
 	)
 	args = parser.parse_args()
 
+	startTime = time.time()
 	result = localCommand(cmds=[str(args.executable)] + args.rest, ignoreFailure=True, stdout=True, stderr=True)
+	duration = time.time() - startTime
 
 	nbChecks = 0
 
@@ -44,6 +57,15 @@ if __name__ == "__main__":
 		assert args.expected_output in result.getStdout() or args.expected_output in result.getStderr(
 		), f"The string '{args.expected_output}' cannot be found in the output of the executable."
 
-	assert nbChecks > 0, f"Please set at least one of the attributes 'expected_returncode' or 'expected_output'."
+	if args.min_duration is not None:
+		nbChecks += 1
+		assert duration >= args.min_duration, f"The execution time was less than the expected minimal duration {args.min_duration}s vs {duration}s."
+
+	if args.max_duration is not None:
+		nbChecks += 1
+		assert duration <= args.max_duration, f"The execution time was more than the expected maximal duration {args.max_duration}s vs {duration}s."
+
+	attributes = ["expected_returncode", "expected_output", "min_duration", "max_duration"]
+	assert nbChecks > 0, f"Please set at least one of the attributes: {', '.join(attributes)}."
 
 	sys.exit(0)

@@ -1,6 +1,5 @@
-#include "cc/targets/tests/timer.hh"
-
 #include "cc/bzd/test/test.hh"
+#include "cc/targets/tests/timer/runner.hh"
 
 TEST_ASYNC(Timer, Basic)
 {
