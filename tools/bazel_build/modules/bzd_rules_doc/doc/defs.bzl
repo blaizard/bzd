@@ -196,3 +196,27 @@ def doc_binary(srcs = None, data = None, **kwargs):
         data = data,
         **kwargs
     )
+
+# buildifier: disable=no-effect
+"""
+TODO: implement doxygen rules.
+Blocked by: https://github.com/TendTo/rules_doxygen/issues/15
+
+bazel_dep(name = "rules_doxygen", version = "2.0.0")
+
+load("@doxygen//:doxygen.bzl", "doxygen")
+
+def doc_cc_library(name, srcs, **kwargs):
+    \"""Create a C++ documentation library.\"""
+
+    doxygen(
+        name = name,
+        srcs = srcs,
+        generate_html = False,
+        generate_xml = True,
+        xml_output = "xml",
+        outs = ["xml"],
+        quiet = True,
+        **kwargs
+    )
+"""
