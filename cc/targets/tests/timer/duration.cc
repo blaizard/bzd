@@ -4,7 +4,7 @@
 TEST_ASYNC(Timer, Duration)
 {
 	auto& timer = test.template getRunner<tests::CustomRunner>().timer;
-	co_await !timer.delay(bzd::units::Second{1});
+	co_await !timer.delay(bzd::units::Second{5});
 
 	co_return {};
 }

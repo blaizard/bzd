@@ -52,5 +52,6 @@ bzd_cc_binary(
 bzd_executable_test(
     name = "duration",
     executable = ":duration_binary",
-    min_duration = 0.8,
+    min_duration = 4,
+    run_on_host_platform = True,
 )
