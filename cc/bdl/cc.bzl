@@ -5,27 +5,14 @@ load("@bzd_bdl//:defs.bzl", "bdl_library", "bdl_system", "bdl_system_test")
 load("@bzd_toolchain_cc//cc:defs.bzl", "cc_compile")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
-def bzd_cc_binary(name, target = "//cc/targets:auto", tags = [], bdls = [], hdrs = [], srcs = [], deps = [], testonly = False, **kwargs):
-    """Rule that defines a bzd C++ binary.
-
-    Args:
-        name: Name for the target.
-        target: The target name.
-        tags: Tags to be added to the rules.
-        bdls: BDLs to be added to the rule.
-        hdrs: Headers to be added to the rule.
-        srcs: Sources to be added to the rule.
-        deps: Dependencies to be added to the rule.
-        testonly: If this is a testonly target.
-        **kwargs: Additional attributes to be added to the `bdl_system` rule.
-    """
-
+def _bzd_cc_binary_impl(name, visibility, target, tags, bdls, hdrs, srcs, deps, testonly, **kwargs):
     updated_deps = deps + []
     if bdls:
         bdl_library(
             name = "{}.bdls".format(name),
             tags = tags + ["manual"],
             srcs = bdls,
+            testonly = testonly,
         )
         updated_deps.append("{}.bdls".format(name))
 
@@ -36,8 +23,8 @@ def bzd_cc_binary(name, target = "//cc/targets:auto", tags = [], bdls = [], hdrs
             hdrs = hdrs,
             srcs = srcs,
             deps = updated_deps,
-            testonly = testonly,
             alwayslink = True,
+            testonly = testonly,
         )
         updated_deps.append("{}.srcs".format(name))
 
@@ -49,8 +36,42 @@ def bzd_cc_binary(name, target = "//cc/targets:auto", tags = [], bdls = [], hdrs
         tags = tags + ["cc"],
         deps = updated_deps,
         testonly = testonly,
+        visibility = visibility,
         **kwargs
     )
+
+bzd_cc_binary = macro(
+    implementation = _bzd_cc_binary_impl,
+    inherit_attrs = bdl_system,
+    attrs = {
+        "bdls": attr.label_list(
+            doc = "BDLs to be added to the rule.",
+            configurable = False,
+        ),
+        "deps": attr.label_list(
+            doc = "Dependencies to be added to the rule.",
+            configurable = False,
+        ),
+        "hdrs": attr.label_list(
+            doc = "Headers to be added to the rule.",
+            configurable = False,
+        ),
+        "srcs": attr.label_list(
+            doc = "Sources to be added to the rule.",
+            configurable = False,
+        ),
+        "tags": attr.string_list(
+            doc = "Tags to be added to the rule.",
+            configurable = False,
+        ),
+        "target": attr.label(
+            doc = "The target name",
+            default = Label("//cc/targets:auto"),
+            configurable = False,
+        ),
+        "targets": None,
+    },
+)
 
 def bzd_cc_test(name, target = "//cc/targets:auto", tags = [], bdls = [], hdrs = [], srcs = [], deps = [], testonly = True, **kwargs):
     """Rule that defines a bzd C++ test binary.

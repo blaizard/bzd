@@ -381,20 +381,10 @@ def _make_composition_language_providers(ctx, name, deps, target_deps = None, ta
     return system_providers
 
 def _bdl_system_impl(ctx):
-    # Compose the target and their name into a dictionary.
-    targets = {}
-    for target, names in ctx.attr.targets.items():
-        for name in names.split(","):
-            if name in ("all", ""):
-                fail("The target name '{}' is protected and therefore cannot be used.".format(name))
-            if name in targets:
-                fail("The target name '{}' is defined twice.".format(name))
-            targets[name] = target
-
     # Loop through all the name/target pairs and generate the composition files.
     bdl_providers = {}
     deps = {}
-    for name, target in targets.items():
+    for name, target in ctx.attr.targets.items():
         target_provider = target[_BdlTargetInfo]
         target_name = "{}.{}".format(ctx.label.name, name)
 
@@ -432,7 +422,7 @@ _bdl_system = rule(
             doc = "List of dependencies.",
             aspects = [_aspect_bdl_providers],
         ),
-        "targets": attr.label_keyed_string_dict(
+        "targets": attr.string_keyed_label_dict(
             mandatory = True,
             providers = [_BdlTargetInfo],
             doc = "Targets to be included for the system definition.",
@@ -547,46 +537,41 @@ def _bzd_binary_generic(is_test):
 _bdl_binary = _bzd_binary_generic(is_test = False)
 _bdl_test = _bzd_binary_generic(is_test = True)
 
-def _bdl_system_generic(is_test, name, targets, testonly, deps, **kwargs):
-    """Create a system rule.
+_BDL_SYSTEM_GENERIC_ATTR = {
+    "deps": attr.label_list(
+        doc = "Dependencies for the rule.",
+    ),
+    "platform": None,
+    "system": None,
+    "target": None,
+    "target_name": None,
+    "targets": attr.string_keyed_label_dict(
+        doc = "A dictionary with name and target corresponding to the binaries for this system.",
+        configurable = False,
+    ),
+    "testonly": attr.bool(
+        doc = "Set testonly attribute.",
+        configurable = False,
+    ),
+}
 
-    A system rule create a composition and build all related binary together.
+def _target_to_platform(target):
+    """Convert a target label into its related platform label."""
+    if Label(target).name.endswith("auto"):
+        return None
+    return str(Label(target)) + ".platform"
 
-    Args:
-        is_test: If this is a test or not.
-        name: The name of the system.
-        targets: a dictionary with name and target corresponding to the binaries
-                for this system.
-        testonly: Set testonly attribute.
-        deps: Dependencies for the rule.
-        **kwargs: Additional attributes to pass to the rule.
-    """
-
-    def _target_to_platform(target):
-        """Convert a target label into its related platform label."""
-        if Label(target).name.endswith("auto"):
-            return None
-        return str(Label(target)) + ".platform"
-
-    targets_processed = {}
-    for target_name, target in targets.items():
-        if target in targets_processed:
-            targets_processed[target] += "," + target_name
-        else:
-            targets_processed[target] = target_name
-
+def _bdl_system_macro_impl(name, targets, testonly, deps, **kwargs):
     _bdl_system(
         name = "{}.system".format(name),
-        targets = targets_processed,
+        targets = targets,
         testonly = testonly,
         deps = deps,
         tags = ["manual"],
     )
 
-    binary_rule = _bdl_test if is_test else _bdl_binary
-
     for target_name, target in targets.items():
-        binary_rule(
+        _bdl_binary(
             name = "{}.{}".format(name, target_name) if len(targets) > 1 else name,
             platform = _target_to_platform(target),
             target = target,
@@ -596,11 +581,37 @@ def _bdl_system_generic(is_test, name, targets, testonly, deps, **kwargs):
             **kwargs
         )
 
-def bdl_system(name, targets, deps = None, testonly = None, **kwargs):
-    _bdl_system_generic(is_test = False, name = name, targets = targets, deps = deps, testonly = False if testonly == None else testonly, **kwargs)
+bdl_system = macro(
+    implementation = _bdl_system_macro_impl,
+    inherit_attrs = _bdl_binary,
+    attrs = _BDL_SYSTEM_GENERIC_ATTR,
+)
 
-def bdl_system_test(name, targets, deps = None, testonly = True, **kwargs):
-    _bdl_system_generic(is_test = True, name = name, targets = targets, deps = deps, testonly = True if testonly == None else testonly, **kwargs)
+def _bdl_system_test_macro_impl(name, targets, testonly, deps, **kwargs):
+    _bdl_system(
+        name = "{}.system".format(name),
+        targets = targets,
+        testonly = testonly,
+        deps = deps,
+        tags = ["manual"],
+    )
+
+    for target_name, target in targets.items():
+        _bdl_test(
+            name = "{}.{}".format(name, target_name) if len(targets) > 1 else name,
+            platform = _target_to_platform(target),
+            target = target,
+            target_name = target_name,
+            testonly = testonly,
+            system = "{}.system".format(name),
+            **kwargs
+        )
+
+bdl_system_test = macro(
+    implementation = _bdl_system_test_macro_impl,
+    inherit_attrs = _bdl_test,
+    attrs = _BDL_SYSTEM_GENERIC_ATTR,
+)
 
 def _bdl_target_impl(ctx):
     return _BdlTargetInfo(

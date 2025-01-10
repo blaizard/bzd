@@ -1,7 +1,7 @@
 load("@bzd_bdl//:defs.bzl", "bdl_library")
 load("@bzd_lib//:executable_test.bzl", "bzd_executable_exec_test")
 load("@rules_cc//cc:defs.bzl", "cc_library")
-load("//cc/bdl:cc.bzl", "bzd_cc_binary", "bzd_cc_test")
+load("//cc/bdl:cc.bzl", "bzd_cc_binary")
 
 package(default_testonly = True)
 
@@ -28,21 +28,11 @@ cc_library(
     ],
 )
 
-bzd_cc_test(
-    name = "timer",
-    srcs = [
-        "timer.cc",
-    ],
-    deps = [
-        ":runner",
-    ],
-)
-
 bzd_cc_binary(
-    name = "duration_binary",
+    name = "out_binary",
     testonly = True,
     srcs = [
-        "duration.cc",
+        "out.cc",
     ],
     deps = [
         ":runner",
@@ -50,8 +40,8 @@ bzd_cc_binary(
 )
 
 bzd_executable_exec_test(
-    name = "duration",
-    executable = ":duration_binary",
-    min_duration = 4,
+    name = "out",
+    executable = ":out_binary",
+    expected_output = "TEST MESSAGE 95485743",
     tags = ["cc"],
 )

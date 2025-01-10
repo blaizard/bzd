@@ -1,84 +1,72 @@
 """Rule to test an executable target."""
 
 load("//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
-load("//lib:attrs.bzl", "ATTRS_COMMON_BUILD_RULES", "attrs_assert_any_of")
-
-def _host_platform_transition_impl(_settings, attr):
-    if attr.run_on_host_platform:
-        return {"//command_line_option:platforms": "@bazel_tools//tools:host_platform"}
-    return None
-
-_host_platform_transition = transition(
-    implementation = _host_platform_transition_impl,
-    inputs = [],
-    outputs = ["//command_line_option:platforms"],
-)
 
 def _bzd_executable_test_impl(ctx):
+    arguments_executor = []
+    if ctx.attr.expected_returncode:
+        arguments_executor += ["--expected-returncode", ctx.attr.expected_returncode]
+    if ctx.attr.expected_output:
+        arguments_executor += ["--expected-output", "'{}'".format(ctx.attr.expected_output)]
+    if ctx.attr.min_duration != -1:
+        arguments_executor += ["--min-duration", str(ctx.attr.min_duration)]
+    if ctx.attr.max_duration != -1:
+        arguments_executor += ["--max-duration", str(ctx.attr.max_duration)]
+
     return [sh_binary_wrapper_impl(
         ctx = ctx,
         locations = {
             ctx.attr.executable: "executable",
-            ctx.attr._executor[0]: "executor",
+            ctx.attr._executor: "executor",
         },
         output = ctx.outputs.executable,
         command = "{{executor}} {arguments_executor} {{executable}} -- {arguments_executable}".format(
-            arguments_executor = " ".join(ctx.attr.arguments_executor),
-            arguments_executable = " ".join(ctx.attr.arguments_executable),
+            arguments_executor = " ".join(arguments_executor),
+            arguments_executable = " ".join(ctx.attr.arguments),
         ),
     )]
 
-_bzd_executable_test = rule(
-    implementation = _bzd_executable_test_impl,
-    attrs = {
-        "arguments_executable": attr.string_list(
-            doc = "The list of string to be used as argument to the underlying executable.",
-        ),
-        "arguments_executor": attr.string_list(
-            doc = "The list of string to be used as argument to the underlying executor.",
+def _bzd_executable_test_attrs_factory(cfg):
+    return {
+        "arguments": attr.string_list(
+            doc = "The list of string to be used as argument to the executable.",
         ),
         "executable": attr.label(
             executable = True,
             cfg = "target",
             mandatory = True,
         ),
-        "run_on_host_platform": attr.bool(
-            doc = "Whether or not the test executor should run on the host platform.",
+        "expected_output": attr.string(
+            doc = "An expected string that is contained within the output of the executable.",
+        ),
+        "expected_returncode": attr.string(
+            doc = "The return code expected by the executable.",
+        ),
+        "max_duration": attr.int(
+            doc = "An expected minimal duration in seconds of the executable execution.",
+            default = -1,
+        ),
+        "min_duration": attr.int(
+            doc = "An expected minimal duration in seconds of the executable execution.",
+            default = -1,
         ),
         "_executor": attr.label(
             executable = True,
-            cfg = _host_platform_transition,
+            cfg = cfg,
             default = Label("//:executable_test"),
         ),
-    },
+    }
+
+bzd_executable_test = rule(
+    doc = "Test the given executable target.",
+    implementation = _bzd_executable_test_impl,
+    attrs = _bzd_executable_test_attrs_factory(cfg = "target"),
     test = True,
 )
 
-def bzd_executable_test(name, executable, args = None, expected_returncode = None, expected_output = None, min_duration = None, max_duration = None, run_on_host_platform = False, **kwargs):
-    """Test the given executable target.
-
-    Args:
-        name: The name of the rule.
-        executable: The executable to be tested.
-        args: Extra arguments to be passed to the executable.
-        expected_returncode: The return code expected by the executable.
-        expected_output: An expected string that is contained within the output of the executable.
-        min_duration: An expected minimal duration in seconds of the executable execution.
-        max_duration: An expected maximal duration in seconds of the executable execution.
-        run_on_host_platform: Whether or not the test executor should run on the host platform.
-        **kwargs: extra common build rules attributes.
-    """
-
-    attrs_assert_any_of(kwargs, ATTRS_COMMON_BUILD_RULES)
-
-    _bzd_executable_test(
-        name = name,
-        arguments_executor = ([] if expected_returncode == None else ["--expected-returncode", str(expected_returncode)]) +
-                             ([] if expected_output == None else ["--expected-output", "'{}'".format(expected_output)]) +
-                             ([] if min_duration == None else ["--min-duration", str(min_duration)]) +
-                             ([] if max_duration == None else ["--max-duration", str(max_duration)]),
-        arguments_executable = args,
-        executable = executable,
-        run_on_host_platform = run_on_host_platform,
-        **kwargs
-    )
+bzd_executable_exec_test = rule(
+    doc = "Test the given executable target using the execution platform.",
+    implementation = _bzd_executable_test_impl,
+    attrs = _bzd_executable_test_attrs_factory(cfg = "exec"),
+    test = True,
+)
