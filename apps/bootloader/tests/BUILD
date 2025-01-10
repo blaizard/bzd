@@ -56,14 +56,14 @@ bzd_executable_test(
     name = "update_test",
     executable = ":update",
     expected_output = "SUCCESS!",
-    expected_returncode = 0,
+    expected_returncode = "0",
 )
 
 bzd_executable_test(
     name = "noop_test",
     executable = "//apps/bootloader",
     expected_output = "Running",
-    expected_returncode = 0,
+    expected_returncode = "0",
 )
 
 bzd_config(
@@ -88,5 +88,5 @@ bzd_executable_test(
     args = ["12"],
     executable = ":with_application",
     expected_output = "144",
-    expected_returncode = 0,
+    expected_returncode = "0",
 )
