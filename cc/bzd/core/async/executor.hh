@@ -5,10 +5,12 @@
 #include "cc/bzd/container/threadsafe/non_owning_ring_spin.hh"
 #include "cc/bzd/container/variant.hh"
 #include "cc/bzd/core/async/executable.hh"
+#include "cc/bzd/core/async/executor_profiler.hh"
 #include "cc/bzd/platform/atomic.hh"
 #include "cc/bzd/utility/ranges/associate_scope.hh"
 #include "cc/bzd/utility/synchronization/spin_shared_mutex.hh"
 #include "cc/bzd/utility/synchronization/sync_lock_guard.hh"
+#include "cc/components/generic/executor_profiler/noop/noop.hh"
 
 namespace bzd::async::impl {
 
@@ -21,16 +23,18 @@ class ExecutorContext : public bzd::threadsafe::NonOwningForwardListElement</*mu
 {
 public: // Traits.
 	using Executor = bzd::async::impl::Executor<Executable>;
-	using IdType = UInt32;
+	using IdType = bzd::async::profiler::UIdType;
 	using TickType = UInt32;
 	using OnTerminateCallback = bzd::FunctionRef<bzd::Optional<Executable&>(void)>;
 	using Continuation = bzd::Variant<bzd::Monostate, Executable*, OnTerminateCallback>;
 
 public:
-	constexpr ExecutorContext() noexcept : id_{makeUId()} {}
+	constexpr ExecutorContext(const UInt16 coreUId) noexcept : coreUId_{coreUId}, contextUId_{makeUId()} {}
 
 	/// Get the unique identifier of this context across this executor.
-	[[nodiscard]] constexpr IdType getUId() const noexcept { return id_; }
+	[[nodiscard]] constexpr IdType getUId() const noexcept { return contextUId_; }
+	/// Get the unique identifier of this context across this executor.
+	[[nodiscard]] constexpr IdType getCoreUId() const noexcept { return coreUId_; }
 	/// Get the current tick for this executor.
 	[[nodiscard]] constexpr TickType getTick() const noexcept { return tick_; }
 	/// Provide an executable to be enqued sequentially, after the execution of the current executable.
@@ -68,7 +72,8 @@ private:
 	}
 
 private:
-	const IdType id_;
+	const UInt16 coreUId_;
+	const IdType contextUId_;
 	TickType tick_{0};
 	Continuation continuation_{};
 };
@@ -112,11 +117,16 @@ public:
 	/// Run all the workload currently in the queue.
 	///
 	/// Drain all workloads and exit only when the queue is empty.
-	void run() noexcept
+	///
+	/// \param coreUId The core unique identifier on which this context is running.
+	/// \param profiler The profiler to be used to profile the activity on this context.
+	template <class Profiler = bzd::components::generic::ExecutorProfilerNoop>
+	void run(const UInt16 coreUId, Profiler& profiler = bzd::components::generic::getExecutorProfilerNoop()) noexcept
 	{
 		// Storage for context related to the this running instance.
-		ExecutorContext<Executable> context{};
+		ExecutorContext<Executable> context{coreUId};
 		auto scope = registerContext(context);
+		auto scopeProfiler = registerProfiler(profiler, context);
 
 		// Set the status.
 		{
@@ -132,25 +142,31 @@ public:
 		while ((getWorkloadCount() > 0 || context.getTick() <= minIterationCount) && status_.load() != Status::abortRequested)
 		{
 			// Drain remaining handles
-			auto maybeExecutable = pop();
-			while (maybeExecutable.hasValue())
+			auto maybeExecutable = pop(context);
+			if (maybeExecutable.hasValue())
 			{
-				auto& executable = maybeExecutable.valueMutable();
-				const auto isCanceled = executable.isCanceled();
-				if (isCanceled)
+				profiler.event(profiler::ExecutableScheduled{});
+				do
 				{
-					executable.cancel(context);
-				}
-				else
-				{
-					executable.resume(context);
-				}
+					auto& executable = maybeExecutable.valueMutable();
+					const auto isCanceled = executable.isCanceled();
+					if (isCanceled)
+					{
+						profiler.event(profiler::ExecutableCanceled{});
+						executable.cancel(context);
+					}
+					else
+					{
+						executable.resume(context);
+					}
 
-				// Execute the continuation if any, this instead of enqueuing it,
-				// as it will speed up execution by avoiding unnecessary atomic operations,
-				// keeping continuation running on the same core to please caching
-				// and reduce the number of spin locks required to update the queue.
-				maybeExecutable = context.popContinuation();
+					// Execute the continuation if any, this instead of enqueuing it,
+					// as it will speed up execution by avoiding unnecessary atomic operations,
+					// keeping continuation running on the same core to please caching
+					// and reduce the number of spin locks required to update the queue.
+					maybeExecutable = context.popContinuation();
+				} while (maybeExecutable.hasValue());
+				profiler.event(profiler::ExecutableUnscheduled{});
 			}
 			context.updateTick();
 		}
@@ -179,7 +195,12 @@ public:
 	/// Schedule a new executable on this executor.
 	constexpr void schedule(Executable& executable, const ExecutableMetadata::Type type) noexcept
 	{
-		executable.setType(type);
+		schedule(executable, ExecutableMetadata{type});
+	}
+
+	constexpr void schedule(Executable& executable, const ExecutableMetadata& metadata) noexcept
+	{
+		executable.setMetadata(metadata);
 		executable.setExecutor(*this);
 		push(executable);
 	}
@@ -201,8 +222,6 @@ public:
 		auto scope = makeSyncSharedLockGuard(contextMutex_);
 		return ranges::associateScope(context_, bzd::move(scope));
 	}
-
-	constexpr void pushBack(Executable& executable) noexcept { queue_.pushBack(executable); }
 
 private:
 	/// Create a scope for the current context, it uses RAII pattern to control the lifetime of the context.
@@ -236,6 +255,19 @@ private:
 			}
 			bzd::assert::isTrue(result.hasValue());
 		}};
+	}
+
+	/// Create a scope for the current profiler, it uses RAII pattern to control the lifetime of the context.
+	///
+	/// \param profiler The profiler object to be attached.
+	/// \param context The context object to be attached.
+	/// \return A scope controlling the lifetime of the profiler.
+	template <class Profiler>
+	[[nodiscard]] auto registerProfiler(Profiler& profiler, const ExecutorContext<Executable>& context) const noexcept
+	{
+		const auto uid = context.getUId();
+		profiler.event(profiler::NewCore{uid});
+		return ScopeGuard{[uid, &profiler]() { profiler.event(profiler::DeleteCore{uid}); }};
 	}
 
 	/// Push a new workload to the queue.
@@ -274,9 +306,14 @@ private:
 		++queueCount_;
 	}
 
-	[[nodiscard]] bzd::Optional<Executable&> pop() noexcept
+	/// Pop the next executable to process.
+	///
+	/// \param context The context that should match the executable, to ensure that async runs on the
+	///                same thread.
+	[[nodiscard]] bzd::Optional<Executable&> pop(ExecutorContext<Executable>& context) noexcept
 	{
-		auto maybeExecutable = queue_.popFront([](auto& executable) { return !executable.isSkipped(); });
+		const auto coreUId = context.getCoreUId();
+		auto maybeExecutable = queue_.popFront([coreUId](auto& executable) { return executable.isReadyToBeScheduled(coreUId); });
 		if (maybeExecutable)
 		{
 			// Show the stack usage
@@ -284,6 +321,9 @@ private:
 			// static void* initial_stack = &stack;
 			// std::cout << "stack: "  << initial_stack << "+" << (reinterpret_cast<bzd::IntPointer>(initial_stack) -
 			// reinterpret_cast<bzd::IntPointer>(stack)) << std::endl;
+
+			// Associate this executable with this context.
+			maybeExecutable->pinCore(coreUId);
 
 			if (maybeExecutable->getType() == ExecutableMetadata::Type::workload)
 			{

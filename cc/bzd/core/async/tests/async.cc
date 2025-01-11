@@ -109,7 +109,7 @@ TEST_ASYNC(Coroutine, PassThrough)
 
 TEST_ASYNC(Coroutine, asyncAll)
 {
-	bzd::String<128> trace;
+	bzd::String<64> trace;
 	const auto result = co_await bzd::async::all(nested(trace, "a", 10), nested(trace, "b", -4));
 	EXPECT_EQ(trace, "[a1][a0][b1][b0][a2][b2]");
 	EXPECT_EQ(result.size(), 2U);

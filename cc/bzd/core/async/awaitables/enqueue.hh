@@ -26,19 +26,31 @@ protected:
 	constexpr Enqueue(Self&&) noexcept = delete;
 	constexpr Self& operator=(Self&&) noexcept = delete;
 
-	constexpr void enqueueAsyncs(bzd::async::impl::PromiseBase& caller, bzd::Optional<CancellationToken&> maybeToken) noexcept
+	constexpr void enqueueAsyncs(bzd::async::impl::PromiseBase& caller,
+								 bzd::Optional<CancellationToken&> maybeToken,
+								 const Bool parallel) noexcept
 	{
 		auto& executor{caller.getExecutor()};
 		continuation_.emplace(caller);
-		constexprForContainerInc(asyncs_, [&](auto& async) {
+
+		// If multi core is enabled, set the context for it.
+		auto metadata = caller.getMetadata();
+		if (parallel)
+		{
+			metadata.anyCore();
+		}
+
+		// Schedule all asyncs
+		const auto schedule = [&](auto& async) {
 			auto& executable = async.getExecutable();
 			if (maybeToken.hasValue())
 			{
 				executable.setCancellationToken(maybeToken.valueMutable());
 			}
 			executable.setConditionalContinuation(callback_);
-			executor.schedule(executable, caller.getType());
-		});
+			executor.schedule(executable, metadata);
+		};
+		bzd::apply([&](auto&... async) { return (schedule(async), ...); }, asyncs_);
 	}
 
 protected:
@@ -56,9 +68,10 @@ public: // Traits.
 
 public: // Constructor.
 	template <class... Ts>
-	constexpr EnqueueAll(Ts&&... asyncs) noexcept :
+	constexpr EnqueueAll(const Bool parallel, Ts&&... asyncs) noexcept :
 		Enqueue<Asyncs...>{bzd::async::impl::PromiseBase::OnTerminateCallback::toMember<Self, &Self::onTerminateCallback>(*this),
-						   bzd::forward<Ts>(asyncs)...}
+						   bzd::forward<Ts>(asyncs)...},
+		parallel_{parallel}
 	{
 	}
 
@@ -68,7 +81,7 @@ public: // Coroutine specializations.
 	constexpr void await_suspend(bzd::async::impl::coroutine_handle<T> caller) noexcept
 	{
 		auto& promise = caller.promise();
-		this->enqueueAsyncs(promise, promise.getCancellationToken());
+		this->enqueueAsyncs(promise, promise.getCancellationToken(), parallel_);
 	}
 
 	// NOLINTNEXTLINE(readability-identifier-naming)
@@ -96,6 +109,7 @@ private:
 	}
 
 private:
+	Bool parallel_;
 	bzd::Atomic<Size> counter_{0};
 };
 
@@ -108,9 +122,10 @@ public: // Traits.
 
 public: // Constructor.
 	template <class... Ts>
-	constexpr EnqueueAny(Ts&&... asyncs) noexcept :
+	constexpr EnqueueAny(const Bool parallel, Ts&&... asyncs) noexcept :
 		Enqueue<Asyncs...>{bzd::async::impl::PromiseBase::OnTerminateCallback::toMember<Self, &Self::onTerminateCallback>(*this),
-						   bzd::forward<Ts>(asyncs)...}
+						   bzd::forward<Ts>(asyncs)...},
+		parallel_{parallel}
 	{
 	}
 
@@ -129,7 +144,7 @@ public: // Coroutine specializations.
 			token_.attachTo(maybeToken.valueMutable());
 		}
 
-		this->enqueueAsyncs(promise, token_);
+		this->enqueueAsyncs(promise, token_, parallel_);
 	}
 
 	// NOLINTNEXTLINE(readability-identifier-naming)
@@ -170,6 +185,7 @@ private:
 	}
 
 private:
+	Bool parallel_;
 	bzd::Atomic<Size> counter_{0};
 	CancellationToken token_{};
 };

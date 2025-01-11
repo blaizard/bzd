@@ -29,6 +29,7 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        ":executor_profiler",
         "//cc/bzd/container:array",
         "//cc/bzd/container:function_ref",
         "//cc/bzd/container:non_owning_list",
@@ -57,6 +58,18 @@ cc_library(
         "//cc/bzd/utility/synchronization:spin_mutex",
         "//cc/bzd/utility/synchronization:spin_shared_mutex",
         "//cc/bzd/utility/synchronization:sync_lock_guard",
+        "//cc/components/generic/executor_profiler/noop",
+    ],
+)
+
+cc_library(
+    name = "executor_profiler",
+    hdrs = [
+        "executor_profiler.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/platform:types",
     ],
 )
 

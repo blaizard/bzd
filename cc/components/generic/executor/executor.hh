@@ -76,17 +76,19 @@ private:
 	constexpr void run(bzd::Core& core) noexcept
 	{
 		Bool runCore{true};
+
+		// Get the index of the core in the array.
+		const auto it = bzd::algorithm::findIf(context_.config.cores, [&core](auto& value) { return &core == &value; });
+		bzd::assert::isTrue(it != context_.config.cores.end(), "Core must be registered.");
+		const auto index = bzd::distance(context_.config.cores.begin(), it);
+
 		do
 		{
-			executor_.run();
+			executor_.run(/*coreUId*/ index);
 			if (workloadCount_.load() == 0u)
 			{
 				break;
 			}
-			// Get the index of the core in the array.
-			const auto it = bzd::algorithm::findIf(context_.config.cores, [&core](auto& value) { return &core == &value; });
-			bzd::assert::isTrue(it != context_.config.cores.end(), "Core must be registered.");
-			const auto index = bzd::distance(context_.config.cores.begin(), it);
 			runCore = idle(index, core);
 		} while (runCore);
 	}

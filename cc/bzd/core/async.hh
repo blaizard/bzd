@@ -157,7 +157,7 @@ public:
 		do
 		{
 			// Run the executor.
-			executor.run();
+			executor.run(/*coreUId*/ 0u);
 			// Here should run the idle task.
 		} while (!hasResult());
 
@@ -438,7 +438,16 @@ requires(!concepts::lValueReference<Asyncs> &&
 		 ...)::bzd::impl::Async<typename bzd::async::awaitable::EnqueueAll<Asyncs...>::ResultType, ::bzd::impl::AsyncTaskTraits>
 all(Asyncs&&... asyncs) noexcept
 {
-	co_return (co_await bzd::async::awaitable::EnqueueAll<Asyncs...>{bzd::forward<Asyncs>(asyncs)...});
+	co_return (co_await bzd::async::awaitable::EnqueueAll<Asyncs...>{/*parallel*/ false, bzd::forward<Asyncs>(asyncs)...});
+}
+
+/// Executes multiple asynchronous function according to the executor policy and return once all are completed.
+template <concepts::async... Asyncs>
+requires(!concepts::lValueReference<Asyncs> &&
+		 ...)::bzd::impl::Async<typename bzd::async::awaitable::EnqueueAll<Asyncs...>::ResultType, ::bzd::impl::AsyncTaskTraits>
+allParallel(Asyncs&&... asyncs) noexcept
+{
+	co_return (co_await bzd::async::awaitable::EnqueueAll<Asyncs...>{/*parallel*/ true, bzd::forward<Asyncs>(asyncs)...});
 }
 
 /// Executes multiple asynchronous function according to the executor policy and return once at least one of them is completed.
@@ -447,7 +456,16 @@ requires(!concepts::lValueReference<Asyncs> &&
 		 ...)::bzd::impl::Async<typename bzd::async::awaitable::EnqueueAny<Asyncs...>::ResultType, ::bzd::impl::AsyncTaskTraits>
 any(Asyncs&&... asyncs) noexcept
 {
-	co_return (co_await bzd::async::awaitable::EnqueueAny<Asyncs...>{bzd::forward<Asyncs>(asyncs)...});
+	co_return (co_await bzd::async::awaitable::EnqueueAny<Asyncs...>{/*parallel*/ false, bzd::forward<Asyncs>(asyncs)...});
+}
+
+/// Executes multiple asynchronous function according to the executor policy and return once at least one of them is completed.
+template <concepts::async... Asyncs>
+requires(!concepts::lValueReference<Asyncs> &&
+		 ...)::bzd::impl::Async<typename bzd::async::awaitable::EnqueueAny<Asyncs...>::ResultType, ::bzd::impl::AsyncTaskTraits>
+anyParallel(Asyncs&&... asyncs) noexcept
+{
+	co_return (co_await bzd::async::awaitable::EnqueueAny<Asyncs...>{/*parallel*/ true, bzd::forward<Asyncs>(asyncs)...});
 }
 
 } // namespace bzd::async

@@ -60,7 +60,7 @@ void makeStressCancellationSuspend(const bzd::Size iterations)
 		// so only exit once the promise is ready.
 		do
 		{
-			executor.run();
+			executor.run(/*coreUId*/ 0u);
 		} while (!promise.hasResult());
 
 		EXPECT_TRUE(promise.hasResult());

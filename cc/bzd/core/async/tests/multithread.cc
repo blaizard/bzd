@@ -41,24 +41,24 @@ bzd::Async<> cancellationNestedWorkload(const bzd::Size counter)
 		auto promise3 = cancellationNestedWorkload<forkType>(counter / 3);
 		if constexpr (forkType == ForkType::any)
 		{
-			auto result = co_await bzd::async::any(bzd::move(promise1), bzd::move(promise2), bzd::move(promise3));
+			auto result = co_await bzd::async::anyParallel(bzd::move(promise1), bzd::move(promise2), bzd::move(promise3));
 			EXPECT_TRUE(isValidResultForAny(result));
 		}
 		else if constexpr (forkType == ForkType::all)
 		{
-			auto result = co_await bzd::async::all(bzd::move(promise1), bzd::move(promise2), bzd::move(promise3));
+			auto result = co_await bzd::async::allParallel(bzd::move(promise1), bzd::move(promise2), bzd::move(promise3));
 			EXPECT_TRUE(isValidResultForAll(result));
 		}
 		else if constexpr (forkType == ForkType::random)
 		{
 			if (counter % 2)
 			{
-				auto result = co_await bzd::async::any(bzd::move(promise1), bzd::move(promise2), bzd::move(promise3));
+				auto result = co_await bzd::async::anyParallel(bzd::move(promise1), bzd::move(promise2), bzd::move(promise3));
 				EXPECT_TRUE(isValidResultForAny(result));
 			}
 			else
 			{
-				auto result = co_await bzd::async::all(bzd::move(promise1), bzd::move(promise2), bzd::move(promise3));
+				auto result = co_await bzd::async::allParallel(bzd::move(promise1), bzd::move(promise2), bzd::move(promise3));
 				EXPECT_TRUE(isValidResultForAll(result));
 			}
 		}
@@ -83,40 +83,40 @@ bzd::Async<> runConcurrentTest(bzd::Async<> (*workload)(const bzd::Size), const 
 
 		if constexpr (forkType == ForkType::any)
 		{
-			auto result = co_await bzd::async::any(bzd::move(promise1),
-												   bzd::move(promise2),
-												   bzd::move(promise3),
-												   bzd::move(promise4),
-												   bzd::move(promise5));
+			auto result = co_await bzd::async::anyParallel(bzd::move(promise1),
+														   bzd::move(promise2),
+														   bzd::move(promise3),
+														   bzd::move(promise4),
+														   bzd::move(promise5));
 			EXPECT_TRUE(isValidResultForAny(result));
 		}
 		else if constexpr (forkType == ForkType::all)
 		{
-			auto result = co_await bzd::async::all(bzd::move(promise1),
-												   bzd::move(promise2),
-												   bzd::move(promise3),
-												   bzd::move(promise4),
-												   bzd::move(promise5));
+			auto result = co_await bzd::async::allParallel(bzd::move(promise1),
+														   bzd::move(promise2),
+														   bzd::move(promise3),
+														   bzd::move(promise4),
+														   bzd::move(promise5));
 			EXPECT_TRUE(isValidResultForAll(result));
 		}
 		else if constexpr (forkType == ForkType::random)
 		{
 			if (static_cast<bzd::Bool>(counterGenerator() % 2))
 			{
-				auto result = co_await bzd::async::any(bzd::move(promise1),
-													   bzd::move(promise2),
-													   bzd::move(promise3),
-													   bzd::move(promise4),
-													   bzd::move(promise5));
+				auto result = co_await bzd::async::anyParallel(bzd::move(promise1),
+															   bzd::move(promise2),
+															   bzd::move(promise3),
+															   bzd::move(promise4),
+															   bzd::move(promise5));
 				EXPECT_TRUE(isValidResultForAny(result));
 			}
 			else
 			{
-				auto result = co_await bzd::async::all(bzd::move(promise1),
-													   bzd::move(promise2),
-													   bzd::move(promise3),
-													   bzd::move(promise4),
-													   bzd::move(promise5));
+				auto result = co_await bzd::async::allParallel(bzd::move(promise1),
+															   bzd::move(promise2),
+															   bzd::move(promise3),
+															   bzd::move(promise4),
+															   bzd::move(promise5));
 				EXPECT_TRUE(isValidResultForAll(result));
 			}
 		}

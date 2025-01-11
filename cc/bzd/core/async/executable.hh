@@ -25,19 +25,6 @@ class Executable;
 /// therefore take care of the fencing if required.
 class ExecutableMetadata
 {
-public: // Constructors/destructor/...
-	ExecutableMetadata() = default;
-	constexpr ExecutableMetadata(const ExecutableMetadata& other) noexcept { *this = other; }
-	constexpr ExecutableMetadata& operator=(const ExecutableMetadata& other) noexcept
-	{
-		type_ = other.type_;
-		flags_.store(other.flags_.load(MemoryOrder::relaxed), MemoryOrder::relaxed);
-		return *this;
-	}
-	ExecutableMetadata(ExecutableMetadata&&) = delete;
-	ExecutableMetadata& operator=(ExecutableMetadata&&) = delete;
-	~ExecutableMetadata() = default;
-
 public: // Types.
 	/// The executable type can only be set once.
 	enum class Type : bzd::UInt8
@@ -50,29 +37,87 @@ public: // Types.
 		service
 	};
 
-	/// Contains the flags associated with the executable.
-	enum class Flags : bzd::UInt8
+public: // Constructors/destructor/...
+	ExecutableMetadata() = default;
+	constexpr ExecutableMetadata(const Type type) noexcept : type_{type} {}
+	constexpr ExecutableMetadata(const ExecutableMetadata& other) noexcept { *this = other; }
+	constexpr ExecutableMetadata& operator=(const ExecutableMetadata& other) noexcept
 	{
-		none = 0,
-		/// If the executable needs to be skipped from the executor queue.
-		skip = 1
-	};
+		type_ = other.type_;
+		flags_.store(other.flags_.load(MemoryOrder::relaxed), MemoryOrder::relaxed);
+		return *this;
+	}
+	ExecutableMetadata(ExecutableMetadata&&) = delete;
+	ExecutableMetadata& operator=(ExecutableMetadata&&) = delete;
+	~ExecutableMetadata() = default;
 
 public: // Accessors.
 	[[nodiscard]] constexpr Type getType() const noexcept { return type_; }
-	[[nodiscard]] constexpr Bool isSkipped() const noexcept { return flags_.load(MemoryOrder::acquire) == Flags::skip; }
+
+	/// If the executable is ready to be scheduled.
+	[[nodiscard]] constexpr Bool isReadyToBeScheduled(const UInt16 contextUId) const noexcept
+	{
+		const auto value = flags_.load(MemoryOrder::acquire);
+		if ((value & 0x1) == 0x1) // skip == 1
+		{
+			return false;
+		}
+		// No context set, can be scheduled on any context.
+		if ((value & 0x2) == 0x0) // context == 0
+		{
+			return true;
+		}
+		const UInt16 actualUId = static_cast<UInt16>(value >> 2);
+		return contextUId == actualUId;
+	}
+
+	/// The executable can operate on any core, therefore threadsafe operation must be considered.
+	constexpr void anyCore() noexcept
+	{
+		auto value = flags_.load(MemoryOrder::acquire);
+		while (!flags_.compareExchange(value, value & ~0x2))
+		{
+		}
+	}
 
 private:
 	template <class U>
 	friend class bzd::async::impl::Executable;
 
-	constexpr void skip() noexcept { flags_.store(Flags::skip, MemoryOrder::release); }
-	constexpr void unskip() noexcept { flags_.store(Flags::none, MemoryOrder::release); }
+	constexpr void skip() noexcept
+	{
+		auto value = flags_.load(MemoryOrder::acquire);
+		while (!flags_.compareExchange(value, value | 0x1))
+		{
+		}
+	}
+
+	constexpr void unskip() noexcept
+	{
+		auto value = flags_.load(MemoryOrder::acquire);
+		while (!flags_.compareExchange(value, value & ~0x1))
+		{
+		}
+	}
+
+	constexpr void pinCore(const UInt16 coreUId) noexcept
+	{
+		auto value = flags_.load(MemoryOrder::acquire);
+		while (!flags_.compareExchange(value, (value & 0x1) | 0x2 | (coreUId << 2)))
+		{
+		}
+	}
 
 	// Type of executable.
 	Type type_{Type::unset};
 	// Flags associated with this executable.
-	bzd::Atomic<Flags> flags_{Flags::none};
+	// It is the form of a bit set formatted as follow:
+	// LSB                                      MSB
+	//  | skip | pined core |     core ID        |
+	// - skip (1b): The executable should be not be executed.
+	// - pined core (1b): If set to 1, the executable is pinned to a particular core.
+	// - core id (16b): The executable must only be scheduled on this particular core.
+	bzd::Atomic<UInt32> flags_{0u};
 };
 
 /// Type to store an executable when suspended for use with ISR (aka in wait-free context).
@@ -213,8 +258,12 @@ public:
 		return cancel_->isCanceled();
 	}
 
-	[[nodiscard]] constexpr Bool isSkipped() const noexcept { return metadata_.isSkipped(); }
+	[[nodiscard]] constexpr Bool isReadyToBeScheduled(const UInt16 contextUId) const noexcept
+	{
+		return metadata_.isReadyToBeScheduled(contextUId);
+	}
 	constexpr void skip() noexcept { metadata_.skip(); }
+	constexpr void pinCore(const UInt16 coreUId) noexcept { metadata_.pinCore(coreUId); }
 
 	constexpr bzd::async::impl::Executor<T>& getExecutor() noexcept
 	{
@@ -225,11 +274,12 @@ public:
 	constexpr T& getExecutable() noexcept { return *static_cast<T*>(this); }
 
 	[[nodiscard]] constexpr bzd::async::impl::ExecutableMetadata::Type getType() const noexcept { return metadata_.getType(); }
+	[[nodiscard]] constexpr bzd::async::impl::ExecutableMetadata getMetadata() const noexcept { return metadata_; }
 
-	constexpr void setType(const bzd::async::impl::ExecutableMetadata::Type type) noexcept
+	constexpr void setMetadata(const bzd::async::impl::ExecutableMetadata metadata) noexcept
 	{
 		bzd::assert::isTrue(metadata_.getType() == bzd::async::impl::ExecutableMetadata::Type::unset);
-		metadata_.type_ = type;
+		metadata_ = metadata;
 	}
 
 	constexpr void destroy() noexcept
