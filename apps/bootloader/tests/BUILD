@@ -85,7 +85,7 @@ bzd_bootloader_binary(
 
 bzd_executable_test(
     name = "application_test",
-    arguments = ["12"],
+    args = ["12"],
     executable = ":with_application",
     expected_output = "144",
     expected_returncode = "0",

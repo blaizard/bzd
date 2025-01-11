@@ -20,17 +20,13 @@ def _bzd_executable_test_impl(ctx):
             ctx.attr._executor: "executor",
         },
         output = ctx.outputs.executable,
-        command = "{{executor}} {arguments_executor} {{executable}} -- {arguments_executable}".format(
+        command = "{{executor}} {arguments_executor} {{executable}} -- \"$@\"".format(
             arguments_executor = " ".join(arguments_executor),
-            arguments_executable = " ".join(ctx.attr.arguments),
         ),
     )]
 
 def _bzd_executable_test_attrs_factory(cfg):
     return {
-        "arguments": attr.string_list(
-            doc = "The list of string to be used as argument to the executable.",
-        ),
         "executable": attr.label(
             executable = True,
             cfg = "target",
