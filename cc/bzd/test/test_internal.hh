@@ -1,10 +1,12 @@
 #pragma once
 
+#include "cc/bzd/algorithm/copy.hh"
 #include "cc/bzd/container/ring_buffer.hh"
 #include "cc/bzd/core/async.hh"
 #include "cc/bzd/meta/macro.hh"
 #include "cc/bzd/test/runner.hh"
 #include "cc/bzd/type_traits/is_same_class.hh"
+#include "cc/bzd/type_traits/range.hh"
 #include "cc/bzd/type_traits/remove_cvref.hh"
 #include "cc/bzd/utility/numeric_limits.hh"
 #include "cc/bzd/utility/pattern/to_string/integral.hh"
@@ -106,12 +108,13 @@
 		};                                                                                                                                 \
 		auto promise = BZDTEST_FCT_NAME_(testCaseName, testName)(test);                                                                    \
 		promise.enqueue(executor, ::bzd::async::Type::workload, onTerminate);                                                              \
+		::bzd::UInt16 coreUId{0u};                                                                                                         \
 		for (auto& entry : threads)                                                                                                        \
 		{                                                                                                                                  \
-			entry = ::std::thread{[&executor, &isTerminated]() {                                                                           \
+			entry = ::std::thread{[coreUId = coreUId++, &executor, &isTerminated]() {                                                      \
 				while (!isTerminated.load())                                                                                               \
 				{                                                                                                                          \
-					executor.run();                                                                                                        \
+					executor.run(coreUId);                                                                                                 \
 				}                                                                                                                          \
 			}};                                                                                                                            \
 		}                                                                                                                                  \
@@ -376,7 +379,15 @@ template <class T>
 class Value
 {
 public:
-	constexpr Value(const T& value) { valueToString(value); }
+	constexpr Value(const T& value)
+	{
+		valueToString(value);
+		if (string_.full())
+		{
+			constexpr auto ellipsis = "..."_sv;
+			bzd::algorithm::copy(ellipsis, string_.subSpan(string_.size() - ellipsis.size()));
+		}
+	}
 	constexpr const char* valueToString() const { return string_.data(); }
 
 private:
@@ -395,7 +406,7 @@ private:
 	constexpr void valueToString(double value) { ::bzd::toString(string_.appender(), value); }
 
 	constexpr void valueToString(char value) { valueToString(static_cast<unsigned char>(value)); }
-	constexpr void valueToString(unsigned char value) { ::bzd::toString(string_.appender(), "{} ({:#x})"_csv, charToString(value), value); }
+	constexpr void valueToString(unsigned char value) { ::bzd::toString(string_.appender(), "'{}'"_csv, charToString(value)); }
 
 	constexpr void valueToString(bool value) { string_ = (value) ? "true"_sv : "false"_sv; }
 
@@ -417,14 +428,10 @@ private:
 	{
 		const char* ptr = value;
 		string_ += '"';
-		for (int maxChar = 0; maxChar < 64 && *ptr; ++maxChar)
+		for (int maxChar = 0; maxChar < 64 && *ptr && !string_.full(); ++maxChar)
 		{
 			const char c = *ptr++;
 			string_ += charToString(c);
-		}
-		if (*ptr)
-		{
-			string_ += "[...]"_sv;
 		}
 		string_ += '"';
 	}
@@ -433,9 +440,22 @@ private:
 		::bzd::toString(string_.appender(), "{:#x}({})"_csv, value, charToString(static_cast<char>(value)));
 	}
 
+	template <::bzd::concepts::forwardRange U>
+	constexpr void valueToString(U& range)
+	{
+		string_ += "("_sv;
+		for (auto it = range.begin(); it != range.end() && !string_.full(); ++it)
+		{
+			valueToString(*it);
+			string_ += ", "_sv;
+		}
+		string_ += ")"_sv;
+	}
+
 	template <class U>
 	constexpr void valueToString(Values<U>& values)
 	{
+		string_ += "("_sv;
 		if (values.overrun())
 		{
 			string_ += "[...]"_sv;
@@ -443,8 +463,9 @@ private:
 		for (const auto& value : values.asSpans())
 		{
 			valueToString(value);
-			string_ += " "_sv;
+			string_ += ", "_sv;
 		}
+		string_ += ")"_sv;
 	}
 
 	template <class U>
@@ -453,20 +474,18 @@ private:
 		const auto* const data = reinterpret_cast<const ::bzd::Byte*>(&values);
 
 		::bzd::toString(string_.appender(), "[Binary ({} bytes)] "_csv, sizeof(U));
-		for (bzd::UInt32 i = 0; i < 8u && i < sizeof(U); ++i)
+		bzd::UInt32 i = 0;
+		while (i < sizeof(U) && !string_.full())
 		{
 			// NOLINTNEXTLINE(clang-analyzer-core.CallAndMessage)
 			valueToString(data[i]);
 			string_ += " "_sv;
-		}
-		if (8u < sizeof(U))
-		{
-			string_ += "[...]"_sv;
+			++i;
 		}
 	}
 
 private:
-	::bzd::String<100> string_{};
+	::bzd::String<1000> string_{};
 };
 
 } // namespace bzd::test::impl

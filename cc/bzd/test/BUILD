@@ -49,11 +49,13 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":runner",
+        "//cc/bzd/algorithm:copy",
         "//cc/bzd/container:ring_buffer",
         "//cc/bzd/core:print",
         "//cc/bzd/core/async",
         "//cc/bzd/meta:macro",
         "//cc/bzd/type_traits:is_same_class",
+        "//cc/bzd/type_traits:range",
         "//cc/bzd/type_traits:remove_cvref",
         "//cc/bzd/utility:numeric_limits",
         "//cc/bzd/utility/random:uniform_int_distribution",
