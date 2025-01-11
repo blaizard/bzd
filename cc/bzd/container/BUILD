@@ -444,6 +444,7 @@ cc_library(
         "//cc/bzd/platform:types",
         "//cc/bzd/type_traits:add_reference",
         "//cc/bzd/type_traits:is_const",
+        "//cc/bzd/type_traits:is_constructible",
         "//cc/bzd/type_traits:is_reference",
         "//cc/bzd/type_traits:is_trivially_copy_assignable",
         "//cc/bzd/type_traits:is_trivially_copy_constructible",
