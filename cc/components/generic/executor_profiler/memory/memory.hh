@@ -2,7 +2,9 @@
 
 #include "cc/bzd/container/ring_buffer.hh"
 #include "cc/bzd/container/variant.hh"
+#include "cc/bzd/core/async/async.hh"
 #include "cc/bzd/core/async/executor_profiler.hh"
+#include "cc/bzd/core/channel.hh"
 
 #include <iostream>
 
