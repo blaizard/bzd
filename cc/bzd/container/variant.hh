@@ -7,6 +7,7 @@
 #include "cc/bzd/platform/types.hh"
 #include "cc/bzd/type_traits/add_reference.hh"
 #include "cc/bzd/type_traits/is_const.hh"
+#include "cc/bzd/type_traits/is_constructible.hh"
 #include "cc/bzd/type_traits/is_reference.hh"
 #include "cc/bzd/type_traits/is_trivially_copy_assignable.hh"
 #include "cc/bzd/type_traits/is_trivially_copy_constructible.hh"
@@ -45,6 +46,19 @@ protected:
 	// Search for T in the list
 	template <class T>
 	using Find = typename TypeList::template Find<T>;
+	// Find the best match for the constructor.
+	// 1. If there is a direct match.
+	// 2. If the type is constructible from T.
+	template <class T>
+	static constexpr auto findForConstructor()
+	{
+		auto index = Find<T>::value;
+		if (index == -1)
+		{
+			index = TypeList::template FindConditional<T, bzd::typeTraits::IsConstructible1>::value;
+		}
+		return index;
+	}
 	// Helper
 	template <Size N, Size Max, template <class> class F, class... Args>
 	struct HelperT
@@ -156,10 +170,10 @@ public: // Constructors
 	/// The first type is selected, this is compatible with std::variant behavior.
 	constexpr VariantBase() noexcept : id_{0}, data_{InPlaceIndex<0>{}} {}
 
-	/// Value constructor (exact type match)
-	template <class T>
-	// NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
-	constexpr VariantBase(T&& value) noexcept : id_{Find<bzd::typeTraits::RemoveReference<T>>::value}, data_{bzd::forward<T>(value)}
+	/// Value constructor.
+	template <class T, int index = findForConstructor<bzd::typeTraits::RemoveReference<T>>()>
+	requires(index != -1)
+	constexpr VariantBase(T&& value) noexcept : id_{index}, data_{InPlaceIndex<index>{}, bzd::forward<T>(value)}
 	{
 	}
 
@@ -172,6 +186,7 @@ public: // Constructors
 
 	/// Value constructor, in place type constructor.
 	template <class T, class... Args>
+	requires(Contains<T>::value)
 	constexpr VariantBase(InPlaceType<T>, Args&&... args) noexcept :
 		id_{Find<T>::value}, data_{inPlaceType<VariantElementStorageType<T>>, bzd::forward<Args>(args)...}
 	{
@@ -242,6 +257,7 @@ public: // Functions
 	}
 
 	template <class T, class U>
+	requires(Contains<T>::value)
 	constexpr void set(U&& value) noexcept
 	{
 		id_ = Find<T>::value;

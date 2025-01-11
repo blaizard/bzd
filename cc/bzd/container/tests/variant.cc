@@ -16,6 +16,8 @@ TEST(ContainerVariant, Constructor)
 	EXPECT_EQ(variantBool.index(), 1);
 	bzd::Variant<int, bool, double> variantDouble{static_cast<double>(5.4)};
 	EXPECT_EQ(variantDouble.index(), 2);
+	bzd::Variant<int, bool, double> variantConstInt{static_cast<const int>(45)};
+	EXPECT_EQ(variantConstInt.index(), 0);
 	bzd::Variant<bzd::test::NoDefaultConstructor, bool, double> variantNoDefault{static_cast<double>(5.4)};
 	EXPECT_EQ(variantNoDefault.index(), 2)
 
@@ -26,6 +28,15 @@ TEST(ContainerVariant, Constructor)
 		bzd::Variant<int, bool, double> variantInPlaceType1{bzd::inPlaceType<int>, 3};
 		EXPECT_EQ(variantInPlaceType1.index(), 0);
 	}
+}
+
+TEST(ContainerVariant, ConstConstructor)
+{
+	const int constInt{};
+	bzd::Variant<int, float> variant1{static_cast<int>(constInt)};
+	EXPECT_EQ(variant1.index(), 0);
+	bzd::Variant<int, float> variant2{constInt};
+	EXPECT_EQ(variant2.index(), 0);
 }
 
 TEST(ContainerVariant, Reference)
