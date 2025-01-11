@@ -14,7 +14,7 @@ struct FindConditional
 template <Size N, template <class, class> class Condition, class T, class U>
 struct FindConditional<N, Condition, T, U>
 {
-	static constexpr const int value = (Condition<U, T>::value) ? static_cast<int>(N) : -1;
+	static constexpr const int value = (Condition<T, U>::value) ? static_cast<int>(N) : -1;
 };
 } // namespace bzd::meta::impl
 
