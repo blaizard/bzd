@@ -40,6 +40,10 @@ class Visitor:
 	def parseXML(path: pathlib.Path) -> Element:
 		return xmlparse(path).getroot()
 
+	@staticmethod
+	def escapeHTML(content: str) -> str:
+		return content.replace("<", "&lt;").replace(">", "&gt;").replace("&", "&amp;")
+
 	def visitParam(self, element: Element, data: Data) -> Json:
 		visitors = {
 		    "type": lambda child, attr: {
@@ -75,6 +79,46 @@ class Visitor:
 			current["column"] = element.attrib["column"]
 		return {"location": current} if current else {}
 
+	def visitDescription(self, element: Element, data: Data) -> str:
+
+		tagMap = {
+		    "bold": "b",
+		    "emphasis": "em",
+		    "computeroutput": "code",
+		    "para": "p",
+		    "programlisting": "pre",
+		    "verbatim": "pre"
+		}
+		tagTextMap = {"codeline": "", "highlight": "", "sp": " "}
+		content = ""
+		for child in element:
+			tag = tagMap.get(child.tag)
+			if not tag:
+				if child.tag in tagTextMap:
+					content += tagTextMap[child.tag]
+				else:
+					print("IGNORED", child.tag)
+					continue
+			content += f"<{tag}>" if tag else ""
+			content += "<code class=\"language-cpp\">" if tag == "pre" else ""
+			if child.text:
+				content += Visitor.escapeHTML(child.text)
+			content += self.visitDescription(child, data)
+			content += "</code>" if tag == "pre" else ""
+			content += f"</{tag}>" if tag else ""
+			if child.tail:
+				content += child.tail
+
+		return content
+
+	def visitBriefDescription(self, element: Element, data: Data) -> Json:
+		description = self.visitDescription(element, data)
+		return {"doc": description} if description else {}
+
+	def visitDetailedDescription(self, element: Element, data: Data) -> Json:
+		description = self.visitDescription(element, data)
+		return {"brief": description} if description else {}
+
 	def visitCompounddef(self, element: Element, data: Data) -> None:
 
 		kind = element.attrib["kind"]
@@ -87,8 +131,14 @@ class Visitor:
 		visitors = {
 		    "location": self.visitLocation,
 		    "templateparamlist": self.visitTemplateParamList,
+		    "briefdescription": self.visitBriefDescription,
+		    "detaileddescription": self.visitDetailedDescription,
 		}
+
 		current = {"kind": kind}
+
+		if element.attrib.get("final") == "yes":
+			current["final"] = True
 
 		for child in element:
 			if child.tag == "compoundname":
