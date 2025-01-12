@@ -1,3 +1,4 @@
+load("@bzd_rules_doc//doc:defs.bzl", "doc_cc_library")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
@@ -9,5 +10,12 @@ cc_library(
         "//cc/bzd/core/async",
         "//cc/bzd/utility/synchronization:spin_mutex",
         "//cc/bzd/utility/synchronization:sync_lock_guard",
+    ],
+)
+
+doc_cc_library(
+    name = "doc",
+    srcs = [
+        "timer_isr.hh",
     ],
 )

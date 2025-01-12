@@ -22,6 +22,12 @@ bazel_dep(name = "rules_cc", version = "0.0.9")
 bazel_dep(name = "bazel_skylib", version = "1.5.0")
 bazel_dep(name = "stardoc", version = "0.7.2")
 bazel_dep(name = "rules_pkg", version = "1.0.1")
+bazel_dep(name = "rules_doxygen", version = "2.0.0")
+git_override(
+    module_name = "rules_doxygen",
+    commit = "30e2694b521caf6ebb0770bd9183a2fdf5300bd5",
+    remote = "https://github.com/TendTo/rules_doxygen.git",
+)
 
 # Override some of the modules that are local.
 [local_path_override(

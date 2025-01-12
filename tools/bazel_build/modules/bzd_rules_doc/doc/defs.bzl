@@ -1,6 +1,7 @@
 """Rules for documentation."""
 
 load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
+load("@doxygen//:doxygen.bzl", "doxygen")
 
 _DocumentationInfo = provider(
     doc = "Provider for documentation entities.",
@@ -197,26 +198,51 @@ def doc_binary(srcs = None, data = None, **kwargs):
         **kwargs
     )
 
-# buildifier: disable=no-effect
-"""
-TODO: implement doxygen rules.
-Blocked by: https://github.com/TendTo/rules_doxygen/issues/15
+def _doxygen_library_impl(ctx):
+    # Hack to get the XML directory.
+    xml = ctx.attr.doxygen[DefaultInfo].files.to_list()[0]
 
-bazel_dep(name = "rules_doxygen", version = "2.0.0")
+    json = ctx.actions.declare_file("{}.json".format(ctx.label.name))
+    ctx.actions.run(
+        inputs = [xml],
+        outputs = [json],
+        executable = ctx.executable._doxygen_parser,
+        progress_message = "Doxygen parsing for {}...".format(ctx.label),
+        arguments = ["--output", json.path, xml.path],
+    )
 
-load("@doxygen//:doxygen.bzl", "doxygen")
+    return [DefaultInfo(files = depset([json]))]
+
+_doxygen_library = rule(
+    implementation = _doxygen_library_impl,
+    attrs = {
+        "doxygen": attr.label(
+            mandatory = True,
+            doc = "The doxygen rule.",
+        ),
+        "_doxygen_parser": attr.label(
+            executable = True,
+            cfg = "exec",
+            default = Label("//doc:doxygen_parser"),
+        ),
+    },
+)
 
 def doc_cc_library(name, srcs, **kwargs):
-    \"""Create a C++ documentation library.\"""
+    """Create a C++ documentation library."""
 
     doxygen(
-        name = name,
+        name = "_{}_doxygen".format(name),
         srcs = srcs,
         generate_html = False,
         generate_xml = True,
         xml_output = "xml",
         outs = ["xml"],
         quiet = True,
+    )
+
+    _doxygen_library(
+        name = name,
+        doxygen = "_{}_doxygen".format(name),
         **kwargs
     )
-"""

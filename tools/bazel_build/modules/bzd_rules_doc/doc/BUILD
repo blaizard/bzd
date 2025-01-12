@@ -29,3 +29,9 @@ py_binary(
     srcs = ["preprocessor.py"],
     visibility = ["//visibility:public"],
 )
+
+py_binary(
+    name = "doxygen_parser",
+    srcs = ["doxygen_parser.py"],
+    visibility = ["//visibility:public"],
+)
