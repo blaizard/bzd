@@ -1,0 +1,14 @@
+
+namespace bzd.components.generic;
+
+
+component ExecutorProfilerMemory {
+config:
+	size = Integer(1024);
+	out = {out};
+	
+interface:
+	
+}
+
+

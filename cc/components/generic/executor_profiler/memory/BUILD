@@ -1,4 +1,12 @@
+load("@bzd_bdl//:defs.bzl", "bdl_library")
 load("@rules_cc//cc:defs.bzl", "cc_library")
+
+bdl_library(
+    name = "bdl",
+    srcs = [
+        "interface.bdl",
+    ],
+)
 
 cc_library(
     name = "memory",
@@ -7,6 +15,7 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        ":bdl",
         "//cc/bzd/container:ring_buffer",
         "//cc/bzd/container:variant",
         "//cc/bzd/core:channel",

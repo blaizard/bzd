@@ -17,6 +17,7 @@ cc_library(
     deps = [
         "//cc/bzd/platform:panic",
         "//cc/components/generic/executor",
+        "//cc/components/generic/executor_profiler/memory",
         "//cc/components/linux/core",
         "//cc/components/linux/proactor/epoll",
         "//cc/components/posix/network/tcp:client",

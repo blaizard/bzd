@@ -5,13 +5,15 @@ use "cc/components/std/timer/steady_clock/interface.bdl"
 use "cc/components/std/clock/system_clock/interface.bdl"
 use "cc/components/linux/proactor/epoll/interface.bdl"
 use "cc/components/posix/shmem/interface.bdl"
+use "cc/components/generic/executor_profiler/memory/interface.bdl"
 
 
 
 composition {
+	executorProfiler = bzd.components.generic.ExecutorProfilerMemory();
 	core1 = bzd.components.linux.Core(stackSize = 200000, name = 2.3);
 	core2 = bzd.components.linux.Core(stackSize = 200000);
-	executor = bzd.components.generic.Executor(cores = list(core1, core2)) [executor];
+	executor = bzd.components.generic.Executor(cores = list(core1, core2), profiler = executorProfiler) [executor];
 	proactor = bzd.components.linux.epoll.Proactor();
 	shmem = bzd.components.posix.Shmem("/hello");
 	
