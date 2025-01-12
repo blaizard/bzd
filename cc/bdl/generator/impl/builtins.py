@@ -50,6 +50,11 @@ class VoidType:
 	toType = "void"
 
 
+class NoneType:
+	constexpr = True
+	toType = "bzd::None"
+
+
 class Byte:
 	constexpr = True
 	toType = "bzd::Byte"
@@ -151,6 +156,7 @@ builtins: typing.Dict[str, typing.Any] = {
     "list": ListType,
     "Integer": IntegerType,
     "Float": FloatType,
+    "None": NoneType,
     "Void": VoidType,
     "Byte": Byte,
     "String": StringType,

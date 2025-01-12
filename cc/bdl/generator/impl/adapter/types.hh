@@ -20,6 +20,11 @@ struct Interface;
 template <bzd::meta::StringLiteral fqn>
 struct Data;
 
+/// Empty type.
+struct None
+{
+};
+
 namespace impl {
 
 /// Helper to get the implementation from an interface.

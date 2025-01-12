@@ -25,7 +25,9 @@ def toLiteralSingleValue_(self: Builtin, args: typing.Dict[str, EntityExpression
 class AnyMeta(Builtin):
 
 	def __init__(self) -> None:
-		super().__init__(ElementBuilder("builtin").setAttr("name", "Any").setAttr("meta", "1"))
+		super().__init__(
+		    ElementBuilder("builtin").setAttr("name", "Any").setAttr("meta", "1").addConfigValue(name="default",
+		                                                                                         literal=""))
 
 
 class ListMeta(Builtin):
@@ -54,6 +56,12 @@ class BindMeta(Builtin):
 
 
 # Concrete types
+
+
+class NoneType(Builtin):
+
+	def __init__(self) -> None:
+		super().__init__(ElementBuilder("builtin").setAttr("name", "None"))
 
 
 class Void(Builtin):
@@ -160,6 +168,7 @@ Builtins = [
     ListMeta(),
     ConnectMeta(),
     BindMeta(),
+    NoneType(),
     Void(),
     Integer(),
     Float(),
