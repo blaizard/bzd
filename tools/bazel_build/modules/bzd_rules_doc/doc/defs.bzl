@@ -1,7 +1,6 @@
 """Rules for documentation."""
 
 load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
-load("@doxygen//:doxygen.bzl", "doxygen")
 
 _DocumentationInfo = provider(
     doc = "Provider for documentation entities.",
@@ -199,10 +198,27 @@ def doc_binary(srcs = None, data = None, **kwargs):
     )
 
 def _doxygen_library_impl(ctx):
-    # Hack to get the XML directory.
-    xml = ctx.attr.doxygen[DefaultInfo].files.to_list()[0]
-
+    xml = ctx.actions.declare_directory("{}.doxygen/xml".format(ctx.label.name))
+    template = ctx.actions.declare_file("{}.template".format(ctx.label.name))
     json = ctx.actions.declare_file("{}.json".format(ctx.label.name))
+
+    ctx.actions.expand_template(
+        template = ctx.file._doxygen_config,
+        output = template,
+        substitutions = {
+            "%INPUTS%": " ".join([src.path for src in ctx.files.srcs]),
+            "%OUTPUT%": xml.dirname,
+        },
+    )
+
+    ctx.actions.run(
+        inputs = ctx.files.srcs + [template],
+        outputs = [xml],
+        executable = ctx.executable._doxygen,
+        arguments = [template.path],
+        progress_message = "Doxygen for {}...".format(ctx.label),
+    )
+
     ctx.actions.run(
         inputs = [xml],
         outputs = [json],
@@ -213,36 +229,27 @@ def _doxygen_library_impl(ctx):
 
     return [DefaultInfo(files = depset([json]))]
 
-_doxygen_library = rule(
+doc_cc_library = rule(
     implementation = _doxygen_library_impl,
     attrs = {
-        "doxygen": attr.label(
+        "srcs": attr.label_list(
+            allow_files = True,
             mandatory = True,
-            doc = "The doxygen rule.",
+            doc = "The input files.",
+        ),
+        "_doxygen": attr.label(
+            executable = True,
+            cfg = "exec",
+            default = Label("@doxygen//:doxygen"),
+        ),
+        "_doxygen_config": attr.label(
+            allow_single_file = True,
+            default = Label("//doxygen:doxygen.config"),
         ),
         "_doxygen_parser": attr.label(
             executable = True,
             cfg = "exec",
-            default = Label("//doc:doxygen_parser"),
+            default = Label("//doxygen:doxygen_parser"),
         ),
     },
 )
-
-def doc_cc_library(name, srcs, **kwargs):
-    """Create a C++ documentation library."""
-
-    doxygen(
-        name = "_{}_doxygen".format(name),
-        srcs = srcs,
-        generate_html = False,
-        generate_xml = True,
-        xml_output = "xml",
-        outs = ["xml"],
-        quiet = True,
-    )
-
-    _doxygen_library(
-        name = name,
-        doxygen = "_{}_doxygen".format(name),
-        **kwargs
-    )

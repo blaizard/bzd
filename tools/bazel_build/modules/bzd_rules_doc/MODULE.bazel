@@ -4,8 +4,8 @@ module(
 )
 
 bazel_dep(name = "bzd_lib", version = "1.0")
+bazel_dep(name = "bzd_platforms", version = "1.0")
 bazel_dep(name = "rules_python", version = "0.38.0")
-bazel_dep(name = "rules_doxygen", version = "2.0.0")
 
 # Python
 
@@ -19,5 +19,5 @@ use_repo(pip, pip = "bzd_rules_doc_pip")
 
 # Doxygen
 
-doxygen_extension = use_extension("@rules_doxygen//:extensions.bzl", "doxygen_extension")
-use_repo(doxygen_extension, "doxygen")
+doxygen = use_extension("//doxygen:doxygen.bzl", "doxygen")
+use_repo(doxygen, "doxygen")

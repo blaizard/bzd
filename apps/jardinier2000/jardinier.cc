@@ -13,6 +13,18 @@ bzd::Async<> water(bzd::Timer& timer, bzd::OStream& out, bzd::Size wateringTimeS
 {
 	bzd::Logger logger{out};
 
+	gpio_reset_pin(waterPumpPin);
+	gpio_set_direction(waterPumpPin, GPIO_MODE_OUTPUT);
+
+	// blink
+	while (true)
+	{
+		gpio_set_level(waterPumpPin, 1);
+		co_await !timer.delay(bzd::units::Millisecond{500});
+		gpio_set_level(waterPumpPin, 0);
+		co_await !timer.delay(bzd::units::Millisecond{500});
+	}
+
 	co_await !logger.info("Watering for {}s..."_csv, wateringTimeS);
 	gpio_reset_pin(waterPumpPin);
 	gpio_set_direction(waterPumpPin, GPIO_MODE_OUTPUT);
