@@ -1,0 +1,10 @@
+
+namespace bzd.components.generic;
+
+
+component ExecutorProfilerNoop {
+interface:
+	
+}
+
+

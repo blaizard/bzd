@@ -10,7 +10,7 @@
 #include "cc/bzd/utility/ranges/associate_scope.hh"
 #include "cc/bzd/utility/synchronization/spin_shared_mutex.hh"
 #include "cc/bzd/utility/synchronization/sync_lock_guard.hh"
-#include "cc/components/generic/executor_profiler/noop/noop.hh"
+#include "cc/components/generic/executor_profiler/noop/core_profiler.hh"
 
 namespace bzd::async::impl {
 
@@ -120,8 +120,8 @@ public:
 	///
 	/// \param coreUId The core unique identifier on which this context is running.
 	/// \param profiler The profiler to be used to profile the activity on this context.
-	template <class Profiler = bzd::components::generic::ExecutorProfilerNoop>
-	void run(const UInt16 coreUId, Profiler& profiler = bzd::components::generic::getExecutorProfilerNoop()) noexcept
+	template <class Profiler = bzd::components::generic::CoreProfilerNoop>
+	void run(const UInt16 coreUId, Profiler& profiler = bzd::components::generic::getCoreProfilerNoop()) noexcept
 	{
 		// Storage for context related to the this running instance.
 		ExecutorContext<Executable> context{coreUId};

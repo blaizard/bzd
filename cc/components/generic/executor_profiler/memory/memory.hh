@@ -26,7 +26,7 @@ public:
 								   bzd::async::profiler::ExecutableScheduled,
 								   bzd::async::profiler::ExecutableUnscheduled,
 								   bzd::async::profiler::ExecutableCanceled>;
-		bzd::RingBuffer<Event, Context::config::size> events_{};
+		bzd::RingBuffer<Event, Context::Config::size> events_{};
 	};
 
 public:

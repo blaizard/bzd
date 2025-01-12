@@ -58,7 +58,7 @@ cc_library(
         "//cc/bzd/utility/synchronization:spin_mutex",
         "//cc/bzd/utility/synchronization:spin_shared_mutex",
         "//cc/bzd/utility/synchronization:sync_lock_guard",
-        "//cc/components/generic/executor_profiler/noop",
+        "//cc/components/generic/executor_profiler/noop:core_profiler",
     ],
 )
 

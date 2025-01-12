@@ -82,9 +82,12 @@ private:
 		bzd::assert::isTrue(it != context_.config.cores.end(), "Core must be registered.");
 		const auto index = bzd::distance(context_.config.cores.begin(), it);
 
+		// Create the profiler for this core.
+		auto profiler = context_.config.profiler.makeCoreProfiler();
+
 		do
 		{
-			executor_.run(/*coreUId*/ index);
+			executor_.run(/*coreUId*/ index, profiler);
 			if (workloadCount_.load() == 0u)
 			{
 				break;

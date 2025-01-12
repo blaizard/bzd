@@ -1,5 +1,6 @@
 use "interfaces/executor.bdl"
 use "interfaces/core.bdl"
+use "cc/components/generic/executor_profiler/noop/interface.bdl"
 
 namespace bzd.components.generic;
 
@@ -11,7 +12,7 @@ config:
 	// The cores to be used by this executor.
 	cores = Array<bzd.Core>;
 	out = {out};
-	profiler = Any;
+	profiler = Any(bzd.components.generic.ExecutorProfilerNoop());
 	
 interface:
 	

@@ -7,6 +7,7 @@ bdl_library(
         "interface.bdl",
     ],
     deps = [
+        "//cc/components/generic/executor_profiler/noop",
         "//interfaces:core",
         "//interfaces:executor",
     ],

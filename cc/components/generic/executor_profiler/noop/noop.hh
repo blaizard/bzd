@@ -1,18 +1,17 @@
 #pragma once
 
 #include "cc/bzd/platform/types.hh"
+#include "cc/components/generic/executor_profiler/noop/core_profiler.hh"
 
 namespace bzd::components::generic {
 
+template <class Context = void>
 class ExecutorProfilerNoop
 {
 public:
-	template <class Event>
-	constexpr void event(const Event) const noexcept
-	{
-	}
+	ExecutorProfilerNoop() = default;
+	constexpr ExecutorProfilerNoop(auto&) noexcept {}
+	constexpr CoreProfilerNoop makeCoreProfiler() const noexcept { return CoreProfilerNoop{}; }
 };
-
-ExecutorProfilerNoop& getExecutorProfilerNoop() noexcept;
 
 } // namespace bzd::components::generic
