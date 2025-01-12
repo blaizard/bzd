@@ -307,13 +307,16 @@ class Element:
 	def __ne__(self, other: object) -> bool:
 		return not (self == other)
 
-	def toString(self, nested: bool = True) -> str:
+	def toString(self, nested: bool = True, simplified: bool = False) -> str:
 		"""Human readable string representation of the element."""
 
-		contentContext = (['context="{}"'.format(self.context)] if self.context is not None else [])
-		content = "<Element {}/>".format(" ".join(
-		    ['{}:{}:{}="{}"'.format(key, attr.index, attr.end, attr.value)
-		     for key, attr in self.attrs.items()] + contentContext))
+		contentContext = [] if simplified else (
+		    ['context="{}"'.format(self.context)] if self.context is not None else [])
+		attributeFormat = '{key}="{value}"' if simplified else '{key}:{index}:{end}="{value}"'
+		content = "<Element {}/>".format(" ".join([
+		    attributeFormat.format(key=key, index=attr.index, end=attr.end, value=attr.value)
+		    for key, attr in self.attrs.items() if attr.value is not None
+		] + contentContext))
 
 		if nested:
 			for kind, sequence in self.sequences.items():

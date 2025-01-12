@@ -136,6 +136,7 @@ class Error:
 	@staticmethod
 	def toStringFromElement(element: Element, attr: typing.Optional[str] = None, message: str = "Error") -> str:
 		context, start, end = element.makeContext(attr=attr)
+		message += f"\nIn context of {element.toString(nested = False, simplified = True)}"
 		return Error.toString(context=context, index=start, end=end, message=message)
 
 	@staticmethod
