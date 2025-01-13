@@ -37,6 +37,20 @@ def tryDecodeBacktrace(binary: pathlib.Path, output: str) -> None:
 		print(f"#{index} {address} in {symbol} {source}", flush=True)
 
 
+def tryReadExitCode(output: str) -> typing.Optional[int]:
+	"""Identify the exit code if any.
+	
+	Args:
+		binary: The binary to get the symbol from.
+		output: The output string.
+	"""
+
+	m = re.search(r"<exit code (-?[0-9])>", output)
+	if m is None:
+		return None
+	return int(m.group(1))
+
+
 def splitEndOfOptionsMarker(args: typing.List[str]) -> typing.Tuple[typing.List[str], typing.List[str]]:
 	"""Split the given argument list at the end-of-options marker if any."""
 	try:
@@ -62,3 +76,9 @@ if __name__ == "__main__":
 	# Try to decode the stack trace if any.
 	if args.binary:
 		tryDecodeBacktrace(args.binary, result.getOutput())
+
+	# Decode the exit code if any.
+	maybeExitCode = tryReadExitCode(result.getOutput())
+	if maybeExitCode is not None:
+		sys.exit(maybeExitCode)
+	sys.exit(42)

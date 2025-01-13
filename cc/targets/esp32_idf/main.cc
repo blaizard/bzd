@@ -23,7 +23,7 @@ int main()
 	[[maybe_unused]] const auto result = runExecutor();
 
 #ifdef BZD_EXECUTOR_SIM
-	::std::cout << "<simulation exit code " << ((result) ? 0 : 1) << ">" << ::std::endl;
+	::std::cout << "<exit code " << ((result) ? 0 : 1) << ">" << ::std::endl;
 	esp_restart();
 #endif
 
