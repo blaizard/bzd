@@ -31,6 +31,9 @@ public:
 
 	constexpr auto end() const noexcept { return bzd::iterator::Sentinel<Iterator>{}; }
 
+	bzd::Async<Iterator> begin() noexcept
+	requires(concepts::asyncRange<Range>);
+
 	bzd::Async<Iterator> begin() const noexcept
 	requires(concepts::asyncRange<Range>);
 

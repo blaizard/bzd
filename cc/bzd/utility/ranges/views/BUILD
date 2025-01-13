@@ -8,6 +8,7 @@ bzd_cc_library(
         ":adaptor",
         ":all",
         ":drop",
+        ":drop_last",
         ":filter",
         ":join",
         ":owning",
@@ -61,6 +62,22 @@ cc_library(
         "//cc/bzd/type_traits:conditional",
         "//cc/bzd/type_traits:is_lvalue_reference",
         "//cc/bzd/type_traits:is_same_class",
+        "//cc/bzd/utility/ranges:view_interface",
+    ],
+)
+
+cc_library(
+    name = "drop_last",
+    hdrs = [
+        "drop_last.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":adaptor",
+        ":all",
+        "//cc/bzd/container:wrapper",
+        "//cc/bzd/core/async:forward",
+        "//cc/bzd/utility/iterators:advance",
         "//cc/bzd/utility/ranges:view_interface",
     ],
 )

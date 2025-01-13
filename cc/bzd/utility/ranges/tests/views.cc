@@ -130,6 +130,30 @@ TEST(Views, Take)
 	helperTestMove("012345"_sv | bzd::ranges::take(2), "012345"_sv | bzd::ranges::take(2), "01"_sv);
 }
 
+TEST(Views, DropLast)
+{
+	bzd::test::Range<bzd::typeTraits::IteratorCategory::bidirectional, int, 5> range{0, 1, 2, 3, 4};
+	auto view = range | bzd::ranges::dropLast(1);
+	static_assert(bzd::typeTraits::isSame<decltype(view), bzd::ranges::DropLast<bzd::ranges::Ref<decltype(range)>>>);
+
+	const auto expected = {0, 1, 2, 3};
+	EXPECT_EQ_RANGE(view, expected);
+	EXPECT_EQ_RANGE(bzd::move(view) | bzd::ranges::all(), expected);
+	EXPECT_EQ_RANGE(range | bzd::ranges::dropLast(1), expected);
+
+	const auto expected2 = {0, 1};
+	EXPECT_EQ_RANGE(range | bzd::ranges::dropLast(2) | bzd::ranges::dropLast(1), expected2);
+
+	EXPECT_EQ_RANGE("hello"_sv | bzd::ranges::dropLast(2), "hel"_sv); // codespell:ignore
+
+	// EXPECT_TRUE(bzd::concepts::borrowedRange<bzd::ranges::Drop<bzd::Span<int>>>);
+	// EXPECT_TRUE(bzd::concepts::borrowedRange<bzd::ranges::Drop<bzd::String<1u>&>>);
+
+	const auto data = "012345"_sv;
+	helperTestCopy(data | bzd::ranges::dropLast(2), "0123"_sv);
+	helperTestMove("012345"_sv | bzd::ranges::dropLast(2), "012345"_sv | bzd::ranges::dropLast(2), "0123"_sv);
+}
+
 TEST(Views, Transform)
 {
 	bzd::test::Range<bzd::typeTraits::IteratorCategory::forward, int, 5> range{0, 1, 2, 3, 4};
