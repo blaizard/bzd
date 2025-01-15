@@ -2,7 +2,7 @@
 
 set -e
 
-VERSION=17.0.5
+VERSION=19.1.7
 HOST=linux_x86_64
 PACKAGE=${HOST}_${VERSION}
 INSTALL=$(pwd)/${PACKAGE}

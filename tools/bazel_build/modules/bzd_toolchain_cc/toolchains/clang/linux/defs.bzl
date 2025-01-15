@@ -32,5 +32,6 @@ def linux():
             "clang_format": "clang_format",
             "clang_tidy": "clang_tidy",
             "llvm_symbolizer": "llvm_symbolizer",
+            "package": "package",
         },
     }
