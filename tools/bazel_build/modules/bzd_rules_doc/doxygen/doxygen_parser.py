@@ -135,7 +135,7 @@ class Visitor:
 		    "detaileddescription": self.visitDetailedDescription,
 		}
 
-		current = {"kind": kind}
+		current: typing.Dict[str, typing.Any] = {"kind": kind}
 
 		if element.attrib.get("final") == "yes":
 			current["final"] = True
