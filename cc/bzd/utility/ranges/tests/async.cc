@@ -1,4 +1,3 @@
-#include "cc/bzd/container/ichannel_buffered.hh"
 #include "cc/bzd/test/test.hh"
 #include "cc/bzd/test/types/generator.hh"
 #include "cc/bzd/test/types/ichannel.hh"

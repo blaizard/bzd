@@ -10,6 +10,8 @@
 #include "cc/bzd/utility/synchronization/lock_guard.hh"
 #include "cc/bzd/utility/synchronization/mutex.hh"
 
+#include <iostream>
+
 namespace bzd {
 
 template <class T>
@@ -65,6 +67,42 @@ public: // Traits.
 	using ValueType = T;
 	using ValueConstType = bzd::typeTraits::AddConst<T>;
 
+	using ChannelRangeIterator =
+		iterator::InputOrOutputReference<typename bzd::Span<ValueConstType>::Iterator,
+										 iterator::InputOrOutputReferencePolicies<typeTraits::IteratorCategory::input>>;
+	using Sentinel = typename bzd::Span<bzd::typeTraits::AddConst<T>>::ConstIterator;
+	using ChannelRange = ranges::SubRange<ChannelRangeIterator, Sentinel>;
+
+	class GeneratorIChannel : public bzd::Generator<ChannelRange>
+	{
+	public:
+		using bzd::Generator<ChannelRange>::Generator;
+
+	public:
+		/// Read the first items from this reader.
+		///
+		/// \param count The number of items to read.
+		///
+		/// \return A generator constraint to a number of items.
+		GeneratorIChannel first(Size count) noexcept
+		{
+			auto it = co_await !this->begin();
+			while (it != this->end() && count > 0)
+			{
+				const Size initialSize = it->size();
+				const auto size = bzd::min(initialSize, count);
+				co_yield ChannelRange{it->begin(), bzd::prev(it->end(), it->size() - size)};
+
+				const auto readLength = initialSize - it->size();
+				count -= readLength;
+				if (it->size() == 0u)
+				{
+					co_await !++it;
+				}
+			}
+		}
+	};
+
 public:
 	IChannel() = default;
 	IChannel(const IChannel&) = delete;
@@ -73,73 +111,36 @@ public:
 	IChannel& operator=(IChannel&&) = default;
 	virtual ~IChannel() = default;
 
-public:
-	/// Read data from an input channel.
+protected:
+	/// Create a read generator from an input channel.
 	///
-	/// This function must returns data if more data is is also expected. In otherword,
-	/// a completion of the channel is defined by this function returning an empty span.
+	/// Return data as long as there is data on this input channel. Returned spans cannot be empty.
 	///
 	/// It is also important that the user relies on the returned buffer to read the data,
 	/// as the input buffer might not be used to avoid unnecessary copies. This provides an interface
 	/// to achieve zero copy in certain situation.
 	///
 	/// \param[in] data A buffer to contain the data to be read.
-	/// \return The data read.
-	virtual bzd::Async<bzd::Span<ValueConstType>> read(bzd::Span<T>&& data) noexcept = 0;
-
-	/// Read data from an input channel.
-	///
-	/// Unlike its counter part, this function ensures that the data is copied
-	/// into the input buffer.
-	///
-	/// \param[in] data A buffer to contain the data to be read.
-	/// \return The data read that is guaranteed to be part of the buffer passed into argument, or empty.
-	bzd::Async<bzd::Span<T>> readToBuffer(bzd::Span<T>&& data) noexcept
+	/// \return A generator to read the data.
+	virtual bzd::Generator<bzd::Span<ValueConstType>> readerImpl(bzd::Span<T>) noexcept
 	{
-		auto dataCopy = data;
-		const auto dataRead = co_await !read(bzd::move(dataCopy));
-		if (dataRead.empty())
-		{
-			co_return bzd::Span<T>{};
-		}
-		if (dataRead.isSubSpan(data))
-		{
-			// It is safe to const-cast here as we tested that the buffer is part of the one given into argument.
-			co_return bzd::Span<T>{const_cast<T*>(dataRead.data()), dataRead.size()};
-		}
-		bzd::algorithm::copy(dataRead, data);
-		co_return data.first(dataRead.size());
+		co_yield bzd::error::Failure("Specialization not implemented."_csv);
 	}
 
-	/// Read all data from an input channel until eof or an error occurs.
-	///
-	/// \param[in] data A buffer to contain the data to be read.
-	/// \return an asynchronous generator containing the data read.
-	bzd::Generator<bzd::Span<ValueConstType>> readerAsRange(bzd::Span<T>&& data) noexcept
+public:
+	virtual GeneratorIChannel reader(bzd::Span<T> data) noexcept
 	{
-		auto copy = data;
-		bzd::Span<ValueConstType> dataRead{};
-		while (dataRead = co_await !read(bzd::move(copy)), !dataRead.empty())
-		{
-			co_yield dataRead;
-			copy = data;
-		}
-	}
-
-	/// Read all data from an input channel until eof or an error occurs.
-	///
-	/// \param[in] data A buffer to contain the data to be read.
-	/// \return an asynchronous generator containing the data read.
-	bzd::Generator<ValueConstType&> reader(bzd::Span<T>&& data) noexcept
-	{
-		auto generator = readerAsRange(bzd::move(data));
+		auto generator = readerImpl(data);
 		auto it = co_await !generator.begin();
 		while (it != generator.end())
 		{
-			for (const auto& c : *it)
+			auto dataIt = bzd::begin(*it);
+			const auto dataEnd = bzd::end(*it);
+			do
 			{
-				co_yield c;
-			}
+				co_yield ChannelRange{ChannelRangeIterator{dataIt}, dataEnd};
+			} while (dataIt != dataEnd);
+
 			co_await !++it;
 		}
 	}

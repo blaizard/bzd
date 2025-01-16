@@ -12,7 +12,10 @@ requires(concepts::asyncRange<Range>)
 {
 	auto begin = co_await !bzd::begin(range_);
 	Iterator it{begin, bzd::end(range_)};
-	co_await !(++it);
+	if (it != end())
+	{
+		co_await !(++it);
+	}
 	co_return it;
 }
 
@@ -22,7 +25,10 @@ requires(concepts::asyncRange<Range>)
 {
 	auto begin = co_await !bzd::begin(range_);
 	Iterator it{begin, bzd::end(range_)};
-	co_await !(++it);
+	if (it != end())
+	{
+		co_await !(++it);
+	}
 	co_return it;
 }
 

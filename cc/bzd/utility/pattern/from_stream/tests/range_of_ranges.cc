@@ -1,7 +1,7 @@
-#include "cc/bzd/container/ichannel_buffered.hh"
 #include "cc/bzd/test/test.hh"
 #include "cc/bzd/test/types/ichannel.hh"
 #include "cc/bzd/utility/pattern/from_stream.hh"
+#include "cc/bzd/utility/ranges/views_async/join.hh"
 
 using TestIChannel = bzd::test::IChannel<char, 32u>;
 using TestIChannelZeroCopy = bzd::test::IChannel<char, 32u, bzd::test::IChannelMode::zeroCopy>;
@@ -23,7 +23,7 @@ TEST_ASYNC(PatternFromStream, RangeOfRanges, AllTestIChannel)
 		"noooo"_sv,
 	};
 	TestType in{};
-	bzd::IChannelBuffered<char, 16u> channel{in};
+	bzd::Array<char, 16u> buffer{};
 
 	// Exact matches.
 	for (const auto& exactMatch : keywords)
@@ -31,7 +31,8 @@ TEST_ASYNC(PatternFromStream, RangeOfRanges, AllTestIChannel)
 		in << exactMatch;
 		bzd::ToSortedRangeOfRanges wrapper{keywords};
 		using Metadata = typename bzd::FromString<decltype(wrapper)>::Metadata;
-		const auto size = co_await !bzd::fromStream(channel.reader(), wrapper, Metadata{Metadata::Mode::greedy});
+		const auto size =
+			co_await !bzd::fromStream(in.reader(buffer.asSpan()) | bzd::ranges::join(), wrapper, Metadata{Metadata::Mode::greedy});
 		EXPECT_EQ(size, bzd::size(exactMatch));
 		EXPECT_STREQ(wrapper.value()->data(), exactMatch.data());
 	}
@@ -39,7 +40,7 @@ TEST_ASYNC(PatternFromStream, RangeOfRanges, AllTestIChannel)
 	{
 		in << "heba";
 		bzd::ToSortedRangeOfRanges wrapper{keywords};
-		const auto size = co_await !bzd::fromStream(channel.reader(), wrapper);
+		const auto size = co_await !bzd::fromStream(in.reader(buffer.asSpan()) | bzd::ranges::join(), wrapper);
 		EXPECT_EQ(size, 1u);
 		EXPECT_STREQ(wrapper.value()->data(), "h");
 	}
@@ -69,16 +70,17 @@ TEST_ASYNC(PatternFromStream, RangeOfRangesReusing, AllTestIChannel)
 		"noooo"_sv,
 	};
 	TestType in{};
-	bzd::IChannelBuffered<char, 16u> channel{in};
+	bzd::Array<char, 16u> buffer{};
+	auto reader = in.reader(buffer.asSpan());
 
 	// re-using wrapper.
 	{
 		in << "helloinfobar";
 		bzd::ToSortedRangeOfRanges wrapper{keywords};
-		const auto result1 = co_await bzd::fromStream(channel.reader(), wrapper);
+		const auto result1 = co_await bzd::fromStream(reader | bzd::ranges::join(), wrapper);
 		EXPECT_TRUE(result1);
 		EXPECT_EQ(result1.value(), 5u);
-		const auto result2 = co_await bzd::fromStream(channel.reader(), wrapper);
+		const auto result2 = co_await bzd::fromStream(reader | bzd::ranges::join(), wrapper);
 		EXPECT_TRUE(result2);
 		EXPECT_EQ(result2.value(), 7u);
 	}

@@ -85,7 +85,7 @@ toolchain_cc = use_extension("@bzd_toolchain_cc//:extensions.bzl", "toolchain_cc
 toolchain_cc.toolchain(
     name = "clang",
     default = True,
-    version = "clang_17.0.0",
+    version = "clang_19.1.7",
 )
 use_repo(toolchain_cc, "clang")
 

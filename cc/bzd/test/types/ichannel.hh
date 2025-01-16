@@ -53,7 +53,17 @@ public:
 
 	void clear() noexcept { buffer_.clear(); }
 
-	bzd::Async<bzd::Span<const T>> read(bzd::Span<T>&& data) noexcept override
+protected:
+	virtual bzd::Generator<bzd::Span<const T>> readerImpl(bzd::Span<T> data) noexcept override
+	{
+		bzd::Span<const T> dataRead{};
+		while (dataRead = co_await !read(data), !dataRead.empty())
+		{
+			co_yield dataRead;
+		}
+	}
+
+	virtual bzd::Async<bzd::Span<const T>> read(bzd::Span<T> data) noexcept
 	{
 		if (buffer_.empty())
 		{

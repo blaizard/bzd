@@ -15,11 +15,10 @@
 #include "cc/bzd/type_traits/is_trivially_move_assignable.hh"
 #include "cc/bzd/type_traits/is_trivially_move_constructible.hh"
 #include "cc/bzd/type_traits/remove_reference.hh"
+#include "cc/bzd/utility/construct_at.hh"
 #include "cc/bzd/utility/forward.hh"
 #include "cc/bzd/utility/in_place.hh"
 #include "cc/bzd/utility/move.hh"
-
-#include <new> // Required for placement new.
 
 namespace bzd::impl {
 
@@ -213,7 +212,7 @@ public: // Functions
 	constexpr void emplace(Args&&... args) noexcept
 	{
 		// Using placement new
-		::new (&(data_.template get<VariantElementStorageType<T>>())) VariantElementStorageType<T>{bzd::forward<Args>(args)...};
+		bzd::constructAt(&(data_.template get<VariantElementStorageType<T>>()), bzd::forward<Args>(args)...);
 		// Sets the ID only if the constructor succeeded
 		id_ = Find<T>::value;
 	}

@@ -63,6 +63,22 @@ private:
 	{
 		return it2.it_.get() != it1;
 	}
+	friend constexpr auto operator-(const InputOrOutputReference<Iterator, Policies>& it1, const Iterator& it2) noexcept
+	{
+		return it1.it_.get() - it2;
+	}
+	friend constexpr auto operator-(const Iterator& it1, const InputOrOutputReference<Iterator, Policies>& it2) noexcept
+	{
+		return it1 - it2.it_.get();
+	}
+	friend constexpr auto operator+(const InputOrOutputReference<Iterator, Policies>& it1, const Iterator& it2) noexcept
+	{
+		return it1.it_.get() + it2;
+	}
+	friend constexpr auto operator+(const Iterator& it1, const InputOrOutputReference<Iterator, Policies>& it2) noexcept
+	{
+		return it1 + it2.it_.get();
+	}
 
 	bzd::ReferenceWrapper<Iterator> it_;
 };

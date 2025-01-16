@@ -3,9 +3,11 @@
 #include "cc/bzd/utility/pattern/to_stream/base.hh"
 #include "cc/bzd/utility/pattern/to_stream/input_range.hh"
 
+#include <iostream>
+
 namespace bzd {
 
-template <concepts::asyncGenerator Generator>
+template <concepts::asyncRange Generator>
 struct ToStream<Generator> : ToStream<bzd::StringView>
 {
 public:
@@ -15,7 +17,9 @@ public:
 	static bzd::Async<Size> process(bzd::OStream& stream, T& generator, Metadata metadata = Metadata{}) noexcept
 	{
 		bzd::Size count{0u};
+		::std::cout << "toStream start" << ::std::endl;
 		auto it = co_await !generator.begin();
+		::std::cout << "toStream start 2" << ::std::endl;
 		while (it != generator.end())
 		{
 			const auto size = co_await !bzd::toStream(stream, *it, metadata);
@@ -40,7 +44,7 @@ public:
 		auto it = co_await !generator.begin();
 		if (metadata.isPrecision)
 		{
-			while (it != generator.end() && metadata.precision <= count)
+			while (it != generator.end() && count <= metadata.precision)
 			{
 				co_await !stream.write(bzd::Span<const bzd::Byte>{reinterpret_cast<const bzd::Byte*>(&(*it)), 1u});
 				++count;

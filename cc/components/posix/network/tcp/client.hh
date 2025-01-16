@@ -8,6 +8,8 @@
 #include "cc/components/posix/network/tcp/interface.hh"
 #include "cc/components/posix/proactor/proactor.hh"
 
+#include <iostream>
+
 namespace bzd::components::posix::network::tcp {
 
 template <class Context>
@@ -84,9 +86,18 @@ struct ClientTraits<bzd::components::posix::network::tcp::Client<Context>>
 			co_return co_await context_.config.proactor.write(socket_.getFileDescriptor(), data);
 		}
 
-		bzd::Async<bzd::Span<const Byte>> read(bzd::Span<Byte>&& data) noexcept final
+	protected:
+		bzd::Generator<bzd::Span<const Byte>> readerImpl(bzd::Span<Byte> data) noexcept final
 		{
-			co_return co_await context_.config.proactor.read(socket_.getFileDescriptor(), bzd::move(data));
+			while (true)
+			{
+				auto dataRead = co_await !context_.config.proactor.read(socket_.getFileDescriptor(), bzd::move(data));
+				if (dataRead.empty())
+				{
+					break;
+				}
+				co_yield dataRead;
+			}
 		}
 
 	private:

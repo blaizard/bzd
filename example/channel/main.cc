@@ -78,8 +78,6 @@ public:
 		std::cout << std::endl;
 		co_return {};
 	}
-
-	bzd::Async<bzd::Span<const bzd::Byte>> read(bzd::Span<bzd::Byte>&& data) noexcept override { co_return data; }
 };
 
 class Adapter2

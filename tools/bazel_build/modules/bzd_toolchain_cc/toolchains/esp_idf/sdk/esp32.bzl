@@ -7,8 +7,8 @@ def sdk(name = "esp32_xtensa_lx6_sdk"):
         name = name,
         build_file = Label("//toolchains/esp_idf:sdk/sdk.BUILD"),
         urls = [
-            "https://datalocal.blaizard.com/file/bzd/sdk/esp32/esp32_xtensa_lx6_sdk_v5.4.tar.xz",
-            "https://data.blaizard.com/file/bzd/sdk/esp32/esp32_xtensa_lx6_sdk_v5.4.tar.xz",
+            "https://datalocal.blaizard.com/file/bzd/sdk/esp32/cc/esp32_xtensa_lx6_sdk_v5.4.tar.xz",
+            "https://data.blaizard.com/file/bzd/sdk/esp32/cc/esp32_xtensa_lx6_sdk_v5.4.tar.xz",
         ],
         strip_prefix = "esp32_xtensa_lx6_sdk",
         sha256 = "e0577241108d945f1ff1a4e0f3ef8c23685a8f2ca3cfa8328c6b69fadced4df8",

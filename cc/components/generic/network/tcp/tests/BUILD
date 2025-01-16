@@ -11,6 +11,7 @@ bzd_cc_test(
         "//cc:bzd",
         "//cc/bdl/generator/impl/adapter:context",
         "//cc/bzd/test",
+        "//cc/bzd/utility/ranges/views_async",
     ],
 )
 

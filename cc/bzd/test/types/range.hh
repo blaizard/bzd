@@ -6,7 +6,7 @@
 namespace bzd::test {
 
 /// Create custom range of various types.
-template <typeTraits::IteratorCategory iteratorCategory, class T = bzd::Int32, Size capacity = 42u>
+template <typeTraits::IteratorCategory iteratorCategory, class T = bzd::Int32, Size capacity = 42u, Bool hasConst = true>
 class Range
 {
 private:
@@ -33,9 +33,17 @@ public: // Constructor.
 
 public: // Iterators
 	[[nodiscard]] constexpr auto begin() noexcept { return Iterator{data_.begin()}; }
-	[[nodiscard]] constexpr auto begin() const noexcept { return ConstIterator{data_.begin()}; }
+	[[nodiscard]] constexpr auto begin() const noexcept
+	requires(hasConst)
+	{
+		return ConstIterator{data_.begin()};
+	}
 	[[nodiscard]] constexpr auto end() noexcept { return Iterator{data_.end()}; }
-	[[nodiscard]] constexpr auto end() const noexcept { return ConstIterator{data_.end()}; }
+	[[nodiscard]] constexpr auto end() const noexcept
+	requires(hasConst)
+	{
+		return ConstIterator{data_.end()};
+	}
 
 private:
 	Container data_;

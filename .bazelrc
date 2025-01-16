@@ -28,6 +28,12 @@ build --experimental_platform_in_output_dir
 # To investigate further, see https://github.com/bazelbuild/bazel/commit/293646c85a718686ce1d7a7ff6d1dd76256cb9bb
 common --noexperimental_use_platforms_in_output_dir_legacy_heuristic
 
+# Directories used by sandboxed non-worker execution may be reused to avoid unnecessary setup costs.
+# Save time on Sandbox creation and deletion when many of the same kind of action run during the
+# build.
+# Docs: https://bazel.build/reference/command-line-reference#flag--reuse_sandbox_directories
+build --reuse_sandbox_directories
+
 # Global test specific options
 test --test_output=errors
 test --verbose_failures

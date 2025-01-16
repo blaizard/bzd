@@ -28,13 +28,26 @@ TEST(ContainerVariant, Constructor)
 	}
 }
 
-TEST(ContainerVariant, ConstConstructor)
+TEST(ContainerVariant, ConstructorConstructible)
 {
 	const int constInt{};
-	bzd::Variant<int, float> variant1{static_cast<int>(constInt)};
+	bzd::Variant<int, double> variant1{static_cast<int>(constInt)};
 	EXPECT_EQ(variant1.index(), 0);
-	bzd::Variant<int, float> variant2{constInt};
+	bzd::Variant<int, double> variant2{constInt};
 	EXPECT_EQ(variant2.index(), 0);
+	bzd::Variant<int, double> variant3{static_cast<short>(constInt)};
+	EXPECT_EQ(variant3.index(), 0);
+}
+
+TEST(ContainerVariant, ConstConstructor)
+{
+	bzd::Variant<const int, float> variant{12};
+	EXPECT_EQ(variant.index(), 0);
+	EXPECT_EQ(variant.template get<const int>(), 12);
+
+	variant.emplace<const int>(5);
+	EXPECT_EQ(variant.index(), 0);
+	EXPECT_EQ(variant.template get<const int>(), 5);
 }
 
 TEST(ContainerVariant, Reference)

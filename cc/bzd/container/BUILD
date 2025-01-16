@@ -9,7 +9,6 @@ bzd_cc_library(
         ":array",
         ":btree",
         ":function_ref",
-        ":ichannel_buffered",
         ":map",
         ":named_type",
         ":non_owning_list",
@@ -94,25 +93,6 @@ cc_library(
         "//cc/bzd/type_traits:add_pointer",
         "//cc/bzd/type_traits:invocable",
         "//cc/bzd/type_traits:is_same_class",
-    ],
-)
-
-cc_library(
-    name = "ichannel_buffered",
-    hdrs = [
-        "ichannel_buffered.hh",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":optional",
-        ":ring_buffer",
-        ":span",
-        "//cc/bzd/algorithm:copy",
-        "//cc/bzd/core:channel",
-        "//cc/bzd/core/async",
-        "//cc/bzd/platform:types",
-        "//cc/bzd/utility/ranges/views:drop",
-        "//cc/bzd/utility/ranges/views:reverse",
     ],
 )
 
@@ -452,6 +432,7 @@ cc_library(
         "//cc/bzd/type_traits:is_trivially_move_assignable",
         "//cc/bzd/type_traits:is_trivially_move_constructible",
         "//cc/bzd/type_traits:remove_reference",
+        "//cc/bzd/utility:construct_at",
         "//cc/bzd/utility:forward",
         "//cc/bzd/utility:in_place",
         "//cc/bzd/utility:move",

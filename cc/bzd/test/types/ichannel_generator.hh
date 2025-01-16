@@ -14,14 +14,13 @@ public:
 	IChannelGenerator() = default;
 	constexpr explicit IChannelGenerator(const T start) noexcept : Parent{}, current_{start} {}
 
-public:
-	bzd::Async<bzd::Span<const T>> read(bzd::Span<T>&& data) noexcept override
+private:
+	bzd::Async<bzd::Span<const T>> read(bzd::Span<T> data) noexcept override
 	{
 		fill();
-		return Parent::read(bzd::move(data));
+		return Parent::read(data);
 	}
 
-private:
 	constexpr void fill() noexcept
 	{
 		while (!this->buffer_.full())

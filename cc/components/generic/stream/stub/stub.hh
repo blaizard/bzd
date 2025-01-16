@@ -13,6 +13,7 @@ public:
 
 	bzd::Async<> write(const bzd::Span<const bzd::Byte>) noexcept override { co_return {}; }
 
-	bzd::Async<bzd::Span<const bzd::Byte>> read(bzd::Span<bzd::Byte>&&) noexcept override { co_return bzd::Span<const bzd::Byte>{}; }
+protected:
+	bzd::Generator<bzd::Span<const bzd::Byte>> readerImpl(bzd::Span<bzd::Byte>) noexcept override { co_yield bzd::Span<const bzd::Byte>{}; }
 };
 } // namespace bzd::components::generic::stream

@@ -1,11 +1,11 @@
 #pragma once
 
-#include "cc/bzd/container/ichannel_buffered.hh"
 #include "cc/bzd/container/map.hh"
 #include "cc/bzd/container/ostream_buffered.hh"
 #include "cc/bzd/container/string_stream.hh"
 #include "cc/bzd/utility/pattern/from_stream.hh"
 #include "cc/bzd/utility/pattern/to_stream.hh"
+#include "cc/bzd/utility/ranges/views_async/join.hh"
 #include "cc/bzd/utility/synchronization/lock_guard.hh"
 #include "cc/bzd/utility/synchronization/mutex.hh"
 #include "interfaces/timer.hh"
@@ -26,86 +26,69 @@ struct Header
 	static constexpr Header accept(const StringView value) noexcept { return {"Accept"_sv, value}; }
 };
 
-template <class Client, Size bufferCapacity = 128u>
+template <class Client>
 class Response : public bzd::IStream
 {
 public:
-	constexpr Response(Client& client) noexcept :
-		client_{client}, connectCounter_{client.connectCounter_}, stream_{client_.stream_.valueMutable()}
+	constexpr Response(Client& client) noexcept : client_{client}, connectCounter_{client.connectCounter_} {}
+
+	GeneratorIChannel reader(bzd::Span<Byte> data) noexcept override
 	{
-	}
+		auto reader = client_.stream_.valueMutable().reader(data);
 
-	/*
-	bzd::Generator<bzd::Span<const bzd::Byte>> reader(bzd::Span<bzd::Byte>&& data) noexcept override
-	{
-		auto generator = stream_.reader(bzd::move(data));
+		// Read the status.
+		const auto [version, code] = co_await !readStatus(reader | bzd::ranges::join());
 
-		auto reader = generator | ranges::join();
-		co_await readStatus(reader);
-		co_await readHeaders(reader);
-
-
-		co_yield *generator
-	}
-	*/
-
-	bzd::Async<bzd::Span<const bzd::Byte>> read(bzd::Span<bzd::Byte>&& data) noexcept override
-	{
-		// A new connection has been sent, the response object is invalid.
-		if (client_.connectCounter_ != connectCounter_)
+		switch (version)
 		{
-			co_return bzd::error::Failure("Session expired.");
+		case "1.0"_s:
+			[[fallthrough]];
+		case "1.1"_s:
+			break;
+		default:
+			co_yield bzd::error::Failure("Version '{}' not supported."_csv, version);
+		}
+		if (code != 200)
+		{
+			co_await !error(reader, "Code {}: {}"_csv, code);
 		}
 
-		if (state_ == State::init)
-		{
-			auto reader = stream_.reader();
-
-			// Read the status.
-			const auto [version, code] = co_await !readStatus(reader);
-			switch (version)
-			{
-			case "1.0"_s:
-				[[fallthrough]];
-			case "1.1"_s:
-				break;
-			default:
-				co_return bzd::error::Failure("Version '{}' not supported."_csv, version);
-			}
-			if (code != 200)
-			{
-				co_await !error(reader, "Code {}: {}"_csv, code);
-			}
-
-			// Read the headers.
-			co_await !readHeaders(reader, options_);
-			state_ = State::body;
-		}
+		// Read the headers.
+		co_await !readHeaders(reader | bzd::ranges::join(), options_);
+		state_ = State::body;
 
 		switch (options_.transferMode)
 		{
 		case Options::TransferMode::normal:
-			co_return co_await !stream_.read(bzd::move(data));
-		case Options::TransferMode::chunked:
 		{
-			if (options_.contentLength == 0u)
+			auto it = co_await !reader.begin();
+			while (it != reader.end())
 			{
-				co_await !bzd::fromStream(stream_.reader(), "\\s*{:x}\r\n"_csv, options_.contentLength);
+				co_yield *it;
+				co_await !++it;
 			}
-			if (options_.contentLength == 0u)
+		}
+		break;
+		case Options::TransferMode::chunked:
+			while (true)
 			{
-				co_return bzd::Span<const bzd::Byte>{};
+				// Read the size.
+				Size contentLength{};
+				co_await !bzd::fromStream(reader | bzd::ranges::join(), "\\s*{:x}[ \r\t]*\n"_csv, contentLength);
+				if (contentLength == 0u)
+				{
+					break;
+				}
+
+				auto chunkReader = reader.first(contentLength);
+				auto it = co_await !chunkReader.begin();
+				while (it != chunkReader.end())
+				{
+					co_yield *it;
+					co_await !++it;
+				}
 			}
-
-			data = data.first(bzd::min(data.size(), options_.contentLength));
-			const auto dataRead = co_await !stream_.read(bzd::move(data));
-			::std::cout << dataRead.size() << ::std::endl;
-			options_.contentLength -= dataRead.size();
-			co_return dataRead;
 		}
-		}
-
-		co_return bzd::error::Failure("Nooo."_csv);
 	}
 
 private:
@@ -161,7 +144,7 @@ private:
 
 	/// Read the first line that should look like this.
 	/// HTTP/1.1 200 OK
-	bzd::Async<Status> readStatus(auto& reader) noexcept
+	bzd::Async<Status> readStatus(auto&& reader) noexcept
 	{
 		Status status{};
 		const auto maybeSuccess =
@@ -174,7 +157,7 @@ private:
 	}
 
 	/// Read headers.
-	bzd::Async<void> readHeaders(auto& reader, Options& options) noexcept
+	bzd::Async<void> readHeaders(auto&& reader, Options& options) noexcept
 	{
 		// Note, when using lambda with capture by reference, it somehow fails.
 		// I believe this is because the reference from the lambda is not valid anymore. <- This is still
@@ -199,7 +182,6 @@ private:
 			const auto maybeResult = co_await bzd::fromStream(reader, "[ \t]*{}[ \t]*:"_csv, wrapper);
 			if (maybeResult.hasValue())
 			{
-				::std::cout << "FOUND! " << wrapper.value()->first.data() << std::endl;
 				const auto maybeResult = co_await wrapper.value()->second(reader, options);
 				(void)maybeResult;
 			}
@@ -215,7 +197,7 @@ private:
 	}
 
 	template <class... Args>
-	bzd::Async<> error(auto& reader, Args&&... args) noexcept
+	bzd::Async<> error(auto&& reader, Args&&... args) noexcept
 	{
 		bzd::StringStream<80u> buffer;
 		auto fillBuffer = bzd::toStream(buffer, "[...]{:.64}[...]"_csv, reader);
@@ -226,7 +208,6 @@ private:
 private:
 	Client& client_;
 	Size connectCounter_;
-	bzd::IStreamBuffered<bufferCapacity> stream_;
 	Options options_{};
 	State state_{State::init};
 };
@@ -263,7 +244,7 @@ public:
 	constexpr auto header(const StringView key, const StringView value) && { return bzd::move(*this).header(Header{key, value}); }
 
 	template <Size bufferCapacity = 128u>
-	Async<Response<Client, bufferCapacity>> send() &&
+	Async<Response<Client>> send() &&
 	{
 		auto scope = co_await !client_.connectIfNeeded();
 
@@ -276,7 +257,7 @@ public:
 		co_await !bzd::toStream(buffer, "\r\n"_csv);
 		co_await !buffer.flush();
 
-		co_return Response<Client, bufferCapacity>{client_};
+		co_return Response<Client>{client_};
 	}
 
 private:
@@ -295,6 +276,7 @@ class Client
 {
 public: // Traits.
 	using Self = Client<Network>;
+	using Stream = typename Network::Stream;
 
 public:
 	constexpr Client(Network& network, bzd::Timer& timer, const StringView hostname, const UInt32 port) noexcept :
@@ -315,7 +297,7 @@ private:
 	template <class, Size>
 	friend class Request;
 
-	template <class, Size>
+	template <class>
 	friend class Response;
 
 	Async<lockGuard::Type<Mutex>> connectIfNeeded()
@@ -329,7 +311,7 @@ private:
 private:
 	Network& network_;
 	bzd::Timer& timer_;
-	Optional<typename Network::Stream> stream_;
+	Optional<Stream> stream_;
 	StringView hostname_;
 	UInt32 port_;
 	/// The number of times a new connection was established.

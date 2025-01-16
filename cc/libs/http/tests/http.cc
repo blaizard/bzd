@@ -15,24 +15,25 @@ TEST_ASYNC(Http, Simple)
 	auto network = bzd::components::generic::network::tcp::MockClientWithString("HTTP/1.1 200 OK\r\n\r\n"_sv.asBytes());
 	bzd::http::Client client{network, test.timer(), "", 1234u};
 
-	auto response = co_await !client.get("/").send();
+	[[maybe_unused]] auto response = co_await !client.get("/").send();
+
+	// Consume the output, should be empty.
 	bzd::Array<char, 100u> data;
-	bzd::ignore = co_await !response.read(data.asBytesMutable());
+	EXPECT_EQ_RANGE(response.reader(data.asBytesMutable()) | bzd::ranges::join(), ""_sv.asBytes());
 
 	co_return {};
 }
 
-TEST_ASYNC(Http, Chunked)
+TEST_ASYNC(Http, Chunked, (bzd::Array<char, 1000u>, bzd::Array<char, 10u>, bzd::Array<char, 1u>))
 {
 	auto network = bzd::components::generic::network::tcp::MockClientWithString(bzd::StringView{request_http1_1_chunked}.asBytes());
 	bzd::http::Client client{network, test.timer(), "", 1234u};
 
 	auto response = co_await !client.get("/").send();
 
-	bzd::Array<char, 100u> data;
-	auto values = response.reader2(data.asBytesMutable()) | bzd::ranges::join();
+	TestType data;
+	auto values = response.reader(data.asBytesMutable()) | bzd::ranges::join();
 	EXPECT_EQ_RANGE(values, bzd::StringView{request_http1_1_chunked_expected}.asBytes());
-
 	co_return {};
 }
 

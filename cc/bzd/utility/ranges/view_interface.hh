@@ -20,8 +20,7 @@ public:
 	constexpr Bool empty() const noexcept { return (child().begin() == child().end()); }
 
 	template <Bool True = true>
-	requires(True && concepts::forwardRange<CRTP<True>> &&
-			 concepts::sizedSentinelFor<typeTraits::RangeIterator<CRTP<True>>, typeTraits::RangeSentinel<CRTP<True>>>)
+	requires(True && concepts::sizedSentinelFor<typeTraits::RangeIterator<CRTP<True>>, typeTraits::RangeSentinel<CRTP<True>>>)
 	constexpr auto size() const noexcept
 	{
 		return child().end() - child().begin();

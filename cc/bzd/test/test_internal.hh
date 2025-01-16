@@ -320,10 +320,10 @@
 #define BZDTEST_TEST_EQ_RANGE_(range1, range2, failFct)                                                                                    \
 	if (![](auto&& bzdTestA_, auto&& bzdTestB_) {                                                                                          \
 			auto maybeFirst1 = BZDTEST_BEGIN_(bzdTestA_);                                                                                  \
-			BZDTEST_FAIL_(!maybeFirst1, "Failure\nTest: bzd::begin(" #range1 ") failed");                                                  \
+			BZDTEST_FAIL_(!maybeFirst1, "Failure\nTest: co_await bzd::begin(" #range1 ") failed");                                         \
 			auto& first1 = maybeFirst1.valueMutable();                                                                                     \
 			auto maybeFirst2 = BZDTEST_BEGIN_(bzdTestB_);                                                                                  \
-			BZDTEST_FAIL_(!maybeFirst2, "Failure\nTest: bzd::begin(" #range2 ") failed");                                                  \
+			BZDTEST_FAIL_(!maybeFirst2, "Failure\nTest: co_await bzd::begin(" #range2 ") failed");                                         \
 			auto& first2 = maybeFirst2.valueMutable();                                                                                     \
 			auto last1 = bzd::end(bzdTestA_);                                                                                              \
 			auto last2 = bzd::end(bzdTestB_);                                                                                              \
@@ -336,11 +336,11 @@
 				values1.pushBack(*first1);                                                                                                 \
 				values2.pushBack(*first2);                                                                                                 \
 				BZDTEST_FAIL_(!(*first1 == *first2), "Failure\nTest: " #range1 " != " #range2, values1, values2);                          \
-				BZDTEST_FAIL_(!BZDTEST_INCREMENT_(first1), "Failure\nTest: ++it1 failed", values1, values2);                               \
-				BZDTEST_FAIL_(!BZDTEST_INCREMENT_(first2), "Failure\nTest: ++it2 failed", values1, values2);                               \
+				BZDTEST_FAIL_(!BZDTEST_INCREMENT_(first1), "Failure\nTest: values identical but co_await ++it1 failed", values1, values2); \
+				BZDTEST_FAIL_(!BZDTEST_INCREMENT_(first2), "Failure\nTest: values identical but co_await ++it2 failed", values1, values2); \
 			}                                                                                                                              \
-			BZDTEST_FAIL_(first1 != last1, "Failure\nTest: " #range2 " terminated while " #range1 " did not");                             \
-			BZDTEST_FAIL_(first2 != last2, "Failure\nTest: " #range1 " terminated while " #range2 " did not");                             \
+			BZDTEST_FAIL_(first1 != last1, "Failure\nTest: " #range2 " terminated while " #range1 " did not", *first1);                    \
+			BZDTEST_FAIL_(first2 != last2, "Failure\nTest: " #range1 " terminated while " #range2 " did not", *first2);                    \
 			return true;                                                                                                                   \
 		}((range1), (range2)))                                                                                                             \
 	{                                                                                                                                      \

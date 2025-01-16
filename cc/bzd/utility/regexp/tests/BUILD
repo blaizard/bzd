@@ -17,7 +17,6 @@ bzd_cc_test(
         "async.cc",
     ],
     deps = [
-        "//cc/bzd/container:ichannel_buffered",
         "//cc/bzd/test",
         "//cc/bzd/test/types",
         "//cc/bzd/utility/ranges/views_async",

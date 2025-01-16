@@ -101,7 +101,8 @@ private:
 	{
 		if (--workloadCount_ == 0u)
 		{
-			logger_.info("All workloads are terminated, requesting shutdown.").sync();
+			// This might be blocking if the services are not running anymore.
+			// logger_.info("All workloads are terminated, requesting shutdown.").sync();
 			executor_.requestShutdown();
 		}
 		return bzd::nullopt;

@@ -11,7 +11,6 @@ bzd_cc_library(
         ":generator",
         ":ichannel",
         ":ichannel_generator",
-        ":istream_reader",
         ":lifetime_counter",
         ":move_only",
         ":no_default_constructor",
@@ -68,20 +67,6 @@ cc_library(
         "//cc/bzd/core/async",
         "//cc/bzd/platform:types",
         "//cc/bzd/utility:to_underlying",
-    ],
-)
-
-cc_library(
-    name = "istream_reader",
-    hdrs = [
-        "istream_reader.hh",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//cc/bzd/container:string",
-        "//cc/bzd/core:channel",
-        "//cc/bzd/core/async",
-        "//cc/bzd/platform:types",
     ],
 )
 

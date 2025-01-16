@@ -46,9 +46,7 @@ struct ClientTraits<bzd::components::generic::network::tcp::Client<Context>>
 	public:
 		explicit constexpr Stream(bzd::components::generic::network::tcp::Client<Context>& client,
 								  const StringView hostname,
-								  const bzd::network::PortType port) noexcept :
-			client_{client},
-			hostname_{hostname}, port_{port}
+								  const bzd::network::PortType port) noexcept : client_{client}, hostname_{hostname}, port_{port}
 		{
 		}
 
@@ -61,17 +59,25 @@ struct ClientTraits<bzd::components::generic::network::tcp::Client<Context>>
 			co_return {};
 		}
 
-		bzd::Async<bzd::Span<const Byte>> read(bzd::Span<Byte>&& data) noexcept override
+	protected:
+		bzd::Generator<bzd::Span<const Byte>> readerImpl(bzd::Span<Byte> data) noexcept override
 		{
-			co_await bzd::async::yield();
-			const auto maximumSize = data.size();
-			Metadata metadata{hostname_, port_, indexRead_};
-			const auto output = client_.read(bzd::move(data), metadata);
-			bzd::assert::isTrue(output.size() <= maximumSize,
-								"config.read() returned too much data: {} vs {}"_csv,
-								output.size(),
-								maximumSize);
-			co_return output;
+			while (true)
+			{
+				co_await bzd::async::yield();
+				const auto maximumSize = data.size();
+				Metadata metadata{hostname_, port_, indexRead_};
+				const auto output = client_.read(bzd::move(data), metadata);
+				bzd::assert::isTrue(output.size() <= maximumSize,
+									"config.read() returned too much data: {} vs {}"_csv,
+									output.size(),
+									maximumSize);
+				if (output.empty())
+				{
+					break;
+				}
+				co_yield output;
+			}
 		}
 
 	private:

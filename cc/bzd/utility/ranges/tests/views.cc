@@ -88,9 +88,11 @@ TEST(Views, Owning)
 	helperTestMove(bzd::ranges::Owning{"012345"_sv}, bzd::ranges::Owning{"012345"_sv}, "012345"_sv);
 }
 
-TEST(Views, Drop)
+using Drop = bzd::test::Range<bzd::typeTraits::IteratorCategory::forward, int, 5>;
+using DropNoConst = bzd::test::Range<bzd::typeTraits::IteratorCategory::forward, int, 5, /*const*/ false>;
+TEST(Views, Drop, (Drop, DropNoConst))
 {
-	bzd::test::Range<bzd::typeTraits::IteratorCategory::forward, int, 5> range{0, 1, 2, 3, 4};
+	TestType range{0, 1, 2, 3, 4};
 	auto view = range | bzd::ranges::drop(2);
 	static_assert(bzd::typeTraits::isSame<decltype(view), bzd::ranges::Drop<bzd::ranges::Ref<decltype(range)>>>);
 
@@ -112,9 +114,11 @@ TEST(Views, Drop)
 	helperTestMove("012345"_sv | bzd::ranges::drop(2), "012345"_sv | bzd::ranges::drop(2), "2345"_sv);
 }
 
-TEST(Views, Take)
+using Take = bzd::test::Range<bzd::typeTraits::IteratorCategory::forward, int, 5>;
+using TakeNoConst = bzd::test::Range<bzd::typeTraits::IteratorCategory::forward, int, 5, /*const*/ false>;
+TEST(Views, Take, (Take, TakeNoConst))
 {
-	bzd::test::Range<bzd::typeTraits::IteratorCategory::forward, int, 5> range{0, 1, 2, 3, 4};
+	TestType range{0, 1, 2, 3, 4};
 	auto view = range | bzd::ranges::take(2);
 	static_assert(bzd::typeTraits::isSame<decltype(view), bzd::ranges::Take<bzd::ranges::Ref<decltype(range)>>>);
 
@@ -130,9 +134,11 @@ TEST(Views, Take)
 	helperTestMove("012345"_sv | bzd::ranges::take(2), "012345"_sv | bzd::ranges::take(2), "01"_sv);
 }
 
-TEST(Views, DropLast)
+using DropLast = bzd::test::Range<bzd::typeTraits::IteratorCategory::bidirectional, int, 5>;
+using DropLastNoConst = bzd::test::Range<bzd::typeTraits::IteratorCategory::bidirectional, int, 5, /*const*/ false>;
+TEST(Views, DropLast, (DropLast, DropLastNoConst))
 {
-	bzd::test::Range<bzd::typeTraits::IteratorCategory::bidirectional, int, 5> range{0, 1, 2, 3, 4};
+	TestType range{0, 1, 2, 3, 4};
 	auto view = range | bzd::ranges::dropLast(1);
 	static_assert(bzd::typeTraits::isSame<decltype(view), bzd::ranges::DropLast<bzd::ranges::Ref<decltype(range)>>>);
 
@@ -154,9 +160,11 @@ TEST(Views, DropLast)
 	helperTestMove("012345"_sv | bzd::ranges::dropLast(2), "012345"_sv | bzd::ranges::dropLast(2), "0123"_sv);
 }
 
-TEST(Views, Transform)
+using Transform = bzd::test::Range<bzd::typeTraits::IteratorCategory::forward, int, 5>;
+using TransformNoConst = bzd::test::Range<bzd::typeTraits::IteratorCategory::forward, int, 5, /*const*/ false>;
+TEST(Views, Transform, (Transform, TransformNoConst))
 {
-	bzd::test::Range<bzd::typeTraits::IteratorCategory::forward, int, 5> range{0, 1, 2, 3, 4};
+	TestType range{0, 1, 2, 3, 4};
 	auto view = range | bzd::ranges::transform([](const auto value) { return value * value; });
 
 	const auto expected = {0, 1, 4, 9, 16};
@@ -168,9 +176,11 @@ TEST(Views, Transform)
 	helperTestMove("ABC"_sv | bzd::ranges::transform(transformFct), "ABC"_sv | bzd::ranges::transform(transformFct), "abc"_sv);
 }
 
-TEST(Views, Reverse)
+using Reverse = bzd::test::Range<bzd::typeTraits::IteratorCategory::bidirectional, int, 5>;
+using ReverseNoConst = bzd::test::Range<bzd::typeTraits::IteratorCategory::bidirectional, int, 5, /*const*/ false>;
+TEST(Views, Reverse, (Reverse, ReverseNoConst))
 {
-	bzd::test::Range<bzd::typeTraits::IteratorCategory::bidirectional, int, 5> range{0, 1, 2, 3, 4};
+	TestType range{0, 1, 2, 3, 4};
 	auto view = range | bzd::ranges::reverse();
 	static_assert(bzd::typeTraits::isSame<decltype(view), bzd::ranges::Reverse<bzd::ranges::Ref<decltype(range)>>>);
 

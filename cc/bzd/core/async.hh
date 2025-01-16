@@ -26,6 +26,8 @@
 #include "cc/bzd/utility/ignore.hh"
 #include "cc/bzd/utility/synchronization/sync_lock_guard.hh"
 
+#include <iostream>
+
 namespace bzd::async {
 using Executable = bzd::async::impl::PromiseBase;
 using ExecutableSuspended = bzd::async::impl::ExecutableSuspended<Executable>;
@@ -366,7 +368,7 @@ private:
 
 namespace bzd::async {
 
-template <concepts::asyncGenerator T, class Callable>
+template <concepts::asyncRange T, class Callable>
 bzd::Async<> forEach(T&& generator, Callable&& callable) noexcept
 {
 	auto it = co_await !generator.begin();

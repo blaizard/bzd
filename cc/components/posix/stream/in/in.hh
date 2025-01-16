@@ -45,14 +45,17 @@ public: // Constructors
 		}
 	}
 
-public: // API
-	bzd::Async<bzd::Span<const bzd::Byte>> read(bzd::Span<bzd::Byte>&& data) noexcept final
+protected: // API
+	bzd::Generator<bzd::Span<const bzd::Byte>> readerImpl(bzd::Span<bzd::Byte> data) noexcept final
 	{
 		if (!init_)
 		{
 			co_return bzd::error::Failure("No terminal."_csv);
 		}
-		co_return (co_await context_.config.proactor.read(in_, bzd::move(data)));
+		while (true)
+		{
+			co_yield (co_await context_.config.proactor.read(in_, bzd::move(data)));
+		}
 	}
 
 private:

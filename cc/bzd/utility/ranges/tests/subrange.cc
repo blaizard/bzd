@@ -39,8 +39,6 @@ TEST(SubRange, VariousTypes)
 	{
 		bzd::test::Range<bzd::typeTraits::IteratorCategory::input> range;
 		bzd::ranges::SubRange subView{range.begin(), range.end()};
-		static_assert(!bzd::concepts::sizedRange<decltype(subView)>, "No size member.");
-		static_assert(!hasSize<decltype(subView)>, "No size member.");
 		static_assert(!hasData<decltype(subView)>, "No data member.");
 		static_assert(!hasData<const decltype(subView)>, "No const data member.");
 		static_assert(!hasRandomAccessor<decltype(subView)>, "No random accessor.");
@@ -49,8 +47,6 @@ TEST(SubRange, VariousTypes)
 	{
 		bzd::test::Range<bzd::typeTraits::IteratorCategory::output> range;
 		bzd::ranges::SubRange subView{range.begin(), range.end()};
-		static_assert(!bzd::concepts::sizedRange<decltype(subView)>, "No size member.");
-		static_assert(!hasSize<decltype(subView)>, "No size member.");
 		static_assert(!hasData<decltype(subView)>, "No data member.");
 		static_assert(!hasData<const decltype(subView)>, "No const data member.");
 		static_assert(!hasRandomAccessor<decltype(subView)>, "No random accessor.");

@@ -10,6 +10,7 @@ clang = {
         "linux-x86_64": linux_x86_64_17_0_5,
     },
     "clang_19.1.7": {
+        "linux-arm64": linux_arm64_17_0_0,
         "linux-x86_64": linux_x86_64_19_1_7,
     },
 }

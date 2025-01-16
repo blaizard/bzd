@@ -3,6 +3,8 @@
 #include "cc/bzd/core/async.hh"
 #include "cc/bzd/utility/iterators/container_of_iterables.hh"
 
+#include <iostream>
+
 namespace bzd::iterator {
 
 template <class Iterator, concepts::sentinelFor<Iterator> Sentinel>
@@ -20,6 +22,7 @@ requires(concepts::asyncIterator<Iterator>)
 			else
 			{
 				nested_ = co_await !bzd::begin(*it_);
+				::std::cout << "ContainerOfIterables" << ::std::endl;
 			}
 		}
 		else
