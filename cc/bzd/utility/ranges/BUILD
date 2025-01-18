@@ -1,4 +1,14 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
+load("//cc/bdl:cc.bzl", "bzd_cc_library")
+
+bzd_cc_library(
+    name = "ranges",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/utility/ranges/views",
+        "//cc/bzd/utility/ranges/views_async",
+    ],
+)
 
 cc_library(
     name = "associate_scope",

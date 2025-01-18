@@ -32,9 +32,12 @@ bzd_cc_library(
         ":to_underlying",
         ":withdraw",
         "//cc/bzd/utility/bit",
+        "//cc/bzd/utility/pattern:from_stream",
+        "//cc/bzd/utility/pattern:from_string",
         "//cc/bzd/utility/pattern:to_stream",
         "//cc/bzd/utility/pattern:to_string",
         "//cc/bzd/utility/random",
+        "//cc/bzd/utility/ranges",
         "//cc/bzd/utility/synchronization",
     ],
 )
