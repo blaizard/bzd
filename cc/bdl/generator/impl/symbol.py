@@ -22,14 +22,12 @@ class _VisitorSymbol(Visitor):
 	    reference: bool,
 	    definition: bool,
 	    nonConst: bool,
-	    referenceForInterface: bool,
 	    values: typing.Optional[typing.Sequence[str]],
 	) -> None:
 		self.namespaceToFQN = namespaceToFQN
 		self.reference = reference
 		self.definition = definition
 		self.nonConst = nonConst
-		self.referenceForInterface = referenceForInterface
 		self.values_ = values
 		self.symbol = symbol
 		super().__init__(symbol=symbol)
@@ -49,13 +47,11 @@ class _VisitorSymbol(Visitor):
 		return ""
 
 	def visitSymbol(self, symbol: Symbol, nested: typing.List[str], parameters: ParametersResolved) -> str:
-		"""
-        Called when an element needs to be formatted.
-        """
+		"""Called when an element needs to be formatted."""
 
 		# Whether this type should be a reference or not.
-		useReference = self.isTopLevel and self.reference
-		useReference |= (self.referenceForInterface and symbol.category == Category.interface)
+		useReference = self.reference if self.isTopLevel else (symbol.category == Category.interface
+		                                                       or symbol.category == Category.component)
 
 		outputList: typing.List[str] = []
 		output: str
@@ -108,7 +104,6 @@ def symbolToStr(
     reference: bool = False,
     definition: bool = False,
     nonConst: bool = False,
-    referenceForInterface: bool = False,
     values: typing.Optional[typing.Sequence[str]] = None,
     registry: bool = False,
 ) -> str:
@@ -145,6 +140,5 @@ def symbolToStr(
 	    reference=reference,
 	    definition=definition,
 	    nonConst=nonConst,
-	    referenceForInterface=referenceForInterface,
 	    values=values,
 	).result

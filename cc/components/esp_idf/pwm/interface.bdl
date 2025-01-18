@@ -1,0 +1,32 @@
+use "interfaces/core.bdl"
+
+namespace bzd.components.esp32;
+
+
+component LEDCTimer {
+config:
+	// Frequency of the timer in Hz.
+	frequency = Integer [min(0)];
+	// The timer number to be used.
+	number = Integer [min(0)];
+	
+interface:
+	method init() [init];
+	method shutdown() [shutdown];
+	
+}
+
+component LEDCPWM {
+config:
+	timer = LEDCTimer;
+	duty = Integer;
+	channel = Integer;
+	io = Integer [min(0)];
+	
+interface:
+	method init() [init];
+	method shutdown() [shutdown];
+	
+}
+
+

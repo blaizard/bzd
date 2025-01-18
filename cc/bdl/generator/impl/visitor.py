@@ -97,10 +97,10 @@ class Transform:
 		return fqnToNameStrOriginal(".".join(fqn))
 
 	def symbolReferenceToStr(self, symbol: Symbol) -> str:
-		return symbolToStrOriginal(symbol=symbol, reference=True, referenceForInterface=True)
+		return symbolToStrOriginal(symbol=symbol, reference=True)
 
 	def symbolDefinitionToStr(self, symbol: Symbol) -> str:
-		return symbolToStrOriginal(symbol=symbol, definition=True, referenceForInterface=True)
+		return symbolToStrOriginal(symbol=symbol, definition=True)
 
 	def symbolNonConstToStr(self, symbol: Symbol) -> str:
 		return symbolToStrOriginal(symbol=symbol, nonConst=True)
@@ -183,7 +183,7 @@ class Transform:
 		    condition=entity.isSymbol,
 		    message="An expression declaration must have a type.",
 		)
-		output += f" {symbolToStrOriginal(entity.symbol, referenceForInterface=True, values=values)}"
+		output += f" {symbolToStrOriginal(entity.symbol, values=values)}"
 		if entity.isName:
 			output += f" {entity.name}"
 		if values:

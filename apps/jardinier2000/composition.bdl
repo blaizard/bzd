@@ -1,11 +1,28 @@
 use "interfaces/timer.bdl"
+use "cc/components/esp_idf/pwm/interface.bdl"
 
 namespace jardinier;
 
 
+component LightController {
+config:
+	pwms = Array<bzd.components.esp32.LEDCPWM>;
+	timer = {timer};
+	out = {out};
+	
+interface:
+	method run();
+	
+}
+
 method water(timer = {timer}, out = {out}, wateringTimeS = Integer, wakeUpPeriodS = Integer);
 composition {
 	water(wateringTimeS = 60, wakeUpPeriodS = 12 * 3600);
+	pwmTimer = bzd.components.esp32.LEDCTimer(frequency = 4000, number = 0);
+	pwm0 = bzd.components.esp32.LEDCPWM(timer = pwmTimer, duty = 50, io = 12, channel = 0);
+	pwm1 = bzd.components.esp32.LEDCPWM(timer = pwmTimer, duty = 50, io = 13, channel = 1);
+	lights = LightController(pwms = list(pwm0, pwm1));
+	lights.run();
 	
 }
 

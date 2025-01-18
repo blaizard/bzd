@@ -8,6 +8,7 @@ bdl_library(
         "composition.bdl",
     ],
     deps = [
+        "//cc/components/esp_idf/pwm",
         "//interfaces:timer",
     ],
 )

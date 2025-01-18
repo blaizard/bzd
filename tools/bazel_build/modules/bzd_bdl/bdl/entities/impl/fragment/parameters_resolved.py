@@ -67,6 +67,11 @@ class ParametersResolvedItem:
 		    throw=throw,
 		)
 
+	def __repr__(self) -> str:
+		if self.isName:
+			return f"{self.name}: {self.param}, expected={self.expected}"
+		return f"<unnamed>: {self.param}, expected={self.expected}"
+
 
 class ParametersResolved:
 
@@ -143,7 +148,5 @@ class ParametersResolved:
 		)
 
 	def __repr__(self) -> str:
-		content = []
-		for item in self.list:
-			content.append(f"{item.name}: {item.param}, expected={item.expected}")
+		content = [str(item) for item in self.list]
 		return "\n".join(content)
