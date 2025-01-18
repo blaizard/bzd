@@ -136,11 +136,7 @@ public:
 		{
 			auto dataIt = bzd::begin(*it);
 			const auto dataEnd = bzd::end(*it);
-			do
-			{
-				co_yield ChannelRange{ChannelRangeIterator{dataIt}, dataEnd};
-			} while (dataIt != dataEnd);
-
+			co_yield ChannelRange{ChannelRangeIterator{dataIt}, dataEnd};
 			co_await !++it;
 		}
 	}
