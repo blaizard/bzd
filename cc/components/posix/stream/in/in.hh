@@ -50,7 +50,7 @@ protected: // API
 	{
 		if (!init_)
 		{
-			co_return bzd::error::Failure("No terminal."_csv);
+			co_yield bzd::error::Failure("No terminal."_csv);
 		}
 		while (true)
 		{
