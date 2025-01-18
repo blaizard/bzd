@@ -1,9 +1,16 @@
 #pragma once
 
 #include "cc/bzd/core/async.hh"
+#include "cc/components/esp_idf/error.hh"
 #include "cc/components/esp_idf/pwm/interface.hh"
 
 #include <driver/ledc.h>
+
+#define LEDC_MODE LEDC_LOW_SPEED_MODE
+#define LEDC_CHANNEL LEDC_CHANNEL_0
+#define LEDC_DUTY_RES LEDC_TIMER_13_BIT // Set duty resolution to 13 bits
+#define LEDC_DUTY (1000)				// Set duty to 50%. (2 ** 13) * 50% = 4096
+#define LEDC_FREQUENCY (4000)			// Frequency in Hertz. Set frequency at 4 kHz
 
 namespace bzd::components::esp32 {
 
@@ -38,20 +45,18 @@ public:
 	bzd::Async<> shutdown() noexcept;
 
 private:
+	template <class>
 	friend class LEDCPWM;
 
 	const UInt32 frequency_;
 	const ledc_timer_t number_;
 };
 
+template <class Context>
 class LEDCPWM
 {
 public:
-	template <class Context>
-	constexpr LEDCPWM(Context& context) noexcept :
-		io_{context.config.io}, timer_{context.config.timer}, channel_{numberToLEDChannel<context.config.channel>()}
-	{
-	}
+	constexpr LEDCPWM(Context& context) noexcept : context_{context}, channel_{numberToLEDChannel<context.config.channel>()} {}
 
 	template <auto number>
 	static constexpr ledc_channel_t numberToLEDChannel() noexcept
@@ -78,15 +83,62 @@ public:
 		}
 	}
 
-	bzd::Async<> init() noexcept;
+	bzd::Async<> init() noexcept
+	{
+		::ledc_channel_config_t ledc_channel{};
+		ledc_channel.speed_mode = LEDC_MODE;
+		ledc_channel.channel = channel_;
+		ledc_channel.timer_sel = context_.config.timer.number_;
+		ledc_channel.intr_type = LEDC_INTR_DISABLE;
+		ledc_channel.gpio_num = context_.config.io;
+		ledc_channel.duty = 0;
+		ledc_channel.hpoint = 0;
 
-	bzd::Async<> setDutyCycle(const UInt32 duty) noexcept;
+		if (const auto result = ::ledc_channel_config(&ledc_channel); result != ESP_OK)
+		{
+			co_return bzd::error::EspErr("ledc_channel_config", result);
+		}
 
-	bzd::Async<> shutdown() noexcept;
+		co_return {};
+	}
+
+	bzd::Async<> run() noexcept
+	{
+		while (true)
+		{
+			const auto result = co_await !context_.io.duty.get();
+			co_await !setDutyCycle(result.value());
+		}
+		co_return {};
+	}
+
+	bzd::Async<> shutdown() noexcept
+	{
+		if (const auto result = ::ledc_stop(LEDC_MODE, channel_, 0u); result != ESP_OK)
+		{
+			co_return bzd::error::EspErr("ledc_stop", result);
+		}
+		co_return {};
+	}
 
 private:
-	const UInt32 io_;
-	LEDCTimer& timer_;
+	bzd::Async<> setDutyCycle(const UInt32 duty) noexcept
+	{
+		if (const auto result = ::ledc_set_duty(LEDC_MODE, channel_, duty); result != ESP_OK)
+		{
+			co_return bzd::error::EspErr("ledc_set_duty", result);
+		}
+
+		if (const auto result = ::ledc_update_duty(LEDC_MODE, channel_); result != ESP_OK)
+		{
+			co_return bzd::error::EspErr("ledc_update_duty", result);
+		}
+
+		co_return {};
+	}
+
+private:
+	Context& context_;
 	const ledc_channel_t channel_;
 };
 

@@ -1,0 +1,12 @@
+use "cc/components/generic/console/interface.bdl"
+
+namespace tests;
+
+
+composition {
+	console = bzd.components.generic.Console();
+	console.run();
+	
+}
+
+

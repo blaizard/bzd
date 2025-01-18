@@ -1,0 +1,15 @@
+
+namespace bzd.components.generic;
+
+
+component Console {
+config:
+	out = {out};
+	in = {in};
+	
+interface:
+	method run();
+	
+}
+
+
