@@ -38,6 +38,36 @@ TEST(UpperBound, Base)
 	}
 }
 
+TEST(UpperBound, StringView)
+{
+	bzd::Array<bzd::StringView, 5> array{"abc"_sv, "de"_sv, "def"_sv, "pq"_sv, "z"_sv};
+
+	{
+		const auto it = bzd::algorithm::upperBound(array.begin(), array.end(), "c"_sv);
+		EXPECT_EQ(*it, "de"_sv);
+	}
+
+	{
+		const auto it = bzd::algorithm::upperBound(array, "a"_sv);
+		EXPECT_EQ(*it, "abc"_sv);
+	}
+
+	{
+		const auto it = bzd::algorithm::upperBound(array, "de"_sv);
+		EXPECT_EQ(*it, "def"_sv);
+	}
+
+	{
+		const auto it = bzd::algorithm::upperBound(array, "pqr"_sv);
+		EXPECT_EQ(*it, "z"_sv);
+	}
+
+	{
+		const auto it = bzd::algorithm::upperBound(array, "z"_sv);
+		EXPECT_EQ(it, array.end());
+	}
+}
+
 TEST(UpperBound, EdgeCase)
 {
 	bzd::Array<int, 5> array{1, 2, 3, 4, 5};

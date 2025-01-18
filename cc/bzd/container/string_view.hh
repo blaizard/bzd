@@ -40,7 +40,8 @@ public:
 
 	constexpr StringView subStr(const Size pos, const Size count = npos) const noexcept
 	{
-		return StringView(&this->at(pos), (count == npos) ? (this->size() - pos) : count);
+		const auto maxSize = this->size() - pos;
+		return StringView(&this->at(pos), (count == npos) ? maxSize : bzd::min(maxSize, count));
 	}
 
 	constexpr void removePrefix(const Size n) noexcept { this->storage_.removePrefix(n); }

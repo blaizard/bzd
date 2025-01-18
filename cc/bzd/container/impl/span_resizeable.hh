@@ -194,6 +194,23 @@ public: // Modifiers.
 		return 1u;
 	}
 
+	/// Appends the given element value to the end of the container.
+	template <class... Args>
+	constexpr Size pushBack(Args&&... args) noexcept
+	{
+		return append(bzd::forward<Args>(args)...);
+	}
+
+	/// Removes the last element, effectively reducing the container size by one.
+	constexpr void popBack() noexcept
+	{
+		const auto size = this->size();
+		if (size)
+		{
+			resize(size - 1);
+		}
+	}
+
 public: // Operators.
 	template <class U>
 	constexpr Self& operator=(U&& data) noexcept

@@ -29,24 +29,6 @@ public: // Traits.
 
 public:
 	constexpr explicit Vector(const Storage& storage, const bzd::Size capacity) noexcept : Parent{Storage{storage}, capacity} {}
-
-public: // API.
-	/// Appends the given element value to the end of the container.
-	template <class... Args>
-	constexpr Size pushBack(Args&&... args) noexcept
-	{
-		return Parent::append(bzd::forward<Args>(args)...);
-	}
-
-	/// Removes the last element in the vector, effectively reducing the container size by one.
-	constexpr void popBack() noexcept
-	{
-		const auto size = Parent::size();
-		if (size)
-		{
-			Parent::resize(size - 1);
-		}
-	}
 };
 
 } // namespace bzd::impl
