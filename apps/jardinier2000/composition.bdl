@@ -6,23 +6,26 @@ namespace jardinier;
 
 component LightController {
 config:
-	pwms = Array<bzd.components.esp32.LEDCPWM>;
 	timer = {timer};
 	out = {out};
 	
 interface:
 	method run();
+	pwmDuty0 = Integer;
+	pwmDuty1 = Integer;
 	
 }
 
 method water(timer = {timer}, out = {out}, wateringTimeS = Integer, wakeUpPeriodS = Integer);
-composition {
+composition lights {
 	water(wateringTimeS = 60, wakeUpPeriodS = 12 * 3600);
 	pwmTimer = bzd.components.esp32.LEDCTimer(frequency = 4000, number = 0);
-	pwm0 = bzd.components.esp32.LEDCPWM(timer = pwmTimer, duty = 50, io = 12, channel = 0);
-	pwm1 = bzd.components.esp32.LEDCPWM(timer = pwmTimer, duty = 50, io = 13, channel = 1);
-	lights = LightController(pwms = list(pwm0, pwm1));
+	pwm0 = bzd.components.esp32.LEDCPWM(timer = pwmTimer, io = 12, channel = 0);
+	pwm1 = bzd.components.esp32.LEDCPWM(timer = pwmTimer, io = 13, channel = 1);
+	lights = LightController();
 	lights.run();
+	connect(lights.pwmDuty0, pwm0.duty);
+	connect(lights.pwmDuty1, pwm1.duty);
 	
 }
 

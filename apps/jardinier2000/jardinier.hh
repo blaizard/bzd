@@ -24,10 +24,8 @@ public:
 		{
 			while (current >= 0 && current <= max)
 			{
-				for (auto& pwm : context_.config.pwms)
-				{
-					co_await !pwm.setDutyCycle(current);
-				}
+				co_await !context_.io.pwmDuty0.set(current);
+				co_await !context_.io.pwmDuty1.set(current);
 				current += inc;
 				co_await !context_.config.timer.delay(bzd::units::Millisecond{1});
 			}
