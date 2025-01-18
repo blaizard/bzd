@@ -71,7 +71,7 @@ if __name__ == "__main__":
 
 	# Note, wrapping QEMU within a python script allow easy killing of the process.
 	# Otherwise we cannot simply use CTRL+C.
-	result = localCommand([str(args.qemu)] + qemuArgs, stdout=True, stderr=True)
+	result = localCommand([str(args.qemu)] + qemuArgs, stdout=True, stderr=True, timeoutS=None)
 
 	# Try to decode the stack trace if any.
 	if args.binary:
