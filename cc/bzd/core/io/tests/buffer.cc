@@ -50,8 +50,7 @@ TEST(Buffer, Range)
 		auto maybeResult = sink.tryGet(2);
 		ASSERT_TRUE(maybeResult);
 		const auto expected = {12, 13};
-		const auto isEqual = bzd::algorithm::equal(maybeResult.value(), expected);
-		EXPECT_TRUE(isEqual);
+		EXPECT_EQ_RANGE(maybeResult.value(), expected);
 	}
 
 	{
@@ -65,8 +64,7 @@ TEST(Buffer, Range)
 		auto maybeResult = sink.tryGet(2);
 		ASSERT_TRUE(maybeResult);
 		const auto expected = {13, 14};
-		const auto isEqual = bzd::algorithm::equal(maybeResult.value(), expected);
-		EXPECT_TRUE(isEqual);
+		EXPECT_EQ_RANGE(maybeResult.value(), expected);
 	}
 }
 
