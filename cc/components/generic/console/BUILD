@@ -12,6 +12,8 @@ cc_library(
     name = "console",
     hdrs = [
         "console.hh",
+        "types.hh",
+        "view.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
