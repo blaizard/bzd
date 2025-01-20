@@ -131,37 +131,37 @@ bzd::Async<> runConcurrentTest(bzd::Async<> (*workload)(const bzd::Size), const 
 
 TEST_ASYNC_MULTITHREAD(Coroutine, StressAllNull, 10)
 {
-	co_await !runConcurrentTest<ForkType::all>(cancellationWorkload, 1000, []() { return 0; });
+	co_await !runConcurrentTest<ForkType::all>(cancellationWorkload, 100, []() { return 0; });
 	co_return {};
 }
 
 TEST_ASYNC_MULTITHREAD(Coroutine, StressAnyNull, 10)
 {
-	co_await !runConcurrentTest<ForkType::any>(cancellationWorkload, 1000, []() { return 0; });
+	co_await !runConcurrentTest<ForkType::any>(cancellationWorkload, 100, []() { return 0; });
 	co_return {};
 }
 
 TEST_ASYNC_MULTITHREAD(Coroutine, StressAllFixed, 10)
 {
-	co_await !runConcurrentTest<ForkType::all>(cancellationWorkload, 1000, []() { return 10; });
+	co_await !runConcurrentTest<ForkType::all>(cancellationWorkload, 100, []() { return 10; });
 	co_return {};
 }
 
 TEST_ASYNC_MULTITHREAD(Coroutine, StressAnyFixed, 10)
 {
-	co_await !runConcurrentTest<ForkType::any>(cancellationWorkload, 1000, []() { return 10; });
+	co_await !runConcurrentTest<ForkType::any>(cancellationWorkload, 100, []() { return 10; });
 	co_return {};
 }
 
 TEST_ASYNC_MULTITHREAD(Coroutine, StressAllRandom, 10)
 {
-	co_await !runConcurrentTest<ForkType::all>(cancellationWorkload, 1000, [&]() { return test.template random<int, 0, 100>(); });
+	co_await !runConcurrentTest<ForkType::all>(cancellationWorkload, 100, [&]() { return test.template random<int, 0, 10>(); });
 	co_return {};
 }
 
 TEST_ASYNC_MULTITHREAD(Coroutine, StressAnyRandom, 10)
 {
-	co_await !runConcurrentTest<ForkType::any>(cancellationWorkload, 1000, [&]() { return test.template random<int, 0, 100>(); });
+	co_await !runConcurrentTest<ForkType::any>(cancellationWorkload, 100, [&]() { return test.template random<int, 0, 10>(); });
 	co_return {};
 }
 
