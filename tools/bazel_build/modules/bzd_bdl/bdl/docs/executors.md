@@ -1,6 +1,6 @@
 # Executors
 
-An executor is a group of computation units (cores) that can share workloads between each others.
+An executor is a group of computation units (cores) that can share workloads between each others (by work-stealing strategy).
 They share the same work queue and a component gets executed on an arbitrary core.
 
 ```mermaid
@@ -32,6 +32,27 @@ composition
 ```
 
 Multiple executors can be created and deployed on the same process/binary, this can be useful to have different task priorities for example.
+
+## Thread safety
+
+By default a component or task is assigned to a specific core during its lifetime. This done at runtime as the number of cores is not always known at build time.
+This ensures that all resources within a component is accessible safely.
+
+### Interaction between components
+
+Components have various ways to interact with each others.
+
+- They can be passed as `config`.
+- They can be passed as argument through their interface.
+- They can use variables to communicate.
+
+To identify on which core, which component should run on, it depends on its dependency with others.
+If a non-thread safe component is a dependency of another component, they will both run on the same core.
+However, if it is marked with the tag `[threadsafe]`, it will be scheduled on any available core.
+
+If the only dependency is through variables, it is also considered as thread safe.
+
+An error will be raised if there is no possible combination. For example, if 2 workloads executed on different executors depend on a 3rd component that is not threadsafe.
 
 ## Default executor
 
