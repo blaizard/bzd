@@ -351,6 +351,7 @@ cc_library(
         "//cc/bzd/platform:types",
         "//cc/bzd/type_traits:is_base_of",
         "//cc/bzd/type_traits:range",
+        "//cc/bzd/utility:min",
     ],
 )
 

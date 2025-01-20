@@ -6,6 +6,7 @@
 #include "cc/bzd/platform/types.hh"
 #include "cc/bzd/type_traits/is_base_of.hh"
 #include "cc/bzd/type_traits/range.hh"
+#include "cc/bzd/utility/min.hh"
 
 namespace bzd::impl {
 template <class T>
