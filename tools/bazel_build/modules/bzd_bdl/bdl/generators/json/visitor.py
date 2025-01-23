@@ -33,6 +33,7 @@ def expressionToJson(expression: Expression) -> Json:
 		data["fqn"] = expression.fqn
 	if expression.isSymbol:
 		data["symbol"] = str(expression.symbol)
+		data["category"] = str(expression.symbol.category.value)
 	if expression.isLiteral:
 		data["value"] = expression.literalNative
 	elif expression.isValue:
