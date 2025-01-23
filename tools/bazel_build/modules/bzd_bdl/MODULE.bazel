@@ -11,6 +11,16 @@ bazel_dep(name = "bzd_lib", version = "1.0")
 bazel_dep(name = "bzd_python", version = "1.0")
 bazel_dep(name = "bzd_toolchain_cc", version = "1.0")
 bazel_dep(name = "bzd_rules_doc", version = "1.0")
+bazel_dep(name = "bzd_rules_nodejs", version = "1.0")
 
 bdl_extension = use_extension("//:extensions.bzl", "bdl_extension")
 use_repo(bdl_extension, "bdl_extension")
+
+# Nodejs
+
+requirements_nodejs = use_extension("@bzd_rules_nodejs//:requirements.bzl", "requirements_nodejs")
+requirements_nodejs.parse(
+    name = "bzd_bdl_nodejs_deps",
+    requirements = "//diagram/requirements:requirements.json",
+)
+use_repo(requirements_nodejs, "bzd_bdl_nodejs_deps")

@@ -1,4 +1,5 @@
 load("@bzd_bdl//:defs.bzl", "bdl_library")
+load("@bzd_bdl//diagram:defs.bzl", "bdl_system_diagram")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//cc/bdl:cc.bzl", "bzd_cc_binary")
 
@@ -35,4 +36,9 @@ bzd_cc_binary(
     deps = [
         ":lib",
     ],
+)
+
+bdl_system_diagram(
+    name = "diagram",
+    system = ":jardinier2000.system",
 )
