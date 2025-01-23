@@ -53,9 +53,18 @@ export default class BdlToElk {
 		return output;
 	}
 
+	getParametersFromExpression(expression) {
+		let parameters = [];
+		for (const parameter of expression.parameters || []) {
+			parameters.push(parameter.name + ": " + this.getExpressionValue(parameter));
+		}
+		return parameters;
+	}
+
 	process() {
 		let children = [];
 		for (const [uid, component] of this.getAllComponents()) {
+			const config = this.getParametersFromExpression(component.expression);
 			children.push({
 				id: uid,
 				labels: [
@@ -63,7 +72,7 @@ export default class BdlToElk {
 						text: uid,
 					},
 					{
-						text: uid + ".config",
+						text: uid + ".config\n" + config.join("\n"),
 					},
 				],
 			});
