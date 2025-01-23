@@ -49,6 +49,13 @@ _BdlCompositionInfo = provider(
     },
 )
 
+BdlSystemJsonInfo = provider(
+    doc = "Provider for a system json representation of a system.",
+    fields = {
+        "json": "Dictionary of json files representing the system, keyed by target.",
+    },
+)
+
 # ---- Aspects ----
 
 def _aspect_bdl_providers_impl(target, ctx):
@@ -408,9 +415,12 @@ def _bdl_system_impl(ctx):
         target_bdl_providers = bdl_providers,
     )
 
-    return _BdlSystemInfo(
+    # JSON provider should always be present.
+    json = {target: data["files"]["json"] for target, data in providers["json"].items()}
+
+    return [_BdlSystemInfo(
         data = providers,
-    )
+    ), BdlSystemJsonInfo(json = json)]
 
 _bdl_system = rule(
     implementation = _bdl_system_impl,
@@ -561,13 +571,14 @@ def _target_to_platform(target):
         return None
     return str(Label(target)) + ".platform"
 
-def _bdl_system_macro_impl(name, targets, testonly, deps, **kwargs):
+def _bdl_system_macro_impl(name, targets, testonly, deps, visibility, **kwargs):
     _bdl_system(
         name = "{}.system".format(name),
         targets = targets,
         testonly = testonly,
         deps = deps,
         tags = ["manual"],
+        visibility = visibility,
     )
 
     for target_name, target in targets.items():
@@ -578,6 +589,7 @@ def _bdl_system_macro_impl(name, targets, testonly, deps, **kwargs):
             target_name = target_name,
             testonly = testonly,
             system = "{}.system".format(name),
+            visibility = visibility,
             **kwargs
         )
 
@@ -587,13 +599,14 @@ bdl_system = macro(
     attrs = _BDL_SYSTEM_GENERIC_ATTR,
 )
 
-def _bdl_system_test_macro_impl(name, targets, testonly, deps, **kwargs):
+def _bdl_system_test_macro_impl(name, targets, testonly, deps, visibility, **kwargs):
     _bdl_system(
         name = "{}.system".format(name),
         targets = targets,
         testonly = testonly,
         deps = deps,
         tags = ["manual"],
+        visibility = visibility,
     )
 
     for target_name, target in targets.items():
@@ -604,6 +617,7 @@ def _bdl_system_test_macro_impl(name, targets, testonly, deps, **kwargs):
             target_name = target_name,
             testonly = testonly,
             system = "{}.system".format(name),
+            visibility = visibility,
             **kwargs
         )
 
