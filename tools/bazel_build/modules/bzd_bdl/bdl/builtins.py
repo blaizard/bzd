@@ -27,7 +27,7 @@ class AnyMeta(Builtin):
 	def __init__(self) -> None:
 		super().__init__(
 		    ElementBuilder("builtin").setAttr("name", "Any").setAttr("meta", "1").addConfigValue(name="default",
-		                                                                                         literal=""))
+		                                                                                         literal="0"))
 
 
 class ListMeta(Builtin):
