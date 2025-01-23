@@ -138,7 +138,8 @@ def bzd_nodejs_transpile(ctx, srcs, runfiles, base_dir_name):
     # Map all the sources to the generated files directory.
     generated = []
     for f in srcs:
-        symlink = ctx.actions.declare_file("{}/{}".format(base_dir_name, f.short_path))
+        # This makes all file live at the same level.
+        symlink = ctx.actions.declare_file("{}/{}".format(base_dir_name, f.short_path.replace("../", "external/")))
         ctx.actions.symlink(
             output = symlink,
             target_file = f,

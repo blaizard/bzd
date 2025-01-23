@@ -62,7 +62,7 @@ def _bzd_nodejs_executable_impl(ctx):
 
     # Look for the entry point.
     paths = {
-        install.transpiled.get(ctx.file.main.short_path, ctx.file.main.short_path): "main",
+        install.transpiled.get(ctx.file.main.path, ctx.file.main.path): "main",
     }
 
     # Gather toolchain executable.
@@ -100,14 +100,16 @@ cp \"coverage/lcov.info\" \"$COVERAGE_OUTPUT_FILE\"
 """
         providers = []
 
-    return [sh_binary_wrapper_impl(
+    default_info = sh_binary_wrapper_impl(
         ctx = ctx,
         locations = locations,
         paths = paths,
         output = ctx.outputs.executable,
         command = command,
         extra_runfiles = [runfiles],
-    ), package] + providers
+    )
+
+    return [default_info, package] + providers
 
 bzd_nodejs_binary = rule(
     doc = "NodeJs binary executor.",
