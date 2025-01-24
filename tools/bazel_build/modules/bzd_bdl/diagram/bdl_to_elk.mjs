@@ -61,24 +61,55 @@ export default class BdlToElk {
 		return parameters;
 	}
 
+	getIOsFromUID(uid) {
+		return this.bdl["ios"][uid] || {};
+	}
+
 	process() {
 		let children = [];
+		let edges = [];
+
 		for (const [uid, component] of this.getAllComponents()) {
 			const config = this.getParametersFromExpression(component.expression);
+			const ios = this.getIOsFromUID(uid);
+			let ports = [];
+			for (const [name, io] of Object.entries(ios)) {
+				const isSource = io.type == "source";
+				ports.push({
+					id: io.uid,
+					width: 10,
+					height: 10,
+					labels: [
+						{
+							text: name,
+						},
+					],
+					properties: {
+						"port.side": isSource ? "EAST" : "WEST",
+					},
+				});
+				if (isSource) {
+					for (const sink of io.connections) {
+						edges.push({
+							id: io.uid + "-" + sink,
+							sources: [io.uid],
+							targets: [sink],
+						});
+					}
+				}
+			}
+
 			children.push({
 				id: uid,
 				labels: [
 					{
 						text: uid,
 					},
-					{
-						text: uid + ".config\n" + config.join("\n"),
-					},
 				],
+				ports: ports,
 			});
 		}
 
-		let edges = [];
 		for (const [uid1, uid2] of this.getAllEdges()) {
 			edges.push({
 				id: uid1 + "-" + uid2,

@@ -142,6 +142,10 @@ build:clang-tidy --output_groups=+clang_tidy
 build:mypy --aspects="@bzd_sanitizer//aspects/mypy:defs.bzl%mypy_aspect"
 build:mypy --output_groups=+mypy
 
+# clippy
+build:clippy --aspects="@rules_rust//rust:defs.bzl%rust_clippy_aspect"
+build:clippy --output_groups=+clippy_checks
+
 # always generate compile command (cost is neglectable)
 build --aspects="@bzd_sanitizer//aspects/compile_commands:defs.bzl%compile_commands_aspect"
 build --output_groups=+compile_commands

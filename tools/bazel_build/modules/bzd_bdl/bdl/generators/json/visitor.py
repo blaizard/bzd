@@ -59,6 +59,19 @@ def expressionEntryToJson(entry: ExpressionEntry) -> Json:
 	}
 
 
+def ioToJson(io: typing.Dict[str, typing.Any]) -> Json:
+
+	result = {}
+	for name, data in io.items():
+		result[name] = {
+		    "type": data["type"],
+		    "connections": data["connections"],
+		    "uid": data["identifier"],
+		    "symbol": str(data["symbol"]),
+		}
+	return result
+
+
 def compositionJson(
     compositions: typing.Dict[str, CompositionView],
     output: pathlib.Path,
@@ -78,5 +91,7 @@ def compositionJson(
 			services = [expressionEntryToJson(service) for service in composition.services.get(context, [])]
 			contexts.append({"registry": registry, "workloads": workloads, "services": services})
 
-		jsonData = json.dumps({"contexts": contexts}, indent=4)
+		ios = {uid: ioToJson(io) for uid, io in composition.iosRegistry.items() if io}
+
+		jsonData = json.dumps({"ios": ios, "contexts": contexts}, indent=4)
 		(output.parent / f"{output.name}.{target}.json").write_text(jsonData)

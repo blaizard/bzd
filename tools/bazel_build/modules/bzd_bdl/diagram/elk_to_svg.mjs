@@ -15,6 +15,8 @@ export default class ElkToSVG {
 			"elk.direction": "RIGHT",
 			"elk.nodeSize.constraints": "NODE_LABELS PORTS PORT_LABELS MINIMUM_SIZE",
 			"elk.nodeLabels.placement": "V_TOP H_CENTER INSIDE",
+			"elk.portConstraints": "FIXED_ORDER",
+			"elk.portLabels.placement": "INSIDE",
 		};
 	}
 
@@ -60,6 +62,14 @@ export default class ElkToSVG {
 		}
 	}
 
+	drawPort(svg, port, x, y) {
+		const group = svg.group().id(port.id);
+		group.rect(port.width, port.height).addClass("port");
+		group.move(x, y);
+
+		this.drawChildren(svg, port, x, y);
+	}
+
 	drawChildren(svg, graph, x, y) {
 		for (const node of graph.children || []) {
 			this.drawNode(svg, node, node.x + x, node.y + y);
@@ -67,6 +77,10 @@ export default class ElkToSVG {
 
 		for (const edge of graph.edges || []) {
 			this.drawEdge(svg, edge, edge.x + x, edge.y + y);
+		}
+
+		for (const port of graph.ports || []) {
+			this.drawPort(svg, port, port.x + x, port.y + y);
 		}
 
 		for (const label of graph.labels || []) {
@@ -80,7 +94,10 @@ export default class ElkToSVG {
 		for (const label of json.labels || []) {
 			if (label.text) {
 				const svgText = svg.text((add) => {
-					add.tspan(label.text);
+					for (const line of label.text.split("\n")) {
+						const tspan = add.tspan(line);
+						tspan.dy(tspan.bbox().height);
+					}
 				});
 				const bbox = svgText.bbox();
 				Object.assign(label, {
@@ -109,6 +126,11 @@ export default class ElkToSVG {
 		});
 		svg.style(".node", {
 			fill: "#eee",
+			stroke: "#f06",
+			"stroke-width": "1",
+		});
+		svg.style(".port", {
+			fill: "#f06",
 			stroke: "#f06",
 			"stroke-width": "1",
 		});

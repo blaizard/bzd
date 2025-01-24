@@ -7,7 +7,7 @@ set -e
 EXTRA_FLAGS="$@"
 
 echo  "==== [normal] static analysis ==============================="
-./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=dev --config=clang-tidy --config=mypy --platform_suffix=static_analysis $EXTRA_FLAGS
+./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=dev --config=clang-tidy --config=mypy --config=clippy --platform_suffix=static_analysis $EXTRA_FLAGS
 echo  "==== [normal] clang prod ==============================="
 ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=clang --config=prod --config=cc --platform_suffix=clang-prod $EXTRA_FLAGS
 echo  "==== [normal] gcc prod ==============================="
