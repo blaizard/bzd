@@ -18,6 +18,58 @@
 export default class BdlToElk {
 	constructor(bdl) {
 		this.bdl = bdl;
+		this.tree = this.makeTree();
+	}
+
+	/// Create a list of all top level elements and their nested members.
+	///
+	/// It adds the following information to the elements:
+	/// - fqn: The FQN of the element, note that it is not unique, the same function can be called multiple times.
+	/// - type: The type of the element.
+	/// - members: The members of the elements.
+	makeTree() {
+		let list = [];
+		const addElementToMap = (element, type) => {
+			const fqn = element.expression.fqn || element.expression.symbol;
+			list.push(
+				Object.assign({}, element, {
+					type: type,
+					fqn: fqn,
+					members: [],
+				}),
+			);
+		};
+
+		for (const context of this.bdl["contexts"]) {
+			for (const workload of context["workloads"] || []) {
+				addElementToMap(workload, "workload");
+			}
+			for (const service of context["services"] || []) {
+				addElementToMap(service, "service");
+			}
+			for (const component of Object.values(context["registry"])) {
+				addElementToMap(component, "registry");
+			}
+		}
+
+		let topLevel = [];
+		for (const maybeNestedElement of list) {
+			let isTopLevel = true;
+			for (const element of list) {
+				if (maybeNestedElement == element) {
+					continue;
+				}
+				if (maybeNestedElement.fqn.startsWith(element.fqn)) {
+					element.members.push(maybeNestedElement);
+					isTopLevel = false;
+				}
+			}
+			if (isTopLevel) {
+				topLevel.push(maybeNestedElement);
+			}
+		}
+
+		return topLevel;
 	}
 
 	*getAllComponents() {
@@ -39,7 +91,12 @@ export default class BdlToElk {
 		}
 	}
 
-	getComponentMembers(uid) {}
+	*getComponentMembers(uid) {
+		for (const context of this.bdl["contexts"]) {
+			for (const workload of context["workloads"] || []) {
+			}
+		}
+	}
 
 	getExpressionValue(expression) {
 		if ("value" in expression) {
@@ -61,19 +118,25 @@ export default class BdlToElk {
 		return parameters;
 	}
 
-	getIOsFromUID(uid) {
-		return this.bdl["ios"][uid] || {};
+	getIOsFromFQN(fqn) {
+		return this.bdl["ios"][fqn] || {};
 	}
 
-	process() {
+	processComponents(root, parent = null) {
 		let children = [];
 		let edges = [];
+		let deps = new Set();
 
-		for (const [uid, component] of this.getAllComponents()) {
+		for (const component of root) {
+			let componentDeps = new Set();
+			const fqn = component.fqn;
+			const name = parent ? fqn.replace(parent, "") : fqn;
 			const config = this.getParametersFromExpression(component.expression);
-			const ios = this.getIOsFromUID(uid);
+			const ios = this.getIOsFromFQN(fqn);
 			let ports = [];
-			for (const [name, io] of Object.entries(ios)) {
+
+			// Create the ports
+			for (const [ioName, io] of Object.entries(ios)) {
 				const isSource = io.type == "source";
 				ports.push({
 					id: io.uid,
@@ -81,7 +144,7 @@ export default class BdlToElk {
 					height: 10,
 					labels: [
 						{
-							text: name,
+							text: ioName,
 						},
 					],
 					properties: {
@@ -99,24 +162,55 @@ export default class BdlToElk {
 				}
 			}
 
+			// Process nested
+			const members = this.processComponents(component.members, /*parent*/ fqn);
+			componentDeps = new Set([...componentDeps, ...members.deps]);
+
+			// Create the child
 			children.push({
-				id: uid,
+				id: fqn,
 				labels: [
 					{
-						text: uid,
+						text: name,
 					},
 				],
+				children: members.children,
+				//edges: members.edges,
 				ports: ports,
 			});
+
+			// Create the edges
+			for (const depFQN of component["deps"] || []) {
+				componentDeps.add(depFQN);
+			}
+
+			// Only dependencies between top-level elements are drawn.
+			if (parent === null) {
+				for (const depFQN of componentDeps) {
+					// Only non-nested dependencies are drawn.
+					if (!fqn.startsWith(depFQN)) {
+						edges.push({
+							id: fqn + "-" + depFQN,
+							sources: [fqn],
+							targets: [depFQN],
+						});
+					}
+				}
+			}
+
+			// Propagate the deps.
+			deps = new Set([...deps, ...componentDeps]);
 		}
 
-		for (const [uid1, uid2] of this.getAllEdges()) {
-			edges.push({
-				id: uid1 + "-" + uid2,
-				sources: [uid1],
-				targets: [uid2],
-			});
-		}
+		return {
+			children: children,
+			edges: edges,
+			deps: deps,
+		};
+	}
+
+	process() {
+		let { children, edges } = this.processComponents(this.tree);
 
 		return {
 			id: "root",
