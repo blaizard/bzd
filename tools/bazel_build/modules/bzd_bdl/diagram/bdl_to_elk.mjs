@@ -2,8 +2,9 @@
 ///
 /// See: https://eclipse.dev/elk/documentation/tooldevelopers/graphdatastructure/jsonformat.html
 export default class BdlToElk {
-	constructor(bdl) {
+	constructor(bdl, target) {
 		this.bdl = bdl;
+		this.target = target;
 		this.tree = this.makeTree();
 	}
 
@@ -58,14 +59,6 @@ export default class BdlToElk {
 		return topLevel;
 	}
 
-	*getAllComponents() {
-		for (const context of this.bdl["contexts"]) {
-			for (const [uid, component] of Object.entries(context["registry"])) {
-				yield [uid, component];
-			}
-		}
-	}
-
 	*getAllEdges() {
 		// All dependencies between components
 		for (const context of this.bdl["contexts"]) {
@@ -101,18 +94,48 @@ export default class BdlToElk {
 		return this.bdl["ios"][fqn] || {};
 	}
 
-	processComponents(root, parent = null) {
+	*getComponents(root, options) {
+		for (const component of root) {
+			if (options.onlyApplication && component.fqn.startsWith(this.target)) {
+				continue;
+			}
+			yield component;
+		}
+	}
+
+	includeFQN(fqn, options) {
+		if (options.onlyApplication && fqn.startsWith(this.target)) {
+			return false;
+		}
+		return true;
+	}
+
+	processComponents(root, options, parent = null) {
 		let children = [];
 		let edges = [];
 		let deps = new Set();
 
+		const addEdge = (from, to) => {
+			if (this.includeFQN(from, options) && this.includeFQN(to, options)) {
+				edges.push({
+					id: from + "-" + to,
+					sources: [from],
+					targets: [to],
+				});
+			}
+		};
+
 		for (const component of root) {
-			let componentDeps = new Set();
 			const fqn = component.fqn;
+			if (!this.includeFQN(fqn, options)) {
+				continue;
+			}
+
 			const name = parent ? fqn.replace(parent, "") : fqn;
 			const config = this.getParametersFromExpression(component.expression);
 			const ios = this.getIOsFromFQN(fqn);
 			let ports = [];
+			let componentDeps = new Set();
 
 			// Create the ports
 			for (const [ioName, io] of Object.entries(ios)) {
@@ -132,17 +155,13 @@ export default class BdlToElk {
 				});
 				if (isSource) {
 					for (const sink of io.connections) {
-						edges.push({
-							id: io.uid + "-" + sink,
-							sources: [io.uid],
-							targets: [sink],
-						});
+						addEdge(io.uid, sink);
 					}
 				}
 			}
 
 			// Process nested
-			const members = this.processComponents(component.members, /*parent*/ fqn);
+			const members = this.processComponents(component.members, options, /*parent*/ fqn);
 			componentDeps = new Set([...componentDeps, ...members.deps]);
 
 			// Create the child
@@ -167,11 +186,7 @@ export default class BdlToElk {
 				for (const depFQN of componentDeps) {
 					// Only non-nested dependencies are drawn.
 					if (!fqn.startsWith(depFQN)) {
-						edges.push({
-							id: fqn + "-" + depFQN,
-							sources: [fqn],
-							targets: [depFQN],
-						});
+						addEdge(fqn, depFQN);
 					}
 				}
 			}
@@ -187,8 +202,10 @@ export default class BdlToElk {
 		};
 	}
 
-	process() {
-		let { children, edges } = this.processComponents(this.tree);
+	process(onlyApplication) {
+		let { children, edges } = this.processComponents(this.tree, {
+			onlyApplication: onlyApplication,
+		});
 
 		return {
 			id: "root",

@@ -23,8 +23,8 @@ program
 		const content = await Fs.promises.readFile(bdlPath);
 		const bdl = JSON.parse(content);
 
-		const converter = new BdlToElk(bdl);
-		const elk = converter.process();
+		const converter = new BdlToElk(bdl, target);
+		const elk = converter.process(/*onlyApplication*/ true);
 
 		const renderer = new ElkToSVG();
 		const svg = await renderer.render(elk);
