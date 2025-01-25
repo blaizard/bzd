@@ -1,20 +1,6 @@
 /// Translate a bdl architecture file into an elk json diagram.
 ///
 /// See: https://eclipse.dev/elk/documentation/tooldevelopers/graphdatastructure/jsonformat.html
-/// const graph = {
-///   id: "root",
-///   layoutOptions: { 'elk.algorithm': 'layered' },
-///   children: [
-///     { id: "n1", width: 30, height: 30 },
-///     { id: "n2", width: 30, height: 30 },
-///     { id: "n3", width: 30, height: 30 }
-///   ],
-///   edges: [
-///     { id: "e1", sources: [ "n1" ], targets: [ "n2" ] },
-///     { id: "e2", sources: [ "n1" ], targets: [ "n3" ] }
-///   ]
-/// };
-
 export default class BdlToElk {
 	constructor(bdl) {
 		this.bdl = bdl;
@@ -87,13 +73,6 @@ export default class BdlToElk {
 				for (const dep of component["deps"]) {
 					yield [uid, dep];
 				}
-			}
-		}
-	}
-
-	*getComponentMembers(uid) {
-		for (const context of this.bdl["contexts"]) {
-			for (const workload of context["workloads"] || []) {
 			}
 		}
 	}
@@ -175,7 +154,6 @@ export default class BdlToElk {
 					},
 				],
 				children: members.children,
-				//edges: members.edges,
 				ports: ports,
 			});
 
