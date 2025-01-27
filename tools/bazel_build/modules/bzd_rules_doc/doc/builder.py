@@ -60,8 +60,8 @@ if __name__ == "__main__":
 	pathlib.Path("./mkdocs.yml").write_text(output)
 
 	# Generate the site with mkdocs and package everything.
-	with tempfile.TemporaryDirectory() as path:
-		path = pathlib.Path(path)
+	with tempfile.TemporaryDirectory() as pathStr:
+		path = pathlib.Path(pathStr)
 		subprocess.run([
 		    args.mkdocs,
 		    "--color",
