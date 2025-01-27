@@ -611,7 +611,7 @@ def _target_to_platform(target):
         return None
     return str(Label(target)) + ".platform"
 
-def _bdl_system_macro_impl(name, targets, testonly, deps, visibility, **kwargs):
+def _bdl_system_macro_impl(name, targets, testonly, deps, visibility, tags = None, target_compatible_with = None, **kwargs):
     _bdl_system(
         name = "{}.system".format(name),
         targets = targets,
@@ -629,6 +629,8 @@ def _bdl_system_macro_impl(name, targets, testonly, deps, visibility, **kwargs):
             testonly = testonly,
             system = "{}.system".format(name),
             visibility = visibility,
+            tags = tags,
+            target_compatible_with = target_compatible_with,
             **kwargs
         )
 
@@ -636,6 +638,8 @@ def _bdl_system_macro_impl(name, targets, testonly, deps, visibility, **kwargs):
         name = name,
         targets = {target_name: "{}.{}".format(name, target_name) for target_name, target in targets.items()},
         visibility = visibility,
+        tags = tags,
+        target_compatible_with = target_compatible_with,
     )
 
 bdl_system = macro(
