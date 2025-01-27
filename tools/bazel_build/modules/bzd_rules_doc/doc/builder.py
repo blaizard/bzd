@@ -20,13 +20,19 @@ def navigationToMkDocsList(root: pathlib.Path, navigation: typing.List[typing.Tu
 	return [f"  {line}" for line in content]
 
 
-def runCommand(command: typing.List[str]) -> None:
-	try:
-		subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, check=True)
-	except subprocess.CalledProcessError as e:
-		print(f"Command {e.cmd} failed with return code {e.returncode}")
-		print(e.output.decode())
-		sys.exit(e.returncode)
+def searchForEntryPoint(output: pathlib.Path) -> typing.Optional[pathlib.Path]:
+	"""Look for the first entry point for the documentation.
+	
+	Args:
+		output: The output directory of the generated documentation.
+
+	Returns:
+		The entry point if any, None otherwise.
+	"""
+
+	for entryPoint in output.glob("**/index.html"):
+		return entryPoint.relative_to(output)
+	return None
 
 
 if __name__ == "__main__":
@@ -55,8 +61,11 @@ if __name__ == "__main__":
 
 	# Generate the site with mkdocs and package everything.
 	with tempfile.TemporaryDirectory() as path:
-		runCommand([
+		path = pathlib.Path(path)
+		subprocess.run([
 		    args.mkdocs,
+		    "--color",
+		    "--quiet",
 		    "--",
 		    "build",
 		    "--strict",
@@ -64,7 +73,27 @@ if __name__ == "__main__":
 		    "mkdocs.yml",
 		    "--site-dir",
 		    path,
-		])
+		],
+		               check=True)
+
+		# Check if there is an entry point, if not create it.
+		if not (path / "index.html").is_file():
+			maybeEntryPoint = searchForEntryPoint(path)
+			assert maybeEntryPoint is not None, "No entry point found for this documentation."
+			(path / "index.html").write_text(f"""
+<!DOCTYPE HTML>
+<html lang="en-US">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="refresh" content="0; url="{maybeEntryPoint}">
+        <script type="text/javascript">window.location.href = "{maybeEntryPoint}"</script>
+        <title>Page Redirection</title>
+    </head>
+    <body>
+        If you are not redirected automatically, follow this <a href="{maybeEntryPoint}">link</a>.
+    </body>
+</html>
+""")
 
 		with tarfile.open(args.output, "w:") as package:
 			package.add(path, arcname="./")

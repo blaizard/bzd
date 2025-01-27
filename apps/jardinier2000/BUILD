@@ -1,7 +1,7 @@
-load("@bzd_bdl//:defs.bzl", "bdl_library")
+load("@bzd_bdl//:defs.bzl", "bdl_library", "bdl_system")
 load("@bzd_bdl//diagram:defs.bzl", "bdl_system_diagram")
+load("@bzd_rules_doc//doc:defs.bzl", "doc_binary")
 load("@rules_cc//cc:defs.bzl", "cc_library")
-load("//cc/bdl:cc.bzl", "bzd_cc_binary")
 
 bdl_library(
     name = "composition",
@@ -31,8 +31,11 @@ cc_library(
     ],
 )
 
-bzd_cc_binary(
+bdl_system(
     name = "jardinier2000",
+    targets = {
+        "esp32": "@@//cc/targets/esp32_idf:gcc",
+    },
     deps = [
         ":lib",
     ],
@@ -40,5 +43,16 @@ bzd_cc_binary(
 
 bdl_system_diagram(
     name = "diagram",
-    system = ":jardinier2000.system",
+    system = ":jardinier2000",
+)
+
+doc_binary(
+    name = "documentation",
+    srcs = [
+        ("Architecture", "README.md"),
+    ],
+    data = [
+        ":diagram",
+    ],
+    visibility = ["//visibility:public"],
 )

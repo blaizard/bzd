@@ -488,6 +488,7 @@ def _bdl_binary_impl(ctx):
             manifests = metadata,
         ),
         OutputGroupInfo(metadata = metadata),
+        ctx.attr.system[BdlSystemJsonInfo],
     ] + providers
 
 def _bzd_binary_generic(is_test):
@@ -506,7 +507,7 @@ def _bzd_binary_generic(is_test):
             "system": attr.label(
                 mandatory = True,
                 doc = "The system rule associated with this target.",
-                providers = [_BdlSystemInfo],
+                providers = [_BdlSystemInfo, BdlSystemJsonInfo],
             ),
             "target": attr.label(
                 mandatory = True,
@@ -565,6 +566,45 @@ _BDL_SYSTEM_GENERIC_ATTR = {
     ),
 }
 
+def _bdl_system_entry_point_impl(ctx):
+    # Use the first target as the default target for this deployment.
+    # It is guaranteed to have at least one target with the mandatory attribute.
+    default_target = None
+    for _, target in ctx.attr.targets.items():
+        default_target = target
+        break
+
+    # Create an alias.
+    executable = ctx.actions.declare_file(ctx.label.name)
+    ctx.actions.symlink(
+        output = executable,
+        target_file = default_target[DefaultInfo].files_to_run.executable,
+    )
+
+    return [
+        DefaultInfo(
+            executable = executable,
+            runfiles = default_target[DefaultInfo].default_runfiles,
+            files = depset(transitive = [target[DefaultInfo].files for target in ctx.attr.targets.values()]),
+        ),
+        default_target[BdlSystemJsonInfo],
+    ]
+
+_bdl_system_entry_point = rule(
+    implementation = _bdl_system_entry_point_impl,
+    doc = """Entry point of a system rule.""",
+    attrs = {
+        "targets": attr.string_keyed_label_dict(
+            mandatory = True,
+            doc = "A dictionary with name and executable targets corresponding to the binaries for this system.",
+            cfg = "target",
+            providers = [BdlSystemJsonInfo],
+        ),
+    },
+    executable = True,
+    provides = [BdlSystemJsonInfo, DefaultInfo],
+)
+
 def _target_to_platform(target):
     """Convert a target label into its related platform label."""
     if Label(target).name.endswith("auto"):
@@ -578,12 +618,11 @@ def _bdl_system_macro_impl(name, targets, testonly, deps, visibility, **kwargs):
         testonly = testonly,
         deps = deps,
         tags = ["manual"],
-        visibility = visibility,
     )
 
     for target_name, target in targets.items():
         _bdl_binary(
-            name = "{}.{}".format(name, target_name) if len(targets) > 1 else name,
+            name = "{}.{}".format(name, target_name),
             platform = _target_to_platform(target),
             target = target,
             target_name = target_name,
@@ -592,6 +631,12 @@ def _bdl_system_macro_impl(name, targets, testonly, deps, visibility, **kwargs):
             visibility = visibility,
             **kwargs
         )
+
+    _bdl_system_entry_point(
+        name = name,
+        targets = {target_name: "{}.{}".format(name, target_name) for target_name, target in targets.items()},
+        visibility = visibility,
+    )
 
 bdl_system = macro(
     implementation = _bdl_system_macro_impl,
@@ -606,12 +651,11 @@ def _bdl_system_test_macro_impl(name, targets, testonly, deps, visibility, **kwa
         testonly = testonly,
         deps = deps,
         tags = ["manual"],
-        visibility = visibility,
     )
 
     for target_name, target in targets.items():
         _bdl_test(
-            name = "{}.{}".format(name, target_name) if len(targets) > 1 else name,
+            name = "{}.{}".format(name, target_name),
             platform = _target_to_platform(target),
             target = target,
             target_name = target_name,
@@ -620,6 +664,12 @@ def _bdl_system_test_macro_impl(name, targets, testonly, deps, visibility, **kwa
             visibility = visibility,
             **kwargs
         )
+
+    native.alias(
+        name = name,
+        actual = "{}.{}".format(name, targets.keys()[0]),
+        visibility = visibility,
+    )
 
 bdl_system_test = macro(
     implementation = _bdl_system_test_macro_impl,
