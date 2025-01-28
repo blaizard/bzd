@@ -164,7 +164,7 @@ export default class BdlToElk {
 			deps = new Set([...deps, ...componentDeps]);
 
 			// Only dependencies between top-level and components elements are drawn.
-			if (level == 0 || level == 1) {
+			if (level == 1) {
 				for (const depFQN of componentDeps) {
 					// Only non-nested dependencies are drawn.
 					if (!fqn.startsWith(depFQN)) {

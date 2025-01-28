@@ -1,4 +1,5 @@
 load("@bzd_bdl//:defs.bzl", "bdl_library", "bdl_system")
+load("@bzd_bdl//diagram:defs.bzl", "bdl_system_diagram")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
 bdl_library(
@@ -28,4 +29,9 @@ bdl_system(
     deps = [
         ":lib",
     ],
+)
+
+bdl_system_diagram(
+    name = "diagram",
+    system = ":system",
 )

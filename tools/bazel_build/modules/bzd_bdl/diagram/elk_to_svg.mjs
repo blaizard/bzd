@@ -43,12 +43,15 @@ export default class ElkToSVG {
 
 	drawEdge(svg, edge, x, y) {
 		const group = svg.group().id(edge.id);
-		for (const section of edge.sections) {
+		for (const section of edge.sections || []) {
 			let points = [section.startPoint, section.endPoint];
 			if (section.bendPoints) {
 				points.splice(1, 0, ...section.bendPoints);
 			}
-			group.polyline(points.map((point) => [point.x + x, point.y + y])).addClass("edge");
+			group.polyline(points.map((point) => [point.x + x, point.y + y]));
+		}
+		for (const name of ["edge", ...edge.classes]) {
+			group.addClass(name);
 		}
 	}
 
@@ -129,8 +132,14 @@ export default class ElkToSVG {
 		// Set the style.
 		svg.style(".edge", {
 			stroke: "rgb(0, 148, 133)",
-			"stroke-width": "2",
 			fill: "none",
+		});
+		svg.style(".edge.io", {
+			"stroke-width": "2",
+		});
+		svg.style(".edge.dependency", {
+			"stroke-width": "1",
+			"stroke-dasharray": "4",
 		});
 		svg.style("text", {
 			fill: "#000",

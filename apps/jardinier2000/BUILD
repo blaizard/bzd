@@ -49,7 +49,7 @@ bdl_system_diagram(
 doc_binary(
     name = "documentation",
     srcs = [
-        ("Architecture", "README.md"),
+        ("Overview", "README.md"),
     ],
     data = [
         ":diagram",

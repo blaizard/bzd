@@ -1,5 +1,6 @@
 import unittest
 import sys
+import typing
 
 from bzd.utils.run import localBazelBinary
 
