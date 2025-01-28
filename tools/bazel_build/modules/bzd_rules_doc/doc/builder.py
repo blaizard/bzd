@@ -20,7 +20,19 @@ def navigationToMkDocsList(root: pathlib.Path, navigation: typing.List[typing.Tu
 	return [f"  {line}" for line in content]
 
 
-def searchForEntryPoint(output: pathlib.Path) -> typing.Optional[pathlib.Path]:
+def navigationToPathList(navigation: typing.List[typing.Tuple[str, typing.Any]]) -> typing.List[pathlib.Path]:
+
+	content = []
+	for name, path in navigation:
+		if isinstance(path, list):
+			content.extend(navigationToPathList(navigation=path))
+		else:
+			content.append(pathlib.Path(path))
+	return content
+
+
+def searchForEntryPoint(output: pathlib.Path,
+                        navigation: typing.List[typing.Tuple[str, typing.Any]]) -> typing.Optional[pathlib.Path]:
 	"""Look for the first entry point for the documentation.
 	
 	Args:
@@ -30,8 +42,10 @@ def searchForEntryPoint(output: pathlib.Path) -> typing.Optional[pathlib.Path]:
 		The entry point if any, None otherwise.
 	"""
 
-	for entryPoint in output.glob("**/index.html"):
-		return entryPoint.relative_to(output)
+	stems = [path.stem for path in navigationToPathList(navigation)]
+	for stem in ["index", *stems]:
+		for entryPoint in output.glob(f"**/{stem}.html"):
+			return entryPoint.relative_to(output)
 	return None
 
 
@@ -78,7 +92,7 @@ if __name__ == "__main__":
 
 		# Check if there is an entry point, if not create it.
 		if not (path / "index.html").is_file():
-			maybeEntryPoint = searchForEntryPoint(path)
+			maybeEntryPoint = searchForEntryPoint(path, navigation)
 			assert maybeEntryPoint is not None, "No entry point found for this documentation."
 			(path / "index.html").write_text(f"""
 <!DOCTYPE HTML>
