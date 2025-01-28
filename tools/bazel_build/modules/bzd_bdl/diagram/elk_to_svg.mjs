@@ -23,21 +23,6 @@ export default class ElkToSVG {
 			"elk.layered.edgeLabels.sideSelection": "DIRECTION_DOWN",
 			"elk.spacing.edgeLabel": 20,
 			"elk.spacing.labelPortHorizontal": 20,
-
-			/*
-			//"elk.algorithm": "elk.layered",
-			//"elk.direction": "RIGHT",
-			"elk.edgeRouting": "ORTHOGONAL",
-			//"elk.hierarchyHandling": "INCLUDE_CHILDREN",
-			"elk.layered.feedbackEdges": "true",
-			"elk.layered.layering.strategy": "BRANDES_KOEPF",
-			"elk.layered.mergeEdges": "true",
-			"elk.layered.mergeHierarchyEdges": "true",
-			"elk.layered.nodePlacement.strategy": "BRANDES_KOEPF",
-			"elk.layoutAncestors": "true",
-			"elk.randomSeed": "1.000000",
-			"elk.spacing.nodeNode": "15.000000"
-			*/
 		};
 	}
 

@@ -111,12 +111,13 @@ export default class BdlToElk {
 		let edges = [];
 		let deps = new Set();
 
-		const addEdge = (from, to) => {
+		const addEdge = (edges, from, to, classes) => {
 			if (this.includeFQN(from, options) && this.includeFQN(to, options)) {
 				edges.push({
 					id: from + "-" + to,
 					sources: [from],
 					targets: [to],
+					classes: classes,
 				});
 			}
 		};
@@ -133,7 +134,6 @@ export default class BdlToElk {
 			const config = this.getParametersFromExpression(component.expression);
 			const ios = this.getIOsFromFQN(fqn);
 			let ports = [];
-			let componentDeps = new Set();
 
 			// Create the ports
 			for (const [ioName, io] of Object.entries(ios)) {
@@ -153,17 +153,28 @@ export default class BdlToElk {
 				});
 				if (isSource) {
 					for (const sink of io.connections) {
-						addEdge(io.uid, sink);
+						addEdge(edges, io.uid, sink, ["io"]);
 					}
 				}
 			}
 
 			// Process nested
 			const members = this.processComponents(component.members, options, /*parent*/ fqn, level + 1);
-			componentDeps = new Set([...componentDeps, ...members.deps]);
+			const componentDeps = new Set([...members.deps, ...(component["deps"] || [])]);
+			deps = new Set([...deps, ...componentDeps]);
+
+			// Only dependencies between top-level and components elements are drawn.
+			if (level == 0 || level == 1) {
+				for (const depFQN of componentDeps) {
+					// Only non-nested dependencies are drawn.
+					if (!fqn.startsWith(depFQN)) {
+						addEdge(edges, fqn, depFQN, ["dependency"]);
+					}
+				}
+			}
 
 			// Create the child
-			let current = {
+			children.push({
 				id: fqn,
 				labels: [
 					{
@@ -174,23 +185,7 @@ export default class BdlToElk {
 				children: members.children,
 				edges: members.edges,
 				ports: ports,
-			};
-
-			children.push(current);
-
-			// Propagate the deps.
-			deps = new Set([...deps, ...componentDeps, ...(component["deps"] || [])]);
-
-			// Only dependencies between top-level elements are drawn.
-			/*if (level == 1) {
-				for (const depFQN of componentDeps) {
-					// Only non-nested dependencies are drawn.
-					if (!fqn.startsWith(depFQN)) {
-						//addEdge(fqn, depFQN);
-					}
-				}
-				//current.edges = edges;
-			}*/
+			});
 		}
 
 		return {

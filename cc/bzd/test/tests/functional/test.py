@@ -5,10 +5,11 @@ from bzd.utils.run import localBazelBinary
 
 
 class TestRun(unittest.TestCase):
-	FAILURE_PATH = None
-	SUCCESS_PATH = None
+	FAILURE_PATH: typing.Optional[str] = None
+	SUCCESS_PATH: typing.Optional[str] = None
 
 	def testAssertFailed(self) -> None:
+		assert TestRun.FAILURE_PATH is not None
 		result = localBazelBinary(
 		    path=TestRun.FAILURE_PATH,
 		    stdout=True,
@@ -18,6 +19,7 @@ class TestRun(unittest.TestCase):
 		self.assertTrue(result.isFailure())
 
 	def testAssertSuccess(self) -> None:
+		assert TestRun.SUCCESS_PATH is not None
 		result = localBazelBinary(
 		    path=TestRun.SUCCESS_PATH,
 		    stdout=True,
