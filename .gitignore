@@ -31,6 +31,13 @@ MODULE.bazel.lock
 *.b#*
 *.s#*
 
+# KiCAD
+*-backups/
+*-cache
+\#*\#
+_*
+*.bak
+
 # OpenSCAD
 *.stl
 

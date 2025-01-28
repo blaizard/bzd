@@ -8,9 +8,9 @@
 
   - In Schematics Editor: `Preferences >> Manage Symbol Libraries...`
     - Nickname: `bzd`
-    - Library Path: `${KIPRJMOD}/../lib/bzd.kicad_sym`
+    - Library Path: `${KIPRJMOD}/../../../kicad/lib/bzd.kicad_sym`
 
 - Add footprint library:
   - In Footprint Editor: `Preferences >> Manage Footprint Libraries...`
     - Nickname: `bzd`
-    - Library Path: `${KIPRJMOD}/../lib/bzd.pretty`
+    - Library Path: `${KIPRJMOD}/../../../kicad/lib/bzd.pretty`

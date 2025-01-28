@@ -10,3 +10,5 @@
 **CMakeLists.txt
 **MODULE.bazel
 **MODULE.bazel.lock
+**sym-lib-table
+**fp-lib-table
