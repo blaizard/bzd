@@ -2,10 +2,24 @@
 ///
 /// See: https://eclipse.dev/elk/documentation/tooldevelopers/graphdatastructure/jsonformat.html
 export default class BdlToElk {
-	constructor(bdl, target) {
-		this.bdl = bdl;
-		this.target = target;
-		this.tree = this.makeTree();
+	constructor() {
+		this.tree = [];
+		this.ios = {};
+	}
+
+	addTarget(target, bdl) {
+		const targetTree = this.makeTree(bdl);
+		this.tree.push({
+			type: "target",
+			fqn: target,
+			expression: {
+				name: target,
+				fqn: target,
+				category: "target",
+			},
+			members: targetTree,
+		});
+		Object.assign(this.ios, bdl["ios"]);
 	}
 
 	/// Create a list of all top level elements and their nested members.
@@ -14,7 +28,7 @@ export default class BdlToElk {
 	/// - fqn: The FQN of the element, note that it is not unique, the same function can be called multiple times.
 	/// - type: The type of the element.
 	/// - members: The members of the elements.
-	makeTree() {
+	makeTree(bdl) {
 		let list = [];
 		const addElementToMap = (element, type) => {
 			const fqn = element.expression.fqn || element.expression.symbol;
@@ -27,7 +41,7 @@ export default class BdlToElk {
 			);
 		};
 
-		for (const context of this.bdl["contexts"]) {
+		for (const context of bdl["contexts"]) {
 			for (const workload of context["workloads"] || []) {
 				addElementToMap(workload, "workload");
 			}
@@ -59,17 +73,6 @@ export default class BdlToElk {
 		return topLevel;
 	}
 
-	*getAllEdges() {
-		// All dependencies between components
-		for (const context of this.bdl["contexts"]) {
-			for (const [uid, component] of Object.entries(context["registry"])) {
-				for (const dep of component["deps"]) {
-					yield [uid, dep];
-				}
-			}
-		}
-	}
-
 	getExpressionValue(expression) {
 		if ("value" in expression) {
 			return expression.value;
@@ -91,26 +94,19 @@ export default class BdlToElk {
 	}
 
 	getIOsFromFQN(fqn) {
-		return this.bdl["ios"][fqn] || {};
-	}
-
-	*getComponents(root, options) {
-		for (const component of root) {
-			if (options.onlyApplication && component.fqn.startsWith(this.target)) {
-				continue;
-			}
-			yield component;
-		}
+		return this.ios[fqn] || {};
 	}
 
 	includeFQN(fqn, options) {
-		if (options.onlyApplication && fqn.startsWith(this.target)) {
-			return false;
+		for (const target of options.filterOut) {
+			if (fqn.startsWith(target)) {
+				return false;
+			}
 		}
 		return true;
 	}
 
-	processComponents(root, options, parent = null) {
+	processComponents(root, options, parent = null, level = 0) {
 		let children = [];
 		let edges = [];
 		let deps = new Set();
@@ -127,11 +123,13 @@ export default class BdlToElk {
 
 		for (const component of root) {
 			const fqn = component.fqn;
-			if (!this.includeFQN(fqn, options)) {
+			const category = component.expression.category;
+
+			if (category != "target" && !this.includeFQN(fqn, options)) {
 				continue;
 			}
 
-			const name = parent ? fqn.replace(parent, "") : fqn;
+			const name = (parent ? fqn.replace(parent, "") : fqn) + (category == "method" ? "(...)" : "");
 			const config = this.getParametersFromExpression(component.expression);
 			const ios = this.getIOsFromFQN(fqn);
 			let ports = [];
@@ -161,38 +159,38 @@ export default class BdlToElk {
 			}
 
 			// Process nested
-			const members = this.processComponents(component.members, options, /*parent*/ fqn);
+			const members = this.processComponents(component.members, options, /*parent*/ fqn, level + 1);
 			componentDeps = new Set([...componentDeps, ...members.deps]);
 
 			// Create the child
-			children.push({
+			let current = {
 				id: fqn,
 				labels: [
 					{
 						text: name,
 					},
 				],
+				classes: ["level-" + level],
 				children: members.children,
+				edges: members.edges,
 				ports: ports,
-			});
+			};
 
-			// Create the edges
-			for (const depFQN of component["deps"] || []) {
-				componentDeps.add(depFQN);
-			}
+			children.push(current);
+
+			// Propagate the deps.
+			deps = new Set([...deps, ...componentDeps, ...(component["deps"] || [])]);
 
 			// Only dependencies between top-level elements are drawn.
-			if (parent === null) {
+			/*if (level == 1) {
 				for (const depFQN of componentDeps) {
 					// Only non-nested dependencies are drawn.
 					if (!fqn.startsWith(depFQN)) {
-						addEdge(fqn, depFQN);
+						//addEdge(fqn, depFQN);
 					}
 				}
-			}
-
-			// Propagate the deps.
-			deps = new Set([...deps, ...componentDeps]);
+				//current.edges = edges;
+			}*/
 		}
 
 		return {
@@ -202,14 +200,11 @@ export default class BdlToElk {
 		};
 	}
 
-	process(onlyApplication) {
-		let { children, edges } = this.processComponents(this.tree, {
-			onlyApplication: onlyApplication,
-		});
+	process(options) {
+		const { children, edges } = this.processComponents(this.tree, options);
 
 		return {
 			id: "root",
-			layoutOptions: { "elk.algorithm": "layered" },
 			children: children,
 			edges: edges,
 		};

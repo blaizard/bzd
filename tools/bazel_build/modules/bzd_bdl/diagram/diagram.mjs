@@ -19,19 +19,20 @@ program
 		return result;
 	}, []);
 
+	const converter = new BdlToElk();
+
 	for (const [target, bdlPath] of inputs) {
 		const content = await Fs.promises.readFile(bdlPath);
 		const bdl = JSON.parse(content);
-
-		const converter = new BdlToElk(bdl, target);
-		const elk = converter.process(/*onlyApplication*/ true);
-
-		const renderer = new ElkToSVG();
-		const svg = await renderer.render(elk);
-
-		console.log(output);
-		console.log(svg);
-
-		await Fs.promises.writeFile(output, svg);
+		converter.addTarget(target, bdl);
 	}
+
+	const elk = converter.process({
+		filterOut: inputs.map(([target, _]) => target),
+	});
+
+	const renderer = new ElkToSVG();
+	const svg = await renderer.render(elk);
+
+	await Fs.promises.writeFile(output, svg);
 })();

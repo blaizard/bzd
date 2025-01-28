@@ -28,6 +28,10 @@ py_test(
     srcs = [
         "test.py",
     ],
+    args = [
+        "$(rootpath :failure)",
+        "$(rootpath :success)",
+    ],
     data = [
         ":failure",
         ":success",

@@ -12,11 +12,32 @@ export default class ElkToSVG {
 
 		this.svg = SVG(document.documentElement);
 		this.layoutOptions = {
+			"elk.algorithm": "layered",
 			"elk.direction": "RIGHT",
 			"elk.nodeSize.constraints": "NODE_LABELS PORTS PORT_LABELS MINIMUM_SIZE",
 			"elk.nodeLabels.placement": "V_TOP H_CENTER INSIDE",
+			"elk.nodeLabels.padding": "top=0, right=50, bottom=0, left=20",
 			"elk.portConstraints": "FIXED_ORDER",
 			"elk.portLabels.placement": "INSIDE",
+			"elk.edgeLabels.placement": "CENTER",
+			"elk.layered.edgeLabels.sideSelection": "DIRECTION_DOWN",
+			"elk.spacing.edgeLabel": 20,
+			"elk.spacing.labelPortHorizontal": 20,
+
+			/*
+			//"elk.algorithm": "elk.layered",
+			//"elk.direction": "RIGHT",
+			"elk.edgeRouting": "ORTHOGONAL",
+			//"elk.hierarchyHandling": "INCLUDE_CHILDREN",
+			"elk.layered.feedbackEdges": "true",
+			"elk.layered.layering.strategy": "BRANDES_KOEPF",
+			"elk.layered.mergeEdges": "true",
+			"elk.layered.mergeHierarchyEdges": "true",
+			"elk.layered.nodePlacement.strategy": "BRANDES_KOEPF",
+			"elk.layoutAncestors": "true",
+			"elk.randomSeed": "1.000000",
+			"elk.spacing.nodeNode": "15.000000"
+			*/
 		};
 	}
 
@@ -36,29 +57,31 @@ export default class ElkToSVG {
 	}
 
 	drawEdge(svg, edge, x, y) {
-		const group = svg.group().id(edge.id).move(x, y);
+		const group = svg.group().id(edge.id);
 		for (const section of edge.sections) {
 			let points = [section.startPoint, section.endPoint];
 			if (section.bendPoints) {
 				points.splice(1, 0, ...section.bendPoints);
 			}
-			group.polyline(points.map((point) => [point.x, point.y])).addClass("edge");
+			group.polyline(points.map((point) => [point.x + x, point.y + y])).addClass("edge");
 		}
 	}
 
 	drawNode(svg, node, x, y) {
 		const group = svg.group().id(node.id);
-		group.rect(node.width, node.height).addClass("node");
+		group.rect(node.width, node.height);
+		for (const name of ["node", ...node.classes]) {
+			group.addClass(name);
+		}
 		group.move(x, y);
 
 		this.drawChildren(group, node, x, y);
 	}
 
 	drawLabel(svg, label, x, y) {
-		if (label.text) {
-			const group = svg.group();
-			group.text(label.text);
-			group.move(x, y);
+		if (label.svg) {
+			label.svg.move(x, y);
+			svg.add(label.svg);
 		}
 	}
 
@@ -67,24 +90,24 @@ export default class ElkToSVG {
 		group.rect(port.width, port.height).addClass("port");
 		group.move(x, y);
 
-		this.drawChildren(svg, port, x, y);
+		this.drawChildren(group, port, x, y);
 	}
 
-	drawChildren(svg, graph, x, y) {
+	drawChildren(svg, graph, offsetX, offsetY) {
 		for (const node of graph.children || []) {
-			this.drawNode(svg, node, node.x + x, node.y + y);
+			this.drawNode(svg, node, node.x + offsetX, node.y + offsetY);
 		}
 
 		for (const edge of graph.edges || []) {
-			this.drawEdge(svg, edge, edge.x + x, edge.y + y);
+			this.drawEdge(svg, edge, offsetX, offsetY);
 		}
 
 		for (const port of graph.ports || []) {
-			this.drawPort(svg, port, port.x + x, port.y + y);
+			this.drawPort(svg, port, port.x + offsetX, port.y + offsetY);
 		}
 
 		for (const label of graph.labels || []) {
-			this.drawLabel(svg, label, label.x + x, label.y + y);
+			this.drawLabel(svg, label, label.x + offsetX, label.y + offsetY);
 		}
 	}
 
@@ -95,8 +118,7 @@ export default class ElkToSVG {
 			if (label.text) {
 				const svgText = svg.text((add) => {
 					for (const line of label.text.split("\n")) {
-						const tspan = add.tspan(line);
-						tspan.dy(tspan.bbox().height);
+						add.tspan(line);
 					}
 				});
 				const bbox = svgText.bbox();
@@ -117,25 +139,40 @@ export default class ElkToSVG {
 
 	draw(graph) {
 		const svg = this.svg.width(graph.width).height(graph.height);
+		svg.viewbox(0, 0, graph.width, graph.height);
 
 		// Set the style.
 		svg.style(".edge", {
-			stroke: "#f06",
+			stroke: "rgb(0, 148, 133)",
 			"stroke-width": "2",
 			fill: "none",
 		});
+		svg.style("text", {
+			fill: "#000",
+			stroke: "none",
+		});
 		svg.style(".node", {
 			fill: "#eee",
-			stroke: "#f06",
+			stroke: "rgb(0, 148, 133)",
 			"stroke-width": "1",
+			color: "#000",
+		});
+		svg.style(".node.level-0", {
+			fill: "#fafafa",
+		});
+		svg.style(".node.level-1", {
+			fill: "#eaeaea",
+		});
+		svg.style(".node.level-2", {
+			fill: "#e0e0e0",
 		});
 		svg.style(".port", {
-			fill: "#f06",
-			stroke: "#f06",
+			fill: "rgb(0, 148, 133)",
+			stroke: "rgb(0, 148, 133)",
 			"stroke-width": "1",
 		});
 
-		this.drawChildren(svg, graph, graph.x, graph.y);
+		this.drawChildren(svg, graph, 0, 0);
 		return svg.svg();
 	}
 }
