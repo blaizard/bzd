@@ -6,7 +6,7 @@ def _clang_tidy_aspect_impl(target, ctx):
     """Run clang-tidy on the target."""
 
     compile_commands_list = make_compile_commands(target, ctx)
-    if not compile_commands_list:
+    if (not compile_commands_list) or ("no-clang-tidy" in ctx.rule.attr.tags):
         return [OutputGroupInfo(clang_tidy = get_ouput_group_files_from_attrs(ctx, "clang_tidy"))]
 
     outputs = []

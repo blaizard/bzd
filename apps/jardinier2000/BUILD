@@ -22,6 +22,9 @@ cc_library(
     hdrs = [
         "jardinier.hh",
     ],
+    tags = [
+        "no-clang-tidy",
+    ],
     target_compatible_with = [
         "@bzd_platforms//al:esp_idf",
     ],

@@ -40,6 +40,8 @@ def esp32s3_linux_x86_64(name, use_fragment):
             # Standard includes, this is needed to avoid indefined include complain from Bazel.
             "-nostdinc",
             "--no-standard-includes",
+            # Needed for clang-tdy
+            "-D__XTENSA__",
         ],
         "cxx_flags": [
             "-std=c++20",
