@@ -102,6 +102,18 @@ To generate the compile_commands.json file:
 bazel run @bzd_sanitizer//aspects/compile_commands:build
 ```
 
+Update `compile_commands.json`
+
+```bash
+bazel run @bzd_sanitizer//aspects/compile_commands:build
+```
+
+Update `rust-project.json`
+
+```bash
+bazel run @rules_rust//tools/rust_analyzer:gen_rust_project -- //rust/...
+```
+
 ## Naming Convention
 
 The code in this repository follows several principle regarding naming convention. The following rules are applied cross languages.

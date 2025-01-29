@@ -47,3 +47,6 @@ esp-idf/
 # Generated in CI
 bin/
 dist/
+
+# Rust
+rust-project.json
