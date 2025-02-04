@@ -9,6 +9,7 @@ def _bzd_nodejs_transition_impl(_settings, _attr):
     return {"//:build_type": "nodejs_web"}
 
 # Transition to notify the dependency graph that this is a `nodejs_web` build.
+# This is used to select the proper dependency in some cases.
 _bzd_nodejs_transition = transition(
     implementation = _bzd_nodejs_transition_impl,
     inputs = [],
@@ -23,9 +24,12 @@ def _bzd_nodejs_web_exec_impl(ctx):
     toolchain_executable = ctx.toolchains["//nodejs:toolchain_type"].executable
 
     vite_config = ctx.actions.declare_file("vite.config.mjs", sibling = install.package_json)
-    ctx.actions.symlink(
+    ctx.actions.expand_template(
         output = vite_config,
-        target_file = ctx.file._vite_config,
+        template = ctx.file._vite_config,
+        substitutions = {
+            "%root%": vite_config.dirname,
+        },
     )
 
     # Add static files, all files under "/public" are copied into the bundle.
@@ -148,7 +152,7 @@ _bzd_nodejs_web_binary = rule(
             allow_single_file = True,
         ),
         "_vite_config": attr.label(
-            default = Label("//toolchain/vite:vite.config.js"),
+            default = Label("//toolchain/vite:vite.config.binary.js"),
             allow_single_file = True,
         ),
         "_web_server": attr.label(

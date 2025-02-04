@@ -10,6 +10,7 @@ load("//nodejs:private/nodejs_package.bzl", bzd_nodejs_package_ = "bzd_nodejs_pa
 load("//nodejs:private/nodejs_requirements_compile.bzl", bzd_nodejs_requirements_compile_ = "bzd_nodejs_requirements_compile")
 load("//nodejs:private/nodejs_static.bzl", bzd_nodejs_static_ = "bzd_nodejs_static")
 load("//nodejs:private/nodejs_web_binary.bzl", bzd_nodejs_web_binary_ = "bzd_nodejs_web_binary")
+load("//nodejs:private/nodejs_web_library.bzl", bzd_nodejs_web_library_ = "bzd_nodejs_web_library")
 load("//nodejs/static:defs.bzl", bzd_nodejs_static_sitemap_ = "bzd_nodejs_static_sitemap")
 
 # Public API.
@@ -20,6 +21,7 @@ bzd_nodejs_install = bzd_nodejs_install_
 bzd_nodejs_library = bzd_nodejs_library_
 bzd_nodejs_package = bzd_nodejs_package_
 bzd_nodejs_extern_binary = bzd_nodejs_extern_binary_
+bzd_nodejs_web_library = bzd_nodejs_web_library_
 bzd_nodejs_web_binary = bzd_nodejs_web_binary_
 bzd_nodejs_static = bzd_nodejs_static_
 bzd_nodejs_static_sitemap = bzd_nodejs_static_sitemap_
