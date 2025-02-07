@@ -1,5 +1,6 @@
 load("@bzd_bdl//:defs.bzl", "bdl_library", "bdl_system")
 load("@bzd_bdl//diagram:defs.bzl", "bdl_system_diagram")
+load("@bzd_rules_doc//doc:defs.bzl", "doc_binary")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
 bdl_library(
@@ -34,4 +35,15 @@ bdl_system(
 bdl_system_diagram(
     name = "diagram",
     system = ":system",
+)
+
+doc_binary(
+    name = "documentation",
+    srcs = [
+        ("Overview", "README.md"),
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":diagram",
+    ],
 )
