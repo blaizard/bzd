@@ -1,4 +1,7 @@
-"""Bash binary rules."""
+"""Bash binary rules.
+
+This uses the runfiles structured as described here: https://github.com/bazelbuild/examples/blob/main/rules/runfiles/tool.bzl
+"""
 
 def _update_runfiles(ctx, runfiles, file):
     """Update the current runfiles and return the executable."""
