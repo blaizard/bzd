@@ -27,7 +27,7 @@ def _bzd_nodejs_web_library_impl(ctx):
         template = ctx.file._vite_config,
         substitutions = {
             "%main%": ctx.file.main.path,
-            "%name%": ctx.label.name,
+            "%name%": ctx.attr.library_name or ctx.label.name,
             "%root%": vite_config.dirname,
         },
     )
@@ -70,6 +70,9 @@ _bzd_nodejs_web_library = rule(
         "install": attr.label(
             mandatory = True,
             providers = [BzdNodeJsInstallInfo],
+        ),
+        "library_name": attr.string(
+            doc = "An optional name for the library, if unset, the name of the rule will be used.",
         ),
         "main": attr.label(
             mandatory = True,
