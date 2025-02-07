@@ -93,5 +93,5 @@ def compositionJson(
 
 		ios = {uid: ioToJson(io) for uid, io in composition.iosRegistry.items() if io}
 
-		jsonData = json.dumps({"ios": ios, "contexts": contexts}, indent=4)
+		jsonData = json.dumps({"target": target, "ios": ios, "contexts": contexts}, indent=4)
 		(output.parent / f"{output.name}.{target}.json").write_text(jsonData)

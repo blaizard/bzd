@@ -7,14 +7,14 @@ export default class BdlToElk {
 		this.ios = {};
 	}
 
-	addTarget(target, bdl) {
+	addTarget(bdl) {
 		const targetTree = this.makeTree(bdl);
 		this.tree.push({
 			type: "target",
-			fqn: target,
+			fqn: bdl.target,
 			expression: {
-				name: target,
-				fqn: target,
+				name: bdl.target,
+				fqn: bdl.target,
 				category: "target",
 			},
 			members: targetTree,
@@ -176,6 +176,7 @@ export default class BdlToElk {
 			// Create the child
 			children.push({
 				id: fqn,
+				tooltip: config.join("\n"),
 				labels: [
 					{
 						text: name,

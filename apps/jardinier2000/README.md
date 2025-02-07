@@ -2,7 +2,7 @@
 
 ## Software
 
-![Architecture Diagram](./diagram.svg)
+::: //apps/jardinier2000:diagram
 
 ## Hardware
 

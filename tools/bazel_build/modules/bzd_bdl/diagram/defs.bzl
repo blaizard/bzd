@@ -1,27 +1,27 @@
 """Rule to draw a diagram from a bdl architecture."""
 
+load("@bzd_rules_doc//doc:defs.bzl", "DocumentationExtensionsInfo", "DocumentationInfo")
 load("//:defs.bzl", "BdlSystemJsonInfo")
 
 def _bdl_system_diagram_impl(ctx):
     system_json = ctx.attr.system[BdlSystemJsonInfo].json
-    inputs = []
-    args = []
-    for target, json in system_json.items():
-        inputs.append(json)
-        args += [target, json.path]
 
-    output = ctx.actions.declare_file("{}.svg".format(ctx.label.name))
-    ctx.actions.run(
-        inputs = inputs,
-        outputs = [output],
-        executable = ctx.executable._diagram,
-        arguments = ["--output", output.path] + args,
-        progress_message = "Generating diagram for {}".format(ctx.label),
+    extension = ctx.actions.declare_file("{}.extension.json".format(ctx.label.name))
+    ctx.actions.write(
+        output = extension,
+        content = json.encode({
+            "//{}:{}".format(ctx.label.package, ctx.label.name): {
+                "args": [bdl.path for bdl in system_json.values()],
+                "executable": ctx.executable._diagram_markdown.path,
+            },
+        }),
     )
 
-    return DefaultInfo(
-        files = depset(inputs + [output]),
-    )
+    return [ctx.attr._diagram_library[DocumentationInfo], DocumentationExtensionsInfo(
+        json = depset([extension]),
+        tools = depset([ctx.attr._diagram_markdown[DefaultInfo].files_to_run]),
+        data = depset(system_json.values()),
+    )]
 
 bdl_system_diagram = rule(
     implementation = _bdl_system_diagram_impl,
@@ -36,6 +36,14 @@ bdl_system_diagram = rule(
             executable = True,
             cfg = "exec",
             default = Label("//diagram"),
+        ),
+        "_diagram_library": attr.label(
+            default = Label("//diagram:doc_library"),
+        ),
+        "_diagram_markdown": attr.label(
+            executable = True,
+            cfg = "exec",
+            default = Label("//diagram:markdown"),
         ),
     },
 )

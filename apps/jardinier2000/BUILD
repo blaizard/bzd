@@ -54,8 +54,8 @@ doc_binary(
     srcs = [
         ("Overview", "README.md"),
     ],
-    data = [
+    visibility = ["//visibility:public"],
+    deps = [
         ":diagram",
     ],
-    visibility = ["//visibility:public"],
 )

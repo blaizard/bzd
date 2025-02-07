@@ -1,28 +1,21 @@
 import ELK from "elkjs";
-import { SVG, registerWindow } from "@svgdotjs/svg.js";
-import { createSVGWindow } from "svgdom";
 
 /// Translate an elk definition into SVG.
 export default class ElkToSVG {
-	constructor() {
-		// The following is needed with nodejs to emulate a DOM.
-		const window = createSVGWindow();
-		const document = window.document;
-		registerWindow(window, document);
-
-		this.svg = SVG(document.documentElement);
+	constructor(svg) {
+		this.svg = svg;
 		this.layoutOptions = {
 			"elk.algorithm": "layered",
 			"elk.direction": "RIGHT",
 			"elk.nodeSize.constraints": "NODE_LABELS PORTS PORT_LABELS MINIMUM_SIZE",
 			"elk.nodeLabels.placement": "V_TOP H_CENTER INSIDE",
-			"elk.nodeLabels.padding": "top=0, right=50, bottom=0, left=20",
+			"elk.nodeLabels.padding": "top=0, right=10, bottom=0, left=10",
 			"elk.portConstraints": "FIXED_ORDER",
 			"elk.portLabels.placement": "INSIDE",
 			"elk.edgeLabels.placement": "CENTER",
 			"elk.layered.edgeLabels.sideSelection": "DIRECTION_DOWN",
-			"elk.spacing.edgeLabel": 20,
-			"elk.spacing.labelPortHorizontal": 20,
+			"elk.spacing.edgeLabel": 5,
+			"elk.spacing.labelPortHorizontal": 5,
 		};
 	}
 
@@ -62,6 +55,10 @@ export default class ElkToSVG {
 			group.addClass(name);
 		}
 		group.move(x, y);
+
+		if (node.tooltip) {
+			group.element("title").words(node.tooltip);
+		}
 
 		this.drawChildren(group, node, x, y);
 	}
@@ -109,6 +106,12 @@ export default class ElkToSVG {
 						add.tspan(line);
 					}
 				});
+				svgText.font({
+					family: "Helvetica",
+					size: 14,
+					anchor: "middle",
+					leading: "1.5em",
+				});
 				const bbox = svgText.bbox();
 				Object.assign(label, {
 					svg: svgText,
@@ -150,6 +153,9 @@ export default class ElkToSVG {
 			stroke: "rgb(0, 148, 133)",
 			"stroke-width": "1",
 			color: "#000",
+		});
+		svg.style(".node:hover", {
+			"stroke-width": "3",
 		});
 		svg.style(".node.level-0", {
 			fill: "#fafafa",
