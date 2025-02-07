@@ -13,6 +13,8 @@ theme:
     primary: "teal"
     accent: "light blue"
 
+{extra}
+
 plugins:
   - offline
   - exclude:

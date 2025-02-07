@@ -2,6 +2,11 @@ load("@pip//:requirements.bzl", "requirement")
 load("@rules_python//python:defs.bzl", "py_binary")
 load("@rules_python//python/entry_points:py_console_script_binary.bzl", "py_console_script_binary")
 
+exports_files(
+    ["js/script.js"],
+    visibility = ["//:__subpackages__"],
+)
+
 py_binary(
     name = "builder",
     srcs = [

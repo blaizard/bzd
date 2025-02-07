@@ -53,6 +53,11 @@ if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="MkDocs documentation builder.")
 	parser.add_argument("--navigation", type=str, default="[]", help="Navigation as a json string.")
 	parser.add_argument("--mkdocs", type=pathlib.Path, default="mkdocs", help="Path of the mkdocs tool.")
+	parser.add_argument("--json",
+	                    type=pathlib.Path,
+	                    default=[],
+	                    action="append",
+	                    help="Javascript libraries to be added.")
 	parser.add_argument(
 	    "--root",
 	    type=pathlib.Path,
@@ -65,30 +70,36 @@ if __name__ == "__main__":
 
 	navigation = json.loads(args.navigation)
 
+	extra = []
+	if args.json:
+		extra.append("extra_javascript:")
+		for file in args.json:
+			extra.append(f"  - {file}")
+
 	# Create the mkdocs.yml file.
 	template = (pathlib.Path(__file__).parent / "mkdocs.yml.template").read_text()
-	output = template.format(
-	    navigation="\n".join(navigationToMkDocsList(root=args.root, navigation=navigation)),
-	    root=args.root.as_posix(),
-	)
+	output = template.format(navigation="\n".join(navigationToMkDocsList(root=args.root, navigation=navigation)),
+	                         root=args.root.as_posix(),
+	                         extra="\n".join(extra))
 	pathlib.Path("./mkdocs.yml").write_text(output)
 
 	# Generate the site with mkdocs and package everything.
 	with tempfile.TemporaryDirectory() as pathStr:
 		path = pathlib.Path(pathStr)
-		subprocess.run([
-		    args.mkdocs,
-		    "--color",
-		    "--quiet",
-		    "--",
-		    "build",
-		    "--strict",
-		    "--config-file",
-		    "mkdocs.yml",
-		    "--site-dir",
-		    path,
-		],
-		               check=True)
+		subprocess.run(
+		    [
+		        args.mkdocs,
+		        "--color",
+		        #"--quiet",
+		        "--",
+		        "build",
+		        "--strict",
+		        "--config-file",
+		        "mkdocs.yml",
+		        "--site-dir",
+		        path,
+		    ],
+		    check=True)
 
 		# Check if there is an entry point, if not create it.
 		if not (path / "index.html").is_file():

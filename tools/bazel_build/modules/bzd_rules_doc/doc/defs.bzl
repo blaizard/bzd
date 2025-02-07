@@ -2,7 +2,7 @@
 
 load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
 
-_DocumentationInfo = provider(
+DocumentationInfo = provider(
     doc = "Provider for documentation entities.",
     fields = {
         "data": "The data files associated with this documentation.",
@@ -11,13 +11,26 @@ _DocumentationInfo = provider(
     },
 )
 
+DocumentationExtensionsInfo = provider(
+    doc = "Provider for documentation extensions.",
+    fields = {
+        "data": "Depset of data to be used by the extensions.",
+        "json": "Extension files to be used.",
+        "tools": "Depset of tools (files_to_run providers) to be used by the extensions.",
+    },
+)
+
 _COMMON_ATTRS = {
     "data": attr.label_list(
         doc = "Extra files used in the documentation.",
         allow_files = True,
     ),
+    "deps": attr.label_list(
+        doc = "Dependencies for this documentation.",
+        providers = [[DocumentationInfo], [DocumentationExtensionsInfo]],
+    ),
     "srcs": attr.label_list(
-        doc = "Source files associated with this documentation",
+        doc = "Source files associated with this documentation.",
         allow_files = True,
     ),
     "titles": attr.string_list(
@@ -30,18 +43,24 @@ _COMMON_ATTRS = {
     ),
 }
 
-def _doc_preprocess(ctx, markdown, deps):
+def _doc_preprocess(ctx, markdown, deps, extensions):
     # No pre-processing for generated markdown.
     if markdown.path.startswith(ctx.bin_dir.path):
         return markdown
 
     new_file = ctx.actions.declare_file(markdown.basename, sibling = markdown)
+
+    args = ctx.actions.args()
+    args.add_all(extensions.json, before_each = "--extension")
+    args.add("--output", new_file)
+    args.add(markdown)
+
     ctx.actions.run(
-        inputs = deps + [markdown],
+        inputs = depset(deps + [markdown], transitive = [extensions.data, extensions.json]),
         outputs = [new_file],
-        tools = [ctx.executable._preprocessor],
+        tools = [ctx.attr._preprocessor[DefaultInfo].files_to_run] + extensions.tools.to_list(),
         executable = ctx.executable._preprocessor,
-        arguments = ["--output", new_file.path, markdown.path],
+        arguments = [args],
         progress_message = "Preprocessing {}".format(markdown.path),
     )
     return new_file
@@ -58,9 +77,23 @@ def _doc_preprocess_data(ctx, data):
     )
     return new_data
 
+def _doc_merge_extensions(deps):
+    """Merge all extensions if the provider is available."""
+
+    return DocumentationExtensionsInfo(
+        json = depset(transitive = [dep[DocumentationExtensionsInfo].json for dep in deps if DocumentationExtensionsInfo in dep]),
+        data = depset(transitive = [dep[DocumentationExtensionsInfo].data for dep in deps if DocumentationExtensionsInfo in dep]),
+        tools = depset(transitive = [dep[DocumentationExtensionsInfo].tools for dep in deps if DocumentationExtensionsInfo in dep]),
+    )
+
 def _doc_library_impl(ctx):
     if len(ctx.attr.srcs) != len(ctx.attr.titles):
         fail("There is not enough sources/titles pair defined.")
+
+    # Update the dependencies.
+
+    data_from_deps = depset(transitive = [dep[DocumentationInfo].data for dep in ctx.attr.deps if DocumentationInfo in dep])
+    extensions = _doc_merge_extensions(ctx.attr.deps)
 
     # Create the navigation map and gather dependencies.
     navigation = []
@@ -69,34 +102,33 @@ def _doc_library_impl(ctx):
     for index in range(0, len(ctx.attr.srcs)):
         name = ctx.attr.titles[index]
         src = ctx.attr.srcs[index]
-        if _DocumentationInfo in src:
+        if DocumentationInfo in src:
             if not name:
                 name = src.label.name
             if name == "**":
-                navigation.extend(src[_DocumentationInfo].navigation)
+                navigation.extend(src[DocumentationInfo].navigation)
             else:
-                navigation.append((name, src[_DocumentationInfo].navigation))
-            providers.append(src[_DocumentationInfo])
+                navigation.append((name, src[DocumentationInfo].navigation))
+            providers.append(src[DocumentationInfo])
         elif src.files:
             for f in src.files.to_list():
                 if not name:
                     name = f.basename[:-(len(f.extension) + 1)]
-                markdown = _doc_preprocess(ctx, f, ctx.files.data)
+                markdown = _doc_preprocess(ctx, f, ctx.files.data, extensions = extensions)
                 navigation.append((name, markdown.path))
                 markdowns.append(markdown)
         else:
             fail("Input source file '{}', not supported.".format(src))
 
-    # Symlink the data to make sure it resides in the the same directory as the markdowns.
-    data = []
-    for f in ctx.files.data:
-        new_file = _doc_preprocess_data(ctx, f)
-        data.append(new_file)
+    # Merge extensions coming from the sources.
+    all_extensions = _doc_merge_extensions(ctx.attr.deps + ctx.attr.srcs)
 
-    data = depset(data, transitive = [p.data for p in providers])
+    # Symlink the data to make sure it resides in the the same directory as the markdowns.
+    local_data = [_doc_preprocess_data(ctx, f) for f in ctx.files.data]
+    data = depset(local_data, transitive = [p.data for p in providers] + [data_from_deps])
     markdowns = depset(markdowns, transitive = [p.markdowns for p in providers])
 
-    return _DocumentationInfo(markdowns = markdowns, data = data, navigation = navigation)
+    return [DocumentationInfo(markdowns = markdowns, data = data, navigation = navigation), all_extensions]
 
 _doc_library = rule(
     implementation = _doc_library_impl,
@@ -104,17 +136,39 @@ _doc_library = rule(
     doc = "Create a documentation library.",
 )
 
+def _create_symlinks(ctx, files):
+    symlinks = []
+    for f in files:
+        symlink = ctx.actions.declare_file(f.path)
+        ctx.actions.symlink(
+            target_file = f,
+            output = symlink,
+        )
+        symlinks.append(symlink)
+    return symlinks
+
 def _doc_binary_impl(ctx):
-    provider = _doc_library_impl(ctx)
+    provider, _ = _doc_library_impl(ctx)
     package = ctx.actions.declare_file("{}.tar".format(ctx.label.name))
 
+    # Create symlink of the js to have the file present under the root tree.
+    # This needs to be done at the top level to remove any duplicates.
+    js_symlinks = _create_symlinks(ctx, ctx.files._js)
+
+    args = ctx.actions.args()
+    args.add_all([f.short_path for f in js_symlinks], before_each = "--js")
+    args.add("--navigation", json.encode(provider.navigation))
+    args.add("--root", ctx.bin_dir.path)
+    args.add("--mkdocs", ctx.executable._mkdocs)
+    args.add(package)
+
     ctx.actions.run(
-        inputs = depset(transitive = [provider.data, provider.markdowns]),
+        inputs = depset(js_symlinks, transitive = [provider.data, provider.markdowns]),
         outputs = [package],
         tools = [ctx.executable._builder, ctx.executable._mkdocs],
         executable = ctx.executable._builder,
         progress_message = "Documentation for {}...".format(ctx.label),
-        arguments = ["--navigation", json.encode(provider.navigation), "--root", ctx.bin_dir.path, "--mkdocs", ctx.executable._mkdocs.path, package.path],
+        arguments = [args],
     )
 
     return [
@@ -135,6 +189,12 @@ _doc_binary = rule(
             executable = True,
             cfg = "exec",
             default = Label("//doc:builder"),
+        ),
+        "_js": attr.label_list(
+            allow_files = True,
+            default = [
+                Label("//doc:js/script.js"),
+            ],
         ),
         "_mkdocs": attr.label(
             executable = True,
@@ -173,8 +233,8 @@ def doc_library(srcs = None, data = None, **kwargs):
         **kwargs: Additional arguments to be passed to the rule.
     """
     _doc_library(
-        srcs = [_get_title_source_pair(item)[1] for item in srcs],
-        titles = [_get_title_source_pair(item)[0] for item in srcs],
+        srcs = [_get_title_source_pair(item)[1] for item in srcs or []],
+        titles = [_get_title_source_pair(item)[0] for item in srcs or []],
         data = data,
         **kwargs
     )
