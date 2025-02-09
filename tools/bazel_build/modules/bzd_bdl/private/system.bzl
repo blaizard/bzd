@@ -1,4 +1,4 @@
-"""BDL rules."""
+"""BDL system rules."""
 
 load("@bzd_package//:defs.bzl", "BzdPackageMetadataFragmentInfo")
 load("//private:common.bzl", "aspect_bdl_providers", "library_extensions", "make_composition_language_providers", "precompile_bdl", "transition_platform")
@@ -6,7 +6,23 @@ load("//private:providers.bzl", "BdlSystemInfo", "BdlSystemJsonInfo", "BdlTarget
 
 visibility(["//..."])
 
-# ---- Extensions ----
+_BDL_SYSTEM_GENERIC_ATTR = {
+    "deps": attr.label_list(
+        doc = "Dependencies for the rule.",
+    ),
+    "platform": None,
+    "system": None,
+    "target": None,
+    "target_name": None,
+    "targets": attr.string_keyed_label_dict(
+        doc = "A dictionary with name and target corresponding to the binaries for this system.",
+        configurable = False,
+    ),
+    "testonly": attr.bool(
+        doc = "Set testonly attribute.",
+        configurable = False,
+    ),
+}
 
 def _bdl_system_impl(ctx):
     # Loop through all the name/target pairs and generate the composition files.
@@ -169,24 +185,6 @@ def _bzd_binary_generic(is_test):
 _bdl_binary = _bzd_binary_generic(is_test = False)
 _bdl_test = _bzd_binary_generic(is_test = True)
 
-_BDL_SYSTEM_GENERIC_ATTR = {
-    "deps": attr.label_list(
-        doc = "Dependencies for the rule.",
-    ),
-    "platform": None,
-    "system": None,
-    "target": None,
-    "target_name": None,
-    "targets": attr.string_keyed_label_dict(
-        doc = "A dictionary with name and target corresponding to the binaries for this system.",
-        configurable = False,
-    ),
-    "testonly": attr.bool(
-        doc = "Set testonly attribute.",
-        configurable = False,
-    ),
-}
-
 def _bdl_system_entry_point_impl(ctx):
     # Use the first target as the default target for this deployment.
     # It is guaranteed to have at least one target with the mandatory attribute.
@@ -301,115 +299,3 @@ bdl_system_test = macro(
     inherit_attrs = _bdl_test,
     attrs = _BDL_SYSTEM_GENERIC_ATTR,
 )
-
-def _bdl_target_impl(ctx):
-    return BdlTargetInfo(
-        composition = ctx.files.composition,
-        deps = ctx.attr.deps,
-        language = ctx.attr.language,
-        binary = ctx.attr.binary,
-    )
-
-_bdl_target = rule(
-    implementation = _bdl_target_impl,
-    doc = """Target definition for the bzd framework.""",
-    attrs = {
-        "binary": attr.label(
-            cfg = "exec",
-            executable = True,
-            doc = "Executable for the binary target.",
-        ),
-        "composition": attr.label_list(
-            mandatory = True,
-            allow_files = [".bdl"],
-            doc = "List of composition bdl source files for this target.",
-        ),
-        "deps": attr.label_list(
-            doc = "List of dependencies.",
-            aspects = [aspect_bdl_providers],
-        ),
-        "language": attr.string(
-            doc = "Language associated with this target.",
-            values = library_extensions.keys(),
-            mandatory = True,
-        ),
-    },
-    provides = [BdlTargetInfo],
-)
-
-def bdl_target(name, **kwargs):
-    if not name.endswith("auto"):
-        fail("The name for bdl_target must ends with 'auto', this is to tell the rule that it does not have related platform.")
-    _bdl_target(
-        name = name,
-        **kwargs
-    )
-
-def _bdl_target_platform_impl(ctx):
-    return ctx.attr.target[BdlTargetInfo]
-
-_bdl_target_platform = rule(
-    implementation = _bdl_target_platform_impl,
-    doc = """Target definition specialized for a specific platform for the bzd framework.""",
-    attrs = {
-        "platform": attr.label(
-            mandatory = True,
-            doc = "The platform associated with this target platform.",
-        ),
-        "target": attr.label(
-            mandatory = True,
-            providers = [BdlTargetInfo],
-            doc = "The target associated with this target platform.",
-        ),
-        "_allowlist_function_transition": attr.label(
-            default = "@bazel_tools//tools/allowlists/function_transition_allowlist",
-        ),
-    },
-    cfg = transition_platform,
-)
-
-def bdl_target_platform(name, target, platform, visibility = None, tags = None):
-    # This is the main target rule to this target. The relation between this
-    # and the platform are through their name.
-    _bdl_target_platform(
-        name = name,
-        target = target,
-        platform = platform,
-        visibility = visibility,
-        tags = tags,
-    )
-
-    # A platform should be used here because we need to hardcode the name of the platform,
-    # to be able to use it into the bazel transition.
-    native.alias(
-        name = "{}.platform".format(name),
-        actual = platform,
-        visibility = visibility,
-        tags = tags,
-    )
-
-def bdl_application_factory(implementation):
-    def _bdl_application_factory_impl(ctx):
-        bdl = ctx.actions.declare_file(ctx.label.name + ".bdl")
-        namespace = ".".join(ctx.label.package.split("/") + [ctx.label.name])
-        providers = implementation(ctx, ctx.attr.target, bdl, namespace)
-
-        bdl_provider, _ = precompile_bdl(ctx, srcs = [bdl], deps = [])
-
-        return [bdl_provider] + providers
-
-    return rule(
-        implementation = _bdl_application_factory_impl,
-        doc = "Wrapper for an application and add bdl information.",
-        attrs = {
-            "target": attr.label(
-                mandatory = True,
-                doc = "The target associated with this application.",
-            ),
-            "_bdl": attr.label(
-                default = Label("//bdl"),
-                cfg = "exec",
-                executable = True,
-            ),
-        },
-    )

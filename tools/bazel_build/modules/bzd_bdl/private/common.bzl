@@ -1,4 +1,4 @@
-"""BDL rules."""
+"""BDL rule helpers."""
 
 load("@bazel_skylib//lib:sets.bzl", "sets")
 load("@bdl_extension//:extensions.bzl", "extensions")
