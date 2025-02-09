@@ -32,11 +32,6 @@ bdl_system_diagram = rule(
             doc = "The system rule associated with this target.",
             providers = [BdlSystemJsonInfo],
         ),
-        "_diagram": attr.label(
-            executable = True,
-            cfg = "exec",
-            default = Label("//diagram"),
-        ),
         "_diagram_library": attr.label(
             default = Label("//diagram:doc_library"),
         ),
