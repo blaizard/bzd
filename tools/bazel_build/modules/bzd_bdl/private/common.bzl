@@ -2,8 +2,8 @@
 
 load("@bazel_skylib//lib:sets.bzl", "sets")
 load("@bdl_extension//:extensions.bzl", "extensions")
-load("//extensions:json.bzl", extension_json = "extension")
 load("//private:providers.bzl", "BdlInfo", "BdlTagInfo")
+load("//private/extensions:json.bzl", extension_json = "extension")
 
 visibility(["//..."])
 

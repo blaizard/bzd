@@ -5,5 +5,5 @@ bzl_library(
     srcs = [
         "json.bzl",
     ],
-    visibility = ["//:__pkg__"],
+    visibility = ["//private:__pkg__"],
 )

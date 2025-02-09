@@ -11,14 +11,6 @@ bzl_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//extensions:json",
-        "@bazel_skylib//lib:sets",
-        "@bazel_skylib//rules:common_settings",
-        "@bdl_extension//:extensions",
-        "@bzd_lib//:sh_binary_wrapper",
-        "@bzd_lib//config:defs",
-        "@bzd_package//:defs",
-        "@bzd_toolchain_cc//cc:defs",
-        "@rules_cc//cc:find_cc_toolchain.bzl",
+        "//private:defs",
     ],
 )
