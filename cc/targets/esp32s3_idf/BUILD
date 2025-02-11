@@ -1,4 +1,4 @@
-load("@bzd_bdl//:defs.bzl", "bdl_target", "bdl_target_platform")
+load("@bzd_bdl//:defs.bzl", "bdl_target")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
@@ -39,10 +39,10 @@ bdl_target(
     ],
 )
 
-bdl_target_platform(
+bdl_target(
     name = "gcc",
+    parent = ":auto",
     platform = "@esp32s3//:platform-esp32s3_idf-xtensa_lx7",
-    target = ":auto",
     visibility = [
         "//visibility:public",
     ],

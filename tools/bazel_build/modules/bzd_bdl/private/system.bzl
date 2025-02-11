@@ -228,7 +228,7 @@ def _target_to_platform(target):
     """Convert a target label into its related platform label."""
     if Label(target).name.endswith("auto"):
         return None
-    return str(Label(target)) + ".platform"
+    return "{}.platform".format(str(Label(target)))
 
 def _bdl_system_macro_impl(name, targets, testonly, deps, visibility, tags = None, target_compatible_with = None, **kwargs):
     _bdl_system(

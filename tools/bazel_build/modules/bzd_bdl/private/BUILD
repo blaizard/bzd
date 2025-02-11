@@ -9,7 +9,6 @@ bzl_library(
         "providers.bzl",
         "system.bzl",
         "target.bzl",
-        "target_platform.bzl",
     ],
     visibility = ["//:__pkg__"],
     deps = [

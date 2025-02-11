@@ -1,4 +1,4 @@
-load("@bzd_bdl//:defs.bzl", "bdl_target", "bdl_target_platform")
+load("@bzd_bdl//:defs.bzl", "bdl_target")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
@@ -35,19 +35,19 @@ bdl_target(
     ],
 )
 
-bdl_target_platform(
+bdl_target(
     name = "x86_64_gcc",
+    parent = ":auto",
     platform = "@gcc//:platform-linux-x86_64",
-    target = ":auto",
     visibility = [
         "//visibility:public",
     ],
 )
 
-bdl_target_platform(
+bdl_target(
     name = "x86_64_clang",
+    parent = ":auto",
     platform = "@clang//:platform-linux-x86_64",
-    target = ":auto",
     visibility = [
         "//visibility:public",
     ],
