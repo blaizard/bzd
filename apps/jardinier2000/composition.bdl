@@ -1,5 +1,4 @@
 use "interfaces/timer.bdl"
-use "cc/components/esp_idf/pwm/interface.bdl"
 
 namespace jardinier;
 
@@ -17,15 +16,12 @@ interface:
 }
 
 method water(timer = {timer}, out = {out}, wateringTimeS = Integer, wakeUpPeriodS = Integer);
-composition lights {
+composition {
 	water(wateringTimeS = 60, wakeUpPeriodS = 12 * 3600);
-	pwmTimer = bzd.components.esp32.LEDCTimer(frequency = 4000, number = 0);
-	pwm0 = bzd.components.esp32.LEDCPWM(timer = pwmTimer, io = 12, channel = 0);
-	pwm1 = bzd.components.esp32.LEDCPWM(timer = pwmTimer, io = 13, channel = 1);
 	lights = LightController();
 	lights.run();
-	connect(lights.pwmDuty0, pwm0.duty);
-	connect(lights.pwmDuty1, pwm1.duty);
+	connect(lights.pwmDuty0, esp32.board.pwm0.duty);
+	connect(lights.pwmDuty1, esp32.board.pwm1.duty);
 	
 }
 

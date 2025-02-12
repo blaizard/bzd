@@ -216,7 +216,7 @@ def make_composition_language_providers(ctx, name, deps, target_deps = None, tar
     target_bdl_providers = target_bdl_providers if target_bdl_providers else {}
 
     # Contains all BDL providers following this schema: List[Pair[BdlInfo, Optional[target]]]
-    bdl_providers = [(dep[BdlInfo], None) for dep in deps if BdlInfo in dep] + [(provider, name) for name, provider in target_bdl_providers.items()]
+    bdl_providers = [(provider, name) for name, provider in target_bdl_providers.items()] + [(dep[BdlInfo], None) for dep in deps if BdlInfo in dep]
 
     # Source list with the following format <path>@<precompiled>@<target> (where @<target> is optional)
     sources = ["{}@{}".format(source[0].path, source[1].path) for provider, target in bdl_providers for source in provider.sources.to_list()]

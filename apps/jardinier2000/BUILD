@@ -1,4 +1,4 @@
-load("@bzd_bdl//:defs.bzl", "bdl_library", "bdl_system")
+load("@bzd_bdl//:defs.bzl", "bdl_library", "bdl_system", "bdl_target")
 load("@bzd_bdl//diagram:defs.bzl", "bdl_system_diagram")
 load("@bzd_rules_doc//doc:defs.bzl", "doc_binary")
 load("@rules_cc//cc:defs.bzl", "cc_library")
@@ -9,7 +9,6 @@ bdl_library(
         "composition.bdl",
     ],
     deps = [
-        "//cc/components/esp_idf/pwm",
         "//interfaces:timer",
     ],
 )
@@ -34,10 +33,21 @@ cc_library(
     ],
 )
 
+bdl_target(
+    name = "board",
+    composition = [
+        ":board.bdl",
+    ],
+    parent = "@@//cc/targets/esp32_idf:gcc",
+    deps = [
+        "//cc/components/esp_idf/pwm",
+    ],
+)
+
 bdl_system(
     name = "jardinier2000",
     targets = {
-        "esp32": "@@//cc/targets/esp32_idf:gcc",
+        "esp32": ":board",
     },
     deps = [
         ":lib",
