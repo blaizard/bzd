@@ -16,9 +16,10 @@ if __name__ == "__main__":
 <script>
 	const {redrawFctName} = async (selectObject) => {{
 		const config = (selectObject)? selectObject.value : "apps";
-		await loadScript("/external/bzd_bdl+/diagram/library.output/library.umd.cjs");
+		await loadScript("$(path /external/bzd_bdl+/diagram/library.output/library.umd.cjs)");
 		const bdls = [{bdlsJson}];
-		const svg = await bdlToSvg(bdls, config == "all");
+		const bdlToSvg = new BdlToSvg(bdls);
+		const svg = await bdlToSvg.render(config == "all");
 		document.getElementById("{divId}").innerHTML = svg;
 	}};
 	window.onload = {redrawFctName};

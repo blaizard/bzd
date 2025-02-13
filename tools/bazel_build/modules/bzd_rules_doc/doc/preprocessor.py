@@ -14,8 +14,14 @@ class Extensions:
 			extension = json.loads(file.read_text())
 			self.data.append(extension)
 
-	def execute(self, action: str) -> str:
+	def replace(self, content: str) -> str:
+		pattern = re.compile(r":::\s*(?P<action>[^\s(]+)")
+		return pattern.sub(self.execute, content)
+
+	def execute(self, m: re.Match) -> str:
 		"""Run an action from the extensions."""
+
+		action = m["action"]
 
 		# Look for all the matches.
 		matches = [extension[action] for extension in self.data if action in extension]
@@ -35,6 +41,25 @@ class Extensions:
 		return result.stdout
 
 
+class Builtin:
+
+	def __init__(self, cwd: pathlib.Path) -> None:
+		self.cwd = cwd
+
+	def replace(self, content: str) -> str:
+		pattern = re.compile(r"\$\(path\s+(?P<path>[^\)\s]+)\)")
+		return pattern.sub(self.updatePath, content)
+
+	def updatePath(self, m: re.Match) -> str:
+		"""Replace path string: $(path <path>) into a relative path, relative to the current
+		documentation being processed.
+		"""
+
+		path = pathlib.Path(m["path"].strip("/"))
+		prefix = pathlib.Path("/".join([".."] * len(self.cwd.parents)))
+		return str(prefix / path)
+
+
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Preprocessor for Markdown file.")
 	parser.add_argument("--output", type=pathlib.Path, help="Output path for the preprocessed markdown.")
@@ -44,15 +69,10 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 
 	extensions = Extensions(args.extension)
-	content = args.input.read_text()
+	content = extensions.replace(args.input.read_text())
 
-	pattern = re.compile(r":::\s*(?P<action>[^\s(]+)")
-	index = 0
-	output = []
-	for m in re.finditer(pattern, content):
-		output.append(content[index:m.start()])
-		output.append(extensions.execute(m["action"]))
-		index = m.end()
-	output.append(content[index:])
+	# Update the path if any.
+	builtin = Builtin(args.input.parent)
+	content = builtin.replace(content)
 
-	args.output.write_text("".join(output))
+	args.output.write_text(content)

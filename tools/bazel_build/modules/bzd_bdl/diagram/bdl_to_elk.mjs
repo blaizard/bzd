@@ -97,40 +97,25 @@ export default class BdlToElk {
 		return this.ios[fqn] || {};
 	}
 
-	includeFQN(fqn, options) {
-		for (const target of options.filterOut) {
-			if (fqn.startsWith(target)) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	processComponents(root, options, parent = null, level = 0) {
+	processComponents(root, parent = null, level = 0) {
 		let children = [];
 		let edges = [];
 		let deps = new Set();
 
 		const addEdge = (edges, from, to, classes) => {
-			if (this.includeFQN(from, options) && this.includeFQN(to, options)) {
-				edges.push({
-					id: from + "-" + to,
-					sources: [from],
-					targets: [to],
-					classes: classes,
-				});
-			}
+			edges.push({
+				id: from + "-" + to,
+				sources: [from],
+				targets: [to],
+				classes: classes,
+			});
 		};
 
 		for (const component of root) {
 			const fqn = component.fqn;
 			const category = component.expression.category;
-
-			if (category != "target" && !this.includeFQN(fqn, options)) {
-				continue;
-			}
-
-			const name = (parent ? fqn.replace(parent, "") : fqn) + (category == "method" ? "(...)" : "");
+			const name = level == 2 ? fqn.replace(parent, "") : fqn;
+			const displayName = name + (category == "method" ? "(...)" : "");
 			const config = this.getParametersFromExpression(component.expression);
 			const ios = this.getIOsFromFQN(fqn);
 			let ports = [];
@@ -159,7 +144,7 @@ export default class BdlToElk {
 			}
 
 			// Process nested
-			const members = this.processComponents(component.members, options, /*parent*/ fqn, level + 1);
+			const members = this.processComponents(component.members, /*parent*/ fqn, level + 1);
 			const componentDeps = new Set([...members.deps, ...(component["deps"] || [])]);
 			deps = new Set([...deps, ...componentDeps]);
 
@@ -179,7 +164,7 @@ export default class BdlToElk {
 				tooltip: config.join("\n"),
 				labels: [
 					{
-						text: name,
+						text: displayName,
 					},
 				],
 				classes: ["level-" + level],
@@ -196,8 +181,8 @@ export default class BdlToElk {
 		};
 	}
 
-	process(options) {
-		const { children, edges } = this.processComponents(this.tree, options);
+	process() {
+		const { children, edges } = this.processComponents(this.tree);
 
 		return {
 			id: "root",

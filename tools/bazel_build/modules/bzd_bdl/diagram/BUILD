@@ -8,7 +8,7 @@ bzd_nodejs_web_library(
         "bdl_to_elk.mjs",
         "library.mjs",
     ],
-    library_name = "bdlToSvg",
+    library_name = "BdlToSvg",
     main = "library.mjs",
     deps = [
         "//diagram/elk_to_svg",
