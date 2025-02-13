@@ -18,7 +18,7 @@ class Extensions:
 		pattern = re.compile(r":::\s*(?P<action>[^\s(]+)")
 		return pattern.sub(self.execute, content)
 
-	def execute(self, m: re.Match) -> str:
+	def execute(self, m: re.Match[str]) -> str:
 		"""Run an action from the extensions."""
 
 		action = m["action"]
@@ -50,7 +50,7 @@ class Builtin:
 		pattern = re.compile(r"\$\(path\s+(?P<path>[^\)\s]+)\)")
 		return pattern.sub(self.updatePath, content)
 
-	def updatePath(self, m: re.Match) -> str:
+	def updatePath(self, m: re.Match[str]) -> str:
 		"""Replace path string: $(path <path>) into a relative path, relative to the current
 		documentation being processed.
 		"""
