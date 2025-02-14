@@ -1,4 +1,5 @@
 load("@bzd_package//:defs.bzl", "bzd_package")
+load("@bzd_rules_doc//doc:defs.bzl", "doc_library")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//cc/bdl:cc.bzl", "bzd_cc_binary")
 
@@ -30,4 +31,12 @@ bzd_package(
     deps = {
         ":example": "example",
     },
+)
+
+doc_library(
+    name = "documentation",
+    srcs = [
+        ("System", "//example/system:documentation"),
+    ],
+    visibility = ["//visibility:public"],
 )

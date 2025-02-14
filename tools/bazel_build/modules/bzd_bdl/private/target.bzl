@@ -1,6 +1,6 @@
 """BDL target rules."""
 
-load("//private:common.bzl", "aspect_bdl_providers", "library_extensions")
+load("//private:common.bzl", "aspect_bdl_providers", "library_extensions", "transition_platform")
 load("//private:providers.bzl", "BdlTargetInfo")
 
 visibility(["//..."])
@@ -60,7 +60,14 @@ _bdl_target = rule(
             doc = "The parent target if it extends an existing target.",
             providers = [BdlTargetInfo],
         ),
+        "platform": attr.label(
+            doc = "The platform used for the transition of this target.",
+        ),
+        "_allowlist_function_transition": attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist",
+        ),
     },
+    cfg = transition_platform,
     provides = [BdlTargetInfo],
 )
 
@@ -73,6 +80,7 @@ def _bdl_target_macro_impl(name, visibility, parent, platform, **kwargs):
         name = name,
         visibility = visibility,
         parent = parent,
+        platform = platform,
         **kwargs
     )
 

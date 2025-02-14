@@ -5,6 +5,7 @@ doc_binary(
     srcs = [
         ("**", "//:documentation"),
         ("Apps", "//apps:documentation"),
+        ("Examples", "//example:documentation"),
         ("BDL", "@bzd_bdl//bdl/docs"),
         ("Bazel", "//docs/api/bazel"),
         ("C++", "//cc:documentation"),
