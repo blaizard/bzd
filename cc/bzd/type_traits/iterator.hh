@@ -90,17 +90,13 @@ concept iterator = concepts::derivedFrom<T, typeTraits::IteratorBase> || concept
 /// Check that it is a synchronous iterator.
 template <class T>
 concept syncIterator = iterator<T> && requires(T& t) {
-	{
-		++t
-	} -> concepts::sync;
+	{ ++t } -> concepts::sync;
 };
 
 /// Check that it is an asynchronous iterator.
 template <class T>
 concept asyncIterator = iterator<T> && requires(T& t) {
-	{
-		++t
-	} -> concepts::async;
+	{ ++t } -> concepts::async;
 };
 
 /// Check that an iterator satisfies a specific iterator category.

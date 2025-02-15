@@ -21,17 +21,13 @@ concept range = requires(T& t) {
 /// Check that it is a synchronous range.
 template <class T>
 concept syncRange = range<T> && requires(T& t) {
-	{
-		bzd::begin(t)
-	} -> concepts::sync;
+	{ bzd::begin(t) } -> concepts::sync;
 };
 
 /// Check that it is an asynchronous range.
 template <class T>
 concept asyncRange = range<T> && requires(T& t) {
-	{
-		bzd::begin(t)
-	} -> concepts::async;
+	{ bzd::begin(t) } -> concepts::async;
 };
 
 /// Check that it is a range which has a size.
@@ -40,11 +36,7 @@ concept sizedRange = range<T> && requires(T& t) { bzd::size(t); };
 
 /// Check that it is a range which has a build type calculated size.
 template <class T>
-concept staticSizedRange = range<T> && sizedRange<T>&&
-						   requires(T)
-{
-	T::size();
-};
+concept staticSizedRange = range<T> && sizedRange<T> && requires(T) { T::size(); };
 
 } // namespace bzd::concepts
 

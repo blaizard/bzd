@@ -9,8 +9,6 @@ concept invocable = requires(T&& t, Args&&... args) { t(bzd::forward<Args>(args)
 
 template <class T, class R, class... Args>
 concept invocableR = requires(T&& t, Args&&... args) {
-	{
-		t(bzd::forward<Args>(args)...)
-	} -> sameAs<R>;
+	{ t(bzd::forward<Args>(args)...) } -> sameAs<R>;
 };
 } // namespace bzd::concepts

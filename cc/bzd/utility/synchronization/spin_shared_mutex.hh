@@ -21,11 +21,7 @@ public: // Constructors/assignments.
 
 public: // API.
 	/// Locks the mutex, blocks if the mutex is not available.
-	constexpr void lock() noexcept
-	{
-		while (!tryLock())
-			;
-	}
+	constexpr void lock() noexcept { while (!tryLock()); }
 
 	/// Tries to lock the mutex. Returns immediately.
 	/// On successful lock acquisition returns true, otherwise returns false.
@@ -38,11 +34,7 @@ public: // API.
 	/// Unlocks the mutex.
 	constexpr void unlock() noexcept { lock_.store(0u, MemoryOrder::release); }
 
-	constexpr void lockShared() noexcept
-	{
-		while (!tryLockShared())
-			;
-	}
+	constexpr void lockShared() noexcept { while (!tryLockShared()); }
 
 	/// Tries to lock the mutex. Returns immediately.
 	/// On successful lock acquisition returns true, otherwise returns false.

@@ -17,11 +17,7 @@ public: // Constructors/assignments.
 	~SpinMutex() = default;
 
 public: // API.
-	constexpr void lock() noexcept
-	{
-		while (!tryLock())
-			;
-	}
+	constexpr void lock() noexcept { while (!tryLock()); }
 
 	/// Tries to lock the mutex. Returns immediately.
 	/// On successful lock acquisition returns true, otherwise returns false.

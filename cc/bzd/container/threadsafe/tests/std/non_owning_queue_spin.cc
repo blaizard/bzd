@@ -28,10 +28,7 @@ TEST(NonOwningQueueSpin, StressPush)
 
 	// Queue
 	threadsafe::NonOwningQueueSpin<ListElement> queue;
-	makePushPopStressTest<3, 2, 1000>(
-		elements,
-		[&](ListElement& element) { queue.pushFront(element); },
-		[&]() { return queue.popBack(); });
+	makePushPopStressTest<3, 2, 1000>(elements, [&](ListElement& element) { queue.pushFront(element); }, [&]() { return queue.popBack(); });
 }
 
 } // namespace bzd::test

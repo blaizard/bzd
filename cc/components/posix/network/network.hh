@@ -29,9 +29,7 @@ public:
 			co_return bzd::error::Failure("A socket is already opened."_csv);
 		}
 
-		struct addrinfo hints
-		{
-		};
+		struct addrinfo hints{};
 		hints.ai_family = AF_UNSPEC;
 		hints.ai_socktype = SOCK_STREAM;
 		hints.ai_protocol = IPPROTO_TCP;

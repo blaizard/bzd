@@ -9,8 +9,6 @@ _DEFAULT_PROVIDERS = [
     CcToolchainConfigInfo,
     DebugPackageInfo,
     DefaultInfo,
-    JavaInfo,
-    JavaPluginInfo,
     OutputGroupInfo,
     PyInfo,
     PyRuntimeInfo,
@@ -18,9 +16,6 @@ _DEFAULT_PROVIDERS = [
     apple_common.XcodeProperties,
     apple_common.XcodeVersionConfig,
     config_common.FeatureFlagInfo,
-    java_common.BootClassPathInfo,
-    java_common.JavaRuntimeInfo,
-    java_common.JavaToolchainInfo,
     platform_common.TemplateVariableInfo,
     platform_common.ToolchainInfo,
 ]
