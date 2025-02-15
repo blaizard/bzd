@@ -101,6 +101,8 @@ export default class BdlToElk {
 		let children = [];
 		let edges = [];
 		let deps = new Set();
+		// Set of target ID known at this level.
+		let targets = new Set();
 
 		const addEdge = (edges, from, to, classes) => {
 			edges.push({
@@ -111,6 +113,15 @@ export default class BdlToElk {
 			});
 		};
 
+		const isEdgeKnown = (edge, targets) => {
+			for (const edgeId of [...edge.sources, ...edge.targets]) {
+				if (!targets.has(edgeId)) {
+					return false;
+				}
+			}
+			return true;
+		};
+
 		for (const component of root) {
 			const fqn = component.fqn;
 			const category = component.expression.category;
@@ -119,6 +130,8 @@ export default class BdlToElk {
 			const config = this.getParametersFromExpression(component.expression);
 			const ios = this.getIOsFromFQN(fqn);
 			let ports = [];
+
+			targets.add(fqn);
 
 			// Create the ports
 			for (const [ioName, io] of Object.entries(ios)) {
@@ -136,6 +149,7 @@ export default class BdlToElk {
 						"port.side": isSource ? "EAST" : "WEST",
 					},
 				});
+				targets.add(io.uid);
 				if (isSource) {
 					for (const sink of io.connections) {
 						addEdge(edges, io.uid, sink, ["io"]);
@@ -147,6 +161,8 @@ export default class BdlToElk {
 			const members = this.processComponents(component.members, /*parent*/ fqn, level + 1);
 			const componentDeps = new Set([...members.deps, ...(component["deps"] || [])]);
 			deps = new Set([...deps, ...componentDeps]);
+			targets = new Set([...targets, ...members.targets]);
+			edges = [...edges, ...members.edges];
 
 			// Only dependencies between top-level and components elements are drawn.
 			if (level == 1) {
@@ -157,6 +173,16 @@ export default class BdlToElk {
 					}
 				}
 			}
+
+			// Separate edges from the known ones only and unknown ones at this level.
+			let edgesChildren = [];
+			edges = edges.filter((edge) => {
+				if (isEdgeKnown(edge, members.targets)) {
+					edgesChildren.push(edge);
+					return false;
+				}
+				return true;
+			});
 
 			// Create the child
 			children.push({
@@ -169,7 +195,7 @@ export default class BdlToElk {
 				],
 				classes: ["level-" + level],
 				children: members.children,
-				edges: members.edges,
+				edges: edgesChildren,
 				ports: ports,
 			});
 		}
@@ -178,6 +204,7 @@ export default class BdlToElk {
 			children: children,
 			edges: edges,
 			deps: deps,
+			targets: targets,
 		};
 	}
 

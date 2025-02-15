@@ -16,6 +16,7 @@ export default class ElkToSVG {
 			"elk.layered.edgeLabels.sideSelection": "DIRECTION_DOWN",
 			"elk.spacing.edgeLabel": 5,
 			"elk.spacing.labelPortHorizontal": 5,
+			//"elk.hierarchyHandling": "INCLUDE_CHILDREN",
 		};
 	}
 
