@@ -14,11 +14,14 @@ if __name__ == "__main__":
 	uid = f"{time.time()}.{random.random()}".replace(".", "")
 	content = """
 <script>
+	let bdlToSvg = null;
 	const {redrawFctName} = async (selectObject) => {{
 		const config = (selectObject)? selectObject.value : "apps";
 		await loadScript("$(path /external/bzd_bdl+/diagram/library.output/library.umd.cjs)");
 		const bdls = [{bdlsJson}];
-		const bdlToSvg = new BdlToSvg(bdls);
+		if (bdlToSvg === null) {{
+			bdlToSvg = new BdlToSvg(bdls);
+		}}
 		const svg = await bdlToSvg.render(config == "all");
 		document.getElementById("{divId}").innerHTML = svg;
 	}};

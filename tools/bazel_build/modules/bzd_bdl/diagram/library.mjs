@@ -128,7 +128,8 @@ export default class BdlToSvg {
 		const elkFiltered = this.filter(this.elk, {
 			targets: new Set(targets),
 		});
+		const deepCopyElkFiltered = structuredClone(elkFiltered);
 
-		return await elkToSVG().render(elkFiltered);
+		return await elkToSVG().render(deepCopyElkFiltered);
 	}
 }
