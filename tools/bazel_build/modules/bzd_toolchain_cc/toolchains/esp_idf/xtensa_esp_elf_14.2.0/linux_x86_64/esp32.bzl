@@ -4,6 +4,7 @@ load("//cc:toolchain.bzl", "toolchain_maker", "toolchain_merge")
 load("//toolchains/esp_idf:sdk/esp32.bzl", "sdk")
 load("//toolchains/esp_idf/app_binary:esp32.bzl", "app_binary")
 load("//toolchains/esp_idf/esptool:defs.bzl", "esptool")
+load("//toolchains/esp_idf/openocd:defs.bzl", "esp32_openocd")
 load("//toolchains/esp_idf/qemu:defs.bzl", "esp32_qemu")
 
 def esp32_linux_x86_64(name, use_fragment):
@@ -16,6 +17,7 @@ def esp32_linux_x86_64(name, use_fragment):
 
     use_fragment(esptool)
     use_fragment(esp32_qemu)
+    use_fragment(esp32_openocd)
     _sdk_name, sdk_toolchain_definition = use_fragment(sdk)
     _app_binary_name, app_binary_toolchain_definition = use_fragment(app_binary)
 

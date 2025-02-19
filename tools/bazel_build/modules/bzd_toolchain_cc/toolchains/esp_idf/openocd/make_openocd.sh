@@ -2,7 +2,7 @@
 
 set -e
 
-VERSION="20240219"
+VERSION="v0.12.0-esp32-20241016"
 HOST=linux_x86_64
 PACKAGE=${HOST}_${VERSION}
 INSTALL=$(pwd)/${PACKAGE}
@@ -11,31 +11,28 @@ INSTALL=$(pwd)/${PACKAGE}
 
 sudo apt install -y \
     git \
-    make \
-    ninja-build \
-    build-essential \
+    autotools-dev \
+    automake \
     pkg-config \
-    libgcrypt20-dev \
-    libglib2.0-dev \
-    libpixman-1-dev
+    libusb-1.0-0-dev
 
 # ---- Setup ----
 
-git clone --recurse-submodules https://github.com/espressif/qemu.git qemu
+git clone https://github.com/espressif/openocd-esp32.git --branch "v0.12.0-esp32-20241016" openocd
 
 # ---- QEMU ----
 
-mkdir -p qemu/build
-pushd qemu/build
-../configure --target-list=xtensa-softmmu \
-            --static \
-            --prefix="${INSTALL}"
+mkdir -p openocd/build
+cd openocd
+./bootstrap
+cd build
+../configure --prefix="${INSTALL}"
 
 # ---- Build/Install ----
 
-make -j $(nproc) vga=no
+make -j $(nproc)
 make install
-popd
+cd ../..
 
 # ---- Set the RPATH ----
 

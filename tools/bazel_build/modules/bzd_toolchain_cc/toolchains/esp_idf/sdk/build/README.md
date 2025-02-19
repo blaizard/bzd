@@ -3,6 +3,12 @@
 1. Install ESP-IDF
 
 ```bash
+# Install dependencies
+sudo apt install \
+	libusb-1.0-0 \
+	python3.12-venv \
+	cmake
+
 git clone --recursive --branch "release/v5.4" https://github.com/espressif/esp-idf.git
 ./esp-idf/install.sh
 . ./esp-idf/export.sh
