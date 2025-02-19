@@ -69,7 +69,10 @@ class Error:
 	@staticmethod
 	def valueExtract(value: typing.Any) -> str:
 		"""Print a snapshot of the value."""
-		return str(value).split("\n")[0][:100]
+		valueStr = str(value)
+		if len(valueStr) > 1024:
+			return f"{valueStr[:1024]}[...]"
+		return valueStr
 
 	@staticmethod
 	def toString(context: typing.Optional[Context], index: int, end: int, message: str) -> str:

@@ -28,6 +28,10 @@ class SubstitutionsAccessor:
 				return True
 		return False
 
+	def __repr__(self) -> str:
+		content = "\n".join(["\t" + str(substitutions).split("\n")[0] for substitutions in self.substitutionsList])
+		return f"<SubstitutionsAccessor>\n{content}\n</SubstitutionsAccessor>"
+
 
 class SubstitutionWrapper:
 
@@ -66,3 +70,7 @@ class SubstitutionWrapper:
 		if key in self.substitutions:
 			return True
 		return bool(self.ext.get(key))
+
+	def __repr__(self) -> str:
+		content = "\n".join([f"\t{l}" for l in str(self.substitutions).split("\n")])
+		return f"<SubstitutionWrapper>\n{content}\n\t<Extensions {', '.join([k for k in self.ext.keys()])}/>\n</SubstitutionWrapper>"

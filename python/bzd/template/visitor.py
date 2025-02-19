@@ -71,9 +71,10 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 				return getattr(value, key)
 			try:
 				return value[key]
-			except:
+			except Exception as e:
 				raise Exception(
-				    f"Substitution value for the key '{key}' does not exists. Value is: '{Error.valueExtract(value)}'")
+				    f"Substitution value for the key '{key}' does not exists ({str(e)}). Value is: '{Error.valueExtract(value)}'"
+				)
 
 		operators: typing.Dict[str, typing.Callable[[typing.Any, typing.Any], typing.Any]] = {
 		    "|": (lambda l, r: r(l)),
