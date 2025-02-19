@@ -53,7 +53,7 @@ class DevelopmentContainer:
 			return ["--platform", "linux/amd64"]
 		if self.platform == "arm64":
 			return ["--platform", "linux/arm64"]
-		raise []
+		return []
 
 	@property
 	def imageName(self) -> str:
