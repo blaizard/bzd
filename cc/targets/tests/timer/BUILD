@@ -49,9 +49,33 @@ bzd_cc_binary(
     ],
 )
 
+bzd_cc_binary(
+    name = "multi_duration_binary",
+    testonly = True,
+    srcs = [
+        "multi_duration.cc",
+    ],
+    deps = [
+        ":runner",
+    ],
+)
+
 bzd_executable_exec_test(
     name = "duration",
     executable = ":duration_binary",
     min_duration = 4,
     tags = ["cc"],
+)
+
+bzd_executable_exec_test(
+    name = "multi_duration",
+    executable = ":multi_duration_binary",
+    min_duration = 4,
+    tags = ["cc"],
+    target_compatible_with = select({
+        # Somehow the timing on esp32s3 is not respected when the alarm is set.
+        # This behavior is not true on real HW.
+        "@bzd_platforms//al:esp32s3_idf": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
 )
