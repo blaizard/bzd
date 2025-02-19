@@ -1,0 +1,27 @@
+
+namespace bzd.components.esp32.io;
+
+
+enum DigitalMode
+{
+	input
+,	output
+,	ouput_open_drain
+,	input_ouput_open_drain
+,	input_output
+}
+
+component Digital {
+config:
+	// Pin number associated with this IO.
+	pin = Integer [min(0) max(255)];
+	// The mode of the IO.
+	mode = DigitalMode [mandatory];
+	
+interface:
+	method init() [init];
+	method shutdown() [shutdown];
+	
+}
+
+
