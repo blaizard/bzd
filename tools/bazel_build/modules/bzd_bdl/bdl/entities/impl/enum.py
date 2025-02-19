@@ -20,7 +20,8 @@ class EnumValue(Entity):
 		Resolve entities.
 		"""
 		# Generate this symbol FQN
-		self._setUnderlyingTypeFQN("bzd.components.esp32.io.DigitalMode." + self.name)
+		underlyingTypeFQN = FQN.fromNamespace(FQN.toNamespace(self.fqn)[:-1])
+		self._setUnderlyingTypeFQN(underlyingTypeFQN)
 		super().resolve(resolver)
 
 	@property
@@ -63,11 +64,6 @@ class Enum(Entity):
         """
 		# Generate this symbol FQN
 		self._setUnderlyingTypeFQN(self.fqn)
-
-		# Resolve values of the enum
-		for value in self.values:
-			entity = value.resolve(resolver=resolver)
-
 		super().resolve(resolver)
 
 	@property
