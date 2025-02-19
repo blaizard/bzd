@@ -15,9 +15,20 @@ class EnumValue(Entity):
 		super().__init__(element, Role.Value)
 		Error.assertHasAttr(element=element, attr="name")
 
+	def resolve(self, resolver: typing.Any) -> None:
+		"""
+		Resolve entities.
+		"""
+		# Generate this symbol FQN
+		self._setUnderlyingTypeFQN("bzd.components.esp32.io.DigitalMode." + self.name)
+		super().resolve(resolver)
+
 	@property
 	def comment(self) -> typing.Optional[str]:
 		return self.element.getAttrValue("comment")
+
+	def __repr__(self) -> str:
+		return self.toString({"name": self.name})
 
 
 class _Visitor(VisitorBase[str, typing.List[str]]):
@@ -52,6 +63,11 @@ class Enum(Entity):
         """
 		# Generate this symbol FQN
 		self._setUnderlyingTypeFQN(self.fqn)
+
+		# Resolve values of the enum
+		for value in self.values:
+			entity = value.resolve(resolver=resolver)
+
 		super().resolve(resolver)
 
 	@property

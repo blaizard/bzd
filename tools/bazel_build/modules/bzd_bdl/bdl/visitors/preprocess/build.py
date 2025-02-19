@@ -10,6 +10,7 @@ from bdl.entities.all import (
     Using,
     Use,
     Enum,
+    EnumValue,
     Extern,
     EntityType,
     Namespace,
@@ -91,6 +92,9 @@ class Build(Visitor[None]):
 		self.registerEntity(entity=entity)
 
 	def visitEnum(self, entity: Enum, result: None) -> None:
+		self.registerEntity(entity=entity)
+
+	def visitEnumValue(self, entity: EnumValue, result: None) -> None:
 		self.registerEntity(entity=entity)
 
 	def visitUse(self, entity: Use, result: None) -> None:

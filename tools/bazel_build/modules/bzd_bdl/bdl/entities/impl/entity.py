@@ -227,7 +227,7 @@ class Entity:
 		)
 		assert self.underlyingTypeFQN is not None
 		entity = resolver.getEntityResolved(fqn=self.underlyingTypeFQN).assertValue(element=self.element)
-		assert entity.isRoleType, "The role of this entity must be a type."
+		assert entity.isRoleType, f"The role of the underlying entity '{entity}' with FQN {self.underlyingTypeFQN} of the entity {self} must be a type."
 		return entity
 
 	@property

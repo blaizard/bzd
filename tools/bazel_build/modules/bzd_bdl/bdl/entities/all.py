@@ -4,7 +4,7 @@ from bzd.parser.error import Error
 from bzd.parser.element import Element
 
 from bdl.entities.impl.builtin import Builtin as _Builtin
-from bdl.entities.impl.enum import Enum as _Enum
+from bdl.entities.impl.enum import Enum as _Enum, EnumValue as _EnumValue
 from bdl.entities.impl.method import Method as _Method
 from bdl.entities.impl.namespace import Namespace as _Namespace
 from bdl.entities.impl.nested import Nested as _Nested
@@ -17,6 +17,7 @@ from bdl.entities.impl.reference import Reference as _Reference
 # Implicitly export all types
 Builtin = _Builtin
 Enum = _Enum
+EnumValue = _EnumValue
 Method = _Method
 Namespace = _Namespace
 Nested = _Nested
@@ -26,7 +27,8 @@ Expression = _Expression
 Extern = _Extern
 Reference = _Reference
 
-EntityType = typing.Union[Expression, Nested, Method, Using, Enum, Extern, Namespace, Use, Builtin, Reference]
+EntityType = typing.Union[Expression, Nested, Method, Using, Enum, EnumValue, Extern, Namespace, Use, Builtin,
+                          Reference]
 SymbolType = typing.Union[Expression, Nested, Method, Using, Enum, Extern]
 
 CATEGORY_TO_ENTITY: typing.Dict[str, typing.Type[EntityType]] = {
@@ -39,6 +41,7 @@ CATEGORY_TO_ENTITY: typing.Dict[str, typing.Type[EntityType]] = {
     "method": Method,
     "using": Using,
     "enum": Enum,
+    "enumValue": EnumValue,
     "namespace": Namespace,
     "use": Use,
     "reference": Reference,

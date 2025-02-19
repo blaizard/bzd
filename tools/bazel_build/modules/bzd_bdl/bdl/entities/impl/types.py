@@ -10,6 +10,7 @@ class Category(enum.Enum):
 	composition = "composition"
 	builtin = "builtin"
 	enum = "enum"
+	enumValue = "enumValue"
 	method = "method"
 	namespace = "namespace"
 	using = "using"

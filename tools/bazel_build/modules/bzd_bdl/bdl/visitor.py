@@ -15,6 +15,7 @@ from bdl.entities.all import (
     Method,
     Using,
     Enum,
+    EnumValue,
     Extern,
     Namespace,
     Use,
@@ -38,7 +39,7 @@ class Parent:
 
 	@property
 	def isNested(self) -> bool:
-		return isinstance(self.entity, Nested)
+		return isinstance(self.entity, Nested) or isinstance(self.entity, Enum)
 
 	@property
 	def namespace(self) -> typing.List[str]:
@@ -205,6 +206,10 @@ class Visitor(VisitorBase[T, T]):
 			# Handle enum
 			elif isinstance(entity, Enum):
 				self.visitEnum(entity, result)
+				self.parents.append(Parent(entity=entity))
+				for value in entity.values:
+					self.visitEnumValue(value, result)
+				self.parents.pop()
 
 			# Handle namespace
 			elif isinstance(entity, Namespace):
@@ -266,6 +271,12 @@ class Visitor(VisitorBase[T, T]):
 		"""
         Called when discovering an enum.
         """
+		pass
+
+	def visitEnumValue(self, entity: EnumValue, result: T) -> None:
+		"""
+		Called when discovering an enum value.
+		"""
 		pass
 
 	def visitNamespace(self, entity: Namespace, result: T) -> None:
