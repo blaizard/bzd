@@ -19,7 +19,8 @@ bzd::Async<> GPTimer::init() noexcept
 	config.clk_src = GPTIMER_CLK_SRC_APB;
 	config.direction = GPTIMER_COUNT_UP;
 	// Note: to avoid an assert, (counter_src_hz / resolution_hz) must be >= 2 && <= 65536
-	config.resolution_hz = 10 * 1000; // 0.1ms
+	config.resolution_hz = 16 * 1000; // 0.06ms
+	config.intr_priority = 3;		  // Highest priority.
 	config.flags.intr_shared = false; // Not mark the timer interrupt source as a shared one.
 
 	if (const auto result = ::gptimer_new_timer(&config, &gptimer_); result != ESP_OK)
@@ -66,19 +67,18 @@ bzd::Async<> GPTimer::delay(const bzd::units::Millisecond duration) noexcept
 	{
 		co_return bzd::move(maybeTime).propagate();
 	}
-	co_await !waitUntilTicks(maybeTime.value() + duration.get() * 10);
+	co_await !waitUntilTicks(maybeTime.value() + duration.get() * 16);
 	co_return {};
 }
 
 bzd::Result<bzd::units::Millisecond, bzd::Error> GPTimer::getTime() noexcept
 {
-	// TODO: To be updated, the / 10 is inefficient here.
 	auto maybeTime = getTicks();
 	if (!maybeTime)
 	{
 		return bzd::move(maybeTime).propagate();
 	}
-	return bzd::units::Millisecond(maybeTime.value() / 10);
+	return bzd::units::Millisecond(maybeTime.value() / 16);
 }
 
 bzd::Result<GPTimer::Tick, bzd::Error> GPTimer::getTicks() noexcept
