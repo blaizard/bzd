@@ -21,7 +21,7 @@ class EnumValue(Entity):
 		# Generate this symbol FQN
 		underlyingTypeFQN = FQN.fromNamespace(FQN.toNamespace(self.fqn)[:-1])
 		self._setUnderlyingTypeFQN(underlyingTypeFQN)
-		self._setLiteral({"type": "enum", "fqn": self.fqn, "value": 0})
+		self._setLiteral({"type": "enum", "fqn": self.fqn})
 		super().resolve(resolver)
 
 	@property

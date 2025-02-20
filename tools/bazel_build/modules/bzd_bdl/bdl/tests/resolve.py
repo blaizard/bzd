@@ -772,14 +772,14 @@ class TestRun(unittest.TestCase):
 
 		value1 = bdl.entity("MyEnum.value1")
 		assert isinstance(value1, EnumValue)
-		self.assertEqual(value1.literalNative, {"fqn": "MyEnum.value1", "type": "enum", "value": 0})
+		self.assertEqual(value1.literalNative, {"fqn": "MyEnum.value1", "type": "enum"})
 		value2 = bdl.entity("MyEnum.value2")
 		assert isinstance(value2, EnumValue)
-		self.assertEqual(value2.literalNative, {"fqn": "MyEnum.value2", "type": "enum", "value": 0})
+		self.assertEqual(value2.literalNative, {"fqn": "MyEnum.value2", "type": "enum"})
 
 		hello = bdl.entity("MyComposition.hello")
 		assert isinstance(hello, Expression)
-		self.assertEqual(hello.literalNative, {"fqn": "MyEnum.value2", "type": "enum", "value": 0})
+		self.assertEqual(hello.literalNative, {"fqn": "MyEnum.value2", "type": "enum"})
 
 	def testInstanceWithParameters(self) -> None:
 		Object.fromContent(

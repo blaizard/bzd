@@ -414,7 +414,6 @@ def makeGrammarEnum() -> Grammar:
 	                                _regexprName,
 	                                {
 	                                    "category": "enumValue",
-	                                    "enum": "0"
 	                                },
 	                                [
 	                                    GrammarItem(r",", FragmentNewElement),
