@@ -16,7 +16,7 @@ from bdl.entities.impl.fragment.parameters_resolved import (
 from bdl.entities.impl.types import Category as CategoryOriginal
 
 from cc.bdl.generator.impl.symbol import symbolToStr as symbolToStrOriginal
-from cc.bdl.generator.impl.value import valueToStr as valueToStrOriginal
+from cc.bdl.generator.impl.value import valueToStr as valueToStrOriginal, literalNativeToStr
 from cc.bdl.generator.impl.comments import (
     commentBlockToStr as commentBlockToStrOriginal,
     commentEmbeddedToStr as commentEmbeddedToStrOriginal,
@@ -121,7 +121,7 @@ class Transform:
 
 	def paramToDefinition(self, item: ParametersResolvedItem, index: int) -> str:
 		if item.param.isLiteral:
-			return f"static constexpr {symbolToStrOriginal(item.symbol)} {item.name}{{{item.param.literal}}};"
+			return f"static constexpr {symbolToStrOriginal(item.symbol)} {item.name}{{{literalNativeToStr(item.param.literalNative)}}};"
 		elif item.isLValue:
 			return f"T{index}& {item.name};"
 		elif item.isRValue:

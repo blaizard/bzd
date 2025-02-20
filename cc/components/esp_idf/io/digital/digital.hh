@@ -7,7 +7,7 @@
 namespace bzd::components::esp32::io {
 
 template <class Context>
-class Digital
+class Digital : public bzd::IO
 {
 public:
 	constexpr Digital(Context& context) noexcept : context_{context} {}
@@ -35,9 +35,15 @@ public:
 		co_return {};
 	}
 
+	bzd::Async<> shutdown() noexcept { co_return {}; }
+
+	bzd::Async<> set() noexcept override { co_return {}; }
+
+	bzd::Async<> clear() noexcept override { co_return {}; }
+
 private:
 	Context& context_;
-	::gpio_num_t pin_{context_.config.pin};
+	::gpio_num_t pin_{static_cast<::gpio_num_t>(context_.config.pin)};
 };
 
 } // namespace bzd::components::esp32::io

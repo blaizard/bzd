@@ -2,7 +2,7 @@ import unittest
 import typing
 
 from bdl.object import Object, ObjectContext
-from bdl.entities.all import Expression
+from bdl.entities.all import Expression, EnumValue
 from bdl.entities.impl.fragment.parameters_resolved import ParametersResolvedItem
 
 
@@ -751,6 +751,35 @@ class TestRun(unittest.TestCase):
 		self.assertEqual(b.parametersResolved[0].expected.literal, "1")
 		self.assertEqual(b.parametersResolved[1].param.literal, "false")
 		self.assertEqual(b.parametersResolved[1].expected.literal, "true")
+
+	def testEnums(self) -> None:
+
+		bdl = Object.fromContent(
+		    content="""
+				enum MyEnum
+				{
+					value1,
+					value2,
+					value3
+				}
+				composition MyComposition
+				{
+					hello = MyEnum.value2;
+				}
+				""",
+		    objectContext=ObjectContext(resolve=True, composition=True),
+		)
+
+		value1 = bdl.entity("MyEnum.value1")
+		assert isinstance(value1, EnumValue)
+		self.assertEqual(value1.literalNative, {"fqn": "MyEnum.value1", "type": "enum", "value": 0})
+		value2 = bdl.entity("MyEnum.value2")
+		assert isinstance(value2, EnumValue)
+		self.assertEqual(value2.literalNative, {"fqn": "MyEnum.value2", "type": "enum", "value": 0})
+
+		hello = bdl.entity("MyComposition.hello")
+		assert isinstance(hello, Expression)
+		self.assertEqual(hello.literalNative, {"fqn": "MyEnum.value2", "type": "enum", "value": 0})
 
 	def testInstanceWithParameters(self) -> None:
 		Object.fromContent(

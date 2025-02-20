@@ -1,4 +1,5 @@
 use "interfaces/timer.bdl"
+use "interfaces/io.bdl"
 
 namespace jardinier;
 
@@ -15,9 +16,9 @@ interface:
 	
 }
 
-method water(timer = {timer}, out = {out}, wateringTimeS = Integer, wakeUpPeriodS = Integer);
+method water(timer = {timer}, out = {out}, wateringTimeS = Integer, wakeUpPeriodS = Integer, io = bzd.IO);
 composition {
-	water(wateringTimeS = 60, wakeUpPeriodS = 12 * 3600);
+	water(wateringTimeS = 60, wakeUpPeriodS = 12 * 3600, io = esp32.board.ioWater);
 	lights = LightController();
 	lights.run();
 	connect(lights.pwmDuty0, esp32.board.pwm0.duty);

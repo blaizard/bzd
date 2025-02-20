@@ -16,12 +16,12 @@ class EnumValue(Entity):
 		Error.assertHasAttr(element=element, attr="name")
 
 	def resolve(self, resolver: typing.Any) -> None:
-		"""
-		Resolve entities.
-		"""
+		"""Resolve entities."""
+
 		# Generate this symbol FQN
 		underlyingTypeFQN = FQN.fromNamespace(FQN.toNamespace(self.fqn)[:-1])
 		self._setUnderlyingTypeFQN(underlyingTypeFQN)
+		self._setLiteral({"type": "enum", "fqn": self.fqn, "value": 0})
 		super().resolve(resolver)
 
 	@property
@@ -30,18 +30,6 @@ class EnumValue(Entity):
 
 	def __repr__(self) -> str:
 		return self.toString({"name": self.name})
-
-
-class _Visitor(VisitorBase[str, typing.List[str]]):
-	nestedKind = None
-
-	def visitBegin(self, result: typing.Any) -> typing.List[str]:
-		return []
-
-	def visitElement(self, element: Element, result: typing.List[str]) -> typing.List[str]:
-		Error.assertHasAttr(element=element, attr="name")
-		result.append(element.getAttr("name").value)
-		return result
 
 
 class Enum(Entity):
@@ -59,9 +47,8 @@ class Enum(Entity):
 		Error.assertHasSequence(element=element, sequence="values")
 
 	def resolve(self, resolver: typing.Any) -> None:
-		"""
-        Resolve entities.
-        """
+		"""Resolve entities."""
+
 		# Generate this symbol FQN
 		self._setUnderlyingTypeFQN(self.fqn)
 		super().resolve(resolver)

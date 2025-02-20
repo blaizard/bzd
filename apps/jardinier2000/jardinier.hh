@@ -48,7 +48,7 @@ private:
 	Context& context_;
 };
 
-bzd::Async<> water(bzd::Timer& timer, bzd::OStream& out, bzd::UInt32 wateringTimeS, bzd::UInt32 wakeUpPeriodS);
+bzd::Async<> water(bzd::Timer& timer, bzd::OStream& out, bzd::UInt32 wateringTimeS, bzd::UInt32 wakeUpPeriodS, bzd::IO& io);
 
 bzd::Async<> light(int io, bzd::Timer& timer, bzd::OStream& out);
 

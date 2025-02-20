@@ -1,4 +1,5 @@
 import typing
+import json
 
 from bdl.entities.impl.fragment.parameters_resolved import ParametersResolvedItem
 from bdl.visitors.symbol_map import SymbolMap
@@ -6,8 +7,24 @@ from bdl.entities.impl.types import Category
 from bdl.entities.impl.expression import Expression
 
 from cc.bdl.generator.impl.symbol import symbolToStr
-from cc.bdl.generator.impl.fqn import fqnToNameStr
+from cc.bdl.generator.impl.fqn import fqnToNameStr, fqnToStr
 from cc.bdl.generator.impl.comments import commentParametersResolvedToStr
+
+
+def literalNativeToStr(literalNative: typing.Any) -> str:
+	"""Convert a literal native type into its C++ representation."""
+
+	if isinstance(literalNative, dict):
+		assert "type" in literalNative, f"Extended literal must be a dictionary with a field 'type', not: {str(literalNative)}"
+		literalType = literalNative["type"]
+		if literalType == "enum":
+			return fqnToStr(literalNative["fqn"])
+		raise KeyError(f"Unsupported extended literal of type '{literalType}'")
+
+	if isinstance(literalNative, str):
+		return json.dumps(literalNative)
+
+	return str(literalNative)
 
 
 def valueToStr(
@@ -43,7 +60,7 @@ def valueToStr(
 		return (", ".join(paramValues) if expectedTypeStr == "" else f"{expectedTypeStr}{{{', '.join(paramValues)}}}")
 
 	if item.param.isLiteral:
-		value = bindTypeAndValue([item.param.literal])  # type: ignore
+		value = bindTypeAndValue([literalNativeToStr(item.param.literalNative)])  # type: ignore
 	elif item.isLValue:
 		fqn = item.param.underlyingValueFQN
 		assert fqn is not None

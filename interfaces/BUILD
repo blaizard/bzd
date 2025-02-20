@@ -42,6 +42,17 @@ bdl_library(
 )
 
 bdl_library(
+    name = "io",
+    srcs = [
+        "io.bdl",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bzd/platform/interfaces:io",
+    ],
+)
+
+bdl_library(
     name = "network",
     srcs = [
         "network.bdl",

@@ -44,6 +44,20 @@ cc_library(
 )
 
 cc_library(
+    name = "io",
+    hdrs = [
+        "io.hh",
+    ],
+    visibility = [
+        "//interfaces:__pkg__",
+    ],
+    deps = [
+        "//cc/bdl/generator/impl/adapter:types",
+        "//cc/bzd/core/async",
+    ],
+)
+
+cc_library(
     name = "tcp",
     hdrs = [
         "tcp.hh",

@@ -35,6 +35,8 @@ class Role:
 
 U = typing.TypeVar("U", bound="Entity")
 
+LiteralExtended = typing.Dict[str, typing.Union[str, int, float]]
+
 
 class Entity:
 	contractAttr: str = "contract"
@@ -127,11 +129,12 @@ class Entity:
 	def _setUnderlyingValueFQN(self, fqn: str) -> None:
 		ElementBuilder.cast(self.element, ElementBuilder).setAttr("fqn_value", fqn)
 
-	def _setLiteral(self, value: typing.Optional[str]) -> None:
+	def _setLiteral(self, value: typing.Optional[typing.Union[str, LiteralExtended]]) -> None:
 		"""Set or unset the literal associated with this element."""
 
 		if value is not None:
-			ElementBuilder.cast(self.element, ElementBuilder).setAttr("literal", value)
+			valueSerialized = value if isinstance(value, str) else json.dumps(value)
+			ElementBuilder.cast(self.element, ElementBuilder).setAttr("literal", valueSerialized)
 		elif self.element.isAttr("literal"):
 			ElementBuilder.cast(self.element, ElementBuilder).removeAttr("literal")
 
@@ -197,10 +200,8 @@ class Entity:
 		return self.element.getAttrValue("literal")
 
 	@property
-	def literalNative(self) -> typing.Optional[typing.Union[int, float, str, bool]]:
-		"""
-        Get the underlying literal value if any within its native type.
-        """
+	def literalNative(self) -> typing.Optional[typing.Union[int, float, str, bool, LiteralExtended]]:
+		"""Get the underlying literal value if any within its native type."""
 
 		literal = self.literal
 		if literal is None:
@@ -213,6 +214,8 @@ class Entity:
 			assert literal.endswith(
 			    '"'), f"If a literal starts with \", it also must end with \", instead received: '{literal}'."
 			return literal[1:-1]
+		if literal.startswith('{'):
+			return json.loads(literal)
 		converted = float(literal)
 		if converted.is_integer():
 			return int(converted)

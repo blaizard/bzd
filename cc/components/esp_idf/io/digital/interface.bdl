@@ -1,3 +1,4 @@
+use "interfaces/io.bdl"
 
 namespace bzd.components.esp32.io;
 
@@ -11,7 +12,7 @@ enum DigitalMode
 ,	input_output
 }
 
-component Digital {
+component Digital : bzd.IO {
 config:
 	// Pin number associated with this IO.
 	pin = Integer [min(0) max(255)];
@@ -21,6 +22,8 @@ config:
 interface:
 	method init() [init];
 	method shutdown() [shutdown];
+	method set();
+	method clear();
 	
 }
 

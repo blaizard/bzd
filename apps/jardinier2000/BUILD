@@ -9,6 +9,7 @@ bdl_library(
         "composition.bdl",
     ],
     deps = [
+        "//interfaces:io",
         "//interfaces:timer",
     ],
 )

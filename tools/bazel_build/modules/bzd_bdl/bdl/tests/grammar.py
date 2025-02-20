@@ -79,6 +79,7 @@ class TestRun(unittest.TestCase):
 		        },
 		        "values": [{
 		            "@": {
+		                "category": "enumValue",
 		                "name": "VAL"
 		            }
 		        }],
@@ -95,10 +96,12 @@ class TestRun(unittest.TestCase):
 		        },
 		        "values": [{
 		            "@": {
+		                "category": "enumValue",
 		                "name": "VAL1"
 		            }
 		        }, {
 		            "@": {
+		                "category": "enumValue",
 		                "name": "VAL2"
 		            }
 		        }],
