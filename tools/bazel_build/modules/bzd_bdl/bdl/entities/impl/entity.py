@@ -215,7 +215,7 @@ class Entity:
 			    '"'), f"If a literal starts with \", it also must end with \", instead received: '{literal}'."
 			return literal[1:-1]
 		if literal.startswith('{'):
-			return json.loads(literal)
+			return typing.cast(LiteralExtended, json.loads(literal))
 		converted = float(literal)
 		if converted.is_integer():
 			return int(converted)

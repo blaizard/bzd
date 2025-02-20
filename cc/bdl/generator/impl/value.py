@@ -24,6 +24,9 @@ def literalNativeToStr(literalNative: typing.Any) -> str:
 	if isinstance(literalNative, str):
 		return json.dumps(literalNative)
 
+	if isinstance(literalNative, bool):
+		return "true" if literalNative else "false"
+
 	return str(literalNative)
 
 
@@ -60,7 +63,7 @@ def valueToStr(
 		return (", ".join(paramValues) if expectedTypeStr == "" else f"{expectedTypeStr}{{{', '.join(paramValues)}}}")
 
 	if item.param.isLiteral:
-		value = bindTypeAndValue([literalNativeToStr(item.param.literalNative)])  # type: ignore
+		value = bindTypeAndValue([literalNativeToStr(item.param.literalNative)])
 	elif item.isLValue:
 		fqn = item.param.underlyingValueFQN
 		assert fqn is not None

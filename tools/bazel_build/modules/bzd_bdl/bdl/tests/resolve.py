@@ -739,18 +739,18 @@ class TestRun(unittest.TestCase):
 		a = bdl.entity("MyComposition.a")
 		assert isinstance(a, Expression)
 		assert len(a.parametersResolved) == 2
-		self.assertEqual(a.parametersResolved[0].param.literal, "34")
-		self.assertEqual(a.parametersResolved[0].expected.literal, "1")
-		self.assertEqual(a.parametersResolved[1].param.literal, "true")
-		self.assertEqual(a.parametersResolved[1].expected.literal, "true")
+		self.assertEqual(a.parametersResolved[0].param.literalNative, 34)
+		self.assertEqual(a.parametersResolved[0].expected.literalNative, 1)
+		self.assertEqual(a.parametersResolved[1].param.literalNative, True)
+		self.assertEqual(a.parametersResolved[1].expected.literalNative, True)
 
 		b = bdl.entity("MyComposition.b")
 		assert isinstance(b, Expression)
 		assert len(b.parametersResolved) == 2
-		self.assertEqual(b.parametersResolved[0].param.literal, "1")
-		self.assertEqual(b.parametersResolved[0].expected.literal, "1")
-		self.assertEqual(b.parametersResolved[1].param.literal, "false")
-		self.assertEqual(b.parametersResolved[1].expected.literal, "true")
+		self.assertEqual(b.parametersResolved[0].param.literalNative, 1)
+		self.assertEqual(b.parametersResolved[0].expected.literalNative, 1)
+		self.assertEqual(b.parametersResolved[1].param.literalNative, False)
+		self.assertEqual(b.parametersResolved[1].expected.literalNative, True)
 
 	def testEnums(self) -> None:
 
