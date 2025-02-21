@@ -42,19 +42,8 @@ private:
 	bzd::Optional<bzd::FunctionRef<void(void)>> notify_{};
 };
 
-/// Implementation agnostic class of a source for a specific value type.
-template <class Value>
-class SourceVirtual
-{
-public:
-	virtual SourceSetResult<Value> trySet() noexcept = 0;
-	virtual bzd::Bool trySet(Value&& value) noexcept = 0;
-	virtual bzd::Async<SourceSetResult<Value>> set() noexcept = 0;
-	virtual bzd::Async<> set(Value&& value) noexcept = 0;
-};
-
 template <class Buffer>
-class Source : public SourceVirtual<typename Buffer::ValueMutable>
+class Source
 {
 private:
 	using Value = typename Buffer::ValueMutable;
@@ -63,7 +52,7 @@ public:
 	constexpr explicit Source(Buffer& buffer) noexcept : buffer_{buffer} {}
 
 public:
-	SourceSetResult<Value> trySet() noexcept override
+	constexpr SourceSetResult<Value> trySet() noexcept
 	{
 		auto result = buffer_.ring_.nextForWriting();
 		if (result)
@@ -75,7 +64,7 @@ public:
 		return SourceSetResult<Value>{bzd::move(result)};
 	}
 
-	bzd::Bool trySet(Value&& value) noexcept override
+	constexpr bzd::Bool trySet(Value&& value) noexcept
 	{
 		if (auto maybeWriter = trySet(); maybeWriter)
 		{
@@ -85,7 +74,7 @@ public:
 		return false;
 	}
 
-	bzd::Async<SourceSetResult<Value>> set() noexcept override
+	bzd::Async<SourceSetResult<Value>> set() noexcept
 	{
 		while (true)
 		{
@@ -97,7 +86,7 @@ public:
 		}
 	}
 
-	bzd::Async<> set(Value&& value) noexcept override
+	bzd::Async<> set(Value&& value) noexcept
 	{
 		auto writer = co_await !set();
 		writer.valueMutable() = bzd::move(value);
@@ -111,16 +100,16 @@ private:
 };
 
 template <class Value>
-class SourceStub : public SourceVirtual<Value>
+class SourceStub
 {
 public:
-	SourceSetResult<Value> trySet() noexcept override { return bzd::Optional<Value&>{}; }
+	constexpr auto trySet() noexcept { return bzd::Optional<Value&>{}; }
 
-	bzd::Bool trySet(Value&&) noexcept override { return true; }
+	constexpr bzd::Bool trySet(Value&&) noexcept { return true; }
 
-	bzd::Async<bzd::Optional<Value&>> set() noexcept override { co_await bzd::Optional<Value&>{}; }
+	bzd::Async<bzd::Optional<Value&>> set() noexcept { co_await bzd::Optional<Value&>{}; }
 
-	bzd::Async<> set(Value&&) noexcept override { co_return {}; }
+	bzd::Async<> set(Value&&) noexcept { co_return {}; }
 
 	constexpr StringView getName() const noexcept { return "unset"; }
 };

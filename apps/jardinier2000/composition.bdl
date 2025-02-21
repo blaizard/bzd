@@ -16,9 +16,22 @@ interface:
 	
 }
 
-method water(timer = {timer}, out = {out}, wateringTimeS = Integer, wakeUpPeriodS = Integer, io = bzd.IO);
+component WaterController {
+config:
+	timer = {timer};
+	out = {out};
+	wateringTimeS = Integer;
+	wakeUpPeriodS = Integer;
+	
+interface:
+	method run();
+	pump = Boolean;
+	
+}
+
 composition {
-	water(wateringTimeS = 60, wakeUpPeriodS = 12 * 3600, io = esp32.board.ioWater);
+	water = WaterController(wateringTimeS = 60, wakeUpPeriodS = 12 * 3600);
+	connect(water.pump, esp32.board.ioWater.io);
 	lights = LightController();
 	lights.run();
 	connect(lights.pwmDuty0, esp32.board.pwm0.duty);

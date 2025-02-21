@@ -23,7 +23,7 @@ interface:
 	method init() [init];
 	method shutdown() [shutdown];
 	method run();
-	value = Boolean;
+	io = const Boolean;
 	
 composition:
 	this.run();
