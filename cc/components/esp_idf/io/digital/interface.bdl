@@ -7,9 +7,9 @@ enum DigitalMode
 {
 	input
 ,	output
-,	ouput_open_drain
-,	input_ouput_open_drain
-,	input_output
+,	ouputOpenDrain
+,	inputOuputOpenDrain
+,	inputOutput
 }
 
 component Digital : bzd.IO {
@@ -22,8 +22,11 @@ config:
 interface:
 	method init() [init];
 	method shutdown() [shutdown];
-	method set();
-	method clear();
+	method run();
+	value = Boolean;
+	
+composition:
+	this.run();
 	
 }
 

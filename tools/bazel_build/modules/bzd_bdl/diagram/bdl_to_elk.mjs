@@ -75,7 +75,13 @@ export default class BdlToElk {
 
 	getExpressionValue(expression) {
 		if ("value" in expression) {
-			return expression.value;
+			const value = expression.value;
+			if (value.constructor == Object) {
+				if (value.type == "enum") {
+					return value.fqn;
+				}
+			}
+			return value;
 		}
 		let output = expression["symbol"] || "<unknown>";
 		if ("parameters" in expression) {
@@ -187,7 +193,7 @@ export default class BdlToElk {
 			// Create the child
 			children.push({
 				id: fqn,
-				tooltip: config.join("\n"),
+				tooltip: "config:\n" + config.map((l) => "- " + l).join("\n"),
 				labels: [
 					{
 						text: displayName,

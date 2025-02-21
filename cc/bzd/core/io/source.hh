@@ -8,70 +8,84 @@
 
 namespace bzd::io {
 
+template <class Value>
+class SourceSetResult : public bzd::threadsafe::RingBufferResult<Value&>
+{
+private:
+	using RingBufferResult = typename bzd::threadsafe::RingBufferResult<Value&>;
+
+public:
+	explicit constexpr SourceSetResult(RingBufferResult&& result) noexcept : RingBufferResult{bzd::move(result)} {}
+	constexpr SourceSetResult(RingBufferResult&& result, bzd::FunctionRef<void(void)> notify) noexcept :
+		RingBufferResult{bzd::move(result)}, notify_{notify}
+	{
+	}
+
+	SourceSetResult(const SourceSetResult&) = delete;
+	SourceSetResult& operator=(const SourceSetResult&) = delete;
+	SourceSetResult& operator=(SourceSetResult&&) = delete;
+	constexpr SourceSetResult(SourceSetResult&& other) noexcept :
+		RingBufferResult{static_cast<RingBufferResult&&>(other)}, notify_{other.notify_}
+	{
+		other.notify_.reset();
+	}
+
+	constexpr ~SourceSetResult() noexcept
+	{
+		if (notify_.hasValue())
+		{
+			notify_.value()();
+		}
+	}
+
+private:
+	bzd::Optional<bzd::FunctionRef<void(void)>> notify_{};
+};
+
+/// Implementation agnostic class of a source for a specific value type.
+template <class Value>
+class SourceVirtual
+{
+public:
+	virtual SourceSetResult<Value> trySet() noexcept = 0;
+	virtual bzd::Bool trySet(Value&& value) noexcept = 0;
+	virtual bzd::Async<SourceSetResult<Value>> set() noexcept = 0;
+	virtual bzd::Async<> set(Value&& value) noexcept = 0;
+};
+
 template <class Buffer>
-class Source
+class Source : public SourceVirtual<typename Buffer::ValueMutable>
 {
 private:
 	using Value = typename Buffer::ValueMutable;
-	class SetResult : public bzd::threadsafe::RingBufferResult<Value&>
-	{
-	private:
-		using RingBufferResult = typename bzd::threadsafe::RingBufferResult<Value&>;
-
-	public:
-		explicit constexpr SetResult(RingBufferResult&& result) noexcept : RingBufferResult{bzd::move(result)} {}
-		constexpr SetResult(RingBufferResult&& result, bzd::FunctionRef<void(void)> notify) noexcept :
-			RingBufferResult{bzd::move(result)}, notify_{notify}
-		{
-		}
-
-		SetResult(const SetResult&) = delete;
-		SetResult& operator=(const SetResult&) = delete;
-		SetResult& operator=(SetResult&&) = delete;
-		constexpr SetResult(SetResult&& other) noexcept : RingBufferResult{static_cast<RingBufferResult&&>(other)}, notify_{other.notify_}
-		{
-			other.notify_.reset();
-		}
-
-		constexpr ~SetResult() noexcept
-		{
-			if (notify_.hasValue())
-			{
-				notify_.value()();
-			}
-		}
-
-	private:
-		bzd::Optional<bzd::FunctionRef<void(void)>> notify_{};
-	};
 
 public:
 	constexpr explicit Source(Buffer& buffer) noexcept : buffer_{buffer} {}
 
 public:
-	constexpr auto trySet() noexcept
+	SourceSetResult<Value> trySet() noexcept override
 	{
 		auto result = buffer_.ring_.nextForWriting();
 		if (result)
 		{
 			// Notify of a new set only after the object destruction.
-			return SetResult{bzd::move(result), bzd::FunctionRef<void(void)>::toMember<Buffer, &Buffer::notifyNewData>(buffer_)};
+			return SourceSetResult<Value>{bzd::move(result),
+										  bzd::FunctionRef<void(void)>::toMember<Buffer, &Buffer::notifyNewData>(buffer_)};
 		}
-		return SetResult{bzd::move(result)};
+		return SourceSetResult<Value>{bzd::move(result)};
 	}
 
-	template <class T>
-	constexpr bzd::Bool trySet(T&& value) noexcept
+	bzd::Bool trySet(Value&& value) noexcept override
 	{
 		if (auto maybeWriter = trySet(); maybeWriter)
 		{
-			maybeWriter.valueMutable() = bzd::forward<T>(value);
+			maybeWriter.valueMutable() = bzd::move(value);
 			return true;
 		}
 		return false;
 	}
 
-	bzd::Async<SetResult> set() noexcept
+	bzd::Async<SourceSetResult<Value>> set() noexcept override
 	{
 		while (true)
 		{
@@ -83,11 +97,10 @@ public:
 		}
 	}
 
-	template <class T>
-	bzd::Async<> set(T&& value) noexcept
+	bzd::Async<> set(Value&& value) noexcept override
 	{
 		auto writer = co_await !set();
-		writer.valueMutable() = bzd::forward<T>(value);
+		writer.valueMutable() = bzd::move(value);
 		co_return {};
 	}
 
@@ -98,24 +111,16 @@ private:
 };
 
 template <class Value>
-class SourceStub
+class SourceStub : public SourceVirtual<Value>
 {
 public:
-	constexpr auto trySet() noexcept { return bzd::Optional<Value&>{}; }
+	SourceSetResult<Value> trySet() noexcept override { return bzd::Optional<Value&>{}; }
 
-	template <class T>
-	constexpr bzd::Bool trySet(T&&) noexcept
-	{
-		return true;
-	}
+	bzd::Bool trySet(Value&&) noexcept override { return true; }
 
-	bzd::Async<bzd::Optional<Value&>> set() noexcept { co_await bzd::Optional<Value&>{}; }
+	bzd::Async<bzd::Optional<Value&>> set() noexcept override { co_await bzd::Optional<Value&>{}; }
 
-	template <class T>
-	bzd::Async<> set(T&&) noexcept
-	{
-		co_return {};
-	}
+	bzd::Async<> set(Value&&) noexcept override { co_return {}; }
 
 	constexpr StringView getName() const noexcept { return "unset"; }
 };

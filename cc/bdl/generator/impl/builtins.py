@@ -60,6 +60,11 @@ class Byte:
 	toType = "bzd::Byte"
 
 
+class Boolean:
+	constexpr = True
+	toType = "bool"
+
+
 class ResultType:
 	constexpr = False
 
@@ -159,6 +164,7 @@ builtins: typing.Dict[str, typing.Any] = {
     "None": NoneType,
     "Void": VoidType,
     "Byte": Byte,
+    "Boolean": Boolean,
     "String": StringType,
     "Span": SpanType,
     "Array": ArrayType,

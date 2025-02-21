@@ -7,7 +7,7 @@ composition board {
 	pwmTimer = bzd.components.esp32.LEDCTimer(frequency = 4000, number = 0);
 	pwm0 = bzd.components.esp32.LEDCPWM(timer = pwmTimer, io = 12, channel = 0);
 	pwm1 = bzd.components.esp32.LEDCPWM(timer = pwmTimer, io = 13, channel = 1);
-	ioWater = bzd.components.esp32.io.Digital(pin = 0, mode = bzd.components.esp32.io.DigitalMode.output);
+	ioWater = bzd.components.esp32.io.Digital(pin = 3, mode = bzd.components.esp32.io.DigitalMode.output);
 	
 }
 
