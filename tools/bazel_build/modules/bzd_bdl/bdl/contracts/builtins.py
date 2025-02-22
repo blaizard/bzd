@@ -20,9 +20,9 @@ def getValueFromSingleParameter_(resolver: typing.Any, typeFQN: str, value: typi
 		if value.isLiteral:
 			return value.literal
 		elif value.underlyingTypeFQN == typeFQN:
-			# Look if there is an underlying value.
+			# Look if there is an underlying value
 			if value.underlyingValueFQN is not None:
-				value = resolver.getEntityResolved(value.underlyingValueFQN).value
+				value = resolver.getEntity(value.underlyingValueFQN).value
 				assert isinstance(value, Expression), "An underlying value FQN must point to an expression."
 			# Get the value from the parameter, at this point we have an expression like `typeFQN(...)`.
 			if value.parametersResolved.size() == 0:
@@ -39,7 +39,10 @@ class Integer_(Integer):
 
 	def check(self, context: TypeContext) -> None:
 		assert "resolver" in context.args
-		context.value = getValueFromSingleParameter_(context.args["resolver"], "Integer", context.value, "0")
+		context.value = getValueFromSingleParameter_(resolver=context.args["resolver"],
+		                                             typeFQN="Integer",
+		                                             value=context.value,
+		                                             defaultValue="0")
 		super().check(context)
 
 
@@ -47,7 +50,10 @@ class Float_(Float):
 
 	def check(self, context: TypeContext) -> None:
 		assert "resolver" in context.args
-		context.value = getValueFromSingleParameter_(context.args["resolver"], "Float", context.value, "0")
+		context.value = getValueFromSingleParameter_(resolver=context.args["resolver"],
+		                                             typeFQN="Float",
+		                                             value=context.value,
+		                                             defaultValue="0")
 		super().check(context)
 
 
@@ -55,7 +61,10 @@ class Boolean_(Boolean):
 
 	def check(self, context: TypeContext) -> None:
 		assert "resolver" in context.args
-		context.value = getValueFromSingleParameter_(context.args["resolver"], "Boolean", context.value, "false")
+		context.value = getValueFromSingleParameter_(resolver=context.args["resolver"],
+		                                             typeFQN="Boolean",
+		                                             value=context.value,
+		                                             defaultValue="false")
 		super().check(context)
 
 

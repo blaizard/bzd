@@ -176,7 +176,7 @@ class Expression(EntityExpression):
 		"""Resolve entities.
 
         Args:
-                - resolver: The resolver to be used.
+            resolver: The resolver to be used.
         """
 
 		# Resolve the interface associated with this expression.
@@ -196,7 +196,8 @@ class Expression(EntityExpression):
 		if self.contracts.validationForValue:
 			validation = Validation(schema=[self.contracts.validationForValue], args={"resolver": resolver})
 			result = validation.validate([self], output="return")
-			self.assertTrue(condition=bool(result), message=str(result))
+			self.assertTrue(condition=bool(result),
+			                message=f"While validating '{self.contracts.validationForValue}': {result}")
 
 	@property
 	def parameters(self) -> Parameters:

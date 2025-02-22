@@ -12,7 +12,7 @@ enum DigitalMode
 ,	inputOutput
 }
 
-component Digital : bzd.IO {
+component Digital : bzd.io.digital.Output {
 config:
 	// Pin number associated with this IO.
 	pin = Integer [min(0) max(255)];
@@ -23,7 +23,6 @@ interface:
 	method init() [init];
 	method shutdown() [shutdown];
 	method run();
-	io = const Boolean;
 	
 composition:
 	this.run();

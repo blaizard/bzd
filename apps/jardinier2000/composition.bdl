@@ -25,13 +25,14 @@ config:
 	
 interface:
 	method run();
-	pump = Boolean;
+	pump = bzd.io.digital.State;
 	
 }
 
 composition {
 	water = WaterController(wateringTimeS = 60, wakeUpPeriodS = 12 * 3600);
-	connect(water.pump, esp32.board.ioWater.io);
+	water.run();
+	connect(water.pump, esp32.board.ioWater.out);
 	lights = LightController();
 	lights.run();
 	connect(lights.pwmDuty0, esp32.board.pwm0.duty);

@@ -1,6 +1,20 @@
 
-namespace bzd;
+namespace bzd.io.digital;
 
-extern interface IO;
+
+using State = Integer [min(0) max(1)];
+interface Output {
+	out = const State;
+	
+}
+
+interface Input {
+	in = State;
+	
+}
+
+interface InputOutput : Input, Output {
+	
+}
 
 

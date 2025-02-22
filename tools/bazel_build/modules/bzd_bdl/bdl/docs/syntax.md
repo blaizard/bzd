@@ -21,6 +21,19 @@ The following built-in types are made available by the implementation as built-i
 | Array<T>  | A fixed length array of type `T`. Its capacity may be defined with contracts.                    |
 | Vector<T> | A resizable and sequential container of type `T`. Its capacity may be defined with contracts.    |
 
+### Literals
+
+Literals is a notation of a value that may define an arbitrary type, written in the bdl format.
+Available literals in bdl are:
+
+- integers: `1`, `-4`, ...
+- floats: `0.23`, `-3.14`, ...
+- booleans: `true`, `false`
+- strings: `"hello"`, ...
+- enumeration values: `myenum.value1`
+
+To be implemented: numbers with units.
+
 ### Structures
 
 ```
@@ -46,7 +59,7 @@ enum MyEnum
 Strong typing is supported with the `using` keyword. For example, to define an integer with strong typing, this can be done as follow:
 
 ```
-using MyStrongType = Integer [min(0), max(23)];
+using MyStrongType = Integer [min(0) max(23)];
 ```
 
 ## Namespaces
@@ -78,7 +91,7 @@ An expression is defined as follow:
 
 where `values` can be an association of `value`, `symbol`, `regexpr` or `preset`.
 
-- `value` is either a string `"hello"`, a number `42` or `-3.14` or a boolean `true` or `false`.
+- `value` is either a literal.
 - `symbol` is either a relative symbol to the current namespace `abc` or a fully qualified name `this.is.abc`.
 - `regexpr` is a regular expression `/[a-z]*/`.
 - `preset` is a preset that is replaced by a predefined content. For example `abc = {out};` is equivalent to `abd: bzd.OStream = target.out;`
