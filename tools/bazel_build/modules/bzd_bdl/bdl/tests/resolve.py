@@ -56,6 +56,18 @@ class TestRun(unittest.TestCase):
 			    objectContext=ObjectContext(resolve=True),
 			)
 
+		with self.assertRaisesRegex(Exception, r"is lower than"):
+			Object.fromContent(
+			    content="""
+					using MyType = Integer [min(1)];
+					component Test { config: value = MyType; }
+					composition {
+						test = Test(0);
+					}
+					""",
+			    objectContext=ObjectContext(resolve=True),
+			)
+
 	def testMandatory(self) -> None:
 		# Not mandatory
 		bdl = Object.fromContent(

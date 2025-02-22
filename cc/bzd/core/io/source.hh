@@ -64,11 +64,12 @@ public:
 		return SourceSetResult<Value>{bzd::move(result)};
 	}
 
-	constexpr bzd::Bool trySet(Value&& value) noexcept
+	template <class T>
+	constexpr bzd::Bool trySet(T&& value) noexcept
 	{
 		if (auto maybeWriter = trySet(); maybeWriter)
 		{
-			maybeWriter.valueMutable() = bzd::move(value);
+			maybeWriter.valueMutable() = bzd::forward<T>(value);
 			return true;
 		}
 		return false;
@@ -86,10 +87,11 @@ public:
 		}
 	}
 
-	bzd::Async<> set(Value&& value) noexcept
+	template <class T>
+	bzd::Async<> set(T&& value) noexcept
 	{
 		auto writer = co_await !set();
-		writer.valueMutable() = bzd::move(value);
+		writer.valueMutable() = bzd::forward<T>(value);
 		co_return {};
 	}
 
@@ -105,11 +107,11 @@ class SourceStub
 public:
 	constexpr auto trySet() noexcept { return bzd::Optional<Value&>{}; }
 
-	constexpr bzd::Bool trySet(Value&&) noexcept { return true; }
+	constexpr bzd::Bool trySet(auto&&) noexcept { return true; }
 
 	bzd::Async<bzd::Optional<Value&>> set() noexcept { co_await bzd::Optional<Value&>{}; }
 
-	bzd::Async<> set(Value&&) noexcept { co_return {}; }
+	bzd::Async<> set(auto&&) noexcept { co_return {}; }
 
 	constexpr StringView getName() const noexcept { return "unset"; }
 };
