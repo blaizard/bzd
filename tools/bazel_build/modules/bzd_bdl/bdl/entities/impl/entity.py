@@ -354,6 +354,39 @@ class Entity:
 
 		return Parameters(element=self.element, NestedElementType=Using)
 
+	def getConfigValues(self, resolver: "Resolver") -> Parameters:
+		"""Get the list of expressions that forms the values and resolve them."""
+
+		from bdl.entities.impl.expression import Expression
+
+		typeFqns: typing.List[str] = []
+
+		# Look for the base type recursively.
+		if self.underlyingTypeFQN:
+			typeFqns += [self.underlyingTypeFQN]
+			underlyingTypeEntity = resolver.getEntityResolved(fqn=self.underlyingTypeFQN).assertValue(
+			    element=self.element)
+			if self != underlyingTypeEntity:
+				return underlyingTypeEntity.getConfigValues(resolver=resolver)
+
+		params = Parameters(element=self.element, NestedElementType=Expression)
+		# Take into account the parents as well.
+		for fqn in reversed(typeFqns + self.getParents()):
+			parentEntity = resolver.getEntityResolved(fqn=fqn).assertValue(element=self.element)
+			parentParams = Parameters(
+			    element=parentEntity.element,
+			    NestedElementType=Expression,
+			    nestedKind=parentEntity.configAttr,
+			    filterFct=lambda entity: entity.category == Category.expression,
+			)
+			# Resolve the types from a config sequence if any.
+			# These are resolved only when used, allowing symbol to be only available during composition.
+			for entity in parentParams:
+				typing.cast("Expression", entity).resolve(resolver=resolver.make(namespace=parentEntity.namespace))
+			params.extend(parentParams)
+
+		return params
+
 	def markAsResolved(self) -> None:
 		"""
         Mark an entity as resolved.

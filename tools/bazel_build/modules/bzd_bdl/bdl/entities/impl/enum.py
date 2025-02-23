@@ -1,11 +1,14 @@
 import typing
+import json
 from functools import cached_property
 
-from bzd.parser.element import Element, Sequence
+from bzd.parser.element import Element, Sequence, ElementBuilder
 from bzd.parser.error import Error
 from bzd.parser.visitor import Visitor as VisitorBase
+from bdl.entities.impl.fragment.parameters import Parameters
 
-from bdl.entities.impl.entity import Entity, Role
+from bdl.entities.impl.expression import Expression
+from bdl.entities.impl.entity import Entity, EntityExpression, Role
 from bdl.entities.impl.fragment.fqn import FQN
 
 
@@ -49,9 +52,35 @@ class Enum(Entity):
 	def resolve(self, resolver: typing.Any) -> None:
 		"""Resolve entities."""
 
-		# Generate this symbol FQN
 		self._setUnderlyingTypeFQN(self.fqn)
 		super().resolve(resolver)
+
+	def toLiteral(self, args: typing.Dict[str, EntityExpression]) -> typing.Optional[str]:
+
+		assert "value" in args, f"There must be a value argument: {args}."
+		value = args['value']
+		assert isinstance(value, EntityExpression), f"The value must be of type 'EntityExpression', not {value}."
+		assert value.isLiteral, f"It must have a literal type: {value}."
+		literal = value.literalNative
+		assert isinstance(literal,
+		                  dict) and literal.get("type") == "enum", f"The value must be of type 'enum', not '{literal}'."
+		return value.literal
+
+	def getConfigValues(self, resolver: "Resolver") -> Parameters:
+
+		# Get the default value.
+		maybeFirst = next(iter(self.values), None)
+		assert maybeFirst, f"This enum '{self.fqn}' does not have any values: '{self.values}'"
+		literal = json.dumps({"type": "enum", "fqn": maybeFirst.fqn})
+
+		# Create the parameter.
+		params = Parameters(element=self.element, NestedElementType=Expression)
+		element = ElementBuilder().setAttr("category", "expression").setAttr("name", "value").setAttr(
+		    "literal", literal).setAttr("symbol", maybeFirst.fqn)
+		expression = Expression(element)
+		params.append(expression, order=0)
+
+		return params
 
 	@property
 	def values(self) -> typing.Iterable[EnumValue]:

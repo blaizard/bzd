@@ -213,35 +213,6 @@ class SymbolFragment(ExpressionFragment):
 		else:
 			self.error(message=f"Cannot create an expression from '{entity.fqn}'.")
 
-	def getConfigValues(self, resolver: "Resolver") -> Parameters:
-		"""Get the list of expressions that forms the values and resolve them."""
-
-		from bdl.entities.impl.expression import Expression
-
-		if self.underlyingTypeFQN:
-			underlyingTypeEntity = resolver.getEntityResolved(fqn=self.underlyingTypeFQN).assertValue(
-			    element=self.element)
-			params = Parameters(element=underlyingTypeEntity.element, NestedElementType=Expression)
-
-			# Take into account the parents as well.
-			for fqn in reversed([self.underlyingTypeFQN, *underlyingTypeEntity.getParents()]):
-				parentEntity = resolver.getEntityResolved(fqn=fqn).assertValue(element=self.element)
-				parentParams = Parameters(
-				    element=parentEntity.element,
-				    NestedElementType=Expression,
-				    nestedKind=parentEntity.configAttr,
-				    filterFct=lambda entity: entity.category == Category.expression,
-				)
-				# Resolve the types from a config sequence if any.
-				# These are resolved only when used, allowing symbol to be only available during composition.
-				for entity in parentParams:
-					typing.cast("Expression", entity).resolve(resolver=resolver.make(namespace=parentEntity.namespace))
-				params.extend(parentParams)
-
-			return params
-
-		return Parameters(element=self.element, NestedElementType=Expression)
-
 	def _resolveAndValidateParameters(self, resolver: "Resolver", resolvedTypeEntity: Entity,
 	                                  parameters: Parameters) -> None:
 		"""Resolve and validate the parameters passed into argument."""
@@ -273,7 +244,10 @@ class SymbolFragment(ExpressionFragment):
 		)
 
 		# Compute and set the literal value if any.
-		maybeValue = resolvedTypeEntity.toLiteral(result.values)  # type: ignore
+		try:
+			maybeValue = resolvedTypeEntity.toLiteral(result.values)  # type: ignore
+		except Exception as e:
+			self.error(message=str(e))
 		if maybeValue is not None:
 			self.assertTrue(
 			    condition=isinstance(maybeValue, str),
