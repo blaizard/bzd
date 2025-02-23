@@ -66,7 +66,7 @@ class Enum(Entity):
 		                  dict) and literal.get("type") == "enum", f"The value must be of type 'enum', not '{literal}'."
 		return value.literal
 
-	def getConfigValues(self, resolver: "Resolver") -> Parameters:
+	def getConfigValues(self, resolver: typing.Any) -> Parameters:
 
 		# Get the default value.
 		maybeFirst = next(iter(self.values), None)

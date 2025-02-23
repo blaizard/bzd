@@ -793,6 +793,48 @@ class TestRun(unittest.TestCase):
 		assert isinstance(hello, Expression)
 		self.assertEqual(hello.literalNative, {"fqn": "MyEnum.value2", "type": "enum"})
 
+	def testEnumDefaultValue(self) -> None:
+
+		bdl = Object.fromContent(
+		    content="""
+				enum MyEnum
+				{
+					value1,
+					value2,
+					value3
+				}
+				composition MyComposition
+				{
+					hello = MyEnum;
+				}
+				""",
+		    objectContext=ObjectContext(resolve=True, composition=True),
+		)
+		hello = bdl.entity("MyComposition.hello")
+		assert isinstance(hello, Expression)
+		self.assertEqual(hello.literalNative, {"fqn": "MyEnum.value1", "type": "enum"})
+
+	def testEnumValue(self) -> None:
+
+		bdl = Object.fromContent(
+		    content="""
+				enum MyEnum
+				{
+					value1,
+					value2,
+					value3
+				}
+				composition MyComposition
+				{
+					hello = MyEnum(MyEnum.value3);
+				}
+				""",
+		    objectContext=ObjectContext(resolve=True, composition=True),
+		)
+		hello = bdl.entity("MyComposition.hello")
+		assert isinstance(hello, Expression)
+		self.assertEqual(hello.literalNative, {"fqn": "MyEnum.value3", "type": "enum"})
+
 	def testInstanceWithParameters(self) -> None:
 		Object.fromContent(
 		    content="""
