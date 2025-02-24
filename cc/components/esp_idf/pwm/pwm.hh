@@ -90,7 +90,7 @@ public:
 		ledc_channel.channel = channel_;
 		ledc_channel.timer_sel = context_.config.timer.number_;
 		ledc_channel.intr_type = LEDC_INTR_DISABLE;
-		ledc_channel.gpio_num = context_.config.io;
+		ledc_channel.gpio_num = context_.config.pin;
 		ledc_channel.duty = 0;
 		ledc_channel.hpoint = 0;
 

@@ -4,6 +4,19 @@ use "interfaces/io.bdl"
 namespace jardinier;
 
 
+enum LightSate
+{
+	on
+,	off
+,	storm
+}
+
+enum WaterPumpState
+{
+	on
+,	off
+}
+
 component LightController {
 config:
 	timer = {timer};
@@ -13,6 +26,7 @@ interface:
 	method run();
 	pwmDuty0 = Integer;
 	pwmDuty1 = Integer;
+	state = const LightSate;
 	
 }
 
@@ -26,17 +40,36 @@ config:
 interface:
 	method run();
 	pump = bzd.io.digital.State;
+	led = bzd.io.digital.State;
+	state = const WaterPumpState;
+	
+}
+
+component Controller {
+config:
+	timer = {timer};
+	out = {out};
+	
+interface:
+	method run();
+	lightState = LightSate;
+	waterPumpSate = WaterPumpState;
 	
 }
 
 composition {
 	water = WaterController(wateringTimeS = 60, wakeUpPeriodS = 12 * 3600);
 	water.run();
-	connect(water.pump, esp32.board.ioWater.out);
+	connect(water.pump, platform.board.ioWater.out);
+	connect(water.led, platform.board.ioLED.out);
 	lights = LightController();
 	lights.run();
-	connect(lights.pwmDuty0, esp32.board.pwm0.duty);
-	connect(lights.pwmDuty1, esp32.board.pwm1.duty);
+	connect(lights.pwmDuty0, platform.board.pwm0.duty);
+	connect(lights.pwmDuty1, platform.board.pwm1.duty);
+	controller = Controller();
+	controller.run();
+	connect(controller.lightState, lights.state);
+	connect(controller.waterPumpSate, water.state);
 	
 }
 

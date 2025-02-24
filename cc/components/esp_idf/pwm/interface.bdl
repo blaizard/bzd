@@ -20,7 +20,7 @@ component LEDCPWM {
 config:
 	timer = LEDCTimer;
 	channel = Integer;
-	io = Integer [min(0)];
+	pin = Integer [min(0)];
 	
 interface:
 	method init() [init];

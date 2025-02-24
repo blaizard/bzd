@@ -369,7 +369,6 @@ class Entities:
 		elif underlyingType.category in {
 		    Category.component,
 		    Category.struct,
-		    Category.enum,
 		    Category.using,
 		}:
 			expression.assertTrue(
@@ -377,7 +376,7 @@ class Entities:
 			    message="All expressions from the registry must have a name.",
 			)
 			entryType = EntryType.registry
-		elif underlyingType.category in {Category.builtin}:
+		elif underlyingType.category in {Category.builtin, Category.enum}:
 			# Ignore all builtins as they are expected to be all the time available.
 			return
 		else:

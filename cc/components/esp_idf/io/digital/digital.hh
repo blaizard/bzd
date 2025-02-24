@@ -5,13 +5,13 @@
 
 #include <driver/gpio.h>
 
-namespace bzd::components::esp32::io {
+namespace bzd::components::esp32::io::digital {
 
 template <class Context>
-class Digital : public bzd::IO
+class Output : public bzd::io::digital::Output<Output<Context>>
 {
 public:
-	constexpr Digital(Context& context) noexcept : context_{context} {}
+	constexpr Output(Context& context) noexcept : context_{context} {}
 
 	bzd::Async<> init() noexcept
 	{
@@ -27,11 +27,18 @@ public:
 		co_return {};
 	}
 
-	bzd::Async<> set() noexcept override { co_return {}; }
-
-	bzd::Async<> clear() noexcept override { co_return {}; }
-
-	bzd::Async<> run() noexcept { co_return {}; }
+	bzd::Async<> run() noexcept
+	{
+		while (true)
+		{
+			const auto data = co_await !context_.io.out.get();
+			if (const auto result = ::gpio_set_level(pin_, data.value()); result != ESP_OK)
+			{
+				co_return bzd::error::EspErr("gpio_set_level", result);
+			}
+		}
+		co_return {};
+	}
 
 private:
 	bzd::Async<> reset() noexcept
@@ -43,25 +50,16 @@ private:
 		co_return {};
 	}
 
-	bzd::Async<> setMode(const DigitalMode mode) noexcept
+	bzd::Async<> setMode(const OutputMode mode) noexcept
 	{
 		::gpio_mode_t gpioMode{};
 		switch (mode)
 		{
-		case DigitalMode::input:
-			gpioMode = GPIO_MODE_INPUT;
-			break;
-		case DigitalMode::output:
+		case OutputMode::normal:
 			gpioMode = GPIO_MODE_OUTPUT;
 			break;
-		case DigitalMode::ouputOpenDrain:
+		case OutputMode::openDrain:
 			gpioMode = GPIO_MODE_OUTPUT_OD;
-			break;
-		case DigitalMode::inputOuputOpenDrain:
-			gpioMode = GPIO_MODE_INPUT_OUTPUT_OD;
-			break;
-		case DigitalMode::inputOutput:
-			gpioMode = GPIO_MODE_INPUT_OUTPUT;
 			break;
 		}
 		if (const auto result = ::gpio_set_direction(pin_, gpioMode); result != ESP_OK)
@@ -76,4 +74,4 @@ private:
 	::gpio_num_t pin_{static_cast<::gpio_num_t>(context_.config.pin)};
 };
 
-} // namespace bzd::components::esp32::io
+} // namespace bzd::components::esp32::io::digital

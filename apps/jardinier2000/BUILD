@@ -16,9 +16,6 @@ bdl_library(
 
 cc_library(
     name = "lib",
-    srcs = [
-        "jardinier.cc",
-    ],
     hdrs = [
         "jardinier.hh",
     ],
@@ -49,7 +46,7 @@ bdl_target(
 bdl_system(
     name = "jardinier2000",
     targets = {
-        "esp32": ":board",
+        "platform": ":board",
     },
     deps = [
         ":lib",

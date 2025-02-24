@@ -1,5 +1,4 @@
 import typing
-import json
 from functools import cached_property
 
 from bzd.parser.element import Element, Sequence, ElementBuilder
@@ -71,13 +70,15 @@ class Enum(Entity):
 		# Get the default value.
 		maybeFirst = next(iter(self.values), None)
 		assert maybeFirst, f"This enum '{self.fqn}' does not have any values: '{self.values}'"
-		literal = json.dumps({"type": "enum", "fqn": maybeFirst.fqn})
 
 		# Create the parameter.
 		params = Parameters(element=self.element, NestedElementType=Expression)
-		element = ElementBuilder().setAttr("category", "expression").setAttr("name", "value").setAttr(
-		    "literal", literal).setAttr("symbol", maybeFirst.fqn)
+		element = ElementBuilder().setAttr("category", "expression").setAttr("name", "value")
+		nested = ElementBuilder().setAttr("symbol", maybeFirst.fqn)
+		element.pushBackElementToNestedSequence("fragments", nested)
+
 		expression = Expression(element)
+		expression.resolve(resolver)
 		params.append(expression, order=0)
 
 		return params

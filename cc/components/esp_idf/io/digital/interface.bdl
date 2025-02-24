@@ -1,23 +1,20 @@
 use "interfaces/io.bdl"
 
-namespace bzd.components.esp32.io;
+namespace bzd.components.esp32.io.digital;
 
 
-enum DigitalMode
+enum OutputMode
 {
-	input
-,	output
-,	ouputOpenDrain
-,	inputOuputOpenDrain
-,	inputOutput
+	normal
+,	openDrain
 }
 
-component Digital : bzd.io.digital.Output {
+component Output : bzd.io.digital.Output {
 config:
 	// Pin number associated with this IO.
 	pin = Integer [min(0) max(255)];
 	// The mode of the IO.
-	mode = DigitalMode [mandatory];
+	mode = OutputMode(OutputMode.normal);
 	
 interface:
 	method init() [init];
