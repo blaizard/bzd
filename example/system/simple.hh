@@ -39,7 +39,7 @@ public:
 		bzd::Int32 counter = 0;
 		while (counter < 10)
 		{
-			const auto result = co_await !bzd::async::any(context_.io.receive.get(), context_.config.timer.timeout(2_s));
+			const auto result = co_await !bzd::async::any(context_.io.receive.getNew(), context_.config.timer.timeout(2_s));
 			co_await !bzd::print(context_.config.out, "Received {:}\n"_csv, result.value());
 			++counter;
 		}

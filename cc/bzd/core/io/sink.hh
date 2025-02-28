@@ -18,8 +18,8 @@ public:
 	constexpr explicit Sink(Buffer& buffer) noexcept : buffer_{buffer} {}
 
 public:
-	/// Get the last element for reading and advance the index.
-	constexpr auto tryGet() noexcept
+	/// Get the last new element for reading and advance the index.
+	constexpr auto tryGetNew() noexcept
 	{
 		auto scope = buffer_.ring_.lastForReading(/*start*/ index_);
 		if (scope)
@@ -29,8 +29,8 @@ public:
 		return scope;
 	}
 
-	/// Get the last X elements for reading and advance the index.
-	constexpr auto tryGet(const bzd::Size count) noexcept
+	/// Get the last X new elements for reading and advance the index.
+	constexpr auto tryGetNew(const bzd::Size count) noexcept
 	{
 		auto scope = buffer_.ring_.asSpansForReading(/*count*/ count, /*first*/ false, /*start*/ index_);
 		if (scope)
@@ -40,12 +40,12 @@ public:
 		return scope;
 	}
 
-	/// Wait for an element to be available and return it.
-	bzd::Async<bzd::threadsafe::RingBufferResult<const Value&>> get() noexcept
+	/// Wait for a new element to be available and return it.
+	bzd::Async<bzd::threadsafe::RingBufferResult<const Value&>> getNew() noexcept
 	{
 		while (true)
 		{
-			if (auto maybeValue = tryGet(); maybeValue)
+			if (auto maybeValue = tryGetNew(); maybeValue)
 			{
 				co_return maybeValue;
 			}
@@ -64,11 +64,11 @@ template <class Value>
 class SinkStub
 {
 public:
-	constexpr auto tryGet() noexcept { return bzd::Optional<const Value&>{}; }
+	constexpr auto tryGetNew() noexcept { return bzd::Optional<const Value&>{}; }
 
-	constexpr auto tryGet(const bzd::Size) noexcept { return bzd::Optional<bzd::Spans<const Value, 2u>>{}; }
+	constexpr auto tryGetNew(const bzd::Size) noexcept { return bzd::Optional<bzd::Spans<const Value, 2u>>{}; }
 
-	bzd::Async<bzd::Optional<const Value&>> get() noexcept { co_return bzd::Optional<const Value&>{}; }
+	bzd::Async<bzd::Optional<const Value&>> getNew() noexcept { co_return bzd::Optional<const Value&>{}; }
 
 	constexpr StringView getName() const noexcept { return "unset"; }
 };

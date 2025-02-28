@@ -140,7 +140,7 @@ private:
 		const auto& executor = co_await bzd::async::getExecutor();
 		while (executor.isRunning())
 		{
-			auto scope = co_await !sink.get();
+			auto scope = co_await !sink.getNew();
 			if (scope)
 			{
 				co_await !bzd::print(context_.config.out, "{}: {}\n"_csv, sink.getName(), scope.value());

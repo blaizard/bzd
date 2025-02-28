@@ -106,7 +106,7 @@ public:
 	{
 		while (true)
 		{
-			const auto result = co_await !context_.io.duty.get();
+			const auto result = co_await !context_.io.duty.getNew();
 			co_await !setDutyCycle(result.value());
 		}
 		co_return {};
