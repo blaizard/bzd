@@ -19,6 +19,7 @@ bzd_cc_test(
     srcs = [
         "format.cc",
         "integral.cc",
+        "enum.cc",
     ],
     deps = [
         "//cc/bzd/container:string_stream",

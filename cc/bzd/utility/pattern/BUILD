@@ -13,6 +13,7 @@ bzd_cc_library(
         "//cc/bzd/utility/pattern/to_string:integral",
         "//cc/bzd/utility/pattern/to_string:pattern",
         "//cc/bzd/utility/pattern/to_string:pointer",
+        "//cc/bzd/utility/pattern/to_string:enum",
     ],
 )
 
