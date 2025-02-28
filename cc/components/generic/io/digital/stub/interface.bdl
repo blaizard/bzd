@@ -1,0 +1,9 @@
+use "interfaces/io.bdl"
+
+namespace bzd.components.generic.io.digital;
+
+
+component Stub : bzd.io.digital.Output {
+}
+
+
