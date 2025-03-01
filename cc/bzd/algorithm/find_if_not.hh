@@ -17,7 +17,7 @@ template <concepts::forwardIterator Iterator,
 		  concepts::predicate<typeTraits::IteratorValue<Iterator>> UnaryPredicate>
 [[nodiscard]] constexpr Iterator findIfNot(Iterator first, Sentinel last, UnaryPredicate predicate) noexcept
 {
-	return bzd::algorithm::findIf(first, last, !predicate);
+	return bzd::algorithm::findIf(first, last, [&predicate](const auto& c) { return !predicate(c); });
 }
 
 /// \copydoc findIfNot

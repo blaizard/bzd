@@ -3,6 +3,7 @@
 
 enum class HelloEnum
 {
+	zero = 0,
 	first = 1,
 	third = 3,
 	tens = 10
@@ -10,26 +11,33 @@ enum class HelloEnum
 
 TEST(ToString, Enum)
 {
-	bzd::String<10> str;
+	bzd::String<20> str;
+
+	{
+		const auto result = bzd::toString(str.assigner(), HelloEnum::zero);
+		ASSERT_TRUE(result);
+		EXPECT_EQ(result.value(), 8U);
+		EXPECT_EQ_RANGE(str, "zero (0)"_sv);
+	}
 
 	{
 		const auto result = bzd::toString(str.assigner(), HelloEnum::first);
-		EXPECT_TRUE(result);
-		EXPECT_EQ(result.value(), 1U);
-		EXPECT_EQ_RANGE(str, "1"_sv);
+		ASSERT_TRUE(result);
+		EXPECT_EQ(result.value(), 9U);
+		EXPECT_EQ_RANGE(str, "first (1)"_sv);
 	}
 
 	{
 		const auto result = bzd::toString(str.assigner(), HelloEnum::third);
-		EXPECT_TRUE(result);
-		EXPECT_EQ(result.value(), 1U);
-		EXPECT_EQ_RANGE(str, "3"_sv);
+		ASSERT_TRUE(result);
+		EXPECT_EQ(result.value(), 13U);
+		EXPECT_EQ_RANGE(str, "<unknown> (3)"_sv);
 	}
 
 	{
 		const auto result = bzd::toString(str.assigner(), HelloEnum::tens);
-		EXPECT_TRUE(result);
-		EXPECT_EQ(result.value(), 2U);
-		EXPECT_EQ_RANGE(str, "10"_sv);
+		ASSERT_TRUE(result);
+		EXPECT_EQ(result.value(), 14U);
+		EXPECT_EQ_RANGE(str, "<unknown> (10)"_sv);
 	}
 }

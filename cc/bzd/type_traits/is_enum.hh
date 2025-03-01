@@ -17,3 +17,8 @@ using IsEnum = typename impl::IsEnum<T>;
 template <class T>
 inline constexpr bool isEnum = IsEnum<T>::value;
 } // namespace bzd::typeTraits
+
+namespace bzd::concepts {
+template <class T>
+concept isEnum = typeTraits::isEnum<T>;
+}

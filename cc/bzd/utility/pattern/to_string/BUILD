@@ -63,9 +63,13 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        ":pattern",
+        "//cc/bzd/algorithm:find_if",
+        "//cc/bzd/container:string",
+        "//cc/bzd/container:string_view",
         "//cc/bzd/type_traits:is_enum",
         "//cc/bzd/type_traits:underlying_type",
-        ":integral",
+        "//cc/bzd/utility/ranges/views:reverse",
     ],
 )
 
