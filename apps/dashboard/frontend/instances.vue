@@ -1,6 +1,9 @@
 <template>
 	<div class="bzd-dashboard-instances">
-		<Instance v-for="(description, uid) in instances" :key="uid" :uid="uid" :description="description"> </Instance>
+		<template v-for="data in layout">
+			<Instance v-if="data.type == 'tile'" :key="data.uid" :uid="data.uid" :description="data"></Instance>
+			<div v-else-if="data.type == 'separator'" class="separator">{{ data.name }}</div>
+		</template>
 	</div>
 </template>
 
@@ -16,15 +19,15 @@
 		},
 		data: function () {
 			return {
-				instances: {},
+				layout: [],
 			};
 		},
 		mounted() {
-			this.getInstances();
+			this.getLayout();
 		},
 		methods: {
-			async getInstances() {
-				this.instances = await this.$rest.request("get", "/instances");
+			async getLayout() {
+				this.layout = (await this.$rest.request("get", "/layout")).layout;
 			},
 		},
 	};
@@ -34,5 +37,9 @@
 	.bzd-dashboard-instances {
 		display: flex;
 		flex-flow: row wrap;
+
+		.separator {
+			flex-basis: 100%;
+		}
 	}
 </style>

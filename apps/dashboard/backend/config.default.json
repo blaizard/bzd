@@ -1,5 +1,5 @@
 {
-    "instances": [
+    "layout": [
         {
             "name": "",
             "nodes.url": "http://localhost:8081",

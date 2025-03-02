@@ -49,7 +49,7 @@
                 }
             }
         },
-        "/instances": {
+        "/layout": {
             "get": {
                 "documentation": "List all instance and their configuration",
                 "response": {

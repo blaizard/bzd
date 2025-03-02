@@ -58,6 +58,7 @@ class EventsFactory {
 	let plugins = {};
 	let pluginClasses = {};
 	let events = {};
+	let layout = [];
 
 	// Get the plugin type of an UID.
 	const uidToType = (uid) => {
@@ -99,25 +100,43 @@ class EventsFactory {
 	}
 
 	// Register plugin instances.
-	for (const data of config.instances) {
-		const uid = makeUid();
+	for (const data of config.layout) {
+		switch (data.type || "tile") {
+			case "tile":
+				const uid = makeUid();
 
-		// Set the structure.
-		plugins[uid] = {
-			instance: null,
-			config: data,
-		};
+				// Set the structure.
+				plugins[uid] = {
+					instance: null,
+					config: data,
+				};
 
-		// Identify the plugin type.
-		const pluginType = uidToType(uid);
-		Exception.assert(pluginType in pluginClasses, "The plugin of type {} does not exists.", pluginType);
-		Log.info("Creating '{}' from plugin '{}'.", uid, pluginType);
+				// Identify the plugin type.
+				const pluginType = uidToType(uid);
+				Exception.assert(pluginType in pluginClasses, "The plugin of type {} does not exists.", pluginType);
+				Log.info("Creating '{}' from plugin '{}'.", uid, pluginType);
 
-		// Event factory.
-		const eventsFactory = new EventsFactory(events, uid);
+				// Event factory.
+				const eventsFactory = new EventsFactory(events, uid);
 
-		// Instantiate the plugin.
-		plugins[uid].instance = new pluginClasses[pluginType](data, eventsFactory);
+				// Instantiate the plugin.
+				plugins[uid].instance = new pluginClasses[pluginType](data, eventsFactory);
+				layout.push(
+					Object.assign(
+						{
+							type: "tile",
+							uid: uid,
+						},
+						data,
+					),
+				);
+				break;
+			case "separator":
+				layout.push(data);
+				break;
+			default:
+				Exception.error("Unsupported layout element type '{}'.", data.type);
+		}
 	}
 
 	// Install the APIs
@@ -125,11 +144,10 @@ class EventsFactory {
 	let api = new RestServer(APIv1.rest, {
 		channel: web,
 	});
-	api.handle("get", "/instances", async () => {
-		return Object.entries(plugins).reduce((object, [uid, data]) => {
-			object[uid] = data.config;
-			return object;
-		}, {});
+	api.handle("get", "/layout", async () => {
+		return {
+			layout: layout,
+		};
 	});
 	api.handle("get", "/instance", async (inputs) => {
 		return plugins[inputs.uid].config;
