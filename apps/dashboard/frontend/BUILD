@@ -1,5 +1,16 @@
+load("@bzd_lib//config:defs.bzl", "bzd_config_default")
 load("@bzd_package//:defs.bzl", "bzd_package")
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_web_binary")
+
+bzd_config_default(
+    name = "config",
+    data = [
+        ":icon.svg",
+    ],
+    visibility = [
+        "//deployment:__subpackages__",
+    ],
+)
 
 bzd_nodejs_web_binary(
     name = "frontend",
@@ -9,6 +20,9 @@ bzd_nodejs_web_binary(
         "**/*.mjs",
     ]),
     config_scss = "//nodejs/styles:default.scss",
+    data = [
+        ":config",
+    ],
     main = "app.mjs",
     visibility = [
         "//apps/dashboard:__pkg__",

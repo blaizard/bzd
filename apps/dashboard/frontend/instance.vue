@@ -56,9 +56,13 @@
 			};
 		},
 		mounted() {
-			// Set the default link if any
+			// If this tile has a backend, fetch the new data.
 			if (this.sourceType) {
 				this.fetch();
+			}
+			// Otherwise add a tile.
+			else {
+				this.assignTilesData({ "": {} });
 			}
 			this.fetchIcon();
 		},
@@ -141,7 +145,8 @@
 			getTileClass(key) {
 				return {
 					container: true,
-					clickable: Boolean(this.tiles[key].clickable) || Boolean(this.tiles[key].link),
+					clickable:
+						Boolean(this.tiles[key].clickable) || Boolean(this.tiles[key].link) || Boolean(this.description.link),
 				};
 			},
 			getStyle(key) {
@@ -212,6 +217,8 @@
 			handleClick(key) {
 				if (this.tiles[key].link) {
 					window.open(this.tiles[key].link);
+				} else if (this.description.link) {
+					window.open(this.description.link);
 				}
 			},
 			handleColor(key, color) {

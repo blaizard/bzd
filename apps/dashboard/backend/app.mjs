@@ -61,14 +61,17 @@ class EventsFactory {
 	let layout = [];
 
 	// Get the plugin type of an UID.
-	const uidToType = (uid) => {
+	const uidToType = (uid, mustExist) => {
 		Exception.assertPrecondition(uid in plugins, "The plugin '{}' does not exists.", uid);
-		Exception.assert(
-			"source.type" in plugins[uid].config,
-			"The plugin '{}' configuration {:j} is missing a 'source.type'.",
-			uid,
-			plugins[uid].config,
-		);
+		if (!("source.type" in plugins[uid].config)) {
+			Exception.assertPrecondition(
+				!mustExist,
+				"The plugin '{}' configuration {:j} is missing a 'source.type'.",
+				uid,
+				plugins[uid].config,
+			);
+			return null;
+		}
 		return plugins[uid].config["source.type"];
 	};
 
@@ -112,15 +115,21 @@ class EventsFactory {
 				};
 
 				// Identify the plugin type.
-				const pluginType = uidToType(uid);
-				Exception.assert(pluginType in pluginClasses, "The plugin of type {} does not exists.", pluginType);
-				Log.info("Creating '{}' from plugin '{}'.", uid, pluginType);
+				const pluginType = uidToType(uid, /*mustExist*/ false);
+				// If the plugin has a backend.
+				if (pluginType) {
+					Exception.assert(pluginType in pluginClasses, "The plugin of type {} does not exists.", pluginType);
+					Log.info("Creating '{}' from plugin '{}'.", uid, pluginType);
 
-				// Event factory.
-				const eventsFactory = new EventsFactory(events, uid);
+					// Event factory.
+					const eventsFactory = new EventsFactory(events, uid);
 
-				// Instantiate the plugin.
-				plugins[uid].instance = new pluginClasses[pluginType](data, eventsFactory);
+					// Instantiate the plugin.
+					plugins[uid].instance = new pluginClasses[pluginType](data, eventsFactory);
+				} else {
+					Log.info("Creating '{}'.", uid);
+				}
+
 				layout.push(
 					Object.assign(
 						{
@@ -153,7 +162,7 @@ class EventsFactory {
 		return plugins[inputs.uid].config;
 	});
 	api.handle("get", "/data", async (inputs) => {
-		const pluginType = uidToType(inputs.uid);
+		const pluginType = uidToType(inputs.uid, /*mustExist*/ true);
 		return await cache.get(pluginType, inputs.uid);
 	});
 	api.handle("post", "/event", async (inputs) => {
@@ -164,7 +173,7 @@ class EventsFactory {
 			inputs.event,
 			inputs.uid,
 		);
-		const pluginType = uidToType(inputs.uid);
+		const pluginType = uidToType(inputs.uid, /*mustExist*/ true);
 
 		await events[inputs.uid][inputs.event](cache, inputs.args);
 
