@@ -50,7 +50,7 @@ export const ExceptionFactory = (...topics) => {
 
 		/// Clone the current exception instance.
 		clone() {
-			let exception = new Exception();
+			let exception = new Exception("");
 			exception.e = [...this.e];
 			exception.topics = topics;
 			return exception;
@@ -148,17 +148,30 @@ export const ExceptionFactory = (...topics) => {
 			assertEqualInternal(value1, value2, exception);
 		}
 
-		/// Ensures that a specific block of code throws an exception
-		static async assertThrows(block, message = "", ...args) {
+		/// Ensures that a specific block of code throws an exception with a specific message
+		static async assertThrowsWithMatch(block, match, message = "", ...args) {
 			let hasThrown = false;
 
 			try {
 				await block();
 			} catch (e) {
 				hasThrown = true;
+				Exception.assert(
+					String(e).includes(match),
+					"Code block threw but the exception message did not match the expectation: '" +
+						match +
+						"' vs '" +
+						String(e) +
+						"'.",
+				);
 			} finally {
 				Exception.assert(hasThrown, "Code block did not throw" + (message ? "; " + message : ""), ...args);
 			}
+		}
+
+		/// Ensures that a specific block of code throws an exception
+		static async assertThrows(block, message = "", ...args) {
+			this.assertThrowsWithMatch(block, "", message, ...args);
 		}
 
 		/// Error reached
@@ -194,7 +207,7 @@ export const ExceptionFactory = (...topics) => {
 				exception = this.clone();
 				exception.combine(new Exception(...args));
 			}
-			Log.custom({ level: "error", topics: exception.topics }, String(exception));
+			Log.custom({ level: "error", topics: exception.topics }, "{}", String(exception));
 		}
 
 		get message() {

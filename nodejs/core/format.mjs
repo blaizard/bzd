@@ -1,61 +1,63 @@
-/**
- * Format a string using python format syntax.
- * @param {*} str
- * @param  {...any} args
- */
+/// Format a string using python format syntax.
+/// @param {*} str
+/// @param  {...any} args
 export default function (str, ...args) {
 	// By default false, as it gets updated during the processing part.
 	let pattern = new RegExp("{([^}:]*)(?::([^}]*))?}", "g");
-	let output = "";
-	let index = 0;
 	let substitutionIndex = 0;
-	let m = null;
-	do {
-		m = pattern.exec(str);
 
-		// Copy the string that has not been processed and update the current index
-		output += str.substring(index, m ? m.index : undefined);
-		index = m ? m.index + m[0].length : 0;
-
+	const replacer = (_, name, metadata) => {
 		// Handle the operation if any match
-		if (m) {
-			const format = _parseFormat(m[1], m[2], substitutionIndex);
-			const value = typeof format.index == "string" ? args[0][format.index] : args[format.index];
+		const format = _parseFormat(name, metadata || "", substitutionIndex);
+		++substitutionIndex;
 
-			switch (format.type || "") {
-				case "j":
-					output += JSON.stringify(value);
-					break;
-				case "":
-					output += String(value);
-					break;
-				default:
-					// Round the float with a specific precision.
-					if (format.type.startsWith(".")) {
-						const precision = parseInt(format.type.substring(1));
-						output += String(value.toFixed(precision));
-						break;
-					}
-					// Pad the number with leading zeros.
-					else if (format.type.startsWith("0")) {
-						const number = parseInt(format.type.substring(1));
-						output += String(value).padStart(number, "0");
-						break;
-					}
-					throw new Error("Unsupported formatting type: " + format.type);
+		// Sync the match with the args
+		let value = null;
+		if (typeof format.index == "string") {
+			const a = args[0];
+			if (!a || a.constructor !== Object) {
+				throw new Error(
+					"Expected a dictionary as argument to match key '" + format.index + "' while formatting string: " + str,
+				);
 			}
-
-			++substitutionIndex;
+			if (!(format.index in a)) {
+				throw new Error("Missing key '" + format.index + "' while formatting string: " + str);
+			}
+			value = a[format.index];
+		} else {
+			if (format.index >= args.length) {
+				throw new Error("Too few arguments passed while formatting string: " + str);
+			}
+			value = args[format.index];
 		}
-	} while (m);
 
-	return output;
+		switch (format.metadata || "") {
+			case "j":
+				return JSON.stringify(value);
+			case "":
+				return String(value);
+			default:
+				// Round the float with a specific precision.
+				if (format.metadata.startsWith(".")) {
+					const precision = parseInt(format.metadata.substring(1));
+					return String(value.toFixed(precision));
+				}
+				// Pad the number with leading zeros.
+				else if (format.metadata.startsWith("0")) {
+					const number = parseInt(format.metadata.substring(1));
+					return String(value).padStart(number, "0");
+				}
+		}
+		throw new Error("Unsupported formatting metadata: " + format.metadata);
+	};
+
+	return str.replace(pattern, replacer);
 }
 
-function _parseFormat(substitutionIndex, options, currentSubstitutionIndex) {
+function _parseFormat(substitutionIndex, metadata, currentSubstitutionIndex) {
 	const index = substitutionIndex ? parseInt(substitutionIndex) : currentSubstitutionIndex;
 	return {
 		index: isNaN(index) ? substitutionIndex : index,
-		type: options,
+		metadata: metadata,
 	};
 }

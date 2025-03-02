@@ -13,6 +13,10 @@ describe("Format", () => {
 			let text = Format("Hello {}!", "you");
 			Exception.assertEqual(text, "Hello you!");
 		});
+		it("Multiple substitution", () => {
+			let text = Format("Hello {} {} {}!", "my", "dear", "friend");
+			Exception.assertEqual(text, "Hello my dear friend!");
+		});
 	});
 
 	describe("Numbered index", () => {
@@ -33,6 +37,26 @@ describe("Format", () => {
 				world: "World",
 			});
 			Exception.assertEqual(text, "Hello World!");
+		});
+	});
+
+	describe("Malformed", () => {
+		it("Wrong key", () => {
+			Exception.assertThrowsWithMatch(() => {
+				Format("{hello}!", {
+					world: "World",
+				});
+			}, "Missing key");
+		});
+		it("Wrong argument type", () => {
+			Exception.assertThrowsWithMatch(() => {
+				Format("{hello}!", 12);
+			}, "Expected a dictionary");
+		});
+		it("Wrong argument type", () => {
+			Exception.assertThrowsWithMatch(() => {
+				Format("{} {}!", 21);
+			}, "Too few arguments");
 		});
 	});
 });
