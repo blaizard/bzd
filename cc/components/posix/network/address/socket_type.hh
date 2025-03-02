@@ -45,12 +45,14 @@ enum class SocketTypeOption
 /// Bit or operator to combine a socket type with optional option(s).
 constexpr SocketType operator|(const SocketType a, const SocketTypeOption b) noexcept
 {
+	// NOLINTNEXTLINE(clang-analyzer-optin.core.EnumCastOutOfRange)
 	return static_cast<SocketType>(bzd::toUnderlying(a) | bzd::toUnderlying(b));
 }
 
 /// Bit or operator to combine a socket type option with another one.
 constexpr SocketTypeOption operator|(const SocketTypeOption a, const SocketTypeOption b) noexcept
 {
+	// NOLINTNEXTLINE(clang-analyzer-optin.core.EnumCastOutOfRange)
 	return static_cast<SocketTypeOption>(bzd::toUnderlying(a) | bzd::toUnderlying(b));
 }
 

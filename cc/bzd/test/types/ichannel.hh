@@ -75,11 +75,13 @@ protected:
 		}
 
 		auto spanForReading = buffer_.asSpanForReading();
+		// NOLINTNEXTLINE(clang-analyzer-optin.core.EnumCastOutOfRange)
 		if constexpr (mode & IChannelMode::chunks)
 		{
 			spanForReading = spanForReading.first(1u);
 		}
 
+		// NOLINTNEXTLINE(clang-analyzer-optin.core.EnumCastOutOfRange)
 		if constexpr (mode & IChannelMode::zeroCopy)
 		{
 			const auto count = bzd::min(data.size(), spanForReading.size());
