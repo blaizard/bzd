@@ -1,28 +1,26 @@
 <template>
-	<div class="bzd-dashboard-tile-group">
-		<div class="bzd-dashboard-tile" v-for="(tile, key) in tiles" :style="getStyle(key)" :key="uid + '-' + key">
-			<div :class="getTileClass(key)" :style="containerStyle" @click="handleClick(key)">
-				<div v-if="getNbErrors(key) > 0" class="error" v-tooltip="tooltipErrorConfig(key)">{{ getNbErrors(key) }}</div>
-				<component
-					v-else
-					class="content"
-					:is="component"
-					:description="description"
-					:metadata="tile.data"
-					:color="colorForeground"
-					:background-color="colorBackground"
-					@color="handleColor(key, $event)"
-					@link="handleLink(key, $event)"
-					@error="handleError(key, $event)"
-					@clickable="handleClickable(key, $event)"
-					@event="handleEvent(key, $event)"
-					@name="handleName(key, $event)"
-					@image="handleImage(key, $event)"
-				>
-				</component>
-				<!--<div v-else-if="isError" class="content">Fatal error</div>//-->
-				<div class="name"><i :class="icon"></i> {{ getName(key) }}</div>
-			</div>
+	<div class="bzd-dashboard-tile" v-for="(tile, key) in tiles" :style="getStyle(key)" :key="uid + '-' + key">
+		<div :class="getTileClass(key)" :style="containerStyle" @click="handleClick(key)">
+			<div v-if="getNbErrors(key) > 0" class="error" v-tooltip="tooltipErrorConfig(key)">{{ getNbErrors(key) }}</div>
+			<component
+				v-else
+				class="content"
+				:is="component"
+				:description="description"
+				:metadata="tile.data"
+				:color="colorForeground"
+				:background-color="colorBackground"
+				@color="handleColor(key, $event)"
+				@link="handleLink(key, $event)"
+				@error="handleError(key, $event)"
+				@clickable="handleClickable(key, $event)"
+				@event="handleEvent(key, $event)"
+				@name="handleName(key, $event)"
+				@image="handleImage(key, $event)"
+			>
+			</component>
+			<!--<div v-else-if="isError" class="content">Fatal error</div>//-->
+			<div class="name"><i :class="icon"></i> {{ getName(key) }}</div>
 		</div>
 	</div>
 </template>
@@ -253,64 +251,59 @@
 
 	$bzdPadding: 10px;
 
-	.bzd-dashboard-tile-group {
-		display: flex;
-		flex-direction: row;
+	.bzd-dashboard-tile {
+		width: 300px;
+		height: 300px;
+		margin: 1px;
+		padding: 0px;
 
-		.bzd-dashboard-tile {
+		background-repeat: no-repeat;
+		background-size: contain;
+		background-position: center;
+
+		.container {
 			width: 300px;
 			height: 300px;
-			margin: 1px;
-			padding: 0px;
 
-			background-repeat: no-repeat;
-			background-size: contain;
-			background-position: center;
+			border-width: 1px;
+			border-style: solid;
+			position: relative;
 
-			.container {
-				width: 300px;
-				height: 300px;
+			&.clickable {
+				@extend %bzd-clickable;
+			}
 
-				border-width: 1px;
-				border-style: solid;
-				position: relative;
+			.name {
+				position: absolute;
+				bottom: $bzdPadding;
+				left: $bzdPadding;
+				right: $bzdPadding;
+				overflow: hidden;
+				line-height: 2em;
+			}
 
-				&.clickable {
-					@extend %bzd-clickable;
-				}
+			.content {
+				position: absolute;
+				top: $bzdPadding;
+				bottom: calc(#{$bzdPadding * 2} + 2em);
+				left: $bzdPadding;
+				right: $bzdPadding;
+				overflow: hidden;
+			}
 
-				.name {
-					position: absolute;
-					bottom: $bzdPadding;
-					left: $bzdPadding;
-					right: $bzdPadding;
-					overflow: hidden;
-					line-height: 2em;
-				}
-
-				.content {
-					position: absolute;
-					top: $bzdPadding;
-					bottom: calc(#{$bzdPadding * 2} + 2em);
-					left: $bzdPadding;
-					right: $bzdPadding;
-					overflow: hidden;
-				}
-
-				.error {
-					position: absolute;
-					right: -1em;
-					top: -1em;
-					width: 2em;
-					height: 2em;
-					border-radius: 1em;
-					border: 1px solid config.$bzdGraphColorWhite;
-					z-index: 1;
-					color: config.$bzdGraphColorWhite;
-					background-color: config.$bzdGraphColorRed;
-					line-height: 2em;
-					text-align: center;
-				}
+			.error {
+				position: absolute;
+				right: -1em;
+				top: -1em;
+				width: 2em;
+				height: 2em;
+				border-radius: 1em;
+				border: 1px solid config.$bzdGraphColorWhite;
+				z-index: 1;
+				color: config.$bzdGraphColorWhite;
+				background-color: config.$bzdGraphColorRed;
+				line-height: 2em;
+				text-align: center;
 			}
 		}
 	}

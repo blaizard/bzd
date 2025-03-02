@@ -40,6 +40,7 @@
 
 		.separator {
 			flex-basis: 100%;
+			font-weight: bold;
 		}
 	}
 </style>
