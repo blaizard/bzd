@@ -38,6 +38,19 @@ cc_library(
 )
 
 cc_library(
+    name = "enum",
+    hdrs = [
+        "enum.hh",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":base",
+        ":pattern",
+        "//cc/bzd/utility/pattern/to_string:enum",
+    ],
+)
+
+cc_library(
     name = "floating_point",
     hdrs = [
         "floating_point.hh",

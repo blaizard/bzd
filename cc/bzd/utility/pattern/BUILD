@@ -8,12 +8,12 @@ bzd_cc_library(
     deps = [
         "//cc/bzd/utility/pattern/to_string:boolean",
         "//cc/bzd/utility/pattern/to_string:byte",
+        "//cc/bzd/utility/pattern/to_string:enum",
         "//cc/bzd/utility/pattern/to_string:floating_point",
         "//cc/bzd/utility/pattern/to_string:input_range",
         "//cc/bzd/utility/pattern/to_string:integral",
         "//cc/bzd/utility/pattern/to_string:pattern",
         "//cc/bzd/utility/pattern/to_string:pointer",
-        "//cc/bzd/utility/pattern/to_string:enum",
     ],
 )
 
@@ -23,6 +23,7 @@ bzd_cc_library(
     deps = [
         "//cc/bzd/utility/pattern/to_stream:boolean",
         "//cc/bzd/utility/pattern/to_stream:byte",
+        "//cc/bzd/utility/pattern/to_stream:enum",
         "//cc/bzd/utility/pattern/to_stream:floating_point",
         "//cc/bzd/utility/pattern/to_stream:generator",
         "//cc/bzd/utility/pattern/to_stream:input_range",

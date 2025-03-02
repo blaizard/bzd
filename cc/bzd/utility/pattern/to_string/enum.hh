@@ -46,22 +46,37 @@ public:
 	template <bzd::concepts::outputByteCopyableRange Range>
 	static constexpr bzd::Optional<bzd::Size> process(Range&& range, const T value) noexcept
 	{
-		constexpr auto pattern = "{} ({})"_csv;
+		constexpr auto pattern{"{} ({})"_csv};
+		const auto [valueTyped, string] = preprocess(value);
+		return ToString<decltype(pattern)>::process(bzd::forward<Range>(range), pattern, string, valueTyped);
+	}
+
+protected:
+	using UnderlyingType = typeTraits::UnderlyingType<T>;
+
+	struct PreprocessResult
+	{
+		UnderlyingType value;
 		bzd::StringView string{"<unknown>"_sv};
+	};
+
+	static constexpr PreprocessResult preprocess(const T value) noexcept
+	{
+		const UnderlyingType valueTyped = static_cast<UnderlyingType>(value);
 		for (const auto [enumValue, enumString] : makeEntries(valuesAsType()))
 		{
-			if (enumValue == static_cast<UnderlyingType>(value))
+			if (enumValue == valueTyped)
 			{
-				string = enumString;
-				break;
+				return {
+					valueTyped,
+					enumString,
+				};
 			}
 		}
-		return ToString<decltype(pattern)>::process(bzd::forward<Range>(range), pattern, string, static_cast<UnderlyingType>(value));
+		return {valueTyped};
 	}
 
 private:
-	using UnderlyingType = typeTraits::UnderlyingType<T>;
-
 	template <UnderlyingType value>
 	inline static constexpr auto valueAsString = enumValueToString<T, static_cast<T>(value)>();
 

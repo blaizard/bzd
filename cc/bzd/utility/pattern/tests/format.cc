@@ -24,6 +24,15 @@ void expectStringStreamFormat(const char* expected, Args&&... args)
 	EXPECT_STREQ(stream.str().data(), expected);
 }
 
+enum class TestEnum
+{
+	zero,
+	one,
+	two,
+	three,
+	four
+};
+
 TEST(Format_, StreamStringFormat)
 {
 	expectStringStreamFormat<256>("Hello 12", "Hello {:d}"_csv, 12);
@@ -37,6 +46,7 @@ TEST(Format_, StreamStringFormat)
 	expectStringStreamFormat<256>("This milk is 3.5%", "This {1} is {0:.1%}"_csv, 0.0349, "milk");
 	expectStringStreamFormat<256>("42 == 0b101010 == 0o52 == 0x2a == 0x2A", "{} == {0:#b} == {0:#o} == {0:#x} == {0:#X}"_csv, 42);
 	expectStringStreamFormat<256>("Pointer 0x1234", "Pointer {}"_csv, reinterpret_cast<const void*>(0x1234));
+	expectStringStreamFormat<256>("enum: three (3) != zero (0)", "enum: {} != {}"_csv, TestEnum::three, TestEnum::zero);
 }
 
 TEST_CONSTEXPR_BEGIN(Format_, Constexpr)
