@@ -31,7 +31,7 @@ public:
 	{
 		while (true)
 		{
-			const auto data = co_await !context_.io.out.get();
+			const auto data = co_await !context_.io.out.getNew();
 			if (const auto result = ::gpio_set_level(pin_, data.value()); result != ESP_OK)
 			{
 				co_return bzd::error::EspErr("gpio_set_level", result);
