@@ -17,6 +17,7 @@
 				@event="handleEvent(key, $event)"
 				@name="handleName(key, $event)"
 				@image="handleImage(key, $event)"
+				v-tooltip="tooltip"
 			>
 			</component>
 			<!--<div v-else-if="isError" class="content">Fatal error</div>//-->
@@ -86,9 +87,7 @@
 			colorForeground() {
 				return (
 					{
-						yellow: "black",
 						white: "black",
-						pink: "black",
 					}[this.colorBackground] || "white"
 				);
 			},
@@ -103,6 +102,15 @@
 			},
 			timeout() {
 				return Plugins[this.sourceType].metadata.timeout || 60;
+			},
+			tooltip() {
+				if (this.description["tooltip"]) {
+					return {
+						type: "text",
+						data: this.description["tooltip"],
+					};
+				}
+				return false;
 			},
 			component() {
 				if (!(this.visualizationType in Plugins)) {

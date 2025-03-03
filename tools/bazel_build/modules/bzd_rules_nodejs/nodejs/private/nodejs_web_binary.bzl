@@ -32,18 +32,24 @@ def _bzd_nodejs_web_exec_impl(ctx):
         },
     )
 
-    # Add static files, all files under "/public" are copied into the bundle.
-    statistics = []
+    static_files_dict = {file.short_path: file for file in ctx.files.data}
     for static, path in ctx.attr.static.items():
         files_to_link = static[DefaultInfo].files.to_list()
         if len(files_to_link) != 1:
             fail("There can be only a single file for {}".format(static))
+        if path in static_files_dict:
+            fail("The static file '{}' was registered twice.".format(path))
+        static_files_dict[path] = files_to_link[0]
+
+    # Add static files, all files under "/public" are copied into the bundle.
+    static_files = []
+    for path, file in static_files_dict.items():
         symlink = ctx.actions.declare_file("public/" + path, sibling = install.package_json)
         ctx.actions.symlink(
             output = symlink,
-            target_file = files_to_link[0],
+            target_file = file,
         )
-        statistics.append(symlink)
+        static_files.append(symlink)
 
     # Create the index.html
     index = ctx.actions.declare_file("index.html", sibling = install.package_json)
@@ -78,7 +84,7 @@ def _bzd_nodejs_web_exec_impl(ctx):
 
     bundle = ctx.actions.declare_directory("{}.bundle".format(ctx.label.name))
     ctx.actions.run(
-        inputs = depset([vite_config, index, config_scss] + statistics, transitive = [install.files]),
+        inputs = depset([vite_config, index, config_scss] + static_files, transitive = [install.files]),
         outputs = [bundle],
         arguments = [
             "{}/node_modules/vite/bin/vite".format(vite_config.dirname),
@@ -122,6 +128,10 @@ _bzd_nodejs_web_binary = rule(
         "config_scss": attr.label(
             allow_single_file = True,
             doc = "Create a config.scss file at the root containing the content of this file.",
+        ),
+        "data": attr.label_list(
+            doc = "Files to be added to the bundle.",
+            allow_files = True,
         ),
         "heads": attr.string_list(
             doc = "elements to add to the <head> tag.",

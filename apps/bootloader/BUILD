@@ -23,6 +23,7 @@ py_binary(
     srcs = [
         "binary.py",
         "bootloader.py",
+        "config.py",
     ],
     data = [
         ":config",
@@ -32,7 +33,6 @@ py_binary(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        ":config",
         ":utils",
         "//apps/artifacts/api/python/node",
         "//apps/artifacts/api/python/release",

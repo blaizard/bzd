@@ -2,7 +2,6 @@
 
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("//config:private/common.bzl", "ConfigInfo")
-load("//lib:attrs.bzl", "ATTRS_COMMON_BUILD_RULES", "attrs_assert_any_of")
 
 def _bzd_config_flag_impl(ctx):
     return BuildSettingInfo(value = ctx.build_setting_value)
@@ -12,29 +11,14 @@ _bzd_config_flag = rule(
     build_setting = config.string(flag = True, allow_multiple = True),
 )
 
-def _target_to_runfiles(ctx, target):
-    """Get the runfiles associated with a target."""
-
-    if type(target) == "File":
-        return ctx.runfiles(
-            files = [target],
-        )
-
-    elif target.files_to_run.executable:
-        return ctx.runfiles().merge_all([ctx.runfiles(
-            files = [target.files_to_run.executable],
-        ), target.default_runfiles])
-
-    else:
-        return target.default_runfiles
-
 def _bzd_config_impl(ctx):
     key_values = [keyValue for keyValue in ctx.attr.set_flag[BuildSettingInfo].value if keyValue] if ctx.attr.set_flag else []
 
     input_files = depset(ctx.files.srcs)
     override_files = depset()
     workspace_status_files = []
-    runfiles = ctx.runfiles().merge_all([_target_to_runfiles(ctx, target) for target in ctx.attr.data])
+    runfiles = ctx.runfiles().merge_all([target.default_runfiles for target in ctx.attr.data])
+    data = depset(ctx.files.data)
 
     # If there are inline values, create an additional input file.
     if ctx.attr.values:
@@ -58,6 +42,7 @@ def _bzd_config_impl(ctx):
         elif ConfigInfo in ctx.attr.file_flag:
             override_files = depset([ctx.attr.file_flag[ConfigInfo].json], transitive = [override_files])
             runfiles = runfiles.merge(ctx.attr.file_flag[ConfigInfo].runfiles)
+            data = depset(transitive = [data, ctx.attr.file_flag[ConfigInfo].data])
         elif ctx.files.file_flag:
             override_files = depset(ctx.files.file_flag, transitive = [override_files])
         else:
@@ -82,13 +67,12 @@ def _bzd_config_impl(ctx):
     )
 
     # Create a python output
-    output_py = ctx.actions.declare_file(ctx.label.name + ".py")
     ctx.actions.run(
         inputs = [ctx.outputs.output_json, ctx.file._template_py],
-        outputs = [output_py],
+        outputs = [ctx.outputs.output_py],
         arguments = [
             "--output",
-            output_py.path,
+            ctx.outputs.output_py.path,
             "--json",
             ctx.outputs.output_json.path,
             ctx.file._template_py.path,
@@ -96,15 +80,9 @@ def _bzd_config_impl(ctx):
         executable = ctx.executable._config_template,
     )
 
-    # Needed for py_binary to find the file.
-    runfiles = runfiles.merge(ctx.runfiles(files = [output_py]))
-
     return [
-        ConfigInfo(json = ctx.outputs.output_json, runfiles = runfiles),
-        DefaultInfo(runfiles = runfiles),
-        PyInfo(
-            transitive_sources = depset([output_py]),
-        ),
+        ConfigInfo(json = ctx.outputs.output_json, runfiles = runfiles, data = data),
+        DefaultInfo(runfiles = runfiles, files = data),
     ]
 
 _bzd_config = rule(
@@ -112,6 +90,7 @@ _bzd_config = rule(
     attrs = {
         "data": attr.label_list(
             doc = "Dependencies for this rule, will be added in the runfiles and used for target expansion.",
+            allow_files = True,
         ),
         "file_flag": attr.label(
             doc = "Build settings to modify the configuration using files.",
@@ -122,6 +101,9 @@ _bzd_config = rule(
         ),
         "output_json": attr.output(
             doc = "Create a json configuration.",
+        ),
+        "output_py": attr.output(
+            doc = "Create a python configuration.",
         ),
         "set_flag": attr.label(
             doc = "Build settings to modify the configuration using key/value pair.",
@@ -149,67 +131,71 @@ _bzd_config = rule(
             allow_single_file = True,
         ),
     },
-    provides = [DefaultInfo, ConfigInfo, PyInfo],
+    provides = [DefaultInfo, ConfigInfo],
 )
 
-def bzd_config(name, srcs = None, values = None, include_workspace_status = None, data = None, **kwargs):
-    """Create a configuration that cannot be overwritten.
-
-    Args:
-        name: The name of the rule.
-        srcs: Configuration files to be used to update the values.
-        values: Inline configuration values.
-        include_workspace_status: Include workspace status data.
-        data: Extra dependencies to be added to the runfiles.
-        **kwargs: extra common build rules attributes.
-    """
-
-    attrs_assert_any_of(kwargs, ATTRS_COMMON_BUILD_RULES)
-
+def _bzd_config_macro_impl(name, visibility, output_json, output_py, **kwargs):
     _bzd_config(
         name = name,
-        output_json = "{}.json".format(name),
-        srcs = srcs or [],
-        values = values or {},
-        include_workspace_status = include_workspace_status or [],
-        data = data,
+        visibility = visibility,
+        output_json = output_json if output_json else "{}.json".format(name),
+        output_py = output_py if output_py else "{}.py".format(name),
         **kwargs
     )
 
-def bzd_config_default(name, srcs = None, values = None, include_workspace_status = None, data = None, **kwargs):
-    """Create a default configuration that can be overwritten.
+bzd_config = macro(
+    doc = "Create a configuration that cannot be overwritten.",
+    implementation = _bzd_config_macro_impl,
+    inherit_attrs = _bzd_config,
+    attrs = {
+        "file_flag": None,
+        "output_json": attr.string(
+            doc = "Name of the generated json configuration.",
+            configurable = False,
+        ),
+        "output_py": attr.string(
+            doc = "Name of the generated python configuration.",
+            configurable = False,
+        ),
+        "set_flag": None,
+    },
+)
 
-    Args:
-        name: The name of the rule.
-        srcs: Configuration files to be used to update the values.
-        values: Inline configuration values.
-        include_workspace_status: Include workspace status data.
-        data: Extra dependencies to be added to the runfiles.
-        **kwargs: extra common build rules attributes.
-    """
-
-    attrs_assert_any_of(kwargs, ATTRS_COMMON_BUILD_RULES)
-
+def _bzd_config_default_macro_impl(name, visibility, output_json, output_py, **kwargs):
     _bzd_config_flag(
-        name = name + ".set",
+        name = "{}.set".format(name),
         build_setting_default = "",
-        visibility = ["//visibility:private"],
     )
 
     native.label_flag(
-        name = name + ".file",
+        name = "{}.file".format(name),
         build_setting_default = Label("//config:empty"),
-        visibility = ["//visibility:private"],
     )
 
     _bzd_config(
         name = name,
+        visibility = visibility,
         set_flag = ":{}.set".format(name),
         file_flag = ":{}.file".format(name),
-        output_json = "{}.json".format(name),
-        srcs = srcs or [],
-        values = values or {},
-        include_workspace_status = include_workspace_status or [],
-        data = data,
+        output_json = output_json if output_json else "{}.json".format(name),
+        output_py = output_py if output_py else "{}.py".format(name),
         **kwargs
     )
+
+bzd_config_default = macro(
+    doc = "Create a default configuration that can be overwritten.",
+    implementation = _bzd_config_default_macro_impl,
+    inherit_attrs = _bzd_config,
+    attrs = {
+        "file_flag": None,
+        "output_json": attr.string(
+            doc = "Name of the generated json configuration.",
+            configurable = False,
+        ),
+        "output_py": attr.string(
+            doc = "Name of the generated python configuration.",
+            configurable = False,
+        ),
+        "set_flag": None,
+    },
+)

@@ -1,7 +1,7 @@
 """Rules to upload a target into artifacts."""
 
 load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
-load("@bzd_lib//config:defs.bzl", "bzd_config")
+load("@bzd_lib//config:defs.bzl", "ConfigInfo", "bzd_config")
 
 def _platform_transition_impl(_settings, attr):
     if attr.platform:
@@ -20,12 +20,12 @@ def _bzd_artifacts_upload_impl(ctx):
         binary = ctx.attr._upload,
         output = ctx.outputs.executable,
         command = "{{binary}} --config \"{config}\" --config-version {version} \"{artifact}\" \"{url}\"".format(
-            config = ctx.file.config.short_path,
+            config = ctx.attr.config[ConfigInfo].json.short_path,
             version = ctx.attr.config_version,
             artifact = ctx.file.target.short_path,
             url = ctx.attr.url,
         ),
-        data = [ctx.file.target, ctx.file.config],
+        data = [ctx.file.target, ctx.attr.config[ConfigInfo].json],
     )]
 
 _bzd_artifacts_upload = rule(
@@ -33,7 +33,7 @@ _bzd_artifacts_upload = rule(
     attrs = {
         "config": attr.label(
             doc = "The configuration to extract the version.",
-            allow_single_file = True,
+            providers = [ConfigInfo],
             mandatory = True,
         ),
         "config_version": attr.string(

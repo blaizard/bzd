@@ -21,11 +21,13 @@ py_library(
 
 py_library(
     name = "ssh",
-    srcs = ["ssh.py"],
+    srcs = [
+        "ssh.py",
+        "//bzd:bin.py",
+    ],
     visibility = ["//visibility:public"],
     deps = [
         ":run",
-        "//bzd:bin",
         "//bzd/http:client",
         requirement("paramiko"),
     ],
