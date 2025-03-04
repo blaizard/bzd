@@ -15,17 +15,31 @@ platform_transition = transition(
 )
 
 def _bzd_artifacts_upload_impl(ctx):
+    kwargs = {
+        "config": ctx.attr.config[ConfigInfo].json.short_path,
+        "version": ctx.attr.config_version,
+    }
+    command = ["{{binary}}", "--config", "\"{config}\"", "--config-version", "{version}"]
+    data = [ctx.attr.config[ConfigInfo].json]
+
+    if not ctx.attr.target:
+        if ctx.attr.url:
+            fail("The 'url' cannot be set if the 'target' is not set.")
+    else:
+        kwargs["artifact"] = ctx.file.target.short_path
+        command.append("\"{artifact}\"")
+        data.append(ctx.file.target)
+        if ctx.attr.url:
+            kwargs["url"] = ctx.attr.url
+            command.append("\"{url}\"")
+    command.append("\"$@\"")
+
     return [sh_binary_wrapper_impl(
         ctx = ctx,
         binary = ctx.attr._upload,
         output = ctx.outputs.executable,
-        command = "{{binary}} --config \"{config}\" --config-version {version} \"{artifact}\" \"{url}\"".format(
-            config = ctx.attr.config[ConfigInfo].json.short_path,
-            version = ctx.attr.config_version,
-            artifact = ctx.file.target.short_path,
-            url = ctx.attr.url,
-        ),
-        data = [ctx.file.target, ctx.attr.config[ConfigInfo].json],
+        command = " ".join(command).format(**kwargs),
+        data = data,
     )]
 
 _bzd_artifacts_upload = rule(
@@ -46,12 +60,10 @@ _bzd_artifacts_upload = rule(
         "target": attr.label(
             doc = "The target to be released.",
             allow_single_file = True,
-            mandatory = True,
             cfg = platform_transition,
         ),
         "url": attr.string(
             doc = "The url to publish to.",
-            mandatory = True,
         ),
         "_upload": attr.label(
             default = Label("//apps/artifacts/api/bazel/upload"),
@@ -62,19 +74,29 @@ _bzd_artifacts_upload = rule(
     executable = True,
 )
 
-def bzd_artifacts_upload(name, **kwargs):
+def _bzd_artifacts_upload_macro_impl(name, visibility, **kwargs):
     bzd_config(
         name = "{}.config".format(name),
         # Note, STABLE_VERSION name was chosen to have it part of of the stable-info.txt file
         # which is the one that trigger an action rebuild, the volatile-info.txt does not.
         # See: https://bazel.build/docs/user-manual#workspace-status
         include_workspace_status = ["STABLE_VERSION"],
-        visibility = ["//visibility:private"],
     )
 
     _bzd_artifacts_upload(
         name = name,
+        visibility = visibility,
         config = "{}.config".format(name),
         config_version = "STABLE_VERSION",
         **kwargs
     )
+
+bzd_artifacts_upload = macro(
+    doc = "Upload a file to the artifact server.",
+    implementation = _bzd_artifacts_upload_macro_impl,
+    inherit_attrs = _bzd_artifacts_upload,
+    attrs = {
+        "config": None,
+        "config_version": None,
+    },
+)

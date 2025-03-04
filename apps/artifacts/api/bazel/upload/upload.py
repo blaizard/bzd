@@ -1,8 +1,21 @@
 import argparse
 import pathlib
 import json
+import tarfile
+import tempfile
 
 from bzd.http.client import HttpClient
+
+
+def upload(url: str, artifact: pathlib.Path) -> None:
+	print(f"Uploading {url} ({artifact.stat().st_size} bytes)...", flush=True, end="")
+	HttpClient.put(
+	    url=url,
+	    file=artifact,
+	    timeoutS=30 * 60  # 30min
+	)
+	print(" done.")
+
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(
@@ -35,13 +48,15 @@ if __name__ == "__main__":
 	# Generate the filename.
 	configDict = json.loads(args.config.read_text())
 	fileName = f"{configDict[args.config_version]}-{args.artifact.name}"
-
 	url = args.url + "/" + fileName
 
-	print(f"Uploading {url} ({args.artifact.stat().st_size} bytes)...", flush=True, end="")
-	HttpClient.put(
-	    url=args.url + "/" + fileName,
-	    file=args.artifact,
-	    timeoutS=30 * 60  # 30min
-	)
-	print(" done.")
+	if not args.artifact.exists():
+		raise FileNotFoundError(args.artifact)
+	elif args.artifact.is_dir():
+		print(f"Creating tar.gz from directory {args.artifact}")
+		with tempfile.NamedTemporaryFile() as fp:
+			with tarfile.open(fp.name, "w:gz") as tar:
+				tar.add(args.artifact)
+			upload(url, pathlib.Path(fp.name))
+	else:
+		upload(url, args.artifact)
