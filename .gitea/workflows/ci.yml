@@ -78,7 +78,7 @@ jobs:
               run: |
                   ./bin/bzd-node timeit --path gitea/coverage_nodejs/command-0 \
                   ./tools/bazel coverage ... --config=nodejs --platform_suffix=coverage-nodejs --config=local
-                  ./bin/bzd-node publish-json --path coverage/nodejs bazel-out/coverage/report.json
+                  ./bin/bzd-node publish-json --path coverage/nodejs $(pwd)/bazel-out/coverage/report.json
 
             - name: "[sanitizer] sanitizer"
               run: |

@@ -37,7 +37,7 @@ jobs:
                   {{ command }}
               {% end %}
               {% if stage.category == "coverage" %}
-                  ./bin/bzd-node publish-json --path coverage/{{ stage.name | normalizeIdentifier }} bazel-out/coverage/report.json
+                  ./bin/bzd-node publish-json --path coverage/{{ stage.name | normalizeIdentifier }} $(pwd)/bazel-out/coverage/report.json
               {% end %}
 
 {% end %}
