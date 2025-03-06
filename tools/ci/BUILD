@@ -33,11 +33,10 @@ py_binary(
 )
 
 bzd_bundle(
-    name = "timeit",
+    name = "bzd_node",
     arguments = [
         "--uid",
         "ci",
-        "timeit",
     ],
     binary = "//apps/artifacts/api/python/node:binary",
     tags = ["manual"],

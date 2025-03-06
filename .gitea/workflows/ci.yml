@@ -26,66 +26,54 @@ jobs:
             - name: "Build Tools"
               run: |
                   mkdir bin
-                  ./tools/bazel build //tools/ci:timeit --remote_download_toplevel --//apps/artifacts/api:config.set=remotes=https://datalocal.blaizard.com
-                  cp bazel-bin/tools/ci/timeit bin/timeit
+                  ./tools/bazel build //tools/ci:bzd_node --remote_download_toplevel --//apps/artifacts/api:config.set=remotes=https://datalocal.blaizard.com
+                  cp bazel-bin/tools/ci/bzd_node bin/bzd-node
 
             - name: "[normal] static analysis"
               run: |
-                  ./bin/timeit --path gitea/normal_static_analysis/command-0 \
+                  ./bin/bzd-node timeit --path gitea/normal_static_analysis/command-0 \
                   ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=dev --config=clang-tidy --config=mypy --config=clippy --platform_suffix=static_analysis
-
             - name: "[normal] clang prod"
               run: |
-                  ./bin/timeit --path gitea/normal_clang_prod/command-0 \
+                  ./bin/bzd-node timeit --path gitea/normal_clang_prod/command-0 \
                   ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=clang --config=prod --config=cc --platform_suffix=clang-prod
-
             - name: "[normal] gcc prod"
               run: |
-                  ./bin/timeit --path gitea/normal_gcc_prod/command-0 \
+                  ./bin/bzd-node timeit --path gitea/normal_gcc_prod/command-0 \
                   ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=gcc --config=prod --config=cc --platform_suffix=gcc-prod
-
             - name: "[normal] esp32 prod"
               run: |
-                  ./bin/timeit --path gitea/normal_esp32_prod/command-0 \
+                  ./bin/bzd-node timeit --path gitea/normal_esp32_prod/command-0 \
                   ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=esp32 --config=prod --config=cc --platform_suffix=esp32-prod
-
             - name: "[normal] esp32s3 prod"
               run: |
-                  ./bin/timeit --path gitea/normal_esp32s3_prod/command-0 \
+                  ./bin/bzd-node timeit --path gitea/normal_esp32s3_prod/command-0 \
                   ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=esp32s3 --config=prod --config=cc --platform_suffix=esp32s3-prod
-
             - name: "[stress] dev (10 runs)"
               run: |
-                  ./bin/timeit --path gitea/stress_dev_10_runs/command-0 \
+                  ./bin/bzd-node timeit --path gitea/stress_dev_10_runs/command-0 \
                   ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --build_tests_only --test_tag_filters=stress,-cc-coverage --config=dev --runs_per_test=10 --local_test_jobs=1 --platform_suffix=stress-dev
-
             - name: "[stress] prod (10 runs)"
               run: |
-                  ./bin/timeit --path gitea/stress_prod_10_runs/command-0 \
+                  ./bin/bzd-node timeit --path gitea/stress_prod_10_runs/command-0 \
                   ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --build_tests_only --test_tag_filters=stress,-cc-coverage --config=prod --runs_per_test=10 --local_test_jobs=1 --platform_suffix=stress-prod
-
             - name: "[sanitizer] asan/lsan/ubsan"
               run: |
-                  ./bin/timeit --path gitea/sanitizer_asan_lsan_ubsan/command-0 \
+                  ./bin/bzd-node timeit --path gitea/sanitizer_asan_lsan_ubsan/command-0 \
                   ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --config=clang --config=cc --config=sanitizer --config=asan --config=lsan --config=ubsan --platform_suffix=clang-asan-lsan-ubsan
-
             - name: "[sanitizer] tsan"
               run: |
-                  ./bin/timeit --path gitea/sanitizer_tsan/command-0 \
+                  ./bin/bzd-node timeit --path gitea/sanitizer_tsan/command-0 \
                   ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --config=clang --config=cc --config=sanitizer --config=tsan --platform_suffix=clang-tsan
-
             - name: "[coverage] nodejs"
               run: |
-                  ./bin/timeit --path gitea/coverage_nodejs/command-0 \
+                  ./bin/bzd-node timeit --path gitea/coverage_nodejs/command-0 \
                   ./tools/bazel coverage ... --config=nodejs --platform_suffix=coverage-nodejs --config=local
-                  ./bin/timeit --path gitea/coverage_nodejs/command-1 \
-                  ./tools/bazel run @bzd_coverage//:coverage --platform_suffix=coverage-nodejs --config=local -- --output bazel-out/coverage-nodejs
-
+                  ./bin/bzd-node publish-json --path coverage/nodejs bazel-out/coverage/report.json
             - name: "[sanitizer] sanitizer"
               run: |
-                  ./bin/timeit --path gitea/sanitizer_sanitizer/command-0 \
+                  ./bin/bzd-node timeit --path gitea/sanitizer_sanitizer/command-0 \
                   ./tools/bazel run :sanitizer -- --check --all
-
             - name: "Deploy"
               uses: https://git.blaizard.com/blaise/deployment@main
               with:

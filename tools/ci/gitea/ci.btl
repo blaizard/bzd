@@ -26,17 +26,19 @@ jobs:
             - name: "Build Tools"
               run: |
                   mkdir bin
-                  ./tools/bazel build //tools/ci:timeit --remote_download_toplevel --//apps/artifacts/api:config.set=remotes=https://datalocal.blaizard.com
-                  cp bazel-bin/tools/ci/timeit bin/timeit
+                  ./tools/bazel build //tools/ci:bzd_node --remote_download_toplevel --//apps/artifacts/api:config.set=remotes=https://datalocal.blaizard.com
+                  cp bazel-bin/tools/ci/bzd_node bin/bzd-node
 
 {% for stage in stages %}
             - name: "[{{ stage.category }}] {{ stage.name }}"
               run: |
               {% for index, command in stage.commands %}
-                  ./bin/timeit --path gitea/{{ stage.category | normalizeIdentifier }}_{{ stage.name | normalizeIdentifier }}/command-{{ index }} \
+                  ./bin/bzd-node timeit --path gitea/{{ stage.category | normalizeIdentifier }}_{{ stage.name | normalizeIdentifier }}/command-{{ index }} \
                   {{ command }}
               {% end %}
-
+              {% if stage.category == "coverage" %}
+                  ./bin/bzd-node publish-json --path coverage/{{ stage.name | normalizeIdentifier }} bazel-out/coverage/report.json
+              {% end %}
 {% end %}
             - name: "Deploy"
               uses: https://git.blaizard.com/blaise/deployment@main

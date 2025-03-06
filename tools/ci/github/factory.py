@@ -25,7 +25,7 @@ class GitHub(Factory):
 		return None
 
 	def getConfigCoverage(self) -> typing.Optional[ConfigCoverage]:
-		return None
+		return ConfigCoverage(exclude={"cc"})
 
 	def getConfigSanitizer(self) -> typing.Optional[ConfigSanitizer]:
 		return ConfigSanitizer()

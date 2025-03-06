@@ -1,4 +1,6 @@
 import argparse
+import json
+import pathlib
 import typing
 import time
 import subprocess
@@ -25,7 +27,7 @@ class Utility:
 			self.fail(message, errorCode)
 
 	def cleanPathToList(self, data: str) -> typing.List[str]:
-		"""CLeanup the given path."""
+		"""Cleanup the given path."""
 
 		segments: typing.List[str] = []
 		for segment in data.split("/"):
@@ -56,6 +58,13 @@ class Utility:
 		self.assertTrue(len(pathData) > 0, f"There is no data to publish, the data given '{data}' evaluates to '.'")
 		self._publish(data=pathData[-1], path=pathData[:-1])
 
+	def publishJson(self, path: str, file: pathlib.Path) -> None:
+		"""Publish some data to a remote node from a json file."""
+
+		pathAsList = self.cleanPathToList(path)
+		data = json.loads(file.read_text())
+		self._publish(data=data, path=pathAsList)
+
 	def timeit(self, path: str, args: typing.List[str]) -> None:
 		"""Time the given command and publish it."""
 
@@ -80,6 +89,11 @@ if __name__ == "__main__":
 	parserPublish = subparsers.add_parser("publish", help="Publish a data point to a node remote.")
 	parserPublish.add_argument("data", help="The path + data to publish separated by slashes.")
 
+	parserPublishJson = subparsers.add_parser("publish-json",
+	                                          help="Publish a data point to a node remote from a json file.")
+	parserPublishJson.add_argument("--path", help="Path of the data to access.", default=".")
+	parserPublishJson.add_argument("file", type=pathlib.Path, help="The path of the json file.")
+
 	parserTimeit = subparsers.add_parser("timeit", help="Time the given command and publish the result to the remote.")
 	parserTimeit.add_argument("--path", help="Path of the data to access.", default=".")
 	parserTimeit.add_argument("rest", nargs=argparse.REMAINDER)
@@ -91,6 +105,8 @@ if __name__ == "__main__":
 
 	if args.command == "publish":
 		utility.publish(data=args.data)
+	elif args.command == "publish-json":
+		utility.publishJson(path=args.path, file=args.file)
 	elif args.command == "timeit":
 		utility.timeit(args=args.rest, path=args.path)
 	else:
