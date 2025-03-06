@@ -40,6 +40,9 @@ public:
 		return scope;
 	}
 
+	/// Get the last element for reading even if it was already read previously.
+	constexpr auto tryGetLast() noexcept { return buffer_.ring_.lastForReading(); }
+
 	/// Wait for a new element to be available and return it.
 	bzd::Async<bzd::threadsafe::RingBufferResult<const Value&>> getNew() noexcept
 	{
@@ -67,6 +70,8 @@ public:
 	constexpr auto tryGetNew() noexcept { return bzd::Optional<const Value&>{}; }
 
 	constexpr auto tryGetNew(const bzd::Size) noexcept { return bzd::Optional<bzd::Spans<const Value, 2u>>{}; }
+
+	constexpr auto tryGetLast() noexcept { return bzd::Optional<const Value&>{}; }
 
 	bzd::Async<bzd::Optional<const Value&>> getNew() noexcept { co_return bzd::Optional<const Value&>{}; }
 
