@@ -14,11 +14,7 @@ export default class FileSystem {
 
 	/// Get the stat object associated with a file
 	static async stat(path) {
-		return new Promise((resolve, reject) => {
-			Fs.stat(path, (e, stats) => {
-				return e ? reject(e) : resolve(stats);
-			});
-		});
+		return await Fs.promises.stat(path);
 	}
 
 	/// Create a directory recursively, if it already exists, do nothing

@@ -85,6 +85,14 @@ bzd_nodejs_library(
 )
 
 bzd_nodejs_library(
+    name = "lock",
+    srcs = [
+        "lock.mjs",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+bzd_nodejs_library(
     name = "filesystem",
     srcs = [
         "filesystem.mjs",

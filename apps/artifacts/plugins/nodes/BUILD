@@ -1,6 +1,21 @@
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 
 bzd_nodejs_library(
+    name = "record",
+    srcs = [
+        "record.mjs",
+    ],
+    visibility = [
+        "//apps/artifacts/plugins:__subpackages__",
+    ],
+    deps = [
+        "//nodejs/core:filesystem",
+        "//nodejs/core:lock",
+        "//nodejs/core:log",
+    ],
+)
+
+bzd_nodejs_library(
     name = "backend",
     srcs = [
         "backend.mjs",

@@ -35,6 +35,24 @@ class Path {
 		return [...this.path];
 	}
 
+	/// Normalize the specified path. All redundant separator and up-level references are collapsed in the process of path normalization.
+	get normalize() {
+		let normalizedPath = [];
+		for (const segment of this.path) {
+			if (segment == "..") {
+				const result = normalizedPath.pop();
+				Exception.assert(
+					result !== undefined,
+					"Path cannot be normalized '{}', the '..' expands beyond the root.",
+					this.path.asPosix(),
+				);
+			} else if (segment != ".") {
+				normalizedPath.push(segment);
+			}
+		}
+		return new Path(this.maybeRoot, normalizedPath);
+	}
+
 	/// Return whether the path is absolute or not. A path is considered absolute if it has both a root and (if the flavour allows) a drive.
 	isAbsolute() {
 		return this.maybeRoot !== null;
@@ -62,9 +80,12 @@ class Path {
 }
 
 const accessors = {
-	path: (pathStr) => {
-		const maybeRoot = pathStr[0] == "/" ? "/" : null;
-		return new Path(maybeRoot, _pathToArray(pathStr));
+	path: (path) => {
+		if (path instanceof Path) {
+			return path;
+		}
+		const maybeRoot = path[0] == "/" ? "/" : null;
+		return new Path(maybeRoot, _pathToArray(path));
 	},
 };
 

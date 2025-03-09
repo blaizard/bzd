@@ -21,3 +21,14 @@ bzd_nodejs_test(
         "//nodejs/db/key_value_store:make_from_config",
     ],
 )
+
+bzd_nodejs_test(
+    name = "record",
+    srcs = ["record_test.mjs"],
+    main = "record_test.mjs",
+    deps = [
+        "//apps/artifacts/plugins/nodes:record",
+        "//nodejs/core:exception",
+        "//nodejs/core/mock:filesystem",
+    ],
+)

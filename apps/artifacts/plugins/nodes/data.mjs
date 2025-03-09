@@ -191,6 +191,7 @@ export default class Data {
 					}
 					// Prepend the new value and the timestamp to the values array.
 					// And ensure there are maximum X elements.
+					// Insert "internal" -> [timestamp, value]
 					data[internal].splice(index, 0, [timestamp, value]);
 					while (data[internal].length > config.history) {
 						data[internal].pop();
