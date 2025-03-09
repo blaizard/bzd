@@ -9,6 +9,7 @@ bzd_nodejs_library(
         "//apps/artifacts/plugins:__subpackages__",
     ],
     deps = [
+        "//nodejs/core:exception",
         "//nodejs/core:filesystem",
         "//nodejs/core:lock",
         "//nodejs/core:log",

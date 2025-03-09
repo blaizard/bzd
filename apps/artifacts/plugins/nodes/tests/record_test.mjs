@@ -13,22 +13,23 @@ describe("Record", () => {
 			await record.init();
 		});
 
-		it("add", async () => {
-			await record.add(0);
+		it("write", async () => {
+			await record.write(0);
 		});
 
-		it("add many", async () => {
-			await Promise.all([record.add(1), record.add(2), record.add(3), record.add(4), record.add(5)]);
+		it("write many", async () => {
+			await Promise.all([record.write(1), record.write(2), record.write(3), record.write(4), record.write(5)]);
 		});
 	});
 
 	describe("Existing", () => {
 		const fs = new Filesystem({
-			"records/0000002.rec": "abc",
-			"records/0000001.rec": "a",
-			"records/0000010.rec": "abcde",
-			"records/invalid.rec": "abcdejsjs",
-			"records/0000007.rec": "abcd",
+			"records/2.rec": '[2,"abc"],',
+			"records/1.rec": '[1,"a"],',
+			"records/10.rec": '[10,"abcde"],',
+			"records/011.rec": '[11,"abcdef"],',
+			"records/invalid.rec": '[3,"abcdejsjs"],',
+			"records/7.rec": '[7,"abcd"],',
 		});
 		const record = new Record("records", { fs: fs });
 
@@ -36,13 +37,23 @@ describe("Record", () => {
 			await record.init();
 
 			const files = await fs.readdir("records");
-			Exception.assertEqual(files, ["0000002.rec", "0000001.rec", "0000010.rec", "0000007.rec"]);
+			Exception.assertEqual(files, ["2.rec", "1.rec", "10.rec", "011.rec", "7.rec"]);
 			Exception.assertEqual(record.entries, [
-				{ timestamp: 1, path: "records/0000001.rec", size: 1 },
-				{ timestamp: 2, path: "records/0000002.rec", size: 3 },
-				{ timestamp: 7, path: "records/0000007.rec", size: 4 },
-				{ timestamp: 10, path: "records/0000010.rec", size: 5 },
+				{ timestamp: 1, path: "records/1.rec", size: 8 },
+				{ timestamp: 2, path: "records/2.rec", size: 10 },
+				{ timestamp: 7, path: "records/7.rec", size: 11 },
+				{ timestamp: 10, path: "records/10.rec", size: 13 },
+				{ timestamp: 11, path: "records/011.rec", size: 14 },
 			]);
+		});
+
+		it("read", async () => {
+			Exception.assertEqual(await record.read(), ["a", 2]);
+			Exception.assertEqual(await record.read(2), ["abc", 7]);
+			Exception.assertEqual(await record.read(7), ["abcd", 10]);
+			Exception.assertEqual(await record.read(10), ["abcde", 11]);
+			Exception.assertEqual(await record.read(11), ["abcdef", null]);
+			Exception.assertEqual(await record.read(12), null);
 		});
 	});
 });

@@ -256,4 +256,18 @@ export default class FileSystem {
 		Exception.assert(p.name in dir, "The file '{}' doesn't exists.", p.asPosix());
 		delete dir[p.name];
 	}
+
+	/// Touch a file (create it if it does not exists) and
+	/// updates its last modification date.
+	async touch(path) {
+		await FileSystem._mockWait();
+		this._toFile(path, /*mustExists*/ false);
+	}
+
+	/// Read the content of a file
+	async readFile(path, options = "utf8") {
+		await FileSystem._mockWait();
+		const file = this._toFile(path, /*mustExists*/ true);
+		return file.content;
+	}
 }
