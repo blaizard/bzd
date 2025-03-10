@@ -1,39 +1,18 @@
 /// Simple async lock implementation
 export default class Lock {
 	constructor() {
-		this.queue = [];
-		this.isLock = false;
+		this.lastTask = Promise.resolve(); // Starts as a resolved promise
 	}
 
-	_next() {
-		if (this.queue.length > 0) {
-			const callback = this.queue.shift();
-			// Immediately process the next item with the next tick. This is done in order
-			// to avoid long call stacks.
-			setTimeout(callback, 0);
-		} else {
-			this.isLock = false;
-		}
-	}
-
-	/// Lock the resource for the duration of the callback.
 	acquire(callback) {
-		return new Promise((resolve, reject) => {
-			const wrapper = () => {
-				callback()
-					.then(resolve)
-					.catch(reject)
-					.finally(() => {
-						this._next();
-					});
-			};
-
-			if (this.isLock) {
-				this.queue.push(wrapper);
-			} else {
-				this.isLock = true;
-				wrapper();
+		// Chain the callback to the last task
+		const nextTask = this.lastTask.then(callback).finally(() => {
+			if (this.lastTask === nextTask) {
+				this.lastTask = Promise.resolve(); // Reset when no tasks are pending
 			}
 		});
+
+		this.lastTask = nextTask;
+		return nextTask;
 	}
 }
