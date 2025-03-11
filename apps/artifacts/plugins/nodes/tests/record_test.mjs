@@ -4,10 +4,10 @@ import Record from "#bzd/apps/artifacts/plugins/nodes/record.mjs";
 
 const Exception = ExceptionFactory("test", "artifacts", "plugins", "record");
 
-const readAll = async (record, timestamp) => {
+const readAll = async (record, tick) => {
 	let values = [];
-	for await (const newValues of record.read(timestamp)) {
-		values = [...values, ...newValues];
+	for await (const [_, value] of record.read(tick)) {
+		values.push(value);
 	}
 	return values;
 };
@@ -34,7 +34,7 @@ describe("Record", () => {
 		});
 
 		it("sanity check", async () => {
-			await record.sanityCheck(/*includePayload*/ true);
+			await record.sanitize();
 		});
 	});
 
@@ -42,10 +42,10 @@ describe("Record", () => {
 		const fs = new Filesystem({
 			"records/2.rec": '[2,"abc"],',
 			"records/1.rec": '[1,"a"],',
-			"records/10.rec": '[10,"abcde"],',
-			"records/011.rec": '[11,"abcdef"],',
+			"records/4.rec": '[4,"abcde"],',
+			"records/5.rec": '[5,"abcdef"],',
 			"records/invalid.rec": '[3,"abcdejsjs"],',
-			"records/7.rec": '[7,"abcd"],',
+			"records/3.rec": '[3,"abcd"],',
 		});
 		const record = new Record("records", { fs: fs });
 
@@ -53,25 +53,24 @@ describe("Record", () => {
 			await record.init();
 
 			const files = await fs.readdir("records");
-			Exception.assertEqual(files, ["2.rec", "1.rec", "10.rec", "011.rec", "7.rec"]);
+			Exception.assertEqual(files, ["2.rec", "1.rec", "4.rec", "5.rec", "3.rec"]);
 			Exception.assertEqual(record.records, [
-				{ timestamp: 1, path: "records/1.rec", size: 8, next: 2 },
-				{ timestamp: 2, path: "records/2.rec", size: 10, next: 7 },
-				{ timestamp: 7, path: "records/7.rec", size: 11, next: 10 },
-				{ timestamp: 10, path: "records/10.rec", size: 13, next: 11 },
-				{ timestamp: 11, path: "records/011.rec", size: 14, next: null },
+				{ tick: 1, path: "records/1.rec", size: 8 },
+				{ tick: 2, path: "records/2.rec", size: 10 },
+				{ tick: 3, path: "records/3.rec", size: 11 },
+				{ tick: 4, path: "records/4.rec", size: 12 },
+				{ tick: 5, path: "records/5.rec", size: 13 },
 			]);
 		});
 
 		it("read", async () => {
-			Exception.assertEqual((await record.read().next()).value, ["a"]);
-			Exception.assertEqual((await record.read(1).next()).value, ["a"]);
-			Exception.assertEqual((await record.read(2).next()).value, ["abc"]);
-			Exception.assertEqual((await record.read(3).next()).value, ["abcd"]);
-			Exception.assertEqual((await record.read(7).next()).value, ["abcd"]);
-			Exception.assertEqual((await record.read(10).next()).value, ["abcde"]);
-			Exception.assertEqual((await record.read(11).next()).value, ["abcdef"]);
-			Exception.assertEqual((await record.read(12).next()).value, null);
+			Exception.assertEqual((await record.read().next()).value, [1, "a"]);
+			Exception.assertEqual((await record.read(1).next()).value, [1, "a"]);
+			Exception.assertEqual((await record.read(2).next()).value, [2, "abc"]);
+			Exception.assertEqual((await record.read(3).next()).value, [3, "abcd"]);
+			Exception.assertEqual((await record.read(4).next()).value, [4, "abcde"]);
+			Exception.assertEqual((await record.read(5).next()).value, [5, "abcdef"]);
+			Exception.assertEqual((await record.read(6).next()).value, null);
 		});
 
 		it("read all", async () => {
@@ -80,17 +79,30 @@ describe("Record", () => {
 			Exception.assertEqual(await readAll(record, 1), ["a", "abc", "abcd", "abcde", "abcdef"]);
 			Exception.assertEqual(await readAll(record, 2), ["abc", "abcd", "abcde", "abcdef"]);
 			Exception.assertEqual(await readAll(record, 3), ["abcd", "abcde", "abcdef"]);
-			Exception.assertEqual(await readAll(record, 4), ["abcd", "abcde", "abcdef"]);
-			Exception.assertEqual(await readAll(record, 5), ["abcd", "abcde", "abcdef"]);
-			Exception.assertEqual(await readAll(record, 6), ["abcd", "abcde", "abcdef"]);
-			Exception.assertEqual(await readAll(record, 7), ["abcd", "abcde", "abcdef"]);
-			Exception.assertEqual(await readAll(record, 8), ["abcde", "abcdef"]);
-			Exception.assertEqual(await readAll(record, 9), ["abcde", "abcdef"]);
-			Exception.assertEqual(await readAll(record, 10), ["abcde", "abcdef"]);
-			Exception.assertEqual(await readAll(record, 11), ["abcdef"]);
+			Exception.assertEqual(await readAll(record, 4), ["abcde", "abcdef"]);
+			Exception.assertEqual(await readAll(record, 5), ["abcdef"]);
+			Exception.assertEqual(await readAll(record, 6), []);
 			Exception.assertEqual(await readAll(record, 12), []);
 			Exception.assertEqual(await readAll(record, 327327), []);
 			Exception.assertEqual(await readAll(record, null), []);
+		});
+
+		it("write", async () => {
+			for (let i = 0; i < 10; ++i) {
+				await record.write("new" + i);
+			}
+		});
+
+		it("read", async () => {
+			Exception.assertEqual((await record.read(5).next()).value, [5, "abcdef"]);
+			Exception.assertEqual((await record.read(6).next()).value, [6, "new0"]);
+			Exception.assertEqual((await record.read(7).next()).value, [7, "new1"]);
+			Exception.assertEqual((await record.read(15).next()).value, [15, "new9"]);
+			Exception.assertEqual((await record.read(16).next()).value, null);
+		});
+
+		it("sanitize", async () => {
+			await record.sanitize();
 		});
 	});
 
@@ -99,7 +111,6 @@ describe("Record", () => {
 		const record = new Record("records", {
 			fs: fs,
 			recordMaxSize: 100,
-			maxSize: 20 * 1024 * 1024,
 		});
 
 		it("init", async () => {
@@ -119,8 +130,65 @@ describe("Record", () => {
 			}
 		}).timeout(10000);
 
-		it("read", async () => {
-			await record.sanityCheck(/*includePayload*/ true);
+		it("sanitize", async () => {
+			await record.sanitize();
+		});
+
+		it("read one by one", async () => {
+			for (let tick = 1; tick < 100; ++tick) {
+				const result = await record.read(tick).next();
+				Exception.assertEqual(result.value[0], tick);
+			}
+		});
+	});
+
+	describe("paylaod larger than recordMaxSize", () => {
+		const fs = new Filesystem();
+		const record = new Record("records", {
+			fs: fs,
+			recordMaxSize: 10,
+		});
+
+		it("init", async () => {
+			await record.init();
+		});
+
+		it("write", async () => {
+			for (let i = 0; i < 10; ++i) {
+				await record.write("ababdjksdskhfjhfjjksahdjkdgdgdgshgdahdsdklsjksjkdsashdashkdsjhdhksjhdkjhasjkdhshgds");
+			}
+		});
+
+		it("sanitize", async () => {
+			await record.sanitize();
+		});
+	});
+
+	describe("MaxSize restriction", () => {
+		const fs = new Filesystem();
+		const record = new Record("records", {
+			fs: fs,
+			recordMaxSize: 100,
+			maxSize: 300,
+		});
+
+		it("init", async () => {
+			await record.init();
+		});
+
+		it("write", async () => {
+			for (let i = 0; i < 100; ++i) {
+				await record.write([i, "ababdjksdskhfjhfjjksahdjkdgdgdgshgdahdsdklsjksjkdsashdashkdsjhdhksjhdkjhasjkdhshgds"]);
+			}
+		}).timeout(10000);
+
+		it("sanitize", async () => {
+			await record.sanitize();
+		});
+
+		it("check deleted records", async () => {
+			const files = await fs.readdir("records");
+			Exception.assertEqual(files.length, 3);
 		});
 	});
 });

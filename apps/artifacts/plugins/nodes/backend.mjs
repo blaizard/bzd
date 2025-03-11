@@ -82,11 +82,7 @@ export default class Plugin extends PluginBase {
 		super(volume, options, provider, endpoints);
 		this.nodes = null;
 		provider.addStartProcess(async () => {
-			const storage = await makeStorageFromConfig({
-				type: "memory",
-				name: "nodes",
-			});
-			this.nodes = new Nodes(storage, options["nodes.handlers"] || {});
+			this.nodes = new Nodes(options["nodes.handlers"] || {});
 			for (const [uid, data] of Object.entries(options["nodes.data"] || {})) {
 				const node = await this.nodes.get(uid);
 				await node.insert(["data"], data);

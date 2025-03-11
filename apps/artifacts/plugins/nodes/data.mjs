@@ -10,8 +10,8 @@ import Optional from "#bzd/nodejs/utils/optional.mjs";
 const SPECIAL_KEY_FOR_VALUE = "\x01";
 
 export default class Data {
-	constructor(storage) {
-		this.storage = storage;
+	constructor() {
+		this.storage = {};
 		const cache = new Cache({
 			garbageCollector: false,
 		});
@@ -25,7 +25,7 @@ export default class Data {
 			// }
 			// Using SPECIAL_KEY_FOR_VALUE for the key, enables nested keys form leaf nodes.
 			//
-			const data = await this.storage.get(uid, {});
+			const data = this.storage[uid] || {};
 			let tree = {};
 			for (const [internal, _] of Object.entries(data)) {
 				const paths = KeyMapping.internalToKey(internal);
@@ -43,6 +43,11 @@ export default class Data {
 	/// Get the timestamp.
 	static getTimestamp() {
 		return Date.now();
+	}
+
+	/// List all available keys
+	async list() {
+		return Object.keys(this.storage);
 	}
 
 	/// Get the tree at a given key.
@@ -86,7 +91,7 @@ export default class Data {
 
 	///  Get all keys/value pair children of key.
 	async get({ uid, key, metadata = false, children = 0, count = null, after = null, before = null, include = null }) {
-		const data = await this.storage.get(uid, {});
+		const data = this.storage[uid] || {};
 
 		const getStartEnd = (value) => {
 			if (after !== null) {
@@ -162,46 +167,40 @@ export default class Data {
 	/// \param timestamp The timestamp to be used.
 	async insert(uid, fragments, timestamp = null) {
 		timestamp = timestamp === null ? Data.getTimestamp() : timestamp;
+		this.storage[uid] ??= {};
+		let data = this.storage[uid];
 
-		await this.storage.update(
-			uid,
-			async (data) => {
-				// Identify the path of the fragments and their values.
-				for (const [key, value, options] of fragments) {
-					const config = Object.assign(
-						{
-							// The number of values to be kept as history.
-							history: 10,
-						},
-						options,
-					);
+		// Identify the path of the fragments and their values.
+		for (const [key, value, options] of fragments) {
+			const config = Object.assign(
+				{
+					// The number of values to be kept as history.
+					history: 10,
+				},
+				options,
+			);
 
-					const internal = KeyMapping.keyToInternal(key);
-					let index = 0;
-					if (!(internal in data)) {
-						data[internal] = [];
-						this.tree.setDirty(uid);
-					}
-					// If the timestamp of the last entry added is newer than the current one.
-					else if (data[internal][0][0] > timestamp) {
-						index = data[internal].findIndex((d) => d[0] <= timestamp);
-						if (index == -1) {
-							index = data[internal].length;
-						}
-					}
-					// Prepend the new value and the timestamp to the values array.
-					// And ensure there are maximum X elements.
-					// Insert "internal" -> [timestamp, value]
-					data[internal].splice(index, 0, [timestamp, value]);
-					while (data[internal].length > config.history) {
-						data[internal].pop();
-					}
+			const internal = KeyMapping.keyToInternal(key);
+			let index = 0;
+			if (!(internal in data)) {
+				data[internal] = [];
+				this.tree.setDirty(uid);
+			}
+			// If the timestamp of the last entry added is newer than the current one.
+			else if (data[internal][0][0] > timestamp) {
+				index = data[internal].findIndex((d) => d[0] <= timestamp);
+				if (index == -1) {
+					index = data[internal].length;
 				}
-
-				return data;
-			},
-			{},
-		);
+			}
+			// Prepend the new value and the timestamp to the values array.
+			// And ensure there are maximum X elements.
+			// Insert "internal" -> [timestamp, value]
+			data[internal].splice(index, 0, [timestamp, value]);
+			while (data[internal].length > config.history) {
+				data[internal].pop();
+			}
+		}
 
 		return true;
 	}

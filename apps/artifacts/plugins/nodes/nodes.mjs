@@ -69,17 +69,14 @@ export class Node {
 }
 
 export class Nodes {
-	constructor(storage, handlers) {
-		this.storage = storage.getAccessor("data");
+	constructor(handlers) {
 		this.handlers = new Handlers(handlers);
-		this.data = new Data(this.storage);
+		this.data = new Data();
 	}
 
 	async *getNodes() {
-		const it = CollectionPaging.makeIterator(async (maxOrPaging) => {
-			return await this.storage.list(maxOrPaging);
-		}, 50);
-		for await (const [name, _] of it) {
+		const all = await this.data.list();
+		for await (const name of all) {
 			yield name;
 		}
 	}

@@ -1,17 +1,12 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import Data from "#bzd/apps/artifacts/plugins/nodes/data.mjs";
-import makeStorageFromConfig from "#bzd/nodejs/db/key_value_store/make_from_config.mjs";
 
 const Exception = ExceptionFactory("test", "artifacts", "plugins", "data");
 
 describe("Nodes", () => {
 	describe("Data", () => {
 		it("basic", async () => {
-			const storage = await makeStorageFromConfig({
-				type: "memory",
-				name: "nodes",
-			});
-			const data = new Data(storage.getAccessor("data"));
+			const data = new Data();
 
 			// Insert single.
 			await data.insert("hello", [[["a", "b"], 12]]);
@@ -98,11 +93,7 @@ describe("Nodes", () => {
 		});
 
 		it("count", async () => {
-			const storage = await makeStorageFromConfig({
-				type: "memory",
-				name: "nodes",
-			});
-			const data = new Data(storage.getAccessor("data"));
+			const data = new Data();
 
 			await data.insert("hello", [[["a", "b"], 1]]);
 			await data.insert("hello", [[["a", "b"], 2]]);
@@ -142,11 +133,7 @@ describe("Nodes", () => {
 		});
 
 		it("timestamp", async () => {
-			const storage = await makeStorageFromConfig({
-				type: "memory",
-				name: "nodes",
-			});
-			const data = new Data(storage.getAccessor("data"));
+			const data = new Data();
 
 			await data.insert("hello", [[["a", "b"], 1]], 1);
 			await data.insert("hello", [[["a", "b"], 10]], 10);
@@ -204,11 +191,7 @@ describe("Nodes", () => {
 		});
 
 		it("include", async () => {
-			const storage = await makeStorageFromConfig({
-				type: "memory",
-				name: "nodes",
-			});
-			const data = new Data(storage.getAccessor("data"));
+			const data = new Data();
 
 			await data.insert("hello", [[["a", "b"], 1]]);
 			await data.insert("hello", [[["a", "b", "c"], 10]]);
