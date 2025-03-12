@@ -1,9 +1,9 @@
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 
 bzd_nodejs_library(
-    name = "record",
+    name = "records",
     srcs = [
-        "record.mjs",
+        "records.mjs",
     ],
     visibility = [
         "//apps/artifacts/plugins:__subpackages__",
@@ -29,6 +29,7 @@ bzd_nodejs_library(
     deps = [
         ":data",
         ":key_mapping",
+        ":records",
         "//apps/artifacts/backend:plugin",
         "//apps/artifacts/plugins/nodes/handlers",
         "//nodejs/core:cache",

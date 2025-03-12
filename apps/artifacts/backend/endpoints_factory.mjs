@@ -1,5 +1,3 @@
-import HttpEndpoint from "#bzd/nodejs/core/http/endpoint.mjs";
-
 export default class EndpointsFactory {
 	constructor() {
 		this.data = {};

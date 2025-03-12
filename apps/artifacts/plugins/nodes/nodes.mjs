@@ -41,7 +41,7 @@ export class Node {
 		let fragments = Node.getAllPathAndValues(fragment, key);
 		fragments = this.handlers.processBeforeInsert(fragments);
 
-		await this.data.insert(this.uid, fragments, Data.getTimestamp() + timestampDelta);
+		return await this.data.insert(this.uid, fragments, Data.getTimestamp() + timestampDelta);
 	}
 
 	/// Get the tree with single values.

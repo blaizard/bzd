@@ -1,8 +1,8 @@
 import StorageBzd from "#bzd/apps/artifacts/plugins/nodes/storage.mjs";
 import { Nodes } from "#bzd/apps/artifacts/plugins/nodes/nodes.mjs";
-import makeStorageFromConfig from "#bzd/nodejs/db/key_value_store/make_from_config.mjs";
 import PluginBase from "#bzd/apps/artifacts/backend/plugin.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
+import Records from "#bzd/apps/artifacts/plugins/nodes/records.mjs";
 
 const Exception = ExceptionFactory("apps", "plugin", "nodes");
 
@@ -81,6 +81,7 @@ export default class Plugin extends PluginBase {
 	constructor(volume, options, provider, endpoints) {
 		super(volume, options, provider, endpoints);
 		this.nodes = null;
+		this.records = new Records("records." + volume);
 		provider.addStartProcess(async () => {
 			this.nodes = new Nodes(options["nodes.handlers"] || {});
 			for (const [uid, data] of Object.entries(options["nodes.data"] || {})) {
@@ -89,6 +90,10 @@ export default class Plugin extends PluginBase {
 			}
 
 			this.setStorage(await StorageBzd.make(this.nodes));
+
+			await this.records.init((payload) => {
+				console.log(payload);
+			});
 		});
 
 		/// Retrieve values from the store.
@@ -166,8 +171,8 @@ export default class Plugin extends PluginBase {
 			output = Object.assign(output, {
 				data: maybeData.value(),
 			});
+			context.setStatus(200);
 			context.sendJson(output);
-			context.sendStatus(200);
 		});
 
 		/// Insert one or multiple entries.
@@ -184,30 +189,39 @@ export default class Plugin extends PluginBase {
 		///    ]
 		/// }```
 		endpoints.register("post", "/{uid}/{path:*}", async (context) => {
-			const bulk = context.getQuery("bulk", false, Boolean);
-			const data = rawBodyParse(context.getBody(), (name) => context.getHeader(name));
-
+			let inputs = {};
+			try {
+				inputs.bulk = context.getQuery("bulk", false, Boolean);
+				inputs.data = rawBodyParse(context.getBody(), (name) => context.getHeader(name));
+			} catch (e) {
+				context.sendStatus(400, String(e));
+				return;
+			}
 			const node = await this.nodes.get(context.getParam("uid"));
 			const key = Plugin.paramPathToKey(context.getParam("path"));
 
-			if (bulk) {
+			let written = [];
+			if (inputs.bulk) {
 				Exception.assertPrecondition(
-					typeof data.timestamp == "number",
+					typeof inputs.data.timestamp == "number",
 					"The timestamp given is not a number {}.",
-					data.timestamp,
+					inputs.data.timestamp,
 				);
-				for (const [timestamp, value] of data.data) {
+				for (const [timestamp, value] of inputs.data.data) {
 					Exception.assertPrecondition(
 						typeof timestamp == "number",
 						"The timestamp given for value '{:j}' is not a number {}.",
 						value,
 						timestamp,
 					);
-					await node.insert(key, value, timestamp - data.timestamp);
+					written = written.concat(await node.insert(key, value, timestamp - inputs.data.timestamp));
 				}
 			} else {
-				await node.insert(key, data);
+				written = await node.insert(key, inputs.data);
 			}
+
+			// Save the data written on disk.
+			await this.records.write(written);
 
 			context.sendStatus(200);
 		});

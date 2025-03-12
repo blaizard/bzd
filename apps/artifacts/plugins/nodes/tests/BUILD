@@ -23,11 +23,22 @@ bzd_nodejs_test(
 )
 
 bzd_nodejs_test(
-    name = "record",
-    srcs = ["record_test.mjs"],
-    main = "record_test.mjs",
+    name = "plugin",
+    srcs = ["plugin_test.mjs"],
+    main = "plugin_test.mjs",
     deps = [
-        "//apps/artifacts/plugins/nodes:record",
+        "//apps/artifacts/backend:plugin_tester",
+        "//apps/artifacts/plugins/nodes:backend",
+        "//nodejs/core:exception",
+    ],
+)
+
+bzd_nodejs_test(
+    name = "records",
+    srcs = ["records_test.mjs"],
+    main = "records_test.mjs",
+    deps = [
+        "//apps/artifacts/plugins/nodes:records",
         "//nodejs/core:exception",
         "//nodejs/core/mock:filesystem",
     ],

@@ -25,6 +25,23 @@ bzd_nodejs_library(
     ],
 )
 
+bzd_nodejs_library(
+    name = "plugin_tester",
+    srcs = [
+        "endpoints_factory.mjs",
+        "plugin_tester.mjs",
+    ],
+    visibility = [
+        "//apps/artifacts/plugins:__subpackages__",
+    ],
+    deps = [
+        "//nodejs/core:exception",
+        "//nodejs/core:router",
+        "//nodejs/core/http/mock:server_context",
+        "//nodejs/core/services",
+    ],
+)
+
 bzd_nodejs_binary(
     name = "backend",
     srcs = [
