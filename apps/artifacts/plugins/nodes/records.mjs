@@ -30,6 +30,12 @@ export default class Record {
 		Exception.assert(this.options.recordMaxSize < this.options.maxSize);
 	}
 
+	/// The current version of the records, any records with a different version
+	/// will be discarded.
+	static get version() {
+		return 1;
+	}
+
 	async init(callback) {
 		await this.options.fs.mkdir(this.options.path);
 
@@ -60,7 +66,14 @@ export default class Record {
 
 	/// Get payload of a record into a list.
 	static payloadToList(payload) {
-		return JSON.parse("[" + payload + "[]]").slice(0, -1);
+		const data = JSON.parse(payload + "[]]}");
+		Exception.assert(
+			data.version == Record.version,
+			"Record is from an incompatible version: {} vs {}.",
+			data.version,
+			Record.version,
+		);
+		return data.records.slice(0, -1);
 	}
 
 	/// Register a new entry to the records.
@@ -76,6 +89,8 @@ export default class Record {
 		if (path === null) {
 			path = this.options.path + "/" + tick + ".rec";
 			await this.options.fs.touch(path);
+			// Add the header.
+			await this.options.fs.appendFile(path, '{"version":' + Record.version + ',"records":[');
 		}
 
 		// Create and insert the new entry.
