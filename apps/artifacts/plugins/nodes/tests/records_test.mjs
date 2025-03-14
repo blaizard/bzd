@@ -46,6 +46,7 @@ describe("Records", () => {
 			"records/6.rec": '{"version":0,"records":[[4,"abcde",7],',
 			"records/5.rec": '{"version":1,"records":[[5,"abcdef",8],',
 			"records/invalid.rec": '{"version":1,"records":[[3,"abcdejsjs",10],',
+			"records/8.rec": '{"version":1,"records":[[8,"abcdefg",9],',
 			"records/3.rec": '{"version":1,"records":[[3,"abcd",6],',
 		});
 		const records = new Records({ path: "records", fs: fs });
@@ -54,13 +55,14 @@ describe("Records", () => {
 			await records.init();
 
 			const files = await fs.readdir("records");
-			Exception.assertEqual(files, ["2.rec", "1.rec", "4.rec", "5.rec", "3.rec"]);
+			Exception.assertEqual(files, ["2.rec", "1.rec", "4.rec", "5.rec", "8.rec", "3.rec"]);
 			Exception.assertEqual(records.records, [
 				{ tick: 1, path: "records/1.rec", size: 34 },
 				{ tick: 2, path: "records/2.rec", size: 36 },
 				{ tick: 3, path: "records/3.rec", size: 37 },
 				{ tick: 4, path: "records/4.rec", size: 38 },
 				{ tick: 5, path: "records/5.rec", size: 39 },
+				{ tick: 8, path: "records/8.rec", size: 40 },
 			]);
 		});
 
@@ -71,18 +73,24 @@ describe("Records", () => {
 			Exception.assertEqual((await records.read(3).next()).value, [3, "abcd", 6]);
 			Exception.assertEqual((await records.read(4).next()).value, [4, "abcde", 7]);
 			Exception.assertEqual((await records.read(5).next()).value, [5, "abcdef", 8]);
-			Exception.assertEqual((await records.read(6).next()).value, null);
+			Exception.assertEqual((await records.read(6).next()).value, [8, "abcdefg", 9]);
+			Exception.assertEqual((await records.read(7).next()).value, [8, "abcdefg", 9]);
+			Exception.assertEqual((await records.read(8).next()).value, [8, "abcdefg", 9]);
+			Exception.assertEqual((await records.read(9).next()).value, null);
 		});
 
 		it("read all", async () => {
-			Exception.assertEqual(await readAll(records, -1), ["a", "abc", "abcd", "abcde", "abcdef"]);
-			Exception.assertEqual(await readAll(records, 0), ["a", "abc", "abcd", "abcde", "abcdef"]);
-			Exception.assertEqual(await readAll(records, 1), ["a", "abc", "abcd", "abcde", "abcdef"]);
-			Exception.assertEqual(await readAll(records, 2), ["abc", "abcd", "abcde", "abcdef"]);
-			Exception.assertEqual(await readAll(records, 3), ["abcd", "abcde", "abcdef"]);
-			Exception.assertEqual(await readAll(records, 4), ["abcde", "abcdef"]);
-			Exception.assertEqual(await readAll(records, 5), ["abcdef"]);
-			Exception.assertEqual(await readAll(records, 6), []);
+			Exception.assertEqual(await readAll(records, -1), ["a", "abc", "abcd", "abcde", "abcdef", "abcdefg"]);
+			Exception.assertEqual(await readAll(records, 0), ["a", "abc", "abcd", "abcde", "abcdef", "abcdefg"]);
+			Exception.assertEqual(await readAll(records, 1), ["a", "abc", "abcd", "abcde", "abcdef", "abcdefg"]);
+			Exception.assertEqual(await readAll(records, 2), ["abc", "abcd", "abcde", "abcdef", "abcdefg"]);
+			Exception.assertEqual(await readAll(records, 3), ["abcd", "abcde", "abcdef", "abcdefg"]);
+			Exception.assertEqual(await readAll(records, 4), ["abcde", "abcdef", "abcdefg"]);
+			Exception.assertEqual(await readAll(records, 5), ["abcdef", "abcdefg"]);
+			Exception.assertEqual(await readAll(records, 6), ["abcdefg"]);
+			Exception.assertEqual(await readAll(records, 7), ["abcdefg"]);
+			Exception.assertEqual(await readAll(records, 8), ["abcdefg"]);
+			Exception.assertEqual(await readAll(records, 9), []);
 			Exception.assertEqual(await readAll(records, 12), []);
 			Exception.assertEqual(await readAll(records, 327327), []);
 			Exception.assertEqual(await readAll(records, null), []);
@@ -95,11 +103,11 @@ describe("Records", () => {
 		});
 
 		it("read", async () => {
-			Exception.assertEqual((await records.read(5).next()).value, [5, "abcdef", 8]);
-			Exception.assertEqual((await records.read(6).next()).value, [6, "new0", 6]);
-			Exception.assertEqual((await records.read(7).next()).value, [7, "new1", 6]);
-			Exception.assertEqual((await records.read(15).next()).value, [15, "new9", 6]);
-			Exception.assertEqual((await records.read(16).next()).value, null);
+			Exception.assertEqual((await records.read(8).next()).value, [8, "abcdefg", 9]);
+			Exception.assertEqual((await records.read(9).next()).value, [9, "new0", 6]);
+			Exception.assertEqual((await records.read(10).next()).value, [10, "new1", 6]);
+			Exception.assertEqual((await records.read(18).next()).value, [18, "new9", 6]);
+			Exception.assertEqual((await records.read(19).next()).value, null);
 		});
 
 		it("sanitize", async () => {

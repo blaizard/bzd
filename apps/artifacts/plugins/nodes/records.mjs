@@ -117,13 +117,12 @@ export default class Record {
 	}
 
 	/// Add new payload to the record list.
-	async _getLastEntryForWriting(payloadSize) {
+	async _getLastEntryForWriting(tick, payloadSize) {
 		Exception.assert(this.records !== null, "Used before initialization.");
-		const tick = ++this.tick;
 		let entry = this._getLastEntryForReading();
 
 		// Check if the entry has still enough space.
-		if (entry && entry.size + payloadSize + 64 > this.options.recordMaxSize) {
+		if (entry && entry.size + payloadSize > this.options.recordMaxSize) {
 			entry = null;
 		}
 
@@ -132,7 +131,7 @@ export default class Record {
 			entry = await this._addRecordEntry(tick);
 		}
 
-		return [tick, entry];
+		return entry;
 	}
 
 	/// Write new records.
@@ -141,8 +140,9 @@ export default class Record {
 
 		// Get the record and write to it atomically.
 		await this.lock.acquire(async () => {
-			const [tick, entry] = await this._getLastEntryForWriting(serialized.length);
+			const tick = ++this.tick;
 			const content = "[" + tick + "," + serialized + "," + serialized.length + "],\n";
+			const entry = await this._getLastEntryForWriting(tick, content.length);
 			await this.options.fs.appendFile(entry.path, content);
 			entry.size += content.length;
 		});
@@ -162,35 +162,37 @@ export default class Record {
 			return null;
 		}
 
-		const maybeContent = await this.lock.acquire(async () => {
+		const maybeEntries = await this.lock.acquire(async () => {
 			// Look for the entry.
 			let index = this.records.findLastIndex((entry) => entry.tick <= tick);
 			if (index === -1) {
 				index = 0;
 			}
-			const entry = this.records[index] || null;
-			if (entry === null) {
-				return null;
+
+			for (; index < this.records.length; ++index) {
+				const entry = this.records[index];
+
+				// Read the file content.
+				const content = await this.options.fs.readFile(entry.path);
+				const payloads = Record.payloadToList(content);
+				const indexPayload = payloads.findIndex((payloadEntry) => payloadEntry[0] >= tick);
+
+				if (indexPayload !== -1) {
+					return payloads.slice(indexPayload);
+				}
+
+				// No match, we are either at the end of the records or we need to look for the next record.
 			}
-			// Read the file content.
-			return await this.options.fs.readFile(entry.path);
+
+			return null;
 		});
 
-		if (maybeContent === null) {
+		if (maybeEntries === null) {
 			return null;
 		}
 
-		const payloads = Record.payloadToList(maybeContent);
-		const index = payloads.findIndex((payloadEntry) => payloadEntry[0] >= tick);
-
-		// No match, we are at the end of the records.
-		if (index === -1) {
-			return null;
-		}
-
-		const entries = payloads.slice(index);
-		Exception.assert(entries.length > 0, "The output cannot be empty as we search in it just before.");
-		return entries;
+		Exception.assert(maybeEntries.length > 0, "The output cannot be empty as we search in it just before.");
+		return maybeEntries;
 	}
 
 	async *read(tick = 0) {
@@ -217,6 +219,13 @@ export default class Record {
 	}
 
 	/// Ensure that everything is in order and reset the tick count.
+	/// Also remove invalid records if any.
+	///
+	/// Things that are checked.
+	/// - All records files name have increasing ticks and are sorted.
+	/// - All records ticks are increasing.
+	/// - The size of each file doesn't exceed the maximum size (unless it contains a single record).
+	/// - The size of all records doesn't exceed the maximum size (unless all entries are single).
 	async _sanitize(callback) {
 		this.tick = null;
 		let totalSize = 0;
@@ -228,51 +237,51 @@ export default class Record {
 			Exception.assert(record.tick == maybeTick, "Path '{}' and tick '{}' do not match.", record.path, record.tick);
 			if (this.tick !== null) {
 				Exception.assert(
-					this.tick + 1 == record.tick,
-					"Tick of the next record must monotonic: expected {} but got {}",
-					this.tick + 1,
+					record.tick > this.tick,
+					"Tick of the next record must greater: expected > {} but got {}",
+					this.tick,
 					record.tick,
 				);
 			}
 
 			this.tick = record.tick - 1;
-			totalSize += record.size;
 
-			// Check the payloads
-			const content = await this.options.fs.readFile(record.path);
-			Exception.assert(
-				content.length == record.size,
-				"There is a mismatch between the payload size and the size recorded: {} vs {}.",
-				content.length,
-				record.size,
-			);
-			let entries = null;
 			try {
-				entries = Record.payloadToList(content);
+				// Check the payloads
+				const content = await this.options.fs.readFile(record.path);
+				Exception.assert(
+					content.length == record.size,
+					"There is a mismatch between the payload size and the size recorded: {} vs {}.",
+					content.length,
+					record.size,
+				);
+				const entries = Record.payloadToList(content);
+
+				for (const [t, entry, _] of entries) {
+					Exception.assert(t > this.tick, "Ticks are increasing, expected > {} but got {}", this.tick, t);
+					this.tick = t;
+					if (callback) {
+						callback(entry);
+					}
+				}
+
+				// Only check the size if there are more than 1 entry.
+				// With one entry, this condition can be false if the entry is larger than the actual max size.
+				if (entries.length > 1) {
+					Exception.assert(
+						record.size <= this.options.recordMaxSize,
+						"The record size is too large: {} vs {}",
+						record.size,
+						this.options.recordMaxSize,
+					);
+				}
+
+				// Update only if the record is successful.
+				allSingleEntries &= entries.length == 1;
+				totalSize += record.size;
 			} catch (e) {
 				Log.warning("Ignoring invalid record '{}': {}", record.path, e.message);
 				toDelete.push(record);
-				continue;
-			}
-
-			for (const [t, entry, _] of entries) {
-				Exception.assert(this.tick + 1 == t, "Thick are not monotonic, expected {} but got {}", this.tick + 1, t);
-				this.tick++;
-				if (callback) {
-					callback(entry);
-				}
-			}
-
-			// Only check the size if there are more than 1 entry.
-			// With one entry, this condition can be false if the entry is larger than the actual max size.
-			allSingleEntries &= entries.length == 1;
-			if (entries.length > 1) {
-				Exception.assert(
-					record.size <= this.options.recordMaxSize,
-					"The record size is too large: {} vs {}",
-					record.size,
-					this.options.recordMaxSize,
-				);
 			}
 		}
 
@@ -285,7 +294,7 @@ export default class Record {
 			);
 		}
 
-		// Delete invalid records
+		// Delete invalid records.
 		for (const record of toDelete) {
 			await this._delete(record);
 		}
