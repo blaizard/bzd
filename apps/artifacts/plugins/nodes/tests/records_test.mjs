@@ -43,6 +43,7 @@ describe("Records", () => {
 			"records/2.rec": '{"version":1,"records":[[2,"abc",5],',
 			"records/1.rec": '{"version":1,"records":[[1,"a",3],',
 			"records/4.rec": '{"version":1,"records":[[4,"abcde",7],',
+			"records/6.rec": '{"version":0,"records":[[4,"abcde",7],',
 			"records/5.rec": '{"version":1,"records":[[5,"abcdef",8],',
 			"records/invalid.rec": '{"version":1,"records":[[3,"abcdejsjs",10],',
 			"records/3.rec": '{"version":1,"records":[[3,"abcd",6],',

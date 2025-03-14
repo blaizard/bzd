@@ -204,11 +204,24 @@ export default class Record {
 		}
 	}
 
+	async _delete(record) {
+		for (let index = 0; index < this.records.length; ++index) {
+			if (this.records[index].path == record.path) {
+				Log.info("Deleting record '{}'.", record.path);
+				this.records.splice(index, 1);
+				await this.options.fs.unlink(record.path);
+				return;
+			}
+		}
+		Exception.unreachable("The record '{}' was not found.", record.path);
+	}
+
 	/// Ensure that everything is in order and reset the tick count.
 	async _sanitize(callback) {
 		this.tick = null;
 		let totalSize = 0;
 		let allSingleEntries = true;
+		let toDelete = [];
 		for (const record of this.records) {
 			const maybeTick = Record.getTickFromPath(record.path);
 			Exception.assert(maybeTick !== null, "Tick cannot be extracted from path '{}'.", record.path);
@@ -233,7 +246,15 @@ export default class Record {
 				content.length,
 				record.size,
 			);
-			const entries = Record.payloadToList(content);
+			let entries = null;
+			try {
+				entries = Record.payloadToList(content);
+			} catch (e) {
+				Log.warning("Ignoring invalid record '{}': {}", record.path, e.message);
+				toDelete.push(record);
+				continue;
+			}
+
 			for (const [t, entry, _] of entries) {
 				Exception.assert(this.tick + 1 == t, "Thick are not monotonic, expected {} but got {}", this.tick + 1, t);
 				this.tick++;
@@ -262,6 +283,11 @@ export default class Record {
 				totalSize,
 				this.options.maxSize,
 			);
+		}
+
+		// Delete invalid records
+		for (const record of toDelete) {
+			await this._delete(record);
 		}
 	}
 
