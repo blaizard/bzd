@@ -37,6 +37,8 @@ export class Node {
 	}
 
 	/// Insert new data at a given path.
+	///
+	/// \return A list of records corresponding to this change.
 	async insert(key, fragment, timestampDelta = 0) {
 		let fragments = Node.getAllPathAndValues(fragment, key);
 		fragments = this.handlers.processBeforeInsert(fragments);
@@ -83,5 +85,11 @@ export class Nodes {
 
 	async get(uid) {
 		return new Node(this.data, uid, this.handlers);
+	}
+
+	// Insert a record entry to the data.
+	async insertRecord(record) {
+		const [uid, key, value, timestamp] = record;
+		await this.data.insert(uid, [[key, value]], timestamp);
 	}
 }

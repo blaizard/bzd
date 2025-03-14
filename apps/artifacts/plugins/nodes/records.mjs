@@ -11,16 +11,17 @@ const Log = LogFactory("apps", "plugin", "nodes");
 /// The format of each entry is as follow:
 /// [tick, payload]
 export default class Record {
-	constructor(path, options = {}) {
+	constructor(options = {}) {
 		this.options = Object.assign(
 			{
+				path: null,
 				fs: FileSystem,
 				recordMaxSize: 1024 * 1024,
 				maxSize: 20 * 1024 * 1024,
 			},
 			options,
 		);
-		this.path = path;
+		Exception.assert(this.options.path !== null, "'path' must be set.");
 		this.lock = new Lock();
 		this.records = null;
 		// A monotonic counter that gets increased for each new payload.
@@ -30,13 +31,13 @@ export default class Record {
 	}
 
 	async init(callback) {
-		await this.options.fs.mkdir(this.path);
+		await this.options.fs.mkdir(this.options.path);
 
 		// Initialize the files map.
-		const files = await this.options.fs.readdir(this.path);
+		const files = await this.options.fs.readdir(this.options.path);
 		this.records = [];
 		for (const name of files) {
-			const path = this.path + "/" + name;
+			const path = this.options.path + "/" + name;
 			const maybeTick = Record.getTickFromPath(path);
 			// Invalid file pattern, try to delete the file.
 			if (maybeTick === null) {
@@ -73,7 +74,7 @@ export default class Record {
 
 		// Create the file if it does not exists.
 		if (path === null) {
-			path = this.path + "/" + tick + ".rec";
+			path = this.options.path + "/" + tick + ".rec";
 			await this.options.fs.touch(path);
 		}
 
@@ -107,7 +108,7 @@ export default class Record {
 		let entry = this._getLastEntryForReading();
 
 		// Check if the entry has still enough space.
-		if (entry && entry.size + payloadSize + 20 > this.options.recordMaxSize) {
+		if (entry && entry.size + payloadSize + 64 > this.options.recordMaxSize) {
 			entry = null;
 		}
 
@@ -126,7 +127,7 @@ export default class Record {
 		// Get the record and write to it atomically.
 		await this.lock.acquire(async () => {
 			const [tick, entry] = await this._getLastEntryForWriting(serialized.length);
-			const content = "[" + tick + "," + serialized + "],\n";
+			const content = "[" + tick + "," + serialized + "," + serialized.length + "],\n";
 			await this.options.fs.appendFile(entry.path, content);
 			entry.size += content.length;
 		});
@@ -192,6 +193,7 @@ export default class Record {
 	async _sanitize(callback) {
 		this.tick = null;
 		let totalSize = 0;
+		let allSingleEntries = true;
 		for (const record of this.records) {
 			const maybeTick = Record.getTickFromPath(record.path);
 			Exception.assert(maybeTick !== null, "Tick cannot be extracted from path '{}'.", record.path);
@@ -217,7 +219,7 @@ export default class Record {
 				record.size,
 			);
 			const entries = Record.payloadToList(content);
-			for (const [t, entry] of entries) {
+			for (const [t, entry, _] of entries) {
 				Exception.assert(this.tick + 1 == t, "Thick are not monotonic, expected {} but got {}", this.tick + 1, t);
 				this.tick++;
 				if (callback) {
@@ -227,6 +229,7 @@ export default class Record {
 
 			// Only check the size if there are more than 1 entry.
 			// With one entry, this condition can be false if the entry is larger than the actual max size.
+			allSingleEntries &= entries.length == 1;
 			if (entries.length > 1) {
 				Exception.assert(
 					record.size <= this.options.recordMaxSize,
@@ -237,12 +240,14 @@ export default class Record {
 			}
 		}
 
-		Exception.assert(
-			totalSize <= this.options.maxSize,
-			"The total record size is too large: {} vs {}",
-			totalSize,
-			this.options.maxSize,
-		);
+		if (!allSingleEntries) {
+			Exception.assert(
+				totalSize <= this.options.maxSize,
+				"The total record size is too large: {} vs {}",
+				totalSize,
+				this.options.maxSize,
+			);
+		}
 	}
 
 	/// Ensure that everything is in order and reset the tick count.

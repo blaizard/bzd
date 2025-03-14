@@ -7,7 +7,11 @@ const Exception = ExceptionFactory("test", "artifacts", "plugins", "nodes");
 describe("Nodes", () => {
 	describe("Plugin", () => {
 		const tester = new PluginTester();
-		tester.register("nodes", Plugin, {});
+		tester.register("nodes", Plugin, {
+			"nodes.records": {
+				path: "./records",
+			},
+		});
 
 		it("start", async () => {
 			await tester.start();
@@ -78,6 +82,29 @@ describe("Nodes", () => {
 				/*throwOnFailure*/ false,
 			);
 			Exception.assert(response.status != 200);
+		});
+
+		it("stop", async () => {
+			await tester.stop();
+		});
+	});
+
+	describe("Plugin reload a second time", () => {
+		const tester = new PluginTester();
+		tester.register("nodes", Plugin, {
+			"nodes.records": {
+				path: "./records",
+			},
+		});
+
+		it("start", async () => {
+			await tester.start();
+		});
+
+		it("read previous entry", async () => {
+			const response = await tester.send("nodes", "get", "/uid01/hello/string");
+			Exception.assertEqual(response.status, 200);
+			Exception.assertEqual(response.data, { data: "hello" });
 		});
 
 		it("stop", async () => {

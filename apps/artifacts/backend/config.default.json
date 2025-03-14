@@ -51,9 +51,15 @@
                     "toString": "[{level}] [{name}] [{source}] {message}"
                 }
             },
+            "nodes.records": {
+                "path": "./nodes.records"
+            },
             "type": "nodes"
         },
         "nodes_private": {
+            "nodes.records": {
+                "path": "./nodes_private.records"
+            },
             "private": true,
             "type": "nodes"
         }

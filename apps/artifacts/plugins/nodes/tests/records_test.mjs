@@ -15,7 +15,7 @@ const readAll = async (record, tick) => {
 describe("Records", () => {
 	describe("Empty", () => {
 		const fs = new Filesystem();
-		const records = new Records("records", { fs: fs });
+		const records = new Records({ path: "records", fs: fs });
 
 		it("init", async () => {
 			await records.init();
@@ -40,14 +40,14 @@ describe("Records", () => {
 
 	describe("Existing", () => {
 		const fs = new Filesystem({
-			"records/2.rec": '[2,"abc"],',
-			"records/1.rec": '[1,"a"],',
-			"records/4.rec": '[4,"abcde"],',
-			"records/5.rec": '[5,"abcdef"],',
-			"records/invalid.rec": '[3,"abcdejsjs"],',
-			"records/3.rec": '[3,"abcd"],',
+			"records/2.rec": '[2,"abc",5],',
+			"records/1.rec": '[1,"a",3],',
+			"records/4.rec": '[4,"abcde",7],',
+			"records/5.rec": '[5,"abcdef",8],',
+			"records/invalid.rec": '[3,"abcdejsjs",10],',
+			"records/3.rec": '[3,"abcd",6],',
 		});
-		const records = new Records("records", { fs: fs });
+		const records = new Records({ path: "records", fs: fs });
 
 		it("init", async () => {
 			await records.init();
@@ -55,21 +55,21 @@ describe("Records", () => {
 			const files = await fs.readdir("records");
 			Exception.assertEqual(files, ["2.rec", "1.rec", "4.rec", "5.rec", "3.rec"]);
 			Exception.assertEqual(records.records, [
-				{ tick: 1, path: "records/1.rec", size: 8 },
-				{ tick: 2, path: "records/2.rec", size: 10 },
-				{ tick: 3, path: "records/3.rec", size: 11 },
-				{ tick: 4, path: "records/4.rec", size: 12 },
-				{ tick: 5, path: "records/5.rec", size: 13 },
+				{ tick: 1, path: "records/1.rec", size: 10 },
+				{ tick: 2, path: "records/2.rec", size: 12 },
+				{ tick: 3, path: "records/3.rec", size: 13 },
+				{ tick: 4, path: "records/4.rec", size: 14 },
+				{ tick: 5, path: "records/5.rec", size: 15 },
 			]);
 		});
 
 		it("read", async () => {
-			Exception.assertEqual((await records.read().next()).value, [1, "a"]);
-			Exception.assertEqual((await records.read(1).next()).value, [1, "a"]);
-			Exception.assertEqual((await records.read(2).next()).value, [2, "abc"]);
-			Exception.assertEqual((await records.read(3).next()).value, [3, "abcd"]);
-			Exception.assertEqual((await records.read(4).next()).value, [4, "abcde"]);
-			Exception.assertEqual((await records.read(5).next()).value, [5, "abcdef"]);
+			Exception.assertEqual((await records.read().next()).value, [1, "a", 3]);
+			Exception.assertEqual((await records.read(1).next()).value, [1, "a", 3]);
+			Exception.assertEqual((await records.read(2).next()).value, [2, "abc", 5]);
+			Exception.assertEqual((await records.read(3).next()).value, [3, "abcd", 6]);
+			Exception.assertEqual((await records.read(4).next()).value, [4, "abcde", 7]);
+			Exception.assertEqual((await records.read(5).next()).value, [5, "abcdef", 8]);
 			Exception.assertEqual((await records.read(6).next()).value, null);
 		});
 
@@ -94,10 +94,10 @@ describe("Records", () => {
 		});
 
 		it("read", async () => {
-			Exception.assertEqual((await records.read(5).next()).value, [5, "abcdef"]);
-			Exception.assertEqual((await records.read(6).next()).value, [6, "new0"]);
-			Exception.assertEqual((await records.read(7).next()).value, [7, "new1"]);
-			Exception.assertEqual((await records.read(15).next()).value, [15, "new9"]);
+			Exception.assertEqual((await records.read(5).next()).value, [5, "abcdef", 8]);
+			Exception.assertEqual((await records.read(6).next()).value, [6, "new0", 6]);
+			Exception.assertEqual((await records.read(7).next()).value, [7, "new1", 6]);
+			Exception.assertEqual((await records.read(15).next()).value, [15, "new9", 6]);
 			Exception.assertEqual((await records.read(16).next()).value, null);
 		});
 
@@ -108,7 +108,8 @@ describe("Records", () => {
 
 	describe("Stress", () => {
 		const fs = new Filesystem();
-		const records = new Records("records", {
+		const records = new Records({
+			path: "records",
 			fs: fs,
 			recordMaxSize: 100,
 		});
@@ -144,7 +145,8 @@ describe("Records", () => {
 
 	describe("paylaod larger than recordMaxSize", () => {
 		const fs = new Filesystem();
-		const records = new Records("records", {
+		const records = new Records({
+			path: "records",
 			fs: fs,
 			recordMaxSize: 10,
 		});
@@ -166,7 +168,8 @@ describe("Records", () => {
 
 	describe("MaxSize restriction", () => {
 		const fs = new Filesystem();
-		const records = new Records("records", {
+		const records = new Records({
+			path: "records",
 			fs: fs,
 			recordMaxSize: 100,
 			maxSize: 300,
@@ -178,7 +181,7 @@ describe("Records", () => {
 
 		it("write", async () => {
 			for (let i = 0; i < 100; ++i) {
-				await records.write([i, "ababdjksdskhfjhfjjksahdjkdgdgdgshgdahdsdklsjksjkdsashdashkdsjhdhksjhdkjhasjkdhshgds"]);
+				await records.write([i, "x" * 40]);
 			}
 		}).timeout(10000);
 
@@ -188,7 +191,7 @@ describe("Records", () => {
 
 		it("check deleted records", async () => {
 			const files = await fs.readdir("records");
-			Exception.assertEqual(files.length, 3);
+			Exception.assertEqual(files.length, 6);
 		});
 	});
 });

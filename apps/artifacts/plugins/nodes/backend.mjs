@@ -81,7 +81,7 @@ export default class Plugin extends PluginBase {
 	constructor(volume, options, provider, endpoints) {
 		super(volume, options, provider, endpoints);
 		this.nodes = null;
-		this.records = new Records("records." + volume);
+		this.records = new Records(options["nodes.records"] || {});
 		provider.addStartProcess(async () => {
 			this.nodes = new Nodes(options["nodes.handlers"] || {});
 			for (const [uid, data] of Object.entries(options["nodes.data"] || {})) {
@@ -91,8 +91,11 @@ export default class Plugin extends PluginBase {
 
 			this.setStorage(await StorageBzd.make(this.nodes));
 
-			await this.records.init((payload) => {
-				console.log(payload);
+			await this.records.init(async (records) => {
+				// Restore previous records.
+				for (const record of records) {
+					await this.nodes.insertRecord(record);
+				}
 			});
 		});
 
@@ -175,6 +178,42 @@ export default class Plugin extends PluginBase {
 			context.sendJson(output);
 		});
 
+		/// Get the records.
+		///
+		/// GET <endpoint>/@records?tick=10
+		/// ```{
+		///    timestamp: xxx,   # node current timestamp for reference.
+		///    records: [...],   # current records from the specified tick.
+		///    next: xxxx        # the tick to provide for the next records.
+		///    end : true|false  # if it contains all remaining records or not.
+		/// }```
+		endpoints.register("get", "/@records", async (context) => {
+			let tick = context.getQuery("tick", 0, parseInt);
+			let maxSize = context.getQuery("size", 1024 * 1024, parseInt);
+
+			let records = [];
+			let currentTick = null;
+			let record = null;
+			let end = true;
+			for await ([currentTick, record, size] of this.records.read(tick)) {
+				records.push(record);
+				maxSize -= size;
+				if (maxSize <= 0) {
+					end = false;
+					break;
+				}
+			}
+
+			const output = {
+				timestamp: Date.now(),
+				records: records,
+				next: currentTick === null ? tick : currentTick + 1,
+				end: end,
+			};
+			context.setStatus(200);
+			context.sendJson(output);
+		});
+
 		/// Insert one or multiple entries.
 		///
 		/// POST <endpoint>/<uid>/<path:*>
@@ -200,7 +239,7 @@ export default class Plugin extends PluginBase {
 			const node = await this.nodes.get(context.getParam("uid"));
 			const key = Plugin.paramPathToKey(context.getParam("path"));
 
-			let written = [];
+			let records = [];
 			if (inputs.bulk) {
 				Exception.assertPrecondition(
 					typeof inputs.data.timestamp == "number",
@@ -214,14 +253,14 @@ export default class Plugin extends PluginBase {
 						value,
 						timestamp,
 					);
-					written = written.concat(await node.insert(key, value, timestamp - inputs.data.timestamp));
+					records = records.concat(await node.insert(key, value, timestamp - inputs.data.timestamp));
 				}
 			} else {
-				written = await node.insert(key, inputs.data);
+				records = await node.insert(key, inputs.data);
 			}
 
 			// Save the data written on disk.
-			await this.records.write(written);
+			await this.records.write(records);
 
 			context.sendStatus(200);
 		});

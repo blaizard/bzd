@@ -136,7 +136,6 @@ export default class Data {
 				keys = new Set(include.map((relative) => KeyMapping.keyToInternal([...key, ...relative])));
 			} else {
 				keys = await this.getKeys(uid, key, children);
-				console.log("keys", keys, key);
 			}
 
 			if (keys !== null) {
@@ -205,7 +204,8 @@ export default class Data {
 			}
 		}
 
-		return fragments.map(([key, value, _]) => [timestamp, uid, key, value]);
+		// Generate records.
+		return fragments.map(([key, value, _]) => [uid, key, value, timestamp]);
 	}
 
 	/// Get direct children of a given key.
