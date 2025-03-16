@@ -203,4 +203,40 @@ describe("Records", () => {
 			Exception.assert(files.length <= 6);
 		});
 	});
+
+	describe("Multiple storages", () => {
+		const fs = new Filesystem();
+		const records = new Records({
+			path: "records",
+			fs: fs,
+			storages: [0, 1, 2],
+		});
+
+		it("init", async () => {
+			await records.init();
+		});
+
+		let all = [];
+		it("write randomly", async () => {
+			for (let i = 0; i < 100; ++i) {
+				await records.write(i, Math.floor(Math.random() * 3));
+				all.push(i);
+			}
+		}).timeout(10000);
+
+		it("read all", async () => {
+			Exception.assertEqual(await readAll(records, 0), all);
+		});
+
+		it("read one by one", async () => {
+			Exception.assertEqual((await records.read(8).next()).value, [8, 7, 1]);
+			Exception.assertEqual((await records.read(42).next()).value, [42, 41, 2]);
+			Exception.assertEqual((await records.read(100).next()).value, [100, 99, 2]);
+			Exception.assertEqual((await records.read(101).next()).value, null);
+		});
+
+		it("sanitize", async () => {
+			await records.sanitize();
+		});
+	});
 });

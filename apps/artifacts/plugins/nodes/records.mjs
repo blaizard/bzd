@@ -18,13 +18,15 @@ export default class Record {
 				fs: FileSystem,
 				recordMaxSize: 1024 * 1024,
 				maxSize: 20 * 1024 * 1024,
+				storages: [Record.defaultStorageName],
 			},
 			options,
 		);
 		Exception.assert(this.options.path !== null, "'path' must be set.");
 		this.storages = {};
-		this.makeStorage(Record.defaultStorageName);
-		// A monotonic counter that gets increased for each new payload.
+		for (const storageName of this.options.storages) {
+			this.makeStorage(storageName);
+		}
 		this.tick = 0;
 
 		Exception.assert(this.options.recordMaxSize < this.options.maxSize);
@@ -72,7 +74,7 @@ export default class Record {
 			}
 		}
 
-		this.tick = await this.sanitize(callback);
+		this.tick = Math.max(this.tick, await this.sanitize(callback));
 	}
 
 	/// Get the tick from a path.
@@ -228,6 +230,14 @@ export default class Record {
 		}
 	}
 
+	/// Generator to read all new values starting from a specific tick.
+	///
+	/// \param tick The initial tick.
+	///
+	/// \return A tuple consisting of:
+	///         1. The next tick to get the new value.
+	///         2. The value.
+	///         3. The approximated size of the serialized payload.
 	async *read(tick = 0) {
 		// Load the first value of all records and filter the ones without values.
 		let iterators = Object.values(this.storages).map((storage) => ({
@@ -243,7 +253,10 @@ export default class Record {
 
 		// Helper.
 		const getMinIndex = () =>
-			iterators.reduce((minIndex, it, i, array) => (it.result.value < array[minIndex].result.value ? i : minIndex), 0);
+			iterators.reduce(
+				(minIndex, it, i, array) => (it.result.value[1] < array[minIndex].result.value[1] ? i : minIndex),
+				0,
+			);
 
 		while (iterators.length > 0) {
 			const index = getMinIndex();
@@ -356,10 +369,10 @@ export default class Record {
 
 	/// Ensure that everything is in order and reset the tick count.
 	async sanitize(callback) {
-		// TODO: loop through all storages.
-		const storage = this.storages[Record.defaultStorageName];
-		return await storage.lock.acquire(async () => {
-			return await this._sanitize(storage, callback);
-		});
+		for (const storage of Object.values(this.storages)) {
+			return await storage.lock.acquire(async () => {
+				return await this._sanitize(storage, callback);
+			});
+		}
 	}
 }
