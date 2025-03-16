@@ -22,12 +22,22 @@ export default class Record {
 			options,
 		);
 		Exception.assert(this.options.path !== null, "'path' must be set.");
-		this.lock = new Lock();
-		this.records = null;
+		this.storages = {};
+		this.makeStorage(Record.defaultStorageName);
 		// A monotonic counter that gets increased for each new payload.
 		this.tick = 0;
 
 		Exception.assert(this.options.recordMaxSize < this.options.maxSize);
+	}
+
+	/// Create a new record storage.
+	makeStorage(name) {
+		Exception.assert(!(name in this.storages), "Storage named '{}' already exists.", name);
+		this.storages[name] = {
+			path: this.options.path + "/" + name,
+			lock: new Lock(),
+			records: null,
+		};
 	}
 
 	/// The current version of the records, any records with a different version
@@ -36,25 +46,33 @@ export default class Record {
 		return 1;
 	}
 
-	async init(callback) {
-		await this.options.fs.mkdir(this.options.path);
+	/// The name of the default storage.
+	static get defaultStorageName() {
+		return "main";
+	}
 
-		// Initialize the files map.
-		const files = await this.options.fs.readdir(this.options.path);
-		this.records = [];
-		for (const name of files) {
-			const path = this.options.path + "/" + name;
-			const maybeTick = Record.getTickFromPath(path);
-			// Invalid file pattern, try to delete the file.
-			if (maybeTick === null) {
-				Log.error("Invalid record, doesn't match the file pattern: '{}', deleting.", path);
-				await this.options.fs.unlink(path);
-				continue;
+	async init(callback) {
+		// Initialize all storages.
+		for (const storage of Object.values(this.storages)) {
+			await this.options.fs.mkdir(storage.path);
+
+			// Initialize the files map.
+			const files = await this.options.fs.readdir(storage.path);
+			storage.records = [];
+			for (const name of files) {
+				const path = storage.path + "/" + name;
+				const maybeTick = Record.getTickFromPath(path);
+				// Invalid file pattern, try to delete the file.
+				if (maybeTick === null) {
+					Log.error("Invalid record, doesn't match the file pattern: '{}', deleting.", path);
+					await this.options.fs.unlink(path);
+					continue;
+				}
+				await this._addRecordEntry(storage, maybeTick, path);
 			}
-			await this._addRecordEntry(maybeTick, path);
 		}
 
-		await this.sanitize(callback);
+		this.tick = await this.sanitize(callback);
 	}
 
 	/// Get the tick from a path.
@@ -78,16 +96,17 @@ export default class Record {
 
 	/// Register a new entry to the records.
 	///
+	/// \param storage The storage to add the entry to.
 	/// \param tick The tick related to the file to be created.
 	/// \param path The path of the existing record if any, null otherwise.
-	async _addRecordEntry(tick, path = null) {
+	async _addRecordEntry(storage, tick, path = null) {
 		// Look for the index that shall be just before the one to insert.
-		const index = this.records.findLastIndex((entry) => entry.tick <= tick);
-		Exception.assert(index === -1 || this.records[index].tick < tick, "2 ticks cannot have the same value.");
+		const index = storage.records.findLastIndex((entry) => entry.tick <= tick);
+		Exception.assert(index === -1 || storage.records[index].tick < tick, "2 ticks cannot have the same value.");
 
 		// Create the file if it does not exists.
 		if (path === null) {
-			path = this.options.path + "/" + tick + ".rec";
+			path = storage.path + "/" + tick + ".rec";
 			await this.options.fs.touch(path);
 			// Add the header.
 			await this.options.fs.appendFile(path, '{"version":' + Record.version + ',"records":[');
@@ -99,12 +118,12 @@ export default class Record {
 			path: path,
 			size: (await this.options.fs.stat(path)).size,
 		};
-		this.records.splice(index + 1, 0, entry);
+		storage.records.splice(index + 1, 0, entry);
 
 		// Cleanup previous records if needed.
-		let size = this.records.reduce((total, record) => record.size + total, 0);
-		while (this.records.length && size > this.options.maxSize - this.options.recordMaxSize) {
-			const entry = this.records.shift();
+		let size = storage.records.reduce((total, record) => record.size + total, 0);
+		while (storage.records.length && size > this.options.maxSize - this.options.recordMaxSize) {
+			const entry = storage.records.shift();
 			await this.options.fs.unlink(entry.path);
 			size -= entry.size;
 		}
@@ -112,14 +131,14 @@ export default class Record {
 		return entry;
 	}
 
-	_getLastEntryForReading() {
-		return this.records[this.records.length - 1] || null;
+	_getLastEntryForReading(storage) {
+		return storage.records[storage.records.length - 1] || null;
 	}
 
 	/// Add new payload to the record list.
-	async _getLastEntryForWriting(tick, payloadSize) {
-		Exception.assert(this.records !== null, "Used before initialization.");
-		let entry = this._getLastEntryForReading();
+	async _getLastEntryForWriting(storage, tick, payloadSize) {
+		Exception.assert(storage.records !== null, "Used before initialization.");
+		let entry = this._getLastEntryForReading(storage);
 
 		// Check if the entry has still enough space.
 		if (entry && entry.size + payloadSize > this.options.recordMaxSize) {
@@ -128,21 +147,23 @@ export default class Record {
 
 		// There is no available entry, create a new one.
 		if (entry === null) {
-			entry = await this._addRecordEntry(tick);
+			entry = await this._addRecordEntry(storage, tick);
 		}
 
 		return entry;
 	}
 
 	/// Write new records.
-	async write(payload) {
+	async write(payload, storageName = Record.defaultStorageName) {
 		const serialized = JSON.stringify(payload);
+		Exception.assert(storageName in this.storages, "Invalid storage requested: '{}'.", storageName);
+		const storage = this.storages[storageName];
 
 		// Get the record and write to it atomically.
-		await this.lock.acquire(async () => {
+		await storage.lock.acquire(async () => {
 			const tick = ++this.tick;
 			const content = "[" + tick + "," + serialized + "," + serialized.length + "],\n";
-			const entry = await this._getLastEntryForWriting(tick, content.length);
+			const entry = await this._getLastEntryForWriting(storage, tick, content.length);
 			await this.options.fs.appendFile(entry.path, content);
 			entry.size += content.length;
 		});
@@ -154,23 +175,23 @@ export default class Record {
 	///
 	/// \return A tuple, containing the list of payload previously stored, and the next tick.
 	///         In case there are no new payloads, null is returned.
-	async _read(tick) {
-		Exception.assert(this.records !== null, "Used before initialization.");
+	async _read(storage, tick) {
+		Exception.assert(storage.records !== null, "Used before initialization.");
 
 		/// If the tick is null, return null, this is to ease looping over _read.
 		if (tick === null) {
 			return null;
 		}
 
-		const maybeEntries = await this.lock.acquire(async () => {
+		const maybeEntries = await storage.lock.acquire(async () => {
 			// Look for the entry.
-			let index = this.records.findLastIndex((entry) => entry.tick <= tick);
+			let index = storage.records.findLastIndex((entry) => entry.tick <= tick);
 			if (index === -1) {
 				index = 0;
 			}
 
-			for (; index < this.records.length; ++index) {
-				const entry = this.records[index];
+			for (; index < storage.records.length; ++index) {
+				const entry = storage.records[index];
 
 				// Read the file content.
 				const content = await this.options.fs.readFile(entry.path);
@@ -197,7 +218,9 @@ export default class Record {
 
 	async *read(tick = 0) {
 		let result = null;
-		while ((result = await this._read(tick))) {
+		// TODO: loop through all storages.
+		const storage = this.storages[Record.defaultStorageName];
+		while ((result = await this._read(storage, tick))) {
 			let payload = null;
 			for (payload of result) {
 				yield payload;
@@ -206,11 +229,11 @@ export default class Record {
 		}
 	}
 
-	async _delete(record) {
-		for (let index = 0; index < this.records.length; ++index) {
-			if (this.records[index].path == record.path) {
+	async _delete(storage, record) {
+		for (let index = 0; index < storage.records.length; ++index) {
+			if (storage.records[index].path == record.path) {
 				Log.info("Deleting record '{}'.", record.path);
-				this.records.splice(index, 1);
+				storage.records.splice(index, 1);
 				await this.options.fs.unlink(record.path);
 				return;
 			}
@@ -226,25 +249,25 @@ export default class Record {
 	/// - All records ticks are increasing.
 	/// - The size of each file doesn't exceed the maximum size (unless it contains a single record).
 	/// - The size of all records doesn't exceed the maximum size (unless all entries are single).
-	async _sanitize(callback) {
-		this.tick = null;
+	async _sanitize(storage, callback) {
+		let tick = null;
 		let totalSize = 0;
 		let allSingleEntries = true;
 		let toDelete = [];
-		for (const record of this.records) {
+		for (const record of storage.records) {
 			const maybeTick = Record.getTickFromPath(record.path);
 			Exception.assert(maybeTick !== null, "Tick cannot be extracted from path '{}'.", record.path);
 			Exception.assert(record.tick == maybeTick, "Path '{}' and tick '{}' do not match.", record.path, record.tick);
-			if (this.tick !== null) {
+			if (tick !== null) {
 				Exception.assert(
-					record.tick > this.tick,
+					record.tick > tick,
 					"Tick of the next record must greater: expected > {} but got {}",
-					this.tick,
+					tick,
 					record.tick,
 				);
 			}
 
-			this.tick = record.tick - 1;
+			tick = record.tick - 1;
 
 			try {
 				// Check the payloads
@@ -258,8 +281,8 @@ export default class Record {
 				const entries = Record.payloadToList(content);
 
 				for (const [t, entry, _] of entries) {
-					Exception.assert(t > this.tick, "Ticks are increasing, expected > {} but got {}", this.tick, t);
-					this.tick = t;
+					Exception.assert(t > tick, "Ticks are increasing, expected > {} but got {}", tick, t);
+					tick = t;
 					if (callback) {
 						callback(entry);
 					}
@@ -296,14 +319,18 @@ export default class Record {
 
 		// Delete invalid records.
 		for (const record of toDelete) {
-			await this._delete(record);
+			await this._delete(storage, record);
 		}
+
+		return tick;
 	}
 
 	/// Ensure that everything is in order and reset the tick count.
 	async sanitize(callback) {
-		await this.lock.acquire(async () => {
-			await this._sanitize(callback);
+		// TODO: loop through all storages.
+		const storage = this.storages[Record.defaultStorageName];
+		return await storage.lock.acquire(async () => {
+			return await this._sanitize(storage, callback);
 		});
 	}
 }

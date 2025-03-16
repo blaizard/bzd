@@ -40,29 +40,29 @@ describe("Records", () => {
 
 	describe("Existing", () => {
 		const fs = new Filesystem({
-			"records/2.rec": '{"version":1,"records":[[2,"abc",5],',
-			"records/1.rec": '{"version":1,"records":[[1,"a",3],',
-			"records/4.rec": '{"version":1,"records":[[4,"abcde",7],',
-			"records/6.rec": '{"version":0,"records":[[4,"abcde",7],',
-			"records/5.rec": '{"version":1,"records":[[5,"abcdef",8],',
-			"records/invalid.rec": '{"version":1,"records":[[3,"abcdejsjs",10],',
-			"records/8.rec": '{"version":1,"records":[[8,"abcdefg",9],',
-			"records/3.rec": '{"version":1,"records":[[3,"abcd",6],',
+			"records/main/2.rec": '{"version":1,"records":[[2,"abc",5],',
+			"records/main/1.rec": '{"version":1,"records":[[1,"a",3],',
+			"records/main/4.rec": '{"version":1,"records":[[4,"abcde",7],',
+			"records/main/6.rec": '{"version":0,"records":[[4,"abcde",7],',
+			"records/main/5.rec": '{"version":1,"records":[[5,"abcdef",8],',
+			"records/main/invalid.rec": '{"version":1,"records":[[3,"abcdejsjs",10],',
+			"records/main/8.rec": '{"version":1,"records":[[8,"abcdefg",9],',
+			"records/main/3.rec": '{"version":1,"records":[[3,"abcd",6],',
 		});
 		const records = new Records({ path: "records", fs: fs });
 
 		it("init", async () => {
 			await records.init();
 
-			const files = await fs.readdir("records");
+			const files = await fs.readdir("records/main");
 			Exception.assertEqual(files, ["2.rec", "1.rec", "4.rec", "5.rec", "8.rec", "3.rec"]);
-			Exception.assertEqual(records.records, [
-				{ tick: 1, path: "records/1.rec", size: 34 },
-				{ tick: 2, path: "records/2.rec", size: 36 },
-				{ tick: 3, path: "records/3.rec", size: 37 },
-				{ tick: 4, path: "records/4.rec", size: 38 },
-				{ tick: 5, path: "records/5.rec", size: 39 },
-				{ tick: 8, path: "records/8.rec", size: 40 },
+			Exception.assertEqual(records.storages["main"].records, [
+				{ tick: 1, path: "records/main/1.rec", size: 34 },
+				{ tick: 2, path: "records/main/2.rec", size: 36 },
+				{ tick: 3, path: "records/main/3.rec", size: 37 },
+				{ tick: 4, path: "records/main/4.rec", size: 38 },
+				{ tick: 5, path: "records/main/5.rec", size: 39 },
+				{ tick: 8, path: "records/main/8.rec", size: 40 },
 			]);
 		});
 
