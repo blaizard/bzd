@@ -195,6 +195,7 @@ export default class Plugin extends PluginBase {
 			let currentTick = null;
 			let record = null;
 			let end = true;
+			let size = null;
 			for await ([currentTick, record, size] of this.records.read(tick)) {
 				records.push(record);
 				maxSize -= size;
