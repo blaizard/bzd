@@ -84,6 +84,14 @@ describe("Nodes", () => {
 			Exception.assert(response.status != 200);
 		});
 
+		it("read @records", async () => {
+			const response = await tester.send("nodes", "get", "/@records");
+			Exception.assertEqual(response.status, 200);
+			Exception.assertEqual(response.data.records.length, 2);
+			Exception.assertEqual(response.data.end, true);
+			Exception.assertEqual(response.data.next, 3);
+		});
+
 		it("stop", async () => {
 			await tester.stop();
 		});
