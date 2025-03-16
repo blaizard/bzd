@@ -169,13 +169,14 @@ export default class Record {
 		});
 	}
 
-	/// Read a record from a tick to its end.
+	/// Read a record from a specific storage at a given tick to its end.
 	///
+	/// \param storage The storage to read from.
 	/// \param tick Initial tick.
 	///
 	/// \return A tuple, containing the list of payload previously stored, and the next tick.
 	///         In case there are no new payloads, null is returned.
-	async _read(storage, tick) {
+	async _readStorageByChunk(storage, tick) {
 		Exception.assert(storage.records !== null, "Used before initialization.");
 
 		/// If the tick is null, return null, this is to ease looping over _read.
@@ -216,16 +217,44 @@ export default class Record {
 		return maybeEntries;
 	}
 
-	async *read(tick = 0) {
+	async *_readStorage(storage, tick = 0) {
 		let result = null;
-		// TODO: loop through all storages.
-		const storage = this.storages[Record.defaultStorageName];
-		while ((result = await this._read(storage, tick))) {
+		while ((result = await this._readStorageByChunk(storage, tick))) {
 			let payload = null;
 			for (payload of result) {
 				yield payload;
 			}
 			tick = payload[0] + 1;
+		}
+	}
+
+	async *read(tick = 0) {
+		// Load the first value of all records and filter the ones without values.
+		let iterators = Object.values(this.storages).map((storage) => ({
+			gen: this._readStorage(storage, tick),
+			result: null,
+		}));
+		await Promise.all(
+			iterators.map(async (it) => {
+				it.result = await it.gen.next();
+			}),
+		);
+		iterators = iterators.filter((it) => !it.result.done);
+
+		// Helper.
+		const getMinIndex = () =>
+			iterators.reduce((minIndex, it, i, array) => (it.result.value < array[minIndex].result.value ? i : minIndex), 0);
+
+		while (iterators.length > 0) {
+			const index = getMinIndex();
+
+			yield iterators[index].result.value;
+
+			// Get the next value.
+			iterators[index].result = await iterators[index].gen.next();
+			if (iterators[index].result.done) {
+				iterators.splice(index, 1);
+			}
 		}
 	}
 
