@@ -123,9 +123,15 @@ export default class Plugin extends PluginBase {
 		//  ...
 		for (const [storageName, data] of Object.entries(optionsRemotes)) {
 			const volume = data.volume || storageName;
-			const client = new HttpClientFactory(data.host + "/x/" + volume, {
+			let optionsClient = {
 				expect: "json",
-			});
+			};
+			if (data.token) {
+				optionsClient["query"] = {
+					t: data.token,
+				};
+			}
+			const client = new HttpClientFactory(data.host + "/x/" + volume, optionsClient);
 
 			provider.addTimeTriggeredProcess("remote." + storageName, this.fetchFromRemote(client, storageName), {
 				periodS: 60,

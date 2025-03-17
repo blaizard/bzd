@@ -11,6 +11,7 @@ bzd_nodejs_library(
         "//nodejs/core:crypto",
         "//nodejs/core:exception",
         "//nodejs/core:log",
+        "//nodejs/utils:object",
     ],
 )
 

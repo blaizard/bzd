@@ -1,6 +1,7 @@
 import { base64Encode } from "../crypto.mjs";
 import ExceptionFactory from "../exception.mjs";
 import LogFactory from "../log.mjs";
+import { deepMerge } from "#bzd/nodejs/utils/object.mjs";
 
 const Exception = ExceptionFactory("http", "client");
 const Log = LogFactory("http", "client");
@@ -17,7 +18,7 @@ export class HttpClientFactory {
 	async request(endpoint, options = {}) {
 		const baseOptions =
 			typeof this.optionsOrCallback == "function" ? await this.optionsOrCallback(options.args) : this.optionsOrCallback;
-		return await HttpClient.request(this.url + endpoint, Object.assign({}, baseOptions, options));
+		return await HttpClient.request(this.url + endpoint, deepMerge({}, baseOptions, options));
 	}
 
 	async get(endpoint, options = {}) {

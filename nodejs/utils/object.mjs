@@ -23,3 +23,36 @@ export function objectDifference(object1, object2) {
 	}
 	return difference;
 }
+
+/// Simple object check.
+///
+/// \param item The variable to be checked.
+///
+/// \return true if this is an object, false otherwise.
+export function isObject(item) {
+	return item && typeof item === "object" && !Array.isArray(item);
+}
+
+/// Deep merge two or more objects.
+///
+/// \param target
+/// \param ...sources
+///
+/// \return The merged object.
+export function deepMerge(target, ...sources) {
+	if (!sources.length) return target;
+	const source = sources.shift();
+
+	if (isObject(target) && isObject(source)) {
+		for (const key in source) {
+			if (isObject(source[key])) {
+				if (!target[key]) Object.assign(target, { [key]: {} });
+				deepMerge(target[key], source[key]);
+			} else {
+				Object.assign(target, { [key]: source[key] });
+			}
+		}
+	}
+
+	return deepMerge(target, ...sources);
+}
