@@ -88,8 +88,10 @@ export class Nodes {
 	}
 
 	// Insert a record entry to the data.
-	async insertRecord(record) {
-		const [uid, key, value, timestamp] = record;
-		await this.data.insert(uid, [[key, value]], timestamp);
+	async insertRecords(records) {
+		for (const record of records) {
+			const [uid, key, value, timestamp] = record;
+			await this.data.insert(uid, [[key, value]], timestamp);
+		}
 	}
 }

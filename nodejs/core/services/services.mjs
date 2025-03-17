@@ -87,7 +87,12 @@ export default class Services {
 			Log.debug("Running '{}.{}'...", uid, name);
 			++record.executions;
 			record.status = Services.Status.running;
-			log.result = await object.process();
+			if (typeof object.process == "function") {
+				log.result = await object.process();
+			} else {
+				// This must be a generator.
+				log.result = (await object.process.next()).value;
+			}
 			record.status = Services.Status.idle;
 			Log.debug("Completed '{}.{}'.", uid, name);
 		} catch (e) {

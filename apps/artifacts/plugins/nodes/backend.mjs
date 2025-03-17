@@ -3,6 +3,7 @@ import { Nodes } from "#bzd/apps/artifacts/plugins/nodes/nodes.mjs";
 import PluginBase from "#bzd/apps/artifacts/backend/plugin.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import Records from "#bzd/apps/artifacts/plugins/nodes/records.mjs";
+import { HttpClientFactory } from "#bzd/nodejs/core/http/client.mjs";
 
 const Exception = ExceptionFactory("apps", "plugin", "nodes");
 
@@ -81,7 +82,25 @@ export default class Plugin extends PluginBase {
 	constructor(volume, options, provider, endpoints) {
 		super(volume, options, provider, endpoints);
 		this.nodes = null;
-		this.records = new Records(options["nodes.records"] || {});
+
+		// nodes.records Should look like this:
+		// {
+		// 	"nodes": {
+		// 		"host": "http://localhost:8081",
+		//      "volume": "nodes"
+		// 	},
+		// 	...
+		// }
+		const optionsRemotes = options["nodes.remotes"] || {};
+		const optionsRecords = Object.assign(
+			{
+				// Set the default storages from the remotes options.
+				storages: [Records.defaultStorageName, ...Object.keys(optionsRemotes)],
+			},
+			options["nodes.records"] || {},
+		);
+
+		this.records = new Records(optionsRecords);
 		provider.addStartProcess(async () => {
 			this.nodes = new Nodes(options["nodes.handlers"] || {});
 			for (const [uid, data] of Object.entries(options["nodes.data"] || {})) {
@@ -92,12 +111,26 @@ export default class Plugin extends PluginBase {
 			this.setStorage(await StorageBzd.make(this.nodes));
 
 			await this.records.init(async (records) => {
-				// Restore previous records.
-				for (const record of records) {
-					await this.nodes.insertRecord(record);
-				}
+				await this.nodes.insertRecords(records);
 			});
 		});
+
+		// Add fetch processes for remotes.
+		//
+		//	"nodes": {
+		//		"host": "http://localhost:8081"
+		//	},
+		//  ...
+		for (const [storageName, data] of Object.entries(optionsRemotes)) {
+			const volume = data.volume || storageName;
+			const client = new HttpClientFactory(data.host + "/x/" + volume, {
+				expect: "json",
+			});
+
+			provider.addTimeTriggeredProcess("remote." + storageName, this.fetchFromRemote(client, storageName), {
+				periodS: 60,
+			});
+		}
 
 		/// Retrieve values from the store.
 		///
@@ -265,6 +298,37 @@ export default class Plugin extends PluginBase {
 
 			context.sendStatus(200);
 		});
+	}
+
+	/// Async generator to fetch data from a remote.
+	///
+	/// \param client The http client factory to fetch data from.
+	/// \param storageName The name of the storage to be used for the records.
+	async *fetchFromRemote(client, storageName) {
+		let tick = 0;
+
+		while (true) {
+			const result = await client.get("/@records", {
+				query: {
+					tick: tick,
+				},
+			});
+
+			// Apply the records from remote.
+			for (const records of result.records) {
+				await this.nodes.insertRecords(records);
+				await this.records.write(records, storageName);
+			}
+
+			tick = result.next;
+			const end = result.end;
+
+			yield {
+				tick: tick,
+				end: end,
+				records: result.records.length,
+			};
+		}
 	}
 
 	static paramPathToKey(paramPath) {

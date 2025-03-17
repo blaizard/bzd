@@ -24,6 +24,14 @@ async function waitFor(callback, timeoutS = 5) {
 	});
 }
 
+async function* asyncGeneratorTest() {
+	let counter = 42;
+	while (true) {
+		yield counter;
+		++counter;
+	}
+}
+
 describe("Services", () => {
 	let startCounter = 0;
 	let stopCounter = 0;
@@ -75,11 +83,16 @@ describe("Services", () => {
 					delayS: 0,
 				},
 			);
+			provider.addTimeTriggeredProcess("3", asyncGeneratorTest(), {
+				periodS: 0.2,
+				delayS: 0,
+			});
 
 			const processes = [...provider.getTimeTriggeredProcesses()];
-			Exception.assertEqual(processes.length, 2);
+			Exception.assertEqual(processes.length, 3);
 			Exception.assertEqual(processes[0][0], "1");
 			Exception.assertEqual(processes[1][0], "2");
+			Exception.assertEqual(processes[2][0], "3");
 		});
 
 		it("register", () => {
@@ -108,6 +121,10 @@ describe("Services", () => {
 
 		it("wait for execution", async () => {
 			await waitFor(() => {
+				const record3 = services.getProcess(uid, "3");
+				if (record3.executions < 2) {
+					return false;
+				}
 				return timeTriggeredCounter1 > 1 && timeTriggeredCounter2 > 0;
 			});
 			const record1 = services.getProcess(uid, "1");
@@ -117,6 +134,12 @@ describe("Services", () => {
 			const record2 = services.getProcess(uid, "2");
 			Exception.assert(record2.executions >= 1);
 			Exception.assert(record2.errors >= 1);
+
+			const record3 = services.getProcess(uid, "3");
+			Exception.assert(record3.executions >= 2);
+			Exception.assertEqual(record3.errors, 0);
+			Exception.assertEqual(record3.logs[1].result, 42);
+			Exception.assertEqual(record3.logs[0].result, 43);
 		});
 
 		it("stop", async () => {
