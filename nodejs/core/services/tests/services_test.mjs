@@ -1,6 +1,7 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import ServiceProvider from "#bzd/nodejs/core/services/provider.mjs";
 import Services from "#bzd/nodejs/core/services/services.mjs";
+import Process from "#bzd/nodejs/core/services/process.mjs";
 
 const Exception = ExceptionFactory("test", "services");
 
@@ -27,8 +28,20 @@ async function waitFor(callback, timeoutS = 5) {
 async function* asyncGeneratorTest() {
 	let counter = 42;
 	while (true) {
-		yield counter;
-		++counter;
+		yield counter++;
+	}
+}
+
+class TestProcess extends Process {
+	constructor() {
+		super();
+		this.counter = 37;
+	}
+
+	process(options) {
+		// The options can be dynamically changed.
+		options.periodS = 0.1;
+		return this.counter++;
 	}
 }
 
@@ -87,12 +100,17 @@ describe("Services", () => {
 				periodS: 0.2,
 				delayS: 0,
 			});
+			provider.addTimeTriggeredProcess("4", new TestProcess(), {
+				periodS: 999,
+				delayS: 0,
+			});
 
 			const processes = [...provider.getTimeTriggeredProcesses()];
-			Exception.assertEqual(processes.length, 3);
+			Exception.assertEqual(processes.length, 4);
 			Exception.assertEqual(processes[0][0], "1");
 			Exception.assertEqual(processes[1][0], "2");
 			Exception.assertEqual(processes[2][0], "3");
+			Exception.assertEqual(processes[3][0], "4");
 		});
 
 		it("register", () => {
@@ -125,6 +143,10 @@ describe("Services", () => {
 				if (record3.executions < 2) {
 					return false;
 				}
+				const record4 = services.getProcess(uid, "4");
+				if (record4.executions < 2) {
+					return false;
+				}
 				return timeTriggeredCounter1 > 1 && timeTriggeredCounter2 > 0;
 			});
 			const record1 = services.getProcess(uid, "1");
@@ -140,6 +162,12 @@ describe("Services", () => {
 			Exception.assertEqual(record3.errors, 0);
 			Exception.assertEqual(record3.logs[1].result, 42);
 			Exception.assertEqual(record3.logs[0].result, 43);
+
+			const record4 = services.getProcess(uid, "4");
+			Exception.assert(record4.executions >= 2);
+			Exception.assertEqual(record4.errors, 0);
+			Exception.assertEqual(record4.logs[1].result, 37);
+			Exception.assertEqual(record4.logs[0].result, 38);
 		});
 
 		it("stop", async () => {

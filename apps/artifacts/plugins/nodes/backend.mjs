@@ -5,6 +5,7 @@ import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import Records from "#bzd/apps/artifacts/plugins/nodes/records.mjs";
 import { HttpClientFactory } from "#bzd/nodejs/core/http/client.mjs";
 import Data from "#bzd/apps/artifacts/plugins/nodes/data.mjs";
+import Process from "#bzd/nodejs/core/services/process.mjs";
 
 const Exception = ExceptionFactory("apps", "plugin", "nodes");
 
@@ -79,6 +80,58 @@ function rawBodyParse(body, headersFunc, forceContentType = null, forceCharset =
 /// Questions:
 /// - What to do with firmware and firmware metadata?
 
+class FetchFromRemoteProcess extends Process {
+	/// Async process to fetch data from a remote.
+	///
+	/// \param client The http client factory to fetch data from.
+	/// \param storageName The name of the storage to be used for the records.
+	constructor(plugin, client, storageName) {
+		super();
+		this.plugin = plugin;
+		this.client = client;
+		this.storageName = storageName;
+		this.tick = 0;
+	}
+
+	async process(options) {
+		const result = await this.client.get("/@records", {
+			query: {
+				tick: this.tick,
+			},
+		});
+
+		const timestampRemote = result.timestamp;
+		const timestampLocal = Data.getTimestamp();
+		this.tick = result.next;
+		const end = result.end;
+
+		// Apply the records from remote.
+		for (const records of result.records) {
+			/// Adjust the timestamp of all records.
+			const updatedRecords = records.map(([uid, key, value, timestamp]) => {
+				return [uid, key, value, timestamp - timestampRemote + timestampLocal];
+			});
+
+			await this.plugin.nodes.insertRecords(updatedRecords);
+			await this.plugin.records.write(updatedRecords, this.storageName);
+		}
+
+		// Update the options.
+		if (end === false) {
+			options.periodS = 0.1;
+		} else {
+			const periodS = 600 * Math.exp(-result.records.length / 20);
+			options.periodS = Math.min(periodS, 60);
+		}
+
+		return {
+			tick: this.tick,
+			end: end,
+			records: result.records.length,
+		};
+	}
+}
+
 export default class Plugin extends PluginBase {
 	constructor(volume, options, provider, endpoints) {
 		super(volume, options, provider, endpoints);
@@ -134,8 +187,8 @@ export default class Plugin extends PluginBase {
 			}
 			const client = new HttpClientFactory(data.host + "/x/" + volume, optionsClient);
 
-			provider.addTimeTriggeredProcess("remote." + storageName, this.fetchFromRemote(client, storageName), {
-				periodS: 60,
+			provider.addTimeTriggeredProcess("remote." + storageName, new FetchFromRemoteProcess(this, client, storageName), {
+				periodS: 5,
 			});
 		}
 
@@ -305,44 +358,6 @@ export default class Plugin extends PluginBase {
 
 			context.sendStatus(200);
 		});
-	}
-
-	/// Async generator to fetch data from a remote.
-	///
-	/// \param client The http client factory to fetch data from.
-	/// \param storageName The name of the storage to be used for the records.
-	async *fetchFromRemote(client, storageName) {
-		let tick = 0;
-
-		while (true) {
-			const result = await client.get("/@records", {
-				query: {
-					tick: tick,
-				},
-			});
-
-			const timestampRemote = result.timestamp;
-			const timestampLocal = Data.getTimestamp();
-			tick = result.next;
-			const end = result.end;
-
-			// Apply the records from remote.
-			for (const records of result.records) {
-				/// Adjust the timestamp of all records.
-				const updatedRecords = records.map(([uid, key, value, timestamp]) => {
-					return [uid, key, value, timestamp - timestampRemote + timestampLocal];
-				});
-
-				await this.nodes.insertRecords(updatedRecords);
-				await this.records.write(updatedRecords, storageName);
-			}
-
-			yield {
-				tick: tick,
-				end: end,
-				records: result.records.length,
-			};
-		}
 	}
 
 	static paramPathToKey(paramPath) {

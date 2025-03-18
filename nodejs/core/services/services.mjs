@@ -1,5 +1,6 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
+import Process from "#bzd/nodejs/core/services/process.mjs";
 
 const Exception = ExceptionFactory("services");
 const Log = LogFactory("services");
@@ -87,8 +88,10 @@ export default class Services {
 			Log.debug("Running '{}.{}'...", uid, name);
 			++record.executions;
 			record.status = Services.Status.running;
-			if (typeof object.process == "function") {
-				log.result = await object.process();
+			if (object.process instanceof Process) {
+				log.result = await object.process.process(object.options);
+			} else if (typeof object.process == "function") {
+				log.result = await object.process(object.options);
 			} else {
 				// This must be a generator.
 				log.result = (await object.process.next()).value;
@@ -291,27 +294,12 @@ export default class Services {
 		Exception.assertPrecondition(uid in this.services, "The service '{}' is not registered.", uid);
 		Exception.assertPrecondition(
 			name in this.services[uid].records,
-			"The process '{}' is part of service '{}'.",
+			"The process '{}' is not part of service '{}', processes are: {}",
 			name,
 			uid,
+			Object.keys(this.services[uid].records),
 		);
 		return this.services[uid].records[name];
-	}
-
-	/// Get a specific process options.
-	///
-	/// \param uid The service UID.
-	/// \param name The process name.
-	/// \return The process options.
-	getProcessOptions(uid, name) {
-		Exception.assertPrecondition(uid in this.services, "The service '{}' is not registered.", uid);
-		Exception.assertPrecondition(
-			name in this.services[uid].provider.processes,
-			"The process '{}' is not part of service '{}'.",
-			name,
-			uid,
-		);
-		return this.services[uid].provider.processes[name].options;
 	}
 
 	/// Install services from all the objects passed into argument.

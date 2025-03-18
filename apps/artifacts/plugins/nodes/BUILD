@@ -36,6 +36,7 @@ bzd_nodejs_library(
         "//nodejs/core:exception",
         "//nodejs/core:log",
         "//nodejs/core/http:client",
+        "//nodejs/core/services",
         "//nodejs/db:utils",
         "//nodejs/db/key_value_store:make_from_config",
         "//nodejs/db/storage",

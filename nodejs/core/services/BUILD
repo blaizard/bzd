@@ -15,6 +15,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "services",
     srcs = [
+        "process.mjs",
         "provider.mjs",
         "services.mjs",
     ],
