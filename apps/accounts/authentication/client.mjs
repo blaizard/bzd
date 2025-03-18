@@ -1,5 +1,6 @@
 import TokenAuthenticationClient from "#bzd/nodejs/core/authentication/token/client.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
+import StubAuthenticationClient from "#bzd/nodejs/core/authentication/stub/client.mjs";
 
 const Exception = ExceptionFactory("authentication", "accounts");
 
@@ -7,16 +8,29 @@ export default class AccountsAuthenticationClient extends TokenAuthenticationCli
 	constructor(options) {
 		super(options, {
 			// URL of the accounts.
-			accounts: null,
+			remote: null,
 		});
 
-		Exception.assert(this.options.accounts, "No accounts URL was specified.");
+		Exception.assert(this.options.remote, "No remote URL was specified.");
+	}
+
+	static make(options) {
+		const { type: type, ...optionsRest } = options;
+		console.log(options, optionsRest, type);
+		switch (type || "accounts") {
+			case "accounts":
+				return new AccountsAuthenticationClient(optionsRest);
+			case "stub":
+				return new StubAuthenticationClient(optionsRest);
+			default:
+				Exception.unreachable("Unsupported account type: '{}'.", type);
+		}
 	}
 
 	_installRestImpl(rest) {
 		// Register the hook to login
 		rest.provide("login", (application) => {
-			window.location.href = this.options.accounts + "/login?application=" + application;
+			window.location.href = this.options.remote + "/login?application=" + application;
 		});
 
 		super._installRestImpl(rest);

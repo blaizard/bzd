@@ -18,12 +18,16 @@ const app = createApp(App);
 
 // ---- Authentication ----
 
-const authentication = new Authentication({
-	accounts: configGlobal.accounts,
-	unauthorizedCallback: async (needAuthentication) => {
-		console.log("Unauthorized!", needAuthentication);
-	},
-});
+const authentication = Authentication.make(
+	Object.assign(
+		{
+			unauthorizedCallback: async (needAuthentication) => {
+				console.log("Unauthorized!", needAuthentication);
+			},
+		},
+		configGlobal.accounts,
+	),
+);
 app.use(AuthenticationPlugin, {
 	authentication: authentication,
 });

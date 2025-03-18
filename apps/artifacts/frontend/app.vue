@@ -30,6 +30,7 @@
 	import Layout from "#bzd/nodejs/vue/components/layout/layout.vue";
 	import Tree from "./tree.vue";
 	import MenuEntry from "#bzd/nodejs/vue/components/menu/entry.vue";
+	import configGlobal from "#bzd/apps/artifacts/config.json" with { type: "json" };
 
 	export default {
 		components: {
@@ -64,7 +65,7 @@
 					{
 						path: "/login",
 						handler: async () => {
-							await this.$rest.invoke("login", "artifacts");
+							await this.$rest.invoke("login", configGlobal.application);
 						},
 					},
 					{

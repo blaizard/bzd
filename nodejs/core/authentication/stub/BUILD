@@ -7,8 +7,8 @@ bzd_nodejs_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//nodejs/core/authentication/stub:client",
-        "//nodejs/core/authentication/token:client",
+        "//nodejs/core/authentication:client",
+        "//nodejs/core/authentication:session",
     ],
 )
 
@@ -19,7 +19,6 @@ bzd_nodejs_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//nodejs/core/authentication/session:server_proxy",
-        "//nodejs/core/authentication/stub:server",
+        "//nodejs/core/authentication:server",
     ],
 )

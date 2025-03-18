@@ -116,8 +116,7 @@ export default class Services {
 	///
 	/// \param uid The uid corresponding to the service.
 	/// \param name The name of the process.
-	/// \param periodS The recurrency period.
-	async runTimeTriggeredProcess(uid, name, periodS) {
+	async runTimeTriggeredProcess(uid, name) {
 		const service = this.services[uid];
 		const object = service.provider.processes[name];
 
@@ -133,8 +132,8 @@ export default class Services {
 		// Re-run, if name is not present it means that the service was stopped.
 		if (name in service.instances) {
 			service.instances[name] = setTimeout(async () => {
-				await this.runTimeTriggeredProcess(uid, name, periodS);
-			}, periodS * 1000);
+				await this.runTimeTriggeredProcess(uid, name);
+			}, object.options.periodS * 1000);
 		}
 	}
 
@@ -211,7 +210,7 @@ export default class Services {
 			Log.info("Starting '{}.{}' every {}s with a delay of {}s.", uid, name, object.options.periodS, delayS);
 
 			service.instances[name] = setTimeout(async () => {
-				await this.runTimeTriggeredProcess(uid, name, object.options.periodS);
+				await this.runTimeTriggeredProcess(uid, name);
 			}, delayS * 1000);
 		}
 
@@ -297,6 +296,22 @@ export default class Services {
 			uid,
 		);
 		return this.services[uid].records[name];
+	}
+
+	/// Get a specific process options.
+	///
+	/// \param uid The service UID.
+	/// \param name The process name.
+	/// \return The process options.
+	getProcessOptions(uid, name) {
+		Exception.assertPrecondition(uid in this.services, "The service '{}' is not registered.", uid);
+		Exception.assertPrecondition(
+			name in this.services[uid].provider.processes,
+			"The process '{}' is not part of service '{}'.",
+			name,
+			uid,
+		);
+		return this.services[uid].provider.processes[name].options;
 	}
 
 	/// Install services from all the objects passed into argument.

@@ -1,3 +1,5 @@
 {
-    "accounts": "http://127.0.0.1:8080"
+    "accounts": {
+        "remote": "http://127.0.0.1:8080"
+    }
 }

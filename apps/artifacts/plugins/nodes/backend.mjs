@@ -4,6 +4,7 @@ import PluginBase from "#bzd/apps/artifacts/backend/plugin.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import Records from "#bzd/apps/artifacts/plugins/nodes/records.mjs";
 import { HttpClientFactory } from "#bzd/nodejs/core/http/client.mjs";
+import Data from "#bzd/apps/artifacts/plugins/nodes/data.mjs";
 
 const Exception = ExceptionFactory("apps", "plugin", "nodes");
 
@@ -320,14 +321,21 @@ export default class Plugin extends PluginBase {
 				},
 			});
 
-			// Apply the records from remote.
-			for (const records of result.records) {
-				await this.nodes.insertRecords(records);
-				await this.records.write(records, storageName);
-			}
-
+			const timestampRemote = result.timestamp;
+			const timestampLocal = Data.getTimestamp();
 			tick = result.next;
 			const end = result.end;
+
+			// Apply the records from remote.
+			for (const records of result.records) {
+				/// Adjust the timestamp of all records.
+				const updatedRecords = records.map(([uid, key, value, timestamp]) => {
+					return [uid, key, value, timestamp - timestampRemote + timestampLocal];
+				});
+
+				await this.nodes.insertRecords(updatedRecords);
+				await this.records.write(updatedRecords, storageName);
+			}
 
 			yield {
 				tick: tick,

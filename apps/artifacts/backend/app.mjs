@@ -49,9 +49,7 @@ program
 	// Services
 	const services = new Services();
 
-	const authentication = new Authentication({
-		accounts: configGlobal.accounts,
-	});
+	const authentication = Authentication.make(configGlobal.accounts);
 	for (const [token, options] of Object.entries(config["tokens"] || {})) {
 		await authentication.preloadApplicationToken(token, options["scopes"]);
 	}
