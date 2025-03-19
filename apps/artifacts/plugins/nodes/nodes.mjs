@@ -43,7 +43,10 @@ export class Node {
 		let fragments = Node.getAllPathAndValues(fragment, key);
 		fragments = this.handlers.processBeforeInsert(fragments);
 
-		return await this.data.insert(this.uid, fragments, Data.getTimestamp() + timestampDelta);
+		const timestamp = await this.data.insert(this.uid, fragments, Data.getTimestamp() + timestampDelta);
+
+		// Generate records.
+		return fragments.map(([key, value, _]) => [this.uid, key, value, timestamp]);
 	}
 
 	/// Get the tree with single values.
@@ -88,7 +91,7 @@ export class Nodes {
 	}
 
 	// Insert a record entry to the data.
-	async insertRecords(records) {
+	async insertRecord(records) {
 		for (const [uid, key, value, timestamp] of records) {
 			await this.data.insert(uid, [[key, value]], timestamp);
 		}

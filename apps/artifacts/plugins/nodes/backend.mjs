@@ -107,13 +107,16 @@ class FetchFromRemoteProcess extends Process {
 		const end = result.end;
 
 		// Apply the records from remote.
-		for (const records of result.records) {
+		for (const record of result.records) {
+			/// Records from remote are optimized to disk.
+			record = Records.recordFromDisk(record);
+
 			/// Adjust the timestamp of all records.
-			const updatedRecords = records.map(([uid, key, value, timestamp]) => {
+			const updatedRecords = record.map(([uid, key, value, timestamp]) => {
 				return [uid, key, value, timestamp - timestampRemote + timestampLocal];
 			});
 
-			await this.plugin.nodes.insertRecords(updatedRecords);
+			await this.plugin.nodes.insertRecord(updatedRecords);
 			await this.plugin.records.write(updatedRecords, this.storageName, tick);
 		}
 
@@ -166,8 +169,8 @@ export default class Plugin extends PluginBase {
 
 			this.setStorage(await StorageBzd.make(this.nodes));
 
-			const output = await this.records.init(async (records) => {
-				await this.nodes.insertRecords(records);
+			const output = await this.records.init(async (record) => {
+				await this.nodes.insertRecord(Records.recordFromDisk(record));
 			});
 
 			return output;
@@ -300,6 +303,8 @@ export default class Plugin extends PluginBase {
 			let end = true;
 			let size = null;
 			for await ([currentTick, record, size] of this.records.read(tick)) {
+				// Pass the record as written to disk (don't use recordFromDisk)
+				// This is done to save network bandwidth.
 				records.push(record);
 				maxSize -= size;
 				if (maxSize <= 0) {
@@ -364,10 +369,30 @@ export default class Plugin extends PluginBase {
 			}
 
 			// Save the data written on disk.
-			await this.records.write(records);
+			await this.records.write(Records.recordToDisk(records));
 
 			context.sendStatus(200);
 		});
+	}
+
+	/// Write a record to the disk.
+	///
+	/// The process is made to reduce disk space.
+	///
+	/// \param record The original record.
+	///
+	/// \return The disk optimized record.
+	static recordToDisk(record) {
+		return record;
+	}
+
+	/// Read a record form the disk.
+	///
+	/// \param record The disk optimized record.
+	///
+	/// \return The original record.
+	static recordFromDisk(record) {
+		return record;
 	}
 
 	static paramPathToKey(paramPath) {

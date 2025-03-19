@@ -166,7 +166,7 @@ export default class Data {
 	/// \param fragments An iterable of tuples, which first element is the absolute key and second the value to be inserted.
 	/// \param timestamp The timestamp to be used.
 	///
-	/// \return The data actually written.
+	/// \return The timestamp actually written.
 	async insert(uid, fragments, timestamp = null) {
 		timestamp = timestamp === null ? Data.getTimestamp() : timestamp;
 		this.storage[uid] ??= {};
@@ -204,8 +204,7 @@ export default class Data {
 			}
 		}
 
-		// Generate records.
-		return fragments.map(([key, value, _]) => [uid, key, value, timestamp]);
+		return timestamp;
 	}
 
 	/// Get direct children of a given key.
