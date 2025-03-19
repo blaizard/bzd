@@ -40,14 +40,14 @@ describe("Records", () => {
 
 	describe("Existing", () => {
 		const fs = new Filesystem({
-			"records/main/2.rec": '{"version":1,"records":[[2,"abc",5],',
-			"records/main/1.rec": '{"version":1,"records":[[1,"a",3],',
-			"records/main/4.rec": '{"version":1,"records":[[4,"abcde",7],',
-			"records/main/6.rec": '{"version":0,"records":[[4,"abcde",7],',
-			"records/main/5.rec": '{"version":1,"records":[[5,"abcdef",8],',
-			"records/main/invalid.rec": '{"version":1,"records":[[3,"abcdejsjs",10],',
-			"records/main/8.rec": '{"version":1,"records":[[8,"abcdefg",9],',
-			"records/main/3.rec": '{"version":1,"records":[[3,"abcd",6],',
+			"records/main/2.rec": '{"version":2,"records":[[2,"abc",5,null],',
+			"records/main/1.rec": '{"version":2,"records":[[1,"a",3,null],',
+			"records/main/4.rec": '{"version":2,"records":[[4,"abcde",7,null],',
+			"records/main/6.rec": '{"version":1,"records":[[4,"abcde",7],',
+			"records/main/5.rec": '{"version":2,"records":[[5,"abcdef",8,null],',
+			"records/main/invalid.rec": '{"version":2,"records":[[3,"abcdejsjs",10,null],',
+			"records/main/8.rec": '{"version":2,"records":[[8,"abcdefg",9,12],',
+			"records/main/3.rec": '{"version":2,"records":[[3,"abcd",6,null],',
 		});
 		const records = new Records({ path: "records", fs: fs });
 
@@ -57,26 +57,30 @@ describe("Records", () => {
 			const files = await fs.readdir("records/main");
 			Exception.assertEqual(files, ["2.rec", "1.rec", "4.rec", "5.rec", "8.rec", "3.rec"]);
 			Exception.assertEqual(records.storages["main"].records, [
-				{ tick: 1, path: "records/main/1.rec", size: 34 },
-				{ tick: 2, path: "records/main/2.rec", size: 36 },
-				{ tick: 3, path: "records/main/3.rec", size: 37 },
-				{ tick: 4, path: "records/main/4.rec", size: 38 },
-				{ tick: 5, path: "records/main/5.rec", size: 39 },
-				{ tick: 8, path: "records/main/8.rec", size: 40 },
+				{ tick: 1, path: "records/main/1.rec", size: 39 },
+				{ tick: 2, path: "records/main/2.rec", size: 41 },
+				{ tick: 3, path: "records/main/3.rec", size: 42 },
+				{ tick: 4, path: "records/main/4.rec", size: 43 },
+				{ tick: 5, path: "records/main/5.rec", size: 44 },
+				{ tick: 8, path: "records/main/8.rec", size: 43 },
 			]);
 		});
 
 		it("read", async () => {
-			Exception.assertEqual((await records.read().next()).value, [1, "a", 3]);
-			Exception.assertEqual((await records.read(1).next()).value, [1, "a", 3]);
-			Exception.assertEqual((await records.read(2).next()).value, [2, "abc", 5]);
-			Exception.assertEqual((await records.read(3).next()).value, [3, "abcd", 6]);
-			Exception.assertEqual((await records.read(4).next()).value, [4, "abcde", 7]);
-			Exception.assertEqual((await records.read(5).next()).value, [5, "abcdef", 8]);
-			Exception.assertEqual((await records.read(6).next()).value, [8, "abcdefg", 9]);
-			Exception.assertEqual((await records.read(7).next()).value, [8, "abcdefg", 9]);
-			Exception.assertEqual((await records.read(8).next()).value, [8, "abcdefg", 9]);
+			Exception.assertEqual((await records.read().next()).value, [1, "a", 3, null]);
+			Exception.assertEqual((await records.read(1).next()).value, [1, "a", 3, null]);
+			Exception.assertEqual((await records.read(2).next()).value, [2, "abc", 5, null]);
+			Exception.assertEqual((await records.read(3).next()).value, [3, "abcd", 6, null]);
+			Exception.assertEqual((await records.read(4).next()).value, [4, "abcde", 7, null]);
+			Exception.assertEqual((await records.read(5).next()).value, [5, "abcdef", 8, null]);
+			Exception.assertEqual((await records.read(6).next()).value, [8, "abcdefg", 9, 12]);
+			Exception.assertEqual((await records.read(7).next()).value, [8, "abcdefg", 9, 12]);
+			Exception.assertEqual((await records.read(8).next()).value, [8, "abcdefg", 9, 12]);
 			Exception.assertEqual((await records.read(9).next()).value, null);
+		});
+
+		it("tick remote", async () => {
+			Exception.assertEqual(records.getTickRemote(), 12);
 		});
 
 		it("read all", async () => {
@@ -102,11 +106,15 @@ describe("Records", () => {
 			}
 		});
 
+		it("tick remote", async () => {
+			Exception.assertEqual(records.getTickRemote(), null);
+		});
+
 		it("read", async () => {
-			Exception.assertEqual((await records.read(8).next()).value, [8, "abcdefg", 9]);
-			Exception.assertEqual((await records.read(9).next()).value, [9, "new0", 6]);
-			Exception.assertEqual((await records.read(10).next()).value, [10, "new1", 6]);
-			Exception.assertEqual((await records.read(18).next()).value, [18, "new9", 6]);
+			Exception.assertEqual((await records.read(8).next()).value, [8, "abcdefg", 9, 12]);
+			Exception.assertEqual((await records.read(9).next()).value, [9, "new0", 6, null]);
+			Exception.assertEqual((await records.read(10).next()).value, [10, "new1", 6, null]);
+			Exception.assertEqual((await records.read(18).next()).value, [18, "new9", 6, null]);
 			Exception.assertEqual((await records.read(19).next()).value, null);
 		});
 
@@ -190,9 +198,13 @@ describe("Records", () => {
 
 		it("write", async () => {
 			for (let i = 0; i < 100; ++i) {
-				await records.write([i, "x" * 40]);
+				await records.write([i, "x" * 40], Records.defaultStorageName, i * 10);
 			}
 		}).timeout(10000);
+
+		it("tick remote", async () => {
+			Exception.assertEqual(records.getTickRemote(), 990);
+		});
 
 		it("sanitize", async () => {
 			await records.sanitize();
@@ -229,9 +241,9 @@ describe("Records", () => {
 		});
 
 		it("read one by one", async () => {
-			Exception.assertEqual((await records.read(8).next()).value, [8, 7, 1]);
-			Exception.assertEqual((await records.read(42).next()).value, [42, 41, 2]);
-			Exception.assertEqual((await records.read(100).next()).value, [100, 99, 2]);
+			Exception.assertEqual((await records.read(8).next()).value, [8, 7, 1, null]);
+			Exception.assertEqual((await records.read(42).next()).value, [42, 41, 2, null]);
+			Exception.assertEqual((await records.read(100).next()).value, [100, 99, 2, null]);
 			Exception.assertEqual((await records.read(101).next()).value, null);
 		});
 

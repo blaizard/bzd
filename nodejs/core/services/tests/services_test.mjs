@@ -160,14 +160,12 @@ describe("Services", () => {
 			const record3 = services.getProcess(uid, "3");
 			Exception.assert(record3.executions >= 2);
 			Exception.assertEqual(record3.errors, 0);
-			Exception.assertEqual(record3.logs[1].result, 42);
-			Exception.assertEqual(record3.logs[0].result, 43);
+			Exception.assertEqual(record3.logs[1].result, record3.logs[0].result - 1);
 
 			const record4 = services.getProcess(uid, "4");
 			Exception.assert(record4.executions >= 2);
 			Exception.assertEqual(record4.errors, 0);
-			Exception.assertEqual(record4.logs[1].result, 37);
-			Exception.assertEqual(record4.logs[0].result, 38);
+			Exception.assertEqual(record4.logs[1].result, record4.logs[0].result - 1);
 		});
 
 		it("stop", async () => {

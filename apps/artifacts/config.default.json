@@ -1,6 +1,9 @@
 {
     "accounts": {
-        "remote": "http://127.0.0.1:8080"
+        "scopes": [
+            "admin-applications"
+        ],
+        "type": "stub"
     },
     "application": "artifacts"
 }

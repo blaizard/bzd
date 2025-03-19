@@ -94,15 +94,16 @@ class FetchFromRemoteProcess extends Process {
 	}
 
 	async process(options) {
+		const tickRemote = this.plugin.records.getTickRemote(this.storageName, 0);
 		const result = await this.client.get("/@records", {
 			query: {
-				tick: this.tick,
+				tick: tickRemote,
 			},
 		});
 
 		const timestampRemote = result.timestamp;
 		const timestampLocal = Data.getTimestamp();
-		this.tick = result.next;
+		const tick = result.next;
 		const end = result.end;
 
 		// Apply the records from remote.
@@ -113,7 +114,7 @@ class FetchFromRemoteProcess extends Process {
 			});
 
 			await this.plugin.nodes.insertRecords(updatedRecords);
-			await this.plugin.records.write(updatedRecords, this.storageName);
+			await this.plugin.records.write(updatedRecords, this.storageName, tick);
 		}
 
 		// Update the options.
@@ -125,8 +126,9 @@ class FetchFromRemoteProcess extends Process {
 		}
 
 		return {
-			tick: this.tick,
+			tick: [tickRemote, tick],
 			end: end,
+			nextCallS: options.periodS,
 			records: result.records.length,
 		};
 	}
@@ -164,9 +166,11 @@ export default class Plugin extends PluginBase {
 
 			this.setStorage(await StorageBzd.make(this.nodes));
 
-			await this.records.init(async (records) => {
+			const output = await this.records.init(async (records) => {
 				await this.nodes.insertRecords(records);
 			});
+
+			return output;
 		});
 
 		// Add fetch processes for remotes.
@@ -281,7 +285,13 @@ export default class Plugin extends PluginBase {
 		///    end : true|false  # if it contains all remaining records or not.
 		/// }```
 		endpoints.register("get", "/@records", async (context) => {
+			// Important note, if tick is greater than this.records.tick, it means that this tick was
+			// taken from a previous version/iteration, therefore we consider the tick passed invalid
+			// and reset it to 0. This is to handle updates on the remote side.
 			let tick = context.getQuery("tick", 0, parseInt);
+			if (tick > this.records.tick + 1) {
+				tick = 0;
+			}
 			let maxSize = context.getQuery("size", 1024 * 1024, parseInt);
 
 			let records = [];

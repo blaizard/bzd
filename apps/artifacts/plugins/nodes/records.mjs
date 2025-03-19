@@ -11,6 +11,14 @@ const Log = LogFactory("apps", "plugin", "nodes");
 /// The format of each entry is as follow:
 /// [tick, payload]
 export default class Record {
+	/// Construct on-disk iterable records.
+	///
+	/// \param options Configuration options for the Record instance.
+	/// - path (string, required): The base directory where record storages will be created.
+	/// - fs: The file system module to use.
+	/// - recordMaxSize: The maximum size of a single record file in bytes.
+	/// - maxSize: The maximum total size of all records in a storage in bytes.
+	/// - storages: An array of storage names to create.
 	constructor(options = {}) {
 		this.options = Object.assign(
 			{
@@ -39,13 +47,14 @@ export default class Record {
 			path: this.options.path + "/" + name,
 			lock: new Lock(),
 			records: null,
+			tickRemote: null,
 		};
 	}
 
 	/// The current version of the records, any records with a different version
 	/// will be discarded.
 	static get version() {
-		return 1;
+		return 2;
 	}
 
 	/// The name of the default storage.
@@ -72,9 +81,21 @@ export default class Record {
 				}
 				await this._addRecordEntry(storage, maybeTick, path);
 			}
+
+			const [tick, tickRemote] = await this._sanitizeStorage(storage, callback);
+			storage.tickRemote = tickRemote;
+			this.tick = Math.max(this.tick, tick);
 		}
 
-		this.tick = Math.max(this.tick, await this.sanitize(callback));
+		return {
+			storages: Object.fromEntries(
+				Object.entries(this.storages).map(([name, storage]) => [
+					name,
+					{ files: storage.records.length, tickRemote: storage.tickRemote },
+				]),
+			),
+			tick: this.tick,
+		};
 	}
 
 	/// Get the tick from a path.
@@ -94,6 +115,16 @@ export default class Record {
 			Record.version,
 		);
 		return data.records.slice(0, -1);
+	}
+
+	/// Get the latest remote tick.
+	getTickRemote(storageName = Record.defaultStorageName, defaultValue = null) {
+		Exception.assert(storageName in this.storages, "Invalid storage requested: '{}'.", storageName);
+		const tick = this.storages[storageName].tickRemote;
+		if (tick === null) {
+			return defaultValue;
+		}
+		return tick;
 	}
 
 	/// Register a new entry to the records.
@@ -156,7 +187,11 @@ export default class Record {
 	}
 
 	/// Write new records.
-	async write(payload, storageName = Record.defaultStorageName) {
+	///
+	/// \param payload The payload to be stored.
+	/// \param storageName The name of the storage.
+	/// \param tickRemote The latest remote tick that leads to new elements.
+	async write(payload, storageName = Record.defaultStorageName, tickRemote = null) {
 		const serialized = JSON.stringify(payload);
 		Exception.assert(storageName in this.storages, "Invalid storage requested: '{}'.", storageName);
 		const storage = this.storages[storageName];
@@ -164,10 +199,11 @@ export default class Record {
 		// Get the record and write to it atomically.
 		await storage.lock.acquire(async () => {
 			const tick = ++this.tick;
-			const content = "[" + tick + "," + serialized + "," + serialized.length + "],\n";
+			const content = "[" + tick + "," + serialized + "," + serialized.length + "," + tickRemote + "],\n";
 			const entry = await this._getLastEntryForWriting(storage, tick, content.length);
 			await this.options.fs.appendFile(entry.path, content);
 			entry.size += content.length;
+			storage.tickRemote = tickRemote;
 		});
 	}
 
@@ -227,6 +263,12 @@ export default class Record {
 				yield payload;
 			}
 			tick = payload[0] + 1;
+			Exception.assert(
+				tick <= this.tick + 1,
+				"The next tick ({}) must always be lower or equal to this.tick + 1 ({}).",
+				tick,
+				this.tick + 1,
+			);
 		}
 	}
 
@@ -291,8 +333,14 @@ export default class Record {
 	/// - All records ticks are increasing.
 	/// - The size of each file doesn't exceed the maximum size (unless it contains a single record).
 	/// - The size of all records doesn't exceed the maximum size (unless all entries are single).
-	async _sanitize(storage, callback) {
+	///
+	/// \param storage The storage to be used.
+	/// \param callback A callback that will be called on each record.
+	///
+	/// \return A tuple containing the current tick and the current remote tick (if any).
+	async _sanitizeStorage(storage, callback) {
 		let tick = null;
+		let remoteTick = null;
 		let totalSize = 0;
 		let allSingleEntries = true;
 		let toDelete = [];
@@ -322,9 +370,16 @@ export default class Record {
 				);
 				const entries = Record.payloadToList(content);
 
-				for (const [t, entry, _] of entries) {
+				for (const [t, entry, _, remoteT] of entries) {
 					Exception.assert(t > tick, "Ticks are increasing, expected > {} but got {}", tick, t);
+					Exception.assert(
+						remoteT === null || remoteTick === null || remoteT >= remoteTick,
+						"Remote ticks are increasing, expected >= {} but got {}",
+						remoteTick,
+						remoteT,
+					);
 					tick = t;
+					remoteTick = remoteT;
 					if (callback) {
 						callback(entry);
 					}
@@ -345,7 +400,7 @@ export default class Record {
 				allSingleEntries &= entries.length == 1;
 				totalSize += record.size;
 			} catch (e) {
-				Log.warning("Ignoring invalid record '{}': {}", record.path, e.message);
+				Log.error("Ignoring invalid record '{}': {}", record.path, e.message);
 				toDelete.push(record);
 			}
 		}
@@ -364,14 +419,14 @@ export default class Record {
 			await this._delete(storage, record);
 		}
 
-		return tick;
+		return [tick, remoteTick];
 	}
 
 	/// Ensure that everything is in order and reset the tick count.
 	async sanitize(callback) {
 		for (const storage of Object.values(this.storages)) {
-			return await storage.lock.acquire(async () => {
-				return await this._sanitize(storage, callback);
+			await storage.lock.acquire(async () => {
+				await this._sanitizeStorage(storage, callback);
 			});
 		}
 	}
