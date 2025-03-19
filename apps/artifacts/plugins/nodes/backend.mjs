@@ -101,6 +101,14 @@ class FetchFromRemoteProcess extends Process {
 			},
 		});
 
+		if (result.version !== Plugin.version) {
+			return {
+				message: "Invalid version for remote recode",
+				actual: result.version,
+				expected: Plugin.version,
+			};
+		}
+
 		const timestampRemote = result.timestamp;
 		const timestampLocal = Data.getTimestamp();
 		const tick = result.next;
@@ -109,7 +117,7 @@ class FetchFromRemoteProcess extends Process {
 		// Apply the records from remote.
 		for (const record of result.records) {
 			/// Records from remote are optimized to disk.
-			record = Records.recordFromDisk(record);
+			record = Plugin.recordFromDisk(record);
 
 			/// Adjust the timestamp of all records.
 			const updatedRecords = record.map(([uid, key, value, timestamp]) => {
@@ -170,7 +178,7 @@ export default class Plugin extends PluginBase {
 			this.setStorage(await StorageBzd.make(this.nodes));
 
 			const output = await this.records.init(async (record) => {
-				await this.nodes.insertRecord(Records.recordFromDisk(record));
+				await this.nodes.insertRecord(Plugin.recordFromDisk(record));
 			});
 
 			return output;
@@ -314,6 +322,7 @@ export default class Plugin extends PluginBase {
 			}
 
 			const output = {
+				version: Plugin.version,
 				timestamp: Date.now(),
 				records: records,
 				next: currentTick === null ? tick : currentTick + 1,
@@ -369,10 +378,14 @@ export default class Plugin extends PluginBase {
 			}
 
 			// Save the data written on disk.
-			await this.records.write(Records.recordToDisk(records));
+			await this.records.write(Plugin.recordToDisk(records));
 
 			context.sendStatus(200);
 		});
+	}
+
+	static get version() {
+		return 1;
 	}
 
 	/// Write a record to the disk.

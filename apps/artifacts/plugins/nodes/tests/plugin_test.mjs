@@ -90,6 +90,7 @@ describe("Nodes", () => {
 			Exception.assertEqual(response.data.records.length, 2);
 			Exception.assertEqual(response.data.end, true);
 			Exception.assertEqual(response.data.next, 3);
+			Exception.assertEqual(response.data.version, 1);
 		});
 
 		it("stop", async () => {
