@@ -386,7 +386,7 @@ export default class Plugin extends PluginBase {
 	}
 
 	static get version() {
-		return 1;
+		return 2;
 	}
 
 	/// Write a record to the disk.
@@ -397,7 +397,40 @@ export default class Plugin extends PluginBase {
 	///
 	/// \return The disk optimized record.
 	static recordToDisk(record) {
-		return record;
+		let clusters = {};
+		for (const [uid, key, value, timestamp] of record) {
+			const keyCluster = uid + "@" + timestamp;
+			clusters[keyCluster] ??= [];
+			clusters[keyCluster].push([key, value]);
+		}
+		let onDiskRecord = [];
+		for (const [keyCluster, cluster] of Object.entries(clusters)) {
+			const [uid, timestampStr] = keyCluster.split("@");
+			let valueCluster = {};
+			for (const [key, value] of cluster) {
+				let current = valueCluster;
+				for (const part of key) {
+					current[part] ??= {};
+					current = current[part];
+				}
+				current["_"] = value;
+			}
+			onDiskRecord.push([uid, valueCluster, parseInt(timestampStr)]);
+		}
+		return onDiskRecord;
+	}
+
+	static getAllPathAndValues(fragment, rootKey = []) {
+		if (fragment && fragment.constructor == Object) {
+			let paths = [];
+			for (const [key, value] of Object.entries(fragment)) {
+				for (const [subKey, subValue] of Node.getAllPathAndValues(value)) {
+					paths.push([[...rootKey, key, ...subKey], subValue]);
+				}
+			}
+			return paths;
+		}
+		return [[[...rootKey], fragment]];
 	}
 
 	/// Read a record form the disk.
@@ -406,7 +439,24 @@ export default class Plugin extends PluginBase {
 	///
 	/// \return The original record.
 	static recordFromDisk(record) {
-		return record;
+		let fromDiskRecord = [];
+		const traverse = (fragment, key = []) => {
+			let paths = [];
+			for (const [part, data] of Object.entries(fragment)) {
+				if (part == "_") {
+					paths.push([key, data]);
+				} else {
+					paths = paths.concat(traverse(data, [...key, part]));
+				}
+			}
+			return paths;
+		};
+		for (const [uid, valueCluster, timestamp] of record) {
+			for (const [key, value] of traverse(valueCluster)) {
+				fromDiskRecord.push([uid, key, value, timestamp]);
+			}
+		}
+		return fromDiskRecord;
 	}
 
 	static paramPathToKey(paramPath) {
