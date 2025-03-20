@@ -420,19 +420,6 @@ export default class Plugin extends PluginBase {
 		return onDiskRecord;
 	}
 
-	static getAllPathAndValues(fragment, rootKey = []) {
-		if (fragment && fragment.constructor == Object) {
-			let paths = [];
-			for (const [key, value] of Object.entries(fragment)) {
-				for (const [subKey, subValue] of Node.getAllPathAndValues(value)) {
-					paths.push([[...rootKey, key, ...subKey], subValue]);
-				}
-			}
-			return paths;
-		}
-		return [[[...rootKey], fragment]];
-	}
-
 	/// Read a record form the disk.
 	///
 	/// \param record The disk optimized record.
