@@ -102,6 +102,7 @@ class FetchFromRemoteProcess extends Process {
 		});
 
 		if (result.version !== Plugin.version) {
+			options.periodS = 5 * 60; // Retry in 5min.
 			return {
 				message: "Invalid version for remote recode",
 				actual: result.version,
