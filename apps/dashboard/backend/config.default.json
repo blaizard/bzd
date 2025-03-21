@@ -2,8 +2,12 @@
     "layout": [
         {
             "name": "",
-            "nodes.url": "http://localhost:8081",
-            "nodes.volume": "nodes",
+            "nodes.remotes": [
+                {
+                    "url": "http://localhost:8081",
+                    "volume": "nodes"
+                }
+            ],
             "source.type": "nodes",
             "visualization.color": "auto",
             "visualization.type": "system_monitor"

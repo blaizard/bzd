@@ -1,7 +1,5 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
-import HttpClient from "#bzd/nodejs/core/http/client.mjs";
-import { CollectionPaging } from "#bzd/nodejs/db/utils.mjs";
 import { Node } from "#bzd/apps/artifacts/api/nodejs/node/node.mjs";
 
 const Exception = ExceptionFactory("plugin", "nodes");
@@ -26,7 +24,7 @@ export default class Nodes {
 		cache.register(
 			"nodes.data",
 			async (url, token, volume, uid) => {
-				const result = await node.getAsTree({
+				const result = await node.get({
 					remote: url,
 					uid: uid,
 					volume: volume,
@@ -34,36 +32,71 @@ export default class Nodes {
 					path: ["data"],
 					children: 2,
 					include: [["battery"], ["cpu"], ["gpu"], ["disk"], ["memory"], ["temperature"]],
+					metadata: true,
 				});
 
-				if (Object.keys(result.data).length == 0) {
+				if (result.data.length == 0) {
 					return null;
 				}
 
-				return Object.assign(
-					{
-						key: uid,
-					},
-					result.data,
-				);
+				return {
+					key: uid,
+					data: result.data,
+				};
 			},
 			{ timeout: 1000 },
 		);
 	}
 
+	/// Fetch all node remotes for a list of nodes.
+	///
+	/// \return An array of dictionary which looks like:
+	///         { nodes: [node1, node2, ...], url: ..., volume: ... }
+	async fetchList(cache) {
+		const promises = this.config["nodes.remotes"].map((remote) =>
+			cache.get("nodes.list", remote.url, remote.token, remote.volume),
+		);
+		const listOfNodes = await Promise.all(promises);
+		return listOfNodes.map((nodes, index) => {
+			return Object.assign(
+				{
+					nodes: nodes,
+				},
+				this.config["nodes.remotes"][index],
+			);
+		});
+	}
+
+	/// Merge similar nodes together and keep the ones with the newest timestamp.
+	mergeAndFormatNodes(listOfNodes) {
+		let clusters = {};
+		// Merge similar nodes.
+		for (const { key, data } of listOfNodes) {
+			clusters[key] ??= [];
+			clusters[key] = clusters[key].concat(data);
+		}
+		// Sort by timestamp.
+		const sortedTuple = Object.entries(clusters).map(([key, data]) => {
+			return [
+				key,
+				data
+					.sort(([key1, [t1, ...rest1]], [key2, [t2, ...rest2]]) => t1 - t2)
+					.map(([key, [t, ...rest]]) => [key, ...rest]),
+			];
+		});
+		// Set to tree and to list.
+		const formatted = sortedTuple.map(([key, data]) => Object.assign({ key: key }, Node.toTree(data)));
+		return formatted.sort((a, b) => a.key.localeCompare(b.key));
+	}
+
 	async fetch(cache) {
-		const nodes = await cache.get(
-			"nodes.list",
-			this.config["nodes.url"],
-			this.config["nodes.token"],
-			this.config["nodes.volume"],
+		const listOfNodes = await this.fetchList(cache);
+		const listOfPromises = listOfNodes.map((data) =>
+			data.nodes.map((node) => cache.get("nodes.data", data.url, data.token, data.volume, node)),
 		);
-
-		const promises = nodes.map((node) =>
-			cache.get("nodes.data", this.config["nodes.url"], this.config["nodes.token"], this.config["nodes.volume"], node),
+		const results = await Promise.all(
+			listOfPromises.reduce((accumulator, currentValue) => accumulator.concat(currentValue), []),
 		);
-		const results = await Promise.all([...promises]);
-
-		return results.filter((entry) => entry !== null);
+		return this.mergeAndFormatNodes(results.filter((entry) => entry !== null));
 	}
 }

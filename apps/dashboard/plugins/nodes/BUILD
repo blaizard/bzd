@@ -5,7 +5,6 @@ bzd_plugin(
     backend_deps = [
         "//nodejs/core:exception",
         "//nodejs/core:log",
-        "//nodejs/db:utils",
         "//apps/artifacts/api/nodejs/node",
     ],
     backend_entry_point = "backend.mjs",

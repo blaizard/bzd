@@ -37,6 +37,7 @@ export class Node {
 	/// \param path The path to be used. This must be a list of path segments.
 	/// \param children The number of children depth level to be included.
 	/// \param include The given path to be included. A list of list of path segments.
+	/// \param metadata Include metadata with each values.
 	async get({
 		remote,
 		uid,
@@ -45,10 +46,14 @@ export class Node {
 		path = null,
 		children = 0,
 		include = null,
+		metadata = false,
 	}) {
 		let query = {};
 		if (children) {
 			query.children = children;
+		}
+		if (metadata) {
+			query.metadata = 1;
 		}
 		if (include) {
 			query.include = include.map((paths) => paths.map(encodeURIComponent).join("/")).join(",");
@@ -66,7 +71,32 @@ export class Node {
 			},
 		);
 
+		// Adjust the timestamp to the local server.
+		if (metadata) {
+			const timestampDiff = result.timestamp - Date.now();
+			result.data = result.data.map(([key, value]) => {
+				const [t, ...rest] = value;
+				return [key, [t - timestampDiff, ...rest]];
+			});
+		}
+
 		return result;
+	}
+
+	/// Convert the data from a flat view to a tree.
+	///
+	/// \note Same keys will be overwritten, keeping the latest one only.
+	static toTree(data) {
+		let tree = {};
+		for (const [key, value] of data) {
+			const last = key.pop();
+			const object = key.reduce((r, segment) => {
+				r[segment] ??= {};
+				return r[segment];
+			}, tree);
+			object[last] = value;
+		}
+		return tree;
 	}
 
 	/// Get data from the nodes as a tree.
@@ -76,16 +106,7 @@ export class Node {
 	async getAsTree(options) {
 		const result = await this.get(options);
 
-		let tree = {};
-		for (const [key, value] of result.data) {
-			const last = key.pop();
-			const object = key.reduce((r, segment) => {
-				r[segment] ??= {};
-				return r[segment];
-			}, tree);
-			object[last] = value;
-		}
-		result.data = tree;
+		result.data = Node.toTree(result.data);
 
 		return result;
 	}
