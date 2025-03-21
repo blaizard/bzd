@@ -31,6 +31,7 @@ export default class FileSystem {
 				return;
 			}
 		}
+		path = Path.resolve(path);
 		const fileList = await FileSystem.readdir(path);
 		for (const i in fileList) {
 			const curPath = Path.resolve(path, fileList[i]);

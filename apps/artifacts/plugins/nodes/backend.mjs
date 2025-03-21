@@ -6,6 +6,7 @@ import Records from "#bzd/apps/artifacts/plugins/nodes/records.mjs";
 import { HttpClientFactory } from "#bzd/nodejs/core/http/client.mjs";
 import Data from "#bzd/apps/artifacts/plugins/nodes/data.mjs";
 import Process from "#bzd/nodejs/core/services/process.mjs";
+import Services from "#bzd/nodejs/core/services/services.mjs";
 
 const Exception = ExceptionFactory("apps", "plugin", "nodes");
 
@@ -94,55 +95,55 @@ class FetchFromRemoteProcess extends Process {
 	}
 
 	async process(options) {
-		const tickRemote = this.plugin.records.getTickRemote(this.storageName, 0);
-		const result = await this.client.get("/@records", {
-			query: {
-				tick: tickRemote,
-			},
-		});
-
-		if (result.version !== Plugin.version) {
-			options.periodS = 5 * 60; // Retry in 5min.
-			return {
-				message: "Invalid version for remote recode",
-				actual: result.version,
-				expected: Plugin.version,
-			};
-		}
-
-		const timestampRemote = result.timestamp;
-		const timestampLocal = Data.getTimestamp();
-		const tick = result.next;
-		const end = result.end;
-
-		// Apply the records from remote.
-		for (const record of result.records) {
-			/// Records from remote are optimized to disk.
-			record = Plugin.recordFromDisk(record);
-
-			/// Adjust the timestamp of all records.
-			const updatedRecords = record.map(([uid, key, value, timestamp]) => {
-				return [uid, key, value, timestamp - timestampRemote + timestampLocal];
+		try {
+			const tickRemote = this.plugin.records.getTickRemote(this.storageName, 0);
+			const result = await this.client.get("/@records", {
+				query: {
+					tick: tickRemote,
+				},
 			});
 
-			await this.plugin.nodes.insertRecord(updatedRecords);
-			await this.plugin.records.write(updatedRecords, this.storageName, tick);
-		}
+			const timestampRemote = result.timestamp;
+			const timestampLocal = Data.getTimestamp();
+			const tick = result.next;
+			const end = result.end;
 
-		// Update the options.
-		if (end === false) {
-			options.periodS = 0.1;
-		} else {
-			const periodS = 600 * Math.exp(-result.records.length / 20);
-			options.periodS = Math.min(periodS, 60);
-		}
+			Exception.assert(
+				result.version === Plugin.version,
+				"Invalid version for remote record: {} vs {}",
+				result.version,
+				Plugin.version,
+			);
+			const updatedRecords = result.records.map((record) =>
+				Plugin.recordFromDisk(record).map(([uid, key, value, timestamp]) => {
+					return [uid, key, value, timestamp - timestampRemote + timestampLocal];
+				}),
+			);
 
-		return {
-			tick: [tickRemote, tick],
-			end: end,
-			nextCallS: options.periodS,
-			records: result.records.length,
-		};
+			// Apply the records from remote.
+			for (const record of updatedRecords) {
+				await this.plugin.nodes.insertRecord(record);
+				await this.plugin.records.write(record, this.storageName, tick);
+			}
+
+			// Update the options.
+			if (end === false) {
+				options.periodS = 0.1;
+			} else {
+				const periodS = 600 * Math.exp(-result.records.length / 20);
+				options.periodS = Math.min(periodS, 60);
+			}
+
+			return {
+				tick: [tickRemote, tick],
+				end: end,
+				nextCallS: options.periodS,
+				records: result.records.length,
+			};
+		} catch (e) {
+			options.periodS = 5 * 60; // Retry in 5min on error.
+			throw e;
+		}
 	}
 }
 
@@ -211,6 +212,7 @@ export default class Plugin extends PluginBase {
 			}
 			const client = new components.HttpClientFactory(data.host + "/x/" + volume, optionsClient);
 			provider.addTimeTriggeredProcess("remote." + storageName, new FetchFromRemoteProcess(this, client, storageName), {
+				policy: data.throwOnFailure ? Services.Policy.throw : Services.Policy.ignore,
 				periodS: 5,
 				delayS: data.delayS || null,
 			});
