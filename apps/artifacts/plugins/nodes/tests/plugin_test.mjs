@@ -179,6 +179,15 @@ const recordOnDiskTest1 = [
 	],
 ];
 
+const recordOnDiskTestVersion1 = [
+	["accounts", ["data", "cpu", "main"], [0.01], 1742552298029],
+	["accounts", ["data", "memory", "ram"], [432209920, 1003941888], 1742552298029],
+	["accounts", ["data", "disk", "/dev/vda1"], [14132637696, 25821052928], 1742552298029],
+	["accounts", ["data", "disk", "/dev/loop2"], [109051904, 109051904], 1742552298029],
+	["accounts", ["data", "disk", "/dev/loop0"], [4456448, 4456448], 1742552298029],
+	["accounts", ["data", "disk", "/dev/vda15"], [6333952, 109422592], 1742552298029],
+];
+
 describe("Nodes", () => {
 	describe("Plugin", () => {
 		const tester = new PluginTester();
@@ -266,7 +275,7 @@ describe("Nodes", () => {
 			Exception.assertEqual(response.data.records.length, 2);
 			Exception.assertEqual(response.data.end, true);
 			Exception.assertEqual(response.data.next, 3);
-			Exception.assertEqual(response.data.version, 2);
+			Exception.assertEqual(response.data.version, 3);
 		});
 
 		it("stop", async () => {
@@ -309,9 +318,15 @@ describe("Nodes", () => {
 			const result = Plugin.recordFromDisk(recordOnDiskTest1);
 			Exception.assertEqual(result, recordTest1);
 		});
+
+		it("RecordFromDiskVersion1", async () => {
+			Exception.assertThrowsWithMatch(() => {
+				Plugin.recordFromDisk(recordOnDiskTestVersion1);
+			}, "Recursive function depth exceeded");
+		});
 	});
 
-	const makeRemoteTest = async (onFetchCallback, verify) => {
+	const makeRemoteTest = async (onFetchCallback, verify = () => {}) => {
 		const tester = new PluginTester();
 		let fetched = false;
 		tester.register(
@@ -339,7 +354,6 @@ describe("Nodes", () => {
 		);
 
 		await tester.start();
-
 		try {
 			await waitUntil(() => fetched);
 			const response = await tester.send("nodes", "get", "/@records");
@@ -365,21 +379,17 @@ describe("Nodes", () => {
 				},
 			);
 		});
-		// The exception is uncaught because of the setTimeout in services,
-		// find a way to handle this properly.
-		/*it("malformed", async () => {
-			Exception.assertThrowsWithMatch(async () => {
-				await makeRemoteTest(
-					() => ({
-						version: Plugin.version,
-						timestamp: "string!>",
-						records: {"this is not as expected": "no no no"},
-						next: 10000,
-						end: true,
-					})
-				);
+		it("malformed", async () => {
+			await Exception.assertThrowsWithMatch(async () => {
+				await makeRemoteTest(() => ({
+					version: Plugin.version,
+					timestamp: "string!>",
+					records: { "this is not as expected": "no no no" },
+					next: 10000,
+					end: true,
+				}));
 			}, "result.records.map is not a function");
-		});*/
+		});
 		it("valid records", async () => {
 			await makeRemoteTest(
 				() => ({
@@ -390,7 +400,8 @@ describe("Nodes", () => {
 					end: true,
 				}),
 				(records) => {
-					Exception.assertEqual(records[0].length, 56);
+					Exception.assertEqual(records.length, 1);
+					Exception.assertEqual(records[0].length, 5);
 				},
 			);
 		});

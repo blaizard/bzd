@@ -91,7 +91,7 @@ export const ExceptionFactory = (...topics) => {
 		/// \param ...args (optional) Arguments to add to the message.
 		static assertPrecondition(expression, message = "", ...args) {
 			if (!expression) {
-				throw this.makePreconditionException("Precondition failed" + (message ? "; " + message : ""), ...args);
+				throw Exception.makePreconditionException("Precondition failed" + (message ? "; " + message : ""), ...args);
 			}
 		}
 
@@ -109,7 +109,7 @@ export const ExceptionFactory = (...topics) => {
 		/// \param expression The result to evaluate.
 		static assertPreconditionResult(result) {
 			if (result.hasError()) {
-				throw this.makePreconditionException("Precondition failed; " + result.error());
+				throw Exception.makePreconditionException("Precondition failed; " + result.error());
 			}
 		}
 
@@ -171,7 +171,7 @@ export const ExceptionFactory = (...topics) => {
 
 		/// Ensures that a specific block of code throws an exception
 		static async assertThrows(block, message = "", ...args) {
-			this.assertThrowsWithMatch(block, "", message, ...args);
+			Exception.assertThrowsWithMatch(block, "", message, ...args);
 		}
 
 		/// Error reached
@@ -181,7 +181,7 @@ export const ExceptionFactory = (...topics) => {
 
 		/// Error reached
 		static errorPrecondition(message, ...args) {
-			throw this.makePreconditionException("Error; " + message, ...args);
+			throw Exception.makePreconditionException("Error; " + message, ...args);
 		}
 
 		/// Flag a line of code unreachable

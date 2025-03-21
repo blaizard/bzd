@@ -123,7 +123,7 @@ class FetchFromRemoteProcess extends Process {
 			// Apply the records from remote.
 			for (const record of updatedRecords) {
 				await this.plugin.nodes.insertRecord(record);
-				await this.plugin.records.write(record, this.storageName, tick);
+				await this.plugin.records.write(Plugin.recordToDisk(record), this.storageName, tick);
 			}
 
 			// Update the options.
@@ -396,7 +396,7 @@ export default class Plugin extends PluginBase {
 	}
 
 	static get version() {
-		return 2;
+		return 3;
 	}
 
 	/// Write a record to the disk.
@@ -437,13 +437,14 @@ export default class Plugin extends PluginBase {
 	/// \return The original record.
 	static recordFromDisk(record) {
 		let fromDiskRecord = [];
-		const traverse = (fragment, key = []) => {
+		const traverse = (fragment, key = [], depth = 0) => {
+			Exception.assert(depth < 32, "Recursive function depth exceeded: {}", depth);
 			let paths = [];
 			for (const [part, data] of Object.entries(fragment)) {
 				if (part == "_") {
 					paths.push([key, data]);
 				} else {
-					paths = paths.concat(traverse(data, [...key, part]));
+					paths = paths.concat(traverse(data, [...key, part], depth + 1));
 				}
 			}
 			return paths;

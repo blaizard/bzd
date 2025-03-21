@@ -26,12 +26,17 @@ export default class Services {
 		ignore: "ignore",
 		/// Restart the whole
 		restart: "restart",
-		/// Raise an exception when an error occurs
+		/// Raise an exception when an error occurs. Note that the exception will not be thrown
+		/// immediately but only upon calling stop(). This ensures that we can catch it and it is
+		/// not thrown within a setTimeout context.
+		/// This policy is useful for testing.
 		throw: "throw",
 	});
 
 	constructor() {
 		this.services = {};
+		// Use when `throw` is set.
+		this.lastException = null;
 	}
 
 	/// Get the current timestamp in ms.
@@ -132,7 +137,8 @@ export default class Services {
 				case Services.Policy.restart:
 					break;
 				case Services.Policy.throw:
-					throw this.getLastError(uid, name);
+					this.lastException = this.getLastError(uid, name);
+					break;
 			}
 		}
 
@@ -189,7 +195,7 @@ export default class Services {
 				return log.error;
 			}
 		}
-		throw new Exception("No previous error found with service {}::{}", uid, name);
+		return new Exception("No previous error found with service {}::{}", uid, name);
 	}
 
 	/// Start a specific service.
@@ -226,7 +232,8 @@ export default class Services {
 					case Services.Policy.restart:
 						break;
 					case Services.Policy.throw:
-						throw this.getLastError(uid, name);
+						this.lastException = this.getLastError(uid, name);
+						break;
 				}
 
 				return false;
@@ -269,7 +276,8 @@ export default class Services {
 					case Services.Policy.restart:
 						break;
 					case Services.Policy.throw:
-						throw this.getLastError(uid, name);
+						this.lastException = this.getLastError(uid, name);
+						break;
 				}
 			}
 		}
@@ -291,6 +299,9 @@ export default class Services {
 	async stop() {
 		for (const uid of Object.keys(this.services)) {
 			await this.stopService(uid);
+		}
+		if (this.lastException !== null) {
+			throw this.lastException;
 		}
 	}
 
