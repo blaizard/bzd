@@ -110,9 +110,10 @@ class FetchFromRemoteProcess extends Process {
 
 			Exception.assert(
 				result.version === Plugin.version,
-				"Invalid version for remote record: {} vs {}",
+				"Invalid version for remote record: {} vs {} (tick remote: {})",
 				result.version,
 				Plugin.version,
+				tickRemote,
 			);
 			const updatedRecords = result.records.map((record) =>
 				Plugin.recordFromDisk(record).map(([uid, key, value, timestamp]) => {
