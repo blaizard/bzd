@@ -147,7 +147,15 @@ class FetchFromRemoteProcess extends Process {
 }
 
 export default class Plugin extends PluginBase {
-	constructor(volume, options, provider, endpoints) {
+	constructor(volume, options, provider, endpoints, components = {}) {
+		// Components that can be mocked for testing.
+		components = Object.assign(
+			{
+				HttpClientFactory: HttpClientFactory,
+			},
+			components,
+		);
+
 		super(volume, options, provider, endpoints);
 		this.nodes = null;
 
@@ -201,10 +209,10 @@ export default class Plugin extends PluginBase {
 					t: data.token,
 				};
 			}
-			const client = new HttpClientFactory(data.host + "/x/" + volume, optionsClient);
-
+			const client = new components.HttpClientFactory(data.host + "/x/" + volume, optionsClient);
 			provider.addTimeTriggeredProcess("remote." + storageName, new FetchFromRemoteProcess(this, client, storageName), {
 				periodS: 5,
+				delayS: data.delayS || null,
 			});
 		}
 

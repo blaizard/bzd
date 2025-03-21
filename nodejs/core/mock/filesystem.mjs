@@ -158,6 +158,13 @@ class Stats {
 	}
 }
 
+/// Policy to follow in case a file/directory does not exists.
+const _NotExists = Object.freeze({
+	create: "create",
+	null: "null",
+	throw: "throw",
+});
+
 export default class FileSystem {
 	/// Create a mocked filesystem.
 	///
@@ -166,7 +173,7 @@ export default class FileSystem {
 	constructor(init = {}) {
 		this.root = {};
 		for (const [path, content] of Object.entries(init)) {
-			const file = this._toFile(path, /*mustExists*/ false);
+			const file = this._toFile(path, _NotExists.create);
 			file.content = content;
 		}
 	}
@@ -184,18 +191,23 @@ export default class FileSystem {
 	/// Return the directory dictionary at a given path.
 	///
 	/// \return Will always return a directory dictionary.
-	_toDir(path, mustExists) {
+	_toDir(path, policy) {
 		const p = Pathlib.path(path);
 		let dir = this.root;
 		for (const segment of p.normalize.parts) {
 			if (!(segment in dir)) {
-				Exception.assert(!mustExists, "The path '{}' does not exists (directory '{}').", p.asPosix(), segment);
+				Exception.assert(
+					policy != _NotExists.throw,
+					"The path '{}' does not exists (directory '{}').",
+					p.asPosix(),
+					segment,
+				);
 				dir[segment] = {};
 			}
 			dir = dir[segment];
 			// Resolve the symlink.
 			if (dir instanceof Symlink) {
-				dir = this._toDir(dir.path, /*mustExists*/ true);
+				dir = this._toDir(dir.path, _NotExists.throw);
 			}
 			Exception.assert(dir.constructor == Object, "A file exists in the path '{}'.", p.asPosix());
 		}
@@ -203,31 +215,55 @@ export default class FileSystem {
 	}
 
 	/// Touch a file and return the file object.
-	_toFile(path, mustExists) {
+	_toFile(path, policy) {
 		const p = Pathlib.path(path);
-		const dir = this._toDir(p.parent, /*mustExists*/ false);
+		const dir = this._toDir(p.parent, policy);
+		if (dir === null) {
+			return null;
+		}
 		const name = p.name;
 		if (name in dir) {
 			if (dir[name] instanceof Symlink) {
-				return this._toFile(dir[name].path, /*mustExists*/ true);
+				return this._toFile(dir[name].path, _NotExists.throw);
 			}
 			Exception.assert(dir[name] instanceof File, "The path '{}' is pointing toward a directory.", p.asPosix());
 			return dir[name];
 		}
-		Exception.assert(mustExists == false, "The file '{}' doesn't exists.", p.asPosix());
+		Exception.assert(policy == _NotExists.create, "The file '{}' doesn't exists.", p.asPosix());
 		dir[name] = new File();
 		return dir[name];
 	}
 
+	/// Checks if the file or directory exists
+	async exists(path) {
+		await FileSystem._mockWait();
+		const p = Pathlib.path(path);
+		const dir = this._toDir(p.parent, _NotExists.null);
+	}
+
 	async mkdir(path) {
 		await FileSystem._mockWait();
-		this._toDir(path, /*mustExists*/ false);
+		this._toDir(path, _NotExists.create);
+	}
+
+	/// Remove a directory recursively
+	static async rmdir(path, mustExists = true) {
+		if (!mustExists) {
+			if (!(await FileSystem.exists(path))) {
+				return;
+			}
+		}
+		await FileSystem._mockWait();
+		const p = Pathlib.path(path);
+		const dir = this._toDir(p.parent, _NotExists.throw);
+		Exception.assert(p.name in dir, "The file '{}' doesn't exists.", p.asPosix());
+		delete dir[p.name];
 	}
 
 	/// Read the content of a directory
 	async readdir(path, withFileTypes = false) {
 		await FileSystem._mockWait();
-		const dir = this._toDir(path, /*mustExists*/ true);
+		const dir = this._toDir(path, _NotExists.throw);
 		if (withFileTypes) {
 			return Object.entries(dir).map(([name, entry]) => new Dirent(name, entry));
 		}
@@ -237,14 +273,14 @@ export default class FileSystem {
 	/// Append data to a file
 	async appendFile(path, data) {
 		await FileSystem._mockWait();
-		const file = this._toFile(path, /*mustExists*/ false);
+		const file = this._toFile(path, _NotExists.create);
 		file.content += data;
 	}
 
 	/// Get the stat object associated with a file
 	async stat(path) {
 		await FileSystem._mockWait();
-		const file = this._toFile(path, /*mustExists*/ true);
+		const file = this._toFile(path, _NotExists.throw);
 		return new Stats(file);
 	}
 
@@ -252,7 +288,7 @@ export default class FileSystem {
 	async unlink(path) {
 		await FileSystem._mockWait();
 		const p = Pathlib.path(path);
-		const dir = this._toDir(p.parent, /*mustExists*/ true);
+		const dir = this._toDir(p.parent, _NotExists.throw);
 		Exception.assert(p.name in dir, "The file '{}' doesn't exists.", p.asPosix());
 		delete dir[p.name];
 	}
@@ -261,13 +297,13 @@ export default class FileSystem {
 	/// updates its last modification date.
 	async touch(path) {
 		await FileSystem._mockWait();
-		this._toFile(path, /*mustExists*/ false);
+		this._toFile(path, _NotExists.create);
 	}
 
 	/// Read the content of a file
 	async readFile(path, options = "utf8") {
 		await FileSystem._mockWait();
-		const file = this._toFile(path, /*mustExists*/ true);
+		const file = this._toFile(path, _NotExists.throw);
 		return file.content;
 	}
 }

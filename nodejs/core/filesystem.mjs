@@ -25,7 +25,12 @@ export default class FileSystem {
 	}
 
 	/// Remove a directory recursively
-	static async rmdir(path) {
+	static async rmdir(path, mustExists = true) {
+		if (!mustExists) {
+			if (!(await FileSystem.exists(path))) {
+				return;
+			}
+		}
 		const fileList = await FileSystem.readdir(path);
 		for (const i in fileList) {
 			const curPath = Path.resolve(path, fileList[i]);

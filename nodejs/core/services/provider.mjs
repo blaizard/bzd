@@ -57,16 +57,26 @@ export default class Provider {
 		};
 	}
 
+	get commongStartOptions() {
+		return Object.assign(this.commongOptions, {
+			policy: Services.Policy.throw,
+		});
+	}
+
+	get commongStopOptions() {
+		return this.commongOptions;
+	}
+
 	addStartProcess(process, options = {}) {
 		const name = "start." + (this.processesStart.length + 1);
 		this.processesStart.push(name);
-		this._addProcess(name, process, Object.assign(this.commongOptions, options));
+		this._addProcess(name, process, Object.assign(this.commongStartOptions, options));
 	}
 
 	addStopProcess(process, options = {}) {
 		const name = "stop." + (this.processesStop.length + 1);
 		this.processesStop.push(name);
-		this._addProcess(name, process, Object.assign(this.commongOptions, options));
+		this._addProcess(name, process, Object.assign(this.commongStopOptions, options));
 	}
 
 	addTimeTriggeredProcess(name, process, options = {}) {

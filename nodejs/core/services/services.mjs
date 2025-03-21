@@ -26,6 +26,8 @@ export default class Services {
 		ignore: "ignore",
 		/// Restart the whole
 		restart: "restart",
+		/// Raise an exception when an error occurs
+		throw: "throw",
 	});
 
 	constructor() {
@@ -129,6 +131,8 @@ export default class Services {
 					break;
 				case Services.Policy.restart:
 					break;
+				case Services.Policy.throw:
+					throw this.getLastError(uid, name);
 			}
 		}
 
@@ -177,6 +181,17 @@ export default class Services {
 		return uid;
 	}
 
+	/// Get the last error of a service/name pair.
+	getLastError(uid, name) {
+		const service = this.services[uid];
+		for (const log of service.records[name].logs) {
+			if (log.error !== null) {
+				return log.error;
+			}
+		}
+		throw new Exception("No previous error found with service {}::{}", uid, name);
+	}
+
 	/// Start a specific service.
 	async startService(uid) {
 		const service = this.services[uid];
@@ -202,6 +217,18 @@ export default class Services {
 			if (!(await this.runProcess(uid, name))) {
 				service.state.timestampStop = Services._getTimestamp();
 				service.state.status = Services.Status.error;
+
+				// Handle the error based on the policy.
+				const object = service.provider.processes[name];
+				switch (object.options.policy) {
+					case Services.Policy.ignore:
+						break;
+					case Services.Policy.restart:
+						break;
+					case Services.Policy.throw:
+						throw this.getLastError(uid, name);
+				}
+
 				return false;
 			}
 		}
@@ -233,7 +260,18 @@ export default class Services {
 
 		// Start the stop processes if any.
 		for (const [name, _] of service.provider.getStopProcesses()) {
-			await this.runProcess(uid, name);
+			if (!(await this.runProcess(uid, name))) {
+				// Handle the error based on the policy.
+				const object = service.provider.processes[name];
+				switch (object.options.policy) {
+					case Services.Policy.ignore:
+						break;
+					case Services.Policy.restart:
+						break;
+					case Services.Policy.throw:
+						throw this.getLastError(uid, name);
+				}
+			}
 		}
 
 		service.state.timestampStop = Services._getTimestamp();
@@ -354,7 +392,15 @@ export default class Services {
 		api.handle("get", "/admin/service/logs", async (inputs) => {
 			const record = this.getProcess(inputs.uid, inputs.name);
 			return {
-				logs: record.logs,
+				logs: record.logs.map((log) => {
+					return {
+						// Convert the error to string.
+						error: log.error ? String(log.error) : null,
+						timestampStart: log.timestampStart,
+						timestampStop: log.timestampStop,
+						result: log.result,
+					};
+				}),
 			};
 		});
 

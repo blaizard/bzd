@@ -19,6 +19,7 @@ export default class Record {
 	/// - recordMaxSize: The maximum size of a single record file in bytes.
 	/// - maxSize: The maximum total size of all records in a storage in bytes.
 	/// - storages: An array of storage names to create.
+	/// - clean: Whether the directory should be cleaned or not.
 	constructor(options = {}) {
 		this.options = Object.assign(
 			{
@@ -27,6 +28,7 @@ export default class Record {
 				recordMaxSize: 1024 * 1024,
 				maxSize: 20 * 1024 * 1024,
 				storages: [Record.defaultStorageName],
+				clean: false,
 			},
 			options,
 		);
@@ -63,6 +65,11 @@ export default class Record {
 	}
 
 	async init(callback) {
+		// Cleanup the directory if needed.
+		if (this.options.clean) {
+			await this.options.fs.rmdir(this.options.path, /*mustExists*/ false);
+		}
+
 		// Initialize all storages.
 		for (const storage of Object.values(this.storages)) {
 			await this.options.fs.mkdir(storage.path);

@@ -13,12 +13,13 @@ export class HttpClientFactory {
 	constructor(url, optionsOrCallback = {}) {
 		this.url = url;
 		this.optionsOrCallback = optionsOrCallback;
+		this.HttpClientClass = HttpClient;
 	}
 
 	async request(endpoint, options = {}) {
 		const baseOptions =
 			typeof this.optionsOrCallback == "function" ? await this.optionsOrCallback(options.args) : this.optionsOrCallback;
-		return await HttpClient.request(this.url + endpoint, deepMerge({}, baseOptions, options));
+		return await this.HttpClientClass.request(this.url + endpoint, deepMerge({}, baseOptions, options));
 	}
 
 	async get(endpoint, options = {}) {

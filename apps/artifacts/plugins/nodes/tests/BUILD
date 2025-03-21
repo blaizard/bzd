@@ -30,6 +30,8 @@ bzd_nodejs_test(
         "//apps/artifacts/backend:plugin_tester",
         "//apps/artifacts/plugins/nodes:backend",
         "//nodejs/core:exception",
+        "//nodejs/core/http/mock:client",
+        "//nodejs/utils:delay",
     ],
 )
 

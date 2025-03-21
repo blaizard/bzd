@@ -13,12 +13,18 @@ export default class PluginTester {
 		this.services = new Services();
 	}
 
-	register(volume, PluginType, options = {}) {
+	/// Register a plugin for testing.
+	///
+	/// \param volume The name of the volume.
+	/// \param PluginType The plugin class to be tested.
+	/// \param options A dictionary of options to be passed to the plugin instance.
+	/// \param components Additional components to be mocked.
+	register(volume, PluginType, options = {}, components = undefined) {
 		Exception.assert(!(volume in this.plugins), "Volume {} already registered.", volume);
 
 		const provider = new ServiceProvider(volume);
 		const endpoints = new EndpointsFactory();
-		const instance = new PluginType(volume, options, provider, endpoints);
+		const instance = new PluginType(volume, options, provider, endpoints, components);
 		let routers = {};
 		for (const [method, dataList] of Object.entries(endpoints.unwrap())) {
 			routers[method] ??= new Router();

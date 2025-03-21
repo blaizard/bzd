@@ -1,8 +1,19 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import Plugin from "#bzd/apps/artifacts/plugins/nodes/backend.mjs";
 import PluginTester from "#bzd/apps/artifacts/backend/plugin_tester.mjs";
+import { makeMockHttpClientFactory } from "#bzd/nodejs/core/http/mock/client.mjs";
+import { delayMs } from "#bzd/nodejs/utils/delay.mjs";
 
 const Exception = ExceptionFactory("test", "artifacts", "plugins", "nodes");
+
+const waitUntil = async (callback) => {
+	while (true) {
+		if (await callback()) {
+			return;
+		}
+		await delayMs(10);
+	}
+};
 
 describe("Nodes", () => {
 	describe("Plugin", () => {
@@ -10,6 +21,7 @@ describe("Nodes", () => {
 		tester.register("nodes", Plugin, {
 			"nodes.records": {
 				path: "./records",
+				clean: true,
 			},
 		});
 
@@ -296,6 +308,61 @@ describe("Nodes", () => {
 		it("RecordFromDisk", async () => {
 			const result = Plugin.recordFromDisk(recordOnDiskTest1);
 			Exception.assertEqual(result, recordTest1);
+		});
+	});
+
+	const makeRemoteTest = async (onFetchCallback, verify) => {
+		const tester = new PluginTester();
+		let fetched = false;
+		tester.register(
+			"nodes",
+			Plugin,
+			{
+				"nodes.records": {
+					path: "./records",
+					clean: true,
+				},
+				"nodes.remotes": {
+					remote1: {
+						host: "http://remote1",
+						delayS: 0.1,
+					},
+				},
+			},
+			{
+				HttpClientFactory: makeMockHttpClientFactory((url, options) => {
+					fetched = true;
+					return onFetchCallback(url, options);
+				}),
+			},
+		);
+
+		await tester.start();
+
+		try {
+			await waitUntil(() => fetched);
+			const response = await tester.send("nodes", "get", "/@records");
+			Exception.assertEqual(response.status, 200);
+			verify(response.data.records);
+		} finally {
+			await tester.stop();
+		}
+	};
+
+	describe("Remote", () => {
+		it("empty", async () => {
+			await makeRemoteTest(
+				() => ({
+					version: Plugin.version,
+					timestamp: 121231,
+					records: [],
+					next: 1,
+					end: true,
+				}),
+				(records) => {
+					Exception.assertEqual(records, []);
+				},
+			);
 		});
 	});
 });
