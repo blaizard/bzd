@@ -7,6 +7,11 @@ import { HttpClientFactory } from "#bzd/nodejs/core/http/client.mjs";
 import Data from "#bzd/apps/artifacts/plugins/nodes/data.mjs";
 import Process from "#bzd/nodejs/core/services/process.mjs";
 import Services from "#bzd/nodejs/core/services/services.mjs";
+import SinkInfluxDB from "#bzd/apps/artifacts/plugins/nodes/sinks/influxdb.mjs";
+
+const sinkTypes = {
+	influxdb: SinkInfluxDB,
+};
 
 const Exception = ExceptionFactory("apps", "plugin", "nodes");
 
@@ -169,11 +174,12 @@ export default class Plugin extends PluginBase {
 		// 	},
 		// 	...
 		// }
-		const optionsRemotes = options["nodes.remotes"] || {};
+		const optionsSources = options["nodes.sources"] || {};
+		const optionsSinks = options["nodes.sinks"] || {};
 		const optionsRecords = Object.assign(
 			{
 				// Set the default storages from the remotes options.
-				storages: [Records.defaultStorageName, ...Object.keys(optionsRemotes)],
+				storages: [Records.defaultStorageName, ...Object.keys(optionsSources)],
 			},
 			options["nodes.records"] || {},
 		);
@@ -201,7 +207,7 @@ export default class Plugin extends PluginBase {
 		//		"host": "http://localhost:8081"
 		//	},
 		//  ...
-		for (const [storageName, data] of Object.entries(optionsRemotes)) {
+		for (const [storageName, data] of Object.entries(optionsSources)) {
 			const volume = data.volume || storageName;
 			let optionsClient = {
 				expect: "json",
@@ -212,7 +218,22 @@ export default class Plugin extends PluginBase {
 				};
 			}
 			const client = new components.HttpClientFactory(data.host + "/x/" + volume, optionsClient);
-			provider.addTimeTriggeredProcess("remote." + storageName, new FetchFromRemoteProcess(this, client, storageName), {
+			provider.addTimeTriggeredProcess("source." + storageName, new FetchFromRemoteProcess(this, client, storageName), {
+				policy: data.throwOnFailure ? Services.Policy.throw : Services.Policy.ignore,
+				periodS: 5,
+				delayS: data.delayS || null,
+			});
+		}
+
+		// Add sink processes
+		//
+		// "name": {
+		//     "type": "influxdb",
+		//     "host": "http://localhost:8081"
+		// }
+		for (const [sinkName, data] of Object.entries(optionsSinks)) {
+			Exception.assert(data.type in sinkTypes, "Unrecognized sink type '{}'.", data.type);
+			provider.addTimeTriggeredProcess("sink." + sinkName, new sinkTypes[data.type](this, data), {
 				policy: data.throwOnFailure ? Services.Policy.throw : Services.Policy.ignore,
 				periodS: 5,
 				delayS: data.delayS || null,
@@ -316,32 +337,20 @@ export default class Plugin extends PluginBase {
 				tick = 0;
 			}
 			let maxSize = context.getQuery("size", 1024 * 1024, parseInt);
+			// Pass the record as written to disk (don't use recordFromDisk)
+			// This is done to save network bandwidth.
+			const output = await this.read(tick, maxSize, /*diskFormat*/ true);
 
-			let records = [];
-			let currentTick = null;
-			let record = null;
-			let end = true;
-			let size = null;
-			for await ([currentTick, record, size] of this.records.read(tick)) {
-				// Pass the record as written to disk (don't use recordFromDisk)
-				// This is done to save network bandwidth.
-				records.push(record);
-				maxSize -= size;
-				if (maxSize <= 0) {
-					end = false;
-					break;
-				}
-			}
-
-			const output = {
-				version: Plugin.version,
-				timestamp: Date.now(),
-				records: records,
-				next: currentTick === null ? tick : currentTick + 1,
-				end: end,
-			};
 			context.setStatus(200);
-			context.sendJson(output);
+			context.sendJson(
+				Object.assign(
+					{
+						version: Plugin.version,
+						timestamp: Date.now(),
+					},
+					output,
+				),
+			);
 		});
 
 		/// Insert one or multiple entries.
@@ -463,5 +472,35 @@ export default class Plugin extends PluginBase {
 			.split("/")
 			.filter(Boolean)
 			.map((x) => decodeURIComponent(x));
+	}
+
+	/// Read records from the given tick.
+	///
+	/// \param tick The initial tick to read from.
+	/// \param maxSize The maximum size the data should be (this is an approximation).
+	/// \param diskFormat Whether the record should keep the disk formatting or be converted.
+	///
+	/// \return A dictionary with the records, the next tick and a flag specifying if this is
+	/// the end of the database.
+	async read(tick, maxSize, diskFormat) {
+		let records = [];
+		let currentTick = null;
+		let record = null;
+		let end = true;
+		let size = null;
+		for await ([currentTick, record, size] of this.records.read(tick)) {
+			records.push(diskFormat ? record : Plugin.recordFromDisk(record));
+			maxSize -= size;
+			if (maxSize <= 0) {
+				end = false;
+				break;
+			}
+		}
+
+		return {
+			records: records,
+			next: currentTick === null ? tick : currentTick + 1,
+			end: end,
+		};
 	}
 }

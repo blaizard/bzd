@@ -60,7 +60,7 @@
             "nodes.records": {
                 "path": "./nodes_mirror.records"
             },
-            "nodes.remotes": {
+            "nodes.sources": {
                 "nodes": {
                     "host": "http://localhost:8081"
                 }

@@ -337,7 +337,7 @@ describe("Nodes", () => {
 					path: "./records",
 					clean: true,
 				},
-				"nodes.remotes": {
+				"nodes.sources": {
 					remote1: {
 						host: "http://remote1",
 						delayS: 0.1,

@@ -32,6 +32,7 @@ bzd_nodejs_library(
         ":records",
         "//apps/artifacts/backend:plugin",
         "//apps/artifacts/plugins/nodes/handlers",
+        "//apps/artifacts/plugins/nodes/sinks:influxdb",
         "//nodejs/core:cache",
         "//nodejs/core:exception",
         "//nodejs/core:log",
