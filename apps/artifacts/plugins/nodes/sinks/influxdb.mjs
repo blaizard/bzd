@@ -1,5 +1,4 @@
 import Sink from "#bzd/apps/artifacts/plugins/nodes/sinks/sink.mjs";
-import { HttpClientFactory } from "#bzd/nodejs/core/http/client.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 
 const Exception = ExceptionFactory("artifacts", "nodes", "sink", "influxdb");
@@ -13,7 +12,7 @@ export default class SinkInfluxDB extends Sink {
 		Exception.assert("bucket" in this.options, "The 'bucket' attribute must be set.");
 		Exception.assert("token" in this.options, "The 'token' attribute must be set.");
 
-		this.client = new HttpClientFactory(this.options.host, {
+		this.client = new this.components.HttpClientFactory(this.options.host, {
 			query: {
 				org: this.options.org,
 				bucket: this.options.bucket,

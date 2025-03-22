@@ -233,7 +233,7 @@ export default class Plugin extends PluginBase {
 		// }
 		for (const [sinkName, data] of Object.entries(optionsSinks)) {
 			Exception.assert(data.type in sinkTypes, "Unrecognized sink type '{}'.", data.type);
-			provider.addTimeTriggeredProcess("sink." + sinkName, new sinkTypes[data.type](this, data), {
+			provider.addTimeTriggeredProcess("sink." + sinkName, new sinkTypes[data.type](this, data, components), {
 				policy: data.throwOnFailure ? Services.Policy.throw : Services.Policy.ignore,
 				periodS: 5,
 				delayS: data.delayS || null,

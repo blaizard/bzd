@@ -4,10 +4,11 @@ import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 const Exception = ExceptionFactory("artifacts", "nodes", "sink");
 
 export default class Sink extends Process {
-	constructor(plugin, options) {
+	constructor(plugin, options, components) {
 		super();
 		this.plugin = plugin;
 		this.options = options;
+		this.components = components;
 		this.tick = 0;
 
 		Exception.assert(typeof this.onRecords === "function", "A sink must implement a 'onRecords' function.");

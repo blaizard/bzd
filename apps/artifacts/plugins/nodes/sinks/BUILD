@@ -10,7 +10,6 @@ bzd_nodejs_library(
     ],
     deps = [
         ":sink",
-        "//nodejs/core/http:client",
     ],
 )
 

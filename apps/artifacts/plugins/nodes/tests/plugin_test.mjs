@@ -326,7 +326,7 @@ describe("Nodes", () => {
 		});
 	});
 
-	const makeRemoteTest = async (onFetchCallback, verify = () => {}) => {
+	const makeSourceTest = async (onFetchCallback, verify = () => {}) => {
 		const tester = new PluginTester();
 		let fetched = false;
 		tester.register(
@@ -338,8 +338,8 @@ describe("Nodes", () => {
 					clean: true,
 				},
 				"nodes.sources": {
-					remote1: {
-						host: "http://remote1",
+					source1: {
+						host: "http://source1",
 						delayS: 0.1,
 						throwOnFailure: true,
 					},
@@ -364,9 +364,9 @@ describe("Nodes", () => {
 		}
 	};
 
-	describe("Remote", () => {
+	describe("Sources", () => {
 		it("empty", async () => {
-			await makeRemoteTest(
+			await makeSourceTest(
 				() => ({
 					version: Plugin.version,
 					timestamp: 121231,
@@ -381,7 +381,7 @@ describe("Nodes", () => {
 		});
 		it("malformed", async () => {
 			await Exception.assertThrowsWithMatch(async () => {
-				await makeRemoteTest(() => ({
+				await makeSourceTest(() => ({
 					version: Plugin.version,
 					timestamp: "string!>",
 					records: { "this is not as expected": "no no no" },
@@ -391,7 +391,7 @@ describe("Nodes", () => {
 			}, "result.records.map is not a function");
 		});
 		it("valid records", async () => {
-			await makeRemoteTest(
+			await makeSourceTest(
 				() => ({
 					version: Plugin.version,
 					timestamp: 121231,
@@ -402,6 +402,64 @@ describe("Nodes", () => {
 				(records) => {
 					Exception.assertEqual(records.length, 1);
 					Exception.assertEqual(records[0].length, 5);
+				},
+			);
+		});
+	});
+
+	const makeSinkTest = async (options, onReceiveCallback) => {
+		const tester = new PluginTester();
+		let fetched = false;
+		tester.register(
+			"nodes",
+			Plugin,
+			{
+				"nodes.records": {
+					path: "./records",
+					clean: true,
+				},
+				"nodes.sinks": {
+					sink1: Object.assign(
+						{
+							delayS: 0.1,
+							throwOnFailure: true,
+						},
+						options,
+					),
+				},
+			},
+			{
+				HttpClientFactory: makeMockHttpClientFactory((url, options) => {
+					fetched = true;
+					onReceiveCallback(url, options);
+				}),
+			},
+		);
+
+		await tester.start();
+		try {
+			await tester.send("nodes", "post", "/uid01/hello/dict", {
+				headers: { "Content-Type": "application/json" },
+				data: JSON.stringify({ a: 1, b: 2 }),
+			});
+			await waitUntil(() => fetched);
+		} finally {
+			await tester.stop();
+		}
+	};
+
+	describe("Sinks", () => {
+		it("empty", async () => {
+			await makeSinkTest(
+				{
+					type: "influxdb",
+					org: "myorg",
+					bucket: "mybucket",
+					host: "http://influxdb1",
+					token: "mytoken",
+				},
+				(url, options) => {
+					Exception.assert(options.data.startsWith("uid01 hello.dict.a=1"));
 				},
 			);
 		});
