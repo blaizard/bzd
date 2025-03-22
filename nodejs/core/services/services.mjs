@@ -71,6 +71,7 @@ export default class Services {
 			durationAvg: 0,
 			status: Services.Status.idle,
 			logs: [],
+			errorLogs: [],
 		};
 		const record = service.records[name];
 
@@ -84,12 +85,11 @@ export default class Services {
 		// Check the maximum number of logs for this entry.
 		const maxLogs = object.options.maxLogs;
 		Exception.assert(typeof maxLogs == "number", "Maxlogs must be a number, instead: {}.", maxLogs);
+		const maxErrorLogs = object.options.maxErrorLogs;
+		Exception.assert(typeof maxErrorLogs == "number", "MaxErrorLogs must be a number, instead: {}.", maxErrorLogs);
 
 		// Insert the new log already.
 		record.logs.unshift(log);
-		if (record.logs.length > maxLogs) {
-			record.logs.splice(maxLogs);
-		}
 
 		try {
 			Log.debug("Running '{}.{}'...", uid, name);
@@ -110,8 +110,21 @@ export default class Services {
 			++record.errors;
 			record.status = Services.Status.error;
 			log.error = e;
+
+			// Insert the new error log if any and keep the last maxErrorLogs.
+			record.errorLogs.unshift(log);
+			if (record.errorLogs.length > maxErrorLogs) {
+				record.errorLogs.splice(maxErrorLogs);
+			}
+			// Remove the log from the current log queue.
+			record.logs.shift();
 		} finally {
 			log.timestampStop = Services._getTimestamp();
+		}
+
+		// Remove extra logs if any.
+		if (record.logs.length > maxLogs) {
+			record.logs.splice(maxLogs);
 		}
 
 		const duration = (log.timestampStop - log.timestampStart) / 1000;
@@ -403,7 +416,7 @@ export default class Services {
 		api.handle("get", "/admin/service/logs", async (inputs) => {
 			const record = this.getProcess(inputs.uid, inputs.name);
 			return {
-				logs: record.logs.map((log) => {
+				logs: [...record.errorLogs, ...record.logs].map((log) => {
 					return {
 						// Convert the error to string.
 						error: log.error ? String(log.error) : null,

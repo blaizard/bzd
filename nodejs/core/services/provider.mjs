@@ -52,6 +52,8 @@ export default class Provider {
 		return {
 			/// Maximum number of logs to be kept.
 			maxLogs: 10,
+			/// Maximum of error logs to be kept.
+			maxErrorLogs: 5,
 			/// The policy to be used when the process stops with an error.
 			policy: Services.Policy.ignore,
 		};
