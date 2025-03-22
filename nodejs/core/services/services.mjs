@@ -203,10 +203,8 @@ export default class Services {
 	/// Get the last error of a service/name pair.
 	getLastError(uid, name) {
 		const service = this.services[uid];
-		for (const log of service.records[name].logs) {
-			if (log.error !== null) {
-				return log.error;
-			}
+		if (service.records[name].errorLogs) {
+			return service.records[name].errorLogs[0].error;
 		}
 		return new Exception("No previous error found with service {}::{}", uid, name);
 	}

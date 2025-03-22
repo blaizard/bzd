@@ -19,11 +19,13 @@ export default class Sink extends Process {
 			const tickStart = this.tick;
 			const result = await this.plugin.read(tickStart, this.options.maxSize || 1024 * 1024, /*diskFormat*/ false);
 
-			this.tick = result.next;
-			const end = result.end;
-
 			const records = result.records.reduce((all, record) => all.concat(record), []);
 			const output = await this.onRecords(records);
+
+			// Set the tick after the onRecords callback is called to make sure that on errors we do not
+			// skip the tick and will retry later on.
+			this.tick = result.next;
+			const end = result.end;
 
 			// Update the options.
 			if (end === false) {
