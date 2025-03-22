@@ -30,7 +30,7 @@ export default class Nodes {
 					volume: volume,
 					token: token,
 					path: ["data"],
-					children: 2,
+					children: 3,
 					include: [["battery"], ["cpu"], ["gpu"], ["disk"], ["memory"], ["temperature"]],
 					metadata: true,
 				});

@@ -56,9 +56,9 @@ class _Monitor:
 		swap = psutil.swap_memory()  # type: ignore
 		memories = {}
 		if virtual.total:
-			memories["ram"] = [virtual.used, virtual.total]
+			memories["ram"] = {"used": virtual.used, "total": virtual.total}
 		if swap.total:
-			memories["swap"] = [swap.used, swap.total]
+			memories["swap"] = {"used": swap.used, "total": swap.total}
 		memories.update(self.nvidia.memories())
 		return memories
 
@@ -67,7 +67,7 @@ class _Monitor:
 		for partition in psutil.disk_partitions():  # type: ignore
 			if partition.device not in disks:
 				usage = psutil.disk_usage(partition.mountpoint)  # type: ignore
-				disks[partition.device] = [usage.used, usage.total]
+				disks[partition.device] = {"used": usage.used, "total": usage.total}
 		return disks
 
 	def upTime(self) -> float:

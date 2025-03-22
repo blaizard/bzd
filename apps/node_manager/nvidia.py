@@ -25,7 +25,7 @@ class Nvidia:
 		output = {}
 		for name, handle in self.handles:
 			info = pynvml.nvmlDeviceGetMemoryInfo(handle)  # type: ignore
-			output[name] = [info.used, info.total]
+			output[name] = {"used": info.used, "total": info.total}
 		return output
 
 	def temperatures(self) -> typing.Any:

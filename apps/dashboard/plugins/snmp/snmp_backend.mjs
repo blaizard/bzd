@@ -193,10 +193,10 @@ export default class SNMP {
 
 		// Assemble memory.
 		for (const [name, data] of Object.entries(memory)) {
-			object["memory"][name] ??= [0, 0];
+			object["memory"][name] ??= { used: 0, total: 0 };
 			Exception.assert("total" in data, "Memory is missing total");
-			object["memory"][name][1] = data.total;
-			object["memory"][name][0] = data.used || object["memory"][name][1] - data.free;
+			object["memory"][name].total = data.total;
+			object["memory"][name].used = data.used || object["memory"][name].total - data.free;
 		}
 
 		return object;
