@@ -45,7 +45,7 @@ export default async function makeFromConfig(config) {
 				config,
 			);
 			return await StorageDockerV2.make(config.url, config.options);
-		case "dockerv2":
+		case "webdav":
 			validateConfig(
 				{
 					type: "mandatory",
