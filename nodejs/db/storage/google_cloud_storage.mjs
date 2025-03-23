@@ -1,4 +1,4 @@
-import CloudAPI from "@google-cloud/storage";
+import { Storage } from "@google-cloud/storage";
 
 import ExceptionFactory from "../../core/exception.mjs";
 import LogFactory from "../../core/log.mjs";
@@ -8,7 +8,6 @@ import { CollectionPaging } from "../utils.mjs";
 import Permissions from "./permissions.mjs";
 import Base from "./storage.mjs";
 
-const Storage = CloudAPI.Storage;
 const Log = LogFactory("db", "storage", "google-cloud-storage");
 const Exception = ExceptionFactory("db", "storage", "google-cloud-storage");
 

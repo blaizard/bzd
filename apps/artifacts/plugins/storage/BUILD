@@ -11,7 +11,8 @@ bzd_nodejs_library(
     deps = [
         "//apps/artifacts/backend:plugin",
         "//apps/artifacts/plugins/extension/release",
-        "//nodejs/db/storage:webdav",
+        "//apps/artifacts/plugins/extension/upload",
+        "//nodejs/db/storage:make_from_config",
     ],
 )
 

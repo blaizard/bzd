@@ -1,9 +1,8 @@
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 
 _PLUGINS = [
-    "fs",
     "docker",
-    "webdav",
+    "storage",
     "nodes",
 ]
 

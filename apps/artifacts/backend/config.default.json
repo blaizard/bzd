@@ -9,8 +9,14 @@
     },
     "volumes": {
         "disk": {
-            "fs.root": "/",
-            "type": "fs"
+            "storage": {
+                "options": {
+                    "mustExists": true
+                },
+                "path": "/",
+                "type": "disk"
+            },
+            "type": "storage"
         },
         "nodes": {
             "nodes.data": {
