@@ -62,7 +62,8 @@
             },
             "nodes.sources": {
                 "nodes": {
-                    "host": "http://localhost:8081"
+                    "host": "http://localhost:8081",
+                    "type": "nodes"
                 }
             },
             "type": "nodes"

@@ -20,7 +20,6 @@ bzd_nodejs_library(
     name = "backend",
     srcs = [
         "backend.mjs",
-        "nodes.mjs",
         "storage.mjs",
     ],
     visibility = [
@@ -29,10 +28,11 @@ bzd_nodejs_library(
     deps = [
         ":data",
         ":key_mapping",
+        ":nodes",
         ":records",
         "//apps/artifacts/backend:plugin",
-        "//apps/artifacts/plugins/nodes/handlers",
         "//apps/artifacts/plugins/nodes/sinks:influxdb",
+        "//apps/artifacts/plugins/nodes/sources:nodes",
         "//nodejs/core:cache",
         "//nodejs/core:exception",
         "//nodejs/core:log",
@@ -42,6 +42,22 @@ bzd_nodejs_library(
         "//nodejs/db/key_value_store:make_from_config",
         "//nodejs/db/storage",
         "//nodejs/utils:optional",
+    ],
+)
+
+bzd_nodejs_library(
+    name = "nodes",
+    srcs = [
+        "nodes.mjs",
+    ],
+    visibility = [
+        "//apps/artifacts/plugins:__subpackages__",
+    ],
+    deps = [
+        ":data",
+        "//apps/artifacts/plugins/nodes/handlers",
+        "//nodejs/core:exception",
+        "//nodejs/core:log",
     ],
 )
 

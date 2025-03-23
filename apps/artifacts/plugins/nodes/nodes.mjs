@@ -1,6 +1,5 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
-import { CollectionPaging } from "#bzd/nodejs/db/utils.mjs";
 import Handlers from "#bzd/apps/artifacts/plugins/nodes/handlers/handlers.mjs";
 import Data from "#bzd/apps/artifacts/plugins/nodes/data.mjs";
 
@@ -95,5 +94,63 @@ export class Nodes {
 		for (const [uid, key, value, timestamp] of records) {
 			await this.data.insert(uid, [[key, value]], timestamp);
 		}
+	}
+
+	/// Write a record to the disk.
+	///
+	/// The process is made to reduce disk space.
+	///
+	/// \param record The original record.
+	///
+	/// \return The disk optimized record.
+	static recordToDisk(record) {
+		let clusters = {};
+		for (const [uid, key, value, timestamp] of record) {
+			const keyCluster = uid + "@" + timestamp;
+			clusters[keyCluster] ??= [];
+			clusters[keyCluster].push([key, value]);
+		}
+		let onDiskRecord = [];
+		for (const [keyCluster, cluster] of Object.entries(clusters)) {
+			const [uid, timestampStr] = keyCluster.split("@");
+			let valueCluster = {};
+			for (const [key, value] of cluster) {
+				let current = valueCluster;
+				for (const part of key) {
+					current[part] ??= {};
+					current = current[part];
+				}
+				current["_"] = value;
+			}
+			onDiskRecord.push([uid, valueCluster, parseInt(timestampStr)]);
+		}
+		return onDiskRecord;
+	}
+
+	/// Read a record form the disk.
+	///
+	/// \param record The disk optimized record.
+	///
+	/// \return The original record.
+	static recordFromDisk(record) {
+		let fromDiskRecord = [];
+		const traverse = (fragment, key = [], depth = 0) => {
+			Exception.assert(depth < 32, "Recursive function depth exceeded: {}", depth);
+			let paths = [];
+			for (const [part, data] of Object.entries(fragment)) {
+				if (part == "_") {
+					paths.push([key, data]);
+				} else {
+					paths = paths.concat(traverse(data, [...key, part], depth + 1));
+				}
+			}
+			return paths;
+		};
+		for (const [uid, valueCluster, timestamp] of record) {
+			for (const [key, value] of traverse(valueCluster)) {
+				fromDiskRecord.push([uid, key, value, timestamp]);
+			}
+		}
+		return fromDiskRecord;
 	}
 }

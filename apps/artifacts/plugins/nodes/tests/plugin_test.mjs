@@ -1,5 +1,6 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import Plugin from "#bzd/apps/artifacts/plugins/nodes/backend.mjs";
+import { Nodes } from "#bzd/apps/artifacts/plugins/nodes/nodes.mjs";
 import PluginTester from "#bzd/apps/artifacts/backend/plugin_tester.mjs";
 import { makeMockHttpClientFactory } from "#bzd/nodejs/core/http/mock/client.mjs";
 import { delayMs } from "#bzd/nodejs/utils/delay.mjs";
@@ -308,20 +309,20 @@ describe("Nodes", () => {
 
 	describe("RecordTo/FromDisk", () => {
 		it("RecordToDisk", async () => {
-			const result = Plugin.recordToDisk(recordTest1);
+			const result = Nodes.recordToDisk(recordTest1);
 			Exception.assertEqual(result, recordOnDiskTest1);
 			Exception.assertEqual(JSON.stringify(recordTest1).length, 4290);
 			Exception.assertEqual(JSON.stringify(result).length, 2662);
 		});
 
 		it("RecordFromDisk", async () => {
-			const result = Plugin.recordFromDisk(recordOnDiskTest1);
+			const result = Nodes.recordFromDisk(recordOnDiskTest1);
 			Exception.assertEqual(result, recordTest1);
 		});
 
 		it("RecordFromDiskVersion1", async () => {
 			Exception.assertThrowsWithMatch(() => {
-				Plugin.recordFromDisk(recordOnDiskTestVersion1);
+				Nodes.recordFromDisk(recordOnDiskTestVersion1);
 			}, "Recursive function depth exceeded");
 		});
 	});
@@ -339,6 +340,7 @@ describe("Nodes", () => {
 				},
 				"nodes.sources": {
 					source1: {
+						type: "nodes",
 						host: "http://source1",
 						delayS: 0.1,
 						throwOnFailure: true,
@@ -368,7 +370,7 @@ describe("Nodes", () => {
 		it("empty", async () => {
 			await makeSourceTest(
 				() => ({
-					version: Plugin.version,
+					version: 3,
 					timestamp: 121231,
 					records: [],
 					next: 1,
@@ -382,7 +384,7 @@ describe("Nodes", () => {
 		it("malformed", async () => {
 			await Exception.assertThrowsWithMatch(async () => {
 				await makeSourceTest(() => ({
-					version: Plugin.version,
+					version: 3,
 					timestamp: "string!>",
 					records: { "this is not as expected": "no no no" },
 					next: 10000,
@@ -393,7 +395,7 @@ describe("Nodes", () => {
 		it("valid records", async () => {
 			await makeSourceTest(
 				() => ({
-					version: Plugin.version,
+					version: 3,
 					timestamp: 121231,
 					records: [recordOnDiskTest1],
 					next: 1,

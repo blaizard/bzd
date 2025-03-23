@@ -8,9 +8,14 @@ import Data from "#bzd/apps/artifacts/plugins/nodes/data.mjs";
 import Process from "#bzd/nodejs/core/services/process.mjs";
 import Services from "#bzd/nodejs/core/services/services.mjs";
 import SinkInfluxDB from "#bzd/apps/artifacts/plugins/nodes/sinks/influxdb.mjs";
+import SourceNodes from "#bzd/apps/artifacts/plugins/nodes/sources/nodes.mjs";
 
 const sinkTypes = {
 	influxdb: SinkInfluxDB,
+};
+
+const sourceTypes = {
+	nodes: SourceNodes,
 };
 
 const Exception = ExceptionFactory("apps", "plugin", "nodes");
@@ -70,89 +75,6 @@ function rawBodyParse(body, headersFunc, forceContentType = null, forceCharset =
 	return body;
 }
 
-/// Data structure of bzd nodes is as follow:
-/// The following is key-ed by UID:
-/// 	pending: [] // an ordered list of pending actions.
-/// 	status: {} // a dictionary of well defined statuses (health status) of the node.
-///			- cpus
-///			- ram
-///			- version (SW, HW, ...)
-///			- ...
-/// 	records: {} // a dictionary of record from the target (those are the internal symbols of the application, it can be anything)
-///
-/// Note: all data should come from the node, no extra data should be available to ensure a single source of truth.
-///		For example no config on the health status check, the node should know it.
-///
-/// Questions:
-/// - What to do with firmware and firmware metadata?
-
-class FetchFromRemoteProcess extends Process {
-	/// Async process to fetch data from a remote.
-	///
-	/// \param client The http client factory to fetch data from.
-	/// \param storageName The name of the storage to be used for the records.
-	constructor(plugin, client, storageName) {
-		super();
-		this.plugin = plugin;
-		this.client = client;
-		this.storageName = storageName;
-		this.tick = 0;
-	}
-
-	async process(options) {
-		try {
-			const tickRemote = this.plugin.records.getTickRemote(this.storageName, 0);
-			const result = await this.client.get("/@records", {
-				query: {
-					tick: tickRemote,
-				},
-			});
-
-			const timestampRemote = result.timestamp;
-			const timestampLocal = Data.getTimestamp();
-			const tick = result.next;
-			const end = result.end;
-
-			Exception.assert(
-				result.version === Plugin.version,
-				"Invalid version for remote record: {} vs {} (tick remote: {})",
-				result.version,
-				Plugin.version,
-				tickRemote,
-			);
-			const updatedRecords = result.records.map((record) =>
-				Plugin.recordFromDisk(record).map(([uid, key, value, timestamp]) => {
-					return [uid, key, value, timestamp - timestampRemote + timestampLocal];
-				}),
-			);
-
-			// Apply the records from remote.
-			for (const record of updatedRecords) {
-				await this.plugin.nodes.insertRecord(record);
-				await this.plugin.records.write(Plugin.recordToDisk(record), this.storageName, tick);
-			}
-
-			// Update the options.
-			if (end === false) {
-				options.periodS = 0.1;
-			} else {
-				const periodS = 600 * Math.exp(-result.records.length / 20);
-				options.periodS = Math.min(periodS, 60);
-			}
-
-			return {
-				tick: [tickRemote, tick],
-				end: end,
-				nextCallS: options.periodS,
-				records: result.records.length,
-			};
-		} catch (e) {
-			options.periodS = 5 * 60; // Retry in 5min on error.
-			throw e;
-		}
-	}
-}
-
 export default class Plugin extends PluginBase {
 	constructor(volume, options, provider, endpoints, components = {}) {
 		// Components that can be mocked for testing.
@@ -195,37 +117,33 @@ export default class Plugin extends PluginBase {
 			this.setStorage(await StorageBzd.make(this.nodes));
 
 			const output = await this.records.init(async (record) => {
-				await this.nodes.insertRecord(Plugin.recordFromDisk(record));
+				await this.nodes.insertRecord(Nodes.recordFromDisk(record));
 			});
 
 			return output;
 		});
 
-		// Add fetch processes for remotes.
+		// Add source processes.
 		//
-		//	"nodes": {
+		//	"storageName": {
+		//     "type": "nodes",
 		//		"host": "http://localhost:8081"
 		//	},
 		//  ...
 		for (const [storageName, data] of Object.entries(optionsSources)) {
-			const volume = data.volume || storageName;
-			let optionsClient = {
-				expect: "json",
-			};
-			if (data.token) {
-				optionsClient["query"] = {
-					t: data.token,
-				};
-			}
-			const client = new components.HttpClientFactory(data.host + "/x/" + volume, optionsClient);
-			provider.addTimeTriggeredProcess("source." + storageName, new FetchFromRemoteProcess(this, client, storageName), {
-				policy: data.throwOnFailure ? Services.Policy.throw : Services.Policy.ignore,
-				periodS: 5,
-				delayS: data.delayS || null,
-			});
+			Exception.assert(data.type in sourceTypes, "Unrecognized source type '{}'.", data.type);
+			provider.addTimeTriggeredProcess(
+				"source." + storageName,
+				new sourceTypes[data.type](this, storageName, data, components),
+				{
+					policy: data.throwOnFailure ? Services.Policy.throw : Services.Policy.ignore,
+					periodS: 5,
+					delayS: data.delayS || null,
+				},
+			);
 		}
 
-		// Add sink processes
+		// Add sink processes.
 		//
 		// "name": {
 		//     "type": "influxdb",
@@ -345,7 +263,7 @@ export default class Plugin extends PluginBase {
 			context.sendJson(
 				Object.assign(
 					{
-						version: Plugin.version,
+						version: this.version,
 						timestamp: Date.now(),
 					},
 					output,
@@ -399,72 +317,14 @@ export default class Plugin extends PluginBase {
 			}
 
 			// Save the data written on disk.
-			await this.records.write(Plugin.recordToDisk(records));
+			await this.records.write(Nodes.recordToDisk(records));
 
 			context.sendStatus(200);
 		});
 	}
 
-	static get version() {
+	get version() {
 		return 3;
-	}
-
-	/// Write a record to the disk.
-	///
-	/// The process is made to reduce disk space.
-	///
-	/// \param record The original record.
-	///
-	/// \return The disk optimized record.
-	static recordToDisk(record) {
-		let clusters = {};
-		for (const [uid, key, value, timestamp] of record) {
-			const keyCluster = uid + "@" + timestamp;
-			clusters[keyCluster] ??= [];
-			clusters[keyCluster].push([key, value]);
-		}
-		let onDiskRecord = [];
-		for (const [keyCluster, cluster] of Object.entries(clusters)) {
-			const [uid, timestampStr] = keyCluster.split("@");
-			let valueCluster = {};
-			for (const [key, value] of cluster) {
-				let current = valueCluster;
-				for (const part of key) {
-					current[part] ??= {};
-					current = current[part];
-				}
-				current["_"] = value;
-			}
-			onDiskRecord.push([uid, valueCluster, parseInt(timestampStr)]);
-		}
-		return onDiskRecord;
-	}
-
-	/// Read a record form the disk.
-	///
-	/// \param record The disk optimized record.
-	///
-	/// \return The original record.
-	static recordFromDisk(record) {
-		let fromDiskRecord = [];
-		const traverse = (fragment, key = [], depth = 0) => {
-			Exception.assert(depth < 32, "Recursive function depth exceeded: {}", depth);
-			let paths = [];
-			for (const [part, data] of Object.entries(fragment)) {
-				if (part == "_") {
-					paths.push([key, data]);
-				} else {
-					paths = paths.concat(traverse(data, [...key, part], depth + 1));
-				}
-			}
-			return paths;
-		};
-		for (const [uid, valueCluster, timestamp] of record) {
-			for (const [key, value] of traverse(valueCluster)) {
-				fromDiskRecord.push([uid, key, value, timestamp]);
-			}
-		}
-		return fromDiskRecord;
 	}
 
 	static paramPathToKey(paramPath) {
@@ -489,7 +349,7 @@ export default class Plugin extends PluginBase {
 		let end = true;
 		let size = null;
 		for await ([currentTick, record, size] of this.records.read(tick)) {
-			records.push(diskFormat ? record : Plugin.recordFromDisk(record));
+			records.push(diskFormat ? record : Nodes.recordFromDisk(record));
 			maxSize -= size;
 			if (maxSize <= 0) {
 				end = false;
