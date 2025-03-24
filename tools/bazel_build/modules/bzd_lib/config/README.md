@@ -16,7 +16,7 @@ bzd_config_default(
     name = "config",
     values = {
       "hello": "world",
-      "nested.key": "1"
+      "nested.key": "1" # This notation expands the '.' as `{nested: {key: 1}}`
     },
 )
 ```
@@ -78,10 +78,10 @@ bzd_config_default(
     ]
 )
 
-py_binary(
+*_binary(
   ...
-  deps = [
-    ":config" # To access the config value with:`from config import path`.
+  srcs = [
+    ":config.json" # To access the config value with:`from config import path`.
   ],
   data = [
     ":config" # To access the files associated with the target at runtime.

@@ -72,11 +72,11 @@ class Config:
 				for existingKey in data.keys():
 					if f"{key}." in existingKey:
 						fatal(
-						    f"Cannot set a key '{key}' (from '{override.source}') and a nested key '{existingKey}' (from '{data[key][0]}') at the same time."
+						    f"Cannot set a key '{key}' (from '{override.source}') and a nested key '{existingKey}' (from '{data[existingKey][0]}') at the same time."
 						)
 					if f"{existingKey}." in key:
 						fatal(
-						    f"Cannot set a key '{existingKey}' (from '{data[key][0]}') and a nested key '{key}' (from '{override.source}') at the same time."
+						    f"Cannot set a key '{existingKey}' (from '{data[existingKey][0]}') and a nested key '{key}' (from '{override.source}') at the same time."
 						)
 
 				data[key] = (

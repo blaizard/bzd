@@ -25,7 +25,15 @@ def _bzd_config_impl(ctx):
         values_file = ctx.actions.declare_file(ctx.label.name + ".values.json")
         expanded_values = {}
         for key, value in ctx.attr.values.items():
-            expanded_values[key] = ctx.expand_location(value, targets = ctx.attr.data)
+            current = expanded_values
+
+            # Expands the '.' to a nested dictionary.
+            parts = key.split(".")
+            if len(parts) > 1:
+                for part in parts[:-1]:
+                    current.setdefault(part, {})
+                    current = current[part]
+            current[parts[-1]] = ctx.expand_location(value, targets = ctx.attr.data)
         ctx.actions.write(
             output = values_file,
             content = json.encode(expanded_values),

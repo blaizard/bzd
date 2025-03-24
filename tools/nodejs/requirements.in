@@ -23,6 +23,7 @@ mime=^1
 multer
 mongodb=6.3.0
 @google-cloud/storage
+googleapis
 nodemailer
 jimp
 svg2img
