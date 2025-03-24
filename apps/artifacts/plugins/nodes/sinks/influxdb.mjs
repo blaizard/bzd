@@ -52,7 +52,7 @@ export default class SinkInfluxDB extends Sink {
 		for (const [uid, key, value, timestamp] of records) {
 			const timestampNanoseconds = timestamp * 1000000;
 			for (const field of SinkInfluxDB.fromValueToFields(
-				key.map((part) => part.replace(/[^a-zA-Z0-9-_]+/g, "-")).join("."),
+				key.map((part) => part.replace(/[\s"']+/g, "-")).join("."),
 				value,
 			)) {
 				content.push(uid + " " + field + " " + timestampNanoseconds);
