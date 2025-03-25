@@ -124,6 +124,7 @@ class Cache2 {
 				error: e,
 				timeout: Cache2.getTimestampMs() + data.options.timeoutMs,
 			});
+			throw e;
 		}
 		return data.values.get(key).value;
 	}
