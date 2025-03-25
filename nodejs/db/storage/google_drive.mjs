@@ -55,8 +55,7 @@ class Cache2 {
 
 	/// Helper to convert a key into an array of string.
 	static keyToArrayOfString(payload) {
-		const [empty, ...path] = payload.split("\0");
-		return path;
+		return payload.split("\0").slice(1);
 	}
 
 	/// Register a new data collection.
