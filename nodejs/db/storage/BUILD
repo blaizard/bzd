@@ -10,6 +10,7 @@ bzd_nodejs_library(
         ":disk",
         ":docker_v2",
         ":google_cloud_storage",
+        ":google_drive",
         ":webdav",
         "//nodejs/core:validation",
     ],
@@ -72,6 +73,24 @@ bzd_nodejs_library(
         "//nodejs/core:filesystem",
         "//nodejs/core:log",
         "//nodejs/core:stream",
+        "//nodejs/db:utils",
+    ],
+)
+
+bzd_nodejs_library(
+    name = "google_drive",
+    srcs = [
+        "google_drive.mjs",
+    ],
+    packages = [
+        "@nodejs_deps//:googleapis",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":storage",
+        "//nodejs/core:cache",
+        "//nodejs/core:exception",
+        "//nodejs/core:log",
         "//nodejs/db:utils",
     ],
 )

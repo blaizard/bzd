@@ -100,7 +100,7 @@ export const ExceptionFactory = (...topics) => {
 		// \param expression The result to evaluate.
 		static assertResult(result) {
 			if (result.hasError()) {
-				throw new Exception("Assertion failed; " + result.error(), ...args);
+				throw new Exception("Assertion failed; " + result.error());
 			}
 		}
 
