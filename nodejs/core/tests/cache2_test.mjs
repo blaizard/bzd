@@ -9,7 +9,7 @@ describe("Cache2", () => {
 			let cache = new Cache2();
 			let argRead = 0;
 			cache.register("test", (arg) => {
-				if (!arg) {
+				if (arg === false) {
 					throw new Error("BOOM!");
 				}
 				argRead = arg;
@@ -21,6 +21,10 @@ describe("Cache2", () => {
 			const result2 = await cache.get("test", "world");
 			Exception.assertEqual(argRead, "world");
 			Exception.assertEqual(result2, "return.world");
+			argRead = "no";
+			const result3 = await cache.get("test", "world");
+			Exception.assertEqual(argRead, "no");
+			Exception.assertEqual(result3, "return.world");
 
 			await Exception.assertThrows(async () => {
 				await cache.get("tefst", "world");
@@ -35,11 +39,35 @@ describe("Cache2", () => {
 				await cache.get();
 			});
 		});
+
+		it("Array Of String", async () => {
+			let cache = new Cache2();
+			let value = 0;
+			cache.register("test", (arg) => {
+				return value++;
+			});
+
+			{
+				const result = await cache.get("test", Cache2.arrayOfStringToKey([]));
+				Exception.assertEqual(result, 0);
+			}
+			{
+				const result = await cache.get("test", Cache2.arrayOfStringToKey([""]));
+				Exception.assertEqual(result, 1);
+			}
+			{
+				const result = await cache.get("test", Cache2.arrayOfStringToKey(["", ""]));
+				Exception.assertEqual(result, 2);
+			}
+			{
+				const result = await cache.get("test", Cache2.arrayOfStringToKey([]));
+				Exception.assertEqual(result, 0);
+			}
+		});
 	});
 
 	it("Stress", async () => {
 		let cache = new Cache2({
-			garbageCollector: false,
 			timeoutMs: 20 * 1000,
 		});
 
