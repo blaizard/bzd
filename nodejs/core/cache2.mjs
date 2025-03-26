@@ -10,6 +10,8 @@ export default class Cache2 {
 			{
 				// Default timeout for the validity of an entry.
 				timeoutMs: 30 * 1000,
+				// Default function to compute the size of the value.
+				getSize: Cache2.defaultGetSize,
 			},
 			options,
 		);
@@ -23,10 +25,10 @@ export default class Cache2 {
 		//          ....
 		//      },
 		//      values: { [key]: {
-		//          value: undefined,
-		//          error: undefined,
+		//          data: undefined,
+		//          status: <Statue>,
+		//          timeout: <int>,
 		//          size: undefined,
-		//          timeout: undefined
 		//      }}
 		// }
 		this.data = {};
@@ -34,6 +36,13 @@ export default class Cache2 {
 
 	/// Defines an empty state.
 	static empty = Symbol();
+
+	/// Status of a entry.
+	static Status = Object.freeze({
+		value: Symbol("value"),
+		error: Symbol("error"),
+		fetching: Symbol("fetching"),
+	});
 
 	/// Current timestamp in milliseconds.
 	static getTimestampMs() {
@@ -50,6 +59,26 @@ export default class Cache2 {
 		return payload.split("\0").slice(1);
 	}
 
+	/// Default function to get a very rought estimate of the size of an object.
+	///
+	/// This function advantages speed of accuracy.
+	/// It is not exact at all but gives a sense of whether a value takes a large
+	/// memory chunk or not and this is all what we need for the eviciton mechanism
+	/// with the cache.
+	static defaultGetSize(value) {
+		const sizeFactory = {
+			number: () => 8,
+			undefined: () => 8,
+			object: (value) => (value === null ? 8 : JSON.stringify(value).length),
+			boolean: () => 1,
+			bigint: (value) => String(value).length,
+			string: (value) => value.length,
+			symbol: () => 8,
+			function: () => 32,
+		};
+		return sizeFactory[typeof value](value);
+	}
+
 	/// Register a new data collection.
 	///
 	/// \param collection The name of the collection.
@@ -57,6 +86,7 @@ export default class Cache2 {
 	/// \param options Options specific to this collection.
 	register(collection, fetch, options) {
 		Exception.assert(!(collection in this.data), "Collection '{}' already registered.", collection);
+		Log.info("Registering collection '{}'.", collection);
 		this.data[collection] = {
 			fetch: fetch,
 			options: Object.assign(
@@ -64,7 +94,7 @@ export default class Cache2 {
 					// Default timeout for the validity of an entry.
 					timeoutMs: this.options.timeoutMs,
 					// Get the size of the value.
-					getSize: undefined,
+					getSize: this.options.getSize,
 				},
 				options,
 			),
@@ -80,16 +110,34 @@ export default class Cache2 {
 	/// \param collection The name of the collection.
 	/// \param key The key for this value.
 	/// \param value The value to be set.
-	set(collection, key, value) {
+	/// \param type The data type to be set.
+	set(collection, key, value, type = Cache2.Status.value) {
 		Exception.assert(collection in this.data, "Collection '{}' doesn't exist.", collection);
 		const data = this.data[collection];
+
 		// Touch the value, this is important to set the value on top.
 		data.values.delete(key);
-		data.values.set(key, {
-			value: value,
-			size: data.options.getSize ? data.options.getSize(value) : undefined,
-			timeout: Cache2.getTimestampMs() + data.options.timeoutMs,
-		});
+
+		switch (type) {
+			case Cache2.Status.value:
+				data.values.set(key, {
+					data: value,
+					status: Cache2.Status.value,
+					size: data.options.getSize ? data.options.getSize(value) : undefined,
+					timeout: Cache2.getTimestampMs() + data.options.timeoutMs,
+				});
+				break;
+			case Cache2.Status.error:
+				data.values.set(key, {
+					data: value,
+					status: Cache2.Status.error,
+					size: 8,
+					timeout: Cache2.getTimestampMs() + data.options.timeoutMs,
+				});
+				break;
+			default:
+				Exception.unreachable("Cannot set the value for {}::{} to type '{}'.", collection, key, type);
+		}
 	}
 
 	/// Access a value or fetch a new value.
@@ -97,27 +145,50 @@ export default class Cache2 {
 	/// \param collection The name of the collection.
 	/// \param key The key for this value.
 	async get(collection, key) {
-		// Check if the value is already available.
-		const maybeValue = this.getInstant(collection, key, Cache2.empty);
-		if (maybeValue !== Cache2.empty) {
-			return maybeValue;
+		const data = this.data[collection];
+		while (true) {
+			// Check if the value is already available.
+			const maybeValue = this.getInstant(collection, key, Cache2.empty);
+			if (maybeValue !== Cache2.empty) {
+				return maybeValue;
+			}
+
+			// Handle the case of concurrency, if the value is being fetched and another caller issues a get(...).
+			// Check if the value is being fetched.
+			const isFetching = (data.values.get(key) ?? { status: null }).status === Cache2.Status.fetching;
+			if (!isFetching) {
+				break;
+			}
+
+			const wait = async () => {
+				return new Promise((resolve) => {
+					data.values.get(key).data.push(resolve);
+				});
+			};
+			await wait();
 		}
 
-		// TODO: handle the case of concurrency, if the value is being fetched
-		// and another caller issues a get(...).
+		// We are the first async thread to fetch this entry.
+		// Mark this entry as fetching.
+		let resolveList = [];
+		data.values.set(key, {
+			// Setting the timeout to -1, will tell that this entry is invalid and needs refetch.
+			timeout: -1,
+			data: resolveList, // contains the resolve callback of all promises waiting.
+			status: Cache2.Status.fetching,
+		});
 
-		const data = this.data[collection];
 		try {
 			const value = await data.fetch(key);
-			this.set(collection, key, value);
+			this.set(collection, key, value, Cache2.Status.value);
 		} catch (e) {
-			data.values.set(key, {
-				error: e,
-				timeout: Cache2.getTimestampMs() + data.options.timeoutMs,
-			});
+			this.set(collection, key, e, Cache2.Status.error);
 			throw e;
+		} finally {
+			resolveList.forEach((resolve) => resolve());
 		}
-		return data.values.get(key).value;
+
+		return data.values.get(key).data;
 	}
 
 	/// Get the value instantly if available.
@@ -135,15 +206,15 @@ export default class Cache2 {
 		if (entry.timeout < Cache2.getTimestampMs()) {
 			return defaultValue;
 		}
-		if (entry.error) {
-			throw data.values[key].error;
+		if (entry.status === Cache2.Status.error) {
+			throw entry.data;
 		}
 
 		// Touch the value.
 		data.values.delete(key);
 		data.values.set(key, entry);
 
-		return entry.value;
+		return entry.data;
 	}
 
 	/// Mark the current data as invalidated (out of date) so it will be reloaded at the next access.
@@ -154,7 +225,7 @@ export default class Cache2 {
 		Exception.assert(collection in this.data, "Collection '{}' doesn't exist.", collection);
 		const data = this.data[collection];
 		if (data.values.has(key)) {
-			data.values.get(key).timeout = Cache2.getTimestampMs() - 1;
+			data.values.get(key).timeout = -1;
 		}
 	}
 }

@@ -66,6 +66,40 @@ describe("Cache2", () => {
 		});
 	});
 
+	it("Concurrency", async () => {
+		let cache = new Cache2({
+			timeoutMs: 20 * 1000,
+		});
+		let value = 1;
+		cache.register(
+			"test",
+			(key) => {
+				// This fetcher should run only once.
+				return new Promise((resolve) => {
+					setTimeout(() => {
+						resolve(value++);
+					}, 10);
+				});
+			},
+			{
+				timeoutMs: 60 * 1000,
+			},
+		);
+
+		let sum = 0;
+		let promises = [];
+		for (let i = 0; i < 10; ++i) {
+			promises.push(
+				(async () => {
+					const result = await cache.get("test", "hello");
+					sum += result;
+				})(),
+			);
+		}
+		await Promise.all(promises);
+		Exception.assertEqual(sum, 10);
+	});
+
 	it("Stress", async () => {
 		let cache = new Cache2({
 			timeoutMs: 20 * 1000,

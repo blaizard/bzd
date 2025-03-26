@@ -127,6 +127,9 @@ program
 	}
 
 	async function isAuthorizedVolume(context, volume) {
+		if (!(volume in volumes)) {
+			return false;
+		}
 		if ("private" in volumes[volume].options) {
 			const maybeSession = await authentication.verify(context);
 			if (!maybeSession) {

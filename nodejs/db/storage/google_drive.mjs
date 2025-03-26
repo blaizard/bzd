@@ -89,7 +89,7 @@ export default class StorageGoogleDrive extends Storage {
 				const isGoogleDocument = entry.mimeType.startsWith("application/vnd.google-apps");
 				const documentType = isGoogleDocument ? entry.mimeType.substring(28) : Path.extname(entry.name).slice(1);
 				// Save the ID in the cache so we don't have to fetch it twice.
-				this.cache.set("id", [...pathList, entry.name], entry.id);
+				this.cache.set("id", Cache2.arrayOfStringToKey([...pathList, entry.name]), entry.id);
 				return Permissions.makeEntry(
 					{
 						name: entry.name,
@@ -129,5 +129,50 @@ export default class StorageGoogleDrive extends Storage {
 		);
 
 		return response.data;
+	}
+
+	async _createFile(pathList, readStream) {
+		const parentId = await this.cache.get("id", Cache2.arrayOfStringToKey(pathList.slice(0, -1)));
+		const fileName = pathList[pathList.length - 1];
+
+		const response = await this.drive.files.create({
+			resource: {
+				name: fileName,
+				parents: parentId,
+			},
+			media: {
+				mimeType: "application/octet-stream",
+				body: readStream,
+			},
+			fields: "id",
+		});
+		// Save the ID in the cache so we don't have to fetch it twice.
+		this.cache.set("id", Cache2.arrayOfStringToKey(pathList), response.data.id);
+	}
+
+	async _writeImpl(pathList, readStream) {
+		try {
+			const id = await this.cache.get("id", Cache2.arrayOfStringToKey(pathList));
+			await this.drive.files.update({
+				fileId: id,
+				media: {
+					mimeType: "application/octet-stream",
+					body: readStream,
+				},
+			});
+		} catch (error) {
+			if (error.errors && error.errors[0].reason === "fileNotFound") {
+				await this._createFile(pathList, readStream);
+				return;
+			}
+			throw error;
+		}
+	}
+
+	async _deleteImpl(pathList) {
+		const id = await this.cache.get("id", Cache2.arrayOfStringToKey(pathList));
+		await this.drive.files.delete({
+			fileId: id,
+		});
 	}
 }
