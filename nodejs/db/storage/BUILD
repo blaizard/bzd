@@ -88,7 +88,7 @@ bzd_nodejs_library(
     visibility = ["//visibility:public"],
     deps = [
         ":storage",
-        "//nodejs/core:cache",
+        "//nodejs/core:cache2",
         "//nodejs/core:exception",
         "//nodejs/core:log",
         "//nodejs/db:utils",

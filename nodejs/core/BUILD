@@ -65,6 +65,18 @@ bzd_nodejs_library(
 )
 
 bzd_nodejs_library(
+    name = "cache2",
+    srcs = [
+        "cache2.mjs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":exception",
+        ":log",
+    ],
+)
+
+bzd_nodejs_library(
     name = "cookie",
     srcs = [
         "cookie.mjs",

@@ -10,6 +10,7 @@ test_srcs = glob([
     main = src,
     deps = [
         "//nodejs/core:cache",
+        "//nodejs/core:cache2",
         "//nodejs/core:format",
         "//nodejs/core:template",
         "//nodejs/core:timeseries",
