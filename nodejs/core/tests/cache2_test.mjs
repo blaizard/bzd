@@ -100,6 +100,27 @@ describe("Cache2", () => {
 		Exception.assertEqual(sum, 10);
 	});
 
+	it("Order", async () => {
+		const cache = new Cache2();
+		cache.register(
+			"test",
+			(key) => key,
+		);
+		const getKeys = () => [...cache.data["test"].values.keys()];
+		Exception.assertEqual(getKeys(), []);
+		await cache.get("test", "a");
+		Exception.assertEqual(getKeys(), ["a"]);
+		await cache.get("test", "b");
+		await cache.get("test", "c");
+		Exception.assertEqual(getKeys(), ["a", "b", "c"]);
+		await cache.get("test", "b");
+		Exception.assertEqual(getKeys(), ["a", "c", "b"]);
+		cache.set("test", "c", 1);
+		Exception.assertEqual(getKeys(), ["a", "b", "c"]);
+		cache.setDirty("test", "a");
+		Exception.assertEqual(getKeys(), ["a", "b", "c"]);
+	});
+
 	it("Stress", async () => {
 		let cache = new Cache2({
 			timeoutMs: 20 * 1000,
