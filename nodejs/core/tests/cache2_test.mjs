@@ -102,10 +102,7 @@ describe("Cache2", () => {
 
 	it("Order", async () => {
 		const cache = new Cache2();
-		cache.register(
-			"test",
-			(key) => key,
-		);
+		cache.register("test", (key) => key);
 		const getKeys = () => [...cache.data["test"].values.keys()];
 		Exception.assertEqual(getKeys(), []);
 		await cache.get("test", "a");
