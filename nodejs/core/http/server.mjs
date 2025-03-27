@@ -344,33 +344,12 @@ export default class HttpServer {
 				})
 				.join("/");
 
-		switch (type.toLowerCase()) {
-			case "get":
-				this.app.get(updatedURI, ...callbackList);
-				break;
-			case "post":
-				this.app.post(updatedURI, ...callbackList);
-				break;
-			case "put":
-				this.app.put(updatedURI, ...callbackList);
-				break;
-			case "delete":
-				this.app.delete(updatedURI, ...callbackList);
-				break;
-			case "head":
-				this.app.head(updatedURI, ...callbackList);
-				break;
-			case "patch":
-				this.app.patch(updatedURI, ...callbackList);
-				break;
-			case "options":
-				this.app.options(updatedURI, ...callbackList);
-				break;
+		switch (type) {
 			case "*":
 				this.app.all(updatedURI, ...callbackList);
 				break;
 			default:
-				throw new Exception("Unknown HTTP type '{}'.", type);
+				this.app[type.toLowerCase()](updatedURI, ...callbackList);
 		}
 
 		Log.debug("Added route: {} {} with options {:j}", type, uri, options);
