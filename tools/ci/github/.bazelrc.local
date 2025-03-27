@@ -4,7 +4,7 @@ build --noshow_loading_progress
 build --show_timestamps
 
 # Allow external dependencies to be retried, but decrease the connect time.
-common --connect_timeout_secs=10
+startup --connect_timeout_secs=10
 common --experimental_repository_downloader_retries=20
 common --http_timeout_scaling=2.0
 
