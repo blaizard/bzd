@@ -6,12 +6,13 @@ bzd_nodejs_library(
         "backend.mjs",
     ],
     visibility = [
-        "//apps/artifacts/plugins:__pkg__",
+        "//apps/artifacts/plugins:__subpackages__",
     ],
     deps = [
         "//apps/artifacts/backend:plugin",
         "//apps/artifacts/plugins/extension/release",
         "//apps/artifacts/plugins/extension/upload",
+        "//apps/artifacts/plugins/extension/webdav",
         "//nodejs/db/storage:make_from_config",
     ],
 )

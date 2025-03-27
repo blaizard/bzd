@@ -22,6 +22,7 @@ bzd_nodejs_oci(
     visibility = [
         "//deployment:__subpackages__",
     ],
+    workdir = "{backend}",
     deps = {
         "//apps/dashboard/backend": "backend",
         "//apps/dashboard/frontend": "frontend",

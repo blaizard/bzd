@@ -16,7 +16,7 @@ export default class PluginBase {
 	}
 
 	setStorage(storage) {
-		Exception.assert(storage instanceof Storage, "The storage must be of type Storage: {}", this);
+		Exception.assert(storage instanceof Storage, "The storage must be of type Storage: {}", storage);
 		this.storage = storage;
 	}
 
@@ -25,7 +25,11 @@ export default class PluginBase {
 	}
 
 	getStorage() {
-		Exception.assert(this.storage, "No storage associated with this plugin: {}", this);
+		Exception.assert(
+			this.storage,
+			"No storage associated with this plugin: {}, maybe the initialization step failed?",
+			this.volume,
+		);
 		return this.storage;
 	}
 }

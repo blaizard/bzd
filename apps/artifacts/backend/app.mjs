@@ -65,7 +65,7 @@ program
 
 	// Add initial volumes.
 	for (const [volume, options] of Object.entries(config.volumes)) {
-		Exception.assert("type" in options, "Volume options must have a type: '{}'.", volume);
+		Exception.assert("type" in options, "The volume '{}' must have a 'type'.", volume);
 		const type = options.type;
 		Exception.assert(type in Plugins, "No plugins of type '{}', requested by '{}'.", type, volume);
 		Exception.assert(Plugins[type].prototype instanceof Plugin, "The plugin '{}' must derive from class Plugin.", type);

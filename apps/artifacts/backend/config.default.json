@@ -18,6 +18,25 @@
             },
             "type": "storage"
         },
+        "memory": {
+            "storage": {
+                "data": {
+                    "a.txt": "content for a",
+                    "b.txt": "content for b",
+                    "empty": {},
+                    "nested": {
+                        "deeper": {
+                            "c.txt": "content for c"
+                        },
+                        "e.txt": "content for e",
+                        "f.txt": "content for b"
+                    }
+                },
+                "type": "memory"
+            },
+            "type": "storage",
+            "webdav": {}
+        },
         "nodes": {
             "nodes.data": {
                 "testnode": {

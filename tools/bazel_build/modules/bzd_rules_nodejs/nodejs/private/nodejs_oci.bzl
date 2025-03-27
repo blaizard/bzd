@@ -6,7 +6,7 @@ load("@bzd_rules_oci//:defs.bzl", "bzd_oci_image")
 
 ROOT_DIRECTORY_ = "/bzd/bin"
 
-def bzd_nodejs_oci(name, deps, cmd, base = "@docker//:nodejs", include_metadata = False, **kwargs):
+def bzd_nodejs_oci(name, deps, cmd, base = "@docker//:nodejs", include_metadata = False, workdir = ROOT_DIRECTORY_, **kwargs):
     """Rule for embedding a NodeJs application into Docker.
 
     Args:
@@ -15,6 +15,7 @@ def bzd_nodejs_oci(name, deps, cmd, base = "@docker//:nodejs", include_metadata 
         cmd: The command to be used.
         base: The base image.
         include_metadata: Whether metadata shall be included.
+        workdir: The working directory.
         **kwargs: Extra arguments common to all build rules.
     """
 
@@ -27,7 +28,7 @@ def bzd_nodejs_oci(name, deps, cmd, base = "@docker//:nodejs", include_metadata 
         include_metadata = include_metadata,
     )
 
-    map_to_directory_ = {dir_name: dir_name for dir_name in deps.values()}
+    map_to_directory_ = {dir_name: (ROOT_DIRECTORY_ + "/" + dir_name) for dir_name in deps.values()}
     bzd_oci_image(
         name = name,
         base = base,
@@ -35,7 +36,7 @@ def bzd_nodejs_oci(name, deps, cmd, base = "@docker//:nodejs", include_metadata 
             "node",
             "--experimental-json-modules",
         ] + [item.format(**map_to_directory_) for item in cmd],
-        workdir = ROOT_DIRECTORY_,
+        workdir = workdir.format(**map_to_directory_),
         env = {
             "NODE_ENV": select({
                 "@bzd_lib//settings/build:dev": "development",

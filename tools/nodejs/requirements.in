@@ -28,3 +28,4 @@ nodemailer
 jimp
 svg2img
 stripe=14.12.0
+fast-xml-parser

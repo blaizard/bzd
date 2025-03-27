@@ -7,3 +7,5 @@ psutil
 yfinance
 pyyaml
 nvidia-ml-py
+webdav4
+fsspec
