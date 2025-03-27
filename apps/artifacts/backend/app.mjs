@@ -145,19 +145,26 @@ program
 		}
 	}
 
-	rest.handle("get", "/file", async function (inputs) {
-		const { volume, pathList } = getInternalPathFromString(inputs.path);
-		await assertAuthorizedVolume(this, volume);
+	rest.handle(
+		"get",
+		"/file",
+		async function (inputs) {
+			const { volume, pathList } = getInternalPathFromString(inputs.path);
+			await assertAuthorizedVolume(this, volume);
 
-		Exception.assertPrecondition(volume, "There is no volume associated with this path: '{}'.", inputs.path);
-		const storage = await cache.get("volume", volume);
-		const metadata = await storage.metadata(pathList);
-		if (metadata.size) {
-			this.setHeader("Content-Length", metadata.size);
-		}
-		this.setHeader("Content-Disposition", 'attachment; filename="' + metadata.name + '"');
-		return await storage.read(pathList);
-	});
+			Exception.assertPrecondition(volume, "There is no volume associated with this path: '{}'.", inputs.path);
+			const storage = await cache.get("volume", volume);
+			const metadata = await storage.metadata(pathList);
+			if (metadata.size) {
+				this.setHeader("Content-Length", metadata.size);
+			}
+			this.setHeader("Content-Disposition", 'attachment; filename="' + metadata.name + '"');
+			return await storage.read(pathList);
+		},
+		{
+			timeoutS: 10 * 60, // 10min timeout
+		},
+	);
 
 	rest.handle("post", "/list", async function (inputs) {
 		const { volume, pathList } = getInternalPath(inputs.path);
