@@ -68,6 +68,40 @@ export default class StorageGoogleDrive extends Storage {
 		this.drive = google.drive({ version: "v3", auth: client });
 	}
 
+	_fileDataTometadata(data) {
+		const isDirectory = data.capabilities.canListChildren;
+		const isGoogleDocument = data.mimeType.startsWith("application/vnd.google-apps");
+		const documentType = isGoogleDocument ? data.mimeType.substring(28) : Path.extname(data.name).slice(1);
+
+		return Permissions.makeEntry(
+			{
+				name: data.name,
+				type: isDirectory ? "directory" : documentType,
+				size: "size" in data ? parseInt(data.size) : undefined,
+				created: data.createdTime,
+				modified: data.modifiedTime,
+			},
+			{
+				// Google documents cannot be downloaded directly, then need to be exported.
+				read: !isGoogleDocument && data.capabilities.canDownload,
+				write: data.capabilities.canEdit,
+				delete: data.capabilities.canDelete,
+				list: isDirectory,
+			},
+		);
+	}
+
+	async _metadataImpl(pathList) {
+		const id = await this.cache.get("id", Cache2.arrayOfStringToKey(pathList));
+		const response = await this.drive.files.get({
+			fileId: id,
+			supportsAllDrives: true,
+			includeItemsFromAllDrives: true,
+			fields: "id, name, createdTime, modifiedTime, size, capabilities, mimeType",
+		});
+		return this._fileDataTometadata(response.data);
+	}
+
 	async _listImpl(pathList, maxOrPaging, includeMetadata) {
 		const id = await this.cache.get("id", Cache2.arrayOfStringToKey(pathList));
 		const paging = CollectionPaging.pagingFromParam(maxOrPaging);
@@ -85,27 +119,9 @@ export default class StorageGoogleDrive extends Storage {
 		let content = [];
 		if (includeMetadata) {
 			content = result.data.files.map((entry) => {
-				const isDirectory = entry.capabilities.canListChildren;
-				const isGoogleDocument = entry.mimeType.startsWith("application/vnd.google-apps");
-				const documentType = isGoogleDocument ? entry.mimeType.substring(28) : Path.extname(entry.name).slice(1);
 				// Save the ID in the cache so we don't have to fetch it twice.
 				this.cache.set("id", Cache2.arrayOfStringToKey([...pathList, entry.name]), entry.id);
-				return Permissions.makeEntry(
-					{
-						name: entry.name,
-						type: isDirectory ? "directory" : documentType,
-						size: "size" in entry ? parseInt(entry.size) : undefined,
-						created: entry.createdTime,
-						modified: entry.modifiedTime,
-					},
-					{
-						// Google documents cannot be downloaded directly, then need to be exported.
-						read: !isGoogleDocument && entry.capabilities.canDownload,
-						write: entry.capabilities.canEdit,
-						delete: entry.capabilities.canDelete,
-						list: isDirectory,
-					},
-				);
+				return this._fileDataTometadata(entry);
 			});
 		} else {
 			content = result.data.files.map((entry) => entry.name);
@@ -119,6 +135,8 @@ export default class StorageGoogleDrive extends Storage {
 		const response = await this.drive.files.get(
 			{
 				fileId: id,
+				supportsAllDrives: true,
+				includeItemsFromAllDrives: true,
 				// Important: Downloads the file content.
 				alt: "media",
 			},
