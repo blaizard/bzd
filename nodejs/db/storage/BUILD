@@ -11,6 +11,7 @@ bzd_nodejs_library(
         ":docker_v2",
         ":google_cloud_storage",
         ":google_drive",
+        ":memory",
         ":webdav",
         "//nodejs/core:validation",
     ],
@@ -91,6 +92,21 @@ bzd_nodejs_library(
         "//nodejs/core:cache2",
         "//nodejs/core:exception",
         "//nodejs/core:log",
+        "//nodejs/db:utils",
+    ],
+)
+
+bzd_nodejs_library(
+    name = "memory",
+    srcs = [
+        "memory.mjs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":storage",
+        "//nodejs/core:exception",
+        "//nodejs/core:log",
+        "//nodejs/core:stream",
         "//nodejs/db:utils",
     ],
 )

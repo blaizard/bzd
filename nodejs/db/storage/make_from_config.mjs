@@ -3,6 +3,7 @@ import StorageGoogleCloudStorage from "#bzd/nodejs/db/storage/google_cloud_stora
 import StorageGoogleDrive from "#bzd/nodejs/db/storage/google_drive.mjs";
 import StorageDockerV2 from "#bzd/nodejs/db/storage/docker_v2.mjs";
 import StorageWebdav from "#bzd/nodejs/db/storage/webdav.mjs";
+import StorageMemory from "#bzd/nodejs/db/storage/memory.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import Validation from "#bzd/nodejs/core/validation.mjs";
 
@@ -46,6 +47,16 @@ export default async function makeFromConfig(config) {
 				config,
 			);
 			return await StorageGoogleDrive.make(config.folderId, config.options);
+		case "memory":
+			validateConfig(
+				{
+					type: "mandatory",
+					data: "mandatory",
+					options: "",
+				},
+				config,
+			);
+			return await StorageMemory.make(config.data, config.options);
 		case "dockerv2":
 			validateConfig(
 				{

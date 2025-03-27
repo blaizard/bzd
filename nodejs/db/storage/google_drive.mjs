@@ -68,7 +68,7 @@ export default class StorageGoogleDrive extends Storage {
 		this.drive = google.drive({ version: "v3", auth: client });
 	}
 
-	_fileDataTometadata(data) {
+	_fileDataToMetadata(data) {
 		const isDirectory = data.capabilities.canListChildren;
 		const isGoogleDocument = data.mimeType.startsWith("application/vnd.google-apps");
 		const documentType = isGoogleDocument ? data.mimeType.substring(28) : Path.extname(data.name).slice(1);
@@ -99,7 +99,7 @@ export default class StorageGoogleDrive extends Storage {
 			includeItemsFromAllDrives: true,
 			fields: "id, name, createdTime, modifiedTime, size, capabilities, mimeType",
 		});
-		return this._fileDataTometadata(response.data);
+		return this._fileDataToMetadata(response.data);
 	}
 
 	async _listImpl(pathList, maxOrPaging, includeMetadata) {
@@ -121,7 +121,7 @@ export default class StorageGoogleDrive extends Storage {
 			content = result.data.files.map((entry) => {
 				// Save the ID in the cache so we don't have to fetch it twice.
 				this.cache.set("id", Cache2.arrayOfStringToKey([...pathList, entry.name]), entry.id);
-				return this._fileDataTometadata(entry);
+				return this._fileDataToMetadata(entry);
 			});
 		} else {
 			content = result.data.files.map((entry) => entry.name);
