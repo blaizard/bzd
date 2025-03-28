@@ -5,7 +5,7 @@ const Exception = ExceptionFactory("http", "server", "context", "mock");
 export default class MockServerContext {
 	constructor() {
 		this.request = {
-			url: null,
+			path: null,
 			method: "GET",
 			queries: {},
 			params: {},
@@ -31,7 +31,7 @@ export default class MockServerContext {
 
 	withPath(url) {
 		const parsedUrl = new URL(url, "http://dummy");
-		this.request.url = parsedUrl.pathname;
+		this.request.path = parsedUrl.pathname;
 		Object.assign(this.request.queries, Object.fromEntries(parsedUrl.searchParams.entries()));
 		return this;
 	}
@@ -42,6 +42,10 @@ export default class MockServerContext {
 
 	getHost() {
 		return "https://dummy";
+	}
+
+	getPath() {
+		return this.request.path;
 	}
 
 	hasHeader(name) {
@@ -94,7 +98,7 @@ export default class MockServerContext {
 	getBody() {
 		switch (this.request.type) {
 			case "raw":
-				let content = this.request.method + " " + this.request.url + " HTTP/1.1\r\n";
+				let content = this.request.method + " " + this.request.path + " HTTP/1.1\r\n";
 				content += Object.entries(this.getHeaders())
 					.map(([key, value]) => key + ": " + value + "\r\n")
 					.join("");

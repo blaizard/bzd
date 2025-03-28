@@ -52,6 +52,13 @@ export default class Storage extends AsyncInitialize {
 	}
 
 	/// Get metadata of a specific file
+	///
+	/// Metadata have special fields:
+	/// - name: The name of the file.
+	/// - size: The size in bytes of the file (number).
+	/// - created: The creation date (Date type).
+	/// - modified: The modification date (Date type).
+	/// - permissions: The permissions of the file.
 	async metadata(path) {
 		const pathList = Array.isArray(path) ? path : [path];
 		if (typeof this._metadataImpl == "function") {

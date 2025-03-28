@@ -12,10 +12,10 @@ const Log = LogFactory("db", "storage", "memory");
 const Exception = ExceptionFactory("db", "storage", "memory");
 
 class File {
-	constructor(content) {
+	constructor(content, date) {
 		this.content = content;
-		this.created = new Date();
-		this.modified = new Date();
+		this.created = date;
+		this.modified = date;
 	}
 
 	get size() {
@@ -27,7 +27,13 @@ class File {
 export default class StorageMemory extends Storage {
 	constructor(data, options) {
 		super();
-		this.options = Object.assign({}, options);
+		this.options = Object.assign(
+			{
+				/// Use a custom date object.
+				date: () => new Date(),
+			},
+			options,
+		);
 
 		const initializeData = (init) => {
 			let data = {};
@@ -35,7 +41,7 @@ export default class StorageMemory extends Storage {
 				if (value !== null && typeof value === "object") {
 					data[key] = initializeData(value);
 				} else {
-					data[key] = new File(value);
+					data[key] = new File(value, this.options.date());
 				}
 			}
 			return data;
@@ -47,16 +53,18 @@ export default class StorageMemory extends Storage {
 
 	async _initialize() {}
 
-	_dataToMetadata(parent, name) {
-		Exception.assertPrecondition(name in parent, "Entry '{}' does not exists.", name);
-		const isDirectory = !(parent[name] instanceof File);
+	_dataToMetadata(data, name) {
+		const isFile = data instanceof File;
+		const isDirectory = !isFile && data !== null && typeof data === "object";
+
+		Exception.assertPrecondition(isFile || isDirectory, "Entry '{}' does not exists.", name);
 		return Permissions.makeEntry(
 			{
 				name: name,
 				type: isDirectory ? "directory" : Path.extname(name).slice(1),
-				size: isDirectory ? undefined : parent[name].size,
-				created: isDirectory ? undefined : parent[name].created,
-				modified: isDirectory ? undefined : parent[name].modified,
+				size: isDirectory ? undefined : data.size,
+				created: isDirectory ? undefined : data.created,
+				modified: isDirectory ? undefined : data.modified,
 			},
 			{
 				read: true,
@@ -70,8 +78,8 @@ export default class StorageMemory extends Storage {
 	_navigateTo(pathList) {
 		let parent = this.data;
 		for (const part of pathList) {
+			Exception.assertPrecondition(!(parent instanceof File), "Entry '{}' must be a directory.", part);
 			Exception.assertPrecondition(part in parent, "Entry '{}' does not exists.", part);
-			Exception.assertPrecondition(!(parent[part] instanceof File), "Entry '{}' is a file.", part);
 			parent = parent[part];
 		}
 		return parent;
@@ -80,11 +88,15 @@ export default class StorageMemory extends Storage {
 	_getParentNamePair(pathList) {
 		Exception.assertPrecondition(pathList.length > 0, "Cannot get entry information from an empty path.");
 		const parent = this._navigateTo(pathList.slice(0, -1));
+		Exception.assertPrecondition(!(parent instanceof File), "Entry '{}' is a file.", part);
 		const name = pathList[pathList.length - 1];
 		return [parent, name];
 	}
 
 	async _isImpl(pathList) {
+		if (pathList.length === 0) {
+			return true;
+		}
 		const [parent, name] = this._getParentNamePair(pathList);
 		return name in parent;
 	}
@@ -93,15 +105,15 @@ export default class StorageMemory extends Storage {
 		const parent = this._navigateTo(pathList);
 		if (includeMetadata) {
 			return CollectionPaging.makeFromList(Object.keys(parent), maxOrPaging, (name) => {
-				return this._dataToMetadata(parent, name);
+				return this._dataToMetadata(parent[name], name);
 			});
 		}
 		return CollectionPaging.makeFromList(Object.keys(parent), maxOrPaging);
 	}
 
 	async _metadataImpl(pathList) {
-		const [parent, name] = this._getParentNamePair(pathList);
-		return this._dataToMetadata(parent, name);
+		const data = this._navigateTo(pathList);
+		return this._dataToMetadata(data, pathList.length ? pathList.at(-1) : "");
 	}
 
 	async _readImpl(pathList) {
@@ -116,9 +128,9 @@ export default class StorageMemory extends Storage {
 		if (name in parent) {
 			Exception.assertPrecondition(parent[name] instanceof File, "'{}' points to a directory.", name);
 			parent[name].content = content;
-			parent[name].modified = new Date();
+			parent[name].modified = this.options.date();
 		} else {
-			parent[name] = new File(content);
+			parent[name] = new File(content, this.options.date());
 		}
 	}
 

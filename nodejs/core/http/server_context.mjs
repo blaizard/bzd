@@ -18,8 +18,12 @@ export class HttpServerContext {
 	}
 
 	getHost() {
-		let host = new Url.URL((this.request.secure ? "https://" : "http://") + this.request.get("host"));
-		return host.toString();
+		const protocol = this.request.headers["x-forwarded-proto"] || this.request.protocol;
+		return protocol + "://" + this.request.get("host");
+	}
+
+	getPath() {
+		return this.request.path;
 	}
 
 	hasHeader(name) {

@@ -57,7 +57,7 @@ export default class PluginTester {
 		Exception.assert(method in routers, "Method {} is not available in the plugin {}.", method, volume);
 
 		const context = ServerContext.make(request).withPath(path);
-		const result = await routers[method].dispatch(context.request.url, context);
+		const result = await routers[method].dispatch(context.request.path, context);
 		Exception.assert(result !== false, "There is no handler for the endpoint {} for plugin {}.", path, volume);
 		Exception.assert(
 			!throwOnFailure || (context.response.status >= 200 && context.response.status <= 299),

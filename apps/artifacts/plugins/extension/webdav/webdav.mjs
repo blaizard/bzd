@@ -1,6 +1,9 @@
 import { XMLParser, XMLBuilder } from "fast-xml-parser";
 import pathlib from "#bzd/nodejs/utils/pathlib.mjs";
 import Permissions from "#bzd/nodejs/db/storage/permissions.mjs";
+import ExceptionFactory from "../../../../../nodejs/core/exception.mjs";
+
+const Exception = ExceptionFactory("apps", "plugin", "webdav");
 
 export default function extensionWebdav(plugin, options, provider, endpoints) {
 	const optionsWebdav = options["webdav"] || null;
@@ -29,7 +32,6 @@ export default function extensionWebdav(plugin, options, provider, endpoints) {
 	endpoints.register("propfind", "/webdav/{path:*}", async (context) => {
 		const depth = context.getHeader("depth", "0");
 		const path = pathlib.path(context.getParam("path")).normalize;
-		const body = context.getBody();
 		const storage = plugin.getStorage();
 
 		if (depth != "0" && depth != "1") {
@@ -37,18 +39,23 @@ export default function extensionWebdav(plugin, options, provider, endpoints) {
 			return;
 		}
 
-		const entry = await storage.metadata(path.parts);
 		const entryToResponse = (path, entry) => {
 			let props = {
 				"D:displayname": entry.name || path.name,
 				"D:resourcetype": Permissions.makeFromEntry(entry).isList() ? { "D:collection": {} } : {},
 			};
-			if ("size" in entry) {
+			if (entry.size) {
 				props["D:getcontentlength"] = entry.size;
+			}
+			if (entry.modified) {
+				props["D:getlastmodified"] = entry.modified.toUTCString();
+			}
+			if (entry.created) {
+				props["D:creationdate"] = entry.created.toUTCString();
 			}
 			return {
 				"$xmlns:D": "DAV:",
-				"D:href": "/x/memory/webdav/" + path.asPosix(),
+				"D:href": context.getHost() + path.asPosix(),
 				"D:propstat": {
 					"D:prop": props,
 				},
@@ -56,10 +63,17 @@ export default function extensionWebdav(plugin, options, provider, endpoints) {
 			};
 		};
 
-		let responses = [entryToResponse(path, entry)];
+		const publicPath = pathlib.path(context.getPath()).normalize;
+		Exception.assert(publicPath.isAbsolute(), "The public path must be absolute: {}", publicPath.asPosix());
+
+		const entry = await storage.metadata(path.parts);
+
+		let responses = [entryToResponse(publicPath, entry)];
 		if (depth == "1") {
 			const children = await storage.list(path.parts, 100, /*includeMetadata*/ true);
-			responses = responses.concat(children.map((entry) => entryToResponse(path.join(entry.name).parts, entry)));
+			responses = responses.concat(
+				children.data().map((entry) => entryToResponse(publicPath.joinPath(entry.name), entry)),
+			);
 		}
 
 		const builder = new XMLBuilder({
