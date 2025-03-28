@@ -78,8 +78,8 @@ export default class StorageGoogleDrive extends Storage {
 				name: data.name,
 				type: isDirectory ? "directory" : documentType,
 				size: "size" in data ? parseInt(data.size) : undefined,
-				created: data.createdTime,
-				modified: data.modifiedTime,
+				created: new Date(Date.parse(data.createdTime)),
+				modified: new Date(Date.parse(data.modifiedTime)),
 			},
 			{
 				// Google documents cannot be downloaded directly, then need to be exported.

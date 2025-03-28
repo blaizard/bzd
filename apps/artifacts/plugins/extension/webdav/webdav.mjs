@@ -13,7 +13,7 @@ export default function extensionWebdav(plugin, options, provider, endpoints) {
 		const body = context.getBody();
 		const storage = plugin.getStorage();
 
-		context.redirect("/file/test/" + context.getParam("path"));
+		context.redirect("/file/memory/" + context.getParam("path"));
 	});
 
 	// See: https://learn.microsoft.com/en-us/previous-versions/office/developer/exchange-server-2003/aa142960(v=exchg.65)
@@ -48,7 +48,7 @@ export default function extensionWebdav(plugin, options, provider, endpoints) {
 			}
 			return {
 				"$xmlns:D": "DAV:",
-				"D:href": "/" + path.asPosix(),
+				"D:href": "/x/memory/webdav/" + path.asPosix(),
 				"D:propstat": {
 					"D:prop": props,
 				},
