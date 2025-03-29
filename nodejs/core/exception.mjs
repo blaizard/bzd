@@ -100,7 +100,7 @@ export const ExceptionFactory = (...topics) => {
 		// \param expression The result to evaluate.
 		static assertResult(result) {
 			if (result.hasError()) {
-				throw new Exception("Assertion failed; " + result.error());
+				throw new Exception("Assertion failed; {}", result.error());
 			}
 		}
 
@@ -109,7 +109,7 @@ export const ExceptionFactory = (...topics) => {
 		/// \param expression The result to evaluate.
 		static assertPreconditionResult(result) {
 			if (result.hasError()) {
-				throw Exception.makePreconditionException("Precondition failed; " + result.error());
+				throw Exception.makePreconditionException("Precondition failed; {}", result.error());
 			}
 		}
 
@@ -121,31 +121,32 @@ export const ExceptionFactory = (...topics) => {
 		/// \param message (optional) The message to display if the assertion fails.
 		/// \param ...args (optional) Arguments to add to the message.
 		static assertEqual(value1, value2, message = "", ...args) {
-			const assertEqualInternal = (value1, value2, exception) => {
+			const assertEqualInternal = (value1, value2, ...exceptionArgs) => {
 				if (typeof value1 === "object" && value1 !== null && typeof value2 === "object" && value2 !== null) {
 					if (value1 instanceof Array && value2 instanceof Array) {
-						Exception.assert(value1.length === value2.length, exception);
+						Exception.assert(value1.length === value2.length, ...exceptionArgs);
 						value1.forEach((subValue1, index) => {
-							assertEqualInternal(subValue1, value2[index], exception);
+							assertEqualInternal(subValue1, value2[index], ...exceptionArgs);
 						});
 					} else {
-						assertEqualInternal(Object.keys(value1), Object.keys(value2), exception);
+						assertEqualInternal(Object.keys(value1), Object.keys(value2), ...exceptionArgs);
 						Object.keys(value1).forEach((key) => {
-							assertEqualInternal(value1[key], value2[key], exception);
+							assertEqualInternal(value1[key], value2[key], ...exceptionArgs);
 						});
 					}
 				} else {
-					Exception.assert(value1 == value2, exception);
+					Exception.assert(value1 == value2, ...exceptionArgs);
 				}
 			};
 
-			const exception = new Exception(
+			assertEqualInternal(
+				value1,
+				value2,
 				"Values are not equal, value1={:j}, value2={:j}" + (message ? "; " + message : ""),
 				value1,
 				value2,
 				...args,
 			);
-			assertEqualInternal(value1, value2, exception);
 		}
 
 		/// Ensures that a specific block of code throws an exception with a specific message

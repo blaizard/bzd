@@ -29,10 +29,12 @@ export default class PluginTester {
 		for (const [method, dataList] of Object.entries(endpoints.unwrap())) {
 			routers[method] ??= new Router();
 			for (const data of dataList) {
-				routers[method].add(data.path, async (params, context) => {
-					context.withParams(params);
-					await data.handler(context);
-				});
+				for (const path of data.paths) {
+					routers[method].add(path, async (params, context) => {
+						context.withParams(params);
+						await data.handler(context);
+					});
+				}
 			}
 		}
 		this.plugins[volume] = {

@@ -240,16 +240,20 @@ export default class HttpServer {
 		}
 	}
 
-	/**
-	 * \brief Add a custom route to the web server.
-	 *
-	 * \param type The type of HTTP request (get, post, put, delete or patch).
-	 * \param uri The uri to which the request should match.
-	 * \param callback A callback that will be called if the uri and type matches
-	 *                 the request.
-	 * \param options (optional) Extra options to be passed to the handler.
-	 */
-	addRoute(type, uri, callback, options) {
+	/// \brief Add one or multiple custom route to the web server.
+	///
+	/// \param type The type of HTTP request (get, post, put, delete or patch).
+	/// \param paths The endpoint to which the request should match. This also accepts a list of endpoints.
+	/// \param callback A callback that will be called if the uri and type matches
+	///                 the request.
+	/// \param options (optional) Extra options to be passed to the handler.
+	addRoute(type, paths, callback, options) {
+		for (const endpoint of typeof paths === "string" ? [paths] : paths) {
+			this._addRouteSingle(type, endpoint, callback, options);
+		}
+	}
+
+	_addRouteSingle(type, uri, callback, options) {
 		// Update the options
 		options = Object.assign(
 			{

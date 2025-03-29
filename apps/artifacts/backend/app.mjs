@@ -205,11 +205,11 @@ program
 	for (const [volume, data] of Object.entries(volumes)) {
 		for (const [method, endpoints] of Object.entries(data.endpoints)) {
 			for (const endpoint of endpoints) {
-				const route = "/x/" + volume + endpoint.path;
-				Log.info("Adding route {}::{}", method, route);
+				const routes = endpoint.paths.map((path) => "/x/" + volume + path);
+				Log.info("Adding route {}::{}", method, routes);
 				web.addRoute(
 					method,
-					route,
+					routes,
 					async (context) => {
 						await assertAuthorizedVolume(context, volume);
 						await endpoint.handler(context);

@@ -53,6 +53,11 @@ class Path {
 		return new Path(this.maybeRoot, normalizedPath);
 	}
 
+	/// Clone the pathlib instance.
+	clone() {
+		return new Path(this.maybeRoot, [...this.path]);
+	}
+
 	/// Return whether the path is absolute or not. A path is considered absolute if it has both a root and (if the flavour allows) a drive.
 	isAbsolute() {
 		return this.maybeRoot !== null;
@@ -72,10 +77,11 @@ class Path {
 
 	/// Calling this method is equivalent to combining the path with each of the given path segments in turn.
 	joinPath(...segments) {
+		const clone = this.clone();
 		for (const segment of segments) {
-			this.path = this.path.concat(_pathToArray(segment));
+			clone.path = clone.path.concat(_pathToArray(segment));
 		}
-		return this;
+		return clone;
 	}
 }
 
