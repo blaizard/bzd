@@ -4,6 +4,8 @@ import ExceptionFactory from "./exception.mjs";
 
 const Exception = ExceptionFactory("router");
 
+const regexp_ = /{([^}:]+):?([^}]*)}/g;
+
 export default class Router {
 	constructor(config) {
 		this.config = Object.assign(
@@ -43,11 +45,9 @@ export default class Router {
 			this.data = compileRoutes(this.routes, this.config);
 			this.dirty = false;
 		}
-
 		// Try to match the regexpr
 		const matches = path.match(this.data.regexpr);
-
-		if (!matches) {
+		if (matches === null) {
 			return false;
 		}
 
@@ -92,35 +92,47 @@ export default class Router {
 		}
 		return false;
 	}
-}
 
-/// \brief Pre-process routes before being used.
-function compileRoutes(routes, config) {
-	// Create the master regexpr, to optimize the search speed
-	let routeData = [];
-	// This is used for future computing and will get the maximum number of variable
-	let maxVars = 0;
-	// Regular expression used to extract variables
-	const regexp = /{([^}:]+):?([^}]*)}/g;
-
-	for (const [path, config] of routes.entries()) {
-		let varList = [];
-
+	static toCompiledRoute(path, config = {}) {
 		// Build the regular expression out of the path
-		const pathList = path.split(regexp);
+		const pathList = path.split(regexp_);
 		let pathRegexpr = regexprEscape(pathList[0]);
-
+		let varList = [];
+		let segments = [pathList[0]];
 		for (let i = 1; i < pathList.length; i += 3) {
 			let castType = String;
+			let uncastType = String;
 
 			// Update the regular expression of the path based on the format given
 			switch (String(pathList[i + 1])) {
+				// Match non-empty strings.
 				case "":
 					castType = decodeURIComponent;
+					uncastType = encodeURIComponent;
 					pathRegexpr += "([^/]+)";
 					break;
+				// Must be placed at the beginning or just after a slash.
+				// Match everything after the slash and also match the empty path even without the slash:
+				// - /hello/{:*} will match:
+				//   - /hello  -> capture: ""
+				//   - /hello/ -> capture: ""
+				//   - /hello/manythigs/including/slashes -> capture: "manythigs/including/slashes"
 				case "*":
-					// No cast here, a raw string should be used here to differentiate between slashes and components.
+					// No decodeURIComponent here, a raw string should be used here to differentiate between slashes and components.
+					castType = (str) => str.substring(1);
+					// If the last character is a '/'.
+					if (pathRegexpr && pathRegexpr.at(-1) == "/") {
+						pathRegexpr = pathRegexpr.slice(0, -1);
+						pathRegexpr += "($|/.*)";
+					} else {
+						Exception.assert(!pathRegexpr, "Variable arguments must be set just after '/'.");
+						pathRegexpr += "(.*)";
+					}
+					break;
+				// Must be placed at the beginning or just after a slash.
+				// Match only if there is something (non-empty) after the slash
+				case "+":
+					Exception.assert(!pathRegexpr || pathRegexpr.at(-1) == "/", "Variable arguments must be set just after '/'.");
 					pathRegexpr += "(.+)";
 					break;
 				case "i":
@@ -134,23 +146,68 @@ function compileRoutes(routes, config) {
 			// Add the variable to the list
 			varList.push({
 				cast: castType,
+				uncast: uncastType,
 				name: pathList[i],
 			});
 
 			// Add the follow-up of the path if any
 			if (pathList[i + 2]) {
 				pathRegexpr += regexprEscape(pathList[i + 2]);
+				segments.push(pathList[i + 2]);
 			}
 		}
 
-		maxVars = Math.max(maxVars, varList.length);
+		const regexpr = new RegExp("^" + pathRegexpr + "$", config.caseSensitive ? undefined : "i");
+		return {
+			regexpr: regexpr,
+			regexprAsString: pathRegexpr,
+			vars: varList,
+			// Match the object against the given path.
+			match: (path) => {
+				const match = path.match(regexpr);
+				if (match === null) {
+					return false;
+				}
+				const vars = varList.map((variable, index) => {
+					const str = match[index + 1];
+					return [variable.name, variable.cast(str)];
+				});
+				return Object.fromEntries(vars);
+			},
+			// Map a set of variables to re-create the route.
+			toRoute: (values) => {
+				return segments
+					.map((segment, index) => {
+						if (varList[index]) {
+							const name = varList[index].name;
+							Exception.assert(name in values, "The value '{}' is missing.", name);
+							segment += varList[index].uncast(values[name]);
+						}
+						return segment;
+					})
+					.join("");
+			},
+		};
+	}
+}
+
+/// \brief Pre-process routes before being used.
+function compileRoutes(routes, config) {
+	// Create the master regexpr, to optimize the search speed
+	let routeData = [];
+	// This is used for future computing and will get the maximum number of variable
+	let maxVars = 0;
+
+	for (const [path, config] of routes.entries()) {
+		const { regexprAsString, vars } = Router.toCompiledRoute(path, config);
+		maxVars = Math.max(maxVars, vars.length);
 
 		// Update the root data
 		routeData.push({
 			args: config.args,
 			handler: config.handler,
-			varList: varList,
-			pathRegexpr: pathRegexpr,
+			varList: vars,
+			pathRegexpr: regexprAsString,
 		});
 	}
 

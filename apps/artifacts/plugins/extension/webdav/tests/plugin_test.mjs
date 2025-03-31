@@ -70,7 +70,7 @@ describe("Webdav", () => {
 			await tester.start();
 		});
 
-		it("propfind on a directory", async () => {
+		it("propfind on root directory", async () => {
 			const response = await tester.send("memory", "propfind", "/webdav");
 			Exception.assertEqual(response.status, 207);
 			const data = new XMLParser().parse(response.data);
@@ -82,8 +82,20 @@ describe("Webdav", () => {
 			});
 		});
 
+		it("propfind on root directory with '/'", async () => {
+			const response = await tester.send("memory", "propfind", "/webdav/");
+			Exception.assertEqual(response.status, 207);
+			const data = new XMLParser().parse(response.data);
+			assertEqualResponses(data, {
+				"": {
+					"D:displayname": "webdav",
+					"D:resourcetype": { "D:collection": "" },
+				},
+			});
+		});
+
 		// webdav4: ls
-		it("propfind on a directory with depth=1", async () => {
+		it("propfind on root directory with depth=1", async () => {
 			const response = await tester.send("memory", "propfind", "/webdav", {
 				headers: {
 					depth: 1,
@@ -113,6 +125,28 @@ describe("Webdav", () => {
 				"/nested": {
 					"D:displayname": "nested",
 					"D:resourcetype": { "D:collection": "" },
+				},
+			});
+		});
+
+		// webdav4: ls
+		it("propfind on nested directory with depth=1", async () => {
+			const response = await tester.send("memory", "propfind", "/webdav/nested/deeper", {
+				headers: {
+					depth: 1,
+				},
+			});
+			Exception.assertEqual(response.status, 207);
+			const data = new XMLParser().parse(response.data);
+			assertEqualResponses(data, {
+				"/nested/deeper": {
+					"D:displayname": "deeper",
+					"D:resourcetype": { "D:collection": "" },
+				},
+				"/nested/deeper/c.txt": {
+					"D:displayname": "c.txt",
+					"D:resourcetype": "",
+					"D:getcontentlength": 13,
 				},
 			});
 		});

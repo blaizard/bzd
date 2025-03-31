@@ -73,6 +73,7 @@ export default class AuthenticationClient {
 
 	/// Attempt to logout
 	async logout(api) {
+		Exception.assert(this.hasLogout(), "Logout is not available with this authentication schema.");
 		await this._logoutImpl(api);
 	}
 
@@ -95,5 +96,10 @@ export default class AuthenticationClient {
 			return await this._updateAuthenticationURLImpl(url);
 		}
 		return url;
+	}
+
+	/// Whether the logout functionality is available or not.
+	hasLogout() {
+		return typeof this._logoutImpl === "function";
 	}
 }

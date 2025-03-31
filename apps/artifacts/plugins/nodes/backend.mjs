@@ -158,6 +158,40 @@ export default class Plugin extends PluginBase {
 			});
 		}
 
+		/// Get the records.
+		///
+		/// GET <endpoint>/@records?tick=10
+		/// ```{
+		///    timestamp: xxx,   # node current timestamp for reference.
+		///    records: [...],   # current records from the specified tick.
+		///    next: xxxx        # the tick to provide for the next records.
+		///    end : true|false  # if it contains all remaining records or not.
+		/// }```
+		endpoints.register("get", ["/@records", "/records"], async (context) => {
+			// Important note, if tick is greater than this.records.tick, it means that this tick was
+			// taken from a previous version/iteration, therefore we consider the tick passed invalid
+			// and reset it to 0. This is to handle updates on the remote side.
+			let tick = context.getQuery("tick", 0, parseInt);
+			if (tick > this.records.tick + 1) {
+				tick = 0;
+			}
+			let maxSize = context.getQuery("size", 1024 * 1024, parseInt);
+			// Pass the record as written to disk (don't use recordFromDisk)
+			// This is done to save network bandwidth.
+			const output = await this.read(tick, maxSize, /*diskFormat*/ true);
+
+			context.setStatus(200);
+			context.sendJson(
+				Object.assign(
+					{
+						version: this.version,
+						timestamp: Date.now(),
+					},
+					output,
+				),
+			);
+		});
+
 		/// Retrieve values from the store.
 		///
 		/// GET <endpoint>/<uid>/<path:*>
@@ -235,40 +269,6 @@ export default class Plugin extends PluginBase {
 			});
 			context.setStatus(200);
 			context.sendJson(output);
-		});
-
-		/// Get the records.
-		///
-		/// GET <endpoint>/@records?tick=10
-		/// ```{
-		///    timestamp: xxx,   # node current timestamp for reference.
-		///    records: [...],   # current records from the specified tick.
-		///    next: xxxx        # the tick to provide for the next records.
-		///    end : true|false  # if it contains all remaining records or not.
-		/// }```
-		endpoints.register("get", "/@records", async (context) => {
-			// Important note, if tick is greater than this.records.tick, it means that this tick was
-			// taken from a previous version/iteration, therefore we consider the tick passed invalid
-			// and reset it to 0. This is to handle updates on the remote side.
-			let tick = context.getQuery("tick", 0, parseInt);
-			if (tick > this.records.tick + 1) {
-				tick = 0;
-			}
-			let maxSize = context.getQuery("size", 1024 * 1024, parseInt);
-			// Pass the record as written to disk (don't use recordFromDisk)
-			// This is done to save network bandwidth.
-			const output = await this.read(tick, maxSize, /*diskFormat*/ true);
-
-			context.setStatus(200);
-			context.sendJson(
-				Object.assign(
-					{
-						version: this.version,
-						timestamp: Date.now(),
-					},
-					output,
-				),
-			);
 		});
 
 		/// Insert one or multiple entries.

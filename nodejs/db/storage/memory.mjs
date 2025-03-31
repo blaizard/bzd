@@ -88,7 +88,7 @@ export default class StorageMemory extends Storage {
 	_getParentNamePair(pathList) {
 		Exception.assertPrecondition(pathList.length > 0, "Cannot get entry information from an empty path.");
 		const parent = this._navigateTo(pathList.slice(0, -1));
-		Exception.assertPrecondition(!(parent instanceof File), "Entry '{}' is a file.", part);
+		Exception.assertPrecondition(!(parent instanceof File), "Entry '{}' is a file.", parent);
 		const name = pathList[pathList.length - 1];
 		return [parent, name];
 	}

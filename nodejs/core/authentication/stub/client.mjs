@@ -33,6 +33,4 @@ export default class StubAuthenticationClient extends AuthenticationClient {
 	async _loginWithSSOImpl(rest, ssoToken) {}
 
 	async _loginWithRestImpl(result) {}
-
-	async _logoutImpl(rest) {}
 }

@@ -16,6 +16,7 @@ export default function extensionWebdav(plugin, options, provider, endpoints) {
 		const body = context.getBody();
 		const storage = plugin.getStorage();
 
+		// TODO, do not hardcode this.
 		context.redirect("/file/memory/" + context.getParam("path"));
 	});
 
@@ -29,7 +30,7 @@ export default function extensionWebdav(plugin, options, provider, endpoints) {
 	///		<a:prop><a:getcontenttype/></a:prop>
 	///		<a:prop><a:getcontentlength/></a:prop>
 	/// </a:propfind>
-	endpoints.register("propfind", ["/webdav/{path:*}", "/webdav"], async (context) => {
+	endpoints.register("propfind", "/webdav/{path:*}", async (context) => {
 		const depth = context.getHeader("depth", "0");
 		const path = pathlib.path(context.getParam("path", "")).normalize;
 		const storage = plugin.getStorage();

@@ -14,7 +14,7 @@ import { ExceptionFactory, ExceptionPrecondition } from "../exception.mjs";
 import FileSystem from "../filesystem.mjs";
 import LogFactory from "../log.mjs";
 import { HttpServerContext, HttpError } from "#bzd/nodejs/core/http/server_context.mjs";
-import Endpoint from "#bzd/nodejs/core/http/endpoint.mjs";
+import HttpEndpoint from "#bzd/nodejs/core/http/endpoint.mjs";
 
 const Log = LogFactory("http", "server");
 const Exception = ExceptionFactory("http", "server");
@@ -273,27 +273,23 @@ export default class HttpServer {
 		);
 		this.maxTimeoutS = Math.max(this.maxTimeoutS, options.timeoutS);
 
-		const endpoint = new Endpoint(uri);
-		const maybeRegexprPath = endpoint.isVarArgs() ? endpoint.toRegexp() : null;
-
+		const endpoint = new HttpEndpoint(uri);
 		let callbackList = [middlewareErrorHandler];
 
 		callbackList.unshift(async function (request, response) {
 			// Create the context.
 			const context = new HttpServerContext(request, response);
-			// Override the params if there is a regexpr.
+			// Override the params.
 			// This is needed because Express apply a urldecode operation to the params which is not
 			// wanted with variable arguments. Because we need to differentiate between / and %2F.
-			if (maybeRegexprPath) {
-				const match = maybeRegexprPath.exec(request.path);
-				Exception.assert(
-					match,
-					"There must be a match with the path ({}) and its regular expression ({}).",
-					request.path,
-					maybeRegexprPath,
-				);
-				request.params = match.groups;
-			}
+			const match = endpoint.match(request.path);
+			Exception.assert(
+				match,
+				"There must be a match with the path ({}) and its regular expression ({}).",
+				request.path,
+				endpoint.toRegexp(),
+			);
+			request.params = match;
 			try {
 				await callback.call(this, context);
 			} catch (e) {
@@ -333,27 +329,12 @@ export default class HttpServer {
 			response.setTimeout(options.timeoutS * 1000);
 			next();
 		});
-
-		const updatedURI =
-			"/" +
-			endpoint
-				.map((fragment) => {
-					if (typeof fragment == "string") {
-						return fragment;
-					}
-					if (fragment.isVarArgs) {
-						return ":" + fragment.name + "(*)";
-					}
-					return ":" + fragment.name;
-				})
-				.join("/");
-
 		switch (type) {
 			case "*":
-				this.app.all(updatedURI, ...callbackList);
+				this.app.all(endpoint.toRegexp(), ...callbackList);
 				break;
 			default:
-				this.app[type.toLowerCase()](updatedURI, ...callbackList);
+				this.app[type.toLowerCase()](endpoint.toRegexp(), ...callbackList);
 		}
 
 		Log.debug("Added route: {} {} with options {:j}", type, uri, options);

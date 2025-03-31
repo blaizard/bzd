@@ -87,7 +87,7 @@ export default class RestClient extends Base {
 		}
 
 		// Update the endpoint if needed.
-		const updatedEndpoint = new HttpEndpoint(endpoint).mapValues(data);
+		const updatedEndpoint = new HttpEndpoint(endpoint).toRoute(data);
 
 		switch (requestOptions.type) {
 			case "json":

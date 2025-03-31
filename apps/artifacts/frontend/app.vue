@@ -6,7 +6,7 @@
 		<template #actions>
 			<template v-if="$authentication.isAuthenticated">
 				<MenuEntry text="Services" icon="bzd-icon-tile" link="/services"></MenuEntry>
-				<MenuEntry text="Logout" icon="bzd-icon-close" link="/logout"></MenuEntry>
+				<MenuEntry v-if="$authentication.hasLogout()" text="Logout" icon="bzd-icon-close" link="/logout"></MenuEntry>
 			</template>
 			<template v-else>
 				<MenuEntry text="Login" icon="bzd-icon-user" link="/login"></MenuEntry>
