@@ -19,6 +19,11 @@
 				<i class="bzd-icon-battery"></i>
 				<span class="value">{{ (batteries.min * 100).toFixed(1) }}%</span>
 			</span>
+
+			<span v-if="uptime" class="entry" v-tooltip="uptime.tooltip">
+				<i class="bzd-icon-clock"></i>
+				<span class="value">{{ uptime.text }}</span>
+			</span>
 		</div>
 
 		<!-- Gauges //-->
@@ -60,7 +65,7 @@
 
 <script>
 	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
-	import { bytesToString, capitalize } from "#bzd/nodejs/utils/to_string.mjs";
+	import { bytesToString, timeMsToString, capitalize } from "#bzd/nodejs/utils/to_string.mjs";
 	import Gauge from "#bzd/apps/dashboard/plugins/system_monitor/gauge.vue";
 	import GaugeRate from "#bzd/apps/dashboard/plugins/system_monitor/gauge_rate.vue";
 
@@ -196,6 +201,16 @@
 					tooltips,
 				};
 			},
+			uptime() {
+				if (this.metadata.uptime) {
+					const text = timeMsToString(this.metadata.uptime * 1000);
+					return {
+						text: text,
+						tooltip: { data: "This node is/was up for " + text + " (" + parseInt(this.metadata.uptime) + "s)" },
+					};
+				}
+				return null;
+			},
 		},
 		methods: {
 			// Utilities
@@ -249,7 +264,7 @@
 
 <style lang="scss">
 	@use "@/nodejs/icons.scss" as * with (
-		$bzdIconNames: thermometer battery
+		$bzdIconNames: thermometer battery clock
 	);
 
 	.system-monitor {
@@ -258,6 +273,9 @@
 			margin-bottom: 20px;
 			.entry {
 				margin-left: 20px;
+				.value {
+					padding-left: 3px;
+				}
 			}
 		}
 

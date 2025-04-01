@@ -31,7 +31,7 @@ export default class Nodes {
 					token: token,
 					path: ["data"],
 					children: 3,
-					include: [["battery"], ["cpu"], ["gpu"], ["disk"], ["memory"], ["temperature"]],
+					include: [["battery"], ["cpu"], ["gpu"], ["disk"], ["memory"], ["temperature"], ["version"], ["uptime"]],
 					metadata: true,
 				});
 
