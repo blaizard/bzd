@@ -153,8 +153,8 @@
 			ios() {
 				let tooltips = {};
 				for (const [name, io] of Object.entries(this.metadata.io || {})) {
-					const [ioCounterIn, ioCounterOut] = io;
-					const rates = this.updateInOutCountersToRates(this.ratesIO, name, ioCounterIn, ioCounterOut);
+					const {in, out} = io;
+					const rates = this.updateInOutCountersToRates(this.ratesIO, name, in, out);
 					tooltips[name] = "read: " + this.formatBytesRate(rates.in) + ", write: " + this.formatBytesRate(rates.out);
 				}
 				return {
@@ -166,8 +166,8 @@
 				let rates = {};
 				let tooltips = {};
 				for (const [name, network] of Object.entries(this.metadata.network || {})) {
-					const [ioCounterIn, ioCounterOut] = network;
-					const rates = this.updateInOutCountersToRates(this.ratesNetwork, name, ioCounterIn, ioCounterOut);
+					const {in, out} = network;
+					const rates = this.updateInOutCountersToRates(this.ratesNetwork, name, in, out);
 					tooltips[name] = "recv: " + this.formatBytesRate(rates.in) + ", send: " + this.formatBytesRate(rates.out);
 				}
 				return {

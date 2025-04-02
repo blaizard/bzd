@@ -13,7 +13,7 @@ from bzd.sync.singleton import Singleton
 from apps.artifacts.api.python.node.node import Node
 
 if __name__ == "__main__":
-	parser = argparse.ArgumentParser(description="WOL manager.")
+	parser = argparse.ArgumentParser(description="Node Manager.")
 	parser.add_argument("--bind", default="0.0.0.0", help="Address to bind.")
 	parser.add_argument("--port", default=9999, type=int, help="Port to bind.")
 	parser.add_argument("--report-rate",

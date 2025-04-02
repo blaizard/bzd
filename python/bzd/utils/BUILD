@@ -64,6 +64,12 @@ py_library(
 )
 
 py_library(
+    name = "timeout",
+    srcs = ["timeout.py"],
+    visibility = ["//visibility:public"],
+)
+
+py_library(
     name = "result",
     srcs = ["result.py"],
     visibility = ["//visibility:public"],

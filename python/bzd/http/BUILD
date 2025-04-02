@@ -11,6 +11,15 @@ py_library(
 )
 
 py_library(
+    name = "parser",
+    srcs = ["parser.py"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//bzd/utils:timeout",
+    ],
+)
+
+py_library(
     name = "server",
     srcs = ["server.py"],
     visibility = ["//visibility:public"],

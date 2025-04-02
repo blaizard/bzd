@@ -175,13 +175,13 @@ export default class SNMP {
 				}
 			} else if (category in { io: "", network: "" }) {
 				const [name, type] = rest;
-				object[category][name] ??= [0, 0];
+				object[category][name] ??= {};
 				switch (type) {
 					case "in":
-						object[category][name][0] = parseInt(value);
+						object[category][name].in = parseInt(value);
 						break;
 					case "out":
-						object[category][name][1] = parseInt(value);
+						object[category][name].out = parseInt(value);
 						break;
 					default:
 						Exception.error("Unsupported id '{}'.", id);
