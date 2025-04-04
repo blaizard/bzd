@@ -6,7 +6,7 @@ import LogFactory from "../../core/log.mjs";
 import { CollectionPaging } from "../utils.mjs";
 
 import Permissions from "./permissions.mjs";
-import Storage from "./storage.mjs";
+import { Storage } from "./storage.mjs";
 
 const Log = LogFactory("db", "storage", "webdav");
 const Exception = ExceptionFactory("db", "storage", "webdav");

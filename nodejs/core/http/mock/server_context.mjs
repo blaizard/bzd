@@ -1,4 +1,5 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
+import { toString } from "#bzd/nodejs/core/stream.mjs";
 
 const Exception = ExceptionFactory("http", "server", "context", "mock");
 
@@ -20,6 +21,7 @@ export default class MockServerContext {
 			data: null,
 			redirect: null,
 			end: false,
+			headers: {},
 		};
 	}
 
@@ -71,7 +73,7 @@ export default class MockServerContext {
 	}
 
 	setHeader(key, value) {
-		this.request.headers[key] = value;
+		this.response.headers[key] = value;
 		return this;
 	}
 
@@ -149,7 +151,8 @@ export default class MockServerContext {
 		if (typeof data == "string") {
 			this.send(data);
 		} else if ("pipe" in data) {
-			this.send(data);
+			const buffer = await toString(data);
+			this.send(buffer);
 		} else {
 			Exception.unreachable("{} {}: callback result is not of a supported format.", method, endpoint);
 		}

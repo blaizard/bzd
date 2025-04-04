@@ -16,6 +16,7 @@ import APIv1 from "#bzd/api.json" with { type: "json" };
 import Plugins from "#bzd/apps/artifacts/plugins/backend.mjs";
 import config from "#bzd/apps/artifacts/backend/config.json" with { type: "json" };
 import configGlobal from "#bzd/apps/artifacts/config.json" with { type: "json" };
+import { FileNotFoundError } from "#bzd/nodejs/db/storage/storage.mjs";
 
 const Log = LogFactory("backend");
 const Exception = ExceptionFactory("backend");
@@ -131,7 +132,7 @@ program
 			return false;
 		}
 		if ("private" in volumes[volume].options) {
-			const maybeSession = await authentication.verify(context);
+			const maybeSession = await authentication.verify(context, /*scopes*/ [volume]);
 			if (!maybeSession) {
 				return false;
 			}
@@ -149,17 +150,25 @@ program
 		"get",
 		"/file",
 		async function (inputs) {
-			const { volume, pathList } = getInternalPathFromString(inputs.path);
-			await assertAuthorizedVolume(this, volume);
+			try {
+				const { volume, pathList } = getInternalPathFromString(inputs.path);
+				await assertAuthorizedVolume(this, volume);
 
-			Exception.assertPrecondition(volume, "There is no volume associated with this path: '{}'.", inputs.path);
-			const storage = await cache.get("volume", volume);
-			const metadata = await storage.metadata(pathList);
-			if (metadata.size) {
-				this.setHeader("Content-Length", metadata.size);
+				Exception.assertPrecondition(volume, "There is no volume associated with this path: '{}'.", inputs.path);
+				const storage = await cache.get("volume", volume);
+				const metadata = await storage.metadata(pathList);
+				if (metadata.size) {
+					this.setHeader("Content-Length", metadata.size);
+				}
+				this.setHeader("Content-Disposition", 'attachment; filename="' + metadata.name + '"');
+				return await storage.read(pathList);
+			} catch (e) {
+				if (e instanceof FileNotFoundError) {
+					this.sendStatus(404);
+					return;
+				}
+				throw e;
 			}
-			this.setHeader("Content-Disposition", 'attachment; filename="' + metadata.name + '"');
-			return await storage.read(pathList);
 		},
 		{
 			timeoutS: 10 * 60, // 10min timeout
@@ -167,39 +176,47 @@ program
 	);
 
 	rest.handle("post", "/list", async function (inputs) {
-		const { volume, pathList } = getInternalPath(inputs.path);
-		const maxOrPaging = "paging" in inputs ? inputs.paging : 50;
+		try {
+			const { volume, pathList } = getInternalPath(inputs.path);
+			const maxOrPaging = "paging" in inputs ? inputs.paging : 50;
 
-		if (!volume) {
-			const volumeNames = Object.keys(volumes);
-			const result = await CollectionPaging.makeFromList(volumeNames, volumeNames.length, async (volume) => {
-				return Permissions.makeEntry(
-					{
-						name: volume,
-						type: "bucket",
-						plugin: volumes[volume].options.type,
-						authorized: await isAuthorizedVolume(this, volume),
-					},
-					{
-						list: true,
-					},
-				);
-			});
+			if (!volume) {
+				const volumeNames = Object.keys(volumes);
+				const result = await CollectionPaging.makeFromList(volumeNames, volumeNames.length, async (volume) => {
+					return Permissions.makeEntry(
+						{
+							name: volume,
+							type: "bucket",
+							plugin: volumes[volume].options.type,
+							authorized: await isAuthorizedVolume(this, volume),
+						},
+						{
+							list: true,
+						},
+					);
+				});
+				return {
+					data: result.data(),
+					next: null,
+				};
+			}
+
+			await assertAuthorizedVolume(this, volume);
+
+			const storage = await cache.get("volume", volume);
+			const result = await storage.list(pathList, maxOrPaging, /*includeMetadata*/ true);
+
 			return {
 				data: result.data(),
-				next: null,
+				next: result.getNextPaging(),
 			};
+		} catch (e) {
+			if (e instanceof FileNotFoundError) {
+				this.sendStatus(404);
+				return;
+			}
+			throw e;
 		}
-
-		await assertAuthorizedVolume(this, volume);
-
-		const storage = await cache.get("volume", volume);
-		const result = await storage.list(pathList, maxOrPaging, /*includeMetadata*/ true);
-
-		return {
-			data: result.data(),
-			next: result.getNextPaging(),
-		};
 	});
 
 	for (const [volume, data] of Object.entries(volumes)) {
@@ -212,7 +229,7 @@ program
 					routes,
 					async (context) => {
 						await assertAuthorizedVolume(context, volume);
-						await endpoint.handler(context);
+						return await endpoint.handler(context);
 					},
 					Object.assign({ exceptionGuard: true, type: ["raw"] }, endpoint.options),
 				);

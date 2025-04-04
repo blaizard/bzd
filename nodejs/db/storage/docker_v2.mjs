@@ -5,7 +5,7 @@ import LogFactory from "../../core/log.mjs";
 import { CollectionPaging } from "../utils.mjs";
 
 import Permissions from "./permissions.mjs";
-import Storage from "./storage.mjs";
+import { Storage, FileNotFoundError } from "./storage.mjs";
 
 const Log = LogFactory("db", "storage", "docker-v2");
 const Exception = ExceptionFactory("db", "storage", "docker-v2");
@@ -221,6 +221,6 @@ export default class StorageDockerV2 extends Storage {
 			const results = await this._listLayers(imageName, tag, maxOrPaging);
 			return includeMetadata ? results : results.map((item) => item.name);
 		}
-		Exception.unreachable("Invalid path '{:j}'", pathList);
+		throw new FileNotFoundError(pathList.join("/"));
 	}
 }

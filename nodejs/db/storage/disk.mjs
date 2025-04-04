@@ -8,7 +8,7 @@ import { copy as copyStream } from "../../core/stream.mjs";
 import { CollectionPaging } from "../utils.mjs";
 
 import Permissions from "./permissions.mjs";
-import Storage from "./storage.mjs";
+import { Storage, FileNotFoundError } from "./storage.mjs";
 
 const Log = LogFactory("db", "storage", "disk");
 const Exception = ExceptionFactory("db", "storage", "disk");
@@ -96,7 +96,11 @@ export default class StorageDisk extends Storage {
 	}
 
 	async _readImpl(pathList) {
-		return Fs.createReadStream(this._getFullPath(pathList));
+		const path = this._getFullPath(pathList);
+		if (!(await FileSystem.exists(path))) {
+			throw new FileNotFoundError(path);
+		}
+		return Fs.createReadStream(path);
 	}
 
 	async _writeImpl(pathList, readStream) {
@@ -108,7 +112,11 @@ export default class StorageDisk extends Storage {
 	}
 
 	async _deleteImpl(pathList) {
-		await FileSystem.unlink(this._getFullPath(pathList));
+		const path = this._getFullPath(pathList);
+		if (!(await FileSystem.exists(path))) {
+			throw new FileNotFoundError(path);
+		}
+		await FileSystem.unlink(path);
 	}
 
 	async _listImpl(pathList, maxOrPaging, includeMetadata) {
@@ -135,15 +143,23 @@ export default class StorageDisk extends Storage {
 			}
 			return await CollectionPaging.makeFromList(data, maxOrPaging);
 		}
-		return new CollectionPaging([]);
+		throw new FileNotFoundError(fullPath);
 	}
 
 	async _metadataImpl(pathList) {
 		const filePath = this._getFullPath(pathList);
+		if (!(await FileSystem.exists(filePath))) {
+			throw new FileNotFoundError(filePath);
+		}
 		return await getMetadata(filePath);
 	}
 
 	async _setPermissionImpl(pathList, permissions) {
+		const filePath = this._getFullPath(pathList);
+		if (!(await FileSystem.exists(filePath))) {
+			throw new FileNotFoundError(filePath);
+		}
+
 		// Create the permission.
 		let mode = 0;
 		if (permissions.isRead()) {
@@ -155,6 +171,6 @@ export default class StorageDisk extends Storage {
 		if (permissions.isExecutable()) {
 			mode |= 0o100 | 0o10 | 0o1;
 		}
-		return await FileSystem.chmod(this._getFullPath(pathList), mode);
+		return await FileSystem.chmod(filePath, mode);
 	}
 }

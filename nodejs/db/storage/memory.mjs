@@ -3,10 +3,10 @@ import Path from "path";
 import ExceptionFactory from "../../core/exception.mjs";
 import LogFactory from "../../core/log.mjs";
 import { CollectionPaging } from "../utils.mjs";
-import { fromChunk } from "#bzd/nodejs/core/stream.mjs";
+import { fromChunk, toBuffer } from "#bzd/nodejs/core/stream.mjs";
 
 import Permissions from "./permissions.mjs";
-import Storage from "./storage.mjs";
+import { Storage, FileNotFoundError } from "./storage.mjs";
 
 const Log = LogFactory("db", "storage", "memory");
 const Exception = ExceptionFactory("db", "storage", "memory");
@@ -79,7 +79,9 @@ export default class StorageMemory extends Storage {
 		let parent = this.data;
 		for (const part of pathList) {
 			Exception.assertPrecondition(!(parent instanceof File), "Entry '{}' must be a directory.", part);
-			Exception.assertPrecondition(part in parent, "Entry '{}' does not exists.", part);
+			if (!(part in parent)) {
+				throw new FileNotFoundError(part);
+			}
 			parent = parent[part];
 		}
 		return parent;
@@ -124,7 +126,7 @@ export default class StorageMemory extends Storage {
 
 	async _writeImpl(pathList, readStream) {
 		const [parent, name] = this._getParentNamePair(pathList);
-		const content = (await streamToBuffer(readStream)).toString("utf8");
+		const content = (await toBuffer(readStream)).toString("utf8");
 		if (name in parent) {
 			Exception.assertPrecondition(parent[name] instanceof File, "'{}' points to a directory.", name);
 			parent[name].content = content;

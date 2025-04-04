@@ -6,9 +6,11 @@ import { AsyncInitialize } from "../utils.mjs";
 
 const Exception = ExceptionFactory("db", "storage");
 
+export class FileNotFoundError extends Error {}
+
 /// File storage module.
 /// Path are addressed by a path list, as some implementation allow slashes as a name.
-export default class Storage extends AsyncInitialize {
+export class Storage extends AsyncInitialize {
 	constructor() {
 		super();
 	}
@@ -47,6 +49,8 @@ export default class Storage extends AsyncInitialize {
 	}
 
 	/// Delete a file from a bucket
+	///
+	/// \throws FileNotFoundError if the file does not exists.
 	async delete(path) {
 		return this._deleteImpl(Array.isArray(path) ? path : [path]);
 	}

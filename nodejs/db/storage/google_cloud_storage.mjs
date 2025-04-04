@@ -6,7 +6,7 @@ import { copy as copyStream } from "../../core/stream.mjs";
 import { CollectionPaging } from "../utils.mjs";
 
 import Permissions from "./permissions.mjs";
-import Base from "./storage.mjs";
+import { Storage as Base } from "./storage.mjs";
 
 const Log = LogFactory("db", "storage", "google-cloud-storage");
 const Exception = ExceptionFactory("db", "storage", "google-cloud-storage");

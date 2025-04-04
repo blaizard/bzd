@@ -6,7 +6,7 @@ import LogFactory from "../../core/log.mjs";
 import { CollectionPaging } from "../utils.mjs";
 
 import Permissions from "./permissions.mjs";
-import Storage from "./storage.mjs";
+import { Storage, FileNotFoundError } from "./storage.mjs";
 import Cache2 from "#bzd/nodejs/core/cache2.mjs";
 
 const Log = LogFactory("db", "storage", "google-drive");
@@ -38,6 +38,7 @@ export default class StorageGoogleDrive extends Storage {
 				const parentId = await this.cache.get("id", Cache2.arrayOfStringToKey(pathList.slice(0, -1)));
 				const escapedFolderName = pathList.at(-1).replace(/'/g, "''");
 				const query = "'" + parentId + "' in parents and name='" + escapedFolderName + "' and trashed=false";
+
 				const response = await this.drive.files.list({
 					q: query,
 					supportsAllDrives: true,
@@ -46,7 +47,7 @@ export default class StorageGoogleDrive extends Storage {
 				});
 				const files = response.data.files;
 				if (files.length !== 1) {
-					return null;
+					throw new FileNotFoundError(pathList.join("/"));
 				}
 				return files[0].id;
 			},

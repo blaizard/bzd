@@ -1,13 +1,27 @@
 import { Readable } from "stream";
 
-export async function toBuffer(data) {
+/// Convert a read stream into a buffer.
+export async function toBuffer(readStream) {
 	return new Promise((resolve, reject) => {
-		let chunks = [];
-		data
+		const chunks = [];
+		readStream
 			.on("data", (d) => chunks.push(d))
 			.on("error", reject)
 			.on("end", () => {
 				resolve(Buffer.concat(chunks));
+			});
+	});
+}
+
+/// Convert a read stream into a string.
+export async function toString(readStream) {
+	return new Promise((resolve, reject) => {
+		const chunks = [];
+		readStream
+			.on("data", (d) => chunks.push(d))
+			.on("error", reject)
+			.on("end", () => {
+				resolve(chunks.join(""));
 			});
 	});
 }

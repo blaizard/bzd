@@ -1,4 +1,4 @@
-import Storage from "#bzd/nodejs/db/storage/storage.mjs";
+import { Storage } from "#bzd/nodejs/db/storage/storage.mjs";
 
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import { CollectionPaging } from "#bzd/nodejs/db/utils.mjs";

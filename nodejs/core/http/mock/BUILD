@@ -22,5 +22,6 @@ bzd_nodejs_library(
     deps = [
         "//nodejs/core:exception",
         "//nodejs/core:log",
+        "//nodejs/core:stream",
     ],
 )

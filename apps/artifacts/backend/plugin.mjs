@@ -1,5 +1,5 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
-import Storage from "#bzd/nodejs/db/storage/storage.mjs";
+import { Storage } from "#bzd/nodejs/db/storage/storage.mjs";
 
 const Exception = ExceptionFactory("plugin");
 
