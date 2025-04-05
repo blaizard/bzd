@@ -25,3 +25,17 @@ bzd_nodejs_library(
         "//nodejs/core:stream",
     ],
 )
+
+bzd_nodejs_library(
+    name = "server",
+    srcs = [
+        "server.mjs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":server_context",
+        "//nodejs/core:exception",
+        "//nodejs/core:log",
+        "//nodejs/core:router",
+    ],
+)

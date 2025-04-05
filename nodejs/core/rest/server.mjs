@@ -4,15 +4,16 @@ import { ExceptionFactory, ExceptionPrecondition } from "../exception.mjs";
 import LogFactory from "../log.mjs";
 import Validation from "../validation.mjs";
 import { HttpServerContext, HttpError } from "#bzd/nodejs/core/http/server_context.mjs";
+import { extendObject } from "#bzd/nodejs/utils/object.mjs";
 
 import Base from "./base.mjs";
 
 const Exception = ExceptionFactory("rest", "server");
 const Log = LogFactory("rest", "server");
 
-class RestServerContext extends HttpServerContext {
+class RestServerContext {
 	constructor(context, rest) {
-		super(context.request, context.response);
+		this.context = context;
 		this.rest = rest;
 		this.debug = {};
 		this.manualResponse = false;
@@ -20,15 +21,15 @@ class RestServerContext extends HttpServerContext {
 
 	getEndpoint(endpoint) {
 		Exception.assert(this.rest, "Rest is not set.");
-		return new Url.URL(this.rest.getEndpoint(endpoint), this.getHost()).href;
+		return new Url.URL(this.rest.getEndpoint(endpoint), this.context.getHost()).href;
 	}
 
 	addDebug(name, data) {
 		this.debug[name] = data;
 	}
 
-	sendStatus(code, message = null) {
-		super.sendStatus(code, message);
+	sendStatus(...args) {
+		this.context.sendStatus(...args);
 		this.manualResponse = true;
 	}
 }
@@ -98,7 +99,8 @@ export default class RestServer extends Base {
 
 		// Create a wrapper to the callback
 		const handler = async (serverContext) => {
-			const context = new RestServerContext(serverContext, this);
+			const restContext = new RestServerContext(serverContext, this);
+			const context = extendObject(serverContext, restContext);
 
 			try {
 				// Set the CORS access control before the authorization check, because the latter can fail

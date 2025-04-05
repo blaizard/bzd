@@ -167,7 +167,7 @@ export default class Plugin extends PluginBase {
 		///    next: xxxx        # the tick to provide for the next records.
 		///    end : true|false  # if it contains all remaining records or not.
 		/// }```
-		endpoints.register("get", ["/@records", "/records"], async (context) => {
+		endpoints.register("get", "/@records", async (context) => {
 			// Important note, if tick is greater than this.records.tick, it means that this tick was
 			// taken from a previous version/iteration, therefore we consider the tick passed invalid
 			// and reset it to 0. This is to handle updates on the remote side.

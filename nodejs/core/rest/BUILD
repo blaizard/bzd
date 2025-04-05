@@ -30,5 +30,6 @@ bzd_nodejs_library(
         "//nodejs/core:log",
         "//nodejs/core:validation",
         "//nodejs/core/http:server",
+        "//nodejs/utils:object",
     ],
 )

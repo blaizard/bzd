@@ -56,3 +56,28 @@ export function deepMerge(target, ...sources) {
 
 	return deepMerge(target, ...sources);
 }
+
+/// Extends an existing object with more methods/variables.
+export function extendObject(object, extension) {
+	return new Proxy(object, {
+		get: function (target, prop, receiver) {
+			// If the property exists on the original object, return it.
+			if (prop in target) {
+				return Reflect.get(target, prop, receiver);
+			}
+
+			// If the property exists in the extensions object, return it (bound to extensions).
+			if (prop in extension) {
+				if (typeof extension[prop] === "function") {
+					// Bind the extension function to the proxy (receiver).
+					return extension[prop].bind(receiver);
+				} else {
+					return extension[prop];
+				}
+			}
+
+			// If the property doesn't exist in either, return undefined.
+			return undefined;
+		},
+	});
+}

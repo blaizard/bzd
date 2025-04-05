@@ -3,6 +3,7 @@ import RestServer from "#bzd/nodejs/core/rest/server.mjs";
 import Cache from "#bzd/nodejs/core/cache.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import HttpServer from "#bzd/nodejs/core/http/server.mjs";
+import MockHttpServer from "#bzd/nodejs/core/http/mock/server.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import Permissions from "#bzd/nodejs/db/storage/permissions.mjs";
 import { CollectionPaging } from "#bzd/nodejs/db/utils.mjs";
@@ -35,17 +36,21 @@ program
 		parseInt,
 	)
 	.option("-s, --static <path>", "Directory to static serve.", ".")
+	.option("--test", "Set the application in test mode.")
 	.parse(process.argv);
 
 (async () => {
 	// Read arguments
 	const PORT = Number(process.env.BZD_PORT || program.opts().port);
 	const PATH_STATIC = program.opts().static;
+	const TEST = program.opts().test;
 
 	const volumes = {};
 
 	// Set the cache
-	const cache = new Cache();
+	const cache = new Cache({
+		garbageCollector: !TEST,
+	});
 
 	// Services
 	const services = new Services();
@@ -57,7 +62,7 @@ program
 	Log.info("Preloaded {} application token(s).", Object.keys(config["tokens"] || {}).length);
 
 	// Set-up the web server
-	let web = new HttpServer(PORT);
+	let web = TEST ? new MockHttpServer() : new HttpServer(PORT);
 	let rest = new RestServer(APIv1.rest, {
 		authentication: authentication,
 		channel: web,
@@ -222,11 +227,11 @@ program
 	for (const [volume, data] of Object.entries(volumes)) {
 		for (const [method, endpoints] of Object.entries(data.endpoints)) {
 			for (const endpoint of endpoints) {
-				const routes = endpoint.paths.map((path) => "/x/" + volume + path);
-				Log.info("Adding route {}::{}", method, routes);
+				const route = "/x/" + volume + endpoint.path;
+				Log.info("Adding route {}::{}", method, route);
 				web.addRoute(
 					method,
-					routes,
+					route,
 					async (context) => {
 						await assertAuthorizedVolume(context, volume);
 						return await endpoint.handler(context);
@@ -242,4 +247,12 @@ program
 	Log.info("Application started");
 	web.addStaticRoute("/", PATH_STATIC);
 	web.start();
+
+	if (TEST) {
+		Exception.assertEqual((await web.send("get", "/file/memory/a.txt")).data, "content for a");
+
+		web.stop();
+		await services.stop();
+		Log.info("Application stopped");
+	}
 })();

@@ -40,6 +40,7 @@ export default class MockServerContext {
 
 	withParams(params) {
 		Object.assign(this.request.params, params);
+		return this;
 	}
 
 	getHost() {

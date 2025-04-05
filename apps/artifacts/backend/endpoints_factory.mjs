@@ -3,10 +3,10 @@ export default class EndpointsFactory {
 		this.data = {};
 	}
 
-	register(method, endpoints, handler, options = {}) {
+	register(method, endpoint, handler, options = {}) {
 		this.data[method] ??= [];
 		this.data[method].push({
-			paths: typeof endpoints === "string" ? [endpoints] : endpoints,
+			path: endpoint,
 			handler: handler,
 			options: options,
 		});
