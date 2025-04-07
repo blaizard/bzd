@@ -58,13 +58,38 @@ export default class MockHttpServer {
 			return await this.send(method, context.response.redirect, request);
 		}
 
-		Exception.assert(
-			context.response.status >= 200 && context.response.status <= 299,
-			"Invalid HTTP response status: {}\nFull response: {:j}",
-			context.response.status,
-			context.response,
-		);
-
 		return context.response;
+	}
+
+	/// Run a collection of tests.
+	///
+	/// \param tests A sequence of tests containing a request and expects key.
+	async test(tests) {
+		for (const test of tests) {
+			const { request, expects } = test;
+			Exception.assert(
+				request.length == 2 || request.length == 3,
+				"Request can only contain 2 or 3 entries: {:j}",
+				request,
+			);
+			let message = "Testing " + request[0] + "::" + request[1];
+			if (request[2]) {
+				message += " (" + JSON.stringify(request[2]) + ")";
+			}
+			Log.info("{}, checking: {}", message, Object.keys(expects));
+			const result = await this.send(...request);
+			for (const [key, value] of Object.entries(expects)) {
+				switch (key) {
+					case "data":
+						Exception.assertEqual(result.data, value);
+						break;
+					case "status":
+						Exception.assertEqual(result.status, value);
+						break;
+					default:
+						Exception.unreachable("Unsupported expected type: {}", key);
+				}
+			}
+		}
 	}
 }

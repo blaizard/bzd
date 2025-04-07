@@ -16,7 +16,7 @@ export default class AccountsAuthenticationServer extends SessionAuthenticationS
 	}
 
 	static make(options) {
-		const { type: type, ...optionsRest } = options;
+		const { type: type, ...optionsRest } = options || { type: "accounts" };
 		switch (type || "accounts") {
 			case "accounts":
 				return new AccountsAuthenticationServer(optionsRest);

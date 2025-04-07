@@ -39,6 +39,8 @@ export default class SessionAuthenticationServerProxy extends SessionAuthenticat
 				next: hashNext,
 			});
 		};
+
+		Log.info("Using session proxy authentication with server {}.", this.options.remote);
 	}
 
 	/// Perform a request to the remote.

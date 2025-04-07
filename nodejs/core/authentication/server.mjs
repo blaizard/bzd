@@ -87,4 +87,26 @@ export default class AuthenticationServer {
 	async preloadApplicationToken(token, scopes = null) {
 		return await this._preloadApplicationTokenImpl(token, scopes);
 	}
+
+	/// Get the access token from an HTTP context.
+	///
+	/// \param context The HTTP context.
+	/// \return The access token if any, null otherwise.
+	static _getAccessToken(context) {
+		let token = null;
+		const data = context.getHeader("authorization", "").split(" ");
+		if (data.length == 2 && data[0].toLowerCase() == "bearer") {
+			token = data[1];
+		}
+		if (!token) {
+			token = context.getQuery("t");
+		}
+		if (!token) {
+			token = context.getCookie("access_token", null);
+		}
+		if (!token) {
+			return null;
+		}
+		return token;
+	}
 }

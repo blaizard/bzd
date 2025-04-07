@@ -249,7 +249,7 @@ program
 	web.start();
 
 	if (TEST) {
-		Exception.assertEqual((await web.send("get", "/file/memory/a.txt")).data, "content for a");
+		await web.test(config.tests || []);
 
 		web.stop();
 		await services.stop();

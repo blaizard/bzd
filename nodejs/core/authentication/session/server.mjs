@@ -60,6 +60,8 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		if (this.options.kvs === null) {
 			this.options.kvs = new KeyValueStoreMemory("session-authentication");
 		}
+
+		Log.info("Using session authentication.");
 	}
 
 	_installRestImpl(rest) {
@@ -116,7 +118,7 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		let maybeTokenObject = false;
 
 		// Check if there is an access token and that it is still valid.
-		const maybeAccessToken = this._getAccessToken(context);
+		const maybeAccessToken = AuthenticationServer._getAccessToken(context);
 		if (maybeAccessToken) {
 			const result = await this._verifyAccessToken(maybeAccessToken, this.options.tokenAccessExpiresInReuse);
 			if (result) {
@@ -165,7 +167,7 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 
 	async clearSession(context) {
 		// Remove the cookies
-		const maybeAccessToken = this._getAccessToken(context);
+		const maybeAccessToken = AuthenticationServer._getAccessToken(context);
 		context.deleteCookie("access_token");
 		const maybeRefreshToken = context.getCookie("refresh_token", null);
 		context.deleteCookie("refresh_token");
@@ -319,7 +321,7 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 	/// \note We cannot refresh the access token as part of this process
 	/// because it needs to live in a query (not cookie) because of of fetch requests.
 	async _verifyImpl(context) {
-		const maybeToken = this._getAccessToken(context);
+		const maybeToken = AuthenticationServer._getAccessToken(context);
 		if (!maybeToken) {
 			return false;
 		}
@@ -338,7 +340,7 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 	/// \param token The token to be preloaded.
 	/// \param scopes The scopes to be assigned to this token.
 	async _preloadApplicationTokenImpl(token, scopes) {
-		Exception.assert(!token.includes("_"), "Application tokens do not have '_' characters: {}", token);
+		Exception.assert(!token.includes("_"), "Application tokens cannot have '_' characters: {}", token);
 		const [uid, hash] = this._readToken(token);
 
 		const sessionData = {
@@ -391,28 +393,6 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		}
 
 		return maybeAccessToken;
-	}
-
-	/// Get the access token from an HTTP context.
-	///
-	/// \param context The HTTP context.
-	/// \return The access token if any, null otherwise.
-	_getAccessToken(context) {
-		let token = null;
-		const data = context.getHeader("authorization", "").split(" ");
-		if (data.length == 2 && data[0].toLowerCase() == "bearer") {
-			token = data[1];
-		}
-		if (!token) {
-			token = context.getQuery("t");
-		}
-		if (!token) {
-			token = context.getCookie("access_token", null);
-		}
-		if (!token) {
-			return null;
-		}
-		return token;
 	}
 
 	/// Check the status of an access token.

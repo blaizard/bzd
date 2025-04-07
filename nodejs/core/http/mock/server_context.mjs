@@ -1,5 +1,6 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import { toString } from "#bzd/nodejs/core/stream.mjs";
+import { HttpError } from "#bzd/nodejs/core/http/server_context.mjs";
 
 const Exception = ExceptionFactory("http", "server", "context", "mock");
 

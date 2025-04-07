@@ -1,6 +1,48 @@
 {
+    "tests": [
+        {
+            "expects": {
+                "data": "content for a",
+                "status": 200
+            },
+            "request": [
+                "get",
+                "/file/memory/a.txt"
+            ]
+        },
+        {
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "get",
+                "/file/memory_private/a.txt"
+            ]
+        },
+        {
+            "expects": {
+                "data": "content for locked a",
+                "status": 200
+            },
+            "request": [
+                "get",
+                "/file/memory_private/a.txt",
+                {
+                    "headers": {
+                        "authorization": "bearer tokenmemoryprivate"
+                    }
+                }
+            ]
+        }
+    ],
     "tokens": {
-        "iamatoken": {
+        "tokenmemoryprivate": {
+            "doc": "Some useful documentation",
+            "scopes": [
+                "memory_private"
+            ]
+        },
+        "tokenscope1": {
             "doc": "Some useful documentation",
             "scopes": [
                 "scope1"
@@ -36,6 +78,16 @@
             },
             "type": "storage",
             "webdav": {}
+        },
+        "memory_private": {
+            "private": true,
+            "storage": {
+                "data": {
+                    "a.txt": "content for locked a"
+                },
+                "type": "memory"
+            },
+            "type": "storage"
         },
         "nodes": {
             "nodes.data": {
@@ -91,13 +143,6 @@
                     "type": "nodes"
                 }
             },
-            "type": "nodes"
-        },
-        "nodes_private": {
-            "nodes.records": {
-                "path": "./nodes_private.records"
-            },
-            "private": true,
             "type": "nodes"
         }
     }
