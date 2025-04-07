@@ -29,10 +29,20 @@ bzd_nodejs_library(
 )
 
 bzd_nodejs_library(
+    name = "server_context",
+    srcs = [
+        "server_context.mjs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//nodejs/core:exception",
+    ],
+)
+
+bzd_nodejs_library(
     name = "server",
     srcs = [
         "server.mjs",
-        "server_context.mjs",
     ],
     packages = [
         "@nodejs_deps//:body-parser",
@@ -48,6 +58,7 @@ bzd_nodejs_library(
     visibility = ["//visibility:public"],
     deps = [
         ":endpoint",
+        ":server_context",
         "//nodejs/core:event",
         "//nodejs/core:exception",
         "//nodejs/core:filesystem",

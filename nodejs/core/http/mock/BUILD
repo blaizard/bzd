@@ -23,6 +23,7 @@ bzd_nodejs_library(
         "//nodejs/core:exception",
         "//nodejs/core:log",
         "//nodejs/core:stream",
+        "//nodejs/core/http:server_context",
     ],
 )
 
