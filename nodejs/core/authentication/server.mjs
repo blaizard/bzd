@@ -95,7 +95,7 @@ export default class AuthenticationServer {
 	static _getAccessToken(context) {
 		let token = null;
 		const data = context.getHeader("authorization", "").split(" ");
-		if (data.length == 2 && data[0].toLowerCase() == "bearer") {
+		if (data.length == 2 && (data[0].toLowerCase() == "bearer" || data[0].toLowerCase() == "basic")) {
 			token = data[1];
 		}
 		if (!token) {
