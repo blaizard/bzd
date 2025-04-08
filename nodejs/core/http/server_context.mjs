@@ -4,9 +4,17 @@ const Exception = ExceptionFactory("http", "server", "context");
 
 /// Handler for http errors.
 export class HttpError extends Error {
-	constructor(code, message) {
+	constructor(code, message, headers = {}) {
 		super(message);
 		this.code = code;
+		this.headers = headers;
+	}
+
+	send(context) {
+		for (const [name, value] of Object.entries(this.headers)) {
+			context.setHeader(name, value);
+		}
+		context.sendStatus(this.code, this.message);
 	}
 }
 
@@ -30,12 +38,21 @@ export class HttpServerContext {
 		return name in this.request.headers;
 	}
 
-	getHeader(name, defaultValue = null) {
-		return name in this.request.headers ? this.request.headers[name] : defaultValue;
+	/// Get the header
+	getHeader(name, defaultValue = null, allowMultiple = false) {
+		const header = this.request.headers[name] ?? null;
+		if (header === null) {
+			return defaultValue;
+		}
+		const headerArray = Array.isArray(header) ? header : [header];
+		if (allowMultiple) {
+			return headerArray;
+		}
+		return headerArray[0];
 	}
 
-	setHeader(key, value) {
-		this.response.setHeader(key, value);
+	setHeader(key, valueOrValues) {
+		this.response.setHeader(key, valueOrValues);
 	}
 
 	setCookie(name, value, options = {}) {
@@ -128,7 +145,7 @@ export class HttpServerContext {
 		this.response.end();
 	}
 
-	httpError(code, message) {
-		return new HttpError(code, message);
+	httpError(...args) {
+		return new HttpError(...args);
 	}
 }

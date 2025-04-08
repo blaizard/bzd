@@ -66,7 +66,7 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 			// Validate the authentication for this UID and session
 			// and return some arguments to be passed to the access token
 			if (!(await authentication.options.refreshToken(uid, session, refreshToken.timeout))) {
-				throw this.httpError(401, "Unauthorized");
+				throw authentication.httpErrorUnauthorized();
 			}
 
 			this.setCookie("refresh_token", refreshToken.token, {
@@ -95,7 +95,7 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 					throw context.httpError(429, "Too Many Requests");
 				case AuthenticationServer.ErrorVerifyIdentity.unauthorized:
 				default:
-					throw context.httpError(401, "Unauthorized");
+					throw this.httpErrorUnauthorized();
 			}
 		});
 
@@ -106,7 +106,7 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 		rest.handle("post", "/auth/refresh", async function () {
 			const refreshToken = this.getCookie("refresh_token", null);
 			if (refreshToken == null) {
-				throw this.httpError(401, "Unauthorized");
+				throw authentication.httpErrorUnauthorized();
 			}
 
 			let data = null;
@@ -118,7 +118,7 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 				authentication.validationRefreshToken.validate(data);
 			} catch (e) {
 				Exception.fromError(e).print();
-				throw this.httpError(401, "Unauthorized");
+				throw authentication.httpErrorUnauthorized();
 			}
 
 			// Check access here

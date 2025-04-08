@@ -128,6 +128,11 @@ export const ExceptionFactory = (...topics) => {
 						value1.forEach((subValue1, index) => {
 							assertEqualInternal(subValue1, value2[index], ...exceptionArgs);
 						});
+					} else if (value1 instanceof Set && value2 instanceof Set) {
+						Exception.assert(value1.size === value2.size, ...exceptionArgs);
+						for (const element of value1) {
+							Exception.assert(value2.has(element), ...exceptionArgs);
+						}
 					} else {
 						assertEqualInternal(Object.keys(value1), Object.keys(value2), ...exceptionArgs);
 						Object.keys(value1).forEach((key) => {

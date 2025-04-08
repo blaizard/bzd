@@ -12,6 +12,12 @@
         },
         {
             "expects": {
+                "headers": {
+                    "www-authenticate": [
+                        "Basic",
+                        "Bearer"
+                    ]
+                },
                 "status": 401
             },
             "request": [
@@ -29,15 +35,15 @@
                 "/file/memory_private/a.txt",
                 {
                     "headers": {
-                        "authorization": "bearer tokenmemoryprivate"
+                        "authorization": "basic aGVsbG86YWJjMTIz"
                     }
                 }
             ]
         }
     ],
     "tokens": {
-        "tokenmemoryprivate": {
-            "doc": "Some useful documentation",
+        "aGVsbG86YWJjMTIz": {
+            "doc": "base64 user:password token for hello:abc123",
             "scopes": [
                 "memory_private"
             ]
@@ -87,7 +93,8 @@
                 },
                 "type": "memory"
             },
-            "type": "storage"
+            "type": "storage",
+            "webdav": {}
         },
         "nodes": {
             "nodes.data": {

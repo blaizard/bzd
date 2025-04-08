@@ -1,4 +1,5 @@
 import ExceptionFactory from "../exception.mjs";
+import { HttpError } from "../http/server_context.mjs";
 import Session from "./session.mjs";
 
 const Exception = ExceptionFactory("authentication", "server");
@@ -108,5 +109,12 @@ export default class AuthenticationServer {
 			return null;
 		}
 		return token;
+	}
+
+	/// Create an unauthorized exception.
+	httpErrorUnauthorized() {
+		return new HttpError(401, "Unauthorized", {
+			"www-authenticate": ["Basic", "Bearer"],
+		});
 	}
 }

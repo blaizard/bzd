@@ -33,7 +33,8 @@ export default function (str, ...args) {
 
 		switch (format.metadata || "") {
 			case "j":
-				return JSON.stringify(value);
+				// Handle Set, otherwise they will be rendered as '{}'.
+				return JSON.stringify(value, (_, value) => (value instanceof Set ? [...value] : value));
 			case "":
 				return String(value);
 			default:

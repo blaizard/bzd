@@ -217,7 +217,7 @@ export default class RestServer extends Base {
 				}
 			} catch (e) {
 				if (e instanceof HttpError) {
-					context.sendStatus(e.code, e.message);
+					e.send(context);
 				} else if (e instanceof ExceptionPrecondition) {
 					context.sendStatus(400, e.message);
 				} else {

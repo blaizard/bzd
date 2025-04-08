@@ -86,6 +86,25 @@ export default class MockHttpServer {
 					case "status":
 						Exception.assertEqual(result.status, value);
 						break;
+					case "headers":
+						for (const [headerName, headerValue] of Object.entries(value)) {
+							Exception.assert(
+								headerName in result.headers,
+								"Expected header '{}' to be present in the response, response: {}",
+								headerName,
+								Object.keys(result.headers),
+							);
+							const valueOrValues = result.headers[headerName];
+							const values = Array.isArray(valueOrValues) ? valueOrValues : [valueOrValues];
+							const expectedValues = Array.isArray(headerValue) ? headerValue : [headerValue];
+							Exception.assertEqual(
+								values.sort(),
+								expectedValues.sort(),
+								"Expected header values for '{}'",
+								headerName,
+							);
+						}
+						break;
 					default:
 						Exception.unreachable("Unsupported expected type: {}", key);
 				}

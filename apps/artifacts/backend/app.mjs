@@ -147,7 +147,7 @@ program
 
 	async function assertAuthorizedVolume(context, volume) {
 		if (!(await isAuthorizedVolume(context, volume))) {
-			throw context.httpError(401, "Unauthorized");
+			throw authentication.httpErrorUnauthorized();
 		}
 	}
 

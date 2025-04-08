@@ -56,7 +56,7 @@ export default class MockServerContext {
 		return name in this.request.headers;
 	}
 
-	getHeaders() {
+	_getHeaders() {
 		const headers = Object.assign(
 			{
 				host: this.getHost(),
@@ -69,13 +69,21 @@ export default class MockServerContext {
 		return Object.fromEntries(Object.entries(headers).map(([k, v]) => [k.toLowerCase(), v]));
 	}
 
-	getHeader(name, defaultValue = null) {
-		const headers = this.getHeaders();
-		return name in headers ? headers[name] : defaultValue;
+	getHeader(name, defaultValue = null, allowMultiple = false) {
+		const headers = this._getHeaders();
+		const header = headers[name] ?? null;
+		if (header === null) {
+			return defaultValue;
+		}
+		const headerArray = Array.isArray(header) ? header : [header];
+		if (allowMultiple) {
+			return headerArray;
+		}
+		return headerArray[0];
 	}
 
-	setHeader(key, value) {
-		this.response.headers[key] = value;
+	setHeader(key, valueOrValues) {
+		this.response.headers[key] = valueOrValues;
 		return this;
 	}
 
@@ -103,9 +111,11 @@ export default class MockServerContext {
 		switch (this.request.type) {
 			case "raw":
 				let content = this.request.method + " " + this.request.path + " HTTP/1.1\r\n";
-				content += Object.entries(this.getHeaders())
-					.map(([key, value]) => key + ": " + value + "\r\n")
-					.join("");
+				for (const [header, valueOrValues] of Object.entries(this._getHeaders())) {
+					for (const value of Array.isArray(valueOrValues) ? valueOrValues : [valueOrValues]) {
+						content += header + ": " + value + "\r\n";
+					}
+				}
 				content += "\r\n\r\n";
 				content += this.request.data;
 				return content;
@@ -172,7 +182,7 @@ export default class MockServerContext {
 		this.response.end = true;
 	}
 
-	httpError(code, message) {
-		return new HttpError(code, message);
+	httpError(...args) {
+		return new HttpError(...args);
 	}
 }

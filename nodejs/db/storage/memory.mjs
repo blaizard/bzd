@@ -35,20 +35,29 @@ export default class StorageMemory extends Storage {
 			options,
 		);
 
+		const count = { "file(s)": 0, directories: 0 };
 		const initializeData = (init) => {
 			let data = {};
 			for (const [key, value] of Object.entries(init)) {
 				if (value !== null && typeof value === "object") {
 					data[key] = initializeData(value);
+					++count.directories;
 				} else {
 					data[key] = new File(value, this.options.date());
+					++count["file(s)"];
 				}
 			}
 			return data;
 		};
 		this.data = initializeData(data);
 
-		Log.info("Using memory DB.");
+		Log.info(
+			"Using memory DB, initialized with {}.",
+			Object.entries(count)
+				.filter(([_, nb]) => nb > 0)
+				.map(([k, v]) => v + " " + k)
+				.join(", "),
+		);
 	}
 
 	async _initialize() {}

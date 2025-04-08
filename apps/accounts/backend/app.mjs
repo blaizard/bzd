@@ -343,10 +343,10 @@ const PATH_STATIC = options.static;
 	api.handle("post", "/password-change", async function (inputs) {
 		const maybeUser = await users.get(inputs.uid, /*allowNull*/ true);
 		if (maybeUser === null) {
-			throw this.httpError(401, "Unauthorized");
+			throw authentication.httpErrorUnauthorized();
 		}
 		if (!inputs.token || maybeUser.getPassword() !== inputs.token) {
-			throw this.httpError(401, "Unauthorized");
+			throw authentication.httpErrorUnauthorized();
 		}
 		await users.update(maybeUser.getUid(), async (user) => {
 			await user.setPassword(inputs.password);

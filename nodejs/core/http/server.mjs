@@ -288,7 +288,7 @@ export default class HttpServer {
 				await callback.call(this, context);
 			} catch (e) {
 				if (e instanceof HttpError) {
-					response.status(e.code).send(e.message);
+					e.send(context);
 				} else if (e instanceof ExceptionPrecondition) {
 					response.status(400).send(e.message);
 				} else if (options.exceptionGuard) {

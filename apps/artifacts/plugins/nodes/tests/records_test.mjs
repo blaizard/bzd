@@ -30,7 +30,7 @@ describe("Records", () => {
 		});
 
 		it("read all", async () => {
-			Exception.assertEqual(new Set(await readAll(records, 0)), new Set([1, 2, 3, 4, 5]));
+			Exception.assertEqual(new Set(await readAll(records, 0)), new Set([0, 1, 2, 3, 4, 5]));
 		});
 
 		it("sanity check", async () => {
