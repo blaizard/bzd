@@ -108,7 +108,7 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 				inputs.next,
 			);
 			if (!maybeToken) {
-				throw authentication.httpErrorUnauthorized();
+				throw authentication.httpErrorUnauthorized(/*requestAuthentication*/ false);
 			}
 			return maybeToken;
 		});
@@ -138,7 +138,7 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		}
 
 		if (!maybeTokenObject) {
-			throw this.httpErrorUnauthorized();
+			throw this.httpErrorUnauthorized(/*requestAuthentication*/ false);
 		}
 
 		// If refresh token is coming from the cookie, set cookies as well.
@@ -221,7 +221,7 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 				throw context.httpError(429, "Too Many Requests");
 			case AuthenticationServer.ErrorVerifyIdentity.unauthorized:
 			default:
-				throw this.httpErrorUnauthorized();
+				throw this.httpErrorUnauthorized(/*requestAuthentication*/ false);
 		}
 	}
 

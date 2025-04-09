@@ -112,9 +112,12 @@ export default class AuthenticationServer {
 	}
 
 	/// Create an unauthorized exception.
-	httpErrorUnauthorized() {
-		return new HttpError(401, "Unauthorized", {
-			"www-authenticate": ["Basic", "Bearer"],
-		});
+	httpErrorUnauthorized(requestAuthentication) {
+		const headers = requestAuthentication
+			? {
+					"www-authenticate": ["Basic", "Bearer"],
+				}
+			: {};
+		return new HttpError(401, "Unauthorized", headers);
 	}
 }
