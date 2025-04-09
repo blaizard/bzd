@@ -4,9 +4,11 @@ import StorageGoogleDrive from "#bzd/nodejs/db/storage/google_drive.mjs";
 import StorageDockerV2 from "#bzd/nodejs/db/storage/docker_v2.mjs";
 import StorageWebdav from "#bzd/nodejs/db/storage/webdav.mjs";
 import StorageMemory from "#bzd/nodejs/db/storage/memory.mjs";
+import LogFactory from "#bzd/nodejs/core/log.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import Validation from "#bzd/nodejs/core/validation.mjs";
 
+const Log = LogFactory("db", "storage", "make-from-config");
 const Exception = ExceptionFactory("db", "storage", "make-from-config");
 
 function validateConfig(schema, config) {
@@ -16,68 +18,144 @@ function validateConfig(schema, config) {
 }
 
 export default async function makeFromConfig(config) {
+	const commonConfig = {
+		type: "mandatory",
+		write: "",
+		tests: "",
+		options: "",
+	};
+	let storage = null;
 	switch (config.type) {
 		case "disk":
 			validateConfig(
-				{
-					type: "mandatory",
-					path: "mandatory",
-					options: "",
-				},
+				Object.assign(
+					{
+						path: "mandatory",
+					},
+					commonConfig,
+				),
 				config,
 			);
-			return await StorageDisk.make(config.path, config.options);
+			storage = await StorageDisk.make(
+				config.path,
+				Object.assign(
+					{
+						write: config.write,
+					},
+					config.options,
+				),
+			);
+			break;
 		case "googleCloudStorage":
 			validateConfig(
-				{
-					type: "mandatory",
-					bucketName: "mandatory",
-					options: "",
-				},
+				Object.assign(
+					{
+						bucketName: "mandatory",
+					},
+					commonConfig,
+				),
 				config,
 			);
-			return await StorageGoogleCloudStorage.make(config.bucketName, config.options);
+			storage = await StorageGoogleCloudStorage.make(
+				config.bucketName,
+				Object.assign(
+					{
+						write: config.write,
+					},
+					config.options,
+				),
+			);
+			break;
 		case "googleDrive":
 			validateConfig(
-				{
-					type: "mandatory",
-					folderId: "mandatory",
-					options: "",
-				},
+				Object.assign(
+					{
+						folderId: "mandatory",
+					},
+					commonConfig,
+				),
 				config,
 			);
-			return await StorageGoogleDrive.make(config.folderId, config.options);
+			storage = await StorageGoogleDrive.make(
+				config.folderId,
+				Object.assign(
+					{
+						write: config.write,
+					},
+					config.options,
+				),
+			);
+			break;
 		case "memory":
 			validateConfig(
-				{
-					type: "mandatory",
-					data: "mandatory",
-					options: "",
-				},
+				Object.assign(
+					{
+						data: "mandatory",
+					},
+					commonConfig,
+				),
 				config,
 			);
-			return await StorageMemory.make(config.data, config.options);
+			storage = await StorageMemory.make(
+				config.data,
+				Object.assign(
+					{
+						write: config.write,
+					},
+					config.options,
+				),
+			);
+			break;
 		case "dockerv2":
 			validateConfig(
-				{
-					type: "mandatory",
-					url: "mandatory",
-					options: "",
-				},
+				Object.assign(
+					{
+						url: "mandatory",
+					},
+					commonConfig,
+				),
 				config,
 			);
-			return await StorageDockerV2.make(config.url, config.options);
+			storage = await StorageDockerV2.make(
+				config.url,
+				Object.assign(
+					{
+						write: config.write,
+					},
+					config.options,
+				),
+			);
+			break;
 		case "webdav":
 			validateConfig(
-				{
-					type: "mandatory",
-					url: "mandatory",
-					options: "",
-				},
+				Object.assign(
+					{
+						url: "mandatory",
+					},
+					commonConfig,
+				),
 				config,
 			);
-			return await StorageWebdav.make(config.url, config.options);
+			storage = await StorageWebdav.make(
+				config.url,
+				Object.assign(
+					{
+						write: config.write,
+					},
+					config.options,
+				),
+			);
+			break;
 		default:
 			Exception.unreachable("Unsupported storage type: '{}'.", config.type);
 	}
+
+	Exception.assert(storage !== null, "Storage cannot be null.");
+	if (config.tests) {
+		const root = config.tests === true ? "validation_tests" : config.tests;
+		Log.info("Running validation tests on '{}' storage at /{}.", config.type, root);
+		await storage.runValidationTests(root);
+	}
+
+	return storage;
 }

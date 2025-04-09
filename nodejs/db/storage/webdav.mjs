@@ -14,15 +14,16 @@ const Exception = ExceptionFactory("db", "storage", "webdav");
 // Webdav cloud storage module
 export default class StorageWebdav extends Storage {
 	constructor(url, options) {
-		super();
-
-		this.options = Object.assign(
-			{
-				username: "",
-				password: "",
-			},
-			options,
+		super(
+			Object.assign(
+				{
+					username: "",
+					password: "",
+				},
+				options,
+			),
 		);
+
 		this.fetch = new HttpClientFactory(url, {
 			authentication: {
 				type: "basic",

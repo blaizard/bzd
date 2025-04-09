@@ -12,6 +12,15 @@
         },
         {
             "expects": {
+                "status": 404
+            },
+            "request": [
+                "get",
+                "/file/memory/not/found/a.txt"
+            ]
+        },
+        {
+            "expects": {
                 "headers": {
                     "www-authenticate": [
                         "Basic",
@@ -80,7 +89,9 @@
                         "f.txt": "content for b"
                     }
                 },
-                "type": "memory"
+                "tests": true,
+                "type": "memory",
+                "write": true
             },
             "type": "storage",
             "webdav": {}
@@ -91,7 +102,9 @@
                 "data": {
                     "a.txt": "content for locked a"
                 },
-                "type": "memory"
+                "tests": true,
+                "type": "memory",
+                "write": true
             },
             "type": "storage",
             "webdav": {}

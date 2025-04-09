@@ -26,13 +26,14 @@ class File {
 /// In-memory virtual file system.
 export default class StorageMemory extends Storage {
 	constructor(data, options) {
-		super();
-		this.options = Object.assign(
-			{
-				/// Use a custom date object.
-				date: () => new Date(),
-			},
-			options,
+		super(
+			Object.assign(
+				{
+					/// Use a custom date object.
+					date: () => new Date(),
+				},
+				options,
+			),
 		);
 
 		const count = { "file(s)": 0, directories: 0 };
@@ -108,8 +109,15 @@ export default class StorageMemory extends Storage {
 		if (pathList.length === 0) {
 			return true;
 		}
-		const [parent, name] = this._getParentNamePair(pathList);
-		return name in parent;
+		try {
+			const [parent, name] = this._getParentNamePair(pathList);
+			return name in parent;
+		} catch (e) {
+			if (e instanceof FileNotFoundError) {
+				return false;
+			}
+			throw e;
+		}
 	}
 
 	async _listImpl(pathList, maxOrPaging, includeMetadata) {
@@ -142,6 +150,17 @@ export default class StorageMemory extends Storage {
 			parent[name].modified = this.options.date();
 		} else {
 			parent[name] = new File(content, this.options.date());
+		}
+	}
+
+	async _mkdirImpl(pathList) {
+		let parent = this.data;
+		for (const part of pathList) {
+			if (!(part in parent)) {
+				parent[part] = {};
+			}
+			parent = parent[part];
+			Exception.assertPrecondition(!(parent instanceof File), "Entry '{}' must be a directory.", part);
 		}
 	}
 

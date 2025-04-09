@@ -106,7 +106,7 @@ export default class Services {
 			record.status = Services.Status.idle;
 			Log.debug("Completed '{}.{}'.", uid, name);
 		} catch (e) {
-			Log.error("Error '{}.{}': {}.", uid, name, e);
+			Log.error("Error '{}.{}': {}: {}\n{}", uid, name, e.constructor.name, e.message, e.stack);
 			++record.errors;
 			record.status = Services.Status.error;
 			log.error = e;

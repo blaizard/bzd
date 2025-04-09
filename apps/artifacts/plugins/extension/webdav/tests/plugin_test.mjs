@@ -58,6 +58,7 @@ const defaultMemory = {
 		options: {
 			date: () => fixedDate,
 		},
+		write: true,
 		type: "memory",
 	},
 	webdav: {},
@@ -271,6 +272,24 @@ describe("Webdav", () => {
 
 		it("head directory", async () => {
 			const response = await tester.send("memory", "head", "/webdav/nested");
+			Exception.assertEqual(response.status, 200);
+			Exception.assertEqual(response.data, null);
+		});
+	});
+
+	describe("mkcol", async () => {
+		const tester = new PluginTester();
+		tester.register("memory", Plugin, defaultMemory);
+		await tester.start();
+
+		it("mkcol single directory", async () => {
+			const response = await tester.send("memory", "mkcol", "/webdav/new");
+			Exception.assertEqual(response.status, 200);
+			Exception.assertEqual(response.data, null);
+		});
+
+		it("head multiple directories", async () => {
+			const response = await tester.send("memory", "mkcol", "/webdav/new/directory/deep");
 			Exception.assertEqual(response.status, 200);
 			Exception.assertEqual(response.data, null);
 		});

@@ -3,7 +3,7 @@ import Url from "url";
 import { ExceptionFactory, ExceptionPrecondition } from "../exception.mjs";
 import LogFactory from "../log.mjs";
 import Validation from "../validation.mjs";
-import { HttpServerContext, HttpError } from "#bzd/nodejs/core/http/server_context.mjs";
+import { HttpError } from "#bzd/nodejs/core/http/server_context.mjs";
 import { extendObject } from "#bzd/nodejs/utils/object.mjs";
 
 import Base from "./base.mjs";
@@ -186,6 +186,12 @@ export default class RestServer extends Base {
 						"{} {}: validation is only available for json type.",
 						method,
 						endpoint,
+					);
+					Exception.assert(result !== null, "A response that expects validation cannot return null.");
+					Exception.assert(
+						typeof result === "object",
+						"A response that expects validation must be a dictionary, instead: {:j}",
+						result,
 					);
 					const validation = new Validation(responseOptions.validation);
 					validation.validate(result, {

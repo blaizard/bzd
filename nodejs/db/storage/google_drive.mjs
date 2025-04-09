@@ -15,17 +15,18 @@ const Exception = ExceptionFactory("db", "storage", "google-drive");
 /// Google drive abstraction layer.
 export default class StorageGoogleDrive extends Storage {
 	constructor(folderId, options) {
-		super();
+		super(
+			Object.assign(
+				{
+					/// The path of the keyFile for the service account to access the google drive.
+					keyFile: null,
+				},
+				options,
+			),
+		);
 		this.drive = null;
 		this.folderId = folderId;
 		this.cache = new Cache2();
-		this.options = Object.assign(
-			{
-				/// The path of the keyFile for the service account to access the google drive.
-				keyFile: null,
-			},
-			options,
-		);
 
 		this.cache.register(
 			"id",
@@ -62,7 +63,10 @@ export default class StorageGoogleDrive extends Storage {
 	async _initialize() {
 		const auth = new google.auth.GoogleAuth({
 			keyFile: this.options.keyFile,
-			scopes: ["https://www.googleapis.com/auth/drive.readonly"],
+			scopes: [
+				//"https://www.googleapis.com/auth/drive.readonly",
+				"https://www.googleapis.com/auth/drive",
+			],
 		});
 
 		const client = await auth.getClient();
@@ -157,12 +161,14 @@ export default class StorageGoogleDrive extends Storage {
 		const response = await this.drive.files.create({
 			resource: {
 				name: fileName,
-				parents: parentId,
+				parents: [parentId],
 			},
 			media: {
 				mimeType: "application/octet-stream",
 				body: readStream,
 			},
+			supportsAllDrives: true,
+			includeItemsFromAllDrives: true,
 			fields: "id",
 		});
 		// Save the ID in the cache so we don't have to fetch it twice.
@@ -178,9 +184,11 @@ export default class StorageGoogleDrive extends Storage {
 					mimeType: "application/octet-stream",
 					body: readStream,
 				},
+				supportsAllDrives: true,
+				includeItemsFromAllDrives: true,
 			});
 		} catch (error) {
-			if (error.errors && error.errors[0].reason === "fileNotFound") {
+			if (error instanceof FileNotFoundError || (error.errors && error.errors[0].reason === "fileNotFound")) {
 				await this._createFile(pathList, readStream);
 				return;
 			}
@@ -188,10 +196,65 @@ export default class StorageGoogleDrive extends Storage {
 		}
 	}
 
+	async _mkdirImpl(pathList) {
+		let currentPath = [];
+		let parentId = this.folderId;
+		for (const part of pathList) {
+			currentPath.push(part);
+			try {
+				parentId = await this.cache.get("id", Cache2.arrayOfStringToKey(currentPath));
+			} catch (e) {
+				if (e instanceof FileNotFoundError) {
+					// Create the directory.
+					const response = await this.drive.files.create({
+						resource: {
+							name: part,
+							mimeType: "application/vnd.google-apps.folder",
+							parents: [parentId],
+						},
+						supportsAllDrives: true,
+						includeItemsFromAllDrives: true,
+						fields: "id",
+					});
+					parentId = response.data.id;
+					this.cache.set("id", Cache2.arrayOfStringToKey(currentPath), parentId);
+				} else {
+					throw e;
+				}
+			}
+		}
+	}
+
 	async _deleteImpl(pathList) {
 		const id = await this.cache.get("id", Cache2.arrayOfStringToKey(pathList));
+
+		// We need to delete recursively all children before we can delete the folder.
+		const listAndDeleteChildren = async (id, nextPageToken = null) => {
+			const result = await this.drive.files.list({
+				q: "'" + id + "' in parents and trashed=false",
+				fields: "nextPageToken, files(id, name, mimeType)",
+				pageToken: nextPageToken,
+				supportsAllDrives: true,
+				includeItemsFromAllDrives: true,
+			});
+			for (const file of result.data.files) {
+				if (file.mimeType == "application/vnd.google-apps.folder") {
+					await listAndDeleteChildren(file.id);
+				}
+				await this.drive.files.delete({
+					fileId: file.id,
+					supportsAllDrives: true,
+				});
+			}
+			if (result.data.nextPageToken) {
+				return listAndDeleteChildren(id, result.data.nextPageToken);
+			}
+		};
+
+		await listAndDeleteChildren(id);
 		await this.drive.files.delete({
 			fileId: id,
+			supportsAllDrives: true,
 		});
 	}
 }

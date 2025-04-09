@@ -16,14 +16,15 @@ const Exception = ExceptionFactory("db", "storage", "google-cloud-storage");
  */
 export default class StorageGoogleCloudStorage extends Base {
 	constructor(bucketName, options) {
-		super();
-
-		this.options = Object.assign(
-			{
-				prefix: null,
-			},
-			options,
+		super(
+			Object.assign(
+				{
+					prefix: null,
+				},
+				options,
+			),
 		);
+
 		this.storage = new Storage();
 		this.bucketName = bucketName;
 		this.bucket = this.storage.bucket(this.bucketName);

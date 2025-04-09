@@ -65,14 +65,14 @@ async function getMetadata(filePath) {
 /// File storage module
 export default class StorageDisk extends Storage {
 	constructor(path, options) {
-		super();
-
-		this.options = Object.assign(
-			{
-				/// If false, it will attempt to create a directory if it does not exists.
-				mustExists: false,
-			},
-			options,
+		super(
+			Object.assign(
+				{
+					/// If false, it will attempt to create a directory if it does not exists.
+					mustExists: false,
+				},
+				options,
+			),
 		);
 		this.path = path;
 
@@ -105,7 +105,6 @@ export default class StorageDisk extends Storage {
 
 	async _writeImpl(pathList, readStream) {
 		const fullPath = this._getFullPath(pathList);
-		await FileSystem.mkdir(Path.dirname(fullPath));
 		let writeStream = Fs.createWriteStream(fullPath);
 
 		return copyStream(writeStream, readStream);
@@ -144,6 +143,10 @@ export default class StorageDisk extends Storage {
 			return await CollectionPaging.makeFromList(data, maxOrPaging);
 		}
 		throw new FileNotFoundError(fullPath);
+	}
+
+	async _mkdirImpl(pathList) {
+		await FileSystem.mkdir(Path.dirname(pathList));
 	}
 
 	async _metadataImpl(pathList) {

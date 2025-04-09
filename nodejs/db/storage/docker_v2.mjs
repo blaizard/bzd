@@ -15,13 +15,13 @@ const Exception = ExceptionFactory("db", "storage", "docker-v2");
  */
 export default class StorageDockerV2 extends Storage {
 	constructor(url, options = {}) {
-		super();
-
-		this.options = Object.assign(
-			{
-				authentication: null,
-			},
-			options,
+		super(
+			Object.assign(
+				{
+					authentication: null,
+				},
+				options,
+			),
 		);
 
 		this.url = url;

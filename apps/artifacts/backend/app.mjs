@@ -84,12 +84,13 @@ program
 			cache.setDirty("volume", volume);
 			instance.resetStorage();
 		});
-		services.register(provider, type);
+		const serviceId = services.register(provider, type);
 
 		volumes[volume] = {
 			options: options,
 			instance: instance,
 			endpoints: endpoints.unwrap(),
+			serviceId: serviceId,
 		};
 	}
 
@@ -151,12 +152,25 @@ program
 		}
 	}
 
+	function assertVolumeReady(volume) {
+		const serviceId = volumes[volume].serviceId;
+		const state = services.getService(serviceId);
+		Exception.assertPrecondition(
+			state.status == "running",
+			"Volume '{}' is not ready, status: '{}'.",
+			volume,
+			state.status,
+		);
+	}
+
 	rest.handle(
 		"get",
 		"/file",
 		async function (inputs) {
 			try {
 				const { volume, pathList } = getInternalPathFromString(inputs.path);
+
+				assertVolumeReady(volume);
 				await assertAuthorizedVolume(this, volume);
 
 				Exception.assertPrecondition(volume, "There is no volume associated with this path: '{}'.", inputs.path);
@@ -169,8 +183,7 @@ program
 				return await storage.read(pathList);
 			} catch (e) {
 				if (e instanceof FileNotFoundError) {
-					this.sendStatus(404);
-					return;
+					throw this.httpError(404, "Not Found");
 				}
 				throw e;
 			}
@@ -206,6 +219,7 @@ program
 				};
 			}
 
+			assertVolumeReady(volume);
 			await assertAuthorizedVolume(this, volume);
 
 			const storage = await cache.get("volume", volume);
@@ -217,8 +231,7 @@ program
 			};
 		} catch (e) {
 			if (e instanceof FileNotFoundError) {
-				this.sendStatus(404);
-				return;
+				throw this.httpError(404, "Not Found");
 			}
 			throw e;
 		}
@@ -233,6 +246,7 @@ program
 					method,
 					route,
 					async (context) => {
+						assertVolumeReady(volume);
 						await assertAuthorizedVolume(context, volume);
 						return await endpoint.handler(context);
 					},

@@ -49,7 +49,7 @@ export default function extensionWebdav(plugin, options, provider, endpoints) {
 
 	/// Write the content of a file.
 	endpoints.register("options", "/webdav/{path:*}", async (context) => {
-		context.setHeader("Allow", "GET, PUT, DELETE, OPTIONS, PROPFIND, HEAD");
+		context.setHeader("Allow", "GET, PUT, DELETE, MKCOL, OPTIONS, PROPFIND, HEAD");
 		context.setHeader("Content-Type", "httpd/unix-directory");
 		context.sendStatus(200);
 	});
@@ -177,6 +177,17 @@ export default function extensionWebdav(plugin, options, provider, endpoints) {
 			const storage = plugin.getStorage();
 
 			await storage.delete(path.parts);
+			context.sendStatus(200);
+		});
+	});
+
+	/// Create a directory.
+	endpoints.register("mkcol", "/webdav/{path:*}", async (context) => {
+		await scopeExceptionHandler(context, async () => {
+			const path = pathlib.path(context.getParam("path", "")).normalize;
+			const storage = plugin.getStorage();
+
+			await storage.mkdir(path.parts);
 			context.sendStatus(200);
 		});
 	});
