@@ -4,6 +4,7 @@ import argparse
 import os
 import sys
 import time
+import shutil
 
 from apps.bootloader.binary import Binary, StablePolicy, ExceptionBinaryAbort
 from apps.bootloader.config import STABLE_VERSION, application, updatePath, updatePolicy
@@ -138,7 +139,9 @@ class Context:
 		self.binary.abort()
 
 	def setStableBinary(self, path: pathlib.Path, stablePath: pathlib.Path) -> None:
-		os.replace(path, stablePath)
+		# Note os.replace or os.rename will throw an "OSError: [Errno 18] Invalid cross-device link"
+		# in case the files are on a different volume. Using shutil fixes this problem.
+		shutil.copy(path, stablePath)
 
 	def setUpdateIgnore(self, ignore: str) -> None:
 		self.updateIgnoreOverride = ignore
