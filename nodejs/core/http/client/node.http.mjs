@@ -9,6 +9,17 @@ const Log = LogFactory("http", "client", "node.http");
 
 const MAX_REDIRECTION = 3;
 
+function makeAbsoluteUrl(urlString, originalUrl) {
+	try {
+		// If it doesn't throw, it's absolute
+		new URL(urlString);
+		return urlString;
+	} catch (error) {
+		const url = new URL(originalUrl);
+		return new URL(urlString, url).toString();
+	}
+}
+
 export default async function request(url, options) {
 	return new Promise((resolve, reject) => {
 		// Check if http or https
@@ -37,8 +48,9 @@ export default async function request(url, options) {
 
 					// Redirect
 					if ("location" in response.headers) {
-						Log.debug("Redirecting to '{}'", response.headers.location);
-						return request(response.headers.location, options).then(resolve).catch(reject);
+						const location = makeAbsoluteUrl(response.headers.location, url);
+						Log.debug("Redirecting to '{}'", location);
+						return request(location, options).then(resolve).catch(reject);
 					}
 				}
 

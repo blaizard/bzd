@@ -2,6 +2,8 @@ import RestServer from "#bzd/nodejs/core/rest/server.mjs";
 import Cache from "#bzd/nodejs/core/cache.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import HttpServer from "#bzd/nodejs/core/http/server.mjs";
+import MockHttpServer from "#bzd/nodejs/core/http/mock/server.mjs";
+import HttpClient from "#bzd/nodejs/core/http/client.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import { Command } from "commander/esm.mjs";
 import config from "#bzd/apps/dashboard/backend/config.json" with { type: "json" };
@@ -23,11 +25,7 @@ program
 		parseInt,
 	)
 	.option("-s, --static <path>", "Directory to static serve.", ".")
-	.option(
-		"-d, --data <path>",
-		"Where to store the data, can also be set with the environment variable BZD_PATH_DATA.",
-		"/bzd/data",
-	)
+	.option("--test", "Set the application in test mode.")
 	.parse(process.argv);
 
 class EventsFactory {
@@ -48,13 +46,15 @@ class EventsFactory {
 	// Read arguments
 	const PORT = Number(process.env.BZD_PORT || program.opts().port);
 	const PATH_STATIC = program.opts().static;
-	const PATH_DATA = process.env.BZD_PATH_DATA || program.opts().data;
+	const TEST = program.opts().test;
 
 	// Set-up the web server
-	let web = new HttpServer(PORT);
+	const web = TEST ? new MockHttpServer() : new HttpServer(PORT);
 	web.addStaticRoute("/", PATH_STATIC);
 
-	let cache = new Cache();
+	let cache = new Cache({
+		garbageCollector: !TEST,
+	});
 	let plugins = {};
 	let pluginClasses = {};
 	let events = {};
@@ -148,10 +148,24 @@ class EventsFactory {
 		}
 	}
 
+	cache.register("check-url", async (url) => {
+		try {
+			await HttpClient.request(url, {
+				method: "get",
+			});
+			return true;
+		} catch (e) {
+			return false;
+		}
+	});
+
 	// Install the APIs
 
 	let api = new RestServer(APIv1.rest, {
 		channel: web,
+	});
+	api.handle("get", "/check-url", async (inputs) => {
+		return { valid: await cache.get("check-url", inputs.url) };
 	});
 	api.handle("get", "/layout", async () => {
 		return {
@@ -183,5 +197,13 @@ class EventsFactory {
 	});
 
 	Log.info("Serving static content from '{}'.", PATH_STATIC);
+	Log.info("Application started");
 	web.start();
+
+	if (TEST) {
+		await web.test(config.tests || []);
+
+		web.stop();
+		Log.info("Application stopped");
+	}
 })();

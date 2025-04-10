@@ -32,6 +32,7 @@ export default class Cache2 {
 		//      }}
 		// }
 		this.data = {};
+		this.size = 0;
 	}
 
 	/// Defines an empty state.
@@ -102,6 +103,8 @@ export default class Cache2 {
 			// 1. Performance: It performs better in scenarios involving frequent additions and removals of key-value pairs.
 			// 2. Key order: The keys in Map are ordered in a straightforward way: A Map object iterates entries, keys, and values in the order of entry insertion.
 			values: new Map(),
+			// Size for this collection.
+			size: 0,
 		};
 	}
 
@@ -116,28 +119,29 @@ export default class Cache2 {
 		const data = this.data[collection];
 
 		// Touch the value, this is important to set the value on top.
+		let sizeDiff = -(data.values.get(key) ?? { size: 0 }).size;
 		data.values.delete(key);
 
+		let size = 0;
 		switch (type) {
 			case Cache2.Status.value:
-				data.values.set(key, {
-					data: value,
-					status: Cache2.Status.value,
-					size: data.options.getSize ? data.options.getSize(value) : undefined,
-					timeout: Cache2.getTimestampMs() + data.options.timeoutMs,
-				});
+				size = data.options.getSize(value);
 				break;
 			case Cache2.Status.error:
-				data.values.set(key, {
-					data: value,
-					status: Cache2.Status.error,
-					size: 8,
-					timeout: Cache2.getTimestampMs() + data.options.timeoutMs,
-				});
+				size = 8;
 				break;
 			default:
 				Exception.unreachable("Cannot set the value for {}::{} to type '{}'.", collection, key, type);
 		}
+		data.values.set(key, {
+			data: value,
+			status: type,
+			size: size,
+			timeout: Cache2.getTimestampMs() + data.options.timeoutMs,
+		});
+		sizeDiff += size;
+		data.size += sizeDiff;
+		this.size += sizeDiff;
 	}
 
 	/// Access a value or fetch a new value.
@@ -176,6 +180,7 @@ export default class Cache2 {
 			timeout: -1,
 			data: resolveList, // contains the resolve callback of all promises waiting.
 			status: Cache2.Status.fetching,
+			size: (data.values.get(key) ?? { size: 0 }).size,
 		});
 
 		try {
@@ -227,5 +232,19 @@ export default class Cache2 {
 		if (data.values.has(key)) {
 			data.values.get(key).timeout = -1;
 		}
+	}
+
+	/// Get the size.
+	///
+	/// \param collection The collection to get data from.
+	///
+	/// \return The size of the data.
+	getSize(collection = null) {
+		if (collection === null) {
+			return this.size;
+		}
+		Exception.assert(collection in this.data, "Collection '{}' doesn't exist.", collection);
+		const data = this.data[collection];
+		return data.size;
 	}
 }

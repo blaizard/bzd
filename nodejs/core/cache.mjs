@@ -137,7 +137,7 @@ class Cache {
 			trigger,
 		);
 		Exception.assert(
-			collection.match(/^[a-z0-9.-_]+$/i),
+			collection.match(/^[a-z0-9.\-_]+$/i),
 			"Invalid collection name '{}', it must contain only the following characters [a-z0-9.-_].",
 			collection,
 		);

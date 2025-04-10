@@ -1,5 +1,5 @@
 <template>
-	<div class="bzd-dashboard-tile" v-for="(tile, key) in tiles" :style="getStyle(key)" :key="uid + '-' + key">
+	<div v-for="(tile, key) in tiles" :style="getStyle(key)" :class="getClass(key)" :key="uid + '-' + key">
 		<div :class="getTileClass(key)" :style="containerStyle" @click="handleClick(key)">
 			<div v-if="getNbErrors(key) > 0" class="error" v-tooltip="tooltipErrorConfig(key)">{{ getNbErrors(key) }}</div>
 			<component
@@ -13,7 +13,7 @@
 				@color="handleColor(key, $event)"
 				@link="handleLink(key, $event)"
 				@error="handleError(key, $event)"
-				@clickable="handleClickable(key, $event)"
+				@active="handleActive(key, $event)"
 				@event="handleEvent(key, $event)"
 				@name="handleName(key, $event)"
 				@image="handleImage(key, $event)"
@@ -153,8 +153,7 @@
 			getTileClass(key) {
 				return {
 					container: true,
-					clickable:
-						Boolean(this.tiles[key].clickable) || Boolean(this.tiles[key].link) || Boolean(this.description.link),
+					clickable: Boolean(this.tiles[key].link),
 				};
 			},
 			getStyle(key) {
@@ -163,6 +162,12 @@
 					style["background-image"] = "url('" + this.tiles[key].image + "')";
 				}
 				return style;
+			},
+			getClass(key) {
+				return {
+					"bzd-dashboard-tile": true,
+					active: this.tiles[key].active,
+				};
 			},
 			tooltipErrorConfig(key) {
 				return {
@@ -180,13 +185,34 @@
 				this.tiles[key].errors ??= [];
 				this.tiles[key].errors.push(e);
 			},
+			handleActive(key, active) {
+				this.tiles[key].active = Boolean(active);
+			},
+			/// This is called once a new tile is created.
+			handleNewTile(key) {
+				if (this.description.link) {
+					this.handleLink(key, this.description.link);
+				}
+			},
 			// Assign the new tiles.
 			assignTilesData(data) {
 				for (const [key, tile] of Object.entries(data)) {
-					this.tiles[key] = {
-						data: tile,
-						timestamp: Date.now(),
-					};
+					const update = Object.assign(
+						this.tiles[key] || {
+							active: true,
+							link: null,
+							errors: [],
+						},
+						{
+							data: tile,
+							timestamp: Date.now(),
+						},
+					);
+					const newTile = !(key in this.tiles);
+					this.tiles[key] = update;
+					if (newTile) {
+						this.handleNewTile(key);
+					}
 				}
 			},
 			async fetch() {
@@ -225,8 +251,6 @@
 			handleClick(key) {
 				if (this.tiles[key].link) {
 					window.open(this.tiles[key].link);
-				} else if (this.description.link) {
-					window.open(this.description.link);
 				}
 			},
 			handleColor(key, color) {
@@ -234,9 +258,15 @@
 			},
 			handleLink(key, link) {
 				this.tiles[key].link = link;
-			},
-			handleClickable(key, clickable) {
-				this.tiles[key].clickable = clickable;
+				// Check if the link is valid.
+				// Due to CORS this method doesn't work, I should use a proxy via the server.
+				this.$rest
+					.request("get", "/check-url", {
+						url: link,
+					})
+					.then((data) => {
+						this.handleActive(key, data.valid);
+					});
 			},
 			handleName(key, name) {
 				this.tiles[key].name = name;
@@ -275,6 +305,10 @@
 		background-repeat: no-repeat;
 		background-size: contain;
 		background-position: center;
+
+		&:not(.active) {
+			opacity: 0.3;
+		}
 
 		.container {
 			width: 300px;

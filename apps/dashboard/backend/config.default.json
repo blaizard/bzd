@@ -11,6 +11,17 @@
             "source.type": "nodes",
             "visualization.color": "auto",
             "visualization.type": "system_monitor"
+        },
+        {
+            "link": "http://www.google.com",
+            "name": "Google",
+            "tooltip": "Access Google search engine.",
+            "visualization.type": "link"
+        },
+        {
+            "link": "http://averyverybutveryinvalidurl.com",
+            "name": "Invalid URL",
+            "visualization.type": "link"
         }
     ]
 }

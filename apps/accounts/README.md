@@ -11,7 +11,7 @@ This web application deals with the following:
 ## Test
 
 ```bash
-bazel run //apps/accounts/backend --config=dev -- --test
+bazel run //apps/accounts/backend --config=dev -- --test-data
 ```
 
 ### Test Stripe

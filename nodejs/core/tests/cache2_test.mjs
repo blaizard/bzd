@@ -15,29 +15,43 @@ describe("Cache2", () => {
 				argRead = arg;
 				return "return." + arg;
 			});
+			Exception.assertEqual(cache.getSize("test"), 0);
+
 			const result1 = await cache.get("test", "hello");
 			Exception.assertEqual(argRead, "hello");
 			Exception.assertEqual(result1, "return.hello");
+			Exception.assertEqual(cache.getSize("test"), 12);
+
 			const result2 = await cache.get("test", "world");
 			Exception.assertEqual(argRead, "world");
 			Exception.assertEqual(result2, "return.world");
+			Exception.assertEqual(cache.getSize("test"), 24);
+
 			argRead = "no";
 			const result3 = await cache.get("test", "world");
 			Exception.assertEqual(argRead, "no");
 			Exception.assertEqual(result3, "return.world");
+			Exception.assertEqual(cache.getSize("test"), 24);
 
 			await Exception.assertThrows(async () => {
 				await cache.get("tefst", "world");
 			});
+			Exception.assertEqual(cache.getSize("test"), 24);
+
 			await Exception.assertThrows(async () => {
 				await cache.get("test", false);
 			});
+			Exception.assertEqual(cache.getSize("test"), 32);
+
 			await Exception.assertThrows(async () => {
 				await cache.get("tedst");
 			});
+			Exception.assertEqual(cache.getSize("test"), 32);
+
 			await Exception.assertThrows(async () => {
 				await cache.get();
 			});
+			Exception.assertEqual(cache.getSize("test"), 32);
 		});
 
 		it("Array Of String", async () => {
@@ -50,18 +64,22 @@ describe("Cache2", () => {
 			{
 				const result = await cache.get("test", Cache2.arrayOfStringToKey([]));
 				Exception.assertEqual(result, 0);
+				Exception.assertEqual(cache.getSize("test"), 8);
 			}
 			{
 				const result = await cache.get("test", Cache2.arrayOfStringToKey([""]));
 				Exception.assertEqual(result, 1);
+				Exception.assertEqual(cache.getSize("test"), 16);
 			}
 			{
 				const result = await cache.get("test", Cache2.arrayOfStringToKey(["", ""]));
 				Exception.assertEqual(result, 2);
+				Exception.assertEqual(cache.getSize("test"), 24);
 			}
 			{
 				const result = await cache.get("test", Cache2.arrayOfStringToKey([]));
 				Exception.assertEqual(result, 0);
+				Exception.assertEqual(cache.getSize("test"), 24);
 			}
 		});
 	});

@@ -1,3 +1,4 @@
+load("@bzd_lib//:executable_test.bzl", "bzd_executable_test")
 load("@bzd_lib//config:defs.bzl", "bzd_config_default")
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_binary")
 
@@ -37,7 +38,7 @@ bzd_nodejs_binary(
         "//apps/accounts/backend/applications",
         "//apps/accounts/backend/email",
         "//apps/accounts/backend/logger/memory",
-        "//apps/accounts/backend/tests:test_data",
+        "//apps/accounts/backend/test_data",
         "//apps/accounts/backend/users",
         "//nodejs/core:filesystem",
         "//nodejs/core/authentication/facebook:server",
@@ -45,6 +46,7 @@ bzd_nodejs_binary(
         "//nodejs/core/authentication/session:server",
         "//nodejs/core/http:client",
         "//nodejs/core/http:server",
+        "//nodejs/core/http/mock:server",
         "//nodejs/core/rest:server",
         "//nodejs/core/services",
         "//nodejs/db/key_value_store:make_from_config",
@@ -53,4 +55,14 @@ bzd_nodejs_binary(
         "//nodejs/utils:delay",
         "//nodejs/utils:result",
     ],
+)
+
+bzd_executable_test(
+    name = "tests",
+    args = [
+        "--test",
+        "--test-data",
+    ],
+    executable = ":backend",
+    expected_returncode = "0",
 )

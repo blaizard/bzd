@@ -59,6 +59,7 @@
 				policy="sum"
 				v-tooltip="makeTooltipMulti('Network', networks.tooltips)"
 			></GaugeRate>
+			<Text name="VERSION" :input="versions.values" v-tooltip="makeTooltipMulti('Version', versions.tooltips)"></Text>
 		</div>
 	</div>
 </template>
@@ -68,6 +69,7 @@
 	import { bytesToString, timeMsToString, capitalize } from "#bzd/nodejs/utils/to_string.mjs";
 	import Gauge from "#bzd/apps/dashboard/plugins/system_monitor/gauge.vue";
 	import GaugeRate from "#bzd/apps/dashboard/plugins/system_monitor/gauge_rate.vue";
+	import Text from "#bzd/apps/dashboard/plugins/system_monitor/text.vue";
 
 	export default {
 		props: {
@@ -76,6 +78,7 @@
 		components: {
 			Gauge,
 			GaugeRate,
+			Text,
 		},
 		directives: {
 			tooltip: DirectiveTooltip,
@@ -85,6 +88,13 @@
 				ratesIO: {},
 				ratesNetwork: {},
 			};
+		},
+		watch: {
+			"metadata.active": {
+				handler(value) {
+					this.$emit("active", value);
+				},
+			},
 		},
 		computed: {
 			// Memory
@@ -171,6 +181,18 @@
 				return {
 					rates: this.ratesNetwork,
 					tooltips,
+				};
+			},
+			versions() {
+				let values = {};
+				let tooltips = {};
+				for (const [name, version] of Object.entries(this.metadata.version || {})) {
+					values[name] = version;
+					tooltips[name] = version;
+				}
+				return {
+					values: values,
+					tooltips: tooltips,
 				};
 			},
 			temperatures() {

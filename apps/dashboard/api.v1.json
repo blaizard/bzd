@@ -1,5 +1,22 @@
 {
     "rest": {
+        "/check-url": {
+            "get": {
+                "documentation": "Check that a URL is reachable.",
+                "request": {
+                    "type": "query",
+                    "validation": {
+                        "url": "mandatory"
+                    }
+                },
+                "response": {
+                    "type": "json",
+                    "validation": {
+                        "valid": "mandatory"
+                    }
+                }
+            }
+        },
         "/configuration": {
             "get": {
                 "documentation": "Get the current configuration",

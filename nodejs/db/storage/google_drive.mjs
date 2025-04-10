@@ -64,8 +64,7 @@ export default class StorageGoogleDrive extends Storage {
 		const auth = new google.auth.GoogleAuth({
 			keyFile: this.options.keyFile,
 			scopes: [
-				//"https://www.googleapis.com/auth/drive.readonly",
-				"https://www.googleapis.com/auth/drive",
+				this.writeAccess ? "https://www.googleapis.com/auth/drive" : "https://www.googleapis.com/auth/drive.readonly",
 			],
 		});
 

@@ -62,8 +62,8 @@ program
 	Log.info("Preloaded {} application token(s).", Object.keys(config["tokens"] || {}).length);
 
 	// Set-up the web server
-	let web = TEST ? new MockHttpServer() : new HttpServer(PORT);
-	let rest = new RestServer(APIv1.rest, {
+	const web = TEST ? new MockHttpServer() : new HttpServer(PORT);
+	const rest = new RestServer(APIv1.rest, {
 		authentication: authentication,
 		channel: web,
 	});

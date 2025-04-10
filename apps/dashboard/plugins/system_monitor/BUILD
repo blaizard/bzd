@@ -11,6 +11,7 @@ bzd_plugin(
     frontend_srcs = [
         "gauge.vue",
         "gauge_rate.vue",
+        "text.vue",
     ],
     metadata = "plugin.mjs",
 )

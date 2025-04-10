@@ -136,6 +136,7 @@ export default class HttpClient {
 		});
 
 		if (options.throwOnResponseError && (result.code < 200 || result.code > 299)) {
+			console.log("ERRRROORR", result);
 			throw new HttpClientException(
 				result.code,
 				result.data,

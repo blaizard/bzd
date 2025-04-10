@@ -13,7 +13,13 @@ export class FileNotFoundError extends Error {}
 export class Storage extends AsyncInitialize {
 	constructor(options = {}) {
 		super();
-		this.options = options;
+		this.options = Object.assign(
+			{
+				/// Enable write access.
+				write: false,
+			},
+			options,
+		);
 	}
 
 	/// Check if the storage has write access.
