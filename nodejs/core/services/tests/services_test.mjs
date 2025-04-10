@@ -59,7 +59,7 @@ describe("Services", () => {
 		it("Initial state", () => {
 			Exception.assertEqual([...provider.getStartProcesses()].length, 0);
 			Exception.assertEqual([...provider.getStopProcesses()].length, 0);
-			Exception.assertEqual([...provider.getTimeTriggeredProcesses()].length, 0);
+			Exception.assertEqual([...provider.getProcesses()].length, 0);
 		});
 
 		it("Start process", () => {
@@ -105,7 +105,7 @@ describe("Services", () => {
 				delayS: 0,
 			});
 
-			const processes = [...provider.getTimeTriggeredProcesses()];
+			const processes = [...provider.getProcesses()];
 			Exception.assertEqual(processes.length, 4);
 			Exception.assertEqual(processes[0][0], "1");
 			Exception.assertEqual(processes[1][0], "2");
