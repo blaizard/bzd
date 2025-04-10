@@ -1,6 +1,6 @@
 import RestServer from "#bzd/nodejs/core/rest/server.mjs";
 
-import Cache from "#bzd/nodejs/core/cache.mjs";
+import Cache2 from "#bzd/nodejs/core/cache2.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import HttpServer from "#bzd/nodejs/core/http/server.mjs";
 import MockHttpServer from "#bzd/nodejs/core/http/mock/server.mjs";
@@ -8,6 +8,7 @@ import LogFactory from "#bzd/nodejs/core/log.mjs";
 import Permissions from "#bzd/nodejs/db/storage/permissions.mjs";
 import { CollectionPaging } from "#bzd/nodejs/db/utils.mjs";
 import { Command } from "commander/esm.mjs";
+import Statistics from "#bzd/nodejs/core/statistics/statistics.mjs";
 import Services from "#bzd/nodejs/core/services/services.mjs";
 import ServiceProvider from "#bzd/nodejs/core/services/provider.mjs";
 import EndpointsFactory from "#bzd/apps/artifacts/backend/endpoints_factory.mjs";
@@ -48,12 +49,15 @@ program
 	const volumes = {};
 
 	// Set the cache
-	const cache = new Cache({
-		garbageCollector: !TEST,
-	});
+	const cache = new Cache2();
 
 	// Services
 	const services = new Services();
+	services.register(cache.serviceGarbageCollector("cache"), "backend");
+
+	// Statistics
+	const statistics = new Statistics();
+	statistics.register(cache.statistics(), "backend");
 
 	const authentication = Authentication.make(configGlobal.accounts);
 	for (const [token, options] of Object.entries(config["tokens"] || {})) {
@@ -67,7 +71,7 @@ program
 		authentication: authentication,
 		channel: web,
 	});
-	rest.installPlugins(authentication, services);
+	rest.installPlugins(authentication, services, statistics);
 
 	// Add initial volumes.
 	for (const [volume, options] of Object.entries(config.volumes)) {

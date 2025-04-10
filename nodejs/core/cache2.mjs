@@ -1,5 +1,7 @@
 import ExceptionFactory from "./exception.mjs";
 import LogFactory from "./log.mjs";
+import ServiceProvider from "#bzd/nodejs/core/services/provider.mjs";
+import StatisticsProvider from "#bzd/nodejs/core/statistics/provider.mjs";
 
 const Log = LogFactory("cache");
 const Exception = ExceptionFactory("cache");
@@ -12,6 +14,8 @@ export default class Cache2 {
 				timeoutMs: 30 * 1000,
 				// Default function to compute the size of the value.
 				getSize: Cache2.defaultGetSize,
+				// Max size allowed for the cache.
+				maxSize: 1024 * 1024,
 			},
 			options,
 		);
@@ -33,6 +37,7 @@ export default class Cache2 {
 		// }
 		this.data = {};
 		this.size = 0;
+		this.trigger = null;
 	}
 
 	/// Defines an empty state.
@@ -142,6 +147,10 @@ export default class Cache2 {
 		sizeDiff += size;
 		data.size += sizeDiff;
 		this.size += sizeDiff;
+
+		if (this.trigger && this.size > this.options.maxSize) {
+			this.trigger.trigger();
+		}
 	}
 
 	/// Access a value or fetch a new value.
@@ -246,5 +255,20 @@ export default class Cache2 {
 		Exception.assert(collection in this.data, "Collection '{}' doesn't exist.", collection);
 		const data = this.data[collection];
 		return data.size;
+	}
+
+	/// Register the garbage collector service.
+	serviceGarbageCollector(...namespaces) {
+		Exception.assert(this.trigger === null, "Garbage collector is already registered.");
+		const provider = new ServiceProvider(...namespaces);
+		this.trigger = provider.addEventTriggeredProcess("garbage.collector", async () => {
+			return {};
+		});
+		return provider;
+	}
+
+	/// Register the statistics for this cache.
+	statistics(...namespaces) {
+		return new StatisticsProvider(...namespaces);
 	}
 }

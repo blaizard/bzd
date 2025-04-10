@@ -5,6 +5,29 @@ import Services from "#bzd/nodejs/core/services/services.mjs";
 const Exception = ExceptionFactory("services", "provider");
 const Log = LogFactory("services", "provider");
 
+/// Trigger for event triggered processes.
+class Trigger {
+	constructor() {
+		this.callback = null;
+	}
+
+	register(callback) {
+		Exception.assert(this.callback === null, "Trigger was already registered.");
+		this.callback = callback;
+	}
+
+	unregister() {
+		Exception.assert(this.callback !== null, "Trigger was not registered.");
+		this.callback = null;
+	}
+
+	trigger() {
+		if (this.callback !== null) {
+			this.callback();
+		}
+	}
+}
+
 /// A service is an entity that has a start, stop and one or more time triggered methods.
 ///
 /// The start and stop are guaranteed to be called before the time triggered methods.
@@ -16,7 +39,7 @@ export default class Provider {
 		this.processes = {};
 	}
 
-	_addProcess(name, process, options) {
+	_addProcess(name, process, options, trigger = null) {
 		Exception.assert(
 			!(name in this.processes),
 			"A '{}' process is already registered for '{}'.",
@@ -26,6 +49,7 @@ export default class Provider {
 		this.processes[name] = {
 			process: process,
 			options: options,
+			trigger: trigger,
 		};
 	}
 
@@ -40,7 +64,7 @@ export default class Provider {
 			yield [name, this.processes[name]];
 		}
 	}
-	*getTimeTriggeredProcesses() {
+	*getProcesses() {
 		for (const [name, object] of Object.entries(this.processes)) {
 			if (!this.processesStart.includes(name) && !this.processesStop.includes(name)) {
 				yield [name, object];
@@ -102,5 +126,16 @@ export default class Provider {
 				options,
 			),
 		);
+	}
+
+	addEventTriggeredProcess(name, process, options = {}) {
+		Exception.assert(
+			!name.startsWith("start.") && !name.startsWith("stop."),
+			"The process name '{}' cannot be used.",
+			name,
+		);
+		const trigger = new Trigger();
+		this._addProcess(name, process, Object.assign(this.commongOptions, {}, options), trigger);
+		return trigger;
 	}
 }

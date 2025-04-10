@@ -1,0 +1,18 @@
+{
+    "rest": {
+        "/admin/statistics/data": {
+            "get": {
+                "authentication": [
+                    "admin-applications"
+                ],
+                "documentation": "Get the statistics data",
+                "request": {
+                    "type": "query"
+                },
+                "response": {
+                    "type": "json"
+                }
+            }
+        }
+    }
+}

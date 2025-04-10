@@ -73,6 +73,8 @@ bzd_nodejs_library(
     deps = [
         ":exception",
         ":log",
+        "//nodejs/core/services",
+        "//nodejs/core/statistics",
     ],
 )
 

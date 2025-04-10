@@ -74,6 +74,10 @@ export default class Services {
 			errorLogs: [],
 		};
 		const record = service.records[name];
+		if (record.status === Services.Status.running) {
+			Log.warning("Service {}.{} is already running.", uid, name);
+			return true;
+		}
 
 		let log = {
 			error: null,
@@ -135,11 +139,11 @@ export default class Services {
 		return log.error === null;
 	}
 
-	/// Run a time triggered process.
+	/// Run a process with its error policy.
 	///
 	/// \param uid The uid corresponding to the service.
 	/// \param name The name of the process.
-	async runTimeTriggeredProcess(uid, name) {
+	async runProcessWithPolicy(uid, name) {
 		const service = this.services[uid];
 		const object = service.provider.processes[name];
 
@@ -154,6 +158,17 @@ export default class Services {
 					break;
 			}
 		}
+	}
+
+	/// Run a time triggered process.
+	///
+	/// \param uid The uid corresponding to the service.
+	/// \param name The name of the process.
+	async runTimeTriggeredProcess(uid, name) {
+		const service = this.services[uid];
+		const object = service.provider.processes[name];
+
+		await this.runProcessWithPolicy(uid, name);
 
 		// Re-run, if name is not present it means that the service was stopped.
 		if (name in service.instances) {
@@ -252,14 +267,24 @@ export default class Services {
 		}
 
 		// Start the time triggered processes if any.
-		for (const [name, object] of service.provider.getTimeTriggeredProcesses()) {
-			const delayS =
-				object.options.delayS === null ? Math.floor(Math.random() * object.options.periodS) : object.options.delayS;
-			Log.info("Starting '{}.{}' every {}s with a delay of {}s.", uid, name, object.options.periodS, delayS);
+		for (const [name, object] of service.provider.getProcesses()) {
+			// Event triggered process
+			if (object.trigger) {
+				object.trigger.register(() => {
+					this.runProcessWithPolicy(uid, name);
+				});
+			}
 
-			service.instances[name] = setTimeout(async () => {
-				await this.runTimeTriggeredProcess(uid, name);
-			}, delayS * 1000);
+			// Time triggered process
+			if (object.options.periodS !== undefined) {
+				const delayS =
+					object.options.delayS === null ? Math.floor(Math.random() * object.options.periodS) : object.options.delayS;
+				Log.info("Starting '{}.{}' every {}s with a delay of {}s.", uid, name, object.options.periodS, delayS);
+
+				service.instances[name] = setTimeout(async () => {
+					await this.runTimeTriggeredProcess(uid, name);
+				}, delayS * 1000);
+			}
 		}
 
 		service.state.status = Services.Status.running;
@@ -270,6 +295,12 @@ export default class Services {
 	async stopService(uid) {
 		const service = this.services[uid];
 		service.state.status = Services.Status.stopping;
+
+		for (const [_, object] of service.provider.getProcesses()) {
+			if (object.trigger) {
+				object.trigger.unregister();
+			}
+		}
 		for (const [name, instance] of Object.entries(service.instances)) {
 			clearTimeout(instance);
 			Log.info("Stopped '{}.{}'.", uid, name);
@@ -372,7 +403,7 @@ export default class Services {
 	}
 
 	installRest(api) {
-		Log.info("Installing 'Services' REST");
+		Log.info("Installing 'Services' REST.");
 
 		// ---- Admin specific API
 
@@ -427,7 +458,7 @@ export default class Services {
 		});
 
 		api.handle("post", "/admin/service/trigger", async (inputs) => {
-			await this.runProcess(inputs.uid, inputs.name);
+			await this.runProcessWithPolicy(inputs.uid, inputs.name);
 		});
 	}
 }
