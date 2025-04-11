@@ -23,6 +23,7 @@
 						<th>Min</th>
 						<th>Max</th>
 						<th>Average</th>
+						<th>Interval</th>
 						<th></th>
 					</tr>
 					<tr v-for="(process, name) in data.processes">
@@ -33,6 +34,7 @@
 						<td>{{ durationSToString(process.durationMin) }}</td>
 						<td>{{ durationSToString(process.durationMax) }}</td>
 						<td>{{ durationSToString(process.durationAvg) }}</td>
+						<td>{{ process.estimatedInterval === 0 ? "-" : durationSToString(process.estimatedInterval) }}</td>
 						<td>
 							<button @click="processTrigger(uid, name)">Trigger</button>
 							<button @click="processShowLogs(uid, name)">Show Logs</button>

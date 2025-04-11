@@ -69,6 +69,7 @@ export default class Services {
 			durationMin: 0,
 			durationMax: 0,
 			durationAvg: 0,
+			estimatedInterval: 0,
 			status: Services.Status.idle,
 			logs: [],
 			errorLogs: [],
@@ -124,6 +125,15 @@ export default class Services {
 			record.logs.shift();
 		} finally {
 			log.timestampStop = Services._getTimestamp();
+		}
+
+		// Estimate the rate.
+		if (record.logs.length >= 2) {
+			const [logN, logNMinus1] = record.logs.slice(0, 2);
+			const intervalS = (logN.timestampStart - logNMinus1.timestampStart) / 1000;
+			if (typeof intervalS === "number") {
+				record.estimatedInterval = 0.4 * record.estimatedInterval + (1 - 0.4) * intervalS;
+			}
 		}
 
 		// Remove extra logs if any.
@@ -198,6 +208,7 @@ export default class Services {
 			//      durationMin: 0,
 			//      durationMax: 0,
 			//      durationAvg: 0,
+			//      estimatedInterval: 0,
 			//      logs: [],
 			//   }
 			// }
