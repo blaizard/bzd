@@ -156,7 +156,7 @@ export default class StorageDockerV2 extends Storage {
 		const [result, headers] = await this.fetch.get("/v2/" + imageName + "/manifests/" + tag, {
 			args: "repository:" + imageName + ":pull",
 			headers: {
-				Accept: "application/vnd.docker.distribution.manifest.v2+json",
+				Accept: "application/vnd.docker.distribution.manifest.v2+json, application/vnd.oci.image.manifest.v1+json",
 			},
 			includeAll: true,
 		});

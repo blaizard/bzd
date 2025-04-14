@@ -95,7 +95,7 @@ test:py --test_lang_filters=py
 # Note: coverage for python seems to be broken, waiting for https://github.com/bazelbuild/rules_python/pull/977 to land.
 # coverage:py --test_env=PYTHON_COVERAGE=external/coveragepy/coverage/__main__.py
 # Use hermetic python interpreter for bootstrap script also, see: https://github.com/bazel-contrib/rules_python/issues/2727
-common --@rules_python//python/config_settings:bootstrap_impl=script
+# common --@rules_python//python/config_settings:bootstrap_impl=script
 
 # Select only NodeJs targets
 build:nodejs --build_tag_filters=nodejs
