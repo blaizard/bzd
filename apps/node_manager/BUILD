@@ -1,4 +1,4 @@
-load("@bzd_bundle//:defs.bzl", "bzd_bundle")
+load("@bzd_bundle//:defs.bzl", "bzd_bundle_binary")
 load("@bzd_lib//config:defs.bzl", "bzd_config")
 load("@bzd_python//:requirements.bzl", "requirement")
 load("@rules_python//python:defs.bzl", "py_binary")
@@ -49,9 +49,9 @@ bzd_bootloader_binary(
     },
 )
 
-bzd_bundle(
+bzd_bundle_binary(
     name = "bundle",
-    binary = ":with_bootloader",
+    executable = ":with_bootloader",
     tags = ["manual"],
     visibility = ["//deployment:__subpackages__"],
 )

@@ -1,4 +1,4 @@
-load("@bzd_python//:defs.bzl", "bzd_py_binary_library")
+load("@bzd_python//:defs.bzl", "bzd_python_binary_library")
 load("@rules_python//python:defs.bzl", "py_library")
 
 py_library(
@@ -22,7 +22,7 @@ py_library(
     visibility = ["//visibility:public"],
 )
 
-bzd_py_binary_library(
+bzd_python_binary_library(
     name = "bin",
     executables = {
         "//:crane": "crane",

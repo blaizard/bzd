@@ -1,4 +1,4 @@
-load("@bzd_bundle//:defs.bzl", "bzd_bundle")
+load("@bzd_bundle//:defs.bzl", "bzd_bundle_binary")
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 
 py_library(
@@ -32,12 +32,12 @@ py_binary(
     ],
 )
 
-bzd_bundle(
+bzd_bundle_binary(
     name = "bzd_node",
-    arguments = [
+    args = [
         "--uid",
         "ci",
     ],
-    binary = "//apps/artifacts/api/python/node:binary",
+    executable = "//apps/artifacts/api/python/node:binary",
     tags = ["manual"],
 )
