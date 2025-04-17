@@ -48,6 +48,9 @@ if __name__ == "__main__":
 		fd.seek(0)
 
 		# Create the self extracting output file.
+		# It sets 2 environment variables:
+		# - BUILD_WORKSPACE_DIRECTORY: Which if unset, will be set to the current directory.
+		# - BZD_BUNDLE: The path of the bootstrap script.
 		with args.output.open(mode="wb") as fileOut:
 			fileOut.write("""#!/usr/bin/env bash
 set -e

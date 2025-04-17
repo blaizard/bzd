@@ -1,49 +1,31 @@
 """OCI image rule."""
 
-load("@rules_oci//oci:defs.bzl", "oci_image", "oci_image_rule")
+load("@bzd_lib//lib:attrs.bzl", "ATTRS_COMMON_BUILD_RULES", "attrs_assert_any_of")
+load("@rules_oci//oci:defs.bzl", "oci_image")
 
-def _bzd_oci_image_impl(name, visibility, base, cmd, entrypoint, workdir, env, tars, **kwargs):
+def bzd_oci_image(name, base = None, cmd = None, workdir = None, env = None, tars = None, entrypoint = None, **kwargs):
+    """Build a container image.
+
+    Args:
+        name: A unique name for this target.
+        base: Label to another image target to use as the base.
+        cmd: Default arguments to the entrypoint of the container.
+        workdir: Sets the current working directory of the entrypoint process in the container.
+        env: Environment variables provisioned by default to the running container.
+        tars: List of tar files to add to the image as layers.
+        entrypoint: Entrypoint of the container.
+        **kwargs: Extra arguments common to all build rules.
+    """
+
+    attrs_assert_any_of(kwargs, ATTRS_COMMON_BUILD_RULES)
+
     oci_image(
         name = name,
         base = base,
-        cmd = cmd,
-        entrypoint = entrypoint,
+        cmd = cmd or [],
         workdir = workdir,
-        env = env,
-        tars = tars,
-        visibility = visibility,
+        env = env or {},
+        tars = tars or [],
+        entrypoint = entrypoint or [],
         **kwargs
     )
-
-bzd_oci_image = macro(
-    doc = "Build a container image.",
-    implementation = _bzd_oci_image_impl,
-    inherit_attrs = oci_image_rule,
-    attrs = {
-        "base": attr.label(
-            mandatory = True,
-            doc = "Base image for the container.",
-            configurable = False,
-        ),
-        "cmd": attr.string_list(
-            doc = "Commands to be passed to the container.",
-            configurable = False,
-        ),
-        "entrypoint": attr.string_list(
-            doc = "Commands to be passed to the container.",
-            configurable = False,
-        ),
-        "env": attr.string_dict(
-            doc = "Environment variables.",
-            configurable = False,
-        ),
-        "tars": attr.label_list(
-            doc = "tarball representing the OCI layers.",
-            allow_files = [".tar"],
-        ),
-        "workdir": attr.string(
-            doc = "Working directory.",
-            configurable = False,
-        ),
-    },
-)
