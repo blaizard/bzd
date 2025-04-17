@@ -96,7 +96,7 @@ set -e
 
 SCRIPTPATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 cd "{workingDirectory}"
-export BUILD_WORKSPACE_DIRECTORY="{workingDirectory}"
+export BUILD_WORKSPACE_DIRECTORY="${{BUILD_WORKSPACE_DIRECTORY:-{workingDirectory}}}"
 export RUNFILES_DIR="{runfilesDirectory}"
 exec "{executable}" "$@"
 """.format(workingDirectory=Bundler.toAbsolute(prefix / workspace, "$SCRIPTPATH"),

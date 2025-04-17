@@ -38,7 +38,7 @@ bzd_bundle_binary(
         "--uid",
         "ci",
     ],
-    compression = None,
+    compression = False,
     executable = "//apps/artifacts/api/python/node:binary",
     tags = ["manual"],
 )
