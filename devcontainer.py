@@ -76,7 +76,7 @@ RUN apt install -y \
 	wget \
 	sudo
 
-RUN ln -s {self.workspace}/tools/bazel /usr/local/bin/bazel
+RUN wget -O /usr/local/bin/bazel https://raw.githubusercontent.com/blaizard/bzd/refs/heads/master/tools/bazel && chmod +x /usr/local/bin/bazel
 """
 
 		if not self.rootless:
@@ -89,7 +89,7 @@ USER {self.user}
 
 		# Set the environment.
 		dockerFile += f"""
-COPY ./tools/shell/sh/bashrc.sh {self.home}/.bashrc
+RUN wget -O {self.home}/.bashrc https://raw.githubusercontent.com/blaizard/bzd/refs/heads/master/tools/shell/sh/bashrc.sh
 RUN echo "PS1=\\"(devcontainer) \$PS1\\"" >> {self.home}/.bashrc
 """
 
