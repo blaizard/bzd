@@ -67,7 +67,7 @@ class Bundler:
 		with patch("time.time", return_value=0.0):
 			with tarfile.open(output, mode=mode) as tar:
 
-				files: typing.Dict[pathlib.Path, typing.List[str]] = {}
+				files: typing.Dict[pathlib.Path, typing.List[pathlib.Path]] = {}
 
 				# Sort by prefix, this ensures reproducibility.
 				for manifest, prefix, entryPoint, workspace in sorted(self.executables, key=lambda x: x[1]):
