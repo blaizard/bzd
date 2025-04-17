@@ -81,6 +81,7 @@ if [[ ! -f "$temp/{stamp}" ]]; then
 fi
 
 export BZD_BUNDLE="$0"
+export BUILD_WORKSPACE_DIRECTORY="${{BUILD_WORKSPACE_DIRECTORY:-$(pwd)}}"
 cd "$temp"
 "$temp/{entryPoint}" {args} "$@" # No exec to activate trap EXIT
 exit 0
