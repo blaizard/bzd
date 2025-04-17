@@ -38,6 +38,7 @@ export default class Cache2 {
 		this.data = {};
 		this.size = 0;
 		this.trigger = null;
+		//this.statistics = new StatisticsProvider();
 	}
 
 	/// Defines an empty state.
@@ -72,10 +73,17 @@ export default class Cache2 {
 	/// memory chunk or not and this is all what we need for the eviciton mechanism
 	/// with the cache.
 	static defaultGetSize(value) {
+		const objectToSize = (value) => {
+			try {
+				return JSON.stringify(value).length;
+			} catch (e) {
+				return 256;
+			}
+		};
 		const sizeFactory = {
 			number: () => 8,
 			undefined: () => 8,
-			object: (value) => (value === null ? 8 : JSON.stringify(value).length),
+			object: (value) => (value === null ? 8 : objectToSize(value)),
 			boolean: () => 1,
 			bigint: (value) => String(value).length,
 			string: (value) => value.length,
@@ -257,7 +265,7 @@ export default class Cache2 {
 		return data.size;
 	}
 
-	/// Register the garbage collector service.
+	/// Create the garbage collector service.
 	serviceGarbageCollector(...namespaces) {
 		Exception.assert(this.trigger === null, "Garbage collector is already registered.");
 		const provider = new ServiceProvider(...namespaces);
@@ -267,8 +275,9 @@ export default class Cache2 {
 		return provider;
 	}
 
-	/// Register the statistics for this cache.
+	/// Create the statistics for this cache.
 	statistics(...namespaces) {
-		return new StatisticsProvider(...namespaces);
+		const statistics = new StatisticsProvider(...namespaces);
+		return statistics;
 	}
 }

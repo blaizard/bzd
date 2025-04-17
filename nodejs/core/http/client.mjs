@@ -45,17 +45,11 @@ export default class HttpClient {
 	static async request(url, options = {}) {
 		options = Object.assign(
 			{
-				/**
-				 * Includes all outputs (in this order): data, headers, status code
-				 */
+				/// Includes all outputs (in this order): data, headers, status code
 				includeAll: false,
-				/**
-				 * Throw if the response status code is not within the 2xx boundaries
-				 */
+				/// Throw if the response status code is not within the 2xx boundaries
 				throwOnResponseError: true,
-				/**
-				 * Maximum request timeout in ms
-				 */
+				/// Maximum request timeout in ms
 				timeoutMs: 60 * 1000,
 			},
 			options,
@@ -136,7 +130,6 @@ export default class HttpClient {
 		});
 
 		if (options.throwOnResponseError && (result.code < 200 || result.code > 299)) {
-			console.log("ERRRROORR", result);
 			throw new HttpClientException(
 				result.code,
 				result.data,
