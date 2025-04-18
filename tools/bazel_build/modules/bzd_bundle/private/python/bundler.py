@@ -78,7 +78,7 @@ class Bundler:
 						if len(split) == 0:
 							continue
 						elif len(split) <= 2:
-							target = (prefix / split[0]) if prefix else split[0]
+							target = (prefix / split[0]) if prefix else pathlib.Path(split[0])
 							path = (manifest.parent / split[0]).resolve()
 						else:
 							raise RuntimeError(f"Manifest '{manifest}' has an unexpected format.")
