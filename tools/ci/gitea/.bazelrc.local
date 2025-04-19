@@ -9,3 +9,6 @@ test --test_timeout_filters=-long,-eternal
 # Use remote execution.
 build --config=remote
 test --config=remote
+
+# Show all possible errors with this build.
+common --keep_going

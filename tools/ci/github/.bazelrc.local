@@ -10,3 +10,6 @@ common --http_timeout_scaling=2.0
 common --notrack_incremental_state
 common --nokeep_state_after_build
 common --discard_analysis_cache
+
+# Show all possible errors with this build.
+common --keep_going

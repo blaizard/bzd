@@ -5,3 +5,6 @@ build --show_timestamps
 
 # cache
 build --sandbox_writable_path=/home/travis/.cache/yarn
+
+# Show all possible errors with this build.
+common --keep_going

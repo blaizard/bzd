@@ -15,6 +15,22 @@ sh_binary(
 
 bzd_bundle_tar(
     name = "generate_tar",
+    compression = None,
+    executables = {
+        "/a/b/c": ":dummy",
+    },
+    output = "generated.tar",
+)
+
+diff_test(
+    name = "reproducible_tar",
+    failure_message = "The tar bundler does not seem to be reproducible.",
+    file1 = ":generated.tar",
+    file2 = "expected.tar",
+)
+
+bzd_bundle_tar(
+    name = "generate_tar_gz",
     compression = "gz",
     executables = {
         "/a/b/c": ":dummy",
@@ -23,8 +39,8 @@ bzd_bundle_tar(
 )
 
 diff_test(
-    name = "reproducible_tar",
-    failure_message = "The tar bundler does not seem to be reproducible.",
+    name = "reproducible_tar_gz",
+    failure_message = "The tar.gz bundler does not seem to be reproducible.",
     file1 = ":generated.tar.gz",
     file2 = "expected.tar.gz",
 )
