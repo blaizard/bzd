@@ -11,6 +11,12 @@ py_binary(
 )
 
 py_binary(
+    name = "diff_test",
+    srcs = ["diff_test.py"],
+    visibility = ["//visibility:public"],
+)
+
+py_binary(
     name = "json_merge",
     srcs = [
         "json_merge.py",

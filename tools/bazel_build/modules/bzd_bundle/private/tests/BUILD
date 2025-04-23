@@ -1,4 +1,4 @@
-load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
+load("@bzd_lib//:diff_test.bzl", "bzd_diff_test")
 load("@bzd_lib//:executable_test.bzl", "bzd_executable_test")
 load("//private:bundle_binary.bzl", "bzd_bundle_binary")
 load("//private:bundle_tar.bzl", "bzd_bundle_tar")
@@ -22,9 +22,8 @@ bzd_bundle_tar(
     output = "generated.tar",
 )
 
-diff_test(
+bzd_diff_test(
     name = "reproducible_tar",
-    failure_message = "The tar bundler does not seem to be reproducible.",
     file1 = ":generated.tar",
     file2 = "expected.tar",
 )
@@ -38,9 +37,8 @@ bzd_bundle_tar(
     output = "generated.tar.gz",
 )
 
-diff_test(
+bzd_diff_test(
     name = "reproducible_tar_gz",
-    failure_message = "The tar.gz bundler does not seem to be reproducible.",
     file1 = ":generated.tar.gz",
     file2 = "expected.tar.gz",
 )
@@ -57,9 +55,8 @@ bzd_executable_test(
     expected_returncode = "0",
 )
 
-diff_test(
+bzd_diff_test(
     name = "reproducible_binary",
-    failure_message = "The binary bundler does not seem to be reproducible.",
     file1 = ":binary",
     file2 = "expected_binary",
 )

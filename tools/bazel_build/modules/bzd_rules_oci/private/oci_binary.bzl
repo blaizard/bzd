@@ -18,7 +18,8 @@ def bzd_oci_binary(name, binary, **kwargs):
     bzd_oci_image(
         name = name,
         workdir = ROOT_DIRECTORY_,
-        cmd = [
+        # Use entry point so that arguments can be passed with `command`.
+        entrypoint = [
             "./.bzd_oci_binary_bootstrap",
         ],
         tars = [
