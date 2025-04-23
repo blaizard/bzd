@@ -73,7 +73,7 @@ class Bundler:
 				for manifest, prefix, entryPoint, workspace in sorted(self.executables, key=lambda x: x[1]):
 					# Gather all the files.
 					atLeastOneEntry = False
-					for line in manifest.read_text().split("\n"):
+					for line in sorted(manifest.read_text().split("\n")):
 						split = list(filter(str.strip, line.split()))
 						if len(split) == 0:
 							continue
