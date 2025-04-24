@@ -6,7 +6,7 @@ import tarfile
 import tempfile
 import typing
 from unittest.mock import patch
-
+import sys
 
 class Bundler:
 
@@ -128,8 +128,9 @@ exec "{executable}" "$@"
 
 				# Copy all the files and create symlinks for the duplicates.
 				# Note, that we sort the array before iterating to ensure reproducibility.
-				for _, data in sorted(files.items(), key=lambda x: x[0]):
+				for fileHash, data in sorted(files.items(), key=lambda x: x[0]):
 					target, *symlinks = data["targets"]
+					print(fileHash, data["targets"])
 
 					# Update the file information within the tarball that ensures reproducibility.
 					tarinfo = Bundler.makeTarInfoFromPath(data["path"], target)
@@ -141,6 +142,7 @@ exec "{executable}" "$@"
 						tarinfo = Bundler.makeTarInfoForSymlink(relativePath, symlink)
 						tar.addfile(tarinfo, fileobj=None)
 
+		sys.exit(1)
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Bundler.")
