@@ -1,12 +1,12 @@
 import argparse
 import pathlib
+import hashlib
 import io
 import tarfile
 import tempfile
 import typing
 from unittest.mock import patch
-import json
-import sys
+
 
 class Bundler:
 
@@ -56,6 +56,20 @@ class Bundler:
 			return path.as_posix()
 		return f"{root}/{path.as_posix()}"
 
+	@staticmethod
+	def fileHash(path: pathlib.Path) -> str:
+		"""Calculate the hash of a file."""
+		hasher = hashlib.new("md5")
+		size = 0
+		with path.open("rb") as file:
+			while True:
+				chunk = file.read(1024 * 1024)
+				if not chunk:
+					break
+				hasher.update(chunk)
+				size += len(chunk)
+		return f"{hasher.hexdigest()}.{size}"
+
 	def process(self, output: pathlib.Path, compression: typing.Optional[str],
 	            bootstrapScript: typing.Optional[pathlib.Path]) -> None:
 
@@ -68,7 +82,7 @@ class Bundler:
 		with patch("time.time", return_value=0.0):
 			with tarfile.open(output, mode=mode) as tar:
 
-				files: typing.Dict[pathlib.Path, typing.List[pathlib.Path]] = {}
+				files: typing.Dict[str, typing.Dict[str, typing.Any]] = {}
 
 				# Sort by prefix, this ensures reproducibility.
 				for manifest, prefix, entryPoint, workspace in sorted(self.executables, key=lambda x: x[1]):
@@ -84,8 +98,14 @@ class Bundler:
 						else:
 							raise RuntimeError(f"Manifest '{manifest}' has an unexpected format.")
 						if path.is_file():
-							files.setdefault(path, [])
-							files[path].append(target)
+							fileHash = Bundler.fileHash(path)
+							if fileHash not in files:
+								files[fileHash] = {"path": path, "targets": []}
+							# TODO: handle hash collisions.
+							else:
+								pass
+
+							files[fileHash]["targets"].append(target)
 							atLeastOneEntry = True
 
 					assert atLeastOneEntry, f"There are no file referenced in the manifest: {manifest}, content:\n{manifest.read_text()[:100]}[...]"
@@ -108,21 +128,18 @@ exec "{executable}" "$@"
 
 				# Copy all the files and create symlinks for the duplicates.
 				# Note, that we sort the array before iterating to ensure reproducibility.
-				for path, targets in sorted(files.items(), key=lambda x: x[0]):
-					print(path, targets)
-					target, *symlinks = targets
+				for _, data in sorted(files.items(), key=lambda x: x[0]):
+					target, *symlinks = data["targets"]
 
 					# Update the file information within the tarball that ensures reproducibility.
-					tarinfo = Bundler.makeTarInfoFromPath(path, target)
-					with path.open("rb") as fd:
+					tarinfo = Bundler.makeTarInfoFromPath(data["path"], target)
+					with data["path"].open("rb") as fd:
 						tar.addfile(tarinfo, fileobj=fd)
 
 					for symlink in symlinks:
 						relativePath = pathlib.Path(target).relative_to(pathlib.Path(symlink).parent, walk_up=True)
 						tarinfo = Bundler.makeTarInfoForSymlink(relativePath, symlink)
 						tar.addfile(tarinfo, fileobj=None)
-
-				sys.exit(1)
 
 
 if __name__ == "__main__":

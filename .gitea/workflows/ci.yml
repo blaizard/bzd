@@ -23,8 +23,15 @@ jobs:
                   cp tools/ci/gitea/.bazelrc.local .bazelrc.local
                   ./info.sh
 
+            - name: "Build Tools"
+              run: |
+                  mkdir bin
+                  ./tools/bazel build //tools/ci:bzd_node --remote_download_toplevel --//apps/artifacts/api:config.set=remotes=https://datalocal.blaizard.com
+                  cp bazel-bin/tools/ci/bzd_node bin/bzd-node
+
             - name: "[normal] static analysis"
               run: |
+                  ./bin/bzd-node timeit --path gitea/normal_static_analysis/command-0 \
                   ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=dev --config=clang-tidy --config=mypy --config=clippy --platform_suffix=static_analysis
 
             - name: "[normal] clang prod"
