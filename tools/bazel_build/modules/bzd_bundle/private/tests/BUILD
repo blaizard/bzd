@@ -14,6 +14,18 @@ sh_binary(
 )
 
 bzd_bundle_tar(
+    name = "empty_tar",
+    compression = None,
+    output = "empty.tar",
+)
+
+bzd_diff_test(
+    name = "reproducible_empty_tar",
+    file1 = ":empty.tar",
+    file2 = "expected_empty.tar",
+)
+
+bzd_bundle_tar(
     name = "generate_tar",
     compression = None,
     executables = {

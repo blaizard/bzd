@@ -12,7 +12,7 @@ class Bundler:
 	def __init__(
 	        self, executables: typing.List[typing.Tuple[pathlib.Path, pathlib.Path, pathlib.Path,
 	                                                    pathlib.Path]]) -> None:
-		self.executables = executables
+		self.executables = executables or []
 
 	@staticmethod
 	def makeTarInfoFromPath(path: pathlib.Path, arcname: pathlib.Path) -> tarfile.TarInfo:
