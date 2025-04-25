@@ -46,6 +46,7 @@ class Update:
 	def toFile(self, path: pathlib.Path) -> None:
 		path.parent.mkdir(parents=True, exist_ok=True)
 		path.write_bytes(self.response.content)
+		assert path.exists(), f"File '{path}' was written but does not exists."
 
 
 class Release(ArtifactsBase):
