@@ -323,6 +323,19 @@ if __name__ == "__main__":
 	if diff.isMatch:
 		sys.exit(0)
 
+	# Print the full content.
+	print(args.file1.as_posix())
+	with args.file1.open("rb") as f:
+		while byte := f.read(16):
+			print(' '.join(f'{b:02x}' for b in byte))
+
+	print(args.file2.as_posix())
+	with args.file2.open("rb") as f:
+		while byte := f.read(16):
+			print(' '.join(f'{b:02x}' for b in byte))
+
+	sys.exit(1)
+
 	visitor = VisitorPrint(color=True, width=80, file1=args.file1.as_posix(), file2=args.file2.as_posix())
 
 	diff.visit(visitor.visitBinary)
