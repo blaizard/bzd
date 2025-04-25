@@ -8,6 +8,7 @@ import typing
 from unittest.mock import patch
 import os
 
+
 class Bundler:
 
 	def __init__(
@@ -24,18 +25,19 @@ class Bundler:
 		tarinfo.mtime = 0
 		tarinfo.uid = 0
 		tarinfo.gid = 0
-		tarinfo.uname=""
-		tarinfo.gname=""
+		tarinfo.uname = ""
+		tarinfo.gname = ""
 		return tarinfo
 
 	@staticmethod
 	def makeTarInfoFromPath(path: pathlib.Path, arcname: pathlib.Path) -> tarfile.TarInfo:
 		tarinfo = Bundler.makeTarInfo(name=arcname.as_posix())
-		stat = path.stat()
-		isExecutable = os.access(path, os.X_OK)
-		tarinfo.mode = 0o755 if isExecutable else 0o644
+		# Add executable permissions to all files, needed because
+		# on some machine bazel set x permissions for some files, see:
+		# https://github.com/bazelbuild/bazel/issues/6530
+		tarinfo.mode = 0o755
 		tarinfo.type = tarfile.REGTYPE
-		tarinfo.size = stat.st_size
+		tarinfo.size = path.stat().st_size
 		return tarinfo
 
 	@staticmethod
@@ -145,6 +147,7 @@ exec "{executable}" "$@"
 						relativePath = pathlib.Path(target).relative_to(pathlib.Path(symlink).parent, walk_up=True)
 						tarinfo = Bundler.makeTarInfoForSymlink(relativePath, symlink)
 						tar.addfile(tarinfo, fileobj=None)
+
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Bundler.")
