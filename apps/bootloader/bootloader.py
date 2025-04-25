@@ -180,7 +180,7 @@ def autoUpdateApplication(context: Context, path: pathlib.Path, uid: str) -> Non
 	maybeUpdate = context.release.fetch(path=str(path), uid=uid, ignore=context.updateIgnore)
 	if maybeUpdate:
 		# Create a directory with the uid to fetch the last update.
-		updatePath = RollingNamedTemporaryFile(namespace=f"bootloader_{uid}", maxFiles=2).get()
+		updatePath = RollingNamedTemporaryFile(namespace=f"bootloader_{uid}", maxFiles=3).get()
 		context.logger.info(f"Update found, writing to '{updatePath}'.")
 		maybeUpdate.toFile(updatePath)
 
