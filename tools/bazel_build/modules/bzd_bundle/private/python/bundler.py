@@ -16,37 +16,42 @@ class Bundler:
 		self.executables = executables or []
 
 	@staticmethod
-	def makeTarInfoFromPath(path: pathlib.Path, arcname: pathlib.Path) -> tarfile.TarInfo:
-		tarinfo = tarfile.TarInfo(name=arcname.as_posix())
-		stat = path.stat()
-		isExecutable = (stat.st_mode & 0o111) != 0
-		tarinfo.mode = 0o755 if isExecutable else 0o644
-		tarinfo.size = stat.st_size
-		tarinfo.mtime = 0
-		tarinfo.uid = 0
-		tarinfo.gid = 0
-		return tarinfo
-
-	@staticmethod
-	def makeTarInfoFromContentExecutable(content: bytes, arcname: pathlib.Path) -> tarfile.TarInfo:
-		tarinfo = tarfile.TarInfo(name=arcname.as_posix())
-		tarinfo.mode = 0o755
-		tarinfo.size = len(content)
-		tarinfo.mtime = 0
-		tarinfo.uid = 0
-		tarinfo.gid = 0
-		return tarinfo
-
-	@staticmethod
-	def makeTarInfoForSymlink(symlink: pathlib.Path, arcname: pathlib.Path) -> tarfile.TarInfo:
-		tarinfo = tarfile.TarInfo(name=arcname.as_posix())
-		tarinfo.mode = 0o777
-		tarinfo.type = tarfile.SYMTYPE
-		tarinfo.linkname = symlink.as_posix()
+	def makeTarInfo(name: str) -> tarfile.TarInfo:
+		tarinfo = tarfile.TarInfo(name=name)
+		tarinfo.mode = 0o644
+		tarinfo.type = tarfile.REGTYPE
 		tarinfo.size = 0
 		tarinfo.mtime = 0
 		tarinfo.uid = 0
 		tarinfo.gid = 0
+		tarinfo.uname=""
+		tarinfo.gname=""
+		return tarinfo
+
+	@staticmethod
+	def makeTarInfoFromPath(path: pathlib.Path, arcname: pathlib.Path) -> tarfile.TarInfo:
+		tarinfo = Bundler.makeTarInfo(name=arcname.as_posix())
+		stat = path.stat()
+		isExecutable = (stat.st_mode & 0o111) != 0
+		tarinfo.mode = 0o755 if isExecutable else 0o644
+		tarinfo.type = tarfile.REGTYPE
+		tarinfo.size = stat.st_size
+		return tarinfo
+
+	@staticmethod
+	def makeTarInfoFromContentExecutable(content: bytes, arcname: pathlib.Path) -> tarfile.TarInfo:
+		tarinfo = Bundler.makeTarInfo(name=arcname.as_posix())
+		tarinfo.mode = 0o755
+		tarinfo.type = tarfile.REGTYPE
+		tarinfo.size = len(content)
+		return tarinfo
+
+	@staticmethod
+	def makeTarInfoForSymlink(symlink: pathlib.Path, arcname: pathlib.Path) -> tarfile.TarInfo:
+		tarinfo = Bundler.makeTarInfo(name=arcname.as_posix())
+		tarinfo.mode = 0o777
+		tarinfo.type = tarfile.SYMTYPE
+		tarinfo.linkname = symlink.as_posix()
 		return tarinfo
 
 	@staticmethod
@@ -130,7 +135,6 @@ exec "{executable}" "$@"
 				# Note, that we sort the array before iterating to ensure reproducibility.
 				for fileHash, data in sorted(files.items(), key=lambda x: x[0]):
 					target, *symlinks = data["targets"]
-					print(fileHash, data["targets"])
 
 					# Update the file information within the tarball that ensures reproducibility.
 					tarinfo = Bundler.makeTarInfoFromPath(data["path"], target)
@@ -141,8 +145,6 @@ exec "{executable}" "$@"
 						relativePath = pathlib.Path(target).relative_to(pathlib.Path(symlink).parent, walk_up=True)
 						tarinfo = Bundler.makeTarInfoForSymlink(relativePath, symlink)
 						tar.addfile(tarinfo, fileobj=None)
-
-		sys.exit(1)
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Bundler.")
