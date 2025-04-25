@@ -148,18 +148,22 @@ class EventsFactory {
 		}
 	}
 
-	cache.register("check-url", async (url) => {
-		try {
-			await HttpClient.request(url, {
-				method: "get",
-			});
-			return true;
-		} catch (e) {
-			return false;
-		}
-	}, {
-		timeout: 1000
-	});
+	cache.register(
+		"check-url",
+		async (url) => {
+			try {
+				await HttpClient.request(url, {
+					method: "get",
+				});
+				return true;
+			} catch (e) {
+				return false;
+			}
+		},
+		{
+			timeout: 1000,
+		},
+	);
 
 	// Install the APIs
 
