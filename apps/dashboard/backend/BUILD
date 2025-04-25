@@ -21,8 +21,6 @@ bzd_nodejs_binary(
     args = [
         "--static",
         "$(rootpath //apps/dashboard/frontend).bundle",
-        "--data",
-        "/tmp/bzd/db",
     ],
     data = [
         "//apps/dashboard/frontend",

@@ -6,7 +6,7 @@ import tarfile
 import tempfile
 import typing
 from unittest.mock import patch
-import sys
+import os
 
 class Bundler:
 
@@ -32,7 +32,7 @@ class Bundler:
 	def makeTarInfoFromPath(path: pathlib.Path, arcname: pathlib.Path) -> tarfile.TarInfo:
 		tarinfo = Bundler.makeTarInfo(name=arcname.as_posix())
 		stat = path.stat()
-		isExecutable = (stat.st_mode & 0o111) != 0
+		isExecutable = os.access(path, os.X_OK)
 		tarinfo.mode = 0o755 if isExecutable else 0o644
 		tarinfo.type = tarfile.REGTYPE
 		tarinfo.size = stat.st_size

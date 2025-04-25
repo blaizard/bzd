@@ -157,6 +157,8 @@ class EventsFactory {
 		} catch (e) {
 			return false;
 		}
+	}, {
+		timeout: 1000
 	});
 
 	// Install the APIs
