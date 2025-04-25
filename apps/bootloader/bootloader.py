@@ -147,6 +147,9 @@ class Context:
 		self.updateIgnoreOverride = ignore
 
 	def switchProcessToBinary(self, path: pathlib.Path, args: typing.List[str]) -> None:
+		assert path.exists(), f"Path '{path}' does not exists."
+		assert path.is_file(), f"Path '{path}' does not point to a file."
+		assert os.access(path, os.X_OK), f"File '{path}' does not have execution permissions."
 		os.execv(path, [str(path), *args])
 
 
