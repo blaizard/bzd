@@ -8,6 +8,8 @@ import os
 import datetime
 
 from bzd.http.parser import HttpParser
+from bzd.utils.scheduler import Scheduler
+from apps.artifacts.api.python.node.node import Node
 
 Container = typing.Dict[str, typing.Any]
 
@@ -197,6 +199,19 @@ class Docker:
 		return None
 
 
+def getDockerData(socket: pathlib.Path) -> typing.Any:
+	docker = Docker(socket)
+	containers = docker.getContainers()
+	data = {}
+	for container in containers:
+		stats = docker.getContainerStats(container)
+		name = container["name"].replace("/", "")
+		data[name] = {
+		    "data": stats,
+		}
+	return data
+
+
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Docker Manager.")
 	parser.add_argument("--report-rate",
@@ -220,17 +235,24 @@ if __name__ == "__main__":
 
 	args = parser.parse_args()
 
-	docker = Docker(args.docker_socket)
-	containers = docker.getContainers()
-
-	data = {}
-	for container in containers:
-		stats = docker.getContainerStats(container)
-		name = container["name"].replace("/", "")
-		data[name] = {"data": stats}
-
 	if args.uid is None:
+		data = getDockerData(args.docker_socket)
 		print(json.dumps(data, indent=4))
 		sys.exit(0)
 
-	sys.exit(0)
+	node = Node(uid=args.uid, token=args.node_token)
+
+	# Start the thread to monitor the node.
+	def monitorWorkload() -> None:
+		data = getDockerData(args.docker_socket)
+		updatedData = {f"{args.uid }.{key}": value for key, value in data.items()}
+		try:
+			node.publishMultiNodes(data=updatedData)
+		except:
+			# Ignore any errors, we don't want to crash if something is wrong on the server side.
+			pass
+
+	scheduler = Scheduler(blocking=True)
+	scheduler.add("monitor", args.report_rate, monitorWorkload)
+	print(f"Monitoring {args.docker_socket} every {args.report_rate}s...", flush=True)
+	scheduler.start()

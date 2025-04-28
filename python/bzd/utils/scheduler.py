@@ -27,10 +27,16 @@ class Workload:
 
 class Scheduler:
 
-	def __init__(self) -> None:
+	def __init__(self, blocking: bool = False) -> None:
+		"""Create a scheduler.
+		
+		Args:
+			blocking: If set, the scheduler will be blocking once it is started.
+		"""
+
 		self.workloads: typing.List[Workload] = []
 		self.queue: typing.List[Workload] = []
-		self.worker = threading.Thread(target=self._process, daemon=True)
+		self.worker = threading.Thread(target=self._process, daemon=False if blocking else True)
 		self.triggerStop = threading.Event()
 
 	def start(self) -> None:

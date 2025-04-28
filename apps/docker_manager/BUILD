@@ -7,7 +7,9 @@ py_binary(
         "docker_manager.py",
     ],
     deps = [
+        "//apps/artifacts/api/python/node",
         "@bzd_python//bzd/http:parser",
+        "@bzd_python//bzd/utils:scheduler",
     ],
 )
 

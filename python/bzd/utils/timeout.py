@@ -1,5 +1,5 @@
-import signal
 import typing
+import threading
 
 
 class TimeoutError(Exception):
@@ -7,19 +7,24 @@ class TimeoutError(Exception):
 
 
 class Timeout:
-	"""Context manager to add a timeout to a block of code."""
+	"""Context manager to add a timeout to a block of code.
+	
+	Note that we cannot use `signal' here as it will not be supported
+	with multithreading. It works only in the main thread.
+	"""
 
 	def __init__(self, seconds: int) -> None:
 		self.seconds = seconds
 
 	def __enter__(self) -> "Timeout":
 
-		def signal_handler(*args: typing.Any) -> None:
+		def timeout() -> None:
 			raise TimeoutError(f"Timed out after {self.seconds}s.")
 
-		signal.signal(signal.SIGALRM, signal_handler)
-		signal.alarm(self.seconds)
+		self.timer = threading.Timer(self.seconds, timeout)
+		self.timer.start()
+
 		return self
 
 	def __exit__(self, *args: typing.Any) -> None:
-		signal.alarm(0)
+		self.timer.cancel()
