@@ -189,8 +189,65 @@ const recordOnDiskTestVersion1 = [
 	["accounts", ["data", "disk", "/dev/vda15"], [6333952, 109422592], 1742552298029],
 ];
 
-describe("Nodes", () => {
-	describe("Plugin", () => {
+describe("Plugin", () => {
+	describe("Write", () => {
+		const tester = new PluginTester();
+		tester.register("nodes", Plugin, {
+			"nodes.records": {
+				path: "./records",
+				clean: true,
+			},
+		});
+
+		it("start", async () => {
+			await tester.start();
+		});
+
+		it("no data", async () => {
+			Exception.assertThrows(async () => {
+				await tester.send("nodes", "get", "/uid01/a/b");
+			});
+		});
+
+		it("write multiple nodes", async () => {
+			await tester.send("nodes", "post", "/", {
+				headers: { "Content-Type": "application/json" },
+				data: JSON.stringify({
+					uid01: {
+						a: {
+							b: 42,
+						},
+					},
+					uid02: {
+						hello: "world",
+					},
+				}),
+			});
+			const result1 = await tester.send("nodes", "get", "/uid01/a/b");
+			Exception.assertEqual(result1.data.data, 42);
+			const result2 = await tester.send("nodes", "get", "/uid02/hello");
+			Exception.assertEqual(result2.data.data, "world");
+		});
+
+		it("write single node", async () => {
+			await tester.send("nodes", "post", "/uid03", {
+				headers: { "Content-Type": "application/json" },
+				data: JSON.stringify({
+					a: {
+						b: 90,
+					},
+				}),
+			});
+			const result = await tester.send("nodes", "get", "/uid03/a/b");
+			Exception.assertEqual(result.data.data, 90);
+		});
+
+		it("stop", async () => {
+			await tester.stop();
+		});
+	});
+
+	describe("Records", () => {
 		const tester = new PluginTester();
 		tester.register("nodes", Plugin, {
 			"nodes.records": {

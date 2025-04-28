@@ -41,6 +41,7 @@ bzd_nodejs_library(
         "//nodejs/db:utils",
         "//nodejs/db/key_value_store:make_from_config",
         "//nodejs/db/storage",
+        "//nodejs/utils:object",
         "//nodejs/utils:optional",
     ],
 )

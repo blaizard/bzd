@@ -14,6 +14,32 @@ class NodePublishNoRemote(RuntimeError):
 
 class Node(ArtifactsBase):
 
+	def publishMultiNodes(self, data: typing.Dict[str, typing.Any], volume: str = defaultNodeVolume) -> None:
+		"""Publish data to a remote to multiple nodes.
+
+		Args:
+			data: The node uid data map to be published.
+			volume: The volume to which the data should be sent.
+		"""
+
+		query = {}
+		if self.token:
+			query["t"] = self.token
+
+		for remote, retry, nbRetries in self.remotes:
+
+			url = f"{remote}/x/{volume}/"
+
+			try:
+				HttpClient.post(url, json=data, query=query)
+				return
+			except Exception as e:
+				if retry == nbRetries:
+					self.logger.warning(f"Exception while publishing {url} after {nbRetries} retry: {str(e)}")
+				pass
+
+		raise NodePublishNoRemote("Unable to publish to any of the remotes.")
+
 	def publish(self,
 	            data: typing.Any,
 	            uid: typing.Optional[str] = None,

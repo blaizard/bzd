@@ -4,11 +4,10 @@ import PluginBase from "#bzd/apps/artifacts/backend/plugin.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import Records from "#bzd/apps/artifacts/plugins/nodes/records.mjs";
 import { HttpClientFactory } from "#bzd/nodejs/core/http/client.mjs";
-import Data from "#bzd/apps/artifacts/plugins/nodes/data.mjs";
-import Process from "#bzd/nodejs/core/services/process.mjs";
 import Services from "#bzd/nodejs/core/services/services.mjs";
 import SinkInfluxDB from "#bzd/apps/artifacts/plugins/nodes/sinks/influxdb.mjs";
 import SourceNodes from "#bzd/apps/artifacts/plugins/nodes/sources/nodes.mjs";
+import { isObject } from "#bzd/nodejs/utils/object.mjs";
 
 const sinkTypes = {
 	influxdb: SinkInfluxDB,
@@ -298,6 +297,7 @@ export default class Plugin extends PluginBase {
 
 			let records = [];
 			if (inputs.bulk) {
+				Exception.assertPrecondition(isObject(inputs.data), "The data must be an object: {:j}", inputs.data);
 				Exception.assertPrecondition(
 					typeof inputs.data.timestamp == "number",
 					"The timestamp given is not a number {}.",
@@ -319,6 +319,31 @@ export default class Plugin extends PluginBase {
 			// Save the data written on disk.
 			await this.records.write(Nodes.recordToDisk(records));
 
+			context.sendStatus(200);
+		});
+
+		/// Insert entries to multiple nodes.
+		///
+		/// POST <endpoint>/
+		/// ```{
+		///    uid1: <value1>,
+		///    uid2: <value2>
+		/// }``` -> stores a new value to several nodes at the server timestamp.
+		endpoints.register("post", "/", async (context) => {
+			let inputs = {};
+			try {
+				inputs.data = rawBodyParse(context.getBody(), (name) => context.getHeader(name));
+			} catch (e) {
+				context.sendStatus(400, String(e));
+				return;
+			}
+			Exception.assertPrecondition(isObject(inputs.data), "The data must be an object: {:j}", inputs.data);
+
+			for (const [uid, value] of Object.entries(inputs.data)) {
+				const node = await this.nodes.get(uid);
+				const records = await node.insert([], value);
+				await this.records.write(Nodes.recordToDisk(records));
+			}
 			context.sendStatus(200);
 		});
 	}
