@@ -328,7 +328,8 @@
 				left: $bzdPadding;
 				right: $bzdPadding;
 				overflow: hidden;
-				line-height: 2em;
+				white-space: nowrap;
+				text-overflow: ellipsis;
 			}
 
 			.content {
