@@ -41,6 +41,10 @@ class Docker:
 			    "image": data["Image"],
 			    "name": data["Names"][0],
 			    "active": True if data["State"].lower() == "running" else False,
+			    "version": {
+			        "image": data["Image"],
+			        "labels": ",".join(data["Labels"].values())
+			    }
 			})
 
 		return containers
@@ -52,28 +56,22 @@ class Docker:
 		Args:
 			stats: The Docker stats dictionary.
 
+		See: https://docs.docker.com/reference/api/engine/version/v1.44/#tag/Container/operation/ContainerExport
+
 		Returns:
 			A dictionary containing CPU usage stats.
 		"""
 
 		try:
-			cpuUsage = stats['cpu_stats']['cpu_usage']['total_usage']
-			systemCpuUsage = stats['cpu_stats']['system_cpu_usage']
-			onlineCpus = stats['cpu_stats']['online_cpus']
+			cpuDelta = stats['cpu_stats']['cpu_usage']['total_usage'] - stats['precpu_stats']['cpu_usage']['total_usage']
+			systemDelta = stats['cpu_stats']['system_cpu_usage'] - stats['precpu_stats']['system_cpu_usage']
+			onlineCpus = len(stats['cpu_stats']['cpu_usage'].get('percpu_usage',
+			                                                     [])) or stats['cpu_stats']['online_cpus']
+			cpuUsage = cpuDelta / systemDelta
 			cpuPercentages = []
 
-			cpuDelta = cpuUsage - stats['precpu_stats']['cpu_usage']['total_usage']
-			systemDelta = systemCpuUsage - stats['precpu_stats']['system_cpu_usage']
-
-			if systemDelta > 0 and onlineCpus > 0:
-				if "percpu_usage" in stats['cpu_stats']['cpu_usage']:
-					for i in range(onlineCpus):
-						cpuDeltaPerCpu = stats['cpu_stats']['cpu_usage']['percpu_usage'][i] - stats['precpu_stats'][
-						    'cpu_usage']['percpu_usage'][i]
-						cpuPercent = (cpuDeltaPerCpu / systemDelta) * 100.0
-						cpuPercentages.append(cpuPercent)
-				else:
-					cpuPercentages = [cpuDelta / systemDelta] * onlineCpus
+			for i in range(onlineCpus):
+				cpuPercentages.append(cpuUsage)
 
 			return {"system": cpuPercentages}
 
@@ -86,6 +84,8 @@ class Docker:
 	def _memoryInfo(stats: typing.Any) -> typing.Any:
 		"""Extracts memory usage stats from the Docker stats dictionary.
 
+		See: https://docs.docker.com/reference/api/engine/version/v1.44/#tag/Container/operation/ContainerExport
+
 		Args:
 			stats: The Docker stats dictionary.
 
@@ -94,7 +94,7 @@ class Docker:
 		"""
 
 		try:
-			memoryUsage = stats['memory_stats']['usage']
+			memoryUsage = stats['memory_stats']['usage'] - stats['memory_stats']['stats'].get('cache', 0)
 			memoryTotal = stats['memory_stats']['limit']
 
 			return {"ram": {"used": memoryUsage, "total": memoryTotal}}
@@ -160,7 +160,7 @@ class Docker:
 
 	def getContainerStats(self, container: Container) -> typing.Any:
 		raw = self.request("GET", f"/containers/{container['id']}/stats?stream=false")
-		output = {"active": container["active"]}
+		output = {"active": container["active"], "version": container["version"]}
 
 		def addIfNotNone(key: str, data: typing.Any) -> None:
 			if data is not None:
