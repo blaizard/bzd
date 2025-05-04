@@ -92,8 +92,10 @@
 		watch: {
 			"metadata.active": {
 				handler(value) {
+					value ??= true; // unless set, it is considered active.
 					this.$emit("active", value);
 				},
+				immediate: true,
 			},
 		},
 		computed: {
