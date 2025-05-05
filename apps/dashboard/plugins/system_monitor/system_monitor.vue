@@ -97,12 +97,20 @@
 				},
 				immediate: true,
 			},
+			status: {
+				handler(value) {
+					value ??= ["success", null]; // unless set, it is considered good.
+					this.$emit("status", value);
+				},
+				immediate: true,
+			},
 		},
 		computed: {
 			// Memory
 			memories() {
 				let ratios = {};
 				let tooltips = {};
+				let warnings = {};
 				for (const [name, memory] of Object.entries(this.metadata.memory || {})) {
 					const { used, total } = memory;
 					tooltips[name] =
@@ -113,15 +121,20 @@
 							weight: used,
 						},
 					];
+					if (used / total > 0.9) {
+						warnings[name] = "Memory almost full";
+					}
 				}
 				return {
 					ratios,
 					tooltips,
+					warnings,
 				};
 			},
 			disks() {
 				let ratios = {};
 				let tooltips = {};
+				let warnings = {};
 				for (const [name, disk] of Object.entries(this.metadata.disk || {})) {
 					const { used, total } = disk;
 					tooltips[name] =
@@ -132,34 +145,48 @@
 							weight: used,
 						},
 					];
+					if (used / total > 0.9) {
+						warnings[name] = "Memory almost full";
+					}
 				}
 				return {
 					ratios,
 					tooltips,
+					warnings,
 				};
 			},
 			cpus() {
 				let ratios = {};
 				let tooltips = {};
+				let warnings = {};
 				for (const [name, data] of Object.entries(this.metadata.cpu || {})) {
 					tooltips[name] = (this.avgArray(data) * 100).toFixed(1) + "% load";
 					ratios[name] = data;
+					if (this.avgArray(data) > 0.9) {
+						warnings[name] = "Full utilisation";
+					}
 				}
 				return {
 					ratios,
 					tooltips,
+					warnings,
 				};
 			},
 			gpus() {
 				let ratios = {};
 				let tooltips = {};
+				let warnings = {};
 				for (const [name, data] of Object.entries(this.metadata.gpu || {})) {
 					tooltips[name] = (this.avgArray(data) * 100).toFixed(1) + "% load";
 					ratios[name] = data;
+					if (this.avgArray(data) > 0.9) {
+						warnings[name] = "Full utilisation";
+					}
 				}
 				return {
 					ratios,
 					tooltips,
+					warnings,
 				};
 			},
 			ios() {
@@ -200,27 +227,37 @@
 			temperatures() {
 				let max = -Infinity;
 				let tooltips = {};
+				let warnings = {};
 				for (const [name, data] of Object.entries(this.metadata.temperature || {})) {
 					const temperatureMax = this.maxArray(data);
 					tooltips[name] = temperatureMax.toFixed(1) + "°C";
 					max = Math.max(max, temperatureMax);
+					if (temperatureMax > 70) {
+						warnings[name] = "High temperature";
+					}
 				}
 				return {
 					max,
 					tooltips,
+					warnings,
 				};
 			},
 			batteries() {
 				let min = Infinity;
 				let tooltips = {};
+				let warnings = {};
 				for (const [name, data] of Object.entries(this.metadata.battery || {})) {
 					const batteryMin = this.minArray(data);
 					tooltips[name] = (batteryMin * 100).toFixed(1) + "%";
 					min = Math.min(min, batteryMin);
+					if (batteryMin < 0.3) {
+						warnings[name] = "Low memory";
+					}
 				}
 				return {
 					min,
 					tooltips,
+					warnings,
 				};
 			},
 			uptime() {
@@ -232,6 +269,26 @@
 					};
 				}
 				return null;
+			},
+			status() {
+				let tooltip = {};
+				const warnings = {
+					Disk: this.disks,
+					Memory: this.memories,
+					CPU: this.cpus,
+					GPU: this.gpus,
+					Temperature: this.temperatures,
+					Battery: this.batteries,
+				};
+				for (const [name, obj] of Object.entries(warnings)) {
+					if (Object.keys(obj.warnings).length > 0) {
+						tooltip[name] = obj.warnings;
+					}
+				}
+				if (Object.keys(tooltip).length > 0) {
+					return ["warning", tooltip];
+				}
+				return ["success", null];
 			},
 		},
 		methods: {

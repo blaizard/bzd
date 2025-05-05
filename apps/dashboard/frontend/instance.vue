@@ -1,6 +1,6 @@
 <template>
 	<div v-for="(tile, key) in tiles" :style="getStyle(key)" :class="getClass(key)" :key="uid + '-' + key">
-		<div :class="getTileClass(key)" :style="containerStyle" @click="handleClick(key)">
+		<div :class="getTileClass(key)" @click="handleClick(key)">
 			<div v-if="getNbErrors(key) > 0" class="error" v-tooltip="tooltipErrorConfig(key)">{{ getNbErrors(key) }}</div>
 			<component
 				v-else
@@ -8,16 +8,17 @@
 				:is="component"
 				:description="description"
 				:metadata="tile.data"
-				:color="colorForeground"
-				:background-color="colorBackground"
+				:color="getColorForeground(key)"
+				:background-color="getColorBackground(key)"
 				@color="handleColor(key, $event)"
 				@link="handleLink(key, $event)"
 				@error="handleError(key, $event)"
+				@status="handleStatus(key, $event)"
 				@active="handleActive(key, $event)"
 				@event="handleEvent(key, $event)"
 				@name="handleName(key, $event)"
 				@image="handleImage(key, $event)"
-				v-tooltip="tooltip"
+				v-tooltip="getTooltip(key)"
 			>
 			</component>
 			<!--<div v-else-if="isError" class="content">Fatal error</div>//-->
@@ -78,18 +79,11 @@
 				const colorList = Object.keys(Colors);
 				return colorList[index % colorList.length];
 			},
-			colorBackground() {
+			defaultColorBackground() {
 				if (this.visualizationColor == "auto") {
 					return this.color || this.colorAuto;
 				}
 				return this.visualizationColor;
-			},
-			colorForeground() {
-				return (
-					{
-						white: "black",
-					}[this.colorBackground] || "white"
-				);
 			},
 			visualizationColor() {
 				return this.description["visualization.color"] || "auto";
@@ -103,37 +97,12 @@
 			timeout() {
 				return Plugins[this.sourceType].metadata.timeout || 60;
 			},
-			tooltip() {
-				if (this.description["tooltip"]) {
-					return {
-						type: "text",
-						data: this.description["tooltip"],
-					};
-				}
-				return false;
-			},
 			component() {
 				if (!(this.visualizationType in Plugins)) {
 					Log.error("Unsupported plugin '{}'", this.visualizationType);
 					return null;
 				}
 				return defineAsyncComponent(() => Plugins[this.visualizationType].module());
-			},
-			containerStyle() {
-				let color = new Color(Colors[this.colorBackground]);
-				color.setAlpha(0.6);
-				const backgroundColor = Colors[this.colorBackground];
-				return (
-					"background-color: " +
-					backgroundColor +
-					"; color: " +
-					Colors[this.colorForeground] +
-					"; border-color: " +
-					Colors[this.colorForeground] +
-					"; --bzd-loading-color:" +
-					Colors[this.colorForeground] +
-					";"
-				);
 			},
 		},
 		methods: {
@@ -156,8 +125,42 @@
 					clickable: Boolean(this.tiles[key].link),
 				};
 			},
+			getTooltip(key) {
+				if (this.tiles[key].tooltip) {
+					return this.tiles[key].tooltip;
+				}
+				if (this.description["tooltip"]) {
+					return {
+						type: "text",
+						data: this.description["tooltip"],
+					};
+				}
+				return false;
+			},
+			getColorBackground(key) {
+				return this.tiles[key].color || this.defaultColorBackground;
+			},
+			getColorForeground(key) {
+				const color = this.getColorBackground(key);
+				return this.getColorForegroundFromBackground(key);
+			},
+			getColorForegroundFromBackground(color) {
+				return (
+					{
+						white: "black",
+					}[color] || "white"
+				);
+			},
 			getStyle(key) {
-				let style = {};
+				const colorBackground = this.getColorBackground(key);
+				const colorForeground = this.getColorForegroundFromBackground(colorBackground);
+				let style = {
+					"background-color": Colors[colorBackground],
+					color: Colors[colorForeground],
+					"border-color": Colors[colorForeground],
+					"--bzd-loading-color": Colors[colorForeground],
+				};
+
 				if (this.tiles[key].image) {
 					style["background-image"] = "url('" + this.tiles[key].image + "')";
 				}
@@ -185,6 +188,29 @@
 				this.tiles[key].errors ??= [];
 				this.tiles[key].errors.push(e);
 			},
+			handleStatus(key, value) {
+				Exception.assert(Array.isArray(value), "Status must be an array, not: {:j}", value);
+				Exception.assert(value.length, "Status must be an array of 2 elements, not: {:j}", value);
+				const [status, tooltip] = value;
+
+				const statusToColor = {
+					success: "green",
+					warning: "orange",
+					progress: "orange",
+					error: "red",
+				};
+				Exception.assert(status in statusToColor, "Unsupported status: {}", status);
+				this.handleColor(key, statusToColor[status]);
+
+				if (tooltip) {
+					this.tiles[key].tooltip = {
+						type: "html",
+						data: this.tooltipFormat(tooltip),
+					};
+				} else {
+					delete this.tiles[key].tooltip;
+				}
+			},
 			handleActive(key, active) {
 				this.tiles[key].active = Boolean(active);
 			},
@@ -193,6 +219,20 @@
 				if (this.description.link) {
 					this.handleLink(key, this.description.link);
 				}
+			},
+			/// Format a tooltip into a printable tooltip.
+			tooltipFormat(tooltip) {
+				const tooltipFormatAsObject = (data) => {
+					let entries = [];
+					for (const [key, value] of Object.entries(data)) {
+						entries.push('<li style="white-space: nowrap;">' + key + ": " + this.tooltipFormat(value) + "</li>");
+					}
+					return "<ul>" + entries.join("\n") + "</ul>";
+				};
+				if (typeof tooltip === "string") {
+					return tooltip;
+				}
+				return tooltipFormatAsObject(tooltip);
 			},
 			// Assign the new tiles.
 			assignTilesData(data) {
