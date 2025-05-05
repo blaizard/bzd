@@ -21,7 +21,6 @@
 				v-tooltip="getTooltip(key)"
 			>
 			</component>
-			<!--<div v-else-if="isError" class="content">Fatal error</div>//-->
 			<div class="name"><i :class="icon"></i> {{ getName(key) }}</div>
 		</div>
 	</div>
@@ -142,7 +141,7 @@
 			},
 			getColorForeground(key) {
 				const color = this.getColorBackground(key);
-				return this.getColorForegroundFromBackground(key);
+				return this.getColorForegroundFromBackground(color);
 			},
 			getColorForegroundFromBackground(color) {
 				return (
