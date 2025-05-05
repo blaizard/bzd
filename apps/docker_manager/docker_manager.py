@@ -43,7 +43,6 @@ class Docker:
 			    "active": True if data["State"].lower() == "running" else False,
 			    "version": {
 			        "image": data["Image"],
-			        "labels": ",".join(data["Labels"].values())
 			    }
 			})
 
