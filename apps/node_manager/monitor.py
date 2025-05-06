@@ -74,7 +74,7 @@ class _Monitor:
 			if partition.device not in disks:
 				usage = psutil.disk_usage(partition.mountpoint)  # type: ignore
 				disks[partition.device] = {"path": [], "data": {"used": usage.used, "total": usage.total}}
-			disks[partition.device]["path"].append(partition.mountpoint)
+			disks[partition.device]["path"].append(partition.mountpoint)  # type: ignore
 
 		return {",".join(sorted(data["path"])): data["data"] for data in disks.values()}
 
