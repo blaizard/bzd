@@ -63,12 +63,20 @@ class _Monitor:
 		return memories
 
 	def disks(self) -> typing.Any:
+		ignoreWithOps = {
+		    "ro"  # Ignore read-only.
+		}
 		disks = {}
 		for partition in psutil.disk_partitions():  # type: ignore
+			# Do some filtering as some cloud vps mount a lot of devices.
+			if any(opt in ignoreWithOps for opt in partition.opts.split(",")):
+				continue
 			if partition.device not in disks:
 				usage = psutil.disk_usage(partition.mountpoint)  # type: ignore
-				disks[partition.device] = {"used": usage.used, "total": usage.total}
-		return disks
+				disks[partition.device] = {"path": [], "data": {"used": usage.used, "total": usage.total}}
+			disks[partition.device]["path"].append(partition.mountpoint)
+
+		return {",".join(sorted(data["path"])): data["data"] for data in disks.values()}
 
 	def upTime(self) -> float:
 		return time.time() - psutil.boot_time()  # type: ignore

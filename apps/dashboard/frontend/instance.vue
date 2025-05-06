@@ -1,9 +1,7 @@
 <template>
 	<div v-for="(tile, key) in tiles" :style="getStyle(key)" :class="getClass(key)" :key="uid + '-' + key">
 		<div :class="getTileClass(key)" @click="handleClick(key)">
-			<div v-if="getNbErrors(key) > 0" class="error" v-tooltip="tooltipErrorConfig(key)">{{ getNbErrors(key) }}</div>
 			<component
-				v-else
 				class="content"
 				:is="component"
 				:description="description"
@@ -18,10 +16,13 @@
 				@event="handleEvent(key, $event)"
 				@name="handleName(key, $event)"
 				@image="handleImage(key, $event)"
-				v-tooltip="getTooltip(key)"
+				v-tooltip="tooltipTile(key)"
 			>
 			</component>
 			<div class="name"><i :class="icon"></i> {{ getName(key) }}</div>
+			<div class="message" v-if="tooltipMessage(key)" v-tooltip="tooltipMessage(key)">
+				<i :class="tooltipMessageIcon(key)"></i>
+			</div>
 		</div>
 	</div>
 </template>
@@ -124,15 +125,24 @@
 					clickable: Boolean(this.tiles[key].link),
 				};
 			},
-			getTooltip(key) {
-				if (this.tiles[key].tooltip) {
-					return this.tiles[key].tooltip;
-				}
+			tooltipTile(key) {
 				if (this.description["tooltip"]) {
 					return {
 						type: "text",
 						data: this.description["tooltip"],
 					};
+				}
+				return false;
+			},
+			tooltipMessageIcon(key) {
+				if (this.tiles[key].tooltipIcon) {
+					return this.tiles[key].tooltipIcon;
+				}
+				return "bzd-icon-email";
+			},
+			tooltipMessage(key) {
+				if (this.tiles[key].tooltip) {
+					return this.tiles[key].tooltip;
 				}
 				return false;
 			},
@@ -157,7 +167,8 @@
 					"background-color": Colors[colorBackground],
 					color: Colors[colorForeground],
 					"border-color": Colors[colorForeground],
-					"--bzd-loading-color": Colors[colorForeground],
+					"--bzd-color-foreground": Colors[colorForeground],
+					"--bzd-color-background": Colors[colorBackground],
 				};
 
 				if (this.tiles[key].image) {
@@ -171,37 +182,25 @@
 					active: this.tiles[key].active,
 				};
 			},
-			tooltipErrorConfig(key) {
-				return {
-					type: "text",
-					data: this.tiles[key].errors.map((e) => String(e)).join(", "),
-				};
-			},
-			getNbErrors(key) {
-				return (this.tiles[key].errors || []).length;
-			},
-			handleInstanceError(e) {
-				Log.error(e);
-			},
 			handleError(key, e) {
-				this.tiles[key].errors ??= [];
-				this.tiles[key].errors.push(e);
+				this.handleStatus(key, ["error", e]);
 			},
 			handleStatus(key, value) {
 				Exception.assert(Array.isArray(value), "Status must be an array, not: {:j}", value);
 				Exception.assert(value.length, "Status must be an array of 2 elements, not: {:j}", value);
 				const [status, tooltip] = value;
 
-				const statusToColor = {
-					success: "green",
-					warning: "orange",
-					progress: "orange",
-					error: "red",
+				const statusToData = {
+					success: { color: "green", icon: "bzd-icon-email" },
+					warning: { color: "orange", icon: "bzd-icon-warning" },
+					progress: { color: "orange", icon: "bzd-icon-email" },
+					error: { color: "red", icon: "bzd-icon-error" },
 				};
-				Exception.assert(status in statusToColor, "Unsupported status: {}", status);
-				this.handleColor(key, statusToColor[status]);
+				Exception.assert(status in statusToData, "Unsupported status: {}", status);
+				this.handleColor(key, statusToData[status].color);
 
 				if (tooltip) {
+					this.tiles[key].tooltipIcon = statusToData[status].icon;
 					this.tiles[key].tooltip = {
 						type: "html",
 						data: this.tooltipFormat(tooltip),
@@ -240,7 +239,6 @@
 						this.tiles[key] || {
 							active: true,
 							link: null,
-							errors: [],
 						},
 						{
 							data: tile,
@@ -277,7 +275,7 @@
 					}
 					this.handleTimeout = setTimeout(this.fetch, this.timeout);
 				} catch (e) {
-					this.handleInstanceError("Error while fetching data: " + String(e));
+					Log.error("Error while fetching data: " + String(e));
 				}
 			},
 			async fetchIcon() {
@@ -322,12 +320,17 @@
 					});
 				} catch (e) {
 					this.handleError(key, "Error while triggering event: " + String(e));
-					this.handleColor(key, "red");
 				}
 			},
 		},
 	};
 </script>
+
+<style lang="scss">
+	@use "@/nodejs/icons.scss" as icons with (
+		$bzdIconNames: email warning error
+	);
+</style>
 
 <style lang="scss" scoped>
 	@use "@/nodejs/styles/default/css/clickable.scss" as *;
@@ -380,19 +383,22 @@
 				overflow: hidden;
 			}
 
-			.error {
+			.message {
 				position: absolute;
-				right: -1em;
-				top: -1em;
-				width: 2em;
-				height: 2em;
-				border-radius: 1em;
-				border: 1px solid config.$bzdGraphColorWhite;
-				z-index: 1;
-				color: config.$bzdGraphColorWhite;
-				background-color: config.$bzdGraphColorRed;
-				line-height: 2em;
+				bottom: 0;
+				right: 0;
+				width: 20px;
+				height: 20px;
+				background-color: var(--bzd-color-foreground);
+				color: var(--bzd-color-background);
+
+				font-size: 20px;
+				line-height: 1.5em;
+				width: 1.5em;
+				height: 1.5em;
 				text-align: center;
+
+				@extend %bzd-clickable;
 			}
 		}
 	}
