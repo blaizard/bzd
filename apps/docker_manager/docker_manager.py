@@ -36,14 +36,18 @@ class Docker:
 
 		containers = []
 		for data in raw:
+			version = {}
+			if "Image" in data:
+				version["image"] = data["Image"]
+			if "Created" in data:
+				datetimeObj = datetime.datetime.fromtimestamp(data["Created"])
+				version["created"] = datetimeObj.strftime("%Y-%m-%d %H:%M:%S")
 			containers.append({
 			    "id": data["Id"],
 			    "image": data["Image"],
 			    "name": data["Names"][0],
 			    "active": True if data["State"].lower() == "running" else False,
-			    "version": {
-			        "image": data["Image"],
-			    }
+			    "version": version
 			})
 
 		return containers

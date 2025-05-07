@@ -24,6 +24,7 @@ MODULE.bazel.lock
 *~
 ~*
 *.bkp
+temp/
 
 # Eagle
 *.l#*
