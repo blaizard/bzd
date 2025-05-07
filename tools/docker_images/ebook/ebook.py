@@ -131,6 +131,7 @@ if __name__ == "__main__":
 	if args.ebook.suffix.lower() == "epub":
 		converter = EPub(outputSanitized)
 
+	assert converter is not None, f"Unsupported format."
 	converter.process()
 	#calibre.convert(outputSanitized, output)
 
