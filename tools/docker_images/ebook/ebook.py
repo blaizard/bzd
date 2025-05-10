@@ -1,102 +1,58 @@
-#!/usr/bin/env python3
-
 import argparse
-import enum
-import glob
-import json
 import pathlib
-import shutil
-import subprocess
 import tempfile
 import typing
+import enum
+import shutil
+
+from tools.docker_images.ebook.calibre.remove_drm import RemoveDRM
+from tools.docker_images.ebook.epub.epub import EPub
+from tools.docker_images.ebook.pillow.convert_images import ConvertImages
+from tools.docker_images.ebook.flow import ActionInterface, FlowRegistry, FlowEnum, FlowSchemaType
+from tools.docker_images.ebook.providers import ProviderEbook, providerSerialize, providerDeserialize
 
 
-class CalibreKey(enum.Enum):
-	adobe = enum.auto()
+class FlowSchema(FlowEnum):
+	epub: FlowSchemaType = ["removeDRM", "epub", "convertImages"]
+	auto: FlowSchemaType = ["discover"]
 
 
-class Calibre:
-	uid_ = 0
+class Discover(ActionInterface):
+	"""Discover the ebook format."""
 
-	def __init__(self, configPath: pathlib.Path) -> None:
-		self.configPath = configPath
-		assert self.configPath.is_dir(
-		), f"Calibre configuration path '{self.configPath}' does not exists or is not a directory."
+	ProviderInput = ProviderEbook
+	ProviderOutput = ProviderEbook
 
-	@staticmethod
-	def getUid() -> int:
-		Calibre.uid_ += 1
-		return Calibre.uid_
+	def __init__(self, ebookFormat: typing.Optional[str]) -> None:
+		self.ebookFormat = ebookFormat
 
-	def autoDetectKeyType(self, path: pathlib.Path) -> typing.Optional[CalibreKey]:
-		if "adobe" in str(path).lower():
-			return CalibreKey.adobe
-		return None
+	def process(self, provider: ProviderEbook,
+	            directory: pathlib.Path) -> typing.Tuple[ProviderEbook, typing.Optional[FlowEnum]]:
 
-	def addKeyToConfig(self, key: str, value: str, isMap: bool) -> None:
-		path = self.configPath / "plugins/dedrm.json"
+		ebookFormat = self.ebookFormat or provider.ebook.suffix.removeprefix(".").lower()
+		print(f"Ebook of format '{ebookFormat}'.")
+		if ebookFormat == "epub":
+			return provider, FlowSchema.epub
 
-		# Load the config.
-		config = {}
-		try:
-			config = json.loads(path.read_text())
-		except:
-			pass
-
-		# Update it.
-		if isMap:
-			config.setdefault(key, {})
-			config[key][str(Calibre.getUid())] = value
-		else:
-			config.setdefault(key, [])
-			config[key].append(value)
-
-		# Save it.
-		path.write_text(json.dumps(config))
-
-	def addKey(self, key: pathlib.Path) -> None:
-		"""Add a key to calibre config."""
-
-		assert key.is_file(), f"The key file '{key}' does not exists."
-
-		# Try to autodetect the key type.
-		keyType = self.autoDetectKeyType(key)
-		assert keyType is not None, f"Cannot detect the key type for '{key}'."
-
-		if keyType == CalibreKey.adobe:
-			content = "".join([f"{b:02x}" for b in key.read_bytes()])
-			self.addKeyToConfig("adeptkeys", content, isMap=True)
-
-	def sanitize(self, ebook: pathlib.Path, output: pathlib.Path) -> None:
-		"""Sanitize an ebook.
-		
-		This for example removes the DRM.
-		"""
-
-		assert ebook.is_file(), f"The ebook file '{ebook}' does not exists."
-
-		with tempfile.TemporaryDirectory() as dirname:
-			subprocess.run(["calibredb", "add", str(ebook), "--with-library", dirname], check=True)
-
-			pattern = pathlib.Path(dirname) / f"**/*{ebook.suffix}"
-			matches = glob.glob(str(pattern), recursive=True)
-			assert len(matches) == 1, f"Cannot find the output file from calibredb: {str(matches)}"
-
-			shutil.move(matches[0], output)
+		assert False, f"Unsupported ebook format: {ebookFormat}, only the following are supported: {str(', '.join([value.name for value in FlowSchema]))}."
 
 
-class EPub:
-	"""Extract information from epub."""
+class SandboxDirectory:
 
-	def __init__(self, ebook: pathlib.Path) -> None:
-		self.ebook = ebook
+	def __init__(self, path: pathlib.Path) -> None:
+		self.path = path
+		self.path.mkdir(parents=True, exist_ok=True)
 
-	def process(self) -> None:
-		pass
+	@property
+	def name(self) -> str:
+		return str(self.path)
+
+	def cleanup(self) -> None:
+		pass  # ignore cleanup
 
 
 if __name__ == "__main__":
-	parser = argparse.ArgumentParser(description="e-book sanitizer.")
+	parser = argparse.ArgumentParser(description="e-book to pdf.")
 	parser.add_argument("--key",
 	                    dest="keys",
 	                    action="append",
@@ -107,33 +63,34 @@ if __name__ == "__main__":
 	                    type=pathlib.Path,
 	                    default=pathlib.Path.home() / ".config/calibre",
 	                    help="Calibre configuration path.")
-	parser.add_argument("--output", type=pathlib.Path, default=None, help="The name of the output file.")
-	parser.add_argument("--format", type=str, default=None, help="Convert the file into another type.")
+	parser.add_argument("--format", type=str, default=None, help="Assume a specific format for the ebook.")
+	parser.add_argument(
+	    "--sandbox",
+	    type=pathlib.Path,
+	    help=
+	    "Directory to use to store the intermediate data, this directory will be kept when the program terminated. Also if interrupted, the process will restart from the last step."
+	)
 	parser.add_argument("ebook", type=pathlib.Path, help="The ebook file to sanitize.")
 
 	args = parser.parse_args()
 
-	calibre = Calibre(configPath=args.calibre_config)
+	actions = {
+	    "removeDRM": RemoveDRM(calibreConfigPath=args.calibre_config),
+	    "epub": EPub(),
+	    "convertImages": ConvertImages(),
+	    "discover": Discover(ebookFormat=args.format)
+	}
 
-	for key in args.keys:
-		calibre.addKey(key)
+	flows = FlowRegistry(schema=FlowSchema, actions=actions)
+	directory = tempfile.TemporaryDirectory() if args.sandbox is None else SandboxDirectory(path=args.sandbox)
+	try:
+		provider = ProviderEbook(ebook=args.ebook, keys=args.keys)
+		flow = flows.restoreOrReset(pathlib.Path(directory.name), FlowSchema.auto, provider)  # type: ignore
+		flow.run()
 
-	outputSuffix = args.ebook.suffix if args.format is None else args.format
-	output = (args.ebook.parent /
-	          (args.ebook.stem + "_sanitized." + outputSuffix)) if args.output is None else args.output
-	#assert args.format is None or outputSuffix == output.suffix, f"The format '{args.format}' does not match the output {output}."
-
-	outputSanitized = output.parent / (output.stem + ".temp" + args.ebook.suffix)
-
-	calibre.sanitize(args.ebook, outputSanitized)
-
-	converter = None
-	if args.ebook.suffix.lower() == "epub":
-		converter = EPub(outputSanitized)
-
-	assert converter is not None, f"Unsupported format."
-	converter.process()
-	#calibre.convert(outputSanitized, output)
+	finally:
+		directory.cleanup()  # type: ignore
 
 	# bazel run tools/docker_images/ebook -- --key $(pwd)/temp/Adobe_PrivateLicenseKey--anonymous.der $(pwd)/temp/temp.epub
 	# tools/docker_images/ebook/ebook.py --key $(pwd)/temp/Adobe_PrivateLicenseKey--anonymous.der --format pdf $(pwd)/temp/temp.epub
+	# bazel run tools/docker_images/ebook -- $(pwd)/temp/temp_sanitized.nodrm.epub

@@ -3,6 +3,9 @@
 load("@bazel_skylib//lib:sets.bzl", "sets")
 
 _PYTHON_EXTENSIONS = ["py", "pyi"]
+_IGNORE_EXTENSIONS = [
+    "typing_extensions",  # Mypy already include 'typing_extensions', if included by another module, it will clash and mypy will complain.
+]
 
 MyPyInfo = provider(
     "Information on the file processed by the rule.",
@@ -149,7 +152,7 @@ def _mypy_aspect_impl(target, ctx):
         executable = ctx.executable._mypy,
         arguments = [output.path, args],
         env = {
-            "MYPYPATH": ":".join(mypy_path.to_list()),
+            "MYPYPATH": ":".join([p for p in mypy_path.to_list() if not any([ignore in p for ignore in _IGNORE_EXTENSIONS])]),
         },
         mnemonic = "Mypy",
         progress_message = "Mypying {}".format(ctx.label),

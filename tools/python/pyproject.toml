@@ -52,5 +52,10 @@ module = [
     "zipp.*",
     "platformdirs.*",
     "peewee.*",
+    "socks.*",
+    "dotenv.*",
+    "webdriver_manager.*",
+    "selenium.*",
+    "websocket.*",
 ]
 ignore_errors = true

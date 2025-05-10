@@ -15,14 +15,7 @@ RUN wget -O temp.zip https://github.com/noDRM/DeDRM_tools/releases/download/v10.
 RUN calibre-customize --add-plugin DeDRM/DeDRM_plugin.zip
 RUN calibre-customize --add-plugin DeDRM/Obok_plugin.zip
 
+RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+RUN apt-get install -y ./google-chrome-stable_current_amd64.deb
+
 ENTRYPOINT ["/bin/bash"]
-
-# Remove the DRM
-# calibredb add La\ via\ secrète\ des\ arbres.epub --with-library=library
-# rm -rfd library/ && mkdir library
-
-# Set the key
-# vim /root/.config/calibre/plugins/dedrm.json
-
-# Convert to PDF
-# ebook-convert La\ via\ secrète\ des\ arbres.epub temp.pdf

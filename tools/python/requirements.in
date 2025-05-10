@@ -9,3 +9,6 @@ pyyaml
 nvidia-ml-py
 webdav4
 fsspec
+selenium
+webdriver-manager
+pillow
