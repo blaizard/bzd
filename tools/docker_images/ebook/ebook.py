@@ -7,13 +7,13 @@ import shutil
 
 from tools.docker_images.ebook.calibre.remove_drm import RemoveDRM
 from tools.docker_images.ebook.epub.epub import EPub
-from tools.docker_images.ebook.pillow.convert_images import ConvertImages
+from tools.docker_images.ebook.pillow.images_to_pdf import ImagesToPdf
 from tools.docker_images.ebook.flow import ActionInterface, FlowRegistry, FlowEnum, FlowSchemaType
 from tools.docker_images.ebook.providers import ProviderEbook, providerSerialize, providerDeserialize
 
 
 class FlowSchema(FlowEnum):
-	epub: FlowSchemaType = ["removeDRM", "epub", "convertImages"]
+	epub: FlowSchemaType = ["removeDRM", "epub", "imagesToPdf"]
 	auto: FlowSchemaType = ["discover"]
 
 
@@ -77,7 +77,7 @@ if __name__ == "__main__":
 	actions = {
 	    "removeDRM": RemoveDRM(calibreConfigPath=args.calibre_config),
 	    "epub": EPub(),
-	    "convertImages": ConvertImages(),
+	    "imagesToPdf": ImagesToPdf(),
 	    "discover": Discover(ebookFormat=args.format)
 	}
 

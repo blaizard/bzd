@@ -33,5 +33,5 @@ py_library(
     ],
     deps = [
         ":metadata",
-    ] + requirement("selenium") + requirement("webdriver-manager"),
+    ] + requirement("selenium") + requirement("webdriver-manager") + requirement("pillow"),
 )

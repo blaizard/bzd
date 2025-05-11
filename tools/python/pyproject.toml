@@ -57,5 +57,6 @@ module = [
     "webdriver_manager.*",
     "selenium.*",
     "websocket.*",
+    "PIL.*",
 ]
 ignore_errors = true

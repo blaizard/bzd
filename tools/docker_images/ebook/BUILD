@@ -11,7 +11,7 @@ py_binary(
         ":providers",
         "//tools/docker_images/ebook/calibre:remove_drm",
         "//tools/docker_images/ebook/epub",
-        "//tools/docker_images/ebook/pillow:convert_images",
+        "//tools/docker_images/ebook/pillow:images_to_pdf",
     ],
 )
 
