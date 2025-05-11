@@ -2,6 +2,7 @@ import typing
 import pathlib
 import enum
 import json
+import dataclasses
 
 from tools.docker_images.ebook.providers import Provider, providerSerialize, providerDeserialize
 
@@ -25,6 +26,25 @@ class ActionInterface(typing.Protocol):
 		raise NotImplementedError()
 
 
+@dataclasses.dataclass
+class FlowState:
+	"""Describte the status of a the flow for a single document."""
+
+	provider: Provider
+	flow: FlowSchemaType
+	index: int
+
+	def serialize(self) -> str:
+		"""Serialize the current state."""
+		data = {"flow": self.flow, "provider": providerSerialize(self.provider), "index": self.index}
+		return json.dumps(data)
+
+	@staticmethod
+	def deserialize(serialized) -> "FlowState":
+		data = json.loads(serialized)
+		return FlowState(provider=providerDeserialize(data["provider"]), flow=data["flow"], index=data["index"])
+
+
 class FlowRegistry:
 
 	def __init__(self, schema: typing.Type[FlowEnum], actions: typing.Dict[str, ActionInterface]) -> None:
@@ -46,7 +66,8 @@ class FlowRegistry:
 	def reset(self, directory: pathlib.Path, flowKey: FlowEnum, provider: Provider) -> "Flow":
 		"""Start a flow from the start."""
 
-		return Flow(self, flowKey.value, directory, provider, 0)
+		state = FlowState(provider=provider, flow=flowKey.value, index=0)
+		return Flow(self, directory, state)
 
 	def restore(self, directory: pathlib.Path) -> "Flow":
 		"""Restore a flow from a previous position."""
@@ -54,11 +75,8 @@ class FlowRegistry:
 		stateJson = Flow.stateJson(directory)
 		assert stateJson.exists(), f"'{stateJson}' does not exists."
 
-		state = json.loads(stateJson.read_text())
-		flow = state["flow"]
-		index = state["index"]
-		provider = providerDeserialize(state["provider"])
-		return Flow(self, flow, directory, provider, index)
+		state = FlowState.deserialize(stateJson.read_text())
+		return Flow(self, directory, state)
 
 	def get(self, name: str) -> ActionInterface:
 		"""Get a flow interface by name."""
@@ -68,13 +86,10 @@ class FlowRegistry:
 
 class Flow:
 
-	def __init__(self, registry: FlowRegistry, flow: FlowSchemaType, directory: pathlib.Path, provider: Provider,
-	             index: int) -> None:
+	def __init__(self, registry: FlowRegistry, directory: pathlib.Path, state: FlowState) -> None:
 		self.registry = registry
-		self.flow = flow
 		self.directory = directory
-		self.provider = provider
-		self.index = index
+		self.state = state
 
 	@staticmethod
 	def stateJson(directory: pathlib.Path) -> pathlib.Path:
@@ -82,18 +97,17 @@ class Flow:
 
 	def run(self) -> None:
 
-		while self.flow:
+		while self.state.flow:
 			# Serialize the current state.
-			state = {"flow": self.flow, "provider": providerSerialize(self.provider), "index": self.index}
-			Flow.stateJson(self.directory).write_text(json.dumps(state))
+			Flow.stateJson(self.directory).write_text(self.state.serialize())
 
-			actionName = self.flow.pop(0)
+			actionName = self.state.flow.pop(0)
 			action = self.registry.get(actionName)
-			workingDirectory = self.directory / f"{(self.index + 1):02}.{actionName}"
+			workingDirectory = self.directory / f"{(self.state.index + 1):02}.{actionName}"
 			workingDirectory.mkdir(parents=True, exist_ok=True)
 			print(f"--- {actionName} ({workingDirectory})")
 
-			self.provider, maybeFlow = action.process(self.provider, workingDirectory)
+			self.state.provider, maybeFlow = action.process(self.state.provider, workingDirectory)
 			if maybeFlow is not None:
-				self.flow = maybeFlow.value + self.flow
-			self.index += 1
+				self.state.flow = maybeFlow.value + self.state.flow
+			self.state.index += 1
