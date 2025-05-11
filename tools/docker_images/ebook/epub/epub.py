@@ -77,7 +77,7 @@ class EPub(ActionInterface):
 		return documents
 
 	def process(self, provider: ProviderEbook,
-	            directory: pathlib.Path) -> typing.Tuple[ProviderImages, typing.Optional[FlowEnum]]:
+	            directory: pathlib.Path) -> typing.List[typing.Tuple[ProviderImages, typing.Optional[FlowEnum]]]:
 
 		outputs = []
 		with self.driver as driver:
@@ -89,4 +89,4 @@ class EPub(ActionInterface):
 				print(output)
 				outputs += output
 
-		return ProviderImages(images=outputs), None
+		return [(ProviderImages(images=outputs), None)]

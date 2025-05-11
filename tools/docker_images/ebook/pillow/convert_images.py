@@ -12,6 +12,6 @@ class ConvertImages(ActionInterface):
 	ProviderOutput = ProviderImages
 
 	def process(self, provider: ProviderImages,
-	            directory: pathlib.Path) -> typing.Tuple[ProviderImages, typing.Optional[FlowEnum]]:
+	            directory: pathlib.Path) -> typing.List[typing.Tuple[ProviderImages, typing.Optional[FlowEnum]]]:
 
-		return provider, None
+		return [(provider, None)]

@@ -3,6 +3,7 @@ import pathlib
 import enum
 import json
 import dataclasses
+import shutil
 
 from tools.docker_images.ebook.providers import Provider, providerSerialize, providerDeserialize
 
@@ -22,7 +23,7 @@ class ActionInterface(typing.Protocol):
 		assert self.ProviderOutput is not None, f"The ProviderOutput must be set."
 
 	def process(self, input: ProviderInput,
-	            directory: pathlib.Path) -> typing.Tuple[ProviderOutput, typing.Optional[FlowEnum]]:
+	            directory: pathlib.Path) -> typing.List[typing.Tuple[ProviderOutput, typing.Optional[FlowEnum]]]:
 		raise NotImplementedError()
 
 
@@ -32,16 +33,17 @@ class FlowState:
 
 	provider: Provider
 	flow: FlowSchemaType
-	index: int
+	index: int = 0
 
-	def serialize(self) -> str:
+	def completed(self) -> bool:
+		return len(self.flow) == 0
+
+	def toJson(self) -> typing.Dict[str, typing.Any]:
 		"""Serialize the current state."""
-		data = {"flow": self.flow, "provider": providerSerialize(self.provider), "index": self.index}
-		return json.dumps(data)
+		return {"flow": self.flow, "provider": providerSerialize(self.provider), "index": self.index}
 
 	@staticmethod
-	def deserialize(serialized) -> "FlowState":
-		data = json.loads(serialized)
+	def fromJson(data: typing.Dict[str, typing.Any]) -> "FlowState":
 		return FlowState(provider=providerDeserialize(data["provider"]), flow=data["flow"], index=data["index"])
 
 
@@ -66,8 +68,8 @@ class FlowRegistry:
 	def reset(self, directory: pathlib.Path, flowKey: FlowEnum, provider: Provider) -> "Flow":
 		"""Start a flow from the start."""
 
-		state = FlowState(provider=provider, flow=flowKey.value, index=0)
-		return Flow(self, directory, state)
+		state = FlowState(provider=provider, flow=flowKey.value)
+		return Flow(self, directory, [state])
 
 	def restore(self, directory: pathlib.Path) -> "Flow":
 		"""Restore a flow from a previous position."""
@@ -75,8 +77,9 @@ class FlowRegistry:
 		stateJson = Flow.stateJson(directory)
 		assert stateJson.exists(), f"'{stateJson}' does not exists."
 
-		state = FlowState.deserialize(stateJson.read_text())
-		return Flow(self, directory, state)
+		data = json.loads(stateJson.read_text())
+		states = [FlowState.fromJson(state) for state in data["states"]]
+		return Flow(self, directory, states)
 
 	def get(self, name: str) -> ActionInterface:
 		"""Get a flow interface by name."""
@@ -86,10 +89,10 @@ class FlowRegistry:
 
 class Flow:
 
-	def __init__(self, registry: FlowRegistry, directory: pathlib.Path, state: FlowState) -> None:
+	def __init__(self, registry: FlowRegistry, directory: pathlib.Path, states: typing.List[FlowState]) -> None:
 		self.registry = registry
 		self.directory = directory
-		self.state = state
+		self.states = states
 
 	@staticmethod
 	def stateJson(directory: pathlib.Path) -> pathlib.Path:
@@ -97,17 +100,34 @@ class Flow:
 
 	def run(self) -> None:
 
-		while self.state.flow:
-			# Serialize the current state.
-			Flow.stateJson(self.directory).write_text(self.state.serialize())
+		while any(not state.completed() for state in self.states):
 
-			actionName = self.state.flow.pop(0)
+			# Serialize the current state.
+			data = {"states": [state.toJson() for state in self.states]}
+			Flow.stateJson(self.directory).write_text(json.dumps(data))
+
+			# Get the next non completed document state.
+			for documentIndex, state in enumerate(self.states):
+				if not state.completed():
+					break
+
+			actionName = state.flow.pop(0)
 			action = self.registry.get(actionName)
-			workingDirectory = self.directory / f"{(self.state.index + 1):02}.{actionName}"
+			workingDirectory = self.directory / f"{(documentIndex + 1):02}.{(state.index + 1):02}.{actionName}"
+			if workingDirectory.exists():
+				shutil.rmtree(workingDirectory)
 			workingDirectory.mkdir(parents=True, exist_ok=True)
 			print(f"--- {actionName} ({workingDirectory})")
 
-			self.state.provider, maybeFlow = action.process(self.state.provider, workingDirectory)
-			if maybeFlow is not None:
-				self.state.flow = maybeFlow.value + self.state.flow
-			self.state.index += 1
+			outputs = action.process(state.provider, workingDirectory)
+			isFirst = True
+			currentFlow = state.flow.copy()
+			for provider, maybeFlow in outputs:
+				flow = ([] if maybeFlow is None else maybeFlow.value) + currentFlow
+				if isFirst:
+					state.provider = provider
+					state.flow = flow
+					state.index += 1
+					isFirst = False
+				else:
+					self.states.append(FlowState(provider=provider, flow=flow))

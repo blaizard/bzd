@@ -27,12 +27,12 @@ class Discover(ActionInterface):
 		self.ebookFormat = ebookFormat
 
 	def process(self, provider: ProviderEbook,
-	            directory: pathlib.Path) -> typing.Tuple[ProviderEbook, typing.Optional[FlowEnum]]:
+	            directory: pathlib.Path) -> typing.List[typing.Tuple[ProviderEbook, typing.Optional[FlowEnum]]]:
 
 		ebookFormat = self.ebookFormat or provider.ebook.suffix.removeprefix(".").lower()
 		print(f"Ebook of format '{ebookFormat}'.")
 		if ebookFormat == "epub":
-			return provider, FlowSchema.epub
+			return [(provider, FlowSchema.epub)]
 
 		assert False, f"Unsupported ebook format: {ebookFormat}, only the following are supported: {str(', '.join([value.name for value in FlowSchema]))}."
 

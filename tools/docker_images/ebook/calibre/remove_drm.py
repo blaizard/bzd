@@ -17,10 +17,10 @@ class RemoveDRM(ActionInterface):
 		self.calibre = Calibre(configPath=calibreConfigPath)
 
 	def process(self, provider: ProviderEbook,
-	            directory: pathlib.Path) -> typing.Tuple[ProviderEbook, typing.Optional[FlowEnum]]:
+	            directory: pathlib.Path) -> typing.List[typing.Tuple[ProviderEbook, typing.Optional[FlowEnum]]]:
 		if not provider.hasKeys:
 			print("No keys provided, therefore not removing the DRM.")
-			return provider, None
+			return [(provider, None)]
 
 		for key in provider.keys:
 			self.calibre.addKey(key)
@@ -28,4 +28,4 @@ class RemoveDRM(ActionInterface):
 		output = directory / provider.ebook.name
 		self.calibre.sanitize(provider.ebook, output)
 
-		return ProviderEbook(ebook=output), None
+		return [(ProviderEbook(ebook=output), None)]
