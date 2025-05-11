@@ -104,7 +104,7 @@ class Flow:
 
 			# Serialize the current state.
 			data = {"states": [state.toJson() for state in self.states]}
-			Flow.stateJson(self.directory).write_text(json.dumps(data))
+			Flow.stateJson(self.directory).write_text(json.dumps(data, indent=4))
 
 			# Get the next non completed document state.
 			for documentIndex, state in enumerate(self.states):

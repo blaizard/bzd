@@ -31,10 +31,10 @@ class DriverMock:
 			) == document.name, f"Expected document '{expectedDocument}' differ from actual '{document.name}'."
 
 		for attrName in ["identifier", "title", "language", "creators", "contributors", "date", "publisher"]:
-			attr = getattr(expected, attrName)
+			attr = getattr(expected.metadata, attrName)
 			if not attr:
 				continue
-			actual = getattr(metadata, attrName)
+			actual = getattr(metadata.metadata, attrName)
 			assert attr == actual, f"Attribute '{attrName}' differs, expected '{attr}' vs actual '{actual}'."
 
 		return []

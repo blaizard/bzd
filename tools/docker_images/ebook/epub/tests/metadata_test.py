@@ -5,7 +5,7 @@ import tempfile
 from tools.docker_images.ebook.epub.epub import EPub
 from tools.docker_images.ebook.epub.tests.driver_mock import DriverMock
 from tools.docker_images.ebook.epub.metadata import EPubMetadata
-from tools.docker_images.ebook.providers import ProviderEbook
+from tools.docker_images.ebook.providers import ProviderEbook, ProviderEbookMetadata
 
 
 class TestRun(unittest.TestCase):
@@ -14,12 +14,12 @@ class TestRun(unittest.TestCase):
 		epub = EPub(driver=DriverMock(expected=[
 		    EPubMetadata(document=[pathlib.Path("c001_chap.xhtml"),
 		                           pathlib.Path("c002_chap.xhtml")],
-		                 title="Title",
-		                 identifier="urn:uuid:32133-1629-43-ac27-4323234",
-		                 language="fr",
-		                 creators=['creator1', 'creator2', 'creator3'],
-		                 date="2023",
-		                 publisher="publisher")
+		                 metadata=ProviderEbookMetadata(title="Title",
+		                                                identifier="urn:uuid:32133-1629-43-ac27-4323234",
+		                                                language="fr",
+		                                                creators=['creator1', 'creator2', 'creator3'],
+		                                                date="2023",
+		                                                publisher="publisher"))
 		]))
 
 		provider = ProviderEbook(ebook=pathlib.Path(__file__).parent / "data/sample1.epub")

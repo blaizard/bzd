@@ -21,6 +21,9 @@ py_library(
         "metadata.py",
     ],
     visibility = ["//tools/docker_images/ebook/epub:__subpackages__"],
+    deps = [
+        "//tools/docker_images/ebook:providers",
+    ],
 )
 
 py_library(

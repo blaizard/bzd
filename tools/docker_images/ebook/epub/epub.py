@@ -12,7 +12,7 @@ import xml.etree.ElementTree as ET
 from tools.docker_images.ebook.epub.driver_selenium import DriverSelenium
 from tools.docker_images.ebook.epub.metadata import EPubMetadata
 from tools.docker_images.ebook.flow import ActionInterface, FlowEnum
-from tools.docker_images.ebook.providers import ProviderEbook, ProviderImages
+from tools.docker_images.ebook.providers import ProviderEbook, ProviderEbookMetadata, ProviderImages
 
 
 class EPub(ActionInterface):
@@ -31,21 +31,21 @@ class EPub(ActionInterface):
 		metadata = EPubMetadata()
 		for elt in root.iter():
 			if elt.tag.endswith("}title"):
-				metadata.title = elt.text
+				metadata.metadata.title = elt.text
 			elif elt.tag.endswith("}identifier"):
-				metadata.identifier = elt.text
+				metadata.metadata.identifier = elt.text
 			elif elt.tag.endswith("}language"):
-				metadata.language = elt.text
+				metadata.metadata.language = elt.text
 			elif elt.tag.endswith("}creator"):
 				assert elt.text is not None
-				metadata.creators.append(elt.text)
+				metadata.metadata.creators.append(elt.text)
 			elif elt.tag.endswith("}contributor"):
 				assert elt.text is not None
-				metadata.contributors.append(elt.text)
+				metadata.metadata.contributors.append(elt.text)
 			elif elt.tag.endswith("}date"):
-				metadata.date = elt.text
+				metadata.metadata.date = elt.text
 			elif elt.tag.endswith("}publisher"):
-				metadata.publisher = elt.text
+				metadata.metadata.publisher = elt.text
 		return metadata
 
 	def readMetadata(self, dirname: pathlib.Path) -> typing.List[EPubMetadata]:
@@ -79,14 +79,13 @@ class EPub(ActionInterface):
 	def process(self, provider: ProviderEbook,
 	            directory: pathlib.Path) -> typing.List[typing.Tuple[ProviderImages, typing.Optional[FlowEnum]]]:
 
-		outputs = []
+		outputs: typing.List[typing.Tuple[ProviderImages, typing.Optional[FlowEnum]]] = []
 		with self.driver as driver:
 			with zipfile.ZipFile(str(provider.ebook), "r") as zipInstance:
 				zipInstance.extractall(directory / "extract")
 			documents = self.readMetadata(directory / "extract")
 			for documentNumber, metadata in enumerate(documents):
 				output = driver.process(documentNumber, metadata, directory / f"document_{documentNumber}")
-				print(output)
-				outputs += output
+				outputs.append((ProviderImages(images=output, metadata=metadata.metadata), None))
 
-		return [(ProviderImages(images=outputs), None)]
+		return outputs
