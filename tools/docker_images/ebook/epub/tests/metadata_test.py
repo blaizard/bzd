@@ -1,6 +1,7 @@
 import unittest
 import pathlib
 import tempfile
+import datetime
 
 from tools.docker_images.ebook.epub.epub import EPub
 from tools.docker_images.ebook.epub.tests.driver_mock import DriverMock
@@ -18,7 +19,7 @@ class TestRun(unittest.TestCase):
 		                                                identifier="urn:uuid:32133-1629-43-ac27-4323234",
 		                                                language="fr",
 		                                                creators=['creator1', 'creator2', 'creator3'],
-		                                                date="2023",
+		                                                date=datetime.datetime(2023, 1, 1),
 		                                                publisher="publisher"))
 		]))
 

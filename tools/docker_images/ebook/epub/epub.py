@@ -1,6 +1,8 @@
 import enum
 import glob
 import json
+import re
+import datetime
 import pathlib
 import shutil
 import subprocess
@@ -25,6 +27,15 @@ class EPub(ActionInterface):
 		super().__init__()
 		self.driver = driver
 
+	@staticmethod
+	def parseDate(string: str) -> typing.Optional[datetime.datetime]:
+		pattern = re.compile(r"(?P<year>[0-9]+)(?:-(?P<month>[0-9]+)(?:-(?P<day>[0-9]+))?)?")
+		maybeMatch = pattern.match(string)
+		if maybeMatch:
+			d = maybeMatch.groupdict()
+			return datetime.datetime(int(d["year"]), int(d["month"] or 1), int(d["day"] or 1))
+		return None
+
 	def readDC(self, root: ET.Element) -> EPubMetadata:
 		"""Populate the metadata."""
 
@@ -43,7 +54,12 @@ class EPub(ActionInterface):
 				assert elt.text is not None
 				metadata.metadata.contributors.append(elt.text)
 			elif elt.tag.endswith("}date"):
-				metadata.metadata.date = elt.text
+				assert elt.text is not None
+				maybeDate = EPub.parseDate(elt.text)
+				if maybeDate and metadata.metadata.date:
+					metadata.metadata.date = min(metadata.metadata.date, maybeDate)
+				else:
+					metadata.metadata.date = maybeDate
 			elif elt.tag.endswith("}publisher"):
 				metadata.metadata.publisher = elt.text
 		return metadata

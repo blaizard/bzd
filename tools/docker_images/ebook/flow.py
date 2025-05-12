@@ -98,7 +98,7 @@ class Flow:
 	def stateJson(directory: pathlib.Path) -> pathlib.Path:
 		return directory / "state.json"
 
-	def run(self) -> None:
+	def run(self) -> typing.List[Provider]:
 
 		while any(not state.completed() for state in self.states):
 
@@ -131,3 +131,5 @@ class Flow:
 					isFirst = False
 				else:
 					self.states.append(FlowState(provider=provider, flow=flow))
+
+		return [state.provider for state in self.states]

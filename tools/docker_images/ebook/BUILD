@@ -10,6 +10,7 @@ py_binary(
         ":flow",
         ":providers",
         "//tools/docker_images/ebook/calibre:remove_drm",
+        "//tools/docker_images/ebook/cbz",
         "//tools/docker_images/ebook/epub",
         "//tools/docker_images/ebook/pillow:images_to_pdf",
     ],

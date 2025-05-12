@@ -3,6 +3,7 @@
 import pathlib
 import typing
 import dataclasses
+import datetime
 import json
 
 Json = typing.Dict[str, typing.Any]
@@ -23,16 +24,30 @@ class ProviderEbookMetadata:
 	# List of contributors that play a secondary role for this ebook.
 	contributors: typing.List[str] = dataclasses.field(default_factory=list)
 	# Publication date.
-	date: typing.Optional[str] = None
+	date: typing.Optional[datetime.datetime] = None
 	# Publisher name.
 	publisher: typing.Optional[str] = None
 
 	def toJson(self) -> Json:
-		return dataclasses.asdict(self)
+		return {
+		    "title": self.title,
+		    "identifier": self.identifier,
+		    "language": self.language,
+		    "creators": self.creators,
+		    "contributors": self.contributors,
+		    "date": None if self.date is None else self.date.isoformat(),
+		    "publisher": self.publisher
+		}
 
 	@staticmethod
 	def fromJson(data: Json) -> "ProviderEbookMetadata":
-		return ProviderEbookMetadata(**data)
+		return ProviderEbookMetadata(title=data["title"],
+		                             identifier=data["identifier"],
+		                             language=data["language"],
+		                             creators=data["creators"],
+		                             contributors=data["contributors"],
+		                             date=datetime.datetime.fromisoformat(data["date"]) if data["date"] else None,
+		                             publisher=data["publisher"])
 
 
 @dataclasses.dataclass
@@ -45,6 +60,10 @@ class ProviderEbook:
 	keys: typing.List[pathlib.Path] = dataclasses.field(default_factory=list)
 	# Metadata associated with this ebook.
 	metadata: ProviderEbookMetadata = dataclasses.field(default_factory=ProviderEbookMetadata)
+
+	def clone(self) -> "ProviderEbook":
+		"""Create a new ebook provider from an existing one."""
+		return dataclasses.replace(self)
 
 	@property
 	def hasKeys(self) -> bool:
@@ -79,7 +98,22 @@ class ProviderImages:
 		                      metadata=ProviderEbookMetadata.fromJson(data["metadata"]))
 
 
-Provider = typing.Union[ProviderEbook, ProviderImages]
+@dataclasses.dataclass
+class ProviderPdf:
+	"""The final provider for a pdf."""
+
+	# The path of the pdf.
+	path: pathlib.Path
+
+	def toJson(self) -> Json:
+		return {"path": str(self.path)}
+
+	@staticmethod
+	def fromJson(data: Json) -> "ProviderPdf":
+		return ProviderPdf(path=pathlib.Path(data["path"]))
+
+
+Provider = typing.Union[ProviderEbook, ProviderImages, ProviderPdf]
 
 
 def providerSerialize(provider: Provider) -> str:

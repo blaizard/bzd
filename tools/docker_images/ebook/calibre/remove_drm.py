@@ -28,4 +28,4 @@ class RemoveDRM(ActionInterface):
 		output = directory / provider.ebook.name
 		self.calibre.sanitize(provider.ebook, output)
 
-		return [(ProviderEbook(ebook=output), None)]
+		return [(ProviderEbook(ebook=output, metadata=provider.metadata), None)]

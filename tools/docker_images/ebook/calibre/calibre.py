@@ -16,8 +16,6 @@ class Calibre:
 
 	def __init__(self, configPath: pathlib.Path) -> None:
 		self.configPath = configPath
-		assert self.configPath.is_dir(
-		), f"Calibre configuration path '{self.configPath}' does not exists or is not a directory."
 
 	_uid = 0
 
@@ -71,6 +69,8 @@ class Calibre:
 		This for example removes the DRM.
 		"""
 
+		assert self.configPath.is_dir(
+		), f"Calibre configuration path '{self.configPath}' does not exists or is not a directory."
 		assert ebook.is_file(), f"The ebook file '{ebook}' does not exists."
 
 		with tempfile.TemporaryDirectory() as dirname:

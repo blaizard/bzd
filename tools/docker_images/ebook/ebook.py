@@ -7,13 +7,15 @@ import shutil
 
 from tools.docker_images.ebook.calibre.remove_drm import RemoveDRM
 from tools.docker_images.ebook.epub.epub import EPub
+from tools.docker_images.ebook.cbz.cbz import Cbz
 from tools.docker_images.ebook.pillow.images_to_pdf import ImagesToPdf
 from tools.docker_images.ebook.flow import ActionInterface, FlowRegistry, FlowEnum, FlowSchemaType
-from tools.docker_images.ebook.providers import ProviderEbook, providerSerialize, providerDeserialize
+from tools.docker_images.ebook.providers import ProviderEbook, ProviderEbookMetadata, ProviderPdf, providerSerialize, providerDeserialize
 
 
 class FlowSchema(FlowEnum):
 	epub: FlowSchemaType = ["removeDRM", "epub", "imagesToPdf"]
+	cbz: FlowSchemaType = ["cbz", "imagesToPdf"]
 	auto: FlowSchemaType = ["discover"]
 
 
@@ -31,8 +33,8 @@ class Discover(ActionInterface):
 
 		ebookFormat = self.ebookFormat or provider.ebook.suffix.removeprefix(".").lower()
 		print(f"Ebook of format '{ebookFormat}'.")
-		if ebookFormat == "epub":
-			return [(provider, FlowSchema.epub)]
+		if hasattr(FlowSchema, ebookFormat):
+			return [(provider, getattr(FlowSchema, ebookFormat))]
 
 		assert False, f"Unsupported ebook format: {ebookFormat}, only the following are supported: {str(', '.join([value.name for value in FlowSchema]))}."
 
@@ -49,6 +51,24 @@ class SandboxDirectory:
 
 	def cleanup(self) -> None:
 		pass  # ignore cleanup
+
+
+def createSiblingOutput(reference: pathlib.Path, extension: str) -> pathlib.Path:
+	"""Generate the name of a siblings file."""
+
+	def generateExtra() -> typing.Generator[str, None, None]:
+		yield ""
+		counter = 1
+		while True:
+			yield f".{counter:03}"
+			counter += 1
+
+	for extra in generateExtra():
+		path = reference.parent / f"{reference.stem}{extra}.{extension}"
+		if path.exists():
+			continue
+		return path
+	assert False, "Unreachable"
 
 
 if __name__ == "__main__":
@@ -77,6 +97,7 @@ if __name__ == "__main__":
 	actions = {
 	    "removeDRM": RemoveDRM(calibreConfigPath=args.calibre_config),
 	    "epub": EPub(),
+	    "cbz": Cbz(),
 	    "imagesToPdf": ImagesToPdf(),
 	    "discover": Discover(ebookFormat=args.format)
 	}
@@ -84,13 +105,17 @@ if __name__ == "__main__":
 	flows = FlowRegistry(schema=FlowSchema, actions=actions)
 	directory = tempfile.TemporaryDirectory() if args.sandbox is None else SandboxDirectory(path=args.sandbox)
 	try:
-		provider = ProviderEbook(ebook=args.ebook, keys=args.keys)
+		provider = ProviderEbook(ebook=args.ebook,
+		                         keys=args.keys,
+		                         metadata=ProviderEbookMetadata(title=args.ebook.stem))
 		flow = flows.restoreOrReset(pathlib.Path(directory.name), FlowSchema.auto, provider)  # type: ignore
-		flow.run()
+		providers = flow.run()
+
+		for output in providers:
+			if isinstance(output, ProviderPdf):
+				path = createSiblingOutput(args.ebook, "pdf")
+				shutil.move(output.path, path)
+				print(f"Output {path}.")
 
 	finally:
 		directory.cleanup()  # type: ignore
-
-	# bazel run tools/docker_images/ebook -- --key $(pwd)/temp/Adobe_PrivateLicenseKey--anonymous.der $(pwd)/temp/temp.epub
-	# tools/docker_images/ebook/ebook.py --key $(pwd)/temp/Adobe_PrivateLicenseKey--anonymous.der --format pdf $(pwd)/temp/temp.epub
-	# bazel run tools/docker_images/ebook -- $(pwd)/temp/temp_sanitized.nodrm.epub
