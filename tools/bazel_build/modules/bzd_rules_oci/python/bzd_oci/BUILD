@@ -12,16 +12,6 @@ py_library(
     ],
 )
 
-py_library(
-    name = "image",
-    srcs = ["image.py"],
-    data = [
-        "//:config.json",
-    ],
-    imports = [".."],
-    visibility = ["//visibility:public"],
-)
-
 bzd_python_binary_library(
     name = "bin",
     executables = {

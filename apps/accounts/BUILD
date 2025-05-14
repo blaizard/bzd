@@ -18,6 +18,7 @@ bzd_config_default(
 
 bzd_nodejs_oci(
     name = "accounts",
+    base = "@oci_nodejs",
     cmd = [
         "{backend}/apps/accounts/backend/app.mjs",
         "--static",

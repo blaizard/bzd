@@ -42,5 +42,6 @@ py_library(
 
 bzd_python_oci(
     name = "image",
+    base = "@oci_ebook",
     binary = ":ebook",
 )
