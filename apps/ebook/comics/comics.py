@@ -35,7 +35,7 @@ class Comics(ActionInterface):
 
 		nGramsCounter: Counter[str] = Counter()
 		for image in images:
-			nGrams = self.generateNGrams(image.stem, min(3, len(image.stem))) #  minimun one entry.
+			nGrams = self.generateNGrams(image.stem, min(3, len(image.stem)))  #  minimum one entry.
 			nGramsAll[image] = nGrams
 			nGramsCounter.update(nGrams)
 		nGramsCounterNormalized = {item: count / len(images) for item, count in nGramsCounter.items()}
