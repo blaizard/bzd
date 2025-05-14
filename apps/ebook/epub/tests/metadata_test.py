@@ -3,10 +3,10 @@ import pathlib
 import tempfile
 import datetime
 
-from tools.docker_images.ebook.epub.epub import EPub
-from tools.docker_images.ebook.epub.tests.driver_mock import DriverMock
-from tools.docker_images.ebook.epub.metadata import EPubMetadata
-from tools.docker_images.ebook.providers import ProviderEbook, ProviderEbookMetadata
+from apps.ebook.epub.epub import EPub
+from apps.ebook.epub.tests.driver_mock import DriverMock
+from apps.ebook.epub.metadata import EPubMetadata
+from apps.ebook.providers import ProviderEbook, ProviderEbookMetadata
 
 
 class TestRun(unittest.TestCase):

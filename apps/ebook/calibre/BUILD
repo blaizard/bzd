@@ -6,7 +6,7 @@ py_library(
         "calibre.py",
     ],
     deps = [
-        "//tools/docker_images/ebook:flow",
+        "//apps/ebook:flow",
     ],
 )
 
@@ -15,10 +15,10 @@ py_library(
     srcs = [
         "remove_drm.py",
     ],
-    visibility = ["//tools/docker_images/ebook:__pkg__"],
+    visibility = ["//apps/ebook:__pkg__"],
     deps = [
         ":calibre",
-        "//tools/docker_images/ebook:flow",
-        "//tools/docker_images/ebook:providers",
+        "//apps/ebook:flow",
+        "//apps/ebook:providers",
     ],
 )

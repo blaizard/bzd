@@ -11,10 +11,10 @@ import typing
 import zipfile
 import xml.etree.ElementTree as ET
 
-from tools.docker_images.ebook.epub.driver_selenium import DriverSelenium
-from tools.docker_images.ebook.epub.metadata import EPubMetadata
-from tools.docker_images.ebook.flow import ActionInterface, FlowEnum
-from tools.docker_images.ebook.providers import ProviderEbook, ProviderEbookMetadata, ProviderImages
+from apps.ebook.epub.driver_selenium import DriverSelenium
+from apps.ebook.epub.metadata import EPubMetadata
+from apps.ebook.flow import ActionInterface, FlowEnum
+from apps.ebook.providers import ProviderEbook, ProviderEbookMetadata, ProviderImages
 
 
 class EPub(ActionInterface):

@@ -6,9 +6,9 @@ py_library(
     srcs = [
         "images_to_pdf.py",
     ],
-    visibility = ["//tools/docker_images/ebook:__pkg__"],
+    visibility = ["//apps/ebook:__pkg__"],
     deps = [
-        "//tools/docker_images/ebook:flow",
-        "//tools/docker_images/ebook:providers",
+        "//apps/ebook:flow",
+        "//apps/ebook:providers",
     ] + requirement("pillow"),
 )

@@ -1,9 +1,9 @@
 import pathlib
 import typing
 
-from tools.docker_images.ebook.calibre.calibre import Calibre
-from tools.docker_images.ebook.flow import ActionInterface, FlowEnum
-from tools.docker_images.ebook.providers import ProviderEbook
+from apps.ebook.calibre.calibre import Calibre
+from apps.ebook.flow import ActionInterface, FlowEnum
+from apps.ebook.providers import ProviderEbook
 
 
 class RemoveDRM(ActionInterface):

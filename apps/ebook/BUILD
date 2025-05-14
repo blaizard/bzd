@@ -9,10 +9,11 @@ py_binary(
     deps = [
         ":flow",
         ":providers",
-        "//tools/docker_images/ebook/calibre:remove_drm",
-        "//tools/docker_images/ebook/cbz",
-        "//tools/docker_images/ebook/epub",
-        "//tools/docker_images/ebook/pillow:images_to_pdf",
+        "//apps/ebook/calibre:remove_drm",
+        "//apps/ebook/comics:cbr",
+        "//apps/ebook/comics:cbz",
+        "//apps/ebook/epub",
+        "//apps/ebook/pillow:images_to_pdf",
     ],
 )
 
@@ -22,7 +23,7 @@ py_library(
         "providers.py",
     ],
     visibility = [
-        "//tools/docker_images/ebook:__subpackages__",
+        "//apps/ebook:__subpackages__",
     ],
 )
 
@@ -32,7 +33,7 @@ py_library(
         "flow.py",
     ],
     visibility = [
-        "//tools/docker_images/ebook:__subpackages__",
+        "//apps/ebook:__subpackages__",
     ],
     deps = [
         ":providers",

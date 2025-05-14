@@ -6,12 +6,12 @@ py_library(
     srcs = [
         "epub.py",
     ],
-    visibility = ["//tools/docker_images/ebook:__subpackages__"],
+    visibility = ["//apps/ebook:__subpackages__"],
     deps = [
         ":driver_selenium",
         ":metadata",
-        "//tools/docker_images/ebook:flow",
-        "//tools/docker_images/ebook:providers",
+        "//apps/ebook:flow",
+        "//apps/ebook:providers",
     ],
 )
 
@@ -20,9 +20,9 @@ py_library(
     srcs = [
         "metadata.py",
     ],
-    visibility = ["//tools/docker_images/ebook/epub:__subpackages__"],
+    visibility = ["//apps/ebook/epub:__subpackages__"],
     deps = [
-        "//tools/docker_images/ebook:providers",
+        "//apps/ebook:providers",
     ],
 )
 

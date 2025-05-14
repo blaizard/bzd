@@ -4,7 +4,7 @@ It is necessary to use an old distro, in order to rely on an old glibc. This inc
 # Build
 
 ```bash
-docker build tools/docker_images/build -t blaizard/build:x86_64
+docker build apps/build -t blaizard/build:x86_64
 ```
 
 # Push

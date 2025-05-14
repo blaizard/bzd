@@ -1,7 +1,7 @@
 # Build
 
 ```bash
-docker build tools/docker_images/keeweb -t blaizard/keeweb:latest
+docker build apps/keeweb -t blaizard/keeweb:latest
 ```
 
 # Use

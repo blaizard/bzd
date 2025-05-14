@@ -9,9 +9,9 @@ py_test(
     main = "metadata_test.py",
     deps = [
         ":driver_mock",
-        "//tools/docker_images/ebook:providers",
-        "//tools/docker_images/ebook/epub",
-        "//tools/docker_images/ebook/epub:metadata",
+        "//apps/ebook:providers",
+        "//apps/ebook/epub",
+        "//apps/ebook/epub:metadata",
     ],
 )
 
@@ -20,8 +20,8 @@ py_library(
     srcs = [
         "driver_mock.py",
     ],
-    visibility = ["//tools/docker_images/ebook:__subpackages__"],
+    visibility = ["//apps/ebook:__subpackages__"],
     deps = [
-        "//tools/docker_images/ebook/epub:metadata",
+        "//apps/ebook/epub:metadata",
     ],
 )

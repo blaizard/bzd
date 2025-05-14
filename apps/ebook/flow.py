@@ -5,7 +5,7 @@ import json
 import dataclasses
 import shutil
 
-from tools.docker_images.ebook.providers import Provider, providerSerialize, providerDeserialize
+from apps.ebook.providers import Provider, providerSerialize, providerDeserialize
 
 FlowSchemaType = typing.List[str]
 

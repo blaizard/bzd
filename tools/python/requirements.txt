@@ -90,6 +90,8 @@ pytz==2024.2
     #   yfinance
 pyyaml==6.0.2
     # via -r tools/python/requirements.in
+rarfile==4.2
+    # via -r tools/python/requirements.in
 requests==2.32.3
     # via
     #   webdriver-manager

@@ -1,7 +1,7 @@
 import pathlib
 import typing
 import dataclasses
-from tools.docker_images.ebook.providers import ProviderEbookMetadata
+from apps.ebook.providers import ProviderEbookMetadata
 
 
 @dataclasses.dataclass

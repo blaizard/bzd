@@ -5,17 +5,19 @@ import typing
 import enum
 import shutil
 
-from tools.docker_images.ebook.calibre.remove_drm import RemoveDRM
-from tools.docker_images.ebook.epub.epub import EPub
-from tools.docker_images.ebook.cbz.cbz import Cbz
-from tools.docker_images.ebook.pillow.images_to_pdf import ImagesToPdf
-from tools.docker_images.ebook.flow import ActionInterface, FlowRegistry, FlowEnum, FlowSchemaType
-from tools.docker_images.ebook.providers import ProviderEbook, ProviderEbookMetadata, ProviderPdf, providerSerialize, providerDeserialize
+from apps.ebook.calibre.remove_drm import RemoveDRM
+from apps.ebook.epub.epub import EPub
+from apps.ebook.comics.cbz import Cbz
+from apps.ebook.comics.cbr import Cbr
+from apps.ebook.pillow.images_to_pdf import ImagesToPdf
+from apps.ebook.flow import ActionInterface, FlowRegistry, FlowEnum, FlowSchemaType
+from apps.ebook.providers import ProviderEbook, ProviderEbookMetadata, ProviderPdf, providerSerialize, providerDeserialize
 
 
 class FlowSchema(FlowEnum):
 	epub: FlowSchemaType = ["removeDRM", "epub", "imagesToPdf"]
 	cbz: FlowSchemaType = ["cbz", "imagesToPdf"]
+	cbr: FlowSchemaType = ["cbr", "imagesToPdf"]
 	auto: FlowSchemaType = ["discover"]
 
 
@@ -84,6 +86,7 @@ if __name__ == "__main__":
 	                    default=pathlib.Path.home() / ".config/calibre",
 	                    help="Calibre configuration path.")
 	parser.add_argument("--format", type=str, default=None, help="Assume a specific format for the ebook.")
+	parser.add_argument("--coefficient", type=float, default=1.0, help="Coefficient to be used to find outliers.")
 	parser.add_argument(
 	    "--sandbox",
 	    type=pathlib.Path,
@@ -97,7 +100,8 @@ if __name__ == "__main__":
 	actions = {
 	    "removeDRM": RemoveDRM(calibreConfigPath=args.calibre_config),
 	    "epub": EPub(),
-	    "cbz": Cbz(),
+	    "cbz": Cbz(coefficient=args.coefficient),
+	    "cbr": Cbr(coefficient=args.coefficient),
 	    "imagesToPdf": ImagesToPdf(),
 	    "discover": Discover(ebookFormat=args.format)
 	}
@@ -111,6 +115,7 @@ if __name__ == "__main__":
 		flow = flows.restoreOrReset(pathlib.Path(directory.name), FlowSchema.auto, provider)  # type: ignore
 		providers = flow.run()
 
+		print("--- result")
 		for output in providers:
 			if isinstance(output, ProviderPdf):
 				path = createSiblingOutput(args.ebook, "pdf")

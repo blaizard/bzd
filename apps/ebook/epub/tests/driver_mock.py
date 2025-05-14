@@ -1,7 +1,7 @@
 import pathlib
 import typing
 
-from tools.docker_images.ebook.epub.metadata import EPubMetadata
+from apps.ebook.epub.metadata import EPubMetadata
 
 
 class DriverMock:

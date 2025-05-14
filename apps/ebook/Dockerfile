@@ -7,6 +7,7 @@ RUN apt-get install -y --no-install-recommends \
     calibre \
 	wget \
 	unzip \
+	unrar \
 	vim \
 	sudo \
 	python3

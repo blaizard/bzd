@@ -12,7 +12,7 @@ from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 
-from tools.docker_images.ebook.epub.metadata import EPubMetadata
+from apps.ebook.epub.metadata import EPubMetadata
 
 
 class DriverSelenium:

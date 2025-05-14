@@ -1,8 +1,8 @@
 import pathlib
 import typing
 
-from tools.docker_images.ebook.flow import ActionInterface, FlowEnum
-from tools.docker_images.ebook.providers import ProviderImages, ProviderPdf
+from apps.ebook.flow import ActionInterface, FlowEnum
+from apps.ebook.providers import ProviderImages, ProviderPdf
 
 from PIL import Image
 

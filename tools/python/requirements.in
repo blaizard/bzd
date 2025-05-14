@@ -12,3 +12,4 @@ fsspec
 selenium
 webdriver-manager
 pillow
+rarfile
