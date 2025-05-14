@@ -13,7 +13,6 @@ bzd_nodejs_library(
 
 bzd_nodejs_oci(
     name = "dashboard",
-    base = "@oci_nodejs",
     cmd = [
         "{backend}/apps/dashboard/backend/app.mjs",
         "--static",

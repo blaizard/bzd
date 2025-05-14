@@ -17,3 +17,14 @@ pip.parse(
     requirements_lock = "@bzd_python//:requirements.txt",
 )
 use_repo(pip, "bzd_python_pip")
+
+images = use_extension("@bzd_rules_oci//:extensions.bzl", "images")
+images.pull(
+    name = "oci_minimal",
+    digest = "sha256:00a24d7c50ebe46934e31f6154c0434e2ab51259a65e028be42413c636385f7f",
+    image = "index.docker.io/library/debian",
+    platforms = [
+        "linux/amd64",
+    ],
+)
+use_repo(images, "oci_minimal")

@@ -15,6 +15,5 @@ py_binary(
 
 bzd_python_oci(
     name = "image",
-    base = "@oci_minimal",
     binary = ":docker_manager",
 )

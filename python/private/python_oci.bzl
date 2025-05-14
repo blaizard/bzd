@@ -3,7 +3,7 @@
 load("@bzd_rules_oci//:defs.bzl", "bzd_oci_binary", "bzd_oci_load")
 load("//private:python_hermetic_binary.bzl", "bzd_python_hermetic_launcher")
 
-def bzd_python_oci(name, binary, base, **kwargs):
+def bzd_python_oci(name, binary, base = Label("@oci_minimal"), **kwargs):
     """Rule for embedding a python application into Docker.
 
     Args:

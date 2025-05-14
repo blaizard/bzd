@@ -24,7 +24,6 @@ bzd_config_default(
 
 bzd_nodejs_oci(
     name = "artifacts",
-    base = "@oci_nodejs",
     cmd = [
         "{backend}/apps/artifacts/backend/app.mjs",
         "--static",

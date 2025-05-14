@@ -20,3 +20,14 @@ requirements_nodejs.parse(
     requirements = "//nodejs/requirements:requirements.json",
 )
 use_repo(requirements_nodejs, nodejs_deps = "bzd_rules_nodejs_deps")
+
+images = use_extension("@bzd_rules_oci//:extensions.bzl", "images")
+images.pull(
+    name = "oci_nodejs",
+    digest = "sha256:1467ea23cce893347696b155b9e00e7f0ac7d21555eb6f27236f1328212e045e",  # 23-alpine
+    image = "index.docker.io/library/node",
+    platforms = [
+        "linux/amd64",
+    ],
+)
+use_repo(images, "oci_nodejs")

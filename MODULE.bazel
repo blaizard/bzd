@@ -170,22 +170,6 @@ images.pull(
     image = "index.docker.io/blaizard/compiler_explorer",
 )
 images.pull(
-    name = "oci_minimal",
-    digest = "sha256:00a24d7c50ebe46934e31f6154c0434e2ab51259a65e028be42413c636385f7f",
-    image = "index.docker.io/library/debian",
-    platforms = [
-        "linux/amd64",
-    ],
-)
-images.pull(
-    name = "oci_nodejs",
-    digest = "sha256:1467ea23cce893347696b155b9e00e7f0ac7d21555eb6f27236f1328212e045e",  # 23-alpine
-    image = "index.docker.io/library/node",
-    platforms = [
-        "linux/amd64",
-    ],
-)
-images.pull(
     name = "oci_nodejs_puppeteer",
     digest = "sha256:68c92c4b27229e1a3ab27e359fb5474a6edc8cfb572e9b2d46fefc230ead7f65",
     image = "index.docker.io/blaizard/nodejs_puppeteer",
@@ -200,7 +184,7 @@ images.pull(
     digest = "sha256:d5df17da8271f80193a5f3a3b858153d4ede80ec63c3bcadc1ec3f9f88b9f768",
     image = "index.docker.io/blaizard/ebook",
 )
-use_repo(images, "oci_bridge", "oci_ebook", "oci_minimal", "oci_nodejs", "oci_nodejs_puppeteer")
+use_repo(images, "oci_bridge", "oci_ebook", "oci_nodejs_puppeteer")
 
 # Sanitizer
 
