@@ -13,25 +13,24 @@ bazel run apps/ebook -- --key $(pwd)/temp/Adobe_PrivateLicenseKey--anonymous.der
 Otherwise:
 
 ```bash
-bazel run apps/ebook -- --sandbox $(pwd)/sandbox $(pwd)/temp/temp.cbz
+bazel run apps/ebook -- $(pwd)/temp/temp.cbz
+```
+
+## Run using the docker image
+
+```bash
+bazel run apps/ebook:image.load
+# You need to mount the content that is intended to be accessible from docker.
+docker run -it --rm -v ./:/sandbox local/image:latest --key /sandbox/adobe_key.der /sandbox/universal.epub
 ```
 
 ## Docker
 
-### Build
+### Use a new docker image
 
 ```bash
 docker build apps/ebook -t blaizard/ebook:latest
-```
-
-### Use
-
-```bash
-docker run --name ebook --rm -it blaizard/ebook:latest
-```
-
-### Push
-
-```bash
 docker push blaizard/ebook:latest
 ```
+
+Don't forget to update the `digest` field of the `oci_ebook` image in the `MODULE.bazel`.

@@ -44,4 +44,5 @@ bzd_python_oci(
     name = "image",
     base = "@oci_ebook",
     binary = ":ebook",
+    visibility = ["//deployment:__subpackages__"],
 )

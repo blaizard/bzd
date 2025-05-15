@@ -181,7 +181,7 @@ images.pull(
 )
 images.pull(
     name = "oci_ebook",
-    digest = "sha256:d5df17da8271f80193a5f3a3b858153d4ede80ec63c3bcadc1ec3f9f88b9f768",
+    digest = "sha256:9bdf40cd46310c4e5bef75b7723e060629a78ce4ce7fa529522e49a433bae1bf",
     image = "index.docker.io/blaizard/ebook",
 )
 use_repo(images, "oci_bridge", "oci_ebook", "oci_nodejs_puppeteer")
