@@ -118,7 +118,7 @@ if __name__ == "__main__":
 		print("--- result")
 		for output in providers:
 			if isinstance(output, ProviderPdf):
-				path = createSiblingOutput(args.ebook, "pdf")
+				path = createSiblingOutput(args.ebook.parent / output.path.name, "pdf")
 				shutil.move(output.path, path)
 				print(f"Output {path}.")
 

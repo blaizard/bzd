@@ -21,7 +21,7 @@ bazel run apps/ebook -- $(pwd)/temp/temp.cbz
 ```bash
 bazel run apps/ebook:image.load
 # You need to mount the content that is intended to be accessible from docker.
-docker run -it --rm -v ./:/sandbox local/image:latest --key /sandbox/adobe_key.der /sandbox/universal.epub
+docker run -it --rm -v .:/sandbox local/image:latest --key /sandbox/adobe_key.der /sandbox/universal.epub
 ```
 
 ## Docker
