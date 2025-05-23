@@ -69,20 +69,17 @@ bzd_nodejs_binary(
     ],
     deps = [
         ":plugin",
-        "//apps/accounts/authentication:server",
         "//apps/artifacts/plugins:backend",
         "//nodejs/core:cache2",
         "//nodejs/core:exception",
         "//nodejs/core:filesystem",
         "//nodejs/core:log",
         "//nodejs/core/http:endpoint",
-        "//nodejs/core/http:server",
-        "//nodejs/core/http/mock:server",
-        "//nodejs/core/rest:server",
         "//nodejs/core/services",
         "//nodejs/core/statistics",
         "//nodejs/db:utils",
         "//nodejs/db/key_value_store:disk",
+        "//nodejs/vue/apps:backend",
     ],
 )
 

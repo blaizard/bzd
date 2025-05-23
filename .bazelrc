@@ -6,9 +6,6 @@ try-import deployment/.bazelrc
 # Add timestamps
 common --show_timestamps
 
-# Ensure the /tmp directory is empty.
-common --sandbox_tmpfs_path=/tmp
-
 # If a command fails, print out the full command line.
 # https://bazel.build/reference/command-line-reference#flag--verbose_failures
 build --verbose_failures

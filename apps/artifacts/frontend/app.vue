@@ -1,15 +1,8 @@
 <template>
-	<Layout :full-page="true">
-		<template #header>
-			<a @click="handleHeader"><i class="bzd-icon-artifact"></i> Artifacts</a>
-		</template>
+	<Application>
 		<template #actions>
 			<template v-if="$authentication.isAuthenticated">
 				<MenuEntry text="Services" icon="bzd-icon-tile" link="/services"></MenuEntry>
-				<MenuEntry v-if="$authentication.hasLogout()" text="Logout" icon="bzd-icon-close" link="/logout"></MenuEntry>
-			</template>
-			<template v-else>
-				<MenuEntry text="Login" icon="bzd-icon-user" link="/login"></MenuEntry>
 			</template>
 		</template>
 		<template #content>
@@ -22,19 +15,19 @@
 				</div>
 			</div>
 		</template>
-	</Layout>
+	</Application>
 </template>
 
 <script>
 	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
-	import Layout from "#bzd/nodejs/vue/components/layout/layout.vue";
+	import Application from "#bzd/nodejs/vue/apps/application.vue";
 	import Tree from "./tree.vue";
 	import MenuEntry from "#bzd/nodejs/vue/components/menu/entry.vue";
 	import configGlobal from "#bzd/apps/artifacts/config.json" with { type: "json" };
 
 	export default {
 		components: {
-			Layout,
+			Application,
 			Tree,
 			MenuEntry,
 		},
@@ -85,29 +78,14 @@
 			handleShowPath(path) {
 				this.showPath = path;
 			},
-			async handleLogout() {
-				await this.$rest.logout();
-				this.$router.dispatch("/");
-			},
-			handleHeader() {
-				this.$router.dispatch("/");
-			},
 		},
 	};
 </script>
 
 <style lang="scss">
-	@use "@/nodejs/styles/default/css/base.scss" as *;
-	@use "@/nodejs/styles/default/css/tooltip.scss" as *;
-	@use "@/nodejs/styles/default/css/loading.scss" as *;
-
 	@use "@/nodejs/icons.scss" as icons with (
-		$bzdIconNames: add tile user close user
+		$bzdIconNames: add tile
 	);
-
-	.bzd-icon-artifact {
-		@include icons.defineIcon("svg/artifact.svg");
-	}
 
 	.bzd-content {
 		margin: 10px;

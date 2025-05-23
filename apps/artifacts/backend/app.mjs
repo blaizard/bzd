@@ -1,9 +1,5 @@
-import RestServer from "#bzd/nodejs/core/rest/server.mjs";
-
 import Cache2 from "#bzd/nodejs/core/cache2.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
-import HttpServer from "#bzd/nodejs/core/http/server.mjs";
-import MockHttpServer from "#bzd/nodejs/core/http/mock/server.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import Permissions from "#bzd/nodejs/db/storage/permissions.mjs";
 import { CollectionPaging } from "#bzd/nodejs/db/utils.mjs";
@@ -12,13 +8,14 @@ import Statistics from "#bzd/nodejs/core/statistics/statistics.mjs";
 import Services from "#bzd/nodejs/core/services/services.mjs";
 import ServiceProvider from "#bzd/nodejs/core/services/provider.mjs";
 import EndpointsFactory from "#bzd/apps/artifacts/backend/endpoints_factory.mjs";
-import Authentication from "#bzd/apps/accounts/authentication/server.mjs";
 import Plugin from "#bzd/apps/artifacts/backend/plugin.mjs";
 import APIv1 from "#bzd/api.json" with { type: "json" };
 import Plugins from "#bzd/apps/artifacts/plugins/backend.mjs";
 import config from "#bzd/apps/artifacts/backend/config.json" with { type: "json" };
 import configGlobal from "#bzd/apps/artifacts/config.json" with { type: "json" };
 import { FileNotFoundError } from "#bzd/nodejs/db/storage/storage.mjs";
+
+import Backend from "#bzd/nodejs/vue/apps/backend.mjs";
 
 const Log = LogFactory("backend");
 const Exception = ExceptionFactory("backend");
@@ -59,19 +56,18 @@ program
 	const statistics = new Statistics();
 	statistics.register(cache.statistics(), "backend");
 
-	const authentication = Authentication.make(configGlobal.accounts);
+	// Backend
+	const backend = Backend.make(TEST)
+		.useAuthentication(configGlobal.accounts)
+		.useRest(APIv1.rest)
+		.setup(PORT, PATH_STATIC);
+
+	backend.rest.installPlugins(services, statistics);
+
 	for (const [token, options] of Object.entries(config["tokens"] || {})) {
-		await authentication.preloadApplicationToken(token, options["scopes"]);
+		await backend.authentication.preloadApplicationToken(token, options["scopes"]);
 	}
 	Log.info("Preloaded {} application token(s).", Object.keys(config["tokens"] || {}).length);
-
-	// Set-up the web server
-	const web = TEST ? new MockHttpServer() : new HttpServer(PORT);
-	const rest = new RestServer(APIv1.rest, {
-		authentication: authentication,
-		channel: web,
-	});
-	rest.installPlugins(authentication, services, statistics);
 
 	// Add initial volumes.
 	for (const [volume, options] of Object.entries(config.volumes)) {
@@ -122,8 +118,8 @@ program
 
 	// Redirect /file/** to /file?path=**
 	// It is needed to do this before the REST API as it takes precedence.
-	web.addRoute("get", "/file/{path:*}", async (context) => {
-		context.redirect(rest.getEndpoint("/file?path=" + context.getParam("path")));
+	backend.web.addRoute("get", "/file/{path:*}", async (context) => {
+		context.redirect(backend.rest.getEndpoint("/file?path=" + context.getParam("path")));
 	});
 
 	// Adding REST handlers.
@@ -142,7 +138,7 @@ program
 			return false;
 		}
 		if ("private" in volumes[volume].options) {
-			const maybeSession = await authentication.verify(context, /*scopes*/ [volume]);
+			const maybeSession = await backend.authentication.verify(context, /*scopes*/ [volume]);
 			if (!maybeSession) {
 				return false;
 			}
@@ -152,7 +148,7 @@ program
 
 	async function assertAuthorizedVolume(context, volume) {
 		if (!(await isAuthorizedVolume(context, volume))) {
-			throw authentication.httpErrorUnauthorized(/*requestAuthentication*/ true);
+			throw backend.authentication.httpErrorUnauthorized(/*requestAuthentication*/ true);
 		}
 	}
 
@@ -167,7 +163,7 @@ program
 		);
 	}
 
-	rest.handle(
+	backend.rest.handle(
 		"get",
 		"/file",
 		async function (inputs) {
@@ -197,7 +193,7 @@ program
 		},
 	);
 
-	rest.handle("post", "/list", async function (inputs) {
+	backend.rest.handle("post", "/list", async function (inputs) {
 		try {
 			const { volume, pathList } = getInternalPath(inputs.path);
 			const maxOrPaging = "paging" in inputs ? inputs.paging : 50;
@@ -246,7 +242,7 @@ program
 			for (const endpoint of endpoints) {
 				const route = "/x/" + volume + endpoint.path;
 				Log.info("Adding route {}::{}", method, route);
-				web.addRoute(
+				backend.web.addRoute(
 					method,
 					route,
 					async (context) => {
@@ -260,16 +256,13 @@ program
 		}
 	}
 	// Catch all to return 404 in case a wrong path is given.
-	web.addRoute("*", "/x/{all:*}", (context) => context.sendStatus(404, "File Not Found"));
-
-	Log.info("Application started");
-	web.addStaticRoute("/", PATH_STATIC);
-	web.start();
+	backend.web.addRoute("*", "/x/{all:*}", (context) => context.sendStatus(404, "File Not Found"));
+	await backend.start();
 
 	if (TEST) {
-		await web.test(config.tests || []);
+		await backend.web.test(config.tests || []);
 
-		web.stop();
+		backend.web.stop();
 		await services.stop();
 		Log.info("Application stopped");
 	}

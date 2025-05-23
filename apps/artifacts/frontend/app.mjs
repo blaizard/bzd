@@ -1,52 +1,26 @@
-import { createApp } from "vue";
-
-import Permissions from "#bzd/nodejs/db/storage/permissions.mjs";
-import RestPlugin from "#bzd/nodejs/vue/rest.mjs";
-import CachePlugin from "#bzd/nodejs/vue/cache.mjs";
-import Notification from "#bzd/nodejs/vue/notification.mjs";
-import Router from "#bzd/nodejs/vue/router/router.mjs";
-import AsyncComputed from "vue-async-computed";
-import Authentication from "#bzd/apps/accounts/authentication/client.mjs";
-import AuthenticationPlugin from "#bzd/nodejs/vue/authentication.mjs";
 import configGlobal from "#bzd/apps/artifacts/config.json" with { type: "json" };
-
 import APIv1 from "#bzd/api.json" with { type: "json" };
+import Frontend from "#bzd/nodejs/vue/apps/frontend.mjs";
+import Permissions from "#bzd/nodejs/db/storage/permissions.mjs";
+import CachePlugin from "#bzd/nodejs/vue/cache.mjs";
+import icon from "#bzd/apps/artifacts/frontend/svg/artifact.svg?url";
 
 import App from "./app.vue";
 
-const app = createApp(App);
+import AsyncComputed from "vue-async-computed";
 
-// ---- Authentication ----
+const frontend = Frontend.make(App)
+	.useMetadata({
+		title: "Artifacts",
+		icon: icon,
+	})
+	.useRest(APIv1.rest)
+	.useAuthentication(configGlobal.accounts)
+	.useRest(APIv1.rest)
+	.setup();
 
-const authentication = Authentication.make(
-	Object.assign(
-		{
-			unauthorizedCallback: async (needAuthentication) => {
-				console.log("Unauthorized!", needAuthentication);
-			},
-		},
-		configGlobal.accounts,
-	),
-);
-app.use(AuthenticationPlugin, {
-	authentication: authentication,
-});
-
-// ---- REST ----
-
-app.use(AsyncComputed);
-app.use(Notification);
-app.use(Router, {
-	hash: false,
-	authentication: authentication,
-});
-app.use(RestPlugin, {
-	schema: APIv1.rest,
-	authentication: authentication,
-	plugins: [authentication],
-});
-
-app.use(CachePlugin, {
+frontend.app.use(AsyncComputed);
+frontend.app.use(CachePlugin, {
 	list: {
 		cache: async (...pathList) => {
 			// The following 3 statements need to be fixed, not clean
@@ -62,7 +36,7 @@ app.use(CachePlugin, {
 			let list = [];
 
 			do {
-				const response = await app.config.globalProperties.$rest.request("post", "/list", {
+				const response = await frontend.app.config.globalProperties.$rest.request("post", "/list", {
 					path: pathList,
 					paging: next,
 				});
@@ -86,4 +60,4 @@ app.use(CachePlugin, {
 	},
 });
 
-app.mount("#app");
+frontend.mount("#app");
