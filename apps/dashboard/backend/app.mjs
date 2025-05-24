@@ -54,7 +54,8 @@ class EventsFactory {
 		.useRest(APIv1.rest)
 		.useServices()
 		.useStatistics()
-		.setup(PORT, PATH_STATIC);
+		.useStaticContent(PATH_STATIC)
+		.setup(PORT);
 
 	let cache = new Cache({
 		garbageCollector: !TEST,

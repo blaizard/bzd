@@ -16,7 +16,6 @@ const frontend = Frontend.make(App)
 	})
 	.useRest(APIv1.rest)
 	.useAuthentication(configGlobal.accounts)
-	.useRest(APIv1.rest)
 	.setup();
 
 frontend.app.use(AsyncComputed);

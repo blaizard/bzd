@@ -49,7 +49,8 @@ program
 		.useServices()
 		.useCache()
 		.useStatistics()
-		.setup(PORT, PATH_STATIC);
+		.useStaticContent(PATH_STATIC)
+		.setup(PORT);
 
 	for (const [token, options] of Object.entries(config["tokens"] || {})) {
 		await backend.authentication.preloadApplicationToken(token, options["scopes"]);

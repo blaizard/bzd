@@ -38,6 +38,7 @@ export default class Frontend {
 	/// Set-up the authentication object.
 	useAuthentication(options) {
 		Exception.assert(this.isSetup == false, "Frontend already set-up.");
+		Exception.assert(!this.instances.authentication, "Authentication already set-up.");
 		this.instances.authentication = Authentication.make(
 			Object.assign(
 				{
@@ -57,6 +58,7 @@ export default class Frontend {
 	/// Set-up the rest object.
 	useRest(options) {
 		Exception.assert(this.isSetup == false, "Frontend already set-up.");
+		Exception.assert(!this.restOptions, "Rest already set-up.");
 		this.restOptions = options;
 		return this;
 	}

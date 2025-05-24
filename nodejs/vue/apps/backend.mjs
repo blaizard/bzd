@@ -21,6 +21,7 @@ export default class Backend {
 			cache: null,
 			statistics: null,
 			services: null,
+			staticPath: null,
 		};
 		this.restOptions = null;
 		this.test = test;
@@ -77,6 +78,7 @@ export default class Backend {
 	/// Set-up the authentication object.
 	useAuthentication(options) {
 		Exception.assert(this.isSetup == false, "Backend already set-up.");
+		Exception.assert(!this.instances.authentication, "Authentication already set-up.");
 		this.instances.authentication = Authentication.make(options);
 		return this;
 	}
@@ -84,6 +86,7 @@ export default class Backend {
 	/// Set-up the rest object.
 	useRest(options) {
 		Exception.assert(this.isSetup == false, "Backend already set-up.");
+		Exception.assert(!this.restOptions, "Rest already set-up.");
 		this.restOptions = options;
 		return this;
 	}
@@ -91,6 +94,7 @@ export default class Backend {
 	/// Set-up the cache object.
 	useCache() {
 		Exception.assert(this.isSetup == false, "Backend already set-up.");
+		Exception.assert(!this.instances.cache, "Cache already set-up.");
 		this.instances.cache = new Cache2();
 		return this;
 	}
@@ -98,6 +102,7 @@ export default class Backend {
 	/// Set-up the services object.
 	useServices() {
 		Exception.assert(this.isSetup == false, "Backend already set-up.");
+		Exception.assert(!this.instances.services, "Services already set-up.");
 		this.instances.services = new Services();
 		return this;
 	}
@@ -105,21 +110,24 @@ export default class Backend {
 	/// Set-up the statistics object.
 	useStatistics() {
 		Exception.assert(this.isSetup == false, "Backend already set-up.");
+		Exception.assert(!this.instances.statistics, "Statistics already set-up.");
 		this.instances.statistics = new Statistics();
 		return this;
 	}
 
+	useStaticContent(path) {
+		Exception.assert(this.isSetup == false, "Backend already set-up.");
+		Exception.assert(!this.instances.staticPath, "Static content already set-up.");
+		this.instances.staticPath = path;
+		return this;
+	}
+
 	/// Set-up the web server.
-	setup(port, staticPath) {
+	setup(port) {
 		Exception.assert(this.isSetup == false, "Backend already set-up.");
 		this.isSetup = true;
 
-		// Set-up the web server.
 		this.instances.web = this.test ? new MockHttpServer() : new HttpServer(port);
-		if (staticPath) {
-			this.instances.web.addStaticRoute("/", staticPath);
-			Log.info("Serving static content from '{}'.", staticPath);
-		}
 
 		if (this.instances.services) {
 			Log.info("Setting up services");
@@ -162,6 +170,12 @@ export default class Backend {
 			Log.info("Starting services");
 			await this.instances.services.start();
 		}
+
+		if (this.instances.staticPath) {
+			this.instances.web.addStaticRoute("/", this.instances.staticPath);
+			Log.info("Serving static content from '{}'.", this.instances.staticPath);
+		}
+
 		Log.info("Starting web server");
 		await this.instances.web.start();
 	}
