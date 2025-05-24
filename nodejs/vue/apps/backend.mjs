@@ -121,21 +121,22 @@ export default class Backend {
 			Log.info("Serving static content from '{}'.", staticPath);
 		}
 
-		// Setup services.
 		if (this.instances.services) {
+			Log.info("Setting up services");
 			if (this.instances.cache) {
 				this.instances.services.register(this.instances.cache.serviceGarbageCollector("cache"), "backend");
 			}
 		}
 
-		// Setup statistics.
 		if (this.instances.statistics) {
+			Log.info("Setting up statistics");
 			if (this.instances.cache) {
 				this.instances.statistics.register(this.instances.cache.statistics(), "backend");
 			}
 		}
 
 		if (this.restOptions) {
+			Log.info("Setting up rest server");
 			this.instances.rest = new RestServer(this.restOptions, {
 				authentication: this.instances.authentication || null,
 				channel: this.instances.web,

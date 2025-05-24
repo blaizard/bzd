@@ -18,7 +18,9 @@ bzd_nodejs_web_binary(
         "**/*.vue",
         "**/*.svg",
         "**/*.mjs",
-    ]),
+    ]) + [
+        "//apps/dashboard:config.json",
+    ],
     apis = ["//apps/dashboard:api.v1.json"],
     config_scss = "//nodejs/styles:default.scss",
     data = [
@@ -32,21 +34,15 @@ bzd_nodejs_web_binary(
     deps = [
         "//apps/dashboard/plugins:plugins.frontend",
         "//nodejs:icons",
-        "//nodejs:vue",
         "//nodejs/core:exception",
         "//nodejs/core:log",
         "//nodejs/core/http:client",
         "//nodejs/styles/default",
         "//nodejs/utils:color",
-        "//nodejs/vue:notification",
-        "//nodejs/vue:rest",
+        "//nodejs/vue/apps:frontend",
         "//nodejs/vue/components/form",
-        "//nodejs/vue/components/layout",
-        "//nodejs/vue/components/layout:component",
-        "//nodejs/vue/components/menu:entry",
         "//nodejs/vue/directives:loading",
         "//nodejs/vue/directives:tooltip",
-        "//nodejs/vue/router",
     ],
 )
 

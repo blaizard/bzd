@@ -1,21 +1,16 @@
-import { createApp } from "vue";
-
-import RestPlugin from "#bzd/nodejs/vue/rest.mjs";
-import Notification from "#bzd/nodejs/vue/notification.mjs";
-import Router from "#bzd/nodejs/vue/router/router.mjs";
-
+import Frontend from "#bzd/nodejs/vue/apps/frontend.mjs";
+import configGlobal from "#bzd/apps/dashboard/config.json" with { type: "json" };
 import APIv1 from "#bzd/api.json" with { type: "json" };
+import icon from "#bzd/apps/dashboard/frontend/icon.svg?url";
 
 import App from "./app.vue";
 
-const app = createApp(App);
-
-app.use(Router, {
-	hash: false,
-});
-app.use(RestPlugin, {
-	schema: APIv1.rest,
-});
-app.use(Notification);
-
-app.mount("#app");
+const frontend = Frontend.make(App)
+	.useMetadata({
+		title: "Dashboard",
+		icon: icon,
+	})
+	.useRest(APIv1.rest)
+	.useAuthentication(configGlobal.accounts)
+	.setup();
+frontend.mount("#app");

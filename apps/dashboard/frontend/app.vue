@@ -1,24 +1,18 @@
 <template>
-	<Layout>
-		<template #header
-			><RouterLink link="/"><i class="bzd-icon-main"></i> Dashboard</RouterLink>
-		</template>
-		<template #menu> </template>
+	<Application>
 		<template #content>
 			<RouterComponent name="view" class="bzd-content"></RouterComponent>
 		</template>
-	</Layout>
+	</Application>
 </template>
 
 <script>
 	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
-	import Layout from "#bzd/nodejs/vue/components/layout/layout.vue";
-	import MenuEntry from "#bzd/nodejs/vue/components/menu/entry.vue";
+	import Application from "#bzd/nodejs/vue/apps/application.vue";
 
 	export default {
 		components: {
-			Layout,
-			MenuEntry,
+			Application,
 		},
 		directives: {
 			tooltip: DirectiveTooltip,
@@ -37,18 +31,6 @@
 </script>
 
 <style lang="scss">
-	@use "@/nodejs/styles/default/css/base.scss" as *;
-	@use "@/nodejs/styles/default/css/tooltip.scss" as *;
-	@use "@/nodejs/styles/default/css/loading.scss" as *;
-
-	@use "@/nodejs/icons.scss" as icons with (
-		$bzdIconNames: add check
-	);
-
-	.bzd-icon-main {
-		@include icons.defineIcon("@/apps/dashboard/frontend/icon.svg");
-	}
-
 	.bzd-content {
 		padding: 20px;
 	}

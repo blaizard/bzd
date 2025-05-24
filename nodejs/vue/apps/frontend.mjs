@@ -88,6 +88,7 @@ export default class Frontend {
 		this.instances.app.use(Notification);
 
 		if (this.restOptions) {
+			Log.info("Setting up rest client");
 			let plugins = [];
 			if (this.instances.authentication) {
 				plugins.push(this.instances.authentication);
