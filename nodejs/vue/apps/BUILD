@@ -10,11 +10,14 @@ bzd_nodejs_library(
     ],
     deps = [
         "//apps/accounts/authentication:server",
+        "//nodejs/core:cache2",
         "//nodejs/core:exception",
         "//nodejs/core:log",
         "//nodejs/core/http:server",
         "//nodejs/core/http/mock:server",
         "//nodejs/core/rest:server",
+        "//nodejs/core/services",
+        "//nodejs/core/statistics",
     ],
 )
 

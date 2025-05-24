@@ -1,11 +1,8 @@
-import Cache2 from "#bzd/nodejs/core/cache2.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import Permissions from "#bzd/nodejs/db/storage/permissions.mjs";
 import { CollectionPaging } from "#bzd/nodejs/db/utils.mjs";
 import { Command } from "commander/esm.mjs";
-import Statistics from "#bzd/nodejs/core/statistics/statistics.mjs";
-import Services from "#bzd/nodejs/core/services/services.mjs";
 import ServiceProvider from "#bzd/nodejs/core/services/provider.mjs";
 import EndpointsFactory from "#bzd/apps/artifacts/backend/endpoints_factory.mjs";
 import Plugin from "#bzd/apps/artifacts/backend/plugin.mjs";
@@ -45,24 +42,14 @@ program
 
 	const volumes = {};
 
-	// Set the cache
-	const cache = new Cache2();
-
-	// Services
-	const services = new Services();
-	services.register(cache.serviceGarbageCollector("cache"), "backend");
-
-	// Statistics
-	const statistics = new Statistics();
-	statistics.register(cache.statistics(), "backend");
-
 	// Backend
 	const backend = Backend.make(TEST)
 		.useAuthentication(configGlobal.accounts)
 		.useRest(APIv1.rest)
+		.useServices()
+		.useCache()
+		.useStatistics()
 		.setup(PORT, PATH_STATIC);
-
-	backend.rest.installPlugins(services, statistics);
 
 	for (const [token, options] of Object.entries(config["tokens"] || {})) {
 		await backend.authentication.preloadApplicationToken(token, options["scopes"]);
@@ -81,10 +68,10 @@ program
 		const instance = new Plugins[type](volume, options, provider, endpoints);
 		provider.addStopProcess(() => {
 			// This stop process will be executed at last.
-			cache.setDirty("volume", volume);
+			backend.cache.setDirty("volume", volume);
 			instance.resetStorage();
 		});
-		const serviceId = services.register(provider, type);
+		const serviceId = backend.services.register(provider, type);
 
 		volumes[volume] = {
 			options: options,
@@ -95,14 +82,11 @@ program
 	}
 
 	// Retrieve the storage implementation associated with this volume
-	cache.register("volume", async (volume) => {
+	backend.cache.register("volume", async (volume) => {
 		Exception.assert(volume in volumes, "No volume are associated with this id: '{}'", volume);
 		const instance = volumes[volume].instance;
 		return instance.getStorage();
 	});
-
-	// Start all the services.
-	await services.start();
 
 	// Docker GCR example
 	// await keyValueStore.set("volume", "docker.gcr", {
@@ -154,7 +138,7 @@ program
 
 	function assertVolumeReady(volume) {
 		const serviceId = volumes[volume].serviceId;
-		const state = services.getService(serviceId);
+		const state = backend.services.getService(serviceId);
 		Exception.assertPrecondition(
 			state.status == "running",
 			"Volume '{}' is not ready, status: '{}'.",
@@ -174,7 +158,7 @@ program
 				await assertAuthorizedVolume(this, volume);
 
 				Exception.assertPrecondition(volume, "There is no volume associated with this path: '{}'.", inputs.path);
-				const storage = await cache.get("volume", volume);
+				const storage = await backend.cache.get("volume", volume);
 				const metadata = await storage.metadata(pathList);
 				if (metadata.size) {
 					this.setHeader("Content-Length", metadata.size);
@@ -222,7 +206,7 @@ program
 			assertVolumeReady(volume);
 			await assertAuthorizedVolume(this, volume);
 
-			const storage = await cache.get("volume", volume);
+			const storage = await backend.cache.get("volume", volume);
 			const result = await storage.list(pathList, maxOrPaging, /*includeMetadata*/ true);
 
 			return {
@@ -261,9 +245,6 @@ program
 
 	if (TEST) {
 		await backend.web.test(config.tests || []);
-
-		backend.web.stop();
-		await services.stop();
-		Log.info("Application stopped");
+		await backend.stop();
 	}
 })();
