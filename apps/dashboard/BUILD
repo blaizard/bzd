@@ -1,13 +1,23 @@
-load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library", "bzd_nodejs_oci")
+load("@bzd_lib//config:defs.bzl", "bzd_config_default")
+load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_oci")
 
-bzd_nodejs_library(
-    name = "api",
-    srcs = [
+exports_files(
+    [
         "api.v1.json",
     ],
     visibility = [
         "//apps/dashboard/backend:__pkg__",
         "//apps/dashboard/frontend:__pkg__",
+    ],
+)
+
+bzd_config_default(
+    name = "config",
+    srcs = [
+        "config.default.json",
+    ],
+    visibility = [
+        "//apps/dashboard:__subpackages__",
     ],
 )
 

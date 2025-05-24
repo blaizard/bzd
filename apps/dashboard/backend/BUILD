@@ -17,7 +17,9 @@ bzd_nodejs_binary(
     srcs = [
         "app.mjs",
         ":config.json",
+        "//apps/dashboard:config.json",
     ],
+    apis = ["//apps/dashboard:api.v1.json"],
     args = [
         "--static",
         "$(rootpath //apps/dashboard/frontend).bundle",
@@ -33,15 +35,12 @@ bzd_nodejs_binary(
         "//apps/dashboard:__pkg__",
     ],
     deps = [
-        "//apps/dashboard:api",
         "//apps/dashboard/plugins:plugins.backend",
         "//nodejs/core:cache",
         "//nodejs/core:filesystem",
         "//nodejs/core/http:client",
-        "//nodejs/core/http:server",
-        "//nodejs/core/http/mock:server",
-        "//nodejs/core/rest:server",
         "//nodejs/utils:uid",
+        "//nodejs/vue/apps:backend",
     ],
 )
 

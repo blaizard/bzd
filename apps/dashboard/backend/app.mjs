@@ -1,15 +1,15 @@
-import RestServer from "#bzd/nodejs/core/rest/server.mjs";
 import Cache from "#bzd/nodejs/core/cache.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
-import HttpServer from "#bzd/nodejs/core/http/server.mjs";
-import MockHttpServer from "#bzd/nodejs/core/http/mock/server.mjs";
 import HttpClient from "#bzd/nodejs/core/http/client.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import { Command } from "commander/esm.mjs";
+import configGlobal from "#bzd/apps/dashboard/config.json" with { type: "json" };
 import config from "#bzd/apps/dashboard/backend/config.json" with { type: "json" };
 import { makeUid } from "#bzd/nodejs/utils/uid.mjs";
-import APIv1 from "#bzd/apps/dashboard/api.v1.json" with { type: "json" };
+import APIv1 from "#bzd/api.json" with { type: "json" };
 import Plugins from "#bzd/apps/dashboard/plugins/plugins.backend.index.mjs";
+
+import Backend from "#bzd/nodejs/vue/apps/backend.mjs";
 
 const Exception = ExceptionFactory("backend");
 const Log = LogFactory("backend");
@@ -48,9 +48,13 @@ class EventsFactory {
 	const PATH_STATIC = program.opts().static;
 	const TEST = program.opts().test;
 
-	// Set-up the web server
-	const web = TEST ? new MockHttpServer() : new HttpServer(PORT);
-	web.addStaticRoute("/", PATH_STATIC);
+	// Backend
+	const backend = Backend.make(TEST)
+		.useAuthentication(configGlobal.accounts)
+		.useRest(APIv1.rest)
+		.useServices()
+		.useStatistics()
+		.setup(PORT, PATH_STATIC);
 
 	let cache = new Cache({
 		garbageCollector: !TEST,
@@ -165,27 +169,24 @@ class EventsFactory {
 		},
 	);
 
-	// Install the APIs
+	// Install the REST APIs.
 
-	let api = new RestServer(APIv1.rest, {
-		channel: web,
-	});
-	api.handle("get", "/check-url", async (inputs) => {
+	backend.rest.handle("get", "/check-url", async (inputs) => {
 		return { valid: await cache.get("check-url", inputs.url) };
 	});
-	api.handle("get", "/layout", async () => {
+	backend.rest.handle("get", "/layout", async () => {
 		return {
 			layout: layout,
 		};
 	});
-	api.handle("get", "/instance", async (inputs) => {
+	backend.rest.handle("get", "/instance", async (inputs) => {
 		return plugins[inputs.uid].config;
 	});
-	api.handle("get", "/data", async (inputs) => {
+	backend.rest.handle("get", "/data", async (inputs) => {
 		const pluginType = uidToType(inputs.uid, /*mustExist*/ true);
 		return await cache.get(pluginType, inputs.uid);
 	});
-	api.handle("post", "/event", async (inputs) => {
+	backend.rest.handle("post", "/event", async (inputs) => {
 		Exception.assert(inputs.uid in events, "No event associated with '{}'.", inputs.uid);
 		Exception.assert(
 			inputs.event in events[inputs.uid],
@@ -202,14 +203,10 @@ class EventsFactory {
 		return await cache.get(pluginType, inputs.uid);
 	});
 
-	Log.info("Serving static content from '{}'.", PATH_STATIC);
-	Log.info("Application started");
-	web.start();
+	await backend.start();
 
 	if (TEST) {
-		await web.test(config.tests || []);
-
-		web.stop();
-		Log.info("Application stopped");
+		await backend.web.test(config.tests || []);
+		await backend.stop();
 	}
 })();

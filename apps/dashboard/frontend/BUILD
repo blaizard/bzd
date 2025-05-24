@@ -19,6 +19,7 @@ bzd_nodejs_web_binary(
         "**/*.svg",
         "**/*.mjs",
     ]),
+    apis = ["//apps/dashboard:api.v1.json"],
     config_scss = "//nodejs/styles:default.scss",
     data = [
         ":config",
@@ -29,7 +30,6 @@ bzd_nodejs_web_binary(
         "//apps/dashboard/backend:__pkg__",
     ],
     deps = [
-        "//apps/dashboard:api",
         "//apps/dashboard/plugins:plugins.frontend",
         "//nodejs:icons",
         "//nodejs:vue",
