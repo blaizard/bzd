@@ -7,6 +7,7 @@ import Authentication from "#bzd/apps/accounts/authentication/server.mjs";
 import Services from "#bzd/nodejs/core/services/services.mjs";
 import Cache2 from "#bzd/nodejs/core/cache2.mjs";
 import Statistics from "#bzd/nodejs/core/statistics/statistics.mjs";
+import config from "#bzd/nodejs/vue/apps/config.json" with { type: "json" };
 
 const Exception = ExceptionFactory("backend");
 const Log = LogFactory("backend");
@@ -76,7 +77,7 @@ export default class Backend {
 	}
 
 	/// Set-up the authentication object.
-	useAuthentication(options) {
+	useAuthentication(options = config.authentication) {
 		Exception.assert(this.isSetup == false, "Backend already set-up.");
 		Exception.assert(!this.instances.authentication, "Authentication already set-up.");
 		this.instances.authentication = Authentication.make(options);
@@ -172,6 +173,7 @@ export default class Backend {
 		}
 
 		if (this.instances.staticPath) {
+			// Important: the static path must be set after all other routes are registered as it will have the least priority.
 			this.instances.web.addStaticRoute("/", this.instances.staticPath);
 			Log.info("Serving static content from '{}'.", this.instances.staticPath);
 		}

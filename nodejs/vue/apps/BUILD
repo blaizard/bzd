@@ -1,9 +1,24 @@
+load("@bzd_lib//config:defs.bzl", "bzd_config_default")
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
+
+bzd_config_default(
+    name = "config",
+    srcs = [
+        "config.default.json",
+    ],
+    visibility = [
+        "//visibility:public",
+    ],
+)
 
 bzd_nodejs_library(
     name = "backend",
     srcs = [
         "backend.mjs",
+        "config.json",
+    ],
+    data = [
+        ":config",
     ],
     visibility = [
         "//visibility:public",
@@ -25,7 +40,11 @@ bzd_nodejs_library(
     name = "frontend",
     srcs = [
         "application.vue",
+        "config.json",
         "frontend.mjs",
+    ],
+    data = [
+        ":config",
     ],
     visibility = [
         "//visibility:public",

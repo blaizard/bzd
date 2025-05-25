@@ -8,6 +8,7 @@ import Router from "#bzd/nodejs/vue/router/router.mjs";
 import Authentication from "#bzd/apps/accounts/authentication/client.mjs";
 import AuthenticationPlugin from "#bzd/nodejs/vue/authentication.mjs";
 import Metadata from "#bzd/nodejs/vue/metadata.mjs";
+import config from "#bzd/nodejs/vue/apps/config.json" with { type: "json" };
 
 const Exception = ExceptionFactory("frontend");
 const Log = LogFactory("frontend");
@@ -36,7 +37,7 @@ export default class Frontend {
 	}
 
 	/// Set-up the authentication object.
-	useAuthentication(options) {
+	useAuthentication(options = config.authentication) {
 		Exception.assert(this.isSetup == false, "Frontend already set-up.");
 		Exception.assert(!this.instances.authentication, "Authentication already set-up.");
 		this.instances.authentication = Authentication.make(

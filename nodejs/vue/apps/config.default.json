@@ -1,0 +1,8 @@
+{
+    "authentication": {
+        "scopes": [
+            "admin-applications"
+        ],
+        "type": "stub"
+    }
+}

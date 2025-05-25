@@ -52,6 +52,5 @@
 <style lang="scss" scoped>
 	.bzd-title-icon {
 		height: 1em;
-		filter: invert(0);
 	}
 </style>
