@@ -9,7 +9,6 @@ import Plugin from "#bzd/apps/artifacts/backend/plugin.mjs";
 import APIv1 from "#bzd/api.json" with { type: "json" };
 import Plugins from "#bzd/apps/artifacts/plugins/backend.mjs";
 import config from "#bzd/apps/artifacts/backend/config.json" with { type: "json" };
-import configGlobal from "#bzd/apps/artifacts/config.json" with { type: "json" };
 import { FileNotFoundError } from "#bzd/nodejs/db/storage/storage.mjs";
 
 import Backend from "#bzd/nodejs/vue/apps/backend.mjs";
@@ -44,7 +43,7 @@ program
 
 	// Backend
 	const backend = Backend.make(TEST)
-		.useAuthentication(configGlobal.accounts)
+		.useAuthentication()
 		.useRest(APIv1.rest)
 		.useServices()
 		.useCache()

@@ -1,4 +1,5 @@
 {
+    "application": "dummy",
     "authentication": {
         "scopes": [
             "admin-applications"

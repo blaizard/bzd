@@ -42,6 +42,8 @@ bzd_nodejs_library(
         "application.vue",
         "config.json",
         "frontend.mjs",
+        "views/404.vue",
+        "views/services.vue",
     ],
     data = [
         ":config",
@@ -55,6 +57,7 @@ bzd_nodejs_library(
         "//nodejs:vue",
         "//nodejs/core:exception",
         "//nodejs/core:log",
+        "//nodejs/core/services:frontend",
         "//nodejs/styles/default",
         "//nodejs/vue:authentication",
         "//nodejs/vue:metadata",

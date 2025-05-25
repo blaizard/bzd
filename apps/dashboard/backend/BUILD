@@ -17,7 +17,6 @@ bzd_nodejs_binary(
     srcs = [
         "app.mjs",
         ":config.json",
-        "//apps/dashboard:config.json",
     ],
     apis = ["//apps/dashboard:api.v1.json"],
     args = [

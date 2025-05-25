@@ -1,10 +1,5 @@
 <template>
 	<Application>
-		<template #actions>
-			<template v-if="$authentication.isAuthenticated">
-				<MenuEntry text="Services" icon="bzd-icon-tile" link="/services"></MenuEntry>
-			</template>
-		</template>
 		<template #content>
 			<div class="layout">
 				<div class="tree">
@@ -23,7 +18,6 @@
 	import Application from "#bzd/nodejs/vue/apps/application.vue";
 	import Tree from "./tree.vue";
 	import MenuEntry from "#bzd/nodejs/vue/components/menu/entry.vue";
-	import configGlobal from "#bzd/apps/artifacts/config.json" with { type: "json" };
 
 	export default {
 		components: {
@@ -54,19 +48,6 @@
 						},
 					},
 					{ path: "/view/{path:*}", component: () => import("./view.vue") },
-					{ path: "/services", component: () => import("./services.vue") },
-					{
-						path: "/login",
-						handler: async () => {
-							await this.$rest.invoke("login", configGlobal.application);
-						},
-					},
-					{
-						path: "/logout",
-						handler: async () => {
-							await this.$rest.logout();
-						},
-					},
 				],
 			});
 		},

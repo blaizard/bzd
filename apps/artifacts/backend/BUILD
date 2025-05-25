@@ -49,7 +49,6 @@ bzd_nodejs_binary(
         "app.mjs",
         "endpoints_factory.mjs",
         ":config.json",
-        "//apps/artifacts:config.json",
     ],
     apis = ["//apps/artifacts:api.v1.json"],
     args = [
@@ -57,7 +56,6 @@ bzd_nodejs_binary(
         "$(rootpath //apps/artifacts/frontend).bundle",
     ],
     data = [
-        ":config",
         "//apps/artifacts/frontend",
     ],
     main = "app.mjs",

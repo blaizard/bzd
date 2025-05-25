@@ -1,8 +1,0 @@
-{
-    "accounts": {
-        "scopes": [
-            "admin-applications"
-        ],
-        "type": "stub"
-    }
-}

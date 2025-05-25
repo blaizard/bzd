@@ -19,6 +19,7 @@ export default class Frontend {
 		this.instances = {
 			app: createApp(app),
 			authentication: null,
+			services: null,
 		};
 		this.restOptions = null;
 		this.isSetup = false;
@@ -79,6 +80,14 @@ export default class Frontend {
 		return this;
 	}
 
+	/// Set-up the services object.
+	useServices() {
+		Exception.assert(this.isSetup == false, "Backend already set-up.");
+		Exception.assert(!this.instances.services, "Services already set-up.");
+		this.instances.services = true;
+		return this;
+	}
+
 	/// Set-up the client.
 	setup() {
 		Exception.assert(this.isSetup == false, "Frontend already set-up.");
@@ -102,6 +111,12 @@ export default class Frontend {
 				plugins: plugins,
 			});
 		}
+
+		// Set flags for the application.
+		this.instances.app.config.globalProperties.$bzdAppsFeatures = {
+			authentication: Boolean(this.instances.authentication),
+			services: this.instances.services || false,
+		};
 
 		return this;
 	}

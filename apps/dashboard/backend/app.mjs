@@ -3,7 +3,6 @@ import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import HttpClient from "#bzd/nodejs/core/http/client.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import { Command } from "commander/esm.mjs";
-import configGlobal from "#bzd/apps/dashboard/config.json" with { type: "json" };
 import config from "#bzd/apps/dashboard/backend/config.json" with { type: "json" };
 import { makeUid } from "#bzd/nodejs/utils/uid.mjs";
 import APIv1 from "#bzd/api.json" with { type: "json" };
@@ -50,7 +49,7 @@ class EventsFactory {
 
 	// Backend
 	const backend = Backend.make(TEST)
-		.useAuthentication(configGlobal.accounts)
+		.useAuthentication()
 		.useRest(APIv1.rest)
 		.useServices()
 		.useStatistics()

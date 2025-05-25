@@ -1,9 +1,0 @@
-{
-    "accounts": {
-        "scopes": [
-            "admin-applications"
-        ],
-        "type": "stub"
-    },
-    "application": "artifacts"
-}

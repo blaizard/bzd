@@ -2,13 +2,17 @@
 	<Layout :full-page="true">
 		<template #header>
 			<RouterLink v-if="$metadata.title" link="/">
-				<img v-if="$metadata.icon" class="bzd-title-icon" :src="$metadata.icon" /> {{ $metadata.title }}
+				<img v-if="$metadata.icon" class="bzd-apps-title-icon" :src="$metadata.icon" /> {{ $metadata.title }}
 			</RouterLink>
 		</template>
 		<template #actions>
 			<slot name="actions"></slot>
-			<template v-if="$authentication">
+			<template v-if="$bzdAppsFeatures.authentication">
 				<template v-if="$authentication.isAuthenticated">
+					<!-- These are features that requires authentication -->
+					<template v-if="$bzdAppsFeatures.services">
+						<MenuEntry text="Services" icon="bzd-icon-tile" link="/services"></MenuEntry>
+					</template>
 					<MenuEntry v-if="$authentication.hasLogout()" text="Logout" icon="bzd-icon-close" link="/logout"></MenuEntry>
 				</template>
 				<template v-else>
@@ -17,7 +21,9 @@
 			</template>
 		</template>
 		<template #content>
-			<slot name="content"></slot>
+			<slot name="content">
+				<RouterComponent name="view" class="bzd-apps-router-view"></RouterComponent>
+			</slot>
 		</template>
 	</Layout>
 </template>
@@ -25,11 +31,38 @@
 <script>
 	import Layout from "#bzd/nodejs/vue/components/layout/layout.vue";
 	import MenuEntry from "#bzd/nodejs/vue/components/menu/entry.vue";
+	import config from "#bzd/nodejs/vue/apps/config.json" with { type: "json" };
 
 	export default {
 		components: {
 			Layout,
 			MenuEntry,
+		},
+		mounted() {
+			let routes = [];
+			if (this.$bzdAppsFeatures.services) {
+				routes.push({ path: "/services", component: () => import("./views/services.vue") });
+			}
+			if (this.$bzdAppsFeatures.authentication) {
+				routes.push({
+					path: "/login",
+					handler: async () => {
+						await this.$rest.invoke("login", config.application);
+					},
+				});
+				routes.push({
+					path: "/logout",
+					handler: async () => {
+						await this.$rest.logout();
+					},
+				});
+			}
+			this.$router.set({
+				// The view component router is where the main application content is displayed.
+				component: "view",
+				routes: routes,
+				fallback: { component: () => import("./views/404.vue") },
+			});
 		},
 		methods: {
 			handleHeader() {
@@ -50,7 +83,10 @@
 </style>
 
 <style lang="scss" scoped>
-	.bzd-title-icon {
+	.bzd-apps-title-icon {
 		height: 1em;
+	}
+	.bzd-apps-router-view {
+		padding: 20px;
 	}
 </style>

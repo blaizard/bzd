@@ -1,4 +1,3 @@
-import configGlobal from "#bzd/apps/artifacts/config.json" with { type: "json" };
 import APIv1 from "#bzd/api.json" with { type: "json" };
 import Frontend from "#bzd/nodejs/vue/apps/frontend.mjs";
 import Permissions from "#bzd/nodejs/db/storage/permissions.mjs";
@@ -15,7 +14,8 @@ const frontend = Frontend.make(App)
 		icon: icon,
 	})
 	.useRest(APIv1.rest)
-	.useAuthentication(configGlobal.accounts)
+	.useAuthentication()
+	.useServices()
 	.setup();
 
 frontend.app.use(AsyncComputed);

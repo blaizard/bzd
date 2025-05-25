@@ -24,7 +24,6 @@
 			this.$router.set({
 				component: "view",
 				routes: [{ path: "/", component: () => import("./instances.vue") }],
-				fallback: { component: () => import("./404.vue") },
 			});
 		},
 	};

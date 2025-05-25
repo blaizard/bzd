@@ -18,9 +18,7 @@ bzd_nodejs_web_binary(
         "**/*.vue",
         "**/*.svg",
         "**/*.mjs",
-    ]) + [
-        "//apps/dashboard:config.json",
-    ],
+    ]),
     apis = ["//apps/dashboard:api.v1.json"],
     config_scss = "//nodejs/styles:default.scss",
     data = [
