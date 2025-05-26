@@ -13,9 +13,6 @@ bzd_nodejs_binary(
         ":frontend",
     ],
     main = "backend.mjs",
-    packages = [
-        "@nodejs_deps//:commander",
-    ],
     deps = [
         "//nodejs/vue/apps:backend",
     ],

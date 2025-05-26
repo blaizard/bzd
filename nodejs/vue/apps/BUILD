@@ -20,6 +20,9 @@ bzd_nodejs_library(
     data = [
         ":config",
     ],
+    packages = [
+        "@nodejs_deps//:commander",
+    ],
     visibility = [
         "//visibility:public",
     ],

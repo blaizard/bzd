@@ -27,9 +27,6 @@ bzd_nodejs_binary(
         "//apps/dashboard/frontend",
     ],
     main = "app.mjs",
-    packages = [
-        "@nodejs_deps//:commander",
-    ],
     visibility = [
         "//apps/dashboard:__pkg__",
     ],

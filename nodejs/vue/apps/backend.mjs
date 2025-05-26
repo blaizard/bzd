@@ -9,29 +9,51 @@ import Cache2 from "#bzd/nodejs/core/cache2.mjs";
 import Statistics from "#bzd/nodejs/core/statistics/statistics.mjs";
 import config from "#bzd/nodejs/vue/apps/config.json" with { type: "json" };
 
+import { Command } from "commander/esm.mjs";
+
 const Exception = ExceptionFactory("backend");
 const Log = LogFactory("backend");
 
 /// Backend server object to be used in the application.
 export default class Backend {
-	constructor(test) {
+	constructor(port, test) {
 		this.instances = {
 			authentication: null,
 			rest: null,
-			web: null,
+			web: test ? new MockHttpServer() : new HttpServer(port),
 			cache: null,
 			statistics: null,
 			services: null,
 			staticPath: null,
 		};
 		this.restOptions = null;
-		this.test = test;
 		this.isSetup = false;
+		this.test = test;
 	}
 
 	// Set-up the backend object.
-	static make(test) {
-		return new Backend(test);
+	static make(port, test) {
+		return new Backend(port, test);
+	}
+
+	// Set-up the backend object from cli.
+	static makeFromCli(argv) {
+		const program = new Command();
+		program
+			.version("1.0.0", "-v, --version")
+			.usage("[OPTIONS]...")
+			.option(
+				"-p, --port <number>",
+				"Port to be used to serve the application, can also be set with the environment variable BZD_PORT.",
+				8080,
+			)
+			.option("-s, --static <path>", "Directory to static serve.", ".")
+			.option("--test", "Set the application in test mode.")
+			.parse(argv);
+
+		const backend = new Backend(parseInt(program.opts().port), program.opts().test);
+		backend.useStaticContent(program.opts().static);
+		return backend;
 	}
 
 	/// Access the web server.
@@ -124,11 +146,9 @@ export default class Backend {
 	}
 
 	/// Set-up the web server.
-	setup(port) {
+	setup() {
 		Exception.assert(this.isSetup == false, "Backend already set-up.");
 		this.isSetup = true;
-
-		this.instances.web = this.test ? new MockHttpServer() : new HttpServer(port);
 
 		if (this.instances.services) {
 			Log.info("Setting up services");

@@ -2,7 +2,6 @@ import Cache from "#bzd/nodejs/core/cache.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import HttpClient from "#bzd/nodejs/core/http/client.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
-import { Command } from "commander/esm.mjs";
 import config from "#bzd/apps/dashboard/backend/config.json" with { type: "json" };
 import { makeUid } from "#bzd/nodejs/utils/uid.mjs";
 import APIv1 from "#bzd/api.json" with { type: "json" };
@@ -12,20 +11,6 @@ import Backend from "#bzd/nodejs/vue/apps/backend.mjs";
 
 const Exception = ExceptionFactory("backend");
 const Log = LogFactory("backend");
-
-const program = new Command();
-program
-	.version("1.0.0", "-v, --version")
-	.usage("[OPTIONS]...")
-	.option(
-		"-p, --port <number>",
-		"Port to be used to serve the application, can also be set with the environment variable BZD_PORT.",
-		8080,
-		parseInt,
-	)
-	.option("-s, --static <path>", "Directory to static serve.", ".")
-	.option("--test", "Set the application in test mode.")
-	.parse(process.argv);
 
 class EventsFactory {
 	constructor(events, uid) {
@@ -42,22 +27,16 @@ class EventsFactory {
 }
 
 (async () => {
-	// Read arguments
-	const PORT = Number(process.env.BZD_PORT || program.opts().port);
-	const PATH_STATIC = program.opts().static;
-	const TEST = program.opts().test;
-
 	// Backend
-	const backend = Backend.make(TEST)
+	const backend = Backend.makeFromCli(process.argv)
 		.useAuthentication()
 		.useRest(APIv1.rest)
 		.useServices()
 		.useStatistics()
-		.useStaticContent(PATH_STATIC)
-		.setup(PORT);
+		.setup();
 
 	let cache = new Cache({
-		garbageCollector: !TEST,
+		garbageCollector: !backend.test,
 	});
 	let plugins = {};
 	let pluginClasses = {};
@@ -205,7 +184,7 @@ class EventsFactory {
 
 	await backend.start();
 
-	if (TEST) {
+	if (backend.test) {
 		await backend.web.test(config.tests || []);
 		await backend.stop();
 	}

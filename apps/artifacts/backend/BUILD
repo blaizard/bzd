@@ -59,9 +59,6 @@ bzd_nodejs_binary(
         "//apps/artifacts/frontend",
     ],
     main = "app.mjs",
-    packages = [
-        "@nodejs_deps//:commander",
-    ],
     visibility = [
         "//apps/artifacts:__pkg__",
     ],

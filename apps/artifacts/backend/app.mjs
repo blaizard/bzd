@@ -2,7 +2,6 @@ import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import Permissions from "#bzd/nodejs/db/storage/permissions.mjs";
 import { CollectionPaging } from "#bzd/nodejs/db/utils.mjs";
-import { Command } from "commander/esm.mjs";
 import ServiceProvider from "#bzd/nodejs/core/services/provider.mjs";
 import EndpointsFactory from "#bzd/apps/artifacts/backend/endpoints_factory.mjs";
 import Plugin from "#bzd/apps/artifacts/backend/plugin.mjs";
@@ -19,37 +18,17 @@ const Exception = ExceptionFactory("backend");
 // For debugging purposes.
 // Log.config.console.setLevel("debug");
 
-const program = new Command();
-program
-	.version("1.0.0", "-v, --version")
-	.usage("[OPTIONS]...")
-	.option(
-		"-p, --port <number>",
-		"Port to be used to serve the application, can also be set with the environment variable BZD_PORT.",
-		8080,
-		parseInt,
-	)
-	.option("-s, --static <path>", "Directory to static serve.", ".")
-	.option("--test", "Set the application in test mode.")
-	.parse(process.argv);
-
 (async () => {
-	// Read arguments
-	const PORT = Number(process.env.BZD_PORT || program.opts().port);
-	const PATH_STATIC = program.opts().static;
-	const TEST = program.opts().test;
-
 	const volumes = {};
 
 	// Backend
-	const backend = Backend.make(TEST)
+	const backend = Backend.makeFromCli(process.argv)
 		.useAuthentication()
 		.useRest(APIv1.rest)
 		.useServices()
 		.useCache()
 		.useStatistics()
-		.useStaticContent(PATH_STATIC)
-		.setup(PORT);
+		.setup();
 
 	for (const [token, options] of Object.entries(config["tokens"] || {})) {
 		await backend.authentication.preloadApplicationToken(token, options["scopes"]);
@@ -243,7 +222,7 @@ program
 	backend.web.addRoute("*", "/x/{all:*}", (context) => context.sendStatus(404, "File Not Found"));
 	await backend.start();
 
-	if (TEST) {
+	if (backend.test) {
 		await backend.web.test(config.tests || []);
 		await backend.stop();
 	}
