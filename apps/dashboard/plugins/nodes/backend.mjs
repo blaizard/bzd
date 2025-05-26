@@ -38,6 +38,7 @@ export default class Nodes {
 						["gpu"],
 						["disk"],
 						["memory"],
+						["network"],
 						["temperature"],
 						["version"],
 						["uptime"],
