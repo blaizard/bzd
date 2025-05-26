@@ -1,5 +1,5 @@
 <template>
-	<Layout :full-page="true">
+	<Layout>
 		<template #header>
 			<RouterLink v-if="$metadata.title" link="/">
 				<img v-if="$metadata.icon" class="bzd-apps-title-icon" :src="$metadata.icon" /> {{ $metadata.title }}
