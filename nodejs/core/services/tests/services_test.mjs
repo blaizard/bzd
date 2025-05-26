@@ -125,14 +125,14 @@ describe("Services", () => {
 			const query = [...services.getServices()];
 			Exception.assertEqual(query.length, 1);
 			const [uid0, state] = query[0];
-			Exception.assertEqual(state.status, Services.Status.idle);
+			Exception.assertEqual(state.state.status, Services.Status.idle);
 			uid = uid0;
 		});
 
 		it("start", async () => {
 			await services.start();
 			const state = services.getService(uid);
-			Exception.assertEqual(state.status, Services.Status.running);
+			Exception.assertEqual(state.state.status, Services.Status.running);
 			Exception.assertEqual(startCounter, 1);
 			Exception.assertEqual(stopCounter, 0);
 		});

@@ -35,8 +35,6 @@ export default class Services {
 
 	constructor() {
 		this.services = {};
-		// Use when `throw` is set.
-		this.lastException = null;
 	}
 
 	/// Get the current timestamp in ms.
@@ -164,7 +162,7 @@ export default class Services {
 				case Services.Policy.restart:
 					break;
 				case Services.Policy.throw:
-					this.lastException = this.getLastError(uid, name);
+					service.lastFatalError = this.getLastError(uid, name);
 					break;
 			}
 		}
@@ -213,6 +211,8 @@ export default class Services {
 			//   }
 			// }
 			records: {},
+			// Last fatal error, if any.
+			lastFatalError: null,
 			state: {
 				status: Services.Status.idle,
 				/// Timestamp of the last start.
@@ -269,7 +269,7 @@ export default class Services {
 					case Services.Policy.restart:
 						break;
 					case Services.Policy.throw:
-						this.lastException = this.getLastError(uid, name);
+						service.lastFatalError = this.getLastError(uid, name);
 						break;
 				}
 
@@ -329,7 +329,7 @@ export default class Services {
 					case Services.Policy.restart:
 						break;
 					case Services.Policy.throw:
-						this.lastException = this.getLastError(uid, name);
+						service.lastFatalError = this.getLastError(uid, name);
 						break;
 				}
 			}
@@ -350,11 +350,15 @@ export default class Services {
 
 	/// Stop all services.
 	async stop() {
+		let exception = null;
 		for (const uid of Object.keys(this.services)) {
 			await this.stopService(uid);
+			if (this.services[uid].lastFatalError) {
+				exception = this.services[uid].lastFatalError;
+			}
 		}
-		if (this.lastException !== null) {
-			throw this.lastException;
+		if (exception) {
+			throw exception;
 		}
 	}
 
@@ -362,8 +366,8 @@ export default class Services {
 	///
 	/// \return A tuple of the UID and the state.
 	*getServices() {
-		for (const [uid, service] of Object.entries(this.services)) {
-			yield [uid, service.state];
+		for (const uid of Object.keys(this.services)) {
+			yield [uid, this.getService(uid)];
 		}
 	}
 
@@ -373,7 +377,18 @@ export default class Services {
 	/// \return The service state.
 	getService(uid) {
 		Exception.assertPrecondition(uid in this.services, "The service '{}' is not registered.", uid);
-		return this.services[uid].state;
+		const service = this.services[uid];
+		return {
+			state: service.state,
+			toString: () => {
+				let message =
+					"Status '" + service.state.status + "', started at " + new Date(service.state.timestampStart).toISOString();
+				if (service.lastFatalError) {
+					message += ", last fatal error: " + String(service.lastFatalError);
+				}
+				return message;
+			},
+		};
 	}
 
 	/// Get all the processes of a specific service.
