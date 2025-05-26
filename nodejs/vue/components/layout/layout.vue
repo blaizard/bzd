@@ -81,9 +81,6 @@
 		directives: {
 			tooltip: DirectiveTooltip,
 		},
-		props: {
-			fullPage: { required: false, default: false, type: Boolean },
-		},
 		components: {
 			Accordion,
 		},
@@ -105,7 +102,7 @@
 					"bzd-layout": true,
 					"bzd-mobile": this.isMobile,
 					"bzd-dock": this.isDock && !this.isMobile && this.isMenu,
-					"bzd-full-page": this.fullPage,
+					"bzd-menu": this.isMenuShow,
 				};
 			},
 			isMenu() {
@@ -210,6 +207,12 @@
 	.bzd-layout {
 		padding: 0;
 		margin: 0;
+		display: flex;
+		flex-direction: column;
+		min-height: 100vh;
+		// Force the layout to take at least the full height of the viewport
+		// see: https://stackoverflow.com/questions/8468066/child-inside-parent-with-min-height-100-not-inheriting-height
+		height: 1px;
 
 		.bzd-layout-header {
 			position: sticky;
@@ -374,6 +377,10 @@
 		}
 
 		.bzd-layout-content-wrapper {
+			flex-grow: 1;
+			display: flex;
+			flex-direction: column;
+
 			.bzd-notification {
 				display: flex;
 				flex-flow: row nowrap;
@@ -433,6 +440,7 @@
 
 			.bzd-layout-content {
 				padding: 0;
+				flex-grow: 1;
 			}
 		}
 
@@ -450,6 +458,10 @@
 		}
 
 		&.bzd-mobile {
+			&.bzd-menu {
+				overflow: hidden;
+			}
+
 			.bzd-layout-menu {
 				.bzd-translate-enter-active,
 				.bzd-translate-leave-active {
@@ -466,16 +478,6 @@
 					.bzd-layout-menu-content-dock {
 						display: none;
 					}
-				}
-			}
-		}
-
-		&.bzd-full-page {
-			.bzd-layout-content-wrapper {
-				height: calc(100vh - #{$headerHeight});
-				.bzd-layout-content {
-					width: 100%;
-					height: 100%;
 				}
 			}
 		}
