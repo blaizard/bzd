@@ -117,8 +117,13 @@ const Exception = ExceptionFactory("backend");
 
 	function assertVolumeReady(volume) {
 		const serviceId = volumes[volume].serviceId;
-		const state = backend.services.getService(serviceId);
-		Exception.assertPrecondition(state.status == "running", "Volume '{}' is not ready. {}", volume, state.toString());
+		const info = backend.services.getService(serviceId);
+		Exception.assertPrecondition(
+			info.state.status == "running",
+			"Volume '{}' is not ready. {}",
+			volume,
+			info.toString(),
+		);
 	}
 
 	backend.rest.handle(

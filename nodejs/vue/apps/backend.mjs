@@ -51,7 +51,8 @@ export default class Backend {
 			.option("--test", "Set the application in test mode.")
 			.parse(argv);
 
-		const backend = new Backend(parseInt(program.opts().port), program.opts().test);
+		const port = parseInt(process.env.BZD_PORT || program.opts().port);
+		const backend = new Backend(port, program.opts().test);
 		backend.useStaticContent(program.opts().static);
 		return backend;
 	}

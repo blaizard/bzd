@@ -131,8 +131,8 @@ describe("Services", () => {
 
 		it("start", async () => {
 			await services.start();
-			const state = services.getService(uid);
-			Exception.assertEqual(state.state.status, Services.Status.running);
+			const info = services.getService(uid);
+			Exception.assertEqual(info.state.status, Services.Status.running);
 			Exception.assertEqual(startCounter, 1);
 			Exception.assertEqual(stopCounter, 0);
 		});

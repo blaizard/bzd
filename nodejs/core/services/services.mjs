@@ -449,7 +449,7 @@ export default class Services {
 		/// }
 		api.handle("get", "/admin/services", async () => {
 			let services = {};
-			for (const [uid, state] of this.getServices()) {
+			for (const [uid, info] of this.getServices()) {
 				let processes = {};
 				for (const [name, record] of this.getProcesses(uid)) {
 					processes[name] = Object.assign({}, record, {
@@ -457,7 +457,7 @@ export default class Services {
 					});
 				}
 				services[uid] = {
-					state: state,
+					state: info.state,
 					processes: processes,
 				};
 			}
