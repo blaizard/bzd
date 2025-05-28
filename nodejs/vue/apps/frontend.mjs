@@ -38,19 +38,23 @@ export default class Frontend {
 	}
 
 	/// Set-up the authentication object.
-	useAuthentication(options = config.authentication) {
+	useAuthentication(options = config.authentication, authentication = null) {
 		Exception.assert(this.isSetup == false, "Frontend already set-up.");
 		Exception.assert(!this.instances.authentication, "Authentication already set-up.");
-		this.instances.authentication = Authentication.make(
-			Object.assign(
-				{
-					unauthorizedCallback: async (needAuthentication) => {
-						console.log("Unauthorized!", needAuthentication);
+		if (authentication) {
+			this.instances.authentication = authentication;
+		} else {
+			this.instances.authentication = Authentication.make(
+				Object.assign(
+					{
+						unauthorizedCallback: async (needAuthentication) => {
+							console.log("Unauthorized!", needAuthentication);
+						},
 					},
-				},
-				options,
-			),
-		);
+					options,
+				),
+			);
+		}
 		this.instances.app.use(AuthenticationPlugin, {
 			authentication: this.instances.authentication,
 		});
@@ -89,22 +93,23 @@ export default class Frontend {
 	}
 
 	/// Set-up the client.
-	setup() {
+	setup(plugins = []) {
 		Exception.assert(this.isSetup == false, "Frontend already set-up.");
 		this.isSetup = true;
+
+		if (this.instances.authentication) {
+			plugins.push(this.instances.authentication);
+		}
 
 		this.instances.app.use(Router, {
 			hash: false,
 			authentication: this.instances.authentication || null,
+			plugins: plugins,
 		});
 		this.instances.app.use(Notification);
 
 		if (this.restOptions) {
 			Log.info("Setting up rest client");
-			let plugins = [];
-			if (this.instances.authentication) {
-				plugins.push(this.instances.authentication);
-			}
 			this.instances.app.use(RestPlugin, {
 				schema: this.restOptions,
 				authentication: this.instances.authentication || null,

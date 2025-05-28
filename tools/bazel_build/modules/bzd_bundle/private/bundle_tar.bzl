@@ -33,7 +33,7 @@ def _bzd_bundle_tar_impl(ctx):
     ctx.actions.run(
         inputs = [executable.manifest for executable in executables],
         outputs = [output],
-        progress_message = "Bundling {}...".format(output.short_path),
+        progress_message = "Bundling {}".format(output.short_path),
         arguments = [args],
         executable = ctx.executable._bundler,
         tools = [executable.files_to_run for executable in executables],

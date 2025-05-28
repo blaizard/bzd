@@ -7,13 +7,13 @@ This utility converts an ebook into a PDF.
 If it has a DRM:
 
 ```bash
-bazel run apps/ebook -- --key $(pwd)/temp/Adobe_PrivateLicenseKey--anonymous.der $(pwd)/temp.epub
+bazel run apps/ebook -- --sandbox $(pwd)/temp/sandbox --key $(pwd)/temp/Adobe_PrivateLicenseKey--anonymous.der $(pwd)/temp/temp.epub
 ```
 
-Otherwise:
+Keeping the sandbox:
 
 ```bash
-bazel run apps/ebook -- $(pwd)/temp/temp.cbz
+bazel run apps/ebook -- --sandbox $(pwd)/temp/sandbox $(pwd)/temp/temp.cbz
 ```
 
 ## Run using the docker image

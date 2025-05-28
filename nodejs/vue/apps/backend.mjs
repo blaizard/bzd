@@ -25,8 +25,10 @@ export default class Backend {
 			statistics: null,
 			services: null,
 			staticPath: null,
+			staticOptions: null,
+			restSchema: null,
+			restOptions: null,
 		};
-		this.restOptions = null;
 		this.isSetup = false;
 		this.test = test;
 	}
@@ -36,9 +38,12 @@ export default class Backend {
 		return new Backend(port, test);
 	}
 
-	// Set-up the backend object from cli.
-	static makeFromCli(argv) {
-		const program = new Command();
+	/// Set-up the backend object from cli.
+	///
+	/// \param {Array} argv - The command line arguments.
+	/// \param {Command} command - The command object to use, if not provided a new one will be created.
+	static makeFromCli(argv, command = null) {
+		const program = command || new Command();
 		program
 			.version("1.0.0", "-v, --version")
 			.usage("[OPTIONS]...")
@@ -108,10 +113,12 @@ export default class Backend {
 	}
 
 	/// Set-up the rest object.
-	useRest(options) {
+	useRest(schema, options) {
 		Exception.assert(this.isSetup == false, "Backend already set-up.");
-		Exception.assert(!this.restOptions, "Rest already set-up.");
-		this.restOptions = options;
+		Exception.assert(!this.instances.restSchema, "Rest schema already set-up.");
+		Exception.assert(!this.instances.restOptions, "Rest options already set-up.");
+		this.instances.restSchema = schema;
+		this.instances.restOptions = options;
 		return this;
 	}
 
@@ -139,10 +146,21 @@ export default class Backend {
 		return this;
 	}
 
-	useStaticContent(path) {
+	useStaticContent(path, options = null) {
 		Exception.assert(this.isSetup == false, "Backend already set-up.");
 		Exception.assert(!this.instances.staticPath, "Static content already set-up.");
 		this.instances.staticPath = path;
+		if (options) {
+			this.useStaticContentOptions(options);
+		}
+		return this;
+	}
+
+	useStaticContentOptions(options) {
+		Exception.assert(this.isSetup == false, "Backend already set-up.");
+		Exception.assert(this.instances.staticPath, "Static content must be set-up.");
+		Exception.assert(!this.instances.staticOptions, "Static content options already set-up.");
+		this.instances.staticOptions = options;
 		return this;
 	}
 
@@ -165,12 +183,17 @@ export default class Backend {
 			}
 		}
 
-		if (this.restOptions) {
+		if (this.instances.restSchema) {
 			Log.info("Setting up rest server");
-			this.instances.rest = new RestServer(this.restOptions, {
-				authentication: this.instances.authentication || null,
-				channel: this.instances.web,
-			});
+			const restOptions = Object.assign(
+				{
+					authentication: this.instances.authentication || null,
+					channel: this.instances.web,
+				},
+				this.instances.restOptions || {},
+			);
+			this.instances.rest = new RestServer(this.instances.restSchema, restOptions);
+
 			if (this.instances.authentication) {
 				this.instances.rest.installPlugins(this.instances.authentication);
 			}
@@ -195,7 +218,7 @@ export default class Backend {
 
 		if (this.instances.staticPath) {
 			// Important: the static path must be set after all other routes are registered as it will have the least priority.
-			this.instances.web.addStaticRoute("/", this.instances.staticPath);
+			this.instances.web.addStaticRoute("/", this.instances.staticPath, this.instances.staticOptions || {});
 			Log.info("Serving static content from '{}'.", this.instances.staticPath);
 		}
 

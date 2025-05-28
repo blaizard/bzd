@@ -29,7 +29,6 @@ class DriverSelenium:
 		options.add_argument("--kiosk")
 		self.driver = webdriver.Firefox(options=options)
 
-		#self.driver = webdriver.Chrome()
 		return self
 
 	def process(self, documentIndex: int, metadata: EPubMetadata, directory: pathlib.Path) -> typing.List[pathlib.Path]:
@@ -39,6 +38,9 @@ class DriverSelenium:
 
 		for document in metadata.document:
 			self.driver.get(f"file://{document}")
+
+			# Set the zoom level to 250% to ensure the text is readable (only if needed)
+			#self.driver.execute_script("document.body.style.zoom = '250%'")
 
 			retry = 0
 			while True:

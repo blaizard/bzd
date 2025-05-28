@@ -1,6 +1,6 @@
-import { program } from "commander";
+import { Command } from "commander";
 
-import RestServer from "#bzd/nodejs/core/rest/server.mjs";
+import Backend from "#bzd/nodejs/vue/apps/backend.mjs";
 import APIv1 from "#bzd/api.json" with { type: "json" };
 import kvsMakeFromConfig from "#bzd/nodejs/db/key_value_store/make_from_config.mjs";
 import emailMakeFromConfig from "#bzd/nodejs/email/make_from_config.mjs";
@@ -10,8 +10,6 @@ import Authentication from "#bzd/nodejs/core/authentication/session/server.mjs";
 import AuthenticationGoogle from "#bzd/nodejs/core/authentication/google/server.mjs";
 import AuthenticationFacebook from "#bzd/nodejs/core/authentication/facebook/server.mjs";
 import Result from "#bzd/nodejs/utils/result.mjs";
-import HttpServer from "#bzd/nodejs/core/http/server.mjs";
-import MockHttpServer from "#bzd/nodejs/core/http/mock/server.mjs";
 import HttpClient from "#bzd/nodejs/core/http/client.mjs";
 import Users from "#bzd/apps/accounts/backend/users/users.mjs";
 import Applications from "#bzd/apps/accounts/backend/applications/applications.mjs";
@@ -22,7 +20,6 @@ import configBackend from "#bzd/apps/accounts/backend/config.json" with { type: 
 import MemoryLogger from "#bzd/apps/accounts/backend/logger/memory/memory.mjs";
 import paymentMakeFromConfig from "#bzd/nodejs/payment/make_from_config.mjs";
 import EmailManager from "#bzd/apps/accounts/backend/email/manager.mjs";
-import Services from "#bzd/nodejs/core/services/services.mjs";
 import Subscription from "#bzd/apps/accounts/backend/users/subscription.mjs";
 import FileSystem from "#bzd/nodejs/core/filesystem.mjs";
 import { delayMs } from "#bzd/nodejs/utils/delay.mjs";
@@ -30,28 +27,32 @@ import { delayMs } from "#bzd/nodejs/utils/delay.mjs";
 const Exception = ExceptionFactory("backend");
 const Log = LogFactory("backend");
 
-program
-	.version("1.0.0", "-v, --version")
-	.usage("[OPTIONS]...")
-	.option(
-		"-p, --port <number>",
-		"Port to be used to serve the application, can also be set with BZD_PORT.",
-		8080,
-		parseInt,
-	)
-	.option("-s, --static <path>", "Directory to static serve.", ".")
-	.option("--dump <path>", "Dump the database to a specific path.")
-	.option("--test-data", "Include test data and run some self tests.")
-	.option("--test", "Set the application in test mode.")
-	.parse(process.argv);
-
-const options = program.opts();
-const PORT = Number(process.env.BZD_PORT || options.port);
-const PATH_STATIC = options.static;
-const TEST = program.opts().test;
-const TEST_DATA = program.opts().testData;
-
 (async () => {
+	// ---- Additional options to be used ----
+
+	const program = new Command();
+	program
+		.option("--dump <path>", "Dump the database to a specific path.")
+		.option("--test-data", "Include test data and run some self tests.");
+	const backend = Backend.makeFromCli(process.argv, program);
+	const options = program.opts();
+
+	// ---- Headers to be used ----
+
+	const headers = {
+		// Needed for Google authentication.
+		"Cross-Origin-Opener-Policy": "same-origin-allow-popups",
+	};
+	if (program.opts().testData) {
+		// This allow http and https interoperability.
+		headers["Referrer-Policy"] = "no-referrer-when-downgrade";
+	}
+	backend
+		.useStaticContentOptions({
+			headers: headers,
+		})
+		.useServices();
+
 	const memoryLogger = new MemoryLogger();
 
 	const keyValueStore = await kvsMakeFromConfig(configBackend.kvs.accounts);
@@ -65,12 +66,6 @@ const TEST_DATA = program.opts().testData;
 
 	// Applications
 	const applications = new Applications(keyValueStore);
-
-	// Set-up the web server
-	const web = TEST ? new MockHttpServer() : new HttpServer(PORT);
-
-	// Services
-	const services = new Services();
 
 	// ---- Helpers ----
 
@@ -289,24 +284,25 @@ const TEST_DATA = program.opts().testData;
 		configBackend.payment,
 	);
 
-	// ---- API ----
+	// ---- REST ----
 
-	const api = new RestServer(APIv1.rest, {
-		authentication: authentication,
-		channel: web,
-	});
-	api.installPlugins(
+	backend
+		.useRest(APIv1.rest, {
+			authentication: authentication,
+		})
+		.setup();
+
+	backend.rest.installPlugins(
 		authentication,
 		authenticationGoogle,
 		authenticationFacebook,
 		users,
 		applications,
-		services,
 		memoryLogger,
 		payment,
 	);
 
-	api.handle("get", "/sso", async function (inputs, session) {
+	backend.rest.handle("get", "/sso", async function (inputs, session) {
 		// Get that the application exists.
 		const application = await applications.get(inputs.application, /*allowNull*/ true);
 		Exception.assertPrecondition(application, "Application '{}' does not exists.", inputs.application);
@@ -320,7 +316,7 @@ const TEST_DATA = program.opts().testData;
 		};
 	});
 
-	api.handle("post", "/password-reset", async (inputs) => {
+	backend.rest.handle("post", "/password-reset", async (inputs) => {
 		const maybeUser = await users.getFromEmail(inputs.uid, /*allowNull*/ true);
 		if (maybeUser === null) {
 			// Don't return any error code if the account does not exists.
@@ -344,7 +340,7 @@ const TEST_DATA = program.opts().testData;
 		});
 	});
 
-	api.handle("post", "/password-change", async function (inputs) {
+	backend.rest.handle("post", "/password-change", async function (inputs) {
 		const maybeUser = await users.get(inputs.uid, /*allowNull*/ true);
 		if (maybeUser === null) {
 			throw authentication.httpErrorUnauthorized(/*requestAuthentication*/ false);
@@ -389,30 +385,22 @@ const TEST_DATA = program.opts().testData;
 		);
 	};
 
-	api.handle("post", "/contact", async (inputs) => {
+	backend.rest.handle("post", "/contact", async (inputs) => {
 		await sendContactMessage(inputs.captcha, inputs.email, inputs.subject, inputs.content);
 	});
 
-	api.handle("post", "/contact-authenticated", async (inputs, session) => {
+	backend.rest.handle("post", "/contact-authenticated", async (inputs, session) => {
 		const user = await users.get(session.getUid());
 		await sendContactMessage(inputs.captcha, user.getEmail(), inputs.subject, inputs.content);
 	});
 
 	// ---- start services ----
 
-	await services.installServices(payment);
-	await services.start();
-
-	// ---- Headers to be used ----
-
-	let headers = {
-		// Needed for Google authentication.
-		"Cross-Origin-Opener-Policy": "same-origin-allow-popups",
-	};
+	await backend.services.installServices(payment);
 
 	// ---- tests data ----
 
-	if (TEST_DATA) {
+	if (program.opts().testData) {
 		const testData = new TestData(users, applications, payment);
 		await testData.install();
 		await testData.run();
@@ -434,19 +422,12 @@ const TEST_DATA = program.opts().testData;
 
 	// ---- serve ----
 
-	web.addStaticRoute("/", PATH_STATIC, {
-		headers: headers,
-	});
-	Log.info("Application started");
-	web.start();
+	await backend.start();
 
 	// ---- run tests ----
 
-	if (TEST) {
-		await web.test(config.tests || []);
-
-		web.stop();
-		await services.stop();
-		Log.info("Application stopped");
+	if (backend.test) {
+		await backend.web.test(config.tests || []);
+		await backend.stop();
 	}
 })();

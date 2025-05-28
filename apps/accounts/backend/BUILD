@@ -45,15 +45,12 @@ bzd_nodejs_binary(
         "//nodejs/core/authentication/google:server",
         "//nodejs/core/authentication/session:server",
         "//nodejs/core/http:client",
-        "//nodejs/core/http:server",
-        "//nodejs/core/http/mock:server",
-        "//nodejs/core/rest:server",
-        "//nodejs/core/services",
         "//nodejs/db/key_value_store:make_from_config",
         "//nodejs/email:make_from_config",
         "//nodejs/payment:make_from_config",
         "//nodejs/utils:delay",
         "//nodejs/utils:result",
+        "//nodejs/vue/apps:backend",
     ],
 )
 
