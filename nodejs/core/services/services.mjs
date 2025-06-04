@@ -27,9 +27,8 @@ export default class Services {
 		/// Restart the whole
 		restart: "restart",
 		/// Raise an exception when an error occurs. Note that the exception will not be thrown
-		/// immediately but only upon calling stop(). This ensures that we can catch it and it is
+		/// immediately but only upon calling start() or stop(). This ensures that we can catch it and it is
 		/// not thrown within a setTimeout context.
-		/// This policy is useful for testing.
 		throw: "throw",
 	});
 
@@ -341,24 +340,40 @@ export default class Services {
 		Log.info("Stopped '{}'.", uid);
 	}
 
+	/// Get pending exceptions if any
+	getPendingException() {
+		const maybeExceptions = Object.values(this.services)
+			.map((service) => service.lastFatalError)
+			.filter(Boolean);
+		if (maybeExceptions.length == 0) {
+			return null;
+		}
+		const exceptionsAsString = maybeExceptions.map((e) => "\t- " + String(e.message));
+		return new AggregateError(
+			maybeExceptions,
+			"Services with pending " + maybeExceptions.length + " exception(s):\n" + exceptionsAsString.join("\n"),
+		);
+	}
+
 	/// Start all services.
 	async start() {
 		for (const uid of Object.keys(this.services)) {
 			await this.startService(uid);
 		}
+		const maybeExceptions = this.getPendingException();
+		if (maybeExceptions) {
+			throw maybeExceptions;
+		}
 	}
 
 	/// Stop all services.
 	async stop() {
-		let exception = null;
 		for (const uid of Object.keys(this.services)) {
 			await this.stopService(uid);
-			if (this.services[uid].lastFatalError) {
-				exception = this.services[uid].lastFatalError;
-			}
 		}
-		if (exception) {
-			throw exception;
+		const maybeExceptions = this.getPendingException();
+		if (maybeExceptions) {
+			throw maybeExceptions;
 		}
 	}
 

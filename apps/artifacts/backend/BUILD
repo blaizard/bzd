@@ -56,6 +56,7 @@ bzd_nodejs_binary(
         "$(rootpath //apps/artifacts/frontend).bundle",
     ],
     data = [
+        ":config",
         "//apps/artifacts/frontend",
     ],
     main = "app.mjs",
