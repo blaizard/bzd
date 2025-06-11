@@ -34,3 +34,14 @@ docker push blaizard/ebook:latest
 ```
 
 Don't forget to update the `digest` field of the `oci_ebook` image in the `MODULE.bazel`.
+
+## Download ebook
+
+### From .acsm files
+
+```bash
+nix-shell -p libgourou
+adept_activate -a
+acsmdownloader my_file.acsm # Downloads the epub.
+acsmdownloader --export-private-key # Download the private key.
+```
