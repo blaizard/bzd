@@ -27,6 +27,10 @@ class Response:
 	def text(self) -> str:
 		return self.content.decode(self.encoding)
 
+	@property
+	def json(self) -> str:
+		return JsonLibrary.loads(self.text)
+
 	def getHeader(self, name: str) -> typing.Optional[str]:
 		return self.response.getheader(name, None)
 
@@ -44,6 +48,14 @@ class HttpClient:
 	@staticmethod
 	def put(*args: typing.Any, **kwargs: typing.Any) -> Response:
 		return HttpClient._any("PUT", *args, **kwargs)
+
+	@staticmethod
+	def head(*args: typing.Any, **kwargs: typing.Any) -> Response:
+		return HttpClient._any("HEAD", *args, **kwargs)
+
+	@staticmethod
+	def delete(*args: typing.Any, **kwargs: typing.Any) -> Response:
+		return HttpClient._any("DELETE", *args, **kwargs)
 
 	@staticmethod
 	def _any(method: str,

@@ -38,9 +38,9 @@ class _SSHInteractiveHandle:
 		stream = ExecuteResultStreamWriter(stdout=stdout, stderr=stderr, maxSize=maxOutputSize)
 
 		def populateStreamer() -> None:
-			if session.recv_ready():
+			while session.recv_ready():
 				stream.addStdout(session.recv(4096))
-			if session.recv_stderr_ready():
+			while session.recv_stderr_ready():
 				stream.addStderr(session.recv_stderr(4096))
 
 		while True:

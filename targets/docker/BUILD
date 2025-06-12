@@ -1,19 +1,41 @@
 load("@bzd_bdl//:defs.bzl", "bdl_library", "bdl_target")
-load("@rules_python//python:defs.bzl", "py_binary")
+load("@bzd_lib//config:defs.bzl", "bzd_config")
+load("@rules_python//python:defs.bzl", "py_binary", "py_library")
+
+bzd_config(
+    name = "config",
+    include_workspace_status = ["STABLE_VERSION"],
+)
 
 py_binary(
     name = "main",
-    srcs = ["main.py"],
+    srcs = [
+        "config.py",
+        "main.py",
+        "registry.py",
+    ],
     data = [
         "registry.yml.btl",
     ],
     deps = [
+        ":docker_compose",
         "//targets/docker/deployment:compose",
         "//targets/docker/deployment:traefik",
         "//targets/docker/transport:ssh",
         "@bzd_bdl//bdl/generators/json/ast",
+        "@bzd_python//bzd/http:client",
         "@bzd_python//bzd/template",
         "@bzd_rules_oci//python/bzd_oci:run",
+    ],
+)
+
+py_library(
+    name = "docker_compose",
+    srcs = [
+        "docker_compose.py",
+    ],
+    visibility = [
+        "//targets/docker:__subpackages__",
     ],
 )
 

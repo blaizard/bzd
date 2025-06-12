@@ -2,9 +2,11 @@ version: "3.3"
 
 services:
     registry:
-        image: "registry"
+        image: "registry:2"
         container_name: "registry"
         ports:
             - {{ port }}:5000
+        environment:
+            REGISTRY_STORAGE_DELETE_ENABLED: "true"
         volumes:
             - ./registry:/var/lib/registry:rw

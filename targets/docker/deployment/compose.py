@@ -6,7 +6,7 @@ from targets.docker.deployment.base import Docker
 from bdl.generators.json.ast.ast import Ast, Parameters
 
 
-class DockerCompose(Docker):
+class DeploymentDockerCompose(Docker):
 
 	def __init__(self, ast: Ast, common: typing.Any) -> None:
 		super().__init__(ast=ast, symbol="docker.Compose")

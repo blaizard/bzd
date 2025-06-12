@@ -6,7 +6,7 @@ from bdl.generators.json.ast.ast import Ast, Parameters
 from bzd.template.template import Template
 
 
-class DockerTraefik(Docker):
+class DeploymentDockerTraefik(Docker):
 
 	def __init__(self, ast: Ast, common: typing.Any) -> None:
 		super().__init__(ast=ast, symbol="docker.Traefik")
