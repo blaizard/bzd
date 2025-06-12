@@ -11,7 +11,7 @@ class DockerCompose:
 	def getImages(self) -> typing.Dict[str, typing.Set[str]]:
 		"""Extract all images and their tags from the docker compose file."""
 
-		images = {}
+		images: typing.Dict[str, typing.Set[str]] = {}
 		for service in self.data.get("services", {}).values():
 			if "image" in service:
 				image = service["image"]

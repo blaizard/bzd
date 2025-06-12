@@ -28,7 +28,7 @@ class Response:
 		return self.content.decode(self.encoding)
 
 	@property
-	def json(self) -> str:
+	def json(self) -> typing.Any:
 		return JsonLibrary.loads(self.text)
 
 	def getHeader(self, name: str) -> typing.Optional[str]:

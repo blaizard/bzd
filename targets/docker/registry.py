@@ -32,7 +32,9 @@ class DockerRegistry:
 		                                        "application/vnd.oci.image.manifest.v1+json,"
 		                                        "application/vnd.oci.image.index.v1+json"
 		                          })
-		return response.getHeader("Docker-Content-Digest")
+		digest = response.getHeader("Docker-Content-Digest")
+		assert digest is not None
+		return digest
 
 	def getImages(self) -> typing.Dict[str, typing.Dict[str, str]]:
 		"""Get a dictionary of images, their tags and digests."""

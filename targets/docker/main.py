@@ -127,11 +127,12 @@ if __name__ == "__main__":
 		# Remove applications that are currently present but not needed anymore.
 		removeApplications = currentApplications - applications
 		for application in removeApplications:
-			directory = f"{applicationsDirectory}/{application}"
+			directory = applicationsDirectory / application
 			print(f"Stopping '{directory}'...", flush=True)
-			handle.command(["docker", "compose", "--file", f"{directory}/docker-compose.yml", "down"],
+			handle.command(["docker", "compose", "--file",
+			                str(directory / "docker-compose.yml"), "down"],
 			               ignoreFailure=True)
-			handle.command(["rm", "-rfd", f"{directory}"])
+			handle.command(["rm", "-rfd", str(directory)])
 
 		# Start applications
 		allDockerComposeFiles: typing.List[pathlib.Path] = []
@@ -177,8 +178,8 @@ if __name__ == "__main__":
 		with handle.forwardPort(args.registry_port, waitHTTP=f"http://localhost:{args.registry_port}/v2/"):
 
 			usedImages = getAllImagesFromDockerComposeFiles(handle, allDockerComposeFiles)
-			registry = DockerRegistry(f"http://localhost:{args.registry_port}")
-			allImages = registry.getImages()
+			dockerRegistry = DockerRegistry(f"http://localhost:{args.registry_port}")
+			allImages = dockerRegistry.getImages()
 
 			# Only keep unused image tags.
 			for repository, tags in usedImages.items():
@@ -188,10 +189,10 @@ if __name__ == "__main__":
 							del allImages[repository][tag]
 
 			# Remove unused image tags.
-			for repository, tags in allImages.items():
-				for tag, digest in tags.items():
+			for repository, tagsDigest in allImages.items():
+				for tag, digest in tagsDigest.items():
 					print(f"- Removing image {repository}:{tag} ({digest}).", flush=True)
-					registry.delete(repository, digest)
+					dockerRegistry.delete(repository, digest)
 
 		# Cleanup docker register and docker
 		print(f"Cleaning up dangling images...", flush=True)
