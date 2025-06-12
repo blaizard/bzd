@@ -21,12 +21,13 @@ from targets.docker.config import STABLE_VERSION
 
 class CommonParameters:
 
-	def __init__(self, port: int) -> None:
+	def __init__(self, port: int, version: str) -> None:
 		self.port = port
+		self.version = version
 
 	def imageResolve(self, image: str) -> str:
 		"""Convert an image name into its resolve url pointing to the registry."""
-		return f"localhost:{self.port}/{image}"
+		return f"localhost:{self.port}/{image}:{self.version}"
 
 	@staticmethod
 	def hostToName(host: str) -> str:
@@ -68,13 +69,14 @@ if __name__ == "__main__":
 	                    default=pathlib.Path("bzd-deployment"),
 	                    help="The name of the directory to be used.")
 	parser.add_argument("--registry-port", type=int, default=5000, help="Port for the registry.")
+	parser.add_argument("--version", type=str, default=STABLE_VERSION, help="The version of this deployment.")
 	parser.add_argument("transport", type=str, help="Location where to deploy the target.")
 	args = parser.parse_args()
 
 	data = json.loads(args.json.read_text())
 	ast = Ast(data)
 
-	common = CommonParameters(port=args.registry_port)
+	common = CommonParameters(port=args.registry_port, version=args.version)
 
 	# Generate docker compose content
 	traefikDockerCompose, traefikImages = DeploymentDockerTraefik(ast=ast,
@@ -111,11 +113,7 @@ if __name__ == "__main__":
 
 			for image in images:
 				print(f"Pushing {image}...", flush=True)
-				ociPush(pathlib.Path(image),
-				        f"localhost:{args.registry_port}/{image}",
-				        stdout=True,
-				        stderr=True,
-				        timeoutS=30 * 60)
+				ociPush(pathlib.Path(image), common.imageResolve(image), stdout=True, stderr=True, timeoutS=30 * 60)
 
 		# Find all applications.
 		applications = set(dockerCompose.keys())
@@ -143,12 +141,12 @@ if __name__ == "__main__":
 
 			dockerComposeDirectory = directory / "docker-compose"
 			dockerComposeFile = directory / "docker-compose.yml"
-			print(f"Copying and using '{dockerComposeDirectory}/{STABLE_VERSION}.yml'.", flush=True)
+			print(f"Copying and using '{dockerComposeDirectory}/{args.version}.yml'.", flush=True)
 			handle.command(["mkdir", "-p", str(dockerComposeDirectory)])
-			handle.uploadContent(content, f"{dockerComposeDirectory / STABLE_VERSION}.yml")
+			handle.uploadContent(content, f"{dockerComposeDirectory / args.version}.yml")
 			# Note, it is important to copy instead of symlink, otherwise docker compose up might lead to orphan
 			# containers if some are deleted as docker will consider it as a new project.
-			handle.command(["cp", "-f", f"{dockerComposeDirectory / STABLE_VERSION}.yml", str(dockerComposeFile)])
+			handle.command(["cp", "-f", f"{dockerComposeDirectory / args.version}.yml", str(dockerComposeFile)])
 
 			print(f"Pulling new images.", flush=True)
 			# Note --ignore-pull-failures: if there is no need for updating a certain image, it can be that it is not in the registry.
