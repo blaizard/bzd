@@ -89,6 +89,14 @@ class HttpClient:
 
 		context = ssl.create_default_context(cafile=certifi.where())
 		request = urllib.request.Request(url, data=body, headers=headers, method=method)
-		response = urllib.request.urlopen(request, timeout=timeoutS, context=context)
 
-		return Response(response)
+		try:
+			response = urllib.request.urlopen(request, timeout=timeoutS, context=context)
+			return Response(response)
+
+		except urllib.error.HTTPError as e:
+			body = e.read().decode("utf-8")
+			raise Exception(f"HTTP Error: {e.reason} ({e.code}) calling {url}: response body: {body}")
+
+		except urllib.error.URLError as e:
+			raise Exception(f"URL Error: {e.reason} calling {url}")
