@@ -185,6 +185,7 @@ if __name__ == "__main__":
 					for tag in tags:
 						if tag in allImages[repository]:
 							del allImages[repository][tag]
+							print(f"- Keeping image {repository}:{tag}", flush=True)
 
 			# Remove unused image tags.
 			for repository, tagsDigest in allImages.items():
@@ -198,6 +199,6 @@ if __name__ == "__main__":
 		    "docker", "exec", "registry", "/bin/registry", "garbage-collect", "--delete-untagged",
 		    "/etc/docker/registry/config.yml"
 		])
-		handle.command(["docker", "image", "prune", "--force"])
+		handle.command(["docker", "system", "prune", "--force", "--volumes", "--all"])
 
 	sys.exit(0)
