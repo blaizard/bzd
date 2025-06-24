@@ -87,6 +87,7 @@ if __name__ == "__main__":
 	                    help="Calibre configuration path.")
 	parser.add_argument("--format", type=str, default=None, help="Assume a specific format for the ebook.")
 	parser.add_argument("--coefficient", type=float, default=1.0, help="Coefficient to be used to find outliers.")
+	parser.add_argument("--zoom", type=float, default=1.0, help="Zoom coefficient to be used.")
 	parser.add_argument(
 	    "--sandbox",
 	    type=pathlib.Path,
@@ -99,7 +100,7 @@ if __name__ == "__main__":
 
 	actions = {
 	    "removeDRM": RemoveDRM(calibreConfigPath=args.calibre_config),
-	    "epub": EPub(),
+	    "epub": EPub(zoom=args.zoom),
 	    "cbz": Cbz(coefficient=args.coefficient),
 	    "cbr": Cbr(coefficient=args.coefficient),
 	    "imagesToPdf": ImagesToPdf(),

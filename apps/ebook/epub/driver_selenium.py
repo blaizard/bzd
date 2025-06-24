@@ -31,7 +31,8 @@ class DriverSelenium:
 
 		return self
 
-	def process(self, documentIndex: int, metadata: EPubMetadata, directory: pathlib.Path) -> typing.List[pathlib.Path]:
+	def process(self, documentIndex: int, metadata: EPubMetadata, directory: pathlib.Path,
+	            zoom: float) -> typing.List[pathlib.Path]:
 		pageIndex = 1
 		outputs = []
 		directory.mkdir(parents=True, exist_ok=True)
@@ -39,8 +40,10 @@ class DriverSelenium:
 		for document in metadata.document:
 			self.driver.get(f"file://{document}")
 
-			# Set the zoom level to 250% to ensure the text is readable (only if needed)
-			#self.driver.execute_script("document.body.style.zoom = '250%'")
+			# Set the zoom level to ensure the text is readable (only if needed)
+			# Only do it if we zoom out as it doesn't seem to work for zooming in.
+			if zoom > 1:
+				self.driver.execute_script(f"document.body.style.zoom = '{zoom}'")  # type: ignore
 
 			retry = 0
 			while True:
@@ -63,8 +66,16 @@ class DriverSelenium:
 					if imageSize[0] != width or imageSize[1] != height:
 						assert retry < 2, f"Too many retries, aborting."
 						retry += 1
-						print(f"Size mismatch {imageSize[0]}x{imageSize[1]} vs {width}x{height}, retrying.")
+						print(f"-> Size mismatch {imageSize[0]}x{imageSize[1]} vs {width}x{height}, retrying.")
 						continue
+
+					# If the zoom is less than 1, we manually reduce the size of the image.
+					if zoom < 1:
+						newWidth = int(width * zoom)
+						newHeight = int(height * zoom)
+						print(f"-> Downsizing to ({newWidth}x{newHeight})")
+						img = img.resize((newWidth, newHeight), Image.LANCZOS)  # type: ignore
+						img.save(pagePath)
 				break
 
 			pageIndex += 1

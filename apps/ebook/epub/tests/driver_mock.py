@@ -15,7 +15,8 @@ class DriverMock:
 		self.currentlyExpected = [expectedMetadata.clone() for expectedMetadata in self.expected]
 		return self
 
-	def process(self, documentIndex: int, metadata: EPubMetadata, directory: pathlib.Path) -> typing.List[pathlib.Path]:
+	def process(self, documentIndex: int, metadata: EPubMetadata, directory: pathlib.Path,
+	            zoom: float) -> typing.List[pathlib.Path]:
 
 		self.currentlyExpected = [expectedMetadata.clone() for expectedMetadata in self.expected]
 

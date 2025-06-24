@@ -23,9 +23,10 @@ class EPub(ActionInterface):
 	ProviderInput = ProviderEbook
 	ProviderOutput = ProviderImages
 
-	def __init__(self, driver: typing.Any = DriverSelenium()) -> None:
+	def __init__(self, driver: typing.Any = DriverSelenium(), zoom: float = 1.0) -> None:
 		super().__init__()
 		self.driver = driver
+		self.zoom = zoom
 
 	@staticmethod
 	def parseDate(string: str) -> typing.Optional[datetime.datetime]:
@@ -101,7 +102,10 @@ class EPub(ActionInterface):
 				zipInstance.extractall(directory / "extract")
 			documents = self.readMetadata(directory / "extract")
 			for documentNumber, metadata in enumerate(documents):
-				output = driver.process(documentNumber, metadata, directory / f"document_{documentNumber}")
+				output = driver.process(documentNumber,
+				                        metadata,
+				                        directory / f"document_{documentNumber}",
+				                        zoom=self.zoom)
 				outputs.append((ProviderImages(images=output, metadata=metadata.metadata), None))
 
 		return outputs
