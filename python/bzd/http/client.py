@@ -95,8 +95,8 @@ class HttpClient:
 			return Response(response)
 
 		except urllib.error.HTTPError as e:
-			body = e.read().decode("utf-8")
-			raise Exception(f"HTTP Error: {e.reason} ({e.code}) calling {url}: response body: {body}")
+			bodyError = e.read().decode("utf-8")
+			raise Exception(f"HTTP Error: {e.reason} ({e.code}) calling {url}: response body: {bodyError}")
 
 		except urllib.error.URLError as e:
 			raise Exception(f"URL Error: {e.reason} calling {url}")

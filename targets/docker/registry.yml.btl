@@ -1,9 +1,9 @@
 version: "3.3"
 
 services:
-    registry:
+    bzd-deployment-registry:
         image: "registry:2"
-        container_name: "registry"
+        container_name: "bzd-deployment-registry"
         ports:
             - {{ port }}:5000
         environment:

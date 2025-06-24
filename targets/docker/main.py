@@ -105,7 +105,9 @@ if __name__ == "__main__":
 		handle.uploadContent(registry, f"{args.directory}/docker-compose.yml")
 
 		print("Starting docker registry.", flush=True)
-		handle.command(["docker", "compose", "--file", f"{args.directory}/docker-compose.yml", "up", "-d", "registry"])
+		handle.command([
+		    "docker", "compose", "--file", f"{args.directory}/docker-compose.yml", "up", "-d", "bzd-deployment-registry"
+		])
 
 		# Push the new images
 		print(f"Forwarding port {args.registry_port}...", flush=True)
@@ -114,6 +116,8 @@ if __name__ == "__main__":
 			for image in images:
 				print(f"Pushing {image}...", flush=True)
 				ociPush(pathlib.Path(image), common.imageResolve(image), stdout=True, stderr=True, timeoutS=30 * 60)
+				# This asserts that the image is available in the registry and accessible by the docker client.
+				handle.command(["docker", "pull", common.imageResolve(image)])
 
 		# Find all applications.
 		applications = set(dockerCompose.keys())
@@ -147,6 +151,9 @@ if __name__ == "__main__":
 			# Note, it is important to copy instead of symlink, otherwise docker compose up might lead to orphan
 			# containers if some are deleted as docker will consider it as a new project.
 			handle.command(["cp", "-f", f"{dockerComposeDirectory / args.version}.yml", str(dockerComposeFile)])
+
+			# Copy the rollback script.
+			handle.upload(pathlib.Path(__file__).parent / "rollback.sh", str(dockerComposeDirectory / "rollback.sh"))
 
 			print(f"Pulling new images.", flush=True)
 			# Note --ignore-pull-failures: if there is no need for updating a certain image, it can be that it is not in the registry.
@@ -196,9 +203,12 @@ if __name__ == "__main__":
 		# Cleanup docker register and docker
 		print(f"Cleaning up dangling images...", flush=True)
 		handle.command([
-		    "docker", "exec", "registry", "/bin/registry", "garbage-collect", "--delete-untagged",
+		    "docker", "exec", "bzd-deployment-registry", "/bin/registry", "garbage-collect", "--delete-untagged",
 		    "/etc/docker/registry/config.yml"
 		])
 		handle.command(["docker", "system", "prune", "--force", "--volumes", "--all"])
+
+		# Health check.
+		# docker compose ps --format json
 
 	sys.exit(0)

@@ -16,6 +16,7 @@ py_binary(
     ],
     data = [
         "registry.yml.btl",
+        "rollback.sh",
     ],
     deps = [
         ":docker_compose",

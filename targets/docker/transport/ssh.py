@@ -16,6 +16,9 @@ class TransportSSHHandle:
 	def uploadContent(self, *args: typing.Any, **kwargs: typing.Any) -> typing.Any:
 		return self.handle.uploadContent(*args, **kwargs)
 
+	def upload(self, *args: typing.Any, **kwargs: typing.Any) -> typing.Any:
+		return self.handle.upload(*args, **kwargs)
+
 	def forwardPort(self, *args: typing.Any, **kwargs: typing.Any) -> typing.Any:
 		return self.ssh.forwardPort(*args, **kwargs)
 
