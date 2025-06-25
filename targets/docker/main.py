@@ -63,7 +63,7 @@ def getAllImagesFromDockerComposeFiles(
 
 
 @contextmanager
-def usingDockerRegistry(handle: typing.Any, dockerComposeFile: pathlib.Path) -> None:
+def usingDockerRegistry(handle: typing.Any, dockerComposeFile: pathlib.Path) -> typing.Iterator[None]:
 	"""Context manager to use the docker registry."""
 
 	def runGarbageCollector() -> None:
