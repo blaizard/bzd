@@ -5,6 +5,7 @@ import typing
 import sys
 import re
 import time
+from contextlib import contextmanager
 
 from bdl.generators.json.ast.ast import Ast
 from bzd.template.template import Template
@@ -50,7 +51,7 @@ def getAllImagesFromDockerComposeFiles(
 	images: typing.Dict[str, typing.Set[str]] = {}
 	for path in dockerComposeFiles:
 		result = handle.command(["docker", "compose", "--file", str(path), "config", "--format", "json"])
-		output = json.loads(result.getOutput())
+		output = json.loads(result.getStdout())
 		imagesCurrentFile = DockerCompose(output).getImages()
 
 		# Merge.
@@ -59,6 +60,34 @@ def getAllImagesFromDockerComposeFiles(
 			images[image].update(tags)
 
 	return images
+
+
+@contextmanager
+def usingDockerRegistry(handle: typing.Any, dockerComposeFile: pathlib.Path) -> None:
+	"""Context manager to use the docker registry."""
+
+	def runGarbageCollector() -> None:
+		"""Run the garbage collector to clean up dangling images."""
+		handle.command(["docker", "compose", "--file", str(dockerComposeFile), "down"])
+		handle.command([
+		    "docker", "compose", "--file",
+		    str(dockerComposeFile), "run", "--rm", "bzd-deployment-registry-maintenance", "/bin/registry",
+		    "garbage-collect", "--delete-untagged", "/etc/docker/registry/config.yml"
+		])
+		handle.command(["docker", "compose", "--file", str(dockerComposeFile), "up", "-d", "bzd-deployment-registry"])
+
+	# Cleanup docker register and start it, this prevents issues with dangling images.
+	print("==== Starting docker registry ====", flush=True)
+	runGarbageCollector()
+
+	try:
+		yield
+	finally:
+
+		# Cleanup docker register and docker
+		print(f"==== Cleaning up dangling images ====", flush=True)
+		runGarbageCollector()
+		handle.command(["docker", "system", "prune", "--force", "--volumes", "--all"])
 
 
 if __name__ == "__main__":
@@ -104,109 +133,104 @@ if __name__ == "__main__":
 		print(f"Copying '{args.directory}/docker-compose.yml'.", flush=True)
 		handle.uploadContent(registry, f"{args.directory}/docker-compose.yml")
 
-		print("Starting docker registry.", flush=True)
-		handle.command([
-		    "docker", "compose", "--file", f"{args.directory}/docker-compose.yml", "up", "-d", "bzd-deployment-registry"
-		])
+		with usingDockerRegistry(handle, pathlib.Path(f"{args.directory}/docker-compose.yml")):
 
-		# Push the new images
-		print(f"Forwarding port {args.registry_port}...", flush=True)
-		with handle.forwardPort(args.registry_port, waitHTTP=f"http://localhost:{args.registry_port}/v2/"):
+			# Push the new images
+			print(f"Forwarding port {args.registry_port}...", flush=True)
+			with handle.forwardPort(args.registry_port, waitHTTP=f"http://localhost:{args.registry_port}/v2/"):
 
-			for image in images:
-				print(f"Pushing {image}...", flush=True)
-				ociPush(pathlib.Path(image), common.imageResolve(image), stdout=True, stderr=True, timeoutS=30 * 60)
-				# This asserts that the image is available in the registry and accessible by the docker client.
-				handle.command(["docker", "pull", common.imageResolve(image)])
+				for image in images:
+					print(f"=== Pushing {image} ====", flush=True)
+					ociPush(pathlib.Path(image), common.imageResolve(image), stdout=True, stderr=True, timeoutS=30 * 60)
+					# This asserts that the image is available in the registry and accessible by the docker client.
+					handle.command(["docker", "pull", common.imageResolve(image)])
 
-		# Find all applications.
-		applications = set(dockerCompose.keys())
-		result = handle.command(["find", str(applicationsDirectory), "-maxdepth", "1", "-type", "d"])
-		currentApplications = set(filter(bool, [d.strip().split("/")[-1] for d in result.getOutput().split("\n")][1:]))
-		print(f"Applications currently deployed: {', '.join(currentApplications)}", flush=True)
-		print(f"Applications: {', '.join(applications)}", flush=True)
+			# Find all applications.
+			applications = set(dockerCompose.keys())
+			result = handle.command(["find", str(applicationsDirectory), "-maxdepth", "1", "-type", "d"])
+			currentApplications = set(
+			    filter(bool, [d.strip().split("/")[-1] for d in result.getOutput().split("\n")][1:]))
+			print(f"Applications currently deployed: {', '.join(currentApplications)}", flush=True)
+			print(f"Applications: {', '.join(applications)}", flush=True)
 
-		# Remove applications that are currently present but not needed anymore.
-		removeApplications = currentApplications - applications
-		for application in removeApplications:
-			directory = applicationsDirectory / application
-			print(f"Stopping '{directory}'...", flush=True)
-			handle.command(["docker", "compose", "--file",
-			                str(directory / "docker-compose.yml"), "down"],
-			               ignoreFailure=True)
-			handle.command(["rm", "-rfd", str(directory)])
+			# Remove applications that are currently present but not needed anymore.
+			removeApplications = currentApplications - applications
+			for application in removeApplications:
+				directory = applicationsDirectory / application
+				print(f"Stopping '{directory}'...", flush=True)
+				handle.command(["docker", "compose", "--file",
+				                str(directory / "docker-compose.yml"), "down"],
+				               ignoreFailure=True)
+				handle.command(["rm", "-rfd", str(directory)])
 
-		# Start applications
-		allDockerComposeFiles: typing.List[pathlib.Path] = []
-		for application, content in dockerCompose.items():
+			# Start applications
+			allDockerComposeFiles: typing.List[pathlib.Path] = []
+			for application, content in dockerCompose.items():
 
-			directory = applicationsDirectory / application
-			handle.command(["mkdir", "-p", str(directory)])
+				print(f"==== Application {application} ====", flush=True)
 
-			dockerComposeDirectory = directory / "docker-compose"
-			dockerComposeFile = directory / "docker-compose.yml"
-			print(f"Copying and using '{dockerComposeDirectory}/{args.version}.yml'.", flush=True)
-			handle.command(["mkdir", "-p", str(dockerComposeDirectory)])
-			handle.uploadContent(content, f"{dockerComposeDirectory / args.version}.yml")
-			# Note, it is important to copy instead of symlink, otherwise docker compose up might lead to orphan
-			# containers if some are deleted as docker will consider it as a new project.
-			handle.command(["cp", "-f", f"{dockerComposeDirectory / args.version}.yml", str(dockerComposeFile)])
+				directory = applicationsDirectory / application
+				handle.command(["mkdir", "-p", str(directory)])
 
-			# Copy the rollback script.
-			handle.upload(pathlib.Path(__file__).parent / "rollback.sh", str(dockerComposeDirectory / "rollback.sh"))
+				dockerComposeDirectory = directory / "docker-compose"
+				dockerComposeFile = directory / "docker-compose.yml"
+				print(f"Copying and using '{dockerComposeDirectory}/{args.version}.yml'.", flush=True)
+				handle.command(["mkdir", "-p", str(dockerComposeDirectory)])
+				handle.uploadContent(content, f"{dockerComposeDirectory / args.version}.yml")
+				# Note, it is important to copy instead of symlink, otherwise docker compose up might lead to orphan
+				# containers if some are deleted as docker will consider it as a new project.
+				handle.command(["cp", "-f", f"{dockerComposeDirectory / args.version}.yml", str(dockerComposeFile)])
 
-			print(f"Pulling new images.", flush=True)
-			# Note --ignore-pull-failures: if there is no need for updating a certain image, it can be that it is not in the registry.
-			# not having --ignore-pull-failures will result in a failure.
-			handle.command(["docker", "compose", "--file", str(dockerComposeFile), "pull", "--ignore-pull-failures"])
-			print(f"Restarting containers.", flush=True)
-			handle.command(["docker", "compose", "--file", str(dockerComposeFile), "up", "-d"])
+				# Copy the rollback script.
+				handle.upload(
+				    pathlib.Path(__file__).parent / "rollback.sh", str(dockerComposeDirectory / "rollback.sh"))
 
-			# Gather all the docker compose files from existing and previous versions and delete the too old ones.
-			dockerComposeFiles = sorted([
-			    s for s in handle.command(["ls", "-1", str(dockerComposeDirectory)]).getOutput().split("\n")
-			    if s.endswith(".yml")
-			],
-			                            reverse=True)
-			print(f"Identified {len(dockerComposeFiles)} version(s): {', '.join(dockerComposeFiles)}", flush=True)
-			keepDockerComposeFiles = dockerComposeFiles[:2]
-			removeDockerComposeFiles = dockerComposeFiles[2:]
-			for name in removeDockerComposeFiles:
-				print(f"- Removing {dockerComposeDirectory / name}", flush=True)
-				handle.command(["rm", str(dockerComposeDirectory / name)])
+				print(f"Pulling new images.", flush=True)
+				# Note --ignore-pull-failures: if there is no need for updating a certain image, it can be that it is not in the registry.
+				# not having --ignore-pull-failures will result in a failure.
+				handle.command(
+				    ["docker", "compose", "--file",
+				     str(dockerComposeFile), "pull", "--ignore-pull-failures"])
+				print(f"Restarting containers.", flush=True)
+				handle.command(["docker", "compose", "--file", str(dockerComposeFile), "up", "-d"])
 
-			# Keep track of all current docker compose files.
-			allDockerComposeFiles += [dockerComposeDirectory / name for name in keepDockerComposeFiles]
+				# Gather all the docker compose files from existing and previous versions and delete the too old ones.
+				dockerComposeFiles = sorted([
+				    s for s in handle.command(["ls", "-1", str(dockerComposeDirectory)]).getOutput().split("\n")
+				    if s.endswith(".yml")
+				],
+				                            reverse=True)
+				print(f"Identified {len(dockerComposeFiles)} version(s): {', '.join(dockerComposeFiles)}", flush=True)
+				keepDockerComposeFiles = dockerComposeFiles[:2]
+				removeDockerComposeFiles = dockerComposeFiles[2:]
+				for name in removeDockerComposeFiles:
+					print(f"- Removing {dockerComposeDirectory / name}", flush=True)
+					handle.command(["rm", str(dockerComposeDirectory / name)])
 
-		# Garbage collect some of the images if needed.
-		print(f"Identifying unused images...", flush=True)
-		with handle.forwardPort(args.registry_port, waitHTTP=f"http://localhost:{args.registry_port}/v2/"):
+				# Keep track of all current docker compose files.
+				allDockerComposeFiles += [dockerComposeDirectory / name for name in keepDockerComposeFiles]
 
-			usedImages = getAllImagesFromDockerComposeFiles(handle, allDockerComposeFiles)
-			dockerRegistry = DockerRegistry(f"http://localhost:{args.registry_port}")
-			allImages = dockerRegistry.getImages()
+			# Garbage collect some of the images if needed.
+			print(f"Identifying unused images...", flush=True)
+			with handle.forwardPort(args.registry_port, waitHTTP=f"http://localhost:{args.registry_port}/v2/"):
 
-			# Only keep unused image tags.
-			for repository, tags in usedImages.items():
-				if repository in allImages:
-					for tag in tags:
-						if tag in allImages[repository]:
-							del allImages[repository][tag]
-							print(f"- Keeping image {repository}:{tag}", flush=True)
+				usedImages = getAllImagesFromDockerComposeFiles(handle, allDockerComposeFiles)
+				dockerRegistry = DockerRegistry(f"http://localhost:{args.registry_port}")
+				allImages = dockerRegistry.getImages()
 
-			# Remove unused image tags.
-			for repository, tagsDigest in allImages.items():
-				for tag, digest in tagsDigest.items():
-					print(f"- Removing image {repository}:{tag} ({digest}).", flush=True)
-					dockerRegistry.delete(repository, digest)
+				# Only keep unused image tags.
+				for repository, tags in usedImages.items():
+					if repository in allImages:
+						for tag in tags:
+							if tag in allImages[repository]:
+								del allImages[repository][tag]
+								print(f"- Keeping image {repository}:{tag}", flush=True)
 
-		# Cleanup docker register and docker
-		print(f"Cleaning up dangling images...", flush=True)
-		handle.command([
-		    "docker", "exec", "bzd-deployment-registry", "/bin/registry", "garbage-collect", "--delete-untagged",
-		    "/etc/docker/registry/config.yml"
-		])
-		handle.command(["docker", "system", "prune", "--force", "--volumes", "--all"])
+				# Remove unused image tags.
+				for repository, tagsDigest in allImages.items():
+					for tag, digest in tagsDigest.items():
+						print(f"- Removing image {repository}:{tag} ({digest}).", flush=True)
+						dockerRegistry.delete(repository, digest)
 
 		# Health check.
 		# docker compose ps --format json

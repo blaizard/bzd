@@ -28,9 +28,19 @@ previous="${files[$((file_count - 2))]}"
 # Revert the current file to the previous one
 # and rollback the containers.
 cp "$previous" "$DOCKER_COMPOSE"
-docker compose --file "$DOCKER_COMPOSE" up -d
+if ! docker compose --file "$DOCKER_COMPOSE" up -d; then
+
+    # On failure, restore the current file.
+    echo "Error: Failed to roll back to $previous"
+    echo "Restoring $current..."
+
+    cp "$current" "$DOCKER_COMPOSE"
+    docker compose --file "$DOCKER_COMPOSE" up -d
+
+    exit 1
+fi
+
 
 # Delete the current file.
 rm "$current"
-
-echo "Rolled back to previous configuration: $previous"
+echo "Rolled back to $previous"

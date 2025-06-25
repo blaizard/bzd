@@ -10,3 +10,12 @@ services:
             REGISTRY_STORAGE_DELETE_ENABLED: "true"
         volumes:
             - ./registry:/var/lib/registry:rw
+
+    bzd-deployment-registry-maintenance:
+        image: "registry:2"
+        container_name: "bzd-deployment-registry-maintenance"
+        environment:
+            REGISTRY_STORAGE_DELETE_ENABLED: "true"
+            REGISTRY_STORAGE_MAINTENANCE_READONLY_ENABLED: "true"
+        volumes:
+            - ./registry:/var/lib/registry:rw
