@@ -40,6 +40,20 @@ def wakeOnLan(mac: str, broadcast: str) -> None:
 	sock.sendto(sendData, (broadcast, 7))
 
 
+def wakeOnLanProxy(mac: str, service: str) -> None:
+	"""Send a packet to wake on lan a specific host via a proxy."""
+
+	service_host, service_port = getHostPort(service)
+	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	sock.connect((service_host, service_port))
+	try:
+		sock.sendall(mac.encode('utf-8'))
+		print(f"Successfully sent '{mac}' to {service_host}:{service_port}")
+
+	finally:
+		sock.close()
+
+
 def checkConnection(host: str, port: int, timeoutS: int = 1) -> bool:
 	"""Check that a connection exists."""
 
@@ -60,11 +74,15 @@ def commandWol(args: argparse.Namespace) -> None:
 	assert checkMAC(args.mac), f"Mac address '{args.mac}' should have the following format: XX:XX:XX:XX:XX:XX"
 
 	# Wake up the machine.
-	wakeOnLan(args.mac, args.broadcast)
+	if args.service:
+		wakeOnLanProxy(args.mac, args.service)
+	else:
+		wakeOnLan(args.mac, args.broadcast)
 
 	# Wait for services to be ready.
 	for entry in args.wait:
 		host, port = getHostPort(entry)
+		print(f"Waiting for {host}:{port} to be ready...")
 		connectionOpen = False
 		startTime = int(time.perf_counter())
 		for timeLimit in range(startTime, startTime + args.timeout, 5):
@@ -99,6 +117,11 @@ if __name__ == "__main__":
 	    "--broadcast",
 	    default="255.255.255.255",
 	    help="The broadcast address to be used.",
+	)
+	wolParser.add_argument(
+	    "-s",
+	    "--service",
+	    help="A service to proxy the WOL call.",
 	)
 	wolParser.add_argument(
 	    "-t",

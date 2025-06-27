@@ -16,7 +16,7 @@ jobs:
 
             - name: "Enable Remote Execution"
               run: |
-                  ./tools/bazel run //deployment:remote_wol --config=local
+                  ./tools/bazel run //deployment:remote_wol_service --config=local
 
             - name: "Environment"
               run: |
