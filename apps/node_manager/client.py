@@ -48,7 +48,7 @@ def wakeOnLanProxy(mac: str, service: str) -> None:
 	sock.connect((service_host, service_port))
 	try:
 		sock.sendall(mac.encode('utf-8'))
-		print(f"Successfully sent '{mac}' to {service_host}:{service_port}")
+		print(f"Successfully sent '{mac}' to {service_host}:{service_port}", flush=True)
 
 	finally:
 		sock.close()
@@ -82,7 +82,7 @@ def commandWol(args: argparse.Namespace) -> None:
 	# Wait for services to be ready.
 	for entry in args.wait:
 		host, port = getHostPort(entry)
-		print(f"Waiting for {host}:{port} to be ready...")
+		print(f"Waiting for {host}:{port} to be ready...", flush=True)
 		connectionOpen = False
 		startTime = int(time.perf_counter())
 		for timeLimit in range(startTime, startTime + args.timeout, 5):
