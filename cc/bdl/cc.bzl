@@ -3,7 +3,7 @@
 load("@bazel_skylib//lib:sets.bzl", "sets")
 load("@bzd_bdl//:defs.bzl", "bdl_library", "bdl_system", "bdl_system_test")
 load("@bzd_toolchain_cc//cc:defs.bzl", "cc_compile")
-load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@rules_cc//cc:defs.bzl", "cc_library", "CcInfo")
 
 def _bzd_cc_binary_impl(name, visibility, target, tags, bdls, hdrs, srcs, deps, testonly, **kwargs):
     updated_deps = deps + []

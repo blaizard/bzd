@@ -2,6 +2,7 @@
 
 load("@bazel_skylib//lib:sets.bzl", "sets")
 load("@bdl_extension//:extensions.bzl", "extensions")
+load("@rules_cc//cc:defs.bzl", "CcInfo")
 load("//private:providers.bzl", "BdlInfo", "BdlTagInfo")
 load("//private/extensions:json.bzl", extension_json = "extension")
 

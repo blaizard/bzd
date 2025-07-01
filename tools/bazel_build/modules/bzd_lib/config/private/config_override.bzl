@@ -1,5 +1,7 @@
 """Configuration override rules."""
 
+load("@rules_cc//cc:defs.bzl", "CcInfo")
+load("@rules_cc//cc/common:debug_package_info.bzl", "DebugPackageInfo")
 load("//lib:attrs.bzl", "ATTRS_COMMON_BUILD_RULES", "attrs_assert_any_of")
 
 # This list was taken from here: https://github.com/fmeum/with_cfg.bzl/blob/main/with_cfg/private/rule_defaults.bzl

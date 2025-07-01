@@ -3,6 +3,7 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
 load("@bzd_toolchain_cc//cc:defs.bzl", "cc_compile", "cc_link")
+load("@rules_cc//cc:defs.bzl", "CcInfo")
 
 def _get_cc_public_header(target):
     """Get all the direct public headers from a target."""
