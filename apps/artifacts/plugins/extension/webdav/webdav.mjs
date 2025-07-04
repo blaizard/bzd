@@ -32,6 +32,11 @@ async function setRessourceHeaders(pathList, context, storage) {
 	context.setHeader("Content-Type", "application/octet-stream");
 }
 
+/// Get the path from the context.
+function getPathFromContext(context) {
+	return pathlib.path(decodeURIComponent(context.getParam("path", ""))).normalize;
+}
+
 export default function extensionWebdav(plugin, options, provider, endpoints) {
 	if (!options["webdav"]) {
 		return;
@@ -60,7 +65,7 @@ export default function extensionWebdav(plugin, options, provider, endpoints) {
 		"/webdav/{path:*}",
 		async (context) => {
 			await scopeExceptionHandler(context, async () => {
-				const path = pathlib.path(context.getParam("path", "")).normalize;
+				const path = getPathFromContext(context);
 				const storage = plugin.getStorage();
 				await setRessourceHeaders(path.parts, context, storage);
 				context.setStatus(200);
@@ -79,7 +84,7 @@ export default function extensionWebdav(plugin, options, provider, endpoints) {
 		"/webdav/{path:*}",
 		async (context) => {
 			await scopeExceptionHandler(context, async () => {
-				const path = pathlib.path(context.getParam("path", "")).normalize;
+				const path = getPathFromContext(context);
 				const storage = plugin.getStorage();
 				const body = context.getBody();
 				await storage.writeFromChunk(path.parts, body);
@@ -105,7 +110,7 @@ export default function extensionWebdav(plugin, options, provider, endpoints) {
 	endpoints.register("propfind", "/webdav/{path:*}", async (context) => {
 		await scopeExceptionHandler(context, async () => {
 			const depth = context.getHeader("depth", "0");
-			const path = pathlib.path(context.getParam("path", "")).normalize;
+			const path = getPathFromContext(context);
 			const storage = plugin.getStorage();
 
 			if (depth != "0" && depth != "1") {
@@ -115,7 +120,7 @@ export default function extensionWebdav(plugin, options, provider, endpoints) {
 
 			const entryToResponse = (path, entry) => {
 				let props = {
-					"D:displayname": entry.name || path.name,
+					"D:displayname": entry.name || decodeURIComponent(path.name),
 					"D:resourcetype": Permissions.makeFromEntry(entry).isList() ? { "D:collection": {} } : {},
 				};
 				if (entry.size) {
@@ -146,7 +151,7 @@ export default function extensionWebdav(plugin, options, provider, endpoints) {
 				try {
 					const children = await storage.list(path.parts, 100, /*includeMetadata*/ true);
 					responses = responses.concat(
-						children.data().map((entry) => entryToResponse(publicPath.joinPath(entry.name), entry)),
+						children.data().map((entry) => entryToResponse(publicPath.joinPath(encodeURIComponent(entry.name)), entry)),
 					);
 				} catch (e) {
 					// ignore errors, it means that the list was performed on a file most likely.
@@ -172,7 +177,7 @@ export default function extensionWebdav(plugin, options, provider, endpoints) {
 	/// Delete a file/directory.
 	endpoints.register("delete", "/webdav/{path:*}", async (context) => {
 		await scopeExceptionHandler(context, async () => {
-			const path = pathlib.path(context.getParam("path", "")).normalize;
+			const path = getPathFromContext(context);
 			const storage = plugin.getStorage();
 
 			await storage.delete(path.parts);
@@ -183,7 +188,7 @@ export default function extensionWebdav(plugin, options, provider, endpoints) {
 	/// Create a directory.
 	endpoints.register("mkcol", "/webdav/{path:*}", async (context) => {
 		await scopeExceptionHandler(context, async () => {
-			const path = pathlib.path(context.getParam("path", "")).normalize;
+			const path = getPathFromContext(context);
 			const storage = plugin.getStorage();
 
 			await storage.mkdir(path.parts);
@@ -194,7 +199,7 @@ export default function extensionWebdav(plugin, options, provider, endpoints) {
 	/// Get the header only to query a resource.
 	endpoints.register("head", "/webdav/{path:*}", async (context) => {
 		await scopeExceptionHandler(context, async () => {
-			const path = pathlib.path(context.getParam("path", "")).normalize;
+			const path = getPathFromContext(context);
 			const storage = plugin.getStorage();
 			await setRessourceHeaders(path.parts, context, storage);
 			context.sendStatus(200);

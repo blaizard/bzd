@@ -47,6 +47,7 @@ const defaultMemory = {
 		data: {
 			"a.txt": "content for a",
 			"b.txt": "content for b",
+			"with space.txt": "content for width space",
 			empty: {},
 			nested: {
 				deeper: {
@@ -119,6 +120,11 @@ describe("Webdav", () => {
 					"D:resourcetype": "",
 					"D:getcontentlength": 13,
 				},
+				"/with%20space.txt": {
+					"D:displayname": "with space.txt",
+					"D:resourcetype": "",
+					"D:getcontentlength": 23,
+				},
 				"/empty": {
 					"D:displayname": "empty",
 					"D:resourcetype": { "D:collection": "" },
@@ -163,6 +169,21 @@ describe("Webdav", () => {
 					"D:displayname": "a.txt",
 					"D:resourcetype": "",
 					"D:getcontentlength": 13,
+				},
+			});
+		});
+
+		// webdav4: cat with space.txt
+		it("propfind on file", async () => {
+			const response = await tester.send("memory", "propfind", "/webdav/with%20space.txt");
+			Exception.assertEqual(response.status, 207);
+			const data = new XMLParser().parse(response.data);
+			const entry = data["D:multistatus"]["D:response"];
+			assertEqualResponses(data, {
+				"/with%20space.txt": {
+					"D:displayname": "with space.txt",
+					"D:resourcetype": "",
+					"D:getcontentlength": 23,
 				},
 			});
 		});

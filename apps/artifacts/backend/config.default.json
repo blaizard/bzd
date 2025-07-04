@@ -87,7 +87,8 @@
                         },
                         "e.txt": "content for e",
                         "f.txt": "content for b"
-                    }
+                    },
+                    "with space.txt": "content for with space"
                 },
                 "tests": true,
                 "type": "memory",
