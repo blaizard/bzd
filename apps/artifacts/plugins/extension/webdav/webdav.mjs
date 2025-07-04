@@ -128,12 +128,11 @@ export default function extensionWebdav(plugin, options, provider, endpoints) {
 					props["D:creationdate"] = entry.created.toUTCString();
 				}
 				return {
-					"$xmlns:D": "DAV:",
 					"D:href": context.getHost() + path.asPosix(),
 					"D:propstat": {
 						"D:prop": props,
+						"D:status": "HTTP/1.1 200 OK",
 					},
-					"D:status": "HTTP/1.1 200 OK",
 				};
 			};
 
@@ -159,14 +158,14 @@ export default function extensionWebdav(plugin, options, provider, endpoints) {
 				attributeNamePrefix: "$",
 			});
 			const xml = builder.build({
-				multistatus: {
-					$xmlns: "DAV:",
+				"D:multistatus": {
+					"$xmlns:D": "DAV:",
 					"D:response": responses,
 				},
 			});
 			context.setHeader("Content-Type", 'text/xml; charset="utf-8"');
 			context.setStatus(207);
-			context.send(xml);
+			context.send('<?xml version="1.0" encoding="utf-8"?>\n' + xml);
 		});
 	});
 

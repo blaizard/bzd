@@ -10,10 +10,10 @@ const fixedDate = new Date();
 const assertEqualResponses = (actual, expected) => {
 	try {
 		const expectedPrefx = "https://dummy/webdav";
-		Exception.assert("multistatus" in actual);
-		const responses = Array.isArray(actual.multistatus["D:response"])
-			? actual.multistatus["D:response"]
-			: [actual.multistatus["D:response"]];
+		Exception.assert("D:multistatus" in actual, "Missing D:multistatus.");
+		const responses = Array.isArray(actual["D:multistatus"]["D:response"])
+			? actual["D:multistatus"]["D:response"]
+			: [actual["D:multistatus"]["D:response"]];
 		let consumed = new Set();
 		for (const response of responses) {
 			Exception.assert(response, "Unexpected response: {:j}", response);
@@ -28,8 +28,9 @@ const assertEqualResponses = (actual, expected) => {
 			const path = href.substring(expectedPrefx.length);
 			Exception.assert(path in expected, "The path '{}' is not matching any of the expected entries.", path);
 			Exception.assert(!(path in consumed), "The path '{}' was covered twice.", path);
-			Exception.assertEqual(response["D:status"], "HTTP/1.1 200 OK");
-			const props = (response["D:propstat"] ?? {})["D:prop"] ?? {};
+			const propstat = response["D:propstat"] ?? {};
+			Exception.assertEqual(propstat["D:status"], "HTTP/1.1 200 OK");
+			const props = propstat["D:prop"] ?? {};
 			for (const [key, value] of Object.entries(expected[path])) {
 				Exception.assert(key in props, "Missing property '{}' in response for '{}', all props {:j}", key, path, props);
 				Exception.assertEqual(props[key], value, "Props '{}' for entry '{}', all props {:j}", key, path, props);
@@ -156,7 +157,7 @@ describe("Webdav", () => {
 			const response = await tester.send("memory", "propfind", "/webdav/a.txt");
 			Exception.assertEqual(response.status, 207);
 			const data = new XMLParser().parse(response.data);
-			const entry = data.multistatus["D:response"];
+			const entry = data["D:multistatus"]["D:response"];
 			assertEqualResponses(data, {
 				"/a.txt": {
 					"D:displayname": "a.txt",
@@ -175,7 +176,7 @@ describe("Webdav", () => {
 			});
 			Exception.assertEqual(response.status, 207);
 			const data = new XMLParser().parse(response.data);
-			const entry = data.multistatus["D:response"];
+			const entry = data["D:multistatus"]["D:response"];
 			assertEqualResponses(data, {
 				"/a.txt": {
 					"D:displayname": "a.txt",
