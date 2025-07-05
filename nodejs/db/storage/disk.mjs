@@ -21,6 +21,10 @@ async function getMetadata(filePath) {
 	let isList = true;
 	let type = "";
 
+	if (!(await FileSystem.exists(filePath))) {
+		throw new FileNotFoundError(filePath);
+	}
+
 	const stat = await FileSystem.stat(filePath);
 
 	if (stat.isFile()) {
