@@ -231,8 +231,13 @@ export default class HttpServer {
 			Exception.assert(await FileSystem.exists(fallback), "The fallback is not present at path '{}'.", fallback);
 			this.app.use(uri, (req, res, next) => {
 				if ((req.method === "GET" || req.method === "HEAD") && req.accepts("html")) {
-					optionsExpress.setHeaders(res, fallback);
-					res.sendFile.call(res, fallback, {}, (err) => err && next());
+					// dotfiles option is important here to allow serving files starting with a dot (.cache for example).
+					res.status(200).sendFile(fallback, { dotfiles: "allow" }, (err) => {
+						if (err) {
+							console.error("Error sending fallback file:", fallback, err);
+							res.status(500).send("<h1>Internal Server Error</h1><p>Could not load fallback content.</p>");
+						}
+					});
 				} else {
 					next();
 				}
