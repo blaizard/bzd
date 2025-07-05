@@ -13,6 +13,7 @@ bzl_library(
     visibility = ["//:__pkg__"],
     deps = [
         "//private/extensions:json",
+        "@@protobuf+//bazel:cc_proto_library_bzl",  # Not sure why this is needed:
         "@bazel_skylib//lib:sets",
         "@bazel_skylib//rules:common_settings",
         "@bdl_extension//:extensions",
@@ -20,7 +21,7 @@ bzl_library(
         "@bzd_lib//config:defs",
         "@bzd_package//:defs",
         "@bzd_toolchain_cc//cc:defs",
+        "@rules_cc//cc:defs_bzl",
         "@rules_cc//cc:find_cc_toolchain_bzl",
-        "@rules_cc//cc/common",
     ],
 )
