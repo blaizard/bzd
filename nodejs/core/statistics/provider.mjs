@@ -37,7 +37,7 @@ export default class Provider {
 	}
 
 	/// Initialize the data structure of a data point.
-	_initData(initial = 0) {
+	_initData(initial) {
 		return {
 			value: initial,
 			max: initial,
@@ -58,7 +58,7 @@ export default class Provider {
 
 	/// Set a value point to the existing points.
 	set(name, value) {
-		this.data[name] ??= this._initData(initial);
+		this.data[name] ??= this._initData(0);
 		this._updateData(this.data[name], value);
 	}
 
