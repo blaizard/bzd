@@ -11,6 +11,7 @@ bzd_nodejs_library(
         "//nodejs/core:exception",
         "//nodejs/core:filesystem",
         "//nodejs/core:log",
+        "//nodejs/core/statistics:provider",
         "//nodejs/utils:pathlib",
     ],
 )

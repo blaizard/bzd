@@ -157,8 +157,8 @@ export default class Cache2 {
 		data.size += sizeDiff;
 		this.size += sizeDiff;
 
-		this.statistics.setSize("collection-" + collection, data.size);
-		this.statistics.setSize("all", this.size);
+		this.statistics.set("collection-" + collection, data.size);
+		this.statistics.set("all", this.size);
 
 		if (this.trigger && this.size > this.options.maxSize) {
 			this.trigger.trigger();

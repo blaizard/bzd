@@ -2,6 +2,7 @@ import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import FileSystem from "#bzd/nodejs/core/filesystem.mjs";
 import pathlib from "#bzd/nodejs/utils/pathlib.mjs";
+import StatisticsProvider from "#bzd/nodejs/core/statistics/provider.mjs";
 
 const Exception = ExceptionFactory("form");
 const Log = LogFactory("form");
@@ -23,6 +24,7 @@ export default class Form {
 			},
 			options,
 		);
+		this.statistics = new StatisticsProvider("form");
 
 		//  Update options.
 		this.options.uploadDirectory = this.options.uploadDirectory
@@ -43,6 +45,16 @@ export default class Form {
 		return this.uploadedFiles[name];
 	}
 
+	/// Add a file entry.
+	async addFile(name, path) {
+		const stat = await FileSystem.stat(path);
+		this.uploadedFiles.set(name, {
+			path: path,
+			size: stat.size,
+		});
+		this.statistics.sum("total.size", stat.size);
+	}
+
 	installRest(api) {
 		Log.info("Installing 'Form' REST.");
 
@@ -55,9 +67,7 @@ export default class Form {
 			const name = "file-" + this.getUid() + "." + pathlib.path(originalPath).suffix;
 			const path = this.options.uploadDirectory.joinPath(name).asPosix();
 			await FileSystem.move(originalPath, path);
-			this.uploadedFiles.set(name, {
-				path: path,
-			});
+			await this.addFile(name, path);
 
 			return { path: name };
 		});

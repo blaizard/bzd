@@ -3,7 +3,7 @@ export default class Provider {
 	constructor(...namespace) {
 		this.namespace = namespace;
 		this.calls = {};
-		this.sizes = {};
+		this.data = {};
 	}
 
 	/// Get the current timestamp in ms.
@@ -34,5 +34,37 @@ export default class Provider {
 		};
 		this.sizes[name].current = size;
 		this.sizes[name].max = Math.max(size, this.sizes[name].max);
+	}
+
+	/// Initialize the data structure of a data point.
+	_initData(initial = 0) {
+		return {
+			value: initial,
+			max: initial,
+			min: initial,
+			avg: initial,
+			count: 0,
+		};
+	}
+
+	/// Update the statistics of the data point.
+	_updateData(data, value) {
+		++data.count;
+		data.value = value;
+		data.max = Math.max(value, data.max);
+		data.min = Math.min(value, data.min);
+		data.avg = (data.avg * (data.count - 1) + value) / data.count;
+	}
+
+	/// Set a value point to the existing points.
+	set(name, value) {
+		this.data[name] ??= this._initData(initial);
+		this._updateData(this.data[name], value);
+	}
+
+	/// Add a value point to the existing points.
+	sum(name, value, initial = 0) {
+		this.data[name] ??= this._initData(initial);
+		this._updateData(this.data[name], this.data[name].value + value);
 	}
 }
