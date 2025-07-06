@@ -11,17 +11,26 @@ export default class Form {
 	/// Constructor for the Form class.
 	///
 	/// \param uploadDirectory Where all uploaded files will be stored.
-	constructor(uploadDirectory = null) {
+	constructor(options = {}) {
 		// Here a map is used instead of the dictionary for the following reasons:
 		// 1. Key order: The keys in Map are ordered in a straightforward way: A Map object iterates entries, keys, and values in the order of entry insertion.
 		this.uploadedFiles = new Map();
 		this.uidCounter = 0;
-		this.uploadDirectory = uploadDirectory
-			? pathlib.path(uploadDirectory).absolute()
+		this.options = Object.assign(
+			{
+				// Where all uploaded files will be stored.
+				uploadDirectory: null,
+			},
+			options,
+		);
+
+		//  Update options.
+		this.options.uploadDirectory = this.options.uploadDirectory
+			? pathlib.path(this.options.uploadDirectory).absolute()
 			: pathlib.tmp().joinPath("form-upload");
 
-		Log.info("Using '{}' for upload.", this.uploadDirectory.asPosix());
-		FileSystem.mkdirSync(this.uploadDirectory.asPosix());
+		Log.info("Using '{}' for upload.", this.options.uploadDirectory.asPosix());
+		FileSystem.mkdirSync(this.options.uploadDirectory.asPosix());
 	}
 
 	getUid() {
@@ -44,7 +53,7 @@ export default class Form {
 
 			// Move the file to the upload directory.
 			const name = "file-" + this.getUid() + "." + pathlib.path(originalPath).suffix;
-			const path = this.uploadDirectory.joinPath(name).asPosix();
+			const path = this.options.uploadDirectory.joinPath(name).asPosix();
 			await FileSystem.move(originalPath, path);
 			this.uploadedFiles.set(name, {
 				path: path,

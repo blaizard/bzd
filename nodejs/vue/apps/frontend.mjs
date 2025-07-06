@@ -20,6 +20,7 @@ export default class Frontend {
 			app: createApp(app),
 			authentication: null,
 			services: null,
+			statistics: null,
 		};
 		this.restOptions = null;
 		this.isSetup = false;
@@ -92,6 +93,14 @@ export default class Frontend {
 		return this;
 	}
 
+	/// Set-up the statistics object.
+	useStatistics() {
+		Exception.assert(this.isSetup == false, "Backend already set-up.");
+		Exception.assert(!this.instances.statistics, "Statistics already set-up.");
+		this.instances.statistics = true;
+		return this;
+	}
+
 	/// Set-up the client.
 	setup(plugins = []) {
 		Exception.assert(this.isSetup == false, "Frontend already set-up.");
@@ -121,6 +130,7 @@ export default class Frontend {
 		this.instances.app.config.globalProperties.$bzdAppsFeatures = {
 			authentication: Boolean(this.instances.authentication),
 			services: this.instances.services || false,
+			statistics: this.instances.statistics || false,
 		};
 
 		return this;

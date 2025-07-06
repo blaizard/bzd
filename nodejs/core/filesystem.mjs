@@ -24,6 +24,13 @@ export default class FileSystem {
 		});
 	}
 
+	/// Create a directory recursively, if it already exists, do nothing
+	static mkdirSync(path) {
+		Fs.mkdirSync(path, {
+			recursive: true,
+		});
+	}
+
 	/// Remove a directory recursively
 	static async rmdir(path, mustExists = true) {
 		if (!mustExists) {

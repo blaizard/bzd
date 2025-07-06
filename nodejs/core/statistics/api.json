@@ -1,6 +1,6 @@
 {
     "rest": {
-        "/admin/statistics/data": {
+        "/admin/statistics": {
             "get": {
                 "authentication": [
                     "admin-applications"

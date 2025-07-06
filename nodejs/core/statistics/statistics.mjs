@@ -33,5 +33,11 @@ export default class Statistics {
 
 	installRest(api) {
 		Log.info("Installing 'Statistics' REST.");
+
+		api.handle("get", "/admin/statistics", async () => {
+			return {
+				data: this.data,
+			};
+		});
 	}
 }

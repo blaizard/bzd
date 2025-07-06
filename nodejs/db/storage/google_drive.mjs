@@ -26,7 +26,7 @@ export default class StorageGoogleDrive extends Storage {
 		);
 		this.drive = null;
 		this.folderId = folderId;
-		this.cache = new Cache2();
+		this.cache = new Cache2("google-drive-cache");
 
 		this.cache.register(
 			"id",

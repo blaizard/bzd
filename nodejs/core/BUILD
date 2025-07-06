@@ -74,7 +74,7 @@ bzd_nodejs_library(
         ":exception",
         ":log",
         "//nodejs/core/services",
-        "//nodejs/core/statistics",
+        "//nodejs/core/statistics:provider",
     ],
 )
 

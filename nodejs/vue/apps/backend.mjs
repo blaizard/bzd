@@ -7,6 +7,7 @@ import Authentication from "#bzd/apps/accounts/authentication/server.mjs";
 import Services from "#bzd/nodejs/core/services/services.mjs";
 import Cache2 from "#bzd/nodejs/core/cache2.mjs";
 import Statistics from "#bzd/nodejs/core/statistics/statistics.mjs";
+import Form from "#bzd/nodejs/vue/components/form/backend.mjs";
 import config from "#bzd/nodejs/vue/apps/config.json" with { type: "json" };
 
 import { Command } from "commander/esm.mjs";
@@ -24,6 +25,7 @@ export default class Backend {
 			cache: null,
 			statistics: null,
 			services: null,
+			form: null,
 			staticPath: null,
 			staticOptions: null,
 			restSchema: null,
@@ -104,6 +106,13 @@ export default class Backend {
 		return this.instances.statistics;
 	}
 
+	/// Access the form object.
+	get form() {
+		Exception.assert(this.isSetup, "Backend not set-up.");
+		Exception.assert(this.instances.form, "Form not set-up.");
+		return this.instances.form;
+	}
+
 	/// Set-up the authentication object.
 	useAuthentication(options = config.authentication) {
 		Exception.assert(this.isSetup == false, "Backend already set-up.");
@@ -126,7 +135,7 @@ export default class Backend {
 	useCache() {
 		Exception.assert(this.isSetup == false, "Backend already set-up.");
 		Exception.assert(!this.instances.cache, "Cache already set-up.");
-		this.instances.cache = new Cache2();
+		this.instances.cache = new Cache2("cache");
 		return this;
 	}
 
@@ -143,6 +152,14 @@ export default class Backend {
 		Exception.assert(this.isSetup == false, "Backend already set-up.");
 		Exception.assert(!this.instances.statistics, "Statistics already set-up.");
 		this.instances.statistics = new Statistics();
+		return this;
+	}
+
+	/// Set-up the form object.
+	useForm(options = null) {
+		Exception.assert(this.isSetup == false, "Backend already set-up.");
+		Exception.assert(!this.instances.form, "Form already set-up.");
+		this.instances.form = new Form(options);
 		return this;
 	}
 
@@ -179,7 +196,7 @@ export default class Backend {
 		if (this.instances.statistics) {
 			Log.info("Setting up statistics");
 			if (this.instances.cache) {
-				this.instances.statistics.register(this.instances.cache.statistics(), "backend");
+				this.instances.statistics.register(this.instances.cache.statistics, "backend");
 			}
 		}
 
@@ -202,6 +219,9 @@ export default class Backend {
 			}
 			if (this.instances.statistics) {
 				this.instances.rest.installPlugins(this.instances.statistics);
+			}
+			if (this.instances.form) {
+				this.instances.rest.installPlugins(this.instances.form);
 			}
 		}
 

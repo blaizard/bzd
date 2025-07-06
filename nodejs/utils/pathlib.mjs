@@ -1,4 +1,5 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
+import Os from "os";
 
 const Exception = ExceptionFactory("pathlib");
 
@@ -58,6 +59,14 @@ class Path {
 		return new Path(this.maybeRoot, [...this.path]);
 	}
 
+	/// Make the path absolute, without normalization or resolving symlinks. Returns a new path object.
+	absolute() {
+		if (this.isAbsolute()) {
+			return this.clone();
+		}
+		return accessors.cwd().joinPath(...this.path);
+	}
+
 	/// Return whether the path is absolute or not. A path is considered absolute if it has both a root and (if the flavour allows) a drive.
 	isAbsolute() {
 		return this.maybeRoot !== null;
@@ -92,6 +101,14 @@ const accessors = {
 		}
 		const maybeRoot = path[0] == "/" ? "/" : null;
 		return new Path(maybeRoot, _pathToArray(path));
+	},
+	/// Return the current working directory as a Path object.
+	cwd() {
+		return accessors.path(process.cwd());
+	},
+	/// Return the temporary directory path.
+	tmp() {
+		return accessors.path(Os.tmpdir());
 	},
 };
 

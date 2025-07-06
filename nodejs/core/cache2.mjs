@@ -7,7 +7,8 @@ const Log = LogFactory("cache");
 const Exception = ExceptionFactory("cache");
 
 export default class Cache2 {
-	constructor(options) {
+	constructor(name = "cache2", options = {}) {
+		this.name = name;
 		this.options = Object.assign(
 			{
 				// Default timeout for the validity of an entry.
@@ -38,7 +39,7 @@ export default class Cache2 {
 		this.data = {};
 		this.size = 0;
 		this.trigger = null;
-		//this.statistics = new StatisticsProvider();
+		this.statistics = new StatisticsProvider(this.name);
 	}
 
 	/// Defines an empty state.
@@ -155,6 +156,9 @@ export default class Cache2 {
 		sizeDiff += size;
 		data.size += sizeDiff;
 		this.size += sizeDiff;
+
+		this.statistics.setSize("collection-" + collection, data.size);
+		this.statistics.setSize("all", this.size);
 
 		if (this.trigger && this.size > this.options.maxSize) {
 			this.trigger.trigger();
@@ -273,11 +277,5 @@ export default class Cache2 {
 			return {};
 		});
 		return provider;
-	}
-
-	/// Create the statistics for this cache.
-	statistics(...namespaces) {
-		const statistics = new StatisticsProvider(...namespaces);
-		return statistics;
 	}
 }

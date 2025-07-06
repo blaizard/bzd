@@ -1,7 +1,7 @@
 @use "sass:math";
 @use "@/nodejs/styles/default/css/form/config.scss" as base;
 @use "@/nodejs/icons.scss" as * with (
-	$bzdIconNames: upload
+	$bzdIconNames: upload file
 );
 
 $borderWidth: 5;
@@ -73,6 +73,10 @@ body.irform-file-drag .irform-array-file {
 				background-color: base.$fieldBorderColor;
 			}
 		}
+	}
+
+	.irform-file-icon {
+		font-size: 3em;
 	}
 
 	.irform-file-name,

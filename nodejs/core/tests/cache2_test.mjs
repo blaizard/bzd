@@ -85,7 +85,7 @@ describe("Cache2", () => {
 	});
 
 	it("Concurrency", async () => {
-		let cache = new Cache2({
+		let cache = new Cache2("cache2", {
 			timeoutMs: 20 * 1000,
 		});
 		let value = 1;
@@ -137,7 +137,7 @@ describe("Cache2", () => {
 	});
 
 	it("Stress", async () => {
-		let cache = new Cache2({
+		let cache = new Cache2("cache2", {
 			timeoutMs: 20 * 1000,
 		});
 

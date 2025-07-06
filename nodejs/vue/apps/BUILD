@@ -36,6 +36,7 @@ bzd_nodejs_library(
         "//nodejs/core/rest:server",
         "//nodejs/core/services",
         "//nodejs/core/statistics",
+        "//nodejs/vue/components/form:backend",
     ],
 )
 
@@ -47,6 +48,7 @@ bzd_nodejs_library(
         "frontend.mjs",
         "views/404.vue",
         "views/services.vue",
+        "views/statistics.vue",
     ],
     data = [
         ":config",
@@ -61,6 +63,7 @@ bzd_nodejs_library(
         "//nodejs/core:exception",
         "//nodejs/core:log",
         "//nodejs/core/services:frontend",
+        "//nodejs/core/statistics:frontend",
         "//nodejs/styles/default",
         "//nodejs/vue:authentication",
         "//nodejs/vue:metadata",

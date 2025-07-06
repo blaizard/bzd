@@ -10,9 +10,20 @@ bzd_nodejs_library(
 )
 
 bzd_nodejs_library(
-    name = "statistics",
+    name = "provider",
     srcs = [
         "provider.mjs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//nodejs/core:exception",
+        "//nodejs/core:log",
+    ],
+)
+
+bzd_nodejs_library(
+    name = "statistics",
+    srcs = [
         "statistics.mjs",
     ],
     apis = ["api.json"],
