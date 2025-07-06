@@ -1,0 +1,15 @@
+{
+    "rest": {
+        "/form/upload": {
+            "post": {
+                "documentation": "Upload a new file",
+                "request": {
+                    "type": "upload"
+                },
+                "response": {
+                    "type": "json"
+                }
+            }
+        }
+    }
+}
