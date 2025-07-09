@@ -142,7 +142,7 @@ const Exception = ExceptionFactory("backend");
 				if (metadata.size) {
 					this.setHeader("Content-Length", metadata.size);
 				}
-				this.setHeader("Content-Disposition", 'attachment; filename="' + metadata.name + '"');
+				this.setHeader("Content-Disposition", 'attachment; filename="' + encodeURI(metadata.name) + '"');
 				return await storage.read(pathList);
 			} catch (e) {
 				if (e instanceof FileNotFoundError) {

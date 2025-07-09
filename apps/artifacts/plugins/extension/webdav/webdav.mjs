@@ -28,7 +28,7 @@ async function setRessourceHeaders(pathList, context, storage) {
 	if (metadata.modified) {
 		context.setHeader("Last-Modified", metadata.modified.toUTCString());
 	}
-	context.setHeader("Content-Disposition", 'attachment; filename="' + metadata.name + '"');
+	context.setHeader("Content-Disposition", 'attachment; filename="' + encodeURI(metadata.name) + '"');
 	context.setHeader("Content-Type", "application/octet-stream");
 }
 

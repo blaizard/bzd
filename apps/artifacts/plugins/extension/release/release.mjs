@@ -14,7 +14,7 @@ export default function extensionRelease(plugin, options, provider, endpoints) {
 
 			if (maybeFile) {
 				const stream = await storage.read([...directory, maybeFile.name]);
-				context.setHeader("Content-Disposition", 'attachment; filename="' + maybeFile.name + '"');
+				context.setHeader("Content-Disposition", 'attachment; filename="' + encodeURI(maybeFile.name) + '"');
 				if (maybeFile.size) {
 					context.setHeader("Content-Length", maybeFile.size);
 				}
