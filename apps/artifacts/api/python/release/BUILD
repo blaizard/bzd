@@ -21,5 +21,6 @@ py_library(
     visibility = ["//visibility:public"],
     deps = [
         ":release",
+        "@bzd_python//http:utils",
     ],
 )

@@ -1,6 +1,7 @@
 import typing
 
 from apps.artifacts.api.python.release.release import Update
+from bzd_python.http.utils import encodeURIComponent
 
 BinaryData = typing.Dict[str, typing.Any]
 TestData = typing.Dict[str, typing.List[BinaryData]]
@@ -17,7 +18,7 @@ class Response:
 
 	def getHeader(self, key: str) -> typing.Optional[str]:
 		headers = {
-		    "content-disposition": f"attachment; filename=\"{self.data['name']}\"",
+		    "content-disposition": f"attachment; filename=\"{encodeURIComponent(self.data['name'])}\"",
 		    "last-modified": "Sat, 28 Mar 2015 08:05:42 GMT"
 		}
 		return headers.get(key.lower(), None)
