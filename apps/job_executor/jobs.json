@@ -1,0 +1,43 @@
+{
+    "dummy": {
+        "args": [
+            [
+                "--key",
+                "{key}"
+            ],
+            "{ebook}"
+        ],
+        "docker": "blaizard/ebook:latest",
+        "inputs": [
+            {
+                "caption": "Test",
+                "name": "something",
+                "type": "Input"
+            }
+        ]
+    },
+    "ebook": {
+        "args": [
+            [
+                "--key",
+                "{key}"
+            ],
+            "{ebook}"
+        ],
+        "docker": "blaizard/ebook:latest",
+        "inputs": [
+            {
+                "caption": "Ebook",
+                "max": 1,
+                "name": "ebook",
+                "type": "File"
+            },
+            {
+                "caption": "Key file",
+                "max": 1,
+                "name": "key",
+                "type": "File"
+            }
+        ]
+    }
+}

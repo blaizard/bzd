@@ -1,0 +1,16 @@
+{
+    "rest": {
+        "/job/send": {
+            "post": {
+                "documentation": "Send a job to be processed.",
+                "request": {
+                    "type": "json",
+                    "validation": {
+                        "data": "mandatory",
+                        "id": "mandatory"
+                    }
+                }
+            }
+        }
+    }
+}

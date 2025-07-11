@@ -12,29 +12,32 @@
 			};
 		},
 		mounted() {
-			if (this.isUpload) {
-				// Add drag and drop events
-				this.$el.addEventListener("dragenter", this.dragEnter, false);
-				this.$el.addEventListener("dragover", this.dragOver, false);
-				this.$el.addEventListener("drop", this.drop, false);
+			// Add drag and drop events
+			this.$el.addEventListener("dragenter", this.dragEnter, false);
+			this.$el.addEventListener("dragover", this.dragOver, false);
+			this.$el.addEventListener("drop", this.drop, false);
 
-				// Attach global drag event
-				document.addEventListener("dragenter", this.globalStartDrag, false);
-				document.addEventListener("dragleave", this.dragLeave, false);
-			}
+			// Attach global drag event
+			document.addEventListener("dragenter", this.globalStartDrag, false);
+			document.addEventListener("dragleave", this.dragLeave, false);
 		},
 		beforeUnmount() {
-			if (this.isUpload) {
-				// Remove global drag event
-				document.removeEventListener("dragenter", this.globalStartDrag, false);
-				document.removeEventListener("dragleave", this.dragLeave, false);
-			}
+			// Remove global drag event
+			document.removeEventListener("dragenter", this.globalStartDrag, false);
+			document.removeEventListener("dragleave", this.dragLeave, false);
 		},
 		computed: {
 			/// ---- CONFIG ----------------------------------------
 			/// Read and parse the upload response. Return the url or path of the file associated.
 			uploadResponseHandler() {
-				return this.getOption("uploadResponseHandler", (response) => response);
+				const defaultHandler = (response) => {
+					response = JSON.parse(response);
+					if (typeof response === "string") {
+						return { file: { path: response } };
+					}
+					return { file: response };
+				};
+				return this.getOption("uploadResponseHandler", defaultHandler);
 			},
 			/// Convert the image path to an accessible image url
 			imageToUrl() {
@@ -42,6 +45,14 @@
 			},
 			/// ---- OVERRIDE ArrayElement ---------------
 			template() {
+				return [
+					{
+						type: "_FileItem",
+						name: "file",
+					},
+				];
+			},
+			/*template() {
 				return FileItem.extend({
 					data: function () {
 						return {
@@ -52,7 +63,7 @@
 						};
 					},
 				});
-			},
+			},*/
 			templateAdd() {
 				return [
 					{
@@ -64,54 +75,47 @@
 				];
 			},
 			allowDelete() {
-				return false;
+				return true;
 			},
 			inline() {
 				return true;
 			},
 			gripHandle() {
-				return false;
+				return true;
 			},
 			/// ---- IMPLEMENTATION ----------------------------------
-			isUpload() {
-				return this.getOption("upload", false) !== false;
-			},
 			upload() {
-				return this.isUpload
-					? new Upload({
-							/**
-							 * Upload URL, where to send the file to be uploaded
-							 */
-							url: this.getOption("upload"),
-							max: () => this.nbLeft,
-							filter: this.getOption("filter", null),
-							onInit: (item) => {
-								this.uploadValueList.push(this.makeObjectFromItem(item));
-							},
-							onCancel: (item) => {
-								const index = this.uploadItemToIndex(item);
-								this.uploadValueList.splice(index, 1);
-							},
-							onError: (item, message) => {
-								this.setError(message);
-								console.error(message);
-							},
-							onComplete: (item, response) => {
-								const output = this.uploadResponseHandler(response);
+				return new Upload({
+					/// Upload URL, where to send the file to be uploaded
+					url: this.getOption("upload", "/api/v1/form/upload"),
+					max: () => this.nbLeft,
+					filter: this.getOption("filter", null),
+					onInit: (item) => {
+						this.uploadValueList.push(this.makeObjectFromItem(item));
+					},
+					onCancel: (item) => {
+						const index = this.uploadItemToIndex(item);
+						this.uploadValueList.splice(index, 1);
+					},
+					onError: (item, message) => {
+						this.setError(message);
+						console.error(message);
+					},
+					onComplete: (item, response) => {
+						const output = this.uploadResponseHandler(response);
 
-								// Delete the current element
-								const index = this.uploadItemToIndex(item);
-								this.uploadValueList.splice(index, 1);
+						// Delete the current element
+						const index = this.uploadItemToIndex(item);
+						this.uploadValueList.splice(index, 1);
 
-								// Add the new item
-								this.itemAdd(output);
-							},
-							onProgress: (item) => {
-								const index = this.uploadItemToIndex(item);
-								this.uploadValueList[index] = this.makeObjectFromItem(item);
-							},
-						})
-					: null;
+						// Add the new item
+						this.itemAdd(output);
+					},
+					onProgress: (item) => {
+						const index = this.uploadItemToIndex(item);
+						this.uploadValueList[index] = this.makeObjectFromItem(item);
+					},
+				});
 			},
 			// Overload internal attributes
 			containerClass() {

@@ -2,6 +2,7 @@ import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import FileSystem from "#bzd/nodejs/core/filesystem.mjs";
 import pathlib from "#bzd/nodejs/utils/pathlib.mjs";
+import { makeUid } from "#bzd/nodejs/utils/uid.mjs";
 import StatisticsProvider from "#bzd/nodejs/core/statistics/provider.mjs";
 
 const Exception = ExceptionFactory("form");
@@ -16,7 +17,6 @@ export default class Form {
 		// Here a map is used instead of the dictionary for the following reasons:
 		// 1. Key order: The keys in Map are ordered in a straightforward way: A Map object iterates entries, keys, and values in the order of entry insertion.
 		this.uploadedFiles = new Map();
-		this.uidCounter = 0;
 		this.options = Object.assign(
 			{
 				// Where all uploaded files will be stored.
@@ -35,14 +35,10 @@ export default class Form {
 		FileSystem.mkdirSync(this.options.uploadDirectory.asPosix());
 	}
 
-	getUid() {
-		return ++this.uidCounter;
-	}
-
 	/// Get the uploaded file given its name.
 	getUploadFile(name) {
-		Exception.assertPrecondition(name in this.uploadedFiles, "File '{}' not found in uploaded files.", name);
-		return this.uploadedFiles[name];
+		Exception.assertPrecondition(this.uploadedFiles.has(name), "File '{}' not found in uploaded files.", name);
+		return this.uploadedFiles.get(name);
 	}
 
 	/// Add a file entry.
@@ -64,7 +60,7 @@ export default class Form {
 			Exception.assert(originalPath, "File to be uploaded, evaluates to null: {:j}", originalPath);
 
 			// Move the file to the upload directory.
-			const name = "file-" + this.getUid() + "." + pathlib.path(originalPath).suffix;
+			const name = makeUid() + "." + pathlib.path(originalPath).suffix;
 			const path = this.options.uploadDirectory.joinPath(name).asPosix();
 			await FileSystem.move(originalPath, path);
 			await this.addFile(name, path);

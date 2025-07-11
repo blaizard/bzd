@@ -13,6 +13,7 @@ bzd_nodejs_library(
         "//nodejs/core:log",
         "//nodejs/core/statistics:provider",
         "//nodejs/utils:pathlib",
+        "//nodejs/utils:uid",
     ],
 )
 

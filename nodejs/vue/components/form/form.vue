@@ -50,6 +50,7 @@
 	import ElementButton from "./element/button.vue";
 	import ElementArray from "./element/array.vue";
 	import ElementTable from "./element/table.vue";
+	import ElementFileItem from "./element/file_item.vue";
 	import ElementFile from "./element/file.vue";
 	import ElementCarousel from "./element/carousel.vue";
 	import ElementEditor from "./element/editor.vue";
@@ -67,6 +68,7 @@
 		Array: ElementArray,
 		Table: ElementTable,
 		File: ElementFile,
+		_FileItem: ElementFileItem,
 		Carousel: ElementCarousel,
 		Editor: ElementEditor,
 		Message: ElementMessage,

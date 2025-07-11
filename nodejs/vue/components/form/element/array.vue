@@ -25,7 +25,7 @@
 				>
 				</Form>
 
-				<div class="irform-array-item-delete" v-if="allowDelete" @click="itemDelete(index)">x</div>
+				<div class="irform-array-item-delete" v-if="allowDelete" @click.stop="itemDelete(index)">x</div>
 			</div>
 		</span>
 
