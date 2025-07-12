@@ -17,6 +17,19 @@ bzd_nodejs_library(
 )
 
 bzd_nodejs_library(
+    name = "command",
+    srcs = [
+        "command.mjs",
+    ],
+    deps = [
+        "//nodejs/core:event",
+        "//nodejs/core:exception",
+        "//nodejs/core:filesystem",
+        "//nodejs/core:log",
+    ],
+)
+
+bzd_nodejs_library(
     name = "websocket",
     srcs = [
         "websocket.mjs",
@@ -25,7 +38,7 @@ bzd_nodejs_library(
         "//visibility:public",
     ],
     deps = [
-        ":terminal",
+        ":command",
         "//nodejs/core:exception",
         "//nodejs/core:log",
     ],
