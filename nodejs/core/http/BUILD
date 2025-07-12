@@ -54,6 +54,7 @@ bzd_nodejs_library(
         "@nodejs_deps//:http",
         "@nodejs_deps//:mime",
         "@nodejs_deps//:multer",
+        "@nodejs_deps//:ws",
     ],
     visibility = ["//visibility:public"],
     deps = [

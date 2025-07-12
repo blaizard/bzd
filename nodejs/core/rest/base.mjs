@@ -51,6 +51,9 @@ export default class Rest {
 			if (typeof plugin.installRest == "function") {
 				plugin.installRest(this);
 			}
+			if (typeof plugin.installWebsocket == "function") {
+				plugin.installWebsocket(this);
+			}
 		}
 		this.event.trigger("ready");
 	}

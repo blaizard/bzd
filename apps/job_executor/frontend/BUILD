@@ -22,6 +22,7 @@ bzd_nodejs_web_binary(
         "//nodejs/vue/apps:frontend",
         "//nodejs/vue/components/form",
         "//nodejs/vue/components/layout:component",
+        "//nodejs/vue/components/terminal/frontend:websocket",
         "//nodejs/vue/directives:loading",
     ],
 )

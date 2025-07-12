@@ -46,8 +46,8 @@ _*
 esp-idf/
 
 # Generated in CI
-bin/
-dist/
+/bin/
+/dist/
 
 # Rust
 rust-project.json

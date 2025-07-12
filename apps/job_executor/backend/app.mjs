@@ -4,6 +4,7 @@ import APIv1 from "#bzd/api.json" with { type: "json" };
 import Jobs from "#bzd/apps/job_executor/jobs.json" with { type: "json" };
 import Args from "#bzd/apps/job_executor/backend/args.mjs";
 import Backend from "#bzd/nodejs/vue/apps/backend.mjs";
+import TerminalWebsocket from "#bzd/nodejs/vue/components/terminal/backend/websocket.mjs";
 
 const Exception = ExceptionFactory("backend");
 const Log = LogFactory("backend");
@@ -15,6 +16,9 @@ const Log = LogFactory("backend");
 		.useStatistics()
 		.useForm()
 		.setup();
+
+	const terminalWebsocket = new TerminalWebsocket();
+	backend.rest.installPlugins(terminalWebsocket);
 
 	// Convert the raw form data to a more usable format.
 	//

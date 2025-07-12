@@ -66,6 +66,14 @@ export default class RestServer extends Base {
 		return await this.options.authentication.loginWithUID(context, uid, identifier, persistent);
 	}
 
+	/// Register a websocket
+	handleWebsocket(endpoint, callback) {
+		Exception.assert(this.options.channel, "Channel is missing");
+		this.options.channel.addRouteWebsocket(this.getEndpoint(endpoint), (ws) => {
+			callback(ws);
+		});
+	}
+
 	/// Register a callback to handle a request
 	handle(method, endpoint, callback /*, options = {}*/) {
 		this._sanityCheck(method, endpoint);
