@@ -26,7 +26,10 @@
 		mounted() {
 			this.$router.set({
 				component: "view",
-				routes: [{ path: "/", component: () => import("./main.vue") }],
+				routes: [
+					{ path: "/", component: () => import("./main.vue") },
+					{ path: "/job/{job}", component: () => import("./job.vue") },
+				],
 			});
 		},
 	};

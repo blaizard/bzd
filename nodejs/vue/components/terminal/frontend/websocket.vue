@@ -15,6 +15,9 @@
 				websocket: null,
 			};
 		},
+		props: {
+			websocketUrl: { type: String, required: true },
+		},
 		async mounted() {
 			this.websocket = await this.create();
 			this.$el.addEventListener("keydown", this.handleKeyDown);
@@ -25,7 +28,7 @@
 		methods: {
 			async create() {
 				return new Promise((resolve, reject) => {
-					let socket = new WebSocket("/api/v1/socket/terminal");
+					let socket = new WebSocket(this.websocketUrl);
 					socket.onopen = () => {
 						socket.send(JSON.stringify({ type: "init", value: {} }));
 						resolve(socket);

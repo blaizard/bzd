@@ -1,4 +1,17 @@
-load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_binary")
+load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_binary", "bzd_nodejs_library")
+
+bzd_nodejs_library(
+    name = "command",
+    srcs = [
+        "command.mjs",
+    ],
+    deps = [
+        "//nodejs/core:event",
+        "//nodejs/core:exception",
+        "//nodejs/core:filesystem",
+        "//nodejs/core:log",
+    ],
+)
 
 bzd_nodejs_binary(
     name = "backend",
@@ -20,11 +33,11 @@ bzd_nodejs_binary(
         "//apps/job_executor:__pkg__",
     ],
     deps = [
+        ":command",
         "//nodejs/core:exception",
         "//nodejs/core:filesystem",
         "//nodejs/core:log",
         "//nodejs/vue/apps:backend",
         "//nodejs/vue/components/form:backend",
-        "//nodejs/vue/components/terminal/backend:websocket",
     ],
 )

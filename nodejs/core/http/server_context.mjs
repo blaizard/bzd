@@ -149,3 +149,27 @@ export class HttpServerContext {
 		return new HttpError(...args);
 	}
 }
+
+/// Websocket context.
+export class WebsocketServerContext {
+	constructor(ws, params) {
+		this.ws = ws;
+		this.params = params;
+	}
+
+	getParams() {
+		return this.params;
+	}
+
+	getParam(name, defaultValue = null) {
+		return name in this.params ? this.params[name] : defaultValue;
+	}
+
+	send(data) {
+		this.ws.send(data);
+	}
+
+	read(handler) {
+		this.ws.on("message", handler);
+	}
+}

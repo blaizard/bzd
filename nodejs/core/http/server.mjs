@@ -9,12 +9,13 @@ import Https from "https";
 import Multer from "multer";
 import Path from "path";
 import { WebSocketServer } from "ws";
+import Router from "#bzd/nodejs/core/router.mjs";
 
 import Event from "../event.mjs";
 import { ExceptionFactory, ExceptionPrecondition } from "../exception.mjs";
 import FileSystem from "../filesystem.mjs";
 import LogFactory from "../log.mjs";
-import { HttpServerContext, HttpError } from "#bzd/nodejs/core/http/server_context.mjs";
+import { HttpServerContext, HttpError, WebsocketServerContext } from "#bzd/nodejs/core/http/server_context.mjs";
 import HttpEndpoint from "#bzd/nodejs/core/http/endpoint.mjs";
 
 const Log = LogFactory("http", "server");
@@ -43,6 +44,7 @@ export default class HttpServer {
 			config,
 		);
 		this.maxTimeoutS = this.config.timeoutS;
+		this.routerWebsockets = new Router();
 
 		this.event = new Event({
 			ready: { proactive: true },
@@ -67,7 +69,6 @@ export default class HttpServer {
 	 */
 	async _initialize(port) {
 		this.app = Express();
-		this.websockets = {};
 
 		this.app.use(
 			Helmet({
@@ -119,9 +120,52 @@ export default class HttpServer {
 		this.event.trigger("ready");
 	}
 
-	/**
-	 * Start the web server
-	 */
+	/// Hook a websocket server to the http server.
+	async startWebsocketServer(server) {
+		this.wss = new WebSocketServer({ noServer: true });
+		this.wss.on("connection", (ws, request, options) => {
+			const context = new WebsocketServerContext(ws, options.params);
+			options.handler(context);
+
+			ws.on("error", (error) => {
+				Exception.print("Receive error from websocket {}; {}", request.url, error);
+			});
+		});
+		server.on("upgrade", (request, socket, head) => {
+			const result = this.routerWebsockets.match(request.url);
+
+			// Ignore if no result.
+			if (!result) {
+				socket.destroy();
+				return;
+			}
+
+			const options = {
+				handler: result.args,
+				params: result.vars,
+			};
+			this.wss.handleUpgrade(request, socket, head, (ws) => {
+				this.wss.emit("connection", ws, request, options);
+			});
+		});
+	}
+
+	/// Stop the websocket server.
+	async stopWebsocketServer() {
+		await new Promise((resolve) => {
+			this.wss.close(() => {
+				resolve();
+			});
+		});
+
+		this.wss.clients.forEach((ws) => {
+			if (ws.readyState === ws.OPEN) {
+				ws.close(1000, "Server shutting down");
+			}
+		});
+	}
+
+	/// Start the web server
 	async start() {
 		await this.event.waitUntil("ready");
 
@@ -153,16 +197,8 @@ export default class HttpServer {
 		// Adds 1 min to make sure the proper timeout handler is triggered before the connection is closed.
 		this.server.requestTimeout = (this.maxTimeoutS + 60) * 1000;
 
-		// Set up the websocket servers.
-		for (const [uid, data] of Object.entries(this.websockets)) {
-			data.wss = new WebSocketServer({ server: this.server, path: uid });
-			data.wss.on("connection", (ws) => {
-				data.callback(ws);
-			});
-			data.wss.on("error", (error) => {
-				Exception.print("Receive error from websocket {}; {}", uri, error);
-			});
-		}
+		/// Start the websocket server.
+		await this.startWebsocketServer(this.server);
 
 		return new Promise((resolve, reject) => {
 			this.server.listen(this.port, undefined, undefined, () => {
@@ -181,24 +217,10 @@ export default class HttpServer {
 		});
 	}
 
-	/**
-	 * Stop the web server
-	 */
+	/// Stop the web server
 	async stop() {
 		// Close the websocket servers.
-		for (const [uid, data] of Object.entries(this.websockets)) {
-			await new Promise((resolve) => {
-				data.wss.close(() => {
-					resolve();
-				});
-			});
-
-			data.wss.clients.forEach((ws) => {
-				if (ws.readyState === ws.OPEN) {
-					ws.close(1000, "Server shutting down");
-				}
-			});
-		}
+		await this.stopWebsocketServer();
 
 		return new Promise((resolve, reject) => {
 			this.server.on("error", (e) => {
@@ -279,10 +301,7 @@ export default class HttpServer {
 	/// \param callback A callback that will be called if the uri and type matches
 	///                 the request.
 	addRouteWebsocket(uri, callback) {
-		this.websockets[uri] = {
-			callback: callback,
-			ws: null,
-		};
+		this.routerWebsockets.add(uri, null, callback);
 	}
 
 	/// \brief Add one or multiple custom route to the web server.

@@ -4,7 +4,7 @@ import APIv1 from "#bzd/api.json" with { type: "json" };
 import Jobs from "#bzd/apps/job_executor/jobs.json" with { type: "json" };
 import Args from "#bzd/apps/job_executor/backend/args.mjs";
 import Backend from "#bzd/nodejs/vue/apps/backend.mjs";
-import TerminalWebsocket from "#bzd/nodejs/vue/components/terminal/backend/websocket.mjs";
+import Command from "#bzd/apps/job_executor/backend/command.mjs";
 
 const Exception = ExceptionFactory("backend");
 const Log = LogFactory("backend");
@@ -16,9 +16,6 @@ const Log = LogFactory("backend");
 		.useStatistics()
 		.useForm()
 		.setup();
-
-	const terminalWebsocket = new TerminalWebsocket();
-	backend.rest.installPlugins(terminalWebsocket);
 
 	// Convert the raw form data to a more usable format.
 	//
@@ -46,14 +43,32 @@ const Log = LogFactory("backend");
 		return [data, files];
 	}
 
+	let nextCommandId = 0;
+	let commands = {};
+
 	backend.rest.handle("post", "/job/send", async (inputs) => {
 		Exception.assertPrecondition(inputs.id in Jobs, "Job id is not known: {}", inputs.id);
-		Log.info("Received job request: {:j}", inputs);
 		const job = Jobs[inputs.id];
 		const [data, files] = formDataToData(job.inputs, inputs.data);
 		const args = new Args(job.args, data);
 		const command = args.process();
-		console.log("Command", command);
+		const commandId = nextCommandId++;
+		Log.info("Processing job {} with arguments {:j}", commandId, command);
+		commands[commandId] = new Command(["echo", ...command]);
+		commands[commandId].execute();
+
+		return {
+			job: commandId,
+		};
+	});
+
+	backend.rest.handleWebsocket("/socket/job/{id}", (context) => {
+		const jobId = context.getParam("id");
+		Exception.assertPrecondition(jobId in commands, "Job id is not known: {}", jobId);
+
+		context.read((data) => {
+			console.log("read", data);
+		});
 	});
 
 	await backend.start();

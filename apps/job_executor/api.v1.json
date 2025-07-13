@@ -9,6 +9,12 @@
                         "data": "mandatory",
                         "id": "mandatory"
                     }
+                },
+                "response": {
+                    "type": "json",
+                    "validation": {
+                        "job": "mandatory"
+                    }
                 }
             }
         }

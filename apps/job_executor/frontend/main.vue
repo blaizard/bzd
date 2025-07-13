@@ -8,7 +8,6 @@
 			@submit="handleSubmitInputs"
 			:all="true"
 		></Form>
-		<TerminalWebsocket style="height: 600px"></TerminalWebsocket>
 	</div>
 </template>
 
@@ -18,7 +17,6 @@
 	import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
 	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.mjs";
-	import TerminalWebsocket from "#bzd/nodejs/vue/components/terminal/frontend/websocket.vue";
 
 	const Exception = ExceptionFactory("main");
 
@@ -26,7 +24,6 @@
 		mixins: [Component],
 		components: {
 			Form,
-			TerminalWebsocket,
 		},
 		directives: {
 			loading: DirectiveLoading,
@@ -57,10 +54,11 @@
 		methods: {
 			async handleSubmitInputs() {
 				await this.handleSubmit(async () => {
-					await this.$rest.request("post", "/job/send", {
+					const response = await this.$rest.request("post", "/job/send", {
 						id: this.jobId,
 						data: this.value,
 					});
+					this.$router.dispatch("/job/" + response.job);
 					this.value = {};
 				});
 			},
