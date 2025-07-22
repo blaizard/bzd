@@ -4,16 +4,16 @@ This utility converts an ebook into a PDF.
 
 ## Convert an ebook into pdf
 
-If it has a DRM:
+Converting an epub with a DRM and keeping the sandbox:
 
 ```bash
 bazel run apps/ebook -- --sandbox $(pwd)/temp/sandbox --key $(pwd)/temp/Adobe_PrivateLicenseKey--anonymous.der $(pwd)/temp/temp.epub
 ```
 
-Keeping the sandbox:
+As a prerequisite, it might be necessary to install some dependencies:
 
 ```bash
-bazel run apps/ebook -- --sandbox $(pwd)/temp/sandbox $(pwd)/temp/temp.cbz
+nix-shell -p calibre
 ```
 
 ## Run using the docker image
