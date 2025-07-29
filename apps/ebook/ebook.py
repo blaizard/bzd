@@ -4,6 +4,7 @@ import tempfile
 import typing
 import enum
 import shutil
+import math
 
 from apps.ebook.calibre.remove_drm import RemoveDRM
 from apps.ebook.epub.epub import EPub
@@ -74,6 +75,22 @@ def createSiblingOutput(reference: pathlib.Path, extension: str) -> pathlib.Path
 	assert False, "Unreachable"
 
 
+def sizeToString(sizeBytes: int) -> str:
+	"""Converts a size in bytes to a human-readable string (e.g., KB, MB, GB)."""
+
+	if sizeBytes == 0:
+		return "0 Bytes"
+
+	# Define the units and their corresponding powers of 1024
+	units = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
+
+	i = int(math.floor(math.log(sizeBytes, 1024)))
+	p = math.pow(1024, i)
+	size = round(sizeBytes / p, 2)
+
+	return f"{size} {units[i]}"
+
+
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="e-book to pdf.")
 	parser.add_argument("--key",
@@ -139,7 +156,8 @@ if __name__ == "__main__":
 			if isinstance(output, ProviderPdf):
 				path = createSiblingOutput(args.ebook.parent / output.path.name, "pdf")
 				shutil.move(output.path, path)
-				print(f"Output {path}.")
+				sizeStr = sizeToString(path.stat().st_size)
+				print(f"Output {path} ({sizeStr}).")
 
 	finally:
 		directory.cleanup()  # type: ignore

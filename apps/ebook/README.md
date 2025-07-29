@@ -9,7 +9,7 @@ Converting an epub with a DRM and keeping the sandbox:
 ```bash
 bazel run apps/ebook -- --sandbox $(pwd)/temp/sandbox --clean --key $(pwd)/temp/Adobe_PrivateLicenseKey--anonymous.der $(pwd)/temp/temp.epub
 # or
-bazel run apps/ebook -- --sandbox $(pwd)/temp/sandbox --clean $(pwd)/temp/temp.cbr
+bazel run apps/ebook -- --sandbox $(pwd)/temp/sandbox --clean $(pwd)/temp/temp.cbz
 ```
 
 As a prerequisite, it might be necessary to install some dependencies:
