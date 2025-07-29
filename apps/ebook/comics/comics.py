@@ -2,6 +2,7 @@ import pathlib
 import typing
 import statistics
 import os
+import re
 from collections import Counter
 
 from PIL import Image
@@ -31,11 +32,13 @@ class Comics(ActionInterface):
 		"""Identify outliers in the file name."""
 
 		nGramsAll = {}
-		stems = [image.stem for image in images]
 
 		nGramsCounter: Counter[str] = Counter()
 		for image in images:
-			nGrams = self.generateNGrams(image.stem, min(3, len(image.stem)))  #  minimum one entry.
+			# Ignore the actual numbers. This is needed otherwise a variation of 1 digit might make the name outlier.
+			# What we want instead is to know that this is a number and test against it.
+			stem = re.sub(r"\d+", "|", image.stem)
+			nGrams = self.generateNGrams(stem, min(3, len(stem)))  #  minimum one entry.
 			nGramsAll[image] = nGrams
 			nGramsCounter.update(nGrams)
 		nGramsCounterNormalized = {item: count / len(images) for item, count in nGramsCounter.items()}
@@ -47,9 +50,19 @@ class Comics(ActionInterface):
 
 		# Calculate the standard deviation and calculate the threshold to find the outliers
 		if len(scores) >= 2:
-			stdev = statistics.stdev(scores.values())
-			threshold = max(scores.values()) - stdev * coefficient
-			outliers = [image for image, value in scores.items() if value < threshold]
+
+			stdev = max(statistics.stdev(scores.values()), 0.1)
+			while True:
+				threshold = max(scores.values()) - stdev * coefficient
+				scoresOutliers = {image: value for image, value in scores.items() if value < threshold}
+				# If there are less than half of the images as outliers, we stop.
+				# Else it probably means that the threshold was too high, then update it.
+				if len(scoresOutliers) == 0 or len(scoresOutliers) < len(images) / 2:
+					break
+				stdev = max(scores.values()) - max(scoresOutliers.values())
+
+			outliers = [*scoresOutliers.keys()]
+
 		else:
 			outliers = []
 

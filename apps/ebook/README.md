@@ -7,7 +7,9 @@ This utility converts an ebook into a PDF.
 Converting an epub with a DRM and keeping the sandbox:
 
 ```bash
-bazel run apps/ebook -- --sandbox $(pwd)/temp/sandbox --key $(pwd)/temp/Adobe_PrivateLicenseKey--anonymous.der $(pwd)/temp/temp.epub
+bazel run apps/ebook -- --sandbox $(pwd)/temp/sandbox --clean --key $(pwd)/temp/Adobe_PrivateLicenseKey--anonymous.der $(pwd)/temp/temp.epub
+# or
+bazel run apps/ebook -- --sandbox $(pwd)/temp/sandbox --clean $(pwd)/temp/temp.cbr
 ```
 
 As a prerequisite, it might be necessary to install some dependencies:
@@ -20,9 +22,13 @@ nix-shell -p calibre
 
 ```bash
 bazel run apps/ebook:image.load
-# You need to mount the content that is intended to be accessible from docker.
-docker run -it --rm -v .:/sandbox local/image:latest --sandbox /sandbox/temp/sandbox --key /sandbox/temp/Adobe_PrivateLicenseKey--anonymous.der /sandbox/temp/temp.epub
+
+# Typical workflow for fnac.com
+docker run -it --rm -v .:/sandbox local/image:latest --sandbox /sandbox/temp/sandbox --clean --key /sandbox/temp/Adobe_PrivateLicenseKey--anonymous.der --max-dpi 300 /sandbox/temp/temp.epub
 ```
+
+Using `--max-dpi 300` gives very good quality pdfs. Perfect for 60ish pages comics, they will be around 60-70MB.
+Also anything between 200 and 300 dpi is good.
 
 ## Docker
 

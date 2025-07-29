@@ -13,6 +13,7 @@ py_binary(
         "//apps/ebook/comics:cbr",
         "//apps/ebook/comics:cbz",
         "//apps/ebook/epub",
+        "//apps/ebook/pillow:images_converter",
         "//apps/ebook/pillow:images_to_pdf",
     ],
 )

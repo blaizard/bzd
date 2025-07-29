@@ -10,6 +10,7 @@ py_test(
         ":data/sample4.cbz",
         ":data/sample5.cbz",
         ":data/sample6.cbz",
+        ":data/sample7.cbz",
     ],
     main = "cbz_test.py",
     deps = [

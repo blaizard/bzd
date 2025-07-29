@@ -10,14 +10,15 @@ from apps.ebook.epub.epub import EPub
 from apps.ebook.comics.cbz import Cbz
 from apps.ebook.comics.cbr import Cbr
 from apps.ebook.pillow.images_to_pdf import ImagesToPdf
+from apps.ebook.pillow.images_converter import ImagesConverter
 from apps.ebook.flow import ActionInterface, FlowRegistry, FlowEnum, FlowSchemaType
 from apps.ebook.providers import ProviderEbook, ProviderEbookMetadata, ProviderPdf, providerSerialize, providerDeserialize
 
 
 class FlowSchema(FlowEnum):
-	epub: FlowSchemaType = ["removeDRM", "epub", "imagesToPdf"]
-	cbz: FlowSchemaType = ["cbz", "imagesToPdf"]
-	cbr: FlowSchemaType = ["cbr", "imagesToPdf"]
+	epub: FlowSchemaType = ["removeDRM", "epub", "imagesConverter", "imagesToPdf"]
+	cbz: FlowSchemaType = ["cbz", "imagesConverter", "imagesToPdf"]
+	cbr: FlowSchemaType = ["cbr", "imagesConverter", "imagesToPdf"]
 	auto: FlowSchemaType = ["discover"]
 
 
@@ -86,8 +87,19 @@ if __name__ == "__main__":
 	                    default=pathlib.Path.home() / ".config/calibre",
 	                    help="Calibre configuration path.")
 	parser.add_argument("--format", type=str, default=None, help="Assume a specific format for the ebook.")
-	parser.add_argument("--coefficient", type=float, default=1.0, help="Coefficient to be used to find outliers.")
+	parser.add_argument(
+	    "--coefficient",
+	    type=float,
+	    default=1.0,
+	    help="Coefficient to be used to find outliers, the lower the value, the more outliers will be removed.")
 	parser.add_argument("--zoom", type=float, default=1.0, help="Zoom coefficient to be used.")
+	parser.add_argument("--clean", action="store_true", help="Start from a clean sandbox if any.")
+	parser.add_argument("--max-dpi", type=int, default=None, help="Maximum DPI for an image.")
+	parser.add_argument("--scale",
+	                    type=float,
+	                    default=None,
+	                    help="Reduce images by the given scale (this number must be <= 1).")
+
 	parser.add_argument(
 	    "--sandbox",
 	    type=pathlib.Path,
@@ -103,9 +115,15 @@ if __name__ == "__main__":
 	    "epub": EPub(zoom=args.zoom),
 	    "cbz": Cbz(coefficient=args.coefficient),
 	    "cbr": Cbr(coefficient=args.coefficient),
+	    "imagesConverter": ImagesConverter(maxDPI=args.max_dpi, scale=args.scale),
 	    "imagesToPdf": ImagesToPdf(),
 	    "discover": Discover(ebookFormat=args.format)
 	}
+
+	if args.clean:
+		if args.sandbox is not None and args.sandbox.exists():
+			print(f"Cleaning sandbox {args.sandbox}.")
+			shutil.rmtree(args.sandbox)
 
 	flows = FlowRegistry(schema=FlowSchema, actions=actions)
 	directory = tempfile.TemporaryDirectory() if args.sandbox is None else SandboxDirectory(path=args.sandbox)

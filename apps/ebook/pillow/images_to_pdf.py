@@ -21,8 +21,10 @@ class ImagesToPdf(ActionInterface):
 
 		images = []
 		for index, path in enumerate(provider.images):
-			image = Image.open(path)
-			images.append(image.convert("RGB"))
+			with Image.open(path) as image:
+				image = image.convert("RGB")
+				images.append(image.convert("RGB"))
+
 		metadata = {}
 		if provider.metadata.title:
 			metadata["title"] = provider.metadata.title
@@ -32,6 +34,7 @@ class ImagesToPdf(ActionInterface):
 			metadata["creationDate"] = provider.metadata.date.strftime("D:%Y%m%d%H%M%S%z")
 
 		assert len(images) > 0, f"There must be at least one image from the ebook."
+
 		images[0].save(output, save_all=True, append_images=images[1:], **metadata)
 
 		return [(ProviderPdf(path=output), None)]
