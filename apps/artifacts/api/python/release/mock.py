@@ -1,7 +1,7 @@
 import typing
 
 from apps.artifacts.api.python.release.release import Update
-from bzd_python.http.utils import encodeURIComponent
+from bzd.http.utils import encodeURIComponent
 
 BinaryData = typing.Dict[str, typing.Any]
 TestData = typing.Dict[str, typing.List[BinaryData]]
