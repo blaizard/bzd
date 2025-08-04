@@ -9,6 +9,9 @@ logger = Logger("scheduler")
 
 Ts = typing.TypeVarTuple("Ts")
 
+CallbackType: typing.TypeAlias = typing.Union[typing.Callable[[*Ts], None], typing.Callable[[*Ts], bool]]
+CallbackAnyType: typing.TypeAlias = typing.Union[typing.Callable[..., None], typing.Callable[..., bool]]
+
 
 @dataclasses.dataclass
 class Workload:
@@ -16,7 +19,7 @@ class Workload:
 
 	name: str
 	intervalS: float
-	callback: typing.Callable[..., typing.Optional[bool]]
+	callback: CallbackAnyType
 	args: typing.List[typing.Any]
 	kwargs: typing.Dict[str, typing.Any]
 	# The workload should start immediately.
@@ -58,7 +61,7 @@ class Scheduler:
 	def add(self,
 	        name: str,
 	        intervalS: float,
-	        callback: typing.Callable[[*Ts], typing.Optional[bool]],
+	        callback: CallbackType[*Ts],
 	        immediate: bool = False,
 	        args: typing.Optional[typing.Tuple[*Ts]] = None,
 	        kwargs: typing.Optional[typing.Dict[str, typing.Any]] = None) -> None:

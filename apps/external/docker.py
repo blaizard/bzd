@@ -14,7 +14,7 @@ def findFreePort() -> int:
 	with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
 		s.bind(('localhost', 0))
 		s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-		return s.getsockname()[1]
+		return int(s.getsockname()[1])
 
 
 def httpServerReady(port: int) -> bool:
@@ -46,8 +46,9 @@ if __name__ == "__main__":
 	command += [args.image]
 
 	scheduler = Scheduler(blocking=False)
-	scheduler.add(name="ping", intervalS=0.5, callback=httpServerReady, args=(exposedPort, ))
+	if exposedPort is not None:
+		scheduler.add(name="ping", intervalS=0.5, callback=httpServerReady, args=(exposedPort, ))
 	scheduler.start()
 
-	print(f"Seting up application...")
+	print(f"Setting up application, please wait...")
 	localDocker(command, timeoutS=None)  #, stdin=True, stdout=True, stderr=True)
