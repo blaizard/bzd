@@ -16,7 +16,7 @@ class Workload:
 
 	name: str
 	intervalS: float
-	callback: typing.Callable[..., None]
+	callback: typing.Callable[..., typing.Optional[bool]]
 	args: typing.List[typing.Any]
 	kwargs: typing.Dict[str, typing.Any]
 	# The workload should start immediately.
@@ -58,7 +58,7 @@ class Scheduler:
 	def add(self,
 	        name: str,
 	        intervalS: float,
-	        callback: typing.Callable[[*Ts], None],
+	        callback: typing.Callable[[*Ts], typing.Optional[bool]],
 	        immediate: bool = False,
 	        args: typing.Optional[typing.Tuple[*Ts]] = None,
 	        kwargs: typing.Optional[typing.Dict[str, typing.Any]] = None) -> None:
@@ -99,11 +99,13 @@ class Scheduler:
 			if self.triggerStop.wait(timeout=timeoutS):
 				break
 
+			maybeStop: typing.Optional[bool] = None
 			try:
-				workload.callback(*workload.args, **workload.kwargs)
+				maybeStop = workload.callback(*workload.args, **workload.kwargs)
 			except Exception as e:
 				logger.error(f"Workload '{workload.name}' failed with error: {str(e)}")
 			finally:
-				self._enqueue(workload, time.time())
+				if not maybeStop:
+					self._enqueue(workload, time.time())
 
 		self.triggerStop.clear()

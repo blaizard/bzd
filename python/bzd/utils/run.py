@@ -219,6 +219,10 @@ def localCommand(
 			if cancellation and cancellation.triggered:
 				stream.addStderr(b"Process was cancelled.\n")
 
+	except KeyboardInterrupt as e:
+		# Exit gracefully on keyboard interrupt.
+		sys.exit(1)
+
 	finally:
 		timer.cancel()
 		Cancellation.killall(gid, signal.SIGKILL)
