@@ -42,6 +42,7 @@ class DriverSelenium:
 		# https://github.com/mozilla/geckodriver/issues/1744
 		options.add_argument("--kiosk")
 		self.driver = webdriver.Firefox(options=options)
+		self.driver.fullscreen_window()
 
 		return self
 
@@ -66,6 +67,8 @@ class DriverSelenium:
 
 				# Setting the window as small as possible will add scrollbar, which make it possible to detect the document size.
 				self.driver.set_window_size(10, 10)
+
+				# We now have the actual size of the document, with the proper ratio.
 				width, height = self.driver.execute_script(  # type: ignore
 				    "return [document.documentElement.scrollWidth, document.documentElement.scrollHeight];")
 				self.driver.set_window_size(width, height)
