@@ -36,6 +36,7 @@ bzd_nodejs_library(
         "//nodejs/core/rest:server",
         "//nodejs/core/services",
         "//nodejs/core/statistics",
+        "//nodejs/core/websocket:server",
         "//nodejs/vue/components/form:backend",
     ],
 )

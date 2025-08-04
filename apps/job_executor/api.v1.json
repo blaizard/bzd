@@ -18,5 +18,10 @@
                 }
             }
         }
+    },
+    "websocket": {
+        "/socket/job/{id}": {
+            "documentation": "Get information about a given job."
+        }
     }
 }

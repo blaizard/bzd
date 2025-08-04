@@ -1,6 +1,7 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import RestServer from "#bzd/nodejs/core/rest/server.mjs";
+import WebsocketServer from "#bzd/nodejs/core/websocket/server.mjs";
 import HttpServer from "#bzd/nodejs/core/http/server.mjs";
 import MockHttpServer from "#bzd/nodejs/core/http/mock/server.mjs";
 import Authentication from "#bzd/apps/accounts/authentication/server.mjs";
@@ -21,6 +22,7 @@ export default class Backend {
 		this.instances = {
 			authentication: null,
 			rest: null,
+			websocket: null,
 			web: test ? new MockHttpServer() : new HttpServer(port),
 			cache: null,
 			statistics: null,
@@ -30,6 +32,8 @@ export default class Backend {
 			staticOptions: null,
 			restSchema: null,
 			restOptions: null,
+			websocketSchema: null,
+			websocketOptions: null,
 		};
 		this.isSetup = false;
 		this.test = test;
@@ -76,6 +80,13 @@ export default class Backend {
 		Exception.assert(this.isSetup, "Backend not set-up.");
 		Exception.assert(this.instances.rest, "Rest server not set-up.");
 		return this.instances.rest;
+	}
+
+	/// Access the websocket server.
+	get websocket() {
+		Exception.assert(this.isSetup, "Backend not set-up.");
+		Exception.assert(this.instances.websocket, "Websocket server not set-up.");
+		return this.instances.websocket;
 	}
 
 	/// Access the authentication object.
@@ -128,6 +139,16 @@ export default class Backend {
 		Exception.assert(!this.instances.restOptions, "Rest options already set-up.");
 		this.instances.restSchema = schema;
 		this.instances.restOptions = options;
+		return this;
+	}
+
+	/// Set-up the websocket object.
+	useWebsocket(schema, options) {
+		Exception.assert(this.isSetup == false, "Backend already set-up.");
+		Exception.assert(!this.instances.websocketSchema, "Websocket schema already set-up.");
+		Exception.assert(!this.instances.websocketOptions, "Websocket options already set-up.");
+		this.instances.websocketSchema = schema;
+		this.instances.websocketOptions = options;
 		return this;
 	}
 
@@ -226,6 +247,17 @@ export default class Backend {
 			if (this.instances.form) {
 				this.instances.rest.installPlugins(this.instances.form);
 			}
+		}
+
+		if (this.instances.websocketSchema) {
+			Log.info("Setting up websocket server");
+			const websocketOptions = Object.assign(
+				{
+					channel: this.instances.web,
+				},
+				this.instances.websocketOptions || {},
+			);
+			this.instances.websocket = new WebsocketServer(this.instances.websocketSchema, websocketOptions);
 		}
 
 		return this;

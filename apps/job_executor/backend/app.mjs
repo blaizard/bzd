@@ -13,6 +13,7 @@ const Log = LogFactory("backend");
 	const backend = Backend.makeFromCli(process.argv)
 		.useAuthentication()
 		.useRest(APIv1.rest)
+		.useWebsocket(APIv1.websocket)
 		.useStatistics()
 		.useForm()
 		.setup();
@@ -62,7 +63,7 @@ const Log = LogFactory("backend");
 		};
 	});
 
-	backend.rest.handleWebsocket("/socket/job/{id}", (context) => {
+	backend.websocket.handle("/socket/job/{id}", (context) => {
 		const jobId = context.getParam("id");
 		Exception.assertPrecondition(jobId in commands, "Job id is not known: {}", jobId);
 
