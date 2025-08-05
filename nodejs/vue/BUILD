@@ -13,6 +13,18 @@ bzd_nodejs_library(
 )
 
 bzd_nodejs_library(
+    name = "websocket",
+    srcs = [
+        "websocket.mjs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//nodejs:vue",
+        "//nodejs/core/websocket:client",
+    ],
+)
+
+bzd_nodejs_library(
     name = "authentication",
     srcs = [
         "authentication.mjs",

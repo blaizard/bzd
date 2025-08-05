@@ -42,6 +42,7 @@ export default class Command {
 	}
 
 	addToOutput(data) {
+		console.log(data);
 		this.output.push(data);
 		this.outputSize += data.length;
 		while (this.outputSize > 1000) {
@@ -64,6 +65,10 @@ export default class Command {
 			default:
 				Exception.assertPrecondition(topic, "Subscription topic {} unsupported.", topic);
 		}
+	}
+
+	remove(topic, callback) {
+		this.event.remove("data", callback);
 	}
 
 	/// Write data to the terminal.

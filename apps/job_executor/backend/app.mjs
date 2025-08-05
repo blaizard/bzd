@@ -67,6 +67,15 @@ const Log = LogFactory("backend");
 		const jobId = context.getParam("id");
 		Exception.assertPrecondition(jobId in commands, "Job id is not known: {}", jobId);
 
+		const command = commands[jobId];
+		const onData = (data) => {
+			context.send(data);
+		};
+		command.on("data", onData);
+		context.exit(() => {
+			command.remove("data", onData);
+		});
+
 		context.read((data) => {
 			console.log("read", data);
 		});

@@ -28,7 +28,7 @@ export default class Rest {
 	}
 
 	getEndpoint(endpoint) {
-		return (this.options.host ? this.options.host : "") + "/api/v" + this.options.version + endpoint;
+		return (this.options.host ? this.options.host : "") + "/websocket/v" + this.options.version + endpoint;
 	}
 
 	/// Install all given plugins..

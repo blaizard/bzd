@@ -172,4 +172,8 @@ export class WebsocketServerContext {
 	read(handler) {
 		this.ws.on("message", handler);
 	}
+
+	exit(handler) {
+		this.ws.on("message", handler);
+	}
 }

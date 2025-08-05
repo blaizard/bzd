@@ -16,42 +16,26 @@
 			};
 		},
 		props: {
-			websocketUrl: { type: String, required: true },
+			websocketEndpoint: { type: String, required: true },
 		},
 		async mounted() {
-			this.websocket = await this.create();
+			this.websocket = await this.$websocket.handle(this.websocketEndpoint, (data) => {
+				this.stream.push(data);
+			});
+			this.websocket.send(JSON.stringify({ type: "init", value: {} }));
 			this.$el.addEventListener("keydown", this.handleKeyDown);
 		},
 		beforeUnmount() {
 			this.$el.removeEventListener("keydown", this.handleKeyDown);
 		},
 		methods: {
-			async create() {
-				return new Promise((resolve, reject) => {
-					let socket = new WebSocket(this.websocketUrl);
-					socket.onopen = () => {
-						socket.send(JSON.stringify({ type: "init", value: {} }));
-						resolve(socket);
-					};
-					socket.onmessage = (event) => {
-						this.stream.push(event.data);
-					};
-					socket.onerror = (error) => {
-						reject(error);
-					};
-				});
-			},
 			handleStreamProcessed(count) {
 				this.stream.splice(0, count);
 			},
-			sleep(ms) {
-				return new Promise((resolve) => setTimeout(resolve, ms));
-			},
 			async setInput(value) {
-				while (!this.websocket) {
-					await this.sleep(100);
+				if (this.websocket) {
+					this.websocket.send(JSON.stringify({ type: "stream", value: value }));
 				}
-				this.websocket.send(JSON.stringify({ type: "stream", value: value }));
 			},
 			async handleKeyDown(event) {
 				const translationMap = {

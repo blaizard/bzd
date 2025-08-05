@@ -2,6 +2,7 @@ import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import Router from "#bzd/nodejs/core/router.mjs";
 import MockServerContext from "#bzd/nodejs/core/http/mock/server_context.mjs";
+import StatisticsProvider from "#bzd/nodejs/core/statistics/provider.mjs";
 
 const Log = LogFactory("http", "server", "mock");
 const Exception = ExceptionFactory("http", "server", "mock");
@@ -10,6 +11,7 @@ export default class MockHttpServer {
 	constructor() {
 		this.started = false;
 		this.routers = {};
+		this.statistics = new StatisticsProvider("http.server");
 	}
 
 	async start() {

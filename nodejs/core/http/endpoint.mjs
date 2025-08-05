@@ -1,7 +1,7 @@
 import ExceptionFactory from "../exception.mjs";
 import Router from "#bzd/nodejs/core/router.mjs";
 
-const Exception = ExceptionFactory("http", "server", "endpoint");
+const Exception = ExceptionFactory("http", "endpoint");
 
 /// Parse an endpoint.
 ///

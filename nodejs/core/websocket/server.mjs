@@ -3,8 +3,8 @@ import LogFactory from "../log.mjs";
 
 import Base from "./base.mjs";
 
-const Exception = ExceptionFactory("rest", "server");
-const Log = LogFactory("rest", "server");
+const Exception = ExceptionFactory("websocket", "server");
+const Log = LogFactory("websocket", "server");
 
 export default class WebsocketServer extends Base {
 	constructor(schema, options) {

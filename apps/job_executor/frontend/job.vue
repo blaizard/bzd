@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<h1>Job {{ job }}</h1>
-		<TerminalWebsocket :websocket-url="websocketUrl" style="height: 600px"></TerminalWebsocket>
+		<TerminalWebsocket :websocket-endpoint="websocketEndpoint" style="height: 600px"></TerminalWebsocket>
 	</div>
 </template>
 
@@ -21,8 +21,8 @@
 			job: { type: String, required: true },
 		},
 		computed: {
-			websocketUrl() {
-				return "/api/v1/socket/job/" + this.job;
+			websocketEndpoint() {
+				return "/socket/job/" + this.job;
 			},
 		},
 		data: function () {

@@ -70,6 +70,7 @@ bzd_nodejs_library(
         "//nodejs/vue:metadata",
         "//nodejs/vue:notification",
         "//nodejs/vue:rest",
+        "//nodejs/vue:websocket",
         "//nodejs/vue/components/layout",
         "//nodejs/vue/components/layout:component",
         "//nodejs/vue/components/menu:entry",

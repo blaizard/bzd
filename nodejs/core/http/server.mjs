@@ -10,6 +10,7 @@ import Multer from "multer";
 import Path from "path";
 import { WebSocketServer } from "ws";
 import Router from "#bzd/nodejs/core/router.mjs";
+import StatisticsProvider from "#bzd/nodejs/core/statistics/provider.mjs";
 
 import Event from "../event.mjs";
 import { ExceptionFactory, ExceptionPrecondition } from "../exception.mjs";
@@ -45,6 +46,7 @@ export default class HttpServer {
 		);
 		this.maxTimeoutS = this.config.timeoutS;
 		this.routerWebsockets = new Router();
+		this.statistics = new StatisticsProvider("http.server");
 
 		this.event = new Event({
 			ready: { proactive: true },
@@ -123,9 +125,28 @@ export default class HttpServer {
 	/// Hook a websocket server to the http server.
 	async startWebsocketServer(server) {
 		this.wss = new WebSocketServer({ noServer: true });
-		this.wss.on("connection", (ws, request, options) => {
+		this.wss.on("connection", async (ws, request, options) => {
 			const context = new WebsocketServerContext(ws, options.params);
-			options.handler(context);
+
+			try {
+				await options.handler(context);
+			} catch (e) {
+				if (e instanceof ExceptionPrecondition) {
+					ws.close(1008, e.message);
+					return;
+				} else if (options.exceptionGuard) {
+					Exception.print("Exception Guard; {}", Exception.fromError(e));
+					ws.close(1008, e.message);
+					return;
+				} else {
+					throw e;
+				}
+			}
+
+			ws.isAlive = true;
+			ws.on("pong", () => {
+				ws.isAlive = true;
+			});
 
 			ws.on("error", (error) => {
 				Exception.print("Receive error from websocket {}; {}", request.url, error);
@@ -143,11 +164,27 @@ export default class HttpServer {
 			const options = {
 				handler: result.args,
 				params: result.vars,
+				/// Add guards to unhandled exceptions. This adds a callstack layer.
+				exceptionGuard: true,
 			};
 			this.wss.handleUpgrade(request, socket, head, (ws) => {
 				this.wss.emit("connection", ws, request, options);
 			});
 		});
+		// Handle heartbeats for websockets to ensure inactive connections are closed.
+		this.websocketsInterval = setInterval(() => {
+			this.wss.clients.forEach((ws) => {
+				if (ws.isAlive === false) {
+					Log.info("Terminating dead websocket connection.");
+					return ws.terminate();
+				}
+
+				// Otherwise, the connection is still alive.
+				ws.isAlive = false;
+				ws.ping();
+			});
+			this.statistics.set("websocket-clients", this.wss.clients.size);
+		}, 30000); // 30 seconds
 	}
 
 	/// Stop the websocket server.
@@ -157,6 +194,8 @@ export default class HttpServer {
 				resolve();
 			});
 		});
+
+		clearInterval(this.websocketsInterval);
 
 		this.wss.clients.forEach((ws) => {
 			if (ws.readyState === ws.OPEN) {
@@ -315,16 +354,12 @@ export default class HttpServer {
 		// Update the options
 		options = Object.assign(
 			{
-				/**
-				 * Data type expected
-				 */
+				/// Data type expected
 				type: [],
 				limit: this.config.limit,
 				path: null,
 				timeoutS: this.config.timeoutS,
-				/**
-				 * Add guards to unhandled exceptions. This adds a callstack layer.
-				 */
+				/// Add guards to unhandled exceptions. This adds a callstack layer.
 				exceptionGuard: false,
 			},
 			options,

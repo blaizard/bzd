@@ -29,6 +29,18 @@ bzd_nodejs_library(
 )
 
 bzd_nodejs_library(
+    name = "endpoints",
+    srcs = [
+        "endpoints.mjs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//nodejs/core:exception",
+        "//nodejs/core:router",
+    ],
+)
+
+bzd_nodejs_library(
     name = "server_context",
     srcs = [
         "server_context.mjs",
@@ -65,6 +77,7 @@ bzd_nodejs_library(
         "//nodejs/core:filesystem",
         "//nodejs/core:log",
         "//nodejs/core:router",
+        "//nodejs/core/statistics:provider",
     ],
 )
 

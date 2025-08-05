@@ -1,6 +1,21 @@
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 
 bzd_nodejs_library(
+    name = "client",
+    srcs = [
+        "base.mjs",
+        "client.mjs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//nodejs/core:event",
+        "//nodejs/core:exception",
+        "//nodejs/core:log",
+        "//nodejs/core/http:endpoints",
+    ],
+)
+
+bzd_nodejs_library(
     name = "server",
     srcs = [
         "base.mjs",

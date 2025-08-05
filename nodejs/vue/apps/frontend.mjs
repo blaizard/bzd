@@ -3,6 +3,7 @@ import { createApp } from "vue";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import RestPlugin from "#bzd/nodejs/vue/rest.mjs";
+import WebsocketPlugin from "#bzd/nodejs/vue/websocket.mjs";
 import Notification from "#bzd/nodejs/vue/notification.mjs";
 import Router from "#bzd/nodejs/vue/router/router.mjs";
 import Authentication from "#bzd/apps/accounts/authentication/client.mjs";
@@ -22,7 +23,8 @@ export default class Frontend {
 			services: null,
 			statistics: null,
 		};
-		this.restOptions = null;
+		this.restSchema = null;
+		this.websocketSchema = null;
 		this.isSetup = false;
 	}
 
@@ -63,10 +65,18 @@ export default class Frontend {
 	}
 
 	/// Set-up the rest object.
-	useRest(options) {
+	useRest(schema) {
 		Exception.assert(this.isSetup == false, "Frontend already set-up.");
-		Exception.assert(!this.restOptions, "Rest already set-up.");
-		this.restOptions = options;
+		Exception.assert(!this.restSchema, "Rest already set-up.");
+		this.restSchema = schema;
+		return this;
+	}
+
+	/// Set-up the websocket object.
+	useWebsocket(schema) {
+		Exception.assert(this.isSetup == false, "Frontend already set-up.");
+		Exception.assert(!this.websocketSchema, "Websocket already set-up.");
+		this.websocketSchema = schema;
 		return this;
 	}
 
@@ -117,11 +127,19 @@ export default class Frontend {
 		});
 		this.instances.app.use(Notification);
 
-		if (this.restOptions) {
+		if (this.restSchema) {
 			Log.info("Setting up rest client");
 			this.instances.app.use(RestPlugin, {
-				schema: this.restOptions,
+				schema: this.restSchema,
 				authentication: this.instances.authentication || null,
+				plugins: plugins,
+			});
+		}
+
+		if (this.websocketSchema) {
+			Log.info("Setting up websocket client");
+			this.instances.app.use(WebsocketPlugin, {
+				schema: this.websocketSchema,
 				plugins: plugins,
 			});
 		}

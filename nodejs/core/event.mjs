@@ -38,6 +38,20 @@ export default class Event {
 		return this;
 	}
 
+	/// \brief Remove a specific callback previously inserted
+	///
+	/// \param id The identifier of the event
+	/// \param callback The function to be removed from the list
+	remove(id, callback) {
+		if (!(id in this.list)) {
+			return;
+		}
+		const index = this.list[id].findIndex((item) => item[0] === callback);
+		if (index !== -1) {
+			this.list[id].splice(index, 1);
+		}
+	}
+
 	/// \brief Check if an event is active (only for proactive events)
 	///
 	/// \param id The identifier of the events to be triggered

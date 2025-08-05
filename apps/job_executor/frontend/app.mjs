@@ -12,6 +12,7 @@ const frontend = Frontend.make(App)
 		icon: icon,
 	})
 	.useRest(APIv1.rest)
+	.useWebsocket(APIv1.websocket)
 	.useAuthentication()
 	.useStatistics()
 	.setup();

@@ -222,6 +222,9 @@ export default class Backend {
 			if (this.instances.form) {
 				this.instances.statistics.register(this.instances.form.statistics, "backend");
 			}
+			if (this.instances.form) {
+				this.instances.statistics.register(this.instances.web.statistics, "backend");
+			}
 		}
 
 		if (this.instances.restSchema) {
