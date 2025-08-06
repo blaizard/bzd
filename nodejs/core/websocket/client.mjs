@@ -28,7 +28,8 @@ export default class WebsocketClient extends Base {
 			};
 			socket.onclose = (object) => {
 				Exception.assert(
-					object.wasClean,
+					// 1008 is used for errors on the server side, so we want to show it.
+					object.wasClean && object.code != 1008,
 					"Endpoint '{}' disconnected with code {} and reason: {}.",
 					endpoint,
 					object.code,
