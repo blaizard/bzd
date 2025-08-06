@@ -17,10 +17,22 @@
                     }
                 }
             }
+        },
+        "/jobs": {
+            "get": {
+                "documentation": "Get the list of jobs.",
+                "response": {
+                    "type": "json",
+                    "validation": {
+                        "jobs": "mandatory",
+                        "timestamp": "mandatory"
+                    }
+                }
+            }
         }
     },
     "websocket": {
-        "/socket/job/{id}": {
+        "/job/{id}": {
             "documentation": "Get information about a given job."
         }
     }

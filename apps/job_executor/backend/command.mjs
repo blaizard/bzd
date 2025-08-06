@@ -19,56 +19,95 @@ export default class Command {
 		this.process = null;
 		this.output = [];
 		this.outputSize = 0;
+		this.timestampStart = null;
+		this.timestampStop = null;
 	}
 
 	execute() {
 		const [command, ...args] = this.command;
+		this.timestampStart = Date.now();
 		this.process = spawn(command, args, {
 			stdio: ["pipe", "pipe", "pipe"],
 		});
 
 		this.process.stdout.on("data", (data) => {
-			this.addToOutput(data.toString());
-			this.event.trigger("data", data.toString());
+			const dataStr = data.toString();
+			this.addToOutput(dataStr);
+			this.event.trigger("data", dataStr);
 		});
 		this.process.stderr.on("data", (data) => {
-			this.addToOutput(data.toString());
-			this.event.trigger("data", data.toString());
+			const dataStr = data.toString();
+			this.addToOutput(dataStr);
+			this.event.trigger("data", dataStr);
 		});
-		this.process.on("close", () => {
+		this.process.on("close", (code) => {
+			this.timestampStop = Date.now();
+			if (code !== 0) {
+				this.addToOutput("Failed with exit code: " + code);
+			}
 			this.event.trigger("exit");
-			this.process = null;
 		});
 	}
 
 	addToOutput(data) {
-		console.log(data);
-		this.output.push(data);
-		this.outputSize += data.length;
-		while (this.outputSize > 1000) {
-			const removed = this.output.shift();
-			this.outputSize -= removed.length;
+		if (data) {
+			this.output.push(data);
+			this.outputSize += data.length;
+			while (this.outputSize > 1000) {
+				const removed = this.output.shift();
+				this.outputSize -= removed.length;
+			}
 		}
 	}
 
+	// Get the status of the command.
+	getStatus() {
+		if (this.process === null) {
+			return "idle";
+		}
+		const exitCode = this.process.exitCode;
+		if (exitCode === null) {
+			return "running";
+		}
+		if (exitCode === 0) {
+			return "completed";
+		}
+		return "failed";
+	}
+
+	// Get information about the command.
+	getInfo() {
+		return {
+			status: this.getStatus(),
+			timestampStart: this.timestampStart,
+			timestampStop: this.timestampStop,
+		};
+	}
+
+	// Subscribe from a topic.
 	on(topic, callback) {
 		switch (topic) {
 			case "data":
 				for (const data of this.output) {
 					callback(data);
 				}
-				this.event.on("data", callback);
+				this.event.on("data", (data) => {
+					callback(data);
+				});
 				break;
 			case "exit":
-				this.event.on("exit", callback);
+				this.event.on("exit", (data) => {
+					callback(data);
+				});
 				break;
 			default:
 				Exception.assertPrecondition(topic, "Subscription topic {} unsupported.", topic);
 		}
 	}
 
+	// Unsubscribe from a topic.
 	remove(topic, callback) {
-		this.event.remove("data", callback);
+		this.event.remove(topic, callback);
 	}
 
 	/// Write data to the terminal.

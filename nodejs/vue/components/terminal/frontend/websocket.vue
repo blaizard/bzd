@@ -27,6 +27,7 @@
 		},
 		beforeUnmount() {
 			this.$el.removeEventListener("keydown", this.handleKeyDown);
+			this.websocket.close();
 		},
 		methods: {
 			handleStreamProcessed(count) {

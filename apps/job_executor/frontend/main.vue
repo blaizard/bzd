@@ -1,6 +1,26 @@
 <template>
 	<div>
-		<h1>Job</h1>
+		<h1>Jobs</h1>
+		<table class="jobs">
+			<tr>
+				<th>Id</th>
+				<th>Type</th>
+				<th>Status</th>
+				<th>Duration</th>
+				<th></th>
+			</tr>
+			<tr v-for="(info, jobId) in jobs" class="job">
+				<td class="job-id">{{ jobId }}</td>
+				<td class="type">{{ info.type }}</td>
+				<td class="status">{{ info.status }}</td>
+				<td class="duration">{{ getDuration(info.timestampStart, info.timestampStop) }}</td>
+				<td class="actions">
+					<a @click="goToJob(jobId)" v-tooltip="tooltipShell"><i class="bzd-icon-shell"></i></a>
+				</td>
+			</tr>
+		</table>
+
+		<h1>Create a new job</h1>
 		<Form
 			v-loading="loading"
 			v-model="value"
@@ -15,10 +35,14 @@
 	import Form from "#bzd/nodejs/vue/components/form/form.vue";
 	import Jobs from "#bzd/apps/job_executor/jobs.json" with { type: "json" };
 	import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
+	import LogFactory from "#bzd/nodejs/core/log.mjs";
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
 	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.mjs";
+	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
+	import { timeMsToString } from "#bzd/nodejs/utils/to_string.mjs";
 
 	const Exception = ExceptionFactory("main");
+	const Log = LogFactory("main");
 
 	export default {
 		mixins: [Component],
@@ -27,10 +51,20 @@
 		},
 		directives: {
 			loading: DirectiveLoading,
+			tooltip: DirectiveTooltip,
+		},
+		mounted() {
+			this.fetchJobs();
+		},
+		beforeUnmount() {
+			clearTimeout(this.instanceTimeout);
 		},
 		data: function () {
 			return {
 				value: {},
+				jobs: {},
+				timestampServer: null,
+				instanceTimeout: null,
 			};
 		},
 		computed: {
@@ -39,7 +73,7 @@
 			},
 			jobDescription() {
 				const jobList = Object.keys(Jobs);
-				return { type: "Dropdown", list: jobList, name: "jobId" };
+				return { type: "Dropdown", list: jobList, name: "jobId", caption: "Type" };
 			},
 			formDescription() {
 				let description = [this.jobDescription];
@@ -50,20 +84,59 @@
 				description = [...description, ...Jobs[this.jobId].inputs, { type: "Button", action: "approve" }];
 				return description;
 			},
+			tooltipShell() {
+				return {
+					type: "text",
+					data: "Access shell",
+				};
+			},
 		},
 		methods: {
+			async fetchJobs() {
+				try {
+					const data = await this.$rest.request("get", "/jobs");
+					this.jobs = data.jobs;
+					this.timestampServer = data.timestamp;
+				} finally {
+					this.instanceTimeout = setTimeout(this.fetchJobs, 1000);
+				}
+			},
 			async handleSubmitInputs() {
 				await this.handleSubmit(async () => {
 					const response = await this.$rest.request("post", "/job/send", {
 						id: this.jobId,
 						data: this.value,
 					});
-					this.$router.dispatch("/job/" + response.job);
-					this.value = {};
+					this.goToJob(response.job);
 				});
+			},
+			goToJob(id) {
+				this.$router.dispatch("/job/" + id);
+				this.value = {};
+			},
+			getDuration(timestampStart, timestampStop) {
+				if (timestampStart === null) {
+					return "-";
+				}
+				const durationMs = (timestampStop === null ? this.timestampServer : timestampStop) - timestampStart;
+				return timeMsToString(durationMs);
 			},
 		},
 	};
 </script>
 
-<style lang="scss"></style>
+<style lang="scss">
+	@use "@/nodejs/icons.scss" as icons with (
+		$bzdIconNames: shell
+	);
+</style>
+
+<style lang="scss" scoped>
+	.jobs {
+		.job {
+			.actions {
+				width: 0;
+			}
+		}
+	}
+</style>

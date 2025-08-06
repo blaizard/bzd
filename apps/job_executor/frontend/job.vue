@@ -22,7 +22,7 @@
 		},
 		computed: {
 			websocketEndpoint() {
-				return "/socket/job/" + this.job;
+				return "/job/" + this.job;
 			},
 		},
 		data: function () {

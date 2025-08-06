@@ -18,6 +18,17 @@ const Log = LogFactory("backend");
 		.useForm()
 		.setup();
 
+	/// Generate the command.
+	function makeCommandFromJob(job, args) {
+		if ("command" in job) {
+			return [job["command"], ...args];
+		}
+		if ("docker" in job) {
+			return ["docker", "run", "--rm", job["docker"], ...args];
+		}
+		Exception.unreachable("Undefined command for this job: {:j}", job);
+	}
+
 	// Convert the raw form data to a more usable format.
 	//
 	// This function also converts the file inputs to their paths and returns a list of files.
@@ -55,19 +66,39 @@ const Log = LogFactory("backend");
 		const command = args.process();
 		const commandId = nextCommandId++;
 		Log.info("Processing job {} with arguments {:j}", commandId, command);
-		commands[commandId] = new Command(["echo", ...command]);
-		commands[commandId].execute();
+		commands[commandId] = {
+			type: inputs.id,
+			command: new Command(makeCommandFromJob(job, command)),
+		};
+		commands[commandId].command.execute();
 
 		return {
 			job: commandId,
 		};
 	});
 
-	backend.websocket.handle("/socket/job/{id}", (context) => {
+	backend.rest.handle("get", "/jobs", async (inputs) => {
+		let jobs = {};
+		for (const [jobId, data] of Object.entries(commands)) {
+			const info = data.command.getInfo();
+			jobs[jobId] = Object.assign(
+				{
+					type: data.type,
+				},
+				info,
+			);
+		}
+		return {
+			jobs: jobs,
+			timestamp: Date.now(),
+		};
+	});
+
+	backend.websocket.handle("/job/{id}", (context) => {
 		const jobId = context.getParam("id");
 		Exception.assertPrecondition(jobId in commands, "Job id is not known: {}", jobId);
 
-		const command = commands[jobId];
+		const command = commands[jobId].command;
 		const onData = (data) => {
 			context.send(data);
 		};

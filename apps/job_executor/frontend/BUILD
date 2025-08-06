@@ -19,6 +19,7 @@ bzd_nodejs_web_binary(
     deps = [
         "//nodejs/core:exception",
         "//nodejs/core:log",
+        "//nodejs/utils:to_string",
         "//nodejs/vue/apps:frontend",
         "//nodejs/vue/components/form",
         "//nodejs/vue/components/layout:component",

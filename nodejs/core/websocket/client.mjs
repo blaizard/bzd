@@ -28,7 +28,7 @@ export default class WebsocketClient extends Base {
 			};
 			socket.onclose = (object) => {
 				Exception.assert(
-					object.code == 1000,
+					object.wasClean,
 					"Endpoint '{}' disconnected with code {} and reason: {}.",
 					endpoint,
 					object.code,

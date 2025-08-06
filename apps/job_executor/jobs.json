@@ -1,21 +1,4 @@
 {
-    "dummy": {
-        "args": [
-            [
-                "--key",
-                "{key}"
-            ],
-            "{ebook}"
-        ],
-        "docker": "blaizard/ebook:latest",
-        "inputs": [
-            {
-                "caption": "Test",
-                "name": "something",
-                "type": "Input"
-            }
-        ]
-    },
     "ebook": {
         "args": [
             [
@@ -30,13 +13,28 @@
                 "caption": "Ebook",
                 "max": 1,
                 "name": "ebook",
-                "type": "File"
+                "type": "File",
+                "validation": "mandatory"
             },
             {
                 "caption": "Key file",
                 "max": 1,
                 "name": "key",
                 "type": "File"
+            }
+        ]
+    },
+    "sleep": {
+        "args": [
+            "{time}"
+        ],
+        "docker": "local/image_sleep:latest",
+        "inputs": [
+            {
+                "caption": "Time (in seconds)",
+                "name": "time",
+                "type": "Input",
+                "validation": "mandatory"
             }
         ]
     }
