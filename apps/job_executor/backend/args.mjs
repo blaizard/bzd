@@ -33,6 +33,9 @@ export default class Args {
 
 		let command = [];
 		const dependencies = [...this.getDependency(pattern)];
+		if (dependencies.length == 0) {
+			return [];
+		}
 		Exception.assert(
 			dependencies.length == 1,
 			"There can only be a single dependency per level: {}, got: {}",

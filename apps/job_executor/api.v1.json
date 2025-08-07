@@ -18,6 +18,11 @@
                 }
             }
         },
+        "/job/{id}": {
+            "delete": {
+                "documentation": "Kill a running job."
+            }
+        },
         "/jobs": {
             "get": {
                 "documentation": "Get the list of jobs.",

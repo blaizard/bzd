@@ -1,4 +1,9 @@
 {
+    "bash": {
+        "args": [],
+        "command": "/bin/bash",
+        "inputs": []
+    },
     "ebook": {
         "args": [
             [

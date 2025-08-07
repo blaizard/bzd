@@ -7,6 +7,7 @@
 				<th>Type</th>
 				<th>Status</th>
 				<th>Duration</th>
+				<th>Arguments</th>
 				<th></th>
 			</tr>
 			<tr v-for="(info, jobId) in jobs" class="job">
@@ -14,7 +15,9 @@
 				<td class="type">{{ info.type }}</td>
 				<td class="status">{{ info.status }}</td>
 				<td class="duration">{{ getDuration(info.timestampStart, info.timestampStop) }}</td>
+				<td class="args">{{ info.args.join(" ") }}</td>
 				<td class="actions">
+					<a v-if="isKill(jobId)" @click="kill(jobId)" v-tooltip="tooltipKill"><i class="bzd-icon-close"></i></a>
 					<a @click="goToJob(jobId)" v-tooltip="tooltipShell"><i class="bzd-icon-shell"></i></a>
 				</td>
 			</tr>
@@ -90,6 +93,12 @@
 					data: "Access shell",
 				};
 			},
+			tooltipKill() {
+				return {
+					type: "text",
+					data: "Kill this job",
+				};
+			},
 		},
 		methods: {
 			async fetchJobs() {
@@ -110,6 +119,16 @@
 					this.goToJob(response.job);
 				});
 			},
+			isKill(id) {
+				return this.jobs[id].status == "running";
+			},
+			async kill(id) {
+				await this.handleSubmit(async () => {
+					await this.$rest.request("delete", "/job/{id}", {
+						id: id,
+					});
+				});
+			},
 			goToJob(id) {
 				this.$router.dispatch("/job/" + id);
 				this.value = {};
@@ -127,7 +146,7 @@
 
 <style lang="scss">
 	@use "@/nodejs/icons.scss" as icons with (
-		$bzdIconNames: shell
+		$bzdIconNames: close shell
 	);
 </style>
 
@@ -135,6 +154,10 @@
 	.jobs {
 		.job {
 			.actions {
+				> * {
+					display: inline-block;
+					margin-right: 5px;
+				}
 				width: 0;
 			}
 		}

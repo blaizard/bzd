@@ -3,13 +3,14 @@
 load("@bzd_rules_oci//:defs.bzl", "bzd_oci_binary", "bzd_oci_load")
 load("//private:python_hermetic_binary.bzl", "bzd_python_hermetic_launcher")
 
-def bzd_python_oci(name, binary, base = Label("@oci_minimal"), **kwargs):
+def bzd_python_oci(name, binary, base = Label("@oci_minimal"), env = None, **kwargs):
     """Rule for embedding a python application into Docker.
 
     Args:
         name: The name of the target.
         binary: The python binary.
         base: The base image.
+        env: Environment variables to set in the container.
         **kwargs: Extra arguments common to all build rules.
     """
 
@@ -22,6 +23,9 @@ def bzd_python_oci(name, binary, base = Label("@oci_minimal"), **kwargs):
         name = name,
         binary = "{}.hermetic".format(name),
         base = base,
+        env = {
+            "PYTHONUNBUFFERED": "1",  # Make sure Python output is unbuffered.
+        } | (env or {}),
         **kwargs
     )
 

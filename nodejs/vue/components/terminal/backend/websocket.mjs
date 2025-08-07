@@ -1,33 +1,29 @@
-import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
-import Command from "#bzd/nodejs/vue/components/terminal/backend/command.mjs";
 
-const Exception = ExceptionFactory("terminal", "websocket");
-const Log = LogFactory("terminal", "websocket");
+const Log = LogFactory("terminal", "backend");
 
-export default class TerminalWebsocket {
-	installWebsocket(comms) {
-		comms.handleWebsocket("/socket/terminal", (ws) => {
-			let terminal = new Command(["docker", "run", "-i", "--rm", "ubuntu", "/bin/bash", "--help"]);
-			terminal.on("data", (data) => {
-				ws.send(data);
-			});
-			terminal.on("exit", () => {
-				ws.close();
-			});
-			ws.on("message", async (event) => {
-				const input = JSON.parse(event.toString());
-				switch (input.type) {
-					case "init":
-						await terminal.start();
-						break;
-					case "stream":
-						await terminal.write(input.value);
-						break;
-					default:
-						Log.error("Unsupported data type '{}' for terminal.", input.type);
-				}
-			});
-		});
-	}
+export default function install(context, command) {
+	const onData = (data) => {
+		context.send(data);
+	};
+
+	// Send data to the client.
+	command.on("data", onData);
+	context.exit(() => {
+		command.remove("data", onData);
+	});
+
+	context.read((data) => {
+		const input = JSON.parse(data.toString());
+		switch (input.type) {
+			case "init":
+				// ignore init in this configuration.
+				break;
+			case "stream":
+				command.write(input.value);
+				break;
+			default:
+				Log.error("Unsupported data type '{}' for terminal.", input.type);
+		}
+	});
 }

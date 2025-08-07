@@ -1,19 +1,11 @@
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 
 bzd_nodejs_library(
-    name = "terminal",
+    name = "status",
     srcs = [
-        "terminal.mjs",
+        "status.mjs",
     ],
-    tools = [
-        "//nodejs/vue/components/terminal/backend/bin:terminal",
-    ],
-    deps = [
-        "//nodejs/core:event",
-        "//nodejs/core:exception",
-        "//nodejs/core:filesystem",
-        "//nodejs/core:log",
-    ],
+    visibility = ["//visibility:public"],
 )
 
 bzd_nodejs_library(
@@ -21,10 +13,14 @@ bzd_nodejs_library(
     srcs = [
         "command.mjs",
     ],
+    tools = [
+        "//nodejs/vue/components/terminal/backend/bin:terminal",
+    ],
+    visibility = ["//visibility:public"],
     deps = [
+        ":status",
         "//nodejs/core:event",
         "//nodejs/core:exception",
-        "//nodejs/core:filesystem",
         "//nodejs/core:log",
     ],
 )
@@ -34,12 +30,8 @@ bzd_nodejs_library(
     srcs = [
         "websocket.mjs",
     ],
-    visibility = [
-        "//visibility:public",
-    ],
+    visibility = ["//visibility:public"],
     deps = [
-        ":command",
-        "//nodejs/core:exception",
         "//nodejs/core:log",
     ],
 )
