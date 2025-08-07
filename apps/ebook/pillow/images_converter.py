@@ -125,7 +125,7 @@ class ImagesConverter(ActionInterface):
 					maybeDPI = image.info.get("dpi", None)
 					if maybeDPI is not None and maybeEstimatedDPI is not None:
 						if abs((maybeDPI[0] - maybeEstimatedDPI[0]) / maybeEstimatedDPI[0]) > 0.1 or \
-                                                                                                                                                                                                                                                                                                      abs((maybeDPI[1] - maybeEstimatedDPI[1]) / maybeEstimatedDPI[1]) > 0.1:
+                                                                                                                                                                                                                                                                                                                        abs((maybeDPI[1] - maybeEstimatedDPI[1]) / maybeEstimatedDPI[1]) > 0.1:
 							comments.append(
 							    f"image DPI {int(maybeDPI[0])}x{int(maybeDPI[1])} != estimated DPI {int(maybeEstimatedDPI[0])}x{int(maybeEstimatedDPI[1])}"
 							)
