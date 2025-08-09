@@ -121,4 +121,31 @@ export default class Command {
 	kill() {
 		this.process.kill();
 	}
+
+	/// Install the command to be used with websockets.
+	installWebsocket(context) {
+		const onData = (data) => {
+			context.send(data);
+		};
+
+		// Send data to the client.
+		this.on("data", onData);
+		context.exit(() => {
+			this.remove("data", onData);
+		});
+
+		context.read((data) => {
+			const input = JSON.parse(data.toString());
+			switch (input.type) {
+				case "init":
+					// ignore init in this configuration.
+					break;
+				case "stream":
+					this.write(input.value);
+					break;
+				default:
+					Log.error("Unsupported data type '{}' for terminal.", input.type);
+			}
+		});
+	}
 }

@@ -1,7 +1,6 @@
 import Command from "#bzd/nodejs/vue/components/terminal/backend/command.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
-import installCommandWebsocket from "#bzd/nodejs/vue/components/terminal/backend/websocket.mjs";
 
 const Exception = ExceptionFactory("commands");
 const Log = LogFactory("commands");
@@ -71,6 +70,6 @@ export default class Commands {
 	}
 
 	installCommandWebsocket(context, uid) {
-		installCommandWebsocket(context, this.get_(uid).command);
+		this.get_(uid).command.installWebsocket(context);
 	}
 }

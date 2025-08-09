@@ -27,6 +27,5 @@ bzd_nodejs_binary(
         "//nodejs/vue/apps:backend",
         "//nodejs/vue/components/form:backend",
         "//nodejs/vue/components/terminal/backend:command",
-        "//nodejs/vue/components/terminal/backend:websocket",
     ],
 )
