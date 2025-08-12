@@ -154,11 +154,12 @@
 	.jobs {
 		.job {
 			.actions {
+				width: 0;
+
 				> * {
 					display: inline-block;
 					margin-right: 5px;
 				}
-				width: 0;
 			}
 		}
 	}
