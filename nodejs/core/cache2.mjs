@@ -6,6 +6,66 @@ import StatisticsProvider from "#bzd/nodejs/core/statistics/provider.mjs";
 const Log = LogFactory("cache");
 const Exception = ExceptionFactory("cache");
 
+class CacheCollectionAccessor {
+	constructor(cache, collection) {
+		Exception.assert(typeof collection == "string", "Collection must be a string, not '{}'.", collection);
+		this.cache = cache;
+		this.collection = collection;
+	}
+
+	/// Register a new data collection.
+	///
+	/// \param collection The name of the collection.
+	/// \param fetch A function to fetch the new data.
+	/// \param options Options specific to this collection.
+	register(collection, fetch, options) {
+		this.cache.register(this.collection + "." + collection, fetch, options);
+	}
+
+	/// Get an accessor for a specific collection.
+	getAccessor(collection) {
+		return new CacheCollectionAccessor(this.cache, this.collection + "." + collection);
+	}
+
+	/// Manually set a value for the collection.
+	///
+	/// \param key The key for this value.
+	/// \param value The value to be set.
+	/// \param type The data type to be set.
+	set(key, value, type = Cache2.Status.value) {
+		this.cache.set(this.collection, key, value, type);
+	}
+
+	/// Access a value or fetch a new value.
+	///
+	/// \param key The key for this value.
+	async get(key) {
+		return this.cache.get(this.collection, key);
+	}
+
+	/// Get the value instantly if available.
+	///
+	/// \param key The key for this value.
+	/// \param defaultValue The default value if the data is not available.
+	getInstant(key, defaultValue) {
+		return this.cache.getInstant(this.collection, key, defaultValue);
+	}
+
+	/// Mark the current data as invalidated (out of date) so it will be reloaded at the next access.
+	///
+	/// \param key The key of the data.
+	setDirty(key) {
+		this.cache.setDirty(this.collection, key);
+	}
+
+	/// Get the size.
+	///
+	/// \return The size of the data.
+	getSize() {
+		return this.getSize(this.collection);
+	}
+}
+
 export default class Cache2 {
 	constructor(name = "cache2", options = {}) {
 		this.name = name;
@@ -92,6 +152,11 @@ export default class Cache2 {
 			function: () => 32,
 		};
 		return sizeFactory[typeof value](value);
+	}
+
+	/// Get an accessor for a specific collection.
+	getAccessor(collection) {
+		return new CacheCollectionAccessor(this, collection);
 	}
 
 	/// Register a new data collection.
