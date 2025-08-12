@@ -2,6 +2,7 @@ import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import Handlers from "#bzd/apps/artifacts/plugins/nodes/handlers/handlers.mjs";
 import Data from "#bzd/apps/artifacts/plugins/nodes/data.mjs";
+import Cache2 from "#bzd/nodejs/core/cache2.mjs";
 
 const Exception = ExceptionFactory("apps", "plugin", "nodes");
 const Log = LogFactory("apps", "plugin", "nodes");
@@ -73,9 +74,11 @@ export class Node {
 }
 
 export class Nodes {
-	constructor(handlers) {
+	constructor(handlers, cache = new Cache2()) {
 		this.handlers = new Handlers(handlers);
-		this.data = new Data();
+		this.data = new Data({
+			cache: cache,
+		});
 	}
 
 	async *getNodes() {

@@ -42,9 +42,16 @@ const Exception = ExceptionFactory("backend");
 		Exception.assert(type in Plugins, "No plugins of type '{}', requested by '{}'.", type, volume);
 		Exception.assert(Plugins[type].prototype instanceof Plugin, "The plugin '{}' must derive from class Plugin.", type);
 
+		const updatedOptions = Object.assign(
+			{
+				cache: backend.cache.getAccessor("plugins"),
+			},
+			options,
+		);
+
 		const provider = new ServiceProvider(volume);
 		const endpoints = new EndpointsFactory();
-		const instance = new Plugins[type](volume, options, provider, endpoints);
+		const instance = new Plugins[type](volume, updatedOptions, provider, endpoints);
 		provider.addStopProcess(() => {
 			// This stop process will be executed at last.
 			backend.cache.setDirty("volume", volume);
@@ -53,7 +60,7 @@ const Exception = ExceptionFactory("backend");
 		const serviceId = backend.services.register(provider, type);
 
 		volumes[volume] = {
-			options: options,
+			options: updatedOptions,
 			instance: instance,
 			endpoints: endpoints.unwrap(),
 			serviceId: serviceId,

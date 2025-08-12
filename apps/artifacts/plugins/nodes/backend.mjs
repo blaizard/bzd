@@ -107,7 +107,7 @@ export default class Plugin extends PluginBase {
 
 		this.records = new Records(optionsRecords);
 		provider.addStartProcess(async () => {
-			this.nodes = new Nodes(options["nodes.handlers"] || {});
+			this.nodes = new Nodes(options["nodes.handlers"] || {}, this.cache);
 			for (const [uid, data] of Object.entries(options["nodes.data"] || {})) {
 				const node = await this.nodes.get(uid);
 				await node.insert(["data"], data);

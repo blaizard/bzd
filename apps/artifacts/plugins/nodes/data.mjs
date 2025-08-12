@@ -1,6 +1,9 @@
-import Cache from "#bzd/nodejs/core/cache.mjs";
+import Cache2 from "#bzd/nodejs/core/cache2.mjs";
 import KeyMapping from "#bzd/apps/artifacts/plugins/nodes/key_mapping.mjs";
 import Optional from "#bzd/nodejs/utils/optional.mjs";
+import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
+
+const Exception = ExceptionFactory("apps", "plugin", "nodes");
 
 /// Structure to contain the data.
 ///
@@ -10,13 +13,19 @@ import Optional from "#bzd/nodejs/utils/optional.mjs";
 const SPECIAL_KEY_FOR_VALUE = "\x01";
 
 export default class Data {
-	constructor() {
+	constructor(options) {
+		this.options = Object.assign(
+			{
+				cache: new Cache2(),
+				external: (uid, internal, count, after, before) => {
+					return [];
+				},
+			},
+			options,
+		);
 		this.storage = {};
-		const cache = new Cache({
-			garbageCollector: false,
-		});
 
-		cache.register("tree", async (uid) => {
+		this.options.cache.register("tree", async (uid) => {
 			// Convert data into a tree with leaf being the internal key.
 			// {
 			//    a: {SPECIAL_KEY_FOR_VALUE: "a"},
@@ -37,7 +46,7 @@ export default class Data {
 			}
 			return tree;
 		});
-		this.tree = cache.getAccessor("tree");
+		this.tree = this.options.cache.getAccessor("tree");
 	}
 
 	/// Get the timestamp.
@@ -65,17 +74,17 @@ export default class Data {
 		return reducedData;
 	}
 
-	/// Get the set of keys for this specific entry, which are equal and children of `key`.
-	async getKeys(uid, key, children) {
+	/// Get the array of keys for this specific entry, which are equal and children of `key`.
+	async getKeys_(uid, key, children) {
 		const data = await this.getTree(uid, key);
 		if (data === null) {
 			return null;
 		}
 
-		const keys = new Set();
+		const keys = [];
 		const treeToKeys = (tree, children) => {
 			if (typeof tree === "string") {
-				keys.add(tree);
+				keys.push(tree);
 			} else {
 				if (children > 0) {
 					Object.entries(tree).forEach(([_, v]) => {
@@ -89,33 +98,84 @@ export default class Data {
 		return keys;
 	}
 
-	///  Get all keys/value pair children of key.
-	async get({ uid, key, metadata = false, children = 0, count = null, after = null, before = null, include = null }) {
+	/// Fetch data from external source.
+	///
+	/// The value might correspond to a time series, where the newest values come first.
+	///
+	/// \return An array of tuple, containing the timestamps and their corresponding value.
+	///         An empty array is returned if this data does not exists.
+	async getExternal_({ uid, internal, count, after = null, before = null }) {
+		return await this.options.external(uid, internal, count, after, before);
+	}
+
+	/// Get a single key/value paur with its metadata.
+	///
+	/// The value might correspond to a time series, where the newest values come first.
+	///
+	/// \return An array of tuple, containing the timestamps and their corresponding value.
+	///         Or null, if there is reference to this data (wrong uid/internal).
+	async getWithMetadata_({ uid, internal, count, after = null, before = null }) {
 		const data = this.storage[uid] || {};
 
-		const getStartEnd = (value) => {
+		// If there is data locally.
+		if (internal in data && data[internal].length) {
+			const value = data[internal];
+
+			if (after !== null && before !== null) {
+				Exception.assertPrecondition(after < before, "after ({}) must be lower than before ({}).", after, before);
+				Exception.unreachable("unsupported yet.");
+			}
+
+			// Gather newer data than 'after' timestamp.
 			if (after !== null) {
 				const end = value.findLastIndex((d) => d[0] > after);
+
+				// Every samples are newer than what is requested.
 				if (end == -1) {
-					return [0, 0];
+					return [];
 				}
-				return [Math.max(end - (count || 1) + 1, 0), end + 1];
+
+				let result = value.slice(Math.max(end - count + 1, 0), end + 1);
+
+				// If it matches the last element, it might be that older elements are also matching.
+				if (end == value.length - 1) {
+					const external = await this.getExternal_({ uid, internal, after, count });
+					result = result.concat(external);
+				}
+
+				return result.slice(-count);
 			}
 
+			// Gather older data than 'before' timestamp.
 			if (before !== null) {
 				const start = value.findIndex((d) => d[0] < before);
+
+				// No local data are older.
 				if (start == -1) {
-					return [0, 0];
+					return await this.getExternal_({ uid, internal, before, count });
 				}
-				return [start, start + (count || 1)];
+
+				let result = value.slice(start, start + count);
+
+				// Get extra data from the external source if needed.
+				if (result.length < count) {
+					const external = await this.getExternal_({ uid, internal, before, count: count - result.length });
+					result = result.concat(external);
+				}
+
+				return result;
 			}
 
-			return [0, count || 1];
-		};
+			return value.slice(0, count);
+		}
 
-		const processValue = (value) => {
-			const [start, end] = getStartEnd(value);
-			const values = value.slice(start, end).map(([t, v]) => {
+		return null;
+	}
+
+	/// Get all keys/value pair children of key.
+	async get({ uid, key, metadata = false, children = 0, count = null, after = null, before = null, include = null }) {
+		const valuesToResult = (values) => {
+			values = values.map(([t, v]) => {
 				if (metadata) {
 					return [t, v];
 				}
@@ -129,31 +189,39 @@ export default class Data {
 			let keys = null;
 			if (children && include) {
 				const arrayOfSets = await Promise.all(
-					include.map(async (subKey) => await this.getKeys(uid, [...key, ...subKey], children)),
+					include.map(async (subKey) => await this.getKeys_(uid, [...key, ...subKey], children)),
 				);
-				keys = new Set(arrayOfSets.filter((a) => a !== null).reduce((a, c) => a.concat([...c]), []));
+				keys = [...new Set(arrayOfSets.filter((a) => a !== null).reduce((a, c) => a.concat([...c]), []))];
 			} else if (include) {
-				keys = new Set(include.map((relative) => KeyMapping.keyToInternal([...key, ...relative])));
+				keys = [...new Set(include.map((relative) => KeyMapping.keyToInternal([...key, ...relative])))];
 			} else {
-				keys = await this.getKeys(uid, key, children);
+				keys = await this.getKeys_(uid, key, children);
 			}
 
 			if (keys !== null) {
-				const values = Object.entries(data)
-					// Only includes the children keys.
-					.filter(([k, _]) => keys.has(k))
-					// Get the values.
-					.map(([k, v]) => [KeyMapping.internalToKey(k).slice(key.length), processValue(v)])
+				// Get all values in parallel.
+				const valuesWithMetadata = await Promise.all(
+					keys.map((internal) => this.getWithMetadata_({ uid, internal, count: count || 1, after, before })),
+				);
+
+				let allValues = [];
+				for (const index in keys) {
+					const [values, internal] = [valuesWithMetadata[index], keys[index]];
 					// Filter out entries that are empty.
-					.filter(([_, v]) => count === null || v.length > 0);
-				return new Optional(values);
+					if (values && values.length) {
+						const processedValues = valuesToResult(values);
+						allValues.push([KeyMapping.internalToKey(internal).slice(key.length), processedValues]);
+					}
+				}
+				return new Optional(allValues);
 			}
 		}
 		// Get the value directly.
 		else {
 			const internal = KeyMapping.keyToInternal(key);
-			if (internal in data) {
-				return new Optional(processValue(data[internal]));
+			const values = await this.getWithMetadata_({ uid, internal, count: count || 1, after, before });
+			if (values !== null) {
+				return new Optional(valuesToResult(values));
 			}
 		}
 

@@ -260,5 +260,161 @@ describe("Nodes", () => {
 				]);
 			}
 		});
+
+		it("external after", async () => {
+			let useExternal = false;
+			let externalData = [];
+			const data = new Data({
+				external: (..._) => {
+					useExternal = true;
+					return externalData;
+				},
+			});
+
+			await data.insert("hello", [[["a"], 1]], 1);
+			await data.insert("hello", [[["a"], 2]], 2);
+			await data.insert("hello", [[["a"], 3]], 3);
+			await data.insert("hello", [[["a"], 4]], 4);
+			await data.insert("hello", [[["a"], 5]], 5);
+
+			{
+				useExternal = false;
+				const result = await data.get({ uid: "hello", key: ["a"], after: 1, count: 5 });
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value(), [5, 4, 3, 2]);
+				Exception.assert(!useExternal);
+			}
+
+			{
+				useExternal = false;
+				externalData = [];
+				const result = await data.get({ uid: "hello", key: ["a"], after: 0, count: 5 });
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value(), [5, 4, 3, 2, 1]);
+				Exception.assert(useExternal);
+			}
+
+			{
+				useExternal = false;
+				externalData = [[0, 0]];
+				const result = await data.get({ uid: "hello", key: ["a"], after: -1, count: 5 });
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value(), [4, 3, 2, 1, 0]);
+				Exception.assert(useExternal);
+			}
+
+			{
+				useExternal = false;
+				externalData = [
+					[0.5, 0.5],
+					[0, 0],
+				];
+				const result = await data.get({ uid: "hello", key: ["a"], after: -1, count: 5 });
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value(), [3, 2, 1, 0.5, 0]);
+				Exception.assert(useExternal);
+			}
+
+			{
+				useExternal = false;
+				externalData = [];
+				const result = await data.get({ uid: "hello", key: ["b"], after: 2, count: 5 });
+				Exception.assert(!result.hasValue());
+				Exception.assert(!useExternal);
+			}
+
+			{
+				useExternal = false;
+				externalData = [];
+				const result = await data.get({ uid: "world", key: ["a"], after: 2, count: 5 });
+				Exception.assert(!result.hasValue());
+				Exception.assert(!useExternal);
+			}
+		});
+
+		it("external before", async () => {
+			let useExternal = false;
+			let externalData = [];
+			const data = new Data({
+				external: (uid, internal, count, after, before) => {
+					useExternal = true;
+					return externalData.slice(0, count);
+				},
+			});
+
+			await data.insert("hello", [[["a"], 1]], 1);
+			await data.insert("hello", [[["a"], 2]], 2);
+			await data.insert("hello", [[["a"], 3]], 3);
+			await data.insert("hello", [[["a"], 4]], 4);
+			await data.insert("hello", [[["a"], 5]], 5);
+
+			{
+				useExternal = false;
+				const result = await data.get({ uid: "hello", key: ["a"], before: 10, count: 5 });
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value(), [5, 4, 3, 2, 1]);
+				Exception.assert(!useExternal);
+			}
+
+			{
+				useExternal = false;
+				externalData = [];
+				const result = await data.get({ uid: "hello", key: ["a"], before: 5, count: 5 });
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value(), [4, 3, 2, 1]);
+				Exception.assert(useExternal);
+			}
+
+			{
+				useExternal = false;
+				externalData = [[0, 0]];
+				const result = await data.get({ uid: "hello", key: ["a"], before: 5, count: 5 });
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value(), [4, 3, 2, 1, 0]);
+				Exception.assert(useExternal);
+			}
+
+			{
+				useExternal = false;
+				externalData = [
+					[0.5, 0.5],
+					[0, 0],
+					[-1, -1],
+					[-2, -2],
+				];
+				const result = await data.get({ uid: "hello", key: ["a"], before: 2, count: 3 });
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value(), [1, 0.5, 0]);
+				Exception.assert(useExternal);
+			}
+
+			{
+				useExternal = false;
+				externalData = [
+					[-2, -2],
+					[-3, -3],
+				];
+				const result = await data.get({ uid: "hello", key: ["a"], before: -1, count: 5 });
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value(), [-2, -3]);
+				Exception.assert(useExternal);
+			}
+
+			{
+				useExternal = false;
+				externalData = [];
+				const result = await data.get({ uid: "hello", key: ["b"], before: 2, count: 5 });
+				Exception.assert(!result.hasValue());
+				Exception.assert(!useExternal);
+			}
+
+			{
+				useExternal = false;
+				externalData = [];
+				const result = await data.get({ uid: "world", key: ["a"], before: 2, count: 5 });
+				Exception.assert(!result.hasValue());
+				Exception.assert(!useExternal);
+			}
+		});
 	});
 });
