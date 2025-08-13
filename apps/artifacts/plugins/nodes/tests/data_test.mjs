@@ -317,18 +317,18 @@ describe("Nodes", () => {
 
 			{
 				useExternal = false;
-				externalData = [];
+				externalData = null;
 				const result = await data.get({ uid: "hello", key: ["b"], after: 2, count: 5 });
 				Exception.assert(!result.hasValue());
-				Exception.assert(!useExternal);
+				Exception.assert(useExternal);
 			}
 
 			{
 				useExternal = false;
-				externalData = [];
+				externalData = null;
 				const result = await data.get({ uid: "world", key: ["a"], after: 2, count: 5 });
 				Exception.assert(!result.hasValue());
-				Exception.assert(!useExternal);
+				Exception.assert(useExternal);
 			}
 		});
 
@@ -338,7 +338,7 @@ describe("Nodes", () => {
 			const data = new Data({
 				external: (uid, internal, count, after, before) => {
 					useExternal = true;
-					return externalData.slice(0, count);
+					return externalData === null ? null : externalData.slice(0, count);
 				},
 			});
 
@@ -402,18 +402,139 @@ describe("Nodes", () => {
 
 			{
 				useExternal = false;
-				externalData = [];
+				externalData = null;
 				const result = await data.get({ uid: "hello", key: ["b"], before: 2, count: 5 });
 				Exception.assert(!result.hasValue());
-				Exception.assert(!useExternal);
+				Exception.assert(useExternal);
 			}
 
 			{
 				useExternal = false;
-				externalData = [];
+				externalData = null;
 				const result = await data.get({ uid: "world", key: ["a"], before: 2, count: 5 });
 				Exception.assert(!result.hasValue());
+				Exception.assert(useExternal);
+			}
+		});
+
+		it("external before/after", async () => {
+			let useExternal = false;
+			let externalData = [];
+			const data = new Data({
+				external: (uid, internal, count, after, before) => {
+					useExternal = true;
+					return externalData === null ? null : externalData.slice(0, count);
+				},
+			});
+
+			await data.insert("hello", [[["a"], 1]], 1);
+			await data.insert("hello", [[["a"], 2]], 2);
+			await data.insert("hello", [[["a"], 3]], 3);
+			await data.insert("hello", [[["a"], 4]], 4);
+			await data.insert("hello", [[["a"], 5]], 5);
+
+			// ask :  [ ]
+			// data: [ local ][ extern ]
+			{
+				useExternal = false;
+				const result = await data.get({ uid: "hello", key: ["a"], before: 5, after: 2, count: 5 });
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value(), [4, 3]);
 				Exception.assert(!useExternal);
+			}
+
+			// ask : [ ]
+			// data:    [ local ][ extern ]
+			{
+				useExternal = false;
+				const result = await data.get({ uid: "hello", key: ["a"], before: 10, after: 5, count: 5 });
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value(), []);
+				Exception.assert(!useExternal);
+			}
+
+			// ask : [     ]
+			// data:   [ local ][ extern ]
+			{
+				useExternal = false;
+				const result = await data.get({ uid: "hello", key: ["a"], before: 9, after: 3, count: 5 });
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value(), [5, 4]);
+				Exception.assert(!useExternal);
+			}
+
+			// ask :            [  ]
+			// data: [ local ][ extern ]
+			{
+				useExternal = false;
+				externalData = [
+					[-1, -1],
+					[-2, -2],
+				];
+				const result = await data.get({ uid: "hello", key: ["a"], before: 0, after: -3, count: 5 });
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value(), [-1, -2]);
+				Exception.assert(useExternal);
+			}
+
+			// ask :       [     ]
+			// data: [ local ][ extern ]
+			{
+				useExternal = false;
+				externalData = [
+					[0, 0],
+					[-1, -1],
+					[-2, -2],
+				];
+				const result = await data.get({ uid: "hello", key: ["a"], before: 2, after: -3, count: 4 });
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value(), [1, 0, -1, -2]);
+				Exception.assert(useExternal);
+			}
+
+			// ask :       [     ]
+			// data: [ local ][ extern ]
+			// using downsampling on the local data
+			{
+				useExternal = false;
+				externalData = [
+					[0, 0],
+					[-2, -2],
+				];
+				const result = await data.get({ uid: "hello", key: ["a"], before: 4, after: -3, count: 4 });
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value(), [3, 1, 0, -2]);
+				Exception.assert(useExternal);
+			}
+
+			// ask :       [     ]
+			// data: [ local ][ extern ]
+			// using upsampling on the local data
+			{
+				useExternal = false;
+				externalData = [
+					[0, 0],
+					[-2, -2],
+				];
+				const result = await data.get({ uid: "hello", key: ["a"], before: 4, after: -3, count: 10 });
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value(), [3, 2, 1, 0, -2]);
+				Exception.assert(useExternal);
+			}
+
+			// ask :       [     ]
+			// data: [ local ][ extern ]
+			// single local data.
+			{
+				useExternal = false;
+				externalData = [
+					[0, 0],
+					[-2, -2],
+				];
+				const result = await data.get({ uid: "hello", key: ["a"], before: 2, after: -3, count: 2 });
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value(), [1, 0]);
+				Exception.assert(useExternal);
 			}
 		});
 	});

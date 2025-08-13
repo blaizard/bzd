@@ -16,9 +16,11 @@ export default class Data {
 	constructor(options) {
 		this.options = Object.assign(
 			{
+				/// The cache instance to be used.
 				cache: new Cache2(),
+				/// The external source to fetch if data is missing locally.
 				external: (uid, internal, count, after, before) => {
-					return [];
+					return null;
 				},
 			},
 			options,
@@ -42,7 +44,7 @@ export default class Data {
 					r[segment] ??= {};
 					return r[segment];
 				}, tree);
-				object[SPECIAL_KEY_FOR_VALUE] = internal;
+				object[SPECIAL_KEY_FOR_VALUE] = { internal: internal, key: paths };
 			}
 			return tree;
 		});
@@ -63,7 +65,7 @@ export default class Data {
 	///
 	/// \return the sub-tree which root is the key if this key is part of the tree,
 	///         or null otherwise.
-	async getTree(uid, key) {
+	async getTree_(uid, key) {
 		const data = await this.tree.get(uid);
 		const reducedData = key.reduce((r, segment) => {
 			if (r === null || !(segment in r) || segment == SPECIAL_KEY_FOR_VALUE) {
@@ -74,23 +76,25 @@ export default class Data {
 		return reducedData;
 	}
 
-	/// Get the array of keys for this specific entry, which are equal and children of `key`.
+	/// Get the dictionary of keys for this specific entry, which are equal and children of `key`.
+	///
+	/// The keys of this dictionary are the internal key representation, while the values are the actual keys.
 	async getKeys_(uid, key, children) {
-		const data = await this.getTree(uid, key);
+		const data = await this.getTree_(uid, key);
 		if (data === null) {
 			return null;
 		}
 
-		const keys = [];
+		const keys = {};
 		const treeToKeys = (tree, children) => {
-			if (typeof tree === "string") {
-				keys.push(tree);
-			} else {
-				if (children > 0) {
-					Object.entries(tree).forEach(([_, v]) => {
+			if (children > 0) {
+				Object.entries(tree).forEach(([k, v]) => {
+					if (k == SPECIAL_KEY_FOR_VALUE) {
+						keys[v.internal] = v.key;
+					} else {
 						treeToKeys(v, children - 1);
-					});
-				}
+					}
+				});
 			}
 		};
 		treeToKeys(data, children + 1); // +1 for '_'.
@@ -103,9 +107,9 @@ export default class Data {
 	/// The value might correspond to a time series, where the newest values come first.
 	///
 	/// \return An array of tuple, containing the timestamps and their corresponding value.
-	///         An empty array is returned if this data does not exists.
-	async getExternal_({ uid, internal, count, after = null, before = null }) {
-		return await this.options.external(uid, internal, count, after, before);
+	///         Or null, if there is reference to this data (wrong uid/internal).
+	async getExternal_({ uid, key, count, after = null, before = null }) {
+		return await this.options.external(uid, key, count, after, before);
 	}
 
 	/// Get a single key/value paur with its metadata.
@@ -114,16 +118,57 @@ export default class Data {
 	///
 	/// \return An array of tuple, containing the timestamps and their corresponding value.
 	///         Or null, if there is reference to this data (wrong uid/internal).
-	async getWithMetadata_({ uid, internal, count, after = null, before = null }) {
+	async getWithMetadata_({ uid, key, value, count, after = null, before = null }) {
 		const data = this.storage[uid] || {};
 
 		// If there is data locally.
-		if (internal in data && data[internal].length) {
-			const value = data[internal];
-
+		if (value && value.length) {
 			if (after !== null && before !== null) {
 				Exception.assertPrecondition(after < before, "after ({}) must be lower than before ({}).", after, before);
-				Exception.unreachable("unsupported yet.");
+
+				const start = value.findIndex((d) => d[0] < before);
+				const end = value.findLastIndex((d) => d[0] > after);
+
+				// Every samples are newer than what is requested.
+				if (end == -1) {
+					return [];
+				}
+
+				// 'before' is older than the local data, means every samples are older.
+				if (start == -1) {
+					const external = await this.getExternal_({ uid, key, count, after, before });
+					return external === null ? [] : external;
+				}
+
+				// Get the local data.
+				let result = value.slice(start, end + 1);
+
+				// If more data is requested, it is ensured that there is at least one sample here.
+				if (end == value.length - 1) {
+					// Calculate how many data are needed from the local/external.
+					const oldestLocal = value[end][0];
+					const durationLocal = before - oldestLocal;
+					const countLocal = Math.round((count * durationLocal) / (before - after)) || 1;
+					const countExternal = count - countLocal;
+
+					// Downsample the local data (we don't want to upsample, create artifial data).
+					// This simple algorithm do not alter the samples and dowsample to the exact number
+					// of samples as the factor is guaranteed to be > 1.
+					if (countLocal < result.length) {
+						const downsamplingFactor = result.length / countLocal;
+						let downsampleResult = [];
+						for (let index = 0; Math.round(index) < result.length; index += downsamplingFactor) {
+							downsampleResult.push(result[Math.round(index)]);
+						}
+						result = downsampleResult;
+					}
+
+					// Get the rest of the data from the external source.
+					const external = await this.getExternal_({ uid, key, count: countExternal, after, before });
+					result = external === null ? result : result.concat(external);
+				}
+
+				return result;
 			}
 
 			// Gather newer data than 'after' timestamp.
@@ -139,8 +184,8 @@ export default class Data {
 
 				// If it matches the last element, it might be that older elements are also matching.
 				if (end == value.length - 1) {
-					const external = await this.getExternal_({ uid, internal, after, count });
-					result = result.concat(external);
+					const external = await this.getExternal_({ uid, key, after, count });
+					result = external === null ? result : result.concat(external);
 				}
 
 				return result.slice(-count);
@@ -152,15 +197,16 @@ export default class Data {
 
 				// No local data are older.
 				if (start == -1) {
-					return await this.getExternal_({ uid, internal, before, count });
+					const external = await this.getExternal_({ uid, key, before, count });
+					return external === null ? [] : external;
 				}
 
 				let result = value.slice(start, start + count);
 
 				// Get extra data from the external source if needed.
 				if (result.length < count) {
-					const external = await this.getExternal_({ uid, internal, before, count: count - result.length });
-					result = result.concat(external);
+					const external = await this.getExternal_({ uid, key, before, count: count - result.length });
+					result = external === null ? result : result.concat(external);
 				}
 
 				return result;
@@ -169,7 +215,7 @@ export default class Data {
 			return value.slice(0, count);
 		}
 
-		return null;
+		return await this.getExternal_({ uid, key, count, after, before });
 	}
 
 	/// Get all keys/value pair children of key.
@@ -183,43 +229,52 @@ export default class Data {
 			});
 			return count === null ? values[0] : values;
 		};
+		const data = this.storage[uid] || {};
 
 		// Get the list of keys.
 		if (children || include) {
 			let keys = null;
 			if (children && include) {
-				const arrayOfSets = await Promise.all(
+				const arrayOfDicts = await Promise.all(
 					include.map(async (subKey) => await this.getKeys_(uid, [...key, ...subKey], children)),
 				);
-				keys = [...new Set(arrayOfSets.filter((a) => a !== null).reduce((a, c) => a.concat([...c]), []))];
+				keys = arrayOfDicts.reduce((a, c) => Object.assign(a, c), {});
 			} else if (include) {
-				keys = [...new Set(include.map((relative) => KeyMapping.keyToInternal([...key, ...relative])))];
+				keys = Object.fromEntries(
+					include.map((relative) => [KeyMapping.keyToInternal([...key, ...relative]), [...key, ...relative]]),
+				);
 			} else {
 				keys = await this.getKeys_(uid, key, children);
 			}
 
 			if (keys !== null) {
+				const entries = Object.entries(keys);
+
 				// Get all values in parallel.
 				const valuesWithMetadata = await Promise.all(
-					keys.map((internal) => this.getWithMetadata_({ uid, internal, count: count || 1, after, before })),
+					entries.map(([internal, path]) =>
+						this.getWithMetadata_({ uid, key: path, value: data[internal], count: count || 1, after, before }),
+					),
 				);
 
-				let allValues = [];
-				for (const index in keys) {
-					const [values, internal] = [valuesWithMetadata[index], keys[index]];
-					// Filter out entries that are empty.
-					if (values && values.length) {
-						const processedValues = valuesToResult(values);
-						allValues.push([KeyMapping.internalToKey(internal).slice(key.length), processedValues]);
-					}
-				}
+				const allValues = entries
+					.map(([_, path], index) => {
+						const values = valuesWithMetadata[index];
+						// Filter out entries that are empty.
+						if (values && values.length) {
+							return [path.slice(key.length), valuesToResult(values)];
+						}
+						return null;
+					})
+					.filter((x) => x !== null);
+
 				return new Optional(allValues);
 			}
 		}
 		// Get the value directly.
 		else {
 			const internal = KeyMapping.keyToInternal(key);
-			const values = await this.getWithMetadata_({ uid, internal, count: count || 1, after, before });
+			const values = await this.getWithMetadata_({ uid, key, value: data[internal], count: count || 1, after, before });
 			if (values !== null) {
 				return new Optional(valuesToResult(values));
 			}
@@ -280,7 +335,7 @@ export default class Data {
 	/// \return A dictionary which keys are the name of the children and value a boolean describing if
 	///         the data is nested of a leaf.
 	async getChildren(uid, key) {
-		const data = await this.getTree(uid, key);
+		const data = await this.getTree_(uid, key);
 		if (data === null) {
 			return new Optional();
 		}
