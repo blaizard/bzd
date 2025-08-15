@@ -9,12 +9,24 @@ py_binary(
     deps = [
         ":flow",
         ":providers",
+        ":utils",
         "//apps/ebook/calibre:remove_drm",
         "//apps/ebook/comics:cbr",
         "//apps/ebook/comics:cbz",
         "//apps/ebook/epub",
+        "//apps/ebook/pdf:pdf_to_images",
         "//apps/ebook/pillow:images_converter",
         "//apps/ebook/pillow:images_to_pdf",
+    ],
+)
+
+py_library(
+    name = "utils",
+    srcs = [
+        "utils.py",
+    ],
+    visibility = [
+        "//apps/ebook:__subpackages__",
     ],
 )
 

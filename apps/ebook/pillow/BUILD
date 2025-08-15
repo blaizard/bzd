@@ -10,6 +10,7 @@ py_library(
     deps = [
         "//apps/ebook:flow",
         "//apps/ebook:providers",
+        "//apps/ebook:utils",
     ] + requirement("pillow"),
 )
 

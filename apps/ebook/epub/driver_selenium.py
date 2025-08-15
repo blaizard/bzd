@@ -14,6 +14,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 
 from apps.ebook.epub.metadata import EPubMetadata
+from apps.ebook.utils import percentToString
 
 
 class ScreenshotType(Enum):
@@ -76,7 +77,7 @@ class DriverSelenium:
 				pagePath = pathlib.Path(directory) / f"{pageIndex:03}.png"
 				commonPrefix = os.path.commonprefix([pagePath, document])
 				print(
-				    f"Saving {document.relative_to(commonPrefix)} -> {pagePath.relative_to(commonPrefix)} ({width}x{height}) ({(pageIndex * 100 / len(metadata.document)):.1f}%)"
+				    f"Saving {document.relative_to(commonPrefix)} -> {pagePath.relative_to(commonPrefix)} ({width}x{height}) ({percentToString(pageIndex / len(metadata.document))})"
 				)
 
 				# Take a screenshot depending on the type.

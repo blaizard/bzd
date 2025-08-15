@@ -33,5 +33,6 @@ py_library(
     ],
     deps = [
         ":metadata",
+        "//apps/ebook:utils",
     ] + requirement("selenium") + requirement("webdriver-manager") + requirement("pillow"),
 )

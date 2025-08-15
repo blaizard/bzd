@@ -10,16 +10,19 @@ from apps.ebook.calibre.remove_drm import RemoveDRM
 from apps.ebook.epub.epub import EPub
 from apps.ebook.comics.cbz import Cbz
 from apps.ebook.comics.cbr import Cbr
+from apps.ebook.pdf.pdf_to_images import PdfToImages
 from apps.ebook.pillow.images_to_pdf import ImagesToPdf
 from apps.ebook.pillow.images_converter import ImagesConverter
 from apps.ebook.flow import ActionInterface, FlowRegistry, FlowEnum, FlowSchemaType
 from apps.ebook.providers import ProviderEbook, ProviderEbookMetadata, ProviderPdf, providerSerialize, providerDeserialize
+from apps.ebook.utils import sizeToString
 
 
 class FlowSchema(FlowEnum):
 	epub: FlowSchemaType = ["removeDRM", "epub", "imagesConverter", "imagesToPdf"]
 	cbz: FlowSchemaType = ["cbz", "imagesConverter", "imagesToPdf"]
 	cbr: FlowSchemaType = ["cbr", "imagesConverter", "imagesToPdf"]
+	pdf: FlowSchemaType = ["pdfToImages", "imagesConverter", "imagesToPdf"]
 	auto: FlowSchemaType = ["discover"]
 
 
@@ -75,22 +78,6 @@ def createSiblingOutput(reference: pathlib.Path, extension: str) -> pathlib.Path
 	assert False, "Unreachable"
 
 
-def sizeToString(sizeBytes: int) -> str:
-	"""Converts a size in bytes to a human-readable string (e.g., KB, MB, GB)."""
-
-	if sizeBytes == 0:
-		return "0 Bytes"
-
-	# Define the units and their corresponding powers of 1024
-	units = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
-
-	i = int(math.floor(math.log(sizeBytes, 1024)))
-	p = math.pow(1024, i)
-	size = round(sizeBytes / p, 2)
-
-	return f"{size} {units[i]}"
-
-
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="e-book to pdf.")
 	parser.add_argument("--key",
@@ -134,6 +121,7 @@ if __name__ == "__main__":
 	    "cbr": Cbr(coefficient=args.coefficient),
 	    "imagesConverter": ImagesConverter(maxDPI=args.max_dpi, scale=args.scale),
 	    "imagesToPdf": ImagesToPdf(),
+	    "pdfToImages": PdfToImages(maxDPI=args.max_dpi),
 	    "discover": Discover(ebookFormat=args.format)
 	}
 

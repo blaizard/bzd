@@ -4,6 +4,7 @@ from collections import Counter
 
 from apps.ebook.flow import ActionInterface, FlowEnum
 from apps.ebook.providers import ProviderImages
+from apps.ebook.utils import estimateDefaultDPI
 
 from PIL import Image
 
@@ -20,90 +21,6 @@ class ImagesConverter(ActionInterface):
 		self.scale = scale
 		assert self.maxDPI is None or self.scale is None, f"Cannot specify both maxDPI and scale, choose one."
 
-	@staticmethod
-	def clusteringDimensions(dimensions: typing.List[typing.Tuple[int, int]],
-	                         tolerance: float) -> typing.List[typing.List[typing.Tuple[int, int]]]:
-		"""Cluster dimensions using the max tolerance as deviation."""
-
-		# Sort the items. Sorting by width primarily and then by height
-		# helps to process items that are "close" in both dimensions together.
-		# This is important for the greedy grouping strategy.
-		sortedDimensions = sorted(dimensions, key=lambda x: (x[0], x[1]))
-
-		clusters = []
-		currentCluster: typing.Optional[typing.List[typing.Tuple[int, int]]] = None
-		maxAllowedWidth: float = 0
-		maxAllowedHeight: float = 0
-		for width, height in sortedDimensions:
-
-			if currentCluster is not None:
-				if width <= maxAllowedWidth and height <= maxAllowedHeight:
-					currentCluster.append((width, height))
-				else:
-					currentCluster = None
-
-			if currentCluster is None:
-				currentCluster = []
-				clusters.append(currentCluster)
-				currentCluster.append((width, height))
-				maxAllowedWidth = width * (1 + tolerance)
-				maxAllowedHeight = height * (1 + tolerance)
-
-		return clusters
-
-	def calculateDefaultDPI(self, provider: ProviderImages) -> typing.Optional[typing.Tuple[int, int]]:
-		"""Calculate the DPI based on the most common page size."""
-
-		dimensions: typing.List[typing.Tuple[int, int]] = []
-		for index, path in enumerate(provider.images):
-			with Image.open(path) as image:
-				width, height = image.size
-				dimensions.append((width, height))
-
-		if len(dimensions) == 0:
-			print("There are no images to process, cannot estimate DPI.")
-			return None
-
-		clusters = ImagesConverter.clusteringDimensions(dimensions, tolerance=0.05)
-		clusters.sort(key=lambda x: len(x), reverse=True)
-		mostCommonCluster = clusters[0]
-		count = len(mostCommonCluster)
-		width = int((mostCommonCluster[0][0] + mostCommonCluster[-1][0]) / 2)
-		height = int((mostCommonCluster[0][1] + mostCommonCluster[-1][1]) / 2)
-
-		if count < len(provider.images) / 2:
-			print(
-			    f"Warning: Most common dimension {width}x{height} only appears {count} times, which is less than half of the total images, ignoring."
-			)
-			return None
-
-		pageType = {
-		    "A4": (210, 297),
-		    "A4 Lanscape": (297, 210),
-		    "US Letter": (215.9, 279.4),
-		    "US Letter Landscape": (279.4, 215.9),
-		    "BD": (240, 320),
-		    "BD Landscape": (320, 240),
-		}
-		dpis = []
-		for name, (pageWidth, pageHeight) in pageType.items():
-			dpis.append((abs((width / height) - (pageWidth / pageHeight)), name, width / (pageWidth / 25.4),
-			             height / (pageHeight / 25.4)))
-		dpis.sort(key=lambda x: x[0])
-		dpiMatch = dpis[0]
-
-		if dpiMatch[0] > 0.1:
-			print(
-			    f"Warning: The most common dimension {width}x{height} does not match any standard page size closely enough (error {dpiMatch[0]}), ignoring."
-			)
-			return None
-
-		dpi = min(int(dpiMatch[2]), int(dpiMatch[3]))
-		print(
-		    f"Estimating page type '{dpiMatch[1]}' with DPI {dpi} from most common dimensions {width}x{height} ({count} times)."
-		)
-		return dpi, dpi
-
 	def process(self, provider: ProviderImages,
 	            directory: pathlib.Path) -> typing.List[typing.Tuple[ProviderImages, typing.Optional[FlowEnum]]]:
 
@@ -119,7 +36,12 @@ class ImagesConverter(ActionInterface):
 
 					# On the first run, estimate the DPI.
 					if index == 0:
-						maybeEstimatedDPI = self.calculateDefaultDPI(provider=provider)
+						dimensions: typing.List[typing.Tuple[int, int]] = []
+						for _, currentPath in enumerate(provider.images):
+							with Image.open(currentPath) as currentImage:
+								width, height = currentImage.size
+								dimensions.append((width, height))
+						maybeEstimatedDPI = estimateDefaultDPI(dimensions=dimensions)
 
 					# Get the DPI of this image.
 					maybeDPI = image.info.get("dpi", None)
