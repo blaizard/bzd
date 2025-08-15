@@ -13,3 +13,5 @@ selenium
 webdriver-manager
 pillow
 rarfile
+pymupdf==1.26.0
+

@@ -74,6 +74,8 @@ platformdirs==4.3.6
     # via yfinance
 psutil==6.0.0
     # via -r tools/python/requirements.in
+pymupdf==1.26.0
+    # via -r tools/python/requirements.in
 pyserial==3.5
     # via -r tools/python/requirements.in
 pysocks==1.7.1
