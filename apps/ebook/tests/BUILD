@@ -6,6 +6,5 @@ py_test(
     main = "cluster_test.py",
     deps = [
         "//apps/ebook:utils",
-        "//apps/ebook/pillow:images_converter",
     ],
 )
