@@ -516,6 +516,7 @@ describe("Plugin", () => {
 					bucket: "mybucket",
 					host: "http://influxdb1",
 					token: "mytoken",
+					write: true,
 				},
 				(url, options) => {
 					Exception.assert(options.data.startsWith("uid01 hello.dict.a=1"));
