@@ -38,10 +38,10 @@ class PdfToImages(ActionInterface):
 			if self.maxDPI is not None:
 				if maybeEstimatedDPI is not None:
 					zoom = self.maxDPI / maybeEstimatedDPI[0]
-					pageArgs["matrix"] = pymupdf.Matrix(zoom, zoom)
+					pageArgs["matrix"] = pymupdf.Matrix(zoom, zoom)  # type: ignore
 					print(f"Using zoom x{zoom} to match target DPI ({self.maxDPI}).")
 				else:
-					pageArgs["dpi"] = self.maxDPI
+					pageArgs["dpi"] = self.maxDPI  # type: ignore
 					print(f"Matching target DPI ({self.maxDPI}).")
 
 			pageTotal = len(doc)
