@@ -74,11 +74,9 @@ export class Node {
 }
 
 export class Nodes {
-	constructor(handlers, cache = new Cache2()) {
+	constructor(handlers, options) {
 		this.handlers = new Handlers(handlers);
-		this.data = new Data({
-			cache: cache,
-		});
+		this.data = new Data(options);
 	}
 
 	async *getNodes() {

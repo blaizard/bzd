@@ -12,6 +12,7 @@ export default class Sink extends Process {
 		this.tick = 0;
 
 		Exception.assert(typeof this.onRecords === "function", "A sink must implement a 'onRecords' function.");
+		Exception.assert(typeof this.onExternal === "function", "A sink must implement a 'onExternal' function.");
 	}
 
 	async process(options) {

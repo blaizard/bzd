@@ -12,7 +12,7 @@ export default class SinkInfluxDB extends Sink {
 		Exception.assert("bucket" in this.options, "The 'bucket' attribute must be set.");
 		Exception.assert("token" in this.options, "The 'token' attribute must be set.");
 
-		this.client = new this.components.HttpClientFactory(this.options.host, {
+		this.clientStore = new this.components.HttpClientFactory(this.options.host, {
 			query: {
 				org: this.options.org,
 				bucket: this.options.bucket,
@@ -21,6 +21,19 @@ export default class SinkInfluxDB extends Sink {
 			headers: {
 				Authorization: "Token " + this.options.token,
 				"Content-Type": "text/plain; charset=utf-8",
+			},
+			expect: "json",
+		});
+
+		this.clientQuery = new this.components.HttpClientFactory(this.options.host, {
+			query: {
+				db: this.options.bucket,
+				p: this.options.token,
+				u: "ignored",
+				epoch: "ms",
+			},
+			headers: {
+				"Content-Type": "application/vnd.influxql",
 			},
 			expect: "json",
 		});
@@ -33,9 +46,9 @@ export default class SinkInfluxDB extends Sink {
 		} else if (typeof value === "boolean") {
 			return [key + "=" + (value ? "true" : "false")];
 		} else if (typeof value === "string") {
-			return [key + "=" + JSON.stringify(value)];
+			return [key + "=" + JSON.stringify(JSON.stringify(value))];
 		} else if (Array.isArray(value)) {
-			return value.reduce((acc, v, i) => acc.concat(SinkInfluxDB.fromValueToFields(key + "[" + i + "]", v)), []);
+			return [key + "=" + JSON.stringify(JSON.stringify(value))];
 		} else if (value === null) {
 			return [];
 		} else if (typeof value === "object") {
@@ -47,25 +60,82 @@ export default class SinkInfluxDB extends Sink {
 		return [];
 	}
 
+	/// Convert a key to a field.
+	static fromKeyToField(key) {
+		return key.map((part) => part.replace(/[\s"']+/g, "-")).join(".");
+	}
+
+	/// Convert a value coming from the database to an actual value.
+	static fromDBValueToValue(value) {
+		if (typeof value === "string") {
+			try {
+				return JSON.parse(value);
+			} catch (e) {
+				// It should not go there, but for now since we have historical data,
+				// it can be the case. Remove this after a month.
+				return value;
+			}
+		}
+		return value;
+	}
+
 	async onRecords(records) {
 		let content = [];
 		for (const [uid, key, value, timestamp] of records) {
 			const timestampNanoseconds = timestamp * 1000000;
-			for (const field of SinkInfluxDB.fromValueToFields(
-				key.map((part) => part.replace(/[\s"']+/g, "-")).join("."),
-				value,
-			)) {
+			for (const field of SinkInfluxDB.fromValueToFields(SinkInfluxDB.fromKeyToField(key), value)) {
 				content.push(uid + " " + field + " " + timestampNanoseconds);
 			}
 		}
 
 		const lineProtocol = content.join("\n");
-		await this.client.post("/api/v2/write", {
+		await this.clientStore.post("/api/v2/write", {
 			data: lineProtocol,
 		});
 
 		return {
 			lineProtocolSize: lineProtocol.length,
 		};
+	}
+
+	/// Get external data on demand.
+	async onExternal(uid, key, count, after, before) {
+		const field = SinkInfluxDB.fromKeyToField(key);
+
+		let influxQL = "";
+
+		if (after !== null && before !== null) {
+			const periodMs = Math.round((before - after) / count) || 1;
+			influxQL += 'SELECT FIRST("' + field + '") ';
+			influxQL += "FROM " + uid + " ";
+			influxQL += "WHERE time > " + after + "ms AND time < " + before + "ms ";
+			influxQL += "GROUP BY time(" + periodMs + "ms)\n";
+		} else if (after !== null) {
+			influxQL += 'SELECT "' + field + '" ';
+			influxQL += "FROM " + uid + " ";
+			influxQL += "WHERE time > " + after + "ms ";
+			influxQL += "LIMIT " + count + "\n";
+		} else if (before !== null) {
+			influxQL += 'SELECT "' + field + '" ';
+			influxQL += "FROM " + uid + " ";
+			influxQL += "WHERE time < " + before + "ms ";
+			influxQL += "ORDER BY time DESC ";
+			influxQL += "LIMIT " + count + "\n";
+		} else {
+			Exception.unreachable("At least one of 'after' or 'before' must be set.");
+		}
+
+		const result = await this.clientQuery.post("/query", {
+			data: influxQL,
+		});
+
+		const data = ((result.results[0].series || [])[0] || {}).values || [];
+		const output = data
+			.filter(([_, value]) => value !== null)
+			.map(([timestamp, value]) => {
+				return [timestamp, SinkInfluxDB.fromDBValueToValue(value)];
+			});
+
+		return output.reverse();
 	}
 }

@@ -2,6 +2,7 @@ import StorageBzd from "#bzd/apps/artifacts/plugins/nodes/storage.mjs";
 import { Nodes } from "#bzd/apps/artifacts/plugins/nodes/nodes.mjs";
 import PluginBase from "#bzd/apps/artifacts/backend/plugin.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
+import LogFactory from "#bzd/nodejs/core/log.mjs";
 import Records from "#bzd/apps/artifacts/plugins/nodes/records.mjs";
 import { HttpClientFactory } from "#bzd/nodejs/core/http/client.mjs";
 import Services from "#bzd/nodejs/core/services/services.mjs";
@@ -18,6 +19,7 @@ const sourceTypes = {
 };
 
 const Exception = ExceptionFactory("apps", "plugin", "nodes");
+const Log = LogFactory("apps", "plugin", "nodes");
 
 function rawBodyParse(body, headersFunc, forceContentType = null, forceCharset = null) {
 	const contentTypeHeader = Object.fromEntries(
@@ -86,6 +88,7 @@ export default class Plugin extends PluginBase {
 
 		super(volume, options, provider, endpoints);
 		this.nodes = null;
+		let dbReadExternal = null;
 
 		// nodes.records Should look like this:
 		// {
@@ -107,7 +110,16 @@ export default class Plugin extends PluginBase {
 
 		this.records = new Records(optionsRecords);
 		provider.addStartProcess(async () => {
-			this.nodes = new Nodes(options["nodes.handlers"] || {}, this.cache);
+			let optionsNodes = {
+				cache: this.cache,
+			};
+			if (dbReadExternal !== null) {
+				optionsNodes["external"] = async (...args) => {
+					return await dbReadExternal.onExternal(...args);
+				};
+			}
+
+			this.nodes = new Nodes(options["nodes.handlers"] || {}, optionsNodes);
 			for (const [uid, data] of Object.entries(options["nodes.data"] || {})) {
 				const node = await this.nodes.get(uid);
 				await node.insert(["data"], data);
@@ -131,6 +143,7 @@ export default class Plugin extends PluginBase {
 		//  ...
 		for (const [storageName, data] of Object.entries(optionsSources)) {
 			Exception.assert(data.type in sourceTypes, "Unrecognized source type '{}'.", data.type);
+			Log.info("[{}] Using source '{}'.", volume, storageName);
 			provider.addTimeTriggeredProcess(
 				"source." + storageName,
 				new sourceTypes[data.type](this, storageName, data, components),
@@ -150,11 +163,29 @@ export default class Plugin extends PluginBase {
 		// }
 		for (const [sinkName, data] of Object.entries(optionsSinks)) {
 			Exception.assert(data.type in sinkTypes, "Unrecognized sink type '{}'.", data.type);
-			provider.addTimeTriggeredProcess("sink." + sinkName, new sinkTypes[data.type](this, data, components), {
-				policy: data.throwOnFailure ? Services.Policy.throw : Services.Policy.ignore,
-				periodS: 5,
-				delayS: data.delayS || null,
-			});
+			Log.info(
+				"[{}] Using sink '{}' with read={}/write={}.",
+				volume,
+				sinkName,
+				data.read || false,
+				data.write || false,
+			);
+			const sink = new sinkTypes[data.type](this, data, components);
+			if (data.write) {
+				provider.addTimeTriggeredProcess("sink." + sinkName, sink, {
+					policy: data.throwOnFailure ? Services.Policy.throw : Services.Policy.ignore,
+					periodS: 5,
+					delayS: data.delayS || null,
+				});
+			}
+			if (data.read) {
+				Exception.assert(
+					dbReadExternal === null,
+					"[{}] Sink read is already set, only one can be set at a time.",
+					volume,
+				);
+				dbReadExternal = sink;
+			}
 		}
 
 		/// Get the records.
