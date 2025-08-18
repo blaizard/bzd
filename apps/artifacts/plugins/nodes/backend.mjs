@@ -6,12 +6,12 @@ import LogFactory from "#bzd/nodejs/core/log.mjs";
 import Records from "#bzd/apps/artifacts/plugins/nodes/records.mjs";
 import { HttpClientFactory } from "#bzd/nodejs/core/http/client.mjs";
 import Services from "#bzd/nodejs/core/services/services.mjs";
-import SinkInfluxDB from "#bzd/apps/artifacts/plugins/nodes/sinks/influxdb.mjs";
+import DatabaseInfluxDB from "#bzd/apps/artifacts/plugins/nodes/databases/influxdb.mjs";
 import SourceNodes from "#bzd/apps/artifacts/plugins/nodes/sources/nodes.mjs";
 import { isObject } from "#bzd/nodejs/utils/object.mjs";
 
-const sinkTypes = {
-	influxdb: SinkInfluxDB,
+const databaseTypes = {
+	influxdb: DatabaseInfluxDB,
 };
 
 const sourceTypes = {
@@ -99,7 +99,7 @@ export default class Plugin extends PluginBase {
 		// 	...
 		// }
 		const optionsSources = options["nodes.sources"] || {};
-		const optionsSinks = options["nodes.sinks"] || {};
+		const optionsDatabases = options["nodes.databases"] || {};
 		const optionsRecords = Object.assign(
 			{
 				// Set the default storages from the remotes options.
@@ -155,24 +155,24 @@ export default class Plugin extends PluginBase {
 			);
 		}
 
-		// Add sink processes.
+		// Add database processes.
 		//
 		// "name": {
 		//     "type": "influxdb",
 		//     "host": "http://localhost:8081"
 		// }
-		for (const [sinkName, data] of Object.entries(optionsSinks)) {
-			Exception.assert(data.type in sinkTypes, "Unrecognized sink type '{}'.", data.type);
+		for (const [databaseName, data] of Object.entries(optionsDatabases)) {
+			Exception.assert(data.type in databaseTypes, "Unrecognized database type '{}'.", data.type);
 			Log.info(
-				"[{}] Using sink '{}' with read={}/write={}.",
+				"[{}] Using database '{}' with read={}/write={}.",
 				volume,
-				sinkName,
+				databaseName,
 				data.read || false,
 				data.write || false,
 			);
-			const sink = new sinkTypes[data.type](this, data, components);
+			const database = new databaseTypes[data.type](this, data, components);
 			if (data.write) {
-				provider.addTimeTriggeredProcess("sink." + sinkName, sink, {
+				provider.addTimeTriggeredProcess("database." + databaseName, database, {
 					policy: data.throwOnFailure ? Services.Policy.throw : Services.Policy.ignore,
 					periodS: 5,
 					delayS: data.delayS || null,
@@ -181,10 +181,10 @@ export default class Plugin extends PluginBase {
 			if (data.read) {
 				Exception.assert(
 					dbReadExternal === null,
-					"[{}] Sink read is already set, only one can be set at a time.",
+					"[{}] database read is already set, only one can be set at a time.",
 					volume,
 				);
-				dbReadExternal = sink;
+				dbReadExternal = database;
 			}
 		}
 

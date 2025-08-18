@@ -1,9 +1,9 @@
-import Sink from "#bzd/apps/artifacts/plugins/nodes/sinks/sink.mjs";
+import Database from "#bzd/apps/artifacts/plugins/nodes/databases/database.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 
-const Exception = ExceptionFactory("artifacts", "nodes", "sink", "influxdb");
+const Exception = ExceptionFactory("artifacts", "nodes", "database", "influxdb");
 
-export default class SinkInfluxDB extends Sink {
+export default class DatabaseInfluxDB extends Database {
 	constructor(...args) {
 		super(...args);
 
@@ -53,7 +53,7 @@ export default class SinkInfluxDB extends Sink {
 			return [];
 		} else if (typeof value === "object") {
 			return Object.entries(value).reduce(
-				(acc, [k, v]) => acc.concat(SinkInfluxDB.fromValueToFields(key + "." + k, v)),
+				(acc, [k, v]) => acc.concat(DatabaseInfluxDB.fromValueToFields(key + "." + k, v)),
 				[],
 			);
 		}
@@ -83,7 +83,7 @@ export default class SinkInfluxDB extends Sink {
 		let content = [];
 		for (const [uid, key, value, timestamp] of records) {
 			const timestampNanoseconds = timestamp * 1000000;
-			for (const field of SinkInfluxDB.fromValueToFields(SinkInfluxDB.fromKeyToField(key), value)) {
+			for (const field of DatabaseInfluxDB.fromValueToFields(DatabaseInfluxDB.fromKeyToField(key), value)) {
 				content.push(uid + " " + field + " " + timestampNanoseconds);
 			}
 		}
@@ -100,7 +100,7 @@ export default class SinkInfluxDB extends Sink {
 
 	/// Get external data on demand.
 	async onExternal(uid, key, count, after, before) {
-		const field = SinkInfluxDB.fromKeyToField(key);
+		const field = DatabaseInfluxDB.fromKeyToField(key);
 
 		let influxQL = "";
 
@@ -133,7 +133,7 @@ export default class SinkInfluxDB extends Sink {
 		const output = data
 			.filter(([_, value]) => value !== null)
 			.map(([timestamp, value]) => {
-				return [timestamp, SinkInfluxDB.fromDBValueToValue(value)];
+				return [timestamp, DatabaseInfluxDB.fromDBValueToValue(value)];
 			});
 
 		return output.reverse();

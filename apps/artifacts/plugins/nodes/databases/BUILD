@@ -9,14 +9,14 @@ bzd_nodejs_library(
         "//apps/artifacts/plugins:__subpackages__",
     ],
     deps = [
-        ":sink",
+        ":database",
     ],
 )
 
 bzd_nodejs_library(
-    name = "sink",
+    name = "database",
     srcs = [
-        "sink.mjs",
+        "database.mjs",
     ],
     visibility = [
         "//apps/artifacts/plugins:__subpackages__",

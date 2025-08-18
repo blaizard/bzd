@@ -1,9 +1,9 @@
 import Process from "#bzd/nodejs/core/services/process.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 
-const Exception = ExceptionFactory("artifacts", "nodes", "sink");
+const Exception = ExceptionFactory("artifacts", "nodes", "database");
 
-export default class Sink extends Process {
+export default class Database extends Process {
 	constructor(plugin, options, components) {
 		super();
 		this.plugin = plugin;
@@ -11,8 +11,8 @@ export default class Sink extends Process {
 		this.components = components;
 		this.tick = 0;
 
-		Exception.assert(typeof this.onRecords === "function", "A sink must implement a 'onRecords' function.");
-		Exception.assert(typeof this.onExternal === "function", "A sink must implement a 'onExternal' function.");
+		Exception.assert(typeof this.onRecords === "function", "A database must implement a 'onRecords' function.");
+		Exception.assert(typeof this.onExternal === "function", "A database must implement a 'onExternal' function.");
 	}
 
 	async process(options) {

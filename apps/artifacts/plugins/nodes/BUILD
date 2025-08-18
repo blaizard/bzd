@@ -31,7 +31,7 @@ bzd_nodejs_library(
         ":nodes",
         ":records",
         "//apps/artifacts/backend:plugin",
-        "//apps/artifacts/plugins/nodes/sinks:influxdb",
+        "//apps/artifacts/plugins/nodes/databases:influxdb",
         "//apps/artifacts/plugins/nodes/sources:nodes",
         "//nodejs/core:cache",
         "//nodejs/core:exception",
@@ -110,7 +110,6 @@ bzd_nodejs_library(
         "keys.vue",
         "value.vue",
         "view_category.vue",
-        "view_node.vue",
     ],
     visibility = [
         "//apps/artifacts/plugins:__subpackages__",

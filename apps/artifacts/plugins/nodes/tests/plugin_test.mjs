@@ -466,7 +466,7 @@ describe("Plugin", () => {
 		});
 	});
 
-	const makeSinkTest = async (options, onReceiveCallback) => {
+	const makeDatabaseTest = async (options, onReceiveCallback) => {
 		const tester = new PluginTester();
 		let fetched = false;
 		tester.register(
@@ -477,8 +477,8 @@ describe("Plugin", () => {
 					path: "./records",
 					clean: true,
 				},
-				"nodes.sinks": {
-					sink1: Object.assign(
+				"nodes.databases": {
+					database1: Object.assign(
 						{
 							delayS: 0.1,
 							throwOnFailure: true,
@@ -507,9 +507,9 @@ describe("Plugin", () => {
 		}
 	};
 
-	describe("Sinks", () => {
+	describe("Databases", () => {
 		it("empty", async () => {
-			await makeSinkTest(
+			await makeDatabaseTest(
 				{
 					type: "influxdb",
 					org: "myorg",
