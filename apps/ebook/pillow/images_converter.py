@@ -4,7 +4,7 @@ from collections import Counter
 
 from apps.ebook.flow import ActionInterface, FlowEnum
 from apps.ebook.providers import ProviderImages
-from apps.ebook.utils import estimateDefaultDPI
+from apps.ebook.utils import estimatePageDPIs
 
 from PIL import Image
 
@@ -24,8 +24,15 @@ class ImagesConverter(ActionInterface):
 	def process(self, provider: ProviderImages,
 	            directory: pathlib.Path) -> typing.List[typing.Tuple[ProviderImages, typing.Optional[FlowEnum]]]:
 
+		# Precalculate the DPI of the images if necessary.
+		dimensions: typing.List[typing.Tuple[int, int]] = []
+		for _, currentPath in enumerate(provider.images):
+			with Image.open(currentPath) as currentImage:
+				width, height = currentImage.size
+				dimensions.append((width, height))
+		maybeEstimatedDPIs = estimatePageDPIs(dimensions=dimensions)
+
 		images = []
-		maybeEstimatedDPI = None
 		for index, path in enumerate(provider.images):
 			with Image.open(path) as image:
 				image = image.convert("RGB")
@@ -34,27 +41,19 @@ class ImagesConverter(ActionInterface):
 
 				if self.maxDPI is not None:
 
-					# On the first run, estimate the DPI.
-					if index == 0:
-						dimensions: typing.List[typing.Tuple[int, int]] = []
-						for _, currentPath in enumerate(provider.images):
-							with Image.open(currentPath) as currentImage:
-								width, height = currentImage.size
-								dimensions.append((width, height))
-						maybeEstimatedDPI = estimateDefaultDPI(dimensions=dimensions)
-
 					# Get the DPI of this image.
 					maybeDPI = image.info.get("dpi", None)
-					if maybeDPI is not None and maybeEstimatedDPI is not None:
-						ratioDiffXDPI = abs((maybeDPI[0] - maybeEstimatedDPI[0]) / maybeEstimatedDPI[0])
-						ratioDiffYDPI = abs((maybeDPI[1] - maybeEstimatedDPI[1]) / maybeEstimatedDPI[1])
-						if ratioDiffXDPI > 0.1 or ratioDiffYDPI > 0.1:
-							comments.append(
-							    f"image DPI {int(maybeDPI[0])}x{int(maybeDPI[1])} != estimated DPI {int(maybeEstimatedDPI[0])}x{int(maybeEstimatedDPI[1])}"
-							)
-							maybeDPI = maybeEstimatedDPI
-					elif maybeDPI is None:
-						maybeDPI = maybeEstimatedDPI
+					if maybeEstimatedDPIs is not None:
+						pageDPI = maybeEstimatedDPIs[index]
+						if maybeDPI is not None:
+							ratioDiffXDPI = abs((maybeDPI[0] - pageDPI) / pageDPI)
+							ratioDiffYDPI = abs((maybeDPI[1] - pageDPI) / pageDPI)
+							if ratioDiffXDPI > 0.1 or ratioDiffYDPI > 0.1:
+								comments.append(
+								    f"image DPI {int(maybeDPI[0])}x{int(maybeDPI[1])} != estimated DPI {pageDPI}")
+								maybeDPI = (pageDPI, pageDPI)
+						else:
+							maybeDPI = (pageDPI, pageDPI)
 
 					# Calculate new dimensions to achieve DPI.
 					if maybeDPI is not None:
@@ -63,9 +62,12 @@ class ImagesConverter(ActionInterface):
 							scaleX = self.maxDPI / maybeDPI[0]
 							scaleY = self.maxDPI / maybeDPI[1]
 							scaleDPI = min(scaleX, scaleY)
-							assert scaleDPI <= scale, f"Scaling by DPI must be less than or equal to {scale}, got {scaleDPI}."
-							comments.append(f"matching max DPI of {self.maxDPI}")
-							scale = scaleDPI
+							assert scaleDPI <= scale, f"Scaling by DPI must be less than or equal to {scale}, got {int(scaleDPI)}."
+							if scaleDPI < 0.95 or scaleDPI > 1.05:
+								comments.append(f"matching max DPI of {self.maxDPI}")
+								scale = scaleDPI
+							else:
+								scale = 1.0
 
 				# Resize the image if necessary
 				assert scale <= 1.0, f"Scale must be less than or equal to 1.0, got {scale}."

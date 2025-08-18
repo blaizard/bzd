@@ -1,5 +1,6 @@
 import math
 import typing
+from dataclasses import dataclass
 
 
 def sizeToString(sizeBytes: int) -> str:
@@ -55,8 +56,17 @@ def clusteringDimensions(dimensions: typing.List[typing.Tuple[int, int]],
 	return clusters
 
 
-def estimateDefaultDPI(dimensions: typing.List[typing.Tuple[int, int]]) -> typing.Optional[typing.Tuple[int, int]]:
-	"""Calculate the DPI based on the most common page size."""
+def estimatePageDPIs(dimensions: typing.List[typing.Tuple[int, int]]) -> typing.Optional[typing.List[float]]:
+	"""Calculate the DPI of each pages based on the most common page size."""
+
+	@dataclass
+	class DPIPageEntry:
+		"""Entry for matching a DPI."""
+
+		name: str
+		ratioDiff: float
+		dpiX: float
+		dpiY: float
 
 	if len(dimensions) == 0:
 		print("There are no images to process, cannot estimate DPI.")
@@ -66,12 +76,12 @@ def estimateDefaultDPI(dimensions: typing.List[typing.Tuple[int, int]]) -> typin
 	clusters.sort(key=lambda x: len(x), reverse=True)
 	mostCommonCluster = clusters[0]
 	count = len(mostCommonCluster)
-	width = int((mostCommonCluster[0][0] + mostCommonCluster[-1][0]) / 2)
-	height = int((mostCommonCluster[0][1] + mostCommonCluster[-1][1]) / 2)
+	width = (mostCommonCluster[0][0] + mostCommonCluster[-1][0]) / 2
+	height = (mostCommonCluster[0][1] + mostCommonCluster[-1][1]) / 2
 
 	if count < len(dimensions) / 2:
 		print(
-		    f"Warning: Most common dimension {width}x{height} only appears {count} times, which is less than half of the total images, ignoring."
+		    f"Warning: Most common dimension {int(width)}x{int(height)} only appears {count} times, which is less than half of the total images, ignoring."
 		)
 		return None
 
@@ -83,21 +93,42 @@ def estimateDefaultDPI(dimensions: typing.List[typing.Tuple[int, int]]) -> typin
 	    "BD": (240, 320),
 	    "BD Landscape": (320, 240),
 	}
-	dpis = []
+	dpis: typing.List[DPIPageEntry] = []
 	for name, (pageWidth, pageHeight) in pageType.items():
-		dpis.append((abs((width / height) - (pageWidth / pageHeight)), name, width / (pageWidth / 25.4),
-		             height / (pageHeight / 25.4)))
-	dpis.sort(key=lambda x: x[0])
+		dpis.append(
+		    DPIPageEntry(name=name,
+		                 ratioDiff=abs((width / height) - (pageWidth / pageHeight)),
+		                 dpiX=width / (pageWidth / 25.4),
+		                 dpiY=height / (pageHeight / 25.4)))
+	dpis.sort(key=lambda x: x.ratioDiff)
 	dpiMatch = dpis[0]
 
-	if dpiMatch[0] > 0.1:
+	if dpiMatch.ratioDiff > 0.1:
 		print(
-		    f"Warning: The most common dimension {width}x{height} does not match any standard page size closely enough (error {dpiMatch[0]}), ignoring."
+		    f"Warning: The most common dimension {int(width)}x{int(height)} does not match any standard page size closely enough (error {dpiMatch.ratioDiff}), ignoring."
 		)
 		return None
 
-	dpi = min(int(dpiMatch[2]), int(dpiMatch[3]))
+	dpi = min(dpiMatch.dpiX, dpiMatch.dpiY)
 	print(
-	    f"Estimating page type '{dpiMatch[1]}' with DPI {dpi} from most common dimensions {width}x{height} ({count} times)."
+	    f"Estimating page type '{dpiMatch.name}' with DPI {int(dpi)} from most common dimensions {int(width)}x{int(height)} ({count} times)."
 	)
-	return dpi, dpi
+
+	# Check every pages, identify outliers and estimate the DPI per pages.
+	dpiPerPage: typing.List[float] = []
+	area = width * height
+	for index, (pageWidth, pageHeight) in enumerate(dimensions):
+		pageArea = pageWidth * pageHeight
+
+		# Area should be within ~2x larger or most common page. This accounts to some pages that are double pages,
+		# anything larger is likely an outlier.
+		if abs((pageArea - area) / area) > 2.1:
+			pageDPI = dpi * math.sqrt(pageArea / area)
+			print(
+			    f"Page {index} is likely an outlier: {int(pageWidth)}x{int(pageHeight)}, esitimated DPI {int(pageDPI)}."
+			)
+			dpiPerPage.append(pageDPI)
+		else:
+			dpiPerPage.append(dpi)
+
+	return dpiPerPage

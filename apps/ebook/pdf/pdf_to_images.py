@@ -3,7 +3,7 @@ import typing
 
 from apps.ebook.flow import ActionInterface, FlowEnum
 from apps.ebook.providers import ProviderEbook, ProviderImages
-from apps.ebook.utils import sizeToString, percentToString, estimateDefaultDPI
+from apps.ebook.utils import sizeToString, percentToString, estimatePageDPIs
 
 import pymupdf
 
@@ -32,26 +32,29 @@ class PdfToImages(ActionInterface):
 				    rect.width,
 				    rect.height,
 				))
-			maybeEstimatedDPI = estimateDefaultDPI(dimensions=dimensions)
-
-			pageArgs = {}
-			if self.maxDPI is not None:
-				if maybeEstimatedDPI is not None:
-					zoom = self.maxDPI / maybeEstimatedDPI[0]
-					pageArgs["matrix"] = pymupdf.Matrix(zoom, zoom)  # type: ignore
-					print(f"Using zoom x{zoom} to match target DPI ({self.maxDPI}).")
-				else:
-					pageArgs["dpi"] = self.maxDPI  # type: ignore
-					print(f"Matching target DPI ({self.maxDPI}).")
+			maybeEstimatedDPIs = estimatePageDPIs(dimensions=dimensions)
 
 			pageTotal = len(doc)
-			for page in doc:
+			for pageIndex, page in enumerate(doc):
+
+				messages = []
+				pageArgs = {}
+				if self.maxDPI is not None:
+					if maybeEstimatedDPIs is not None:
+						zoom = self.maxDPI / maybeEstimatedDPIs[pageIndex]
+						pageArgs["matrix"] = pymupdf.Matrix(zoom, zoom)  # type: ignore
+						messages.append(f"zoom x{zoom:.1f} to match target DPI ({self.maxDPI})")
+					else:
+						pageArgs["dpi"] = self.maxDPI  # type: ignore
+						messages.append(f"matching target DPI ({self.maxDPI})")
+
 				pix = page.get_pixmap(**pageArgs)
-				pageIndex = page.number
 				output = directory / f"{pageIndex}.jpg"
 				pix.save(output)
 				allImages.append(output)
 				sizeStr = sizeToString(output.stat().st_size)
-				print(f"Extracted image '{output.name}' ({sizeStr}) ({percentToString(pageIndex / pageTotal)})")
+				print(
+				    f"Extracted image '{output.name}' ({sizeStr}) ({percentToString(pageIndex / pageTotal)}): {'; '.join(messages)}"
+				)
 
 		return [(ProviderImages(images=allImages, metadata=provider.metadata), None)]
