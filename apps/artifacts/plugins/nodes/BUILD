@@ -36,6 +36,7 @@ bzd_nodejs_library(
         "//nodejs/core:cache",
         "//nodejs/core:exception",
         "//nodejs/core:log",
+        "//nodejs/core:router",
         "//nodejs/core/http:client",
         "//nodejs/core/services",
         "//nodejs/db:utils",
@@ -109,14 +110,22 @@ bzd_nodejs_library(
     srcs = [
         "keys.vue",
         "value.vue",
-        "view_category.vue",
+        "view.vue",
+        "view_dashboard.vue",
+        "view_data.vue",
+    ],
+    packages = [
+        "@nodejs_deps//:chart-js",
+        "@nodejs_deps//:chartjs-plugin-zoom",
     ],
     visibility = [
         "//apps/artifacts/plugins:__subpackages__",
     ],
     deps = [
         "//apps/artifacts/plugins:default",
+        "//nodejs/core:localstorage",
         "//nodejs/utils:to_string",
+        "//nodejs/vue/components/form",
         "//nodejs/vue/directives:tooltip",
     ],
 )

@@ -65,11 +65,12 @@ export class Node {
 		return await this.data.get({ uid: this.uid, key, metadata, children, count, after, before, include });
 	}
 
-	/// Get direct children of a given key.
+	/// Get children of a given key.
 	///
-	/// TODO: this should not be needed.
-	async getChildren(key) {
-		return await this.data.getChildren(this.uid, key);
+	/// \param key The key to locate the data to be returned.
+	/// \param children The level of nested children to be added to the result.
+	async getChildren(key, children) {
+		return await this.data.getChildren(this.uid, key, children);
 	}
 }
 

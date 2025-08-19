@@ -31,17 +31,13 @@ export default class StorageBzd extends Storage {
 
 	async _listCategories(uid, paths, maxOrPaging) {
 		const node = await this.nodes.get(uid);
-		const maybeData = await node.getChildren(paths);
-		if (maybeData.isEmpty()) {
-			return [];
-		}
-		const data = maybeData.value();
-		return await CollectionPaging.makeFromList(Object.keys(data), maxOrPaging, (name) => {
+		const data = await node.getChildren(paths, /*children*/ 0);
+		return await CollectionPaging.makeFromList(data ?? [], maxOrPaging, ({ key, leaf }) => {
 			return Permissions.makeEntry(
 				{
-					name: name,
+					name: key.at(-1),
 				},
-				{ read: true, list: data[name] },
+				{ read: true, list: !leaf },
 			);
 		});
 	}

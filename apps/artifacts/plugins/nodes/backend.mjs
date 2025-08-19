@@ -9,6 +9,7 @@ import Services from "#bzd/nodejs/core/services/services.mjs";
 import DatabaseInfluxDB from "#bzd/apps/artifacts/plugins/nodes/databases/influxdb.mjs";
 import SourceNodes from "#bzd/apps/artifacts/plugins/nodes/sources/nodes.mjs";
 import { isObject } from "#bzd/nodejs/utils/object.mjs";
+import Router from "#bzd/nodejs/core/router.mjs";
 
 const databaseTypes = {
 	influxdb: DatabaseInfluxDB,
@@ -107,6 +108,7 @@ export default class Plugin extends PluginBase {
 			},
 			options["nodes.records"] || {},
 		);
+		const optionsDashboards = options["nodes.dashboards"] || [];
 
 		this.records = new Records(optionsRecords);
 		provider.addStartProcess(async () => {
@@ -220,6 +222,25 @@ export default class Plugin extends PluginBase {
 					output,
 				),
 			);
+		});
+
+		/// Get information about the dashboards at the specified path.
+		endpoints.register("get", "/@dashboards/{uid}/{path:*}", async (context) => {
+			const node = await this.nodes.get(context.getParam("uid"));
+			const key = Plugin.paramPathToKey(context.getParam("path"));
+			const children = await node.getChildren(key, 2);
+
+			const router = new Router();
+			for (const dashboard of optionsDashboards) {
+				for (const [match, _] of Object.entries(dashboard.inputs)) {
+					router.add(match, () => {}, dashboard);
+				}
+			}
+
+			// Go through the children and match them against the router.
+			console.log(children, key);
+
+			return {};
 		});
 
 		/// Retrieve values from the store.

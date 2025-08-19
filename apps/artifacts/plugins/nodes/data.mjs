@@ -76,28 +76,48 @@ export default class Data {
 		return reducedData;
 	}
 
-	/// Get the dictionary of keys for this specific entry, which are equal and children of `key`.
+	/// Get the list of keys for this specific entry, which are equal and children of `key`.
 	///
-	/// The keys of this dictionary are the internal key representation, while the values are the actual keys.
-	async getKeys_(uid, key, children) {
+	/// \param uid The uid to get the keys for.
+	/// \param key The key to get the children of.
+	/// \param children The number of children to reach.
+	/// \param inner If true, the inner nodes are included, otherwise only the leaf nodes.
+	///
+	/// \return A dictionary of keys, or null if the key is not part of the tree.
+	async getKeys_(uid, key, children, inner = true) {
 		const data = await this.getTree_(uid, key);
 		if (data === null) {
 			return null;
 		}
 
-		const keys = {};
-		const treeToKeys = (tree, children) => {
+		const keys = [];
+		const treeToKeys = (tree, children, key) => {
 			if (children > 0) {
 				Object.entries(tree).forEach(([k, v]) => {
 					if (k == SPECIAL_KEY_FOR_VALUE) {
-						keys[v.internal] = v.key;
+						if (!inner) {
+							keys.push({
+								internal: v.internal,
+								key: v.key,
+								leaf: true,
+							});
+						}
 					} else {
-						treeToKeys(v, children - 1);
+						const subKey = key.concat(k);
+						treeToKeys(v, children - 1, subKey);
+						if (inner) {
+							const isLeaf = SPECIAL_KEY_FOR_VALUE in v;
+							keys.push({
+								key: subKey,
+								leaf: isLeaf,
+								internal: isLeaf ? v[SPECIAL_KEY_FOR_VALUE].internal : null,
+							});
+						}
 					}
 				});
 			}
 		};
-		treeToKeys(data, children + 1); // +1 for '_'.
+		treeToKeys(data, children + 1, key); // +1 for '_'.
 
 		return keys;
 	}
@@ -229,40 +249,49 @@ export default class Data {
 			});
 			return count === null ? values[0] : values;
 		};
+
 		const data = this.storage[uid] || {};
 
 		// Get the list of keys.
 		if (children || include) {
 			let keys = null;
 			if (children && include) {
-				const arrayOfDicts = await Promise.all(
-					include.map(async (subKey) => await this.getKeys_(uid, [...key, ...subKey], children)),
+				const arrayOfArrays = await Promise.all(
+					include.map(async (subKey) => await this.getKeys_(uid, [...key, ...subKey], children, /*inner*/ false)),
 				);
-				keys = arrayOfDicts.reduce((a, c) => Object.assign(a, c), {});
+				keys = arrayOfArrays.flat();
 			} else if (include) {
-				keys = Object.fromEntries(
-					include.map((relative) => [KeyMapping.keyToInternal([...key, ...relative]), [...key, ...relative]]),
-				);
+				keys = include.map((relative) => {
+					return {
+						internal: KeyMapping.keyToInternal([...key, ...relative]),
+						key: [...key, ...relative],
+					};
+				});
 			} else {
-				keys = await this.getKeys_(uid, key, children);
+				keys = await this.getKeys_(uid, key, children, /*inner*/ false);
 			}
 
 			if (keys !== null) {
-				const entries = Object.entries(keys);
-
 				// Get all values in parallel.
 				const valuesWithMetadata = await Promise.all(
-					entries.map(([internal, path]) =>
-						this.getWithMetadata_({ uid, key: path, value: data[internal], count: count || 1, after, before }),
+					keys.map((child) =>
+						this.getWithMetadata_({
+							uid,
+							key: child.key,
+							value: data[child.internal],
+							count: count || 1,
+							after,
+							before,
+						}),
 					),
 				);
 
-				const allValues = entries
-					.map(([_, path], index) => {
+				const allValues = keys
+					.map((child, index) => {
 						const values = valuesWithMetadata[index];
 						// Filter out entries that are empty.
 						if (values && values.length) {
-							return [path.slice(key.length), valuesToResult(values)];
+							return [child.key.slice(key.length), valuesToResult(values)];
 						}
 						return null;
 					})
@@ -334,19 +363,16 @@ export default class Data {
 	///
 	/// \return A dictionary which keys are the name of the children and value a boolean describing if
 	///         the data is nested of a leaf.
-	async getChildren(uid, key) {
-		const data = await this.getTree_(uid, key);
+	async getChildren(uid, key, children) {
+		const data = await this.getKeys_(uid, key, children, /*inner*/ true);
 		if (data === null) {
-			return new Optional();
+			return null;
 		}
-
-		const children = Object.keys(data)
-			.filter((v) => v != SPECIAL_KEY_FOR_VALUE)
-			.map((v) => {
-				const keys = Object.keys(data[v]);
-				return [v, !(keys.length == 1 && keys[0] == SPECIAL_KEY_FOR_VALUE)];
-			});
-
-		return new Optional(Object.fromEntries(children));
+		return data.map((child) => {
+			return {
+				key: child.key,
+				leaf: child.leaf,
+			};
+		});
 	}
 }

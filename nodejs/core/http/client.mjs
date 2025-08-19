@@ -141,11 +141,15 @@ export default class HttpClient {
 		}
 
 		const dataParsed = ((data) => {
-			switch (options.expect) {
-				case "json":
-					return data ? JSON.parse(data) : {};
-				default:
-					return data;
+			try {
+				switch (options.expect) {
+					case "json":
+						return data ? JSON.parse(data) : {};
+					default:
+						return data;
+				}
+			} catch (e) {
+				Exception.error("Cannot decode output (expected: {}) with error: {}, output:\n{:j}", options.expect, e, data);
 			}
 		})(result.data);
 
