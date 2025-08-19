@@ -1,6 +1,7 @@
 load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper")
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_requirements_compile")
 
+# Update: bazel run //tools/nodejs:requirements
 bzd_nodejs_requirements_compile(
     name = "requirements",
     srcs = [

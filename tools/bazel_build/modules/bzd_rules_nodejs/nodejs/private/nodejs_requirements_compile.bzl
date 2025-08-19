@@ -2,7 +2,7 @@
 
 load("@rules_python//python:defs.bzl", "py_binary")
 
-def _bzd_nodejs_requirements_compile_impl(name, srcs, output, output_path, **kwargs):
+def _bzd_nodejs_requirements_compile_impl(name, srcs, output, **kwargs):
     compile_py = Label("//nodejs/requirements:compile.py")
     npm = Label("@node//:npm")
     data = srcs + [npm] + ([output] if output else [])
@@ -13,10 +13,9 @@ def _bzd_nodejs_requirements_compile_impl(name, srcs, output, output_path, **kwa
         srcs = [
             compile_py,
         ],
-        args = ([
+        args = [
             "--output",
-            "$(rlocationpath {})".format(output),
-        ] if output else []) + (["--output-path", output_path] if output_path else []) + [
+            "$(rootpath {})".format(output),
             "--npm",
             "$(rootpath {})".format(npm),
         ] + ["$(rootpath {})".format(src) for src in srcs],
@@ -35,8 +34,7 @@ bzd_nodejs_requirements_compile = macro(
         "data": None,
         "deps": None,
         "main": None,
-        "output": attr.label(doc = "Location of the processed output.", configurable = False),
-        "output_path": attr.string(doc = "Location of the processed output as a string.", configurable = False),
+        "output": attr.label(doc = "Location of the processed output.", configurable = False, mandatory = True),
         "srcs": attr.label_list(mandatory = True, doc = "The requirements to be processed.", configurable = False),
     },
     implementation = _bzd_nodejs_requirements_compile_impl,

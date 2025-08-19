@@ -244,7 +244,6 @@ class RequirementsFactory:
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Compile requiments into a deps lock file.")
 	parser.add_argument("--output", type=pathlib.Path, help="The output path for the generated file.")
-	parser.add_argument("--output-path", type=pathlib.Path, help="The output path for the generated file as a string.")
 	parser.add_argument("--npm", type=pathlib.Path, help="The path of the pnpm tool.", required=True)
 	parser.add_argument("srcs", type=pathlib.Path, nargs="+", help="Requirement inputs.")
 
@@ -273,11 +272,7 @@ if __name__ == "__main__":
 	serialized = json.dumps(result, sort_keys=True, indent=4)
 
 	if args.output:
-		[repoName, *path] = pathlib.Path(args.output).parts
-		output = pathlib.Path(os.environ["BUILD_WORKSPACE_DIRECTORY"]) / pathlib.Path(*path)
-		output.write_text(serialized)
-	elif args.output_path:
-		output = pathlib.Path(os.environ["BUILD_WORKSPACE_DIRECTORY"]) / pathlib.Path(args.output_path)
+		output = pathlib.Path(args.output).resolve(strict=True)
 		output.write_text(serialized)
 	else:
 		print(serialized)

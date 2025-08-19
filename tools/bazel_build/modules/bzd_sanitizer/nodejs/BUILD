@@ -5,4 +5,5 @@ bzd_nodejs_requirements_compile(
     srcs = [
         "requirements.in",
     ],
+    output = "requirements.json",
 )

@@ -5,5 +5,5 @@ bzd_nodejs_requirements_compile(
     srcs = [
         "requirements.in",
     ],
-    output_path = "tools/bazel_build/modules/bzd_bdl/diagram/requirements/requirements.json",
+    output = "requirements.json",
 )

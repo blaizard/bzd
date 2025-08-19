@@ -1,1 +1,2 @@
 **/*.kicad_*
+**/requirements.json
