@@ -28,12 +28,15 @@ export default class DatabaseInfluxDB extends Database {
 		this.clientQuery = new this.components.HttpClientFactory(this.options.host, {
 			query: {
 				db: this.options.bucket,
-				p: this.options.token,
-				u: "ignored",
 				epoch: "ms",
 			},
 			headers: {
 				"Content-Type": "application/vnd.influxql",
+			},
+			authentication: {
+				type: "basic",
+				username: "ignored",
+				password: this.options.token,
 			},
 			expect: "json",
 		});
