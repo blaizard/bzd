@@ -5,12 +5,25 @@ import typing
 import dataclasses
 import datetime
 import json
+import hashlib
 
 Json = typing.Dict[str, typing.Any]
 
 
+class ProviderBase:
+	"""Base class for a provider."""
+
+	def __init__(self) -> None:
+		assert hasattr(self, "toJson"), f"The 'toJson' must be implemented."
+		assert hasattr(self, "fromJson"), f"The 'fromJson' must be implemented."
+
+	def hash(self) -> str:
+		string = json.dumps(self.toJson())  # type: ignore
+		return str(hashlib.sha256(string.encode("utf-8")).hexdigest())
+
+
 @dataclasses.dataclass
-class ProviderEbookMetadata:
+class ProviderEbookMetadata(ProviderBase):
 	"""Provides the ebook metadata."""
 
 	# The title of this document.
@@ -51,7 +64,7 @@ class ProviderEbookMetadata:
 
 
 @dataclasses.dataclass
-class ProviderEbook:
+class ProviderEbook(ProviderBase):
 	"""Provides an ebook as a file."""
 
 	# Path of the input ebook.
@@ -81,7 +94,7 @@ class ProviderEbook:
 
 
 @dataclasses.dataclass
-class ProviderImages:
+class ProviderImages(ProviderBase):
 	"""Provides a sequence of images."""
 
 	# Ordered sequence of images.
@@ -99,7 +112,7 @@ class ProviderImages:
 
 
 @dataclasses.dataclass
-class ProviderPdf:
+class ProviderPdf(ProviderBase):
 	"""The final provider for a pdf."""
 
 	# The path of the pdf.
@@ -112,8 +125,33 @@ class ProviderPdf:
 	def fromJson(data: Json) -> "ProviderPdf":
 		return ProviderPdf(path=pathlib.Path(data["path"]))
 
+	@property
+	def outputs(self) -> typing.List[pathlib.Path]:
+		"""Return the outputs of this provider."""
+		return [self.path]
 
-Provider = typing.Union[ProviderEbook, ProviderImages, ProviderPdf]
+
+@dataclasses.dataclass
+class ProviderCover(ProviderBase):
+	"""The final provider for a cover image."""
+
+	# The path of the cover image.
+	path: pathlib.Path
+
+	def toJson(self) -> Json:
+		return {"path": str(self.path)}
+
+	@staticmethod
+	def fromJson(data: Json) -> "ProviderCover":
+		return ProviderCover(path=pathlib.Path(data["path"]))
+
+	@property
+	def outputs(self) -> typing.List[pathlib.Path]:
+		"""Return the outputs of this provider."""
+		return [self.path]
+
+
+Provider = typing.Union[ProviderEbook, ProviderImages, ProviderPdf, ProviderCover]
 
 
 def providerSerialize(provider: Provider) -> str:

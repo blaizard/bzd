@@ -7,6 +7,7 @@ from apps.ebook.epub.epub import EPub
 from apps.ebook.epub.tests.driver_mock import DriverMock
 from apps.ebook.epub.metadata import EPubMetadata
 from apps.ebook.providers import ProviderEbook, ProviderEbookMetadata
+from apps.ebook.flow import FlowContext
 
 
 class TestRun(unittest.TestCase):
@@ -25,7 +26,7 @@ class TestRun(unittest.TestCase):
 
 		provider = ProviderEbook(ebook=pathlib.Path(__file__).parent / "data/sample1.epub")
 		with tempfile.TemporaryDirectory() as directory:
-			epub.process(provider=provider, directory=pathlib.Path(directory))
+			epub.process(provider=provider, directory=pathlib.Path(directory), context=FlowContext.forTesting())
 
 
 if __name__ == "__main__":

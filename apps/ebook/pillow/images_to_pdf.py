@@ -1,7 +1,7 @@
 import pathlib
 import typing
 
-from apps.ebook.flow import ActionInterface, FlowEnum
+from apps.ebook.flow import ActionInterface, FlowEnum, FlowContext
 from apps.ebook.providers import ProviderImages, ProviderPdf
 
 from PIL import Image
@@ -13,8 +13,8 @@ class ImagesToPdf(ActionInterface):
 	ProviderInput = ProviderImages
 	ProviderOutput = ProviderPdf
 
-	def process(self, provider: ProviderImages,
-	            directory: pathlib.Path) -> typing.List[typing.Tuple[ProviderPdf, typing.Optional[FlowEnum]]]:
+	def process(self, provider: ProviderImages, directory: pathlib.Path,
+	            context: FlowContext) -> typing.List[typing.Tuple[ProviderPdf, typing.Optional[FlowEnum]]]:
 
 		output = directory / f"{provider.metadata.title or 'output'}.pdf"
 		print(f"Converting {len(provider.images)} images into {output}.")

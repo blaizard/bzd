@@ -16,6 +16,7 @@ py_binary(
         "//apps/ebook/epub",
         "//apps/ebook/pdf:pdf_to_images",
         "//apps/ebook/pillow:images_converter",
+        "//apps/ebook/pillow:images_to_cover",
         "//apps/ebook/pillow:images_to_pdf",
     ],
 )

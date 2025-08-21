@@ -13,7 +13,7 @@ import xml.etree.ElementTree as ET
 
 from apps.ebook.epub.driver_selenium import DriverSelenium
 from apps.ebook.epub.metadata import EPubMetadata
-from apps.ebook.flow import ActionInterface, FlowEnum
+from apps.ebook.flow import ActionInterface, FlowEnum, FlowContext
 from apps.ebook.providers import ProviderEbook, ProviderEbookMetadata, ProviderImages
 
 
@@ -93,8 +93,8 @@ class EPub(ActionInterface):
 
 		return documents
 
-	def process(self, provider: ProviderEbook,
-	            directory: pathlib.Path) -> typing.List[typing.Tuple[ProviderImages, typing.Optional[FlowEnum]]]:
+	def process(self, provider: ProviderEbook, directory: pathlib.Path,
+	            context: FlowContext) -> typing.List[typing.Tuple[ProviderImages, typing.Optional[FlowEnum]]]:
 
 		outputs: typing.List[typing.Tuple[ProviderImages, typing.Optional[FlowEnum]]] = []
 		with self.driver as driver:

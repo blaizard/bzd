@@ -2,7 +2,7 @@ import pathlib
 import typing
 from collections import Counter
 
-from apps.ebook.flow import ActionInterface, FlowEnum
+from apps.ebook.flow import ActionInterface, FlowEnum, FlowContext
 from apps.ebook.providers import ProviderImages
 from apps.ebook.utils import estimatePageDPIs
 
@@ -21,8 +21,8 @@ class ImagesConverter(ActionInterface):
 		self.scale = scale
 		assert self.maxDPI is None or self.scale is None, f"Cannot specify both maxDPI and scale, choose one."
 
-	def process(self, provider: ProviderImages,
-	            directory: pathlib.Path) -> typing.List[typing.Tuple[ProviderImages, typing.Optional[FlowEnum]]]:
+	def process(self, provider: ProviderImages, directory: pathlib.Path,
+	            context: FlowContext) -> typing.List[typing.Tuple[ProviderImages, typing.Optional[FlowEnum]]]:
 
 		# Precalculate the DPI of the images if necessary.
 		dimensions: typing.List[typing.Tuple[int, int]] = []

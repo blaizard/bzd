@@ -15,6 +15,19 @@ py_library(
 )
 
 py_library(
+    name = "images_to_cover",
+    srcs = [
+        "images_to_cover.py",
+    ],
+    visibility = ["//apps/ebook:__pkg__"],
+    deps = [
+        "//apps/ebook:flow",
+        "//apps/ebook:providers",
+        "//apps/ebook:utils",
+    ] + requirement("pillow"),
+)
+
+py_library(
     name = "images_to_pdf",
     srcs = [
         "images_to_pdf.py",

@@ -14,6 +14,17 @@ class FlowEnum(enum.Enum):
 	pass
 
 
+@dataclasses.dataclass
+class FlowContext:
+	"""Context for the flow."""
+
+	schema: typing.Type[FlowEnum]
+
+	@staticmethod
+	def forTesting() -> "FlowContext":
+		return FlowContext(schema=FlowEnum)
+
+
 class ActionInterface(typing.Protocol):
 	ProviderInput: typing.Any = None
 	ProviderOutput: typing.Any = None
@@ -22,8 +33,8 @@ class ActionInterface(typing.Protocol):
 		assert self.ProviderInput is not None, f"The ProviderInput must be set."
 		assert self.ProviderOutput is not None, f"The ProviderOutput must be set."
 
-	def process(self, input: ProviderInput,
-	            directory: pathlib.Path) -> typing.List[typing.Tuple[ProviderOutput, typing.Optional[FlowEnum]]]:
+	def process(self, input: ProviderInput, directory: pathlib.Path,
+	            context: FlowContext) -> typing.List[typing.Tuple[ProviderOutput, typing.Optional[FlowEnum]]]:
 		raise NotImplementedError()
 
 
@@ -58,27 +69,35 @@ class FlowRegistry:
 			for actionName in flow.value:
 				assert actionName in self.actions, f"The action named '{actionName}' does not exists."
 
-	def restoreOrReset(self, directory: pathlib.Path, flowKey: FlowEnum, provider: Provider) -> "Flow":
+	def restoreOrReset(self, directory: pathlib.Path, flow: FlowSchemaType, provider: Provider) -> "Flow":
 		"""Restore a flow if a previous state exists, other starts from scratch."""
 
 		if Flow.stateJson(directory).exists():
-			return self.restore(directory)
-		return self.reset(directory, flowKey, provider)
+			try:
+				return self.restore(directory, provider)
+			except AssertionError as e:
+				print(f"Could not restore previous flow: {str(e)}, resetting flow state.")
+		return self.reset(directory, flow, provider)
 
-	def reset(self, directory: pathlib.Path, flowKey: FlowEnum, provider: Provider) -> "Flow":
+	def reset(self, directory: pathlib.Path, flow: FlowSchemaType, provider: Provider) -> "Flow":
 		"""Start a flow from the start."""
 
-		state = FlowState(provider=provider, flow=flowKey.value)
+		state = FlowState(provider=provider, flow=flow)
 		return Flow(self, directory, [state])
 
-	def restore(self, directory: pathlib.Path) -> "Flow":
+	def restore(self, directory: pathlib.Path, provider: Provider) -> "Flow":
 		"""Restore a flow from a previous position."""
 
 		stateJson = Flow.stateJson(directory)
-		assert stateJson.exists(), f"'{stateJson}' does not exists."
+		assert stateJson.exists(), f"'{stateJson}' does not exists"
 
 		data = json.loads(stateJson.read_text())
+		uid = provider.hash()
+		assert data["uid"] == uid, "not matching provider"
+		assert data["flow"] == self.schema.__name__, "not matching flow"
+
 		states = [FlowState.fromJson(state) for state in data["states"]]
+		print(f"Restoring flow '{uid}' to previous state.")
 		return Flow(self, directory, states)
 
 	def get(self, name: str) -> ActionInterface:
@@ -98,12 +117,23 @@ class Flow:
 	def stateJson(directory: pathlib.Path) -> pathlib.Path:
 		return directory / "state.json"
 
-	def run(self) -> typing.List[Provider]:
+	def run(self, uid: str) -> typing.List[Provider]:
+		"""Run a specific flow.
+		
+		Args:
+			uid: A unique ID representing this flow instance, used for restoring a flow.
+		"""
+
+		context = FlowContext(schema=self.registry.schema)
 
 		while any(not state.completed() for state in self.states):
 
 			# Serialize the current state.
-			data = {"states": [state.toJson() for state in self.states]}
+			data = {
+			    "uid": uid,
+			    "flow": self.registry.schema.__name__,
+			    "states": [state.toJson() for state in self.states]
+			}
 			Flow.stateJson(self.directory).write_text(json.dumps(data, indent=4))
 
 			# Get the next non completed document state.
@@ -119,7 +149,7 @@ class Flow:
 			workingDirectory.mkdir(parents=True, exist_ok=True)
 			print(f"--- {actionName} ({workingDirectory})")
 
-			outputs = action.process(state.provider, workingDirectory)
+			outputs = action.process(state.provider, workingDirectory, context)
 			isFirst = True
 			currentFlow = state.flow.copy()
 			for provider, maybeFlow in outputs:

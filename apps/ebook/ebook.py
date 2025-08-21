@@ -12,18 +12,30 @@ from apps.ebook.comics.cbz import Cbz
 from apps.ebook.comics.cbr import Cbr
 from apps.ebook.pdf.pdf_to_images import PdfToImages
 from apps.ebook.pillow.images_to_pdf import ImagesToPdf
+from apps.ebook.pillow.images_to_cover import ImagesToCover
 from apps.ebook.pillow.images_converter import ImagesConverter
-from apps.ebook.flow import ActionInterface, FlowRegistry, FlowEnum, FlowSchemaType
+from apps.ebook.flow import ActionInterface, FlowRegistry, FlowEnum, FlowSchemaType, FlowContext
 from apps.ebook.providers import ProviderEbook, ProviderEbookMetadata, ProviderPdf, providerSerialize, providerDeserialize
 from apps.ebook.utils import sizeToString
 
 
-class FlowSchema(FlowEnum):
+class FlowSchemaPdf(FlowEnum):
 	epub: FlowSchemaType = ["removeDRM", "epub", "imagesConverter", "imagesToPdf"]
 	cbz: FlowSchemaType = ["cbz", "imagesConverter", "imagesToPdf"]
 	cbr: FlowSchemaType = ["cbr", "imagesConverter", "imagesToPdf"]
 	pdf: FlowSchemaType = ["pdfToImages", "imagesConverter", "imagesToPdf"]
 	auto: FlowSchemaType = ["discover"]
+
+
+class FlowSchemaCover(FlowEnum):
+	pdf: FlowSchemaType = ["pdfToCoverImage", "imagesToCover"]
+	auto: FlowSchemaType = ["discover"]
+
+
+flowSchemas = {
+    "pdf": FlowSchemaPdf,
+    "cover": FlowSchemaCover,
+}
 
 
 class Discover(ActionInterface):
@@ -35,15 +47,15 @@ class Discover(ActionInterface):
 	def __init__(self, ebookFormat: typing.Optional[str]) -> None:
 		self.ebookFormat = ebookFormat
 
-	def process(self, provider: ProviderEbook,
-	            directory: pathlib.Path) -> typing.List[typing.Tuple[ProviderEbook, typing.Optional[FlowEnum]]]:
+	def process(self, provider: ProviderEbook, directory: pathlib.Path,
+	            context: FlowContext) -> typing.List[typing.Tuple[ProviderEbook, typing.Optional[FlowEnum]]]:
 
 		ebookFormat = self.ebookFormat or provider.ebook.suffix.removeprefix(".").lower()
 		print(f"Ebook of format '{ebookFormat}'.")
-		if hasattr(FlowSchema, ebookFormat):
-			return [(provider, getattr(FlowSchema, ebookFormat))]
+		if hasattr(context.schema, ebookFormat):
+			return [(provider, getattr(context.schema, ebookFormat))]
 
-		assert False, f"Unsupported ebook format: {ebookFormat}, only the following are supported: {str(', '.join([value.name for value in FlowSchema]))}."
+		assert False, f"Unsupported ebook extension '.{ebookFormat}', only the following are supported for this flow: {str(', '.join([value.name for value in context.schema]))}."
 
 
 class SandboxDirectory:
@@ -60,7 +72,7 @@ class SandboxDirectory:
 		pass  # ignore cleanup
 
 
-def createSiblingOutput(reference: pathlib.Path, extension: str) -> pathlib.Path:
+def createSiblingOutput(reference: pathlib.Path) -> pathlib.Path:
 	"""Generate the name of a siblings file."""
 
 	def generateExtra() -> typing.Generator[str, None, None]:
@@ -71,11 +83,29 @@ def createSiblingOutput(reference: pathlib.Path, extension: str) -> pathlib.Path
 			counter += 1
 
 	for extra in generateExtra():
-		path = reference.parent / f"{reference.stem}{extra}.{extension}"
+		path = reference.parent / f"{reference.stem}{extra}{reference.suffix}"
 		if path.exists():
 			continue
 		return path
 	assert False, "Unreachable"
+
+
+def runFlow(provider: ProviderEbook, flowRegistry: FlowRegistry, directory: pathlib.Path) -> None:
+	"""Run the given flow."""
+
+	flow = flowRegistry.restoreOrReset(directory, ["discover"], provider)
+	providers = flow.run(uid=provider.hash())
+
+	print("--- result")
+	for output in providers:
+		if hasattr(output, "outputs"):
+			for path in output.outputs:
+				destination = createSiblingOutput(provider.ebook.parent / path.name)
+				# Note, we use this instead of shutil.copy/move to avoid copying metadata.
+				# This is important for some filesystem that do not support copying metadata.
+				shutil.copyfile(path, destination)
+				sizeStr = sizeToString(destination.stat().st_size)
+				print(f"Output {destination} ({sizeStr}).")
 
 
 if __name__ == "__main__":
@@ -110,7 +140,8 @@ if __name__ == "__main__":
 	    help=
 	    "Directory to use to store the intermediate data, this directory will be kept when the program terminated. Also if interrupted, the process will restart from the last step."
 	)
-	parser.add_argument("ebook", type=pathlib.Path, help="The ebook file to sanitize.")
+	parser.add_argument("action", type=str, choices=flowSchemas.keys(), help="The type of action to perform.")
+	parser.add_argument("ebook", type=pathlib.Path, help="The ebook file or directory to sanitize.")
 
 	args = parser.parse_args()
 
@@ -121,31 +152,36 @@ if __name__ == "__main__":
 	    "cbr": Cbr(coefficient=args.coefficient),
 	    "imagesConverter": ImagesConverter(maxDPI=args.max_dpi, scale=args.scale),
 	    "imagesToPdf": ImagesToPdf(),
+	    "imagesToCover": ImagesToCover(),
 	    "pdfToImages": PdfToImages(maxDPI=args.max_dpi),
+	    "pdfToCoverImage": PdfToImages(maxDPI=100, maxImages=1),
 	    "discover": Discover(ebookFormat=args.format)
 	}
+
+	schema = flowSchemas[args.action]
 
 	if args.clean:
 		if args.sandbox is not None and args.sandbox.exists():
 			print(f"Cleaning sandbox {args.sandbox}.")
 			shutil.rmtree(args.sandbox)
 
-	flows = FlowRegistry(schema=FlowSchema, actions=actions)
-	directory = tempfile.TemporaryDirectory() if args.sandbox is None else SandboxDirectory(path=args.sandbox)
-	try:
-		provider = ProviderEbook(ebook=args.ebook,
-		                         keys=args.keys,
-		                         metadata=ProviderEbookMetadata(title=args.ebook.stem))
-		flow = flows.restoreOrReset(pathlib.Path(directory.name), FlowSchema.auto, provider)  # type: ignore
-		providers = flow.run()
+	assert args.ebook.exists(), f"File or directory '{args.ebook}' does not exists."
+	if args.ebook.is_file():
+		ebooks = [args.ebook]
+	else:
+		allFiles = args.ebook.rglob("**/*")
+		ebooks = [f for f in allFiles if hasattr(schema, f.suffix.removeprefix(".").lower())]
 
-		print("--- result")
-		for output in providers:
-			if isinstance(output, ProviderPdf):
-				path = createSiblingOutput(args.ebook.parent / output.path.name, "pdf")
-				shutil.move(output.path, path)
-				sizeStr = sizeToString(path.stat().st_size)
-				print(f"Output {path} ({sizeStr}).")
+	for ebook in ebooks:
+		directory = tempfile.TemporaryDirectory() if args.sandbox is None else SandboxDirectory(path=args.sandbox)
+		try:
+			print(f"=== Running flow '{args.action}' on {ebook} ===")
+			provider = ProviderEbook(ebook=ebook, keys=args.keys, metadata=ProviderEbookMetadata(title=ebook.stem))
+			runFlow(
+			    provider=provider,
+			    flowRegistry=FlowRegistry(schema=flowSchemas[args.action], actions=actions),
+			    directory=pathlib.Path(directory.name)  # type: ignore
+			)
 
-	finally:
-		directory.cleanup()  # type: ignore
+		finally:
+			directory.cleanup()  # type: ignore

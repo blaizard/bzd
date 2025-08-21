@@ -5,6 +5,7 @@ import typing
 
 from apps.ebook.comics.cbz import Cbz
 from apps.ebook.providers import ProviderEbook, ProviderImages
+from apps.ebook.flow import FlowContext
 
 
 class TestRun(unittest.TestCase):
@@ -24,7 +25,7 @@ class TestRun(unittest.TestCase):
 		cbz = Cbz()
 		provider = ProviderEbook(ebook=pathlib.Path(__file__).parent / "data/sample1.cbz")
 		with tempfile.TemporaryDirectory() as directory:
-			result = cbz.process(provider=provider, directory=pathlib.Path(directory))
+			result = cbz.process(provider=provider, directory=pathlib.Path(directory), context=FlowContext.forTesting())
 			self.assertEqual(len(result), 1)
 			self.assertProviderEbook(result[0][0], expectedImages=[
 			    "file001.jpg",
@@ -44,7 +45,7 @@ class TestRun(unittest.TestCase):
 		cbz = Cbz()
 		provider = ProviderEbook(ebook=pathlib.Path(__file__).parent / "data/sample2.cbz")
 		with tempfile.TemporaryDirectory() as directory:
-			result = cbz.process(provider=provider, directory=pathlib.Path(directory))
+			result = cbz.process(provider=provider, directory=pathlib.Path(directory), context=FlowContext.forTesting())
 			self.assertEqual(len(result), 1)
 			self.assertProviderEbook(result[0][0],
 			                         expectedImages=[
@@ -64,7 +65,7 @@ class TestRun(unittest.TestCase):
 		cbz = Cbz()
 		provider = ProviderEbook(ebook=pathlib.Path(__file__).parent / "data/sample3.cbz")
 		with tempfile.TemporaryDirectory() as directory:
-			result = cbz.process(provider=provider, directory=pathlib.Path(directory))
+			result = cbz.process(provider=provider, directory=pathlib.Path(directory), context=FlowContext.forTesting())
 			self.assertEqual(len(result), 1)
 			self.assertProviderEbook(result[0][0], expectedImages=[
 			    "file001.jpg",
@@ -85,7 +86,7 @@ class TestRun(unittest.TestCase):
 		cbz = Cbz()
 		provider = ProviderEbook(ebook=pathlib.Path(__file__).parent / "data/sample4.cbz")
 		with tempfile.TemporaryDirectory() as directory:
-			result = cbz.process(provider=provider, directory=pathlib.Path(directory))
+			result = cbz.process(provider=provider, directory=pathlib.Path(directory), context=FlowContext.forTesting())
 			self.assertEqual(len(result), 2)
 			self.assertProviderEbook(result[0][0], expectedImages=["credit.jpg"])
 			self.assertProviderEbook(result[1][0],
@@ -102,7 +103,7 @@ class TestRun(unittest.TestCase):
 		cbz = Cbz()
 		provider = ProviderEbook(ebook=pathlib.Path(__file__).parent / "data/sample5.cbz")
 		with tempfile.TemporaryDirectory() as directory:
-			result = cbz.process(provider=provider, directory=pathlib.Path(directory))
+			result = cbz.process(provider=provider, directory=pathlib.Path(directory), context=FlowContext.forTesting())
 			self.assertEqual(len(result), 0)
 
 	def testSample6(self) -> None:
@@ -115,7 +116,7 @@ class TestRun(unittest.TestCase):
 		cbz = Cbz()
 		provider = ProviderEbook(ebook=pathlib.Path(__file__).parent / "data/sample6.cbz")
 		with tempfile.TemporaryDirectory() as directory:
-			result = cbz.process(provider=provider, directory=pathlib.Path(directory))
+			result = cbz.process(provider=provider, directory=pathlib.Path(directory), context=FlowContext.forTesting())
 			self.assertEqual(len(result), 1)
 			self.assertProviderEbook(result[0][0], expectedImages=[
 			    "1.jpg",
@@ -131,7 +132,7 @@ class TestRun(unittest.TestCase):
 		cbz = Cbz()
 		provider = ProviderEbook(ebook=pathlib.Path(__file__).parent / "data/sample7.cbz")
 		with tempfile.TemporaryDirectory() as directory:
-			result = cbz.process(provider=provider, directory=pathlib.Path(directory))
+			result = cbz.process(provider=provider, directory=pathlib.Path(directory), context=FlowContext.forTesting())
 			self.assertEqual(len(result), 1)
 			self.assertProviderEbook(result[0][0],
 			                         expectedImages=[

@@ -7,9 +7,9 @@ This utility converts an ebook into a PDF.
 Converting an epub with a DRM and keeping the sandbox:
 
 ```bash
-bazel run apps/ebook -- --sandbox $(pwd)/temp/sandbox --clean --max-dpi 200 --key $(pwd)/temp/Adobe_PrivateLicenseKey--anonymous.der $(pwd)/temp/temp.epub
+bazel run apps/ebook -- --sandbox $(pwd)/temp/sandbox --clean --max-dpi 200 --key $(pwd)/temp/Adobe_PrivateLicenseKey--anonymous.der pdf $(pwd)/temp/temp.epub
 # or
-bazel run apps/ebook -- --sandbox $(pwd)/temp/sandbox --clean --max-dpi 200 $(pwd)/temp/temp.pdf
+bazel run apps/ebook -- --sandbox $(pwd)/temp/sandbox --clean --max-dpi 200 pdf $(pwd)/temp/temp.pdf
 ```
 
 As a prerequisite, it might be necessary to install some dependencies:
@@ -24,13 +24,13 @@ nix-shell -p calibre
 bazel run apps/ebook:image.load
 
 # Typical workflow for fnac.com
-docker run -it --rm -v .:/sandbox local/image:latest --key /sandbox/temp/Adobe_PrivateLicenseKey--anonymous.der --max-dpi 200 "/sandbox/temp/temp.epub"
+docker run -it --rm -v .:/sandbox local/image:latest --key /sandbox/temp/Adobe_PrivateLicenseKey--anonymous.der --max-dpi 200 pdf "/sandbox/temp/temp.epub"
 
 # Typical workflow for a .cbz
-docker run -it --rm -v .:/sandbox local/image:latest --max-dpi 300 "/sandbox/temp/temp.cbz"
+docker run -it --rm -v .:/sandbox local/image:latest --max-dpi 300 pdf "/sandbox/temp/temp.cbz"
 
 # Typical workflow for a .pdf
-docker run -it --rm -v .:/sandbox local/image:latest --max-dpi 300 "/sandbox/temp/temp.pdf"
+docker run -it --rm -v .:/sandbox local/image:latest --max-dpi 300 pdf "/sandbox/temp/temp.pdf"
 ```
 
 Using `--max-dpi 300` gives very good quality pdfs. Perfect for 60ish pages comics, they will be around 60-70MB.
