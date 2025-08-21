@@ -1,6 +1,7 @@
 <template>
 	<div class="data">
 		<div style="width: 800px"><canvas id="acquisitions"></canvas></div>
+		{{ dashboards }}
 	</div>
 </template>
 
@@ -55,7 +56,6 @@
 						method: "get",
 						expect: "json",
 					});
-					console.log(dashboards);
 				});
 			},
 		},

@@ -81,10 +81,10 @@ export default class Data {
 	/// \param uid The uid to get the keys for.
 	/// \param key The key to get the children of.
 	/// \param children The number of children to reach.
-	/// \param inner If true, the inner nodes are included, otherwise only the leaf nodes.
+	/// \param includeInner If true, the inner nodes are included, otherwise only the leaf nodes.
 	///
 	/// \return A dictionary of keys, or null if the key is not part of the tree.
-	async getKeys_(uid, key, children, inner = true) {
+	async getKeys_(uid, key, children, includeInner = true) {
 		const data = await this.getTree_(uid, key);
 		if (data === null) {
 			return null;
@@ -95,7 +95,7 @@ export default class Data {
 			if (children > 0) {
 				Object.entries(tree).forEach(([k, v]) => {
 					if (k == SPECIAL_KEY_FOR_VALUE) {
-						if (!inner) {
+						if (!includeInner) {
 							keys.push({
 								internal: v.internal,
 								key: v.key,
@@ -105,7 +105,7 @@ export default class Data {
 					} else {
 						const subKey = key.concat(k);
 						treeToKeys(v, children - 1, subKey);
-						if (inner) {
+						if (includeInner) {
 							const isLeaf = SPECIAL_KEY_FOR_VALUE in v;
 							keys.push({
 								key: subKey,
@@ -257,7 +257,9 @@ export default class Data {
 			let keys = null;
 			if (children && include) {
 				const arrayOfArrays = await Promise.all(
-					include.map(async (subKey) => await this.getKeys_(uid, [...key, ...subKey], children, /*inner*/ false)),
+					include.map(
+						async (subKey) => await this.getKeys_(uid, [...key, ...subKey], children, /*includeInner*/ false),
+					),
 				);
 				keys = arrayOfArrays.flat();
 			} else if (include) {
@@ -268,7 +270,7 @@ export default class Data {
 					};
 				});
 			} else {
-				keys = await this.getKeys_(uid, key, children, /*inner*/ false);
+				keys = await this.getKeys_(uid, key, children, /*includeInner*/ false);
 			}
 
 			if (keys !== null) {
@@ -363,8 +365,8 @@ export default class Data {
 	///
 	/// \return A dictionary which keys are the name of the children and value a boolean describing if
 	///         the data is nested of a leaf.
-	async getChildren(uid, key, children) {
-		const data = await this.getKeys_(uid, key, children, /*inner*/ true);
+	async getChildren(uid, key, children, includeInner) {
+		const data = await this.getKeys_(uid, key, children, includeInner);
 		if (data === null) {
 			return null;
 		}

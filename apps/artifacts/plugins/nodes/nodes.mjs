@@ -69,8 +69,9 @@ export class Node {
 	///
 	/// \param key The key to locate the data to be returned.
 	/// \param children The level of nested children to be added to the result.
-	async getChildren(key, children) {
-		return await this.data.getChildren(this.uid, key, children);
+	/// \param includeInner Whether to include inner nodes or not.
+	async getChildren(key, children, includeInner) {
+		return await this.data.getChildren(this.uid, key, children, includeInner);
 	}
 }
 

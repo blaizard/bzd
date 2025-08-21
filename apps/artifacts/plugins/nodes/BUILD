@@ -35,6 +35,7 @@ bzd_nodejs_library(
         "//apps/artifacts/plugins/nodes/sources:nodes",
         "//nodejs/core:cache",
         "//nodejs/core:exception",
+        "//nodejs/core:format",
         "//nodejs/core:log",
         "//nodejs/core:router",
         "//nodejs/core/http:client",

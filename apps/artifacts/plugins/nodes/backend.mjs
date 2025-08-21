@@ -10,6 +10,7 @@ import DatabaseInfluxDB from "#bzd/apps/artifacts/plugins/nodes/databases/influx
 import SourceNodes from "#bzd/apps/artifacts/plugins/nodes/sources/nodes.mjs";
 import { isObject } from "#bzd/nodejs/utils/object.mjs";
 import Router from "#bzd/nodejs/core/router.mjs";
+import format from "#bzd/nodejs/core/format.mjs";
 
 const databaseTypes = {
 	influxdb: DatabaseInfluxDB,
@@ -77,6 +78,29 @@ function rawBodyParse(body, headersFunc, forceContentType = null, forceCharset =
 	return body;
 }
 
+/// Build a router for the dashboards.
+///
+/// The router will match the inputs of the dashboards.
+function buildRouterForDashboards(optionsDashboards) {
+	// Group all matches together, there might be multiple dashboards with the same inputs.
+	let matches = new Set();
+	for (const dashboard of optionsDashboards) {
+		Exception.assert("title" in dashboard, "Dashboard must have a title: {:j}", dashboard);
+		Exception.assert("inputs" in dashboard, "Dashboard must have inputs: {:j}", dashboard);
+		for (const [match, _] of Object.entries(dashboard.inputs)) {
+			matches.add(match);
+		}
+	}
+
+	// Create a router to match the inputs.
+	const router = new Router();
+	for (const match of matches) {
+		router.add(match, () => {}, match);
+	}
+
+	return router;
+}
+
 export default class Plugin extends PluginBase {
 	constructor(volume, options, provider, endpoints, components = {}) {
 		// Components that can be mocked for testing.
@@ -109,6 +133,7 @@ export default class Plugin extends PluginBase {
 			options["nodes.records"] || {},
 		);
 		const optionsDashboards = options["nodes.dashboards"] || [];
+		const routerDashboards = buildRouterForDashboards(optionsDashboards);
 
 		this.records = new Records(optionsRecords);
 		provider.addStartProcess(async () => {
@@ -228,19 +253,44 @@ export default class Plugin extends PluginBase {
 		endpoints.register("get", "/@dashboards/{uid}/{path:*}", async (context) => {
 			const node = await this.nodes.get(context.getParam("uid"));
 			const key = Plugin.paramPathToKey(context.getParam("path"));
-			const children = await node.getChildren(key, 2);
+			const children = await node.getChildren(key, 99, /*includeInner*/ false);
 
-			const router = new Router();
-			for (const dashboard of optionsDashboards) {
-				for (const [match, _] of Object.entries(dashboard.inputs)) {
-					router.add(match, () => {}, dashboard);
+			// Go through the children and match them against the router.
+			let inputs = {};
+			for (const { key } of children) {
+				const path = Plugin.keyToPath(key);
+				const match = routerDashboards.match(path);
+				if (match) {
+					inputs[match.args] ??= [];
+					inputs[match.args].push(match.vars);
 				}
 			}
 
-			// Go through the children and match them against the router.
-			console.log(children, key);
+			let dashboardsByUid = {};
+			optionsDashboards.forEach((dashboard, index) => {
+				for (const [match, options] of Object.entries(dashboard.inputs)) {
+					for (const vars of inputs[match] || []) {
+						const uid = index + "-" + JSON.stringify(vars);
+						dashboardsByUid[uid] ??= { dashboard: dashboard, inputs: {}, vars: vars };
+						const varsEncoded = Object.fromEntries(Object.entries(vars).map(([k, v]) => [k, encodeURIComponent(v)]));
+						const path = format(match, varsEncoded);
+						dashboardsByUid[uid].inputs[path] = options;
+					}
+				}
+			});
 
-			return {};
+			// Updated some fields with the actual ones and return the dashboards.
+			const dashboards = Object.values(dashboardsByUid).map((entry) => {
+				return Object.assign({}, entry.dashboard, {
+					inputs: entry.inputs,
+					title: format(entry.dashboard.title, entry.vars),
+				});
+			});
+
+			context.setStatus(200);
+			context.sendJson({
+				dashboards: dashboards,
+			});
 		});
 
 		/// Retrieve values from the store.
@@ -409,6 +459,10 @@ export default class Plugin extends PluginBase {
 			.split("/")
 			.filter(Boolean)
 			.map((x) => decodeURIComponent(x));
+	}
+
+	static keyToPath(key) {
+		return "/" + key.map((x) => encodeURIComponent(x)).join("/");
 	}
 
 	/// Read records from the given tick.
