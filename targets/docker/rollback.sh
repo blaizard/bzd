@@ -2,6 +2,9 @@
 
 set -o pipefail -o errexit
 
+# Move to the directory of this script.
+cd -- "$( dirname -- "${BASH_SOURCE[0]}" )"
+
 DIRECTORY="./docker-compose"
 DOCKER_COMPOSE="./docker-compose.yml"
 

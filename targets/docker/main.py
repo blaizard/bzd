@@ -6,6 +6,7 @@ import sys
 import re
 import time
 from contextlib import contextmanager
+from dataclasses import dataclass
 
 from bdl.generators.json.ast.ast import Ast
 from bzd.template.template import Template
@@ -62,6 +63,54 @@ def getAllImagesFromDockerComposeFiles(
 	return images
 
 
+@dataclass
+class ContainerState:
+	"""Container state information."""
+
+	# Result of socker inspect
+	inspect: typing.Dict[str, typing.Any]
+
+	def isHealthy(self) -> typing.Optional[bool]:
+		"""Check if the container is healthy."""
+
+		# If it restarted, it is not healthy.
+		if self.inspect.get("RestartCount", 0) > 0:
+			return False
+		state = self.inspect.get("State", {})
+		if state.get("ExitCode", 0) != 0:
+			return False
+		if state.get("Error", "") != "":
+			return False
+		if state.get("Dead", False):
+			return False
+		if state.get("OOMKilled", False):
+			return False
+		return None
+
+	def getId(self) -> str:
+		"""Get the name of the container."""
+		return str(self.inspect["Id"])
+
+	def printLogs(self, handle: typing.Any) -> None:
+		"""Get the logs of the container."""
+
+		handle.command(["docker", "logs", "--tail", "50", self.getId()], stdout=True, stderr=True)
+
+
+def getStatesFromDockerCompose(handle: typing.Any, dockerComposeFile: pathlib.Path) -> typing.Dict[str, ContainerState]:
+	"""Get the status of the containers of a docker compose file."""
+
+	result = handle.command(["docker", "compose", "--file", str(dockerComposeFile), "ps", "--format", "json"])
+	output = json.loads(result.getStdout())
+	statuses: typing.Dict[str, ContainerState] = {}
+	for item in output:
+		name = item["Name"]
+		inspectResult = handle.command(["docker", "inspect", name, "--format", "json"])
+		inspectOutput = json.loads(inspectResult.getStdout())
+		statuses[name] = ContainerState(inspectOutput[0])
+	return statuses
+
+
 @contextmanager
 def usingDockerRegistry(handle: typing.Any, dockerComposeFile: pathlib.Path) -> typing.Iterator[None]:
 	"""Context manager to use the docker registry."""
@@ -90,6 +139,14 @@ def usingDockerRegistry(handle: typing.Any, dockerComposeFile: pathlib.Path) -> 
 		handle.command(["docker", "system", "prune", "--force", "--volumes", "--all"])
 
 
+def rollback(handle: typing.Any, directory: pathlib.Path) -> None:
+	"""Rollback the application by running the rollback script."""
+
+	print(f"Rolling back {directory}...", flush=True)
+	rollbackScript = directory / "rollback.sh"
+	handle.command([str(rollbackScript)])
+
+
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Traefik deployment.")
 	parser.add_argument("--json", type=pathlib.Path, help="Path of the manifest.")
@@ -99,6 +156,10 @@ if __name__ == "__main__":
 	                    help="The name of the directory to be used.")
 	parser.add_argument("--registry-port", type=int, default=5000, help="Port for the registry.")
 	parser.add_argument("--version", type=str, default=STABLE_VERSION, help="The version of this deployment.")
+	parser.add_argument("--health-check-time",
+	                    type=int,
+	                    default=30,
+	                    help="The time in seconds to wait before performing the health check.")
 	parser.add_argument("transport", type=str, help="Location where to deploy the target.")
 	args = parser.parse_args()
 
@@ -182,8 +243,7 @@ if __name__ == "__main__":
 				handle.command(["cp", "-f", f"{dockerComposeDirectory / args.version}.yml", str(dockerComposeFile)])
 
 				# Copy the rollback script.
-				handle.upload(
-				    pathlib.Path(__file__).parent / "rollback.sh", str(dockerComposeDirectory / "rollback.sh"))
+				handle.upload(pathlib.Path(__file__).parent / "rollback.sh", str(directory / "rollback.sh"))
 
 				print(f"Pulling new images.", flush=True)
 				# Note --ignore-pull-failures: if there is no need for updating a certain image, it can be that it is not in the registry.
@@ -210,6 +270,21 @@ if __name__ == "__main__":
 				# Keep track of all current docker compose files.
 				allDockerComposeFiles += [dockerComposeDirectory / name for name in keepDockerComposeFiles]
 
+				# Health check.
+				print(f"Waiting maximum {args.health_check_time} seconds for the application to start.", flush=True)
+				started = time.time()
+				while time.time() - started < args.health_check_time:
+					time.sleep(1)
+					statuses = getStatesFromDockerCompose(handle, dockerComposeFile)
+					for name, state in statuses.items():
+						if state.isHealthy() == False:
+							print(f"- ERROR: {name} is not healthy, rolling back to previous version.", flush=True)
+							print(f"Logs of {name}:", flush=True)
+							state.printLogs(handle)
+							rollback(handle, directory)
+							sys.exit(1)
+				print(f"Applications seem healthy, continuing.", flush=True)
+
 			# Garbage collect some of the images if needed.
 			print(f"Identifying unused images...", flush=True)
 			with handle.forwardPort(args.registry_port, waitHTTP=f"http://localhost:{args.registry_port}/v2/"):
@@ -231,8 +306,5 @@ if __name__ == "__main__":
 					for tag, digest in tagsDigest.items():
 						print(f"- Removing image {repository}:{tag} ({digest}).", flush=True)
 						dockerRegistry.delete(repository, digest)
-
-		# Health check.
-		# docker compose ps --format json
 
 	sys.exit(0)

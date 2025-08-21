@@ -9,6 +9,7 @@ from contextlib import contextmanager
 import paramiko
 import shlex
 import sys
+import stat
 
 from bzd.utils.run import localCommand, ExecuteResult, ExecuteResultStreamWriter
 from bzd.bin import ssh, scp
@@ -69,8 +70,12 @@ class _SSHInteractiveHandle:
 		"""Copy a file to the remote."""
 
 		client = self.transport.open_sftp_client()
-		client.put(str(source), str(destination))
-		client.close()
+		try:
+			client.put(str(source), str(destination))
+			mode = stat.S_IMODE(source.stat().st_mode)
+			client.chmod(str(destination), mode)
+		finally:
+			client.close()
 
 
 class SSH:
