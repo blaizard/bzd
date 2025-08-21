@@ -84,7 +84,6 @@ bzd_nodejs_library(
         "google_drive.mjs",
     ],
     packages = [
-        "@nodejs_deps//:google-auth-library",
         "@nodejs_deps//:googleapis",
     ],
     visibility = ["//visibility:public"],
