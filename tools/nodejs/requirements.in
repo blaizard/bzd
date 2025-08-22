@@ -31,3 +31,5 @@ stripe=14.12.0
 fast-xml-parser
 chart.js
 chartjs-plugin-zoom
+chartjs-adapter-date-fns
+date-fns

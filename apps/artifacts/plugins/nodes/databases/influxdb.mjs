@@ -125,7 +125,10 @@ export default class DatabaseInfluxDB extends Database {
 			influxQL += "ORDER BY time DESC ";
 			influxQL += "LIMIT " + count + "\n";
 		} else {
-			Exception.unreachable("At least one of 'after' or 'before' must be set.");
+			influxQL += 'SELECT "' + field + '" ';
+			influxQL += "FROM " + uid + " ";
+			influxQL += "ORDER BY time DESC ";
+			influxQL += "LIMIT " + count + "\n";
 		}
 
 		const result = await this.clientQuery.post("/query", {

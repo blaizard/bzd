@@ -232,7 +232,12 @@ export default class Data {
 				return result;
 			}
 
-			return value.slice(0, count);
+			let result = value.slice(0, count);
+			if (result.length < count) {
+				const external = await this.getExternal_({ uid, key, count: count - result.length });
+				result = external === null ? result : result.concat(external);
+			}
+			return result;
 		}
 
 		return await this.getExternal_({ uid, key, count, after, before });

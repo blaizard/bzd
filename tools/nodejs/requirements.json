@@ -395,6 +395,15 @@
         "name": "chart.js",
         "version": "4.5.0"
     },
+    "chartjs-adapter-date-fns": {
+        "dependencies": {
+            "chartjs-adapter-date-fns@3.0.0": {
+                "integrity": "sha512-Rs3iEB3Q5pJ973J93OBTpnP7qoGwvq3nUnoMdtxO+9aoJof7UFcRbWcIDteXuYd1fgAvct/32T9qaLyLuZVwCg=="
+            }
+        },
+        "name": "chartjs-adapter-date-fns",
+        "version": "3.0.0"
+    },
     "chartjs-plugin-zoom": {
         "dependencies": {
             "@types/hammerjs@2.0.46": {
@@ -601,6 +610,15 @@
         },
         "name": "cookie-parser",
         "version": "1.4.7"
+    },
+    "date-fns": {
+        "dependencies": {
+            "date-fns@4.1.0": {
+                "integrity": "sha512-Ukq0owbQXxa/U3EGtsdVBkR1w7KOQ5gIBqdH2hkvknzZPYvBxb/aa6E8L7tmjFtkwZBu3UXBbjIgPo/Ez4xaNg=="
+            }
+        },
+        "name": "date-fns",
+        "version": "4.1.0"
     },
     "express": {
         "dependencies": {
@@ -2341,8 +2359,8 @@
             "estree-walker@2.0.2": {
                 "integrity": "sha512-Rfkk/Mp/DL7JVje3u18FxFujQlTNR2q6QfMSMB7AvCBx91NGj/ba3kCfza0f6dVDbw7YlRf/nDrn7pQrCCyQ/w=="
             },
-            "magic-string@0.30.17": {
-                "integrity": "sha512-sNPKHvyjVf7gyjwS4xGTaW/mCnF8wnjtifKBEhxfZ7E/S8tQ0rssrwGNn6q8JH/ohItJfSQp9mBtQYuTlH5QnA=="
+            "magic-string@0.30.18": {
+                "integrity": "sha512-yi8swmWbO17qHhwIBNeeZxTceJMeBvWJaId6dyvTSOwTipqeHhMhOrz6513r1sOKnpvQ7zkhlG8tPrpilwTxHQ=="
             },
             "nanoid@3.3.11": {
                 "integrity": "sha512-N8SpfPUnUp1bK+PMYW8qSWdl9U+wwNWI4QKxOYDy9JAro3WMX7p2OeVRF9v+347pnakNevPmiHhNmZ2HbFA76w=="

@@ -1,65 +1,103 @@
 <template>
-	<div class="data">
-		<div style="width: 800px"><canvas id="acquisitions"></canvas></div>
-		{{ dashboards }}
+	<div class="components">
+		<template v-for="dashboard in dashboards">
+			<ViewGraph :title="dashboard.title" :inputs="dashboardInputs(dashboard)"></ViewGraph>
+		</template>
 	</div>
 </template>
 
 <script>
 	import Base from "#bzd/apps/artifacts/plugins/base.vue";
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
-	import Chart from "chart.js/auto";
-
-	const data = [
-		{ year: 2010, count: 10 },
-		{ year: 2011, count: 20 },
-		{ year: 2012, count: 15 },
-		{ year: 2013, count: 25 },
-		{ year: 2014, count: 22 },
-		{ year: 2015, count: 30 },
-		{ year: 2016, count: 28 },
-	];
+	import ViewGraph from "#bzd/apps/artifacts/plugins/nodes/view_graph.vue";
 
 	export default {
 		mixins: [Base, Component],
+		components: {
+			ViewGraph,
+		},
 		data: function () {
 			return {
-				dashboards: {},
+				dashboards: [],
+				inputs: {},
 			};
 		},
 		mounted() {
 			this.fetchDashboards();
-
-			const char = new Chart(document.getElementById("acquisitions"), {
-				type: "line",
-				data: {
-					labels: data.map((row) => row.year),
-					datasets: [
-						{
-							label: "Acquisitions by year",
-							data: data.map((row) => row.count),
-						},
-					],
-				},
-			});
 		},
 		computed: {
 			dashboardEndpoint() {
 				const [volume, ...rest] = this.pathList;
 				return "/x/" + encodeURIComponent(volume) + "/@dashboards/" + rest.map(encodeURIComponent).join("/");
 			},
+			endpoint() {
+				const [volume, uid, ..._] = this.pathList;
+				return "/x/" + encodeURIComponent(volume) + "/" + encodeURIComponent(uid);
+			},
+			// Gather all inputs to gather.
+			inputsKeys() {
+				return [
+					...new Set(
+						this.dashboards
+							.map((dashboard) => {
+								return Object.keys(dashboard.inputs);
+							})
+							.flat(),
+					),
+				];
+			},
 		},
 		methods: {
+			dashboardInputs(dashboard) {
+				let inputs = {};
+				for (const [input, options] of Object.entries(dashboard.inputs)) {
+					if (input in this.inputs) {
+						inputs[input] = {
+							data: this.inputs[input],
+							options: options || {},
+						};
+					}
+				}
+				return inputs;
+			},
 			async fetchDashboards() {
 				await this.handleSubmit(async () => {
-					this.dashboards = await this.requestBackend(this.dashboardEndpoint, {
+					const result = await this.requestBackend(this.dashboardEndpoint, {
 						method: "get",
 						expect: "json",
 					});
+					this.dashboards = result.dashboards;
+				});
+				await this.fetchData();
+			},
+			async fetchData() {
+				await this.handleSubmit(async () => {
+					const result = await this.requestBackend(this.endpoint, {
+						method: "get",
+						query: {
+							include: this.inputsKeys.join(","),
+							metadata: 1,
+							count: 100,
+						},
+						expect: "json",
+					});
+
+					let inputs = {};
+					for (const [key, data] of result.data) {
+						const path = "/" + key.map(encodeURIComponent).join("/");
+						inputs[path] = data;
+					}
+					this.inputs = inputs;
 				});
 			},
 		},
 	};
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+	.components {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+	}
+</style>
