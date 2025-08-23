@@ -97,13 +97,30 @@ class ContainerState:
 		handle.command(["docker", "logs", "--tail", "50", self.getId()], stdout=True, stderr=True)
 
 
+def jsonArrayOrStreamToItems(string: str) -> typing.Iterator[typing.Dict[str, typing.Any]]:
+	"""Convert a json array or stream into items."""
+
+	for line in string.split("\n"):
+		line = line.strip()
+		if not line:
+			continue
+		data = json.loads(line)
+		if isinstance(data, list):
+			for item in data:
+				yield item
+		else:
+			yield data
+
+
 def getStatesFromDockerCompose(handle: typing.Any, dockerComposeFile: pathlib.Path) -> typing.Dict[str, ContainerState]:
 	"""Get the status of the containers of a docker compose file."""
 
 	result = handle.command(["docker", "compose", "--file", str(dockerComposeFile), "ps", "--format", "json"])
-	output = json.loads(result.getStdout())
 	statuses: typing.Dict[str, ContainerState] = {}
-	for item in output:
+
+	# docker-compose ps --format json can return either a json array or a stream of json objects.
+	# depending on the version of docker-compose.
+	for item in jsonArrayOrStreamToItems(result.getStdout()):
 		name = item["Name"]
 		inspectResult = handle.command(["docker", "inspect", name, "--format", "json"])
 		inspectOutput = json.loads(inspectResult.getStdout())
