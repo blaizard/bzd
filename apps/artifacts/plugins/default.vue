@@ -53,6 +53,7 @@
 	import Base from "./base.vue";
 	import Button from "#bzd/nodejs/vue/components/form/element/button.vue";
 	import { bytesToString } from "#bzd/nodejs/utils/to_string.mjs";
+	import Utils from "#bzd/apps/artifacts/common/utils.mjs";
 
 	export default {
 		mixins: [Base],
@@ -88,8 +89,8 @@
 				return item.permissions.isRead() && !item.permissions.isList();
 			},
 			downloadLink(item) {
-				const pathList = item ? [...this.pathList, item.name] : this.pathList;
-				return "/file/" + pathList.map(encodeURIComponent).join("/");
+				const key = item ? [...this.pathList, item.name] : this.pathList;
+				return "/file" + Utils.keyToPath(key);
 			},
 			sortStrategy(key1, key2) {
 				const firsts = ["name", "type", "size", "created", "modified"];

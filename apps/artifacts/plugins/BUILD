@@ -38,7 +38,18 @@ bzd_nodejs_library(
         "//apps/artifacts/plugins:__subpackages__",
     ],
     deps = [
+        "//apps/artifacts/common:utils",
         "//nodejs/utils:to_string",
         "//nodejs/vue/directives:tooltip",
+    ],
+)
+
+bzd_nodejs_library(
+    name = "utils",
+    srcs = [
+        "utils.mjs",
+    ],
+    visibility = [
+        "//apps/artifacts:__subpackages__",
     ],
 )

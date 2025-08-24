@@ -41,31 +41,7 @@
 		},
 		computed: {
 			formDescription() {
-				return [
-					{ type: "Checkbox", name: "dashboard", text: "Dashboard", align: "right" },
-					{
-						type: "Dropdown",
-						name: "interval",
-						list: [
-							"Last 5 minutes",
-							"Last 15 minutes",
-							"Last 30 minutes",
-							"Last 1 hour",
-							"Last 3 hours",
-							"Last 6 hours",
-							"Last 12 hours",
-							"Last 24 hours",
-							"Last 2 days",
-							"Last 7 days",
-							"Last 30 days",
-							"Last 6 months",
-							"Last 1 year",
-							"Last 2 years",
-							"Last 5 years",
-						],
-						condition: (value) => value.dashboard,
-					},
-				];
+				return [{ type: "Checkbox", name: "dashboard", text: "Dashboard", align: "right" }];
 			},
 		},
 	};

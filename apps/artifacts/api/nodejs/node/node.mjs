@@ -1,6 +1,7 @@
 import config from "#bzd/apps/artifacts/api/config.json" with { type: "json" };
 import HttpClient from "#bzd/nodejs/core/http/client.mjs";
 import { CollectionPaging } from "#bzd/nodejs/db/utils.mjs";
+import Utils from "#bzd/apps/artifacts/common/utils.mjs";
 
 export class Node {
 	/// List all nodes from a remote.
@@ -56,15 +57,14 @@ export class Node {
 			query.metadata = 1;
 		}
 		if (include) {
-			query.include = include.map((paths) => paths.map(encodeURIComponent).join("/")).join(",");
+			query.include = include.map(Utils.keyToPath).join(",");
 		}
 		if (token) {
 			query.t = token;
 		}
 
-		const pathUrl = (path || []).map(encodeURIComponent).join("/");
 		const result = await HttpClient.get(
-			remote + "/x/" + encodeURIComponent(volume) + "/" + encodeURIComponent(uid) + "/" + pathUrl,
+			remote + "/x/" + encodeURIComponent(volume) + "/" + encodeURIComponent(uid) + Utils.keyToPath(path || []),
 			{
 				query: query,
 				expect: "json",

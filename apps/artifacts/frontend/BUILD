@@ -17,6 +17,7 @@ bzd_nodejs_web_binary(
         "//apps/artifacts:__subpackages__",
     ],
     deps = [
+        "//apps/artifacts/common:utils",
         "//apps/artifacts/plugins:frontend",
         "//nodejs/db/storage:permissions",
         "//nodejs/vue:cache",

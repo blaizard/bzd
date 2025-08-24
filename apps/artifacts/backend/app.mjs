@@ -9,6 +9,7 @@ import APIv1 from "#bzd/api.json" with { type: "json" };
 import Plugins from "#bzd/apps/artifacts/plugins/backend.mjs";
 import config from "#bzd/apps/artifacts/backend/config.json" with { type: "json" };
 import { FileNotFoundError } from "#bzd/nodejs/db/storage/storage.mjs";
+import Utils from "#bzd/apps/artifacts/common/utils.mjs";
 
 import Backend from "#bzd/nodejs/vue/apps/backend.mjs";
 
@@ -93,14 +94,9 @@ const Exception = ExceptionFactory("backend");
 	});
 
 	// Adding REST handlers.
-	function getInternalPath(pathList) {
-		Exception.assert(Array.isArray(pathList), "Path must be an array: '{:j}'", pathList);
-		pathList = pathList.filter((path) => Boolean(path));
-		return { volume: pathList[0], pathList: pathList.slice(1) };
-	}
-
-	function getInternalPathFromString(path) {
-		return getInternalPath(path.split("/").map(decodeURIComponent));
+	function getInternalPath(key) {
+		Exception.assert(Array.isArray(key), "Path must be an array: '{:j}'", key);
+		return { volume: key[0], pathList: key.slice(1) };
 	}
 
 	async function isAuthorizedVolume(context, volume) {
@@ -138,7 +134,7 @@ const Exception = ExceptionFactory("backend");
 		"/file",
 		async function (inputs) {
 			try {
-				const { volume, pathList } = getInternalPathFromString(inputs.path);
+				const { volume, pathList } = getInternalPath(Utils.pathToKey(inputs.path));
 
 				assertVolumeReady(volume);
 				await assertAuthorizedVolume(this, volume);

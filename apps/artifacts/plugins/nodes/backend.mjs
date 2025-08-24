@@ -11,6 +11,7 @@ import SourceNodes from "#bzd/apps/artifacts/plugins/nodes/sources/nodes.mjs";
 import { isObject } from "#bzd/nodejs/utils/object.mjs";
 import Router from "#bzd/nodejs/core/router.mjs";
 import format from "#bzd/nodejs/core/format.mjs";
+import Utils from "#bzd/apps/artifacts/common/utils.mjs";
 
 const databaseTypes = {
 	influxdb: DatabaseInfluxDB,
@@ -252,13 +253,13 @@ export default class Plugin extends PluginBase {
 		/// Get information about the dashboards at the specified path.
 		endpoints.register("get", "/@dashboards/{uid}/{path:*}", async (context) => {
 			const node = await this.nodes.get(context.getParam("uid"));
-			const key = Plugin.paramPathToKey(context.getParam("path"));
+			const key = Utils.pathToKey(context.getParam("path"));
 			const children = await node.getChildren(key, 99, /*includeInner*/ false);
 
 			// Go through the children and match them against the router.
 			let inputs = {};
 			for (const { key } of children) {
-				const path = Plugin.keyToPath(key);
+				const path = Utils.keyToPath(key);
 				const match = routerDashboards.match(path);
 				if (match) {
 					inputs[match.args] ??= [];
@@ -290,6 +291,7 @@ export default class Plugin extends PluginBase {
 			context.setStatus(200);
 			context.sendJson({
 				dashboards: dashboards,
+				timestamp: Date.now(),
 			});
 		});
 
@@ -339,7 +341,7 @@ export default class Plugin extends PluginBase {
 				value
 					.split(",")
 					.filter(Boolean)
-					.map((path) => Plugin.paramPathToKey(path)),
+					.map((path) => Utils.pathToKey(path)),
 			);
 
 			const node = await this.nodes.get(context.getParam("uid"));
@@ -352,7 +354,7 @@ export default class Plugin extends PluginBase {
 			}
 
 			const maybeData = await node.get({
-				key: Plugin.paramPathToKey(context.getParam("path")),
+				key: Utils.pathToKey(context.getParam("path")),
 				metadata,
 				children,
 				count,
@@ -395,7 +397,7 @@ export default class Plugin extends PluginBase {
 				return;
 			}
 			const node = await this.nodes.get(context.getParam("uid"));
-			const key = Plugin.paramPathToKey(context.getParam("path"));
+			const key = Utils.pathToKey(context.getParam("path"));
 
 			let records = [];
 			if (inputs.bulk) {
@@ -452,17 +454,6 @@ export default class Plugin extends PluginBase {
 
 	get version() {
 		return 3;
-	}
-
-	static paramPathToKey(paramPath) {
-		return paramPath
-			.split("/")
-			.filter(Boolean)
-			.map((x) => decodeURIComponent(x));
-	}
-
-	static keyToPath(key) {
-		return "/" + key.map((x) => encodeURIComponent(x)).join("/");
 	}
 
 	/// Read records from the given tick.

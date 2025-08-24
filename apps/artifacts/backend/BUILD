@@ -66,6 +66,7 @@ bzd_nodejs_binary(
     ],
     deps = [
         ":plugin",
+        "//apps/artifacts/common:utils",
         "//apps/artifacts/plugins:backend",
         "//nodejs/core:exception",
         "//nodejs/core:filesystem",

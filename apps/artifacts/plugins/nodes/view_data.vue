@@ -22,6 +22,7 @@
 	import Value from "#bzd/apps/artifacts/plugins/nodes/value.vue";
 	import Keys from "#bzd/apps/artifacts/plugins/nodes/keys.vue";
 	import { timeMsToString } from "#bzd/nodejs/utils/to_string.mjs";
+	import Utils from "#bzd/apps/artifacts/common/utils.mjs";
 
 	export default {
 		mixins: [Base, Component],
@@ -43,7 +44,7 @@
 				return timeMsToString(this.metadata.timestamp - this.timestamp);
 			},
 			endpoint() {
-				return "/x/" + this.pathList.map(encodeURIComponent).join("/");
+				return "/x" + Utils.keyToPath(this.pathList);
 			},
 			isValue() {
 				return "_" in this.tree;
@@ -138,7 +139,7 @@
 				}
 			},
 			onSelect(pathList) {
-				const url = "/view/" + pathList.map(encodeURIComponent).join("/");
+				const url = "/view/" + Utils.keyToPath(pathList);
 				this.$router.dispatch(url);
 			},
 		},

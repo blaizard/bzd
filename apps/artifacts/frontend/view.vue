@@ -17,6 +17,7 @@
 	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.mjs";
 	import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 	import { defineAsyncComponent } from "vue";
+	import Utils from "#bzd/apps/artifacts/common/utils.mjs";
 
 	import Plugins from "../plugins/frontend.mjs";
 
@@ -50,7 +51,7 @@
 		},
 		computed: {
 			pathList() {
-				return this.path.split("/").map((c) => decodeURIComponent(c));
+				return Utils.pathToKey(this.path);
 			},
 			volume() {
 				return this.pathList[0] || null;
@@ -77,13 +78,7 @@
 				});
 			},
 			getLink(index) {
-				return (
-					"/view/" +
-					this.pathList
-						.slice(0, index + 1)
-						.map((segment) => encodeURIComponent(segment))
-						.join("/")
-				);
+				return "/view" + Utils.keyToPath(this.pathList.slice(0, index + 1));
 			},
 		},
 	};

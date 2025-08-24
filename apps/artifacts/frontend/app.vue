@@ -18,6 +18,7 @@
 	import Application from "#bzd/nodejs/vue/apps/application.vue";
 	import Tree from "./tree.vue";
 	import MenuEntry from "#bzd/nodejs/vue/components/menu/entry.vue";
+	import Utils from "#bzd/apps/artifacts/common/utils.mjs";
 
 	export default {
 		components: {
@@ -53,8 +54,8 @@
 		},
 		methods: {
 			handleItem(item) {
-				const path = item.path.concat([item.item.name]);
-				this.$router.dispatch("/view/" + path.map((c) => encodeURIComponent(c)).join("/"));
+				const key = item.path.concat([item.item.name]);
+				this.$router.dispatch("/view" + Utils.keyToPath(key));
 			},
 			handleShowPath(path) {
 				this.showPath = path;

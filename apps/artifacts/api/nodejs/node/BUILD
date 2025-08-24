@@ -8,6 +8,7 @@ bzd_nodejs_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        "//apps/artifacts/common:utils",
         "//nodejs/core/http:client",
         "//nodejs/db:utils",
     ],

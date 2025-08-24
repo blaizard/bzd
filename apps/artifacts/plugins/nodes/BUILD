@@ -31,6 +31,7 @@ bzd_nodejs_library(
         ":nodes",
         ":records",
         "//apps/artifacts/backend:plugin",
+        "//apps/artifacts/common:utils",
         "//apps/artifacts/plugins/nodes/databases:influxdb",
         "//apps/artifacts/plugins/nodes/sources:nodes",
         "//nodejs/core:cache",
@@ -126,6 +127,7 @@ bzd_nodejs_library(
         "//apps/artifacts/plugins:__subpackages__",
     ],
     deps = [
+        "//apps/artifacts/common:utils",
         "//apps/artifacts/plugins:default",
         "//nodejs/core:localstorage",
         "//nodejs/utils:to_string",
