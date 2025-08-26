@@ -22,7 +22,6 @@ class ImagesToPdf(ActionInterface):
 		images = []
 		for index, path in enumerate(provider.images):
 			with Image.open(path) as image:
-				image = image.convert("RGB")
 				images.append(image.convert("RGB"))
 
 		metadata = {}

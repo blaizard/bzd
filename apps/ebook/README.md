@@ -10,6 +10,8 @@ Converting an epub with a DRM and keeping the sandbox:
 bazel run apps/ebook -- --sandbox $(pwd)/temp/sandbox --clean --max-dpi 200 --key $(pwd)/temp/Adobe_PrivateLicenseKey--anonymous.der pdf $(pwd)/temp/temp.epub
 # or
 bazel run apps/ebook -- --sandbox $(pwd)/temp/sandbox --clean --max-dpi 200 pdf $(pwd)/temp/temp.pdf
+# or
+bazel run apps/ebook -- --max-dpi 300 pdf $(pwd)/temp/
 ```
 
 As a prerequisite, it might be necessary to install some dependencies:

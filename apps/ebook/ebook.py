@@ -5,6 +5,7 @@ import typing
 import enum
 import shutil
 import math
+import multiprocessing
 
 from apps.ebook.calibre.remove_drm import RemoveDRM
 from apps.ebook.epub.epub import EPub
@@ -16,7 +17,7 @@ from apps.ebook.pillow.images_to_cover import ImagesToCover
 from apps.ebook.pillow.images_converter import ImagesConverter
 from apps.ebook.flow import ActionInterface, FlowRegistry, FlowEnum, FlowSchemaType, FlowContext
 from apps.ebook.providers import ProviderEbook, ProviderEbookMetadata, ProviderPdf, providerSerialize, providerDeserialize
-from apps.ebook.utils import sizeToString
+from apps.ebook.utils import sizeToString, percentToString
 
 
 class FlowSchemaPdf(FlowEnum):
@@ -172,16 +173,18 @@ if __name__ == "__main__":
 		allFiles = args.ebook.rglob("**/*")
 		ebooks = [f for f in allFiles if hasattr(schema, f.suffix.removeprefix(".").lower())]
 
-	for ebook in ebooks:
+	for index, ebook in enumerate(ebooks):
 		directory = tempfile.TemporaryDirectory() if args.sandbox is None else SandboxDirectory(path=args.sandbox)
 		try:
-			print(f"=== Running flow '{args.action}' on {ebook} ===")
+			print(f"=== [{index + 1}/{len(ebooks)}] Running flow '{args.action}' on {ebook} ===")
 			provider = ProviderEbook(ebook=ebook, keys=args.keys, metadata=ProviderEbookMetadata(title=ebook.stem))
-			runFlow(
-			    provider=provider,
-			    flowRegistry=FlowRegistry(schema=flowSchemas[args.action], actions=actions),
-			    directory=pathlib.Path(directory.name)  # type: ignore
-			)
+
+			# Run the flow in isolation, this prevents any memory leaks/hogs which becomes problematic with batch runs.
+			p = multiprocessing.Process(target=runFlow,
+			                            args=(provider, FlowRegistry(schema=flowSchemas[args.action],
+			                                                         actions=actions), pathlib.Path(directory.name)))
+			p.start()
+			p.join()
 
 		finally:
 			directory.cleanup()  # type: ignore
