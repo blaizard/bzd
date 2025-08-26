@@ -44,8 +44,11 @@
 			///
 			/// \param action The action to be performed.
 			/// \param throwOnError If an error, throw an exception.
-			async handleSubmit(action, throwOnError = false) {
-				this.loading = true;
+			/// \param updateLoading Whether loading should be updated as well or not.
+			async handleSubmit(action, { throwOnError = false, updateLoading = true } = {}) {
+				if (updateLoading) {
+					this.loading = true;
+				}
 				try {
 					return await action();
 				} catch (e) {
@@ -54,7 +57,9 @@
 						throw e;
 					}
 				} finally {
-					this.loading = false;
+					if (updateLoading) {
+						this.loading = false;
+					}
 				}
 			},
 			/// Handler to chain the state of loading child components.

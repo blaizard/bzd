@@ -266,7 +266,7 @@ export default class Data {
 						async (subKey) => await this.getKeys_(uid, [...key, ...subKey], children, /*includeInner*/ false),
 					),
 				);
-				keys = arrayOfArrays.flat();
+				keys = arrayOfArrays.filter((item) => item !== null).flat();
 			} else if (include) {
 				keys = include.map((relative) => {
 					return {

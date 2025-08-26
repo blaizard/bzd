@@ -7,7 +7,7 @@ export default {
 			case 1:
 				return import("#bzd/apps/artifacts/plugins/default.vue");
 			default:
-				return import("#bzd/apps/artifacts/plugins/nodes/view.vue");
+				return import("#bzd/apps/artifacts/plugins/nodes/frontend/view.vue");
 		}
 	},
 };

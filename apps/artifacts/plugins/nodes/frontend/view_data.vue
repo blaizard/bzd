@@ -19,8 +19,8 @@
 <script>
 	import Base from "#bzd/apps/artifacts/plugins/base.vue";
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
-	import Value from "#bzd/apps/artifacts/plugins/nodes/value.vue";
-	import Keys from "#bzd/apps/artifacts/plugins/nodes/keys.vue";
+	import Value from "#bzd/apps/artifacts/plugins/nodes/frontend/value.vue";
+	import Keys from "#bzd/apps/artifacts/plugins/nodes/frontend/keys.vue";
 	import { timeMsToString } from "#bzd/nodejs/utils/to_string.mjs";
 	import Utils from "#bzd/apps/artifacts/common/utils.mjs";
 

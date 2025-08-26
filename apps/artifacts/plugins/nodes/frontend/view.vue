@@ -8,8 +8,8 @@
 
 <script>
 	import Base from "#bzd/apps/artifacts/plugins/base.vue";
-	import ViewData from "#bzd/apps/artifacts/plugins/nodes/view_data.vue";
-	import ViewDashboard from "#bzd/apps/artifacts/plugins/nodes/view_dashboard.vue";
+	import ViewData from "#bzd/apps/artifacts/plugins/nodes/frontend/view_data.vue";
+	import ViewDashboard from "#bzd/apps/artifacts/plugins/nodes/frontend/view_dashboard.vue";
 	import Form from "#bzd/nodejs/vue/components/form/form.vue";
 	import LocalStorage from "#bzd/nodejs/core/localstorage.mjs";
 

@@ -102,36 +102,7 @@ bzd_nodejs_library(
         "//apps/artifacts/plugins:__pkg__",
     ],
     deps = [
-        ":view",
         "//apps/artifacts/plugins:default",
-    ],
-)
-
-bzd_nodejs_library(
-    name = "view",
-    srcs = [
-        "keys.vue",
-        "value.vue",
-        "view.vue",
-        "view_dashboard.vue",
-        "view_data.vue",
-        "view_graph.vue",
-    ],
-    packages = [
-        "@nodejs_deps//:chart-js",
-        "@nodejs_deps//:chartjs-adapter-date-fns",
-        "@nodejs_deps//:chartjs-plugin-zoom",
-        "@nodejs_deps//:date-fns",
-    ],
-    visibility = [
-        "//apps/artifacts/plugins:__subpackages__",
-    ],
-    deps = [
-        "//apps/artifacts/common:utils",
-        "//apps/artifacts/plugins:default",
-        "//nodejs/core:localstorage",
-        "//nodejs/utils:to_string",
-        "//nodejs/vue/components/form",
-        "//nodejs/vue/directives:tooltip",
+        "//apps/artifacts/plugins/nodes/frontend:view",
     ],
 )

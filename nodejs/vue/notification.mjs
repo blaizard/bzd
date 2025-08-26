@@ -24,8 +24,8 @@ export default {
 		const defaultActions = [{ id: "close", callback: (entry) => notificationClose(entry) }];
 		const notify = (type, message, options = {}, callback = () => {}) => {
 			if (message && typeof message == "object") {
-				for (const key in message) {
-					notifySingle(key, type, message[key], options, callback);
+				for (const [key, subMessage] of Object.entries(message)) {
+					notifySingle(key, type, subMessage, options, callback);
 				}
 			} else {
 				notifySingle(null, type, message, options, callback);
@@ -101,7 +101,10 @@ export default {
 					options,
 				),
 				(m) => {
-					Log.error("{}", m);
+					// Console is used here, to properly show the stack trace.
+					// If we use Log, it will be converted into a string and the stack trace shown
+					// will be the one from the Log, which is confusing.
+					console.error(m);
 				},
 			);
 		};

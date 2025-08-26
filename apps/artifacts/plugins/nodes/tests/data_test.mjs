@@ -259,6 +259,17 @@ describe("Nodes", () => {
 					[["d"], 0],
 				]);
 			}
+
+			// include non existent
+			{
+				const result = await data.get({ uid: "hello", key: [], include: [["a", "b"], ["d"]], children: 1 });
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value(), [
+					[["a", "b"], 1],
+					[["a", "b", "c"], 10],
+					[["a", "b", "d"], 0],
+				]);
+			}
 		});
 
 		it("external after", async () => {
