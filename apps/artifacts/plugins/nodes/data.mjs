@@ -2,6 +2,7 @@ import Cache2 from "#bzd/nodejs/core/cache2.mjs";
 import KeyMapping from "#bzd/apps/artifacts/plugins/nodes/key_mapping.mjs";
 import Optional from "#bzd/nodejs/utils/optional.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
+import Utils from "#bzd/apps/artifacts/common/utils.mjs";
 
 const Exception = ExceptionFactory("apps", "plugin", "nodes");
 
@@ -49,11 +50,6 @@ export default class Data {
 			return tree;
 		});
 		this.tree = this.options.cache.getAccessor("tree");
-	}
-
-	/// Get the timestamp.
-	static getTimestamp() {
-		return Date.now();
 	}
 
 	/// List all available keys
@@ -327,7 +323,7 @@ export default class Data {
 	///
 	/// \return The timestamp actually written.
 	async insert(uid, fragments, timestamp = null) {
-		timestamp = timestamp === null ? Data.getTimestamp() : timestamp;
+		timestamp = timestamp === null ? Utils.timestampMs() : timestamp;
 		this.storage[uid] ??= {};
 		let data = this.storage[uid];
 

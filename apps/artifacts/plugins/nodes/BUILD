@@ -59,6 +59,7 @@ bzd_nodejs_library(
     ],
     deps = [
         ":data",
+        "//apps/artifacts/common:utils",
         "//apps/artifacts/plugins/nodes/handlers",
         "//nodejs/core:cache2",
         "//nodejs/core:exception",
@@ -76,6 +77,7 @@ bzd_nodejs_library(
     ],
     deps = [
         ":key_mapping",
+        "//apps/artifacts/common:utils",
         "//nodejs/core:cache2",
         "//nodejs/core:exception",
         "//nodejs/core:log",

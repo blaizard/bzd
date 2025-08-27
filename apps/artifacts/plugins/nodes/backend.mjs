@@ -243,7 +243,7 @@ export default class Plugin extends PluginBase {
 				Object.assign(
 					{
 						version: this.version,
-						timestamp: Date.now(),
+						timestamp: Utils.timestampMs(),
 					},
 					output,
 				),
@@ -291,7 +291,7 @@ export default class Plugin extends PluginBase {
 			context.setStatus(200);
 			context.sendJson({
 				dashboards: dashboards,
-				timestamp: Date.now(),
+				timestamp: Utils.timestampMs(),
 			});
 		});
 
@@ -349,7 +349,7 @@ export default class Plugin extends PluginBase {
 			let output = {};
 			if (metadata) {
 				output = Object.assign(output, {
-					timestamp: Date.now(),
+					timestamp: Utils.timestampMs(),
 				});
 			}
 

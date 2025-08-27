@@ -2,6 +2,7 @@ import pathlib from "#bzd/nodejs/utils/pathlib.mjs";
 import format from "#bzd/nodejs/core/format.mjs";
 import { CollectionPaging } from "#bzd/nodejs/db/utils.mjs";
 import Permissions from "#bzd/nodejs/db/storage/permissions.mjs";
+import Utils from "#bzd/apps/artifacts/common/utils.mjs";
 
 export default function extensionUpload(plugin, options, provider, endpoints) {
 	for (const [path, uploadOptions] of Object.entries(options["upload"] || {})) {
@@ -17,7 +18,7 @@ export default function extensionUpload(plugin, options, provider, endpoints) {
 				if ("rename" in uploadOptions) {
 					const renamed = format(uploadOptions.rename, {
 						name: fullPath.name,
-						timestamp: Date.now(),
+						timestamp: Utils.timestampMs(),
 					});
 					fullPath = fullPath.parent.joinPath(renamed);
 				}

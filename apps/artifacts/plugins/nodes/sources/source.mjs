@@ -15,11 +15,6 @@ export default class Source extends Process {
 		Exception.assert(typeof this.fetchRecords === "function", "A source must implement a 'fetchRecords' function.");
 	}
 
-	/// Get the current timestamp in ms.
-	getTimestampMs() {
-		return Date.now();
-	}
-
 	async process(options) {
 		try {
 			const tickRemote = this.plugin.records.getTickRemote(this.storageName, 0);

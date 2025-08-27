@@ -10,6 +10,7 @@ bzd_nodejs_library(
     ],
     deps = [
         ":source",
+        "//apps/artifacts/common:utils",
         "//apps/artifacts/plugins/nodes",
         "//nodejs/core:exception",
         "//nodejs/core:log",

@@ -9,6 +9,7 @@ bzd_nodejs_library(
         "//apps/artifacts/plugins:__subpackages__",
     ],
     deps = [
+        "//apps/artifacts/common:utils",
         "//nodejs/core:format",
         "//nodejs/db:utils",
         "//nodejs/db/storage:permissions",

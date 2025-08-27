@@ -2,7 +2,7 @@ import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import Handlers from "#bzd/apps/artifacts/plugins/nodes/handlers/handlers.mjs";
 import Data from "#bzd/apps/artifacts/plugins/nodes/data.mjs";
-import Cache2 from "#bzd/nodejs/core/cache2.mjs";
+import Utils from "#bzd/apps/artifacts/common/utils.mjs";
 
 const Exception = ExceptionFactory("apps", "plugin", "nodes");
 const Log = LogFactory("apps", "plugin", "nodes");
@@ -43,7 +43,7 @@ export class Node {
 		let fragments = Node.getAllPathAndValues(fragment, key);
 		fragments = this.handlers.processBeforeInsert(fragments);
 
-		const timestamp = await this.data.insert(this.uid, fragments, Data.getTimestamp() + timestampDelta);
+		const timestamp = await this.data.insert(this.uid, fragments, Utils.timestampMs() + timestampDelta);
 
 		// Generate records.
 		return fragments.map(([key, value, _]) => [this.uid, key, value, timestamp]);

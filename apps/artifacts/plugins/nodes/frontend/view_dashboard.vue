@@ -152,7 +152,7 @@
 				this.loading = true;
 				try {
 					this.inputs.reset({ periodLimit: periodMs });
-					const now = this.timeToServer(Date.now());
+					const now = this.timeToServer(Utils.timestampMs());
 					const data = await this.fetchData({ before: now, after: now - periodMs });
 					this.inputs.add(data);
 					this.inputs.refreshPeriodically(async ([_, timestampNewest]) => {
@@ -190,7 +190,7 @@
 							expect: "json",
 						});
 						this.dashboards = result.dashboards;
-						this.timestampDiff = result.timestamp - Date.now();
+						this.timestampDiff = result.timestamp - Utils.timestampMs();
 					},
 					{ updateLoading: false },
 				);
