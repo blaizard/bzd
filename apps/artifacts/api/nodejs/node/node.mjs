@@ -73,7 +73,7 @@ export class Node {
 
 		// Adjust the timestamp to the local server.
 		if (metadata) {
-			const timestampDiff = result.timestamp - Date.now();
+			const timestampDiff = result.timestamp - Utils.timestampMs();
 			result.data = result.data.map(([key, value]) => {
 				const [t, ...rest] = value;
 				return [key, [t - timestampDiff, ...rest]];

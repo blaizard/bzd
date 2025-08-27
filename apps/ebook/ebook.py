@@ -181,8 +181,8 @@ if __name__ == "__main__":
 
 			# Run the flow in isolation, this prevents any memory leaks/hogs which becomes problematic with batch runs.
 			p = multiprocessing.Process(target=runFlow,
-			                            args=(provider, FlowRegistry(schema=flowSchemas[args.action],
-			                                                         actions=actions), pathlib.Path(directory.name)))
+			                            args=(provider, FlowRegistry(schema=flowSchemas[args.action], actions=actions),
+			                                  pathlib.Path(directory.name)))  # type: ignore
 			p.start()
 			p.join()
 
