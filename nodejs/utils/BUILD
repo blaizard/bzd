@@ -1,6 +1,14 @@
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 
 bzd_nodejs_library(
+    name = "array",
+    srcs = [
+        "array.mjs",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+bzd_nodejs_library(
     name = "color",
     srcs = [
         "color.mjs",

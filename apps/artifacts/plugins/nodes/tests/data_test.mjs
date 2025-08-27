@@ -327,6 +327,21 @@ describe("Nodes", () => {
 			}
 
 			{
+				// overlapping data from external.
+
+				useExternal = false;
+				externalData = [
+					[1, 1],
+					[0.5, 0.5],
+					[0, 0],
+				];
+				const result = await data.get({ uid: "hello", key: ["a"], after: -1, count: 5 });
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value(), [3, 2, 1, 0.5, 0]);
+				Exception.assert(useExternal);
+			}
+
+			{
 				useExternal = false;
 				externalData = null;
 				const result = await data.get({ uid: "hello", key: ["b"], after: 2, count: 5 });
@@ -408,6 +423,18 @@ describe("Nodes", () => {
 				const result = await data.get({ uid: "hello", key: ["a"], before: -1, count: 5 });
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), [-2, -3]);
+				Exception.assert(useExternal);
+			}
+
+			{
+				useExternal = false;
+				externalData = [
+					[0, 0],
+					[-1, -1],
+				];
+				const result = await data.get({ uid: "hello", key: ["a"], before: 2, count: 5 });
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value(), [1, 0, -1]);
 				Exception.assert(useExternal);
 			}
 

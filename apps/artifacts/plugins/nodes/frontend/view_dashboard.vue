@@ -3,7 +3,7 @@
 		<Form :description="formDescription" v-model="options"></Form>
 		<div class="components" v-loading="loading">
 			<template v-for="dashboard in dashboards">
-				<ViewGraph :inputs="dashboardInputs(dashboard)" :options="dashboard"> </ViewGraph>
+				<ViewGraph :inputs="dashboardInputs(dashboard)" :options="dashboard" :timeRange="timeRange"> </ViewGraph>
 			</template>
 		</div>
 	</div>
@@ -18,6 +18,7 @@
 	import TimeseriesCollection from "#bzd/apps/artifacts/plugins/nodes/frontend/timeseries_collection.mjs";
 	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.mjs";
 	import { dateToDefaultString } from "#bzd/nodejs/utils/to_string.mjs";
+	import { arrayFindCommonPrefix } from "#bzd/nodejs/utils/array.mjs";
 
 	export default {
 		mixins: [Base, Component],
@@ -38,6 +39,7 @@
 					interval: "Last 15 minutes",
 				},
 				timeout: null,
+				periodMs: null,
 			};
 		},
 		watch: {
@@ -124,8 +126,18 @@
 					),
 				];
 			},
+			timeRange() {
+				const [_, timestampNewest] = this.inputs.timeRange;
+				if (timestampNewest === null || this.periodMs === null) {
+					return [null, null];
+				}
+				return [timestampNewest - this.periodMs, timestampNewest];
+			},
 			timeRangeString() {
-				const [timestampOldest, timestampNewest] = this.inputs.timeRange;
+				const [timestampOldest, timestampNewest] = this.timeRange;
+				if (timestampOldest === null && timestampNewest === null) {
+					return "";
+				}
 				const result = [
 					timestampOldest ? dateToDefaultString(timestampOldest) : "?",
 					timestampNewest ? dateToDefaultString(timestampNewest) : "?",
@@ -141,7 +153,7 @@
 					},
 					{
 						type: "Message",
-						value: this.timeRangeString,
+						value: this.dashboards.length > 0 ? this.timeRangeString : "No dashboards",
 						align: "center",
 					},
 				];
@@ -151,10 +163,25 @@
 			async useLastPeriod(periodMs) {
 				this.loading = true;
 				try {
-					this.inputs.reset({ periodLimit: periodMs });
-					const now = this.timeToServer(Utils.timestampMs());
-					const data = await this.fetchData({ before: now, after: now - periodMs });
+					this.periodMs = periodMs;
+					this.inputs.reset({ periodLimit: this.periodMs });
+
+					let now = this.timeToServer(Utils.timestampMs());
+					let data = await this.fetchData({ before: now, after: now - this.periodMs });
 					this.inputs.add(data);
+
+					// If there are no data in this timerange, it means that the data is either older (most likely) or newer.
+					if (this.inputs.timeRange[1] === null) {
+						// Look for the latest sample and fetch data from there.
+						data = await this.fetchData({ count: 1 });
+						this.inputs.add(data);
+						now = this.inputs.timeRange[1];
+						if (now !== null) {
+							data = await this.fetchData({ before: now, after: now - this.periodMs });
+							this.inputs.add(data);
+						}
+					}
+
 					this.inputs.refreshPeriodically(async ([_, timestampNewest]) => {
 						return await this.fetchData({ after: timestampNewest });
 					}, 1000);
@@ -185,24 +212,49 @@
 			async fetchDashboards() {
 				await this.handleSubmit(
 					async () => {
+						// Get the dashboard and approximate the time difference between the server and the client.
+						const t1 = Utils.timestampMs();
 						const result = await this.requestBackend(this.dashboardEndpoint, {
 							method: "get",
 							expect: "json",
 						});
+						const t4 = Utils.timestampMs();
+						const networkDelay = (t4 - t1) / 2; // Time it took to receive the response.
+						this.timestampDiff = result.timestamp + networkDelay - t4;
+
+						// Update the input name for the inputs of the dashboard.
+						for (const dashboard of result.dashboards) {
+							const inputs = Object.entries(dashboard.inputs).map(([path, options]) => [
+								path,
+								options,
+								Utils.pathToKey(path),
+							]);
+							const commonPrefixLength = arrayFindCommonPrefix(...inputs.map(([_1, _2, key]) => key)).length;
+							dashboard.inputs = Object.fromEntries(
+								inputs.map(([path, options, key]) => {
+									options = Object.assign(
+										{
+											name: inputs.length == 1 ? key.at(-1) : key.slice(commonPrefixLength).join("."),
+										},
+										options,
+									);
+									return [path, options];
+								}),
+							);
+						}
 						this.dashboards = result.dashboards;
-						this.timestampDiff = result.timestamp - Utils.timestampMs();
 					},
 					{ updateLoading: false },
 				);
 			},
-			async fetchData({ before = null, after = null }) {
+			async fetchData({ before = null, after = null, count = 800 } = {}) {
 				return await this.handleSubmit(
 					async () => {
 						const query = Object.fromEntries(
 							Object.entries({
 								include: this.inputsKeys.join(","),
 								metadata: 1,
-								count: 100,
+								count: count,
 								before: before,
 								after: after,
 							}).filter(([_, v]) => v !== null),

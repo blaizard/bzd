@@ -180,7 +180,7 @@ export default class Data {
 					}
 
 					// Get the rest of the data from the external source.
-					const external = await this.getExternal_({ uid, key, count: countExternal, after, before });
+					const external = await this.getExternal_({ uid, key, count: countExternal, after, before: oldestLocal });
 					result = external === null ? result : result.concat(external);
 				}
 
@@ -201,7 +201,11 @@ export default class Data {
 				// If it matches the last element, it might be that older elements are also matching.
 				if (end == value.length - 1) {
 					const external = await this.getExternal_({ uid, key, after, count });
-					result = external === null ? result : result.concat(external);
+					if (external !== null && external.length) {
+						const newestExternal = external[0][0];
+						const endLocal = result.findLastIndex((d) => newestExternal < d[0]);
+						result = result.slice(0, endLocal + 1).concat(external);
+					}
 				}
 
 				return result.slice(-count);
@@ -221,7 +225,12 @@ export default class Data {
 
 				// Get extra data from the external source if needed.
 				if (result.length < count) {
-					const external = await this.getExternal_({ uid, key, before, count: count - result.length });
+					const external = await this.getExternal_({
+						uid,
+						key,
+						before: result.length ? result.at(-1)[0] : before,
+						count: count - result.length,
+					});
 					result = external === null ? result : result.concat(external);
 				}
 

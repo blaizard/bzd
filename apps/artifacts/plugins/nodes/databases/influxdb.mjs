@@ -110,23 +110,23 @@ export default class DatabaseInfluxDB extends Database {
 		if (after !== null && before !== null) {
 			const periodMs = Math.round((before - after) / count) || 1;
 			influxQL += 'SELECT FIRST("' + field + '") ';
-			influxQL += "FROM " + uid + " ";
+			influxQL += 'FROM "' + uid + '" ';
 			influxQL += "WHERE time > " + after + "ms AND time < " + before + "ms ";
 			influxQL += "GROUP BY time(" + periodMs + "ms)\n";
 		} else if (after !== null) {
 			influxQL += 'SELECT "' + field + '" ';
-			influxQL += "FROM " + uid + " ";
+			influxQL += 'FROM "' + uid + '" ';
 			influxQL += "WHERE time > " + after + "ms ";
 			influxQL += "LIMIT " + count + "\n";
 		} else if (before !== null) {
 			influxQL += 'SELECT "' + field + '" ';
-			influxQL += "FROM " + uid + " ";
+			influxQL += 'FROM "' + uid + '" ';
 			influxQL += "WHERE time < " + before + "ms ";
 			influxQL += "ORDER BY time DESC ";
 			influxQL += "LIMIT " + count + "\n";
 		} else {
-			influxQL += 'SELECT "' + field + '" ';
-			influxQL += "FROM " + uid + " ";
+			influxQL += 'SELECT "' + "dsdswe" + '" ';
+			influxQL += 'FROM "' + uid + '" ';
 			influxQL += "ORDER BY time DESC ";
 			influxQL += "LIMIT " + count + "\n";
 		}
@@ -135,7 +135,7 @@ export default class DatabaseInfluxDB extends Database {
 			data: influxQL,
 		});
 
-		const data = ((result.results[0].series || [])[0] || {}).values || [];
+		const data = result.results[0]?.series?.[0]?.values ?? [];
 		const output = data
 			.filter(([_, value]) => value !== null)
 			.map(([timestamp, value]) => {

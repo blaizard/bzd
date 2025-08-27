@@ -9,6 +9,7 @@ bzd_nodejs_library(
         "//apps/artifacts/plugins:__subpackages__",
     ],
     deps = [
+        "//nodejs/core:exception",
         "//nodejs/core:log",
     ],
 )
@@ -37,6 +38,7 @@ bzd_nodejs_library(
         "//apps/artifacts/common:utils",
         "//apps/artifacts/plugins:default",
         "//nodejs/core:localstorage",
+        "//nodejs/utils:array",
         "//nodejs/utils:to_string",
         "//nodejs/vue/components/form",
         "//nodejs/vue/directives:tooltip",

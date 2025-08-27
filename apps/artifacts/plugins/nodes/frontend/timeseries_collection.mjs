@@ -1,6 +1,8 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
+import LogFactory from "#bzd/nodejs/core/log.mjs";
 
 const Exception = ExceptionFactory("apps", "plugin", "nodes");
+const Log = LogFactory("apps", "plugin", "nodes");
 
 export default class TimeseriesCollection {
 	constructor() {
@@ -69,7 +71,7 @@ export default class TimeseriesCollection {
 			if (collectionNewData.length === 0) {
 				return;
 			}
-			collectionNewData.sort((p) => p[0]);
+			collectionNewData.sort((a, b) => a[0] - b[0]);
 
 			const timeFirstNew = collectionNewData[0][0];
 			const timeLastNew = collectionNewData.at(-1)[0];
@@ -89,6 +91,21 @@ export default class TimeseriesCollection {
 
 			// Adjust the data based on the range, keep the last samples always.
 			this._updateLimits(collection);
+
+			// Sanity check.
+			let previous = null;
+			collectionNewData.forEach(([t, _], index) => {
+				if (previous !== null && previous > t) {
+					Log.warning(
+						"Previous timestamp ({}) is greater than current ({}) at index {} on collection '{}'.",
+						previous,
+						t,
+						index,
+						collection,
+					);
+				}
+				previous = t;
+			});
 		}
 	}
 

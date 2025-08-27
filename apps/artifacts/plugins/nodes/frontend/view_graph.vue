@@ -14,6 +14,7 @@
 			options: { mandatory: true, type: Object },
 			// It should be formatted as { <name>: { "data": [[<time>, <value>], ...], "options": {} } }
 			inputs: { mandatory: true, type: Object },
+			timeRange: { mandatory: true, type: Array },
 		},
 		data: function () {
 			// It's important to make sure chart is not reactive.
@@ -25,6 +26,13 @@
 			datasets() {
 				if (this.chart) {
 					this.chart.data.datasets = this.datasets;
+					this.chart.update("none"); // "none" suppress animation.
+				}
+			},
+			timeRange() {
+				if (this.timeRange[0] && this.timeRange[1]) {
+					this.chart.options.scales.x.min = this.timeRange[0];
+					this.chart.options.scales.x.max = this.timeRange[1];
 					this.chart.update("none"); // "none" suppress animation.
 				}
 			},
@@ -46,6 +54,11 @@
 				options: {
 					responsive: true,
 					maintainAspectRatio: false,
+					elements: {
+						point: {
+							radius: 1,
+						},
+					},
 					plugins: {
 						title: {
 							display: true,
@@ -59,23 +72,34 @@
 							intersect: false, // Tooltip appears even if not directly hovering a point
 							callbacks: {
 								label: (item) => {
+									const label = item.dataset.label || "";
 									if (unitFormatter === nopFormatter) {
-										return item.formattedValue;
+										return label + ": " + item.formattedValue;
 									}
-									return unitFormatter(item.parsed.y) + " (" + item.formattedValue + ")";
+									return label + ": " + unitFormatter(item.parsed.y) + " (" + item.formattedValue + ")";
+								},
+							},
+						},
+						legend: {
+							maxHeight: 30, // Hides if the legend takes 2 lines, this avoid shrinking the actual graph
+							labels: {
+								// Creates small round labels
+								boxWidth: 12,
+								boxHeight: 12,
+								useBorderRadius: true,
+								borderRadius: 6,
+								font: {
+									size: 12,
 								},
 							},
 						},
 					},
 					scales: {
 						x: {
-							type: "timeseries",
+							type: "time",
 							title: {
 								display: true,
 								text: "Time",
-							},
-							time: {
-								unit: "minute",
 							},
 						},
 						y: {
@@ -101,17 +125,20 @@
 			datasets() {
 				return Object.entries(this.inputs)
 					.map(([name, input]) => {
+						const label = this.options.inputs?.[name]?.name ?? name;
 						if (input.data.length > 0 && Array.isArray(input.data[0][1])) {
 							const zippedData = input.data[0][1].map((_, index) => input.data.map(([t, v]) => [t, v[index]]));
 							return zippedData.map((data, index) => ({
-								label: name + "[" + index + "]",
+								label: label + "[" + index + "]",
 								data: data,
+								spanGaps: false,
 							}));
 						}
 						return [
 							{
-								label: name,
+								label: label,
 								data: input.data.map(([t, v]) => [t, v]),
+								spanGaps: false,
 							},
 						];
 					})
