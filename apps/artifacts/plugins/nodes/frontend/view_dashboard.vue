@@ -163,28 +163,36 @@
 			async useLastPeriod(periodMs) {
 				this.loading = true;
 				try {
+					const nbSamples = 800;
+
 					this.periodMs = periodMs;
 					this.inputs.reset({ periodLimit: this.periodMs });
 
-					let now = this.timeToServer(Utils.timestampMs());
-					let data = await this.fetchData({ before: now, after: now - this.periodMs });
+					// Look for the latest sample and fetch data from there.
+					// This takes care of sample with time unsyncrhonized with the server.
+					let data = await this.fetchData({ count: 1 });
 					this.inputs.add(data);
-
-					// If there are no data in this timerange, it means that the data is either older (most likely) or newer.
-					if (this.inputs.timeRange[1] === null) {
-						// Look for the latest sample and fetch data from there.
-						data = await this.fetchData({ count: 1 });
+					const timestampNewest = this.inputs.timeRange[1];
+					if (timestampNewest !== null) {
+						data = await this.fetchData({
+							before: timestampNewest,
+							after: timestampNewest - this.periodMs,
+							count: nbSamples,
+						});
 						this.inputs.add(data);
-						now = this.inputs.timeRange[1];
-						if (now !== null) {
-							data = await this.fetchData({ before: now, after: now - this.periodMs });
-							this.inputs.add(data);
-						}
 					}
 
+					// Adjust the refresh period to match the sampling of the graph.
+					// When we want real time (>=15min) we grasp as many samples as we can,
+					// otherwise we sample.
+					const refreshPeriodMs = Math.max(periodMs / nbSamples, 1000);
+					const refreshCount = periodMs <= 15 * 60 * 1000 ? nbSamples : 1;
+
+					console.log(refreshPeriodMs, refreshCount);
+
 					this.inputs.refreshPeriodically(async ([_, timestampNewest]) => {
-						return await this.fetchData({ after: timestampNewest });
-					}, 1000);
+						return await this.fetchData({ after: timestampNewest, count: refreshCount });
+					}, refreshPeriodMs);
 				} finally {
 					this.loading = false;
 				}
