@@ -134,7 +134,7 @@ export default class Data {
 	///
 	/// \return An array of tuple, containing the timestamps and their corresponding value.
 	///         Or null, if there is reference to this data (wrong uid/internal).
-	async getWithMetadata_({ uid, key, value, count, after = null, before = null }) {
+	async getWithMetadata_({ uid, key, value, count, after = null, before = null, sampling = null }) {
 		const data = this.storage[uid] || {};
 
 		// If there is data locally.
@@ -173,8 +173,15 @@ export default class Data {
 					if (countLocal < result.length) {
 						const downsamplingFactor = result.length / countLocal;
 						let downsampleResult = [];
+						const samplingFct = sampling
+							? {
+									newest: Math.floor,
+									oldest: Math.ceil,
+								}[sampling]
+							: Math.round;
+						Exception.assertPrecondition(samplingFct, "Unsupported sampling mode '{}'", sampling);
 						for (let index = 0; Math.round(index) < result.length; index += downsamplingFactor) {
-							downsampleResult.push(result[Math.round(index)]);
+							downsampleResult.push(result[samplingFct(index)]);
 						}
 						result = downsampleResult;
 					}
@@ -249,7 +256,17 @@ export default class Data {
 	}
 
 	/// Get all keys/value pair children of key.
-	async get({ uid, key, metadata = false, children = 0, count = null, after = null, before = null, include = null }) {
+	async get({
+		uid,
+		key,
+		metadata = false,
+		children = 0,
+		count = null,
+		after = null,
+		before = null,
+		include = null,
+		sampling = null,
+	}) {
 		const valuesToResult = (values) => {
 			values = values.map(([t, v]) => {
 				if (metadata) {
@@ -294,6 +311,7 @@ export default class Data {
 							count: count || 1,
 							after,
 							before,
+							sampling,
 						}),
 					),
 				);
@@ -315,7 +333,15 @@ export default class Data {
 		// Get the value directly.
 		else {
 			const internal = KeyMapping.keyToInternal(key);
-			const values = await this.getWithMetadata_({ uid, key, value: data[internal], count: count || 1, after, before });
+			const values = await this.getWithMetadata_({
+				uid,
+				key,
+				value: data[internal],
+				count: count || 1,
+				after,
+				before,
+				sampling,
+			});
 			if (values !== null) {
 				return new Optional(valuesToResult(values));
 			}

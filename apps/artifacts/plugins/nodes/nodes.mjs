@@ -59,10 +59,20 @@ export class Node {
 	/// \param after Only return values after this timestamp.
 	/// \param before Only return values before this timestamp.
 	/// \param include Include the given path to the result.
+	/// \param sampling The sampling method to be used.
 	///
 	/// \return An optional with a value if success, empty if the key points to an unknown record.
-	async get({ key, metadata = false, children = 0, count = null, after = null, before = null, include = null }) {
-		return await this.data.get({ uid: this.uid, key, metadata, children, count, after, before, include });
+	async get({
+		key,
+		metadata = false,
+		children = 0,
+		count = null,
+		after = null,
+		before = null,
+		include = null,
+		sampling = null,
+	}) {
+		return await this.data.get({ uid: this.uid, key, metadata, children, count, after, before, include, sampling });
 	}
 
 	/// Get children of a given key.

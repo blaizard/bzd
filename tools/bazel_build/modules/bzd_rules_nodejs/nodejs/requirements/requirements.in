@@ -2,7 +2,8 @@
 sass-embedded
 terser
 vite
-c8=^10.1.2
-mocha=^10.4.0
+c8
+mocha
 @types/node=^20.14.6
-typescript=^5.5.2
+typescript
+postcss-preset-env

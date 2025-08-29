@@ -3,7 +3,13 @@
 		<Form :description="formDescription" v-model="options"></Form>
 		<div class="components" v-loading="loading">
 			<template v-for="dashboard in dashboards">
-				<ViewGraph :inputs="dashboardInputs(dashboard)" :options="dashboard" :timeRange="timeRange"> </ViewGraph>
+				<ViewGraph
+					:inputs="dashboardInputs(dashboard)"
+					:options="dashboard"
+					:timeRange="timeRange"
+					:class="dashboardClass(dashboard)"
+				>
+				</ViewGraph>
 			</template>
 		</div>
 	</div>
@@ -19,6 +25,9 @@
 	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.mjs";
 	import { dateToDefaultString } from "#bzd/nodejs/utils/to_string.mjs";
 	import { arrayFindCommonPrefix } from "#bzd/nodejs/utils/array.mjs";
+	import LocalStorage from "#bzd/nodejs/core/localstorage.mjs";
+
+	const optionsStorageKey = "bzd-artifacts-plugin-nodes-view-dashboard-options";
 
 	export default {
 		mixins: [Base, Component],
@@ -49,8 +58,16 @@
 			async dashboards() {
 				await this.triggerFetch();
 			},
+			options() {
+				LocalStorage.setSerializable(optionsStorageKey, this.options);
+			},
 		},
 		mounted() {
+			try {
+				this.options = LocalStorage.getSerializable(optionsStorageKey, this.options);
+			} catch (e) {
+				// ignore.
+			}
 			this.fetchDashboards();
 		},
 		beforeUnmount() {
@@ -174,25 +191,30 @@
 					this.inputs.add(data);
 					const timestampNewest = this.inputs.timeRange[1];
 					if (timestampNewest !== null) {
+						const timestampDiff = timestampNewest - Utils.timestampMs();
 						data = await this.fetchData({
 							before: timestampNewest,
 							after: timestampNewest - this.periodMs,
 							count: nbSamples,
 						});
 						this.inputs.add(data);
+
+						// Adjust the refresh period to match the sampling of the graph.
+						const refreshPeriodMs = Math.max(periodMs / nbSamples, 1000);
+						this.inputs.refreshPeriodically(async ([_, timestampNewestLocal]) => {
+							const timestampNewestRemote = Math.max(Utils.timestampMs() + timestampDiff, timestampNewestLocal + 1);
+							const periodRequestedMs = timestampNewestRemote - timestampNewestLocal;
+							const count = Math.round((periodRequestedMs * nbSamples) / periodMs);
+							if (count) {
+								return await this.fetchData({
+									after: timestampNewestLocal,
+									before: timestampNewestRemote,
+									count: count,
+									sampling: "newest",
+								});
+							}
+						}, refreshPeriodMs);
 					}
-
-					// Adjust the refresh period to match the sampling of the graph.
-					// When we want real time (>=15min) we grasp as many samples as we can,
-					// otherwise we sample.
-					const refreshPeriodMs = Math.max(periodMs / nbSamples, 1000);
-					const refreshCount = periodMs <= 15 * 60 * 1000 ? nbSamples : 1;
-
-					console.log(refreshPeriodMs, refreshCount);
-
-					this.inputs.refreshPeriodically(async ([_, timestampNewest]) => {
-						return await this.fetchData({ after: timestampNewest, count: refreshCount });
-					}, refreshPeriodMs);
 				} finally {
 					this.loading = false;
 				}
@@ -213,6 +235,9 @@
 					}
 				}
 				return inputs;
+			},
+			dashboardClass(dashboard) {
+				return "dashboard-component-medium";
 			},
 			timeToServer(timestamp) {
 				return timestamp + this.timestampDiff;
@@ -255,7 +280,7 @@
 					{ updateLoading: false },
 				);
 			},
-			async fetchData({ before = null, after = null, count = 800 } = {}) {
+			async fetchData({ before = null, after = null, count = 800, sampling = null } = {}) {
 				return await this.handleSubmit(
 					async () => {
 						const query = Object.fromEntries(
@@ -265,6 +290,7 @@
 								count: count,
 								before: before,
 								after: after,
+								sampling: sampling,
 							}).filter(([_, v]) => v !== null),
 						);
 
@@ -291,5 +317,17 @@
 		display: flex;
 		flex-direction: row;
 		flex-wrap: wrap;
+		container-type: inline-size;
+
+		.dashboard-component-medium {
+			width: 100%;
+			height: 300px;
+		}
+
+		@container (width >= 800px) {
+			.dashboard-component-medium {
+				width: 50%;
+			}
+		}
 	}
 </style>

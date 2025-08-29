@@ -2,7 +2,6 @@ import BodyParser from "body-parser";
 import Compression from "compression";
 import CookieParser from "cookie-parser";
 import Express from "express";
-import Minify from "express-minify";
 import Helmet from "helmet";
 import Http from "http";
 import Https from "https";
@@ -40,7 +39,7 @@ export default class HttpServer {
 				/// \brief SSL certificate authority.
 				ca: null,
 				/// \brief Use data compression and minfy certain file types.
-				useCompression: true,
+				useCompression: false,
 			},
 			config,
 		);
@@ -90,11 +89,6 @@ export default class HttpServer {
 		// Enable compression
 		if (this.config.useCompression) {
 			this.app.use(Compression());
-			this.app.use(
-				Minify({
-					cache: false, // use memory cache
-				}),
-			);
 		}
 
 		// Set the storage information for upload (if needed)

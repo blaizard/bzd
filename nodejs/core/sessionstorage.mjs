@@ -1,21 +1,21 @@
-/// Set persistent local storage
-export default class LocalStorage {
+/// Set temporary local storage
+export default class SessionStorage {
 	static set(key, value) {
-		window.localStorage.setItem(key, value);
+		window.sessionStorage.setItem(key, value);
 	}
 
 	static setSerializable(key, value) {
-		LocalStorage.set(key, JSON.stringify(value));
+		SessionStorage.set(key, JSON.stringify(value));
 	}
 
 	static get(key, defaultValue) {
-		const value = window.localStorage.getItem(key);
+		const value = window.sessionStorage.getItem(key);
 		return value === null ? defaultValue || null : value;
 	}
 
 	static getSerializable(key, defaultValue) {
 		const noData = Symbol();
-		const serialized = LocalStorage.get(key, noData);
+		const serialized = SessionStorage.get(key, noData);
 		if (serialized === noData) {
 			return defaultValue;
 		}
@@ -23,10 +23,10 @@ export default class LocalStorage {
 	}
 
 	static remove(key) {
-		window.localStorage.removeItem(key);
+		window.sessionStorage.removeItem(key);
 	}
 
 	static removeAll() {
-		window.localStorage.clear();
+		window.sessionStorage.clear();
 	}
 }

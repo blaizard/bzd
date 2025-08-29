@@ -343,6 +343,7 @@ export default class Plugin extends PluginBase {
 					.filter(Boolean)
 					.map((path) => Utils.pathToKey(path)),
 			);
+			const sampling = context.getQuery("sampling", null);
 
 			const node = await this.nodes.get(context.getParam("uid"));
 
@@ -361,6 +362,7 @@ export default class Plugin extends PluginBase {
 				after,
 				before,
 				include,
+				sampling,
 			});
 			if (maybeData.isEmpty()) {
 				context.sendStatus(404);

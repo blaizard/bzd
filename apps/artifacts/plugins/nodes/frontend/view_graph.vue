@@ -1,5 +1,5 @@
 <template>
-	<div class="graph-container" style="width: 800px; height: 300px">
+	<div class="graph-container">
 		<canvas ref="graph"></canvas>
 	</div>
 </template>

@@ -21,20 +21,12 @@ export default defineConfig({
 			formats: ["umd"],
 		},
 		minify: isProduction ? "terser" : false,
-		target: "es6",
 		assetsDir: "assets",
 		emptyOutDir: true,
 		rollupOptions: {
 			output: {
 				// Ensures everything is bundled into one file.
 				inlineDynamicImports: true,
-			},
-		},
-	},
-	css: {
-		preprocessorOptions: {
-			scss: {
-				api: "modern-compiler",
 			},
 		},
 	},

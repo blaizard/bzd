@@ -29,14 +29,14 @@
 		},
 		mounted() {
 			try {
-				this.options = JSON.parse(LocalStorage.get(optionsStorageKey, "{}"));
+				this.options = LocalStorage.getSerializable(optionsStorageKey, this.options);
 			} catch (e) {
 				// ignore.
 			}
 		},
 		watch: {
 			options() {
-				LocalStorage.set(optionsStorageKey, JSON.stringify(this.options));
+				LocalStorage.setSerializable(optionsStorageKey, this.options);
 			},
 		},
 		computed: {

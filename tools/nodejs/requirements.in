@@ -16,7 +16,6 @@ body-parser
 compression
 cookie-parser
 express
-express-minify
 helmet
 http
 mime=^1

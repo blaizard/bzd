@@ -151,6 +151,14 @@ bzd_nodejs_library(
 )
 
 bzd_nodejs_library(
+    name = "sessionstorage",
+    srcs = [
+        "sessionstorage.mjs",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+bzd_nodejs_library(
     name = "stream",
     srcs = [
         "stream.mjs",

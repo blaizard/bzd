@@ -61,7 +61,6 @@ bzd_nodejs_library(
         "@nodejs_deps//:compression",
         "@nodejs_deps//:cookie-parser",
         "@nodejs_deps//:express",
-        "@nodejs_deps//:express-minify",
         "@nodejs_deps//:helmet",
         "@nodejs_deps//:http",
         "@nodejs_deps//:mime",
