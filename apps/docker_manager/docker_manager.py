@@ -32,7 +32,7 @@ class Docker:
 			return json.loads(content)
 
 	def getContainers(self) -> typing.List[Container]:
-		raw = self.request("GET", "/containers/json?all=true")
+		raw = self.request("GET", "/containers/json?all=true&size=true")
 
 		containers = []
 		for data in raw:
@@ -47,7 +47,8 @@ class Docker:
 			    "image": data["Image"],
 			    "name": data["Names"][0],
 			    "active": True if data["State"].lower() == "running" else False,
-			    "version": version
+			    "version": version,
+			    "size": data["SizeRootFs"]
 			})
 
 		return containers
@@ -163,7 +164,15 @@ class Docker:
 
 	def getContainerStats(self, container: Container) -> typing.Any:
 		raw = self.request("GET", f"/containers/{container['id']}/stats?stream=false")
-		output = {"active": container["active"], "version": container["version"]}
+		output = {
+		    "active": container["active"],
+		    "version": container["version"],
+		    "disk": {
+		        "/": {
+		            "used": container["size"]
+		        }
+		    }
+		}
 
 		def addIfNotNone(key: str, data: typing.Any) -> None:
 			if data is not None:
