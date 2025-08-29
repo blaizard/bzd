@@ -46,8 +46,12 @@ class _Monitor:
 		return data
 
 	def batteries(self) -> typing.Any:
-		maybeBattery = psutil.sensors_battery()  # type: ignore
-		if maybeBattery is None:
+		try:
+			maybeBattery = psutil.sensors_battery()  # type: ignore
+			if maybeBattery is None:
+				return None
+		except FileNotFoundError:
+			# On Synology for example, /sys/class/power_supply does not exists and it makes the application crash.
 			return None
 		return {"main": [maybeBattery[0] / 100.]}
 
