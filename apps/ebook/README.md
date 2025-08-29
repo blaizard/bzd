@@ -12,6 +12,8 @@ bazel run apps/ebook -- --sandbox $(pwd)/temp/sandbox --clean --max-dpi 200 --ke
 bazel run apps/ebook -- --sandbox $(pwd)/temp/sandbox --clean --max-dpi 200 pdf $(pwd)/temp/temp.pdf
 # or
 bazel run apps/ebook -- --max-dpi 300 pdf $(pwd)/temp/
+# or
+bazel run apps/ebook -- cover $(pwd)/temp/
 ```
 
 As a prerequisite, it might be necessary to install some dependencies:
