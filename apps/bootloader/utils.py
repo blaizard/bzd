@@ -2,6 +2,7 @@ import pathlib
 import tempfile
 import time
 import typing
+import os
 
 
 class RollingNamedTemporaryFile:
@@ -15,10 +16,11 @@ class RollingNamedTemporaryFile:
 			namespace: The namespace to refer to.
 			maxFiles: Keep maximum a certain number of files, older ones will be deleted.
 		"""
-		self.temporaryDirectory = pathlib.Path(tempfile.gettempdir()) / f"namespace_{namespace}"
+		self.temporaryDirectory = pathlib.Path(os.getenv("BZD_TEMP")
+		                                       or tempfile.gettempdir()) / f"namespace_{namespace}"
 		self.maxFiles = maxFiles
 
-		self.temporaryDirectory.mkdir(exist_ok=True)
+		self.temporaryDirectory.mkdir(exist_ok=True, parents=True)
 
 	def get(self) -> pathlib.Path:
 		"""Get a named temporary file from a namespace.

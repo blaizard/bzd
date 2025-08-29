@@ -63,7 +63,11 @@ case $1 in
 		shift
 		;;
 	*)
-		temp=$(mktemp -d)
+		if [ -n "$BZD_TEMP" ]; then
+			temp=$(mktemp -d -p "$BZD_TEMP")
+		else
+			temp=$(mktemp -d)
+		fi
 		;;
 esac
 
