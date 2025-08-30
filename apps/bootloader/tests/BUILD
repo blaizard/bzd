@@ -1,4 +1,4 @@
-load("@bzd_lib//:executable_test.bzl", "bzd_executable_test")
+load("@bzd_lib//:defs.bzl", "bzd_executable_test")
 load("@bzd_lib//config:defs.bzl", "bzd_config")
 load("@rules_python//python:defs.bzl", "py_binary", "py_test")
 load("//apps/bootloader:defs.bzl", "bzd_bootloader_binary")

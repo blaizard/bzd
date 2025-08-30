@@ -1,5 +1,5 @@
 load("@bzd_bdl//:defs.bzl", "bdl_library")
-load("@bzd_lib//:executable_test.bzl", "bzd_executable_exec_test")
+load("@bzd_lib//:defs.bzl", "bzd_executable_exec_test")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//cc/bdl:cc.bzl", "bzd_cc_binary", "bzd_cc_test")
 

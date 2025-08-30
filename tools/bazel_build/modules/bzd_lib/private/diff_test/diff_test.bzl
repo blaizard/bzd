@@ -2,6 +2,8 @@
 
 load("//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
 
+visibility("//...")
+
 def _bzd_diff_test_impl(ctx):
     arguments_diff = []
 
@@ -33,7 +35,7 @@ bzd_diff_test = rule(
         "_diff": attr.label(
             executable = True,
             cfg = "exec",
-            default = Label("//:diff_test"),
+            default = Label("//private/diff_test:diff_test"),
         ),
     },
     test = True,

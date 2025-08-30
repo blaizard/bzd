@@ -1,19 +1,16 @@
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 load("@rules_python//python:defs.bzl", "py_binary")
 
-py_binary(
-    name = "executable_test",
-    srcs = ["executable_test.py"],
+bzl_library(
+    name = "bzl",
+    srcs = [
+        "defs.bzl",
+    ],
     visibility = ["//visibility:public"],
     deps = [
-        "@bzd_python//bzd/utils:run",
+        "//private/diff_test:bzl",
+        "//private/executable_test:bzl",
     ],
-)
-
-py_binary(
-    name = "diff_test",
-    srcs = ["diff_test.py"],
-    visibility = ["//visibility:public"],
 )
 
 py_binary(

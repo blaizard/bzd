@@ -1,5 +1,4 @@
-load("@bzd_lib//:diff_test.bzl", "bzd_diff_test")
-load("@bzd_lib//:executable_test.bzl", "bzd_executable_test")
+load("@bzd_lib//:defs.bzl", "bzd_diff_test", "bzd_executable_test")
 load("@rules_shell//shell:sh_binary.bzl", "sh_binary")
 load("//private:bundle_binary.bzl", "bzd_bundle_binary")
 load("//private:bundle_tar.bzl", "bzd_bundle_tar")

@@ -1,4 +1,4 @@
-load("@bzd_lib//:executable_test.bzl", "bzd_executable_test")
+load("@bzd_lib//:defs.bzl", "bzd_executable_test")
 load("@bzd_lib//config:defs.bzl", "bzd_config_default")
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_binary", "bzd_nodejs_library")
 
