@@ -5,9 +5,10 @@ import time
 
 from apps.node_manager.rest_server import RESTServerContext
 from apps.node_manager.nvidia import Nvidia
+from apps.node_manager.config import Config
 
 
-class _Monitor:
+class Monitor:
 	"""Data format output:
 
 	```json
@@ -26,7 +27,8 @@ class _Monitor:
 	CPU loads are in percent.
 	"""
 
-	def __init__(self) -> None:
+	def __init__(self, config: Config) -> None:
+		self.config = config
 		self.nvidia = Nvidia()
 
 	def temperatures(self) -> typing.Any:
@@ -80,7 +82,8 @@ class _Monitor:
 				disks[partition.device] = {"path": [], "data": {"used": usage.used, "total": usage.total}}
 			disks[partition.device]["path"].append(partition.mountpoint)  # type: ignore
 
-		return {",".join(sorted(data["path"])): data["data"] for data in disks.values()}
+		dictionary = {",".join(sorted(data["path"])): data["data"] for data in disks.values()}
+		return self.config.disksMappings(dictionary)
 
 	def upTime(self) -> float:
 		return time.time() - psutil.boot_time()  # type: ignore
@@ -103,13 +106,6 @@ class _Monitor:
 
 		return content
 
-
-monitor = _Monitor()
-
-
-def handlerMonitor(context: RESTServerContext) -> None:
-	context.header("Content-type", "application/json")
-	context.write(json.dumps(monitor.all()))
-
-
-handlersMonitor = {"/monitor": handlerMonitor}
+	def handlerMonitor(self, context: RESTServerContext) -> None:
+		context.header("Content-type", "application/json")
+		context.write(json.dumps(self.all()))

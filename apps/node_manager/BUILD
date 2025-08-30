@@ -17,6 +17,7 @@ py_binary(
 py_binary(
     name = "node_manager",
     srcs = [
+        "config.py",
         "monitor.py",
         "node_manager.py",
         "nvidia.py",

@@ -3,14 +3,16 @@ import json
 import threading
 import sys
 import os
+import pathlib
 
 from apps.node_manager.rest_server import RESTServer, RESTServerContext
 from apps.node_manager.power import handlersPower
-from apps.node_manager.monitor import handlersMonitor, monitor
+from apps.node_manager.monitor import Monitor
 from bzd.http.client import HttpClient
 from bzd.utils.scheduler import Scheduler
 from bzd.sync.singleton import Singleton
 from apps.artifacts.api.python.node.node import Node
+from apps.node_manager.config import Config
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Node Manager.")
@@ -25,6 +27,7 @@ if __name__ == "__main__":
 	                    type=str,
 	                    default=os.environ.get("BZD_NODE_TOKEN"),
 	                    help="A token to be used to access the node server.")
+	parser.add_argument("--config", type=pathlib.Path, help="Configuration for the manager.")
 	parser.add_argument(
 	    "uid",
 	    nargs="?",
@@ -33,6 +36,10 @@ if __name__ == "__main__":
 	    "The UID of this node. If no UID is provided, the application will report the monitoring on the command line.")
 
 	args = parser.parse_args()
+
+	# Instantiate the monitor.
+	config = Config(path=args.config)
+	monitor = Monitor(config=config)
 
 	if args.uid is None:
 		data = monitor.all()
@@ -61,7 +68,7 @@ if __name__ == "__main__":
 	scheduler.start()
 
 	try:
-		handlers = {**handlersMonitor}
+		handlers = {"/monitor": monitor.handlerMonitor}
 		if args.power:
 			handlers.update(**handlersPower)
 
