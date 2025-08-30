@@ -49,7 +49,7 @@ def _bzd_executable_test_attrs_factory(cfg):
         "_executor": attr.label(
             executable = True,
             cfg = cfg,
-            default = Label("//:executable_test"),
+            default = Label("//private/executable_test:executable_test"),
         ),
     }
 
