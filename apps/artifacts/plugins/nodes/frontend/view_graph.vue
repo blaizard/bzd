@@ -42,6 +42,7 @@
 			const unitFormatter =
 				{
 					bytes: bytesToString,
+					"bytes/s": (x) => bytesToString(x) + "/s",
 					percent: (x) => x * 100 + "%",
 					celsius: (x) => x + "°C",
 				}[this.options.unit] || nopFormatter;

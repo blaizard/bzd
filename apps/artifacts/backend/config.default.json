@@ -111,6 +111,67 @@
             "webdav": {}
         },
         "nodes": {
+            "nodes.dashboards": [
+                {
+                    "inputs": {
+                        "/data/cpu/{name}": {}
+                    },
+                    "max": 1,
+                    "min": 0,
+                    "title": "CPU {name}",
+                    "type": "linear",
+                    "unit": "percent"
+                },
+                {
+                    "inputs": {
+                        "/data/disk/{name}/total": {},
+                        "/data/disk/{name}/used": {}
+                    },
+                    "min": 0,
+                    "title": "Disk {name}",
+                    "type": "linear",
+                    "unit": "bytes"
+                },
+                {
+                    "inputs": {
+                        "/data/memory/{name}/total": {},
+                        "/data/memory/{name}/used": {}
+                    },
+                    "min": 0,
+                    "title": "Memory {name}",
+                    "type": "linear",
+                    "unit": "bytes"
+                },
+                {
+                    "inputs": {
+                        "/data/temperature/{name}": {}
+                    },
+                    "min": 0,
+                    "title": "Temperature {name}",
+                    "type": "linear",
+                    "unit": "celsius"
+                },
+                {
+                    "inputs": {
+                        "/data/io/{name}/in": {},
+                        "/data/io/{name}/out": {}
+                    },
+                    "min": 0,
+                    "title": "IO {name}",
+                    "type": "linear",
+                    "unit": "bytes/s"
+                },
+                {
+                    "inputs": {
+                        "/data/network/{name}/in": {},
+                        "/data/network/{name}/out": {}
+                    },
+                    "min": 0,
+                    "title": "Network {name}",
+                    "type": "linear",
+                    "unit": "bytes/s"
+                }
+            ],
             "nodes.data": {
                 "testnode": {
                     "a": 12,
