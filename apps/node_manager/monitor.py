@@ -30,6 +30,8 @@ class Monitor:
 	def __init__(self, config: Config) -> None:
 		self.config = config
 		self.nvidia = Nvidia()
+		self.networkPrevious = {}
+		self.ioPrevious = {}
 
 	def temperatures(self) -> typing.Any:
 		data = {}
@@ -85,6 +87,52 @@ class Monitor:
 		dictionary = {",".join(sorted(data["path"])): data["data"] for data in disks.values()}
 		return self.config.disksMappings(dictionary)
 
+	def network(self) -> typing.Any:
+
+		# Calculate the time diff in S from the previous run.
+		timestampS = time.time()
+		timestampDiffS = timestampS - self.networkPrevious.get("_timestampS", time.time())
+		self.networkPrevious["_timestampS"] = timestampS
+
+		netStat = psutil.net_io_counters(pernic=True, nowrap=True)
+		network = {}
+		for name, snetio in netStat.items():
+			self.networkPrevious.setdefault(name, {})
+			diffIn = snetio.bytes_recv - self.networkPrevious[name].get("in", snetio.bytes_recv)
+			diffOut = snetio.bytes_sent - self.networkPrevious[name].get("out", snetio.bytes_sent)
+			self.networkPrevious[name] = {
+			    "in": snetio.bytes_recv,
+			    "out": snetio.bytes_sent,
+			}
+			network[name] = {
+			    "in": (diffIn / timestampDiffS) if timestampDiffS else 0,
+			    "out": (diffOut / timestampDiffS) if timestampDiffS else 0
+			}
+		return network
+
+	def io(self) -> typing.Any:
+
+		# Calculate the time diff in S from the previous run.
+		timestampS = time.time()
+		timestampDiffS = timestampS - self.ioPrevious.get("_timestampS", time.time())
+		self.ioPrevious["_timestampS"] = timestampS
+
+		ioStat = psutil.disk_io_counters(perdisk=True, nowrap=True)
+		io = {}
+		for name, sdiskio in ioStat.items():
+			self.ioPrevious.setdefault(name, {})
+			diffIn = sdiskio.write_bytes - self.ioPrevious[name].get("in", sdiskio.write_bytes)
+			diffOut = sdiskio.read_bytes - self.ioPrevious[name].get("out", sdiskio.read_bytes)
+			self.ioPrevious[name] = {
+			    "in": sdiskio.write_bytes,
+			    "out": sdiskio.read_bytes,
+			}
+			io[name] = {
+			    "in": (diffIn / timestampDiffS) if timestampDiffS else 0,
+			    "out": (diffOut / timestampDiffS) if timestampDiffS else 0
+			}
+		return io
+
 	def upTime(self) -> float:
 		return time.time() - psutil.boot_time()  # type: ignore
 
@@ -101,6 +149,8 @@ class Monitor:
 		assignIfSet("temperature", self.temperatures())
 		assignIfSet("battery", self.batteries())
 		assignIfSet("memory", self.memories())
+		assignIfSet("network", self.network())
+		assignIfSet("io", self.io())
 		assignIfSet("disk", self.disks())
 		assignIfSet("uptime", self.upTime())
 
