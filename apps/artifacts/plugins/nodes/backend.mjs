@@ -271,8 +271,17 @@ export default class Plugin extends PluginBase {
 			optionsDashboards.forEach((dashboard, index) => {
 				for (const [match, options] of Object.entries(dashboard.inputs)) {
 					for (const vars of inputs[match] || []) {
-						const uid = index + "-" + JSON.stringify(vars);
-						dashboardsByUid[uid] ??= { dashboard: dashboard, inputs: {}, vars: vars };
+						// Generate the UID by index and some variables. Exclude the group by, as we want
+						// to keep these indexes together when they diverge.
+						const filtereVars = Object.keys(vars).reduce((acc, key) => {
+							if (!(dashboard.groupBy || []).includes(key)) {
+								acc[key] = vars[key];
+							}
+							return acc;
+						}, {});
+						const uid = index + "-" + JSON.stringify(filtereVars);
+
+						dashboardsByUid[uid] ??= { dashboard: dashboard, inputs: {}, vars: filtereVars };
 						const varsEncoded = Object.fromEntries(Object.entries(vars).map(([k, v]) => [k, encodeURIComponent(v)]));
 						const path = format(match, varsEncoded);
 						dashboardsByUid[uid].inputs[path] = options;

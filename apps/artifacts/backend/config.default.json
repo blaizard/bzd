@@ -143,6 +143,54 @@
                     "unit": "bytes"
                 },
                 {
+                    "groupBy": [
+                        "name"
+                    ],
+                    "inputs": {
+                        "/data/io/{name}/in": {}
+                    },
+                    "min": 0,
+                    "title": "IO write",
+                    "type": "linear",
+                    "unit": "bytes/s"
+                },
+                {
+                    "groupBy": [
+                        "name"
+                    ],
+                    "inputs": {
+                        "/data/io/{name}/out": {}
+                    },
+                    "min": 0,
+                    "title": "IO read",
+                    "type": "linear",
+                    "unit": "bytes/s"
+                },
+                {
+                    "groupBy": [
+                        "name"
+                    ],
+                    "inputs": {
+                        "/data/network/{name}/in": {}
+                    },
+                    "min": 0,
+                    "title": "Network receive",
+                    "type": "linear",
+                    "unit": "bytes/s"
+                },
+                {
+                    "groupBy": [
+                        "name"
+                    ],
+                    "inputs": {
+                        "/data/network/{name}/out": {}
+                    },
+                    "min": 0,
+                    "title": "Network send",
+                    "type": "linear",
+                    "unit": "bytes/s"
+                },
+                {
                     "inputs": {
                         "/data/temperature/{name}": {}
                     },
@@ -150,26 +198,6 @@
                     "title": "Temperature {name}",
                     "type": "linear",
                     "unit": "celsius"
-                },
-                {
-                    "inputs": {
-                        "/data/io/{name}/in": {},
-                        "/data/io/{name}/out": {}
-                    },
-                    "min": 0,
-                    "title": "IO {name}",
-                    "type": "linear",
-                    "unit": "bytes/s"
-                },
-                {
-                    "inputs": {
-                        "/data/network/{name}/in": {},
-                        "/data/network/{name}/out": {}
-                    },
-                    "min": 0,
-                    "title": "Network {name}",
-                    "type": "linear",
-                    "unit": "bytes/s"
                 }
             ],
             "nodes.data": {
