@@ -30,8 +30,8 @@ class Monitor:
 	def __init__(self, config: Config) -> None:
 		self.config = config
 		self.nvidia = Nvidia()
-		self.networkPrevious = {}
-		self.ioPrevious = {}
+		self.networkPrevious: typing.Dict[str, typing.Any] = {}
+		self.ioPrevious: typing.Dict[str, typing.Any] = {}
 
 	def temperatures(self) -> typing.Any:
 		data = {}
@@ -89,12 +89,12 @@ class Monitor:
 
 	def network(self) -> typing.Any:
 
-		# Calculate the time diff in S from the previous run.
+		# Calculate the time diff in seconds from the previous run.
 		timestampS = time.time()
 		timestampDiffS = timestampS - self.networkPrevious.get("_timestampS", time.time())
 		self.networkPrevious["_timestampS"] = timestampS
 
-		netStat = psutil.net_io_counters(pernic=True, nowrap=True)
+		netStat = psutil.net_io_counters(pernic=True, nowrap=True)  # type: ignore
 		network = {}
 		for name, snetio in netStat.items():
 			self.networkPrevious.setdefault(name, {})
@@ -112,12 +112,12 @@ class Monitor:
 
 	def io(self) -> typing.Any:
 
-		# Calculate the time diff in S from the previous run.
+		# Calculate the time diff in seconds from the previous run.
 		timestampS = time.time()
 		timestampDiffS = timestampS - self.ioPrevious.get("_timestampS", time.time())
 		self.ioPrevious["_timestampS"] = timestampS
 
-		ioStat = psutil.disk_io_counters(perdisk=True, nowrap=True)
+		ioStat = psutil.disk_io_counters(perdisk=True, nowrap=True)  # type: ignore
 		io = {}
 		for name, sdiskio in ioStat.items():
 			self.ioPrevious.setdefault(name, {})
