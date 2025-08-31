@@ -39,6 +39,7 @@ export default class Nodes {
 						["disk"],
 						["memory"],
 						["network"],
+						["io"],
 						["temperature"],
 						["version"],
 						["uptime"],
