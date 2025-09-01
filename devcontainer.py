@@ -90,7 +90,7 @@ USER {self.user}
 		# Set the environment.
 		dockerFile += f"""
 RUN wget -O {self.home}/.bashrc https://raw.githubusercontent.com/blaizard/bzd/refs/heads/master/tools/shell/sh/bashrc.sh
-RUN echo "PS1=\\"(devcontainer) \$PS1\\"" >> {self.home}/.bashrc
+RUN echo "PS1=\\"(devcontainer) \\$PS1\\"" >> {self.home}/.bashrc
 """
 
 		return dockerFile.encode()
