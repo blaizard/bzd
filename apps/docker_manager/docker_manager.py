@@ -6,6 +6,7 @@ import pathlib
 import typing
 import os
 import datetime
+import time
 
 from bzd.http.parser import HttpParser
 from bzd.utils.scheduler import Scheduler
@@ -18,6 +19,8 @@ class Docker:
 
 	def __init__(self, socket: pathlib.Path) -> None:
 		self.socket = socket
+		self.previousIO: typing.Dict[str, typing.Any] = {}
+		self.previousNetwork: typing.Dict[str, typing.Any] = {}
 
 	def request(self, method: str, endpoint: str) -> typing.Any:
 		with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as sock:
@@ -53,8 +56,7 @@ class Docker:
 
 		return containers
 
-	@staticmethod
-	def _cpuInfo(stats: typing.Any) -> typing.Any:
+	def _cpuInfo(self, stats: typing.Any) -> typing.Any:
 		"""Extracts CPU usage stats from the Docker stats dictionary.
 
 		Args:
@@ -84,8 +86,7 @@ class Docker:
 
 		return None
 
-	@staticmethod
-	def _memoryInfo(stats: typing.Any) -> typing.Any:
+	def _memoryInfo(self, stats: typing.Any) -> typing.Any:
 		"""Extracts memory usage stats from the Docker stats dictionary.
 
 		See: https://docs.docker.com/reference/api/engine/version/v1.44/#tag/Container/operation/ContainerExport
@@ -108,8 +109,28 @@ class Docker:
 
 		return None
 
-	@staticmethod
-	def _ioInfo(stats: typing.Any) -> typing.Any:
+	def _returnRate(self, previousData: typing.Any, data: typing.Any) -> typing.Any:
+		"""Calculate the rate from a dictionary containing in/out numbers."""
+
+		timestampS = time.time()
+		previousTimestampS = previousData.get("_timestampS", timestampS)
+		previousData["_timestampS"] = timestampS
+		diffTimestampS = timestampS - previousTimestampS
+
+		dataWithRates = {}
+		for name, rate in data.items():
+			previousDataRates = previousData.get(name, {})
+			dataWithRates[name] = {
+			    "in":
+			        ((rate["in"] - previousDataRates.get("in", rate["in"])) / diffTimestampS) if diffTimestampS else 0,
+			    "out": ((rate["out"] - previousDataRates.get("out", rate["out"])) /
+			            diffTimestampS) if diffTimestampS else 0,
+			}
+			previousData[name] = rate
+
+		return dataWithRates
+
+	def _ioInfo(self, stats: typing.Any) -> typing.Any:
 		"""Extracts I/O throughput stats from the Docker stats dictionary.
 
 		Args:
@@ -131,15 +152,14 @@ class Docker:
 					elif entry['op'] == 'write':
 						writeBytes += entry['value']
 
-				return {"block": {"in": writeBytes, "out": readBytes}}
+				return self._returnRate(self.previousIO, {"block": {"in": writeBytes, "out": readBytes}})
 
 		except KeyError as e:
 			pass
 
 		return None
 
-	@staticmethod
-	def _networkInfo(stats: typing.Any) -> typing.Any:
+	def _networkInfo(self, stats: typing.Any) -> typing.Any:
 		"""Extracts network throughput stats from the Docker stats dictionary.
 
 		Args:
@@ -155,7 +175,7 @@ class Docker:
 				rxBytes = data['rx_bytes']
 				txBytes = data['tx_bytes']
 				output[interface] = {"in": rxBytes, "out": txBytes}
-			return output
+			return self._returnRate(self.previousNetwork, output)
 
 		except KeyError as e:
 			pass
@@ -210,18 +230,16 @@ class Docker:
 
 		return None
 
-
-def getDockerData(socket: pathlib.Path) -> typing.Any:
-	docker = Docker(socket)
-	containers = docker.getContainers()
-	data = {}
-	for container in containers:
-		stats = docker.getContainerStats(container)
-		name = container["name"].replace("/", "")
-		data[name] = {
-		    "data": stats,
-		}
-	return data
+	def getDockerData(self) -> typing.Any:
+		containers = self.getContainers()
+		data = {}
+		for container in containers:
+			stats = self.getContainerStats(container)
+			name = container["name"].replace("/", "")
+			data[name] = {
+			    "data": stats,
+			}
+		return data
 
 
 if __name__ == "__main__":
@@ -247,8 +265,11 @@ if __name__ == "__main__":
 
 	args = parser.parse_args()
 
+	docker = Docker(args.docker_socket)
+	docker.getDockerData()
+
 	if args.uid is None:
-		data = getDockerData(args.docker_socket)
+		data = docker.getDockerData()
 		print(json.dumps(data, indent=4))
 		sys.exit(0)
 
@@ -256,8 +277,8 @@ if __name__ == "__main__":
 
 	# Start the thread to monitor the node.
 	def monitorWorkload() -> None:
-		data = getDockerData(args.docker_socket)
-		updatedData = {f"{args.uid }.{key}": value for key, value in data.items()}
+		data = docker.getDockerData()
+		updatedData = {f"{args.uid}.{key}": value for key, value in data.items()}
 		try:
 			node.publishMultiNodes(data=updatedData)
 		except:

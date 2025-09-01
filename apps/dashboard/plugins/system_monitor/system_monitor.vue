@@ -66,7 +66,7 @@
 
 <script>
 	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
-	import { bytesToString, timeMsToString, capitalize } from "#bzd/nodejs/utils/to_string.mjs";
+	import { bytesToString, timeMsToString } from "#bzd/nodejs/utils/to_string.mjs";
 	import Gauge from "#bzd/apps/dashboard/plugins/system_monitor/gauge.vue";
 	import GaugeRate from "#bzd/apps/dashboard/plugins/system_monitor/gauge_rate.vue";
 	import Text from "#bzd/apps/dashboard/plugins/system_monitor/text.vue";
@@ -192,23 +192,20 @@
 			ios() {
 				let tooltips = {};
 				for (const [name, io] of Object.entries(this.metadata.io || {})) {
-					const rates = this.updateInOutCountersToRates(this.ratesIO, name, io.in, io.out);
-					tooltips[name] = "read: " + this.formatBytesRate(rates.in) + ", write: " + this.formatBytesRate(rates.out);
+					tooltips[name] = "read: " + this.formatBytesRate(io.in) + ", write: " + this.formatBytesRate(io.out);
 				}
 				return {
-					rates: this.ratesIO,
+					rates: this.metadata.io || {},
 					tooltips,
 				};
 			},
 			networks() {
-				let rates = {};
 				let tooltips = {};
 				for (const [name, network] of Object.entries(this.metadata.network || {})) {
-					const rates = this.updateInOutCountersToRates(this.ratesNetwork, name, network.in, network.out);
-					tooltips[name] = "recv: " + this.formatBytesRate(rates.in) + ", send: " + this.formatBytesRate(rates.out);
+					tooltips[name] = "recv: " + this.formatBytesRate(network.in) + ", send: " + this.formatBytesRate(network.out);
 				}
 				return {
-					rates: this.ratesNetwork,
+					rates: this.metadata.network || {},
 					tooltips,
 				};
 			},

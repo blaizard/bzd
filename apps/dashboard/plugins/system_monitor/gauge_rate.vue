@@ -20,8 +20,8 @@
 				<div class="name">{{ name }}</div>
 				<div class="values">
 					<div class="value">
-						<div class="bar" :style="gaugeStyle(aggregatedRate.in)"></div>
-						<div class="bar" :style="gaugeStyle(aggregatedRate.out)"></div>
+						<div class="bar fit-2" :style="gaugeStyle(aggregatedRate.in)"></div>
+						<div class="bar fit-2" :style="gaugeStyle(aggregatedRate.out)"></div>
 						<div class="overlay">{{ bytesToRateString(aggregatedRate.in + aggregatedRate.out) }}</div>
 					</div>
 				</div>
@@ -68,6 +68,15 @@
 						return {
 							in: sumIn,
 							out: sumOut,
+						};
+					case "max":
+						const [maxIn, maxOut] = rateOrRates.reduce(
+							(obj, data) => [Math.max(obj[0], data.in), Math.max(obj[1], data.out)],
+							[0, 0],
+						);
+						return {
+							in: maxIn,
+							out: maxOut,
 						};
 					default:
 						Exception.error("Unsupported policy '{}'.", this.policy);

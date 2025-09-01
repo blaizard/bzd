@@ -174,7 +174,7 @@
                         "/data/network/{name}/in": {}
                     },
                     "min": 0,
-                    "title": "Network receive",
+                    "title": "Network recv",
                     "type": "linear",
                     "unit": "bytes/s"
                 },
