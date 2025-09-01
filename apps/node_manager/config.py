@@ -2,6 +2,15 @@ import pathlib
 import json
 import typing
 import re
+from dataclasses import dataclass
+
+
+@dataclass
+class UPSClient:
+	hostname: str = "127.0.0.1"
+	port: int = 3493
+	login: typing.Optional[str] = None
+	password: typing.Optional[str] = None
 
 
 class Config:
@@ -63,3 +72,8 @@ class Config:
 					matches[identifier] = f"{replacement}.{index}"
 
 		return {matches.get(k, k): v for k, v in dictionary.items()}
+
+	def ups(self) -> typing.Dict[str, UPSClient]:
+		"""Get all the ups clients."""
+
+		return {name: UPSClient(**data) for name, data in self.config.get("ups", {}).items()}

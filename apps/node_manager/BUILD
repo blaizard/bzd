@@ -23,13 +23,14 @@ py_binary(
         "nvidia.py",
         "power.py",
         "rest_server.py",
+        "ups.py",
     ],
     deps = [
         "//apps/artifacts/api/python/node",
         "@bzd_python//bzd/http:client",
         "@bzd_python//bzd/sync:singleton",
         "@bzd_python//bzd/utils:scheduler",
-    ] + requirement("psutil") + requirement("nvidia-ml-py"),
+    ] + requirement("psutil") + requirement("nvidia-ml-py") + requirement("nut2"),
 )
 
 bzd_config(

@@ -59,6 +59,7 @@ module = [
     "websocket.*",
     "PIL.*",
     "rarfile.*",
-    "pymupdf.*"
+    "pymupdf.*",
+    "nut2.*"
 ]
 ignore_errors = true

@@ -5,6 +5,7 @@ import time
 
 from apps.node_manager.rest_server import RESTServerContext
 from apps.node_manager.nvidia import Nvidia
+from apps.node_manager.ups import UPS
 from apps.node_manager.config import Config
 
 
@@ -30,6 +31,7 @@ class Monitor:
 	def __init__(self, config: Config) -> None:
 		self.config = config
 		self.nvidia = Nvidia()
+		self.ups = UPS(config=config)
 		self.networkPrevious: typing.Dict[str, typing.Any] = {}
 		self.ioPrevious: typing.Dict[str, typing.Any] = {}
 
@@ -144,14 +146,20 @@ class Monitor:
 			if value:
 				content[key] = value
 
-		assignIfSet("cpu", self.cpus())
-		assignIfSet("gpu", self.gpus())
-		assignIfSet("temperature", self.temperatures())
-		assignIfSet("battery", self.batteries())
-		assignIfSet("memory", self.memories())
-		assignIfSet("network", self.network())
-		assignIfSet("io", self.io())
-		assignIfSet("disk", self.disks())
+		def mergeDictIfSet(key: str, value: typing.Any) -> None:
+			if value:
+				content.setdefault(key, {})
+				content[key].update(value)
+
+		mergeDictIfSet("cpu", self.cpus())
+		mergeDictIfSet("gpu", self.gpus())
+		mergeDictIfSet("temperature", self.temperatures())
+		mergeDictIfSet("battery", self.batteries())
+		mergeDictIfSet("battery", self.ups.batteries())
+		mergeDictIfSet("memory", self.memories())
+		mergeDictIfSet("network", self.network())
+		mergeDictIfSet("io", self.io())
+		mergeDictIfSet("disk", self.disks())
 		assignIfSet("uptime", self.upTime())
 
 		return content

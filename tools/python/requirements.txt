@@ -56,6 +56,8 @@ numpy==2.1.1
     # via
     #   pandas
     #   yfinance
+nut2==2.1.0
+    # via -r tools/python/requirements.in
 nvidia-ml-py==12.560.30
     # via -r tools/python/requirements.in
 outcome==1.3.0.post0
