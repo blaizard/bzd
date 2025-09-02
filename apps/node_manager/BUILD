@@ -30,7 +30,7 @@ py_binary(
         "@bzd_python//bzd/http:client",
         "@bzd_python//bzd/sync:singleton",
         "@bzd_python//bzd/utils:scheduler",
-    ] + requirement("psutil") + requirement("nvidia-ml-py") + requirement("nut2"),
+    ] + requirement("psutil") + requirement("nvidia-ml-py"),
 )
 
 bzd_config(

@@ -9,7 +9,7 @@ from dataclasses import dataclass
 class UPSClient:
 	hostname: str = "127.0.0.1"
 	port: int = 3493
-	login: typing.Optional[str] = None
+	username: typing.Optional[str] = None
 	password: typing.Optional[str] = None
 
 
@@ -76,4 +76,6 @@ class Config:
 	def ups(self) -> typing.Dict[str, UPSClient]:
 		"""Get all the ups clients."""
 
-		return {name: UPSClient(**data) for name, data in self.config.get("ups", {}).items()}
+		ups = {name: UPSClient(**data) for name, data in self.config.get("ups", {}).items()}
+		# If not client is explicitly set, look if there is a default NUT server.
+		return ups if ups else {"": UPSClient()}
