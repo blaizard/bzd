@@ -14,4 +14,3 @@ webdriver-manager
 pillow
 rarfile
 pymupdf==1.26.0
-nut2==2.1.0

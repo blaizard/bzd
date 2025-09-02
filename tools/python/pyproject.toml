@@ -60,6 +60,5 @@ module = [
     "PIL.*",
     "rarfile.*",
     "pymupdf.*",
-    "nut2.*"
 ]
 ignore_errors = true
