@@ -69,10 +69,10 @@ class Docker:
 		"""
 
 		try:
-			cpuDelta = stats['cpu_stats']['cpu_usage']['total_usage'] - stats['precpu_stats']['cpu_usage']['total_usage']
-			systemDelta = stats['cpu_stats']['system_cpu_usage'] - stats['precpu_stats']['system_cpu_usage']
-			onlineCpus = len(stats['cpu_stats']['cpu_usage'].get('percpu_usage',
-			                                                     [])) or stats['cpu_stats']['online_cpus']
+			cpuDelta = stats["cpu_stats"]["cpu_usage"]["total_usage"] - stats["precpu_stats"]["cpu_usage"]["total_usage"]
+			systemDelta = stats["cpu_stats"]["system_cpu_usage"] - stats["precpu_stats"]["system_cpu_usage"]
+			onlineCpus = len(stats["cpu_stats"]["cpu_usage"].get("percpu_usage",
+			                                                     [])) or stats["cpu_stats"]["online_cpus"]
 			cpuUsage = cpuDelta / systemDelta
 			cpuPercentages = []
 
@@ -99,8 +99,8 @@ class Docker:
 		"""
 
 		try:
-			memoryUsage = stats['memory_stats']['usage'] - stats['memory_stats']['stats'].get('cache', 0)
-			memoryTotal = stats['memory_stats']['limit']
+			memoryUsage = stats["memory_stats"]["usage"] - stats["memory_stats"]["stats"].get("cache", 0)
+			memoryTotal = stats["memory_stats"]["limit"]
 
 			return {"ram": {"used": memoryUsage, "total": memoryTotal}}
 
@@ -119,13 +119,17 @@ class Docker:
 
 		dataWithRates = {}
 		for name, rate in data.items():
-			previousDataRates = previousData.get(name, {})
-			dataWithRates[name] = {
-			    "in":
-			        ((rate["in"] - previousDataRates.get("in", rate["in"])) / diffTimestampS) if diffTimestampS else 0,
-			    "out": ((rate["out"] - previousDataRates.get("out", rate["out"])) /
-			            diffTimestampS) if diffTimestampS else 0,
-			}
+			if diffTimestampS < 0.01:
+				dataWithRates[name] = {
+				    "in": 0,
+				    "out": 0,
+				}
+			else:
+				previousDataRates = previousData.get(name, {})
+				dataWithRates[name] = {
+				    "in": ((rate["in"] - previousDataRates.get("in", rate["in"])) / diffTimestampS),
+				    "out": ((rate["out"] - previousDataRates.get("out", rate["out"])) / diffTimestampS),
+				}
 			previousData[name] = rate
 
 		return dataWithRates
@@ -147,10 +151,10 @@ class Docker:
 			# This can be None.
 			if stats["blkio_stats"]["io_service_bytes_recursive"]:
 				for entry in stats["blkio_stats"]["io_service_bytes_recursive"]:
-					if entry['op'] == 'read':
-						readBytes += entry['value']
-					elif entry['op'] == 'write':
-						writeBytes += entry['value']
+					if entry["op"] == 'read':
+						readBytes += entry["value"]
+					elif entry["op"] == "write":
+						writeBytes += entry["value"]
 
 				return self._returnRate(self.previousIO, {"block": {"in": writeBytes, "out": readBytes}})
 
@@ -171,9 +175,9 @@ class Docker:
 
 		try:
 			output = {}
-			for interface, data in stats['networks'].items():
-				rxBytes = data['rx_bytes']
-				txBytes = data['tx_bytes']
+			for interface, data in stats["networks"].items():
+				rxBytes = data["rx_bytes"]
+				txBytes = data["tx_bytes"]
 				output[interface] = {"in": rxBytes, "out": txBytes}
 			return self._returnRate(self.previousNetwork, output)
 
@@ -256,6 +260,7 @@ if __name__ == "__main__":
 	                    type=pathlib.Path,
 	                    default=pathlib.Path("/run/user/1000/docker.sock"),
 	                    help="Docker socket to connect to the docker daemon.")
+	parser.add_argument("--measure-time", type=float, default=None, help="Measure for x seconds.")
 	parser.add_argument(
 	    "uid",
 	    nargs="?",
@@ -269,6 +274,9 @@ if __name__ == "__main__":
 	docker.getDockerData()
 
 	if args.uid is None:
+		if args.measure_time is not None:
+			docker.getDockerData()
+			time.sleep(args.measure_time)
 		data = docker.getDockerData()
 		print(json.dumps(data, indent=4))
 		sys.exit(0)
