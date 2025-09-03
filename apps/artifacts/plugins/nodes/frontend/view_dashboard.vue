@@ -4,12 +4,14 @@
 		<div class="components" v-loading="loading">
 			<template v-for="dashboard in dashboards">
 				<ViewGraph
+					v-if="dashboard.type == 'linear'"
 					:inputs="dashboardInputs(dashboard)"
 					:options="dashboard"
 					:timeRange="timeRange"
 					:class="dashboardClass(dashboard)"
 				>
 				</ViewGraph>
+				<div v-else>Unsupported graph type "{{ dashboard.type }}".</div>
 			</template>
 		</div>
 	</div>

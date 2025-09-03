@@ -59,6 +59,9 @@
 						point: {
 							radius: 1,
 						},
+						line: {
+							borderWidth: 2,
+						},
 					},
 					plugins: {
 						title: {
