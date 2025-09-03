@@ -178,6 +178,6 @@ class UPS:
 		for name, data in self.clients.items():
 			with data["client"].connect() as accessor:
 				for ups in data["devices"]:
-					batteries[f"{name}.{ups}"] = float(accessor.get(ups, "battery.charge")) / 100.
+					batteries[f"{name}.{ups}" if name else ups] = float(accessor.get(ups, "battery.charge")) / 100.
 
 		return batteries if batteries else None
