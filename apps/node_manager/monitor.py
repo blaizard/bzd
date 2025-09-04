@@ -93,30 +93,39 @@ class Monitor:
 
 		# Calculate the time diff in seconds from the previous run.
 		timestampS = time.time()
-		timestampDiffS = timestampS - self.networkPrevious.get("_timestampS", time.time())
+		timestampDiffS = timestampS - self.networkPrevious.get("_timestampS", timestampS)
 		self.networkPrevious["_timestampS"] = timestampS
 
+		# Only consider interfaces that are UP and the ones that are not loopback.
+		statsAll = psutil.net_if_stats()  # type: ignore
+		validInterfaces = {
+		    interface
+		    for interface, stats in statsAll.items() if stats.isup and "loopback" not in stats.flags.lower()
+		}
+
+		# Get the stats
 		netStat = psutil.net_io_counters(pernic=True, nowrap=True)  # type: ignore
 		network = {}
 		for name, snetio in netStat.items():
-			self.networkPrevious.setdefault(name, {})
-			diffIn = snetio.bytes_recv - self.networkPrevious[name].get("in", snetio.bytes_recv)
-			diffOut = snetio.bytes_sent - self.networkPrevious[name].get("out", snetio.bytes_sent)
-			self.networkPrevious[name] = {
-			    "in": snetio.bytes_recv,
-			    "out": snetio.bytes_sent,
-			}
-			network[name] = {
-			    "in": (diffIn / timestampDiffS) if timestampDiffS else 0,
-			    "out": (diffOut / timestampDiffS) if timestampDiffS else 0
-			}
+			if name in validInterfaces:
+				self.networkPrevious.setdefault(name, {})
+				diffIn = snetio.bytes_recv - self.networkPrevious[name].get("in", snetio.bytes_recv)
+				diffOut = snetio.bytes_sent - self.networkPrevious[name].get("out", snetio.bytes_sent)
+				self.networkPrevious[name] = {
+				    "in": snetio.bytes_recv,
+				    "out": snetio.bytes_sent,
+				}
+				network[name] = {
+				    "in": (diffIn / timestampDiffS) if timestampDiffS > 0.01 else 0,
+				    "out": (diffOut / timestampDiffS) if timestampDiffS > 0.01 else 0
+				}
 		return network
 
 	def io(self) -> typing.Any:
 
 		# Calculate the time diff in seconds from the previous run.
 		timestampS = time.time()
-		timestampDiffS = timestampS - self.ioPrevious.get("_timestampS", time.time())
+		timestampDiffS = timestampS - self.ioPrevious.get("_timestampS", timestampS)
 		self.ioPrevious["_timestampS"] = timestampS
 
 		ioStat = psutil.disk_io_counters(perdisk=True, nowrap=True)  # type: ignore
@@ -130,8 +139,8 @@ class Monitor:
 			    "out": sdiskio.read_bytes,
 			}
 			io[name] = {
-			    "in": (diffIn / timestampDiffS) if timestampDiffS else 0,
-			    "out": (diffOut / timestampDiffS) if timestampDiffS else 0
+			    "in": (diffIn / timestampDiffS) if timestampDiffS > 0.01 else 0,
+			    "out": (diffOut / timestampDiffS) if timestampDiffS > 0.01 else 0
 			}
 		return io
 
