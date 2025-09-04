@@ -53,6 +53,7 @@ export class Node {
 	///
 	/// \param key The key to locate the data to be returned.
 	/// \param metadata Whether metadata should be returned or not.
+	///        It true, a tuple of (timestamp, value, isValid) is returned.
 	///        If false, the raw value is returned.
 	/// \param children The level of nested children to be added to the result.
 	/// \param count Maximal number of values to be returned per entry.

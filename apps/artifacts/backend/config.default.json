@@ -192,6 +192,16 @@
                 },
                 {
                     "inputs": {
+                        "/data/battery/{name}": {}
+                    },
+                    "max": 1,
+                    "min": 0,
+                    "title": "Battery {name}",
+                    "type": "linear",
+                    "unit": "percent"
+                },
+                {
+                    "inputs": {
                         "/data/temperature/{name}": {}
                     },
                     "min": 0,

@@ -1,5 +1,6 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import Data from "#bzd/apps/artifacts/plugins/nodes/data.mjs";
+import Utils from "#bzd/apps/artifacts/common/utils.mjs";
 
 const Exception = ExceptionFactory("test", "artifacts", "plugins", "data");
 
@@ -18,6 +19,8 @@ describe("Nodes", () => {
 			]);
 			// Insert child entry of another leaf.
 			await data.insert("hello", [[["a", "b", "d"], -3]]);
+			// Insert expired data.
+			await data.insert("hello", [[["a", "d", "expired"], 42]], 10);
 
 			// get w/no options.
 			{
@@ -46,6 +49,16 @@ describe("Nodes", () => {
 				Exception.assert(result.hasValue());
 				Exception.assert(typeof result.value()[0] == "number");
 				Exception.assertEqual(result.value()[1], 12);
+				Exception.assertEqual(result.value()[2], 1); // not expired
+			}
+
+			// get w/metadata expired
+			{
+				const result = await data.get({ uid: "hello", key: ["a", "d", "expired"], metadata: true });
+				Exception.assert(result.hasValue());
+				Exception.assert(typeof result.value()[0] == "number");
+				Exception.assertEqual(result.value()[1], 42);
+				Exception.assertEqual(result.value()[2], 0); // expired
 			}
 
 			// get w/children
@@ -134,11 +147,12 @@ describe("Nodes", () => {
 
 		it("timestamp", async () => {
 			const data = new Data();
+			const timestamp = Utils.timestampMs();
 
-			await data.insert("hello", [[["a", "b"], 1]], 1);
-			await data.insert("hello", [[["a", "b"], 10]], 10);
-			await data.insert("hello", [[["a", "b"], 2]], 2);
-			await data.insert("hello", [[["a", "b"], 0]], 0);
+			await data.insert("hello", [[["a", "b"], 1]], timestamp - 2);
+			await data.insert("hello", [[["a", "b"], 10]], timestamp);
+			await data.insert("hello", [[["a", "b"], 2]], timestamp - 1);
+			await data.insert("hello", [[["a", "b"], 0]], timestamp - 3);
 
 			// read all
 			{
@@ -149,44 +163,70 @@ describe("Nodes", () => {
 
 			// read all after 2
 			{
-				const result = await data.get({ uid: "hello", key: ["a", "b"], count: 10, after: 2 });
+				const result = await data.get({ uid: "hello", key: ["a", "b"], count: 10, after: timestamp - 1 });
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), [10]);
 			}
 
 			// read 2 entries after 2
 			{
-				const result = await data.get({ uid: "hello", key: ["a", "b"], count: 2, after: 0 });
+				const result = await data.get({ uid: "hello", key: ["a", "b"], count: 2, after: timestamp - 3 });
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), [2, 1]);
 			}
 
 			// read all entries after 10
 			{
-				const result = await data.get({ uid: "hello", key: ["a", "b"], count: 10, after: 10 });
+				const result = await data.get({ uid: "hello", key: ["a", "b"], count: 10, after: timestamp });
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), []);
 			}
 
 			// read all before 2
 			{
-				const result = await data.get({ uid: "hello", key: ["a", "b"], count: 10, before: 2 });
+				const result = await data.get({ uid: "hello", key: ["a", "b"], count: 10, before: timestamp - 1 });
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), [1, 0]);
 			}
 
 			// read 2 entries before 10
 			{
-				const result = await data.get({ uid: "hello", key: ["a", "b"], count: 2, before: 10 });
+				const result = await data.get({ uid: "hello", key: ["a", "b"], count: 2, before: timestamp });
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), [2, 1]);
 			}
 
 			// read all entries before 0
 			{
-				const result = await data.get({ uid: "hello", key: ["a", "b"], count: 10, before: 0 });
+				const result = await data.get({ uid: "hello", key: ["a", "b"], count: 10, before: timestamp - 3 });
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), []);
+			}
+		});
+
+		it("expired", async () => {
+			const data = new Data();
+			const timestamp = Utils.timestampMs();
+			const expiredTimestamp = timestamp - 1000 * 1000;
+
+			await data.insert("hello", [[["a", "b"], 1]], timestamp);
+			await data.insert("hello", [[["a", "b"], 10]], expiredTimestamp);
+
+			// read all w/o metadata
+			{
+				const result = await data.get({ uid: "hello", key: ["a", "b"], count: 10 });
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value(), [1]);
+			}
+
+			// read all w/metadata
+			{
+				const result = await data.get({ uid: "hello", key: ["a", "b"], count: 10, metadata: true });
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value(), [
+					[timestamp, 1, 1],
+					[expiredTimestamp, 10, 0],
+				]);
 			}
 		});
 
@@ -281,16 +321,17 @@ describe("Nodes", () => {
 					return externalData;
 				},
 			});
+			const timestamp = Utils.timestampMs();
 
-			await data.insert("hello", [[["a"], 1]], 1);
-			await data.insert("hello", [[["a"], 2]], 2);
-			await data.insert("hello", [[["a"], 3]], 3);
-			await data.insert("hello", [[["a"], 4]], 4);
-			await data.insert("hello", [[["a"], 5]], 5);
+			await data.insert("hello", [[["a"], 1]], timestamp + 1);
+			await data.insert("hello", [[["a"], 2]], timestamp + 2);
+			await data.insert("hello", [[["a"], 3]], timestamp + 3);
+			await data.insert("hello", [[["a"], 4]], timestamp + 4);
+			await data.insert("hello", [[["a"], 5]], timestamp + 5);
 
 			{
 				useExternal = false;
-				const result = await data.get({ uid: "hello", key: ["a"], after: 1, count: 5 });
+				const result = await data.get({ uid: "hello", key: ["a"], after: timestamp + 1, count: 5 });
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), [5, 4, 3, 2]);
 				Exception.assert(!useExternal);
@@ -299,7 +340,7 @@ describe("Nodes", () => {
 			{
 				useExternal = false;
 				externalData = [];
-				const result = await data.get({ uid: "hello", key: ["a"], after: 0, count: 5 });
+				const result = await data.get({ uid: "hello", key: ["a"], after: timestamp, count: 5 });
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), [5, 4, 3, 2, 1]);
 				Exception.assert(useExternal);
@@ -307,8 +348,8 @@ describe("Nodes", () => {
 
 			{
 				useExternal = false;
-				externalData = [[0, 0]];
-				const result = await data.get({ uid: "hello", key: ["a"], after: -1, count: 5 });
+				externalData = [[timestamp, 0]];
+				const result = await data.get({ uid: "hello", key: ["a"], after: timestamp - 1, count: 5 });
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), [4, 3, 2, 1, 0]);
 				Exception.assert(useExternal);
@@ -317,10 +358,10 @@ describe("Nodes", () => {
 			{
 				useExternal = false;
 				externalData = [
-					[0.5, 0.5],
-					[0, 0],
+					[timestamp + 0.5, 0.5],
+					[timestamp, 0],
 				];
-				const result = await data.get({ uid: "hello", key: ["a"], after: -1, count: 5 });
+				const result = await data.get({ uid: "hello", key: ["a"], after: timestamp - 1, count: 5 });
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), [3, 2, 1, 0.5, 0]);
 				Exception.assert(useExternal);
@@ -331,11 +372,11 @@ describe("Nodes", () => {
 
 				useExternal = false;
 				externalData = [
-					[1, 1],
-					[0.5, 0.5],
-					[0, 0],
+					[timestamp + 1, 1],
+					[timestamp + 0.5, 0.5],
+					[timestamp, 0],
 				];
-				const result = await data.get({ uid: "hello", key: ["a"], after: -1, count: 5 });
+				const result = await data.get({ uid: "hello", key: ["a"], after: timestamp - 1, count: 5 });
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), [3, 2, 1, 0.5, 0]);
 				Exception.assert(useExternal);
@@ -344,7 +385,7 @@ describe("Nodes", () => {
 			{
 				useExternal = false;
 				externalData = null;
-				const result = await data.get({ uid: "hello", key: ["b"], after: 2, count: 5 });
+				const result = await data.get({ uid: "hello", key: ["b"], after: timestamp + 2, count: 5 });
 				Exception.assert(!result.hasValue());
 				Exception.assert(useExternal);
 			}
@@ -352,7 +393,7 @@ describe("Nodes", () => {
 			{
 				useExternal = false;
 				externalData = null;
-				const result = await data.get({ uid: "world", key: ["a"], after: 2, count: 5 });
+				const result = await data.get({ uid: "world", key: ["a"], after: timestamp + 2, count: 5 });
 				Exception.assert(!result.hasValue());
 				Exception.assert(useExternal);
 			}
@@ -367,16 +408,17 @@ describe("Nodes", () => {
 					return externalData === null ? null : externalData.slice(0, count);
 				},
 			});
+			const timestamp = Utils.timestampMs();
 
-			await data.insert("hello", [[["a"], 1]], 1);
-			await data.insert("hello", [[["a"], 2]], 2);
-			await data.insert("hello", [[["a"], 3]], 3);
-			await data.insert("hello", [[["a"], 4]], 4);
-			await data.insert("hello", [[["a"], 5]], 5);
+			await data.insert("hello", [[["a"], 1]], timestamp + 1);
+			await data.insert("hello", [[["a"], 2]], timestamp + 2);
+			await data.insert("hello", [[["a"], 3]], timestamp + 3);
+			await data.insert("hello", [[["a"], 4]], timestamp + 4);
+			await data.insert("hello", [[["a"], 5]], timestamp + 5);
 
 			{
 				useExternal = false;
-				const result = await data.get({ uid: "hello", key: ["a"], before: 10, count: 5 });
+				const result = await data.get({ uid: "hello", key: ["a"], before: timestamp + 10, count: 5 });
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), [5, 4, 3, 2, 1]);
 				Exception.assert(!useExternal);
@@ -385,7 +427,7 @@ describe("Nodes", () => {
 			{
 				useExternal = false;
 				externalData = [];
-				const result = await data.get({ uid: "hello", key: ["a"], before: 5, count: 5 });
+				const result = await data.get({ uid: "hello", key: ["a"], before: timestamp + 5, count: 5 });
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), [4, 3, 2, 1]);
 				Exception.assert(useExternal);
@@ -393,8 +435,8 @@ describe("Nodes", () => {
 
 			{
 				useExternal = false;
-				externalData = [[0, 0]];
-				const result = await data.get({ uid: "hello", key: ["a"], before: 5, count: 5 });
+				externalData = [[timestamp, 0]];
+				const result = await data.get({ uid: "hello", key: ["a"], before: timestamp + 5, count: 5 });
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), [4, 3, 2, 1, 0]);
 				Exception.assert(useExternal);
@@ -403,12 +445,12 @@ describe("Nodes", () => {
 			{
 				useExternal = false;
 				externalData = [
-					[0.5, 0.5],
-					[0, 0],
-					[-1, -1],
-					[-2, -2],
+					[timestamp + 0.5, 0.5],
+					[timestamp, 0],
+					[timestamp - 1, -1],
+					[timestamp - 2, -2],
 				];
-				const result = await data.get({ uid: "hello", key: ["a"], before: 2, count: 3 });
+				const result = await data.get({ uid: "hello", key: ["a"], before: timestamp + 2, count: 3 });
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), [1, 0.5, 0]);
 				Exception.assert(useExternal);
@@ -417,10 +459,10 @@ describe("Nodes", () => {
 			{
 				useExternal = false;
 				externalData = [
-					[-2, -2],
-					[-3, -3],
+					[timestamp - 2, -2],
+					[timestamp - 3, -3],
 				];
-				const result = await data.get({ uid: "hello", key: ["a"], before: -1, count: 5 });
+				const result = await data.get({ uid: "hello", key: ["a"], before: timestamp - 1, count: 5 });
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), [-2, -3]);
 				Exception.assert(useExternal);
@@ -429,10 +471,10 @@ describe("Nodes", () => {
 			{
 				useExternal = false;
 				externalData = [
-					[0, 0],
-					[-1, -1],
+					[timestamp, 0],
+					[timestamp - 1, -1],
 				];
-				const result = await data.get({ uid: "hello", key: ["a"], before: 2, count: 5 });
+				const result = await data.get({ uid: "hello", key: ["a"], before: timestamp + 2, count: 5 });
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), [1, 0, -1]);
 				Exception.assert(useExternal);
@@ -441,7 +483,7 @@ describe("Nodes", () => {
 			{
 				useExternal = false;
 				externalData = null;
-				const result = await data.get({ uid: "hello", key: ["b"], before: 2, count: 5 });
+				const result = await data.get({ uid: "hello", key: ["b"], before: timestamp + 2, count: 5 });
 				Exception.assert(!result.hasValue());
 				Exception.assert(useExternal);
 			}
@@ -449,7 +491,7 @@ describe("Nodes", () => {
 			{
 				useExternal = false;
 				externalData = null;
-				const result = await data.get({ uid: "world", key: ["a"], before: 2, count: 5 });
+				const result = await data.get({ uid: "world", key: ["a"], before: timestamp + 2, count: 5 });
 				Exception.assert(!result.hasValue());
 				Exception.assert(useExternal);
 			}
@@ -464,18 +506,25 @@ describe("Nodes", () => {
 					return externalData === null ? null : externalData.slice(0, count);
 				},
 			});
+			const timestamp = Utils.timestampMs();
 
-			await data.insert("hello", [[["a"], 1]], 1);
-			await data.insert("hello", [[["a"], 2]], 2);
-			await data.insert("hello", [[["a"], 3]], 3);
-			await data.insert("hello", [[["a"], 4]], 4);
-			await data.insert("hello", [[["a"], 5]], 5);
+			await data.insert("hello", [[["a"], 1]], timestamp + 1);
+			await data.insert("hello", [[["a"], 2]], timestamp + 2);
+			await data.insert("hello", [[["a"], 3]], timestamp + 3);
+			await data.insert("hello", [[["a"], 4]], timestamp + 4);
+			await data.insert("hello", [[["a"], 5]], timestamp + 5);
 
 			// ask :  [ ]
 			// data: [ local ][ extern ]
 			{
 				useExternal = false;
-				const result = await data.get({ uid: "hello", key: ["a"], before: 5, after: 2, count: 5 });
+				const result = await data.get({
+					uid: "hello",
+					key: ["a"],
+					before: timestamp + 5,
+					after: timestamp + 2,
+					count: 5,
+				});
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), [4, 3]);
 				Exception.assert(!useExternal);
@@ -485,7 +534,13 @@ describe("Nodes", () => {
 			// data:    [ local ][ extern ]
 			{
 				useExternal = false;
-				const result = await data.get({ uid: "hello", key: ["a"], before: 10, after: 5, count: 5 });
+				const result = await data.get({
+					uid: "hello",
+					key: ["a"],
+					before: timestamp + 10,
+					after: timestamp + 5,
+					count: 5,
+				});
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), []);
 				Exception.assert(!useExternal);
@@ -495,7 +550,13 @@ describe("Nodes", () => {
 			// data:   [ local ][ extern ]
 			{
 				useExternal = false;
-				const result = await data.get({ uid: "hello", key: ["a"], before: 9, after: 3, count: 5 });
+				const result = await data.get({
+					uid: "hello",
+					key: ["a"],
+					before: timestamp + 9,
+					after: timestamp + 3,
+					count: 5,
+				});
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), [5, 4]);
 				Exception.assert(!useExternal);
@@ -506,10 +567,10 @@ describe("Nodes", () => {
 			{
 				useExternal = false;
 				externalData = [
-					[-1, -1],
-					[-2, -2],
+					[timestamp - 1, -1],
+					[timestamp - 2, -2],
 				];
-				const result = await data.get({ uid: "hello", key: ["a"], before: 0, after: -3, count: 5 });
+				const result = await data.get({ uid: "hello", key: ["a"], before: timestamp, after: timestamp - 3, count: 5 });
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), [-1, -2]);
 				Exception.assert(useExternal);
@@ -520,11 +581,17 @@ describe("Nodes", () => {
 			{
 				useExternal = false;
 				externalData = [
-					[0, 0],
-					[-1, -1],
-					[-2, -2],
+					[timestamp, 0],
+					[timestamp - 1, -1],
+					[timestamp - 2, -2],
 				];
-				const result = await data.get({ uid: "hello", key: ["a"], before: 2, after: -3, count: 4 });
+				const result = await data.get({
+					uid: "hello",
+					key: ["a"],
+					before: timestamp + 2,
+					after: timestamp - 3,
+					count: 4,
+				});
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), [1, 0, -1, -2]);
 				Exception.assert(useExternal);
@@ -536,10 +603,16 @@ describe("Nodes", () => {
 			{
 				useExternal = false;
 				externalData = [
-					[0, 0],
-					[-2, -2],
+					[timestamp, 0],
+					[timestamp - 2, -2],
 				];
-				const result = await data.get({ uid: "hello", key: ["a"], before: 4, after: -3, count: 4 });
+				const result = await data.get({
+					uid: "hello",
+					key: ["a"],
+					before: timestamp + 4,
+					after: timestamp - 3,
+					count: 4,
+				});
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), [3, 1, 0, -2]);
 				Exception.assert(useExternal);
@@ -551,10 +624,16 @@ describe("Nodes", () => {
 			{
 				useExternal = false;
 				externalData = [
-					[0, 0],
-					[-2, -2],
+					[timestamp, 0],
+					[timestamp - 2, -2],
 				];
-				const result = await data.get({ uid: "hello", key: ["a"], before: 4, after: -3, count: 10 });
+				const result = await data.get({
+					uid: "hello",
+					key: ["a"],
+					before: timestamp + 4,
+					after: timestamp - 3,
+					count: 10,
+				});
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), [3, 2, 1, 0, -2]);
 				Exception.assert(useExternal);
@@ -566,10 +645,16 @@ describe("Nodes", () => {
 			{
 				useExternal = false;
 				externalData = [
-					[0, 0],
-					[-2, -2],
+					[timestamp, 0],
+					[timestamp - 2, -2],
 				];
-				const result = await data.get({ uid: "hello", key: ["a"], before: 2, after: -3, count: 2 });
+				const result = await data.get({
+					uid: "hello",
+					key: ["a"],
+					before: timestamp + 2,
+					after: timestamp - 3,
+					count: 2,
+				});
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), [1, 0]);
 				Exception.assert(useExternal);

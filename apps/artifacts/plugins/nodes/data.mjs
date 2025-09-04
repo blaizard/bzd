@@ -23,6 +23,8 @@ export default class Data {
 				external: (uid, internal, count, after, before) => {
 					return null;
 				},
+				/// Default expiring time for any values, will be adjusted over time.
+				defaultExpires: 60 * 1000,
 			},
 			options,
 		);
@@ -135,8 +137,6 @@ export default class Data {
 	/// \return An array of tuple, containing the timestamps and their corresponding value.
 	///         Or null, if there is reference to this data (wrong uid/internal).
 	async getWithMetadata_({ uid, key, value, count, after = null, before = null, sampling = null }) {
-		const data = this.storage[uid] || {};
-
 		// If there is data locally.
 		if (value && value.length) {
 			if (after !== null && before !== null) {
@@ -267,17 +267,21 @@ export default class Data {
 		include = null,
 		sampling = null,
 	}) {
-		const valuesToResult = (values) => {
-			values = values.map(([t, v]) => {
-				if (metadata) {
-					return [t, v];
-				}
-				return v;
-			});
-			return count === null ? values[0] : values;
-		};
-
 		const data = this.storage[uid] || {};
+
+		const valuesToResult = (internal, values) => {
+			const expiredTimestampMs = Utils.timestampMs() - (data[internal]?.expires ?? this.options.defaultExpires);
+			if (metadata) {
+				return values.map(([t, v]) => {
+					return [t, v, t > expiredTimestampMs ? 1 : 0];
+				});
+			}
+			return values
+				.filter(([t, _]) => t > expiredTimestampMs)
+				.map(([_, v]) => {
+					return v;
+				});
+		};
 
 		// Get the list of keys.
 		if (children || include) {
@@ -307,7 +311,7 @@ export default class Data {
 						this.getWithMetadata_({
 							uid,
 							key: child.key,
-							value: data[child.internal],
+							value: data[child.internal]?.values,
 							count: count || 1,
 							after,
 							before,
@@ -321,7 +325,10 @@ export default class Data {
 						const values = valuesWithMetadata[index];
 						// Filter out entries that are empty.
 						if (values && values.length) {
-							return [child.key.slice(key.length), valuesToResult(values)];
+							const result = valuesToResult(child.internal, values);
+							if (result.length) {
+								return [child.key.slice(key.length), count === null ? result[0] : result];
+							}
 						}
 						return null;
 					})
@@ -336,14 +343,15 @@ export default class Data {
 			const values = await this.getWithMetadata_({
 				uid,
 				key,
-				value: data[internal],
+				value: data[internal]?.values,
 				count: count || 1,
 				after,
 				before,
 				sampling,
 			});
 			if (values !== null) {
-				return new Optional(valuesToResult(values));
+				const result = valuesToResult(internal, values);
+				return new Optional(count === null ? result[0] : result);
 			}
 		}
 
@@ -375,22 +383,25 @@ export default class Data {
 			const internal = KeyMapping.keyToInternal(key);
 			let index = 0;
 			if (!(internal in data)) {
-				data[internal] = [];
+				data[internal] = {
+					expires: this.options.defaultExpires,
+					values: [],
+				};
 				this.tree.setDirty(uid);
 			}
 			// If the timestamp of the last entry added is newer than the current one.
-			else if (data[internal][0][0] > timestamp) {
-				index = data[internal].findIndex((d) => d[0] <= timestamp);
+			else if (data[internal].values[0][0] > timestamp) {
+				index = data[internal].values.findIndex((d) => d[0] <= timestamp);
 				if (index == -1) {
-					index = data[internal].length;
+					index = data[internal].values.length;
 				}
 			}
 			// Prepend the new value and the timestamp to the values array.
 			// And ensure there are maximum X elements.
 			// Insert "internal" -> [timestamp, value]
-			data[internal].splice(index, 0, [timestamp, value]);
-			while (data[internal].length > config.history) {
-				data[internal].pop();
+			data[internal].values.splice(index, 0, [timestamp, value]);
+			while (data[internal].values.length > config.history) {
+				data[internal].values.pop();
 			}
 		}
 
