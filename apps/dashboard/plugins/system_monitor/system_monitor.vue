@@ -70,6 +70,9 @@
 	import Gauge from "#bzd/apps/dashboard/plugins/system_monitor/gauge.vue";
 	import GaugeRate from "#bzd/apps/dashboard/plugins/system_monitor/gauge_rate.vue";
 	import Text from "#bzd/apps/dashboard/plugins/system_monitor/text.vue";
+	import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
+
+	const Exception = ExceptionFactory("plugin", "system_monitor");
 
 	export default {
 		props: {
@@ -294,15 +297,19 @@
 				return Object.keys(map).length === 0;
 			},
 			maxArray(array) {
+				Exception.assert(Array.isArray(array), "Not an array: {:j}", array);
 				return array.reduce((m, v) => Math.max(m, v), -Infinity);
 			},
 			minArray(array) {
+				Exception.assert(Array.isArray(array), "Not an array: {:j}", array);
 				return array.reduce((m, v) => Math.min(m, v), Infinity);
 			},
 			sumArray(array) {
+				Exception.assert(Array.isArray(array), "Not an array: {:j}", array);
 				return array.reduce((a, b) => a + b, 0);
 			},
 			avgArray(array) {
+				Exception.assert(Array.isArray(array), "Not an array: {:j}", array);
 				return this.sumArray(array) / array.length;
 			},
 			formatBytesRate(rate) {

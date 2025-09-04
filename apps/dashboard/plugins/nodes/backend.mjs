@@ -44,7 +44,6 @@ export default class Nodes {
 						["version"],
 						["uptime"],
 					],
-					metadata: true,
 				});
 
 				if (result.data.length == 0) {
@@ -81,23 +80,17 @@ export default class Nodes {
 
 	/// Merge similar nodes together and keep the ones with the newest timestamp.
 	mergeAndFormatNodes(listOfNodes) {
+		// Merge similar nodes (needed when the same node is on 2 different remote for example).
 		let clusters = {};
-		// Merge similar nodes.
 		for (const { key, data } of listOfNodes) {
 			clusters[key] ??= [];
 			clusters[key] = clusters[key].concat(data);
 		}
-		// Sort by timestamp.
-		const sortedTuple = Object.entries(clusters).map(([key, data]) => {
-			return [
-				key,
-				data
-					.sort(([key1, [t1, ...rest1]], [key2, [t2, ...rest2]]) => t1 - t2)
-					.map(([key, [t, ...rest]]) => [key, ...rest]),
-			];
-		});
+
 		// Set to tree and to list.
-		const formatted = sortedTuple.map(([key, data]) => Object.assign({ key: key }, Node.toTree(data)));
+		const formatted = Object.entries(clusters).map(([key, data]) => Object.assign({ key: key }, Node.toTree(data)));
+
+		// Sort to ensure node order consistency on the dashboard.
 		return formatted.sort((a, b) => a.key.localeCompare(b.key));
 	}
 
