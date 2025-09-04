@@ -23,8 +23,8 @@ export default class Data {
 				external: (uid, internal, count, after, before) => {
 					return null;
 				},
-				/// Default expiring time for any values, will be adjusted over time.
-				defaultExpires: 60 * 1000,
+				/// Initial expiring time for any values, will be adjusted over time.
+				initialExpires: 60 * 1000,
 			},
 			options,
 		);
@@ -270,7 +270,7 @@ export default class Data {
 		const data = this.storage[uid] || {};
 
 		const valuesToResult = (internal, values) => {
-			const expiredTimestampMs = Utils.timestampMs() - (data[internal]?.expires ?? this.options.defaultExpires);
+			const expiredTimestampMs = Utils.timestampMs() - (data[internal]?.expires ?? this.options.initialExpires);
 			if (metadata) {
 				return values.map(([t, v]) => {
 					return [t, v, t > expiredTimestampMs ? 1 : 0];
@@ -384,9 +384,11 @@ export default class Data {
 			let index = 0;
 			if (!(internal in data)) {
 				data[internal] = {
-					expires: this.options.defaultExpires,
+					expiresType: "auto",
+					expires: this.options.initialExpires,
 					values: [],
 				};
+
 				this.tree.setDirty(uid);
 			}
 			// If the timestamp of the last entry added is newer than the current one.
@@ -396,6 +398,13 @@ export default class Data {
 					index = data[internal].values.length;
 				}
 			}
+			// The new samples is newer than the last one and it exists.
+			else if (data[internal].expiresType == "auto") {
+				// Estimate the rate and estimate the expiration rate.
+				const expiresEstimate = (timestamp - data[internal].values[0][0]) * 3;
+				data[internal].expires = 0.4 * data[internal].expires + (1 - 0.4) * expiresEstimate;
+			}
+
 			// Prepend the new value and the timestamp to the values array.
 			// And ensure there are maximum X elements.
 			// Insert "internal" -> [timestamp, value]

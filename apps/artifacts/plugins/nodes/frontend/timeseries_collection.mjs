@@ -87,7 +87,7 @@ export default class TimeseriesCollection {
 			const deleteCount = indexEnd === -1 || indexEnd < indexStart ? 0 : indexEnd - indexStart + 1;
 
 			// Use splice to remove the old range and insert the new chunk.
-			data.splice(deleteFrom, deleteCount, ...collectionNewData);
+			data.splice(deleteFrom, deleteCount, ...collectionNewData.map(([t, v, ..._]) => [t, v]));
 
 			// Adjust the data based on the range, keep the last samples always.
 			this._updateLimits(collection);
