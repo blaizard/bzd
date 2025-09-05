@@ -11,6 +11,11 @@
 				<span class="value">{{ temperatures.max }}°C</span>
 			</span>
 
+			<span v-if="uptime" class="entry" v-tooltip="uptime.tooltip">
+				<i class="bzd-icon-clock"></i>
+				<span class="value">{{ uptime.text }}</span>
+			</span>
+
 			<span
 				v-if="!isMapEmpty(metadata.battery || {})"
 				class="entry"
@@ -18,11 +23,6 @@
 			>
 				<i class="bzd-icon-battery"></i>
 				<span class="value">{{ (batteries.min * 100).toFixed(1) }}%</span>
-			</span>
-
-			<span v-if="uptime" class="entry" v-tooltip="uptime.tooltip">
-				<i class="bzd-icon-clock"></i>
-				<span class="value">{{ uptime.text }}</span>
 			</span>
 		</div>
 
@@ -52,11 +52,11 @@
 				policy="average"
 				v-tooltip="makeTooltipMulti('Disk', disks.tooltips)"
 			></Gauge>
-			<GaugeRate name="IO" :input="ios.rates" policy="sum" v-tooltip="makeTooltipMulti('IO', ios.tooltips)"></GaugeRate>
+			<GaugeRate name="IO" :input="ios.rates" policy="max" v-tooltip="makeTooltipMulti('IO', ios.tooltips)"></GaugeRate>
 			<GaugeRate
 				name="NETWORK"
 				:input="networks.rates"
-				policy="sum"
+				policy="max"
 				v-tooltip="makeTooltipMulti('Network', networks.tooltips)"
 			></GaugeRate>
 			<Text name="VERSION" :input="versions.values" v-tooltip="makeTooltipMulti('Version', versions.tooltips)"></Text>
