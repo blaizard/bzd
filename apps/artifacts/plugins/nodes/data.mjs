@@ -20,11 +20,14 @@ export default class Data {
 				/// The cache instance to be used.
 				cache: new Cache2(),
 				/// The external source to fetch if data is missing locally.
-				external: (uid, internal, count, after, before) => {
+				external: (uid, key, count, after, before) => {
 					return null;
 				},
-				/// Initial expiring time for any values, will be adjusted over time.
-				initialExpires: 60 * 1000,
+				/// The timeout in milliseconds of a value at the given uid / key.
+				/// If null is returned, it will be calculated automatically.
+				timeout: (uid, key) => {
+					return null;
+				},
 			},
 			options,
 		);
@@ -57,6 +60,21 @@ export default class Data {
 	/// List all available keys
 	async list() {
 		return Object.keys(this.storage);
+	}
+
+	/// Helper to access an internal value.
+	getDataInternal_(uid, key, internal) {
+		this.storage[uid] ??= {};
+		if (!(internal in this.storage[uid])) {
+			const timeout = this.options.timeout(uid, key);
+			this.storage[uid][internal] = {
+				expiresType: timeout === null ? "auto" : "manual",
+				expires: timeout === null ? 60 * 1000 : timeout,
+				values: [],
+			};
+			this.tree.setDirty(uid);
+		}
+		return this.storage[uid][internal];
 	}
 
 	/// Get the tree at a given key.
@@ -269,8 +287,8 @@ export default class Data {
 	}) {
 		const data = this.storage[uid] || {};
 
-		const valuesToResult = (internal, values) => {
-			const expiredTimestampMs = Utils.timestampMs() - (data[internal]?.expires ?? this.options.initialExpires);
+		const valuesToResult = (key, internal, values) => {
+			const expiredTimestampMs = Utils.timestampMs() - this.getDataInternal_(uid, key, internal).expires;
 			if (metadata) {
 				return values.map(([t, v]) => {
 					return [t, v, t > expiredTimestampMs ? 1 : 0];
@@ -325,7 +343,7 @@ export default class Data {
 						const values = valuesWithMetadata[index];
 						// Filter out entries that are empty.
 						if (values && values.length) {
-							const result = valuesToResult(child.internal, values);
+							const result = valuesToResult(child.key, child.internal, values);
 							if (result.length) {
 								return [child.key.slice(key.length), count === null ? result[0] : result];
 							}
@@ -350,7 +368,7 @@ export default class Data {
 				sampling,
 			});
 			if (values !== null) {
-				const result = valuesToResult(internal, values);
+				const result = valuesToResult(key, internal, values);
 				return new Optional(count === null ? result[0] : result);
 			}
 		}
@@ -367,8 +385,6 @@ export default class Data {
 	/// \return The timestamp actually written.
 	async insert(uid, fragments, timestamp = null) {
 		timestamp = timestamp === null ? Utils.timestampMs() : timestamp;
-		this.storage[uid] ??= {};
-		let data = this.storage[uid];
 
 		// Identify the path of the fragments and their values.
 		for (const [key, value, options] of fragments) {
@@ -380,37 +396,31 @@ export default class Data {
 				options,
 			);
 
-			const internal = KeyMapping.keyToInternal(key);
 			let index = 0;
-			if (!(internal in data)) {
-				data[internal] = {
-					expiresType: "auto",
-					expires: this.options.initialExpires,
-					values: [],
-				};
+			const data = this.getDataInternal_(uid, key, KeyMapping.keyToInternal(key));
 
-				this.tree.setDirty(uid);
-			}
-			// If the timestamp of the last entry added is newer than the current one.
-			else if (data[internal].values[0][0] > timestamp) {
-				index = data[internal].values.findIndex((d) => d[0] <= timestamp);
-				if (index == -1) {
-					index = data[internal].values.length;
+			if (data.values.length) {
+				// If the timestamp of the last entry added is newer than the current one.
+				if (data.values[0][0] > timestamp) {
+					index = data.values.findIndex((d) => d[0] <= timestamp);
+					if (index == -1) {
+						index = data.values.length;
+					}
 				}
-			}
-			// The new samples is newer than the last one and it exists.
-			else if (data[internal].expiresType == "auto") {
-				// Estimate the rate and estimate the expiration rate.
-				const expiresEstimate = (timestamp - data[internal].values[0][0]) * 3;
-				data[internal].expires = 0.4 * data[internal].expires + (1 - 0.4) * expiresEstimate;
+				// The new samples is newer than the last one and it exists.
+				else if (data.expiresType == "auto") {
+					// Estimate the rate and estimate the expiration rate.
+					const expiresEstimate = (timestamp - data.values[0][0]) * 3;
+					data.expires = 0.4 * data.expires + 0.6 * expiresEstimate;
+				}
 			}
 
 			// Prepend the new value and the timestamp to the values array.
 			// And ensure there are maximum X elements.
 			// Insert "internal" -> [timestamp, value]
-			data[internal].values.splice(index, 0, [timestamp, value]);
-			while (data[internal].values.length > config.history) {
-				data[internal].values.pop();
+			data.values.splice(index, 0, [timestamp, value]);
+			while (data.values.length > config.history) {
+				data.values.pop();
 			}
 		}
 
