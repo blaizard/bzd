@@ -216,6 +216,20 @@ export default class Plugin extends PluginBase {
 			}
 		}
 
+		/// Endpoint to perform time synchronization.
+		///
+		/// This is used to get the time from the server and measurte the time
+		/// delay between the client and the server clock.
+		/// It can be measured as follow:
+		/// ~ ((timestamp - t1) + (t4 - timestamp)) / 2
+		endpoints.register("get", "/@time", async (context) => {
+			context.setStatus(200);
+			context.sendJson({
+				version: this.version,
+				timestamp: Utils.timestampMs(),
+			});
+		});
+
 		/// Get the records.
 		///
 		/// GET <endpoint>/@records?tick=10
@@ -299,6 +313,7 @@ export default class Plugin extends PluginBase {
 
 			context.setStatus(200);
 			context.sendJson({
+				version: this.version,
 				dashboards: dashboards,
 				timestamp: Utils.timestampMs(),
 			});
