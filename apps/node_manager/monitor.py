@@ -66,7 +66,8 @@ class Monitor:
 		swap = psutil.swap_memory()  # type: ignore
 		memories = {}
 		if virtual.total:
-			memories["ram"] = {"used": virtual.used, "total": virtual.total}
+			# Using virtual.used doesn't give the same result as reported by the OS.
+			memories["ram"] = {"used": (virtual.total - virtual.available), "total": virtual.total}
 		if swap.total:
 			memories["swap"] = {"used": swap.used, "total": swap.total}
 		memories.update(self.nvidia.memories())
