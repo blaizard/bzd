@@ -56,7 +56,7 @@ class Docker:
 
 		return containers
 
-	def _cpuInfo(self, stats: typing.Any) -> typing.Any:
+	def _cpuInfo(self, containerId: str, stats: typing.Any) -> typing.Any:
 		"""Extracts CPU usage stats from the Docker stats dictionary.
 
 		Args:
@@ -86,7 +86,7 @@ class Docker:
 
 		return None
 
-	def _memoryInfo(self, stats: typing.Any) -> typing.Any:
+	def _memoryInfo(self, containerId: str, stats: typing.Any) -> typing.Any:
 		"""Extracts memory usage stats from the Docker stats dictionary.
 
 		See: https://docs.docker.com/reference/api/engine/version/v1.44/#tag/Container/operation/ContainerExport
@@ -134,7 +134,7 @@ class Docker:
 
 		return dataWithRates
 
-	def _ioInfo(self, stats: typing.Any) -> typing.Any:
+	def _ioInfo(self, containerId: str, stats: typing.Any) -> typing.Any:
 		"""Extracts I/O throughput stats from the Docker stats dictionary.
 
 		Args:
@@ -156,14 +156,18 @@ class Docker:
 					elif entry["op"] == "write":
 						writeBytes += entry["value"]
 
-				return self._returnRate(self.previousIO, {"block": {"in": writeBytes, "out": readBytes}})
+				return self._returnRate(self.previousIO.setdefault(containerId, {}),
+				                        {"block": {
+				                            "in": writeBytes,
+				                            "out": readBytes
+				                        }})
 
 		except KeyError as e:
 			pass
 
 		return None
 
-	def _networkInfo(self, stats: typing.Any) -> typing.Any:
+	def _networkInfo(self, containerId: str, stats: typing.Any) -> typing.Any:
 		"""Extracts network throughput stats from the Docker stats dictionary.
 
 		Args:
@@ -176,10 +180,8 @@ class Docker:
 		try:
 			output = {}
 			for interface, data in stats["networks"].items():
-				rxBytes = data["rx_bytes"]
-				txBytes = data["tx_bytes"]
-				output[interface] = {"in": rxBytes, "out": txBytes}
-			return self._returnRate(self.previousNetwork, output)
+				output[interface] = {"in": data["rx_bytes"], "out": data["tx_bytes"]}
+			return self._returnRate(self.previousNetwork.setdefault(containerId, {}), output)
 
 		except KeyError as e:
 			pass
@@ -187,7 +189,8 @@ class Docker:
 		return None
 
 	def getContainerStats(self, container: Container) -> typing.Any:
-		raw = self.request("GET", f"/containers/{container['id']}/stats?stream=false")
+		containerId = container["id"]
+		raw = self.request("GET", f"/containers/{containerId}/stats?stream=false")
 		output = {
 		    "active": container["active"],
 		    "version": container["version"],
@@ -202,10 +205,10 @@ class Docker:
 			if data is not None:
 				output[key] = data
 
-		addIfNotNone("cpu", self._cpuInfo(raw))
-		addIfNotNone("memory", self._memoryInfo(raw))
-		addIfNotNone("io", self._ioInfo(raw))
-		addIfNotNone("network", self._networkInfo(raw))
+		addIfNotNone("cpu", self._cpuInfo(containerId, raw))
+		addIfNotNone("memory", self._memoryInfo(containerId, raw))
+		addIfNotNone("io", self._ioInfo(containerId, raw))
+		addIfNotNone("network", self._networkInfo(containerId, raw))
 		addIfNotNone("uptime", self.getContainerUpTime(container))
 
 		return output
@@ -271,7 +274,6 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 
 	docker = Docker(args.docker_socket)
-	docker.getDockerData()
 
 	if args.uid is None:
 		if args.measure_time is not None:
