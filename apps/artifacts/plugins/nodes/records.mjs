@@ -2,6 +2,8 @@ import FileSystem from "#bzd/nodejs/core/filesystem.mjs";
 import Lock from "#bzd/nodejs/core/lock.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
+import zlib from "zlib";
+import StatisticsProvider from "#bzd/nodejs/core/statistics/provider.mjs";
 
 const Exception = ExceptionFactory("apps", "plugin", "nodes");
 const Log = LogFactory("apps", "plugin", "nodes");
@@ -25,10 +27,13 @@ export default class Record {
 			{
 				path: null,
 				fs: FileSystem,
+				/// Maximum size of a single record not compressed.
 				recordMaxSize: 1024 * 1024,
+				/// Maximum size of all the records compressed.
 				maxSize: 20 * 1024 * 1024,
 				storages: [Record.defaultStorageName],
 				clean: false,
+				statistics: new StatisticsProvider("records"),
 			},
 			options,
 		);
@@ -50,6 +55,7 @@ export default class Record {
 			lock: new Lock(),
 			records: null,
 			tickRemote: null,
+			statistics: this.options.statistics.makeNested("storage", name),
 		};
 	}
 
@@ -107,7 +113,7 @@ export default class Record {
 
 	/// Get the tick from a path.
 	static getTickFromPath(path) {
-		const filePattern = new RegExp("^(?:.*/)?([0-9]+).rec$");
+		const filePattern = new RegExp("^(?:.*/)?([0-9]+)\\.rec(\\.gz)?$");
 		const match = filePattern.exec(path);
 		return match === null ? null : parseInt(match[1]);
 	}
@@ -168,6 +174,9 @@ export default class Record {
 			size -= entry.size;
 		}
 
+		storage.statistics.set("size", size);
+		storage.statistics.set("files", storage.records.length);
+
 		return entry;
 	}
 
@@ -175,13 +184,56 @@ export default class Record {
 		return storage.records[storage.records.length - 1] || null;
 	}
 
+	/// Compress an existing entry and update the entry itself.
+	async _compressEntry(entry) {
+		const content = await this._readEntry(entry);
+		const compressed = await new Promise((resolve, reject) => {
+			zlib.gzip(content, (err, compressedBuffer) => {
+				if (err) {
+					reject(new Exception("Error compressing data: {}", err));
+					return;
+				}
+				resolve(compressedBuffer);
+			});
+		});
+		const newPath = entry.path + ".gz";
+		await this.options.fs.writeBinary(newPath, compressed);
+		await this.options.fs.unlink(entry.path);
+
+		// Update the entry information.
+		entry.path = newPath;
+		entry.size = (await this.options.fs.stat(newPath)).size;
+	}
+
+	/// Read the content of an entry and handle decompression if needed.
+	async _readEntry(entry) {
+		if (entry.path.endsWith(".rec")) {
+			this.options.statistics.sum("read", 1);
+			return await this.options.fs.readFile(entry.path);
+		} else if (entry.path.endsWith(".gz")) {
+			this.options.statistics.sum("read.gz", 1);
+			const content = await this.options.fs.readBinary(entry.path);
+			return new Promise((resolve, reject) => {
+				zlib.gunzip(content, (err, decompressedBuffer) => {
+					if (err) {
+						reject(new Exception("Error decompressing data: {}", err));
+						return;
+					}
+					resolve(decompressedBuffer.toString("utf8"));
+				});
+			});
+		}
+		Exception.unreachable("Unsupported file format: {}", entry.path);
+	}
+
 	/// Add new payload to the record list.
 	async _getLastEntryForWriting(storage, tick, payloadSize) {
 		Exception.assert(storage.records !== null, "Used before initialization.");
 		let entry = this._getLastEntryForReading(storage);
 
-		// Check if the entry has still enough space.
+		// Check if the entry has still enough space, if not compress it.
 		if (entry && entry.size + payloadSize > this.options.recordMaxSize) {
+			await this._compressEntry(entry);
 			entry = null;
 		}
 
@@ -240,7 +292,7 @@ export default class Record {
 				const entry = storage.records[index];
 
 				// Read the file content.
-				const content = await this.options.fs.readFile(entry.path);
+				const content = await this._readEntry(entry);
 				const payloads = Record.payloadToList(content);
 				const indexPayload = payloads.findIndex((payloadEntry) => payloadEntry[0] >= tick);
 
@@ -368,13 +420,16 @@ export default class Record {
 
 			try {
 				// Check the payloads
-				const content = await this.options.fs.readFile(record.path);
-				Exception.assert(
-					content.length == record.size,
-					"There is a mismatch between the payload size and the size recorded: {} vs {}.",
-					content.length,
-					record.size,
-				);
+				const content = await this._readEntry(record);
+				// Only check if it is not compressed
+				if (record.path.endsWith(".rec")) {
+					Exception.assert(
+						content.length == record.size,
+						"There is a mismatch between the payload size and the size recorded: {} vs {}.",
+						content.length,
+						record.size,
+					);
+				}
 				const entries = Record.payloadToList(content);
 
 				for (const [t, entry, _, remoteT] of entries) {

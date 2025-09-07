@@ -29,6 +29,7 @@ bzd_nodejs_library(
     apis = ["api.json"],
     visibility = ["//visibility:public"],
     deps = [
+        ":provider",
         "//nodejs/core:exception",
         "//nodejs/core:log",
     ],

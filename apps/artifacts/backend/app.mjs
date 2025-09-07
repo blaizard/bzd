@@ -36,6 +36,8 @@ const Exception = ExceptionFactory("backend");
 	}
 	Log.info("Preloaded {} application token(s).", Object.keys(config["tokens"] || {}).length);
 
+	const statisticsPluginProvider = backend.statistics.makeProvider("plugins");
+
 	// Add initial volumes.
 	for (const [volume, options] of Object.entries(config.volumes)) {
 		Exception.assert("type" in options, "The volume '{}' must have a 'type'.", volume);
@@ -46,6 +48,7 @@ const Exception = ExceptionFactory("backend");
 		const updatedOptions = Object.assign(
 			{
 				cache: backend.cache.getAccessor("plugins"),
+				statistics: statisticsPluginProvider.makeNested(volume),
 			},
 			options,
 		);

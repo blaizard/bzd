@@ -23,6 +23,7 @@ bzd_nodejs_library(
     deps = [
         "//nodejs/core:cache2",
         "//nodejs/core:exception",
+        "//nodejs/core/statistics:provider",
         "//nodejs/db/storage",
     ],
 )

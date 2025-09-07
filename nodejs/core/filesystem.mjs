@@ -61,11 +61,21 @@ export default class FileSystem {
 		return data.toString();
 	}
 
+	/// Read a binary file as a buffer, do not decode any characters.
+	static async readBinary(path) {
+		return await Fs.promises.readFile(path);
+	}
+
 	/// Write the content of a file
 	static async writeFile(path, data, options = "utf8") {
 		await Fs.promises.writeFile(path, data, {
 			encoding: options,
 		});
+	}
+
+	/// Write the content of a file as binary, do not attempt any encoding.
+	static async writeBinary(path, data) {
+		await Fs.promises.writeFile(path, data);
 	}
 
 	/// Read the content of a directory

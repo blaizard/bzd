@@ -1,6 +1,7 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import Filesystem from "#bzd/nodejs/core/mock/filesystem.mjs";
 import Records from "#bzd/apps/artifacts/plugins/nodes/records.mjs";
+import zlib from "zlib";
 
 const Exception = ExceptionFactory("test", "artifacts", "plugins", "records");
 
@@ -44,7 +45,7 @@ describe("Records", () => {
 			"records/main/1.rec": '{"version":2,"records":[[1,"a",3,null],',
 			"records/main/4.rec": '{"version":2,"records":[[4,"abcde",7,null],',
 			"records/main/6.rec": '{"version":1,"records":[[4,"abcde",7],',
-			"records/main/5.rec": '{"version":2,"records":[[5,"abcdef",8,null],',
+			"records/main/5.rec.gz": zlib.gzipSync('{"version":2,"records":[[5,"abcdef",8,null],'),
 			"records/main/invalid.rec": '{"version":2,"records":[[3,"abcdejsjs",10,null],',
 			"records/main/8.rec": '{"version":2,"records":[[8,"abcdefg",9,12],',
 			"records/main/3.rec": '{"version":2,"records":[[3,"abcd",6,null],',
@@ -55,13 +56,13 @@ describe("Records", () => {
 			await records.init();
 
 			const files = await fs.readdir("records/main");
-			Exception.assertEqual(files, ["2.rec", "1.rec", "4.rec", "5.rec", "8.rec", "3.rec"]);
+			Exception.assertEqual(files, ["2.rec", "1.rec", "4.rec", "5.rec.gz", "8.rec", "3.rec"]);
 			Exception.assertEqual(records.storages["main"].records, [
 				{ tick: 1, path: "records/main/1.rec", size: 39 },
 				{ tick: 2, path: "records/main/2.rec", size: 41 },
 				{ tick: 3, path: "records/main/3.rec", size: 42 },
 				{ tick: 4, path: "records/main/4.rec", size: 43 },
-				{ tick: 5, path: "records/main/5.rec", size: 44 },
+				{ tick: 5, path: "records/main/5.rec.gz", size: 64 },
 				{ tick: 8, path: "records/main/8.rec", size: 43 },
 			]);
 		});

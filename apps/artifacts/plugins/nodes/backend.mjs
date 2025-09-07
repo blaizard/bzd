@@ -130,6 +130,7 @@ export default class Plugin extends PluginBase {
 			{
 				// Set the default storages from the remotes options.
 				storages: [Records.defaultStorageName, ...Object.keys(optionsSources)],
+				statistics: this.statistics,
 			},
 			options["nodes.records"] || {},
 		);

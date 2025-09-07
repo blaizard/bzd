@@ -1,6 +1,7 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import { Storage } from "#bzd/nodejs/db/storage/storage.mjs";
 import Cache2 from "#bzd/nodejs/core/cache2.mjs";
+import StatisticsProvider from "#bzd/nodejs/core/statistics/provider.mjs";
 
 const Exception = ExceptionFactory("plugin");
 
@@ -10,6 +11,7 @@ export default class PluginBase {
 		this.options = options;
 		this.storage = null;
 		this.cache = (options["cache"] || new Cache2("cache")).getAccessor(volume);
+		this.statistics = options["statistics"] || new StatisticsProvider();
 
 		// Register extensions.
 		for (const extension of extensions) {

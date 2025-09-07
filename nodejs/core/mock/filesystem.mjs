@@ -306,4 +306,18 @@ export default class FileSystem {
 		const file = this._toFile(path, _NotExists.throw);
 		return file.content;
 	}
+
+	/// Read the content of a binary file
+	async readBinary(path) {
+		await FileSystem._mockWait();
+		const file = this._toFile(path, _NotExists.throw);
+		return new Buffer(file.content);
+	}
+
+	/// Write the content of a file
+	async writeBinary(path, data) {
+		await FileSystem._mockWait();
+		const file = this._toFile(path, _NotExists.create);
+		file.content = data;
+	}
 }

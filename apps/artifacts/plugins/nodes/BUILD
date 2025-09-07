@@ -13,6 +13,7 @@ bzd_nodejs_library(
         "//nodejs/core:filesystem",
         "//nodejs/core:lock",
         "//nodejs/core:log",
+        "//nodejs/core/statistics:provider",
     ],
 )
 
@@ -41,6 +42,7 @@ bzd_nodejs_library(
         "//nodejs/core:router",
         "//nodejs/core/http:client",
         "//nodejs/core/services",
+        "//nodejs/core/statistics:provider",
         "//nodejs/db:utils",
         "//nodejs/db/key_value_store:make_from_config",
         "//nodejs/db/storage",
