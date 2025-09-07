@@ -2,6 +2,11 @@
 	<div class="system-monitor">
 		<!-- Header //-->
 		<div class="header">
+			<span v-if="uptime" class="entry" v-tooltip="uptime.tooltip">
+				<i class="bzd-icon-clock"></i>
+				<span class="value">{{ uptime.text }}</span>
+			</span>
+
 			<span
 				v-if="!isMapEmpty(metadata.temperature || {})"
 				class="entry"
@@ -9,11 +14,6 @@
 			>
 				<i class="bzd-icon-thermometer"></i>
 				<span class="value">{{ temperatures.max }}°C</span>
-			</span>
-
-			<span v-if="uptime" class="entry" v-tooltip="uptime.tooltip">
-				<i class="bzd-icon-clock"></i>
-				<span class="value">{{ uptime.text }}</span>
 			</span>
 
 			<span
