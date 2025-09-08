@@ -6,7 +6,7 @@ load("@bzd_rules_oci//:defs.bzl", "bzd_oci_image")
 
 ROOT_DIRECTORY_ = "/bzd/bin"
 
-def bzd_nodejs_oci(name, deps, cmd, base = Label("@oci_nodejs"), include_metadata = False, workdir = ROOT_DIRECTORY_, **kwargs):
+def bzd_nodejs_oci(name, deps, cmd, base = Label("@oci_nodejs"), include_metadata = False, workdir = ROOT_DIRECTORY_, tags = None, **kwargs):
     """Rule for embedding a NodeJs application into Docker.
 
     Args:
@@ -23,7 +23,7 @@ def bzd_nodejs_oci(name, deps, cmd, base = Label("@oci_nodejs"), include_metadat
 
     bzd_package(
         name = "{}.package".format(name),
-        tags = ["nodejs"],
+        tags = ["nodejs"] + (tags or []),
         deps = {target: ROOT_DIRECTORY_ + "/" + dir_name for target, dir_name in deps.items()},
         include_metadata = include_metadata,
     )
@@ -43,7 +43,7 @@ def bzd_nodejs_oci(name, deps, cmd, base = Label("@oci_nodejs"), include_metadat
                 "@bzd_lib//settings/build:prod": "production",
             }),
         },
-        tags = ["nodejs"],
+        tags = ["nodejs"] + (tags or []),
         tars = [
             "{}.package".format(name),
         ],
