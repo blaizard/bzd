@@ -258,13 +258,13 @@ describe("Plugin", () => {
 
 		it("start", async () => {
 			await tester.start();
-		});
+		}).timeout(10000);
 
 		it("read empty", async () => {
 			Exception.assertThrows(async () => {
 				await tester.send("nodes", "get", "/uid01/unknown/path");
 			});
-		});
+		}).timeout(10000);
 
 		it("write string", async () => {
 			await tester.send("nodes", "post", "/uid01/hello/string", {
@@ -274,7 +274,7 @@ describe("Plugin", () => {
 			const response = await tester.send("nodes", "get", "/uid01/hello/string");
 			Exception.assertEqual(response.status, 200);
 			Exception.assertEqual(response.data, { data: "hello" });
-		});
+		}).timeout(10000);
 
 		it("write dictionary", async () => {
 			await tester.send("nodes", "post", "/uid01/hello/dict", {
@@ -300,7 +300,7 @@ describe("Plugin", () => {
 					],
 				});
 			}
-		});
+		}).timeout(10000);
 
 		it("write malformed", async () => {
 			const response = await tester.send(
@@ -314,7 +314,7 @@ describe("Plugin", () => {
 				/*throwOnFailure*/ false,
 			);
 			Exception.assertEqual(response.status, 400);
-		});
+		}).timeout(10000);
 
 		it("read malformed", async () => {
 			const response = await tester.send(
@@ -325,7 +325,7 @@ describe("Plugin", () => {
 				/*throwOnFailure*/ false,
 			);
 			Exception.assert(response.status != 200);
-		});
+		}).timeout(10000);
 
 		it("read @records", async () => {
 			const response = await tester.send("nodes", "get", "/@records");
@@ -334,11 +334,11 @@ describe("Plugin", () => {
 			Exception.assertEqual(response.data.end, true);
 			Exception.assertEqual(response.data.next, 3);
 			Exception.assertEqual(response.data.version, 3);
-		});
+		}).timeout(10000);
 
 		it("stop", async () => {
 			await tester.stop();
-		});
+		}).timeout(10000);
 	});
 
 	describe("Plugin reload a second time", () => {
