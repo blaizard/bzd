@@ -16,6 +16,7 @@ def bzd_nodejs_oci(name, deps, cmd, base = Label("@oci_nodejs"), include_metadat
         base: The base image.
         include_metadata: Whether metadata shall be included.
         workdir: The working directory.
+        tags: The tags of the underlying rules.
         **kwargs: Extra arguments common to all build rules.
     """
 
