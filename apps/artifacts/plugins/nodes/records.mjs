@@ -77,7 +77,7 @@ export default class Record {
 		}
 
 		// Initialize all storages.
-		for (const storage of Object.values(this.storages)) {
+		for (const [storageName, storage] of Object.entries(this.storages)) {
 			await this.options.fs.mkdir(storage.path);
 
 			// Initialize the files map.
@@ -98,6 +98,8 @@ export default class Record {
 			const [tick, tickRemote] = await this._sanitizeStorage(storage, callback);
 			storage.tickRemote = tickRemote;
 			this.tick = Math.max(this.tick, tick);
+
+			Log.info("Initialized storage '{}' with {} record(s).", storageName, storage.records.length);
 		}
 
 		return {
@@ -234,6 +236,11 @@ export default class Record {
 		// Check if the entry has still enough space, if not compress it.
 		if (entry && entry.size + payloadSize > this.options.recordMaxSize) {
 			await this._compressEntry(entry);
+			entry = null;
+		}
+
+		// Check if this is a compressed entry, in that case skip it.
+		if (entry && !entry.path.endsWith(".rec")) {
 			entry = null;
 		}
 
@@ -434,12 +441,13 @@ export default class Record {
 
 				for (const [t, entry, _, remoteT] of entries) {
 					Exception.assert(t > tick, "Ticks are increasing, expected > {} but got {}", tick, t);
-					Exception.assert(
-						remoteT === null || remoteTick === null || remoteT >= remoteTick,
-						"Remote ticks are increasing, expected >= {} but got {}",
-						remoteTick,
-						remoteT,
-					);
+					if (remoteT !== null && remoteTick !== null && remoteT < remoteTick) {
+						Log.warning(
+							"Remote ticks are increasing, expected >= {} but got {}. This happens if remote restarted and lost its previous records.",
+							remoteTick,
+							remoteT,
+						);
+					}
 					tick = t;
 					remoteTick = remoteT;
 					if (callback) {
