@@ -5,18 +5,25 @@ const Exception = ExceptionFactory("statistics");
 /// Way to provide statistics information.
 export default class Provider {
 	constructor(...namespace) {
-		this.namespace = namespace;
-		this.namespaceStr = namespace.length ? namespace.join(".") + "." : "";
-		this.calls = {};
-		this.data = {};
+		this.root = {};
+		this.data = Provider._rootToData(this.root, ...namespace);
+	}
+
+	static _rootToData(root, ...namespace) {
+		let data = root;
+		for (const name of namespace) {
+			data[name] ??= {};
+			data = data[name];
+		}
+		return data;
 	}
 
 	/// Create a nested statistics provider.
 	makeNested(...namespace) {
 		Exception.assert(namespace.length > 0, "Nested statistics must have a namespace");
-		const statistics = new Provider(...this.namespace, ...namespace);
-		statistics.calls = this.calls;
-		statistics.data = this.data;
+		const statistics = new Provider();
+		statistics.root = this.root;
+		statistics.data = Provider._rootToData(this.data, ...namespace);
 		return statistics;
 	}
 
@@ -47,31 +54,28 @@ export default class Provider {
 
 	/// Time the given process.
 	async timeit(name, callback) {
-		const fqn = this.namespaceStr + name;
 		const start = Provider._getTimestamp();
 		try {
 			await callback();
 		} finally {
-			this.calls[fqn] ??= {
+			this.data[name] ??= {
 				count: 0,
 				duration: 0,
 			};
-			++this.calls[fqn].count;
-			this.calls[fqn].duration = Provider._getTimestamp() - start;
+			++this.data[name].count;
+			this.data[name].duration = Provider._getTimestamp() - start;
 		}
 	}
 
 	/// Set a value point to the existing points.
 	set(name, value) {
-		const fqn = this.namespaceStr + name;
-		this.data[fqn] ??= this._initData(0);
-		this._updateData(this.data[fqn], value);
+		this.data[name] ??= this._initData(0);
+		this._updateData(this.data[name], value);
 	}
 
 	/// Add a value point to the existing points.
 	sum(name, value, initial = 0) {
-		const fqn = this.namespaceStr + name;
-		this.data[fqn] ??= this._initData(initial);
-		this._updateData(this.data[fqn], this.data[fqn].value + value);
+		this.data[name] ??= this._initData(initial);
+		this._updateData(this.data[name], this.data[name].value + value);
 	}
 }

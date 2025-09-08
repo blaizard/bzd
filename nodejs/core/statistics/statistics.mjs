@@ -29,11 +29,11 @@ export default class Statistics {
 	register(provider, name = null) {
 		const uid = this._makeStartisticsUid(name);
 		Exception.assert(!(uid in this.data), "Statistics '{}' is already registered.", uid);
-		this.data[uid] = provider;
+		this.data[uid] = provider.root;
 	}
 
 	/// Create a provider and attach it to this server.
-	makeProvider(name) {
+	makeProvider(name = null) {
 		const provider = new Provider();
 		this.register(provider, name);
 		return provider;
