@@ -428,9 +428,10 @@ export default class Plugin extends PluginBase {
 
 			let records = [];
 			if (inputs.bulk) {
+				const isFixedTimestamp = !("timestamp" in inputs.data);
 				Exception.assertPrecondition(isObject(inputs.data), "The data must be an object: {:j}", inputs.data);
 				Exception.assertPrecondition(
-					typeof inputs.data.timestamp == "number",
+					isFixedTimestamp || typeof inputs.data.timestamp == "number",
 					"The timestamp given is not a number {}.",
 					inputs.data.timestamp,
 				);
@@ -441,7 +442,10 @@ export default class Plugin extends PluginBase {
 						value,
 						timestamp,
 					);
-					records = records.concat(await node.insert(key, value, timestamp - inputs.data.timestamp));
+					const actualTimestamp = isFixedTimestamp
+						? timestamp
+						: timestamp - inputs.data.timestamp + Utils.timestampMs();
+					records = records.concat(await node.insert(key, value, actualTimestamp, isFixedTimestamp));
 				}
 			} else {
 				records = await node.insert(key, inputs.data);

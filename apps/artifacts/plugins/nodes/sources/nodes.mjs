@@ -32,8 +32,7 @@ export default class SourceNodes extends Source {
 			},
 		});
 
-		const timestampRemote = result.timestamp;
-		const timestampLocal = Utils.timestampMs();
+		const timeDelayLocalRemote = Utils.timestampMs() - result.timestamp;
 		const next = result.next;
 		const end = result.end;
 
@@ -45,8 +44,8 @@ export default class SourceNodes extends Source {
 			tick,
 		);
 		const updatedRecords = result.records.map((record) =>
-			Nodes.recordFromDisk(record).map(([uid, key, value, timestamp]) => {
-				return [uid, key, value, timestamp - timestampRemote + timestampLocal];
+			Nodes.recordFromDisk(record).map(([uid, key, value, timestamp, isFixedTimestamp]) => {
+				return [uid, key, value, isFixedTimestamp ? timestamp : timestamp + timeDelayLocalRemote];
 			}),
 		);
 

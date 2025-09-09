@@ -38,15 +38,20 @@ export class Node {
 
 	/// Insert new data at a given path.
 	///
+	/// \param key The key at which the entry shall be inserted.
+	/// \param fragment The data to be inserted.
+	/// \param timestamp The timestamp to use.
+	/// \param isFixedTimestamp Whether the timestamp is fixed and shall not be modified or is based on the server time.
+	///
 	/// \return A list of records corresponding to this change.
-	async insert(key, fragment, timestampDelta = 0) {
+	async insert(key, fragment, timestamp = null, isFixedTimestamp = false) {
 		let fragments = Node.getAllPathAndValues(fragment, key);
 		fragments = this.handlers.processBeforeInsert(fragments);
 
-		const timestamp = await this.data.insert(this.uid, fragments, Utils.timestampMs() + timestampDelta);
+		await this.data.insert(this.uid, fragments, timestamp);
 
 		// Generate records.
-		return fragments.map(([key, value, _]) => [this.uid, key, value, timestamp]);
+		return fragments.map(([key, value, _]) => [this.uid, key, value, timestamp, isFixedTimestamp]);
 	}
 
 	/// Get the tree with single values.
@@ -105,7 +110,7 @@ export class Nodes {
 
 	// Insert a record entry to the data.
 	async insertRecord(records) {
-		for (const [uid, key, value, timestamp] of records) {
+		for (const [uid, key, value, timestamp, _isFixedTimestamp] of records) {
 			await this.data.insert(uid, [[key, value]], timestamp);
 		}
 	}
@@ -119,16 +124,20 @@ export class Nodes {
 	/// \return The disk optimized record.
 	static recordToDisk(record) {
 		let clusters = {};
-		for (const [uid, key, value, timestamp] of record) {
-			const keyCluster = uid + "@" + timestamp;
-			clusters[keyCluster] ??= [];
-			clusters[keyCluster].push([key, value]);
+		for (const [uid, key, value, timestamp, isFixedTimestamp] of record) {
+			const keyCluster = uid + "@" + timestamp + "@" + isFixedTimestamp;
+			clusters[keyCluster] ??= {
+				uid: uid,
+				timestamp: timestamp,
+				isFixedTimestamp: isFixedTimestamp,
+				data: [],
+			};
+			clusters[keyCluster].data.push([key, value]);
 		}
 		let onDiskRecord = [];
-		for (const [keyCluster, cluster] of Object.entries(clusters)) {
-			const [uid, timestampStr] = keyCluster.split("@");
+		for (const [_, cluster] of Object.entries(clusters)) {
 			let valueCluster = {};
-			for (const [key, value] of cluster) {
+			for (const [key, value] of cluster.data) {
 				let current = valueCluster;
 				for (const part of key) {
 					current[part] ??= {};
@@ -136,7 +145,7 @@ export class Nodes {
 				}
 				current["_"] = value;
 			}
-			onDiskRecord.push([uid, valueCluster, parseInt(timestampStr)]);
+			onDiskRecord.push([cluster.uid, valueCluster, cluster.timestamp, Boolean(cluster.isFixedTimestamp) ? 1 : 0]);
 		}
 		return onDiskRecord;
 	}
@@ -160,9 +169,9 @@ export class Nodes {
 			}
 			return paths;
 		};
-		for (const [uid, valueCluster, timestamp] of record) {
+		for (const [uid, valueCluster, timestamp, isFixedTimestamp] of record) {
 			for (const [key, value] of traverse(valueCluster)) {
-				fromDiskRecord.push([uid, key, value, timestamp]);
+				fromDiskRecord.push([uid, key, value, timestamp, Boolean(isFixedTimestamp)]);
 			}
 		}
 		return fromDiskRecord;

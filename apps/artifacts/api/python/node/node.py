@@ -85,9 +85,13 @@ class Node(ArtifactsBase):
 	    uid: typing.Optional[str] = None,
 	    volume: str = defaultNodeVolume,
 	    path: typing.Optional[typing.List[str]] = None,
-	    timestamp: typing.Optional[float] = None
+	    timestamp: typing.Optional[float] = None,
+	    isFixedTimestamp: bool = False
 	) -> typing.Generator[typing.Callable[[float, typing.Dict[str, typing.Any]], None], None, None]:
 		"""Publish a bulk of data to remote."""
+
+		if isFixedTimestamp:
+			assert timestamp == None, "Fixed timestamp cannot be set with the remote timestamp being set, it doesn't make sense."
 
 		bulk: typing.List[typing.Tuple[float, typing.Any]] = []
 
@@ -100,16 +104,12 @@ class Node(ArtifactsBase):
 		yield publisher
 
 		# Calculate the timestamp.
-		timestamp = max([t for [t, _] in bulk]) if timestamp is None else timestamp
+		data = {"data": bulk}
+		if not isFixedTimestamp:
+			timestamp = max([t for [t, _] in bulk]) if timestamp is None else timestamp
+			data["timestamp"] = timestamp
 
-		self.publish(data={
-		    "timestamp": timestamp,
-		    "data": bulk
-		},
-		             uid=uid,
-		             volume=volume,
-		             path=path,
-		             query={"bulk": "1"})
+		self.publish(data=data, uid=uid, volume=volume, path=path, query={"bulk": "1"})
 
 	def makeLoggerHandler(self) -> "LoggerHandlerNode":
 		"""Create a logger handler that sends data to the node."""
