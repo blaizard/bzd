@@ -408,10 +408,11 @@ export default class Plugin extends PluginBase {
 		///
 		/// POST <endpoint>/<uid>/<path:*>?bulk=1
 		/// ```{
-		///    timestamp: xxx,             # node current timestamp for reference.
+		///    timestamp: xxx,             # Node current timestamp for reference.
+		///                                # If unset, the timestamp will be treated as "fixed timestamps".
 		///    data: [
-		///      [<timestamp1>, <value1>], # Store a new value with timestamp1
-		///      [<timestamp2>, <value2>]  # Store another value with timestamp2
+		///      [<timestamp1>, <value1>], # Store a new value with timestamp1.
+		///      [<timestamp2>, <value2>]  # Store another value with timestamp2.
 		///    ]
 		/// }```
 		endpoints.register("post", "/{uid}/{path:*}", async (context) => {
