@@ -104,12 +104,11 @@ class Node(ArtifactsBase):
 		yield publisher
 
 		# Calculate the timestamp.
-		data = {"data": bulk}
+		content: typing.Dict[str, typing.Any] = {"data": bulk}
 		if not isFixedTimestamp:
-			timestamp = max([t for [t, _] in bulk]) if timestamp is None else timestamp
-			data["timestamp"] = timestamp
+			content["timestamp"] = max([t for [t, _] in bulk]) if timestamp is None else timestamp
 
-		self.publish(data=data, uid=uid, volume=volume, path=path, query={"bulk": "1"})
+		self.publish(data=content, uid=uid, volume=volume, path=path, query={"bulk": "1"})
 
 	def makeLoggerHandler(self) -> "LoggerHandlerNode":
 		"""Create a logger handler that sends data to the node."""
