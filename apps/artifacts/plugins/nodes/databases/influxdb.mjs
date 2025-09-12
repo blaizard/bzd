@@ -129,7 +129,7 @@ export default class DatabaseInfluxDB extends Database {
 			influxQL += "ORDER BY time DESC ";
 			influxQL += "LIMIT " + count + "\n";
 		} else {
-			influxQL += 'SELECT "' + "dsdswe" + '" ';
+			influxQL += 'SELECT "' + field + '" ';
 			influxQL += 'FROM "' + uid + '" ';
 			influxQL += "ORDER BY time DESC ";
 			influxQL += "LIMIT " + count + "\n";
