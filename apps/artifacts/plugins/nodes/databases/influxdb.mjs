@@ -92,9 +92,13 @@ export default class DatabaseInfluxDB extends Database {
 		}
 
 		const lineProtocol = content.join("\n");
-		await this.clientStore.post("/api/v2/write", {
-			data: lineProtocol,
-		});
+		try {
+			await this.clientStore.post("/api/v2/write", {
+				data: lineProtocol,
+			});
+		} catch (e) {
+			throw Exception.fromError(e, "Line Protocol:\n{}", lineProtocol);
+		}
 
 		return {
 			lineProtocolSize: lineProtocol.length,
