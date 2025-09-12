@@ -34,14 +34,14 @@
 			return {
 				metadata: {},
 				tree: {},
-				timestamp: 0,
+				timestampNewest: 0,
 				timeout: null,
 				isDestroyed: false,
 			};
 		},
 		computed: {
 			durationString() {
-				return timeMsToString(this.metadata.timestamp - this.timestamp);
+				return timeMsToString(Math.max(this.timestampServer - this.timestampNewest, 0));
 			},
 			endpoint() {
 				return "/x" + Utils.keyToPath(this.pathList);
@@ -71,6 +71,9 @@
 					return ["?metadata=1", "?count=5"];
 				}
 				return ["?children=99", "?children=99&metadata=1", "?children=99&count=5"];
+			},
+			timestampServer() {
+				return this.metadata.timestamp || Date.now();
 			},
 		},
 		mounted() {
@@ -102,15 +105,15 @@
 				const keepLastN = key.length === 0 ? 100 : 10;
 				object["_"] = object["_"].slice(-keepLastN);
 
-				// Update the timestamp.
+				// Update the last timestamp.
 				const last = object["_"].slice(-1)[0];
-				this.timestamp = Math.max(this.timestamp, last[0]);
+				this.timestampNewest = Math.max(this.timestampNewest, last[0]);
 			},
 			async fetchMetadata() {
 				await this.handleSubmit(async () => {
 					let query = { metadata: 1, children: 99, count: 1 };
-					if (this.timestamp) {
-						query.after = this.timestamp;
+					if (this.timestampNewest) {
+						query.after = this.timestampNewest;
 						query.count = 5;
 					}
 					this.metadata = await this.requestBackend(this.endpoint, {

@@ -2,12 +2,11 @@ import Format from "../core/format.mjs";
 
 function _unitsToString(unitList, value, maxNbUnits = 1, decimalPoints = 1) {
 	let unitIndex = 0;
-
 	while (value > unitList[unitIndex][2]) {
-		value /= unitList[unitIndex][2];
 		if (!unitList[unitIndex + 1]) {
 			break;
 		}
+		value /= unitList[unitIndex][2];
 		unitIndex++;
 	}
 
@@ -45,7 +44,7 @@ export function timeMsToString(value, maxNbUnits = 1) {
 			["s", "s", 60],
 			[" min", " min", 60],
 			["h", "h", 24],
-			[" day", " days", 30],
+			[" day", " days", 1],
 		],
 		value,
 		maxNbUnits,
