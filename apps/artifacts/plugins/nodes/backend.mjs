@@ -273,12 +273,14 @@ export default class Plugin extends PluginBase {
 
 			// Go through the children and match them against the router.
 			let inputs = {};
-			for (const { key } of children) {
-				const path = Utils.keyToPath(key);
-				const match = routerDashboards.match(path);
-				if (match) {
-					inputs[match.args] ??= [];
-					inputs[match.args].push(match.vars);
+			if (children) {
+				for (const { key } of children) {
+					const path = Utils.keyToPath(key);
+					const match = routerDashboards.match(path);
+					if (match) {
+						inputs[match.args] ??= [];
+						inputs[match.args].push(match.vars);
+					}
 				}
 			}
 
