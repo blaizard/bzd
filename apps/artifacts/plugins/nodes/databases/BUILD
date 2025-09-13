@@ -10,6 +10,7 @@ bzd_nodejs_library(
     ],
     deps = [
         ":database",
+        "//apps/artifacts/common:utils",
     ],
 )
 

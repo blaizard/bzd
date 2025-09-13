@@ -200,6 +200,9 @@ export default class Plugin extends PluginBase {
 				data.write || false,
 			);
 			const database = new databaseTypes[data.type](this, data, components);
+			provider.addStartProcess(async () => {
+				return await database.initialize();
+			});
 			if (data.write) {
 				provider.addTimeTriggeredProcess("database." + databaseName, database, {
 					policy: data.throwOnFailure ? Services.Policy.throw : Services.Policy.ignore,

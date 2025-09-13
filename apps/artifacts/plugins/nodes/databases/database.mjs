@@ -15,6 +15,8 @@ export default class Database extends Process {
 		Exception.assert(typeof this.onExternal === "function", "A database must implement a 'onExternal' function.");
 	}
 
+	async initialize() {}
+
 	async process(options) {
 		try {
 			const tickStart = this.tick;

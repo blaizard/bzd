@@ -1,7 +1,10 @@
 import Database from "#bzd/apps/artifacts/plugins/nodes/databases/database.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
+import LogFactory from "#bzd/nodejs/core/log.mjs";
+import Utils from "#bzd/apps/artifacts/common/utils.mjs";
 
 const Exception = ExceptionFactory("artifacts", "nodes", "database", "influxdb");
+const Log = LogFactory("artifacts", "nodes", "database", "influxdb");
 
 export default class DatabaseInfluxDB extends Database {
 	constructor(...args) {
@@ -25,6 +28,14 @@ export default class DatabaseInfluxDB extends Database {
 			expect: "json",
 		});
 
+		this.clientRetention = new this.components.HttpClientFactory(this.options.host, {
+			headers: {
+				Authorization: "Token " + this.options.token,
+				"Content-Type": "application/json",
+			},
+			expect: "json",
+		});
+
 		this.clientQuery = new this.components.HttpClientFactory(this.options.host, {
 			query: {
 				db: this.options.bucket,
@@ -40,6 +51,8 @@ export default class DatabaseInfluxDB extends Database {
 			},
 			expect: "json",
 		});
+
+		this.retentionS = this.options.retentionS || null;
 	}
 
 	/// Convert a value into influxdb fields.
@@ -82,11 +95,56 @@ export default class DatabaseInfluxDB extends Database {
 		return value;
 	}
 
+	async initialize() {
+		// If unset try to get the retention from the server.
+		if (this.retentionS === null) {
+			const response = await this.clientRetention.get("/api/v2/buckets");
+			let orgBucket = null;
+			for (const bucket of response.buckets) {
+				if (bucket.orgID == this.options.org) {
+					orgBucket = bucket;
+					break;
+				}
+			}
+			Exception.assert(
+				orgBucket !== null,
+				"Couldn't find bucket corresponding to our organization '{}': {:j}",
+				this.options.org,
+				response,
+			);
+			this.retentionS =
+				orgBucket.retentionRules.reduce((acc, value) => (value.type == "expire" ? value.everySeconds : acc), 0) || null;
+		}
+
+		return {
+			retentionS: this.retentionS,
+		};
+	}
+
 	async onRecords(records) {
 		let content = [];
+		let skipped = 0;
+		const timestampMin = this.retentionS ? Utils.timestampMs() - this.retentionS * 1000 + 86400 * 1000 : 0;
 		for (const [uid, key, value, timestamp] of records) {
 			const timestampNanoseconds = timestamp * 1000000;
 			for (const field of DatabaseInfluxDB.fromValueToFields(DatabaseInfluxDB.fromKeyToField(key), value)) {
+				Exception.assert(
+					timestamp,
+					"timestamp is null: {} for record: [{}, ..., {}]",
+					timestampMin,
+					uid,
+					timestampNanoseconds,
+				);
+				if (timestamp <= timestampMin) {
+					Log.warning(
+						"Skipping record [{}, ..., {}], record is too old for the retention policy ({}s).",
+						uid,
+						timestampNanoseconds,
+						this.retentionS,
+					);
+					++skipped;
+					continue;
+				}
 				content.push(uid + " " + field + " " + timestampNanoseconds);
 			}
 		}
@@ -101,6 +159,7 @@ export default class DatabaseInfluxDB extends Database {
 		}
 
 		return {
+			skipped: skipped,
 			lineProtocolSize: lineProtocol.length,
 		};
 	}
