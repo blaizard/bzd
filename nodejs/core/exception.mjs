@@ -69,8 +69,13 @@ export const ExceptionFactory = (...topics) => {
 		}
 
 		/// Convert an Error into an Exception
-		static fromError(e) {
-			return new Exception(e);
+		static fromError(e, message = null, ...args) {
+			const base = new Exception(e);
+			if (message) {
+				const update = new Exception(message, ...args);
+				base.combine(update);
+			}
+			return base;
 		}
 
 		/// \brief Assert that expression evaluates to true.

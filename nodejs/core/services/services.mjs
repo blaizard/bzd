@@ -58,7 +58,20 @@ export default class Services {
 	/// \param name The name of the process.
 	/// \return true if succeed, false otherwise.
 	async runProcess(uid, name) {
+		Exception.assertPrecondition(
+			uid in this.services,
+			"No service exists with uid {}, choose from: {}",
+			uid,
+			Object.keys(this.services).join(", "),
+		);
 		const service = this.services[uid];
+		Exception.assertPrecondition(
+			name in service.provider.processes,
+			"No service exists with name {}.{}, choose from: {}",
+			uid,
+			name,
+			Object.keys(service.provider.processes).join(", "),
+		);
 		const object = service.provider.processes[name];
 		service.records[name] ??= {
 			executions: 0,
