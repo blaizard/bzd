@@ -38,6 +38,7 @@ bzd_nodejs_library(
         "//apps/artifacts/common:utils",
         "//apps/artifacts/plugins:default",
         "//nodejs/core:localstorage",
+        "//nodejs/core:lock",
         "//nodejs/utils:array",
         "//nodejs/utils:to_string",
         "//nodejs/vue/components/form",

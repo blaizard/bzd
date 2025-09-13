@@ -28,6 +28,7 @@
 	import { dateToDefaultString } from "#bzd/nodejs/utils/to_string.mjs";
 	import { arrayFindCommonPrefix } from "#bzd/nodejs/utils/array.mjs";
 	import LocalStorage from "#bzd/nodejs/core/localstorage.mjs";
+	import Lock from "#bzd/nodejs/core/lock.mjs";
 
 	const optionsStorageKey = "bzd-artifacts-plugin-nodes-view-dashboard-options";
 
@@ -51,6 +52,7 @@
 				},
 				timeout: null,
 				periodMs: null,
+				lock: new Lock(),
 			};
 		},
 		watch: {
@@ -182,7 +184,7 @@
 			async useLastPeriod(periodMs) {
 				this.loading = true;
 				try {
-					const nbSamples = 800;
+					const nbSamples = 600;
 
 					this.periodMs = periodMs;
 					this.inputs.reset({ periodLimit: this.periodMs });
@@ -223,7 +225,9 @@
 			},
 			async triggerFetch() {
 				if (this.dashboards && this.options.interval in this.intervalOptions) {
-					await this.intervalOptions[this.options.interval]();
+					await this.lock.acquire(async () => {
+						await this.intervalOptions[this.options.interval]();
+					});
 				}
 			},
 			dashboardInputs(dashboard) {
