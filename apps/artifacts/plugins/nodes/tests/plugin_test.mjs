@@ -485,7 +485,6 @@ describe("Plugin", () => {
 				"nodes.databases": {
 					database1: Object.assign(
 						{
-							delayS: 0.1,
 							throwOnFailure: true,
 						},
 						options,
@@ -494,39 +493,95 @@ describe("Plugin", () => {
 			},
 			{
 				HttpClientFactory: makeMockHttpClientFactory((url, options) => {
-					fetched = true;
-					onReceiveCallback(url, options);
+					const resolve = () => {
+						fetched = true;
+					};
+					return onReceiveCallback(url, options, resolve);
 				}),
 			},
 		);
 
 		await tester.start();
 		try {
+			// Write data with server's timestamp
 			await tester.send("nodes", "post", "/uid01/hello/dict", {
 				headers: { "Content-Type": "application/json" },
 				data: JSON.stringify({ a: 1, b: 2 }),
 			});
+			// Write data with fixed timestamp
+			await tester.send("nodes", "post", "/uid01/hello/fixed", {
+				queries: { bulk: 1 },
+				headers: { "Content-Type": "application/json" },
+				data: JSON.stringify({ data: [[1234, { c: 3 }]] }),
+			});
+			await tester.serviceRun("nodes.nodes", "database.database1");
 			await waitUntil(() => fetched);
 		} finally {
 			await tester.stop();
 		}
 	};
 
-	describe("Databases", () => {
-		it("empty", async () => {
-			await makeDatabaseTest(
-				{
-					type: "influxdb",
-					org: "myorg",
-					bucket: "mybucket",
-					host: "http://influxdb1",
-					token: "mytoken",
-					write: true,
-				},
-				(url, options) => {
-					Exception.assert(options.data.startsWith("uid01 hello.dict.a=1"));
-				},
-			);
+	const makeInfluxDBDatabaseTest = async (onReceiveCallback) => {
+		await makeDatabaseTest(
+			{
+				type: "influxdb",
+				org: "myorg",
+				bucket: "mybucket",
+				host: "http://influxdb1",
+				token: "mytoken",
+				write: true,
+				read: true,
+			},
+			onReceiveCallback,
+		);
+	};
+
+	describe("Databases influxdb", () => {
+		it("retention", async () => {
+			await makeInfluxDBDatabaseTest((url, options, resolve) => {
+				if (url.endsWith("/api/v2/buckets")) {
+					return {
+						buckets: [
+							{
+								orgID: "myorg",
+								retentionRules: [
+									{
+										type: "expire",
+										everySeconds: 2592000,
+									},
+								],
+							},
+						],
+					};
+				} else if (url.endsWith("/api/v2/write")) {
+					Exception.assert(options.data.includes("uid01 hello.dict.a=1"));
+					Exception.assert(!options.data.includes("uid01 hello.fixed.c=3"));
+					resolve();
+				} else {
+					Exception.unreachable("Should not be reached.");
+				}
+			});
+		});
+
+		it("no retention + fixed timestamp", async () => {
+			await makeInfluxDBDatabaseTest((url, options, resolve) => {
+				if (url.endsWith("/api/v2/buckets")) {
+					return {
+						buckets: [
+							{
+								orgID: "myorg",
+								retentionRules: [],
+							},
+						],
+					};
+				} else if (url.endsWith("/api/v2/write")) {
+					Exception.assert(options.data.includes("uid01 hello.dict.a=1"));
+					Exception.assert(options.data.includes("uid01 hello.fixed.c=3 1234000000"));
+					resolve();
+				} else {
+					Exception.unreachable("Should not be reached.");
+				}
+			});
 		});
 	});
 });

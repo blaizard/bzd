@@ -67,4 +67,12 @@ export default class PluginTester {
 
 		return context.response;
 	}
+
+	async serviceRun(uid, name) {
+		const result = await this.services.runProcess(uid, name);
+		if (!result) {
+			const error = this.services.getLastError(uid, name);
+			Exception.assert(false, "Process {}.{} manually run, failed with error: {}", uid, name, error);
+		}
+	}
 }
