@@ -12,6 +12,12 @@ class NodePublishNoRemote(RuntimeError):
 	pass
 
 
+class PublisherProtocol(typing.Protocol):
+
+	def __call__(self, timestamp: float, data: typing.Dict[str, typing.Any]) -> None:
+		...
+
+
 class Node(ArtifactsBase):
 
 	def publishMultiNodes(self, data: typing.Dict[str, typing.Any], volume: str = defaultNodeVolume) -> None:
@@ -80,14 +86,12 @@ class Node(ArtifactsBase):
 		raise NodePublishNoRemote("Unable to publish to any of the remotes.")
 
 	@contextmanager
-	def publishBulk(
-	    self,
-	    uid: typing.Optional[str] = None,
-	    volume: str = defaultNodeVolume,
-	    path: typing.Optional[typing.List[str]] = None,
-	    timestamp: typing.Optional[float] = None,
-	    isFixedTimestamp: bool = False
-	) -> typing.Generator[typing.Callable[[float, typing.Dict[str, typing.Any]], None], None, None]:
+	def publishBulk(self,
+	                uid: typing.Optional[str] = None,
+	                volume: str = defaultNodeVolume,
+	                path: typing.Optional[typing.List[str]] = None,
+	                timestamp: typing.Optional[float] = None,
+	                isFixedTimestamp: bool = False) -> typing.Generator[PublisherProtocol, None, None]:
 		"""Publish a bulk of data to remote."""
 
 		if isFixedTimestamp:
