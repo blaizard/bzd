@@ -7,14 +7,15 @@ const fieldToKey = {
 	"": [""],
 	".": ["", ""],
 	"a.b.c": ["a", "b", "c"],
-	"a\\x2eb.c": ["a.b", "c"],
-	"\\x2ea\\x2eb\\x2ec": [".a.b.c"],
-	"a\\x22b.c": ['a"b', "c"],
-	"a\\x27b.c": ["a'b", "c"],
-	"a\\x20\\x09b.c": ["a \tb", "c"],
-	"a\\x3db.c": ["a=b", "c"],
-	"\\x5fa": ["_a"],
+	"a|x2eb.c": ["a.b", "c"],
+	"|x2ea|x2eb|x2ec": [".a.b.c"],
+	"a|x22b.c": ['a"b', "c"],
+	"a|x27b.c": ["a'b", "c"],
+	"a|x20|x09b.c": ["a \tb", "c"],
+	"a|x3db.c": ["a=b", "c"],
+	"|x5fa": ["_a"],
 	"a_b._c": ["a_b", "_c"],
+	"a|x5cb": ["a\\b"],
 };
 
 describe("Influxdb", () => {

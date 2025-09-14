@@ -83,22 +83,23 @@ export default class DatabaseInfluxDB extends Database {
 	/// - You cannot use a comma ,.
 	/// - No Leading Underscores.
 	/// - Avoid Special Characters.
+	/// - Avoid \ to avoid escaping complexity.
 	static fromKeyToField(key) {
 		return key
 			.map((part) =>
-				part.replace(/[\s"',=\.]/g, (char) => {
+				part.replace(/[\s"',=\.\\]/g, (char) => {
 					const hexValue = char.charCodeAt(0).toString(16).padStart(2, "0");
-					return "\\x" + hexValue;
+					return "|x" + hexValue;
 				}),
 			)
 			.join(".")
-			.replace(/^_/, "\\x5f");
+			.replace(/^_/, "|x5f");
 	}
 
 	/// Convert a field to a key.
 	static fromFieldToKey(field) {
 		return field.split(".").map((part) =>
-			part.replace(/\\x([0-9a-fA-F]{2})/g, (match, hex) => {
+			part.replace(/\|x([0-9a-fA-F]{2})/g, (match, hex) => {
 				return String.fromCharCode(parseInt(hex, 16));
 			}),
 		);
@@ -175,10 +176,8 @@ export default class DatabaseInfluxDB extends Database {
 
 		const gatherFieldAndValues = async (uid, useFields) => {
 			const selector = useFields ? useFields.map((field) => '"' + field + '"').join(",") : "*";
-			const result = await this.clientQuery.post("/query", {
-				data: "SELECT " + selector + ' FROM "' + uid + '" ORDER BY time DESC LIMIT 1',
-			});
-			const data = result.results[0]?.series?.[0] ?? {};
+			const result = await this._sql("SELECT " + selector + ' FROM "' + uid + '" ORDER BY time DESC LIMIT 1');
+			const data = result?.series?.[0] ?? {};
 			const [_time, ...fields] = data.columns;
 			const values = data.values
 				.map((values) => {
@@ -263,6 +262,17 @@ export default class DatabaseInfluxDB extends Database {
 		};
 	}
 
+	async _sql(sql) {
+		try {
+			const result = await this.clientQuery.post("/query", {
+				data: sql,
+			});
+			return result.results[0];
+		} catch (e) {
+			throw Exception.fromError(e, "SQL:\n{}", sql);
+		}
+	}
+
 	/// Get external data on demand.
 	async onExternal(uid, key, count, after, before) {
 		const field = DatabaseInfluxDB.fromKeyToField(key);
@@ -293,11 +303,8 @@ export default class DatabaseInfluxDB extends Database {
 			influxQL += "LIMIT " + count + "\n";
 		}
 
-		const result = await this.clientQuery.post("/query", {
-			data: influxQL,
-		});
-
-		const data = result.results[0]?.series?.[0]?.values ?? [];
+		const result = await this._sql(influxQL);
+		const data = result?.series?.[0]?.values ?? [];
 		const output = data
 			.filter(([_, value]) => value !== null)
 			.map(([timestamp, value]) => {
