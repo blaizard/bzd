@@ -1,5 +1,16 @@
+load("@bzd_lib//config:defs.bzl", "bzd_config_default")
 load("@bzd_python//:requirements.bzl", "requirement")
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
+
+bzd_config_default(
+    name = "config_polygon",
+    srcs = [
+        "config.polygon.json",
+    ],
+    visibility = [
+        "//deployment:__subpackages__",
+    ],
+)
 
 py_binary(
     name = "generator_yfinance",
@@ -13,6 +24,21 @@ py_binary(
         ":recording_to_path",
         "@bzd_python//bzd/utils:worker",
     ] + requirement("yfinance"),
+)
+
+py_binary(
+    name = "generator_polygon",
+    srcs = [
+        "config_polygon.py",
+        "generator_polygon.py",
+    ],
+    tags = ["manual"],
+    visibility = ["//apps/trader_python:__subpackages__"],
+    deps = [
+        "//apps/artifacts/api/python/node",
+        "@bzd_python//bzd/http:client",
+        "@bzd_python//bzd/logging",
+    ],
 )
 
 py_library(
