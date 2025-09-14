@@ -515,4 +515,9 @@ export default class Plugin extends PluginBase {
 			end: end,
 		};
 	}
+
+	/// Write a value to the in-memory data, do not write any record about it and bypass the handlers.
+	async write(uid, key, value, timestamp) {
+		await this.nodes.insertRecord(Nodes.recordFromSingleEntry(uid, key, value, timestamp));
+	}
 }

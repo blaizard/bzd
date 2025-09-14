@@ -2,6 +2,7 @@ import Database from "#bzd/apps/artifacts/plugins/nodes/databases/database.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import Utils from "#bzd/apps/artifacts/common/utils.mjs";
+import Services from "#bzd/nodejs/core/services/services.mjs";
 
 const Exception = ExceptionFactory("artifacts", "nodes", "database", "influxdb");
 const Log = LogFactory("artifacts", "nodes", "database", "influxdb");
@@ -77,8 +78,30 @@ export default class DatabaseInfluxDB extends Database {
 	}
 
 	/// Convert a key to a field.
+	///
+	/// Here are some restrictions:
+	/// - You cannot use a comma ,.
+	/// - No Leading Underscores.
+	/// - Avoid Special Characters.
 	static fromKeyToField(key) {
-		return key.map((part) => part.replace(/[\s"']+/g, "-")).join(".");
+		return key
+			.map((part) =>
+				part.replace(/[\s"',=\.]/g, (char) => {
+					const hexValue = char.charCodeAt(0).toString(16).padStart(2, "0");
+					return "\\x" + hexValue;
+				}),
+			)
+			.join(".")
+			.replace(/^_/, "\\x5f");
+	}
+
+	/// Convert a field to a key.
+	static fromFieldToKey(field) {
+		return field.split(".").map((part) =>
+			part.replace(/\\x([0-9a-fA-F]{2})/g, (match, hex) => {
+				return String.fromCharCode(parseInt(hex, 16));
+			}),
+		);
 	}
 
 	/// Convert a value coming from the database to an actual value.
@@ -100,6 +123,19 @@ export default class DatabaseInfluxDB extends Database {
 		provider.addStartProcess("initialize", async () => {
 			return await this.initialize();
 		});
+		if (this.options.read) {
+			provider.addTimeTriggeredProcess(
+				"read",
+				async (options) => {
+					return await this.read(options);
+				},
+				{
+					policy: this.options.throwOnFailure ? Services.Policy.throw : Services.Policy.ignore,
+					periodS: 86400,
+					delayS: 0,
+				},
+			);
+		}
 	}
 
 	async initialize() {
@@ -123,36 +159,64 @@ export default class DatabaseInfluxDB extends Database {
 				orgBucket.retentionRules.reduce((acc, value) => (value.type == "expire" ? value.everySeconds : acc), 0) || null;
 		}
 
-		// Read all the nodes from this database.
-		/*
-curl --request POST \
-  "http://localhost:8086/api/v2/query?org=YOUR_ORG" \
-  --header "Authorization: Token YOUR_API_TOKEN" \
-  --header "Content-Type: application/json" \
-  --header "Accept: application/json" \
-  --data '{
-    "query": "import \"influxdata/influxdb/schema\" schema.fieldKeys(bucket: \"YOUR_BUCKET_NAME\") |> group(columns: [\"_measurement\"])"
-  }'
-		*/
-		/*
+		return {
+			retentionS: this.retentionS,
+		};
+	}
+
+	/// Read all the measurements and all fields and initial values to populate the database.
+	///
+	/// This is done sequentially to reduce the load, as it doesn't need to be performed fast.
+	async read(options) {
 		const result = await this.clientQuery.post("/query", {
 			data: "SHOW MEASUREMENTS",
 		});
+		const measurements = result.results[0]?.series?.[0]?.values ?? [];
 
-		console.log(result);
-		const data = result.results[0]?.series?.[0]?.values ?? [];
-		console.log(data);
-
-		for (const [uid] of data) {
+		const gatherFieldAndValues = async (uid, useFields) => {
+			const selector = useFields ? useFields.map((field) => '"' + field + '"').join(",") : "*";
 			const result = await this.clientQuery.post("/query", {
-				data: 'SELECT last(*) FROM "' + uid + '" ORDER BY time DESC LIMIT 5',
+				data: "SELECT " + selector + ' FROM "' + uid + '" ORDER BY time DESC LIMIT 1',
 			});
-			const data2 = result.results[0]?.series?.[0] ?? {};
-			console.log(data2);
+			const data = result.results[0]?.series?.[0] ?? {};
+			const [_time, ...fields] = data.columns;
+			const values = data.values
+				.map((values) => {
+					const timestamp = values[0];
+					return fields.map((field, index) => {
+						return values[index + 1] === null
+							? null
+							: [DatabaseInfluxDB.fromFieldToKey(field), values[index + 1], timestamp];
+					});
+				})
+				.flat();
+			const remainingFields = fields.filter((_, index) => values[index] === null);
+			return [values.filter(Boolean), remainingFields];
+		};
+
+		// Read all measurements of each uid and their values.
+		let nbValues = 0;
+		for (const [uid] of measurements) {
+			let useFields = null;
+			while (useFields === null || useFields.length > 0) {
+				const [values, remainingFields] = await gatherFieldAndValues(uid, useFields);
+				nbValues += values.length;
+				for (const [key, value, timestamp] of values) {
+					await this.plugin.write(uid, key, value, timestamp);
+				}
+				Exception.assert(
+					useFields === null || useFields.length > remainingFields.length,
+					"More fields should have been fetched: remaining previous={:j}, now={:j}",
+					useFields,
+					remainingFields,
+				);
+				useFields = remainingFields;
+			}
 		}
-*/
+
 		return {
-			retentionS: this.retentionS,
+			measurements: measurements.length,
+			nbValues: nbValues,
 		};
 	}
 

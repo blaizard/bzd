@@ -83,7 +83,7 @@ export default class Handlers {
 						Exception.unreachable("Missing group handler.");
 					}
 				} catch (e) {
-					Log.error("Error while handling path {}: {}", KeyMapping.internalToPath(internal), e.toString());
+					Log.error("Error while handling path {:j}: {}", data.key, e.toString());
 					fragmentsGroup.push([data.key, data["data"]]);
 				}
 			}

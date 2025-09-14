@@ -557,8 +557,12 @@ describe("Plugin", () => {
 					Exception.assert(options.data.includes("uid01 hello.dict.a=1"));
 					Exception.assert(!options.data.includes("uid01 hello.fixed.c=3"));
 					resolve();
+				} else if (url.endsWith("/query")) {
+					return {
+						results: [],
+					};
 				} else {
-					Exception.unreachable("Should not be reached.");
+					Exception.unreachable("Should not be reached: {}", url);
 				}
 			});
 		});
@@ -578,8 +582,12 @@ describe("Plugin", () => {
 					Exception.assert(options.data.includes("uid01 hello.dict.a=1"));
 					Exception.assert(options.data.includes("uid01 hello.fixed.c=3 1234000000"));
 					resolve();
+				} else if (url.endsWith("/query")) {
+					return {
+						results: [],
+					};
 				} else {
-					Exception.unreachable("Should not be reached.");
+					Exception.unreachable("Should not be reached: {}", url);
 				}
 			});
 		});

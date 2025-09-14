@@ -176,4 +176,9 @@ export class Nodes {
 		}
 		return fromDiskRecord;
 	}
+
+	/// Create a record from a single entry.
+	static recordFromSingleEntry(uid, key, value, timestamp, isFixedTimestamp = false) {
+		return [[uid, key, value, timestamp, isFixedTimestamp]];
+	}
 }
