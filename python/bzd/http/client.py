@@ -9,6 +9,19 @@ import ssl
 import http.client
 
 
+class HttpClientException(Exception):
+	"""A custom exception for HTTP client errors."""
+
+	def __init__(self, message: str, status: int = None, reason: str = None, content: bytes = None):
+		super().__init__(message)
+		self.status = status
+		self.reason = reason
+		self.content = content
+
+	def __str__(self):
+		return f"{super().__str__()} [Status Code: {self.status}, Reason: {self.reason}]"
+
+
 class Response:
 
 	def __init__(self, response: http.client.HTTPResponse) -> None:
@@ -96,7 +109,11 @@ class HttpClient:
 
 		except urllib.error.HTTPError as e:
 			bodyError = e.read().decode("utf-8")
-			raise Exception(f"HTTP Error: {e.reason} ({e.code}) calling {url}: response body: {bodyError}")
+			raise HttpClientException(
+			    message=f"HTTP Error: {e.reason} ({e.code}) calling {url}: response body: {bodyError}",
+			    status=e.code,
+			    reason=e.reason,
+			    content=bodyError) from e
 
 		except urllib.error.URLError as e:
 			raise Exception(f"URL Error: {e.reason} calling {url}")
