@@ -12,13 +12,13 @@ import http.client
 class HttpClientException(Exception):
 	"""A custom exception for HTTP client errors."""
 
-	def __init__(self, message: str, status: int = None, reason: str = None, content: bytes = None):
+	def __init__(self, message: str, status: int, reason: str, content: bytes) -> None:
 		super().__init__(message)
 		self.status = status
 		self.reason = reason
 		self.content = content
 
-	def __str__(self):
+	def __str__(self) -> str:
 		return f"{super().__str__()} [Status Code: {self.status}, Reason: {self.reason}]"
 
 
@@ -108,9 +108,9 @@ class HttpClient:
 			return Response(response)
 
 		except urllib.error.HTTPError as e:
-			bodyError = e.read().decode("utf-8")
+			bodyError = e.read()
 			raise HttpClientException(
-			    message=f"HTTP Error: {e.reason} ({e.code}) calling {url}: response body: {bodyError}",
+			    message=f"HTTP Error: {e.reason} ({e.code}) calling {url}: response body: {bodyError.decode('utf-8')}",
 			    status=e.code,
 			    reason=e.reason,
 			    content=bodyError) from e
