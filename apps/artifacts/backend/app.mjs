@@ -56,7 +56,7 @@ const Exception = ExceptionFactory("backend");
 		const provider = new ServiceProvider(volume);
 		const endpoints = new EndpointsFactory();
 		const instance = new Plugins[type](volume, updatedOptions, provider, endpoints);
-		provider.addStopProcess(() => {
+		provider.addStopProcess("destructor", () => {
 			// This stop process will be executed at last.
 			backend.cache.setDirty("volume", volume);
 			instance.resetStorage();

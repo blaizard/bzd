@@ -63,20 +63,20 @@ describe("Services", () => {
 		});
 
 		it("Start process", () => {
-			provider.addStartProcess(() => ++startCounter);
+			provider.addStartProcess("start", () => ++startCounter);
 
 			const processes = [...provider.getStartProcesses()];
 			Exception.assertEqual(processes.length, 1);
-			Exception.assertEqual(processes[0][0], "start.1");
+			Exception.assertEqual(processes[0][0], "start");
 			Exception.assert("options" in processes[0][1]);
 		});
 
 		it("Stop process", () => {
-			provider.addStopProcess(() => ++stopCounter);
+			provider.addStopProcess("stop", () => ++stopCounter);
 
 			const processes = [...provider.getStopProcesses()];
 			Exception.assertEqual(processes.length, 1);
-			Exception.assertEqual(processes[0][0], "stop.1");
+			Exception.assertEqual(processes[0][0], "stop");
 			Exception.assert("options" in processes[0][1]);
 		});
 

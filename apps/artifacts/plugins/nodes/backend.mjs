@@ -138,7 +138,7 @@ export default class Plugin extends PluginBase {
 		const routerDashboards = buildRouterForDashboards(optionsDashboards);
 
 		this.records = new Records(optionsRecords);
-		provider.addStartProcess(async () => {
+		provider.addStartProcess("records.initialize", async () => {
 			let optionsNodes = {
 				cache: this.cache,
 			};
@@ -190,27 +190,20 @@ export default class Plugin extends PluginBase {
 		//     "type": "influxdb",
 		//     "host": "http://localhost:8081"
 		// }
-		for (const [databaseName, data] of Object.entries(optionsDatabases)) {
-			Exception.assert(data.type in databaseTypes, "Unrecognized database type '{}'.", data.type);
+		for (const [databaseName, databaseOptions] of Object.entries(optionsDatabases)) {
+			Exception.assert(databaseOptions.type in databaseTypes, "Unrecognized database type '{}'.", databaseOptions.type);
 			Log.info(
 				"[{}] Using database '{}' with read={}/write={}.",
 				volume,
 				databaseName,
-				data.read || false,
-				data.write || false,
+				databaseOptions.read || false,
+				databaseOptions.write || false,
 			);
-			const database = new databaseTypes[data.type](this, data, components);
-			provider.addStartProcess(async () => {
-				return await database.initialize();
-			});
-			if (data.write) {
-				provider.addTimeTriggeredProcess("database." + databaseName, database, {
-					policy: data.throwOnFailure ? Services.Policy.throw : Services.Policy.ignore,
-					periodS: 5,
-					delayS: data.delayS || null,
-				});
-			}
-			if (data.read) {
+			const database = new databaseTypes[databaseOptions.type](this, databaseOptions, components);
+			const providerDatabase = provider.makeNested("database", databaseName);
+			database.installServices(providerDatabase);
+
+			if (databaseOptions.read) {
 				Exception.assert(
 					dbReadExternal === null,
 					"[{}] database read is already set, only one can be set at a time.",

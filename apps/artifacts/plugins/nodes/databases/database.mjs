@@ -1,11 +1,10 @@
-import Process from "#bzd/nodejs/core/services/process.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
+import Services from "#bzd/nodejs/core/services/services.mjs";
 
 const Exception = ExceptionFactory("artifacts", "nodes", "database");
 
-export default class Database extends Process {
+export default class Database {
 	constructor(plugin, options, components) {
-		super();
 		this.plugin = plugin;
 		this.options = options;
 		this.components = components;
@@ -15,7 +14,21 @@ export default class Database extends Process {
 		Exception.assert(typeof this.onExternal === "function", "A database must implement a 'onExternal' function.");
 	}
 
-	async initialize() {}
+	installServices(provider) {
+		if (this.options.write) {
+			provider.addTimeTriggeredProcess(
+				"write",
+				async (options) => {
+					return await this.process(options);
+				},
+				{
+					policy: this.options.throwOnFailure ? Services.Policy.throw : Services.Policy.ignore,
+					periodS: 5,
+					delayS: this.options.delayS || null,
+				},
+			);
+		}
+	}
 
 	async process(options) {
 		try {

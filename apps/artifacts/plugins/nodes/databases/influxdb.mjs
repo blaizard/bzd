@@ -95,6 +95,13 @@ export default class DatabaseInfluxDB extends Database {
 		return value;
 	}
 
+	installServices(provider) {
+		super.installServices(provider);
+		provider.addStartProcess("initialize", async () => {
+			return await this.initialize();
+		});
+	}
+
 	async initialize() {
 		// If unset try to get the retention from the server.
 		if (this.retentionS === null) {
@@ -116,6 +123,34 @@ export default class DatabaseInfluxDB extends Database {
 				orgBucket.retentionRules.reduce((acc, value) => (value.type == "expire" ? value.everySeconds : acc), 0) || null;
 		}
 
+		// Read all the nodes from this database.
+		/*
+curl --request POST \
+  "http://localhost:8086/api/v2/query?org=YOUR_ORG" \
+  --header "Authorization: Token YOUR_API_TOKEN" \
+  --header "Content-Type: application/json" \
+  --header "Accept: application/json" \
+  --data '{
+    "query": "import \"influxdata/influxdb/schema\" schema.fieldKeys(bucket: \"YOUR_BUCKET_NAME\") |> group(columns: [\"_measurement\"])"
+  }'
+		*/
+		/*
+		const result = await this.clientQuery.post("/query", {
+			data: "SHOW MEASUREMENTS",
+		});
+
+		console.log(result);
+		const data = result.results[0]?.series?.[0]?.values ?? [];
+		console.log(data);
+
+		for (const [uid] of data) {
+			const result = await this.clientQuery.post("/query", {
+				data: 'SELECT last(*) FROM "' + uid + '" ORDER BY time DESC LIMIT 5',
+			});
+			const data2 = result.results[0]?.series?.[0] ?? {};
+			console.log(data2);
+		}
+*/
 		return {
 			retentionS: this.retentionS,
 		};

@@ -10,7 +10,7 @@ export default class Plugin extends PluginBase {
 	constructor(volume, options, provider, endpoints) {
 		super(volume, options, provider, endpoints);
 
-		provider.addStartProcess(async () => {
+		provider.addStartProcess(volume + ".constructor", async () => {
 			let storage = null;
 			switch (options["docker.type"]) {
 				case "v2":
@@ -27,7 +27,7 @@ export default class Plugin extends PluginBase {
 
 		if (options["docker.proxy"] == true) {
 			this.proxy = null;
-			provider.addStartProcess(async () => {
+			provider.addStartProcess(volume + ".constructor.proxy", async () => {
 				this.proxy = DockerV2Proxy.makeFromStorageDockerV2(
 					options["docker.proxy.url"],
 					options["docker.proxy.port"],
@@ -36,7 +36,7 @@ export default class Plugin extends PluginBase {
 				await this.proxy.start();
 			});
 
-			provider.addStopProcess(async () => {
+			provider.addStopProcess(volume + ".destructor.proxy", async () => {
 				await this.proxy.stop();
 				this.proxy = null;
 			});

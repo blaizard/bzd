@@ -15,7 +15,7 @@ import extensionWebdav from "#bzd/apps/artifacts/plugins/extension/webdav/webdav
 export default class Plugin extends PluginBase {
 	constructor(volume, options, provider, endpoints) {
 		super(volume, options, provider, endpoints, [extensionRelease, extensionUpload, extensionWebdav]);
-		provider.addStartProcess(async () => {
+		provider.addStartProcess(volume + ".constructor", async () => {
 			const storage = await makeFromConfig(options.storage);
 			this.setStorage(storage);
 		});

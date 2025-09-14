@@ -514,7 +514,7 @@ describe("Plugin", () => {
 				headers: { "Content-Type": "application/json" },
 				data: JSON.stringify({ data: [[1234, { c: 3 }]] }),
 			});
-			await tester.serviceRun("nodes.nodes", "database.database1");
+			await tester.serviceRun("nodes.nodes", "database.database1.write");
 			await waitUntil(() => fetched);
 		} finally {
 			await tester.stop();

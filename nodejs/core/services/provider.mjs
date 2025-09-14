@@ -34,9 +34,25 @@ class Trigger {
 export default class Provider {
 	constructor(...namespace) {
 		this.namespace = namespace;
-		this.processesStart = [];
-		this.processesStop = [];
+		this.prefix = "";
+		this.processesStart = new Set();
+		this.processesStop = new Set();
 		this.processes = {};
+	}
+
+	/// Create a nested provider that maps to its parent.
+	makeNested(...namespace) {
+		Exception.assert(namespace.length > 0, "Nested services must have a namespace");
+		const provider = new Provider(...this.namespace);
+		provider.prefix = namespace.join(".") + ".";
+		provider.processesStart = this.processesStart;
+		provider.processesStop = this.processesStop;
+		provider.processes = this.processes;
+		return provider;
+	}
+
+	_makeName(name) {
+		return this.prefix ? this.prefix + name : name;
 	}
 
 	_addProcess(name, process, options, trigger = null) {
@@ -66,7 +82,7 @@ export default class Provider {
 	}
 	*getProcesses() {
 		for (const [name, object] of Object.entries(this.processes)) {
-			if (!this.processesStart.includes(name) && !this.processesStop.includes(name)) {
+			if (!this.processesStart.has(name) && !this.processesStop.has(name)) {
 				yield [name, object];
 			}
 		}
@@ -93,26 +109,22 @@ export default class Provider {
 		return this.commongOptions;
 	}
 
-	addStartProcess(process, options = {}) {
-		const name = "start." + (this.processesStart.length + 1);
-		this.processesStart.push(name);
-		this._addProcess(name, process, Object.assign(this.commongStartOptions, options));
+	addStartProcess(name, process, options = {}) {
+		const actualName = this._makeName(name);
+		this.processesStart.add(actualName);
+		this._addProcess(actualName, process, Object.assign(this.commongStartOptions, options));
 	}
 
-	addStopProcess(process, options = {}) {
-		const name = "stop." + (this.processesStop.length + 1);
-		this.processesStop.push(name);
-		this._addProcess(name, process, Object.assign(this.commongStopOptions, options));
+	addStopProcess(name, process, options = {}) {
+		const actualName = this._makeName(name);
+		this.processesStop.add(actualName);
+		this._addProcess(actualName, process, Object.assign(this.commongStopOptions, options));
 	}
 
 	addTimeTriggeredProcess(name, process, options = {}) {
-		Exception.assert(
-			!name.startsWith("start.") && !name.startsWith("stop."),
-			"The process name '{}' cannot be used.",
-			name,
-		);
+		const actualName = this._makeName(name);
 		this._addProcess(
-			name,
+			actualName,
 			process,
 			Object.assign(
 				this.commongOptions,
@@ -129,13 +141,9 @@ export default class Provider {
 	}
 
 	addEventTriggeredProcess(name, process, options = {}) {
-		Exception.assert(
-			!name.startsWith("start.") && !name.startsWith("stop."),
-			"The process name '{}' cannot be used.",
-			name,
-		);
+		const actualName = this._makeName(name);
 		const trigger = new Trigger();
-		this._addProcess(name, process, Object.assign(this.commongOptions, {}, options), trigger);
+		this._addProcess(actualName, process, Object.assign(this.commongOptions, {}, options), trigger);
 		return trigger;
 	}
 }

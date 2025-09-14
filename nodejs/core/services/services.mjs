@@ -60,14 +60,14 @@ export default class Services {
 	async runProcess(uid, name) {
 		Exception.assertPrecondition(
 			uid in this.services,
-			"No service exists with uid {}, choose from: {}",
+			"No service exists with uid '{}', choose from: {}",
 			uid,
 			Object.keys(this.services).join(", "),
 		);
 		const service = this.services[uid];
 		Exception.assertPrecondition(
 			name in service.provider.processes,
-			"No service exists with name {}.{}, choose from: {}",
+			"No service for uid '{}' exists with name '{}', choose from: {}",
 			uid,
 			name,
 			Object.keys(service.provider.processes).join(", "),
