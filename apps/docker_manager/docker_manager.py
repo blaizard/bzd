@@ -13,6 +13,7 @@ from bzd.utils.scheduler import Scheduler
 from apps.artifacts.api.python.node.node import Node
 
 Container = typing.Dict[str, typing.Any]
+DiskSpace = typing.Dict[str, typing.Any]
 
 
 class Docker:
@@ -39,22 +40,37 @@ class Docker:
 
 		containers = []
 		for data in raw:
-			version = {}
-			if "Image" in data:
-				version["image"] = data["Image"]
-			if "Created" in data:
-				datetimeObj = datetime.datetime.fromtimestamp(data["Created"])
-				version["created"] = datetimeObj.strftime("%Y-%m-%d %H:%M:%S")
-			containers.append({
+
+			info = {
 			    "id": data["Id"],
 			    "image": data["Image"],
 			    "name": data["Names"][0],
 			    "active": True if data["State"].lower() == "running" else False,
-			    "version": version,
+			    "version": {},
+			    "volumes": {
+			        mount["Name"]: mount["Destination"]
+			        for mount in data.get("Mounts", []) if mount["Type"] == "volume"
+			    },
 			    "size": data["SizeRootFs"]
-			})
+			}
+
+			if "Image" in data:
+				info["version"]["image"] = data["Image"]
+			if "Created" in data:
+				datetimeObj = datetime.datetime.fromtimestamp(data["Created"])
+				info["version"]["created"] = datetimeObj.strftime("%Y-%m-%d %H:%M:%S")
+
+			containers.append(info)
 
 		return containers
+
+	def getDiskSpace(self) -> DiskSpace:
+		raw = self.request("GET", f"/system/df")
+
+		output: DiskSpace = {"volumes": {}}
+		for volume in raw.get("Volumes", []):
+			output["volumes"][volume["Name"]] = {"used": volume["UsageData"]["Size"]}
+		return output
 
 	def _cpuInfo(self, containerId: str, stats: typing.Any) -> typing.Any:
 		"""Extracts CPU usage stats from the Docker stats dictionary.
@@ -188,7 +204,7 @@ class Docker:
 
 		return None
 
-	def getContainerStats(self, container: Container) -> typing.Any:
+	def getContainerStats(self, container: Container, diskSpace: DiskSpace) -> typing.Any:
 		containerId = container["id"]
 		raw = self.request("GET", f"/containers/{containerId}/stats?stream=false")
 		output = {
@@ -200,6 +216,9 @@ class Docker:
 		        }
 		    }
 		}
+
+		for volume, destination in container["volumes"].items():
+			output["disk"][destination] = diskSpace["volumes"][volume]
 
 		def addIfNotNone(key: str, data: typing.Any) -> None:
 			if data is not None:
@@ -239,9 +258,10 @@ class Docker:
 
 	def getDockerData(self) -> typing.Any:
 		containers = self.getContainers()
+		diskSpace = self.getDiskSpace()
 		data = {}
 		for container in containers:
-			stats = self.getContainerStats(container)
+			stats = self.getContainerStats(container, diskSpace)
 			name = container["name"].replace("/", "")
 			data[name] = {
 			    "data": stats,
