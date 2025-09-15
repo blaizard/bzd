@@ -7,6 +7,7 @@ import typing
 import os
 import datetime
 import time
+import threading
 
 from bzd.http.parser import HttpParser
 from bzd.utils.scheduler import Scheduler
@@ -15,6 +16,47 @@ from apps.artifacts.api.python.node.node import Node
 Container = typing.Dict[str, typing.Any]
 DiskSpace = typing.Dict[str, typing.Any]
 
+T = typing.TypeVar("T")
+
+
+class AsyncFunction(typing.Generic[T]):
+
+	def __init__(self, function: typing.Callable[[], T], defaultValue: T) -> None:
+		self.function = function
+		self.worker: typing.Optional[threading.Thread] = None
+		self.result = defaultValue
+
+	def _wrapper(self) -> None:
+		self.result = self.function()
+
+	def trigger(self) -> bool:
+		"""Trigger the function.
+		
+		Returns:
+			True if the function was triggered, False if it is already running from a previous trigger.
+		"""
+
+		if (self.worker is None) or (not self.worker.is_alive()):
+			self.worker = threading.Thread(target=self._wrapper, daemon=True)
+			self.worker.start()
+			return True
+		return False
+
+	def get(self, waitMaxS: int = 0) -> T:
+		"""Get the result.
+
+		Args:
+			waitMaxS: Wait for a mxiumum of seconds for the result. If no new result is present by that time,
+			return the previous or default value.
+		"""
+
+		if self.trigger():
+			assert self.worker is not None
+			endTime = time.time() + waitMaxS
+			while time.time() < endTime and self.worker.is_alive():
+				time.sleep(0.1)
+		return self.result
+
 
 class Docker:
 
@@ -22,6 +64,7 @@ class Docker:
 		self.socket = socket
 		self.previousIO: typing.Dict[str, typing.Any] = {}
 		self.previousNetwork: typing.Dict[str, typing.Any] = {}
+		self.diskSpace: AsyncFunction[DiskSpace] = AsyncFunction(self.getDiskSpace, {})
 
 	def request(self, method: str, endpoint: str) -> typing.Any:
 		with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as sock:
@@ -65,7 +108,9 @@ class Docker:
 		return containers
 
 	def getDiskSpace(self) -> DiskSpace:
-		raw = self.request("GET", f"/system/df")
+
+		# This takes time.
+		raw = self.request("GET", f"/system/df?type=volume")
 
 		output: DiskSpace = {"volumes": {}}
 		for volume in raw.get("Volumes", []):
@@ -204,7 +249,7 @@ class Docker:
 
 		return None
 
-	def getContainerStats(self, container: Container, diskSpace: DiskSpace) -> typing.Any:
+	def getContainerStats(self, container: Container) -> typing.Any:
 		containerId = container["id"]
 		raw = self.request("GET", f"/containers/{containerId}/stats?stream=false")
 		output = {
@@ -218,7 +263,9 @@ class Docker:
 		}
 
 		for volume, destination in container["volumes"].items():
-			output["disk"][destination] = diskSpace["volumes"][volume]
+			diskSpace = self.diskSpace.get(1).get("volumes", {})
+			if volume in diskSpace:
+				output["disk"][destination] = diskSpace[volume]
 
 		def addIfNotNone(key: str, data: typing.Any) -> None:
 			if data is not None:
@@ -258,10 +305,9 @@ class Docker:
 
 	def getDockerData(self) -> typing.Any:
 		containers = self.getContainers()
-		diskSpace = self.getDiskSpace()
 		data = {}
 		for container in containers:
-			stats = self.getContainerStats(container, diskSpace)
+			stats = self.getContainerStats(container)
 			name = container["name"].replace("/", "")
 			data[name] = {
 			    "data": stats,
