@@ -1,5 +1,9 @@
 import typing
-import threading
+from multiprocessing import Process, Queue
+from queue import Empty
+
+ReturnType = typing.TypeVar("ReturnType")
+ParameterTypes = typing.ParamSpec("ParameterTypes")
 
 
 class TimeoutError(Exception):
@@ -7,24 +11,33 @@ class TimeoutError(Exception):
 
 
 class Timeout:
-	"""Context manager to add a timeout to a block of code.
-	
-	Note that we cannot use `signal' here as it will not be supported
-	with multithreading. It works only in the main thread.
+	"""Add a timeout to a function.
+
+	Note that this is the only viable solution I found.
+	- Using `signal', will not supported multithreading.
+	- Using `threading.Timer`, will not show a proper stack trace.
+	- Using `PyThreadState_SetAsyncExc`, is not portable. 
 	"""
 
 	def __init__(self, seconds: int) -> None:
 		self.seconds = seconds
 
-	def __enter__(self) -> "Timeout":
+	def run(self, func: typing.Callable[ParameterTypes, ReturnType], *args: ParameterTypes.args,
+	        **kwargs: ParameterTypes.kwargs) -> ReturnType:
+		queue: Queue[ReturnType] = Queue()
 
-		def timeout() -> None:
-			raise TimeoutError(f"Timed out after {self.seconds}s.")
+		def wrapper() -> None:
+			"""The target for the new process."""
+			result = func(*args, **kwargs)
+			queue.put(result)
 
-		self.timer = threading.Timer(self.seconds, timeout)
-		self.timer.start()
+		process = Process(target=wrapper)
+		process.start()
 
-		return self
-
-	def __exit__(self, *args: typing.Any) -> None:
-		self.timer.cancel()
+		try:
+			return queue.get(timeout=self.seconds)
+		except Empty:
+			process.terminate()
+			process.join()
+		allArgs = [repr(arg) for arg in args] + [f"{key}={repr(value)}" for key, value in kwargs.items()]
+		raise TimeoutError(f"Function {func.__name__}({', '.join(allArgs)}) timed out after {self.seconds}s")

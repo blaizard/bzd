@@ -41,6 +41,16 @@ py_test(
 )
 
 py_test(
+    name = "timeout",
+    srcs = ["timeout_test.py"],
+    main = "timeout_test.py",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@bzd_python//bzd/utils:timeout",
+    ],
+)
+
+py_test(
     name = "worker",
     srcs = ["worker_test.py"],
     main = "worker_test.py",

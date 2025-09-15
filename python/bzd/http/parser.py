@@ -48,8 +48,7 @@ class HttpParser:
 		return defaultValue
 
 	def _read(self) -> bytes:
-		with Timeout(self.timeoutS):
-			return self.reader()
+		return Timeout(self.timeoutS).run(self.reader)
 
 	def _readHeaders(self) -> None:
 		"""Process the data and parse the headers.
