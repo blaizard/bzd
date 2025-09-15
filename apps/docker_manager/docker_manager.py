@@ -19,19 +19,24 @@ DiskSpace = typing.Dict[str, typing.Any]
 T = typing.TypeVar("T")
 
 
-class AsyncFunction(typing.Generic[T]):
+class Cache(typing.Generic[T]):
 
-	def __init__(self, function: typing.Callable[[], T], defaultValue: T) -> None:
+	def __init__(self, function: typing.Callable[[], T], defaultValue: T, expireS: int) -> None:
 		self.function = function
 		self.worker: typing.Optional[threading.Thread] = None
 		self.result = defaultValue
+		self.expireS = expireS
+		self.lastRunS: float = 0
 
 	def _wrapper(self) -> None:
 		self.result = self.function()
 
-	def trigger(self) -> bool:
+	def trigger(self, waitMaxS: int = 0) -> bool:
 		"""Trigger the function.
-		
+
+		Args:
+			waitMaxS: Wait for a maximum of seconds for the result.
+
 		Returns:
 			True if the function was triggered, False if it is already running from a previous trigger.
 		"""
@@ -39,22 +44,20 @@ class AsyncFunction(typing.Generic[T]):
 		if (self.worker is None) or (not self.worker.is_alive()):
 			self.worker = threading.Thread(target=self._wrapper, daemon=True)
 			self.worker.start()
+			self.lastRunS = time.time()
+
+			endTime = time.time() + waitMaxS
+			while time.time() < endTime and self.worker.is_alive():
+				time.sleep(0.1)
+
 			return True
 		return False
 
 	def get(self, waitMaxS: int = 0) -> T:
-		"""Get the result.
+		"""Get the result."""
 
-		Args:
-			waitMaxS: Wait for a mxiumum of seconds for the result. If no new result is present by that time,
-			return the previous or default value.
-		"""
-
-		if self.trigger():
-			assert self.worker is not None
-			endTime = time.time() + waitMaxS
-			while time.time() < endTime and self.worker.is_alive():
-				time.sleep(0.1)
+		if self.lastRunS + self.expireS < time.time():
+			self.trigger(waitMaxS)
 		return self.result
 
 
@@ -64,7 +67,7 @@ class Docker:
 		self.socket = socket
 		self.previousIO: typing.Dict[str, typing.Any] = {}
 		self.previousNetwork: typing.Dict[str, typing.Any] = {}
-		self.diskSpace: AsyncFunction[DiskSpace] = AsyncFunction(self.getDiskSpace, {})
+		self.diskSpace: Cache[DiskSpace] = Cache(self.getDiskSpace, defaultValue={}, expireS=3600 * 6)
 
 	def request(self, method: str, endpoint: str, timeoutS: int = 10) -> typing.Any:
 		with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as sock:
@@ -79,7 +82,7 @@ class Docker:
 			return json.loads(content)
 
 	def getContainers(self) -> typing.List[Container]:
-		raw = self.request("GET", "/containers/json?all=true&size=true")
+		raw = self.request("GET", "/containers/json?all=true&size=true", timeoutS=600)
 
 		containers = []
 		for data in raw:
@@ -251,7 +254,7 @@ class Docker:
 
 	def getContainerStats(self, container: Container) -> typing.Any:
 		containerId = container["id"]
-		raw = self.request("GET", f"/containers/{containerId}/stats?stream=false")
+		raw = self.request("GET", f"/containers/{containerId}/stats?stream=false", timeoutS=600)
 		output = {
 		    "active": container["active"],
 		    "version": container["version"],
@@ -288,7 +291,7 @@ class Docker:
 		Returns:
 			A float representing the container's uptime in seconds, or None if an error occurs.
 		"""
-		raw = self.request("GET", f"/containers/{container['id']}/json")
+		raw = self.request("GET", f"/containers/{container['id']}/json", timeoutS=600)
 
 		try:
 
