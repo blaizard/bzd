@@ -66,7 +66,7 @@ class Docker:
 		self.previousNetwork: typing.Dict[str, typing.Any] = {}
 		self.diskSpace: AsyncFunction[DiskSpace] = AsyncFunction(self.getDiskSpace, {})
 
-	def request(self, method: str, endpoint: str) -> typing.Any:
+	def request(self, method: str, endpoint: str, timeoutS: int = 10) -> typing.Any:
 		with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as sock:
 			sock.connect(self.socket.as_posix())
 
@@ -74,7 +74,7 @@ class Docker:
 			request = f"{method} {endpoint} HTTP/1.1\r\nHost: docker\r\n\r\n"
 			sock.sendall(request.encode())
 
-			parser = HttpParser(lambda: sock.recv(4096))
+			parser = HttpParser(lambda: sock.recv(4096), timeoutS=timeoutS)
 			content = parser.readAll().decode()
 			return json.loads(content)
 
@@ -110,7 +110,7 @@ class Docker:
 	def getDiskSpace(self) -> DiskSpace:
 
 		# This takes time.
-		raw = self.request("GET", f"/system/df?type=volume")
+		raw = self.request("GET", f"/system/df?type=volume", timeoutS=600)
 
 		output: DiskSpace = {"volumes": {}}
 		for volume in raw.get("Volumes", []):
