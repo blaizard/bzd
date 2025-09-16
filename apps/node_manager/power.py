@@ -8,4 +8,12 @@ def handlerSuspend(context: RESTServerContext) -> None:
 	os.system("systemctl suspend")
 
 
-handlersPower = {"/suspend": handlerSuspend}
+def handlerShutdown(context: RESTServerContext) -> None:
+	print("Shutting down...")
+	os.system("systemctl poweroff")
+
+
+handlersPower = {
+    "/suspend": handlerSuspend,
+    "/shutdown": handlerShutdown,
+}

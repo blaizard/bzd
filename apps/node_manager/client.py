@@ -107,6 +107,17 @@ def commandSuspend(args: argparse.Namespace) -> None:
 		print(str(e))
 
 
+def commandShutdown(args: argparse.Namespace) -> None:
+	"""Shutdown a machine running the server."""
+
+	host, port = getHostPort(args.ip)
+
+	try:
+		urllib.request.urlopen(f"http://{host}:{port}/shutdown").read()
+	except Exception as e:
+		print(str(e))
+
+
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Wake On Lan client.")
 	subparsers = parser.add_subparsers(help="Available sub-commands.", dest="command")
@@ -139,8 +150,11 @@ if __name__ == "__main__":
 	)
 	wolParser.add_argument("mac", help="The mac address for the machine to wake up.")
 
-	shutdownParser = subparsers.add_parser("suspend", help="Suspend a machine running the server.")
-	shutdownParser.add_argument("ip", help="The ip:port address for the machine to suspend.")
+	suspendParser = subparsers.add_parser("suspend", help="Suspend a machine running the server.")
+	suspendParser.add_argument("ip", help="The ip:port address for the machine to suspend.")
+
+	shutdownParser = subparsers.add_parser("shutdown", help="Shutdown a machine running the server.")
+	shutdownParser.add_argument("ip", help="The ip:port address for the machine to shutdown.")
 
 	args = parser.parse_args()
 
@@ -148,5 +162,7 @@ if __name__ == "__main__":
 		commandWol(args)
 	elif args.command == "suspend":
 		commandSuspend(args)
+	elif args.command == "shutdown":
+		commandShutdown(args)
 	else:
 		assert False, f"Unknown command: '{args.command}'."
