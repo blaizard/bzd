@@ -8,8 +8,8 @@
 		<div>
 			<span>Accessors:</span>
 			<ul>
-				<li v-for="query in endpointsQueryAccessors">
-					<a :href="endpoint + query">{{ endpoint }}{{ query }}</a>
+				<li v-for="accessor in endpointsAccessors">
+					<a :href="accessor">{{ accessor }}</a>
 				</li>
 			</ul>
 		</div>
@@ -46,6 +46,10 @@
 			endpoint() {
 				return "/x" + Utils.keyToPath(this.pathList);
 			},
+			endpointExport() {
+				const [volume, ...path] = this.pathList;
+				return "/x/" + encodeURIComponent(volume) + "/@export" + Utils.keyToPath(path);
+			},
 			isValue() {
 				return "_" in this.tree;
 			},
@@ -63,14 +67,24 @@
 			valueOldestTimestamp() {
 				return this.value[0][0];
 			},
-			endpointsQueryAccessors() {
+			endpointsAccessors() {
 				if (this.isValue) {
 					if (this.isChildren) {
-						return ["?children=99", "?metadata=1", "?count=5"];
+						return [
+							this.endpoint + "?children=99",
+							this.endpoint + "?metadata=1",
+							this.endpoint + "?count=5",
+							this.endpointExport + "?children=99&format=csv",
+						];
 					}
-					return ["?metadata=1", "?count=5"];
+					return [this.endpoint + "?metadata=1", this.endpoint + "?count=5", this.endpointExport + "?format=csv"];
 				}
-				return ["?children=99", "?children=99&metadata=1", "?children=99&count=5"];
+				return [
+					this.endpoint + "?children=99",
+					this.endpoint + "?children=99&metadata=1",
+					this.endpoint + "?children=99&count=5",
+					this.endpointExport + "?children=99&format=csv",
+				];
 			},
 			timestampServer() {
 				return this.metadata.timestamp || Date.now();

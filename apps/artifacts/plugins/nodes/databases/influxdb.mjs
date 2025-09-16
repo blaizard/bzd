@@ -201,7 +201,7 @@ export default class DatabaseInfluxDB extends Database {
 				const [values, remainingFields] = await gatherFieldAndValues(uid, useFields);
 				nbValues += values.length;
 				for (const [key, value, timestamp] of values) {
-					await this.plugin.write(uid, key, value, timestamp);
+					await this.plugin.write(uid, key, DatabaseInfluxDB.fromDBValueToValue(value), timestamp);
 				}
 				Exception.assert(
 					useFields === null || useFields.length > remainingFields.length,
