@@ -178,6 +178,14 @@ export class Nodes {
 	}
 
 	/// Create a record from a single entry.
+	///
+	/// \param uid The identifier of the node.
+	/// \param key The key where to store the value.
+	/// \param value The value to be stored.
+	/// \param timestamp The timestamp in Ms of this value.
+	/// \param isFixedTimestamp If the timestamp is considered fixed or not.
+	///
+	/// \return A record containing this information.
 	static recordFromSingleEntry(uid, key, value, timestamp, isFixedTimestamp = false) {
 		return [[uid, key, value, timestamp, isFixedTimestamp]];
 	}

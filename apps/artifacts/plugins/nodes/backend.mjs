@@ -12,6 +12,8 @@ import { isObject } from "#bzd/nodejs/utils/object.mjs";
 import Router from "#bzd/nodejs/core/router.mjs";
 import format from "#bzd/nodejs/core/format.mjs";
 import Utils from "#bzd/apps/artifacts/common/utils.mjs";
+import DataGenerator from "#bzd/apps/artifacts/plugins/nodes/data_generator.mjs";
+import { Readable } from "stream";
 
 const databaseTypes = {
 	influxdb: DatabaseInfluxDB,
@@ -259,6 +261,40 @@ export default class Plugin extends PluginBase {
 					output,
 				),
 			);
+		});
+
+		/// Export a dataset into a file of a specific format.
+		endpoints.register("get", "/@export/{uid}/{path:*}", async (context) => {
+			const uid = context.getParam("uid");
+			const key = Utils.pathToKey(context.getParam("path"));
+			const format = context.getQuery("format", "csv", String);
+			const children = context.getQuery("children", 0, parseInt);
+			const after = context.getQuery("after", 0, parseInt);
+			const before = context.getQuery("before", null, parseInt);
+
+			const node = await this.nodes.get(uid);
+			const generator = new DataGenerator(node, key, children, after, before);
+			const name = [uid, ...key].join(".").replace(/[^a-z0-9_\-\.]+/gi, "-");
+
+			switch (format) {
+				case "csv":
+					context.setHeader("Content-Type", "text/csv");
+					context.setHeader("Content-Disposition", 'attachment; filename="' + name + '.csv"');
+					const stream = new Readable({ read() {} });
+					context.sendStream(stream);
+
+					const columns = await generator.getColumns();
+					stream.push("date;timestamp;" + columns.join(";") + "\n");
+
+					for await (const [timestamp, values] of generator.byTimestamp()) {
+						const row = columns.map((column) => String(values[column] || ""));
+						stream.push(new Date(timestamp).toUTCString() + ";" + timestamp + ";" + row.join(";") + "\n");
+					}
+					stream.push(null);
+					break;
+				default:
+					Exception.assertPrecondition(false, "Unsupported format '{}'.", format);
+			}
 		});
 
 		/// Get information about the dashboards at the specified path.
@@ -516,7 +552,16 @@ export default class Plugin extends PluginBase {
 		};
 	}
 
-	/// Write a value to the in-memory data, do not write any record about it and bypass the handlers.
+	/// Write a value to the in-memory data.
+	///
+	/// Note, it does not:
+	/// - Write a record for this.
+	/// - Use the handlers mechanism.
+	///
+	/// \param uid The identifier of the node.
+	/// \param key The key where to store the value.
+	/// \param value The value to be stored.
+	/// \param timestamp The timestamp in Ms of this value.
 	async write(uid, key, value, timestamp) {
 		await this.nodes.insertRecord(Nodes.recordFromSingleEntry(uid, key, value, timestamp));
 	}

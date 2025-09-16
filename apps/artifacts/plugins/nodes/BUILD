@@ -21,6 +21,7 @@ bzd_nodejs_library(
     name = "backend",
     srcs = [
         "backend.mjs",
+        "data_generator.mjs",
         "storage.mjs",
     ],
     visibility = [
