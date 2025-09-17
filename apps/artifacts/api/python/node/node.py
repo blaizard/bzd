@@ -1,7 +1,6 @@
 import typing
 from contextlib import contextmanager
 
-from bzd.http.client import HttpClient
 from bzd.http.utils import encodeURIComponent
 from bzd.logging.handler import Log, LoggerHandler, LoggerHandlerData, LoggerHandlerFlow
 from apps.artifacts.api.python.common import ArtifactsBase
@@ -20,6 +19,17 @@ class PublisherProtocol(typing.Protocol):
 
 class Node(ArtifactsBase):
 
+	def __init__(self, buffer: typing.Optional[int] = None, **kwargs: typing.Any) -> None:
+		"""Initialize the Node object.
+		
+		Args:
+			buffer: The number of entries that can be buffered if the server cannot be reached.
+			        Once the server can be reached again, all entries will be sent again.
+		"""
+
+		super().__init__(**kwargs)
+		self.buffer = buffer
+
 	def publishMultiNodes(self, data: typing.Dict[str, typing.Any], volume: str = defaultNodeVolume) -> None:
 		"""Publish data to a remote to multiple nodes.
 
@@ -37,7 +47,7 @@ class Node(ArtifactsBase):
 			url = f"{remote}/x/{volume}/"
 
 			try:
-				HttpClient.post(url, json=data, query=query)
+				self.httpClient.post(url, json=data, query=query)
 				return
 			except Exception as e:
 				if retry == nbRetries:
@@ -76,7 +86,7 @@ class Node(ArtifactsBase):
 			url = f"{remote}/x/{volume}/{actualUid}/data" + (f"/{subPath}" if subPath else "") + "/"
 
 			try:
-				HttpClient.post(url, json=data, query=query)
+				self.httpClient.post(url, json=data, query=query)
 				return
 			except Exception as e:
 				if retry == nbRetries:

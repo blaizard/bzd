@@ -8,6 +8,7 @@ py_library(
     ],
     visibility = ["//apps/artifacts/api/python:__subpackages__"],
     deps = [
+        "@bzd_python//bzd/http:client",
         "@bzd_python//bzd/logging",
     ],
 )

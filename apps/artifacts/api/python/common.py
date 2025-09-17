@@ -1,6 +1,7 @@
 import typing
 import os
 
+from bzd.http.client import HttpClient
 from apps.artifacts.api.config import remotes as configRemotes, token as configToken
 from bzd.logging import Logger
 
@@ -11,11 +12,12 @@ class ArtifactsBase:
 	"""Common libraries for the Artifacts API library."""
 
 	def __init__(
-	    self,
-	    uid: typing.Optional[str] = None,
-	    remotes: typing.List[str] = configRemotes,
-	    token: typing.Optional[str] = os.environ.get("BZD_NODE_TOKEN", configToken),
-	    logger: Logger = Logger("artifacts.api")
+	        self,
+	        uid: typing.Optional[str] = None,
+	        remotes: typing.List[str] = configRemotes,
+	        token: typing.Optional[str] = os.environ.get("BZD_NODE_TOKEN", configToken),
+	        logger: Logger = Logger("artifacts.api"),
+	        httpClient: typing.Any = HttpClient,
 	) -> None:
 		"""Construct the Artifacts API object.
 
@@ -30,6 +32,7 @@ class ArtifactsBase:
 		self.token = token
 		self.logger = logger
 		self.remote: typing.Optional[str] = None
+		self.httpClient = httpClient
 
 	@property
 	def remotes(self) -> typing.Generator[typing.Tuple[str, int, int], None, None]:

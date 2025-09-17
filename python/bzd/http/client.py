@@ -8,6 +8,18 @@ import certifi
 import ssl
 import http.client
 
+# ---- Interfaces ----
+
+
+class HttpClientRequestProtocol(typing.Protocol):
+
+	def __call__(self, method: str, url: str, body: typing.Optional[bytes], headers: typing.Dict[str, str],
+	             timeoutS: int) -> "HttpResponse":
+		...
+
+
+# ---- Generic ----
+
 
 class HttpClientException(Exception):
 	"""A custom exception for HTTP client errors."""
@@ -22,19 +34,20 @@ class HttpClientException(Exception):
 		return f"{super().__str__()} [Status Code: {self.status}, Reason: {self.reason}]"
 
 
-class Response:
+class HttpResponse(typing.Protocol):
 
-	def __init__(self, response: http.client.HTTPResponse) -> None:
-		self.response = response
-		self.encoding = "utf8"
+	encoding: str = "utf8"
 
 	@property
 	def status(self) -> int:
-		return self.response.status
+		...
 
 	@property
 	def content(self) -> bytes:
-		return self.response.read()
+		...
+
+	def getHeader(self, name: str) -> typing.Optional[str]:
+		...
 
 	@property
 	def text(self) -> str:
@@ -44,41 +57,39 @@ class Response:
 	def json(self) -> typing.Any:
 		return JsonLibrary.loads(self.text)
 
-	def getHeader(self, name: str) -> typing.Optional[str]:
-		return self.response.getheader(name, None)
-
 
 class HttpClient:
 
 	@staticmethod
-	def get(*args: typing.Any, **kwargs: typing.Any) -> Response:
-		return HttpClient._any("GET", *args, **kwargs)
+	def get(*args: typing.Any, **kwargs: typing.Any) -> HttpResponse:
+		return HttpClient._any(_request, "GET", *args, **kwargs)
 
 	@staticmethod
-	def post(*args: typing.Any, **kwargs: typing.Any) -> Response:
-		return HttpClient._any("POST", *args, **kwargs)
+	def post(*args: typing.Any, **kwargs: typing.Any) -> HttpResponse:
+		return HttpClient._any(_request, "POST", *args, **kwargs)
 
 	@staticmethod
-	def put(*args: typing.Any, **kwargs: typing.Any) -> Response:
-		return HttpClient._any("PUT", *args, **kwargs)
+	def put(*args: typing.Any, **kwargs: typing.Any) -> HttpResponse:
+		return HttpClient._any(_request, "PUT", *args, **kwargs)
 
 	@staticmethod
-	def head(*args: typing.Any, **kwargs: typing.Any) -> Response:
-		return HttpClient._any("HEAD", *args, **kwargs)
+	def head(*args: typing.Any, **kwargs: typing.Any) -> HttpResponse:
+		return HttpClient._any(_request, "HEAD", *args, **kwargs)
 
 	@staticmethod
-	def delete(*args: typing.Any, **kwargs: typing.Any) -> Response:
-		return HttpClient._any("DELETE", *args, **kwargs)
+	def delete(*args: typing.Any, **kwargs: typing.Any) -> HttpResponse:
+		return HttpClient._any(_request, "DELETE", *args, **kwargs)
 
 	@staticmethod
-	def _any(method: str,
+	def _any(request: HttpClientRequestProtocol,
+	         method: str,
 	         url: str,
 	         query: typing.Optional[typing.Dict[str, str]] = None,
 	         json: typing.Optional[typing.Dict[str, typing.Any]] = None,
 	         file: typing.Optional[pathlib.Path] = None,
 	         mimetype: typing.Optional[str] = None,
 	         timeoutS: int = 60,
-	         headers: typing.Optional[typing.Dict[str, str]] = None) -> Response:
+	         headers: typing.Optional[typing.Dict[str, str]] = None) -> HttpResponse:
 
 		body = None
 		headers = headers or {}
@@ -100,20 +111,47 @@ class HttpClient:
 					queries.append(f"{urllib.parse.quote(key)}={urllib.parse.quote(value)}")
 			url += "?" + "&".join(queries)
 
-		context = ssl.create_default_context(cafile=certifi.where())
-		request = urllib.request.Request(url, data=body, headers=headers, method=method)
+		return request(method=method, url=url, body=body, headers=headers, timeoutS=timeoutS)
 
-		try:
-			response = urllib.request.urlopen(request, timeout=timeoutS, context=context)
-			return Response(response)
 
-		except urllib.error.HTTPError as e:
-			bodyError = e.read()
-			raise HttpClientException(
-			    message=f"HTTP Error: {e.reason} ({e.code}) calling {url}: response body: {bodyError.decode('utf-8')}",
-			    status=e.code,
-			    reason=e.reason,
-			    content=bodyError) from e
+# ---- Implementation ----
 
-		except urllib.error.URLError as e:
-			raise Exception(f"URL Error: {e.reason} calling {url}")
+
+class _HTTPResponseAdapter(HttpResponse):
+
+	def __init__(self, response: http.client.HTTPResponse) -> None:
+		self.response = response
+
+	@property
+	def status(self) -> int:
+		return self.response.status
+
+	@property
+	def content(self) -> bytes:
+		return self.response.read()
+
+	def getHeader(self, name: str) -> typing.Optional[str]:
+		return self.response.getheader(name, None)
+
+
+def _request(method: str, url: str, body: typing.Optional[bytes], headers: typing.Dict[str, str],
+             timeoutS: int) -> HttpResponse:
+	"""Processor of a request using urllib."""
+
+	context = ssl.create_default_context(cafile=certifi.where())
+	request = urllib.request.Request(url, data=body, headers=headers, method=method)
+
+	try:
+		response = urllib.request.urlopen(request, timeout=timeoutS, context=context)
+		return _HTTPResponseAdapter(response)
+
+	except urllib.error.HTTPError as e:
+		bodyError = e.read()
+		raise HttpClientException(
+		    message=f"HTTP Error: {e.reason} ({e.code}) calling {url}: response body: {bodyError.decode('utf-8')}",
+		    status=e.code,
+		    reason=e.reason,
+		    content=bodyError) from e
+
+	except urllib.error.URLError as e:
+		raise Exception(f"URL Error: {e.reason} calling {url}")

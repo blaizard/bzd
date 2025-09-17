@@ -11,6 +11,16 @@ py_library(
 )
 
 py_library(
+    name = "client_mock",
+    testonly = True,
+    srcs = ["client_mock.py"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":client",
+    ],
+)
+
+py_library(
     name = "parser",
     srcs = ["parser.py"],
     visibility = ["//visibility:public"],
