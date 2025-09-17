@@ -286,8 +286,21 @@ export default class Plugin extends PluginBase {
 					const columns = await generator.getColumns();
 					stream.push("date;timestamp;" + columns.join(";") + "\n");
 
+					const valueToCell = (value) => {
+						switch (typeof value) {
+							case "undefined":
+								return "";
+							case "object":
+								return JSON.stringify(value);
+							case "boolean":
+								return value ? "true" : "false";
+							default:
+								return String(value);
+						}
+					};
+
 					for await (const [timestamp, values] of generator.byTimestamp()) {
-						const row = columns.map((column) => String(values[column] || ""));
+						const row = columns.map((column) => valueToCell(values[column]));
 						stream.push(new Date(timestamp).toUTCString() + ";" + timestamp + ";" + row.join(";") + "\n");
 					}
 					stream.push(null);
