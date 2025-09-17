@@ -3,7 +3,7 @@ import typing
 import json
 
 from apps.artifacts.api.python.node.node import Node
-from bzd.http.client_mock import HttpClientMock, HttpResponseMock
+from bzd.http.client_mock import HttpClientMock
 
 
 class TestRun(unittest.TestCase):

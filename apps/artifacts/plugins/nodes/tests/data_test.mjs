@@ -66,8 +66,8 @@ describe("Nodes", () => {
 				const result = await data.get({ uid: "hello", key: ["a", "c"], children: 1 });
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), [
-					[["e"], 1],
 					[["d"], 13],
+					[["e"], 1],
 				]);
 			}
 
@@ -76,9 +76,9 @@ describe("Nodes", () => {
 				const result = await data.get({ uid: "hello", key: ["a", "c"], children: 2 });
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), [
-					[["e"], 1],
 					[["d"], 13],
 					[["d", "f"], 4],
+					[["e"], 1],
 				]);
 			}
 
