@@ -94,6 +94,8 @@ export default class Data {
 
 	/// Get the list of keys for this specific entry, which are equal and children of `key`.
 	///
+	/// \note The keys are sorted, useful to get consistent results.
+	///
 	/// \param uid The uid to get the keys for.
 	/// \param key The key to get the children of.
 	/// \param children The number of children to reach.
@@ -109,7 +111,9 @@ export default class Data {
 		const keys = [];
 		const treeToKeys = (tree, children, key) => {
 			if (children > 0) {
-				Object.entries(tree).forEach(([k, v]) => {
+				const sortedKeys = Object.keys(tree).sort();
+				sortedKeys.forEach((k) => {
+					const v = tree[k];
 					if (k == SPECIAL_KEY_FOR_VALUE) {
 						if (!includeInner) {
 							keys.push({
