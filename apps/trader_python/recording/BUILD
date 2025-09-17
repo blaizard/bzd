@@ -81,3 +81,14 @@ py_library(
     ],
     visibility = ["//apps/trader_python:__subpackages__"],
 )
+
+py_binary(
+    name = "sp500",
+    srcs = [
+        "sp500.py",
+    ],
+    deps = [
+        "//apps/artifacts/api/python/node",
+        "@bzd_python//bzd/http:client",
+    ] + requirement("lxml"),
+)
