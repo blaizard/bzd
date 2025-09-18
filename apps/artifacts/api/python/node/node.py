@@ -1,6 +1,7 @@
 import typing
 import time
 from contextlib import contextmanager
+from dataclasses import dataclass
 
 from bzd.http.utils import encodeURIComponent
 from bzd.logging.handler import Log, LoggerHandler, LoggerHandlerData, LoggerHandlerFlow
@@ -18,50 +19,70 @@ class PublisherProtocol(typing.Protocol):
 		...
 
 
+@dataclass
+class BufferEntryBulk:
+	"""A buffer entry for a bulk publishing request."""
+
+	# The path to publish to.
+	uri: str
+	# The data to be published and their associated timestamp.
+	data: typing.List[typing.Tuple[float, typing.Any]]
+	# If true, it means that the timestamp given for each entry are the client timestamp in milliseconds.
+	# They might be adjusted to match the exact time at which they will be sent.
+	# If false, they will not be modified.
+	isClientTimestamp: bool
+
+
 class Node(ArtifactsBase):
 
-	def __init__(self, buffer: int = 0, **kwargs: typing.Any) -> None:
+	def __init__(self, maxBufferSize: int = 0, **kwargs: typing.Any) -> None:
 		"""Initialize the Node object.
 		
 		Args:
-			buffer: The number of entries that can be buffered if the server cannot be reached.
-			        Once the server can be reached again, all entries will be sent again.
+			maxBufferSize: The maximal number of entries that can be buffered if the server cannot be reached.
+			Once the server can be reached again, all entries will be sent again.
 		"""
 
 		super().__init__(**kwargs)
-		self.bufferSize = buffer
+		self.maxBufferSize = maxBufferSize
+		self.buffer: typing.List[BufferEntryBulk] = []
 
-	def _publishBulk(self, uri: str, data: typing.Optional[typing.List[typing.Tuple[float, typing.Any]]],
-	                 isClientTimestamp: bool) -> None:
+	def _publish(self, entry: BufferEntryBulk) -> None:
 		"""Publish data to a remote.
 
 		Args:
-			uri: The path to publish to.
-			data: The data to be published which are using the.
-			isClientTimestamp: If true, it means that the timestamp given for each entry are the client timestamp in milliseconds.
-			                   They might be adjusted to match the exact time at which they will be sent.
-							   If false, they will not be modified.
+			entry: The entry to be published.
 		"""
 
 		headers = {}
 		if self.token:
 			headers["authorization"] = f"basic {self.token}"
 
-		content: typing.Dict[str, typing.Any] = {"data": data}
+		self.buffer.append(entry)
 
 		for remote, retry, nbRetries in self.remotes:
 
-			url = remote + uri
-
 			try:
-				if isClientTimestamp:
-					content["timestamp"] = time.time() * 1000
-				self.httpClient.post(url, json=content, query={"bulk": 1}, headers=headers)
+				while len(self.buffer):
+					entry = self.buffer[0]
+					content: typing.Dict[str, typing.Any] = {"data": entry.data}
+					url = remote + entry.uri
+					if entry.isClientTimestamp:
+						content["timestamp"] = time.time() * 1000
+					self.httpClient.post(url, json=content, query={"bulk": 1}, headers=headers)
+					self.buffer.pop(0)
 				return
+
 			except Exception as e:
 				if retry == nbRetries:
 					self.logger.warning(f"Exception while publishing {url} after {nbRetries} retry: {str(e)}")
 				pass
+
+		# The buffer can contain maxBufferSize + 1 element, in that case, it is considered full.
+		# Only when it is full we throw.
+		if len(self.buffer) < self.maxBufferSize + 1:
+			return
+		self.buffer = self.buffer[-self.maxBufferSize:]
 
 		raise NodePublishNoRemote("Unable to publish to any of the remotes.")
 
@@ -82,7 +103,10 @@ class Node(ArtifactsBase):
 		"""
 
 		timestampMs = time.time() * 1000
-		self._publishBulk(uri=f"/x/{volume}/", data=[(timestampMs, data,)], isClientTimestamp=True)
+		self._publish(BufferEntryBulk(uri=f"/x/{volume}/", data=[(
+		    timestampMs,
+		    data,
+		)], isClientTimestamp=True))
 
 	def publish(self,
 	            data: typing.Any,
@@ -102,7 +126,10 @@ class Node(ArtifactsBase):
 
 		# Use the bulk method to publish, that way we control the timestamp. This is needed as
 		# data published might be published later in case of connection problem.
-		self._publishBulk(uri=uri, data=[(time.time() * 1000, data,)], isClientTimestamp=True)
+		self._publish(BufferEntryBulk(uri=uri, data=[(
+		    time.time() * 1000,
+		    data,
+		)], isClientTimestamp=True))
 
 	@contextmanager
 	def publishBulk(self,
@@ -117,7 +144,7 @@ class Node(ArtifactsBase):
 			volume: The volume to which the data should be sent.
 			path: The path to publish to.
 			isClientTimestamp: If true, it means that the timestamp given for each entry are the client timestamp in milliseconds.
-			                   They might be adjusted to match the exact time at which they will be sent.
+							   They might be adjusted to match the exact time at which they will be sent.
 							   If false, they will not be modified.
 		"""
 
@@ -132,7 +159,7 @@ class Node(ArtifactsBase):
 		yield publisher
 
 		uri = self._makeURI(uid=uid, volume=volume, path=path)
-		self._publishBulk(uri=uri, data=bulk, isClientTimestamp=isClientTimestamp)
+		self._publish(BufferEntryBulk(uri=uri, data=bulk, isClientTimestamp=isClientTimestamp))
 
 	def makeLoggerHandler(self) -> "LoggerHandlerNode":
 		"""Create a logger handler that sends data to the node."""

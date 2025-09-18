@@ -65,7 +65,7 @@ if __name__ == "__main__":
 	    "The UID of this node. If no UID is provided, the application will report the monitoring on the command line.")
 
 	args = parser.parse_args()
-	node = Node(uid=args.uid)
+	node = Node(uid=args.uid, maxBufferSize=20)
 
 	tickerList = [
 	    "ABNB",
