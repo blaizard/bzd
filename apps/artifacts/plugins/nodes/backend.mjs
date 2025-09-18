@@ -451,7 +451,7 @@ export default class Plugin extends PluginBase {
 		/// Insert one or multiple entries.
 		///
 		/// \note If <path:*> is not empty the first item is the uid, while the rest corresponds to the key.
-		/// If <path:*> is empty, value is expected to be a dictionary which keys are the uid and value th value.
+		/// If <path:*> is empty, value is expected to be a dictionary which keys are the uid and value the actual value.
 		///
 		/// POST <endpoint>/<path:*>
 		/// ```<value>``` -> stores a new value to the path at the server timestamp.
@@ -474,35 +474,49 @@ export default class Plugin extends PluginBase {
 				context.sendStatus(400, String(e));
 				return;
 			}
-			const path = context.getParam("path");
-			let records = [];
 
-			// Handle the case where the uid is the first element in the dictionary.
-			let pathToValues = path ? { [path]: inputs.data } : inputs.data;
-			for (const [path, values] of Object.entries(pathToValues)) {
-				const [uid, ...key] = Utils.pathToKey(path);
-				const node = await this.nodes.get(uid);
-
+			const now = Utils.timestampMs();
+			// Normalize the data to bulk data format.
+			// bulk = List[Tuple[<timestamp>, <values>]]
+			// timestampClient = The timestamp on the client side, if unset, use the current timestamp.
+			// isFixedTimestamp = If this timestamp is intended to be modified or not.
+			const [bulk, timestampClient, isFixedTimestamp] = ((data) => {
 				if (inputs.bulk) {
-					const isFixedTimestamp = !("timestamp" in values);
-					Exception.assertPrecondition(isObject(values), "The data must be an object: {:j}", values);
+					const isFixedTimestamp = !("timestamp" in data);
+					Exception.assertPrecondition(isObject(data), "The data must be an object: {:j}", data);
 					Exception.assertPrecondition(
-						isFixedTimestamp || typeof values.timestamp == "number",
+						isFixedTimestamp || typeof data.timestamp == "number",
 						"The timestamp given is not a number {}.",
-						values.timestamp,
+						data.timestamp,
 					);
-					for (const [timestamp, value] of values.data) {
-						Exception.assertPrecondition(
-							typeof timestamp == "number",
-							"The timestamp given for value '{:j}' is not a number {}.",
-							value,
-							timestamp,
-						);
-						const actualTimestamp = isFixedTimestamp ? timestamp : timestamp - values.timestamp + Utils.timestampMs();
-						records = records.concat(await node.insert(key, value, actualTimestamp, isFixedTimestamp));
+					return [data.data, data.timestamp ?? now, isFixedTimestamp];
+				} else {
+					return [[[now, inputs.data]], now, false];
+				}
+			})(inputs.data);
+
+			let records = [];
+			const [uid, ...key] = Utils.pathToKey(context.getParam("path"));
+			let node = uid ? await this.nodes.get(uid) : null;
+
+			for (const [timestamp, value] of bulk) {
+				Exception.assertPrecondition(
+					typeof timestamp == "number",
+					"The timestamp given for value '{:j}' is not a number {}.",
+					value,
+					timestamp,
+				);
+				const actualTimestamp = isFixedTimestamp ? timestamp : timestamp - timestampClient + Utils.timestampMs();
+
+				// If there is no 'uid' set for this request, it must be embedded in the value.
+				if (node === null) {
+					Exception.assertPrecondition(isObject(value), "Expected an object, containing uid to values: {:j}", value);
+					for (const [uid, subValue] of Object.entries(value)) {
+						const subNode = await this.nodes.get(uid);
+						records = records.concat(await subNode.insert(key, subValue, actualTimestamp, isFixedTimestamp));
 					}
 				} else {
-					records = await node.insert(key, values);
+					records = records.concat(await node.insert(key, value, actualTimestamp, isFixedTimestamp));
 				}
 			}
 

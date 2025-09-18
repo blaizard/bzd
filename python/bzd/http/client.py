@@ -108,7 +108,7 @@ class HttpClient:
 			queries = []
 			for key, value in query.items():
 				if value is not None:
-					queries.append(f"{urllib.parse.quote(key)}={urllib.parse.quote(value)}")
+					queries.append(f"{urllib.parse.quote(key)}={urllib.parse.quote(str(value))}")
 			url += "?" + "&".join(queries)
 
 		return request(method=method, url=url, body=body, headers=headers, timeoutS=timeoutS)
