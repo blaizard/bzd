@@ -32,9 +32,9 @@ class Generator:
 
 				# Save all the data to remote.
 				with self.node.publishBulk(path=["ohlc", self.ticker, "USD", "polygon.io"],
-				                           isFixedTimestamp=True) as publish:
+				                           isClientTimestamp=False) as publish:
 					for item in data.get("results", []):
-						publish(timestamp=item["t"],
+						publish(timestampMs=item["t"],
 						        data={
 						            "price": item.get("vw") or (item["o"] + item["l"] + item["c"] + item["l"]) / 4,
 						            "volume": item["v"],
@@ -68,8 +68,6 @@ if __name__ == "__main__":
 	node = Node(uid=args.uid)
 
 	tickerList = [
-	    "A",
-	    "ABBV",
 	    "ABNB",
 	    "ABT",
 	    "ACGL",
