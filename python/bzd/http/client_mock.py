@@ -34,16 +34,17 @@ class HttpClientMock:
 		return HttpClientMock.makeResponse(response)
 
 	@staticmethod
-	def makeResponse(response: typing.Optional[typing.Union[str, HttpResponse]]) -> HttpResponseMock:
+	def makeResponse(response: typing.Optional[typing.Union[str, bytes, HttpResponse]]) -> HttpResponseMock:
 		status = 200
 		content = b""
 		headers: typing.Dict[str, str] = {}
 
 		if isinstance(response, HttpResponseMock):
 			return response
-
-		if isinstance(response, str):
+		elif isinstance(response, str):
 			content = response.encode()
+		elif isinstance(response, bytes):
+			content = response
 
 		return HttpResponseMock(status=status, content=content, headers=headers)
 
