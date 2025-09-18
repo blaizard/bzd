@@ -70,6 +70,20 @@ class TestRun(unittest.TestCase):
 			accessor(timestamp=2, data={"hello": "world2"})
 		self.assertEqual(self.calledCounter, 1)
 
+	def testPublishMultiNodes(self) -> None:
+
+		self.calledCounter = 0
+
+		def callback(method: str, url: str, body: typing.Optional[bytes], **kwargs: typing.Any) -> None:
+			self.assertEqual(method, "POST")
+			self.assertEqual(url, "http://localhost:8081/x/nodes/")
+			self._assertJsonBodyEqual(body, {'hello': '1', 'world': '2'})
+			self.calledCounter += 1
+
+		node = Node(uid="testuid", httpClient=HttpClientMock(callback=callback))
+		node.publishMultiNodes(data={"hello": "1", "world": "2"})
+		self.assertEqual(self.calledCounter, 1)
+
 
 if __name__ == "__main__":
 	unittest.main()

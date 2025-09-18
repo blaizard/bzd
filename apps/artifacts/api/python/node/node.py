@@ -19,7 +19,7 @@ class PublisherProtocol(typing.Protocol):
 
 class Node(ArtifactsBase):
 
-	def __init__(self, buffer: typing.Optional[int] = None, **kwargs: typing.Any) -> None:
+	def __init__(self, buffer: int = 0, **kwargs: typing.Any) -> None:
 		"""Initialize the Node object.
 		
 		Args:
@@ -28,7 +28,34 @@ class Node(ArtifactsBase):
 		"""
 
 		super().__init__(**kwargs)
-		self.buffer = buffer
+		self.bufferSize = buffer
+
+	def _publish(self, uri: str, data: typing.Any, query: typing.Optional[typing.Dict[str, str]] = None) -> None:
+		"""Publish data to a remote.
+
+		Args:
+			data: The data to be published.
+			uri: The path to publish to.
+			query: Query URL to be used while posting.
+		"""
+
+		headers = {}
+		if self.token:
+			headers["authorization"] = f"basic {self.token}"
+
+		for remote, retry, nbRetries in self.remotes:
+
+			url = remote + uri
+
+			try:
+				self.httpClient.post(url, json=data, query=(query or {}), headers=headers)
+				return
+			except Exception as e:
+				if retry == nbRetries:
+					self.logger.warning(f"Exception while publishing {url} after {nbRetries} retry: {str(e)}")
+				pass
+
+		raise NodePublishNoRemote("Unable to publish to any of the remotes.")
 
 	def publishMultiNodes(self, data: typing.Dict[str, typing.Any], volume: str = defaultNodeVolume) -> None:
 		"""Publish data to a remote to multiple nodes.
@@ -38,23 +65,7 @@ class Node(ArtifactsBase):
 			volume: The volume to which the data should be sent.
 		"""
 
-		query = {}
-		if self.token:
-			query["t"] = self.token
-
-		for remote, retry, nbRetries in self.remotes:
-
-			url = f"{remote}/x/{volume}/"
-
-			try:
-				self.httpClient.post(url, json=data, query=query)
-				return
-			except Exception as e:
-				if retry == nbRetries:
-					self.logger.warning(f"Exception while publishing {url} after {nbRetries} retry: {str(e)}")
-				pass
-
-		raise NodePublishNoRemote("Unable to publish to any of the remotes.")
+		self._publish(uri=f"/x/{volume}/", data=data)
 
 	def publish(self,
 	            data: typing.Any,
@@ -74,26 +85,10 @@ class Node(ArtifactsBase):
 
 		actualUid = uid or self.uid
 		assert actualUid is not None, f"No UID were specified."
-
 		subPath = "/".join([encodeURIComponent(s) for s in path or []])
+		uri = f"/x/{volume}/{actualUid}/data" + (f"/{subPath}" if subPath else "") + "/"
 
-		query = query or {}
-		if self.token:
-			query["t"] = self.token
-
-		for remote, retry, nbRetries in self.remotes:
-
-			url = f"{remote}/x/{volume}/{actualUid}/data" + (f"/{subPath}" if subPath else "") + "/"
-
-			try:
-				self.httpClient.post(url, json=data, query=query)
-				return
-			except Exception as e:
-				if retry == nbRetries:
-					self.logger.warning(f"Exception while publishing {url} after {nbRetries} retry: {str(e)}")
-				pass
-
-		raise NodePublishNoRemote("Unable to publish to any of the remotes.")
+		self._publish(uri=uri, data=data, query=query)
 
 	@contextmanager
 	def publishBulk(self,
