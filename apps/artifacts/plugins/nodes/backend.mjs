@@ -450,10 +450,13 @@ export default class Plugin extends PluginBase {
 
 		/// Insert one or multiple entries.
 		///
-		/// POST <endpoint>/<uid>/<path:*>
+		/// \note If <path:*> is not empty the first item is the uid, while the rest corresponds to the key.
+		/// If <path:*> is empty, value is expected to be a dictionary which keys are the uid and value th value.
+		///
+		/// POST <endpoint>/<path:*>
 		/// ```<value>``` -> stores a new value to the path at the server timestamp.
 		///
-		/// POST <endpoint>/<uid>/<path:*>?bulk=1
+		/// POST <endpoint>/<path:*>?bulk=1
 		/// ```{
 		///    timestamp: xxx,             # Node current timestamp for reference.
 		///                                # If unset, the timestamp will be treated as "fixed timestamps".
@@ -462,7 +465,7 @@ export default class Plugin extends PluginBase {
 		///      [<timestamp2>, <value2>]  # Store another value with timestamp2.
 		///    ]
 		/// }```
-		endpoints.register("post", "/{uid}/{path:*}", async (context) => {
+		endpoints.register("post", "/{path:*}", async (context) => {
 			let inputs = {};
 			try {
 				inputs.bulk = context.getQuery("bulk", false, Boolean);
@@ -471,62 +474,41 @@ export default class Plugin extends PluginBase {
 				context.sendStatus(400, String(e));
 				return;
 			}
-			const node = await this.nodes.get(context.getParam("uid"));
-			const key = Utils.pathToKey(context.getParam("path"));
-
+			const path = context.getParam("path");
 			let records = [];
-			if (inputs.bulk) {
-				const isFixedTimestamp = !("timestamp" in inputs.data);
-				Exception.assertPrecondition(isObject(inputs.data), "The data must be an object: {:j}", inputs.data);
-				Exception.assertPrecondition(
-					isFixedTimestamp || typeof inputs.data.timestamp == "number",
-					"The timestamp given is not a number {}.",
-					inputs.data.timestamp,
-				);
-				for (const [timestamp, value] of inputs.data.data) {
+
+			// Handle the case where the uid is the first element in the dictionary.
+			let pathToValues = path ? { [path]: inputs.data } : inputs.data;
+			for (const [path, values] of Object.entries(pathToValues)) {
+				const [uid, ...key] = Utils.pathToKey(path);
+				const node = await this.nodes.get(uid);
+
+				if (inputs.bulk) {
+					const isFixedTimestamp = !("timestamp" in values);
+					Exception.assertPrecondition(isObject(values), "The data must be an object: {:j}", values);
 					Exception.assertPrecondition(
-						typeof timestamp == "number",
-						"The timestamp given for value '{:j}' is not a number {}.",
-						value,
-						timestamp,
+						isFixedTimestamp || typeof values.timestamp == "number",
+						"The timestamp given is not a number {}.",
+						values.timestamp,
 					);
-					const actualTimestamp = isFixedTimestamp
-						? timestamp
-						: timestamp - inputs.data.timestamp + Utils.timestampMs();
-					records = records.concat(await node.insert(key, value, actualTimestamp, isFixedTimestamp));
+					for (const [timestamp, value] of values.data) {
+						Exception.assertPrecondition(
+							typeof timestamp == "number",
+							"The timestamp given for value '{:j}' is not a number {}.",
+							value,
+							timestamp,
+						);
+						const actualTimestamp = isFixedTimestamp ? timestamp : timestamp - values.timestamp + Utils.timestampMs();
+						records = records.concat(await node.insert(key, value, actualTimestamp, isFixedTimestamp));
+					}
+				} else {
+					records = await node.insert(key, values);
 				}
-			} else {
-				records = await node.insert(key, inputs.data);
 			}
 
 			// Save the data written on disk.
 			await this.records.write(Nodes.recordToDisk(records));
 
-			context.sendStatus(200);
-		});
-
-		/// Insert entries to multiple nodes.
-		///
-		/// POST <endpoint>/
-		/// ```{
-		///    uid1: <value1>,
-		///    uid2: <value2>
-		/// }``` -> stores a new value to several nodes at the server timestamp.
-		endpoints.register("post", "/", async (context) => {
-			let inputs = {};
-			try {
-				inputs.data = rawBodyParse(context.getBody(), (name) => context.getHeader(name));
-			} catch (e) {
-				context.sendStatus(400, String(e));
-				return;
-			}
-			Exception.assertPrecondition(isObject(inputs.data), "The data must be an object: {:j}", inputs.data);
-
-			for (const [uid, value] of Object.entries(inputs.data)) {
-				const node = await this.nodes.get(uid);
-				const records = await node.insert([], value);
-				await this.records.write(Nodes.recordToDisk(records));
-			}
 			context.sendStatus(200);
 		});
 	}
