@@ -224,7 +224,8 @@ export default class DatabaseInfluxDB extends Database {
 		let skipped = 0;
 		const timestampMin = this.retentionS ? Utils.timestampMs() - this.retentionS * 1000 + 86400 * 1000 : 0;
 		for (const [uid, key, value, timestamp] of records) {
-			const timestampNanoseconds = timestamp * 1000000;
+			// InfluxDB doesn't support numbers with comma.
+			const timestampNanoseconds = Math.round(timestamp * 1000000);
 			for (const field of DatabaseInfluxDB.fromValueToFields(DatabaseInfluxDB.fromKeyToField(key), value)) {
 				Exception.assert(
 					timestamp,
@@ -283,17 +284,17 @@ export default class DatabaseInfluxDB extends Database {
 			const periodMs = Math.round((before - after) / count) || 1;
 			influxQL += 'SELECT FIRST("' + field + '") ';
 			influxQL += 'FROM "' + uid + '" ';
-			influxQL += "WHERE time > " + after + "ms AND time < " + before + "ms ";
+			influxQL += "WHERE time > " + Math.round(after) + "ms AND time < " + Math.round(before) + "ms ";
 			influxQL += "GROUP BY time(" + periodMs + "ms)\n";
 		} else if (after !== null) {
 			influxQL += 'SELECT "' + field + '" ';
 			influxQL += 'FROM "' + uid + '" ';
-			influxQL += "WHERE time > " + after + "ms ";
+			influxQL += "WHERE time > " + Math.round(after) + "ms ";
 			influxQL += "LIMIT " + count + "\n";
 		} else if (before !== null) {
 			influxQL += 'SELECT "' + field + '" ';
 			influxQL += 'FROM "' + uid + '" ';
-			influxQL += "WHERE time < " + before + "ms ";
+			influxQL += "WHERE time < " + Math.round(before) + "ms ";
 			influxQL += "ORDER BY time DESC ";
 			influxQL += "LIMIT " + count + "\n";
 		} else {
