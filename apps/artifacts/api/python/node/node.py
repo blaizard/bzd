@@ -35,16 +35,18 @@ class BufferEntryBulk:
 
 class Node(ArtifactsBase):
 
-	def __init__(self, maxBufferSize: int = 0, **kwargs: typing.Any) -> None:
+	def __init__(self, maxBufferSize: int = 0, blockForS: typing.Optional[int] = None, **kwargs: typing.Any) -> None:
 		"""Initialize the Node object.
 		
 		Args:
 			maxBufferSize: The maximal number of entries that can be buffered if the server cannot be reached.
 			Once the server can be reached again, all entries will be sent again.
+			blockForS: The publish call will be blocking for a number of seconds if no remote can be accessed.
 		"""
 
 		super().__init__(**kwargs)
 		self.maxBufferSize = maxBufferSize
+		self.blockForS = blockForS
 		self.buffer: typing.List[BufferEntryBulk] = []
 
 	def _publish(self, entry: BufferEntryBulk) -> None:
@@ -59,31 +61,44 @@ class Node(ArtifactsBase):
 			headers["authorization"] = f"basic {self.token}"
 
 		self.buffer.append(entry)
+		timestampStart = time.time()
 
-		for remote, retry, nbRetries in self.remotes:
+		while True:
 
-			try:
-				while len(self.buffer):
-					entry = self.buffer[0]
-					content: typing.Dict[str, typing.Any] = {"data": entry.data}
-					url = remote + entry.uri
-					if entry.isClientTimestamp:
-						content["timestamp"] = time.time() * 1000
-					self.httpClient.post(url, json=content, query={"bulk": 1}, headers=headers)
-					self.buffer.pop(0)
+			for remote, retry, nbRetries in self.remotes:
+
+				try:
+					while len(self.buffer):
+						entry = self.buffer[0]
+						content: typing.Dict[str, typing.Any] = {"data": entry.data}
+						url = remote + entry.uri
+						if entry.isClientTimestamp:
+							content["timestamp"] = time.time() * 1000
+						self.httpClient.post(url, json=content, query={"bulk": 1}, headers=headers)
+						self.buffer.pop(0)
+					return
+
+				except Exception as e:
+					if retry == nbRetries:
+						self.logger.warning(f"Exception while publishing {url} after {nbRetries} retry: {str(e)}")
+					pass
+
+			# The buffer can contain maxBufferSize + 1 element.
+			if len(self.buffer) < self.maxBufferSize + 1:
 				return
 
-			except Exception as e:
-				if retry == nbRetries:
-					self.logger.warning(f"Exception while publishing {url} after {nbRetries} retry: {str(e)}")
-				pass
+			# If blockForS is not set or expired, exit the loop.
+			if self.blockForS is None:
+				break
+			timestampElapsed = (time.time() - timestampStart)
+			if timestampElapsed > self.blockForS:
+				break
 
-		# The buffer can contain maxBufferSize + 1 element, in that case, it is considered full.
-		# Only when it is full we throw.
-		if len(self.buffer) < self.maxBufferSize + 1:
-			return
+			# Else wait for 30s max before retrying.
+			timestampRemaining = max(self.blockForS - timestampElapsed, 0)
+			time.sleep(min(timestampRemaining, 30))
+
 		self.buffer = self.buffer[-self.maxBufferSize:]
-
 		raise NodePublishNoRemote("Unable to publish to any of the remotes.")
 
 	def _makeURI(self, uid: typing.Optional[str], volume: str, path: typing.Optional[typing.List[str]]) -> str:
