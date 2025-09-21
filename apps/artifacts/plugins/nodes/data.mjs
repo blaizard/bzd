@@ -3,6 +3,7 @@ import KeyMapping from "#bzd/apps/artifacts/plugins/nodes/key_mapping.mjs";
 import Optional from "#bzd/nodejs/utils/optional.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import Utils from "#bzd/apps/artifacts/common/utils.mjs";
+import StatisticsProvider from "#bzd/nodejs/core/statistics/provider.mjs";
 
 const Exception = ExceptionFactory("apps", "plugin", "nodes");
 
@@ -19,6 +20,8 @@ export default class Data {
 			{
 				/// The cache instance to be used.
 				cache: new Cache2(),
+				/// The statistics provider to be used.
+				statistics: new StatisticsProvider("data"),
 				/// The external source to fetch if data is missing locally.
 				external: (uid, key, count, after, before) => {
 					return null;
@@ -385,9 +388,10 @@ export default class Data {
 	/// \param uid The uid to update.
 	/// \param fragments An iterable of tuples, which first element is the absolute key and second the value to be inserted.
 	/// \param timestamp The timestamp to be used.
+	/// \param updateStatistics Whether the statistics should be updated.
 	///
 	/// \return The timestamp actually written.
-	async insert(uid, fragments, timestamp = null) {
+	async insert(uid, fragments, timestamp = null, updateStatistics = true) {
 		timestamp = timestamp === null ? Utils.timestampMs() : timestamp;
 
 		// Identify the path of the fragments and their values.
@@ -426,6 +430,10 @@ export default class Data {
 			while (data.values.length > config.history) {
 				data.values.pop();
 			}
+		}
+
+		if (updateStatistics) {
+			this.options.statistics.rate("insert", fragments.length);
 		}
 
 		return timestamp;

@@ -274,6 +274,11 @@ export default class Backend {
 			await this.instances.services.start();
 		}
 
+		if (this.instances.statistics) {
+			Log.info("Starting statistics");
+			await this.instances.statistics.start();
+		}
+
 		if (this.instances.staticPath) {
 			// Important: the static path must be set after all other routes are registered as it will have the least priority.
 			this.instances.web.addStaticRoute("/", this.instances.staticPath, this.instances.staticOptions || {});
@@ -290,6 +295,10 @@ export default class Backend {
 		if (this.instances.services) {
 			Log.info("Stopping services");
 			await this.instances.services.stop();
+		}
+		if (this.instances.statistics) {
+			Log.info("Stopping statistics");
+			await this.instances.statistics.stop();
 		}
 	}
 }

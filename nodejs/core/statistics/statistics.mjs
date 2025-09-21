@@ -8,7 +8,9 @@ const Log = LogFactory("statistics");
 /// This class is a statistics manager.
 export default class Statistics {
 	constructor() {
-		this.data = {};
+		this.providers = {};
+		// Used to run processors.
+		this.intervalProcessors = null;
 	}
 
 	/// Create the statistics UID from the name and the service provider.
@@ -17,7 +19,7 @@ export default class Statistics {
 			let counter = 0;
 			do {
 				name = "_" + (++counter).toString();
-			} while (this._makeStartisticsUid(name) in this.data);
+			} while (this._makeStartisticsUid(name) in this.providers);
 		}
 		return name;
 	}
@@ -28,8 +30,8 @@ export default class Statistics {
 	/// \param name The name of the statistics.
 	register(provider, name = null) {
 		const uid = this._makeStartisticsUid(name);
-		Exception.assert(!(uid in this.data), "Statistics '{}' is already registered.", uid);
-		this.data[uid] = provider.root;
+		Exception.assert(!(uid in this.providers), "Statistics '{}' is already registered.", uid);
+		this.providers[uid] = provider;
 	}
 
 	/// Create a provider and attach it to this server.
@@ -44,8 +46,25 @@ export default class Statistics {
 
 		api.handle("get", "/admin/statistics", async () => {
 			return {
-				data: this.data,
+				data: Object.fromEntries(Object.entries(this.providers).map(([uid, provider]) => [uid, provider.root])),
 			};
 		});
+	}
+
+	/// Starting statistics.
+	async start() {
+		Exception.assert(this.intervalProcessors === null, "Statistics is already started.");
+		this.intervalProcessors = setInterval(() => {
+			for (const provider of Object.values(this.providers)) {
+				for (const processors of Object.values(provider.processors)) {
+					processors.process(1);
+				}
+			}
+		}, 1000);
+	}
+
+	/// Stopping statistics.
+	async stop() {
+		clearInterval(this.intervalProcessors);
 	}
 }

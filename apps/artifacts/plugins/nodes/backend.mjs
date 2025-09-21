@@ -143,6 +143,7 @@ export default class Plugin extends PluginBase {
 		provider.addStartProcess("records.initialize", async () => {
 			let optionsNodes = {
 				cache: this.cache,
+				statistics: this.statistics.makeNested("data"),
 			};
 			if (dbReadExternal !== null) {
 				optionsNodes["external"] = async (...args) => {

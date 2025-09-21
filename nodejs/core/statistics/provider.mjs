@@ -2,11 +2,43 @@ import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 
 const Exception = ExceptionFactory("statistics");
 
+/// Processor for a rate.
+class ProcessorRates {
+	constructor(data) {
+		this.data = Object.assign(data, {
+			rate: 0,
+			rateAvg: 0,
+			count: 0,
+			max: 0,
+		});
+		this.current = 0;
+	}
+
+	update(value) {
+		this.current += value;
+	}
+
+	process(durationS) {
+		const rate = this.current / durationS;
+		const durationSMax60 = Math.min(60, durationS);
+		Object.assign(this.data, {
+			rate: rate,
+			rateAvg: ((60 - durationSMax60) * this.data.rateAvg + durationSMax60 * rate) / 60,
+			count: this.data.count + this.current,
+			max: Math.max(rate, this.data.max),
+		});
+		this.current = 0;
+	}
+}
+
 /// Way to provide statistics information.
 export default class Provider {
 	constructor(...namespace) {
+		this.namespace = namespace;
+		this.namespaceStr = namespace.join(".");
 		this.root = {};
 		this.data = Provider._rootToData(this.root, ...namespace);
+		this.processors = {};
 	}
 
 	static _rootToData(root, ...namespace) {
@@ -21,8 +53,9 @@ export default class Provider {
 	/// Create a nested statistics provider.
 	makeNested(...namespace) {
 		Exception.assert(namespace.length > 0, "Nested statistics must have a namespace");
-		const statistics = new Provider();
+		const statistics = new Provider(...this.namespace, ...namespace);
 		statistics.root = this.root;
+		statistics.processors = this.processors;
 		statistics.data = Provider._rootToData(this.data, ...namespace);
 		return statistics;
 	}
@@ -77,5 +110,15 @@ export default class Provider {
 	sum(name, value, initial = 0) {
 		this.data[name] ??= this._initData(initial);
 		this._updateData(this.data[name], this.data[name].value + value);
+	}
+
+	/// Calculate the rate of a point.
+	///
+	/// Compute the rate per/seconds.
+	rate(name, value = 1) {
+		const namespace = this.namespaceStr + "." + name;
+		this.data[name] ??= {};
+		this.processors[namespace] ??= new ProcessorRates(this.data[name]);
+		this.processors[namespace].update(value);
 	}
 }

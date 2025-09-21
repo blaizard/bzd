@@ -48,7 +48,7 @@ export class Node {
 		let fragments = Node.getAllPathAndValues(fragment, key);
 		fragments = this.handlers.processBeforeInsert(fragments);
 
-		timestamp = await this.data.insert(this.uid, fragments, timestamp);
+		timestamp = await this.data.insert(this.uid, fragments, timestamp, /*updateStatistics*/ true);
 
 		// Generate records.
 		return fragments.map(([key, value, _]) => [this.uid, key, value, timestamp, isFixedTimestamp]);
@@ -111,7 +111,7 @@ export class Nodes {
 	// Insert a record entry to the data.
 	async insertRecord(records) {
 		for (const [uid, key, value, timestamp, _isFixedTimestamp] of records) {
-			await this.data.insert(uid, [[key, value]], timestamp);
+			await this.data.insert(uid, [[key, value]], timestamp, /*updateStatistics*/ false);
 		}
 	}
 
