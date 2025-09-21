@@ -10,7 +10,8 @@ export default class Statistics {
 	constructor() {
 		this.providers = {};
 		// Used to run processors.
-		this.intervalProcessors = null;
+		this.timeoutTimestamp = 0;
+		this.timeoutProcessors = null;
 	}
 
 	/// Create the statistics UID from the name and the service provider.
@@ -53,18 +54,26 @@ export default class Statistics {
 
 	/// Starting statistics.
 	async start() {
-		Exception.assert(this.intervalProcessors === null, "Statistics is already started.");
-		this.intervalProcessors = setInterval(() => {
+		Exception.assert(this.timeoutProcessors === null, "Statistics is already started.");
+		const processorWorkload = () => {
+			const timestampStart = Date.now();
 			for (const provider of Object.values(this.providers)) {
 				for (const processors of Object.values(provider.processors)) {
-					processors.process(1);
+					processors.process((Date.now() - this.timeoutTimestamp) / 1000);
 				}
 			}
-		}, 1000);
+			const durationMs = Date.now() - timestampStart;
+			// Should not take more than 1% of the workload.
+			this.timeoutTimestamp = Date.now();
+			this.timeoutProcessors = setTimeout(processorWorkload, Math.max(durationMs * 100, 1000));
+		};
+
+		this.timeoutTimestamp = Date.now();
+		this.timeoutProcessors = setTimeout(processorWorkload, 1000);
 	}
 
 	/// Stopping statistics.
 	async stop() {
-		clearInterval(this.intervalProcessors);
+		clearTimeout(this.timeoutProcessors);
 	}
 }
