@@ -65,11 +65,7 @@
 					},
 					plugins: {
 						title: {
-							display: true,
-							text: this.options.title || "Missing title",
-							font: {
-								size: 20,
-							},
+							display: false,
 						},
 						tooltip: {
 							mode: "index", // Show tooltip for all datasets at that index

@@ -3,15 +3,18 @@
 		<Form :description="formDescription" v-model="options"></Form>
 		<div class="components" v-loading="loading">
 			<template v-for="dashboard in dashboards">
-				<ViewGraph
-					v-if="dashboard.type == 'linear'"
-					:inputs="dashboardInputs(dashboard)"
-					:options="dashboard"
-					:timeRange="timeRange"
-					:class="dashboardClass(dashboard)"
-				>
-				</ViewGraph>
-				<div v-else>Unsupported graph type "{{ dashboard.type }}".</div>
+				<div :class="dashboardClass(dashboard)">
+					<h2 class="dashboard-component-title">{{ dashboard.title || "Missing title" }}</h2>
+					<ViewGraph
+						v-if="dashboard.type == 'linear'"
+						:inputs="dashboardInputs(dashboard)"
+						:options="dashboard"
+						:timeRange="timeRange"
+						class="dashboard-component-graph"
+					>
+					</ViewGraph>
+					<div v-else class="dashboard-component-unsupported">Unsupported graph type "{{ dashboard.type }}".</div>
+				</div>
 			</template>
 		</div>
 	</div>
@@ -324,6 +327,20 @@
 		flex-direction: row;
 		flex-wrap: wrap;
 		container-type: inline-size;
+
+		.dashboard-component-title {
+			height: 30px;
+			line-height: 30px;
+			font-size: 20px;
+			margin: 0;
+			text-align: center;
+		}
+
+		.dashboard-component-graph,
+		.dashboard-component-unsupported {
+			width: 100%;
+			height: calc(100% - 30px);
+		}
 
 		.dashboard-component-medium {
 			width: 100%;
