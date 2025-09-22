@@ -57,11 +57,14 @@ class Generator:
 class GeneratorArgs:
 	"""Generate ticker and date information."""
 
-	def __init__(self, tickers: typing.List[str], dateStart: datetime.date, dateEnd: datetime.date) -> None:
+	def __init__(self, tickers: typing.List[str], dateStart: datetime.datetime, dateEnd: datetime.datetime) -> None:
 		self.tickers = tickers
 		self.dateStart = dateStart.timestamp()
 		self.dateEnd = dateEnd.timestamp()
-		self.current: typing.Tuple[int, int] = [0, self.dateStart]
+		self.current: typing.Tuple[int, float] = (
+		    0,
+		    self.dateStart,
+		)
 		self.lock = threading.Lock()
 
 	def generate(self) -> typing.Optional[typing.Tuple[str, str]]:
@@ -70,12 +73,18 @@ class GeneratorArgs:
 			index, timestamp = self.current
 			if index >= len(self.tickers):
 				return None
-			result = [self.tickers[index], datetime.datetime.utcfromtimestamp(timestamp).strftime("%Y-%m-%d")]
+			result = (
+			    self.tickers[index],
+			    datetime.datetime.utcfromtimestamp(timestamp).strftime("%Y-%m-%d"),
+			)
 			timestamp += 24 * 60 * 60
 			if timestamp > self.dateEnd:
 				index += 1
 				timestamp = self.dateStart
-			self.current = [index, timestamp]
+			self.current = (
+			    index,
+			    timestamp,
+			)
 
 		return result
 
