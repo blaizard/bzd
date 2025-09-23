@@ -1,21 +1,19 @@
 <template>
 	<div class="view-dashboard">
 		<Form :description="formDescription" v-model="options"></Form>
-		<div class="components" v-loading="loading">
-			<template v-for="dashboard in dashboards">
-				<div :class="dashboardClass(dashboard)">
-					<h2 class="dashboard-component-title">{{ dashboard.title || "Missing title" }}</h2>
-					<ViewGraph
-						v-if="dashboard.type == 'linear'"
-						:inputs="dashboardInputs(dashboard)"
-						:options="dashboard"
-						:timeRange="timeRange"
-						class="dashboard-component-graph"
-					>
-					</ViewGraph>
-					<div v-else class="dashboard-component-unsupported">Unsupported graph type "{{ dashboard.type }}".</div>
-				</div>
-			</template>
+		<div class="components" v-loading="loading" ref="componentContainer">
+			<div :class="dashboardClass(dashboard)" v-for="dashboard in dashboards">
+				<h2 class="dashboard-component-title">{{ dashboard.title || "Missing title" }}</h2>
+				<ViewGraph
+					v-if="dashboard.type == 'linear'"
+					:inputs="dashboardInputs(dashboard)"
+					:options="dashboard"
+					:timeRange="timeRange"
+					class="dashboard-component-graph"
+				>
+				</ViewGraph>
+				<div v-else class="dashboard-component-unsupported">Unsupported graph type "{{ dashboard.type }}".</div>
+			</div>
 		</div>
 	</div>
 </template>
@@ -47,6 +45,10 @@
 		data: function () {
 			return {
 				dashboards: [],
+				viewport: {
+					dashboards: [],
+					width: 0,
+				},
 				// Timestamp difference between server and client.
 				timestampDiff: 0,
 				inputs: new TimeseriesCollection(),
@@ -56,13 +58,11 @@
 				timeout: null,
 				periodMs: null,
 				lock: new Lock(),
+				scrollWatcher: null,
 			};
 		},
 		watch: {
-			async "options.interval"() {
-				await this.triggerFetch();
-			},
-			async dashboards() {
+			async triggerConditionsChange() {
 				await this.triggerFetch();
 			},
 			options() {
@@ -76,11 +76,17 @@
 				// ignore.
 			}
 			this.fetchDashboards();
+			this.scrollWatcher = setInterval(this.watchViewport, 1000);
 		},
 		beforeUnmount() {
+			clearInterval(this.scrollWatcher);
 			this.inputs.close();
 		},
 		computed: {
+			// Conditions that can trigger a new data fetch.
+			triggerConditionsChange() {
+				return [this.dashboards, this.options.interval, this.viewport];
+			},
 			intervalOptions() {
 				return {
 					"Last 5 minutes": async () => {
@@ -138,18 +144,6 @@
 				const [volume, uid, ..._] = this.pathList;
 				return "/x/" + encodeURIComponent(volume) + "/" + encodeURIComponent(uid);
 			},
-			// Gather all inputs to gather.
-			inputsKeys() {
-				return [
-					...new Set(
-						this.dashboards
-							.map((dashboard) => {
-								return Object.keys(dashboard.inputs);
-							})
-							.flat(),
-					),
-				];
-			},
 			timeRange() {
 				const [_, timestampNewest] = this.inputs.timeRange;
 				if (timestampNewest === null || this.periodMs === null) {
@@ -160,7 +154,7 @@
 			timeRangeString() {
 				const [timestampOldest, timestampNewest] = this.timeRange;
 				if (timestampOldest === null && timestampNewest === null) {
-					return "";
+					return "...";
 				}
 				const result = [
 					timestampOldest ? dateToDefaultString(timestampOldest) : "?",
@@ -184,17 +178,41 @@
 			},
 		},
 		methods: {
+			watchViewport() {
+				const elements = this.$refs.componentContainer.children;
+				let viewport = {
+					dashboards: [],
+					width: 0,
+				};
+				[...elements]
+					.filter((element) => element.classList.contains("dashboard-component"))
+					.forEach((element, index) => {
+						const rect = element.getBoundingClientRect();
+						if (rect.bottom < 0 || window.innerHeight < rect.top) {
+							return;
+						}
+						viewport.width = Math.max(viewport.width, rect.width);
+						viewport.dashboards.push(this.dashboards[index]);
+					});
+				// Update only if needed.
+				if (
+					viewport.width != this.viewport.width ||
+					!viewport.dashboards.every((d, index) => d === this.viewport.dashboards[index])
+				) {
+					this.viewport = viewport;
+				}
+			},
 			async useLastPeriod(periodMs) {
 				this.loading = true;
 				try {
-					const nbSamples = 600;
+					const nbSamples = Math.max(Math.round(this.viewport.width / 2), 100);
 
 					this.periodMs = periodMs;
 					this.inputs.reset({ periodLimit: this.periodMs });
 
 					// Look for the latest sample and fetch data from there.
 					// This takes care of sample with time unsyncrhonized with the server.
-					let data = await this.fetchData({ count: 1 });
+					let data = await this.fetchData({ count: 1, all: true });
 					this.inputs.add(data);
 					const timestampNewest = this.inputs.timeRange[1];
 					if (timestampNewest !== null) {
@@ -203,6 +221,7 @@
 							before: timestampNewest,
 							after: timestampNewest - this.periodMs,
 							count: nbSamples,
+							all: false,
 						});
 						this.inputs.add(data);
 
@@ -218,6 +237,7 @@
 									before: timestampNewestRemote,
 									count: count,
 									sampling: "newest",
+									all: false,
 								});
 							}
 						}, refreshPeriodMs);
@@ -226,8 +246,20 @@
 					this.loading = false;
 				}
 			},
+			// Gather all inputs to gather from the list of dashboards.
+			inputsKeysFromDashboards(dashboards) {
+				return [
+					...new Set(
+						dashboards
+							.map((dashboard) => {
+								return Object.keys(dashboard.inputs);
+							})
+							.flat(),
+					),
+				];
+			},
 			async triggerFetch() {
-				if (this.dashboards && this.options.interval in this.intervalOptions) {
+				if (this.dashboards && this.options.interval in this.intervalOptions && this.viewport.dashboards.length > 0) {
 					await this.lock.acquire(async () => {
 						await this.intervalOptions[this.options.interval]();
 					});
@@ -246,7 +278,10 @@
 				return inputs;
 			},
 			dashboardClass(dashboard) {
-				return "dashboard-component-medium";
+				return {
+					"dashboard-component": true,
+					"dashboard-component-medium": true,
+				};
 			},
 			timeToServer(timestamp) {
 				return timestamp + this.timestampDiff;
@@ -289,12 +324,12 @@
 					{ updateLoading: false },
 				);
 			},
-			async fetchData({ before = null, after = null, count = 800, sampling = null } = {}) {
+			async fetchData({ before = null, after = null, count = 800, sampling = null, all = false } = {}) {
 				return await this.handleSubmit(
 					async () => {
 						const query = Object.fromEntries(
 							Object.entries({
-								include: this.inputsKeys.join(","),
+								include: this.inputsKeysFromDashboards(all ? this.dashboards : this.viewport.dashboards).join(","),
 								metadata: 1,
 								count: count,
 								before: before,
@@ -329,11 +364,15 @@
 		container-type: inline-size;
 
 		.dashboard-component-title {
+			width: 100%;
 			height: 30px;
 			line-height: 30px;
 			font-size: 20px;
 			margin: 0;
 			text-align: center;
+			text-overflow: ellipsis;
+			overflow: hidden;
+			white-space: nowrap;
 		}
 
 		.dashboard-component-graph,
