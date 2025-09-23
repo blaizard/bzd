@@ -174,6 +174,7 @@ export default class DatabaseInfluxDB extends Database {
 		});
 		const measurements = result.results[0]?.series?.[0]?.values ?? [];
 
+		// Gather the data.
 		const gatherFieldAndValues = async (uid, useFields) => {
 			const selector = useFields ? useFields.map((field) => '"' + field + '"').join(",") : "*";
 			const result = await this._sql("SELECT " + selector + ' FROM "' + uid + '" ORDER BY time DESC LIMIT 1');
@@ -193,22 +194,39 @@ export default class DatabaseInfluxDB extends Database {
 			return [values.filter(Boolean), remainingFields];
 		};
 
+		// Gather the data as chunks.
+		const gatherViaChunks = async (uid, useFields, chunkSize) => {
+			if (useFields === null) {
+				return await gatherFieldAndValues(uid, useFields);
+			} else {
+				let promises = [];
+				while (useFields.length) {
+					const chunk = useFields.splice(0, chunkSize);
+					promises.push(gatherFieldAndValues(uid, chunk));
+				}
+				const result = await Promise.all(promises);
+				return result.reduce(
+					([values, remainingFields], [v, r]) => {
+						return [
+							[...values, ...v],
+							[...remainingFields, ...r],
+						];
+					},
+					[[], []],
+				);
+			}
+		};
+
 		// Read all measurements of each uid and their values.
 		let nbValues = 0;
 		for (const [uid] of measurements) {
 			let useFields = null;
 			while (useFields === null || useFields.length > 0) {
-				const [values, remainingFields] = await gatherFieldAndValues(uid, useFields);
+				const [values, remainingFields] = await gatherViaChunks(uid, useFields, 100);
 				nbValues += values.length;
 				for (const [key, value, timestamp] of values) {
 					await this.plugin.write(uid, key, DatabaseInfluxDB.fromDBValueToValue(value), timestamp);
 				}
-				Exception.assert(
-					useFields === null || useFields.length > remainingFields.length,
-					"More fields should have been fetched: remaining previous={:j}, now={:j}",
-					useFields,
-					remainingFields,
-				);
 				useFields = remainingFields;
 			}
 		}
