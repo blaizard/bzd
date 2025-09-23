@@ -110,8 +110,8 @@ class Monitor:
 		for name, snetio in netStat.items():
 			if name in validInterfaces:
 				self.networkPrevious.setdefault(name, {})
-				diffIn = snetio.bytes_recv - self.networkPrevious[name].get("in", snetio.bytes_recv)
-				diffOut = snetio.bytes_sent - self.networkPrevious[name].get("out", snetio.bytes_sent)
+				diffIn = max(snetio.bytes_recv - self.networkPrevious[name].get("in", snetio.bytes_recv), 0)
+				diffOut = max(snetio.bytes_sent - self.networkPrevious[name].get("out", snetio.bytes_sent), 0)
 				self.networkPrevious[name] = {
 				    "in": snetio.bytes_recv,
 				    "out": snetio.bytes_sent,
@@ -133,8 +133,8 @@ class Monitor:
 		io = {}
 		for name, sdiskio in ioStat.items():
 			self.ioPrevious.setdefault(name, {})
-			diffIn = sdiskio.write_bytes - self.ioPrevious[name].get("in", sdiskio.write_bytes)
-			diffOut = sdiskio.read_bytes - self.ioPrevious[name].get("out", sdiskio.read_bytes)
+			diffIn = max(sdiskio.write_bytes - self.ioPrevious[name].get("in", sdiskio.write_bytes), 0)
+			diffOut = max(sdiskio.read_bytes - self.ioPrevious[name].get("out", sdiskio.read_bytes), 0)
 			self.ioPrevious[name] = {
 			    "in": sdiskio.write_bytes,
 			    "out": sdiskio.read_bytes,
