@@ -126,6 +126,28 @@ class ConfigOverride:
 		fatal(f"{self.source} {message}")
 
 
+def makeDictionary(keyStr: str, value: typing.Any) -> typing.Dict[str, typing.Any]:
+	"""Make a dictionary from a key string."""
+
+	root: typing.Dict[str, typing.Any] = {}
+	data = root
+	[*keys, key] = keyStr.split(".")
+	for k in keys:
+		data[k] = {}
+		data = data[k]
+	data[key] = value
+
+	return root
+
+
+def updateOutput(output: typing.Dict[str, typing.Any], data: typing.Dict[str, typing.Any],
+                 failOnConflict: bool) -> None:
+	try:
+		updateDeep(output, data, policy=UpdatePolicy.raiseOnConflict if failOnConflict else UpdatePolicy.override)
+	except KeyError as e:
+		fatal(f"The key {e} from '{f}' was already defined by another base configuration.")
+
+
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Merge multiple JSON files together.")
 	parser.add_argument("--output", default=None, type=pathlib.Path, help="The output path of the JSON file.")
@@ -157,13 +179,26 @@ if __name__ == "__main__":
 	                    action="append",
 	                    type=str,
 	                    help="Keys to add to the configuration.")
-
-	parser.add_argument(
-	    "inputs",
-	    nargs="*",
-	    type=pathlib.Path,
-	    help="JSON input files to be merged.",
-	)
+	parser.add_argument("--src",
+	                    dest="srcs",
+	                    default=[],
+	                    action="append",
+	                    type=pathlib.Path,
+	                    help="JSON input files to be merged.")
+	parser.add_argument("--value-at",
+	                    dest="values_at",
+	                    default=[],
+	                    action="append",
+	                    nargs=2,
+	                    metavar=("<KEY>", "<VALUE>"),
+	                    help="Value to be merged at a given key.")
+	parser.add_argument("--src-at",
+	                    dest="srcs_at",
+	                    default=[],
+	                    action="append",
+	                    nargs=2,
+	                    metavar=("<KEY>", "<FILE>"),
+	                    help="JSON input files to be merged at a given key.")
 
 	args = parser.parse_args()
 
@@ -179,15 +214,22 @@ if __name__ == "__main__":
 	# Keep only specific keys.
 	output = {key: workspaceStatus[key] for key in args.workspaceStatusKeys}
 
-	# Compute the unmodified output.
-	for f in args.inputs:
+	# Create the output:
+	# - From json files.
+	for f in args.srcs:
 		data = json.loads(f.read_text())
-		try:
-			updateDeep(output,
-			           data,
-			           policy=UpdatePolicy.raiseOnConflict if args.failOnConflict else UpdatePolicy.override)
-		except KeyError as e:
-			fatal(f"The key {e} from '{f}' was already defined by another base configuration.")
+		updateOutput(output, data, args.failOnConflict)
+
+	# - From json files at a specified key.
+	for keyStr, f in args.srcs_at:
+		value = json.loads(pathlib.Path(f).read_text())
+		data = makeDictionary(keyStr, value)
+		updateOutput(output, data, args.failOnConflict)
+
+	# - From values at a specified key.
+	for keyStr, value in args.values_at:
+		data = makeDictionary(keyStr, value)
+		updateOutput(output, data, args.failOnConflict)
 
 	config = Config(output)
 	overrides: typing.List[ConfigOverride] = []

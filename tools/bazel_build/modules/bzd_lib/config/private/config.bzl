@@ -12,62 +12,56 @@ _bzd_config_flag = rule(
 )
 
 def _bzd_config_impl(ctx):
-    key_values = [keyValue for keyValue in ctx.attr.set_flag[BuildSettingInfo].value if keyValue] if ctx.attr.set_flag else []
-
-    input_files = depset(ctx.files.srcs)
-    override_files = depset()
-    workspace_status_files = []
+    input_files = depset()
     runfiles = ctx.runfiles().merge_all([target.default_runfiles for target in ctx.attr.data])
     data = depset(ctx.files.data)
-
-    # If there are inline values, create an additional input file.
-    if ctx.attr.values:
-        values_file = ctx.actions.declare_file(ctx.label.name + ".values.json")
-        expanded_values = {}
-        for key, value in ctx.attr.values.items():
-            current = expanded_values
-
-            # Expands the '.' to a nested dictionary.
-            parts = key.split(".")
-            if len(parts) > 1:
-                for part in parts[:-1]:
-                    current.setdefault(part, {})
-                    current = current[part]
-            current[parts[-1]] = ctx.expand_location(value, targets = ctx.attr.data)
-        ctx.actions.write(
-            output = values_file,
-            content = json.encode(expanded_values),
-        )
-        input_files = depset([values_file], transitive = [input_files])
-
-    if ctx.attr.include_workspace_status:
-        workspace_status_files.append(ctx.info_file)
-        workspace_status_files.append(ctx.version_file)
-
-    if ctx.attr.file_flag:
-        if ctx.attr.file_flag.label == Label("//config:empty"):
-            pass
-        elif ConfigInfo in ctx.attr.file_flag:
-            override_files = depset([ctx.attr.file_flag[ConfigInfo].json], transitive = [override_files])
-            runfiles = runfiles.merge(ctx.attr.file_flag[ConfigInfo].runfiles)
-            data = depset(transitive = [data, ctx.attr.file_flag[ConfigInfo].data])
-        elif ctx.files.file_flag:
-            override_files = depset(ctx.files.file_flag, transitive = [override_files])
-        else:
-            fail("Invalid config override target type: {} {}".format(ctx.attr.file_flag.label))
 
     args = ctx.actions.args()
     args.add("--fail-on-conflict")
     args.add("--output", ctx.outputs.output_json)
-    args.add_all(key_values, before_each = "--set")
-    args.add_all(override_files, before_each = "--file")
-    args.add_all(workspace_status_files, before_each = "--workspace-status-file")
-    args.add_all(ctx.attr.include_workspace_status, before_each = "--workspace-status-key")
-    args.add_all(input_files)
+    args.add_all([keyValue for keyValue in ctx.attr.set_flag[BuildSettingInfo].value if keyValue] if ctx.attr.set_flag else [], before_each = "--set")
+
+    # Handle inline values.
+    for key, value in ctx.attr.values.items():
+        args.add_all("--value-at", [key, value])
+
+    # Handle files.
+    if ctx.attr.srcs:
+        args.add_all(ctx.files.srcs, before_each = "--src")
+        input_files = depset(ctx.files.srcs, transitive = [input_files])
+
+    # Handle files at a given key.
+    if ctx.attr.srcs_at:
+        for key, target in ctx.attr.srcs_at.items():
+            args.add_all("--src-at", [key, target.files.to_list()[0]])
+        input_files = depset(ctx.files.srcs_at, transitive = [input_files])
+
+    if ctx.attr.include_workspace_status:
+        workspace_status_files = [
+            ctx.info_file,
+            ctx.version_file,
+        ]
+        args.add_all(ctx.attr.include_workspace_status, before_each = "--workspace-status-key")
+        args.add_all(workspace_status_files, before_each = "--workspace-status-file")
+        input_files = depset(workspace_status_files, transitive = [input_files])
+
+    # Handle override with files.
+    if ctx.attr.file_flag and (ctx.attr.file_flag.label != Label("//config:empty")):
+        override_files = []
+        if ConfigInfo in ctx.attr.file_flag:
+            override_files.append(ctx.attr.file_flag[ConfigInfo].json)
+            runfiles = runfiles.merge(ctx.attr.file_flag[ConfigInfo].runfiles)
+            data = depset(transitive = [data, ctx.attr.file_flag[ConfigInfo].data])
+        elif ctx.files.file_flag:
+            override_files += ctx.files.file_flag
+        else:
+            fail("Invalid config override target type: {} {}".format(ctx.attr.file_flag.label))
+        args.add_all(override_files, before_each = "--file")
+        input_files = depset(override_files, transitive = [input_files])
 
     # Build the default configuration.
     ctx.actions.run(
-        inputs = depset(workspace_status_files, transitive = [input_files, override_files]),
+        inputs = input_files,
         outputs = [ctx.outputs.output_json],
         progress_message = "Generating default configuration for {}...".format(ctx.label),
         arguments = [args],
