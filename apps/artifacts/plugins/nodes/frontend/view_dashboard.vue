@@ -5,7 +5,7 @@
 			<div :class="dashboardClass(dashboard)" v-for="dashboard in dashboards">
 				<h2 class="dashboard-component-title">{{ dashboard.title || "Missing title" }}</h2>
 				<ViewGraph
-					v-if="dashboard.type == 'linear'"
+					v-if="['linear', 'bar'].includes(dashboard.type)"
 					:inputs="dashboardInputs(dashboard)"
 					:options="dashboard"
 					:timeRange="timeRange"
