@@ -56,22 +56,21 @@ def _bzd_config_impl(ctx):
         else:
             fail("Invalid config override target type: {} {}".format(ctx.attr.file_flag.label))
 
+    args = ctx.actions.args()
+    args.add("--fail-on-conflict")
+    args.add("--output", ctx.outputs.output_json)
+    args.add_all(key_values, before_each = "--set")
+    args.add_all(override_files, before_each = "--file")
+    args.add_all(workspace_status_files, before_each = "--workspace-status-file")
+    args.add_all(ctx.attr.include_workspace_status, before_each = "--workspace-status-key")
+    args.add_all(input_files)
+
     # Build the default configuration.
     ctx.actions.run(
         inputs = depset(workspace_status_files, transitive = [input_files, override_files]),
         outputs = [ctx.outputs.output_json],
         progress_message = "Generating default configuration for {}...".format(ctx.label),
-        arguments = [
-                        "--fail-on-conflict",
-                        "--output",
-                        ctx.outputs.output_json.path,
-                    ] +
-                    ["--set=" + key_value for key_value in key_values] +
-                    ["--file=" + f.path for f in override_files.to_list()] +
-                    ["--workspace-status-file=" + f.path for f in workspace_status_files] +
-                    ["--workspace-status-key=" + key for key in ctx.attr.include_workspace_status] +
-                    #["--srcs=" + f.path for f in input_files.to_list()] +
-                    [f.path for f in input_files.to_list()],
+        arguments = [args],
         executable = ctx.executable._config_merge,
     )
 
