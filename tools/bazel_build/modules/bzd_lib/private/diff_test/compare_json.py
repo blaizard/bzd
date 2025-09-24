@@ -5,7 +5,7 @@ import unittest
 
 class MyAssertions(unittest.TestCase):
 
-	def runTest(self):
+	def runTest(self) -> None:
 		pass
 
 
