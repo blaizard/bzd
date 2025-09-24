@@ -4,8 +4,9 @@
 		<div class="components" v-loading="loading" ref="componentContainer">
 			<div :class="dashboardClass(dashboard)" v-for="dashboard in dashboards">
 				<h2 class="dashboard-component-title">{{ dashboard.title || "Missing title" }}</h2>
+				<div v-if="!viewport.dashboards.includes(dashboard)" class="dashboard-component-loading">...</div>
 				<ViewGraph
-					v-if="['linear', 'bar'].includes(dashboard.type)"
+					v-else-if="['linear', 'bar'].includes(dashboard.type)"
 					:inputs="dashboardInputs(dashboard)"
 					:options="dashboard"
 					:timeRange="timeRange"
@@ -423,7 +424,8 @@
 		}
 
 		.dashboard-component-graph,
-		.dashboard-component-unsupported {
+		.dashboard-component-unsupported,
+		.dashboard-component-loading {
 			width: 100%;
 			height: calc(100% - 30px);
 		}
