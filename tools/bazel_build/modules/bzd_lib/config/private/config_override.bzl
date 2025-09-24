@@ -2,7 +2,6 @@
 
 load("@rules_cc//cc:defs.bzl", "CcInfo")
 load("@rules_cc//cc/common:debug_package_info.bzl", "DebugPackageInfo")
-load("//lib:attrs.bzl", "ATTRS_COMMON_BUILD_RULES", "attrs_assert_any_of")
 
 # This list was taken from here: https://github.com/fmeum/with_cfg.bzl/blob/main/with_cfg/private/rule_defaults.bzl
 _DEFAULT_PROVIDERS = [
@@ -24,7 +23,7 @@ _DEFAULT_PROVIDERS = [
 
 # ---- Factory ----
 
-def make_bzd_config_apply(target, providers = None, configs = None, executable = False, test = False):
+def make_bzd_config_apply(target = None, providers = None, configs = None, executable = False, test = False):
     """Factory function to create a bzd_config_apply, to apply a configuration to a target.
 
     Args:
@@ -76,7 +75,7 @@ def make_bzd_config_apply(target, providers = None, configs = None, executable =
 
     def _bzd_config_apply_impl(ctx):
         # Due to the transition, the target becomes an array.
-        target = ctx.attr._target[0]
+        target = ctx.attr.target[0]
         ignore_providers = []
         extra_providers = []
 
@@ -84,7 +83,7 @@ def make_bzd_config_apply(target, providers = None, configs = None, executable =
         if executable:
             ctx.actions.symlink(
                 output = ctx.outputs.executable,
-                target_file = ctx.executable._target,
+                target_file = ctx.executable.target,
                 is_executable = True,
             )
             default_info_provider = DefaultInfo(
@@ -110,7 +109,7 @@ def make_bzd_config_apply(target, providers = None, configs = None, executable =
                 mandatory = True,
                 allow_files = True,
             ),
-            "_target": attr.label(
+            "target": attr.label(
                 executable = executable,
                 default = target,
                 doc = "The target associated with this application.",
@@ -130,10 +129,9 @@ def make_bzd_config_apply(target, providers = None, configs = None, executable =
             **kwargs: Extra arguments to be propagated to the rule.
         """
 
-        attrs_assert_any_of(kwargs, ATTRS_COMMON_BUILD_RULES)
-
         _bzd_config_apply_rule(
             name = name,
+            # This trick is needed as there is no label_keyed_label_dict.
             config_overrides = configs.keys(),
             config_values = configs.values(),
             **kwargs

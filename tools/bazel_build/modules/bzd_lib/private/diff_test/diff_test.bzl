@@ -5,7 +5,10 @@ load("//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
 visibility("//...")
 
 def _bzd_diff_test_impl(ctx):
-    arguments_diff = []
+    arguments_diff = [
+        "--format",
+        ctx.attr.format,
+    ]
 
     return [sh_binary_wrapper_impl(
         ctx = ctx,
@@ -31,6 +34,11 @@ bzd_diff_test = rule(
         "file2": attr.label(
             allow_single_file = True,
             mandatory = True,
+        ),
+        "format": attr.string(
+            values = ["binary", "json"],
+            default = "binary",
+            doc = "The format of the files to be compared.",
         ),
         "_diff": attr.label(
             executable = True,

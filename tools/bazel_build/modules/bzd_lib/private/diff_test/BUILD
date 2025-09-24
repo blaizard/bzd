@@ -12,5 +12,9 @@ bzl_library(
 
 py_binary(
     name = "diff_test",
-    srcs = ["diff_test.py"],
+    srcs = [
+        "compare_binary.py",
+        "compare_json.py",
+        "diff_test.py",
+    ],
 )

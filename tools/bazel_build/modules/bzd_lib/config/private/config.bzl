@@ -70,6 +70,7 @@ def _bzd_config_impl(ctx):
                     ["--file=" + f.path for f in override_files.to_list()] +
                     ["--workspace-status-file=" + f.path for f in workspace_status_files] +
                     ["--workspace-status-key=" + key for key in ctx.attr.include_workspace_status] +
+                    #["--srcs=" + f.path for f in input_files.to_list()] +
                     [f.path for f in input_files.to_list()],
         executable = ctx.executable._config_merge,
     )
@@ -120,6 +121,10 @@ _bzd_config = rule(
         "srcs": attr.label_list(
             allow_files = [".json"],
             doc = "Configuration files.",
+        ),
+        "srcs_at": attr.string_keyed_label_dict(
+            allow_files = [".json"],
+            doc = "Configuration files that will be merged at the specified key.",
         ),
         "values": attr.string_dict(
             doc = "Inline configuration values.",
