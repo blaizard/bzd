@@ -362,26 +362,38 @@
 			async fetchData({ before = null, after = null, count = 800, sampling = null, all = false } = {}) {
 				return await this.handleSubmit(
 					async () => {
-						const query = Object.fromEntries(
-							Object.entries({
-								include: this.inputsKeysFromDashboards(all ? this.dashboards : this.viewport.dashboards).join(","),
-								metadata: 1,
-								count: count,
-								before: before,
-								after: after,
-								sampling: sampling,
-							}).filter(([_, v]) => v !== null),
-						);
-
-						const result = await this.requestBackend(this.endpoint, {
-							method: "get",
-							query: query,
-							expect: "json",
-						});
-						let inputs = {};
-						for (const [key, data] of result.data) {
-							inputs[Utils.keyToPath(key)] = data;
+						// Make requests as chunks.
+						const includes = this.inputsKeysFromDashboards(all ? this.dashboards : this.viewport.dashboards);
+						let promises = [];
+						while (includes.length) {
+							const chunk = includes.splice(0, 100);
+							const query = Object.fromEntries(
+								Object.entries({
+									include: chunk.join(","),
+									metadata: 1,
+									count: count,
+									before: before,
+									after: after,
+									sampling: sampling,
+								}).filter(([_, v]) => v !== null),
+							);
+							promises.push(
+								this.requestBackend(this.endpoint, {
+									method: "get",
+									query: query,
+									expect: "json",
+								}),
+							);
 						}
+						const results = await Promise.all(promises);
+
+						let inputs = {};
+						for (const result of results) {
+							for (const [key, data] of result.data) {
+								inputs[Utils.keyToPath(key)] = data;
+							}
+						}
+
 						return inputs;
 					},
 					{ updateLoading: false },
