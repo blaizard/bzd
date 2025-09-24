@@ -51,6 +51,8 @@
 				},
 				// Timestamp difference between server and client.
 				timestampDiff: 0,
+				// Cached information for the getTimestamp function.
+				getTimestampCache: null,
 				inputs: new TimeseriesCollection(),
 				options: {
 					interval: "Last 15 minutes",
@@ -58,7 +60,7 @@
 				timeout: null,
 				periodMs: null,
 				lock: new Lock(),
-				scrollWatcher: null,
+				viewportUpdatedTimeout: null,
 			};
 		},
 		watch: {
@@ -69,17 +71,19 @@
 				LocalStorage.setSerializable(optionsStorageKey, this.options);
 			},
 		},
-		mounted() {
+		async mounted() {
 			try {
 				this.options = LocalStorage.getSerializable(optionsStorageKey, this.options);
 			} catch (e) {
 				// ignore.
 			}
-			this.fetchDashboards();
-			this.scrollWatcher = setInterval(this.watchViewport, 1000);
+			await this.fetchDashboards();
+			this.viewportUpdated();
+			window.addEventListener("scroll", this.handleScroll);
 		},
 		beforeUnmount() {
-			clearInterval(this.scrollWatcher);
+			window.removeEventListener("scroll", this.handleScroll);
+			clearTimeout(this.viewportUpdatedTimeout);
 			this.inputs.close();
 		},
 		computed: {
@@ -178,7 +182,11 @@
 			},
 		},
 		methods: {
-			watchViewport() {
+			handleScroll() {
+				clearTimeout(this.viewportUpdatedTimeout);
+				this.viewportUpdatedTimeout = setTimeout(this.viewportUpdated, 100);
+			},
+			viewportUpdated() {
 				const elements = this.$refs.componentContainer.children;
 				let viewport = {
 					dashboards: [],
@@ -202,22 +210,49 @@
 					this.viewport = viewport;
 				}
 			},
+			/// Get information about the timestamp of the data sets.
+			///
+			/// This includes the newest timestamp and the timestamp diff between the client and the server.
+			async getTimestamp() {
+				if (this.getTimestampCache === null) {
+					const timestampBefore = Utils.timestampMs();
+					const data = await this.fetchData({ count: 1, all: true });
+					const timestampAfter = Utils.timestampMs();
+					const timestampClient = (timestampAfter + timestampBefore) / 2;
+
+					// Get the newest timestamp.
+					const inputs = new TimeseriesCollection();
+					inputs.add(data);
+					const timestampNewest = inputs.timeRange[1];
+					inputs.close();
+
+					this.getTimestampCache = {
+						client: timestampClient,
+						server: timestampNewest,
+					};
+				}
+
+				// Return a tuple containing the current newest timestamp and the diff between the client and remote.
+				if (this.getTimestampCache.server === null) {
+					return [null, null];
+				}
+				const elapsedTime = Utils.timestampMs() - this.getTimestampCache.client;
+				return [
+					this.getTimestampCache.server + elapsedTime,
+					this.getTimestampCache.server - this.getTimestampCache.client,
+				];
+			},
 			async useLastPeriod(periodMs) {
 				this.loading = true;
 				try {
-					const nbSamples = Math.max(Math.round(this.viewport.width / 2), 100);
+					const [timestampNewest, timestampDiff] = await this.getTimestamp();
 
+					const nbSamples = Math.max(Math.round(this.viewport.width / 2), 100);
 					this.periodMs = periodMs;
 					this.inputs.reset({ periodLimit: this.periodMs });
 
-					// Look for the latest sample and fetch data from there.
-					// This takes care of sample with time unsyncrhonized with the server.
-					let data = await this.fetchData({ count: 1, all: true });
-					this.inputs.add(data);
-					const timestampNewest = this.inputs.timeRange[1];
 					if (timestampNewest !== null) {
-						const timestampDiff = timestampNewest - Utils.timestampMs();
-						data = await this.fetchData({
+						const data = await this.fetchData({
 							before: timestampNewest,
 							after: timestampNewest - this.periodMs,
 							count: nbSamples,

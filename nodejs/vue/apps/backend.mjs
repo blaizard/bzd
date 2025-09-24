@@ -217,13 +217,13 @@ export default class Backend {
 		if (this.instances.statistics) {
 			Log.info("Setting up statistics");
 			if (this.instances.cache) {
-				this.instances.statistics.register(this.instances.cache.statistics, "backend");
+				this.instances.statistics.register(this.instances.cache.statistics, "backend.cache");
 			}
 			if (this.instances.form) {
-				this.instances.statistics.register(this.instances.form.statistics, "backend");
+				this.instances.statistics.register(this.instances.form.statistics, "backend.form");
 			}
 			if (this.instances.form) {
-				this.instances.statistics.register(this.instances.web.statistics, "backend");
+				this.instances.statistics.register(this.instances.web.statistics, "backend.web");
 			}
 		}
 
