@@ -29,6 +29,7 @@ bzd_nodejs_binary(
     main = "app.mjs",
     visibility = [
         "//apps/dashboard:__pkg__",
+        "//deployment:__subpackages__",
     ],
     deps = [
         "//apps/dashboard/plugins:plugins.backend",

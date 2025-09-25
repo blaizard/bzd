@@ -33,7 +33,10 @@ py_binary(
         "generator_polygon.py",
     ],
     tags = ["manual"],
-    visibility = ["//apps/trader_python:__subpackages__"],
+    visibility = [
+        "//apps/trader_python:__subpackages__",
+        "//deployment:__subpackages__",
+    ],
     deps = [
         "//apps/artifacts/api/python/node",
         "@bzd_python//bzd/http:client",
@@ -86,6 +89,9 @@ py_binary(
     name = "sp500",
     srcs = [
         "sp500.py",
+    ],
+    visibility = [
+        "//deployment:__subpackages__",
     ],
     deps = [
         "//apps/artifacts/api/python/node",

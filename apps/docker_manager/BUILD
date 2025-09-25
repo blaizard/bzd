@@ -6,6 +6,9 @@ py_binary(
     srcs = [
         "docker_manager.py",
     ],
+    visibility = [
+        "//deployment:__subpackages__",
+    ],
     deps = [
         "//apps/artifacts/api/python/node",
         "@bzd_python//bzd/http:parser",
@@ -16,4 +19,7 @@ py_binary(
 bzd_python_oci(
     name = "image",
     binary = ":docker_manager",
+    visibility = [
+        "//deployment:__subpackages__",
+    ],
 )
