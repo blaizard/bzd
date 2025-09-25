@@ -64,6 +64,7 @@ bzd_nodejs_binary(
     main = "app.mjs",
     visibility = [
         "//apps/artifacts:__pkg__",
+        "//deployment:__subpackages__",
     ],
     deps = [
         ":plugin",
