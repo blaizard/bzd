@@ -11,8 +11,8 @@ bzd_config_default(
         "b.json",
     ],
     srcs_at = {
-        "c.nested": "c.json",
-        "c.nested2": "c.json",
+        "b.json": "c.nested",
+        "c.json": "c.nested,c.nested2",
     },
     values = {
         "d.value": "hello",
@@ -31,7 +31,7 @@ bzd_diff_test(
 bzd_config(
     name = "config_override",
     srcs_at = {
-        "a": "b.json",
+        "b.json": "a",
     },
     values = {
         "c.nested.c": "wrong",

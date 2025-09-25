@@ -32,8 +32,9 @@ def _bzd_config_impl(ctx):
 
     # Handle files at a given key.
     if ctx.attr.srcs_at:
-        for key, target in ctx.attr.srcs_at.items():
-            args.add_all("--src-at", [key, target.files.to_list()[0]])
+        for target, keys in ctx.attr.srcs_at.items():
+            for key in keys.split(","):
+                args.add_all("--src-at", [key, target.files.to_list()[0]])
         input_files = depset(ctx.files.srcs_at, transitive = [input_files])
 
     if ctx.attr.include_workspace_status:
@@ -115,9 +116,16 @@ _bzd_config = rule(
             allow_files = [".json"],
             doc = "Configuration files.",
         ),
-        "srcs_at": attr.string_keyed_label_dict(
+        "srcs_at": attr.label_keyed_string_dict(
             allow_files = [".json"],
-            doc = "Configuration files that will be merged at the specified key.",
+            doc = """Configuration files that will be merged at the specified key.
+            
+            The value corresponds to one of multiples keys (separated by a comma). This allow the same config to be used
+            at multiple places in the configuration.
+            It also allow multiple config to be applied to the same key, in that case, they will be merged together.
+
+            Note, only dictionaries can be merged together.
+            """,
         ),
         "values": attr.string_dict(
             doc = "Inline configuration values.",
