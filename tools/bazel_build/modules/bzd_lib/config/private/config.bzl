@@ -23,7 +23,7 @@ def _bzd_config_impl(ctx):
 
     # Handle inline values.
     for key, value in ctx.attr.values.items():
-        args.add_all("--value-at", [key, value])
+        args.add_all("--value-at", [key, ctx.expand_location(value, targets = ctx.attr.data)])
 
     # Handle files.
     if ctx.attr.srcs:
