@@ -121,6 +121,7 @@
 					this.endpoint + "?children=99",
 					this.endpoint + "?children=99&metadata=1",
 					this.endpoint + "?children=99&count=5",
+					this.endpoint + "?keys=1",
 					this.endpointExport + "?children=99&format=csv",
 				];
 			},

@@ -672,12 +672,12 @@ describe("Nodes", () => {
 			await data.insert("hello", [[["a", "c"], 6]]);
 
 			{
-				const result = await data.getChildren("hello", [], /*children*/ 0, /*includeInner*/ false);
+				const result = await data.getChildren({ uid: "hello", key: [], children: 0, includeInner: false });
 				Exception.assertEqual(result, []);
 			}
 
 			{
-				const result = await data.getChildren("hello", [], /*children*/ 0, /*includeInner*/ true);
+				const result = await data.getChildren({ uid: "hello", key: [], children: 0, includeInner: true });
 				Exception.assertEqual(result, [
 					{ key: ["a"], leaf: true },
 					{ key: ["b"], leaf: true },
@@ -686,7 +686,7 @@ describe("Nodes", () => {
 			}
 
 			{
-				const result = await data.getChildren("hello", [], /*children*/ 1, /*includeInner*/ false);
+				const result = await data.getChildren({ uid: "hello", key: [], children: 1, includeInner: false });
 				Exception.assertEqual(result, [
 					{ key: ["a"], leaf: true },
 					{ key: ["b"], leaf: true },
@@ -695,7 +695,7 @@ describe("Nodes", () => {
 			}
 
 			{
-				const result = await data.getChildren("hello", [], /*children*/ 2, /*includeInner*/ false);
+				const result = await data.getChildren({ uid: "hello", key: [], children: 2, includeInner: false });
 				Exception.assertEqual(result, [
 					{ key: ["a"], leaf: true },
 					{ key: ["a", "c"], leaf: true },
@@ -703,6 +703,32 @@ describe("Nodes", () => {
 					{ key: ["c"], leaf: true },
 					{ key: ["c", "d"], leaf: true },
 				]);
+			}
+
+			{
+				const result = await data.getChildren({ uid: "hello", key: [], children: 3, includeInner: false });
+				Exception.assertEqual(result, [
+					{ key: ["a"], leaf: true },
+					{ key: ["a", "b", "c"], leaf: true },
+					{ key: ["a", "c"], leaf: true },
+					{ key: ["b"], leaf: true },
+					{ key: ["c"], leaf: true },
+					{ key: ["c", "d"], leaf: true },
+				]);
+			}
+
+			{
+				const result = await data.getChildren({ uid: "hello", key: ["a"], children: 2, includeInner: false });
+				Exception.assertEqual(result, [
+					{ key: [], leaf: true },
+					{ key: ["b", "c"], leaf: true },
+					{ key: ["c"], leaf: true },
+				]);
+			}
+
+			{
+				const result = await data.getChildren({ uid: "hello", key: ["hello"], children: 0, includeInner: false });
+				Exception.assertEqual(result, null);
 			}
 		});
 	});

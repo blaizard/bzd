@@ -314,14 +314,14 @@ export default class Plugin extends PluginBase {
 		/// Get information about the dashboards at the specified path.
 		endpoints.register("get", "/@dashboards/{uid}/{path:*}", async (context) => {
 			const node = await this.nodes.get(context.getParam("uid"));
-			const key = Utils.pathToKey(context.getParam("path"));
-			const children = await node.getChildren(key, 99, /*includeInner*/ false);
+			const rootKey = Utils.pathToKey(context.getParam("path"));
+			const children = await node.getChildren({ key: rootKey, children: 99, includeInner: false });
 
 			// Go through the children and match them against the router.
 			let inputs = {};
 			if (children) {
 				for (const { key } of children) {
-					const path = Utils.keyToPath(key);
+					const path = Utils.keyToPath([...rootKey, ...key]);
 					const match = routerDashboards.match(path);
 					if (match) {
 						inputs[match.args] ??= [];
@@ -404,6 +404,14 @@ export default class Plugin extends PluginBase {
 		/// GET <endpoint>/<uid>/<path:*>?include=/a/b,/a/d/e
 		/// Only show the path /a/b and /a/d/e
 		///
+		/// GET <endpoint>/<uid>/<path:*>?keys=1&children=99
+		/// ```{
+		///   data: [
+		///      [{key: ["a", "b"], leaf: false}],       # This is an inner key
+		///      [{key: ["a", "b", "c"], leaf: true}],   # This is a leaf key that contain a value
+		///   ]
+		/// }```
+		///
 		endpoints.register("get", "/{uid}/{path:*}", async (context) => {
 			const metadata = context.getQuery("metadata", false, Boolean);
 			const children = context.getQuery("children", 0, parseInt);
@@ -430,7 +438,20 @@ export default class Plugin extends PluginBase {
 			}
 
 			if (keys) {
-				const maybeData = await node.getChildren(key, children, /*includeInner*/ true);
+				Exception.assertPrecondition(
+					context.getQuery("metadata", null) === null,
+					"'metadata' cannot be set with 'keys'",
+				);
+				Exception.assertPrecondition(context.getQuery("count", null) === null, "'count' cannot be set with 'keys'");
+				Exception.assertPrecondition(context.getQuery("after", null) === null, "'after' cannot be set with 'keys'");
+				Exception.assertPrecondition(context.getQuery("before", null) === null, "'before' cannot be set with 'keys'");
+				Exception.assertPrecondition(context.getQuery("include", null) === null, "'include' cannot be set with 'keys'");
+				Exception.assertPrecondition(
+					context.getQuery("sampling", null) === null,
+					"'sampling' cannot be set with 'keys'",
+				);
+
+				const maybeData = await node.getChildren({ key, children, includeInner: true });
 				if (!maybeData) {
 					context.sendStatus(404);
 					return;

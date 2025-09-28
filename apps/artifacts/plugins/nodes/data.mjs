@@ -443,14 +443,14 @@ export default class Data {
 	///
 	/// \return A dictionary which keys are the name of the children and value a boolean describing if
 	///         the data is nested of a leaf.
-	async getChildren(uid, key, children, includeInner) {
+	async getChildren({ uid, key, children, includeInner }) {
 		const data = await this.getKeys_(uid, key, children, includeInner);
 		if (data === null) {
 			return null;
 		}
 		return data.map((child) => {
 			return {
-				key: child.key,
+				key: child.key.slice(key.length),
 				leaf: child.leaf,
 			};
 		});
