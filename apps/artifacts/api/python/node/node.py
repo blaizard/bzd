@@ -1,7 +1,9 @@
 import typing
 import time
+import json
 from contextlib import contextmanager
 from dataclasses import dataclass
+from urllib.parse import urlparse
 
 from bzd.http.utils import encodeURIComponent
 from bzd.logging.handler import Log, LoggerHandler, LoggerHandlerData, LoggerHandlerFlow
@@ -35,19 +37,49 @@ class BufferEntryBulk:
 
 class Node(ArtifactsBase):
 
-	def __init__(self, maxBufferSize: int = 0, blockForS: typing.Optional[int] = None, **kwargs: typing.Any) -> None:
+	def __init__(self,
+	             path: typing.Optional[typing.List[str]] = None,
+	             maxBufferSize: int = 0,
+	             blockForS: typing.Optional[int] = None,
+	             **kwargs: typing.Any) -> None:
 		"""Initialize the Node object.
 		
 		Args:
+			path: The default path to be used.
 			maxBufferSize: The maximal number of entries that can be buffered if the server cannot be reached.
 			Once the server can be reached again, all entries will be sent again.
 			blockForS: The publish call will be blocking for a number of seconds if no remote can be accessed.
 		"""
 
 		super().__init__(**kwargs)
+		self.path = path or []
 		self.maxBufferSize = maxBufferSize
 		self.blockForS = blockForS
 		self.buffer: typing.List[BufferEntryBulk] = []
+
+	@staticmethod
+	def fromUrl(url: str) -> "Node":
+		"""Create a node object from a URL."""
+
+		parsedUrl = urlparse(url)
+
+		remote = f"{parsedUrl.scheme}://{parsedUrl.netloc}"
+		key = Node.pathToKey(parsedUrl.path)
+		if len(key) > 0 and key[0] == "view":
+			key.pop(0)
+		volume = key.pop(0) if len(key) > 0 else None
+		uid = key.pop(0) if len(key) > 0 else None
+		if len(key) > 0 and key[0] == "data":
+			key.pop(0)
+		path = key if len(key) > 0 else None
+
+		return Node(remotes=[remote], volume=volume, uid=uid, path=path)
+
+	def _repr(self) -> typing.List[str]:
+		content = super()._repr()
+		if len(self.path):
+			content.append(f"path=/{'/'.join(self.path)}")
+		return content
 
 	def _publish(self, entry: BufferEntryBulk) -> None:
 		"""Publish data to a remote.
@@ -101,15 +133,23 @@ class Node(ArtifactsBase):
 		self.buffer = self.buffer[-self.maxBufferSize:]
 		raise NodePublishNoRemote("Unable to publish to any of the remotes.")
 
-	def _makeURI(self, uid: typing.Optional[str], volume: str, path: typing.Optional[typing.List[str]]) -> str:
+	def _makeURI(self,
+	             uid: typing.Optional[str],
+	             volume: typing.Optional[str] = None,
+	             path: typing.Optional[typing.List[str]] = None,
+	             endpoint: str = "data") -> str:
 		"""Generate the URI from the parameters."""
+
+		endpointToComponent = {"data": "", "export": "@export/"}
 
 		actualUid = uid or self.uid
 		assert actualUid is not None, f"No UID were specified."
-		subPath = "/".join([encodeURIComponent(s) for s in path or []])
-		return f"/x/{volume}/{actualUid}/data" + (f"/{subPath}" if subPath else "") + "/"
+		assert endpoint in endpointToComponent, f"The endpoint type '{endpoint}' does not exist."
+		subPath = "/".join([encodeURIComponent(s) for s in (self.path + (path or []))])
+		return f"/x/{volume or self.volume}/{endpointToComponent[endpoint]}{actualUid}/data" + (f"/{subPath}" if subPath
+		                                                                                        else "") + "/"
 
-	def publishMultiNodes(self, data: typing.Dict[str, typing.Any], volume: str = defaultNodeVolume) -> None:
+	def publishMultiNodes(self, data: typing.Dict[str, typing.Any], volume: typing.Optional[str] = None) -> None:
 		"""Publish data to a remote to multiple nodes.
 
 		Args:
@@ -118,15 +158,16 @@ class Node(ArtifactsBase):
 		"""
 
 		timestampMs = time.time() * 1000
-		self._publish(BufferEntryBulk(uri=f"/x/{volume}/", data=[(
-		    timestampMs,
-		    data,
-		)], isClientTimestamp=True))
+		self._publish(
+		    BufferEntryBulk(uri=f"/x/{volume or self.volume}/", data=[(
+		        timestampMs,
+		        data,
+		    )], isClientTimestamp=True))
 
 	def publish(self,
 	            data: typing.Any,
 	            uid: typing.Optional[str] = None,
-	            volume: str = defaultNodeVolume,
+	            volume: typing.Optional[str] = None,
 	            path: typing.Optional[typing.List[str]] = None) -> None:
 		"""Publish data to a remote.
 
@@ -149,7 +190,7 @@ class Node(ArtifactsBase):
 	@contextmanager
 	def publishBulk(self,
 	                uid: typing.Optional[str] = None,
-	                volume: str = defaultNodeVolume,
+	                volume: typing.Optional[str] = None,
 	                path: typing.Optional[typing.List[str]] = None,
 	                isClientTimestamp: bool = True) -> typing.Generator[PublisherProtocol, None, None]:
 		"""Publish a bulk of data to remote.
@@ -180,6 +221,79 @@ class Node(ArtifactsBase):
 		"""Create a logger handler that sends data to the node."""
 
 		return LoggerHandlerNode(node=self)
+
+	def export(self,
+	           uid: typing.Optional[str] = None,
+	           volume: typing.Optional[str] = None,
+	           path: typing.Optional[typing.List[str]] = None,
+	           after: typing.Optional[int] = None,
+	           before: typing.Optional[int] = None,
+	           children: int = 0,
+	           format: str = "csv") -> bytes:
+		"""Export data from the given node.
+
+		Args:
+			uid: The unique identifier of the node.
+			volume: The volume corresponding to the data.
+			path: The path at which the data shall be exported.
+			after: The starting timestamp when to gather the data.
+			before: The ending timestamp when to gather the data.
+			children: The number of depth level to include.
+			format: The export format of the data.
+
+		Returns:
+			Data as bytes.
+		"""
+
+		uri = self._makeURI(uid=uid, volume=volume, path=path, endpoint="export")
+		headers = {}
+		if self.token:
+			headers["authorization"] = f"basic {self.token}"
+
+		query = {"children": str(children), "format": format}
+		if after is not None:
+			query["after"] = str(after)
+		if before is not None:
+			query["before"] = str(before)
+
+		for remote, retry, nbRetries in self.remotes:
+			url = remote + uri
+			response = self.httpClient.get(url, headers=headers, query=query)
+			return response.content  #  type: ignore
+
+		raise NodePublishNoRemote("Unable to export from any of the remotes.")
+
+	def get(self,
+	        uid: typing.Optional[str] = None,
+	        volume: typing.Optional[str] = None,
+	        path: typing.Optional[typing.List[str]] = None,
+	        after: typing.Optional[int] = None,
+	        before: typing.Optional[int] = None,
+	        children: typing.Optional[int] = None,
+	        keys: typing.Optional[bool] = None) -> typing.Any:
+		"""Get data from the nodes remote volumes.."""
+
+		uri = self._makeURI(uid=uid, volume=volume, path=path)
+		headers = {}
+		if self.token:
+			headers["authorization"] = f"basic {self.token}"
+
+		query = {}
+		if children is not None:
+			query["children"] = str(children)
+		if after is not None:
+			query["after"] = str(after)
+		if before is not None:
+			query["before"] = str(before)
+		if keys is not None:
+			query["keys"] = str(1 if keys else 0)
+
+		for remote, retry, nbRetries in self.remotes:
+			url = remote + uri
+			response = self.httpClient.get(url, headers=headers, query=query)
+			return response.json
+
+		raise NodePublishNoRemote("Unable to export from any of the remotes.")
 
 
 class LoggerHandlerNode(LoggerHandler):
