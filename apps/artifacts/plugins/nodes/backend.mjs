@@ -416,7 +416,9 @@ export default class Plugin extends PluginBase {
 					.filter(Boolean)
 					.map((path) => Utils.pathToKey(path)),
 			);
-			const sampling = context.getQuery("sampling", null);
+			const sampling = context.getQuery("sampling", null, String);
+			const keys = context.getQuery("keys", false, Boolean);
+			const key = Utils.pathToKey(context.getParam("path"));
 
 			const node = await this.nodes.get(context.getParam("uid"));
 
@@ -427,24 +429,35 @@ export default class Plugin extends PluginBase {
 				});
 			}
 
-			const maybeData = await node.get({
-				key: Utils.pathToKey(context.getParam("path")),
-				metadata,
-				children,
-				count,
-				after,
-				before,
-				include,
-				sampling,
-			});
-			if (maybeData.isEmpty()) {
-				context.sendStatus(404);
-				return;
+			if (keys) {
+				const maybeData = await node.getChildren(key, children, /*includeInner*/ true);
+				if (!maybeData) {
+					context.sendStatus(404);
+					return;
+				}
+				output = Object.assign(output, {
+					data: maybeData,
+				});
+			} else {
+				const maybeData = await node.get({
+					key: key,
+					metadata,
+					children,
+					count,
+					after,
+					before,
+					include,
+					sampling,
+				});
+				if (maybeData.isEmpty()) {
+					context.sendStatus(404);
+					return;
+				}
+				output = Object.assign(output, {
+					data: maybeData.value(),
+				});
 			}
 
-			output = Object.assign(output, {
-				data: maybeData.value(),
-			});
 			context.setStatus(200);
 			context.sendJson(output);
 		});

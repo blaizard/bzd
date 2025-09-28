@@ -660,5 +660,50 @@ describe("Nodes", () => {
 				Exception.assert(useExternal);
 			}
 		});
+
+		it("getChildren", async () => {
+			const data = new Data();
+
+			await data.insert("hello", [[["a"], 1]]);
+			await data.insert("hello", [[["b"], 2]]);
+			await data.insert("hello", [[["c"], 3]]);
+			await data.insert("hello", [[["c", "d"], 4]]);
+			await data.insert("hello", [[["a", "b", "c"], 5]]);
+			await data.insert("hello", [[["a", "c"], 6]]);
+
+			{
+				const result = await data.getChildren("hello", [], /*children*/ 0, /*includeInner*/ false);
+				Exception.assertEqual(result, []);
+			}
+
+			{
+				const result = await data.getChildren("hello", [], /*children*/ 0, /*includeInner*/ true);
+				Exception.assertEqual(result, [
+					{ key: ["a"], leaf: true },
+					{ key: ["b"], leaf: true },
+					{ key: ["c"], leaf: true },
+				]);
+			}
+
+			{
+				const result = await data.getChildren("hello", [], /*children*/ 1, /*includeInner*/ false);
+				Exception.assertEqual(result, [
+					{ key: ["a"], leaf: true },
+					{ key: ["b"], leaf: true },
+					{ key: ["c"], leaf: true },
+				]);
+			}
+
+			{
+				const result = await data.getChildren("hello", [], /*children*/ 2, /*includeInner*/ false);
+				Exception.assertEqual(result, [
+					{ key: ["a"], leaf: true },
+					{ key: ["a", "c"], leaf: true },
+					{ key: ["b"], leaf: true },
+					{ key: ["c"], leaf: true },
+					{ key: ["c", "d"], leaf: true },
+				]);
+			}
+		});
 	});
 });
