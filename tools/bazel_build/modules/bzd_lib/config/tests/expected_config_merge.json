@@ -23,5 +23,6 @@
     },
     "d": {
         "value": "hello"
-    }
+    },
+    "data": "external/bzd_lib+/config/tests/data.txt"
 }

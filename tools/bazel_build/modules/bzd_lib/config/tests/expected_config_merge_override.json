@@ -10,5 +10,6 @@
     },
     "d": {
         "value": "world"
-    }
+    },
+    "data": "external/bzd_lib+/config/tests/data.txt"
 }

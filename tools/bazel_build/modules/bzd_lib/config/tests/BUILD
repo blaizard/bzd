@@ -10,12 +10,16 @@ bzd_config_default(
         "a.json",
         "b.json",
     ],
+    data = [
+        "data.txt",
+    ],
     srcs_at = {
         "b.json": "c.nested",
         "c.json": "c.nested,c.nested2",
     },
     values = {
         "d.value": "hello",
+        "data": "$(location data.txt)",
     },
 )
 
