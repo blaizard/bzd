@@ -37,6 +37,7 @@ export default class Backend {
 		};
 		this.isSetup = false;
 		this.test = test;
+		this.signalDestructor = null;
 	}
 
 	// Set-up the backend object.
@@ -285,11 +286,25 @@ export default class Backend {
 			Log.info("Serving static content from '{}'.", this.instances.staticPath);
 		}
 
+		Log.info("Setup SIGINT and SIGTERM listeners.");
+		const shutdown = async () => await this.stop();
+		process.on("SIGINT", shutdown);
+		process.on("SIGTERM", shutdown);
+		this.signalDestructor = () => {
+			Log.info("Shutting down SIGINT and SIGTERM listeners.");
+			process.off("SIGINT", shutdown);
+			process.off("SIGTERM", shutdown);
+			this.signalDestructor = null;
+		};
+
 		Log.info("Starting web server");
 		await this.instances.web.start();
 	}
 
 	async stop() {
+		Exception.assert(this.signalDestructor !== null, "Signal destructor already called.");
+		this.signalDestructor();
+
 		Log.info("Stopping web server");
 		await this.instances.web.stop();
 		if (this.instances.services) {
