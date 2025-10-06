@@ -106,7 +106,9 @@ export default class Provider {
 	}
 
 	get commongStopOptions() {
-		return this.commongOptions;
+		return Object.assign(this.commongOptions, {
+			policy: Services.Policy.throw,
+		});
 	}
 
 	addStartProcess(name, process, options = {}) {

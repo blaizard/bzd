@@ -283,6 +283,8 @@ export default class Services {
 					case Services.Policy.throw:
 						service.lastFatalError = this.getLastError(uid, name);
 						break;
+					default:
+						Exception.unreachable("Unsupported policy: {}", object.options.policy);
 				}
 
 				return false;
@@ -343,6 +345,8 @@ export default class Services {
 					case Services.Policy.throw:
 						service.lastFatalError = this.getLastError(uid, name);
 						break;
+					default:
+						Exception.unreachable("Unsupported policy: {}", object.options.policy);
 				}
 			}
 		}
