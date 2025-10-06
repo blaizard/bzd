@@ -230,7 +230,7 @@ export default class Record {
 
 	/// Add new payload to the record list.
 	async _getLastEntryForWriting(storage, tick, payloadSize) {
-		Exception.assert(storage.records !== null, "Used before initialization.");
+		Exception.assertPrecondition(storage.records !== null, "Used before initialization.");
 		let entry = this._getLastEntryForReading(storage);
 
 		// Check if the entry has still enough space, if not compress it.
@@ -281,7 +281,7 @@ export default class Record {
 	/// \return A tuple, containing the list of payload previously stored, and the next tick.
 	///         In case there are no new payloads, null is returned.
 	async _readStorageByChunk(storage, tick) {
-		Exception.assert(storage.records !== null, "Used before initialization.");
+		Exception.assertPrecondition(storage.records !== null, "Used before initialization.");
 
 		/// If the tick is null, return null, this is to ease looping over _read.
 		if (tick === null) {

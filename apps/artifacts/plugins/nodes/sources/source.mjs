@@ -9,21 +9,30 @@ export default class Source extends Process {
 		super();
 		this.plugin = plugin;
 		this.storageName = storageName;
-		this.options = options;
+		this.options = Object.assign(
+			{
+				persistent: true,
+			},
+			options,
+		);
 		this.components = components;
+		this.nextTickRemote = this.options.persistent ? this.plugin.records.getTickRemote(this.storageName, 0) : 0;
 
 		Exception.assert(typeof this.fetchRecords === "function", "A source must implement a 'fetchRecords' function.");
 	}
 
 	async process(options) {
 		try {
-			const tickRemote = this.plugin.records.getTickRemote(this.storageName, 0);
-			const [records, next, end] = await this.fetchRecords(tickRemote);
+			const [records, next, end] = await this.fetchRecords(this.nextTickRemote);
+			const currentTickRemote = this.nextTickRemote;
+			this.nextTickRemote = next;
 
 			// Apply the records from remote.
 			for (const record of records) {
 				await this.plugin.nodes.insertRecord(record);
-				await this.plugin.records.write(Nodes.recordToDisk(record), this.storageName, next);
+				if (this.options.persistent) {
+					await this.plugin.records.write(Nodes.recordToDisk(record), this.storageName, this.nextTickRemote);
+				}
 			}
 
 			// Update the options.
@@ -35,7 +44,7 @@ export default class Source extends Process {
 			}
 
 			return {
-				tick: [tickRemote, next],
+				tick: [currentTickRemote, this.nextTickRemote],
 				end: end,
 				nextCallS: options.periodS,
 				records: records.length,

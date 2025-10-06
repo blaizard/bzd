@@ -61,7 +61,7 @@ export default class PluginTester {
 		Exception.assert(result !== false, "There is no handler for the endpoint {} for plugin {}.", path, volume);
 		Exception.assert(
 			!throwOnFailure || (context.response.status >= 200 && context.response.status <= 299),
-			"Invalid result status: {}",
+			"There is a handler but it returned an invalid result status: {}",
 			context.response.status,
 		);
 

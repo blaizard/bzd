@@ -9,7 +9,7 @@ export default class MockServerContext {
 		this.request = {
 			path: null,
 			method: "GET",
-			queries: {},
+			query: {},
 			params: {},
 			headers: {},
 			cookies: {},
@@ -35,7 +35,7 @@ export default class MockServerContext {
 	withPath(url) {
 		const parsedUrl = new URL(url, "http://dummy");
 		this.request.path = parsedUrl.pathname;
-		Object.assign(this.request.queries, Object.fromEntries(parsedUrl.searchParams.entries()));
+		Object.assign(this.request.query, Object.fromEntries(parsedUrl.searchParams.entries()));
 		return this;
 	}
 
@@ -125,11 +125,11 @@ export default class MockServerContext {
 	}
 
 	getQueries() {
-		return this.request.queries;
+		return this.request.query;
 	}
 
 	getQuery(name, defaultValue = null, cast = (v) => v) {
-		return name in this.request.queries ? cast(this.request.queries[name]) : defaultValue;
+		return name in this.request.query ? cast(this.request.query[name]) : defaultValue;
 	}
 
 	getFiles() {

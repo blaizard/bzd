@@ -404,8 +404,8 @@ describe("Plugin", () => {
 					source1: {
 						type: "nodes",
 						host: "http://source1",
-						delayS: 0.1,
 						throwOnFailure: true,
+						persistent: true,
 					},
 				},
 			},
@@ -419,7 +419,7 @@ describe("Plugin", () => {
 
 		await tester.start();
 		try {
-			await waitUntil(() => fetched);
+			await tester.serviceRun("nodes.nodes", "source.source1");
 			const response = await tester.send("nodes", "get", "/@records");
 			Exception.assertEqual(response.status, 200);
 			verify(response.data.records);
@@ -471,6 +471,109 @@ describe("Plugin", () => {
 		});
 	});
 
+	describe("Sync", () => {
+		it("stress", async () => {
+			const tester = new PluginTester();
+			tester.register(
+				"node1",
+				Plugin,
+				{
+					"nodes.records": {
+						path: "./records1",
+						clean: true,
+					},
+					"nodes.sources": {
+						node2: {
+							type: "nodes",
+							host: "http://node2",
+							throwOnFailure: true,
+							persistent: false,
+							// Don't run before anything is initialized. We will run this manually anyway.
+							delayS: 10,
+						},
+					},
+				},
+				{
+					HttpClientFactory: makeMockHttpClientFactory(async (url, options) => {
+						if (url.startsWith("http://node2/x/node2/@records")) {
+							return (await tester.send("node2", options.method, "/@records", options)).data;
+						} else {
+							Exception.unreachable("Unexpected request: {}", url);
+						}
+					}),
+				},
+			);
+
+			tester.register(
+				"node2",
+				Plugin,
+				{
+					"nodes.records": {
+						path: "./records2",
+						clean: true,
+					},
+					"nodes.sources": {
+						node1: {
+							type: "nodes",
+							host: "http://node1",
+							throwOnFailure: true,
+							persistent: false,
+							// Don't run before anything is initialized. We will run this manually anyway.
+							delayS: 10,
+						},
+					},
+				},
+				{
+					HttpClientFactory: makeMockHttpClientFactory(async (url, options) => {
+						if (url.startsWith("http://node1/x/node1/@records")) {
+							return (await tester.send("node1", options.method, "/@records", options)).data;
+						} else {
+							Exception.unreachable("Unexpected request: {}", url);
+						}
+					}),
+				},
+			);
+
+			const nodes = ["node1", "node2"];
+
+			await tester.start();
+			try {
+				// Send a lot of data to both nodes randomly.
+				let nbDataLeft = 1000;
+				let counter = 0;
+				while (nbDataLeft--) {
+					const nodeName = nodes[Math.floor(Math.random() * nodes.length)];
+					const value = ++counter;
+					await tester.send(nodeName, "post", "/hello/value", {
+						query: { bulk: 1 },
+						headers: { "Content-Type": "application/json" },
+						data: JSON.stringify({ data: [[value, value]] }),
+					});
+				}
+
+				// Sync.
+				await tester.serviceRun("node1.node1", "source.node2");
+				await tester.serviceRun("node2.node2", "source.node1");
+
+				// Read the last 5 data points.
+				for (const nodeName of nodes) {
+					const result = await tester.send(nodeName, "get", "/hello/value", {
+						query: { count: 5, metadata: 1 },
+					});
+					Exception.assertEqual(result.data.data, [
+						[1000, 1000, 0],
+						[999, 999, 0],
+						[998, 998, 0],
+						[997, 997, 0],
+						[996, 996, 0],
+					]);
+				}
+			} finally {
+				await tester.stop();
+			}
+		});
+	});
+
 	const makeDatabaseTest = async (options, onReceiveCallback) => {
 		const tester = new PluginTester();
 		let fetched = false;
@@ -510,7 +613,7 @@ describe("Plugin", () => {
 			});
 			// Write data with fixed timestamp
 			await tester.send("nodes", "post", "/uid01/hello/fixed", {
-				queries: { bulk: 1 },
+				query: { bulk: 1 },
 				headers: { "Content-Type": "application/json" },
 				data: JSON.stringify({ data: [[1234, { c: 3 }]] }),
 			});
@@ -521,22 +624,22 @@ describe("Plugin", () => {
 		}
 	};
 
-	const makeInfluxDBDatabaseTest = async (onReceiveCallback) => {
-		await makeDatabaseTest(
-			{
-				type: "influxdb",
-				org: "myorg",
-				bucket: "mybucket",
-				host: "http://influxdb1",
-				token: "mytoken",
-				write: true,
-				read: true,
-			},
-			onReceiveCallback,
-		);
-	};
-
 	describe("Databases influxdb", () => {
+		const makeInfluxDBDatabaseTest = async (onReceiveCallback) => {
+			await makeDatabaseTest(
+				{
+					type: "influxdb",
+					org: "myorg",
+					bucket: "mybucket",
+					host: "http://influxdb1",
+					token: "mytoken",
+					write: true,
+					read: true,
+				},
+				onReceiveCallback,
+			);
+		};
+
 		it("retention", async () => {
 			await makeInfluxDBDatabaseTest((url, options, resolve) => {
 				if (url.endsWith("/api/v2/buckets")) {

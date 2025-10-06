@@ -260,6 +260,7 @@
             "nodes.sources": {
                 "nodes": {
                     "host": "http://localhost:8081",
+                    "persistent": false,
                     "type": "nodes"
                 }
             },

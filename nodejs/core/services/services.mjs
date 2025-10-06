@@ -269,6 +269,7 @@ export default class Services {
 
 		// Start the start processes if any.
 		for (const [name, _] of service.provider.getStartProcesses()) {
+			Log.info("Running start process '{}.{}'.", uid, name);
 			if (!(await this.runProcess(uid, name))) {
 				service.state.timestampStop = Services._getTimestamp();
 				service.state.status = Services.Status.error;
@@ -334,6 +335,7 @@ export default class Services {
 
 		// Start the stop processes if any.
 		for (const [name, _] of service.provider.getStopProcesses()) {
+			Log.info("Running stop process '{}.{}'.", uid, name);
 			if (!(await this.runProcess(uid, name))) {
 				// Handle the error based on the policy.
 				const object = service.provider.processes[name];
