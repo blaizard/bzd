@@ -32,6 +32,7 @@ export default class Record {
 				/// Maximum size of all the records compressed.
 				maxSize: 20 * 1024 * 1024,
 				storages: [Record.defaultStorageName],
+				/// If set all previous records will be removed.
 				clean: false,
 				statistics: new StatisticsProvider("records"),
 			},

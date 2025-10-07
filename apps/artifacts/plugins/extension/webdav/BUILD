@@ -15,6 +15,7 @@ bzd_nodejs_library(
     deps = [
         "//nodejs/db/storage",
         "//nodejs/utils:pathlib",
+        "//nodejs/core:lock",
     ],
 )
 

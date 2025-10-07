@@ -3,13 +3,16 @@ import pathlib from "#bzd/nodejs/utils/pathlib.mjs";
 import Permissions from "#bzd/nodejs/db/storage/permissions.mjs";
 import ExceptionFactory from "../../../../../nodejs/core/exception.mjs";
 import { FileNotFoundError } from "#bzd/nodejs/db/storage/storage.mjs";
+import Lock from "#bzd/nodejs/core/lock.mjs";
 
 const Exception = ExceptionFactory("apps", "plugin", "webdav");
 
-/// Simple exception handler.
-async function scopeExceptionHandler(context, action) {
+/// Simple exception handler with a lock, ensuring that every webdav operation is sequential.
+async function scopeExceptionHandler(context, lock, action) {
 	try {
-		await action();
+		await lock.acquire(async () => {
+			await action();
+		});
 	} catch (e) {
 		if (e instanceof FileNotFoundError) {
 			context.sendStatus(404);
@@ -51,6 +54,7 @@ export default function extensionWebdav(plugin, options, provider, endpoints) {
 		},
 		options["webdav"],
 	);
+	const lock = new Lock();
 
 	/// Write the content of a file.
 	endpoints.register("options", "/webdav/{path:*}", async (context) => {
@@ -64,7 +68,7 @@ export default function extensionWebdav(plugin, options, provider, endpoints) {
 		"get",
 		"/webdav/{path:*}",
 		async (context) => {
-			await scopeExceptionHandler(context, async () => {
+			await scopeExceptionHandler(context, lock, async () => {
 				const path = getPathFromContext(context);
 				const storage = plugin.getStorage();
 				await setRessourceHeaders(path.parts, context, storage);
@@ -83,7 +87,7 @@ export default function extensionWebdav(plugin, options, provider, endpoints) {
 		"put",
 		"/webdav/{path:*}",
 		async (context) => {
-			await scopeExceptionHandler(context, async () => {
+			await scopeExceptionHandler(context, lock, async () => {
 				const path = getPathFromContext(context);
 				const storage = plugin.getStorage();
 				const body = context.getBody();
@@ -108,7 +112,7 @@ export default function extensionWebdav(plugin, options, provider, endpoints) {
 	///		<a:prop><a:getcontentlength/></a:prop>
 	/// </a:propfind>
 	endpoints.register("propfind", "/webdav/{path:*}", async (context) => {
-		await scopeExceptionHandler(context, async () => {
+		await scopeExceptionHandler(context, lock, async () => {
 			const depth = context.getHeader("depth", "0");
 			const path = getPathFromContext(context);
 			const storage = plugin.getStorage();
@@ -176,7 +180,7 @@ export default function extensionWebdav(plugin, options, provider, endpoints) {
 
 	/// Delete a file/directory.
 	endpoints.register("delete", "/webdav/{path:*}", async (context) => {
-		await scopeExceptionHandler(context, async () => {
+		await scopeExceptionHandler(context, lock, async () => {
 			const path = getPathFromContext(context);
 			const storage = plugin.getStorage();
 
@@ -187,7 +191,7 @@ export default function extensionWebdav(plugin, options, provider, endpoints) {
 
 	/// Create a directory.
 	endpoints.register("mkcol", "/webdav/{path:*}", async (context) => {
-		await scopeExceptionHandler(context, async () => {
+		await scopeExceptionHandler(context, lock, async () => {
 			const path = getPathFromContext(context);
 			const storage = plugin.getStorage();
 
@@ -198,7 +202,7 @@ export default function extensionWebdav(plugin, options, provider, endpoints) {
 
 	/// Get the header only to query a resource.
 	endpoints.register("head", "/webdav/{path:*}", async (context) => {
-		await scopeExceptionHandler(context, async () => {
+		await scopeExceptionHandler(context, lock, async () => {
 			const path = getPathFromContext(context);
 			const storage = plugin.getStorage();
 			await setRessourceHeaders(path.parts, context, storage);
