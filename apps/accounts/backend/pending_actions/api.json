@@ -3,7 +3,7 @@
         "/admin/pending_actions/stats": {
             "get": {
                 "authentication": [
-                    "admin"
+                    "/pending_actions"
                 ],
                 "documentation": "Get current statistics about pending actions",
                 "response": {

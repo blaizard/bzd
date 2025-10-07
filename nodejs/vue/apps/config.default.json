@@ -2,7 +2,7 @@
     "application": "dummy",
     "authentication": {
         "scopes": [
-            "admin-applications"
+            "/"
         ],
         "type": "stub"
     }

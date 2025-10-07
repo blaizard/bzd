@@ -3,7 +3,7 @@
         "/admin/logger/memory": {
             "get": {
                 "authentication": [
-                    "admin-applications"
+                    "/applications"
                 ],
                 "documentation": "Get all logs",
                 "response": {

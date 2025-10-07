@@ -54,13 +54,13 @@
         "aGVsbG86YWJjMTIz": {
             "doc": "base64 user:password token for hello:abc123",
             "scopes": [
-                "memory_private"
+                "/volume/memory_private"
             ]
         },
         "tokenscope1": {
             "doc": "Some useful documentation",
             "scopes": [
-                "scope1"
+                "/volume/scope1"
             ]
         }
     },

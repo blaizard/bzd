@@ -3,7 +3,7 @@
         "/admin/service/logs": {
             "get": {
                 "authentication": [
-                    "admin-applications"
+                    "/applications"
                 ],
                 "documentation": "Get the logs for a specific service/process",
                 "request": {
@@ -24,7 +24,7 @@
         "/admin/service/trigger": {
             "post": {
                 "authentication": [
-                    "admin-applications"
+                    "/applications"
                 ],
                 "documentation": "Manually trigger a service",
                 "request": {
@@ -39,7 +39,7 @@
         "/admin/services": {
             "get": {
                 "authentication": [
-                    "admin-applications"
+                    "/applications"
                 ],
                 "documentation": "List available services",
                 "response": {

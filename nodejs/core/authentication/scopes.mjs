@@ -2,43 +2,35 @@ import Result from "#bzd/nodejs/utils/result.mjs";
 
 export default class Scopes {
 	constructor(scopes) {
-		this.values_ = new Set(scopes);
+		this.list_ = [...new Set(scopes).values()].filter((scope) => Boolean(scope.trim()));
 	}
 
 	toList() {
-		return [...this.values_.values()];
+		return [...this.list_];
 	}
 
 	/// Check that this scope is contained in this object.
 	contains(scope) {
-		return this.values_.has(scope);
-	}
-
-	/// Ensure that all scopes are associated with this.
-	matchAll(scopeOrScopes) {
-		const scopeList = Array.isArray(scopeOrScopes) ? scopeOrScopes : [scopeOrScopes];
-		return scopeList.every((scope) => this.values_.has(scope));
+		return this.list_.some(
+			(objectScope) =>
+				scope.startsWith(objectScope) &&
+				(objectScope.at(-1) == "/" || [undefined, "/"].includes(scope[objectScope.length])),
+		);
 	}
 
 	/// Ensure that at least one scope is associated with this session.
 	matchAny(scopeOrScopes) {
 		const scopeList = Array.isArray(scopeOrScopes) ? scopeOrScopes : [scopeOrScopes];
-		return scopeList.some((scope) => this.values_.has(scope));
+		return scopeList.some((scope) => this.contains(scope));
 	}
 
 	/// Have exactly the same scopes are the ones passed into argument.
-	sameAs(scopeOrScopes) {
-		let scopeList = Array.isArray(scopeOrScopes) ? [...new Set(scopeOrScopes).values()] : [scopeOrScopes];
-		if (scopeList.length != this.values_.length) {
+	sameAs(scopes) {
+		let scopesObject = new Scopes(scopes);
+		if (scopesObject.list_.length != this.list_.length) {
 			return false;
 		}
-		while (scopeList.length) {
-			const scope = scopeList.pop();
-			if (!this.values_.has(scope)) {
-				return false;
-			}
-		}
-		return true;
+		return scopesObject.list_.every((scope) => this.list_.includes(scope));
 	}
 
 	/// Filter a dictionary with key: [scopes...] pairs.
@@ -47,8 +39,8 @@ export default class Scopes {
 	/// \param keyScopesMap A dictionary key to scope correspondence map.
 	/// \return The filtered dictionary.
 	filterDictionary(data, keyScopesMap) {
-		return Object.entries(keyScopesMap).reduce((obj, [key, scopes]) => {
-			if (this.matchAny(scopes)) {
+		return Object.entries(keyScopesMap).reduce((obj, [key, scopeOrScopes]) => {
+			if (this.matchAny(scopeOrScopes)) {
 				obj[key] = data[key];
 			}
 			return obj;
@@ -56,6 +48,8 @@ export default class Scopes {
 	}
 
 	/// Check that all dictionary keys matches the key: [scopes...] pairs.
+	///
+	/// \return a result containing the error message if any.
 	checkDictionary(data, keyScopesMap) {
 		const allKeys = new Set([...Object.keys(data), ...Object.keys(keyScopesMap)]);
 		for (const key of allKeys) {
@@ -73,16 +67,14 @@ export default class Scopes {
 	}
 
 	/// Check that all the scopes passed into arguments are valid (part of this).
+	///
+	/// \return a result containing the error message if any.
 	checkValid(scopes) {
 		for (const scope of scopes) {
-			if (!this.values_.has(scope)) {
-				return Result.makeErrorString("Scope '{}' is not valid, must be one of: {}.", scope, [...this.values_]);
+			if (!this.contains(scope)) {
+				return Result.makeErrorString("Scope '{}' is not valid, must be one of: {:j}.", scope, this.list_);
 			}
 		}
 		return new Result();
-	}
-
-	intersect(scopes) {
-		return new Scopes([...scopes].filter((scope) => this.values_.has(scope)));
 	}
 }

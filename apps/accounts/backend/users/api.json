@@ -3,7 +3,7 @@
         "/admin/user": {
             "delete": {
                 "authentication": [
-                    "admin-users"
+                    "/users"
                 ],
                 "documentation": "Delete a specific user",
                 "request": {
@@ -15,7 +15,7 @@
             },
             "post": {
                 "authentication": [
-                    "admin-users"
+                    "/users"
                 ],
                 "documentation": "Create a new user",
                 "request": {
@@ -27,7 +27,7 @@
             },
             "put": {
                 "authentication": [
-                    "admin-users"
+                    "/users"
                 ],
                 "documentation": "Update user information",
                 "request": {
@@ -43,7 +43,7 @@
         "/admin/users": {
             "get": {
                 "authentication": [
-                    "admin-users"
+                    "/users"
                 ],
                 "documentation": "List all users",
                 "request": {
@@ -61,7 +61,7 @@
         "/subscription": {
             "get": {
                 "authentication": [
-                    "self-subscriptions:r"
+                    "/self/subscriptions/r"
                 ],
                 "cors": true,
                 "documentation": "Check if a subscription is active",
@@ -82,7 +82,7 @@
         "/user": {
             "delete": {
                 "authentication": [
-                    "self-basic:w"
+                    "/self/basic/w"
                 ],
                 "documentation": "Delete current user account",
                 "request": {
@@ -94,42 +94,42 @@
             },
             "get": {
                 "authentication": [
-                    "self-basic:r"
+                    "/self/basic/r"
                 ],
                 "cors": true,
                 "documentation": "Get current user information",
                 "request": {
                     "scopes": {
-                        "uid": "admin-users"
+                        "uid": "/users"
                     },
                     "type": "query"
                 },
                 "response": {
                     "scopes": {
-                        "creation": "self-basic:r",
-                        "email": "self-basic:r",
-                        "last_failed_login": "self-basic:r",
-                        "last_login": "self-basic:r",
-                        "last_password_reset": "self-basic:r",
-                        "roles": "self-roles:r",
-                        "scopes": "self-roles:r",
-                        "subscriptions": "self-subscriptions:r",
-                        "tokens": "self-tokens:r"
+                        "creation": "/self/basic/r",
+                        "email": "/self/basic/r",
+                        "last_failed_login": "/self/basic/r",
+                        "last_login": "/self/basic/r",
+                        "last_password_reset": "/self/basic/r",
+                        "roles": "/self/roles/r",
+                        "scopes": "/self/roles/r",
+                        "subscriptions": "/self/subscriptions/r",
+                        "tokens": "/self/tokens/r"
                     },
                     "type": "json"
                 }
             },
             "put": {
                 "authentication": [
-                    "self-basic:w"
+                    "/self/basic/w"
                 ],
                 "documentation": "Update current user information",
                 "request": {
                     "scopes": {
-                        "oldpassword": "self-basic:w",
-                        "password": "self-basic:w",
-                        "tokens": "self-tokens:w",
-                        "uid": "admin-users"
+                        "oldpassword": "/self/basic/w",
+                        "password": "/self/basic/w",
+                        "tokens": "/self/tokens/w",
+                        "uid": "/users"
                     },
                     "type": "json",
                     "validation": {

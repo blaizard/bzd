@@ -3,7 +3,7 @@
         "/admin/statistics": {
             "get": {
                 "authentication": [
-                    "admin-applications"
+                    "/applications"
                 ],
                 "documentation": "Get the statistics data",
                 "request": {

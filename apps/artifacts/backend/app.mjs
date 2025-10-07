@@ -107,7 +107,7 @@ const Exception = ExceptionFactory("backend");
 			return false;
 		}
 		if ("private" in volumes[volume].options) {
-			const maybeSession = await backend.authentication.verify(context, /*scopes*/ [volume]);
+			const maybeSession = await backend.authentication.verify(context, /*scopes*/ ["/volume/" + volume]);
 			if (!maybeSession) {
 				return false;
 			}

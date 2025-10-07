@@ -3,7 +3,7 @@
         "/admin/application": {
             "delete": {
                 "authentication": [
-                    "admin-applications"
+                    "/applications"
                 ],
                 "documentation": "Delete an existing application",
                 "request": {
@@ -15,7 +15,7 @@
             },
             "post": {
                 "authentication": [
-                    "admin-applications"
+                    "/applications"
                 ],
                 "documentation": "Create a new application",
                 "request": {
@@ -31,7 +31,7 @@
         "/admin/applications": {
             "get": {
                 "authentication": [
-                    "admin-applications"
+                    "/applications"
                 ],
                 "documentation": "List all applications",
                 "request": {

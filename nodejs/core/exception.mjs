@@ -109,6 +109,15 @@ export const ExceptionFactory = (...topics) => {
 			}
 		}
 
+		/// Assert that the result passed into argument has an error.
+		///
+		// \param expression The result to evaluate.
+		static assertResultError(result) {
+			if (result.hasValue()) {
+				throw new Exception("Assertion failed; result contains the value: {:j}", result.value());
+			}
+		}
+
 		/// Assert that the result passed into argument has a value.
 		///
 		/// \param expression The result to evaluate.
