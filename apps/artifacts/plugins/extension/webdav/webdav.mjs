@@ -40,6 +40,17 @@ function getPathFromContext(context) {
 	return pathlib.path(decodeURIComponent(context.getParam("path", ""))).normalize;
 }
 
+/// Get the path from a header.
+function getPathFromHeader(context, name) {
+	const fullPath = context.getHeader(name, null);
+	Exception.assertPrecondition(fullPath !== null, "Missing '{}' header.", name);
+
+	const index = fullPath.indexOf("/webdav/");
+	Exception.assertPrecondition(index !== -1, "Path '{}' is malformed: '{}'.", name, fullPath);
+
+	return pathlib.path(fullPath.slice(index + 8)).normalize;
+}
+
 export default function extensionWebdav(plugin, options, provider, endpoints) {
 	if (!options["webdav"]) {
 		return;
@@ -58,7 +69,7 @@ export default function extensionWebdav(plugin, options, provider, endpoints) {
 
 	/// Write the content of a file.
 	endpoints.register("options", "/webdav/{path:*}", async (context) => {
-		context.setHeader("Allow", "GET, PUT, DELETE, MKCOL, OPTIONS, PROPFIND, HEAD");
+		context.setHeader("Allow", "GET, PUT, DELETE, MKCOL, OPTIONS, PROPFIND, HEAD, COPY, MOVE");
 		context.setHeader("Content-Type", "httpd/unix-directory");
 		context.sendStatus(200);
 	});
@@ -185,6 +196,30 @@ export default function extensionWebdav(plugin, options, provider, endpoints) {
 			const storage = plugin.getStorage();
 
 			await storage.delete(path.parts);
+			context.sendStatus(200);
+		});
+	});
+
+	/// Copy a file.
+	endpoints.register("copy", "/webdav/{path:*}", async (context) => {
+		await scopeExceptionHandler(context, lock, async () => {
+			const path = getPathFromContext(context);
+			const destination = getPathFromHeader(context, "destination");
+			const storage = plugin.getStorage();
+
+			await storage.copy(path.parts, destination.parts, /*mkdir*/ true);
+			context.sendStatus(200);
+		});
+	});
+
+	/// Move a file.
+	endpoints.register("move", "/webdav/{path:*}", async (context) => {
+		await scopeExceptionHandler(context, lock, async () => {
+			const path = getPathFromContext(context);
+			const destination = getPathFromHeader(context, "destination");
+			const storage = plugin.getStorage();
+
+			await storage.move(path.parts, destination.parts, /*mkdir*/ true);
 			context.sendStatus(200);
 		});
 	});

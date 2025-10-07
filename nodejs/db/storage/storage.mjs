@@ -79,6 +79,18 @@ export class Storage extends AsyncInitialize {
 		return this._deleteImpl(Array.isArray(path) ? path : [path]);
 	}
 
+	/// Copy a file to the given destination.
+	async copy(source, destination, mkdir = false) {
+		const readStream = await this.read(source);
+		return this.write(destination, readStream, mkdir);
+	}
+
+	/// Move a file to the given destination.
+	async move(source, destination, mkdir = false) {
+		await this.copy(source, destination, mkdir);
+		return this.delete(source);
+	}
+
 	/// Create a directory at a given path.
 	///
 	/// If the parent directory also does not exists, create it as well.

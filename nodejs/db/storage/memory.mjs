@@ -137,6 +137,9 @@ export default class StorageMemory extends Storage {
 
 	async _readImpl(pathList) {
 		const [parent, name] = this._getParentNamePair(pathList);
+		if (!(name in parent)) {
+			throw new FileNotFoundError(name);
+		}
 		Exception.assertPrecondition(parent[name] instanceof File, "'{}' points to a directory.", name);
 		return fromChunk(parent[name].content);
 	}

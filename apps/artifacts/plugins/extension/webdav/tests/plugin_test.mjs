@@ -316,4 +316,134 @@ describe("Webdav", () => {
 			Exception.assertEqual(response.data, null);
 		});
 	});
+
+	describe("move", async () => {
+		const tester = new PluginTester();
+		tester.register("memory", Plugin, defaultMemory);
+		await tester.start();
+
+		it("move file", async () => {
+			const response = await tester.send("memory", "move", "/webdav/a.txt", {
+				headers: {
+					Destination: "/webdav/a_moved.txt",
+				},
+			});
+			Exception.assertEqual(response.status, 200);
+			const response2 = await tester.send("memory", "get", "/webdav/a.txt", {}, /*throwOnFailure*/ false);
+			Exception.assertEqual(response2.status, 404);
+			const response3 = await tester.send("memory", "get", "/webdav/a_moved.txt");
+			Exception.assertEqual(response3.status, 200);
+			Exception.assertEqual(response3.data, "content for a");
+		});
+
+		it("move file new directory", async () => {
+			const response = await tester.send("memory", "move", "/webdav/a_moved.txt", {
+				headers: {
+					Destination: "/webdav/new/a.txt",
+				},
+			});
+			Exception.assertEqual(response.status, 200);
+			const response2 = await tester.send("memory", "get", "/webdav/a_moved.txt", {}, /*throwOnFailure*/ false);
+			Exception.assertEqual(response2.status, 404);
+			const response3 = await tester.send("memory", "get", "/webdav/new/a.txt");
+			Exception.assertEqual(response3.status, 200);
+			Exception.assertEqual(response3.data, "content for a");
+		});
+
+		it("move file invalid path", async () => {
+			const response = await tester.send(
+				"memory",
+				"move",
+				"/webdav/a.txt",
+				{
+					headers: {
+						Destination: "/invalid/a_moved.txt",
+					},
+				},
+				/*throwOnFailure*/ false,
+			);
+			Exception.assertEqual(response.status, 400);
+		});
+
+		it("move directory", async () => {
+			const response = await tester.send(
+				"memory",
+				"move",
+				"/webdav/nested",
+				{
+					headers: {
+						Destination: "/invalid/nested_moved",
+					},
+				},
+				/*throwOnFailure*/ false,
+			);
+			Exception.assertEqual(response.status, 400);
+		});
+	});
+
+	describe("copy", async () => {
+		const tester = new PluginTester();
+		tester.register("memory", Plugin, defaultMemory);
+		await tester.start();
+
+		it("copy file", async () => {
+			const response = await tester.send("memory", "copy", "/webdav/a.txt", {
+				headers: {
+					Destination: "/webdav/a_copied.txt",
+				},
+			});
+			Exception.assertEqual(response.status, 200);
+			const response2 = await tester.send("memory", "get", "/webdav/a.txt");
+			Exception.assertEqual(response2.status, 200);
+			Exception.assertEqual(response2.data, "content for a");
+			const response3 = await tester.send("memory", "get", "/webdav/a_copied.txt");
+			Exception.assertEqual(response3.status, 200);
+			Exception.assertEqual(response3.data, "content for a");
+		});
+
+		it("copy file new directory", async () => {
+			const response = await tester.send("memory", "copy", "/webdav/a.txt", {
+				headers: {
+					Destination: "/webdav/new/a.txt",
+				},
+			});
+			Exception.assertEqual(response.status, 200);
+			const response2 = await tester.send("memory", "get", "/webdav/a.txt");
+			Exception.assertEqual(response2.status, 200);
+			Exception.assertEqual(response2.data, "content for a");
+			const response3 = await tester.send("memory", "get", "/webdav/new/a.txt");
+			Exception.assertEqual(response3.status, 200);
+			Exception.assertEqual(response3.data, "content for a");
+		});
+
+		it("copy file invalid path", async () => {
+			const response = await tester.send(
+				"memory",
+				"copy",
+				"/webdav/a.txt",
+				{
+					headers: {
+						Destination: "/invalid/a_copied.txt",
+					},
+				},
+				/*throwOnFailure*/ false,
+			);
+			Exception.assertEqual(response.status, 400);
+		});
+
+		it("copy directory", async () => {
+			const response = await tester.send(
+				"memory",
+				"copy",
+				"/webdav/nested",
+				{
+					headers: {
+						Destination: "/invalid/nested_copied",
+					},
+				},
+				/*throwOnFailure*/ false,
+			);
+			Exception.assertEqual(response.status, 400);
+		});
+	});
 });

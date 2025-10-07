@@ -1,9 +1,10 @@
-import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
+import { ExceptionFactory, ExceptionPrecondition } from "#bzd/nodejs/core/exception.mjs";
 import Services from "#bzd/nodejs/core/services/services.mjs";
 import ServiceProvider from "#bzd/nodejs/core/services/provider.mjs";
 import EndpointsFactory from "#bzd/apps/artifacts/backend/endpoints_factory.mjs";
 import Router from "#bzd/nodejs/core/router.mjs";
 import ServerContext from "#bzd/nodejs/core/http/mock/server_context.mjs";
+import { HttpError } from "#bzd/nodejs/core/http/server_context.mjs";
 
 const Exception = ExceptionFactory("plugin", "tester");
 
@@ -57,8 +58,18 @@ export default class PluginTester {
 		Exception.assert(method in routers, "Method {} is not available in the plugin {}.", method, volume);
 
 		const context = ServerContext.make(request).withPath(path);
-		const result = await routers[method].dispatch(context.request.path, context);
-		Exception.assert(result !== false, "There is no handler for the endpoint {} for plugin {}.", path, volume);
+		try {
+			const result = await routers[method].dispatch(context.request.path, context);
+			Exception.assert(result !== false, "There is no handler for the endpoint {} for plugin {}.", path, volume);
+		} catch (e) {
+			if (e instanceof HttpError) {
+				e.send(context);
+			} else if (e instanceof ExceptionPrecondition) {
+				context.sendStatus(400, e.message);
+			} else {
+				throw e;
+			}
+		}
 		Exception.assert(
 			!throwOnFailure || (context.response.status >= 200 && context.response.status <= 299),
 			"There is a handler but it returned an invalid result status: {}",
