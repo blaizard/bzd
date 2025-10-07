@@ -8,6 +8,7 @@ bzd_config_default(
         "config.default.json",
     ],
     visibility = [
+        "//apps/artifacts:__subpackages__",
         "//deployment:__subpackages__",
     ],
 )
@@ -63,7 +64,7 @@ bzd_nodejs_binary(
     ],
     main = "app.mjs",
     visibility = [
-        "//apps/artifacts:__pkg__",
+        "//apps/artifacts:__subpackages__",
         "//deployment:__subpackages__",
     ],
     deps = [
@@ -81,7 +82,7 @@ bzd_nodejs_binary(
 )
 
 bzd_executable_test(
-    name = "tests",
+    name = "backend_tests",
     args = [
         "--test",
     ],
