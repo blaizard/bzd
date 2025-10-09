@@ -4,6 +4,7 @@ bzd_nodejs_library(
     name = "records",
     srcs = [
         "records.mjs",
+        "records_reader.mjs",
     ],
     visibility = [
         "//apps/artifacts/plugins:__subpackages__",

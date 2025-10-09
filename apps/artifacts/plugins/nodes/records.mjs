@@ -22,6 +22,7 @@ export default class Record {
 	/// - maxSize: The maximum total size of all records in a storage in bytes.
 	/// - storages: An array of storage names to create.
 	/// - clean: Whether the directory should be cleaned or not.
+	/// - statistics: The statistics object to be used.
 	constructor(options = {}) {
 		this.options = Object.assign(
 			{

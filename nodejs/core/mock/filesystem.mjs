@@ -27,7 +27,7 @@ class Symlink extends FileBase {
 
 class Dirent {
 	constructor(name, entry) {
-		this.name = name;
+		this._name = name;
 		this.entry = entry;
 	}
 	isBlockDevice() {
@@ -52,7 +52,7 @@ class Dirent {
 		return this.entry instanceof Symlink;
 	}
 	get name() {
-		return this.name;
+		return this._name;
 	}
 }
 
