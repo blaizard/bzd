@@ -3,7 +3,7 @@ import { Nodes } from "#bzd/apps/artifacts/plugins/nodes/nodes.mjs";
 import PluginBase from "#bzd/apps/artifacts/backend/plugin.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
-import Records from "#bzd/apps/artifacts/plugins/nodes/records/records.mjs";
+import RecordsDistributed from "#bzd/apps/artifacts/plugins/nodes/records/distributed.mjs";
 import { HttpClientFactory } from "#bzd/nodejs/core/http/client.mjs";
 import Services from "#bzd/nodejs/core/services/services.mjs";
 import DatabaseInfluxDB from "#bzd/apps/artifacts/plugins/nodes/databases/influxdb.mjs";
@@ -14,6 +14,7 @@ import format from "#bzd/nodejs/core/format.mjs";
 import Utils from "#bzd/apps/artifacts/common/utils.mjs";
 import DataGenerator from "#bzd/apps/artifacts/plugins/nodes/data_generator.mjs";
 import { Readable } from "stream";
+import Os from "os";
 
 const databaseTypes = {
 	influxdb: DatabaseInfluxDB,
@@ -128,10 +129,11 @@ export default class Plugin extends PluginBase {
 		// }
 		const optionsSources = options["nodes.sources"] || {};
 		const optionsDatabases = options["nodes.databases"] || {};
+		const recordsMainStorageName = "main";
 		const optionsRecords = Object.assign(
 			{
 				// Set the default storages from the remotes options.
-				storages: [Records.defaultStorageName, ...Object.keys(optionsSources)],
+				storages: [recordsMainStorageName, ...Object.keys(optionsSources)],
 				statistics: this.statistics,
 			},
 			options["nodes.records"] || {},
@@ -139,7 +141,7 @@ export default class Plugin extends PluginBase {
 		const optionsDashboards = options["nodes.dashboards"] || [];
 		const routerDashboards = buildRouterForDashboards(optionsDashboards);
 
-		this.records = new Records(optionsRecords);
+		this.records = new RecordsDistributed(Os.hostname(), optionsRecords);
 		provider.addStartProcess("records.initialize", async () => {
 			let optionsNodes = {
 				cache: this.cache,
@@ -159,7 +161,7 @@ export default class Plugin extends PluginBase {
 
 			this.setStorage(await StorageBzd.make(this.nodes));
 
-			const output = await this.records.init(async (record) => {
+			const output = await this.records.init(provider, async (record) => {
 				await this.nodes.insertRecord(Nodes.recordFromDisk(record));
 			});
 
@@ -556,7 +558,7 @@ export default class Plugin extends PluginBase {
 			}
 
 			// Save the data written on disk.
-			await this.records.write(Nodes.recordToDisk(records));
+			await this.records.write(Nodes.recordToDisk(records), recordsMainStorageName);
 
 			context.sendStatus(200);
 		});

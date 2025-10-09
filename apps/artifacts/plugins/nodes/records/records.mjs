@@ -20,10 +20,10 @@ const Log = LogFactory("apps", "plugin", "nodes");
 ///
 /// The format of each entry is as follow:
 /// [tick, payload]
-export default class Record {
+export default class Records {
 	/// Construct on-disk iterable records.
 	///
-	/// \param options Configuration options for the Record instance.
+	/// \param options Configuration options for the Records instance.
 	/// - path (string, required): The base directory where record storages will be created.
 	/// - fs: The file system module to use.
 	/// - recordMaxSize: The maximum size of a single record file in bytes.
@@ -40,7 +40,7 @@ export default class Record {
 				recordMaxSize: 1024 * 1024,
 				/// Maximum size of all the records compressed.
 				maxSize: 20 * 1024 * 1024,
-				storages: [Record.defaultStorageName],
+				storages: [Records.defaultStorageName],
 				/// If set all previous records will be removed.
 				clean: false,
 				statistics: new StatisticsProvider("records"),
@@ -128,7 +128,7 @@ export default class Record {
 	}
 
 	/// Get the latest remote tick.
-	getTickRemote(storageName = Record.defaultStorageName, defaultValue = null) {
+	getTickRemote(storageName = Records.defaultStorageName, defaultValue = null) {
 		Exception.assert(storageName in this.storages, "Invalid storage requested: '{}'.", storageName);
 		const tick = this.storages[storageName].tickRemote;
 		if (tick === null) {
@@ -152,7 +152,7 @@ export default class Record {
 			path = storage.path + "/" + tick + ".rec";
 			await this.options.fs.touch(path);
 			// Add the header.
-			await this.options.fs.appendFile(path, '{"version":' + Record.version + ',"records":[');
+			await this.options.fs.appendFile(path, '{"version":' + Records.version + ',"records":[');
 		}
 
 		// Create and insert the new entry.
@@ -227,7 +227,7 @@ export default class Record {
 	/// \param payload The payload to be stored.
 	/// \param storageName The name of the storage.
 	/// \param tickRemote The latest remote tick that leads to new elements.
-	async write(payload, storageName = Record.defaultStorageName, tickRemote = null) {
+	async write(payload, storageName = Records.defaultStorageName, tickRemote = null) {
 		const serialized = JSON.stringify(payload);
 		Exception.assert(storageName in this.storages, "Invalid storage requested: '{}'.", storageName);
 		const storage = this.storages[storageName];

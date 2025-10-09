@@ -50,7 +50,7 @@
                 "options": {
                     "mustExists": true
                 },
-                "path": "/",
+                "path": ".",
                 "type": "disk"
             },
             "type": "storage"

@@ -3,6 +3,7 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "records",
     srcs = [
+        "distributed.mjs",
         "reader.mjs",
         "records.mjs",
     ],
