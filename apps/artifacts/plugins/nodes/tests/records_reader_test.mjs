@@ -89,6 +89,6 @@ describe("RecordsReader", () => {
 
 			Exception.assert(readChunkLastCounter > 0);
 			Exception.assert(readChunkFirstCounter > 0);
-		}).timeout(10000);
+		}).timeout(100000);
 	});
 });

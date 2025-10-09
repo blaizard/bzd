@@ -3,7 +3,6 @@ import LogFactory from "#bzd/nodejs/core/log.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import zlib from "zlib";
 import StatisticsProvider from "#bzd/nodejs/core/statistics/provider.mjs";
-import Records from "#bzd/apps/artifacts/plugins/nodes/records.mjs";
 
 const Exception = ExceptionFactory("apps", "plugin", "nodes");
 const Log = LogFactory("apps", "plugin", "nodes");
@@ -29,6 +28,31 @@ export default class RecordsReader {
 		this.storages = {};
 	}
 
+	/// The current version of the records, any records with a different version
+	/// will be discarded.
+	static get version() {
+		return 2;
+	}
+
+	/// Get the tick from a path.
+	static getTickFromPath(path) {
+		const filePattern = new RegExp("^(?:.*/)?([0-9]+)\\.rec(\\.gz)?$");
+		const match = filePattern.exec(path);
+		return match === null ? null : parseInt(match[1]);
+	}
+
+	/// Get payload of a record into a list.
+	static payloadToList(payload) {
+		const data = JSON.parse(payload + "[]]}");
+		Exception.assert(
+			data.version == RecordsReader.version,
+			"Record is from an incompatible version: {} vs {}.",
+			data.version,
+			RecordsReader.version,
+		);
+		return data.records.slice(0, -1);
+	}
+
 	async init() {
 		await this.discoverAll();
 	}
@@ -50,7 +74,7 @@ export default class RecordsReader {
 			for (const entry of entries) {
 				if (entry.isFile()) {
 					const path = storagePath + "/" + entry.name;
-					const maybeTick = Records.getTickFromPath(path);
+					const maybeTick = RecordsReader.getTickFromPath(path);
 					// Invalid file pattern, ignore
 					if (maybeTick === null) {
 						continue;
@@ -82,7 +106,7 @@ export default class RecordsReader {
 	}
 
 	/// Read the content of a record and handle decompression if needed.
-	async _readRecord(path) {
+	async readRecord(path) {
 		if (path.endsWith(".rec")) {
 			this.options.statistics.sum("read", 1);
 			return await this.options.fs.readFile(path);
@@ -120,17 +144,17 @@ export default class RecordsReader {
 			let recordsProcessed = 0;
 
 			do {
+				// Handle case when the records are empty or if some records have been processed
+				// previously, it means that some data are not available.
+				if (!(storageName in this.storages) || this.storages[storageName].records.length == 0 || recordsProcessed > 0) {
+					await this.discover(storageName);
+				}
+
 				const storage = this.storages[storageName];
 
 				// This storage is not existing anymore.
 				if (storage === undefined) {
 					break;
-				}
-
-				// Handle case when the records are empty or if some records have been processed
-				// previously, it means that some data are not available.
-				if (storage.records.length == 0 || recordsProcessed > 0) {
-					await this.discover(storageName);
 				}
 
 				// Look for the entry.
@@ -152,8 +176,8 @@ export default class RecordsReader {
 
 					// Read the file content.
 					try {
-						const content = await this._readRecord(entry.path);
-						const payloads = Records.payloadToList(content);
+						const content = await this.readRecord(entry.path);
+						const payloads = RecordsReader.payloadToList(content);
 						const indexPayload = payloads.findIndex((payloadEntry) => payloadEntry[0] >= tick);
 						if (indexPayload !== -1) {
 							return payloads.slice(indexPayload);

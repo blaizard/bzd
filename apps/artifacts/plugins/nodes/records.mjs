@@ -4,6 +4,7 @@ import LogFactory from "#bzd/nodejs/core/log.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import zlib from "zlib";
 import StatisticsProvider from "#bzd/nodejs/core/statistics/provider.mjs";
+import RecordsReader from "#bzd/apps/artifacts/plugins/nodes/records_reader.mjs";
 
 const Exception = ExceptionFactory("apps", "plugin", "nodes");
 const Log = LogFactory("apps", "plugin", "nodes");
@@ -45,6 +46,7 @@ export default class Record {
 			this.makeStorage(storageName);
 		}
 		this.tick = 0;
+		this.reader = new RecordsReader(this.options);
 
 		Exception.assert(this.options.recordMaxSize < this.options.maxSize);
 	}
@@ -64,7 +66,7 @@ export default class Record {
 	/// The current version of the records, any records with a different version
 	/// will be discarded.
 	static get version() {
-		return 2;
+		return RecordsReader.version;
 	}
 
 	/// The name of the default storage.
@@ -87,7 +89,7 @@ export default class Record {
 			storage.records = [];
 			for (const name of files) {
 				const path = storage.path + "/" + name;
-				const maybeTick = Record.getTickFromPath(path);
+				const maybeTick = RecordsReader.getTickFromPath(path);
 				// Invalid file pattern, try to delete the file.
 				if (maybeTick === null) {
 					Log.error("Invalid record, doesn't match the file pattern: '{}', deleting.", path);
@@ -104,6 +106,9 @@ export default class Record {
 			Log.info("Initialized storage '{}' with {} record(s).", storageName, storage.records.length);
 		}
 
+		// Initialize the reader after the storage is set.
+		await this.reader.init();
+
 		return {
 			storages: Object.fromEntries(
 				Object.entries(this.storages).map(([name, storage]) => [
@@ -113,25 +118,6 @@ export default class Record {
 			),
 			tick: this.tick,
 		};
-	}
-
-	/// Get the tick from a path.
-	static getTickFromPath(path) {
-		const filePattern = new RegExp("^(?:.*/)?([0-9]+)\\.rec(\\.gz)?$");
-		const match = filePattern.exec(path);
-		return match === null ? null : parseInt(match[1]);
-	}
-
-	/// Get payload of a record into a list.
-	static payloadToList(payload) {
-		const data = JSON.parse(payload + "[]]}");
-		Exception.assert(
-			data.version == Record.version,
-			"Record is from an incompatible version: {} vs {}.",
-			data.version,
-			Record.version,
-		);
-		return data.records.slice(0, -1);
 	}
 
 	/// Get the latest remote tick.
@@ -184,13 +170,9 @@ export default class Record {
 		return entry;
 	}
 
-	_getLastEntryForReading(storage) {
-		return storage.records[storage.records.length - 1] || null;
-	}
-
 	/// Compress an existing entry and update the entry itself.
 	async _compressEntry(entry) {
-		const content = await this._readEntry(entry);
+		const content = await this.reader.readRecord(entry.path);
 		const compressed = await new Promise((resolve, reject) => {
 			zlib.gzip(content, (err, compressedBuffer) => {
 				if (err) {
@@ -209,31 +191,10 @@ export default class Record {
 		entry.size = (await this.options.fs.stat(newPath)).size;
 	}
 
-	/// Read the content of an entry and handle decompression if needed.
-	async _readEntry(entry) {
-		if (entry.path.endsWith(".rec")) {
-			this.options.statistics.sum("read", 1);
-			return await this.options.fs.readFile(entry.path);
-		} else if (entry.path.endsWith(".gz")) {
-			this.options.statistics.sum("read.gz", 1);
-			const content = await this.options.fs.readBinary(entry.path);
-			return new Promise((resolve, reject) => {
-				zlib.gunzip(content, (err, decompressedBuffer) => {
-					if (err) {
-						reject(new Exception("Error decompressing data: {}", err));
-						return;
-					}
-					resolve(decompressedBuffer.toString("utf8"));
-				});
-			});
-		}
-		Exception.unreachable("Unsupported file format: {}", entry.path);
-	}
-
 	/// Add new payload to the record list.
 	async _getLastEntryForWriting(storage, tick, payloadSize) {
 		Exception.assertPrecondition(storage.records !== null, "Used before initialization.");
-		let entry = this._getLastEntryForReading(storage);
+		let entry = storage.records[storage.records.length - 1] || null;
 
 		// Check if the entry has still enough space, if not compress it.
 		if (entry && entry.size + payloadSize > this.options.recordMaxSize) {
@@ -275,71 +236,6 @@ export default class Record {
 		});
 	}
 
-	/// Read a record from a specific storage at a given tick to its end.
-	///
-	/// \param storage The storage to read from.
-	/// \param tick Initial tick.
-	///
-	/// \return A tuple, containing the list of payload previously stored, and the next tick.
-	///         In case there are no new payloads, null is returned.
-	async _readStorageByChunk(storage, tick) {
-		Exception.assertPrecondition(storage.records !== null, "Used before initialization.");
-
-		/// If the tick is null, return null, this is to ease looping over _read.
-		if (tick === null) {
-			return null;
-		}
-
-		const maybeEntries = await storage.lock.acquire(async () => {
-			// Look for the entry.
-			let index = storage.records.findLastIndex((entry) => entry.tick <= tick);
-			if (index === -1) {
-				index = 0;
-			}
-
-			for (; index < storage.records.length; ++index) {
-				const entry = storage.records[index];
-
-				// Read the file content.
-				const content = await this._readEntry(entry);
-				const payloads = Record.payloadToList(content);
-				const indexPayload = payloads.findIndex((payloadEntry) => payloadEntry[0] >= tick);
-
-				if (indexPayload !== -1) {
-					return payloads.slice(indexPayload);
-				}
-
-				// No match, we are either at the end of the records or we need to look for the next record.
-			}
-
-			return null;
-		});
-
-		if (maybeEntries === null) {
-			return null;
-		}
-
-		Exception.assert(maybeEntries.length > 0, "The output cannot be empty as we search in it just before.");
-		return maybeEntries;
-	}
-
-	async *_readStorage(storage, tick = 0) {
-		let result = null;
-		while ((result = await this._readStorageByChunk(storage, tick))) {
-			let payload = null;
-			for (payload of result) {
-				yield payload;
-			}
-			tick = payload[0] + 1;
-			Exception.assert(
-				tick <= this.tick + 1,
-				"The next tick ({}) must always be lower or equal to this.tick + 1 ({}).",
-				tick,
-				this.tick + 1,
-			);
-		}
-	}
-
 	/// Generator to read all new values starting from a specific tick.
 	///
 	/// \param tick The initial tick.
@@ -349,36 +245,7 @@ export default class Record {
 	///         2. The value.
 	///         3. The approximated size of the serialized payload.
 	async *read(tick = 0) {
-		// Load the first value of all records and filter the ones without values.
-		let iterators = Object.values(this.storages).map((storage) => ({
-			gen: this._readStorage(storage, tick),
-			result: null,
-		}));
-		await Promise.all(
-			iterators.map(async (it) => {
-				it.result = await it.gen.next();
-			}),
-		);
-		iterators = iterators.filter((it) => !it.result.done);
-
-		// Helper.
-		const getMinIndex = () =>
-			iterators.reduce(
-				(minIndex, it, i, array) => (it.result.value[1] < array[minIndex].result.value[1] ? i : minIndex),
-				0,
-			);
-
-		while (iterators.length > 0) {
-			const index = getMinIndex();
-
-			yield iterators[index].result.value;
-
-			// Get the next value.
-			iterators[index].result = await iterators[index].gen.next();
-			if (iterators[index].result.done) {
-				iterators.splice(index, 1);
-			}
-		}
+		yield* this.reader.read(tick);
 	}
 
 	async _delete(storage, record) {
@@ -413,7 +280,7 @@ export default class Record {
 		let allSingleEntries = true;
 		let toDelete = [];
 		for (const record of storage.records) {
-			const maybeTick = Record.getTickFromPath(record.path);
+			const maybeTick = RecordsReader.getTickFromPath(record.path);
 			Exception.assert(maybeTick !== null, "Tick cannot be extracted from path '{}'.", record.path);
 			Exception.assert(record.tick == maybeTick, "Path '{}' and tick '{}' do not match.", record.path, record.tick);
 			if (tick !== null) {
@@ -429,7 +296,7 @@ export default class Record {
 
 			try {
 				// Check the payloads
-				const content = await this._readEntry(record);
+				const content = await this.reader.readRecord(record.path);
 				// Only check if it is not compressed
 				if (record.path.endsWith(".rec")) {
 					Exception.assert(
@@ -439,7 +306,7 @@ export default class Record {
 						record.size,
 					);
 				}
-				const entries = Record.payloadToList(content);
+				const entries = RecordsReader.payloadToList(content);
 
 				for (const [t, entry, _, remoteT] of entries) {
 					Exception.assert(t > tick, "Ticks are increasing, expected > {} but got {}", tick, t);
