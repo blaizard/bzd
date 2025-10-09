@@ -1,24 +1,6 @@
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 
 bzd_nodejs_library(
-    name = "records",
-    srcs = [
-        "records.mjs",
-        "records_reader.mjs",
-    ],
-    visibility = [
-        "//apps/artifacts/plugins:__subpackages__",
-    ],
-    deps = [
-        "//nodejs/core:exception",
-        "//nodejs/core:filesystem",
-        "//nodejs/core:lock",
-        "//nodejs/core:log",
-        "//nodejs/core/statistics:provider",
-    ],
-)
-
-bzd_nodejs_library(
     name = "backend",
     srcs = [
         "backend.mjs",
@@ -32,10 +14,10 @@ bzd_nodejs_library(
         ":data",
         ":key_mapping",
         ":nodes",
-        ":records",
         "//apps/artifacts/backend:plugin",
         "//apps/artifacts/common:utils",
         "//apps/artifacts/plugins/nodes/databases:influxdb",
+        "//apps/artifacts/plugins/nodes/records",
         "//apps/artifacts/plugins/nodes/sources:nodes",
         "//nodejs/core:cache",
         "//nodejs/core:exception",

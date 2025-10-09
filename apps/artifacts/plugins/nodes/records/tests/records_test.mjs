@@ -1,6 +1,6 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import Filesystem from "#bzd/nodejs/core/mock/filesystem.mjs";
-import Records from "#bzd/apps/artifacts/plugins/nodes/records.mjs";
+import Records from "#bzd/apps/artifacts/plugins/nodes/records/records.mjs";
 import zlib from "zlib";
 
 const Exception = ExceptionFactory("test", "artifacts", "plugins", "records");

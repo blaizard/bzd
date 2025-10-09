@@ -4,12 +4,19 @@ import LogFactory from "#bzd/nodejs/core/log.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import zlib from "zlib";
 import StatisticsProvider from "#bzd/nodejs/core/statistics/provider.mjs";
-import RecordsReader from "#bzd/apps/artifacts/plugins/nodes/records_reader.mjs";
+import RecordsReader from "#bzd/apps/artifacts/plugins/nodes/records/reader.mjs";
 
 const Exception = ExceptionFactory("apps", "plugin", "nodes");
 const Log = LogFactory("apps", "plugin", "nodes");
 
 /// Construct on-disk iterable records.
+///
+/// Records are stored in the following directory structure:
+/// - root
+///     - main
+///          - 1.rec
+///     - <another source>
+///          - 7.rec
 ///
 /// The format of each entry is as follow:
 /// [tick, payload]

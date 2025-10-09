@@ -3,7 +3,7 @@ import { Nodes } from "#bzd/apps/artifacts/plugins/nodes/nodes.mjs";
 import PluginBase from "#bzd/apps/artifacts/backend/plugin.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
-import Records from "#bzd/apps/artifacts/plugins/nodes/records.mjs";
+import Records from "#bzd/apps/artifacts/plugins/nodes/records/records.mjs";
 import { HttpClientFactory } from "#bzd/nodejs/core/http/client.mjs";
 import Services from "#bzd/nodejs/core/services/services.mjs";
 import DatabaseInfluxDB from "#bzd/apps/artifacts/plugins/nodes/databases/influxdb.mjs";
