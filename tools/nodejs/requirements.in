@@ -32,3 +32,4 @@ chart.js
 chartjs-plugin-zoom
 chartjs-adapter-date-fns
 date-fns
+ntp-client
