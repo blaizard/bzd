@@ -36,7 +36,7 @@ bzd_diff_test = rule(
             mandatory = True,
         ),
         "format": attr.string(
-            values = ["binary", "json"],
+            values = ["binary", "json", "text"],
             default = "binary",
             doc = "The format of the files to be compared.",
         ),

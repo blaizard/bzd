@@ -1,4 +1,5 @@
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+load("@pip//:requirements.bzl", "requirement")
 load("@rules_python//python:defs.bzl", "py_binary")
 
 filegroup(
@@ -6,9 +7,16 @@ filegroup(
     visibility = ["//visibility:public"],
 )
 
-exports_files(
-    ["template_py.btl"],
+py_binary(
+    name = "convert",
+    srcs = [
+        "convert.py",
+    ],
     visibility = ["//config:__subpackages__"],
+    deps = [
+        "//config:reader",
+        requirement("pyyaml"),
+    ],
 )
 
 py_binary(
@@ -19,6 +27,7 @@ py_binary(
     visibility = ["//visibility:public"],
     deps = [
         "@bzd_python//bzd/utils:dict",
+        requirement("pyyaml"),
     ],
 )
 
@@ -28,18 +37,6 @@ py_binary(
         "reader.py",
     ],
     visibility = ["//visibility:public"],
-)
-
-py_binary(
-    name = "template",
-    srcs = [
-        "template.py",
-    ],
-    visibility = ["//config:__subpackages__"],
-    deps = [
-        "//config:reader",
-        "@bzd_python//bzd/template",
-    ],
 )
 
 bzl_library(

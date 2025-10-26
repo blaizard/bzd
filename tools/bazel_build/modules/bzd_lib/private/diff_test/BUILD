@@ -15,6 +15,7 @@ py_binary(
     srcs = [
         "compare_binary.py",
         "compare_json.py",
+        "compare_text.py",
         "diff_test.py",
     ],
 )

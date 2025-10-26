@@ -69,19 +69,25 @@ def _bzd_config_impl(ctx):
         executable = ctx.executable._config_merge,
     )
 
-    # Create a python output
-    ctx.actions.run(
-        inputs = [ctx.outputs.output_json, ctx.file._template_py],
-        outputs = [ctx.outputs.output_py],
-        arguments = [
-            "--output",
-            ctx.outputs.output_py.path,
-            "--json",
-            ctx.outputs.output_json.path,
-            ctx.file._template_py.path,
-        ],
-        executable = ctx.executable._config_template,
-    )
+    # Create the additional outputs
+    outputs = {
+        "yaml": ctx.outputs.output_yaml,
+        "py": ctx.outputs.output_py
+    }
+    for format, file in outputs.items():
+        ctx.actions.run(
+            inputs = [ctx.outputs.output_json],
+            outputs = [file],
+            arguments = [
+                "--output",
+                file.path,
+                "--json",
+                ctx.outputs.output_json.path,
+                "--format",
+                format,
+            ],
+            executable = ctx.executable._config_convert,
+        )
 
     return [
         ConfigInfo(json = ctx.outputs.output_json, runfiles = runfiles, data = data),
@@ -108,16 +114,19 @@ _bzd_config = rule(
         "output_py": attr.output(
             doc = "Create a python configuration.",
         ),
+        "output_yaml": attr.output(
+            doc = "Create a yaml configuration.",
+        ),
         "set_flag": attr.label(
             doc = "Build settings to modify the configuration using key/value pair.",
             providers = [BuildSettingInfo],
         ),
         "srcs": attr.label_list(
-            allow_files = [".json"],
+            allow_files = [".json", ".yaml", ".yml"],
             doc = "Configuration files.",
         ),
         "srcs_at": attr.label_keyed_string_dict(
-            allow_files = [".json"],
+            allow_files = [".json", ".yaml", ".yml"],
             doc = """Configuration files that will be merged at the specified key.
             
             The value corresponds to one of multiples keys (separated by a comma). This allow the same config to be used
@@ -130,29 +139,26 @@ _bzd_config = rule(
         "values": attr.string_dict(
             doc = "Inline configuration values.",
         ),
+        "_config_convert": attr.label(
+            default = Label("//config:convert"),
+            cfg = "exec",
+            executable = True,
+        ),
         "_config_merge": attr.label(
             default = Label("//config:merge"),
             cfg = "exec",
             executable = True,
         ),
-        "_config_template": attr.label(
-            default = Label("//config:template"),
-            cfg = "exec",
-            executable = True,
-        ),
-        "_template_py": attr.label(
-            default = Label("//config:template_py.btl"),
-            allow_single_file = True,
-        ),
     },
     provides = [DefaultInfo, ConfigInfo],
 )
 
-def _bzd_config_macro_impl(name, visibility, output_json, output_py, **kwargs):
+def _bzd_config_macro_impl(name, visibility, output_json, output_yaml, output_py, **kwargs):
     _bzd_config(
         name = name,
         visibility = visibility,
         output_json = output_json if output_json else "{}.json".format(name),
+        output_yaml = output_yaml if output_yaml else "{}.yaml".format(name),
         output_py = output_py if output_py else "{}.py".format(name),
         **kwargs
     )
@@ -171,11 +177,15 @@ bzd_config = macro(
             doc = "Name of the generated python configuration.",
             configurable = False,
         ),
+        "output_yaml": attr.string(
+            doc = "Name of the generated yaml configuration.",
+            configurable = False,
+        ),
         "set_flag": None,
     },
 )
 
-def _bzd_config_default_macro_impl(name, visibility, output_json, output_py, **kwargs):
+def _bzd_config_default_macro_impl(name, visibility, output_json, output_yaml, output_py, **kwargs):
     _bzd_config_flag(
         name = "{}.set".format(name),
         build_setting_default = "",
@@ -192,6 +202,7 @@ def _bzd_config_default_macro_impl(name, visibility, output_json, output_py, **k
         set_flag = ":{}.set".format(name),
         file_flag = ":{}.file".format(name),
         output_json = output_json if output_json else "{}.json".format(name),
+        output_yaml = output_yaml if output_yaml else "{}.yaml".format(name),
         output_py = output_py if output_py else "{}.py".format(name),
         **kwargs
     )
@@ -208,6 +219,10 @@ bzd_config_default = macro(
         ),
         "output_py": attr.string(
             doc = "Name of the generated python configuration.",
+            configurable = False,
+        ),
+        "output_yaml": attr.string(
+            doc = "Name of the generated yaml configuration.",
             configurable = False,
         ),
         "set_flag": None,

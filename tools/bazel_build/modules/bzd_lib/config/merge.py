@@ -3,6 +3,7 @@ import pathlib
 import typing
 import json
 import sys
+import yaml
 
 from bzd.utils.dict import updateDeep, UpdatePolicy
 
@@ -148,6 +149,22 @@ def updateOutput(output: typing.Dict[str, typing.Any], data: typing.Dict[str, ty
 		fatal(f"The key {e} from '{f}' was already defined by another base configuration.")
 
 
+def dataFromPath(path: pathlib.Path) -> typing.Dict[str, typing.Any]:
+	"""Load the content of a file from its path."""
+
+	extension = path.suffix.lower()
+	if extension == ".json":
+		return json.loads(path.read_text())
+	elif extension in (
+	    ".yaml",
+	    ".yml",
+	):
+		with open(path, "r") as f:
+			return yaml.load(f, Loader=yaml.SafeLoader)
+	else:
+		fatal(f"File extension '{extension}' not supported: {str(path)}.")
+
+
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Merge multiple JSON files together.")
 	parser.add_argument("--output", default=None, type=pathlib.Path, help="The output path of the JSON file.")
@@ -215,14 +232,14 @@ if __name__ == "__main__":
 	output = {key: workspaceStatus[key] for key in args.workspaceStatusKeys}
 
 	# Create the output:
-	# - From json files.
+	# - From files.
 	for f in args.srcs:
-		data = json.loads(f.read_text())
+		data = dataFromPath(f)
 		updateOutput(output, data, args.failOnConflict)
 
-	# - From json files at a specified key.
+	# - From files at a specified key.
 	for keyStr, f in args.srcs_at:
-		value = json.loads(pathlib.Path(f).read_text())
+		value = dataFromPath(pathlib.Path(f))
 		data = makeDictionary(keyStr, value)
 		updateOutput(output, data, args.failOnConflict)
 
@@ -237,7 +254,7 @@ if __name__ == "__main__":
 	# Apply the files.
 	for f in args.files:
 		override = ConfigOverride(str(f))
-		data = json.loads(f.read_text())
+		data = dataFromPath(f)
 		for key, value in data.items():
 			override.add(key, value)
 		overrides.append(override)

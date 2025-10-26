@@ -7,7 +7,7 @@ load("//config/tests:defs.bzl", "bzd_config_apply_test")
 bzd_config_default(
     name = "config_merge",
     srcs = [
-        "a.json",
+        "a.yaml",
         "b.json",
     ],
     data = [
@@ -24,10 +24,24 @@ bzd_config_default(
 )
 
 bzd_diff_test(
-    name = "config_merge_test",
+    name = "config_merge_json_test",
     file1 = ":config_merge.json",
     file2 = "expected_config_merge.json",
     format = "json",
+)
+
+bzd_diff_test(
+    name = "config_merge_yaml_test",
+    file1 = ":config_merge.yaml",
+    file2 = "expected_config_merge.yaml",
+    format = "text",
+)
+
+bzd_diff_test(
+    name = "config_merge_py_test",
+    file1 = ":config_merge.py",
+    file2 = "expected_config_merge.py",
+    format = "text",
 )
 
 # ---- Override some values ----

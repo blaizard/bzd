@@ -1,0 +1,19 @@
+a:
+  nested:
+    a: 1
+    list:
+    - 0
+    - 1
+    - 2
+    - 3
+  value: 42
+b: 42
+c:
+  nested:
+    b: 42
+    c: true
+  nested2:
+    c: true
+d:
+  value: hello
+data: external/bzd_lib+/config/tests/data.txt
