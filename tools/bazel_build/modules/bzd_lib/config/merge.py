@@ -154,15 +154,18 @@ def dataFromPath(path: pathlib.Path) -> typing.Dict[str, typing.Any]:
 
 	extension = path.suffix.lower()
 	if extension == ".json":
-		return json.loads(path.read_text())
+		content = json.loads(path.read_text())
 	elif extension in (
 	    ".yaml",
 	    ".yml",
 	):
 		with open(path, "r") as f:
-			return yaml.load(f, Loader=yaml.SafeLoader)
+			content = yaml.load(f, Loader=yaml.SafeLoader)  # type: ignore
 	else:
 		fatal(f"File extension '{extension}' not supported: {str(path)}.")
+
+	assert isinstance(content, dict), f"The content of the data at '{path}' must be a dictionary."
+	return content
 
 
 if __name__ == "__main__":
