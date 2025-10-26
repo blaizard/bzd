@@ -40,4 +40,5 @@ if __name__ == "__main__":
 	        str(args.config),
 	    ),
 	    endswith=args.endswith,
+	    excludeFile=".sanitizerignore",
 	)

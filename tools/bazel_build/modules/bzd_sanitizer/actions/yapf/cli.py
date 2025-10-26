@@ -37,4 +37,5 @@ if __name__ == "__main__":
 	    workload,
 	    args=(str(args.config), ),
 	    endswith=[".py", ".pyi"],
+	    excludeFile=".sanitizerignore",
 	)

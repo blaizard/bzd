@@ -71,8 +71,8 @@ def _bzd_config_impl(ctx):
 
     # Create the additional outputs
     outputs = {
+        "py": ctx.outputs.output_py,
         "yaml": ctx.outputs.output_yaml,
-        "py": ctx.outputs.output_py
     }
     for format, file in outputs.items():
         ctx.actions.run(
