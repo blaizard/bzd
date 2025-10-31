@@ -34,6 +34,14 @@ py_library(
 )
 
 py_library(
+    name = "to_yaml",
+    srcs = [
+        "to_yaml.py",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+py_library(
     name = "worker",
     srcs = ["worker.py"],
     visibility = ["//visibility:public"],
