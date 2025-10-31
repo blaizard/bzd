@@ -4,6 +4,7 @@ import sys
 import time
 import threading
 import signal
+import shlex
 from typing import Any, List, Dict, Optional, Tuple, TextIO, Union
 from pathlib import Path
 import selectors
@@ -165,18 +166,18 @@ def localCommand(
 ) -> ExecuteResult:
 	"""Run a process locally.
 
-    Args:
-            cmds: The list of commands to be executed.
-            ignoreFailure: If set to True, upon failure (return code != 0), it will throw.
-            cwd: The current working directory.
-            env: The set of environment variable to be injected to the process.
-            timeoutS: The timeout in seconds until when the command terminates.
-                      A value of None, give an unlimited timeout.
-            stdin: If set to True, the input stream will also be streamed to stdin.
-            stdout: If set to True, the output will also be streamed to stdout.
-            stderr: If set to True, the errors will also be streamed to stderr.
-            maxOutputSize: The maximum size of the output, if larger, only the most recent output will be kept.
-    """
+	Args:
+			cmds: The list of commands to be executed.
+			ignoreFailure: If set to True, upon failure (return code != 0), it will throw.
+			cwd: The current working directory.
+			env: The set of environment variable to be injected to the process.
+			timeoutS: The timeout in seconds until when the command terminates.
+					  A value of None, give an unlimited timeout.
+			stdin: If set to True, the input stream will also be streamed to stdin.
+			stdout: If set to True, the output will also be streamed to stdout.
+			stderr: If set to True, the errors will also be streamed to stderr.
+			maxOutputSize: The maximum size of the output, if larger, only the most recent output will be kept.
+	"""
 
 	sel = selectors.DefaultSelector()
 	stream = ExecuteResultStreamWriter(stdout, stderr, maxOutputSize)
@@ -219,8 +220,9 @@ def localCommand(
 			if cancellation and cancellation.triggered:
 				stream.addStderr(b"Process was cancelled.\n")
 
-	except KeyboardInterrupt as e:
+	except KeyboardInterrupt:
 		# Exit gracefully on keyboard interrupt.
+		Cancellation.killall(gid, signal.SIGINT)
 		sys.exit(1)
 
 	finally:
@@ -229,8 +231,7 @@ def localCommand(
 
 	result = ExecuteResult(stream=stream, returncode=returnCode)
 
-	assert (ignoreFailure or returnCode
-	        == 0), f"While executing {' '.join(cmds)}\nReturn code {result.getReturnCode()}\n{result.getOutput()}"
+	assert (ignoreFailure or returnCode == 0), f"While executing: {shlex.join(cmds)}\n{result}"
 
 	return result
 
@@ -270,8 +271,8 @@ def localBazelTarget(target: str,
                      **kwargs: Any) -> ExecuteResult:
 	"""Execute a bazel target locally.
 
-    Note, the environment variable is passed to ensure the current are not propagated to the environment.
-    """
+	Note, the environment variable is passed to ensure the current are not propagated to the environment.
+	"""
 
 	defaultEnv = {
 	    # PATH env variable is by default passed, this is needed to find tools with rctx.which for example.
