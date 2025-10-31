@@ -1,0 +1,6 @@
+services:
+    stirling_pdf:
+        image: "docker.stirlingpdf.com/stirlingtools/stirling-pdf:latest"
+        environment:
+            DISABLE_ADDITIONAL_FEATURES: false
+            LANGS: "en_GB"

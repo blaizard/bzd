@@ -1,7 +1,7 @@
 load("//apps/external:defs.bzl", "bzd_docker_binary")
 
 bzd_docker_binary(
-    name = "stirling_pdf",
+    name = "transmission_openvpn",
     docker_compose = ":docker-compose.yml",
-    expose = 8080,
+    expose = 9091,
 )

@@ -1,0 +1,17 @@
+services:
+    transmission_openvpn:
+        cap_add:
+            - NET_ADMIN
+        volumes:
+            - "~/Downloads:/data"
+        environment:
+            LOCAL_NETWORK: 192.168.0.0/16
+            TRANSMISSION_WEB_UI: flood-for-transmission
+            CREATE_TUN_DEVICE: false
+        logging:
+            driver: json-file
+            options:
+                max-size: 10m
+        devices:
+            - "/dev/net/tun:/dev/net/tun"
+        image: haugene/transmission-openvpn

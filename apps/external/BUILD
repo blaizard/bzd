@@ -9,5 +9,6 @@ py_binary(
         "@bzd_python//bzd/http:client",
         "@bzd_python//bzd/utils:run",
         "@bzd_python//bzd/utils:scheduler",
+        "@bzd_python//bzd/utils:to_yaml",
     ],
 )
