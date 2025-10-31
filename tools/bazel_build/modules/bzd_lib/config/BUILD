@@ -12,9 +12,8 @@ py_binary(
     srcs = [
         "convert.py",
     ],
-    visibility = ["//config:__subpackages__"],
     deps = [
-        "//config:reader",
+        ":reader",
         requirement("pyyaml"),
     ],
 )
@@ -24,7 +23,6 @@ py_binary(
     srcs = [
         "merge.py",
     ],
-    visibility = ["//visibility:public"],
     deps = [
         "@bzd_python//bzd/utils:dict",
         requirement("pyyaml"),
@@ -36,7 +34,6 @@ py_binary(
     srcs = [
         "reader.py",
     ],
-    visibility = ["//visibility:public"],
 )
 
 bzl_library(
