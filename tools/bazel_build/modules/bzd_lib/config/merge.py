@@ -139,7 +139,7 @@ if __name__ == "__main__":
 	# Create the output, cannot override the same key twice.
 
 	# - From workspace status files.
-	workspaceStatusKeysUsed = set()
+	workspaceStatusKeysUsed: typing.Set[str] = set()
 	for workspaceStatusFile in args.workspaceStatusFiles:
 		workspaceStatus = {}
 		for line in workspaceStatusFile.read_text().split("\n"):
