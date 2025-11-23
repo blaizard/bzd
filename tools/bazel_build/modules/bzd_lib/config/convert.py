@@ -5,7 +5,7 @@ import json
 import re
 import yaml
 
-from config.reader import processKeyValues
+from config.reader import processKeyValues, internalToDictionary
 
 
 def toJson(data: typing.Any) -> typing.Any:
@@ -33,11 +33,11 @@ def toSubsetChar(name: str) -> str:
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Substitute template values.")
 	parser.add_argument("--output", type=pathlib.Path, help="The output path for the generated file.")
-	parser.add_argument("--json", type=pathlib.Path, help="The input values in json format.", required=True)
-	parser.add_argument("--format", choices=["yaml", "py"], type=str, help="The output format.", required=True)
+	parser.add_argument("--json", type=pathlib.Path, help="The internal values in json format.", required=True)
+	parser.add_argument("--format", choices=["yaml", "py", "json"], type=str, help="The output format.", required=True)
 
 	args = parser.parse_args()
-	data = json.loads(args.json.read_text())
+	data = internalToDictionary(json.loads(args.json.read_text()))
 
 	if args.format == "py":
 		content = """# This file was auto-generated.
@@ -49,6 +49,9 @@ if __name__ == "__main__":
 
 	elif args.format == "yaml":
 		content = yaml.dump(data)
+
+	elif args.format == "json":
+		content = json.dumps(data, indent=4)
 
 	else:
 		raise Exception(f"Unsupported format: {args.format}.")

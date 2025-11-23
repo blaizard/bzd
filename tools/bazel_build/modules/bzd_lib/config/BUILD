@@ -24,6 +24,7 @@ py_binary(
         "merge.py",
     ],
     deps = [
+        ":reader",
         "@bzd_python//bzd/utils:dict",
         requirement("pyyaml"),
     ],
@@ -33,6 +34,9 @@ py_binary(
     name = "reader",
     srcs = [
         "reader.py",
+    ],
+    deps = [
+        "@bzd_python//bzd/utils:dict",
     ],
 )
 

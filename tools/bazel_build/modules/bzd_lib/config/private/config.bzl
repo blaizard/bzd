@@ -18,8 +18,7 @@ def _bzd_config_impl(ctx):
 
     args = ctx.actions.args()
     args.add("--fail-on-conflict")
-    args.add("--output", ctx.outputs.output_json)
-    args.add_all([keyValue for keyValue in ctx.attr.set_flag[BuildSettingInfo].value if keyValue] if ctx.attr.set_flag else [], before_each = "--set")
+    args.add_all([keyValue for keyValue in ctx.attr.set_flag[BuildSettingInfo].value if keyValue] if ctx.attr.set_flag else [], before_each = "--override-set")
 
     # Handle inline values.
     for key, value in ctx.attr.values.items():
@@ -57,13 +56,15 @@ def _bzd_config_impl(ctx):
             override_files += ctx.files.file_flag
         else:
             fail("Invalid config override target type: {} {}".format(ctx.attr.file_flag.label))
-        args.add_all(override_files, before_each = "--file")
+        args.add_all(override_files, before_each = "--override-file")
         input_files = depset(override_files, transitive = [input_files])
 
     # Build the default configuration.
+    output = ctx.actions.declare_file("{}.private.json".format(ctx.label))
+    args.add("--output", output)
     ctx.actions.run(
         inputs = input_files,
-        outputs = [ctx.outputs.output_json],
+        outputs = [output],
         progress_message = "Generating default configuration for {}...".format(ctx.label),
         arguments = [args],
         executable = ctx.executable._config_merge,
@@ -71,26 +72,28 @@ def _bzd_config_impl(ctx):
 
     # Create the additional outputs
     outputs = {
+        "json": ctx.outputs.output_json,
         "py": ctx.outputs.output_py,
         "yaml": ctx.outputs.output_yaml,
     }
     for format, file in outputs.items():
         ctx.actions.run(
-            inputs = [ctx.outputs.output_json],
+            inputs = [output],
             outputs = [file],
             arguments = [
                 "--output",
                 file.path,
                 "--json",
-                ctx.outputs.output_json.path,
+                output.path,
                 "--format",
                 format,
             ],
+            progress_message = "Converting configuration to {} for {}...".format(format, ctx.label),
             executable = ctx.executable._config_convert,
         )
 
     return [
-        ConfigInfo(json = ctx.outputs.output_json, runfiles = runfiles, data = data),
+        ConfigInfo(json = output, runfiles = runfiles, data = data),
         DefaultInfo(runfiles = runfiles, files = data),
     ]
 
