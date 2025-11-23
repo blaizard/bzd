@@ -139,6 +139,7 @@ if __name__ == "__main__":
 	# Create the output, cannot override the same key twice.
 
 	# - From workspace status files.
+	workspaceStatusKeysUsed = set()
 	for workspaceStatusFile in args.workspaceStatusFiles:
 		workspaceStatus = {}
 		for line in workspaceStatusFile.read_text().split("\n"):
@@ -147,10 +148,13 @@ if __name__ == "__main__":
 				workspaceStatus[key.strip()] = value.strip()
 			except ValueError:
 				pass
-		output.addDict({key: workspaceStatus[key]
-		                for key in args.workspaceStatusKeys},
-		               source=str(workspaceStatusFile),
-		               failOnConflict=True)
+		filteredWorkspaceStatus = {
+		    key: workspaceStatus[key]
+		    for key in args.workspaceStatusKeys if key in workspaceStatus
+		}
+		output.addDict(filteredWorkspaceStatus, source=str(workspaceStatusFile), failOnConflict=True)
+		workspaceStatusKeysUsed.update(filteredWorkspaceStatus.keys())
+	assert len(workspaceStatusKeysUsed) == len(args.workspaceStatusKeys), "Some workspace status keys were not found."
 
 	# - From files.
 	for f in args.srcs:
