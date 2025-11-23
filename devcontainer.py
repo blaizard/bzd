@@ -98,7 +98,9 @@ class DevelopmentContainer:
 			self.startEmulation()
 
 		# Write the docker files.
+		self.dockerFilePath.parent.mkdir(parents=True, exist_ok=True)
 		self.dockerFilePath.write_text(self.dockerFile)
+		self.dockerComposePath.parent.mkdir(parents=True, exist_ok=True)
 		self.dockerComposePath.write_text(self.dockerCompose)
 
 	@staticmethod
@@ -124,11 +126,11 @@ class DevelopmentContainer:
 
 	@property
 	def dockerFilePath(self) -> pathlib.Path:
-		return self.temporaryPath / f"bzd-DockerFile-{self.namePrefix}"
+		return self.temporaryPath / f"bzd-devcontainer-{self.namePrefix}" / "DockerFile"
 
 	@property
 	def dockerComposePath(self) -> pathlib.Path:
-		return self.temporaryPath / f"bzd-docker-compose-{self.namePrefix}.yaml"
+		return self.temporaryPath / f"bzd-devcontainer-{self.namePrefix}" / "docker-compose.yaml"
 
 	@property
 	def dockerFile(self) -> str:
