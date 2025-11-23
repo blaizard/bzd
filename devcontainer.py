@@ -15,6 +15,9 @@ class Feature:
 
 	isAvailable: bool = False
 
+	def __init__(self, container: "DevelopmentContainer") -> None:
+		self.container = container
+
 	@property
 	def groups(self) -> typing.List[str]:
 		return []
@@ -31,7 +34,8 @@ class Feature:
 class FeatureDocker(Feature):
 	"""Feature: Docker inside the container."""
 
-	def __init__(self) -> None:
+	def __init__(self, **kwargs: typing.Any) -> None:
+		super().__init__(**kwargs)
 		self.mayberDockerSocket = FeatureDocker.getDockerSocket()
 		self.isAvailable = self.mayberDockerSocket is not None
 
@@ -39,9 +43,12 @@ class FeatureDocker(Feature):
 	def getDockerSocket() -> typing.Optional[pathlib.Path]:
 		"""Get the docker socket path if available."""
 
-		dockerSocket = pathlib.Path("/var/run/docker.sock")
-		if dockerSocket.exists():
-			return dockerSocket
+		for dockerSocket in [
+		    pathlib.Path(os.getenv("XDG_RUNTIME_DIR", "") + "/docker.sock"),
+		    pathlib.Path("/var/run/docker.sock")
+		]:
+			if dockerSocket.exists():
+				return dockerSocket.resolve()
 		return None
 
 	def getDockerGid(self) -> str:
@@ -51,8 +58,8 @@ class FeatureDocker(Feature):
 		"""
 
 		result = subprocess.run([
-		    "docker", "run", "--rm", "-v", f"{self.mayberDockerSocket}:/var/run/docker.sock", self.imageBase, "stat",
-		    "-c", "'%g'", "/var/run/docker.sock"
+		    "docker", "run", "--rm", "-v", f"{self.mayberDockerSocket}:/var/run/docker.sock", self.container.imageBase,
+		    "stat", "-c", "'%g'", "/var/run/docker.sock"
 		],
 		                        capture_output=True)
 		assert result.returncode == 0, "Failed to get docker group id from container."
@@ -83,9 +90,9 @@ class DevelopmentContainer:
 		self.temporaryPath = temporaryPath
 		self.uid = os.getuid()
 		self.gid = os.getgid()
-		self.rootless = DevelopmentContainer.isRootless()
-		self.user = "root" if self.rootless else getpass.getuser()
-		self.features = [feature for feature in [FeatureDocker()] if feature.isAvailable]
+		self.userNamespaceRemapping = DevelopmentContainer.isUserNamespaceRemapping()
+		self.user = "root" if self.userNamespaceRemapping else getpass.getuser()
+		self.features = [feature for feature in [FeatureDocker(container=self)] if feature.isAvailable]
 
 		if self.platform:
 			self.startEmulation()
@@ -95,9 +102,9 @@ class DevelopmentContainer:
 		self.dockerComposePath.write_text(self.dockerCompose)
 
 	@staticmethod
-	def isRootless() -> bool:
-		"""Check if docker is rootless.
-		
+	def isUserNamespaceRemapping() -> bool:
+		"""Check if user namespace remapping is enabled.
+
 		A rootless container will have its file permissions mapped to the root user and translated to the host via docker.
 		"""
 
@@ -128,20 +135,24 @@ class DevelopmentContainer:
 
 		instructions = []
 
-		if self.rootless:
-			instructions += [f"RUN mkdir -p {self.home}", f"ENV HOME={self.home}"]
+		if self.userNamespaceRemapping:
+			instructions += [
+			    f"RUN mkdir -p {self.home}",
+			    f"ENV HOME={self.home}",
+			]
 		else:
-			groups = [str(self.gid), "sudo"]
-			for feature in self.features:
-				groups += feature.groups
+
+			groups = [str(self.gid), "sudo"] + [group for feature in self.features for group in feature.groups]
 			instructions += [
 			    f"RUN groupadd -o --gid {self.gid} {self.user}",
+			    # Delete any existing user with the same uid if any.
+			    f"RUN id -u {self.uid} &>/dev/null && userdel -r $(id -un {self.uid}) || true",
 			    f"RUN useradd --create-home -d {self.home} --no-log-init --uid {self.uid} --gid {self.gid} --groups {','.join(groups)} {self.user}",
-			    f"""RUN echo "\"{self.user}\" ALL=(ALL) NOPASSWD:ALL\" >> /etc/sudoers""", f"USER {self.user}"
+			    f"""RUN echo "\"{self.user}\" ALL=(ALL) NOPASSWD:ALL\" >> /etc/sudoers""",
+			    f"USER {self.user}"
 			]
 
-		for feature in self.features:
-			instructions += feature.dockerFile
+		instructions += [instruction for feature in self.features for instruction in feature.dockerFile]
 
 		return f"""
 FROM {self.imageBase}
@@ -152,6 +163,8 @@ RUN apt install -y \
 	python3 \
 	git \
 	wget \
+	curl \
+	patchelf \
 	sudo
 
 RUN wget -O /usr/local/bin/bazel https://raw.githubusercontent.com/blaizard/bzd/refs/heads/master/tools/bazel && chmod +x /usr/local/bin/bazel
@@ -167,7 +180,8 @@ RUN echo "PS1=\\"(devcontainer) \\$PS1\\"" >> {self.home}/.bashrc
 
 		# Volumes
 		volumes = [
-		    f"{self.workspace}", f"{self.home}/.bash_history", f"{self.home}/.cache", f"user-volume:/bzd-user-volume"
+		    f"{self.workspace}:{self.workspace}", f"{self.home}/.bash_history:{self.home}/.bash_history",
+		    f"{self.home}/.cache:{self.home}/.cache", f"user-volume:/bzd-user-volume"
 		]
 		for feature in self.features:
 			volumes += feature.volumes
@@ -178,7 +192,7 @@ RUN echo "PS1=\\"(devcontainer) \\$PS1\\"" >> {self.home}/.bashrc
 			extra += ["platform: linux/amd64"]
 		elif self.platform == "arm64":
 			extra += ["platform: linux/arm64"]
-		if not self.rootless:
+		if self.userNamespaceRemapping == False:
 			extra += [
 			    f"command: sh -c \"sudo chown {self.uid}:{self.gid} /bzd-user-volume && sudo chmod 755 /bzd-user-volume && bash\""
 			]
