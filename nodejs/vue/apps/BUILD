@@ -31,6 +31,7 @@ bzd_nodejs_library(
         "//nodejs/core:cache2",
         "//nodejs/core:exception",
         "//nodejs/core:log",
+        "//nodejs/core/clock:ntp",
         "//nodejs/core/http:server",
         "//nodejs/core/http/mock:server",
         "//nodejs/core/rest:server",
