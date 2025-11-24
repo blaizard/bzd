@@ -49,7 +49,7 @@ def _bzd_config_impl(ctx):
     if ctx.attr.file_flag and (ctx.attr.file_flag.label != Label("//config:empty")):
         override_files = []
         if ConfigInfo in ctx.attr.file_flag:
-            override_files.append(ctx.attr.file_flag[ConfigInfo].json)
+            override_files.append(ctx.attr.file_flag[ConfigInfo].internal)
             runfiles = runfiles.merge(ctx.attr.file_flag[ConfigInfo].runfiles)
             data = depset(transitive = [data, ctx.attr.file_flag[ConfigInfo].data])
         elif ctx.files.file_flag:
@@ -60,11 +60,11 @@ def _bzd_config_impl(ctx):
         input_files = depset(override_files, transitive = [input_files])
 
     # Build the default configuration.
-    output = ctx.actions.declare_file("{}.private.json".format(ctx.label))
-    args.add("--output", output)
+    internal = ctx.actions.declare_file("{}.internal".format(ctx.label))
+    args.add("--output", internal)
     ctx.actions.run(
         inputs = input_files,
-        outputs = [output],
+        outputs = [internal],
         progress_message = "Generating default configuration for {}...".format(ctx.label),
         arguments = [args],
         executable = ctx.executable._config_merge,
@@ -78,13 +78,13 @@ def _bzd_config_impl(ctx):
     }
     for format, file in outputs.items():
         ctx.actions.run(
-            inputs = [output],
+            inputs = [internal],
             outputs = [file],
             arguments = [
                 "--output",
                 file.path,
-                "--json",
-                output.path,
+                "--internal",
+                internal.path,
                 "--format",
                 format,
             ],
@@ -93,7 +93,7 @@ def _bzd_config_impl(ctx):
         )
 
     return [
-        ConfigInfo(json = output, runfiles = runfiles, data = data),
+        ConfigInfo(internal = internal, runfiles = runfiles, data = data),
         DefaultInfo(runfiles = runfiles, files = data),
     ]
 

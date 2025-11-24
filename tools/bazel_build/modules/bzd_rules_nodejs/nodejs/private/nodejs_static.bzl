@@ -1,6 +1,5 @@
 """Static file generator from a user provided script."""
 
-load("@bzd_lib//config:defs.bzl", "ConfigInfo")
 load("//nodejs:private/nodejs_install.bzl", "BzdNodeJsInstallInfo")
 
 def _update_argument(arg, reader, config, **kwargs):
@@ -21,7 +20,7 @@ def _bzd_nodejs_static_impl(ctx):
         arg = _update_argument(
             arg,
             reader = ctx.executable._config_reader.path,
-            config = ctx.attr.config[ConfigInfo].json.path,
+            config = ctx.file.config.path,
             api = ctx.attr.install[BzdNodeJsInstallInfo].api.path,
             output = output.path,
         )
@@ -33,7 +32,7 @@ def _bzd_nodejs_static_impl(ctx):
         outputs = [param_file],
         tools = [
             ctx.executable._config_reader,
-            ctx.attr.config[ConfigInfo].json,
+            ctx.file.config,
         ],
         command = "set -o errexit\n" + "\n".join([arg + " >> " + param_file.path for arg in params]),
     )
@@ -67,7 +66,7 @@ bzd_nodejs_static = rule(
         "config": attr.label(
             mandatory = True,
             doc = "The configuration file to be used.",
-            providers = [ConfigInfo],
+            allow_single_file = [".json"],
         ),
         "install": attr.label(
             mandatory = True,

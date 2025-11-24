@@ -2,7 +2,6 @@
 
 load("@rules_cc//cc:defs.bzl", "CcInfo")
 load("@rules_cc//cc/common:debug_package_info.bzl", "DebugPackageInfo")
-load("//config:private/common.bzl", "ConfigInfo")
 
 # This list was taken from here: https://github.com/fmeum/with_cfg.bzl/blob/main/with_cfg/private/rule_defaults.bzl
 _DEFAULT_PROVIDERS = [
@@ -104,7 +103,6 @@ def make_bzd_config_apply(target = None, providers = None, configs = None, execu
             "config_overrides": attr.label_list(
                 doc = "Configuration to be overritten.",
                 mandatory = True,
-                providers = [ConfigInfo],
             ),
             "config_values": attr.label_list(
                 doc = "Configurations values to be applied.",

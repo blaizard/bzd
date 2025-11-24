@@ -1,7 +1,6 @@
 """DNS bazel rules."""
 
 load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
-load("@bzd_lib//config:defs.bzl", "ConfigInfo")
 
 def _bzd_dns_zones_impl(ctx):
     output = ctx.outputs.output_json
@@ -14,9 +13,9 @@ def _bzd_dns_zones_impl(ctx):
     args = ctx.actions.args()
     args.add("--output", output.path)
     args.add_all(ctx.files.srcs)
-    if ctx.attr.config:
-        args.add("--config", ctx.attr.config[ConfigInfo].json.path)
-        input_files.append(ctx.attr.config[ConfigInfo].json)
+    if ctx.file.config:
+        args.add("--config", ctx.file.config.path)
+        input_files.append(ctx.file.config.json)
 
     # Build the aggregated configuration.
     ctx.actions.run(
@@ -35,7 +34,7 @@ bzd_dns_zones = rule(
     attrs = {
         "config": attr.label(
             doc = "Configuration used for substitution.",
-            providers = [ConfigInfo],
+            allow_single_file = [".json"],
         ),
         "output_json": attr.output(
             doc = "Create a json zones.",
@@ -63,11 +62,11 @@ def _bzd_dns_binary_impl(ctx):
         for domain in domains.split(","):
             for f in target[DefaultInfo].files.to_list():
                 args.add_all("--input", [domain, f])
-    args.add(ctx.attr.config[ConfigInfo].json)
+    args.add(ctx.file.config)
 
     # Generate the file structure under output.
     ctx.actions.run(
-        inputs = ctx.files.srcs + [ctx.attr.config[ConfigInfo].json],
+        inputs = ctx.files.srcs + [ctx.file.config],
         outputs = [output],
         progress_message = "Generating DNS zones for {}...".format(ctx.label),
         arguments = [args],
@@ -91,7 +90,7 @@ bzd_dns_binary = rule(
     attrs = {
         "config": attr.label(
             doc = "Configuration for the provider.",
-            providers = [ConfigInfo],
+            allow_single_file = [".json"],
             mandatory = True,
         ),
         "srcs": attr.label_keyed_string_dict(

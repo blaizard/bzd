@@ -6,7 +6,7 @@ import sys
 import yaml
 
 from bzd.utils.dict import updateDeep, UpdatePolicy
-from config.reader import internalToDictionary, InternalFragmentList
+from config.reader import InternalFragmentList, InternalFragment, makeDictionary
 
 
 def fatal(message: str) -> None:
@@ -38,20 +38,6 @@ class Config:
 			fatal(f"The key {e} from '{source}' was already defined by another base configuration.")
 
 
-def makeDictionary(keyStr: str, value: typing.Any) -> typing.Dict[str, typing.Any]:
-	"""Make a dictionary from a key string."""
-
-	root: typing.Dict[str, typing.Any] = {}
-	data = root
-	[*keys, key] = keyStr.split(".")
-	for k in keys:
-		data[k] = {}
-		data = data[k]
-	data[key] = value
-
-	return root
-
-
 def updateOutput(output: typing.Dict[str, typing.Any], data: typing.Dict[str, typing.Any],
                  failOnConflict: bool) -> None:
 	try:
@@ -60,23 +46,29 @@ def updateOutput(output: typing.Dict[str, typing.Any], data: typing.Dict[str, ty
 		fatal(f"The key {e} from '{f}' was already defined by another base configuration.")
 
 
-def dataFromPath(path: pathlib.Path) -> typing.Dict[str, typing.Any]:
+def dataFromPath(path: pathlib.Path) -> typing.Iterator[InternalFragment]:
 	"""Load the content of a file from its path."""
 
 	extension = path.suffix.lower()
 	if extension == ".json":
 		content = json.loads(path.read_text())
+		yield (None, content, str(path))
+
 	elif extension in (
 	    ".yaml",
 	    ".yml",
 	):
 		with open(path, "r") as f:
 			content = yaml.load(f, Loader=yaml.SafeLoader)  # type: ignore
+		yield (None, content, str(path))
+
+	elif extension == ".internal":
+		fragments: InternalFragmentList = json.loads(path.read_text())
+		for key, value, source in fragments:
+			yield (key, value, source)
+
 	else:
 		fatal(f"File extension '{extension}' not supported: {str(path)}.")
-
-	assert isinstance(content, dict), f"The content of the data at '{path}' must be a dictionary."
-	return content
 
 
 if __name__ == "__main__":
@@ -158,13 +150,13 @@ if __name__ == "__main__":
 
 	# - From files.
 	for f in args.srcs:
-		data = dataFromPath(f)
-		output.addDict(data, source=str(f), failOnConflict=True)
+		for _, value, source in dataFromPath(f):
+			output.addDict(value, source=source, failOnConflict=True)
 
 	# - From files at a specified key.
 	for keyStr, f in args.srcs_at:
-		value = dataFromPath(pathlib.Path(f))
-		output.addKey(keyStr, value, source=str(f), failOnConflict=True)
+		for _, value, source in dataFromPath(pathlib.Path(f)):
+			output.addKey(keyStr, value, source=source, failOnConflict=True)
 
 	# - From values at a specified key.
 	for keyStr, value in args.values_at:
@@ -174,8 +166,7 @@ if __name__ == "__main__":
 
 	# Apply the files.
 	for f in args.overrideFiles:
-		fragments: InternalFragmentList = json.loads(f.read_text())
-		for key, value, source in fragments:
+		for key, value, source in dataFromPath(f):
 			output.addKey(key, value, source=source, failOnConflict=False)
 
 	# Apply the key value pairs.
