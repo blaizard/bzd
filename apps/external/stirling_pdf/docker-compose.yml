@@ -4,3 +4,5 @@ services:
         environment:
             DISABLE_ADDITIONAL_FEATURES: false
             LANGS: "en_GB"
+            SYSTEM_ENABLEANALYTICS: false
+            DISABLE_PIXEL: true

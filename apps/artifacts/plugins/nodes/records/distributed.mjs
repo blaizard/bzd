@@ -13,6 +13,7 @@ const Log = LogFactory("apps", "plugin", "nodes");
 ///    - current_host
 ///    - host1
 ///    - host2
+///
 /// Where the content of the host directory is the same as for Records.
 export default class RecordsDistributed {
 	/// Constructor for the distributed records.
