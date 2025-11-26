@@ -155,6 +155,7 @@ class DevelopmentContainer:
 			]
 
 		instructions += [instruction for feature in self.features for instruction in feature.dockerFile]
+		instructionsStr = "\n".join(instructions)
 
 		return f"""
 FROM {self.imageBase}
@@ -171,7 +172,7 @@ RUN apt install -y \
 
 RUN wget -O /usr/local/bin/bazel https://raw.githubusercontent.com/blaizard/bzd/refs/heads/master/tools/bazel && chmod +x /usr/local/bin/bazel
 
-{"\n".join(instructions)}
+{instructionsStr}
 
 RUN wget -O {self.home}/.bashrc https://raw.githubusercontent.com/blaizard/bzd/refs/heads/master/tools/shell/sh/bashrc.sh
 RUN echo "PS1=\\"(devcontainer) \\$PS1\\"" >> {self.home}/.bashrc
@@ -187,6 +188,7 @@ RUN echo "PS1=\\"(devcontainer) \\$PS1\\"" >> {self.home}/.bashrc
 		]
 		for feature in self.features:
 			volumes += feature.volumes
+		volumesStr = "\n".join([f"      - {volume}" for volume in volumes])
 
 		# Additional options.
 		extra = []
@@ -198,6 +200,7 @@ RUN echo "PS1=\\"(devcontainer) \\$PS1\\"" >> {self.home}/.bashrc
 			extra += [
 			    f"command: sh -c \"sudo chown {self.uid}:{self.gid} /bzd-user-volume && sudo chmod 755 /bzd-user-volume && bash\""
 			]
+		extraStr = "\n".join([f"    {line}" for line in extra])
 
 		# Docker compose.
 		return f"""
@@ -211,9 +214,9 @@ services:
     hostname: {self.imageName}
     tty: true
     stdin_open: true
-{"\n".join([f"    {line}" for line in extra])}
+{extraStr}
     volumes:
-{"\n".join([f"      - {volume}" for volume in volumes])}
+{volumesStr}
 
 volumes:
   user-volume:
