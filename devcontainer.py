@@ -115,11 +115,11 @@ class FeaturePlatform(Feature):
 	def initialize(self) -> None:
 		# See: https://stackoverflow.com/questions/72444103/what-does-running-the-multiarch-qemu-user-static-does-before-building-a-containe
 		#if self.isRootless:
-		# subprocess.run(["sudo", "systemctl", "start", "docker"])
-		# subprocess.run(
-		#	    ["sudo", "docker", "run", "--rm", "--privileged", "multiarch/qemu-user-static", "--reset", "-p", "yes"])
+		subprocess.run(["sudo", "systemctl", "start", "docker"])
+		subprocess.run(
+		    ["sudo", "docker", "run", "--rm", "--privileged", "multiarch/qemu-user-static", "--reset", "-p", "yes"])
 		#else:
-		subprocess.run(["docker", "run", "--rm", "--privileged", "multiarch/qemu-user-static", "--reset", "-p", "yes"])
+		#subprocess.run(["docker", "run", "--rm", "--privileged", "multiarch/qemu-user-static", "--reset", "-p", "yes"])
 
 	@property
 	def dockerCompose(self) -> typing.List[str]:
@@ -142,6 +142,8 @@ class DevelopmentContainer:
 		self.userNamespaceRemapping = DevelopmentContainer.isUserNamespaceRemapping()
 		self.user = "root" if self.userNamespaceRemapping else getpass.getuser()
 		self.features = [feature for feature in features if feature.isAvailable]
+
+	def initialize(self) -> None:
 
 		# Initialize features.
 		for feature in self.features:
@@ -322,6 +324,7 @@ if __name__ == "__main__":
 
 	features = [FeatureClass(args) for FeatureClass in Features]
 	devContainer = DevelopmentContainer(features=features, temporaryPath=args.temp)
+	devContainer.initialize()
 	if args.build:
 		devContainer.build()
 	devContainer.run(args=args.rest, env=args.env)
