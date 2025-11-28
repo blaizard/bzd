@@ -22,6 +22,17 @@ bzd_nodejs_library(
 )
 
 bzd_nodejs_library(
+    name = "mock",
+    srcs = [
+        "mock.mjs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":clock",
+    ],
+)
+
+bzd_nodejs_library(
     name = "ntp",
     srcs = [
         "ntp.mjs",

@@ -41,7 +41,7 @@ export default class ClockNTP extends Clock {
 		this.delta = now.getTime() - Date.now();
 	}
 
-	_getTime() {
+	_getTimeMs() {
 		return Date.now() + this.delta;
 	}
 }

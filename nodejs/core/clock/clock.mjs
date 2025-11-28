@@ -4,7 +4,7 @@ const Exception = ExceptionFactory("clock");
 
 export default class Clock {
 	constructor() {
-		Exception.assert(typeof this._getTime === "function", "A clock must implement a '_getTime' function.");
+		Exception.assert(typeof this._getTimeMs === "function", "A clock must implement a '_getTimeMs' function.");
 	}
 
 	/// Will be called upon startup.
@@ -16,7 +16,14 @@ export default class Clock {
 	/// Get the current timestamp in milliseconds.
 	///
 	/// \return The timestamp in milliseconds.
-	getTime() {
-		return this._getTime();
+	getTimeMs() {
+		return this._getTimeMs();
+	}
+
+	/// Get the current timestamp in seconds.
+	///
+	/// \return The timestamp in seconds.
+	getTimeS() {
+		return this._getTimeMs() / 1000;
 	}
 }

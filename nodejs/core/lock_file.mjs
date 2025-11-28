@@ -1,6 +1,7 @@
 import fs from "fs/promises";
 import pathlib from "#bzd/nodejs/utils/pathlib.mjs";
 import ExceptionFactory from "./exception.mjs";
+import ClockDate from "#bzd/nodejs/core/clock/date.mjs";
 
 const Exception = ExceptionFactory("lock-file");
 
@@ -17,16 +18,17 @@ export default class LockFile {
 		expired: "expired",
 	});
 
-	constructor(path) {
+	constructor(path, options = {}) {
 		this.path = pathlib.path(path);
+		this.options = Object.assign(
+			{
+				clock: new ClockDate(),
+				heartBeatIntervalMs: 5000,
+			},
+			options,
+		);
 		this.interval = null;
 		this.lastExpiryCheck = null;
-		this.heartBeatIntervalMs = 5000;
-	}
-
-	/// Return the current timestamp in seconds.
-	_timestampS() {
-		return Date.now() / 1000;
 	}
 
 	/// Whether or not the lock is already acquired by this instance.
@@ -47,8 +49,9 @@ export default class LockFile {
 		return false;
 	}
 
-	async _unlock(path) {
-		await fs.rm(path, { recursive: true, force: true });
+	async _unlock(path, force) {
+		// force = true, will silently ignore if the path does not exist.
+		await fs.rm(path, { recursive: true, force: force });
 	}
 
 	/// Check if the status of the lock.
@@ -56,18 +59,18 @@ export default class LockFile {
 	/// \return true if the lock is expired, false otherwise.
 	async getStatus() {
 		const path = this.path.asPosix();
-		const currentTimeS = this._timestampS();
+		const currentTimeMs = this.options.clock.getTimeMs();
 		try {
 			const stats = await fs.stat(path);
 			const fileTimeMs = stats.mtime.getTime();
 
 			// Update the last expiry check time.
 			if (this.lastExpiryCheck === null) {
-				this.lastExpiryCheck = [fileTimeMs, currentTimeS];
+				this.lastExpiryCheck = [fileTimeMs, currentTimeMs];
 			} else if (this.lastExpiryCheck[0] == fileTimeMs) {
 				// Do nothing, the file has not been updated since last check.
 			} else {
-				this.lastExpiryCheck = [fileTimeMs, currentTimeS];
+				this.lastExpiryCheck = [fileTimeMs, currentTimeMs];
 			}
 		} catch (error) {
 			if (error.code === "ENOENT") {
@@ -77,7 +80,7 @@ export default class LockFile {
 		}
 
 		// Check if the lock is expired (no update in the last 15s).
-		if (currentTimeS - this.lastExpiryCheck[1] > this.heartBeatIntervalMs * 3) {
+		if (currentTimeMs - this.lastExpiryCheck[1] > this.options.heartBeatIntervalMs * 3) {
 			return LockFile.Status.expired;
 		}
 
@@ -94,7 +97,7 @@ export default class LockFile {
 		if (await this._tryLock(path)) {
 			// Update the mtime of the file using file system time.
 			const heartBeat = async () => {
-				const timestampS = this._timestampS();
+				const timestampS = this.options.clock.getTimeS();
 				try {
 					await fs.utimes(path, timestampS, timestampS);
 				} catch (e) {
@@ -104,7 +107,7 @@ export default class LockFile {
 				}
 			};
 			await heartBeat();
-			this.interval = setInterval(heartBeat, this.heartBeatIntervalMs).unref();
+			this.interval = setInterval(heartBeat, this.options.heartBeatIntervalMs).unref();
 			return true;
 		}
 
@@ -112,9 +115,11 @@ export default class LockFile {
 	}
 
 	/// Unlock the pre-acquired lock.
-	async unlock() {
-		Exception.assert(this.isLock(), "Lock is not acquired.");
-		await this._unlock(this.path.asPosix());
+	///
+	/// \param force Whether or not to force unlock even if not locked. This is useful for cleanup.
+	async unlock(force = false) {
+		Exception.assert(force || this.isLock(), "Lock is not acquired.");
+		await this._unlock(this.path.asPosix(), force);
 		clearInterval(this.interval);
 		this.interval = null;
 	}
@@ -122,11 +127,11 @@ export default class LockFile {
 	/// Execute the given function with the lock acquired and release it afterwards.
 	async lock(workFn, timeoutS = null) {
 		Exception.assert(!this.isLock(), "Lock is already acquired.");
-		const startTime = this._timestampS();
+		const startTime = this.options.clock.getTimeS();
 		while (!(await this.tryLock())) {
 			await new Promise((resolve) => setTimeout(resolve, 1));
 			Exception.assert(
-				!timeoutS || this._timestampS() - startTime < timeoutS,
+				!timeoutS || this.options.clock.getTimeS() - startTime < timeoutS,
 				"Timeout acquiring lock after {}s.",
 				timeoutS,
 			);
