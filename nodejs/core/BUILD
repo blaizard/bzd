@@ -99,6 +99,18 @@ bzd_nodejs_library(
 )
 
 bzd_nodejs_library(
+    name = "lock_file",
+    srcs = [
+        "lock_file.mjs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":exception",
+        "//nodejs/utils:pathlib",
+    ],
+)
+
+bzd_nodejs_library(
     name = "lock",
     srcs = [
         "lock.mjs",
