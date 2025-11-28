@@ -9,14 +9,21 @@ import tempfile
 import subprocess
 import typing
 
+imageBase = "ubuntu:24.04"
+
 
 class Feature:
 	"""Base class for a feature."""
 
 	isAvailable: bool = False
 
-	def __init__(self, container: "DevelopmentContainer") -> None:
-		self.container = container
+	@staticmethod
+	def cli(parser: argparse.ArgumentParser) -> None:
+		pass
+
+	@property
+	def namePrefix(self) -> typing.List[str]:
+		return []
 
 	@property
 	def groups(self) -> typing.List[str]:
@@ -30,12 +37,18 @@ class Feature:
 	def dockerFile(self) -> typing.List[str]:
 		return []
 
+	@property
+	def dockerCompose(self) -> typing.List[str]:
+		return []
+
+	def initialize(self) -> None:
+		pass
+
 
 class FeatureDocker(Feature):
 	"""Feature: Docker inside the container."""
 
-	def __init__(self, **kwargs: typing.Any) -> None:
-		super().__init__(**kwargs)
+	def __init__(self, args: argparse.Namespace) -> None:
 		self.mayberDockerSocket = FeatureDocker.getDockerSocket()
 		self.isAvailable = self.mayberDockerSocket is not None
 
@@ -58,8 +71,8 @@ class FeatureDocker(Feature):
 		"""
 
 		result = subprocess.run([
-		    "docker", "run", "--rm", "-v", f"{self.mayberDockerSocket}:/var/run/docker.sock", self.container.imageBase,
-		    "stat", "-c", "'%g'", "/var/run/docker.sock"
+		    "docker", "run", "--rm", "-v", f"{self.mayberDockerSocket}:/var/run/docker.sock", imageBase, "stat", "-c",
+		    "'%g'", "/var/run/docker.sock"
 		],
 		                        capture_output=True)
 		assert result.returncode == 0, "Failed to get docker group id from container."
@@ -78,24 +91,61 @@ class FeatureDocker(Feature):
 		return ["RUN curl -fsSL https://get.docker.com | sh"]
 
 
+class FeaturePlatform(Feature):
+	"""Feature: Platform emulation inside the container."""
+
+	def __init__(self, args: argparse.Namespace) -> None:
+		self.platform = args.platform
+		self.isAvailable = self.platform is not None
+
+	@staticmethod
+	def cli(parser: argparse.ArgumentParser) -> None:
+		parser.add_argument("-p",
+		                    "--platform",
+		                    choices=(
+		                        "amd64",
+		                        "arm64",
+		                    ),
+		                    help="The architecture on which the docker should run.")
+
+	@property
+	def namePrefix(self) -> typing.List[str]:
+		return [self.platform]
+
+	def initialize(self) -> None:
+		# See: https://stackoverflow.com/questions/72444103/what-does-running-the-multiarch-qemu-user-static-does-before-building-a-containe
+		#if self.isRootless:
+		# subprocess.run(["sudo", "systemctl", "start", "docker"])
+		# subprocess.run(
+		#	    ["sudo", "docker", "run", "--rm", "--privileged", "multiarch/qemu-user-static", "--reset", "-p", "yes"])
+		#else:
+		subprocess.run(["docker", "run", "--rm", "--privileged", "multiarch/qemu-user-static", "--reset", "-p", "yes"])
+
+	@property
+	def dockerCompose(self) -> typing.List[str]:
+		if self.platform == "amd64":
+			return ["platform: linux/amd64"]
+		elif self.platform == "arm64":
+			return ["platform: linux/arm64"]
+		return []
+
+
 class DevelopmentContainer:
 
-	imageBase = "ubuntu:24.04"
-
-	def __init__(self, platform: typing.Optional[str], temporaryPath: pathlib.Path) -> None:
+	def __init__(self, features: typing.Sequence[Feature], temporaryPath: pathlib.Path) -> None:
 		self.workspace = pathlib.Path(__file__).resolve().parent
 		self.cwd = pathlib.Path.cwd()
 		self.home = pathlib.Path.home()
-		self.platform = platform
 		self.temporaryPath = temporaryPath
 		self.uid = os.getuid()
 		self.gid = os.getgid()
 		self.userNamespaceRemapping = DevelopmentContainer.isUserNamespaceRemapping()
 		self.user = "root" if self.userNamespaceRemapping else getpass.getuser()
-		self.features = [feature for feature in [FeatureDocker(container=self)] if feature.isAvailable]
+		self.features = [feature for feature in features if feature.isAvailable]
 
-		if self.platform:
-			self.startEmulation()
+		# Initialize features.
+		for feature in self.features:
+			feature.initialize()
 
 		# Write the docker files.
 		self.dockerFilePath.parent.mkdir(parents=True, exist_ok=True)
@@ -115,10 +165,9 @@ class DevelopmentContainer:
 
 	@property
 	def namePrefix(self) -> str:
-		prefix = self.user
-		if self.platform:
-			prefix += f"-{self.platform}"
-		return prefix
+		prefixList = [self.user]
+		prefixList += [prefix for feature in self.features for prefix in feature.namePrefix]
+		return "-".join(prefixList)
 
 	@property
 	def imageName(self) -> str:
@@ -158,7 +207,7 @@ class DevelopmentContainer:
 		instructionsStr = "\n".join(instructions)
 
 		return f"""
-FROM {self.imageBase}
+FROM {imageBase}
 RUN apt update -y
 RUN apt upgrade -y
 RUN apt install -y \
@@ -192,10 +241,7 @@ RUN echo "PS1=\\"(devcontainer) \\$PS1\\"" >> {self.home}/.bashrc
 
 		# Additional options.
 		extra = []
-		if self.platform == "amd64":
-			extra += ["platform: linux/amd64"]
-		elif self.platform == "arm64":
-			extra += ["platform: linux/arm64"]
+		extra += [line for feature in self.features for line in feature.dockerCompose]
 		if self.userNamespaceRemapping == False:
 			extra += [
 			    f"command: sh -c \"sudo chown {self.uid}:{self.gid} /bzd-user-volume && sudo chmod 755 /bzd-user-volume && bash\""
@@ -223,16 +269,6 @@ volumes:
     name: "volume-{self.imageName}"
 """
 
-	def startEmulation(self) -> None:
-		# See: https://stackoverflow.com/questions/72444103/what-does-running-the-multiarch-qemu-user-static-does-before-building-a-containe
-		if self.isRootless:
-			subprocess.run(["sudo", "systemctl", "start", "docker"])
-			subprocess.run(
-			    ["sudo", "docker", "run", "--rm", "--privileged", "multiarch/qemu-user-static", "--reset", "-p", "yes"])
-		else:
-			subprocess.run(
-			    ["docker", "run", "--rm", "--privileged", "multiarch/qemu-user-static", "--reset", "-p", "yes"])
-
 	def build(self) -> None:
 		subprocess.run([
 		    "docker",
@@ -244,7 +280,7 @@ volumes:
 		],
 		               check=True)
 
-	def run(self) -> None:
+	def run(self, args: typing.List[str], env: typing.List[str]) -> None:
 		subprocess.run([
 		    "docker",
 		    "compose",
@@ -254,11 +290,17 @@ volumes:
 		    "--detach",
 		], check=True)
 
+		extra = [arg for e in env for arg in ("--env", e)]
+
 		workdir = self.cwd if self.cwd.is_relative_to(self.workspace) else self.workspace
-		subprocess.run(["docker", "exec", "-it", "--workdir", str(workdir), self.imageName, "/bin/bash"])
+		subprocess.run(
+		    ["docker", "exec", *extra, "-it", "--workdir",
+		     str(workdir), self.imageName, *(args or ["/bin/bash"])])
 
 
 if __name__ == "__main__":
+
+	Features = [FeatureDocker, FeaturePlatform]
 
 	parser = argparse.ArgumentParser(description="Development container.")
 	parser.add_argument("-b", "--build", action="store_true", help="Re-build the container if set.")
@@ -266,16 +308,20 @@ if __name__ == "__main__":
 	                    type=pathlib.Path,
 	                    default=pathlib.Path(tempfile.gettempdir()),
 	                    help="A temporary directory where to store the docker related configuration files.")
-	parser.add_argument("-p",
-	                    "--platform",
-	                    choices=(
-	                        "amd64",
-	                        "arm64",
-	                    ),
-	                    help="The architecture on which the docker should run.")
+	parser.add_argument("-e",
+	                    "--env",
+	                    action="append",
+	                    default=[],
+	                    help="Environment variables to pass to the container.")
+	parser.add_argument("rest", nargs=argparse.REMAINDER, help="Additional arguments to pass to the container.")
+
+	for FeatureClass in Features:
+		FeatureClass.cli(parser)
+
 	args = parser.parse_args()
 
-	devContainer = DevelopmentContainer(args.platform, temporaryPath=args.temp)
+	features = [FeatureClass(args) for FeatureClass in Features]
+	devContainer = DevelopmentContainer(features=features, temporaryPath=args.temp)
 	if args.build:
 		devContainer.build()
-	devContainer.run()
+	devContainer.run(args=args.rest, env=args.env)
