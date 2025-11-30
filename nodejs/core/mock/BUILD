@@ -8,6 +8,7 @@ bzd_nodejs_library(
         "filesystem.mjs",
     ],
     deps = [
+        "//nodejs/core/clock:date",
         "//nodejs/utils:pathlib",
     ],
 )

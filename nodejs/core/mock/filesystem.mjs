@@ -1,10 +1,14 @@
 import Pathlib from "#bzd/nodejs/utils/pathlib.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
+import ClockDate from "#bzd/nodejs/core/clock/date.mjs";
 
 const Exception = ExceptionFactory("filesystem");
 
 class Entry {
-	constructor() {
+	constructor(clock) {
+		const timeMs = clock.getTimeMs();
+		this.atime = timeMs;
+		this.mtime = timeMs;
 		this.read = true;
 		this.write = true;
 		this.exec = false;
@@ -12,22 +16,22 @@ class Entry {
 }
 
 class File extends Entry {
-	constructor() {
-		super();
+	constructor(clock) {
+		super(clock);
 		this.content = "";
 	}
 }
 
 class Symlink extends Entry {
-	constructor(path) {
-		super();
+	constructor(path, clock) {
+		super(clock);
 		this.path = path;
 	}
 }
 
 class Directory extends Entry {
-	constructor() {
-		super();
+	constructor(clock) {
+		super(clock);
 		// List of children entries.
 		this.children = {};
 	}
@@ -166,13 +170,13 @@ class Stats {
 	}
 }
 
-/// Policy to follow in case a file/directory does not exists.
+/// Policy to follow when navigating in the directory tree.
 const _Policy = Object.freeze({
-	createFile: "createFile",
-	createDirectory: "createDirectory",
-	mustExistsDirectory: "mustExistsDirectory",
-	mustExistsFile: "mustExistsFile",
-	mustExists: "mustExists",
+	mustExists: 0b00001,
+	create: 0b00010,
+	file: 0b00100,
+	directory: 0b01000,
+	touch: 0b10000,
 });
 
 export default class FileSystem {
@@ -180,10 +184,16 @@ export default class FileSystem {
 	///
 	/// \param init dictionary to initialize the root folder, with keys corresponding to the path,
 	///             and the value, the content of the file.
-	constructor(init = {}) {
-		this.root = new Directory();
+	constructor(init = {}, options = {}) {
+		this.options = Object.assign(
+			{
+				clock: new ClockDate(),
+			},
+			options,
+		);
+		this.root = new Directory(this.options.clock);
 		for (const [path, content] of Object.entries(init)) {
-			const file = this._toEntry(path, _Policy.createFile);
+			const file = this._toEntry(path, _Policy.create | _Policy.file);
 			file.content = content;
 		}
 	}
@@ -214,16 +224,11 @@ export default class FileSystem {
 
 			// If the entry does not exists.
 			if (!(segment in entry.children)) {
-				Exception.assert(
-					policy != _Policy.mustExists,
-					"The path '{}' does not exists (directory '{}').",
-					path,
-					segment,
-				);
-				if (isLast && policy == _Policy.createFile) {
-					entry.children[segment] = new File();
+				Exception.assert(policy & _Policy.create, "The path '{}' does not exists (directory '{}').", path, segment);
+				if (isLast && policy & _Policy.file) {
+					entry.children[segment] = new File(this.options.clock);
 				} else {
-					entry.children[segment] = new Directory();
+					entry.children[segment] = new Directory(this.options.clock);
 				}
 			}
 			entry = entry.children[segment];
@@ -235,22 +240,19 @@ export default class FileSystem {
 
 			if (entry instanceof File) {
 				Exception.assert(isLast, "A file exists in the path '{}'.", path);
-				Exception.assert(
-					[_Policy.createFile, _Policy.mustExistsFile, _Policy.mustExists].includes(policy),
-					"The path '{}' points to a file.",
-					path,
-				);
+				Exception.assert(!(policy & _Policy.directory), "The path '{}' points to a file.", path);
 			} else if (entry instanceof Directory) {
 				if (isLast) {
-					Exception.assert(
-						[_Policy.createDirectory, _Policy.mustExistsDirectory, _Policy.mustExists].includes(policy),
-						"The path '{}' points to a directory.",
-						path,
-					);
+					Exception.assert(!(policy & _Policy.file), "The path '{}' points to a directory.", path);
 				}
 			} else {
 				Exception.unreachable("Invalid entry type for path '{}' ({:j}).", path, entry);
 			}
+		}
+
+		// Update the modification timestamp.
+		if (policy & _Policy.touch) {
+			entry.mtime = this.options.clock.getTimeMs();
 		}
 
 		return entry;
@@ -258,11 +260,11 @@ export default class FileSystem {
 
 	async mkdir(path) {
 		await FileSystem._mockWait();
-		this._toEntry(path, _Policy.createDirectory);
+		this._toEntry(path, _Policy.create | _Policy.directory);
 	}
 
 	/// Remove a directory recursively
-	static async rmdir(path, mustExists = true) {
+	async rmdir(path, mustExists = true) {
 		if (!mustExists) {
 			if (!(await FileSystem.exists(path))) {
 				return;
@@ -270,15 +272,16 @@ export default class FileSystem {
 		}
 		await FileSystem._mockWait();
 		const p = Pathlib.path(path);
-		const dir = this._toEntry(p.parent, _Policy.mustExistsDirectory);
+		const dir = this._toEntry(p.parent, _Policy.mustExists | _Policy.directory);
 		Exception.assert(p.name in dir.children, "The file '{}' doesn't exists.", p.asPosix());
+		Exception.assert(dir.children[p.name] instanceof Directory, "The entry '{}' must be a directory.", p.asPosix());
 		delete dir.children[p.name];
 	}
 
 	/// Read the content of a directory
 	async readdir(path, withFileTypes = false) {
 		await FileSystem._mockWait();
-		const dir = this._toEntry(path, _Policy.mustExistsDirectory);
+		const dir = this._toEntry(path, _Policy.mustExists | _Policy.directory);
 		if (withFileTypes) {
 			return Object.entries(dir.children).map(([name, entry]) => new Dirent(name, entry));
 		}
@@ -288,7 +291,7 @@ export default class FileSystem {
 	/// Append data to a file
 	async appendFile(path, data) {
 		await FileSystem._mockWait();
-		const file = this._toEntry(path, _Policy.createFile);
+		const file = this._toEntry(path, _Policy.create | _Policy.file | _Policy.touch);
 		file.content += data;
 	}
 
@@ -303,7 +306,7 @@ export default class FileSystem {
 	async unlink(path) {
 		await FileSystem._mockWait();
 		const p = Pathlib.path(path);
-		const dir = this._toEntry(p.parent, _Policy.mustExistsDirectory);
+		const dir = this._toEntry(p.parent, _Policy.mustExists | _Policy.directory);
 		Exception.assert(p.name in dir.children, "The file '{}' doesn't exists.", p.asPosix());
 		delete dir.children[p.name];
 	}
@@ -312,27 +315,27 @@ export default class FileSystem {
 	/// updates its last modification date.
 	async touch(path) {
 		await FileSystem._mockWait();
-		this._toEntry(path, _Policy.createFile);
+		this._toEntry(path, _Policy.create | _Policy.file | _Policy.touch);
 	}
 
 	/// Read the content of a file
 	async readFile(path, options = "utf8") {
 		await FileSystem._mockWait();
-		const file = this._toEntry(path, _Policy.mustExistsFile);
+		const file = this._toEntry(path, _Policy.mustExists | _Policy.file);
 		return file.content;
 	}
 
 	/// Read the content of a binary file
 	async readBinary(path) {
 		await FileSystem._mockWait();
-		const file = this._toEntry(path, _Policy.mustExistsFile);
+		const file = this._toEntry(path, _Policy.mustExists | _Policy.file);
 		return new Buffer(file.content);
 	}
 
 	/// Write the content of a file
 	async writeBinary(path, data) {
 		await FileSystem._mockWait();
-		const file = this._toEntry(path, _Policy.createFile);
+		const file = this._toEntry(path, _Policy.create | _Policy.file | _Policy.touch);
 		file.content = data;
 	}
 }
