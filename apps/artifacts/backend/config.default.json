@@ -1,4 +1,7 @@
 {
+    "locks": {
+        "path": "./locks"
+    },
     "tests": [
         {
             "expects": {

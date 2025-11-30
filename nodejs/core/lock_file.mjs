@@ -22,7 +22,11 @@ export default class LockFile {
 		this.path = pathlib.path(path);
 		this.options = Object.assign(
 			{
+				// Clock instance to use for time retrieval.
 				clock: new ClockDate(),
+				// file system layer.
+				fs: null,
+				// Heartbeat interval in milliseconds.
 				heartBeatIntervalMs: 5000,
 			},
 			options,

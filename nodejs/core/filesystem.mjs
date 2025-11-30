@@ -21,6 +21,7 @@ export default class FileSystem {
 	static async mkdir(path) {
 		await Fs.promises.mkdir(path, {
 			recursive: true,
+			force: true,
 		});
 	}
 

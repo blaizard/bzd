@@ -3,7 +3,7 @@ import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 
 const Exception = ExceptionFactory("filesystem");
 
-class FileBase {
+class Entry {
 	constructor() {
 		this.read = true;
 		this.write = true;
@@ -11,17 +11,25 @@ class FileBase {
 	}
 }
 
-class File extends FileBase {
+class File extends Entry {
 	constructor() {
 		super();
 		this.content = "";
 	}
 }
 
-class Symlink extends FileBase {
+class Symlink extends Entry {
 	constructor(path) {
 		super();
 		this.path = path;
+	}
+}
+
+class Directory extends Entry {
+	constructor() {
+		super();
+		// List of children entries.
+		this.children = {};
 	}
 }
 
@@ -37,7 +45,7 @@ class Dirent {
 		return false;
 	}
 	isDirectory() {
-		return this.entry.constructor == Object;
+		return this.entry instanceof Directory;
 	}
 	isFIFO() {
 		return false;
@@ -159,10 +167,12 @@ class Stats {
 }
 
 /// Policy to follow in case a file/directory does not exists.
-const _NotExists = Object.freeze({
-	create: "create",
-	null: "null",
-	throw: "throw",
+const _Policy = Object.freeze({
+	createFile: "createFile",
+	createDirectory: "createDirectory",
+	mustExistsDirectory: "mustExistsDirectory",
+	mustExistsFile: "mustExistsFile",
+	mustExists: "mustExists",
 });
 
 export default class FileSystem {
@@ -171,9 +181,9 @@ export default class FileSystem {
 	/// \param init dictionary to initialize the root folder, with keys corresponding to the path,
 	///             and the value, the content of the file.
 	constructor(init = {}) {
-		this.root = {};
+		this.root = new Directory();
 		for (const [path, content] of Object.entries(init)) {
-			const file = this._toFile(path, _NotExists.create);
+			const file = this._toEntry(path, _Policy.createFile);
 			file.content = content;
 		}
 	}
@@ -188,62 +198,67 @@ export default class FileSystem {
 		});
 	}
 
-	/// Return the directory dictionary at a given path.
-	///
-	/// \return Will always return a directory dictionary.
-	_toDir(path, policy) {
-		const p = Pathlib.path(path);
-		let dir = this.root;
-		for (const segment of p.normalize.parts) {
-			if (!(segment in dir)) {
+	/// Return the entry at a given path.
+	_toEntry(path, policy) {
+		const parts = Pathlib.path(path).normalize.parts;
+		let entry = this.root;
+
+		for (const [index, segment] of parts.entries()) {
+			const isLast = index == parts.length - 1;
+			Exception.assert(
+				entry instanceof Directory,
+				"The entry must be a directory '{}' (directory '{}').",
+				path,
+				segment,
+			);
+
+			// If the entry does not exists.
+			if (!(segment in entry.children)) {
 				Exception.assert(
-					policy != _NotExists.throw,
+					policy != _Policy.mustExists,
 					"The path '{}' does not exists (directory '{}').",
-					p.asPosix(),
+					path,
 					segment,
 				);
-				dir[segment] = {};
+				if (isLast && policy == _Policy.createFile) {
+					entry.children[segment] = new File();
+				} else {
+					entry.children[segment] = new Directory();
+				}
 			}
-			dir = dir[segment];
-			// Resolve the symlink.
-			if (dir instanceof Symlink) {
-				dir = this._toDir(dir.path, _NotExists.throw);
-			}
-			Exception.assert(dir.constructor == Object, "A file exists in the path '{}'.", p.asPosix());
-		}
-		return dir;
-	}
+			entry = entry.children[segment];
 
-	/// Touch a file and return the file object.
-	_toFile(path, policy) {
-		const p = Pathlib.path(path);
-		const dir = this._toDir(p.parent, policy);
-		if (dir === null) {
-			return null;
-		}
-		const name = p.name;
-		if (name in dir) {
-			if (dir[name] instanceof Symlink) {
-				return this._toFile(dir[name].path, _NotExists.throw);
+			// Resolve symlinks.
+			if (entry instanceof Symlink) {
+				entry = this._toEntry(entry.path, _Policy.mustExists);
 			}
-			Exception.assert(dir[name] instanceof File, "The path '{}' is pointing toward a directory.", p.asPosix());
-			return dir[name];
-		}
-		Exception.assert(policy == _NotExists.create, "The file '{}' doesn't exists.", p.asPosix());
-		dir[name] = new File();
-		return dir[name];
-	}
 
-	/// Checks if the file or directory exists
-	async exists(path) {
-		await FileSystem._mockWait();
-		const p = Pathlib.path(path);
-		const dir = this._toDir(p.parent, _NotExists.null);
+			if (entry instanceof File) {
+				Exception.assert(isLast, "A file exists in the path '{}'.", path);
+				Exception.assert(
+					[_Policy.createFile, _Policy.mustExistsFile, _Policy.mustExists].includes(policy),
+					"The path '{}' points to a file.",
+					path,
+				);
+			} else if (entry instanceof Directory) {
+				if (isLast) {
+					Exception.assert(
+						[_Policy.createDirectory, _Policy.mustExistsDirectory, _Policy.mustExists].includes(policy),
+						"The path '{}' points to a directory.",
+						path,
+					);
+				}
+			} else {
+				Exception.unreachable("Invalid entry type for path '{}' ({:j}).", path, entry);
+			}
+		}
+
+		return entry;
 	}
 
 	async mkdir(path) {
 		await FileSystem._mockWait();
-		this._toDir(path, _NotExists.create);
+		this._toEntry(path, _Policy.createDirectory);
 	}
 
 	/// Remove a directory recursively
@@ -255,69 +270,69 @@ export default class FileSystem {
 		}
 		await FileSystem._mockWait();
 		const p = Pathlib.path(path);
-		const dir = this._toDir(p.parent, _NotExists.throw);
-		Exception.assert(p.name in dir, "The file '{}' doesn't exists.", p.asPosix());
-		delete dir[p.name];
+		const dir = this._toEntry(p.parent, _Policy.mustExistsDirectory);
+		Exception.assert(p.name in dir.children, "The file '{}' doesn't exists.", p.asPosix());
+		delete dir.children[p.name];
 	}
 
 	/// Read the content of a directory
 	async readdir(path, withFileTypes = false) {
 		await FileSystem._mockWait();
-		const dir = this._toDir(path, _NotExists.throw);
+		const dir = this._toEntry(path, _Policy.mustExistsDirectory);
 		if (withFileTypes) {
-			return Object.entries(dir).map(([name, entry]) => new Dirent(name, entry));
+			return Object.entries(dir.children).map(([name, entry]) => new Dirent(name, entry));
 		}
-		return Object.keys(dir);
+		return Object.keys(dir.children);
 	}
 
 	/// Append data to a file
 	async appendFile(path, data) {
 		await FileSystem._mockWait();
-		const file = this._toFile(path, _NotExists.create);
+		const file = this._toEntry(path, _Policy.createFile);
 		file.content += data;
 	}
 
 	/// Get the stat object associated with a file
 	async stat(path) {
 		await FileSystem._mockWait();
-		const file = this._toFile(path, _NotExists.throw);
-		return new Stats(file);
+		const entry = this._toEntry(path, _Policy.mustExists);
+		return new Stats(entry);
 	}
 
 	/// Delete a file
 	async unlink(path) {
 		await FileSystem._mockWait();
 		const p = Pathlib.path(path);
-		const dir = this._toDir(p.parent, _NotExists.throw);
-		Exception.assert(p.name in dir, "The file '{}' doesn't exists.", p.asPosix());
-		delete dir[p.name];
+		const dir = this._toEntry(p.parent, _Policy.mustExistsDirectory);
+		Exception.assert(p.name in dir.children, "The file '{}' doesn't exists.", p.asPosix());
+		delete dir.children[p.name];
 	}
 
 	/// Touch a file (create it if it does not exists) and
 	/// updates its last modification date.
 	async touch(path) {
 		await FileSystem._mockWait();
-		this._toFile(path, _NotExists.create);
+		this._toEntry(path, _Policy.createFile);
 	}
 
 	/// Read the content of a file
 	async readFile(path, options = "utf8") {
 		await FileSystem._mockWait();
-		const file = this._toFile(path, _NotExists.throw);
+		const file = this._toEntry(path, _Policy.mustExistsFile);
 		return file.content;
 	}
 
 	/// Read the content of a binary file
 	async readBinary(path) {
 		await FileSystem._mockWait();
-		const file = this._toFile(path, _NotExists.throw);
+		const file = this._toEntry(path, _Policy.mustExistsFile);
 		return new Buffer(file.content);
 	}
 
 	/// Write the content of a file
 	async writeBinary(path, data) {
 		await FileSystem._mockWait();
-		const file = this._toFile(path, _NotExists.create);
+		const file = this._toEntry(path, _Policy.createFile);
 		file.content = data;
 	}
 }

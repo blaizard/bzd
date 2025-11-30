@@ -10,6 +10,7 @@ import Plugins from "#bzd/apps/artifacts/plugins/backend.mjs";
 import config from "#bzd/apps/artifacts/backend/config.json" with { type: "json" };
 import { FileNotFoundError } from "#bzd/nodejs/db/storage/storage.mjs";
 import Utils from "#bzd/apps/artifacts/common/utils.mjs";
+import Locks from "#bzd/apps/artifacts/backend/locks.mjs";
 
 import Backend from "#bzd/nodejs/vue/apps/backend.mjs";
 
@@ -36,6 +37,7 @@ const Exception = ExceptionFactory("backend");
 	}
 	Log.info("Preloaded {} application token(s).", Object.keys(config["tokens"] || {}).length);
 
+	const locks = new Locks(config.locks.path);
 	const statisticsPluginProvider = backend.statistics.makeProvider("plugins");
 
 	// Add initial volumes.
@@ -47,6 +49,7 @@ const Exception = ExceptionFactory("backend");
 
 		const updatedOptions = Object.assign(
 			{
+				locks: locks,
 				cache: backend.cache.getAccessor("plugins"),
 				statistics: statisticsPluginProvider.makeNested(volume),
 			},

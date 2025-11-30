@@ -46,6 +46,22 @@ bzd_nodejs_library(
     ],
 )
 
+bzd_nodejs_library(
+    name = "locks",
+    srcs = [
+        "locks.mjs",
+    ],
+    visibility = [
+        "//apps/artifacts:__subpackages__",
+    ],
+    deps = [
+        "//nodejs/core:exception",
+        "//nodejs/core:lock_file",
+        "//nodejs/core/statistics:provider",
+        "//nodejs/utils:pathlib",
+    ],
+)
+
 bzd_nodejs_binary(
     name = "backend",
     srcs = [
@@ -68,6 +84,7 @@ bzd_nodejs_binary(
         "//deployment:__subpackages__",
     ],
     deps = [
+        ":locks",
         ":plugin",
         "//apps/artifacts/common:utils",
         "//apps/artifacts/plugins:backend",
