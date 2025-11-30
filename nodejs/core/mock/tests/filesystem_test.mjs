@@ -31,6 +31,9 @@ describe("Filesystem", () => {
 			await fs.mkdir("hello/dir1/dir2");
 			Exception.assertEqual(await fs.readdir("hello/dir1"), ["file3", "dir2"]);
 			Exception.assertThrows(async () => await fs.mkdir("hello/dir1/file3"));
+
+			await fs.mkdir("hello/dir1/dir2", { force: true });
+			Exception.assertThrows(async () => await fs.mkdir("hello/dir1/dir2", { force: false }));
 		});
 
 		it("rmdir", async () => {

@@ -1,7 +1,7 @@
-import fs from "fs/promises";
 import pathlib from "#bzd/nodejs/utils/pathlib.mjs";
 import ExceptionFactory from "./exception.mjs";
 import ClockDate from "#bzd/nodejs/core/clock/date.mjs";
+import FileSystem from "./filesystem.mjs";
 
 const Exception = ExceptionFactory("lock-file");
 
@@ -25,7 +25,7 @@ export default class LockFile {
 				// Clock instance to use for time retrieval.
 				clock: new ClockDate(),
 				// file system layer.
-				fs: null,
+				fs: FileSystem,
 				// Heartbeat interval in milliseconds.
 				heartBeatIntervalMs: 5000,
 			},
@@ -45,7 +45,7 @@ export default class LockFile {
 	/// \return true of false, whether the lock was acquired of not.
 	async _tryLock(path) {
 		try {
-			await fs.mkdir(path);
+			await this.options.fs.mkdir(path, { force: false });
 			return true;
 		} catch (error) {
 			Exception.assert(error.code == "EEXIST", "Error attempting to create lock directory: {}", error);
@@ -55,7 +55,7 @@ export default class LockFile {
 
 	async _unlock(path, force) {
 		// force = true, will silently ignore if the path does not exist.
-		await fs.rm(path, { recursive: true, force: force });
+		await this.options.fs.rmdir(path, { force: force });
 	}
 
 	/// Check if the status of the lock.
@@ -65,7 +65,7 @@ export default class LockFile {
 		const path = this.path.asPosix();
 		const currentTimeMs = this.options.clock.getTimeMs();
 		try {
-			const stats = await fs.stat(path);
+			const stats = await this.options.fs.stat(path);
 			const fileTimeMs = stats.mtime.getTime();
 
 			// Update the last expiry check time.
@@ -103,7 +103,7 @@ export default class LockFile {
 			const heartBeat = async () => {
 				const timestampS = this.options.clock.getTimeS();
 				try {
-					await fs.utimes(path, timestampS, timestampS);
+					await this.options.fs.utimes(path, timestampS, timestampS);
 				} catch (e) {
 					clearInterval(this.interval);
 					this.interval = null;

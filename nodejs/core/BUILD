@@ -106,6 +106,7 @@ bzd_nodejs_library(
     visibility = ["//visibility:public"],
     deps = [
         ":exception",
+        ":filesystem",
         "//nodejs/core/clock:date",
         "//nodejs/utils:pathlib",
     ],

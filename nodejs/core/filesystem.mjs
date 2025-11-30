@@ -17,11 +17,13 @@ export default class FileSystem {
 		return await Fs.promises.stat(path);
 	}
 
-	/// Create a directory recursively, if it already exists, do nothing
-	static async mkdir(path) {
+	/// Create a directory recursively.
+	//
+	// \param path The path of the directory.
+	// \param force If false, it will throw if a directory already exists or if the parent path does not exists.
+	static async mkdir(path, { force = true } = {}) {
 		await Fs.promises.mkdir(path, {
-			recursive: true,
-			force: true,
+			recursive: force,
 		});
 	}
 
@@ -32,26 +34,9 @@ export default class FileSystem {
 		});
 	}
 
-	/// Remove a directory recursively
-	static async rmdir(path, mustExists = true) {
-		if (!mustExists) {
-			if (!(await FileSystem.exists(path))) {
-				return;
-			}
-		}
-		path = Path.resolve(path);
-		const fileList = await FileSystem.readdir(path);
-		for (const i in fileList) {
-			const curPath = Path.resolve(path, fileList[i]);
-			const stat = await FileSystem.stat(curPath);
-			if (stat.isDirectory()) {
-				await FileSystem.rmdir(curPath);
-			} else {
-				await FileSystem.unlink(curPath);
-			}
-		}
-
-		await Fs.promises.rmdir(path);
+	/// Remove a directory recursively.
+	static async rmdir(path, { force = false } = {}) {
+		await Fs.promises.rm(path, { recursive: true, force: force });
 	}
 
 	/// Read the content of a file
@@ -128,6 +113,11 @@ export default class FileSystem {
 	static async touch(path) {
 		const fd = await FileSystem.open(path, "a");
 		await FileSystem.close(fd);
+	}
+
+	/// Change the file system timestamps of the object referenced by path.
+	static async utimes(path, atimeS, mtimeS) {
+		await Fs.promises.utimes(path, atimeS, mtimeS);
 	}
 
 	/// Open a file asynchronously

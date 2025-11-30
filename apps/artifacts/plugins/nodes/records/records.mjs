@@ -84,7 +84,7 @@ export default class Records {
 	async init(callback) {
 		// Cleanup the directory if needed.
 		if (this.options.clean) {
-			await this.options.fs.rmdir(this.options.path, /*mustExists*/ false);
+			await this.options.fs.rmdir(this.options.path, { force: true });
 		}
 
 		// Initialize all storages.

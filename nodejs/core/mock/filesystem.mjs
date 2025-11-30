@@ -6,9 +6,10 @@ const Exception = ExceptionFactory("filesystem");
 
 class Entry {
 	constructor(clock) {
-		const timeMs = clock.getTimeMs();
-		this.atime = timeMs;
-		this.mtime = timeMs;
+		const timeS = clock.getTimeS();
+		this.ctimeS = timeS;
+		this.atimeS = timeS;
+		this.mtimeS = timeS;
 		this.read = true;
 		this.write = true;
 		this.exec = false;
@@ -168,6 +169,24 @@ class Stats {
 	get blocks() {
 		return this.size / this.blksize + 1;
 	}
+	get atimeMs() {
+		return this.entry.atimeS * 1000;
+	}
+	get mtimeMs() {
+		return this.entry.mtimeS * 1000;
+	}
+	get ctimeMs() {
+		return this.entry.ctimeS * 1000;
+	}
+	get atime() {
+		return new Date(this.mtimeMs);
+	}
+	get mtime() {
+		return new Date(this.atimeMs);
+	}
+	get ctime() {
+		return new Date(this.ctimeMs);
+	}
 }
 
 /// Policy to follow when navigating in the directory tree.
@@ -250,32 +269,40 @@ export default class FileSystem {
 			}
 		}
 
-		// Update the modification timestamp.
+		// Update the timestamps.
+		const accessTimeS = this.options.clock.getTimeS();
+		entry.atimeS = accessTimeS;
 		if (policy & _Policy.touch) {
-			entry.mtime = this.options.clock.getTimeMs();
+			entry.mtimeS = accessTimeS;
 		}
 
 		return entry;
 	}
 
-	async mkdir(path) {
+	async mkdir(path, { force = true } = {}) {
 		await FileSystem._mockWait();
+
+		// Check the non-existence of the entry, this must be done atomically to mimic file systems.
+		if (!force) {
+			const p = Pathlib.path(path);
+			const directory = this._toEntry(p.parent, _Policy.mustExists | _Policy.directory);
+			Exception.assert(!(p.name in directory.children), "Directory '{}' already exists.", p.asPosix());
+		}
+
 		this._toEntry(path, _Policy.create | _Policy.directory);
 	}
 
 	/// Remove a directory recursively
-	async rmdir(path, mustExists = true) {
-		if (!mustExists) {
-			if (!(await FileSystem.exists(path))) {
-				return;
-			}
-		}
+	async rmdir(path, { force = false } = {}) {
 		await FileSystem._mockWait();
 		const p = Pathlib.path(path);
-		const dir = this._toEntry(p.parent, _Policy.mustExists | _Policy.directory);
-		Exception.assert(p.name in dir.children, "The file '{}' doesn't exists.", p.asPosix());
-		Exception.assert(dir.children[p.name] instanceof Directory, "The entry '{}' must be a directory.", p.asPosix());
-		delete dir.children[p.name];
+		const parent = this._toEntry(p.parent, _Policy.mustExists | _Policy.directory);
+		if (!(p.name in parent.children)) {
+			Exception.assert(force, "The file '{}' doesn't exists.", p.asPosix());
+			return;
+		}
+		Exception.assert(parent.children[p.name] instanceof Directory, "The entry '{}' must be a directory.", p.asPosix());
+		delete parent.children[p.name];
 	}
 
 	/// Read the content of a directory
@@ -316,6 +343,14 @@ export default class FileSystem {
 	async touch(path) {
 		await FileSystem._mockWait();
 		this._toEntry(path, _Policy.create | _Policy.file | _Policy.touch);
+	}
+
+	/// Change the file system timestamps of the object referenced by path.
+	async utimes(path, atimeS, mtimeS) {
+		await FileSystem._mockWait();
+		const file = this._toEntry(path, _Policy.mustExists | _Policy.file);
+		file.atimeS = atimeS;
+		file.mtimeS = mtimeS;
 	}
 
 	/// Read the content of a file
