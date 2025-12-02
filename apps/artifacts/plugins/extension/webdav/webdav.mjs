@@ -102,7 +102,9 @@ export default function extensionWebdav(plugin, options, provider, endpoints) {
 				const path = getPathFromContext(context);
 				const storage = plugin.getStorage();
 				const body = context.getBody();
-				await storage.writeFromChunk(path.parts, body);
+				await plugin.locks.lock(path.asPosix(), async () => {
+					await storage.writeFromChunk(path.parts, body);
+				});
 				context.sendStatus(200);
 			});
 		},
@@ -195,7 +197,9 @@ export default function extensionWebdav(plugin, options, provider, endpoints) {
 			const path = getPathFromContext(context);
 			const storage = plugin.getStorage();
 
-			await storage.delete(path.parts);
+			await plugin.locks.lock(path.asPosix(), async () => {
+				await storage.delete(path.parts);
+			});
 			context.sendStatus(200);
 		});
 	});
@@ -207,7 +211,9 @@ export default function extensionWebdav(plugin, options, provider, endpoints) {
 			const destination = getPathFromHeader(context, "destination");
 			const storage = plugin.getStorage();
 
-			await storage.copy(path.parts, destination.parts, /*mkdir*/ true);
+			await plugin.locks.lock(path.asPosix(), async () => {
+				await storage.copy(path.parts, destination.parts, /*mkdir*/ true);
+			});
 			context.sendStatus(200);
 		});
 	});
@@ -219,7 +225,9 @@ export default function extensionWebdav(plugin, options, provider, endpoints) {
 			const destination = getPathFromHeader(context, "destination");
 			const storage = plugin.getStorage();
 
-			await storage.move(path.parts, destination.parts, /*mkdir*/ true);
+			await plugin.locks.lock(path.asPosix(), async () => {
+				await storage.move(path.parts, destination.parts, /*mkdir*/ true);
+			});
 			context.sendStatus(200);
 		});
 	});

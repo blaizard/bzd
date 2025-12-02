@@ -22,11 +22,13 @@ export default class Locks {
 			},
 			options,
 		);
+
+		this.options.fs.mkdirSync(this.path.asPosix());
 	}
 
 	/// Get a unique hash for the given path.
 	_getInternalPath(path) {
-		return this.path.join(Crypto.createHash("sha1").update(path).digest("hex"));
+		return this.path.joinPath(Crypto.createHash("sha1").update(path).digest("hex"));
 	}
 
 	/// Try to acquire a lock for the given path.
