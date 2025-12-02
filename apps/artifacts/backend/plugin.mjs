@@ -12,6 +12,9 @@ export default class PluginBase {
 		this.storage = null;
 		this.cache = (options["cache"] || new Cache2("cache")).getAccessor(volume);
 		this.statistics = options["statistics"] || new StatisticsProvider();
+		this.locks = options["locks"] || null;
+
+		Exception.assert(this.locks, "Missing locks implementation for '{}'.", volume);
 
 		// Register extensions.
 		for (const extension of extensions) {

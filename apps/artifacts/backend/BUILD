@@ -39,9 +39,11 @@ bzd_nodejs_library(
         "//apps/artifacts/plugins:__subpackages__",
     ],
     deps = [
+        ":locks",
         "//nodejs/core:exception",
         "//nodejs/core:router",
         "//nodejs/core/http/mock:server_context",
+        "//nodejs/core/mock:filesystem",
         "//nodejs/core/services",
     ],
 )
@@ -56,6 +58,7 @@ bzd_nodejs_library(
     ],
     deps = [
         "//nodejs/core:exception",
+        "//nodejs/core:filesystem",
         "//nodejs/core:lock_file",
         "//nodejs/core/statistics:provider",
         "//nodejs/utils:pathlib",

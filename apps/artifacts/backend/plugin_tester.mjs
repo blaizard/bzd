@@ -5,6 +5,8 @@ import EndpointsFactory from "#bzd/apps/artifacts/backend/endpoints_factory.mjs"
 import Router from "#bzd/nodejs/core/router.mjs";
 import ServerContext from "#bzd/nodejs/core/http/mock/server_context.mjs";
 import { HttpError } from "#bzd/nodejs/core/http/server_context.mjs";
+import FileSystemMock from "#bzd/nodejs/core/mock/filesystem.mjs";
+import Locks from "#bzd/apps/artifacts/backend/locks.mjs";
 
 const Exception = ExceptionFactory("plugin", "tester");
 
@@ -25,7 +27,15 @@ export default class PluginTester {
 
 		const provider = new ServiceProvider(volume);
 		const endpoints = new EndpointsFactory();
-		const instance = new PluginType(volume, options, provider, endpoints, components);
+		const updatedOptions = Object.assign(
+			{
+				locks: new Locks("/dummy", {
+					fs: new FileSystemMock(),
+				}),
+			},
+			options,
+		);
+		const instance = new PluginType(volume, updatedOptions, provider, endpoints, components);
 		let routers = {};
 		for (const [method, dataList] of Object.entries(endpoints.unwrap())) {
 			routers[method] ??= new Router();
