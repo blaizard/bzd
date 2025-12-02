@@ -1,0 +1,4 @@
+services:
+    mazanoke:
+        container_name: mazanoke
+        image: ghcr.io/civilblur/mazanoke:latest
