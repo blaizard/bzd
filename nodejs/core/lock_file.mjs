@@ -32,6 +32,7 @@ export default class LockFile {
 			options,
 		);
 		this.interval = null;
+		this.intervalActive = false;
 		this.lastExpiryCheck = null;
 	}
 
@@ -56,6 +57,28 @@ export default class LockFile {
 	async _unlock(path, force) {
 		// force = true, will silently ignore if the path does not exist.
 		await this.options.fs.rmdir(path, { force: force });
+	}
+
+	/// Wait for a certain amount of time in milliseconds.
+	async _wait(timeMs) {
+		return new Promise((resolve) => setTimeout(resolve, timeMs));
+	}
+
+	/// Stop the interval function and wait until it is completed.
+	async _stopInterval(timeoutS) {
+		clearInterval(this.interval);
+		this.interval = null;
+
+		// Wait for the interval to stop, the code should very rarely go there.
+		const startTime = this.options.clock.getTimeS();
+		while (this.intervalActive) {
+			await this._wait(1);
+			Exception.assert(
+				!timeoutS || this.options.clock.getTimeS() - startTime < timeoutS,
+				"Timeout acquiring lock after {}s.",
+				timeoutS,
+			);
+		}
 	}
 
 	/// Check if the status of the lock.
@@ -103,11 +126,14 @@ export default class LockFile {
 			const heartBeat = async () => {
 				const timestampS = this.options.clock.getTimeS();
 				try {
+					this.intervalActive = true;
 					await this.options.fs.utimes(path, timestampS, timestampS);
 				} catch (e) {
 					clearInterval(this.interval);
 					this.interval = null;
-					Exception.unreachable("Lock heartbeat failed: {}", e);
+					Exception.unreachable("Should never happen, we have exclusive access on the directory: {}", e);
+				} finally {
+					this.intervalActive = false;
 				}
 			};
 			await heartBeat();
@@ -121,11 +147,11 @@ export default class LockFile {
 	/// Unlock the pre-acquired lock.
 	///
 	/// \param force Whether or not to force unlock even if not locked. This is useful for cleanup.
-	async unlock(force = false) {
+	async unlock(force = false, timeoutS = 1) {
 		Exception.assert(force || this.isLock(), "Lock is not acquired.");
+
+		await this._stopInterval(timeoutS);
 		await this._unlock(this.path.asPosix(), force);
-		clearInterval(this.interval);
-		this.interval = null;
 	}
 
 	/// Execute the given function with the lock acquired and release it afterwards.
@@ -133,7 +159,7 @@ export default class LockFile {
 		Exception.assert(!this.isLock(), "Lock is already acquired.");
 		const startTime = this.options.clock.getTimeS();
 		while (!(await this.tryLock())) {
-			await new Promise((resolve) => setTimeout(resolve, 1));
+			await this._wait(1);
 			Exception.assert(
 				!timeoutS || this.options.clock.getTimeS() - startTime < timeoutS,
 				"Timeout acquiring lock after {}s.",

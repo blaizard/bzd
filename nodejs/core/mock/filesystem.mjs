@@ -281,7 +281,10 @@ export default class FileSystem {
 
 	async mkdir(path, { force = true } = {}) {
 		await FileSystem._mockWait();
+		this.mkdirSync(path, { force });
+	}
 
+	mkdirSync(path, { force = true } = {}) {
 		// Check the non-existence of the entry, this must be done atomically to mimic file systems.
 		if (!force) {
 			const p = Pathlib.path(path);
@@ -348,9 +351,9 @@ export default class FileSystem {
 	/// Change the file system timestamps of the object referenced by path.
 	async utimes(path, atimeS, mtimeS) {
 		await FileSystem._mockWait();
-		const file = this._toEntry(path, _Policy.mustExists | _Policy.file);
-		file.atimeS = atimeS;
-		file.mtimeS = mtimeS;
+		const entry = this._toEntry(path, _Policy.mustExists);
+		entry.atimeS = atimeS;
+		entry.mtimeS = mtimeS;
 	}
 
 	/// Read the content of a file

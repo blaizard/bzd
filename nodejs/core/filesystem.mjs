@@ -28,9 +28,9 @@ export default class FileSystem {
 	}
 
 	/// Create a directory recursively, if it already exists, do nothing
-	static mkdirSync(path) {
+	static mkdirSync(path, { force = true } = {}) {
 		Fs.mkdirSync(path, {
-			recursive: true,
+			recursive: force,
 		});
 	}
 
