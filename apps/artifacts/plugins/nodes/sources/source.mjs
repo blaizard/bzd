@@ -16,12 +16,17 @@ export default class Source extends Process {
 			options,
 		);
 		this.components = components;
-		this.nextTickRemote = this.options.persistent ? this.plugin.records.getTickRemote(this.storageName, 0) : 0;
+		this.nextTickRemote = -1;
 
 		Exception.assert(typeof this.fetchRecords === "function", "A source must implement a 'fetchRecords' function.");
 	}
 
 	async process(options) {
+		// For the first call, initialize the next tick remote, since only then the records are ready.
+		if (this.nextTickRemote == -1) {
+			this.nextTickRemote = this.options.persistent ? this.plugin.records.getTickRemote(this.storageName, 0) : 0;
+		}
+
 		try {
 			const [records, next, end] = await this.fetchRecords(this.nextTickRemote);
 			const currentTickRemote = this.nextTickRemote;

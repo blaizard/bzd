@@ -14,7 +14,6 @@ import format from "#bzd/nodejs/core/format.mjs";
 import Utils from "#bzd/apps/artifacts/common/utils.mjs";
 import DataGenerator from "#bzd/apps/artifacts/plugins/nodes/data_generator.mjs";
 import { Readable } from "stream";
-import Os from "os";
 
 const databaseTypes = {
 	influxdb: DatabaseInfluxDB,
@@ -135,13 +134,14 @@ export default class Plugin extends PluginBase {
 				// Set the default storages from the remotes options.
 				storages: [recordsMainStorageName, ...Object.keys(optionsSources)],
 				statistics: this.statistics,
+				locks: options.locks,
 			},
 			options["nodes.records"] || {},
 		);
 		const optionsDashboards = options["nodes.dashboards"] || [];
 		const routerDashboards = buildRouterForDashboards(optionsDashboards);
 
-		this.records = new RecordsDistributed(Os.hostname(), optionsRecords);
+		this.records = new RecordsDistributed(optionsRecords);
 		provider.addStartProcess("records.initialize", async () => {
 			let optionsNodes = {
 				cache: this.cache,
