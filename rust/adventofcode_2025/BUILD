@@ -1,0 +1,20 @@
+load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library")
+
+rust_library(
+    name = "utils",
+    srcs = ["utils.rs"],
+)
+
+[rust_binary(
+    name = name,
+    srcs = ["{}.rs".format(name)],
+    args = ["$(location :{}.txt)".format(name)],
+    data = [
+        ":{}.txt".format(name),
+    ],
+    deps = [
+        ":utils",
+    ],
+) for name in [
+    "day1",
+]]
