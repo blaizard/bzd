@@ -3,6 +3,7 @@
 
 import argparse
 import getpass
+import hashlib
 import os
 import pathlib
 import tempfile
@@ -167,7 +168,8 @@ class DevelopmentContainer:
 
 	@property
 	def namePrefix(self) -> str:
-		prefixList = [self.user]
+		pathHash = hashlib.md5(self.workspace.as_posix().encode()).hexdigest()[:10]
+		prefixList = [pathHash, self.user]
 		prefixList += [prefix for feature in self.features for prefix in feature.namePrefix]
 		return "-".join(prefixList)
 
