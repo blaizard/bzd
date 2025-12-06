@@ -219,7 +219,7 @@ if __name__ == "__main__":
 
 				for image in images:
 					print(f"=== Pushing {image} ====", flush=True)
-					ociPush(pathlib.Path(image), common.imageResolve(image), stdout=True, stderr=True, timeoutS=30 * 60)
+					ociPush(pathlib.Path(image), common.imageResolve(image), stdout=True, stderr=True, timeoutS=60 * 60)
 					# This asserts that the image is available in the registry and accessible by the docker client.
 					handle.command(["docker", "pull", common.imageResolve(image)])
 
