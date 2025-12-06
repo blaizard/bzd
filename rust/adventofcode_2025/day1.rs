@@ -69,7 +69,7 @@ fn part2(lines: &Vec<String>) {
 }
 
 fn main() {
-    let lines = arg1_to_vector();
+    let lines = arg1_to_vector('\n');
     part1(&lines);
     part2(&lines);
 }

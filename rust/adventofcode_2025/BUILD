@@ -17,4 +17,5 @@ rust_library(
     ],
 ) for name in [
     "day1",
+    "day2",
 ]]
