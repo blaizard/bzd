@@ -35,6 +35,7 @@ py_binary(
     srcs = [
         "reader.py",
     ],
+    visibility = ["//visibility:public"],
     deps = [
         "@bzd_python//bzd/utils:dict",
     ],
