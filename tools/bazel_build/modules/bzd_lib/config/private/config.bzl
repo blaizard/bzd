@@ -20,44 +20,45 @@ def _bzd_config_impl(ctx):
     args.add("--fail-on-conflict")
     args.add_all([keyValue for keyValue in ctx.attr.set_flag[BuildSettingInfo].value if keyValue] if ctx.attr.set_flag else [], before_each = "--override-set")
 
-    # Handle inline values.
-    for key, value in ctx.attr.values.items():
-        args.add_all("--value-at", [key, ctx.expand_location(value, targets = ctx.attr.data)])
-
-    # Handle files.
-    if ctx.attr.srcs:
-        args.add_all(ctx.files.srcs, before_each = "--src")
-        input_files = depset(ctx.files.srcs, transitive = [input_files])
-
-    # Handle files at a given key.
-    if ctx.attr.srcs_at:
-        for target, keys in ctx.attr.srcs_at.items():
-            for key in keys.split(","):
-                args.add_all("--src-at", [key, target.files.to_list()[0]])
-        input_files = depset(ctx.files.srcs_at, transitive = [input_files])
-
-    if ctx.attr.include_workspace_status:
-        workspace_status_files = [
-            ctx.info_file,
-            ctx.version_file,
-        ]
-        args.add_all(ctx.attr.include_workspace_status, before_each = "--workspace-status-key")
-        args.add_all(workspace_status_files, before_each = "--workspace-status-file")
-        input_files = depset(workspace_status_files, transitive = [input_files])
-
-    # Handle override with files.
-    if ctx.attr.file_flag and (ctx.attr.file_flag.label != Label("//config:empty")):
+    # Handle override with files, ignore all the other attribute if set.
+    if ctx.attr.override_flag and (ctx.attr.override_flag.label != Label("//config:empty")):
         override_files = []
-        if ConfigInfo in ctx.attr.file_flag:
-            override_files.append(ctx.attr.file_flag[ConfigInfo].internal)
-            runfiles = runfiles.merge(ctx.attr.file_flag[ConfigInfo].runfiles)
-            data = depset(transitive = [data, ctx.attr.file_flag[ConfigInfo].data])
-        elif ctx.files.file_flag:
-            override_files += ctx.files.file_flag
+        if ConfigInfo in ctx.attr.override_flag:
+            override_files.append(ctx.attr.override_flag[ConfigInfo].internal)
+            runfiles = runfiles.merge(ctx.attr.override_flag[ConfigInfo].runfiles)
+            data = depset(transitive = [data, ctx.attr.override_flag[ConfigInfo].data])
+        elif ctx.files.override_flag:
+            override_files += ctx.files.override_flag
         else:
-            fail("Invalid config override target type: {} {}".format(ctx.attr.file_flag.label))
+            fail("Invalid config override target type: {} {}".format(ctx.attr.override_flag.label))
         args.add_all(override_files, before_each = "--override-file")
         input_files = depset(override_files, transitive = [input_files])
+
+    else:
+        # Handle inline values.
+        for key, value in ctx.attr.values.items():
+            args.add_all("--value-at", [key, ctx.expand_location(value, targets = ctx.attr.data)])
+
+        # Handle files.
+        if ctx.attr.srcs:
+            args.add_all(ctx.files.srcs, before_each = "--src")
+            input_files = depset(ctx.files.srcs, transitive = [input_files])
+
+        # Handle files at a given key.
+        if ctx.attr.srcs_at:
+            for target, keys in ctx.attr.srcs_at.items():
+                for key in keys.split(","):
+                    args.add_all("--src-at", [key, target.files.to_list()[0]])
+            input_files = depset(ctx.files.srcs_at, transitive = [input_files])
+
+        if ctx.attr.include_workspace_status:
+            workspace_status_files = [
+                ctx.info_file,
+                ctx.version_file,
+            ]
+            args.add_all(ctx.attr.include_workspace_status, before_each = "--workspace-status-key")
+            args.add_all(workspace_status_files, before_each = "--workspace-status-file")
+            input_files = depset(workspace_status_files, transitive = [input_files])
 
     # Build the default configuration.
     internal = ctx.actions.declare_file("{}.internal".format(ctx.label))
@@ -104,10 +105,6 @@ _bzd_config = rule(
             doc = "Dependencies for this rule, will be added in the runfiles and used for target expansion.",
             allow_files = True,
         ),
-        "file_flag": attr.label(
-            doc = "Build settings to modify the configuration using files.",
-            allow_files = True,
-        ),
         "include_workspace_status": attr.string_list(
             doc = "Include the key/value pairs from the status information about the workspace, see --workspace_status_command.",
         ),
@@ -120,8 +117,12 @@ _bzd_config = rule(
         "output_yaml": attr.output(
             doc = "Create a yaml configuration.",
         ),
+        "override_flag": attr.label(
+            doc = "Build settings to override the configuration with another configuration.",
+            allow_files = True,
+        ),
         "set_flag": attr.label(
-            doc = "Build settings to modify the configuration using key/value pair.",
+            doc = "Build settings to modify the configuration using key/value pair, this will update the current configuration.",
             providers = [BuildSettingInfo],
         ),
         "srcs": attr.label_list(
@@ -171,7 +172,6 @@ bzd_config = macro(
     implementation = _bzd_config_macro_impl,
     inherit_attrs = _bzd_config,
     attrs = {
-        "file_flag": None,
         "output_json": attr.string(
             doc = "Name of the generated json configuration.",
             configurable = False,
@@ -184,6 +184,7 @@ bzd_config = macro(
             doc = "Name of the generated yaml configuration.",
             configurable = False,
         ),
+        "override_flag": None,
         "set_flag": None,
     },
 )
@@ -195,7 +196,7 @@ def _bzd_config_default_macro_impl(name, visibility, output_json, output_yaml, o
     )
 
     native.label_flag(
-        name = "{}.file".format(name),
+        name = "{}.override".format(name),
         build_setting_default = Label("//config:empty"),
     )
 
@@ -203,7 +204,7 @@ def _bzd_config_default_macro_impl(name, visibility, output_json, output_yaml, o
         name = name,
         visibility = visibility,
         set_flag = ":{}.set".format(name),
-        file_flag = ":{}.file".format(name),
+        override_flag = ":{}.override".format(name),
         output_json = output_json if output_json else "{}.json".format(name),
         output_yaml = output_yaml if output_yaml else "{}.yaml".format(name),
         output_py = output_py if output_py else "{}.py".format(name),
@@ -215,7 +216,6 @@ bzd_config_default = macro(
     implementation = _bzd_config_default_macro_impl,
     inherit_attrs = _bzd_config,
     attrs = {
-        "file_flag": None,
         "output_json": attr.string(
             doc = "Name of the generated json configuration.",
             configurable = False,
@@ -228,6 +228,7 @@ bzd_config_default = macro(
             doc = "Name of the generated yaml configuration.",
             configurable = False,
         ),
+        "override_flag": None,
         "set_flag": None,
     },
 )

@@ -60,7 +60,7 @@ bzd_config(
 bzd_diff_test(
     name = "_config_merge_override_test",
     file1 = ":config_merge.json",
-    file2 = "expected_config_merge_override.json",
+    file2 = "expected_config_override.json",
     format = "json",
     tags = ["manual"],
 )

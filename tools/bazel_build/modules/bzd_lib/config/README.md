@@ -24,7 +24,7 @@ bzd_config_default(
 To update the configuration from a file, use the following syntax:
 
 ```sh
-bazel build --//path:config.file=//somepath:update_config.json ...
+bazel build --//path:config.override=//somepath:new_config.json ...
 ```
 
 The file must have the following syntax:

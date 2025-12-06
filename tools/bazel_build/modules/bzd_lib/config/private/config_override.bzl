@@ -37,7 +37,7 @@ def make_bzd_config_apply(target = None, providers = None, configs = None, execu
         A tuple containing the macro to be used and an internal rule, the latter should not be used.
     """
 
-    _default_configs = [str(label.same_package_label("{}.file".format(label.name))) for label in configs or []]
+    _default_configs = [str(label.same_package_label("{}.override".format(label.name))) for label in configs or []]
 
     def _bzd_transition_config_override_impl(settings, attr):
         for key in ["config_overrides", "config_values"]:
@@ -52,7 +52,7 @@ def make_bzd_config_apply(target = None, providers = None, configs = None, execu
 
         # Apply the transitions and do some checks.
         for override, value in zip(attr.config_overrides, attr.config_values):
-            label = override.same_package_label("{}.file".format(override.name))
+            label = override.same_package_label("{}.override".format(override.name))
             label_str = str(label)
             if label_str not in settings.keys():
                 fail(
