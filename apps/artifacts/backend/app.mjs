@@ -37,7 +37,9 @@ const Exception = ExceptionFactory("backend");
 	}
 	Log.info("Preloaded {} application token(s).", Object.keys(config["tokens"] || {}).length);
 
-	const locks = new Locks(config.locks.path);
+	const locks = new Locks(config.locks.path, {
+		services: backend.services.makeProvider("locks"),
+	});
 	const statisticsPluginProvider = backend.statistics.makeProvider("plugins");
 
 	// Add initial volumes.

@@ -1,6 +1,7 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import Process from "#bzd/nodejs/core/services/process.mjs";
+import Provider from "#bzd/nodejs/core/services/provider.mjs";
 
 const Exception = ExceptionFactory("services");
 const Log = LogFactory("services");
@@ -236,6 +237,13 @@ export default class Services {
 
 		Log.info("Registering service '{}'.", uid);
 		return uid;
+	}
+
+	/// Create a provider and attach it to this server.
+	makeProvider(name = null) {
+		const provider = new Provider();
+		this.register(provider, name);
+		return provider;
 	}
 
 	/// Get the last error of a service/name pair.
