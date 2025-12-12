@@ -3,6 +3,7 @@
 
 import argparse
 import getpass
+import grp
 import hashlib
 import os
 import pathlib
@@ -134,7 +135,9 @@ class FeaturePlatform(Feature):
 class DevelopmentContainer:
 
 	def __init__(self, features: typing.Sequence[Feature], temporaryPath: pathlib.Path) -> None:
-		self.workspace = pathlib.Path(__file__).resolve().parent
+		# Do not resolve symlinks so that we can use symlinks to create multiple devcontainers
+		# from the same source file.
+		self.workspace = pathlib.Path(__file__).absolute().parent
 		self.cwd = pathlib.Path.cwd()
 		self.home = pathlib.Path.home()
 		self.temporaryPath = temporaryPath
@@ -168,8 +171,9 @@ class DevelopmentContainer:
 
 	@property
 	def namePrefix(self) -> str:
-		pathHash = hashlib.md5(self.workspace.as_posix().encode()).hexdigest()[:10]
-		prefixList = [pathHash, self.user]
+		pathHash = hashlib.md5(self.workspace.as_posix().encode()).hexdigest()[:6]
+		directory = self.workspace.name[-10:]
+		prefixList = [pathHash, directory, self.user]
 		prefixList += [prefix for feature in self.features for prefix in feature.namePrefix]
 		return "-".join(prefixList)
 
@@ -197,9 +201,14 @@ class DevelopmentContainer:
 			]
 		else:
 
-			groups = [str(self.gid), "sudo"] + [group for feature in self.features for group in feature.groups]
+			user_groups = {gid: grp.getgrgid(gid) for gid in os.getgrouplist(self.user, self.gid)}
+			groups = [str(gid) for gid in user_groups.keys()
+			          ] + ["sudo"] + [group for feature in self.features for group in feature.groups]
+			# Create all user groups if not existing.
 			instructions += [
-			    f"RUN groupadd -o --gid {self.gid} {self.user}",
+			    f"RUN getent group {gid} || groupadd -g {gid} '{name}'" for gid, name in user_groups.items()
+			]
+			instructions += [
 			    # Delete any existing user with the same uid if any.
 			    f"RUN id -u {self.uid} &>/dev/null && userdel -r $(id -un {self.uid}) || true",
 			    f"RUN useradd --create-home -d {self.home} --no-log-init --uid {self.uid} --gid {self.gid} --groups {','.join(groups)} {self.user}",
@@ -221,7 +230,8 @@ RUN apt install -y \
 	wget \
 	curl \
 	patchelf \
-	sudo
+	sudo \
+	build-essential
 
 RUN wget -O /usr/local/bin/bazel https://raw.githubusercontent.com/blaizard/bzd/refs/heads/master/tools/bazel && chmod +x /usr/local/bin/bazel
 
