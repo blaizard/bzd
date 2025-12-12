@@ -12,7 +12,7 @@ fn part1(ranges: &Vec<(u64, u64)>, ids: &Vec<u64>) {
         }
     }
 
-    println!("Part 2: {}", total);
+    println!("Part 1: {}", total);
 }
 
 fn part2(ranges: &Vec<(u64, u64)>) {
@@ -40,7 +40,7 @@ fn part2(ranges: &Vec<(u64, u64)>) {
 }
 
 fn main() {
-    let lines = arg1_to_vector('\n');
+    let lines = arg1_to_vector('\n', true);
     let index = lines.iter().position(|x| !x.contains('-')).unwrap();
     let ranges: Vec<(u64, u64)> = lines[0..index]
         .iter()

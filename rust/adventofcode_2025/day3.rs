@@ -71,7 +71,7 @@ fn part2(banks: &Vec<String>) {
 }
 
 fn main() {
-    let banks = arg1_to_vector('\n');
+    let banks = arg1_to_vector('\n', true);
     part1(&banks);
     part2(&banks);
 }

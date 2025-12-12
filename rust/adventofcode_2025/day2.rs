@@ -59,7 +59,7 @@ fn part2(ranges: &Vec<String>) {
 }
 
 fn main() {
-    let ranges = arg1_to_vector(',');
+    let ranges = arg1_to_vector(',', true);
     part1(&ranges);
     part2(&ranges);
 }

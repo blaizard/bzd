@@ -101,7 +101,7 @@ fn part2(bool_grid: &mut Vec<Vec<bool>>) {
 }
 
 fn main() {
-    let lines = arg1_to_vector('\n');
+    let lines = arg1_to_vector('\n', true);
     let mut bool_grid: Vec<Vec<bool>> = lines
         .iter()
         .map(|line| line.chars().map(|c| c == '@').collect())
