@@ -15,6 +15,7 @@ bzd_git_reset()
         git reset --hard $origin
         # Note: do not delete untracked files as they might be used (for local configuration for example).
         git clean -fd
+        git submodule foreach --recursive "git rest --hard && git clean -fd"
         git submodule update --init --recursive
     fi
 }
