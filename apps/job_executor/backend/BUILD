@@ -1,4 +1,15 @@
+load("@bzd_lib//config:defs.bzl", "bzd_config_default")
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_binary")
+
+bzd_config_default(
+    name = "config",
+    srcs = [
+        "config.default.json",
+    ],
+    visibility = [
+        "//deployment:__subpackages__",
+    ],
+)
 
 bzd_nodejs_binary(
     name = "backend",
@@ -6,6 +17,9 @@ bzd_nodejs_binary(
         "app.mjs",
         "args.mjs",
         "commands.mjs",
+        "executor.mjs",
+        "executor_docker.mjs",
+        ":config.json",
         "//apps/job_executor:jobs.json",
     ],
     apis = ["//apps/job_executor:api.v1.json"],
@@ -14,6 +28,7 @@ bzd_nodejs_binary(
         "$(rootpath //apps/job_executor/frontend).bundle",
     ],
     data = [
+        ":config",
         "//apps/job_executor/frontend",
     ],
     main = "app.mjs",
@@ -24,6 +39,8 @@ bzd_nodejs_binary(
         "//nodejs/core:exception",
         "//nodejs/core:filesystem",
         "//nodejs/core:log",
+        "//nodejs/utils:pathlib",
+        "//nodejs/utils:uid",
         "//nodejs/vue/apps:backend",
         "//nodejs/vue/components/form:backend",
         "//nodejs/vue/components/terminal/backend:command",

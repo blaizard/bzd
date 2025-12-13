@@ -72,7 +72,16 @@ export default class FileSystem {
 	/// Move a file from a location to another. Note pathFrom and pathTo
 	/// are the full path of the file including the file name.
 	static async move(pathFrom, pathTo) {
-		await Fs.promises.rename(pathFrom, pathTo);
+		try {
+			await Fs.promises.rename(pathFrom, pathTo);
+		} catch (error) {
+			if (error.code === "EXDEV") {
+				await Fs.promises.copyFile(pathFrom, pathTo);
+				await Fs.promises.unlink(pathFrom);
+			} else {
+				throw error;
+			}
+		}
 	}
 
 	/// Rename a file.

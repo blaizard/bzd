@@ -4,6 +4,9 @@ import Os from "os";
 const Exception = ExceptionFactory("pathlib");
 
 function _pathToArray(path) {
+	if (path instanceof Path) {
+		return path.path;
+	}
 	return path.split("/").filter(Boolean);
 }
 

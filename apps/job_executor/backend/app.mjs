@@ -5,9 +5,25 @@ import Jobs from "#bzd/apps/job_executor/jobs.json" with { type: "json" };
 import Args from "#bzd/apps/job_executor/backend/args.mjs";
 import Backend from "#bzd/nodejs/vue/apps/backend.mjs";
 import Commands from "#bzd/apps/job_executor/backend/commands.mjs";
+import FileSystem from "#bzd/nodejs/core/filesystem.mjs";
+import { makeUid } from "#bzd/nodejs/utils/uid.mjs";
+import pathlib from "#bzd/nodejs/utils/pathlib.mjs";
+import config from "#bzd/apps/job_executor/backend/config.json" with { type: "json" };
+import Executor from "#bzd/apps/job_executor/backend/executor.mjs";
+import ExecutorDocker from "#bzd/apps/job_executor/backend/executor_docker.mjs";
 
 const Exception = ExceptionFactory("backend");
 const Log = LogFactory("backend");
+
+function makeExecutor(root, schema) {
+	if ("command" in schema) {
+		return new Executor(root, schema);
+	}
+	if ("docker" in schema) {
+		return new ExecutorDocker(root, schema);
+	}
+	Exception.unreachable("Undefined executor for this job: {:j}", schema);
+}
 
 (async () => {
 	const backend = Backend.makeFromCli(process.argv)
@@ -18,12 +34,12 @@ const Log = LogFactory("backend");
 		.useForm()
 		.setup();
 
-	// Convert the raw form data to a more usable format.
-	//
-	// This function also converts the file inputs to their paths and returns a list of files.
-	function formDataToData(inputs, formData) {
+	const sandboxPath = pathlib.path("sandbox");
+	await FileSystem.rmdir(sandboxPath.asPosix(), { force: true });
+
+	// Convert the raw form data into relative data to the sandbox root.
+	async function formDataToSandbox(root, inputs, formData) {
 		let data = {};
-		let files = [];
 		for (const item of inputs) {
 			const key = item.name;
 			const type = item.type;
@@ -33,28 +49,50 @@ const Log = LogFactory("backend");
 			if (value !== undefined) {
 				switch (type) {
 					case "File":
-						data[key] = value.map((entry) => backend.form.getUploadFile(entry.file.path).path);
-						files = files.concat(data[key]);
+						const originalPaths = value.map((entry) => backend.form.getUploadFile(entry.file.path).path);
+						data[key] = [];
+						// Move all files into an input directory within the sandbox.
+						for (const originalPath of originalPaths) {
+							const relativePath = pathlib.path("inputs").joinPath(pathlib.path(originalPath).name).asPosix();
+							const path = pathlib.path(root).joinPath(relativePath);
+							await FileSystem.mkdir(path.parent.asPosix(), { force: true });
+							await FileSystem.move(originalPath, path.asPosix());
+							data[key].push(relativePath);
+						}
 						break;
 					default:
 						data[key] = value;
 				}
 			}
 		}
-		return [data, files];
+		return data;
 	}
 
 	let commands = new Commands();
 
 	backend.rest.handle("post", "/job/send", async (inputs) => {
 		Exception.assertPrecondition(inputs.id in Jobs, "Job id is not known: {}", inputs.id);
-		const job = Jobs[inputs.id];
-		const [data, files] = formDataToData(job.inputs, inputs.data);
-		const args = new Args(job.args, data);
-		const command = args.process();
-		const jobId = commands.make(inputs.id, job, command);
-		commands.execute(jobId);
-		Log.info("Executing job {} with arguments {:j}", jobId, command);
+		const schema = Jobs[inputs.id];
+		const jobId = commands.allocate();
+		const root = sandboxPath.joinPath("job-" + jobId).asPosix();
+		await FileSystem.mkdir(root, { force: true });
+
+		try {
+			const data = await formDataToSandbox(root, schema.inputs, inputs.data);
+			const args = new Args(schema.args, data);
+			const command = args.process();
+			commands.make(jobId, command);
+
+			const executor = makeExecutor(root, schema);
+			await commands.detach(executor, jobId);
+
+			Log.info("Executing job {} with arguments {:j}", jobId, command);
+		} catch (error) {
+			await FileSystem.rmdir(root, { force: true });
+			Log.error("Executing job {}", jobId);
+			throw error;
+		}
+
 		return {
 			job: jobId,
 		};
@@ -62,13 +100,13 @@ const Log = LogFactory("backend");
 
 	backend.rest.handle("get", "/jobs", async (inputs) => {
 		return {
-			jobs: commands.getAllInfo(),
+			jobs: await commands.getAllInfo(),
 			timestamp: Date.now(),
 		};
 	});
 
 	backend.rest.handle("delete", "/job/{id}", async (inputs) => {
-		commands.kill(inputs.id);
+		await commands.kill(inputs.id);
 		Log.info("Killing job {}", inputs.id);
 	});
 

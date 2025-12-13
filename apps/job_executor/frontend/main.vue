@@ -4,7 +4,6 @@
 		<table class="jobs">
 			<tr>
 				<th>Id</th>
-				<th>Type</th>
 				<th>Status</th>
 				<th>Duration</th>
 				<th>Arguments</th>
@@ -12,7 +11,6 @@
 			</tr>
 			<tr v-for="(info, jobId) in jobs" class="job">
 				<td class="job-id">{{ jobId }}</td>
-				<td class="type">{{ info.type }}</td>
 				<td class="status">{{ info.status }}</td>
 				<td class="duration">{{ getDuration(info.timestampStart, info.timestampStop) }}</td>
 				<td class="args">{{ info.args.join(" ") }}</td>

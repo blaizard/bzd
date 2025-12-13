@@ -1,4 +1,3 @@
-import Command from "#bzd/nodejs/vue/components/terminal/backend/command.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 
@@ -7,69 +6,61 @@ const Log = LogFactory("commands");
 
 export default class Commands {
 	constructor() {
-		this.commands = {};
+		this.contexts = {};
 		this.uid = 0;
 	}
 
-	/// Generate the command.
-	makeCliFromJob(schema, args) {
-		if ("command" in schema) {
-			return [schema["command"], ...args];
-		}
-		if ("docker" in schema) {
-			return ["docker", "run", "--rm", schema["docker"], ...args];
-		}
-		Exception.unreachable("Undefined command for this job: {:j}", schema);
+	/// Allocate a jobId for a command.
+	allocate() {
+		return ++this.uid;
 	}
 
 	/// Create a new command.
-	make(type, schema, args) {
-		const uid = ++this.uid;
-		const cliArgs = this.makeCliFromJob(schema, args);
-		const command = {
-			type: type,
-			command: new Command(cliArgs),
+	make(uid, args) {
+		Exception.assert(!(uid in this.contexts), "The uid '{}' is already in use.", uid);
+		const context = {
 			args: args,
+			executor: null,
 		};
-		this.commands[uid] = command;
-		return uid;
+		this.contexts[uid] = context;
 	}
 
 	get_(uid) {
-		Exception.assert(uid in this.commands, "Undefined job id '{}'.", uid);
-		return this.commands[uid];
+		Exception.assert(uid in this.contexts, "Undefined job id '{}'.", uid);
+		return this.contexts[uid];
 	}
 
 	/// Run a specific command.
-	execute(uid) {
-		this.get_(uid).command.execute();
+	async detach(executor, uid) {
+		const context = this.get_(uid);
+		Exception.assert(context.executor === null, "This uid '{}' has already been executed.", uid);
+		context.executor = executor;
+		await context.executor.initialize(context.args);
+		context.executor.execute().catch((_) => {});
 	}
 
 	/// Kill a specific command.
-	kill(uid) {
-		this.get_(uid).command.kill();
+	async kill(uid) {
+		await this.get_(uid).executor.kill();
 	}
 
-	getInfo(uid) {
-		const data = this.get_(uid);
+	async getInfo(uid) {
+		const context = this.get_(uid);
 		return Object.assign(
 			{
-				type: data.type,
-				args: data.args,
+				args: context.args,
 			},
-			data.command.getInfo(),
+			await context.executor.getInfo(),
 		);
 	}
 
-	getAllInfo() {
-		let jobs = {};
-		for (const uid of Object.keys(this.commands)) {
-			jobs[uid] = this.getInfo(uid);
-		}
-		return jobs;
+	async getAllInfo() {
+		const keys = Object.keys(this.contexts);
+		const infos = await Promise.all(keys.map((uid) => this.getInfo(uid)));
+		return Object.fromEntries(infos.map((info, index) => [keys[index], info]));
 	}
 
 	installCommandWebsocket(context, uid) {
-		this.get_(uid).command.installWebsocket(context);
+		this.get_(uid).executor.installWebsocket(context);
 	}
 }

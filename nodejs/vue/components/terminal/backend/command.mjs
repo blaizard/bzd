@@ -26,37 +26,42 @@ export default class Command {
 		this.timestampStop = null;
 	}
 
-	execute() {
-		this.timestampStart = Date.now();
-		this.status = Status.running;
-		this.process = spawn("nodejs/vue/components/terminal/backend/bin/terminal", this.command, {
-			stdio: ["pipe", "pipe", "pipe"],
-		});
+	async execute() {
+		return new Promise((resolve, reject) => {
+			this.timestampStart = Date.now();
+			this.status = Status.running;
+			this.process = spawn("nodejs/vue/components/terminal/backend/bin/terminal", this.command, {
+				stdio: ["pipe", "pipe", "pipe"],
+			});
 
-		this.process.stdout.on("data", (data) => {
-			const dataStr = data.toString();
-			this.addToOutput(dataStr);
-			this.event.trigger("data", dataStr);
-		});
-		this.process.stderr.on("data", (data) => {
-			const dataStr = data.toString();
-			this.addToOutput(dataStr);
-			this.event.trigger("data", dataStr);
-		});
-		this.process.on("close", (code) => {
-			this.timestampStop = Date.now();
-			if (typeof code === "number") {
-				if (code !== 0) {
-					this.status = Status.failed;
-					this.addToOutput("Failed with exit code: " + code + ".");
+			this.process.stdout.on("data", (data) => {
+				const dataStr = data.toString();
+				this.addToOutput(dataStr);
+				this.event.trigger("data", dataStr);
+			});
+			this.process.stderr.on("data", (data) => {
+				const dataStr = data.toString();
+				this.addToOutput(dataStr);
+				this.event.trigger("data", dataStr);
+			});
+			this.process.on("close", (code) => {
+				this.timestampStop = Date.now();
+				if (typeof code === "number") {
+					if (code !== 0) {
+						this.status = Status.failed;
+						this.addToOutput("Failed with exit code: " + code + ".");
+						reject("Failed with exit code: " + code + ".");
+					} else {
+						this.status = Status.completed;
+						resolve();
+					}
 				} else {
-					this.status = Status.completed;
+					this.status = Status.cancelled;
+					this.addToOutput("Cancelled.");
+					reject("Cancelled.");
 				}
-			} else {
-				this.status = Status.cancelled;
-				this.addToOutput("Cancelled.");
-			}
-			this.event.trigger("exit");
+				this.event.trigger("exit");
+			});
 		});
 	}
 
