@@ -8,7 +8,17 @@ const Log = LogFactory("backend", "executor-docker");
 
 export default class ExecutorDocker extends Executor {
 	async initialize(args) {
-		this.command = new Command(["docker", "run", "--rm", this.schema["docker"], ...args]);
+		this.command = new Command([
+			"docker",
+			"run",
+			"--rm",
+			"-v",
+			this.root + ":/sandbox",
+			"--workdir",
+			"/sandbox",
+			this.schema["docker"],
+			...args,
+		]);
 	}
 
 	async getInfo() {

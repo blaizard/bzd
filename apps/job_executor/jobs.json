@@ -10,10 +10,23 @@
                 "--key",
                 "{key}"
             ],
+            [
+                "{action}"
+            ],
             "{ebook}"
         ],
-        "docker": "blaizard/ebook:latest",
+        "docker": "local/image:latest",
         "inputs": [
+            {
+                "caption": "Action",
+                "list": [
+                    "pdf",
+                    "cover"
+                ],
+                "name": "action",
+                "type": "Dropdown",
+                "validation": "mandatory"
+            },
             {
                 "caption": "Ebook",
                 "max": 1,

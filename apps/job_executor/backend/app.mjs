@@ -34,7 +34,7 @@ function makeExecutor(root, schema) {
 		.useForm()
 		.setup();
 
-	const sandboxPath = pathlib.path("sandbox");
+	const sandboxPath = pathlib.path("sandbox").absolute();
 	await FileSystem.rmdir(sandboxPath.asPosix(), { force: true });
 
 	// Convert the raw form data into relative data to the sandbox root.

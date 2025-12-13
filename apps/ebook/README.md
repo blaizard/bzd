@@ -42,7 +42,9 @@ Also anything between 200 and 300 dpi is good.
 
 ## Docker
 
-### Use a new docker image
+### Use and push a new base docker image
+
+This is the image that will be used as a base for the application, this is NOT the application.
 
 ```bash
 docker build apps/ebook -t blaizard/ebook:latest
