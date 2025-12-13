@@ -7,11 +7,12 @@ load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
 _CC_SRCS_EXTENSIONS = (".c", ".cc", ".cpp", ".cxx", ".c++", ".C")
 _CC_HDRS_EXTENSIONS = (".h", ".hh", ".hpp", ".hxx", ".inc", ".inl", ".H")
 
-def _cc_config(ctx):
+def _cc_config(ctx, features = None):
     """Helper function to gather toolchain and feature config.
 
     Args:
         ctx: The rule context.
+        features: Additional features to enable.
 
     Returns:
         The cc_toolchain and feature_configuration
@@ -21,7 +22,7 @@ def _cc_config(ctx):
     feature_configuration = cc_common.configure_features(
         ctx = ctx,
         cc_toolchain = cc_toolchain,
-        requested_features = ctx.features,
+        requested_features = ctx.features + (features or []),
         unsupported_features = ctx.disabled_features,
     )
     return cc_toolchain, feature_configuration
@@ -105,10 +106,13 @@ def cc_link(ctx, name = None, hdrs = [], srcs = [], deps = [], map_analyzer = No
     if name == None:
         name = ctx.attr.name
 
-    cc_toolchain, feature_configuration = _cc_config(ctx)
+    cc_toolchain, feature_configuration = _cc_config(ctx, features = ["generate_linkmap"])
     _compilation_context, cc_outputs, cc_infos = _cc_compile(ctx, name, hdrs, srcs, deps)
 
-    map_file = ctx.actions.declare_file("{}.map".format(name))
+    map_file = None
+    if cc_common.is_enabled(feature_configuration = feature_configuration, feature_name = "generate_linkmap"):
+        map_file = ctx.actions.declare_file("{}.binary.map".format(name))
+
     linking_outputs = cc_common.link(
         name = name + ".binary",
         actions = ctx.actions,
@@ -116,14 +120,13 @@ def cc_link(ctx, name = None, hdrs = [], srcs = [], deps = [], map_analyzer = No
         cc_toolchain = cc_toolchain,
         compilation_outputs = cc_outputs,
         linking_contexts = [cc_info.linking_context for cc_info in cc_infos],
-        additional_outputs = [map_file],
-        user_link_flags = ["-Wl,-Map={}".format(map_file.path)],
+        additional_outputs = [map_file] if map_file else [],
     )
     binary_file = linking_outputs.executable
     metadata_files = []
 
     # Analyze the map file.
-    if map_analyzer:
+    if map_analyzer and map_file:
         metadata_file = ctx.actions.declare_file("{}.metadata.map".format(name))
         ctx.actions.run(
             inputs = [map_file, binary_file],

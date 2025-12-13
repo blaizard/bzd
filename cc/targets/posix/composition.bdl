@@ -1,0 +1,30 @@
+use "cc/components/generic/core/interface.bdl"
+use "cc/components/posix/stream/out/interface.bdl"
+use "cc/components/posix/stream/in/interface.bdl"
+use "cc/components/std/timer/steady_clock/interface.bdl"
+use "cc/components/std/clock/system_clock/interface.bdl"
+use "cc/components/posix/proactor/sync/interface.bdl"
+use "cc/components/posix/shmem/interface.bdl"
+use "cc/components/generic/executor_profiler/memory/interface.bdl"
+
+
+
+composition {
+	executorProfiler = bzd.components.generic.ExecutorProfilerMemory();
+	core = bzd.components.generic.Core();
+	// Re-enabled 2 cores. It fails with apps/trader.
+	executor = bzd.components.generic.Executor(cores = list(core), profiler = executorProfiler) [executor];
+	proactor = bzd.components.posix.sync.Proactor();
+	shmem = bzd.components.posix.Shmem("/hello");
+	
+}
+
+composition {
+	out: bzd.OStream = bzd.components.posix.Out(proactor = proactor);
+	in: bzd.IStream = bzd.components.posix.In(proactor = proactor);
+	timer: bzd.Timer = bzd.components.std.timer.SteadyClock();
+	clock: bzd.Clock = bzd.components.std.clock.SystemClock();
+	
+}
+
+

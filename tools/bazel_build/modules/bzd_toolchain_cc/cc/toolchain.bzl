@@ -123,8 +123,8 @@ def _impl(repository_ctx):
     for patch in repository_ctx.attr.patches:
         repository_ctx.patch(patch)
 
-_toolchain_maker_linux = repository_rule(
-    doc = "Linux specific implementation of the toolchain.",
+_toolchain_maker_unix = repository_rule(
+    doc = "Unix specific implementation of the toolchain.",
     implementation = _impl,
     attrs = {
         # Aliases
@@ -187,7 +187,7 @@ def toolchain_maker(name, implementation, definition):
             "link_flags": LINKOPTS_GCC,
         }, definition)
 
-        _toolchain_maker_linux(
+        _toolchain_maker_unix(
             name = name,
             **updated_definition
         )
@@ -202,7 +202,16 @@ def toolchain_maker(name, implementation, definition):
             "link_flags": LINKOPTS_CLANG,
         }, definition)
 
-        _toolchain_maker_linux(
+        _toolchain_maker_unix(
+            name = name,
+            **updated_definition
+        )
+
+    elif implementation == "osx_clang":
+        updated_definition = toolchain_merge({
+        }, definition)
+
+        _toolchain_maker_unix(
             name = name,
             **updated_definition
         )

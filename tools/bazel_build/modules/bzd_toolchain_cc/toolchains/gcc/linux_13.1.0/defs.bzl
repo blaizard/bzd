@@ -3,10 +3,11 @@
 load("//cc:toolchain.bzl", "toolchain_maker", "toolchain_merge")
 load("//toolchains/gcc:linux/defs.bzl", "linux")
 
-def linux_x86_64(name, use_fragment):
+def linux_x86_64(_module_ctx, name, use_fragment):
     """Metadata for Linux toolchains.
 
     Args:
+        _module_ctx: The context of the module.
         name: The name of the toolchain.
         use_fragment: Factory to make use of a fragment.
 

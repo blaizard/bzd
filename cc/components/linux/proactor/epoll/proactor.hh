@@ -23,7 +23,7 @@ public:
 	using posix::sync::Proactor::write;
 
 	template <class Context>
-	constexpr Proactor(Context&) noexcept
+	constexpr Proactor(Context& context) noexcept : posix::sync::Proactor{context}
 	{
 	}
 

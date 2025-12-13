@@ -1,7 +1,7 @@
 """Metadata for Clang toolchains."""
 
-def linux():
-    """Metadata for Linux toolchains.
+def unix():
+    """Metadata for Unix toolchains.
 
     Returns:
         The toolchain metadata.
@@ -23,8 +23,9 @@ def linux():
             "strip": "bin/llvm-strip",
         },
         "build_files": [
-            "@bzd_toolchain_cc//toolchains/clang:linux/linux.BUILD",
+            "@bzd_toolchain_cc//toolchains/clang:unix/unix.BUILD",
         ],
+        "compiler": "clang",
         "loads": {
             "@bzd_lib//:sh_binary_wrapper.bzl": ["sh_binary_wrapper"],
         },

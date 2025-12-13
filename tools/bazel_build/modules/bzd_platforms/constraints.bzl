@@ -15,8 +15,12 @@ AL_CONSTRAINTS = {
         "alias": Label("@platforms//os:linux"),
         "isa": ["arm64", "x86_64"],
     },
+    "osx": {
+        "alias": Label("@platforms//os:osx"),
+        "isa": ["arm64"],
+    },
     "posix": {
-        "children": ["linux"],
+        "children": ["linux", "osx"],
         "isa": [],
     },
 }

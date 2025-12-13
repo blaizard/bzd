@@ -7,10 +7,11 @@ load("//toolchains/esp_idf/esptool:defs.bzl", "esptool")
 load("//toolchains/esp_idf/openocd:defs.bzl", "esp32_openocd")
 load("//toolchains/esp_idf/qemu:defs.bzl", "esp32_qemu")
 
-def esp32s3_linux_x86_64(name, use_fragment):
+def esp32s3_linux_x86_64(_module_ctx, name, use_fragment):
     """Metadata for ESP32S3 toolchains.
 
     Args:
+        _module_ctx: The context of the module.
         name: The name of the toolchain.
         use_fragment: Factory to make use of a fragment.
     """
@@ -45,6 +46,7 @@ def esp32s3_linux_x86_64(name, use_fragment):
             # Needed for clang-tdy
             "-D__XTENSA__",
         ],
+        "compiler": "gcc",
         "cxx_flags": [
             "-std=c++20",
         ],

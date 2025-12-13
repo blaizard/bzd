@@ -27,10 +27,9 @@ filegroup(
         ":cc",
         ":ld",
         "bin/lld",
-        "bin/ld.lld",
         ":dynamic_libraries_files",
         ":static_libraries_files",
-    ]
+    ] + glob(["bin/*.lld"])
 )
 
 filegroup(

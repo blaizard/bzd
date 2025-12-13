@@ -338,7 +338,11 @@ bool installStackTrace()
 	stack_t signalStack{};
 	signalStack.ss_size = stack.size();
 	signalStack.ss_sp = stack.data();
-	bzd::assert::isTrue(sigaltstack(&signalStack, 0) != -1);
+	if (sigaltstack(&signalStack, 0) == -1)
+	{
+		::perror("sigaltstack");
+		bzd::assert::unreachable();
+	}
 
 	struct ::sigaction sa;
 	sigemptyset(&sa.sa_mask);

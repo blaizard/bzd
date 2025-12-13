@@ -15,6 +15,11 @@ namespace bzd::components::posix::sync {
 class Proactor : public bzd::components::posix::Proactor<Proactor>
 {
 public:
+	template <class Context>
+	constexpr Proactor(Context&) noexcept
+	{
+	}
+
 	/// Perform a synchronous write operation.
 	// NOLINTNEXTLINE(bugprone-exception-escape)
 	bzd::Async<> write(const FileDescriptor fd, const bzd::Span<const bzd::Byte> data) noexcept

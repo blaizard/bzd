@@ -175,7 +175,7 @@ def _toolchain_cc_impl(module_ctx):
         configs = _make_configs(name, toolchain.version)
         tools = {}
         for repo_name, config in configs.items():
-            result = config.factory(repo_name, use_fragment)
+            result = config.factory(module_ctx, repo_name, use_fragment)
             if result:
                 for target, actual in result.setdefault("tools", {}).items():
                     tools.setdefault(target, {})["@bzd_platforms//al_isa:{}".format(config.execution)] = "@{}//:{}".format(repo_name, actual)

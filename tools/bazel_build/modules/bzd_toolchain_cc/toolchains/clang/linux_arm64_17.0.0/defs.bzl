@@ -1,12 +1,13 @@
 """Metadata for Linux toolchains."""
 
 load("//cc:toolchain.bzl", "toolchain_maker", "toolchain_merge")
-load("//toolchains/clang:linux/defs.bzl", "linux")
+load("//toolchains/clang:unix/defs.bzl", "unix")
 
-def linux_arm64(name, use_fragment):
+def linux_arm64(_module_ctx, name, use_fragment):
     """Metadata for Linux toolchains.
 
     Args:
+        _module_ctx: The context of the module.
         name: The name of the toolchain.
         use_fragment: Factory to make use of a fragment.
 
@@ -14,7 +15,7 @@ def linux_arm64(name, use_fragment):
         The toolchain definition.
     """
 
-    _linux_name, linux_toolchain_definition = use_fragment(linux)
+    _unix_name, unix_toolchain_definition = use_fragment(unix)
 
     toolchain_definition = {
         "build_files": [
@@ -69,7 +70,7 @@ def linux_arm64(name, use_fragment):
         ],
     }
 
-    toolchain_definition = toolchain_merge(toolchain_definition, linux_toolchain_definition)
+    toolchain_definition = toolchain_merge(toolchain_definition, unix_toolchain_definition)
 
     toolchain_maker(
         name = name,

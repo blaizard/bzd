@@ -25,4 +25,5 @@ def linux():
         "build_files": [
             "@bzd_toolchain_cc//toolchains/gcc:linux/linux.BUILD",
         ],
+        "compiler": "gcc",
     }

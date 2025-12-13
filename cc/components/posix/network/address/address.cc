@@ -29,7 +29,7 @@ bzd::Result<Address, bzd::Error> Address::fromIpV4(const Protocol protocol,
 		return bzd::error::Errno("inet_pton");
 	}
 	storage.sin_family = AF_INET;
-	storage.sin_port = ::htons(port);
+	storage.sin_port = htons(port);
 
 	return address;
 }
@@ -52,7 +52,7 @@ bzd::Result<Address, bzd::Error> Address::fromIpV6(const Protocol protocol,
 		return bzd::error::Errno("inet_pton");
 	}
 	storage.sin6_family = AF_INET6;
-	storage.sin6_port = ::htons(port);
+	storage.sin6_port = htons(port);
 
 	return address;
 }
