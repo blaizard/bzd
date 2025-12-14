@@ -6,7 +6,7 @@ import sys
 import yaml
 
 from bzd.utils.dict import updateDeep, UpdatePolicy
-from config.reader import InternalFragmentList, InternalFragment, makeDictionary
+from config.reader import InternalFragmentList, InternalFragment, makeDictionary, internalToDictionary
 
 
 def fatal(message: str) -> None:
@@ -29,6 +29,10 @@ class Config:
 		self._addData(data, source, failOnConflict)
 		self.data.append((None, data, source))
 
+	def useBase(self, base: "Config") -> None:
+		self.data = [*base.data, *self.data]
+		self.dataAsDict = internalToDictionary(self.data)
+
 	def _addData(self, data: typing.Dict[str, typing.Any], source: str, failOnConflict: bool) -> None:
 		try:
 			updateDeep(self.dataAsDict,
@@ -36,14 +40,6 @@ class Config:
 			           policy=UpdatePolicy.raiseOnConflict if failOnConflict else UpdatePolicy.override)
 		except KeyError as e:
 			fatal(f"The key {e} from '{source}' was already defined by another base configuration.")
-
-
-def updateOutput(output: typing.Dict[str, typing.Any], data: typing.Dict[str, typing.Any],
-                 failOnConflict: bool) -> None:
-	try:
-		updateDeep(output, data, policy=UpdatePolicy.raiseOnConflict if failOnConflict else UpdatePolicy.override)
-	except KeyError as e:
-		fatal(f"The key {e} from '{f}' was already defined by another base configuration.")
 
 
 def dataFromPath(path: pathlib.Path) -> typing.Iterator[InternalFragment]:
@@ -74,16 +70,7 @@ def dataFromPath(path: pathlib.Path) -> typing.Iterator[InternalFragment]:
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Merge multiple JSON files together.")
 	parser.add_argument("--output", default=None, type=pathlib.Path, help="The output path of the JSON file.")
-	parser.add_argument("--fail-on-conflict",
-	                    dest="failOnConflict",
-	                    action="store_true",
-	                    help="Fail if there is a conflict while merging files with the same keys.")
-	parser.add_argument("--override-file",
-	                    dest="overrideFiles",
-	                    default=[],
-	                    action="append",
-	                    type=pathlib.Path,
-	                    help="file to be used for updating the config.")
+	parser.add_argument("--base", type=pathlib.Path, help="file to be used as a base.")
 	parser.add_argument("--override-set",
 	                    dest="overrideSets",
 	                    default=[],
@@ -162,12 +149,14 @@ if __name__ == "__main__":
 	for keyStr, value in args.values_at:
 		output.addKey(keyStr, value, source="values_at", failOnConflict=True)
 
-	# Overrides, can override existing keys.
+	# Base and overrides, can override existing keys.
 
 	# Apply the files.
-	for f in args.overrideFiles:
-		for key, value, source in dataFromPath(f):
-			output.addKey(key, value, source=source, failOnConflict=False)
+	if args.base:
+		base = Config()
+		for key, value, source in dataFromPath(args.base):
+			base.addKey(key, value, source=source, failOnConflict=False)
+		output.useBase(base)
 
 	# Apply the key value pairs.
 	for keyValue in args.overrideSets:

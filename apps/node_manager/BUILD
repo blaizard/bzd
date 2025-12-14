@@ -35,6 +35,7 @@ py_binary(
 
 bzd_config(
     name = "bootloader_config",
+    base = "//apps/bootloader:config.base",
     data = [
         ":node_manager",
     ],

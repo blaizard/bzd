@@ -61,8 +61,6 @@ def make_bzd_config_apply(target = None, providers = None, configs = None, execu
                         ",\n".join(["- " + s for s in settings.keys()]),
                     ),
                 )
-            if outputs[label_str] != Label("//config:empty"):
-                fail("The configuration '{}' is overwritten twice.".format(label_str))
             outputs[label_str] = value
 
         return outputs
