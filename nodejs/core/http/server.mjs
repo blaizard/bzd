@@ -405,7 +405,7 @@ export default class HttpServer {
 		if (options.type.indexOf("upload") != -1) {
 			let upload = Multer({
 				storage: this.storage,
-				limits: { fileSize: options.limit },
+				limits: { fileSize: options.limit || Infinity },
 			});
 			callbackList.unshift(upload.any());
 		}

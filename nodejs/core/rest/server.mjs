@@ -67,7 +67,7 @@ export default class RestServer extends Base {
 	}
 
 	/// Register a callback to handle a request
-	handle(method, endpoint, callback /*, options = {}*/) {
+	handle(method, endpoint, callback, options = {}) {
 		this._sanityCheck(method, endpoint);
 		const endpointOptions = this.schema[endpoint][method] || {};
 		const requestOptions = endpointOptions.request || {};
@@ -95,6 +95,10 @@ export default class RestServer extends Base {
 		let webOptions = {};
 		if ("type" in requestOptions) {
 			webOptions.type = [requestOptions.type];
+		}
+		// Set the upload limit
+		if ("limit" in options || "limit" in requestOptions) {
+			webOptions.limit = options.limit ?? requestOptions.limit;
 		}
 
 		// Create a wrapper to the callback

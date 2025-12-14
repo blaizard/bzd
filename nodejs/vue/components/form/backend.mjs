@@ -54,18 +54,25 @@ export default class Form {
 	installRest(api) {
 		Log.info("Installing 'Form' REST.");
 
-		api.handle("post", "/form/upload", async (inputs) => {
-			Exception.assert(inputs.files.length == 1, "There must be exactly 1 file uploaded: {:j}", inputs);
-			const originalPath = inputs.files[0];
-			Exception.assert(originalPath, "File to be uploaded, evaluates to null: {:j}", originalPath);
+		api.handle(
+			"post",
+			"/form/upload",
+			async (inputs) => {
+				Exception.assert(inputs.files.length == 1, "There must be exactly 1 file uploaded: {:j}", inputs);
+				const originalPath = inputs.files[0];
+				Exception.assert(originalPath, "File to be uploaded, evaluates to null: {:j}", originalPath);
 
-			// Move the file to the upload directory.
-			const name = makeUid() + "." + pathlib.path(originalPath).suffix;
-			const path = this.options.uploadDirectory.joinPath(name).asPosix();
-			await FileSystem.move(originalPath, path);
-			await this.addFile(name, path);
+				// Move the file to the upload directory.
+				const name = makeUid() + "." + pathlib.path(originalPath).suffix;
+				const path = this.options.uploadDirectory.joinPath(name).asPosix();
+				await FileSystem.move(originalPath, path);
+				await this.addFile(name, path);
 
-			return { path: name };
-		});
+				return { path: name };
+			},
+			{
+				limit: 0,
+			},
+		);
 	}
 }
