@@ -39,6 +39,7 @@ bzd_nodejs_binary(
         "//nodejs/core:exception",
         "//nodejs/core:filesystem",
         "//nodejs/core:log",
+        "//nodejs/db/storage:disk",
         "//nodejs/utils:pathlib",
         "//nodejs/utils:uid",
         "//nodejs/vue/apps:backend",

@@ -19,8 +19,10 @@ bzd_nodejs_web_binary(
     deps = [
         "//nodejs/core:exception",
         "//nodejs/core:log",
+        "//nodejs/db/storage:permissions",
         "//nodejs/utils:to_string",
         "//nodejs/vue/apps:frontend",
+        "//nodejs/vue/components/file_explorer",
         "//nodejs/vue/components/form",
         "//nodejs/vue/components/layout:component",
         "//nodejs/vue/components/terminal/frontend:websocket",

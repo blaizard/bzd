@@ -11,6 +11,7 @@ import pathlib from "#bzd/nodejs/utils/pathlib.mjs";
 import config from "#bzd/apps/job_executor/backend/config.json" with { type: "json" };
 import Executor from "#bzd/apps/job_executor/backend/executor.mjs";
 import ExecutorDocker from "#bzd/apps/job_executor/backend/executor_docker.mjs";
+import StorageDisk from "#bzd/nodejs/db/storage/disk.mjs";
 
 const Exception = ExceptionFactory("backend");
 const Log = LogFactory("backend");
@@ -36,6 +37,7 @@ function makeExecutor(root, schema) {
 
 	const sandboxPath = pathlib.path("sandbox").absolute();
 	await FileSystem.rmdir(sandboxPath.asPosix(), { force: true });
+	const storage = await StorageDisk.make(sandboxPath.asPosix());
 
 	// Convert the raw form data into relative data to the sandbox root.
 	async function formDataToSandbox(root, inputs, formData) {
@@ -117,6 +119,17 @@ function makeExecutor(root, schema) {
 	backend.rest.handle("delete", "/job/{id}", async (inputs) => {
 		await commands.kill(inputs.id);
 		Log.info("Killing job {}", inputs.id);
+	});
+
+	backend.rest.handle("post", "/files/{id}", async (inputs) => {
+		const pathList = ["job-" + inputs.id, ...inputs.path];
+		const maxOrPaging = "paging" in inputs ? inputs.paging : 50;
+		const result = await storage.list(pathList, maxOrPaging, /*includeMetadata*/ true);
+
+		return {
+			data: result.data(),
+			next: result.getNextPaging(),
+		};
 	});
 
 	backend.websocket.handle("/job/{id}", (context) => {

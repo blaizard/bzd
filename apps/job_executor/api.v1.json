@@ -1,5 +1,25 @@
 {
     "rest": {
+        "/files/{id}": {
+            "post": {
+                "documentation": "Get the file/directory list from a specific path.",
+                "request": {
+                    "type": "json",
+                    "validation": {
+                        "id": "",
+                        "paging": "",
+                        "path": "mandatory"
+                    }
+                },
+                "response": {
+                    "type": "json",
+                    "validation": {
+                        "data": "mandatory",
+                        "next": "mandatory"
+                    }
+                }
+            }
+        },
         "/job/send": {
             "post": {
                 "documentation": "Send a job to be processed.",
