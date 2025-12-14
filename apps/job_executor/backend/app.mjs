@@ -78,15 +78,24 @@ function makeExecutor(root, schema) {
 		await FileSystem.mkdir(root, { force: true });
 
 		try {
+			// Build the input data.
 			const data = await formDataToSandbox(root, schema.inputs, inputs.data);
-			const args = new Args(schema.args, data);
-			const command = args.process();
-			commands.make(jobId, command);
+			const makeArgs = (visitor) => {
+				const updatedData = Object.fromEntries(
+					Object.entries(data).map(([key, value]) => {
+						const item = schema.inputs.find((item) => item.name == key);
+						return [key, visitor(item.type || "unknown", value)];
+					}),
+				);
+				const args = new Args(schema.args, updatedData);
+				return args.process();
+			};
+			commands.make(jobId, makeArgs);
 
 			const executor = makeExecutor(root, schema);
 			await commands.detach(executor, jobId);
 
-			Log.info("Executing job {} with arguments {:j}", jobId, command);
+			Log.info("Executing job {}", jobId);
 		} catch (error) {
 			await FileSystem.rmdir(root, { force: true });
 			Log.error("Executing job {}", jobId);

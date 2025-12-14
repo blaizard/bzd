@@ -28,6 +28,10 @@ export default class Executor {
 		return this.command.getInfo();
 	}
 
+	visitorArgs(_type, arg) {
+		return arg;
+	}
+
 	installWebsocket(context) {
 		this.command.installWebsocket(context);
 	}

@@ -24,4 +24,12 @@ export default class ExecutorDocker extends Executor {
 	async getInfo() {
 		return this.command.getInfo();
 	}
+
+	visitorArgs(type, arg) {
+		switch (type) {
+			case "File":
+				return "/sandbox/" + arg;
+		}
+		return arg;
+	}
 }

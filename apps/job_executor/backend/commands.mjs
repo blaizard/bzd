@@ -16,10 +16,11 @@ export default class Commands {
 	}
 
 	/// Create a new command.
-	make(uid, args) {
+	make(uid, makeArgs) {
 		Exception.assert(!(uid in this.contexts), "The uid '{}' is already in use.", uid);
 		const context = {
-			args: args,
+			makeArgs: makeArgs,
+			args: [],
 			executor: null,
 		};
 		this.contexts[uid] = context;
@@ -35,6 +36,7 @@ export default class Commands {
 		const context = this.get_(uid);
 		Exception.assert(context.executor === null, "This uid '{}' has already been executed.", uid);
 		context.executor = executor;
+		context.args = context.makeArgs(context.executor.visitorArgs);
 		await context.executor.initialize(context.args);
 		context.executor.execute().catch((_) => {});
 	}
