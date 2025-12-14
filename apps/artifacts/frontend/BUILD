@@ -22,6 +22,7 @@ bzd_nodejs_web_binary(
         "//nodejs/db/storage:permissions",
         "//nodejs/vue:cache",
         "//nodejs/vue/apps:frontend",
+        "//nodejs/vue/components/file_explorer",
         "//nodejs/vue/components/form",
     ],
 )

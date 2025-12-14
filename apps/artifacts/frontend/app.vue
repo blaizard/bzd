@@ -2,9 +2,13 @@
 	<Application>
 		<template #content>
 			<div class="layout">
-				<div class="tree">
-					<Tree :key="refreshCounter" @item="handleItem" :show-path="showPath"></Tree>
-				</div>
+				<FileExplorer
+					class="tree"
+					:key="refreshCounter"
+					@item="handleItem"
+					:fetch="fetchPath"
+					:path="showPath"
+				></FileExplorer>
 				<div class="content">
 					<RouterComponent name="view" class="bzd-content" @show="handleShowPath"></RouterComponent>
 				</div>
@@ -16,14 +20,14 @@
 <script>
 	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
 	import Application from "#bzd/nodejs/vue/apps/application.vue";
-	import Tree from "./tree.vue";
+	import FileExplorer from "#bzd/nodejs/vue/components/file_explorer/file_explorer.vue";
 	import MenuEntry from "#bzd/nodejs/vue/components/menu/entry.vue";
 	import Utils from "#bzd/apps/artifacts/common/utils.mjs";
 
 	export default {
 		components: {
 			Application,
-			Tree,
+			FileExplorer,
 			MenuEntry,
 		},
 		directives: {
@@ -53,6 +57,9 @@
 			});
 		},
 		methods: {
+			async fetchPath(path) {
+				return await this.$cache.get("list", ...path);
+			},
 			handleItem(item) {
 				const key = item.path.concat([item.item.name]);
 				this.$router.dispatch("/view" + Utils.keyToPath(key));
@@ -90,7 +97,6 @@
 			width: 25%;
 			max-width: 400px;
 			margin-right: 15px;
-			padding: 10px;
 		}
 		.content {
 			flex: 1;

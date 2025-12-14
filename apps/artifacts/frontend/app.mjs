@@ -48,7 +48,6 @@ frontend.app.use(CachePlugin, {
 					}),
 				);
 			} while (next);
-			list.sort((a, b) => Intl.Collator().compare(a.name, b.name));
 
 			return list;
 		},

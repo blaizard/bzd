@@ -9,6 +9,7 @@
 			</div>
 			<div v-if="item.name in expanded && isAuthorized(item)" :key="item.name + '.expanded'">
 				<TreeDirectory
+					:fetch="fetch"
 					:path="makePath(item)"
 					:depth="depth + 1"
 					:showPath="showPath"
@@ -34,6 +35,7 @@
 			showPath: { type: Array, mandatory: false, default: () => [] },
 			path: { type: Array, mandatory: false, default: () => [] },
 			depth: { type: Number, mandatory: false, default: 0 },
+			fetch: { type: Function, mandatory: true },
 		},
 		directives: {
 			loading: DirectiveLoading,
@@ -75,7 +77,7 @@
 			async fetchPath() {
 				try {
 					await this.handleSubmit(async () => {
-						this.list = await this.$cache.get("list", ...this.path);
+						this.list = await this.fetch(this.path);
 						// Set directories first.
 						this.list.sort((a, b) => {
 							const isAList = this.isPermissionList(a);
@@ -86,7 +88,7 @@
 								}
 								return 1;
 							}
-							return 0;
+							return Intl.Collator().compare(a.name, b.name);
 						});
 						this.updateExpand();
 					}, /*throwOnError*/ true);
