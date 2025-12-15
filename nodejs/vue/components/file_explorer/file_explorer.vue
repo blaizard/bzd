@@ -1,6 +1,6 @@
 <template>
 	<div class="file-explorer">
-		<Tree :fetch="fetch" :show-path="path" @item="handleEventPropagation('item', $event)"></Tree>
+		<Tree :fetch="fetch" :show-path="path" @item="handleEventPropagation('item', $event)" :metadata="metadata"></Tree>
 	</div>
 </template>
 
@@ -14,6 +14,7 @@
 		props: {
 			path: { type: Array, mandatory: false, default: () => [] },
 			fetch: { type: Function, mandatory: true },
+			metadata: { type: Boolean, default: false },
 		},
 		emits: ["item"],
 		methods: {

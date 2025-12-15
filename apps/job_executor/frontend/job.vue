@@ -3,7 +3,7 @@
 		<h1>Job {{ job }}</h1>
 		<TerminalWebsocket :websocket-endpoint="websocketEndpoint" style="height: 600px"></TerminalWebsocket>
 		<h2>Files</h2>
-		<FileExplorer class="files" :fetch="fetchPath"></FileExplorer>
+		<FileExplorer class="files" :fetch="fetchPath" :metadata="true"></FileExplorer>
 	</div>
 </template>
 

@@ -9,9 +9,10 @@ def _from_attr_to_config_info(ctx, attr):
     if ConfigInfo in attr:
         return [attr[ConfigInfo].internal, attr[ConfigInfo].runfiles, attr[ConfigInfo].data]
     elif attr[DefaultInfo].files:
-        if len(attr[DefaultInfo].files.to_list()) != 1:
+        all_files = attr[DefaultInfo].files.to_list()
+        if len(all_files) != 1:
             fail("There must be exactly 1 config: {}".format(attr.label))
-        return [attr[DefaultInfo].files, ctx.runfiles(), depset()]
+        return [all_files[0], ctx.runfiles(), depset()]
     else:
         fail("Invalid config override target type: {}".format(attr.label))
 
@@ -146,6 +147,7 @@ _bzd_config_update = rule(
     doc = "Update an existing configuration, this is needed to support overrides.",
     attrs = {
         "base": attr.label(
+            allow_files = True,
             doc = "Base configuration to update.",
         ),
         "set_flag": attr.label(

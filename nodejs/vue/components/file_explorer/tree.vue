@@ -2,9 +2,15 @@
 	<div class="container" v-loading="loading">
 		<template v-for="item in list" :key="item.name">
 			<div @click="isAuthorized(item) && handleExpand(item)" :class="getClass(item)">
-				<i v-if="!isAuthorized(item)" class="bzd-icon-lock icon"></i>
-				<i v-if="isPermissionList(item)" class="bzd-icon-folder icon"></i>
-				<span class="name" @click.stop="isAuthorized(item) && handleSelect(item)">{{ item.name }}</span>
+				<span class="item-container" @click.stop="isAuthorized(item) && handleSelect(item)">
+					<span v-for="(key, index) in innerItemListSortedKeys" :key="key" class="attribute">
+						<template v-if="index == 0">
+							<i v-if="!isAuthorized(item)" class="bzd-icon-lock icon"></i>
+							<i v-if="isPermissionList(item)" class="bzd-icon-folder icon"></i>
+						</template>
+						{{ key in item ? displayValue(key, item[key]) : "" }}
+					</span>
+				</span>
 				<span class="actions" @click.stop=""> </span>
 			</div>
 			<div v-if="item.name in expanded && isAuthorized(item)" :key="item.name + '.expanded'">
@@ -13,13 +19,14 @@
 					:path="makePath(item)"
 					:depth="depth + 1"
 					:showPath="showPath"
+					:metadata="metadata"
 					class="indent"
 					@item="handleItemPropagation(item.name, $event)"
 				></TreeDirectory>
 			</div>
 		</template>
 		<div v-if="isError" class="error">{{ error }}</div>
-		<div v-if="loading" class="loading">&nbsp;</div>
+		<div v-if="loading" class="loading">...</div>
 		<div v-else-if="isEmpty">&lt;empty&gt;</div>
 	</div>
 </template>
@@ -27,6 +34,7 @@
 <script>
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
 	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.mjs";
+	import { bytesToString } from "#bzd/nodejs/utils/to_string.mjs";
 
 	export default {
 		mixins: [Component],
@@ -36,6 +44,7 @@
 			path: { type: Array, mandatory: false, default: () => [] },
 			depth: { type: Number, mandatory: false, default: 0 },
 			fetch: { type: Function, mandatory: true },
+			metadata: { type: Boolean, default: false },
 		},
 		directives: {
 			loading: DirectiveLoading,
@@ -72,8 +81,42 @@
 				}
 				return false;
 			},
+			/// Return the keys for the entries within the current list (directory).
+			innerItemListSortedKeys() {
+				const sortStrategy = (key1, key2) => {
+					const firsts = ["name", "type", "size", "permissions", "modified", "created"];
+					const pos1 = firsts.indexOf(key1);
+					const pos2 = firsts.indexOf(key2);
+					if (pos1 == -1 && pos2 == -1) {
+						return key1.localeCompare(key2);
+					}
+					if (pos1 == -1) {
+						return 1;
+					}
+					if (pos2 == -1) {
+						return -1;
+					}
+					return pos1 < pos2 ? -1 : 1;
+				};
+				let keys = new Set();
+				for (const item of this.list) {
+					Object.keys(item).forEach((key) => {
+						keys.add(key);
+					});
+				}
+				const keyList = Array.from(keys);
+				return keyList.sort(sortStrategy).slice(0, this.metadata ? 5 : 1);
+			},
 		},
 		methods: {
+			displayValue(key, value) {
+				switch (key) {
+					case "size":
+						return bytesToString(value);
+					default:
+						return value;
+				}
+			},
 			async fetchPath() {
 				try {
 					await this.handleSubmit(async () => {
@@ -99,6 +142,7 @@
 			getClass(item) {
 				return {
 					entry: true,
+					metadata: this.metadata,
 					child: this.depth > 0,
 					expandable: this.isPermissionList(item),
 					expanded: item.name in this.expanded,
@@ -216,9 +260,67 @@
 				margin-right: #{$arrowSize}px;
 			}
 
-			&:hover {
-				.name {
-					opacity: 0.7;
+			.item-container {
+				&:hover {
+					.attribute {
+						opacity: 0.7;
+					}
+				}
+
+				.attribute {
+					display: inline-block;
+				}
+			}
+
+			&.metadata {
+				.item-container {
+					container-type: inline-size;
+
+					// By max 5 elements.
+					.attribute {
+						overflow: hidden;
+						text-overflow: ellipsis;
+						width: 20%;
+					}
+					.attribute:nth-child(n + 6) {
+						display: none;
+					}
+					@container (max-width: 999px) {
+						// Print 4 elements.
+						.attribute {
+							width: 25%;
+						}
+						.attribute:nth-child(n + 5) {
+							display: none;
+						}
+					}
+					@container (max-width: 799px) {
+						// Print 3 elements.
+						.attribute {
+							width: 33%;
+						}
+						.attribute:nth-child(n + 4) {
+							display: none;
+						}
+					}
+					@container (max-width: 599px) {
+						// Print 2 elements.
+						.attribute {
+							width: 50%;
+						}
+						.attribute:nth-child(n + 3) {
+							display: none;
+						}
+					}
+					@container (max-width: 399px) {
+						// Print 1 element.
+						.attribute {
+							width: 100%;
+						}
+						.attribute:nth-child(n + 2) {
+							display: none;
+						}
+					}
 				}
 			}
 

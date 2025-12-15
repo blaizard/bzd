@@ -8,6 +8,7 @@
 					@item="handleItem"
 					:fetch="fetchPath"
 					:path="showPath"
+					:metadata="false"
 				></FileExplorer>
 				<div class="content">
 					<RouterComponent name="view" class="bzd-content" @show="handleShowPath"></RouterComponent>

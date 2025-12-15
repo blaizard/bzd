@@ -13,6 +13,7 @@ bzd_nodejs_library(
         "//nodejs/core:exception",
         "//nodejs/core:log",
         "//nodejs/db/storage:permissions",
+        "//nodejs/utils:to_string",
         "//nodejs/vue/components/layout:component",
         "//nodejs/vue/directives:loading",
     ],

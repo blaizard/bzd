@@ -70,6 +70,7 @@ pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
         extra_pip_args = [
             "--platform",
             platform,
+            "--only-binary=:all:",
         ],
         hub_name = name,
         python_version = "3.12",
