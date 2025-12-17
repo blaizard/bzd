@@ -16,5 +16,6 @@ bzd_nodejs_library(
         "//nodejs/utils:to_string",
         "//nodejs/vue/components/layout:component",
         "//nodejs/vue/directives:loading",
+        "//nodejs/vue/directives:tooltip",
     ],
 )
