@@ -8,8 +8,8 @@
 		<Tree
 			:key="refreshCounter"
 			:fetch="fetch"
-			:show-path="path"
-			@item="handleEventPropagation('item', $event)"
+			:show-path="path ?? currentPath"
+			@item="handleItem"
 			:metadata="metadata"
 		></Tree>
 	</div>
@@ -27,19 +27,21 @@
 			tooltip: DirectiveTooltip,
 		},
 		props: {
-			path: { type: Array, mandatory: false, default: () => [] },
+			path: { type: Array, mandatory: false, default: null },
 			fetch: { type: Function, mandatory: true },
 			metadata: { type: Boolean, default: false },
 		},
 		data: function () {
 			return {
 				refreshCounter: 0,
+				currentPath: [],
 			};
 		},
 		emits: ["item"],
 		methods: {
-			handleEventPropagation(name, event) {
-				this.$emit(name, event);
+			handleItem(item) {
+				this.currentPath = [...item.path, item.item.name];
+				this.$emit("item", item);
 			},
 			refresh() {
 				++this.refreshCounter;
