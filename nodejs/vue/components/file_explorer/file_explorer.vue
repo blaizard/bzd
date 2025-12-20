@@ -9,6 +9,7 @@
 			<Tree
 				:key="refreshCounter"
 				:fetch="fetch"
+				:download="download"
 				:show-path="path ?? currentPath"
 				@item="handleItem"
 				:metadata="metadata"
@@ -29,8 +30,9 @@
 			tooltip: DirectiveTooltip,
 		},
 		props: {
-			path: { type: Array, mandatory: false, default: null },
+			path: { type: Array, default: null },
 			fetch: { type: Function, mandatory: true },
+			download: { type: Function, default: null },
 			metadata: { type: Boolean, default: false },
 		},
 		data: function () {

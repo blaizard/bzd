@@ -12,6 +12,7 @@ import config from "#bzd/apps/job_executor/backend/config.json" with { type: "js
 import Executor from "#bzd/apps/job_executor/backend/executor.mjs";
 import ExecutorDocker from "#bzd/apps/job_executor/backend/executor_docker.mjs";
 import StorageDisk from "#bzd/nodejs/db/storage/disk.mjs";
+import { FileNotFoundError } from "#bzd/nodejs/db/storage/storage.mjs";
 
 const Exception = ExceptionFactory("backend");
 const Log = LogFactory("backend");
@@ -121,16 +122,47 @@ function makeExecutor(root, schema) {
 		Log.info("Killing job {}", inputs.id);
 	});
 
-	backend.rest.handle("post", "/files/{id}", async (inputs) => {
-		const pathList = ["job-" + inputs.id, ...inputs.path];
-		const maxOrPaging = "paging" in inputs ? inputs.paging : 50;
-		const result = await storage.list(pathList, maxOrPaging, /*includeMetadata*/ true);
+	backend.rest.handle("post", "/files/{id}", async function (inputs) {
+		try {
+			const pathList = ["job-" + inputs.id, ...inputs.path];
+			const maxOrPaging = "paging" in inputs ? inputs.paging : 50;
+			const result = await storage.list(pathList, maxOrPaging, /*includeMetadata*/ true);
 
-		return {
-			data: result.data(),
-			next: result.getNextPaging(),
-		};
+			return {
+				data: result.data(),
+				next: result.getNextPaging(),
+			};
+		} catch (e) {
+			if (e instanceof FileNotFoundError) {
+				throw this.httpError(404, "Not Found");
+			}
+			throw e;
+		}
 	});
+
+	backend.rest.handle(
+		"get",
+		"/file/{id}",
+		async function (inputs) {
+			try {
+				const pathList = ["job-" + inputs.id, ...inputs.path.split("/")];
+				const metadata = await storage.metadata(pathList);
+				if (metadata.size) {
+					this.setHeader("Content-Length", metadata.size);
+				}
+				this.setHeader("Content-Disposition", 'attachment; filename="' + encodeURI(metadata.name) + '"');
+				return await storage.read(pathList);
+			} catch (e) {
+				if (e instanceof FileNotFoundError) {
+					throw this.httpError(404, "Not Found");
+				}
+				throw e;
+			}
+		},
+		{
+			timeoutS: 10 * 60, // 10min timeout
+		},
+	);
 
 	backend.websocket.handle("/job/{id}", (context) => {
 		const jobId = context.getParam("id");

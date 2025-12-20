@@ -3,7 +3,7 @@
 		<h1>Job {{ job }}</h1>
 		<TerminalWebsocket :websocket-endpoint="websocketEndpoint" style="height: 600px"></TerminalWebsocket>
 		<h2>Files</h2>
-		<FileExplorer class="files" :fetch="fetchPath" :metadata="true"></FileExplorer>
+		<FileExplorer class="files" :fetch="fetchPath" :download="download" :metadata="true"></FileExplorer>
 	</div>
 </template>
 
@@ -54,6 +54,10 @@
 					);
 				} while (next);
 				return list;
+			},
+			download(pathList) {
+				window.location =
+					this.$rest.getEndpoint("/file/" + this.job) + "?path=" + encodeURIComponent(pathList.join("/"));
 			},
 		},
 	};

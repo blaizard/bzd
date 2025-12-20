@@ -1,5 +1,20 @@
 {
     "rest": {
+        "/file/{id}": {
+            "get": {
+                "documentation": "Retrieve the content of a specific file.",
+                "request": {
+                    "type": "query",
+                    "validation": {
+                        "id": "",
+                        "path": "mandatory"
+                    }
+                },
+                "response": {
+                    "type": "file"
+                }
+            }
+        },
         "/files/{id}": {
             "post": {
                 "documentation": "Get the file/directory list from a specific path.",

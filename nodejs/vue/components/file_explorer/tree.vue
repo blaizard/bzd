@@ -11,7 +11,16 @@
 				<span class="name-content">
 					<i v-if="!isAuthorized(item)" class="bzd-icon-lock icon"></i>
 					<i v-if="isPermissionList(item)" class="bzd-icon-folder icon"></i>
-					{{ displayValue("name", item["name"]) }}
+					<a
+						v-if="Boolean(download) && !isPermissionList(item)"
+						@click="download([...path, item.name])"
+						v-tooltip="{ type: 'text', data: 'Download ' + item.name }"
+					>
+						{{ item["name"] }}
+					</a>
+					<template v-else>
+						{{ item["name"] }}
+					</template>
 				</span>
 			</div>
 			<div v-for="key in innerItemListSortedKeys.slice(1)" v-if="!isPermissionList(item)" class="attribute">
@@ -25,6 +34,7 @@
 				:depth="depth + 1"
 				:showPath="showPath"
 				:metadata="metadata"
+				:download="download"
 				@item="handleItemPropagation(item.name, $event)"
 			></TreeDirectory>
 		</template>
@@ -34,6 +44,7 @@
 <script>
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
 	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.mjs";
+	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
 	import { bytesToString } from "#bzd/nodejs/utils/to_string.mjs";
 
 	export default {
@@ -45,9 +56,11 @@
 			depth: { type: Number, mandatory: false, default: 0 },
 			fetch: { type: Function, mandatory: true },
 			metadata: { type: Boolean, default: false },
+			download: { type: Function, default: null },
 		},
 		directives: {
 			loading: DirectiveLoading,
+			tooltip: DirectiveTooltip,
 		},
 		emits: ["item"],
 		data: function () {
@@ -228,6 +241,10 @@
 			position: relative;
 			margin-left: #{$arrowSize * 2}px;
 			padding-left: #{$arrowSize * 2}px;
+
+			.icon {
+				margin-right: 5px;
+			}
 		}
 
 		// Vertical line for child items.
