@@ -1,34 +1,34 @@
 <template>
-	<div class="container" v-loading="loading">
-		<template v-for="item in list" :key="item.name">
-			<div @click="isAuthorized(item) && handleExpand(item)" :class="getClass(item)">
-				<span class="item-container" @click.stop="isAuthorized(item) && handleSelect(item)">
-					<span v-for="(key, index) in innerItemListSortedKeys" :key="key" class="attribute">
-						<template v-if="index == 0">
-							<i v-if="!isAuthorized(item)" class="bzd-icon-lock icon"></i>
-							<i v-if="isPermissionList(item)" class="bzd-icon-folder icon"></i>
-						</template>
-						{{ key in item ? displayValue(key, item[key]) : "" }}
-					</span>
-				</span>
-				<span class="actions" @click.stop=""> </span>
-			</div>
-			<div v-if="item.name in expanded && isAuthorized(item)" :key="item.name + '.expanded'">
-				<TreeDirectory
-					:fetch="fetch"
-					:path="makePath(item)"
-					:depth="depth + 1"
-					:showPath="showPath"
-					:metadata="metadata"
-					class="indent"
-					@item="handleItemPropagation(item.name, $event)"
-				></TreeDirectory>
-			</div>
-		</template>
-		<div v-if="isError" class="error">{{ error }}</div>
-		<div v-if="loading" class="loading">...</div>
-		<div v-else-if="isEmpty">&lt;empty&gt;</div>
+	<div v-if="loading" v-loading="loading" class="entry">
+		<div class="name attribute" :style="styleName">...</div>
 	</div>
+	<div v-else-if="isEmpty" class="entry">
+		<div class="name attribute" :style="styleName"><span class="name-content">&lt;empty&gt;</span></div>
+	</div>
+	<template v-else v-for="item in list" :key="item.name">
+		<div @click="isAuthorized(item) && handleSelect(item)" :class="getClass(item)">
+			<div class="name attribute" :style="styleName">
+				<span class="name-content">
+					<i v-if="!isAuthorized(item)" class="bzd-icon-lock icon"></i>
+					<i v-if="isPermissionList(item)" class="bzd-icon-folder icon"></i>
+					{{ displayValue("name", item["name"]) }}
+				</span>
+			</div>
+			<div v-for="key in innerItemListSortedKeys.slice(1)" v-if="!isPermissionList(item)" class="attribute">
+				{{ key in item ? displayValue(key, item[key]) : "" }}
+			</div>
+		</div>
+		<template v-if="item.name in expanded && isAuthorized(item)" :key="item.name + '.expanded'">
+			<TreeDirectory
+				:fetch="fetch"
+				:path="makePath(item)"
+				:depth="depth + 1"
+				:showPath="showPath"
+				:metadata="metadata"
+				@item="handleItemPropagation(item.name, $event)"
+			></TreeDirectory>
+		</template>
+	</template>
 </template>
 
 <script>
@@ -54,7 +54,6 @@
 			return {
 				list: [],
 				expanded: {},
-				error: null,
 			};
 		},
 		mounted() {
@@ -69,9 +68,6 @@
 			},
 		},
 		computed: {
-			isError() {
-				return this.error !== null;
-			},
 			isEmpty() {
 				return !this.loading && this.list.length == 0;
 			},
@@ -107,6 +103,11 @@
 				const keyList = Array.from(keys);
 				return keyList.sort(sortStrategy).slice(0, this.metadata ? 5 : 1);
 			},
+			styleName() {
+				return {
+					"padding-left": 20 * this.depth + "px",
+				};
+			},
 		},
 		methods: {
 			displayValue(key, value) {
@@ -118,26 +119,22 @@
 				}
 			},
 			async fetchPath() {
-				try {
-					await this.handleSubmit(async () => {
-						this.list = await this.fetch(this.path);
-						// Set directories first.
-						this.list.sort((a, b) => {
-							const isAList = this.isPermissionList(a);
-							const isBList = this.isPermissionList(b);
-							if (isAList != isBList) {
-								if (isAList) {
-									return -1;
-								}
-								return 1;
+				await this.handleSubmit(async () => {
+					this.list = await this.fetch(this.path);
+					// Set directories first.
+					this.list.sort((a, b) => {
+						const isAList = this.isPermissionList(a);
+						const isBList = this.isPermissionList(b);
+						if (isAList != isBList) {
+							if (isAList) {
+								return -1;
 							}
-							return Intl.Collator().compare(a.name, b.name);
-						});
-						this.updateExpand();
-					}, /*throwOnError*/ true);
-				} catch (e) {
-					this.error = e;
-				}
+							return 1;
+						}
+						return Intl.Collator().compare(a.name, b.name);
+					});
+					this.updateExpand();
+				});
 			},
 			getClass(item) {
 				return {
@@ -172,7 +169,7 @@
 				const maybeItem = this.list.find((item) => item.name == name);
 				return maybeItem || null;
 			},
-			handleExpand(item) {
+			handleSelect(item) {
 				const name = item.name;
 				if (name in this.expanded) {
 					delete this.expanded[name];
@@ -185,18 +182,6 @@
 						this.expanded[name] = true;
 					}
 				}
-			},
-			handleSelect(item) {
-				const name = item.name;
-				if (!(name in this.expanded)) {
-					if (this.isPermissionList(item)) {
-						this.expanded[name] = true;
-					}
-				}
-				this.$emit("item", {
-					item: item,
-					path: [],
-				});
 			},
 			handleItemPropagation(name, item) {
 				item.path.unshift(name);
@@ -223,125 +208,45 @@
 	$arrowOffsetY: math.div($lineHeight, 2);
 	$lineColor: config.$bzdGraphColorGray;
 
-	.indent {
-		padding-left: #{$indent}px;
+	.entry {
+		display: table-row;
 		position: relative;
-		&:after {
-			position: absolute;
-			content: "";
-			border-left: 1px dotted $lineColor;
-			left: 0;
-			top: 0;
-			bottom: #{$lineHeight - $arrowOffsetY - 1}px;
-		}
-	}
 
-	.container {
-		font-size: #{$fontSize}px;
-		line-height: #{$lineHeight}px;
-
-		.error {
-			color: config.$bzdGraphColorRed;
-			white-space: nowrap;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			&:hover {
-				white-space: pre-wrap;
-			}
-		}
-
-		.entry {
-			position: relative;
-			padding-left: #{$arrowSize * 2}px;
+		.attribute {
+			display: table-cell;
 			white-space: nowrap;
 			cursor: pointer;
-
-			.icon {
-				margin-right: #{$arrowSize}px;
+			padding-right: 20px;
+		}
+		&:hover {
+			.attribute {
+				opacity: 0.7;
 			}
+		}
 
-			.item-container {
-				&:hover {
-					.attribute {
-						opacity: 0.7;
-					}
-				}
+		.name-content {
+			position: relative;
+			margin-left: #{$arrowSize * 2}px;
+			padding-left: #{$arrowSize * 2}px;
+		}
 
-				.attribute {
-					display: inline-block;
-				}
-			}
-
-			&.metadata {
-				.item-container {
-					container-type: inline-size;
-
-					// By max 5 elements.
-					.attribute {
-						overflow: hidden;
-						text-overflow: ellipsis;
-						width: 20%;
-					}
-					.attribute:nth-child(n + 6) {
-						display: none;
-					}
-					@container (max-width: 999px) {
-						// Print 4 elements.
-						.attribute {
-							width: 25%;
-						}
-						.attribute:nth-child(n + 5) {
-							display: none;
-						}
-					}
-					@container (max-width: 799px) {
-						// Print 3 elements.
-						.attribute {
-							width: 33%;
-						}
-						.attribute:nth-child(n + 4) {
-							display: none;
-						}
-					}
-					@container (max-width: 599px) {
-						// Print 2 elements.
-						.attribute {
-							width: 50%;
-						}
-						.attribute:nth-child(n + 3) {
-							display: none;
-						}
-					}
-					@container (max-width: 399px) {
-						// Print 1 element.
-						.attribute {
-							width: 100%;
-						}
-						.attribute:nth-child(n + 2) {
-							display: none;
-						}
-					}
-				}
-			}
-
-			.actions {
-				float: right;
-				opacity: 0.3;
-				&:hover {
-					opacity: 1;
-				}
-			}
-
-			&.child:after {
+		// Vertical line for child items.
+		&.child {
+			.name-content:after {
 				position: absolute;
 				content: "";
-				border-top: 1px dotted $lineColor;
+				border-left: 1px dotted $lineColor;
+				border-bottom: 1px dotted $lineColor;
 				left: #{-$indent + 1}px;
-				top: #{$arrowOffsetY}px;
+				top: 0;
+				bottom: #{$lineHeight - $arrowOffsetY - 1}px;
 				width: #{$indent - $arrowSize * 2}px;
 			}
+		}
 
-			&.expandable {
+		// Arrow for expandable items.
+		&.expandable {
+			.name-content {
 				&:before {
 					position: absolute;
 					left: #{math.div(-$arrowSize, 2)}px;
@@ -356,9 +261,54 @@
 					transition: transform 0.5s;
 				}
 			}
-
-			&.expanded:before {
+		}
+		&.expanded {
+			.name-content:before {
 				transform: rotate(90deg) translateY(#{math.div($arrowSize, 2)}px) translateX(#{math.div($arrowSize, 2)}px);
+			}
+		}
+
+		// Responsive attributes display (display max 5 elements).
+		.attribute {
+			width: 20%;
+		}
+		.attribute:nth-child(n + 6) {
+			display: none;
+		}
+		@container (max-width: 999px) {
+			// Print 4 elements.
+			.attribute {
+				width: 25%;
+			}
+			.attribute:nth-child(n + 5) {
+				display: none;
+			}
+		}
+		@container (max-width: 799px) {
+			// Print 3 elements.
+			.attribute {
+				width: 33%;
+			}
+			.attribute:nth-child(n + 4) {
+				display: none;
+			}
+		}
+		@container (max-width: 599px) {
+			// Print 2 elements.
+			.attribute {
+				width: 50%;
+			}
+			.attribute:nth-child(n + 3) {
+				display: none;
+			}
+		}
+		@container (max-width: 399px) {
+			// Print 1 element.
+			.attribute {
+				width: 100%;
+			}
+			.attribute:nth-child(n + 2) {
+				display: none;
 			}
 		}
 	}

@@ -5,13 +5,15 @@
 				<i class="bzd-icon-refresh"></i>
 			</div>
 		</div>
-		<Tree
-			:key="refreshCounter"
-			:fetch="fetch"
-			:show-path="path ?? currentPath"
-			@item="handleItem"
-			:metadata="metadata"
-		></Tree>
+		<div class="tree">
+			<Tree
+				:key="refreshCounter"
+				:fetch="fetch"
+				:show-path="path ?? currentPath"
+				@item="handleItem"
+				:metadata="metadata"
+			></Tree>
+		</div>
 	</div>
 </template>
 
@@ -60,6 +62,7 @@
 	@use "@/nodejs/styles/default/css/clickable.scss" as *;
 
 	.file-explorer {
+		container-type: inline-size;
 		padding: 10px;
 
 		.toolbar {
@@ -75,6 +78,10 @@
 				text-align: center;
 				@extend %bzd-clickable;
 			}
+		}
+
+		.tree {
+			display: table;
 		}
 	}
 </style>
