@@ -201,7 +201,7 @@ class DevelopmentContainer:
 			]
 		else:
 
-			user_groups = {gid: grp.getgrgid(gid) for gid in os.getgrouplist(self.user, self.gid)}
+			user_groups = {gid: grp.getgrgid(gid).gr_name for gid in os.getgrouplist(self.user, self.gid)}
 			groups = [str(gid) for gid in user_groups.keys()
 			          ] + ["sudo"] + [group for feature in self.features for group in feature.groups]
 			# Create all user groups if not existing.
