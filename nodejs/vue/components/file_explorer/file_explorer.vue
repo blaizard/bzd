@@ -13,6 +13,7 @@
 				:show-path="path ?? currentPath"
 				@item="handleItem"
 				:metadata="metadata"
+				:refreshPeriosS="refreshPeriosS"
 			></Tree>
 		</div>
 	</div>
@@ -34,6 +35,7 @@
 			fetch: { type: Function, mandatory: true },
 			download: { type: Function, default: null },
 			metadata: { type: Boolean, default: false },
+			refreshPeriosS: { type: Number, default: 0 },
 		},
 		data: function () {
 			return {

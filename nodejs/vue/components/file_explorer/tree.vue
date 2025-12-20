@@ -35,6 +35,7 @@
 				:showPath="showPath"
 				:metadata="metadata"
 				:download="download"
+				:refreshPeriosS="refreshPeriosS"
 				@item="handleItemPropagation(item.name, $event)"
 			></TreeDirectory>
 		</template>
@@ -57,6 +58,7 @@
 			fetch: { type: Function, mandatory: true },
 			metadata: { type: Boolean, default: false },
 			download: { type: Function, default: null },
+			refreshPeriosS: { type: Number, default: 0 },
 		},
 		directives: {
 			loading: DirectiveLoading,
@@ -67,10 +69,14 @@
 			return {
 				list: [],
 				expanded: {},
+				timeout: null,
 			};
 		},
 		mounted() {
 			this.fetchPath();
+		},
+		beforeUnmount() {
+			clearTimeout(this.timeout);
 		},
 		watch: {
 			showPath: {
@@ -148,6 +154,12 @@
 					});
 					this.updateExpand();
 				});
+				if (this.refreshPeriosS > 0) {
+					clearTimeout(this.timeout);
+					this.timeout = setTimeout(() => {
+						this.fetchPath();
+					}, this.refreshPeriosS * 1000);
+				}
 			},
 			getClass(item) {
 				return {
