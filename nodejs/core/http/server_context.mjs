@@ -174,6 +174,6 @@ export class WebsocketServerContext {
 	}
 
 	exit(handler) {
-		this.ws.on("message", handler);
+		this.ws.on("close", handler);
 	}
 }

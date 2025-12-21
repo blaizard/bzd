@@ -37,8 +37,7 @@ export default class Commands {
 		Exception.assert(context.executor === null, "This uid '{}' has already been executed.", uid);
 		context.executor = executor;
 		context.args = context.makeArgs(context.executor.visitorArgs);
-		await context.executor.initialize(context.args);
-		context.executor.execute().catch((_) => {});
+		await context.executor.execute(uid, context.args);
 	}
 
 	/// Kill a specific command.

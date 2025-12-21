@@ -36,6 +36,7 @@ bzd_nodejs_binary(
         "//apps/job_executor:__pkg__",
     ],
     deps = [
+        "//nodejs/core:event",
         "//nodejs/core:exception",
         "//nodejs/core:filesystem",
         "//nodejs/core:log",
@@ -44,6 +45,6 @@ bzd_nodejs_binary(
         "//nodejs/utils:uid",
         "//nodejs/vue/apps:backend",
         "//nodejs/vue/components/form:backend",
-        "//nodejs/vue/components/terminal/backend:command",
+        "//nodejs/vue/components/terminal/backend/local",
     ],
 )

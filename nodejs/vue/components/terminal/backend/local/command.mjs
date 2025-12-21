@@ -30,19 +30,19 @@ export default class Command {
 		return new Promise((resolve, reject) => {
 			this.timestampStart = Date.now();
 			this.status = Status.running;
-			this.process = spawn("nodejs/vue/components/terminal/backend/bin/terminal", this.command, {
+			this.process = spawn("nodejs/vue/components/terminal/backend/local/bin/terminal", this.command, {
 				stdio: ["pipe", "pipe", "pipe"],
 			});
 
+			this.process.stdout.setEncoding("utf8");
 			this.process.stdout.on("data", (data) => {
-				const dataStr = data.toString();
-				this.addToOutput(dataStr);
-				this.event.trigger("data", dataStr);
+				this.addToOutput(data);
+				this.event.trigger("data", data);
 			});
+			this.process.stderr.setEncoding("utf8");
 			this.process.stderr.on("data", (data) => {
-				const dataStr = data.toString();
-				this.addToOutput(dataStr);
-				this.event.trigger("data", dataStr);
+				this.addToOutput(data);
+				this.event.trigger("data", data);
 			});
 			this.process.on("close", (code) => {
 				this.timestampStop = Date.now();

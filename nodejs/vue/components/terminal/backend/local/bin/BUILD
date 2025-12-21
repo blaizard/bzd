@@ -5,5 +5,5 @@ py_binary(
     srcs = [
         "terminal.py",
     ],
-    visibility = ["//nodejs/vue/components/terminal/backend:__pkg__"],
+    visibility = ["//nodejs/vue/components/terminal/backend/local:__pkg__"],
 )

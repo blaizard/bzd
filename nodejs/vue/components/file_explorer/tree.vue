@@ -139,9 +139,9 @@
 			},
 			async fetchPath() {
 				await this.handleSubmit(async () => {
-					this.list = await this.fetch(this.path);
+					let list = await this.fetch(this.path);
 					// Set directories first.
-					this.list.sort((a, b) => {
+					list.sort((a, b) => {
 						const isAList = this.isPermissionList(a);
 						const isBList = this.isPermissionList(b);
 						if (isAList != isBList) {
@@ -152,6 +152,7 @@
 						}
 						return Intl.Collator().compare(a.name, b.name);
 					});
+					this.list = list;
 					this.updateExpand();
 				});
 				if (this.refreshPeriosS > 0) {
