@@ -1,79 +1,34 @@
-import Event from "#bzd/nodejs/core/event.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import { spawn } from "child_process";
 import Status from "#bzd/nodejs/vue/components/terminal/backend/status.mjs";
+import CommandBase from "#bzd/nodejs/vue/components/terminal/backend/base.mjs";
 
-const Exception = ExceptionFactory("terminal", "backend");
+const Exception = ExceptionFactory("terminal", "local");
 
-export default class Command {
-	constructor(command, options) {
-		Exception.assertPrecondition(Array.isArray(command), "Command must be an array.");
-		Exception.assertPrecondition(command.length >= 1, "There must be at least 1 command.");
-		this.options = Object.assign(
-			{
-				/// Maximum number of bytes in the stdout.
-				maxOutputSize: 10000,
-			},
-			options,
-		);
-		this.command = command;
-		this.event = new Event();
+export default class Command extends CommandBase {
+	constructor(options) {
+		super(options);
 		this.process = null;
-		this.output = [];
-		this.outputSize = 0;
 		this.status = Status.idle;
 		this.timestampStart = null;
 		this.timestampStop = null;
 	}
 
-	async execute() {
-		return new Promise((resolve, reject) => {
-			this.timestampStart = Date.now();
-			this.status = Status.running;
-			this.process = spawn("nodejs/vue/components/terminal/backend/local/bin/terminal", this.command, {
-				stdio: ["pipe", "pipe", "pipe"],
-			});
+	async detach(command) {
+		Exception.assertPrecondition(Array.isArray(command), "Command must be an array.");
+		Exception.assertPrecondition(command.length >= 1, "There must be at least 1 command.");
 
-			this.process.stdout.setEncoding("utf8");
-			this.process.stdout.on("data", (data) => {
-				this.addToOutput(data);
-				this.event.trigger("data", data);
-			});
-			this.process.stderr.setEncoding("utf8");
-			this.process.stderr.on("data", (data) => {
-				this.addToOutput(data);
-				this.event.trigger("data", data);
-			});
-			this.process.on("close", (code) => {
+		this.timestampStart = Date.now();
+		this.status = Status.running;
+		this.process = spawn("nodejs/vue/components/terminal/backend/local/bin/terminal", command);
+
+		await this.subprocessMonitor(this.process, {
+			untilSpawn: true,
+			updateStatus: (status) => {
+				this.status = status;
 				this.timestampStop = Date.now();
-				if (typeof code === "number") {
-					if (code !== 0) {
-						this.status = Status.failed;
-						this.addToOutput("Failed with exit code: " + code + ".");
-						reject("Failed with exit code: " + code + ".");
-					} else {
-						this.status = Status.completed;
-						resolve();
-					}
-				} else {
-					this.status = Status.cancelled;
-					this.addToOutput("Cancelled.");
-					reject("Cancelled.");
-				}
-				this.event.trigger("exit");
-			});
+			},
 		});
-	}
-
-	addToOutput(data) {
-		if (data) {
-			this.output.push(data);
-			this.outputSize += data.length;
-			while (this.outputSize > this.options.maxOutputSize) {
-				const removed = this.output.shift();
-				this.outputSize -= removed.length;
-			}
-		}
 	}
 
 	// Get the status of the command.
@@ -82,38 +37,12 @@ export default class Command {
 	}
 
 	// Get information about the command.
-	getInfo() {
+	async getInfo() {
 		return {
 			status: this.getStatus(),
 			timestampStart: this.timestampStart,
 			timestampStop: this.timestampStop,
 		};
-	}
-
-	// Subscribe from a topic.
-	on(topic, callback) {
-		switch (topic) {
-			case "data":
-				for (const data of this.output) {
-					callback(data);
-				}
-				this.event.on("data", (data) => {
-					callback(data);
-				});
-				break;
-			case "exit":
-				this.event.on("exit", (data) => {
-					callback(data);
-				});
-				break;
-			default:
-				Exception.assertPrecondition(topic, "Subscription topic {} unsupported.", topic);
-		}
-	}
-
-	// Unsubscribe from a topic.
-	remove(topic, callback) {
-		this.event.remove(topic, callback);
 	}
 
 	/// Write data to the terminal.
@@ -123,22 +52,13 @@ export default class Command {
 	}
 
 	/// Kill the command.
-	kill() {
+	async kill() {
 		this.process.kill();
 	}
 
 	/// Install the command to be used with websockets.
 	installWebsocket(context) {
-		const onData = (data) => {
-			context.send(data);
-		};
-
-		// Send data to the client.
-		this.on("data", onData);
-		context.exit(() => {
-			this.remove("data", onData);
-		});
-
+		super.installWebsocket(context);
 		context.read((data) => {
 			const input = JSON.parse(data.toString());
 			switch (input.type) {

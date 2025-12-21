@@ -45,6 +45,7 @@ bzd_nodejs_binary(
         "//nodejs/utils:uid",
         "//nodejs/vue/apps:backend",
         "//nodejs/vue/components/form:backend",
+        "//nodejs/vue/components/terminal/backend/docker",
         "//nodejs/vue/components/terminal/backend/local",
     ],
 )

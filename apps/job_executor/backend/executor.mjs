@@ -16,8 +16,8 @@ export default class Executor {
 	static async discover() {}
 
 	async execute(uid, args) {
-		this.command = new Command(["--cwd", this.root, "--", this.schema["command"], ...args]);
-		this.command.execute().catch((_) => {});
+		this.command = new Command();
+		await this.command.detach(["--cwd", this.root, "--", this.schema["command"], ...args]);
 	}
 
 	async kill() {
