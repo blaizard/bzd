@@ -21,7 +21,7 @@ export default class Executor {
 	}
 
 	async kill() {
-		this.command.kill();
+		await this.command.kill();
 	}
 
 	async getInfo() {

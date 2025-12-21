@@ -21,14 +21,6 @@ export default class ExecutorDocker extends Executor {
 		await this.command.detach(["-v", this.root + ":/sandbox", "--workdir", "/sandbox", this.schema["docker"], ...args]);
 	}
 
-	async kill() {
-		await this.command.kill();
-	}
-
-	async getInfo() {
-		return await this.command.getInfo();
-	}
-
 	visitorArgs(type, arg) {
 		switch (type) {
 			case "File":

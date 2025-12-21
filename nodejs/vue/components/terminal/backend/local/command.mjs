@@ -8,52 +8,33 @@ const Exception = ExceptionFactory("terminal", "local");
 export default class Command extends CommandBase {
 	constructor(options) {
 		super(options);
-		this.process = null;
-		this.status = Status.idle;
-		this.timestampStart = null;
-		this.timestampStop = null;
+		this.subprocess = null;
 	}
 
 	async detach(command) {
 		Exception.assertPrecondition(Array.isArray(command), "Command must be an array.");
 		Exception.assertPrecondition(command.length >= 1, "There must be at least 1 command.");
 
-		this.timestampStart = Date.now();
-		this.status = Status.running;
-		this.process = spawn("nodejs/vue/components/terminal/backend/local/bin/terminal", command);
+		this.setStatus(Status.running);
+		this.subprocess = spawn("nodejs/vue/components/terminal/backend/local/bin/terminal", command);
 
-		await this.subprocessMonitor(this.process, {
+		await this.subprocessMonitor(this.subprocess, {
 			untilSpawn: true,
 			updateStatus: (status) => {
-				this.status = status;
-				this.timestampStop = Date.now();
+				this.setStatus(status);
 			},
 		});
 	}
 
-	// Get the status of the command.
-	getStatus() {
-		return this.status;
-	}
-
-	// Get information about the command.
-	async getInfo() {
-		return {
-			status: this.getStatus(),
-			timestampStart: this.timestampStart,
-			timestampStop: this.timestampStop,
-		};
-	}
-
 	/// Write data to the terminal.
 	write(data) {
-		Exception.assert(this.process !== null, "The command is not running.");
-		this.process.stdin.write(data);
+		Exception.assert(this.subprocess !== null, "The command is not running.");
+		this.subprocess.stdin.write(data);
 	}
 
 	/// Kill the command.
 	async kill() {
-		this.process.kill();
+		this.subprocess.kill();
 	}
 
 	/// Install the command to be used with websockets.

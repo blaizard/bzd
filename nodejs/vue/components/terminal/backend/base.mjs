@@ -17,6 +17,9 @@ export default class CommandBase {
 		);
 		this.output = [];
 		this.outputSize = 0;
+		this.status = Status.idle;
+		this.timestampStart = null;
+		this.timestampStop = null;
 
 		this.event = new Event();
 		this.event.on("data", (data) => {
@@ -27,6 +30,39 @@ export default class CommandBase {
 				this.outputSize -= removed.length;
 			}
 		});
+	}
+
+	/// Get the status of the command.
+	getStatus() {
+		return this.status;
+	}
+
+	/// Set the status of the command.
+	setStatus(status) {
+		switch (status) {
+			case Status.idle:
+				break;
+			case Status.running:
+				this.timestampStart = Date.now();
+				break;
+			case Status.completed:
+			case Status.failed:
+			case Status.cancelled:
+				this.timestampStop = Date.now();
+				break;
+			default:
+				Exception.assertUnreachable(`Unsupported status value: ${status}`);
+		}
+		this.status = status;
+	}
+
+	/// Get information about the command.
+	getInfo() {
+		return {
+			status: this.getStatus(),
+			timestampStart: this.timestampStart,
+			timestampStop: this.timestampStop,
+		};
 	}
 
 	async subprocessMonitor(subprocess, { untilSpawn = false, updateStatus = (_) => {} } = {}) {
