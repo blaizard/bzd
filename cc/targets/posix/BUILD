@@ -22,7 +22,7 @@ cc_library(
         "//cc/components/posix/proactor/sync",
         "//cc/components/posix/network/tcp:client",
         "//cc/components/posix/shmem",
-        # Not support by osx
+        # Not supported by osx
         # "//cc/components/posix/stack_trace",
         "//cc/components/posix/stream/in",
         "//cc/components/posix/stream/out",
@@ -50,6 +50,9 @@ bdl_target(
     name = "osx_arm64_clang",
     parent = ":auto",
     platform = "@clang//:platform-osx-arm64",
+    tags = [
+        "manual",
+    ],
     visibility = [
         "//visibility:public",
     ],
