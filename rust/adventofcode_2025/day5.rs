@@ -1,6 +1,6 @@
 use utils::arg1_to_vector;
 
-fn part1(ranges: &Vec<(u64, u64)>, ids: &Vec<u64>) {
+fn part1(ranges: &[(u64, u64)], ids: &[u64]) {
     let mut total = 0;
 
     for id in ids {
@@ -15,7 +15,7 @@ fn part1(ranges: &Vec<(u64, u64)>, ids: &Vec<u64>) {
     println!("Part 1: {}", total);
 }
 
-fn part2(ranges: &Vec<(u64, u64)>) {
+fn part2(ranges: &[(u64, u64)]) {
     let mut total = 0;
 
     let mut copy_ranges = ranges.to_vec();

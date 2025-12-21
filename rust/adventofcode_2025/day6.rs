@@ -1,6 +1,6 @@
 use utils::arg1_to_vector;
 
-fn part1(numbers: &Vec<Vec<i64>>, operations: &Vec<char>) {
+fn part1(numbers: &[Vec<i64>], operations: &[char]) {
     let mut total = 0;
 
     for (index, operation) in operations.iter().enumerate() {
@@ -20,7 +20,7 @@ fn part1(numbers: &Vec<Vec<i64>>, operations: &Vec<char>) {
     println!("Part 1: {}", total);
 }
 
-fn part2(numbers: &Vec<Vec<i64>>, operations: &Vec<char>) {
+fn part2(numbers: &[Vec<i64>], operations: &[char]) {
     let mut total = 0;
 
     for (index, operation) in operations.iter().enumerate() {
@@ -46,13 +46,13 @@ fn main() {
     let operations: Vec<char> = lines
         .pop()
         .unwrap()
-        .split(" ")
-        .filter_map(|x| x.trim().chars().nth(0))
+        .split(' ')
+        .filter_map(|x| x.trim().chars().next())
         .collect();
     let numbers: Vec<Vec<i64>> = lines
         .iter()
         .map(|x| {
-            x.split(" ")
+            x.split(' ')
                 .filter_map(|y| y.trim().parse::<i64>().ok())
                 .collect()
         })

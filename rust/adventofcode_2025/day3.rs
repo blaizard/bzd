@@ -7,7 +7,7 @@ fn part1(banks: &Vec<String>) {
 
     for bank in banks {
         let range_size = bank.len() as i32;
-        let mut c1: u32 = 0;
+        let mut c1: u32;
         let mut c2: u32 = 0;
         if range_size > 2 {
             let mut heap: BinaryHeap<(u32, i32)> = BinaryHeap::with_capacity(bank.len());
@@ -42,7 +42,6 @@ fn part2(banks: &Vec<String>) {
     let mut total: u64 = 0;
 
     for bank in banks {
-        let range_size = bank.len() as i32;
         let mut left = 12;
         let mut count: u64 = 0;
         let mut previous_index = 1;

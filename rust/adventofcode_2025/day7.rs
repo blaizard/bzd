@@ -1,6 +1,6 @@
 use utils::arg1_to_vector;
 
-fn part1(lines: &Vec<String>) {
+fn part1(lines: &[String]) {
     let mut total = 0;
     let mut lines_of_chars: Vec<Vec<char>> = lines.iter().map(|x| x.chars().collect()).collect();
 
@@ -27,7 +27,7 @@ fn part1(lines: &Vec<String>) {
     println!("Part 1: {}", total);
 }
 
-fn part2(lines: &Vec<String>) {
+fn part2(lines: &[String]) {
     let mut lines_of_chars: Vec<Vec<char>> = lines.iter().map(|x| x.chars().collect()).collect();
     let mut number_of_lines: Vec<u64> = vec![0; lines_of_chars[0].len()];
 

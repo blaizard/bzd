@@ -14,7 +14,7 @@ struct ShortestDistance {
 fn nb_junctions(index: usize, distances: &Vec<ShortestDistance>, covered: &mut Vec<bool>) -> usize {
     let mut nb = 0;
 
-    if covered[index] == false {
+    if !covered[index] {
         covered[index] = true;
         nb += 1;
 
@@ -26,11 +26,11 @@ fn nb_junctions(index: usize, distances: &Vec<ShortestDistance>, covered: &mut V
         nb += nb_junctions(distances[index].index, distances, covered);
     }
 
-    return nb;
+    nb
 }
 
 fn part1(ranges: &Vec<Coordinates>) {
-    let mut total = 0;
+    let total = 0;
     let mut distances: Vec<ShortestDistance> = vec![];
 
     // Calculate the shortest distances between all boxes.
@@ -40,11 +40,11 @@ fn part1(ranges: &Vec<Coordinates>) {
             index: 0,
         };
         let a = &ranges[index_a];
-        for index_b in 0..ranges.len() {
+        for (index_b, range_item) in ranges.iter().enumerate() {
             if index_a == index_b {
                 continue;
             }
-            let b = &ranges[index_b];
+            let b = &range_item;
             let distance =
                 ((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y) + (a.z - b.z) * (a.z - b.z))
                     .sqrt();
@@ -72,7 +72,7 @@ fn part1(ranges: &Vec<Coordinates>) {
 
     // Create the circuits.
     for index in 0..distances.len() {
-        if covered[index] == true {
+        if covered[index] {
             continue;
         }
         let nb = nb_junctions(index, &distances, &mut covered);
@@ -82,8 +82,8 @@ fn part1(ranges: &Vec<Coordinates>) {
     println!("Part 1: {}", total);
 }
 
-fn part2(ranges: &Vec<Coordinates>) {
-    let mut total = 0;
+fn part2(_ranges: &[Coordinates]) {
+    let total = 0;
 
     println!("Part 2: {}", total);
 }

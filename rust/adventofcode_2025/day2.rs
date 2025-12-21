@@ -3,7 +3,7 @@ use utils::arg1_to_vector;
 fn part1(ranges: &Vec<String>) {
     let mut invalid = 0;
     for range in ranges {
-        let (left_str, right_str) = range.split_once("-").unwrap();
+        let (left_str, right_str) = range.split_once('-').unwrap();
         let (left, right) = (
             left_str.parse::<u64>().unwrap(),
             right_str.parse::<u64>().unwrap(),
@@ -26,7 +26,7 @@ fn part1(ranges: &Vec<String>) {
 fn part2(ranges: &Vec<String>) {
     let mut invalid = 0;
     for range in ranges {
-        let (left_str, right_str) = range.split_once("-").unwrap();
+        let (left_str, right_str) = range.split_once('-').unwrap();
         let (left, right) = (
             left_str.parse::<u64>().unwrap(),
             right_str.parse::<u64>().unwrap(),
@@ -38,7 +38,7 @@ fn part2(ranges: &Vec<String>) {
                 if id_str.len() % index == 0 {
                     let mut same = true;
                     let (test1, mut rest) = id_str.split_at(index);
-                    while rest.len() > 0 {
+                    while !rest.is_empty() {
                         let test2;
                         (test2, rest) = rest.split_at(index);
                         if test1 != test2 {
@@ -46,7 +46,7 @@ fn part2(ranges: &Vec<String>) {
                             break;
                         }
                     }
-                    if same == true {
+                    if same {
                         invalid += id;
                         break;
                     }

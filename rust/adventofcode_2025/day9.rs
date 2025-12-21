@@ -3,7 +3,7 @@ use utils::arg1_to_vector;
 fn part1(tiles: &Vec<(i64, i64)>) {
     let mut total = 0;
 
-    let is_empty = |x1: i64, y1: i64, x2: i64, y2: i64, tiles: &Vec<(i64, i64)>| -> bool {
+    let _is_empty = |x1: i64, y1: i64, x2: i64, y2: i64, tiles: &Vec<(i64, i64)>| -> bool {
         for (x, y) in tiles {
             if x > &x1 && x < &x2 {
                 return false;
@@ -12,7 +12,7 @@ fn part1(tiles: &Vec<(i64, i64)>) {
                 return false;
             }
         }
-        return true;
+        true
     };
 
     // Check rectangle that are empty
@@ -35,7 +35,7 @@ fn part1(tiles: &Vec<(i64, i64)>) {
     println!("Part 1: {}", total);
 }
 
-fn part2(tiles: &Vec<(i64, i64)>) {
+fn part2(_tiles: &[(i64, i64)]) {
     let total = 0;
     println!("Part 2: {}", total);
 }

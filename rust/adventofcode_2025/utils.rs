@@ -6,7 +6,7 @@ pub fn file_to_vector(path: &str, delimiter: char, trim: bool) -> Vec<String> {
         .unwrap()
         .split(delimiter)
         .map(|s| {
-            if (trim) {
+            if trim {
                 s.trim().to_string()
             } else {
                 s.to_string()

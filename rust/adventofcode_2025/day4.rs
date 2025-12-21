@@ -76,14 +76,14 @@ fn part2(bool_grid: &mut Vec<Vec<bool>>) {
             for x in 0..=max_x {
                 if bool_grid[y as usize][x as usize] {
                     let mut count = 0;
-                    count += count_rool(&bool_grid, x - 1, y - 1);
-                    count += count_rool(&bool_grid, x - 1, y);
-                    count += count_rool(&bool_grid, x - 1, y + 1);
-                    count += count_rool(&bool_grid, x, y - 1);
-                    count += count_rool(&bool_grid, x, y + 1);
-                    count += count_rool(&bool_grid, x + 1, y - 1);
-                    count += count_rool(&bool_grid, x + 1, y);
-                    count += count_rool(&bool_grid, x + 1, y + 1);
+                    count += count_rool(bool_grid, x - 1, y - 1);
+                    count += count_rool(bool_grid, x - 1, y);
+                    count += count_rool(bool_grid, x - 1, y + 1);
+                    count += count_rool(bool_grid, x, y - 1);
+                    count += count_rool(bool_grid, x, y + 1);
+                    count += count_rool(bool_grid, x + 1, y - 1);
+                    count += count_rool(bool_grid, x + 1, y);
+                    count += count_rool(bool_grid, x + 1, y + 1);
                     if count < 4 {
                         total += 1;
                         bool_grid[y as usize][x as usize] = false;
