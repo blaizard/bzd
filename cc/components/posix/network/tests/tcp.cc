@@ -31,14 +31,14 @@ TEST_ASYNC(Tcp, Server)
 
 TEST_ASYNC(Tcp, Client)
 {
-	struct Config
+	/*struct Config
 	{
 		bzd::components::posix::sync::Proactor proactor{};
 	};
 	struct Context
 	{
 		Config config{};
-	};
+	};*/
 	/*Context context{};
 	bzd::components::posix::network::tcp::Client client{context};
 	[[maybe_unused]] auto stream = co_await client.connect("google.com", 80);*/
