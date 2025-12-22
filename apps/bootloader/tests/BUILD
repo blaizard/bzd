@@ -68,6 +68,7 @@ bzd_executable_test(
 
 bzd_config(
     name = "bootloader_config",
+    base = "//apps/bootloader:config.base",
     data = [
         "//apps/bootloader/tests:square",
     ],
