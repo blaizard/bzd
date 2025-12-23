@@ -1,4 +1,5 @@
 import ExceptionFactory from "../exception.mjs";
+import { pipeline } from "stream/promises";
 
 const Exception = ExceptionFactory("http", "server", "context");
 
@@ -124,10 +125,7 @@ export class HttpServerContext {
 		if (typeof data == "string") {
 			this.response.sendFile(data);
 		} else if ("pipe" in data) {
-			await new Promise((resolve, reject) => {
-				data.on("error", reject).on("end", resolve).on("finish", resolve).pipe(this.response);
-			});
-			this.response.end();
+			await pipeline(data, this.response);
 		} else {
 			Exception.unreachable("{} {}: callback result is not of a supported format.", method, endpoint);
 		}
