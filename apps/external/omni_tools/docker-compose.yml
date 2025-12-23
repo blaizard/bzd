@@ -1,0 +1,3 @@
+services:
+    omni_tools:
+        image: iib0011/omni-tools:latest
