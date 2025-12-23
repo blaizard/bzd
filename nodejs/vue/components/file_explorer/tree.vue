@@ -138,23 +138,26 @@
 				}
 			},
 			async fetchPath() {
-				await this.handleSubmit(async () => {
-					let list = await this.fetch(this.path);
-					// Set directories first.
-					list.sort((a, b) => {
-						const isAList = this.isPermissionList(a);
-						const isBList = this.isPermissionList(b);
-						if (isAList != isBList) {
-							if (isAList) {
-								return -1;
+				await this.handleSubmit(
+					async () => {
+						let list = await this.fetch(this.path);
+						// Set directories first.
+						list.sort((a, b) => {
+							const isAList = this.isPermissionList(a);
+							const isBList = this.isPermissionList(b);
+							if (isAList != isBList) {
+								if (isAList) {
+									return -1;
+								}
+								return 1;
 							}
-							return 1;
-						}
-						return Intl.Collator().compare(a.name, b.name);
-					});
-					this.list = list;
-					this.updateExpand();
-				});
+							return Intl.Collator().compare(a.name, b.name);
+						});
+						this.list = list;
+						this.updateExpand();
+					},
+					{ updateLoading: this.timeout === null },
+				);
 				if (this.refreshPeriosS > 0) {
 					clearTimeout(this.timeout);
 					this.timeout = setTimeout(() => {
@@ -267,6 +270,7 @@
 				content: "";
 				border-left: 1px dotted $lineColor;
 				border-bottom: 1px dotted $lineColor;
+				border-radius: 2px;
 				left: #{-$indent + 1}px;
 				top: 0;
 				bottom: #{$lineHeight - $arrowOffsetY - 1}px;
