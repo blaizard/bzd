@@ -1,5 +1,7 @@
 import { google } from "googleapis";
 import Path from "path";
+import { pipeline } from "stream/promises";
+import { PassThrough } from "stream";
 
 import ExceptionFactory from "../../core/exception.mjs";
 import LogFactory from "../../core/log.mjs";
@@ -136,21 +138,73 @@ export default class StorageGoogleDrive extends Storage {
 
 	async _readImpl(pathList) {
 		const id = await this.cache.get("id", Cache2.arrayOfStringToKey(pathList));
-		const response = await this.drive.files.get(
-			{
-				fileId: id,
-				supportsAllDrives: true,
-				includeItemsFromAllDrives: true,
-				// Important: Downloads the file content.
-				alt: "media",
-			},
-			{
-				// Get response as a stream.
-				responseType: "stream",
-			},
-		);
+		const bridge = new PassThrough();
 
-		return response.data;
+		(async () => {
+			let previousBytesRead = 0;
+			let bytesRead = 0;
+			let isFinished = false;
+			let retryLeft = 3;
+
+			while (!isFinished) {
+				previousBytesRead = bytesRead;
+
+				// Client has closed the connection.
+				if (bridge.destroyed) {
+					return;
+				}
+
+				try {
+					const response = await this.drive.files.get(
+						{
+							fileId: id,
+							supportsAllDrives: true,
+							includeItemsFromAllDrives: true,
+							// Important: Downloads the file content.
+							alt: "media",
+							headers: { Range: "bytes=" + bytesRead + "-" },
+						},
+						{
+							// Get response as a stream.
+							responseType: "stream",
+						},
+					);
+
+					// How many bytes Google intends to send in THIS specific connection.
+					const expectedLength = parseInt(response.headers["content-length"]);
+					let bytesInThisSession = 0;
+					response.data.on("data", (chunk) => {
+						bytesRead += chunk.length;
+						bytesInThisSession += chunk.length;
+					});
+					await pipeline(response.data, bridge, { end: false });
+
+					if (bytesInThisSession >= expectedLength) {
+						isFinished = true;
+					} else {
+						throw new Error("Stream ended prematurely (Socket hang up)");
+					}
+				} catch (err) {
+					if (err.code === 416 || err.response?.status === 416) {
+						isFinished = true;
+						break;
+					}
+					// No progress made, likely end of file, retry a few times.
+					if (previousBytesRead == bytesRead) {
+						if (!--retryLeft) {
+							break;
+						}
+					} else {
+						retryLeft = 3;
+					}
+				}
+			}
+			if (!bridge.destroyed) {
+				bridge.end();
+			}
+		})().catch((err) => !bridge.destroyed && bridge.destroy(err));
+
+		return bridge;
 	}
 
 	async _createFile(pathList, readStream) {
