@@ -66,6 +66,18 @@ bzd_nodejs_library(
 )
 
 bzd_nodejs_library(
+    name = "run",
+    srcs = [
+        "run.mjs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//nodejs/core:event",
+        "//nodejs/core:exception",
+    ],
+)
+
+bzd_nodejs_library(
     name = "to_string",
     srcs = [
         "to_string.mjs",

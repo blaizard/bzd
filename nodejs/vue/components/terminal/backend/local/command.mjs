@@ -1,5 +1,4 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
-import { spawn } from "child_process";
 import Status from "#bzd/nodejs/vue/components/terminal/backend/status.mjs";
 import CommandBase from "#bzd/nodejs/vue/components/terminal/backend/base.mjs";
 
@@ -9,6 +8,7 @@ export default class Command extends CommandBase {
 	constructor(options) {
 		super(options);
 		this.subprocess = null;
+		this.result = null;
 	}
 
 	async detach(command) {
@@ -16,30 +16,29 @@ export default class Command extends CommandBase {
 		Exception.assertPrecondition(command.length >= 1, "There must be at least 1 command.");
 
 		this.setStatus(Status.running);
-		this.subprocess = spawn("nodejs/vue/components/terminal/backend/local/bin/terminal", command);
-
-		await this.subprocessMonitor(this.subprocess, {
-			untilSpawn: true,
-			updateStatus: (status) => {
-				this.setStatus(status);
-			},
+		this.result = await this.localCommandToOutput([
+			"nodejs/vue/components/terminal/backend/local/bin/terminal",
+			...command,
+		]);
+		this.result.on("status", (status) => {
+			this.setStatus(status);
 		});
 	}
 
 	/// Write data to the terminal.
 	write(data) {
-		Exception.assert(this.subprocess !== null, "The command is not running.");
-		this.subprocess.stdin.write(data);
+		Exception.assertPrecondition(this.result !== null, "The command is not running.");
+		this.result.writeToStdin(data);
 	}
 
 	/// Kill the command.
 	async kill() {
-		this.subprocess.kill();
+		this.result.kill();
 	}
 
 	/// Install the command to be used with websockets.
 	installWebsocket(context) {
-		super.installWebsocket(context);
+		this.installWebsocketForOutput(context);
 		context.read((data) => {
 			const input = JSON.parse(data.toString());
 			switch (input.type) {

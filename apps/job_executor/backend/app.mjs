@@ -73,6 +73,11 @@ function makeExecutor(root, schema) {
 
 	let commands = new Commands();
 
+	// Preload existing jobs if any.
+	for (const ExecutorClass of [Executor, ExecutorDocker]) {
+		await ExecutorClass.discover();
+	}
+
 	backend.rest.handle("post", "/job/send", async (inputs) => {
 		Exception.assertPrecondition(inputs.id in Jobs, "Job id is not known: {}", inputs.id);
 		const schema = Jobs[inputs.id];
@@ -96,7 +101,7 @@ function makeExecutor(root, schema) {
 			commands.make(jobId, makeArgs);
 
 			const executor = makeExecutor(root, schema);
-			await commands.detach(executor, jobId);
+			await commands.detach(executor, jobId, schema);
 
 			Log.info("Executing job {}", jobId);
 		} catch (error) {

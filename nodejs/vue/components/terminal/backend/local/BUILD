@@ -13,6 +13,7 @@ bzd_nodejs_library(
         "//nodejs/core:event",
         "//nodejs/core:exception",
         "//nodejs/core:log",
+        "//nodejs/utils:run",
         "//nodejs/vue/components/terminal/backend:base",
         "//nodejs/vue/components/terminal/backend:status",
     ],

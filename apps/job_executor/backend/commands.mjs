@@ -32,12 +32,12 @@ export default class Commands {
 	}
 
 	/// Run a specific command.
-	async detach(executor, uid) {
+	async detach(executor, uid, schema) {
 		const context = this.get_(uid);
 		Exception.assert(context.executor === null, "This uid '{}' has already been executed.", uid);
 		context.executor = executor;
 		context.args = context.makeArgs(context.executor.visitorArgs);
-		await context.executor.execute(uid, context.args);
+		await context.executor.execute(uid, schema, context.args);
 	}
 
 	/// Kill a specific command.

@@ -42,6 +42,7 @@ bzd_nodejs_binary(
         "//nodejs/core:log",
         "//nodejs/db/storage:disk",
         "//nodejs/utils:pathlib",
+        "//nodejs/utils:run",
         "//nodejs/utils:uid",
         "//nodejs/vue/apps:backend",
         "//nodejs/vue/components/form:backend",

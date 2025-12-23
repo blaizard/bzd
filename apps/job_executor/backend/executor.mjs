@@ -6,18 +6,17 @@ const Exception = ExceptionFactory("backend", "executor");
 const Log = LogFactory("backend", "executor");
 
 export default class Executor {
-	constructor(root, schema) {
+	constructor(root) {
 		this.root = root;
-		this.schema = schema;
 		this.command = null;
 	}
 
 	/// Discover currently running processes. To be used to resume jobs after a restart.
 	static async discover() {}
 
-	async execute(uid, args) {
+	async execute(uid, schema, args) {
 		this.command = new Command();
-		await this.command.detach(["--cwd", this.root, "--", this.schema["command"], ...args]);
+		await this.command.detach(["--cwd", this.root, "--", schema["command"], ...args]);
 	}
 
 	async kill() {
