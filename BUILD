@@ -1,5 +1,6 @@
 load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper")
 load("@bzd_rules_doc//doc:defs.bzl", "doc_library")
+load("@rules_python//python:defs.bzl", "py_binary")
 
 exports_files([
     ".clang-tidy",
@@ -44,4 +45,9 @@ sh_binary_wrapper(
         "//tools/shell:generate",
     ],
     binary = "@bzd_sanitizer//:sanitizer",
+)
+
+py_binary(
+    name = "devcontainer",
+    srcs = ["devcontainer.py"],
 )
