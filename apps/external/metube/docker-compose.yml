@@ -1,0 +1,5 @@
+services:
+    metube:
+        image: ghcr.io/alexta69/metube
+        volumes:
+            - "~/Downloads:/downloads"
