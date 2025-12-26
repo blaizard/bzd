@@ -1,27 +1,33 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
+import Executor from "#bzd/apps/job_executor/backend/executor.mjs";
 
 const Exception = ExceptionFactory("commands");
 const Log = LogFactory("commands");
 
 export default class Commands {
-	constructor() {
+	constructor(context) {
+		this.context = context;
 		this.contexts = {};
-		this.uid = 0;
+
+		// Prefill the context
+		for (const [uid, contextJob] of Object.entries(this.context.getAllJobs())) {
+			this.make(uid, contextJob);
+		}
 	}
 
 	/// Allocate a jobId for a command.
 	allocate() {
-		return ++this.uid;
+		return this.context.allocate();
 	}
 
 	/// Create a new command.
-	make(uid, makeArgs) {
+	make(uid, contextJob, makeArgs = (_type, arg) => arg) {
 		Exception.assert(!(uid in this.contexts), "The uid '{}' is already in use.", uid);
 		const context = {
 			makeArgs: makeArgs,
 			args: [],
-			executor: null,
+			executor: new Executor(contextJob),
 		};
 		this.contexts[uid] = context;
 	}
@@ -34,7 +40,6 @@ export default class Commands {
 	/// Run a specific command.
 	async detach(executor, uid, schema) {
 		const context = this.get_(uid);
-		Exception.assert(context.executor === null, "This uid '{}' has already been executed.", uid);
 		context.executor = executor;
 		context.args = context.makeArgs(context.executor.visitorArgs);
 		await context.executor.execute(uid, schema, context.args);
@@ -42,17 +47,27 @@ export default class Commands {
 
 	/// Kill a specific command.
 	async kill(uid) {
-		await this.get_(uid).executor.kill();
+		const context = this.get_(uid);
+		if (context.executor.kill) {
+			await context.executor.kill();
+		}
+	}
+
+	/// Remove a specific job.
+	async remove(uid) {
+		await this.kill(uid);
+		delete this.contexts[uid];
 	}
 
 	async getInfo(uid) {
 		const context = this.get_(uid);
-		return Object.assign(
-			{
-				args: context.args,
-			},
-			await context.executor.getInfo(),
-		);
+		let args = {
+			args: context.args,
+		};
+		if (context.executor) {
+			Object.assign(args, await context.executor.getInfo());
+		}
+		return args;
 	}
 
 	async getAllInfo() {
@@ -62,6 +77,9 @@ export default class Commands {
 	}
 
 	installCommandWebsocket(context, uid) {
-		this.get_(uid).executor.installWebsocket(context);
+		const job = this.get_(uid);
+		if (job.executor) {
+			job.executor.installWebsocket(context);
+		}
 	}
 }

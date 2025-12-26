@@ -53,9 +53,14 @@
                 }
             }
         },
-        "/job/{id}": {
+        "/job/{id}/cancel": {
             "delete": {
                 "documentation": "Kill a running job."
+            }
+        },
+        "/job/{id}/delete": {
+            "delete": {
+                "documentation": "Delete a job and its sandbox."
             }
         },
         "/jobs": {

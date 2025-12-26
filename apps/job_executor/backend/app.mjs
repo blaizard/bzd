@@ -5,24 +5,23 @@ import Jobs from "#bzd/apps/job_executor/jobs.json" with { type: "json" };
 import Args from "#bzd/apps/job_executor/backend/args.mjs";
 import Backend from "#bzd/nodejs/vue/apps/backend.mjs";
 import Commands from "#bzd/apps/job_executor/backend/commands.mjs";
-import FileSystem from "#bzd/nodejs/core/filesystem.mjs";
 import { makeUid } from "#bzd/nodejs/utils/uid.mjs";
 import pathlib from "#bzd/nodejs/utils/pathlib.mjs";
 import config from "#bzd/apps/job_executor/backend/config.json" with { type: "json" };
-import Executor from "#bzd/apps/job_executor/backend/executor.mjs";
+import ExecutorShell from "#bzd/apps/job_executor/backend/executor_shell.mjs";
+import Context from "#bzd/apps/job_executor/backend/context.mjs";
 import ExecutorDocker from "#bzd/apps/job_executor/backend/executor_docker.mjs";
-import StorageDisk from "#bzd/nodejs/db/storage/disk.mjs";
 import { FileNotFoundError } from "#bzd/nodejs/db/storage/storage.mjs";
 
 const Exception = ExceptionFactory("backend");
 const Log = LogFactory("backend");
 
-function makeExecutor(root, schema) {
+function makeExecutor(contextJob, schema) {
 	if ("command" in schema) {
-		return new Executor(root, schema);
+		return new ExecutorShell(contextJob, schema);
 	}
 	if ("docker" in schema) {
-		return new ExecutorDocker(root, schema);
+		return new ExecutorDocker(contextJob, schema);
 	}
 	Exception.unreachable("Undefined executor for this job: {:j}", schema);
 }
@@ -36,12 +35,8 @@ function makeExecutor(root, schema) {
 		.useForm()
 		.setup();
 
-	const sandboxPath = pathlib.path("sandbox").absolute();
-	await FileSystem.rmdir(sandboxPath.asPosix(), { force: true });
-	const storage = await StorageDisk.make(sandboxPath.asPosix());
-
 	// Convert the raw form data into relative data to the sandbox root.
-	async function formDataToSandbox(root, inputs, formData) {
+	async function formDataToSandbox(contextJob, inputs, formData) {
 		let data = {};
 		for (const item of inputs) {
 			const key = item.name;
@@ -57,9 +52,7 @@ function makeExecutor(root, schema) {
 						// Move all files into an input directory within the sandbox.
 						for (const originalPath of originalPaths) {
 							const relativePath = pathlib.path("inputs").joinPath(pathlib.path(originalPath).name).asPosix();
-							const path = pathlib.path(root).joinPath(relativePath);
-							await FileSystem.mkdir(path.parent.asPosix(), { force: true });
-							await FileSystem.move(originalPath, path.asPosix());
+							await contextJob.moveTo(originalPath, relativePath);
 							data[key].push(relativePath);
 						}
 						break;
@@ -71,23 +64,24 @@ function makeExecutor(root, schema) {
 		return data;
 	}
 
-	let commands = new Commands();
+	let context = new Context(pathlib.path("sandbox"));
+	await context.initialize();
+	let commands = new Commands(context);
 
 	// Preload existing jobs if any.
-	for (const ExecutorClass of [Executor, ExecutorDocker]) {
-		await ExecutorClass.discover();
+	for (const ExecutorClass of [ExecutorShell, ExecutorDocker]) {
+		await ExecutorClass.discover(context);
 	}
 
 	backend.rest.handle("post", "/job/send", async (inputs) => {
 		Exception.assertPrecondition(inputs.id in Jobs, "Job id is not known: {}", inputs.id);
 		const schema = Jobs[inputs.id];
 		const jobId = commands.allocate();
-		const root = sandboxPath.joinPath("job-" + jobId).asPosix();
-		await FileSystem.mkdir(root, { force: true });
+		const contextJob = await context.addJob(jobId);
 
 		try {
 			// Build the input data.
-			const data = await formDataToSandbox(root, schema.inputs, inputs.data);
+			const data = await formDataToSandbox(contextJob, schema.inputs, inputs.data);
 			const makeArgs = (visitor) => {
 				const updatedData = Object.fromEntries(
 					Object.entries(data).map(([key, value]) => {
@@ -98,14 +92,14 @@ function makeExecutor(root, schema) {
 				const args = new Args(schema.args, updatedData);
 				return args.process();
 			};
-			commands.make(jobId, makeArgs);
+			commands.make(jobId, contextJob, makeArgs);
 
-			const executor = makeExecutor(root, schema);
+			const executor = makeExecutor(contextJob, schema);
 			await commands.detach(executor, jobId, schema);
 
 			Log.info("Executing job {}", jobId);
 		} catch (error) {
-			await FileSystem.rmdir(root, { force: true });
+			await context.removeJob(jobId);
 			Log.error("Executing job {}", jobId);
 			throw error;
 		}
@@ -122,16 +116,20 @@ function makeExecutor(root, schema) {
 		};
 	});
 
-	backend.rest.handle("delete", "/job/{id}", async (inputs) => {
+	backend.rest.handle("delete", "/job/{id}/cancel", async (inputs) => {
 		await commands.kill(inputs.id);
-		Log.info("Killing job {}", inputs.id);
+	});
+
+	backend.rest.handle("delete", "/job/{id}/delete", async (inputs) => {
+		await commands.remove(inputs.id);
+		await context.removeJob(inputs.id);
 	});
 
 	backend.rest.handle("post", "/files/{id}", async function (inputs) {
 		try {
-			const pathList = ["job-" + inputs.id, ...inputs.path];
 			const maxOrPaging = "paging" in inputs ? inputs.paging : 50;
-			const result = await storage.list(pathList, maxOrPaging, /*includeMetadata*/ true);
+			const contextJob = context.getJob(inputs.id);
+			const result = await contextJob.list(inputs.path, maxOrPaging, /*includeMetadata*/ true);
 
 			return {
 				data: result.data(),
@@ -149,14 +147,15 @@ function makeExecutor(root, schema) {
 		"get",
 		"/file/{id}",
 		async function (inputs) {
+			const contextJob = context.getJob(inputs.id);
 			try {
-				const pathList = ["job-" + inputs.id, ...inputs.path.split("/")];
-				const metadata = await storage.metadata(pathList);
+				const pathList = inputs.path.split("/");
+				const metadata = await contextJob.metadata(pathList);
 				if (metadata.size) {
 					this.setHeader("Content-Length", metadata.size);
 				}
 				this.setHeader("Content-Disposition", 'attachment; filename="' + encodeURI(metadata.name) + '"');
-				return await storage.read(pathList);
+				return await contextJob.read(pathList);
 			} catch (e) {
 				if (e instanceof FileNotFoundError) {
 					throw this.httpError(404, "Not Found");

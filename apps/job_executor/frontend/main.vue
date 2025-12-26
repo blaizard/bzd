@@ -17,6 +17,7 @@
 				<td class="actions">
 					<a v-if="isKill(jobId)" @click="kill(jobId)" v-tooltip="tooltipKill"><i class="bzd-icon-close"></i></a>
 					<a @click="goToJob(jobId)" v-tooltip="tooltipShell"><i class="bzd-icon-shell"></i></a>
+					<a @click="remove(jobId)" v-tooltip="tooltipRemove"><i class="bzd-icon-trash"></i></a>
 				</td>
 			</tr>
 		</table>
@@ -97,6 +98,12 @@
 					data: "Kill this job",
 				};
 			},
+			tooltipRemove() {
+				return {
+					type: "text",
+					data: "Remove this job and its data",
+				};
+			},
 		},
 		methods: {
 			async fetchJobs() {
@@ -122,7 +129,14 @@
 			},
 			async kill(id) {
 				await this.handleSubmit(async () => {
-					await this.$rest.request("delete", "/job/{id}", {
+					await this.$rest.request("delete", "/job/{id}/cancel", {
+						id: id,
+					});
+				});
+			},
+			async remove(id) {
+				await this.handleSubmit(async () => {
+					await this.$rest.request("delete", "/job/{id}/delete", {
 						id: id,
 					});
 				});
@@ -144,7 +158,7 @@
 
 <style lang="scss">
 	@use "@/nodejs/icons.scss" as icons with (
-		$bzdIconNames: close shell
+		$bzdIconNames: close shell trash
 	);
 </style>
 

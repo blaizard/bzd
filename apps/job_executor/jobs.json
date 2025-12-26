@@ -11,6 +11,10 @@
                 "{key}"
             ],
             [
+                "--max-dpi",
+                "{dpi}"
+            ],
+            [
                 "{action}"
             ],
             "{ebook}"
@@ -39,6 +43,11 @@
                 "max": 1,
                 "name": "key",
                 "type": "File"
+            },
+            {
+                "caption": "Max DPI",
+                "name": "dpi",
+                "type": "Input"
             }
         ]
     },

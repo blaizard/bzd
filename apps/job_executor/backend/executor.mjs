@@ -6,32 +6,17 @@ const Exception = ExceptionFactory("backend", "executor");
 const Log = LogFactory("backend", "executor");
 
 export default class Executor {
-	constructor(root) {
-		this.root = root;
-		this.command = null;
-	}
-
-	/// Discover currently running processes. To be used to resume jobs after a restart.
-	static async discover() {}
-
-	async execute(uid, schema, args) {
-		this.command = new Command();
-		await this.command.detach(["--cwd", this.root, "--", schema["command"], ...args]);
-	}
-
-	async kill() {
-		await this.command.kill();
+	constructor(contextJob) {
+		this.contextJob = contextJob;
 	}
 
 	async getInfo() {
-		return this.command.getInfo();
+		return {};
 	}
 
 	visitorArgs(_type, arg) {
 		return arg;
 	}
 
-	installWebsocket(context) {
-		this.command.installWebsocket(context);
-	}
+	installWebsocket(context) {}
 }
