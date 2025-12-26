@@ -119,7 +119,11 @@ export default class StorageDisk extends Storage {
 		if (!(await FileSystem.exists(path))) {
 			throw new FileNotFoundError(path);
 		}
-		await FileSystem.unlink(path);
+		if ((await FileSystem.stat(path)).isDirectory()) {
+			await FileSystem.rmdir(path, { force: false });
+		} else {
+			await FileSystem.unlink(path);
+		}
 	}
 
 	async _listImpl(pathList, maxOrPaging, includeMetadata) {
@@ -150,7 +154,8 @@ export default class StorageDisk extends Storage {
 	}
 
 	async _mkdirImpl(pathList) {
-		await FileSystem.mkdir(Path.dirname(pathList));
+		const fullPath = this._getFullPath(pathList);
+		await FileSystem.mkdir(fullPath, { force: true });
 	}
 
 	async _metadataImpl(pathList) {

@@ -2,7 +2,7 @@ import Fs from "fs";
 
 import ExceptionFactory from "../../core/exception.mjs";
 import { fromChunk, toBuffer } from "../../core/stream.mjs";
-import { AsyncInitialize } from "../utils.mjs";
+import { AsyncInitialize, CollectionPaging } from "../utils.mjs";
 
 const Exception = ExceptionFactory("db", "storage");
 
@@ -32,9 +32,21 @@ export class Storage extends AsyncInitialize {
 		return this._isImpl(Array.isArray(path) ? path : [path]);
 	}
 
-	/// List all files under this path
+	/// List all files under this path at a given chunk size
 	async list(path, maxOrPaging = 20, includeMetadata = false) {
 		return this._listImpl(Array.isArray(path) ? path : [path], maxOrPaging, includeMetadata);
+	}
+
+	/// List all files under this path
+	async listAll(path, maxOrPaging = 20, includeMetadata = false) {
+		let all = [];
+		const pathAsArray = Array.isArray(path) ? path : [path];
+		for await (const [_, data] of CollectionPaging.makeIterator(async (maxOrPaging) => {
+			return await this._listImpl(pathAsArray, maxOrPaging, includeMetadata);
+		}, maxOrPaging)) {
+			all.push(data);
+		}
+		return all;
 	}
 
 	/// Return a file read stream from a specific key
