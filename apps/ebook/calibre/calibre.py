@@ -25,7 +25,7 @@ class Calibre:
 		return Calibre._uid
 
 	def autoDetectKeyType(self, path: pathlib.Path) -> typing.Optional[CalibreKey]:
-		if "adobe" in str(path).lower():
+		if str(path).lower().endswith(".der"):
 			return CalibreKey.adobe
 		return None
 
