@@ -35,8 +35,12 @@ export default class CommandDocker extends CommandBase {
 	}
 
 	async kill() {
-		const result = await this.localCommandToOutput(["docker", "kill", this.name]);
-		await result.join();
+		try {
+			const result = await this.localCommandToOutput(["docker", "kill", this.name]);
+			await result.join();
+		} catch (_) {
+			// Ignore in case of error, kill should not throw if the container does not exists anymore.
+		}
 	}
 
 	/// Install the command to be used with websockets.
