@@ -68,7 +68,7 @@ if __name__== "__main__":
 		}
 		basename = OSAndArchitectureToBasename[osAndArchitecture]
 
-		url = "https://github.com/bazelbuild/bazelisk/releases/download/v1.20.0/{}".format(basename)
+		url = "https://github.com/bazelbuild/bazelisk/releases/download/v1.27.0/{}".format(basename)
 		print(f"No bazel binary detected, downloading bazelisk from {url}...", flush=True)
 		ctx = ssl.create_default_context()
 		ctx.check_hostname = False
