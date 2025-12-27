@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<h1>Jobs</h1>
-		<table class="jobs">
+		<table class="jobs" v-loading="beforeFetchJobs">
 			<tr>
 				<th>Id</th>
 				<th>Status</th>
@@ -9,15 +9,15 @@
 				<th>Arguments</th>
 				<th></th>
 			</tr>
-			<tr v-for="(info, jobId) in jobs" class="job">
+			<tr v-for="(info, jobId) in jobs" class="job" @click="goToJob(jobId)">
 				<td class="job-id">{{ jobId }}</td>
 				<td class="status">{{ info.status }}</td>
 				<td class="duration">{{ getDuration(info.timestampStart, info.timestampStop) }}</td>
 				<td class="args">{{ info.args.join(" ") }}</td>
 				<td class="actions">
-					<a v-if="isKill(jobId)" @click="kill(jobId)" v-tooltip="tooltipKill"><i class="bzd-icon-close"></i></a>
-					<a @click="goToJob(jobId)" v-tooltip="tooltipShell"><i class="bzd-icon-shell"></i></a>
-					<a @click="remove(jobId)" v-tooltip="tooltipRemove"><i class="bzd-icon-trash"></i></a>
+					<a v-if="isKill(jobId)" @click.stop="kill(jobId)" v-tooltip="tooltipKill"><i class="bzd-icon-close"></i></a>
+					<a @click.stop="goToJob(jobId)" v-tooltip="tooltipShell"><i class="bzd-icon-shell"></i></a>
+					<a @click.stop="remove(jobId)" v-tooltip="tooltipRemove"><i class="bzd-icon-trash"></i></a>
 				</td>
 			</tr>
 		</table>
@@ -104,6 +104,9 @@
 					data: "Remove this job and its data",
 				};
 			},
+			beforeFetchJobs() {
+				return this.instanceTimeout === null;
+			}
 		},
 		methods: {
 			async fetchJobs() {
@@ -165,6 +168,10 @@
 <style lang="scss" scoped>
 	.jobs {
 		.job {
+			&:hover {
+				background-color: #eee;
+				cursor: pointer;
+			}
 			.actions {
 				width: 0;
 
