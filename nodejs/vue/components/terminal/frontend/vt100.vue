@@ -80,6 +80,17 @@
 						return (csiFctMapping[name] || (() => false))(...args);
 					},
 				];
+				const csiPrivateFctMapping = {
+					25: this.ignore("Show/hide cursor"),
+					2004: this.ignore("Bracketed Paste Mode")
+				};
+				const csiPrivateMapping = [
+					new RegExp("([0-9;]*)([hl])", "g"),
+					(_, featureStr, ending) => {
+						const feature = parseInt(featureStr);
+						return (csiPrivateFctMapping[feature] || (() => false))(ending == "h");
+					}
+				];
 				const oscFctMapping = {
 					0: this.ignore("Set title"),
 					2: this.ignore("Set title"),
@@ -98,13 +109,17 @@
 					},
 				];
 				return {
+					"\x1b[?": csiPrivateMapping,
 					"\x1b[": csiMapping,
 					"\x9b": csiMapping,
 					"\x1b]": oscMapping,
 				};
 			},
 			regexprCategory() {
-				const string = Object.keys(this.categoryMapping).map(this.escapeRegexpr).join("|");
+				const keys = Object.keys(this.categoryMapping);
+				// Sort from the longest to ensure that for example "\x1b[?" and "\x1b[" are correctly handled.
+				keys.sort((a, b) => b.length - a.length);
+				const string = keys.map(this.escapeRegexpr).join("|");
 				return new RegExp("(" + string + ")", "g");
 			},
 		},
@@ -349,7 +364,7 @@
 					// No matches right after the category.
 					if (match.index !== position) {
 						Log.error(
-							"Command '{}' followed with '{}...' is malformed or not supported.",
+							"Command {:j} followed with '{}...' is malformed or not supported.",
 							matchStr,
 							stream.substring(0, 10),
 						);
@@ -357,7 +372,7 @@
 					}
 					// Process the function.
 					if (!handler(...match)) {
-						Log.error("Command '{}{}' is malformed or not supported.", matchStr, match[0]);
+						Log.error("Command {:j} + {:j} is malformed or not supported.", matchStr, match[0]);
 					}
 
 					position = regexpr.lastIndex;
