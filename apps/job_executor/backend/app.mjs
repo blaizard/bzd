@@ -5,26 +5,12 @@ import Jobs from "#bzd/apps/job_executor/jobs.json" with { type: "json" };
 import Args from "#bzd/apps/job_executor/backend/args.mjs";
 import Backend from "#bzd/nodejs/vue/apps/backend.mjs";
 import Commands from "#bzd/apps/job_executor/backend/commands.mjs";
-import { makeUid } from "#bzd/nodejs/utils/uid.mjs";
 import pathlib from "#bzd/nodejs/utils/pathlib.mjs";
 import config from "#bzd/apps/job_executor/backend/config.json" with { type: "json" };
-import ExecutorShell from "#bzd/apps/job_executor/backend/executor_shell.mjs";
-import Context from "#bzd/apps/job_executor/backend/context.mjs";
-import ExecutorDocker from "#bzd/apps/job_executor/backend/executor_docker.mjs";
 import { FileNotFoundError } from "#bzd/nodejs/db/storage/storage.mjs";
 
 const Exception = ExceptionFactory("backend");
 const Log = LogFactory("backend");
-
-function makeExecutor(contextJob, schema) {
-	if ("command" in schema) {
-		return new ExecutorShell(contextJob, schema);
-	}
-	if ("docker" in schema) {
-		return new ExecutorDocker(contextJob, schema);
-	}
-	Exception.unreachable("Undefined executor for this job: {:j}", schema);
-}
 
 (async () => {
 	const backend = Backend.makeFromCli(process.argv)
@@ -64,48 +50,36 @@ function makeExecutor(contextJob, schema) {
 		return data;
 	}
 
-	let context = new Context(pathlib.path("sandbox"));
-	await context.initialize();
-	let commands = new Commands(context);
+	let commands = new Commands(pathlib.path("sandbox"));
+	await commands.initialize();
 
 	// Preload existing jobs if any.
-	for (const ExecutorClass of [ExecutorShell, ExecutorDocker]) {
-		await ExecutorClass.discover(context);
-	}
+	//for (const ExecutorClass of [ExecutorShell, ExecutorDocker]) {
+	//	await ExecutorClass.discover(context);
+	//}
 
 	backend.rest.handle("post", "/job/send", async (inputs) => {
 		Exception.assertPrecondition(inputs.id in Jobs, "Job id is not known: {}", inputs.id);
 		const schema = Jobs[inputs.id];
-		const jobId = commands.allocate();
-		const contextJob = await context.addJob(jobId);
+		const contextJob = await commands.allocate();
+		const uid = contextJob.getUid();
 
 		try {
 			// Build the input data.
 			const data = await formDataToSandbox(contextJob, schema.inputs, inputs.data);
-			const makeArgs = (visitor) => {
-				const updatedData = Object.fromEntries(
-					Object.entries(data).map(([key, value]) => {
-						const item = schema.inputs.find((item) => item.name == key);
-						return [key, visitor(item.type || "unknown", value)];
-					}),
-				);
-				const args = new Args(schema.args, updatedData);
-				return args.process();
-			};
-			commands.make(jobId, contextJob, makeArgs);
 
-			const executor = makeExecutor(contextJob, schema);
-			await commands.detach(executor, jobId, schema);
+			commands.makeFromSchema(uid, schema, data);
+			await commands.detach(uid);
 
-			Log.info("Executing job {}", jobId);
+			Log.info("Executing job {}", uid);
 		} catch (error) {
-			await context.removeJob(jobId);
-			Log.error("Executing job {}", jobId);
+			Log.error("Executing job {}", uid);
+			await commands.remove(uid);
 			throw error;
 		}
 
 		return {
-			job: jobId,
+			job: uid,
 		};
 	});
 
@@ -122,13 +96,12 @@ function makeExecutor(contextJob, schema) {
 
 	backend.rest.handle("delete", "/job/{id}/delete", async (inputs) => {
 		await commands.remove(inputs.id);
-		await context.removeJob(inputs.id);
 	});
 
 	backend.rest.handle("post", "/files/{id}", async function (inputs) {
 		try {
 			const maxOrPaging = "paging" in inputs ? inputs.paging : 50;
-			const contextJob = context.getJob(inputs.id);
+			const contextJob = commands.getContext(inputs.id);
 			const result = await contextJob.list(inputs.path, maxOrPaging, /*includeMetadata*/ true);
 
 			return {
@@ -147,7 +120,7 @@ function makeExecutor(contextJob, schema) {
 		"get",
 		"/file/{id}",
 		async function (inputs) {
-			const contextJob = context.getJob(inputs.id);
+			const contextJob = commands.getContext(inputs.id);
 			try {
 				const pathList = inputs.path.split("/");
 				const metadata = await contextJob.metadata(pathList);
@@ -169,8 +142,8 @@ function makeExecutor(contextJob, schema) {
 	);
 
 	backend.websocket.handle("/job/{id}", (context) => {
-		const jobId = context.getParam("id");
-		commands.installCommandWebsocket(context, jobId);
+		const uid = context.getParam("id");
+		commands.installCommandWebsocket(context, uid);
 	});
 
 	await backend.start();

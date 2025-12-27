@@ -16,6 +16,11 @@ class ContextJob {
 		this.uid_ = uid;
 	}
 
+	/// Get the unique identifier for this job.
+	getUid() {
+		return this.uid_;
+	}
+
 	/// Get the absolute root directory for this job.
 	getRoot() {
 		return this.root_.joinPath(this.getPrefix());
@@ -77,7 +82,7 @@ export default class Context {
 	}
 
 	getAllJobs() {
-		return this.jobs;
+		return Object.keys(this.jobs);
 	}
 
 	async initialize() {

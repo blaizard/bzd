@@ -14,9 +14,9 @@ export default class Executor {
 	/// Discover currently running processes. To be used to resume jobs after a restart.
 	static async discover() {}
 
-	async execute(uid, schema, args) {
+	async execute(uid, args) {
 		this.command = new Command();
-		await this.command.detach(["--cwd", this.contextJob.getRoot().asPosix(), "--", schema["command"], ...args]);
+		await this.command.detach(["--cwd", this.contextJob.getRoot().asPosix(), "--", ...args]);
 	}
 
 	async kill() {
@@ -27,7 +27,11 @@ export default class Executor {
 		return this.command.getInfo();
 	}
 
-	visitorArgs(_type, arg) {
+	visitorArgs(type, arg, schema) {
+		switch (type) {
+			case "post":
+				return [schema["command"], ...arg];
+		}
 		return arg;
 	}
 

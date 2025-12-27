@@ -36,14 +36,13 @@ export default class ExecutorDocker {
 		console.log(containers);
 	}
 
-	async execute(uid, schema, args) {
+	async execute(uid, args) {
 		this.command = new CommandDocker("bzd-job-executor-" + uid);
 		await this.command.detach([
 			"-v",
 			this.contextJob.getRoot().absolute().asPosix() + ":/sandbox",
 			"--workdir",
 			"/sandbox",
-			schema["docker"],
 			...args,
 		]);
 	}
@@ -56,10 +55,12 @@ export default class ExecutorDocker {
 		return this.command.getInfo();
 	}
 
-	visitorArgs(type, arg) {
+	visitorArgs(type, arg, schema) {
 		switch (type) {
 			case "File":
 				return "/sandbox/" + arg;
+			case "post":
+				return [schema["docker"], ...arg];
 		}
 		return arg;
 	}
