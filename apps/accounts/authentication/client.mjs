@@ -16,7 +16,6 @@ export default class AccountsAuthenticationClient extends TokenAuthenticationCli
 
 	static make(options) {
 		const { type: type, ...optionsRest } = options;
-		console.log(options, optionsRest, type);
 		switch (type || "accounts") {
 			case "accounts":
 				return new AccountsAuthenticationClient(optionsRest);
