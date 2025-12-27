@@ -63,11 +63,11 @@ export default class Commands {
 	/// Create a new command.
 	make(uid, executor, args) {
 		Exception.assert(!(uid in this.jobs), "The uid '{}' is already in use.", uid);
-		const context = {
+		const job = {
 			args: args,
 			executor: executor,
 		};
-		this.jobs[uid] = context;
+		this.jobs[uid] = job;
 	}
 
 	get_(uid) {
@@ -77,15 +77,16 @@ export default class Commands {
 
 	/// Run a specific command.
 	async detach(uid) {
-		const context = this.get_(uid);
-		await context.executor.execute(uid, context.args);
+		const job = this.get_(uid);
+		await job.executor.execute(uid, job.args);
+		this.getContext(uid).captureOutput(job.executor);
 	}
 
 	/// Kill a specific command.
 	async kill(uid) {
-		const context = this.get_(uid);
-		if (context.executor.kill) {
-			await context.executor.kill();
+		const job = this.get_(uid);
+		if (job.executor.kill) {
+			await job.executor.kill();
 		}
 	}
 
@@ -101,12 +102,12 @@ export default class Commands {
 	}
 
 	async getInfo(uid) {
-		const context = this.get_(uid);
+		const job = this.get_(uid);
 		let args = {
-			args: context.args,
+			args: job.args,
 		};
-		if (context.executor) {
-			Object.assign(args, await context.executor.getInfo());
+		if (job.executor) {
+			Object.assign(args, await job.executor.getInfo());
 		}
 		return args;
 	}

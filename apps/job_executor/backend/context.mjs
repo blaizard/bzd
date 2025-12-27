@@ -9,11 +9,25 @@ import pathlib from "#bzd/nodejs/utils/pathlib.mjs";
 const Exception = ExceptionFactory("backend", "context");
 const Log = LogFactory("backend", "context");
 
+class JobLogCapture {
+	constructor(path) {
+		this.path = path;
+	}
+
+	send(data) {
+		FileSystem.appendFile(this.path, data);
+	}
+
+	read(onRead) {}
+	exit(onExit) {}
+}
+
 class ContextJob {
 	constructor(root, storage, uid) {
 		this.root_ = root;
 		this.storage_ = storage;
 		this.uid_ = uid;
+		this.prefix_ = "job-" + this.uid_;
 	}
 
 	/// Get the unique identifier for this job.
@@ -23,17 +37,21 @@ class ContextJob {
 
 	/// Get the absolute root directory for this job.
 	getRoot() {
-		return this.root_.joinPath(this.getPrefix());
+		return this.root_.joinPath(...this.getPrefixData());
 	}
 
-	/// Get the prefix for this job.
-	getPrefix() {
-		return "job-" + this.uid_;
+	getLog() {
+		return this.root_.joinPath(this.prefix_, "log.txt");
+	}
+
+	/// Get the prefix for the data.
+	getPrefixData() {
+		return [this.prefix_, "sandbox"];
 	}
 
 	/// Initialize the current job context.
 	async initialize() {
-		await this.storage_.mkdir([this.getPrefix()]);
+		await this.storage_.mkdir(this.getPrefixData());
 	}
 
 	/// Copy the content of the path into this job context.
@@ -46,21 +64,27 @@ class ContextJob {
 		await FileSystem.move(source, path.asPosix());
 	}
 
+	/// Capture the output of the given executor.
+	captureOutput(executor) {
+		const context = new JobLogCapture(this.getLog().asPosix());
+		executor.installWebsocket(context);
+	}
+
 	/// Destroy the current job context.
 	async destroy() {
-		await this.storage_.delete([this.getPrefix()]);
+		await this.storage_.delete([this.prefix_]);
 	}
 
 	async metadata(pathList) {
-		return await this.storage_.metadata([this.getPrefix(), ...pathList]);
+		return await this.storage_.metadata([...this.getPrefixData(), ...pathList]);
 	}
 
 	async read(pathList) {
-		return await this.storage_.read([this.getPrefix(), ...pathList]);
+		return await this.storage_.read([...this.getPrefixData(), ...pathList]);
 	}
 
 	async list(pathList, maxOrPaging, includeMetadata) {
-		return await this.storage_.list([this.getPrefix(), ...pathList], maxOrPaging, includeMetadata);
+		return await this.storage_.list([...this.getPrefixData(), ...pathList], maxOrPaging, includeMetadata);
 	}
 }
 
@@ -98,6 +122,7 @@ export default class Context {
 			if (match) {
 				const uid = parseInt(match[1], 10);
 				this.jobs[uid] = new ContextJob(this.root, this.storage, uid);
+				this.uid = Math.max(this.uid, uid);
 				Log.info("Discovered previous job context '{}'.", uid);
 			} else {
 				Log.warning("Unexpected directory '{}'.", name);

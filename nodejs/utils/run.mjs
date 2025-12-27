@@ -140,23 +140,24 @@ export async function localCommand(cmds, { stdout = null, stderr = null, maxOutp
 			stderr.forEach((handler) => handler(data));
 		});
 
-		result.promise = new Promise((finalResolve, finalReject) => {
+		// Do not reject not to end up with an unhandled rejection.
+		result.promise = new Promise((finalResolve, _) => {
 			subprocess.on("close", (code) => {
 				if (typeof code === "number") {
 					result.returncode = code;
 					if (code == 0) {
 						result.event.trigger("status", "completed");
-						finalResolve(result);
+						finalResolve();
 					} else {
 						result.event.trigger("status", "failed");
 						const message = "Process failed with error code: " + code;
 						stderr.forEach((handler) => handler(message));
-						finalReject(message);
+						finalResolve();
 					}
 				} else {
 					result.event.trigger("status", "cancelled");
 					stderr.forEach((handler) => handler("Cancelled"));
-					finalResolve(result);
+					finalResolve();
 				}
 			});
 		});
