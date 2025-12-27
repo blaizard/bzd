@@ -7,6 +7,8 @@ const Exception = ExceptionFactory("backend", "executor-docker");
 const Log = LogFactory("backend", "executor-docker");
 
 export default class ExecutorDocker {
+	static type = "docker";
+
 	constructor(contextJob) {
 		this.contextJob = contextJob;
 		this.command = null;
@@ -25,15 +27,23 @@ export default class ExecutorDocker {
 				const data = JSON.parse(line);
 				return data["Names"];
 			});
-		let discovered = [];
+		let executors = {};
 		const regex = /^bzd-job-executor-(\d+)$/;
 		for (const name of containers) {
 			const match = name.match(regex);
 			if (match) {
 				const uid = parseInt(match[1], 10);
+				const maybeContextJob = context.getJob(uid, null);
+				executors[uid] = new ExecutorDocker(maybeContextJob);
+				await executors[uid].attach(uid);
 			}
 		}
-		console.log(containers);
+		return executors;
+	}
+
+	async attach(uid) {
+		this.command = new CommandDocker("bzd-job-executor-" + uid);
+		await this.command.attach();
 	}
 
 	async execute(uid, args) {

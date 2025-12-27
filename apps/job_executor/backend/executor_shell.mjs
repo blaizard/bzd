@@ -6,13 +6,17 @@ const Exception = ExceptionFactory("backend", "executor");
 const Log = LogFactory("backend", "executor");
 
 export default class Executor {
+	static type = "shell";
+
 	constructor(contextJob) {
 		this.contextJob = contextJob;
 		this.command = null;
 	}
 
 	/// Discover currently running processes. To be used to resume jobs after a restart.
-	static async discover() {}
+	static async discover() {
+		return {};
+	}
 
 	async execute(uid, args) {
 		this.command = new Command();

@@ -28,6 +28,13 @@ export default class CommandDocker extends CommandBase {
 		});
 	}
 
+	/// Monitor an existing container.
+	async attach() {
+		this.setStatus(Status.running);
+		await this._monitorDockerContainer();
+	}
+
+	/// Start and monitor an existing container.
 	async detach(args) {
 		this.setStatus(Status.running);
 		await this._startDockerContainer(args);

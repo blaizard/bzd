@@ -53,11 +53,6 @@ const Log = LogFactory("backend");
 	let commands = new Commands(pathlib.path("sandbox"));
 	await commands.initialize();
 
-	// Preload existing jobs if any.
-	//for (const ExecutorClass of [ExecutorShell, ExecutorDocker]) {
-	//	await ExecutorClass.discover(context);
-	//}
-
 	backend.rest.handle("post", "/job/send", async (inputs) => {
 		Exception.assertPrecondition(inputs.id in Jobs, "Job id is not known: {}", inputs.id);
 		const schema = Jobs[inputs.id];

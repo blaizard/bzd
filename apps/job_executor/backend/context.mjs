@@ -168,9 +168,11 @@ export default class Context {
 		return this.jobs[uid];
 	}
 
-	getJob(uid) {
-		Exception.assertPrecondition(uid in this.jobs, "There is not uid '{}' associated with a job context.", uid);
-		return this.jobs[uid];
+	getJob(uid, valueOr = undefined) {
+		if (valueOr === undefined) {
+			Exception.assertPrecondition(uid in this.jobs, "There is not uid '{}' associated with a job context.", uid);
+		}
+		return this.jobs[uid] || valueOr;
 	}
 
 	async removeJob(uid) {

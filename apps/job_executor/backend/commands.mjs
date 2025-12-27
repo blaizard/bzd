@@ -29,11 +29,25 @@ export default class Commands {
 	async initialize() {
 		await this.context.initialize();
 
-		// Prefill the context
+		// Discover existing jobs if any.
+		for (const ExecutorClass of [ExecutorShell, ExecutorDocker]) {
+			const executors = await ExecutorClass.discover(this.context);
+			for (const [uid, executor] of Object.entries(executors)) {
+				await this.make(uid, executor);
+				const maybeContextJob = this.getContext(uid, null);
+				if (maybeContextJob) {
+					maybeContextJob.captureOutput(executor);
+				}
+			}
+		}
+
+		// Prefill the entries that are not already.
 		for (const uid of this.context.getAllJobs()) {
-			const contextJob = this.getContext(uid);
-			const executor = new Executor(contextJob);
-			await this.make(uid, executor);
+			if (!(uid in this.executors)) {
+				const contextJob = this.getContext(uid);
+				const executor = new Executor(contextJob);
+				await this.make(uid, executor);
+			}
 		}
 
 		// Start the info gathered thread.
@@ -41,9 +55,11 @@ export default class Commands {
 			await Promise.all(
 				Object.entries(this.executors).map(async ([uid, executor]) => {
 					try {
-						const contextJob = this.getContext(uid);
 						const info = await executor.getInfo();
-						await contextJob.updateInfo(info);
+						const maybeContextJob = this.getContext(uid, null);
+						if (maybeContextJob) {
+							await maybeContextJob.updateInfo(info);
+						}
 					} catch (e) {
 						Log.warning("Concurrent access while gathering info: {}", e);
 					}
@@ -79,11 +95,20 @@ export default class Commands {
 	async make(uid, executor, args = null) {
 		Exception.assert(!(uid in this.executors), "The uid '{}' is already in use.", uid);
 		this.executors[uid] = executor;
+
+		// Update the information.
+		let info = {};
 		if (args) {
-			const contextJob = this.getContext(uid);
-			await contextJob.updateInfo({
-				args: args,
-			});
+			info.args = args;
+		}
+		if (executor.constructor.type) {
+			info.type = executor.constructor.type;
+		}
+		if (Object.keys(info).length > 0) {
+			const maybeContextJob = this.getContext(uid);
+			if (maybeContextJob) {
+				await maybeContextJob.updateInfo(info);
+			}
 		}
 	}
 
@@ -99,7 +124,7 @@ export default class Commands {
 		const info = await contextJob.getInfo();
 		Exception.assert("args" in info, "Information from uid '{}' is missing args: {:j}", uid, info);
 		await executor.execute(uid, info.args);
-		this.getContext(uid).captureOutput(executor);
+		contextJob.captureOutput(executor);
 	}
 
 	/// Kill a specific command.
@@ -117,8 +142,8 @@ export default class Commands {
 		delete this.executors[uid];
 	}
 
-	getContext(uid) {
-		return this.context.getJob(uid);
+	getContext(uid, valueOr) {
+		return this.context.getJob(uid, valueOr);
 	}
 
 	async getInfo(uid) {
