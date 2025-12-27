@@ -16,7 +16,7 @@ export default class Executor {
 
 	async execute(uid, args) {
 		this.command = new Command();
-		await this.command.detach(["--cwd", this.contextJob.getRoot().asPosix(), "--", ...args]);
+		await this.command.detach(["--cwd", this.contextJob.getRootPath().asPosix(), "--", ...args]);
 	}
 
 	async kill() {

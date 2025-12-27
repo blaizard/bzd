@@ -13,11 +13,9 @@ class JobLogCapture {
 	constructor(path) {
 		this.path = path;
 	}
-
 	send(data) {
 		FileSystem.appendFile(this.path, data);
 	}
-
 	read(onRead) {}
 	exit(onExit) {}
 }
@@ -28,6 +26,7 @@ class ContextJob {
 		this.storage_ = storage;
 		this.uid_ = uid;
 		this.prefix_ = "job-" + this.uid_;
+		this.info = null;
 	}
 
 	/// Get the unique identifier for this job.
@@ -36,12 +35,45 @@ class ContextJob {
 	}
 
 	/// Get the absolute root directory for this job.
-	getRoot() {
+	getRootPath() {
 		return this.root_.joinPath(...this.getPrefixData());
 	}
 
-	getLog() {
+	getLogPath() {
 		return this.root_.joinPath(this.prefix_, "log.txt");
+	}
+
+	getInfoPath() {
+		return this.root_.joinPath(this.prefix_, "info.json");
+	}
+
+	/// Update the current information from this job.
+	async updateInfo(info) {
+		if (!info) {
+			return;
+		}
+		const infoSerialized = JSON.stringify(info);
+		if (this.info === null) {
+			await this.getInfo();
+		}
+		if (infoSerialized == this.info[1]) {
+			return;
+		}
+		await FileSystem.writeFile(this.getInfoPath().asPosix(), infoSerialized);
+		this.info = [info, infoSerialized];
+	}
+
+	/// Get the information from this job.
+	async getInfo() {
+		if (this.info === null) {
+			try {
+				const raw = await FileSystem.readFile(this.getInfoPath().asPosix());
+				this.info = [JSON.parse(raw), raw];
+			} catch (e) {
+				this.info = [{}, "{}"];
+			}
+		}
+		return this.info[0];
 	}
 
 	/// Get the prefix for the data.
@@ -59,14 +91,14 @@ class ContextJob {
 	/// \param source The source path, should be an absolute path.
 	/// \param destination The destination path, relative to the job root.
 	async moveTo(source, destination) {
-		const path = this.getRoot().joinPath(destination);
+		const path = this.getRootPath().joinPath(destination);
 		await FileSystem.mkdir(path.parent.asPosix(), { force: true });
 		await FileSystem.move(source, path.asPosix());
 	}
 
 	/// Capture the output of the given executor.
 	captureOutput(executor) {
-		const context = new JobLogCapture(this.getLog().asPosix());
+		const context = new JobLogCapture(this.getLogPath().asPosix());
 		executor.installWebsocket(context);
 	}
 

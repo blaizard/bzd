@@ -1,5 +1,5 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
-import Status from "#bzd/nodejs/vue/components/terminal/backend/status.mjs";
+import { Status } from "#bzd/nodejs/utils/run.mjs";
 import CommandBase from "#bzd/nodejs/vue/components/terminal/backend/base.mjs";
 
 const Exception = ExceptionFactory("terminal", "local");

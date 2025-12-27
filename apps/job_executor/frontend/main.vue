@@ -13,7 +13,7 @@
 				<td class="job-id">{{ jobId }}</td>
 				<td class="status">{{ info.status }}</td>
 				<td class="duration">{{ getDuration(info.timestampStart, info.timestampStop) }}</td>
-				<td class="args">{{ info.args.join(" ") }}</td>
+				<td class="args">{{ info.args ? info.args.join(" ") : "" }}</td>
 				<td class="actions">
 					<a v-if="isKill(jobId)" @click.stop="kill(jobId)" v-tooltip="tooltipKill"><i class="bzd-icon-close"></i></a>
 					<a @click.stop="goToJob(jobId)" v-tooltip="tooltipShell"><i class="bzd-icon-shell"></i></a>
@@ -106,7 +106,7 @@
 			},
 			beforeFetchJobs() {
 				return this.instanceTimeout === null;
-			}
+			},
 		},
 		methods: {
 			async fetchJobs() {

@@ -1,7 +1,7 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import CommandBase from "#bzd/nodejs/vue/components/terminal/backend/base.mjs";
-import Status from "#bzd/nodejs/vue/components/terminal/backend/status.mjs";
+import { Status } from "#bzd/nodejs/utils/run.mjs";
 
 const Exception = ExceptionFactory("terminal", "docker");
 const Log = LogFactory("terminal", "docker");

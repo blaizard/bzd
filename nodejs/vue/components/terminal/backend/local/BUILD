@@ -15,6 +15,5 @@ bzd_nodejs_library(
         "//nodejs/core:log",
         "//nodejs/utils:run",
         "//nodejs/vue/components/terminal/backend:base",
-        "//nodejs/vue/components/terminal/backend:status",
     ],
 )

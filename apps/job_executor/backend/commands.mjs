@@ -35,6 +35,28 @@ export default class Commands {
 			const executor = new Executor(contextJob);
 			this.make(uid, executor, []);
 		}
+
+		// Start the info gathered thread.
+		setInterval(async () => {
+			await Promise.all(
+				Object.keys(this.jobs).map(async (uid) => {
+					try {
+						const job = this.get_(uid);
+						const contextJob = this.getContext(uid);
+						const info = await job.executor.getInfo();
+						const updateInfo = Object.assign(
+							{
+								args: job.args,
+							},
+							info,
+						);
+						await contextJob.updateInfo(updateInfo);
+					} catch (e) {
+						Log.warning("Concurrent access while gathering info: {}", e);
+					}
+				}),
+			);
+		}, 5000);
 	}
 
 	/// Allocate a jobId for a command.
@@ -71,7 +93,7 @@ export default class Commands {
 	}
 
 	get_(uid) {
-		Exception.assert(uid in this.jobs, "Undefined job id '{}'.", uid);
+		Exception.assertPrecondition(uid in this.jobs, "Undefined job id '{}'.", uid);
 		return this.jobs[uid];
 	}
 
@@ -102,14 +124,8 @@ export default class Commands {
 	}
 
 	async getInfo(uid) {
-		const job = this.get_(uid);
-		let args = {
-			args: job.args,
-		};
-		if (job.executor) {
-			Object.assign(args, await job.executor.getInfo());
-		}
-		return args;
+		const contextJob = this.getContext(uid);
+		return await contextJob.getInfo();
 	}
 
 	async getAllInfo() {
@@ -120,8 +136,6 @@ export default class Commands {
 
 	installCommandWebsocket(context, uid) {
 		const job = this.get_(uid);
-		if (job.executor) {
-			job.executor.installWebsocket(context);
-		}
+		job.executor.installWebsocket(context);
 	}
 }

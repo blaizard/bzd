@@ -4,6 +4,14 @@ import Event from "#bzd/nodejs/core/event.mjs";
 
 const Exception = ExceptionFactory("run");
 
+export const Status = Object.freeze({
+	idle: "idle",
+	running: "running",
+	failed: "failed",
+	completed: "completed",
+	cancelled: "cancelled",
+});
+
 class ExecuteResult {
 	constructor(subprocess, { maxOutputSize }) {
 		this.subprocess = subprocess;
@@ -13,7 +21,7 @@ class ExecuteResult {
 
 		this.output = [];
 		this.outputSize = 0;
-		this.status = "running";
+		this.status = Status.idle;
 		this.event = new Event();
 		this.event.on("status", (status) => {
 			this.status = status;
@@ -146,16 +154,16 @@ export async function localCommand(cmds, { stdout = null, stderr = null, maxOutp
 				if (typeof code === "number") {
 					result.returncode = code;
 					if (code == 0) {
-						result.event.trigger("status", "completed");
+						result.event.trigger("status", Status.completed);
 						finalResolve();
 					} else {
-						result.event.trigger("status", "failed");
+						result.event.trigger("status", Status.failed);
 						const message = "Process failed with error code: " + code;
 						stderr.forEach((handler) => handler(message));
 						finalResolve();
 					}
 				} else {
-					result.event.trigger("status", "cancelled");
+					result.event.trigger("status", Status.cancelled);
 					stderr.forEach((handler) => handler("Cancelled"));
 					finalResolve();
 				}
@@ -163,10 +171,11 @@ export async function localCommand(cmds, { stdout = null, stderr = null, maxOutp
 		});
 
 		subprocess.on("spawn", () => {
+			result.event.trigger("status", Status.running);
 			resolve(result);
 		});
 		subprocess.on("error", (err) => {
-			result.event.trigger("status", "failed");
+			result.event.trigger("status", Status.failed);
 			const message = "Process failed to start: " + String(err);
 			stderr.forEach((handler) => handler(message));
 			reject(new Exception(message));

@@ -1,8 +1,7 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import Event from "#bzd/nodejs/core/event.mjs";
-import Status from "#bzd/nodejs/vue/components/terminal/backend/status.mjs";
-import { localCommand } from "#bzd/nodejs/utils/run.mjs";
+import { localCommand, Status } from "#bzd/nodejs/utils/run.mjs";
 
 const Exception = ExceptionFactory("terminal");
 const Log = LogFactory("terminal");

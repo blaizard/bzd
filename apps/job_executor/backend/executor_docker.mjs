@@ -40,7 +40,7 @@ export default class ExecutorDocker {
 		this.command = new CommandDocker("bzd-job-executor-" + uid);
 		await this.command.detach([
 			"-v",
-			this.contextJob.getRoot().absolute().asPosix() + ":/sandbox",
+			this.contextJob.getRootPath().absolute().asPosix() + ":/sandbox",
 			"--workdir",
 			"/sandbox",
 			...args,
