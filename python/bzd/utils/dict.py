@@ -28,9 +28,14 @@ class UpdatePolicy(enum.Enum):
 	raiseOnNonConflict = enum.auto()
 
 
-def updateDeep(d: typing.MutableMapping[typing.Any, typing.Any],
-               u: typing.MutableMapping[typing.Any, typing.Any],
-               policy: UpdatePolicy = UpdatePolicy.override) -> typing.MutableMapping[typing.Any, typing.Any]:
+UpdatePolicyCallable = typing.Callable[[typing.Any, typing.Any, typing.List[str]], None]
+
+
+def updateDeep(
+    d: typing.MutableMapping[typing.Any, typing.Any],
+    u: typing.MutableMapping[typing.Any, typing.Any],
+    policy: typing.Union[UpdatePolicy, UpdatePolicyCallable] = UpdatePolicy.override
+) -> typing.MutableMapping[typing.Any, typing.Any]:
 	"""Deep update of 2 dictionaries.
 	
 	Args:
@@ -42,27 +47,44 @@ def updateDeep(d: typing.MutableMapping[typing.Any, typing.Any],
 		The updated dictionary.
 	"""
 
-	return _updateDeep(d, u, policy, [])
+	if policy == UpdatePolicy.override:
+
+		def policyCallback(d: typing.Any, u: typing.Any, keys: typing.List[str]) -> None:
+			pass
+	elif policy == UpdatePolicy.raiseOnConflict:
+
+		def policyCallback(d: typing.Any, u: typing.Any, keys: typing.List[str]) -> None:
+			if d is not None:
+				raise KeyError(".".join(keys))
+	elif policy == UpdatePolicy.raiseOnNonConflict:
+
+		def policyCallback(d: typing.Any, u: typing.Any, keys: typing.List[str]) -> None:
+			if d is None:
+				raise KeyError(".".join(keys))
+	else:
+		policyCallback = policy
+
+	return _updateDeep(d, u, policyCallback, [])
 
 
 def _updateDeep(d: typing.MutableMapping[typing.Any, typing.Any], u: typing.MutableMapping[typing.Any, typing.Any],
-                policy: UpdatePolicy, keys: typing.List[str]) -> typing.MutableMapping[typing.Any, typing.Any]:
+                policyCallback: UpdatePolicyCallable,
+                keys: typing.List[str]) -> typing.MutableMapping[typing.Any, typing.Any]:
 
 	for k, v in u.items():
 		keys.append(k)
-		if (policy == UpdatePolicy.raiseOnNonConflict) and (k not in d):
-			raise KeyError(".".join(keys))
+		if k not in d:
+			policyCallback(None, v, keys)
 		if isinstance(v, dict):
 			d.setdefault(k, {})
 			if isinstance(d[k], dict):
 				d[k] = _updateDeep(d[k], v, policy, keys)
 			else:
-				if policy == UpdatePolicy.raiseOnConflict:
-					raise KeyError(".".join(keys))
+				policyCallback(d[k], v, keys)
 				d[k] = v
 		else:
-			if policy == UpdatePolicy.raiseOnConflict and (k in d):
-				raise KeyError(".".join(keys))
+			if k in d:
+				policyCallback(d.get(k), v, keys)
 			d[k] = v
 		keys.pop()
 

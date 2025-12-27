@@ -34,10 +34,16 @@ class Config:
 		self.dataAsDict = internalToDictionary(self.data)
 
 	def _addData(self, data: typing.Dict[str, typing.Any], source: str, failOnConflict: bool) -> None:
+
+		def policy(originalValue: typing.Any, newValue: typing.Any, keys: typing.List[str]) -> None:
+			if originalValue is None or newValue is None:
+				return
+			if isinstance(originalValue, list) and not isinstance(newValue, list):
+				fatal(f"The override of a list should be a list, see key '{'.'.join(keys)}' from '{source}'.")
+			return
+
 		try:
-			updateDeep(self.dataAsDict,
-			           data,
-			           policy=UpdatePolicy.raiseOnConflict if failOnConflict else UpdatePolicy.override)
+			updateDeep(self.dataAsDict, data, policy=UpdatePolicy.raiseOnConflict if failOnConflict else policy)
 		except KeyError as e:
 			fatal(f"The key {e} from '{source}' was already defined by another base configuration.")
 
@@ -161,6 +167,8 @@ if __name__ == "__main__":
 	# Apply the key value pairs.
 	for keyValue in args.overrideSets:
 		key, value = keyValue.strip().split("=", 1)
+		if value.startswith("[") and value.endswith("]"):
+			value = [value[1:-1]]
 		output.addKey(key, value, source="command line", failOnConflict=False)
 
 	outputJson = json.dumps(output.data)
