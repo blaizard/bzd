@@ -61,8 +61,10 @@ def updateDeep(
 		def policyCallback(d: typing.Any, u: typing.Any, keys: typing.List[str]) -> None:
 			if d is None:
 				raise KeyError(".".join(keys))
+	elif callable(policy):
+		policyCallback = policy  # type: ignore
 	else:
-		policyCallback = policy
+		raise Exception(f"Unsupported policy '{str(policy)}'")
 
 	return _updateDeep(d, u, policyCallback, [])
 
@@ -78,7 +80,7 @@ def _updateDeep(d: typing.MutableMapping[typing.Any, typing.Any], u: typing.Muta
 		if isinstance(v, dict):
 			d.setdefault(k, {})
 			if isinstance(d[k], dict):
-				d[k] = _updateDeep(d[k], v, policy, keys)
+				d[k] = _updateDeep(d[k], v, policyCallback, keys)
 			else:
 				policyCallback(d[k], v, keys)
 				d[k] = v
