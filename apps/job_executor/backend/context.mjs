@@ -52,15 +52,14 @@ class ContextJob {
 		if (!info) {
 			return;
 		}
-		const infoSerialized = JSON.stringify(info);
-		if (this.info === null) {
-			await this.getInfo();
-		}
-		if (infoSerialized == this.info[1]) {
+		const previousInfo = await this.getInfo();
+		const updatedInfo = Object.assign({}, previousInfo, info);
+		const updatedInfoSerialized = JSON.stringify(updatedInfo);
+		if (updatedInfoSerialized == this.info[1]) {
 			return;
 		}
-		await FileSystem.writeFile(this.getInfoPath().asPosix(), infoSerialized);
-		this.info = [info, infoSerialized];
+		await FileSystem.writeFile(this.getInfoPath().asPosix(), updatedInfoSerialized);
+		this.info = [updatedInfo, updatedInfoSerialized];
 	}
 
 	/// Get the information from this job.

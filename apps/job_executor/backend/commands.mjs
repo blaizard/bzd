@@ -23,7 +23,7 @@ function makeExecutor(contextJob, schema) {
 export default class Commands {
 	constructor(root) {
 		this.context = new Context(root);
-		this.jobs = {};
+		this.executors = {};
 	}
 
 	async initialize() {
@@ -33,24 +33,17 @@ export default class Commands {
 		for (const uid of this.context.getAllJobs()) {
 			const contextJob = this.getContext(uid);
 			const executor = new Executor(contextJob);
-			this.make(uid, executor, []);
+			await this.make(uid, executor);
 		}
 
 		// Start the info gathered thread.
 		setInterval(async () => {
 			await Promise.all(
-				Object.keys(this.jobs).map(async (uid) => {
+				Object.entries(this.executors).map(async ([uid, executor]) => {
 					try {
-						const job = this.get_(uid);
 						const contextJob = this.getContext(uid);
-						const info = await job.executor.getInfo();
-						const updateInfo = Object.assign(
-							{
-								args: job.args,
-							},
-							info,
-						);
-						await contextJob.updateInfo(updateInfo);
+						const info = await executor.getInfo();
+						await contextJob.updateInfo(info);
 					} catch (e) {
 						Log.warning("Concurrent access while gathering info: {}", e);
 					}
@@ -65,7 +58,7 @@ export default class Commands {
 		return await this.context.addJob(uid);
 	}
 
-	makeFromSchema(uid, schema, data) {
+	async makeFromSchema(uid, schema, data) {
 		const makeArgs = (visitor) => {
 			const updatedData = Object.fromEntries(
 				Object.entries(data).map(([key, value]) => {
@@ -79,36 +72,41 @@ export default class Commands {
 		const contextJob = this.getContext(uid);
 		const executor = makeExecutor(contextJob, schema);
 		const args = makeArgs(executor.visitorArgs);
-		this.make(uid, executor, args);
+		await this.make(uid, executor, args);
 	}
 
 	/// Create a new command.
-	make(uid, executor, args) {
-		Exception.assert(!(uid in this.jobs), "The uid '{}' is already in use.", uid);
-		const job = {
-			args: args,
-			executor: executor,
-		};
-		this.jobs[uid] = job;
+	async make(uid, executor, args = null) {
+		Exception.assert(!(uid in this.executors), "The uid '{}' is already in use.", uid);
+		this.executors[uid] = executor;
+		if (args) {
+			const contextJob = this.getContext(uid);
+			await contextJob.updateInfo({
+				args: args,
+			});
+		}
 	}
 
-	get_(uid) {
-		Exception.assertPrecondition(uid in this.jobs, "Undefined job id '{}'.", uid);
-		return this.jobs[uid];
+	getExecutor(uid) {
+		Exception.assertPrecondition(uid in this.executors, "Undefined job id '{}'.", uid);
+		return this.executors[uid];
 	}
 
 	/// Run a specific command.
 	async detach(uid) {
-		const job = this.get_(uid);
-		await job.executor.execute(uid, job.args);
-		this.getContext(uid).captureOutput(job.executor);
+		const executor = this.getExecutor(uid);
+		const contextJob = this.getContext(uid);
+		const info = await contextJob.getInfo();
+		Exception.assert("args" in info, "Information from uid '{}' is missing args: {:j}", uid, info);
+		await executor.execute(uid, info.args);
+		this.getContext(uid).captureOutput(executor);
 	}
 
 	/// Kill a specific command.
 	async kill(uid) {
-		const job = this.get_(uid);
-		if (job.executor.kill) {
-			await job.executor.kill();
+		const executor = this.getExecutor(uid);
+		if (executor.kill) {
+			await executor.kill();
 		}
 	}
 
@@ -116,7 +114,7 @@ export default class Commands {
 	async remove(uid) {
 		await this.kill(uid);
 		await this.context.removeJob(uid);
-		delete this.jobs[uid];
+		delete this.executors[uid];
 	}
 
 	getContext(uid) {
@@ -129,13 +127,13 @@ export default class Commands {
 	}
 
 	async getAllInfo() {
-		const keys = Object.keys(this.jobs);
+		const keys = this.context.getAllJobs();
 		const infos = await Promise.all(keys.map((uid) => this.getInfo(uid)));
 		return Object.fromEntries(infos.map((info, index) => [keys[index], info]));
 	}
 
 	installCommandWebsocket(context, uid) {
-		const job = this.get_(uid);
-		job.executor.installWebsocket(context);
+		const executor = this.getExecutor(uid);
+		executor.installWebsocket(context);
 	}
 }
