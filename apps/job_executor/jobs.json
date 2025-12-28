@@ -20,6 +20,10 @@
             ],
             "{ebook}"
         ],
+        "default": {
+            "action": "pdf",
+            "dpi": "200"
+        },
         "image": "local/image:latest",
         "inputs": [
             {

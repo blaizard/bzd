@@ -86,7 +86,15 @@
 			},
 			jobDescription() {
 				const jobList = Object.keys(Jobs);
-				return { type: "Dropdown", list: jobList, name: "jobId", caption: "Type" };
+				return {
+					type: "Dropdown",
+					list: jobList,
+					name: "jobId",
+					caption: "Type",
+					onchange: (value) => {
+						this.value = Object.assign({}, Jobs[this.jobId].default, this.value);
+					},
+				};
 			},
 			formDescription() {
 				let description = [this.jobDescription];
