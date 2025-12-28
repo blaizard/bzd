@@ -82,14 +82,14 @@
 				];
 				const csiPrivateFctMapping = {
 					25: this.ignore("Show/hide cursor"),
-					2004: this.ignore("Bracketed Paste Mode")
+					2004: this.ignore("Bracketed Paste Mode"),
 				};
 				const csiPrivateMapping = [
 					new RegExp("([0-9;]*)([hl])", "g"),
 					(_, featureStr, ending) => {
 						const feature = parseInt(featureStr);
 						return (csiPrivateFctMapping[feature] || (() => false))(ending == "h");
-					}
+					},
 				];
 				const oscFctMapping = {
 					0: this.ignore("Set title"),

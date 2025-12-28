@@ -13,9 +13,9 @@ bzd_nodejs_library(
         "//apps/artifacts/plugins:__subpackages__",
     ],
     deps = [
+        "//nodejs/core:lock",
         "//nodejs/db/storage",
         "//nodejs/utils:pathlib",
-        "//nodejs/core:lock",
     ],
 )
 
