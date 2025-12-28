@@ -11,6 +11,7 @@ import Statistics from "#bzd/nodejs/core/statistics/statistics.mjs";
 import Form from "#bzd/nodejs/vue/components/form/backend.mjs";
 import config from "#bzd/nodejs/vue/apps/config.json" with { type: "json" };
 import ClockNTP from "#bzd/nodejs/core/clock/ntp.mjs";
+import LoggerMemory from "#bzd/nodejs/vue/components/logger/backend/memory/memory.mjs";
 
 import { Command } from "commander/esm.mjs";
 
@@ -29,6 +30,7 @@ export default class Backend {
 			statistics: null,
 			services: null,
 			form: null,
+			loggerMemory: null,
 			staticPath: null,
 			staticOptions: null,
 			restSchema: null,
@@ -127,6 +129,13 @@ export default class Backend {
 		return this.instances.form;
 	}
 
+	/// Access the logger memory object.
+	get loggerMemory() {
+		Exception.assert(this.isSetup, "Backend not set-up.");
+		Exception.assert(this.instances.loggerMemory, "LoggerMemory not set-up.");
+		return this.instances.loggerMemory;
+	}
+
 	/// Access the clock object.
 	get clock() {
 		Exception.assert(this.isSetup, "Backend not set-up.");
@@ -191,6 +200,14 @@ export default class Backend {
 		Exception.assert(this.isSetup == false, "Backend already set-up.");
 		Exception.assert(!this.instances.form, "Form already set-up.");
 		this.instances.form = new Form(options);
+		return this;
+	}
+
+	/// Set-up the logger memory object.
+	useLoggerMemory() {
+		Exception.assert(this.isSetup == false, "Backend already set-up.");
+		Exception.assert(!this.instances.loggerMemory, "LoggerMemory already set-up.");
+		this.instances.loggerMemory = new LoggerMemory();
 		return this;
 	}
 
@@ -267,6 +284,9 @@ export default class Backend {
 			}
 			if (this.instances.form) {
 				this.instances.rest.installPlugins(this.instances.form);
+			}
+			if (this.instances.loggerMemory) {
+				this.instances.rest.installPlugins(this.instances.loggerMemory);
 			}
 		}
 

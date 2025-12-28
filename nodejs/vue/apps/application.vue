@@ -16,6 +16,9 @@
 					<template v-if="$bzdAppsFeatures.statistics">
 						<MenuEntry text="Statistics" icon="bzd-icon-statistics" link="/statistics"></MenuEntry>
 					</template>
+					<template v-if="$bzdAppsFeatures.logger">
+						<MenuEntry text="Logs" icon="bzd-icon-logs" link="/logger"></MenuEntry>
+					</template>
 					<MenuEntry v-if="$authentication.hasLogout()" text="Logout" icon="bzd-icon-close" link="/logout"></MenuEntry>
 				</template>
 				<template v-else>
@@ -48,6 +51,9 @@
 			}
 			if (this.$bzdAppsFeatures.statistics) {
 				routes.push({ path: "/statistics", component: () => import("./views/statistics.vue") });
+			}
+			if (this.$bzdAppsFeatures.logger) {
+				routes.push({ path: "/logger", component: () => import("./views/logger.vue") });
 			}
 			if (this.$bzdAppsFeatures.authentication) {
 				routes.push({
@@ -84,7 +90,7 @@
 	@use "@/nodejs/styles/default/css/loading.scss" as *;
 
 	@use "@/nodejs/icons.scss" as icons with (
-		$bzdIconNames: tile user close statistics
+		$bzdIconNames: tile user close statistics logs
 	);
 </style>
 

@@ -19,6 +19,7 @@ const Log = LogFactory("backend");
 		.useWebsocket(APIv1.websocket)
 		.useStatistics()
 		.useServices()
+		.useLoggerMemory()
 		.useForm()
 		.setup();
 

@@ -17,7 +17,6 @@ import TokenInfo from "#bzd/apps/accounts/backend/users/token.mjs";
 import TestData from "#bzd/apps/accounts/backend/test_data/test_data.mjs";
 import config from "#bzd/apps/accounts/config.json" with { type: "json" };
 import configBackend from "#bzd/apps/accounts/backend/config.json" with { type: "json" };
-import MemoryLogger from "#bzd/apps/accounts/backend/logger/memory/memory.mjs";
 import paymentMakeFromConfig from "#bzd/nodejs/payment/make_from_config.mjs";
 import EmailManager from "#bzd/apps/accounts/backend/email/manager.mjs";
 import Subscription from "#bzd/apps/accounts/backend/users/subscription.mjs";
@@ -52,8 +51,6 @@ const Log = LogFactory("backend");
 			headers: headers,
 		})
 		.useServices();
-
-	const memoryLogger = new MemoryLogger();
 
 	const keyValueStore = await kvsMakeFromConfig(configBackend.kvs.accounts);
 	const email = await emailMakeFromConfig(configBackend.email);
@@ -290,6 +287,7 @@ const Log = LogFactory("backend");
 		.useRest(APIv1.rest, {
 			authentication: authentication,
 		})
+		.useLoggerMemory()
 		.setup();
 
 	backend.rest.installPlugins(
@@ -298,7 +296,6 @@ const Log = LogFactory("backend");
 		authenticationFacebook,
 		users,
 		applications,
-		memoryLogger,
 		payment,
 	);
 

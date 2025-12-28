@@ -22,6 +22,7 @@ export default class Frontend {
 			authentication: null,
 			services: null,
 			statistics: null,
+			logger: null,
 		};
 		this.restSchema = null;
 		this.websocketSchema = null;
@@ -111,6 +112,14 @@ export default class Frontend {
 		return this;
 	}
 
+	/// Set-up the logger object.
+	useLogger() {
+		Exception.assert(this.isSetup == false, "Backend already set-up.");
+		Exception.assert(!this.instances.logger, "Logger already set-up.");
+		this.instances.logger = true;
+		return this;
+	}
+
 	/// Set-up the client.
 	setup(plugins = []) {
 		Exception.assert(this.isSetup == false, "Frontend already set-up.");
@@ -149,6 +158,7 @@ export default class Frontend {
 			authentication: Boolean(this.instances.authentication),
 			services: this.instances.services || false,
 			statistics: this.instances.statistics || false,
+			logger: this.instances.logger || false,
 		};
 
 		return this;

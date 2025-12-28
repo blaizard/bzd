@@ -33,6 +33,7 @@ class EventsFactory {
 		.useRest(APIv1.rest)
 		.useServices()
 		.useStatistics()
+		.useLoggerMemory()
 		.setup();
 
 	let cache = new Cache({

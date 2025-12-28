@@ -12,5 +12,6 @@ const frontend = Frontend.make(App)
 	.useRest(APIv1.rest)
 	.useAuthentication()
 	.useServices()
+	.useLogger()
 	.setup();
 frontend.mount("#app");

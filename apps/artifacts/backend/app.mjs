@@ -30,6 +30,7 @@ const Exception = ExceptionFactory("backend");
 		.useServices()
 		.useCache()
 		.useStatistics()
+		.useLoggerMemory()
 		.setup();
 
 	for (const [token, options] of Object.entries(config["tokens"] || {})) {

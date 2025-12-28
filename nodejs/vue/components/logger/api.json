@@ -1,6 +1,6 @@
 {
     "rest": {
-        "/admin/logger/memory": {
+        "/admin/logger": {
             "get": {
                 "authentication": [
                     "/applications"

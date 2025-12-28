@@ -37,7 +37,6 @@ bzd_nodejs_binary(
     deps = [
         "//apps/accounts/backend/applications",
         "//apps/accounts/backend/email",
-        "//apps/accounts/backend/logger/memory",
         "//apps/accounts/backend/test_data",
         "//apps/accounts/backend/users",
         "//nodejs/core:filesystem",

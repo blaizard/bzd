@@ -16,5 +16,6 @@ const frontend = Frontend.make(App)
 	.useAuthentication()
 	.useStatistics()
 	.useServices()
+	.useLogger()
 	.setup();
 frontend.mount("#app");

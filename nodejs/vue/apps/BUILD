@@ -39,6 +39,7 @@ bzd_nodejs_library(
         "//nodejs/core/statistics",
         "//nodejs/core/websocket:server",
         "//nodejs/vue/components/form:backend",
+        "//nodejs/vue/components/logger/backend/memory",
     ],
 )
 
@@ -49,6 +50,7 @@ bzd_nodejs_library(
         "config.json",
         "frontend.mjs",
         "views/404.vue",
+        "views/logger.vue",
         "views/services.vue",
         "views/statistics.vue",
     ],
@@ -74,6 +76,7 @@ bzd_nodejs_library(
         "//nodejs/vue:websocket",
         "//nodejs/vue/components/layout",
         "//nodejs/vue/components/layout:component",
+        "//nodejs/vue/components/logger/frontend",
         "//nodejs/vue/components/menu:entry",
         "//nodejs/vue/directives:loading",
         "//nodejs/vue/directives:tooltip",

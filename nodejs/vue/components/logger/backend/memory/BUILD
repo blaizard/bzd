@@ -5,23 +5,12 @@ bzd_nodejs_library(
     srcs = [
         "memory.mjs",
     ],
-    apis = ["api.json"],
+    apis = ["//nodejs/vue/components/logger:api.json"],
     visibility = [
-        "//apps/accounts/backend:__subpackages__",
+        "//visibility:public",
     ],
     deps = [
         "//nodejs/core:exception",
         "//nodejs/core:log",
-    ],
-)
-
-bzd_nodejs_library(
-    name = "frontend",
-    srcs = [
-        "memory.vue",
-    ],
-    apis = ["api.json"],
-    visibility = [
-        "//apps/accounts:__subpackages__",
     ],
 )

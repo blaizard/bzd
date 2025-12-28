@@ -38,6 +38,7 @@ frontend
 	})
 	.useRest(APIv1.rest)
 	.useServices()
+	.useLogger()
 	.useAuthentication({}, authentication)
 	.setup(plugins);
 
