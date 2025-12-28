@@ -4,6 +4,7 @@
 		<table class="jobs" v-loading="beforeFetchJobs">
 			<tr>
 				<th>Id</th>
+				<th>Type</th>
 				<th>Status</th>
 				<th>Duration</th>
 				<th>Arguments</th>
@@ -11,13 +12,23 @@
 			</tr>
 			<tr v-for="(info, jobId) in jobs" class="job" @click="goToJob(jobId)">
 				<td class="job-id">{{ jobId }}</td>
+				<td class="type">{{ info.type }}</td>
 				<td class="status">{{ info.status }}</td>
 				<td class="duration">{{ getDuration(info.timestampStart, info.timestampStop) }}</td>
 				<td class="args">{{ info.args ? info.args.join(" ") : "" }}</td>
 				<td class="actions">
-					<a v-if="isKill(jobId)" @click.stop="kill(jobId)" v-tooltip="tooltipKill"><i class="bzd-icon-close"></i></a>
-					<a @click.stop="goToJob(jobId)" v-tooltip="tooltipShell"><i class="bzd-icon-shell"></i></a>
-					<a @click.stop="remove(jobId)" v-tooltip="tooltipRemove"><i class="bzd-icon-trash"></i></a>
+					<a v-if="isStart(jobId)" @click.stop="start(jobId)" v-tooltip="{ type: 'text', data: 'Start this job' }"
+						><i class="bzd-icon-play"></i
+					></a>
+					<a v-if="isKill(jobId)" @click.stop="kill(jobId)" v-tooltip="{ type: 'text', data: 'Kill this job' }"
+						><i class="bzd-icon-close"></i
+					></a>
+					<a @click.stop="goToJob(jobId)" v-tooltip="{ type: 'text', data: 'Access the shell' }"
+						><i class="bzd-icon-shell"></i
+					></a>
+					<a @click.stop="remove(jobId)" v-tooltip="{ type: 'text', data: 'Remove this job' }"
+						><i class="bzd-icon-trash"></i
+					></a>
 				</td>
 			</tr>
 		</table>
@@ -86,24 +97,6 @@
 				description = [...description, ...Jobs[this.jobId].inputs, { type: "Button", action: "approve" }];
 				return description;
 			},
-			tooltipShell() {
-				return {
-					type: "text",
-					data: "Access shell",
-				};
-			},
-			tooltipKill() {
-				return {
-					type: "text",
-					data: "Kill this job",
-				};
-			},
-			tooltipRemove() {
-				return {
-					type: "text",
-					data: "Remove this job and its data",
-				};
-			},
 			beforeFetchJobs() {
 				return this.instanceTimeout === null;
 			},
@@ -127,8 +120,18 @@
 					this.goToJob(response.job);
 				});
 			},
+			isStart(id) {
+				return this.jobs[id].status == "idle";
+			},
 			isKill(id) {
 				return this.jobs[id].status == "running";
+			},
+			async start(id) {
+				await this.handleSubmit(async () => {
+					await this.$rest.request("post", "/job/{id}/start", {
+						id: id,
+					});
+				});
 			},
 			async kill(id) {
 				await this.handleSubmit(async () => {
@@ -149,7 +152,7 @@
 				this.value = {};
 			},
 			getDuration(timestampStart, timestampStop) {
-				if (timestampStart === null) {
+				if (!timestampStart) {
 					return "-";
 				}
 				const durationMs = (timestampStop === null ? this.timestampServer : timestampStop) - timestampStart;
@@ -161,7 +164,7 @@
 
 <style lang="scss">
 	@use "@/nodejs/icons.scss" as icons with (
-		$bzdIconNames: close shell trash
+		$bzdIconNames: close shell trash play
 	);
 </style>
 

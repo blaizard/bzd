@@ -24,11 +24,16 @@ export default class Executor {
 	}
 
 	async kill() {
-		await this.command.kill();
+		if (this.command) {
+			await this.command.kill();
+		}
 	}
 
 	async getInfo() {
-		return this.command.getInfo();
+		if (this.command) {
+			return this.command.getInfo();
+		}
+		return {};
 	}
 
 	visitorArgs(type, arg, schema) {
@@ -40,6 +45,8 @@ export default class Executor {
 	}
 
 	installWebsocket(context) {
-		this.command.installWebsocket(context);
+		if (this.command) {
+			this.command.installWebsocket(context);
+		}
 	}
 }

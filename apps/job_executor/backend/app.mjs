@@ -89,6 +89,10 @@ const Log = LogFactory("backend");
 		};
 	});
 
+	backend.rest.handle("post", "/job/{id}/start", async (inputs) => {
+		await commands.detach(inputs.id);
+	});
+
 	backend.rest.handle("delete", "/job/{id}/cancel", async (inputs) => {
 		await commands.kill(inputs.id);
 	});

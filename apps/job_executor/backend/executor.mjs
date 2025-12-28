@@ -7,8 +7,9 @@ import { Status } from "#bzd/nodejs/utils/run.mjs";
 const Exception = ExceptionFactory("backend", "executor");
 const Log = LogFactory("backend", "executor");
 export default class Executor {
-	constructor(contextJob) {
-		this.contextJob = contextJob;
+	constructor(maybeContextJob) {
+		Exception.assert(maybeContextJob, "Executor can only works with a valid ContextJob.");
+		this.contextJob = maybeContextJob;
 	}
 
 	async getInfo() {

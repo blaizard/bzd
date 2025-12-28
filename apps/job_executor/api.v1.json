@@ -63,6 +63,11 @@
                 "documentation": "Delete a job and its sandbox."
             }
         },
+        "/job/{id}/start": {
+            "post": {
+                "documentation": "Start a job."
+            }
+        },
         "/jobs": {
             "get": {
                 "documentation": "Get the list of jobs.",
