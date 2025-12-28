@@ -15,5 +15,6 @@ const frontend = Frontend.make(App)
 	.useWebsocket(APIv1.websocket)
 	.useAuthentication()
 	.useStatistics()
+	.useServices()
 	.setup();
 frontend.mount("#app");

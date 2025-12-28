@@ -18,6 +18,7 @@ const Log = LogFactory("backend");
 		.useRest(APIv1.rest)
 		.useWebsocket(APIv1.websocket)
 		.useStatistics()
+		.useServices()
 		.useForm()
 		.setup();
 
@@ -50,7 +51,9 @@ const Log = LogFactory("backend");
 		return data;
 	}
 
-	let commands = new Commands(pathlib.path("sandbox"));
+	let commands = new Commands(pathlib.path("sandbox"), {
+		services: backend.services.makeProvider("commands"),
+	});
 	await commands.initialize();
 
 	backend.rest.handle("post", "/job/send", async (inputs) => {

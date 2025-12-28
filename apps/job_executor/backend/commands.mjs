@@ -2,6 +2,7 @@ import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import Context from "#bzd/apps/job_executor/backend/context.mjs";
 import Args from "#bzd/apps/job_executor/backend/args.mjs";
+import ServicesProvider from "#bzd/nodejs/core/services/provider.mjs";
 
 import Executor from "#bzd/apps/job_executor/backend/executor.mjs";
 import ExecutorShell from "#bzd/apps/job_executor/backend/executor_shell.mjs";
@@ -21,8 +22,14 @@ function makeExecutor(contextJob, schema) {
 }
 
 export default class Commands {
-	constructor(root) {
+	constructor(root, options) {
 		this.context = new Context(root);
+		this.options = Object.assign(
+			{
+				services: new ServicesProvider(),
+			},
+			options,
+		);
 		this.executors = {};
 	}
 
@@ -51,21 +58,29 @@ export default class Commands {
 		}
 
 		// Start the info gathered thread.
-		setInterval(async () => {
-			await Promise.all(
-				Object.entries(this.executors).map(async ([uid, executor]) => {
-					try {
-						const info = await executor.getInfo();
-						const maybeContextJob = this.getContext(uid, null);
-						if (maybeContextJob) {
-							await maybeContextJob.updateInfo(info);
+		this.options.services.addTimeTriggeredProcess(
+			"fetch.info",
+			async () => {
+				const infoAll = await Promise.all(
+					Object.entries(this.executors).map(async ([uid, executor]) => {
+						try {
+							const info = await executor.getInfo();
+							const maybeContextJob = this.getContext(uid, null);
+							if (maybeContextJob) {
+								await maybeContextJob.updateInfo(info);
+							}
+							return info;
+						} catch (e) {
+							Log.warning("Concurrent access while gathering info: {}", e);
 						}
-					} catch (e) {
-						Log.warning("Concurrent access while gathering info: {}", e);
-					}
-				}),
-			);
-		}, 5000);
+					}),
+				);
+				return infoAll;
+			},
+			{
+				periodS: 5,
+			},
+		);
 	}
 
 	/// Allocate a jobId for a command.

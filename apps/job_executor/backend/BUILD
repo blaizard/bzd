@@ -42,6 +42,7 @@ bzd_nodejs_binary(
         "//nodejs/core:exception",
         "//nodejs/core:filesystem",
         "//nodejs/core:log",
+        "//nodejs/core/services",
         "//nodejs/db/storage:disk",
         "//nodejs/utils:pathlib",
         "//nodejs/utils:run",
