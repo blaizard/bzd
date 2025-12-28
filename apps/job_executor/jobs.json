@@ -2,7 +2,8 @@
     "bash": {
         "args": [],
         "command": "/bin/bash",
-        "inputs": []
+        "inputs": [],
+        "type": "shell"
     },
     "ebook": {
         "args": [
@@ -19,7 +20,7 @@
             ],
             "{ebook}"
         ],
-        "docker": "local/image:latest",
+        "image": "local/image:latest",
         "inputs": [
             {
                 "caption": "Action",
@@ -49,13 +50,14 @@
                 "name": "dpi",
                 "type": "Input"
             }
-        ]
+        ],
+        "type": "docker"
     },
     "sleep": {
         "args": [
             "{time}"
         ],
-        "docker": "local/image_sleep:latest",
+        "image": "local/image_sleep:latest",
         "inputs": [
             {
                 "caption": "Time (in seconds)",
@@ -63,6 +65,13 @@
                 "type": "Input",
                 "validation": "mandatory"
             }
-        ]
+        ],
+        "type": "docker"
+    },
+    "ubuntu": {
+        "args": [],
+        "image": "docker.io/ubuntu:latest",
+        "inputs": [],
+        "type": "docker"
     }
 }

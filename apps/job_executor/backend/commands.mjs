@@ -12,16 +12,6 @@ import ExecutorDocker from "#bzd/apps/job_executor/backend/executor_docker.mjs";
 const Exception = ExceptionFactory("commands");
 const Log = LogFactory("commands");
 
-function makeExecutor(contextJob, schema) {
-	if ("command" in schema) {
-		return new ExecutorShell(contextJob);
-	}
-	if ("docker" in schema) {
-		return new ExecutorDocker(contextJob);
-	}
-	Exception.unreachable("Undefined executor for this job: {:j}", schema);
-}
-
 export default class Commands {
 	constructor(root, options) {
 		this.context = new Context(root);
@@ -32,17 +22,16 @@ export default class Commands {
 			options,
 		);
 		this.executors = {};
+		this.availableExecutors = Object.fromEntries(
+			[ExecutorShell, ExecutorDocker].map((ExecutorClass) => [ExecutorClass.type, ExecutorClass]),
+		);
 	}
 
 	async initialize() {
 		await this.context.initialize();
 
-		const executorClasses = Object.fromEntries(
-			[ExecutorShell, ExecutorDocker].map((ExecutorClass) => [ExecutorClass.type, ExecutorClass]),
-		);
-
 		// Discover existing jobs if any.
-		for (const ExecutorClass of Object.values(executorClasses)) {
+		for (const ExecutorClass of Object.values(this.availableExecutors)) {
 			const executors = await ExecutorClass.discover(this.context);
 			for (const [uid, executor] of Object.entries(executors)) {
 				await this.make(uid, executor);
@@ -59,8 +48,8 @@ export default class Commands {
 				const contextJob = this.getContext(uid);
 				const info = await contextJob.getInfo();
 				// Jobs that are in idle status and that have a type can be matched with an executor.
-				if (info.status == Status.idle && info.type in executorClasses) {
-					const executor = new executorClasses[info.type](contextJob);
+				if (info.status == Status.idle && info.type in this.availableExecutors) {
+					const executor = this.makeExecutor(info.type, contextJob);
 					await this.make(uid, executor);
 				} else {
 					const executor = new Executor(contextJob);
@@ -95,6 +84,11 @@ export default class Commands {
 		);
 	}
 
+	makeExecutor(type, contextJob) {
+		Exception.assert(type in this.availableExecutors, "Executor of type '{}' doesn't exists.", type);
+		return new this.availableExecutors[type](contextJob);
+	}
+
 	/// Allocate a jobId for a command.
 	async allocate() {
 		const uid = this.context.allocate();
@@ -113,7 +107,7 @@ export default class Commands {
 			return visitor("post", args.process(), schema);
 		};
 		const contextJob = this.getContext(uid);
-		const executor = makeExecutor(contextJob, schema);
+		const executor = this.makeExecutor(schema.type, contextJob);
 		const args = makeArgs(executor.visitorArgs);
 		await this.make(uid, executor, {
 			args: args,

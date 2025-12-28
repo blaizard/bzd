@@ -75,7 +75,7 @@ export default class ExecutorDocker {
 			case "File":
 				return "/sandbox/" + arg;
 			case "post":
-				return [schema["docker"], ...arg];
+				return [schema["image"], ...arg];
 		}
 		return arg;
 	}
