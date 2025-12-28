@@ -73,9 +73,18 @@
         "type": "docker"
     },
     "ubuntu": {
-        "args": [],
+        "args": [
+            "{commands}"
+        ],
         "image": "docker.io/ubuntu:latest",
-        "inputs": [],
+        "inputs": [
+            {
+                "caption": "Commands",
+                "name": "commands",
+                "type": "Textarea",
+                "validation": "mandatory"
+            }
+        ],
         "type": "docker"
     }
 }
