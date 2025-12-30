@@ -109,7 +109,9 @@ class ExecuteResult {
 export async function localCommand(cmds, { stdout = null, stderr = null, maxOutputSize = 1000000 } = {}) {
 	Exception.assert(Array.isArray(cmds) && cmds.length > 0, "No command to run");
 
-	const subprocess = spawn(cmds[0], cmds.slice(1));
+	const subprocess = spawn(cmds[0], cmds.slice(1), {
+		stdio: ["pipe", "pipe", "pipe"],
+	});
 	const result = new ExecuteResult(subprocess, { maxOutputSize: maxOutputSize });
 
 	return new Promise((resolve, reject) => {
