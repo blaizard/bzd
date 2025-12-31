@@ -49,15 +49,33 @@ export default class Executor {
 	}
 
 	static async makeFromExecutor(executor, maybeContextJob) {
-		const executorWrapper = new Executor(executor);
+		const wrapper = new Executor(executor);
+
 		if (maybeContextJob) {
 			await maybeContextJob.getLogs((line) => {
-				executorWrapper.event.trigger("output", line);
+				wrapper.event.trigger("output", line);
 			});
 			maybeContextJob.captureOutput(executor);
 		}
-		executorWrapper.captureInputOutputExecutor();
-		return executorWrapper;
+
+		if (wrapper.executor.installWebsocket) {
+			// Capture the executor output.
+			class Capture {
+				constructor(event) {
+					this.event = event;
+				}
+				send(data) {
+					this.event.trigger("output", data);
+				}
+				read(onRead) {
+					this.event.on("input", onRead);
+				}
+				exit() {}
+			}
+			wrapper.executor.installWebsocket(new Capture(wrapper.event));
+		}
+
+		return wrapper;
 	}
 
 	/// Discover existing jobs if any.
@@ -89,25 +107,6 @@ export default class Executor {
 
 	visitorArgs(type, arg, schema) {
 		return this.executor.visitorArgs(type, arg, schema);
-	}
-
-	async captureInputOutputExecutor() {
-		if (this.executor.installWebsocket) {
-			// Capture the executor output.
-			class Capture {
-				constructor(event) {
-					this.event = event;
-				}
-				send(data) {
-					this.event.trigger("output", data);
-				}
-				read(onRead) {
-					this.event.on("input", onRead);
-				}
-				exit() {}
-			}
-			this.executor.installWebsocket(new Capture(this.event));
-		}
 	}
 
 	installWebsocket(context) {
