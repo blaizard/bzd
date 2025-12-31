@@ -48,9 +48,11 @@ export default class Executor {
 		return await Executor.makeFromExecutor(executor, contextJob);
 	}
 
+	/// Entry point for the constructor.
 	static async makeFromExecutor(executor, maybeContextJob) {
 		const wrapper = new Executor(executor);
 
+		// If a context is associated with this executor.
 		if (maybeContextJob) {
 			await maybeContextJob.getLogs((line) => {
 				wrapper.event.trigger("output", line);
@@ -58,21 +60,18 @@ export default class Executor {
 			maybeContextJob.captureOutput(executor);
 		}
 
+		// If the executor supports websockets.
 		if (wrapper.executor.installWebsocket) {
-			// Capture the executor output.
-			class Capture {
-				constructor(event) {
-					this.event = event;
-				}
-				send(data) {
-					this.event.trigger("output", data);
-				}
-				read(onRead) {
-					this.event.on("input", onRead);
-				}
-				exit() {}
-			}
-			wrapper.executor.installWebsocket(new Capture(wrapper.event));
+			const contextWebsocket = {
+				send: (data) => {
+					wrapper.event.trigger("output", data);
+				},
+				read: (onRead) => {
+					wrapper.event.on("input", onRead);
+				},
+				exit: () => {},
+			};
+			wrapper.executor.installWebsocket(contextWebsocket);
 		}
 
 		return wrapper;

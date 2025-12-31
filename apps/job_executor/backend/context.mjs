@@ -108,8 +108,10 @@ class ContextJob {
 
 	/// Capture the output of the given executor.
 	captureOutput(executor) {
-		const context = new JobLogCapture(this.getLogPath().asPosix());
-		executor.installWebsocket(context);
+		if (executor.installWebsocket) {
+			const context = new JobLogCapture(this.getLogPath().asPosix());
+			executor.installWebsocket(context);
+		}
 	}
 
 	/// Destroy the current job context.
