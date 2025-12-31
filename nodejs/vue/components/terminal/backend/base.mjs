@@ -91,4 +91,22 @@ export default class CommandBase {
 			this.event.remove("output", onOutput);
 		});
 	}
+
+	/// Install the command to be used with websockets.
+	installWebsocketForOutputAndInput(context) {
+		this.installWebsocketForOutput(context);
+		context.read((data) => {
+			const input = JSON.parse(data.toString());
+			switch (input.type) {
+				case "init":
+					// ignore init in this configuration.
+					break;
+				case "stream":
+					this.write(input.value);
+					break;
+				default:
+					Log.error("Unsupported data type '{}' for terminal.", input.type);
+			}
+		});
+	}
 }

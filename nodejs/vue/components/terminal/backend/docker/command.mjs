@@ -38,7 +38,7 @@ export default class CommandDocker extends CommandBase {
 
 		const req = http.request({
 			socketPath: "/run/user/1000/docker.sock",
-			path: "/containers/" + this.name + "/attach?stream=1&stdout=1&stderr=1",
+			path: "/containers/" + this.name + "/attach?stream=1&stdout=1&stderr=1&stdin=1&tty=1",
 			method: "POST",
 			headers: {
 				Connection: "Upgrade",
@@ -83,6 +83,13 @@ export default class CommandDocker extends CommandBase {
 		await this._monitorDockerContainer();
 	}
 
+	/// Write data to the terminal.
+	write(data) {
+		Exception.assertPrecondition(this.client !== null, "The pipe is not running.");
+		Exception.assertPrecondition(this.client.writable, "The pipe is not writeable.");
+		this.client.write(data);
+	}
+
 	async kill() {
 		try {
 			const result = await this.localCommandToOutput(["docker", "kill", this.name]);
@@ -94,6 +101,6 @@ export default class CommandDocker extends CommandBase {
 
 	/// Install the command to be used with websockets.
 	installWebsocket(context) {
-		this.installWebsocketForOutput(context);
+		this.installWebsocketForOutputAndInput(context);
 	}
 }
