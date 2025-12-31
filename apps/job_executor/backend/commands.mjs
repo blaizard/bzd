@@ -5,9 +5,7 @@ import Args from "#bzd/apps/job_executor/backend/args.mjs";
 import ServicesProvider from "#bzd/nodejs/core/services/provider.mjs";
 import { Status } from "#bzd/nodejs/utils/run.mjs";
 
-import Executor from "#bzd/apps/job_executor/backend/executor.mjs";
-import ExecutorShell from "#bzd/apps/job_executor/backend/executor_shell.mjs";
-import ExecutorDocker from "#bzd/apps/job_executor/backend/executor_docker.mjs";
+import Executor from "#bzd/apps/job_executor/backend/executor/executor.mjs";
 
 const Exception = ExceptionFactory("commands");
 const Log = LogFactory("commands");
@@ -22,24 +20,14 @@ export default class Commands {
 			options,
 		);
 		this.executors = {};
-		this.availableExecutors = Object.fromEntries(
-			[ExecutorShell, ExecutorDocker].map((ExecutorClass) => [ExecutorClass.type, ExecutorClass]),
-		);
 	}
 
 	async initialize() {
 		await this.context.initialize();
 
-		// Discover existing jobs if any.
-		for (const ExecutorClass of Object.values(this.availableExecutors)) {
-			const executors = await ExecutorClass.discover(this.context);
-			for (const [uid, executor] of Object.entries(executors)) {
-				await this.make(uid, executor);
-				const maybeContextJob = this.getContext(uid, null);
-				if (maybeContextJob) {
-					maybeContextJob.captureOutput(executor);
-				}
-			}
+		const executors = await Executor.discover(this.context);
+		for (const [uid, executor] of Object.entries(executors)) {
+			await this.make(uid, executor);
 		}
 
 		// Prefill the entries that are have not been discovered.
@@ -48,11 +36,11 @@ export default class Commands {
 				const contextJob = this.getContext(uid);
 				const info = await contextJob.getInfo();
 				// Jobs that are in idle status and that have a type can be matched with an executor.
-				if (info.status == Status.idle && info.type in this.availableExecutors) {
-					const executor = this.makeExecutor(info.type, contextJob);
+				if (info.status == Status.idle) {
+					const executor = await Executor.make(uid, info.type, contextJob);
 					await this.make(uid, executor);
 				} else {
-					const executor = new Executor(contextJob);
+					const executor = await Executor.make(uid, "readonly", contextJob);
 					await this.make(uid, executor);
 				}
 			}
@@ -84,11 +72,6 @@ export default class Commands {
 		);
 	}
 
-	makeExecutor(type, contextJob) {
-		Exception.assert(type in this.availableExecutors, "Executor of type '{}' doesn't exists.", type);
-		return new this.availableExecutors[type](contextJob);
-	}
-
 	/// Allocate a jobId for a command.
 	async allocate() {
 		const uid = this.context.allocate();
@@ -107,8 +90,8 @@ export default class Commands {
 			return visitor("post", args.process(), schema);
 		};
 		const contextJob = this.getContext(uid);
-		const executor = this.makeExecutor(schema.type, contextJob);
-		const args = makeArgs(executor.visitorArgs);
+		const executor = await Executor.make(uid, schema.type, contextJob);
+		const args = makeArgs((...args) => executor.visitorArgs(...args));
 		await this.make(uid, executor, {
 			args: args,
 			status: Status.idle,
@@ -144,8 +127,7 @@ export default class Commands {
 		const info = await contextJob.getInfo();
 		Exception.assertPrecondition(info.status == Status.idle, "This job already started: {:j}", uid);
 		Exception.assert("args" in info, "Information from uid '{}' is missing args: {:j}", uid, info);
-		await executor.execute(uid, info.args);
-		contextJob.captureOutput(executor);
+		await executor.execute(info.args);
 	}
 
 	/// Kill a specific command.

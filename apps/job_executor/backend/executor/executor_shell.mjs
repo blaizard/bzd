@@ -5,12 +5,13 @@ import Command from "#bzd/nodejs/vue/components/terminal/backend/local/command.m
 const Exception = ExceptionFactory("backend", "executor");
 const Log = LogFactory("backend", "executor");
 
-export default class Executor {
+export default class ExecutorShell {
 	static type = "shell";
 
-	constructor(contextJob) {
+	constructor(uid, contextJob) {
+		this.uid = uid;
 		this.contextJob = contextJob;
-		this.command = null;
+		this.command = new Command();
 	}
 
 	/// Discover currently running processes. To be used to resume jobs after a restart.
@@ -18,22 +19,16 @@ export default class Executor {
 		return {};
 	}
 
-	async execute(uid, args) {
-		this.command = new Command();
+	async execute(args) {
 		await this.command.detach(["--cwd", this.contextJob.getRootPath().asPosix(), "--", ...args]);
 	}
 
 	async kill() {
-		if (this.command) {
-			await this.command.kill();
-		}
+		await this.command.kill();
 	}
 
 	async getInfo() {
-		if (this.command) {
-			return this.command.getInfo();
-		}
-		return {};
+		return this.command.getInfo();
 	}
 
 	visitorArgs(type, arg, schema) {
@@ -45,8 +40,6 @@ export default class Executor {
 	}
 
 	installWebsocket(context) {
-		if (this.command) {
-			this.command.installWebsocket(context);
-		}
+		this.command.installWebsocket(context);
 	}
 }

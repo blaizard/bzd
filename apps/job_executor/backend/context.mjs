@@ -47,6 +47,17 @@ class ContextJob {
 		return this.root_.joinPath(this.prefix_, "info.json");
 	}
 
+	async getLogs(onLog) {
+		try {
+			const data = await FileSystem.readFile(this.getLogPath().asPosix());
+			for (const line of data.split("\n")) {
+				onLog(line + "\n");
+			}
+		} catch (e) {
+			// ignore.
+		}
+	}
+
 	/// Update the current information from this job.
 	async updateInfo(info) {
 		if (!info) {

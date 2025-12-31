@@ -9,9 +9,10 @@ const Log = LogFactory("backend", "executor-docker");
 export default class ExecutorDocker {
 	static type = "docker";
 
-	constructor(contextJob) {
+	constructor(uid, contextJob) {
+		this.uid = uid;
 		this.contextJob = contextJob;
-		this.command = null;
+		this.command = new CommandDocker("bzd-job-executor-" + this.uid);
 	}
 
 	/// Discover currently running processes. To be used to resume jobs after a restart.
@@ -34,23 +35,22 @@ export default class ExecutorDocker {
 			if (match) {
 				const uid = parseInt(match[1], 10);
 				const maybeContextJob = context.getJob(uid, null);
-				executors[uid] = new ExecutorDocker(maybeContextJob);
-				await executors[uid].attach(uid);
+				executors[uid] = new ExecutorDocker(uid, maybeContextJob);
+				await executors[uid].attach();
 			}
 		}
 		return executors;
 	}
 
-	async attach(uid) {
-		this.command = new CommandDocker("bzd-job-executor-" + uid);
+	async attach() {
 		await this.command.attach();
 	}
 
-	async execute(uid, args) {
-		this.command = new CommandDocker("bzd-job-executor-" + uid);
+	async execute(args) {
 		await this.command.detach([
 			"-v",
 			this.contextJob.getRootPath().absolute().asPosix() + ":/sandbox",
+			//"--cpus", "1",
 			"--workdir",
 			"/sandbox",
 			...args,
@@ -58,16 +58,11 @@ export default class ExecutorDocker {
 	}
 
 	async kill() {
-		if (this.command) {
-			await this.command.kill();
-		}
+		await this.command.kill();
 	}
 
 	async getInfo() {
-		if (this.command) {
-			return this.command.getInfo();
-		}
-		return {};
+		return this.command.getInfo();
 	}
 
 	visitorArgs(type, arg, schema) {
@@ -81,8 +76,6 @@ export default class ExecutorDocker {
 	}
 
 	installWebsocket(context) {
-		if (this.command) {
-			this.command.installWebsocket(context);
-		}
+		this.command.installWebsocket(context);
 	}
 }
