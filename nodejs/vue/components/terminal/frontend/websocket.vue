@@ -39,6 +39,7 @@
 				}
 			},
 			async handleKeyDown(event) {
+				event.preventDefault();
 				const translationMap = {
 					enter: "\n",
 					backspace: "\b",
