@@ -45,31 +45,6 @@ export default class Commands {
 				}
 			}
 		}
-
-		// Start the info gathered thread.
-		this.options.services.addTimeTriggeredProcess(
-			"fetch.info",
-			async () => {
-				const infoAll = await Promise.all(
-					Object.entries(this.executors).map(async ([uid, executor]) => {
-						try {
-							const info = await executor.getInfo();
-							const maybeContextJob = this.getContext(uid, null);
-							if (maybeContextJob) {
-								await maybeContextJob.updateInfo(info);
-							}
-							return info;
-						} catch (e) {
-							Log.warning("Concurrent access while gathering info: {}", e);
-						}
-					}),
-				);
-				return infoAll;
-			},
-			{
-				periodS: 5,
-			},
-		);
 	}
 
 	/// Allocate a jobId for a command.
@@ -123,8 +98,7 @@ export default class Commands {
 	/// Run a specific command.
 	async detach(uid) {
 		const executor = this.getExecutor(uid);
-		const contextJob = this.getContext(uid);
-		const info = await contextJob.getInfo();
+		const info = await executor.getInfo();
 		Exception.assertPrecondition(info.status == Status.idle, "This job already started: {:j}", uid);
 		Exception.assert("args" in info, "Information from uid '{}' is missing args: {:j}", uid, info);
 		await executor.execute(info.args);
@@ -150,14 +124,14 @@ export default class Commands {
 	}
 
 	async getInfo(uid) {
-		const contextJob = this.getContext(uid);
-		return await contextJob.getInfo();
+		const executor = this.getExecutor(uid);
+		return await executor.getInfo();
 	}
 
 	async getAllInfo() {
-		const keys = this.context.getAllJobs();
-		const infos = await Promise.all(keys.map((uid) => this.getInfo(uid)));
-		return Object.fromEntries(infos.map((info, index) => [keys[index], info]));
+		const uids = Object.keys(this.executors);
+		const infos = await Promise.all(uids.map((uid) => this.getInfo(uid)));
+		return Object.fromEntries(infos.map((info, index) => [uids[index], info]));
 	}
 
 	installCommandWebsocket(context, uid) {

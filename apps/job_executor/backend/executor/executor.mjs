@@ -19,8 +19,9 @@ export default class Executor {
 		docker: ExecutorDocker,
 	};
 
-	constructor(executor, options) {
+	constructor(executor, maybeContextJob, options) {
 		this.executor = executor;
+		this.maybeContextJob = maybeContextJob;
 		this.options = Object.assign(
 			{
 				/// Maximum number of bytes in the stdout.
@@ -29,6 +30,7 @@ export default class Executor {
 			options,
 		);
 
+		this.info = {};
 		this.output = [];
 		this.outputSize = 0;
 		this.event = new Event();
@@ -42,38 +44,17 @@ export default class Executor {
 		});
 	}
 
+	/// Factory to make an executor from its type.
 	static async make(uid, type, contextJob) {
 		Exception.assert(type in Executor.ExecutorClasses, "No executor type '{}' available.", type);
 		const executor = new Executor.ExecutorClasses[type](uid, contextJob);
 		return await Executor.makeFromExecutor(executor, contextJob);
 	}
 
-	/// Entry point for the constructor.
+	/// Factory to make an executor from a typed-executor.
 	static async makeFromExecutor(executor, maybeContextJob) {
-		const wrapper = new Executor(executor);
-
-		// If a context is associated with this executor.
-		if (maybeContextJob) {
-			await maybeContextJob.getLogs((line) => {
-				wrapper.event.trigger("output", line);
-			});
-			maybeContextJob.captureOutput(executor);
-		}
-
-		// If the executor supports websockets.
-		if (wrapper.executor.installWebsocket) {
-			const contextWebsocket = {
-				send: (data) => {
-					wrapper.event.trigger("output", data);
-				},
-				read: (onRead) => {
-					wrapper.event.on("input", onRead);
-				},
-				exit: () => {},
-			};
-			wrapper.executor.installWebsocket(contextWebsocket);
-		}
-
+		const wrapper = new Executor(executor, maybeContextJob);
+		await wrapper.initialize();
 		return wrapper;
 	}
 
@@ -90,6 +71,30 @@ export default class Executor {
 		return discovered;
 	}
 
+	async initialize() {
+		// If a context is associated with this executor.
+		if (this.maybeContextJob) {
+			await this.maybeContextJob.getLogs((line) => {
+				this.event.trigger("output", line);
+			});
+			this.maybeContextJob.captureOutput(this.executor);
+			this.info = await this.maybeContextJob.getInfo();
+		}
+
+		// If the executor supports websockets.
+		if (this.executor.installWebsocket) {
+			this.executor.installWebsocket({
+				send: (data) => {
+					this.event.trigger("output", data);
+				},
+				read: (onRead) => {
+					this.event.on("input", onRead);
+				},
+				exit: () => {},
+			});
+		}
+	}
+
 	async execute(args) {
 		await this.executor.execute(args);
 	}
@@ -101,7 +106,12 @@ export default class Executor {
 	}
 
 	async getInfo() {
-		return await this.executor.getInfo();
+		let info = await this.executor.getInfo();
+		if (this.maybeContextJob) {
+			await this.maybeContextJob.updateInfo(info);
+			info = await this.maybeContextJob.getInfo();
+		}
+		return info;
 	}
 
 	visitorArgs(type, arg, schema) {
