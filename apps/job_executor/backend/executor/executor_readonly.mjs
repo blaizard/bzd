@@ -20,7 +20,7 @@ export default class ExecutorReadonly {
 		switch (info.status) {
 			case Status.idle:
 			case Status.running:
-				info.status = "unknown";
+				info.status = undefined;
 				break;
 		}
 		return info;

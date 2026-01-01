@@ -5,6 +5,12 @@
         "inputs": [],
         "type": "shell"
     },
+    "blaizard/build:x86_64": {
+        "args": [],
+        "image": "docker.io/blaizard/build:x86_64",
+        "inputs": [],
+        "type": "docker"
+    },
     "ebook": {
         "args": [
             [

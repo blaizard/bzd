@@ -6,6 +6,7 @@ import ServicesProvider from "#bzd/nodejs/core/services/provider.mjs";
 import { Status } from "#bzd/nodejs/utils/run.mjs";
 
 import Executor from "#bzd/apps/job_executor/backend/executor/executor.mjs";
+import Scheduler from "#bzd/apps/job_executor/backend/scheduler/scheduler.mjs";
 
 const Exception = ExceptionFactory("commands");
 const Log = LogFactory("commands");
@@ -20,6 +21,7 @@ export default class Commands {
 			options,
 		);
 		this.executors = {};
+		this.scheduler = new Scheduler(this.executors, this.options);
 	}
 
 	async initialize() {
@@ -84,26 +86,19 @@ export default class Commands {
 		return this.executors[uid];
 	}
 
-	/// Run a specific command.
-	async detach(uid) {
-		const executor = this.getExecutor(uid);
-		const info = await executor.getInfo();
-		Exception.assertPrecondition(info.status == Status.idle, "This job already started: {:j}", uid);
-		Exception.assert("args" in info, "Information from uid '{}' is missing args: {:j}", uid, info);
-		await executor.execute(info.args);
+	/// Send a workload to be scheduled.
+	schedule(uid, type) {
+		this.scheduler.schedule(uid, type);
 	}
 
 	/// Kill a specific command.
-	async kill(uid) {
-		const executor = this.getExecutor(uid);
-		if (executor.kill) {
-			await executor.kill();
-		}
+	async terminate(uid, { force = false } = {}) {
+		await this.scheduler.terminate(uid, { force });
 	}
 
 	/// Remove a specific job.
 	async remove(uid) {
-		await this.kill(uid);
+		await this.terminate(uid, { force: true });
 		await this.context.removeJob(uid);
 		delete this.executors[uid];
 	}

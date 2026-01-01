@@ -36,6 +36,7 @@ bzd_nodejs_binary(
     ],
     deps = [
         "//apps/job_executor/backend/executor",
+        "//apps/job_executor/backend/scheduler",
         "//nodejs/core:event",
         "//nodejs/core:exception",
         "//nodejs/core:filesystem",
