@@ -30,7 +30,9 @@ export default class Executor {
 			options,
 		);
 
-		this.info = {};
+		this.info = {
+			type: this.executor.constructor.type || null,
+		};
 		this.output = [];
 		this.outputSize = 0;
 		this.event = new Event();
@@ -78,7 +80,6 @@ export default class Executor {
 				this.event.trigger("output", line);
 			});
 			this.maybeContextJob.captureOutput(this.executor);
-			this.info = await this.maybeContextJob.getInfo();
 		}
 
 		// If the executor supports websockets.
@@ -106,12 +107,19 @@ export default class Executor {
 	}
 
 	async getInfo() {
-		let info = await this.executor.getInfo();
+		const info = await this.executor.getInfo();
+		await this.updateInfo(info);
+		return this.info;
+	}
+
+	async updateInfo(info) {
+		Object.assign(this.info, info);
+
+		// Save and merge this information with the persistent one.
 		if (this.maybeContextJob) {
-			await this.maybeContextJob.updateInfo(info);
-			info = await this.maybeContextJob.getInfo();
+			await this.maybeContextJob.updateInfo(this.info);
+			this.info = await this.maybeContextJob.getInfo();
 		}
-		return info;
 	}
 
 	visitorArgs(type, arg, schema) {

@@ -27,7 +27,7 @@ export default class Commands {
 
 		const executors = await Executor.discover(this.context);
 		for (const [uid, executor] of Object.entries(executors)) {
-			await this.make(uid, executor);
+			this.make(uid, executor);
 		}
 
 		// Prefill the entries that are have not been discovered.
@@ -38,10 +38,10 @@ export default class Commands {
 				// Jobs that are in idle status and that have a type can be matched with an executor.
 				if (info.status == Status.idle) {
 					const executor = await Executor.make(uid, info.type, contextJob);
-					await this.make(uid, executor);
+					this.make(uid, executor);
 				} else {
 					const executor = await Executor.make(uid, "readonly", contextJob);
-					await this.make(uid, executor);
+					this.make(uid, executor);
 				}
 			}
 		}
@@ -67,31 +67,20 @@ export default class Commands {
 		const contextJob = this.getContext(uid);
 		const executor = await Executor.make(uid, schema.type, contextJob);
 		const args = makeArgs((...args) => executor.visitorArgs(...args));
-		await this.make(uid, executor, {
+		this.make(uid, executor);
+		await executor.updateInfo({
 			args: args,
-			status: Status.idle,
 		});
 	}
 
 	/// Create a new command.
-	async make(uid, executor, info = {}) {
+	make(uid, executor) {
 		Exception.assert(!(uid in this.executors), "The uid '{}' is already in use.", uid);
 		this.executors[uid] = executor;
-
-		// Update the information.
-		if (executor.constructor.type) {
-			info.type = executor.constructor.type;
-		}
-		if (Object.keys(info).length > 0) {
-			const maybeContextJob = this.getContext(uid);
-			if (maybeContextJob) {
-				await maybeContextJob.updateInfo(info);
-			}
-		}
 	}
 
 	getExecutor(uid) {
-		Exception.assertPrecondition(uid in this.executors, "Undefined job id '{}'.", uid);
+		Exception.assert(uid in this.executors, "Undefined job id '{}'.", uid);
 		return this.executors[uid];
 	}
 
@@ -119,8 +108,8 @@ export default class Commands {
 		delete this.executors[uid];
 	}
 
-	getContext(uid, valueOr) {
-		return this.context.getJob(uid, valueOr);
+	getContext(uid) {
+		return this.context.getJob(uid);
 	}
 
 	async getInfo(uid) {
