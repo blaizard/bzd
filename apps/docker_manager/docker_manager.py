@@ -6,6 +6,7 @@ import pathlib
 import typing
 import os
 import datetime
+import subprocess
 import time
 import threading
 
@@ -63,11 +64,31 @@ class Cache(typing.Generic[T]):
 
 class Docker:
 
-	def __init__(self, socket: pathlib.Path) -> None:
-		self.socket = socket
+	def __init__(self, socket: typing.Optional[pathlib.Path]) -> None:
+		self.socket = self.getDockerSocketPath() if socket is None else socket
 		self.previousIO: typing.Dict[str, typing.Any] = {}
 		self.previousNetwork: typing.Dict[str, typing.Any] = {}
 		self.diskSpace: Cache[DiskSpace] = Cache(self.getDiskSpace, defaultValue={}, expireS=3600 * 6)
+
+	@staticmethod
+	def getDockerSocketPath() -> pathlib.Path:
+		"""Auto-discover the docker socket."""
+
+		socket = "/var/run/docker.sock"
+
+		def dockerInspect() -> typing.Optional[bytes]:
+			try:
+				return subprocess.check_output(
+				    ["docker", "context", "inspect", "--format", "{{ .Endpoints.docker.Host }}"])
+			except:
+				return None
+
+		maybeData = dockerInspect()
+		if maybeData is not None:
+			maybePath = maybeData.decode().strip()
+			if maybePath.startswith("unix://"):
+				socket = maybePath.removeprefix("unix://")
+		return pathlib.Path(socket)
 
 	def request(self, method: str, endpoint: str, timeoutS: int = 10) -> typing.Any:
 		with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as sock:
@@ -330,7 +351,7 @@ if __name__ == "__main__":
 	                    help="A token to be used to access the node server.")
 	parser.add_argument("--docker-socket",
 	                    type=pathlib.Path,
-	                    default=pathlib.Path("/run/user/1000/docker.sock"),
+	                    default=None,
 	                    help="Docker socket to connect to the docker daemon.")
 	parser.add_argument("--measure-time", type=float, default=None, help="Measure for x seconds.")
 	parser.add_argument(
@@ -366,5 +387,5 @@ if __name__ == "__main__":
 
 	scheduler = Scheduler(blocking=True)
 	scheduler.add("monitor", args.report_rate, monitorWorkload)
-	print(f"Monitoring {args.docker_socket} every {args.report_rate}s...", flush=True)
+	print(f"Monitoring {docker.socket} every {args.report_rate}s...", flush=True)
 	scheduler.start()
