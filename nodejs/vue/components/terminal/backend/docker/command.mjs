@@ -73,6 +73,13 @@ export default class CommandDocker extends CommandBase {
 
 				this.client = socket;
 				this.client.setEncoding("utf8");
+
+				// Handle any data that might have arrived in the first packet.
+				if (head && head.length > 0) {
+					this.event.trigger("output", head.toString());
+				}
+
+				// Handle events.
 				this.client.on("error", (err) => {
 					this.event.trigger("output", "Error: " + String(err));
 					this.setStatus(Status.failed);
