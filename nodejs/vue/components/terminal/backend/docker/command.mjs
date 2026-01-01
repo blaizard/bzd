@@ -3,6 +3,7 @@ import LogFactory from "#bzd/nodejs/core/log.mjs";
 import CommandBase from "#bzd/nodejs/vue/components/terminal/backend/base.mjs";
 import { Status } from "#bzd/nodejs/utils/run.mjs";
 import http from "http";
+import { localCommand } from "#bzd/nodejs/utils/run.mjs";
 
 const Exception = ExceptionFactory("terminal", "docker");
 const Log = LogFactory("terminal", "docker");
@@ -11,8 +12,28 @@ export default class CommandDocker extends CommandBase {
 	constructor(name, options) {
 		super(options);
 		this.name = name;
-		this.result = null;
 		this.client = null;
+	}
+
+	/// Get the path of the docker socket.
+	static #dockerSocketPath = null;
+	static async getDockerSocket() {
+		if (CommandDocker.#dockerSocketPath === null) {
+			const result = await localCommand(["docker", "context", "inspect", "--format", "{{ .Endpoints.docker.Host }}"]);
+			await result.join();
+			const maybeSocket = result.getOutput().trim();
+			if (maybeSocket) {
+				Exception.assert(
+					maybeSocket.startsWith("unix://"),
+					"Docker socket must start with 'unix://', instead {}",
+					maybeSocket,
+				);
+				CommandDocker.#dockerSocketPath = maybeSocket.replace("unix://", "");
+			} else {
+				CommandDocker.#dockerSocketPath = "/var/run/docker.sock";
+			}
+		}
+		return CommandDocker.#dockerSocketPath;
 	}
 
 	async _startDockerContainer(args) {
@@ -37,7 +58,7 @@ export default class CommandDocker extends CommandBase {
 		Exception.assertPrecondition(this.client === null, "Monitoring already started.");
 
 		const req = http.request({
-			socketPath: "/run/user/1000/docker.sock",
+			socketPath: await CommandDocker.getDockerSocket(),
 			path: "/containers/" + this.name + "/attach?stream=1&stdout=1&stderr=1&stdin=1&tty=1",
 			method: "POST",
 			headers: {
@@ -85,8 +106,7 @@ export default class CommandDocker extends CommandBase {
 
 	/// Write data to the terminal.
 	write(data) {
-		Exception.assertPrecondition(this.client !== null, "The pipe is not running.");
-		if (this.client.writable) {
+		if (this.client && this.client.writable) {
 			this.client.write(data);
 		}
 	}
