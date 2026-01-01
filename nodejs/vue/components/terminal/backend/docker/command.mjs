@@ -86,8 +86,9 @@ export default class CommandDocker extends CommandBase {
 	/// Write data to the terminal.
 	write(data) {
 		Exception.assertPrecondition(this.client !== null, "The pipe is not running.");
-		Exception.assertPrecondition(this.client.writable, "The pipe is not writeable.");
-		this.client.write(data);
+		if (this.client.writable) {
+			this.client.write(data);
+		}
 	}
 
 	async kill() {
