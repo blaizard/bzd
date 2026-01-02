@@ -91,5 +91,6 @@ export default class Scheduler {
 		if (executor.kill) {
 			await executor.kill();
 		}
+		return await executor.getInfo();
 	}
 }

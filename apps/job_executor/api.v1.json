@@ -55,7 +55,13 @@
         },
         "/job/{id}/cancel": {
             "delete": {
-                "documentation": "Kill a running job."
+                "documentation": "Kill a running job.",
+                "response": {
+                    "type": "json",
+                    "validation": {
+                        "info": "mandatory"
+                    }
+                }
             }
         },
         "/job/{id}/delete": {
@@ -67,7 +73,10 @@
             "post": {
                 "documentation": "Start a job.",
                 "response": {
-                    "type": "json"
+                    "type": "json",
+                    "validation": {
+                        "info": "mandatory"
+                    }
                 }
             }
         },

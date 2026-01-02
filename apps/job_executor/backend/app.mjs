@@ -89,11 +89,17 @@ const Log = LogFactory("backend");
 	});
 
 	backend.rest.handle("post", "/job/{id}/start", async (inputs) => {
-		return await commands.schedule(inputs.id, { type: "immediately" });
+		const info = await commands.schedule(inputs.id, { type: "immediately" });
+		return {
+			info: info,
+		};
 	});
 
 	backend.rest.handle("delete", "/job/{id}/cancel", async (inputs) => {
-		await commands.terminate(inputs.id);
+		const info = await commands.terminate(inputs.id);
+		return {
+			info: info,
+		};
 	});
 
 	backend.rest.handle("delete", "/job/{id}/delete", async (inputs) => {

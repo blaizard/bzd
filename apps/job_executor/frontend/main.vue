@@ -17,7 +17,10 @@
 				<td class="duration">{{ getDuration(info.timestampStart, info.timestampStop) }}</td>
 				<td class="args">{{ info.args ? info.args.join(" ") : "" }}</td>
 				<td class="actions">
-					<a v-if="isStart(jobId)" @click.stop="start(jobId)" v-tooltip="{ type: 'text', data: 'Start this job' }"
+					<a
+						v-if="isStartManually(jobId)"
+						@click.stop="start(jobId)"
+						v-tooltip="{ type: 'text', data: 'Start this job' }"
 						><i class="bzd-icon-play"></i
 					></a>
 					<a v-if="isKill(jobId)" @click.stop="kill(jobId)" v-tooltip="{ type: 'text', data: 'Kill this job' }"
@@ -129,25 +132,27 @@
 					this.goToJob(response.job);
 				});
 			},
-			isStart(id) {
+			isStartManually(id) {
 				return this.jobs[id].status == "idle";
 			},
 			isKill(id) {
 				return this.jobs[id].status == "running";
 			},
 			async start(id) {
-				await this.handleSubmit(async () => {
-					await this.$rest.request("post", "/job/{id}/start", {
+				const result = await this.handleSubmit(async () => {
+					return await this.$rest.request("post", "/job/{id}/start", {
 						id: id,
 					});
 				});
+				this.jobs[id] = result.info;
 			},
 			async kill(id) {
-				await this.handleSubmit(async () => {
-					await this.$rest.request("delete", "/job/{id}/cancel", {
+				const result = await this.handleSubmit(async () => {
+					return await this.$rest.request("delete", "/job/{id}/cancel", {
 						id: id,
 					});
 				});
+				this.jobs[id] = result.info;
 			},
 			async remove(id) {
 				await this.handleSubmit(async () => {
@@ -155,6 +160,7 @@
 						id: id,
 					});
 				});
+				delete this.jobs[id];
 			},
 			goToJob(id) {
 				this.$router.dispatch("/job/" + id);

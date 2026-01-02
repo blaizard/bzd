@@ -87,13 +87,13 @@ export default class Commands {
 	}
 
 	/// Send a workload to be scheduled.
-	schedule(uid, type) {
-		this.scheduler.schedule(uid, type);
+	async schedule(uid, type) {
+		return await this.scheduler.schedule(uid, type);
 	}
 
 	/// Kill a specific command.
 	async terminate(uid, { force = false } = {}) {
-		await this.scheduler.terminate(uid, { force });
+		return await this.scheduler.terminate(uid, { force });
 	}
 
 	/// Remove a specific job.
