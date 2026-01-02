@@ -1,6 +1,6 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
-import { Status } from "#bzd/nodejs/utils/run.mjs";
+import Status from "#bzd/apps/job_executor/backend/status.mjs";
 import ServicesProvider from "#bzd/nodejs/core/services/provider.mjs";
 
 const Exception = ExceptionFactory("scheduler");
@@ -27,7 +27,7 @@ export default class Scheduler {
 
 				// Loop through the executors ready to be scheduled.
 				for (const [uid, status] of Object.entries(this.statuses)) {
-					if (status == Status.idle && this.isReadyToBeExecuted(uid)) {
+					if (status == Status.idle && this.isReadyToBeExecuted(uid, infos[uid].scheduler)) {
 						await this._execute(uid);
 						this.statuses[uid] = Status.running;
 					}
@@ -47,17 +47,27 @@ export default class Scheduler {
 	/// - immediately
 	/// - queued
 	/// - periodically <time>
-	async schedule(uid, type) {
+	async schedule(uid, scheduler) {
 		const executor = this._getExecutor(uid);
-		await executor.updateInfo({
-			scheduler: {
-				type: type,
-			},
+		return await executor.updateInfo({
+			scheduler: scheduler,
 		});
 	}
 
 	/// Check if this uid is ready to be executed.
-	isReadyToBeExecuted(uid) {
+	isReadyToBeExecuted(uid, scheduler) {
+		const type = scheduler.type;
+		switch (type) {
+			// Run if there is no other running executor.
+			case "queue":
+				const isAnyRunning = Object.values(this.statuses).some((status) => status == Status.running);
+				return !isAnyRunning;
+
+			// Run regardless of any conditions.
+			case "immediately":
+				return true;
+		}
+
 		return true;
 	}
 

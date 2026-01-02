@@ -1,5 +1,5 @@
 load("@bzd_lib//config:defs.bzl", "bzd_config_default")
-load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_binary")
+load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_binary", "bzd_nodejs_library")
 
 bzd_config_default(
     name = "config",
@@ -8,6 +8,19 @@ bzd_config_default(
     ],
     visibility = [
         "//deployment:__subpackages__",
+    ],
+)
+
+bzd_nodejs_library(
+    name = "status",
+    srcs = [
+        "status.mjs",
+    ],
+    visibility = [
+        "//apps/job_executor:__subpackages__",
+    ],
+    deps = [
+        "//nodejs/utils:run",
     ],
 )
 
@@ -35,6 +48,7 @@ bzd_nodejs_binary(
         "//apps/job_executor:__pkg__",
     ],
     deps = [
+        ":status",
         "//apps/job_executor/backend/executor",
         "//apps/job_executor/backend/scheduler",
         "//nodejs/core:event",

@@ -67,7 +67,7 @@ const Log = LogFactory("backend");
 			// Build the input data.
 			const data = await formDataToSandbox(contextJob, schema.inputs, inputs.data);
 			await commands.makeFromSchema(uid, schema, data);
-			await commands.schedule(uid, "queue");
+			await commands.schedule(uid, { type: "queue" });
 
 			Log.info("Executing job {}", uid);
 		} catch (error) {
@@ -89,7 +89,7 @@ const Log = LogFactory("backend");
 	});
 
 	backend.rest.handle("post", "/job/{id}/start", async (inputs) => {
-		await commands.schedule(inputs.id, "queue");
+		return await commands.schedule(inputs.id, { type: "immediately" });
 	});
 
 	backend.rest.handle("delete", "/job/{id}/cancel", async (inputs) => {

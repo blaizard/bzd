@@ -13,7 +13,7 @@
 			<tr v-for="(info, jobId) in jobs" class="job" @click="goToJob(jobId)">
 				<td class="job-id">{{ jobId }}</td>
 				<td class="type">{{ info.type }}</td>
-				<td class="status">{{ info.status }}</td>
+				<td class="status">{{ getStatus(info) }}</td>
 				<td class="duration">{{ getDuration(info.timestampStart, info.timestampStop) }}</td>
 				<td class="args">{{ info.args ? info.args.join(" ") : "" }}</td>
 				<td class="actions">
@@ -53,6 +53,7 @@
 	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.mjs";
 	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
 	import { timeMsToString } from "#bzd/nodejs/utils/to_string.mjs";
+	import Status from "#bzd/apps/job_executor/backend/status.mjs";
 
 	const Exception = ExceptionFactory("main");
 	const Log = LogFactory("main");
@@ -165,6 +166,12 @@
 				}
 				const durationMs = (timestampStop === null ? this.timestampServer : timestampStop) - timestampStart;
 				return timeMsToString(durationMs);
+			},
+			getStatus(info) {
+				if (info.status == Status.idle && info.scheduler?.type) {
+					return "scheduled (" + info.scheduler.type + ")";
+				}
+				return info.status;
 			},
 		},
 	};

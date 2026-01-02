@@ -60,17 +60,16 @@ class ContextJob {
 
 	/// Update the current information from this job.
 	async updateInfo(info) {
-		if (!info) {
-			return;
+		if (info) {
+			const previousInfo = await this.getInfo();
+			const updatedInfo = Object.assign({}, previousInfo, info);
+			const updatedInfoSerialized = JSON.stringify(updatedInfo);
+			if (updatedInfoSerialized != this.info[1]) {
+				await FileSystem.writeFile(this.getInfoPath().asPosix(), updatedInfoSerialized);
+				this.info = [updatedInfo, updatedInfoSerialized];
+			}
 		}
-		const previousInfo = await this.getInfo();
-		const updatedInfo = Object.assign({}, previousInfo, info);
-		const updatedInfoSerialized = JSON.stringify(updatedInfo);
-		if (updatedInfoSerialized == this.info[1]) {
-			return;
-		}
-		await FileSystem.writeFile(this.getInfoPath().asPosix(), updatedInfoSerialized);
-		this.info = [updatedInfo, updatedInfoSerialized];
+		return this.info[0];
 	}
 
 	/// Get the information from this job.

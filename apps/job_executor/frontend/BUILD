@@ -17,6 +17,7 @@ bzd_nodejs_web_binary(
         "//apps/job_executor/backend:__pkg__",
     ],
     deps = [
+        "//apps/job_executor/backend:status",
         "//nodejs/core:exception",
         "//nodejs/core:log",
         "//nodejs/db/storage:permissions",

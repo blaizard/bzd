@@ -108,8 +108,7 @@ export default class Executor {
 
 	async getInfo() {
 		const info = await this.executor.getInfo();
-		await this.updateInfo(info);
-		return this.info;
+		return await this.updateInfo(info);
 	}
 
 	async updateInfo(info) {
@@ -117,9 +116,10 @@ export default class Executor {
 
 		// Save and merge this information with the persistent one.
 		if (this.maybeContextJob) {
-			await this.maybeContextJob.updateInfo(this.info);
-			this.info = await this.maybeContextJob.getInfo();
+			this.info = await this.maybeContextJob.updateInfo(this.info);
 		}
+
+		return this.info;
 	}
 
 	visitorArgs(type, arg, schema) {

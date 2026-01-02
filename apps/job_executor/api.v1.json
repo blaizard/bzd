@@ -65,7 +65,10 @@
         },
         "/job/{id}/start": {
             "post": {
-                "documentation": "Start a job."
+                "documentation": "Start a job.",
+                "response": {
+                    "type": "json"
+                }
             }
         },
         "/jobs": {

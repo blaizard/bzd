@@ -1,7 +1,6 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
-import FileSystem from "#bzd/nodejs/core/filesystem.mjs";
-import { Status } from "#bzd/nodejs/utils/run.mjs";
+import Status from "#bzd/apps/job_executor/backend/status.mjs";
 
 const Exception = ExceptionFactory("backend", "executor");
 const Log = LogFactory("backend", "executor");
@@ -18,9 +17,8 @@ export default class ExecutorReadonly {
 	async getInfo() {
 		const info = await this.contextJob.getInfo();
 		switch (info.status) {
-			case Status.idle:
 			case Status.running:
-				info.status = undefined;
+				info.status = Status.terminated;
 				break;
 		}
 		return info;

@@ -3,7 +3,7 @@ import LogFactory from "#bzd/nodejs/core/log.mjs";
 import Context from "#bzd/apps/job_executor/backend/context.mjs";
 import Args from "#bzd/apps/job_executor/backend/args.mjs";
 import ServicesProvider from "#bzd/nodejs/core/services/provider.mjs";
-import { Status } from "#bzd/nodejs/utils/run.mjs";
+import Status from "#bzd/apps/job_executor/backend/status.mjs";
 
 import Executor from "#bzd/apps/job_executor/backend/executor/executor.mjs";
 import Scheduler from "#bzd/apps/job_executor/backend/scheduler/scheduler.mjs";
