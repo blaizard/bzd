@@ -3,12 +3,14 @@
         "args": [],
         "command": "/bin/bash",
         "inputs": [],
+        "stdin": true,
         "type": "shell"
     },
     "blaizard/build:x86_64": {
         "args": [],
         "image": "docker.io/blaizard/build:x86_64",
         "inputs": [],
+        "stdin": true,
         "type": "docker"
     },
     "ebook": {
@@ -91,6 +93,7 @@
                 "validation": "mandatory"
             }
         ],
+        "stdin": true,
         "type": "docker"
     }
 }

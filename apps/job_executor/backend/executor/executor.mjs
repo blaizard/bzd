@@ -96,6 +96,10 @@ export default class Executor {
 		}
 	}
 
+	writeToStdin(data) {
+		this.event.trigger("input", JSON.stringify({ type: "stream", value: data }));
+	}
+
 	async execute(args) {
 		await this.executor.execute(args);
 	}

@@ -25,15 +25,19 @@ const Log = LogFactory("backend");
 
 	// Convert the raw form data into relative data to the sandbox root.
 	async function formDataToSandbox(contextJob, inputs, formData) {
+		const getType = (key) => {
+			const maybeItem = inputs.find((item) => item.name == key);
+			if (maybeItem) {
+				return maybeItem.type;
+			}
+			return null;
+		};
+
 		let data = {};
-		for (const item of inputs) {
-			const key = item.name;
-			const type = item.type;
-			Exception.assert(type, "Input item {} has no type", key);
-			Exception.assert(key, "Input item {} has no name", item);
-			const value = formData[key];
-			if (value !== undefined) {
-				switch (type) {
+		for (const [key, value] of Object.entries(formData)) {
+			const maybeType = getType(key);
+			if (maybeType) {
+				switch (maybeType) {
 					case "File":
 						const originalPaths = value.map((entry) => backend.form.getUploadFile(entry.file.path).path);
 						data[key] = [];
@@ -44,12 +48,10 @@ const Log = LogFactory("backend");
 							data[key].push(relativePath);
 						}
 						break;
-					default:
-						data[key] = value;
 				}
 			}
 		}
-		return data;
+		return Object.assign(formData, data);
 	}
 
 	let commands = new Commands(pathlib.path("sandbox"), {

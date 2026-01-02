@@ -27,7 +27,7 @@ export default class Scheduler {
 
 				// Loop through the executors ready to be scheduled.
 				for (const [uid, status] of Object.entries(this.statuses)) {
-					if (status == Status.idle && this.isReadyToBeExecuted(uid, infos[uid].scheduler)) {
+					if (status == Status.idle && infos[uid].scheduler && this.isReadyToBeExecuted(uid, infos[uid].scheduler)) {
 						await this._execute(uid);
 						this.statuses[uid] = Status.running;
 					}
@@ -80,17 +80,19 @@ export default class Scheduler {
 		const executor = this._getExecutor(uid);
 		const info = await executor.getInfo();
 		Exception.assertPrecondition(info.status == Status.idle, "The job '{uid}' has already started", uid);
-		Exception.assert("args" in info, "The job '{}' is missing args: {:j}", uid, info);
+		Exception.assertPrecondition("args" in info, "The job '{}' is missing args: {:j}", uid, info);
 		await executor.execute(info.args);
+
+		if (info.data && info.data.stdin) {
+			executor.writeToStdin(info.data.stdin + "\n");
+		}
 	}
 
 	async terminate(uid, { force = false } = {}) {
 		const executor = this._getExecutor(uid);
 		const info = await executor.getInfo();
 		Exception.assertPrecondition(force || info.status == Status.running, "The job '{}' is not running.", uid);
-		if (executor.kill) {
-			await executor.kill();
-		}
+		await executor.kill();
 		return await executor.getInfo();
 	}
 }

@@ -106,7 +106,12 @@
 					return description;
 				}
 				Exception.assert(this.jobId in Jobs, `Job ${this.jobId} not found`);
-				description = [...description, ...Jobs[this.jobId].inputs, { type: "Button", action: "approve" }];
+				const schema = Jobs[this.jobId];
+				let extra = [];
+				if (schema.stdin) {
+					extra.push({ type: "Textarea", name: "stdin", caption: "Commands to send to the standard input" });
+				}
+				description = [...description, ...schema.inputs, ...extra, { type: "Button", action: "approve" }];
 				return description;
 			},
 			beforeFetchJobs() {

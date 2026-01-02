@@ -27,13 +27,16 @@ export default class Command extends CommandBase {
 
 	/// Write data to the terminal.
 	write(data) {
-		Exception.assertPrecondition(this.result !== null, "The command is not running.");
-		this.result.writeToStdin(data);
+		if (this.result) {
+			this.result.writeToStdin(data);
+		}
 	}
 
 	/// Kill the command.
 	async kill() {
-		this.result.kill();
+		if (this.result) {
+			this.result.kill();
+		}
 	}
 
 	/// Install the command to be used with websockets.

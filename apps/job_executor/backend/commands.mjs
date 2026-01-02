@@ -60,7 +60,10 @@ export default class Commands {
 			const updatedData = Object.fromEntries(
 				Object.entries(data).map(([key, value]) => {
 					const item = schema.inputs.find((item) => item.name == key);
-					return [key, visitor(item.type || "unknown", value, schema)];
+					if (item) {
+						return [key, visitor(item.type || "unknown", value, schema)];
+					}
+					return [key, value];
 				}),
 			);
 			const args = new Args(schema.args, updatedData);
@@ -72,6 +75,7 @@ export default class Commands {
 		this.make(uid, executor);
 		await executor.updateInfo({
 			args: args,
+			data: data,
 		});
 	}
 
@@ -99,8 +103,8 @@ export default class Commands {
 	/// Remove a specific job.
 	async remove(uid) {
 		await this.terminate(uid, { force: true });
-		await this.context.removeJob(uid);
 		delete this.executors[uid];
+		await this.context.removeJob(uid);
 	}
 
 	getContext(uid) {
