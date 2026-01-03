@@ -31,6 +31,7 @@
 				x: 0,
 				y: 0,
 				remainder: "",
+				insertMode: false,
 			};
 		},
 		created() {
@@ -61,6 +62,8 @@
 			categoryMapping() {
 				const csiFctMapping = {
 					m: this.sgr,
+					h: this.set,
+					l: this.unset,
 					A: this.moveCursorUp,
 					B: this.moveCursorDown,
 					C: this.moveCursorRight,
@@ -168,9 +171,10 @@
 					fontWeight: "normal",
 					fontStyle: "normal",
 					textDecoration: "none",
-					colorText: "inherit",
-					colorBackground: "transparent",
+					colorText: "var(--text-color)",
+					colorBackground: "var(--background-color)",
 					display: "inline",
+					filter: "none",
 				};
 			},
 			ignore(name) {
@@ -189,16 +193,22 @@
 						this.terminalStyle.fontStyle = "italic";
 					} else if (arg == 4) {
 						this.terminalStyle.textDecoration = "underline";
+					} else if (arg == 7) {
+						this.terminalStyle.filter = "invert(100%)";
 					} else if (arg == 8) {
 						this.terminalStyle.display = "none";
 					} else if (arg == 9) {
 						this.terminalStyle.textDecoration = "line-through";
+					} else if (arg == 21) {
+						this.terminalStyle.fontStyle = "normal";
 					} else if (arg == 22) {
 						this.terminalStyle.fontWeight = "normal";
 					} else if (arg == 23) {
 						this.terminalStyle.fontStyle = "normal";
 					} else if (arg == 24) {
 						this.terminalStyle.textDecoration = "none";
+					} else if (arg == 27) {
+						this.terminalStyle.filter = "none";
 					} else if (arg == 28) {
 						this.terminalStyle.display = "inline";
 					} else if (arg == 29) {
@@ -206,11 +216,11 @@
 					} else if (arg >= 30 && arg <= 37) {
 						this.terminalStyle.colorText = colors8[arg - 30];
 					} else if (arg == 39) {
-						this.terminalStyle.colorText = "inherit";
+						this.terminalStyle.colorText = "var(--text-color)";
 					} else if (arg >= 40 && arg <= 47) {
 						this.terminalStyle.colorBackground = colors8[arg - 40];
 					} else if (arg == 49) {
-						this.terminalStyle.colorText = "transparent";
+						this.terminalStyle.colorText = "var(--background-color)";
 					} else if (arg >= 90 && arg <= 97) {
 						this.terminalStyle.colorText = colorsBright8[arg - 90];
 					} else if (arg >= 100 && arg <= 107) {
@@ -222,6 +232,26 @@
 				this.createStyle();
 				return true;
 			},
+			set(...args) {
+				for (const arg of args) {
+					if (arg == 4) {
+						this.insertMode = true;
+					} else {
+						return false;
+					}
+				}
+				return true;
+			},
+			unset(...args) {
+				for (const arg of args) {
+					if (arg == 4) {
+						this.insertMode = false;
+					} else {
+						return false;
+					}
+				}
+				return true;
+			},
 			// Write content to the stream at the cursor position.
 			write(content) {
 				const size = content.length;
@@ -231,7 +261,7 @@
 					for (let y = this.content.length; y <= this.y; ++y) {
 						this.content[y] = [];
 					}
-					// If the column does not exists, create it. The loop does not need to cover this.x because this will be done when writing.
+					// If the column does not exists, create it. The loop does cover this.x, it is needed for displaying the cursor.
 					for (let x = this.content[this.y].length; x <= this.x; ++x) {
 						this.content[this.y].push([" ", 0]);
 					}
@@ -250,30 +280,30 @@
 						} else if (c == "\x07") {
 							// Bell character - ignore
 						} else {
-							this.content[this.y][this.x] = [c, this.styleId];
+							if (this.insertMode) {
+								this.content[this.y].splice(this.x, 0, [c, this.styleId]);
+							} else {
+								this.content[this.y][this.x] = [c, this.styleId];
+							}
 							++this.x;
 						}
 					}
 				} while (i < size);
 			},
 			moveCursorUp(lines = 0) {
-				Exception.assert(typeof lines == "number", "Must be a number, instead: {}", lines);
-				this.y = Math.max(this.y - lines, 0);
+				this.y = Math.max(this.y - (lines ?? 1), 0);
 				return true;
 			},
 			moveCursorDown(lines) {
-				Exception.assert(typeof lines == "number", "Must be a number, instead: {}", lines);
-				this.y += lines;
+				this.y += lines ?? 1;
 				return true;
 			},
 			moveCursorRight(columns) {
-				Exception.assert(typeof columns == "number", "Must be a number, instead: {}", columns);
-				this.x += columns;
+				this.x += columns ?? 1;
 				return true;
 			},
 			moveCursorLeft(columns) {
-				Exception.assert(typeof columns == "number", "Must be a number, instead: {}", columns);
-				this.x = Math.max(this.x - columns, 0);
+				this.x = Math.max(this.x - (columns ?? 1), 0);
 				return true;
 			},
 			moveCursorDownBegining(lines) {
@@ -352,6 +382,8 @@
 					this.terminalStyle.fontStyle +
 					"; text-decoration: " +
 					this.terminalStyle.textDecoration +
+					"; filter: " +
+					this.terminalStyle.filter +
 					";";
 				if (!(style in this.stylesMap)) {
 					this.styles.push(style);
@@ -426,11 +458,14 @@
 
 <style lang="scss" scoped>
 	.terminal-vt100 {
+		--background-color: #222;
+		--text-color: #ddd;
+
 		width: 100%;
 		height: 100%;
 		padding: 10px;
-		background-color: #222;
-		color: #ddd;
+		background-color: var(--background-color);
+		color: var(--text-color);
 		overflow: auto;
 		display: flex;
 		flex-direction: column-reverse;

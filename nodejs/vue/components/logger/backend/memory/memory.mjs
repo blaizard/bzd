@@ -33,7 +33,7 @@ export default class LoggerMemory {
 			while (this.errors.length >= this.options.maxErrors) {
 				this.errors.shift();
 			}
-			this.errors.push([...this.buffer]);
+			this.errors.push(this.buffer.at(1));
 		}
 	}
 
