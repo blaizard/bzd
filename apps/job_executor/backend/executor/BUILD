@@ -15,6 +15,7 @@ bzd_nodejs_library(
         "//nodejs/core:event",
         "//nodejs/core:exception",
         "//nodejs/core:filesystem",
+        "//nodejs/core:lock",
         "//nodejs/core:log",
         "//nodejs/utils:run",
         "//nodejs/vue/components/terminal/backend/docker",

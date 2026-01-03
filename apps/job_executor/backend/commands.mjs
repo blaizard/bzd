@@ -55,7 +55,7 @@ export default class Commands {
 		return await this.context.addJob(uid);
 	}
 
-	async makeFromSchema(uid, schema, data) {
+	async makeFromSchema(contextJob, schema, data) {
 		const makeArgs = (visitor) => {
 			const updatedData = Object.fromEntries(
 				Object.entries(data).map(([key, value]) => {
@@ -69,7 +69,7 @@ export default class Commands {
 			const args = new Args(schema.args, updatedData);
 			return visitor("post", args.process(), schema);
 		};
-		const contextJob = this.getContext(uid);
+		const uid = contextJob.getUid();
 		const executor = await Executor.make(uid, schema.type, contextJob);
 		const args = makeArgs((...args) => executor.visitorArgs(...args));
 		this.make(uid, executor);
@@ -103,8 +103,8 @@ export default class Commands {
 	/// Remove a specific job.
 	async remove(uid) {
 		await this.terminate(uid, { force: true });
+		await this.executors[uid].remove();
 		delete this.executors[uid];
-		await this.context.removeJob(uid);
 	}
 
 	getContext(uid) {

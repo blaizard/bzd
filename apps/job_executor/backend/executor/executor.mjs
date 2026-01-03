@@ -1,6 +1,7 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import Event from "#bzd/nodejs/core/event.mjs";
+import Lock from "#bzd/nodejs/core/lock.mjs";
 
 import ExecutorReadonly from "#bzd/apps/job_executor/backend/executor/executor_readonly.mjs";
 import ExecutorShell from "#bzd/apps/job_executor/backend/executor/executor_shell.mjs";
@@ -29,6 +30,7 @@ export default class Executor {
 			},
 			options,
 		);
+		this.lock = new Lock();
 
 		this.info = {
 			type: this.executor.constructor.type || null,
@@ -74,26 +76,28 @@ export default class Executor {
 	}
 
 	async initialize() {
-		// If a context is associated with this executor.
-		if (this.maybeContextJob) {
-			await this.maybeContextJob.getLogs((line) => {
-				this.event.trigger("output", line);
-			});
-			this.maybeContextJob.captureOutput(this.executor);
-		}
+		await this.lock.acquire(async () => {
+			// If a context is associated with this executor.
+			if (this.maybeContextJob) {
+				await this.maybeContextJob.getLogs((line) => {
+					this.event.trigger("output", line);
+				});
+				this.maybeContextJob.captureOutput(this.executor);
+			}
 
-		// If the executor supports websockets.
-		if (this.executor.installWebsocket) {
-			this.executor.installWebsocket({
-				send: (data) => {
-					this.event.trigger("output", data);
-				},
-				read: (onRead) => {
-					this.event.on("input", onRead);
-				},
-				exit: () => {},
-			});
-		}
+			// If the executor supports websockets.
+			if (this.executor.installWebsocket) {
+				this.executor.installWebsocket({
+					send: (data) => {
+						this.event.trigger("output", data);
+					},
+					read: (onRead) => {
+						this.event.on("input", onRead);
+					},
+					exit: () => {},
+				});
+			}
+		});
 	}
 
 	writeToStdin(data) {
@@ -101,29 +105,47 @@ export default class Executor {
 	}
 
 	async execute(args) {
-		await this.executor.execute(args);
+		await this.lock.acquire(async () => {
+			await this.executor.execute(args);
+		});
 	}
 
 	async kill() {
-		if (this.executor.kill) {
-			return await this.executor.kill();
-		}
+		await this.lock.acquire(async () => {
+			if (this.executor.kill) {
+				await this.executor.kill();
+			}
+		});
 	}
 
 	async getInfo() {
-		const info = await this.executor.getInfo();
-		return await this.updateInfo(info);
+		return await this.lock.acquire(async () => {
+			const info = await this.executor.getInfo();
+			return await this.updateInfo(info, /*acquire*/ false);
+		});
 	}
 
-	async updateInfo(info) {
+	async updateInfo(info, acquire = true) {
 		Object.assign(this.info, info);
 
 		// Save and merge this information with the persistent one.
-		if (this.maybeContextJob) {
-			this.info = await this.maybeContextJob.updateInfo(this.info);
-		}
+		const acquireFct = acquire ? (callback) => this.lock.acquire(callback) : (callback) => callback();
+		await acquireFct(async () => {
+			if (this.maybeContextJob) {
+				this.info = await this.maybeContextJob.updateInfo(this.info);
+			}
+		});
 
 		return this.info;
+	}
+
+	async remove() {
+		await this.lock.acquire(async () => {
+			if (this.maybeContextJob) {
+				await this.maybeContextJob.destroy();
+				this.maybeContextJob = null;
+			}
+		});
 	}
 
 	visitorArgs(type, arg, schema) {

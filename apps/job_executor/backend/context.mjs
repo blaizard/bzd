@@ -21,9 +21,8 @@ class JobLogCapture {
 }
 
 class ContextJob {
-	constructor(root, storage, uid) {
-		this.root_ = root;
-		this.storage_ = storage;
+	constructor(context, uid) {
+		this.context_ = context;
 		this.uid_ = uid;
 		this.prefix_ = "job-" + this.uid_;
 		this.info = null;
@@ -36,15 +35,15 @@ class ContextJob {
 
 	/// Get the absolute root directory for this job.
 	getRootPath() {
-		return this.root_.joinPath(...this.getPrefixData());
+		return this.context_.root.joinPath(...this.getPrefixData());
 	}
 
 	getLogPath() {
-		return this.root_.joinPath(this.prefix_, "log.txt");
+		return this.context_.root.joinPath(this.prefix_, "log.txt");
 	}
 
 	getInfoPath() {
-		return this.root_.joinPath(this.prefix_, "info.json");
+		return this.context_.root.joinPath(this.prefix_, "info.json");
 	}
 
 	async getLogs(onLog) {
@@ -92,7 +91,7 @@ class ContextJob {
 
 	/// Initialize the current job context.
 	async initialize() {
-		await this.storage_.mkdir(this.getPrefixData());
+		await this.context_.storage.mkdir(this.getPrefixData());
 	}
 
 	/// Copy the content of the path into this job context.
@@ -115,19 +114,20 @@ class ContextJob {
 
 	/// Destroy the current job context.
 	async destroy() {
-		await this.storage_.delete([this.prefix_]);
+		await this.context_.storage.delete([this.prefix_]);
+		delete this.context_.jobs[this.uid_];
 	}
 
 	async metadata(pathList) {
-		return await this.storage_.metadata([...this.getPrefixData(), ...pathList]);
+		return await this.context_.storage.metadata([...this.getPrefixData(), ...pathList]);
 	}
 
 	async read(pathList) {
-		return await this.storage_.read([...this.getPrefixData(), ...pathList]);
+		return await this.context_.storage.read([...this.getPrefixData(), ...pathList]);
 	}
 
 	async list(pathList, maxOrPaging, includeMetadata) {
-		return await this.storage_.list([...this.getPrefixData(), ...pathList], maxOrPaging, includeMetadata);
+		return await this.context_.storage.list([...this.getPrefixData(), ...pathList], maxOrPaging, includeMetadata);
 	}
 }
 
@@ -164,7 +164,7 @@ export default class Context {
 			const match = name.match(regex);
 			if (match) {
 				const uid = parseInt(match[1], 10);
-				this.jobs[uid] = new ContextJob(this.root, this.storage, uid);
+				this.jobs[uid] = new ContextJob(this, uid);
 				this.uid = Math.max(this.uid, uid);
 				Log.info("Discovered previous job context '{}'.", uid);
 			} else {
@@ -175,7 +175,7 @@ export default class Context {
 
 	async addJob(uid) {
 		Exception.assertPrecondition(!(uid in this.jobs), "The uid '{}' has already a job context associated to it.", uid);
-		this.jobs[uid] = new ContextJob(this.root, this.storage, uid);
+		this.jobs[uid] = new ContextJob(this, uid);
 		await this.jobs[uid].initialize();
 		return this.jobs[uid];
 	}
@@ -185,11 +185,5 @@ export default class Context {
 			Exception.assertPrecondition(uid in this.jobs, "There is not uid '{}' associated with a job context.", uid);
 		}
 		return this.jobs[uid] || valueOr;
-	}
-
-	async removeJob(uid) {
-		Exception.assertPrecondition(uid in this.jobs, "There is not uid '{}' associated with a job context.", uid);
-		await this.jobs[uid].destroy();
-		delete this.jobs[uid];
 	}
 }

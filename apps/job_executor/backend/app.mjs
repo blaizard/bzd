@@ -68,7 +68,7 @@ const Log = LogFactory("backend");
 		try {
 			// Build the input data.
 			const data = await formDataToSandbox(contextJob, schema.inputs, inputs.data);
-			await commands.makeFromSchema(uid, schema, data);
+			await commands.makeFromSchema(contextJob, schema, data);
 			await commands.schedule(uid, { type: "queue" });
 
 			Log.info("Executing job {}", uid);
