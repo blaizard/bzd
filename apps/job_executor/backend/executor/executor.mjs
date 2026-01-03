@@ -82,9 +82,10 @@ export default class Executor {
 				await this.maybeContextJob.getLogs((line) => {
 					this.event.trigger("output", line);
 				});
+
+				const logPath = this.maybeContextJob.getLogPath().asPosix();
 				this.maybeContextJob.captureOutput(this.executor);
 			}
-
 			// If the executor supports websockets.
 			if (this.executor.installWebsocket) {
 				this.executor.installWebsocket({

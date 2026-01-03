@@ -7,7 +7,6 @@ const Exception = ExceptionFactory("terminal", "local");
 export default class Command extends CommandBase {
 	constructor(options) {
 		super(options);
-		this.subprocess = null;
 		this.result = null;
 	}
 
@@ -35,7 +34,8 @@ export default class Command extends CommandBase {
 	/// Kill the command.
 	async kill() {
 		if (this.result) {
-			this.result.kill();
+			await this.result.kill();
+			this.result = null;
 		}
 	}
 

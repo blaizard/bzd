@@ -67,8 +67,14 @@ class ExecuteResult {
 		this.event.remove(topic, handler);
 	}
 
-	kill() {
+	async kill() {
+		const promise = new Promise((resolve) => {
+			this.subprocess.on("exit", () => {
+				resolve();
+			});
+		});
 		this.subprocess.kill();
+		return promise;
 	}
 
 	getStdout() {

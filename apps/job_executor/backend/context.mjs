@@ -14,7 +14,8 @@ class JobLogCapture {
 		this.path = path;
 	}
 	send(data) {
-		FileSystem.appendFile(this.path, data);
+		// Ignore any error, it might mean that the file is not there.
+		FileSystem.appendFile(this.path, data).catch(() => {});
 	}
 	read(onRead) {}
 	exit(onExit) {}
