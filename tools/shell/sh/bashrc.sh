@@ -72,7 +72,7 @@ _bzd_prepend()
 
 case "$TERM" in
 xterm*|rxvt*|konsole*)
-	PS1="\[\e[31m\]\$(_bzd_last_non_zero_return_code)\[\e[00m\]\$(_bzd_prepend)\u@\h \[\e[32m\]\w\[\e[33m\]\$(_bzd_parse_git_branch)\[\e[00m\] $ "
+	PS1="\[\e[0;31m\]\$(_bzd_last_non_zero_return_code)\[\e[0m\]\$(_bzd_prepend)\u@\h \[\e[32m\]\w\[\e[33m\]\$(_bzd_parse_git_branch)\[\e[0m\] $ "
 	;;
 *)
 	;;
