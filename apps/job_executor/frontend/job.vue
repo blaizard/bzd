@@ -1,7 +1,11 @@
 <template>
 	<div>
 		<h1>Job {{ job }}</h1>
-		<TerminalWebsocket :websocket-endpoint="websocketEndpoint" style="height: 600px"></TerminalWebsocket>
+		<TerminalWebsocket
+			:websocket-endpoint="websocketEndpoint"
+			style="height: 600px"
+			:readonly="false"
+		></TerminalWebsocket>
 		<h2>Files</h2>
 		<FileExplorer
 			class="files"

@@ -1,8 +1,10 @@
 <template>
 	<div class="terminal-vt100" ref="terminal">
-		<template v-for="line in reverse(content)">
+		<template v-for="(line, lineY) in reverse(content)">
 			<div>
-				<span v-for="data in groupByStyleId(line)" :style="styles[data[1]]">{{ data[0] }}</span>
+				<span v-for="data in groupByStyleId(line, y - lineY)" :style="styles[data[1]] ?? predefinedStyle(data[1])">{{
+					data[0]
+				}}</span>
 			</div>
 		</template>
 	</div>
@@ -38,6 +40,7 @@
 		},
 		props: {
 			stream: { type: Array, mandatory: false, default: () => [] },
+			readonly: { type: Boolean, required: false, default: false },
 		},
 		emits: ["processed"],
 		watch: {
@@ -125,10 +128,14 @@
 		},
 		methods: {
 			/// Group characters by their style identifiers.
-			groupByStyleId(line) {
+			groupByStyleId(line, y) {
 				let styleId = -1;
 				let output = [];
-				for (const data of line) {
+				for (const [x, data] of line.entries()) {
+					if (this.x == x && this.y == y) {
+						styleId = "cursor";
+						output.push(["", styleId]);
+					}
 					if (data[1] != styleId) {
 						styleId = data[1];
 						output.push(["", styleId]);
@@ -136,6 +143,25 @@
 					output.at(-1)[0] += data[0];
 				}
 				return output;
+			},
+			predefinedStyle(style) {
+				switch (style) {
+					case "cursor":
+						if (this.readonly) {
+							return {};
+						}
+						return {
+							width: "1ch",
+							height: "1em",
+							display: "inline-block",
+							position: "relative",
+							"margin-right": "-1ch",
+							"vertical-align": "sub",
+							"background-color": "currentColor",
+							animation: "blinker 1s linear infinite",
+						};
+				}
+				Exception.unreachable("Unsupported predefined style '{}'.", style);
 			},
 			resetTerminalStyle() {
 				this.terminalStyle = {
@@ -206,7 +232,7 @@
 						this.content[y] = [];
 					}
 					// If the column does not exists, create it. The loop does not need to cover this.x because this will be done when writing.
-					for (let x = this.content[this.y].length; x < this.x; ++x) {
+					for (let x = this.content[this.y].length; x <= this.x; ++x) {
 						this.content[this.y].push([" ", 0]);
 					}
 					// Fill the content.
@@ -390,6 +416,14 @@
 	};
 </script>
 
+<style lang="scss">
+	@keyframes blinker {
+		50% {
+			opacity: 0;
+		}
+	}
+</style>
+
 <style lang="scss" scoped>
 	.terminal-vt100 {
 		width: 100%;
@@ -400,6 +434,7 @@
 		overflow: auto;
 		display: flex;
 		flex-direction: column-reverse;
+		font-family: monospace;
 
 		> * {
 			white-space: pre-wrap;

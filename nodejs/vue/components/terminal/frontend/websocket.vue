@@ -1,5 +1,12 @@
 <template>
-	<TerminalVt100 :stream="stream" @processed="handleStreamProcessed" tabindex="-1"></TerminalVt100>
+	<TerminalVt100
+		:stream="stream"
+		@processed="handleStreamProcessed"
+		@focus="hasFocus = true"
+		@blur="hasFocus = false"
+		tabindex="-1"
+		:readonly="readonly || !hasFocus"
+	></TerminalVt100>
 </template>
 
 <script>
@@ -13,10 +20,12 @@
 			return {
 				stream: [],
 				websocket: null,
+				hasFocus: false,
 			};
 		},
 		props: {
 			websocketEndpoint: { type: String, required: true },
+			readonly: { type: Boolean, required: false, default: false },
 		},
 		async mounted() {
 			this.websocket = await this.$websocket.handle(this.websocketEndpoint, (data) => {
@@ -34,7 +43,7 @@
 				this.stream.splice(0, count);
 			},
 			async setInput(value) {
-				if (this.websocket) {
+				if (this.websocket && !this.readonly) {
 					this.websocket.send(JSON.stringify({ type: "stream", value: value }));
 				}
 			},
@@ -49,7 +58,7 @@
 					wakeup: true,
 					shift: true,
 					capslock: true,
-					tab: true,
+					tab: "\t",
 					arrowup: true,
 					arrowdown: true,
 					arrowleft: true,
