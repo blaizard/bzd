@@ -88,10 +88,10 @@
 					shift: true,
 					capslock: true,
 					tab: "\t",
-					arrowup: true,
-					arrowdown: true,
-					arrowleft: true,
-					arrowright: true,
+					arrowup: "\u001b[A",
+					arrowdown: "\u001b[B",
+					arrowleft: "\u001b[D",
+					arrowright: "\u001b[C",
 				};
 				const key = translationMap[event.key.toLowerCase()] || event.key;
 				if (key !== true) {
