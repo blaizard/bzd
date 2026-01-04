@@ -91,6 +91,7 @@ export default class CommandDocker extends CommandBase {
 					this.event.trigger("output", data);
 				});
 				this.client.on("close", () => {
+					this.client = null;
 					this.setStatus(Status.completed);
 				});
 
