@@ -2,17 +2,13 @@
 	<TerminalVt100
 		:stream="stream"
 		@processed="handleStreamProcessed"
-		@click="handleClick"
-		tabindex="-1"
-		:readonly="readonly || !hasFocus"
-		v-bind="$attrs"
-	></TerminalVt100>
-	<textarea
-		ref="input"
-		style="opacity: 0; position: absolute"
 		@focus="hasFocus = true"
 		@blur="hasFocus = false"
-	></textarea>
+		@keydown="handleKeyDown"
+		@paste="handlePaste"
+		tabindex="-1"
+		:readonly="readonly || !hasFocus"
+	></TerminalVt100>
 </template>
 
 <script>
@@ -38,12 +34,8 @@
 				this.stream.push(data);
 			});
 			this.websocket.send(JSON.stringify({ type: "init", value: {} }));
-			this.$refs.input.addEventListener("keydown", this.handleKeyDown);
-			this.$refs.input.addEventListener("paste", this.handlePaste);
 		},
 		beforeUnmount() {
-			this.$refs.input.removeEventListener("paste", this.handlePaste);
-			this.$refs.input.removeEventListener("keydown", this.handleKeyDown);
 			this.websocket.close();
 		},
 		methods: {
@@ -56,7 +48,7 @@
 				}
 			},
 			async handleKeyDown(event) {
-				// Ignore ctrl+<something>, this is to ensure that paste event for example is not handled by this.
+				// Ignore ctrl+<something>, this ensures that paste events for example are not handled by this.
 				if (event.ctrlKey || event.metaKey) {
 					return;
 				}
@@ -85,9 +77,6 @@
 				event.preventDefault();
 				const text = (event.clipboardData || window.clipboardData).getData("text");
 				await this.setInput("\x1b[200~" + text + "\x1b[201~");
-			},
-			handleClick() {
-				this.$refs.input.focus();
 			},
 		},
 	};
