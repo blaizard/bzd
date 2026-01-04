@@ -22,8 +22,23 @@ function makeAbsoluteUrl(urlString, originalUrl) {
 
 export default async function request(url, options) {
 	return new Promise((resolve, reject) => {
-		// Check if http or https
-		let requestHandler = url.toLowerCase().startsWith("https://") ? requestHttps : requestHttp;
+		// Check the transport type, by default it is HTTP.
+		let requestHandler = requestHttp;
+		if (url.startsWith("unix://")) {
+			requestHandler = (_, options, callback) => {
+				return requestHttp(
+					Object.assign(
+						{
+							socketPath: url.replace("unix://", "", 1),
+						},
+						options,
+					),
+					callback,
+				);
+			};
+		} else if (url.startsWith("https://")) {
+			requestHandler = requestHttps;
+		}
 
 		// Doing this will help to have a clean stack trace
 		const exceptionTimeout = new Exception("Request timeout (" + options.timeoutMs + " ms)");
@@ -33,6 +48,7 @@ export default async function request(url, options) {
 			url,
 			{
 				method: options.method,
+				path: options.path,
 				headers: options.headers,
 				timeout: options.timeoutMs,
 			},

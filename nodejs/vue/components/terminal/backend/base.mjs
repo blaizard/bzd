@@ -104,6 +104,11 @@ export default class CommandBase {
 				case "stream":
 					this.write(input.value);
 					break;
+				case "resize":
+					this.resize(input.value.width, input.value.height).catch((e) => {
+						Log.error(e);
+					});
+					break;
 				default:
 					Log.error("Unsupported data type '{}' for terminal.", input.type);
 			}

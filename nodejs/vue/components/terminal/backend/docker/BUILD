@@ -9,6 +9,7 @@ bzd_nodejs_library(
     deps = [
         "//nodejs/core:exception",
         "//nodejs/core:log",
+        "//nodejs/core/http:client",
         "//nodejs/utils:run",
         "//nodejs/vue/components/terminal/backend:base",
     ],

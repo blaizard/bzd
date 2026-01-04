@@ -4,6 +4,7 @@ import CommandBase from "#bzd/nodejs/vue/components/terminal/backend/base.mjs";
 import { Status } from "#bzd/nodejs/utils/run.mjs";
 import http from "http";
 import { localCommand } from "#bzd/nodejs/utils/run.mjs";
+import HttpClient from "#bzd/nodejs/core/http/client.mjs";
 
 const Exception = ExceptionFactory("terminal", "docker");
 const Log = LogFactory("terminal", "docker");
@@ -13,6 +14,8 @@ export default class CommandDocker extends CommandBase {
 		super(options);
 		this.name = name;
 		this.client = null;
+		this.width = 120;
+		this.height = 30;
 	}
 
 	/// Get the path of the docker socket.
@@ -68,7 +71,7 @@ export default class CommandDocker extends CommandBase {
 		});
 
 		return new Promise((resolve, reject) => {
-			req.on("upgrade", (res, socket, head) => {
+			req.on("upgrade", async (res, socket, head) => {
 				this.setStatus(Status.running);
 
 				this.client = socket;
@@ -90,6 +93,9 @@ export default class CommandDocker extends CommandBase {
 				this.client.on("close", () => {
 					this.setStatus(Status.completed);
 				});
+
+				await this.resize(this.width, this.height);
+
 				resolve();
 			});
 			req.on("error", (err) => {
@@ -109,6 +115,24 @@ export default class CommandDocker extends CommandBase {
 	async detach(args) {
 		await this._startDockerContainer(args);
 		await this._monitorDockerContainer();
+	}
+
+	/// Resize the terminal.
+	async resize(width, height) {
+		this.width = width;
+		this.height = height;
+		if (!this.client) {
+			return;
+		}
+		const host = await CommandDocker.getDockerSocket();
+		await HttpClient.request("unix://" + host, {
+			path: "/containers/" + this.name + "/resize",
+			method: "POST",
+			query: {
+				w: width,
+				h: height,
+			},
+		});
 	}
 
 	/// Write data to the terminal.

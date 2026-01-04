@@ -24,6 +24,10 @@
                 "{dpi}"
             ],
             [
+                "--zoom",
+                "{zoom}"
+            ],
+            [
                 "{action}"
             ],
             "{ebook}"
@@ -60,6 +64,11 @@
             {
                 "caption": "Max DPI",
                 "name": "dpi",
+                "type": "Input"
+            },
+            {
+                "caption": "Zoom (default 1.0)",
+                "name": "zoom",
                 "type": "Input"
             }
         ],

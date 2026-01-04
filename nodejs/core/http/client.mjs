@@ -42,7 +42,7 @@ export class HttpClientException extends ExceptionFactory("fetch", "impl") {
 }
 
 export default class HttpClient {
-	static async request(url, options = {}) {
+	static async request(urlOrPath, options = {}) {
 		options = Object.assign(
 			{
 				/// Includes all outputs (in this order): data, headers, status code
@@ -55,13 +55,34 @@ export default class HttpClient {
 			options,
 		);
 
+		// Construct the url + path pair depending on the schema.
+		let url = "";
+		let path = options.path ?? "";
+		if (urlOrPath.startsWith("http://") || urlOrPath.startsWith("https://")) {
+			const parsedURL = new URL(urlOrPath);
+			url = parsedURL.origin;
+			path ||= parsedURL.href.replace(parsedURL.origin, "", 1);
+		} else if (urlOrPath.startsWith("unix://")) {
+			url = urlOrPath;
+		} else if (urlOrPath.startsWith("/")) {
+			Exception.assert(
+				!options.path,
+				"The path for request '{}' is set twice (as parameter and via 'path': '{}').",
+				urlOrPath,
+				options.path,
+			);
+			path = urlOrPath;
+		} else {
+			Exception.unreachable("Unsupported url or path: '{}'.", urlOrPath);
+		}
+
 		// Handle queries
 		if ("query" in options) {
 			const query = Object.keys(options.query)
 				.filter((key) => options.query[key] !== undefined)
 				.map((key) => key + "=" + encodeURIComponent(options.query[key]))
 				.join("&");
-			url += query ? "?" + query : "";
+			path += query ? "?" + query : "";
 		}
 
 		let headers = {};
@@ -118,13 +139,14 @@ export default class HttpClient {
 
 		let request = (await import("./client/backend.mjs")).default;
 
-		Log.debug("{} {} (headers: {:j})", method, url, headers);
+		Log.debug("{} url={} path={} (headers: {:j})", method, url, path, headers);
 		Log.trace("(body: {})", data);
 
 		const result = await request(url, {
 			method: method,
 			headers: headers,
 			data: data,
+			path: path,
 			expect: options.expect,
 			timeoutMs: options.timeoutMs,
 		});

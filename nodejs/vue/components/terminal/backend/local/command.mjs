@@ -24,6 +24,11 @@ export default class Command extends CommandBase {
 		});
 	}
 
+	/// Resize the terminal.
+	async resize(width, height) {
+		// to be implemented.
+	}
+
 	/// Write data to the terminal.
 	write(data) {
 		if (this.result) {

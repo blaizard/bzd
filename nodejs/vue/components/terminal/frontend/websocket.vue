@@ -6,6 +6,7 @@
 		@blur="hasFocus = false"
 		@keydown="handleKeyDown"
 		@paste="handlePaste"
+		@resize="handleResize"
 		tabindex="-1"
 		:readonly="readonly || !hasFocus"
 	></TerminalVt100>
@@ -23,6 +24,7 @@
 				stream: [],
 				websocket: null,
 				hasFocus: false,
+				dimension: null,
 			};
 		},
 		props: {
@@ -37,15 +39,39 @@
 		},
 		beforeUnmount() {
 			this.websocket.close();
+			this.websocket = null;
+		},
+		watch: {
+			async triggerResize(value) {
+				if (value.ready) {
+					await this.setInputResize(value.width, value.height);
+				}
+			},
+		},
+		computed: {
+			triggerResize() {
+				return Object.assign(
+					{
+						ready: Boolean(this.websocket) && Boolean(this.dimension),
+					},
+					this.dimension,
+				);
+			},
 		},
 		methods: {
 			handleStreamProcessed(count) {
 				this.stream.splice(0, count);
 			},
-			async setInput(value) {
+			async setInput(type, value) {
 				if (this.websocket && !this.readonly) {
-					this.websocket.send(JSON.stringify({ type: "stream", value: value }));
+					this.websocket.send(JSON.stringify({ type: type, value: value }));
 				}
+			},
+			async setInputStream(value) {
+				await this.setInput("stream", value);
+			},
+			async setInputResize(width, height) {
+				await this.setInput("resize", { width, height });
 			},
 			async handleKeyDown(event) {
 				// Ignore ctrl+<something>, this ensures that paste events for example are not handled by this.
@@ -70,13 +96,16 @@
 				const key = translationMap[event.key.toLowerCase()] || event.key;
 				if (key !== true) {
 					event.preventDefault();
-					await this.setInput(key);
+					await this.setInputStream(key);
 				}
 			},
 			async handlePaste(event) {
 				event.preventDefault();
 				const text = (event.clipboardData || window.clipboardData).getData("text");
-				await this.setInput("\x1b[200~" + text + "\x1b[201~");
+				await this.setInputStream("\x1b[200~" + text + "\x1b[201~");
+			},
+			async handleResize(dimension) {
+				this.dimension = dimension;
 			},
 		},
 	};

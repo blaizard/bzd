@@ -1,5 +1,8 @@
 <template>
 	<div class="terminal-vt100" ref="terminal">
+		<div ref="measureHeight" v-if="charDimension === null">
+			<span ref="measureWidth">A</span>
+		</div>
 		<template v-for="(line, lineY) in reverse(content)">
 			<div>
 				<span v-for="data in groupByStyleId(line, y - lineY)" :style="styles[data[1]] ?? predefinedStyle(data[1])">{{
@@ -32,6 +35,8 @@
 				y: 0,
 				remainder: "",
 				insertMode: false,
+				charDimension: null,
+				resizeObserver: null,
 			};
 		},
 		created() {
@@ -43,7 +48,18 @@
 			stream: { type: Array, mandatory: false, default: () => [] },
 			readonly: { type: Boolean, required: false, default: false },
 		},
-		emits: ["processed"],
+		emits: ["processed", "resize"],
+		mounted() {
+			this.charDimension = {
+				height: this.$refs.measureHeight.getBoundingClientRect().height,
+				width: this.$refs.measureWidth.getBoundingClientRect().width,
+			};
+			this.resizeObserver = new ResizeObserver(this.handleResize);
+			this.resizeObserver.observe(this.$el);
+		},
+		beforeUnmount() {
+			this.resizeObserver.unobserve(this.$el);
+		},
 		watch: {
 			stream: {
 				handler() {
@@ -442,6 +458,15 @@
 			*reverse(content) {
 				for (let i = content.length - 1; i >= 0; --i) {
 					yield content[i];
+				}
+			},
+			handleResize(entries) {
+				for (const entry of entries) {
+					const width = entry.contentRect.width;
+					const height = entry.contentRect.height;
+					const nbCharWidth = Math.floor(width / this.charDimension.width);
+					const nbCharHeight = Math.floor(height / this.charDimension.height);
+					this.$emit("resize", { width: nbCharWidth, height: nbCharHeight });
 				}
 			},
 		},

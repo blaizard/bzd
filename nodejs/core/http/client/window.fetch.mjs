@@ -9,7 +9,7 @@ export default async function request(url, options) {
 		options.data = JSON.stringify(options.data);
 	}
 
-	const promiseFetch = window.fetch(url, {
+	const promiseFetch = window.fetch(url + options.path, {
 		method: options.method,
 		body: options.data,
 		headers: options.headers,
