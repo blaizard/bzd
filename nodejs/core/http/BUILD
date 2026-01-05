@@ -88,8 +88,8 @@ bzd_nodejs_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        ":client",
         "//nodejs/core:exception",
         "//nodejs/core:log",
-        "//nodejs/core/http/client:http",
     ],
 )
