@@ -4,7 +4,7 @@ import CommandBase from "#bzd/nodejs/vue/components/terminal/backend/base.mjs";
 import { Status } from "#bzd/nodejs/utils/run.mjs";
 import http from "http";
 import { localCommand } from "#bzd/nodejs/utils/run.mjs";
-import HttpClient from "#bzd/nodejs/core/http/client.mjs";
+import { HttpClient, WebsocketClient } from "#bzd/nodejs/core/http/client.mjs";
 
 const Exception = ExceptionFactory("terminal", "docker");
 const Log = LogFactory("terminal", "docker");
@@ -31,9 +31,9 @@ export default class CommandDocker extends CommandBase {
 					"Docker socket must start with 'unix://', instead {}",
 					maybeSocket,
 				);
-				CommandDocker.#dockerSocketPath = maybeSocket.replace("unix://", "");
+				CommandDocker.#dockerSocketPath = maybeSocket;
 			} else {
-				CommandDocker.#dockerSocketPath = "/var/run/docker.sock";
+				CommandDocker.#dockerSocketPath = "unix:///var/run/docker.sock";
 			}
 		}
 		return CommandDocker.#dockerSocketPath;
@@ -60,51 +60,38 @@ export default class CommandDocker extends CommandBase {
 	async _monitorDockerContainer() {
 		Exception.assertPrecondition(this.client === null, "Monitoring already started.");
 
-		const req = http.request({
-			socketPath: await CommandDocker.getDockerSocket(),
-			path: "/containers/" + this.name + "/attach?stream=1&stdout=1&stderr=1&stdin=1&tty=1",
-			method: "POST",
-			headers: {
-				Connection: "Upgrade",
-				Upgrade: "tcp",
-			},
-		});
-
-		return new Promise((resolve, reject) => {
-			req.on("upgrade", async (res, socket, head) => {
-				this.setStatus(Status.running);
-
-				this.client = socket;
-				this.client.setEncoding("utf8");
-
-				// Handle any data that might have arrived in the first packet.
-				if (head && head.length > 0) {
-					this.event.trigger("output", head.toString());
-				}
-
-				// Handle events.
-				this.client.on("error", (err) => {
-					this.event.trigger("output", "Error: " + String(err));
-					this.setStatus(Status.failed);
-				});
-				this.client.on("data", (data) => {
+		try {
+			this.client = await WebsocketClient.handle(
+				await CommandDocker.getDockerSocket(),
+				(data) => {
 					this.event.trigger("output", data);
-				});
-				this.client.on("close", () => {
-					this.client = null;
-					this.setStatus(Status.completed);
-				});
-
-				await this.resize(this.width, this.height);
-
-				resolve();
+				},
+				{
+					path: "/containers/" + this.name + "/attach/ws",
+					query: {
+						stream: 1,
+						stdout: 1,
+						stderr: 1,
+						stdin: 1,
+						tty: 1,
+					},
+				},
+			);
+			this.setStatus(Status.running);
+			this.client.onError((e) => {
+				this.event.trigger("output", "Error: " + String(e));
+				this.setStatus(Status.failed);
 			});
-			req.on("error", (err) => {
-				this.event.trigger("output", "Error: " + String(err));
-				reject(new Exception(err));
+			this.client.onClose(() => {
+				this.client = null;
+				this.setStatus(Status.completed);
 			});
-			req.end();
-		});
+		} catch (e) {
+			this.event.trigger("output", "Error: " + String(e));
+			this.setStatus(Status.failed);
+			return;
+		}
+		await this.resize(this.width, this.height);
 	}
 
 	/// Monitor an existing container.
@@ -125,8 +112,7 @@ export default class CommandDocker extends CommandBase {
 		if (!this.client) {
 			return;
 		}
-		const host = await CommandDocker.getDockerSocket();
-		await HttpClient.request("unix://" + host, {
+		await HttpClient.request(await CommandDocker.getDockerSocket(), {
 			path: "/containers/" + this.name + "/resize",
 			method: "POST",
 			query: {
@@ -138,8 +124,8 @@ export default class CommandDocker extends CommandBase {
 
 	/// Write data to the terminal.
 	write(data) {
-		if (this.client && this.client.writable) {
-			this.client.write(data);
+		if (this.client) {
+			this.client.send(data);
 		}
 	}
 

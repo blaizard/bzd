@@ -11,6 +11,7 @@ bzd_nodejs_library(
         "//nodejs/core:event",
         "//nodejs/core:exception",
         "//nodejs/core:log",
+        "//nodejs/core/http:client",
         "//nodejs/core/http:endpoints",
     ],
 )

@@ -10,7 +10,7 @@ import Authentication from "#bzd/nodejs/core/authentication/session/server.mjs";
 import AuthenticationGoogle from "#bzd/nodejs/core/authentication/google/server.mjs";
 import AuthenticationFacebook from "#bzd/nodejs/core/authentication/facebook/server.mjs";
 import Result from "#bzd/nodejs/utils/result.mjs";
-import HttpClient from "#bzd/nodejs/core/http/client.mjs";
+import { HttpClient } from "#bzd/nodejs/core/http/client.mjs";
 import Users from "#bzd/apps/accounts/backend/users/users.mjs";
 import Applications from "#bzd/apps/accounts/backend/applications/applications.mjs";
 import TokenInfo from "#bzd/apps/accounts/backend/users/token.mjs";

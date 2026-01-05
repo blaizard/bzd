@@ -1,4 +1,4 @@
-import HttpClient from "#bzd/nodejs/core/http/client.mjs";
+import { HttpClient } from "#bzd/nodejs/core/http/client.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 
 const Exception = ExceptionFactory("plugin", "coverage");

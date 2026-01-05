@@ -1,6 +1,6 @@
 import ExceptionFactory from "../../exception.mjs";
 import LogFactory from "../../log.mjs";
-import HTTPClient from "#bzd/nodejs/core/http/client.mjs";
+import { HTTPClient } from "#bzd/nodejs/core/http/client.mjs";
 
 const Exception = ExceptionFactory("authentication", "facebook");
 const Log = LogFactory("authentication", "facebook");

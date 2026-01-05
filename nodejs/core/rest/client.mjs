@@ -1,9 +1,9 @@
-import ExceptionFactory from "../exception.mjs";
-import HttpClient from "../http/client.mjs";
+import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
+import { HttpClient } from "#bzd/nodejs/core/http/client.mjs";
 import HttpEndpoint from "#bzd/nodejs/core/http/endpoint.mjs";
-import Validation from "../validation.mjs";
+import Validation from "#bzd/nodejs/core/validation.mjs";
 
-import Base from "./base.mjs";
+import Base from "#bzd/nodejs/core/rest/base.mjs";
 
 const Exception = ExceptionFactory("rest", "client");
 

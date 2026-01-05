@@ -1,6 +1,6 @@
 import Cache from "#bzd/nodejs/core/cache.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
-import HttpClient from "#bzd/nodejs/core/http/client.mjs";
+import { HttpClient } from "#bzd/nodejs/core/http/client.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import config from "#bzd/apps/dashboard/backend/config.json" with { type: "json" };
 import { makeUid } from "#bzd/nodejs/utils/uid.mjs";

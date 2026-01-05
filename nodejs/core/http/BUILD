@@ -4,13 +4,14 @@ bzd_nodejs_library(
     name = "client",
     srcs = [
         "client.mjs",
-        "//nodejs/core/http/client:backend.mjs",
+        "//nodejs/core/http/client/http:backend.mjs",
     ],
     visibility = ["//visibility:public"],
     deps = [
         "//nodejs/core:crypto",
         "//nodejs/core:exception",
         "//nodejs/core:log",
+        "//nodejs/core/http/client/websocket:backend",
         "//nodejs/utils:object",
     ],
 )
@@ -87,8 +88,8 @@ bzd_nodejs_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        ":client",
         "//nodejs/core:exception",
         "//nodejs/core:log",
+        "//nodejs/core/http/client:http",
     ],
 )

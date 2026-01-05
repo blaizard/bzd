@@ -1,6 +1,7 @@
 import { ExceptionFactory } from "../exception.mjs";
 import LogFactory from "../log.mjs";
 import Endpoints from "#bzd/nodejs/core/http/endpoints.mjs";
+import { WebsocketClient as WebsocketClientImpl } from "#bzd/nodejs/core/http/client.mjs";
 
 import Base from "./base.mjs";
 
@@ -17,28 +18,6 @@ export default class WebsocketClient extends Base {
 	async handle(endpoint, callback) {
 		const updatedEndpoint = this.endpoints.match(endpoint);
 		this._sanityCheck(updatedEndpoint);
-
-		return new Promise((resolve, reject) => {
-			let socket = new WebSocket(this.getEndpoint(endpoint));
-			socket.onopen = () => {
-				resolve(socket);
-			};
-			socket.onmessage = async (event) => {
-				await callback(event.data);
-			};
-			socket.onclose = (object) => {
-				Exception.assert(
-					// 1008 is used for errors on the server side, so we want to show it.
-					object.wasClean && object.code != 1008,
-					"Endpoint '{}' disconnected with code {} and reason: {}.",
-					endpoint,
-					object.code,
-					object.reason,
-				);
-			};
-			socket.onerror = (error) => {
-				reject(error);
-			};
-		});
+		return await WebsocketClientImpl.handle(this.getEndpoint(endpoint), callback);
 	}
 }

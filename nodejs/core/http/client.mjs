@@ -2,6 +2,8 @@ import { base64Encode } from "../crypto.mjs";
 import ExceptionFactory from "../exception.mjs";
 import LogFactory from "../log.mjs";
 import { deepMerge } from "#bzd/nodejs/utils/object.mjs";
+import httpBackend from "#bzd/nodejs/core/http/client/http/backend.mjs";
+import websocketBackend from "#bzd/nodejs/core/http/client/websocket/backend.mjs";
 
 const Exception = ExceptionFactory("http", "client");
 const Log = LogFactory("http", "client");
@@ -41,7 +43,7 @@ export class HttpClientException extends ExceptionFactory("fetch", "impl") {
 	}
 }
 
-export default class HttpClient {
+export class HttpClient {
 	static async request(urlOrPath, options = {}) {
 		options = Object.assign(
 			{
@@ -137,12 +139,10 @@ export default class HttpClient {
 
 		Object.assign(headers, options.headers);
 
-		let request = (await import("./client/backend.mjs")).default;
-
 		Log.debug("{} url={} path={} (headers: {:j})", method, url, path, headers);
 		Log.trace("(body: {})", data);
 
-		const result = await request(url, {
+		const result = await httpBackend(url, {
 			method: method,
 			headers: headers,
 			data: data,
@@ -189,5 +189,44 @@ export default class HttpClient {
 	static async post(url, options = {}) {
 		options["method"] = "post";
 		return await HttpClient.request(url, options);
+	}
+}
+
+export class WebsocketClient {
+	/// Register and connect to a websocket.
+	static async handle(urlOrPath, callback, options = {}) {
+		// Construct the url + path pair depending on the schema.
+		let url = "";
+		let path = options.path ?? "";
+		if (urlOrPath.startsWith("ws://")) {
+			const parsedURL = new URL(urlOrPath);
+			url = parsedURL.origin;
+			path ||= parsedURL.href.replace(parsedURL.origin, "", 1);
+		} else if (urlOrPath.startsWith("unix://")) {
+			url = urlOrPath;
+		} else if (urlOrPath.startsWith("/")) {
+			Exception.assert(
+				!options.path,
+				"The path for request '{}' is set twice (as parameter and via 'path': '{}').",
+				urlOrPath,
+				options.path,
+			);
+			path = urlOrPath;
+		} else {
+			Exception.unreachable("Unsupported url or path: '{}'.", urlOrPath);
+		}
+
+		// Handle queries
+		if ("query" in options) {
+			const query = Object.keys(options.query)
+				.filter((key) => options.query[key] !== undefined)
+				.map((key) => key + "=" + encodeURIComponent(options.query[key]))
+				.join("&");
+			path += query ? "?" + query : "";
+		}
+
+		return await websocketBackend(url, callback, {
+			path: path,
+		});
 	}
 }

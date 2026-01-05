@@ -1,4 +1,4 @@
-import ExceptionFactory from "../../exception.mjs";
+import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 
 const Exception = ExceptionFactory("http", "client", "window.fetch");
 

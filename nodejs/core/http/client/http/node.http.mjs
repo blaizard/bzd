@@ -1,8 +1,8 @@
 import { request as requestHttp } from "http";
 import { request as requestHttps } from "https";
 
-import ExceptionFactory from "../../exception.mjs";
-import LogFactory from "../../log.mjs";
+import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
+import LogFactory from "#bzd/nodejs/core/log.mjs";
 
 const Exception = ExceptionFactory("http", "client", "node.http");
 const Log = LogFactory("http", "client", "node.http");

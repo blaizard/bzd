@@ -1,6 +1,6 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
-import HttpClient from "#bzd/nodejs/core/http/client.mjs";
+import { HttpClient } from "#bzd/nodejs/core/http/client.mjs";
 
 import Email from "./email.mjs";
 
