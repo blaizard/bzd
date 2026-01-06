@@ -36,15 +36,7 @@ export default class Commands {
 		for (const uid of this.context.getAllJobs()) {
 			if (!(uid in this.executors)) {
 				const contextJob = this.getContext(uid);
-				const info = await contextJob.getInfo();
-				// Jobs that are in idle status and that have a type can be matched with an executor.
-				if (info.status == Status.idle) {
-					const executor = await Executor.make(uid, info.type, contextJob);
-					this.make(uid, executor);
-				} else {
-					const executor = await Executor.make(uid, "readonly", contextJob);
-					this.make(uid, executor);
-				}
+				await this.makeDefault(uid, contextJob);
 			}
 		}
 	}
@@ -70,16 +62,23 @@ export default class Commands {
 			return visitor("post", args.process(), schema);
 		};
 		const uid = contextJob.getUid();
-		const executor = await Executor.make(uid, schema.type, contextJob);
-		const args = makeArgs((...args) => executor.visitorArgs(...args));
-		this.make(uid, executor);
+		const args = makeArgs((...args) => Executor.getVisitorArgsFunc(schema.type)(...args));
+		const executor = await this.makeDefault(uid, contextJob);
 		await executor.updateInfo({
+			type: schema.type,
 			args: args,
 			data: data,
 		});
 	}
 
-	/// Create a new command.
+	/// Create a command from the default executor.
+	async makeDefault(uid, contextJob) {
+		const executor = await Executor.make(uid, "readonly", contextJob);
+		this.make(uid, executor);
+		return executor;
+	}
+
+	/// Create a command from a predefined executor.
 	make(uid, executor) {
 		Exception.assert(!(uid in this.executors), "The uid '{}' is already in use.", uid);
 		this.executors[uid] = executor;
@@ -92,6 +91,8 @@ export default class Commands {
 
 	/// Send a workload to be scheduled.
 	async schedule(uid, type) {
+		const executor = this.getExecutor(uid);
+		await executor.reset();
 		return await this.scheduler.schedule(uid, type);
 	}
 

@@ -65,7 +65,7 @@ export default class ExecutorDocker {
 		return this.command.getInfo();
 	}
 
-	visitorArgs(type, arg, schema) {
+	static visitorArgs(type, arg, schema) {
 		switch (type) {
 			case "File":
 				return "/sandbox/" + arg;

@@ -2,6 +2,7 @@ import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import Event from "#bzd/nodejs/core/event.mjs";
 import Lock from "#bzd/nodejs/core/lock.mjs";
+import Status from "#bzd/apps/job_executor/backend/status.mjs";
 
 import ExecutorReadonly from "#bzd/apps/job_executor/backend/executor/executor_readonly.mjs";
 import ExecutorShell from "#bzd/apps/job_executor/backend/executor/executor_shell.mjs";
@@ -62,6 +63,21 @@ export default class Executor {
 		return wrapper;
 	}
 
+	/// Reset an existing executor.
+	async reset() {
+		const info = await this.getInfo();
+		Exception.assertPrecondition(
+			info.type in Executor.ExecutorClasses,
+			"This executor is not associated with a valid type: '{}'.",
+			info.type,
+		);
+		Exception.assertPrecondition(this.maybeContextJob, "This executor does not have a valid context.");
+		Exception.assertPrecondition(info.status != Status.running, "This executor is already running.");
+		const executor = new Executor.ExecutorClasses[info.type](this.maybeContextJob.getUid(), this.maybeContextJob);
+		this.executor = executor;
+		await this.initialize();
+	}
+
 	/// Discover existing jobs if any.
 	static async discover(context) {
 		let discovered = {};
@@ -73,6 +89,11 @@ export default class Executor {
 			}
 		}
 		return discovered;
+	}
+
+	static getVisitorArgsFunc(type) {
+		Exception.assert(type in Executor.ExecutorClasses, "No executor type '{}' available.", type);
+		return Executor.ExecutorClasses[type].visitorArgs;
 	}
 
 	async initialize() {
@@ -147,10 +168,6 @@ export default class Executor {
 				this.maybeContextJob = null;
 			}
 		});
-	}
-
-	visitorArgs(type, arg, schema) {
-		return this.executor.visitorArgs(type, arg, schema);
 	}
 
 	installWebsocket(context) {

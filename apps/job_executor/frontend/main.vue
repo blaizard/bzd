@@ -138,7 +138,7 @@
 				});
 			},
 			isStartManually(id) {
-				return this.jobs[id].status == "idle";
+				return !(this.jobs[id].status in { running: true });
 			},
 			isKill(id) {
 				return this.jobs[id].status == "running";

@@ -31,7 +31,7 @@ export default class ExecutorShell {
 		return this.command.getInfo();
 	}
 
-	visitorArgs(type, arg, schema) {
+	static visitorArgs(type, arg, schema) {
 		switch (type) {
 			case "post":
 				return [schema["command"], ...arg];

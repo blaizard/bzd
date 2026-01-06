@@ -24,7 +24,7 @@ export default class ExecutorReadonly {
 		return info;
 	}
 
-	visitorArgs(_type, arg) {
+	static visitorArgs(_type, arg) {
 		return arg;
 	}
 }
