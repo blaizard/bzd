@@ -1,6 +1,6 @@
 import ExceptionFactory from "../../exception.mjs";
 import LogFactory from "../../log.mjs";
-import { HTTPClient } from "#bzd/nodejs/core/http/client.mjs";
+import { HttpClient } from "#bzd/nodejs/core/http/client.mjs";
 
 const Exception = ExceptionFactory("authentication", "facebook");
 const Log = LogFactory("authentication", "facebook");
@@ -10,7 +10,7 @@ export default class FacebookIdentityServer {
 		rest.handle("post", "/auth/facebook", async function (inputs) {
 			let email = null;
 			try {
-				const response = await HTTPClient.request("https://graph.facebook.com/me", {
+				const response = await HttpClient.request("https://graph.facebook.com/me", {
 					query: {
 						fields: "email",
 						access_token: inputs.authResponse.accessToken,

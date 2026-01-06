@@ -3,7 +3,7 @@ import LogFactory from "#bzd/nodejs/core/log.mjs";
 import Http from "http";
 import Url from "url";
 
-import HttpClient from "./client.mjs";
+import { HttpClient } from "./client.mjs";
 
 const Log = LogFactory("http", "proxy");
 const Exception = ExceptionFactory("http", "proxy");
