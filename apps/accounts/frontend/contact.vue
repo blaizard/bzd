@@ -8,7 +8,7 @@
 <script>
 	import Form from "#bzd/nodejs/vue/components/form/form.vue";
 	import Base from "#bzd/apps/accounts/frontend/base.vue";
-	import Config from "#bzd/apps/accounts/config.json";
+	import Config from "#bzd/apps/accounts/config.json" with { type: "json" };
 
 	export default {
 		mixins: [Base],
