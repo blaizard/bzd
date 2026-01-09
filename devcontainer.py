@@ -90,6 +90,28 @@ class FeatureVolume(Feature):
 		return [f"volume-{volume}" for volume in self.args.volumes]
 
 
+class FeatureDevcontainerCLI(Feature):
+	"""Feature: Add the devcontainer CLI to the container."""
+
+	def __init__(self, args: argparse.Namespace) -> None:
+		super().__init__(args)
+		self.isAvailable = args.devcontainer_cli
+
+	@staticmethod
+	def cli(parser: argparse.ArgumentParser) -> None:
+		parser.add_argument("--devcontainer_cli",
+		                    action="store_true",
+		                    help="Include the devcontainer CLI to the container.")
+
+	@property
+	def dockerFile(self) -> typing.List[str]:
+		return ["RUN sudo apt install -y nodejs npm", "RUN sudo npm install -g @devcontainers/cli"]
+
+	@property
+	def namePrefix(self) -> typing.List[str]:
+		return ["devctonainer-cli"]
+
+
 class FeatureDocker(Feature):
 	"""Feature: Docker outside the container."""
 
@@ -242,7 +264,6 @@ class DevelopmentContainer:
 		if self.userNamespaceRemapping:
 			instructions += [
 			    f"RUN mkdir -p {self.home}",
-			    f"ENV HOME={self.home}",
 			]
 		else:
 
@@ -259,8 +280,12 @@ class DevelopmentContainer:
 			    f"RUN useradd --create-home -d {self.home} --no-log-init --uid {self.uid} --gid {self.gid} --groups {','.join(groups)} {self.user}",
 			    f"""RUN echo "\"{self.user}\" ALL=(ALL) NOPASSWD:ALL\" >> /etc/sudoers""",
 			    f"RUN chown \"{self.user}\" /bzd/startup.sh",
-			    f"USER {self.user}"
+			    f"USER {self.user}",
 			]
+		instructions += [
+		    f"ENV USER=\"{self.user}\"",
+		    f"ENV HOME=\"{self.home}\"",
+		]
 
 		instructions += [instruction for feature in self.features for instruction in feature.dockerFile]
 		instructionsStr = "\n".join(instructions)
@@ -336,15 +361,14 @@ services:
 {extraStr}
 """
 
-	def build(self) -> None:
+	def build(self, force: bool) -> None:
 		subprocess.run([
 		    "docker",
 		    "compose",
 		    "--file",
 		    str(self.dockerComposePath),
 		    "build",
-		    "--no-cache",
-		],
+		] + (["--no-cache"] if force else []),
 		               check=True)
 
 	def run(self, args: typing.List[str], env: typing.List[str]) -> None:
@@ -367,10 +391,11 @@ services:
 
 if __name__ == "__main__":
 
-	Features = [FeatureDocker, FeaturePlatform, FeatureVolume]
+	Features = [FeatureDocker, FeaturePlatform, FeatureVolume, FeatureDevcontainerCLI]
 
 	parser = argparse.ArgumentParser(description="Development container.")
 	parser.add_argument("--build", action="store_true", help="Re-build the container if set.")
+	parser.add_argument("--build-force", action="store_true", help="Force re-build the container if set.")
 	parser.add_argument("--temp",
 	                    type=pathlib.Path,
 	                    default=pathlib.Path(tempfile.gettempdir()),
@@ -386,6 +411,8 @@ if __name__ == "__main__":
 	features = [FeatureClass(args) for FeatureClass in Features]
 	devContainer = DevelopmentContainer(features=features, temporaryPath=args.temp)
 	devContainer.initialize()
+	if args.build_force:
+		devContainer.build(force=True)
 	if args.build:
-		devContainer.build()
+		devContainer.build(force=False)
 	devContainer.run(args=args.rest, env=args.env)
