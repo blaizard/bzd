@@ -3,7 +3,7 @@
 		<div class="overlay-size" v-if="Boolean(terminalDimensionTimeout)">
 			{{ terminalDimension.width }} x {{ terminalDimension.height }}
 		</div>
-		<div class="container">
+		<div class="container" ref="container">
 			<div ref="measureHeight" v-if="charDimension === null">
 				<span ref="measureWidth">A</span>
 			</div>
@@ -62,17 +62,20 @@
 				width: this.$refs.measureWidth.getBoundingClientRect().width,
 			};
 			this.resizeObserver = new ResizeObserver(this.handleResize);
-			this.resizeObserver.observe(this.$el);
+			this.resizeObserver.observe(this.$refs.container);
 		},
 		beforeUnmount() {
-			this.resizeObserver.unobserve(this.$el);
+			this.resizeObserver.unobserve(this.$refs.container);
 		},
 		watch: {
 			stream: {
 				handler() {
 					const count = this.stream.length;
 					const update = this.stream.reduce((obj, value) => obj + value, this.remainder);
-					this.remainder = this.process(update);
+					if (update) {
+						//this.print(update); // Un-comment when debugging.
+						this.remainder = this.process(update);
+					}
 					if (count) {
 						this.$emit("processed", count);
 					}
@@ -421,6 +424,17 @@
 			cloneRegexpr(regexpr, position = 0) {
 				regexpr.lastIndex = position;
 				return regexpr;
+			},
+			/// Helper to print a stream, shall be used for debug purposes only.
+			print(stream) {
+				const streamPrint = stream.split("").map((c) => {
+					const code = c.charCodeAt(0);
+					if (code >= 32 && code <= 126) {
+						return c;
+					}
+					return `\\x${code.toString(16).toUpperCase().padStart(2, "0")}`;
+				});
+				console.log(streamPrint.join(" "));
 			},
 			process(stream) {
 				let regexprCategory = this.cloneRegexpr(this.regexprCategory);
