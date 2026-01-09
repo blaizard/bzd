@@ -1,15 +1,20 @@
 <template>
 	<div class="terminal-vt100" ref="terminal">
-		<div ref="measureHeight" v-if="charDimension === null">
-			<span ref="measureWidth">A</span>
+		<div class="overlay-size" v-if="Boolean(terminalDimensionTimeout)">
+			{{ terminalDimension.width }} x {{ terminalDimension.height }}
 		</div>
-		<template v-for="(line, lineY) in reverse(content)">
-			<div>
-				<span v-for="data in groupByStyleId(line, y - lineY)" :style="styles[data[1]] ?? predefinedStyle(data[1])">{{
-					data[0]
-				}}</span>
+		<div class="container">
+			<div ref="measureHeight" v-if="charDimension === null">
+				<span ref="measureWidth">A</span>
 			</div>
-		</template>
+			<template v-for="(line, lineY) in reverse(content)">
+				<div>
+					<span v-for="data in groupByStyleId(line, y - lineY)" :style="styles[data[1]] ?? predefinedStyle(data[1])">{{
+						data[0]
+					}}</span>
+				</div>
+			</template>
+		</div>
 	</div>
 </template>
 
@@ -36,6 +41,8 @@
 				remainder: "",
 				insertMode: false,
 				charDimension: null,
+				terminalDimension: null,
+				terminalDimensionTimeout: null,
 				resizeObserver: null,
 			};
 		},
@@ -464,9 +471,16 @@
 				for (const entry of entries) {
 					const width = entry.contentRect.width;
 					const height = entry.contentRect.height;
-					const nbCharWidth = Math.floor(width / this.charDimension.width);
-					const nbCharHeight = Math.floor(height / this.charDimension.height);
-					this.$emit("resize", { width: nbCharWidth, height: nbCharHeight });
+					this.terminalDimension = {
+						width: Math.floor(width / this.charDimension.width),
+						height: Math.floor(height / this.charDimension.height),
+					};
+					this.$emit("resize", { width: this.terminalDimension.width, height: this.terminalDimension.height });
+
+					clearTimeout(this.terminalDimensionTimeout);
+					this.terminalDimensionTimeout = setTimeout(() => {
+						this.terminalDimensionTimeout = null;
+					}, 1000);
 				}
 			},
 		},
@@ -486,19 +500,33 @@
 		--background-color: #222;
 		--text-color: #ddd;
 
-		width: 100%;
-		height: 100%;
-		padding: 10px;
 		background-color: var(--background-color);
 		color: var(--text-color);
-		overflow: auto;
-		display: flex;
-		flex-direction: column-reverse;
-		font-family: monospace;
+		position: relative;
 
-		> * {
-			white-space: pre-wrap;
-			word-break: break-all;
+		.container {
+			width: 100%;
+			height: 100%;
+			padding: 10px;
+			overflow: auto;
+			display: flex;
+			flex-direction: column-reverse;
+			font-family: monospace;
+
+			> * {
+				white-space: pre-wrap;
+				word-break: break-all;
+			}
+		}
+
+		.overlay-size {
+			position: absolute;
+			top: 0;
+			right: 0;
+			padding: 5px 10px;
+			color: var(--background-color);
+			background-color: var(--text-color);
+			opacity: 0.6;
 		}
 	}
 </style>
