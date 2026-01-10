@@ -1,3 +1,5 @@
+import enum
+import json
 import os
 import sys
 import select
@@ -12,9 +14,32 @@ import struct
 import fcntl
 
 
+class ActionType(enum.Enum):
+	data = 68  # "D"
+	size = 83  # "S"
+
+
 def resize(fd: int, rows: int, columns: int) -> None:
 	winsize = struct.pack("HHHH", rows, columns, 0, 0)
 	fcntl.ioctl(fd, termios.TIOCSWINSZ, winsize)
+
+
+def inputDeserialize(data: bytes, callback: typing.Callable[[ActionType, typing.Any], None]) -> bytes:
+	"""Process the input data and returns the left over."""
+
+	index = 0
+	while True:
+		indexNull = data.find(b'\x00', index)
+		if indexNull == -1:
+			break
+		actionType = ActionType(data[index])
+		payload = json.loads(data[index + 1:indexNull].decode())
+
+		callback(actionType, payload)
+
+		index = indexNull + 1
+
+	return data[index:]
 
 
 def main(cwd: pathlib.Path, env: typing.Dict[str, str], args: typing.List[str]) -> None:
@@ -46,7 +71,14 @@ def main(cwd: pathlib.Path, env: typing.Dict[str, str], args: typing.List[str]) 
 		# Close the slave side of the pty in the parent process, as the child is now using it.
 		os.close(fdSlave)
 
+	def inputProcess(actionType: ActionType, data: typing.Any) -> None:
+		if actionType == ActionType.data:
+			os.write(fdMaster, data.encode())
+		elif actionType == ActionType.size:
+			resize(fdMaster, data["height"], data["width"])
+
 	# Use a non-blocking read/write loop to handle I/O.
+	inputBuffer: bytes = b""
 	while proc.poll() is None:
 		# Use select to wait for data from the pty master or our own stdin
 		rlist, _, _ = select.select([fdMaster, sys.stdin.fileno()], [], [], 0.1)
@@ -65,9 +97,9 @@ def main(cwd: pathlib.Path, env: typing.Dict[str, str], args: typing.List[str]) 
 		# Read from our stdin and write to the child's stdin
 		if sys.stdin.fileno() in rlist:
 			try:
-				input_data = os.read(sys.stdin.fileno(), 1024)
-				if input_data:
-					os.write(fdMaster, input_data)
+				inputData = os.read(sys.stdin.fileno(), 1024)
+				if inputData:
+					inputBuffer = inputDeserialize(inputBuffer + inputData, inputProcess)
 				else:
 					# stdin is closed, break
 					break

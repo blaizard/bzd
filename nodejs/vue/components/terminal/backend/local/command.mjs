@@ -26,13 +26,15 @@ export default class Command extends CommandBase {
 
 	/// Resize the terminal.
 	async resize(width, height) {
-		// to be implemented.
+		if (this.result) {
+			this.result.writeToStdin("S" + JSON.stringify({ width, height }) + "\0");
+		}
 	}
 
 	/// Write data to the terminal.
 	write(data) {
 		if (this.result) {
-			this.result.writeToStdin(data);
+			this.result.writeToStdin("D" + JSON.stringify(data) + "\0");
 		}
 	}
 
