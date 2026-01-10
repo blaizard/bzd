@@ -9,9 +9,11 @@
 			</div>
 			<template v-for="(line, lineY) in reverse(content)">
 				<div>
-					<span v-for="data in groupByStyleId(line, y - lineY)" :style="styles[data[1]] ?? predefinedStyle(data[1])">{{
-						data[0]
-					}}</span>
+					<span
+						v-for="[char, charStyleId] in groupByStyleId(line, content.length - lineY - 1)"
+						:style="styles[charStyleId] ?? predefinedStyle(charStyleId)"
+						>{{ char }}</span
+					>
 				</div>
 			</template>
 		</div>
@@ -75,6 +77,8 @@
 					if (update) {
 						//this.print(update); // Un-comment when debugging.
 						this.remainder = this.process(update);
+						// Add a blank space to display the cursor.
+						this.content[this.y][this.x] ??= [" ", this.styleId];
 					}
 					if (count) {
 						this.$emit("processed", count);
@@ -101,6 +105,9 @@
 					H: this.moveCursorLineColumn,
 					J: this.eraseScreen,
 					K: this.eraseLine,
+					P: this.deleteChar,
+					X: this.eraseChar,
+					"@": this.insertChar,
 				};
 				const csiMapping = [
 					new RegExp("([0-9;]*)([^0-9;])", "g"),
@@ -160,16 +167,16 @@
 			groupByStyleId(line, y) {
 				let styleId = -1;
 				let output = [];
-				for (const [x, data] of line.entries()) {
+				for (const [x, [char, charStyleId]] of line.entries()) {
 					if (this.x == x && this.y == y) {
 						styleId = "cursor";
 						output.push(["", styleId]);
 					}
-					if (data[1] != styleId) {
-						styleId = data[1];
+					if (charStyleId != styleId) {
+						styleId = charStyleId;
 						output.push(["", styleId]);
 					}
-					output.at(-1)[0] += data[0];
+					output.at(-1)[0] += char;
 				}
 				return output;
 			},
@@ -282,54 +289,59 @@
 			write(content) {
 				const size = content.length;
 				let i = 0;
-				do {
-					// If the row does not exists, create it. The loop need to cover this.y, hence the <= sign.
-					for (let y = this.content.length; y <= this.y; ++y) {
-						this.content[y] = [];
-					}
-					// If the column does not exists, create it. The loop does cover this.x, it is needed for displaying the cursor.
-					for (let x = this.content[this.y].length; x <= this.x; ++x) {
-						this.content[this.y].push([" ", 0]);
-					}
-					// Fill the content.
-					while (i < size) {
-						const c = content[i++];
-						if (c == "\n") {
-							++this.y;
-							this.x = 0;
-							break;
-						} else if (c == "\r") {
-							this.x = 0;
-							break;
-						} else if (c == "\b") {
-							this.x = Math.max(this.x - 1, 0);
-						} else if (c == "\x07") {
-							// Bell character - ignore
-						} else {
-							if (this.insertMode) {
-								this.content[this.y].splice(this.x, 0, [c, this.styleId]);
-							} else {
-								this.content[this.y][this.x] = [c, this.styleId];
-							}
-							++this.x;
+				const space = [" ", 0];
+				const newLine = () => {
+					++this.y;
+					this.content[this.y] ??= [];
+				};
+				// If the row does not exists, create it. The loop need to cover this.y, hence the <= sign.
+				for (let y = this.content.length; y <= this.y; ++y) {
+					this.content[y] = [];
+				}
+				// If the column does not exists, create it. The loop does cover this.x, it is needed for displaying the cursor.
+				for (let x = this.content[this.y].length; x < this.x; ++x) {
+					this.content[this.y].push(space);
+				}
+				// Fill the content.
+				while (i < size) {
+					const c = content[i++];
+					if (c == "\n") {
+						newLine();
+						this.x = 0;
+					} else if (c == "\r") {
+						// TODO: handle tty wrapping, handle this only if terminalDimension is taken into account.
+						if (this.terminalDimension && this.x == this.terminalDimension.width + 1) {
+							newLine();
 						}
+						this.x = 0;
+					} else if (c == "\b") {
+						this.x = Math.max(this.x - 1, 0);
+					} else if (c == "\x07") {
+						// Bell character - ignore
+					} else {
+						if (this.insertMode) {
+							this.content[this.y].splice(this.x, 0, [c, this.styleId]);
+						} else {
+							this.content[this.y][this.x] = [c, this.styleId];
+						}
+						++this.x;
 					}
-				} while (i < size);
+				}
 			},
-			moveCursorUp(lines = 0) {
-				this.y = Math.max(this.y - (lines ?? 1), 0);
+			moveCursorUp(lines = 1) {
+				this.y = Math.max(this.y - lines, 0);
 				return true;
 			},
-			moveCursorDown(lines) {
-				this.y += lines ?? 1;
+			moveCursorDown(lines = 1) {
+				this.y += lines;
 				return true;
 			},
-			moveCursorRight(columns) {
-				this.x += columns ?? 1;
+			moveCursorRight(columns = 1) {
+				this.x += columns;
 				return true;
 			},
-			moveCursorLeft(columns) {
-				this.x = Math.max(this.x - (columns ?? 1), 0);
+			moveCursorLeft(columns = 1) {
+				this.x = Math.max(this.x - columns, 0);
 				return true;
 			},
 			moveCursorDownBegining(lines) {
@@ -352,6 +364,23 @@
 				Exception.assert(typeof column == "number", "Must be a number.");
 				this.x = column;
 				this.y = line;
+				return true;
+			},
+			deleteChar(number = 1) {
+				Exception.assert(typeof number == "number", "Must be a number.");
+				this.content[this.y].splice(this.x, number);
+				return true;
+			},
+			eraseChar(number = 1) {
+				Exception.assert(typeof number == "number", "Must be a number.");
+				for (let indent = 0; indent < number; ++indent) {
+					this.content[this.y][this.x + indent] = [" ", this.styleId];
+				}
+				return true;
+			},
+			insertChar(number = 1) {
+				Exception.assert(typeof number == "number", "Must be a number.");
+				this.content[this.y].splice(this.x, 0, ...Array(number).fill(" "));
 				return true;
 			},
 			eraseLine(arg) {
@@ -486,7 +515,7 @@
 					const width = entry.contentRect.width;
 					const height = entry.contentRect.height;
 					this.terminalDimension = {
-						width: Math.floor(width / this.charDimension.width),
+						width: Math.floor(width / this.charDimension.width) - 1,
 						height: Math.floor(height / this.charDimension.height),
 					};
 					this.$emit("resize", { width: this.terminalDimension.width, height: this.terminalDimension.height });
