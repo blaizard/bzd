@@ -105,6 +105,10 @@ export default class RestClient extends Base {
 				Exception.assert(typeof data === "object", "Data must be of type 'object', got '{:j}' instead.", data);
 				fetchOptions.query = data;
 				break;
+			case "form":
+				Exception.assert(data instanceof FormData, "Data must be of type 'FormData', got '{:j}' instead.", data);
+				fetchOptions.form = data;
+				break;
 			case undefined:
 				break;
 			default:

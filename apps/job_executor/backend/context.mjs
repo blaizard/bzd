@@ -95,16 +95,6 @@ class ContextJob {
 		await this.context_.storage.mkdir(this.getPrefixData());
 	}
 
-	/// Copy the content of the path into this job context.
-	///
-	/// \param source The source path, should be an absolute path.
-	/// \param destination The destination path, relative to the job root.
-	async moveTo(source, destination) {
-		const path = this.getRootPath().joinPath(destination);
-		await FileSystem.mkdir(path.parent.asPosix(), { force: true });
-		await FileSystem.move(source, path.asPosix());
-	}
-
 	/// Capture the output of the given executor.
 	captureOutput(executor) {
 		if (executor.installWebsocket) {
@@ -121,6 +111,10 @@ class ContextJob {
 
 	async metadata(pathList) {
 		return await this.context_.storage.metadata([...this.getPrefixData(), ...pathList]);
+	}
+
+	async write(pathList, stream) {
+		return await this.context_.storage.write([...this.getPrefixData(), ...pathList], stream, /*mkdir*/ true);
 	}
 
 	async read(pathList) {

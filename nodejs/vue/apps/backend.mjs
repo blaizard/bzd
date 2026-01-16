@@ -8,7 +8,6 @@ import Authentication from "#bzd/apps/accounts/authentication/server.mjs";
 import Services from "#bzd/nodejs/core/services/services.mjs";
 import Cache2 from "#bzd/nodejs/core/cache2.mjs";
 import Statistics from "#bzd/nodejs/core/statistics/statistics.mjs";
-import Form from "#bzd/nodejs/vue/components/form/backend.mjs";
 import config from "#bzd/nodejs/vue/apps/config.json" with { type: "json" };
 import ClockNTP from "#bzd/nodejs/core/clock/ntp.mjs";
 import LoggerMemory from "#bzd/nodejs/vue/components/logger/backend/memory/memory.mjs";
@@ -29,7 +28,6 @@ export default class Backend {
 			cache: null,
 			statistics: null,
 			services: null,
-			form: null,
 			loggerMemory: null,
 			staticPath: null,
 			staticOptions: null,
@@ -122,13 +120,6 @@ export default class Backend {
 		return this.instances.statistics;
 	}
 
-	/// Access the form object.
-	get form() {
-		Exception.assert(this.isSetup, "Backend not set-up.");
-		Exception.assert(this.instances.form, "Form not set-up.");
-		return this.instances.form;
-	}
-
 	/// Access the logger memory object.
 	get loggerMemory() {
 		Exception.assert(this.isSetup, "Backend not set-up.");
@@ -195,14 +186,6 @@ export default class Backend {
 		return this;
 	}
 
-	/// Set-up the form object.
-	useForm(options = null) {
-		Exception.assert(this.isSetup == false, "Backend already set-up.");
-		Exception.assert(!this.instances.form, "Form already set-up.");
-		this.instances.form = new Form(options);
-		return this;
-	}
-
 	/// Set-up the logger memory object.
 	useLoggerMemory() {
 		Exception.assert(this.isSetup == false, "Backend already set-up.");
@@ -254,10 +237,7 @@ export default class Backend {
 			if (this.instances.cache) {
 				this.instances.statistics.register(this.instances.cache.statistics, "backend.cache");
 			}
-			if (this.instances.form) {
-				this.instances.statistics.register(this.instances.form.statistics, "backend.form");
-			}
-			if (this.instances.form) {
+			if (this.instances.web) {
 				this.instances.statistics.register(this.instances.web.statistics, "backend.web");
 			}
 		}
@@ -281,9 +261,6 @@ export default class Backend {
 			}
 			if (this.instances.statistics) {
 				this.instances.rest.installPlugins(this.instances.statistics);
-			}
-			if (this.instances.form) {
-				this.instances.rest.installPlugins(this.instances.form);
 			}
 			if (this.instances.loggerMemory) {
 				this.instances.rest.installPlugins(this.instances.loggerMemory);

@@ -65,14 +65,14 @@ export default class ExecutorDocker {
 		return this.command.getInfo();
 	}
 
-	static visitorArgs(type, arg, schema) {
+	static visitorArgs(type, args, schema) {
 		switch (type) {
 			case "File":
-				return "/sandbox/" + arg;
+				return args.map((arg) => "/sandbox/" + arg.file);
 			case "post":
-				return [schema["image"], ...arg];
+				return [schema["image"], ...args];
 		}
-		return arg;
+		return args;
 	}
 
 	installWebsocket(context) {

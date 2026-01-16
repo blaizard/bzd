@@ -31,12 +31,14 @@ export default class ExecutorShell {
 		return this.command.getInfo();
 	}
 
-	static visitorArgs(type, arg, schema) {
+	static visitorArgs(type, args, schema) {
 		switch (type) {
+			case "File":
+				return args.map((arg) => "/sandbox/" + arg.file);
 			case "post":
-				return [schema["command"], ...arg];
+				return [schema["command"], ...args];
 		}
-		return arg;
+		return args;
 	}
 
 	installWebsocket(context) {

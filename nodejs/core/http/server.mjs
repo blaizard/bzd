@@ -5,7 +5,6 @@ import Express from "express";
 import Helmet from "helmet";
 import Http from "http";
 import Https from "https";
-import Multer from "multer";
 import Path from "path";
 import { WebSocketServer } from "ws";
 
@@ -89,25 +88,6 @@ export default class HttpServer {
 		// Enable compression
 		if (this.config.useCompression) {
 			this.app.use(Compression());
-		}
-
-		// Set the storage information for upload (if needed)
-		{
-			let diskStorageConfig = {
-				filename: (req, file, cb) => {
-					this._initialize.uid = this._initialize.uid || 0;
-					cb(null, Date.now() + "-" + String(this._initialize.uid++) + "-" + file.originalname);
-				},
-			};
-			if (this.config.uploadDir) {
-				// Create the directory if it does not exists
-				await FileSystem.mkdir(this.config.uploadDir);
-
-				diskStorageConfig.destination = (req, file, cb) => {
-					cb(null, this.config.uploadDir);
-				};
-			}
-			this.storage = Multer.diskStorage(diskStorageConfig);
 		}
 
 		// Save the port number for connection
@@ -378,6 +358,7 @@ export default class HttpServer {
 				endpoint.toRegexp(),
 			);
 			request.params = match;
+
 			try {
 				await callback.call(this, context);
 			} catch (e) {
@@ -401,14 +382,6 @@ export default class HttpServer {
 
 		if (options.type.indexOf("raw") != -1) {
 			callbackList.unshift(BodyParser.raw({ limit: options.limit, type: () => true }));
-		}
-
-		if (options.type.indexOf("upload") != -1) {
-			let upload = Multer({
-				storage: this.storage,
-				limits: { fileSize: options.limit || Infinity },
-			});
-			callbackList.unshift(upload.any());
 		}
 
 		// Set specific options at the beginning to ensure they are processed before the following layer.

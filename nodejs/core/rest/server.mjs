@@ -147,11 +147,6 @@ export default class RestServer extends Base {
 					case "query":
 						data = context.getQueries();
 						break;
-					case "upload":
-						data = Object.assign({}, context.getQueries() || {}, {
-							files: context.getFiles(),
-						});
-						break;
 				}
 				// Add any params to the data (if any)
 				Object.assign(data, context.getParams());

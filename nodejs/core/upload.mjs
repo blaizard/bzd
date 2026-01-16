@@ -1,9 +1,7 @@
 let UIDCounter = 0;
 
 class UploadItem {
-	/**
-	 * Upload Item
-	 */
+	/// Upload Item
 	constructor(file, xhr) {
 		this.file = file;
 		this.xhr = xhr;
@@ -20,9 +18,7 @@ class UploadItem {
 		return this.file.name;
 	}
 
-	/**
-	 * Cancel the upload
-	 */
+	/// Cancel the upload
 	cancel() {
 		this.xhr.abort();
 	}
@@ -32,62 +28,40 @@ export default class Upload {
 	constructor(config) {
 		this.config = Object.assign(
 			{
-				/**
-				 * Upload URL, where to send the file to be uploaded
-				 */
+				/// Upload URL, where to send the file to be uploaded.
+				/// If unset, the file will not be uploaded, only the file object will be returned.
 				url: null,
-				/**
-				 * Max number of files to be uploaded or a function (if dynamic that returns the max number of files)
-				 */
+				/// Max number of files to be uploaded or a function (if dynamic that returns the max number of files)
 				max: Number.MAX_SAFE_INTEGER,
-				/**
-				 * Filter the selection with the following categories. Accepted filters are:
-				 * - image
-				 * - audio
-				 * - video
-				 * It can be empty, a string or an array of strings
-				 */
+				/// Filter the selection with the following categories. Accepted filters are:
+				/// - image
+				/// - audio
+				/// - video
+				/// It can be empty, a string or an array of strings
 				filter: null,
-				/**
-				 * To be called to monitor the upload progress
-				 */
+				/// To be called to monitor the upload progress
 				onInit: (/*item*/) => {},
-
-				/**
-				 * To be called if the upload was manually canceled
-				 */
+				/// To be called if the upload was manually canceled
 				onCancel: (/*item*/) => {},
-
-				/**
-				 * To be called to monitor the upload progress
-				 */
+				/// To be called to monitor the upload progress
 				onProgress: (/*item*/) => {},
-
-				/**
-				 * To be called upon error
-				 */
+				/// To be called upon error
 				onError: (/*item, message*/) => {},
-
-				/**
-				 * To be called once the upload successfully completes
-				 */
+				/// To be called once the upload successfully completes
 				onComplete: (/*item, response*/) => {},
 			},
 			config,
 		);
 	}
 
-	/**
-	 * Manual trigger the upload action
-	 *
-	 * \param nothrow Set to true if the function should no throw exception
-	 */
+	/// Manual trigger the upload action
+	///
+	/// \param nothrow Set to true if the function should no throw exception
+	/// \return the file objects that have been uploaded.
 	async trigger(nothrow, options) {
 		options = Object.assign(
 			{
-				/**
-				 * Callback to be called before the upload process takes place
-				 */
+				/// Callback to be called before the upload process takes place
 				beforeUpload: async () => {},
 			},
 			options,
@@ -127,7 +101,11 @@ export default class Upload {
 				"change",
 				async () => {
 					await options.beforeUpload();
-					this.handleFiles(input.files, nothrow).then(resolve).catch(reject);
+					if (this.config.url) {
+						this.handleFiles(input.files, nothrow).then(resolve).catch(reject);
+					} else {
+						resolve(input.files);
+					}
 				},
 				false,
 			);
@@ -140,7 +118,7 @@ export default class Upload {
 				// Should be triggered with a short delay to let onchange event be triggered if necessary
 				setTimeout(() => {
 					if (!input.files.length) {
-						resolve();
+						resolve([]);
 					}
 					window.removeEventListener("focus", resolveCancel, { once: true });
 					document.removeEventListener("mousemove", resolveCancel, {
@@ -157,12 +135,11 @@ export default class Upload {
 		});
 	}
 
-	/**
-	 * Handles the files object to be uploaded to the server
-	 *
-	 * \param files The file list object
-	 * \param nothrow Set to true if the function should no throw exception
-	 */
+	/// Handles the files object to be uploaded to the server
+	///
+	/// \param files The file list object
+	/// \param nothrow Set to true if the function should no throw exception
+	/// \return the file objects that have been uploaded.
 	async handleFiles(files, nothrow) {
 		const maxNbFiles = Math.min(
 			files.length,
@@ -176,14 +153,14 @@ export default class Upload {
 
 		// Wait for all promises to be completed or throw depending on the configuration
 		await Promise.all(promiseList);
+
+		return files;
 	}
 
-	/**
-	 * Handle a single file
-	 *
-	 * \param file The file object
-	 * \param nothrow Set to true if the function should no throw exception
-	 */
+	/// Handle a single file
+	///
+	/// \param file The file object
+	/// \param nothrow Set to true if the function should no throw exception
 	async handleFile(file, nothrow) {
 		return new Promise((resolve, reject) => {
 			try {

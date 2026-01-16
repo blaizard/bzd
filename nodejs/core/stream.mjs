@@ -1,4 +1,5 @@
 import { Readable } from "stream";
+import { pipeline } from "stream/promises";
 
 /// Convert a read stream into a buffer.
 export async function toBuffer(readStream) {
@@ -15,15 +16,13 @@ export async function toBuffer(readStream) {
 
 /// Convert a read stream into a string.
 export async function toString(readStream) {
-	return new Promise((resolve, reject) => {
-		const chunks = [];
-		readStream
-			.on("data", (d) => chunks.push(d))
-			.on("error", reject)
-			.on("end", () => {
-				resolve(chunks.join(""));
-			});
+	const chunks = [];
+	await pipeline(readStream, async (source) => {
+		for await (const chunk of source) {
+			chunks.push(chunk);
+		}
 	});
+	return Buffer.concat(chunks).toString();
 }
 
 /// Create a stream from a string, Buffer or Uint8Array

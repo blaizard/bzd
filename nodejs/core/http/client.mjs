@@ -94,6 +94,8 @@ export class HttpClient {
 		if ("json" in options) {
 			headers["Content-Type"] = "application/json";
 			data = JSON.stringify(options.json);
+		} else if ("form" in options) {
+			data = options.form;
 		} else if (typeof options.data != "undefined") {
 			data = options.data;
 		}

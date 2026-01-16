@@ -20,55 +20,27 @@ const Log = LogFactory("backend");
 		.useStatistics()
 		.useServices()
 		.useLoggerMemory()
-		.useForm()
 		.setup();
-
-	// Convert the raw form data into relative data to the sandbox root.
-	async function formDataToSandbox(contextJob, inputs, formData) {
-		const getType = (key) => {
-			const maybeItem = inputs.find((item) => item.name == key);
-			if (maybeItem) {
-				return maybeItem.type;
-			}
-			return null;
-		};
-
-		let data = {};
-		for (const [key, value] of Object.entries(formData)) {
-			const maybeType = getType(key);
-			if (maybeType) {
-				switch (maybeType) {
-					case "File":
-						const originalPaths = value.map((entry) => backend.form.getUploadFile(entry.file.path).path);
-						data[key] = [];
-						// Move all files into an input directory within the sandbox.
-						for (const originalPath of originalPaths) {
-							const relativePath = pathlib.path("inputs").joinPath(pathlib.path(originalPath).name).asPosix();
-							await contextJob.moveTo(originalPath, relativePath);
-							data[key].push(relativePath);
-						}
-						break;
-				}
-			}
-		}
-		return Object.assign(formData, data);
-	}
 
 	let commands = new Commands(pathlib.path("sandbox"), {
 		services: backend.services.makeProvider("commands"),
 	});
 	await commands.initialize();
 
-	backend.rest.handle("post", "/job/send", async (inputs) => {
-		Exception.assertPrecondition(inputs.id in Jobs, "Job id is not known: {}", inputs.id);
-		const schema = Jobs[inputs.id];
+	backend.rest.handle("post", "/job/send", async function () {
 		const contextJob = await commands.allocate();
 		const uid = contextJob.getUid();
 
 		try {
+			const inputs = await this.processForm(async (key, file, info) => {
+				const path = ["inputs", info.name];
+				await contextJob.write(path, file);
+				return path.join("/");
+			});
+			Exception.assertPrecondition(inputs.type in Jobs, "Job type is not known: {}", inputs.type);
+
 			// Build the input data.
-			const data = await formDataToSandbox(contextJob, schema.inputs, inputs.data);
-			await commands.makeFromSchema(contextJob, schema, data);
+			await commands.makeFromSchema(contextJob, Jobs[inputs.type], inputs);
 			await commands.schedule(uid, { type: "queue" });
 
 			Log.info("Executing job {}", uid);

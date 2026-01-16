@@ -60,6 +60,5 @@ bzd_nodejs_binary(
         "//nodejs/utils:pathlib",
         "//nodejs/utils:uid",
         "//nodejs/vue/apps:backend",
-        "//nodejs/vue/components/form:backend",
     ],
 )

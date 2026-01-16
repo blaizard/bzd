@@ -86,8 +86,6 @@
 			/// ---- IMPLEMENTATION ----------------------------------
 			upload() {
 				return new Upload({
-					/// Upload URL, where to send the file to be uploaded
-					url: this.getOption("upload", "/api/v1/form/upload"),
 					max: () => this.nbLeft,
 					filter: this.getOption("filter", null),
 					onInit: (item) => {
@@ -202,7 +200,10 @@
 			},
 
 			async triggerUpload() {
-				await this.upload.trigger(/*nothrow*/ true);
+				const files = await this.upload.trigger(/*nothrow*/ true);
+				for (const file of files) {
+					this.itemAdd({ file: file });
+				}
 			},
 
 			async itemClick(index) {

@@ -18,7 +18,10 @@
 		</span>
 
 		<!-- Name //-->
-		<div v-if="isFile" class="irform-file-name">{{ path }}</div>
+		<template v-if="isFile">
+			<div class="irform-file-name">{{ path }}</div>
+			<div class="irform-file-size">{{ size }}</div>
+		</template>
 		<!--<div v-else-if="isUpload" class="irform-file-name">{{ fileName }} ({{ currentSizeStr }})</div>//-->
 
 		<!-- Actions //-->
@@ -32,6 +35,7 @@
 <script>
 	import Element from "./element.vue";
 	import Touch from "../../../directives/touch.mjs";
+	import { bytesToString } from "#bzd/nodejs/utils/to_string.mjs";
 
 	export default {
 		mixins: [Element],
@@ -75,7 +79,10 @@
 				return this.get() || {};
 			},
 			path() {
-				return this.value.path;
+				return this.value.name;
+			},
+			size() {
+				return bytesToString(this.value.size);
 			},
 			isError() {
 				return Boolean(this.errorMessage);

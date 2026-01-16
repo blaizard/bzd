@@ -15,6 +15,7 @@
 				<MenuEntry text="Input" link="/form/input"></MenuEntry>
 				<MenuEntry text="Password" link="/form/password"></MenuEntry>
 				<MenuEntry text="Dropdown" link="/form/dropdown"></MenuEntry>
+				<MenuEntry text="File" link="/form/file"></MenuEntry>
 				<MenuEntry text="Autocomplete" link="/form/autocomplete"></MenuEntry>
 				<MenuEntry text="Validation" link="/form/validation"></MenuEntry>
 				<MenuEntry text="Output" link="/form/output"></MenuEntry>
@@ -55,6 +56,7 @@
 					{ path: "/form/input", component: () => import("./form/input.vue") },
 					{ path: "/form/password", component: () => import("./form/password.vue") },
 					{ path: "/form/dropdown", component: () => import("./form/dropdown.vue") },
+					{ path: "/form/file", component: () => import("./form/file.vue") },
 					{ path: "/form/autocomplete", component: () => import("./form/autocomplete.vue") },
 					{ path: "/form/validation", component: () => import("./form/validation.vue") },
 					{ path: "/form/output", component: () => import("./form/output.vue") },

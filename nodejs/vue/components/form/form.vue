@@ -39,6 +39,7 @@
 	import Item from "./item.vue";
 	import Validation from "../../../core/validation.mjs";
 	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
+	import { FormValues } from "#bzd/nodejs/vue/components/form/form.mjs";
 
 	// Include all the supported elements
 	import ElementInput from "./element/input.vue";
@@ -190,7 +191,7 @@
 				}
 
 				if (!this.isError) {
-					this.$emit("submit", this.returnedValue);
+					this.$emit("submit", new FormValues(this.returnedValue));
 				} else {
 					console.error(
 						"Validation error(s); " +

@@ -1,5 +1,9 @@
 import ExceptionFactory from "../exception.mjs";
-import { pipeline } from "stream/promises";
+import { pipeline, finished } from "stream/promises";
+import Busboy from "busboy";
+import { toString } from "#bzd/nodejs/core/stream.mjs";
+
+import { Writable } from "stream";
 
 const Exception = ExceptionFactory("http", "server", "context");
 
@@ -37,6 +41,65 @@ export class HttpServerContext {
 
 	hasHeader(name) {
 		return name in this.request.headers;
+	}
+
+	/// Set the callback to handle file streams
+	async processForm(onFile) {
+		return new Promise((resolve, reject) => {
+			const busboy = Busboy({ headers: this.request.headers });
+			const processingTasks = [];
+			let inputs = {};
+			let inputSerialized = null;
+			let blobs = {};
+			busboy.on("file", (key, stream, info) => {
+				processingTasks.push(
+					(async () => {
+						const actualFilename = info.filename.startsWith("@bzd-") ? info.filename.split("-", 4)[3] : info.filename;
+						try {
+							blobs[info.filename] = await onFile(key, stream, {
+								name: actualFilename,
+								mime: info.mimeType,
+							});
+						} finally {
+							stream.resume();
+							await finished(stream);
+						}
+					})(),
+				);
+			});
+			busboy.on("field", (key, value, info) => {
+				if (key == "@bzd-form") {
+					Exception.assertPrecondition(inputSerialized === null, "Cannot have 2 entries with key '@bzd-form'.");
+					inputSerialized = value;
+				} else {
+					inputs[key] = value;
+				}
+			});
+			busboy.on("close", () => {
+				// Finish processing the I/Os.
+				Promise.all(processingTasks)
+					.then(() => {
+						if (inputSerialized) {
+							// At this point the blobs are fully processed.
+							Object.assign(
+								inputs,
+								JSON.parse(inputSerialized, (_, value) => {
+									if (value in blobs) {
+										return blobs[value];
+									}
+									return value;
+								}),
+							);
+						}
+						resolve(inputs);
+					})
+					.catch(reject);
+			});
+			busboy.on("error", (error) => {
+				reject(error);
+			});
+			this.request.pipe(busboy);
+		});
 	}
 
 	/// Get the header

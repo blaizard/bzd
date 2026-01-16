@@ -77,9 +77,11 @@ body.irform-file-drag .irform-array-file {
 
 	.irform-file-icon {
 		font-size: 3em;
+		margin: 10px;
 	}
 
 	.irform-file-name,
+	.irform-file-size,
 	.irform-file-error {
 		width: 100%;
 		text-align: center;
@@ -87,6 +89,7 @@ body.irform-file-drag .irform-array-file {
 		overflow: hidden;
 		text-overflow: ellipsis;
 		font-size: 0.8em;
+		line-height: 1em;
 	}
 
 	.irform-file-actions {

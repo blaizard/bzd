@@ -128,12 +128,11 @@
 					this.instanceTimeout = setTimeout(this.fetchJobs, 1000);
 				}
 			},
-			async handleSubmitInputs() {
+			async handleSubmitInputs(values) {
 				await this.handleSubmit(async () => {
-					const response = await this.$rest.request("post", "/job/send", {
-						id: this.jobId,
-						data: this.value,
-					});
+					const formData = values.getFormData();
+					formData.append("type", this.jobId);
+					const response = await this.$rest.request("post", "/job/send", formData);
 					this.goToJob(response.job);
 				});
 			},

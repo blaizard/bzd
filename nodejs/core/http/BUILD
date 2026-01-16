@@ -46,9 +46,13 @@ bzd_nodejs_library(
     srcs = [
         "server_context.mjs",
     ],
+    packages = [
+        "@nodejs_deps//:busboy",
+    ],
     visibility = ["//visibility:public"],
     deps = [
         "//nodejs/core:exception",
+        "//nodejs/core:stream",
     ],
 )
 
@@ -65,7 +69,6 @@ bzd_nodejs_library(
         "@nodejs_deps//:helmet",
         "@nodejs_deps//:http",
         "@nodejs_deps//:mime",
-        "@nodejs_deps//:multer",
         "@nodejs_deps//:ws",
     ],
     visibility = ["//visibility:public"],

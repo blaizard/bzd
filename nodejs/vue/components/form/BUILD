@@ -1,28 +1,12 @@
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 
 bzd_nodejs_library(
-    name = "backend",
-    srcs = [
-        "backend.mjs",
-    ],
-    apis = ["api.json"],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//nodejs/core:exception",
-        "//nodejs/core:filesystem",
-        "//nodejs/core:log",
-        "//nodejs/core/statistics:provider",
-        "//nodejs/utils:pathlib",
-        "//nodejs/utils:uid",
-    ],
-)
-
-bzd_nodejs_library(
     name = "form",
     srcs = glob([
         "**/*.vue",
-    ]),
-    apis = ["api.json"],
+    ]) + [
+        "form.mjs",
+    ],
     visibility = ["//visibility:public"],
     deps = [
         "//nodejs:icons",
@@ -30,6 +14,7 @@ bzd_nodejs_library(
         "//nodejs/core:script",
         "//nodejs/core:upload",
         "//nodejs/core:validation",
+        "//nodejs/utils:to_string",
         "//nodejs/vue/directives:tooltip",
         "//nodejs/vue/directives:touch",
     ],

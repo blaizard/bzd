@@ -3,12 +3,6 @@ import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 const Exception = ExceptionFactory("http", "client", "window.fetch");
 
 export default async function request(url, options) {
-	// Add support for FormData
-	if (options.data instanceof FormData) {
-		options.headers["Content-Type"] = "application/x-www-form-urlencoded";
-		options.data = JSON.stringify(options.data);
-	}
-
 	const promiseFetch = window.fetch(url + options.path, {
 		method: options.method,
 		body: options.data,
