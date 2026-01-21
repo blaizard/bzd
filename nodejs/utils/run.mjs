@@ -53,7 +53,7 @@ class ExecuteResult {
 
 	on(topic, handler) {
 		Exception.assertPrecondition(
-			Array.isArray(["status", "stdout", "stderr", "output"]),
+			["status", "stdout", "stderr", "output"].includes(topic),
 			"Unsupported topic: " + topic,
 		);
 		this.event.on(topic, handler);
@@ -61,7 +61,7 @@ class ExecuteResult {
 
 	remove(topic, handler) {
 		Exception.assertPrecondition(
-			Array.isArray(["status", "stdout", "stderr", "output"]),
+			["status", "stdout", "stderr", "output"].includes(topic),
 			"Unsupported topic: " + topic,
 		);
 		this.event.remove(topic, handler);
