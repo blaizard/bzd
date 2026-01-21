@@ -1,6 +1,7 @@
 """mypy aspect rule."""
 
 load("@bazel_skylib//lib:sets.bzl", "sets")
+load("@rules_python//python:defs.bzl", "PyInfo")
 
 _PYTHON_EXTENSIONS = ["py", "pyi"]
 _IGNORE_EXTENSIONS = [
