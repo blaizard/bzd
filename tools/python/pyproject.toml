@@ -39,6 +39,7 @@ module = [
     "nacl.*",
     "bcrypt.*",
     "codespell.*",
+    "codespell_lib.*",
     "chardet.*",
     "elftools.*",
     "yaml.*",
