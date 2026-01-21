@@ -2,6 +2,7 @@ package(default_visibility = ["//visibility:public"])
 
 load("@bzd_toolchain_cc//cc:unix/unix_cc_toolchain_config.bzl", "cc_toolchain_config")
 load("@bzd_toolchain_cc//binary:defs.bzl", "binary_toolchain")
+load("@rules_cc//cc:defs.bzl", "cc_toolchain")
 %{loads}
 
 # C++ toolchain

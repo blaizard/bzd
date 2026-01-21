@@ -46,6 +46,7 @@ def _bdl_extension_impl(module_ctx):
         create = {
             "BUILD": """
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+load("@rules_python//python:defs.bzl", "py_library")
 
 bzl_library(
     name = "extensions",

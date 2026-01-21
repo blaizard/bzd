@@ -1,5 +1,7 @@
 """Expose binaries to a python target."""
 
+load("@rules_python//python:defs.bzl", "PyInfo")
+
 def _bzd_python_binary_library_impl(ctx):
     output_py = ctx.actions.declare_file(ctx.label.name + ".py")
 

@@ -1,4 +1,5 @@
 load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper")
+load("@rules_shell//shell:sh_binary.bzl", "sh_binary")
 
 package(default_visibility = ["//visibility:public"])
 

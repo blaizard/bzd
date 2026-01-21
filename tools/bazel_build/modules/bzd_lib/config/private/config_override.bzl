@@ -1,24 +1,14 @@
 """Configuration override rules."""
 
 load("@rules_cc//cc:defs.bzl", "CcInfo")
-load("@rules_cc//cc/common:debug_package_info.bzl", "DebugPackageInfo")
+load("@rules_python//python:defs.bzl", "PyInfo", "PyRuntimeInfo")
 
-# This list was taken from here: https://github.com/fmeum/with_cfg.bzl/blob/main/with_cfg/private/rule_defaults.bzl
 _DEFAULT_PROVIDERS = [
-    AnalysisTestResultInfo,
     CcInfo,
-    CcToolchainConfigInfo,
-    DebugPackageInfo,
     DefaultInfo,
     OutputGroupInfo,
     PyInfo,
     PyRuntimeInfo,
-    apple_common.Objc,
-    apple_common.XcodeProperties,
-    apple_common.XcodeVersionConfig,
-    config_common.FeatureFlagInfo,
-    platform_common.TemplateVariableInfo,
-    platform_common.ToolchainInfo,
 ]
 
 # ---- Factory ----

@@ -10,6 +10,7 @@ bazel_dep(name = "bzd_rules_oci", version = "1.0")
 bazel_dep(name = "bzd_python", version = "1.0")
 bazel_dep(name = "bazel_skylib", version = "1.7.1")
 bazel_dep(name = "rules_python", version = "1.5.4")
+bazel_dep(name = "rules_shell", version = "0.6.1")
 
 toolchain_nodejs = use_extension("//:extensions.bzl", "toolchain_nodejs")
 use_repo(toolchain_nodejs, "node", "pnpm")
