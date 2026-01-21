@@ -1,6 +1,7 @@
 import argparse
 import pathlib
 import json
+import os
 import typing
 import tempfile
 import tarfile
@@ -83,6 +84,10 @@ if __name__ == "__main__":
 	                         extra="\n".join(extra))
 	pathlib.Path("./mkdocs.yml").write_text(output)
 
+	# Workaround for https://github.com/bazel-contrib/rules_python/issues/3518
+	env = dict(**os.environ)
+	del env["RUNFILES_DIR"]
+
 	# Generate the site with mkdocs and package everything.
 	with tempfile.TemporaryDirectory() as pathStr:
 		path = pathlib.Path(pathStr)
@@ -99,6 +104,7 @@ if __name__ == "__main__":
 		        "--site-dir",
 		        path,
 		    ],
+		    env=env,
 		    check=True)
 
 		# Check if there is an entry point, if not create it.
