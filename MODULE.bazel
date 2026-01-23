@@ -57,29 +57,14 @@ python.toolchain(
     python_version = "3.12",
 )
 
-pip_platforms = {
-    "pip_linux_arm64": "manylinux2014_aarch64",
-    "pip_linux_x86_64": "manylinux2014_x86_64",
-}
-
 pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
-
-[
-    pip.parse(
-        download_only = True,
-        extra_pip_args = [
-            "--platform",
-            platform,
-            "--only-binary=:all:",
-        ],
-        hub_name = name,
-        python_version = "3.12",
-        requirements_lock = "//tools/python:requirements.txt",
-    )
-    for name, platform in pip_platforms.items()
-]
-
-[use_repo(pip, name) for name in pip_platforms.keys()]
+pip.parse(
+    download_only = True,
+    hub_name = "pip",
+    python_version = "3.12",
+    requirements_lock = "//tools/python:requirements.txt",
+)
+use_repo(pip, "pip")
 
 # C++
 

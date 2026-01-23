@@ -1,4 +1,4 @@
-load("@bzd_python//:requirements.bzl", "requirement")
+load("@pip//:requirements.bzl", "requirement")
 load("@rules_python//python:defs.bzl", "py_library")
 
 py_library(
@@ -34,5 +34,8 @@ py_library(
     deps = [
         ":metadata",
         "//apps/ebook:utils",
-    ] + requirement("selenium") + requirement("webdriver-manager") + requirement("pillow"),
+        requirement("selenium"),
+        requirement("webdriver-manager"),
+        requirement("pillow"),
+    ],
 )

@@ -1,5 +1,5 @@
 load("@bzd_lib//config:defs.bzl", "bzd_config_default")
-load("@bzd_python//:requirements.bzl", "requirement")
+load("@pip//:requirements.bzl", "requirement")
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 
 bzd_config_default(
@@ -23,7 +23,8 @@ py_binary(
         ":recording_from_data",
         ":recording_to_path",
         "@bzd_python//bzd/utils:worker",
-    ] + requirement("yfinance"),
+        requirement("yfinance"),
+    ],
 )
 
 py_binary(
@@ -96,5 +97,6 @@ py_binary(
     deps = [
         "//apps/artifacts/api/python/node",
         "@bzd_python//bzd/http:client",
-    ] + requirement("lxml"),
+        requirement("lxml"),
+    ],
 )

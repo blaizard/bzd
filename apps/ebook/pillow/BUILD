@@ -1,4 +1,4 @@
-load("@bzd_python//:requirements.bzl", "requirement")
+load("@pip//:requirements.bzl", "requirement")
 load("@rules_python//python:defs.bzl", "py_library")
 
 py_library(
@@ -11,7 +11,8 @@ py_library(
         "//apps/ebook:flow",
         "//apps/ebook:providers",
         "//apps/ebook:utils",
-    ] + requirement("pillow"),
+        requirement("pillow"),
+    ],
 )
 
 py_library(
@@ -24,7 +25,8 @@ py_library(
         "//apps/ebook:flow",
         "//apps/ebook:providers",
         "//apps/ebook:utils",
-    ] + requirement("pillow"),
+        requirement("pillow"),
+    ],
 )
 
 py_library(
@@ -36,5 +38,6 @@ py_library(
     deps = [
         "//apps/ebook:flow",
         "//apps/ebook:providers",
-    ] + requirement("pillow"),
+        requirement("pillow"),
+    ],
 )

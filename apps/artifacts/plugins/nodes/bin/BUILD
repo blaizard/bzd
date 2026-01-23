@@ -1,4 +1,4 @@
-load("@bzd_python//:requirements.bzl", "requirement")
+load("@pip//:requirements.bzl", "requirement")
 load("@rules_python//python:defs.bzl", "py_binary")
 
 py_binary(
@@ -8,5 +8,6 @@ py_binary(
     ],
     deps = [
         "//apps/artifacts/api/python/node",
-    ] + requirement("python-dateutil"),
+        requirement("python-dateutil"),
+    ],
 )

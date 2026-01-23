@@ -21,11 +21,11 @@ bzd_nodejs_library(
 
 py_console_script_binary(
     name = "dav",
-    pkg = "@pip_linux_x86_64//webdav4",
+    pkg = "@pip//webdav4",
     script = "dav",
     tags = ["manual"],
     visibility = ["//visibility:public"],
     deps = [
-        "@pip_linux_x86_64//fsspec",
+        "@pip//fsspec",
     ],
 )
