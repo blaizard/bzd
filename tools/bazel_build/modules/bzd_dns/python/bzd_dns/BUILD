@@ -5,6 +5,9 @@ load("@rules_python//python/entry_points:py_console_script_binary.bzl", "py_cons
 py_console_script_binary(
     name = "octodns-sync",
     pkg = "@pip//octodns",
+    tags = [
+        "mypy-ignore",
+    ],
     visibility = ["//visibility:public"],
     deps = [
         requirement("octodns_digitalocean"),
@@ -15,6 +18,9 @@ py_console_script_binary(
 py_console_script_binary(
     name = "octodns-validate",
     pkg = "@pip//octodns",
+    tags = [
+        "mypy-ignore",
+    ],
     visibility = ["//visibility:public"],
     deps = [
         requirement("octodns_digitalocean"),

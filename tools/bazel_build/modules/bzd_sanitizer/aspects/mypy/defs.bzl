@@ -68,6 +68,10 @@ def _mypy_aspect_impl(target, ctx):
     if not PyInfo in target:
         return []
 
+    # Ignore targets tagged with "mypy-ignore" tag.
+    if "mypy-ignore" in ctx.rule.attr.tags:
+        return []
+
     py_rule = ctx.rule
 
     # Instead of reading the 'srcs' attribute to identify which file need to be mypy-ed, we read the PyInfo and get all the
