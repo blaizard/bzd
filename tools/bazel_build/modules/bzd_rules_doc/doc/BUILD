@@ -21,6 +21,9 @@ py_binary(
 py_console_script_binary(
     name = "mkdocs",
     pkg = "@pip//mkdocs",
+    tags = [
+        "mypy-ignore",
+    ],
     visibility = ["//visibility:public"],
     deps = [
         requirement("mkdocs"),
