@@ -6,6 +6,8 @@ stardoc(
     out = "bdl.md",
     format = "markdown",
     input = "@bzd_bdl//:defs.bzl",
+    # TODO: generate markdown crashes with bazel 9.0.0, investigate later
+    tags = ["manual"],
     deps = [
         "@bzd_bdl//:defs",
     ],
@@ -16,6 +18,8 @@ stardoc(
     out = "cc.md",
     format = "markdown",
     input = "//cc/bdl:cc.bzl",
+    # TODO: generate markdown crashes with bazel 9.0.0, investigate later
+    tags = ["manual"],
     deps = [
         "//cc/bdl:cc",
     ],
@@ -24,8 +28,8 @@ stardoc(
 doc_library(
     name = "bazel",
     srcs = [
-        "bdl.md",
-        "cc.md",
+        #"bdl.md",
+        #"cc.md",
     ],
     visibility = ["//docs:__pkg__"],
 )
