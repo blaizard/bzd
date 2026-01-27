@@ -1,6 +1,6 @@
 use utils::arg1_to_vector;
 
-fn part1(bool_grid: &Vec<Vec<bool>>) {
+fn part1(bool_grid: &[Vec<bool>]) {
     let max_x = (bool_grid[0].len() - 1) as isize;
     let max_y = (bool_grid.len() - 1) as isize;
     let count_rool = |x: isize, y: isize| {

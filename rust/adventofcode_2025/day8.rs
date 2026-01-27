@@ -29,7 +29,7 @@ fn nb_junctions(index: usize, distances: &Vec<ShortestDistance>, covered: &mut V
     nb
 }
 
-fn part1(ranges: &Vec<Coordinates>) {
+fn part1(ranges: &[Coordinates]) {
     let total = 0;
     let mut distances: Vec<ShortestDistance> = vec![];
 
