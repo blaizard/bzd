@@ -7,11 +7,3 @@ py_binary(
     ],
     visibility = ["//visibility:public"],
 )
-
-py_binary(
-    name = "bundler",
-    srcs = [
-        "bundler.py",
-    ],
-    visibility = ["//visibility:public"],
-)

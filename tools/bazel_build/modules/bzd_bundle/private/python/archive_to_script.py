@@ -56,7 +56,7 @@ if __name__ == "__main__":
 set -e
 
 case $1 in
-	--extract)
+	--bzd-extract)
 		temp="$2"
 		mkdir -p "$temp"
 		shift

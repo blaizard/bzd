@@ -16,12 +16,12 @@ sh_binary(
 bzd_bundle_tar(
     name = "empty_tar",
     compression = None,
-    output = "empty.tar",
+    output = "empty_tar.tar",
 )
 
 bzd_diff_test(
     name = "reproducible_empty_tar",
-    file1 = ":empty.tar",
+    file1 = ":empty_tar.tar",
     file2 = "expected_empty.tar",
 )
 
@@ -29,14 +29,14 @@ bzd_bundle_tar(
     name = "generate_tar",
     compression = None,
     executables = {
-        "/a/b/c": ":dummy",
+        "a": ":dummy",
     },
-    output = "generated.tar",
+    output = "generate_tar.tar",
 )
 
 bzd_diff_test(
     name = "reproducible_tar",
-    file1 = ":generated.tar",
+    file1 = ":generate_tar.tar",
     file2 = "expected.tar",
 )
 
@@ -44,14 +44,14 @@ bzd_bundle_tar(
     name = "generate_tar_gz",
     compression = "gz",
     executables = {
-        "/a/b/c": ":dummy",
+        "a": ":dummy",
     },
-    output = "generated.tar.gz",
+    output = "generate_tar_gz.tar.gz",
 )
 
 bzd_diff_test(
     name = "reproducible_tar_gz",
-    file1 = ":generated.tar.gz",
+    file1 = ":generate_tar_gz.tar.gz",
     file2 = "expected.tar.gz",
 )
 

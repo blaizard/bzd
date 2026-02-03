@@ -7,7 +7,7 @@ def _bzd_bundle_binary_script_impl(ctx):
     args.add("--output", ctx.outputs.executable)
     args.add("--entry-point", ctx.attr.bootstrap_script)
     if ctx.attr.compression:
-        args.add("--compression", "gz")
+        args.add("--compression", ctx.attr.compression)
     args.add(ctx.file.archive)
 
     ctx.actions.run(
@@ -40,8 +40,9 @@ _bzd_bundle_binary_script = rule(
         "bootstrap_script": attr.string(
             doc = "Entry point of the executable.",
         ),
-        "compression": attr.bool(
-            doc = "If the tarball is compressed or not.",
+        "compression": attr.string(
+            values = ["gz", "bz2", "xz"],
+            doc = "The type of compression for the resulting tarball.",
         ),
         "_archive_to_script": attr.label(
             default = Label("//private/python:archive_to_script"),
@@ -52,23 +53,21 @@ _bzd_bundle_binary_script = rule(
     executable = True,
 )
 
-def _bzd_bundle_binary_impl(name, visibility, compression, executable, bootstrap_script, args, **kwargs):
-    archive_name = "{}.tar.gz".format(name) if compression else "{}.tar".format(name)
+def _bzd_bundle_binary_impl(name, visibility, compression, compression_level, executable, bootstrap_script, args, **kwargs):
     bzd_bundle_tar(
         name = "{}.bundle".format(name),
         executables = {
-            "": executable,
+            bootstrap_script: executable,
         },
-        bootstrap_script = bootstrap_script,
-        compression = "gz" if compression else None,
-        output = archive_name,
+        compression = compression or None,
+        compression_level = compression_level,
     )
 
     _bzd_bundle_binary_script(
         name = name,
         bootstrap_script = bootstrap_script,
-        compression = compression,
-        archive = archive_name,
+        compression = compression or None,
+        archive = "{}.bundle".format(name),
         visibility = visibility,
         arguments = args,
         **kwargs
@@ -87,10 +86,16 @@ bzd_bundle_binary = macro(
         "bootstrap_script": attr.string(
             doc = "Entry point of the executable.",
             default = ".bzd_bundle_binary_bootstrap",
+            configurable = False,
         ),
-        "compression": attr.bool(
-            doc = "If the tarball is compressed or not.",
-            default = True,
+        "compression": attr.string(
+            values = ["gz", "bz2", "xz"],
+            doc = "The type of compression for the resulting tarball.",
+            configurable = False,
+        ),
+        "compression_level": attr.int(
+            doc = "The compression level for the resulting tarball.",
+            default = 6,
             configurable = False,
         ),
         "executable": attr.label(

@@ -56,6 +56,7 @@ bzd_bootloader_binary(
 
 bzd_bundle_binary(
     name = "bundle",
+    compression = "gz",
     executable = ":with_bootloader",
     tags = ["manual"],
     visibility = ["//deployment:__subpackages__"],

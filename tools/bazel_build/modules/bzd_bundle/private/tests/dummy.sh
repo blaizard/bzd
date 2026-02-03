@@ -1,2 +1,2 @@
 echo "from dummy.sh"
-cat $(dirname $(realpath $0))/dummy.txt
+cat "$(dirname $(realpath $0))/dummy.txt"
