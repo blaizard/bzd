@@ -10,16 +10,15 @@ def bzd_oci_binary(name, binary, **kwargs):
         name = "{}.package".format(name),
         output = "{}.package.tar".format(name),
         executables = {
-            ROOT_DIRECTORY_: binary,
+            ".bzd_oci_binary_bootstrap": binary,
         },
-        bootstrap_script = ".bzd_oci_binary_bootstrap",
     )
 
     bzd_oci_image(
         name = name,
         # Use entry point so that arguments can be passed with `command`.
         entrypoint = [
-            "{}/.bzd_oci_binary_bootstrap".format(ROOT_DIRECTORY_),
+            ".bzd_oci_binary_bootstrap",
         ],
         tars = [
             "{}.package.tar".format(name),
