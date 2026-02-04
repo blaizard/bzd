@@ -3,6 +3,7 @@ module(
     version = "1.0",
 )
 
+bazel_dep(name = "platforms", version = "1.0.0")
 bazel_dep(name = "bzd_platforms", version = "1.0")
 bazel_dep(name = "bzd_lib", version = "1.0")
 bazel_dep(name = "bzd_python", version = "1.0")

@@ -48,7 +48,7 @@ constraint_value(
 platform(
     name = "platform",
     parents = [
-        "@local_config_platform//:host",
+        "@platforms//host",
     ],
     constraint_values = [
         ":toolchain",
