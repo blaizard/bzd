@@ -7,7 +7,7 @@ doc_binary(
         ("Apps", "//apps:documentation"),
         ("Examples", "//example:documentation"),
         ("BDL", "@bzd_bdl//bdl/docs"),
-        ("Bazel", "//docs/api/bazel"),
+        #("Bazel", "//docs/api/bazel"),
         ("C++", "//cc:documentation"),
         ("Python", "@bzd_python//:documentation"),
     ],
