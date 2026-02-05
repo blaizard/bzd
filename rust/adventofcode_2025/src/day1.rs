@@ -73,3 +73,15 @@ fn main() {
     part1(&lines);
     part2(&lines);
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn day1_test() {
+        let input = vec!["L10".to_string(), "R20".to_string(), "L30".to_string()];
+        part1(&input);
+        part2(&input);
+    }
+}

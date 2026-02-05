@@ -1,16 +1,16 @@
-load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library")
+load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library", "rust_test")
 
 rust_library(
     name = "utils",
-    srcs = ["utils.rs"],
+    srcs = ["src/utils.rs"],
 )
 
 [rust_binary(
     name = name,
-    srcs = ["{}.rs".format(name)],
-    args = ["$(location :{}.txt)".format(name)],
+    srcs = ["src/{}.rs".format(name)],
+    args = ["$(location :src/{}.txt)".format(name)],
     data = [
-        ":{}.txt".format(name),
+        ":src/{}.txt".format(name),
     ],
     deps = [
         ":utils",
@@ -26,3 +26,8 @@ rust_library(
     "day8",
     "day9",
 ]]
+
+rust_test(
+    name = "day1_test",
+    crate = ":day1",
+)
