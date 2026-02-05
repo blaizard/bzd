@@ -1,8 +1,6 @@
 use std::env;
 use std::fs;
 
-use lib;
-
 struct Config {
     query: String,
     file_path: String,
