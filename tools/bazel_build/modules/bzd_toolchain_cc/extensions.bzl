@@ -95,6 +95,19 @@ toolchain(
     toolchain = "@{repo_name}//:binary_toolchain",
     toolchain_type = "@bzd_toolchain_cc//binary:toolchain_type",
 )
+
+toolchain(
+    name = "test-{name}",
+    exec_compatible_with = [
+        {execution_constraints}
+    ],
+    target_compatible_with = [
+        ":toolchain",
+        {target_constraints}
+    ],
+    toolchain = "@bazel_tools//tools/test:empty_toolchain",
+    toolchain_type = "@bazel_tools//tools/test:default_test_toolchain_type",
+)
 """.format(
             comment = "{}/{} (execution/target)".format(config.execution, config.target),
             name = "{}-{}".format(config.execution, config.target),
