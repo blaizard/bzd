@@ -318,13 +318,16 @@ RUN echo "PS1=\\"(devcontainer) \\$PS1\\"" >> {self.home}/.bashrc
 	@cached_property
 	def dockerCompose(self) -> str:
 
-		# Volumes
+		# Add some directories as volumes.
 		volumes = [
 		    f"{self.workspace}:{self.workspace}",
-		    f"{self.home}/.bash_history:{self.home}/.bash_history",
 		    f"{self.home}/.cache:{self.home}/.cache",
-		    f"{self.home}/.netrc:{self.home}/.netrc",
 		]
+
+		# Add some files as volumes only if they exist (otherwise docker-compose will create an empty directory).
+		volumes += [f"{file}:{file}" for file in [self.home / ".bash_history", self.home / ".netrc"] if file.is_file()]
+
+		# Add some volumes from features.
 		for feature in self.features:
 			volumes += feature.volumes
 		volumesStr = "\n".join([f"      - {volume}" for volume in volumes])
