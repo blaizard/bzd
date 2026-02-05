@@ -1,2 +1,4 @@
 **/*.kicad_*
 **/requirements.json
+**/BUILD
+**/*.bazel
