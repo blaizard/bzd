@@ -84,7 +84,7 @@ rust_stdlib_filegroup(
 rust_toolchain(
     name = "rust_toolchain_{index}",
     binary_ext = "",
-    default_edition = "2024",
+    default_edition = "{edition}",
     dylib_ext = ".so",
     env = {{}},
     exec_triple = "{exec_triple}",
@@ -126,6 +126,7 @@ toolchain(
 )
 """.format(
             index = index,
+            edition = repository_ctx.attr.edition,
             exec_triple = config_settings_to_rust_triple[exec_platform],
             exec_platform = exec_platform,
             target_platform = repository_ctx.attr.target_platform,
@@ -142,6 +143,7 @@ toolchain(
 toolchain_repository = repository_rule(
     implementation = _toolchain_repository_impl,
     attrs = {
+        "edition": attr.string(mandatory = True),
         "exec_platforms": attr.label_list(mandatory = True),
         "repo_name": attr.string(mandatory = True),
         "stdlib_target": attr.string(mandatory = True),
@@ -194,6 +196,7 @@ def _toolchain_rust_impl(module_ctx):
             exec_platforms = exec_platforms,
             toolchain = "{}_toolchain".format(repository_name),
             stdlib_target = "{}_stdlib_target".format(repository_name),
+            edition = toolchain.edition,
         )
 
     repository = _repositories["esp-rust-1.92.0"]

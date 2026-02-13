@@ -1,0 +1,54 @@
+crates_esp32 = use_extension("@rules_rust//crate_universe:extension.bzl", "crate")
+crates_esp32.from_specs(
+    name = "crates_esp32",
+)
+crates_esp32.spec(
+    package = "xtensa-lx",
+    version = "0.13.0",
+)
+crates_esp32.spec(
+    package = "xtensa-lx-rt",
+    version = "0.21.0",
+)
+crates_esp32.spec(
+    features = [
+        "esp32",
+        "unstable",
+        "rt",
+    ],
+    package = "esp-hal",
+    version = "1.0.0",
+)
+crates_esp32.spec(
+    features = [
+        "esp32",
+        "panic-handler",
+        "println",
+    ],
+    package = "esp-backtrace",
+    version = "0.18.1",
+)
+crates_esp32.spec(
+    features = ["esp32"],
+    package = "esp-println",
+    version = "0.16.1",
+)
+crates_esp32.annotation(
+    crate = "esp-sync",
+    deps = ["@crates_esp32//:xtensa-lx"],
+)
+crates_esp32.annotation(
+    crate = "esp-backtrace",
+    deps = ["@crates_esp32//:xtensa-lx"],
+)
+crates_esp32.annotation(
+    crate = "esp-hal",
+    deps = [
+        "@crates_esp32//:xtensa-lx",
+        "@crates_esp32//:xtensa-lx-rt",
+    ],
+)
+crates_esp32.render_config(
+    generate_target_compatible_with = False,
+)
+use_repo(crates_esp32, "crates_esp32")
