@@ -1,6 +1,6 @@
 """Module extension for CC toolchains."""
 
-load("@bzd_platforms//:defs.bzl", "constraints_from_platform")
+load("@bzd_platforms//:defs.bzl", "constraints_from_platform_name")
 load("//toolchains/clang:defs.bzl", "clang")
 load("//toolchains/esp_idf:defs.bzl", "esp32", "esp32s3")
 load("//toolchains/gcc:defs.bzl", "gcc")
@@ -63,8 +63,8 @@ platform(
     targets = {}
     configs = _make_configs(repository_ctx.attr.repo_name, repository_ctx.attr.version)
     for repo_name, config in configs.items():
-        execution_constraints = constraints_from_platform(config.execution)
-        target_constraints = constraints_from_platform(config.target)
+        execution_constraints = constraints_from_platform_name(config.execution)
+        target_constraints = constraints_from_platform_name(config.target)
         targets[config.target] = target_constraints
 
         build_content += """

@@ -17,7 +17,7 @@ def _doxygen_impl(_module_ctx):
                 ],
             },
             "platforms": [
-                "linux-x86_64",
+                Label("@bzd_platforms//al_isa:linux-x86_64"),
             ],
         }],
         expose = {

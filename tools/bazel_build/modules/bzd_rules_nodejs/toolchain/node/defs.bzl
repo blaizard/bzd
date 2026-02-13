@@ -13,7 +13,7 @@ _repositories = {
             ],
         },
         "platforms": [
-            "linux-x86_64",
+            Label("@bzd_platforms//al_isa:linux-x86_64"),
         ],
     }],
     "20.5.1": [{
@@ -26,7 +26,7 @@ _repositories = {
             ],
         },
         "platforms": [
-            "linux-x86_64",
+            Label("@bzd_platforms//al_isa:linux-x86_64"),
         ],
     }],
     "23.1.0": [{
@@ -39,7 +39,7 @@ _repositories = {
             ],
         },
         "platforms": [
-            "linux-x86_64",
+            Label("@bzd_platforms//al_isa:linux-x86_64"),
         ],
     }],
 }

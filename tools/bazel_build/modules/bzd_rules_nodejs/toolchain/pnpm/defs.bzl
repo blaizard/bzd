@@ -19,7 +19,7 @@ def pnpm_install(name):
                 },
             },
             "platforms": [
-                "linux-x86_64",
+                Label("@bzd_platforms//al_isa:linux-x86_64"),
             ],
         }, {
             "build_file": Label("//toolchain/pnpm:pnpm.BUILD"),
@@ -31,7 +31,7 @@ def pnpm_install(name):
                 },
             },
             "platforms": [
-                "linux-arm64",
+                Label("@bzd_platforms//al_isa:linux-arm64"),
             ],
         }],
         expose = {

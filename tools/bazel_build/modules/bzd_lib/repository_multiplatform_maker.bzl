@@ -20,7 +20,7 @@ alias(
 )
 """.format(
             exposed_name = exposed_name,
-            select = "\n".join(["\"@bzd_platforms//al_isa:{}\": \"@{}//:{}\",".format(platform, repository_name, target_name) for platform, repository_name in repository_ctx.attr.platform_mapping.items()]),
+            select = "\n".join(["\"{}\": \"@{}//:{}\",".format(platform, repository_name, target_name) for platform, repository_name in repository_ctx.attr.platform_mapping.items()]),
         )
 
         defs_content += """
@@ -51,7 +51,7 @@ _repository_multiplatform_maker = repository_rule(
     implementation = _repository_multiplatform_maker_impl,
     attrs = {
         "expose": attr.string_dict(),
-        "platform_mapping": attr.string_dict(),
+        "platform_mapping": attr.label_keyed_string_dict(),
     },
 )
 
@@ -71,7 +71,7 @@ def repository_multiplatform_maker(name, repositories, expose):
                 "strip_prefix": "linux_x86_64_8.1.2",
             },
             "platforms": [
-                "linux-x86_64",
+                Label("@bzd_platforms//al_isa:linux-x86_64"),
             ],
         }],
         "expose": {"qemu": "qemu_impl"}
@@ -90,7 +90,7 @@ def repository_multiplatform_maker(name, repositories, expose):
             },
             "build_file": "@bzd_toolchain_cc//:fragments/esp32/qemu/linux_x86_64_8.1.2.BUILD",
             "platforms": [
-                "linux-x86_64",
+                Label("@bzd_platforms//al_isa:linux-x86_64"),
             ],
         }],
         "expose": {"qemu": "qemu_impl"}
@@ -104,8 +104,8 @@ def repository_multiplatform_maker(name, repositories, expose):
     """
 
     platform_mapping = {}
-    for repository in repositories:
-        repository_name = "{}_{}".format(name, "_".join(repository.get("platforms", [])))
+    for index, repository in enumerate(repositories):
+        repository_name = "{}_{}".format(name, index)
 
         if "archive" in repository:
             for attr in ("build_file", "files"):

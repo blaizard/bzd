@@ -2,3 +2,5 @@
 **/requirements.json
 **/BUILD
 **/*.bazel
+BUILD
+*.bazel

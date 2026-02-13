@@ -15,7 +15,7 @@ def _constraint_target(kind, name):
 
     return Label("//{}:{}".format(kind, name))
 
-def constraints_from_platform(platform):
+def constraints_from_platform_name(platform):
     """Return the set of constraints from a platform name.
 
     Args:

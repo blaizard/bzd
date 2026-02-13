@@ -18,7 +18,7 @@ def esp32_qemu(name = "esp32_qemu"):
                 ],
             },
             "platforms": [
-                "linux-x86_64",
+                Label("@bzd_platforms//al_isa:linux-x86_64"),
             ],
         }],
         expose = {

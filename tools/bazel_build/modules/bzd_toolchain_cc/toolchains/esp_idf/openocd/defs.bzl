@@ -18,7 +18,7 @@ def esp32_openocd(name = "esp32_openocd"):
                 ],
             },
             "platforms": [
-                "linux-x86_64",
+                Label("@bzd_platforms//al_isa:linux-x86_64"),
             ],
         }],
         expose = {
