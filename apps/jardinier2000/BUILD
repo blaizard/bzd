@@ -33,7 +33,7 @@ bdl_target(
     composition = [
         ":board.bdl",
     ],
-    parent = "@@//cc/targets/esp32s3_idf:gcc",
+    parent = "@@//cc/targets/esp32s3:gcc",
     deps = [
         "//cc/components/esp_idf/io/digital",
         "//cc/components/esp_idf/pwm",
