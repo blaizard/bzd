@@ -23,5 +23,6 @@ cc_library(
     deps = [
         ":interface",
         "//cc/bzd/core/async",
+        "//cc/libs/esp_idf",
     ],
 )

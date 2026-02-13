@@ -19,7 +19,7 @@ def esp32s3_linux_x86_64(_module_ctx, name, use_fragment):
     use_fragment(esptool)
     use_fragment(esp32_qemu)
     use_fragment(esp32_openocd)
-    _sdk_name, sdk_toolchain_definition = use_fragment(sdk)
+    use_fragment(sdk)
     _app_binary_name, app_binary_toolchain_definition = use_fragment(app_binary)
 
     toolchain_definition = {
@@ -80,9 +80,6 @@ def esp32s3_linux_x86_64(_module_ctx, name, use_fragment):
         ],
     }
 
-    # Note, the order is important here. We want the definition of the SDK to have precedence over the
-    # toolchain: includes from the SDK should have higher priority than the ones from the toolchain.
-    toolchain_definition = toolchain_merge(sdk_toolchain_definition, toolchain_definition)
     toolchain_definition = toolchain_merge(app_binary_toolchain_definition, toolchain_definition)
 
     toolchain_maker(

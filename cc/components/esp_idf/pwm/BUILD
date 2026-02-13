@@ -27,5 +27,6 @@ cc_library(
         ":interface",
         "//cc/bzd/core/async",
         "//cc/components/esp_idf:error",
+        "//cc/libs/esp_idf",
     ],
 )

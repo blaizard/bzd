@@ -20,7 +20,6 @@ filegroup(
         ":header_files",
         "bin/xtensa-esp32s3-elf-gcc",
         "bin/xtensa-esp-elf-gcc",
-        "@esp32s3_xtensa_lx7_sdk//:compiler_files",
     ] + glob([
         "lib/**",
         "libexec/gcc/xtensa-esp-elf/14.2.0/*",
@@ -35,7 +34,6 @@ filegroup(
         ":ld",
         ":dynamic_libraries_files",
         ":static_libraries_files",
-        "@esp32s3_xtensa_lx7_sdk//:linker_files",
         "bin/xtensa-esp32s3-elf-gcc",
         "bin/xtensa-esp-elf-gcc",
     ] + glob([
@@ -66,9 +64,7 @@ filegroup(
 
 filegroup(
     name = "static_libraries_files",
-    srcs = [
-        "@esp32s3_xtensa_lx7_sdk//:static_libraries_files"
-    ] + glob([
+    srcs = glob([
         "xtensa-esp-elf/lib/**",
     ]),
 )

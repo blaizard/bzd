@@ -28,6 +28,7 @@ cc_library(
         "//cc/bzd/core:print",
         "//cc/bzd/core/async",
         "//cc/components/esp_idf:error",
+        "//cc/libs/esp_idf",
         "//cc/libs/timer:timer_isr",
     ],
 )

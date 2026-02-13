@@ -2,30 +2,25 @@ load("@bzd_bdl//:defs.bzl", "bdl_library")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
 bdl_library(
-    name = "bdl",
+    name = "interface",
     srcs = [
         "interface.bdl",
     ],
     deps = [
-        "//interfaces:timer",
+        "//interfaces:recorder",
     ],
 )
 
 cc_library(
-    name = "xthal",
-    srcs = [
-        "xthal.cc",
-    ],
+    name = "out",
     hdrs = [
-        "xthal.hh",
-    ],
-    target_compatible_with = [
-        "@bzd_platforms//al:esp_idf",
+        "out.hh",
     ],
     visibility = ["//visibility:public"],
     deps = [
-        ":bdl",
+        ":interface",
+        "//cc/bzd/core:print",
+        "//cc/bzd/core:units",
         "//cc/bzd/core/async",
-        "//cc/libs/esp_idf",
     ],
 )

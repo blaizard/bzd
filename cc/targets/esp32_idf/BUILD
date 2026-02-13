@@ -21,6 +21,7 @@ cc_library(
         "//cc/components/generic/executor",
         "//cc/components/generic/stream/stub",
         "//cc/components/std/stream/out",
+        "//cc/libs/esp_idf",
         "//interfaces:stream",
     ],
 )

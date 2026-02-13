@@ -102,6 +102,10 @@ use_repo(toolchain_cc, "gcc")
 
 register_toolchains("@gcc//:all")
 
+# ESP IDF SDK
+
+include("//cc/libs/esp_idf:esp_idf.MODULE.bazel")
+
 # Bdl
 
 bdl_extension = use_extension("@bzd_bdl//:extensions.bzl", "bdl_extension")

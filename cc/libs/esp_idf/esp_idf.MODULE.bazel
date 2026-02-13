@@ -1,0 +1,23 @@
+http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+http_archive(
+    name = "esp32_xtensa_lx6_sdk",
+    build_file = "//cc/libs/esp_idf:esp32_xtensa_lx6_sdk.BUILD",
+    sha256 = "e0577241108d945f1ff1a4e0f3ef8c23685a8f2ca3cfa8328c6b69fadced4df8",
+    strip_prefix = "esp32_xtensa_lx6_sdk",
+    urls = [
+        "https://datalocal.blaizard.com/file/bzd/sdk/esp32/cc/esp32_xtensa_lx6_sdk_v5.4.tar.xz",
+        "https://data.blaizard.com/file/bzd/sdk/esp32/cc/esp32_xtensa_lx6_sdk_v5.4.tar.xz",
+    ],
+)
+
+http_archive(
+    name = "esp32s3_xtensa_lx7_sdk",
+    build_file = "//cc/libs/esp_idf:esp32s3_xtensa_lx7_sdk.BUILD",
+    sha256 = "ebcfd902bd5896b9e33c46a819ee19bdd365ab34e50fc6f9f3127efe43fc769d",
+    strip_prefix = "esp32_xtensa_lx6_sdk",
+    urls = [
+        "https://datalocal.blaizard.com/file/bzd/sdk/esp32s3/cc/esp32s3_xtensa_lx7_sdk_v5.4.tar.xz",
+        "https://data.blaizard.com/file/bzd/sdk/esp32s3/cc/esp32s3_xtensa_lx7_sdk_v5.4.tar.xz",
+    ],
+)

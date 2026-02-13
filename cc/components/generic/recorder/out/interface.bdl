@@ -1,0 +1,19 @@
+use "interfaces/recorder.bdl"
+
+namespace bzd.components.generic.recorder;
+
+
+component Out : bzd.Recorder {
+config:
+	out = {out};
+	timer = {timer};
+	
+interface:
+	method run();
+	
+composition:
+	this.run();
+	
+}
+
+
