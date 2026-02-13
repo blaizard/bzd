@@ -22,9 +22,6 @@ cc_library(
     tags = [
         "no-clang-tidy",
     ],
-    target_compatible_with = [
-        "@bzd_platforms//al:esp_idf",
-    ],
     deps = [
         ":composition",
         "//cc:bzd",
