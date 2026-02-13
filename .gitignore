@@ -16,6 +16,7 @@ bazel-*
 .bazelrc.local
 !/tools/**/.bazelrc.local
 MODULE.bazel.lock
+vendor_src/
 
 # Editors
 .vscode/

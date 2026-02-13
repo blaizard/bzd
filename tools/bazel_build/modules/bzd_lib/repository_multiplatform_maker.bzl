@@ -29,7 +29,7 @@ alias(
 }}
 """.format(
             exposed_name = exposed_name,
-            content = "\n".join(["\"{}\": Label(\"@{}//:{}\"),".format(platform, repository_name, target_name) for platform, repository_name in repository_ctx.attr.platform_mapping.items()]),
+            content = "\n".join(["Label(\"{}\"): Label(\"@{}//:{}\"),".format(platform, repository_name, target_name) for platform, repository_name in repository_ctx.attr.platform_mapping.items()]),
         )
 
     # Create the BUILD file.

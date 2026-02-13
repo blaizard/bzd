@@ -87,5 +87,5 @@ def get_platform_from_os(os):
     maybe_al = to_al(os.name)
     maybe_isa = to_isa(os.arch)
     if maybe_isa and maybe_al:
-        return maybe_al + "-" + maybe_isa
+        return Label("//al_isa:{}-{}".format(maybe_al, maybe_isa))
     return None
