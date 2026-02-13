@@ -75,7 +75,7 @@ bzd_executable_exec_test(
     target_compatible_with = select({
         # Somehow the timing on esp32s3 is not respected when the alarm is set.
         # This behavior is not true on real HW.
-        "@bzd_platforms//al:esp32s3_idf": ["@platforms//:incompatible"],
+        "@bzd_platforms//al:esp32s3": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
 )

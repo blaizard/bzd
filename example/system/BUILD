@@ -24,7 +24,7 @@ cc_library(
 bdl_system(
     name = "system",
     targets = {
-        "esp32": "@@//cc/targets/esp32_idf:gcc",
+        "esp32": "@@//cc/targets/esp32:gcc",
         "hpc": "@@//cc/targets/linux:x86_64_clang",
     },
     deps = [

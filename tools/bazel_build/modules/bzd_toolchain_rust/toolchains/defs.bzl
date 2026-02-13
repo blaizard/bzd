@@ -63,5 +63,5 @@ toolchain_sysroot = rule(
 
 config_settings_to_rust_triple = {
     Label("@bzd_platforms//al_isa:linux-x86_64"): "x86_64-unknown-linux-gnu",
-    Label("@bzd_platforms//al_isa:esp32_idf-xtensa_lx6"): "xtensa-esp32-none-elf",
+    Label("@bzd_platforms//al_isa:esp32-xtensa_lx6"): "xtensa-esp32-none-elf",
 }

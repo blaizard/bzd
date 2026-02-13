@@ -1,3 +1,5 @@
+"""Extension to generate a rust toolchain."""
+
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bzd_lib//:repository_multiplatform_maker.bzl", "repository_multiplatform_maker")
 load("@bzd_platforms//:defs.bzl", "constraints_from_platform_name")
@@ -30,10 +32,10 @@ _repositories = {
 }
 
 _data = {
-    "esp32_idf-xtensa_lx6": {
+    "esp32-xtensa_lx6": {
         "1.92.0": {
             "repository": "esp-rust-1.92.0",
-            "target": Label("@bzd_platforms//al_isa:esp32_idf-xtensa_lx6"),
+            "target": Label("@bzd_platforms//al_isa:esp32-xtensa_lx6"),
         },
     },
 }

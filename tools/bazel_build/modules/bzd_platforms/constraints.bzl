@@ -1,15 +1,11 @@
 """Constraints."""
 
 AL_CONSTRAINTS = {
-    "esp32_idf": {
+    "esp32": {
         "isa": ["xtensa_lx6"],
     },
-    "esp32s3_idf": {
+    "esp32s3": {
         "isa": ["xtensa_lx7"],
-    },
-    "esp_idf": {
-        "children": ["esp32_idf", "esp32s3_idf"],
-        "isa": ["xtensa"],
     },
     "linux": {
         "alias": Label("@platforms//os:linux"),

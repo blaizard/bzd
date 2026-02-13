@@ -43,7 +43,7 @@ bdl_target(
 bdl_target(
     name = "gcc",
     parent = ":auto",
-    platform = "@esp32//:platform-esp32_idf-xtensa_lx6",
+    platform = "@esp32//:platform-esp32-xtensa_lx6",
     visibility = [
         "//visibility:public",
     ],
