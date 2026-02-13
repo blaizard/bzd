@@ -16,9 +16,6 @@ cc_library(
     hdrs = [
         "core.hh",
     ],
-    target_compatible_with = [
-        "@bzd_platforms//al:esp_idf",
-    ],
     visibility = ["//visibility:public"],
     deps = [
         ":interface",

@@ -19,9 +19,6 @@ cc_library(
     hdrs = [
         "gptimer.hh",
     ],
-    target_compatible_with = [
-        "@bzd_platforms//al:esp_idf",
-    ],
     visibility = ["//visibility:public"],
     deps = [
         ":bdl",

@@ -5,14 +5,12 @@ cc_library(
     hdrs = [
         "error.hh",
     ],
-    target_compatible_with = [
-        "@bzd_platforms//al:esp_idf",
-    ],
     visibility = [
         "//visibility:public",
     ],
     deps = [
         "//cc/bzd/container:result",
         "//cc/bzd/core:error",
+        "//cc/libs/esp_idf",
     ],
 )
