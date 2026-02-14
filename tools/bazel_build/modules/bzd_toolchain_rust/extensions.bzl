@@ -45,6 +45,29 @@ def _toolchain_repository_impl(repository_ctx):
 load("@rules_rust//rust:toolchain.bzl", "rust_toolchain", "rust_stdlib_filegroup")
 load("{toolchain_defs_bzl}", "use_bootstrap", "toolchain_sysroot", "config_settings_to_rust_triple")
 
+# ---- Toolchain config setting,
+""".format(
+        toolchain_defs_bzl = Label("//toolchains:defs.bzl"),
+    )
+
+    if repository_ctx.attr.toolchain_constraint:
+        build_content += """
+alias(
+    name = "toolchain",
+    actual = "{toolchain_constraint}",
+    visibility = ["//visibility:public"],
+)
+""".format(toolchain_constraint = repository_ctx.attr.toolchain_constraint)
+    else:
+        build_content += """
+constraint_value(
+    name = "toolchain",
+    constraint_setting = "@bzd_platforms//toolchain",
+    visibility = ["//visibility:public"],
+)
+"""
+
+    build_content += """
 # ---- Build the target stdlib
 
 use_bootstrap(
@@ -69,7 +92,6 @@ rust_stdlib_filegroup(
     }}),
 )
 """.format(
-        toolchain_defs_bzl = Label("//toolchains:defs.bzl"),
         toolchain_is_bootstrap = Label("//toolchains:is_bootstrap"),
         stdlib_target = repository_ctx.attr.stdlib_target,
     )
@@ -107,6 +129,7 @@ toolchain(
         {exec_constraints}
     ],
     target_compatible_with = [
+        ":toolchain",
         {target_constraints}
     ],
     toolchain = "rust_toolchain_{index}",
@@ -119,6 +142,7 @@ toolchain(
         {exec_constraints}
     ],
     target_compatible_with = [
+        ":toolchain",
         {exec_constraints}
     ],
     toolchain = ":rust_toolchain_{index}",
@@ -149,6 +173,7 @@ toolchain_repository = repository_rule(
         "stdlib_target": attr.string(mandatory = True),
         "target_platform": attr.label(mandatory = True),
         "toolchain": attr.string(mandatory = True),
+        "toolchain_constraint": attr.label(),
     },
 )
 
@@ -163,6 +188,7 @@ def _toolchain_rust_impl(module_ctx):
                 fail("Unsupported Rust version '%s' for target '%s'." % (toolchain.version, toolchain.target))
             toolchains[toolchain.name] = struct(
                 edition = toolchain.edition,
+                toolchain_constraint = toolchain.toolchain_constraint,
                 data = _data[toolchain.target][toolchain.version],
             )
     all_repositories = {toolchain.data["repository"]: True for toolchain in toolchains.values()}.keys()
@@ -197,6 +223,7 @@ def _toolchain_rust_impl(module_ctx):
             toolchain = "{}_toolchain".format(repository_name),
             stdlib_target = "{}_stdlib_target".format(repository_name),
             edition = toolchain.edition,
+            toolchain_constraint = toolchain.toolchain_constraint,
         )
 
     repository = _repositories["esp-rust-1.92.0"]
@@ -226,6 +253,7 @@ toolchain_rust = module_extension(
                 "edition": attr.string(mandatory = True),
                 "name": attr.string(mandatory = True),
                 "target": attr.string(values = _data.keys(), mandatory = True),
+                "toolchain_constraint": attr.label(doc = "Defines the constraint to select the toolchain."),
                 "version": attr.string(values = _ALL_VERSIONS, mandatory = True),
             },
         ),

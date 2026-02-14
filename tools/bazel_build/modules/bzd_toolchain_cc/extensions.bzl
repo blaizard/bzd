@@ -22,29 +22,28 @@ def _make_configs(name, version):
     return configs
 
 def _toolchain_repository_impl(repository_ctx):
-    build_content = """# ---- Compiler constraint value
+    build_content = """# ---- Toolchain constraint value.
 """
 
     # Generate the constraint value for the toolchain.
-    if repository_ctx.attr.default:
+    if repository_ctx.attr.toolchain_constraint:
         build_content += """
 alias(
     name = "toolchain",
-    actual = "@bzd_platforms//toolchain:default",
+    actual = "{toolchain_constraint}",
     visibility = ["//visibility:public"],
 )
-"""
+""".format(toolchain_constraint = repository_ctx.attr.toolchain_constraint)
     else:
         build_content += """
 constraint_value(
     name = "toolchain",
-    constraint_setting = "@bzd_platforms//toolchain:toolchain",
+    constraint_setting = "@bzd_platforms//toolchain",
     visibility = ["//visibility:public"],
 )
 """
 
     build_content += """
-
 platform(
     name = "platform",
     parents = [
@@ -56,7 +55,7 @@ platform(
     visibility = ["//visibility:public"],
 )
 
-# ---- Toolchains (CC & Binary)
+# ---- Toolchains (CC & Binary & Test)
 """
 
     # Add the cc and binary toolchains.
@@ -154,9 +153,9 @@ config_setting(
 toolchain_repository = repository_rule(
     implementation = _toolchain_repository_impl,
     attrs = {
-        "default": attr.bool(mandatory = True),
         "extra": attr.string(),
         "repo_name": attr.string(mandatory = True),
+        "toolchain_constraint": attr.label(),
         "version": attr.string(values = _repositories.keys(), mandatory = True),
     },
 )
@@ -171,7 +170,7 @@ def _toolchain_cc_impl(module_ctx):
                 fail("A toolchain with the name '{}' already exists.".format(toolchain.name))
             configs[toolchain.name] = struct(
                 version = toolchain.version,
-                default = toolchain.default,
+                toolchain_constraint = toolchain.toolchain_constraint,
             )
 
     fragments = {}
@@ -214,7 +213,7 @@ alias(
             name = name,
             repo_name = name,
             version = toolchain.version,
-            default = toolchain.default,
+            toolchain_constraint = toolchain.toolchain_constraint,
             extra = extra,
         )
 
@@ -223,8 +222,8 @@ toolchain_cc = module_extension(
     tag_classes = {
         "toolchain": tag_class(
             attrs = {
-                "default": attr.bool(default = False),
                 "name": attr.string(mandatory = True),
+                "toolchain_constraint": attr.label(doc = "Defines the constraint to select the toolchain."),
                 "version": attr.string(values = _repositories.keys(), mandatory = True),
             },
         ),

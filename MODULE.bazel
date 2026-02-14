@@ -8,6 +8,7 @@ bazel_dep(name = "bzd_bdl", version = "1.0")
 bazel_dep(name = "bzd_coverage", version = "1.0")
 bazel_dep(name = "bzd_rules_doc", version = "1.0")
 bazel_dep(name = "bzd_toolchain_cc", version = "1.0")
+bazel_dep(name = "bzd_toolchain_rust", version = "1.0")
 bazel_dep(name = "bzd_rules_nodejs", version = "1.0")
 bazel_dep(name = "bzd_platforms", version = "1.0")
 bazel_dep(name = "bzd_dns", version = "1.0")
@@ -34,6 +35,7 @@ bazel_dep(name = "rules_pkg", version = "1.1.0")
     "bzd_coverage",
     "bzd_rules_doc",
     "bzd_toolchain_cc",
+    "bzd_toolchain_rust",
     "bzd_rules_nodejs",
     "bzd_rules_oci",
     "bzd_bundle",
@@ -71,7 +73,7 @@ use_repo(pip, "pip")
 toolchain_cc = use_extension("@bzd_toolchain_cc//:extensions.bzl", "toolchain_cc")
 toolchain_cc.toolchain(
     name = "clang",
-    default = True,
+    toolchain_constraint = "@bzd_platforms//toolchain:default",
     version = "clang_19.1.7",
 )
 use_repo(toolchain_cc, "clang")
@@ -101,10 +103,6 @@ toolchain_cc.toolchain(
 use_repo(toolchain_cc, "gcc")
 
 register_toolchains("@gcc//:all")
-
-# ESP IDF SDK
-
-include("//cc/libs/esp_idf:esp_idf.MODULE.bazel")
 
 # Bdl
 
@@ -137,14 +135,35 @@ use_repo(requirements_nodejs, "nodejs_deps")
 
 # Rust
 
+RUST_EDITION = "2024"
+
+RUST_VERSION = "1.92.0"
+
+toolchain_rust = use_extension("@bzd_toolchain_rust//:extensions.bzl", "toolchain_rust")
+toolchain_rust.toolchain(
+    name = "esp32_rust",
+    edition = RUST_EDITION,
+    target = "esp32-xtensa_lx6",
+    toolchain_constraint = "@esp32//:toolchain",
+    version = RUST_VERSION,
+)
+use_repo(toolchain_rust, "esp32_rust")
+
+register_toolchains("@esp32_rust//:all")
+
 rust = use_extension("@rules_rust//rust:extensions.bzl", "rust")
 rust.toolchain(
-    edition = "2024",
-    versions = ["1.93.0"],
+    edition = RUST_EDITION,
+    versions = [RUST_VERSION],
 )
 use_repo(rust, "rust_toolchains")
 
 register_toolchains("@rust_toolchains//:all")
+
+# ESP SDK
+
+include("//cc/libs/esp_idf:esp_idf.MODULE.bazel")
+include("//rust/libs/esp_hal:esp_hal.MODULE.bazel")
 
 # Docker
 
