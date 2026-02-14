@@ -22,6 +22,7 @@ def _make_configs(name, version):
     return configs
 
 def _toolchain_repository_impl(repository_ctx):
+    is_default_toolchain = repository_ctx.attr.toolchain_constraint == Label("@bzd_platforms//toolchain:default")
     build_content = """# ---- Toolchain constraint value.
 """
 
@@ -65,6 +66,7 @@ platform(
         execution_constraints = constraints_from_platform_name(config.execution)
         target_constraints = constraints_from_platform_name(config.target)
         targets[config.target] = target_constraints
+        extra_target_constraints = [] if is_default_toolchain else [":toolchain"]
 
         build_content += """
 # -------- {comment}
@@ -75,7 +77,6 @@ toolchain(
         {execution_constraints}
     ],
     target_compatible_with = [
-        ":toolchain",
         {target_constraints}
     ],
     toolchain = "@{repo_name}//:cc_toolchain",
@@ -88,7 +89,6 @@ toolchain(
         {execution_constraints}
     ],
     target_compatible_with = [
-        ":toolchain",
         {target_constraints}
     ],
     toolchain = "@{repo_name}//:binary_toolchain",
@@ -101,7 +101,6 @@ toolchain(
         {execution_constraints}
     ],
     target_compatible_with = [
-        ":toolchain",
         {target_constraints}
     ],
     toolchain = "@bazel_tools//tools/test:empty_toolchain",
@@ -112,7 +111,7 @@ toolchain(
             name = "{}-{}".format(config.execution, config.target),
             repo_name = repo_name,
             execution_constraints = "\n".join(["\"{}\",".format(c) for c in execution_constraints]),
-            target_constraints = "\n".join(["\"{}\",".format(c) for c in target_constraints]),
+            target_constraints = "\n".join(["\"{}\",".format(c) for c in target_constraints + extra_target_constraints]),
         )
 
     build_content += "\n# ---- Platforms & Configs\n"

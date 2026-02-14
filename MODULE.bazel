@@ -72,15 +72,6 @@ use_repo(pip, "pip")
 
 toolchain_cc = use_extension("@bzd_toolchain_cc//:extensions.bzl", "toolchain_cc")
 toolchain_cc.toolchain(
-    name = "clang",
-    toolchain_constraint = "@bzd_platforms//toolchain:default",
-    version = "clang_19.1.7",
-)
-use_repo(toolchain_cc, "clang")
-
-register_toolchains("@clang//:all")
-
-toolchain_cc.toolchain(
     name = "esp32",
     version = "esp32_gcc_14.2.0",
 )
@@ -103,6 +94,16 @@ toolchain_cc.toolchain(
 use_repo(toolchain_cc, "gcc")
 
 register_toolchains("@gcc//:all")
+
+# Register the default toolchain last to have the least priority.
+toolchain_cc.toolchain(
+    name = "clang",
+    toolchain_constraint = "@bzd_platforms//toolchain:default",
+    version = "clang_19.1.7",
+)
+use_repo(toolchain_cc, "clang")
+
+register_toolchains("@clang//:all")
 
 # Bdl
 
@@ -158,6 +159,7 @@ rust.toolchain(
 )
 use_repo(rust, "rust_toolchains")
 
+# Register the default toolchain last to have the least priority.
 register_toolchains("@rust_toolchains//:all")
 
 # ESP SDK

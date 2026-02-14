@@ -40,7 +40,11 @@ _data = {
     },
 }
 
+def _constraints_to_string(constraints):
+    return ", ".join(["\"{}\"".format(constraint) for constraint in constraints])
+
 def _toolchain_repository_impl(repository_ctx):
+    is_default_toolchain = repository_ctx.attr.toolchain_constraint == Label("@bzd_platforms//toolchain:default")
     build_content = """
 load("@rules_rust//rust:toolchain.bzl", "rust_toolchain", "rust_stdlib_filegroup")
 load("{toolchain_defs_bzl}", "use_bootstrap", "toolchain_sysroot", "config_settings_to_rust_triple")
@@ -97,6 +101,7 @@ rust_stdlib_filegroup(
     )
 
     target_constraints = constraints_from_platform_name(repository_ctx.attr.target_platform.name)
+    extra_target_constraints = [] if is_default_toolchain else [":toolchain"]
     for index, exec_platform in enumerate(repository_ctx.attr.exec_platforms):
         exec_constraints = constraints_from_platform_name(exec_platform.name)
 
@@ -129,7 +134,6 @@ toolchain(
         {exec_constraints}
     ],
     target_compatible_with = [
-        ":toolchain",
         {target_constraints}
     ],
     toolchain = "rust_toolchain_{index}",
@@ -154,8 +158,8 @@ toolchain(
             exec_triple = config_settings_to_rust_triple[exec_platform],
             exec_platform = exec_platform,
             target_platform = repository_ctx.attr.target_platform,
-            target_constraints = ", ".join(["\"{}\"".format(constraint) for constraint in target_constraints]),
-            exec_constraints = ", ".join(["\"{}\"".format(constraint) for constraint in exec_constraints]),
+            target_constraints = _constraints_to_string(target_constraints + extra_target_constraints),
+            exec_constraints = _constraints_to_string(exec_constraints),
         )
 
     repository_ctx.file(
