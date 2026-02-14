@@ -52,6 +52,8 @@ jobs:
                   ./tools/bazel clean --expunge
                   ./bin/bzd-node timeit --path github/normal_esp32_prod/command-0 \
                   ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=esp32 --config=prod --config=cc --platform_suffix=esp32-prod
+                  ./bin/bzd-node timeit --path github/normal_esp32_prod/command-1 \
+                  ./tools/bazel test //rust/... --output_groups=+metadata --config=esp32 --config=prod --platform_suffix=esp32-prod
 
             - name: "[normal] esp32s3 prod"
               run: |

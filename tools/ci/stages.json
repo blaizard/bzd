@@ -32,7 +32,8 @@
         },
         {
             "commands": [
-                "./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=esp32 --config=prod --config=cc --platform_suffix=esp32-prod"
+                "./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=esp32 --config=prod --config=cc --platform_suffix=esp32-prod",
+                "./tools/bazel test //rust/... --output_groups=+metadata --config=esp32 --config=prod --platform_suffix=esp32-prod"
             ],
             "name": "esp32 prod",
             "tags": [
