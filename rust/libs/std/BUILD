@@ -5,4 +5,5 @@ rust_library_group(
     target_compatible_with = [
         "@bzd_platforms//al:linux",
     ],
+    visibility = ["//visibility:public"],
 )
