@@ -5,6 +5,9 @@ rust_library(
     srcs = [
         "lib.rs",
     ],
+    deps = [
+        "//rust/libs/std",
+    ],
 )
 
 rust_test(

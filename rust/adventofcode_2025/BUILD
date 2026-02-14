@@ -3,6 +3,7 @@ load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library", "rust_test")
 rust_library(
     name = "utils",
     srcs = ["src/utils.rs"],
+    deps = ["//rust/libs/std"],
 )
 
 [rust_binary(

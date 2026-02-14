@@ -7,7 +7,9 @@ struct Config {
 }
 
 impl Config {
-    fn build(args: &[String]) -> Result<Config, String> {
+    fn build<T: Iterator<Item = String>>(args: T) -> Result<Config, String> {
+        let args: Vec<String> = args.collect();
+
         if args.len() != 3 {
             return Err(format!(
                 "Wrong number of arguments, provided {}; Usage: grep <query> <file_path>",
@@ -33,8 +35,7 @@ fn run(config: Config) -> Result<(), String> {
 }
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
-    let config = Config::build(&args).expect("Parsing argument failed");
+    let config = Config::build(env::args()).expect("Parsing argument failed");
 
     println!(
         "Searching for '{}' in file '{}'",
