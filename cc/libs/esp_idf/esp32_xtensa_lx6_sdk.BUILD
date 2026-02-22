@@ -2,6 +2,10 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 
 package(default_visibility = ["//visibility:public"])
 
+exports_files(glob([
+    "bin/*",
+]))
+
 cc_library(
 	name = "sdk",
 	hdrs = glob([

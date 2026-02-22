@@ -2,5 +2,7 @@
 **/requirements.json
 **/BUILD
 **/*.bazel
+**/*.bzl
 BUILD
 *.bazel
+*.bzl
