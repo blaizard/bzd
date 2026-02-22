@@ -24,6 +24,7 @@ rust_library(
         "unstable",
         "no_std",
         "no-asm",
+        "mem"
     ],
     crate_name = "compiler_builtins",
     #edition = "2024",
@@ -47,7 +48,7 @@ rust_library(
     ]),
     crate_features = [
         # "stdsimd",
-        # "no_std",
+        "no_std",
     ],
     crate_name = "core",
     #edition = "2024",

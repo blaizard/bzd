@@ -12,9 +12,9 @@ crates_esp32.spec(
 )
 crates_esp32.spec(
     features = [
+        "rt",
         "esp32",
         "unstable",
-        "rt",
     ],
     package = "esp-hal",
     version = "1.0.0",
