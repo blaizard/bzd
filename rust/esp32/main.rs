@@ -4,7 +4,7 @@
 use esp_backtrace as _;
 use esp_hal::{
     clock::CpuClock,
-    gpio::{Io, Level, Output, OutputConfig},
+    gpio::{Level, Output, OutputConfig},
     main,
     time::{Duration, Instant},
 }; // Forces the create to be linked
@@ -24,7 +24,10 @@ fn main() -> ! {
     // Set GPIO0 as an output, and set its state high initially.
     let mut led = Output::new(peripherals.GPIO0, Level::High, OutputConfig::default());
 
+    esp_println::println!("Init!");
+
     loop {
+        esp_println::print!(".");
         led.toggle();
         // Wait for half a second
         let delay_start = Instant::now();

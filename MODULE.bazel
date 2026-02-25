@@ -75,7 +75,7 @@ toolchain_cc.toolchain(
     name = "esp32",
     version = "esp32_gcc_14.2.0",
 )
-use_repo(toolchain_cc, "esp32")
+use_repo(toolchain_cc, "esp32", "esp32_qemu", "esptool")
 
 register_toolchains("@esp32//:all")
 
@@ -158,6 +158,20 @@ rust.toolchain(
     versions = [RUST_VERSION],
 )
 use_repo(rust, "rust_toolchains")
+
+crates = use_extension("@rules_rust//crate_universe:extension.bzl", "crate")
+crates.from_specs(
+    name = "crates",
+)
+crates.spec(
+    package = "syn",
+    version = "2.0",
+)
+crates.spec(
+    package = "quote",
+    version = "1.0",
+)
+use_repo(crates, "crates")
 
 # Register the default toolchain last to have the least priority.
 register_toolchains("@rust_toolchains//:all")
