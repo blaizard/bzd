@@ -24,7 +24,7 @@ class Data:
 			current = current.setdefault(name, {})
 		current = current.setdefault("_", {})
 		current.update(data)
-		return current
+		return current # type: ignore
 
 	def toJson(self) -> str:
 		return json.dumps(self.data, sort_keys=True, indent=4)
@@ -59,7 +59,7 @@ class Visitor:
 		param: typing.Dict[str, str] = {}
 		for child in element:
 			if child.tag in visitors:
-				param.update(visitors[child.tag](child, child.attrib))  #type: ignore
+				param.update(visitors[child.tag](child, child.attrib))
 		return param
 
 	def visitTemplateParamList(self, element: Element, data: Data) -> Json:
