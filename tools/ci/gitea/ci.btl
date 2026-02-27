@@ -2,8 +2,8 @@ name: CI
 
 on:
     workflow_dispatch: # allows manual triggering
-    #schedule:
-    #    - cron: "0 2 * * *" # runs daily at 02:00
+    schedule:
+        - cron: "0 2 * * *" # runs daily at 02:00
 
 jobs:
     build:

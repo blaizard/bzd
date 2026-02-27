@@ -34,6 +34,11 @@ common --reuse_sandbox_directories
 # Local copy of all dependencies
 common --vendor_dir=vendor_src
 
+# This keeps a bit of resources when building locally. More importantly, it prevents the local execution
+# from being starved of resources when running alongside a remote execution, which can cause timeouts and other issues.
+build --local_resources=cpu=HOST_CPUS*.9
+build --local_resources=memory=HOST_RAM*.9
+
 # Global test specific options
 test --test_output=errors
 test --verbose_failures
@@ -68,7 +73,6 @@ build:remote --define=EXECUTOR=remote
 
 # local
 build:local --remote_executor=
-build:local --jobs=HOST_CPUS
 
 # Select only C++ targets
 build --build_tag_filters=-cc-coverage
