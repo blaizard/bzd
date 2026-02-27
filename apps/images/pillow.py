@@ -23,8 +23,8 @@ class ConverterPillow(Converter):
 					return ConversionResult.skipped
 
 			exif = image.info.get("exif")
-			image = ImageOps.exif_transpose(image)
-			image = image.resize((image.width, image.height), Image.Resampling.LANCZOS)
+			image = ImageOps.exif_transpose(image)  # type: ignore
+			image = image.resize((image.width, image.height), Image.Resampling.LANCZOS)  # type: ignore
 
 			image.save(
 			    output,

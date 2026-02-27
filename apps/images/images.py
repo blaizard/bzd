@@ -20,7 +20,7 @@ class Converters:
 
 	@cached_property
 	def allExtensions(self) -> typing.Set[str]:
-		return {value for converter in self.converters for value in converter.extensions}
+		return {value for converter in self.converters for value in converter.extensions}  # type: ignore
 
 	def process(self, path: pathlib.Path, outputFormat: OutputFormat) -> None:
 		if args.path.is_file():
@@ -30,7 +30,7 @@ class Converters:
 				for name in sorted(files):
 					self._processFile(root / name, outputFormat=outputFormat)
 
-	def _getOutput(self, path: pathlib.Path, outputFormat: OutputFormat) -> typing.Optional[pathlib.Path]:
+	def _getOutput(self, path: pathlib.Path, outputFormat: OutputFormat) -> typing.Tuple[pathlib.Path, pathlib.Path]:
 
 		if outputFormat == OutputFormat.JPEG:
 			output = path.with_suffix(".jpg")
@@ -49,18 +49,16 @@ class Converters:
 		fileSize = path.stat().st_size
 		return f"{fileSize / (1024 * 1024):.2f}MB"
 
-	def _run(self, commands: typing.Sequence[str]) -> bool:
+	def _run(self, commands: typing.Sequence[str]) -> typing.Optional[str]:
 		result = subprocess.run(commands, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 		if result.returncode != 0:
 			print(f"Command {' '.join(commands)} failed:", result.stdout)
-			return False
+			return None
 		return result.stdout
 
 	def _mergeExif(self, path: pathlib.Path) -> None:
 		"""Read and merge sidecar exif attributes to the image."""
 
-		processed = []
-		json = {}
 		for extensions in {".xmp", ".XMP"}:
 			file = path.with_name(path.name + extensions)
 			if not file.is_file():
@@ -104,7 +102,7 @@ class Converters:
 		oldestTimestamp = int(oldestDate.timestamp())
 		os.utime(path, (oldestTimestamp, oldestTimestamp))
 
-	def _moveFiles(self, original: pathlib.Path, file: pathlib.Path, output: pathlib.Path) -> typing.List[pathlib.Path]:
+	def _moveFiles(self, original: pathlib.Path, file: pathlib.Path, output: pathlib.Path) -> None:
 		"""This function moves the files including their sidecar."""
 
 		originalTimes = (original.stat().st_atime, original.stat().st_mtime)
@@ -136,12 +134,13 @@ class Converters:
 		output, outputTemporary = self._getOutput(path, outputFormat)
 
 		for converter in self.converters:
-			if extension not in converter.extensions:
+			if extension not in converter.extensions:  # type: ignore
 				continue
 			print(f"Converting {path} ({self._sizeToString(path)}) with {converter.__class__.__name__}...")
 
 			try:
-				result = converter.tryConvert(path=path, outputFormat=OutputFormat.JPEG, output=outputTemporary)
+				result = converter.tryConvert(  # type: ignore
+				    path=path, outputFormat=OutputFormat.JPEG, output=outputTemporary)
 
 			except Exception as e:
 				print(f" -> FAILED: {str(e)}")
