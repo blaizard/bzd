@@ -4,7 +4,7 @@
 use main as _;
 
 #[cfg(test)]
-#[bzd::test]
+#[bzd_test::test]
 mod tests {
     #[test]
     fn test_dummy() {

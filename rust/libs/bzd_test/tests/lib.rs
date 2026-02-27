@@ -40,7 +40,7 @@ macro_rules! bzd_assert_eq {
 #[cfg(test)]
 #[bzd_test::test]
 mod tests {
-    use crate::TestError;
+    use super::TestError;
     use bzd_test::tests::get_tests;
 
     #[test]

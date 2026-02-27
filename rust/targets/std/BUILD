@@ -6,4 +6,7 @@ rust_library(
         "main.rs",
     ],
     visibility = ["//visibility:public"],
+    deps = [
+        "//rust/libs/std",
+    ],
 )
