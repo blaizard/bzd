@@ -353,6 +353,8 @@ services:
     image: bzd/{self.imageName}
     container_name: {self.imageName}
     hostname: {self.imageName}
+    extra_hosts:
+      - "{self.imageName}:127.0.0.1"
     network_mode: host
     init: true
     tty: true
