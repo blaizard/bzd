@@ -61,7 +61,7 @@ class DriverSelenium:
 			# Set the zoom level to ensure the text is readable (only if needed)
 			# Only do it if we zoom out as it doesn't seem to work for zooming in.
 			if zoom > 1:
-				self.driver.execute_script(f"document.body.style.zoom = '{zoom}'")  # type: ignore
+				self.driver.execute_script(f"document.body.style.zoom = '{zoom}'")
 
 			retry = 0
 			while True:
@@ -70,7 +70,7 @@ class DriverSelenium:
 				self.driver.set_window_size(10, 10)
 
 				# We now have the actual size of the document, with the proper ratio.
-				width, height = self.driver.execute_script(  # type: ignore
+				width, height = self.driver.execute_script(
 				    "return [document.documentElement.scrollWidth, document.documentElement.scrollHeight];")
 				self.driver.set_window_size(width, height)
 

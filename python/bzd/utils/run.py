@@ -44,14 +44,14 @@ class ExecuteResultStreamWriter:
 			self._addBuffer(True, data)
 			if self.stdout is not False:
 				write = ExecuteResultStreamWriter._printToStdout if isinstance(self.stdout, bool) else self.stdout.write
-				write(data.decode(errors="ignore"))  # type: ignore
+				write(data.decode(errors="ignore"))
 
 	def addStderr(self, data: bytes) -> None:
 		if data != b"":
 			self._addBuffer(False, data)
 			if self.stderr is not False:
 				write = ExecuteResultStreamWriter._printToStderr if isinstance(self.stderr, bool) else self.stderr.write
-				write(data.decode(errors="ignore"))  # type: ignore
+				write(data.decode(errors="ignore"))
 
 
 class ExecuteResult:

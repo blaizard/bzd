@@ -47,6 +47,8 @@ idna==3.11
     #   trio
 librt==0.8.1
     # via mypy
+lxml==6.0.2
+    # via -r tools/python/requirements.in
 multitasking==0.0.12
     # via yfinance
 mypy==1.19.1

@@ -16,3 +16,4 @@ rarfile
 rawpy
 pymupdf==1.26.0
 python-dateutil
+lxml
