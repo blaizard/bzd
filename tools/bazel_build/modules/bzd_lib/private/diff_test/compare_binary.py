@@ -268,7 +268,7 @@ class Diff:
 		if not delta.isEmpty:
 			visitor(delta)
 
-	def lcs(self) -> bytes:
+	def lcs(self) -> bytearray:
 		"""Finds a common subsequence of two bytes sequences using a greedy approach.
 		Note: This does not guarantee the *longest* common subsequence.
 

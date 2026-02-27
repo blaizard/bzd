@@ -20,7 +20,7 @@ class Config:
 		self.data: InternalFragmentList = []
 		self.dataAsDict: typing.Dict[str, typing.Any] = {}
 
-	def addKey(self, key: str, value: typing.Any, source: str, failOnConflict: bool) -> None:
+	def addKey(self, key: typing.Optional[str], value: typing.Any, source: str, failOnConflict: bool) -> None:
 		data = makeDictionary(key, value)
 		self._addData(data, source, failOnConflict)
 		self.data.append((key, value, source))
