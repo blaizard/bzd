@@ -22,7 +22,6 @@ crates_esp32.spec(
 crates_esp32.spec(
     features = [
         "esp32",
-        "panic-handler",
         "println",
     ],
     package = "esp-backtrace",

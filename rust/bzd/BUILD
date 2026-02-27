@@ -7,6 +7,6 @@ rust_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//rust/bzd/test",
+        "//rust/bzd/base",
     ],
 )

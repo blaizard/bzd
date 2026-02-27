@@ -3,10 +3,10 @@ unsafe extern "Rust" {
 }
 
 #[unsafe(no_mangle)]
-fn main() -> i32 {
+fn main() {
     println!("Main started!");
     let _ = unsafe { run_executor() };
     println!("Main stopped!");
 
-    0
+    std::process::exit(0);
 }

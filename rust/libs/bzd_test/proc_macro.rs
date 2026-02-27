@@ -9,6 +9,11 @@ pub fn test(_args: TokenStream, input: TokenStream) -> TokenStream {
     let mut item_mod = parse_macro_input!(input as ItemMod);
     let mut registrations = Vec::new();
 
+    // Make sure the main module is linked.
+    registrations.push(quote! {
+        use main as _;
+    });
+
     if let Some((_, content)) = &mut item_mod.content {
         for item in content.iter_mut() {
             if let Item::Fn(func) = item {
@@ -20,16 +25,19 @@ pub fn test(_args: TokenStream, input: TokenStream) -> TokenStream {
                     // Remove the #[test] attribute to prevent the default test runner from picking it up.
                     func.attrs.remove(index);
 
+                    // Check for #[ignore]
+                    let is_ignored = func.attrs.iter().any(|attr| attr.path().is_ident("ignore"));
+
                     let test_name = &func.sig.ident;
                     let reg_name = format_ident!("__REG_{}", test_name.to_string().to_uppercase());
-                    //panic!("hello {}", test_name);
 
                     registrations.push(quote! {
                         #[used]
-                        #[unsafe(link_section = "bzd_tests_data")]
-                        static #reg_name: ::bzd::tests::TestMetadata = ::bzd::tests::TestMetadata {
+                        #[unsafe(link_section = "bzd_test_data")]
+                        static #reg_name: ::bzd_test::tests::TestMetadata = ::bzd_test::tests::TestMetadata {
                             name: stringify!(#test_name),
                             test_fn: #test_name,
+                            ignore: #is_ignored,
                         };
                     });
                 }

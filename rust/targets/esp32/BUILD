@@ -5,14 +5,9 @@ rust_library(
     srcs = [
         "main.rs",
     ],
-    rustc_flags = [
-        "-C",
-        "link-arg=-Wl,--undefined=main",
-        "-C",
-        "link-arg=-Wl,--undefined=rust_begin_unwind",
-    ],
     visibility = ["//visibility:public"],
     deps = [
+        "//rust/bzd",
         "//rust/libs/esp_hal",
     ],
     alwayslink = True,

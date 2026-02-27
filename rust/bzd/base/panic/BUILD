@@ -1,9 +1,9 @@
 load("@rules_rust//rust:defs.bzl", "rust_library")
 
 rust_library(
-    name = "main",
+    name = "panic",
     srcs = [
-        "main.rs",
+        "panic.rs",
     ],
     visibility = ["//visibility:public"],
 )

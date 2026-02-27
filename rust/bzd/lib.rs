@@ -1,4 +1,5 @@
 #![no_std]
 
-pub use test::test;
-pub use test::tests;
+pub mod base {
+    pub use base::*;
+}

@@ -8,6 +8,7 @@ def rust_test(name, deps = None, **kwargs):
         use_libtest_harness = False,
         deps = (deps or []) + [
             "//rust/targets:main",
+            "//rust/libs/bzd_test",
         ],
         **kwargs
     )

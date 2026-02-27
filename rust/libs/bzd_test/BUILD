@@ -17,12 +17,12 @@ rust_proc_macro(
 )
 
 rust_library(
-    name = "test",
+    name = "bzd_test",
     srcs = [
-        "test.rs",
+        "lib.rs",
     ],
     proc_macro_deps = [
         ":proc_macro",
     ],
-    visibility = ["//rust/bzd:__pkg__"],
+    visibility = ["//visibility:public"],
 )
