@@ -1,5 +1,5 @@
 load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library")
-load("//rust/bzd/test:defs.bzl", "rust_test")
+load("//rust/libs/bzd_test:defs.bzl", "rust_test")
 
 rust_binary(
     name = "esp32",
