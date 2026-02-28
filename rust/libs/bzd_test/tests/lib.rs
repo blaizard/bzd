@@ -44,6 +44,7 @@ mod tests {
     use bzd_test::tests::get_tests;
 
     #[test]
+    #[allow(clippy::eq_op)]
     fn test_success() {
         bzd_assert_eq!(1, 1).unwrap();
 
