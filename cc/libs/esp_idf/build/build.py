@@ -147,6 +147,7 @@ if __name__ == "__main__":
 		print(f"Processing entry '{name}'...")
 
 		gcc = CommandExtractorGcc(cwd=project / "build")
+		assert entry.command is not None
 		gcc.parse(entry.command)
 		result = gcc.values(
 		    exclude={

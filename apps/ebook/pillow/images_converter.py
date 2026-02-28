@@ -35,7 +35,7 @@ class ImagesConverter(ActionInterface):
 		images = []
 		for index, path in enumerate(provider.images):
 			with Image.open(path) as image:
-				image = image.convert("RGB")
+				image = image.convert("RGB")  # type: ignore
 				scale = self.scale or 1.0
 				comments: typing.List[str] = []
 

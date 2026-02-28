@@ -21,16 +21,16 @@ from apps.ebook.utils import sizeToString, percentToString
 
 
 class FlowSchemaPdf(FlowEnum):
-	epub: FlowSchemaType = ["removeDRM", "epub", "imagesConverter", "imagesToPdf"]
-	cbz: FlowSchemaType = ["cbz", "imagesConverter", "imagesToPdf"]
-	cbr: FlowSchemaType = ["cbr", "imagesConverter", "imagesToPdf"]
-	pdf: FlowSchemaType = ["pdfToImages", "imagesConverter", "imagesToPdf"]
-	auto: FlowSchemaType = ["discover"]
+	epub = ["removeDRM", "epub", "imagesConverter", "imagesToPdf"]
+	cbz = ["cbz", "imagesConverter", "imagesToPdf"]
+	cbr = ["cbr", "imagesConverter", "imagesToPdf"]
+	pdf = ["pdfToImages", "imagesConverter", "imagesToPdf"]
+	auto = ["discover"]
 
 
 class FlowSchemaCover(FlowEnum):
-	pdf: FlowSchemaType = ["pdfToCoverImage", "imagesToCover"]
-	auto: FlowSchemaType = ["discover"]
+	pdf = ["pdfToCoverImage", "imagesToCover"]
+	auto = ["discover"]
 
 
 flowSchemas = {
@@ -181,10 +181,10 @@ if __name__ == "__main__":
 
 			# Run the flow in isolation, this prevents any memory leaks/hogs which becomes problematic with batch runs.
 			p = multiprocessing.Process(target=runFlow,
-			                            args=(provider, FlowRegistry(schema=flowSchemas[args.action], actions=actions),
-			                                  pathlib.Path(directory.name)))  # type: ignore
+			                            args=(provider, FlowRegistry(schema=flowSchemas[args.action],
+			                                                         actions=actions), pathlib.Path(directory.name)))
 			p.start()
 			p.join()
 
 		finally:
-			directory.cleanup()  # type: ignore
+			directory.cleanup()

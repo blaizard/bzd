@@ -28,7 +28,7 @@ class ImagesToCover(ActionInterface):
 		assert len(provider.images) >= 1, "The provider should contain at least 1 image."
 		source = provider.images[0]
 		with Image.open(source) as image:
-			image = image.convert("RGB")
+			image = image.convert("RGB")  # type: ignore
 			scale = math.sqrt(self.area / (image.width * image.height))
 			width = int(image.width * scale)
 			height = int(image.height * scale)

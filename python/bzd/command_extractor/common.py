@@ -67,7 +67,7 @@ class ItemFactory:
 
 	def make(self, Kind: typing.Type[T], *args: typing.Any, **kwargs: typing.Any) -> T:
 		assert issubclass(Kind, Item), f"The type '{Kind}' must be a subclass of 'Item'."
-		return typing.cast(T, Kind(self.original, *args, **kwargs))
+		return Kind(self.original, *args, **kwargs)
 
 
 @dataclasses.dataclass
