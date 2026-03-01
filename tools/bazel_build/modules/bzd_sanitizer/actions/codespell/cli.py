@@ -16,13 +16,14 @@ def stdoutParser(stdout: str, workspace: pathlib.Path) -> typing.Generator[Outpu
 			yield OutputWithPath(path=pathlib.Path(m.group(1)), output=line)
 
 
-def workload(args: typing.Tuple[pathlib.Path, typing.Sequence[pathlib.Path], bool, str, str],
-             stdout: typing.TextIO) -> bool:
-	workspace, paths, check, codespell, config = args
+def workload(args: typing.Tuple[pathlib.Path, typing.Sequence[pathlib.Path], bool, str, typing.Optional[pathlib.Path],
+                                typing.Optional[pathlib.Path]], stdout: typing.TextIO) -> bool:
+	workspace, paths, check, codespell, config, toml = args
 
 	params = []
 	params += [] if check else ["--write-changes"]
-	params += ["--config", config] if config else []
+	params += ["--config", str(config)] if config else []
+	params += ["--toml", str(toml)] if toml else []
 
 	result = localBazelBinary(
 	    codespell,
@@ -43,6 +44,11 @@ if __name__ == "__main__":
 	    type=pathlib.Path,
 	    help="The path of the configuration file for codespell.",
 	)
+	parser.add_argument(
+	    "--toml",
+	    type=pathlib.Path,
+	    help="The path of the pyproject.toml file for codespell.",
+	)
 	parser.add_argument("context", type=pathlib.Path, help="The context file path.")
 	args = parser.parse_args()
 
@@ -52,7 +58,8 @@ if __name__ == "__main__":
 	    stdoutParser=stdoutParser,
 	    args=(
 	        str(args.codespell),
-	        str(args.config),
+	        args.config,
+	        args.toml,
 	    ),
 	    excludeFile=".codespellignore",
 	)

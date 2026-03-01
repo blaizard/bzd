@@ -13,6 +13,13 @@ pub fn test(_args: TokenStream, input: TokenStream) -> TokenStream {
     registrations.push(quote! {
         use main as _;
     });
+    // Add the public interface to the test module.
+    registrations.push(quote! {
+        use ::bzd_test::public::*;
+    });
+    registrations.push(quote! {
+        use ::bzd_test::public::assert_eq;
+    });
 
     if let Some((_, content)) = &mut item_mod.content {
         for item in content.iter_mut() {

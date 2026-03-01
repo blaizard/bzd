@@ -65,3 +65,5 @@ module = [
     "pymupdf.*",
 ]
 ignore_errors = true
+
+[tool.codespell]

@@ -1,5 +1,4 @@
-load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library")
-load("//rust/libs/bzd_test:defs.bzl", "rust_test")
+load("@rules_rust//rust:defs.bzl", "rust_binary")
 
 rust_binary(
     name = "esp32",
@@ -9,21 +8,4 @@ rust_binary(
     deps = [
         "//rust/libs/esp_hal",
     ],
-)
-
-rust_library(
-    name = "lib",
-    srcs = [
-        "lib.rs",
-    ],
-    deps = [
-        "//rust/bzd",
-        "//rust/libs/esp_hal",
-        "//rust/targets:main",
-    ],
-)
-
-rust_test(
-    name = "test",
-    crate = "lib",
 )

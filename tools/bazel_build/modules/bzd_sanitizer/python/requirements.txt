@@ -8,7 +8,7 @@ black==24.8.0
     # via -r tools/bazel_build/modules/bzd_sanitizer/requirements.in
 click==8.1.7
     # via black
-codespell==2.3.0
+codespell==2.4.1
     # via -r tools/bazel_build/modules/bzd_sanitizer/requirements.in
 importlib-metadata==8.5.0
     # via yapf

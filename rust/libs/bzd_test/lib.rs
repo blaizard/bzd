@@ -1,17 +1,12 @@
 #![no_std]
 
+mod assertions;
+mod types;
+
 pub use proc_macro::test;
 
 pub mod tests {
-
-    #[repr(C)]
-    // Force the linker to start the struct on a 4-byte boundary, which is important on some architectures.
-    #[repr(align(4))]
-    pub struct TestMetadata {
-        pub name: &'static str,
-        pub test_fn: fn(),
-        pub ignore: bool,
-    }
+    pub use crate::types::TestMetadata;
 
     #[allow(improper_ctypes)]
     unsafe extern "C" {
@@ -30,6 +25,11 @@ pub mod tests {
     }
 }
 
+pub mod public {
+    pub use crate::assert_eq;
+    pub use crate::types::{TestError, TestResult};
+}
+
 #[unsafe(no_mangle)]
 pub fn run_executor() -> bool {
     let tests = tests::get_tests();
@@ -38,7 +38,10 @@ pub fn run_executor() -> bool {
         if test.ignore {
             continue;
         }
-        (test.test_fn)();
+        let result = (test.test_fn)();
+        if let Err(err) = result {
+            panic!("{}", err);
+        }
     }
 
     true

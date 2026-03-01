@@ -19,7 +19,9 @@ rust_proc_macro(
 rust_library(
     name = "bzd_test",
     srcs = [
+        "assertions.rs",
         "lib.rs",
+        "types.rs",
     ],
     proc_macro_deps = [
         ":proc_macro",

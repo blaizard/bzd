@@ -17,6 +17,16 @@ sh_binary_wrapper(
     visibility = ["//visibility:public"],
 )
 
+sh_binary_wrapper(
+    name = "codespell",
+    command = "{binary} --toml {config} $@",
+    locations = {
+        "@bzd_sanitizer//actions/codespell": "binary",
+        "pyproject.toml": "config",
+    },
+    visibility = ["//visibility:public"],
+)
+
 # bazel run //tools/python:requirements.update
 compile_pip_requirements(
     name = "requirements",
