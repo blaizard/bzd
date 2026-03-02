@@ -174,7 +174,6 @@ def _bzd_binary_generic(is_test):
         )) for name, data in library_extensions.items() if "binary" in data},
         toolchains = [
             "@rules_cc//cc:toolchain_type",
-            "@bzd_toolchain_cc//binary:toolchain_type",
         ],
         fragments = ["cpp"],
         cfg = transition_platform,

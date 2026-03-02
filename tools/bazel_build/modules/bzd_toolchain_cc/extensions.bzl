@@ -84,18 +84,6 @@ toolchain(
 )
 
 toolchain(
-    name = "binary-{name}",
-    exec_compatible_with = [
-        {execution_constraints}
-    ],
-    target_compatible_with = [
-        {target_constraints}
-    ],
-    toolchain = "@{repo_name}//:binary_toolchain",
-    toolchain_type = "@bzd_toolchain_cc//binary:toolchain_type",
-)
-
-toolchain(
     name = "test-{name}",
     exec_compatible_with = [
         {execution_constraints}

@@ -28,14 +28,6 @@ def _impl(repository_ctx):
         uniq = sets.to_list(sets.make(interfaces))
         loads.append("load(\"{}\", {})".format(repo, ", ".join(["\"{}\"".format(i) for i in uniq])))
 
-    # Build the binary toolchain arguments
-    binary_kwargs = []
-    binary_kwargs.append("build = [{}],".format(", ".join(["\"{}\"".format(build) for build in repository_ctx.attr.app_build])))
-    binary_kwargs.append("metadata = [{}],".format(", ".join(["\"{}\"".format(metadata) for metadata in repository_ctx.attr.app_metadata])))
-    if not repository_ctx.attr.app_executors:
-        fail("Toolchain is missing executors.")
-    binary_kwargs.append("executors = {},".format(repository_ctx.attr.app_executors))
-
     # Set the default values of the binaries
     binaries = {
         "ar": "/usr/bin/false",
@@ -62,7 +54,6 @@ def _impl(repository_ctx):
         "%{aliases}": "\n".join([alias_template.format(k, v) for k, v in aliases.items()]),
         "%{ar}": binaries["ar"],
         "%{as}": binaries["as"],
-        "%{binary_kwargs}": "\n".join(binary_kwargs),
         "%{builtin_include_directories}": "\n".join(["'{}',".format(t) for t in repository_ctx.attr.builtin_include_directories]),
         "%{cc}": binaries["cc"],
         "%{compile_dev_flags}": "\n".join(
@@ -218,11 +209,6 @@ def toolchain_maker(name, implementation, definition):
 
     else:
         fail("Unsupported toolchain type '{}'".format(implementation))
-
-    #native.register_toolchains(
-    #    "@{}//:toolchain".format(name),
-    #    "@{}//:binary_toolchain".format(name),
-    #)
 
 def toolchain_merge(data1, data2):
     """Merge 2 toolchain data entries into a new one.

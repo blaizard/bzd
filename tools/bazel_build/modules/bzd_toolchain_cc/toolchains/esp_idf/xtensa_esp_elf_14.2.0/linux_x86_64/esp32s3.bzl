@@ -1,8 +1,7 @@
 """Metadata for ESP32S3 toolchains."""
 
-load("//cc:toolchain.bzl", "toolchain_maker", "toolchain_merge")
+load("//cc:toolchain.bzl", "toolchain_maker")
 load("//toolchains/esp_idf:sdk/esp32s3.bzl", "sdk")
-load("//toolchains/esp_idf/app_binary:esp32s3.bzl", "app_binary")
 load("//toolchains/esp_idf/esptool:defs.bzl", "esptool")
 load("//toolchains/esp_idf/openocd:defs.bzl", "esp32_openocd")
 load("//toolchains/esp_idf/qemu:defs.bzl", "esp32_qemu")
@@ -20,7 +19,6 @@ def esp32s3_linux_x86_64(_module_ctx, name, use_fragment):
     use_fragment(esp32_qemu)
     use_fragment(esp32_openocd)
     use_fragment(sdk)
-    _app_binary_name, app_binary_toolchain_definition = use_fragment(app_binary)
 
     toolchain_definition = {
         "binaries": {
@@ -79,8 +77,6 @@ def esp32s3_linux_x86_64(_module_ctx, name, use_fragment):
             "https://data.blaizard.com/file/bzd/toolchains/cc/gcc/esp32_xtensa_lx6/xtensa-esp-elf-14.2.0_20241119-x86_64-linux-gnu.tar.xz",
         ],
     }
-
-    toolchain_definition = toolchain_merge(app_binary_toolchain_definition, toolchain_definition)
 
     toolchain_maker(
         name = name,
