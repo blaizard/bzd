@@ -18,6 +18,7 @@ cc_library(
     name = "lib",
     hdrs = [
         "jardinier.hh",
+        "led.hh",
     ],
     tags = [
         "no-clang-tidy",
@@ -25,6 +26,19 @@ cc_library(
     deps = [
         ":composition",
         "//cc:bzd",
+    ],
+)
+
+bdl_target(
+    name = "board_generic",
+    composition = [
+        ":board_generic.bdl",
+    ],
+    parent = "@@//cc/targets/esp32:gcc",
+    deps = [
+        "//cc/components/esp_idf/pwm",
+        "//cc/components/generic/io/digital/stub",
+        "//cc/components/generic/recorder/out",
     ],
 )
 

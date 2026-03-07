@@ -1,0 +1,18 @@
+use "cc/components/esp_idf/pwm/interface.bdl"
+use "cc/components/generic/io/digital/stub/interface.bdl"
+use "cc/components/generic/recorder/out/interface.bdl"
+
+
+
+composition board {
+	recorder = bzd.components.generic.recorder.Out();
+	pwmTimer = bzd.components.esp32.LEDCTimer(frequency = 4000, number = 0);
+	pwm0 = bzd.components.esp32.LEDCPWM(timer = pwmTimer, pin = 12, channel = 0);
+	pwm1 = bzd.components.esp32.LEDCPWM(timer = pwmTimer, pin = 13, channel = 1);
+	ioWater = bzd.components.generic.io.digital.Stub();
+	ioLED = bzd.components.generic.io.digital.Stub();
+	connect(/.*/, recorder);
+	
+}
+
+

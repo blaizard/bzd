@@ -35,13 +35,13 @@ public:
 		bzd::Logger logger{context_.config.out};
 
 		// blink
-		while (true)
+		/*while (true)
 		{
 			co_await !context_.io.led.set(1);
 			co_await !context_.config.timer.delay(bzd::units::Millisecond{500});
 			co_await !context_.io.led.set(0);
 			co_await !context_.config.timer.delay(bzd::units::Millisecond{500});
-		}
+		}*/
 
 		co_await !logger.info("Watering for {}s..."_csv, context_.config.wateringTimeS);
 		co_await !context_.io.pump.set(1);
