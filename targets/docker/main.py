@@ -211,7 +211,10 @@ if __name__ == "__main__":
 		print(f"Copying '{args.directory}/docker-compose.yml'.", flush=True)
 		handle.uploadContent(registry, f"{args.directory}/docker-compose.yml")
 
-		with usingDockerRegistry(handle, pathlib.Path(f"{args.directory}/docker-compose.yml")):
+		with usingDockerRegistry(
+		    handle,
+		    pathlib.Path(f"{args.directory}/docker-compose.yml"),
+		):
 
 			# Push the new images
 			print(f"Forwarding port {args.registry_port}...", flush=True)
@@ -219,7 +222,11 @@ if __name__ == "__main__":
 
 				for image in images:
 					print(f"=== Pushing {image} ====", flush=True)
-					ociPush(pathlib.Path(image), common.imageResolve(image), stdout=True, stderr=True, timeoutS=60 * 60)
+					ociPush(pathlib.Path(image),
+					        common.imageResolve(image),
+					        stdout=True,
+					        stderr=True,
+					        timeoutS=10 * 60 * 60)
 					# This asserts that the image is available in the registry and accessible by the docker client.
 					handle.command(["docker", "pull", common.imageResolve(image)])
 
