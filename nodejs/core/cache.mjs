@@ -584,7 +584,7 @@ function yieldThread() {
 	return new Promise((resolve) => {
 		setTimeout(() => {
 			resolve();
-		}, 1);
+		}, 100); // Increase value as a workaround for issue with garbage collection.
 	});
 }
 
