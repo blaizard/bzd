@@ -262,7 +262,7 @@ def localBazelBinary(path: str,
 def localBazel(cmds: List[str], **kwargs: Any) -> ExecuteResult:
 	"""Execute a bazel command locally."""
 
-	return localCommand([os.environ.get("BAZEL_REAL", "bazel")] + cmds, **kwargs)
+	return localCommand(["bazel"] + cmds, **kwargs)
 
 
 def localBazelTarget(target: str,
