@@ -117,12 +117,12 @@ rust_toolchain(
     exec_triple = "{exec_triple}",
     extra_exec_rustc_flags = [],
     extra_rustc_flags = [],
-    rust_doc = "@esp32//:rustdoc",
+    rust_doc = "@{toolchain}//:rustdoc",
     rust_std = select({{
         "{target_platform}": ":stdlib_target",
-        "//conditions:default": "@esp32//:stdlib_exec",
+        "//conditions:default": "@{toolchain}//:stdlib_exec",
     }}),
-    rustc = "@esp32//:rustc",
+    rustc = "@{toolchain}//:rustc",
     staticlib_ext = ".a",
     stdlib_linkflags = [],
     target_triple = select(config_settings_to_rust_triple),
@@ -160,6 +160,7 @@ toolchain(
             target_platform = repository_ctx.attr.target_platform,
             target_constraints = _constraints_to_string(target_constraints + extra_target_constraints),
             exec_constraints = _constraints_to_string(exec_constraints),
+            toolchain = repository_ctx.attr.toolchain,
         )
 
     repository_ctx.file(
@@ -229,23 +230,6 @@ def _toolchain_rust_impl(module_ctx):
             edition = toolchain.edition,
             toolchain_constraint = toolchain.toolchain_constraint,
         )
-
-    repository = _repositories["esp-rust-1.92.0"]
-
-    repository_multiplatform_maker(
-        name = "esp32",
-        repositories = repository["toolchain"],
-        expose = {
-            "rustc": "rustc",
-            "rustdoc": "rustdoc",
-            "stdlib_exec": "stdlib_exec",
-        },
-    )
-
-    http_archive(
-        name = "stdlib_target",
-        **repository["stdlib_target"]["archive"]
-    )
 
 _ALL_VERSIONS = {version: True for value in _data.values() for version in value.keys()}.keys()
 
