@@ -64,11 +64,12 @@ if __name__== "__main__":
 			"darwin_arm64": "bazelisk-darwin-arm64",
 			"linux_x86_64": "bazelisk-linux-amd64",
 			"linux_arm64": "bazelisk-linux-arm64",
-			"windows_x86_64": "bazelisk-windows-amd64.exe"
+			"windows_x86_64": "bazelisk-windows-amd64.exe",
+			"windows_arm64": "bazelisk-windows-arm64.exe",
 		}
 		basename = OSAndArchitectureToBasename[osAndArchitecture]
 
-		url = "https://github.com/bazelbuild/bazelisk/releases/download/v1.27.0/{}".format(basename)
+		url = "https://github.com/bazelbuild/bazelisk/releases/download/v1.28.1/{}".format(basename)
 		print(f"No bazel binary detected, downloading bazelisk from {url}...", flush=True)
 		ctx = ssl.create_default_context()
 		ctx.check_hostname = False
