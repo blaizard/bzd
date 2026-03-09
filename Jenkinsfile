@@ -64,15 +64,15 @@ pipeline
 				{
 					steps
 					{
-						sh "./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=esp32_qemu --config=prod --config=cc"
-						sh "./tools/bazel test //rust/... --output_groups=+metadata --config=esp32_qemu --config=prod --platform_suffix=esp32-prod"
+						sh "./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=esp32 --config=qemu --config=prod --config=cc"
+						sh "./tools/bazel test //rust/... --output_groups=+metadata --config=esp32 --config=qemu --config=prod --platform_suffix=esp32-prod"
 					}
 				}
 				stage("[normal] esp32s3 prod")
 				{
 					steps
 					{
-						sh "./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=esp32s3_qemu --config=prod --config=cc"
+						sh "./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=esp32s3 --config=qemu --config=prod --config=cc"
 					}
 				}
 				stage("[stress] dev (10 runs)")
