@@ -128,99 +128,55 @@ def _bdl_binary_impl(ctx):
         ctx.attr.system[BdlSystemJsonInfo],
     ] + providers
 
-def _bzd_binary_generic(is_test):
-    return rule(
-        implementation = _bdl_binary_impl,
-        doc = """Create a binary from a system rule.""",
-        attrs = {
-            "data": attr.label_list(
-                allow_files = True,
-                doc = "Files to be added to the runfiles.",
-            ),
-            "platform": attr.label(
-                default = None,
-                doc = "The platform used for the transition of this rule.",
-            ),
-            "system": attr.label(
-                mandatory = True,
-                doc = "The system rule associated with this target.",
-                providers = [BdlSystemInfo, BdlSystemJsonInfo],
-            ),
-            "target": attr.label(
-                mandatory = True,
-                doc = "The target label for this binary.",
-                providers = [BdlTargetInfo],
-            ),
-            "target_name": attr.string(
-                mandatory = True,
-                doc = "The name of the target.",
-            ),
-            "_allowlist_function_transition": attr.label(
-                default = Label("@bazel_tools//tools/allowlists/function_transition_allowlist"),
-            ),
-            "_debug": attr.label(
-                default = Label("@@//tools/bazel_build/settings/debug"),
-            ),
-            "_executor": attr.label(
-                default = Label("@@//tools/bazel_build/settings/executor"),
-            ),
-            "_map_analyzer_script": attr.label(
-                executable = True,
-                cfg = "exec",
-                default = Label("@bzd_toolchain_cc//binary/map_analyzer"),
-            ),
-        } | {("_metadata_" + name): (attr.label_list(
-            default = data["binary"]["metadata"],
-        )) for name, data in library_extensions.items() if "binary" in data},
-        toolchains = [
-            "@rules_cc//cc:toolchain_type",
-        ],
-        fragments = ["cpp"],
-        cfg = transition_platform,
-        executable = True,
-        test = is_test,
-    )
-
-_bdl_binary = _bzd_binary_generic(is_test = False)
-_bdl_test = _bzd_binary_generic(is_test = True)
-
-def _bdl_system_entry_point_impl(ctx):
-    # Use the first target as the default target for this deployment.
-    # It is guaranteed to have at least one target with the mandatory attribute.
-    default_target = None
-    for _, target in ctx.attr.targets.items():
-        default_target = target
-        break
-
-    # Create an alias.
-    executable = ctx.actions.declare_file(ctx.label.name)
-    ctx.actions.symlink(
-        output = executable,
-        target_file = default_target[DefaultInfo].files_to_run.executable,
-    )
-
-    return [
-        DefaultInfo(
-            executable = executable,
-            runfiles = default_target[DefaultInfo].default_runfiles,
-            files = depset(transitive = [target[DefaultInfo].files for target in ctx.attr.targets.values()]),
-        ),
-        default_target[BdlSystemJsonInfo],
-    ]
-
-_bdl_system_entry_point = rule(
-    implementation = _bdl_system_entry_point_impl,
-    doc = """Entry point of a system rule.""",
+_bdl_binary = rule(
+    implementation = _bdl_binary_impl,
+    doc = """Create a binary from a system rule.""",
     attrs = {
-        "targets": attr.string_keyed_label_dict(
-            mandatory = True,
-            doc = "A dictionary with name and executable targets corresponding to the binaries for this system.",
-            cfg = "target",
-            providers = [BdlSystemJsonInfo],
+        "data": attr.label_list(
+            allow_files = True,
+            doc = "Files to be added to the runfiles.",
         ),
-    },
+        "platform": attr.label(
+            default = None,
+            doc = "The platform used for the transition of this rule.",
+        ),
+        "system": attr.label(
+            mandatory = True,
+            doc = "The system rule associated with this target.",
+            providers = [BdlSystemInfo, BdlSystemJsonInfo],
+        ),
+        "target": attr.label(
+            mandatory = True,
+            doc = "The target label for this binary.",
+            providers = [BdlTargetInfo],
+        ),
+        "target_name": attr.string(
+            mandatory = True,
+            doc = "The name of the target.",
+        ),
+        "_allowlist_function_transition": attr.label(
+            default = Label("@bazel_tools//tools/allowlists/function_transition_allowlist"),
+        ),
+        "_debug": attr.label(
+            default = Label("@@//tools/bazel_build/settings/debug"),
+        ),
+        "_executor": attr.label(
+            default = Label("@@//tools/bazel_build/settings/executor"),
+        ),
+        "_map_analyzer_script": attr.label(
+            executable = True,
+            cfg = "exec",
+            default = Label("@bzd_toolchain_cc//binary/map_analyzer"),
+        ),
+    } | {("_metadata_" + name): (attr.label_list(
+        default = data["binary"]["metadata"],
+    )) for name, data in library_extensions.items() if "binary" in data},
+    toolchains = [
+        "@rules_cc//cc:toolchain_type",
+    ],
+    fragments = ["cpp"],
+    cfg = transition_platform,
     executable = True,
-    provides = [BdlSystemJsonInfo, DefaultInfo],
 )
 
 def _target_to_platform(target):
@@ -229,11 +185,12 @@ def _target_to_platform(target):
         return None
     return "{}.platform".format(str(Label(target)))
 
-def _bdl_system_macro_impl(name, targets, testonly, deps, visibility, tags = None, target_compatible_with = None, **kwargs):
+def _bdl_system_macro_impl(name, visibility, targets, testonly, deps, **kwargs):
     _bdl_system(
-        name = "{}.system".format(name),
+        name = name,
         targets = targets,
         testonly = testonly,
+        visibility = visibility,
         deps = deps,
         tags = ["manual"],
     )
@@ -245,56 +202,13 @@ def _bdl_system_macro_impl(name, targets, testonly, deps, visibility, tags = Non
             target = target,
             target_name = target_name,
             testonly = testonly,
-            system = "{}.system".format(name),
+            system = name,
             visibility = visibility,
-            tags = tags,
-            target_compatible_with = target_compatible_with,
             **kwargs
         )
-
-    _bdl_system_entry_point(
-        name = name,
-        targets = {target_name: "{}.{}".format(name, target_name) for target_name, target in targets.items()},
-        visibility = visibility,
-        tags = tags,
-        target_compatible_with = target_compatible_with,
-    )
 
 bdl_system = macro(
     implementation = _bdl_system_macro_impl,
     inherit_attrs = _bdl_binary,
-    attrs = _BDL_SYSTEM_GENERIC_ATTR,
-)
-
-def _bdl_system_test_macro_impl(name, targets, testonly, deps, visibility, **kwargs):
-    _bdl_system(
-        name = "{}.system".format(name),
-        targets = targets,
-        testonly = testonly,
-        deps = deps,
-        tags = ["manual"],
-    )
-
-    for target_name, target in targets.items():
-        _bdl_test(
-            name = "{}.{}".format(name, target_name),
-            platform = _target_to_platform(target),
-            target = target,
-            target_name = target_name,
-            testonly = testonly,
-            system = "{}.system".format(name),
-            visibility = visibility,
-            **kwargs
-        )
-
-    native.alias(
-        name = name,
-        actual = "{}.{}".format(name, targets.keys()[0]),
-        visibility = visibility,
-    )
-
-bdl_system_test = macro(
-    implementation = _bdl_system_test_macro_impl,
-    inherit_attrs = _bdl_test,
     attrs = _BDL_SYSTEM_GENERIC_ATTR,
 )

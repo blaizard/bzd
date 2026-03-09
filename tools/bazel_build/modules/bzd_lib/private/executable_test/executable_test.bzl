@@ -6,6 +6,8 @@ def _bzd_executable_test_impl(ctx):
     arguments_executor = []
     if ctx.attr.expected_returncode:
         arguments_executor += ["--expected-returncode", ctx.attr.expected_returncode]
+    if ctx.attr.unexpected_returncode:
+        arguments_executor += ["--unexpected-returncode", ctx.attr.unexpected_returncode]
     if ctx.attr.expected_output:
         arguments_executor += ["--expected-output", "'{}'".format(ctx.attr.expected_output)]
     if ctx.attr.min_duration != -1:
@@ -25,8 +27,10 @@ def _bzd_executable_test_impl(ctx):
         ),
     )]
 
-def _bzd_executable_test_attrs_factory(cfg):
-    return {
+bzd_executable_test = rule(
+    doc = "Test the given executable target.",
+    implementation = _bzd_executable_test_impl,
+    attrs = {
         "executable": attr.label(
             executable = True,
             cfg = "target",
@@ -46,23 +50,14 @@ def _bzd_executable_test_attrs_factory(cfg):
             doc = "An expected minimal duration in seconds of the executable execution.",
             default = -1,
         ),
+        "unexpected_returncode": attr.string(
+            doc = "An unexpected return code by the executable.",
+        ),
         "_executor": attr.label(
             executable = True,
-            cfg = cfg,
+            cfg = "exec",
             default = Label("//private/executable_test:executable_test"),
         ),
-    }
-
-bzd_executable_test = rule(
-    doc = "Test the given executable target.",
-    implementation = _bzd_executable_test_impl,
-    attrs = _bzd_executable_test_attrs_factory(cfg = "target"),
-    test = True,
-)
-
-bzd_executable_exec_test = rule(
-    doc = "Test the given executable target using the execution platform.",
-    implementation = _bzd_executable_test_impl,
-    attrs = _bzd_executable_test_attrs_factory(cfg = "exec"),
+    },
     test = True,
 )

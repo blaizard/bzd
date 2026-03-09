@@ -96,12 +96,6 @@ formatter and linters for YAML, json and markdown are also available.
 | Node     | prettier     | eslint                              | Yes           | Yes            |               |
 | Skylark  | buildifier   | buildifier                          |               |                | stardoc       |
 
-To generate the compile_commands.json file:
-
-```bash
-bazel run @bzd_sanitizer//aspects/compile_commands:build
-```
-
 Update `compile_commands.json`
 
 ```bash

@@ -14,6 +14,11 @@ if __name__ == "__main__":
 	    help="The expected return code of the executable.",
 	)
 	parser.add_argument(
+	    "--unexpected-returncode",
+	    type=int,
+	    help="An unexpected return code by the executable.",
+	)
+	parser.add_argument(
 	    "--expected-output",
 	    type=str,
 	    help="The executable outputs the given string.",
@@ -52,6 +57,11 @@ if __name__ == "__main__":
 		assert result.getReturnCode(
 		) == args.expected_returncode, f"The return code {result.getReturnCode()} is different from the expected return code {args.expected_returncode}."
 
+	if args.unexpected_returncode is not None:
+		nbChecks += 1
+		assert result.getReturnCode(
+		) != args.unexpected_returncode, f"The return code {result.getReturnCode()} was not expected."
+
 	if args.expected_output is not None:
 		nbChecks += 1
 		assert args.expected_output in result.getStdout() or args.expected_output in result.getStderr(
@@ -65,7 +75,7 @@ if __name__ == "__main__":
 		nbChecks += 1
 		assert duration <= args.max_duration, f"The execution time was more than the expected maximal duration {args.max_duration}s vs {duration}s."
 
-	attributes = ["expected_returncode", "expected_output", "min_duration", "max_duration"]
+	attributes = ["expected_returncode", "unexpected_returncode", "expected_output", "min_duration", "max_duration"]
 	assert nbChecks > 0, f"Please set at least one of the attributes: {', '.join(attributes)}."
 
 	sys.exit(0)

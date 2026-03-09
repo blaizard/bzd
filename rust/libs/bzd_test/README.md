@@ -20,7 +20,7 @@ mod tests {
 BUILD.bazel
 
 ```py
-load("//rust/libs/bzd_test:defs.bzl", "rust_test")
+load("//rust:defs.bzl", "rust_test")
 
 rust_library(
     name = "lib",

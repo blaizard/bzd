@@ -1,4 +1,4 @@
-load("@rules_rust//rust:defs.bzl", "rust_binary")
+load("//rust:defs.bzl", "rust_binary")
 
 rust_binary(
     name = "esp32",

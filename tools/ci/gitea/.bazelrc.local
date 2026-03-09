@@ -9,3 +9,8 @@ test --test_timeout_filters=-long,-eternal
 # Use remote execution.
 build --config=remote
 test --config=remote
+
+# Use disk cache.
+build --disk_cache=/runner_shared
+build --experimental_disk_cache_gc_max_age=7d
+build --experimental_disk_cache_gc_max_size=10G

@@ -20,22 +20,22 @@ jobs:
         - name: "[normal] static analysis"
           script:
               - cp tools/ci/travis/.bazelrc.local .bazelrc.local
-              - ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=dev --config=clang-tidy --config=mypy --config=clippy --platform_suffix=static_analysis
+              - ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=dev --config=clang-tidy --config=mypy --config=clippy
 
         - name: "[normal] clang prod"
           script:
               - cp tools/ci/travis/.bazelrc.local .bazelrc.local
-              - ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=clang --config=prod --config=cc --platform_suffix=clang-prod
+              - ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=clang --config=prod --config=cc
 
         - name: "[normal] gcc prod"
           script:
               - cp tools/ci/travis/.bazelrc.local .bazelrc.local
-              - ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=gcc --config=prod --config=cc --platform_suffix=gcc-prod
+              - ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=gcc --config=prod --config=cc
 
         - name: "[normal] esp32s3 prod"
           script:
               - cp tools/ci/travis/.bazelrc.local .bazelrc.local
-              - ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=esp32s3_qemu --config=prod --config=cc --platform_suffix=esp32s3-prod
+              - ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=esp32s3_qemu --config=prod --config=cc
 
         - name: "[sanitizer] sanitizer"
           script:

@@ -1,3 +1,4 @@
+load("@bzd_lib//:defs.bzl", "bzd_make_runner_toolchain")
 load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper")
 
 sh_binary_wrapper(
@@ -14,6 +15,15 @@ sh_binary_wrapper(
         "@esp32s3_xtensa_lx7_sdk//:bin/partition-table.bin": "partitions",
         "@esptool//:esptool": "esptool",
     },
+)
+
+bzd_make_runner_toolchain(
+    name = "qemu_toolchain",
+    runner = ":qemu",
+    target_compatible_with = [
+        "@bzd_platforms//al:esp32s3",
+        "@bzd_platforms//isa:xtensa_lx7",
+    ],
 )
 
 sh_binary_wrapper(
@@ -33,4 +43,13 @@ sh_binary_wrapper(
         "@esp32s3_xtensa_lx7_sdk//:bin/partition-table.bin": "partitions",
         "@esptool//:esptool": "esptool",
     },
+)
+
+bzd_make_runner_toolchain(
+    name = "uart_toolchain",
+    runner = ":uart",
+    target_compatible_with = [
+        "@bzd_platforms//al:esp32s3",
+        "@bzd_platforms//isa:xtensa_lx7",
+    ],
 )

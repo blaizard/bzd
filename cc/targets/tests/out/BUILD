@@ -1,5 +1,5 @@
 load("@bzd_bdl//:defs.bzl", "bdl_library")
-load("@bzd_lib//:defs.bzl", "bzd_executable_exec_test")
+load("@bzd_lib//:defs.bzl", "bzd_executable_test")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//cc/bdl:cc.bzl", "bzd_cc_binary")
 
@@ -39,7 +39,7 @@ bzd_cc_binary(
     ],
 )
 
-bzd_executable_exec_test(
+bzd_executable_test(
     name = "out",
     executable = ":out_binary",
     expected_output = "TEST MESSAGE 95485743",

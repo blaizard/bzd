@@ -1,7 +1,8 @@
 """Rules for CC."""
 
 load("@bazel_skylib//lib:sets.bzl", "sets")
-load("@bzd_bdl//:defs.bzl", "bdl_library", "bdl_system", "bdl_system_test")
+load("@bzd_bdl//:defs.bzl", "bdl_library", "bdl_system")
+load("@bzd_lib//:defs.bzl", "bzd_runner_binary", "bzd_runner_test")
 load("@bzd_toolchain_cc//cc:defs.bzl", "cc_compile")
 load("@rules_cc//cc:defs.bzl", "CcInfo", "cc_library")
 
@@ -29,15 +30,22 @@ def _bzd_cc_binary_impl(name, visibility, target, tags, bdls, hdrs, srcs, deps, 
         updated_deps.append("{}.srcs".format(name))
 
     bdl_system(
-        name = name,
+        name = "{}.system".format(name),
         targets = {
             "default": target,
         },
-        tags = tags + ["cc"],
+        tags = tags + ["manual"],
         deps = updated_deps,
         testonly = testonly,
-        visibility = visibility,
         **kwargs
+    )
+
+    bzd_runner_binary(
+        name = name,
+        binary = "{}.system.default".format(name),
+        testonly = testonly,
+        visibility = visibility,
+        tags = tags + ["cc"],
     )
 
 bzd_cc_binary = macro(
@@ -109,14 +117,21 @@ def bzd_cc_test(name, target = "//cc/targets:auto", tags = [], bdls = [], hdrs =
         )
         updated_deps.append("{}.srcs".format(name))
 
-    bdl_system_test(
-        name = name,
+    bdl_system(
+        name = "{}.system".format(name),
         targets = {
             "default": target,
         },
-        tags = tags + ["cc"],
+        tags = ["manual"],
         deps = updated_deps,
         testonly = testonly,
+    )
+
+    bzd_runner_test(
+        name = name,
+        binary = "{}.system.default".format(name),
+        testonly = testonly,
+        tags = tags + ["cc"],
         **kwargs
     )
 

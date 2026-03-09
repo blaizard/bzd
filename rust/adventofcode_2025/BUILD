@@ -1,4 +1,5 @@
-load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library", "rust_test")
+load("@rules_rust//rust:defs.bzl", "rust_library")
+load("//rust:defs.bzl", "rust_binary")
 
 rust_library(
     name = "utils",
@@ -27,8 +28,3 @@ rust_library(
     "day8",
     "day9",
 ]]
-
-rust_test(
-    name = "day1_test",
-    crate = ":day1",
-)

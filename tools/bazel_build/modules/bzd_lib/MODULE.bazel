@@ -15,3 +15,7 @@ pip.parse(
     requirements_lock = "//python:requirements.txt",
 )
 use_repo(pip, pip = "bzd_lib_pip")
+
+# Register the passthrough runner toolchain, which doesn't use a runner and just runs the binary directly.
+# This is used by default for all runner rules, but can be overridden by specifying a different toolchain.r
+register_toolchains("//private/runner:passthrough_toolchain")

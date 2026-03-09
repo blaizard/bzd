@@ -33,25 +33,25 @@ jobs:
               run: |
                   ./tools/bazel clean --expunge
                   ./bin/bzd-node timeit --path github/normal_static_analysis/command-0 \
-                  ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=dev --config=clang-tidy --config=mypy --config=clippy --platform_suffix=static_analysis
+                  ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=dev --config=clang-tidy --config=mypy --config=clippy
 
             - name: "[normal] clang prod"
               run: |
                   ./tools/bazel clean --expunge
                   ./bin/bzd-node timeit --path github/normal_clang_prod/command-0 \
-                  ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=clang --config=prod --config=cc --platform_suffix=clang-prod
+                  ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=clang --config=prod --config=cc
 
             - name: "[normal] gcc prod"
               run: |
                   ./tools/bazel clean --expunge
                   ./bin/bzd-node timeit --path github/normal_gcc_prod/command-0 \
-                  ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=gcc --config=prod --config=cc --platform_suffix=gcc-prod
+                  ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=gcc --config=prod --config=cc
 
             - name: "[normal] esp32 prod"
               run: |
                   ./tools/bazel clean --expunge
                   ./bin/bzd-node timeit --path github/normal_esp32_prod/command-0 \
-                  ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=esp32_qemu --config=prod --config=cc --platform_suffix=esp32-prod
+                  ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=esp32_qemu --config=prod --config=cc
                   ./bin/bzd-node timeit --path github/normal_esp32_prod/command-1 \
                   ./tools/bazel test //rust/... --output_groups=+metadata --config=esp32_qemu --config=prod --platform_suffix=esp32-prod
 
@@ -59,25 +59,25 @@ jobs:
               run: |
                   ./tools/bazel clean --expunge
                   ./bin/bzd-node timeit --path github/normal_esp32s3_prod/command-0 \
-                  ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=esp32s3_qemu --config=prod --config=cc --platform_suffix=esp32s3-prod
+                  ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=esp32s3_qemu --config=prod --config=cc
 
             - name: "[sanitizer] asan/lsan/ubsan"
               run: |
                   ./tools/bazel clean --expunge
                   ./bin/bzd-node timeit --path github/sanitizer_asan_lsan_ubsan/command-0 \
-                  ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --config=clang --config=cc --config=sanitizer --config=asan --config=lsan --config=ubsan --platform_suffix=clang-asan-lsan-ubsan
+                  ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --config=clang --config=cc --config=sanitizer --config=asan --config=lsan --config=ubsan
 
             - name: "[sanitizer] tsan"
               run: |
                   ./tools/bazel clean --expunge
                   ./bin/bzd-node timeit --path github/sanitizer_tsan/command-0 \
-                  ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --config=clang --config=cc --config=sanitizer --config=tsan --platform_suffix=clang-tsan
+                  ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --config=clang --config=cc --config=sanitizer --config=tsan
 
             - name: "[coverage] nodejs"
               run: |
                   ./tools/bazel clean --expunge
                   ./bin/bzd-node timeit --path github/coverage_nodejs/command-0 \
-                  ./tools/bazel coverage ... --config=nodejs --platform_suffix=coverage-nodejs --config=local
+                  ./tools/bazel coverage ... --config=nodejs --config=local
                   ./bin/bzd-node publish-json --path coverage/nodejs $(pwd)/bazel-out/coverage/report.json
 
             - name: "[sanitizer] sanitizer"

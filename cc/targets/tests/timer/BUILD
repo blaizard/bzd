@@ -1,5 +1,5 @@
 load("@bzd_bdl//:defs.bzl", "bdl_library")
-load("@bzd_lib//:defs.bzl", "bzd_executable_exec_test")
+load("@bzd_lib//:defs.bzl", "bzd_executable_test")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//cc/bdl:cc.bzl", "bzd_cc_binary", "bzd_cc_test")
 
@@ -60,14 +60,14 @@ bzd_cc_binary(
     ],
 )
 
-bzd_executable_exec_test(
+bzd_executable_test(
     name = "duration",
     executable = ":duration_binary",
     min_duration = 4,
     tags = ["cc"],
 )
 
-bzd_executable_exec_test(
+bzd_executable_test(
     name = "multi_duration",
     executable = ":multi_duration_binary",
     min_duration = 4,
