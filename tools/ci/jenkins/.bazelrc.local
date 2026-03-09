@@ -7,6 +7,8 @@ build --show_timestamps
 # Cache.
 startup --output_user_root=/cache/output
 build --disk_cache=/cache/bazel
+build --experimental_disk_cache_gc_max_age=7d
+build --experimental_disk_cache_gc_max_size=10G
 build --sandbox_add_mount_pair=/cache
 build --sandbox_writable_path=/cache
 build --@bzd_rules_nodejs//nodejs:cache=/cache
