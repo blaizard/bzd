@@ -1,5 +1,5 @@
-**BUILD
-**/*.BUILD
+**BUILD.bazel
+**/*.BUILD.bazel
 **/*.LICENSE
 **/*.MODULE.bazel
 **WORKSPACE.bazel
