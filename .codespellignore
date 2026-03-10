@@ -6,3 +6,4 @@
 BUILD
 *.bazel
 *.bzl
+**/*.raw

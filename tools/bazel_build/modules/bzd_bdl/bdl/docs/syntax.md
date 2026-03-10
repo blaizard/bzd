@@ -94,7 +94,7 @@ where `values` can be an association of `value`, `symbol`, `regexpr` or `preset`
 - `value` is either a literal.
 - `symbol` is either a relative symbol to the current namespace `abc` or a fully qualified name `this.is.abc`.
 - `regexpr` is a regular expression `/[a-z]*/`.
-- `preset` is a preset that is replaced by a predefined content. For example `abc = {out};` is equivalent to `abd: bzd.OStream = target.out;`
+- `preset` is a preset that is replaced by a predefined content. For example `abc = {out};` is equivalent to `abc: bzd.OStream = target.out;`
 
 ## Methods
 

@@ -1,6 +1,6 @@
 #pragma once
 
-/// Returns 1 if the argument is empty, 0 ortherwise.
+/// Returns 1 if the argument is empty, 0 otherwise.
 #define BZD_IS_EMPTY(...) BZD_IS_EMPTY_X(1, 0, __VA_ARGS__)
 
 /// Returns tvalue if the argument is empty, fvalue otherwise.

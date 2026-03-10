@@ -73,7 +73,7 @@ TEST_ASYNC(PatternFromStream, RangeOfRangesReusing, AllTestIChannel)
 	bzd::Array<char, 16u> buffer{};
 	auto reader = in.reader(buffer.asSpan());
 
-	// re-using wrapper.
+	// reusing wrapper.
 	{
 		in << "helloinfobar";
 		bzd::ToSortedRangeOfRanges wrapper{keywords};

@@ -24,7 +24,7 @@ class Data:
 			current = current.setdefault(name, {})
 		current = current.setdefault("_", {})
 		current.update(data)
-		return current # type: ignore
+		return current  # type: ignore
 
 	def toJson(self) -> str:
 		return json.dumps(self.data, sort_keys=True, indent=4)

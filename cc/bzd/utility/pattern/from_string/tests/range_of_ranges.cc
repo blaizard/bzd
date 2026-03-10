@@ -61,7 +61,7 @@ TEST(RangeOfRangesFromString, SortedRange)
 		EXPECT_STREQ(wrapper.value()->data(), "hello");
 	}
 
-	// re-using wrapper.
+	// reusing wrapper.
 	{
 		bzd::ToSortedRangeOfRanges wrapper{keywords};
 		const auto result1 = bzd::fromString("hello"_sv, wrapper);
