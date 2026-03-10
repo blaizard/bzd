@@ -18,6 +18,8 @@ paramiko==3.4.1
     # via -r python/requirements.in
 pycparser==2.22
     # via cffi
+pyelftools==0.29
+    # via -r python/requirements.in
 pynacl==1.5.0
     # via paramiko
 pyserial==3.5

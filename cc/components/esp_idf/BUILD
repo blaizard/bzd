@@ -11,6 +11,6 @@ cc_library(
     deps = [
         "//cc/bzd/container:result",
         "//cc/bzd/core:error",
-        "//cc/libs/esp_idf",
+        "@bzd_espressif//hal/cc",
     ],
 )

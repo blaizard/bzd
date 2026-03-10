@@ -38,6 +38,12 @@ _data = {
             "target": Label("@bzd_platforms//al_isa:esp32-xtensa_lx6"),
         },
     },
+    "esp32s3-xtensa_lx7": {
+        "1.92.0": {
+            "repository": "esp-rust-1.92.0",
+            "target": Label("@bzd_platforms//al_isa:esp32s3-xtensa_lx7"),
+        },
+    },
 }
 
 def _constraints_to_string(constraints):

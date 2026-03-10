@@ -25,6 +25,9 @@ build --experimental_platform_in_output_dir
 # To investigate further, see https://github.com/bazelbuild/bazel/commit/293646c85a718686ce1d7a7ff6d1dd76256cb9bb
 common --noexperimental_use_platforms_in_output_dir_legacy_heuristic
 
+# Needed by bzlmod @bzd_espressif for rust.
+common --experimental_isolated_extension_usages
+
 # Directories used by sandboxed non-worker execution may be reused to avoid unnecessary setup costs.
 # Save time on Sandbox creation and deletion when many of the same kind of action run during the
 # build.
@@ -134,14 +137,15 @@ coverage:gcc --experimental_fetch_all_coverage_outputs
 build:esp32 --platforms="@esp32//:platform-esp32-xtensa_lx6"
 build:esp32 --platform_suffix=esp32-xtensa_lx6-gcc
 build:esp32 --extra_execution_platforms=@esp32//:platform
-build:qemu --extra_toolchains=//cc/targets/esp32/runner:qemu_toolchain
-build:uart --extra_toolchains=//cc/targets/esp32/runner:uart_toolchain
+build:qemu --extra_toolchains=@bzd_espressif//runner/esp32:qemu_toolchain
+build:uart --extra_toolchains=@bzd_espressif//runner/esp32:uart_toolchain
 
 # esp32s3-xtensa_lx7-gcc
 build:esp32s3 --platforms="@esp32s3//:platform-esp32s3-xtensa_lx7"
 build:esp32s3 --platform_suffix=esp32s3-xtensa_lx7-gcc
-build:qemu --extra_toolchains=//cc/targets/esp32s3/runner:qemu_toolchain
-build:uart --extra_toolchains=//cc/targets/esp32s3/runner:uart_toolchain
+build:esp32s3 --extra_execution_platforms=@esp32s3//:platform
+build:qemu --extra_toolchains=@bzd_espressif//runner/esp32s3:qemu_toolchain
+build:uart --extra_toolchains=@bzd_espressif//runner/esp32s3:uart_toolchain
 
 # clang-tidy
 build:clang-tidy --aspects="@bzd_sanitizer//aspects/clang_tidy:defs.bzl%clang_tidy_aspect"

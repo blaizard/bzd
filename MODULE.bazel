@@ -17,6 +17,7 @@ bazel_dep(name = "bzd_package", version = "1.0")
 bazel_dep(name = "bzd_bundle", version = "1.0")
 bazel_dep(name = "bzd_rules_oci", version = "1.0")
 bazel_dep(name = "bzd_python", version = "1.0")
+bazel_dep(name = "bzd_espressif", version = "1.0")
 bazel_dep(name = "platforms", version = "1.0.0")
 bazel_dep(name = "rules_python", version = "1.9.0")
 bazel_dep(name = "rules_rust", version = "0.68.1")
@@ -43,6 +44,7 @@ bazel_dep(name = "rules_pkg", version = "1.1.0")
     "bzd_sanitizer",
     "bzd_package",
     "bzd_dns",
+    "bzd_espressif",
 )]
 
 local_path_override(
@@ -75,7 +77,7 @@ toolchain_cc.toolchain(
     name = "esp32",
     version = "esp32_gcc_14.2.0",
 )
-use_repo(toolchain_cc, "esp32", "esp32_qemu", "esptool")
+use_repo(toolchain_cc, "esp32")
 
 register_toolchains("@esp32//:all")
 
@@ -152,6 +154,17 @@ use_repo(toolchain_rust, "esp32_rust")
 
 register_toolchains("@esp32_rust//:all")
 
+toolchain_rust.toolchain(
+    name = "esp32s3_rust",
+    edition = RUST_EDITION,
+    target = "esp32s3-xtensa_lx7",
+    toolchain_constraint = "@esp32s3//:toolchain",
+    version = RUST_VERSION,
+)
+use_repo(toolchain_rust, "esp32s3_rust")
+
+register_toolchains("@esp32s3_rust//:all")
+
 rust = use_extension("@rules_rust//rust:extensions.bzl", "rust")
 rust.toolchain(
     edition = RUST_EDITION,
@@ -175,11 +188,6 @@ use_repo(crates, "crates")
 
 # Register the default toolchain last to have the least priority.
 register_toolchains("@rust_toolchains//:all")
-
-# ESP SDK
-
-include("//cc/libs/esp_idf:esp_idf.MODULE.bazel")
-include("//rust/libs/esp_hal:esp_hal.MODULE.bazel")
 
 # Docker
 

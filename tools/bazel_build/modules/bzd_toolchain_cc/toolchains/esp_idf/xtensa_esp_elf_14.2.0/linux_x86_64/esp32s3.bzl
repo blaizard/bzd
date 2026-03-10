@@ -1,24 +1,15 @@
 """Metadata for ESP32S3 toolchains."""
 
 load("//cc:toolchain.bzl", "toolchain_maker")
-load("//toolchains/esp_idf:sdk/esp32s3.bzl", "sdk")
-load("//toolchains/esp_idf/esptool:defs.bzl", "esptool")
-load("//toolchains/esp_idf/openocd:defs.bzl", "esp32_openocd")
-load("//toolchains/esp_idf/qemu:defs.bzl", "esp32_qemu")
 
-def esp32s3_linux_x86_64(_module_ctx, name, use_fragment):
+def esp32s3_linux_x86_64(_module_ctx, name, _use_fragment):
     """Metadata for ESP32S3 toolchains.
 
     Args:
         _module_ctx: The context of the module.
         name: The name of the toolchain.
-        use_fragment: Factory to make use of a fragment.
+        _use_fragment: Factory to make use of a fragment.
     """
-
-    use_fragment(esptool)
-    use_fragment(esp32_qemu)
-    use_fragment(esp32_openocd)
-    use_fragment(sdk)
 
     toolchain_definition = {
         "binaries": {

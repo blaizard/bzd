@@ -166,7 +166,7 @@ _bdl_binary = rule(
         "_map_analyzer_script": attr.label(
             executable = True,
             cfg = "exec",
-            default = Label("@bzd_toolchain_cc//binary/map_analyzer"),
+            default = Label("@bzd_python//bzd/apps/map_analyzer"),
         ),
     } | {("_metadata_" + name): (attr.label_list(
         default = data["binary"]["metadata"],
