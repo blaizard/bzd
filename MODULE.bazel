@@ -177,6 +177,7 @@ crates.from_specs(
     name = "crates",
 )
 crates.spec(
+    features = ["full"],
     package = "syn",
     version = "2.0",
 )
