@@ -51,15 +51,17 @@ jobs:
               run: |
                   ./tools/bazel clean --expunge
                   ./bin/bzd-node timeit --path github/normal_esp32_prod/command-0 \
-                  ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=esp32 --config=qemu --config=prod --config=cc
+                  ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=esp32 --config=prod --config=cc
                   ./bin/bzd-node timeit --path github/normal_esp32_prod/command-1 \
-                  ./tools/bazel test //rust/... --output_groups=+metadata --config=esp32 --config=qemu --config=prod --platform_suffix=esp32-prod
+                  ./tools/bazel test //rust/... --output_groups=+metadata --config=esp32 --config=prod
 
             - name: "[normal] esp32s3 prod"
               run: |
                   ./tools/bazel clean --expunge
                   ./bin/bzd-node timeit --path github/normal_esp32s3_prod/command-0 \
-                  ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=esp32s3 --config=qemu --config=prod --config=cc
+                  ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=esp32s3 --config=prod --config=cc
+                  ./bin/bzd-node timeit --path github/normal_esp32s3_prod/command-1 \
+                  ./tools/bazel test //rust/... --output_groups=+metadata --config=esp32s3 --config=prod
 
             - name: "[sanitizer] asan/lsan/ubsan"
               run: |

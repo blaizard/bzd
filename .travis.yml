@@ -35,7 +35,8 @@ jobs:
         - name: "[normal] esp32s3 prod"
           script:
               - cp tools/ci/travis/.bazelrc.local .bazelrc.local
-              - ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=esp32s3 --config=qemu --config=prod --config=cc
+              - ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=esp32s3 --config=prod --config=cc
+              - ./tools/bazel test //rust/... --output_groups=+metadata --config=esp32s3 --config=prod
 
         - name: "[sanitizer] sanitizer"
           script:
