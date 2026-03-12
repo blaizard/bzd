@@ -12,22 +12,24 @@ from cc.bdl.generator.impl.comments import commentParametersResolvedToStr
 
 
 def literalNativeToStr(literalNative: typing.Any) -> str:
-	"""Convert a literal native type into its C++ representation."""
+    """Convert a literal native type into its C++ representation."""
 
-	if isinstance(literalNative, dict):
-		assert "type" in literalNative, f"Extended literal must be a dictionary with a field 'type', not: {str(literalNative)}"
-		literalType = literalNative["type"]
-		if literalType == "enum":
-			return fqnToStr(literalNative["fqn"])
-		raise KeyError(f"Unsupported extended literal of type '{literalType}'")
+    if isinstance(literalNative, dict):
+        assert "type" in literalNative, (
+            f"Extended literal must be a dictionary with a field 'type', not: {str(literalNative)}"
+        )
+        literalType = literalNative["type"]
+        if literalType == "enum":
+            return fqnToStr(literalNative["fqn"])
+        raise KeyError(f"Unsupported extended literal of type '{literalType}'")
 
-	if isinstance(literalNative, str):
-		return json.dumps(literalNative)
+    if isinstance(literalNative, str):
+        return json.dumps(literalNative)
 
-	if isinstance(literalNative, bool):
-		return "true" if literalNative else "false"
+    if isinstance(literalNative, bool):
+        return "true" if literalNative else "false"
 
-	return str(literalNative)
+    return str(literalNative)
 
 
 def valueToStr(
@@ -36,7 +38,7 @@ def valueToStr(
     registry: bool = False,
     includeComment: bool = True,
 ) -> str:
-	"""Convert an item object into a C++ string.
+    """Convert an item object into a C++ string.
     Args:
             item: The item to be converted.
             symbols: The symbols map to be used.
@@ -44,45 +46,65 @@ def valueToStr(
             includeComment; Whether or not comment should be prepended to the value.
     """
 
-	item.assertTrue(
-	    condition=item.param.isRoleValue,
-	    message=f"'valueToStr' only applies to item with role values, not '{item}'.",
-	)
+    item.assertTrue(
+        condition=item.param.isRoleValue,
+        message=f"'valueToStr' only applies to item with role values, not '{item}'.",
+    )
 
-	def bindTypeAndValue(values: typing.List[str]) -> str:
-		"""Associate a value with its type."""
+    def bindTypeAndValue(values: typing.List[str]) -> str:
+        """Associate a value with its type."""
 
-		paramTypeStr = (symbolToStr(item.param.symbol, values=values) if item.param.isSymbol else "")
-		paramValues = (values if paramTypeStr == "" else [f"{paramTypeStr}{{{', '.join(values)}}}"])
+        paramTypeStr = (
+            symbolToStr(item.param.symbol, values=values) if item.param.isSymbol else ""
+        )
+        paramValues = (
+            values if paramTypeStr == "" else [f"{paramTypeStr}{{{', '.join(values)}}}"]
+        )
 
-		# If the types (param and expected) are the same, return already.
-		if item.sameType:
-			return ", ".join(paramValues)
+        # If the types (param and expected) are the same, return already.
+        if item.sameType:
+            return ", ".join(paramValues)
 
-		expectedTypeStr = (symbolToStr(item.expected.symbol, values=paramValues) if item.expected.isSymbol else "")
-		return (", ".join(paramValues) if expectedTypeStr == "" else f"{expectedTypeStr}{{{', '.join(paramValues)}}}")
+        expectedTypeStr = (
+            symbolToStr(item.expected.symbol, values=paramValues)
+            if item.expected.isSymbol
+            else ""
+        )
+        return (
+            ", ".join(paramValues)
+            if expectedTypeStr == ""
+            else f"{expectedTypeStr}{{{', '.join(paramValues)}}}"
+        )
 
-	if item.param.isLiteral:
-		value = bindTypeAndValue([literalNativeToStr(item.param.literalNative)])
-	elif item.isLValue:
-		fqn = item.param.underlyingValueFQN
-		assert fqn is not None
-		value = fqnToNameStr(fqn)
-		if registry:
-			value = f"registry.{value}_.get()"
-		if symbols is not None:
-			# Cast values to there underlying interface type.
-			expectedInterface = (item.expected.underlyingInterfaceFQN or item.expected.underlyingTypeFQN)
-			assert expectedInterface is not None
-			if (symbols.getEntityResolved(expectedInterface).value.category == Category.interface):
-				value = f'bzd::Interface<"{expectedInterface}">::cast({value})'
-	elif item.isRValue:
-		assert isinstance(item.param, Expression)
-		values = [valueToStr(item=i, symbols=symbols, registry=registry) for i in item.param.parametersResolved]
-		value = bindTypeAndValue(values)
-	else:
-		item.error(message="Type not supported, should never happen.")
+    if item.param.isLiteral:
+        value = bindTypeAndValue([literalNativeToStr(item.param.literalNative)])
+    elif item.isLValue:
+        fqn = item.param.underlyingValueFQN
+        assert fqn is not None
+        value = fqnToNameStr(fqn)
+        if registry:
+            value = f"registry.{value}_.get()"
+        if symbols is not None:
+            # Cast values to there underlying interface type.
+            expectedInterface = (
+                item.expected.underlyingInterfaceFQN or item.expected.underlyingTypeFQN
+            )
+            assert expectedInterface is not None
+            if (
+                symbols.getEntityResolved(expectedInterface).value.category
+                == Category.interface
+            ):
+                value = f'bzd::Interface<"{expectedInterface}">::cast({value})'
+    elif item.isRValue:
+        assert isinstance(item.param, Expression)
+        values = [
+            valueToStr(item=i, symbols=symbols, registry=registry)
+            for i in item.param.parametersResolved
+        ]
+        value = bindTypeAndValue(values)
+    else:
+        item.error(message="Type not supported, should never happen.")
 
-	if includeComment:
-		return f"{commentParametersResolvedToStr(item)}{value}"
-	return value
+    if includeComment:
+        return f"{commentParametersResolvedToStr(item)}{value}"
+    return value

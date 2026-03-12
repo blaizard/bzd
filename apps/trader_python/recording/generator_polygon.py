@@ -1,11 +1,8 @@
-import pathlib
 import datetime
 import typing
 import argparse
-import traceback
 import os
 import time
-import random
 import threading
 
 from bzd.http.client import HttpClient, HttpClientException
@@ -17,136 +14,418 @@ logger = Logger("polygon.io")
 
 
 class Generator:
-	"""Generate recording using polygon.io data."""
+    """Generate recording using polygon.io data."""
 
-	def __init__(self, node: Node, apiKey: str) -> None:
-		self.node = node
-		self.apiKey = apiKey
+    def __init__(self, node: Node, apiKey: str) -> None:
+        self.node = node
+        self.apiKey = apiKey
 
-	def generate(self, ticker: str, dateStr: str) -> None:
-		url = f"https://api.polygon.io/v2/aggs/ticker/{ticker}/range/1/minute/{dateStr}/{dateStr}?apiKey={self.apiKey}&limit=50000"
+    def generate(self, ticker: str, dateStr: str) -> None:
+        url = f"https://api.polygon.io/v2/aggs/ticker/{ticker}/range/1/minute/{dateStr}/{dateStr}?apiKey={self.apiKey}&limit=50000"
 
-		while url:
-			try:
-				response = HttpClient.get(url)
-				data = response.json
-				url = data.get("next_url")
+        while url:
+            try:
+                response = HttpClient.get(url)
+                data = response.json
+                url = data.get("next_url")
 
-				# Save all the data to remote.
-				with self.node.publishBulk(path=["ohlc", ticker, "USD", "polygon.io"],
-				                           isClientTimestamp=False) as publish:
-					for item in data.get("results", []):
-						publish(timestampMs=item["t"],
-						        data={
-						            "price": item.get("vw") or (item["o"] + item["l"] + item["c"] + item["l"]) / 4,
-						            "volume": item["v"],
-						            "open": item["o"],
-						            "close": item["c"],
-						            "high": item["h"],
-						            "low": item["l"],
-						        })
+                # Save all the data to remote.
+                with self.node.publishBulk(
+                    path=["ohlc", ticker, "USD", "polygon.io"], isClientTimestamp=False
+                ) as publish:
+                    for item in data.get("results", []):
+                        publish(
+                            timestampMs=item["t"],
+                            data={
+                                "price": item.get("vw")
+                                or (item["o"] + item["l"] + item["c"] + item["l"]) / 4,
+                                "volume": item["v"],
+                                "open": item["o"],
+                                "close": item["c"],
+                                "high": item["h"],
+                                "low": item["l"],
+                            },
+                        )
 
-			except HttpClientException as e:
-				if e.status == 429:
-					logger.info("Reached API limit, waiting 15s...")
-					time.sleep(15)
-				else:
-					raise
+            except HttpClientException as e:
+                if e.status == 429:
+                    logger.info("Reached API limit, waiting 15s...")
+                    time.sleep(15)
+                else:
+                    raise
 
 
 class GeneratorArgs:
-	"""Generate ticker and date information."""
+    """Generate ticker and date information."""
 
-	def __init__(self, tickers: typing.List[str], dateStart: datetime.datetime, dateEnd: datetime.datetime) -> None:
-		self.tickers = tickers
-		self.dateStart = dateStart.timestamp()
-		self.dateEnd = dateEnd.timestamp()
-		self.current: typing.Tuple[int, float] = (
-		    0,
-		    self.dateStart,
-		)
-		self.lock = threading.Lock()
+    def __init__(
+        self,
+        tickers: typing.List[str],
+        dateStart: datetime.datetime,
+        dateEnd: datetime.datetime,
+    ) -> None:
+        self.tickers = tickers
+        self.dateStart = dateStart.timestamp()
+        self.dateEnd = dateEnd.timestamp()
+        self.current: typing.Tuple[int, float] = (
+            0,
+            self.dateStart,
+        )
+        self.lock = threading.Lock()
 
-	def generate(self) -> typing.Optional[typing.Tuple[str, str]]:
+    def generate(self) -> typing.Optional[typing.Tuple[str, str]]:
 
-		with self.lock:
-			index, timestamp = self.current
-			if index >= len(self.tickers):
-				return None
-			result = (
-			    self.tickers[index],
-			    datetime.datetime.utcfromtimestamp(timestamp).strftime("%Y-%m-%d"),
-			)
-			timestamp += 24 * 60 * 60
-			if timestamp > self.dateEnd:
-				index += 1
-				timestamp = self.dateStart
-			self.current = (
-			    index,
-			    timestamp,
-			)
+        with self.lock:
+            index, timestamp = self.current
+            if index >= len(self.tickers):
+                return None
+            result = (
+                self.tickers[index],
+                datetime.datetime.utcfromtimestamp(timestamp).strftime("%Y-%m-%d"),
+            )
+            timestamp += 24 * 60 * 60
+            if timestamp > self.dateEnd:
+                index += 1
+                timestamp = self.dateStart
+            self.current = (
+                index,
+                timestamp,
+            )
 
-		return result
+        return result
 
 
 def workload(generator: Generator, generatorArgs: GeneratorArgs) -> bool:
 
-	while True:
-		data = generatorArgs.generate()
-		if data is None:
-			return True
-		ticker, dateStr = data
-		logger.info(f"Processing '{ticker}' @ {dateStr}")
-		generator.generate(ticker=ticker, dateStr=dateStr)
+    while True:
+        data = generatorArgs.generate()
+        if data is None:
+            return True
+        ticker, dateStr = data
+        logger.info(f"Processing '{ticker}' @ {dateStr}")
+        generator.generate(ticker=ticker, dateStr=dateStr)
 
-	return False
+    return False
 
 
 if __name__ == "__main__":
-	parser = argparse.ArgumentParser(description="Polygon data scrapper.")
-	parser.add_argument("--node-token",
-	                    type=str,
-	                    default=os.environ.get("BZD_NODE_TOKEN"),
-	                    help="A token to be used to access the node server.")
-	parser.add_argument(
-	    "uid",
-	    default=os.environ.get("BZD_NODE_UID"),
-	    help=
-	    "The UID of this node. If no UID is provided, the application will report the monitoring on the command line.")
+    parser = argparse.ArgumentParser(description="Polygon data scrapper.")
+    parser.add_argument(
+        "--node-token",
+        type=str,
+        default=os.environ.get("BZD_NODE_TOKEN"),
+        help="A token to be used to access the node server.",
+    )
+    parser.add_argument(
+        "uid",
+        default=os.environ.get("BZD_NODE_UID"),
+        help="The UID of this node. If no UID is provided, the application will report the monitoring on the command line.",
+    )
 
-	args = parser.parse_args()
-	tickerList = [
-	    "HCA", "HD", "HIG", "HII", "HLT", "HOLX", "HON", "HPE", "HPQ", "HRL", "HSIC", "HST", "HSY", "HUBB", "HUM",
-	    "HWM", "IBKR", "IBM", "ICE", "IDXX", "IEX", "IFF", "INCY", "INTC", "INTU", "INVH", "IP", "IPG", "IQV", "IR",
-	    "IRM", "ISRG", "IT", "ITW", "IVZ", "J", "JBHT", "JBL", "JCI", "JKHY", "JNJ", "JPM", "K", "KDP", "KEY", "KEYS",
-	    "KHC", "KIM", "KKR", "KLAC", "KMB", "KMI", "KMX", "KO", "KR", "KVUE", "L", "LDOS", "LEN", "LH", "LHX", "LII",
-	    "LIN", "LKQ", "LLY", "LMT", "LNT", "LOW", "LRCX", "LULU", "LUV", "LVS", "LW", "LYB", "LYV", "MA", "MAA", "MAR",
-	    "MAS", "MCD", "MCHP", "MCK", "MCO", "MDLZ", "MDT", "MET", "META", "MGM", "MHK", "MKC", "MKTX", "MLM", "MMC",
-	    "MMM", "MNST", "MO", "MOH", "MOS", "MPC", "MPWR", "MRK", "MRNA", "MS", "MSCI", "MSI", "MTB", "MTCH", "MTD",
-	    "MU", "NCLH", "NDAQ", "NDSN", "NEE", "NEM", "NFLX", "NI", "NKE", "NOC", "NOW", "NRG", "NSC", "NTAP", "NTRS",
-	    "NUE", "NVDA", "NVR", "NWS", "NWSA", "NXPI", "O", "ODFL", "OKE", "OMC", "ON", "ORCL", "ORLY", "OTIS", "OXY",
-	    "PANW", "PAYC", "PAYX", "PCAR", "PCG", "PEG", "PEP", "PFE", "PFG", "PG", "PGR", "PH", "PHM", "PKG", "PLD",
-	    "PLTR", "PM", "PNC", "PNR", "PNW", "PODD", "POOL", "PPG", "PPL", "PRU", "PSA", "PSKY", "PSX", "PTC", "PWR",
-	    "PYPL", "QCOM", "RCL", "REG", "REGN", "RF", "RJF", "RL", "RMD", "ROK", "ROL", "ROP", "ROST", "RSG", "RTX",
-	    "RVTY", "SBAC", "SBUX", "SCHW", "SHW", "SJM", "SLB", "SMCI", "SNA", "SNPS", "SO", "SOLV", "SPG", "SPGI", "SRE",
-	    "STE", "STLD", "STT", "STX", "STZ", "SW", "SWK", "SWKS", "SYF", "SYK", "SYY", "T", "TAP", "TDG", "TDY", "TECH",
-	    "TEL", "TER", "TFC", "TGT", "TJX", "TKO", "TMO", "TMUS", "TPL", "TPR", "TRGP", "TRMB", "TROW", "TRV", "TSCO",
-	    "TSLA", "TSN", "TT", "TTD", "TTWO", "TXN", "TXT", "TYL", "UAL", "UBER", "UDR", "UHS", "ULTA", "UNH", "UNP",
-	    "UPS", "URI", "USB", "V", "VICI", "VLO", "VLTO", "VMC", "VRSK", "VRSN", "VRTX", "VST", "VTR", "VTRS", "VZ",
-	    "WAB", "WAT", "WBD", "WDAY", "WDC", "WEC", "WELL", "WFC", "WM", "WMB", "WMT", "WRB", "WSM", "WST", "WTW", "WY",
-	    "WYNN", "XEL", "XOM", "XYL", "XYZ", "YUM", "ZBH", "ZBRA", "ZTS"
-	]
+    args = parser.parse_args()
+    tickerList = [
+        "HCA",
+        "HD",
+        "HIG",
+        "HII",
+        "HLT",
+        "HOLX",
+        "HON",
+        "HPE",
+        "HPQ",
+        "HRL",
+        "HSIC",
+        "HST",
+        "HSY",
+        "HUBB",
+        "HUM",
+        "HWM",
+        "IBKR",
+        "IBM",
+        "ICE",
+        "IDXX",
+        "IEX",
+        "IFF",
+        "INCY",
+        "INTC",
+        "INTU",
+        "INVH",
+        "IP",
+        "IPG",
+        "IQV",
+        "IR",
+        "IRM",
+        "ISRG",
+        "IT",
+        "ITW",
+        "IVZ",
+        "J",
+        "JBHT",
+        "JBL",
+        "JCI",
+        "JKHY",
+        "JNJ",
+        "JPM",
+        "K",
+        "KDP",
+        "KEY",
+        "KEYS",
+        "KHC",
+        "KIM",
+        "KKR",
+        "KLAC",
+        "KMB",
+        "KMI",
+        "KMX",
+        "KO",
+        "KR",
+        "KVUE",
+        "L",
+        "LDOS",
+        "LEN",
+        "LH",
+        "LHX",
+        "LII",
+        "LIN",
+        "LKQ",
+        "LLY",
+        "LMT",
+        "LNT",
+        "LOW",
+        "LRCX",
+        "LULU",
+        "LUV",
+        "LVS",
+        "LW",
+        "LYB",
+        "LYV",
+        "MA",
+        "MAA",
+        "MAR",
+        "MAS",
+        "MCD",
+        "MCHP",
+        "MCK",
+        "MCO",
+        "MDLZ",
+        "MDT",
+        "MET",
+        "META",
+        "MGM",
+        "MHK",
+        "MKC",
+        "MKTX",
+        "MLM",
+        "MMC",
+        "MMM",
+        "MNST",
+        "MO",
+        "MOH",
+        "MOS",
+        "MPC",
+        "MPWR",
+        "MRK",
+        "MRNA",
+        "MS",
+        "MSCI",
+        "MSI",
+        "MTB",
+        "MTCH",
+        "MTD",
+        "MU",
+        "NCLH",
+        "NDAQ",
+        "NDSN",
+        "NEE",
+        "NEM",
+        "NFLX",
+        "NI",
+        "NKE",
+        "NOC",
+        "NOW",
+        "NRG",
+        "NSC",
+        "NTAP",
+        "NTRS",
+        "NUE",
+        "NVDA",
+        "NVR",
+        "NWS",
+        "NWSA",
+        "NXPI",
+        "O",
+        "ODFL",
+        "OKE",
+        "OMC",
+        "ON",
+        "ORCL",
+        "ORLY",
+        "OTIS",
+        "OXY",
+        "PANW",
+        "PAYC",
+        "PAYX",
+        "PCAR",
+        "PCG",
+        "PEG",
+        "PEP",
+        "PFE",
+        "PFG",
+        "PG",
+        "PGR",
+        "PH",
+        "PHM",
+        "PKG",
+        "PLD",
+        "PLTR",
+        "PM",
+        "PNC",
+        "PNR",
+        "PNW",
+        "PODD",
+        "POOL",
+        "PPG",
+        "PPL",
+        "PRU",
+        "PSA",
+        "PSKY",
+        "PSX",
+        "PTC",
+        "PWR",
+        "PYPL",
+        "QCOM",
+        "RCL",
+        "REG",
+        "REGN",
+        "RF",
+        "RJF",
+        "RL",
+        "RMD",
+        "ROK",
+        "ROL",
+        "ROP",
+        "ROST",
+        "RSG",
+        "RTX",
+        "RVTY",
+        "SBAC",
+        "SBUX",
+        "SCHW",
+        "SHW",
+        "SJM",
+        "SLB",
+        "SMCI",
+        "SNA",
+        "SNPS",
+        "SO",
+        "SOLV",
+        "SPG",
+        "SPGI",
+        "SRE",
+        "STE",
+        "STLD",
+        "STT",
+        "STX",
+        "STZ",
+        "SW",
+        "SWK",
+        "SWKS",
+        "SYF",
+        "SYK",
+        "SYY",
+        "T",
+        "TAP",
+        "TDG",
+        "TDY",
+        "TECH",
+        "TEL",
+        "TER",
+        "TFC",
+        "TGT",
+        "TJX",
+        "TKO",
+        "TMO",
+        "TMUS",
+        "TPL",
+        "TPR",
+        "TRGP",
+        "TRMB",
+        "TROW",
+        "TRV",
+        "TSCO",
+        "TSLA",
+        "TSN",
+        "TT",
+        "TTD",
+        "TTWO",
+        "TXN",
+        "TXT",
+        "TYL",
+        "UAL",
+        "UBER",
+        "UDR",
+        "UHS",
+        "ULTA",
+        "UNH",
+        "UNP",
+        "UPS",
+        "URI",
+        "USB",
+        "V",
+        "VICI",
+        "VLO",
+        "VLTO",
+        "VMC",
+        "VRSK",
+        "VRSN",
+        "VRTX",
+        "VST",
+        "VTR",
+        "VTRS",
+        "VZ",
+        "WAB",
+        "WAT",
+        "WBD",
+        "WDAY",
+        "WDC",
+        "WEC",
+        "WELL",
+        "WFC",
+        "WM",
+        "WMB",
+        "WMT",
+        "WRB",
+        "WSM",
+        "WST",
+        "WTW",
+        "WY",
+        "WYNN",
+        "XEL",
+        "XOM",
+        "XYL",
+        "XYZ",
+        "YUM",
+        "ZBH",
+        "ZBRA",
+        "ZTS",
+    ]
 
-	generatorArgs = GeneratorArgs(tickerList, datetime.datetime(2024, 1, 1), datetime.datetime(2024, 12, 31))
-	node = Node(uid=args.uid, blockForS=3600)
+    generatorArgs = GeneratorArgs(
+        tickerList, datetime.datetime(2024, 1, 1), datetime.datetime(2024, 12, 31)
+    )
+    node = Node(uid=args.uid, blockForS=3600)
 
-	threads = [
-	    threading.Thread(target=workload, args=(
-	        Generator(node, apiKey),
-	        generatorArgs,
-	    )) for apiKey in apiKeys
-	]
-	for thread in threads:
-		thread.start()
-	for thread in threads:
-		thread.join()
+    threads = [
+        threading.Thread(
+            target=workload,
+            args=(
+                Generator(node, apiKey),
+                generatorArgs,
+            ),
+        )
+        for apiKey in apiKeys
+    ]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()

@@ -1,6 +1,5 @@
 import json
 import typing
-import ast
 import pathlib
 
 from bdl.object import Object
@@ -13,63 +12,64 @@ Json = typing.Dict[str, typing.Any]
 
 
 def formatJson(bdl: Object, data: typing.Optional[pathlib.Path] = None) -> str:
-	return ""
+    return ""
 
 
 def parametersToJson(parameters: ParametersResolved) -> typing.Sequence[Json]:
-	expressions = []
-	for parameter in parameters:
-		data = expressionToJson(typing.cast(Expression, parameter.expected)) | expressionToJson(
-		    typing.cast(Expression, parameter.param))
-		expressions.append(data)
-	return expressions
+    expressions = []
+    for parameter in parameters:
+        data = expressionToJson(
+            typing.cast(Expression, parameter.expected)
+        ) | expressionToJson(typing.cast(Expression, parameter.param))
+        expressions.append(data)
+    return expressions
 
 
 def expressionToJson(expression: Expression) -> Json:
-	data: Json = {}
-	if expression.isName:
-		data["name"] = expression.name
-	if expression.isName and expression.isFQN:
-		data["fqn"] = expression.fqn
-	if expression.isSymbol:
-		data["symbol"] = str(expression.symbol)
-		data["category"] = str(expression.symbol.category.value)
-	if expression.isLiteral:
-		data["value"] = expression.literalNative
-	elif expression.isValue:
-		data["value"] = str(expression.value)
-	elif expression.isParameters:
-		data["parameters"] = parametersToJson(expression.parametersResolved)
-	return data
+    data: Json = {}
+    if expression.isName:
+        data["name"] = expression.name
+    if expression.isName and expression.isFQN:
+        data["fqn"] = expression.fqn
+    if expression.isSymbol:
+        data["symbol"] = str(expression.symbol)
+        data["category"] = str(expression.symbol.category.value)
+    if expression.isLiteral:
+        data["value"] = expression.literalNative
+    elif expression.isValue:
+        data["value"] = str(expression.value)
+    elif expression.isParameters:
+        data["parameters"] = parametersToJson(expression.parametersResolved)
+    return data
 
 
 def expressionToFQN(expression: Expression) -> str:
-	assert expression.isFQN, f"Expression '{expression}' must have a FQN."
-	assert expression.isName, f"Expression '{expression}' must have a name."
-	return expression.fqn
+    assert expression.isFQN, f"Expression '{expression}' must have a FQN."
+    assert expression.isName, f"Expression '{expression}' must have a name."
+    return expression.fqn
 
 
 def expressionEntryToJson(entry: ExpressionEntry) -> Json:
-	return {
-	    "expression": expressionToJson(entry.expression),
-	    "init": [expressionToJson(expression) for expression in entry.init],
-	    "intra": [expressionToJson(expression) for expression in entry.intra],
-	    "shutdown": [expressionToJson(expression) for expression in entry.shutdown],
-	    "deps": [expressionToFQN(expression) for expression in entry.deps],
-	}
+    return {
+        "expression": expressionToJson(entry.expression),
+        "init": [expressionToJson(expression) for expression in entry.init],
+        "intra": [expressionToJson(expression) for expression in entry.intra],
+        "shutdown": [expressionToJson(expression) for expression in entry.shutdown],
+        "deps": [expressionToFQN(expression) for expression in entry.deps],
+    }
 
 
 def ioToJson(io: typing.Dict[str, typing.Any]) -> Json:
 
-	result = {}
-	for name, data in io.items():
-		result[name] = {
-		    "type": data["type"],
-		    "connections": data["connections"],
-		    "uid": data["identifier"],
-		    "symbol": str(data["symbol"]),
-		}
-	return result
+    result = {}
+    for name, data in io.items():
+        result[name] = {
+            "type": data["type"],
+            "connections": data["connections"],
+            "uid": data["identifier"],
+            "symbol": str(data["symbol"]),
+        }
+    return result
 
 
 def compositionJson(
@@ -78,20 +78,29 @@ def compositionJson(
     data: typing.Optional[pathlib.Path] = None,
 ) -> None:
 
-	for target, composition in compositions.items():
+    for target, composition in compositions.items():
+        contexts = []
 
-		contexts = []
+        for index, context in enumerate(composition.contexts):
+            registry = {
+                uid: expressionEntryToJson(registry)
+                for uid, registry in composition.registry.get(context, {}).items()
+            }
+            workloads = [
+                expressionEntryToJson(workload)
+                for workload in composition.workloads.get(context, [])
+            ]
+            services = [
+                expressionEntryToJson(service)
+                for service in composition.services.get(context, [])
+            ]
+            contexts.append(
+                {"registry": registry, "workloads": workloads, "services": services}
+            )
 
-		for index, context in enumerate(composition.contexts):
-			registry = {
-			    uid: expressionEntryToJson(registry)
-			    for uid, registry in composition.registry.get(context, {}).items()
-			}
-			workloads = [expressionEntryToJson(workload) for workload in composition.workloads.get(context, [])]
-			services = [expressionEntryToJson(service) for service in composition.services.get(context, [])]
-			contexts.append({"registry": registry, "workloads": workloads, "services": services})
+        ios = {uid: ioToJson(io) for uid, io in composition.iosRegistry.items() if io}
 
-		ios = {uid: ioToJson(io) for uid, io in composition.iosRegistry.items() if io}
-
-		jsonData = json.dumps({"target": target, "ios": ios, "contexts": contexts}, indent=4)
-		(output.parent / f"{output.name}.{target}.json").write_text(jsonData)
+        jsonData = json.dumps(
+            {"target": target, "ios": ios, "contexts": contexts}, indent=4
+        )
+        (output.parent / f"{output.name}.{target}.json").write_text(jsonData)

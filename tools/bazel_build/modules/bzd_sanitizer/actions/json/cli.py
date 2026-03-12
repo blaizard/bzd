@@ -6,25 +6,27 @@ import json
 from bzd_sanitizer.worker import worker
 
 
-def workload(args: typing.Tuple[pathlib.Path, pathlib.Path, bool], stdout: typing.TextIO) -> bool:
-	workspace, path, check = args
+def workload(
+    args: typing.Tuple[pathlib.Path, pathlib.Path, bool], stdout: typing.TextIO
+) -> bool:
+    workspace, path, check = args
 
-	original = (workspace / path).read_text()
-	formatted = json.dumps(json.loads(original), indent=4, sort_keys=True)
+    original = (workspace / path).read_text()
+    formatted = json.dumps(json.loads(original), indent=4, sort_keys=True)
 
-	if original != formatted:
-		if check:
-			stdout.write("This file is not formatted properly.\n")
-			return False
-		else:
-			(workspace / path).write_text(formatted, encoding="utf-8")
+    if original != formatted:
+        if check:
+            stdout.write("This file is not formatted properly.\n")
+            return False
+        else:
+            (workspace / path).write_text(formatted, encoding="utf-8")
 
-	return True
+    return True
 
 
 if __name__ == "__main__":
-	parser = argparse.ArgumentParser(description="Json formatter/linter.")
-	parser.add_argument("context", type=pathlib.Path, help="The context file path.")
-	args = parser.parse_args()
+    parser = argparse.ArgumentParser(description="Json formatter/linter.")
+    parser.add_argument("context", type=pathlib.Path, help="The context file path.")
+    args = parser.parse_args()
 
-	worker(args.context, workload, endswith=[".json"])
+    worker(args.context, workload, endswith=[".json"])

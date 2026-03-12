@@ -15,7 +15,8 @@ SchemaList = SchemaList_
 
 
 class Validation(ValidationBase[Schema]):
-	AVAILABLE_CONSTRAINTS: typing.Dict[str, typing.Type[Constraint]] = {
-	    contract.name: contract.constraint
-	    for contract in _Contracts if contract.constraint
-	}
+    AVAILABLE_CONSTRAINTS: typing.Dict[str, typing.Type[Constraint]] = {
+        contract.name: contract.constraint
+        for contract in _Contracts
+        if contract.constraint
+    }

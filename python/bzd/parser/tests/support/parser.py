@@ -1,5 +1,3 @@
-from pathlib import Path
-
 from bzd.parser.parser import Parser
 from bzd.parser.grammar import Grammar, GrammarItem, GrammarItemSpaces
 from bzd.parser.fragments import (
@@ -27,13 +25,15 @@ _grammarVariableDeclaration = [
                     GrammarItem(
                         r"=",
                         Fragment,
-                        [GrammarItem(
-                            r"(?P<value>[0-9]+)",
-                            Fragment,
-                            [
-                                GrammarItem(r";", FragmentNewElement),
-                            ],
-                        )],
+                        [
+                            GrammarItem(
+                                r"(?P<value>[0-9]+)",
+                                Fragment,
+                                [
+                                    GrammarItem(r";", FragmentNewElement),
+                                ],
+                            )
+                        ],
                     ),
                 ],
             ),
@@ -52,7 +52,8 @@ _grammarFunctionDeclaration = [
                     GrammarItem(
                         r"{",
                         FragmentNestedStart,
-                        _grammarVariableDeclaration + [GrammarItem(r"}", FragmentNestedStopNewElement)],
+                        _grammarVariableDeclaration
+                        + [GrammarItem(r"}", FragmentNestedStopNewElement)],
                     )
                 ],
             )
@@ -64,10 +65,9 @@ _grammar: Grammar = _grammarVariableDeclaration + _grammarFunctionDeclaration
 
 
 class TestParser(Parser):
-
-	def __init__(self, content: str) -> None:
-		super().__init__(
-		    content,
-		    grammar=_grammar,
-		    defaultGrammarPre=[GrammarItemSpaces] + _grammarComment,
-		)
+    def __init__(self, content: str) -> None:
+        super().__init__(
+            content,
+            grammar=_grammar,
+            defaultGrammarPre=[GrammarItemSpaces] + _grammarComment,
+        )

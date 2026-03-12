@@ -9,86 +9,86 @@ from tools.shell.factory import Factory
 
 
 class MyAssertions(unittest.TestCase):
-
-	def runTest(self) -> None:
-		pass
+    def runTest(self) -> None:
+        pass
 
 
 class Sh(Factory):
+    def __init__(self) -> None:
+        self.path: typing.Optional[pathlib.Path] = None
 
-	def __init__(self) -> None:
-		self.path: typing.Optional[pathlib.Path] = None
+    def getName(self) -> str:
+        """Give the name of the shell."""
 
-	def getName(self) -> str:
-		"""Give the name of the shell."""
+        return "Sh-compatible shell"
 
-		return "Sh-compatible shell"
+    def isCompatible(self) -> bool:
+        """Tell if this is a sh-compatibel shell."""
 
-	def isCompatible(self) -> bool:
-		"""Tell if this is a sh-compatibel shell."""
+        return os.environ.get("SHELL", "").endswith(
+            (
+                "/sh",
+                "/bash",
+            )
+        )
 
-		return os.environ.get("SHELL", "").endswith((
-		    "/sh",
-		    "/bash",
-		))
+    def _render(self) -> str:
+        return self.renderTemplate(
+            pathlib.Path("tools/shell/sh/srcs/bashrc.btl"),
+            {
+                "always": pathlib.Path("tools/shell/sh/srcs/always"),
+                "interactive": pathlib.Path("tools/shell/sh/srcs/interactive"),
+            },
+        )
 
-	def _render(self) -> str:
-		return self.renderTemplate(
-		    pathlib.Path("tools/shell/sh/srcs/bashrc.btl"),
-		    {
-		        "always": pathlib.Path("tools/shell/sh/srcs/always"),
-		        "interactive": pathlib.Path("tools/shell/sh/srcs/interactive"),
-		    },
-		)
+    def build(self, workspace: pathlib.Path) -> None:
+        """Build the configuration if needed."""
 
-	def build(self, workspace: pathlib.Path) -> None:
-		"""Build the configuration if needed."""
+        content = self._render()
+        self.path = workspace / "tools/shell/sh/bashrc.sh"
+        self.path.write_text(content)
 
-		content = self._render()
-		self.path = workspace / "tools/shell/sh/bashrc.sh"
-		self.path.write_text(content)
+    def check(self, workspace: pathlib.Path) -> bool:
+        content = self._render()
+        self.path = workspace / "tools/shell/sh/bashrc.sh"
+        try:
+            MyAssertions().assertEqual(content, self.path.read_text())
+            return True
+        except AssertionError as e:
+            print(e)
+            return False
 
-	def check(self, workspace: pathlib.Path) -> bool:
-		content = self._render()
-		self.path = workspace / "tools/shell/sh/bashrc.sh"
-		try:
-			MyAssertions().assertEqual(content, self.path.read_text())
-			return True
-		except AssertionError as e:
-			print(e)
-			return False
+    def install(self) -> None:
+        """Install the shell."""
 
-	def install(self) -> None:
-		"""Install the shell."""
+        # Look for the current .bashrc
+        assert "HOME" in os.environ, "HOME environment variable is not set."
+        home = pathlib.Path(os.environ["HOME"])
+        assert home.is_dir(), "Directory does not exists."
+        hookFile = home / ".bashrc"
+        if not hookFile.is_file():
+            print(f"Creating {hookFile}.")
+            hookFile.touch()
 
-		# Look for the current .bashrc
-		assert "HOME" in os.environ, "HOME environment variable is not set."
-		home = pathlib.Path(os.environ["HOME"])
-		assert home.is_dir(), "Directory does not exists."
-		hookFile = home / ".bashrc"
-		if not hookFile.is_file():
-			print(f"Creating {hookFile}.")
-			hookFile.touch()
+        # Update the hook file.
+        content = hookFile.read_text()
+        hook = "# bzd-hook-start\n# This is a generate hook from the bzd monorepo, please do not remove.\nsource ~/.bzd/bashrc.sh\n# bzd-hook-end\n"
+        updateContent = re.sub(
+            r"^#\s*bzd-hook-start[\s\S]*\n#\s*bzd-hook-end\n",
+            hook,
+            content,
+            count=1,
+            flags=re.MULTILINE,
+        )
+        if id(content) == id(updateContent):
+            updateContent += "\n" + hook
+        if content != updateContent:
+            print(f"Updating {hookFile}.")
+            hookFile.write_text(updateContent)
 
-		# Update the hook file.
-		content = hookFile.read_text()
-		hook = "# bzd-hook-start\n# This is a generate hook from the bzd monorepo, please do not remove.\nsource ~/.bzd/bashrc.sh\n# bzd-hook-end\n"
-		updateContent = re.sub(
-		    r"^#\s*bzd-hook-start[\s\S]*\n#\s*bzd-hook-end\n",
-		    hook,
-		    content,
-		    count=1,
-		    flags=re.MULTILINE,
-		)
-		if id(content) == id(updateContent):
-			updateContent += "\n" + hook
-		if content != updateContent:
-			print(f"Updating {hookFile}.")
-			hookFile.write_text(updateContent)
+        # Replace the content of the directory.
+        assert self.path
+        self.createEmptyDirectory(home / ".bzd")
+        shutil.copy(self.path, home / ".bzd/bashrc.sh")
 
-		# Replace the content of the directory.
-		assert self.path
-		self.createEmptyDirectory(home / ".bzd")
-		shutil.copy(self.path, home / ".bzd/bashrc.sh")
-
-		print("To take immediate effect, run 'source ~/.bashrc'.")
+        print("To take immediate effect, run 'source ~/.bashrc'.")

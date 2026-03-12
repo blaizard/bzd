@@ -4,7 +4,7 @@ from bzd.template.template import Template
 
 
 class TestRun(unittest.TestCase):
-	"""
+    """
     def testSimpleCondition(self) -> None:
             template = Template("{% if value %}hello{% end %}")
 
@@ -63,19 +63,21 @@ class TestRun(unittest.TestCase):
             self.assertEqual("goodbye", result)
     """
 
-	def testElIfCondition(self) -> None:
-		template = Template("{% if value1 %}hello{% elif value2 %}goodbye{% else %}what?!{% end %}")
+    def testElIfCondition(self) -> None:
+        template = Template(
+            "{% if value1 %}hello{% elif value2 %}goodbye{% else %}what?!{% end %}"
+        )
 
-		result = template.render({"value1": True})
-		self.assertEqual("hello", result)
+        result = template.render({"value1": True})
+        self.assertEqual("hello", result)
 
-		result = template.render({"value1": False, "value2": True})
-		self.assertEqual("goodbye", result)
+        result = template.render({"value1": False, "value2": True})
+        self.assertEqual("goodbye", result)
 
-		result = template.render({"value1": False, "value2": False})
-		self.assertEqual("what?!", result)
+        result = template.render({"value1": False, "value2": False})
+        self.assertEqual("what?!", result)
 
-	"""
+    """
 	def testElseNestedCondition(self) -> None:
 		template = Template("{% if value1 %}0{% if value2 %}1{% else %}2{% end %}{% else %}3{% end %}")
 
@@ -118,40 +120,40 @@ class TestRun(unittest.TestCase):
 		self.assertEqual("hello ", result)
 	"""
 
-	def testAutoSrip(self) -> None:
-		template = Template("""
+    def testAutoSrip(self) -> None:
+        template = Template("""
 	{% if value %}
   hello
 			{% end %}""")
-		result = template.render({"value": True})
-		self.assertEqual("\n  hello\n", result)
+        result = template.render({"value": True})
+        self.assertEqual("\n  hello\n", result)
 
-	def testAutoSripNested(self) -> None:
-		template = Template("""
+    def testAutoSripNested(self) -> None:
+        template = Template("""
 	{% if value %} {% if value %}
   hello
 		{% end %} {% end %}
 """)
-		result = template.render({"value": True})
-		self.assertEqual("\n   hello\n ", result)
+        result = template.render({"value": True})
+        self.assertEqual("\n   hello\n ", result)
 
-	def testAutoSripNested2(self) -> None:
-		template = Template("""
+    def testAutoSripNested2(self) -> None:
+        template = Template("""
 	{% if value %}
 		{% if value %}
   hello
 		{% end %}
 	{% end %}
 """)
-		result = template.render({"value": True})
-		self.assertEqual("\n  hello\n", result)
+        result = template.render({"value": True})
+        self.assertEqual("\n  hello\n", result)
 
-	def testAutoSripStartOfFile(self) -> None:
-		template = Template("""       {% if value %}hello{% end %}""")
-		result = template.render({"value": True})
-		# Not supported
-		# self.assertEqual("hello", result)
+    def testAutoSripStartOfFile(self) -> None:
+        template = Template("""       {% if value %}hello{% end %}""")
+        template.render({"value": True})
+        # Not supported
+        # self.assertEqual("hello", result)
 
 
 if __name__ == "__main__":
-	unittest.main()
+    unittest.main()

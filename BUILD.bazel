@@ -38,7 +38,7 @@ sh_binary_wrapper(
         "--use",
         "//tools/nodejs:prettier",
         "--use",
-        "//tools/python:yapf",
+        "//tools/python:ruff",
         "--use",
         "//tools/ci:generate",
         "--use",

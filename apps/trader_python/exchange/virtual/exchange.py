@@ -8,12 +8,11 @@ from apps.trader_python.recording.recording import Recording
 
 
 class Virtual:
+    def __init__(self, recording: Recording) -> None:
+        self.recording = recording
+        self.pairs = [VirtualPair(pair) for pair in self.recording]
 
-	def __init__(self, recording: Recording) -> None:
-		self.recording = recording
-		self.pairs = [VirtualPair(pair) for pair in self.recording]
+    def getPairs(self) -> typing.Iterator[Pair]:
 
-	def getPairs(self) -> typing.Iterator[Pair]:
-
-		for pair in self.pairs:
-			yield typing.cast(Pair, pair)
+        for pair in self.pairs:
+            yield typing.cast(Pair, pair)

@@ -7,153 +7,157 @@ TypeConversionCallableReturn = typing.Tuple[str, typing.List[str]]
 
 
 class IntegerType:
-	constexpr: bool = True
+    constexpr: bool = True
 
-	@staticmethod
-	def toType(
-	    entity: Symbol,
-	    nested: typing.List[str],
-	    reference: bool,
-	    values: typing.Optional[typing.Sequence[str]],
-	) -> TypeConversionCallableReturn:
-		maybeContractMin = entity.contracts.get("min")
-		isSigned = (True if maybeContractMin is None or maybeContractMin.valueNumber < 0 else False)
-		maybeContractMax = entity.contracts.get("max")
-		bits = 32
-		if maybeContractMax is not None:
-			maxValue = maybeContractMax.valueNumber
-			if maxValue < 2**8:
-				bits = 8
-			elif maxValue < 2**16:
-				bits = 16
-			elif maxValue < 2**32:
-				bits = 32
-			elif maxValue < 2**64:
-				bits = 64
-			else:
-				Error.handleFromElement(
-				    element=entity.element,
-				    message="Value too large, max supported is 64-bit.",
-				)
-		if isSigned:
-			return "bzd::Int{}".format(bits), nested
-		return "bzd::UInt{}".format(bits), nested
+    @staticmethod
+    def toType(
+        entity: Symbol,
+        nested: typing.List[str],
+        reference: bool,
+        values: typing.Optional[typing.Sequence[str]],
+    ) -> TypeConversionCallableReturn:
+        maybeContractMin = entity.contracts.get("min")
+        isSigned = (
+            True
+            if maybeContractMin is None or maybeContractMin.valueNumber < 0
+            else False
+        )
+        maybeContractMax = entity.contracts.get("max")
+        bits = 32
+        if maybeContractMax is not None:
+            maxValue = maybeContractMax.valueNumber
+            if maxValue < 2**8:
+                bits = 8
+            elif maxValue < 2**16:
+                bits = 16
+            elif maxValue < 2**32:
+                bits = 32
+            elif maxValue < 2**64:
+                bits = 64
+            else:
+                Error.handleFromElement(
+                    element=entity.element,
+                    message="Value too large, max supported is 64-bit.",
+                )
+        if isSigned:
+            return "bzd::Int{}".format(bits), nested
+        return "bzd::UInt{}".format(bits), nested
 
 
 class FloatType:
-	constexpr = True
-	toType = "bzd::Float32"
+    constexpr = True
+    toType = "bzd::Float32"
 
 
 class VoidType:
-	constexpr = False
-	toType = "void"
+    constexpr = False
+    toType = "void"
 
 
 class NoneType:
-	constexpr = True
-	toType = "bzd::None"
+    constexpr = True
+    toType = "bzd::None"
 
 
 class Byte:
-	constexpr = True
-	toType = "bzd::Byte"
+    constexpr = True
+    toType = "bzd::Byte"
 
 
 class Boolean:
-	constexpr = True
-	toType = "bool"
+    constexpr = True
+    toType = "bool"
 
 
 class ResultType:
-	constexpr = False
+    constexpr = False
 
-	@staticmethod
-	def toType(
-	    entity: Symbol,
-	    nested: typing.List[str],
-	    reference: bool,
-	    values: typing.Optional[typing.Sequence[str]],
-	) -> TypeConversionCallableReturn:
-		if len(nested) == 0:
-			nested.append("void")
-		if len(nested) == 1:
-			nested.append("bzd::Error")
-		return "bzd::Result", nested
+    @staticmethod
+    def toType(
+        entity: Symbol,
+        nested: typing.List[str],
+        reference: bool,
+        values: typing.Optional[typing.Sequence[str]],
+    ) -> TypeConversionCallableReturn:
+        if len(nested) == 0:
+            nested.append("void")
+        if len(nested) == 1:
+            nested.append("bzd::Error")
+        return "bzd::Result", nested
 
 
 class AsyncType:
-	constexpr = False
+    constexpr = False
 
-	@staticmethod
-	def toType(
-	    entity: Symbol,
-	    nested: typing.List[str],
-	    reference: bool,
-	    values: typing.Optional[typing.Sequence[str]],
-	) -> TypeConversionCallableReturn:
-		if len(nested) == 0:
-			nested.append("void")
-		if len(nested) == 1:
-			nested.append("bzd::Error")
-		return "bzd::Async", nested
+    @staticmethod
+    def toType(
+        entity: Symbol,
+        nested: typing.List[str],
+        reference: bool,
+        values: typing.Optional[typing.Sequence[str]],
+    ) -> TypeConversionCallableReturn:
+        if len(nested) == 0:
+            nested.append("void")
+        if len(nested) == 1:
+            nested.append("bzd::Error")
+        return "bzd::Async", nested
 
 
 class CallableType:
-	constexpr = False
-	toType = "bzd::FunctionRef<void(void)>"
+    constexpr = False
+    toType = "bzd::FunctionRef<void(void)>"
 
 
 class SpanType:
-	constexpr = False
-	toType = "bzd::Span"
+    constexpr = False
+    toType = "bzd::Span"
 
 
 class StringType:
-	constexpr = True
-	toType = "bzd::StringView"
+    constexpr = True
+    toType = "bzd::StringView"
 
 
 class AnyType:
-	constexpr = True
-	toType = ""
+    constexpr = True
+    toType = ""
 
 
 class ListType:
-	constexpr = True
-	toType = ""
+    constexpr = True
+    toType = ""
 
 
 class ArrayType:
-	name = "Array"
-	constexpr = False
+    name = "Array"
+    constexpr = False
 
-	@classmethod
-	def toType(
-	    cls,
-	    entity: Symbol,
-	    nested: typing.List[str],
-	    reference: bool,
-	    values: typing.Optional[typing.List[str]],
-	) -> TypeConversionCallableReturn:
-		if reference:
-			return f"bzd::interface::{cls.name}", nested
-		maybeContractCapacity = entity.contracts.get("capacity")
-		if maybeContractCapacity is None:
-			if values is None:
-				# Default capacity is always 1
-				nested.append("1u")
-			else:
-				nested.append(f"{len(values)}u")
-		else:
-			nested.append("{:d}u".format(int(maybeContractCapacity.valueNumber)))
-		if values is not None:
-			values.insert(0, "bzd::inPlace")
-		return f"bzd::{cls.name}", nested
+    @classmethod
+    def toType(
+        cls,
+        entity: Symbol,
+        nested: typing.List[str],
+        reference: bool,
+        values: typing.Optional[typing.List[str]],
+    ) -> TypeConversionCallableReturn:
+        if reference:
+            return f"bzd::interface::{cls.name}", nested
+        maybeContractCapacity = entity.contracts.get("capacity")
+        if maybeContractCapacity is None:
+            if values is None:
+                # Default capacity is always 1
+                nested.append("1u")
+            else:
+                nested.append(f"{len(values)}u")
+        else:
+            nested.append("{:d}u".format(int(maybeContractCapacity.valueNumber)))
+        if values is not None:
+            values.insert(0, "bzd::inPlace")
+        return f"bzd::{cls.name}", nested
 
 
 class VectorType(ArrayType):
-	name = "Vector"
+    name = "Vector"
 
 
 builtins: typing.Dict[str, typing.Any] = {

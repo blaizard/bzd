@@ -92,7 +92,7 @@ formatter and linters for YAML, json and markdown are also available.
 | Language | Formatters   | Code Analyzers                      | Code Coverage | Test Framework | Documentation |
 | -------- | ------------ | ----------------------------------- | ------------- | -------------- | ------------- |
 | C++      | clang-format | clang-tidy, asan, lsan, tsan, ubsan | Yes           | Yes            | doxygen-based |
-| Python   | yapf         | mypy                                | Yes           | Yes            |               |
+| Python   | ruff         | ruff, mypy                          | Yes           | Yes            |               |
 | Node     | prettier     | eslint                              | Yes           | Yes            |               |
 | Skylark  | buildifier   | buildifier                          |               |                | stardoc       |
 

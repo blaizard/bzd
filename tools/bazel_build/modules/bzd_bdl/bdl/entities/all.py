@@ -27,8 +27,19 @@ Expression = _Expression
 Extern = _Extern
 Reference = _Reference
 
-EntityType = typing.Union[Expression, Nested, Method, Using, Enum, EnumValue, Extern, Namespace, Use, Builtin,
-                          Reference]
+EntityType = typing.Union[
+    Expression,
+    Nested,
+    Method,
+    Using,
+    Enum,
+    EnumValue,
+    Extern,
+    Namespace,
+    Use,
+    Builtin,
+    Reference,
+]
 SymbolType = typing.Union[Expression, Nested, Method, Using, Enum, Extern]
 
 CATEGORY_TO_ENTITY: typing.Dict[str, typing.Type[EntityType]] = {
@@ -53,17 +64,19 @@ def elementToEntity(
     element: Element,
     extension: typing.Optional[typing.Dict[str, typing.Type[EntityType]]] = None,
 ) -> EntityType:
-	"""
+    """
     Instantiate an entity from an element.
     """
 
-	Error.assertHasAttr(element=element, attr="category")
-	category = element.getAttr("category").value
+    Error.assertHasAttr(element=element, attr="category")
+    category = element.getAttr("category").value
 
-	if extension and category in extension:
-		return extension[category](element=element)
+    if extension and category in extension:
+        return extension[category](element=element)
 
-	if category not in CATEGORY_TO_ENTITY:
-		Error.handleFromElement(element=element, message="Unexpected element category: {}".format(category))
+    if category not in CATEGORY_TO_ENTITY:
+        Error.handleFromElement(
+            element=element, message="Unexpected element category: {}".format(category)
+        )
 
-	return CATEGORY_TO_ENTITY[category](element=element)
+    return CATEGORY_TO_ENTITY[category](element=element)
