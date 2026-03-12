@@ -18,6 +18,16 @@ sh_binary_wrapper(
 )
 
 sh_binary_wrapper(
+    name = "ruff",
+    command = "{binary} --config {config} $@",
+    locations = {
+        "@bzd_sanitizer//actions/ruff": "binary",
+        "pyproject.toml": "config",
+    },
+    visibility = ["//visibility:public"],
+)
+
+sh_binary_wrapper(
     name = "codespell",
     command = "{binary} --toml {config} $@",
     locations = {

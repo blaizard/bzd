@@ -67,3 +67,10 @@ module = [
 ignore_errors = true
 
 [tool.codespell]
+
+[tool.ruff]
+line-length = 120
+indent-width = 1
+
+[tool.ruff.format]
+indent-style = "tab"

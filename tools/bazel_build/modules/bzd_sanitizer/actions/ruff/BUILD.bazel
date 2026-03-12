@@ -1,0 +1,37 @@
+load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper")
+load("@rules_python//python:defs.bzl", "py_binary")
+
+py_binary(
+    name = "ruff_binary",
+    srcs = [
+        "ruff_binary.py",
+    ],
+    data = [
+        "@pip//ruff:extracted_whl_files",
+    ],
+    deps = [
+        "@pip//ruff",
+    ],
+)
+
+py_binary(
+    name = "cli",
+    srcs = [
+        "cli.py",
+    ],
+    main = "cli.py",
+    deps = [
+        "//python/bzd_sanitizer:worker",
+        "@bzd_python//bzd/utils:run",
+    ],
+)
+
+sh_binary_wrapper(
+    name = "ruff",
+    command = "{binary} --ruff {ruff} $@",
+    locations = {
+        ":cli": "binary",
+        ":ruff_binary": "ruff",
+    },
+    visibility = ["//visibility:public"],
+)
