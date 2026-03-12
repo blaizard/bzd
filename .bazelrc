@@ -137,14 +137,12 @@ coverage:gcc --experimental_fetch_all_coverage_outputs
 build:esp32 --platforms="@esp32//:platform-esp32-xtensa_lx6"
 build:esp32 --platform_suffix=esp32-xtensa_lx6-gcc
 build:esp32 --extra_execution_platforms=@esp32//:platform
-build:qemu --extra_toolchains=@bzd_espressif//runner/esp32:qemu_toolchain
 build:uart --extra_toolchains=@bzd_espressif//runner/esp32:uart_toolchain
 
 # esp32s3-xtensa_lx7-gcc
 build:esp32s3 --platforms="@esp32s3//:platform-esp32s3-xtensa_lx7"
 build:esp32s3 --platform_suffix=esp32s3-xtensa_lx7-gcc
 build:esp32s3 --extra_execution_platforms=@esp32s3//:platform
-build:qemu --extra_toolchains=@bzd_espressif//runner/esp32s3:qemu_toolchain
 build:uart --extra_toolchains=@bzd_espressif//runner/esp32s3:uart_toolchain
 
 # clang-tidy

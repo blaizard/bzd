@@ -25,3 +25,6 @@ use_repo(pip, pip = "bzd_espressif_pip")
 # Rust SDK
 include("//hal/rust:esp32_hal.MODULE.bazel")
 include("//hal/rust:esp32s3_hal.MODULE.bazel")
+
+# Default runners are QEMU.
+register_toolchains("//runner/esp32:qemu_toolchain", "//runner/esp32s3:qemu_toolchain")

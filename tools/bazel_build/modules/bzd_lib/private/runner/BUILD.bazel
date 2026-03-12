@@ -1,3 +1,4 @@
+load("@platforms//host:constraints.bzl", "HOST_CONSTRAINTS")
 load("//private/runner:toolchain.bzl", "bzd_make_runner_toolchain")
 
 toolchain_type(
@@ -6,6 +7,7 @@ toolchain_type(
 )
 
 bzd_make_runner_toolchain(
-    name = "passthrough_toolchain",
+    name = "host_toolchain",
     runner = None,
+    target_compatible_with = HOST_CONSTRAINTS,
 )
