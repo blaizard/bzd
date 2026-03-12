@@ -10,7 +10,7 @@ def pnpm_install(name):
     repository_multiplatform_maker(
         name = name,
         repositories = [{
-            "build_file": Label("//toolchain/pnpm:pnpm.BUILD"),
+            "build_file": Label("//toolchain/pnpm:pnpm.BUILD.bazel"),
             "files": {
                 "pnpm": {
                     "executable": True,
@@ -22,7 +22,7 @@ def pnpm_install(name):
                 Label("@bzd_platforms//al_isa:linux-x86_64"),
             ],
         }, {
-            "build_file": Label("//toolchain/pnpm:pnpm.BUILD"),
+            "build_file": Label("//toolchain/pnpm:pnpm.BUILD.bazel"),
             "files": {
                 "pnpm": {
                     "executable": True,

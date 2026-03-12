@@ -5,7 +5,7 @@ load("@bzd_lib//:repository_multiplatform_maker.bzl", "repository_multiplatform_
 _repositories = {
     "20.11.0": [{
         "archive": {
-            "build_file": Label("//toolchain/node:node.BUILD"),
+            "build_file": Label("//toolchain/node:node.BUILD.bazel"),
             "integrity": "sha256-gieANp0Oownn0hjkHeu9GgP4zfNU6/ikQg6J85zC5hI=",
             "strip_prefix": "node-v20.11.0-linux-x64",
             "urls": [
@@ -18,7 +18,7 @@ _repositories = {
     }],
     "20.5.1": [{
         "archive": {
-            "build_file": Label("//toolchain/node:node.BUILD"),
+            "build_file": Label("//toolchain/node:node.BUILD.bazel"),
             "sha256": "a4a700bbca51ac26538eda2250e449955a9cc49638a45b38d5501e97f5b020b4",
             "strip_prefix": "node-v20.5.1-linux-x64",
             "urls": [
@@ -31,7 +31,7 @@ _repositories = {
     }],
     "23.1.0": [{
         "archive": {
-            "build_file": Label("//toolchain/node:node.BUILD"),
+            "build_file": Label("//toolchain/node:node.BUILD.bazel"),
             "integrity": "sha256-zKz/TzLjw3KfUJTSDkCJoWo7jxOB6XMLGfHBb3z2Tak=",
             "strip_prefix": "node-v23.1.0-linux-x64",
             "urls": [

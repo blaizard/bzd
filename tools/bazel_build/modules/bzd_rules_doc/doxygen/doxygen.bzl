@@ -9,7 +9,7 @@ def _doxygen_impl(_module_ctx):
         name = "doxygen",
         repositories = [{
             "archive": {
-                "build_file": Label("//doxygen:doxygen.BUILD"),
+                "build_file": Label("//doxygen:doxygen.BUILD.bazel"),
                 "integrity": "sha256-PHABHhV2hoT5aDP3PjO+5MKMyT/CS6qHtv+gEbjGn/4=",
                 "strip_prefix": "linux_x86_64_1_13_2",
                 "urls": [

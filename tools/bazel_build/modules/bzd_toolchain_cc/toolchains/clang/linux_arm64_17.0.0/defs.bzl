@@ -19,7 +19,7 @@ def linux_arm64(_module_ctx, name, use_fragment):
 
     toolchain_definition = {
         "build_files": [
-            "@bzd_toolchain_cc//toolchains/clang:linux_arm64_17.0.0/linux_arm64.BUILD",
+            "@bzd_toolchain_cc//toolchains/clang:linux_arm64_17.0.0/linux_arm64.BUILD.bazel",
         ],
         "builtin_include_directories": [
             "/usr/include/aarch64-linux-gnu",

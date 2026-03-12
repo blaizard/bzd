@@ -1,15 +1,17 @@
+"""Unix compiler description."""
+
 filegroup(
     name = "ar_files",
     srcs = [
         ":ar",
-    ]
+    ],
 )
 
 filegroup(
     name = "as_files",
     srcs = [
         ":as",
-    ]
+    ],
 )
 
 filegroup(
@@ -18,7 +20,7 @@ filegroup(
         ":cc",
         ":cpp",
         ":header_files",
-    ]
+    ],
 )
 
 filegroup(
@@ -29,21 +31,21 @@ filegroup(
         "bin/lld",
         ":dynamic_libraries_files",
         ":static_libraries_files",
-    ] + glob(["bin/*.lld"])
+    ] + glob(["bin/*.lld"]),
 )
 
 filegroup(
     name = "objcopy_files",
     srcs = [
         ":objcopy",
-    ]
+    ],
 )
 
 filegroup(
     name = "strip_files",
     srcs = [
         ":strip",
-    ]
+    ],
 )
 
 filegroup(
@@ -67,7 +69,7 @@ filegroup(
         ":llvm_symbolizer",
         ":clang_tidy",
         ":cov",
-        ":objdump"
+        ":objdump",
     ],
 )
 
@@ -84,15 +86,15 @@ filegroup(
 sh_binary_wrapper(
     name = "clang_tidy",
     locations = {
+        ":llvm_symbolizer": "llvm_symbolizer",
         "bin/clang-tidy": "clang_tidy",
-        ":llvm_symbolizer": "llvm_symbolizer"
     },
     command = """
 export LLVM_SYMBOLIZER_PATH="{llvm_symbolizer}"
 {clang_tidy} $@
     """,
     data = [
-        ":header_files"
+        ":header_files",
     ],
     visibility = ["//visibility:public"],
 )
@@ -101,7 +103,7 @@ export LLVM_SYMBOLIZER_PATH="{llvm_symbolizer}"
 sh_binary_wrapper(
     name = "executor_host",
     locations = {
-        ":llvm_symbolizer": "llvm_symbolizer"
+        ":llvm_symbolizer": "llvm_symbolizer",
     },
     command = """
 export PATH=$(dirname {llvm_symbolizer}):$PATH

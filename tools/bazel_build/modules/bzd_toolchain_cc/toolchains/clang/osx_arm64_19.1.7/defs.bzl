@@ -22,7 +22,7 @@ def osx_arm64(module_ctx, name, use_fragment):
 
     toolchain_definition = {
         "build_files": [
-            "@bzd_toolchain_cc//toolchains/clang:osx_arm64_19.1.7/osx_arm64.BUILD",
+            "@bzd_toolchain_cc//toolchains/clang:osx_arm64_19.1.7/osx_arm64.BUILD.bazel",
         ],
         "builtin_include_directories": [
             "{}/System/Library/Frameworks/Kernel.framework/Headers".format(sdk_root),

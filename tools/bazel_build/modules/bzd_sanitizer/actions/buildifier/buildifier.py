@@ -48,4 +48,5 @@ if __name__ == "__main__":
 	    args=(str(args.buildifier), ),
 	    endswith=[".bazel", ".bzl"],
 	    include=["**BUILD", "**WORKSPACE"],
+	    excludeFile=".sanitizerignore",
 	)

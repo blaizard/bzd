@@ -93,7 +93,7 @@ def _impl(repository_ctx):
     }
 
     # Substitute the BUILD file content.
-    template = repository_ctx.read(Label("//cc:unix/template.BUILD"))
+    template = repository_ctx.read(Label("//cc:unix/template.BUILD.bazel"))
     for key, value in build_substitutions.items():
         template = template.replace(key, value)
 

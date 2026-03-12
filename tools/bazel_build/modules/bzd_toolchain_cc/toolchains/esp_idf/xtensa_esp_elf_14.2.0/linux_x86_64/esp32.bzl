@@ -24,7 +24,7 @@ def esp32_linux_x86_64(_module_ctx, name, _use_fragment):
             "strip": "xtensa-esp-elf/bin/strip",
         },
         "build_files": [
-            Label("//toolchains/esp_idf:xtensa_esp_elf_14.2.0/linux_x86_64/esp32.BUILD"),
+            Label("//toolchains/esp_idf:xtensa_esp_elf_14.2.0/linux_x86_64/esp32.BUILD.bazel"),
         ],
         "compile_flags": [
             # Allow long calls

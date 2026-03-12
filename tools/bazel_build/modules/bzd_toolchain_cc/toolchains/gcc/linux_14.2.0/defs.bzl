@@ -19,7 +19,7 @@ def linux_x86_64(_module_ctx, name, use_fragment):
 
     toolchain_definition = {
         "build_files": [
-            "@bzd_toolchain_cc//toolchains/gcc:linux_14.2.0/linux_x86_64.BUILD",
+            "@bzd_toolchain_cc//toolchains/gcc:linux_14.2.0/linux_x86_64.BUILD.bazel",
         ],
         "builtin_include_directories": [
             "/usr/include/x86_64-linux-gnu",

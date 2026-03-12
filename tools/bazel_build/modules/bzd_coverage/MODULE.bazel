@@ -13,7 +13,7 @@ http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "ht
 
 http_archive(
     name = "lcov",
-    build_file = ":lcov.BUILD",
+    build_file = ":lcov.BUILD.bazel",
     integrity = "",
     strip_prefix = "lcov-1.16",
     url = "https://github.com/linux-test-project/lcov/releases/download/v1.16/lcov-1.16.tar.gz",

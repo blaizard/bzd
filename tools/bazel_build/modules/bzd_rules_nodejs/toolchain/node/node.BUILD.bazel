@@ -1,3 +1,5 @@
+"""Node binary."""
+
 load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper")
 load("@rules_shell//shell:sh_binary.bzl", "sh_binary")
 
@@ -19,8 +21,8 @@ sh_binary(
 sh_binary_wrapper(
     name = "npm",
     locations = {
+        ":bin": "node",
         ":bin/npm": "npm",
-        ":bin": "node"
     },
     command = "PATH={node}:$PATH {npm} $@",
     data = glob([

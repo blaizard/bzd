@@ -1,13 +1,15 @@
+"""Stdlib."""
+
 load("@rules_rust//rust:defs.bzl", "rust_library")
 
-package(default_visibility =  ["//visibility:public"])
+package(default_visibility = ["//visibility:public"])
 
 filegroup(
     name = "stdlib_target",
     srcs = [
         ":compiler_builtins",
         ":core",
-	],
+    ],
 )
 
 rust_library(
@@ -24,7 +26,7 @@ rust_library(
         "unstable",
         "no_std",
         "no-asm",
-        "mem"
+        "mem",
     ],
     crate_name = "compiler_builtins",
     #edition = "2024",

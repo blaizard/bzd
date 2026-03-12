@@ -23,7 +23,7 @@ def unix():
             "strip": "bin/llvm-strip",
         },
         "build_files": [
-            "@bzd_toolchain_cc//toolchains/clang:unix/unix.BUILD",
+            "@bzd_toolchain_cc//toolchains/clang:unix/unix.BUILD.bazel",
         ],
         "compiler": "clang",
         "loads": {

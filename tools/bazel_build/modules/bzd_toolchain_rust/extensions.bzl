@@ -9,7 +9,7 @@ _repositories = {
     "esp-rust-1.92.0": {
         "stdlib_target": {
             "archive": {
-                "build_file": Label("//toolchains/esp_rust_1.92.0:stdlib_target.BUILD"),
+                "build_file": Label("//toolchains/esp_rust_1.92.0:stdlib_target.BUILD.bazel"),
                 "sha256": "159577235ac78591c850a432ad1a982735fe910d0495d26e7c5c17643acc4b4f",
                 "strip_prefix": "rust-src-nightly/rust-src/lib/rustlib/src/rust",
                 "urls": ["https://github.com/esp-rs/rust-build/releases/download/v1.92.0.0/rust-src-1.92.0.0.tar.xz"],
@@ -17,7 +17,7 @@ _repositories = {
         },
         "toolchain": [{
             "archive": {
-                "build_file": Label("//toolchains/esp_rust_1.92.0:toolchain.BUILD"),
+                "build_file": Label("//toolchains/esp_rust_1.92.0:toolchain.BUILD.bazel"),
                 "integrity": "sha256-vLCRgGo+El8ParhSFcHrcXT7w4g5dZdlUJ6d0lVl65U=",
                 "strip_prefix": "rust-nightly-x86_64-unknown-linux-gnu",
                 "urls": [

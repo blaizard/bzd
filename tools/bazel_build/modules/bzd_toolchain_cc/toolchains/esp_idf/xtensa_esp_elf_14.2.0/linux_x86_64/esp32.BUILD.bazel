@@ -1,15 +1,17 @@
+"""ESP32 C++ compiler."""
+
 filegroup(
     name = "ar_files",
     srcs = [
         ":ar",
-    ]
+    ],
 )
 
 filegroup(
     name = "as_files",
     srcs = [
         ":as",
-    ]
+    ],
 )
 
 filegroup(
@@ -24,7 +26,7 @@ filegroup(
         "lib/**",
         "libexec/gcc/xtensa-esp-elf/14.2.0/*",
         "xtensa-esp-elf/bin/*",
-    ])
+    ]),
 )
 
 filegroup(
@@ -39,22 +41,22 @@ filegroup(
     ] + glob([
         "lib/**",
         "libexec/gcc/xtensa-esp-elf/14.2.0/*",
-        "lib/gcc/xtensa-esp-elf/14.2.0/*"
-    ])
+        "lib/gcc/xtensa-esp-elf/14.2.0/*",
+    ]),
 )
 
 filegroup(
     name = "objcopy_files",
     srcs = [
         ":objcopy",
-    ]
+    ],
 )
 
 filegroup(
     name = "strip_files",
     srcs = [
         ":strip",
-    ]
+    ],
 )
 
 filegroup(
@@ -75,5 +77,5 @@ filegroup(
         "lib/gcc/xtensa-esp-elf/14.2.0/include/**",
         "lib/gcc/xtensa-esp-elf/14.2.0/include-fixed/**",
         "xtensa-esp-elf/include/**",
-    ])
+    ]),
 )

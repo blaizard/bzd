@@ -23,7 +23,7 @@ def linux():
             "strip": "bin/strip",
         },
         "build_files": [
-            "@bzd_toolchain_cc//toolchains/gcc:linux/linux.BUILD",
+            "@bzd_toolchain_cc//toolchains/gcc:linux/linux.BUILD.bazel",
         ],
         "compiler": "gcc",
     }
