@@ -1,11 +1,17 @@
 import os
-import logging
 import pathlib
 import typing
 import re
 import shutil
+import unittest
 
 from tools.shell.factory import Factory
+
+
+class MyAssertions(unittest.TestCase):
+
+	def runTest(self) -> None:
+		pass
 
 
 class Sh(Factory):
@@ -26,18 +32,31 @@ class Sh(Factory):
 		    "/bash",
 		))
 
-	def build(self, workspace: pathlib.Path) -> None:
-		"""Build the configuration if needed."""
-
-		content = self.renderTemplate(
+	def _render(self) -> str:
+		return self.renderTemplate(
 		    pathlib.Path("tools/shell/sh/srcs/bashrc.btl"),
 		    {
 		        "always": pathlib.Path("tools/shell/sh/srcs/always"),
 		        "interactive": pathlib.Path("tools/shell/sh/srcs/interactive"),
 		    },
 		)
+
+	def build(self, workspace: pathlib.Path) -> None:
+		"""Build the configuration if needed."""
+
+		content = self._render()
 		self.path = workspace / "tools/shell/sh/bashrc.sh"
 		self.path.write_text(content)
+
+	def check(self, workspace: pathlib.Path) -> bool:
+		content = self._render()
+		self.path = workspace / "tools/shell/sh/bashrc.sh"
+		try:
+			MyAssertions().assertEqual(content, self.path.read_text())
+			return True
+		except AssertionError as e:
+			print(e)
+			return False
 
 	def install(self) -> None:
 		"""Install the shell."""
@@ -48,7 +67,7 @@ class Sh(Factory):
 		assert home.is_dir(), "Directory does not exists."
 		hookFile = home / ".bashrc"
 		if not hookFile.is_file():
-			logging.info(f"Creating {hookFile}.")
+			print(f"Creating {hookFile}.")
 			hookFile.touch()
 
 		# Update the hook file.
@@ -64,7 +83,7 @@ class Sh(Factory):
 		if id(content) == id(updateContent):
 			updateContent += "\n" + hook
 		if content != updateContent:
-			logging.info(f"Updating {hookFile}.")
+			print(f"Updating {hookFile}.")
 			hookFile.write_text(updateContent)
 
 		# Replace the content of the directory.
@@ -72,4 +91,4 @@ class Sh(Factory):
 		self.createEmptyDirectory(home / ".bzd")
 		shutil.copy(self.path, home / ".bzd/bashrc.sh")
 
-		logging.info("To take immediate effect, run 'source ~/.bashrc'.")
+		print("To take immediate effect, run 'source ~/.bashrc'.")

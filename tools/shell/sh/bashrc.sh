@@ -1,7 +1,5 @@
 # This file is auto-generated, do not edit as modifications will be overwritten.
 
-bzd_is_shell=`echo "$-" | grep i > /dev/null`
-
 # ---- Content from aliases.sh
 # --- ls ----------------------------------------------------------------------
 alias ls='ls --color=auto -h'
@@ -34,61 +32,37 @@ alias bzd_reload='. ~/.bashrc'
 
 
 # Only output to interactive shell.
-if ${bzd_is_shell}; then
+if [[ "$TERM" != "dumb" ]] && [[ $- == *i* ]]; then
 
-# ---- Content from prompt.sh
-# Set the prompt
-_bzd_parse_git_branch()
+# ---- Content from clean.sh
+_bzd_free_size_kb()
 {
-	branch=`git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'`
-	if [ ! -z "${branch}" ]; then
-		origin=`git for-each-ref --format='%(upstream:short)' $(git symbolic-ref -q HEAD) 2> /dev/null | head -n1`
-		extra=""
-		if [ ! -z "${origin}" ]; then
-			distance=`git rev-list --left-right --count ${origin}...${branch} 2> /dev/null`
-			if [ ! -z "${distance}" ]; then
-				behind=`echo -n "${distance}" | awk '{print $1}'`
-				ahead=`echo -n "${distance}" | awk '{print $2}'`
-				if [ ${behind} -gt 0 ]; then extra=" -${behind}"; fi
-				if [ ${ahead} -gt 0 ]; then extra="${extra} +${ahead}"; fi
-			fi
-		fi
-		echo -en " (${branch}${extra})"
-	fi
+    total_free=0;
+    for i in $(df -k 2> /dev/null | egrep '^/dev' | awk '{print $4}'); do
+        total_free=$(($total_free + $i));
+    done
+    echo ${total_free}
 }
 
-_bzd_last_non_zero_return_code()
+# Remove unused files from the computer, such as cache etc.
+bzd_clean_disk()
 {
-	return_code="$?"
-	if [ $return_code != 0 ]; then
-		echo -n "x "
-	fi
-}
+    total_free_begin=$(_bzd_free_size_kb)
 
-_bzd_prepend()
-{
-	[[ ! -v IN_NIX_SHELL ]] || echo -n "(nix-shell) "
-}
+    echo "---- Clean docker images."
+    docker system prune -af
 
-case "$TERM" in
-xterm*|rxvt*|konsole*)
-	PS1="\[\e[0;31m\]\$(_bzd_last_non_zero_return_code)\[\e[0m\]\$(_bzd_prepend)\u@\h \[\e[32m\]\w\[\e[33m\]\$(_bzd_parse_git_branch)\[\e[0m\] $ "
-	;;
-*)
-	;;
-esac
+    bazel_workspaces=$(find / -name '.*' -prune -false -o -name 'WORKSPACE' 2>/dev/null)
+    for workspace in ${bazel_workspaces}; do
+        path=$(dirname "${workspace}")
+        echo "---- Clean bazel workspace ${path}."
+        cd "${path}"
+        bazel clean --ui_event_filters=-info,-stdout,-stderr --noshow_progress --expunge
+    done
 
-# ---- Content from math.sh
-# simple math extension to calculate from the command line
-bzd_math() {
-    py_code="from math import *; print(${@})"
-    python -c "${py_code}"
-}
-
-# ---- Content from google_chrome.sh
-bzd_google_chrome() {
-    # Start chrome in an isolated sandbox and it will not affect the main chrome profile.
-    google-chrome --disable-site-isolation-trials --disable-web-security --allow-file-access-from-files --user-data-dir=/tmp
+    total_free_end=$(_bzd_free_size_kb)
+    total_free_saved=$(($total_free_end - $total_free_begin))
+    echo "---- Saved ${total_free_saved}K bytes."
 }
 
 # ---- Content from git.sh
@@ -142,6 +116,61 @@ EOF
     git bisect log
 }
 
+# ---- Content from google_chrome.sh
+bzd_google_chrome() {
+    # Start chrome in an isolated sandbox and it will not affect the main chrome profile.
+    google-chrome --disable-site-isolation-trials --disable-web-security --allow-file-access-from-files --user-data-dir=/tmp
+}
+
+# ---- Content from math.sh
+# simple math extension to calculate from the command line
+bzd_math() {
+    py_code="from math import *; print(${@})"
+    python -c "${py_code}"
+}
+
+# ---- Content from prompt.sh
+# Set the prompt
+_bzd_parse_git_branch()
+{
+	branch=`git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'`
+	if [ ! -z "${branch}" ]; then
+		origin=`git for-each-ref --format='%(upstream:short)' $(git symbolic-ref -q HEAD) 2> /dev/null | head -n1`
+		extra=""
+		if [ ! -z "${origin}" ]; then
+			distance=`git rev-list --left-right --count ${origin}...${branch} 2> /dev/null`
+			if [ ! -z "${distance}" ]; then
+				behind=`echo -n "${distance}" | awk '{print $1}'`
+				ahead=`echo -n "${distance}" | awk '{print $2}'`
+				if [ ${behind} -gt 0 ]; then extra=" -${behind}"; fi
+				if [ ${ahead} -gt 0 ]; then extra="${extra} +${ahead}"; fi
+			fi
+		fi
+		echo -en " (${branch}${extra})"
+	fi
+}
+
+_bzd_last_non_zero_return_code()
+{
+	return_code="$?"
+	if [ $return_code != 0 ]; then
+		echo -n "x "
+	fi
+}
+
+_bzd_prepend()
+{
+	[[ ! -v IN_NIX_SHELL ]] || echo -n "(nix-shell) "
+}
+
+case "$TERM" in
+xterm*|rxvt*|konsole*)
+	PS1="\[\e[0;31m\]\$(_bzd_last_non_zero_return_code)\[\e[0m\]\$(_bzd_prepend)\u@\h \[\e[32m\]\w\[\e[33m\]\$(_bzd_parse_git_branch)\[\e[0m\] $ "
+	;;
+*)
+	;;
+esac
+
 # ---- Content from update.sh
 # Auto update script 
 bzd_update()
@@ -166,37 +195,6 @@ if [[ "$TERM_PROGRAM" != "vscode" ]] && [[ -z "$ZELLIJ" ]]; then
         exec zellij
     fi
 fi
-
-# ---- Content from clean.sh
-_bzd_free_size_kb()
-{
-    total_free=0;
-    for i in $(df -k 2> /dev/null | egrep '^/dev' | awk '{print $4}'); do
-        total_free=$(($total_free + $i));
-    done
-    echo ${total_free}
-}
-
-# Remove unused files from the computer, such as cache etc.
-bzd_clean_disk()
-{
-    total_free_begin=$(_bzd_free_size_kb)
-
-    echo "---- Clean docker images."
-    docker system prune -af
-
-    bazel_workspaces=$(find / -name '.*' -prune -false -o -name 'WORKSPACE' 2>/dev/null)
-    for workspace in ${bazel_workspaces}; do
-        path=$(dirname "${workspace}")
-        echo "---- Clean bazel workspace ${path}."
-        cd "${path}"
-        bazel clean --ui_event_filters=-info,-stdout,-stderr --noshow_progress --expunge
-    done
-
-    total_free_end=$(_bzd_free_size_kb)
-    total_free_saved=$(($total_free_end - $total_free_begin))
-    echo "---- Saved ${total_free_saved}K bytes."
-}
 
 
 fi

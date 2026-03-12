@@ -2,7 +2,7 @@ import argparse
 import pathlib
 import sys
 
-from tools.shell.shell import buildAll
+from tools.shell.shell import buildAll, checkAll
 from bzd_sanitizer.context import Context
 
 if __name__ == "__main__":
@@ -11,6 +11,10 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 
 	context = Context.fromFile(args.context)
-	buildAll(workspace=context.workspace)
-
+	if context.check:
+		isValid = checkAll(workspace=context.workspace)
+		if not isValid:
+			sys.exit(1)
+	else:
+		buildAll(workspace=context.workspace)
 	sys.exit(0)

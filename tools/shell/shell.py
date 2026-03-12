@@ -1,4 +1,3 @@
-import logging
 import sys
 import os
 import pathlib
@@ -13,8 +12,17 @@ factories: typing.Final[typing.Iterable[typing.Type[Factory]]] = (Sh, )
 def buildAll(workspace: pathlib.Path) -> None:
 	for factoryClass in factories:
 		factory = factoryClass()
-		logging.info(f"Building {factory.getName()}.")
+		print(f"Building {factory.getName()}.")
 		factory.build(workspace=workspace)
+
+
+def checkAll(workspace: pathlib.Path) -> bool:
+	isValid = True
+	for factoryClass in factories:
+		factory = factoryClass()
+		print(f"Checking {factory.getName()}.")
+		isValid = factory.check(workspace=workspace) and isValid
+	return isValid
 
 
 if __name__ == "__main__":
@@ -22,12 +30,13 @@ if __name__ == "__main__":
 		factory = factoryClass()
 		# Look for the type of shell used on the current platform.
 		if factory.isCompatible():
-			logging.info(f"Building {factory.getName()}.")
+			print(f"Building {factory.getName()}.")
 			factory.build(workspace=pathlib.Path(os.environ.get("BUILD_WORKSPACE_DIRECTORY", ".")))
 
-			logging.info(f"Installing {factory.getName()}.")
+			print(f"Installing {factory.getName()}.")
 			factory.install()
 
 			sys.exit(0)
 
-	logging.error("Unsupported shell type.")
+	print("Unsupported shell type.")
+	sys.exit(1)

@@ -25,6 +25,11 @@ class Factory(ABC):
 		pass
 
 	@abstractmethod
+	def check(self, workspace: pathlib.Path) -> bool:
+		"""Check that the configuration has been correctly generated."""
+		pass
+
+	@abstractmethod
 	def install(self) -> None:
 		"""Install the shell."""
 		pass
@@ -55,9 +60,9 @@ class Factory(ABC):
 		"""Render a template from files."""
 
 		data = {}
-		for name, path in directoryMap.items():
+		for name, path in sorted(directoryMap.items()):
 			sub = {}
-			for fileName in os.listdir(path):
+			for fileName in sorted(os.listdir(path)):
 				sub[fileName] = (path / fileName).read_text()
 			data[name] = sub
 

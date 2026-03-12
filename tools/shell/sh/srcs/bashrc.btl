@@ -1,14 +1,12 @@
 # This file is auto-generated, do not edit as modifications will be overwritten.
 
-bzd_is_shell=`echo "$-" | grep i > /dev/null`
-
 {% for name, content in always %}
 # ---- Content from {{ name }}
 {{ content }}
 {% end %}
 
 # Only output to interactive shell.
-if ${bzd_is_shell}; then
+if [[ "$TERM" != "dumb" ]] && [[ $- == *i* ]]; then
 
 {% for name, content in interactive %}
 # ---- Content from {{ name }}
