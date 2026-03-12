@@ -18,6 +18,7 @@ VERSION=$1
 # Install deps
 sudo apt-get install -y --no-install-recommends \
     zlib1g-dev \
+    libbz2-dev \
     libssl-dev
 
 cd /tmp/

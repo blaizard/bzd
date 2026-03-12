@@ -20,7 +20,8 @@ ENV CXX=/usr/local/bin/g++
 # Python
 COPY build_install_python.sh /build_install_python.sh
 RUN /build_install_python.sh --install /usr/local 3.11.4
-RUN ln -s /usr/local/bin/python3.11 /usr/bin/python3
+RUN ln -s /usr/local/bin/python3.11 /usr/local/bin/python3
+RUN ln -s /usr/local/bin/pip3.11 /usr/local/bin/pip3
 
 # CMake
 COPY build_install_cmake.sh /build_install_cmake.sh
