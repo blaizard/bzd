@@ -32,6 +32,11 @@ crates_esp32.spec(
     package = "esp-println",
     version = "0.16.1",
 )
+crates_esp32.spec(
+    features = ["esp32"],
+    package = "esp-bootloader-esp-idf",
+    version = "0.4.0",
+)
 crates_esp32.annotation(
     crate = "esp-sync",
     deps = ["@crates_esp32//:xtensa-lx"],

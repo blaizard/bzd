@@ -8,6 +8,8 @@ use esp_hal::{
     time::{Duration, Instant},
 }; // Forces the create to be linked
 
+esp_bootloader_esp_idf::esp_app_desc!();
+
 // You need a panic handler. Usually, you you would use esp_backtrace, panic-probe, or
 // something similar, but you can also bring your own like this:
 #[panic_handler]

@@ -6,6 +6,8 @@ use bzd::base::panic::PanicPrint;
 use esp_hal::{main, system::software_reset};
 use esp_println::{print, println};
 
+esp_bootloader_esp_idf::esp_app_desc!();
+
 unsafe extern "Rust" {
     fn run_executor() -> bool;
 }

@@ -12,11 +12,13 @@ rust_library_group(
     deps = select({
         "@bzd_platforms//al_isa:esp32-xtensa_lx6": [
             "@crates_esp32//:esp-backtrace",
+            "@crates_esp32//:esp-bootloader-esp-idf",
             "@crates_esp32//:esp-hal",
             "@crates_esp32//:esp-println",
         ],
         "@bzd_platforms//al_isa:esp32s3-xtensa_lx7": [
             "@crates_esp32s3//:esp-backtrace",
+            "@crates_esp32s3//:esp-bootloader-esp-idf",
             "@crates_esp32s3//:esp-hal",
             "@crates_esp32s3//:esp-println",
         ],
