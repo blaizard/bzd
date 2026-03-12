@@ -53,11 +53,11 @@ def _load_tools(_module_ctx):
         repositories = [{
             "archive": {
                 "build_file": "//tools/qemu:linux_x86_64.BUILD.bazel",
-                "integrity": "sha256-dc44obKaVGE46RHozHRb2wwkQQu5+ZwH+7v9q2eHo70=",
-                "strip_prefix": "linux_x86_64_20240219",
+                "integrity": "sha256-bfL5Vfftu7vjx4vdY5f83/gfKcUHMRiuqNP3XUN+9/Y=",
+                "strip_prefix": "linux_x86_64_esp-develop-9.2.2-20250817",
                 "urls": [
-                    "https://datalocal.blaizard.com/file/bzd/qemu/esp32/linux_x86_64_20240219.tar.xz",
-                    "https://data.blaizard.com/file/bzd/qemu/esp32/linux_x86_64_20240219.tar.xz",
+                    "https://datalocal.blaizard.com/file/bzd/qemu/esp32/linux_x86_64_esp-develop-9.2.2-20250817.tar.xz",
+                    "https://data.blaizard.com/file/bzd/qemu/esp32/linux_x86_64_esp-develop-9.2.2-20250817.tar.xz",
                 ],
             },
             "platforms": [
