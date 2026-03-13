@@ -72,6 +72,7 @@ def _get_minimal_parameters(parameters):
         "-imultilib",
         "-nostdinc",
         "-nostdinc++",
+        "--no-standard-includes",
         "--embed-dir",
         "-L",
         "-B",
