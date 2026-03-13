@@ -7,29 +7,29 @@ from bdl.entities.impl.entity import Entity, Role
 
 
 class Extern(Entity):
-    """
-    A extern statement is used to pull a symbol coming from an external file (not interpretable by BDL).
-    - Attributes:
-            - category: The category of external symbol.
-            - name: The name of the symbol.
-    """
+	"""
+	A extern statement is used to pull a symbol coming from an external file (not interpretable by BDL).
+	- Attributes:
+	        - category: The category of external symbol.
+	        - name: The name of the symbol.
+	"""
 
-    def __init__(self, element: Element) -> None:
-        super().__init__(element, Role.Type)
-        Error.assertHasAttr(element=element, attr="category")
-        Error.assertHasAttr(element=element, attr="name")
+	def __init__(self, element: Element) -> None:
+		super().__init__(element, Role.Type)
+		Error.assertHasAttr(element=element, attr="category")
+		Error.assertHasAttr(element=element, attr="name")
 
-    @property
-    def type(self) -> str:
-        return self.element.getAttr("category").value
+	@property
+	def type(self) -> str:
+		return self.element.getAttr("category").value
 
-    def resolve(self, resolver: typing.Any) -> None:
-        """
-        Resolve entities.
-        """
-        self._setUnderlyingTypeFQN(self.fqn)
+	def resolve(self, resolver: typing.Any) -> None:
+		"""
+		Resolve entities.
+		"""
+		self._setUnderlyingTypeFQN(self.fqn)
 
-        super().resolve(resolver)
+		super().resolve(resolver)
 
-    def __repr__(self) -> str:
-        return self.toString({"name": self.name, "category": self.type})
+	def __repr__(self) -> str:
+		return self.toString({"name": self.name, "category": self.type})

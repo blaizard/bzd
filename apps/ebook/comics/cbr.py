@@ -8,13 +8,13 @@ from apps.ebook.providers import ProviderEbook, ProviderImages
 
 
 class Cbr(Comics):
-    """Convert a .cbr file into a sequence of images."""
+	"""Convert a .cbr file into a sequence of images."""
 
-    def process(
-        self, provider: ProviderEbook, directory: pathlib.Path, context: FlowContext
-    ) -> typing.List[typing.Tuple[ProviderImages, typing.Optional[FlowEnum]]]:
+	def process(
+		self, provider: ProviderEbook, directory: pathlib.Path, context: FlowContext
+	) -> typing.List[typing.Tuple[ProviderImages, typing.Optional[FlowEnum]]]:
 
-        with rarfile.RarFile(str(provider.ebook), "r") as rarInstance:  # type: ignore
-            rarInstance.extractall(directory / "extract")
+		with rarfile.RarFile(str(provider.ebook), "r") as rarInstance:  # type: ignore
+			rarInstance.extractall(directory / "extract")
 
-        return self.processDirectory(provider, directory / "extract")
+		return self.processDirectory(provider, directory / "extract")

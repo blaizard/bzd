@@ -6,12 +6,12 @@ from bdl.generators.bdl.visitor import formatBdl
 
 
 class TestRun(unittest.TestCase):
-    def _stripString(self, content: str) -> typing.List[str]:
-        return [line.strip() for line in content.split("\n") if line.strip()]
+	def _stripString(self, content: str) -> typing.List[str]:
+		return [line.strip() for line in content.split("\n") if line.strip()]
 
-    def testFormatter(self) -> None:
-        bdl = Object.fromContent(
-            content="""/*
+	def testFormatter(self) -> None:
+		bdl = Object.fromContent(
+			content="""/*
   This is a multi-line comment
  */
 
@@ -42,12 +42,12 @@ composition
 	regexpr1    = /12/-/da\\.ds.*/;
 	}
 """
-        )
-        output = formatBdl(bdl)
+		)
+		output = formatBdl(bdl)
 
-        self.assertEqual(
-            self._stripString(output),
-            self._stripString("""
+		self.assertEqual(
+			self._stripString(output),
+			self._stripString("""
 // This is a multi-line comment
 struct ab {
 	// Contracts
@@ -68,8 +68,8 @@ composition {
 	var1 = 12 + ab.int32;
 	regexpr1 = /12/-/da\\.ds.*/;
 }"""),
-        )
+		)
 
 
 if __name__ == "__main__":
-    unittest.main()
+	unittest.main()

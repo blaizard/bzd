@@ -8,35 +8,33 @@ from bdl.entities.impl.entity import Entity, Role
 
 
 class _Visitor(VisitorBase[str, typing.List[str]]):
-    nestedKind = None
+	nestedKind = None
 
-    def visitBegin(self, result: typing.Any) -> typing.List[str]:
-        return []
+	def visitBegin(self, result: typing.Any) -> typing.List[str]:
+		return []
 
-    def visitElement(
-        self, element: Element, result: typing.List[str]
-    ) -> typing.List[str]:
-        Error.assertHasAttr(element=element, attr="name")
-        result.append(element.getAttr("name").value)
-        return result
+	def visitElement(self, element: Element, result: typing.List[str]) -> typing.List[str]:
+		Error.assertHasAttr(element=element, attr="name")
+		result.append(element.getAttr("name").value)
+		return result
 
 
 class Namespace(Entity):
-    """
-    A namespace defines a scope in which entities are available.
-    - Sequence:
-            - name: The list of names constituing the namespace.
-    """
+	"""
+	A namespace defines a scope in which entities are available.
+	- Sequence:
+	        - name: The list of names constituing the namespace.
+	"""
 
-    def __init__(self, element: Element) -> None:
-        super().__init__(element, Role.Type)
-        Error.assertHasSequence(element=element, sequence="name")
+	def __init__(self, element: Element) -> None:
+		super().__init__(element, Role.Type)
+		Error.assertHasSequence(element=element, sequence="name")
 
-    @property
-    def nameList(self) -> typing.List[str]:
-        sequence = self.element.getNestedSequence("name")
-        assert sequence is not None
-        return _Visitor().visit(sequence=sequence)
+	@property
+	def nameList(self) -> typing.List[str]:
+		sequence = self.element.getNestedSequence("name")
+		assert sequence is not None
+		return _Visitor().visit(sequence=sequence)
 
-    def __repr__(self) -> str:
-        return self.toString({"name": ".".join(self.nameList)})
+	def __repr__(self) -> str:
+		return self.toString({"name": ".".join(self.nameList)})

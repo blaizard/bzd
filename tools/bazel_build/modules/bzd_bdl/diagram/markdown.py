@@ -4,15 +4,13 @@ import time
 import random
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Create diagram explorer in markdown.")
-    parser.add_argument(
-        "bdls", type=pathlib.Path, nargs="+", help="bdls in json format."
-    )
+	parser = argparse.ArgumentParser(description="Create diagram explorer in markdown.")
+	parser.add_argument("bdls", type=pathlib.Path, nargs="+", help="bdls in json format.")
 
-    args = parser.parse_args()
+	args = parser.parse_args()
 
-    uid = f"{time.time()}.{random.random()}".replace(".", "")
-    content = """
+	uid = f"{time.time()}.{random.random()}".replace(".", "")
+	content = """
 <script>
 	const {redrawFctName} = async (selectObject) => {{
 		const config = (selectObject)? selectObject.value : "apps";
@@ -32,8 +30,8 @@ if __name__ == "__main__":
 </select>
 <div id="{divId}">Diagram Loading...</div>
 """.format(
-        bdlsJson=",".join([bdl.read_text() for bdl in args.bdls]),
-        divId=f"diagram_{uid}",
-        redrawFctName=f"redraw_{uid}",
-    )
-    print(content)
+		bdlsJson=",".join([bdl.read_text() for bdl in args.bdls]),
+		divId=f"diagram_{uid}",
+		redrawFctName=f"redraw_{uid}",
+	)
+	print(content)

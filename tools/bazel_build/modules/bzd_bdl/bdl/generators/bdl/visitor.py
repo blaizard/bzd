@@ -11,65 +11,57 @@ from bdl.entities.impl.types import Category
 
 
 class _VisitorSymbol(VisitorSymbol):
-    def visitSymbol(
-        self, symbol: Symbol, nested: typing.List[str], parameters: ParametersResolved
-    ) -> str:
-        output = symbol.kind
-        if symbol.const:
-            output = "const {}".format(output)
-        # Top level (aka non-template) comments are handled at a higher level.
-        if not self.isTopLevel and symbol.comment:
-            output = "/*{comment}*/ {output}".format(
-                comment=symbol.comment, output=output
-            )
-        if nested:
-            output = "{}<{}>".format(output, ", ".join(nested))
-        return output
+	def visitSymbol(self, symbol: Symbol, nested: typing.List[str], parameters: ParametersResolved) -> str:
+		output = symbol.kind
+		if symbol.const:
+			output = "const {}".format(output)
+		# Top level (aka non-template) comments are handled at a higher level.
+		if not self.isTopLevel and symbol.comment:
+			output = "/*{comment}*/ {output}".format(comment=symbol.comment, output=output)
+		if nested:
+			output = "{}<{}>".format(output, ", ".join(nested))
+		return output
 
 
 def _namespaceToStr(entity: Namespace) -> str:
-    return ".".join(entity.nameList)
+	return ".".join(entity.nameList)
 
 
 def _symbolToStr(symbol: typing.Optional[Symbol]) -> typing.Optional[str]:
-    if symbol is None:
-        return None
-    return _VisitorSymbol(symbol=symbol).result
+	if symbol is None:
+		return None
+	return _VisitorSymbol(symbol=symbol).result
 
 
 def _inlineComment(comment: typing.Optional[str]) -> str:
-    if comment is None:
-        return ""
-    return "/*{}*/".format(comment)
+	if comment is None:
+		return ""
+	return "/*{}*/".format(comment)
 
 
 def _normalComment(comment: typing.Optional[str]) -> str:
-    if comment is None:
-        return ""
-    return "".join([f"// {line}\n" for line in comment.split("\n")])
+	if comment is None:
+		return ""
+	return "".join([f"// {line}\n" for line in comment.split("\n")])
 
 
 def _inheritanceToStr(inheritanceList: typing.List[Symbol]) -> str:
-    return ", ".join(
-        [str(_symbolToStr(inheritance)) for inheritance in inheritanceList]
-    )
+	return ", ".join([str(_symbolToStr(inheritance)) for inheritance in inheritanceList])
 
 
 def formatBdl(bdl: Object, data: typing.Optional[Path] = None) -> str:
-    template = Template.fromPath(
-        Path(__file__).parent / "template/file.bdl.btl", indent=True
-    )
-    output = template.render(
-        bdl.tree,
-        {
-            "Category": Category,
-            "symbolToStr": _symbolToStr,
-            "namespaceToStr": _namespaceToStr,
-            "inlineComment": _inlineComment,
-            "normalComment": _normalComment,
-            "inheritanceToStr": _inheritanceToStr,
-            "data": json.loads(data.read_text()) if data else {},
-        },
-    )
+	template = Template.fromPath(Path(__file__).parent / "template/file.bdl.btl", indent=True)
+	output = template.render(
+		bdl.tree,
+		{
+			"Category": Category,
+			"symbolToStr": _symbolToStr,
+			"namespaceToStr": _namespaceToStr,
+			"inlineComment": _inlineComment,
+			"normalComment": _normalComment,
+			"inheritanceToStr": _inheritanceToStr,
+			"data": json.loads(data.read_text()) if data else {},
+		},
+	)
 
-    return output
+	return output

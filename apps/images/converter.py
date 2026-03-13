@@ -2,19 +2,19 @@ import enum
 
 
 class OutputFormat(enum.Enum):
-    """Output format supported."""
+	"""Output format supported."""
 
-    JPEG = "jpeg"
+	JPEG = "jpeg"
 
 
 class ConversionResult(enum.Enum):
-    """Result of a conversion."""
+	"""Result of a conversion."""
 
-    completed = enum.auto()
-    failed = enum.auto()
-    # Use when the file is already considered 'good', no need to convert it.
-    skipped = enum.auto()
+	completed = enum.auto()
+	failed = enum.auto()
+	# Use when the file is already considered 'good', no need to convert it.
+	skipped = enum.auto()
 
 
 class Converter:
-    pass
+	pass

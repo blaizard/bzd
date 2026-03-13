@@ -15,50 +15,40 @@ from bdl.contracts.convertible import ContractConvertible
 from bdl.contracts.executor import ContractExecutor
 
 _Contracts = [
-    ContractInteger(),
-    ContractFloat(),
-    ContractString(),
-    ContractBoolean(),
-    ContractMin(),
-    ContractMax(),
-    ContractMandatory(),
-    ContractCapacity(),
-    ContractInit(),
-    ContractShutdown(),
-    ContractConvertible(),
-    ContractExecutor(),
+	ContractInteger(),
+	ContractFloat(),
+	ContractString(),
+	ContractBoolean(),
+	ContractMin(),
+	ContractMax(),
+	ContractMandatory(),
+	ContractCapacity(),
+	ContractInit(),
+	ContractShutdown(),
+	ContractConvertible(),
+	ContractExecutor(),
 ]
 
 
 class AllContracts:
-    """Contains all contracts."""
+	"""Contains all contracts."""
 
-    @cached_classproperty
-    def all(cls) -> typing.Mapping[str, ContractTraits]:
-        return {contract.name: contract for contract in _Contracts}
+	@cached_classproperty
+	def all(cls) -> typing.Mapping[str, ContractTraits]:
+		return {contract.name: contract for contract in _Contracts}
 
-    @cached_classproperty
-    def allPublic(cls) -> typing.Mapping[str, ContractTraits]:
-        return {
-            contract.name: contract for contract in _Contracts if contract.isRolePublic
-        }
+	@cached_classproperty
+	def allPublic(cls) -> typing.Mapping[str, ContractTraits]:
+		return {contract.name: contract for contract in _Contracts if contract.isRolePublic}
 
-    @cached_classproperty
-    def forValue(cls) -> typing.Mapping[str, ContractTraits]:
-        return {
-            contract.name: contract for contract in _Contracts if contract.isRoleValue
-        }
+	@cached_classproperty
+	def forValue(cls) -> typing.Mapping[str, ContractTraits]:
+		return {contract.name: contract for contract in _Contracts if contract.isRoleValue}
 
-    @cached_classproperty
-    def forTemplate(cls) -> typing.Mapping[str, ContractTraits]:
-        return {
-            contract.name: contract
-            for contract in _Contracts
-            if contract.isRoleTemplate
-        }
+	@cached_classproperty
+	def forTemplate(cls) -> typing.Mapping[str, ContractTraits]:
+		return {contract.name: contract for contract in _Contracts if contract.isRoleTemplate}
 
-    @cached_classproperty
-    def forEntity(cls) -> typing.Mapping[str, ContractTraits]:
-        return {
-            contract.name: contract for contract in _Contracts if contract.isRoleEntity
-        }
+	@cached_classproperty
+	def forEntity(cls) -> typing.Mapping[str, ContractTraits]:
+		return {contract.name: contract for contract in _Contracts if contract.isRoleEntity}

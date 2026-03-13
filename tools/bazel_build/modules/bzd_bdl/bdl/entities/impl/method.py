@@ -11,71 +11,67 @@ from bdl.entities.impl.types import Category
 
 
 class Method(Entity):
-    """
-    A method is a definition of a functional object.
-    - Attributes:
-            - name: The name of the method.
-            - [type]: The return type if any.
-    - Sequence:
-            - argument: The list of arguments to this method.
-    """
+	"""
+	A method is a definition of a functional object.
+	- Attributes:
+	        - name: The name of the method.
+	        - [type]: The return type if any.
+	- Sequence:
+	        - argument: The list of arguments to this method.
+	"""
 
-    def __init__(self, element: Element) -> None:
-        super().__init__(element, Role.Type)
-        Error.assertHasAttr(element=element, attr="name")
+	def __init__(self, element: Element) -> None:
+		super().__init__(element, Role.Type)
+		Error.assertHasAttr(element=element, attr="name")
 
-    @property
-    def configAttr(self) -> str:
-        return "argument"
+	@property
+	def configAttr(self) -> str:
+		return "argument"
 
-    @property
-    def isSymbol(self) -> bool:
-        return self.element.isAttr("symbol")
+	@property
+	def isSymbol(self) -> bool:
+		return self.element.isAttr("symbol")
 
-    @property
-    def symbol(self) -> typing.Optional[Symbol]:
-        return (
-            Symbol(
-                element=self.element,
-                kind="symbol",
-                underlyingTypeFQN="fqn_return_type",
-                template="template",
-                contract="contract_return",
-                const="const",
-            )
-            if self.isSymbol
-            else None
-        )
+	@property
+	def symbol(self) -> typing.Optional[Symbol]:
+		return (
+			Symbol(
+				element=self.element,
+				kind="symbol",
+				underlyingTypeFQN="fqn_return_type",
+				template="template",
+				contract="contract_return",
+				const="const",
+			)
+			if self.isSymbol
+			else None
+		)
 
-    def resolve(self, resolver: typing.Any) -> None:
-        """
-        Resolve entities.
-        """
-        # Generate this symbol FQN
-        self._setUnderlyingTypeFQN(self.fqn)
+	def resolve(self, resolver: typing.Any) -> None:
+		"""
+		Resolve entities.
+		"""
+		# Generate this symbol FQN
+		self._setUnderlyingTypeFQN(self.fqn)
 
-        maybeSymbol = self.symbol
-        if maybeSymbol is not None:
-            maybeSymbol.resolve(resolver=resolver)
+		maybeSymbol = self.symbol
+		if maybeSymbol is not None:
+			maybeSymbol.resolve(resolver=resolver)
 
-        self.parameters.resolve(resolver=resolver)
+		self.parameters.resolve(resolver=resolver)
 
-        # Validate the type of arguments.
-        parameterTypeCategories = {
-            *self.parameters.getUnderlyingTypeCategories(resolver)
-        }
-        self.assertTrue(
-            condition=Category.component not in parameterTypeCategories,
-            message="Components are not allowed as method parameter.",
-        )
+		# Validate the type of arguments.
+		parameterTypeCategories = {*self.parameters.getUnderlyingTypeCategories(resolver)}
+		self.assertTrue(
+			condition=Category.component not in parameterTypeCategories,
+			message="Components are not allowed as method parameter.",
+		)
 
-        super().resolve(resolver)
+		super().resolve(resolver)
 
-    @property
-    def parameters(self) -> Parameters:
-        return Parameters(
-            element=self.element, NestedElementType=Expression, nestedKind="argument"
-        )
+	@property
+	def parameters(self) -> Parameters:
+		return Parameters(element=self.element, NestedElementType=Expression, nestedKind="argument")
 
-    def __repr__(self) -> str:
-        return self.toString({"name": self.name})
+	def __repr__(self) -> str:
+		return self.toString({"name": self.name})

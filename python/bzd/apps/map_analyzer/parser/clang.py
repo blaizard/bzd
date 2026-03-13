@@ -5,82 +5,82 @@ from .parser import Parser
 
 
 class ParserClang(Parser):
-    """
-    Clang-generated map file parser.
-    """
+	"""
+	Clang-generated map file parser.
+	"""
 
-    def parse(self) -> bool:
-        """
-        Parse the file.
+	def parse(self) -> bool:
+		"""
+		Parse the file.
 
-        Returns:
-                True in case of success, False otherwise.
-        """
+		Returns:
+		        True in case of success, False otherwise.
+		"""
 
-        with open(self.path, "r") as f:
-            # First line corresponds to the formatting.
-            table = FixedTable.fromHeader(
-                header=f.readline().lower(),
-                schema={
-                    "vma": {"align": "right"},
-                    "lma": {"align": "right"},
-                    "size": {"align": "right"},
-                    "align": {"align": "right"},
-                    "out": {"align": "left"},
-                    "in": {"align": "left"},
-                    "symbol": {"align": "left"},
-                },
-            )
+		with open(self.path, "r") as f:
+			# First line corresponds to the formatting.
+			table = FixedTable.fromHeader(
+				header=f.readline().lower(),
+				schema={
+					"vma": {"align": "right"},
+					"lma": {"align": "right"},
+					"size": {"align": "right"},
+					"align": {"align": "right"},
+					"out": {"align": "left"},
+					"in": {"align": "left"},
+					"symbol": {"align": "left"},
+				},
+			)
 
-            if not table:
-                return False
+			if not table:
+				return False
 
-            if (
-                not table.isValidIdentifier("vma")
-                or not table.isValidIdentifier("size")
-                or not table.isValidIdentifier("out")
-                or not table.isValidIdentifier("in")
-            ):
-                return False
+			if (
+				not table.isValidIdentifier("vma")
+				or not table.isValidIdentifier("size")
+				or not table.isValidIdentifier("out")
+				or not table.isValidIdentifier("in")
+			):
+				return False
 
-            section = None
-            units = []
-            sections = []
-            # Parse the content of the table
-            for line in f:
-                parts = table.parse(line)
+			section = None
+			units = []
+			sections = []
+			# Parse the content of the table
+			for line in f:
+				parts = table.parse(line)
 
-                maybeSize = parts.get("size")
-                if not maybeSize:
-                    continue
+				maybeSize = parts.get("size")
+				if not maybeSize:
+					continue
 
-                maybeAddress = parts.get("vma")
-                if not maybeAddress:
-                    continue
+				maybeAddress = parts.get("vma")
+				if not maybeAddress:
+					continue
 
-                # Extract important data
-                cellOut = parts.get("out")
-                if cellOut:
-                    section = cellOut
-                    sections.append(
-                        {
-                            "section": section,
-                            "address": int(maybeAddress, 16),
-                            "size": int(maybeSize, 16),
-                        }
-                    )
+				# Extract important data
+				cellOut = parts.get("out")
+				if cellOut:
+					section = cellOut
+					sections.append(
+						{
+							"section": section,
+							"address": int(maybeAddress, 16),
+							"size": int(maybeSize, 16),
+						}
+					)
 
-                cellIn = parts.get("in")
-                if cellIn:
-                    m = re.match(r"^([^\(:]+).*$", cellIn)
-                    if m:
-                        units.append(
-                            {
-                                "section": section,
-                                "size": int(maybeSize, 16),
-                                "units": m.group(1),
-                            }
-                        )
+				cellIn = parts.get("in")
+				if cellIn:
+					m = re.match(r"^([^\(:]+).*$", cellIn)
+					if m:
+						units.append(
+							{
+								"section": section,
+								"size": int(maybeSize, 16),
+								"units": m.group(1),
+							}
+						)
 
-            self.setParsedData(units=units, sections=sections, areUnitsPath=True)
-        return True
+			self.setParsedData(units=units, sections=sections, areUnitsPath=True)
+		return True

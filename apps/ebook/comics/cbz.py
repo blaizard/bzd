@@ -8,13 +8,13 @@ from apps.ebook.providers import ProviderEbook, ProviderImages
 
 
 class Cbz(Comics):
-    """Convert a .cbz file into a sequence of images."""
+	"""Convert a .cbz file into a sequence of images."""
 
-    def process(
-        self, provider: ProviderEbook, directory: pathlib.Path, context: FlowContext
-    ) -> typing.List[typing.Tuple[ProviderImages, typing.Optional[FlowEnum]]]:
+	def process(
+		self, provider: ProviderEbook, directory: pathlib.Path, context: FlowContext
+	) -> typing.List[typing.Tuple[ProviderImages, typing.Optional[FlowEnum]]]:
 
-        with zipfile.ZipFile(str(provider.ebook), "r") as zipInstance:
-            zipInstance.extractall(directory / "extract")
+		with zipfile.ZipFile(str(provider.ebook), "r") as zipInstance:
+			zipInstance.extractall(directory / "extract")
 
-        return self.processDirectory(provider, directory / "extract")
+		return self.processDirectory(provider, directory / "extract")

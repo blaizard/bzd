@@ -11,177 +11,169 @@ Json = typing.Dict[str, typing.Any]
 
 
 class ProviderBase:
-    """Base class for a provider."""
+	"""Base class for a provider."""
 
-    def __init__(self) -> None:
-        assert hasattr(self, "toJson"), "The 'toJson' must be implemented."
-        assert hasattr(self, "fromJson"), "The 'fromJson' must be implemented."
+	def __init__(self) -> None:
+		assert hasattr(self, "toJson"), "The 'toJson' must be implemented."
+		assert hasattr(self, "fromJson"), "The 'fromJson' must be implemented."
 
-    def hash(self) -> str:
-        string = json.dumps(self.toJson())  # type: ignore
-        return str(hashlib.sha256(string.encode("utf-8")).hexdigest())
+	def hash(self) -> str:
+		string = json.dumps(self.toJson())  # type: ignore
+		return str(hashlib.sha256(string.encode("utf-8")).hexdigest())
 
 
 @dataclasses.dataclass
 class ProviderEbookMetadata(ProviderBase):
-    """Provides the ebook metadata."""
+	"""Provides the ebook metadata."""
 
-    # The title of this document.
-    title: typing.Optional[str] = None
-    # The identifier of this document.
-    identifier: typing.Optional[str] = None
-    # The language for this document.
-    language: typing.Optional[str] = None
-    # List of creators.
-    creators: typing.List[str] = dataclasses.field(default_factory=list)
-    # List of contributors that play a secondary role for this ebook.
-    contributors: typing.List[str] = dataclasses.field(default_factory=list)
-    # Publication date.
-    date: typing.Optional[datetime.datetime] = None
-    # Publisher name.
-    publisher: typing.Optional[str] = None
+	# The title of this document.
+	title: typing.Optional[str] = None
+	# The identifier of this document.
+	identifier: typing.Optional[str] = None
+	# The language for this document.
+	language: typing.Optional[str] = None
+	# List of creators.
+	creators: typing.List[str] = dataclasses.field(default_factory=list)
+	# List of contributors that play a secondary role for this ebook.
+	contributors: typing.List[str] = dataclasses.field(default_factory=list)
+	# Publication date.
+	date: typing.Optional[datetime.datetime] = None
+	# Publisher name.
+	publisher: typing.Optional[str] = None
 
-    def toJson(self) -> Json:
-        return {
-            "title": self.title,
-            "identifier": self.identifier,
-            "language": self.language,
-            "creators": self.creators,
-            "contributors": self.contributors,
-            "date": None if self.date is None else self.date.isoformat(),
-            "publisher": self.publisher,
-        }
+	def toJson(self) -> Json:
+		return {
+			"title": self.title,
+			"identifier": self.identifier,
+			"language": self.language,
+			"creators": self.creators,
+			"contributors": self.contributors,
+			"date": None if self.date is None else self.date.isoformat(),
+			"publisher": self.publisher,
+		}
 
-    @staticmethod
-    def fromJson(data: Json) -> "ProviderEbookMetadata":
-        return ProviderEbookMetadata(
-            title=data["title"],
-            identifier=data["identifier"],
-            language=data["language"],
-            creators=data["creators"],
-            contributors=data["contributors"],
-            date=datetime.datetime.fromisoformat(data["date"])
-            if data["date"]
-            else None,
-            publisher=data["publisher"],
-        )
+	@staticmethod
+	def fromJson(data: Json) -> "ProviderEbookMetadata":
+		return ProviderEbookMetadata(
+			title=data["title"],
+			identifier=data["identifier"],
+			language=data["language"],
+			creators=data["creators"],
+			contributors=data["contributors"],
+			date=datetime.datetime.fromisoformat(data["date"]) if data["date"] else None,
+			publisher=data["publisher"],
+		)
 
 
 @dataclasses.dataclass
 class ProviderEbook(ProviderBase):
-    """Provides an ebook as a file."""
+	"""Provides an ebook as a file."""
 
-    # Path of the input ebook.
-    ebook: pathlib.Path
-    # Keys associated to this ebook.
-    keys: typing.List[pathlib.Path] = dataclasses.field(default_factory=list)
-    # Metadata associated with this ebook.
-    metadata: ProviderEbookMetadata = dataclasses.field(
-        default_factory=ProviderEbookMetadata
-    )
+	# Path of the input ebook.
+	ebook: pathlib.Path
+	# Keys associated to this ebook.
+	keys: typing.List[pathlib.Path] = dataclasses.field(default_factory=list)
+	# Metadata associated with this ebook.
+	metadata: ProviderEbookMetadata = dataclasses.field(default_factory=ProviderEbookMetadata)
 
-    def clone(self) -> "ProviderEbook":
-        """Create a new ebook provider from an existing one."""
-        return dataclasses.replace(self)
+	def clone(self) -> "ProviderEbook":
+		"""Create a new ebook provider from an existing one."""
+		return dataclasses.replace(self)
 
-    @property
-    def hasKeys(self) -> bool:
-        """Check if this ebook as associated keys."""
-        return len(self.keys) > 0
+	@property
+	def hasKeys(self) -> bool:
+		"""Check if this ebook as associated keys."""
+		return len(self.keys) > 0
 
-    def toJson(self) -> Json:
-        return {
-            "ebook": str(self.ebook),
-            "keys": [str(key) for key in self.keys],
-            "metadata": self.metadata.toJson(),
-        }
+	def toJson(self) -> Json:
+		return {
+			"ebook": str(self.ebook),
+			"keys": [str(key) for key in self.keys],
+			"metadata": self.metadata.toJson(),
+		}
 
-    @staticmethod
-    def fromJson(data: Json) -> "ProviderEbook":
-        return ProviderEbook(
-            ebook=pathlib.Path(data["ebook"]),
-            keys=[pathlib.Path(key) for key in data["keys"]],
-            metadata=ProviderEbookMetadata.fromJson(data["metadata"]),
-        )
+	@staticmethod
+	def fromJson(data: Json) -> "ProviderEbook":
+		return ProviderEbook(
+			ebook=pathlib.Path(data["ebook"]),
+			keys=[pathlib.Path(key) for key in data["keys"]],
+			metadata=ProviderEbookMetadata.fromJson(data["metadata"]),
+		)
 
 
 @dataclasses.dataclass
 class ProviderImages(ProviderBase):
-    """Provides a sequence of images."""
+	"""Provides a sequence of images."""
 
-    # Ordered sequence of images.
-    images: typing.List[pathlib.Path]
-    # Metadata associated with this ebook.
-    metadata: ProviderEbookMetadata = dataclasses.field(
-        default_factory=ProviderEbookMetadata
-    )
+	# Ordered sequence of images.
+	images: typing.List[pathlib.Path]
+	# Metadata associated with this ebook.
+	metadata: ProviderEbookMetadata = dataclasses.field(default_factory=ProviderEbookMetadata)
 
-    def toJson(self) -> Json:
-        return {
-            "images": [str(image) for image in self.images],
-            "metadata": self.metadata.toJson(),
-        }
+	def toJson(self) -> Json:
+		return {
+			"images": [str(image) for image in self.images],
+			"metadata": self.metadata.toJson(),
+		}
 
-    @staticmethod
-    def fromJson(data: Json) -> "ProviderImages":
-        return ProviderImages(
-            images=[pathlib.Path(image) for image in data["images"]],
-            metadata=ProviderEbookMetadata.fromJson(data["metadata"]),
-        )
+	@staticmethod
+	def fromJson(data: Json) -> "ProviderImages":
+		return ProviderImages(
+			images=[pathlib.Path(image) for image in data["images"]],
+			metadata=ProviderEbookMetadata.fromJson(data["metadata"]),
+		)
 
 
 @dataclasses.dataclass
 class ProviderPdf(ProviderBase):
-    """The final provider for a pdf."""
+	"""The final provider for a pdf."""
 
-    # The path of the pdf.
-    path: pathlib.Path
+	# The path of the pdf.
+	path: pathlib.Path
 
-    def toJson(self) -> Json:
-        return {"path": str(self.path)}
+	def toJson(self) -> Json:
+		return {"path": str(self.path)}
 
-    @staticmethod
-    def fromJson(data: Json) -> "ProviderPdf":
-        return ProviderPdf(path=pathlib.Path(data["path"]))
+	@staticmethod
+	def fromJson(data: Json) -> "ProviderPdf":
+		return ProviderPdf(path=pathlib.Path(data["path"]))
 
-    @property
-    def outputs(self) -> typing.List[pathlib.Path]:
-        """Return the outputs of this provider."""
-        return [self.path]
+	@property
+	def outputs(self) -> typing.List[pathlib.Path]:
+		"""Return the outputs of this provider."""
+		return [self.path]
 
 
 @dataclasses.dataclass
 class ProviderCover(ProviderBase):
-    """The final provider for a cover image."""
+	"""The final provider for a cover image."""
 
-    # The path of the cover image.
-    path: pathlib.Path
+	# The path of the cover image.
+	path: pathlib.Path
 
-    def toJson(self) -> Json:
-        return {"path": str(self.path)}
+	def toJson(self) -> Json:
+		return {"path": str(self.path)}
 
-    @staticmethod
-    def fromJson(data: Json) -> "ProviderCover":
-        return ProviderCover(path=pathlib.Path(data["path"]))
+	@staticmethod
+	def fromJson(data: Json) -> "ProviderCover":
+		return ProviderCover(path=pathlib.Path(data["path"]))
 
-    @property
-    def outputs(self) -> typing.List[pathlib.Path]:
-        """Return the outputs of this provider."""
-        return [self.path]
+	@property
+	def outputs(self) -> typing.List[pathlib.Path]:
+		"""Return the outputs of this provider."""
+		return [self.path]
 
 
 Provider = typing.Union[ProviderEbook, ProviderImages, ProviderPdf, ProviderCover]
 
 
 def providerSerialize(provider: Provider) -> str:
-    return json.dumps(
-        {"type": provider.__class__.__name__, "values": provider.toJson()}
-    )
+	return json.dumps({"type": provider.__class__.__name__, "values": provider.toJson()})
 
 
 def providerDeserialize(data: str) -> Provider:
-    content = json.loads(data)
-    for providerType in typing.get_args(Provider):
-        if providerType.__name__ == content["type"]:
-            return providerType.fromJson(content["values"])  # type: ignore
-    raise Exception(f"Cannot deserialize the provider of type: '{content['type']}'.")
+	content = json.loads(data)
+	for providerType in typing.get_args(Provider):
+		if providerType.__name__ == content["type"]:
+			return providerType.fromJson(content["values"])  # type: ignore
+	raise Exception(f"Cannot deserialize the provider of type: '{content['type']}'.")
