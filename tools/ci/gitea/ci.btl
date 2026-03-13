@@ -14,15 +14,6 @@ jobs:
               with:
                   submodules: "true"
   
-            - name: "Check for /cache directory"
-              run: |
-                if [ -d "/cache" ]; then
-                  echo "SUCCESS: /cache directory found!"
-                else
-                  echo "FAILURE: /cache directory does not exist in the container."
-                  exit 1
-                fi
-
             - name: "Enable Remote Execution"
               run: |
                   ./tools/bazel run //deployment:remote_wol_service --config=local
