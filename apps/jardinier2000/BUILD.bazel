@@ -48,6 +48,7 @@ bdl_target(
         ":board.bdl",
     ],
     parent = "@@//cc/targets/esp32s3:gcc",
+    platform = "@esp32s3//:platform-esp32s3-xtensa_lx7",
     deps = [
         "//cc/components/esp_idf/io/digital",
         "//cc/components/esp_idf/pwm",
