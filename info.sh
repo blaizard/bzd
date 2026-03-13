@@ -4,6 +4,8 @@ echo "==== user ==============================================================="
 echo "id: `id`"
 echo "==== disk ==============================================================="
 df -h
+echo "==== root directory ====================================================="
+ls -lla / || echo "Warning: Failed to list the root directory."
 echo "==== current working directory =========================================="
 pwd
 ls -lla
