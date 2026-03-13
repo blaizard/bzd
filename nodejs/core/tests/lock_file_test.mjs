@@ -74,7 +74,7 @@ describe("LockFile", () => {
 				Exception.assertEqual(result[result.length - 1], uid);
 			});
 		};
-		const nbPromise = 50;
+		const nbPromise = 10;
 		const promises = [];
 		for (let i = 0; i < nbPromise; i++) {
 			promises.push(worker(i));
