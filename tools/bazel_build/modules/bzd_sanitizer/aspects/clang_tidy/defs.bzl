@@ -12,8 +12,12 @@ def _clang_tidy_aspect_impl(target, ctx):
     outputs = []
     for compile_commands in compile_commands_list:
         for src in compile_commands.srcs:
+            # Quick fix, ignore external dependency (provide options to do this better).
+            if src.path.startswith("external"):
+                continue
+
             # The label name should also be used to avoid a conflict with 2 cc_library rules with the shared file for example.
-            output = ctx.actions.declare_file("{}.{}.clang_tidy".format(src.short_path.replace("/", "."), ctx.label.name))
+            output = ctx.actions.declare_file("{}.{}.clang_tidy".format(src.short_path.replace("..", "").replace("/", "."), ctx.label.name))
             ctx.actions.run(
                 inputs = compile_commands.files,
                 outputs = [output],
