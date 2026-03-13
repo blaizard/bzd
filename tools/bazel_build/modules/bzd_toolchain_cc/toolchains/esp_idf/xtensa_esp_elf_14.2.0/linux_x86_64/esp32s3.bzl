@@ -48,6 +48,9 @@ def esp32s3_linux_x86_64(_module_ctx, name, _use_fragment):
 
             # Do not link with shared libraries
             "-Wl,-static",
+
+            # This warning is not relevant for esp32.
+            "-Wl,--no-warn-rwx-segments",
         ],
         "package_name": "xtensa-esp32-elf",
         "patches": [
