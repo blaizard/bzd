@@ -20,6 +20,7 @@ cc_library(
     deps = [
         ":interface",
         "//cc/bzd/core/async",
+        "//cc/components/esp_idf:error",
         "@bzd_espressif//hal/cc",
     ],
 )
