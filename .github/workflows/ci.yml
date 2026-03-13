@@ -90,7 +90,7 @@ jobs:
 
             - name: Build documentation
               run: |
-                  ./tools/bazel build docs
+                  ./tools/bazel build //docs:docs
                   rm -rfd .dist
                   mkdir -p .dist
                   tar -xf ./bazel-bin/docs/docs.tar -C .dist
