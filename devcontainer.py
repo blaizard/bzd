@@ -29,10 +29,6 @@ class Feature:
 		return {}
 
 	@property
-	def namePrefix(self) -> typing.List[str]:
-		return []
-
-	@property
 	def groups(self) -> typing.List[str]:
 		return []
 
@@ -87,10 +83,6 @@ class FeatureVolume(Feature):
 	@property
 	def dockerCompose(self) -> typing.Dict[str, typing.List[str]]:
 		return {"volumes": [f'{volume}:\n  name: "{volume}"' for volume in self.args.volumes]}
-
-	@property
-	def namePrefix(self) -> typing.List[str]:
-		return [f"volume-{volume}" for volume in self.args.volumes]
 
 
 class FeatureIsolation(Feature):
@@ -152,10 +144,6 @@ class FeatureDevcontainerCLI(Feature):
 			"RUN sudo apt install -y nodejs npm",
 			"RUN sudo npm install -g @devcontainers/cli",
 		]
-
-	@property
-	def namePrefix(self) -> typing.List[str]:
-		return ["devctonainer-cli"]
 
 
 class FeatureDocker(Feature):
@@ -235,10 +223,6 @@ class FeaturePlatform(Feature):
 			}
 		}
 
-	@property
-	def namePrefix(self) -> typing.List[str]:
-		return [self.platform]
-
 	def initialize(self, context: "DevelopmentContainer") -> None:
 		super().initialize(context=context)
 		# See: https://stackoverflow.com/questions/72444103/what-does-running-the-multiarch-qemu-user-static-does-before-building-a-containe
@@ -270,7 +254,7 @@ class FeaturePlatform(Feature):
 
 
 class DevelopmentContainer:
-	def __init__(self, features: typing.Sequence[Feature], temporaryPath: pathlib.Path) -> None:
+	def __init__(self, args: argparse.Namespace, features: typing.Sequence[Feature], temporaryPath: pathlib.Path) -> None:
 		# Do not resolve symlinks so that we can use symlinks to create multiple devcontainers
 		# from the same source file, but we still want a normalized absolute path.
 		self.workspace = pathlib.Path(os.path.normpath(__file__)).absolute().parent
@@ -282,6 +266,24 @@ class DevelopmentContainer:
 		self.userNamespaceRemapping = DevelopmentContainer.isUserNamespaceRemapping()
 		self.user = "root" if self.userNamespaceRemapping else getpass.getuser()
 		self.features = [feature for feature in features if feature.isAvailable]
+		self.args = args
+
+	@cached_property
+	def namePrefix(self) -> str:
+
+		toHash = [self.workspace.as_posix(), self.user]
+
+		# Add the feature class names of the active features.
+		toHash += sorted([feature.__class__.__name__ for feature in self.features])
+
+		# Compute the cli parameters for the hash.
+		argNames = sorted([kwargs.get("dest", name) for feature in self.features for name, kwargs in feature.cli().items()])
+		toHash += [f"{name}={getattr(self.args, name)}" for name in argNames]
+
+		# Generate the hash.
+		pathHash = hashlib.md5("-".join(toHash).encode()).hexdigest()[:6]
+		directory = self.workspace.name[-10:]
+		return "-".join([pathHash, re.sub(r"[^a-zA-Z0-9]+", "-", directory).strip("-")])
 
 	def initialize(self, dry: bool) -> None:
 
@@ -311,14 +313,6 @@ class DevelopmentContainer:
 
 		output = subprocess.check_output(["docker", "info", "-f", "{{println .SecurityOptions}}"])
 		return b"rootless" in output
-
-	@cached_property
-	def namePrefix(self) -> str:
-		toHash = [self.workspace.as_posix(), self.user]
-		toHash += [prefix for feature in self.features for prefix in feature.namePrefix]
-		pathHash = hashlib.md5("-".join(toHash).encode()).hexdigest()[:6]
-		directory = self.workspace.name[-10:]
-		return "-".join([pathHash, re.sub(r"[^a-zA-Z0-9]+", "-", directory).strip("-")])
 
 	@cached_property
 	def imageName(self) -> str:
@@ -541,7 +535,7 @@ if __name__ == "__main__":
 	featureNames = set(args.enable if len(args.enable) else allFeatures.keys()) - set(args.disable)
 	features = [allFeatures[name](args) for name in featureNames]
 
-	devContainer = DevelopmentContainer(features=features, temporaryPath=args.temp)
+	devContainer = DevelopmentContainer(args=args, features=features, temporaryPath=args.temp)
 	devContainer.initialize(dry=args.dry)
 	if not args.dry:
 		if args.build_force:
