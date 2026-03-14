@@ -9,8 +9,9 @@ import os
 import pathlib
 import re
 import tempfile
-import subprocess
 import typing
+import subprocess
+import sys
 from functools import cached_property
 
 imageBase = "ubuntu:24.04"
@@ -508,7 +509,11 @@ if __name__ == "__main__":
 		"opencode": FeatureOpenCode,
 	}
 
-	Features = [FeatureDocker, FeaturePlatform, FeatureVolume, FeatureIsolation, FeatureDevcontainerCLI]
+	allPresets = {
+		"agent1": ["--enable", "opencode", "--opencode", "--prefix", "agent1"],
+		"agent2": ["--enable", "opencode", "--opencode", "--prefix", "agent2"],
+		"agent3": ["--enable", "opencode", "--opencode", "--prefix", "agent3"],
+	}
 
 	parser = argparse.ArgumentParser(description="Development container.")
 	parser.add_argument("--build", action="store_true", help="Re-build the container if set.")
@@ -553,6 +558,12 @@ if __name__ == "__main__":
 		help="Add a prefix in name of the container, note that this might create a new container, each container is uniquely identified by its name.",
 	)
 	parser.add_argument(
+		"-p",
+		"--preset",
+		choices=allPresets.keys(),
+		help="Use a predefined argument set.",
+	)
+	parser.add_argument(
 		"rest",
 		nargs=argparse.REMAINDER,
 		help="Additional arguments to pass to the container.",
@@ -562,8 +573,12 @@ if __name__ == "__main__":
 		for name, kwargs in FeatureClass.cli().items():
 			parser.add_argument(f"--{name}", **kwargs)
 
+	# Read the arguments.
 	args = parser.parse_args()
+	if args.preset:
+		args = parser.parse_args([*allPresets[args.preset], *sys.argv[1:]])
 
+	# Select only the features asked.
 	featureNames = set(args.enable if len(args.enable) else allFeatures.keys()) - set(args.disable)
 	features = [allFeatures[name](args) for name in featureNames]
 
