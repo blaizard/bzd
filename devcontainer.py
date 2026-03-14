@@ -26,7 +26,7 @@ class Feature:
 		self.context: typing.Optional["DevelopmentContainer"] = None
 
 	@staticmethod
-	def cli() -> typing.Dict[str, dict]:
+	def cli() -> typing.Dict[str, typing.Dict[str, typing.Any]]:
 		return {}
 
 	@property
@@ -57,7 +57,7 @@ class FeatureVolume(Feature):
 		self.isAvailable = self.args.volumes is not None
 
 	@staticmethod
-	def cli() -> typing.Dict[str, dict]:
+	def cli() -> typing.Dict[str, typing.Dict[str, typing.Any]]:
 		return {
 			"volume": {
 				"dest": "volumes",
@@ -94,7 +94,7 @@ class FeatureIsolation(Feature):
 		self.isAvailable = True
 
 	@staticmethod
-	def cli() -> typing.Dict[str, dict]:
+	def cli() -> typing.Dict[str, typing.Dict[str, typing.Any]]:
 		return {
 			"isolate": {
 				"action": "store_true",
@@ -106,6 +106,8 @@ class FeatureIsolation(Feature):
 	def volumes(self) -> typing.List[str]:
 		if self.args.isolate:
 			return []
+
+		assert self.context
 		volumes = [
 			# Share the cache.
 			f"{self.context.home}/.cache:{self.context.home}/.cache",
@@ -131,7 +133,7 @@ class FeatureDevcontainerCLI(Feature):
 		self.isAvailable = args.devcontainer_cli
 
 	@staticmethod
-	def cli() -> typing.Dict[str, dict]:
+	def cli() -> typing.Dict[str, typing.Dict[str, typing.Any]]:
 		return {
 			"devcontainer_cli": {
 				"action": "store_true",
@@ -155,7 +157,7 @@ class FeatureOpenCode(Feature):
 		self.isAvailable = args.opencode
 
 	@staticmethod
-	def cli() -> typing.Dict[str, dict]:
+	def cli() -> typing.Dict[str, typing.Dict[str, typing.Any]]:
 		return {
 			"opencode": {
 				"action": "store_true",
@@ -237,7 +239,7 @@ class FeaturePlatform(Feature):
 		self.isAvailable = self.platform is not None
 
 	@staticmethod
-	def cli() -> typing.Dict[str, dict]:
+	def cli() -> typing.Dict[str, typing.Dict[str, typing.Any]]:
 		return {
 			"platform": {
 				"choices": (
