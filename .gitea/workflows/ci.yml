@@ -13,7 +13,7 @@ jobs:
             - uses: actions/checkout@v3
               with:
                   submodules: "true"
-  
+
             - name: "Enable Remote Execution"
               run: |
                   ./tools/bazel run //deployment:remote_wol_service --config=local
