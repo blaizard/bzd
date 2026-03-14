@@ -92,6 +92,42 @@ class FeatureVolume(Feature):
 		return [f"volume-{volume}" for volume in self.args.volumes]
 
 
+class FeatureIsolation(Feature):
+	"""Feature: Add sandbox limitations to the container."""
+
+	def __init__(self, args: argparse.Namespace) -> None:
+		super().__init__(args)
+		self.isAvailable = True
+
+	@staticmethod
+	def cli(parser: argparse.ArgumentParser) -> None:
+		parser.add_argument(
+			"--isolate",
+			action="store_true",
+			help="Isolate the container from the host.",
+		)
+
+	@property
+	def volumes(self) -> typing.List[str]:
+		if self.args.isolate:
+			return []
+		volumes = [
+			# Share the cache.
+			f"{self.context.home}/.cache:{self.context.home}/.cache",
+		]
+		# Add some files as volumes only if they exist (otherwise docker-compose will create an empty directory).
+		volumes += [
+			f"{file}:{file}" for file in [self.context.home / ".bash_history", self.context.home / ".netrc"] if file.is_file()
+		]
+		return volumes
+
+	@property
+	def dockerCompose(self) -> typing.Dict[str, typing.List[str]]:
+		if self.args.isolate:
+			return {}
+		return {"service": ["network_mode: host"]}
+
+
 class FeatureDevcontainerCLI(Feature):
 	"""Feature: Add the devcontainer CLI to the container."""
 
@@ -243,17 +279,24 @@ class DevelopmentContainer:
 		self.user = "root" if self.userNamespaceRemapping else getpass.getuser()
 		self.features = [feature for feature in features if feature.isAvailable]
 
-	def initialize(self) -> None:
+	def initialize(self, dry: bool) -> None:
 
 		# Initialize features.
 		for feature in self.features:
 			feature.initialize(context=self)
 
-		# Write the docker files.
-		self.dockerFilePath.parent.mkdir(parents=True, exist_ok=True)
-		self.dockerFilePath.write_text(self.dockerFile)
-		self.dockerComposePath.parent.mkdir(parents=True, exist_ok=True)
-		self.dockerComposePath.write_text(self.dockerCompose)
+		if dry:
+			print("==== DockerFile ====")
+			print(self.dockerFile)
+			print("==== DockerCompose ====")
+			print(self.dockerCompose)
+
+		else:
+			# Write the docker files.
+			self.dockerFilePath.parent.mkdir(parents=True, exist_ok=True)
+			self.dockerFilePath.write_text(self.dockerFile)
+			self.dockerComposePath.parent.mkdir(parents=True, exist_ok=True)
+			self.dockerComposePath.write_text(self.dockerCompose)
 
 	@staticmethod
 	def isUserNamespaceRemapping() -> bool:
@@ -347,15 +390,9 @@ RUN echo "PS1=\\"(devcontainer) \\$PS1\\"" >> {self.home}/.bashrc
 	@cached_property
 	def dockerCompose(self) -> str:
 
-		# Add some directories as volumes.
 		volumes = [
 			f"{self.workspace}:{self.workspace}",
-			f"{self.home}/.cache:{self.home}/.cache",
 		]
-
-		# Add some files as volumes only if they exist (otherwise docker-compose will create an empty directory).
-		volumes += [f"{file}:{file}" for file in [self.home / ".bash_history", self.home / ".netrc"] if file.is_file()]
-
 		# Add some volumes from features.
 		for feature in self.features:
 			volumes += feature.volumes
@@ -383,7 +420,6 @@ services:
     hostname: {self.imageName}
     extra_hosts:
       - "{self.imageName}:127.0.0.1"
-    network_mode: host
     init: true
     tty: true
     stdin_open: true
@@ -438,7 +474,7 @@ services:
 
 
 if __name__ == "__main__":
-	Features = [FeatureDocker, FeaturePlatform, FeatureVolume, FeatureDevcontainerCLI]
+	Features = [FeatureDocker, FeaturePlatform, FeatureVolume, FeatureIsolation, FeatureDevcontainerCLI]
 
 	parser = argparse.ArgumentParser(description="Development container.")
 	parser.add_argument("--build", action="store_true", help="Re-build the container if set.")
@@ -460,6 +496,11 @@ if __name__ == "__main__":
 		help="Environment variables to pass to the container.",
 	)
 	parser.add_argument(
+		"--dry",
+		action="store_true",
+		help="Only show the DockerFile and docker-compose.yaml that it would use.",
+	)
+	parser.add_argument(
 		"rest",
 		nargs=argparse.REMAINDER,
 		help="Additional arguments to pass to the container.",
@@ -472,9 +513,10 @@ if __name__ == "__main__":
 
 	features = [FeatureClass(args) for FeatureClass in Features]
 	devContainer = DevelopmentContainer(features=features, temporaryPath=args.temp)
-	devContainer.initialize()
-	if args.build_force:
-		devContainer.build(force=True)
-	if args.build:
-		devContainer.build(force=False)
-	devContainer.run(args=args.rest, env=args.env)
+	devContainer.initialize(dry=args.dry)
+	if not args.dry:
+		if args.build_force:
+			devContainer.build(force=True)
+		if args.build:
+			devContainer.build(force=False)
+		devContainer.run(args=args.rest, env=args.env)
