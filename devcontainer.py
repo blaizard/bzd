@@ -146,6 +146,30 @@ class FeatureDevcontainerCLI(Feature):
 		]
 
 
+class FeatureOpenCode(Feature):
+	"""Feature: Add opencode CLI to the container."""
+
+	def __init__(self, args: argparse.Namespace) -> None:
+		super().__init__(args)
+		self.isAvailable = args.opencode
+
+	@staticmethod
+	def cli() -> typing.Dict[str, dict]:
+		return {
+			"opencode": {
+				"action": "store_true",
+				"help": "Include the opencode to the container.",
+			}
+		}
+
+	@property
+	def dockerFile(self) -> typing.List[str]:
+		return [
+			"RUN sudo apt install -y nodejs npm",
+			"RUN sudo npm install -g opencode-ai@latest",
+		]
+
+
 class FeatureDocker(Feature):
 	"""Feature: Docker outside the container."""
 
@@ -282,8 +306,11 @@ class DevelopmentContainer:
 
 		# Generate the hash.
 		pathHash = hashlib.md5("-".join(toHash).encode()).hexdigest()[:6]
+
+		names = [self.args.prefix] if self.args.prefix else []
 		directory = self.workspace.name[-10:]
-		return "-".join([pathHash, re.sub(r"[^a-zA-Z0-9]+", "-", directory).strip("-")])
+		names += [pathHash, re.sub(r"[^a-zA-Z0-9]+", "-", directory).strip("-")]
+		return "-".join(names)
 
 	def initialize(self, dry: bool) -> None:
 
@@ -478,6 +505,7 @@ if __name__ == "__main__":
 		"volume": FeatureVolume,
 		"isolation": FeatureIsolation,
 		"devcontainer": FeatureDevcontainerCLI,
+		"opencode": FeatureOpenCode,
 	}
 
 	Features = [FeatureDocker, FeaturePlatform, FeatureVolume, FeatureIsolation, FeatureDevcontainerCLI]
@@ -519,6 +547,10 @@ if __name__ == "__main__":
 		default=[],
 		choices=allFeatures.keys(),
 		help="Enable some of the features.",
+	)
+	parser.add_argument(
+		"--prefix",
+		help="Add a prefix in name of the container, note that this might create a new container, each container is uniquely identified by its name.",
 	)
 	parser.add_argument(
 		"rest",
