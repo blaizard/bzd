@@ -25,8 +25,8 @@ class Feature:
 		self.context: typing.Optional["DevelopmentContainer"] = None
 
 	@staticmethod
-	def cli(parser: argparse.ArgumentParser) -> None:
-		pass
+	def cli() -> typing.Dict[str, dict]:
+		return {}
 
 	@property
 	def namePrefix(self) -> typing.List[str]:
@@ -60,14 +60,15 @@ class FeatureVolume(Feature):
 		self.isAvailable = self.args.volumes is not None
 
 	@staticmethod
-	def cli(parser: argparse.ArgumentParser) -> None:
-		parser.add_argument(
-			"--volume",
-			dest="volumes",
-			type=str,
-			action="append",
-			help="Add one or more docker volume The volumes will be mounted under /bzd/volumes/<name>.",
-		)
+	def cli() -> typing.Dict[str, dict]:
+		return {
+			"volume": {
+				"dest": "volumes",
+				"type": str,
+				"action": "append",
+				"help": "Add one or more docker volume The volumes will be mounted under /bzd/volumes/<name>.",
+			}
+		}
 
 	@property
 	def volumes(self) -> typing.List[str]:
@@ -100,12 +101,13 @@ class FeatureIsolation(Feature):
 		self.isAvailable = True
 
 	@staticmethod
-	def cli(parser: argparse.ArgumentParser) -> None:
-		parser.add_argument(
-			"--isolate",
-			action="store_true",
-			help="Isolate the container from the host.",
-		)
+	def cli() -> typing.Dict[str, dict]:
+		return {
+			"isolate": {
+				"action": "store_true",
+				"help": "Isolate the container from the host.",
+			}
+		}
 
 	@property
 	def volumes(self) -> typing.List[str]:
@@ -136,12 +138,13 @@ class FeatureDevcontainerCLI(Feature):
 		self.isAvailable = args.devcontainer_cli
 
 	@staticmethod
-	def cli(parser: argparse.ArgumentParser) -> None:
-		parser.add_argument(
-			"--devcontainer_cli",
-			action="store_true",
-			help="Include the devcontainer CLI to the container.",
-		)
+	def cli() -> typing.Dict[str, dict]:
+		return {
+			"devcontainer_cli": {
+				"action": "store_true",
+				"help": "Include the devcontainer CLI to the container.",
+			}
+		}
 
 	@property
 	def dockerFile(self) -> typing.List[str]:
@@ -221,15 +224,16 @@ class FeaturePlatform(Feature):
 		self.isAvailable = self.platform is not None
 
 	@staticmethod
-	def cli(parser: argparse.ArgumentParser) -> None:
-		parser.add_argument(
-			"--platform",
-			choices=(
-				"amd64",
-				"arm64",
-			),
-			help="The architecture on which the docker should run.",
-		)
+	def cli() -> typing.Dict[str, dict]:
+		return {
+			"platform": {
+				"choices": (
+					"amd64",
+					"arm64",
+				),
+				"help": "The architecture on which the docker should run.",
+			}
+		}
 
 	@property
 	def namePrefix(self) -> typing.List[str]:
@@ -474,6 +478,14 @@ services:
 
 
 if __name__ == "__main__":
+	allFeatures = {
+		"docker": FeatureDocker,
+		"platform": FeaturePlatform,
+		"volume": FeatureVolume,
+		"isolation": FeatureIsolation,
+		"devcontainer": FeatureDevcontainerCLI,
+	}
+
 	Features = [FeatureDocker, FeaturePlatform, FeatureVolume, FeatureIsolation, FeatureDevcontainerCLI]
 
 	parser = argparse.ArgumentParser(description="Development container.")
@@ -501,17 +513,34 @@ if __name__ == "__main__":
 		help="Only show the DockerFile and docker-compose.yaml that it would use.",
 	)
 	parser.add_argument(
+		"--disable",
+		action="append",
+		default=[],
+		choices=allFeatures.keys(),
+		help="Disable some of the features.",
+	)
+	parser.add_argument(
+		"--enable",
+		action="append",
+		default=[],
+		choices=allFeatures.keys(),
+		help="Enable some of the features.",
+	)
+	parser.add_argument(
 		"rest",
 		nargs=argparse.REMAINDER,
 		help="Additional arguments to pass to the container.",
 	)
 
-	for FeatureClass in Features:
-		FeatureClass.cli(parser)
+	for FeatureClass in allFeatures.values():
+		for name, kwargs in FeatureClass.cli().items():
+			parser.add_argument(f"--{name}", **kwargs)
 
 	args = parser.parse_args()
 
-	features = [FeatureClass(args) for FeatureClass in Features]
+	featureNames = set(args.enable if len(args.enable) else allFeatures.keys()) - set(args.disable)
+	features = [allFeatures[name](args) for name in featureNames]
+
 	devContainer = DevelopmentContainer(features=features, temporaryPath=args.temp)
 	devContainer.initialize(dry=args.dry)
 	if not args.dry:
