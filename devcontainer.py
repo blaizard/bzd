@@ -86,6 +86,28 @@ class FeatureVolume(Feature):
 		return {"volumes": [f'{volume}:\n  name: "{volume}"' for volume in self.args.volumes]}
 
 
+class FeatureSession(Feature):
+	"""Feature: Add support for sessions."""
+
+	def __init__(self, args: argparse.Namespace) -> None:
+		super().__init__(args)
+		self.isAvailable = True
+
+	@property
+	def dockerFile(self) -> typing.List[str]:
+		return [
+			"RUN sudo apt install -y tmux",
+			"""RUN <<EOF cat > ~/.tmux.conf
+set -g default-command "/bin/bash"
+EOF""",
+			"""RUN <<EOF cat > /usr/local/bin/session
+#!/bin/bash
+exec tmux new-session -A -s main
+EOF""",
+			"RUN chmod +x /usr/local/bin/session",
+		]
+
+
 class FeatureIsolation(Feature):
 	"""Feature: Add sandbox limitations to the container."""
 
@@ -509,12 +531,13 @@ if __name__ == "__main__":
 		"isolation": FeatureIsolation,
 		"devcontainer": FeatureDevcontainerCLI,
 		"opencode": FeatureOpenCode,
+		"session": FeatureSession,
 	}
 
 	allPresets = {
-		"agent1": ["--enable", "opencode", "--opencode", "--prefix", "agent1"],
-		"agent2": ["--enable", "opencode", "--opencode", "--prefix", "agent2"],
-		"agent3": ["--enable", "opencode", "--opencode", "--prefix", "agent3"],
+		"agent1": ["--enable", "opencode", "--enable", "session", "--opencode", "--prefix", "agent1"],
+		"agent2": ["--enable", "opencode", "--enable", "session", "--opencode", "--prefix", "agent2"],
+		"agent3": ["--enable", "opencode", "--enable", "session", "--opencode", "--prefix", "agent3"],
 	}
 
 	parser = argparse.ArgumentParser(description="Development container.")
