@@ -100,11 +100,11 @@ class FeatureSession(Feature):
 			"""RUN <<EOF cat > ~/.tmux.conf
 set -g default-command "/bin/bash"
 EOF""",
-			"""RUN <<EOF cat > /usr/local/bin/session
+			"""RUN sudo tee /usr/local/bin/session <<EOF
 #!/bin/bash
-exec tmux new-session -A -s main
+exec tmux new-session -A -s "${1:-main}"
 EOF""",
-			"RUN chmod +x /usr/local/bin/session",
+			"RUN sudo chmod +x /usr/local/bin/session",
 		]
 
 
@@ -193,6 +193,16 @@ class FeatureOpenCode(Feature):
 			"RUN sudo apt install -y nodejs npm",
 			"RUN sudo npm install -g opencode-ai@latest",
 		]
+
+	@property
+	def volumes(self) -> typing.List[str]:
+		assert self.context
+		configPaths = [
+			self.context.home / ".config/opencode",
+			self.context.home / ".local/share/opencode",
+			self.context.home / ".local/state/opencode",
+		]
+		return [f"{path}:{path}" for path in configPaths if path.exists()]
 
 
 class FeatureDocker(Feature):
@@ -407,6 +417,8 @@ class DevelopmentContainer:
 		instructions += [
 			f'ENV USER="{self.user}"',
 			f'ENV HOME="{self.home}"',
+			"ENV SHELL=/bin/bash",
+			"ENV EDITOR=vim",
 		]
 
 		instructions += [instruction for feature in self.features for instruction in feature.dockerFile]
@@ -414,9 +426,7 @@ class DevelopmentContainer:
 
 		return f"""
 FROM {imageBase}
-RUN apt update -y
-RUN apt upgrade -y
-RUN apt install -y \
+RUN apt update -y && apt upgrade -y && apt install -y \
 	ca-certificates \
 	python3 \
 	git \
@@ -424,6 +434,7 @@ RUN apt install -y \
 	curl \
 	patchelf \
 	sudo \
+	vim \
 	build-essential
 
 RUN wget -O /usr/local/bin/bazel https://raw.githubusercontent.com/blaizard/bzd/refs/heads/master/tools/bazel && chmod +x /usr/local/bin/bazel
@@ -506,6 +517,12 @@ services:
 			check=True,
 		)
 
+		env += [
+			"LANG",
+			"LC_CTYPE",
+			"TERM",
+			"COLORTERM",
+		]
 		extra = [arg for e in env for arg in ("--env", e)]
 
 		workdir = self.cwd if self.cwd.is_relative_to(self.workspace) else self.workspace
@@ -535,9 +552,8 @@ if __name__ == "__main__":
 	}
 
 	allPresets = {
-		"agent1": ["--enable", "opencode", "--enable", "session", "--opencode", "--prefix", "agent1"],
-		"agent2": ["--enable", "opencode", "--enable", "session", "--opencode", "--prefix", "agent2"],
-		"agent3": ["--enable", "opencode", "--enable", "session", "--opencode", "--prefix", "agent3"],
+		f"agent{i}": ["--enable", "opencode", "--enable", "session", "--opencode", "--prefix", f"agent{i}"]
+		for i in range(1, 10)
 	}
 
 	parser = argparse.ArgumentParser(description="Development container.")
