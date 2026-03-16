@@ -58,14 +58,13 @@ sh_binary_wrapper(
         "{node}": "node_binary"
     }},
     command = \"""
-        set +e # Do not return if the command fails.
+        set +e
         error=$(PATH={{node_binary}}/..:$PATH {{binary}} --shamefully-hoist --store-dir=./store --color "$@" 2>&1)
         code=$?
         if ((code)); then
             echo "$error"
             exit $code
         fi
-        echo "1" > "$1"
     \""",
     data = [
         "{node}",

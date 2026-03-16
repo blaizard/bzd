@@ -111,15 +111,12 @@ def bzd_nodejs_make_node_modules(ctx, packages, base_dir_name):
             "--quiet",  # Note: --slient is better but it hangs: https://github.com/pnpm/pnpm/issues/7839
             "--ignore-scripts",
             "--config.node-linker=hoisted",  # Needed for remote.
+            "--config.package-import-method=copy",
             "--offline",
         ],
         progress_message = "Installing package(s) for {}".format(ctx.label),
         mnemonic = "NodejsUpdate",
         executable = toolchain_executable.manager.files_to_run,
-        execution_requirements = {
-            # Avoid remote execution as it fails because sometimes pnpm tries to chown files and this is not allowed in remote execution.
-            "no-remote-exec": "1",
-        },
     )
 
     return [package_json, node_modules]
