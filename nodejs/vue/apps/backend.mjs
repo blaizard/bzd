@@ -9,7 +9,6 @@ import Services from "#bzd/nodejs/core/services/services.mjs";
 import Cache2 from "#bzd/nodejs/core/cache2.mjs";
 import Statistics from "#bzd/nodejs/core/statistics/statistics.mjs";
 import config from "#bzd/nodejs/vue/apps/config.json" with { type: "json" };
-import ClockNTP from "#bzd/nodejs/core/clock/ntp.mjs";
 import LoggerMemory from "#bzd/nodejs/vue/components/logger/backend/memory/memory.mjs";
 
 import { Command } from "commander/esm.mjs";
@@ -127,13 +126,6 @@ export default class Backend {
 		return this.instances.loggerMemory;
 	}
 
-	/// Access the clock object.
-	get clock() {
-		Exception.assert(this.isSetup, "Backend not set-up.");
-		Exception.assert(this.instances.clock, "Clock not set-up.");
-		return this.instances.clock;
-	}
-
 	/// Set-up the authentication object.
 	useAuthentication(options = config.authentication) {
 		Exception.assert(this.isSetup == false, "Backend already set-up.");
@@ -191,14 +183,6 @@ export default class Backend {
 		Exception.assert(this.isSetup == false, "Backend already set-up.");
 		Exception.assert(!this.instances.loggerMemory, "LoggerMemory already set-up.");
 		this.instances.loggerMemory = new LoggerMemory();
-		return this;
-	}
-
-	/// Set-up the clock object.
-	useClock() {
-		Exception.assert(this.isSetup == false, "Backend already set-up.");
-		Exception.assert(!this.instances.clock, "Clock already set-up.");
-		this.instances.clock = new ClockNTP();
 		return this;
 	}
 
@@ -284,10 +268,6 @@ export default class Backend {
 	/// Start the web server.
 	async start() {
 		Exception.assert(this.isSetup, "Backend not set-up.");
-		if (this.instances.clock) {
-			Log.info("Starting clock");
-			await this.instances.clock.start();
-		}
 
 		if (this.instances.services) {
 			Log.info("Starting services");
@@ -333,10 +313,6 @@ export default class Backend {
 		if (this.instances.statistics) {
 			Log.info("Stopping statistics");
 			await this.instances.statistics.stop();
-		}
-		if (this.instances.clock) {
-			Log.info("Stopping clock");
-			await this.instances.clock.stop();
 		}
 	}
 }

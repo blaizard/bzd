@@ -31,17 +31,3 @@ bzd_nodejs_library(
         ":clock",
     ],
 )
-
-bzd_nodejs_library(
-    name = "ntp",
-    srcs = [
-        "ntp.mjs",
-    ],
-    packages = [
-        "@nodejs_deps//:ntp-client",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":clock",
-    ],
-)

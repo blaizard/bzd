@@ -1559,15 +1559,6 @@
         "name": "nodemailer",
         "version": "7.0.12"
     },
-    "ntp-client": {
-        "dependencies": {
-            "ntp-client@0.5.3": {
-                "integrity": "sha512-/Ja8ljm8V0yb+zZnjEaJlFY3abA9gIpQcnkX8RJ59NzHVcnJJpGoKtU3UcrnAwRfduYAktI+2gJLpn1NepxgnA=="
-            }
-        },
-        "name": "ntp-client",
-        "version": "0.5.3"
-    },
     "puppeteer": {
         "dependencies": {
             "@babel/code-frame@7.28.6": {
