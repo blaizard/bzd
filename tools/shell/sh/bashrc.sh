@@ -65,6 +65,15 @@ bzd_clean_disk()
     echo "---- Saved ${total_free_saved}K bytes."
 }
 
+# ---- Content from fzf.sh
+# Install fzf, a general-purpose command-line fuzzy finder.
+bzd_fzf_install()
+{
+	git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+	~/.fzf/install
+	eval "$(fzf --bash)"
+}
+
 # ---- Content from git.sh
 # Reset the current branch to its state in origin
 bzd_git_reset()
@@ -82,10 +91,12 @@ bzd_git_reset()
         git fetch --prune
         git reset --hard $origin
         # Note: do not delete untracked files as they might be used (for local configuration for example).
-        git clean -fd
-        git submodule foreach --recursive "git reset --hard && git clean -fd"
-        git submodule sync --recursive
-        git submodule update --init --recursive
+        git clean -ffd
+        if git submodule status >/dev/null 2>&1; then
+            git submodule foreach --recursive "git reset --hard && git clean -ffd"
+            git submodule sync --recursive
+            git submodule update --init --recursive
+        fi
     fi
 }
 
