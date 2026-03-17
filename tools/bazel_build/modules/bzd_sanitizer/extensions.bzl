@@ -35,12 +35,7 @@ alias(
     actual = "{}",
     visibility = ["//visibility:public"],
 )
-alias(
-    name = "mypy_config",
-    actual = "{}",
-    visibility = ["//visibility:public"],
-)
-""".format(mypy_config.binary if mypy_config else ":no_mypy", mypy_config.config if mypy_config else ":no_mypy")
+""".format(mypy_config.binary if mypy_config else ":no_mypy")
 
 def _sanitizer_impl(module_ctx):
     clang_tidy_config = None
@@ -58,7 +53,6 @@ def _sanitizer_impl(module_ctx):
                 fail("The mypy config is set twice.")
             mypy_config = struct(
                 binary = mypy.binary,
-                config = mypy.config,
             )
 
     build_file = ""
@@ -96,10 +90,6 @@ sanitizer = module_extension(
                     cfg = "exec",
                     executable = True,
                     doc = "The mypy binary, this must be the same as the one running the test.",
-                ),
-                "config": attr.label(
-                    mandatory = True,
-                    doc = "The mypy ini configuration.",
                 ),
             },
         ),

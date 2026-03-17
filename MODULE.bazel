@@ -229,5 +229,4 @@ sanitizer.clang_tidy(
 )
 sanitizer.mypy(
     binary = "//tools/python:mypy",
-    config = "//tools/python:pyproject.toml",
 )
