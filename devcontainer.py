@@ -22,7 +22,7 @@ class Feature:
 
 	def __init__(self, args: argparse.Namespace) -> None:
 		self.args = args
-		self.isAvailable: bool = False
+		self.isAvailable: bool = True
 		self.context: typing.Optional["DevelopmentContainer"] = None
 
 	@staticmethod
@@ -89,10 +89,6 @@ class FeatureVolume(Feature):
 class FeatureSession(Feature):
 	"""Feature: Add support for sessions."""
 
-	def __init__(self, args: argparse.Namespace) -> None:
-		super().__init__(args)
-		self.isAvailable = True
-
 	@property
 	def dockerFile(self) -> typing.List[str]:
 		return [
@@ -110,10 +106,6 @@ EOF""",
 
 class FeatureIsolation(Feature):
 	"""Feature: Add sandbox limitations to the container."""
-
-	def __init__(self, args: argparse.Namespace) -> None:
-		super().__init__(args)
-		self.isAvailable = True
 
 	@staticmethod
 	def cli() -> typing.Dict[str, typing.Dict[str, typing.Any]]:
