@@ -146,10 +146,11 @@ def _mypy_aspect_impl(target, ctx):
     # Derive the python_version from the toolchain.
     python_version = "3"
     python_toolchain = ctx.toolchains["@rules_python//python:toolchain_type"]
-    py3_runtime = python_toolchain.py3_runtime
-    if py3_runtime and py3_runtime.interpreter_version_info:
-        v = py3_runtime.interpreter_version_info
-        python_version = "{}.{}".format(v.major, v.minor)
+    if python_toolchain:
+        py3_runtime = python_toolchain.py3_runtime
+        if py3_runtime and py3_runtime.interpreter_version_info:
+            v = py3_runtime.interpreter_version_info
+            python_version = "{}.{}".format(v.major, v.minor)
 
     # Generate a per-action *.mypy.ini.
     third_party_modules = _get_third_party_top_level_modules(all_srcs)
@@ -235,5 +236,5 @@ mypy_aspect = aspect(
         ),
     },
     attr_aspects = ["deps"],
-    toolchains = ["@rules_python//python:toolchain_type"],
+    toolchains = [config_common.toolchain_type("@rules_python//python:toolchain_type", mandatory = False)],
 )
