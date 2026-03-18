@@ -54,7 +54,9 @@ export class HttpServerContext {
 			busboy.on("file", (key, stream, info) => {
 				processingTasks.push(
 					(async () => {
-						const actualFilename = info.filename.startsWith("@bzd-") ? info.filename.split("-", 4)[3] : info.filename;
+						const actualFilename = info.filename.startsWith("@bzd-")
+							? info.filename.split("-").slice(3).join("-")
+							: info.filename;
 						try {
 							blobs[info.filename] = await onFile(key, stream, {
 								name: actualFilename,
