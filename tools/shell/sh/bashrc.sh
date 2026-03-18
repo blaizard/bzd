@@ -1,6 +1,11 @@
 # This file is auto-generated, do not edit as modifications will be overwritten.
 
 # ---- Content from aliases.sh
+# --- locale ------------------------------------------------------------------
+export LANG="${LANG:-en_US.UTF-8}"
+export LC_CTYPE="${LC_CTYPE:-en_US.UTF-8}"
+export LC_COLLATE="${LC_COLLATE:-en_US.UTF-8}"
+
 # --- ls ----------------------------------------------------------------------
 alias ls='ls --color=auto -h'
 alias ll='ls -lh'
@@ -19,11 +24,13 @@ type vim &> /dev/null
 if [ $? -eq 0 ]; then
 	# Vim as default
 	alias vi=vim
-	alias edit='vim'
+	alias edit="vim"
+	export EDITOR="${EDITOR:-vim}"
 	git config --global core.editor "vim" 2> /dev/null
 else
 	# Vi as default
 	alias edit='vi'
+	export EDITOR="${EDITOR:-vi}"
 	git config --global core.editor "vi" 2> /dev/null
 fi
 
