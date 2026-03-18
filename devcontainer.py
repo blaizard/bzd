@@ -5,6 +5,7 @@ import argparse
 import getpass
 import grp
 import hashlib
+import json
 import os
 import pathlib
 import re
@@ -15,6 +16,7 @@ import sys
 from functools import cached_property
 
 imageBase = "ubuntu:24.04"
+imagePrefix = "devcontainer-"
 
 
 class Feature:
@@ -91,9 +93,10 @@ class FeatureSession(Feature):
 
 	@property
 	def dockerFile(self) -> typing.List[str]:
+		assert self.context is not None
 		return [
 			"RUN sudo apt install -y tmux",
-			"""RUN <<EOF cat > ~/.tmux.conf
+			f"""RUN <<EOF cat > {self.context.home}/.tmux.conf
 set -g default-command "/bin/bash"
 EOF""",
 			"""RUN sudo tee /usr/local/bin/session <<EOF
@@ -305,6 +308,8 @@ class FeaturePlatform(Feature):
 
 
 class DevelopmentContainer:
+	"""Development container."""
+
 	def __init__(self, args: argparse.Namespace, features: typing.Sequence[Feature], temporaryPath: pathlib.Path) -> None:
 		# Do not resolve symlinks so that we can use symlinks to create multiple devcontainers
 		# from the same source file, but we still want a normalized absolute path.
@@ -322,12 +327,9 @@ class DevelopmentContainer:
 	@cached_property
 	def namePrefix(self) -> str:
 
+		# Element that makes this container unique.
 		toHash = [self.workspace.as_posix(), self.user]
-
-		# Add the feature class names of the active features.
 		toHash += sorted([feature.__class__.__name__ for feature in self.features])
-
-		# Compute the cli parameters for the hash.
 		argNames = sorted([kwargs.get("dest", name) for feature in self.features for name, kwargs in feature.cli().items()])
 		toHash += [f"{name}={getattr(self.args, name)}" for name in argNames]
 
@@ -370,7 +372,7 @@ class DevelopmentContainer:
 
 	@cached_property
 	def imageName(self) -> str:
-		return f"devcontainer-{self.namePrefix}"
+		return f"{imagePrefix}{self.namePrefix}"
 
 	@cached_property
 	def dockerFilePath(self) -> pathlib.Path:
@@ -410,7 +412,6 @@ class DevelopmentContainer:
 			f'ENV USER="{self.user}"',
 			f'ENV HOME="{self.home}"',
 			"ENV SHELL=/bin/bash",
-			"ENV EDITOR=vim",
 		]
 
 		instructions += [instruction for feature in self.features for instruction in feature.dockerFile]
@@ -427,7 +428,11 @@ RUN apt update -y && apt upgrade -y && apt install -y \
 	patchelf \
 	sudo \
 	vim \
-	build-essential
+	build-essential \
+	locales
+
+RUN locale-gen en_US.UTF-8
+ENV LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
 
 RUN wget -O /usr/local/bin/bazel https://raw.githubusercontent.com/blaizard/bzd/refs/heads/master/tools/bazel && chmod +x /usr/local/bin/bazel
 
@@ -473,6 +478,10 @@ services:
     hostname: {self.imageName}
     extra_hosts:
       - "{self.imageName}:127.0.0.1"
+    labels:
+      com.bzd.devcontainer.workspace: "{self.workspace}"
+      com.bzd.devcontainer.user: "{self.user}"
+      com.bzd.devcontainer.command: "{" ".join(sys.argv[1:])}"
     init: true
     tty: true
     stdin_open: true
@@ -530,6 +539,62 @@ services:
 				*(args or ["/bin/bash"]),
 			]
 		)
+
+	@staticmethod
+	def ls() -> None:
+		result = subprocess.run(
+			["docker", "ps", "--filter", f"name={imagePrefix}", "-a", "--format", "json"],
+			capture_output=True,
+			text=True,
+			check=True,
+		)
+		containers = []
+		for container in map(json.loads, result.stdout.splitlines()):
+			labels = {
+				label.split("=", 1)[0]: label.split("=", 1)[1]
+				for label in container["Labels"].split(",")
+				if label.startswith("com.bzd.devcontainer.")
+			}
+			try:
+				workspace = pathlib.Path(labels["com.bzd.devcontainer.workspace"]).resolve()
+				relativeWorkspace = pathlib.Path(os.path.relpath(workspace, pathlib.Path.cwd().resolve()))
+				lines = [
+					f"Command: {relativeWorkspace / pathlib.Path(__file__).name} {labels['com.bzd.devcontainer.command']}",
+					f"User: {labels['com.bzd.devcontainer.user']}",
+				]
+				order = len(relativeWorkspace.parts)
+			except Exception as e:
+				lines, order = [f"{e.__class__.__name__}: {e}"], 999
+			containers.append(
+				{
+					"name": container["Names"],
+					"status": container["Status"],
+					"active": container["State"] == "running",
+					"lines": lines,
+					"order": order,
+				}
+			)
+
+		result = subprocess.run(
+			["docker", "stats", "--no-stream", "--format", "json"] + [container["name"] for container in containers],
+			capture_output=True,
+			text=True,
+			check=True,
+		)
+		allStats = [json.loads(line) for line in result.stdout.splitlines()]
+		for container in sorted(containers, key=lambda u: u["order"]):
+			color = "\033[32m" if container["active"] else "\033[31m"
+			stats: typing.Dict[str, str] = next((d for d in allStats if d.get("Container") == container["name"]), {})
+			infos = [
+				container["status"].lower(),
+				f"cpu={stats.get('CPUPerc', '?')}",
+				f"mem={stats.get('MemPerc', '?')}",
+				f"block.io={stats.get('BlockIO', '?').replace(' ', '')}",
+				f"net.io={stats.get('NetIO', '?').replace(' ', '')}",
+			]
+			print(f"- {color}{container['name']}\033[0m: {', '.join(infos)}")
+			for line in container["lines"]:
+				print(f"    {line}")
 
 
 if __name__ == "__main__":
@@ -610,6 +675,12 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 	if args.preset:
 		args = parser.parse_args([*allPresets[args.preset], *sys.argv[1:]])
+	if args.rest:
+		if args.rest[0] == "ls":
+			DevelopmentContainer.ls()
+			sys.exit(0)
+		if args.rest[0] == "--":
+			args.rest = args.rest[1:]
 
 	# Select only the features asked.
 	featureNames = set(args.enable if len(args.enable) else allFeatures.keys()) - set(args.disable)
