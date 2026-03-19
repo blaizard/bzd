@@ -5,6 +5,9 @@
 {{ content }}
 {% end %}
 
+# Variables to be used by the prompt.
+__session_names=()
+
 # Only output to interactive shell.
 if [[ "$TERM" != "dumb" ]] && [[ $- == *i* ]]; then
 

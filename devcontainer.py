@@ -459,7 +459,7 @@ RUN mkdir /bzd && echo "#!/usr/bin/env bash" > /bzd/startup.sh && chmod +x /bzd/
 {instructionsStr}
 
 RUN wget -O {self.home}/.bashrc https://raw.githubusercontent.com/blaizard/bzd/refs/heads/master/tools/shell/sh/bashrc.sh
-RUN echo "PS1=\\"(devcontainer) \\$PS1\\"" >> {self.home}/.bashrc
+RUN echo "__session_names+=(devcontainer)" >> {self.home}/.bashrc
 """
 
 	@cached_property

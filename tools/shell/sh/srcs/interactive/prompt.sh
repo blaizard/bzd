@@ -31,9 +31,16 @@ _bzd_prepend()
 	[[ ! -v IN_NIX_SHELL ]] || echo -n "(nix-shell) "
 }
 
+_bzd_sessions()
+{
+	if [ ${#__session_names[@]} -gt 0 ]; then
+		echo -n "(${__session_names[@]}) "
+	fi
+}
+
 case "$TERM" in
-xterm*|rxvt*|konsole*)
-	PS1="\[\e[0;31m\]\$(_bzd_last_non_zero_return_code)\[\e[0m\]\$(_bzd_prepend)\u@\h \[\e[32m\]\w\[\e[33m\]\$(_bzd_parse_git_branch)\[\e[0m\] $ "
+xterm*|rxvt*|konsole*|tmux*)
+	PS1="\$(_bzd_sessions)\[\e[0;31m\]\$(_bzd_last_non_zero_return_code)\[\e[0m\]\$(_bzd_prepend)\u@\h \[\e[32m\]\w\[\e[33m\]\$(_bzd_parse_git_branch)\[\e[0m\] $ "
 	;;
 *)
 	;;

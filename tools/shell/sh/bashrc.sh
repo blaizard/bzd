@@ -38,6 +38,9 @@ fi
 alias bzd_reload='. ~/.bashrc'
 
 
+# Variables to be used by the prompt.
+__session_names=()
+
 # Only output to interactive shell.
 if [[ "$TERM" != "dumb" ]] && [[ $- == *i* ]]; then
 
@@ -181,9 +184,16 @@ _bzd_prepend()
 	[[ ! -v IN_NIX_SHELL ]] || echo -n "(nix-shell) "
 }
 
+_bzd_sessions()
+{
+	if [ ${#__session_names[@]} -gt 0 ]; then
+		echo -n "(${__session_names[@]}) "
+	fi
+}
+
 case "$TERM" in
-xterm*|rxvt*|konsole*)
-	PS1="\[\e[0;31m\]\$(_bzd_last_non_zero_return_code)\[\e[0m\]\$(_bzd_prepend)\u@\h \[\e[32m\]\w\[\e[33m\]\$(_bzd_parse_git_branch)\[\e[0m\] $ "
+xterm*|rxvt*|konsole*|tmux*)
+	PS1="\$(_bzd_sessions)\[\e[0;31m\]\$(_bzd_last_non_zero_return_code)\[\e[0m\]\$(_bzd_prepend)\u@\h \[\e[32m\]\w\[\e[33m\]\$(_bzd_parse_git_branch)\[\e[0m\] $ "
 	;;
 *)
 	;;
@@ -195,6 +205,11 @@ if command -v tmux >/dev/null 2>&1; then
 	sessions=$(tmux list-sessions -F '#S' 2>/dev/null)
 	if [ -n "$sessions" ]; then
 		printf 'tmux session(s): %s\n' "$(echo "$sessions" | paste -sd ', ' -)"
+	fi
+
+	# If we are inside a tmux session.
+	if [ -n "$TMUX" ]; then
+		__session_names+=("$(tmux display-message -p '#S')")
 	fi
 fi
 
