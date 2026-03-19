@@ -138,7 +138,15 @@ class FeatureIsolation(Feature):
 	@property
 	def dockerCompose(self) -> typing.Dict[str, typing.List[str]]:
 		if self.args.isolate:
-			return {}
+			assert self.context is not None
+			return {
+				"service": [
+					"cap_drop:",
+					"  - ALL",
+					"security_opt:",
+					"  - no-new-privileges:true",
+				]
+			}
 		return {"service": ["network_mode: host"]}
 
 
@@ -311,6 +319,7 @@ class DevelopmentContainer:
 	"""Development container."""
 
 	def __init__(self, args: argparse.Namespace, features: typing.Sequence[Feature], temporaryPath: pathlib.Path) -> None:
+
 		# Do not resolve symlinks so that we can use symlinks to create multiple devcontainers
 		# from the same source file, but we still want a normalized absolute path.
 		self.workspace = pathlib.Path(os.path.normpath(__file__)).absolute().parent
@@ -325,16 +334,17 @@ class DevelopmentContainer:
 		self.args = args
 
 	@cached_property
-	def namePrefix(self) -> str:
-
-		# Element that makes this container unique.
-		toHash = [self.workspace.as_posix(), self.user]
+	def toHash(self) -> typing.List[str]:
+		toHash = [f"workspace={self.workspace.as_posix()}", f"user={getpass.getuser()}"]
 		toHash += sorted([feature.__class__.__name__ for feature in self.features])
 		argNames = sorted([kwargs.get("dest", name) for feature in self.features for name, kwargs in feature.cli().items()])
 		toHash += [f"{name}={getattr(self.args, name)}" for name in argNames]
+		return toHash
 
+	@cached_property
+	def namePrefix(self) -> str:
 		# Generate the hash.
-		pathHash = hashlib.md5("-".join(toHash).encode()).hexdigest()[:6]
+		pathHash = hashlib.md5("-".join(self.toHash).encode()).hexdigest()[:6]
 
 		names = [self.args.prefix] if self.args.prefix else []
 		directory = self.workspace.name[-10:]
@@ -348,6 +358,8 @@ class DevelopmentContainer:
 			feature.initialize(context=self)
 
 		if dry:
+			print("==== Hash ====")
+			print("\n".join(self.toHash))
 			print("==== DockerFile ====")
 			print(self.dockerFile)
 			print("==== DockerCompose ====")
@@ -367,8 +379,13 @@ class DevelopmentContainer:
 		A rootless container will have its file permissions mapped to the root user and translated to the host via docker.
 		"""
 
-		output = subprocess.check_output(["docker", "info", "-f", "{{println .SecurityOptions}}"])
-		return b"rootless" in output
+		try:
+			output = subprocess.check_output(["docker", "info", "-f", "{{println .SecurityOptions}}"])
+			return b"rootless" in output
+
+		# If docker is not present, return a default value, this is needed for testing.
+		except FileNotFoundError:
+			return True
 
 	@cached_property
 	def imageName(self) -> str:
@@ -480,7 +497,7 @@ services:
       - "{self.imageName}:127.0.0.1"
     labels:
       com.bzd.devcontainer.workspace: "{self.workspace}"
-      com.bzd.devcontainer.user: "{self.user}"
+      com.bzd.devcontainer.user: "{getpass.getuser()}"
       com.bzd.devcontainer.command: "{" ".join(sys.argv[1:])}"
     init: true
     tty: true
@@ -609,7 +626,18 @@ if __name__ == "__main__":
 	}
 
 	allPresets = {
-		f"agent{i}": ["--enable", "opencode", "--enable", "session", "--opencode", "--prefix", f"agent{i}"]
+		f"agent{i}": [
+			"--enable",
+			"opencode",
+			"--enable",
+			"session",
+			"--enable",
+			"isolation",
+			"--opencode",
+			"--isolate",
+			"--prefix",
+			f"agent{i}",
+		]
 		for i in range(1, 10)
 	}
 
