@@ -25,8 +25,6 @@ export default class HttpServer {
 		Exception.assert(typeof port === "number", "The port '{}' must be a number.", port);
 		this.config = Object.assign(
 			{
-				/// \brief Set the upload directory.
-				uploadDir: false,
 				/// \brief Set the file transfer limit.
 				limit: 1 * 1024 * 1024,
 				/// \brief Default request timeout.
