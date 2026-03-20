@@ -5,7 +5,7 @@ import socket
 import typing
 import time
 
-from bzd.http.client import HTTPClient
+from bzd.http.client import HttpClient
 
 
 def checkMAC(mac: str) -> bool:
@@ -103,7 +103,7 @@ def commandSuspend(args: argparse.Namespace) -> None:
 	host, port = getHostPort(args.ip)
 
 	try:
-		HTTPClient.get(f"http://{host}:{port}/suspend")
+		HttpClient.get(f"http://{host}:{port}/suspend")
 	except Exception as e:
 		print(str(e))
 
@@ -114,7 +114,7 @@ def commandShutdown(args: argparse.Namespace) -> None:
 	host, port = getHostPort(args.ip)
 
 	try:
-		HTTPClient.get(f"http://{host}:{port}/shutdown")
+		HttpClient.get(f"http://{host}:{port}/shutdown")
 	except Exception as e:
 		print(str(e))
 
