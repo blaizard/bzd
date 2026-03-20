@@ -4,12 +4,12 @@ import sys
 import os
 import pathlib
 
-from apps.node_manager.power import handlersPower
-from apps.node_manager.monitor import Monitor
+from apps.node_manager.private.server.power import handlersPower
+from apps.node_manager.private.server.monitor import Monitor
+from apps.node_manager.private.server.config import Config
 from bzd.utils.scheduler import Scheduler
 from bzd.sync.singleton import Singleton
 from apps.artifacts.api.python.node.node import Node
-from apps.node_manager.config import Config
 from bzd.http.server import HttpServer
 
 if __name__ == "__main__":

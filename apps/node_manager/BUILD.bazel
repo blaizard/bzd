@@ -1,6 +1,5 @@
 load("@bzd_bundle//:defs.bzl", "bzd_bundle_binary")
 load("@bzd_lib//config:defs.bzl", "bzd_config")
-load("@pip//:requirements.bzl", "requirement")
 load("@rules_python//python:defs.bzl", "py_binary")
 load("//apps/bootloader:defs.bzl", "bzd_bootloader_binary")
 
@@ -22,20 +21,15 @@ py_binary(
 py_binary(
     name = "node_manager",
     srcs = [
-        "config.py",
-        "monitor.py",
         "node_manager.py",
-        "nvidia.py",
-        "power.py",
-        "ups.py",
     ],
     deps = [
         "//apps/artifacts/api/python/node",
+        "//apps/node_manager/private/server:monitor",
+        "//apps/node_manager/private/server:power",
         "@bzd_python//bzd/http:server",
         "@bzd_python//bzd/sync:singleton",
         "@bzd_python//bzd/utils:scheduler",
-        requirement("psutil"),
-        requirement("nvidia-ml-py"),
     ],
 )
 

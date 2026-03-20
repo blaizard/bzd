@@ -1,0 +1,62 @@
+load("@pip//:requirements.bzl", "requirement")
+load("@rules_python//python:defs.bzl", "py_library")
+
+py_library(
+    name = "config",
+    srcs = [
+        "config.py",
+    ],
+    visibility = [
+        "//apps/node_manager:__pkg__",
+    ],
+)
+
+py_library(
+    name = "nvidia",
+    srcs = [
+        "nvidia.py",
+    ],
+    deps = [
+        requirement("nvidia-ml-py"),
+    ],
+)
+
+py_library(
+    name = "power",
+    srcs = [
+        "power.py",
+    ],
+    visibility = [
+        "//apps/node_manager:__pkg__",
+    ],
+    deps = [
+        "@bzd_python//bzd/http:server",
+    ],
+)
+
+py_library(
+    name = "ups",
+    srcs = [
+        "ups.py",
+    ],
+    deps = [
+        ":config",
+    ],
+)
+
+py_library(
+    name = "monitor",
+    srcs = [
+        "monitor.py",
+    ],
+    visibility = [
+        "//apps/node_manager:__pkg__",
+    ],
+    deps = [
+        ":config",
+        ":nvidia",
+        ":ups",
+        "@bzd_python//bzd/http:server",
+        requirement("psutil"),
+    ],
+)

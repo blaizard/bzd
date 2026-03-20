@@ -4,9 +4,9 @@ import json
 import time
 
 from bzd.http.server import RESTServerContext
-from apps.node_manager.nvidia import Nvidia
-from apps.node_manager.ups import UPS
-from apps.node_manager.config import Config
+from apps.node_manager.private.server.nvidia import Nvidia
+from apps.node_manager.private.server.ups import UPS
+from apps.node_manager.private.server.config import Config
 
 
 class Monitor:

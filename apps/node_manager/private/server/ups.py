@@ -3,7 +3,7 @@ import socket
 import shlex
 from contextlib import contextmanager
 
-from apps.node_manager.config import Config
+from apps.node_manager.private.server.config import Config
 
 
 class NUTClientAccessor:
