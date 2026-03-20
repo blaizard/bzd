@@ -14,6 +14,7 @@ py_library(
     ],
     visibility = [
         "//apps/node_manager:__pkg__",
+        "//apps/node_manager/private/client/command/tests:__pkg__",
     ],
     deps = [
         ":common",
@@ -27,6 +28,7 @@ py_library(
     ],
     visibility = [
         "//apps/node_manager:__pkg__",
+        "//apps/node_manager/private/client/command/tests:__pkg__",
     ],
     deps = [
         ":common",
@@ -41,6 +43,22 @@ py_library(
     ],
     visibility = [
         "//apps/node_manager:__pkg__",
+        "//apps/node_manager/private/client/command/tests:__pkg__",
+    ],
+    deps = [
+        ":common",
+        "@bzd_python//bzd/http:client",
+    ],
+)
+
+py_library(
+    name = "lease",
+    srcs = [
+        "lease.py",
+    ],
+    visibility = [
+        "//apps/node_manager:__pkg__",
+        "//apps/node_manager/private/client/command/tests:__pkg__",
     ],
     deps = [
         ":common",

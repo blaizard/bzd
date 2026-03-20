@@ -1,8 +1,10 @@
 import argparse
+import sys
 
 from apps.node_manager.private.client.command.wake_on_lan import commandWakeOnLan
 from apps.node_manager.private.client.command.suspend import commandSuspend
 from apps.node_manager.private.client.command.shutdown import commandShutdown
+from apps.node_manager.private.client.command.lease import commandLease
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Wake On Lan client.")
@@ -42,6 +44,23 @@ if __name__ == "__main__":
 	shutdownParser = subparsers.add_parser("shutdown", help="Shutdown a machine running the server.")
 	shutdownParser.add_argument("ip", help="The ip:port address for the machine to shutdown.")
 
+	leaseParser = subparsers.add_parser(
+		"lease", help="Register a workload, run a heartbeat and release the workload when completed."
+	)
+	leaseParser.add_argument("ip", help="The ip:port address for the machine to register the workload.")
+	leaseParser.add_argument(
+		"--name",
+		default="unknown",
+		help="The name of the workload.",
+	)
+	leaseParser.add_argument(
+		"--ttl",
+		default=60,
+		type=int,
+		help="The time-to-live of the workload lease.",
+	)
+	leaseParser.add_argument("workload", nargs=argparse.REMAINDER, help="The command to execute.")
+
 	args = parser.parse_args()
 
 	if args.command == "wol":
@@ -56,5 +75,13 @@ if __name__ == "__main__":
 		commandSuspend(server=args.ip)
 	elif args.command == "shutdown":
 		commandShutdown(server=args.ip)
+	elif args.command == "lease":
+		returnCode = commandLease(
+			server=args.ip,
+			name=args.name,
+			ttl=args.ttl,
+			command=args.workload,
+		)
+		sys.exit(returnCode)
 	else:
 		assert False, f"Unknown command: '{args.command}'."

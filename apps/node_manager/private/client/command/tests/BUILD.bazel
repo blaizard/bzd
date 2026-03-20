@@ -1,0 +1,10 @@
+load("@rules_python//python:defs.bzl", "py_test")
+
+py_test(
+    name = "lease_test",
+    srcs = ["lease_test.py"],
+    deps = [
+        "//apps/node_manager/private/client/command:lease",
+        "@bzd_python//bzd/http:client_mock",
+    ],
+)

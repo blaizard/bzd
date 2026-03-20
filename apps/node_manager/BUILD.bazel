@@ -12,6 +12,7 @@ py_binary(
         "//visibility:public",
     ],
     deps = [
+        "//apps/node_manager/private/client/command:lease",
         "//apps/node_manager/private/client/command:shutdown",
         "//apps/node_manager/private/client/command:suspend",
         "//apps/node_manager/private/client/command:wake_on_lan",
