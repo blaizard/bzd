@@ -1,6 +1,7 @@
 import unittest
 import typing
 
+from bzd.http.client import HttpClient, HttpClientProtocol
 from bzd.http.client_mock import HttpClientMock
 
 
@@ -67,6 +68,10 @@ class TestRun(unittest.TestCase):
 		self.assertEqual(response.status, 200)
 		self.assertEqual(response.content, b'{"hello": "world"}')
 		self.assertEqual(response.json, {"hello": "world"})
+
+	def testProtocol(self) -> None:
+		_clientAsProtocol: HttpClientProtocol = HttpClient()
+		_clientMockAsProtocol: HttpClientProtocol = HttpClientMock(callback=lambda **kwargs: None)
 
 
 if __name__ == "__main__":

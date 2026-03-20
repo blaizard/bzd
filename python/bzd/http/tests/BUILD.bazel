@@ -9,3 +9,13 @@ py_test(
         "//bzd/http:client_mock",
     ],
 )
+
+py_test(
+    name = "server",
+    srcs = ["server_test.py"],
+    main = "server_test.py",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//bzd/http:server",
+    ],
+)

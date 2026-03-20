@@ -1,8 +1,10 @@
+import json
 import http.server
 import socketserver
 import typing
 import pathlib
 import mimetypes
+import dataclasses
 from http import HTTPStatus
 from functools import partial
 
@@ -13,18 +15,54 @@ StaticRoutes = typing.Dict[str, pathlib.Path]
 METHODS_ = {"get", "post", "put", "delete", "head", "patch"}
 
 
+@dataclasses.dataclass
+class RESTServerContextRequest:
+	headers: typing.Mapping[str, str]
+	data: typing.Union[typing.BinaryIO, bytes]
+
+
+@dataclasses.dataclass
+class RESTServerContextResponse:
+	headers: typing.List[typing.Tuple[str, str]] = dataclasses.field(default_factory=list)
+	data: typing.List[typing.Any] = dataclasses.field(default_factory=list)
+
+
 class RESTServerContext:
-	def __init__(self) -> None:
-		self.headers: typing.List[typing.Tuple[str, str]] = []
-		self.data: typing.List[typing.Any] = []
+	def __init__(self, request: RESTServerContextRequest) -> None:
+		self.request = request
+		self.response = RESTServerContextResponse()
+
+	# ---- Request Specific interface ----
+
+	def read(self) -> bytes:
+		"""Return the raw request body bytes."""
+
+		if not isinstance(self.request.data, bytes):
+			contentLength = int(self.request.headers.get("Content-Length", "0"))
+			self.request.data = self.request.data.read(contentLength) if contentLength > 0 else b""
+
+		return self.request.data
+
+	def readJson(self) -> typing.Any:
+		"""Decode the request body in JSON.
+
+		Raises:
+			json.JSONDecodeError: if the body is not a valid JSON.
+		"""
+
+		return json.loads(self.read().decode("utf-8"))
+
+	# ---- Response Specific interface ----
 
 	def header(self, key: str, value: str) -> None:
-		self.headers.append((key, value))
+		"""Set a new header for the response."""
+
+		self.response.headers.append((key, value))
 
 	def write(self, data: typing.Any) -> None:
 		if isinstance(data, str):
-			data = data.encode("utf8")
-		self.data.append(data)
+			data = data.encode("utf-8")
+		self.response.data.append(data)
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
@@ -64,7 +102,11 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
 	def _handle(self, method: str) -> bool:
 		if self.path in self.handlers[method]:
-			context = RESTServerContext()
+			request = RESTServerContextRequest(
+				headers=typing.cast(typing.Mapping[str, str], self.headers),
+				data=typing.cast(typing.BinaryIO, self.rfile),
+			)
+			context = RESTServerContext(request=request)
 
 			try:
 				self.handlers[method][self.path](context)
@@ -76,10 +118,10 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
 			# Write the response.
 			self.send_response(HTTPStatus.OK)
-			for header in context.headers:
+			for header in context.response.headers:
 				self.send_header(header[0], header[1])
 			self.end_headers()
-			for data in context.data:
+			for data in context.response.data:
 				self.wfile.write(data)
 			return True
 

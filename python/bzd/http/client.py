@@ -12,6 +12,8 @@ import http.client
 
 
 class HttpClientRequestProtocol(typing.Protocol):
+	"""Interface for the the HttpClientRequest."""
+
 	def __call__(
 		self,
 		method: str,
@@ -20,6 +22,20 @@ class HttpClientRequestProtocol(typing.Protocol):
 		headers: typing.Dict[str, str],
 		timeoutS: int,
 	) -> "HttpResponse": ...
+
+
+class HttpClientProtocol(typing.Protocol):
+	"""Interface for the the HttpClient."""
+
+	def get(self, *args: typing.Any, **kwargs: typing.Any) -> "HttpResponse": ...
+
+	def post(self, *args: typing.Any, **kwargs: typing.Any) -> "HttpResponse": ...
+
+	def put(self, *args: typing.Any, **kwargs: typing.Any) -> "HttpResponse": ...
+
+	def head(self, *args: typing.Any, **kwargs: typing.Any) -> "HttpResponse": ...
+
+	def delete(self, *args: typing.Any, **kwargs: typing.Any) -> "HttpResponse": ...
 
 
 # ---- Generic ----
