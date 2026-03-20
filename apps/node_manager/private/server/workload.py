@@ -74,11 +74,15 @@ class Workload:
 		return True
 
 	def hasActiveLease(self) -> bool:
-		"""Return True if at least one lease is not yet expired."""
+		"""Return True if at least one lease is not yet expired.
+
+		Also garbage collect expired leases.
+		"""
 
 		now = self.clockFn()
 		with self.lock:
-			return any(lease.expiry > now for lease in self.leases.values())
+			self.leases = {leaseId: lease for leaseId, lease in self.leases.items() if lease.expiry > now}
+			return bool(self.leases)
 
 	def terminationWatcher(self) -> None:
 		"""Polling callback that decides when to terminate."""

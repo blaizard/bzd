@@ -8,11 +8,15 @@ from bzd.http.server_mock import makeRESTServerContext
 class TestWorkload(unittest.TestCase):
 	def setUp(self) -> None:
 		self.currentTime = 1000.0
+		self.terminated = False
 
 		def clockFn() -> float:
 			return self.currentTime
 
-		self.workload = Workload(clockFn=clockFn)
+		def terminateFn() -> None:
+			self.terminated = True
+
+		self.workload = Workload(clockFn=clockFn, terminateFn=terminateFn)
 
 	def testRegister(self) -> None:
 		leaseId = self.workload.register(name="test", ttl=100)
@@ -100,6 +104,51 @@ class TestWorkload(unittest.TestCase):
 		self.assertAlmostEqual(data["1"]["ttl"], 80)
 		self.assertEqual(data["2"]["name"], "app2")
 		self.assertAlmostEqual(data["2"]["ttl"], 50)
+
+	def testTerminationWatcher(self) -> None:
+		# Scenario 1: No active leases sets terminationTimestamp.
+		self.workload.terminationWatcher()
+		self.assertEqual(self.workload.terminationTimestamp, self.currentTime + self.workload.terminationGracePeriodS)
+		self.assertFalse(self.terminated)
+
+		# Scenario 2: Advancing time within grace period does not trigger termination.
+		self.currentTime += self.workload.terminationGracePeriodS - 1
+		self.workload.terminationWatcher()
+		self.assertFalse(self.terminated)
+
+		# Scenario 3: Advancing time beyond grace period triggers termination.
+		self.currentTime += 1
+		self.workload.terminationWatcher()
+		self.assertTrue(self.terminated)
+
+		# Scenario 4: Active lease clears terminationTimestamp.
+		self.terminated = False
+		self.workload.terminationTimestamp = None
+		self.workload.register(name="test", ttl=100)
+		self.workload.terminationWatcher()
+		self.assertIsNone(self.workload.terminationTimestamp)
+
+		# Scenario 5: Expired lease re-enables terminationTimestamp.
+		self.currentTime += 101
+		self.workload.terminationWatcher()
+		self.assertEqual(self.workload.terminationTimestamp, self.currentTime + self.workload.terminationGracePeriodS)
+
+		# Scenario 6: New lease during grace period clears terminationTimestamp.
+		self.workload.register(name="test2", ttl=100)
+		self.workload.terminationWatcher()
+		self.assertIsNone(self.workload.terminationTimestamp)
+
+	def testGarbageCollection(self) -> None:
+		self.workload.register(name="to-be-expired", ttl=10)
+		self.assertEqual(len(self.workload.leases), 1)
+
+		# Advance time beyond TTL
+		self.currentTime += 11
+		# hasActiveLease should trigger garbage collection
+		self.assertFalse(self.workload.hasActiveLease())
+
+		# Verify it's removed from the internal dictionary
+		self.assertEqual(len(self.workload.leases), 0)
 
 
 if __name__ == "__main__":
