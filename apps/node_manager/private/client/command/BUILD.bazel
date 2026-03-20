@@ -1,0 +1,49 @@
+load("@rules_python//python:defs.bzl", "py_library")
+
+py_library(
+    name = "common",
+    srcs = [
+        "common.py",
+    ],
+)
+
+py_library(
+    name = "wake_on_lan",
+    srcs = [
+        "wake_on_lan.py",
+    ],
+    visibility = [
+        "//apps/node_manager:__pkg__",
+    ],
+    deps = [
+        ":common",
+    ],
+)
+
+py_library(
+    name = "suspend",
+    srcs = [
+        "suspend.py",
+    ],
+    visibility = [
+        "//apps/node_manager:__pkg__",
+    ],
+    deps = [
+        ":common",
+        "@bzd_python//bzd/http:client",
+    ],
+)
+
+py_library(
+    name = "shutdown",
+    srcs = [
+        "shutdown.py",
+    ],
+    visibility = [
+        "//apps/node_manager:__pkg__",
+    ],
+    deps = [
+        ":common",
+        "@bzd_python//bzd/http:client",
+    ],
+)
