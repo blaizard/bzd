@@ -103,7 +103,7 @@ def commandSuspend(args: argparse.Namespace) -> None:
 	host, port = getHostPort(args.ip)
 
 	try:
-		HTTPCLient.get(f"http://{host}:{port}/suspend")
+		HTTPClient.get(f"http://{host}:{port}/suspend")
 	except Exception as e:
 		print(str(e))
 
@@ -114,7 +114,7 @@ def commandShutdown(args: argparse.Namespace) -> None:
 	host, port = getHostPort(args.ip)
 
 	try:
-		HTTPCLient.get(f"http://{host}:{port}/shutdown")
+		HTTPClient.get(f"http://{host}:{port}/shutdown")
 	except Exception as e:
 		print(str(e))
 
