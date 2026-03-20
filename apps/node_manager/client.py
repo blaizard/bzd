@@ -5,7 +5,7 @@ import socket
 import typing
 import time
 
-from bzd.http.client import HTTPCLient
+from bzd.http.client import HTTPClient
 
 
 def checkMAC(mac: str) -> bool:
