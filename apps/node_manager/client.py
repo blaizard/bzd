@@ -4,7 +4,8 @@ import struct
 import socket
 import typing
 import time
-import urllib.request
+
+from bzd.http.client import HTTPCLient
 
 
 def checkMAC(mac: str) -> bool:
@@ -102,7 +103,7 @@ def commandSuspend(args: argparse.Namespace) -> None:
 	host, port = getHostPort(args.ip)
 
 	try:
-		urllib.request.urlopen(f"http://{host}:{port}/suspend").read()
+		HTTPCLient.get(f"http://{host}:{port}/suspend")
 	except Exception as e:
 		print(str(e))
 
@@ -113,7 +114,7 @@ def commandShutdown(args: argparse.Namespace) -> None:
 	host, port = getHostPort(args.ip)
 
 	try:
-		urllib.request.urlopen(f"http://{host}:{port}/shutdown").read()
+		HTTPCLient.get(f"http://{host}:{port}/shutdown")
 	except Exception as e:
 		print(str(e))
 

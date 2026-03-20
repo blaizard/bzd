@@ -12,6 +12,9 @@ py_binary(
     visibility = [
         "//visibility:public",
     ],
+    deps = [
+        "@bzd_python//bzd/http:client",
+    ],
 )
 
 py_binary(
@@ -22,12 +25,11 @@ py_binary(
         "node_manager.py",
         "nvidia.py",
         "power.py",
-        "rest_server.py",
         "ups.py",
     ],
     deps = [
         "//apps/artifacts/api/python/node",
-        "@bzd_python//bzd/http:client",
+        "@bzd_python//bzd/http:server",
         "@bzd_python//bzd/sync:singleton",
         "@bzd_python//bzd/utils:scheduler",
         requirement("psutil"),

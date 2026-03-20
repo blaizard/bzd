@@ -3,7 +3,7 @@ import typing
 import json
 import time
 
-from apps.node_manager.rest_server import RESTServerContext
+from bzd.http.server import RESTServerContext
 from apps.node_manager.nvidia import Nvidia
 from apps.node_manager.ups import UPS
 from apps.node_manager.config import Config

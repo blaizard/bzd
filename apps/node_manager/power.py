@@ -1,6 +1,6 @@
 import os
 
-from apps.node_manager.rest_server import RESTServerContext
+from bzd.http.server import RESTServerContext
 
 
 def handlerSuspend(context: RESTServerContext) -> None:
