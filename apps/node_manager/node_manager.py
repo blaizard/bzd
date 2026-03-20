@@ -4,9 +4,10 @@ import sys
 import os
 import pathlib
 
-from apps.node_manager.private.server.power import handlersPower
+from apps.node_manager.private.server.power import handlerSuspend, handlerShutdown
 from apps.node_manager.private.server.monitor import Monitor
 from apps.node_manager.private.server.config import Config
+from apps.node_manager.private.server.workload import Workload
 from bzd.utils.scheduler import Scheduler
 from bzd.sync.singleton import Singleton
 from apps.artifacts.api.python.node.node import Node
@@ -69,19 +70,34 @@ if __name__ == "__main__":
 			# Ignore any errors, we don't want to crash if something is wrong on the server side.
 			pass
 
+	workload = Workload()
 	scheduler = Scheduler()
+	server = HttpServer(port=args.port, bind=args.bind)
+
 	scheduler.add("monitor", args.report_rate, monitorWorkload)
-	scheduler.start()
+	handlers = {
+		"get": {
+			"/monitor": monitor.handlerMonitor,
+			"/workload/monitor": workload.handlerMonitor,
+		},
+		"post": {
+			"/workload/register": workload.handlerRegister,
+			"/workload/heartbeat": workload.handlerHeartBeat,
+			"/workload/release": workload.handlerRelease,
+		},
+	}
+
+	if args.power:
+		handlers["get"]["/suspend"] = handlerSuspend
+		handlers["get"]["/shutdown"] = handlerShutdown
+		scheduler.add("shutdown_watcher", 60, workload.shutdownWatcher)
+
+	for method, data in handlers.items():
+		for path, handler in data.items():
+			server.addRoute(method=method, uri=path, handler=handler)
 
 	try:
-		handlers = {"/monitor": monitor.handlerMonitor}
-		if args.power:
-			handlers.update(**handlersPower)
-
-		server = HttpServer(port=args.port, bind=args.bind)
-		for path, handler in handlers.items():
-			server.addRoute(method="get", uri=path, handler=handler)
+		scheduler.start()
 		server.start()
-
 	finally:
 		scheduler.stop()

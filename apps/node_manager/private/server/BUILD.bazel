@@ -60,3 +60,16 @@ py_library(
         requirement("psutil"),
     ],
 )
+
+py_library(
+    name = "workload",
+    srcs = [
+        "workload.py",
+    ],
+    visibility = [
+        "//apps/node_manager:__pkg__",
+    ],
+    deps = [
+        "@bzd_python//bzd/http:server",
+    ],
+)

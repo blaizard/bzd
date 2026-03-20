@@ -25,8 +25,10 @@ py_binary(
     ],
     deps = [
         "//apps/artifacts/api/python/node",
+        "//apps/node_manager/private/server:config",
         "//apps/node_manager/private/server:monitor",
         "//apps/node_manager/private/server:power",
+        "//apps/node_manager/private/server:workload",
         "@bzd_python//bzd/http:server",
         "@bzd_python//bzd/sync:singleton",
         "@bzd_python//bzd/utils:scheduler",
