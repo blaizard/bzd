@@ -16,6 +16,6 @@ py_test(
     main = "server_test.py",
     visibility = ["//visibility:public"],
     deps = [
-        "//bzd/http:server",
+        "//bzd/http:server_mock",
     ],
 )

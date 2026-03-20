@@ -1,0 +1,11 @@
+load("@rules_python//python:defs.bzl", "py_test")
+
+py_test(
+    name = "workload_test",
+    srcs = ["workload_test.py"],
+    main = "workload_test.py",
+    deps = [
+        "//apps/node_manager/private/server:workload",
+        "@bzd_python//bzd/http:server_mock",
+    ],
+)

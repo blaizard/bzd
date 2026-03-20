@@ -7,7 +7,7 @@ py_library(
         "config.py",
     ],
     visibility = [
-        "//apps/node_manager:__pkg__",
+        "//apps/node_manager:__subpackages__",
     ],
 )
 
@@ -27,7 +27,7 @@ py_library(
         "power.py",
     ],
     visibility = [
-        "//apps/node_manager:__pkg__",
+        "//apps/node_manager:__subpackages__",
     ],
     deps = [
         "@bzd_python//bzd/http:server",
@@ -50,7 +50,7 @@ py_library(
         "monitor.py",
     ],
     visibility = [
-        "//apps/node_manager:__pkg__",
+        "//apps/node_manager:__subpackages__",
     ],
     deps = [
         ":config",
@@ -67,7 +67,7 @@ py_library(
         "workload.py",
     ],
     visibility = [
-        "//apps/node_manager:__pkg__",
+        "//apps/node_manager:__subpackages__",
     ],
     deps = [
         "@bzd_python//bzd/http:server",
