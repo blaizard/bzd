@@ -18,11 +18,27 @@ class Lease:
 class Workload:
 	"""Keep track of workload leases and shutdown the server when all leases have been expired."""
 
-	def __init__(self, clockFn: typing.Callable[[], float] = time.monotonic) -> None:
+	def __init__(
+		self,
+		terminationGracePeriodS: int = 300,
+		terminateFn: typing.Callable[[], None] = lambda: None,
+		clockFn: typing.Callable[[], float] = time.monotonic,
+	) -> None:
+		"""Initialize the workload class.
+
+		Args:
+			terminationGracePeriodS: Period in seconds until which the server will be terminated.
+			terminateFn: Termination callback.
+			clockFn: Time provider.
+		"""
+
+		self.terminationGracePeriodS = terminationGracePeriodS
 		self.leases: typing.Dict[str, Lease] = {}
 		self.uidCouner = 0
+		self.terminateFn = terminateFn
 		self.clockFn = clockFn
 		self.lock = threading.Lock()
+		self.terminationTimestamp: typing.Optional[float] = None
 
 	def makeUid(self) -> str:
 		self.uidCouner += 1
@@ -64,9 +80,22 @@ class Workload:
 		with self.lock:
 			return any(lease.expiry > now for lease in self.leases.values())
 
-	def shutdownWatcher(self) -> None:
-		"""Start the background polling scheduler."""
-		pass
+	def terminationWatcher(self) -> None:
+		"""Polling callback that decides when to terminate."""
+
+		# If there is any active lease, dismiss the termination period grace.
+		if self.hasActiveLease():
+			self.terminationTimestamp = None
+			return
+
+		# Set the termination period if unset.
+		now = self.clockFn()
+		if self.terminationTimestamp is None:
+			self.terminationTimestamp = now + self.terminationGracePeriodS
+
+		# If the termination period is expired, call terminate.
+		if self.terminationTimestamp <= now:
+			self.terminateFn()
 
 	def handlerRegister(self, context: RESTServerContext) -> None:
 		"""Register a lease."""

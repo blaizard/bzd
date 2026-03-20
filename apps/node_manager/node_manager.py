@@ -70,7 +70,10 @@ if __name__ == "__main__":
 			# Ignore any errors, we don't want to crash if something is wrong on the server side.
 			pass
 
-	workload = Workload()
+	def terminateFn() -> None:
+		print("Terminate (no workload)")
+
+	workload = Workload(terminateFn=terminateFn)
 	scheduler = Scheduler()
 	server = HttpServer(port=args.port, bind=args.bind)
 
@@ -90,7 +93,7 @@ if __name__ == "__main__":
 	if args.power:
 		handlers["get"]["/suspend"] = handlerSuspend
 		handlers["get"]["/shutdown"] = handlerShutdown
-		scheduler.add("shutdown_watcher", 60, workload.shutdownWatcher)
+		scheduler.add("termination_watcher", 60, workload.terminationWatcher)
 
 	for method, data in handlers.items():
 		for path, handler in data.items():
