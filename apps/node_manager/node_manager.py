@@ -44,9 +44,13 @@ if __name__ == "__main__":
 
 	args = parser.parse_args()
 
+	def terminateFn() -> None:
+		print("Terminate (no workload)")
+
 	# Instantiate the monitor.
 	config = Config(path=args.config)
-	monitor = Monitor(config=config)
+	workload = Workload(terminateFn=terminateFn)
+	monitor = Monitor(config=config, workload=workload)
 
 	if args.uid is None:
 		data = monitor.all()
@@ -70,10 +74,6 @@ if __name__ == "__main__":
 			# Ignore any errors, we don't want to crash if something is wrong on the server side.
 			pass
 
-	def terminateFn() -> None:
-		print("Terminate (no workload)")
-
-	workload = Workload(terminateFn=terminateFn)
 	scheduler = Scheduler()
 	server = HttpServer(port=args.port, bind=args.bind)
 
@@ -81,7 +81,6 @@ if __name__ == "__main__":
 	handlers = {
 		"get": {
 			"/monitor": monitor.handlerMonitor,
-			"/workload/monitor": workload.handlerMonitor,
 		},
 		"post": {
 			"/workload/register": workload.handlerRegister,

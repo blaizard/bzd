@@ -1,4 +1,3 @@
-import json
 import typing
 import time
 import dataclasses
@@ -101,6 +100,13 @@ class Workload:
 		if self.terminationTimestamp <= now:
 			self.terminateFn()
 
+	def getActiveLeases(self) -> typing.Dict[str, typing.Any]:
+		"""Show the active leases."""
+
+		now = self.clockFn()
+		with self.lock:
+			return {leaseId: {"name": lease.name, "ttl": max(lease.expiry - now, 0)} for leaseId, lease in self.leases.items()}
+
 	def handlerRegister(self, context: RESTServerContext) -> None:
 		"""Register a lease."""
 
@@ -126,13 +132,3 @@ class Workload:
 			leaseId=leaseId,
 		)
 		assert ok, f"The lease '{leaseId}' doesn't exists."
-
-	def handlerMonitor(self, context: RESTServerContext) -> None:
-		"""Show the active leases."""
-
-		now = self.clockFn()
-		with self.lock:
-			data = {leaseId: {"name": lease.name, "ttl": max(lease.expiry - now, 0)} for leaseId, lease in self.leases.items()}
-
-		context.header("Content-type", "application/json")
-		context.write(json.dumps(data))

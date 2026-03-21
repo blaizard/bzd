@@ -7,6 +7,7 @@ from bzd.http.server import RESTServerContext
 from apps.node_manager.private.server.nvidia import Nvidia
 from apps.node_manager.private.server.ups import UPS
 from apps.node_manager.private.server.config import Config
+from apps.node_manager.private.server.workload import Workload
 
 
 class Monitor:
@@ -28,8 +29,9 @@ class Monitor:
 	CPU loads are in percent.
 	"""
 
-	def __init__(self, config: Config) -> None:
+	def __init__(self, config: Config, workload: Workload) -> None:
 		self.config = config
+		self.workload = workload
 		self.nvidia = Nvidia()
 		self.ups = UPS(config=config)
 		self.networkPrevious: typing.Dict[str, typing.Any] = {}
@@ -190,6 +192,7 @@ class Monitor:
 		mergeDictIfSet("io", self.io())
 		mergeDictIfSet("disk", self.disks())
 		assignIfSet("uptime", self.upTime())
+		mergeDictIfSet("leases", self.workload.getActiveLeases())
 
 		return content
 

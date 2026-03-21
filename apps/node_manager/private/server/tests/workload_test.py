@@ -85,7 +85,7 @@ class TestWorkload(unittest.TestCase):
 
 		self.assertFalse(self.workload.hasActiveLease())
 
-	def testHandlerMonitor(self) -> None:
+	def testGetActiveLeases(self) -> None:
 		self.workload.register(name="app1", ttl=100)
 		self.currentTime += 20
 		self.workload.register(name="app2", ttl=50)
@@ -94,11 +94,7 @@ class TestWorkload(unittest.TestCase):
 		# app1 expiry: 1000 + 100 = 1100. TTL: 80
 		# app2 expiry: 1020 + 50 = 1070. TTL: 50
 
-		context = makeRESTServerContext()
-		self.workload.handlerMonitor(context)
-
-		self.assertEqual(len(context.response.data), 1)
-		data = json.loads(context.response.data[0].decode("utf-8"))
+		data = self.workload.getActiveLeases()
 
 		self.assertEqual(data["1"]["name"], "app1")
 		self.assertAlmostEqual(data["1"]["ttl"], 80)
