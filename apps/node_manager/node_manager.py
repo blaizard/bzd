@@ -36,6 +36,9 @@ if __name__ == "__main__":
 	)
 	parser.add_argument("--config", type=pathlib.Path, help="Configuration for the manager.")
 	parser.add_argument(
+		"--default-termination-period", type=float, default=3 * 60 * 60, help="The default termination period in seconds."
+	)
+	parser.add_argument(
 		"uid",
 		nargs="?",
 		default=os.environ.get("BZD_NODE_UID"),
@@ -49,7 +52,7 @@ if __name__ == "__main__":
 
 	# Instantiate the monitor.
 	config = Config(path=args.config)
-	workload = Workload(terminateFn=terminateFn)
+	workload = Workload(terminateFn=terminateFn, defaultTerminationPeriodS=args.default_termination_period)
 	monitor = Monitor(config=config, workload=workload)
 
 	if args.uid is None:

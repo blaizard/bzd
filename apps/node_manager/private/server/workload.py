@@ -19,6 +19,7 @@ class Workload:
 
 	def __init__(
 		self,
+		defaultTerminationPeriodS: typing.Optional[float] = None,
 		terminationGracePeriodS: int = 300,
 		terminateFn: typing.Callable[[], None] = lambda: None,
 		clockFn: typing.Callable[[], float] = time.monotonic,
@@ -37,7 +38,9 @@ class Workload:
 		self.terminateFn_ = terminateFn
 		self.clockFn_ = clockFn
 		self.lock_ = threading.Lock()
-		self.terminationTimestamp_: typing.Optional[float] = None
+		self.terminationTimestamp_: typing.Optional[float] = (
+			None if defaultTerminationPeriodS is None else (self.clockFn_() + defaultTerminationPeriodS)
+		)
 
 	def makeUid_(self) -> str:
 		self.uidCounter_ += 1

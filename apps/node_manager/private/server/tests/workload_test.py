@@ -189,6 +189,55 @@ class TestWorkload(unittest.TestCase):
 		# Verify it's removed from the active leases
 		self.assertEqual(len(self.workload.getActiveLeases()), 0)
 
+	def testDefaultTerminationPeriodS(self) -> None:
+		def clockFn() -> float:
+			return self.currentTime
+
+		def terminateFn() -> None:
+			self.terminated = True
+
+		# Initialize with a default termination period of 500s.
+		# Current time is 1000.0, so termination should be at 1500.0.
+		workload = Workload(
+			defaultTerminationPeriodS=500, terminationGracePeriodS=self.gracePeriod, clockFn=clockFn, terminateFn=terminateFn
+		)
+
+		self.assertEqual(workload.plannedDownTime(), 500)
+
+		# Advance time to 1499.
+		self.currentTime = 1499
+		workload.terminationWatcher()
+		self.assertFalse(self.terminated)
+		self.assertEqual(workload.plannedDownTime(), 1)
+
+		# Advance time to 1501.
+		self.currentTime = 1501
+		workload.terminationWatcher()
+		self.assertTrue(self.terminated)
+		self.assertEqual(workload.plannedDownTime(), 0)
+
+	def testDefaultTerminationPeriodSClearedByLease(self) -> None:
+		def clockFn() -> float:
+			return self.currentTime
+
+		def terminateFn() -> None:
+			self.terminated = True
+
+		# Current time is 1000.0.
+		workload = Workload(
+			defaultTerminationPeriodS=500, terminationGracePeriodS=self.gracePeriod, clockFn=clockFn, terminateFn=terminateFn
+		)
+
+		# Register a lease with TTL 100 (expiry at 1100).
+		workload.register(name="test", ttl=100)
+
+		# Calling terminationWatcher should clear the default termination period because there's an active lease.
+		workload.terminationWatcher()
+
+		# Now plannedDownTime should be based on lease expiry (1100) + grace period (300) = 1400.
+		# 1400 - 1000 = 400.
+		self.assertEqual(workload.plannedDownTime(), 400)
+
 
 if __name__ == "__main__":
 	unittest.main()
