@@ -9,6 +9,7 @@ class TestWorkload(unittest.TestCase):
 	def setUp(self) -> None:
 		self.currentTime = 1000.0
 		self.terminated = False
+		self.gracePeriod = 300
 
 		def clockFn() -> float:
 			return self.currentTime
@@ -16,7 +17,7 @@ class TestWorkload(unittest.TestCase):
 		def terminateFn() -> None:
 			self.terminated = True
 
-		self.workload = Workload(clockFn=clockFn, terminateFn=terminateFn)
+		self.workload = Workload(terminationGracePeriodS=self.gracePeriod, clockFn=clockFn, terminateFn=terminateFn)
 
 	def testRegister(self) -> None:
 		leaseId = self.workload.register(name="test", ttl=100)
@@ -107,7 +108,7 @@ class TestWorkload(unittest.TestCase):
 		self.assertFalse(self.terminated)
 
 		# Scenario 2: Advancing time within grace period does not trigger termination.
-		self.currentTime += self.workload.terminationGracePeriodS - 1
+		self.currentTime += self.gracePeriod - 1
 		self.workload.terminationWatcher()
 		self.assertFalse(self.terminated)
 
@@ -121,7 +122,7 @@ class TestWorkload(unittest.TestCase):
 		self.workload.register(name="test", ttl=100)
 		self.workload.terminationWatcher()
 		# Termination should not happen even after grace period if lease is active.
-		self.currentTime += self.workload.terminationGracePeriodS + 1
+		self.currentTime += self.gracePeriod + 1
 		self.workload.terminationWatcher()
 		self.assertFalse(self.terminated)
 
@@ -129,7 +130,7 @@ class TestWorkload(unittest.TestCase):
 		self.currentTime += 101  # Lease expired.
 		self.workload.terminationWatcher()
 		self.assertFalse(self.terminated)
-		self.currentTime += self.workload.terminationGracePeriodS
+		self.currentTime += self.gracePeriod
 		self.workload.terminationWatcher()
 		self.assertTrue(self.terminated)
 

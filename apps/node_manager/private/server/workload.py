@@ -31,45 +31,45 @@ class Workload:
 			clockFn: Time provider.
 		"""
 
-		self.terminationGracePeriodS = terminationGracePeriodS
-		self.leases: typing.Dict[str, Lease] = {}
-		self.uidCouner = 0
-		self.terminateFn = terminateFn
-		self.clockFn = clockFn
-		self.lock = threading.Lock()
-		self.terminationTimestamp: typing.Optional[float] = None
+		self.terminationGracePeriodS_ = terminationGracePeriodS
+		self.leases_: typing.Dict[str, Lease] = {}
+		self.uidCounter_ = 0
+		self.terminateFn_ = terminateFn
+		self.clockFn_ = clockFn
+		self.lock_ = threading.Lock()
+		self.terminationTimestamp_: typing.Optional[float] = None
 
-	def makeUid(self) -> str:
-		self.uidCouner += 1
-		return str(self.uidCouner)
+	def makeUid_(self) -> str:
+		self.uidCounter_ += 1
+		return str(self.uidCounter_)
 
 	def register(self, name: str, ttl: int) -> str:
 		"""Register a new lease."""
 
-		with self.lock:
-			leaseId = self.makeUid()
-			self.leases[leaseId] = Lease(
+		with self.lock_:
+			leaseId = self.makeUid_()
+			self.leases_[leaseId] = Lease(
 				name=name,
-				expiry=self.clockFn() + ttl,
+				expiry=self.clockFn_() + ttl,
 			)
 		return leaseId
 
 	def heartBeat(self, leaseId: str, ttl: int) -> bool:
 		"""Refresh an existing lease. Returns False if the lease does not exists."""
 
-		with self.lock:
-			if leaseId not in self.leases:
+		with self.lock_:
+			if leaseId not in self.leases_:
 				return False
-			self.leases[leaseId].expiry = self.clockFn() + ttl
+			self.leases_[leaseId].expiry = self.clockFn_() + ttl
 		return True
 
 	def release(self, leaseId: str) -> bool:
 		"""Remove a lease immediately. Returns False if the lease does not exists."""
 
-		with self.lock:
-			if leaseId not in self.leases:
+		with self.lock_:
+			if leaseId not in self.leases_:
 				return False
-			del self.leases[leaseId]
+			del self.leases_[leaseId]
 		return True
 
 	def hasActiveLease(self) -> bool:
@@ -78,45 +78,45 @@ class Workload:
 		Also garbage collect expired leases.
 		"""
 
-		now = self.clockFn()
-		with self.lock:
-			self.leases = {leaseId: lease for leaseId, lease in self.leases.items() if lease.expiry > now}
-			return bool(self.leases)
+		now = self.clockFn_()
+		with self.lock_:
+			self.leases_ = {leaseId: lease for leaseId, lease in self.leases_.items() if lease.expiry > now}
+			return bool(self.leases_)
 
 	def terminationWatcher(self) -> None:
 		"""Polling callback that decides when to terminate."""
 
 		# If there is any active lease, dismiss the termination period grace.
 		if self.hasActiveLease():
-			self.terminationTimestamp = None
+			self.terminationTimestamp_ = None
 			return
 
 		# Set the termination period if unset.
-		now = self.clockFn()
-		if self.terminationTimestamp is None:
-			self.terminationTimestamp = now + self.terminationGracePeriodS
+		now = self.clockFn_()
+		if self.terminationTimestamp_ is None:
+			self.terminationTimestamp_ = now + self.terminationGracePeriodS_
 
 		# If the termination period is expired, call terminate.
-		if self.terminationTimestamp <= now:
-			self.terminateFn()
+		if self.terminationTimestamp_ <= now:
+			self.terminateFn_()
 
 	def getActiveLeases(self) -> typing.Dict[str, typing.Any]:
 		"""Show the active leases."""
 
-		now = self.clockFn()
-		with self.lock:
-			return {leaseId: {"name": lease.name, "ttl": max(lease.expiry - now, 0)} for leaseId, lease in self.leases.items()}
+		now = self.clockFn_()
+		with self.lock_:
+			return {leaseId: {"name": lease.name, "ttl": max(lease.expiry - now, 0)} for leaseId, lease in self.leases_.items()}
 
 	def plannedDownTime(self) -> float:
 		"""When downtime is expected."""
 
-		now = self.clockFn()
-		if self.terminationTimestamp is None:
-			with self.lock:
-				maxExpiry = max([now] + [lease.expiry for lease in self.leases.values()])
-			expectedDownTime = maxExpiry + self.terminationGracePeriodS
+		now = self.clockFn_()
+		if self.terminationTimestamp_ is None:
+			with self.lock_:
+				maxExpiry = max([now] + [lease.expiry for lease in self.leases_.values()])
+			expectedDownTime = maxExpiry + self.terminationGracePeriodS_
 		else:
-			expectedDownTime = self.terminationTimestamp
+			expectedDownTime = self.terminationTimestamp_
 		return max(expectedDownTime - now, 0)
 
 	def handlerRegister(self, context: RESTServerContext) -> None:
