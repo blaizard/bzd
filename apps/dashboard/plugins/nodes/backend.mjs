@@ -43,6 +43,7 @@ export default class Nodes {
 						["temperature"],
 						["version"],
 						["uptime"],
+						["downtime"],
 					],
 				});
 

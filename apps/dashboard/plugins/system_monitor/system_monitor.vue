@@ -2,9 +2,9 @@
 	<div class="system-monitor">
 		<!-- Header //-->
 		<div class="header">
-			<span v-if="uptime" class="entry" v-tooltip="uptime.tooltip">
+			<span v-if="time" class="entry" v-tooltip="time.tooltip">
 				<i class="bzd-icon-clock"></i>
-				<span class="value">{{ uptime.text }}</span>
+				<span class="value">{{ time.text }}</span>
 			</span>
 
 			<span
@@ -260,12 +260,22 @@
 					warnings,
 				};
 			},
-			uptime() {
+			time() {
+				let text = null;
+				let tooltips = [];
 				if (this.metadata.uptime) {
-					const text = timeMsToString(this.metadata.uptime * 1000);
+					text = timeMsToString(this.metadata.uptime * 1000);
+					tooltips.push("Up time for " + text + " (" + parseInt(this.metadata.uptime) + "s)");
+				}
+				if (this.metadata.downtime) {
+					const downtimeText = timeMsToString(this.metadata.downtime * 1000);
+					text = "-" + downtimeText;
+					tooltips.push("Expected down time in " + downtimeText + " (" + parseInt(this.metadata.downtime) + "s)");
+				}
+				if (text) {
 					return {
 						text: text,
-						tooltip: { data: "This node is/was up for " + text + " (" + parseInt(this.metadata.uptime) + "s)" },
+						tooltip: { data: tooltips.join("<br/>") },
 					};
 				}
 				return null;

@@ -51,4 +51,4 @@ systemctl reset-failed
 
 ## Run
 
-bazel run apps/node_manager:with_bootloader -- --bootloader-uid hello hello
+bazel run apps/node_manager:with_bootloader -- --bootloader-uid $(uname -n) $(uname -n)
