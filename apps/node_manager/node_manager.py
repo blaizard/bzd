@@ -53,7 +53,7 @@ if __name__ == "__main__":
 	# Instantiate the monitor.
 	config = Config(path=args.config)
 	workload = Workload(terminateFn=terminateFn, defaultTerminationPeriodS=args.default_termination_period)
-	monitor = Monitor(config=config, workload=workload)
+	monitor = Monitor(config=config, workload=workload if args.power else None)
 
 	if args.uid is None:
 		data = monitor.all()
@@ -85,16 +85,23 @@ if __name__ == "__main__":
 		"get": {
 			"/monitor": monitor.handlerMonitor,
 		},
-		"post": {
-			"/workload/register": workload.handlerRegister,
-			"/workload/heartbeat": workload.handlerHeartBeat,
-			"/workload/release": workload.handlerRelease,
-		},
+		"post": {},
 	}
 
 	if args.power:
-		handlers["get"]["/suspend"] = handlerSuspend
-		handlers["get"]["/shutdown"] = handlerShutdown
+		handlers["get"].update(
+			{
+				"/suspend": handlerSuspend,
+				"/shutdown": handlerShutdown,
+			}
+		)
+		handlers["post"].update(
+			{
+				"/workload/register": workload.handlerRegister,
+				"/workload/heartbeat": workload.handlerHeartBeat,
+				"/workload/release": workload.handlerRelease,
+			}
+		)
 		scheduler.add("termination_watcher", 60, workload.terminationWatcher)
 
 	for method, data in handlers.items():

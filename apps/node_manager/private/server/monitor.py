@@ -29,7 +29,7 @@ class Monitor:
 	CPU loads are in percent.
 	"""
 
-	def __init__(self, config: Config, workload: Workload) -> None:
+	def __init__(self, config: Config, workload: typing.Optional[Workload]) -> None:
 		self.config = config
 		self.workload = workload
 		self.nvidia = Nvidia()
@@ -192,8 +192,9 @@ class Monitor:
 		mergeDictIfSet("io", self.io())
 		mergeDictIfSet("disk", self.disks())
 		assignIfSet("uptime", self.upTime())
-		assignIfSet("downtime", self.workload.plannedDownTime())
-		mergeDictIfSet("leases", self.workload.getActiveLeases())
+		if self.workload is not None:
+			assignIfSet("downtime", self.workload.plannedDownTime())
+			mergeDictIfSet("leases", self.workload.getActiveLeases())
 
 		return content
 
