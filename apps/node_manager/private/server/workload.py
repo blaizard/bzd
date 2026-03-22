@@ -107,6 +107,18 @@ class Workload:
 		with self.lock:
 			return {leaseId: {"name": lease.name, "ttl": max(lease.expiry - now, 0)} for leaseId, lease in self.leases.items()}
 
+	def plannedDownTime(self) -> float:
+		"""When downtime is expected."""
+
+		now = self.clockFn()
+		if self.terminationTimestamp is None:
+			with self.lock:
+				maxExpiry = max([now] + [lease.expiry for lease in self.leases.values()])
+			expectedDownTime = maxExpiry + self.terminationGracePeriodS
+		else:
+			expectedDownTime = self.terminationTimestamp
+		return max(expectedDownTime - now, 0)
+
 	def handlerRegister(self, context: RESTServerContext) -> None:
 		"""Register a lease."""
 

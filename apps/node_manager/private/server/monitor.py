@@ -192,6 +192,7 @@ class Monitor:
 		mergeDictIfSet("io", self.io())
 		mergeDictIfSet("disk", self.disks())
 		assignIfSet("uptime", self.upTime())
+		assignIfSet("downtime", self.workload.plannedDownTime())
 		mergeDictIfSet("leases", self.workload.getActiveLeases())
 
 		return content

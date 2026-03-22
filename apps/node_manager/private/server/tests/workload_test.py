@@ -102,9 +102,8 @@ class TestWorkload(unittest.TestCase):
 		self.assertAlmostEqual(data["2"]["ttl"], 50)
 
 	def testTerminationWatcher(self) -> None:
-		# Scenario 1: No active leases sets terminationTimestamp.
+		# Scenario 1: No active leases triggers termination grace period.
 		self.workload.terminationWatcher()
-		self.assertEqual(self.workload.terminationTimestamp, self.currentTime + self.workload.terminationGracePeriodS)
 		self.assertFalse(self.terminated)
 
 		# Scenario 2: Advancing time within grace period does not trigger termination.
@@ -117,34 +116,77 @@ class TestWorkload(unittest.TestCase):
 		self.workload.terminationWatcher()
 		self.assertTrue(self.terminated)
 
-		# Scenario 4: Active lease clears terminationTimestamp.
+		# Scenario 4: Active lease clears termination.
 		self.terminated = False
-		self.workload.terminationTimestamp = None
 		self.workload.register(name="test", ttl=100)
 		self.workload.terminationWatcher()
-		self.assertIsNone(self.workload.terminationTimestamp)
-
-		# Scenario 5: Expired lease re-enables terminationTimestamp.
-		self.currentTime += 101
+		# Termination should not happen even after grace period if lease is active.
+		self.currentTime += self.workload.terminationGracePeriodS + 1
 		self.workload.terminationWatcher()
-		self.assertEqual(self.workload.terminationTimestamp, self.currentTime + self.workload.terminationGracePeriodS)
+		self.assertFalse(self.terminated)
 
-		# Scenario 6: New lease during grace period clears terminationTimestamp.
-		self.workload.register(name="test2", ttl=100)
+		# Scenario 5: Expired lease re-enables termination.
+		self.currentTime += 101  # Lease expired.
 		self.workload.terminationWatcher()
-		self.assertIsNone(self.workload.terminationTimestamp)
+		self.assertFalse(self.terminated)
+		self.currentTime += self.workload.terminationGracePeriodS
+		self.workload.terminationWatcher()
+		self.assertTrue(self.terminated)
+
+	def testPlannedDownTime(self) -> None:
+		# Initial state: no leases.
+		# plannedDownTime = max(now, maxExpiry) + gracePeriod - now = 0 + 300 = 300
+		self.assertEqual(self.workload.plannedDownTime(), 300)
+
+		# Register a lease with TTL 100.
+		# plannedDownTime = (1000 + 100) + 300 - 1000 = 400
+		self.workload.register(name="test", ttl=100)
+		self.assertEqual(self.workload.plannedDownTime(), 400)
+
+		# Advance time by 50.
+		# plannedDownTime = 1100 + 300 - 1050 = 350
+		self.currentTime += 50
+		self.assertEqual(self.workload.plannedDownTime(), 350)
+
+		# Add another lease with longer TTL.
+		# app2 expiry: 1050 + 200 = 1250.
+		# plannedDownTime = 1250 + 300 - 1050 = 500
+		self.workload.register(name="test2", ttl=200)
+		self.assertEqual(self.workload.plannedDownTime(), 500)
+
+		# Trigger termination watcher.
+		# Since we have active leases, it shouldn't affect the result here.
+		self.workload.terminationWatcher()
+		self.assertEqual(self.workload.plannedDownTime(), 500)
+
+		# Release all leases.
+		self.workload.release("1")
+		self.workload.release("2")
+		# No leases.
+		# plannedDownTime = 1050 + 300 - 1050 = 300
+		self.assertEqual(self.workload.plannedDownTime(), 300)
+
+		# Trigger termination watcher.
+		# plannedDownTime = 1350 - 1050 = 300
+		self.workload.terminationWatcher()
+		self.assertEqual(self.workload.plannedDownTime(), 300)
+
+		# Advance time.
+		self.currentTime += 100
+		# plannedDownTime = 1350 - 1150 = 200
+		self.assertEqual(self.workload.plannedDownTime(), 200)
 
 	def testGarbageCollection(self) -> None:
 		self.workload.register(name="to-be-expired", ttl=10)
-		self.assertEqual(len(self.workload.leases), 1)
+		self.assertEqual(len(self.workload.getActiveLeases()), 1)
 
 		# Advance time beyond TTL
 		self.currentTime += 11
 		# hasActiveLease should trigger garbage collection
 		self.assertFalse(self.workload.hasActiveLease())
 
-		# Verify it's removed from the internal dictionary
-		self.assertEqual(len(self.workload.leases), 0)
+		# Verify it's removed from the active leases
+		self.assertEqual(len(self.workload.getActiveLeases()), 0)
 
 
 if __name__ == "__main__":
