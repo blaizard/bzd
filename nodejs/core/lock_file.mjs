@@ -75,7 +75,7 @@ export default class LockFile {
 			await this._wait(1);
 			Exception.assert(
 				!timeoutS || this.options.clock.getTimeS() - startTime < timeoutS,
-				"Timeout acquiring lock after {}s.",
+				"Timeout releasing lock after {}s.",
 				timeoutS,
 			);
 		}
@@ -147,11 +147,14 @@ export default class LockFile {
 	/// Unlock the pre-acquired lock.
 	///
 	/// \param force Whether or not to force unlock even if not locked. This is useful for cleanup.
-	async unlock(force = false, timeoutS = 1) {
+	async unlock(force = false, timeoutS = 5) {
 		Exception.assert(force || this.isLock(), "Lock is not acquired.");
 
-		await this._stopInterval(timeoutS);
-		await this._unlock(this.path.asPosix(), force);
+		try {
+			await this._stopInterval(timeoutS);
+		} finally {
+			await this._unlock(this.path.asPosix(), force);
+		}
 	}
 
 	/// Execute the given function with the lock acquired and release it afterwards.
@@ -159,7 +162,7 @@ export default class LockFile {
 		Exception.assert(!this.isLock(), "Lock is already acquired.");
 		const startTime = this.options.clock.getTimeS();
 		while (!(await this.tryLock())) {
-			await this._wait(1);
+			await this._wait(10);
 			Exception.assert(
 				!timeoutS || this.options.clock.getTimeS() - startTime < timeoutS,
 				"Timeout acquiring lock after {}s.",
@@ -169,7 +172,7 @@ export default class LockFile {
 		try {
 			return await workFn();
 		} finally {
-			await this.unlock();
+			await this.unlock(/*force*/ true);
 		}
 	}
 }
