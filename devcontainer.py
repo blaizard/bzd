@@ -320,9 +320,7 @@ class DevelopmentContainer:
 
 	def __init__(self, args: argparse.Namespace, features: typing.Sequence[Feature], temporaryPath: pathlib.Path) -> None:
 
-		# Do not resolve symlinks so that we can use symlinks to create multiple devcontainers
-		# from the same source file, but we still want a normalized absolute path.
-		self.workspace = pathlib.Path(os.path.normpath(__file__)).absolute().parent
+		self.root = args.root.resolve().absolute()
 		self.cwd = pathlib.Path.cwd()
 		self.home = pathlib.Path.home()
 		self.temporaryPath = temporaryPath
@@ -335,7 +333,7 @@ class DevelopmentContainer:
 
 	@cached_property
 	def toHash(self) -> typing.List[str]:
-		toHash = [f"workspace={self.workspace.as_posix()}", f"user={getpass.getuser()}"]
+		toHash = [f"root={self.root.as_posix()}", f"user={getpass.getuser()}"]
 		toHash += sorted([feature.__class__.__name__ for feature in self.features])
 		argNames = sorted([kwargs.get("dest", name) for feature in self.features for name, kwargs in feature.cli().items()])
 		toHash += [f"{name}={getattr(self.args, name)}" for name in argNames]
@@ -347,7 +345,7 @@ class DevelopmentContainer:
 		pathHash = hashlib.md5("-".join(self.toHash).encode()).hexdigest()[:6]
 
 		names = [self.args.prefix] if self.args.prefix else []
-		directory = self.workspace.name[-10:]
+		directory = self.root.name[-10:]
 		names += [pathHash, re.sub(r"[^a-zA-Z0-9]+", "-", directory).strip("-")]
 		return "-".join(names)
 
@@ -466,7 +464,7 @@ RUN echo "__session_names+=(devcontainer)" >> {self.home}/.bashrc
 	def dockerCompose(self) -> str:
 
 		volumes = [
-			f"{self.workspace}:{self.workspace}",
+			f"{self.root}:{self.root}",
 		]
 		# Add some volumes from features.
 		for feature in self.features:
@@ -496,7 +494,7 @@ services:
     extra_hosts:
       - "{self.imageName}:127.0.0.1"
     labels:
-      com.bzd.devcontainer.workspace: "{self.workspace}"
+      com.bzd.devcontainer.root: "{self.root}"
       com.bzd.devcontainer.user: "{getpass.getuser()}"
       com.bzd.devcontainer.command: "{" ".join(sys.argv[1:])}"
     init: true
@@ -543,7 +541,8 @@ services:
 		]
 		extra = [arg for e in env for arg in ("--env", e)]
 
-		workdir = self.cwd if self.cwd.is_relative_to(self.workspace) else self.workspace
+		cwd = pathlib.Path.cwd().resolve()
+		workdir = cwd if cwd.is_relative_to(self.root) else self.root
 		subprocess.run(
 			[
 				"docker",
@@ -573,13 +572,14 @@ services:
 				if label.startswith("com.bzd.devcontainer.")
 			}
 			try:
-				workspace = pathlib.Path(labels["com.bzd.devcontainer.workspace"]).resolve()
-				relativeWorkspace = pathlib.Path(os.path.relpath(workspace, pathlib.Path.cwd().resolve()))
+				root = pathlib.Path(labels["com.bzd.devcontainer.root"]).resolve()
+				relativeRoot = pathlib.Path(os.path.relpath(root, pathlib.Path.cwd().resolve()))
 				lines = [
-					f"Command: {relativeWorkspace / pathlib.Path(__file__).name} {labels['com.bzd.devcontainer.command']}",
-					f"User: {labels['com.bzd.devcontainer.user']}",
+					f"root: {relativeRoot}",
+					f"command: {pathlib.Path(__file__).name} {labels['com.bzd.devcontainer.command']}",
+					f"user: {labels['com.bzd.devcontainer.user']}",
 				]
-				order = len(relativeWorkspace.parts)
+				order = len(relativeRoot.parts)
 			except Exception as e:
 				lines, order = [f"{e.__class__.__name__}: {e}"], 999
 			containers.append(
@@ -653,6 +653,12 @@ if __name__ == "__main__":
 		type=pathlib.Path,
 		default=pathlib.Path(tempfile.gettempdir()),
 		help="A temporary directory where to store the docker related configuration files.",
+	)
+	parser.add_argument(
+		"--root",
+		type=pathlib.Path,
+		default=pathlib.Path.cwd(),
+		help="The root (top) folder to be mounted in the container.",
 	)
 	parser.add_argument(
 		"--env",
