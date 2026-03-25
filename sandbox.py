@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Development container."""
+"""Sandbox container."""
 
 import argparse
 import getpass
@@ -16,7 +16,7 @@ import sys
 from functools import cached_property
 
 imageBase = "ubuntu:24.04"
-imagePrefix = "devcontainer-"
+imagePrefix = "sandbox-"
 
 
 class Feature:
@@ -25,7 +25,7 @@ class Feature:
 	def __init__(self, args: argparse.Namespace) -> None:
 		self.args = args
 		self.isAvailable: bool = True
-		self.context: typing.Optional["DevelopmentContainer"] = None
+		self.context: typing.Optional["SandboxContainer"] = None
 
 	@staticmethod
 	def cli() -> typing.Dict[str, typing.Dict[str, typing.Any]]:
@@ -47,7 +47,7 @@ class Feature:
 	def dockerCompose(self) -> typing.Dict[str, typing.List[str]]:
 		return {}
 
-	def initialize(self, context: "DevelopmentContainer") -> None:
+	def initialize(self, context: "SandboxContainer") -> None:
 		self.context = context
 
 
@@ -285,7 +285,7 @@ class FeaturePlatform(Feature):
 			}
 		}
 
-	def initialize(self, context: "DevelopmentContainer") -> None:
+	def initialize(self, context: "SandboxContainer") -> None:
 		super().initialize(context=context)
 		# See: https://stackoverflow.com/questions/72444103/what-does-running-the-multiarch-qemu-user-static-does-before-building-a-containe
 		# if self.isRootless:
@@ -315,8 +315,8 @@ class FeaturePlatform(Feature):
 		return {}
 
 
-class DevelopmentContainer:
-	"""Development container."""
+class SandboxContainer:
+	"""Sandbox container."""
 
 	def __init__(self, args: argparse.Namespace, features: typing.Sequence[Feature], temporaryPath: pathlib.Path) -> None:
 
@@ -326,7 +326,7 @@ class DevelopmentContainer:
 		self.temporaryPath = temporaryPath
 		self.uid = os.getuid()
 		self.gid = os.getgid()
-		self.userNamespaceRemapping = DevelopmentContainer.isUserNamespaceRemapping()
+		self.userNamespaceRemapping = SandboxContainer.isUserNamespaceRemapping()
 		self.user = "root" if self.userNamespaceRemapping else getpass.getuser()
 		self.features = [feature for feature in features if feature.isAvailable]
 		self.args = args
@@ -391,11 +391,11 @@ class DevelopmentContainer:
 
 	@cached_property
 	def dockerFilePath(self) -> pathlib.Path:
-		return self.temporaryPath / f"bzd-devcontainer-{self.namePrefix}" / "DockerFile"
+		return self.temporaryPath / f"bzd-sandbox-{self.namePrefix}" / "DockerFile"
 
 	@cached_property
 	def dockerComposePath(self) -> pathlib.Path:
-		return self.temporaryPath / f"bzd-devcontainer-{self.namePrefix}" / "docker-compose.yaml"
+		return self.temporaryPath / f"bzd-sandbox-{self.namePrefix}" / "docker-compose.yaml"
 
 	@cached_property
 	def dockerFile(self) -> str:
@@ -457,7 +457,7 @@ RUN mkdir /bzd && echo "#!/usr/bin/env bash" > /bzd/startup.sh && chmod +x /bzd/
 {instructionsStr}
 
 RUN wget -O {self.home}/.bashrc https://raw.githubusercontent.com/blaizard/bzd/refs/heads/master/tools/shell/sh/bashrc.sh
-RUN echo "__session_names+=(devcontainer)" >> {self.home}/.bashrc
+RUN echo "__session_names+=(sandbox)" >> {self.home}/.bashrc
 """
 
 	@cached_property
@@ -494,9 +494,9 @@ services:
     extra_hosts:
       - "{self.imageName}:127.0.0.1"
     labels:
-      com.bzd.devcontainer.root: "{self.root}"
-      com.bzd.devcontainer.user: "{getpass.getuser()}"
-      com.bzd.devcontainer.command: "{" ".join(sys.argv[1:])}"
+      com.bzd.sandbox.root: "{self.root}"
+      com.bzd.sandbox.user: "{getpass.getuser()}"
+      com.bzd.sandbox.command: "{" ".join(sys.argv[1:])}"
     init: true
     tty: true
     stdin_open: true
@@ -569,15 +569,15 @@ services:
 			labels = {
 				label.split("=", 1)[0]: label.split("=", 1)[1]
 				for label in container["Labels"].split(",")
-				if label.startswith("com.bzd.devcontainer.")
+				if label.startswith("com.bzd.sandbox.")
 			}
 			try:
-				root = pathlib.Path(labels["com.bzd.devcontainer.root"]).resolve()
+				root = pathlib.Path(labels["com.bzd.sandbox.root"]).resolve()
 				relativeRoot = pathlib.Path(os.path.relpath(root, pathlib.Path.cwd().resolve()))
 				lines = [
 					f"root: {relativeRoot}",
-					f"command: {pathlib.Path(__file__).name} {labels['com.bzd.devcontainer.command']}",
-					f"user: {labels['com.bzd.devcontainer.user']}",
+					f"command: {pathlib.Path(__file__).name} {labels['com.bzd.sandbox.command']}",
+					f"user: {labels['com.bzd.sandbox.user']}",
 				]
 				order = len(relativeRoot.parts)
 			except Exception as e:
@@ -641,7 +641,7 @@ if __name__ == "__main__":
 		for i in range(1, 10)
 	}
 
-	parser = argparse.ArgumentParser(description="Development container.")
+	parser = argparse.ArgumentParser(description="Sandbox container.")
 	parser.add_argument("--build", action="store_true", help="Re-build the container if set.")
 	parser.add_argument(
 		"--build-force",
@@ -711,7 +711,7 @@ if __name__ == "__main__":
 		args = parser.parse_args([*allPresets[args.preset], *sys.argv[1:]])
 	if args.rest:
 		if args.rest[0] == "ls":
-			DevelopmentContainer.ls()
+			SandboxContainer.ls()
 			sys.exit(0)
 		if args.rest[0] == "--":
 			args.rest = args.rest[1:]
@@ -720,7 +720,7 @@ if __name__ == "__main__":
 	featureNames = set(args.enable if len(args.enable) else allFeatures.keys()) - set(args.disable)
 	features = [allFeatures[name](args) for name in featureNames]
 
-	devContainer = DevelopmentContainer(args=args, features=features, temporaryPath=args.temp)
+	devContainer = SandboxContainer(args=args, features=features, temporaryPath=args.temp)
 	devContainer.initialize(dry=args.dry)
 	if not args.dry:
 		if args.build_force:

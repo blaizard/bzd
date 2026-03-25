@@ -49,17 +49,17 @@ sh_binary_wrapper(
 )
 
 py_binary(
-    name = "devcontainer",
-    srcs = ["devcontainer.py"],
+    name = "sandbox",
+    srcs = ["sandbox.py"],
 )
 
 bzd_executable_test(
-    name = "devcontainer_agent_test",
+    name = "sandbox_agent_test",
     args = [
         "--preset",
         "agent1",
         "--dry",
     ],
-    executable = ":devcontainer",
+    executable = ":sandbox",
     expected_output = "no-new-privileges:true",
 )
