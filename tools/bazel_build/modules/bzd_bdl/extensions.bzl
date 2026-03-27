@@ -1,7 +1,7 @@
 """Register a new extension."""
 
 load("@bazel_skylib//lib:sets.bzl", "sets")
-load("@bzd_lib//:repository_maker.bzl", "repository_maker")
+load("@bzd_lib//:defs.bzl", "bzd_repository_maker")
 
 def _target_to_py_module(target):
     return target.package.replace("/", ".") + "." + target.name
@@ -41,10 +41,9 @@ def _bdl_extension_impl(module_ctx):
 
     extensions_content += """extensions = {}\n""".format(" | ".join(extensions.keys()))
 
-    repository_maker(
+    bzd_repository_maker(
         name = "bdl_extension",
-        create = {
-            "BUILD": """
+        build_file_content = """
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 load("@rules_python//python:defs.bzl", "py_library")
 
@@ -68,9 +67,10 @@ py_library(
     ]
 )
 """.format(
-                deps_extensions = ",\n".join(["\"" + str(e) + "\"" for e in deps_extensions]),
-                deps = ",\n".join(["\"" + str(e) + "\"" for e in sets.to_list(deps)]),
-            ),
+            deps_extensions = ",\n".join(["\"" + str(e) + "\"" for e in deps_extensions]),
+            deps = ",\n".join(["\"" + str(e) + "\"" for e in sets.to_list(deps)]),
+        ),
+        files_content = {
             "bdl_extension.py": py_content_imports + """
 
 formatters = {{}} | {formatters}

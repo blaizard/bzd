@@ -67,7 +67,6 @@ def esp32s3_linux_x86_64(_module_ctx, name, _use_fragment):
             "@{}//xtensa-esp-elf/include".format(name),
         ],
         "urls": [
-            "https://datalocal.blaizard.com/file/bzd/toolchains/cc/gcc/esp32_xtensa_lx6/xtensa-esp-elf-14.2.0_20241119-x86_64-linux-gnu.tar.xz",
             "https://data.blaizard.com/file/bzd/toolchains/cc/gcc/esp32_xtensa_lx6/xtensa-esp-elf-14.2.0_20241119-x86_64-linux-gnu.tar.xz",
         ],
     }

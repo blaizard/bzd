@@ -65,7 +65,6 @@ def linux_arm64(_module_ctx, name, use_fragment):
             "@{}//include/aarch64-unknown-linux-gnu/c++/v1".format(name),
         ],
         "urls": [
-            "https://datalocal.blaizard.com/file/bzd/toolchains/cc/clang/linux_arm64/linux_arm64_17.0.0.tar.xz",
             "https://data.blaizard.com/file/bzd/toolchains/cc/clang/linux_arm64/linux_arm64_17.0.0.tar.xz",
         ],
     }

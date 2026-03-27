@@ -60,7 +60,6 @@ def linux_x86_64(_module_ctx, name, use_fragment):
             "@{}//lib/gcc/x86_64-pc-linux-gnu/14.2.0/include-fixed".format(name),
         ],
         "urls": [
-            "https://datalocal.blaizard.com/file/bzd/toolchains/cc/gcc/linux_x86_64/linux_x86_64_14.2.0.tar.xz",
             "https://data.blaizard.com/file/bzd/toolchains/cc/gcc/linux_x86_64/linux_x86_64_14.2.0.tar.xz",
         ],
     }

@@ -65,7 +65,6 @@ def linux_x86_64(_module_ctx, name, use_fragment):
             "@{}//include/x86_64-unknown-linux-gnu/c++/v1".format(name),
         ],
         "urls": [
-            "https://datalocal.blaizard.com/file/bzd/toolchains/cc/clang/linux_x86_64/linux_x86_64_19.1.7.tar.xz",
             "https://data.blaizard.com/file/bzd/toolchains/cc/clang/linux_x86_64/linux_x86_64_19.1.7.tar.xz",
         ],
     }

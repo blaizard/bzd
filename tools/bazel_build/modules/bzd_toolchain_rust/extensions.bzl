@@ -1,31 +1,38 @@
 """Extension to generate a rust toolchain."""
 
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-load("@bzd_lib//:repository_multiplatform_maker.bzl", "repository_multiplatform_maker")
+load("@bzd_lib//:defs.bzl", "bzd_http_archive", "bzd_repository_maker", "bzd_repository_multiplatform_maker")
 load("@bzd_platforms//:defs.bzl", "constraints_from_platform_name")
 load("//toolchains:defs.bzl", "config_settings_to_rust_triple")
 
 _repositories = {
     "esp-rust-1.92.0": {
         "stdlib_target": {
-            "archive": {
-                "build_file": Label("//toolchains/esp_rust_1.92.0:stdlib_target.BUILD.bazel"),
-                "sha256": "159577235ac78591c850a432ad1a982735fe910d0495d26e7c5c17643acc4b4f",
-                "strip_prefix": "rust-src-nightly/rust-src/lib/rustlib/src/rust",
-                "urls": ["https://github.com/esp-rs/rust-build/releases/download/v1.92.0.0/rust-src-1.92.0.0.tar.xz"],
-            },
+            "build_file": Label("//toolchains/esp_rust_1.92.0:stdlib_target.BUILD.bazel"),
+            "http": [
+                bzd_http_archive(
+                    sha256 = "159577235ac78591c850a432ad1a982735fe910d0495d26e7c5c17643acc4b4f",
+                    strip_prefix = "rust-src-nightly/rust-src/lib/rustlib/src/rust",
+                    url = "https://data.blaizard.com/file/bzd/toolchains/rust/esp/rust-src-1.92.0.0.tar.xz",
+                ),
+            ],
         },
         "toolchain": [{
-            "archive": {
-                "build_file": Label("//toolchains/esp_rust_1.92.0:toolchain.BUILD.bazel"),
-                "integrity": "sha256-vLCRgGo+El8ParhSFcHrcXT7w4g5dZdlUJ6d0lVl65U=",
-                "strip_prefix": "rust-nightly-x86_64-unknown-linux-gnu",
-                "urls": [
-                    "https://github.com/esp-rs/rust-build/releases/download/v1.92.0.0/rust-1.92.0.0-x86_64-unknown-linux-gnu.tar.xz",
-                ],
-            },
-            "platforms": [
+            "build_file": Label("//toolchains/esp_rust_1.92.0:toolchain.BUILD.bazel"),
+            "compatible_with": [
                 Label("@bzd_platforms//al_isa:linux-x86_64"),
+            ],
+            "http": [
+                bzd_http_archive(
+                    integrity = "sha256-vLCRgGo+El8ParhSFcHrcXT7w4g5dZdlUJ6d0lVl65U=",
+                    strip_prefix = "rust-nightly-x86_64-unknown-linux-gnu/rustc",
+                    url = "https://data.blaizard.com/file/bzd/toolchains/rust/esp/rust-1.92.0.0-x86_64-unknown-linux-gnu.tar.xz",
+                ),
+                bzd_http_archive(
+                    integrity = "sha256-vLCRgGo+El8ParhSFcHrcXT7w4g5dZdlUJ6d0lVl65U=",
+                    strip_prefix = "rust-nightly-x86_64-unknown-linux-gnu/rust-std-x86_64-unknown-linux-gnu",
+                    url = "https://data.blaizard.com/file/bzd/toolchains/rust/esp/rust-1.92.0.0-x86_64-unknown-linux-gnu.tar.xz",
+                    output = "stdlib_exec",
+                ),
             ],
         }],
     },
@@ -122,13 +129,14 @@ rust_toolchain(
     env = {{}},
     exec_triple = "{exec_triple}",
     extra_exec_rustc_flags = [],
-    extra_rustc_flags = [],
+    extra_rustc_flags = ["-L=./rustc/lib/"],
     rust_doc = "@{toolchain}//:rustdoc",
     rust_std = select({{
         "{target_platform}": ":stdlib_target",
         "//conditions:default": "@{toolchain}//:stdlib_exec",
     }}),
     rustc = "@{toolchain}//:rustc",
+    rustc_lib = "@{toolchain}//:rustc_lib",
     staticlib_ext = ".a",
     stdlib_linkflags = [],
     target_triple = select(config_settings_to_rust_triple),
@@ -207,25 +215,26 @@ def _toolchain_rust_impl(module_ctx):
     # Load the toolchain and stdlib for the target.
     for name in all_repositories:
         repository = _repositories[name]
-        repository_multiplatform_maker(
+        bzd_repository_multiplatform_maker(
             name = "{}_toolchain".format(name),
             repositories = repository["toolchain"],
             expose = {
                 "rustc": "rustc",
+                "rustc_lib": "rustc_lib",
                 "rustdoc": "rustdoc",
                 "stdlib_exec": "stdlib_exec",
             },
         )
-        http_archive(
+        bzd_repository_maker(
             name = "{}_stdlib_target".format(name),
-            **repository["stdlib_target"]["archive"]
+            **repository["stdlib_target"]
         )
 
     # Make the rust repositories.
     for name, toolchain in toolchains.items():
         repository_name = toolchain.data["repository"]
         repository = _repositories[repository_name]
-        exec_platforms = {platform: True for toolchain in repository["toolchain"] for platform in toolchain.get("platforms", [])}.keys()
+        exec_platforms = {platform: True for toolchain in repository["toolchain"] for platform in toolchain.get("compatible_with", [])}.keys()
         toolchain_repository(
             name = name,
             repo_name = name,

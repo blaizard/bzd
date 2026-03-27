@@ -1,6 +1,6 @@
 """Module extension for NodeJs toolchains."""
 
-load("@bzd_lib//:repository_maker.bzl", "repository_maker")
+load("@bzd_lib//:defs.bzl", "bzd_repository_maker")
 load("//toolchain/node:defs.bzl", "node_install", "node_versions")
 load("//toolchain/pnpm:defs.bzl", "pnpm_install")
 
@@ -126,22 +126,20 @@ def _toolchain_nodejs_impl(module_ctx):
         )
 
         # Create the main repository.
-        repository_maker(
+        bzd_repository_maker(
             name = name,
-            create = {
-                "BUILD": _toolchain_repository_build_content(
-                    node = "@node-" + toolchain["version"] + "//:node",
-                    pnpm = "@pnpm//:pnpm",
-                    default = toolchain["default"],
-                ),
-            },
+            build_file_content = _toolchain_repository_build_content(
+                node = "@node-" + toolchain["version"] + "//:node",
+                pnpm = "@pnpm//:pnpm",
+                default = toolchain["default"],
+            ),
         )
 
     # Create the default node repository.
-    repository_maker(
+    bzd_repository_maker(
         name = "node",
-        copy = {
-            "BUILD": "@node-" + default_toolchain["version"] + "//:BUILD",
+        build_file = "@node-" + default_toolchain["version"] + "//:BUILD",
+        files = {
             "defs.bzl": "@node-" + default_toolchain["version"] + "//:defs.bzl",
         },
     )

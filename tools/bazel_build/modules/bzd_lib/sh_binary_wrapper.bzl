@@ -118,7 +118,7 @@ sh_binary_wrapper = rule(
             doc = "Label or file of the binary to be wrapped.",
         ),
         "command": attr.string(
-            default = "{binary} $@",
+            default = "{binary} \"$@\"",
             doc = "Content of the wrapping script, by default it simply forwards all command line arguments to the binary.",
         ),
         "data": attr.label_list(

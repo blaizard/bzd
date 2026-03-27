@@ -1,7 +1,6 @@
 """Expose target from a multi-platform repository."""
 
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-load("//:repository_maker.bzl", "repository_maker")
+load("//private/repository_maker:repository_maker.bzl", "bzd_repository_maker")
 
 def _repository_multiplatform_maker_impl(repository_ctx):
     build_content = ""
@@ -55,7 +54,7 @@ _repository_multiplatform_maker = repository_rule(
     },
 )
 
-def repository_multiplatform_maker(name, repositories, expose):
+def bzd_repository_multiplatform_maker(name, repositories, expose):
     """Multi-platform repository.
 
     Creates a repository that exposes several target which point to target specific underlying repositories.
@@ -64,32 +63,14 @@ def repository_multiplatform_maker(name, repositories, expose):
     repository_multiplatform_maker(
         name = "my_repo",
         repositories = [{
-            "archive": {
-                "url": "https://data.blaizard.com/file/bzd/qemu/esp32/linux_x86_64_8.1.2.tar.xz",
-                "sha256": "df996467865470dbf7c6a80b1d921ffe23eba7be477c165c41192b4343c42d21",
-                "build_file": "@bzd_toolchain_cc//:fragments/esp32/qemu/linux_x86_64_8.1.2.BUILD",
-                "strip_prefix": "linux_x86_64_8.1.2",
-            },
-            "platforms": [
-                Label("@bzd_platforms//al_isa:linux-x86_64"),
+            "http": [
+                bzd_http_archive(
+                    url = "https://data.blaizard.com/file/bzd/qemu/esp32/linux_x86_64_8.1.2.tar.xz",
+                    sha256 = "df996467865470dbf7c6a80b1d921ffe23eba7be477c165c41192b4343c42d21",
+                )
             ],
-        }],
-        "expose": {"qemu": "qemu_impl"}
-    )
-
-    or
-
-    repository_multiplatform_maker(
-        name = "my_repo",
-        repositories = [{
-            "files": {
-                "pnpm": {
-                    "url": "https://data.blaizard.com/file/bzd/qemu/esp32/linux_x86_64_8.1.2.tar.xz",
-                    "sha256": "df996467865470dbf7c6a80b1d921ffe23eba7be477c165c41192b4343c42d21",
-                }
-            },
             "build_file": "@bzd_toolchain_cc//:fragments/esp32/qemu/linux_x86_64_8.1.2.BUILD",
-            "platforms": [
+            "compatible_with": [
                 Label("@bzd_platforms//al_isa:linux-x86_64"),
             ],
         }],
@@ -107,31 +88,20 @@ def repository_multiplatform_maker(name, repositories, expose):
     for index, repository in enumerate(repositories):
         repository_name = "{}_{}".format(name, index)
 
-        if "archive" in repository:
-            for attr in ("build_file", "files"):
-                if attr in repository:
-                    fail("'{}' attribute should not be present if 'archive' is defined.".format(attr))
-            http_archive(
-                name = repository_name,
-                **repository["archive"]
-            )
+        if "compatible_with" not in repository:
+            fail("Missing 'compatible_with' attribute.")
+        repository = dict(repository)
+        compatible_with = repository.pop("compatible_with")
 
-        if "files" in repository:
-            for attr in ("archive",):
-                if attr in repository:
-                    fail("'{}' attribute should not be present if 'files' is defined.".format(attr))
-            repository_maker(
-                name = repository_name,
-                download = repository["files"],
-                copy = {
-                    "BUILD.bazel": repository["build_file"],
-                },
-            )
+        bzd_repository_maker(
+            name = repository_name,
+            **repository
+        )
 
-        for platform in repository.get("platforms", []):
-            if platform in platform_mapping:
-                fail("The platform '{}' is defined multiple times.".format(platform))
-            platform_mapping[platform] = repository_name
+        for constraint in compatible_with:
+            if constraint in platform_mapping:
+                fail("The constraint '{}' is defined multiple times.".format(constraint))
+            platform_mapping[constraint] = repository_name
 
     _repository_multiplatform_maker(
         name = name,

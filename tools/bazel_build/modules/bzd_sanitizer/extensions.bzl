@@ -1,6 +1,6 @@
 """Manage configuration for the sanitizer."""
 
-load("@bzd_lib//:repository_maker.bzl", "repository_maker")
+load("@bzd_lib//:defs.bzl", "bzd_repository_maker")
 
 def _make_clang_tidy_config(clang_tidy_config):
     return """
@@ -59,11 +59,9 @@ def _sanitizer_impl(module_ctx):
     build_file += _make_clang_tidy_config(clang_tidy_config)
     build_file += _make_mypy_config(mypy_config)
 
-    repository_maker(
+    bzd_repository_maker(
         name = "bzd_sanitizer_config",
-        create = {
-            "BUILD": build_file,
-        },
+        build_file_content = build_file,
     )
 
 sanitizer = module_extension(

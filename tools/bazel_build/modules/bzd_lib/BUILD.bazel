@@ -10,6 +10,7 @@ bzl_library(
     deps = [
         "//private/diff_test:bzl",
         "//private/executable_test:bzl",
+        "//private/repository_maker:bzl",
     ],
 )
 
@@ -22,14 +23,6 @@ py_binary(
     deps = [
         "@bzd_python//bzd/utils:dict",
     ],
-)
-
-bzl_library(
-    name = "repository_multiplatform_maker",
-    srcs = [
-        "repository_multiplatform_maker.bzl",
-    ],
-    visibility = ["//visibility:public"],
 )
 
 bzl_library(

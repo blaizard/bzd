@@ -1,6 +1,6 @@
 """Module extension for NodeJs toolchains."""
 
-load("@bzd_lib//:repository_maker.bzl", "repository_maker")
+load("@bzd_lib//:defs.bzl", "bzd_repository_maker")
 load("@bzd_platforms//:defs.bzl", "get_platform_from_os", "to_al", "to_isa")
 load("@node//:defs.bzl", "node_binary", "npm_binary")
 
@@ -137,11 +137,9 @@ def _requirements_nodejs_impl(module_ctx):
                 repository_name = repository_name,
             )
 
-        repository_maker(
+        bzd_repository_maker(
             name = name,
-            create = {
-                "BUILD": build_file,
-            },
+            build_file_content = build_file,
         )
 
 requirements_nodejs = module_extension(
