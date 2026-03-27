@@ -9,7 +9,7 @@ jobs:
 
     # STAGE 1: Wake up the remote.
     wake_up_remote:
-        runs-on: linux
+        runs-on: synology
         steps:
             - name: "WoL"
               run: |
