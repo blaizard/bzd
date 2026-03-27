@@ -7,10 +7,4 @@ build --show_timestamps
 test --test_timeout_filters=-long,-eternal
 
 # Use remote execution.
-build --config=remote
-test --config=remote
-
-# Enable disk cache
-common --disk_cache=/cache/bazel/disk_cache
-common --repository_cache=/cache/bazel/repository_cache
-common --experimental_disk_cache_gc_max_size=10G
+common --config=remote
