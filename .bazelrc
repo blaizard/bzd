@@ -1,7 +1,7 @@
 common --announce_rc
 
-try-import .bazelrc.local
-try-import deployment/.bazelrc
+try-import %workspace%/.bazelrc.local
+try-import %workspace%/deployment/.bazelrc
 
 # Add timestamps
 common --show_timestamps
@@ -60,7 +60,7 @@ coverage --collect_code_coverage
 build:docker --experimental_docker_verbose
 build:docker --experimental_enable_docker_sandbox
 build:docker --spawn_strategy=docker,worker,sandboxed,local
-build:docker --extra_execution_platforms=@bzd_rules_oci//execution_platforms:linux_x86_64
+build:docker --experimental_docker_image=blaizard/linux_x86_64:ubuntu-24.04
 
 # Remote
 build:remote --dynamic_mode=off

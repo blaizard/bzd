@@ -3,5 +3,11 @@
 ## Re-build the image
 
 ```
-docker build --no-cache apps/linux_x86_64 -t blaizard/linux_x86_64:latest
+docker build --no-cache tools/docker_images/linux_x86_64 -t blaizard/linux_x86_64:latest -t blaizard/linux_x86_64:ubuntu-24.04
+```
+
+# Push
+
+```bash
+docker push blaizard/linux_x86_64:ubuntu-24.04
 ```

@@ -28,6 +28,6 @@ This is done with the following command:
 cd ~
 mkdir -p .bzd
 wget "https://raw.githubusercontent.com/blaizard/bzd/master/tools/shell/sh/bashrc.sh" -O .bzd/bashrc.sh
-echo "source .bzd/bashrc.sh" > .bashrc
+echo "source .bzd/bashrc.sh" >> .bashrc
 source .bashrc
 ```

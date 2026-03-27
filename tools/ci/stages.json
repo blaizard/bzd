@@ -33,7 +33,7 @@
         {
             "commands": [
                 "./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=esp32 --config=prod --config=cc",
-                "./tools/bazel test //rust/... --output_groups=+metadata --config=esp32 --config=prod --config=local"
+                "./tools/bazel test //rust/... --output_groups=+metadata --config=esp32 --config=prod"
             ],
             "name": "esp32 prod",
             "tags": [
@@ -44,7 +44,7 @@
         {
             "commands": [
                 "./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=esp32s3 --config=prod --config=cc",
-                "./tools/bazel test //rust/... --output_groups=+metadata --config=esp32s3 --config=prod --config=local"
+                "./tools/bazel test //rust/... --output_groups=+metadata --config=esp32s3 --config=prod"
             ],
             "name": "esp32s3 prod",
             "tags": [
