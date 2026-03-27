@@ -6,17 +6,32 @@ on:
         - cron: "0 2 * * *" # runs daily at 02:00
 
 jobs:
-    build:
-        runs-on: linux
 
+    # STAGE 1: Wake up the remote.
+    wake_up_remote:
+        runs-on: linux
         steps:
             - uses: actions/checkout@v3
               with:
                   submodules: "true"
 
+            - name: "Environment"
+              run: |
+                  cp tools/ci/gitea/.bazelrc.local .bazelrc.local
+                  ./info.sh
+
             - name: "Enable Remote Execution"
               run: |
                   ./tools/bazel run //deployment:remote_wol_service --config=local
+
+    # STAGE 2: Build remotely.
+    build_remote:
+        needs: wake_up_remote
+        runs-on: linux-remote
+        steps:
+            - uses: actions/checkout@v3
+              with:
+                  submodules: "true"
 
             - name: "Environment"
               run: |
