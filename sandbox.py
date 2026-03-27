@@ -557,7 +557,7 @@ services:
 		)
 
 	@staticmethod
-	def ls() -> None:
+	def _list_containers() -> typing.List[typing.Dict[str, typing.Any]]:
 		result = subprocess.run(
 			["docker", "ps", "--filter", f"name={imagePrefix}", "-a", "--format", "json"],
 			capture_output=True,
@@ -591,7 +591,11 @@ services:
 					"order": order,
 				}
 			)
+		return containers
 
+	@staticmethod
+	def ls() -> None:
+		containers = SandboxContainer._list_containers()
 		result = subprocess.run(
 			["docker", "stats", "--no-stream", "--format", "json"] + [container["name"] for container in containers],
 			capture_output=True,
@@ -612,6 +616,17 @@ services:
 			print(f"- {color}{container['name']}\033[0m: {', '.join(infos)}")
 			for line in container["lines"]:
 				print(f"    {line}")
+
+	@staticmethod
+	def prune() -> None:
+		containers = SandboxContainer._list_containers()
+		for container in containers:
+			if container["active"]:
+				continue
+			print(f"Deleting container '{container['name']}'.")
+			subprocess.run(["docker", "rm", "-f", container["name"]])
+		print("Pruning unused images.")
+		subprocess.run(["docker", "image", "prune", "-a", "-f", "--filter", "label=com.docker.compose.service=bzd"])
 
 
 if __name__ == "__main__":
@@ -641,7 +656,15 @@ if __name__ == "__main__":
 		for i in range(1, 10)
 	}
 
-	parser = argparse.ArgumentParser(description="Sandbox container.")
+	additionalCommands = {
+		"ls": SandboxContainer.ls,
+		"prune": SandboxContainer.prune,
+	}
+
+	parser = argparse.ArgumentParser(
+		description="Sandbox container.",
+		epilog=f"Additional commands: {', '.join(additionalCommands.keys())}",
+	)
 	parser.add_argument("--build", action="store_true", help="Re-build the container if set.")
 	parser.add_argument(
 		"--build-force",
@@ -710,21 +733,21 @@ if __name__ == "__main__":
 	if args.preset:
 		args = parser.parse_args([*allPresets[args.preset], *sys.argv[1:]])
 	if args.rest:
-		if args.rest[0] == "ls":
-			SandboxContainer.ls()
+		if args.rest[0] in additionalCommands:
+			additionalCommands[args.rest[0]]()
 			sys.exit(0)
-		if args.rest[0] == "--":
+		elif args.rest[0] == "--":
 			args.rest = args.rest[1:]
 
 	# Select only the features asked.
 	featureNames = set(args.enable if len(args.enable) else allFeatures.keys()) - set(args.disable)
 	features = [allFeatures[name](args) for name in featureNames]
 
-	devContainer = SandboxContainer(args=args, features=features, temporaryPath=args.temp)
-	devContainer.initialize(dry=args.dry)
+	sandbox = SandboxContainer(args=args, features=features, temporaryPath=args.temp)
+	sandbox.initialize(dry=args.dry)
 	if not args.dry:
 		if args.build_force:
-			devContainer.build(force=True)
+			sandbox.build(force=True)
 		if args.build:
-			devContainer.build(force=False)
-		devContainer.run(args=args.rest, env=args.env)
+			sandbox.build(force=False)
+		sandbox.run(args=args.rest, env=args.env)
