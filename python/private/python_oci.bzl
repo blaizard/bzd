@@ -1,6 +1,6 @@
 """Rules for NodeJs Docker."""
 
-load("@bzd_rules_oci//:defs.bzl", "bzd_oci_binary", "bzd_oci_load")
+load("@bzd_rules_oci//:defs.bzl", "bzd_oci_binary")
 load("//private:python_hermetic_binary.bzl", "bzd_python_hermetic_launcher")
 
 def bzd_python_oci(name, binary, base = Label("@oci_minimal"), env = None, **kwargs):
@@ -27,11 +27,4 @@ def bzd_python_oci(name, binary, base = Label("@oci_minimal"), env = None, **kwa
             "PYTHONUNBUFFERED": "1",  # Make sure Python output is unbuffered.
         } | (env or {}),
         **kwargs
-    )
-
-    bzd_oci_load(
-        name = "{}.load".format(name),
-        image = name,
-        remote_tags = ["latest"],
-        repository = "local/{}".format(name),
     )

@@ -26,6 +26,6 @@ def bzd_oci_image(name, base = None, cmd = None, workdir = None, env = None, tar
         workdir = workdir,
         env = env or {},
         tars = tars or [],
-        entrypoint = entrypoint or [],
+        entrypoint = entrypoint,
         **kwargs
     )

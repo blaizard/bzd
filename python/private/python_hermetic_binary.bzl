@@ -2,6 +2,17 @@
 
 load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
 
+def _variant_transition_impl(_settings, attr):
+    if attr.libc:
+        return {"@rules_python//python/config_settings:py_linux_libc": attr.libc}
+    return None
+
+_variant_transition = transition(
+    implementation = _variant_transition_impl,
+    inputs = [],
+    outputs = ["@rules_python//python/config_settings:py_linux_libc"],
+)
+
 def _bzd_python_hermetic_launcher_impl(ctx):
     py_runtime = ctx.toolchains["@bazel_tools//tools/python:toolchain_type"].py3_runtime
 
@@ -29,7 +40,12 @@ bzd_python_hermetic_launcher = rule(
             executable = True,
             cfg = "target",
         ),
+        "libc": attr.string(
+            doc = "The ABI to be used.",
+            values = ["gnu", "musl"],
+        ),
     },
+    cfg = _variant_transition,
     toolchains = ["@bazel_tools//tools/python:toolchain_type"],
     provides = [DefaultInfo],
     executable = True,

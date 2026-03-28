@@ -218,7 +218,15 @@ images.pull(
     digest = "sha256:9bdf40cd46310c4e5bef75b7723e060629a78ce4ce7fa529522e49a433bae1bf",
     image = "index.docker.io/blaizard/ebook",
 )
-use_repo(images, "oci_bridge", "oci_ebook", "oci_nodejs_puppeteer")
+images.pull(
+    name = "oci_gitea_act_runner",
+    digest = "sha256:c2a169c5e99864c25e32527cef3d82203225e09558773022bf3dc164a2e6d762",
+    image = "index.docker.io/gitea/act_runner",
+    platforms = [
+        "linux/amd64",
+    ],
+)
+use_repo(images, "oci_bridge", "oci_ebook", "oci_gitea_act_runner", "oci_nodejs_puppeteer")
 
 # Sanitizer
 
