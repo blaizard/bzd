@@ -13,9 +13,7 @@ jobs:
         steps:
             - name: "WoL"
               run: |
-                  curl -fsSL 'https://datalocal.blaizard.com/x/bzd/apps/node_manager_client?al=linux&isa=x86_64' -o ./node_manager_client
-                  chmod +x ./node_manager_client
-                  ./node_manager_client wol --wait 10.10.0.11:8980 --broadcast 10.10.0.255 --timeout 300 08:bf:b8:14:04:b6
+                  /node_manager_client wol --wait 10.10.0.11:8980 --broadcast 10.10.0.255 --timeout 300 08:bf:b8:14:04:b6
 
     # STAGE 2: Build remotely.
     build_remote:
