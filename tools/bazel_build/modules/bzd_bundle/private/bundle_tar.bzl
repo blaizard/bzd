@@ -52,7 +52,7 @@ _bzd_bundle_bootstrap = rule(
     executable = True,
 )
 
-def _bzd_bundle_tar_impl(name, visibility, executables, compression, compression_level, output, **kwargs):
+def _bzd_bundle_tar_impl(name, visibility, executables, compression, compression_level, output, tags, **kwargs):
     bootstrap_name = "{}.bootstrap".format(name)
     _bzd_bundle_bootstrap(
         name = bootstrap_name,
@@ -74,12 +74,14 @@ def _bzd_bundle_tar_impl(name, visibility, executables, compression, compression
         extension = compression,
         compression_level = compression_level,
         visibility = visibility,
+        tags = (tags or []) + ["no-remote-cache"],
         **kwargs
     )
 
 bzd_bundle_tar = macro(
     doc = "Create a bundle with bootstrap scripts for the given executables.",
     implementation = _bzd_bundle_tar_impl,
+    inherit_attrs = "common",
     attrs = {
         "compression": attr.string(
             values = ["gz", "bz2", "xz"],

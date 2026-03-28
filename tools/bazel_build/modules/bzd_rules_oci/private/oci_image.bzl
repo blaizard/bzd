@@ -3,7 +3,7 @@
 load("@bzd_lib//lib:attrs.bzl", "ATTRS_COMMON_BUILD_RULES", "attrs_assert_any_of")
 load("@rules_oci//oci:defs.bzl", "oci_image")
 
-def bzd_oci_image(name, base = None, cmd = None, workdir = None, env = None, tars = None, entrypoint = None, **kwargs):
+def bzd_oci_image(name, base = None, cmd = None, workdir = None, env = None, tars = None, entrypoint = None, tags = None, **kwargs):
     """Build a container image.
 
     Args:
@@ -14,6 +14,7 @@ def bzd_oci_image(name, base = None, cmd = None, workdir = None, env = None, tar
         env: Environment variables provisioned by default to the running container.
         tars: List of tar files to add to the image as layers.
         entrypoint: Entrypoint of the container.
+        tags: Tags to be added to the target.
         **kwargs: Extra arguments common to all build rules.
     """
 
@@ -27,5 +28,6 @@ def bzd_oci_image(name, base = None, cmd = None, workdir = None, env = None, tar
         env = env or {},
         tars = tars or [],
         entrypoint = entrypoint,
+        tags = (tags or []) + ["no-remote-cache"],
         **kwargs
     )
