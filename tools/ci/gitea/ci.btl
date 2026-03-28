@@ -7,19 +7,14 @@ on:
 
 jobs:
 
-    # STAGE 1: Wake up the remote.
-    wake_up_remote:
-        runs-on: linux-local
+    use_linux_remote:
+        runs-on: node_manager_client
         steps:
-            - name: "WoL"
-              run: |
-                  curl -fsSL 'https://datalocal.blaizard.com/x/bzd/apps/node_manager_client?al=linux&isa=x86_64' -o ./node_manager_client
-                  chmod +x ./node_manager_client
-                  ./node_manager_client wol --wait 10.10.0.11:8980 --broadcast 10.10.0.255 --timeout 300 08:bf:b8:14:04:b6
+            - name: "Use Linux Remote"
+              uses: https://git.blaizard.com/blaise/deployment/ci/gitea/use_linux_remote@main
 
-    # STAGE 2: Build remotely.
     build_remote:
-        needs: wake_up_remote
+        needs: use_linux_remote
         runs-on: linux-remote
         steps:
             - uses: actions/checkout@v3
@@ -50,7 +45,7 @@ jobs:
 
 {% end %}
             - name: "Deploy"
-              uses: https://git.blaizard.com/blaise/deployment@main
+              uses: https://git.blaizard.com/blaise/deployment/ci/gitea/deploy@main
               with:
                   ssh_private_key: ${{{ secrets.BZD_SSH_PRIVATE_KEY }}
                   digitalocean_api_token: ${{{ secrets.BZD_DIGITALOCEAN_API_TOKEN }}
