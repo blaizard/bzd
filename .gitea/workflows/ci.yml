@@ -7,14 +7,14 @@ on:
 
 jobs:
 
-    use_linux_remote:
+    lease_linux_remote:
         runs-on: node_manager_client
         steps:
-            - name: "Use Linux Remote"
-              uses: https://git.blaizard.com/blaise/deployment/ci/gitea/use_linux_remote@main
+            - name: "Lease Linux Remote"
+              uses: https://git.blaizard.com/blaise/deployment/ci/gitea/lease_linux_remote@main
 
     build_remote:
-        needs: use_linux_remote
+        needs: lease_linux_remote
         runs-on: linux-remote
         steps:
             - uses: actions/checkout@v3
