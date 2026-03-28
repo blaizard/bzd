@@ -6,7 +6,6 @@ on:
         - cron: "0 2 * * *" # runs daily at 02:00
 
 jobs:
-
     lease_linux_remote:
         runs-on: node_manager_client
         steps:
