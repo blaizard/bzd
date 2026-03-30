@@ -37,6 +37,30 @@ fi
 # Reload the configuration if needed
 alias bzd_reload='. ~/.bashrc'
 
+# ---- Content from path.sh
+# Update PATH to include .bzd/bin/
+mkdir -p "$HOME/.bzd/bin"
+export PATH="$PATH:$HOME/.bzd/bin"
+
+# Add a new binary
+#
+# Usage:
+#   bzd_make_binary <name> <<EOF
+#   <content of the binary>
+#   EOF
+function bzd_make_binary() {
+	local name="$1"
+	local binary_path="$HOME/.bzd/bin/$name"
+
+	if [[ ! -f "$binary_path" ]]; then
+		echo "#!/usr/bin/env bash" > "$binary_path"
+		echo "set -euo pipefail" >> "$binary_path"
+		echo "self=\$(readlink -f \${BASH_SOURCE[0]})" >> "$binary_path"
+		cat >> "$binary_path"
+		chmod +x "$binary_path"
+	fi
+}
+
 
 # Variables to be used by the prompt.
 __session_names=()
@@ -75,9 +99,25 @@ bzd_clean_disk()
     echo "---- Saved ${total_free_saved}K bytes."
 }
 
+# ---- Content from fetch.sh
+bzd_make_binary "bzd_fetch" <<EOF
+url="\$1"
+output="\$2"
+
+mkdir -p "\$(dirname "\$output")"
+if command -v wget >/dev/null 2>&1; then
+	wget -q --no-cache "\$url" -O "\$output"
+elif command -v curl >/dev/null 2>&1; then
+	curl -S -s -H "Cache-Control: no-cache, no-store" -H "Pragma: no-cache" -o "\$output" "\$url"
+else
+	echo "Cannot download, neither 'wget' nor 'curl' is available." >&2
+	exit 1
+fi
+EOF
+
 # ---- Content from fzf.sh
 # Install fzf, a general-purpose command-line fuzzy finder.
-bzd_fzf_install()
+bzd_install_fzf()
 {
 	git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
 	~/.fzf/install
@@ -137,19 +177,6 @@ EOF
     git bisect log
 }
 
-# ---- Content from google_chrome.sh
-bzd_google_chrome() {
-    # Start chrome in an isolated sandbox and it will not affect the main chrome profile.
-    google-chrome --disable-site-isolation-trials --disable-web-security --allow-file-access-from-files --user-data-dir=/tmp
-}
-
-# ---- Content from math.sh
-# simple math extension to calculate from the command line
-bzd_math() {
-    py_code="from math import *; print(${@})"
-    python -c "${py_code}"
-}
-
 # ---- Content from prompt.sh
 # Set the prompt
 _bzd_parse_git_branch()
@@ -199,6 +226,15 @@ xterm*|rxvt*|konsole*|tmux*)
 	;;
 esac
 
+# ---- Content from sandbox.sh
+bzd_make_binary bzd_sandbox <<EOF
+tmp="\${self}.tmp"
+bzd_fetch "https://raw.githubusercontent.com/blaizard/bzd/master/sandbox.py" > "\$tmp"
+chmod +x "\$tmp"
+mv "\$tmp" "\$self"
+exec "\$self" "\$@"
+EOF
+
 # ---- Content from tmux.sh
 # Show tmux sessions if any exist
 if command -v tmux >/dev/null 2>&1; then
@@ -217,15 +253,7 @@ fi
 # Auto update script 
 bzd_update()
 {
-    url="https://raw.githubusercontent.com/blaizard/cpp-async/master/tools/shell/sh/bashrc.sh"
-	if which wget >/dev/null; then
-		wget -q --no-cache "$url" -O ~/.bzd_update_temp
-	elif which curl >/dev/null; then
-		curl -S -s -H "Cache-Control: no-cache, no-store" -H "Pragma: no-cache" -o ~/.bzd_update_temp "$url"
-	else
-		echo "Cannot download, neither wget nor curl is available."
-		return 1
-	fi
+	bzd_fetch "https://raw.githubusercontent.com/blaizard/cpp-async/master/tools/shell/sh/bashrc.sh" ~/.bzd_update_temp
 	rm -rfd ~/.bzd && mkdir -p ~/.bzd && mv ~/.bzd_update_temp ~/.bzd/bashrc.sh
 	bzd_reload
 }

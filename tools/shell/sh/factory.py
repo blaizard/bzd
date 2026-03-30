@@ -62,8 +62,7 @@ class Sh(Factory):
 		"""Install the shell."""
 
 		# Look for the current .bashrc
-		assert "HOME" in os.environ, "HOME environment variable is not set."
-		home = pathlib.Path(os.environ["HOME"])
+		home = pathlib.Path.home()
 		assert home.is_dir(), "Directory does not exists."
 		hookFile = home / ".bashrc"
 		if not hookFile.is_file():
