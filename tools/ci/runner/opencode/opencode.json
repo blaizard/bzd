@@ -1,0 +1,10 @@
+{
+    "$schema": "https://opencode.ai/config.json",
+    "mcp": {
+        "gitea": {
+            "enabled": true,
+            "type": "remote",
+            "url": "https://git-mcp.blaizard.com/mcp"
+        }
+    }
+}

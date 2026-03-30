@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:24.04
 
 # Needed for dependencies which ask for some interactive input (besides yes and no)
 ENV DEBIAN_FRONTEND=noninteractive
@@ -17,22 +17,18 @@ RUN apt-get update && apt-get install -y \
 	python3 \
 	nodejs
 
-# Install docker
-RUN curl -sSL https://get.docker.com/ | sh
-
-# Set user and group
+# Set user and group.
 ARG user=testuser
 ARG group=testgroup
 ARG uid=1000
 ARG gid=1000
 
-# Add Test user user
-RUN sudo groupadd -g ${gid} ${group}
-RUN sudo useradd -u ${uid} -s /bin/sh -g ${group} -m ${user}
-RUN usermod -aG docker ${user}
+# Add test user	and group.
+RUN id -u ${uid} &>/dev/null && userdel -r $(id -un ${uid}) || true
+RUN getent group ${gid} &>/dev/null && groupdel $(getent group ${gid} | cut -d: -f1) || true
+RUN groupadd -g ${gid} ${group}
+RUN useradd -s /bin/sh --uid ${uid} --gid ${gid} -m ${user} --groups sudo
+RUN echo "\"${user}\" ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 # Switch to user
 USER ${uid}:${gid}
-
-# Install rootless docker (needs to be done as non-root)
-RUN dockerd-rootless-setuptool.sh install

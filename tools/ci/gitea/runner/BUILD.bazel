@@ -1,0 +1,19 @@
+load("@bzd_python//:defs.bzl", "bzd_python_hermetic_launcher")
+load("@bzd_rules_oci//:defs.bzl", "bzd_oci_binaries")
+
+bzd_python_hermetic_launcher(
+    name = "client",
+    binary = "//apps/node_manager:client",
+    libc = "musl",
+)
+
+bzd_oci_binaries(
+    name = "node_manager_client_runner_image",
+    base = "@oci_gitea_act_runner",
+    binaries = {
+        "node_manager_client": ":client",
+    },
+    visibility = [
+        "//deployment:__subpackages__",
+    ],
+)
