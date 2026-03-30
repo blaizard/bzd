@@ -214,7 +214,9 @@ def autoUpdateApplication(context: Context, path: pathlib.Path, uid: str) -> Non
 	if maybeUpdate:
 		# Create a directory with the uid to fetch the last update.
 		updatePath = RollingNamedTemporaryFile(namespace=f"bootloader_{uid}", maxFiles=3).get()
-		context.logger.info(f"Update found, writing to '{updatePath}'.")
+		context.logger.info(
+			f"Update found ({maybeUpdate.name}), writing to '{updatePath}' and validating in the background..."
+		)
 		maybeUpdate.toFile(updatePath)
 
 		# Set the ignore name.
@@ -225,7 +227,8 @@ def autoUpdateApplication(context: Context, path: pathlib.Path, uid: str) -> Non
 		try:
 			binary.run()
 		except Exception as e:
-			context.logger.error(f"Invalid update failed with error: {e}")
+			context.logger.error(f"Validation of the update ({maybeUpdate.name}) failed with error: {e}")
+			context.logger.info("Keeping the current application.")
 		else:
 			context.logger.info(f"Update validated, switching to '{updatePath}'.")
 			context.changeBinary(updatePath)

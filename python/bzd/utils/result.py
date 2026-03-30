@@ -24,6 +24,12 @@ class Result(typing.Generic[V, E]):
 	def __bool__(self) -> bool:
 		return self.error_ is None
 
+	def hasValue(self) -> bool:
+		return bool(self)
+
+	def hasError(self) -> bool:
+		return not bool(self)
+
 	@property
 	def value(self) -> V:
 		assert self.value_ is not None, f"Cannot access the value of a result containing an error: {self.error}"

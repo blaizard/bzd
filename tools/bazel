@@ -81,9 +81,13 @@ if __name__== "__main__":
 		st = bazeliskPath.stat()
 		bazeliskPath.chmod(st.st_mode | stat.S_IEXEC)
 
+	# Run under at bazel level (useful for CI).
+	maybeBazelRunUnder = os.environ.get("BAZEL_RUN_UNDER")
+	runUnder = [maybeBazelRunUnder] if maybeBazelRunUnder else []
+
 	try:
 		# Forward commands to the real bazel
-		processRun([bazeliskPath] + sys.argv[1:])
+		processRun(runUnder + [bazeliskPath] + sys.argv[1:])
 
 		# If this script is called by the wrapper, ignore
 		if "BAZELISK_SKIP_WRAPPER" in os.environ:
@@ -91,7 +95,7 @@ if __name__== "__main__":
 
 		# Generate the coverage report
 		if args.command == "coverage":
-			processRun([bazeliskPath, "run", "@bzd_coverage//:coverage"])
+			processRun(runUnder + [bazeliskPath, "run", "@bzd_coverage//:coverage"])
 
 	# Gracefully handle keyboard interrupts.
 	except KeyboardInterrupt:

@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from bdl.generators.json.ast.ast import Ast
 from bzd.template.template import Template
 from bzd_oci.run import ociPush
+from bzd.utils.result import Result
 
 from targets.docker.deployment.compose import DeploymentDockerCompose
 from targets.docker.deployment.traefik import DeploymentDockerTraefik
@@ -70,21 +71,21 @@ class ContainerState:
 	# Result of socker inspect
 	inspect: typing.Dict[str, typing.Any]
 
-	def isHealthy(self) -> typing.Optional[bool]:
+	def isHealthy(self) -> typing.Optional[Result[bool, str]]:
 		"""Check if the container is healthy."""
 
 		# If it restarted, it is not healthy.
 		if self.inspect.get("RestartCount", 0) > 0:
-			return False
+			return Result.makeError("Container restarted")
 		state = self.inspect.get("State", {})
 		if state.get("ExitCode", 0) != 0:
-			return False
+			return Result.makeError(f"Exit code == {state.get('ExitCode')}")
 		if state.get("Error", "") != "":
-			return False
+			return Result.makeError(state.get("Error"))
 		if state.get("Dead", False):
-			return False
+			return Result.makeError("Dead")
 		if state.get("OOMKilled", False):
-			return False
+			return Result.makeError("OOMKilled")
 		return None
 
 	def getId(self) -> str:
@@ -385,11 +386,13 @@ if __name__ == "__main__":
 					time.sleep(1)
 					statuses = getStatesFromDockerCompose(handle, dockerComposeFile)
 					for name, state in statuses.items():
-						if not state.isHealthy():
+						maybeResult = state.isHealthy()
+						if maybeResult is not None and maybeResult.hasError():
 							print(
 								f"- ERROR: {name} is not healthy, rolling back to previous version.",
 								flush=True,
 							)
+							print(f"Reported error: {maybeResult.error}", flush=True)
 							print(f"Logs of {name}:", flush=True)
 							state.printLogs(handle)
 							rollback(handle, directory)

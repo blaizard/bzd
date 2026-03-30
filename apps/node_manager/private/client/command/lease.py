@@ -1,3 +1,4 @@
+import os
 import typing
 import threading
 import subprocess
@@ -42,7 +43,7 @@ def commandLease(
 	heartbeatThread.start()
 
 	try:
-		with subprocess.Popen(command) as process:
+		with subprocess.Popen(command, cwd=os.environ.get("BUILD_WORKSPACE_DIRECTORY", None)) as process:
 			process.wait()
 			return process.returncode
 

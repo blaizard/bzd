@@ -29,6 +29,11 @@ if __name__ == "__main__":
 		help="Whether or not the power on this node can be controlled.",
 	)
 	parser.add_argument(
+		"--dry",
+		action="store_true",
+		help="For testing only, do not publish or perform any destructive action.",
+	)
+	parser.add_argument(
 		"--node-token",
 		type=str,
 		default=os.environ.get("BZD_NODE_TOKEN"),
@@ -48,7 +53,7 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 
 	def terminateFn() -> None:
-		print("Terminate (no workload)")
+		handlerSuspend()
 
 	# Instantiate the monitor.
 	config = Config(path=args.config)
@@ -72,7 +77,8 @@ if __name__ == "__main__":
 	def monitorWorkload() -> None:
 		data = monitor.all()
 		try:
-			node.publish(data=data)
+			if not args.dry:
+				node.publish(data=data)
 		except Exception:
 			# Ignore any errors, we don't want to crash if something is wrong on the server side.
 			pass
