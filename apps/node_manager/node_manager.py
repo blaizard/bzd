@@ -1,6 +1,7 @@
 import argparse
 import json
 import sys
+import time
 import os
 import pathlib
 
@@ -53,7 +54,9 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 
 	def terminateFn() -> None:
-		handlerSuspend()
+		print("Shutdown in 5s...")
+		time.sleep(5)
+		handlerShutdown()
 
 	# Instantiate the monitor.
 	config = Config(path=args.config)
