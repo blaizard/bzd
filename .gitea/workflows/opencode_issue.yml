@@ -47,6 +47,8 @@ jobs:
 
                     Do NOT post any comments on the issue yourself. Just provide the plan or questions in your response.
                   " > /tmp/agent-response.txt
+                  echo "Response from agent:"
+                  cat /tmp/agent-response.txt
 
             - name: "Check response type"
               run: |
