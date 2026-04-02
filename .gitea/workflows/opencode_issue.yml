@@ -1,0 +1,68 @@
+name: Issue Event Handler with Opencode
+
+on:
+    issues:
+        types: [opened, labeled]
+    issue_comment:
+        types: [created, edited]
+
+jobs:
+    lease_linux:
+        runs-on: node_manager_client
+        steps:
+            - name: "Lease Linux"
+              uses: https://git.blaizard.com/blaise/deployment/ci/gitea/lease_linux@main
+
+    handle_issue:
+        runs-on: opencode
+        steps:
+            - uses: actions/checkout@v3
+              with:
+                  submodules: "true"
+
+            - name: "Build Tools"
+              run: |
+                  mkdir bin
+                  ./tools/bazel build //deployment:lease --remote_download_toplevel
+                  mv bazel-bin/deployment/lease bin/bzd-lease
+                  export BAZEL_RUN_UNDER=./bin/bzd-lease
+
+            - name: "Run opencode"
+              env:
+                  GITEA_REPOSITORY: ${{ github.repository }}
+                  GITEA_ISSUE_NUMBER: ${{ github.event.issue.number }}
+              run: |
+                  ./bin/bzd-lease opencode run --agent plan "
+                    You are working on the repository '${GITEA_REPOSITORY}'' and handling issue #${GITEA_ISSUE_NUMBER}.
+
+                    Use the Gitea MCP to:
+                    1. Fetch the issue details (title, body, labels, comments).
+                    2. Fetch ALL comments on this issue to understand the full conversation history,
+                       previous clarifications, and any plans already discussed.
+                    3. Check for any related issues or pull requests that might be relevant to this issue.
+
+                    Once you have gathered all the context, respond with ONE of the following:
+                    - If you need clarifiaction, write your question and ask for more details.
+                    - If everything is clear, start with 'PLAN: ' followed by a detailed implementation plan.
+
+                    Do NOT post any comments on the issue yourself. Just provide the plan or questions in your response.
+                  " > /tmp/agent-response.txt
+
+            - name: "Check response type"
+              run: |
+                  if grep -q "^PLAN:" /tmp/agent-response.txt; then
+                      echo "Response is a plan."
+                      echo "type=plan" >> $GITHUB_OUTPUT
+                  else
+                      echo "Response is a comment."
+                      echo "type=comment" >> $GITHUB_OUTPUT
+                  fi
+
+            - name: "Post comment on issue"
+              uses: ./.gitea/actions/comment
+              with:
+                  server_url: ${{ github.server_url }}
+                  repository: ${{ github.repository }}
+                  issue_number: ${{ github.event.issue.number }}
+                  token: ${{ secrets.GITEA_AGENT_TOKEN }}
+                  body_file: /tmp/agent-response.txt

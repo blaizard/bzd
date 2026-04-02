@@ -1,0 +1,37 @@
+name: comment
+description: "Comment on an issue or pull request"
+
+inputs:
+    server_url:
+        description: "Gitea server URL (e.g., https://gitea.com)"
+        required: true
+    repository:
+        description: "The repository to comment on (format: owner/repo)"
+        required: true
+    issue_number:
+        description: "The issue or pull request number to comment on"
+        required: true
+    token:
+        description: "Gitea personal access token with permissions to comment on issues"
+        required: true
+    body_file:
+        description: "Path to a file containing the comment body (supports markdown)"
+        required: true
+
+runs:
+    using: composite
+    shell: bash
+    run: |
+        payload=$(jq -n --rawfile body "${{ inputs.body_file }}" '{body: $body}')
+        httpCode=$(curl -sS -o /tmp/gitea-comment-response.json -w "%{http_code}" -X POST \
+          -H "Authorization: token ${{ inputs.token }}" \
+          -H "Content-Type: application/json" \
+          -d "$payload" \
+          "${{ inputs.server_url }}/api/v1/repos/${{ inputs.repository }}/issues/${{ inputs.issue_number }}/comments")
+
+        if [ "${httpCode}" -lt 200 ] || [ "${httpCode}" -ge 300 ]; then
+          echo "Failed to create comment. HTTP status code: $httpCode"
+          cat /tmp/gitea-comment-response.json
+          exit 1
+        fi
+        echo "Comment created successfully."
