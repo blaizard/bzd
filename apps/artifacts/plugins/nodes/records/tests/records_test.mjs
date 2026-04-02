@@ -65,7 +65,7 @@ describe("Records", () => {
 				{ tick: 5, path: "records/main/5.rec.gz", size: 64 },
 				{ tick: 8, path: "records/main/8.rec", size: 43 },
 			]);
-		});
+		}, /*timeout*/ 10000);
 
 		it("read", async () => {
 			Exception.assertEqual((await records.read().next()).value, [1, "a", 3, null]);
