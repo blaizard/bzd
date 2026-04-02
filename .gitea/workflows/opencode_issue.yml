@@ -66,5 +66,5 @@ jobs:
                   server_url: ${{ github.server_url }}
                   repository: ${{ github.repository }}
                   issue_number: ${{ github.event.issue.number }}
-                  token: ${{ secrets.GITEA_AGENT_TOKEN }}
+                  token: ${{ secrets.BZD_AGENT_TOKEN }}
                   body_file: /tmp/agent-response.txt
