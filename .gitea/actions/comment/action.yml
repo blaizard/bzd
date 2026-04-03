@@ -20,17 +20,19 @@ inputs:
 
 runs:
     using: composite
-    shell: bash
-    run: |
-        set -euo pipefail
-        if [ ! -s "${{ inputs.body_file }}" ]; then
-            echo "Error: Body file '${{ inputs.body_file }}' is missing or empty."
-            exit 1
-        fi
-        payload=$(jq -n --rawfile body "${{ inputs.body_file }}" '{body: $body}')
-        curl -sS --fail-with-body -X POST \
-            -H "Authorization: token ${{ inputs.token }}" \
-            -H "Content-Type: application/json" \
-            -d "$payload" \
-            "${{ inputs.server_url }}/api/v1/repos/${{ inputs.repository }}/issues/${{ inputs.issue_number }}/comments"
-        echo "SUCCESS: comment created."
+    steps:
+        - name: "Post comment to Gitea"
+          shell: bash
+          run: |
+              set -euo pipefail
+              if [ ! -s "${{ inputs.body_file }}" ]; then
+                  echo "Error: Body file '${{ inputs.body_file }}' is missing or empty."
+                  exit 1
+              fi
+              payload=$(jq -n --rawfile body "${{ inputs.body_file }}" '{body: $body}')
+              curl -sS --fail-with-body -X POST \
+                  -H "Authorization: token ${{ inputs.token }}" \
+                  -H "Content-Type: application/json" \
+                  -d "$payload" \
+                  "${{ inputs.server_url }}/api/v1/repos/${{ inputs.repository }}/issues/${{ inputs.issue_number }}/comments"
+              echo "SUCCESS: comment created."

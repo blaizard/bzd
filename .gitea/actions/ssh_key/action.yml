@@ -8,20 +8,22 @@ inputs:
 
 runs:
     using: composite
-    shell: bash
-    env:
-        SSH_PRIVATE_KEY: ${{ inputs.ssh_private_key }}
-    run: |
-        set -euo pipefail
+    steps:
+        - name: "Set up SSH key"
+          shell: bash
+          env:
+              SSH_PRIVATE_KEY: ${{ inputs.ssh_private_key }}
+          run: |
+              set -euo pipefail
 
-        eval "$(ssh-agent -s)"
+              eval "$(ssh-agent -s)"
 
-        # Persist agent variables for subsequent steps
-        echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> $GITHUB_ENV
-        echo "SSH_AGENT_PID=$SSH_AGENT_PID" >> $GITHUB_ENV
+              # Persist agent variables for subsequent steps
+              echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> $GITHUB_ENV
+              echo "SSH_AGENT_PID=$SSH_AGENT_PID" >> $GITHUB_ENV
 
-        # Load the SSH private key into the agent.
-        printf '%s\n' "$SSH_PRIVATE_KEY" | ssh-add -
+              # Load the SSH private key into the agent.
+              printf '%s\n' "$SSH_PRIVATE_KEY" | ssh-add -
 
-        # Print the keys loaded. This is useful for debugging and verification.
-        ssh-add -l
+              # Print the keys loaded. This is useful for debugging and verification.
+              ssh-add -l

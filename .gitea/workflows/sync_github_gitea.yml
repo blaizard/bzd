@@ -16,6 +16,9 @@ jobs:
         needs: lease_linux
         runs-on: linux
         steps:
+            # Needed to access the .gitea/actions/...
+            - uses: actions/checkout@v3
+
             - name: "Set the SSH key"
               uses: ./.gitea/actions/ssh_key
               with:
@@ -27,9 +30,10 @@ jobs:
 
                   BRANCH=master
 
-                  # Initialize a temporary Git repository to compare the branches.
-                  git init
+                  # Initialize.
+                  git remote remove github || true
                   git remote add github git@github.com:blaizard/bzd.git
+                  git remote remove gitea || true
                   git remote add gitea ssh://git@10.10.0.2:6222/blaise/bzd.git
 
                   # Fetch
