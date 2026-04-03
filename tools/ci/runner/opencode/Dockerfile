@@ -5,5 +5,5 @@ RUN sudo apt-get update && sudo apt-get install -y \
 	nodejs
 
 RUN sudo npm install -g opencode-ai@latest
-
-COPY opencode.json /home/testuser/.config/opencode/opencode.json
+# This ensure the migration of the database.
+RUN opencode db path

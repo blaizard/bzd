@@ -15,7 +15,10 @@ RUN apt-get update && apt-get install -y \
 	sudo \
 	build-essential \
 	python3 \
-	nodejs
+	nodejs \
+	jq \
+	sed \
+	openssh-client
 
 # Set user and group.
 ARG user=testuser
