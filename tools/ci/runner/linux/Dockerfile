@@ -35,3 +35,9 @@ RUN echo "\"${user}\" ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 # Switch to user
 USER ${uid}:${gid}
+
+# Add known hosts for git operations
+RUN mkdir -p ~/.ssh
+RUN ssh-keyscan github.com >> ~/.ssh/known_hosts
+RUN ssh-keyscan -p 6222 10.10.0.2 >> ~/.ssh/known_hosts
+RUN chmod 644 ~/.ssh/known_hosts

@@ -31,9 +31,9 @@ jobs:
                   BRANCH=master
 
                   # Initialize.
-                  git remote remove github || true
+                  git remote remove github 2>/dev/null || true
                   git remote add github git@github.com:blaizard/bzd.git
-                  git remote remove gitea || true
+                  git remote remove gitea 2>/dev/null || true
                   git remote add gitea ssh://git@10.10.0.2:6222/blaise/bzd.git
 
                   # Fetch
@@ -42,6 +42,9 @@ jobs:
 
                   github_sha=$(git rev-parse refs/remotes/github/$BRANCH)
                   gitea_sha=$(git rev-parse refs/remotes/gitea/$BRANCH)
+
+                  echo "Github SHA: $github_sha"
+                  echo "Gitea SHA: $gitea_sha"
 
                   if [ "$github_sha" == "$gitea_sha" ]; then
                       echo "Branches are already in sync. No action needed."
