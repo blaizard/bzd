@@ -31,9 +31,9 @@ jobs:
                   BRANCH=master
 
                   # Initialize.
-                  git remote remove github >/dev/null || true
+                  git remote remove github >/dev/null 2>&1 || true
                   git remote add github git@github.com:blaizard/bzd.git
-                  git remote remove gitea >/dev/null || true
+                  git remote remove gitea >/dev/null 2>&1 || true
                   git remote add gitea ssh://git@10.10.0.2:6222/blaise/bzd.git
 
                   # Fetch
