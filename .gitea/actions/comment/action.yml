@@ -22,16 +22,15 @@ runs:
     using: composite
     shell: bash
     run: |
-        payload=$(jq -n --rawfile body "${{ inputs.body_file }}" '{body: $body}')
-        httpCode=$(curl -sS -o /tmp/gitea-comment-response.json -w "%{http_code}" -X POST \
-          -H "Authorization: token ${{ inputs.token }}" \
-          -H "Content-Type: application/json" \
-          -d "$payload" \
-          "${{ inputs.server_url }}/api/v1/repos/${{ inputs.repository }}/issues/${{ inputs.issue_number }}/comments")
-
-        if [ "${httpCode}" -lt 200 ] || [ "${httpCode}" -ge 300 ]; then
-          echo "Failed to create comment. HTTP status code: $httpCode"
-          cat /tmp/gitea-comment-response.json
-          exit 1
+        set -euo pipefail
+        if [ ! -s "${{ inputs.body_file }}" ]; then
+            echo "Error: Body file '${{ inputs.body_file }}' is missing or empty."
+            exit 1
         fi
-        echo "Comment created successfully."
+        payload=$(jq -n --rawfile body "${{ inputs.body_file }}" '{body: $body}')
+        curl -sS --fail-with-body -X POST \
+            -H "Authorization: token ${{ inputs.token }}" \
+            -H "Content-Type: application/json" \
+            -d "$payload" \
+            "${{ inputs.server_url }}/api/v1/repos/${{ inputs.repository }}/issues/${{ inputs.issue_number }}/comments"
+        echo "SUCCESS: comment created."

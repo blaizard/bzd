@@ -8,12 +8,14 @@ on:
 
 jobs:
     lease_linux:
+        if: github.actor != 'agent'
         runs-on: node_manager_client
         steps:
             - name: "Lease Linux"
               uses: https://git.blaizard.com/blaise/deployment/ci/gitea/lease_linux@main
 
     handle_issue:
+        needs: lease_linux
         runs-on: opencode
         steps:
             - uses: actions/checkout@v3
@@ -32,8 +34,8 @@ jobs:
                   GITEA_REPOSITORY: ${{ github.repository }}
                   GITEA_ISSUE_NUMBER: ${{ github.event.issue.number }}
               run: |
-                  ./bin/bzd-lease opencode run --agent plan "
-                    You are working on the repository '${GITEA_REPOSITORY}'' and handling issue #${GITEA_ISSUE_NUMBER}.
+                  PROMPT="
+                    You are working on the repository '${GITEA_REPOSITORY}' and handling issue #${GITEA_ISSUE_NUMBER}.
 
                     Use the Gitea MCP to:
                     1. Fetch the issue details (title, body, labels, comments).
@@ -41,13 +43,28 @@ jobs:
                        previous clarifications, and any plans already discussed.
                     3. Check for any related issues or pull requests that might be relevant to this issue.
 
-                    Once you have gathered all the context, respond with ONE of the following:
-                    - If you need clarifiaction, write your question and ask for more details.
-                    - If everything is clear, start with 'PLAN: ' followed by a detailed implementation plan.
+                    INSTRUCTIONS FOR ANALYSIS:
+                    - Use the fetched data to identify the technical root cause.
+                    - If the issue body or comments lack information to elaborate a precise plan, you MUST ask a QUESTION.
+                    - Do NOT repeat the issue metadata (Title, Body, Comments) in your response. I already have that.
 
-                    Do NOT post any comments on the issue yourself. Just provide the plan or questions in your response.
-                  " > /tmp/agent-response.txt
-                  echo "Response from agent:"
+                    STRICT OUTPUT FORMAT:
+                    Your response must contain ONLY the implementation steps or the clarification request. 
+                    CRITICAL: If you do not follow the response requirement format, the CI will fail.
+
+                    CHOOSE ONE:
+
+                    PLAN:
+                    1. [Step 1]
+                    2. [Step 2]
+                    ...
+
+                    QUESTION:
+                    [Your specific question here]
+                  "
+                  echo "PROMPT: $PROMPT"
+                  ./bin/bzd-lease opencode run "$PROMPT" > /tmp/agent-response.txt
+                  echo "RESPONSE:"
                   cat /tmp/agent-response.txt
 
             - name: "Check response type"
@@ -56,8 +73,9 @@ jobs:
                       echo "Response is a plan."
                       echo "type=plan" >> $GITHUB_OUTPUT
                   else
-                      echo "Response is a comment."
-                      echo "type=comment" >> $GITHUB_OUTPUT
+                      echo "Response is a question."
+                      echo "type=question" >> $GITHUB_OUTPUT
+                      sed -i 's/^[[:space:]]*QUESTION:[[:space:]]*//' /tmp/agent-response.txt
                   fi
 
             - name: "Post comment on issue"

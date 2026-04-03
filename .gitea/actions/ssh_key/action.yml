@@ -1,0 +1,27 @@
+name: ssh_key
+description: "Set up SSH keys for deployment"
+
+inputs:
+    ssh_private_key:
+        description: "The SSH private key to use for deployment (should be provided as a secret)"
+        required: true
+
+runs:
+    using: composite
+    shell: bash
+    env:
+        SSH_PRIVATE_KEY: ${{ inputs.ssh_private_key }}
+    run: |
+        set -euo pipefail
+
+        eval "$(ssh-agent -s)"
+
+        # Persist agent variables for subsequent steps
+        echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> $GITHUB_ENV
+        echo "SSH_AGENT_PID=$SSH_AGENT_PID" >> $GITHUB_ENV
+
+        # Load the SSH private key into the agent.
+        printf '%s\n' "$SSH_PRIVATE_KEY" | ssh-add -
+
+        # Print the keys loaded. This is useful for debugging and verification.
+        ssh-add -l

@@ -1,0 +1,55 @@
+name: "GitHub <-> Gitea"
+
+on:
+    workflow_dispatch: # allows manual triggering
+    schedule:
+        - cron: "0 2 * * *" # runs daily at 02:00
+
+jobs:
+    lease_linux:
+        runs-on: node_manager_client
+        steps:
+            - name: "Lease Linux"
+              uses: https://git.blaizard.com/blaise/deployment/ci/gitea/lease_linux@main
+
+    handle_issue:
+        needs: lease_linux
+        runs-on: linux
+        steps:
+            - name: "Set the SSH key"
+              uses: ./.gitea/actions/ssh_key
+              with:
+                  ssh_private_key: ${{ secrets.BZD_SYNC_GITHUB_GITEA_SSH_KEY }}
+
+            - name: "GitHub <-> Gitea"
+              run: |
+                  set -euo pipefail
+
+                  BRANCH=master
+
+                  # Initialize a temporary Git repository to compare the branches.
+                  git init
+                  git remote add github git@github.com:blaizard/bzd.git
+                  git remote add gitea ssh://git@10.10.0.2:6222/blaise/bzd.git
+
+                  # Fetch
+                  git fetch github $BRANCH:refs/remotes/github/$BRANCH
+                  git fetch gitea $BRANCH:refs/remotes/gitea/$BRANCH
+
+                  github_sha=$(git rev-parse refs/remotes/github/$BRANCH)
+                  gitea_sha=$(git rev-parse refs/remotes/gitea/$BRANCH)
+
+                  if [ "$github_sha" == "$gitea_sha" ]; then
+                      echo "Branches are already in sync. No action needed."
+                  fi
+
+                  if git merge-base --is-ancestor "$github_sha" "$gitea_sha"; then
+                      echo "GitHub branch is behind Gitea. Fast-forwarding GitHub branch."
+                      git push github refs/remotes/gitea/$BRANCH:refs/heads/$BRANCH
+                  elif git merge-base --is-ancestor "$gitea_sha" "$github_sha"; then
+                      echo "Gitea branch is behind GitHub. Fast-forwarding Gitea branch."
+                      git push gitea refs/remotes/github/$BRANCH:refs/heads/$BRANCH
+                  else
+                      echo "Branches have diverged. Manual intervention required."
+                      exit 1
+                  fi
