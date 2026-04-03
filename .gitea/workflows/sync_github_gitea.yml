@@ -48,14 +48,15 @@ jobs:
 
                   if [ "$github_sha" == "$gitea_sha" ]; then
                       echo "Branches are already in sync. No action needed."
-                  fi
 
-                  if git merge-base --is-ancestor "$github_sha" "$gitea_sha"; then
+                  elif git merge-base --is-ancestor "$github_sha" "$gitea_sha"; then
                       echo "GitHub branch is behind Gitea. Fast-forwarding GitHub branch."
                       git push github refs/remotes/gitea/$BRANCH:refs/heads/$BRANCH
+
                   elif git merge-base --is-ancestor "$gitea_sha" "$github_sha"; then
                       echo "Gitea branch is behind GitHub. Fast-forwarding Gitea branch."
                       git push gitea refs/remotes/github/$BRANCH:refs/heads/$BRANCH
+
                   else
                       echo "Branches have diverged. Manual intervention required."
                       exit 1
