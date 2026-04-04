@@ -13,6 +13,9 @@ jobs:
         steps:
             - name: "Lease Linux"
               uses: https://git.blaizard.com/blaise/deployment/ci/gitea/lease_linux@main
+              with:
+                  name: "opencode_issue"
+                  ttl: "300"
 
     handle_issue:
         needs: lease_linux

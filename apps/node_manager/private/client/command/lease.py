@@ -4,6 +4,7 @@ import threading
 import subprocess
 
 from apps.node_manager.private.client.command.common import getHostPort
+from apps.node_manager.private.client.command.lease_period import leasePeriod
 from bzd.http.client import HttpClient
 
 
@@ -21,12 +22,7 @@ def commandLease(
 	stopHeartbeat = threading.Event()
 
 	# Register the workload
-	try:
-		response = httpClient.post(f"{baseUrl}/workload/register", json={"name": name, "ttl": ttl})
-		leaseId = response.text
-	except Exception as e:
-		print(f"Failed to register workload: {e}")
-		return 1
+	leaseId = leasePeriod(baseUrl=baseUrl, name=name, ttl=ttl, httpClient=httpClient)
 
 	def heartbeatLoop() -> None:
 		while not stopHeartbeat.is_set():

@@ -11,6 +11,9 @@ jobs:
         steps:
             - name: "Lease Linux"
               uses: https://git.blaizard.com/blaise/deployment/ci/gitea/lease_linux@main
+              with:
+                  name: "sync_github_gitea"
+                  ttl: "300"
 
     handle_issue:
         needs: lease_linux

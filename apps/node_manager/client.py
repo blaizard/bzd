@@ -5,6 +5,7 @@ from apps.node_manager.private.client.command.wake_on_lan import commandWakeOnLa
 from apps.node_manager.private.client.command.suspend import commandSuspend
 from apps.node_manager.private.client.command.shutdown import commandShutdown
 from apps.node_manager.private.client.command.lease import commandLease
+from apps.node_manager.private.client.command.lease_period import commandLeasePeriod
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Wake On Lan client.")
@@ -61,6 +62,20 @@ if __name__ == "__main__":
 	)
 	leaseParser.add_argument("workload", nargs=argparse.REMAINDER, help="The command to execute.")
 
+	leasePreriodParser = subparsers.add_parser("lease-period", help="Register a workload for a predefined period.")
+	leasePreriodParser.add_argument("ip", help="The ip:port address for the machine to register the workload.")
+	leasePreriodParser.add_argument(
+		"--name",
+		default="unknown",
+		help="The name of the workload.",
+	)
+	leasePreriodParser.add_argument(
+		"--ttl",
+		default=60,
+		type=int,
+		help="The time-to-live of the workload lease.",
+	)
+
 	args = parser.parse_args()
 
 	if args.command == "wol":
@@ -83,5 +98,11 @@ if __name__ == "__main__":
 			command=args.workload,
 		)
 		sys.exit(returnCode)
+	elif args.command == "lease-period":
+		commandLeasePeriod(
+			server=args.ip,
+			name=args.name,
+			ttl=args.ttl,
+		)
 	else:
 		assert False, f"Unknown command: '{args.command}'."

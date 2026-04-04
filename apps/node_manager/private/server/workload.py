@@ -38,6 +38,7 @@ class Workload:
 		self.terminateFn_ = terminateFn
 		self.clockFn_ = clockFn
 		self.lock_ = threading.Lock()
+		self.shutingDown_ = False
 		self.terminationTimestamp_: typing.Optional[float] = (
 			None if defaultTerminationPeriodS is None else (self.clockFn_() + defaultTerminationPeriodS)
 		)
@@ -100,8 +101,10 @@ class Workload:
 			self.terminationTimestamp_ = now + self.terminationGracePeriodS_
 
 		# If the termination period is expired, call terminate.
-		if self.terminationTimestamp_ <= now:
-			self.terminateFn_()
+		with self.lock_:
+			if self.terminationTimestamp_ <= now:
+				self.shutingDown_ = True
+				self.terminateFn_()
 
 	def getActiveLeases(self) -> typing.Dict[str, typing.Any]:
 		"""Show the active leases."""
@@ -127,6 +130,7 @@ class Workload:
 
 		data = context.readJson()
 		leaseId = self.register(name=data.get("name", "unknown"), ttl=int(data.get("ttl", 900)))
+		assert not self.shutingDown_, "Shutdown is in progress, no new heartbeat can be accepted."
 		context.header("Content-Type", "text/plain")
 		context.write(leaseId)
 
@@ -136,6 +140,7 @@ class Workload:
 		data = context.readJson()
 		leaseId = data["id"]
 		ok = self.heartBeat(leaseId=leaseId, ttl=int(data.get("ttl", 900)))
+		assert not self.shutingDown_, "Shutdown is in progress, no new heartbeat can be accepted."
 		assert ok, f"The lease '{leaseId}' doesn't exists."
 
 	def handlerRelease(self, context: RESTServerContext) -> None:

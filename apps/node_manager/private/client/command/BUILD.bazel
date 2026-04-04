@@ -62,6 +62,21 @@ py_library(
     ],
     deps = [
         ":common",
+        ":lease_period",
+        "@bzd_python//bzd/http:client",
+    ],
+)
+
+py_library(
+    name = "lease_period",
+    srcs = [
+        "lease_period.py",
+    ],
+    visibility = [
+        "//apps/node_manager:__pkg__",
+    ],
+    deps = [
+        ":common",
         "@bzd_python//bzd/http:client",
     ],
 )
