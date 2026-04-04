@@ -3,7 +3,7 @@ name: "GitHub <-> Gitea"
 on:
     workflow_dispatch: # allows manual triggering
     schedule:
-        - cron: "0 2 * * *" # runs daily at 02:00
+        - cron: "0 17 * * *" # runs daily at 17:00 UTC (02:00 JST)
 
 jobs:
     lease_linux:

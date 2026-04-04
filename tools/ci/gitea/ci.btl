@@ -3,7 +3,7 @@ name: CI
 on:
     workflow_dispatch: # allows manual triggering
     schedule:
-        - cron: "0 2 * * *" # runs daily at 02:00
+        - cron: "0 17 * * *" # runs daily at 17:00 UTC (02:00 JST)
 
 jobs:
     lease_linux:
@@ -11,6 +11,9 @@ jobs:
         steps:
             - name: "Lease Linux"
               uses: https://git.blaizard.com/blaise/deployment/ci/gitea/lease_linux@main
+              with:
+                  name: "ci"
+                  ttl: "300"
 
     build_linux:
         needs: lease_linux
@@ -38,7 +41,7 @@ jobs:
             - name: "[{{ stage.category }}] {{ stage.name }}"
               run: |
               {% for index, command in stage.commands %}
-                  ./bin/bzd-lease ./bin/bzd-node timeit --path gitea/{{ stage.category | normalizeIdentifier }}_{{ stage.name | normalizeIdentifier }}/command-{{ index }} \
+                  ./bin/bzd-node timeit --path gitea/{{ stage.category | normalizeIdentifier }}_{{ stage.name | normalizeIdentifier }}/command-{{ index }} \
                   {{ command }}
               {% end %}
               {% if stage.category == "coverage" %}

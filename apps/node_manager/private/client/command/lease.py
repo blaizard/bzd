@@ -26,9 +26,10 @@ def commandLease(
 
 	def heartbeatLoop() -> None:
 		while not stopHeartbeat.is_set():
-			# Sleep for half of the TTL to ensure we heartbeat in time.
-			# But also don't wait forever if we want to stop.
-			if stopHeartbeat.wait(ttl / 2):
+			# Sleep for half of the TTL to ensure we heartbeat in time,
+			# but at most 10 seconds.
+			# Also don't wait forever if we want to stop.
+			if stopHeartbeat.wait(min(ttl / 2, 10)):
 				break
 			try:
 				httpClient.post(f"{baseUrl}/workload/heartbeat", json={"id": leaseId, "ttl": ttl})
