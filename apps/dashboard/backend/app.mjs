@@ -36,9 +36,7 @@ class EventsFactory {
 		.useLoggerMemory()
 		.setup();
 
-	let cache = new Cache({
-		garbageCollector: !backend.test,
-	});
+	let cache = new Cache();
 	let plugins = {};
 	let pluginClasses = {};
 	let events = {};

@@ -272,6 +272,13 @@
 					text = "-" + downtimeText;
 					tooltips.push("Expected down time in " + downtimeText + " (" + parseInt(this.metadata.downtime) + "s)");
 				}
+				if (this.metadata.leases) {
+					let tooltip = [];
+					for (const [leaseId, lease] of Object.entries(this.metadata.leases)) {
+						tooltip.push(" - " + (lease.name || leaseId) + ": " + timeMsToString(lease.ttl));
+					}
+					tooltips.push("Leases:<br/>" + tooltip.join("<br/>"));
+				}
 				if (text) {
 					return {
 						text: text,

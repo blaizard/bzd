@@ -44,6 +44,7 @@ export default class Nodes {
 						["version"],
 						["uptime"],
 						["downtime"],
+						["leases"],
 					],
 				});
 

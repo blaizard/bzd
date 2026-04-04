@@ -92,7 +92,7 @@ class Cache {
 				timeoutMs: 30 * 1000,
 				maxSize: 1000000, // 1MB
 				maxEntries: 100,
-				garbageCollector: true,
+				garbageCollector: false, //  Doesn't work.
 				garbageCollectorPeriodMs: 10000, // Every 10s
 			},
 			config,
