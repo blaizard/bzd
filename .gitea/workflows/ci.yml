@@ -104,8 +104,3 @@ jobs:
               if: always()
               run: |
                   ./info.sh
-
-            - name: "Disable Remote Execution"
-              if: always()
-              run: |
-                  ./tools/bazel run //deployment:remote_shutdown --config=local
