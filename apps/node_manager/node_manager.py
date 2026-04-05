@@ -54,9 +54,9 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 
 	def terminateFn() -> None:
-		print("Shutdown in 5s...")
+		print("Suspending in 5s...")
 		time.sleep(5)
-		handlerShutdown()
+		handlerSuspend()
 
 	# Instantiate the monitor.
 	config = Config(path=args.config)

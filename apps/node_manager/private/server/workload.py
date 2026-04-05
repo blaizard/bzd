@@ -43,6 +43,13 @@ class Workload:
 			None if defaultTerminationPeriodS is None else (self.clockFn_() + defaultTerminationPeriodS)
 		)
 
+	def reset(self) -> None:
+		"""Reset everything to restart from a fresh state."""
+		self.terminationTimestamp_ = self.terminationGracePeriodS_
+		self.uidCounter_ = 0
+		self.leases_ = {}
+		self.shutingDown_ = False
+
 	def makeUid_(self) -> str:
 		self.uidCounter_ += 1
 		return str(self.uidCounter_)
@@ -105,6 +112,8 @@ class Workload:
 			if self.terminationTimestamp_ <= now:
 				self.shutingDown_ = True
 				self.terminateFn_()
+				# Wake up from suspend.
+				self.reset()
 
 	def getActiveLeases(self) -> typing.Dict[str, typing.Any]:
 		"""Show the active leases."""
