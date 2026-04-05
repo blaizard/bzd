@@ -34,6 +34,7 @@ jobs:
                   ./tools/bazel build //deployment:lease --remote_download_toplevel
                   mv bazel-bin/deployment/lease bin/bzd-lease
                   export BAZEL_RUN_UNDER=./bin/bzd-lease
+                  echo "BAZEL_RUN_UNDER=$BAZEL_RUN_UNDER" >> $GITHUB_ENV
                   ./tools/bazel build //tools/ci:bzd_node --remote_download_toplevel --//apps/artifacts/api:config.set=remotes=[https://datalocal.blaizard.com]
                   mv bazel-bin/tools/ci/bzd_node bin/bzd-node
 
