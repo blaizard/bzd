@@ -43,11 +43,20 @@ class Workload:
 			None if defaultTerminationPeriodS is None else (self.clockFn_() + defaultTerminationPeriodS)
 		)
 
-	def reset(self) -> None:
-		"""Reset everything to restart from a fresh state."""
+	def terminate(self) -> None:
+		"""Terminate and handle wake up to a fresh state."""
+
+		# This disable all APIs.
+		self.shutingDown_ = True
+
+		self.terminateFn_()
+
+		print("Waking up from suspend.")
 		self.terminationTimestamp_ = self.terminationGracePeriodS_
 		self.uidCounter_ = 0
 		self.leases_ = {}
+
+		# Re-enable all APIs.
 		self.shutingDown_ = False
 
 	def makeUid_(self) -> str:
@@ -110,10 +119,7 @@ class Workload:
 		# If the termination period is expired, call terminate.
 		with self.lock_:
 			if self.terminationTimestamp_ <= now:
-				self.shutingDown_ = True
-				self.terminateFn_()
-				# Wake up from suspend.
-				self.reset()
+				self.terminate()
 
 	def getActiveLeases(self) -> typing.Dict[str, typing.Any]:
 		"""Show the active leases."""
