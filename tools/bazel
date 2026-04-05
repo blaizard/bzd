@@ -9,6 +9,7 @@ import shutil
 import stat
 import struct
 import subprocess
+import shlex
 import sys
 import ssl
 
@@ -83,7 +84,10 @@ if __name__== "__main__":
 
 	# Run under at bazel level (useful for CI).
 	maybeBazelRunUnder = os.environ.get("BAZEL_RUN_UNDER")
-	runUnder = [maybeBazelRunUnder] if maybeBazelRunUnder else []
+	runUnder = []
+	if maybeBazelRunUnder:
+		runUnder = shlex.split(maybeBazelRunUnder)
+		print(f"Running bazel under {maybeBazelRunUnder}")
 
 	try:
 		# Forward commands to the real bazel
