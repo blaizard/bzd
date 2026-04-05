@@ -87,7 +87,7 @@ if __name__== "__main__":
 	runUnder = []
 	if maybeBazelRunUnder:
 		runUnder = shlex.split(maybeBazelRunUnder)
-		print(f"Running bazel under {maybeBazelRunUnder}")
+		print(f"Running bazel under {maybeBazelRunUnder}", flush=True)
 
 	try:
 		# Forward commands to the real bazel
