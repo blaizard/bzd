@@ -1,0 +1,60 @@
+name: checkout
+description: "Checkout a repository to the runner's workspace"
+
+inputs:
+    submodules:
+        description: "Whether to fetch submodules. Can be 'true' or 'false'."
+        required: false
+        default: "false"
+    token:
+        description: "The token to use for authentication. Can be a personal access token or the GITHUB_TOKEN secret."
+        required: false
+        default: "${{ secrets.GITHUB_TOKEN }}"
+
+runs:
+    using: composite
+    steps:
+        - name: "Checkout the repository"
+          shell: bash
+          env:
+              SERVER_URL: ${{ github.server_url }}
+              REPOSITORY: ${{ github.repository }}
+              SHA: ${{ github.sha }}
+              TOKEN: ${{ inputs.token }}
+          run: |
+              set -euo pipefail
+
+              # Clean up any existing git state
+              rm -rf .git
+
+              # Initialize git repository and set remote
+              git config --global init.defaultBranch ${{ github.event.repository.default_branch }}
+              git init .
+              git remote add origin "${SERVER_URL}/${REPOSITORY}.git"
+
+              # Check if TOKEN is provided and set up git authentication
+              if [[ -n "${TOKEN:-}" ]]; then
+                host="${SERVER_URL#*://}"
+                git config --local url."https://x-access-token:${TOKEN}@${host}".insteadOf "https://${host}"
+              else
+                echo "No token provided, skipping authentication setup."
+              fi
+
+              # Fetch the specific commit
+              git fetch --no-tags --depth=1 origin "${SHA}"
+              git checkout --detach "${SHA}"
+
+              echo "Status:"
+              git rev-parse HEAD
+
+        - name: "Checkout submodules"
+          if: inputs.submodules == 'true'
+          shell: bash
+          run: |
+              set -euo pipefail
+
+              git submodule sync --recursive
+              git submodule update --init --recursive --depth=1
+
+              echo "Submodule status:"
+              git submodule status --recursive

@@ -1,0 +1,29 @@
+name: comment_delete
+description: "Delete a comment on an issue"
+
+inputs:
+    api_url:
+        description: "The Gitea API URL (e.g., https://gitea.com/api/v1)"
+        required: true
+    repository:
+        description: "The repository to delete the comment from (format: owner/repo)"
+        required: true
+    token:
+        description: "Gitea personal access token with permissions delete comment on issues"
+        required: true
+    comment_id:
+        description: "The comment ID to delete"
+        required: true
+
+runs:
+    using: composite
+    steps:
+        - name: "Delete a comment"
+          shell: bash
+          run: |
+              set -euo pipefail
+              curl -sS --fail-with-body -X DELETE \
+                  -H "Authorization: token ${{ inputs.token }}" \
+                  -H "Accept: application/json" \
+                  "${{ inputs.api_url }}/repos/${{ inputs.repository }}/issues/comments/${{ inputs.comment_id }}"
+              echo "SUCCESS: comment deleted."

@@ -15,7 +15,6 @@ RUN apt-get update && apt-get install -y \
 	sudo \
 	build-essential \
 	python3 \
-	nodejs \
 	jq \
 	sed \
 	openssh-client

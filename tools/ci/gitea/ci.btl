@@ -19,22 +19,14 @@ jobs:
         needs: lease_linux
         runs-on: linux
         steps:
-            - uses: actions/checkout@v3
-              with:
-                  submodules: "true"
+            - uses: https://git.blaizard.com/blaise/deployment/ci/gitea/setup@main
 
-            - name: "Environment"
+            - name: "Info"
               run: |
-                  cp tools/ci/gitea/.bazelrc.local .bazelrc.local
                   ./info.sh
 
             - name: "Build Tools"
               run: |
-                  mkdir bin
-                  ./tools/bazel build //deployment:lease --remote_download_toplevel
-                  mv bazel-bin/deployment/lease bin/bzd-lease
-                  export BAZEL_RUN_UNDER=./bin/bzd-lease
-                  echo "BAZEL_RUN_UNDER=$BAZEL_RUN_UNDER" >> $GITHUB_ENV
                   ./tools/bazel build //tools/ci:bzd_node --remote_download_toplevel --//apps/artifacts/api:config.set=remotes=[https://datalocal.blaizard.com]
                   mv bazel-bin/tools/ci/bzd_node bin/bzd-node
 

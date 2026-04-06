@@ -1,0 +1,49 @@
+name: pr
+description: "Create a PR"
+
+inputs:
+    api_url:
+        description: "The Gitea API URL (e.g., https://gitea.com/api/v1)"
+        required: true
+    repository:
+        description: "The repository to comment on (format: owner/repo)"
+        required: true
+    token:
+        description: "Gitea personal access token with permissions to create a pr"
+        required: true
+    title:
+        description: "Title of the PR"
+        required: true
+    body_file:
+        description: "Path to a file containing the pr description (supports markdown)"
+        required: true
+    base_branch:
+        description: "The base branch for the PR (default: master)"
+        required: true
+    head_branch:
+        description: "The head branch for the PR (default: current branch)"
+        required: false
+
+runs:
+    using: composite
+    steps:
+        - name: "Create a PR"
+          shell: bash
+          run: |
+              set -euo pipefail
+              if [ ! -s "${{ inputs.body_file }}" ]; then
+                  echo "Error: Body file '${{ inputs.body_file }}' is missing or empty."
+                  exit 1
+              fi
+              payload=$(jq -n \
+                --arg title "${{ inputs.title }}" \
+                --rawfile body "${{ inputs.body_file }}" \
+                --arg head "${{ inputs.head_branch }}" \
+                --arg base "${{ inputs.base_branch }}" \
+                '{title: $title, body: $body, head: $head, base: $base}')
+              curl -sS --fail-with-body -X POST \
+                  -H "Authorization: token ${{ inputs.token }}" \
+                  -H "Content-Type: application/json" \
+                  -d "$payload" \
+                  "${{ inputs.api_url }}/repos/${{ inputs.repository }}/pulls"
+              echo "SUCCESS: PR created."

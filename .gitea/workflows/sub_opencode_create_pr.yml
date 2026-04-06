@@ -1,0 +1,92 @@
+name: Create a PR
+
+on:
+  workflow_call:
+
+jobs:
+    create_pr:
+        runs-on: opencode
+        steps:
+            - uses: https://git.blaizard.com/blaise/deployment/ci/gitea/setup@main
+              with:
+                  git_token: ${{ secrets.BZD_AGENT_TOKEN }}
+
+            - name: "Create PR description from comment"
+              env:
+                  ISSUE_NUMBER: ${{ github.event.issue.number }}
+                  TOKEN: ${{ github.token }}
+                  SERVER_URL: ${{ github.server_url }}
+                  API_URL: ${{ github.api_url }}
+                  REPOSITORY: ${{ github.repository }}
+                  CURRENT_COMMENT_BODY: ${{ github.event.comment.body }}
+                  CURRENT_COMMENT_ID: ${{ github.event.comment.id }}
+              run: |
+                  set -euo pipefail
+
+                  TARGET_ID=$(echo "${CURRENT_COMMENT_BODY}" | awk '{print $2}')
+                  echo "Input target ID: ${TARGET_ID}"
+
+                  if [[ -n "${TARGET_ID}" && "${TARGET_ID}" =~ ^[0-9]+$ ]]; then
+                    echo "Specific comment requested. Fetching ID: $TARGET_ID"
+
+                    COMMENT_JSON=$(curl -sSL -H "Authorization: token ${TOKEN}" \
+                      -H "Accept: application/json" \
+                      "${API_URL}/repos/${REPOSITORY}/issues/comments/${TARGET_ID}")
+                    TARGET_BODY=$(echo "${COMMENT_JSON}" | jq -r '.body')
+
+                  else
+                    echo "No valid comment ID provided. Fetching the previous comment..."
+                    
+                    COMMENTS_JSON=$(curl -sSL -H "Authorization: token ${TOKEN}" \
+                      -H "Accept: application/json" \
+                      "${API_URL}/repos/${REPOSITORY}/issues/${ISSUE_NUMBER}/comments")
+                    TARGET_BODY=$(echo "${COMMENTS_JSON}" | jq -r --argjson current_id "${CURRENT_COMMENT_ID}" '[.[] | select(.id < $current_id)] | last | .body')
+                  fi
+
+                  # Final safety check
+                  if [[ "$TARGET_BODY" == "null" || -z "$TARGET_BODY" ]]; then
+                    echo "Error: Could not retrieve target text. The comment might have been deleted."
+                    exit 1
+                  fi
+
+                  echo "$TARGET_BODY" > /tmp/pr-description.txt
+                  echo -e "\n\nCreated from [Issue #${ISSUE_NUMBER}](${SERVER_URL}/${REPOSITORY}/issues/${ISSUE_NUMBER})" >> /tmp/pr-description.txt
+                  echo "Successfully retrieved target body!"
+                  echo  "==== description ============================================"
+                  cat /tmp/pr-description.txt
+
+            - name: "Create branch for PR"
+              env:
+                  ISSUE_NUMBER: ${{ github.event.issue.number }}
+                  RUN_ID: ${{ github.run_id }}
+              run: |
+                  set -euo pipefail
+
+                  PR_HEAD_BRANCH="agent/issue-${ISSUE_NUMBER}/${RUN_ID}"
+                  PR_TITLE="Fix: ${{ github.event.issue.title }}"
+                  echo "PR_TITLE=${PR_TITLE}" >> $GITHUB_ENV
+                  echo "PR_HEAD_BRANCH=${PR_HEAD_BRANCH}" >> $GITHUB_ENV
+
+                  # Create a new branch with an empty PR.
+                  git checkout -b "${PR_HEAD_BRANCH}"
+                  git commit --allow-empty -m "${PR_TITLE}"
+                  git push -u origin "${PR_HEAD_BRANCH}"
+
+            - name: "Create a PR"
+              uses: ./.gitea/actions/pr
+              with:
+                  api_url: ${{ github.api_url }}
+                  repository: ${{ github.repository }}
+                  token: ${{ secrets.BZD_AGENT_TOKEN }}
+                  title: ${{ env.PR_TITLE }}
+                  base_branch: ${{ github.event.repository.default_branch }}
+                  head_branch: ${{ env.PR_HEAD_BRANCH }}
+                  body_file: /tmp/pr-description.txt
+
+            - name: "Delete comment"
+              uses: ./.gitea/actions/comment_delete
+              with:
+                  api_url: ${{ github.api_url }}
+                  repository: ${{ github.repository }}
+                  token: ${{ secrets.BZD_AGENT_TOKEN }}
+                  comment_id: ${{ github.event.comment.id }}

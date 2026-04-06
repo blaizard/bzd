@@ -1,48 +1,23 @@
-name: Issue Event Handler with Opencode
+name: Add a comment with a plan or clarification question
 
 on:
-    issues:
-        types: [opened, labeled]
-    issue_comment:
-        types: [created, edited]
+  workflow_call:
 
 jobs:
-    lease_linux:
-        if: github.actor != 'agent'
-        runs-on: node_manager_client
-        steps:
-            - name: "Lease Linux"
-              uses: https://git.blaizard.com/blaise/deployment/ci/gitea/lease_linux@main
-              with:
-                  name: "opencode_issue"
-                  ttl: "300"
-
-    handle_issue:
-        needs: lease_linux
+    create_comment:
         runs-on: opencode
         steps:
-            - uses: actions/checkout@v3
+            - uses: https://git.blaizard.com/blaise/deployment/ci/gitea/setup@main
               with:
-                  submodules: "true"
-
-            - name: "Environment"
-              run: |
-                  cp tools/ci/gitea/.bazelrc.local .bazelrc.local
-
-            - name: "Build Tools"
-              run: |
-                  mkdir bin
-                  ./tools/bazel build //deployment:lease --remote_download_toplevel
-                  mv bazel-bin/deployment/lease bin/bzd-lease
-                  export BAZEL_RUN_UNDER=./bin/bzd-lease
+                  lease: "true"
 
             - name: "Run opencode"
               env:
-                  GITEA_REPOSITORY: ${{ github.repository }}
-                  GITEA_ISSUE_NUMBER: ${{ github.event.issue.number }}
+                  REPOSITORY: ${{ github.repository }}
+                  ISSUE_NUMBER: ${{ github.event.issue.number }}
               run: |
                   PROMPT="
-                    You are working on the repository '${GITEA_REPOSITORY}' and handling issue #${GITEA_ISSUE_NUMBER}.
+                    You are working on the repository '${REPOSITORY}' and handling issue #${ISSUE_NUMBER}.
 
                     Use the Gitea MCP and your available tools to deeply research the context: 
                     1. Fetch the issue details (title, body, labels, comments, etc).
@@ -73,15 +48,17 @@ jobs:
                     (Ask only if exhaustive independent research failed. Briefly state what you investigated and exactly what information is blocking you.)
                     [Your specific question here]
                   "
-                  echo "PROMPT: $PROMPT"
-                  ./bin/bzd-lease opencode run "$PROMPT" > /tmp/agent-response.txt
-                  echo "RESPONSE:"
+                  echo  "==== prompt ================================================="
+                  echo "$PROMPT"
+                  echo  "==== processing ============================================="
+                  bzd-lease opencode run "$PROMPT" > /tmp/agent-response.txt
+                  echo  "==== response ==============================================="
                   cat /tmp/agent-response.txt
 
             - name: "Post comment on issue"
               uses: ./.gitea/actions/comment
               with:
-                  server_url: ${{ github.server_url }}
+                  api_url: ${{ github.api_url }}
                   repository: ${{ github.repository }}
                   issue_number: ${{ github.event.issue.number }}
                   token: ${{ secrets.BZD_AGENT_TOKEN }}

@@ -1,0 +1,62 @@
+name: Update a PR with opencode
+
+on:
+  workflow_call:
+
+jobs:
+    update_pr:
+        runs-on: opencode
+        steps:
+            - uses: https://git.blaizard.com/blaise/deployment/ci/gitea/setup@main
+              with:
+                  lease: "true"
+
+            - name: "Run opencode"
+              env:
+                  REPOSITORY: ${{ github.repository }}
+                  PR_NUMBER: ${{ github.event.pull_request.number }}
+              run: |
+                  PROMPT="
+                    You are an expert software engineer. You are currently assigned to repository '${REPOSITORY}' to implement the changes requested in PR #${PR_NUMBER}.
+
+                    Your primary objective is to write the code required to fulfill the PR description, seamlessly integrate it into the existing codebase, and commit and push the final changes.
+
+                    PHASE 1: CONTEXT & DEEP RESEARCH (Use Gitea MCP & Tools)
+                    1. Fetch the details of PR #${PR_NUMBER} (title, body).
+                    2. TRACE THE ORIGIN: The PR body contains a reference/link to the original issue that triggered this PR. You MUST fetch that original issue and read its entire comment history to understand the exact feature request, prior discussions, and intended architectural approach.
+                    3. DEEP CODEBASE RECONNAISSANCE: Do not guess. Actively search the codebase, read relevant file contents, and trace dependencies. Understand how the modules you need to modify interact with the rest of the system.
+
+                    PHASE 2: IMPLEMENTATION STRATEGY & VALIDATION
+                    - EXHAUST ALL POSSIBILITIES: Before writing code, formulate an implementation plan. Mentally trace the execution path of your proposed changes. Check for potential side-effects, broken imports, or typing errors. 
+                    - AVOID LAZY QUESTIONS: Do not ask a question if the answer can be found by reading the code or investigating independently. You must try everything you can to resolve ambiguities by looking at existing codebase patterns.
+                    - MATCH EXISTING STYLE: Your implementation must strictly adhere to the existing naming conventions, architectural patterns, and coding standards found in the repository.
+
+                    PHASE 3: EXECUTION & COMMIT (CRITICAL)
+                    - Once your implementation is ready and validated, you MUST use your available tools to apply the changes directly to the workspace.
+                    - Stage your changes and create a clean, descriptive Git commit (adhering to conventional commits if the repository uses them).
+                    - Execute the git push to upload your changes to the remote branch associated with PR #${PR_NUMBER}.
+
+                    PHASE 4: OUTPUT
+                    - If you have successfully applied, committed, and pushed the changes, your response must be a brief summary of the completed work.
+                    - If, and ONLY if, you have exhausted all avenues of independent investigation and a critical product decision is completely blocking you from writing the code, you may ask a clarifying QUESTION.
+                    - Do NOT repeat the PR/Issue metadata (Title, Body, Comments) in your response. I already have that context.
+
+                    STRICT OUTPUT FORMAT:
+                    Your response must contain ONLY the summary of the successfully pushed implementation OR the single clarification request. 
+                    CRITICAL: Do not include introductory filler (e.g., \"I will now push the code\" or \"I have researched the issue\"). If you do not follow this exact format, the CI pipeline will fail.
+                  "
+                  echo  "==== prompt ================================================="
+                  echo "$PROMPT"
+                  echo  "==== processing ============================================="
+                  bzd-lease opencode run "$PROMPT" > /tmp/agent-response.txt
+                  echo  "==== response ==============================================="
+                  cat /tmp/agent-response.txt
+
+            - name: "Post comment on PR"
+              uses: ./.gitea/actions/comment
+              with:
+                  api_url: ${{ github.api_url }}
+                  repository: ${{ github.repository }}
+                  issue_number: ${{ github.event.pull_request.number }}
+                  token: ${{ secrets.BZD_AGENT_TOKEN }}
+                  body_file: /tmp/agent-response.txt

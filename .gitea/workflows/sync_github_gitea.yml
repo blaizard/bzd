@@ -19,11 +19,8 @@ jobs:
         needs: lease_linux
         runs-on: linux
         steps:
-            # Needed to access the .gitea/actions/...
-            - uses: actions/checkout@v3
-
             - name: "Set the SSH key"
-              uses: ./.gitea/actions/ssh_key
+              uses: https://git.blaizard.com/blaise/bzd/.gitea/actions/ssh_key@main
               with:
                   ssh_private_key: ${{ secrets.BZD_SYNC_GITHUB_GITEA_SSH_KEY }}
 
@@ -34,9 +31,8 @@ jobs:
                   BRANCH=master
 
                   # Initialize.
-                  git remote remove github >/dev/null 2>&1 || true
+                  git init .
                   git remote add github git@github.com:blaizard/bzd.git
-                  git remote remove gitea >/dev/null 2>&1 || true
                   git remote add gitea ssh://git@10.10.0.2:6222/blaise/bzd.git
 
                   # Fetch

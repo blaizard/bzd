@@ -1,0 +1,68 @@
+name: Opencode Event Router
+
+on:
+    issues:
+        types: [opened, labeled]
+    issue_comment:
+        types: [created, edited]
+    pull_request:
+        types: [opened]
+
+jobs:
+    router:
+        runs-on: node_manager_client
+        outputs:
+            route: ${{ steps.set-route.outputs.route }}
+        steps:
+            - name: "Determine Route"
+              id: set-route
+              env:
+                  EVENT_NAME: ${{ github.event_name }}
+                  COMMENT_BODY: ${{ github.event.comment.body }}
+                  ACTOR: ${{ github.actor }}
+              run: |
+                  if [[ "$EVENT_NAME" == "issue_comment" && "$COMMENT_BODY" != /pr* && "$ACTOR" != "agent" ]]; then
+                      echo "route=issue_comment" >> $GITHUB_OUTPUT
+                      
+                  elif [[ "$EVENT_NAME" == "issue_comment" && "$COMMENT_BODY" == /pr* ]]; then
+                      echo "route=create_pr" >> $GITHUB_OUTPUT
+                      
+                  elif [[ "$EVENT_NAME" == "pull_request" && "$ACTOR" == "agent" ]]; then
+                      echo "route=update_pr" >> $GITHUB_OUTPUT
+                      
+                  else
+                      echo "route=none" >> $GITHUB_OUTPUT
+                      echo "No routing needed for this event."
+                  fi
+
+    lease_linux:
+        needs: router
+        if: needs.router.outputs.route != 'none'
+        runs-on: node_manager_client
+        steps:
+            - name: "Lease Linux"
+              uses: https://git.blaizard.com/blaise/deployment/ci/gitea/lease_linux@main
+              with:
+                  name: "opencode_issue"
+                  ttl: "300"
+
+    route_issue_comment:
+        needs: [router, lease_linux]
+        runs-on: opencode
+        if: needs.router.outputs.route == 'issue_comment'
+        uses: ./.gitea/workflows/sub_opencode_issue_comment.yml
+        secrets: inherit
+
+    route_create_pr:
+        needs: [router, lease_linux]
+        runs-on: opencode
+        if: needs.router.outputs.route == 'create_pr'
+        uses: ./.gitea/workflows/sub_opencode_create_pr.yml
+        secrets: inherit
+
+    route_update_pr:
+        needs: [router, lease_linux]
+        runs-on: opencode
+        if: needs.router.outputs.route == 'update_pr'
+        uses: ./.gitea/workflows/sub_opencode_update_pr.yml
+        secrets: inherit

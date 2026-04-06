@@ -2,8 +2,8 @@ name: comment
 description: "Comment on an issue or pull request"
 
 inputs:
-    server_url:
-        description: "Gitea server URL (e.g., https://gitea.com)"
+    api_url:
+        description: "The Gitea API URL (e.g., https://gitea.com/api/v1)"
         required: true
     repository:
         description: "The repository to comment on (format: owner/repo)"
@@ -34,5 +34,5 @@ runs:
                   -H "Authorization: token ${{ inputs.token }}" \
                   -H "Content-Type: application/json" \
                   -d "$payload" \
-                  "${{ inputs.server_url }}/api/v1/repos/${{ inputs.repository }}/issues/${{ inputs.issue_number }}/comments"
+                  "${{ inputs.api_url }}/repos/${{ inputs.repository }}/issues/${{ inputs.issue_number }}/comments"
               echo "SUCCESS: comment created."
