@@ -1,7 +1,7 @@
 name: Add a comment with a plan or clarification question
 
 on:
-  workflow_call:
+    workflow_call:
 
 jobs:
     create_comment:

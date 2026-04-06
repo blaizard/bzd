@@ -1,7 +1,7 @@
 name: Update a PR with opencode
 
 on:
-  workflow_call:
+    workflow_call:
 
 jobs:
     update_pr:

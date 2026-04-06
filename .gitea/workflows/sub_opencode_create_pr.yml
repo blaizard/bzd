@@ -1,7 +1,7 @@
 name: Create a PR
 
 on:
-  workflow_call:
+    workflow_call:
 
 jobs:
     create_pr:
