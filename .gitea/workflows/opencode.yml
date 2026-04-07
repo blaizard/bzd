@@ -23,7 +23,7 @@ jobs:
                   EVENT_NAME: ${{ github.event_name }}
                   ACTOR: ${{ github.actor }}
                   COMMENT_BODY: ${{ github.event.comment.body || '' }}
-                  IS_PR: ${{ github.event_name == 'issue_comment' && github.event.pull_request && 'true' || 'false' }}
+                  IS_PR: ${{ github.event_name == 'issue_comment' && github.event.issue.pull_request && 'true' || 'false' }}
               run: |
                   set -euo pipefail
 
