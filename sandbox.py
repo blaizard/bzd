@@ -153,19 +153,6 @@ class FeatureIsolation(Feature):
 class FeatureDevcontainerCLI(Feature):
 	"""Feature: Add the devcontainer CLI to the container."""
 
-	def __init__(self, args: argparse.Namespace) -> None:
-		super().__init__(args)
-		self.isAvailable = args.devcontainer_cli
-
-	@staticmethod
-	def cli() -> typing.Dict[str, typing.Dict[str, typing.Any]]:
-		return {
-			"devcontainer_cli": {
-				"action": "store_true",
-				"help": "Include the devcontainer CLI to the container.",
-			}
-		}
-
 	@property
 	def dockerFile(self) -> typing.List[str]:
 		return [
@@ -176,19 +163,6 @@ class FeatureDevcontainerCLI(Feature):
 
 class FeatureOpenCode(Feature):
 	"""Feature: Add opencode CLI to the container."""
-
-	def __init__(self, args: argparse.Namespace) -> None:
-		super().__init__(args)
-		self.isAvailable = args.opencode
-
-	@staticmethod
-	def cli() -> typing.Dict[str, typing.Dict[str, typing.Any]]:
-		return {
-			"opencode": {
-				"action": "store_true",
-				"help": "Include the opencode to the container.",
-			}
-		}
 
 	@property
 	def dockerFile(self) -> typing.List[str]:
@@ -628,6 +602,15 @@ services:
 		print("Pruning unused images.")
 		subprocess.run(["docker", "image", "prune", "-a", "-f", "--filter", "label=com.docker.compose.service=bzd"])
 
+	@staticmethod
+	def clean() -> None:
+		containers = SandboxContainer._list_containers()
+		for container in containers:
+			print(f"Deleting container '{container['name']}'.")
+			subprocess.run(["docker", "rm", "-f", container["name"]])
+		print("Pruning unused images.")
+		subprocess.run(["docker", "image", "prune", "-a", "-f", "--filter", "label=com.docker.compose.service=bzd"])
+
 
 if __name__ == "__main__":
 	allFeatures = {
@@ -640,6 +623,8 @@ if __name__ == "__main__":
 		"session": FeatureSession,
 	}
 
+	defaultFeatures = ["docker", "platform", "volume", "isolation", "session"]
+
 	allPresets = {
 		f"agent{i}": [
 			"--enable",
@@ -648,7 +633,6 @@ if __name__ == "__main__":
 			"session",
 			"--enable",
 			"isolation",
-			"--opencode",
 			"--isolate",
 			"--prefix",
 			f"agent{i}",
@@ -659,6 +643,7 @@ if __name__ == "__main__":
 	additionalCommands = {
 		"ls": SandboxContainer.ls,
 		"prune": SandboxContainer.prune,
+		"clean": SandboxContainer.clean,
 	}
 
 	parser = argparse.ArgumentParser(
@@ -706,7 +691,7 @@ if __name__ == "__main__":
 		action="append",
 		default=[],
 		choices=allFeatures.keys(),
-		help="Enable some of the features.",
+		help=f"Enable some of the features (default: {', '.join(defaultFeatures)}).",
 	)
 	parser.add_argument(
 		"--prefix",
@@ -740,7 +725,7 @@ if __name__ == "__main__":
 			args.rest = args.rest[1:]
 
 	# Select only the features asked.
-	featureNames = set(args.enable if len(args.enable) else allFeatures.keys()) - set(args.disable)
+	featureNames = set(args.enable if len(args.enable) else defaultFeatures) - set(args.disable)
 	features = [allFeatures[name](args) for name in featureNames]
 
 	sandbox = SandboxContainer(args=args, features=features, temporaryPath=args.temp)
