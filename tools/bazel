@@ -82,10 +82,12 @@ if __name__== "__main__":
 		st = bazeliskPath.stat()
 		bazeliskPath.chmod(st.st_mode | stat.S_IEXEC)
 
+	isBazeliskSkipWrapper = "BAZELISK_SKIP_WRAPPER" in os.environ
+
 	# Run under at bazel level (useful for CI).
-	maybeBazelRunUnder = os.environ.get("BAZEL_RUN_UNDER")
 	runUnder = []
-	if maybeBazelRunUnder:
+	maybeBazelRunUnder = os.environ.get("BAZEL_RUN_UNDER")
+	if maybeBazelRunUnder and isBazeliskSkipWrapper:
 		runUnder = shlex.split(maybeBazelRunUnder)
 		print(f"Running bazel under {maybeBazelRunUnder}", flush=True)
 
@@ -94,7 +96,7 @@ if __name__== "__main__":
 		processRun(runUnder + [bazeliskPath] + sys.argv[1:])
 
 		# If this script is called by the wrapper, ignore
-		if "BAZELISK_SKIP_WRAPPER" in os.environ:
+		if isBazeliskSkipWrapper:
 			sys.exit(0)
 
 		# Generate the coverage report
