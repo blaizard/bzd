@@ -7,6 +7,21 @@ from apps.node_manager.private.client.command.shutdown import commandShutdown
 from apps.node_manager.private.client.command.lease import commandLease
 from apps.node_manager.private.client.command.lease_period import commandLeasePeriod
 
+
+def exceptionToString(exception: Exception) -> str:
+	lines = [f"{type(exception).__name__}: {str(exception)}"]
+	cause = exception.__cause__
+	count = 0
+	while cause:
+		count += 1
+		lines.append(f"{'  ' * count}-> Caused by {type(cause).__name__}: {str(cause)}")
+		cause = cause.__cause__
+		if count > 10:
+			lines.append("Too many nested exceptions, stopping here.")
+			break
+	return "\n".join(lines)
+
+
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Wake On Lan client.")
 	subparsers = parser.add_subparsers(help="Available sub-commands.", dest="command")
@@ -28,7 +43,7 @@ if __name__ == "__main__":
 		"--timeout",
 		default=60,
 		type=int,
-		help="Timeout in S until which the check returns.",
+		help="Timeout in seconds until which the check returns.",
 	)
 	wolParser.add_argument(
 		"-w",
@@ -78,31 +93,35 @@ if __name__ == "__main__":
 
 	args = parser.parse_args()
 
-	if args.command == "wol":
-		commandWakeOnLan(
-			mac=args.mac,
-			broadcast=args.broadcast,
-			service=args.service,
-			wait=args.wait,
-			timeout=args.timeout,
-		)
-	elif args.command == "suspend":
-		commandSuspend(server=args.ip)
-	elif args.command == "shutdown":
-		commandShutdown(server=args.ip)
-	elif args.command == "lease":
-		returnCode = commandLease(
-			server=args.ip,
-			name=args.name,
-			ttl=args.ttl,
-			command=args.workload,
-		)
-		sys.exit(returnCode)
-	elif args.command == "lease-period":
-		commandLeasePeriod(
-			server=args.ip,
-			name=args.name,
-			ttl=args.ttl,
-		)
-	else:
-		assert False, f"Unknown command: '{args.command}'."
+	try:
+		if args.command == "wol":
+			commandWakeOnLan(
+				mac=args.mac,
+				broadcast=args.broadcast,
+				service=args.service,
+				wait=args.wait,
+				timeout=args.timeout,
+			)
+		elif args.command == "suspend":
+			commandSuspend(server=args.ip)
+		elif args.command == "shutdown":
+			commandShutdown(server=args.ip)
+		elif args.command == "lease":
+			returnCode = commandLease(
+				server=args.ip,
+				name=args.name,
+				ttl=args.ttl,
+				command=args.workload,
+			)
+			sys.exit(returnCode)
+		elif args.command == "lease-period":
+			commandLeasePeriod(
+				server=args.ip,
+				name=args.name,
+				ttl=args.ttl,
+			)
+		else:
+			assert False, f"Unknown command: '{args.command}'."
+	except Exception as e:
+		print(exceptionToString(e), file=sys.stderr)
+		sys.exit(1)
