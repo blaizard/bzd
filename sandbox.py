@@ -57,6 +57,13 @@ class FeatureVolume(Feature):
 	def __init__(self, args: argparse.Namespace) -> None:
 		super().__init__(args)
 		self.isAvailable = self.args.volumes is not None
+		if self.isAvailable:
+			self.namedVolumes: typing.Dict[str, str] = {}
+			self.bindVolumes: typing.Dict[str, str] = {}
+			for volume in self.args.volumes:
+				volumes = self.bindVolumes if volume.startswith("./") or volume.startswith("/") else self.namedVolumes
+				volumeSplit = volume.split(":", 1)
+				volumes[volumeSplit[0]] = f"/bzd/volumes/{volumeSplit[0]}" if len(volumeSplit) == 1 else volumeSplit[1]
 
 	@staticmethod
 	def cli() -> typing.Dict[str, typing.Dict[str, typing.Any]]:
@@ -65,27 +72,27 @@ class FeatureVolume(Feature):
 				"dest": "volumes",
 				"type": str,
 				"action": "append",
-				"help": "Add one or more docker volume The volumes will be mounted under /bzd/volumes/<name>.",
+				"help": "Add one or more docker volume. It supports bind mounts and named volumes. If no destination path is given, the volumes will be mounted under /bzd/volumes/<name>.",
 			}
 		}
 
 	@property
 	def volumes(self) -> typing.List[str]:
-		return [f"{volume}:/bzd/volumes/{volume}" for volume in self.args.volumes]
+		return [f"{source}:{destination}" for source, destination in (self.namedVolumes | self.bindVolumes).items()]
 
 	@property
 	def dockerFile(self) -> typing.List[str]:
 		assert self.context is not None
 		if not self.context.userNamespaceRemapping:
 			return [
-				f"RUN echo 'sudo chown {self.context.uid}:{self.context.gid} /bzd/volumes/{volume} && sudo chmod 755 /bzd/volumes/{volume}' >> /bzd/startup.sh"
-				for volume in self.args.volumes
+				f"RUN echo 'sudo chown {self.context.uid}:{self.context.gid} {destination} && sudo chmod 755 {destination}' >> /bzd/startup.sh"
+				for destination in self.namedVolumes.values()
 			]
 		return []
 
 	@property
 	def dockerCompose(self) -> typing.Dict[str, typing.List[str]]:
-		return {"volumes": [f'{volume}:\n  name: "{volume}"' for volume in self.args.volumes]}
+		return {"volumes": [f'{volume}:\n  name: "{volume}"' for volume in self.namedVolumes.keys()]}
 
 
 class FeatureSession(Feature):
@@ -301,13 +308,14 @@ class SandboxContainer:
 		self.uid = os.getuid()
 		self.gid = os.getgid()
 		self.userNamespaceRemapping = SandboxContainer.isUserNamespaceRemapping()
+		self.isInteractive = sys.stdin.isatty() or sys.stdout.isatty()
 		self.user = "root" if self.userNamespaceRemapping else getpass.getuser()
 		self.features = [feature for feature in features if feature.isAvailable]
 		self.args = args
 
 	@cached_property
 	def toHash(self) -> typing.List[str]:
-		toHash = [f"root={self.root.as_posix()}", f"user={getpass.getuser()}"]
+		toHash = [f"root={self.root.as_posix()}", f"user={getpass.getuser()}", f"interactive={self.isInteractive}"]
 		toHash += sorted([feature.__class__.__name__ for feature in self.features])
 		argNames = sorted([kwargs.get("dest", name) for feature in self.features for name, kwargs in feature.cli().items()])
 		toHash += [f"{name}={getattr(self.args, name)}" for name in argNames]
@@ -472,8 +480,8 @@ services:
       com.bzd.sandbox.user: "{getpass.getuser()}"
       com.bzd.sandbox.command: "{" ".join(sys.argv[1:])}"
     init: true
-    tty: true
-    stdin_open: true
+    tty: {"true" if self.isInteractive else "false"}
+    stdin_open: {"true" if self.isInteractive else "false"}
 {extraServiceStr}
     volumes:
 {volumesStr}
@@ -599,8 +607,9 @@ services:
 				continue
 			print(f"Deleting container '{container['name']}'.")
 			subprocess.run(["docker", "rm", "-f", container["name"]])
-		print("Pruning unused images.")
+		print("Pruning unused images/networks.")
 		subprocess.run(["docker", "image", "prune", "-a", "-f", "--filter", "label=com.docker.compose.service=bzd"])
+		subprocess.run(["docker", "network", "prune", "-f"])
 
 	@staticmethod
 	def clean() -> None:
@@ -608,8 +617,9 @@ services:
 		for container in containers:
 			print(f"Deleting container '{container['name']}'.")
 			subprocess.run(["docker", "rm", "-f", container["name"]])
-		print("Pruning unused images.")
+		print("Pruning unused images/networks.")
 		subprocess.run(["docker", "image", "prune", "-a", "-f", "--filter", "label=com.docker.compose.service=bzd"])
+		subprocess.run(["docker", "network", "prune", "-f"])
 
 
 if __name__ == "__main__":
