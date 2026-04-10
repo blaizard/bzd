@@ -19,13 +19,20 @@ runs:
         # - The ref is not populated correctly.
         - name: "Gather PR Metadata"
           id: metadata
-          if: github.event.pull_request != null || (github.event_name == 'issue_comment' && github.event.issue.pull_request != null)
+          if: >-
+              startsWith(github.event_name, 'pull_request') ||
+              (github.event_name == 'issue_comment' && github.event.issue.pull_request != null)
           shell: bash
           env:
-              PR_NUM: ${{ github.event.pull_request.number || github.event.issue.number }}
+              PR_NUMBER: ${{ github.event.pull_request.number || github.event.issue.number }}
               TOKEN: ${{ inputs.token }}
           run: |
-              PR_URL="${{ github.api_url }}/repos/${{ github.repository }}/pulls/${PR_NUM}"
+              if [ -z "$PR_NUMBER" ]; then
+                echo "Error: PR_NUMBER is empty."
+                exit 1
+              fi
+
+              PR_URL="${{ github.api_url }}/repos/${{ github.repository }}/pulls/${PR_NUMBER}"
               if command -v curl >/dev/null 2>&1; then
                   RESPONSE=$(curl -s -H "Authorization: token ${TOKEN}" "$PR_URL")
               else
@@ -34,7 +41,7 @@ runs:
 
               BRANCH=$(echo "$RESPONSE" | sed -E 's/.*"head":\{[^}]*"ref":"([^"]+)".*/\1/')
               SHA=$(echo "$RESPONSE" | sed -E 's/.*"head":\{[^}]*"sha":"([^"]+)".*/\1/')
-              REF="refs/pull/${PR_NUM}/head"
+              REF="refs/pull/${PR_NUMBER}/head"
 
               echo "pr url: ${PR_URL}"
               echo "response: ${RESPONSE}"
