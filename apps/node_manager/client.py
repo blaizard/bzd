@@ -63,7 +63,15 @@ if __name__ == "__main__":
 	leaseParser = subparsers.add_parser(
 		"lease", help="Register a workload, run a heartbeat and release the workload when completed."
 	)
-	leaseParser.add_argument("ip", help="The ip:port address for the machine to register the workload.")
+	leaseParser.add_argument(
+		"--server", required=True, help="The ip:port address for the machine to register the workload."
+	)
+	leaseParser.add_argument(
+		"--undefine",
+		action="append",
+		default=[],
+		help="Environment variable to undefine before running the workload.",
+	)
 	leaseParser.add_argument(
 		"--name",
 		default="unknown",
@@ -78,7 +86,9 @@ if __name__ == "__main__":
 	leaseParser.add_argument("workload", nargs=argparse.REMAINDER, help="The command to execute.")
 
 	leasePreriodParser = subparsers.add_parser("lease-period", help="Register a workload for a predefined period.")
-	leasePreriodParser.add_argument("ip", help="The ip:port address for the machine to register the workload.")
+	leasePreriodParser.add_argument(
+		"--server", required=True, help="The ip:port address for the machine to register the workload."
+	)
 	leasePreriodParser.add_argument(
 		"--name",
 		default="unknown",
@@ -108,15 +118,16 @@ if __name__ == "__main__":
 			commandShutdown(server=args.ip)
 		elif args.command == "lease":
 			returnCode = commandLease(
-				server=args.ip,
+				server=args.server,
 				name=args.name,
 				ttl=args.ttl,
+				undefine=args.undefine,
 				command=args.workload,
 			)
 			sys.exit(returnCode)
 		elif args.command == "lease-period":
 			commandLeasePeriod(
-				server=args.ip,
+				server=args.server,
 				name=args.name,
 				ttl=args.ttl,
 			)

@@ -13,6 +13,7 @@ def commandLease(
 	name: str,
 	ttl: int,
 	command: typing.List[str],
+	undefine: typing.Optional[typing.List[str]] = None,
 	httpClient: typing.Any = HttpClient,
 ) -> int:
 	"""Register a workload, run a heartbeat and release the workload when completed."""
@@ -39,8 +40,12 @@ def commandLease(
 	heartbeatThread = threading.Thread(target=heartbeatLoop, daemon=True)
 	heartbeatThread.start()
 
+	env = os.environ.copy()
+	for name in undefine:
+		env.pop(name, None)
+
 	try:
-		with subprocess.Popen(command, cwd=os.environ.get("BUILD_WORKSPACE_DIRECTORY", None)) as process:
+		with subprocess.Popen(command, cwd=os.environ.get("BUILD_WORKSPACE_DIRECTORY", None), env=env) as process:
 			process.wait()
 			return process.returncode
 
