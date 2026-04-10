@@ -89,7 +89,7 @@ if __name__== "__main__":
 	maybeBazelRunUnder = os.environ.get("BAZEL_RUN_UNDER")
 	if maybeBazelRunUnder and isBazeliskSkipWrapper:
 		runUnder = shlex.split(maybeBazelRunUnder)
-		print(f"Running bazel under {maybeBazelRunUnder}", flush=True)
+		print(f"Running bazel under: {maybeBazelRunUnder}", flush=True)
 
 	try:
 		# Forward commands to the real bazel
