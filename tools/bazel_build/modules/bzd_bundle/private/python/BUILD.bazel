@@ -7,3 +7,18 @@ py_binary(
     ],
     visibility = ["//visibility:public"],
 )
+
+py_binary(
+    name = "bundle",
+    srcs = [
+        "bundle.py",
+    ],
+    args = [
+        "--bundle",
+        "$(location //private:binary)",
+    ],
+    data = [
+        "//private:binary",
+    ],
+    visibility = ["//:__pkg__"],
+)

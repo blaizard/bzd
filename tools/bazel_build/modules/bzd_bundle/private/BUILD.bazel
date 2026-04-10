@@ -1,0 +1,26 @@
+load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
+load("//private:bundle_binary.bzl", "bzd_bundle_binary")
+
+genrule(
+    name = "invalid_executable",
+    outs = ["invalid_executable"],
+    cmd = "cat > $@ << 'EOF'\n!/usr/bin/env sh\nexit 0\nEOF\nchmod +x $@",
+    executable = True,
+)
+
+label_flag(
+    name = "executable",
+    build_setting_default = ":invalid_executable",
+)
+
+string_flag(
+    name = "args",
+    build_setting_default = "",
+)
+
+bzd_bundle_binary(
+    name = "binary",
+    args_build_setting = ":args",
+    executable = ":executable",
+    visibility = ["//private/python:__pkg__"],
+)

@@ -1,5 +1,6 @@
 """Bundle an executable into an self extractable binary."""
 
+load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("//private:bundle_tar.bzl", "bzd_bundle_tar")
 
 def _bzd_bundle_binary_script_impl(ctx):
@@ -9,15 +10,20 @@ def _bzd_bundle_binary_script_impl(ctx):
     if ctx.attr.compression:
         args.add("--compression", ctx.attr.compression)
     args.add(ctx.file.archive)
+    args.add("--")
+
+    if ctx.attr.arguments and ctx.attr.args_build_setting:
+        fail("'args' and 'args_build_setting' are mutually exclusive.")
+    if ctx.attr.arguments:
+        args.add_all(ctx.attr.arguments)
+    if ctx.attr.args_build_setting:
+        args.add_all(ctx.attr.args_build_setting[BuildSettingInfo].value.split(" "))
 
     ctx.actions.run(
         inputs = [ctx.file.archive],
         outputs = [ctx.outputs.executable],
         progress_message = "Bundling self extractable binary {}...".format(str(ctx.label)),
-        arguments = [
-            args,
-            "--",
-        ] + ctx.attr.arguments,
+        arguments = [args],
         executable = ctx.executable._archive_to_script,
     )
 
@@ -33,6 +39,10 @@ _bzd_bundle_binary_script = rule(
         "archive": attr.label(
             doc = "The archive to be bundled.",
             allow_single_file = True,
+        ),
+        "args_build_setting": attr.label(
+            doc = "Build setting containing additional arguments to embed in the bootstrap script.",
+            providers = [BuildSettingInfo],
         ),
         "arguments": attr.string_list(
             doc = "List of arguments to be embedded in the bootstrap script.",

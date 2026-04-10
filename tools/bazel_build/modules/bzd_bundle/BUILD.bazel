@@ -1,0 +1,14 @@
+alias(
+    name = "executable",
+    actual = "//private:executable",
+)
+
+alias(
+    name = "args",
+    actual = "//private:args",
+)
+
+alias(
+    name = "bzd_bundle",
+    actual = "//private/python:bundle",
+)

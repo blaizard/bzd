@@ -6,6 +6,8 @@ def _bzd_bundle_bootstrap_impl(ctx):
     runfiles = ctx.runfiles()
     outputs = []
     for name, executable in ctx.attr.executables.items():
+        if executable.label == ctx.attr._invalid_executable.label:
+            fail("No executable provided! Pleae use --@bzd_bundle//:executable=<my target> to provide an executable.")
         if "/" in name or "\\" in name:
             fail("The executable file name '{}' cannot contain (back-)slashes.".format(name))
         output = ctx.actions.declare_file("{}.links/{}".format(ctx.label.name, name))
@@ -47,6 +49,11 @@ _bzd_bundle_bootstrap = rule(
         "template": attr.label(
             allow_single_file = True,
             doc = "Template script to used for the bootstrap.",
+        ),
+        "_invalid_executable": attr.label(
+            cfg = "target",
+            executable = True,
+            default = "//private:invalid_executable",
         ),
     },
     executable = True,
