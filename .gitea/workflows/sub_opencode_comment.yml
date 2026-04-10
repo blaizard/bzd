@@ -1,0 +1,41 @@
+name: Update a PR with opencode
+
+on:
+    workflow_call:
+        inputs:
+            issue_number:
+                description: "The issue number to send the comment to."
+                required: true
+                type: string
+            prompt:
+                description: "The prompt to be used for the agent."
+                required: true
+                type: string
+
+jobs:
+    update_pr:
+        runs-on: opencode
+        steps:
+            - uses: https://git.blaizard.com/blaise/deployment/ci/gitea/setup@main
+              with:
+                  lease: "true"
+
+            - name: "Run opencode"
+              env:
+                  PROMPT: ${{ inputs.prompt }}
+              run: |
+                  echo  "==== prompt ================================================="
+                  echo "$PROMPT"
+                  echo  "==== processing ============================================="
+                  bzd-lease opencode run "$PROMPT" > /tmp/agent-response.txt
+                  echo  "==== response ==============================================="
+                  cat /tmp/agent-response.txt
+
+            - name: "Post comment on PR"
+              uses: ./.gitea/actions/comment
+              with:
+                  api_url: ${{ github.api_url }}
+                  repository: ${{ github.repository }}
+                  issue_number: ${{ inputs.issue_number }}
+                  token: ${{ secrets.BZD_AGENT_TOKEN }}
+                  body_file: /tmp/agent-response.txt

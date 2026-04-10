@@ -69,8 +69,41 @@ jobs:
         needs: [router, lease_linux]
         runs-on: opencode
         if: needs.router.outputs.route == 'issue_comment'
-        uses: ./.gitea/workflows/sub_opencode_issue_comment.yml
+        uses: ./.gitea/workflows/sub_opencode_comment.yml
         secrets: inherit
+        with:
+            issue_number: ${{ github.event.issue.number }}
+            prompt: |
+                You are working on the repository '${{ github.repository }}' and handling issue #${{ github.event.issue.number }}.
+
+                Use the Gitea MCP and your available tools to deeply research the context: 
+                1. Fetch the issue details (title, body, labels, comments, etc).
+                2. Fetch ALL comments on this issue to understand the full conversation history, previous clarifications, and any plans already discussed.
+                3. Check for any related issues or pull requests that might be relevant.
+                4. DEEP RESEARCH: Actively search the codebase, read relevant file contents, and trace dependencies related to the issue to fully understand the current architecture.
+
+                INSTRUCTIONS FOR ANALYSIS:
+                - EXHAUST ALL POSSIBILITIES: Before proposing a plan or asking a question, you MUST formulate hypotheses and attempt to validate them using your tools. Trace the logic, inspect configurations, and dry-run potential solutions mentally or via tools if available.
+                - Do not ask a question if the answer can be found by reading the code or investigating independently. You must try everything you can to find the root cause yourself.
+                - Identify the precise technical root cause based on your deep research.
+                - If, and ONLY if, you have exhausted all avenues of independent investigation and critical information is still missing, you may ask a QUESTION.
+                - Do NOT repeat the issue metadata (Title, Body, Comments) in your response. I already have that.
+
+                STRICT OUTPUT FORMAT:
+                Your response must contain ONLY the implementation steps or the clarification request.  
+                CRITICAL: If you do not follow the response requirement format exactly, the CI will fail. 
+
+                CHOOSE ONE:
+
+                PLAN: 
+                (Your plan must be highly precise. Include exact file paths, target functions/classes, and specific logical changes required. No vague descriptions.)
+                1. [File: path/to/file.ext] - [Precise code change or addition to make]
+                2. [File: path/to/another.ext] - [Precise code change or addition to make]
+                ... 
+
+                QUESTION: 
+                (Ask only if exhaustive independent research failed. Briefly state what you investigated and exactly what information is blocking you.)
+                [Your specific question here]
 
     route_create_pr:
         needs: [router, lease_linux]
@@ -86,5 +119,35 @@ jobs:
         needs: [router, lease_linux]
         runs-on: opencode
         if: needs.router.outputs.route == 'update_pr'
-        uses: ./.gitea/workflows/sub_opencode_update_pr.yml
+        uses: ./.gitea/workflows/sub_opencode_comment.yml
         secrets: inherit
+        with:
+            issue_number: ${{ github.event.pull_request.number }}
+            prompt: |
+                You are an expert software engineer. You are currently assigned to repository '${{ github.repository }}' to implement the changes requested in PR #${{ github.event.pull_request.number }}.
+
+                Your primary objective is to write the code required to fulfill the PR description, seamlessly integrate it into the existing codebase, and commit and push the final changes.
+
+                PHASE 1: CONTEXT & DEEP RESEARCH (Use Gitea MCP & Tools)
+                1. Fetch the details of PR #${{ github.event.pull_request.number }} (title, body).
+                2. TRACE THE ORIGIN: The PR body contains a reference/link to the original issue that triggered this PR. You MUST fetch that original issue and read its entire comment history to understand the exact feature request, prior discussions, and intended architectural approach.
+                3. DEEP CODEBASE RECONNAISSANCE: Do not guess. Actively search the codebase, read relevant file contents, and trace dependencies. Understand how the modules you need to modify interact with the rest of the system.
+
+                PHASE 2: IMPLEMENTATION STRATEGY & VALIDATION
+                - EXHAUST ALL POSSIBILITIES: Before writing code, formulate an implementation plan. Mentally trace the execution path of your proposed changes. Check for potential side-effects, broken imports, or typing errors. 
+                - AVOID LAZY QUESTIONS: Do not ask a question if the answer can be found by reading the code or investigating independently. You must try everything you can to resolve ambiguities by looking at existing codebase patterns.
+                - MATCH EXISTING STYLE: Your implementation must strictly adhere to the existing naming conventions, architectural patterns, and coding standards found in the repository.
+
+                PHASE 3: EXECUTION & COMMIT (CRITICAL)
+                - Once your implementation is ready and validated, you MUST use your available tools to apply the changes directly to the workspace.
+                - Stage your changes and create a clean, descriptive Git commit (adhering to conventional commits if the repository uses them).
+                - Execute the git push to upload your changes to the remote branch associated with PR #${{ github.event.pull_request.number }}.
+
+                PHASE 4: OUTPUT
+                - If you have successfully applied, committed, and pushed the changes, your response must be a brief summary of the completed work.
+                - If, and ONLY if, you have exhausted all avenues of independent investigation and a critical product decision is completely blocking you from writing the code, you may ask a clarifying QUESTION.
+                - Do NOT repeat the PR/Issue metadata (Title, Body, Comments) in your response. I already have that context.
+
+                STRICT OUTPUT FORMAT:
+                Your response must contain ONLY the summary of the successfully pushed implementation OR the single clarification request. 
+                CRITICAL: Do not include introductory filler (e.g., \"I will now push the code\" or \"I have researched the issue\"). If you do not follow this exact format, the CI pipeline will fail.
