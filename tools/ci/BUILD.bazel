@@ -1,4 +1,3 @@
-load("@bzd_bundle//:defs.bzl", "bzd_bundle_binary")
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 
 py_library(
@@ -30,14 +29,4 @@ py_binary(
         "//tools/ci/travis:factory",
         "@bzd_sanitizer//python/bzd_sanitizer:context",
     ],
-)
-
-bzd_bundle_binary(
-    name = "bzd_node",
-    args = [
-        "--uid",
-        "ci",
-    ],
-    executable = "//apps/artifacts/api/python/node:binary",
-    tags = ["manual"],
 )
