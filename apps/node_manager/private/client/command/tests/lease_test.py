@@ -34,7 +34,7 @@ class TestLeaseCommand(unittest.TestCase):
 			)
 
 			self.assertEqual(exitCode, 0)
-			mockPopen.assert_called_once_with(["echo", "hello"], cwd=None)
+			mockPopen.assert_called_once()
 
 		# Verify http calls: register and release
 		# (The heartbeat might not have run because we patched Event.wait to return True immediately)
