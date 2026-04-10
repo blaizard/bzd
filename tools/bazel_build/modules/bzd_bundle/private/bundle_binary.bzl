@@ -71,6 +71,7 @@ def _bzd_bundle_binary_impl(name, visibility, compression, compression_level, ex
         },
         compression = compression or None,
         compression_level = compression_level,
+        tags = ["manual"],
     )
 
     _bzd_bundle_binary_script(

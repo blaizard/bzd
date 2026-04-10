@@ -2,20 +2,22 @@ load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
 load("//private:bundle_binary.bzl", "bzd_bundle_binary")
 
 genrule(
-    name = "invalid_executable",
-    outs = ["invalid_executable"],
+    name = "noop",
+    outs = ["noop"],
     cmd = "cat > $@ << 'EOF'\n!/usr/bin/env sh\nexit 0\nEOF\nchmod +x $@",
     executable = True,
 )
 
 label_flag(
     name = "executable",
-    build_setting_default = ":invalid_executable",
+    build_setting_default = ":noop",
+    visibility = ["//:__pkg__"],
 )
 
 string_flag(
     name = "args",
     build_setting_default = "",
+    visibility = ["//:__pkg__"],
 )
 
 bzd_bundle_binary(

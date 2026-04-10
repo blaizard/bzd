@@ -41,7 +41,7 @@ def commandLease(
 	heartbeatThread.start()
 
 	env = os.environ.copy()
-	for name in undefine:
+	for name in undefine or []:
 		env.pop(name, None)
 
 	try:
