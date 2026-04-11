@@ -13,7 +13,7 @@ inputs:
 
 runs:
     using: composite
-    steps:
+    steps:    
         # Special logic for PRs, they do behave differently:
         # - comments on PR are treated as comment on the base branch (no info on the PR branch)
         # - The ref is not populated correctly.

@@ -20,6 +20,12 @@ jobs:
         outputs:
             route: ${{ steps.set-route.outputs.route }}
         steps:
+            - name: "Dump Github context"
+              env:
+                  GITHUB_CONTEXT: ${{ toJson(github) }}
+              run: |
+                  echo "Github context: $GITHUB_CONTEXT"
+
             - name: "Determine Route"
               id: set-route
               shell: bash
