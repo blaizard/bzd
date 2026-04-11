@@ -1,5 +1,6 @@
 import Cache2 from "../cache2.mjs";
 import ExceptionFactory from "../exception.mjs";
+import Services from "#bzd/nodejs/core/services/services.mjs";
 
 const Exception = ExceptionFactory("test", "cache2");
 
@@ -181,4 +182,26 @@ describe("Cache2", () => {
 
 		Exception.assertEqual(sum, expected);
 	}).timeout(10000);
+
+	it("Garbage Collector - maxSize enforcement", async () => {
+		const cache = new Cache2("cache2", {
+			maxSize: 20,
+			timeoutMs: 60 * 1000,
+		});
+		cache.register("test", (key) => key, { maxSize: 20 });
+
+		const provider = cache.serviceGarbageCollector("test");
+		const services = new Services();
+		services.register(provider, "test");
+
+		await services.start();
+
+		cache.set("test", "a", "aaaaaaaaaa"); // 10 chars
+		cache.set("test", "b", "bbbbbbbbbb"); // 10 chars - triggers auto-GC at 20
+		cache.set("test", "c", "cccccccccc"); // 10 chars - exceeds maxSize, triggers GC
+
+		Exception.assertEqual(cache.getSize("test"), 20);
+
+		await services.stop();
+	});
 });

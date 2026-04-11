@@ -335,11 +335,45 @@ export default class Cache2 {
 	}
 
 	/// Create the garbage collector service.
+	/// Evicts expired entries and enforces maxSize limit when capacity is exceeded.
 	serviceGarbageCollector(...namespaces) {
 		Exception.assert(this.trigger === null, "Garbage collector is already registered.");
 		const provider = new ServiceProvider(...namespaces);
 		this.trigger = provider.addEventTriggeredProcess("garbage.collector", async () => {
-			return {};
+			const now = Cache2.getTimestampMs();
+			let evictedCount = 0;
+			let evictedSize = 0;
+
+			for (const collectionName of Object.keys(this.data)) {
+				const data = this.data[collectionName];
+
+				// Remove expired entries directly during iteration.
+				for (const [key, entry] of data.values.entries()) {
+					if (entry.timeout > 0 && entry.timeout < now) {
+						data.size -= entry.size;
+						this.size -= entry.size;
+						evictedSize += entry.size;
+						data.values.delete(key);
+						++evictedCount;
+					}
+				}
+
+				// Remove the oldest entry (first in Map iteration order) until size is within limit.
+				while (this.size > this.options.maxSize && data.values.size > 0) {
+					const firstKey = data.values.keys().next().value;
+					const entry = data.values.get(firstKey);
+					data.size -= entry.size;
+					this.size -= entry.size;
+					data.values.delete(firstKey);
+					++evictedCount;
+					evictedSize += entry.size;
+				}
+
+				this.statistics.set("collection-" + collectionName, data.size);
+			}
+
+			this.statistics.set("evicted", evictedCount);
+			return { evictedCount, evictedSize };
 		});
 		return provider;
 	}
