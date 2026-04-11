@@ -171,17 +171,18 @@ jobs:
 
                 Your mission is to address new feedback provided in the PR timeline since your last activity.
 
-                PHASE 0: TIMELINE AUDIT & DELTA IDENTIFICATION
+                PHASE 0: COMPREHENSIVE FEEDBACK RETRIEVAL
                 1. Use the Gitea MCP to fetch the FULL TIMELINE for PR #${{ needs.router.outputs.issue_number }}.
-                2. Identify your own most recent comment or action (your username is 'agent').
-                3. Extract all user comments, code review feedback, and inline replies that occurred AFTER your last activity. These are your new requirements.
-                4. If there is no activity from 'agent' in the timeline, treat the PR description and all existing comments as the requirements.
+                2. CRITICAL: Use the specific "Get Pull Request Review Comments" or "List Pull Request Reviews" MCP tools. 
+                   - Note: Inline feedback often lives in 'review_comments' which are distinct from general timeline comments.
+                3. Identify your own most recent activity ('agent').
+                4. Extract all feedback (General comments + Inline Review comments) occurring AFTER your last activity.
 
-                PHASE 1: CONTEXTUAL RESEARCH
-                - For each piece of new feedback identified in Phase 0:
-                  - Locate the specific file and line number if it's an inline comment.
-                  - Use MCP tools to read the current state of that code.
-                  - Trace dependencies to ensure the requested change won't break existing logic.
+                PHASE 1: CONTEXTUAL RESEARCH & CODE MAPPING
+                - For each 'review_comment' or 'timeline_comment' identified:
+                  - If the tool provides a `path` and `position` (inline), immediately fetch that file's content.
+                  - If the feedback is general, locate the relevant logic via search/grep tools.
+                  - Cross-reference the comment's `diff_hunk` with the current file state to ensure the context hasn't shifted.
 
                 PHASE 2: IMPLEMENTATION
                 - Implement the fixes or changes requested in the new feedback.
