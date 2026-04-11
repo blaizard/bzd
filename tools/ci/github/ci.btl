@@ -8,7 +8,7 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            - uses: actions/checkout@v4
+            - uses: https://github.com/blaizard/bzd/.gitea/actions/checkout@master
 
             - name: "Free Up Disk Space (hack)"
               run: |
