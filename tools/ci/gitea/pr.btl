@@ -36,7 +36,6 @@ jobs:
               {% end %}
 
 {% end %}
-
             - name: "Info"
               if: always()
               run: |
