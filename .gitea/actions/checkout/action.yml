@@ -83,6 +83,12 @@ runs:
               fi
 
               fetch_target="${REF:-${BRANCH:-${SHA}}}"
+              echo "Inputs:"
+              echo "  branch=${BRANCH:-<none>}"
+              echo "  ref=${REF:-<none>}"
+              echo "  sha=${SHA:-<none>}"
+              echo "  fetch_target=${fetch_target:-<none>}"
+
               git fetch --no-tags --depth=1 origin "${fetch_target}"
 
               # Fetch the specific commit or branch
@@ -95,11 +101,6 @@ runs:
                 git checkout --detach "${SHA}"
               fi
 
-              echo "Inputs:"
-              echo "  branch=${BRANCH:-<none>}"
-              echo "  ref=${REF:-<none>}"
-              echo "  sha=${SHA:-<none>}"
-              echo "  fetch_target=${fetch_target:-<none>}"
               echo "Status:"
               echo "  HEAD=$(git rev-parse HEAD)"
               echo "  branch=$(git branch --show-current || true)"

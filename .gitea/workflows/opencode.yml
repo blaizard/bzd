@@ -1,6 +1,7 @@
 name: Opencode Event Router
 
 on:
+    # Issue created.
     issues:
         types: [opened, labeled]
     # Issue comment, PR comment (main thread), PR inline comment reply
