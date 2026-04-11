@@ -115,7 +115,7 @@ jobs:
         needs: [router, lease_linux]
         runs-on: opencode
         if: needs.router.outputs.route == 'create_pr'
-        uses: ./.gitea/workflows/sub_opencode_create_pr.yml
+        uses: ./.gitea/workflows/sub_create_pr.yml
         secrets: inherit
 
     route_initialize_pr:
