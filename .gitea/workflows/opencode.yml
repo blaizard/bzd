@@ -48,7 +48,7 @@ jobs:
                           route="issue_comment"
                       fi    
                   elif [[ "$EVENT_NAME" == "pull_request" && "$ACTOR" == "agent" ]]; then
-                      route="update_pr"
+                      route="initialize_pr"
                   elif [[ "$EVENT_NAME" == "pull_request_review" && "$ACTOR" != "agent" ]]; then
                       route="update_pr"
                   else
@@ -118,13 +118,10 @@ jobs:
         uses: ./.gitea/workflows/sub_opencode_create_pr.yml
         secrets: inherit
 
-    route_update_pr:
-        concurrency:
-            group: agent-pr-${{ needs.router.outputs.issue_number }}
-            cancel-in-progress: false
+    route_initialize_pr:
         needs: [router, lease_linux]
         runs-on: opencode
-        if: needs.router.outputs.route == 'update_pr'
+        if: needs.router.outputs.route == 'initialize_pr'
         uses: ./.gitea/workflows/sub_opencode_comment.yml
         secrets: inherit
         with:
@@ -157,3 +154,49 @@ jobs:
                 STRICT OUTPUT FORMAT:
                 Your response must contain ONLY the summary of the successfully pushed implementation OR the single clarification request. 
                 CRITICAL: Do not include introductory filler (e.g., \"I will now push the code\" or \"I have researched the issue\"). If you do not follow this exact format, the CI pipeline will fail.
+
+    route_update_pr:
+        concurrency:
+            group: agent-pr-${{ needs.router.outputs.issue_number }}
+            cancel-in-progress: false
+        needs: [router, lease_linux]
+        runs-on: opencode
+        if: needs.router.outputs.route == 'update_pr'
+        uses: ./.gitea/workflows/sub_opencode_comment.yml
+        secrets: inherit
+        with:
+            issue_number: ${{ needs.router.outputs.issue_number }}
+            prompt: |
+                You are an expert software engineer assigned to repository '${{ github.repository }}' to update PR #${{ needs.router.outputs.issue_number }}.
+
+                Your mission is to address new feedback provided in the PR timeline since your last activity.
+
+                PHASE 0: TIMELINE AUDIT & DELTA IDENTIFICATION
+                1. Use the Gitea MCP to fetch the FULL TIMELINE for PR #${{ needs.router.outputs.issue_number }}.
+                2. Identify your own most recent comment or action (your username is 'agent').
+                3. Extract all user comments, code review feedback, and inline replies that occurred AFTER your last activity. These are your new requirements.
+                4. If there is no activity from 'agent' in the timeline, treat the PR description and all existing comments as the requirements.
+
+                PHASE 1: CONTEXTUAL RESEARCH
+                - For each piece of new feedback identified in Phase 0:
+                  - Locate the specific file and line number if it's an inline comment.
+                  - Use MCP tools to read the current state of that code.
+                  - Trace dependencies to ensure the requested change won't break existing logic.
+
+                PHASE 2: IMPLEMENTATION
+                - Implement the fixes or changes requested in the new feedback.
+                - Ensure your code matches the repository's naming conventions and style.
+                - Validation: Mentally simulate the fix. Do not push code that introduces obvious syntax or import errors.
+
+                PHASE 3: EXECUTION & COMMIT
+                - Apply the changes to the workspace.
+                - Create a concise Git commit message summarizing the updates (e.g., "fix: addressed code review feedback regarding cache logic").
+                - Push the changes to the remote branch associated with PR #${{ needs.router.outputs.issue_number }}.
+
+                PHASE 4: OUTPUT
+                - Provide a brief summary of the specific comments you addressed and the changes you made.
+                - If the feedback was ambiguous and you are blocked despite exhaustive research, ask a single clarifying QUESTION.
+                - Do NOT repeat metadata. Do NOT include conversational filler.
+
+                STRICT OUTPUT FORMAT:
+                [Summary of addressed feedback and pushed changes] OR [Clarification Question]
