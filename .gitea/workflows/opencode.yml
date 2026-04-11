@@ -21,7 +21,7 @@ jobs:
             route: ${{ steps.set-metadata.outputs.route }}
             issue_number: ${{ steps.set-metadata.outputs.issue_number }}
         steps:
-            - name: "Determine Metadata"
+            - name: "Determine Route Information"
               id: set-metadata
               shell: bash
               env:
@@ -171,12 +171,13 @@ jobs:
 
                 Your mission is to address new feedback provided in the PR timeline since your last activity.
 
-                PHASE 0: COMPREHENSIVE FEEDBACK RETRIEVAL
-                1. Use the Gitea MCP to fetch the FULL TIMELINE for PR #${{ needs.router.outputs.issue_number }}.
-                2. CRITICAL: Use the specific "Get Pull Request Review Comments" or "List Pull Request Reviews" MCP tools. 
-                   - Note: Inline feedback often lives in 'review_comments' which are distinct from general timeline comments.
-                3. Identify your own most recent activity ('agent').
-                4. Extract all feedback (General comments + Inline Review comments) occurring AFTER your last activity.
+                PHASE 0: TIMELINE AUDIT & DELTA IDENTIFICATION
+                1. ACCESS DATA: 
+                   - Use `gitea_issue_read` with method `get_comments` for general PR discussion.
+                   - Use `gitea_pull_request_read` with method `list_pull_request_review_comments` to fetch all inline code feedback.
+                2. FILTER: Identify the 'agent' username's most recent timestamp.
+                3. EXTRACT: Collate all comments from both sources that occurred AFTER your last activity. These are your new requirements.
+                4. MAP: For inline comments, note the `path`, `position`, and `diff_hunk` provided by the tool to pinpoint the code location.
 
                 PHASE 1: CONTEXTUAL RESEARCH & CODE MAPPING
                 - For each 'review_comment' or 'timeline_comment' identified:
