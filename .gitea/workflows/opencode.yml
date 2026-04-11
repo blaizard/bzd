@@ -146,7 +146,7 @@ jobs:
                 PHASE 3: EXECUTION & COMMIT (CRITICAL)
                 - Once your implementation is ready and validated, you MUST use your available tools to apply the changes directly to the workspace.
                 - Stage your changes and create a clean, descriptive Git commit (adhering to conventional commits if the repository uses them).
-                - Execute the git push to upload your changes to the remote branch associated with PR #${{ needs.router.outputs.issue_number }}.
+                - ONLY WHEN your change is approved by the reviewer agent, push the changes to the remote branch associated with PR #${{ needs.router.outputs.issue_number }}.
 
                 PHASE 4: OUTPUT
                 - If you have successfully applied, committed, and pushed the changes, your response must be a brief summary of the completed work.
@@ -196,7 +196,7 @@ jobs:
                 PHASE 3: EXECUTION & COMMIT
                 - Apply the changes to the workspace.
                 - Create a concise Git commit message summarizing the updates (e.g., "fix: addressed code review feedback regarding cache logic").
-                - Push the changes to the remote branch associated with PR #${{ needs.router.outputs.issue_number }}.
+                - ONLY WHEN your change is approved by the reviewer agent, push the changes to the remote branch associated with PR #${{ needs.router.outputs.issue_number }}.
 
                 PHASE 4: OUTPUT
                 - Provide ONLY a brief summary of the specific comments you addressed and the changes you made.
