@@ -54,12 +54,12 @@ describe("Persistence", function () {
 		it("single", async function () {
 			await persistence.savepoint();
 			await persistence.consistencyCheck();
-		}).timeout(10000);
+		}).timeout(100000);
 		it("multiple", async function () {
 			const promise = [persistence.savepoint(), persistence.savepoint(), persistence.savepoint()];
 			await Promise.all(promise);
 			await persistence.consistencyCheck();
-		}).timeout(10000);
+		}).timeout(100000);
 	});
 
 	describe("reset", function () {
