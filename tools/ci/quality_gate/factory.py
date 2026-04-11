@@ -17,16 +17,16 @@ class QualityGate(Factory):
 	def getName(self) -> str:
 		return "Quality Gate"
 
-	def getConfigNormal(self) -> typing.Optional[ConfigNormal]:
+	def getConfigNormal(self, variant: typing.Optional[str]) -> typing.Optional[ConfigNormal]:
 		return ConfigNormal()
 
-	def getConfigStress(self) -> typing.Optional[ConfigStress]:
+	def getConfigStress(self, variant: typing.Optional[str]) -> typing.Optional[ConfigStress]:
 		return ConfigStress()
 
-	def getConfigCoverage(self) -> typing.Optional[ConfigCoverage]:
+	def getConfigCoverage(self, variant: typing.Optional[str]) -> typing.Optional[ConfigCoverage]:
 		return ConfigCoverage()
 
-	def getConfigSanitizer(self) -> typing.Optional[ConfigSanitizer]:
+	def getConfigSanitizer(self, variant: typing.Optional[str]) -> typing.Optional[ConfigSanitizer]:
 		return ConfigSanitizer()
 
 	def build(self) -> None:

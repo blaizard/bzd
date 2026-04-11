@@ -3,7 +3,7 @@ name: Opencode Event Router
 on:
     # Issue created.
     issues:
-        types: [opened, labeled]
+        types: [opened]
     # Issue comment, PR comment (main thread), PR inline comment reply
     issue_comment:
         types: [created, edited]
@@ -36,7 +36,9 @@ jobs:
                   route="none"
                   issue_number="$ISSUE_NUMBER"
 
-                  if [[ "$EVENT_NAME" == "issue_comment" && "$ACTOR" != "agent" ]]; then
+                  if [[ "$EVENT_NAME" == "issues" ]]; then
+                      route="issue_comment"
+                  elif [[ "$EVENT_NAME" == "issue_comment" && "$ACTOR" != "agent" ]]; then
                       if [[ "$IS_PR" == "true" ]]; then
                           route="update_pr"
                       elif [[ "$COMMENT_BODY" == /pr* ]]; then
@@ -79,6 +81,7 @@ jobs:
         secrets: inherit
         with:
             issue_number: ${{ needs.router.outputs.issue_number }}
+            agent: "plan_orchestrator"
             prompt: |
                 You are working on the repository '${{ github.repository }}' and handling issue #${{ needs.router.outputs.issue_number }}.
 
@@ -102,10 +105,7 @@ jobs:
                 CHOOSE ONE:
 
                 PLAN: 
-                (Your plan must be highly precise. Include exact file paths, target functions/classes, and specific logical changes required. No vague descriptions.)
-                1. [File: path/to/file.ext] - [Precise code change or addition to make]
-                2. [File: path/to/another.ext] - [Precise code change or addition to make]
-                ... 
+                (Your plan must be highly precise. Include specific logical changes required. No vague descriptions.)
 
                 QUESTION: 
                 (Ask only if exhaustive independent research failed. Briefly state what you investigated and exactly what information is blocking you.)
@@ -175,8 +175,8 @@ jobs:
                 1. ACCESS DATA: 
                    - Use `gitea_issue_read` with method `get_comments` for general PR discussion.
                    - Use `gitea_pull_request_read` with method `list_pull_request_review_comments` to fetch all inline code feedback.
-                2. FILTER: Identify the 'agent' username's most recent timestamp.
-                3. EXTRACT: Collate all comments from both sources that occurred AFTER your last activity. These are your new requirements.
+                2. FILTER: Identify ALL unresolved comments. Crucially, you must include comments that appeared BEFORE your last activity if they were not addressed by you ('agent') and remain unresolved. Do not filter out comments based on your last timestamp.
+                3. EXTRACT: Collate this complete list of unresolved comments from both sources. These are your active requirements.
                 4. MAP: For inline comments, note the `path`, `position`, and `diff_hunk` provided by the tool to pinpoint the code location.
 
                 PHASE 1: CONTEXTUAL RESEARCH & CODE MAPPING
@@ -196,9 +196,9 @@ jobs:
                 - Push the changes to the remote branch associated with PR #${{ needs.router.outputs.issue_number }}.
 
                 PHASE 4: OUTPUT
-                - Provide a brief summary of the specific comments you addressed and the changes you made.
+                - Provide ONLY a brief summary of the specific comments you addressed and the changes you made.
+                - You MUST NOT output your thinking steps, reasoning, internal logic, conversational filler, or metadata.
                 - If the feedback was ambiguous and you are blocked despite exhaustive research, ask a single clarifying QUESTION.
-                - Do NOT repeat metadata. Do NOT include conversational filler.
 
                 STRICT OUTPUT FORMAT:
                 [Summary of addressed feedback and pushed changes] OR [Clarification Question]

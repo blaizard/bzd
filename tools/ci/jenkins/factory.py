@@ -17,16 +17,16 @@ class Jenkins(Factory):
 	def getName(self) -> str:
 		return "Jenkins"
 
-	def getConfigNormal(self) -> typing.Optional[ConfigNormal]:
+	def getConfigNormal(self, variant: typing.Optional[str]) -> typing.Optional[ConfigNormal]:
 		return ConfigNormal()
 
-	def getConfigStress(self) -> typing.Optional[ConfigStress]:
+	def getConfigStress(self, variant: typing.Optional[str]) -> typing.Optional[ConfigStress]:
 		return ConfigStress(runs=10)
 
-	def getConfigCoverage(self) -> typing.Optional[ConfigCoverage]:
+	def getConfigCoverage(self, variant: typing.Optional[str]) -> typing.Optional[ConfigCoverage]:
 		return ConfigCoverage(exclude={"cc"})
 
-	def getConfigSanitizer(self) -> typing.Optional[ConfigSanitizer]:
+	def getConfigSanitizer(self, variant: typing.Optional[str]) -> typing.Optional[ConfigSanitizer]:
 		return ConfigSanitizer()
 
 	def build(self) -> None:

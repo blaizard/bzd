@@ -28,6 +28,11 @@ jobs:
               run: |
                   ./info.sh
 
+            - name: "[sanitizer] sanitizer"
+              run: |
+                  bzd-node timeit --path gitea/sanitizer_sanitizer/command-0 \
+                  ./tools/bazel run :sanitizer -- --check --all
+
             - name: "[normal] static analysis"
               run: |
                   bzd-node timeit --path gitea/normal_static_analysis/command-0 \
@@ -82,11 +87,6 @@ jobs:
                   bzd-node timeit --path gitea/coverage_nodejs/command-0 \
                   ./tools/bazel coverage ... --config=nodejs --config=local
                   bzd-node publish-json --path coverage/nodejs $(pwd)/bazel-out/coverage/report.json
-
-            - name: "[sanitizer] sanitizer"
-              run: |
-                  bzd-node timeit --path gitea/sanitizer_sanitizer/command-0 \
-                  ./tools/bazel run :sanitizer -- --check --all
 
             - name: "Deploy"
               uses: https://git.blaizard.com/blaise/deployment/ci/gitea/deploy@main

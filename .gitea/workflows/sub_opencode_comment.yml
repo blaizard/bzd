@@ -11,6 +11,11 @@ on:
                 description: "The prompt to be used for the agent."
                 required: true
                 type: string
+            agent:
+                description: "The agent to be using."
+                required: false
+                default: "build"
+                type: string
 
 jobs:
     update_pr:
@@ -23,11 +28,12 @@ jobs:
             - name: "Run opencode"
               env:
                   PROMPT: ${{ inputs.prompt }}
+                  AGENT: ${{ inputs.agent }}
               run: |
                   echo  "==== prompt ================================================="
                   echo "$PROMPT"
                   echo  "==== processing ============================================="
-                  bzd-lease opencode run "$PROMPT" > /tmp/agent-response.txt
+                  bzd-lease opencode run --agent "$AGENT" "$PROMPT" > /tmp/agent-response.txt
                   echo  "==== response ==============================================="
                   cat /tmp/agent-response.txt
 

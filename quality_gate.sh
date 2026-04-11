@@ -6,6 +6,8 @@ set -e
 
 EXTRA_FLAGS="$@"
 
+echo  "==== [sanitizer] sanitizer ==============================="
+./tools/bazel run :sanitizer -- --check --all $EXTRA_FLAGS
 echo  "==== [normal] static analysis ==============================="
 ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=dev --config=clang-tidy --config=mypy --config=clippy $EXTRA_FLAGS
 echo  "==== [normal] clang prod ==============================="
@@ -30,5 +32,3 @@ echo  "==== [coverage] cc ==============================="
 ./tools/bazel coverage cc/... --config=gcc --config=cc --config=local $EXTRA_FLAGS
 echo  "==== [coverage] nodejs ==============================="
 ./tools/bazel coverage ... --config=nodejs --config=local $EXTRA_FLAGS
-echo  "==== [sanitizer] sanitizer ==============================="
-./tools/bazel run :sanitizer -- --check --all $EXTRA_FLAGS

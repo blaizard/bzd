@@ -17,6 +17,11 @@ jobs:
               - cp tools/ci/travis/.bazelrc.local .bazelrc.local
               - ./info.sh
 
+        - name: "[sanitizer] sanitizer"
+          script:
+              - cp tools/ci/travis/.bazelrc.local .bazelrc.local
+              - ./tools/bazel run :sanitizer -- --check --all
+
         - name: "[normal] static analysis"
           script:
               - cp tools/ci/travis/.bazelrc.local .bazelrc.local
@@ -37,8 +42,3 @@ jobs:
               - cp tools/ci/travis/.bazelrc.local .bazelrc.local
               - ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=esp32s3 --config=prod --config=cc
               - ./tools/bazel test //rust/... --output_groups=+metadata --config=esp32s3 --config=prod
-
-        - name: "[sanitizer] sanitizer"
-          script:
-              - cp tools/ci/travis/.bazelrc.local .bazelrc.local
-              - ./tools/bazel run :sanitizer -- --check --all

@@ -12,26 +12,34 @@ from tools.ci.factory import (
 
 class Gitea(Factory):
 	def __init__(self) -> None:
-		self.jenkinsFile: typing.Optional[str] = None
+		self.content: typing.Optional[typing.Dict[str, str]] = None
 
 	def getName(self) -> str:
 		return "Gitea Actions"
 
-	def getConfigNormal(self) -> typing.Optional[ConfigNormal]:
+	def getConfigNormal(self, variant: typing.Optional[str]) -> typing.Optional[ConfigNormal]:
 		return ConfigNormal()
 
-	def getConfigStress(self) -> typing.Optional[ConfigStress]:
+	def getConfigStress(self, variant: typing.Optional[str]) -> typing.Optional[ConfigStress]:
+		if variant == "pr":
+			return None
 		return ConfigStress(runs=10)
 
-	def getConfigCoverage(self) -> typing.Optional[ConfigCoverage]:
+	def getConfigCoverage(self, variant: typing.Optional[str]) -> typing.Optional[ConfigCoverage]:
+		if variant == "pr":
+			return None
 		return ConfigCoverage(exclude={"cc"})
 
-	def getConfigSanitizer(self) -> typing.Optional[ConfigSanitizer]:
+	def getConfigSanitizer(self, variant: typing.Optional[str]) -> typing.Optional[ConfigSanitizer]:
 		return ConfigSanitizer()
 
 	def build(self) -> None:
-		self.jenkinsFile = self.renderTemplate(pathlib.Path("tools/ci/gitea/ci.btl"))
+		self.content = {
+			"deployment": self.renderTemplate(pathlib.Path("tools/ci/gitea/deployment.btl"), variant="deployment"),
+			"pr": self.renderTemplate(pathlib.Path("tools/ci/gitea/pr.btl"), variant="pr"),
+		}
 
 	def install(self, workspace: pathlib.Path) -> None:
-		assert self.jenkinsFile
-		(workspace / ".gitea/workflows/ci.yml").write_text(self.jenkinsFile)
+		assert self.content
+		(workspace / ".gitea/workflows/deployment.yml").write_text(self.content["deployment"])
+		(workspace / ".gitea/workflows/pr.yml").write_text(self.content["pr"])

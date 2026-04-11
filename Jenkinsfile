@@ -39,6 +39,13 @@ pipeline
 		{
 			parallel
 			{
+				stage("[sanitizer] sanitizer")
+				{
+					steps
+					{
+						sh "./tools/bazel run :sanitizer -- --check --all"
+					}
+				}
 				stage("[normal] static analysis")
 				{
 					steps
@@ -113,13 +120,6 @@ pipeline
 							sh "./tools/bazel coverage ... --config=nodejs --config=local"
 						}
 						archiveArtifacts artifacts: "bazel-out/coverage-nodejs/**/*", onlyIfSuccessful: true
-					}
-				}
-				stage("[sanitizer] sanitizer")
-				{
-					steps
-					{
-						sh "./tools/bazel run :sanitizer -- --check --all"
 					}
 				}
 			}

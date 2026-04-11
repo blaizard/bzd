@@ -61,22 +61,22 @@ class Factory(ABC):
 		pass
 
 	@abstractmethod
-	def getConfigNormal(self) -> typing.Optional[ConfigNormal]:
+	def getConfigNormal(self, variant: typing.Optional[str]) -> typing.Optional[ConfigNormal]:
 		"""Return the configuration associated with normal tests."""
 		pass
 
 	@abstractmethod
-	def getConfigStress(self) -> typing.Optional[ConfigStress]:
+	def getConfigStress(self, variant: typing.Optional[str]) -> typing.Optional[ConfigStress]:
 		"""Return the configuration associated with stress tests."""
 		pass
 
 	@abstractmethod
-	def getConfigCoverage(self) -> typing.Optional[ConfigCoverage]:
+	def getConfigCoverage(self, variant: typing.Optional[str]) -> typing.Optional[ConfigCoverage]:
 		"""Return the configuration associated with coverage tests."""
 		pass
 
 	@abstractmethod
-	def getConfigSanitizer(self) -> typing.Optional[ConfigSanitizer]:
+	def getConfigSanitizer(self, variant: typing.Optional[str]) -> typing.Optional[ConfigSanitizer]:
 		"""Return the configuration associated with sanitizer tests."""
 		pass
 
@@ -84,16 +84,16 @@ class Factory(ABC):
 	def normalizeIdentifier(string: str) -> str:
 		return re.sub(r"[^a-zA-Z0-9_]+", "_", string).strip("_")
 
-	def renderTemplate(self, templatePath: pathlib.Path) -> str:
+	def renderTemplate(self, templatePath: pathlib.Path, variant: typing.Optional[str] = None) -> str:
 		"""Render a template."""
 
 		configs = {
 			config.name: config
 			for config in [
-				self.getConfigNormal(),
-				self.getConfigStress(),
-				self.getConfigCoverage(),
-				self.getConfigSanitizer(),
+				self.getConfigNormal(variant),
+				self.getConfigStress(variant),
+				self.getConfigCoverage(variant),
+				self.getConfigSanitizer(variant),
 			]
 			if config is not None
 		}

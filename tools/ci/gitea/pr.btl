@@ -1,0 +1,43 @@
+name: Gate
+
+on:
+    pull_request:
+        types: [synchronize]
+
+jobs:
+    lease_linux:
+        runs-on: node_manager_client
+        steps:
+            - name: "Lease Linux"
+              uses: https://git.blaizard.com/blaise/deployment/ci/gitea/lease_linux@main
+              with:
+                  name: "ci"
+                  ttl: "300"
+
+    build_linux:
+        needs: lease_linux
+        runs-on: linux
+        steps:
+            - uses: https://git.blaizard.com/blaise/deployment/ci/gitea/setup@main
+              with:
+                  lease: "true"
+                  node: "true"
+
+            - name: "Info"
+              run: |
+                  ./info.sh
+
+{% for stage in stages %}
+            - name: "[{{ stage.category }}] {{ stage.name }}"
+              run: |
+              {% for index, command in stage.commands %}
+                  bzd-node timeit --path gitea/{{ stage.category | normalizeIdentifier }}_{{ stage.name | normalizeIdentifier }}/command-{{ index }} \
+                  {{ command }}
+              {% end %}
+
+{% end %}
+
+            - name: "Info"
+              if: always()
+              run: |
+                  ./info.sh

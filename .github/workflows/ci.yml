@@ -34,6 +34,12 @@ jobs:
                       -- \
                       --output $(pwd)/bin/bzd-node
 
+            - name: "[sanitizer] sanitizer"
+              run: |
+                  ./tools/bazel clean --expunge
+                  ./bin/bzd-node timeit --path github/sanitizer_sanitizer/command-0 \
+                  ./tools/bazel run :sanitizer -- --check --all
+
             - name: "[normal] static analysis"
               run: |
                   ./tools/bazel clean --expunge
@@ -86,12 +92,6 @@ jobs:
                   ./bin/bzd-node timeit --path github/coverage_nodejs/command-0 \
                   ./tools/bazel coverage ... --config=nodejs --config=local
                   ./bin/bzd-node publish-json --path coverage/nodejs $(pwd)/bazel-out/coverage/report.json
-
-            - name: "[sanitizer] sanitizer"
-              run: |
-                  ./tools/bazel clean --expunge
-                  ./bin/bzd-node timeit --path github/sanitizer_sanitizer/command-0 \
-                  ./tools/bazel run :sanitizer -- --check --all
 
             - name: Build documentation
               run: |

@@ -1,6 +1,14 @@
 {
     "stages": [
         {
+            "category": "sanitizer",
+            "commands": [
+                "./tools/bazel run :sanitizer -- --check --all"
+            ],
+            "name": "sanitizer",
+            "tags": []
+        },
+        {
             "commands": [
                 "./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --output_groups=+metadata --config=dev --config=clang-tidy --config=mypy --config=clippy"
             ],
@@ -123,14 +131,6 @@
                 "x86_64",
                 "nodejs"
             ]
-        },
-        {
-            "category": "sanitizer",
-            "commands": [
-                "./tools/bazel run :sanitizer -- --check --all"
-            ],
-            "name": "sanitizer",
-            "tags": []
         }
     ]
 }
