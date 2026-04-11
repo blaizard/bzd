@@ -18,26 +18,23 @@ jobs:
     router:
         runs-on: node_manager_client
         outputs:
-            route: ${{ steps.set-route.outputs.route }}
+            route: ${{ steps.set-metadata.outputs.route }}
+            issue_number: ${{ steps.set-metadata.outputs.issue_number }}
         steps:
-            - name: "Dump Github context"
-              env:
-                  GITHUB_CONTEXT: ${{ toJson(github) }}
-              run: |
-                  echo "Github context: $GITHUB_CONTEXT"
-
-            - name: "Determine Route"
-              id: set-route
+            - name: "Determine Metadata"
+              id: set-metadata
               shell: bash
               env:
                   EVENT_NAME: ${{ github.event_name }}
                   ACTOR: ${{ github.actor }}
                   COMMENT_BODY: ${{ github.event.comment.body || '' }}
                   IS_PR: ${{ github.event_name == 'issue_comment' && github.event.issue.pull_request && 'true' || 'false' }}
+                  ISSUE_NUMBER: ${{ github.event.pull_request.number || github.event.issue.number }}
               run: |
                   set -euo pipefail
 
                   route="none"
+                  issue_number="$ISSUE_NUMBER"
 
                   if [[ "$EVENT_NAME" == "issue_comment" && "$ACTOR" != "agent" ]]; then
                       if [[ "$IS_PR" == "true" ]]; then
@@ -59,7 +56,9 @@ jobs:
                   fi
 
                   echo "route=$route" >> $GITHUB_OUTPUT
+                  echo "issue_number=$issue_number" >> $GITHUB_OUTPUT
                   echo "Determined route: $route"
+                  echo "Determined issue_number: $issue_number"
 
     lease_linux:
         needs: router
@@ -79,9 +78,9 @@ jobs:
         uses: ./.gitea/workflows/sub_opencode_comment.yml
         secrets: inherit
         with:
-            issue_number: ${{ github.event.issue.number }}
+            issue_number: ${{ needs.router.outputs.issue_number }}
             prompt: |
-                You are working on the repository '${{ github.repository }}' and handling issue #${{ github.event.issue.number }}.
+                You are working on the repository '${{ github.repository }}' and handling issue #${{ needs.router.outputs.issue_number }}.
 
                 Use the Gitea MCP and your available tools to deeply research the context: 
                 1. Fetch the issue details (title, body, labels, comments, etc).
@@ -121,7 +120,7 @@ jobs:
 
     route_update_pr:
         concurrency:
-            group: agent-pr-${{ github.event.pull_request.number }}
+            group: agent-pr-${{ needs.router.outputs.issue_number }}
             cancel-in-progress: false
         needs: [router, lease_linux]
         runs-on: opencode
@@ -129,14 +128,14 @@ jobs:
         uses: ./.gitea/workflows/sub_opencode_comment.yml
         secrets: inherit
         with:
-            issue_number: ${{ github.event.pull_request.number }}
+            issue_number: ${{ needs.router.outputs.issue_number }}
             prompt: |
-                You are an expert software engineer. You are currently assigned to repository '${{ github.repository }}' to implement the changes requested in PR #${{ github.event.pull_request.number }}.
+                You are an expert software engineer. You are currently assigned to repository '${{ github.repository }}' to implement the changes requested in PR #${{ needs.router.outputs.issue_number }}.
 
                 Your primary objective is to write the code required to fulfill the PR description, seamlessly integrate it into the existing codebase, and commit and push the final changes.
 
                 PHASE 1: CONTEXT & DEEP RESEARCH (Use Gitea MCP & Tools)
-                1. Fetch the details of PR #${{ github.event.pull_request.number }} (title, body).
+                1. Fetch the details of PR #${{ needs.router.outputs.issue_number }} (title, body).
                 2. TRACE THE ORIGIN: The PR body contains a reference/link to the original issue that triggered this PR. You MUST fetch that original issue and read its entire comment history to understand the exact feature request, prior discussions, and intended architectural approach.
                 3. DEEP CODEBASE RECONNAISSANCE: Do not guess. Actively search the codebase, read relevant file contents, and trace dependencies. Understand how the modules you need to modify interact with the rest of the system.
 
@@ -148,7 +147,7 @@ jobs:
                 PHASE 3: EXECUTION & COMMIT (CRITICAL)
                 - Once your implementation is ready and validated, you MUST use your available tools to apply the changes directly to the workspace.
                 - Stage your changes and create a clean, descriptive Git commit (adhering to conventional commits if the repository uses them).
-                - Execute the git push to upload your changes to the remote branch associated with PR #${{ github.event.pull_request.number }}.
+                - Execute the git push to upload your changes to the remote branch associated with PR #${{ needs.router.outputs.issue_number }}.
 
                 PHASE 4: OUTPUT
                 - If you have successfully applied, committed, and pushed the changes, your response must be a brief summary of the completed work.
