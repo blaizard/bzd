@@ -105,7 +105,7 @@ jobs:
                 CHOOSE ONE:
 
                 PLAN:
-                [Task Objective: Write one or two sentences summarizing the overall goal of this task.]
+                Task Objective: Write one or two sentences summarizing the overall goal of this task.
                 (Your plan must be highly precise. Include specific logical changes required. No vague descriptions.)
 
                 QUESTION:
@@ -127,6 +127,7 @@ jobs:
         secrets: inherit
         with:
             issue_number: ${{ needs.router.outputs.issue_number }}
+            agent: "build_orchestrator"
             prompt: |
                 You are an expert software engineer. You are currently assigned to repository '${{ github.repository }}' to implement the changes requested in PR #${{ needs.router.outputs.issue_number }}.
 
@@ -167,6 +168,7 @@ jobs:
         secrets: inherit
         with:
             issue_number: ${{ needs.router.outputs.issue_number }}
+            agent: "build_orchestrator"
             prompt: |
                 You are an expert software engineer assigned to repository '${{ github.repository }}' to update PR #${{ needs.router.outputs.issue_number }}.
 
