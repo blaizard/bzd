@@ -235,7 +235,7 @@ mv "\$tmp" "\$self"
 exec "\$self" "\$@"
 EOF
 
-# ---- Content from tmux.sh
+# ---- Content from session.sh
 # Show tmux sessions if any exist
 if command -v tmux >/dev/null 2>&1; then
 	sessions=$(tmux list-sessions -F '#S' 2>/dev/null)
@@ -245,8 +245,13 @@ if command -v tmux >/dev/null 2>&1; then
 
 	# If we are inside a tmux session.
 	if [ -n "$TMUX" ]; then
-		__session_names+=("$(tmux display-message -p '#S')")
+		__session_names+=("tmux:$(tmux display-message -p '#S')")
 	fi
+fi
+
+# If we are inside a custom session.
+if [ -n "$BZD_SESSION" ]; then
+	__session_names+=("$BZD_SESSION")
 fi
 
 # ---- Content from update.sh
