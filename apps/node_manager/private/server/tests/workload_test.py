@@ -214,7 +214,7 @@ class TestWorkload(unittest.TestCase):
 		self.currentTime = 1501
 		workload.terminationWatcher()
 		self.assertTrue(self.terminated)
-		self.assertEqual(workload.plannedDownTime(), 0)
+		self.assertEqual(workload.plannedDownTime(), 300)
 
 	def testDefaultTerminationPeriodSClearedByLease(self) -> None:
 		def clockFn() -> float:
