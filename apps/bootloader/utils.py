@@ -27,9 +27,9 @@ class RollingNamedTemporaryFile:
 		        The full path of the temporary file.
 		"""
 
-		# Generate a unique file name.
+		# Generate a unique file name using time + random bytes for guaranteed uniqueness.
 		while True:
-			path = self.temporaryDirectory / f"tmp.{time.time()}"
+			path = self.temporaryDirectory / f"tmp.{time.time()}.{os.urandom(8).hex()}"
 			if not path.exists():
 				path.touch()
 				break
