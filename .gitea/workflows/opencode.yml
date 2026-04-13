@@ -3,7 +3,7 @@ name: Opencode Event Router
 on:
     # Issue created.
     issues:
-        types: [opened]
+        types: [opened, edited]
     # Issue comment, PR comment (main thread), PR inline comment reply
     issue_comment:
         types: [created, edited]
