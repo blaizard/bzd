@@ -83,7 +83,7 @@ export default class LockFile {
 
 	/// Check if the status of the lock.
 	///
-	/// \return true if the lock is expired, false otherwise.
+	/// \return the status of the lock.
 	async getStatus() {
 		const path = this.path.asPosix();
 		const currentTimeMs = this.options.clock.getTimeMs();
@@ -92,23 +92,29 @@ export default class LockFile {
 			const fileTimeMs = stats.mtime.getTime();
 
 			// Update the last expiry check time.
+			const thresholdMs = Math.max(this.options.heartBeatIntervalMs * 3, 2000);
 			if (this.lastExpiryCheck === null) {
-				this.lastExpiryCheck = [fileTimeMs, currentTimeMs];
+				// If the lock is already older than the threshold, initialize it as expired.
+				if (currentTimeMs - fileTimeMs > thresholdMs) {
+					this.lastExpiryCheck = [fileTimeMs, currentTimeMs - thresholdMs - 1];
+				} else {
+					this.lastExpiryCheck = [fileTimeMs, currentTimeMs];
+				}
 			} else if (this.lastExpiryCheck[0] == fileTimeMs) {
 				// Do nothing, the file has not been updated since last check.
 			} else {
 				this.lastExpiryCheck = [fileTimeMs, currentTimeMs];
+			}
+
+			// Check if the lock is expired.
+			if (currentTimeMs - this.lastExpiryCheck[1] > thresholdMs) {
+				return LockFile.Status.expired;
 			}
 		} catch (error) {
 			if (error.code === "ENOENT") {
 				return LockFile.Status.unlocked;
 			}
 			throw error;
-		}
-
-		// Check if the lock is expired (no update in the last 15s).
-		if (currentTimeMs - this.lastExpiryCheck[1] > this.options.heartBeatIntervalMs * 3) {
-			return LockFile.Status.expired;
 		}
 
 		return LockFile.Status.locked;
@@ -124,19 +130,27 @@ export default class LockFile {
 		if (await this._tryLock(path)) {
 			// Update the mtime of the file using file system time.
 			const heartBeat = async () => {
+				if (this.intervalActive) {
+					return;
+				}
 				const timestampS = this.options.clock.getTimeS();
 				try {
 					this.intervalActive = true;
 					await this.options.fs.utimes(path, timestampS, timestampS);
+					return true;
 				} catch (e) {
-					clearInterval(this.interval);
-					this.interval = null;
-					Exception.unreachable("Should never happen, we have exclusive access on the directory: {}", e);
+					if (this.interval) {
+						clearInterval(this.interval);
+						this.interval = null;
+					}
+					return false;
 				} finally {
 					this.intervalActive = false;
 				}
 			};
-			await heartBeat();
+			if (!(await heartBeat())) {
+				return false;
+			}
 			this.interval = setInterval(heartBeat, this.options.heartBeatIntervalMs).unref();
 			return true;
 		}

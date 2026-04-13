@@ -3,16 +3,30 @@ import Os from "os";
 import ExceptionFactory from "../exception.mjs";
 import LockFile from "../lock_file.mjs";
 import ClockMock from "#bzd/nodejs/core/clock/mock.mjs";
+import pathlib from "#bzd/nodejs/utils/pathlib.mjs";
+import FileSystem from "../filesystem.mjs";
 
 const Exception = ExceptionFactory("test", "lockFile");
 
 describe("LockFile", () => {
 	const tmpDir = process.env.TEST_TMPDIR || Os.tmpdir();
-	const lockFilePath = tmpDir + "/simple_lockfile_test.lock";
+	let lockFilePath;
+	let lockFile;
+
+	beforeEach(async () => {
+		lockFilePath = pathlib.path(tmpDir).joinPath("simple_lockfile_test.lock").asPosix();
+		await FileSystem.rmdir(lockFilePath, { force: true });
+	});
+
+	afterEach(async () => {
+		if (lockFile && typeof lockFile.unlock === "function") {
+			await lockFile.unlock(true);
+		}
+	});
 
 	it("Simple", async () => {
 		const clock = new ClockMock();
-		const lockFile = new LockFile(lockFilePath, {
+		lockFile = new LockFile(lockFilePath, {
 			clock: clock,
 		});
 		Exception.assert(!lockFile.isLock());
@@ -67,12 +81,12 @@ describe("LockFile", () => {
 	it("Concurrent", async () => {
 		let result = [];
 		const worker = async (uid) => {
-			const lockFile = new LockFile(lockFilePath);
-			await lockFile.lock(async () => {
+			const workerLockFile = new LockFile(lockFilePath);
+			await workerLockFile.lock(async () => {
 				result.push(uid);
 				await new Promise((resolve) => setTimeout(resolve, 1));
 				Exception.assertEqual(result[result.length - 1], uid);
-			});
+			}, 10);
 		};
 		const nbPromise = 10;
 		const promises = [];
@@ -81,5 +95,24 @@ describe("LockFile", () => {
 		}
 		await Promise.all(promises);
 		Exception.assertEqual(result.length, nbPromise);
+	});
+
+	it("Heartbeat Failure", async () => {
+		const clock = new ClockMock();
+		lockFile = new LockFile(lockFilePath, {
+			clock: clock,
+			heartBeatIntervalMs: 10,
+		});
+
+		await lockFile.tryLock();
+		Exception.assert(lockFile.isLock());
+
+		// Manually remove the lock directory.
+		await FileSystem.rmdir(lockFilePath, { force: true });
+
+		// Wait for a heartbeat cycle.
+		await new Promise((resolve) => setTimeout(resolve, 100));
+
+		Exception.assert(!lockFile.isLock());
 	});
 });
