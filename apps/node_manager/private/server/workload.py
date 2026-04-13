@@ -52,7 +52,7 @@ class Workload:
 		self.terminateFn_()
 
 		print("Waking up from suspend.")
-		self.terminationTimestamp_ = self.terminationGracePeriodS_
+		self.terminationTimestamp_ = None
 		self.uidCounter_ = 0
 		self.leases_ = {}
 
