@@ -102,13 +102,13 @@ class FeatureSession(Feature):
 	def dockerFile(self) -> typing.List[str]:
 		assert self.context is not None
 		return [
-			"RUN sudo apt install -y tmux",
-			f"""RUN <<EOF cat > {self.context.home}/.tmux.conf
-set -g default-command "/bin/bash"
-EOF""",
+			"RUN sudo apt update && sudo apt install -y dtach",
 			"""RUN sudo tee /usr/local/bin/session <<EOF
-#!/bin/bash
-exec tmux new-session -A -s "${1:-main}"
+#!/usr/bin/env bash
+set -euo pipefail
+mkdir -p ~/.dtach
+export BZD_SESSION="\\${1:-main}"
+exec dtach -A ~/.dtach/"\\${1:-main}" bash
 EOF""",
 			"RUN sudo chmod +x /usr/local/bin/session",
 		]
@@ -163,7 +163,7 @@ class FeatureDevcontainerCLI(Feature):
 	@property
 	def dockerFile(self) -> typing.List[str]:
 		return [
-			"RUN sudo apt install -y nodejs npm",
+			"RUN sudo apt update && sudo apt install -y nodejs npm",
 			"RUN sudo npm install -g @devcontainers/cli",
 		]
 
@@ -174,7 +174,7 @@ class FeatureOpenCode(Feature):
 	@property
 	def dockerFile(self) -> typing.List[str]:
 		return [
-			"RUN sudo apt install -y nodejs npm",
+			"RUN sudo apt update && sudo apt install -y nodejs npm",
 			"RUN sudo npm install -g opencode-ai@latest",
 		]
 
@@ -308,7 +308,7 @@ class SandboxContainer:
 		self.uid = os.getuid()
 		self.gid = os.getgid()
 		self.userNamespaceRemapping = SandboxContainer.isUserNamespaceRemapping()
-		self.isInteractive = sys.stdin.isatty() or sys.stdout.isatty()
+		self.isInteractive = sys.stdin.isatty() and sys.stdout.isatty()
 		self.user = "root" if self.userNamespaceRemapping else getpass.getuser()
 		self.features = [feature for feature in features if feature.isAvailable]
 		self.args = args
@@ -416,7 +416,7 @@ class SandboxContainer:
 
 		return f"""
 FROM {imageBase}
-RUN apt update -y && apt upgrade -y && apt install -y \
+RUN apt update && apt upgrade -y && apt install -y \
 	ca-certificates \
 	python3 \
 	git \
