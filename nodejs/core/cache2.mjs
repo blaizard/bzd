@@ -272,14 +272,13 @@ export default class Cache2 {
 		try {
 			const value = await data.fetch(key);
 			this.set(collection, key, value, Cache2.Status.value);
+			return value;
 		} catch (e) {
 			this.set(collection, key, e, Cache2.Status.error);
 			throw e;
 		} finally {
 			resolveList.forEach((resolve) => resolve());
 		}
-
-		return data.values.get(key).data;
 	}
 
 	/// Get the value instantly if available.
