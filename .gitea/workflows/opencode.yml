@@ -153,8 +153,9 @@ jobs:
                 - Do NOT repeat the PR/Issue metadata (Title, Body, Comments) in your response. I already have that context.
 
                 STRICT OUTPUT FORMAT:
-                Your response must contain ONLY the summary of the successfully pushed implementation OR the single clarification request. 
-                CRITICAL: Do not include introductory filler (e.g., \"I will now push the code\" or \"I have researched the issue\"). If you do not follow this exact format, the CI pipeline will fail.
+                - ABSOLUTELY NO introductory filler, thinking text, or explanations.
+                - CRITICAL: If you do not follow this exact format, the CI will fail.
+                - Your response must contain ONLY the summary of the successfully pushed implementation OR the clarification request.
 
     route_update_pr:
         concurrency:
@@ -203,4 +204,6 @@ jobs:
                 - If the feedback was ambiguous and you are blocked despite exhaustive research, ask a single clarifying QUESTION.
 
                 STRICT OUTPUT FORMAT:
-                [Summary of addressed feedback and pushed changes] OR [Clarification Question]
+                - ABSOLUTELY NO introductory filler, thinking text, or explanations.
+                - CRITICAL: If you do not follow this exact format, the CI will fail.
+                - Your response must contain ONLY the summary of the successfully pushed implementation OR the clarification request.
