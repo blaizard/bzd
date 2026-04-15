@@ -571,7 +571,7 @@ describe("Plugin", () => {
 			} finally {
 				await tester.stop();
 			}
-		}, /*timeout*/ 10000);
+		}).timeout(10000);
 	});
 
 	const makeDatabaseTest = async (options, onReceiveCallback) => {
