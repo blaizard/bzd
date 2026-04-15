@@ -1,8 +1,8 @@
-name: Gate
+name: PR Gate
 
 on:
     pull_request:
-        types: [synchronize]
+        types: [opened, synchronize, reopened]
 
 jobs:
     lease_linux:

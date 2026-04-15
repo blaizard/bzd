@@ -21,12 +21,12 @@ class Gitea(Factory):
 		return ConfigNormal()
 
 	def getConfigStress(self, variant: typing.Optional[str]) -> typing.Optional[ConfigStress]:
-		if variant == "pr":
+		if variant == "pr_gate":
 			return None
 		return ConfigStress(runs=10)
 
 	def getConfigCoverage(self, variant: typing.Optional[str]) -> typing.Optional[ConfigCoverage]:
-		if variant == "pr":
+		if variant == "pr_gate":
 			return None
 		return ConfigCoverage(exclude={"cc"})
 
@@ -35,11 +35,11 @@ class Gitea(Factory):
 
 	def build(self) -> None:
 		self.content = {
-			"deployment": self.renderTemplate(pathlib.Path("tools/ci/gitea/deployment.btl"), variant="deployment"),
-			"pr": self.renderTemplate(pathlib.Path("tools/ci/gitea/pr.btl"), variant="pr"),
+			"ci_cd": self.renderTemplate(pathlib.Path("tools/ci/gitea/ci_cd.btl"), variant="ci_cd"),
+			"pr_gate": self.renderTemplate(pathlib.Path("tools/ci/gitea/pr_gate.btl"), variant="pr_gate"),
 		}
 
 	def install(self, workspace: pathlib.Path) -> None:
 		assert self.content
-		(workspace / ".gitea/workflows/deployment.yml").write_text(self.content["deployment"])
-		(workspace / ".gitea/workflows/pr.yml").write_text(self.content["pr"])
+		(workspace / ".gitea/workflows/ci_cd.yml").write_text(self.content["ci_cd"])
+		(workspace / ".gitea/workflows/pr_gate.yml").write_text(self.content["pr_gate"])

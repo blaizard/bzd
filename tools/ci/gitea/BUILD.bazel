@@ -6,8 +6,8 @@ py_library(
         "factory.py",
     ],
     data = [
-        "deployment.btl",
-        "pr.btl",
+        "ci_cd.btl",
+        "pr_gate.btl",
     ],
     visibility = [
         "//tools/ci:__pkg__",
