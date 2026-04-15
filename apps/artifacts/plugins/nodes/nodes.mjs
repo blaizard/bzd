@@ -110,9 +110,11 @@ export class Nodes {
 
 	// Insert a record entry to the data.
 	async insertRecord(records) {
-		for (const [uid, key, value, timestamp, _isFixedTimestamp] of records) {
-			await this.data.insert(uid, [[key, value]], timestamp, /*updateStatistics*/ false);
-		}
+		await Promise.all(
+			records.map(([uid, key, value, timestamp, _isFixedTimestamp]) =>
+				this.data.insert(uid, [[key, value]], timestamp, /*updateStatistics*/ false),
+			),
+		);
 	}
 
 	/// Write a record to the disk.
