@@ -24,6 +24,7 @@ bzd_nodejs_oci(
         "{frontend}",
     ],
     include_metadata = True,
+    tags = ["manual"],
     visibility = [
         "//deployment:__subpackages__",
     ],
