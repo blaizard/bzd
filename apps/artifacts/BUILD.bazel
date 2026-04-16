@@ -18,7 +18,10 @@ bzd_nodejs_oci(
         "{frontend}",
     ],
     include_metadata = True,
-    tags = ["manual"],
+    tags = [
+        "manual",
+        "no-remote",
+    ],
     visibility = [
         "//deployment:__subpackages__",
     ],

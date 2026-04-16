@@ -11,4 +11,8 @@ py_binary(
 bzd_python_oci(
     name = "image_sleep",
     binary = ":sleep",
+    tags = [
+        "manual",
+        "no-remote",
+    ],
 )
