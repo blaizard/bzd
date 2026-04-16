@@ -19,6 +19,10 @@ py_binary(
 bzd_python_oci(
     name = "image",
     binary = ":docker_manager",
+    tags = [
+        "manual",
+        "no-remote",
+    ],
     visibility = [
         "//deployment:__subpackages__",
     ],
