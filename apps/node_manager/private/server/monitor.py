@@ -156,13 +156,19 @@ class Monitor:
 				sdiskio.read_bytes - self.ioPrevious[name].get("out", sdiskio.read_bytes),
 				0,
 			)
+			diffUsage = max(
+				sdiskio.busy_time - self.ioPrevious[name].get("usage", sdiskio.busy_time),
+				0,
+			)
 			self.ioPrevious[name] = {
 				"in": sdiskio.write_bytes,
 				"out": sdiskio.read_bytes,
+				"usage": sdiskio.busy_time,
 			}
 			io[name] = {
 				"in": (diffIn / timestampDiffS) if timestampDiffS > 0.01 else 0,
 				"out": (diffOut / timestampDiffS) if timestampDiffS > 0.01 else 0,
+				"usage": (diffUsage / timestampDiffS / 1000.0) if timestampDiffS > 0.01 else 0,
 			}
 		return io
 

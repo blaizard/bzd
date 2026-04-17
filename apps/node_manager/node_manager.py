@@ -35,6 +35,11 @@ if __name__ == "__main__":
 		help="For testing only, do not publish or perform any destructive action.",
 	)
 	parser.add_argument(
+		"--watch",
+		action="store_true",
+		help="For testing only, print every 1s a new update.",
+	)
+	parser.add_argument(
 		"--node-token",
 		type=str,
 		default=os.environ.get("BZD_NODE_TOKEN"),
@@ -64,8 +69,13 @@ if __name__ == "__main__":
 	monitor = Monitor(config=config, workload=workload if args.power else None)
 
 	if args.uid is None:
-		data = monitor.all()
-		print(json.dumps(data, indent=4))
+		while True:
+			data = monitor.all()
+			print(json.dumps(data, indent=4))
+			if args.watch:
+				time.sleep(1)
+				continue
+			break
 		sys.exit(0)
 
 	# Ensure only a single instance of this program is running at a time.
