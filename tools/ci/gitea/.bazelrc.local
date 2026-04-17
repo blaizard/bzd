@@ -8,3 +8,8 @@ test --test_timeout_filters=-long,-eternal
 
 # Use remote execution.
 common --config=remote
+
+# Repository cache.
+common --repository_cache=/opt/bazel_repo_cache
+# Sandbox base into RAM.
+common --sandbox_base=/dev/shm
