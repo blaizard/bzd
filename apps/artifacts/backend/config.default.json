@@ -130,6 +130,19 @@
                         "name"
                     ],
                     "inputs": {
+                        "/data/io/{name}/usage": {}
+                    },
+                    "max": 1,
+                    "min": 0,
+                    "title": "IO usage",
+                    "type": "linear",
+                    "unit": "percent"
+                },
+                {
+                    "groupBy": [
+                        "name"
+                    ],
+                    "inputs": {
                         "/data/io/{name}/in": {}
                     },
                     "min": 0,
