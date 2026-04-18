@@ -168,7 +168,7 @@ class Monitor:
 			io[name] = {
 				"in": (diffIn / timestampDiffS) if timestampDiffS > 0.01 else 0,
 				"out": (diffOut / timestampDiffS) if timestampDiffS > 0.01 else 0,
-				"usage": (diffUsage / timestampDiffS / 1000.0) if timestampDiffS > 0.01 else 0,
+				"usage": min(1.0, diffUsage / timestampDiffS / 1000.0) if timestampDiffS > 0.01 else 0,
 			}
 		return io
 
