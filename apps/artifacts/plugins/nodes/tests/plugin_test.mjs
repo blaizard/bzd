@@ -539,16 +539,23 @@ describe("Plugin", () => {
 			await tester.start();
 			try {
 				// Send a lot of data to both nodes randomly.
+				let promises = [];
 				let nbDataLeft = 1000;
 				let counter = 0;
 				while (nbDataLeft--) {
 					const nodeName = nodes[Math.floor(Math.random() * nodes.length)];
 					const value = ++counter;
-					await tester.send(nodeName, "post", "/hello/value", {
-						query: { bulk: 1 },
-						headers: { "Content-Type": "application/json" },
-						data: JSON.stringify({ data: [[value, value]] }),
-					});
+					promises.push(
+						tester.send(nodeName, "post", "/hello/value", {
+							query: { bulk: 1 },
+							headers: { "Content-Type": "application/json" },
+							data: JSON.stringify({ data: [[value, value]] }),
+						}),
+					);
+					if (promises.length === 50) {
+						await Promise.all(promises);
+						promises = [];
+					}
 				}
 
 				// Sync.
