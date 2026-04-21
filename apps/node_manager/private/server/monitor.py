@@ -50,6 +50,11 @@ class Monitor:
 			"main": [cpu / 100.0 for cpu in psutil.cpu_percent(interval=1, percpu=True)]  # type: ignore
 		}
 
+	def cpu_freqs(self) -> typing.Any:
+		return {
+			"main": [freq.current * 1000000 for freq in psutil.cpu_freq(percpu=True)]  # type: ignore
+		}
+
 	def gpus(self) -> typing.Any:
 		data = {}
 		data.update(self.nvidia.gpus())
@@ -189,6 +194,7 @@ class Monitor:
 				content[key].update(value)
 
 		mergeDictIfSet("cpu", self.cpus())
+		mergeDictIfSet("cpu_frequency", self.cpu_freqs())
 		mergeDictIfSet("gpu", self.gpus())
 		mergeDictIfSet("temperature", self.temperatures())
 		mergeDictIfSet("battery", self.batteries())

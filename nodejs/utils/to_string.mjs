@@ -37,6 +37,21 @@ export function bytesToString(value, decimalPoints = 1) {
 	);
 }
 
+export function frequencyToString(value, decimalPoints = 1) {
+	return _unitsToString(
+		[
+			["Hz", "Hz", 1000],
+			["KHz", "KHz", 1000],
+			["MHz", "MHz", 1000],
+			["GHz", "GHz", 1000],
+			["THz", "THz", 1000],
+		],
+		value,
+		/*maxNbUnits*/ 1,
+		decimalPoints,
+	);
+}
+
 export function timeMsToString(value, maxNbUnits = 1) {
 	return _unitsToString(
 		[

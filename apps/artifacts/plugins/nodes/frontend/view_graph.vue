@@ -7,7 +7,7 @@
 <script>
 	import Chart from "chart.js/auto";
 	import "chartjs-adapter-date-fns";
-	import { bytesToString } from "#bzd/nodejs/utils/to_string.mjs";
+	import { bytesToString, frequencyToString } from "#bzd/nodejs/utils/to_string.mjs";
 	import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 
 	const Exception = ExceptionFactory("apps", "plugin", "nodes");
@@ -48,6 +48,7 @@
 					"bytes/s": (x) => bytesToString(x) + "/s",
 					percent: (x) => x * 100 + "%",
 					celsius: (x) => x + "°C",
+					frequency: (x) => frequencyToString(x),
 				}[this.options.unit] || nopFormatter;
 
 			this.chart = new Chart(
