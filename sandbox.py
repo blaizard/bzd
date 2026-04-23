@@ -302,13 +302,12 @@ class SandboxContainer:
 	def __init__(self, args: argparse.Namespace, features: typing.Sequence[Feature], temporaryPath: pathlib.Path) -> None:
 
 		self.root = args.root.resolve().absolute()
-		self.cwd = pathlib.Path.cwd()
 		self.home = pathlib.Path.home()
 		self.temporaryPath = temporaryPath
 		self.uid = os.getuid()
 		self.gid = os.getgid()
 		self.userNamespaceRemapping = SandboxContainer.isUserNamespaceRemapping()
-		self.isInteractive = sys.stdin.isatty() and sys.stdout.isatty()
+		self.isInteractive = False if args.no_tty else (sys.stdin.isatty() and sys.stdout.isatty())
 		self.user = "root" if self.userNamespaceRemapping else getpass.getuser()
 		self.features = [feature for feature in features if feature.isAvailable]
 		self.args = args
@@ -477,6 +476,7 @@ services:
       - "{self.imageName}:127.0.0.1"
     labels:
       com.bzd.sandbox.root: "{self.root}"
+      com.bzd.sandbox.interactive: "{1 if self.isInteractive else 0}"
       com.bzd.sandbox.user: "{getpass.getuser()}"
       com.bzd.sandbox.command: "{" ".join(sys.argv[1:])}"
     init: true
@@ -515,6 +515,19 @@ services:
 			check=True,
 		)
 
+		SandboxContainer._exec(
+			imageName=self.imageName,
+			root=self.root,
+			interactive=self.isInteractive,
+			args=args,
+			env=env,
+		)
+
+	@staticmethod
+	def _exec(
+		imageName: str, root: pathlib.Path, interactive: bool, args: typing.List[str], env: typing.List[str] = []
+	) -> None:
+
 		env += [
 			"LANG",
 			"LC_CTYPE",
@@ -524,16 +537,16 @@ services:
 		extra = [arg for e in env for arg in ("--env", e)]
 
 		cwd = pathlib.Path.cwd().resolve()
-		workdir = cwd if cwd.is_relative_to(self.root) else self.root
+		workdir = cwd if cwd.is_relative_to(root) else root
 		subprocess.run(
 			[
 				"docker",
 				"exec",
 				*extra,
-				"-it",
+				*(["-it"] if interactive else []),
 				"--workdir",
-				str(workdir),
-				self.imageName,
+				str(workdir.absolute().resolve()),
+				imageName,
 				*(args or ["/bin/bash"]),
 			]
 		)
@@ -556,27 +569,33 @@ services:
 			try:
 				root = pathlib.Path(labels["com.bzd.sandbox.root"]).resolve()
 				relativeRoot = pathlib.Path(os.path.relpath(root, pathlib.Path.cwd().resolve()))
-				lines = [
-					f"root: {relativeRoot}",
-					f"command: {pathlib.Path(__file__).name} {labels['com.bzd.sandbox.command']}",
-					f"user: {labels['com.bzd.sandbox.user']}",
-				]
-				order = len(relativeRoot.parts)
-			except Exception as e:
-				lines, order = [f"{e.__class__.__name__}: {e}"], 999
+				kwargs: typing.Dict[str, typing.Any] = {
+					"root": relativeRoot,
+				}
+				sameUser = labels.get("com.bzd.sandbox.user") == getpass.getuser()
+				interactive = labels.get("com.bzd.sandbox.interactive") == "1"
+				if labels.get("com.bzd.sandbox.command"):
+					kwargs["arguments"] = labels["com.bzd.sandbox.command"]
+				if not sameUser:
+					kwargs["user"] = labels["com.bzd.sandbox.user"]
+				if interactive:
+					kwargs["interactive"] = True
+				order = len(relativeRoot.parts) + (0 if sameUser else 100) + (0 if interactive else 1)
+			except Exception:
+				kwargs, order = {}, 999
 			containers.append(
 				{
 					"name": container["Names"],
 					"status": container["Status"],
 					"active": container["State"] == "running",
-					"lines": lines,
 					"order": order,
+					**kwargs,
 				}
 			)
-		return containers
+		return sorted(containers, key=lambda u: u["order"])
 
 	@staticmethod
-	def ls() -> None:
+	def ls(_: typing.List[str]) -> None:
 		containers = SandboxContainer._list_containers()
 		result = subprocess.run(
 			["docker", "stats", "--no-stream", "--format", "json"] + [container["name"] for container in containers],
@@ -585,7 +604,7 @@ services:
 			check=True,
 		)
 		allStats = [json.loads(line) for line in result.stdout.splitlines()]
-		for container in sorted(containers, key=lambda u: u["order"]):
+		for container in containers:
 			color = "\033[32m" if container["active"] else "\033[31m"
 			stats: typing.Dict[str, str] = next((d for d in allStats if d.get("Container") == container["name"]), {})
 			infos = [
@@ -596,11 +615,12 @@ services:
 				f"net.io={stats.get('NetIO', '?').replace(' ', '')}",
 			]
 			print(f"- {color}{container['name']}\033[0m: {', '.join(infos)}")
-			for line in container["lines"]:
-				print(f"    {line}")
+			for name in ["root", "arguments", "user", "interactive"]:
+				if name in container:
+					print(f"    {name}: {container[name]}")
 
 	@staticmethod
-	def prune() -> None:
+	def prune(_: typing.List[str]) -> None:
 		containers = SandboxContainer._list_containers()
 		for container in containers:
 			if container["active"]:
@@ -612,7 +632,7 @@ services:
 		subprocess.run(["docker", "network", "prune", "-f"])
 
 	@staticmethod
-	def clean() -> None:
+	def clean(_: typing.List[str]) -> None:
 		containers = SandboxContainer._list_containers()
 		for container in containers:
 			print(f"Deleting container '{container['name']}'.")
@@ -620,6 +640,29 @@ services:
 		print("Pruning unused images/networks.")
 		subprocess.run(["docker", "image", "prune", "-a", "-f", "--filter", "label=com.docker.compose.service=bzd"])
 		subprocess.run(["docker", "network", "prune", "-f"])
+
+	@staticmethod
+	def use(args: typing.List[str]) -> None:
+		containers = [container for container in SandboxContainer._list_containers() if container["active"]]
+		if not containers:
+			print("No sandbox container found.")
+			sys.exit(1)
+		for i, container in enumerate(containers):
+			color = "\033[0;37m" if container["order"] == 0 else "\033[1;30m"
+			description = [f"[{container[name]}]" for name in ["root", "arguments", "user"] if name in container]
+			print(f"{i}. {color}{container['name']} - {''.join(description)}\033[0m")
+		try:
+			index = int(input("Select a container: [0] ").strip() or "0")
+			container = containers[index]
+		except Exception:
+			print("Invalid selection.")
+			sys.exit(1)
+		SandboxContainer._exec(
+			imageName=container["name"],
+			root=container["root"],
+			interactive=container.get("interactive", False),
+			args=args,
+		)
 
 
 if __name__ == "__main__":
@@ -654,6 +697,7 @@ if __name__ == "__main__":
 		"ls": SandboxContainer.ls,
 		"prune": SandboxContainer.prune,
 		"clean": SandboxContainer.clean,
+		"use": SandboxContainer.use,
 	}
 
 	parser = argparse.ArgumentParser(
@@ -688,6 +732,11 @@ if __name__ == "__main__":
 		"--dry",
 		action="store_true",
 		help="Only show the DockerFile and docker-compose.yaml that it would use.",
+	)
+	parser.add_argument(
+		"--no-tty",
+		action="store_true",
+		help="Force no tty to be used.",
 	)
 	parser.add_argument(
 		"--disable",
@@ -729,7 +778,7 @@ if __name__ == "__main__":
 		args = parser.parse_args([*allPresets[args.preset], *sys.argv[1:]])
 	if args.rest:
 		if args.rest[0] in additionalCommands:
-			additionalCommands[args.rest[0]]()
+			additionalCommands[args.rest[0]](args.rest[1:])
 			sys.exit(0)
 		elif args.rest[0] == "--":
 			args.rest = args.rest[1:]
