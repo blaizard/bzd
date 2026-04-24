@@ -25,6 +25,7 @@ bzd_nodejs_library(
         "//nodejs/core:log",
         "//nodejs/core:router",
         "//nodejs/core/http:client",
+        "//nodejs/core/mcp:server",
         "//nodejs/core/services",
         "//nodejs/core/statistics:provider",
         "//nodejs/db:utils",

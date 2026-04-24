@@ -107,6 +107,15 @@
                 },
                 {
                     "inputs": {
+                        "/data/cpu_frequency/{name}": {}
+                    },
+                    "min": 0,
+                    "title": "CPU Frequency {name}",
+                    "type": "linear",
+                    "unit": "frequency"
+                },
+                {
+                    "inputs": {
                         "/data/disk/{name}/total": {},
                         "/data/disk/{name}/used": {}
                     },
@@ -242,6 +251,18 @@
                 "/data/log": {
                     "history": 100,
                     "toString": "[{level}] [{name}] [{source}] {message}"
+                }
+            },
+            "nodes.mcp": {
+                "/@mcp": {
+                    "tools": {
+                        "get": {
+                            "doc": "Get current CPU, memory, network, etc. statistics for a specific node."
+                        },
+                        "list_nodes": {
+                            "doc": "Get a list of all available nodes."
+                        }
+                    }
                 }
             },
             "nodes.records": {

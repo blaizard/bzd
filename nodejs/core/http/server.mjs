@@ -213,10 +213,10 @@ export default class HttpServer {
 		await this.startWebsocketServer(this.server);
 
 		return new Promise((resolve, reject) => {
-			this.server.listen(this.port, undefined, undefined, () => {
+			this.server.listen(this.port, "0.0.0.0", undefined, () => {
 				resetErrorHandler.call(this, reject);
 				Log.info(
-					"Web server serving at http://localhost:{}{}",
+					"Web server serving at http://0.0.0.0:{}{}",
 					this.port,
 					configStrList.length ? " (" + configStrList.join(" and ") + ")" : "",
 				);

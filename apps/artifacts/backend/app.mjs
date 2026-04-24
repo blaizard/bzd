@@ -27,6 +27,7 @@ const Exception = ExceptionFactory("backend");
 	const backend = Backend.makeFromCli(process.argv)
 		.useAuthentication()
 		.useRest(APIv1.rest)
+		.useMCP()
 		.useServices()
 		.useCache()
 		.useStatistics()
@@ -213,10 +214,20 @@ const Exception = ExceptionFactory("backend");
 	});
 
 	for (const [volume, data] of Object.entries(volumes)) {
-		for (const [method, endpoints] of Object.entries(data.endpoints)) {
+		// Handle MCP endpoints.
+		// Note, the registration done before the REST endpoint as these are fixed (non-regexpr) endpoint,
+		// so it will not shadow potential rest endpoints while the opposite is probable.
+		for (const [path, endpoint] of Object.entries(data.endpoints.mcp)) {
+			const route = "/x/" + volume + path;
+			Log.info("Adding MCP route {}", route);
+			backend.mcp.addRoute(route, endpoint.handler, endpoint.schema, endpoint.options);
+		}
+
+		// Handle REST endpoints.
+		for (const [method, endpoints] of Object.entries(data.endpoints.rest)) {
 			for (const endpoint of endpoints) {
 				const route = "/x/" + volume + endpoint.path;
-				Log.info("Adding route {}::{}", method, route);
+				Log.info("Adding REST route {}::{}", method, route);
 				backend.web.addRoute(
 					method,
 					route,
@@ -230,6 +241,7 @@ const Exception = ExceptionFactory("backend");
 			}
 		}
 	}
+
 	// Catch all to return 404 in case a wrong path is given.
 	backend.web.addRoute("*", "/x/{all:*}", (context) => context.sendStatus(404, "File Not Found"));
 	await backend.start();

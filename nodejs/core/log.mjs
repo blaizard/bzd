@@ -37,7 +37,7 @@ class Logger {
 			trace: 5,
 			debug: 4,
 			info: 3,
-			warning: 4,
+			warning: 2,
 			error: 1,
 		};
 	}

@@ -1,0 +1,26 @@
+load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library", "bzd_nodejs_test")
+
+bzd_nodejs_library(
+    name = "server",
+    srcs = [
+        "server.mjs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//nodejs/core:event",
+        "//nodejs/core:exception",
+        "//nodejs/core:log",
+        "//nodejs/utils:object",
+    ],
+)
+
+bzd_nodejs_test(
+    name = "server_test",
+    srcs = [
+        "tests/server_test.mjs",
+    ],
+    main = "tests/server_test.mjs",
+    deps = [
+        ":server",
+    ],
+)

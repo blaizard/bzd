@@ -2,6 +2,7 @@ import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import RestServer from "#bzd/nodejs/core/rest/server.mjs";
 import WebsocketServer from "#bzd/nodejs/core/websocket/server.mjs";
+import MCPServer from "#bzd/nodejs/core/mcp/server.mjs";
 import HttpServer from "#bzd/nodejs/core/http/server.mjs";
 import MockHttpServer from "#bzd/nodejs/core/http/mock/server.mjs";
 import Authentication from "#bzd/apps/accounts/authentication/server.mjs";
@@ -34,7 +35,7 @@ export default class Backend {
 			restOptions: null,
 			websocketSchema: null,
 			websocketOptions: null,
-			clock: null,
+			mcpOptions: null,
 		};
 		this.isSetup = false;
 		this.test = test;
@@ -89,6 +90,13 @@ export default class Backend {
 		Exception.assert(this.isSetup, "Backend not set-up.");
 		Exception.assert(this.instances.websocket, "Websocket server not set-up.");
 		return this.instances.websocket;
+	}
+
+	/// Access the MCP server.
+	get mcp() {
+		Exception.assert(this.isSetup, "Backend not set-up.");
+		Exception.assert(this.instances.mcp, "MCP server not set-up.");
+		return this.instances.mcp;
 	}
 
 	/// Access the authentication object.
@@ -151,6 +159,14 @@ export default class Backend {
 		Exception.assert(!this.instances.websocketOptions, "Websocket options already set-up.");
 		this.instances.websocketSchema = schema;
 		this.instances.websocketOptions = options;
+		return this;
+	}
+
+	/// Set-up the mcp object.
+	useMCP(options) {
+		Exception.assert(this.isSetup == false, "Backend already set-up.");
+		Exception.assert(this.instances.mcpOptions === null, "MCP options already set-up.");
+		this.instances.mcpOptions = options || {};
 		return this;
 	}
 
@@ -260,6 +276,17 @@ export default class Backend {
 				this.instances.websocketOptions || {},
 			);
 			this.instances.websocket = new WebsocketServer(this.instances.websocketSchema, websocketOptions);
+		}
+
+		if (this.instances.mcpOptions !== null) {
+			Log.info("Setting up MCP server");
+			const mcpOptions = Object.assign(
+				{
+					channel: this.instances.web,
+				},
+				this.instances.mcpOptions,
+			);
+			this.instances.mcp = new MCPServer(mcpOptions);
 		}
 
 		return this;

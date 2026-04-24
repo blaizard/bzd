@@ -14,6 +14,7 @@ import format from "#bzd/nodejs/core/format.mjs";
 import Utils from "#bzd/apps/artifacts/common/utils.mjs";
 import DataGenerator from "#bzd/apps/artifacts/plugins/nodes/data_generator.mjs";
 import { Readable } from "stream";
+import MCPServer from "#bzd/nodejs/core/mcp/server.mjs";
 
 const databaseTypes = {
 	influxdb: DatabaseInfluxDB,
@@ -562,6 +563,29 @@ export default class Plugin extends PluginBase {
 
 			context.sendStatus(200);
 		});
+
+		for (const [endpoint, mcpOptions] of Object.entries(options["nodes.mcp"] || {})) {
+			const schema = MCPServer.updateSchema(
+				{
+					tools: {
+						list_nodes: {
+							doc: "Get a list of all available nodes.",
+						},
+						get: {
+							doc: "Get current CPU, memory, network, etc. statistics for a specific node.",
+							parameters: {
+								name: {
+									doc: "The exact name of the node to get the data for.",
+									type: "string",
+								},
+							},
+						},
+					},
+				},
+				mcpOptions || {},
+			);
+			endpoints.registerMCP(endpoint, async (tool) => {}, schema);
+		}
 	}
 
 	get version() {

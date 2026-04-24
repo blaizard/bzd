@@ -33,6 +33,7 @@ bzd_nodejs_library(
         "//nodejs/core:log",
         "//nodejs/core/http:server",
         "//nodejs/core/http/mock:server",
+        "//nodejs/core/mcp:server",
         "//nodejs/core/rest:server",
         "//nodejs/core/services",
         "//nodejs/core/statistics",
