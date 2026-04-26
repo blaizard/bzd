@@ -213,6 +213,19 @@ bzd_nodejs_library(
 )
 
 bzd_nodejs_library(
+    name = "validation_schema",
+    srcs = [
+        "validation_schema.mjs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":exception",
+        "//nodejs/utils:object",
+        "//nodejs/utils:result",
+    ],
+)
+
+bzd_nodejs_library(
     name = "validation",
     srcs = [
         "validation.mjs",

@@ -17,6 +17,7 @@ test_srcs = glob([
         "//nodejs/core:template",
         "//nodejs/core:timeseries",
         "//nodejs/core:validation",
+        "//nodejs/core:validation_schema",
         "//nodejs/core/clock:mock",
         "//nodejs/core/cryptography:bcrypt",
         "//nodejs/core/persistence:disk",
