@@ -178,5 +178,51 @@ describe("Validation", () => {
 				});
 			});
 		});
+		it("required validation", () => {
+			const validation = new ValidationSchema({
+				required: ["id", "hello"],
+			});
+			validation.validate({
+				id: 12,
+				hello: false,
+			});
+			Exception.assertThrows(() => {
+				validation.validate({
+					hello: true,
+				});
+			});
+		});
+		it("additionalProperties=true/default validation", () => {
+			const validation = new ValidationSchema({
+				properties: {
+					id: {
+						type: "boolean",
+					},
+				},
+			});
+			validation.validate({
+				id: true,
+				hello: "world",
+			});
+		});
+		it("additionalProperties=false validation", () => {
+			const validation = new ValidationSchema({
+				properties: {
+					id: {
+						type: "boolean",
+					},
+				},
+				additionalProperties: false,
+			});
+			validation.validate({
+				id: true,
+			});
+			Exception.assertThrows(() => {
+				validation.validate({
+					id: true,
+					hello: "world",
+				});
+			});
+		});
 	});
 });

@@ -64,6 +64,28 @@ export default class ValidationSchema {
 					validateProperty(value, properties[key], nested + "." + key);
 				}
 			}
+			if (schema.required) {
+				const required = new Set(schema["required"]);
+				const keys = new Set(Object.keys(values));
+				Exception.assert(
+					required.isSubsetOf(keys),
+					"[key={}] Some required key(s) are not present: {}",
+					nested,
+					[...required.difference(keys)].join(", "),
+				);
+			}
+			const additionalProperties = schema.additionalProperties ?? true;
+			// By default it is true.
+			if (!additionalProperties) {
+				const allowedKeys = new Set(Object.keys(properties));
+				const keys = new Set(Object.keys(values));
+				Exception.assert(
+					keys.isSubsetOf(allowedKeys),
+					"[key={}] Some key(s) are not allowed: {}",
+					nested,
+					[...keys.difference(allowedKeys)].join(", "),
+				);
+			}
 		};
 
 		validate(values, this.schema, "");
