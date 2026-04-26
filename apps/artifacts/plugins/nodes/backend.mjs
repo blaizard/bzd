@@ -584,7 +584,20 @@ export default class Plugin extends PluginBase {
 				},
 				mcpOptions || {},
 			);
-			endpoints.registerMCP(endpoint, async (tool) => {}, schema);
+			endpoints.registerMCP(
+				endpoint,
+				async (tool, args) => {
+					if (tool == "list_nodes") {
+						let uids = [];
+						for await (const uid of this.nodes.getNodes()) {
+							uids.push(uid);
+						}
+						return uids;
+					}
+					Exception.unreachable("Unsupported tool '{}'", tool);
+				},
+				schema,
+			);
 		}
 	}
 

@@ -95,25 +95,23 @@ export default class MCPServer {
 		this.options.channel.addRoute(
 			"POST",
 			endpoint,
-			(context) => {
+			async (context) => {
 				const body = context.getBody();
 				const method = body.method;
+				let response = {
+					jsonrpc: "2.0",
+					id: body.id,
+				};
 				if (method === "initialize") {
 					let capabilities = {};
 					if (schema.tools) {
 						capabilities["tools"] = {};
 					}
-					const response = {
-						jsonrpc: "2.0",
-						id: body.id,
-						result: {
-							protocolVersion: "2024-11-05",
-							capabilities: capabilities,
-							serverInfo: { name: "bzd-mcp", version: "1.0.0" },
-						},
+					response.result = {
+						protocolVersion: "2024-11-05",
+						capabilities: capabilities,
+						serverInfo: { name: "bzd-mcp", version: "1.0.0" },
 					};
-					context.setHeader("Content-Type", "application/json");
-					context.sendStatus(200, JSON.stringify(response));
 				} else if (method === "tools/list") {
 					const tools = Object.entries(schema.tools || {}).map(([name, tool]) => {
 						return {
@@ -135,19 +133,44 @@ export default class MCPServer {
 							},
 						};
 					});
-					console.log(tools);
-					const response = {
-						jsonrpc: "2.0",
-						id: body.id,
-						result: {
-							tools: tools,
-						},
+					response.result = {
+						tools: tools,
 					};
-					context.setHeader("Content-Type", "application/json");
-					context.sendStatus(200, JSON.stringify(response));
+				} else if (method === "tools/call") {
+					const body = context.getBody() || {};
+					const tool = body.params?.name;
+					const args = body.params?.arguments;
+					Exception.assertPrecondition(tool && args, "Missing tool and arguments: {:j}", body);
+					try {
+						const data = await callback(tool, args);
+						response.result = {
+							content: [
+								{
+									type: "text",
+									text: JSON.stringify(data),
+								},
+							],
+							isError: false,
+						};
+					} catch (e) {
+						response.result = {
+							content: [
+								{
+									type: "text",
+									text: e.toString(),
+								},
+							],
+							isError: true,
+						};
+					}
 				} else {
-					Log.info("Unsupported MCP method: {}", method);
+					response.error = {
+						message: "Unsupported MCP method: " + method,
+					};
 				}
+
+				context.setHeader("Content-Type", "application/json");
+				context.sendStatus(200, JSON.stringify(response));
 			},
 			{
 				type: "json",
