@@ -25,7 +25,7 @@ _bzd_config_flag = rule(
 )
 
 def _bzd_config_impl(ctx):
-    input_files = depset()
+    input_files = depset(ctx.files.deps)
     runfiles = ctx.runfiles().merge_all([target.default_runfiles for target in ctx.attr.data])
     data = depset(ctx.files.data)
 
@@ -89,6 +89,10 @@ _bzd_config = rule(
         "data": attr.label_list(
             doc = "Dependencies for this rule, will be added in the runfiles and used for target expansion.",
             allow_files = True,
+        ),
+        "deps": attr.label_list(
+            doc = "Build dependencies for this rule, will be used when building the configuration in the execution target environment.",
+            allow_files = [".json", ".yaml", ".yml"],
         ),
         "include_workspace_status": attr.string_list(
             doc = "Include the key/value pairs from the status information about the workspace, see --workspace_status_command.",

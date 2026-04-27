@@ -72,3 +72,22 @@ bzd_config_apply_test(
     },
     target = ":_config_merge_override_test",
 )
+
+# ---- Ref ----
+
+bzd_config_default(
+    name = "config_ref",
+    srcs = [
+        "ref.json",
+    ],
+    deps = [
+        "b.json",
+    ],
+)
+
+bzd_diff_test(
+    name = "config_ref_test",
+    file1 = ":config_ref.json",
+    file2 = "expected_config_ref.json",
+    format = "json",
+)

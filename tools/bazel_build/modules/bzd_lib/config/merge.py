@@ -62,21 +62,63 @@ class Config:
 			fatal(f"The key {e} from '{source}' was already defined by another base configuration.")
 
 
-def dataFromPath(path: pathlib.Path) -> typing.Iterator[InternalFragment]:
-	"""Load the content of a file from its path."""
+def dataFromJson(path: pathlib.Path) -> typing.Any:
+	"""Load the content of a JSON file from its path."""
+
+	def resolvePath(ref: str) -> pathlib.Path:
+		refPath = pathlib.Path(ref)
+		if not refPath.is_file():
+			refPath = path.parent / refPath
+			if not refPath.is_file():
+				fatal(f"Reference path '{ref}' not found from '{str(path)}'.")
+		return refPath
+
+	def visitJson(data: typing.Any) -> typing.Any:
+		if isinstance(data, dict):
+			# Add support for references, the value of a reference can be either a single string or an array of strings.
+			refs = [data["$ref"]] if "$ref" in data else []
+			refs.extend(data.get("$refs", []))
+			data.pop("$ref", None)
+			data.pop("$refs", None)
+			for ref in refs:
+				refPath = resolvePath(ref)
+				updateDeep(
+					data,
+					dataFromSrc(refPath),
+					policy=UpdatePolicy.raiseOnConflict,
+				)
+			return {key: visitJson(value) for key, value in data.items()}
+		elif isinstance(data, list):
+			return [visitJson(item) for item in data]
+		return data
+
+	data = json.loads(path.read_text())
+	return visitJson(data)
+
+
+def dataFromSrc(path: pathlib.Path) -> typing.Optional[typing.Any]:
+	"""Load the content of a source file from its path."""
 
 	extension = path.suffix.lower()
 	if extension == ".json":
-		content = json.loads(path.read_text())
-		yield (None, content, str(path))
+		return dataFromJson(path)
 
 	elif extension in (
 		".yaml",
 		".yml",
 	):
 		with open(path, "r") as f:
-			content = yaml.load(f, Loader=yaml.SafeLoader)  # type: ignore
-		yield (None, content, str(path))
+			return yaml.load(f, Loader=yaml.SafeLoader)  # type: ignore
+	return None
+
+
+def dataFromPath(path: pathlib.Path) -> typing.Iterator[InternalFragment]:
+	"""Load the content of a file from its path."""
+
+	extension = path.suffix.lower()
+	maybeContent = dataFromSrc(path)
+	if maybeContent is not None:
+		yield (None, maybeContent, str(path))
 
 	elif extension == ".internal":
 		fragments: InternalFragmentList = json.loads(path.read_text())
