@@ -94,126 +94,8 @@
             "webdav": {}
         },
         "nodes": {
-            "nodes.dashboards": [
-                {
-                    "inputs": {
-                        "/data/cpu/{name}": {}
-                    },
-                    "max": 1,
-                    "min": 0,
-                    "title": "CPU {name}",
-                    "type": "linear",
-                    "unit": "percent"
-                },
-                {
-                    "inputs": {
-                        "/data/cpu_frequency/{name}": {}
-                    },
-                    "min": 0,
-                    "title": "CPU Frequency {name}",
-                    "type": "linear",
-                    "unit": "frequency"
-                },
-                {
-                    "inputs": {
-                        "/data/disk/{name}/total": {},
-                        "/data/disk/{name}/used": {}
-                    },
-                    "min": 0,
-                    "title": "Disk {name}",
-                    "type": "linear",
-                    "unit": "bytes"
-                },
-                {
-                    "inputs": {
-                        "/data/memory/{name}/total": {},
-                        "/data/memory/{name}/used": {}
-                    },
-                    "min": 0,
-                    "title": "Memory {name}",
-                    "type": "linear",
-                    "unit": "bytes"
-                },
-                {
-                    "groupBy": [
-                        "name"
-                    ],
-                    "inputs": {
-                        "/data/io/{name}/usage": {}
-                    },
-                    "max": 1,
-                    "min": 0,
-                    "title": "IO usage",
-                    "type": "linear",
-                    "unit": "percent"
-                },
-                {
-                    "groupBy": [
-                        "name"
-                    ],
-                    "inputs": {
-                        "/data/io/{name}/in": {}
-                    },
-                    "min": 0,
-                    "title": "IO write",
-                    "type": "linear",
-                    "unit": "bytes/s"
-                },
-                {
-                    "groupBy": [
-                        "name"
-                    ],
-                    "inputs": {
-                        "/data/io/{name}/out": {}
-                    },
-                    "min": 0,
-                    "title": "IO read",
-                    "type": "linear",
-                    "unit": "bytes/s"
-                },
-                {
-                    "groupBy": [
-                        "name"
-                    ],
-                    "inputs": {
-                        "/data/network/{name}/in": {}
-                    },
-                    "min": 0,
-                    "title": "Network recv",
-                    "type": "linear",
-                    "unit": "bytes/s"
-                },
-                {
-                    "groupBy": [
-                        "name"
-                    ],
-                    "inputs": {
-                        "/data/network/{name}/out": {}
-                    },
-                    "min": 0,
-                    "title": "Network send",
-                    "type": "linear",
-                    "unit": "bytes/s"
-                },
-                {
-                    "inputs": {
-                        "/data/battery/{name}": {}
-                    },
-                    "max": 1,
-                    "min": 0,
-                    "title": "Battery {name}",
-                    "type": "linear",
-                    "unit": "percent"
-                },
-                {
-                    "inputs": {
-                        "/data/temperature/{name}": {}
-                    },
-                    "min": 0,
-                    "title": "Temperature {name}",
-                    "type": "linear",
-                    "unit": "celsius"
-                }
+            "$refs": [
+                "apps/artifacts/backend/config.nodes.compute.json"
             ],
             "nodes.data": {
                 "testnode": {
@@ -244,24 +126,6 @@
                     },
                     "path/with/slashes": {
                         "nested": -42
-                    }
-                }
-            },
-            "nodes.handlers": {
-                "/data/log": {
-                    "history": 100,
-                    "toString": "[{level}] [{name}] [{source}] {message}"
-                }
-            },
-            "nodes.mcp": {
-                "/@mcp": {
-                    "tools": {
-                        "get": {
-                            "doc": "Get current CPU, memory, network, etc. statistics for a specific node."
-                        },
-                        "list_nodes": {
-                            "doc": "Get a list of all available nodes."
-                        }
                     }
                 }
             },

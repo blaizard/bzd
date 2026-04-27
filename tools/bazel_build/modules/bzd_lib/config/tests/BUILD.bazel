@@ -82,6 +82,8 @@ bzd_config_default(
     ],
     deps = [
         "b.json",
+        "d.json",
+        "d_amend.json",
     ],
 )
 

@@ -1,4 +1,8 @@
 {
     "$ref": "b.json",
+    "$refs": [
+        "d.json",
+        "d_amend.json"
+    ],
     "key": "hello"
 }

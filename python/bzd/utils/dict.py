@@ -35,6 +35,7 @@ def updateDeep(
 	d: typing.MutableMapping[typing.Any, typing.Any],
 	u: typing.MutableMapping[typing.Any, typing.Any],
 	policy: typing.Union[UpdatePolicy, UpdatePolicyCallable] = UpdatePolicy.override,
+	extendLists: bool = False,
 ) -> typing.MutableMapping[typing.Any, typing.Any]:
 	"""Deep update of 2 dictionaries.
 
@@ -42,6 +43,7 @@ def updateDeep(
 	        d: Dictionary to merge, the merge happen in-place, so this dictionary will be modified.
 	        u: Dictionary to apply.
 	        policy: The policy to be used when merging.
+			extendLists: Whether to extend lists instead of replacing them.
 
 	Return:
 	        The updated dictionary.
@@ -66,13 +68,14 @@ def updateDeep(
 	else:
 		raise Exception(f"Unsupported policy '{str(policy)}'")
 
-	return _updateDeep(d, u, policyCallback, [])
+	return _updateDeep(d, u, policyCallback, extendLists, [])
 
 
 def _updateDeep(
 	d: typing.MutableMapping[typing.Any, typing.Any],
 	u: typing.MutableMapping[typing.Any, typing.Any],
 	policyCallback: UpdatePolicyCallable,
+	extendLists: bool,
 	keys: typing.List[str],
 ) -> typing.MutableMapping[typing.Any, typing.Any]:
 
@@ -83,10 +86,18 @@ def _updateDeep(
 		if isinstance(v, dict):
 			d.setdefault(k, {})
 			if isinstance(d[k], dict):
-				d[k] = _updateDeep(d[k], v, policyCallback, keys)
+				d[k] = _updateDeep(d[k], v, policyCallback, extendLists, keys)
 			else:
 				policyCallback(d[k], v, keys)
 				d[k] = v
+		elif extendLists and isinstance(v, list):
+			if (k not in d) or isinstance(d[k], list):
+				d.setdefault(k, [])
+				d[k].extend(v)
+			else:
+				policyCallback(d[k], v, keys)
+				d[k] = v
+
 		else:
 			if k in d:
 				policyCallback(d.get(k), v, keys)

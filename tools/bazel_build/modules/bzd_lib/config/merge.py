@@ -86,6 +86,7 @@ def dataFromJson(path: pathlib.Path) -> typing.Any:
 					data,
 					dataFromSrc(refPath),
 					policy=UpdatePolicy.raiseOnConflict,
+					extendLists=True,
 				)
 			return {key: visitJson(value) for key, value in data.items()}
 		elif isinstance(data, list):

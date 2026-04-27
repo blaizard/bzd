@@ -2,6 +2,8 @@ load("@bzd_lib//:defs.bzl", "bzd_executable_test")
 load("@bzd_lib//config:defs.bzl", "bzd_config_default")
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_binary", "bzd_nodejs_library")
 
+exports_files(["config.nodes.compute.json"])
+
 bzd_config_default(
     name = "config",
     srcs = [
@@ -10,6 +12,9 @@ bzd_config_default(
     visibility = [
         "//apps/artifacts:__subpackages__",
         "//deployment:__subpackages__",
+    ],
+    deps = [
+        "config.nodes.compute.json",
     ],
 )
 
