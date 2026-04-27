@@ -12,6 +12,7 @@ describe("Validation", () => {
 		});
 		it("string validation", () => {
 			const validation = new ValidationSchema({
+				type: "object",
 				properties: {
 					id: {
 						type: "string",
@@ -28,21 +29,20 @@ describe("Validation", () => {
 			});
 		});
 		it("unknown validation type", () => {
-			const validation = new ValidationSchema({
-				properties: {
-					id: {
-						type: "sdkasd",
-					},
-				},
-			});
 			Exception.assertThrows(() => {
-				validation.validate({
-					id: "hello",
+				new ValidationSchema({
+					type: "object",
+					properties: {
+						id: {
+							type: "sdkasd",
+						},
+					},
 				});
 			});
 		});
 		it("string enum validation", () => {
 			const validation = new ValidationSchema({
+				type: "object",
 				properties: {
 					id: {
 						type: "string",
@@ -61,6 +61,7 @@ describe("Validation", () => {
 		});
 		it("number validation", () => {
 			const validation = new ValidationSchema({
+				type: "object",
 				properties: {
 					id: {
 						type: "number",
@@ -78,6 +79,7 @@ describe("Validation", () => {
 		});
 		it("integer validation", () => {
 			const validation = new ValidationSchema({
+				type: "object",
 				properties: {
 					id: {
 						type: "integer",
@@ -95,6 +97,7 @@ describe("Validation", () => {
 		});
 		it("boolean validation", () => {
 			const validation = new ValidationSchema({
+				type: "object",
 				properties: {
 					id: {
 						type: "boolean",
@@ -112,6 +115,7 @@ describe("Validation", () => {
 		});
 		it("null validation", () => {
 			const validation = new ValidationSchema({
+				type: "object",
 				properties: {
 					id: {
 						type: "null",
@@ -129,6 +133,7 @@ describe("Validation", () => {
 		});
 		it("object validation", () => {
 			const validation = new ValidationSchema({
+				type: "object",
 				properties: {
 					id: {
 						type: "object",
@@ -160,6 +165,7 @@ describe("Validation", () => {
 		});
 		it("array validation", () => {
 			const validation = new ValidationSchema({
+				type: "object",
 				properties: {
 					id: {
 						type: "array",
@@ -180,6 +186,7 @@ describe("Validation", () => {
 		});
 		it("required validation", () => {
 			const validation = new ValidationSchema({
+				type: "object",
 				required: ["id", "hello"],
 			});
 			validation.validate({
@@ -194,6 +201,7 @@ describe("Validation", () => {
 		});
 		it("additionalProperties=true/default validation", () => {
 			const validation = new ValidationSchema({
+				type: "object",
 				properties: {
 					id: {
 						type: "boolean",
@@ -207,6 +215,7 @@ describe("Validation", () => {
 		});
 		it("additionalProperties=false validation", () => {
 			const validation = new ValidationSchema({
+				type: "object",
 				properties: {
 					id: {
 						type: "boolean",
@@ -221,6 +230,102 @@ describe("Validation", () => {
 				validation.validate({
 					id: true,
 					hello: "world",
+				});
+			});
+		});
+		it("additionalProperties={...} validation", () => {
+			const validation = new ValidationSchema({
+				type: "object",
+				additionalProperties: {
+					type: "string",
+				},
+			});
+			validation.validate({
+				id: "hello",
+			});
+			Exception.assertThrows(() => {
+				validation.validate({
+					id: true,
+				});
+			});
+		});
+		it("$refs validation", () => {
+			const validation = new ValidationSchema({
+				type: "object",
+				properties: {
+					id: {
+						$ref: "#/$defs/boolean",
+					},
+				},
+				$defs: {
+					boolean: {
+						type: "boolean",
+					},
+				},
+			});
+			validation.validate({
+				id: true,
+			});
+			Exception.assertThrows(() => {
+				validation.validate({
+					id: 12,
+				});
+			});
+		});
+		it("allOf validation", () => {
+			const validation = new ValidationSchema({
+				allOf: [
+					{ type: "object" },
+					{ required: ["id"] },
+					{
+						properties: {
+							id: {
+								enum: ["hello", "world"],
+							},
+						},
+					},
+				],
+				properties: {
+					id: {
+						type: "string",
+					},
+				},
+			});
+			validation.validate({
+				id: "hello",
+			});
+			Exception.assertThrows(() => {
+				validation.validate({
+					id: 12,
+				});
+			});
+			Exception.assertThrows(() => {
+				validation.validate({});
+			});
+			Exception.assertThrows(() => {
+				validation.validate({
+					id: "bonjour",
+				});
+			});
+		});
+		it("anyOf validation", () => {
+			const validation = new ValidationSchema({
+				type: "object",
+				properties: {
+					id: {
+						anyOf: [{ type: "boolean" }, { type: "integer" }],
+					},
+				},
+			});
+			validation.validate({
+				id: true,
+			});
+			validation.validate({
+				id: 12,
+			});
+			Exception.assertThrows(() => {
+				validation.validate({
+					id: "hello",
 				});
 			});
 		});
