@@ -38,7 +38,7 @@ export default class PluginTester {
 		const instance = new PluginType(volume, updatedOptions, provider, endpoints, components);
 		let routers = {};
 		// Handle REST endpoints.
-		for (const [method, dataList] of Object.entries(endpoints.unwrap()).rest) {
+		for (const [method, dataList] of Object.entries(endpoints.unwrap().rest)) {
 			routers[method] ??= new Router();
 			for (const data of dataList) {
 				routers[method].add(data.path, async (params, context) => {
