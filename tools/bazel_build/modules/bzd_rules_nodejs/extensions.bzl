@@ -59,7 +59,7 @@ sh_binary_wrapper(
     }},
     command = \"""
         set +e
-        error=$(PATH={{node_binary}}/..:$PATH {{binary}} --shamefully-hoist --store-dir=./store --color "$@" 2>&1)
+        error=$(PATH={{node_binary}}/..:$PATH {{binary}} --store-dir=./store --color "$@" 2>&1)
         code=$?
         if ((code)); then
             echo "$error"
@@ -74,7 +74,6 @@ sh_binary_wrapper(
 
 nodejs_toolchain(
     name = "nodejs_toolchain_specific",
-    manager = ":pnpm",
     node = ":node",
 )
 

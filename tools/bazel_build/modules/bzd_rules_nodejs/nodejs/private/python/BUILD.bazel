@@ -1,0 +1,9 @@
+load("@rules_python//python:defs.bzl", "py_binary")
+
+py_binary(
+    name = "nodejs_install",
+    srcs = [
+        "nodejs_install.py",
+    ],
+    visibility = ["//nodejs:__pkg__"],
+)

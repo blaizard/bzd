@@ -39,6 +39,12 @@ bzd_nodejs_extern_binary = rule(
         "params": attr.string_list(
             doc = "Arguments as a string.",
         ),
+        "_nodejs_install": attr.label(
+            default = "//nodejs/private/python:nodejs_install",
+            doc = "The NodeJs install binary.",
+            cfg = "exec",
+            executable = True,
+        )
     },
     executable = True,
     toolchains = ["//nodejs:toolchain_type"],
