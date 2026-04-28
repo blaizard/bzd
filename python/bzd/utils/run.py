@@ -170,7 +170,7 @@ def localCommand(
 	                env: The set of environment variable to be injected to the process.
 	                timeoutS: The timeout in seconds until when the command terminates.
 	                                  A value of None, give an unlimited timeout.
-	                stdin: If set to True, the input stream will also be streamed to stdin.
+	                stdin: If set to True, the input stream will also be streamed to stdin. If set to False, the input stream will be closed.
 	                stdout: If set to True, the output will also be streamed to stdout.
 	                stderr: If set to True, the errors will also be streamed to stderr.
 	                maxOutputSize: The maximum size of the output, if larger, only the most recent output will be kept.
@@ -182,7 +182,7 @@ def localCommand(
 		cmds,
 		cwd=cwd,
 		stdout=subprocess.PIPE,
-		stdin=None if stdin else subprocess.PIPE,
+		stdin=None if stdin else subprocess.DEVNULL,
 		stderr=subprocess.PIPE,
 		env=env,
 		start_new_session=True,
@@ -239,12 +239,6 @@ def localPython(script: str, args: Optional[List[str]] = None, **kwargs: Any) ->
 	"""Execute a python script locally."""
 
 	return localCommand([sys.executable, script] + (args or []), **kwargs)
-
-
-def localBash(script: bytes, args: Optional[List[str]] = None, **kwargs: Any) -> ExecuteResult:
-	"""Execute a bash script locally."""
-
-	return localCommand(["bash", "-s", "--"] + (args or []), **kwargs)
 
 
 def localBazelBinary(
