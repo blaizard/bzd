@@ -82,9 +82,11 @@ def dataFromJson(path: pathlib.Path) -> typing.Any:
 			data.pop("$refs", None)
 			for ref in refs:
 				refPath = resolvePath(ref)
+				refData = dataFromSrc(refPath)
+				assert refData is not None, f"Reference path '{ref}' from '{str(path)}' could not be loaded."
 				updateDeep(
 					data,
-					dataFromSrc(refPath),
+					refData,
 					policy=UpdatePolicy.raiseOnConflict,
 					extendLists=True,
 				)
