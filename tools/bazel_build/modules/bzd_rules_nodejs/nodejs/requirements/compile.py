@@ -210,41 +210,50 @@ class RequirementsFactory:
 		"""Build the content of the requirements file.
 
 		Format is as follow:
-		        "express-minify": {
-		                "dependencies": {
-		                        "clean-css@4.2.4": {
-		                                "integrity": "sha512-EJUDT7nDVFDvaQgAo2G/PJvxmp1o/c6iXLbswsBbUFXi1Nr+AjA2cKmfbKDMjMvzEe75g3P6JkaDDAKk96A85A==",
-		                                "os": ["linux"], // optional
-		                                "cpu": ["arm64"] // optional
-		                        }
-		                        ...
-		                },
-		                "name": "express-minify",
-		                "version": "1.0.0"
+				"top_level": {
+					"express-minify": "express-minify@1.0.0"
+				},
+		        "packages": {
+		            "express-minify@1.0.0": {
+		                "integrity": "sha512-xxx",
+		                "dependencies": ["clean-css@4.2.4"], // optional
+		            }
+		            "clean-css@4.2.4": {
+		                "integrity": "sha512-xxx",
+		                "os": ["linux"], // optional
+		                "cpu": ["arm64"] // optional
+		            }
 		        },
 		"""
 
-		output = {}
+		topLevel: typing.Dict[str, str] = {}
+		allPackages: typing.Dict[str, Package] = {}
+
 		for name, maybeConstraints in requirements.items():
 			package = self.packages.getMatching(
 				name=name,
 				constraints=maybeConstraints if maybeConstraints else "latest",
 			)
-			packages = self.getDependencies(package)
+			topLevel[name] = package.package
+			for dependency in self.getDependencies(package):
+				if dependency.package not in allPackages:
+					allPackages[dependency.package] = dependency
 
-			# Build the dependencies
-			dependencies = {}
-			for d in packages:
-				dependencies[d.package] = (
-					{"integrity": d.integrity} | ({} if d.os is None else {"os": d.os}) | ({} if d.cpu is None else {"cpu": d.cpu})
-				)
-
-			output[name] = {
-				"name": name,
-				"version": str(package.version),
-				"dependencies": dependencies,
+		packages: typing.Dict[str, typing.Any] = {}
+		for key, pkg in allPackages.items():
+			packages[key] = {
+				"integrity": pkg.integrity,
 			}
-		return output
+			if pkg.dependencies:
+				packages[key]["dependencies"] = [dependency.package for dependency in pkg.dependencies]
+			if pkg.os:
+				packages[key]["os"] = pkg.os
+			if pkg.cpu:
+				packages[key]["cpu"] = pkg.cpu
+		return {
+			"top_level": topLevel,
+			"packages": packages,
+		}
 
 
 if __name__ == "__main__":

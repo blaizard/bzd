@@ -24,6 +24,7 @@ bzd_nodejs_library(
     }) + [
         "@bzd_bdl_nodejs_deps//:elkjs",
         "@bzd_bdl_nodejs_deps//:svgdotjs-svg-js",
+        "@bzd_bdl_nodejs_deps//:web-worker",
     ],
     visibility = ["//diagram:__pkg__"],
 )

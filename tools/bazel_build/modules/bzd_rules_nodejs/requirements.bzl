@@ -49,14 +49,18 @@ def _requirement_repository_impl(repository_ctx):
         packages_to_filename[_package_to_alias(package)] = npm_data["filename"]
 
     repository_ctx.file(
+        "dependencies.json",
+        content = repository_ctx.attr.dependencies,
+    )
+
+    repository_ctx.file(
         "BUILD",
         content = """
-load("{defs}", "bzd_nodejs_package", "bzd_nodejs_library")
+load("{defs}", "bzd_nodejs_package")
 
 bzd_nodejs_package(
     name = "package",
-    package = "{package}",
-    version = "{version}",
+    dependencies = ":dependencies.json",
     packages = {{
         {packages}
     }},
@@ -64,8 +68,6 @@ bzd_nodejs_package(
 )
 """.format(
             defs = Label("//nodejs:defs.bzl"),
-            package = repository_ctx.attr.package,
-            version = repository_ctx.attr.version,
             packages = ",\n".join(["\"{}\": \":packages/{}\"".format(name, path) for name, path in packages_to_filename.items()]),
         ),
     )
@@ -73,9 +75,8 @@ bzd_nodejs_package(
 requirement_repository = repository_rule(
     implementation = _requirement_repository_impl,
     attrs = {
-        "package": attr.string(mandatory = True),
+        "dependencies": attr.string(mandatory = True),
         "packages": attr.string_dict(mandatory = True),
-        "version": attr.string(mandatory = True),
     },
 )
 
@@ -92,6 +93,24 @@ def _is_valid_dependency(module_ctx, dependency):
             return False
     return True
 
+def _get_transitive_packages(packages_section, root_key):
+    """Collect all transitive package keys reachable from root_key."""
+
+    visited = {root_key: True}
+    frontier = [root_key]
+    for _ in range(len(packages_section)):
+        next_frontier = []
+        for key in frontier:
+            pkg = packages_section.get(key, {})
+            for dep_key in pkg.get("dependencies", []):
+                if dep_key not in visited:
+                    visited[dep_key] = True
+                    next_frontier.append(dep_key)
+        if not next_frontier:
+            break
+        frontier = next_frontier
+    return visited
+
 def _requirements_nodejs_impl(module_ctx):
     # Gather all the requirements.
     requirements = {}
@@ -103,29 +122,51 @@ def _requirements_nodejs_impl(module_ctx):
 
     already_generated = {}
     for name, data in requirements.items():
-        # Merge all requirements into one.
-        merged_requirements = dict()
+        # Merge all requirements files.
+        merged_top_level = {}
+        merged_packages = {}
         for requirement in data:
             content = module_ctx.read(requirement)
             content_json = json.decode(content)
-            merged_requirements.update(content_json)
+            for k, v in content_json["top_level"].items():
+                merged_top_level[k] = v
+            for k, v in content_json["packages"].items():
+                merged_packages[k] = v
 
         build_file = ""
 
         # Create repositories for each requirement.
-        for requirement_name, packages in merged_requirements.items():
-            repository_name = _sanitize_repository_name("package_{}_{}".format(packages["name"], packages["version"]))
-            if not repository_name in already_generated:
-                requirement_repository(
-                    name = repository_name,
-                    package = packages["name"],
-                    version = packages["version"],
-                    packages = {
-                        dependency_name: dependency["integrity"]
-                        for dependency_name, dependency in packages["dependencies"].items()
-                        if _is_valid_dependency(module_ctx, dependency)
-                    },
-                )
+        for requirement_name, pkg_key in merged_top_level.items():
+            repository_name = _sanitize_repository_name("package-{}".format(pkg_key))
+            if repository_name in already_generated:
+                continue
+
+            transitive_keys = _get_transitive_packages(merged_packages, pkg_key)
+
+            # First pass: determine the complete set of valid (platform-compatible) package keys.
+            valid_packages = {}
+            for dep_key in transitive_keys:
+                if dep_key in merged_packages and _is_valid_dependency(module_ctx, merged_packages[dep_key]):
+                    valid_packages[dep_key] = merged_packages[dep_key]["integrity"]
+
+            # Second pass: build metadata, filtering lists to valid keys only.
+            dependencies = {}
+            for dep_key in valid_packages:
+                pkg_meta = merged_packages[dep_key]
+                meta_entry = {"integrity": pkg_meta["integrity"]}
+                if "dependencies" in pkg_meta:
+                    meta_entry["dependencies"] = [d for d in pkg_meta["dependencies"] if d in valid_packages]
+                dependencies[dep_key] = meta_entry
+
+            requirement_repository(
+                name = repository_name,
+                packages = valid_packages,
+                dependencies = json.encode_indent({
+                    "package": pkg_key,
+                    "packages": dependencies,
+                }),
+            )
+
             already_generated[repository_name] = True
             build_file += """alias(
     name = "{alias_name}",

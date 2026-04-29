@@ -35,7 +35,6 @@ def bzd_nodejs_make_node_modules(ctx, packages, base_dir_name):
     package_providers = [package[BzdNodeJsPackageInfo] for package in packages]
 
     package_json_content = {
-        "dependencies": {package.package: package.version for package in package_providers},
         "imports": {
             "#bzd/*": "./*",
         },
@@ -51,24 +50,23 @@ def bzd_nodejs_make_node_modules(ctx, packages, base_dir_name):
         content = json.encode_indent(package_json_content),
     )
 
-    dependencies = {}
-    package_tars = []
-    for info in package_providers:
-        dependencies[info.package] ={package: file.path for package, file in info.packages.items()}
-        package_tars += info.packages.values()
-
-    dependencies_json = ctx.actions.declare_file("{}/dependencies.json".format(base_dir_name))
-    ctx.actions.write(
-        output = dependencies_json,
-        content = json.encode_indent(dependencies),
-    )
+    package_tars = [tar for info in package_providers for tar in info.packages.values()]
+    dependency_files = [info.dependencies for info in package_providers]
 
     args = ctx.actions.args()
-    args.add(dependencies_json)
+
+    # Provide tar file information.
+    for info in package_providers:
+        for key, file in info.packages.items():
+            args.add_all("--package", [key, file.path])
+
+    # Provide the dependencies information.
+    for info in package_providers:
+        args.add("--dependency", info.dependencies)
     args.add(node_modules.path)
 
     ctx.actions.run(
-        inputs = depset([dependencies_json] + package_tars),
+        inputs = depset(package_tars + dependency_files),
         outputs = [node_modules],
         arguments = [args],
         progress_message = "Installing package(s) for {}".format(ctx.label),
@@ -206,6 +204,12 @@ and the installation of the actual packages.
             cfg = "exec",
             executable = True,
         ),
+        "_nodejs_install": attr.label(
+            default = "//nodejs/private/python:nodejs_install",
+            doc = "The NodeJs install binary.",
+            cfg = "exec",
+            executable = True,
+        ),
         "_tsc": attr.label(
             default = Label("//toolchain/typescript:tsc"),
             cfg = "exec",
@@ -215,11 +219,5 @@ and the installation of the actual packages.
             default = Label("//toolchain/typescript:tsconfig.json"),
             allow_single_file = True,
         ),
-        "_nodejs_install": attr.label(
-            default = "//nodejs/private/python:nodejs_install",
-            doc = "The NodeJs install binary.",
-            cfg = "exec",
-            executable = True,
-        )
     } | LIBRARY_ATTRS,
 )

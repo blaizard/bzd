@@ -1,4 +1,5 @@
-elkjs
+elkjs=0.9.3
 @svgdotjs/svg.js
 svgdom
 commander
+web-worker

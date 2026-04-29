@@ -1,5 +1,6 @@
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_requirements_compile")
 
+# bazel run @bzd_bdl//diagram/requirements
 bzd_nodejs_requirements_compile(
     name = "requirements",
     srcs = [
