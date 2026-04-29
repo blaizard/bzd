@@ -44,7 +44,7 @@ bzd_nodejs_extern_binary = rule(
             doc = "The NodeJs install binary.",
             cfg = "exec",
             executable = True,
-        )
+        ),
     },
     executable = True,
     toolchains = ["//nodejs:toolchain_type"],

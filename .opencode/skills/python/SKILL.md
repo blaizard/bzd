@@ -112,7 +112,6 @@ To exclude a file or directory from sanitizer checks, place a `.sanitizerignore`
 ## Adding a New Internal Python Library
 
 1. Create the `.py` source file(s):
-
    - Core shared library → `python/bzd/<module>/my_lib.py`
    - App-specific module → `apps/<app_name>/my_module.py`
 
@@ -132,7 +131,6 @@ py_library(
 ```
 
 3. Import paths follow the directory structure from the workspace root:
-
    - File at `python/bzd/utils/my_lib.py` → `from bzd.utils.my_lib import MyClass`
    - File at `apps/my_app/my_module.py` → `from apps.my_app.my_module import MyClass`
 
