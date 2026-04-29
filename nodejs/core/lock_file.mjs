@@ -55,6 +55,7 @@ export default class LockFile {
 	}
 
 	async _unlock(path, force) {
+		this.lastExpiryCheck = null;
 		// force = true, will silently ignore if the path does not exist.
 		await this.options.fs.rmdir(path, { force: force });
 	}
@@ -142,12 +143,14 @@ export default class LockFile {
 					if (this.interval) {
 						clearInterval(this.interval);
 						this.interval = null;
+						this.lastExpiryCheck = null;
 					}
 					return false;
 				} finally {
 					this.intervalActive = false;
 				}
 			};
+			this.lastExpiryCheck = null;
 			if (!(await heartBeat())) {
 				return false;
 			}
