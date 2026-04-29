@@ -24,7 +24,7 @@ def bzd_nodejs_oci(name, deps, cmd, base = Label("@oci_nodejs"), include_metadat
 
     bzd_package(
         name = "{}.package".format(name),
-        tags = ["nodejs"] + (tags or []),
+        tags = ["nodejs"] + [t for t in (tags or []) if t not in ("no-remote", "no-remote-cache", "no-remote-exec")],
         deps = {target: ROOT_DIRECTORY_ + "/" + dir_name for target, dir_name in deps.items()},
         include_metadata = include_metadata,
     )
