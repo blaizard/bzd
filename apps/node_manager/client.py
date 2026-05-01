@@ -26,79 +26,103 @@ if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Wake On Lan client.")
 	subparsers = parser.add_subparsers(help="Available sub-commands.", dest="command")
 
+	broadcast_kwargs = {
+		"default": "255.255.255.255",
+		"help": "The broadcast address to be used.",
+	}
+	service_kwargs = {
+		"help": "A service to proxy the WOL call.",
+	}
+	timeout_kwargs = {
+		"default": 60,
+		"type": int,
+		"help": "Timeout in seconds until which the check returns.",
+	}
+	wait_kwargs = {
+		"action": "append",
+		"default": [],
+		"help": "Wait until a specific TCP connection is open.",
+	}
+	server_kwargs = {"required": True, "help": "The ip:port address for the machine to register the workload."}
+	undefine_kwargs = {
+		"action": "append",
+		"default": [],
+		"help": "Environment variable to undefine before running the workload.",
+	}
+	name_kwargs = {
+		"default": "unknown",
+		"help": "The name of the workload.",
+	}
+	ttl_kwargs = {
+		"default": 60,
+		"type": int,
+		"help": "The time-to-live of the workload lease.",
+	}
+
 	wolParser = subparsers.add_parser("wol", help="Wake-up a machine from its MAC address.")
 	wolParser.add_argument(
-		"-b",
 		"--broadcast",
-		default="255.255.255.255",
-		help="The broadcast address to be used.",
+		**broadcast_kwargs,  # type: ignore
 	)
 	wolParser.add_argument(
-		"-s",
 		"--service",
-		help="A service to proxy the WOL call.",
+		**service_kwargs,  # type: ignore
 	)
 	wolParser.add_argument(
-		"-t",
 		"--timeout",
-		default=60,
-		type=int,
-		help="Timeout in seconds until which the check returns.",
+		**timeout_kwargs,  # type: ignore
 	)
 	wolParser.add_argument(
-		"-w",
 		"--wait",
-		action="append",
-		default=[],
-		help="Wait until a specific TCP connection is open.",
+		**wait_kwargs,  # type: ignore
 	)
 	wolParser.add_argument("mac", help="The mac address for the machine to wake up.")
 
 	suspendParser = subparsers.add_parser("suspend", help="Suspend a machine running the server.")
-	suspendParser.add_argument("ip", help="The ip:port address for the machine to suspend.")
+	suspendParser.add_argument(
+		"--server",
+		**server_kwargs,  # type: ignore
+	)
 
 	shutdownParser = subparsers.add_parser("shutdown", help="Shutdown a machine running the server.")
-	shutdownParser.add_argument("ip", help="The ip:port address for the machine to shutdown.")
+	shutdownParser.add_argument(
+		"--server",
+		**server_kwargs,  # type: ignore
+	)
 
 	leaseParser = subparsers.add_parser(
 		"lease", help="Register a workload, run a heartbeat and release the workload when completed."
 	)
 	leaseParser.add_argument(
-		"--server", required=True, help="The ip:port address for the machine to register the workload."
+		"--server",
+		**server_kwargs,  # type: ignore
 	)
 	leaseParser.add_argument(
 		"--undefine",
-		action="append",
-		default=[],
-		help="Environment variable to undefine before running the workload.",
+		**undefine_kwargs,  # type: ignore
 	)
 	leaseParser.add_argument(
 		"--name",
-		default="unknown",
-		help="The name of the workload.",
+		**name_kwargs,  # type: ignore
 	)
 	leaseParser.add_argument(
 		"--ttl",
-		default=60,
-		type=int,
-		help="The time-to-live of the workload lease.",
+		**ttl_kwargs,  # type: ignore
 	)
 	leaseParser.add_argument("workload", nargs=argparse.REMAINDER, help="The command to execute.")
 
 	leasePreriodParser = subparsers.add_parser("lease-period", help="Register a workload for a predefined period.")
 	leasePreriodParser.add_argument(
-		"--server", required=True, help="The ip:port address for the machine to register the workload."
+		"--server",
+		**server_kwargs,  # type: ignore
 	)
 	leasePreriodParser.add_argument(
 		"--name",
-		default="unknown",
-		help="The name of the workload.",
+		**name_kwargs,  # type: ignore
 	)
 	leasePreriodParser.add_argument(
 		"--ttl",
-		default=60,
-		type=int,
-		help="The time-to-live of the workload lease.",
+		**ttl_kwargs,  # type: ignore
 	)
 
 	args = parser.parse_args()
@@ -113,9 +137,9 @@ if __name__ == "__main__":
 				timeout=args.timeout,
 			)
 		elif args.command == "suspend":
-			commandSuspend(server=args.ip)
+			commandSuspend(server=args.server)
 		elif args.command == "shutdown":
-			commandShutdown(server=args.ip)
+			commandShutdown(server=args.server)
 		elif args.command == "lease":
 			returnCode = commandLease(
 				server=args.server,

@@ -138,7 +138,7 @@ pipeline
     post {
         always {
 			sh "./info.sh"
-			sh "./tools/bazel run //apps/node_manager:client --config=local -- suspend 10.10.0.10:8000"
+			sh "./tools/bazel run //apps/node_manager:client --config=local -- suspend --server 10.10.0.10:8000"
         }
     }
 }
