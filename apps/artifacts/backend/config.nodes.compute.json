@@ -21,6 +21,16 @@
         },
         {
             "inputs": {
+                "/data/gpu/{name}": {}
+            },
+            "max": 1,
+            "min": 0,
+            "title": "GPU {name}",
+            "type": "linear",
+            "unit": "percent"
+        },
+        {
+            "inputs": {
                 "/data/disk/{name}/total": {},
                 "/data/disk/{name}/used": {}
             },
