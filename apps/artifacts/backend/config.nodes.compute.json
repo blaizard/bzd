@@ -12,15 +12,6 @@
         },
         {
             "inputs": {
-                "/data/cpu_frequency/{name}": {}
-            },
-            "min": 0,
-            "title": "CPU Frequency {name}",
-            "type": "linear",
-            "unit": "frequency"
-        },
-        {
-            "inputs": {
                 "/data/gpu/{name}": {}
             },
             "max": 1,
@@ -28,6 +19,15 @@
             "title": "GPU {name}",
             "type": "linear",
             "unit": "percent"
+        },
+        {
+            "inputs": {
+                "/data/cpu_frequency/{name}": {}
+            },
+            "min": 0,
+            "title": "CPU Frequency {name}",
+            "type": "linear",
+            "unit": "frequency"
         },
         {
             "inputs": {
