@@ -44,6 +44,38 @@ def commandWoLLeasePeriod(
 	raise Exception(f"Error: Could not secure lease for '{name}' after 3 attempts.")
 
 
+def commandWoLLease(
+	mac: str,
+	broadcast: str,
+	service: str,
+	wait: typing.List[str],
+	timeout: int,
+	server: str,
+	name: str,
+	ttl: int,
+	command: typing.List[str],
+	undefine: typing.Optional[typing.List[str]] = None,
+) -> int:
+	commandWoLLeasePeriod(
+		mac=mac,
+		broadcast=broadcast,
+		service=service,
+		wait=wait,
+		timeout=timeout,
+		server=server,
+		name=name,
+		# WOl and lease for 60s.
+		ttl=60,
+	)
+	return commandLease(
+		server=server,
+		name=name,
+		ttl=ttl,
+		undefine=undefine,
+		command=command,
+	)
+
+
 def setupArgs(parser: argparse.ArgumentParser, args: typing.List[str]) -> None:
 	all_args: typing.Dict[str, typing.Dict[str, typing.Any]] = {
 		"broadcast": {
@@ -111,7 +143,15 @@ if __name__ == "__main__":
 	leasePreriodParser = subparsers.add_parser("lease-period", help="Register a workload for a predefined period.")
 	setupArgs(leasePreriodParser, ["server", "name", "ttl"])
 
-	wolLeasePeriodParser = subparsers.add_parser("wol-lease-period", help="Wake-up a machine from its MAC address.")
+	wolLeaseParser = subparsers.add_parser(
+		"wol-lease", help="Wake-up a machine from its MAC address and register a workload."
+	)
+	setupArgs(wolLeaseParser, ["broadcast", "service", "timeout", "wait", "mac", "server", "undefine", "name", "ttl"])
+	wolLeaseParser.add_argument("workload", nargs=argparse.REMAINDER, help="The command to execute.")
+
+	wolLeasePeriodParser = subparsers.add_parser(
+		"wol-lease-period", help="Wake-up a machine from its MAC address and register a workload for a predefined period."
+	)
 	setupArgs(wolLeasePeriodParser, ["broadcast", "service", "timeout", "wait", "mac", "server", "name", "ttl"])
 
 	args = parser.parse_args()
@@ -144,6 +184,20 @@ if __name__ == "__main__":
 				name=args.name,
 				ttl=args.ttl,
 			)
+		elif args.command == "wol-lease":
+			returnCode = commandWoLLease(
+				mac=args.mac,
+				broadcast=args.broadcast,
+				service=args.service,
+				wait=args.wait,
+				timeout=args.timeout,
+				server=args.server,
+				name=args.name,
+				ttl=args.ttl,
+				undefine=args.undefine,
+				command=args.workload,
+			)
+			sys.exit(returnCode)
 		elif args.command == "wol-lease-period":
 			commandWoLLeasePeriod(
 				mac=args.mac,
