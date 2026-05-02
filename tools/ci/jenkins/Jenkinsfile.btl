@@ -30,7 +30,7 @@ pipeline
 				sh "git submodule update --init --recursive"
 				sh "ls -ll /"
 				// Wake-up the remote executor.
-				sh "./tools/bazel run //apps/node_manager:client --config=local -- wol --wait 10.10.0.11:8980 --timeout 300 08:bf:b8:14:04:b6"
+				sh "./tools/bazel run //apps/node_manager:client --config=local -- wol --wait 10.10.0.11:8980 --timeout 300 --mac 08:bf:b8:14:04:b6"
 				sh "./info.sh"
 			}
 		}

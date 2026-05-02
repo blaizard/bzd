@@ -1,5 +1,6 @@
 import argparse
 import sys
+import typing
 
 from apps.node_manager.private.client.command.wake_on_lan import commandWakeOnLan
 from apps.node_manager.private.client.command.suspend import commandSuspend
@@ -22,108 +23,96 @@ def exceptionToString(exception: Exception) -> str:
 	return "\n".join(lines)
 
 
+def commandWoLLeasePeriod(
+	mac: str, broadcast: str, service: str, wait: typing.List[str], timeout: int, server: str, name: str, ttl: int
+) -> None:
+
+	for attempt in range(1, 4):
+		try:
+			commandLeasePeriod(server=server, name=name, ttl=ttl)
+			print(f"Lease secured for '{name}' for {ttl}s.", flush=True)
+			return
+		except Exception as e:
+			print(exceptionToString(e), file=sys.stderr, flush=True)
+
+		print(f"Lease attempt {attempt} for '{name}' failed. Sending WOL...", flush=True)
+		try:
+			commandWakeOnLan(mac=mac, broadcast=broadcast, service=service, wait=wait, timeout=timeout)
+		except Exception as e:
+			print(exceptionToString(e), file=sys.stderr, flush=True)
+
+	raise Exception(f"Error: Could not secure lease for '{name}' after 3 attempts.")
+
+
+def setupArgs(parser: argparse.ArgumentParser, args: typing.List[str]) -> None:
+	all_args: typing.Dict[str, typing.Dict[str, typing.Any]] = {
+		"broadcast": {
+			"default": "255.255.255.255",
+			"help": "The broadcast address to be used.",
+		},
+		"service": {
+			"help": "A service to proxy the WOL call.",
+		},
+		"timeout": {
+			"default": 60,
+			"type": int,
+			"help": "Timeout in seconds until which the check returns.",
+		},
+		"wait": {
+			"action": "append",
+			"default": [],
+			"help": "Wait until a specific TCP connection is open.",
+		},
+		"mac": {"required": True, "help": "The mac address for the machine to wake up."},
+		"server": {"required": True, "help": "The ip:port address for the machine to register the workload."},
+		"undefine": {
+			"action": "append",
+			"default": [],
+			"help": "Environment variable to undefine before running the workload.",
+		},
+		"name": {
+			"default": "unknown",
+			"help": "The name of the workload.",
+		},
+		"ttl": {
+			"default": 60,
+			"type": int,
+			"help": "The time-to-live of the workload lease.",
+		},
+	}
+
+	for arg in args:
+		assert arg in all_args, f"Unknown argument '{arg}'."
+		parser.add_argument(
+			f"--{arg}",
+			**all_args[arg],
+		)
+
+
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Wake On Lan client.")
 	subparsers = parser.add_subparsers(help="Available sub-commands.", dest="command")
 
-	broadcast_kwargs = {
-		"default": "255.255.255.255",
-		"help": "The broadcast address to be used.",
-	}
-	service_kwargs = {
-		"help": "A service to proxy the WOL call.",
-	}
-	timeout_kwargs = {
-		"default": 60,
-		"type": int,
-		"help": "Timeout in seconds until which the check returns.",
-	}
-	wait_kwargs = {
-		"action": "append",
-		"default": [],
-		"help": "Wait until a specific TCP connection is open.",
-	}
-	server_kwargs = {"required": True, "help": "The ip:port address for the machine to register the workload."}
-	undefine_kwargs = {
-		"action": "append",
-		"default": [],
-		"help": "Environment variable to undefine before running the workload.",
-	}
-	name_kwargs = {
-		"default": "unknown",
-		"help": "The name of the workload.",
-	}
-	ttl_kwargs = {
-		"default": 60,
-		"type": int,
-		"help": "The time-to-live of the workload lease.",
-	}
-
 	wolParser = subparsers.add_parser("wol", help="Wake-up a machine from its MAC address.")
-	wolParser.add_argument(
-		"--broadcast",
-		**broadcast_kwargs,  # type: ignore
-	)
-	wolParser.add_argument(
-		"--service",
-		**service_kwargs,  # type: ignore
-	)
-	wolParser.add_argument(
-		"--timeout",
-		**timeout_kwargs,  # type: ignore
-	)
-	wolParser.add_argument(
-		"--wait",
-		**wait_kwargs,  # type: ignore
-	)
-	wolParser.add_argument("mac", help="The mac address for the machine to wake up.")
+	setupArgs(wolParser, ["broadcast", "service", "timeout", "wait", "mac"])
 
 	suspendParser = subparsers.add_parser("suspend", help="Suspend a machine running the server.")
-	suspendParser.add_argument(
-		"--server",
-		**server_kwargs,  # type: ignore
-	)
+	setupArgs(suspendParser, ["server"])
 
 	shutdownParser = subparsers.add_parser("shutdown", help="Shutdown a machine running the server.")
-	shutdownParser.add_argument(
-		"--server",
-		**server_kwargs,  # type: ignore
-	)
+	setupArgs(shutdownParser, ["server"])
 
 	leaseParser = subparsers.add_parser(
 		"lease", help="Register a workload, run a heartbeat and release the workload when completed."
 	)
-	leaseParser.add_argument(
-		"--server",
-		**server_kwargs,  # type: ignore
-	)
-	leaseParser.add_argument(
-		"--undefine",
-		**undefine_kwargs,  # type: ignore
-	)
-	leaseParser.add_argument(
-		"--name",
-		**name_kwargs,  # type: ignore
-	)
-	leaseParser.add_argument(
-		"--ttl",
-		**ttl_kwargs,  # type: ignore
-	)
+	setupArgs(leaseParser, ["server", "undefine", "name", "ttl"])
 	leaseParser.add_argument("workload", nargs=argparse.REMAINDER, help="The command to execute.")
 
 	leasePreriodParser = subparsers.add_parser("lease-period", help="Register a workload for a predefined period.")
-	leasePreriodParser.add_argument(
-		"--server",
-		**server_kwargs,  # type: ignore
-	)
-	leasePreriodParser.add_argument(
-		"--name",
-		**name_kwargs,  # type: ignore
-	)
-	leasePreriodParser.add_argument(
-		"--ttl",
-		**ttl_kwargs,  # type: ignore
-	)
+	setupArgs(leasePreriodParser, ["server", "name", "ttl"])
+
+	wolLeasePeriodParser = subparsers.add_parser("wol-lease-period", help="Wake-up a machine from its MAC address.")
+	setupArgs(wolLeasePeriodParser, ["broadcast", "service", "timeout", "wait", "mac", "server", "name", "ttl"])
 
 	args = parser.parse_args()
 
@@ -155,8 +144,19 @@ if __name__ == "__main__":
 				name=args.name,
 				ttl=args.ttl,
 			)
+		elif args.command == "wol-lease-period":
+			commandWoLLeasePeriod(
+				mac=args.mac,
+				broadcast=args.broadcast,
+				service=args.service,
+				wait=args.wait,
+				timeout=args.timeout,
+				server=args.server,
+				name=args.name,
+				ttl=args.ttl,
+			)
 		else:
 			assert False, f"Unknown command: '{args.command}'."
 	except Exception as e:
-		print(exceptionToString(e), file=sys.stderr)
+		print(exceptionToString(e), file=sys.stderr, flush=True)
 		sys.exit(1)
