@@ -10,6 +10,7 @@ jobs:
             - uses: https://git.blaizard.com/blaise/deployment/ci/gitea/setup@main
               with:
                   git_token: ${{ secrets.BZD_AGENT_TOKEN }}
+                  opencode_token: ${{ secrets.BZD_OPENCODE_TOKEN }}
 
             - name: "Create PR description from comment"
               env:
