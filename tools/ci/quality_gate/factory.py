@@ -34,4 +34,4 @@ class QualityGate(Factory):
 
 	def install(self, workspace: pathlib.Path) -> None:
 		assert self.jenkinsFile
-		(workspace / "quality_gate.sh").write_text(self.jenkinsFile)
+		(workspace / "quality_gate").write_text(self.jenkinsFile)
