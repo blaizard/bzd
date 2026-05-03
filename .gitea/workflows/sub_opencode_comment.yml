@@ -24,6 +24,7 @@ jobs:
             - uses: https://git.blaizard.com/blaise/deployment/ci/gitea/setup@main
               with:
                   lease: "true"
+                  opencode_token: ${{ secrets.BZD_OPENCODE_TOKEN }}
 
             - name: "Run opencode"
               env:
