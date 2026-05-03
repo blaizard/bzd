@@ -6,8 +6,8 @@ build --show_timestamps
 # Exclude long and eternal tests.
 test --test_timeout_filters=-long,-eternal
 
-# Use remote execution.
-common --config=remote
+# Use remote execution (build scope only to avoid errors on non-build commands like query).
+build --config=remote
 
 # Repository cache.
 common --repository_cache=/opt/bazel_repo_cache
