@@ -23,7 +23,7 @@ jobs:
 
             - name: "Install Nix"
               run: |
-                curl -sSfL https://artifacts.nixos.org/nix-installer | sh -s -- install --enable-flakes
+                curl -sSfL https://artifacts.nixos.org/nix-installer | sh -s -- install --enable-flakes --no-confirm
 
             - name: "Set the SSH key"
               uses: https://git.blaizard.com/blaise/bzd/.gitea/actions/ssh_key@master
