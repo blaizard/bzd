@@ -25,6 +25,7 @@ jobs:
               run: |
                 set -euo pipefail
                 curl -sSfL https://artifacts.nixos.org/nix-installer | sh -s -- install linux --enable-flakes --no-confirm --init none
+                . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
 
             #- name: "Set the SSH key"
             #  uses: https://git.blaizard.com/blaise/bzd/.gitea/actions/ssh_key@master
