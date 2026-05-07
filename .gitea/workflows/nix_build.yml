@@ -23,9 +23,12 @@ jobs:
 
             - name: "Install Nix"
               run: |
-                set -euo pipefail
-                curl -sSfL https://artifacts.nixos.org/nix-installer | sh -s -- install linux --enable-flakes --no-confirm --init none
-                . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+                sudo bash -c '
+                  set -euo pipefail
+                  curl -sSfL https://artifacts.nixos.org/nix-installer | sh -s -- install linux --enable-flakes --no-confirm --init none
+                  . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+                  nix profile install nixpkgs#nixos-rebuild
+                '
 
             #- name: "Set the SSH key"
             #  uses: https://git.blaizard.com/blaise/bzd/.gitea/actions/ssh_key@master
@@ -35,8 +38,7 @@ jobs:
             - name: "Build"
               run: |
                   bzd-lease sudo bash -c '
-                      export PATH="/nix/var/nix/profiles/default/bin:$PATH"
-                      nix profile install nixpkgs#nixos-rebuild
+                      export PATH="/root/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH"
 
                       ./deployment/nixos/provision.py --node beast-llm --cache beast-nixos-cache build
                   '
