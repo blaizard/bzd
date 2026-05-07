@@ -21,7 +21,9 @@ jobs:
               with:
                   lease: "true"
 
-            - uses: DeterminateSystems/nix-installer-action@v12
+            - name: "Install Nix"
+              run: |
+                curl -sSfL https://artifacts.nixos.org/nix-installer | sh -s -- install --enable-flakes
 
             - name: "Set the SSH key"
               uses: https://git.blaizard.com/blaise/bzd/.gitea/actions/ssh_key@master
