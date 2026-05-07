@@ -1,0 +1,33 @@
+name: NixOS Build
+
+on:
+    workflow_dispatch: # allows manual triggering
+
+jobs:
+    lease_linux:
+        runs-on: node_manager_client
+        steps:
+            - name: "Lease Linux"
+              uses: https://git.blaizard.com/blaise/deployment/ci/gitea/lease_linux@main
+              with:
+                  name: "nixos_build"
+                  ttl: "300"
+
+    build_linux:
+        needs: lease_linux
+        runs-on: linux
+        steps:
+            - uses: https://git.blaizard.com/blaise/deployment/ci/gitea/setup@main
+              with:
+                  lease: "true"
+
+            - uses: DeterminateSystems/nix-installer-action@v12
+
+            - name: "Set the SSH key"
+              uses: https://git.blaizard.com/blaise/bzd/.gitea/actions/ssh_key@master
+              with:
+                  ssh_private_key: ${{ secrets.BZD_NIXOS_CACHE_SSH_KEY }}
+
+            - name: "Build"
+              run: |
+                  bzd-lease ./deployment/nixos/provision.py --node beast-llm --cache beast-nixos-cache build
