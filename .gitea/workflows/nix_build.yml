@@ -23,12 +23,13 @@ jobs:
 
             - name: "Install Nix"
               run: |
+                set -euo pipefail
                 curl -sSfL https://artifacts.nixos.org/nix-installer | sh -s -- install linux --enable-flakes --no-confirm --init none
 
-            - name: "Set the SSH key"
-              uses: https://git.blaizard.com/blaise/bzd/.gitea/actions/ssh_key@master
-              with:
-                  ssh_private_key: ${{ secrets.BZD_NIXOS_CACHE_SSH_KEY }}
+            #- name: "Set the SSH key"
+            #  uses: https://git.blaizard.com/blaise/bzd/.gitea/actions/ssh_key@master
+            #  with:
+            #      ssh_private_key: ${{ secrets.BZD_NIXOS_CACHE_SSH_KEY }}
 
             - name: "Build"
               run: |
