@@ -34,4 +34,7 @@ jobs:
 
             - name: "Build"
               run: |
-                  bzd-lease sudo ./deployment/nixos/provision.py --node beast-llm --cache beast-nixos-cache build
+                  bzd-lease sudo bash -c '
+                      export PATH="/nix/var/nix/profiles/default/bin:$PATH"
+                      ./deployment/nixos/provision.py --node beast-llm --cache beast-nixos-cache build
+                  '
