@@ -36,5 +36,7 @@ jobs:
               run: |
                   bzd-lease sudo bash -c '
                       export PATH="/nix/var/nix/profiles/default/bin:$PATH"
+                      nix profile install nixpkgs#nixos-rebuild
+
                       ./deployment/nixos/provision.py --node beast-llm --cache beast-nixos-cache build
                   '
