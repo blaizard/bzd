@@ -10,7 +10,7 @@ jobs:
             - name: "Lease Linux"
               uses: https://git.blaizard.com/blaise/deployment/ci/gitea/lease_linux@main
               with:
-                  name: "nixos_build"
+                  name: "nix_build"
                   ttl: "300"
 
     build_linux:
@@ -34,4 +34,4 @@ jobs:
 
             - name: "Build"
               run: |
-                  bzd-lease ./deployment/nixos/provision.py --node beast-llm --cache beast-nixos-cache build
+                  bzd-lease sudo ./deployment/nixos/provision.py --node beast-llm --cache beast-nixos-cache build
