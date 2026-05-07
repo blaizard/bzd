@@ -1,4 +1,4 @@
-name: NixOS Build
+name: Nix Build
 
 on:
     workflow_dispatch: # allows manual triggering
@@ -23,7 +23,7 @@ jobs:
 
             - name: "Install Nix"
               run: |
-                curl -sSfL https://artifacts.nixos.org/nix-installer | sh -s -- install --enable-flakes --no-confirm
+                curl -sSfL https://artifacts.nixos.org/nix-installer | sh -s -- install linux --enable-flakes --no-confirm --init none
 
             - name: "Set the SSH key"
               uses: https://git.blaizard.com/blaise/bzd/.gitea/actions/ssh_key@master
