@@ -5,7 +5,11 @@
 Build and Push the image.
 
 ```bash
+# Build
 docker build tools/ci/runner/linux --no-cache -t docker.blaizard.com/tools/ci/runner/linux:latest
+# Run locally
+docker run -it --rm docker.blaizard.com/tools/ci/runner/linux:latest /bin/bash
+# Push
 docker push docker.blaizard.com/tools/ci/runner/linux:latest
 ```
 

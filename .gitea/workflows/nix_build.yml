@@ -21,13 +21,6 @@ jobs:
               with:
                   lease: "true"
 
-            - name: "Install Nix"
-              run: |
-                  bzd-lease sudo bash -c '
-                      set -euo pipefail
-                      curl -sSfL https://artifacts.nixos.org/nix-installer | sh -s -- install linux --enable-flakes --no-confirm --init none
-                  '
-
             - name: "Set the SSH key"
               uses: https://git.blaizard.com/blaise/bzd/.gitea/actions/ssh_key@master
               with:
@@ -35,7 +28,4 @@ jobs:
 
             - name: "Build"
               run: |
-                  bzd-lease sudo bash -c '
-                      export PATH="/root/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH"
-                      ./deployment/nixos/provision.py --node beast-llm --cache beast-nixos-cache build
-                  '
+                  bzd-lease ./deployment/nixos/provision.py --node beast-llm --cache beast-nixos-cache build
