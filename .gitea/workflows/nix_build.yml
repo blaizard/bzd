@@ -25,7 +25,6 @@ jobs:
             - name: "Lease Linux"
               uses: https://git.blaizard.com/blaise/deployment/ci/gitea/lease_linux@main
               with:
-                  name: "nix_build"
                   ttl: "300"
 
     build_linux:
