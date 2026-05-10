@@ -2,6 +2,21 @@ name: Nix Build
 
 on:
     workflow_dispatch: # allows manual triggering
+        inputs:
+            target_node:
+                description: 'Select the node to build'
+                required: true
+                default: 'all'
+                type: choice
+                options:
+                    - all
+                    - beast-buildbarn
+                    - beast-game
+                    - beast-llm
+                    - beast-nixos-cache
+                    - beast-runner
+                    - beast-x86_64-linux
+                    - laptop-xps13-9315
 
 jobs:
     lease_linux:
@@ -31,30 +46,37 @@ jobs:
                   ssh_private_key: ${{ secrets.BZD_NIXOS_CACHE_SSH_KEY }}
 
             - name: "Build beast-buildbarn"
+              if: inputs.target_node == 'all' || inputs.target_node == 'beast-buildbarn'
               run: |
                   bzd-lease ./deployment/nixos/provision.py --cache beast-nixos-cache build --node beast-buildbarn
 
             - name: "Build beast-game"
+              if: inputs.target_node == 'all' || inputs.target_node == 'beast-game'
               run: |
                   bzd-lease ./deployment/nixos/provision.py --cache beast-nixos-cache build --node beast-game
 
             - name: "Build beast-llm"
+              if: inputs.target_node == 'all' || inputs.target_node == 'beast-llm'
               run: |
                   bzd-lease ./deployment/nixos/provision.py --cache beast-nixos-cache build --node beast-llm
 
             - name: "Build beast-nixos-cache"
+              if: inputs.target_node == 'all' || inputs.target_node == 'beast-nixos-cache'
               run: |
                   bzd-lease ./deployment/nixos/provision.py --cache beast-nixos-cache build --node beast-nixos-cache
 
             - name: "Build beast-runner"
+              if: inputs.target_node == 'all' || inputs.target_node == 'beast-runner'
               run: |
                   bzd-lease ./deployment/nixos/provision.py --cache beast-nixos-cache build --node beast-runner
 
             - name: "Build beast-x86_64-linux"
+              if: inputs.target_node == 'all' || inputs.target_node == 'beast-x86_64-linux'
               run: |
                   bzd-lease ./deployment/nixos/provision.py --cache beast-nixos-cache build --node beast-x86_64-linux
 
             - name: "Build laptop-xps13-9315"
+              if: inputs.target_node == 'all' || inputs.target_node == 'laptop-xps13-9315'
               run: |
                   bzd-lease ./deployment/nixos/provision.py --cache beast-nixos-cache build --node laptop-xps13-9315
 
