@@ -48,4 +48,3 @@ RUN curl -sSfL https://artifacts.nixos.org/nix-installer | sh -s -- install linu
   --extra-conf "sandbox = false" --enable-flakes --init none --no-confirm
 RUN sudo chown -R ${user}:${group} /nix
 ENV PATH="${PATH}:/nix/var/nix/profiles/default/bin"
-RUN nix profile install nixpkgs#nixpkgs-fmt
