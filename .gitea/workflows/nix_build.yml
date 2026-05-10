@@ -21,18 +21,44 @@ jobs:
               with:
                   lease: "true"
 
+            - name: "Info"
+              run: |
+                  ./info.sh
+
             - name: "Set the SSH key"
               uses: https://git.blaizard.com/blaise/bzd/.gitea/actions/ssh_key@master
               with:
                   ssh_private_key: ${{ secrets.BZD_NIXOS_CACHE_SSH_KEY }}
 
-            - name: "Build"
+            - name: "Build beast-buildbarn"
               run: |
-                  bzd-lease ./deployment/nixos/provision.py --cache beast-nixos-cache build \
-                        --node beast-buildbarn \
-                        --node beast-game \
-                        --node beast-llm \
-                        --node beast-nixos-cache \
-                        --node beast-runner \
-                        --node beast-x86_64-linux \
-                        --node laptop-xps13-9315
+                  bzd-lease ./deployment/nixos/provision.py --cache beast-nixos-cache build --node beast-buildbarn
+
+            - name: "Build beast-game"
+              run: |
+                  bzd-lease ./deployment/nixos/provision.py --cache beast-nixos-cache build --node beast-game
+
+            - name: "Build beast-llm"
+              run: |
+                  bzd-lease ./deployment/nixos/provision.py --cache beast-nixos-cache build --node beast-llm
+
+            - name: "Build beast-nixos-cache"
+              run: |
+                  bzd-lease ./deployment/nixos/provision.py --cache beast-nixos-cache build --node beast-nixos-cache
+
+            - name: "Build beast-runner"
+              run: |
+                  bzd-lease ./deployment/nixos/provision.py --cache beast-nixos-cache build --node beast-runner
+
+            - name: "Build beast-x86_64-linux"
+              run: |
+                  bzd-lease ./deployment/nixos/provision.py --cache beast-nixos-cache build --node beast-x86_64-linux
+
+            - name: "Build laptop-xps13-9315"
+              run: |
+                  bzd-lease ./deployment/nixos/provision.py --cache beast-nixos-cache build --node laptop-xps13-9315
+
+            - name: "Info"
+              if: always()
+              run: |
+                  ./info.sh

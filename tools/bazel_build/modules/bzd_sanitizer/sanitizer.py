@@ -81,12 +81,22 @@ def getFileList(workspace: pathlib.Path, path: pathlib.Path, all: bool) -> typin
 	return fileList
 
 
+def getTargetFromTag(workspace: pathlib.Path, tag: str) -> typing.List[str]:
+	result = localCommand(
+		["bazel", "query", 'attr("tags", "' + tag + '", //...)', "--output=label"],
+		cwd=workspace,
+	)
+	return [target for line in result.getStdout().split("\n") if (target := line.strip())]
+
+
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Workspace sanitizer.")
-	parser.add_argument("-u", "--use", type=str, action="append", default=[], help="Actions to be used.")
-	parser.add_argument("-a", "--all", action="store_true", help="Sanitize all files in the workspace.")
+	parser.add_argument("--use", type=str, action="append", default=[], help="Actions to be used.")
 	parser.add_argument(
-		"-c",
+		"--use-tag", type=str, action="append", default=[], help="Actions that match a specific tag will to be used."
+	)
+	parser.add_argument("--all", action="store_true", help="Sanitize all files in the workspace.")
+	parser.add_argument(
 		"--check",
 		action="store_true",
 		help="Only check if the files need to be sanitized.",
@@ -98,7 +108,6 @@ if __name__ == "__main__":
 		help="If set, the output will have colors.",
 	)
 	parser.add_argument(
-		"-w",
 		"--workspace",
 		type=pathlib.Path,
 		default=os.environ.get("BUILD_WORKSPACE_DIRECTORY", "."),
@@ -122,10 +131,15 @@ if __name__ == "__main__":
 	)
 	context.toFile(path=contextFilePath)
 
+	# Gather all the actions to run.
+	useActions = [*args.use]
+	for tag in args.use_tag:
+		useActions += getTargetFromTag(workspace=args.workspace, tag=tag)
+
 	success = True
 	try:
 		print(f"{'Checking' if context.check else 'Sanitizing'} {context.size()} file(s) in {args.workspace / args.path}:")
-		for action in args.use:
+		for action in useActions:
 			printActionContext = context.printAction(action)
 			startTime = time.monotonic()
 

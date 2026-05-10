@@ -44,6 +44,8 @@ sh_binary_wrapper(
         "//tools/ci:generate",
         "--use",
         "//tools/shell:generate",
+        "--use-tag",
+        "sanitizer",
     ],
     binary = "@bzd_sanitizer//:sanitizer",
 )
