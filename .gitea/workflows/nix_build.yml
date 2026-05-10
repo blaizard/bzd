@@ -28,4 +28,11 @@ jobs:
 
             - name: "Build"
               run: |
-                  bzd-lease ./deployment/nixos/provision.py --node beast-llm --cache beast-nixos-cache build
+                  bzd-lease ./deployment/nixos/provision.py --cache beast-nixos-cache build \
+                        --node beast-buildbarn \
+                        --node beast-game \
+                        --node beast-llm \
+                        --node beast-nixos-cache \
+                        --node beast-runner \
+                        --node beast-x86_64-linux \
+                        --node laptop-xps13-9315
