@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
 
-./sandbox.py -p agent1 --prefix opencode
+./sandbox.py -p agent1 --prefix opencode "$@"
+
