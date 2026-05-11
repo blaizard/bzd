@@ -16,7 +16,7 @@ on:
                     - beast-nixos-cache
                     - beast-runner
                     - beast-x86_64-linux
-                    - laptop-xps13-9315
+                    - laptop-xp13-9315
 
 jobs:
     lease_linux:
@@ -74,10 +74,10 @@ jobs:
               run: |
                   bzd-lease ./deployment/nixos/provision.py --cache beast-nixos-cache build --node beast-x86_64-linux
 
-            - name: "Build laptop-xps13-9315"
-              if: inputs.target_node == 'all' || inputs.target_node == 'laptop-xps13-9315'
+            - name: "Build laptop-xp13-9315"
+              if: inputs.target_node == 'all' || inputs.target_node == 'laptop-xp13-9315'
               run: |
-                  bzd-lease ./deployment/nixos/provision.py --cache beast-nixos-cache build --node laptop-xps13-9315
+                  bzd-lease ./deployment/nixos/provision.py --cache beast-nixos-cache build --node laptop-xp13-9315
 
             - name: "Info"
               if: always()

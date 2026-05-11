@@ -20,22 +20,27 @@ def commandLease(
 
 	host, port = getHostPort(server)
 	baseUrl = f"http://{host}:{port}"
-	stopHeartbeat = threading.Event()
+	stop = threading.Event()
 
 	# Register the workload
 	leaseId = leasePeriod(baseUrl=baseUrl, name=name, ttl=ttl, httpClient=httpClient)
 
 	def heartbeatLoop() -> None:
-		while not stopHeartbeat.is_set():
+		consecutiveFailures = 0
+		while not stop.is_set():
 			# Sleep for half of the TTL to ensure we heartbeat in time,
 			# but at most 10 seconds.
 			# Also don't wait forever if we want to stop.
-			if stopHeartbeat.wait(min(ttl / 2, 10)):
+			if stop.wait(min(ttl / 2, 10)):
 				break
 			try:
 				httpClient.post(f"{baseUrl}/workload/heartbeat", json={"id": leaseId, "ttl": ttl})
+				consecutiveFailures = 0
 			except Exception as e:
+				consecutiveFailures += 1
 				print(f"Heartbeat failed: {e}")
+				if consecutiveFailures > 2:
+					stop.set()
 
 	heartbeatThread = threading.Thread(target=heartbeatLoop, daemon=True)
 	heartbeatThread.start()
@@ -46,11 +51,17 @@ def commandLease(
 
 	try:
 		with subprocess.Popen(command, cwd=os.environ.get("BUILD_WORKSPACE_DIRECTORY", None), env=env) as process:
-			process.wait()
-			return process.returncode
+			while not stop.is_set():
+				try:
+					returnCode = process.wait(timeout=1.0)
+					return returnCode
+				except subprocess.TimeoutExpired:
+					continue
+			process.terminate()
+			print("Aborting.")
 
 	finally:
-		stopHeartbeat.set()
+		stop.set()
 		try:
 			httpClient.post(f"{baseUrl}/workload/release", json={"id": leaseId})
 		except Exception as e:

@@ -146,7 +146,9 @@ class RequirementsFactory:
 			packagesByName[name][package] = []
 			# We take optional dependencies because of `rollup` which declares some of the things as optional.
 			# It is fine, be we should filter everything by platform/cpu as well.
-			dependencies = data.get("dependencies", {}) | data.get("optionalDependencies", {})
+			dependencies = (
+				data.get("dependencies", {}) | data.get("optionalDependencies", {}) | (data.get("peerDependencies") or {})
+			)
 			for alias, matchData in dependencies.items():
 				# Packages may have aliases in the form: case-1.5.3@npm:case@1.5.3
 				if matchData.startswith("npm:"):
@@ -156,6 +158,7 @@ class RequirementsFactory:
 							"alias": alias,
 							"name": packageName,
 							"matcher": SemverMatcher(constraint),
+							"isPeer": alias in (data.get("peerDependencies") or {}),
 						}
 					)
 				else:
@@ -164,6 +167,7 @@ class RequirementsFactory:
 							"alias": None,
 							"name": alias,
 							"matcher": SemverMatcher(matchData),
+							"isPeer": alias in (data.get("peerDependencies") or {}),
 						}
 					)
 
@@ -172,9 +176,13 @@ class RequirementsFactory:
 		for name, packageVersions in packagesByName.items():
 			for package, dependencies in packageVersions.items():
 				for dependency in dependencies:
-					assert dependency["name"] in packagesByName, (
-						f"The dependency '{dependency['name']}' from package '{package}' is not found."
-					)
+					if dependency["name"] not in packagesByName:
+						if dependency.get("isPeer"):
+							print(
+								f"WARNING: Peer dependency '{dependency['name']}' from package '{package}' is not found in the lockfile. Skipping."
+							)
+							continue
+						assert False, f"The dependency '{dependency['name']}' from package '{package}' is not found."
 					versionsPackages = {p.version: p for p in packagesByName[dependency["name"]].keys()}
 					maybeVersion = dependency["matcher"].matchLatest(versionsPackages.keys())
 					assert maybeVersion is not None, (
@@ -245,7 +253,7 @@ class RequirementsFactory:
 				"integrity": pkg.integrity,
 			}
 			if pkg.dependencies:
-				packages[key]["dependencies"] = [dependency.package for dependency in pkg.dependencies]
+				packages[key]["dependencies"] = sorted([dependency.package for dependency in pkg.dependencies])
 			if pkg.os:
 				packages[key]["os"] = pkg.os
 			if pkg.cpu:
