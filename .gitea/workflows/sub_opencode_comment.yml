@@ -38,7 +38,7 @@ jobs:
                   echo  "==== prompt ================================================="
                   echo "$PROMPT"
                   echo  "==== processing ============================================="
-                  bzd-lease opencode run --dangerously-skeip-permissions --agent "$AGENT" "$PROMPT" > /tmp/agent-response.txt || {
+                  bzd-lease opencode run --dangerously-skip-permissions --agent "$AGENT" "$PROMPT" > /tmp/agent-response.txt || {
                     echo "==== Opencode failed, dumping last log ======================"
                     tail -n 100 "$(ls -t ~/.local/share/opencode/log/*.log 2>/dev/null | head -n 1)" || echo "No log found"
                     exit 1
