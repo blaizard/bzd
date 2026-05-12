@@ -26,6 +26,10 @@ jobs:
                   lease: "true"
                   opencode_token: ${{ secrets.BZD_OPENCODE_TOKEN }}
 
+            - name: "Opencode version"
+              run: |
+                  opencode --version
+
             - name: "Run opencode"
               env:
                   PROMPT: ${{ inputs.prompt }}
