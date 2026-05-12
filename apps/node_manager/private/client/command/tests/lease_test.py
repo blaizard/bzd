@@ -57,7 +57,7 @@ class TestLeaseCommand(unittest.TestCase):
 
 		mockProcess = MagicMock()
 		mockProcess.__enter__.return_value = mockProcess
-		mockProcess.wait.side_effect = lambda: heartbeatCalled.wait(timeout=5)
+		mockProcess.wait.side_effect = lambda timeout: heartbeatCalled.wait(timeout=5)
 		mockProcess.returncode = 0
 
 		with patch("subprocess.Popen", return_value=mockProcess):

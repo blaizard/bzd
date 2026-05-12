@@ -53,12 +53,13 @@ def commandLease(
 		with subprocess.Popen(command, cwd=os.environ.get("BUILD_WORKSPACE_DIRECTORY", None), env=env) as process:
 			while not stop.is_set():
 				try:
-					returnCode = process.wait(timeout=1.0)
-					return returnCode
+					process.wait(timeout=1.0)
+					return process.returncode
 				except subprocess.TimeoutExpired:
 					continue
 			process.terminate()
 			print("Aborting.")
+			return 1
 
 	finally:
 		stop.set()
