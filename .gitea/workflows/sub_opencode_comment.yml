@@ -34,7 +34,7 @@ jobs:
                   echo  "==== prompt ================================================="
                   echo "$PROMPT"
                   echo  "==== processing ============================================="
-                  bzd-lease opencode run --agent "$AGENT" "$PROMPT" > /tmp/agent-response.txt
+                  bzd-lease opencode run --print-logs --agent "$AGENT" "$PROMPT" > /tmp/agent-response.txt
                   echo  "==== response ==============================================="
                   cat /tmp/agent-response.txt
 
