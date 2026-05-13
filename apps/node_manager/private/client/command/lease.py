@@ -2,6 +2,7 @@ import os
 import typing
 import threading
 import subprocess
+import shlex
 
 from apps.node_manager.private.client.command.common import getHostPort
 from apps.node_manager.private.client.command.lease_period import leasePeriod
@@ -38,7 +39,7 @@ def commandLease(
 				consecutiveFailures = 0
 			except Exception as e:
 				consecutiveFailures += 1
-				print(f"Heartbeat failed: {e}")
+				print(f"Heartbeat failed: {e}", flush=True)
 				if consecutiveFailures > 2:
 					stop.set()
 
@@ -50,7 +51,11 @@ def commandLease(
 		env.pop(name, None)
 
 	try:
-		with subprocess.Popen(command, cwd=os.environ.get("BUILD_WORKSPACE_DIRECTORY", None), env=env) as process:
+		# Run the process in a shell, to mimic what a user would do when calling the script.
+		# This is needed by some program which need to think they are in an interactive shell.
+		with subprocess.Popen(
+			shlex.join(command), cwd=os.environ.get("BUILD_WORKSPACE_DIRECTORY", None), env=env, shell=True
+		) as process:
 			while not stop.is_set():
 				try:
 					process.wait(timeout=1.0)
@@ -58,7 +63,7 @@ def commandLease(
 				except subprocess.TimeoutExpired:
 					continue
 			process.terminate()
-			print("Aborting.")
+			print("Aborting.", flush=True)
 			return 1
 
 	finally:
@@ -66,4 +71,4 @@ def commandLease(
 		try:
 			httpClient.post(f"{baseUrl}/workload/release", json={"id": leaseId})
 		except Exception as e:
-			print(f"Failed to release workload: {e}")
+			print(f"Failed to release workload: {e}", flush=True)

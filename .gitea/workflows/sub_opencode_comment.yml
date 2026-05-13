@@ -35,6 +35,7 @@ jobs:
                   PROMPT: ${{ inputs.prompt }}
                   AGENT: ${{ inputs.agent }}
               run: |
+                  set -euo pipefail
                   echo  "==== prompt ================================================="
                   echo "$PROMPT"
                   echo  "==== processing ============================================="
