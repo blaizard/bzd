@@ -4,9 +4,9 @@ on:
     workflow_dispatch: # allows manual triggering
         inputs:
             target_node:
-                description: 'Select the node to build'
+                description: "Select the node to build"
                 required: true
-                default: 'all'
+                default: "all"
                 type: choice
                 options:
                     - all
