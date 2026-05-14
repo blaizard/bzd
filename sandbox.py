@@ -143,6 +143,14 @@ class FeatureIsolation(Feature):
 		return volumes
 
 	@property
+	def dockerFile(self) -> typing.List[str]:
+		if self.args.isolate:
+			return [
+				'ENV TAR_OPTIONS="--no-same-owner"',
+			]
+		return []
+
+	@property
 	def dockerCompose(self) -> typing.Dict[str, typing.List[str]]:
 		if self.args.isolate:
 			assert self.context is not None
