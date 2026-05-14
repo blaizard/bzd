@@ -31,10 +31,9 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
 
 #[main]
 fn main() -> ! {
-    let result = unsafe { run_executor() };
+    let _ = unsafe { run_executor() };
 
     println!("<exit code 0>");
 
     software_reset();
-    loop {}
 }

@@ -28,7 +28,8 @@ crates_esp32s3.spec(
     version = "0.18.1",
 )
 crates_esp32s3.spec(
-    features = ["esp32s3"],
+    default_features = False,
+    features = ["esp32s3", "auto"],
     package = "esp-println",
     version = "0.16.1",
 )
@@ -46,6 +47,7 @@ crates_esp32s3.annotation(
     deps = ["@crates_esp32s3//:xtensa-lx"],
 )
 crates_esp32s3.annotation(
+    build_script_env = {"OPT_LEVEL": "3"},
     crate = "esp-hal",
     deps = [
         "@crates_esp32s3//:xtensa-lx",
