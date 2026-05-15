@@ -58,5 +58,10 @@ jobs:
 
                   else
                       echo "Branches have diverged. Manual intervention required."
+                      echo "This can be done as follow:"
+                      echo "# Add github remote."
+                      echo "git remote add github <git url>"
+                      echo "# Force push toward github."
+                      echo "git push -f github master"
                       exit 1
                   fi
