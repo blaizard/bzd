@@ -4,7 +4,7 @@ import threading
 import subprocess
 import shlex
 
-from apps.node_manager.private.client.command.common import getHostPort
+from apps.node_manager.private.common import getHostPort
 from apps.node_manager.private.client.command.lease_period import leasePeriod
 from bzd.http.client import HttpClient
 

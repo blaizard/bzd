@@ -1,13 +1,6 @@
 load("@rules_python//python:defs.bzl", "py_library")
 
 py_library(
-    name = "common",
-    srcs = [
-        "common.py",
-    ],
-)
-
-py_library(
     name = "wake_on_lan",
     srcs = [
         "wake_on_lan.py",
@@ -17,7 +10,7 @@ py_library(
         "//apps/node_manager/private/client/command/tests:__pkg__",
     ],
     deps = [
-        ":common",
+        "//apps/node_manager/private:common",
     ],
 )
 
@@ -31,7 +24,7 @@ py_library(
         "//apps/node_manager/private/client/command/tests:__pkg__",
     ],
     deps = [
-        ":common",
+        "//apps/node_manager/private:common",
         "@bzd_python//bzd/http:client",
     ],
 )
@@ -46,7 +39,7 @@ py_library(
         "//apps/node_manager/private/client/command/tests:__pkg__",
     ],
     deps = [
-        ":common",
+        "//apps/node_manager/private:common",
         "@bzd_python//bzd/http:client",
     ],
 )
@@ -61,8 +54,8 @@ py_library(
         "//apps/node_manager/private/client/command/tests:__pkg__",
     ],
     deps = [
-        ":common",
         ":lease_period",
+        "//apps/node_manager/private:common",
         "@bzd_python//bzd/http:client",
     ],
 )
@@ -76,7 +69,7 @@ py_library(
         "//apps/node_manager:__pkg__",
     ],
     deps = [
-        ":common",
+        "//apps/node_manager/private:common",
         "@bzd_python//bzd/http:client",
     ],
 )

@@ -1,5 +1,6 @@
 load("@bzd_bundle//:defs.bzl", "bzd_bundle_binary")
 load("@bzd_lib//config:defs.bzl", "bzd_config")
+load("@bzd_python//:defs.bzl", "bzd_python_oci")
 load("@rules_python//python:defs.bzl", "py_binary")
 load("//apps/bootloader:defs.bzl", "bzd_bootloader_binary")
 
@@ -37,6 +38,16 @@ py_binary(
     ],
 )
 
+py_binary(
+    name = "proxy",
+    srcs = [
+        "proxy.py",
+    ],
+    deps = [
+        "//apps/node_manager/private:common",
+    ],
+)
+
 bzd_config(
     name = "bootloader_config",
     base = "//apps/bootloader:config.base",
@@ -61,5 +72,15 @@ bzd_bundle_binary(
     compression = "gz",
     executable = ":with_bootloader",
     tags = ["manual"],
+    visibility = ["//deployment:__subpackages__"],
+)
+
+bzd_python_oci(
+    name = "image_proxy",
+    binary = ":proxy",
+    tags = [
+        "manual",
+        "no-remote",
+    ],
     visibility = ["//deployment:__subpackages__"],
 )

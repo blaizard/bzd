@@ -1,4 +1,4 @@
-from apps.node_manager.private.client.command.common import getHostPort
+from apps.node_manager.private.common import getHostPort
 from bzd.http.client import HttpClient
 
 
