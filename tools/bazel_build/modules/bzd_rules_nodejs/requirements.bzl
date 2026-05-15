@@ -4,79 +4,96 @@ load("@bzd_lib//:defs.bzl", "bzd_repository_maker")
 load("@bzd_platforms//:defs.bzl", "get_platform_from_os", "to_al", "to_isa")
 load("@node//:defs.bzl", "node_binary", "npm_binary")
 
-def _sanitize_repository_name(name):
-    return "".join([c if c.isalnum() else "-" for c in name.elems()]).strip("-")
-
 def _execute(repository_ctx, args, environment = {}):
     result = repository_ctx.execute(
         args,
         environment = environment,
     )
     if result.return_code != 0:
-        fail("Unable to fetch {}: Error executing '{}': {}{}".format(repository_ctx.name, args, result.stdout, result.stderr))
+        fail("Unable to fetch {}: Error executing '{}': {}{}".format(repository_ctx.name, " ".join([str(arg) for arg in args]), result.stdout, result.stderr))
     return result.stdout or result.stderr
 
-def _package_to_alias(package):
-    """Convert a package name into an alias.
+def _sanitize_repository_name(name):
+    """Sanitize a packge name to make it compatible with bazel target."""
 
-    For example, mocha@1.0 -> mocha@1.0
-    but momo@npm:mocha@1.0 -> momo
-    """
+    return "".join([c if c.isalnum() else "-" for c in name.elems()]).strip("-")
 
+def _module_name_from_package(package: str) -> str:
+    """Get the module name from the raw package name."""
+
+    # If it has an alias.
     if "@npm:" in package:
         return package.split("@npm:")[0]
+    return package.rsplit("@", 1)[0]
+
+def _canonical_name_from_package(package: str) -> str:
+    """Get the canonical name from the raw package name."""
+
+    # If it has an alias.
+    if "@npm:" in package:
+        return package.split("@npm:")[1]
     return package
+
+def _repository_name_from_package(package: str) -> str:
+    """Get the respository name from the raw package name."""
+
+    canonical_name = _canonical_name_from_package(package)
+    return _sanitize_repository_name("package-{}".format(canonical_name))
 
 def _requirement_repository_impl(repository_ctx):
     maybe_platform = get_platform_from_os(repository_ctx.os)
     node_path = repository_ctx.path(node_binary[maybe_platform])
     npm_path = repository_ctx.path(npm_binary[maybe_platform])
 
-    _execute(repository_ctx, ["mkdir", repository_ctx.path("packages")])
     output = _execute(
         repository_ctx,
-        [npm_path, "pack", "--json", "--pack-destination", repository_ctx.path("packages")] + repository_ctx.attr.packages.keys(),
+        [npm_path, "pack", "--json", "--pack-destination", ".", repository_ctx.attr.canonical_name],
         environment = {"PATH": str(node_path.dirname)},
     )
 
-    packages_to_filename = {}
-    for npm_data, package, integrity_expected in zip(json.decode(output), repository_ctx.attr.packages.keys(), repository_ctx.attr.packages.values()):
-        integrity_actual = npm_data["integrity"]
-        if not integrity_expected:
-            print("The integrity for '{}' is {}", package, integrity_actual)  # buildifier: disable=print
-        elif integrity_expected != integrity_actual:
-            fail("The package '{}' doesn't have the expected integrity '{}' vs '{}'.".format(package, integrity_expected, integrity_actual))
-        packages_to_filename[_package_to_alias(package)] = npm_data["filename"]
+    archive_path = json.decode(output)[0]["filename"]
+
+    # Create the dependency list.
+    dependencies = []
+    for dependency in repository_ctx.attr.dependencies:
+        module_name = _module_name_from_package(dependency)
+        canonical_name = _canonical_name_from_package(dependency)
+        repository_name = _repository_name_from_package(dependency)
+        line = "\"{}\": \"@{}//:package\"".format(module_name, repository_name)
+        if canonical_name not in repository_ctx.attr.valid_dependencies:
+            line = "# " + line
+        dependencies.append(line)
 
     repository_ctx.file(
-        "dependencies.json",
-        content = repository_ctx.attr.dependencies,
-    )
-
-    repository_ctx.file(
-        "BUILD",
+        "BUILD.bazel",
         content = """
 load("{defs}", "bzd_nodejs_package")
 
 bzd_nodejs_package(
     name = "package",
-    dependencies = ":dependencies.json",
-    packages = {{
-        {packages}
+    module_name = "{module_name}",
+    canonical_name = "{canonical_name}",
+    archive = ":{archive_path}",
+    deps = {{
+{dependencies}
     }},
     visibility = ["//visibility:public"],
 )
 """.format(
             defs = Label("//nodejs:defs.bzl"),
-            packages = ",\n".join(["\"{}\": \":packages/{}\"".format(name, path) for name, path in packages_to_filename.items()]),
+            module_name = _module_name_from_package(repository_ctx.attr.canonical_name),
+            canonical_name = repository_ctx.attr.canonical_name,
+            archive_path = archive_path,
+            dependencies = ",\n".join(dependencies),
         ),
     )
 
 requirement_repository = repository_rule(
     implementation = _requirement_repository_impl,
     attrs = {
-        "dependencies": attr.string(mandatory = True),
-        "packages": attr.string_dict(mandatory = True),
+        "canonical_name": attr.string(mandatory = True),
+        "dependencies": attr.string_list(mandatory = True),
+        "valid_dependencies": attr.string_list(mandatory = True),
     },
 )
 
@@ -93,24 +110,6 @@ def _is_valid_dependency(module_ctx, dependency):
             return False
     return True
 
-def _get_transitive_packages(packages_section, root_key):
-    """Collect all transitive package keys reachable from root_key."""
-
-    visited = {root_key: True}
-    frontier = [root_key]
-    for _ in range(len(packages_section)):
-        next_frontier = []
-        for key in frontier:
-            pkg = packages_section.get(key, {})
-            for dep_key in pkg.get("dependencies", []):
-                if dep_key not in visited:
-                    visited[dep_key] = True
-                    next_frontier.append(dep_key)
-        if not next_frontier:
-            break
-        frontier = next_frontier
-    return visited
-
 def _requirements_nodejs_impl(module_ctx):
     # Gather all the requirements.
     requirements = {}
@@ -122,61 +121,43 @@ def _requirements_nodejs_impl(module_ctx):
 
     already_generated = {}
     for name, data in requirements.items():
-        # Merge all requirements files.
-        merged_top_level = {}
-        merged_packages = {}
+        build_file = ""
         for requirement in data:
             content = module_ctx.read(requirement)
             content_json = json.decode(content)
-            for k, v in content_json["top_level"].items():
-                merged_top_level[k] = v
-            for k, v in content_json["packages"].items():
-                merged_packages[k] = v
+            packages = content_json["packages"]
 
-        build_file = ""
+            # First pass, remove all incomatible packages.
+            valid_packages = {package: metadata for package, metadata in packages.items() if _is_valid_dependency(module_ctx, metadata)}
 
-        # Create repositories for each requirement.
-        for requirement_name, pkg_key in merged_top_level.items():
-            repository_name = _sanitize_repository_name("package-{}".format(pkg_key))
-            if repository_name in already_generated:
-                continue
+            # Second pass, create the package repositories.
+            for package, metadata in valid_packages.items():
+                canonical_name = _canonical_name_from_package(package)
+                repository_name = _repository_name_from_package(package)
 
-            transitive_keys = _get_transitive_packages(merged_packages, pkg_key)
+                if repository_name not in already_generated:
+                    requirement_repository(
+                        name = repository_name,
+                        canonical_name = canonical_name,
+                        dependencies = metadata.get("dependencies", []),
+                        valid_dependencies = valid_packages.keys(),
+                    )
+                    already_generated[repository_name] = True
 
-            # First pass: determine the complete set of valid (platform-compatible) package keys.
-            valid_packages = {}
-            for dep_key in transitive_keys:
-                if dep_key in merged_packages and _is_valid_dependency(module_ctx, merged_packages[dep_key]):
-                    valid_packages[dep_key] = merged_packages[dep_key]["integrity"]
-
-            # Second pass: build metadata, filtering lists to valid keys only.
-            dependencies = {}
-            for dep_key in valid_packages:
-                pkg_meta = merged_packages[dep_key]
-                meta_entry = {"integrity": pkg_meta["integrity"]}
-                if "dependencies" in pkg_meta:
-                    meta_entry["dependencies"] = [d for d in pkg_meta["dependencies"] if d in valid_packages]
-                dependencies[dep_key] = meta_entry
-
-            requirement_repository(
-                name = repository_name,
-                packages = valid_packages,
-                dependencies = json.encode_indent({
-                    "package": pkg_key,
-                    "packages": dependencies,
-                }),
-            )
-
-            already_generated[repository_name] = True
-            build_file += """alias(
+            # Update the build file with the top-level packages.
+            for requirement_name, package in content_json["top_level"].items():
+                repository_name = _repository_name_from_package(package)
+                if repository_name not in already_generated:
+                    fail("The top-level package '{}' is requested but not generated, this should never happen.".format(package))
+                build_file += """alias(
     name = "{alias_name}",
     actual = "@{repository_name}//:package",
     visibility = ["//visibility:public"],
 )
 """.format(
-                alias_name = _sanitize_repository_name(requirement_name),
-                repository_name = repository_name,
-            )
+                    alias_name = _sanitize_repository_name(requirement_name),
+                    repository_name = repository_name,
+                )
 
         bzd_repository_maker(
             name = name,

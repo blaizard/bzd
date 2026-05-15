@@ -1,9 +1,9 @@
 load("@rules_python//python:defs.bzl", "py_binary")
 
 py_binary(
-    name = "nodejs_install",
+    name = "extract",
     srcs = [
-        "nodejs_install.py",
+        "extract.py",
     ],
     visibility = ["//nodejs:__pkg__"],
 )

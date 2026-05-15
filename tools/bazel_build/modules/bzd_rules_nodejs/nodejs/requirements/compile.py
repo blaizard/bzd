@@ -188,10 +188,22 @@ class RequirementsFactory:
 					assert maybeVersion is not None, (
 						f"Couldn't find a matching version for '{dependency['name']}' with {dependency['matcher']} and {versionsPackages.keys()}."
 					)
+					resolved = versionsPackages[maybeVersion]
+					# Skip peer dependency edges that would create a cycle (e.g., browserslist <-> update-browserslist-db)
+					visited: typing.Set[Package] = set()
+					queue = list(resolved.dependencies)
+					while queue:
+						current = queue.pop()
+						if current in visited:
+							continue
+						visited.add(current)
+						queue += list(current.dependencies)
+					if package in visited:
+						continue
 					if dependency["alias"]:
-						package.dependencies.add(versionsPackages[maybeVersion].makeAlias(alias=dependency["alias"]))
+						package.dependencies.add(resolved.makeAlias(alias=dependency["alias"]))
 					else:
-						package.dependencies.add(versionsPackages[maybeVersion])
+						package.dependencies.add(resolved)
 				packages.add(package)
 
 		return packages

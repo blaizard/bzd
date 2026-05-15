@@ -27,9 +27,6 @@ def _bzd_nodejs_web_exec_impl(ctx):
     ctx.actions.expand_template(
         output = vite_config,
         template = ctx.file._vite_config,
-        substitutions = {
-            "%root%": vite_config.dirname,
-        },
     )
 
     static_files_dict = {file.short_path: file for file in ctx.files.data}
@@ -89,14 +86,13 @@ def _bzd_nodejs_web_exec_impl(ctx):
         arguments = [
             "{}/node_modules/vite/bin/vite".format(vite_config.dirname),
             "build",
-            "--outDir",
-            "../{}".format(bundle.basename),
             "--logLevel",
             "warn",
             "--config",
             vite_config.path,
         ],
         env = {
+            "BZD_BUNDLE_DIR": bundle.path,
             "BZD_ROOT_DIR": vite_config.dirname,
             "FORCE_COLOR": "1",
             "NODE_ENV": "production" if ctx.attr._build[BuildSettingInfo].value == "prod" else "development",

@@ -1,10 +1,13 @@
 import { defineConfig } from "vite";
 import path from "path";
 import vue from "@vitejs/plugin-vue";
-import PostCss from "postcss-preset-env";
 
-const root = path.resolve("%root%");
+const root = import.meta.dirname;
 const isProduction = process.env.NODE_ENV == "production";
+
+if (!process.env.BZD_BUNDLE_DIR) {
+	throw new Error("BZD_BUNDLE_DIR environment variable is not set.");
+}
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -14,12 +17,11 @@ export default defineConfig({
 			plugins: [],
 		},
 	},
-	root: path.resolve(root),
+	root: root,
 	resolve: {
 		alias: {
-			"@": path.resolve(root),
+			"@": root,
 		},
-		preserveSymlinks: true,
 	},
 	build: {
 		// Note, there is a bug in javascript core that affects Safari only, this doesn't seem to be fixed in esbuild,
@@ -28,10 +30,6 @@ export default defineConfig({
 		minify: isProduction ? "terser" : false,
 		assetsDir: "assets",
 		emptyOutDir: true,
-		rollupOptions: {
-			input: {
-				index: "/index.html",
-			},
-		},
+		outDir: path.resolve(process.cwd(), process.env.BZD_BUNDLE_DIR),
 	},
 });

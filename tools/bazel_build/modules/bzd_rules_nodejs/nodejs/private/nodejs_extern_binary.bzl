@@ -5,23 +5,31 @@ load("//nodejs:private/nodejs_install.bzl", "bzd_nodejs_make_node_modules")
 load("//nodejs:private/nodejs_package.bzl", "BzdNodeJsPackageInfo")
 
 def _bzd_nodejs_extern_binary_impl(ctx):
-    _package_json, node_modules = bzd_nodejs_make_node_modules(ctx, ctx.attr.packages, base_dir_name = ctx.label.name + ".install")
+    package_json, node_modules = bzd_nodejs_make_node_modules(ctx, ctx.attr.packages, base_dir_name = ctx.label.name + ".install")
 
     # Gather toolchain manager
     toolchain_executable = ctx.toolchains["//nodejs:toolchain_type"].executable
 
     # Build the command
-    command = "NODE_ENV=production {{node}} {{node_modules}}/{} ".format(ctx.attr.binary) + " ".join(ctx.attr.params) + " $@"
+    command = """
+export NODE_ENV=production
+export NODE_MODULES="$(dirname {{package_json}})/node_modules"
+
+{{node}} $NODE_MODULES/{binary} {params} "$@"
+""".format(
+        binary = ctx.attr.binary,
+        params = " ".join(ctx.attr.params),
+    )
 
     return [sh_binary_wrapper_impl(
         ctx = ctx,
         locations = {
             toolchain_executable.node: "node",
-            node_modules: "node_modules",
+            package_json: "package_json",
         },
         output = ctx.outputs.executable,
         command = command,
-        data = [node_modules],
+        data = node_modules,
     )]
 
 bzd_nodejs_extern_binary = rule(
@@ -39,9 +47,9 @@ bzd_nodejs_extern_binary = rule(
         "params": attr.string_list(
             doc = "Arguments as a string.",
         ),
-        "_nodejs_install": attr.label(
-            default = "//nodejs/private/python:nodejs_install",
-            doc = "The NodeJs install binary.",
+        "_extract": attr.label(
+            default = "//nodejs/private/python:extract",
+            doc = "The extract binary.",
             cfg = "exec",
             executable = True,
         ),

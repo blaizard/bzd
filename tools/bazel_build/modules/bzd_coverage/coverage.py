@@ -2,21 +2,42 @@ import argparse
 import os
 import re
 import json
-from pathlib import Path
+import pathlib
+import typing
 
 from bzd.utils.run import localCommand
 
+
+def resolvePath(path: pathlib.Path, workspace: pathlib.Path) -> typing.Optional[pathlib.Path]:
+	"""Attempt to resolve the given path."""
+
+	def resolve(currentPath: pathlib.Path) -> typing.Optional[pathlib.Path]:
+		while not (workspace / currentPath).is_file():
+			if not currentPath.parts:
+				return None
+			currentPath = currentPath.relative_to(currentPath.parts[0])
+		return currentPath
+
+	for startFromDirectory in ["bazel-out"]:
+		if startFromDirectory in path.parts:
+			index = path.parts.index(startFromDirectory)
+			maybePath = resolve(pathlib.Path(*path.parts[index + 1 :]))
+			if maybePath:
+				return maybePath
+	return resolve(path)
+
+
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
-	parser.add_argument("--output", help="Output path", type=Path, default=Path("bazel-out/coverage"))
+	parser.add_argument("--output", help="Output path", type=pathlib.Path, default=pathlib.Path("bazel-out/coverage"))
 	parser.add_argument(
 		"--workspace",
-		type=Path,
-		default=Path(os.environ["BUILD_WORKSPACE_DIRECTORY"]),
+		type=pathlib.Path,
+		default=pathlib.Path(os.environ["BUILD_WORKSPACE_DIRECTORY"]),
 		help="Output path",
 	)
-	parser.add_argument("--genhtml", type=Path, help="Path for genhtml binary")
-	parser.add_argument("--report", type=Path, default=Path("bazel-out/_coverage/_coverage_report.dat"))
+	parser.add_argument("--genhtml", type=pathlib.Path, help="Path for genhtml binary")
+	parser.add_argument("--report", type=pathlib.Path, default=pathlib.Path("bazel-out/_coverage/_coverage_report.dat"))
 	args = parser.parse_args()
 
 	# Build the report
@@ -30,16 +51,17 @@ if __name__ == "__main__":
 	}
 
 	# Cleanup path and count the number of files
-	reportUpdate = Path("{}.update".format(args.report.as_posix()))
+	reportUpdate = pathlib.Path("{}.update".format(args.report.as_posix()))
 	with open(args.workspace / args.report, "r") as fin:
 		with open(args.workspace / reportUpdate, "w") as fout:
 			ignore = False
 			for line in fin:
 				if line.startswith("SF:"):
 					data["files"] += 1
-					path = Path(line[3:].strip())
-					if (args.workspace / path).is_file():
-						line = f"SF:{path}\n"
+					path = pathlib.Path(line[3:].strip())
+					maybePath = resolvePath(path, workspace=args.workspace)
+					if maybePath:
+						line = f"SF:{maybePath}\n"
 						ignore = False
 					else:
 						ignore = True
