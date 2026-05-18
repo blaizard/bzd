@@ -32,8 +32,7 @@ export NODE_MODULES="$(dirname {{package_json}})/node_modules"
         },
         output = ctx.outputs.executable,
         command = command,
-        data = result.source_dirs.values() + result.symlinks,
-        symlinks = None,
+        data = result.files,
     )
 
     # Add symlink target entries to the runfiles with the install prefix.

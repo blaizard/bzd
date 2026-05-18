@@ -25,11 +25,8 @@ def _relpath(from_file, to_file):
     This produces a relative path string suitable for use as target_path in ctx.actions.symlink().
     The path is relative to the parent directory of from_file.
     """
-    from_parts = from_file.path.split("/")
+    from_parts = from_file.path.split("/")[:-1]
     to_parts = to_file.path.split("/")
-
-    # from_file's parent directory (remove the filename component)
-    from_parts = from_parts[:-1]
 
     # Find the common prefix length
     common = 0
@@ -39,12 +36,8 @@ def _relpath(from_file, to_file):
         else:
             break
 
-    # Go up from from_parts to common ancestor
     up = [".."] * (len(from_parts) - common)
-
-    # Go down from common ancestor to to_parts
     down = to_parts[common:]
-
     return "/".join(up + down)
 
 def bzd_nodejs_add_symlink_runfiles(ctx, runfiles, symlink_targets, prefix = None):
@@ -84,8 +77,7 @@ def bzd_nodejs_make_node_modules(ctx, packages, base_dir_name):
     Returns:
         A struct with:
           - package_json: The package.json file.
-          - source_dirs: A dict mapping canonical name to extraction TreeArtifact.
-          - symlinks: A list of declare_symlink artifacts (for use as action inputs).
+          - files: A list of the TreeArtifact to be included.
           - symlink_targets: A dict mapping symlink path to target extraction output
             (for use in runfiles, avoids Bazel NPE with declare_symlink artifacts).
     """
@@ -158,8 +150,7 @@ def bzd_nodejs_make_node_modules(ctx, packages, base_dir_name):
 
     return struct(
         package_json = package_json,
-        source_dirs = sources,
-        symlinks = symlinks,
+        files = sources.values() + symlinks,
         symlink_targets = symlink_targets,
     )
 
@@ -239,7 +230,7 @@ def _bzd_nodejs_install_impl(ctx):
 
     result = bzd_nodejs_make_node_modules(ctx, providers.packages.to_list(), base_dir_name = base_dir_name)
     package_json = result.package_json
-    node_modules = result.source_dirs.values() + result.symlinks
+    node_modules = result.files
 
     # --- Create the APIs
 
@@ -275,28 +266,14 @@ def _bzd_nodejs_install_impl(ctx):
         executable = ctx.attr._metadata.files_to_run,
     )
 
-    # Return the providers (including outputs and dependencies).
-    #
-    # NOTE: declare_symlink artifacts are NOT included in the main files depset
-    # because they cause a NullPointerException in Bazel 9.1.0's
-    # SourceManifestAction when passed through runfiles. They are included in
-    # OutputGroupInfo to ensure they are materialized in the output tree,
-    # and symlink paths are mapped to extraction targets via symlink_targets
-    # for runfiles creation in the caller.
     return [
         BzdPackageMetadataFragmentInfo(manifests = [metadata]),
         BzdNodeJsInstallInfo(
             api = api,
-            files = depset([package_json, api] + result.source_dirs.values() + srcs + transpiled.values(), transitive = [providers.data]),
+            files = depset([package_json, api] + result.files + srcs + transpiled.values(), transitive = [providers.data]),
             package_json = package_json,
             transpiled = transpiled,
             symlink_targets = result.symlink_targets,
-        ),
-        DefaultInfo(
-            files = depset([package_json, api] + result.source_dirs.values() + srcs + transpiled.values() + result.symlinks, transitive = [providers.data]),
-        ),
-        OutputGroupInfo(
-            nodejs_symlinks = depset(result.symlinks),
         ),
     ]
 
