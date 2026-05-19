@@ -3,7 +3,7 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
 load("@bzd_package//:defs.bzl", "BzdPackageFragmentInfo", "bzd_package_prefix_from_file", "bzd_package_to_runfiles")
-load("//nodejs:private/nodejs_install.bzl", "BzdNodeJsInstallInfo", "bzd_nodejs_add_symlink_runfiles")
+load("//nodejs:private/nodejs_install.bzl", "BzdNodeJsInstallInfo")
 
 _COMMON_EXEC_ATTRS = {
     "data": attr.label_list(
@@ -52,16 +52,13 @@ def _bzd_nodejs_executable_impl(ctx):
     # Retrieve the install provider
     install = ctx.attr.install[BzdNodeJsInstallInfo]
 
-    # Create the package provider for extraction outputs and source files.
+    # Create the package provider.
     package = BzdPackageFragmentInfo(
         files = {
             bzd_package_prefix_from_file(install.package_json, depth_from_root = 1): install.files,
         },
     )
     runfiles = bzd_package_to_runfiles(ctx, package)
-
-    # Add symlink target entries to the runfiles.
-    runfiles = bzd_nodejs_add_symlink_runfiles(ctx, runfiles, install.symlink_targets)
 
     # Look for the entry point.
     paths = {
