@@ -1,9 +1,17 @@
 load("@rules_python//python:defs.bzl", "py_binary")
 
 py_binary(
-    name = "extract",
+    name = "repackage",
     srcs = [
-        "extract.py",
+        "repackage.py",
+    ],
+    visibility = ["//nodejs:__pkg__"],
+)
+
+py_binary(
+    name = "node_modules",
+    srcs = [
+        "node_modules.py",
     ],
     visibility = ["//nodejs:__pkg__"],
 )

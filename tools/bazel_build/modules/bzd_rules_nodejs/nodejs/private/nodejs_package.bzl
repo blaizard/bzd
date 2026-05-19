@@ -1,24 +1,21 @@
 """NodeJs package rule.
 
-Source: https://pnpm.io/symlinked-node-modules-structure
-
 The target is to recreate such structure:
 
 node_modules
-├── foo -> ./.pnpm/foo@1.0.0/node_modules/foo
-└── .pnpm
+├── foo -> ./.store/foo@1.0.0
+└── .store
     ├── bar@1.0.0
+    │   ├── <src>
     │   └── node_modules
-    │       ├── bar -> <store>
-    │       └── qar -> ../../qar@2.0.0/node_modules/qar
+    │       └── qar -> ../../qar@2.0.0
     ├── foo@1.0.0
+    │   ├── <src>
     │   └── node_modules
-    │       ├── foo -> <store>
-    │       ├── bar -> ../../bar@1.0.0/node_modules/bar
-    │       └── qar -> ../../qar@2.0.0/node_modules/qar
+    │       ├── bar -> ../../bar@1.0.0
+    │       └── qar -> ../../qar@2.0.0
     └── qar@2.0.0
-        └── node_modules
-            └── qar -> <store>
+        └── <src>
 """
 
 # ---- Providers
@@ -26,44 +23,44 @@ node_modules
 BzdNodeJsPackageInfo = provider(
     "Provider for a single package",
     fields = {
-        "archive": "The archive of this package.",
         "canonical_name": "The canonical name of the package, ex: foo@1.0.0",
         "module_name": "The module name of the package, ex: foo",
-        "source_path": "Where the source of this package should be extracted.",
-        "symlink": "The top level symlink for this package.",
-    },
-)
-
-BzdNodeJsPackagesInfo = provider(
-    "Provider for packages",
-    fields = {
-        "transitive_packages": "All packages related to this package (including itself).",
-        "transitive_symlinks": "All symlinks related to the dependencies of this package.",
+        "transitive_stores": "All stores archive related to this package (including itself).",
     },
 )
 
 # ---- Rule
 
 def _bzd_nodejs_package_impl(ctx):
-    package_node_modules = "node_modules/.store/{}/node_modules".format(ctx.attr.canonical_name)
+    store = ctx.actions.declare_file("store.tar")
+    args = ctx.actions.args()
+    args.add("--output", store)
+    args.add("--root", ctx.attr.canonical_name)
 
-    # Compute the dependencies symlinks.
-    symlinks = []
+    # Compute the symlinks and their relative paths.
+    node_modules = "{}/node_modules".format(ctx.attr.canonical_name)
     for module_name, dep in ctx.attr.deps.items():
-        symlinks.append(("{}/{}".format(package_node_modules, module_name), dep[BzdNodeJsPackageInfo].canonical_name))
+        symlink = "{}/{}".format(node_modules, module_name)
+        path_up = [".."] * (len(symlink.split("/")) - 1)
+        relative_path = "/".join(path_up + [dep[BzdNodeJsPackageInfo].canonical_name])
+        args.add_all("--symlink", [module_name, relative_path])
 
-    package = BzdNodeJsPackageInfo(
-        canonical_name = ctx.attr.canonical_name,
-        module_name = ctx.attr.module_name,
-        archive = ctx.file.archive,
-        source_path = "{}/{}".format(package_node_modules, ctx.attr.module_name),
-        symlink = ("node_modules/{}".format(ctx.attr.module_name), ctx.attr.canonical_name),
+    args.add(ctx.file.archive)
+
+    ctx.actions.run(
+        inputs = [ctx.file.archive],
+        outputs = [store],
+        arguments = [args],
+        progress_message = "Repackaging {} for {}".format(ctx.attr.canonical_name, ctx.label),
+        mnemonic = "NodeJsRepackage",
+        executable = ctx.executable._repackage,
     )
 
-    return [package, BzdNodeJsPackagesInfo(
-        transitive_packages = depset([package], transitive = [dep[BzdNodeJsPackagesInfo].transitive_packages for dep in ctx.attr.deps.values()]),
-        transitive_symlinks = depset(symlinks, transitive = [dep[BzdNodeJsPackagesInfo].transitive_symlinks for dep in ctx.attr.deps.values()]),
-    )]
+    return BzdNodeJsPackageInfo(
+        canonical_name = ctx.attr.canonical_name,
+        module_name = ctx.attr.module_name,
+        transitive_stores = depset([store], transitive = [dep[BzdNodeJsPackageInfo].transitive_stores for dep in ctx.attr.deps.values()]),
+    )
 
 bzd_nodejs_package = rule(
     doc = "Package implementation.",
@@ -79,12 +76,18 @@ bzd_nodejs_package = rule(
             doc = "The canonical name of the package.",
         ),
         "deps": attr.string_keyed_label_dict(
-            providers = [BzdNodeJsPackagesInfo, BzdNodeJsPackageInfo],
+            providers = [BzdNodeJsPackageInfo],
             doc = "The dependencies associated with this package.",
         ),
         "module_name": attr.string(
             mandatory = True,
             doc = "The module name of the package.",
+        ),
+        "_repackage": attr.label(
+            default = "//nodejs/private/python:repackage",
+            doc = "Repackage npm packages to include relative symlinks.",
+            cfg = "exec",
+            executable = True,
         ),
     },
     provides = [BzdNodeJsPackageInfo],

@@ -2,7 +2,7 @@
 
 load("@bzd_package//:defs.bzl", "BzdPackageMetadataFragmentInfo")
 load("//nodejs:private/nodejs_library.bzl", "LIBRARY_ATTRS", "bzd_nodejs_library_get_provider")
-load("//nodejs:private/nodejs_package.bzl", "BzdNodeJsPackageInfo", "BzdNodeJsPackagesInfo")
+load("//nodejs:private/nodejs_package.bzl", "BzdNodeJsPackageInfo")
 
 # ---- Provider
 
@@ -30,6 +30,7 @@ def bzd_nodejs_make_node_modules(ctx, packages, base_dir_name):
 
     # Outputs of this rule.
     package_json = ctx.actions.declare_file("{}/package.json".format(base_dir_name))
+    node_modules = ctx.actions.declare_directory("{}/node_modules".format(base_dir_name))
 
     package_json_content = {
         "imports": {
@@ -47,44 +48,25 @@ def bzd_nodejs_make_node_modules(ctx, packages, base_dir_name):
         content = json.encode_indent(package_json_content),
     )
 
-    transitive_packages = depset(transitive = [package[BzdNodeJsPackagesInfo].transitive_packages for package in packages])
-    transitive_symlinks = depset([package[BzdNodeJsPackageInfo].symlink for package in packages], transitive = [package[BzdNodeJsPackagesInfo].transitive_symlinks for package in packages])
+    transitive_stores = depset(transitive = [package[BzdNodeJsPackageInfo].transitive_stores for package in packages])
 
-    # Extract package sources.
-    sources = {}
-    for package in transitive_packages.to_list():
-        package_sources = ctx.actions.declare_directory("{}/{}".format(base_dir_name, package.source_path))
-        args = ctx.actions.args()
-        args.add("--output", package_sources.path)
-        args.add(package.archive)
+    args = ctx.actions.args()
+    args.add("--output", node_modules.path)
+    args.add_all(transitive_stores, before_each = "--store")
+    for package in packages:
+        info = package[BzdNodeJsPackageInfo]
+        args.add_all("--top-level", [info.module_name, info.canonical_name])
 
-        # Note, this action should be performed only once and cache for other node_modules as it only depends on package-related inputs.
-        ctx.actions.run(
-            inputs = [package.archive],
-            outputs = [package_sources],
-            arguments = [args],
-            progress_message = "Extracting {} for {}".format(package.canonical_name, ctx.label),
-            mnemonic = "NodejsExtract",
-            executable = ctx.executable._extract,
-        )
+    ctx.actions.run(
+        inputs = transitive_stores,
+        outputs = [node_modules],
+        arguments = [args],
+        progress_message = "Installing node modules for {}...".format(ctx.label),
+        mnemonic = "NodejsNodeModulesInstall",
+        executable = ctx.executable._node_modules,
+    )
 
-        if package.canonical_name in sources:
-            fail("The module '{}' was extracted twice, it should never happen.".format(package.canonical_name))
-        sources[package.canonical_name] = package_sources
-
-    # Assemble the pnpm-like node_modules with symlinks.
-    symlinks = []
-    for path, module in transitive_symlinks.to_list():
-        symlink = ctx.actions.declare_directory("{}/{}".format(base_dir_name, path))
-        if module not in sources:
-            fail("The module '{}' was not extracted, it should never happen.".format(module))
-        ctx.actions.symlink(
-            output = symlink,
-            target_file = sources[module],
-        )
-        symlinks.append(symlink)
-
-    return [package_json, sources.values() + symlinks]
+    return [package_json, [node_modules]]
 
 def bzd_nodejs_transpile(ctx, srcs, runfiles, base_dir_name):
     """Build a file tree at the root of `base_dir` and transpile the files if needed.
@@ -212,12 +194,6 @@ and the installation of the actual packages.
 """,
     implementation = _bzd_nodejs_install_impl,
     attrs = {
-        "_extract": attr.label(
-            default = "//nodejs/private/python:extract",
-            doc = "The extract binary.",
-            cfg = "exec",
-            executable = True,
-        ),
         "_json_merge": attr.label(
             default = Label("@bzd_lib//:json_merge"),
             cfg = "exec",
@@ -225,6 +201,12 @@ and the installation of the actual packages.
         ),
         "_metadata": attr.label(
             default = Label("//nodejs/metadata"),
+            cfg = "exec",
+            executable = True,
+        ),
+        "_node_modules": attr.label(
+            default = "//nodejs/private/python:node_modules",
+            doc = "Setup the node_modules directory.",
             cfg = "exec",
             executable = True,
         ),

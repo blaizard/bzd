@@ -47,9 +47,9 @@ bzd_nodejs_extern_binary = rule(
         "params": attr.string_list(
             doc = "Arguments as a string.",
         ),
-        "_extract": attr.label(
-            default = "//nodejs/private/python:extract",
-            doc = "The extract binary.",
+        "_node_modules": attr.label(
+            default = "//nodejs/private/python:node_modules",
+            doc = "Setup the node_modules directory.",
             cfg = "exec",
             executable = True,
         ),
