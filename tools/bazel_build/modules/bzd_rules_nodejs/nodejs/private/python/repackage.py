@@ -3,23 +3,7 @@ import os
 import pathlib
 import tarfile
 import tempfile
-import typing
-
-
-def extractTar(source: pathlib.Path, destination: pathlib.Path) -> None:
-	"""Extract a package tar archive."""
-
-	def stripTopLevel(member: tarfile.TarInfo) -> typing.Optional[tarfile.TarInfo]:
-		_, _, rest = member.name.partition("/")
-		if not rest:
-			return None
-		member.name = rest
-		return member
-
-	with tarfile.open(source, "r") as tar:
-		tar.extractall(
-			destination, members=(s for m in tar.getmembers() if (s := stripTopLevel(m)) is not None), filter="data"
-		)
+import shutil
 
 
 def createTar(source: pathlib.Path, destination: pathlib.Path) -> None:
@@ -62,15 +46,16 @@ if __name__ == "__main__":
 		help="Relative symlink to be included in the package. Can be used multiple times to include multiple symlinks.",
 	)
 	parser.add_argument(
-		"archive",
+		"srcs",
 		type=pathlib.Path,
-		help="The path of the package archive to be extracted.",
+		help="The source directory to be included in the package.",
 	)
 	args = parser.parse_args()
 
 	with tempfile.TemporaryDirectory() as tempDir:
 		tempDirPath = pathlib.Path(tempDir)
-		extractTar(source=args.archive, destination=tempDirPath / args.root)
+		# Copy and strip the first directory.
+		shutil.copytree(next(args.srcs.iterdir()), tempDirPath / args.root)
 		for moduleName, relativePath in args.symlink:
 			createSymlink(linkPath=tempDirPath / args.root / "node_modules" / moduleName, relativePath=relativePath)
 		createTar(source=tempDirPath, destination=args.output)

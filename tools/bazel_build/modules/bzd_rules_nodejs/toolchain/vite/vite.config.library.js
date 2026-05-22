@@ -11,6 +11,7 @@ export default defineConfig({
 		alias: {
 			"@": root,
 		},
+		preserveSymlinks: true,
 	},
 	build: {
 		lib: {

@@ -22,6 +22,7 @@ export default defineConfig({
 		alias: {
 			"@": root,
 		},
+		preserveSymlinks: true,
 	},
 	build: {
 		// Note, there is a bug in javascript core that affects Safari only, this doesn't seem to be fixed in esbuild,

@@ -11,7 +11,7 @@ bzd_nodejs_extern_binary(
     ],
     params = [
         "--typeRoots",
-        "$NODE_MODULES/@types",
+        "{node_modules}/@types",
     ],
     visibility = ["//visibility:public"],
 )

@@ -18,6 +18,8 @@ node_modules
         └── <src>
 """
 
+load("@bazel_skylib//rules/directory:providers.bzl", "DirectoryInfo")
+
 # ---- Providers
 
 BzdNodeJsPackageInfo = provider(
@@ -45,10 +47,11 @@ def _bzd_nodejs_package_impl(ctx):
         relative_path = "/".join(path_up + [dep[BzdNodeJsPackageInfo].canonical_name])
         args.add_all("--symlink", [module_name, relative_path])
 
-    args.add(ctx.file.archive)
+    srcs = ctx.attr.srcs[DirectoryInfo]
+    args.add(srcs.path)
 
     ctx.actions.run(
-        inputs = [ctx.file.archive],
+        inputs = srcs.transitive_files,
         outputs = [store],
         arguments = [args],
         progress_message = "Repackaging {} for {}".format(ctx.attr.canonical_name, ctx.label),
@@ -66,11 +69,6 @@ bzd_nodejs_package = rule(
     doc = "Package implementation.",
     implementation = _bzd_nodejs_package_impl,
     attrs = {
-        "archive": attr.label(
-            mandatory = True,
-            allow_single_file = [".tar.gz", ".tgz"],
-            doc = "The package archive.",
-        ),
         "canonical_name": attr.string(
             mandatory = True,
             doc = "The canonical name of the package.",
@@ -82,6 +80,11 @@ bzd_nodejs_package = rule(
         "module_name": attr.string(
             mandatory = True,
             doc = "The module name of the package.",
+        ),
+        "srcs": attr.label(
+            mandatory = True,
+            doc = "The source files of the package.",
+            providers = [DirectoryInfo],
         ),
         "_repackage": attr.label(
             default = "//nodejs/private/python:repackage",

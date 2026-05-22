@@ -1,17 +1,7 @@
 """Module extension for NodeJs toolchains."""
 
 load("@bzd_lib//:defs.bzl", "bzd_repository_maker")
-load("@bzd_platforms//:defs.bzl", "get_platform_from_os", "to_al", "to_isa")
-load("@node//:defs.bzl", "node_binary", "npm_binary")
-
-def _execute(repository_ctx, args, environment = {}):
-    result = repository_ctx.execute(
-        args,
-        environment = environment,
-    )
-    if result.return_code != 0:
-        fail("Unable to fetch {}: Error executing '{}': {}{}".format(repository_ctx.name, " ".join([str(arg) for arg in args]), result.stdout, result.stderr))
-    return result.stdout or result.stderr
+load("@bzd_platforms//:defs.bzl", "to_al", "to_isa")
 
 def _sanitize_repository_name(name):
     """Sanitize a packge name to make it compatible with bazel target."""
@@ -40,18 +30,27 @@ def _repository_name_from_package(package: str) -> str:
     canonical_name = _canonical_name_from_package(package)
     return _sanitize_repository_name("package-{}".format(canonical_name))
 
-def _requirement_repository_impl(repository_ctx):
-    maybe_platform = get_platform_from_os(repository_ctx.os)
-    node_path = repository_ctx.path(node_binary[maybe_platform])
-    npm_path = repository_ctx.path(npm_binary[maybe_platform])
+def _canonical_name_to_url(canonical_name: str) -> str:
+    """Convert a canonical name to a URL."""
 
-    output = _execute(
-        repository_ctx,
-        [npm_path, "pack", "--json", "--pack-destination", ".", repository_ctx.attr.canonical_name],
-        environment = {"PATH": str(node_path.dirname)},
+    module_name = canonical_name.rsplit("@", 1)[0]
+    basename = module_name.split("/")[-1]
+    version = canonical_name.rsplit("@", 1)[1]
+    return "https://registry.npmjs.org/{module_name}/-/{basename}-{version}.tgz".format(
+        module_name = module_name,
+        basename = basename,
+        version = version,
     )
 
-    archive_path = json.decode(output)[0]["filename"]
+def _requirement_repository_impl(repository_ctx):
+    url = _canonical_name_to_url(repository_ctx.attr.canonical_name)
+    repository_ctx.download_and_extract(
+        url,
+        output = "srcs",
+        integrity = repository_ctx.attr.integrity,
+        # TODO: add this when supported (not as of 9.1.0).
+        # strip_comoinents = 1,
+    )
 
     # Create the dependency list.
     dependencies = []
@@ -67,13 +66,26 @@ def _requirement_repository_impl(repository_ctx):
     repository_ctx.file(
         "BUILD.bazel",
         content = """
+load("@bazel_skylib//rules/directory:directory.bzl", "directory")
+load("@bazel_skylib//rules/directory:subdirectory.bzl", "subdirectory")
 load("{defs}", "bzd_nodejs_package")
+
+directory(
+    name = "root",
+    srcs = glob(["srcs/**"]),
+)
+
+subdirectory(
+    name = "srcs",
+    parent = ":root",
+    path = "srcs",
+)
 
 bzd_nodejs_package(
     name = "package",
     module_name = "{module_name}",
     canonical_name = "{canonical_name}",
-    archive = ":{archive_path}",
+    srcs = ":srcs",
     deps = {{
 {dependencies}
     }},
@@ -83,7 +95,6 @@ bzd_nodejs_package(
             defs = Label("//nodejs:defs.bzl"),
             module_name = _module_name_from_package(repository_ctx.attr.canonical_name),
             canonical_name = repository_ctx.attr.canonical_name,
-            archive_path = archive_path,
             dependencies = ",\n".join(dependencies),
         ),
     )
@@ -93,6 +104,7 @@ requirement_repository = repository_rule(
     attrs = {
         "canonical_name": attr.string(mandatory = True),
         "dependencies": attr.string_list(mandatory = True),
+        "integrity": attr.string(mandatory = True),
         "valid_dependencies": attr.string_list(mandatory = True),
     },
 )
@@ -140,6 +152,7 @@ def _requirements_nodejs_impl(module_ctx):
                         name = repository_name,
                         canonical_name = canonical_name,
                         dependencies = metadata.get("dependencies", []),
+                        integrity = metadata["integrity"],
                         valid_dependencies = valid_packages.keys(),
                     )
                     already_generated[repository_name] = True

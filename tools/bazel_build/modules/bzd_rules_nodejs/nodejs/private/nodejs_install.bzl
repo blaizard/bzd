@@ -61,12 +61,12 @@ def bzd_nodejs_make_node_modules(ctx, packages, base_dir_name):
         inputs = transitive_stores,
         outputs = [node_modules],
         arguments = [args],
-        progress_message = "Installing node modules for {}...".format(ctx.label),
+        progress_message = "Preparing node_modules for {}...".format(ctx.label),
         mnemonic = "NodejsNodeModulesInstall",
         executable = ctx.executable._node_modules,
     )
 
-    return [package_json, [node_modules]]
+    return [package_json, node_modules]
 
 def bzd_nodejs_transpile(ctx, srcs, runfiles, base_dir_name):
     """Build a file tree at the root of `base_dir` and transpile the files if needed.
@@ -86,22 +86,14 @@ def bzd_nodejs_transpile(ctx, srcs, runfiles, base_dir_name):
 
     # Map all the sources to the generated files directory.
     generated = []
-    to_copy = {}
     for f in srcs:
         # This makes all file live at the same level.
-        copy = ctx.actions.declare_file("{}/{}".format(base_dir_name, f.short_path.replace("../", "external/")))
-        generated.append(copy)
-        to_copy[f.path] = copy.path
-
-    # Copy all sources, otherwise (if symlinked) node will use their real ath to resolve imports.
-    if to_copy:
-        ctx.actions.run_shell(
-            inputs = srcs,
-            outputs = generated,
-            command = "\n".join(["cp \"{}\" \"{}\"".format(src, dst) for src, dst in to_copy.items()]),
-            mnemonic = "CopyFiles",
-            progress_message = "Copying {} source file(s) for {}".format(len(to_copy), ctx.label),
+        symlink = ctx.actions.declare_file("{}/{}".format(base_dir_name, f.short_path.replace("../", "external/")))
+        ctx.actions.symlink(
+            output = symlink,
+            target_file = f,
         )
+        generated.append(symlink)
 
     # Convert TypeScript to Javascript
     typescript = {}
@@ -158,13 +150,13 @@ def _bzd_nodejs_install_impl(ctx):
 
     # --- Apply transpilers to the sources
 
-    srcs, transpiled = bzd_nodejs_transpile(ctx, providers.srcs.to_list(), runfiles = [package_json] + node_modules, base_dir_name = base_dir_name)
+    srcs, transpiled = bzd_nodejs_transpile(ctx, providers.srcs.to_list(), runfiles = [package_json, node_modules], base_dir_name = base_dir_name)
 
     # --- Fill in the metadata
 
     metadata = ctx.actions.declare_file("{}.nodejs_install/metadata.json".format(ctx.label.name))
     ctx.actions.run(
-        inputs = [package_json, api] + node_modules,
+        inputs = [package_json, api, node_modules],
         outputs = [metadata],
         progress_message = "Generating manifest for {}".format(ctx.label),
         mnemonic = "NodejsMetadata",
@@ -181,7 +173,7 @@ def _bzd_nodejs_install_impl(ctx):
         BzdPackageMetadataFragmentInfo(manifests = [metadata]),
         BzdNodeJsInstallInfo(
             api = api,
-            files = depset([package_json, api] + node_modules + srcs + transpiled.values(), transitive = [providers.data]),
+            files = depset([package_json, api, node_modules] + srcs + transpiled.values(), transitive = [providers.data]),
             package_json = package_json,
             transpiled = transpiled,
         ),
