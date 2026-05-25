@@ -23,6 +23,7 @@ bzd_oci_binary(
         "--static",
         "apps/accounts/frontend/frontend.bundle",
     ],
+    tags = ["manual"],
     visibility = [
         "//deployment:__subpackages__",
     ],

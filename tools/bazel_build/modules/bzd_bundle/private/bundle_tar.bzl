@@ -127,7 +127,7 @@ _bzd_tar = rule(
     },
 )
 
-def _bzd_bundle_tar_impl(name, visibility, executables, output, tags, **kwargs):
+def _bzd_bundle_tar_impl(name, visibility, executables, output, **kwargs):
     _bzd_tar(
         name = name,
         aliases = executables,
@@ -140,7 +140,6 @@ def _bzd_bundle_tar_impl(name, visibility, executables, output, tags, **kwargs):
         srcs = executables.values(),
         output = output or name,
         visibility = visibility,
-        tags = (tags or []) + ["no-remote-cache"],
         **kwargs
     )
 

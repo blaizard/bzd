@@ -14,6 +14,7 @@ def bzd_oci_binary(name, binary, base = Label("@oci_minimal"), **kwargs):
         executables = {
             ".bzd_oci_binary_bootstrap": binary,
         },
+        tags = ["manual"],
     )
 
     bzd_oci_image(
