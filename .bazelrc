@@ -210,3 +210,5 @@ build:msan --linkopt -fsanitize=memory
 build:tsan --copt -fsanitize=thread
 build:tsan --copt -DTHREAD_SANITIZER
 build:tsan --linkopt -fsanitize=thread
+# Needed as personality syscalls are not supported in the sandbox.
+build:tsan --strategy=TestRunner=local
