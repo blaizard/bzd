@@ -10,6 +10,7 @@ test --test_timeout_filters=-long,-eternal
 build --config=remote
 
 # Repository cache.
+# Disabling as sometimes it returns wrong entry, seems to be corrupted. Maybe because of race?
 #common --repository_cache=/opt/bazel_repo_cache
 # Sandbox base into RAM.
 common --sandbox_base=/dev/shm
