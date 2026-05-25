@@ -10,6 +10,6 @@ test --test_timeout_filters=-long,-eternal
 build --config=remote
 
 # Repository cache.
-common --repository_cache=/opt/bazel_repo_cache
+#common --repository_cache=/opt/bazel_repo_cache
 # Sandbox base into RAM.
 common --sandbox_base=/dev/shm
