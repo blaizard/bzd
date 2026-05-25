@@ -218,8 +218,8 @@ images.pull(
 )
 images.pull(
     name = "oci_gitea_act_runner",
-    digest = "sha256:c2a169c5e99864c25e32527cef3d82203225e09558773022bf3dc164a2e6d762",
-    image = "index.docker.io/gitea/act_runner",
+    digest = "sha256:ab581a3e1a260efa0521886ad8051f0e8c4ff1f1d52aa8ef0a2e3ad7465f8b74",
+    image = "index.docker.io/gitea/runner",
     platforms = [
         "linux/amd64",
     ],
