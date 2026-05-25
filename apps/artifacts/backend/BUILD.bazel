@@ -81,7 +81,7 @@ bzd_nodejs_binary(
     apis = ["//apps/artifacts:api.v1.json"],
     args = [
         "--static",
-        "$(rootpath //apps/artifacts/frontend).bundle",
+        "apps/artifacts/frontend/frontend.bundle",
     ],
     data = [
         ":config",

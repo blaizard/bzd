@@ -21,7 +21,7 @@ bzd_nodejs_binary(
     apis = ["//apps/dashboard:api.v1.json"],
     args = [
         "--static",
-        "$(rootpath //apps/dashboard/frontend).bundle",
+        "apps/dashboard/frontend/frontend.bundle",
     ],
     data = [
         "//apps/dashboard/frontend",

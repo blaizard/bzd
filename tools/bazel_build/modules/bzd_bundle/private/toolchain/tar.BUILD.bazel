@@ -1,0 +1,3 @@
+"""bsdtar cli."""
+
+exports_files(["tar"])

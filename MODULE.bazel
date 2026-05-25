@@ -13,7 +13,6 @@ bazel_dep(name = "bzd_rules_nodejs", version = "1.0")
 bazel_dep(name = "bzd_platforms", version = "1.0")
 bazel_dep(name = "bzd_dns", version = "1.0")
 bazel_dep(name = "bzd_sanitizer", version = "1.0")
-bazel_dep(name = "bzd_package", version = "1.0")
 bazel_dep(name = "bzd_bundle", version = "1.0")
 bazel_dep(name = "bzd_rules_oci", version = "1.0")
 bazel_dep(name = "bzd_python", version = "1.0")
@@ -42,7 +41,6 @@ bazel_dep(name = "rules_pkg", version = "1.1.0")
     "bzd_bundle",
     "bzd_platforms",
     "bzd_sanitizer",
-    "bzd_package",
     "bzd_dns",
     "bzd_espressif",
 )]

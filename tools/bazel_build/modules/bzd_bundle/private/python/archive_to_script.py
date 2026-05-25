@@ -7,8 +7,8 @@ import stat
 def tarCompressionArgument(compression: str) -> str:
 	compressionToArg = {
 		"gz": "-z",
-		"xz": "-f",
-		"bz2": "-x",
+		"xz": "-J",
+		"bz2": "-j",
 	}
 	assert compression in compressionToArg, f"Unsupported compression algorithm '{compression}'."
 	return compressionToArg[compression]

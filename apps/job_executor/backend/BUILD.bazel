@@ -37,7 +37,7 @@ bzd_nodejs_binary(
     apis = ["//apps/job_executor:api.v1.json"],
     args = [
         "--static",
-        "$(rootpath //apps/job_executor/frontend).bundle",
+        "apps/job_executor/frontend/frontend.bundle",
     ],
     data = [
         ":config",

@@ -25,50 +25,23 @@ bzd_diff_test(
     file2 = "expected_empty.tar",
 )
 
-bzd_bundle_tar(
-    name = "generate_tar",
-    compression = None,
-    executables = {
-        "a": ":dummy",
-    },
-    output = "generate_tar.tar",
-)
+# Test that the same binary with different compression algorithms produces reproducible output.
+_binaries_to_compression = {
+    "binary": None,
+    "binary_bz2": "bz2",
+    "binary_gz": "gz",
+    "binary_xz": "xz",
+}
 
-bzd_diff_test(
-    name = "reproducible_tar",
-    file1 = ":generate_tar.tar",
-    file2 = "expected.tar",
-)
-
-bzd_bundle_tar(
-    name = "generate_tar_gz",
-    compression = "gz",
-    executables = {
-        "a": ":dummy",
-    },
-    output = "generate_tar_gz.tar.gz",
-)
-
-bzd_diff_test(
-    name = "reproducible_tar_gz",
-    file1 = ":generate_tar_gz.tar.gz",
-    file2 = "expected.tar.gz",
-)
-
-bzd_bundle_binary(
-    name = "binary",
+[bzd_bundle_binary(
+    name = name,
+    compression = compression,
     executable = ":dummy",
-)
+) for name, compression in _binaries_to_compression.items()]
 
-bzd_executable_test(
-    name = "test_binary",
-    executable = ":binary",
+[bzd_executable_test(
+    name = "test_{}".format(name),
+    executable = name,
     expected_output = "from dummy.sh\nfrom dummy.txt",
     expected_returncode = "0",
-)
-
-bzd_diff_test(
-    name = "reproducible_binary",
-    file1 = ":binary",
-    file2 = "expected_binary",
-)
+) for name, _ in _binaries_to_compression.items()]

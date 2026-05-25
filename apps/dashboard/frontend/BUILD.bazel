@@ -1,5 +1,4 @@
 load("@bzd_lib//config:defs.bzl", "bzd_config_default")
-load("@bzd_package//:defs.bzl", "bzd_package")
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_web_binary")
 
 bzd_config_default(
@@ -42,14 +41,4 @@ bzd_nodejs_web_binary(
         "//nodejs/vue/directives:loading",
         "//nodejs/vue/directives:tooltip",
     ],
-)
-
-bzd_package(
-    name = "local",
-    args = ["/tmp/bzd"],
-    include_metadata = True,
-    tags = ["nodejs"],
-    deps = {
-        ":frontend": "frontend",
-    },
 )

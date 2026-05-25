@@ -2,7 +2,6 @@
 
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
-load("@bzd_package//:defs.bzl", "BzdPackageFragmentInfo", "bzd_package_prefix_from_file")
 load("//nodejs:private/nodejs_install.bzl", "BzdNodeJsInstallInfo", "bzd_nodejs_install")
 
 def _bzd_nodejs_transition_impl(_settings, _attr):
@@ -109,11 +108,6 @@ def _bzd_nodejs_web_exec_impl(ctx):
             },
             output = ctx.outputs.executable,
             command = "{binary} {bundle} $@",
-        ),
-        BzdPackageFragmentInfo(
-            files = {
-                bzd_package_prefix_from_file(bundle): depset([bundle]),
-            },
         ),
     ]
 

@@ -12,3 +12,14 @@ bazel_dep(name = "bzd_lib", version = "1.0")
 bazel_dep(name = "bzd_python", version = "1.0")
 bazel_dep(name = "bzd_bdl", version = "1.0")
 bazel_dep(name = "bzd_bundle", version = "1.0")
+
+images = use_extension("//:extensions.bzl", "images")
+images.pull(
+    name = "oci_minimal",
+    digest = "sha256:00a24d7c50ebe46934e31f6154c0434e2ab51259a65e028be42413c636385f7f",
+    image = "index.docker.io/library/debian",
+    platforms = [
+        "linux/amd64",
+    ],
+)
+use_repo(images, "oci_minimal")

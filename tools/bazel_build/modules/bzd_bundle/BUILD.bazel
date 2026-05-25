@@ -10,5 +10,5 @@ alias(
 
 alias(
     name = "bzd_bundle",
-    actual = "//private/python:bundle",
+    actual = "//private/python:copy",
 )

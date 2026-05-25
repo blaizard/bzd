@@ -19,7 +19,6 @@ bzl_library(
         "@bdl_extension//:extensions",
         "@bzd_lib//:sh_binary_wrapper",
         "@bzd_lib//config:defs",
-        "@bzd_package//:defs",
         "@bzd_toolchain_cc//cc:defs",
         "@rules_cc//cc:defs_bzl",
         "@rules_cc//cc:find_cc_toolchain_bzl",

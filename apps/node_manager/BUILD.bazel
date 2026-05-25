@@ -78,9 +78,5 @@ bzd_bundle_binary(
 bzd_python_oci(
     name = "image_proxy",
     binary = ":proxy",
-    tags = [
-        "manual",
-        "no-remote",
-    ],
     visibility = ["//deployment:__subpackages__"],
 )

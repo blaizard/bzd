@@ -1,6 +1,5 @@
 """BDL system rules."""
 
-load("@bzd_package//:defs.bzl", "BzdPackageMetadataFragmentInfo")
 load("//private:common.bzl", "aspect_bdl_providers", "library_extensions", "make_composition_language_providers", "precompile_bdl", "transition_platform")
 load("//private:providers.bzl", "BdlSystemInfo", "BdlSystemJsonInfo", "BdlTargetInfo")
 
@@ -121,9 +120,6 @@ def _bdl_binary_impl(ctx):
         fail("Unsupported target language '{}'.".format(fmt))
 
     return [
-        BzdPackageMetadataFragmentInfo(
-            manifests = metadata,
-        ),
         OutputGroupInfo(metadata = metadata),
         ctx.attr.system[BdlSystemJsonInfo],
     ] + providers

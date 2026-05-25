@@ -78,7 +78,6 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl",
     "bzd_nodejs_test",
     "bzd_nodejs_web_binary",
     "bzd_nodejs_web_library",
-    "bzd_nodejs_oci",
     "bzd_nodejs_requirements_compile",
 )
 ```
@@ -90,7 +89,6 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl",
 | `bzd_nodejs_test`                 | Node.js test — runs under Mocha automatically              |
 | `bzd_nodejs_web_binary`           | Vite-bundled frontend app (produces a `.bundle` directory) |
 | `bzd_nodejs_web_library`          | Vite-compiled UMD/CJS library                              |
-| `bzd_nodejs_oci`                  | Wraps a Node.js binary into a Docker/OCI image             |
 | `bzd_nodejs_requirements_compile` | Converts `requirements.in` → `requirements.json` lockfile  |
 | `bzd_nodejs_static`               | Generates static files from a Node.js script               |
 

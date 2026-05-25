@@ -153,18 +153,20 @@ class VisitorPrint:
 		right: typing.List[str] = [f"== {self.file2}@{delta.offset2}"]
 
 		for chunk1, chunk2 in VisitorPrint.chunkedIterator(delta.diff1, delta.diff2, chunkSize):
-			left.append(
-				formatLine.format(
-					self.toHexAsString(chunk1, padding=chunkSize),
-					self.toTextAsString(chunk1, padding=chunkSize),
+			if chunk1:
+				left.append(
+					formatLine.format(
+						self.toHexAsString(chunk1, padding=chunkSize),
+						self.toTextAsString(chunk1, padding=chunkSize),
+					)
 				)
-			)
-			right.append(
-				formatLine.format(
-					self.toHexAsString(chunk2, padding=chunkSize),
-					self.toTextAsString(chunk2, padding=chunkSize),
+			if chunk2:
+				right.append(
+					formatLine.format(
+						self.toHexAsString(chunk2, padding=chunkSize),
+						self.toTextAsString(chunk2, padding=chunkSize),
+					)
 				)
-			)
 
 		print("=" * self.width)
 		print("\n".join(left))
@@ -338,6 +340,17 @@ class Diff:
 		return lcs
 
 
+def getShortestDistinctPaths(path1: pathlib.Path, path2: pathlib.Path) -> typing.Tuple[pathlib.Path, pathlib.Path]:
+	shortest1 = []
+	shortest2 = []
+	for p1, p2 in zip(path1.parts[::-1], path2.parts[::-1]):
+		shortest1.append(p1)
+		shortest2.append(p2)
+		if p1 != p2:
+			break
+	return pathlib.Path(*shortest1[::-1]), pathlib.Path(*shortest2[::-1])
+
+
 def compare(file1: pathlib.Path, file2: pathlib.Path) -> bool:
 
 	content1 = file1.read_bytes()
@@ -348,7 +361,8 @@ def compare(file1: pathlib.Path, file2: pathlib.Path) -> bool:
 	if diff.isMatch:
 		return True
 
-	visitor = VisitorPrint(color=True, width=80, file1=file1.as_posix(), file2=file2.as_posix())
+	shortest1, shortest2 = getShortestDistinctPaths(file1, file2)
+	visitor = VisitorPrint(color=True, width=80, file1=shortest1.as_posix(), file2=shortest2.as_posix())
 
 	diff.visit(visitor.visitBinary)
 	return False

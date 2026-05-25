@@ -1,6 +1,5 @@
 """NodeJs install rule."""
 
-load("@bzd_package//:defs.bzl", "BzdPackageMetadataFragmentInfo")
 load("//nodejs:private/nodejs_library.bzl", "LIBRARY_ATTRS", "bzd_nodejs_library_get_provider")
 load("//nodejs:private/nodejs_package.bzl", "BzdNodeJsPackageInfo")
 
@@ -11,8 +10,9 @@ BzdNodeJsInstallInfo = provider(
     fields = {
         "api": "The interface metadata.",
         "files": "All the files of the installation.",
+        "node_modules": "The node_modules directory.",
         "package_json": "The package.json file located at the root.",
-        "transpiled": "The map of transpiled files.",
+        "path_mapping": "A mapping between the original path and the actual file path.",
     },
 )
 
@@ -83,6 +83,7 @@ def bzd_nodejs_transpile(ctx, srcs, runfiles, base_dir_name):
 
     base_dir_short_path = ctx.label.package + "/" + base_dir_name
     base_dir_path = ctx.genfiles_dir.path + "/" + base_dir_short_path
+    path_mapping = {}
 
     # Map all the sources to the generated files directory.
     generated = []
@@ -94,6 +95,7 @@ def bzd_nodejs_transpile(ctx, srcs, runfiles, base_dir_name):
             target_file = f,
         )
         generated.append(symlink)
+        path_mapping[f] = symlink
 
     # Convert TypeScript to Javascript
     typescript = {}
@@ -102,6 +104,7 @@ def bzd_nodejs_transpile(ctx, srcs, runfiles, base_dir_name):
             path = f.short_path.removeprefix(base_dir_short_path + "/")
             expected = ctx.actions.declare_file(f.basename.replace(".ts", ".js"), sibling = f)
             typescript[path] = expected
+            path_mapping[f] = expected
 
     # If there are any typescript files to process...
     if typescript:
@@ -124,7 +127,7 @@ def bzd_nodejs_transpile(ctx, srcs, runfiles, base_dir_name):
             executable = ctx.executable._tsc,
         )
 
-    return generated + typescript.values(), {original: final.short_path.removeprefix(base_dir_short_path + "/") for original, final in typescript.items()}
+    return generated + typescript.values(), path_mapping
 
 def _bzd_nodejs_install_impl(ctx):
     providers = bzd_nodejs_library_get_provider(ctx)
@@ -150,7 +153,7 @@ def _bzd_nodejs_install_impl(ctx):
 
     # --- Apply transpilers to the sources
 
-    srcs, transpiled = bzd_nodejs_transpile(ctx, providers.srcs.to_list(), runfiles = [package_json, node_modules], base_dir_name = base_dir_name)
+    srcs, path_mapping = bzd_nodejs_transpile(ctx, providers.srcs.to_list(), runfiles = [package_json, node_modules], base_dir_name = base_dir_name)
 
     # --- Fill in the metadata
 
@@ -170,12 +173,12 @@ def _bzd_nodejs_install_impl(ctx):
 
     # Return the providers (including outputs and dependencies)
     return [
-        BzdPackageMetadataFragmentInfo(manifests = [metadata]),
         BzdNodeJsInstallInfo(
             api = api,
-            files = depset([package_json, api, node_modules] + srcs + transpiled.values(), transitive = [providers.data]),
+            files = depset([package_json, api, node_modules] + srcs + path_mapping.values(), transitive = [providers.data]),
             package_json = package_json,
-            transpiled = transpiled,
+            node_modules = node_modules,
+            path_mapping = path_mapping,
         ),
     ]
 

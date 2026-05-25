@@ -9,9 +9,17 @@ py_binary(
 )
 
 py_binary(
-    name = "bundle",
+    name = "bundler",
     srcs = [
-        "bundle.py",
+        "bundler.py",
+    ],
+    visibility = ["//private:__pkg__"],
+)
+
+py_binary(
+    name = "copy",
+    srcs = [
+        "copy.py",
     ],
     args = [
         "--bundle",

@@ -1,4 +1,4 @@
-load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_oci")
+load("@bzd_rules_oci//:defs.bzl", "bzd_oci_binary")
 
 exports_files(
     [
@@ -10,24 +10,14 @@ exports_files(
     ],
 )
 
-bzd_nodejs_oci(
+bzd_oci_binary(
     name = "artifacts",
+    binary = "//apps/artifacts/backend",
     cmd = [
-        "{backend}/apps/artifacts/backend/app.mjs",
         "--static",
-        "{frontend}",
-    ],
-    include_metadata = True,
-    tags = [
-        "manual",
-        "no-remote",
+        "apps/artifacts/frontend/frontend.bundle",
     ],
     visibility = [
         "//deployment:__subpackages__",
     ],
-    workdir = "{backend}",
-    deps = {
-        "//apps/artifacts/backend": "backend",
-        "//apps/artifacts/frontend": "frontend",
-    },
 )

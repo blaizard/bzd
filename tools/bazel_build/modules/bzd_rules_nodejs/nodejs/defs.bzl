@@ -3,9 +3,8 @@
 load("@bzd_lib//lib:attrs.bzl", "ATTRS_COMMON_BINARY_RULES", "ATTRS_COMMON_BUILD_RULES", "ATTRS_COMMON_TEST_RULES", "attrs_assert_any_of")
 load("//nodejs:private/nodejs_executable.bzl", bzd_nodejs_binary_ = "bzd_nodejs_binary", bzd_nodejs_test_ = "bzd_nodejs_test")
 load("//nodejs:private/nodejs_extern_binary.bzl", bzd_nodejs_extern_binary_ = "bzd_nodejs_extern_binary")
-load("//nodejs:private/nodejs_install.bzl", bzd_nodejs_install_ = "bzd_nodejs_install")
+load("//nodejs:private/nodejs_install.bzl", "bzd_nodejs_install")
 load("//nodejs:private/nodejs_library.bzl", bzd_nodejs_library_ = "bzd_nodejs_library")
-load("//nodejs:private/nodejs_oci.bzl", bzd_nodejs_oci_ = "bzd_nodejs_oci")
 load("//nodejs:private/nodejs_package.bzl", bzd_nodejs_package_ = "bzd_nodejs_package")
 load("//nodejs:private/nodejs_requirements_compile.bzl", bzd_nodejs_requirements_compile_ = "bzd_nodejs_requirements_compile")
 load("//nodejs:private/nodejs_static.bzl", bzd_nodejs_static_ = "bzd_nodejs_static")
@@ -16,8 +15,6 @@ load("//nodejs/static:defs.bzl", bzd_nodejs_static_sitemap_ = "bzd_nodejs_static
 # Public API.
 
 bzd_nodejs_requirements_compile = bzd_nodejs_requirements_compile_
-bzd_nodejs_oci = bzd_nodejs_oci_
-bzd_nodejs_install = bzd_nodejs_install_
 bzd_nodejs_library = bzd_nodejs_library_
 bzd_nodejs_package = bzd_nodejs_package_
 bzd_nodejs_extern_binary = bzd_nodejs_extern_binary_

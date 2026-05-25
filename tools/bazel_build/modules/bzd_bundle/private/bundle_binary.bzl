@@ -63,14 +63,13 @@ _bzd_bundle_binary_script = rule(
     executable = True,
 )
 
-def _bzd_bundle_binary_impl(name, visibility, compression, compression_level, executable, bootstrap_script, args, **kwargs):
+def _bzd_bundle_binary_impl(name, visibility, compression, executable, bootstrap_script, args, **kwargs):
     bzd_bundle_tar(
         name = "{}.bundle".format(name),
         executables = {
             bootstrap_script: executable,
         },
         compression = compression or None,
-        compression_level = compression_level,
         tags = ["manual"],
     )
 
@@ -102,11 +101,6 @@ bzd_bundle_binary = macro(
         "compression": attr.string(
             values = ["gz", "bz2", "xz"],
             doc = "The type of compression for the resulting tarball.",
-            configurable = False,
-        ),
-        "compression_level": attr.int(
-            doc = "The compression level for the resulting tarball.",
-            default = 6,
             configurable = False,
         ),
         "executable": attr.label(
