@@ -63,13 +63,16 @@ build:docker --spawn_strategy=docker,worker,sandboxed,local
 build:docker --experimental_docker_image=blaizard/linux_x86_64:ubuntu-24.04
 
 # Remote
-build:remote --dynamic_mode=off
-build:remote --spawn_strategy=remote,worker,sandboxed,local
-build:remote --remote_download_minimal
+# Always on to take effect during initial handshake.
+build --remote_timeout=15s
+build:remote --remote_retries=3
+build:remote --remote_retry_max_delay=3s
 # See https://blog.bazel.build/2023/10/06/bwob-in-bazel-7.html#handle-remote-cache-eviction
 build:remote --experimental_remote_cache_eviction_retries=3
-build:remote --remote_retries=2
+build:remote --dynamic_mode=off
+build:remote --spawn_strategy=remote,worker,sandboxed,local
 build:remote --define=EXECUTOR=remote
+build:remote --remote_download_minimal
 
 # local
 build:local --remote_executor=
