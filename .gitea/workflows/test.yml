@@ -17,11 +17,6 @@ jobs:
         needs: lease_linux
         runs-on: linux
         steps:
-            - uses: https://git.blaizard.com/blaise/deployment/ci/gitea/setup@main
-              with:
-                  lease: "true"
-                  node: "true"
-
             - name: "Info"
               run: |
-                  ./info.sh
+                  echo "hello"
