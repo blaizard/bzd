@@ -29,6 +29,6 @@ echo  "==== [sanitizer] asan/lsan/ubsan ==============================="
 echo  "==== [sanitizer] tsan ==============================="
 ./tools/bazel test --target_pattern_file=tools/ci/bazel_target_patterns.txt --config=clang --config=cc --config=sanitizer --config=tsan $EXTRA_FLAGS
 echo  "==== [coverage] cc ==============================="
-./tools/bazel coverage cc/... --config=gcc --config=cc --config=local $EXTRA_FLAGS
+./tools/bazel coverage cc/... --config=gcc --config=cc $EXTRA_FLAGS
 echo  "==== [coverage] nodejs ==============================="
-./tools/bazel coverage ... --config=nodejs --config=local $EXTRA_FLAGS
+./tools/bazel coverage ... --config=nodejs $EXTRA_FLAGS

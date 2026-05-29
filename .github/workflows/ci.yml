@@ -90,7 +90,7 @@ jobs:
               run: |
                   ./tools/bazel clean --expunge
                   ./bin/bzd-node timeit --path github/coverage_nodejs/command-0 \
-                  ./tools/bazel coverage ... --config=nodejs --config=local
+                  ./tools/bazel coverage ... --config=nodejs
                   ./bin/bzd-node publish-json --path coverage/nodejs $(pwd)/bazel-out/coverage/report.json
 
             - name: Build documentation
