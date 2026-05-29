@@ -26,7 +26,7 @@ jobs:
             - name: "Build Tools"
               run: |
                   mkdir bin
-                  ./tools/bazel run @bzd_bundle \
+                  ./tools/bazel run @bzd_bundle//:to_binary \
                       --@bzd_bundle//:executable=//apps/artifacts/api/python/node:binary \
                       --@bzd_bundle//:args="--uid ci" \
                       --//apps/artifacts/api:config.set=remotes=[https://data.blaizard.com] \
