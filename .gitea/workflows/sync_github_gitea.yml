@@ -19,10 +19,10 @@ jobs:
         needs: lease_linux
         runs-on: linux
         steps:
-            #- name: "Set the SSH key"
-            #  uses: https://git.blaizard.com/blaise/bzd/.gitea/actions/ssh_key@master
-            #  with:
-            #      ssh_private_key: ${{ secrets.BZD_SYNC_GITHUB_GITEA_SSH_KEY }}
+            - name: "Set the SSH key"
+              uses: https://git.blaizard.com/blaise/bzd/.gitea/actions/ssh_key@master
+              with:
+                  ssh_private_key: ${{ secrets.BZD_SYNC_GITHUB_GITEA_SSH_KEY }}
 
             - name: "GitHub <-> Gitea"
               run: |
