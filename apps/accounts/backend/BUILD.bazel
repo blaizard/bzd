@@ -25,7 +25,7 @@ bzd_nodejs_binary(
         "apps/accounts/frontend/frontend.bundle",
     ],
     data = [
-        "//apps/accounts/frontend",
+        "//apps/accounts/frontend:frontend.bundle",
     ],
     main = "app.mjs",
     packages = [

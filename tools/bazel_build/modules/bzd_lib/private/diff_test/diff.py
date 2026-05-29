@@ -1,4 +1,5 @@
 import argparse
+import os
 import pathlib
 import sys
 
@@ -17,6 +18,16 @@ if __name__ == "__main__":
 		help="The format of the files to be checked for equality.",
 	)
 	parser.add_argument(
+		"--cwd",
+		help="The current working directory to resolve relative path from the input files.",
+		default=pathlib.Path(os.environ.get("BUILD_WORKSPACE_DIRECTORY", ".")),
+	)
+	parser.add_argument(
+		"--color",
+		action="store_true",
+		help="Add color to the output.",
+	)
+	parser.add_argument(
 		"file1",
 		type=pathlib.Path,
 		help="The first file to be tested.",
@@ -30,5 +41,5 @@ if __name__ == "__main__":
 
 	assert args.format in compareFunctions, f"The format requested ({args.format}) is not supported."
 
-	result = compareFunctions[args.format](args.file1, args.file2)
+	result = compareFunctions[args.format](file1=args.cwd / args.file1, file2=args.cwd / args.file2, color=args.color)
 	sys.exit(0 if result else 1)

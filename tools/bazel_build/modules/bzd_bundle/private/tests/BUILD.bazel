@@ -19,6 +19,15 @@ bzd_bundle_tar(
     output = "empty_tar.tar",
 )
 
+bzd_bundle_tar(
+    name = "dummy_tar",
+    srcs = [
+        ":dummy",
+    ],
+    include_runfiles = True,
+    output = "dummy_tar.tar",
+)
+
 bzd_diff_test(
     name = "reproducible_empty_tar",
     file1 = ":empty_tar.tar",

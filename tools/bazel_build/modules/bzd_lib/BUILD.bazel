@@ -38,3 +38,9 @@ py_binary(
     srcs = ["web_server.py"],
     visibility = ["//visibility:public"],
 )
+
+alias(
+    name = "diff",
+    actual = "//private/diff_test:diff",
+    visibility = ["//visibility:public"],
+)

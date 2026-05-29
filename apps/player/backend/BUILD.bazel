@@ -15,10 +15,10 @@ bzd_nodejs_binary(
     ]),
     args = [
         "--static",
-        "$(rootpath //apps/player/frontend).bundle",
+        "apps/player/frontend/frontend.bundle",
     ],
     data = [
-        "//apps/player/frontend",
+        "//apps/player/frontend:frontend.bundle",
     ],
     main = "app.mjs",
     packages = [

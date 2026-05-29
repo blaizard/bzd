@@ -26,10 +26,10 @@ bzd_nodejs_binary(
         "//apps/accounts/example:config.json",
     ],
     args = [
-        "$(rootpath :frontend).bundle",
+        "$(rootpath :frontend.bundle)",
     ],
     data = [
-        ":frontend",
+        ":frontend.bundle",
     ],
     main = "backend.mjs",
     deps = [

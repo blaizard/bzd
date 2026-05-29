@@ -5,10 +5,6 @@ import vue from "@vitejs/plugin-vue";
 const root = import.meta.dirname;
 const isProduction = process.env.NODE_ENV == "production";
 
-if (!process.env.BZD_BUNDLE_DIR) {
-	throw new Error("BZD_BUNDLE_DIR environment variable is not set.");
-}
-
 // https://vitejs.dev/config/
 export default defineConfig({
 	plugins: [vue()],
@@ -31,6 +27,6 @@ export default defineConfig({
 		minify: isProduction ? "terser" : false,
 		assetsDir: "assets",
 		emptyOutDir: true,
-		outDir: path.resolve(process.cwd(), process.env.BZD_BUNDLE_DIR),
+		outDir: path.resolve(process.cwd(), "%bundle%"),
 	},
 });

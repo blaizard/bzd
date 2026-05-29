@@ -24,7 +24,7 @@ bzd_nodejs_binary(
         "apps/dashboard/frontend/frontend.bundle",
     ],
     data = [
-        "//apps/dashboard/frontend",
+        "//apps/dashboard/frontend:frontend.bundle",
     ],
     main = "app.mjs",
     visibility = [

@@ -351,7 +351,7 @@ def getShortestDistinctPaths(path1: pathlib.Path, path2: pathlib.Path) -> typing
 	return pathlib.Path(*shortest1[::-1]), pathlib.Path(*shortest2[::-1])
 
 
-def compare(file1: pathlib.Path, file2: pathlib.Path) -> bool:
+def compare(file1: pathlib.Path, file2: pathlib.Path, color: bool) -> bool:
 
 	content1 = file1.read_bytes()
 	content2 = file2.read_bytes()
@@ -362,7 +362,7 @@ def compare(file1: pathlib.Path, file2: pathlib.Path) -> bool:
 		return True
 
 	shortest1, shortest2 = getShortestDistinctPaths(file1, file2)
-	visitor = VisitorPrint(color=True, width=80, file1=shortest1.as_posix(), file2=shortest2.as_posix())
+	visitor = VisitorPrint(color=color, width=80, file1=shortest1.as_posix(), file2=shortest2.as_posix())
 
 	diff.visit(visitor.visitBinary)
 	return False

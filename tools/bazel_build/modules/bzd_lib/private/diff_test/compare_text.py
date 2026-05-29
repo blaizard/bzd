@@ -7,7 +7,7 @@ class MyAssertions(unittest.TestCase):
 		pass
 
 
-def compare(file1: pathlib.Path, file2: pathlib.Path) -> bool:
+def compare(file1: pathlib.Path, file2: pathlib.Path, color: bool) -> bool:
 
 	content1 = file1.read_text()
 	content2 = file2.read_text()

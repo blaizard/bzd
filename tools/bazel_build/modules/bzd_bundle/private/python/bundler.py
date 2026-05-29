@@ -14,75 +14,157 @@ _compressionToArgs = {
 }
 
 
-class Mtree:
-	def __init__(self) -> None:
-		self.mtree = ["#mtree", "/set uid=0 gid=0 time=0"]
+class Layers:
+	"""Represents the layers of the bundle, it keeps track of all layers and the files already added."""
 
-	def addDirectory(self, path: pathlib.Path) -> None:
-		self.mtree.append(f"{path} mode=0755 type=dir")
+	def __init__(self) -> None:
+		self.all: typing.Set[pathlib.Path] = set([pathlib.Path()])
+		self.current: typing.Set[pathlib.Path] = set([pathlib.Path()])
+
+	def __contains__(self, path: pathlib.Path) -> bool:
+		"""Check if a path is already written."""
+
+		return path in self.all or path in self.current
+
+	def inCurrentLayer(self, path: pathlib.Path) -> bool:
+		"""Check if a path is already written in the current layer."""
+
+		return path in self.current
+
+	def newLayer(self) -> None:
+		"""Create a new layer."""
+
+		self.all.update(self.current)
+		self.current = set([pathlib.Path()])
+
+	def add(self, path: pathlib.Path) -> None:
+		"""Add a path to the current layer."""
+
+		self.current.add(path)
+
+
+class Mtree:
+	"""Create an mtree representation of the file system structure, this is used to create a deterministic tarball with bsdtar."""
+
+	def __init__(self, layers: Layers) -> None:
+		self.mtree = ["#mtree", "/set uid=0 gid=0 time=0"]
+		self.layers = layers
+
+	def addParentDirectories(self, parent: pathlib.Path) -> None:
+		"""Add parent directories to a current path."""
+
+		while parent != pathlib.Path(".") and not self.layers.inCurrentLayer(parent):
+			self.mtree.append(f"./{parent} mode=0755 type=dir")
+			self.layers.add(parent)
+			parent = parent.parent
+
+	def addDirectory(self, path: pathlib.Path) -> bool:
+		"""Add a directory to the mtree."""
+
+		if path in self.layers:
+			return False
+		self.addParentDirectories(path.parent)
+		self.mtree.append(f"./{path} mode=0755 type=dir")
+		self.layers.add(path)
+		return True
 
 	def addFile(self, path: pathlib.Path) -> None:
+		"""Add a file to the mtree."""
+
+		if path in self.layers:
+			return
+		self.addParentDirectories(path.parent)
 		if os.access(path, os.X_OK):
-			self.mtree.append(f"{path} mode=0755 type=file")
+			self.mtree.append(f"./{path} mode=0755 type=file")
 		else:
-			self.mtree.append(f"{path} mode=0644 type=file")
+			self.mtree.append(f"./{path} mode=0644 type=file")
+		self.layers.add(path)
 
 	def addLink(self, path: pathlib.Path, target: pathlib.Path) -> None:
-		self.mtree.append(f"{path} mode=0777 type=link link={target}")
+		"""Add a symlink to the mtree."""
+
+		if path in self.layers:
+			return
+		self.addParentDirectories(path.parent)
+		self.mtree.append(f"./{path} mode=0777 type=link link={target}")
+		self.layers.add(path)
 
 	def toBytes(self) -> bytes:
 		return "\n".join(self.mtree).encode() + b"\n"
+
+
+class PathCollection:
+	"""Represents a collection of paths, this is used to identify which file/directory should be copied and which should be symlinked."""
+
+	def __init__(self) -> None:
+		self.paths: typing.Set[pathlib.Path] = set()
+		self.path: typing.Optional[pathlib.Path] = None
+
+	def add(self, path: pathlib.Path) -> None:
+		self.paths.add(path)
+
+	def identifyPathAndSymlinks(self) -> typing.Tuple[pathlib.Path, typing.List[pathlib.Path]]:
+		"""Identify the actual path and the symlinks pointing to it."""
+
+		if self.path is None:
+			self.path = self._identifyPath(list(self.paths))
+		return self.path, sorted([p for p in self.paths if p != self.path])
+
+	@staticmethod
+	def _identifyPath(paths: typing.List[pathlib.Path]) -> pathlib.Path:
+		"""Given a list of paths, identify the actual path to be copied."""
+		if len(paths) != 1:
+			paths.sort(key=lambda p: (len(p.parts), str(p)))
+			# Look for the first non-symlink path, this is the actual file/directory. The rest are symlinks pointing to it.
+			for path in paths:
+				if not path.is_symlink():
+					return path
+		return paths[0]
 
 
 class TreeBuilder:
 	def __init__(self) -> None:
 		self.mtree: typing.Optional[Mtree] = None
 		self.entries: typing.Dict[pathlib.Path, str] = {}
-		self.files: typing.Dict[pathlib.Path, typing.Set[pathlib.Path]] = {}
-		self.directories: typing.Dict[pathlib.Path, typing.Set[pathlib.Path]] = {}
+		self.files: typing.Dict[pathlib.Path, PathCollection] = {}
+		self.directories: typing.Dict[pathlib.Path, PathCollection] = {}
 		self.links: typing.Dict[pathlib.Path, pathlib.Path] = {}
 
-	def _addEntry(self, path: pathlib.Path, data: typing.Any, check: bool = True) -> None:
-		if check and path in self.entries:
-			raise Exception(f"Duplicate entry for path '{path}', original entry: {self.entries[path]}, new entry: {data}")
+	def _addEntry(self, path: pathlib.Path, data: typing.Any) -> None:
+		if path in self.entries and self.entries[path] != data:
+			raise Exception(
+				f"Duplicate entry for path '{path}' with different type, original entry: {self.entries[path]}, new entry: {data}"
+			)
 		self.entries[path] = data
 
 	def addFile(self, path: pathlib.Path) -> None:
 		assert self.mtree is None, "Mtree already generated, cannot add new entry."
 		actual = path.resolve()
-		self.files.setdefault(actual, set()).add(path)
+		self.files.setdefault(actual, PathCollection()).add(path)
 		self._addEntry(path, "file")
 
 	def addDirectory(self, path: pathlib.Path) -> None:
 		assert self.mtree is None, "Mtree already generated, cannot add new entry."
 		actual = path.resolve()
-		self.directories.setdefault(actual, set()).add(path)
+		self.directories.setdefault(actual, PathCollection()).add(path)
 		self._addEntry(path, "directory")
 
-	def addLink(self, path: pathlib.Path, target: pathlib.Path, check: bool = True) -> None:
+	def addLink(self, path: pathlib.Path, target: pathlib.Path) -> None:
 		assert self.mtree is None, "Mtree already generated, cannot add new entry."
 		assert not target.is_absolute(), f"Link target '{target}' must be a relative path."
 
 		self.links[path] = target
-		self._addEntry(path, f"link -> {target}", check=check)
+		self._addEntry(path, f"link -> {target}")
 
-	def addAbsoluteLink(self, path: pathlib.Path, targetPath: pathlib.Path, check: bool = True) -> None:
-		target = targetPath.relative_to(path.parent, walk_up=True)
-		self.addLink(path, target, check=check)
+	def addAbsoluteLink(self, path: pathlib.Path, targetPath: pathlib.Path) -> None:
+		target = self._linkFromPath(path, targetPath)
+		self.addLink(path, target)
 
 	@staticmethod
-	def _identifyPathAndSymlinks(
-		paths: typing.List[pathlib.Path],
-	) -> typing.Tuple[pathlib.Path, typing.List[pathlib.Path]]:
-		"""Given a list of paths, identify the actual path and the symlinks pointing to it."""
-		if len(paths) == 1:
-			return paths[0], []
-		paths.sort(key=lambda p: (len(p.parts), str(p)))
-		# Look for the first non-symlink path, this is the actual file/directory. The rest are symlinks pointing to it.
-		for path in paths:
-			if not path.is_symlink():
-				return path, [p for p in paths if p != path]
-		return paths[0], paths[1:]
+	def _linkFromPath(path: pathlib.Path, targetPath: pathlib.Path) -> pathlib.Path:
+		"""Get the relative link target from a path, this is used to identify the target of a symlink."""
+
+		return targetPath.relative_to(path.parent, walk_up=True)
 
 	@staticmethod
 	def _listDirectory(
@@ -111,17 +193,14 @@ class TreeBuilder:
 				(symlinks if (root / current).is_symlink() else files).append(current)
 			yield directories, files, symlinks
 
-	def generate(self) -> bytes:
+	def generate(self, mtree: Mtree) -> bytes:
 		"""Generate the mtree content, this is a deterministic representation of the file system structure."""
 
-		if self.mtree is None:
-			mtree = Mtree()
+		# Set the directory entries, this ensure that parent directories are created before their content.
+		for actual, collection in self.directories.items():
+			path, symlinks = collection.identifyPathAndSymlinks()
 
-			# Set the directory entries, this ensure that parent directories are created before their content.
-			for actual, paths in self.directories.items():
-				path, symlinks = self._identifyPathAndSymlinks(list(paths))
-
-				mtree.addDirectory(path)
+			if mtree.addDirectory(path):
 				for directoryPaths, filePaths, linkPaths in self._listDirectory(actual):
 					for relative in directoryPaths:
 						mtree.addDirectory(path / relative)
@@ -134,23 +213,23 @@ class TreeBuilder:
 						else:
 							self.addLink(path / relative, target)
 
-				for symlink in symlinks:
-					self.addAbsoluteLink(symlink, path, check=False)
+			for symlink in symlinks:
+				target = self._linkFromPath(symlink, path)
+				mtree.addLink(symlink, target)
 
-			# Set the file entries.
-			for actual, paths in self.files.items():
-				path, symlinks = self._identifyPathAndSymlinks(list(paths))
-				mtree.addFile(path)
-				for symlink in symlinks:
-					self.addAbsoluteLink(symlink, path, check=False)
+		# Set the file entries.
+		for actual, collection in self.files.items():
+			path, symlinks = collection.identifyPathAndSymlinks()
+			mtree.addFile(path)
+			for symlink in symlinks:
+				target = self._linkFromPath(symlink, path)
+				mtree.addLink(symlink, target)
 
-			# Set the link entries.
-			for path, target in self.links.items():
-				mtree.addLink(path, target)
+		# Set the link entries.
+		for symlink, target in self.links.items():
+			mtree.addLink(symlink, target)
 
-			self.mtree = mtree
-
-		return self.mtree.toBytes()
+		return mtree.toBytes()
 
 
 def normalize(path: typing.Union[str, pathlib.Path]) -> pathlib.Path:
@@ -187,36 +266,49 @@ if __name__ == "__main__":
 
 	manifest = json.loads(args.manifest.read_text())
 	builder = TreeBuilder()
-
-	# Process the files and directories, this will also populate the mtree with the content of the directories.
-	for path in manifest["files"]:
-		path = normalize(path)
-		if path.is_file():
-			builder.addFile(path)
-		elif path.is_dir():
-			builder.addDirectory(path)
-		else:
-			raise Exception(f"Path '{path}' is neither a file nor a directory.")
-
-	# Process the symlinks, this will add the link entries to the mtree.
-	for path, info in manifest["symlinks"].items():
-		symlink = normalize(path)
-		target = normalize(info["target"])
-		if info["type"] == "relative":
-			builder.addLink(symlink, target)
-		elif info["type"] == "absolute":
-			builder.addAbsoluteLink(symlink, target)
-		else:
-			raise Exception(f"Unsupported symlink type '{info['type']}' for path '{path}'.")
+	layers = Layers()
 
 	extraArguments = []
 	if args.compression:
 		extraArguments.extend(_compressionToArgs[args.compression])
 
-	with tempfile.NamedTemporaryFile() as mtreeFile:
-		mtreeFile.write(builder.generate())
-		mtreeFile.flush()
-		subprocess.run(
-			[args.tar, "-cf", args.output, *extraArguments, "--dereference", "--format=pax", f"@{mtreeFile.name}"],
-			check=True,
-		)
+	for layer in manifest["layers"]:
+		layers.newLayer()
+
+		# Process the files and directories, this will also populate the mtree with the content of the directories.
+		for path in layer["files"]:
+			path = normalize(path)
+			if path.is_file():
+				builder.addFile(path)
+			elif path.is_dir():
+				builder.addDirectory(path)
+			else:
+				raise Exception(f"Path '{path}' is neither a file nor a directory.")
+
+		# Process the symlinks, this will add the link entries to the mtree.
+		for path, info in layer["symlinks"].items():
+			symlink = normalize(path)
+			target = normalize(info["target"])
+			if info["type"] == "relative":
+				builder.addLink(symlink, target)
+			elif info["type"] == "absolute":
+				builder.addAbsoluteLink(symlink, target)
+			else:
+				raise Exception(f"Unsupported symlink type '{info['type']}' for path '{path}'.")
+
+		with tempfile.NamedTemporaryFile() as mtreeFile:
+			mtreeBytes = builder.generate(Mtree(layers))
+			mtreeFile.write(mtreeBytes)
+			mtreeFile.flush()
+			subprocess.run(
+				[
+					args.tar,
+					"-cf",
+					args.output / layer["output"],
+					*extraArguments,
+					"--dereference",
+					"--format=pax",
+					f"@{mtreeFile.name}",
+				],
+				check=True,
+			)

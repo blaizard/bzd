@@ -9,6 +9,6 @@ alias(
 )
 
 alias(
-    name = "bzd_bundle",
-    actual = "//private/python:copy",
+    name = "to_binary",
+    actual = "//private/python:copy_binary",
 )

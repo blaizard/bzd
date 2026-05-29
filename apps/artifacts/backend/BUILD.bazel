@@ -85,7 +85,7 @@ bzd_nodejs_binary(
     ],
     data = [
         ":config",
-        "//apps/artifacts/frontend",
+        "//apps/artifacts/frontend:frontend.bundle",
     ],
     main = "app.mjs",
     visibility = [

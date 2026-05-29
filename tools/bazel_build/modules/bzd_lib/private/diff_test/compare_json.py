@@ -8,7 +8,7 @@ class MyAssertions(unittest.TestCase):
 		pass
 
 
-def compare(file1: pathlib.Path, file2: pathlib.Path) -> bool:
+def compare(file1: pathlib.Path, file2: pathlib.Path, color: bool) -> bool:
 
 	content1 = json.loads(file1.read_text())
 	content2 = json.loads(file2.read_text())

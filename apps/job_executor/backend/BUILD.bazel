@@ -41,7 +41,7 @@ bzd_nodejs_binary(
     ],
     data = [
         ":config",
-        "//apps/job_executor/frontend",
+        "//apps/job_executor/frontend:frontend.bundle",
     ],
     main = "app.mjs",
     visibility = [

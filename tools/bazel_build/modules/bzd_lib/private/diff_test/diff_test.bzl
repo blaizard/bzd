@@ -6,6 +6,7 @@ visibility("//...")
 
 def _bzd_diff_test_impl(ctx):
     arguments_diff = [
+        "--color",
         "--format",
         ctx.attr.format,
     ]
@@ -43,7 +44,7 @@ bzd_diff_test = rule(
         "_diff": attr.label(
             executable = True,
             cfg = "exec",
-            default = Label("//private/diff_test:diff_test"),
+            default = Label("//private/diff_test:diff"),
         ),
     },
     test = True,

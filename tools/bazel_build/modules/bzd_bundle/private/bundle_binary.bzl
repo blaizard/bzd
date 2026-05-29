@@ -66,9 +66,13 @@ _bzd_bundle_binary_script = rule(
 def _bzd_bundle_binary_impl(name, visibility, compression, executable, bootstrap_script, args, **kwargs):
     bzd_bundle_tar(
         name = "{}.bundle".format(name),
-        executables = {
+        srcs = [
+            executable,
+        ],
+        root_symlinks = {
             bootstrap_script: executable,
         },
+        include_runfiles = True,
         compression = compression or None,
         tags = ["manual"],
     )

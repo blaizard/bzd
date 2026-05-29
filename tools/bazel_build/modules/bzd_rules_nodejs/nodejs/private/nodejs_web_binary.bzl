@@ -1,32 +1,13 @@
 """NodeJs Web binary rule."""
 
-load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
-load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
+load("@bzd_lib//:web_server_binary.bzl", "bzd_web_server_binary")
 load("//nodejs:private/nodejs_install.bzl", "BzdNodeJsInstallInfo", "bzd_nodejs_install")
+load("//nodejs:private/nodejs_library.bzl", "LIBRARY_ATTRS")
+load("//nodejs:private/nodejs_web_library.bzl", "bzd_nodejs_web_transition", "vite_run")
 
-def _bzd_nodejs_transition_impl(_settings, _attr):
-    return {"//:build_type": "nodejs_web"}
-
-# Transition to notify the dependency graph that this is a `nodejs_web` build.
-# This is used to select the proper dependency in some cases.
-_bzd_nodejs_transition = transition(
-    implementation = _bzd_nodejs_transition_impl,
-    inputs = [],
-    outputs = ["//:build_type"],
-)
-
-def _bzd_nodejs_web_exec_impl(ctx):
+def _vite_bundle_impl(ctx):
     # Retrieve the install provider
     install = ctx.attr.install[BzdNodeJsInstallInfo]
-
-    # Gather toolchain manager
-    toolchain_executable = ctx.toolchains["//nodejs:toolchain_type"].executable
-
-    vite_config = ctx.actions.declare_file("vite.config.mjs", sibling = install.package_json)
-    ctx.actions.expand_template(
-        output = vite_config,
-        template = ctx.file._vite_config,
-    )
 
     static_files_dict = {file.short_path: file for file in ctx.files.data}
     for static, path in ctx.attr.static.items():
@@ -78,42 +59,20 @@ def _bzd_nodejs_web_exec_impl(ctx):
         target_file = ctx.file.config_scss,
     )
 
-    bundle = ctx.actions.declare_directory("{}.bundle".format(ctx.label.name))
-    ctx.actions.run(
-        inputs = depset([vite_config, index, config_scss] + static_files, transitive = [install.files]),
-        outputs = [bundle],
-        arguments = [
-            "{}/node_modules/vite/bin/vite".format(vite_config.dirname),
-            "build",
-            "--logLevel",
-            "warn",
-            "--config",
-            vite_config.path,
-        ],
-        env = {
-            "BZD_BUNDLE_DIR": bundle.path,
-            "BZD_ROOT_DIR": vite_config.dirname,
-            "FORCE_COLOR": "1",
-            "NODE_ENV": "production" if ctx.attr._build[BuildSettingInfo].value == "prod" else "development",
+    bundle = ctx.actions.declare_directory(ctx.label.name)
+    return vite_run(
+        ctx = ctx,
+        install = install,
+        inputs = [index, config_scss] + static_files,
+        output = bundle,
+        substitutions = {
+            "%bundle%": bundle.path,
         },
-        executable = toolchain_executable.node.files_to_run,
     )
 
-    return [
-        sh_binary_wrapper_impl(
-            ctx = ctx,
-            locations = {
-                ctx.attr._web_server: "binary",
-                bundle: "bundle",
-            },
-            output = ctx.outputs.executable,
-            command = "{binary} {bundle} $@",
-        ),
-    ]
-
-_bzd_nodejs_web_binary = rule(
-    doc = "NodeJs web application executor.",
-    implementation = _bzd_nodejs_web_exec_impl,
+_vite_bundle = rule(
+    doc = "NodeJs web application bundler.",
+    implementation = _vite_bundle_impl,
     attrs = {
         "config_scss": attr.label(
             allow_single_file = True,
@@ -155,28 +114,13 @@ _bzd_nodejs_web_binary = rule(
             default = Label("//toolchain/vite:vite.config.binary.js"),
             allow_single_file = True,
         ),
-        "_web_server": attr.label(
-            executable = True,
-            cfg = "target",
-            default = Label("@bzd_lib//:web_server"),
-        ),
     },
-    cfg = _bzd_nodejs_transition,
-    executable = True,
+    cfg = bzd_nodejs_web_transition,
     toolchains = ["//nodejs:toolchain_type"],
 )
 
-def bzd_nodejs_web_binary(name, srcs = [], packages = [], deps = [], apis = [], **kwargs):
-    """Create a web application with NodeJs.
-
-    Args:
-        name: The name of the target.
-        srcs: The source files.
-        packages: The packages to add.
-        deps: The dependencies.
-        apis: The API to be used.
-        **kwargs: Additional arguments to add to the rule.
-    """
+def _bzd_nodejs_web_binary_impl(name, visibility, srcs, packages, deps, apis, tools, tags, **kwargs):
+    """Create a web application with NodeJs."""
 
     bzd_nodejs_install(
         name = name + ".install",
@@ -191,10 +135,27 @@ def bzd_nodejs_web_binary(name, srcs = [], packages = [], deps = [], apis = [], 
             Label("@nodejs_deps//:vite"),
         ] + packages,
         deps = deps,
+        tools = tools,
     )
 
-    _bzd_nodejs_web_binary(
-        name = name,
+    _vite_bundle(
+        name = name + ".bundle",
         install = name + ".install",
+        visibility = visibility,
         **kwargs
     )
+
+    bzd_web_server_binary(
+        name = name,
+        static = name + ".bundle",
+        visibility = visibility,
+        tags = tags,
+    )
+
+bzd_nodejs_web_binary = macro(
+    implementation = _bzd_nodejs_web_binary_impl,
+    inherit_attrs = _vite_bundle,
+    attrs = {
+        "install": None,
+    } | LIBRARY_ATTRS,
+)

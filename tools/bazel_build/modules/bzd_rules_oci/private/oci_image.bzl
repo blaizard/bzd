@@ -28,6 +28,6 @@ def bzd_oci_image(name, base = None, cmd = None, workdir = None, env = None, tar
         env = env or {},
         tars = tars or [],
         entrypoint = entrypoint,
-        tags = (tags or []) + ["no-remote-cache"],
+        tags = (tags or []),
         **kwargs
     )

@@ -2,7 +2,8 @@
 
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
-load("//nodejs:private/nodejs_install.bzl", "BzdNodeJsInstallInfo")
+load("//nodejs:private/nodejs_install.bzl", "BzdNodeJsInstallInfo", "bzd_nodejs_install")
+load("//nodejs:private/nodejs_library.bzl", "LIBRARY_ATTRS")
 
 _COMMON_EXEC_ATTRS = {
     "data": attr.label_list(
@@ -104,9 +105,11 @@ cp \"coverage/lcov.info\" \"$COVERAGE_OUTPUT_FILE\"
         extra_runfiles = [runfiles],
     )
 
-    return [default_info] + providers
+    return [default_info, OutputGroupInfo(
+        node_modules = depset([install.node_modules]),
+    )] + providers
 
-bzd_nodejs_binary = rule(
+_bzd_nodejs_binary = rule(
     doc = "NodeJs binary executor.",
     implementation = _bzd_nodejs_executable_impl,
     attrs = _COMMON_EXEC_ATTRS,
@@ -115,7 +118,7 @@ bzd_nodejs_binary = rule(
     cfg = _bzd_nodejs_transition,
 )
 
-bzd_nodejs_test = rule(
+_bzd_nodejs_test = rule(
     doc = "NodeJs test executor.",
     implementation = _bzd_nodejs_executable_impl,
     attrs = _COMMON_EXEC_ATTRS,
@@ -123,4 +126,65 @@ bzd_nodejs_test = rule(
     test = True,
     toolchains = ["//nodejs:toolchain_type"],
     cfg = _bzd_nodejs_transition,
+)
+
+def _bzd_nodejs_binary_macro_impl(name, visibility, data, tools, deps, packages, srcs, apis, tags, **kwargs):
+    bzd_nodejs_install(
+        name = name + ".install",
+        data = data,
+        deps = deps,
+        packages = packages,
+        srcs = srcs,
+        apis = apis,
+        tags = ["nodejs", "manual"],
+        tools = tools,
+    )
+
+    _bzd_nodejs_binary(
+        name = name,
+        data = data,
+        install = name + ".install",
+        tags = ["nodejs"] + (tags or []),
+        visibility = visibility,
+        **kwargs
+    )
+
+bzd_nodejs_binary = macro(
+    implementation = _bzd_nodejs_binary_macro_impl,
+    inherit_attrs = _bzd_nodejs_binary,
+    attrs = {
+        "executor": None,
+        "install": None,
+    } | LIBRARY_ATTRS,
+)
+
+def _bzd_nodejs_test_macro_impl(name, visibility, data, tools, deps, packages, srcs, apis, tags, **kwargs):
+    bzd_nodejs_install(
+        name = name + ".install",
+        data = data,
+        deps = deps,
+        packages = packages,
+        srcs = srcs,
+        apis = apis,
+        tags = ["nodejs", "manual"],
+        tools = tools,
+    )
+
+    _bzd_nodejs_test(
+        name = name,
+        data = data,
+        executor = Label("//toolchain/mocha"),
+        install = name + ".install",
+        tags = ["nodejs"] + (tags or []),
+        visibility = visibility,
+        **kwargs
+    )
+
+bzd_nodejs_test = macro(
+    implementation = _bzd_nodejs_test_macro_impl,
+    inherit_attrs = _bzd_nodejs_test,
+    attrs = {
+        "executor": None,
+        "install": None,
+    } | LIBRARY_ATTRS,
 )

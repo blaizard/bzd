@@ -21,7 +21,7 @@ string_flag(
 )
 
 bzd_bundle_binary(
-    name = "binary",
+    name = "binary_factory",
     args_build_setting = ":args",
     executable = ":executable",
     visibility = ["//private/python:__pkg__"],

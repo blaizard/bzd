@@ -17,16 +17,16 @@ py_binary(
 )
 
 py_binary(
-    name = "copy",
+    name = "copy_binary",
     srcs = [
-        "copy.py",
+        "copy_binary.py",
     ],
     args = [
         "--bundle",
-        "$(location //private:binary)",
+        "$(location //private:binary_factory)",
     ],
     data = [
-        "//private:binary",
+        "//private:binary_factory",
     ],
     visibility = ["//:__pkg__"],
 )

@@ -7,11 +7,16 @@ load("@bzd_bundle//:defs.bzl", "bzd_bundle_tar")
 load("//:private/oci_image.bzl", "bzd_oci_image")
 load("//:private/oci_load.bzl", "bzd_oci_load")
 
-def bzd_oci_binaries(name, binaries, base = Label("@oci_minimal"), **kwargs):
+def bzd_oci_binaries(name, binaries, base = Label("@oci_minimal"), layers = None, **kwargs):
     bzd_bundle_tar(
         name = "{}.package".format(name),
         output = "{}.package.tar".format(name),
-        executables = binaries,
+        compression = "gz",
+        root_symlinks = binaries,
+        include_runfiles = True,
+        srcs = binaries.values(),
+        layers = layers or [],
+        tags = ["manual"],
     )
 
     bzd_oci_image(
