@@ -118,8 +118,7 @@ runs:
               set -euo pipefail
 
               git submodule sync --recursive
-              # Do not use --depth=1 as the ref might not be present.
-              git submodule update --init --recursive
+              git submodule update --init --recursive --depth=1
 
               echo "Submodule status:"
               git submodule status --recursive
