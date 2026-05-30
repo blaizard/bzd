@@ -3,7 +3,7 @@ load("//private:bundle_binary.bzl", "bzd_bundle_binary")
 
 genrule(
     name = "noop",
-    outs = ["noop"],
+    outs = ["noop_exec"],
     cmd = "cat > $@ << 'EOF'\n#!/usr/bin/env sh\nexit 0\nEOF\nchmod +x $@",
     executable = True,
 )
