@@ -129,6 +129,7 @@ export default class Plugin extends PluginBase {
 		// }
 		const optionsSources = options["nodes.sources"] || {};
 		const optionsDatabases = options["nodes.databases"] || {};
+		const optionsSchema = options["nodes.schema"] || {};
 		const recordsMainStorageName = "main";
 		const optionsRecords = Object.assign(
 			{
@@ -572,13 +573,16 @@ export default class Plugin extends PluginBase {
 							doc: "Get a list of all available nodes.",
 						},
 						get: {
-							doc: "Get current CPU, memory, network, etc. statistics for a specific node.",
+							doc: "Get data attached to a node.",
 							parameters: {
 								name: {
-									doc: "The exact name of the node to get the data for.",
+									doc: "The exact name of the node as provided by 'list_nodes' to get the data for.",
 									type: "string",
 								},
 							},
+						},
+						schema: {
+							doc: "Get the description and schema of the data available.",
 						},
 					},
 				},
@@ -587,14 +591,18 @@ export default class Plugin extends PluginBase {
 			endpoints.registerMCP(
 				endpoint,
 				async (tool, args) => {
-					if (tool == "list_nodes") {
-						let uids = [];
-						for await (const uid of this.nodes.getNodes()) {
-							uids.push(uid);
-						}
-						return uids;
+					switch (tool) {
+						case "list_nodes":
+							let uids = [];
+							for await (const uid of this.nodes.getNodes()) {
+								uids.push(uid);
+							}
+							return uids;
+						case "schema":
+							return optionsSchema;
+						default:
+							Exception.unreachable("Unsupported tool '{}'", tool);
 					}
-					Exception.unreachable("Unsupported tool '{}'", tool);
 				},
 				schema,
 			);

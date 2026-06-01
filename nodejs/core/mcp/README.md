@@ -11,6 +11,6 @@ nix shell nixpkgs#nodejs -c npx @modelcontextprotocol/inspector
 Use:
 
 ```
-Transport Type: SSE
-URL: http://localhost:8081/nodes
+Transport Type: Streamable HTTP
+URL: http://localhost:8081/x/nodes/@mcp/compute
 ```
