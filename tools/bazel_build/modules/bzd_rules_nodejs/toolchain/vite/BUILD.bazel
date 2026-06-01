@@ -1,4 +1,4 @@
 exports_files([
-    "vite.config.binary.js",
-    "vite.config.library.js",
+    "vite.config.binary.js.template",
+    "vite.config.library.js.template",
 ])

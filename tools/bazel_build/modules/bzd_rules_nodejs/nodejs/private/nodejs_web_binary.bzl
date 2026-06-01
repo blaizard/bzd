@@ -111,7 +111,7 @@ _vite_bundle = rule(
             allow_single_file = True,
         ),
         "_vite_config": attr.label(
-            default = Label("//toolchain/vite:vite.config.binary.js"),
+            default = Label("//toolchain/vite:vite.config.binary.js.template"),
             allow_single_file = True,
         ),
     },

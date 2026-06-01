@@ -36,7 +36,11 @@ def vite_run(ctx, install, inputs, output, substitutions):
     ctx.actions.expand_template(
         output = vite_config,
         template = ctx.file._vite_config,
-        substitutions = substitutions,
+        substitutions = substitutions | {
+            # We could also use all modules here, not only top-level ones and use only the ones
+            # that are not duplicated (different versions).
+            "%dedupe%": json.encode(install.modules),
+        },
     )
 
     ctx.actions.run(
@@ -106,7 +110,7 @@ _vite_bundle = rule(
             default = "@bzd_lib//settings/build",
         ),
         "_vite_config": attr.label(
-            default = Label("//toolchain/vite:vite.config.library.js"),
+            default = Label("//toolchain/vite:vite.config.library.js.template"),
             allow_single_file = True,
         ),
     },

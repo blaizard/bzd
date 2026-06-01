@@ -10,6 +10,7 @@ BzdNodeJsInstallInfo = provider(
     fields = {
         "api": "The interface metadata.",
         "files": "All the files of the installation.",
+        "modules": "Top level module names, will be used for deduplicating.",
         "node_modules": "The node_modules directory.",
         "package_json": "The package.json file located at the root.",
         "path_mapping": "A mapping between the original path and the actual file path.",
@@ -135,7 +136,8 @@ def _bzd_nodejs_install_impl(ctx):
 
     # --- Generate the package.json and node_modules files
 
-    package_json, node_modules = bzd_nodejs_make_node_modules(ctx, providers.packages.to_list(), base_dir_name = base_dir_name)
+    packages = providers.packages.to_list()
+    package_json, node_modules = bzd_nodejs_make_node_modules(ctx, packages, base_dir_name = base_dir_name)
 
     # --- Create the APIs
 
@@ -179,6 +181,7 @@ def _bzd_nodejs_install_impl(ctx):
             package_json = package_json,
             node_modules = node_modules,
             path_mapping = path_mapping,
+            modules = [package[BzdNodeJsPackageInfo].module_name for package in packages],
         ),
     ]
 

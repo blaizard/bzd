@@ -19,6 +19,11 @@ export default defineConfig({
 			"@": root,
 		},
 		preserveSymlinks: true,
+		// Deduplicate all top-level packages so that transient dependencies                                                                                                                                           
+		// (e.g., from pnpm-style .store packages) resolve to the same module                                                                                                                                          
+		// identity as direct imports. Required because preserveSymlinks                                                                                                                                               
+		// prevents Rollup from collapsing symlinks to the same real path. 
+		dedupe: %dedupe%,
 	},
 	build: {
 		// Note, there is a bug in javascript core that affects Safari only, this doesn't seem to be fixed in esbuild,
