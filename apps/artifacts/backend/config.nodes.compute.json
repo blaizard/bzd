@@ -147,5 +147,147 @@
                 }
             }
         }
+    },
+    "nodes.schema": {
+        "/data/battery": {
+            "additionalProperties": {
+                "items": {
+                    "maximum": 1,
+                    "minimum": 0,
+                    "type": "number"
+                },
+                "minItems": 1,
+                "type": "array"
+            },
+            "description": "Battery charge level per battery unit, values are in the range [0, 1].",
+            "type": "object"
+        },
+        "/data/cpu": {
+            "additionalProperties": {
+                "items": {
+                    "maximum": 1,
+                    "minimum": 0,
+                    "type": "number"
+                },
+                "minItems": 1,
+                "type": "array"
+            },
+            "description": "CPU utilization per core, values are in the range [0, 1].",
+            "type": "object"
+        },
+        "/data/cpu_frequency": {
+            "additionalProperties": {
+                "items": {
+                    "minimum": 0,
+                    "type": "number"
+                },
+                "minItems": 1,
+                "type": "array"
+            },
+            "description": "CPU frequency per core in Hz.",
+            "type": "object"
+        },
+        "/data/disk": {
+            "additionalProperties": {
+                "properties": {
+                    "total": {
+                        "minimum": 0,
+                        "type": "number"
+                    },
+                    "used": {
+                        "minimum": 0,
+                        "type": "number"
+                    }
+                },
+                "type": "object"
+            },
+            "description": "Disk usage per mount point, containing total and used space.",
+            "type": "object"
+        },
+        "/data/gpu": {
+            "additionalProperties": {
+                "items": {
+                    "maximum": 1,
+                    "minimum": 0,
+                    "type": "number"
+                },
+                "minItems": 1,
+                "type": "array"
+            },
+            "description": "GPU utilization per device, values are in the range [0, 1].",
+            "type": "object"
+        },
+        "/data/io": {
+            "additionalProperties": {
+                "properties": {
+                    "in": {
+                        "minimum": 0,
+                        "type": "number"
+                    },
+                    "out": {
+                        "minimum": 0,
+                        "type": "number"
+                    },
+                    "usage": {
+                        "maximum": 1,
+                        "minimum": 0,
+                        "type": "number"
+                    }
+                },
+                "type": "object"
+            },
+            "description": "Disk I/O statistics per device, including inbound, outbound throughput and usage ratio.",
+            "type": "object"
+        },
+        "/data/memory": {
+            "additionalProperties": {
+                "properties": {
+                    "total": {
+                        "minimum": 0,
+                        "type": "number"
+                    },
+                    "used": {
+                        "minimum": 0,
+                        "type": "number"
+                    }
+                },
+                "type": "object"
+            },
+            "description": "Memory usage per zone, containing total and used memory.",
+            "type": "object"
+        },
+        "/data/network": {
+            "additionalProperties": {
+                "properties": {
+                    "in": {
+                        "minimum": 0,
+                        "type": "number"
+                    },
+                    "out": {
+                        "minimum": 0,
+                        "type": "number"
+                    }
+                },
+                "type": "object"
+            },
+            "description": "Network traffic per interface, including inbound and outbound throughput.",
+            "type": "object"
+        },
+        "/data/temperature": {
+            "additionalProperties": {
+                "items": {
+                    "type": "number"
+                },
+                "minItems": 1,
+                "type": "array"
+            },
+            "description": "Temperature readings per sensor in degrees Celsius.",
+            "type": "object"
+        },
+        "/data/uptime": {
+            "description": "System uptime in seconds.",
+            "minimum": 0,
+            "type": "number"
+        }
     }
 }
