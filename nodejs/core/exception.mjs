@@ -1,6 +1,6 @@
 import Format from "./format.mjs";
 import LogFactory from "./log.mjs";
-import uncaughtExceptionHandler from "./impl/exception/backend.mjs";
+import uncaughtExceptionHandler from "#bzd/nodejs/core/impl/exception/backend.mjs";
 const Log = LogFactory("exception");
 
 export class ExceptionPrecondition extends Error {

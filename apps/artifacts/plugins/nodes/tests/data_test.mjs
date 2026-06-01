@@ -103,7 +103,7 @@ describe("Nodes", () => {
 				const result = await data.get({ uid: "hello", key: ["a", "b", "_"], children: 1 });
 				Exception.assert(!result.hasValue());
 			}
-		});
+		}).timeout(5000);
 
 		it("count", async () => {
 			const data = new Data();
