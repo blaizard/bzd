@@ -8,7 +8,7 @@ Build and Push the image.
 # Build
 docker build tools/ci/runner/linux --no-cache -t docker.blaizard.com/tools/ci/runner/linux:latest
 # Run locally
-docker run -it --rm docker.blaizard.com/tools/ci/runner/linux:latest /bin/bash
+docker run -it --rm -v .:/workspace --workdir /workspace docker.blaizard.com/tools/ci/runner/linux:latest /bin/bash
 # Push
 docker push docker.blaizard.com/tools/ci/runner/linux:latest
 ```

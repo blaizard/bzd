@@ -130,6 +130,14 @@ export default class Plugin extends PluginBase {
 		const optionsSources = options["nodes.sources"] || {};
 		const optionsDatabases = options["nodes.databases"] || {};
 		const optionsSchema = options["nodes.schema"] || {};
+		const optionsHandlers = options["nodes.handlers"] || {};
+
+		// Add the validation to the handlers options.
+		for (const [path, validation] of Object.entries(optionsSchema)) {
+			optionsHandlers[path] ??= {};
+			optionsHandlers[path].validation = validation;
+		}
+
 		const recordsMainStorageName = "main";
 		const optionsRecords = Object.assign(
 			{
@@ -155,7 +163,7 @@ export default class Plugin extends PluginBase {
 				};
 			}
 
-			this.nodes = new Nodes(options["nodes.handlers"] || {}, optionsNodes);
+			this.nodes = new Nodes(optionsHandlers, optionsNodes);
 			for (const [uid, data] of Object.entries(options["nodes.data"] || {})) {
 				const node = await this.nodes.get(uid);
 				await node.insert(["data"], data);

@@ -46,7 +46,7 @@ export class Node {
 	/// \return A list of records corresponding to this change.
 	async insert(key, fragment, timestamp = null, isFixedTimestamp = false) {
 		let fragments = Node.getAllPathAndValues(fragment, key);
-		fragments = this.handlers.processBeforeInsert(fragments);
+		fragments = this.handlers.process(fragments);
 
 		timestamp = await this.data.insert(this.uid, fragments, timestamp, /*updateStatistics*/ true);
 
@@ -93,7 +93,9 @@ export class Node {
 
 export class Nodes {
 	constructor(handlers, options) {
-		this.handlers = new Handlers(handlers);
+		this.handlers = new Handlers(handlers, {
+			history: 10,
+		});
 		this.data = new Data(options);
 	}
 

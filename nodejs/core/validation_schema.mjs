@@ -13,6 +13,15 @@ export default class ValidationSchema {
 					type: "string",
 					enum: ["string", "number", "integer", "boolean", "null", "object", "array"],
 				},
+				minimum: {
+					type: "number",
+				},
+				maximum: {
+					type: "number",
+				},
+				description: {
+					type: "string",
+				},
 				properties: {
 					type: "object",
 					additionalProperties: {
@@ -76,6 +85,27 @@ export default class ValidationSchema {
 		return current;
 	}
 
+	static validationNumber(value, property, key) {
+		if ("minimum" in property) {
+			Exception.assert(
+				value >= property.minimum,
+				"[key={}] expected minimum value {}, not {:j}",
+				key,
+				property.minimum,
+				value,
+			);
+		}
+		if ("maximum" in property) {
+			Exception.assert(
+				value <= property.maximum,
+				"[key={}] expected maximum value {}, not {:j}",
+				key,
+				property.maximum,
+				value,
+			);
+		}
+	}
+
 	static validateSchema(values, schema, options) {
 		const validate = (valuesToValidate, schemaToValidate, nested) => {
 			// Validate a single property, excluding anyOf, oneOf, allOf.
@@ -101,9 +131,11 @@ export default class ValidationSchema {
 							break;
 						case "number":
 							Exception.assert(typeof value === "number", "[key={}] expected type number, not {:j}", key, value);
+							ValidationSchema.validationNumber(value, property, key);
 							break;
 						case "integer":
 							Exception.assert(Number.isInteger(value), "[key={}] expected type integer, not {:j}", key, value);
+							ValidationSchema.validationNumber(value, property, key);
 							break;
 						case "boolean":
 							Exception.assert(typeof value === "boolean", "[key={}] expected type boolean, not {:j}", key, value);

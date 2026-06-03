@@ -156,7 +156,6 @@
                     "minimum": 0,
                     "type": "number"
                 },
-                "minItems": 1,
                 "type": "array"
             },
             "description": "Battery charge level per battery unit, values are in the range [0, 1].",
@@ -169,7 +168,6 @@
                     "minimum": 0,
                     "type": "number"
                 },
-                "minItems": 1,
                 "type": "array"
             },
             "description": "CPU utilization per core, values are in the range [0, 1].",
@@ -181,7 +179,6 @@
                     "minimum": 0,
                     "type": "number"
                 },
-                "minItems": 1,
                 "type": "array"
             },
             "description": "CPU frequency per core in Hz.",
@@ -211,7 +208,6 @@
                     "minimum": 0,
                     "type": "number"
                 },
-                "minItems": 1,
                 "type": "array"
             },
             "description": "GPU utilization per device, values are in the range [0, 1].",
@@ -278,7 +274,6 @@
                 "items": {
                     "type": "number"
                 },
-                "minItems": 1,
                 "type": "array"
             },
             "description": "Temperature readings per sensor in degrees Celsius.",

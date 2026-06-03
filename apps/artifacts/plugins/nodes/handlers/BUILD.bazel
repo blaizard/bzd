@@ -11,6 +11,7 @@ bzd_nodejs_library(
     deps = [
         ":history",
         ":to_string",
+        ":validation",
         "//apps/artifacts/plugins/nodes:key_mapping",
         "//nodejs/core:exception",
         "//nodejs/core:log",
@@ -30,6 +31,19 @@ bzd_nodejs_library(
         "to_string.mjs",
     ],
     deps = [
+        "//apps/artifacts/plugins/nodes:key_mapping",
+        "//nodejs/core:exception",
         "//nodejs/core:format",
+    ],
+)
+
+bzd_nodejs_library(
+    name = "validation",
+    srcs = [
+        "validation.mjs",
+    ],
+    deps = [
+        "//nodejs/core:exception",
+        "//nodejs/core:validation_schema",
     ],
 )

@@ -1,0 +1,13 @@
+load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_test")
+
+bzd_nodejs_test(
+    name = "handlers",
+    srcs = [
+        "handlers_test.mjs",
+    ],
+    main = "handlers_test.mjs",
+    deps = [
+        "//apps/artifacts/plugins/nodes/handlers",
+        "//nodejs/core:exception",
+    ],
+)
