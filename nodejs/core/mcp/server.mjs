@@ -94,6 +94,14 @@ export default class MCPServer {
 			}),
 		);
 
+		// Enable CORS Headers so that it can be reached from browsers.
+		this.options.channel.addRoute("OPTIONS", endpoint, (context) => {
+			context.setHeader("Access-Control-Allow-Origin", "*");
+			context.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+			context.setHeader("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization");
+			context.sendStatus(200, "OK");
+		});
+
 		this.options.channel.addRoute(
 			"POST",
 			endpoint,
