@@ -18,7 +18,7 @@ def commandLeasePeriod(
 	name: str,
 	ttl: int,
 	httpClient: typing.Any = HttpClient,
-) -> None:
+) -> str:
 	"""Register a workload for a given period of time.
 
 	Args:
@@ -33,4 +33,4 @@ def commandLeasePeriod(
 
 	host, port = getHostPort(server)
 	baseUrl = f"http://{host}:{port}"
-	leasePeriod(baseUrl=baseUrl, name=name, ttl=ttl, httpClient=httpClient)
+	return leasePeriod(baseUrl=baseUrl, name=name, ttl=ttl, httpClient=httpClient)

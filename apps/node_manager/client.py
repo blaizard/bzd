@@ -8,6 +8,42 @@ from apps.node_manager.private.client.command.shutdown import commandShutdown
 from apps.node_manager.private.client.command.lease import commandLease
 from apps.node_manager.private.client.command.lease_period import commandLeasePeriod
 
+ARGUMENTS: typing.Dict[str, typing.Dict[str, typing.Any]] = {
+	"broadcast": {
+		"default": "255.255.255.255",
+		"help": "The broadcast address to be used.",
+	},
+	"service": {
+		"help": "A service to proxy the WOL call.",
+	},
+	"timeout": {
+		"default": 60,
+		"type": int,
+		"help": "Timeout in seconds until which the check returns.",
+	},
+	"wait": {
+		"action": "append",
+		"default": [],
+		"help": "Wait until a specific TCP connection is open.",
+	},
+	"mac": {"required": True, "help": "The mac address for the machine to wake up."},
+	"server": {"required": True, "help": "The ip:port address for the machine to register the workload."},
+	"undefine": {
+		"action": "append",
+		"default": [],
+		"help": "Environment variable to undefine before running the workload.",
+	},
+	"name": {
+		"default": "unknown",
+		"help": "The name of the workload.",
+	},
+	"ttl": {
+		"default": 60,
+		"type": int,
+		"help": "The time-to-live of the workload lease.",
+	},
+}
+
 
 def exceptionToString(exception: Exception) -> str:
 	lines = [f"{type(exception).__name__}: {str(exception)}"]
@@ -25,13 +61,13 @@ def exceptionToString(exception: Exception) -> str:
 
 def commandWoLLeasePeriod(
 	mac: str, broadcast: str, service: str, wait: typing.List[str], timeout: int, server: str, name: str, ttl: int
-) -> None:
+) -> str:
 
 	for attempt in range(1, 4):
 		try:
-			commandLeasePeriod(server=server, name=name, ttl=ttl)
-			print(f"Lease secured for '{name}' for {ttl}s.", flush=True)
-			return
+			leaseId = commandLeasePeriod(server=server, name=name, ttl=ttl)
+			print(f"Lease id={leaseId} secured for '{name}' for {ttl}s.", flush=True)
+			return leaseId
 		except Exception as e:
 			print(exceptionToString(e), file=sys.stderr, flush=True)
 
@@ -77,47 +113,11 @@ def commandWoLLease(
 
 
 def setupArgs(parser: argparse.ArgumentParser, args: typing.List[str]) -> None:
-	all_args: typing.Dict[str, typing.Dict[str, typing.Any]] = {
-		"broadcast": {
-			"default": "255.255.255.255",
-			"help": "The broadcast address to be used.",
-		},
-		"service": {
-			"help": "A service to proxy the WOL call.",
-		},
-		"timeout": {
-			"default": 60,
-			"type": int,
-			"help": "Timeout in seconds until which the check returns.",
-		},
-		"wait": {
-			"action": "append",
-			"default": [],
-			"help": "Wait until a specific TCP connection is open.",
-		},
-		"mac": {"required": True, "help": "The mac address for the machine to wake up."},
-		"server": {"required": True, "help": "The ip:port address for the machine to register the workload."},
-		"undefine": {
-			"action": "append",
-			"default": [],
-			"help": "Environment variable to undefine before running the workload.",
-		},
-		"name": {
-			"default": "unknown",
-			"help": "The name of the workload.",
-		},
-		"ttl": {
-			"default": 60,
-			"type": int,
-			"help": "The time-to-live of the workload lease.",
-		},
-	}
-
 	for arg in args:
-		assert arg in all_args, f"Unknown argument '{arg}'."
+		assert arg in ARGUMENTS, f"Unknown argument '{arg}'."
 		parser.add_argument(
 			f"--{arg}",
-			**all_args[arg],
+			**ARGUMENTS[arg],
 		)
 
 

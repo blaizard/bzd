@@ -3,28 +3,22 @@ import typing
 import threading
 import subprocess
 import shlex
+from contextlib import contextmanager
 
 from apps.node_manager.private.common import getHostPort
 from apps.node_manager.private.client.command.lease_period import leasePeriod
 from bzd.http.client import HttpClient
 
 
-def commandLease(
-	server: str,
-	name: str,
-	ttl: int,
-	command: typing.List[str],
-	undefine: typing.Optional[typing.List[str]] = None,
-	httpClient: typing.Any = HttpClient,
-) -> int:
-	"""Register a workload, run a heartbeat and release the workload when completed."""
+@contextmanager
+def leaseHeartbeats(
+	server: str, leaseId: str, ttl: int, httpClient: typing.Any = HttpClient
+) -> typing.Generator[threading.Event, None, None]:
+	"""Run a heartbeat and release the workload when completed."""
 
 	host, port = getHostPort(server)
 	baseUrl = f"http://{host}:{port}"
 	stop = threading.Event()
-
-	# Register the workload
-	leaseId = leasePeriod(baseUrl=baseUrl, name=name, ttl=ttl, httpClient=httpClient)
 
 	def heartbeatLoop() -> None:
 		consecutiveFailures = 0
@@ -46,11 +40,38 @@ def commandLease(
 	heartbeatThread = threading.Thread(target=heartbeatLoop, daemon=True)
 	heartbeatThread.start()
 
-	env = os.environ.copy()
-	for name in undefine or []:
-		env.pop(name, None)
-
 	try:
+		yield stop
+
+	finally:
+		stop.set()
+		try:
+			httpClient.post(f"{baseUrl}/workload/release", json={"id": leaseId})
+		except Exception as e:
+			print(f"Failed to release workload: {e}", flush=True)
+
+
+def commandLease(
+	server: str,
+	name: str,
+	ttl: int,
+	command: typing.List[str],
+	undefine: typing.Optional[typing.List[str]] = None,
+	httpClient: typing.Any = HttpClient,
+) -> int:
+	"""Register a workload, run a heartbeat and release the workload when completed."""
+
+	host, port = getHostPort(server)
+	baseUrl = f"http://{host}:{port}"
+
+	# Register the workload
+	leaseId = leasePeriod(baseUrl=baseUrl, name=name, ttl=ttl, httpClient=httpClient)
+
+	with leaseHeartbeats(server=server, leaseId=leaseId, ttl=ttl, httpClient=httpClient) as stop:
+		env = os.environ.copy()
+		for name in undefine or []:
+			env.pop(name, None)
+
 		# Run the process in a shell, to mimic what a user would do when calling the script.
 		# This is needed by some program which need to think they are in an interactive shell.
 		with subprocess.Popen(
@@ -65,10 +86,3 @@ def commandLease(
 			process.terminate()
 			print("Aborting.", flush=True)
 			return 1
-
-	finally:
-		stop.set()
-		try:
-			httpClient.post(f"{baseUrl}/workload/release", json={"id": leaseId})
-		except Exception as e:
-			print(f"Failed to release workload: {e}", flush=True)

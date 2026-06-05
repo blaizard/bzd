@@ -44,6 +44,7 @@ py_binary(
         "proxy.py",
     ],
     deps = [
+        ":client",
         "//apps/node_manager/private:common",
     ],
 )

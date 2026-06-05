@@ -4,6 +4,7 @@ import functools
 import typing
 
 from apps.node_manager.private.common import getHostPort
+from apps.node_manager.client import ARGUMENTS
 
 
 async def pipe(reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:
@@ -75,6 +76,11 @@ if __name__ == "__main__":
 		metavar=("<BIND PORT>", "<TARGET HOST:PORT>"),
 		help="Port to target proxy mapping.",
 	)
+	for arg in ["broadcast", "service", "timeout", "wait", "mac", "server", "name", "ttl"]:
+		parser.add_argument(
+			f"--{arg}",
+			**ARGUMENTS[arg],
+		)
 
 	args = parser.parse_args()
 
