@@ -10,6 +10,7 @@ bzd_nodejs_library(
         "//nodejs/core:event",
         "//nodejs/core:exception",
         "//nodejs/core:log",
+        "//nodejs/core:validation_schema",
         "//nodejs/utils:object",
     ],
 )
@@ -22,5 +23,6 @@ bzd_nodejs_test(
     main = "tests/server_test.mjs",
     deps = [
         ":server",
+        "//nodejs/core/http/mock:server",
     ],
 )

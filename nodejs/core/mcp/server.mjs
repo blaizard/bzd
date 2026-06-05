@@ -1,9 +1,32 @@
-import { ExceptionFactory } from "../exception.mjs";
-import LogFactory from "../log.mjs";
+import { ExceptionFactory } from "#bzd/nodejs/core/exception.mjs";
+import LogFactory from "#bzd/nodejs/core/log.mjs";
+import ValidationSchema from "#bzd/nodejs/core/validation_schema.mjs";
 import { isObject } from "#bzd/nodejs/utils/object.mjs";
 
 const Exception = ExceptionFactory("mcp", "server");
 const Log = LogFactory("mcp", "server");
+
+const mcpSchemaDescriptor = {
+	type: "object",
+	properties: {
+		tools: {
+			type: "object",
+			additionalProperties: {
+				type: "object",
+				properties: {
+					description: {
+						type: "string",
+					},
+					parameters: {
+						type: "object",
+						additionalProperties: true,
+					},
+				},
+				required: ["description"],
+			},
+		},
+	},
+};
 
 export default class MCPServer {
 	constructor(options) {
@@ -20,11 +43,11 @@ export default class MCPServer {
 	}
 
 	/// Update a schema with new documentation.
-	/// Only 'doc' fields can be updated - all other fields from schema are preserved.
+	/// Only 'description' fields can be updated - all other fields from schema are preserved.
 	/// @param schema The existing schema to update
-	/// @param content The new documentation to merge (only 'doc' fields will be used)
+	/// @param content The new documentation to merge (only 'description' fields will be used)
 	/// @returns A new schema with updated documentation
-	/// @throws Error if content contains keys that don't exist in schema (except 'doc')
+	/// @throws Error if content contains keys that don't exist in schema (except 'description')
 	static updateSchema(schema, content) {
 		Exception.assert(isObject(content), "Schema override must be an object");
 
@@ -41,48 +64,21 @@ export default class MCPServer {
 				typeof result[key],
 				typeof content[key],
 			);
-			if (key === "doc") {
+			if (key === "description") {
 				result[key] = content[key];
 			} else if (isObject(content[key])) {
-				Exception.assert(isObject(result[key]), "Invalid key '{}' in content - only 'doc' fields can be updated", key);
+				Exception.assert(
+					isObject(result[key]),
+					"Invalid key '{}' in content - only 'description' fields can be updated",
+					key,
+				);
 				result[key] = this.updateSchema(result[key], content[key]);
 			} else {
-				Exception.error("Invalid key '{}' in content - only 'doc' fields can be updated", key);
+				Exception.error("Invalid key '{}' in content - only 'description' fields can be updated", key);
 			}
 		}
 
 		return result;
-	}
-
-	/// Assert that the schema provided is correct.
-	static assertSchema(schema) {
-		const supportedParameterTypes = ["string"];
-		Exception.assert(isObject(schema), "The schema must be an object: {:j}", schema);
-		for (const [name, tool] of Object.entries(schema.tools || {})) {
-			Exception.assert("doc" in tool, "The tool '{}' is missing a documentation.", name);
-			for (const [parameterName, parameter] of Object.entries(tool.parameters || {})) {
-				Exception.assert(
-					"doc" in parameter,
-					"The parameter '{}' in tool '{}' is missing a documentation.",
-					parameterName,
-					name,
-				);
-				Exception.assert(
-					"type" in parameter,
-					"The parameter '{}' in tool '{}' is missing a type.",
-					parameterName,
-					name,
-				);
-				Exception.assert(
-					supportedParameterTypes.includes(parameter.type),
-					"The parameter '{}' in tool '{}' should be one of {:j}, not '{}'.",
-					parameterName,
-					name,
-					supportedParameterTypes,
-					parameter.type,
-				);
-			}
-		}
 	}
 
 	/// Register a mcp endpoint
@@ -90,7 +86,13 @@ export default class MCPServer {
 	/// Support SSE endpoint definition.
 	addRoute(endpoint, callback, schema, options) {
 		Exception.assert(this.options.channel, "Channel is missing");
-		MCPServer.assertSchema(schema);
+		new ValidationSchema(mcpSchemaDescriptor).validate(schema);
+
+		const parametersValidationSchema = Object.fromEntries(
+			Object.entries(schema.tools || {}).map(([name, data]) => {
+				return [name, new ValidationSchema(data.parameters || {})];
+			}),
+		);
 
 		this.options.channel.addRoute(
 			"POST",
@@ -116,21 +118,8 @@ export default class MCPServer {
 					const tools = Object.entries(schema.tools || {}).map(([name, tool]) => {
 						return {
 							name: name,
-							description: tool.doc,
-							inputSchema: {
-								type: "object",
-								properties: Object.fromEntries(
-									Object.entries(tool.parameters || {}).map(([parameterName, parameter]) => {
-										return [
-											parameterName,
-											{
-												description: parameter.doc,
-												type: parameter.type,
-											},
-										];
-									}),
-								),
-							},
+							description: tool.description,
+							inputSchema: tool.parameters || { type: "object", properties: {} },
 						};
 					});
 					response.result = {
@@ -139,8 +128,21 @@ export default class MCPServer {
 				} else if (method === "tools/call") {
 					const body = context.getBody() || {};
 					const tool = body.params?.name;
-					const args = body.params?.arguments;
+					const args = body.params?.arguments ?? {};
 					Exception.assertPrecondition(tool && args, "Missing tool and arguments: {:j}", body);
+					Exception.assertPrecondition(typeof tool === "string", "Tool must be a string, not: {:j}", tool);
+					Exception.assertPrecondition(isObject(args), "Arguments must be a dictionary, not: {:j}", args);
+					Exception.assertPrecondition(tool in schema.tools, "Unknown tool '{}'", tool);
+					Exception.assert(
+						tool in parametersValidationSchema,
+						"Parameter validation should be available for tool '{}'",
+						tool,
+					);
+					try {
+						parametersValidationSchema[tool].validate(args);
+					} catch (e) {
+						Exception.errorPrecondition("parameters for tool '{}' are invalid: {}", tool, e.message);
+					}
 					try {
 						const data = await callback(tool, args);
 						response.result = {
@@ -157,7 +159,7 @@ export default class MCPServer {
 							content: [
 								{
 									type: "text",
-									text: e.toString(),
+									text: e.message.toString(),
 								},
 							],
 							isError: true,
