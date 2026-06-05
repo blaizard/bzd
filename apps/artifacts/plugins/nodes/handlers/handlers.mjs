@@ -1,6 +1,7 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import ToStringHandler from "#bzd/apps/artifacts/plugins/nodes/handlers/to_string.mjs";
+import ExpiresHandler from "#bzd/apps/artifacts/plugins/nodes/handlers/expires.mjs";
 import HistoryHandler from "#bzd/apps/artifacts/plugins/nodes/handlers/history.mjs";
 import ValidationHandler from "#bzd/apps/artifacts/plugins/nodes/handlers/validation.mjs";
 import KeyMapping from "#bzd/apps/artifacts/plugins/nodes/key_mapping.mjs";
@@ -11,9 +12,12 @@ const Log = LogFactory("apps", "plugin", "nodes", "handlers");
 const sortedAvailableHandlers = [
 	["validation", ValidationHandler],
 	["toString", ToStringHandler],
+	["expires", ExpiresHandler],
 	["history", HistoryHandler],
 ];
 const availableHandlers = Object.fromEntries(sortedAvailableHandlers);
+
+const SPECIAL_KEY_FOR_HANDLERS = "\x01";
 
 class FragmentAccessor {
 	constructor(fragments, index, root) {
@@ -87,69 +91,73 @@ export default class Handlers {
 		//	 },
 		// }
 		// into:
-		// [
-		//   [["a", "b", "c"], new handler1(options1)],
-		//   [["a", "b", "c"], new handler2(options2)],
-		// ]
-		const result = [];
+		// {
+		//    a: {
+		//       b: {
+		//          c: {
+		//             SPECIAL_KEY_FOR_HANDLERS: {
+		//                handlers: [ new handler1(options1), new handler2(options2) ],
+		//                root: ["a", "b", "c"]
+		//             }
+		//          }
+		//		 }
+		//    }
+		// }
+		const result = {};
 		for (const [path, props] of Object.entries(configuration)) {
 			const key = KeyMapping.pathToKey(path);
+			const object = key.reduce((r, segment) => {
+				r[segment] ??= {};
+				return r[segment];
+			}, result);
 
 			// Sort the handlers by their order in the sortedAvailableHandlers.
 			const sortedProps = Object.entries(props).sort(
 				([a], [b]) =>
 					sortedAvailableHandlers.findIndex(([h]) => h === a) - sortedAvailableHandlers.findIndex(([h]) => h === b),
 			);
-			for (const [handler, options] of sortedProps) {
-				Exception.assert(handler in availableHandlers, "The handler '{}' is not supported.", handler);
-				const handlerInstance = new availableHandlers[handler](options);
-				result.push([key, handlerInstance]);
-			}
+
+			object[SPECIAL_KEY_FOR_HANDLERS] = {
+				handlers: sortedProps.map(([handler, options]) => {
+					Exception.assert(handler in availableHandlers, "The handler '{}' is not supported.", handler);
+					return new availableHandlers[handler](options);
+				}),
+				root: key,
+			};
 		}
-		this.configuration = Handlers.sort(result);
+		this.configuration = result;
 		this.defaultOptions = defaultOptions;
 	}
 
 	/// Sort in place the fragments by their keys.
 	static sort(fragments) {
-		return fragments.sort((a, b) => Handlers.compare(a[0], b[0]));
-	}
-
-	/// Compare two keys.
-	///
-	/// \param keyA The first key.
-	/// \param keyB The second key.
-	/// \returns -1 if keyA < keyB, 1 if keyA > keyB, 0 otherwise.
-	static compare(keyA, keyB) {
-		const a = KeyMapping.keyToInternal(keyA);
-		const b = KeyMapping.keyToInternal(keyB);
-		if (a < b) return -1;
-		if (a > b) return 1;
-		return 0;
+		return fragments.sort(([keyA], [keyB]) => {
+			const a = KeyMapping.keyToInternal(keyA);
+			const b = KeyMapping.keyToInternal(keyB);
+			if (a < b) return -1;
+			if (a > b) return 1;
+			return 0;
+		});
 	}
 
 	process(fragments) {
 		// Sort and initialize the fragments with an empty options.
 		fragments = Handlers.sort(fragments).map(([key, value]) => [key, value, Object.assign({}, this.defaultOptions)]);
 
-		let indexConfig = 0;
-		let indexFragment = 0;
-		while (indexConfig < this.configuration.length && indexFragment < fragments.length) {
-			const [root, handler] = this.configuration[indexConfig];
-			const [key] = fragments[indexFragment];
-			// If the root is a prefix of the key, we can process the handler.
-			if (KeyMapping.keyStartsWith(key, root)) {
-				const range = new FragmentRange(fragments, indexFragment, root);
-				handler.process(range);
-				++indexConfig;
-			}
-			// If the root comes before the key, we can move to the next configuration.
-			else if (Handlers.compare(root, key) < 0) {
-				indexConfig++;
-			}
-			// Else the root comes after the key, we can move to the next fragment.
-			else {
-				indexFragment++;
+		for (let index = 0; index < fragments.length; ++index) {
+			const keys = [...fragments[index][0]];
+			let current = this.configuration;
+			let key;
+			while ((key = keys.shift()) !== undefined) {
+				if (!(key in current)) {
+					break;
+				}
+				current = current[key];
+				const { handlers, root } = current[SPECIAL_KEY_FOR_HANDLERS] ?? { handlers: [], root: [] };
+				for (const handler of handlers) {
+					const range = new FragmentRange(fragments, index, root);
+					handler.process(range);
+				}
 			}
 		}
 

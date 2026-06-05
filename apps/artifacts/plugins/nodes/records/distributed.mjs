@@ -3,6 +3,7 @@ import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import StatisticsProvider from "#bzd/nodejs/core/statistics/provider.mjs";
 import Records from "#bzd/apps/artifacts/plugins/nodes/records/records.mjs";
 import FileSystem from "#bzd/nodejs/core/filesystem.mjs";
+import FileSystemMemory from "#bzd/nodejs/core/mock/filesystem.mjs";
 
 const Exception = ExceptionFactory("apps", "plugin", "nodes");
 const Log = LogFactory("apps", "plugin", "nodes");
@@ -28,6 +29,18 @@ export default class RecordsDistributed {
 			},
 			options,
 		);
+
+		// If no path is provided, use an in-memory file system.
+		if (!this.options.path) {
+			this.options.fs = new FileSystemMemory(
+				{},
+				{
+					wait: () => {},
+				},
+			);
+			this.options.path = "/records";
+		}
+
 		this.records = null;
 	}
 

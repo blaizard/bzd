@@ -5,6 +5,70 @@
     "tests": [
         {
             "expects": {
+                "status": 404
+            },
+            "request": [
+                "get",
+                "/x/nodes/testnode/a"
+            ]
+        },
+        {
+            "expects": {
+                "status": 200
+            },
+            "request": [
+                "post",
+                "/x/nodes/testnode/a",
+                {
+                    "data": "world"
+                }
+            ]
+        },
+        {
+            "expects": {
+                "data": {
+                    "data": "world"
+                },
+                "status": 200
+            },
+            "request": [
+                "get",
+                "/x/nodes/testnode/a"
+            ]
+        },
+        {
+            "expects": {
+                "status": 200
+            },
+            "request": [
+                "post",
+                "/x/nodes/testnode/data/cpu/main",
+                {
+                    "data": [
+                        0,
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "expects": {
+                "data_contains": "expected maximum",
+                "status": 400
+            },
+            "request": [
+                "post",
+                "/x/nodes/testnode/data/cpu/main",
+                {
+                    "data": [
+                        0,
+                        2
+                    ]
+                }
+            ]
+        },
+        {
+            "expects": {
                 "data": "content for a",
                 "status": 200
             },
@@ -128,9 +192,6 @@
                         "nested": -42
                     }
                 }
-            },
-            "nodes.records": {
-                "path": "./nodes.records"
             },
             "type": "nodes"
         },

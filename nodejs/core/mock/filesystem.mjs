@@ -206,6 +206,7 @@ export default class FileSystem {
 	constructor(init = {}, options = {}) {
 		this.options = Object.assign(
 			{
+				wait: FileSystem._mockWait,
 				clock: new ClockDate(),
 			},
 			options,
@@ -217,11 +218,9 @@ export default class FileSystem {
 		}
 	}
 
-	static async _mockWait(ms = null) {
-		if (ms === null) {
-			// Generates 0 or 1.
-			ms = Math.round(Math.random());
-		}
+	static async _mockWait() {
+		// Generates 0 or 1.
+		const ms = Math.round(Math.random());
 		return new Promise((resolve) => {
 			setTimeout(resolve, ms);
 		});
@@ -280,7 +279,7 @@ export default class FileSystem {
 	}
 
 	async mkdir(path, { force = true } = {}) {
-		await FileSystem._mockWait();
+		await this.options.wait();
 		this.mkdirSync(path, { force });
 	}
 
@@ -297,7 +296,7 @@ export default class FileSystem {
 
 	/// Remove a directory recursively
 	async rmdir(path, { force = false } = {}) {
-		await FileSystem._mockWait();
+		await this.options.wait();
 		const p = Pathlib.path(path);
 		const parent = this._toEntry(p.parent, _Policy.mustExists | _Policy.directory);
 		if (!(p.name in parent.children)) {
@@ -310,7 +309,7 @@ export default class FileSystem {
 
 	/// Read the content of a directory
 	async readdir(path, withFileTypes = false) {
-		await FileSystem._mockWait();
+		await this.options.wait();
 		const dir = this._toEntry(path, _Policy.mustExists | _Policy.directory);
 		if (withFileTypes) {
 			return Object.entries(dir.children).map(([name, entry]) => new Dirent(name, entry));
@@ -320,21 +319,21 @@ export default class FileSystem {
 
 	/// Append data to a file
 	async appendFile(path, data) {
-		await FileSystem._mockWait();
+		await this.options.wait();
 		const file = this._toEntry(path, _Policy.create | _Policy.file | _Policy.touch);
 		file.content += data;
 	}
 
 	/// Get the stat object associated with a file
 	async stat(path) {
-		await FileSystem._mockWait();
+		await this.options.wait();
 		const entry = this._toEntry(path, _Policy.mustExists);
 		return new Stats(entry);
 	}
 
 	/// Delete a file
 	async unlink(path) {
-		await FileSystem._mockWait();
+		await this.options.wait();
 		const p = Pathlib.path(path);
 		const dir = this._toEntry(p.parent, _Policy.mustExists | _Policy.directory);
 		Exception.assert(p.name in dir.children, "The file '{}' doesn't exists.", p.asPosix());
@@ -344,13 +343,13 @@ export default class FileSystem {
 	/// Touch a file (create it if it does not exists) and
 	/// updates its last modification date.
 	async touch(path) {
-		await FileSystem._mockWait();
+		await this.options.wait();
 		this._toEntry(path, _Policy.create | _Policy.file | _Policy.touch);
 	}
 
 	/// Change the file system timestamps of the object referenced by path.
 	async utimes(path, atimeS, mtimeS) {
-		await FileSystem._mockWait();
+		await this.options.wait();
 		const entry = this._toEntry(path, _Policy.mustExists);
 		entry.atimeS = atimeS;
 		entry.mtimeS = mtimeS;
@@ -358,21 +357,21 @@ export default class FileSystem {
 
 	/// Read the content of a file
 	async readFile(path, options = "utf8") {
-		await FileSystem._mockWait();
+		await this.options.wait();
 		const file = this._toEntry(path, _Policy.mustExists | _Policy.file);
 		return file.content;
 	}
 
 	/// Read the content of a binary file
 	async readBinary(path) {
-		await FileSystem._mockWait();
+		await this.options.wait();
 		const file = this._toEntry(path, _Policy.mustExists | _Policy.file);
 		return new Buffer(file.content);
 	}
 
 	/// Write the content of a file
 	async writeBinary(path, data) {
-		await FileSystem._mockWait();
+		await this.options.wait();
 		const file = this._toEntry(path, _Policy.create | _Policy.file | _Policy.touch);
 		file.content = data;
 	}

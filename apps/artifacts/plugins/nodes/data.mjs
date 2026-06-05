@@ -400,6 +400,8 @@ export default class Data {
 				{
 					// The number of values to be kept as history.
 					history: 10,
+					// The duration in ms until which an entry is considered expired.
+					expires: undefined,
 				},
 				options,
 			);
@@ -429,6 +431,12 @@ export default class Data {
 			data.values.splice(index, 0, [timestamp, value]);
 			while (data.values.length > config.history) {
 				data.values.pop();
+			}
+
+			// If a manual expires time is set.
+			if (config.expires !== undefined) {
+				data.expiresType = "manual";
+				data.expires = config.expires;
 			}
 		}
 

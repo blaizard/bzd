@@ -9,12 +9,20 @@ bzd_nodejs_library(
         "//apps/artifacts/plugins:__subpackages__",
     ],
     deps = [
+        ":expires",
         ":history",
         ":to_string",
         ":validation",
         "//apps/artifacts/plugins/nodes:key_mapping",
         "//nodejs/core:exception",
         "//nodejs/core:log",
+    ],
+)
+
+bzd_nodejs_library(
+    name = "expires",
+    srcs = [
+        "expires.mjs",
     ],
 )
 

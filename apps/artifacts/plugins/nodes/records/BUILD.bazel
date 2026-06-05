@@ -15,6 +15,7 @@ bzd_nodejs_library(
         "//nodejs/core:filesystem",
         "//nodejs/core:lock",
         "//nodejs/core:log",
+        "//nodejs/core/mock:filesystem",
         "//nodejs/core/statistics:provider",
     ],
 )

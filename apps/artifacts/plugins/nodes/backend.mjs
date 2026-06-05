@@ -578,19 +578,23 @@ export default class Plugin extends PluginBase {
 				{
 					tools: {
 						list_nodes: {
-							doc: "Get a list of all available nodes.",
+							description: "Get a list of all available nodes.",
 						},
 						get: {
-							doc: "Get data attached to a node.",
+							description: "Get data attached to a node.",
 							parameters: {
-								name: {
-									doc: "The exact name of the node as provided by 'list_nodes' to get the data for.",
-									type: "string",
+								type: "object",
+								properties: {
+									name: {
+										description: "The exact name of the node as provided by 'list_nodes' to get the data for.",
+										type: "string",
+									},
 								},
+								required: ["name"],
 							},
 						},
 						schema: {
-							doc: "Get the description and schema of the data available.",
+							description: "Get the description and schema of the data available.",
 						},
 					},
 				},
@@ -606,6 +610,10 @@ export default class Plugin extends PluginBase {
 								uids.push(uid);
 							}
 							return uids;
+						case "get":
+							const node = await this.nodes.get(args.name.trim());
+							const maybeData = await node.get({ key: [], children: 99 });
+							return maybeData.isEmpty() ? [] : maybeData.value();
 						case "schema":
 							return optionsSchema;
 						default:

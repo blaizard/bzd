@@ -131,6 +131,9 @@
         }
     ],
     "nodes.handlers": {
+        "/data/leases": {
+            "expires": 30000
+        },
         "/data/log": {
             "history": 100,
             "toString": "[{level}] [{name}] [{source}] {message}"
@@ -140,10 +143,10 @@
         "/@mcp/compute": {
             "tools": {
                 "get": {
-                    "doc": "Get current CPU, memory, network, etc. statistics for a specific node."
+                    "description": "Get current CPU, memory, network, etc. statistics for a specific node."
                 },
                 "list_nodes": {
-                    "doc": "Get a list of all available nodes."
+                    "description": "Get a list of all available compute nodes."
                 }
             }
         }

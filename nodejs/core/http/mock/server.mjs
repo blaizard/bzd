@@ -1,4 +1,4 @@
-import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
+import { ExceptionFactory, ExceptionPrecondition } from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 import Router from "#bzd/nodejs/core/router.mjs";
 import MockServerContext from "#bzd/nodejs/core/http/mock/server_context.mjs";
@@ -37,7 +37,15 @@ export default class MockHttpServer {
 		}
 
 		this.routers[methodLower].add(path, async (params, context) => {
-			await callback(context.withParams(params));
+			try {
+				await callback(context.withParams(params));
+			} catch (e) {
+				if (e instanceof ExceptionPrecondition) {
+					context.sendStatus(400, e.message);
+				} else {
+					throw e;
+				}
+			}
 		});
 	}
 
@@ -84,6 +92,15 @@ export default class MockHttpServer {
 				switch (key) {
 					case "data":
 						Exception.assertEqual(result.data, value);
+						break;
+					case "data_contains":
+						Exception.assertEqual(typeof result.data, "string", "Expected data to be a string.");
+						Exception.assert(
+							result.data.includes(value),
+							"Expected data to contain '{}', data: {}",
+							value,
+							result.data,
+						);
 						break;
 					case "status":
 						Exception.assertEqual(result.status, value);
