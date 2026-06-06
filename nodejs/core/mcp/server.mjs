@@ -98,7 +98,10 @@ export default class MCPServer {
 		this.options.channel.addRoute("OPTIONS", endpoint, (context) => {
 			context.setHeader("Access-Control-Allow-Origin", "*");
 			context.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-			context.setHeader("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization");
+			context.setHeader(
+				"Access-Control-Allow-Headers",
+				"Origin, Content-Type, Accept, Authorization, mcp-protocol-version",
+			);
 			context.sendStatus(200, "OK");
 		});
 
