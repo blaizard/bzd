@@ -179,6 +179,8 @@ export default class MCPServer {
 					};
 				}
 
+				context.setHeader("Access-Control-Allow-Origin", "*");
+				context.setHeader("Access-Control-Expose-Headers", "*");
 				context.setHeader("Content-Type", "application/json");
 				context.sendStatus(200, JSON.stringify(response));
 			},
