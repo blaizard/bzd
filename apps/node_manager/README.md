@@ -49,6 +49,14 @@ systemctl daemon-reload
 systemctl reset-failed
 ```
 
-## Run
+### Run
 
+```bash
 bazel run apps/node_manager:with_bootloader -- --bootloader-uid $(uname -n) $(uname -n)
+```
+
+## Proxy
+
+```bash
+bazel run apps/node_manager:proxy -- --proxy 8083 127.0.0.1:80
+```

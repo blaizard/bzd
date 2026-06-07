@@ -92,7 +92,7 @@ def commandWoLLease(
 	command: typing.List[str],
 	undefine: typing.Optional[typing.List[str]] = None,
 ) -> int:
-	commandWoLLeasePeriod(
+	leaseId = commandWoLLeasePeriod(
 		mac=mac,
 		broadcast=broadcast,
 		service=service,
@@ -107,6 +107,7 @@ def commandWoLLease(
 		server=server,
 		name=name,
 		ttl=ttl,
+		leaseId=leaseId,
 		undefine=undefine,
 		command=command,
 	)

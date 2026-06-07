@@ -11,14 +11,18 @@ from bzd.http.client import HttpClient
 
 
 @contextmanager
-def leaseHeartbeats(
-	server: str, leaseId: str, ttl: int, httpClient: typing.Any = HttpClient
+def leaseContext(
+	name: str, server: str, ttl: int, leaseId: typing.Optional[str] = None, httpClient: typing.Any = HttpClient
 ) -> typing.Generator[threading.Event, None, None]:
-	"""Run a heartbeat and release the workload when completed."""
+	"""Register a workload, run a heartbeat and release the workload when completed."""
 
 	host, port = getHostPort(server)
 	baseUrl = f"http://{host}:{port}"
 	stop = threading.Event()
+
+	if leaseId is None:
+		# Register the workload
+		leaseId = leasePeriod(baseUrl=baseUrl, name=name, ttl=ttl, httpClient=httpClient)
 
 	def heartbeatLoop() -> None:
 		consecutiveFailures = 0
@@ -56,18 +60,13 @@ def commandLease(
 	name: str,
 	ttl: int,
 	command: typing.List[str],
+	leaseId: typing.Optional[str] = None,
 	undefine: typing.Optional[typing.List[str]] = None,
 	httpClient: typing.Any = HttpClient,
 ) -> int:
 	"""Register a workload, run a heartbeat and release the workload when completed."""
 
-	host, port = getHostPort(server)
-	baseUrl = f"http://{host}:{port}"
-
-	# Register the workload
-	leaseId = leasePeriod(baseUrl=baseUrl, name=name, ttl=ttl, httpClient=httpClient)
-
-	with leaseHeartbeats(server=server, leaseId=leaseId, ttl=ttl, httpClient=httpClient) as stop:
+	with leaseContext(name=name, server=server, ttl=ttl, leaseId=leaseId, httpClient=httpClient) as stop:
 		env = os.environ.copy()
 		for name in undefine or []:
 			env.pop(name, None)
