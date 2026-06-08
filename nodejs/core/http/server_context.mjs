@@ -46,7 +46,11 @@ export class HttpServerContext {
 	/// Set the callback to handle file streams
 	async processForm(onFile) {
 		return new Promise((resolve, reject) => {
-			const busboy = Busboy({ headers: this.request.headers });
+			const busboy = Busboy({
+				headers: this.request.headers,
+				defCharset: "utf8",
+				defParamCharset: "utf8",
+			});
 			const processingTasks = [];
 			let inputs = {};
 			let inputSerialized = null;
