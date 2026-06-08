@@ -43,6 +43,8 @@ class WolLeaseManager:
 				await self.clientEvent.wait()
 				continue
 
+			print(f"{self.activeClients} client(s), leasing...")
+
 			try:
 				leaseId = commandWoLLeasePeriod(
 					mac=self.mac,
@@ -68,6 +70,8 @@ class WolLeaseManager:
 			except Exception as e:
 				print(f"Lease error: {e}", flush=True)
 				await asyncio.sleep(5)
+
+			print("Leasing completed.")
 
 	@contextmanager
 	def lease(self) -> typing.Generator[None, None, None]:
@@ -105,9 +109,6 @@ async def handleCLient(
 ) -> None:
 	"""Handle incoming connection and routes it to the correct target port."""
 
-	clientAddress = clientWriter.get_extra_info("peername")
-	print(f"New connection from {clientAddress} -> {targetHost}:{targetPort}")
-
 	with wolLeaseManager.lease():
 		try:
 			targetReader, targetWriter = await asyncio.open_connection(targetHost, targetPort)
@@ -120,8 +121,6 @@ async def handleCLient(
 		pipToTarget = asyncio.create_task(pipe(clientReader, targetWriter))
 		pipToClient = asyncio.create_task(pipe(targetReader, clientWriter))
 		await asyncio.gather(pipToTarget, pipToClient)
-
-		print(f"Connection closed for {clientAddress}")
 
 
 async def main(bind: str, mapping: typing.Dict[int, str], wolLeaseManager: WolLeaseManager) -> None:
