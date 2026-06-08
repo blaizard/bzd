@@ -1,3 +1,5 @@
+load("@rules_rust//rust:defs.bzl", "rust_library_group")
+
 alias(
     name = "main",
     actual = select({
@@ -7,4 +9,27 @@ alias(
         "@bzd_platforms//al_isa:esp32s3-xtensa_lx7": "//rust/targets/esp:main",
     }),
     visibility = ["//visibility:public"],
+)
+
+rust_library_group(
+    name = "embassy",
+    visibility = ["//visibility:public"],
+    deps = select({
+        "@bzd_platforms//al:linux": [
+            "//rust/targets/std:embassy",
+            "@crates//:embassy-executor",
+        ],
+        "@bzd_platforms//al:osx": [
+            "//rust/targets/std:embassy",
+            "@crates//:embassy-executor",
+        ],
+        "@bzd_platforms//al_isa:esp32-xtensa_lx6": [
+            "//rust/targets/esp:embassy",
+            "@bzd_espressif//hal/rust:embassy",
+        ],
+        "@bzd_platforms//al_isa:esp32s3-xtensa_lx7": [
+            "//rust/targets/esp:embassy",
+            "@bzd_espressif//hal/rust:embassy",
+        ],
+    }),
 )

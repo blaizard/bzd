@@ -25,14 +25,13 @@ rust_binary = macro(
     implementation = _rust_binary_impl,
 )
 
-def _rust_test_impl(name, visibility, crate_name, deps, tags, **kwargs):
+def _rust_test_impl(name, visibility, crate_name, deps, tags, target, **kwargs):
     rust_test_original(
         name = "{}.original".format(name),
         crate_name = crate_name or name,
         use_libtest_harness = False,
         tags = (tags or []) + ["manual"],
-        deps = (deps or []) + [
-            "//rust/targets:main",
+        deps = (deps or []) + target + [
             "//rust/libs/bzd_test",
         ],
         **kwargs
@@ -47,6 +46,7 @@ def _rust_test_impl(name, visibility, crate_name, deps, tags, **kwargs):
 rust_test = macro(
     inherit_attrs = rust_test_original,
     attrs = {
+        "target": attr.label_list(default = ["//rust/targets:main"]),
         "use_libtest_harness": None,
     },
     implementation = _rust_test_impl,

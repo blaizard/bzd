@@ -12,3 +12,15 @@ rust_library(
     ],
     alwayslink = True,
 )
+
+rust_library(
+    name = "embassy",
+    srcs = ["embassy.rs"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//rust/bzd",
+        "@bzd_espressif//hal/rust",
+        "@bzd_espressif//hal/rust:embassy",
+    ],
+    alwayslink = True,
+)

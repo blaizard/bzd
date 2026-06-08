@@ -183,6 +183,18 @@ crates.spec(
     package = "quote",
     version = "1.0",
 )
+crates.spec(
+    features = [
+        "arch-std",
+        "executor-thread",
+    ],
+    package = "embassy-executor",
+    version = "0.9.1",
+)
+crates.spec(
+    package = "static_cell",
+    version = "2.1.1",
+)
 use_repo(crates, "crates")
 
 # Register the default toolchain last to have the least priority.

@@ -29,7 +29,10 @@ crates_esp32.spec(
 )
 crates_esp32.spec(
     default_features = False,
-    features = ["esp32", "auto"],
+    features = [
+        "esp32",
+        "auto",
+    ],
     package = "esp-println",
     version = "0.16.1",
 )
@@ -37,6 +40,27 @@ crates_esp32.spec(
     features = ["esp32"],
     package = "esp-bootloader-esp-idf",
     version = "0.4.0",
+)
+crates_esp32.spec(
+    features = [
+        "embassy",
+        "esp32",
+    ],
+    package = "esp-rtos",
+    version = "0.2.0",
+)
+crates_esp32.spec(
+    package = "embassy-executor",
+    version = "0.9.1",
+)
+crates_esp32.spec(
+    features = ["generic-queue-8"],
+    package = "embassy-time",
+    version = "0.5.0",
+)
+crates_esp32.spec(
+    package = "static_cell",
+    version = "2.1.1",
 )
 crates_esp32.annotation(
     crate = "esp-sync",

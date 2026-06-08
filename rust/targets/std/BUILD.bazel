@@ -10,3 +10,15 @@ rust_library(
         "//rust/libs/std",
     ],
 )
+
+rust_library(
+    name = "embassy",
+    srcs = [
+        "embassy.rs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@crates//:embassy-executor",
+        "@crates//:static_cell",
+    ],
+)

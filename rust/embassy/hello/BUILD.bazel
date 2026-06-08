@@ -1,0 +1,16 @@
+load("@rules_rust//rust:defs.bzl", "rust_library")
+load("//rust:defs.bzl", "rust_test")
+
+rust_library(
+    name = "hello",
+    srcs = [
+        "lib.rs",
+    ],
+    deps = ["//rust/targets:embassy"],
+)
+
+rust_test(
+    name = "hello_test",
+    crate = ":hello",
+    target = ["//rust/targets:embassy"],
+)
