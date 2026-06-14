@@ -54,7 +54,7 @@ export default class Locks {
 					const status = await lock.getStatus();
 					if (status == LockFile.Status.expired) {
 						await lock.unlock(/*force*/ true);
-						Exception.unreachable("Dangling lock with status expired: '{}', removed.", name);
+						Log.warning("Dangling lock with status expired: '{}', removed.", name);
 					}
 				}
 			},
