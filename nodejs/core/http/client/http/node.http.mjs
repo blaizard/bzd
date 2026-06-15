@@ -12,12 +12,18 @@ const MAX_REDIRECTION = 3;
 function makeAbsoluteUrl(urlString, originalUrl) {
 	try {
 		// If it doesn't throw, it's absolute
-		new URL(urlString);
-		return urlString;
+		return new URL(urlString);
 	} catch (error) {
 		const url = new URL(originalUrl);
-		return new URL(urlString, url).toString();
+		return new URL(urlString, url);
 	}
+}
+
+function splitToUrlAndPath(url) {
+	return {
+		url: url.origin,
+		path: url.pathname + url.search + url.hash,
+	};
 }
 
 export default async function request(url, options) {
@@ -64,9 +70,16 @@ export default async function request(url, options) {
 
 					// Redirect
 					if ("location" in response.headers) {
-						const location = makeAbsoluteUrl(response.headers.location, url);
-						Log.debug("Redirecting to '{}'", location);
-						return request(location, options).then(resolve).catch(reject);
+						const location = splitToUrlAndPath(makeAbsoluteUrl(response.headers.location, url));
+						Log.debug("Redirecting to url={} path={}", location.url, location.path);
+						return request(
+							location.url,
+							Object.assign({}, options, {
+								path: location.path,
+							}),
+						)
+							.then(resolve)
+							.catch(reject);
 					}
 				}
 
