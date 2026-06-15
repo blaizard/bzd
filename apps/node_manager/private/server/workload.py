@@ -4,6 +4,7 @@ import dataclasses
 import threading
 
 from bzd.http.server import RESTServerContext
+from bzd.logging import Logger
 
 
 @dataclasses.dataclass
@@ -19,6 +20,7 @@ class Workload:
 
 	def __init__(
 		self,
+		logger: typing.Optional[Logger] = None,
 		defaultTerminationPeriodS: typing.Optional[float] = None,
 		terminationGracePeriodS: int = 300,
 		terminateFn: typing.Callable[[], None] = lambda: None,
@@ -32,6 +34,7 @@ class Workload:
 			clockFn: Time provider.
 		"""
 
+		self.logger = logger or Logger("workload")
 		self.terminationGracePeriodS_ = terminationGracePeriodS
 		self.leases_: typing.Dict[str, Lease] = {}
 		self.uidCounter_ = 0
@@ -51,7 +54,7 @@ class Workload:
 
 		self.terminateFn_()
 
-		print("Waking up from suspend.")
+		self.logger.info("Waking up from suspend.")
 		self.terminationTimestamp_ = None
 		self.uidCounter_ = 0
 		self.leases_ = {}

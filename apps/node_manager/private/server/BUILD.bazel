@@ -72,5 +72,6 @@ py_library(
     ],
     deps = [
         "@bzd_python//bzd/http:server",
+        "@bzd_python//bzd/logging",
     ],
 )

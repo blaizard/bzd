@@ -11,6 +11,7 @@ py_library(
     ],
     deps = [
         "//apps/node_manager/private:common",
+        "@bzd_python//bzd/logging",
     ],
 )
 
@@ -26,6 +27,7 @@ py_library(
     deps = [
         "//apps/node_manager/private:common",
         "@bzd_python//bzd/http:client",
+        "@bzd_python//bzd/logging",
     ],
 )
 
@@ -41,6 +43,7 @@ py_library(
     deps = [
         "//apps/node_manager/private:common",
         "@bzd_python//bzd/http:client",
+        "@bzd_python//bzd/logging",
     ],
 )
 
@@ -57,6 +60,7 @@ py_library(
         ":lease_period",
         "//apps/node_manager/private:common",
         "@bzd_python//bzd/http:client",
+        "@bzd_python//bzd/logging",
     ],
 )
 

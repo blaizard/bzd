@@ -6,5 +6,6 @@ py_test(
     deps = [
         "//apps/node_manager/private/client/command:lease",
         "@bzd_python//bzd/http:client_mock",
+        "@bzd_python//bzd/logging",
     ],
 )

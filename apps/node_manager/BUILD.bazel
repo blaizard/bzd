@@ -18,6 +18,8 @@ py_binary(
         "//apps/node_manager/private/client/command:shutdown",
         "//apps/node_manager/private/client/command:suspend",
         "//apps/node_manager/private/client/command:wake_on_lan",
+        "@bzd_python//bzd/logging",
+        "@bzd_python//bzd/logging/handler:stderr",
     ],
 )
 
@@ -33,6 +35,8 @@ py_binary(
         "//apps/node_manager/private/server:power",
         "//apps/node_manager/private/server:workload",
         "@bzd_python//bzd/http:server",
+        "@bzd_python//bzd/logging",
+        "@bzd_python//bzd/logging/handler:stderr",
         "@bzd_python//bzd/sync:singleton",
         "@bzd_python//bzd/utils:scheduler",
     ],
@@ -46,6 +50,8 @@ py_binary(
     deps = [
         ":client",
         "//apps/node_manager/private:common",
+        "@bzd_python//bzd/logging",
+        "@bzd_python//bzd/logging/handler:stderr",
     ],
 )
 

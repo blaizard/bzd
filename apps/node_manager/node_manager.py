@@ -5,6 +5,8 @@ import time
 import os
 import pathlib
 
+from bzd.logging import Logger
+from bzd.logging.handler.stderr import LoggerHandlerStderr
 from apps.node_manager.private.server.power import handlerSuspend, handlerShutdown
 from apps.node_manager.private.server.monitor import Monitor
 from apps.node_manager.private.server.config import Config
@@ -58,14 +60,16 @@ if __name__ == "__main__":
 
 	args = parser.parse_args()
 
+	logger = Logger("node_manager").handlers(LoggerHandlerStderr())
+
 	def terminateFn() -> None:
-		print("Suspending in 5s...")
+		logger.info("Suspending in 5s...")
 		time.sleep(5)
 		handlerSuspend()
 
 	# Instantiate the monitor.
 	config = Config(path=args.config)
-	workload = Workload(terminateFn=terminateFn, defaultTerminationPeriodS=args.default_termination_period)
+	workload = Workload(terminateFn=terminateFn, defaultTerminationPeriodS=args.default_termination_period, logger=logger)
 	monitor = Monitor(config=config, workload=workload if args.power else None)
 
 	if args.uid is None:
@@ -81,7 +85,7 @@ if __name__ == "__main__":
 	# Ensure only a single instance of this program is running at a time.
 	singleton = Singleton.makeFromName("node_manager")
 	if not singleton.lock():
-		print("Another instance of 'node_manager' is already running, aborting.")
+		logger.error("Another instance of 'node_manager' is already running, aborting.")
 		sys.exit(0)
 
 	node = Node(uid=args.uid, token=args.node_token)

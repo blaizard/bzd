@@ -51,6 +51,14 @@ systemctl reset-failed
 
 ### Run
 
+Print the metrics
+
+```bash
+bazel run apps/node_manager:with_bootloader
+```
+
+Publish the metrics
+
 ```bash
 bazel run apps/node_manager:with_bootloader -- --bootloader-uid $(uname -n) $(uname -n)
 ```
@@ -58,5 +66,5 @@ bazel run apps/node_manager:with_bootloader -- --bootloader-uid $(uname -n) $(un
 ## Proxy
 
 ```bash
-bazel run apps/node_manager:proxy -- --proxy 8083 127.0.0.1:80
+bazel run apps/node_manager:proxy -- --proxy 8083 "8.8.8.8:53" --server "0.0.0.0:9999" --mac "00:00:00:00:00:00"
 ```

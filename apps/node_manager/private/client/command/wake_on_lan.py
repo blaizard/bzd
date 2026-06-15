@@ -5,6 +5,7 @@ import time
 import typing
 
 from apps.node_manager.private.common import getHostPort
+from bzd.logging import Logger
 
 
 def checkMAC(mac: str) -> bool:
@@ -60,7 +61,9 @@ def checkConnection(host: str, port: int, timeoutS: int = 1) -> bool:
 		return True
 
 
-def commandWakeOnLan(mac: str, broadcast: str, service: str, wait: typing.List[str], timeout: int) -> None:
+def commandWakeOnLan(
+	mac: str, broadcast: str, service: str, wait: typing.List[str], timeout: int, logger: Logger
+) -> None:
 	"""Wake on LAN command."""
 
 	assert checkMAC(mac), f"Mac address '{mac}' should have the following format: XX:XX:XX:XX:XX:XX"
@@ -74,7 +77,7 @@ def commandWakeOnLan(mac: str, broadcast: str, service: str, wait: typing.List[s
 	# Wait for services to be ready.
 	for entry in wait:
 		host, port = getHostPort(entry)
-		print(f"Waiting for {host}:{port} to be ready...", flush=True)
+		logger.info(f"Waiting for {host}:{port} to be ready...")
 		connectionOpen = False
 		startTime = int(time.perf_counter())
 		for timeLimit in range(startTime, startTime + timeout, 5):

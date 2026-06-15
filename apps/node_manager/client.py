@@ -2,6 +2,8 @@ import argparse
 import sys
 import typing
 
+from bzd.logging import Logger
+from bzd.logging.handler.stderr import LoggerHandlerStderr
 from apps.node_manager.private.client.command.wake_on_lan import commandWakeOnLan
 from apps.node_manager.private.client.command.suspend import commandSuspend
 from apps.node_manager.private.client.command.shutdown import commandShutdown
@@ -60,22 +62,30 @@ def exceptionToString(exception: Exception) -> str:
 
 
 def commandWoLLeasePeriod(
-	mac: str, broadcast: str, service: str, wait: typing.List[str], timeout: int, server: str, name: str, ttl: int
+	mac: str,
+	broadcast: str,
+	service: str,
+	wait: typing.List[str],
+	timeout: int,
+	server: str,
+	name: str,
+	ttl: int,
+	logger: Logger,
 ) -> str:
 
 	for attempt in range(1, 4):
 		try:
 			leaseId = commandLeasePeriod(server=server, name=name, ttl=ttl)
-			print(f"Lease id={leaseId} secured for '{name}' for {ttl}s.", flush=True)
+			logger.info(f"Lease id={leaseId} secured for '{name}' for {ttl}s.")
 			return leaseId
 		except Exception as e:
-			print(exceptionToString(e), file=sys.stderr, flush=True)
+			logger.error(exceptionToString(e))
 
-		print(f"Lease attempt {attempt} for '{name}' failed. Sending WOL...", flush=True)
+		logger.info(f"Lease attempt {attempt} for '{name}' failed. Sending WOL...")
 		try:
-			commandWakeOnLan(mac=mac, broadcast=broadcast, service=service, wait=wait, timeout=timeout)
+			commandWakeOnLan(mac=mac, broadcast=broadcast, service=service, wait=wait, timeout=timeout, logger=logger)
 		except Exception as e:
-			print(exceptionToString(e), file=sys.stderr, flush=True)
+			logger.error(exceptionToString(e))
 
 	raise Exception(f"Error: Could not secure lease for '{name}' after 3 attempts.")
 
@@ -90,6 +100,7 @@ def commandWoLLease(
 	name: str,
 	ttl: int,
 	command: typing.List[str],
+	logger: Logger,
 	undefine: typing.Optional[typing.List[str]] = None,
 ) -> int:
 	leaseId = commandWoLLeasePeriod(
@@ -100,6 +111,7 @@ def commandWoLLease(
 		timeout=timeout,
 		server=server,
 		name=name,
+		logger=logger,
 		# WOl and lease for 60s.
 		ttl=60,
 	)
@@ -110,6 +122,7 @@ def commandWoLLease(
 		leaseId=leaseId,
 		undefine=undefine,
 		command=command,
+		logger=logger,
 	)
 
 
@@ -157,6 +170,8 @@ if __name__ == "__main__":
 
 	args = parser.parse_args()
 
+	logger = Logger("node_manager").handlers(LoggerHandlerStderr())
+
 	try:
 		if args.command == "wol":
 			commandWakeOnLan(
@@ -165,11 +180,12 @@ if __name__ == "__main__":
 				service=args.service,
 				wait=args.wait,
 				timeout=args.timeout,
+				logger=logger,
 			)
 		elif args.command == "suspend":
-			commandSuspend(server=args.server)
+			commandSuspend(server=args.server, logger=logger)
 		elif args.command == "shutdown":
-			commandShutdown(server=args.server)
+			commandShutdown(server=args.server, logger=logger)
 		elif args.command == "lease":
 			returnCode = commandLease(
 				server=args.server,
@@ -177,6 +193,7 @@ if __name__ == "__main__":
 				ttl=args.ttl,
 				undefine=args.undefine,
 				command=args.workload,
+				logger=logger,
 			)
 			sys.exit(returnCode)
 		elif args.command == "lease-period":
@@ -197,6 +214,7 @@ if __name__ == "__main__":
 				ttl=args.ttl,
 				undefine=args.undefine,
 				command=args.workload,
+				logger=logger,
 			)
 			sys.exit(returnCode)
 		elif args.command == "wol-lease-period":
@@ -209,9 +227,10 @@ if __name__ == "__main__":
 				server=args.server,
 				name=args.name,
 				ttl=args.ttl,
+				logger=logger,
 			)
 		else:
 			assert False, f"Unknown command: '{args.command}'."
 	except Exception as e:
-		print(exceptionToString(e), file=sys.stderr, flush=True)
+		logger.error(exceptionToString(e))
 		sys.exit(1)

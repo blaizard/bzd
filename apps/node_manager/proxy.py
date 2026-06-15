@@ -4,6 +4,8 @@ import functools
 import typing
 from contextlib import contextmanager
 
+from bzd.logging import Logger
+from bzd.logging.handler.stderr import LoggerHandlerStderr
 from apps.node_manager.private.common import getHostPort
 from apps.node_manager.client import ARGUMENTS, commandWoLLeasePeriod
 from apps.node_manager.private.client.command.lease import leaseContext
@@ -21,6 +23,7 @@ class WolLeaseManager:
 		name: str,
 		ttl: int,
 		gracePeriodS: int,
+		logger: Logger,
 	) -> None:
 		self.mac = mac
 		self.broadcast = broadcast
@@ -31,6 +34,7 @@ class WolLeaseManager:
 		self.name = name
 		self.ttl = ttl
 		self.gracePeriodS = gracePeriodS
+		self.logger = logger
 		self.activeClients = 0
 		self.clientEvent = asyncio.Event()
 
@@ -43,7 +47,7 @@ class WolLeaseManager:
 				await self.clientEvent.wait()
 				continue
 
-			print(f"{self.activeClients} client(s), leasing...")
+			self.logger.info(f"{self.activeClients} client(s), leasing...")
 
 			try:
 				leaseId = commandWoLLeasePeriod(
@@ -54,13 +58,15 @@ class WolLeaseManager:
 					timeout=self.timeout,
 					server=self.server,
 					name=self.name,
+					logger=self.logger,
 					# WoL and lease for 60s.
 					ttl=60,
 				)
-				with leaseContext(name=self.name, server=self.server, ttl=self.ttl, leaseId=leaseId) as stop:
+				with leaseContext(name=self.name, server=self.server, ttl=self.ttl, leaseId=leaseId, logger=self.logger) as stop:
 					while not stop.is_set():
 						await asyncio.sleep(1)
 						if self.activeClients == 0:
+							self.clientEvent.clear()
 							try:
 								await asyncio.wait_for(self.clientEvent.wait(), timeout=self.gracePeriodS)
 							except TimeoutError:
@@ -68,10 +74,10 @@ class WolLeaseManager:
 									break
 
 			except Exception as e:
-				print(f"Lease error: {e}", flush=True)
+				self.logger.error(f"Lease error: {e}")
 				await asyncio.sleep(5)
 
-			print("Leasing completed.")
+			self.logger.info("Leasing completed.")
 
 	@contextmanager
 	def lease(self) -> typing.Generator[None, None, None]:
@@ -112,8 +118,7 @@ async def handleCLient(
 	with wolLeaseManager.lease():
 		try:
 			targetReader, targetWriter = await asyncio.open_connection(targetHost, targetPort)
-		except Exception as e:
-			print(f"Failed to connect to target {targetHost}:{targetPort}: {e}")
+		except Exception:
 			clientWriter.close()
 			return
 
@@ -123,7 +128,7 @@ async def handleCLient(
 		await asyncio.gather(pipToTarget, pipToClient)
 
 
-async def main(bind: str, mapping: typing.Dict[int, str], wolLeaseManager: WolLeaseManager) -> None:
+async def main(bind: str, mapping: typing.Dict[int, str], wolLeaseManager: WolLeaseManager, logger: Logger) -> None:
 
 	servers = []
 
@@ -134,7 +139,7 @@ async def main(bind: str, mapping: typing.Dict[int, str], wolLeaseManager: WolLe
 		)
 		server = await asyncio.start_server(handler, bind, listenPort)
 		servers.append(server.serve_forever())
-		print(f"Proxy started, listening at {bind}:{listenPort} -> {targetHost}:{targetPort}")
+		logger.info(f"Proxy started, listening at {bind}:{listenPort} -> {targetHost}:{targetPort}")
 
 	await asyncio.gather(wolLeaseManager.process(), *servers)
 
@@ -163,6 +168,8 @@ if __name__ == "__main__":
 
 	args = parser.parse_args()
 
+	logger = Logger("node_manager").handlers(LoggerHandlerStderr())
+
 	mapping = {int(port): target for port, target in args.proxy}
 
 	wolLeaseManager = WolLeaseManager(
@@ -175,5 +182,6 @@ if __name__ == "__main__":
 		name=args.name,
 		ttl=args.ttl,
 		gracePeriodS=5,
+		logger=logger,
 	)
-	asyncio.run(main(bind=args.bind, mapping=mapping, wolLeaseManager=wolLeaseManager))
+	asyncio.run(main(bind=args.bind, mapping=mapping, wolLeaseManager=wolLeaseManager, logger=logger))

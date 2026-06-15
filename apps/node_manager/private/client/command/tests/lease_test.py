@@ -5,6 +5,7 @@ import typing
 
 from apps.node_manager.private.client.command.lease import commandLease
 from bzd.http.client_mock import HttpClientMock
+from bzd.logging import Logger
 
 
 class TestLeaseCommand(unittest.TestCase):
@@ -29,6 +30,7 @@ class TestLeaseCommand(unittest.TestCase):
 				server="localhost:1234",
 				name="test-workload",
 				ttl=60,
+				logger=Logger("test"),
 				command=["echo", "hello"],
 				httpClient=httpClient,
 			)
@@ -65,6 +67,7 @@ class TestLeaseCommand(unittest.TestCase):
 				server="localhost:1234",
 				name="test-workload",
 				ttl=1,  # Small ttl to trigger wait
+				logger=Logger("test"),
 				command=["echo", "hello"],
 				httpClient=httpClient,
 			)
