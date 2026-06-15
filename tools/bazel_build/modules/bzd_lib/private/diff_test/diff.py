@@ -6,15 +6,16 @@ import sys
 from private.diff_test.compare_binary import compare as compareBinary
 from private.diff_test.compare_json import compare as compareJson
 from private.diff_test.compare_text import compare as compareText
+from private.diff_test.compare_lines import compare as compareLines
 
-compareFunctions = {"binary": compareBinary, "json": compareJson, "text": compareText}
+compareFunctions = {"binary": compareBinary, "json": compareJson, "text": compareText, "lines": compareLines}
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Test the equality of 2 files.")
 	parser.add_argument(
 		"--format",
 		default="binary",
-		choices=["binary", "json", "text"],
+		choices=compareFunctions.keys(),
 		help="The format of the files to be checked for equality.",
 	)
 	parser.add_argument(

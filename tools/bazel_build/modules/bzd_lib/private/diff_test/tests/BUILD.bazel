@@ -1,0 +1,29 @@
+load("//private/diff_test:diff_test.bzl", "bzd_diff_test")
+
+bzd_diff_test(
+    name = "binary",
+    file1 = ":file1.txt",
+    file2 = ":file2.txt",
+    format = "binary",
+)
+
+bzd_diff_test(
+    name = "json",
+    file1 = ":file1.json",
+    file2 = ":file2.json",
+    format = "json",
+)
+
+bzd_diff_test(
+    name = "lines",
+    file1 = ":file1.txt",
+    file2 = ":file2.txt",
+    format = "lines",
+)
+
+bzd_diff_test(
+    name = "text",
+    file1 = ":file1.txt",
+    file2 = ":file2.txt",
+    format = "text",
+)

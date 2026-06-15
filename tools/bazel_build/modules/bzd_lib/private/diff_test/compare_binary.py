@@ -2,6 +2,8 @@ import pathlib
 import typing
 import dataclasses
 
+from private.diff_test.common import getShortestDistinctPaths, maybeColorizeLine
+
 # Take a value of 0 if there is no diff, or a running number that corresponds to the
 # match in both contents.
 IsDiff = int
@@ -66,11 +68,11 @@ class VisitorPrint:
 		self.width = width
 
 	@staticmethod
-	def getColorAsString(isDiff: IsDiff) -> str:
+	def maybeGetColorAsString(isDiff: IsDiff, color: bool) -> typing.Optional[str]:
 		colors = ["\033[0;31m", "\033[0;33m", "\033[0;34m", "\033[0;35m"]
-		if isDiff > 0:
+		if color and isDiff > 0:
 			return colors[(isDiff - 1) % len(colors)]
-		return ""
+		return None
 
 	def toHexAsString(self, diff: DiffContent, padding: typing.Optional[int] = None) -> str:
 		"""Convert a diff into its hexadecimal representation.
@@ -83,10 +85,10 @@ class VisitorPrint:
 		        The string representing the diff.
 		"""
 
-		if self.color:
-			content = ["{}{:02x}\033[0m".format(VisitorPrint.getColorAsString(isDiff), byte) for byte, isDiff in diff]
-		else:
-			content = ["{:02x}".format(byte) for byte, _ in diff]
+		content = [
+			maybeColorizeLine("{:02x}".format(byte), VisitorPrint.maybeGetColorAsString(isDiff, self.color))
+			for byte, isDiff in diff
+		]
 		if padding is not None:
 			content += ["  "] * max(0, padding - len(diff))
 		return " ".join(content)
@@ -102,16 +104,13 @@ class VisitorPrint:
 		        The string representing the diff.
 		"""
 
-		if self.color:
-			content = [
-				"{}{}\033[0m".format(
-					VisitorPrint.getColorAsString(isDiff),
-					chr(byte) if byte in range(32, 127) else ".",
-				)
-				for byte, isDiff in diffContent
-			]
-		else:
-			content = ["{}".format(chr(byte) if byte in range(32, 127) else ".") for byte, _ in diffContent]
+		content = [
+			maybeColorizeLine(
+				chr(byte) if byte in range(32, 127) else ".",
+				VisitorPrint.maybeGetColorAsString(isDiff, self.color),
+			)
+			for byte, isDiff in diffContent
+		]
 		if padding is not None:
 			content += [" "] * max(0, padding - len(diffContent))
 		return "".join(content)
@@ -338,17 +337,6 @@ class Diff:
 				else:
 					index1 += 1
 		return lcs
-
-
-def getShortestDistinctPaths(path1: pathlib.Path, path2: pathlib.Path) -> typing.Tuple[pathlib.Path, pathlib.Path]:
-	shortest1 = []
-	shortest2 = []
-	for p1, p2 in zip(path1.parts[::-1], path2.parts[::-1]):
-		shortest1.append(p1)
-		shortest2.append(p2)
-		if p1 != p2:
-			break
-	return pathlib.Path(*shortest1[::-1]), pathlib.Path(*shortest2[::-1])
 
 
 def compare(file1: pathlib.Path, file2: pathlib.Path, color: bool) -> bool:
