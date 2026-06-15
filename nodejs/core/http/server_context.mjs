@@ -108,6 +108,12 @@ export class HttpServerContext {
 		});
 	}
 
+	/// Get a dictionary representing all headers.
+	/// Duplicated headers are represented as array.
+	getHeaders() {
+		return Object.assign({}, this.request.headers);
+	}
+
 	/// Get the header
 	getHeader(name, defaultValue = null, allowMultiple = false) {
 		const header = this.request.headers[name] ?? null;
@@ -190,14 +196,20 @@ export class HttpServerContext {
 		this.response.end();
 	}
 
-	async sendStream(data) {
-		if (typeof data == "string") {
-			this.response.sendFile(data);
-		} else if ("pipe" in data) {
-			await pipeline(data, this.response);
-		} else {
-			Exception.unreachable("{} {}: callback result is not of a supported format.", method, endpoint);
-		}
+	async sendFile(data) {
+		return new Promise((resolve, reject) => {
+			this.response.sendFile(data, (err) => {
+				if (err) {
+					reject(err);
+				} else {
+					resolve();
+				}
+			});
+		});
+	}
+
+	async sendStream(data, ...transforms) {
+		await pipeline(data, ...transforms, this.response);
 	}
 
 	send(data = null) {

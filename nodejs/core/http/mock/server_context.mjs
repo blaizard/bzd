@@ -56,7 +56,7 @@ export default class MockServerContext {
 		return name in this.request.headers;
 	}
 
-	_getHeaders() {
+	getHeaders() {
 		const headers = Object.assign(
 			{
 				host: this.getHost(),
@@ -70,7 +70,7 @@ export default class MockServerContext {
 	}
 
 	getHeader(name, defaultValue = null, allowMultiple = false) {
-		const headers = this._getHeaders();
+		const headers = this.getHeaders();
 		const header = headers[name] ?? null;
 		if (header === null) {
 			return defaultValue;
@@ -111,7 +111,7 @@ export default class MockServerContext {
 		switch (this.request.type) {
 			case "raw":
 				let content = this.request.method + " " + this.request.path + " HTTP/1.1\r\n";
-				for (const [header, valueOrValues] of Object.entries(this._getHeaders())) {
+				for (const [header, valueOrValues] of Object.entries(this.getHeaders())) {
 					for (const value of Array.isArray(valueOrValues) ? valueOrValues : [valueOrValues]) {
 						content += header + ": " + value + "\r\n";
 					}
@@ -159,15 +159,13 @@ export default class MockServerContext {
 		this.send(data);
 	}
 
-	async sendStream(data) {
-		if (typeof data == "string") {
-			this.send(data);
-		} else if ("pipe" in data) {
-			const buffer = await toString(data);
-			this.send(buffer);
-		} else {
-			Exception.unreachable("{} {}: callback result is not of a supported format.", method, endpoint);
-		}
+	async sendFile(data) {
+		this.send(data);
+	}
+
+	async sendStream(data, ...transforms) {
+		const buffer = await toString(data, ...transforms);
+		this.send(buffer);
 	}
 
 	send(data = null) {

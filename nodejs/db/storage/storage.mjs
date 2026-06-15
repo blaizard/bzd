@@ -91,6 +91,21 @@ export class Storage extends AsyncInitialize {
 		return this._deleteImpl(Array.isArray(path) ? path : [path]);
 	}
 
+	/// Try to delete a file or directory from a path, do nothing if the file does not exists.
+	///
+	/// \return true if the file was deleted, false if the file did not exists.
+	async tryDelete(path) {
+		try {
+			await this.delete(path);
+			return true;
+		} catch (e) {
+			if (e instanceof FileNotFoundError) {
+				return false;
+			}
+			throw e;
+		}
+	}
+
 	/// Copy a file to the given destination.
 	async copy(source, destination, mkdir = false) {
 		const readStream = await this.read(source);

@@ -210,8 +210,10 @@ export default class RestServer extends Base {
 							context.sendJson(result);
 							break;
 						case "stream":
-						case "file":
 							await context.sendStream(result);
+							break;
+						case "file":
+							await context.sendFile(result);
 							break;
 						case "raw":
 							context.send(result);

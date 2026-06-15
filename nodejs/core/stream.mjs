@@ -1,4 +1,4 @@
-import { Readable } from "stream";
+import { Readable, PassThrough } from "stream";
 import { pipeline } from "stream/promises";
 
 /// Convert a read stream into a buffer.
@@ -15,9 +15,9 @@ export async function toBuffer(readStream) {
 }
 
 /// Convert a read stream into a string.
-export async function toString(readStream) {
+export async function toString(readStream, ...transforms) {
 	const chunks = [];
-	await pipeline(readStream, async (source) => {
+	await pipeline(readStream, ...transforms, async (source) => {
 		for await (const chunk of source) {
 			chunks.push(chunk);
 		}
@@ -54,4 +54,20 @@ export async function* streamChunks(stream) {
 	} finally {
 		reader.releaseLock();
 	}
+}
+
+/// Duplicates a readable stream into two independent PassThrough streams containing the same data.
+export function teeReadStream(readStream) {
+	const stream1 = new PassThrough();
+	const stream2 = new PassThrough();
+
+	readStream.pipe(stream1);
+	readStream.pipe(stream2);
+
+	readStream.on("error", (error) => {
+		stream1.destroy(error);
+		stream2.destroy(error);
+	});
+
+	return [stream1, stream2];
 }

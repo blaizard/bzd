@@ -414,5 +414,9 @@ function resetErrorHandler(reject) {
 // eslint-disable-next-line no-unused-vars
 function middlewareErrorHandler(e, req, res, next) {
 	Exception.print("Receive error; {}", e);
-	res.status(500).send(e.message);
+	try {
+		res.status(500).send(e.message);
+	} catch (error) {
+		Log.error("While reporting error to client: {}", error.message);
+	}
 }
