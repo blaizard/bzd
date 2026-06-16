@@ -6,7 +6,7 @@ bzd_nodejs_library(
         "cache_entry.mjs",
     ],
     visibility = [
-        "//apps/artifacts/plugins/extensions/caching_proxy:__subpackages__",
+        "//apps/artifacts/plugins/extension/caching_proxy:__subpackages__",
     ],
 )
 

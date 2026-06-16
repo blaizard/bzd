@@ -5,7 +5,7 @@ bzd_nodejs_test(
     srcs = ["cache_entry_test.mjs"],
     main = "cache_entry_test.mjs",
     deps = [
-        "//apps/artifacts/plugins/extensions/caching_proxy:cache_entry",
+        "//apps/artifacts/plugins/extension/caching_proxy:cache_entry",
         "//nodejs/core:exception",
     ],
 )

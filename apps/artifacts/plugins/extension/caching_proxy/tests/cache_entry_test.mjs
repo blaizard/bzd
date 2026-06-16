@@ -3,7 +3,7 @@ import { buffer } from "stream/consumers";
 import {
 	buildCacheEntryStream,
 	CacheEntryReader,
-} from "#bzd/apps/artifacts/plugins/extensions/caching_proxy/cache_entry.mjs";
+} from "#bzd/apps/artifacts/plugins/extension/caching_proxy/cache_entry.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 
 const Exception = ExceptionFactory("test", "cache_entry");
