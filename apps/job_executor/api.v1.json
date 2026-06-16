@@ -11,7 +11,7 @@
                     }
                 },
                 "response": {
-                    "type": "file"
+                    "type": "stream"
                 }
             }
         },

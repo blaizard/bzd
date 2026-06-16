@@ -31,7 +31,7 @@ def compare(file1: pathlib.Path, file2: pathlib.Path, color: bool) -> bool:
 
 	for line in diff:
 		prefix = line[0] if line else ""
-		color = colors.get(prefix, None)
-		print(maybeColorizeLine(line.rstrip("\n"), color))
+		maybeColorStr = colors.get(prefix, None) if color else None
+		print(maybeColorizeLine(line.rstrip("\n"), maybeColorStr))
 
 	return False

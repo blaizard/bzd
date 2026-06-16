@@ -1,8 +1,9 @@
 import Fs from "fs";
 
 import ExceptionFactory from "../../core/exception.mjs";
-import { fromChunk, toBuffer } from "../../core/stream.mjs";
+import { fromChunk, toBuffer, toString } from "../../core/stream.mjs";
 import { AsyncInitialize, CollectionPaging } from "../utils.mjs";
+import Permissions from "./permissions.mjs";
 
 const Exception = ExceptionFactory("db", "storage");
 
@@ -38,7 +39,7 @@ export class Storage extends AsyncInitialize {
 	}
 
 	/// List all files under this path
-	async listAll(path, maxOrPaging = 20, includeMetadata = false) {
+	async listAll(path, maxOrPaging = 100, includeMetadata = false) {
 		let all = [];
 		const pathAsArray = Array.isArray(path) ? path : [path];
 		for await (const [_, data] of CollectionPaging.makeIterator(async (maxOrPaging) => {
@@ -47,6 +48,19 @@ export class Storage extends AsyncInitialize {
 			all.push(data);
 		}
 		return all;
+	}
+
+	/// Print all files/directories at a given path
+	async *walk(path, maxOrPaging = 100, includeMetadata = false) {
+		const pathAsArray = Array.isArray(path) ? path : [path];
+		for await (const [_, entry] of CollectionPaging.makeIterator(async (maxOrPaging) => {
+			return await this._listImpl(pathAsArray, maxOrPaging, /*includeMetadata*/ true);
+		}, maxOrPaging)) {
+			yield [path, includeMetadata ? entry : entry.name];
+			if (Permissions.makeFromEntry(entry).isList()) {
+				yield* this.walk([...path, entry.name], maxOrPaging, includeMetadata);
+			}
+		}
 	}
 
 	/// Return a file read stream from a specific key
@@ -58,6 +72,12 @@ export class Storage extends AsyncInitialize {
 	async readToBuffer(path) {
 		const readStream = await this.read(path);
 		return await toBuffer(readStream);
+	}
+
+	/// Return the content of a file as a buffer.
+	async readToString(path) {
+		const readStream = await this.read(path);
+		return await toString(readStream);
 	}
 
 	/// Store a file to a specific path

@@ -112,6 +112,17 @@
         }
     },
     "volumes": {
+        "cache": {
+            "cachingProxy": {
+                "maxStorageSize": 1073741824
+            },
+            "storage": {
+                "path": "./cache",
+                "type": "disk",
+                "write": true
+            },
+            "type": "storage"
+        },
         "disk": {
             "storage": {
                 "options": {

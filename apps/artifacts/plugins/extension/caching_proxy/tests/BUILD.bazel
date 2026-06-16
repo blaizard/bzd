@@ -1,0 +1,11 @@
+load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_test")
+
+bzd_nodejs_test(
+    name = "cache_entry",
+    srcs = ["cache_entry_test.mjs"],
+    main = "cache_entry_test.mjs",
+    deps = [
+        "//apps/artifacts/plugins/extensions/caching_proxy:cache_entry",
+        "//nodejs/core:exception",
+    ],
+)

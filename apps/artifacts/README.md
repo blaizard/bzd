@@ -17,3 +17,9 @@ bazel run //apps/docker_manager -- --docker-socket /run/user/1000/docker.sock --
 ```bash
 bazel run //apps/artifacts/backend --config=dev -- --test
 ```
+
+### Caching Proxy
+
+```bash
+wget http://127.0.0.1:8081/x/cache/@caching-proxy/https/github.com/bazelbuild/bazel/releases/download/9.1.1/bazel-9.1.1-dist.zip
+```

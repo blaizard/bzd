@@ -3,6 +3,7 @@ import PluginBase from "#bzd/apps/artifacts/backend/plugin.mjs";
 import extensionRelease from "#bzd/apps/artifacts/plugins/extension/release/release.mjs";
 import extensionUpload from "#bzd/apps/artifacts/plugins/extension/upload/upload.mjs";
 import extensionWebdav from "#bzd/apps/artifacts/plugins/extension/webdav/webdav.mjs";
+import extensionCachingProxy from "#bzd/apps/artifacts/plugins/extension/caching_proxy/caching_proxy.mjs";
 
 /// The storage plugin support the following features:
 ///
@@ -14,7 +15,12 @@ import extensionWebdav from "#bzd/apps/artifacts/plugins/extension/webdav/webdav
 ///   Create a webdav server to access the files.
 export default class Plugin extends PluginBase {
 	constructor(volume, options, provider, endpoints) {
-		super(volume, options, provider, endpoints, [extensionRelease, extensionUpload, extensionWebdav]);
+		super(volume, options, provider, endpoints, [
+			extensionRelease,
+			extensionUpload,
+			extensionWebdav,
+			extensionCachingProxy,
+		]);
 		provider.addStartProcess(volume + ".constructor", async () => {
 			const storage = await makeFromConfig(options.storage);
 			this.setStorage(storage);

@@ -24,7 +24,7 @@
                     }
                 },
                 "response": {
-                    "type": "file"
+                    "type": "stream"
                 }
             },
             "post": {
