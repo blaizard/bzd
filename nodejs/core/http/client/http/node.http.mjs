@@ -1,6 +1,8 @@
 import { request as requestHttp } from "http";
 import { request as requestHttps } from "https";
+import { pipeline } from "stream";
 
+import { toString } from "#bzd/nodejs/core/stream.mjs";
 import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
 import LogFactory from "#bzd/nodejs/core/log.mjs";
 
@@ -26,7 +28,7 @@ function splitToUrlAndPath(url) {
 	};
 }
 
-export default async function request(url, options) {
+async function requestResponse(url, options) {
 	return new Promise((resolve, reject) => {
 		// Check the transport type, by default it is HTTP.
 		let requestHandler = requestHttp;
@@ -46,9 +48,6 @@ export default async function request(url, options) {
 			requestHandler = requestHttps;
 		}
 
-		// Doing this will help to have a clean stack trace
-		const exceptionTimeout = new Exception("Request timeout (" + options.timeoutMs + " ms)");
-
 		// Create the request
 		let req = requestHandler(
 			url,
@@ -59,55 +58,16 @@ export default async function request(url, options) {
 				timeout: options.timeoutMs,
 			},
 			(response) => {
-				// Handle redirection
-				if (response.statusCode >= 300 && response.statusCode < 400) {
-					// Limit the number of redirections
-					options.redirection || (options.redirection = 0);
-					if (options.redirection >= MAX_REDIRECTION) {
-						return reject(new Exception("Too many redirection ({}) when requesting '{}'", options.redirection, url));
-					}
-					++options.redirection;
-
-					// Redirect
-					if ("location" in response.headers) {
-						const location = splitToUrlAndPath(makeAbsoluteUrl(response.headers.location, url));
-						Log.debug("Redirecting to url={} path={}", location.url, location.path);
-						return request(
-							location.url,
-							Object.assign({}, options, {
-								path: location.path,
-							}),
-						)
-							.then(resolve)
-							.catch(reject);
-					}
-				}
-
-				let result = {
-					data: null,
-					headers: response.headers,
-					code: response.statusCode,
-				};
-
-				if (options.expect == "stream") {
-					result.data = response;
-					resolve(result);
-				} else {
-					let data = "";
-					response.on("data", (chunk) => {
-						data += chunk;
-					});
-					response.on("end", () => {
-						result.data = data;
-						resolve(result);
-					});
-				}
+				req.setTimeout(0);
+				req.removeAllListeners("timeout");
+				req.removeAllListeners("error");
+				resolve(response);
 			},
 		);
 
 		req.on("timeout", () => {
 			req.destroy();
-			reject(exceptionTimeout);
+			reject(new Exception("Request for " + url + options.path + " timeout (" + options.timeoutMs + " ms)"));
 		});
 
 		req.on("error", (e) => {
@@ -121,11 +81,57 @@ export default async function request(url, options) {
 		}
 		// A read stream
 		else if (typeof options.data == "object" && typeof options.data.pipe == "function") {
-			options.data.pipe(req, { end: true });
+			pipeline(options.data, req, (err) => {
+				if (err) {
+					reject(err);
+				}
+			});
 		} else if (typeof options.data == "undefined") {
 			req.end();
 		} else {
 			reject(new Exception("Unsupported data format: {:j}", options.data));
 		}
 	});
+}
+
+export default async function request(url, options) {
+	let redirection = 0;
+	let response = null;
+	let updatedOptions = { ...options };
+
+	while (true) {
+		response = await requestResponse(url, updatedOptions);
+		if (response.statusCode < 300 || response.statusCode >= 400) {
+			break;
+		}
+
+		// Limit the number of redirections
+		if (redirection >= MAX_REDIRECTION) {
+			throw new Exception("Too many redirection ({}) when requesting '{}'", redirection, url);
+		}
+		++redirection;
+
+		// Redirect
+		if ("location" in response.headers) {
+			const location = splitToUrlAndPath(makeAbsoluteUrl(response.headers.location, url));
+			Log.debug("Redirecting to url={} path={}", location.url, location.path);
+
+			url = location.url;
+			updatedOptions.path = location.path;
+			response.destroy();
+		}
+	}
+
+	let result = {
+		data: null,
+		headers: response.headers,
+		code: response.statusCode,
+	};
+
+	if (options.expect == "stream") {
+		result.data = response;
+	} else {
+		result.data = await toString(response);
+	}
+	return result;
 }

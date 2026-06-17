@@ -21,5 +21,5 @@ bazel run //apps/artifacts/backend --config=dev -- --test
 ### Caching Proxy
 
 ```bash
-wget http://127.0.0.1:8081/x/cache/@caching-proxy/https/github.com/bazelbuild/bazel/releases/download/9.1.1/bazel-9.1.1-dist.zip
+curl http://127.0.0.1:8081/x/cache/@caching-proxy/https/github.com/bazelbuild/bazel/releases/download/9.1.1/bazel-9.1.1-dist.zip -o /dev/null
 ```

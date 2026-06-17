@@ -20,8 +20,6 @@ const HEADERS_CACHE_KEY = ["accept-encoding", "accept", "accept-language"];
 // Headers to remove from the request.
 const HEADERS_REQUEST_BLACKLIST = new Set([
 	"host",
-	"connection",
-	"keep-alive",
 	"proxy-authenticate",
 	"proxy-authorization",
 	"trailer",
@@ -81,10 +79,13 @@ async function fetchFile(context, url, headers) {
 			return !HEADERS_REQUEST_BLACKLIST.has(headerName);
 		}),
 	);
+	headersRequest["host"] = new URL(url).host;
+	headersRequest["user-agent"] = "bzd/proxy 1.0";
 	const [readStream, headersResponse, code] = await HttpClient.get(url, {
 		headers: headersRequest,
 		expect: "stream",
 		includeAll: true,
+		throwOnResponseError: false,
 	});
 	const metadata = {
 		headers: Object.fromEntries(
@@ -148,43 +149,51 @@ export default function extensionCachingProxy(plugin, options, provider, endpoin
 			// If the file does not exists.
 			if (e instanceof FileNotFoundError) {
 				const [metadata, readStream] = await fetchFile(context, url, headersRequest);
-
-				// Fetch a local copy and save it to the storage.
-				const maybeLock = await plugin.locks.tryLock(pathList.join("/"));
-				if (maybeLock) {
-					Log.info("Fetching {}", url);
-					const temporaryPath = pathList.with(-1, "." + pathList.at(-1) + ".temp");
-					const [streamSend, streamWrite] = teeReadStream(readStream);
-					const promiseSend = context.sendStream(streamSend);
-					const promiseWrite = storage.write(
-						temporaryPath,
-						buildCacheEntryStream(metadata, streamWrite),
-						/*mkdir*/ true,
-					);
-					try {
-						await Promise.all([promiseSend, promiseWrite]);
-						await storage.move(temporaryPath, pathList);
-					} catch (e) {
-						// Destroy all the pipes first.
-						readStream.destroy();
-						streamSend.destroy();
-						streamWrite.destroy();
-						// Prevent Unhandled Promise Rejections.
-						await Promise.all([promiseSend.catch(() => {}), promiseWrite.catch(() => {})]);
-						// Only after cleanup the the files and report the error.
-						await storage.tryDelete(temporaryPath);
-						await storage.tryDelete(pathList);
-						sendErrorFromException(context, url, e);
-					} finally {
-						await maybeLock.unlock();
-					}
-				}
-				// If the file is already being fetched.
-				else {
+				if (metadata.status < 200 || metadata.status >= 300) {
+					Log.warning("Fetching {} failed with HTTP code {}, ignoring.", url, metadata.status);
 					try {
 						await context.sendStream(readStream);
 					} catch (e) {
 						sendErrorFromException(context, url, e);
+					}
+				} else {
+					// Fetch a local copy and save it to the storage.
+					const maybeLock = await plugin.locks.tryLock(pathList.join("/"));
+					if (maybeLock) {
+						Log.info("Fetching {} {}", url, metadata.status);
+						const temporaryPath = pathList.with(-1, "." + pathList.at(-1) + ".temp");
+						const [streamSend, streamWrite] = teeReadStream(readStream);
+						const promiseSend = context.sendStream(streamSend);
+						const promiseWrite = storage.write(
+							temporaryPath,
+							buildCacheEntryStream(metadata, streamWrite),
+							/*mkdir*/ true,
+						);
+						try {
+							await Promise.all([promiseSend, promiseWrite]);
+							await storage.move(temporaryPath, pathList);
+						} catch (e) {
+							// Destroy all the pipes first.
+							readStream.destroy();
+							streamSend.destroy();
+							streamWrite.destroy();
+							// Prevent Unhandled Promise Rejections.
+							await Promise.all([promiseSend.catch(() => {}), promiseWrite.catch(() => {})]);
+							// Only after cleanup the the files and report the error.
+							await storage.tryDelete(temporaryPath);
+							await storage.tryDelete(pathList);
+							sendErrorFromException(context, url, e);
+						} finally {
+							await maybeLock.unlock();
+						}
+					}
+					// If the file is already being fetched.
+					else {
+						try {
+							await context.sendStream(readStream);
+						} catch (e) {
+							sendErrorFromException(context, url, e);
+						}
 					}
 				}
 			} else {
