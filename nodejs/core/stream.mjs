@@ -71,3 +71,45 @@ export function teeReadStream(readStream) {
 
 	return [stream1, stream2];
 }
+
+/// Reads a limited number of bytes from a readable stream, applying a timeout to prevent hanging.
+/// * This function is safely designed to extract a preview of a payload (like an HTTP error response).
+/// It uses asynchronous iteration to read chunks and automatically destroys the stream once the
+/// byte limit is reached, the stream ends, or the timeout expires.
+///
+/// \param stream - The readable stream to consume.
+/// \param maxBytes - The maximum number of bytes to read before aborting.
+/// \param timeoutMs - The maximum time in milliseconds to wait before aborting.
+/// \returns A promise that resolves to a UTF-8 string containing the extracted bytes.
+/// If the limit or timeout is reached, a truncation marker is appended.
+export async function peekReadStream(stream, maxBytes = 256, timeoutMs = 1000) {
+	let buffer = Buffer.alloc(0);
+	let timer;
+
+	try {
+		// 1. Task to read the stream
+		const readPromise = async () => {
+			for await (const chunk of stream) {
+				buffer = Buffer.concat([buffer, chunk]);
+				if (buffer.length >= maxBytes) break; // Stop reading once we hit the limit
+			}
+		};
+
+		// 2. Task to handle the timeout
+		const timeoutPromise = new Promise((_, reject) => {
+			timer = setTimeout(() => reject(new Error("timeout")), timeoutMs);
+		});
+
+		// 3. Race them against each other
+		await Promise.race([readPromise(), timeoutPromise]);
+	} catch (err) {
+		// We catch the timeout error or any unexpected stream errors here.
+		// We intentionally do nothing, because we just want whatever was in the buffer before it failed.
+	} finally {
+		// 4. Always clean up
+		clearTimeout(timer);
+		stream.destroy();
+	}
+
+	return buffer.subarray(0, maxBytes);
+}

@@ -4,6 +4,7 @@ import LogFactory from "../log.mjs";
 import { deepMerge } from "#bzd/nodejs/utils/object.mjs";
 import httpBackend from "#bzd/nodejs/core/http/client/http/backend.mjs";
 import websocketBackend from "#bzd/nodejs/core/http/client/websocket/backend.mjs";
+import { peekReadStream } from "#bzd/nodejs/core/stream.mjs";
 
 const Exception = ExceptionFactory("http", "client");
 const Log = LogFactory("http", "client");
@@ -154,13 +155,19 @@ export class HttpClient {
 		});
 
 		if (options.throwOnResponseError && (result.code < 200 || result.code > 299)) {
+			let dataPreview = result.data;
+			// This has 2 roles, print a readable message, but also consume the stream so that
+			// the TCP socket does not remains open and the program doesn't hang.
+			if (options.expect == "stream") {
+				dataPreview = (await peekReadStream(result.data, 1024, 1000)).toString();
+			}
 			throw new HttpClientException(
 				result.code,
-				result.data,
+				dataPreview,
 				"Request to '{}' responded with: {}: {}",
 				url,
 				result.code,
-				result.data,
+				dataPreview,
 			);
 		}
 

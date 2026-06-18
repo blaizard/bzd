@@ -116,13 +116,22 @@ export default async function request(url, options) {
 			const location = splitToUrlAndPath(makeAbsoluteUrl(response.headers.location, url));
 			Log.debug("Redirecting to url={} path={}", location.url, location.path);
 
+			// If the domain change remove some headers.
+			if (url != location.url && updatedOptions.headers) {
+				updatedOptions.headers = Object.fromEntries(
+					Object.entries(updatedOptions.headers).filter(([key, _]) => {
+						return !(key.toLowerCase() in { host: true });
+					}),
+				);
+			}
+
 			url = location.url;
 			updatedOptions.path = location.path;
 			response.destroy();
 		}
 	}
 
-	let result = {
+	const result = {
 		data: null,
 		headers: response.headers,
 		code: response.statusCode,

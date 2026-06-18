@@ -1,0 +1,15 @@
+load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_test")
+
+bzd_nodejs_test(
+    name = "client",
+    srcs = [
+        "client_test.mjs",
+    ],
+    main = "client_test.mjs",
+    tags = ["manual"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//nodejs/core:exception",
+        "//nodejs/core/http:client",
+    ],
+)
