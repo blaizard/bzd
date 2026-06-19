@@ -21,7 +21,7 @@ Build and Push the image.
 # Build
 docker build tools/ci/runner/opencode --no-cache -t docker.blaizard.com/tools/ci/runner/opencode:latest
 # Run locally
-docker run -it --rm docker.blaizard.com/tools/ci/runner/opencode:latest /bin/bash
+docker run -it --rm -v .:/workspace --workdir /workspace docker.blaizard.com/tools/ci/runner/opencode:latest /bin/bash
 # Push
 docker push docker.blaizard.com/tools/ci/runner/opencode:latest
 ```

@@ -184,6 +184,8 @@ class FeatureOpenCode(Feature):
 		return [
 			"RUN sudo apt update && sudo apt install -y nodejs npm",
 			"RUN sudo npm install -g opencode-ai@latest",
+			"RUN sudo npm install -g @playwright/cli@latest",
+			"RUN playwright-cli install-browser chrome",
 		]
 
 	@property
