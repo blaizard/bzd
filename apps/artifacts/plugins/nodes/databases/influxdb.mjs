@@ -253,7 +253,7 @@ export default class DatabaseInfluxDB extends Database {
 					timestampNanoseconds,
 				);
 				if (timestamp <= timestampMin) {
-					Log.warning(
+					Log.debug(
 						"Skipping record [{}, ..., {}], record is too old for the retention policy ({}s).",
 						uid,
 						timestampNanoseconds,
