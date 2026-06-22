@@ -118,6 +118,25 @@ async function readGlobalMetadata(storage) {
 	}
 }
 
+async function syncGlobalMetadata(storage, metadataUpdate) {
+	let keys = Object.keys(metadataUpdate);
+	const nbEntries = keys.length;
+	if (nbEntries > 0) {
+		await plugin.locks.lock(PATH_GLOBAL_METADATA, async () => {
+			const storage = plugin.getStorage();
+			const metadata = await readGlobalMetadata(storage);
+			while (keys.length > 0) {
+				const path = keys.pop();
+				metadata[path] = metadataUpdate[path];
+				delete metadataUpdate[path];
+			}
+			const serializedMetadata = JSON.stringify(metadata);
+			await storage.writeFromChunk([PATH_GLOBAL_METADATA], serializedMetadata);
+		});
+	}
+	return nbEntries;
+}
+
 export default function extensionCachingProxy(plugin, options, provider, endpoints) {
 	if (!("cachingProxy" in options)) {
 		return;
@@ -218,22 +237,70 @@ export default function extensionCachingProxy(plugin, options, provider, endpoin
 					if (!Permissions.makeFromEntry(entry).isList()) {
 						current[[...path, entry.name].join("/")] = entry.size;
 					}
+					// TODO: delete orphan leaf directories.
 				}
 				const totalSize = Object.values(current).reduce((sum, value) => sum + value, 0);
+				let stats = {
+					originalTotalSize: totalSize,
+					orphanFilesDeleted: 0,
+					orphanMetadataDeleted: 0,
+					filesDeleted: 0,
+				};
 
 				// If it needs some cleanup.
 				if (totalSize > maxStorageSize) {
+					// Make sure the metadata is in-sync with the actual.
+					await syncGlobalMetadata(storage, globalMetadataUpdate);
 					await plugin.locks.lock(PATH_GLOBAL_METADATA, async () => {
 						const metadata = await readGlobalMetadata(storage);
-						// TODO: implement cleanup.
-						// Start with the entries that are in 'current' but not in 'metadata'.
-						// Continue with the entries the oldest (from 'metadata').
+
+						// Phase 1: delete orphan files not tracked in metadata.
+						for (const path of Object.keys(current)) {
+							if (!(path in metadata)) {
+								await storage.tryDelete(path.split("/"));
+								delete current[path];
+								++stats.orphanFilesDeleted;
+							}
+						}
+
+						// Remove stale metadata entries for files that no longer exist on disk.
+						for (const path of Object.keys(metadata)) {
+							if (!(path in current)) {
+								delete metadata[path];
+								++stats.orphanMetadataDeleted;
+							}
+						}
+
+						// Phase 2: evict oldest entries until under budget.
+						let remainingSize = Object.values(current).reduce((sum, value) => sum + value, 0);
+						const sortedPaths = Object.entries(metadata)
+							.sort((a, b) => a[1] - b[1])
+							.map(([path]) => path);
+						for (const path of sortedPaths) {
+							if (remainingSize <= maxStorageSize) {
+								break;
+							}
+							if (path in current) {
+								remainingSize -= current[path];
+								await storage.tryDelete(path.split("/"));
+								delete metadata[path];
+								delete current[path];
+								++stats.filesDeleted;
+							}
+						}
+
+						// Persist cleaned metadata.
+						const serializedMetadata = JSON.stringify(metadata);
+						await storage.writeFromChunk([PATH_GLOBAL_METADATA], serializedMetadata);
 					});
 				}
 
-				return {
-					totalSize: totalSize,
-				};
+				return Object.assign(
+					{
+						totalSize: Object.values(current).reduce((sum, value) => sum + value, 0),
+					},
+					stats,
+				);
 			},
 			{
 				periodS: 3600,
@@ -244,20 +311,7 @@ export default function extensionCachingProxy(plugin, options, provider, endpoin
 	provider.addTimeTriggeredProcess(
 		"cache.update-metadata",
 		async () => {
-			const nbEntries = Object.keys(globalMetadataUpdate).length;
-			if (nbEntries > 0) {
-				await plugin.locks.lock(PATH_GLOBAL_METADATA, async () => {
-					const storage = plugin.getStorage();
-					const metadata = await readGlobalMetadata(storage);
-					for (const [path, timestamp] of Object.entries(globalMetadataUpdate)) {
-						metadata[path] = timestamp;
-					}
-					const serializedMetadata = JSON.stringify(metadata);
-					await storage.writeFromChunk([PATH_GLOBAL_METADATA], serializedMetadata);
-				});
-				globalMetadataUpdate = {};
-			}
-			return nbEntries;
+			return await syncGlobalMetadata();
 		},
 		{
 			periodS: 60,

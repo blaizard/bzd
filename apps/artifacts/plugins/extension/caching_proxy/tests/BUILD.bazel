@@ -9,3 +9,14 @@ bzd_nodejs_test(
         "//nodejs/core:exception",
     ],
 )
+
+bzd_nodejs_test(
+    name = "garbage_collect",
+    srcs = ["garbage_collect_test.mjs"],
+    main = "garbage_collect_test.mjs",
+    deps = [
+        "//apps/artifacts/backend:plugin_tester",
+        "//apps/artifacts/plugins/storage:backend",
+        "//nodejs/core:exception",
+    ],
+)
