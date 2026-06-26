@@ -126,8 +126,8 @@ class TreeBuilder:
 	def __init__(self) -> None:
 		self.mtree: typing.Optional[Mtree] = None
 		self.entries: typing.Dict[pathlib.Path, str] = {}
-		self.files: typing.Dict[pathlib.Path, PathCollection] = {}
-		self.directories: typing.Dict[pathlib.Path, PathCollection] = {}
+		self.files: typing.Dict[typing.Union[typing.Tuple[int, int], pathlib.Path], PathCollection] = {}
+		self.directories: typing.Dict[typing.Union[typing.Tuple[int, int], pathlib.Path], PathCollection] = {}
 		self.links: typing.Dict[pathlib.Path, pathlib.Path] = {}
 
 	def _addEntry(self, path: pathlib.Path, data: typing.Any) -> None:
@@ -139,14 +139,12 @@ class TreeBuilder:
 
 	def addFile(self, path: pathlib.Path) -> None:
 		assert self.mtree is None, "Mtree already generated, cannot add new entry."
-		actual = path.resolve()
-		self.files.setdefault(actual, PathCollection()).add(path)
+		self.files.setdefault(self._fileKey(path), PathCollection()).add(path)
 		self._addEntry(path, "file")
 
 	def addDirectory(self, path: pathlib.Path) -> None:
 		assert self.mtree is None, "Mtree already generated, cannot add new entry."
-		actual = path.resolve()
-		self.directories.setdefault(actual, PathCollection()).add(path)
+		self.files.setdefault(self._fileKey(path), PathCollection()).add(path)
 		self._addEntry(path, "directory")
 
 	def addLink(self, path: pathlib.Path, target: pathlib.Path) -> None:
@@ -159,6 +157,16 @@ class TreeBuilder:
 	def addAbsoluteLink(self, path: pathlib.Path, targetPath: pathlib.Path) -> None:
 		target = self._linkFromPath(path, targetPath)
 		self.addLink(path, target)
+
+	@staticmethod
+	def _fileKey(path: pathlib.Path) -> typing.Union[typing.Tuple[int, int], pathlib.Path]:
+		"""Return a hashable key that uniquely identifies the underlying file."""
+
+		stat = path.stat()
+		# When st_ino == 0, inodes are not meaningful (for FAT/exFAT for example).
+		if stat.st_ino == 0:
+			return path.resolve()
+		return (stat.st_dev, stat.st_ino)
 
 	@staticmethod
 	def _linkFromPath(path: pathlib.Path, targetPath: pathlib.Path) -> pathlib.Path:
@@ -197,17 +205,17 @@ class TreeBuilder:
 		"""Generate the mtree content, this is a deterministic representation of the file system structure."""
 
 		# Set the directory entries, this ensure that parent directories are created before their content.
-		for actual, collection in self.directories.items():
+		for collection in self.directories.values():
 			path, symlinks = collection.identifyPathAndSymlinks()
 
 			if mtree.addDirectory(path):
-				for directoryPaths, filePaths, linkPaths in self._listDirectory(actual):
+				for directoryPaths, filePaths, linkPaths in self._listDirectory(path):
 					for relative in directoryPaths:
 						mtree.addDirectory(path / relative)
 					for relative in filePaths:
 						self.addFile(path / relative)
 					for relative in linkPaths:
-						target = (actual / relative).readlink()
+						target = (path / relative).readlink()
 						if target.is_absolute():
 							self.addFile(path / relative)
 						else:
@@ -218,7 +226,7 @@ class TreeBuilder:
 				mtree.addLink(symlink, target)
 
 		# Set the file entries.
-		for actual, collection in self.files.items():
+		for collection in self.files.values():
 			path, symlinks = collection.identifyPathAndSymlinks()
 			mtree.addFile(path)
 			for symlink in symlinks:
