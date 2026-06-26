@@ -144,7 +144,7 @@ class TreeBuilder:
 
 	def addDirectory(self, path: pathlib.Path) -> None:
 		assert self.mtree is None, "Mtree already generated, cannot add new entry."
-		self.files.setdefault(self._fileKey(path), PathCollection()).add(path)
+		self.directories.setdefault(self._fileKey(path), PathCollection()).add(path)
 		self._addEntry(path, "directory")
 
 	def addLink(self, path: pathlib.Path, target: pathlib.Path) -> None:
