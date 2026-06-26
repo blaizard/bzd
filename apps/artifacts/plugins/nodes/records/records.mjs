@@ -171,7 +171,7 @@ export default class Records {
 			size -= entry.size;
 		}
 
-		storage.statistics.set("size", size);
+		storage.statistics.size("size", size);
 		storage.statistics.set("files", storage.records.length);
 
 		return entry;

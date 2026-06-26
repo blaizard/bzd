@@ -29,13 +29,9 @@
 					<div class="bzd-statistics-card" :class="'bzd-statistics-type-' + item.type">
 						<div class="bzd-statistics-title">{{ item.name }}</div>
 						<div class="bzd-statistics-badge">{{ item.type }}</div>
-						<div class="bzd-statistics-value">{{ formatMetric(item.metric, item.path) }}</div>
-						<div v-if="getDetails(item.metric, item.path).length" class="bzd-statistics-details">
-							<div
-								v-for="detail in getDetails(item.metric, item.path)"
-								:key="detail.label"
-								class="bzd-statistics-detail"
-							>
+						<div class="bzd-statistics-value">{{ formatMetric(item.metric) }}</div>
+						<div v-if="getDetails(item.metric).length" class="bzd-statistics-details">
+							<div v-for="detail in getDetails(item.metric)" :key="detail.label" class="bzd-statistics-detail">
 								<span class="bzd-statistics-detail-label">{{ detail.label }}:</span>
 								<span class="bzd-statistics-detail-value">{{ detail.value }}</span>
 							</div>
@@ -100,7 +96,7 @@
 						if (!node) {
 							node = { name: segment, key: segments.slice(0, i + 1).join(".") };
 							if (isLeaf) {
-								Object.assign(node, { metric: item.metric, type: item.type, path: item.path });
+								Object.assign(node, { metric: item.metric, type: item.type });
 							} else {
 								node.children = [];
 							}
@@ -137,7 +133,6 @@
 								depth: depth,
 								metric: node.metric,
 								type: node.type,
-								path: node.path,
 							});
 						}
 					}
@@ -189,7 +184,7 @@
 				if (value === null || typeof value !== "object" || Array.isArray(value)) {
 					return false;
 				}
-				const metricKeys = ["value", "sum", "rate", "duration", "rateAvg", "count", "max", "min", "avg"];
+				const metricKeys = ["value", "sum", "size", "rate", "duration", "rateAvg", "count", "max", "min", "avg"];
 				const keys = Object.keys(value);
 				return (
 					keys.length > 0 &&
@@ -198,31 +193,17 @@
 				);
 			},
 			detectMetricType(metric) {
-				if ("rate" in metric) {
-					return "rate";
-				}
-				if ("duration" in metric) {
-					return "time";
-				}
-				if ("value" in metric || "sum" in metric) {
-					return "value";
-				}
+				if ("rate" in metric) return "rate";
+				if ("duration" in metric) return "time";
+				if ("size" in metric) return "size";
+				if ("sum" in metric) return "sum";
+				if ("value" in metric) return "value";
 				return "unknown";
-			},
-			detectUnit(path) {
-				const name = path[path.length - 1].toLowerCase();
-				if (name.includes("size") || name.includes("bytes")) {
-					return "bytes";
-				}
-				if (name.includes("time") || name.includes("duration") || name.includes("latency")) {
-					return "time";
-				}
-				return null;
 			},
 			formatNumber(value) {
 				return parseFloat(value ?? 0).toFixed(2);
 			},
-			formatValue(key, value, { type, unit } = {}) {
+			formatValue(key, value, { type } = {}) {
 				if (key === "rate" || key === "rateAvg") {
 					return this.formatNumber(value) + "/s";
 				}
@@ -232,17 +213,21 @@
 				if (key === "count") {
 					return this.formatNumber(value);
 				}
-				if (unit && (key === "value" || key === "sum" || key === "max" || key === "min" || key === "avg")) {
-					if (unit === "bytes") {
+				if (type === "size") {
+					const sizeKeys = ["size", "max", "min", "avg"];
+					if (sizeKeys.includes(key)) {
 						return bytesToString(value);
 					}
-					if (unit === "time") {
+				}
+				if (type === "time") {
+					const timeKeys = ["duration", "max", "min", "avg"];
+					if (timeKeys.includes(key)) {
 						return timeMsToString(value);
 					}
 				}
 				return this.formatNumber(value);
 			},
-			formatMetric(metric, path) {
+			formatMetric(metric) {
 				const type = this.detectMetricType(metric);
 				if (type === "rate") {
 					return this.formatValue("rate", metric.rate, { type });
@@ -250,31 +235,34 @@
 				if (type === "time") {
 					return this.formatValue("duration", metric.duration, { type });
 				}
+				if (type === "size") {
+					return this.formatValue("size", metric.size, { type });
+				}
+				if (type === "sum") {
+					return this.formatValue("sum", metric.sum, { type });
+				}
 				if (type === "value") {
-					const primaryKey = "sum" in metric ? "sum" : "value";
-					const unit = this.detectUnit(path);
-					return this.formatValue(primaryKey, metric[primaryKey], { type, unit });
+					return this.formatValue("value", metric.value, { type });
 				}
 				// Unknown type: show a summary of all fields
 				return Object.entries(metric)
 					.map(([key, value]) => key + "=" + this.formatValue(key, value))
 					.join(", ");
 			},
-			getDetails(metric, path) {
+			getDetails(metric) {
 				const details = [];
 				const type = this.detectMetricType(metric);
-				const unit = type === "value" ? this.detectUnit(path) : null;
 
-				// Keys already shown as the primary value in the card header
 				const primaryKeys =
 					{
 						rate: ["rate"],
 						time: ["duration"],
-						value: ["value", "sum"],
+						size: ["size"],
+						sum: ["sum"],
+						value: ["value"],
 						unknown: [],
 					}[type] || [];
 
-				// Display priority: max, min, avg, count first, then everything else alphabetically
 				const priority = ["max", "min", "avg", "count"];
 				const sortedKeys = Object.keys(metric).sort((a, b) => {
 					const ia = priority.indexOf(a);
@@ -291,7 +279,7 @@
 					}
 					details.push({
 						label: key,
-						value: this.formatValue(key, metric[key], { type, unit }),
+						value: this.formatValue(key, metric[key], { type }),
 					});
 				}
 				return details;
@@ -442,6 +430,14 @@
 			}
 
 			&.bzd-statistics-type-value {
+				border-left-color: config.$bzdGraphColorGreen;
+			}
+
+			&.bzd-statistics-type-size {
+				border-left-color: config.$bzdGraphColorGreen;
+			}
+
+			&.bzd-statistics-type-sum {
 				border-left-color: config.$bzdGraphColorGreen;
 			}
 

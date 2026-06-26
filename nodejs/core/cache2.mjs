@@ -222,8 +222,8 @@ export default class Cache2 {
 		data.size += sizeDiff;
 		this.size += sizeDiff;
 
-		this.statistics.set("collection-" + collection, data.size);
-		this.statistics.set("all", this.size);
+		this.statistics.size("collection-" + collection, data.size);
+		this.statistics.size("all", this.size);
 
 		if (this.trigger && this.size > this.options.maxSize) {
 			this.trigger.trigger();
@@ -368,7 +368,7 @@ export default class Cache2 {
 					evictedSize += entry.size;
 				}
 
-				this.statistics.set("collection-" + collectionName, data.size);
+				this.statistics.size("collection-" + collectionName, data.size);
 			}
 
 			this.statistics.set("evicted", evictedCount);

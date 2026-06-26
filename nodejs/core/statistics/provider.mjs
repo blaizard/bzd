@@ -102,10 +102,16 @@ export default class Provider {
 		this._updateData("value", this.data[name], value);
 	}
 
+	/// Set a size point to the existing points.
+	size(name, value) {
+		this.data[name] ??= this._initData("size", 0);
+		this._updateData("size", this.data[name], value);
+	}
+
 	/// Add a value point to the existing points.
 	sum(name, value, initial = 0) {
 		this.data[name] ??= this._initData("sum", initial);
-		this._updateData("sum", this.data[name], this.data[name].value + value);
+		this._updateData("sum", this.data[name], this.data[name].sum + value);
 	}
 
 	/// Calculate the rate of a point.
