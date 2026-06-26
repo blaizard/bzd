@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
 
-./sandbox.py -p agent1 --prefix opencode "$@"
+AGENT_NUM=1
+if [[ "$1" =~ ^[0-9]+$ ]]; then
+    AGENT_NUM=$1
+    shift
+fi
 
+echo -ne "\033]0;Agent $AGENT_NUM\007"
+./sandbox.py -p "agent${AGENT_NUM}" --prefix "opencode${AGENT_NUM}" "$@"
