@@ -311,7 +311,8 @@ export default function extensionCachingProxy(plugin, options, provider, endpoin
 	provider.addTimeTriggeredProcess(
 		"cache.update-metadata",
 		async () => {
-			return await syncGlobalMetadata();
+			const storage = plugin.getStorage();
+			return await syncGlobalMetadata(storage, globalMetadataUpdate);
 		},
 		{
 			periodS: 60,
