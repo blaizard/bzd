@@ -203,86 +203,39 @@
 			formatNumber(value) {
 				return parseFloat(value ?? 0).toFixed(2);
 			},
-			formatValue(key, value, { type } = {}) {
-				if (key === "rate" || key === "rateAvg") {
-					return this.formatNumber(value) + "/s";
-				}
-				if (key === "duration") {
-					return timeMsToString(value);
-				}
-				if (key === "count") {
-					return this.formatNumber(value);
-				}
-				if (type === "size") {
-					const sizeKeys = ["size", "max", "min", "avg"];
-					if (sizeKeys.includes(key)) {
-						return bytesToString(value);
-					}
-				}
-				if (type === "time") {
-					const timeKeys = ["duration", "max", "min", "avg"];
-					if (timeKeys.includes(key)) {
-						return timeMsToString(value);
-					}
-				}
-				return this.formatNumber(value);
-			},
 			formatMetric(metric) {
 				const type = this.detectMetricType(metric);
-				if (type === "rate") {
-					return this.formatValue("rate", metric.rate, { type });
-				}
-				if (type === "time") {
-					return this.formatValue("duration", metric.duration, { type });
-				}
-				if (type === "size") {
-					return this.formatValue("size", metric.size, { type });
-				}
-				if (type === "sum") {
-					return this.formatValue("sum", metric.sum, { type });
-				}
-				if (type === "value") {
-					return this.formatValue("value", metric.value, { type });
-				}
+				if (type === "rate") return this.formatNumber(metric.rate) + "/s";
+				if (type === "time") return timeMsToString(metric.duration);
+				if (type === "size") return bytesToString(metric.size);
+				if (type === "sum") return this.formatNumber(metric.sum);
+				if (type === "value") return this.formatNumber(metric.value);
 				// Unknown type: show a summary of all fields
 				return Object.entries(metric)
-					.map(([key, value]) => key + "=" + this.formatValue(key, value))
+					.map(([key, value]) => key + "=" + this.formatNumber(value))
 					.join(", ");
 			},
 			getDetails(metric) {
-				const details = [];
 				const type = this.detectMetricType(metric);
-
 				const primaryKeys =
-					{
-						rate: ["rate"],
-						time: ["duration"],
-						size: ["size"],
-						sum: ["sum"],
-						value: ["value"],
-						unknown: [],
-					}[type] || [];
+					{ rate: ["rate"], time: ["duration"], size: ["size"], sum: ["sum"], value: ["value"] }[type] || [];
+				const unit = type === "size" ? "bytes" : type === "time" ? "time" : null;
 
-				const priority = ["max", "min", "avg", "count"];
-				const sortedKeys = Object.keys(metric).sort((a, b) => {
-					const ia = priority.indexOf(a);
-					const ib = priority.indexOf(b);
-					if (ia !== -1 && ib !== -1) return ia - ib;
-					if (ia !== -1) return -1;
-					if (ib !== -1) return 1;
-					return a.localeCompare(b);
-				});
-
-				for (const key of sortedKeys) {
-					if (primaryKeys.includes(key)) {
-						continue;
-					}
-					details.push({
+				return Object.entries(metric)
+					.filter(([key]) => !primaryKeys.includes(key))
+					.map(([key, value]) => ({
 						label: key,
-						value: this.formatValue(key, metric[key], { type }),
-					});
-				}
-				return details;
+						value:
+							key === "count"
+								? this.formatNumber(value)
+								: key === "rateAvg"
+									? this.formatNumber(value) + "/s"
+									: unit === "bytes"
+										? bytesToString(value)
+										: unit === "time"
+											? timeMsToString(value)
+											: this.formatNumber(value),
+					}));
 			},
 			buildMetrics(obj, uid, path = []) {
 				const metrics = [];
