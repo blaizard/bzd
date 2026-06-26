@@ -342,35 +342,42 @@ export default class HttpServer {
 		const endpoint = new HttpEndpoint(uri);
 		let callbackList = [middlewareErrorHandler];
 
+		const statisticsName = type.toLowerCase() + "-" + uri;
+		const measureStatistics = async (callback) => {
+			this.statistics.rate("rate-" + statisticsName);
+			await this.statistics.timeit("time-" + statisticsName, callback);
+		};
 		callbackList.unshift(async function (request, response) {
-			// Create the context.
-			const context = new HttpServerContext(request, response);
-			// Override the params.
-			// This is needed because Express apply a urldecode operation to the params which is not
-			// wanted with variable arguments. Because we need to differentiate between / and %2F.
-			const match = endpoint.match(request.path);
-			Exception.assert(
-				match,
-				"There must be a match with the path ({}) and its regular expression ({}).",
-				request.path,
-				endpoint.toRegexp(),
-			);
-			request.params = match;
+			await measureStatistics(async () => {
+				// Create the context.
+				const context = new HttpServerContext(request, response);
+				// Override the params.
+				// This is needed because Express apply a urldecode operation to the params which is not
+				// wanted with variable arguments. Because we need to differentiate between / and %2F.
+				const match = endpoint.match(request.path);
+				Exception.assert(
+					match,
+					"There must be a match with the path ({}) and its regular expression ({}).",
+					request.path,
+					endpoint.toRegexp(),
+				);
+				request.params = match;
 
-			try {
-				await callback.call(this, context);
-			} catch (e) {
-				if (e instanceof HttpError) {
-					e.send(context);
-				} else if (e instanceof ExceptionPrecondition) {
-					response.status(400).send(e.message);
-				} else if (options.exceptionGuard) {
-					Exception.print("Exception Guard; {}", Exception.fromError(e));
-					response.status(500).send(e.message);
-				} else {
-					throw e;
+				try {
+					await callback.call(this, context);
+				} catch (e) {
+					if (e instanceof HttpError) {
+						e.send(context);
+					} else if (e instanceof ExceptionPrecondition) {
+						response.status(400).send(e.message);
+					} else if (options.exceptionGuard) {
+						Exception.print("Exception Guard; {}", Exception.fromError(e));
+						response.status(500).send(e.message);
+					} else {
+						throw e;
+					}
 				}
-			}
+			});
 		});
 
 		if (options.type.indexOf("json") != -1) {

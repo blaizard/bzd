@@ -232,7 +232,7 @@ export default class RestServer extends Base {
 					// The formatting string is important to ensure that error message is not
 					// considered as a formatting string.
 					Exception.print("{}", Exception.fromError(e));
-					Log.error("Context for '{}' {}: {:j}", method, this.getEndpoint(endpoint), context.debug);
+					Log.error("Context for '{}' {}: {:?.1024}", method, this.getEndpoint(endpoint), context.debug);
 					context.sendStatus(500, e.message);
 				}
 			}

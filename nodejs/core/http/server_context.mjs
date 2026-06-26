@@ -209,7 +209,16 @@ export class HttpServerContext {
 	}
 
 	async sendStream(data, ...transforms) {
-		await pipeline(data, ...transforms, this.response);
+		try {
+			await pipeline(data, ...transforms, this.response);
+		} catch (e) {
+			if (e.code === "ERR_STREAM_PREMATURE_CLOSE") {
+				// Client disconnected before the stream completed.
+				// This is expected behavior, not a server error.
+				return;
+			}
+			throw e;
+		}
 	}
 
 	send(data = null) {
