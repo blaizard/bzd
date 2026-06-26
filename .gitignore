@@ -51,8 +51,11 @@ esp-idf/
 /dist/
 
 # Rust
+.ruff_cache/
 rust-project.json
 
-# Opencode
+# Agent-related
 opencode.json
 session-ses_*
+.playwright/
+.playwright-cli/
