@@ -1,3 +1,80 @@
+/// Dump the given object as a string for observability purposes.
+///
+/// Unlike JSON.stringiy, it handles very large object, by printing only the first `maxSize` bytes.
+function toDumpString(object, maxSize = 1000) {
+	const iterableToString = (iterable, sizeLeft, start, end) => {
+		let result = start;
+		let first = true;
+		for (const subItem of iterable) {
+			result += first ? "" : ", ";
+			result += itemToString(subItem, sizeLeft - result.length);
+			if (result.length >= sizeLeft) {
+				return result;
+			}
+			first = false;
+		}
+		return result + end;
+	};
+
+	const dictionaryToString = (dictionary, sizeLeft, start, end) => {
+		let result = start;
+		let first = true;
+		for (const [key, value] of Object.entries(dictionary)) {
+			result += first ? "" : ", ";
+			result += itemToString(key, sizeLeft - result.length) + ": ";
+			result += itemToString(value, sizeLeft - result.length);
+			if (result.length >= sizeLeft) {
+				return result;
+			}
+			first = false;
+		}
+		return result + end;
+	};
+
+	const itemToString = (item, sizeLeft) => {
+		if (sizeLeft <= 0) {
+			return "";
+		}
+		switch (typeof item) {
+			case "object":
+				if (item === null) {
+					return "null";
+				}
+				if (Array.isArray(item)) {
+					return iterableToString(item, sizeLeft, "[", "]");
+				}
+				if (item instanceof Set) {
+					return iterableToString(item, sizeLeft, "Set(", ")");
+				}
+				if (item.constructor == Object) {
+					return dictionaryToString(item, sizeLeft, "{", "}");
+				}
+				return "??";
+			case "boolean":
+				return item ? "true" : "false";
+			case "number":
+				return item.toString();
+			case "bigint":
+				return "<bigint>";
+			case "string":
+				return '"' + item.substring(0, sizeLeft) + '"';
+			case "symbol":
+				return "<symbol>";
+			case "function":
+				return "<function>";
+			case "undefined":
+			default:
+				return "??";
+		}
+	};
+
+	const string = itemToString(object, maxSize);
+	if (string.length > maxSize) {
+		return string.substring(0, maxSize) + "[...]";
+	}
+	return string;
+}
+
 /// Format a string using python format syntax.
 /// @param {*} str
 /// @param  {...any} args
@@ -31,11 +108,15 @@ export default function (str, ...args) {
 			value = args[format.index];
 		}
 
-		switch (format.metadata || "") {
+		switch (format.metadata[0]) {
 			case "j":
-				// Handle Set, otherwise they will be rendered as '{}'.
-				return JSON.stringify(value, (_, value) => (value instanceof Set ? [...value] : value));
-			case "":
+			case "?":
+				let maxSize = 1000;
+				if ((format.metadata[1] ?? "").startsWith(".")) {
+					maxSize = parseInt(format.metadata.substring(2));
+				}
+				return toDumpString(value, maxSize);
+			case undefined:
 				return String(value);
 			default:
 				// Round the float with a specific precision.

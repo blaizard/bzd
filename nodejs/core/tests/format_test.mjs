@@ -59,4 +59,23 @@ describe("Format", () => {
 			}, "Too few arguments");
 		});
 	});
+
+	describe("Dump", () => {
+		it("Dictionary", () => {
+			let text = Format("{:?}", {
+				hello: "Hello",
+			});
+			Exception.assertEqual(text, '{"hello": "Hello"}');
+		});
+		it("List", () => {
+			let text = Format("{:?}", {
+				hello: [0, 1, 2],
+			});
+			Exception.assertEqual(text, '{"hello": [0, 1, 2]}');
+		});
+		it("MaxSize", () => {
+			let text = Format("{:?.5}", "thisisastring");
+			Exception.assertEqual(text, '"this[...]');
+		});
+	});
 });
