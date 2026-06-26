@@ -65,6 +65,8 @@ compatibility: opencode
 ./tools/bazel test //apps/...
 ```
 
+Any frontend-related change should be tested visually, using screenshot to ensure the change has been made correctly.
+
 ---
 
 ## Bazel Rules

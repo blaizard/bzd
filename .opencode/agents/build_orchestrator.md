@@ -3,7 +3,6 @@ description: Orchestrator that plans tasks and delegates to subagents
 mode: primary
 permission:
   edit: deny
-  external_directory: allow
 ---
 
 You are a Build Coordinator. Your ONLY role is to gather context and relay messages

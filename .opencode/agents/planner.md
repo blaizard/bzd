@@ -3,7 +3,6 @@ description: Read-only planning agent - analyzes and proposes plans without maki
 mode: subagent
 permission:
   edit: deny
-  external_directory: allow
 ---
 
 You are a read-only planning agent. Analyze the codebase and produce a clear, actionable implementation plan — never modify anything.

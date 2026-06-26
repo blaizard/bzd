@@ -25,30 +25,27 @@ class Feature:
 	def __init__(self, args: argparse.Namespace) -> None:
 		self.args = args
 		self.isAvailable: bool = True
-		self.context: typing.Optional["SandboxContainer"] = None
+		self.groups: typing.List[str] = []
+		self.volumes: typing.List[str] = []
+		self.dockerFile: typing.List[str] = []
+		self.dockerCompose: typing.Dict[str, typing.List[str]] = {}
 
 	@staticmethod
 	def cli() -> typing.Dict[str, typing.Dict[str, typing.Any]]:
 		return {}
 
-	@property
-	def groups(self) -> typing.List[str]:
-		return []
+	def process(self, context: "SandboxContainer") -> None:
+		"""Process the feature."""
+		raise Exception("Not Implemented")
 
-	@property
-	def volumes(self) -> typing.List[str]:
-		return []
-
-	@property
-	def dockerFile(self) -> typing.List[str]:
-		return []
-
-	@property
-	def dockerCompose(self) -> typing.Dict[str, typing.List[str]]:
-		return {}
-
-	def initialize(self, context: "SandboxContainer") -> None:
-		self.context = context
+	def includes(self, source: str, destination: str, context: "SandboxContainer") -> None:
+		"""Helper function to include a local code file/directory from bzd into the container."""
+		self.dockerFile.append(f"RUN mkdir -p {pathlib.Path(destination).parent}")
+		root = pathlib.Path(__file__).parent.resolve()
+		if (root / source).exists():
+			self.volumes.append(f"{root / source}:{destination}")
+		else:
+			self.dockerFile.append(f"COPY --from=bzd --chown={context.uid}:{context.gid} /tmp/bzd/{source} {destination}")
 
 
 class FeatureVolume(Feature):
@@ -57,13 +54,6 @@ class FeatureVolume(Feature):
 	def __init__(self, args: argparse.Namespace) -> None:
 		super().__init__(args)
 		self.isAvailable = self.args.volumes is not None
-		if self.isAvailable:
-			self.namedVolumes: typing.Dict[str, str] = {}
-			self.bindVolumes: typing.Dict[str, str] = {}
-			for volume in self.args.volumes:
-				volumes = self.bindVolumes if volume.startswith("./") or volume.startswith("/") else self.namedVolumes
-				volumeSplit = volume.split(":", 1)
-				volumes[volumeSplit[0]] = f"/bzd/volumes/{volumeSplit[0]}" if len(volumeSplit) == 1 else volumeSplit[1]
 
 	@staticmethod
 	def cli() -> typing.Dict[str, typing.Dict[str, typing.Any]]:
@@ -76,32 +66,28 @@ class FeatureVolume(Feature):
 			}
 		}
 
-	@property
-	def volumes(self) -> typing.List[str]:
-		return [f"{source}:{destination}" for source, destination in (self.namedVolumes | self.bindVolumes).items()]
+	def process(self, context: "SandboxContainer") -> None:
+		self.namedVolumes: typing.Dict[str, str] = {}
+		self.bindVolumes: typing.Dict[str, str] = {}
+		for volume in self.args.volumes:
+			volumes = self.bindVolumes if volume.startswith("./") or volume.startswith("/") else self.namedVolumes
+			volumeSplit = volume.split(":", 1)
+			volumes[volumeSplit[0]] = f"/bzd/volumes/{volumeSplit[0]}" if len(volumeSplit) == 1 else volumeSplit[1]
 
-	@property
-	def dockerFile(self) -> typing.List[str]:
-		assert self.context is not None
-		if not self.context.userNamespaceRemapping:
-			return [
-				f"RUN echo 'sudo chown {self.context.uid}:{self.context.gid} {destination} && sudo chmod 755 {destination}' >> /bzd/startup.sh"
+		self.volumes += [f"{source}:{destination}" for source, destination in (self.namedVolumes | self.bindVolumes).items()]
+		if not context.userNamespaceRemapping:
+			self.dockerFile += [
+				f"RUN echo 'sudo chown {context.uid}:{context.gid} {destination} && sudo chmod 755 {destination}' >> /bzd/startup.sh"
 				for destination in self.namedVolumes.values()
 			]
-		return []
-
-	@property
-	def dockerCompose(self) -> typing.Dict[str, typing.List[str]]:
-		return {"volumes": [f'{volume}:\n  name: "{volume}"' for volume in self.namedVolumes.keys()]}
+		self.dockerCompose = {"volumes": [f'{volume}:\n  name: "{volume}"' for volume in self.namedVolumes.keys()]}
 
 
 class FeatureSession(Feature):
 	"""Feature: Add support for sessions."""
 
-	@property
-	def dockerFile(self) -> typing.List[str]:
-		assert self.context is not None
-		return [
+	def process(self, context: "SandboxContainer") -> None:
+		self.dockerFile += [
 			"RUN sudo apt update && sudo apt install -y dtach",
 			"""RUN sudo tee /usr/local/bin/session <<EOF
 #!/usr/bin/env bash
@@ -126,35 +112,12 @@ class FeatureIsolation(Feature):
 			}
 		}
 
-	@property
-	def volumes(self) -> typing.List[str]:
+	def process(self, context: "SandboxContainer") -> None:
 		if self.args.isolate:
-			return []
-
-		assert self.context
-		volumes = [
-			# Share the cache.
-			f"{self.context.home}/.cache:{self.context.home}/.cache",
-		]
-		# Add some files as volumes only if they exist (otherwise docker-compose will create an empty directory).
-		volumes += [
-			f"{file}:{file}" for file in [self.context.home / ".bash_history", self.context.home / ".netrc"] if file.is_file()
-		]
-		return volumes
-
-	@property
-	def dockerFile(self) -> typing.List[str]:
-		if self.args.isolate:
-			return [
+			self.dockerFile += [
 				'ENV TAR_OPTIONS="--no-same-owner"',
 			]
-		return []
-
-	@property
-	def dockerCompose(self) -> typing.Dict[str, typing.List[str]]:
-		if self.args.isolate:
-			assert self.context is not None
-			return {
+			self.dockerCompose = {
 				"service": [
 					"cap_drop:",
 					"  - ALL",
@@ -162,15 +125,21 @@ class FeatureIsolation(Feature):
 					"  - no-new-privileges:true",
 				]
 			}
-		return {"service": ["network_mode: host"]}
+		else:
+			self.volumes += [
+				# Add some files as volumes only if they exist (otherwise docker-compose will create an empty directory).
+				f"{file}:{file}"
+				for file in [context.home / ".cache", context.home / ".bash_history", context.home / ".netrc"]
+				if file.exists()
+			]
+			self.dockerCompose = {"service": ["network_mode: host"]}
 
 
 class FeatureDevcontainerCLI(Feature):
 	"""Feature: Add the devcontainer CLI to the container."""
 
-	@property
-	def dockerFile(self) -> typing.List[str]:
-		return [
+	def process(self, context: "SandboxContainer") -> None:
+		self.dockerFile += [
 			"RUN sudo apt update && sudo apt install -y nodejs npm",
 			"RUN sudo npm install -g @devcontainers/cli",
 		]
@@ -179,24 +148,50 @@ class FeatureDevcontainerCLI(Feature):
 class FeatureOpenCode(Feature):
 	"""Feature: Add opencode CLI to the container."""
 
-	@property
-	def dockerFile(self) -> typing.List[str]:
-		return [
+	@staticmethod
+	def cli() -> typing.Dict[str, typing.Dict[str, typing.Any]]:
+		return {
+			"opencode": {
+				"action": "append",
+				"default": [],
+				"choices": ["none", "playwright"],
+				"help": "Opencode tools to be made available.",
+			}
+		}
+
+	def process(self, context: "SandboxContainer") -> None:
+		# Add generic agents/commands/skills.
+		self.includes(".opencode/agents", f"{context.home}/.opencode_config/agents", context)
+		self.includes(".opencode/commands", f"{context.home}/.opencode_config/commands", context)
+		self.includes(
+			".opencode/skills/software-architecture", f"{context.home}/.opencode_config/skills/software-architecture", context
+		)
+		self.dockerFile += [
+			# Important! If not set, docker will create synthetic directory and write access will not be permitted.
+			f"RUN mkdir -p {context.home}/.config {context.home}/.local/share {context.home}/.local/state",
+			f"ENV OPENCODE_CONFIG_DIR={context.home}/.opencode_config",
 			"RUN sudo apt update && sudo apt install -y nodejs npm",
 			"RUN sudo npm install -g opencode-ai@latest",
-			"RUN sudo npm install -g @playwright/cli@latest",
-			"RUN playwright-cli install-browser chrome",
+			f"RUN echo '{
+				json.dumps({'$schema': 'https://opencode.ai/config.json', 'permission': {'external_directory': 'allow'}})
+			}' > {context.home}/.opencode_config/opencode.json",
+		]
+		self.volumes += [
+			f"{path}:{path}"
+			for path in [
+				context.home / ".config/opencode",
+				context.home / ".local/share/opencode",
+				context.home / ".local/state/opencode",
+			]
+			if path.exists()
 		]
 
-	@property
-	def volumes(self) -> typing.List[str]:
-		assert self.context
-		configPaths = [
-			self.context.home / ".config/opencode",
-			self.context.home / ".local/share/opencode",
-			self.context.home / ".local/state/opencode",
-		]
-		return [f"{path}:{path}" for path in configPaths if path.exists()]
+		if not self.args.opencode or "playwright" in self.args.opencode:
+			self.includes(".opencode/skills/playwright-cli", f"{context.home}/.opencode_config/skills/playwright-cli", context)
+			self.dockerFile += [
+				"RUN sudo npm install -g @playwright/cli@latest",
+				"RUN playwright-cli install-browser chrome --with-deps",
+			]
 
 
 class FeatureDocker(Feature):
@@ -243,17 +238,10 @@ class FeatureDocker(Feature):
 		assert result.returncode == 0, "Failed to get docker group id from container."
 		return str(result.stdout.decode().strip().strip("'\""))
 
-	@property
-	def groups(self) -> typing.List[str]:
-		return [self.getDockerGid()]
-
-	@property
-	def volumes(self) -> typing.List[str]:
-		return [f"{self.mayberDockerSocket}:/var/run/docker.sock"]
-
-	@property
-	def dockerFile(self) -> typing.List[str]:
-		return ["RUN command -v docker >/dev/null 2>&1 || curl -fsSL https://get.docker.com | sh"]
+	def process(self, context: "SandboxContainer") -> None:
+		self.groups += [self.getDockerGid()]
+		self.volumes += [f"{self.mayberDockerSocket}:/var/run/docker.sock"]
+		self.dockerFile += ["RUN command -v docker >/dev/null 2>&1 || curl -fsSL https://get.docker.com | sh"]
 
 
 class FeaturePlatform(Feature):
@@ -276,8 +264,7 @@ class FeaturePlatform(Feature):
 			}
 		}
 
-	def initialize(self, context: "SandboxContainer") -> None:
-		super().initialize(context=context)
+	def process(self, context: "SandboxContainer") -> None:
 		# See: https://stackoverflow.com/questions/72444103/what-does-running-the-multiarch-qemu-user-static-does-before-building-a-containe
 		# if self.isRootless:
 		subprocess.run(["sudo", "systemctl", "start", "docker"])
@@ -296,14 +283,10 @@ class FeaturePlatform(Feature):
 		)
 		# else:
 		# subprocess.run(["docker", "run", "--rm", "--privileged", "multiarch/qemu-user-static", "--reset", "-p", "yes"])
-
-	@property
-	def dockerCompose(self) -> typing.Dict[str, typing.List[str]]:
 		if self.platform == "amd64":
-			return {"service": ["platform: linux/amd64"]}
+			self.dockerCompose = {"service": ["platform: linux/amd64"]}
 		elif self.platform == "arm64":
-			return {"service": ["platform: linux/arm64"]}
-		return {}
+			self.dockerCompose = {"service": ["platform: linux/arm64"]}
 
 
 class SandboxContainer:
@@ -344,7 +327,7 @@ class SandboxContainer:
 
 		# Initialize features.
 		for feature in self.features:
-			feature.initialize(context=self)
+			feature.process(context=self)
 
 		if dry:
 			print("==== Hash ====")
@@ -424,6 +407,11 @@ class SandboxContainer:
 		instructionsStr = "\n".join(instructions)
 
 		return f"""
+FROM {imageBase} AS bzd
+
+RUN apt update && apt upgrade -y && apt install -y git
+RUN git clone --depth 1 https://github.com/blaizard/bzd.git /tmp/bzd
+
 FROM {imageBase}
 RUN apt update && apt upgrade -y && apt install -y \
 	ca-certificates \
@@ -440,14 +428,14 @@ RUN apt update && apt upgrade -y && apt install -y \
 RUN locale-gen en_US.UTF-8
 ENV LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
 
-RUN wget -O /usr/local/bin/bazel https://raw.githubusercontent.com/blaizard/bzd/refs/heads/master/tools/bazel && chmod +x /usr/local/bin/bazel
+COPY --from=bzd --chown={self.uid}:{self.gid} /tmp/bzd/tools/bazel /usr/local/bin/bazel
 
 # Entry point script that will run once upon container start.
 RUN mkdir /bzd && echo "#!/usr/bin/env bash" > /bzd/startup.sh && chmod +x /bzd/startup.sh
 
 {instructionsStr}
 
-RUN wget -O {self.home}/.bashrc https://raw.githubusercontent.com/blaizard/bzd/refs/heads/master/tools/shell/sh/bashrc.sh
+COPY --from=bzd --chown={self.uid}:{self.gid} /tmp/bzd/tools/shell/sh/bashrc.sh {self.home}/.bashrc
 RUN echo "__session_names+=(sandbox)" >> {self.home}/.bashrc
 """
 
@@ -512,7 +500,7 @@ services:
 			check=True,
 		)
 
-	def run(self, args: typing.List[str], env: typing.List[str]) -> None:
+	def run(self, args: typing.List[str], env: typing.List[str], recreate: bool) -> None:
 		subprocess.run(
 			[
 				"docker",
@@ -521,7 +509,8 @@ services:
 				str(self.dockerComposePath),
 				"up",
 				"--detach",
-			],
+			]
+			+ (["--force-recreate"] if recreate else []),
 			check=True,
 		)
 
@@ -696,6 +685,8 @@ if __name__ == "__main__":
 			"session",
 			"--enable",
 			"isolation",
+			"--enable",
+			"volume",
 			"--isolate",
 			"--prefix",
 			f"agent{i}",
@@ -714,11 +705,11 @@ if __name__ == "__main__":
 		description="Sandbox container.",
 		epilog=f"Additional commands: {', '.join(additionalCommands.keys())}",
 	)
-	parser.add_argument("--build", action="store_true", help="Re-build the container if set.")
+	parser.add_argument("--build", action="store_true", help="Re-build/clean the container if set.")
 	parser.add_argument(
 		"--build-force",
 		action="store_true",
-		help="Force re-build the container if set.",
+		help="Force re-build/clean the container if set.",
 	)
 	parser.add_argument(
 		"--temp",
@@ -804,4 +795,4 @@ if __name__ == "__main__":
 			sandbox.build(force=True)
 		if args.build:
 			sandbox.build(force=False)
-		sandbox.run(args=args.rest, env=args.env)
+		sandbox.run(args=args.rest, env=args.env, recreate=args.build or args.build_force)
