@@ -2,7 +2,7 @@
 
 set -e
 
-TAG="esp-develop-9.2.2-20250817"
+TAG="esp-develop-9.2.2-20260417"
 HOST=linux_x86_64
 PACKAGE=${HOST}_${TAG}
 INSTALL=$(pwd)/${PACKAGE}
@@ -28,17 +28,17 @@ git clone --depth 1 --branch ${TAG} --recurse-submodules https://github.com/espr
 git clone --depth 1 --branch "2.82.0" https://gitlab.gnome.org/GNOME/glib.git glib
 git clone --depth 1 https://gitlab.freedesktop.org/slirp/libslirp.git
 
-# ---- slirp ----
+# ---- GLIB ----
 
-pushd libslirp
+pushd glib
 meson setup _build --default-library=static
 meson compile -C _build
 meson install -C _build
 popd
 
-# ---- GLIB ----
+# ---- slirp ----
 
-pushd glib
+pushd libslirp
 meson setup _build --default-library=static
 meson compile -C _build
 meson install -C _build

@@ -54,9 +54,9 @@ def _load_tools(_module_ctx):
             ],
             "http": [
                 bzd_http_archive(
-                    integrity = "sha256-bfL5Vfftu7vjx4vdY5f83/gfKcUHMRiuqNP3XUN+9/Y=",
-                    strip_prefix = "linux_x86_64_esp-develop-9.2.2-20250817",
-                    url = "https://data.blaizard.com/file/bzd/qemu/esp32/linux_x86_64_esp-develop-9.2.2-20250817.tar.xz",
+                    integrity = "sha256-hymy0hjYeQKPY/T2AD5Tyk9roJ7MrsvT7a1eELO3fDo=",
+                    strip_prefix = "linux_x86_64_esp-develop-9.2.2-20260417",
+                    url = "https://data.blaizard.com/file/bzd/qemu/esp32/linux_x86_64_esp-develop-9.2.2-20260417.tar.xz",
                 ),
             ],
         }],
