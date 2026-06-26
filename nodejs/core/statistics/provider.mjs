@@ -66,9 +66,9 @@ export default class Provider {
 	}
 
 	/// Initialize the data structure of a data point.
-	_initData(initial) {
+	_initData(name, initial) {
 		return {
-			value: initial,
+			[name]: initial,
 			max: initial,
 			min: initial,
 			avg: initial,
@@ -77,9 +77,9 @@ export default class Provider {
 	}
 
 	/// Update the statistics of the data point.
-	_updateData(data, value) {
+	_updateData(name, data, value) {
 		++data.count;
-		data.value = value;
+		data[name] = value;
 		data.max = Math.max(value, data.max);
 		data.min = Math.min(value, data.min);
 		data.avg = (data.avg * (data.count - 1) + value) / data.count;
@@ -91,25 +91,21 @@ export default class Provider {
 		try {
 			await callback();
 		} finally {
-			this.data[name] ??= {
-				count: 0,
-				duration: 0,
-			};
-			++this.data[name].count;
-			this.data[name].duration = Provider._getTimestamp() - start;
+			this.data[name] ??= this._initData("duration", 0);
+			this._updateData("duration", this.data[name], Provider._getTimestamp() - start);
 		}
 	}
 
 	/// Set a value point to the existing points.
 	set(name, value) {
-		this.data[name] ??= this._initData(0);
-		this._updateData(this.data[name], value);
+		this.data[name] ??= this._initData("value", 0);
+		this._updateData("value", this.data[name], value);
 	}
 
 	/// Add a value point to the existing points.
 	sum(name, value, initial = 0) {
-		this.data[name] ??= this._initData(initial);
-		this._updateData(this.data[name], this.data[name].value + value);
+		this.data[name] ??= this._initData("sum", initial);
+		this._updateData("sum", this.data[name], this.data[name].value + value);
 	}
 
 	/// Calculate the rate of a point.
