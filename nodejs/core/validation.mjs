@@ -154,7 +154,7 @@ export default class Validation {
 						this._processConstraint(processedSchema, key, name, args);
 					});
 			} else {
-				Exception.unreachable("Constraints type is unsupported: {:j}", constraints);
+				Exception.unreachable("Constraints type is unsupported: {:?}", constraints);
 			}
 		}
 
@@ -189,7 +189,7 @@ export default class Validation {
 				value: values,
 			};
 		}
-		Exception.assert(typeof values == "object", "Value must be a dictionary: {:j}", values);
+		Exception.assert(typeof values == "object", "Value must be a dictionary: {:?}", values);
 
 		options = Object.assign(
 			{
@@ -294,7 +294,7 @@ export default class Validation {
 						if (this.args.length == 1) {
 							this.assert(result, this.args.includes(value), "must be equal to {}", this.args[0]);
 						} else {
-							this.assert(result, this.args.includes(value), "must be equal to one of {:j}", this.args);
+							this.assert(result, this.args.includes(value), "must be equal to one of {:?}", this.args);
 						}
 					};
 				}

@@ -57,7 +57,7 @@ export default class HttpProxy {
 
 			// Logger for request
 			Log.debug("> {} {}", request.method, request.url);
-			Log.trace("> {:j}", request.headers);
+			Log.trace("> {:?}", request.headers);
 
 			await this.options.beforeRequest(request, response);
 
@@ -92,7 +92,7 @@ export default class HttpProxy {
 
 			// Logger for response
 			Log.debug("< {} {} {}", proxyResponse.statusCode, request.method, request.url);
-			Log.trace("< {:j}", proxyResponse.headers);
+			Log.trace("< {:?}", proxyResponse.headers);
 		});
 		this.server.setTimeout(this.options.timeoutMs, () => {
 			Log.error("TIMEOUT server {} ({} ms)", this.target.hostname, this.server.timeout);
@@ -102,7 +102,7 @@ export default class HttpProxy {
 		this.server.headersTimeout = this.options.timeoutMs;
 
 		this.server.on("clientError", (e, socket) => {
-			Log.error("{}: {:j}", this.target.hostname, e);
+			Log.error("{}: {:?}", this.target.hostname, e);
 			socket.end("HTTP/1.1 400 Bad Request\r\n\r\n");
 		});
 

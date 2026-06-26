@@ -98,15 +98,15 @@ export default class RestClient extends Base {
 					endpoint,
 					method,
 				);
-				Exception.assert(typeof data === "object", "Data must be of type 'object', got '{:j}' instead.", data);
+				Exception.assert(typeof data === "object", "Data must be of type 'object', got '{:?}' instead.", data);
 				fetchOptions.json = data;
 				break;
 			case "query":
-				Exception.assert(typeof data === "object", "Data must be of type 'object', got '{:j}' instead.", data);
+				Exception.assert(typeof data === "object", "Data must be of type 'object', got '{:?}' instead.", data);
 				fetchOptions.query = data;
 				break;
 			case "form":
-				Exception.assert(data instanceof FormData, "Data must be of type 'FormData', got '{:j}' instead.", data);
+				Exception.assert(data instanceof FormData, "Data must be of type 'FormData', got '{:?}' instead.", data);
 				fetchOptions.form = data;
 				break;
 			case undefined:

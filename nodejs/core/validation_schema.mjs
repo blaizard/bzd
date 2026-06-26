@@ -89,7 +89,7 @@ export default class ValidationSchema {
 		if ("minimum" in property) {
 			Exception.assert(
 				value >= property.minimum,
-				"[key={}] expected minimum value {}, not {:j}",
+				"[key={}] expected minimum value {}, not {:?}",
 				key,
 				property.minimum,
 				value,
@@ -98,7 +98,7 @@ export default class ValidationSchema {
 		if ("maximum" in property) {
 			Exception.assert(
 				value <= property.maximum,
-				"[key={}] expected maximum value {}, not {:j}",
+				"[key={}] expected maximum value {}, not {:?}",
 				key,
 				property.maximum,
 				value,
@@ -118,11 +118,11 @@ export default class ValidationSchema {
 
 					switch (property.type) {
 						case "string":
-							Exception.assert(typeof value === "string", "[key={}] expected type string, not {:j}", key, value);
+							Exception.assert(typeof value === "string", "[key={}] expected type string, not {:?}", key, value);
 							if ("enum" in property) {
 								Exception.assert(
 									property.enum.includes(value),
-									"[key={}] expected on of: {}, not {:j}",
+									"[key={}] expected on of: {}, not {:?}",
 									key,
 									property.enum.join(", "),
 									value,
@@ -130,21 +130,21 @@ export default class ValidationSchema {
 							}
 							break;
 						case "number":
-							Exception.assert(typeof value === "number", "[key={}] expected type number, not {:j}", key, value);
+							Exception.assert(typeof value === "number", "[key={}] expected type number, not {:?}", key, value);
 							ValidationSchema.validationNumber(value, property, key);
 							break;
 						case "integer":
-							Exception.assert(Number.isInteger(value), "[key={}] expected type integer, not {:j}", key, value);
+							Exception.assert(Number.isInteger(value), "[key={}] expected type integer, not {:?}", key, value);
 							ValidationSchema.validationNumber(value, property, key);
 							break;
 						case "boolean":
-							Exception.assert(typeof value === "boolean", "[key={}] expected type boolean, not {:j}", key, value);
+							Exception.assert(typeof value === "boolean", "[key={}] expected type boolean, not {:?}", key, value);
 							break;
 						case "null":
-							Exception.assert(value === null, "[key={}] expected 'null', not {:j}", key, value);
+							Exception.assert(value === null, "[key={}] expected 'null', not {:?}", key, value);
 							break;
 						case "object":
-							Exception.assert(isObject(value), "[key={}] expected type object, not {:j}", key, value);
+							Exception.assert(isObject(value), "[key={}] expected type object, not {:?}", key, value);
 							const properties = property.properties || {};
 							const additionalProperties = property.additionalProperties ?? true; // By default it is true.
 							Object.entries(value).forEach(([subKey, subValue]) => {
@@ -176,7 +176,7 @@ export default class ValidationSchema {
 							}
 							break;
 						case "array":
-							Exception.assert(Array.isArray(value), "[key={}] expected type array, not {:j}", key, value);
+							Exception.assert(Array.isArray(value), "[key={}] expected type array, not {:?}", key, value);
 							if ("items" in property) {
 								value.forEach((item, index) => {
 									validate(item, property.items, key + "[" + index + "]");

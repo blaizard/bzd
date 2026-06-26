@@ -128,12 +128,12 @@ class Cache {
 	register(collection, trigger, options) {
 		Exception.assert(
 			typeof collection === "string",
-			"register(...) must take a string as first argument: {:j}",
+			"register(...) must take a string as first argument: {:?}",
 			collection,
 		);
 		Exception.assert(
 			typeof trigger === "function",
-			"register(...) must take a function as second argument: {:j}",
+			"register(...) must take a function as second argument: {:?}",
 			trigger,
 		);
 		Exception.assert(

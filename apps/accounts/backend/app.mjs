@@ -359,7 +359,7 @@ const Log = LogFactory("backend");
 			},
 		});
 		const data = JSON.parse(response);
-		Exception.assertPrecondition(data.success, "The captcha token is invalid: {:j}", data["error-codes"]);
+		Exception.assertPrecondition(data.success, "The captcha token is invalid: {:?}", data["error-codes"]);
 		await email.send(
 			[configBackend.email.from, from],
 			"[contact-" + Math.floor(Math.random() * 10000) + "] " + subject,

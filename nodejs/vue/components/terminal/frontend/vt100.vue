@@ -488,7 +488,7 @@
 					// No matches right after the category.
 					if (match.index !== position) {
 						Log.error(
-							"Command {:j} followed with '{}...' is malformed or not supported.",
+							"Command {:?} followed with '{}...' is malformed or not supported.",
 							matchStr,
 							stream.substring(0, 10),
 						);
@@ -496,7 +496,7 @@
 					}
 					// Process the function.
 					if (!handler(...match)) {
-						Log.error("Command {:j} + {:j} is malformed or not supported.", matchStr, match[0]);
+						Log.error("Command {:?} + {:?} is malformed or not supported.", matchStr, match[0]);
 					}
 
 					position = regexpr.lastIndex;

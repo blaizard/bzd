@@ -46,7 +46,7 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 		const result = await this.fetch.request("/", {
 			method: "get",
 		});
-		Exception.assert("version" in result, "Unexpected response: {:j}", result);
+		Exception.assert("version" in result, "Unexpected response: {:?}", result);
 	}
 
 	_bucketToURI(bucket) {
@@ -64,7 +64,7 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 			query: query,
 		});
 		Exception.assert(["created", "updated"].includes(result.result), "Unexpected result, received: {}", result.result);
-		Exception.assert("_id" in result, "Response is malformed: {:j}", result);
+		Exception.assert("_id" in result, "Response is malformed: {:?}", result);
 		return result._id;
 	}
 
@@ -73,7 +73,7 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 			const result = await this.fetch.request("/" + this._bucketToURI(bucket) + "/_doc/" + encodeURIComponent(key), {
 				method: "get",
 			});
-			Exception.assert("_source" in result, "Response is malformed: {:j}", result);
+			Exception.assert("_source" in result, "Response is malformed: {:?}", result);
 			if (includeAll) {
 				return [result._source, result, false];
 			}
@@ -98,7 +98,7 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 			let modifiedValue = await modifier(value);
 			let query = {};
 			if (!isDefault) {
-				Exception.assert("_seq_no" in rawValue && "_primary_term" in rawValue, "Response is malformed: {:j}", rawValue);
+				Exception.assert("_seq_no" in rawValue && "_primary_term" in rawValue, "Response is malformed: {:?}", rawValue);
 				query = { if_seq_no: rawValue._seq_no, if_primary_term: rawValue._primary_term };
 			}
 			try {
@@ -130,7 +130,7 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 					},
 				},
 			});
-			Exception.assert("count" in result, "Result malformed: {:j}", result);
+			Exception.assert("count" in result, "Result malformed: {:?}", result);
 			return result.count;
 		} catch (e) {
 			if (e instanceof HttpClientException) {
@@ -155,7 +155,7 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 				},
 			);
 
-			Exception.assert("hits" in result && "hits" in result.hits, "Result malformed: {:j}", result);
+			Exception.assert("hits" in result && "hits" in result.hits, "Result malformed: {:?}", result);
 
 			return CollectionPaging.makeFromTotal(
 				result.hits.hits.reduce((obj, item) => {
@@ -193,6 +193,6 @@ export default class KeyValueStoreElasticsearch extends KeyValueStore {
 		const result = await this.fetch.request("/" + this._bucketToURI(bucket) + "/_doc/" + encodeURIComponent(key), {
 			method: "delete",
 		});
-		Exception.assert(result._shards.failed === 0, "Delete operation failed: {:j}", result);
+		Exception.assert(result._shards.failed === 0, "Delete operation failed: {:?}", result);
 	}
 }

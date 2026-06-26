@@ -69,7 +69,7 @@ export default class StorageGoogleCloudStorage extends Base {
 			await this._delay(1000);
 			timeMs += 1000;
 		}
-		Exception.assert(await this._isImpl(pathList), "File path='{:j}' does not exists", pathList);
+		Exception.assert(await this._isImpl(pathList), "File path='{:?}' does not exists", pathList);
 	}
 
 	async _writeImpl(pathList, readStream) {

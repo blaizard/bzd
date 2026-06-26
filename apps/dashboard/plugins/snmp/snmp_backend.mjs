@@ -51,7 +51,7 @@ class Snmp {
 				}
 				break;
 		}
-		Log.error("Unsupported value type '{}' ({}): {:j}", data.type, SnmpNative.ObjectType[data.type], data);
+		Log.error("Unsupported value type '{}' ({}): {:?}", data.type, SnmpNative.ObjectType[data.type], data);
 		return "unsupported";
 	}
 

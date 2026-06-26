@@ -132,7 +132,7 @@ export default class Users {
 
 		// Update password if any.
 		if ("password" in values) {
-			Exception.assertPrecondition("oldpassword" in values, "Missing old password: '{:j}'", values);
+			Exception.assertPrecondition("oldpassword" in values, "Missing old password: '{:?}'", values);
 			Exception.assertPrecondition(user.getPassword() === values.oldpassword, "Old password is different");
 
 			await user.setPassword(values.password);

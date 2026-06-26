@@ -82,7 +82,7 @@ export class Storage extends AsyncInitialize {
 
 	/// Store a file to a specific path
 	async writeFromFile(path, inputFilePath, mkdir = false) {
-		Exception.assert(typeof inputFilePath == "string", "Path must be a string, {:j}", inputFilePath);
+		Exception.assert(typeof inputFilePath == "string", "Path must be a string, {:?}", inputFilePath);
 		const readStream = Fs.createReadStream(inputFilePath);
 		return this.write(path, readStream, mkdir);
 	}

@@ -189,7 +189,7 @@ export default class RestServer extends Base {
 					Exception.assert(result !== null, "A response that expects validation cannot return null.");
 					Exception.assert(
 						typeof result === "object",
-						"A response that expects validation must be a dictionary, instead: {:j}",
+						"A response that expects validation must be a dictionary, instead: {:?}",
 						result,
 					);
 					const validation = new Validation(responseOptions.validation);

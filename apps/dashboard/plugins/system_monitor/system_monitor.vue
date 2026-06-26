@@ -314,19 +314,19 @@
 				return Object.keys(map).length === 0;
 			},
 			maxArray(array) {
-				Exception.assert(Array.isArray(array), "Not an array: {:j}", array);
+				Exception.assert(Array.isArray(array), "Not an array: {:?}", array);
 				return array.reduce((m, v) => Math.max(m, v), -Infinity);
 			},
 			minArray(array) {
-				Exception.assert(Array.isArray(array), "Not an array: {:j}", array);
+				Exception.assert(Array.isArray(array), "Not an array: {:?}", array);
 				return array.reduce((m, v) => Math.min(m, v), Infinity);
 			},
 			sumArray(array) {
-				Exception.assert(Array.isArray(array), "Not an array: {:j}", array);
+				Exception.assert(Array.isArray(array), "Not an array: {:?}", array);
 				return array.reduce((a, b) => a + b, 0);
 			},
 			avgArray(array) {
-				Exception.assert(Array.isArray(array), "Not an array: {:j}", array);
+				Exception.assert(Array.isArray(array), "Not an array: {:?}", array);
 				return this.sumArray(array) / array.length;
 			},
 			formatBytesRate(rate) {

@@ -264,7 +264,7 @@ export default class FileSystem {
 					Exception.assert(!(policy & _Policy.file), "The path '{}' points to a directory.", path);
 				}
 			} else {
-				Exception.unreachable("Invalid entry type for path '{}' ({:j}).", path, entry);
+				Exception.unreachable("Invalid entry type for path '{}' ({:?}).", path, entry);
 			}
 		}
 

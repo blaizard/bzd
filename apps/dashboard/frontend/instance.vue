@@ -186,8 +186,8 @@
 				this.handleStatus(key, ["error", e]);
 			},
 			handleStatus(key, value) {
-				Exception.assert(Array.isArray(value), "Status must be an array, not: {:j}", value);
-				Exception.assert(value.length, "Status must be an array of 2 elements, not: {:j}", value);
+				Exception.assert(Array.isArray(value), "Status must be an array, not: {:?}", value);
+				Exception.assert(value.length, "Status must be an array of 2 elements, not: {:?}", value);
 				const [status, tooltip] = value;
 
 				const statusToData = {

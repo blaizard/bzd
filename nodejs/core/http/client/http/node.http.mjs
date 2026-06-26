@@ -89,7 +89,7 @@ async function requestResponse(url, options) {
 		} else if (typeof options.data == "undefined") {
 			req.end();
 		} else {
-			reject(new Exception("Unsupported data format: {:j}", options.data));
+			reject(new Exception("Unsupported data format: {:?}", options.data));
 		}
 	});
 }

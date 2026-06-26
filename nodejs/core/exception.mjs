@@ -114,7 +114,7 @@ export const ExceptionFactory = (...topics) => {
 		// \param expression The result to evaluate.
 		static assertResultError(result) {
 			if (result.hasValue()) {
-				throw new Exception("Assertion failed; result contains the value: {:j}", result.value());
+				throw new Exception("Assertion failed; result contains the value: {:?}", result.value());
 			}
 		}
 
@@ -161,7 +161,7 @@ export const ExceptionFactory = (...topics) => {
 			assertEqualInternal(
 				value1,
 				value2,
-				"Values are not equal, value1={:j}, value2={:j}" + (message ? "; " + message : ""),
+				"Values are not equal, value1={:?}, value2={:?}" + (message ? "; " + message : ""),
 				value1,
 				value2,
 				...args,

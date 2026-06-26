@@ -89,8 +89,8 @@ function buildRouterForDashboards(optionsDashboards) {
 	// Group all matches together, there might be multiple dashboards with the same inputs.
 	let matches = new Set();
 	for (const dashboard of optionsDashboards) {
-		Exception.assert("title" in dashboard, "Dashboard must have a title: {:j}", dashboard);
-		Exception.assert("inputs" in dashboard, "Dashboard must have inputs: {:j}", dashboard);
+		Exception.assert("title" in dashboard, "Dashboard must have a title: {:?}", dashboard);
+		Exception.assert("inputs" in dashboard, "Dashboard must have inputs: {:?}", dashboard);
 		for (const [match, _] of Object.entries(dashboard.inputs)) {
 			matches.add(match);
 		}
@@ -530,7 +530,7 @@ export default class Plugin extends PluginBase {
 			const [bulk, timestampClient, isFixedTimestamp] = ((data) => {
 				if (inputs.bulk) {
 					const isFixedTimestamp = !("timestamp" in data);
-					Exception.assertPrecondition(isObject(data), "The data must be an object: {:j}", data);
+					Exception.assertPrecondition(isObject(data), "The data must be an object: {:?}", data);
 					Exception.assertPrecondition(
 						isFixedTimestamp || typeof data.timestamp == "number",
 						"The timestamp given is not a number {}.",
@@ -549,7 +549,7 @@ export default class Plugin extends PluginBase {
 			for (const [timestamp, value] of bulk) {
 				Exception.assertPrecondition(
 					typeof timestamp == "number",
-					"The timestamp given for value '{:j}' is not a number {}.",
+					"The timestamp given for value '{:?}' is not a number {}.",
 					value,
 					timestamp,
 				);
@@ -557,7 +557,7 @@ export default class Plugin extends PluginBase {
 
 				// If there is no 'uid' set for this request, it must be embedded in the value.
 				if (node === null) {
-					Exception.assertPrecondition(isObject(value), "Expected an object, containing uid to values: {:j}", value);
+					Exception.assertPrecondition(isObject(value), "Expected an object, containing uid to values: {:?}", value);
 					for (const [uid, subValue] of Object.entries(value)) {
 						const subNode = await this.nodes.get(uid);
 						records = records.concat(await subNode.insert(key, subValue, actualTimestamp, isFixedTimestamp));

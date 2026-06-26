@@ -48,7 +48,7 @@ class EventsFactory {
 		if (!("source.type" in plugins[uid].config)) {
 			Exception.assertPrecondition(
 				!mustExist,
-				"The plugin '{}' configuration {:j} is missing a 'source.type'.",
+				"The plugin '{}' configuration {:?} is missing a 'source.type'.",
 				uid,
 				plugins[uid].config,
 			);

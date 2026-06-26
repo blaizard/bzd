@@ -64,7 +64,7 @@ export default class StorageDockerV2 extends Storage {
 	}
 
 	static async makeFromGcr(keyContent, service = "gcr.io") {
-		Exception.assert(typeof keyContent == "string", "keyContent must be a string: {:j}", keyContent);
+		Exception.assert(typeof keyContent == "string", "keyContent must be a string: {:?}", keyContent);
 		return await StorageDockerV2.make("https://" + service, {
 			authentication: async function (scope) {
 				return await this.authenticationScope(service, scope, {

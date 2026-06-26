@@ -80,7 +80,7 @@ export default class Scheduler {
 		const executor = this._getExecutor(uid);
 		const info = await executor.getInfo();
 		Exception.assertPrecondition(info.status == Status.idle, "The job '{uid}' has already started", uid);
-		Exception.assertPrecondition("args" in info, "The job '{}' is missing args: {:j}", uid, info);
+		Exception.assertPrecondition("args" in info, "The job '{}' is missing args: {:?}", uid, info);
 		await executor.execute(info.args);
 
 		if (info.data && info.data.stdin) {

@@ -72,7 +72,7 @@ export default class Scopes {
 	checkValid(scopes) {
 		for (const scope of scopes) {
 			if (!this.contains(scope)) {
-				return Result.makeErrorString("Scope '{}' is not valid, must be one of: {:j}.", scope, this.list_);
+				return Result.makeErrorString("Scope '{}' is not valid, must be one of: {:?}.", scope, this.list_);
 			}
 		}
 		return new Result();

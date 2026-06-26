@@ -16,11 +16,11 @@ const assertEqualResponses = (actual, expected) => {
 			: [actual["D:multistatus"]["D:response"]];
 		let consumed = new Set();
 		for (const response of responses) {
-			Exception.assert(response, "Unexpected response: {:j}", response);
+			Exception.assert(response, "Unexpected response: {:?}", response);
 			const href = response["D:href"] || "";
 			Exception.assert(
 				href.startsWith(expectedPrefx),
-				"D:href ({}) must start with '{}': {:j}",
+				"D:href ({}) must start with '{}': {:?}",
 				href,
 				expectedPrefx,
 				response,
@@ -32,8 +32,8 @@ const assertEqualResponses = (actual, expected) => {
 			Exception.assertEqual(propstat["D:status"], "HTTP/1.1 200 OK");
 			const props = propstat["D:prop"] ?? {};
 			for (const [key, value] of Object.entries(expected[path])) {
-				Exception.assert(key in props, "Missing property '{}' in response for '{}', all props {:j}", key, path, props);
-				Exception.assertEqual(props[key], value, "Props '{}' for entry '{}', all props {:j}", key, path, props);
+				Exception.assert(key in props, "Missing property '{}' in response for '{}', all props {:?}", key, path, props);
+				Exception.assertEqual(props[key], value, "Props '{}' for entry '{}', all props {:?}", key, path, props);
 			}
 		}
 	} catch (e) {

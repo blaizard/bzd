@@ -79,7 +79,7 @@ export default class MockHttpServer {
 			const { request, expects } = test;
 			Exception.assert(
 				request.length == 2 || request.length == 3,
-				"Request can only contain 2 or 3 entries: {:j}",
+				"Request can only contain 2 or 3 entries: {:?}",
 				request,
 			);
 			let message = "Testing " + request[0] + "::" + request[1];

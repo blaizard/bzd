@@ -146,8 +146,8 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 		let data = null;
 		try {
 			data = await this.readToken(token);
-			Exception.assert(data && "uid" in data, "Invalid token: {:j}", data);
-			Exception.assert(data && "scopes" in data, "Invalid token: {:j}", data);
+			Exception.assert(data && "uid" in data, "Invalid token: {:?}", data);
+			Exception.assert(data && "scopes" in data, "Invalid token: {:?}", data);
 		} catch (e) {
 			return false;
 		}

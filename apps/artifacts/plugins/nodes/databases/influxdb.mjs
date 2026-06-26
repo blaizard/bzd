@@ -152,7 +152,7 @@ export default class DatabaseInfluxDB extends Database {
 			}
 			Exception.assert(
 				orgBucket !== null,
-				"Couldn't find bucket corresponding to our organization '{}': {:j}",
+				"Couldn't find bucket corresponding to our organization '{}': {:?}",
 				this.options.org,
 				response,
 			);

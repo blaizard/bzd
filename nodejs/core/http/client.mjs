@@ -142,7 +142,7 @@ export class HttpClient {
 
 		Object.assign(headers, options.headers);
 
-		Log.debug("{} url={} path={} (headers: {:j})", method, url, path, headers);
+		Log.debug("{} url={} path={} (headers: {:?})", method, url, path, headers);
 		Log.trace("(body: {})", data);
 
 		const result = await httpBackend(url, {
@@ -180,7 +180,7 @@ export class HttpClient {
 						return data;
 				}
 			} catch (e) {
-				Exception.error("Cannot decode output (expected: {}) with error: {}, output:\n{:j}", options.expect, e, data);
+				Exception.error("Cannot decode output (expected: {}) with error: {}, output:\n{:?}", options.expect, e, data);
 			}
 		})(result.data);
 

@@ -140,9 +140,9 @@ export default class MCPServer {
 					const body = context.getBody() || {};
 					const tool = body.params?.name;
 					const args = body.params?.arguments ?? {};
-					Exception.assertPrecondition(tool && args, "Missing tool and arguments: {:j}", body);
-					Exception.assertPrecondition(typeof tool === "string", "Tool must be a string, not: {:j}", tool);
-					Exception.assertPrecondition(isObject(args), "Arguments must be a dictionary, not: {:j}", args);
+					Exception.assertPrecondition(tool && args, "Missing tool and arguments: {:?}", body);
+					Exception.assertPrecondition(typeof tool === "string", "Tool must be a string, not: {:?}", tool);
+					Exception.assertPrecondition(isObject(args), "Arguments must be a dictionary, not: {:?}", args);
 					Exception.assertPrecondition(tool in schema.tools, "Unknown tool '{}'", tool);
 					Exception.assert(
 						tool in parametersValidationSchema,

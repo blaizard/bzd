@@ -24,14 +24,14 @@ describe("Influxdb", () => {
 			Exception.assertEqual(
 				DatabaseInfluxDB.fromKeyToField(key),
 				field,
-				"fromKeyToField({:j}) should be {}",
+				"fromKeyToField({:?}) should be {}",
 				key,
 				field,
 			);
 			Exception.assertEqual(
 				DatabaseInfluxDB.fromFieldToKey(field),
 				key,
-				"fromFieldToKey({}) should be {:j}",
+				"fromFieldToKey({}) should be {:?}",
 				field,
 				key,
 			);

@@ -109,7 +109,6 @@ export default function (str, ...args) {
 		}
 
 		switch (format.metadata[0]) {
-			case "j":
 			case "?":
 				let maxSize = 1000;
 				if ((format.metadata[1] ?? "").startsWith(".")) {

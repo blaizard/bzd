@@ -61,7 +61,7 @@ export default class TimeseriesCollection {
 		for (const [collection, collectionNewData] of Object.entries(newData)) {
 			Exception.assertPrecondition(
 				Array.isArray(collectionNewData),
-				"Data must be an array, not {:j}",
+				"Data must be an array, not {:?}",
 				collectionNewData,
 			);
 

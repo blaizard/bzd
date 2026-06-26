@@ -45,7 +45,7 @@ export default class TimeseriesElasticsearch extends Timeseries {
 		const result = await this.fetch.request("/", {
 			method: "get",
 		});
-		Exception.assert("version" in result, "Unexpected response: {:j}", result);
+		Exception.assert("version" in result, "Unexpected response: {:?}", result);
 	}
 
 	_bucketToURI(bucket) {
@@ -80,7 +80,7 @@ export default class TimeseriesElasticsearch extends Timeseries {
 					},
 				},
 			);
-			Exception.assert("hits" in result && "hits" in result.hits, "Result malformed: {:j}", result);
+			Exception.assert("hits" in result && "hits" in result.hits, "Result malformed: {:?}", result);
 
 			return CollectionPaging.makeFromTotal(
 				result.hits.hits.map((item) => [item._source.date, item._source.data]),

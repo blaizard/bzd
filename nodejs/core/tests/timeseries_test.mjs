@@ -37,14 +37,14 @@ describe("TimeSeries", () => {
 			timeseries.insert(i, 0);
 		}
 
-		Exception.assertEqual(timeseries.getTimestamp(0), 0, "timeseries={:j}", timeseries.data);
-		Exception.assertEqual(timeseries.getTimestamp(1), 1, "timeseries={:j}", timeseries.data);
-		Exception.assertEqual(timeseries.getTimestamp(9), 9, "timeseries={:j}", timeseries.data);
-		Exception.assertEqual(timeseries.getTimestamp(10), null, "timeseries={:j}", timeseries.data);
-		Exception.assertEqual(timeseries.getTimestamp(-1), 9, "timeseries={:j}", timeseries.data);
-		Exception.assertEqual(timeseries.getTimestamp(-2), 8, "timeseries={:j}", timeseries.data);
-		Exception.assertEqual(timeseries.getTimestamp(-10), 0, "timeseries={:j}", timeseries.data);
-		Exception.assertEqual(timeseries.getTimestamp(-11), null, "timeseries={:j}", timeseries.data);
+		Exception.assertEqual(timeseries.getTimestamp(0), 0, "timeseries={:?}", timeseries.data);
+		Exception.assertEqual(timeseries.getTimestamp(1), 1, "timeseries={:?}", timeseries.data);
+		Exception.assertEqual(timeseries.getTimestamp(9), 9, "timeseries={:?}", timeseries.data);
+		Exception.assertEqual(timeseries.getTimestamp(10), null, "timeseries={:?}", timeseries.data);
+		Exception.assertEqual(timeseries.getTimestamp(-1), 9, "timeseries={:?}", timeseries.data);
+		Exception.assertEqual(timeseries.getTimestamp(-2), 8, "timeseries={:?}", timeseries.data);
+		Exception.assertEqual(timeseries.getTimestamp(-10), 0, "timeseries={:?}", timeseries.data);
+		Exception.assertEqual(timeseries.getTimestamp(-11), null, "timeseries={:?}", timeseries.data);
 	});
 
 	it("Find", () => {

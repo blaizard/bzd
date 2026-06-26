@@ -140,7 +140,7 @@ export default class StripePaymentWebhook extends PaymentInterface {
 			this.processedDeletedSubscriptions.add(uid);
 			return isProcessed;
 		} catch (e) {
-			Log.error("Cancel Recurrency: {:j}", subscription);
+			Log.error("Cancel Recurrency: {:?}", subscription);
 			throw e;
 		}
 	}
@@ -179,7 +179,7 @@ export default class StripePaymentWebhook extends PaymentInterface {
 			this.processedPayments.add(uid);
 			return isProcessed;
 		} catch (e) {
-			Log.error("Checkout Session: {:j}", checkoutSession);
+			Log.error("Checkout Session: {:?}", checkoutSession);
 			throw e;
 		}
 	}
@@ -215,7 +215,7 @@ export default class StripePaymentWebhook extends PaymentInterface {
 			this.processedPayments.add(uid);
 			return isProcessed;
 		} catch (e) {
-			Log.error("Invoice: {:j}", invoice);
+			Log.error("Invoice: {:?}", invoice);
 			throw e;
 		}
 	}

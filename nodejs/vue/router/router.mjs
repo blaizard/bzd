@@ -141,7 +141,7 @@ class RouterManager {
 		let router = new Router();
 
 		configuration.routes.forEach((route) => {
-			Exception.assert(route.path, "This route is missing a path: {:j}", route);
+			Exception.assert(route.path, "This route is missing a path: {:?}", route);
 			if (this.options.schema !== null) {
 				Exception.assert(route.path in this.options.schema, "The route '{}' is missing from the schema.", route.path);
 				route = Object.assign({}, route, this.options.schema[route.path]);

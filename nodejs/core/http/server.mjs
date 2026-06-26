@@ -403,7 +403,7 @@ export default class HttpServer {
 				this.app[type.toLowerCase()](endpoint.toRegexp(), ...callbackList);
 		}
 
-		Log.debug("Added route: {} {} with options {:j}", type, uri, options);
+		Log.debug("Added route: {} {} with options {:?}", type, uri, options);
 	}
 }
 

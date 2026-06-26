@@ -52,7 +52,7 @@ export default class StorageWebdav extends Storage {
 		for (const tag of tags) {
 			const result = this._matchTag(str, tag);
 			if (result.length > 0) {
-				Exception.assert(result.length == 1, "There must be at most one tag '{}', instead {:j}", tag, result);
+				Exception.assert(result.length == 1, "There must be at most one tag '{}', instead {:?}", tag, result);
 				output[tag] = decodeURIComponent(result[0]);
 			}
 		}
