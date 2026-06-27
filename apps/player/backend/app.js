@@ -5,7 +5,7 @@ import LogFactory from "#bzd/nodejs/core/log.js";
 import StorageDisk from "#bzd/nodejs/db/storage/disk.js";
 import Permissions from "#bzd/nodejs/db/storage/permissions.js";
 import { spawn } from "child_process";
-import { Command } from "commander/esm.js";
+import { Command } from "commander/esm.mjs";
 import Path from "path";
 import { Readable } from "stream";
 import { WebSocketServer } from "ws";

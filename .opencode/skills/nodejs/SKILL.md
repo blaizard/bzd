@@ -114,7 +114,7 @@ import Format from "./format.js";
 import Router from "../router.js";
 
 // npm package import — bare package name, no prefix
-import { Command } from "commander/esm.js";
+import { Command } from "commander/esm.mjs";
 ```
 
 **Rule of thumb:**
@@ -489,7 +489,7 @@ All npm packages are declared in `tools/nodejs/requirements.in` and locked in `t
 4. Import in code using the bare package name (no `#bzd/` prefix):
    ```javascript
    import { something } from "my-package";
-   import { Command } from "commander/esm.js";
+   import { Command } from "commander/esm.mjs";
    ```
 
 ---
