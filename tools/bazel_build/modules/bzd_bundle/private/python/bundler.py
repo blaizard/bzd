@@ -75,9 +75,9 @@ class Mtree:
 			return
 		self.addParentDirectories(path.parent)
 		if os.access(path, os.X_OK):
-			self.mtree.append(f"./{path} mode=0755 type=file contents={path.resolve()}")
+			self.mtree.append(f"./{path} mode=0755 type=file content={path.absolute()}")
 		else:
-			self.mtree.append(f"./{path} mode=0644 type=file contents={path.resolve()}")
+			self.mtree.append(f"./{path} mode=0644 type=file content={path.absolute()}")
 		self.layers.add(path)
 
 	def addLink(self, path: pathlib.Path, target: pathlib.Path) -> None:
@@ -313,8 +313,11 @@ if __name__ == "__main__":
 					args.tar,
 					"-cf",
 					args.output / layer["output"],
+					# This makes bsdtar unable to check the file system for the actual files,
+					# which might cause an issue with we want to create a link from a file for example.
+					"-C",
+					args.output,
 					*extraArguments,
-					"--dereference",
 					"--format=pax",
 					f"@{mtreeFile.name}",
 				],
