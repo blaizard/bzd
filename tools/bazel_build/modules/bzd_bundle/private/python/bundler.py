@@ -75,9 +75,9 @@ class Mtree:
 			return
 		self.addParentDirectories(path.parent)
 		if os.access(path, os.X_OK):
-			self.mtree.append(f"./{path} mode=0755 type=file")
+			self.mtree.append(f"./{path} mode=0755 type=file contents={path.resolve()}")
 		else:
-			self.mtree.append(f"./{path} mode=0644 type=file")
+			self.mtree.append(f"./{path} mode=0644 type=file contents={path.resolve()}")
 		self.layers.add(path)
 
 	def addLink(self, path: pathlib.Path, target: pathlib.Path) -> None:
