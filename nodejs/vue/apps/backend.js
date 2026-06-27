@@ -12,7 +12,7 @@ import Statistics from "#bzd/nodejs/core/statistics/statistics.js";
 import config from "#bzd/nodejs/vue/apps/config.json" with { type: "json" };
 import LoggerMemory from "#bzd/nodejs/vue/components/logger/backend/memory/memory.js";
 
-import { Command } from "commander/esm.js";
+import { Command } from "commander/esm.mjs";
 
 const Exception = ExceptionFactory("backend");
 const Log = LogFactory("backend");
