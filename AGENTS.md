@@ -89,7 +89,7 @@ The project manages its own toolchains via Bazel. Do NOT install global compiler
 - **Extension:** `.mjs` (ES Modules are preferred).
 - **Naming:** Follows the general `camelCase` for functions and variables.
 - **Imports:** Use the `#bzd/` prefix for internal project imports to resolve against the monorepo root.
-  - Example: `import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";`
+  - Example: `import ExceptionFactory from "#bzd/nodejs/core/exception.js";`
 - **Linting/Formatting:** Uses `eslint` and `prettier`.
 
 ### Rust Specifics

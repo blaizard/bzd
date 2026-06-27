@@ -32,8 +32,8 @@
 
 <script>
 	import Gauge from "#bzd/apps/dashboard/plugins/system_monitor/gauge.vue";
-	import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
-	import { bytesToString } from "#bzd/nodejs/utils/to_string.mjs";
+	import ExceptionFactory from "#bzd/nodejs/core/exception.js";
+	import { bytesToString } from "#bzd/nodejs/utils/to_string.js";
 
 	const Exception = ExceptionFactory("plugin", "system_monitor", "gauge_rate");
 

@@ -18,11 +18,11 @@
 </template>
 
 <script>
-	import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
+	import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
 	import TerminalWebsocket from "#bzd/nodejs/vue/components/terminal/frontend/websocket.vue";
 	import FileExplorer from "#bzd/nodejs/vue/components/file_explorer/file_explorer.vue";
-	import Permissions from "#bzd/nodejs/db/storage/permissions.mjs";
+	import Permissions from "#bzd/nodejs/db/storage/permissions.js";
 
 	const Exception = ExceptionFactory("main");
 

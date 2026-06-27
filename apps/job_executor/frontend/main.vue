@@ -50,13 +50,13 @@
 <script>
 	import Form from "#bzd/nodejs/vue/components/form/form.vue";
 	import Jobs from "#bzd/apps/job_executor/jobs.json" with { type: "json" };
-	import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
-	import LogFactory from "#bzd/nodejs/core/log.mjs";
+	import ExceptionFactory from "#bzd/nodejs/core/exception.js";
+	import LogFactory from "#bzd/nodejs/core/log.js";
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
-	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.mjs";
-	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
-	import { timeMsToString } from "#bzd/nodejs/utils/to_string.mjs";
-	import Status from "#bzd/apps/job_executor/backend/status.mjs";
+	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.js";
+	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.js";
+	import { timeMsToString } from "#bzd/nodejs/utils/to_string.js";
+	import Status from "#bzd/apps/job_executor/backend/status.js";
 
 	const Exception = ExceptionFactory("main");
 	const Log = LogFactory("main");

@@ -21,7 +21,7 @@
 
 <script>
 	import Tree from "#bzd/nodejs/vue/components/file_explorer/tree.vue";
-	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
+	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.js";
 
 	export default {
 		components: {

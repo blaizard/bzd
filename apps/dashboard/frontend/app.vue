@@ -7,7 +7,7 @@
 </template>
 
 <script>
-	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
+	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.js";
 	import Application from "#bzd/nodejs/vue/apps/application.vue";
 
 	export default {

@@ -104,17 +104,17 @@ The `#bzd/` import prefix resolves to the **monorepo root**. Use it for all cros
 
 ```javascript
 // Cross-package import — ALWAYS use #bzd/
-import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
-import LogFactory from "#bzd/nodejs/core/log.mjs";
-import { HttpClient } from "#bzd/nodejs/core/http/client.mjs";
+import ExceptionFactory from "#bzd/nodejs/core/exception.js";
+import LogFactory from "#bzd/nodejs/core/log.js";
+import { HttpClient } from "#bzd/nodejs/core/http/client.js";
 import config from "#bzd/nodejs/vue/apps/config.json" with { type: "json" };
 
 // Relative import — OK within the same package/directory
-import Format from "./format.mjs";
-import Router from "../router.mjs";
+import Format from "./format.js";
+import Router from "../router.js";
 
 // npm package import — bare package name, no prefix
-import { Command } from "commander/esm.mjs";
+import { Command } from "commander/esm.js";
 ```
 
 **Rule of thumb:**
@@ -159,7 +159,7 @@ import { Command } from "commander/esm.mjs";
 All modules create their own typed exception class using `ExceptionFactory`. This is the standard error-handling mechanism — never throw raw `Error` objects.
 
 ```javascript
-import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
+import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 
 const Exception = ExceptionFactory("mymodule", "submodule");
 
@@ -189,7 +189,7 @@ const e = Exception.fromError(caughtError, "Context: {}", contextInfo);
 ## Logging
 
 ```javascript
-import LogFactory from "#bzd/nodejs/core/log.mjs";
+import LogFactory from "#bzd/nodejs/core/log.js";
 
 const Log = LogFactory("mymodule");
 
@@ -206,7 +206,7 @@ Log.debug("Processing item {}", item);
 1. Create `nodejs/<module>/my_feature.mjs`:
 
 ```javascript
-import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
+import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 
 const Exception = ExceptionFactory("mymodule", "myfeature");
 
@@ -231,7 +231,7 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 
 bzd_nodejs_library(
 	name = "my_feature",
-	srcs = ["my_feature.mjs"],
+	srcs = ["my_feature.js"],
 	visibility = ["//visibility:public"],
 	deps = [
 		"//nodejs/core:exception",
@@ -252,8 +252,8 @@ Tests use Mocha and are named `<name>_test.mjs`. Mocha globals (`describe`, `it`
 ### Test file structure
 
 ```javascript
-import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
-import MyFeature from "#bzd/nodejs/mymodule/my_feature.mjs";
+import ExceptionFactory from "#bzd/nodejs/core/exception.js";
+import MyFeature from "#bzd/nodejs/mymodule/my_feature.js";
 
 const Exception = ExceptionFactory("test", "myfeature");
 
@@ -288,8 +288,8 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_test")
 
 bzd_nodejs_test(
 	name = "my_feature",
-	srcs = ["my_feature_test.mjs"],
-	main = "my_feature_test.mjs",
+	srcs = ["my_feature_test.js"],
+	main = "my_feature_test.js",
 	deps = [
 		"//nodejs/mymodule:my_feature",
 		"//nodejs/core:exception",
@@ -302,10 +302,10 @@ bzd_nodejs_test(
 ```python
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_test")
 
-test_srcs = glob(["*_test.mjs"])
+test_srcs = glob(["*_test.js"])
 
 [bzd_nodejs_test(
-	name = src.replace("_test.mjs", ""),
+	name = src.replace("_test.js", ""),
 	srcs = [src],
 	main = src,
 	deps = [
@@ -320,8 +320,8 @@ test_srcs = glob(["*_test.mjs"])
 ```python
 bzd_nodejs_test(
 	name = "my_test",
-	srcs = ["my_test.mjs"],
-	main = "my_test.mjs",
+	srcs = ["my_test.js"],
+	main = "my_test.js",
 	packages = ["@nodejs_deps//:some_package"],
 	deps = ["//nodejs/core:exception"],
 )
@@ -351,13 +351,13 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_binary")
 
 bzd_nodejs_binary(
 	name = "backend",
-	srcs = ["backend.mjs", "api.json"],
+	srcs = ["backend.js", "api.json"],
 	args = [
 		"--static",
 		"$(rootpath //apps/my_app/frontend:frontend).bundle",
 	],
 	data = ["//apps/my_app/frontend:frontend"],
-	main = "backend.mjs",
+	main = "backend.js",
 	deps = ["//nodejs/vue/apps:backend"],
 )
 ```
@@ -369,9 +369,9 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_web_binary")
 
 bzd_nodejs_web_binary(
 	name = "frontend",
-	srcs = ["app.mjs", "app.vue"],
+	srcs = ["app.js", "app.vue"],
 	config_scss = "//nodejs/styles:default.scss",
-	main = "app.mjs",
+	main = "app.js",
 	deps = ["//nodejs/vue/apps:frontend"],
 )
 ```
@@ -380,7 +380,7 @@ bzd_nodejs_web_binary(
 
 ```javascript
 import APIv1 from "#bzd/api.json" with { type: "json" };
-import Backend from "#bzd/nodejs/vue/apps/backend.mjs";
+import Backend from "#bzd/nodejs/vue/apps/backend.js";
 
 const backend = await Backend.make(APIv1).useAuthentication().useLogger().setup();
 await backend.start();
@@ -390,7 +390,7 @@ await backend.start();
 
 ```javascript
 import APIv1 from "#bzd/api.json" with { type: "json" };
-import Frontend from "#bzd/nodejs/vue/apps/frontend.mjs";
+import Frontend from "#bzd/nodejs/vue/apps/frontend.js";
 import App from "./app.vue";
 
 const frontend = Frontend.make(App).useRest(APIv1.rest).useAuthentication().useLogger().setup();
@@ -412,7 +412,7 @@ Vue components use `.vue` single-file component (SFC) format with `<template>`, 
 </template>
 
 <script>
-import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
+import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 
 const Exception = ExceptionFactory("components", "mycomponent");
 
@@ -480,7 +480,7 @@ All npm packages are declared in `tools/nodejs/requirements.in` and locked in `t
    ```python
    bzd_nodejs_library(
    	name = "my_lib",
-   	srcs = ["my_lib.mjs"],
+   	srcs = ["my_lib.js"],
    	packages = ["@nodejs_deps//:my_package"],
    	visibility = ["//visibility:public"],
    )
@@ -489,7 +489,7 @@ All npm packages are declared in `tools/nodejs/requirements.in` and locked in `t
 4. Import in code using the bare package name (no `#bzd/` prefix):
    ```javascript
    import { something } from "my-package";
-   import { Command } from "commander/esm.mjs";
+   import { Command } from "commander/esm.js";
    ```
 
 ---

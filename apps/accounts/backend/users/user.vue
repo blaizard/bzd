@@ -7,13 +7,13 @@
 <script>
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
 	import Form from "#bzd/nodejs/vue/components/form/form.vue";
-	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
+	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.js";
 	import {
 		scopeSelfBasicRead,
 		scopeSelfTokensRead,
 		scopeSelfTokensWrite,
 		scopeSelfSubscriptionsRead,
-	} from "#bzd/apps/accounts/backend/users/scopes.mjs";
+	} from "#bzd/apps/accounts/backend/users/scopes.js";
 
 	export default {
 		mixins: [Component],

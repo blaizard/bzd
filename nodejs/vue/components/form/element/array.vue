@@ -40,7 +40,7 @@
 
 <script>
 	import Element from "./element.vue";
-	import Touch from "../../../directives/touch.mjs";
+	import Touch from "../../../directives/touch.js";
 	import { defineAsyncComponent } from "vue";
 
 	export default {

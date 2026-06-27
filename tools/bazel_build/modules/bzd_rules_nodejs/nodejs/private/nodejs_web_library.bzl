@@ -32,7 +32,7 @@ def vite_run(ctx, install, inputs, output, substitutions):
     # Gather toolchain manager
     toolchain_executable = ctx.toolchains["//nodejs:toolchain_type"].executable
 
-    vite_config = ctx.actions.declare_file("vite.config.mjs", sibling = install.package_json)
+    vite_config = ctx.actions.declare_file("vite.config.js", sibling = install.package_json)
     ctx.actions.expand_template(
         output = vite_config,
         template = ctx.file._vite_config,

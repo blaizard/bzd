@@ -3,10 +3,10 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "executor",
     srcs = [
-        "executor.mjs",
-        "executor_docker.mjs",
-        "executor_readonly.mjs",
-        "executor_shell.mjs",
+        "executor.js",
+        "executor_docker.js",
+        "executor_readonly.js",
+        "executor_shell.js",
     ],
     visibility = [
         "//apps/job_executor/backend:__pkg__",

@@ -2,8 +2,8 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_test")
 
 bzd_nodejs_test(
     name = "nodes",
-    srcs = ["nodes_test.mjs"],
-    main = "nodes_test.mjs",
+    srcs = ["nodes_test.js"],
+    main = "nodes_test.js",
     deps = [
         "//apps/artifacts/plugins/nodes:backend",
         "//apps/artifacts/plugins/nodes:key_mapping",
@@ -13,8 +13,8 @@ bzd_nodejs_test(
 
 bzd_nodejs_test(
     name = "data",
-    srcs = ["data_test.mjs"],
-    main = "data_test.mjs",
+    srcs = ["data_test.js"],
+    main = "data_test.js",
     deps = [
         "//apps/artifacts/plugins/nodes:data",
         "//nodejs/core:exception",
@@ -24,8 +24,8 @@ bzd_nodejs_test(
 
 bzd_nodejs_test(
     name = "plugin",
-    srcs = ["plugin_test.mjs"],
-    main = "plugin_test.mjs",
+    srcs = ["plugin_test.js"],
+    main = "plugin_test.js",
     deps = [
         "//apps/artifacts/backend:plugin_tester",
         "//apps/artifacts/plugins/nodes:backend",

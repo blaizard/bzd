@@ -3,7 +3,7 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "timeseries_collection",
     srcs = [
-        "timeseries_collection.mjs",
+        "timeseries_collection.js",
     ],
     visibility = [
         "//apps/artifacts/plugins:__subpackages__",

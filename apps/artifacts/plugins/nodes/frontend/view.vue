@@ -11,7 +11,7 @@
 	import ViewData from "#bzd/apps/artifacts/plugins/nodes/frontend/view_data.vue";
 	import ViewDashboard from "#bzd/apps/artifacts/plugins/nodes/frontend/view_dashboard.vue";
 	import Form from "#bzd/nodejs/vue/components/form/form.vue";
-	import LocalStorage from "#bzd/nodejs/core/localstorage.mjs";
+	import LocalStorage from "#bzd/nodejs/core/localstorage.js";
 
 	const optionsStorageKey = "bzd-artifacts-plugin-nodes-view-options";
 

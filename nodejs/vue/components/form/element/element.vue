@@ -1,6 +1,6 @@
 <script>
-	import Validation from "../../../../core/validation.mjs";
-	import ExceptionFactory from "../../../../core/exception.mjs";
+	import Validation from "../../../../core/validation.js";
+	import ExceptionFactory from "../../../../core/exception.js";
 
 	const Exception = ExceptionFactory("form");
 	let uidCounter = 0;

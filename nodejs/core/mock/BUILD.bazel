@@ -5,7 +5,7 @@ package(default_visibility = ["//visibility:public"])
 bzd_nodejs_library(
     name = "filesystem",
     srcs = [
-        "filesystem.mjs",
+        "filesystem.js",
     ],
     deps = [
         "//nodejs/core/clock:date",

@@ -4,16 +4,16 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 bzd_symlink(
     name = "symlink",
     input = select({
-        "@bzd_rules_nodejs//:nodejs": "node.ws.mjs",
-        "@bzd_rules_nodejs//:nodejs_web": "browser.websocket.mjs",
+        "@bzd_rules_nodejs//:nodejs": "node.ws.js",
+        "@bzd_rules_nodejs//:nodejs_web": "browser.websocket.js",
     }),
-    output = "backend.mjs",
+    output = "backend.js",
 )
 
 bzd_nodejs_library(
     name = "backend",
     srcs = [
-        "backend.mjs",
+        "backend.js",
     ],
     packages = select({
         "@bzd_rules_nodejs//:nodejs": [

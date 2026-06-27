@@ -7,8 +7,8 @@
 <script>
 	import Chart from "chart.js/auto";
 	import "chartjs-adapter-date-fns";
-	import { bytesToString, frequencyToString } from "#bzd/nodejs/utils/to_string.mjs";
-	import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
+	import { bytesToString, frequencyToString } from "#bzd/nodejs/utils/to_string.js";
+	import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 
 	const Exception = ExceptionFactory("apps", "plugin", "nodes");
 

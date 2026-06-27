@@ -86,7 +86,7 @@ def _bzd_plugins_gen_index_impl(ctx):
         content_entries.append(entry)
         index += 1
 
-    out = ctx.actions.declare_file(ctx.label.name + ".mjs")
+    out = ctx.actions.declare_file(ctx.label.name + ".js")
     ctx.actions.write(
         output = out,
         content = """

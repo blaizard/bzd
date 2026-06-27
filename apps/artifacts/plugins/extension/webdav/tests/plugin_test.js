@@ -1,0 +1,449 @@
+import ExceptionFactory from "#bzd/nodejs/core/exception.js";
+import Plugin from "#bzd/apps/artifacts/plugins/storage/backend.js";
+import PluginTester from "#bzd/apps/artifacts/backend/plugin_tester.js";
+import { XMLParser } from "fast-xml-parser";
+
+const Exception = ExceptionFactory("test", "artifacts", "extension", "webdav");
+const fixedDate = new Date();
+
+/// Check that a webdav response contains the expected entries.
+const assertEqualResponses = (actual, expected) => {
+	try {
+		const expectedPrefx = "https://dummy/webdav";
+		Exception.assert("D:multistatus" in actual, "Missing D:multistatus.");
+		const responses = Array.isArray(actual["D:multistatus"]["D:response"])
+			? actual["D:multistatus"]["D:response"]
+			: [actual["D:multistatus"]["D:response"]];
+		let consumed = new Set();
+		for (const response of responses) {
+			Exception.assert(response, "Unexpected response: {:?}", response);
+			const href = response["D:href"] || "";
+			Exception.assert(
+				href.startsWith(expectedPrefx),
+				"D:href ({}) must start with '{}': {:?}",
+				href,
+				expectedPrefx,
+				response,
+			);
+			const path = href.substring(expectedPrefx.length);
+			Exception.assert(path in expected, "The path '{}' is not matching any of the expected entries.", path);
+			Exception.assert(!(path in consumed), "The path '{}' was covered twice.", path);
+			const propstat = response["D:propstat"] ?? {};
+			Exception.assertEqual(propstat["D:status"], "HTTP/1.1 200 OK");
+			const props = propstat["D:prop"] ?? {};
+			for (const [key, value] of Object.entries(expected[path])) {
+				Exception.assert(key in props, "Missing property '{}' in response for '{}', all props {:?}", key, path, props);
+				Exception.assertEqual(props[key], value, "Props '{}' for entry '{}', all props {:?}", key, path, props);
+			}
+		}
+	} catch (e) {
+		console.error("Received:", JSON.stringify(actual, null, 4));
+		throw e;
+	}
+};
+
+const defaultMemory = {
+	storage: {
+		data: {
+			"a.txt": "content for a",
+			"b.txt": "content for b",
+			"with space.txt": "content for width space",
+			empty: {},
+			nested: {
+				deeper: {
+					"c.txt": "content for c",
+				},
+				"e.txt": "content for e",
+				"f.txt": "content for b",
+			},
+		},
+		options: {
+			date: () => fixedDate,
+		},
+		write: true,
+		type: "memory",
+	},
+	webdav: {},
+};
+
+describe("Webdav", () => {
+	describe("propfind", async () => {
+		const tester = new PluginTester();
+		tester.register("memory", Plugin, defaultMemory);
+		await tester.start();
+
+		it("propfind on root directory", async () => {
+			const response = await tester.send("memory", "propfind", "/webdav");
+			Exception.assertEqual(response.status, 207);
+			const data = new XMLParser().parse(response.data);
+			assertEqualResponses(data, {
+				"": {
+					"D:displayname": "webdav",
+					"D:resourcetype": { "D:collection": "" },
+				},
+			});
+		});
+
+		it("propfind on root directory with '/'", async () => {
+			const response = await tester.send("memory", "propfind", "/webdav/");
+			Exception.assertEqual(response.status, 207);
+			const data = new XMLParser().parse(response.data);
+			assertEqualResponses(data, {
+				"": {
+					"D:displayname": "webdav",
+					"D:resourcetype": { "D:collection": "" },
+				},
+			});
+		});
+
+		// webdav4: ls
+		it("propfind on root directory with depth=1", async () => {
+			const response = await tester.send("memory", "propfind", "/webdav", {
+				headers: {
+					depth: 1,
+				},
+			});
+			Exception.assertEqual(response.status, 207);
+			const data = new XMLParser().parse(response.data);
+			assertEqualResponses(data, {
+				"": {
+					"D:displayname": "webdav",
+					"D:resourcetype": { "D:collection": "" },
+				},
+				"/a.txt": {
+					"D:displayname": "a.txt",
+					"D:resourcetype": "",
+					"D:getcontentlength": 13,
+				},
+				"/b.txt": {
+					"D:displayname": "b.txt",
+					"D:resourcetype": "",
+					"D:getcontentlength": 13,
+				},
+				"/with%20space.txt": {
+					"D:displayname": "with space.txt",
+					"D:resourcetype": "",
+					"D:getcontentlength": 23,
+				},
+				"/empty": {
+					"D:displayname": "empty",
+					"D:resourcetype": { "D:collection": "" },
+				},
+				"/nested": {
+					"D:displayname": "nested",
+					"D:resourcetype": { "D:collection": "" },
+				},
+			});
+		});
+
+		// webdav4: ls
+		it("propfind on nested directory with depth=1", async () => {
+			const response = await tester.send("memory", "propfind", "/webdav/nested/deeper", {
+				headers: {
+					depth: 1,
+				},
+			});
+			Exception.assertEqual(response.status, 207);
+			const data = new XMLParser().parse(response.data);
+			assertEqualResponses(data, {
+				"/nested/deeper": {
+					"D:displayname": "deeper",
+					"D:resourcetype": { "D:collection": "" },
+				},
+				"/nested/deeper/c.txt": {
+					"D:displayname": "c.txt",
+					"D:resourcetype": "",
+					"D:getcontentlength": 13,
+				},
+			});
+		});
+
+		// webdav4: cat
+		it("propfind on file", async () => {
+			const response = await tester.send("memory", "propfind", "/webdav/a.txt");
+			Exception.assertEqual(response.status, 207);
+			const data = new XMLParser().parse(response.data);
+			const entry = data["D:multistatus"]["D:response"];
+			assertEqualResponses(data, {
+				"/a.txt": {
+					"D:displayname": "a.txt",
+					"D:resourcetype": "",
+					"D:getcontentlength": 13,
+				},
+			});
+		});
+
+		// webdav4: cat with space.txt
+		it("propfind on file", async () => {
+			const response = await tester.send("memory", "propfind", "/webdav/with%20space.txt");
+			Exception.assertEqual(response.status, 207);
+			const data = new XMLParser().parse(response.data);
+			const entry = data["D:multistatus"]["D:response"];
+			assertEqualResponses(data, {
+				"/with%20space.txt": {
+					"D:displayname": "with space.txt",
+					"D:resourcetype": "",
+					"D:getcontentlength": 23,
+				},
+			});
+		});
+
+		// webdav4: rm file
+		it("propfind on file with depth=1", async () => {
+			const response = await tester.send("memory", "propfind", "/webdav/a.txt", {
+				headers: {
+					depth: 1,
+				},
+			});
+			Exception.assertEqual(response.status, 207);
+			const data = new XMLParser().parse(response.data);
+			const entry = data["D:multistatus"]["D:response"];
+			assertEqualResponses(data, {
+				"/a.txt": {
+					"D:displayname": "a.txt",
+					"D:resourcetype": "",
+					"D:getcontentlength": 13,
+				},
+			});
+		});
+
+		it("propfind on wrong path", async () => {
+			const response = await tester.send("memory", "propfind", "/webdav/wrong", {}, /*throwOnFailure*/ false);
+			Exception.assertEqual(response.status, 404);
+		});
+	});
+
+	describe("get", async () => {
+		const tester = new PluginTester();
+		tester.register("memory", Plugin, defaultMemory);
+		await tester.start();
+
+		it("get file", async () => {
+			const response = await tester.send("memory", "get", "/webdav/a.txt");
+			Exception.assertEqual(response.status, 200);
+			Exception.assertEqual(response.data, "content for a");
+		});
+
+		it("get wrong file", async () => {
+			const response = await tester.send("memory", "get", "/webdav/wrong.txt", {}, /*throwOnFailure*/ false);
+			Exception.assertEqual(response.status, 404);
+		});
+	});
+
+	describe("put", async () => {
+		const tester = new PluginTester();
+		tester.register("memory", Plugin, defaultMemory);
+		await tester.start();
+
+		it("put file", async () => {
+			const response = await tester.send("memory", "put", "/webdav/new.txt", {
+				data: "hello new content",
+			});
+			Exception.assertEqual(response.status, 200);
+
+			const responseRead = await tester.send("memory", "get", "/webdav/new.txt");
+			Exception.assertEqual(responseRead.status, 200);
+			Exception.assertEqual(responseRead.data, "hello new content");
+		}, 10000);
+
+		it("put override file", async () => {
+			const response = await tester.send("memory", "put", "/webdav/a.txt", {
+				data: "hello new content",
+			});
+			Exception.assertEqual(response.status, 200);
+
+			const responseRead = await tester.send("memory", "get", "/webdav/a.txt");
+			Exception.assertEqual(responseRead.status, 200);
+			Exception.assertEqual(responseRead.data, "hello new content");
+		});
+	});
+
+	describe("delete", async () => {
+		const tester = new PluginTester();
+		tester.register("memory", Plugin, defaultMemory);
+		await tester.start();
+
+		it("delete file", async () => {
+			const response = await tester.send("memory", "delete", "/webdav/a.txt");
+			Exception.assertEqual(response.status, 200);
+		});
+
+		it("delete directory", async () => {
+			const response = await tester.send("memory", "delete", "/webdav/nested");
+			Exception.assertEqual(response.status, 200);
+		});
+
+		it("delete wrong resource", async () => {
+			const response = await tester.send("memory", "delete", "/webdav/not/exists", {}, /*throwOnFailure*/ false);
+			Exception.assertEqual(response.status, 404);
+		});
+	});
+
+	describe("head", async () => {
+		const tester = new PluginTester();
+		tester.register("memory", Plugin, defaultMemory);
+		await tester.start();
+
+		it("head file", async () => {
+			const response = await tester.send("memory", "head", "/webdav/a.txt");
+			Exception.assertEqual(response.status, 200);
+			Exception.assertEqual(response.headers["Content-Length"], 13);
+			Exception.assertEqual(response.headers["Last-Modified"], fixedDate.toUTCString());
+			Exception.assertEqual(response.data, null);
+		});
+
+		it("head directory", async () => {
+			const response = await tester.send("memory", "head", "/webdav/nested");
+			Exception.assertEqual(response.status, 200);
+			Exception.assertEqual(response.data, null);
+		});
+	});
+
+	describe("mkcol", async () => {
+		const tester = new PluginTester();
+		tester.register("memory", Plugin, defaultMemory);
+		await tester.start();
+
+		it("mkcol single directory", async () => {
+			const response = await tester.send("memory", "mkcol", "/webdav/new");
+			Exception.assertEqual(response.status, 200);
+			Exception.assertEqual(response.data, null);
+		});
+
+		it("head multiple directories", async () => {
+			const response = await tester.send("memory", "mkcol", "/webdav/new/directory/deep");
+			Exception.assertEqual(response.status, 200);
+			Exception.assertEqual(response.data, null);
+		});
+	});
+
+	describe("move", async () => {
+		const tester = new PluginTester();
+		tester.register("memory", Plugin, defaultMemory);
+		await tester.start();
+
+		it("move file", async () => {
+			const response = await tester.send("memory", "move", "/webdav/a.txt", {
+				headers: {
+					Destination: "/webdav/a_moved.txt",
+				},
+			});
+			Exception.assertEqual(response.status, 200);
+			const response2 = await tester.send("memory", "get", "/webdav/a.txt", {}, /*throwOnFailure*/ false);
+			Exception.assertEqual(response2.status, 404);
+			const response3 = await tester.send("memory", "get", "/webdav/a_moved.txt");
+			Exception.assertEqual(response3.status, 200);
+			Exception.assertEqual(response3.data, "content for a");
+		});
+
+		it("move file new directory", async () => {
+			const response = await tester.send("memory", "move", "/webdav/a_moved.txt", {
+				headers: {
+					Destination: "/webdav/new/a.txt",
+				},
+			});
+			Exception.assertEqual(response.status, 200);
+			const response2 = await tester.send("memory", "get", "/webdav/a_moved.txt", {}, /*throwOnFailure*/ false);
+			Exception.assertEqual(response2.status, 404);
+			const response3 = await tester.send("memory", "get", "/webdav/new/a.txt");
+			Exception.assertEqual(response3.status, 200);
+			Exception.assertEqual(response3.data, "content for a");
+		});
+
+		it("move file invalid path", async () => {
+			const response = await tester.send(
+				"memory",
+				"move",
+				"/webdav/a.txt",
+				{
+					headers: {
+						Destination: "/invalid/a_moved.txt",
+					},
+				},
+				/*throwOnFailure*/ false,
+			);
+			Exception.assertEqual(response.status, 400);
+		});
+
+		it("move directory", async () => {
+			const response = await tester.send(
+				"memory",
+				"move",
+				"/webdav/nested",
+				{
+					headers: {
+						Destination: "/invalid/nested_moved",
+					},
+				},
+				/*throwOnFailure*/ false,
+			);
+			Exception.assertEqual(response.status, 400);
+		});
+	});
+
+	describe("copy", async () => {
+		const tester = new PluginTester();
+		tester.register("memory", Plugin, defaultMemory);
+		await tester.start();
+
+		it("copy file", async () => {
+			const response = await tester.send("memory", "copy", "/webdav/a.txt", {
+				headers: {
+					Destination: "/webdav/a_copied.txt",
+				},
+			});
+			Exception.assertEqual(response.status, 200);
+			const response2 = await tester.send("memory", "get", "/webdav/a.txt");
+			Exception.assertEqual(response2.status, 200);
+			Exception.assertEqual(response2.data, "content for a");
+			const response3 = await tester.send("memory", "get", "/webdav/a_copied.txt");
+			Exception.assertEqual(response3.status, 200);
+			Exception.assertEqual(response3.data, "content for a");
+		});
+
+		it("copy file new directory", async () => {
+			const response = await tester.send("memory", "copy", "/webdav/a.txt", {
+				headers: {
+					Destination: "/webdav/new/a.txt",
+				},
+			});
+			Exception.assertEqual(response.status, 200);
+			const response2 = await tester.send("memory", "get", "/webdav/a.txt");
+			Exception.assertEqual(response2.status, 200);
+			Exception.assertEqual(response2.data, "content for a");
+			const response3 = await tester.send("memory", "get", "/webdav/new/a.txt");
+			Exception.assertEqual(response3.status, 200);
+			Exception.assertEqual(response3.data, "content for a");
+		});
+
+		it("copy file invalid path", async () => {
+			const response = await tester.send(
+				"memory",
+				"copy",
+				"/webdav/a.txt",
+				{
+					headers: {
+						Destination: "/invalid/a_copied.txt",
+					},
+				},
+				/*throwOnFailure*/ false,
+			);
+			Exception.assertEqual(response.status, 400);
+		});
+
+		it("copy directory", async () => {
+			const response = await tester.send(
+				"memory",
+				"copy",
+				"/webdav/nested",
+				{
+					headers: {
+						Destination: "/invalid/nested_copied",
+					},
+				},
+				/*throwOnFailure*/ false,
+			);
+			Exception.assertEqual(response.status, 400);
+		});
+	});
+});

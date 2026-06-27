@@ -3,7 +3,7 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "array",
     srcs = [
-        "array.mjs",
+        "array.js",
     ],
     visibility = ["//visibility:public"],
 )
@@ -11,7 +11,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "color",
     srcs = [
-        "color.mjs",
+        "color.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -22,7 +22,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "delay",
     srcs = [
-        "delay.mjs",
+        "delay.js",
     ],
     visibility = ["//visibility:public"],
 )
@@ -30,7 +30,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "object",
     srcs = [
-        "object.mjs",
+        "object.js",
     ],
     visibility = ["//visibility:public"],
 )
@@ -38,7 +38,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "optional",
     srcs = [
-        "optional.mjs",
+        "optional.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -49,7 +49,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "query",
     srcs = [
-        "query.mjs",
+        "query.js",
     ],
     visibility = ["//visibility:public"],
 )
@@ -57,7 +57,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "pathlib",
     srcs = [
-        "pathlib.mjs",
+        "pathlib.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -68,7 +68,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "run",
     srcs = [
-        "run.mjs",
+        "run.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -80,7 +80,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "to_string",
     srcs = [
-        "to_string.mjs",
+        "to_string.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -91,7 +91,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "uid",
     srcs = [
-        "uid.mjs",
+        "uid.js",
     ],
     visibility = ["//visibility:public"],
 )
@@ -99,7 +99,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "regexpr",
     srcs = [
-        "regexpr.mjs",
+        "regexpr.js",
     ],
     visibility = ["//visibility:public"],
 )
@@ -107,7 +107,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "result",
     srcs = [
-        "result.mjs",
+        "result.js",
     ],
     visibility = ["//visibility:public"],
     deps = [

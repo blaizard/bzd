@@ -46,7 +46,7 @@
 <script>
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
 	import Checkbox from "#bzd/nodejs/vue/components/form/element/checkbox.vue";
-	import { bytesToString, timeMsToString, dateToDefaultString } from "#bzd/nodejs/utils/to_string.mjs";
+	import { bytesToString, timeMsToString, dateToDefaultString } from "#bzd/nodejs/utils/to_string.js";
 
 	export default {
 		mixins: [Component],

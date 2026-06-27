@@ -5,11 +5,11 @@ load("@rules_python//python:defs.bzl", "py_binary")
 bzd_nodejs_web_library(
     name = "library",
     srcs = [
-        "bdl_to_elk.mjs",
-        "library.mjs",
+        "bdl_to_elk.js",
+        "library.js",
     ],
     library_name = "BdlToSvg",
-    main = "library.mjs",
+    main = "library.js",
     deps = [
         "//diagram/elk_to_svg",
     ],

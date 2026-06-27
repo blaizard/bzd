@@ -4,10 +4,10 @@ bzd_nodejs_web_binary(
     name = "frontend",
     srcs = glob([
         "**/*.vue",
-        "**/*.mjs",
+        "**/*.js",
     ]),
     config_scss = "//nodejs/styles:default.scss",
-    main = "app.mjs",
+    main = "app.js",
     packages = [
         "@nodejs_deps//:highlight-js",
     ],

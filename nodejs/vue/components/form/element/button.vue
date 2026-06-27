@@ -12,7 +12,7 @@
 
 <script>
 	import Element from "./element.vue";
-	import loadScript from "#bzd/nodejs/core/script.mjs";
+	import loadScript from "#bzd/nodejs/core/script.js";
 
 	export default {
 		mixins: [Element],

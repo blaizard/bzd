@@ -3,7 +3,7 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library", "bzd_nodejs_tes
 bzd_nodejs_library(
     name = "server",
     srcs = [
-        "server.mjs",
+        "server.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -18,9 +18,9 @@ bzd_nodejs_library(
 bzd_nodejs_test(
     name = "server_test",
     srcs = [
-        "tests/server_test.mjs",
+        "tests/server_test.js",
     ],
-    main = "tests/server_test.mjs",
+    main = "tests/server_test.js",
     deps = [
         ":server",
         "//nodejs/core/http/mock:server",

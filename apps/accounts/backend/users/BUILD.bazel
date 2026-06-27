@@ -8,12 +8,12 @@ bzd_nodejs_library(
     name = "users",
     srcs = [
         "api.json",
-        "roles.mjs",
-        "scopes.mjs",
-        "subscription.mjs",
-        "token.mjs",
-        "user.mjs",
-        "users.mjs",
+        "roles.js",
+        "scopes.js",
+        "subscription.js",
+        "token.js",
+        "user.js",
+        "users.js",
     ],
     apis = ["api.json"],
     visibility = [
@@ -31,7 +31,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "frontend",
     srcs = [
-        "scopes.mjs",
+        "scopes.js",
         "user.vue",
         "users.vue",
     ],

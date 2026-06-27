@@ -3,7 +3,7 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "email",
     srcs = [
-        "manager.mjs",
+        "manager.js",
     ],
     visibility = [
         "//apps/accounts/backend:__subpackages__",

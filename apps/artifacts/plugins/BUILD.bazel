@@ -9,7 +9,7 @@ _PLUGINS = [
 bzd_nodejs_library(
     name = "frontend",
     srcs = [
-        "frontend.mjs",
+        "frontend.js",
     ],
     visibility = [
         "//apps/artifacts:__subpackages__",
@@ -20,7 +20,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "backend",
     srcs = [
-        "backend.mjs",
+        "backend.js",
     ],
     visibility = [
         "//apps/artifacts:__subpackages__",
@@ -47,7 +47,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "utils",
     srcs = [
-        "utils.mjs",
+        "utils.js",
     ],
     visibility = [
         "//apps/artifacts:__subpackages__",

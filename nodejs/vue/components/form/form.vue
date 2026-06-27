@@ -37,9 +37,9 @@
 
 <script>
 	import Item from "./item.vue";
-	import Validation from "../../../core/validation.mjs";
-	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
-	import { FormValues } from "#bzd/nodejs/vue/components/form/form.mjs";
+	import Validation from "../../../core/validation.js";
+	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.js";
+	import { FormValues } from "#bzd/nodejs/vue/components/form/form.js";
 
 	// Include all the supported elements
 	import ElementInput from "./element/input.vue";

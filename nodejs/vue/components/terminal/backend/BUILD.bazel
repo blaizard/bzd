@@ -3,7 +3,7 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "base",
     srcs = [
-        "base.mjs",
+        "base.js",
     ],
     visibility = ["//nodejs/vue/components/terminal/backend:__subpackages__"],
     deps = [

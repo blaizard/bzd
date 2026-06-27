@@ -3,7 +3,7 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_binary", "bzd_nodejs_web_
 bzd_nodejs_web_binary(
     name = "frontend",
     srcs = [
-        "frontend.mjs",
+        "frontend.js",
         "frontend.vue",
         "//apps/accounts/example:config.json",
     ],
@@ -11,7 +11,7 @@ bzd_nodejs_web_binary(
         "//apps/accounts/backend/users:api.json",
     ],
     config_scss = "//nodejs/styles:default.scss",
-    main = "frontend.mjs",
+    main = "frontend.js",
     deps = [
         "//apps/accounts/authentication:client",
         "//nodejs/vue:authentication",
@@ -22,7 +22,7 @@ bzd_nodejs_web_binary(
 bzd_nodejs_binary(
     name = "server",
     srcs = [
-        "backend.mjs",
+        "backend.js",
         "//apps/accounts/example:config.json",
     ],
     args = [
@@ -31,7 +31,7 @@ bzd_nodejs_binary(
     data = [
         ":frontend.bundle",
     ],
-    main = "backend.mjs",
+    main = "backend.js",
     deps = [
         "//apps/accounts/authentication:server",
         "//nodejs/core/http:server",

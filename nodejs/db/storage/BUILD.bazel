@@ -3,7 +3,7 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "make_from_config",
     srcs = [
-        "make_from_config.mjs",
+        "make_from_config.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -20,7 +20,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "permissions",
     srcs = [
-        "permissions.mjs",
+        "permissions.js",
     ],
     visibility = ["//visibility:public"],
 )
@@ -28,7 +28,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "storage",
     srcs = [
-        "storage.mjs",
+        "storage.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -43,8 +43,8 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "disk",
     srcs = [
-        "disk.mjs",
-        "storage.mjs",
+        "disk.js",
+        "storage.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -61,7 +61,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "google_cloud_storage",
     srcs = [
-        "google_cloud_storage.mjs",
+        "google_cloud_storage.js",
     ],
     packages = [
         "@nodejs_deps//:google-cloud-storage",
@@ -81,7 +81,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "google_drive",
     srcs = [
-        "google_drive.mjs",
+        "google_drive.js",
     ],
     packages = [
         "@nodejs_deps//:googleapis",
@@ -99,7 +99,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "memory",
     srcs = [
-        "memory.mjs",
+        "memory.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -114,7 +114,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "docker_v2",
     srcs = [
-        "docker_v2.mjs",
+        "docker_v2.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -131,7 +131,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "webdav",
     srcs = [
-        "webdav.mjs",
+        "webdav.js",
     ],
     visibility = ["//visibility:public"],
     deps = [

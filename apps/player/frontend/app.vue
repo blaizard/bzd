@@ -35,10 +35,10 @@
 	import Terminal from "./terminal.vue";
 	import Editor from "./editor.vue";
 	import Camera from "./camera.vue";
-	import Scenario from "../lib/scenario.mjs";
-	import FileSystem from "../lib/filesystem.mjs";
-	import LogFactory from "#bzd/nodejs/core/log.mjs";
-	import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
+	import Scenario from "../lib/scenario.js";
+	import FileSystem from "../lib/filesystem.js";
+	import LogFactory from "#bzd/nodejs/core/log.js";
+	import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 
 	const Log = LogFactory("app");
 	const Exception = ExceptionFactory("app");

@@ -5,9 +5,9 @@ bzd_nodejs_test(
     srcs = [
         "customer.subscription.deleted.json",
         "invoice.payment_succeeded.json",
-        "webhook_test.mjs",
+        "webhook_test.js",
     ],
-    main = "webhook_test.mjs",
+    main = "webhook_test.js",
     deps = [
         "//nodejs/payment/stripe:webhook",
     ],

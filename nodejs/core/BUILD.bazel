@@ -3,7 +3,7 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "authentication",
     srcs = [
-        "authentication.mjs",
+        "authentication.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -14,7 +14,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "log",
     srcs = [
-        "log.mjs",
+        "log.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -25,8 +25,8 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "exception",
     srcs = [
-        "exception.mjs",
-        "//nodejs/core/impl/exception:backend.mjs",
+        "exception.js",
+        "//nodejs/core/impl/exception:backend.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -38,7 +38,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "event",
     srcs = [
-        "event.mjs",
+        "event.js",
     ],
     visibility = ["//visibility:public"],
 )
@@ -46,7 +46,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "format",
     srcs = [
-        "format.mjs",
+        "format.js",
     ],
     visibility = ["//visibility:public"],
 )
@@ -54,7 +54,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "cache",
     srcs = [
-        "cache.mjs",
+        "cache.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -67,7 +67,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "cache2",
     srcs = [
-        "cache2.mjs",
+        "cache2.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -81,7 +81,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "cookie",
     srcs = [
-        "cookie.mjs",
+        "cookie.js",
     ],
     visibility = ["//visibility:public"],
 )
@@ -89,8 +89,8 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "crypto",
     srcs = [
-        "crypto.mjs",
-        "//nodejs/core/impl/crypto:backend.mjs",
+        "crypto.js",
+        "//nodejs/core/impl/crypto:backend.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -101,7 +101,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "lock_file",
     srcs = [
-        "lock_file.mjs",
+        "lock_file.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -115,7 +115,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "lock",
     srcs = [
-        "lock.mjs",
+        "lock.js",
     ],
     visibility = ["//visibility:public"],
 )
@@ -123,7 +123,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "filesystem",
     srcs = [
-        "filesystem.mjs",
+        "filesystem.js",
     ],
     visibility = ["//visibility:public"],
 )
@@ -131,7 +131,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "localstorage",
     srcs = [
-        "localstorage.mjs",
+        "localstorage.js",
     ],
     visibility = ["//visibility:public"],
 )
@@ -139,7 +139,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "mutex",
     srcs = [
-        "mutex.mjs",
+        "mutex.js",
     ],
     visibility = ["//visibility:public"],
 )
@@ -147,7 +147,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "router",
     srcs = [
-        "router.mjs",
+        "router.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -159,7 +159,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "script",
     srcs = [
-        "script.mjs",
+        "script.js",
     ],
     visibility = ["//visibility:public"],
 )
@@ -167,7 +167,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "sessionstorage",
     srcs = [
-        "sessionstorage.mjs",
+        "sessionstorage.js",
     ],
     visibility = ["//visibility:public"],
 )
@@ -175,7 +175,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "stream",
     srcs = [
-        "stream.mjs",
+        "stream.js",
     ],
     visibility = ["//visibility:public"],
 )
@@ -183,7 +183,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "template",
     srcs = [
-        "template.mjs",
+        "template.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -195,7 +195,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "timeseries",
     srcs = [
-        "timeseries.mjs",
+        "timeseries.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -207,7 +207,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "upload",
     srcs = [
-        "upload.mjs",
+        "upload.js",
     ],
     visibility = ["//visibility:public"],
 )
@@ -215,7 +215,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "validation_schema",
     srcs = [
-        "validation_schema.mjs",
+        "validation_schema.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -228,7 +228,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "validation",
     srcs = [
-        "validation.mjs",
+        "validation.js",
     ],
     visibility = ["//visibility:public"],
     deps = [

@@ -3,7 +3,7 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "client",
     srcs = [
-        "client.mjs",
+        "client.js",
         "facebook.svg",
     ],
     apis = ["api.json"],
@@ -18,7 +18,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "server",
     srcs = [
-        "server.mjs",
+        "server.js",
     ],
     apis = ["api.json"],
     visibility = ["//visibility:public"],

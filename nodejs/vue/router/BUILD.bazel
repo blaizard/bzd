@@ -3,8 +3,8 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "router",
     srcs = [
-        "registry.mjs",
-        "router.mjs",
+        "registry.js",
+        "router.js",
         "router_component.vue",
         "router_link.vue",
         "router_loading.vue",

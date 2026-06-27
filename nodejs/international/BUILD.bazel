@@ -3,7 +3,7 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "client",
     srcs = [
-        "client.mjs",
+        "client.js",
     ],
     visibility = ["//visibility:public"],
 )
@@ -11,7 +11,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "countries",
     srcs = [
-        "countries.mjs",
+        "countries.js",
     ],
     visibility = ["//visibility:public"],
 )
@@ -19,7 +19,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "currency",
     srcs = [
-        "currency.mjs",
+        "currency.js",
     ],
     visibility = ["//visibility:public"],
     deps = [

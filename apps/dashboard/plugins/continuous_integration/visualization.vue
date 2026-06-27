@@ -34,7 +34,7 @@
 
 <script>
 	import Plot from "#bzd/nodejs/vue/components/graph/plot.vue";
-	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
+	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.js";
 
 	export default {
 		components: {

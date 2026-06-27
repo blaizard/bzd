@@ -23,8 +23,8 @@
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
 	import Value from "#bzd/apps/artifacts/plugins/nodes/frontend/value.vue";
 	import Keys from "#bzd/apps/artifacts/plugins/nodes/frontend/keys.vue";
-	import { timeMsToString } from "#bzd/nodejs/utils/to_string.mjs";
-	import Utils from "#bzd/apps/artifacts/common/utils.mjs";
+	import { timeMsToString } from "#bzd/nodejs/utils/to_string.js";
+	import Utils from "#bzd/apps/artifacts/common/utils.js";
 	import Form from "#bzd/nodejs/vue/components/form/form.vue";
 
 	export default {

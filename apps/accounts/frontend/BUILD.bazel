@@ -3,7 +3,7 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_web_binary")
 bzd_nodejs_web_binary(
     name = "frontend",
     srcs = glob([
-        "**/*.mjs",
+        "**/*.js",
         "**/*.vue",
         "**/*.svg",
     ]) + ["//apps/accounts:config.json"],
@@ -12,7 +12,7 @@ bzd_nodejs_web_binary(
     heads = [
         "<title>Accounts</title>",
     ],
-    main = "app.mjs",
+    main = "app.js",
     visibility = [
         "//apps/accounts:__pkg__",
         "//apps/accounts/backend:__pkg__",

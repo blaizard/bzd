@@ -15,7 +15,7 @@ bzd_config_default(
 bzd_nodejs_binary(
     name = "backend",
     srcs = [
-        "app.mjs",
+        "app.js",
         ":config.json",
     ],
     apis = ["//apps/dashboard:api.v1.json"],
@@ -26,7 +26,7 @@ bzd_nodejs_binary(
     data = [
         "//apps/dashboard/frontend:frontend.bundle",
     ],
-    main = "app.mjs",
+    main = "app.js",
     visibility = [
         "//apps/dashboard:__pkg__",
         "//deployment:__subpackages__",

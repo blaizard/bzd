@@ -3,7 +3,7 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "cache_entry",
     srcs = [
-        "cache_entry.mjs",
+        "cache_entry.js",
     ],
     visibility = [
         "//apps/artifacts/plugins/extension/caching_proxy:__subpackages__",
@@ -13,7 +13,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "caching_proxy",
     srcs = [
-        "caching_proxy.mjs",
+        "caching_proxy.js",
     ],
     visibility = [
         "//apps/artifacts/plugins:__subpackages__",

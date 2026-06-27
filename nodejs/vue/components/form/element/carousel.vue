@@ -29,7 +29,7 @@
 
 <script>
 	import Element from "./element.vue";
-	import Touch from "../../../directives/touch.mjs";
+	import Touch from "../../../directives/touch.js";
 
 	export default {
 		mixins: [Element],

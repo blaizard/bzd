@@ -3,7 +3,7 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "test_data",
     srcs = [
-        "test_data.mjs",
+        "test_data.js",
     ],
     visibility = [
         "//apps/accounts/backend:__subpackages__",

@@ -1,0 +1,146 @@
+import { request as requestHttp } from "http";
+import { request as requestHttps } from "https";
+import { pipeline } from "stream";
+
+import { toString } from "#bzd/nodejs/core/stream.js";
+import ExceptionFactory from "#bzd/nodejs/core/exception.js";
+import LogFactory from "#bzd/nodejs/core/log.js";
+
+const Exception = ExceptionFactory("http", "client", "node.http");
+const Log = LogFactory("http", "client", "node.http");
+
+const MAX_REDIRECTION = 3;
+
+function makeAbsoluteUrl(urlString, originalUrl) {
+	try {
+		// If it doesn't throw, it's absolute
+		return new URL(urlString);
+	} catch (error) {
+		const url = new URL(originalUrl);
+		return new URL(urlString, url);
+	}
+}
+
+function splitToUrlAndPath(url) {
+	return {
+		url: url.origin,
+		path: url.pathname + url.search + url.hash,
+	};
+}
+
+async function requestResponse(url, options) {
+	return new Promise((resolve, reject) => {
+		// Check the transport type, by default it is HTTP.
+		let requestHandler = requestHttp;
+		if (url.startsWith("unix://")) {
+			requestHandler = (_, options, callback) => {
+				return requestHttp(
+					Object.assign(
+						{
+							socketPath: url.replace("unix://", "", 1),
+						},
+						options,
+					),
+					callback,
+				);
+			};
+		} else if (url.startsWith("https://")) {
+			requestHandler = requestHttps;
+		}
+
+		// Create the request
+		let req = requestHandler(
+			url,
+			{
+				method: options.method,
+				path: options.path,
+				headers: options.headers,
+				timeout: options.timeoutMs,
+			},
+			(response) => {
+				req.setTimeout(0);
+				req.removeAllListeners("timeout");
+				req.removeAllListeners("error");
+				resolve(response);
+			},
+		);
+
+		req.on("timeout", () => {
+			req.destroy();
+			reject(new Exception("Request for " + url + options.path + " timeout (" + options.timeoutMs + " ms)"));
+		});
+
+		req.on("error", (e) => {
+			reject(e);
+		});
+
+		// A string
+		if (typeof options.data == "string") {
+			req.write(options.data);
+			req.end();
+		}
+		// A read stream
+		else if (typeof options.data == "object" && typeof options.data.pipe == "function") {
+			pipeline(options.data, req, (err) => {
+				if (err) {
+					reject(err);
+				}
+			});
+		} else if (typeof options.data == "undefined") {
+			req.end();
+		} else {
+			reject(new Exception("Unsupported data format: {:?}", options.data));
+		}
+	});
+}
+
+export default async function request(url, options) {
+	let redirection = 0;
+	let response = null;
+	let updatedOptions = { ...options };
+
+	while (true) {
+		response = await requestResponse(url, updatedOptions);
+		if (response.statusCode < 300 || response.statusCode >= 400) {
+			break;
+		}
+
+		// Limit the number of redirections
+		if (redirection >= MAX_REDIRECTION) {
+			throw new Exception("Too many redirection ({}) when requesting '{}'", redirection, url);
+		}
+		++redirection;
+
+		// Redirect
+		if ("location" in response.headers) {
+			const location = splitToUrlAndPath(makeAbsoluteUrl(response.headers.location, url));
+			Log.debug("Redirecting to url={} path={}", location.url, location.path);
+
+			// If the domain change remove some headers.
+			if (url != location.url && updatedOptions.headers) {
+				updatedOptions.headers = Object.fromEntries(
+					Object.entries(updatedOptions.headers).filter(([key, _]) => {
+						return !(key.toLowerCase() in { host: true });
+					}),
+				);
+			}
+
+			url = location.url;
+			updatedOptions.path = location.path;
+			response.destroy();
+		}
+	}
+
+	const result = {
+		data: null,
+		headers: response.headers,
+		code: response.statusCode,
+	};
+
+	if (options.expect == "stream") {
+		result.data = response;
+	} else {
+		result.data = await toString(response);
+	}
+	return result;
+}

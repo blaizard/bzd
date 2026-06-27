@@ -32,9 +32,9 @@
 
 <script>
 	import Layout from "#bzd/nodejs/vue/components/layout/layout.vue";
-	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.mjs";
+	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.js";
 	import MenuEntry from "#bzd/nodejs/vue/components/menu/entry.vue";
-	import { scopeAdminUsers, scopeAdminApplications } from "#bzd/apps/accounts/backend/users/scopes.mjs";
+	import { scopeAdminUsers, scopeAdminApplications } from "#bzd/apps/accounts/backend/users/scopes.js";
 
 	export default {
 		components: {

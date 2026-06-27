@@ -11,7 +11,7 @@ py_binary(
 bzd_nodejs_binary(
     name = "backend",
     srcs = glob([
-        "*.mjs",
+        "*.js",
     ]),
     args = [
         "--static",
@@ -20,7 +20,7 @@ bzd_nodejs_binary(
     data = [
         "//apps/player/frontend:frontend.bundle",
     ],
-    main = "app.mjs",
+    main = "app.js",
     packages = [
         "@nodejs_deps//:commander",
         "@nodejs_deps//:ws",

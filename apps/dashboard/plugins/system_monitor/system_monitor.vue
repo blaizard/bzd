@@ -65,12 +65,12 @@
 </template>
 
 <script>
-	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
-	import { bytesToString, timeMsToString } from "#bzd/nodejs/utils/to_string.mjs";
+	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.js";
+	import { bytesToString, timeMsToString } from "#bzd/nodejs/utils/to_string.js";
 	import Gauge from "#bzd/apps/dashboard/plugins/system_monitor/gauge.vue";
 	import GaugeRate from "#bzd/apps/dashboard/plugins/system_monitor/gauge_rate.vue";
 	import Text from "#bzd/apps/dashboard/plugins/system_monitor/text.vue";
-	import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
+	import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 
 	const Exception = ExceptionFactory("plugin", "system_monitor");
 

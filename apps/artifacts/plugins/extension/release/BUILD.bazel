@@ -3,7 +3,7 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "release",
     srcs = [
-        "release.mjs",
+        "release.js",
     ],
     visibility = [
         "//apps/artifacts/plugins:__subpackages__",

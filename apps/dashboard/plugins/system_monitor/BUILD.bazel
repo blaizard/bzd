@@ -13,5 +13,5 @@ bzd_plugin(
         "gauge_rate.vue",
         "text.vue",
     ],
-    metadata = "plugin.mjs",
+    metadata = "plugin.js",
 )

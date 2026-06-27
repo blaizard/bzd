@@ -70,8 +70,8 @@
 
 <script>
 	import Base from "./base.vue";
-	import LocalStorage from "#bzd/nodejs/core/localstorage.mjs";
-	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
+	import LocalStorage from "#bzd/nodejs/core/localstorage.js";
+	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.js";
 	import { Comment, Fragment, Text } from "vue";
 	import config from "#bzd/nodejs/vue/components/layout/config.json" with { type: "json" };
 	import Accordion from "#bzd/nodejs/vue/components/layout/accordion.vue";

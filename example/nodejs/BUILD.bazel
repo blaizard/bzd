@@ -3,9 +3,9 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_binary")
 bzd_nodejs_binary(
     name = "nodejs",
     srcs = [
-        "app.mjs",
+        "app.js",
     ],
-    main = "app.mjs",
+    main = "app.js",
     packages = [
         "@nodejs_deps//:mustache",
     ],

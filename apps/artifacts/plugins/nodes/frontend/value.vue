@@ -14,10 +14,10 @@
 </template>
 
 <script>
-	import { dateToString } from "#bzd/nodejs/utils/to_string.mjs";
-	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
+	import { dateToString } from "#bzd/nodejs/utils/to_string.js";
+	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.js";
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
-	import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
+	import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 
 	const Exception = ExceptionFactory("apps", "plugin", "nodes");
 

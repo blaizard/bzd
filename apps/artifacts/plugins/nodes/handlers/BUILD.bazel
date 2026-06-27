@@ -3,7 +3,7 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "handlers",
     srcs = [
-        "handlers.mjs",
+        "handlers.js",
     ],
     visibility = [
         "//apps/artifacts/plugins:__subpackages__",
@@ -22,21 +22,21 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "expires",
     srcs = [
-        "expires.mjs",
+        "expires.js",
     ],
 )
 
 bzd_nodejs_library(
     name = "history",
     srcs = [
-        "history.mjs",
+        "history.js",
     ],
 )
 
 bzd_nodejs_library(
     name = "to_string",
     srcs = [
-        "to_string.mjs",
+        "to_string.js",
     ],
     deps = [
         "//apps/artifacts/plugins/nodes:key_mapping",
@@ -48,7 +48,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "validation",
     srcs = [
-        "validation.mjs",
+        "validation.js",
     ],
     deps = [
         "//nodejs/core:exception",

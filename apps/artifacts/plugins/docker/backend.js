@@ -1,0 +1,45 @@
+import ExceptionFactory from "#bzd/nodejs/core/exception.js";
+import StorageDockerV2 from "#bzd/nodejs/db/storage/docker_v2.js";
+import PluginBase from "#bzd/apps/artifacts/backend/plugin.js";
+
+import DockerV2Proxy from "./docker_v2_proxy.js";
+
+const Exception = ExceptionFactory("plugins", "docker");
+
+export default class Plugin extends PluginBase {
+	constructor(volume, options, provider, endpoints) {
+		super(volume, options, provider, endpoints);
+
+		provider.addStartProcess(volume + ".constructor", async () => {
+			let storage = null;
+			switch (options["docker.type"]) {
+				case "v2":
+					storage = await StorageDockerV2.make(options["docker.url"]);
+					break;
+				case "gcr":
+					storage = await StorageDockerV2.makeFromGcr(options["docker.key"], options["docker.service"]);
+					break;
+				default:
+					Exception.unreachable("Unsupported Docker type '{}'", options["docker.type"]);
+			}
+			this.setStorage(storage);
+		});
+
+		if (options["docker.proxy"] == true) {
+			this.proxy = null;
+			provider.addStartProcess(volume + ".constructor.proxy", async () => {
+				this.proxy = DockerV2Proxy.makeFromStorageDockerV2(
+					options["docker.proxy.url"],
+					options["docker.proxy.port"],
+					this.getStorage(),
+				);
+				await this.proxy.start();
+			});
+
+			provider.addStopProcess(volume + ".destructor.proxy", async () => {
+				await this.proxy.stop();
+				this.proxy = null;
+			});
+		}
+	}
+}

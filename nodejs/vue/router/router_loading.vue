@@ -3,7 +3,7 @@
 </template>
 
 <script>
-	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.mjs";
+	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.js";
 
 	export default {
 		directives: {

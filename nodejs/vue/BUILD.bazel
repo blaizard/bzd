@@ -3,7 +3,7 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "rest",
     srcs = [
-        "rest.mjs",
+        "rest.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -15,7 +15,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "websocket",
     srcs = [
-        "websocket.mjs",
+        "websocket.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -27,7 +27,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "authentication",
     srcs = [
-        "authentication.mjs",
+        "authentication.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -39,7 +39,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "cache",
     srcs = [
-        "cache.mjs",
+        "cache.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -52,7 +52,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "lang",
     srcs = [
-        "lang.mjs",
+        "lang.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -64,7 +64,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "metadata",
     srcs = [
-        "metadata.mjs",
+        "metadata.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -77,7 +77,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "notification",
     srcs = [
-        "notification.mjs",
+        "notification.js",
     ],
     visibility = ["//visibility:public"],
     deps = [

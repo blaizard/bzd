@@ -3,7 +3,7 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "local",
     srcs = [
-        "command.mjs",
+        "command.js",
     ],
     tools = [
         "//nodejs/vue/components/terminal/backend/local/bin:terminal",

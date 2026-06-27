@@ -15,7 +15,7 @@ bzd_config_default(
 bzd_nodejs_binary(
     name = "backend",
     srcs = [
-        "app.mjs",
+        "app.js",
         ":config.json",
         "//apps/accounts:config.json",
     ],
@@ -27,7 +27,7 @@ bzd_nodejs_binary(
     data = [
         "//apps/accounts/frontend:frontend.bundle",
     ],
-    main = "app.mjs",
+    main = "app.js",
     packages = [
         "@nodejs_deps//:commander",
     ],

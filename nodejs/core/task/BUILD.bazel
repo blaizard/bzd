@@ -3,8 +3,8 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "manager",
     srcs = [
-        "manager.mjs",
-        "task.mjs",
+        "manager.js",
+        "task.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -16,7 +16,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "manager_singleton",
     srcs = [
-        "manager_singleton.mjs",
+        "manager_singleton.js",
     ],
     visibility = ["//visibility:public"],
     deps = [

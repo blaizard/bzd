@@ -6,7 +6,7 @@ bzd_nodejs_web_binary(
         "**/*",
     ]),
     config_scss = "//nodejs/styles:default.scss",
-    main = "app.mjs",
+    main = "app.js",
     deps = [
         "//nodejs/styles/default",
         "//nodejs/vue:notification",

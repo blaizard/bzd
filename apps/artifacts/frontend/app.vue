@@ -19,11 +19,11 @@
 </template>
 
 <script>
-	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
+	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.js";
 	import Application from "#bzd/nodejs/vue/apps/application.vue";
 	import FileExplorer from "#bzd/nodejs/vue/components/file_explorer/file_explorer.vue";
 	import MenuEntry from "#bzd/nodejs/vue/components/menu/entry.vue";
-	import Utils from "#bzd/apps/artifacts/common/utils.mjs";
+	import Utils from "#bzd/apps/artifacts/common/utils.js";
 
 	export default {
 		components: {

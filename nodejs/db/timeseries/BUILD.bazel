@@ -3,8 +3,8 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "disk",
     srcs = [
-        "disk.mjs",
-        "timeseries.mjs",
+        "disk.js",
+        "timeseries.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -20,8 +20,8 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "elasticsearch",
     srcs = [
-        "elasticsearch.mjs",
-        "timeseries.mjs",
+        "elasticsearch.js",
+        "timeseries.js",
     ],
     visibility = ["//visibility:public"],
     deps = [

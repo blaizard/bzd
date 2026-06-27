@@ -1,5 +1,5 @@
 <script>
-	import Upload from "../../../../core/upload.mjs";
+	import Upload from "../../../../core/upload.js";
 	import ArrayElement from "./array.vue";
 	import FileItem from "./file_item.vue";
 

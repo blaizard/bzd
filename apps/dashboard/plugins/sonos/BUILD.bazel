@@ -2,7 +2,7 @@ load("//apps/dashboard/plugins:defs.bzl", "bzd_plugin")
 
 bzd_plugin(
     name = "sonos",
-    backend_entry_point = "sonos_backend.mjs",
+    backend_entry_point = "sonos_backend.js",
     backend_packages = [
         "@nodejs_deps//:chromecast-api",
         "@nodejs_deps//:sonos",
@@ -11,11 +11,11 @@ bzd_plugin(
     frontend_srcs = [
         "sonos.svg",
     ],
-    metadata = "sonos.mjs",
+    metadata = "sonos.js",
 )
 
 bzd_plugin(
     name = "media_player",
     frontend_entry_point = "media_player.vue",
-    metadata = "media_player.mjs",
+    metadata = "media_player.js",
 )

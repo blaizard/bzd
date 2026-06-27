@@ -3,7 +3,7 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "node",
     srcs = [
-        "node.mjs",
+        "node.js",
         "//apps/artifacts/api:config.json",
     ],
     visibility = ["//visibility:public"],

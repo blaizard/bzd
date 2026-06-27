@@ -1,0 +1,26 @@
+import ExceptionFactory from "../exception.js";
+import Router from "#bzd/nodejs/core/router.js";
+
+const Exception = ExceptionFactory("http", "endpoint");
+
+/// Parse an endpoint.
+///
+/// Valid schema are as follow:
+/// /hello/{world}/my/{path:*}
+export default class HttpEndpoint {
+	constructor(endpoint) {
+		this.compiledRoute = Router.toCompiledRoute(endpoint);
+	}
+
+	match(path) {
+		return this.compiledRoute.match(path);
+	}
+
+	toRegexp() {
+		return this.compiledRoute.regexpr;
+	}
+
+	toRoute(values) {
+		return this.compiledRoute.toRoute(values);
+	}
+}

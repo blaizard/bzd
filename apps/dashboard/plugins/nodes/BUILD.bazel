@@ -7,6 +7,6 @@ bzd_plugin(
         "//nodejs/core:log",
         "//apps/artifacts/api/nodejs/node",
     ],
-    backend_entry_point = "backend.mjs",
-    metadata = "plugin.mjs",
+    backend_entry_point = "backend.js",
+    metadata = "plugin.js",
 )

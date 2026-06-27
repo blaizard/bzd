@@ -3,8 +3,8 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "client",
     srcs = [
-        "client.mjs",
-        "//nodejs/core/http/client/http:backend.mjs",
+        "client.js",
+        "//nodejs/core/http/client/http:backend.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -20,7 +20,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "endpoint",
     srcs = [
-        "endpoint.mjs",
+        "endpoint.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -33,7 +33,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "endpoints",
     srcs = [
-        "endpoints.mjs",
+        "endpoints.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -45,7 +45,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "server_context",
     srcs = [
-        "server_context.mjs",
+        "server_context.js",
     ],
     packages = [
         "@nodejs_deps//:busboy",
@@ -60,7 +60,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "server",
     srcs = [
-        "server.mjs",
+        "server.js",
     ],
     packages = [
         "@nodejs_deps//:body-parser",
@@ -88,7 +88,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "proxy",
     srcs = [
-        "proxy.mjs",
+        "proxy.js",
     ],
     visibility = ["//visibility:public"],
     deps = [

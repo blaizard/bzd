@@ -3,7 +3,7 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "touch",
     srcs = [
-        "touch.mjs",
+        "touch.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -14,7 +14,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "tooltip",
     srcs = [
-        "tooltip.mjs",
+        "tooltip.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -26,7 +26,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "resize",
     srcs = [
-        "resize.mjs",
+        "resize.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -37,7 +37,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "mask",
     srcs = [
-        "mask.mjs",
+        "mask.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -48,7 +48,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "loading",
     srcs = [
-        "loading.mjs",
+        "loading.js",
     ],
     visibility = ["//visibility:public"],
     deps = [

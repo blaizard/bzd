@@ -1,11 +1,11 @@
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_test")
 
 test_srcs = glob([
-    "*_test.mjs",
+    "*_test.js",
 ])
 
 [bzd_nodejs_test(
-    name = src.replace("_test.mjs", ""),
+    name = src.replace("_test.js", ""),
     srcs = [src],
     main = src,
     deps = [

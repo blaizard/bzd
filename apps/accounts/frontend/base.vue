@@ -1,5 +1,5 @@
 <script>
-	import { HttpClientException } from "#bzd/nodejs/core/http/client.mjs";
+	import { HttpClientException } from "#bzd/nodejs/core/http/client.js";
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
 
 	export default {

@@ -8,7 +8,7 @@
 </template>
 
 <script>
-	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
+	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.js";
 	import Application from "#bzd/nodejs/vue/apps/application.vue";
 	import MenuEntry from "#bzd/nodejs/vue/components/menu/entry.vue";
 

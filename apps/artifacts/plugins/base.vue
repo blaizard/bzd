@@ -1,5 +1,5 @@
 <script>
-	import { HttpClient } from "#bzd/nodejs/core/http/client.mjs";
+	import { HttpClient } from "#bzd/nodejs/core/http/client.js";
 
 	export default {
 		props: {

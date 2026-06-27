@@ -3,7 +3,7 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "influxdb",
     srcs = [
-        "influxdb.mjs",
+        "influxdb.js",
     ],
     visibility = [
         "//apps/artifacts/plugins:__subpackages__",
@@ -17,7 +17,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "database",
     srcs = [
-        "database.mjs",
+        "database.js",
     ],
     visibility = [
         "//apps/artifacts/plugins:__subpackages__",

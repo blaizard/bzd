@@ -4,7 +4,7 @@ bzd_nodejs_library(
     name = "graph",
     srcs = glob([
         "**/*.vue",
-        "**/*.mjs",
+        "**/*.js",
     ]),
     visibility = ["//visibility:public"],
     deps = [

@@ -2,8 +2,8 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_test")
 
 bzd_nodejs_test(
     name = "provider",
-    srcs = ["provider_test.mjs"],
-    main = "provider_test.mjs",
+    srcs = ["provider_test.js"],
+    main = "provider_test.js",
     deps = [
         "//nodejs/core:exception",
         "//nodejs/core/statistics:provider",

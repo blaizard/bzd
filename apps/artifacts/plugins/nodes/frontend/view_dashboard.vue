@@ -24,13 +24,13 @@
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
 	import ViewGraph from "#bzd/apps/artifacts/plugins/nodes/frontend/view_graph.vue";
 	import Form from "#bzd/nodejs/vue/components/form/form.vue";
-	import Utils from "#bzd/apps/artifacts/common/utils.mjs";
-	import TimeseriesCollection from "#bzd/apps/artifacts/plugins/nodes/frontend/timeseries_collection.mjs";
-	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.mjs";
-	import { dateToDefaultString } from "#bzd/nodejs/utils/to_string.mjs";
-	import { arrayFindCommonPrefix } from "#bzd/nodejs/utils/array.mjs";
-	import LocalStorage from "#bzd/nodejs/core/localstorage.mjs";
-	import Lock from "#bzd/nodejs/core/lock.mjs";
+	import Utils from "#bzd/apps/artifacts/common/utils.js";
+	import TimeseriesCollection from "#bzd/apps/artifacts/plugins/nodes/frontend/timeseries_collection.js";
+	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.js";
+	import { dateToDefaultString } from "#bzd/nodejs/utils/to_string.js";
+	import { arrayFindCommonPrefix } from "#bzd/nodejs/utils/array.js";
+	import LocalStorage from "#bzd/nodejs/core/localstorage.js";
+	import Lock from "#bzd/nodejs/core/lock.js";
 
 	const optionsStorageKey = "bzd-artifacts-plugin-nodes-view-dashboard-options";
 

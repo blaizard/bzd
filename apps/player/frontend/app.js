@@ -1,0 +1,18 @@
+import RestPlugin from "#bzd/nodejs/vue/rest.js";
+import Router from "#bzd/nodejs/vue/router/router.js";
+import { createApp } from "vue";
+
+import APIv1 from "../api.v1.json" with { type: "json" };
+
+import App from "./app.vue";
+
+const app = createApp(App);
+
+app.use(Router, {
+	hash: false,
+});
+app.use(RestPlugin, {
+	schema: APIv1.rest,
+});
+
+app.mount("#app");

@@ -3,11 +3,11 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_web_binary")
 bzd_nodejs_web_binary(
     name = "nodejs_web",
     srcs = [
-        "app.mjs",
+        "app.js",
         "app.vue",
     ],
     config_scss = "//nodejs/styles:default.scss",
-    main = "app.mjs",
+    main = "app.js",
     deps = [
         "//nodejs:vue",
     ],

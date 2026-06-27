@@ -2,8 +2,8 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_test")
 
 bzd_nodejs_test(
     name = "array",
-    srcs = ["array_test.mjs"],
-    main = "array_test.mjs",
+    srcs = ["array_test.js"],
+    main = "array_test.js",
     deps = [
         "//nodejs/core:exception",
         "//nodejs/utils:array",

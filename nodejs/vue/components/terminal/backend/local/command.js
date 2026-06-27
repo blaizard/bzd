@@ -1,0 +1,53 @@
+import ExceptionFactory from "#bzd/nodejs/core/exception.js";
+import { Status } from "#bzd/nodejs/utils/run.js";
+import CommandBase from "#bzd/nodejs/vue/components/terminal/backend/base.js";
+
+const Exception = ExceptionFactory("terminal", "local");
+
+export default class Command extends CommandBase {
+	constructor(options) {
+		super(options);
+		this.result = null;
+	}
+
+	async detach(command) {
+		Exception.assertPrecondition(Array.isArray(command), "Command must be an array.");
+		Exception.assertPrecondition(command.length >= 1, "There must be at least 1 command.");
+
+		this.setStatus(Status.running);
+		this.result = await this.localCommandToOutput([
+			"nodejs/vue/components/terminal/backend/local/bin/terminal",
+			...command,
+		]);
+		this.result.on("status", (status) => {
+			this.setStatus(status);
+		});
+	}
+
+	/// Resize the terminal.
+	async resize(width, height) {
+		if (this.result) {
+			this.result.writeToStdin("S" + JSON.stringify({ width, height }) + "\0");
+		}
+	}
+
+	/// Write data to the terminal.
+	write(data) {
+		if (this.result) {
+			this.result.writeToStdin("D" + JSON.stringify(data) + "\0");
+		}
+	}
+
+	/// Kill the command.
+	async kill() {
+		if (this.result) {
+			await this.result.kill();
+			this.result = null;
+		}
+	}
+
+	/// Install the command to be used with websockets.
+	installWebsocket(context) {
+		this.installWebsocketForOutputAndInput(context);
+	}
+}

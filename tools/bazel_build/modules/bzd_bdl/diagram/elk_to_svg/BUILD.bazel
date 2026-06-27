@@ -4,17 +4,17 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 bzd_symlink(
     name = "entry_point",
     input = select({
-        "@bzd_rules_nodejs//:nodejs": "node.mjs",
-        "@bzd_rules_nodejs//:nodejs_web": "window.mjs",
+        "@bzd_rules_nodejs//:nodejs": "node.js",
+        "@bzd_rules_nodejs//:nodejs_web": "window.js",
     }),
-    output = "entry_point.mjs",
+    output = "entry_point.js",
 )
 
 bzd_nodejs_library(
     name = "elk_to_svg",
     srcs = [
-        "entry_point.mjs",
-        "library.mjs",
+        "entry_point.js",
+        "library.js",
     ],
     packages = select({
         "@bzd_rules_nodejs//:nodejs": [

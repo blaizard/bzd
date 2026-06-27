@@ -3,8 +3,8 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "backend",
     srcs = [
-        "backend.mjs",
-        "docker_v2_proxy.mjs",
+        "backend.js",
+        "docker_v2_proxy.js",
     ],
     visibility = [
         "//apps/artifacts/plugins:__pkg__",
@@ -21,7 +21,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "frontend",
     srcs = [
-        "frontend.mjs",
+        "frontend.js",
     ],
     visibility = [
         "//apps/artifacts/plugins:__pkg__",

@@ -65,7 +65,7 @@
 
 <script>
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
-	import { timeMsToString, dateToDefaultString } from "#bzd/nodejs/utils/to_string.mjs";
+	import { timeMsToString, dateToDefaultString } from "#bzd/nodejs/utils/to_string.js";
 
 	export default {
 		mixins: [Component],

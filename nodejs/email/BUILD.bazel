@@ -3,7 +3,7 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "make_from_config",
     srcs = [
-        "make_from_config.mjs",
+        "make_from_config.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -17,8 +17,8 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "nodemailer",
     srcs = [
-        "email.mjs",
-        "nodemailer.mjs",
+        "email.js",
+        "nodemailer.js",
     ],
     packages = [
         "@nodejs_deps//:nodemailer",
@@ -32,8 +32,8 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "sendgrid",
     srcs = [
-        "email.mjs",
-        "sendgrid.mjs",
+        "email.js",
+        "sendgrid.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -46,8 +46,8 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "stub",
     srcs = [
-        "email.mjs",
-        "stub.mjs",
+        "email.js",
+        "stub.js",
     ],
     visibility = ["//visibility:public"],
     deps = [

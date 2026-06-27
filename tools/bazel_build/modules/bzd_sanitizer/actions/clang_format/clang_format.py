@@ -46,7 +46,7 @@ if __name__ == "__main__":
 	if args.cc:
 		extensions += [".c", ".cc", ".cpp", ".h", ".hh", ".hpp"]
 	if args.js:
-		extensions += [".mjs", ".js", ".ts"]
+		extensions += [".cjs", ".mjs", ".js", ".ts"]
 
 	worker(
 		args.context,

@@ -12,9 +12,9 @@
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
 	import Form from "#bzd/nodejs/vue/components/form/form.vue";
 	import Modal from "#bzd/nodejs/vue/components/modal/modal.vue";
-	import { CollectionPaging } from "#bzd/nodejs/db/utils.mjs";
-	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
-	import { allScopes } from "#bzd/apps/accounts/backend/users/scopes.mjs";
+	import { CollectionPaging } from "#bzd/nodejs/db/utils.js";
+	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.js";
+	import { allScopes } from "#bzd/apps/accounts/backend/users/scopes.js";
 
 	export default {
 		mixins: [Component],

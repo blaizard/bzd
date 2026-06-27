@@ -14,7 +14,7 @@ bzd_config_default(
 bzd_nodejs_library(
     name = "backend",
     srcs = [
-        "backend.mjs",
+        "backend.js",
         "config.json",
     ],
     data = [
@@ -47,7 +47,7 @@ bzd_nodejs_library(
     srcs = [
         "application.vue",
         "config.json",
-        "frontend.mjs",
+        "frontend.js",
         "views/404.vue",
         "views/logger.vue",
         "views/services.vue",

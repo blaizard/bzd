@@ -10,5 +10,5 @@ bzd_plugin(
     frontend_srcs = [
         "continuous_integration.svg",
     ],
-    metadata = "plugin.mjs",
+    metadata = "plugin.js",
 )

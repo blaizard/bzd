@@ -3,7 +3,7 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "disk",
     srcs = [
-        "disk.mjs",
+        "disk.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -19,7 +19,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "memory",
     srcs = [
-        "memory.mjs",
+        "memory.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -32,7 +32,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "timeseries",
     srcs = [
-        "timeseries.mjs",
+        "timeseries.js",
     ],
     visibility = ["//visibility:public"],
     deps = [

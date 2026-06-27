@@ -3,7 +3,7 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "client",
     srcs = [
-        "client.mjs",
+        "client.js",
     ],
     apis = ["api.json"],
     visibility = ["//visibility:public"],
@@ -17,7 +17,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "server_proxy",
     srcs = [
-        "server_proxy.mjs",
+        "server_proxy.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -29,7 +29,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "server",
     srcs = [
-        "server.mjs",
+        "server.js",
         ":api.json",
     ],
     apis = ["api.json"],

@@ -14,12 +14,12 @@
 
 <script>
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
-	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.mjs";
-	import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
+	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.js";
+	import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 	import { defineAsyncComponent } from "vue";
-	import Utils from "#bzd/apps/artifacts/common/utils.mjs";
+	import Utils from "#bzd/apps/artifacts/common/utils.js";
 
-	import Plugins from "../plugins/frontend.mjs";
+	import Plugins from "../plugins/frontend.js";
 
 	const Exception = ExceptionFactory("view");
 

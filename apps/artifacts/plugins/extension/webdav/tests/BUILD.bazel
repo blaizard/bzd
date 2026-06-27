@@ -2,8 +2,8 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_test")
 
 bzd_nodejs_test(
     name = "plugin",
-    srcs = ["plugin_test.mjs"],
-    main = "plugin_test.mjs",
+    srcs = ["plugin_test.js"],
+    main = "plugin_test.js",
     packages = [
         "@nodejs_deps//:fast-xml-parser",
     ],

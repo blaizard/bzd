@@ -3,7 +3,7 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "session",
     srcs = [
-        "session.mjs",
+        "session.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -14,7 +14,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "client",
     srcs = [
-        "client.mjs",
+        "client.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -25,7 +25,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "scopes",
     srcs = [
-        "scopes.mjs",
+        "scopes.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -36,7 +36,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "server",
     srcs = [
-        "server.mjs",
+        "server.js",
     ],
     visibility = ["//visibility:public"],
     deps = [

@@ -19,8 +19,8 @@
 </template>
 
 <script>
-	import HoverChildren from "./directive/hover_children.mjs";
-	import { tooltipHide } from "../../directives/tooltip.mjs";
+	import HoverChildren from "./directive/hover_children.js";
+	import { tooltipHide } from "../../directives/tooltip.js";
 
 	export default {
 		props: {

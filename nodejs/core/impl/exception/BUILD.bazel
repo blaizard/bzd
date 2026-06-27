@@ -3,9 +3,9 @@ load("@bzd_lib//:symlink.bzl", "bzd_symlink")
 bzd_symlink(
     name = "backend",
     input = select({
-        "@bzd_rules_nodejs//:nodejs": "process.mjs",
-        "@bzd_rules_nodejs//:nodejs_web": "window.mjs",
+        "@bzd_rules_nodejs//:nodejs": "process.js",
+        "@bzd_rules_nodejs//:nodejs_web": "window.js",
     }),
-    output = "backend.mjs",
+    output = "backend.js",
     visibility = ["//nodejs/core:__pkg__"],
 )

@@ -3,12 +3,12 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_binary")
 bzd_nodejs_binary(
     name = "generator",
     srcs = [
-        "generator.mjs",
+        "generator.js",
     ],
     data = glob([
         "flags/*.svg",
     ]),
-    main = "generator.mjs",
+    main = "generator.js",
     packages = [
         "@nodejs_deps//:jimp",
         "@nodejs_deps//:svg2img",

@@ -6,9 +6,9 @@ bzd_plugin(
         "//nodejs/core:exception",
         "//nodejs/core:log",
     ],
-    backend_entry_point = "snmp_backend.mjs",
+    backend_entry_point = "snmp_backend.js",
     backend_packages = [
         "@nodejs_deps//:net-snmp",
     ],
-    metadata = "plugin.mjs",
+    metadata = "plugin.js",
 )

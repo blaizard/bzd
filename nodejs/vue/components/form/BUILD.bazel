@@ -5,7 +5,7 @@ bzd_nodejs_library(
     srcs = glob([
         "**/*.vue",
     ]) + [
-        "form.mjs",
+        "form.js",
     ],
     visibility = ["//visibility:public"],
     deps = [

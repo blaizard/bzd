@@ -16,14 +16,14 @@ bzd_nodejs_web_binary(
     srcs = glob([
         "**/*.vue",
         "**/*.svg",
-        "**/*.mjs",
+        "**/*.js",
     ]),
     apis = ["//apps/dashboard:api.v1.json"],
     config_scss = "//nodejs/styles:default.scss",
     data = [
         ":config",
     ],
-    main = "app.mjs",
+    main = "app.js",
     visibility = [
         "//apps/dashboard:__pkg__",
         "//apps/dashboard/backend:__pkg__",

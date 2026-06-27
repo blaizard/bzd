@@ -19,7 +19,7 @@
 
 <script>
 	import Element from "./element.vue";
-	import HoverChildren from "./directive/hover_children.mjs";
+	import HoverChildren from "./directive/hover_children.js";
 
 	export default {
 		components: {

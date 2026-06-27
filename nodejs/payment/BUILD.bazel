@@ -3,7 +3,7 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "make_from_config",
     srcs = [
-        "make_from_config.mjs",
+        "make_from_config.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -17,7 +17,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "payment",
     srcs = [
-        "payment.mjs",
+        "payment.js",
     ],
     visibility = ["//nodejs/payment:__subpackages__"],
     deps = [

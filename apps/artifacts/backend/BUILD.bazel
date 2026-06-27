@@ -21,7 +21,7 @@ bzd_config_default(
 bzd_nodejs_library(
     name = "plugin",
     srcs = [
-        "plugin.mjs",
+        "plugin.js",
     ],
     visibility = [
         "//apps/artifacts/plugins:__subpackages__",
@@ -38,8 +38,8 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "plugin_tester",
     srcs = [
-        "endpoints_factory.mjs",
-        "plugin_tester.mjs",
+        "endpoints_factory.js",
+        "plugin_tester.js",
     ],
     visibility = [
         "//apps/artifacts/plugins:__subpackages__",
@@ -57,7 +57,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "locks",
     srcs = [
-        "locks.mjs",
+        "locks.js",
     ],
     visibility = [
         "//apps/artifacts:__subpackages__",
@@ -74,8 +74,8 @@ bzd_nodejs_library(
 bzd_nodejs_binary(
     name = "backend",
     srcs = [
-        "app.mjs",
-        "endpoints_factory.mjs",
+        "app.js",
+        "endpoints_factory.js",
         ":config.json",
     ],
     apis = ["//apps/artifacts:api.v1.json"],
@@ -87,7 +87,7 @@ bzd_nodejs_binary(
         ":config",
         "//apps/artifacts/frontend:frontend.bundle",
     ],
-    main = "app.mjs",
+    main = "app.js",
     visibility = [
         "//apps/artifacts:__subpackages__",
         "//deployment:__subpackages__",

@@ -3,7 +3,7 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "clock",
     srcs = [
-        "clock.mjs",
+        "clock.js",
     ],
     deps = [
         "//nodejs/core:exception",
@@ -13,7 +13,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "date",
     srcs = [
-        "date.mjs",
+        "date.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -24,7 +24,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "mock",
     srcs = [
-        "mock.mjs",
+        "mock.js",
     ],
     visibility = ["//visibility:public"],
     deps = [

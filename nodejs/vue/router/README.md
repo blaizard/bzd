@@ -12,7 +12,7 @@ First of all the router is a Vue plugin and must be installed before being able 
 
 ```js
 import { createApp } from "vue"
-import Router from "bzd/vue/router/router.mjs"
+import Router from "bzd/vue/router/router.js"
 
 const app = createApp(...);
 

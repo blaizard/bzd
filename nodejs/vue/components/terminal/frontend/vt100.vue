@@ -21,8 +21,8 @@
 </template>
 
 <script>
-	import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
-	import LogFactory from "#bzd/nodejs/core/log.mjs";
+	import ExceptionFactory from "#bzd/nodejs/core/exception.js";
+	import LogFactory from "#bzd/nodejs/core/log.js";
 
 	const Exception = ExceptionFactory("terminal-vt100");
 	const Log = LogFactory("terminal-vt100");

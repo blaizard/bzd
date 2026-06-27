@@ -3,9 +3,9 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_test")
 bzd_nodejs_test(
     name = "client",
     srcs = [
-        "client_test.mjs",
+        "client_test.js",
     ],
-    main = "client_test.mjs",
+    main = "client_test.js",
     tags = ["manual"],
     visibility = ["//visibility:public"],
     deps = [

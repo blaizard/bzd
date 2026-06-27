@@ -5,10 +5,10 @@ bzd_plugin(
     backend_deps = [
         "//nodejs/core/http:client",
     ],
-    backend_entry_point = "source_backend.mjs",
+    backend_entry_point = "source_backend.js",
     frontend_entry_point = "source_frontend.vue",
     frontend_srcs = [
         "github.svg",
     ],
-    metadata = "plugin.mjs",
+    metadata = "plugin.js",
 )

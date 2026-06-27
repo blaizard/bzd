@@ -4,7 +4,7 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "reset_password",
     srcs = [
-        "reset_password.mjs",
+        "reset_password.js",
         ":reset_password_html",
         ":reset_password_txt",
     ],
@@ -20,12 +20,12 @@ bzd_embed(
     name = "reset_password_html",
     format = "mjs-text",
     input = "reset_password.html",
-    output = "reset_password_html.mjs",
+    output = "reset_password_html.js",
 )
 
 bzd_embed(
     name = "reset_password_txt",
     format = "mjs-text",
     input = "reset_password.txt",
-    output = "reset_password_txt.mjs",
+    output = "reset_password_txt.js",
 )

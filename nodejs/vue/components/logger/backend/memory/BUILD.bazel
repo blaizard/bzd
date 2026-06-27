@@ -3,7 +3,7 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "memory",
     srcs = [
-        "memory.mjs",
+        "memory.js",
     ],
     apis = ["//nodejs/vue/components/logger:api.json"],
     visibility = [

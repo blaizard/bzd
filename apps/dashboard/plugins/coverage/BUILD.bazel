@@ -2,8 +2,8 @@ load("//apps/dashboard/plugins:defs.bzl", "bzd_plugin")
 
 bzd_plugin(
     name = "coverage_report",
-    backend_entry_point = "source_backend.mjs",
-    metadata = "report.mjs",
+    backend_entry_point = "source_backend.js",
+    metadata = "report.js",
 )
 
 bzd_plugin(
@@ -15,5 +15,5 @@ bzd_plugin(
     frontend_srcs = [
         "lines.svg",
     ],
-    metadata = "coverage.mjs",
+    metadata = "coverage.js",
 )

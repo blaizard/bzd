@@ -22,7 +22,7 @@
 </template>
 
 <script>
-	import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
+	import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 
 	const Exception = ExceptionFactory("plugin", "system_monitor", "text");
 

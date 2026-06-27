@@ -49,11 +49,11 @@
 </template>
 
 <script>
-	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
+	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.js";
 	import Base from "./base.vue";
 	import Button from "#bzd/nodejs/vue/components/form/element/button.vue";
-	import { bytesToString } from "#bzd/nodejs/utils/to_string.mjs";
-	import Utils from "#bzd/apps/artifacts/common/utils.mjs";
+	import { bytesToString } from "#bzd/nodejs/utils/to_string.js";
+	import Utils from "#bzd/apps/artifacts/common/utils.js";
 
 	export default {
 		mixins: [Base],

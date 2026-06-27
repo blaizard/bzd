@@ -44,9 +44,9 @@
 
 <script>
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
-	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.mjs";
-	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
-	import { bytesToString } from "#bzd/nodejs/utils/to_string.mjs";
+	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.js";
+	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.js";
+	import { bytesToString } from "#bzd/nodejs/utils/to_string.js";
 
 	export default {
 		mixins: [Component],

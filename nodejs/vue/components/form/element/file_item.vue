@@ -34,8 +34,8 @@
 
 <script>
 	import Element from "./element.vue";
-	import Touch from "../../../directives/touch.mjs";
-	import { bytesToString } from "#bzd/nodejs/utils/to_string.mjs";
+	import Touch from "../../../directives/touch.js";
+	import { bytesToString } from "#bzd/nodejs/utils/to_string.js";
 
 	export default {
 		mixins: [Element],

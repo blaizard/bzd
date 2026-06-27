@@ -17,7 +17,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "provider",
     srcs = [
-        "provider.mjs",
+        "provider.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -29,7 +29,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "statistics",
     srcs = [
-        "statistics.mjs",
+        "statistics.js",
     ],
     apis = ["api.json"],
     visibility = ["//visibility:public"],

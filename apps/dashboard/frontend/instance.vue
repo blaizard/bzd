@@ -29,12 +29,12 @@
 
 <script>
 	import Colors from "#bzd/nodejs/styles/default/css/colors.module.scss";
-	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.mjs";
-	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.mjs";
-	import Plugins from "../plugins/plugins.frontend.index.mjs";
-	import Color from "#bzd/nodejs/utils/color.mjs";
-	import LogFactory from "#bzd/nodejs/core/log.mjs";
-	import ExceptionFactory from "#bzd/nodejs/core/exception.mjs";
+	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.js";
+	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.js";
+	import Plugins from "../plugins/plugins.frontend.index.js";
+	import Color from "#bzd/nodejs/utils/color.js";
+	import LogFactory from "#bzd/nodejs/core/log.js";
+	import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 	import { defineAsyncComponent } from "vue";
 
 	const Log = LogFactory("instance");

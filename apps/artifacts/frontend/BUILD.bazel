@@ -5,11 +5,11 @@ bzd_nodejs_web_binary(
     srcs = glob([
         "**/*.vue",
         "**/*.svg",
-        "**/*.mjs",
+        "**/*.js",
     ]),
     apis = ["//apps/artifacts:api.v1.json"],
     config_scss = "//nodejs/styles:default.scss",
-    main = "app.mjs",
+    main = "app.js",
     packages = [
         "@nodejs_deps//:vue-async-computed",
     ],
