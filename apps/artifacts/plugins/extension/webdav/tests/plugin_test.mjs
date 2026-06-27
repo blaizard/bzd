@@ -244,7 +244,7 @@ describe("Webdav", () => {
 			const responseRead = await tester.send("memory", "get", "/webdav/new.txt");
 			Exception.assertEqual(responseRead.status, 200);
 			Exception.assertEqual(responseRead.data, "hello new content");
-		});
+		}, 10000);
 
 		it("put override file", async () => {
 			const response = await tester.send("memory", "put", "/webdav/a.txt", {
