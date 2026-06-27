@@ -1,3 +1,3 @@
-countries.mjs
-currency.mjs
-generator/generator.mjs
+countries.js
+currency.js
+generator/generator.js
