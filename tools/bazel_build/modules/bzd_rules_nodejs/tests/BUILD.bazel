@@ -1,0 +1,47 @@
+load("//nodejs:defs.bzl", "bzd_nodejs_library", "bzd_nodejs_test")
+
+bzd_nodejs_library(
+    name = "a",
+    srcs = [
+        "srcs/a.mjs",
+    ],
+    deps = [
+        ":b",
+    ],
+)
+
+bzd_nodejs_library(
+    name = "b",
+    srcs = [
+        "srcs/b.mjs",
+    ],
+)
+
+bzd_nodejs_library(
+    name = "c",
+    srcs = [
+        "srcs/c.ts",
+    ],
+    deps = [
+        ":d",
+    ],
+)
+
+bzd_nodejs_library(
+    name = "d",
+    srcs = [
+        "srcs/d.ts",
+    ],
+)
+
+bzd_nodejs_test(
+    name = "binary",
+    srcs = [
+        "srcs/binary.mjs",
+    ],
+    main = "srcs/binary.mjs",
+    deps = [
+        ":a",
+        ":c",
+    ],
+)

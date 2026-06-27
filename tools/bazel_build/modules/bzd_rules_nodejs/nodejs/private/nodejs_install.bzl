@@ -82,8 +82,7 @@ def bzd_nodejs_transpile(ctx, srcs, runfiles, base_dir_name):
         A tuple containing the generated files and the transpiled files as a dictionary.
     """
 
-    base_dir_short_path = ctx.label.package + "/" + base_dir_name
-    base_dir_path = ctx.genfiles_dir.path + "/" + base_dir_short_path
+    base_dir_path = "/".join([ctx.genfiles_dir.path, ctx.label.workspace_root, ctx.label.package, base_dir_name])
     path_mapping = {}
 
     # Map all the sources to the generated files directory.
@@ -99,12 +98,11 @@ def bzd_nodejs_transpile(ctx, srcs, runfiles, base_dir_name):
         path_mapping[f] = symlink
 
     # Convert TypeScript to Javascript
-    typescript = {}
+    typescript = []
     for f in generated:
         if f.path.endswith(".ts"):
-            path = f.short_path.removeprefix(base_dir_short_path + "/")
             expected = ctx.actions.declare_file(f.basename.replace(".ts", ".js"), sibling = f)
-            typescript[path] = expected
+            typescript.append(expected)
             path_mapping[f] = expected
 
     # If there are any typescript files to process...
@@ -117,18 +115,16 @@ def bzd_nodejs_transpile(ctx, srcs, runfiles, base_dir_name):
 
         ctx.actions.run(
             inputs = generated + runfiles + [tsconfig],
-            outputs = typescript.values(),
+            outputs = typescript,
             progress_message = "Processing TypeScript for {}...".format(ctx.label),
             arguments = [
-                "--baseUrl",
-                base_dir_path,
                 "--project",
                 base_dir_path,
             ],
             executable = ctx.executable._tsc,
         )
 
-    return generated + typescript.values(), path_mapping
+    return generated + typescript, path_mapping
 
 def _bzd_nodejs_install_impl(ctx):
     providers = bzd_nodejs_library_get_provider(ctx)
