@@ -14,3 +14,7 @@ compatibility: opencode
 
 - **ESP-IDF (Official C/C++ Framework):** [ESP-IDF Programming Guide](https://docs.espressif.com/projects/esp-idf/en/stable/esp32/) — _The comprehensive API reference for the official Espressif IoT Development Framework._
 - **ESP-IDF (Official Rust Framework):** [ESP-IDF Rust](https://docs.espressif.com/projects/rust/)
+
+## QEMU
+
+- https://github.com/espressif/esp-toolchain-docs/tree/main/qemu/
