@@ -55,11 +55,13 @@ rust_library_group(
     deps = select({
         "@bzd_platforms//al_isa:esp32-xtensa_lx6": [
             "@crates_esp32//:embassy-executor",
+            "@crates_esp32//:embassy-time",
             "@crates_esp32//:esp-rtos",
             "@crates_esp32//:static_cell",
         ],
         "@bzd_platforms//al_isa:esp32s3-xtensa_lx7": [
             "@crates_esp32s3//:embassy-executor",
+            "@crates_esp32s3//:embassy-time",
             "@crates_esp32s3//:esp-rtos",
             "@crates_esp32s3//:static_cell",
         ],

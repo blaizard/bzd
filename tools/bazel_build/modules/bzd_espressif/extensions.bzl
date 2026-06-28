@@ -85,6 +85,27 @@ def _load_tools(_module_ctx):
         },
     )
 
+    bzd_repository_multiplatform_maker(
+        name = "gdb",
+        repositories = [{
+            "build_file": "//tools/gdb:linux_x86_64.BUILD.bazel",
+            "compatible_with": [
+                Label("@bzd_platforms//al_isa:linux-x86_64"),
+            ],
+            "http": [
+                bzd_http_archive(
+                    integrity = "sha256-c7xsTlCwbc62DpS1Ot7WG3dpvjz1Y1ciadnI1kPbjpU=",
+                    strip_prefix = "xtensa-esp-elf-gdb",
+                    url = "https://github.com/espressif/binutils-gdb/releases/download/esp-gdb-v17.1_20260402/xtensa-esp-elf-gdb-17.1_20260402-x86_64-linux-gnu.tar.gz",
+                ),
+            ],
+        }],
+        expose = {
+            "gdb-esp32": "gdb-esp32",
+            "gdb-esp32s3": "gdb-esp32s3",
+        },
+    )
+
 def _load_dependencies_impl(module_ctx):
     _load_cc_sdks(module_ctx)
     _load_tools(module_ctx)

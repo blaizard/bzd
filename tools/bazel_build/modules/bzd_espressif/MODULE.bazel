@@ -12,7 +12,7 @@ bazel_dep(name = "rules_rust", version = "0.68.1")
 bazel_dep(name = "rules_python", version = "1.9.0")
 
 load_dependencies = use_extension("//:extensions.bzl", "load_dependencies")
-use_repo(load_dependencies, "esp32_xtensa_lx6_sdk", "esp32s3_xtensa_lx7_sdk", "esptool", "qemu")
+use_repo(load_dependencies, "esp32_xtensa_lx6_sdk", "esp32s3_xtensa_lx7_sdk", "esptool", "gdb", "qemu")
 
 pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
 pip.parse(

@@ -1,0 +1,23 @@
+alias(
+    name = "qemu",
+    actual = "@qemu//:qemu-system-xtensa",
+    visibility = ["//visibility:public"],
+)
+
+alias(
+    name = "esptool",
+    actual = "@esptool//:esptool",
+    visibility = ["//visibility:public"],
+)
+
+alias(
+    name = "gdb-esp32",
+    actual = "@gdb//:gdb-esp32",
+    visibility = ["//visibility:public"],
+)
+
+alias(
+    name = "gdb-esp32s3",
+    actual = "@gdb//:gdb-esp32s3",
+    visibility = ["//visibility:public"],
+)
