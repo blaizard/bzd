@@ -1,5 +1,5 @@
 alias(
-    name = "qemu",
+    name = "qemu-system-xtensa",
     actual = "@qemu//:qemu-system-xtensa",
     visibility = ["//visibility:public"],
 )

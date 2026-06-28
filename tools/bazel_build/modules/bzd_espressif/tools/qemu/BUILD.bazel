@@ -1,3 +1,4 @@
+load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper")
 load("@rules_python//python:defs.bzl", "py_binary")
 
 py_binary(
@@ -5,8 +6,17 @@ py_binary(
     srcs = [
         ":executor_qemu.py",
     ],
-    visibility = ["//visibility:public"],
     deps = [
         "@bzd_python//bzd/utils:run",
     ],
+)
+
+sh_binary_wrapper(
+    name = "qemu-system-xtensa",
+    command = "{executor_qemu} --qemu {qemu} \"$@\"",
+    locations = {
+        ":executor_qemu": "executor_qemu",
+        "@qemu//:qemu-system-xtensa": "qemu",
+    },
+    visibility = ["//visibility:public"],
 )

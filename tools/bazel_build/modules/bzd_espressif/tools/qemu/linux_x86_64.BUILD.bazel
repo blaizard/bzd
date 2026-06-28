@@ -11,8 +11,7 @@ sh_binary_wrapper(
     ],
     locations = {
         "//:bin/qemu-system-xtensa": "qemu",
-        "@bzd_espressif//tools/qemu:executor_qemu": "executor_qemu",
     },
-    command = "{executor_qemu} --qemu {qemu} \"$@\"",
+    command = "{qemu} \"$@\"",
     data = glob(["**"]),
 )

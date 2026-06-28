@@ -101,8 +101,8 @@ def _load_tools(_module_ctx):
             ],
         }],
         expose = {
-            "gdb-esp32": "gdb-esp32",
-            "gdb-esp32s3": "gdb-esp32s3",
+            "xtensa-esp32-elf-gdb": "xtensa-esp32-elf-gdb",
+            "xtensa-esp32s3-elf-gdb": "xtensa-esp32s3-elf-gdb",
         },
     )
 

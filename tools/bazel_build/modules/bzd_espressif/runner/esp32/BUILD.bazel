@@ -9,11 +9,11 @@ sh_binary_wrapper(
         {qemu} --binary "$1" -- -machine esp32 -m 4M -drive file=./qemu_flash.bin,if=mtd,format=raw -no-reboot -nographic
     """,
     locations = {
+        "//tools/qemu:qemu-system-xtensa": "qemu",
         "@bzd_python//bzd/utils:binary_builder": "builder",
         "@esp32_xtensa_lx6_sdk//:bin/bootloader.bin": "bootloader",
         "@esp32_xtensa_lx6_sdk//:bin/partition-table.bin": "partitions",
         "@esptool//:esptool": "esptool",
-        "@qemu//:qemu-system-xtensa": "qemu",
     },
 )
 

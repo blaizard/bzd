@@ -2,25 +2,25 @@
 
 load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper")
 
-alias(
-    name = "gdb-esp32",
-    actual = "//:bin/xtensa-esp32-elf-gdb",
-    visibility = ["//visibility:public"],
-)
-
-alias(
-    name = "gdb-esp32s3",
-    actual = "//:bin/xtensa-esp32s3-elf-gdb",
-    visibility = ["//visibility:public"],
-)
-
 sh_binary_wrapper(
-    name = "gdb2",
+    name = "xtensa-esp32-elf-gdb",
     visibility = [
         "//visibility:public",
     ],
     locations = {
         "//:bin/xtensa-esp32-elf-gdb": "gdb",
+    },
+    command = "{gdb} \"$@\"",
+    data = glob(["**"]),
+)
+
+sh_binary_wrapper(
+    name = "xtensa-esp32s3-elf-gdb",
+    visibility = [
+        "//visibility:public",
+    ],
+    locations = {
+        "//:bin/xtensa-esp32s3-elf-gdb": "gdb",
     },
     command = "{gdb} \"$@\"",
     data = glob(["**"]),
