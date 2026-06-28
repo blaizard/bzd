@@ -1,9 +1,6 @@
 name: Opencode Event Router
 
 on:
-    # Issue created.
-    issues:
-        types: [opened, edited]
     # Issue comment, PR comment (main thread), PR inline comment reply
     issue_comment:
         types: [created, edited]
@@ -36,18 +33,19 @@ jobs:
                   route="none"
                   issue_number="$ISSUE_NUMBER"
 
-                  if [[ "$EVENT_NAME" == "issues" ]]; then
-                      route="issue_comment"
-                  elif [[ "$EVENT_NAME" == "issue_comment" && "$ACTOR" != "agent" ]]; then
+                  if [[ "$EVENT_NAME" == "issue_comment" && "$ACTOR" != "agent" ]]; then
+                      read -r ACTION _ <<< "$COMMENT_BODY"
                       if [[ "$IS_PR" == "true" ]]; then
                           route="update_pr"
-                      elif [[ "$COMMENT_BODY" == /pr* ]]; then
+                      elif [[ "$ACTION" == "/pr" ]]; then
                           route="create_pr"
-                      elif [[ "$COMMENT_BODY" == /* ]]; then
+                      elif [[ "$ACTION" == "/plan" ]]; then
+                          route="issue_plan"
+                      elif [[ "$ACTION" == /* ]]; then
                           echo "Unsupported command: $COMMENT_BODY" >&2
                           exit 1
                       else
-                          route="issue_comment"
+                          echo "No routing needed for this event."
                       fi    
                   elif [[ "$EVENT_NAME" == "pull_request" && "$ACTOR" == "agent" ]]; then
                       route="initialize_pr"
@@ -73,10 +71,10 @@ jobs:
                   name: "opencode_issue"
                   ttl: "300"
 
-    route_issue_comment:
+    route_issue_plan:
         needs: [router, lease_linux]
         runs-on: opencode
-        if: needs.router.outputs.route == 'issue_comment'
+        if: needs.router.outputs.route == 'issue_plan'
         uses: ./.gitea/workflows/sub_opencode_comment.yml
         secrets: inherit
         with:
