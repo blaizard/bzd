@@ -27,6 +27,31 @@ bzd_make_runner_toolchain(
 )
 
 sh_binary_wrapper(
+    name = "qemu_gdb",
+    command = """
+        {esptool} --chip esp32 elf2image -o "./image" "$1"
+        {builder} --size 4MB --chunk {bootloader},0x1000 --chunk {partitions},0x8000 --chunk ./image,0x10000 ./qemu_flash.bin
+        {qemu_gdb} --binary "$1" -- -machine esp32 -m 4M -drive file=./qemu_flash.bin,if=mtd,format=raw -no-reboot -nographic
+    """,
+    locations = {
+        "//tools/qemu_gdb:esp32": "qemu_gdb",
+        "@bzd_python//bzd/utils:binary_builder": "builder",
+        "@esp32_xtensa_lx6_sdk//:bin/bootloader.bin": "bootloader",
+        "@esp32_xtensa_lx6_sdk//:bin/partition-table.bin": "partitions",
+        "@esptool//:esptool": "esptool",
+    },
+)
+
+bzd_make_runner_toolchain(
+    name = "qemu_gdb_toolchain",
+    runner = ":qemu_gdb",
+    target_compatible_with = [
+        "@bzd_platforms//al:esp32",
+        "@bzd_platforms//isa:xtensa_lx6",
+    ],
+)
+
+sh_binary_wrapper(
     name = "uart",
     command = """
         {esptool} --chip esp32 elf2image -o "./image" "$1"

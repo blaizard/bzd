@@ -1,0 +1,23 @@
+load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper")
+load("@rules_python//python:defs.bzl", "py_binary")
+
+py_binary(
+    name = "executor_qemu_gdb",
+    srcs = [
+        ":executor_qemu_gdb.py",
+    ],
+    deps = [
+        "@bzd_python//bzd/utils:run",
+    ],
+)
+
+sh_binary_wrapper(
+    name = "esp32",
+    command = "{executor_qemu_gdb} --qemu {qemu} --gdb {gdb} \"$@\"",
+    locations = {
+        ":executor_qemu_gdb": "executor_qemu_gdb",
+        "@gdb//:xtensa-esp32-elf-gdb": "gdb",
+        "@qemu//:qemu-system-xtensa": "qemu",
+    },
+    visibility = ["//visibility:public"],
+)
