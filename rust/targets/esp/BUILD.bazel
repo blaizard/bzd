@@ -37,3 +37,14 @@ rust_binary(
         "@bzd_espressif//hal/rust:embassy",
     ],
 )
+
+rust_binary(
+    name = "interrupt",
+    srcs = [
+        "interrupt.rs",
+    ],
+    deps = [
+        "//rust/bzd",
+        "@bzd_espressif//hal/rust",
+    ],
+)
