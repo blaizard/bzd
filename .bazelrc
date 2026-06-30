@@ -146,6 +146,7 @@ build:esp32s3 --platforms="@esp32s3//:platform-esp32s3-xtensa_lx7"
 build:esp32s3 --platform_suffix=esp32s3-xtensa_lx7-gcc
 build:esp32s3 --extra_execution_platforms=@esp32s3//:platform
 build:uart --extra_toolchains=@bzd_espressif//runner/esp32s3:uart_toolchain
+build:gdb --extra_toolchains=@bzd_espressif//runner/esp32s3:qemu_gdb_toolchain
 
 # clang-tidy
 build:clang-tidy --aspects="@bzd_sanitizer//aspects/clang_tidy:defs.bzl%clang_tidy_aspect"

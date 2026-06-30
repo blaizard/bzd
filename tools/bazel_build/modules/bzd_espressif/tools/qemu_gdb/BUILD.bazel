@@ -21,3 +21,14 @@ sh_binary_wrapper(
     },
     visibility = ["//visibility:public"],
 )
+
+sh_binary_wrapper(
+    name = "esp32s3",
+    command = "{executor_qemu_gdb} --qemu {qemu} --gdb {gdb} \"$@\"",
+    locations = {
+        ":executor_qemu_gdb": "executor_qemu_gdb",
+        "@gdb//:xtensa-esp32s3-elf-gdb": "gdb",
+        "@qemu//:qemu-system-xtensa": "qemu",
+    },
+    visibility = ["//visibility:public"],
+)

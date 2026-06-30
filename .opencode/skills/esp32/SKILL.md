@@ -18,3 +18,18 @@ compatibility: opencode
 ## QEMU
 
 - https://github.com/espressif/esp-toolchain-docs/tree/main/qemu/
+
+## Commands
+
+Useful commands to build, run, debug esp32 targets.
+
+```bash
+# Build and run a target for the esp32 platform on qemu.
+./tools/bazel run //rust/esp32 --config=esp32
+
+# Build and run a target for the esp32s3 platform on qemu.
+./tools/bazel run //rust/esp32 --config=esp32s3
+
+# Build a target for the esp32s platform with debug symbols and run it on qemu. Attach a gdb debug and wait for user commands.
+./tools/bazel run //rust/esp32 --config=esp32 --config=gdb --config=dev
+```

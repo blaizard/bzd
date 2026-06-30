@@ -2,6 +2,11 @@ import argparse
 import pathlib
 import typing
 import sys
+import os
+import threading
+import time
+
+from bzd.utils.run import localCommand, Cancellation
 
 
 def splitEndOfOptionsMarker(
@@ -21,13 +26,52 @@ if __name__ == "__main__":
 	parser.add_argument("--gdb", type=pathlib.Path, required=True, help="The path of GDB.")
 	parser.add_argument(
 		"--binary",
+		required=True,
 		type=pathlib.Path,
 		help="The binary containing the symbols used to decode the stack trace.",
+	)
+	parser.add_argument(
+		"--workspace",
+		type=pathlib.Path,
+		default=os.environ.get("BUILD_WORKSPACE_DIRECTORY", os.environ.get("BUILD_WORKING_DIRECTORY", ".")),
+		help="The path of the workspace.",
 	)
 	scriptArgs, qemuArgs = splitEndOfOptionsMarker(sys.argv[1:])
 	args = parser.parse_args(scriptArgs)
 
-	# Run build/qemu-system-xtensa -s -S {qemuArgs}
-	# Then run xtensa-esp32-elf-gdb build/app-name.elf -ex "target remote :1234" -ex "monitor system_reset" -ex "tb app_main" -ex "c"
+	qemuCancellation = Cancellation()
 
-	print(qemuArgs)
+	def runQemu() -> None:
+		localCommand(
+			[str(args.qemu), "-s", "-S"] + qemuArgs, timeoutS=None, ignoreFailure=True, cancellation=qemuCancellation
+		)
+
+	thread = threading.Thread(target=runQemu)
+	thread.start()
+
+	print("Wait for QEMU to be ready...")
+	time.sleep(1)
+
+	try:
+		localCommand(
+			[
+				str(args.gdb),
+				str(args.binary),
+				"-ex",
+				"target remote :1234",
+				"-ex",
+				f"directory {args.workspace.absolute()}",
+				"-ex",
+				"break main",
+				"-ex",
+				"continue",
+			],
+			stdout=True,
+			stderr=True,
+			stdin=True,
+			timeoutS=None,
+		)
+	finally:
+		print("Terminating QEMU process, this might take a few seconds...")
+		qemuCancellation.cancel()
+		thread.join()
