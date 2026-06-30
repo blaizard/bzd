@@ -32,4 +32,7 @@ Useful commands to build, run, debug esp32 targets.
 
 # Build a target for the esp32s platform with debug symbols and run it on qemu. Attach a gdb debug and wait for user commands.
 ./tools/bazel run //rust/esp32 --config=esp32 --config=gdb --config=dev
+
+# When too many qemu process are ghosted.
+killall qemu-system-xtensa
 ```
