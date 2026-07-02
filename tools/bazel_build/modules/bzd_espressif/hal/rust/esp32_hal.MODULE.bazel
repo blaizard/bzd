@@ -8,7 +8,7 @@ crates_esp32.spec(
 )
 crates_esp32.spec(
     package = "xtensa-lx-rt",
-    version = "0.21.0",
+    version = "0.22.0",
 )
 crates_esp32.spec(
     features = [
@@ -17,7 +17,7 @@ crates_esp32.spec(
         "unstable",
     ],
     package = "esp-hal",
-    version = "1.0.0",
+    version = "1.1.0",
 )
 crates_esp32.spec(
     features = [
@@ -25,7 +25,7 @@ crates_esp32.spec(
         "println",
     ],
     package = "esp-backtrace",
-    version = "0.18.1",
+    version = "0.19.0",
 )
 crates_esp32.spec(
     default_features = False,
@@ -34,12 +34,12 @@ crates_esp32.spec(
         "auto",
     ],
     package = "esp-println",
-    version = "0.16.1",
+    version = "0.17.0",
 )
 crates_esp32.spec(
     features = ["esp32"],
     package = "esp-bootloader-esp-idf",
-    version = "0.4.0",
+    version = "0.5.0",
 )
 crates_esp32.spec(
     features = [
@@ -47,16 +47,16 @@ crates_esp32.spec(
         "esp32",
     ],
     package = "esp-rtos",
-    version = "0.2.0",
+    version = "0.3.0",
 )
 crates_esp32.spec(
     package = "embassy-executor",
-    version = "0.9.1",
+    version = "0.10.0",
 )
 crates_esp32.spec(
     features = ["generic-queue-8"],
     package = "embassy-time",
-    version = "0.5.0",
+    version = "0.5.1",
 )
 crates_esp32.spec(
     package = "static_cell",
@@ -71,7 +71,7 @@ crates_esp32.annotation(
     deps = ["@crates_esp32//:xtensa-lx"],
 )
 crates_esp32.annotation(
-    build_script_env = {"OPT_LEVEL": "3"},
+    build_script_env = {"OPT_LEVEL": "s"},
     crate = "esp-hal",
     deps = [
         "@crates_esp32//:xtensa-lx",

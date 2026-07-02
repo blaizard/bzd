@@ -1,7 +1,6 @@
 import os
 import subprocess
 import sys
-import time
 import threading
 import signal
 import shlex
@@ -121,32 +120,37 @@ class Cancellation:
 			self._cancel()
 
 	@staticmethod
-	def killall(gid: int, sig: signal.Signals, timeoutS: float = 5.0) -> bool:
+	def killall(gid: int, sig: signal.Signals, proc: Optional[subprocess.Popen] = None, timeoutS: float = 5.0) -> bool:
 		"""Try to kill all process from the given group.
 
 		Args:
 		        gid: Group identifier.
 		        sig: The signal to be sent.
+		        proc: The process to be killed, if None, it will be ignored.
 		        timeoutS: The timeout in seconds.
 
 		Returns:
-		        True if all processes have been killed, False otherwise.
+		        True if all processes have been killed, False otherwise or if we don't know.
 		"""
 
-		timeStart = time.time()
-		while time.time() - timeStart <= timeoutS:
+		try:
+			os.killpg(gid, sig)
+		except Exception:
+			pass
+		if proc is not None:
 			try:
-				os.killpg(gid, sig)
-			except Exception:
+				proc.wait(timeout=timeoutS)
 				return True
+			except subprocess.TimeoutExpired:
+				return False
 		return False
 
 	def _cancel(self) -> None:
 		self.triggered = True
 		if self.proc:
 			gid = os.getpgid(self.proc.pid)
-			if not Cancellation.killall(gid, signal.SIGTERM):
-				Cancellation.killall(gid, signal.SIGKILL)
+			if not Cancellation.killall(gid, signal.SIGTERM, proc=self.proc):
+				Cancellation.killall(gid, signal.SIGKILL, proc=self.proc)
 
 
 def localCommand(
@@ -221,7 +225,6 @@ def localCommand(
 
 	except KeyboardInterrupt:
 		# Exit gracefully on keyboard interrupt.
-		Cancellation.killall(gid, signal.SIGINT)
 		sys.exit(1)
 
 	finally:

@@ -10,7 +10,7 @@ sh_binary_wrapper(
     locations = {
         "//:bin/xtensa-esp32-elf-gdb": "gdb",
     },
-    command = "{gdb} \"$@\"",
+    command = "exec {gdb} \"$@\"",
     data = glob(["**"]),
 )
 
@@ -22,6 +22,6 @@ sh_binary_wrapper(
     locations = {
         "//:bin/xtensa-esp32s3-elf-gdb": "gdb",
     },
-    command = "{gdb} \"$@\"",
+    command = "exec {gdb} \"$@\"",
     data = glob(["**"]),
 )

@@ -11,6 +11,6 @@ sh_binary_wrapper(
         "//:bin/openocd": "openocd",
         "//:share/openocd/scripts": "scripts",
     },
-    command = "{openocd} -s {scripts} \"$@\"",
+    command = "exec {openocd} -s {scripts} \"$@\"",
     data = glob(["**"]),
 )

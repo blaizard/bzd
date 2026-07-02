@@ -5,8 +5,10 @@ import sys
 import os
 import threading
 import time
+import pty
+import socket
 
-from bzd.utils.run import localCommand, Cancellation
+from bzd.utils.run import localCommand, localBazel, Cancellation
 
 
 def splitEndOfOptionsMarker(
@@ -18,6 +20,24 @@ def splitEndOfOptionsMarker(
 		return args[0:index], args[index + 1 :]
 	except ValueError:
 		return args, []
+
+
+def checkConnection(host: str, port: int, timeoutS: int) -> bool:
+	"""Check that a connection exists."""
+
+	timeStart = time.time()
+
+	while time.time() - timeStart < timeoutS:
+		sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		sock.settimeout(timeoutS)
+		try:
+			sock.connect((host, port))
+		except Exception:
+			continue
+		else:
+			sock.close()
+			return True
+	return False
 
 
 if __name__ == "__main__":
@@ -39,6 +59,9 @@ if __name__ == "__main__":
 	scriptArgs, qemuArgs = splitEndOfOptionsMarker(sys.argv[1:])
 	args = parser.parse_args(scriptArgs)
 
+	# Look for the external directory
+	outputBase = pathlib.Path(localBazel(["info", "output_base"], cwd=args.workspace).getStdout().strip())
+
 	qemuCancellation = Cancellation()
 
 	def runQemu() -> None:
@@ -49,29 +72,27 @@ if __name__ == "__main__":
 	thread = threading.Thread(target=runQemu)
 	thread.start()
 
-	print("Wait for QEMU to be ready...")
-	time.sleep(1)
-
 	try:
-		localCommand(
+		print("Wait for QEMU to be ready (5 seconds)...")
+		if not checkConnection(host="127.0.0.1", port=1234, timeoutS=5):
+			print("QEMU did not start in time, terminating.")
+			sys.exit(1)
+
+		pty.spawn(
 			[
 				str(args.gdb),
 				str(args.binary),
 				"-ex",
 				"target remote :1234",
 				"-ex",
-				f"directory {args.workspace.absolute()}",
+				f"directory '{args.workspace.absolute()}' '{outputBase.absolute()}'",
 				"-ex",
 				"break main",
 				"-ex",
 				"continue",
 			],
-			stdout=True,
-			stderr=True,
-			stdin=True,
-			timeoutS=None,
 		)
 	finally:
-		print("Terminating QEMU process, this might take a few seconds...")
+		print("Terminating QEMU process.")
 		qemuCancellation.cancel()
 		thread.join()

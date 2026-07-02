@@ -30,8 +30,10 @@ async fn main(_spawner: Spawner) -> ! {
     let peripherals = esp_hal::init(config);
     //let peripherals = esp_hal::init(esp_hal::Config::default());
 
-    let timg0 = TimerGroup::new(peripherals.TIMG1);
-    esp_rtos::start(timg0.timer0);
+    let timg0 = TimerGroup::new(peripherals.TIMG0);
+    use esp_hal::interrupt::software::SoftwareInterruptControl;
+    let software_interrupt = SoftwareInterruptControl::new(peripherals.SW_INTERRUPT);
+    esp_rtos::start(timg0.timer0, software_interrupt.software_interrupt0);
 
     //let mut led = Output::new(peripherals.GPIO2, Level::High, OutputConfig::default());
     println!("Start");

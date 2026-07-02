@@ -18,7 +18,7 @@ py_binary(
 sh_binary_wrapper(
     name = "metadata",
     command = """
-        {profiler} --groups {profile_groups} "$@"
+        exec {profiler} --groups {profile_groups} "$@"
     """,
     locations = {
         "//tools/esptool:profile_groups.json": "profile_groups",
