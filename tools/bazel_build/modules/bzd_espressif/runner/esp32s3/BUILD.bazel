@@ -54,7 +54,7 @@ bzd_make_runner_toolchain(
 sh_binary_wrapper(
     name = "uart",
     command = """
-        {esptool} --chip esp32-s3 elf2image -o "./image" "$1"
+        {esptool} --chip esp32s3 elf2image -o "./image" "$1"
         {executor_uart} \
                 --esptool {esptool} \
                 --device_vid_pid 0x303A 0x1001 \

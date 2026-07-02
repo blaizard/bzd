@@ -90,7 +90,8 @@ class Uart:
 	def start(self) -> None:
 		with self.serial as serialInstance:
 			while True:
-				line = serialInstance.readline()
-				if line:
-					sys.stdout.write(line.decode(errors="ignore"))
+				bytesToRead = max(1, serialInstance.in_waiting)
+				chunk = serialInstance.read(bytesToRead)
+				if chunk:
+					sys.stdout.write(chunk.decode(errors="ignore"))
 					sys.stdout.flush()
