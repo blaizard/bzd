@@ -120,7 +120,9 @@ class Cancellation:
 			self._cancel()
 
 	@staticmethod
-	def killall(gid: int, sig: signal.Signals, proc: Optional[subprocess.Popen[Any]] = None, timeoutS: float = 5.0) -> bool:
+	def killall(
+		gid: int, sig: signal.Signals, proc: Optional[subprocess.Popen[Any]] = None, timeoutS: float = 5.0
+	) -> bool:
 		"""Try to kill all process from the given group.
 
 		Args:
