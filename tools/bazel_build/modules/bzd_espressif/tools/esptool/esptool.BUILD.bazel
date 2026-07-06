@@ -14,4 +14,5 @@ py_binary(
         requirement("pyserial"),
     ],
     data = glob(["esptool/**"]),
+    tags = ["mypy-ignore"],
 )

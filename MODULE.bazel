@@ -185,11 +185,11 @@ crates.spec(
 )
 crates.spec(
     features = [
-        "arch-std",
+        "platform-std",
         "executor-thread",
     ],
     package = "embassy-executor",
-    version = "0.9.1",
+    version = "0.10.0",
 )
 crates.spec(
     package = "static_cell",

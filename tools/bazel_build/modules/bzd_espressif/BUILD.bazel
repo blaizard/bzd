@@ -11,13 +11,13 @@ alias(
 )
 
 alias(
-    name = "gdb-esp32",
-    actual = "@gdb//:gdb-esp32",
+    name = "xtensa-esp32-elf-gdb",
+    actual = "@gdb//:xtensa-esp32-elf-gdb",
     visibility = ["//visibility:public"],
 )
 
 alias(
-    name = "gdb-esp32s3",
-    actual = "@gdb//:gdb-esp32s3",
+    name = "xtensa-esp32s3-elf-gdb",
+    actual = "@gdb//:xtensa-esp32s3-elf-gdb",
     visibility = ["//visibility:public"],
 )
