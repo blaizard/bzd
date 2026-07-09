@@ -6,11 +6,13 @@ rust_library(
     srcs = [
         "lib.rs",
     ],
+    tags = ["manual"],
     deps = ["//rust/targets:embassy"],
 )
 
 rust_test(
     name = "hello_test",
     crate = ":hello",
+    tags = ["manual"],
     target = ["//rust/targets:embassy"],
 )
