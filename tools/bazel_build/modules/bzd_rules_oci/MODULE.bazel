@@ -12,6 +12,10 @@ bazel_dep(name = "bzd_lib", version = "1.0")
 bazel_dep(name = "bzd_python", version = "1.0")
 bazel_dep(name = "bzd_bdl", version = "1.0")
 bazel_dep(name = "bzd_bundle", version = "1.0")
+bazel_dep(name = "bzd_platforms", version = "1.0")
+
+load_dependencies = use_extension("//:extensions.bzl", "load_dependencies")
+use_repo(load_dependencies, "podman")
 
 images = use_extension("//:extensions.bzl", "images")
 images.pull(
@@ -23,3 +27,5 @@ images.pull(
     ],
 )
 use_repo(images, "oci_minimal")
+
+register_toolchains("//toolchain:all")

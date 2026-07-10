@@ -1,0 +1,36 @@
+load("//toolchain:defs.bzl", "oci_toolchain")
+
+toolchain_type(name = "oci_toolchain_type")
+
+oci_toolchain(
+    name = "oci_toolchain",
+    oci_runner = "@podman//:podman",
+)
+
+toolchain(
+    name = "toolchain_linux_x86_64",
+    exec_compatible_with = [
+        "@bzd_platforms//al:linux",
+        "@bzd_platforms//isa:x86_64",
+    ],
+    target_compatible_with = [
+        "@bzd_platforms//al:linux",
+        "@bzd_platforms//isa:x86_64",
+    ],
+    toolchain = ":oci_toolchain",
+    toolchain_type = ":oci_toolchain_type",
+)
+
+toolchain(
+    name = "toolchain_linux_arm64",
+    exec_compatible_with = [
+        "@bzd_platforms//al:linux",
+        "@bzd_platforms//isa:arm64",
+    ],
+    target_compatible_with = [
+        "@bzd_platforms//al:linux",
+        "@bzd_platforms//isa:arm64",
+    ],
+    toolchain = ":oci_toolchain",
+    toolchain_type = ":oci_toolchain_type",
+)

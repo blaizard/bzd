@@ -1,0 +1,17 @@
+"""Podman binary."""
+
+load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper")
+
+sh_binary_wrapper(
+    name = "podman",
+    command = """
+export CONTAINERS_HELPER_BINARY_DIR="$(dirname {conmon})"
+exec {podman} --conmon {conmon} run --rm "$@"
+""",
+    locations = {
+        "usr/local/bin/podman": "podman",
+        "usr/local/lib/podman/conmon": "conmon",
+    },
+    data = glob(["**/*"]),
+    visibility = ["//visibility:public"],
+)

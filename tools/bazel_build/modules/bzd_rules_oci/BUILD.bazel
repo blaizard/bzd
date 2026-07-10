@@ -18,3 +18,9 @@ bzd_crane_binary(
     name = "crane",
     visibility = ["//visibility:public"],
 )
+
+alias(
+    name = "podman",
+    actual = "@podman//:podman",
+    visibility = ["//visibility:public"],
+)
