@@ -196,12 +196,12 @@ bzd_git_reset()
         return 1
     fi
 
-    origin=`git for-each-ref --format='%(upstream:short)' $(git symbolic-ref -q HEAD) 2> /dev/null | head -n1`
-    read -p "Do you want to reset your local branch to '$origin' (all modification will be lost)? [y/N] " -n 1 -r
+    branch=$(git branch --show-current)
+    remote=$(git config --get branch.$branch.remote || echo "origin")
+    read -p "Do you want to reset your local branch to '$remote/$branch' (all modification will be lost)? [y/N] " -n 1 -r
     echo ""
     if [[ $REPLY =~ ^[Yy]$ ]]; then
-        git fetch --prune
-        git reset --hard $origin
+        git fetch --prune "$remote" "$branch" && git reset --hard FETCH_HEAD
         # Note: do not delete untracked files as they might be used (for local configuration for example).
         git clean -ffd
         if git submodule status >/dev/null 2>&1; then
