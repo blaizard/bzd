@@ -4,9 +4,32 @@ import sys
 import threading
 import signal
 import shlex
-from typing import Any, List, Dict, Optional, Tuple, TextIO, Union
+from typing import Any, Callable, List, Dict, Optional, Tuple, TextIO, Union
 from pathlib import Path
 import selectors
+import enum
+
+
+class StreamCallback:
+	"""Callback class for streaming output."""
+
+	class Mode(enum.Enum):
+		STREAM = enum.auto()
+		LINE = enum.auto()
+
+	def __init__(self, callback: Callable[[str], None], mode: Mode = Mode.STREAM) -> None:
+		self.callback = callback
+		self.mode = mode
+		self.buffer = ""
+
+	def write(self, data: str) -> None:
+		if self.mode == StreamCallback.Mode.STREAM:
+			self.callback(data)
+		elif self.mode == StreamCallback.Mode.LINE:
+			self.buffer += data
+			while "\n" in self.buffer:
+				line, self.buffer = self.buffer.split("\n", 1)
+				self.callback(line.strip("\r"))
 
 
 class ExecuteResultStreamWriter:
@@ -103,21 +126,23 @@ class Cancellation:
 		self.timeBeforeKillS = timeBeforeKillS
 		self.reset()
 
-	def reset(self, proc: Optional[subprocess.Popen[bytes]] = None) -> None:
+	def reset(
+		self, proc: Optional[subprocess.Popen[bytes]] = None, sig: signal.Signals = signal.SIGTERM, timeoutS: float = 5.0
+	) -> None:
 		"""Reset the cancellation state."""
 
 		with self.mutex:
 			self.proc = proc
 			if self.proc and self.triggered:
-				self._cancel()
+				self._cancel(sig=sig, timeoutS=timeoutS)
 			else:
 				self.triggered = False
 
-	def cancel(self) -> None:
+	def cancel(self, sig: signal.Signals = signal.SIGTERM, timeoutS: float = 5.0) -> None:
 		"""Cancel the current process."""
 
 		with self.mutex:
-			self._cancel()
+			self._cancel(sig=sig, timeoutS=timeoutS)
 
 	@staticmethod
 	def killall(
@@ -147,12 +172,16 @@ class Cancellation:
 				return False
 		return False
 
-	def _cancel(self) -> None:
+	def _cancel(self, sig: signal.Signals, timeoutS: float) -> None:
 		self.triggered = True
-		if self.proc:
+		if not self.proc:
+			return
+		try:
 			gid = os.getpgid(self.proc.pid)
-			if not Cancellation.killall(gid, signal.SIGTERM, proc=self.proc):
-				Cancellation.killall(gid, signal.SIGKILL, proc=self.proc)
+		except ProcessLookupError:
+			return
+		if not Cancellation.killall(gid, sig, proc=self.proc, timeoutS=timeoutS):
+			Cancellation.killall(gid, signal.SIGKILL, proc=self.proc, timeoutS=timeoutS)
 
 
 def localCommand(
@@ -203,6 +232,7 @@ def localCommand(
 	sel.register(proc.stderr, events=selectors.EVENT_READ)  # type: ignore
 
 	returnCode = 1
+	terminationSignal = signal.SIGKILL
 	try:
 		isRunning = True
 		timer.start()
@@ -212,26 +242,27 @@ def localCommand(
 				if not data:
 					isRunning = False
 				(stream.addStdout if key.fileobj is proc.stdout else stream.addStderr)(data)
-		remainingStdout, remainingStderr = proc.communicate()
-		stream.addStdout(remainingStdout)
-		stream.addStderr(remainingStderr)
 
 		if not timer.is_alive():
 			stream.addStderr(f"Execution of '{' '.join(cmds)}' timed out after {timeoutS}s, terminating process.\n".encode())
-		else:
-			returnCode = proc.returncode
-			if returnCode is None:
-				stream.addStderr(b"Process did not complete.\n")
-			if cancellation and cancellation.triggered:
-				stream.addStderr(b"Process was cancelled.\n")
 
 	except KeyboardInterrupt:
 		# Exit gracefully on keyboard interrupt.
+		terminationSignal = signal.SIGINT
 		sys.exit(1)
 
 	finally:
 		timer.cancel()
-		Cancellation.killall(gid, signal.SIGKILL)
+		Cancellation.killall(gid, terminationSignal, proc=proc)
+		remainingStdout, remainingStderr = proc.communicate()
+		stream.addStdout(remainingStdout)
+		stream.addStderr(remainingStderr)
+
+	returnCode = proc.returncode
+	if returnCode is None:
+		stream.addStderr(b"Process did not complete.\n")
+	if cancellation and cancellation.triggered:
+		stream.addStderr(b"Process was cancelled.\n")
 
 	result = ExecuteResult(stream=stream, returncode=returnCode)
 

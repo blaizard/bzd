@@ -1,9 +1,8 @@
-load("//apps/external:defs.bzl", "bzd_docker_binary")
+load("//apps/external:defs.bzl", "bzd_oci_binary")
 
 exports_files(["docker-compose.yml"])
 
-bzd_docker_binary(
+bzd_oci_binary(
     name = "transmission_openvpn",
     docker_compose = ":docker-compose.yml",
-    expose = 9091,
 )

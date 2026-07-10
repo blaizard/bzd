@@ -15,3 +15,4 @@ services:
         devices:
             - "/dev/net/tun:/dev/net/tun"
         image: haugene/transmission-openvpn
+        ports: [9091]

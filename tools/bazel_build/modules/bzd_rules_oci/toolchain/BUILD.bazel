@@ -1,6 +1,6 @@
 load("//toolchain:defs.bzl", "oci_toolchain")
 
-toolchain_type(name = "oci_toolchain_type")
+toolchain_type(name = "toolchain_type")
 
 oci_toolchain(
     name = "oci_toolchain",
@@ -18,7 +18,7 @@ toolchain(
         "@bzd_platforms//isa:x86_64",
     ],
     toolchain = ":oci_toolchain",
-    toolchain_type = ":oci_toolchain_type",
+    toolchain_type = ":toolchain_type",
 )
 
 toolchain(
@@ -32,5 +32,5 @@ toolchain(
         "@bzd_platforms//isa:arm64",
     ],
     toolchain = ":oci_toolchain",
-    toolchain_type = ":oci_toolchain_type",
+    toolchain_type = ":toolchain_type",
 )

@@ -6,3 +6,5 @@ services:
             LANGS: "en_GB"
             SYSTEM_ENABLEANALYTICS: false
             DISABLE_PIXEL: true
+            SECURITY_ENABLELOGIN: false
+        ports: [8080]
