@@ -228,6 +228,8 @@ export default function extensionCachingProxy(plugin, options, provider, endpoin
 			async () => {
 				const storage = plugin.getStorage();
 				let current = {};
+				const dirs = [];
+				const dirsWithFile = new Set();
 				for await (const [path, entry] of storage.walk([], /*maxOrPaging*/ 100, /*includeMetadata*/ true)) {
 					// Ignore top-level files, as these are the files that are used or metadata storing.
 					if (!path.length) {
@@ -236,16 +238,38 @@ export default function extensionCachingProxy(plugin, options, provider, endpoin
 					// If it's a file.
 					if (!Permissions.makeFromEntry(entry).isList()) {
 						current[[...path, entry.name].join("/")] = entry.size;
+						// Mark every ancestor directory as containing at least one file descendant.
+						let parent = path.slice();
+						while (parent.length) {
+							dirsWithFile.add(parent.join("/"));
+							parent.pop();
+						}
+					} else {
+						// Keep track of the directories.
+						dirs.push([...path, entry.name]);
 					}
-					// TODO: delete orphan leaf directories.
 				}
 				const totalSize = Object.values(current).reduce((sum, value) => sum + value, 0);
 				let stats = {
 					originalTotalSize: totalSize,
 					orphanFilesDeleted: 0,
 					orphanMetadataDeleted: 0,
+					orphanDirectoriesDeleted: 0,
 					filesDeleted: 0,
 				};
+
+				// Phase 0: delete orphan leaf directories (no file descendants), deepest first
+				// so each directory is empty when removed. This ensures correct behavior and
+				// accurate counting across all storage backends.
+				// Note: directories left empty by Phase 1/2 file eviction below are not rescanned
+				// (no extra walk is performed) and will be cleaned up on the next GC cycle.
+				dirs.sort((a, b) => b.length - a.length);
+				for (const dir of dirs) {
+					if (!dirsWithFile.has(dir.join("/"))) {
+						await storage.tryDelete(dir);
+						++stats.orphanDirectoriesDeleted;
+					}
+				}
 
 				// If it needs some cleanup.
 				if (totalSize > maxStorageSize) {

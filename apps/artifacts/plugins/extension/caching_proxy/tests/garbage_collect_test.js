@@ -77,4 +77,28 @@ describe("CachingProxy garbage collector", () => {
 		const result = await runGC(tester);
 		Exception.assertEqual(result.orphanFilesDeleted, 1);
 	});
+
+	it("deletes orphan leaf directories containing no files", async () => {
+		tester = new PluginTester();
+		tester.register("cache", Plugin, {
+			storage: {
+				type: "memory",
+				data: {
+					"metadata.json": JSON.stringify({ "host/real/file": 1 }),
+					host: {
+						empty: {},
+						nested: { empty: {} },
+						real: { file: "hello" },
+					},
+				},
+				write: true,
+			},
+			cachingProxy: { maxStorageSize: 100 },
+		});
+		await tester.start();
+
+		const result = await runGC(tester);
+		Exception.assertEqual(result.orphanDirectoriesDeleted, 3);
+		Exception.assertEqual(result.filesDeleted, 0);
+	});
 });
