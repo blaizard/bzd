@@ -4,7 +4,7 @@ build --noshow_loading_progress
 build --show_timestamps
 
 # Allow external dependencies to be retried from slow remote.
-common --http_timeout_scaling=2.0
+common --http_timeout_scaling=5.0
 
 # Reduce memory.
 common --notrack_incremental_state
