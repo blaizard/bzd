@@ -232,19 +232,25 @@ def localCommand(
 	sel.register(proc.stderr, events=selectors.EVENT_READ)  # type: ignore
 
 	returnCode = 1
-	terminationSignal = signal.SIGKILL
+	terminationSignal: Optional[signal.Signals] = signal.SIGKILL
 	try:
-		isRunning = True
+		activeStreams = {proc.stdout, proc.stderr}
 		timer.start()
-		while isRunning and timer.is_alive():
+		while activeStreams and timer.is_alive():
 			for key, _ in sel.select():
 				data = key.fileobj.read1(128)  # type: ignore
 				if not data:
-					isRunning = False
-				(stream.addStdout if key.fileobj is proc.stdout else stream.addStderr)(data)
+					# Unregister the stream if it is closed.
+					sel.unregister(key.fileobj)
+					activeStreams.discard(key.fileobj)
+				else:
+					(stream.addStdout if key.fileobj is proc.stdout else stream.addStderr)(data)
 
 		if not timer.is_alive():
 			stream.addStderr(f"Execution of '{' '.join(cmds)}' timed out after {timeoutS}s, terminating process.\n".encode())
+		else:
+			# Process completed successfully, no need to send a termination signal.
+			terminationSignal = None
 
 	except KeyboardInterrupt:
 		# Exit gracefully on keyboard interrupt.
@@ -253,7 +259,8 @@ def localCommand(
 
 	finally:
 		timer.cancel()
-		Cancellation.killall(gid, terminationSignal, proc=proc)
+		if terminationSignal is not None:
+			Cancellation.killall(gid, terminationSignal, proc=proc)
 		remainingStdout, remainingStderr = proc.communicate()
 		stream.addStdout(remainingStdout)
 		stream.addStderr(remainingStderr)
