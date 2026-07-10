@@ -211,59 +211,59 @@ def localCommand(
 	                maxOutputSize: The maximum size of the output, if larger, only the most recent output will be kept.
 	"""
 
-	sel = selectors.DefaultSelector()
-	stream = ExecuteResultStreamWriter(stdout, stderr, maxOutputSize)
-	proc = subprocess.Popen(
-		cmds,
-		cwd=cwd,
-		stdout=subprocess.PIPE,
-		stdin=None if stdin else subprocess.DEVNULL,
-		stderr=subprocess.PIPE,
-		env=env,
-		start_new_session=True,
-	)
-	gid = os.getpgid(proc.pid)
-	if cancellation:
-		cancellation.reset(proc)
-	timer: threading.Timer = (
-		threading.Timer(timeoutS, proc.kill) if timeoutS is not None else _NoopTimer()  # type: ignore
-	)
-	sel.register(proc.stdout, events=selectors.EVENT_READ)  # type: ignore
-	sel.register(proc.stderr, events=selectors.EVENT_READ)  # type: ignore
+	with selectors.DefaultSelector() as sel:
+		stream = ExecuteResultStreamWriter(stdout, stderr, maxOutputSize)
+		proc = subprocess.Popen(
+			cmds,
+			cwd=cwd,
+			stdout=subprocess.PIPE,
+			stdin=None if stdin else subprocess.DEVNULL,
+			stderr=subprocess.PIPE,
+			env=env,
+			start_new_session=True,
+		)
+		gid = os.getpgid(proc.pid)
+		if cancellation:
+			cancellation.reset(proc)
+		timer: threading.Timer = (
+			threading.Timer(timeoutS, proc.kill) if timeoutS is not None else _NoopTimer()  # type: ignore
+		)
+		sel.register(proc.stdout, events=selectors.EVENT_READ)  # type: ignore
+		sel.register(proc.stderr, events=selectors.EVENT_READ)  # type: ignore
 
-	returnCode = 1
-	terminationSignal: Optional[signal.Signals] = signal.SIGKILL
-	try:
-		activeStreams = {proc.stdout, proc.stderr}
-		timer.start()
-		while activeStreams and timer.is_alive():
-			for key, _ in sel.select():
-				data = key.fileobj.read1(128)  # type: ignore
-				if not data:
-					# Unregister the stream if it is closed.
-					sel.unregister(key.fileobj)
-					activeStreams.discard(key.fileobj)
-				else:
-					(stream.addStdout if key.fileobj is proc.stdout else stream.addStderr)(data)
+		returnCode = 1
+		terminationSignal: Optional[signal.Signals] = signal.SIGKILL
+		try:
+			activeStreams = {proc.stdout, proc.stderr}
+			timer.start()
+			while activeStreams and timer.is_alive():
+				for key, _ in sel.select():
+					data = key.fileobj.read1(128)  # type: ignore
+					if not data:
+						# Unregister the stream if it is closed.
+						sel.unregister(key.fileobj)
+						activeStreams.discard(key.fileobj)  # type: ignore
+					else:
+						(stream.addStdout if key.fileobj is proc.stdout else stream.addStderr)(data)
 
-		if not timer.is_alive():
-			stream.addStderr(f"Execution of '{' '.join(cmds)}' timed out after {timeoutS}s, terminating process.\n".encode())
-		else:
-			# Process completed successfully, no need to send a termination signal.
-			terminationSignal = None
+			if not timer.is_alive():
+				stream.addStderr(f"Execution of '{' '.join(cmds)}' timed out after {timeoutS}s, terminating process.\n".encode())
+			else:
+				# Process completed successfully, no need to send a termination signal.
+				terminationSignal = None
 
-	except KeyboardInterrupt:
-		# Exit gracefully on keyboard interrupt.
-		terminationSignal = signal.SIGINT
-		sys.exit(1)
+		except KeyboardInterrupt:
+			# Exit gracefully on keyboard interrupt.
+			terminationSignal = signal.SIGINT
+			sys.exit(1)
 
-	finally:
-		timer.cancel()
-		if terminationSignal is not None:
-			Cancellation.killall(gid, terminationSignal, proc=proc)
-		remainingStdout, remainingStderr = proc.communicate()
-		stream.addStdout(remainingStdout)
-		stream.addStderr(remainingStderr)
+		finally:
+			timer.cancel()
+			if terminationSignal is not None:
+				Cancellation.killall(gid, terminationSignal, proc=proc)
+			remainingStdout, remainingStderr = proc.communicate()
+			stream.addStdout(remainingStdout)
+			stream.addStderr(remainingStderr)
 
 	returnCode = proc.returncode
 	if returnCode is None:
