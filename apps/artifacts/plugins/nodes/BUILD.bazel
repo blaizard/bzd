@@ -4,7 +4,6 @@ bzd_nodejs_library(
     name = "backend",
     srcs = [
         "backend.js",
-        "data_generator.js",
         "storage.js",
     ],
     visibility = [
@@ -27,6 +26,7 @@ bzd_nodejs_library(
         "//nodejs/core/services",
         "//nodejs/core/statistics:provider",
         "//nodejs/db:utils",
+        "//nodejs/db/data:generator",
         "//nodejs/db/key_value_store:make_from_config",
         "//nodejs/db/storage",
         "//nodejs/utils:object",

@@ -1,6 +1,7 @@
-export default class DataGenerator {
-	constructor(node, key, children, after, before) {
-		this.node = node;
+export default class Generator {
+	constructor(data, uid, key, children, after, before) {
+		this.data = data;
+		this.uid = uid;
 		this.key = key;
 		this.children = children;
 		this.after = after;
@@ -13,7 +14,8 @@ export default class DataGenerator {
 			return null;
 		}
 
-		const maybeData = await this.node.get({
+		const maybeData = await this.data.get({
+			uid: this.uid,
 			key: this.key,
 			metadata: true,
 			children: this.children,

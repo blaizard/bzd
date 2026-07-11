@@ -19,6 +19,16 @@ bzd_nodejs_library(
 )
 
 bzd_nodejs_library(
+    name = "generator",
+    srcs = [
+        "generator.js",
+    ],
+    visibility = [
+        "//visibility:public",
+    ],
+)
+
+bzd_nodejs_library(
     name = "key_mapping",
     srcs = [
         "key_mapping.js",

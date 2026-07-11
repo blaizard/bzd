@@ -12,7 +12,7 @@ import { isObject } from "#bzd/nodejs/utils/object.js";
 import Router from "#bzd/nodejs/core/router.js";
 import format from "#bzd/nodejs/core/format.js";
 import Utils from "#bzd/apps/artifacts/common/utils.js";
-import DataGenerator from "#bzd/apps/artifacts/plugins/nodes/data_generator.js";
+import DataGenerator from "#bzd/nodejs/db/data/generator.js";
 import { Readable } from "stream";
 import MCPServer from "#bzd/nodejs/core/mcp/server.js";
 import { timestampMs } from "#bzd/nodejs/utils/timestamp.js";
@@ -286,8 +286,7 @@ export default class Plugin extends PluginBase {
 			const after = context.getQuery("after", 0, parseInt);
 			const before = context.getQuery("before", null, parseInt);
 
-			const node = await this.nodes.get(uid);
-			const generator = new DataGenerator(node, key, children, after, before);
+			const generator = new DataGenerator(this.nodes.data, uid, key, children, after, before);
 			const name = [uid, ...key].join(".").replace(/[^a-z0-9_\-\.]+/gi, "-");
 
 			switch (format) {
