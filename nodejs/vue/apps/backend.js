@@ -11,6 +11,7 @@ import Cache2 from "#bzd/nodejs/core/cache2.js";
 import Statistics from "#bzd/nodejs/core/statistics/statistics.js";
 import config from "#bzd/nodejs/vue/apps/config.json" with { type: "json" };
 import LoggerMemory from "#bzd/nodejs/vue/components/logger/backend/memory/memory.js";
+import ProviderProcess from "#bzd/nodejs/core/statistics/provider_process.js";
 
 import { Command } from "commander/esm.mjs";
 
@@ -27,6 +28,7 @@ export default class Backend {
 			web: test ? new MockHttpServer() : new HttpServer(port),
 			cache: null,
 			statistics: null,
+			statisticsProviderProcess: null,
 			services: null,
 			loggerMemory: null,
 			staticPath: null,
@@ -191,6 +193,8 @@ export default class Backend {
 		Exception.assert(this.isSetup == false, "Backend already set-up.");
 		Exception.assert(!this.instances.statistics, "Statistics already set-up.");
 		this.instances.statistics = new Statistics();
+		this.instances.statisticsProviderProcess = new ProviderProcess();
+		this.instances.statistics.register(this.instances.statisticsProviderProcess, "backend");
 		return this;
 	}
 
@@ -303,6 +307,7 @@ export default class Backend {
 
 		if (this.instances.statistics) {
 			Log.info("Starting statistics");
+			this.instances.statisticsProviderProcess.start();
 			await this.instances.statistics.start();
 		}
 
@@ -340,6 +345,7 @@ export default class Backend {
 		if (this.instances.statistics) {
 			Log.info("Stopping statistics");
 			await this.instances.statistics.stop();
+			this.instances.statisticsProviderProcess.stop();
 		}
 	}
 }

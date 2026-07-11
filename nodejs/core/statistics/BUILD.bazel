@@ -15,6 +15,17 @@ bzd_nodejs_library(
 )
 
 bzd_nodejs_library(
+    name = "provider_process",
+    srcs = [
+        "provider_process.js",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":provider",
+    ],
+)
+
+bzd_nodejs_library(
     name = "provider",
     srcs = [
         "provider.js",

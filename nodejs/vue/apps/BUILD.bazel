@@ -37,6 +37,7 @@ bzd_nodejs_library(
         "//nodejs/core/rest:server",
         "//nodejs/core/services",
         "//nodejs/core/statistics",
+        "//nodejs/core/statistics:provider_process",
         "//nodejs/core/websocket:server",
         "//nodejs/vue/components/logger/backend/memory",
     ],
