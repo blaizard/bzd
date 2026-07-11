@@ -23,11 +23,6 @@ export default class Data {
 				external: (uid, key, count, after, before) => {
 					return null;
 				},
-				/// The timeout in milliseconds of a value at the given uid / key.
-				/// If null is returned, it will be calculated automatically.
-				timeout: (uid, key) => {
-					return null;
-				},
 			},
 			options,
 		);
@@ -66,10 +61,9 @@ export default class Data {
 	getDataInternal_(uid, key, internal) {
 		this.storage[uid] ??= {};
 		if (!(internal in this.storage[uid])) {
-			const timeout = this.options.timeout(uid, key);
 			this.storage[uid][internal] = {
-				expiresType: timeout === null ? "auto" : "manual",
-				expires: timeout === null ? 60 * 1000 : timeout,
+				expiresType: "auto",
+				expires: 60 * 1000,
 				values: [],
 			};
 			this.tree.setDirty(uid);
