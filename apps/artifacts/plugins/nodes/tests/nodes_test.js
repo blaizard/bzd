@@ -1,7 +1,6 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import { Nodes, Node } from "#bzd/apps/artifacts/plugins/nodes/nodes.js";
 import makeStorageFromConfig from "#bzd/nodejs/db/key_value_store/make_from_config.js";
-import KeyMapping from "#bzd/apps/artifacts/plugins/nodes/key_mapping.js";
 import Utils from "#bzd/apps/artifacts/common/utils.js";
 
 const Exception = ExceptionFactory("test", "artifacts", "plugins", "nodes");

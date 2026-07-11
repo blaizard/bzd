@@ -10,17 +10,17 @@ describe("Nodes", () => {
 			const data = new Data();
 
 			// Insert single.
-			await data.insert("hello", [[["a", "b"], 12]]);
+			data.insert("hello", [[["a", "b"], 12]]);
 			// Insert multi.
-			await data.insert("hello", [
+			data.insert("hello", [
 				[["a", "c", "e"], 1],
 				[["a", "c", "d"], 13],
 				[["a", "c", "d", "f"], 4],
 			]);
 			// Insert child entry of another leaf.
-			await data.insert("hello", [[["a", "b", "d"], -3]]);
+			data.insert("hello", [[["a", "b", "d"], -3]]);
 			// Insert expired data.
-			await data.insert("hello", [[["a", "d", "expired"], 42]], 10);
+			data.insert("hello", [[["a", "d", "expired"], 42]], 10);
 
 			// get w/no options.
 			{
@@ -108,8 +108,8 @@ describe("Nodes", () => {
 		it("count", async () => {
 			const data = new Data();
 
-			await data.insert("hello", [[["a", "b"], 1]]);
-			await data.insert("hello", [[["a", "b"], 2]]);
+			data.insert("hello", [[["a", "b"], 1]]);
+			data.insert("hello", [[["a", "b"], 2]]);
 
 			// get w/no options.
 			{
@@ -149,10 +149,10 @@ describe("Nodes", () => {
 			const data = new Data();
 			const timestamp = Utils.timestampMs();
 
-			await data.insert("hello", [[["a", "b"], 1]], timestamp - 2);
-			await data.insert("hello", [[["a", "b"], 10]], timestamp);
-			await data.insert("hello", [[["a", "b"], 2]], timestamp - 1);
-			await data.insert("hello", [[["a", "b"], 0]], timestamp - 3);
+			data.insert("hello", [[["a", "b"], 1]], timestamp - 2);
+			data.insert("hello", [[["a", "b"], 10]], timestamp);
+			data.insert("hello", [[["a", "b"], 2]], timestamp - 1);
+			data.insert("hello", [[["a", "b"], 0]], timestamp - 3);
 
 			// read all
 			{
@@ -209,8 +209,8 @@ describe("Nodes", () => {
 			const timestamp = Utils.timestampMs();
 			const expiredTimestamp = timestamp - 1000 * 1000;
 
-			await data.insert("hello", [[["a", "b"], 1]], timestamp);
-			await data.insert("hello", [[["a", "b"], 10]], expiredTimestamp);
+			data.insert("hello", [[["a", "b"], 1]], timestamp);
+			data.insert("hello", [[["a", "b"], 10]], expiredTimestamp);
 
 			// read all w/o metadata
 			{
@@ -233,10 +233,10 @@ describe("Nodes", () => {
 		it("include", async () => {
 			const data = new Data();
 
-			await data.insert("hello", [[["a", "b"], 1]]);
-			await data.insert("hello", [[["a", "b", "c"], 10]]);
-			await data.insert("hello", [[["a"], 2]]);
-			await data.insert("hello", [[["a", "b", "d"], 0]]);
+			data.insert("hello", [[["a", "b"], 1]]);
+			data.insert("hello", [[["a", "b", "c"], 10]]);
+			data.insert("hello", [[["a"], 2]]);
+			data.insert("hello", [[["a", "b", "d"], 0]]);
 
 			// absolute
 			{
@@ -323,11 +323,11 @@ describe("Nodes", () => {
 			});
 			const timestamp = Utils.timestampMs();
 
-			await data.insert("hello", [[["a"], 1]], timestamp + 1);
-			await data.insert("hello", [[["a"], 2]], timestamp + 2);
-			await data.insert("hello", [[["a"], 3]], timestamp + 3);
-			await data.insert("hello", [[["a"], 4]], timestamp + 4);
-			await data.insert("hello", [[["a"], 5]], timestamp + 5);
+			data.insert("hello", [[["a"], 1]], timestamp + 1);
+			data.insert("hello", [[["a"], 2]], timestamp + 2);
+			data.insert("hello", [[["a"], 3]], timestamp + 3);
+			data.insert("hello", [[["a"], 4]], timestamp + 4);
+			data.insert("hello", [[["a"], 5]], timestamp + 5);
 
 			{
 				useExternal = false;
@@ -410,11 +410,11 @@ describe("Nodes", () => {
 			});
 			const timestamp = Utils.timestampMs();
 
-			await data.insert("hello", [[["a"], 1]], timestamp + 1);
-			await data.insert("hello", [[["a"], 2]], timestamp + 2);
-			await data.insert("hello", [[["a"], 3]], timestamp + 3);
-			await data.insert("hello", [[["a"], 4]], timestamp + 4);
-			await data.insert("hello", [[["a"], 5]], timestamp + 5);
+			data.insert("hello", [[["a"], 1]], timestamp + 1);
+			data.insert("hello", [[["a"], 2]], timestamp + 2);
+			data.insert("hello", [[["a"], 3]], timestamp + 3);
+			data.insert("hello", [[["a"], 4]], timestamp + 4);
+			data.insert("hello", [[["a"], 5]], timestamp + 5);
 
 			{
 				useExternal = false;
@@ -508,11 +508,11 @@ describe("Nodes", () => {
 			});
 			const timestamp = Utils.timestampMs();
 
-			await data.insert("hello", [[["a"], 1]], timestamp + 1);
-			await data.insert("hello", [[["a"], 2]], timestamp + 2);
-			await data.insert("hello", [[["a"], 3]], timestamp + 3);
-			await data.insert("hello", [[["a"], 4]], timestamp + 4);
-			await data.insert("hello", [[["a"], 5]], timestamp + 5);
+			data.insert("hello", [[["a"], 1]], timestamp + 1);
+			data.insert("hello", [[["a"], 2]], timestamp + 2);
+			data.insert("hello", [[["a"], 3]], timestamp + 3);
+			data.insert("hello", [[["a"], 4]], timestamp + 4);
+			data.insert("hello", [[["a"], 5]], timestamp + 5);
 
 			// ask :  [ ]
 			// data: [ local ][ extern ]
@@ -664,12 +664,12 @@ describe("Nodes", () => {
 		it("getChildren", async () => {
 			const data = new Data();
 
-			await data.insert("hello", [[["a"], 1]]);
-			await data.insert("hello", [[["b"], 2]]);
-			await data.insert("hello", [[["c"], 3]]);
-			await data.insert("hello", [[["c", "d"], 4]]);
-			await data.insert("hello", [[["a", "b", "c"], 5]]);
-			await data.insert("hello", [[["a", "c"], 6]]);
+			data.insert("hello", [[["a"], 1]]);
+			data.insert("hello", [[["b"], 2]]);
+			data.insert("hello", [[["c"], 3]]);
+			data.insert("hello", [[["c", "d"], 4]]);
+			data.insert("hello", [[["a", "b", "c"], 5]]);
+			data.insert("hello", [[["a", "c"], 6]]);
 
 			{
 				const result = await data.getChildren({ uid: "hello", key: [], children: 0, includeInner: false });
