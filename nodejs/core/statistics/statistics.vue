@@ -1,5 +1,8 @@
 <template>
 	<div class="bzd-statistics">
+		<div class="bzd-statistics-search">
+			<Input :description="{ placeholder: 'Filter...' }" @directInput="searchQuery = $event" />
+		</div>
 		<div class="bzd-statistics-toolbar">
 			<Checkbox
 				:model-value="autoRefresh"
@@ -12,46 +15,46 @@
 			<button @click="handleFetch" :disabled="loading">Refresh</button>
 		</div>
 		<div v-if="loading && !timestamp" class="bzd-statistics-loading">Loading...</div>
-		<div v-else class="bzd-statistics-tree" v-if="items.length">
-			<template v-for="item in items" :key="item.key">
-				<!-- Branch node -->
-				<div
-					v-if="item.type === 'branch'"
-					:style="{ paddingLeft: item.depth * 20 + 'px' }"
-					class="bzd-statistics-branch"
-					@click="toggleNode(item.key)"
-				>
-					<span class="bzd-statistics-branch-arrow">{{ item.expanded ? "▾" : "▸" }}</span>
-					<span class="bzd-statistics-branch-name">{{ item.name }}</span>
-				</div>
-				<!-- Leaf node (metric card) -->
-				<div v-else class="bzd-statistics-card-wrapper">
-					<div class="bzd-statistics-card" :class="'bzd-statistics-type-' + item.type">
-						<div class="bzd-statistics-title">{{ item.name }}</div>
-						<div class="bzd-statistics-badge">{{ item.type }}</div>
-						<div class="bzd-statistics-value">{{ formatMetric(item.metric) }}</div>
-						<div v-if="getDetails(item.metric).length" class="bzd-statistics-details">
-							<div v-for="detail in getDetails(item.metric)" :key="detail.label" class="bzd-statistics-detail">
-								<span class="bzd-statistics-detail-label">{{ detail.label }}:</span>
-								<span class="bzd-statistics-detail-value">{{ detail.value }}</span>
+		<div v-else-if="items.length" class="bzd-statistics-list">
+			<template v-for="group in filteredItems" :key="group.key">
+				<div class="bzd-statistics-group">
+					<div class="bzd-statistics-group-title">{{ group.name }}</div>
+					<div class="bzd-statistics-group-cards">
+						<div
+							v-for="card in group.metrics"
+							:key="card.key"
+							class="bzd-statistics-card"
+							:class="'bzd-statistics-type-' + card.type"
+						>
+							<div class="bzd-statistics-title">{{ card.name }}</div>
+							<div class="bzd-statistics-badge">{{ card.type }}</div>
+							<div class="bzd-statistics-value">{{ formatMetric(card.metric) }}</div>
+							<div v-if="getDetails(card.metric).length" class="bzd-statistics-details">
+								<div v-for="detail in getDetails(card.metric)" :key="detail.label" class="bzd-statistics-detail">
+									<span class="bzd-statistics-detail-label">{{ detail.label }}:</span>
+									<span class="bzd-statistics-detail-value">{{ detail.value }}</span>
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>
 			</template>
 		</div>
+		<div v-else class="bzd-statistics-empty">No statistics available.</div>
 	</div>
 </template>
 
 <script>
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
 	import Checkbox from "#bzd/nodejs/vue/components/form/element/checkbox.vue";
+	import Input from "#bzd/nodejs/vue/components/form/element/input.vue";
 	import { bytesToString, timeMsToString, dateToDefaultString } from "#bzd/nodejs/utils/to_string.js";
 
 	export default {
 		mixins: [Component],
 		components: {
 			Checkbox,
+			Input,
 		},
 		data: function () {
 			return {
@@ -59,7 +62,7 @@
 				refreshIntervalMs: 5000,
 				timestamp: null,
 				statistics: {},
-				collapsed: [],
+				searchQuery: "",
 			};
 		},
 		mounted() {
@@ -79,77 +82,61 @@
 		},
 		computed: {
 			items() {
-				// Flatten raw statistics into a sorted tree, then flatten with depth for rendering
-				const metrics = [];
+				const allMetrics = [];
 				for (const [uid, value] of Object.entries(this.statistics)) {
-					metrics.push(...this.buildMetrics(value, uid));
+					allMetrics.push(...this.buildMetrics(value, uid));
 				}
-				// Build tree from flat metrics by grouping common path segments
-				const root = [];
-				for (const item of metrics) {
-					const segments = item.path;
-					let current = root;
-					for (let i = 0; i < segments.length; i++) {
-						const segment = segments[i];
-						const isLeaf = i === segments.length - 1;
-						let node = current.find((n) => n.name === segment);
-						if (!node) {
-							node = { name: segment, key: segments.slice(0, i + 1).join(".") };
-							if (isLeaf) {
-								Object.assign(node, { metric: item.metric, type: item.type });
-							} else {
-								node.children = [];
-							}
-							current.push(node);
-						}
-						current = node.children || [];
+				const groups = new Map();
+				for (const m of allMetrics) {
+					const parentPath = [m.uid, ...m.path.slice(0, -1)];
+					const joined = parentPath.join(".");
+					const groupKey = joined || Symbol.for("bzd.statistics.root");
+					let group = groups.get(groupKey);
+					if (!group) {
+						group = {
+							key: groupKey,
+							name: typeof groupKey === "symbol" ? "(root)" : joined,
+							metrics: [],
+						};
+						groups.set(groupKey, group);
 					}
+					group.metrics.push({
+						key: [m.uid, ...m.path].join("."),
+						name: m.path[m.path.length - 1],
+						metric: m.metric,
+						type: m.type,
+					});
 				}
-				// Sort children at every level alphabetically by name
-				const sortNodes = (nodes) => {
-					nodes.sort((a, b) => a.name.localeCompare(b.name));
-					for (const node of nodes) {
-						if (node.children) {
-							sortNodes(node.children);
-						}
-					}
-				};
-				sortNodes(root);
-				// Flatten tree with depth, respecting collapsed state
-				const result = [];
-				const walk = (nodes, depth) => {
-					for (const node of nodes) {
-						if (node.children) {
-							const isExpanded = !this.collapsed.includes(node.key);
-							result.push({ type: "branch", name: node.name, key: node.key, depth: depth, expanded: isExpanded });
-							if (isExpanded) {
-								walk(node.children, depth + 1);
-							}
-						} else {
-							result.push({
-								type: "leaf",
-								name: node.name,
-								key: node.key,
-								depth: depth,
-								metric: node.metric,
-								type: node.type,
-							});
-						}
-					}
-				};
-				walk(root, 0);
+				const result = [...groups.values()];
+				result.sort((a, b) => a.name.localeCompare(b.name));
+				for (const g of result) {
+					g.metrics.sort((a, b) => a.name.localeCompare(b.name));
+				}
 				return result;
+			},
+			filteredItems() {
+				const query = this.searchQuery.trim().toLowerCase();
+				if (!query) {
+					return this.items;
+				}
+				return this.items
+					.map((group) => {
+						const groupMatch = group.name.toLowerCase().includes(query);
+						if (groupMatch) {
+							return group;
+						}
+						const matchingMetrics = group.metrics.filter((card) => {
+							return card.key.toLowerCase().includes(query);
+						});
+						if (matchingMetrics.length > 0) {
+							return { ...group, metrics: matchingMetrics };
+						}
+						return null;
+					})
+					.filter((g) => g !== null);
 			},
 		},
 		methods: {
-			toggleNode(key) {
-				const index = this.collapsed.indexOf(key);
-				if (index !== -1) {
-					this.collapsed.splice(index, 1);
-				} else {
-					this.collapsed.push(key);
-				}
-			},
 			startTimer() {
 				if (!this.autoRefresh || this.refreshTimer || this.loading) {
 					return;
@@ -290,36 +277,35 @@
 			}
 		}
 
+		.bzd-statistics-search {
+			margin-bottom: 16px;
+		}
+
 		.bzd-statistics-loading {
 			color: config.$bzdGraphColorGray;
 		}
 
-		.bzd-statistics-branch {
-			cursor: pointer;
-			user-select: none;
-			padding: 4px 0;
-			margin: 4px 0;
+		.bzd-statistics-list {
 			display: flex;
-			align-items: center;
-			gap: 4px;
-
-			.bzd-statistics-branch-arrow {
-				font-size: 0.85em;
-				color: config.$bzdGraphColorGray;
-				width: 16px;
-				flex-shrink: 0;
-			}
-
-			.bzd-statistics-branch-name {
-				font-weight: 600;
-				color: config.$bzdGraphColorBlack;
-			}
+			flex-direction: column;
+			gap: 16px;
 		}
 
-		.bzd-statistics-card-wrapper {
-			display: inline-block;
-			vertical-align: top;
-			margin: 4px;
+		.bzd-statistics-group-title {
+			font-weight: bold;
+			color: config.$bzdGraphColorBlack;
+			margin-bottom: 8px;
+			overflow-wrap: anywhere;
+		}
+
+		.bzd-statistics-group-cards {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 8px;
+		}
+
+		.bzd-statistics-empty {
+			color: config.$bzdGraphColorGray;
 		}
 
 		.bzd-statistics-card {
