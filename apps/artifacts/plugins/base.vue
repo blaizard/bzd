@@ -34,14 +34,5 @@
 				return null;
 			},
 		},
-		methods: {
-			/// Request the backend server.
-			///
-			/// This method deals with authentication if needed.
-			async requestBackend(endpoint, options = {}) {
-				await this.$authentication.updateFetch(options);
-				return await HttpClient.request(endpoint, options);
-			},
-		},
 	};
 </script>

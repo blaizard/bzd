@@ -5,29 +5,59 @@ const Exception = ExceptionFactory("statistics");
 /// Processor for a rate.
 class ProcessorRates {
 	constructor(data) {
-		this.data = Object.assign(data, {
-			rate: 0,
-			rateAvg: 0,
-			count: 0,
-			max: 0,
-		});
 		this.current = 0;
+		this.rateAvg = 0;
 	}
 
 	update(value) {
 		this.current += value;
 	}
 
-	process(durationS) {
+	process(durationS, provider) {
 		const rate = this.current / durationS;
 		const durationSMax60 = Math.min(60, durationS);
-		Object.assign(this.data, {
+		provider.set("rate", rate);
+		const rateAvg = ((60 - durationSMax60) * this.rateAvg + durationSMax60 * rate) / 60;
+		provider.set("rateAvg", rateAvg);
+		this.rateAvg = rateAvg;
+		/*Object.assign(this.data, {
 			rate: rate,
 			rateAvg: ((60 - durationSMax60) * this.data.rateAvg + durationSMax60 * rate) / 60,
 			count: this.data.count + this.current,
 			max: Math.max(rate, this.data.max),
-		});
+		});*/
 		this.current = 0;
+	}
+}
+
+class DataProxy {
+	static uid = 0;
+
+	constructor() {
+		this.data = null;
+		this.namespace = [];
+		this.processors = {};
+		this.uid = DataProxy.uid++;
+	}
+
+	register(data, processors, ...namespace) {
+		this.data = data;
+		this.processors = processors;
+		this.namespace = namespace;
+	}
+
+	insert(...args) {
+		if (this.data) {
+			this.data.insert(...args);
+		}
+	}
+
+	processor(key, create) {
+		const path = ["data-proxy", this.uid, ...key].join(".");
+		if (!(path in this.processors)) {
+			this.processors[path] = create();
+		}
+		return this.processors[path];
 	}
 }
 
@@ -35,34 +65,25 @@ class ProcessorRates {
 export default class Provider {
 	constructor(...namespace) {
 		this.namespace = namespace;
-		this.namespaceStr = namespace.join(".");
-		this.root = {};
-		this.data = Provider._rootToData(this.root, ...namespace);
-		this.processors = {};
-	}
-
-	static _rootToData(root, ...namespace) {
-		let data = root;
-		for (const name of namespace) {
-			data[name] ??= {};
-			data = data[name];
-		}
-		return data;
+		this.proxy = new DataProxy();
+		this.previous = {};
 	}
 
 	/// Create a nested statistics provider.
 	makeNested(...namespace) {
 		Exception.assert(namespace.length > 0, "Nested statistics must have a namespace");
-		const statistics = new Provider(...this.namespace, ...namespace);
-		statistics.root = this.root;
-		statistics.processors = this.processors;
-		statistics.data = Provider._rootToData(this.data, ...namespace);
-		return statistics;
+		const provider = new Provider(...this.namespace, ...namespace);
+		provider.proxy = this.proxy;
+		return provider;
 	}
 
-	/// Get the current timestamp in ms.
-	static _getTimestamp() {
-		return Date.now();
+	_processor(key, create) {
+		const [_, processor] = this.proxy.processor(key, () => [this.makeNested(...key), create()]);
+		return processor;
+	}
+
+	_insert(key, value) {
+		this.proxy.insert("statistics", [[[...this.proxy.namespace, ...this.namespace, ...key], value]]);
 	}
 
 	/// Initialize the data structure of a data point.
@@ -87,40 +108,35 @@ export default class Provider {
 
 	/// Time the given process.
 	async timeit(name, callback) {
-		const start = Provider._getTimestamp();
+		const start = performance.now();
 		try {
 			await callback();
 		} finally {
-			this.data[name] ??= this._initData("duration", 0);
-			this._updateData("duration", this.data[name], Provider._getTimestamp() - start);
+			this._insert([name, "duration"], (performance.now() - start) / 1000);
 		}
 	}
 
 	/// Set a value point to the existing points.
 	set(name, value) {
-		this.data[name] ??= this._initData("value", 0);
-		this._updateData("value", this.data[name], value);
+		this._insert([name], value);
 	}
 
 	/// Set a size point to the existing points.
 	size(name, value) {
-		this.data[name] ??= this._initData("size", 0);
-		this._updateData("size", this.data[name], value);
+		this._insert([name, "size"], value);
 	}
 
 	/// Add a value point to the existing points.
 	sum(name, value, initial = 0) {
-		this.data[name] ??= this._initData("sum", initial);
-		this._updateData("sum", this.data[name], this.data[name].sum + value);
+		this.previous[name] ??= initial;
+		this.previous[name] += value;
+		this._insert([name, "sum"], this.previous[name]);
 	}
 
 	/// Calculate the rate of a point.
 	///
 	/// Compute the rate per/seconds.
 	rate(name, value = 1) {
-		const namespace = this.namespaceStr + "." + name;
-		this.data[name] ??= {};
-		this.processors[namespace] ??= new ProcessorRates(this.data[name]);
-		this.processors[namespace].update(value);
+		this._processor([name], () => new ProcessorRates()).update(value);
 	}
 }

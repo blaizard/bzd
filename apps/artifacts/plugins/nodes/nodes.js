@@ -7,90 +7,6 @@ import Utils from "#bzd/apps/artifacts/common/utils.js";
 const Exception = ExceptionFactory("apps", "plugin", "nodes");
 const Log = LogFactory("apps", "plugin", "nodes");
 
-/// A node is a collection of data.
-///
-/// Data are denominated by a path, each data can be set at various interval.
-/// Data have a validity time that is adjusted automatically.
-export class Node {
-	constructor(data, uid, handlers) {
-		this.data = data;
-		this.uid = uid;
-		this.handlers = handlers;
-	}
-
-	/// Identify the path of the fragments that are being set.
-	///
-	/// A path is determined by the full path up to a value or a list.
-	///
-	/// \return A list of paths and values.
-	static getAllPathAndValues(fragment, rootKey = []) {
-		if (fragment && fragment.constructor == Object) {
-			let paths = [];
-			for (const [key, value] of Object.entries(fragment)) {
-				for (const [subKey, subValue] of Node.getAllPathAndValues(value)) {
-					paths.push([[...rootKey, key, ...subKey], subValue]);
-				}
-			}
-			return paths;
-		}
-		return [[[...rootKey], fragment]];
-	}
-
-	/// Insert new data at a given path.
-	///
-	/// \param key The key at which the entry shall be inserted.
-	/// \param fragment The data to be inserted.
-	/// \param timestamp The timestamp to use.
-	/// \param isFixedTimestamp Whether the timestamp is fixed and shall not be modified or is based on the server time.
-	///
-	/// \return A list of records corresponding to this change.
-	async insert(key, fragment, timestamp = null, isFixedTimestamp = false) {
-		let fragments = Node.getAllPathAndValues(fragment, key);
-		fragments = this.handlers.process(fragments);
-
-		timestamp = this.data.insert(this.uid, fragments, timestamp);
-
-		// Generate records.
-		return fragments.map(([key, value, _]) => [this.uid, key, value, timestamp, isFixedTimestamp]);
-	}
-
-	/// Get the tree with single values.
-	///
-	/// \param key The key to locate the data to be returned.
-	/// \param metadata Whether metadata should be returned or not.
-	///        It true, a tuple of (timestamp, value, isValid) is returned.
-	///        If false, the raw value is returned.
-	/// \param children The level of nested children to be added to the result.
-	/// \param count Maximal number of values to be returned per entry.
-	/// \param after Only return values after this timestamp.
-	/// \param before Only return values before this timestamp.
-	/// \param include Include the given path to the result.
-	/// \param sampling The sampling method to be used.
-	///
-	/// \return An optional with a value if success, empty if the key points to an unknown record.
-	async get({
-		key,
-		metadata = false,
-		children = 0,
-		count = null,
-		after = null,
-		before = null,
-		include = null,
-		sampling = null,
-	}) {
-		return await this.data.get({ uid: this.uid, key, metadata, children, count, after, before, include, sampling });
-	}
-
-	/// Get children of a given key.
-	///
-	/// \param key The key to locate the data to be returned.
-	/// \param children The level of nested children to be added to the result.
-	/// \param includeInner Whether to include inner nodes or not.
-	async getChildren({ key, children, includeInner }) {
-		return await this.data.getChildren({ uid: this.uid, key, children, includeInner });
-	}
-}
-
 export class Nodes {
 	constructor(handlers, options) {
 		this.handlers = new Handlers(handlers, {
@@ -106,8 +22,80 @@ export class Nodes {
 		}
 	}
 
-	async get(uid) {
-		return new Node(this.data, uid, this.handlers);
+	/// Identify the path of the fragments that are being set.
+	///
+	/// A path is determined by the full path up to a value or a list.
+	///
+	/// \return A list of paths and values.
+	static getAllPathAndValues(fragment, rootKey = []) {
+		if (fragment && fragment.constructor == Object) {
+			let paths = [];
+			for (const [key, value] of Object.entries(fragment)) {
+				for (const [subKey, subValue] of Nodes.getAllPathAndValues(value)) {
+					paths.push([[...rootKey, key, ...subKey], subValue]);
+				}
+			}
+			return paths;
+		}
+		return [[[...rootKey], fragment]];
+	}
+
+	/// Insert new data at a given path.
+	///
+	/// \param uid The identifier of the node.
+	/// \param key The key at which the entry shall be inserted.
+	/// \param fragment The data to be inserted.
+	/// \param timestamp The timestamp to use.
+	/// \param isFixedTimestamp Whether the timestamp is fixed and shall not be modified or is based on the server time.
+	///
+	/// \return A list of records corresponding to this change.
+	async insert(uid, key, fragment, timestamp = null, isFixedTimestamp = false) {
+		let fragments = Nodes.getAllPathAndValues(fragment, key);
+		fragments = this.handlers.process(fragments);
+
+		timestamp = this.data.insert(uid, fragments, timestamp);
+
+		// Generate records.
+		return fragments.map(([key, value, _]) => [uid, key, value, timestamp, isFixedTimestamp]);
+	}
+
+	/// Get the tree with single values.
+	///
+	/// \param uid The identifier of the node.
+	/// \param key The key to locate the data to be returned.
+	/// \param metadata Whether metadata should be returned or not.
+	///        It true, a tuple of (timestamp, value, isValid) is returned.
+	///        If false, the raw value is returned.
+	/// \param children The level of nested children to be added to the result.
+	/// \param count Maximal number of values to be returned per entry.
+	/// \param after Only return values after this timestamp.
+	/// \param before Only return values before this timestamp.
+	/// \param include Include the given path to the result.
+	/// \param sampling The sampling method to be used.
+	///
+	/// \return An optional with a value if success, empty if the key points to an unknown record.
+	async get({
+		uid,
+		key,
+		metadata = false,
+		children = 0,
+		count = null,
+		after = null,
+		before = null,
+		include = null,
+		sampling = null,
+	}) {
+		return await this.data.get({ uid, key, metadata, children, count, after, before, include, sampling });
+	}
+
+	/// Get children of a given key.
+	///
+	/// \param uid The identifier of the node.
+	/// \param key The key to locate the data to be returned.
+	/// \param children The level of nested children to be added to the result.
+	/// \param includeInner Whether to include inner nodes or not.
+	async getChildren({ uid, key, children, includeInner }) {
+		return await this.data.getChildren({ uid, key, children, includeInner });
 	}
 
 	// Insert a record entry to the data.

@@ -17,11 +17,8 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "view",
     srcs = [
-        "keys.vue",
-        "value.vue",
         "view.vue",
         "view_dashboard.vue",
-        "view_data.vue",
         "view_graph.vue",
     ],
     packages = [
@@ -39,6 +36,7 @@ bzd_nodejs_library(
         "//apps/artifacts/plugins:default",
         "//nodejs/core:localstorage",
         "//nodejs/core:lock",
+        "//nodejs/db/data/frontend:view_data",
         "//nodejs/utils:array",
         "//nodejs/utils:timestamp",
         "//nodejs/utils:to_string",

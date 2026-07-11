@@ -16,6 +16,7 @@ import DataGenerator from "#bzd/nodejs/db/data/generator.js";
 import { Readable } from "stream";
 import MCPServer from "#bzd/nodejs/core/mcp/server.js";
 import { timestampMs } from "#bzd/nodejs/utils/timestamp.js";
+import { handleDataGet } from "#bzd/nodejs/db/data/backend/handler.js";
 
 const databaseTypes = {
 	influxdb: DatabaseInfluxDB,
@@ -166,8 +167,7 @@ export default class Plugin extends PluginBase {
 
 			this.nodes = new Nodes(optionsHandlers, optionsNodes);
 			for (const [uid, data] of Object.entries(options["nodes.data"] || {})) {
-				const node = await this.nodes.get(uid);
-				await node.insert(["data"], data);
+				await this.nodes.insert(uid, ["data"], data);
 			}
 
 			this.setStorage(await StorageBzd.make(this.nodes));
@@ -325,9 +325,9 @@ export default class Plugin extends PluginBase {
 
 		/// Get information about the dashboards at the specified path.
 		endpoints.register("get", "/@dashboards/{uid}/{path:*}", async (context) => {
-			const node = await this.nodes.get(context.getParam("uid"));
+			const uid = context.getParam("uid");
 			const rootKey = Utils.pathToKey(context.getParam("path"));
-			const children = await node.getChildren({ key: rootKey, children: 99, includeInner: false });
+			const children = await this.nodes.getChildren({ uid: uid, key: rootKey, children: 99, includeInner: false });
 
 			// Go through the children and match them against the router.
 			let inputs = {};
@@ -380,119 +380,11 @@ export default class Plugin extends PluginBase {
 			});
 		});
 
-		/// Retrieve values from the store.
-		///
-		/// GET <endpoint>/<uid>/<path:*>
-		/// ```{data: <value>}``` -> Return the raw value at the given path.
-		///
-		/// GET <endpoint>/<uid>/<path:*>?metadata=1
-		/// ```{
-		///   timestamp: <timestamp>, # The current server timestamp for reference,
-		///   data: [<timestamp>, <value>] # The latest value and its timestamp.
-		/// }```
-		///
-		/// GET <endpoint>/<uid>/<path:*>?count=2
-		/// ```{
-		///   data: [
-		///      <value1>, # The latest value.
-		///      <value2>  # Another value.
-		///   ]
-		/// }```
-		///
-		/// GET <endpoint>/<uid>/<path:*>?children=3
-		/// ```{
-		///   data: [
-		///      [["a", "b"], <value1>],       # The latest value for /<path>/a/b.
-		///      [["a", "d", "e"], <value2>]   # The latest value for /<path>/a/d/e.
-		///   ]
-		/// }```
-		///
-		/// GET <endpoint>/<uid>/<path:*>?after=<timestamp>
-		/// Only show entries after a specific timestamp (not including)
-		///
-		/// GET <endpoint>/<uid>/<path:*>?before=<timestamp>
-		/// Only show entries before a specific timestamp (not including)
-		///
-		/// GET <endpoint>/<uid>/<path:*>?include=/a/b,/a/d/e
-		/// Only show the path /a/b and /a/d/e
-		///
-		/// GET <endpoint>/<uid>/<path:*>?keys=1&children=99
-		/// ```{
-		///   data: [
-		///      [{key: ["a", "b"], leaf: false}],       # This is an inner key
-		///      [{key: ["a", "b", "c"], leaf: true}],   # This is a leaf key that contain a value
-		///   ]
-		/// }```
-		///
+		/// Retrieve values from the nodes.
 		endpoints.register("get", "/{uid}/{path:*}", async (context) => {
-			const metadata = context.getQuery("metadata", false, Boolean);
-			const children = context.getQuery("children", 0, parseInt);
-			const count = context.getQuery("count", null, parseInt);
-			const after = context.getQuery("after", null, parseInt);
-			const before = context.getQuery("before", null, parseInt);
-			const include = context.getQuery("include", null, (value) =>
-				value
-					.split(",")
-					.filter(Boolean)
-					.map((path) => Utils.pathToKey(path)),
-			);
-			const sampling = context.getQuery("sampling", null, String);
-			const keys = context.getQuery("keys", false, Boolean);
+			const uid = context.getParam("uid");
 			const key = Utils.pathToKey(context.getParam("path"));
-
-			const node = await this.nodes.get(context.getParam("uid"));
-
-			let output = {};
-			if (metadata) {
-				output = Object.assign(output, {
-					timestamp: timestampMs(),
-				});
-			}
-
-			if (keys) {
-				Exception.assertPrecondition(
-					context.getQuery("metadata", null) === null,
-					"'metadata' cannot be set with 'keys'",
-				);
-				Exception.assertPrecondition(context.getQuery("count", null) === null, "'count' cannot be set with 'keys'");
-				Exception.assertPrecondition(context.getQuery("after", null) === null, "'after' cannot be set with 'keys'");
-				Exception.assertPrecondition(context.getQuery("before", null) === null, "'before' cannot be set with 'keys'");
-				Exception.assertPrecondition(context.getQuery("include", null) === null, "'include' cannot be set with 'keys'");
-				Exception.assertPrecondition(
-					context.getQuery("sampling", null) === null,
-					"'sampling' cannot be set with 'keys'",
-				);
-
-				const maybeData = await node.getChildren({ key, children, includeInner: true });
-				if (!maybeData) {
-					context.sendStatus(404);
-					return;
-				}
-				output = Object.assign(output, {
-					data: maybeData,
-				});
-			} else {
-				const maybeData = await node.get({
-					key: key,
-					metadata,
-					children,
-					count,
-					after,
-					before,
-					include,
-					sampling,
-				});
-				if (maybeData.isEmpty()) {
-					context.sendStatus(404);
-					return;
-				}
-				output = Object.assign(output, {
-					data: maybeData.value(),
-				});
-			}
-
-			context.setStatus(200);
-			context.sendJson(output);
+			await handleDataGet(context, this.nodes, uid, key);
 		});
 
 		/// Insert one or multiple entries.
@@ -544,7 +436,6 @@ export default class Plugin extends PluginBase {
 
 			let records = [];
 			const [uid, ...key] = Utils.pathToKey(context.getParam("path"));
-			let node = uid ? await this.nodes.get(uid) : null;
 
 			for (const [timestamp, value] of bulk) {
 				Exception.assertPrecondition(
@@ -556,14 +447,13 @@ export default class Plugin extends PluginBase {
 				const actualTimestamp = isFixedTimestamp ? timestamp : timestamp - timestampClient + timestampMs();
 
 				// If there is no 'uid' set for this request, it must be embedded in the value.
-				if (node === null) {
+				if (!uid) {
 					Exception.assertPrecondition(isObject(value), "Expected an object, containing uid to values: {:?}", value);
 					for (const [uid, subValue] of Object.entries(value)) {
-						const subNode = await this.nodes.get(uid);
-						records = records.concat(await subNode.insert(key, subValue, actualTimestamp, isFixedTimestamp));
+						records = records.concat(await this.nodes.insert(uid, key, subValue, actualTimestamp, isFixedTimestamp));
 					}
 				} else {
-					records = records.concat(await node.insert(key, value, actualTimestamp, isFixedTimestamp));
+					records = records.concat(await this.nodes.insert(uid, key, value, actualTimestamp, isFixedTimestamp));
 				}
 			}
 
@@ -611,8 +501,8 @@ export default class Plugin extends PluginBase {
 							}
 							return uids;
 						case "get":
-							const node = await this.nodes.get(args.name.trim());
-							const maybeData = await node.get({ key: [], children: 99 });
+							const uid = args.name.trim();
+							const maybeData = await this.nodes.get({ uid, key: [], children: 99 });
 							return maybeData.isEmpty() ? [] : maybeData.value();
 						case "schema":
 							return optionsSchema;

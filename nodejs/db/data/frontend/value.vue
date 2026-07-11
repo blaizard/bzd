@@ -19,7 +19,7 @@
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
 	import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 
-	const Exception = ExceptionFactory("apps", "plugin", "nodes");
+	const Exception = ExceptionFactory("db", "data");
 
 	export default {
 		mixins: [Component],

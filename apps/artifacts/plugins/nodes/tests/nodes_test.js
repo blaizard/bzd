@@ -1,14 +1,14 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
-import { Nodes, Node } from "#bzd/apps/artifacts/plugins/nodes/nodes.js";
+import { Nodes } from "#bzd/apps/artifacts/plugins/nodes/nodes.js";
 import makeStorageFromConfig from "#bzd/nodejs/db/key_value_store/make_from_config.js";
 import { timestampMs } from "#bzd/nodejs/utils/timestamp.js";
 
 const Exception = ExceptionFactory("test", "artifacts", "plugins", "nodes");
 
 describe("Nodes", () => {
-	describe("Node", () => {
-		it("getAllPathAndValues", async () => {
-			const result = Node.getAllPathAndValues({
+	describe("getAllPathAndValues", () => {
+		it("basic", async () => {
+			const result = Nodes.getAllPathAndValues({
 				a: {
 					b: { c: 12, e: [], f: null },
 					d: [12, 3],
@@ -26,17 +26,17 @@ describe("Nodes", () => {
 		});
 
 		it("string", async () => {
-			const result = Node.getAllPathAndValues("hello");
+			const result = Nodes.getAllPathAndValues("hello");
 			Exception.assertEqual(result, [[[], "hello"]]);
 		});
 
 		it("array", async () => {
-			const result = Node.getAllPathAndValues(["a", "b", { c: 1 }]);
+			const result = Nodes.getAllPathAndValues(["a", "b", { c: 1 }]);
 			Exception.assertEqual(result, [[[], ["a", "b", { c: 1 }]]]);
 		});
 
 		it("null", async () => {
-			const result = Node.getAllPathAndValues(null);
+			const result = Nodes.getAllPathAndValues(null);
 			Exception.assertEqual(result, [[[], null]]);
 		});
 	});
@@ -50,8 +50,7 @@ describe("Nodes", () => {
 		});
 
 		it("insert no timestamp", async () => {
-			const hello = await nodes.get("hello");
-			const fragment = await hello.insert(["mykey"], "world");
+			const fragment = await nodes.insert("hello", ["mykey"], "world");
 			Exception.assertEqual(fragment.length, 1);
 			Exception.assertEqual(fragment[0].length, 5);
 			Exception.assertEqual(fragment[0][0], "hello");
@@ -62,14 +61,12 @@ describe("Nodes", () => {
 		});
 
 		it("insert w/timestamp (fixed)", async () => {
-			const hello = await nodes.get("hello");
-			const fragment = await hello.insert(["mykey"], "world", 123456, /*isFixedTimestamp*/ true);
+			const fragment = await nodes.insert("hello", ["mykey"], "world", 123456, /*isFixedTimestamp*/ true);
 			Exception.assertEqual(fragment, [["hello", ["mykey"], "world", 123456, true]]);
 		});
 
 		it("insert w/fixed timestamp (non fixed)", async () => {
-			const hello = await nodes.get("hello");
-			const fragment = await hello.insert(["mykey"], "world", 123456);
+			const fragment = await nodes.insert("hello", ["mykey"], "world", 123456);
 			Exception.assertEqual(fragment, [["hello", ["mykey"], "world", 123456, false]]);
 		});
 	});

@@ -1,92 +1,49 @@
 <template>
 	<div class="data" v-if="metadata">
 		<div>Updated: {{ durationString }} ago</div>
-		<Keys class="keys" :value="tree" :path-list="pathList" v-slot="serializeSlotProps" @select="onSelect">
+		<Keys class="keys" :value="tree" :path-list="pathList" v-slot="serializeSlotProps" @select="propagateOnSelect">
 			<Value v-if="isPathListValue(serializeSlotProps.pathList)" :value="serializeSlotProps.value" :view="0"></Value>
-			<Value v-else :value="serializeSlotProps.value" :view="1" @select="onSelect(serializeSlotProps.pathList)"></Value>
+			<Value
+				v-else
+				:value="serializeSlotProps.value"
+				:view="1"
+				@select="propagateOnSelect(serializeSlotProps.pathList)"
+			></Value>
 		</Keys>
-		<div>
-			<span>Export:</span>
-			<Form :description="exportFormDescription" v-model="exportOptions" @submit="handleExportSubmit"></Form>
-			<span>REST API:</span>
-			<ul>
-				<li v-for="accessor in endpointsAccessors">
-					<a :href="accessor">{{ accessor }}</a>
-				</li>
-			</ul>
-		</div>
 	</div>
 </template>
 
 <script>
-	import Base from "#bzd/apps/artifacts/plugins/base.vue";
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
-	import Value from "#bzd/apps/artifacts/plugins/nodes/frontend/value.vue";
-	import Keys from "#bzd/apps/artifacts/plugins/nodes/frontend/keys.vue";
+	import Value from "#bzd/nodejs/db/data/frontend/value.vue";
+	import Keys from "#bzd/nodejs/db/data/frontend/keys.vue";
 	import { timeMsToString } from "#bzd/nodejs/utils/to_string.js";
-	import Utils from "#bzd/apps/artifacts/common/utils.js";
 	import Form from "#bzd/nodejs/vue/components/form/form.vue";
 
 	export default {
-		mixins: [Base, Component],
+		mixins: [Component],
 		components: {
 			Value,
 			Keys,
 			Form,
 		},
 		data: function () {
-			const now = new Date();
-			const nowMinus1Year = new Date();
-			nowMinus1Year.setFullYear(nowMinus1Year.getFullYear() - 1);
 			return {
 				metadata: {},
 				tree: {},
 				timestampNewest: 0,
 				timeout: null,
 				isDestroyed: false,
-				exportOptions: {
-					format: "csv",
-					after: nowMinus1Year.getTime(),
-					before: now.getTime(),
-				},
 			};
 		},
+		emits: ["select"],
+		props: {
+			endpoint: { mandatory: true, type: String },
+			pathList: { mandatory: true, type: Array },
+		},
 		computed: {
-			exportFormDescription() {
-				return [
-					{
-						type: "Date",
-						name: "after",
-						width: 0.3,
-					},
-					{
-						type: "Date",
-						name: "before",
-						width: 0.3,
-					},
-					{
-						type: "Dropdown",
-						name: "format",
-						list: ["csv"],
-						width: 0.2,
-					},
-					{
-						type: "Button",
-						action: "approve",
-						content: "Export",
-						width: 0.2,
-					},
-				];
-			},
 			durationString() {
 				return timeMsToString(Math.max(this.timestampServer - this.timestampNewest, 0));
-			},
-			endpoint() {
-				return "/x" + Utils.keyToPath(this.pathList);
-			},
-			endpointExport() {
-				const [volume, ...path] = this.pathList;
-				return "/x/" + encodeURIComponent(volume) + "/@export" + Utils.keyToPath(path);
 			},
 			isValue() {
 				return "_" in this.tree;
@@ -105,26 +62,6 @@
 			valueOldestTimestamp() {
 				return this.value[0][0];
 			},
-			endpointsAccessors() {
-				if (this.isValue) {
-					if (this.isChildren) {
-						return [
-							this.endpoint + "?children=99",
-							this.endpoint + "?metadata=1",
-							this.endpoint + "?count=5",
-							this.endpointExport + "?children=99&format=csv",
-						];
-					}
-					return [this.endpoint + "?metadata=1", this.endpoint + "?count=5", this.endpointExport + "?format=csv"];
-				}
-				return [
-					this.endpoint + "?children=99",
-					this.endpoint + "?children=99&metadata=1",
-					this.endpoint + "?children=99&count=5",
-					this.endpoint + "?keys=1",
-					this.endpointExport + "?children=99&format=csv",
-				];
-			},
 			timestampServer() {
 				return this.metadata.timestamp || Date.now();
 			},
@@ -137,11 +74,6 @@
 			clearTimeout(this.timeout);
 		},
 		methods: {
-			handleExportSubmit(values) {
-				const query = ["children=99", ...Object.entries(values).map(([key, value]) => key + "=" + value)];
-				const url = this.endpointExport + "?" + query.join("&");
-				window.location.assign(url);
-			},
 			isPathListValue(pathList) {
 				return (
 					this.pathList.length === pathList.length && this.pathList.every((entry, index) => entry == pathList[index])
@@ -199,9 +131,8 @@
 					this.timeout = setTimeout(this.fetchMetadata, 1000);
 				}
 			},
-			onSelect(pathList) {
-				const url = "/view/" + Utils.keyToPath(pathList);
-				this.$router.dispatch(url);
+			propagateOnSelect(pathList) {
+				this.$emit("select", pathList);
 			},
 		},
 	};

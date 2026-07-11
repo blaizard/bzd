@@ -8,6 +8,7 @@ bzd_nodejs_library(
     apis = ["api.json"],
     visibility = ["//visibility:public"],
     deps = [
+        "//nodejs/db/data/frontend:view_data",
         "//nodejs/utils:to_string",
         "//nodejs/vue/components/form",
         "//nodejs/vue/components/layout:component",
@@ -48,5 +49,7 @@ bzd_nodejs_library(
         ":provider",
         "//nodejs/core:exception",
         "//nodejs/core:log",
+        "//nodejs/db/data",
+        "//nodejs/db/data/backend:handler",
     ],
 )
