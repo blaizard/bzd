@@ -10,3 +10,14 @@ bzd_nodejs_test(
         "//nodejs/utils:timestamp",
     ],
 )
+
+bzd_nodejs_test(
+    name = "generator",
+    srcs = ["generator_test.js"],
+    main = "generator_test.js",
+    deps = [
+        "//nodejs/core:exception",
+        "//nodejs/db/data",
+        "//nodejs/db/data:generator",
+    ],
+)
