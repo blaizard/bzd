@@ -7,7 +7,7 @@ bzd_nodejs_test(
     ],
     main = "handlers_test.js",
     deps = [
-        "//apps/artifacts/plugins/nodes/handlers",
         "//nodejs/core:exception",
+        "//nodejs/db/data/handlers",
     ],
 )

@@ -1,7 +1,7 @@
 import config from "#bzd/apps/artifacts/api/config.json" with { type: "json" };
 import { HttpClient } from "#bzd/nodejs/core/http/client.js";
 import { CollectionPaging } from "#bzd/nodejs/db/utils.js";
-import Utils from "#bzd/apps/artifacts/common/utils.js";
+import { timestampMs } from "#bzd/nodejs/utils/timestamp.js";
 
 export class Node {
 	/// List all nodes from a remote.
@@ -73,7 +73,7 @@ export class Node {
 
 		// Adjust the timestamp to the local server.
 		if (metadata) {
-			const timestampDiff = result.timestamp - Utils.timestampMs();
+			const timestampDiff = result.timestamp - timestampMs();
 			result.data = result.data.map(([key, value]) => {
 				const [t, ...rest] = value;
 				return [key, [t - timestampDiff, ...rest]];

@@ -11,8 +11,6 @@ bzd_nodejs_library(
         "//apps/artifacts/plugins:__subpackages__",
     ],
     deps = [
-        ":data",
-        ":key_mapping",
         ":nodes",
         "//apps/artifacts/backend:plugin",
         "//apps/artifacts/common:utils",
@@ -33,6 +31,7 @@ bzd_nodejs_library(
         "//nodejs/db/storage",
         "//nodejs/utils:object",
         "//nodejs/utils:optional",
+        "//nodejs/utils:timestamp",
     ],
 )
 
@@ -45,40 +44,12 @@ bzd_nodejs_library(
         "//apps/artifacts/plugins:__subpackages__",
     ],
     deps = [
-        ":data",
-        "//apps/artifacts/common:utils",
-        "//apps/artifacts/plugins/nodes/handlers",
-        "//nodejs/core:cache2",
-        "//nodejs/core:exception",
-        "//nodejs/core:log",
-    ],
-)
-
-bzd_nodejs_library(
-    name = "data",
-    srcs = [
-        "data.js",
-    ],
-    visibility = [
-        "//apps/artifacts/plugins:__subpackages__",
-    ],
-    deps = [
-        ":key_mapping",
         "//apps/artifacts/common:utils",
         "//nodejs/core:cache2",
         "//nodejs/core:exception",
         "//nodejs/core:log",
-        "//nodejs/utils:optional",
-    ],
-)
-
-bzd_nodejs_library(
-    name = "key_mapping",
-    srcs = [
-        "key_mapping.js",
-    ],
-    visibility = [
-        "//apps/artifacts/plugins:__subpackages__",
+        "//nodejs/db/data",
+        "//nodejs/db/data/handlers",
     ],
 )
 

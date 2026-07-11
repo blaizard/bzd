@@ -15,6 +15,7 @@ import Utils from "#bzd/apps/artifacts/common/utils.js";
 import DataGenerator from "#bzd/apps/artifacts/plugins/nodes/data_generator.js";
 import { Readable } from "stream";
 import MCPServer from "#bzd/nodejs/core/mcp/server.js";
+import { timestampMs } from "#bzd/nodejs/utils/timestamp.js";
 
 const databaseTypes = {
 	influxdb: DatabaseInfluxDB,
@@ -238,7 +239,7 @@ export default class Plugin extends PluginBase {
 			context.setStatus(200);
 			context.sendJson({
 				version: this.version,
-				timestamp: Utils.timestampMs(),
+				timestamp: timestampMs(),
 			});
 		});
 
@@ -269,7 +270,7 @@ export default class Plugin extends PluginBase {
 				Object.assign(
 					{
 						version: this.version,
-						timestamp: Utils.timestampMs(),
+						timestamp: timestampMs(),
 					},
 					output,
 				),
@@ -376,7 +377,7 @@ export default class Plugin extends PluginBase {
 			context.sendJson({
 				version: this.version,
 				dashboards: dashboards,
-				timestamp: Utils.timestampMs(),
+				timestamp: timestampMs(),
 			});
 		});
 
@@ -445,7 +446,7 @@ export default class Plugin extends PluginBase {
 			let output = {};
 			if (metadata) {
 				output = Object.assign(output, {
-					timestamp: Utils.timestampMs(),
+					timestamp: timestampMs(),
 				});
 			}
 
@@ -522,7 +523,7 @@ export default class Plugin extends PluginBase {
 				return;
 			}
 
-			const now = Utils.timestampMs();
+			const now = timestampMs();
 			// Normalize the data to bulk data format.
 			// bulk = List[Tuple[<timestamp>, <values>]]
 			// timestampClient = The timestamp on the client side, if unset, use the current timestamp.
@@ -553,7 +554,7 @@ export default class Plugin extends PluginBase {
 					value,
 					timestamp,
 				);
-				const actualTimestamp = isFixedTimestamp ? timestamp : timestamp - timestampClient + Utils.timestampMs();
+				const actualTimestamp = isFixedTimestamp ? timestamp : timestamp - timestampClient + timestampMs();
 
 				// If there is no 'uid' set for this request, it must be embedded in the value.
 				if (node === null) {

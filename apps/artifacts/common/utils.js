@@ -8,9 +8,4 @@ export default class Utils {
 	static keyToPath(key) {
 		return "/" + key.map(encodeURIComponent).join("/");
 	}
-
-	/// Get the current UTC timestamp.
-	static timestampMs() {
-		return Date.now();
-	}
 }

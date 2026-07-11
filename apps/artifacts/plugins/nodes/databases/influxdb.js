@@ -1,8 +1,8 @@
 import Database from "#bzd/apps/artifacts/plugins/nodes/databases/database.js";
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import LogFactory from "#bzd/nodejs/core/log.js";
-import Utils from "#bzd/apps/artifacts/common/utils.js";
 import Services from "#bzd/nodejs/core/services/services.js";
+import { timestampMs } from "#bzd/nodejs/utils/timestamp.js";
 
 const Exception = ExceptionFactory("artifacts", "nodes", "database", "influxdb");
 const Log = LogFactory("artifacts", "nodes", "database", "influxdb");
@@ -240,7 +240,7 @@ export default class DatabaseInfluxDB extends Database {
 	async onRecords(records) {
 		let content = [];
 		let skipped = 0;
-		const timestampMin = this.retentionS ? Utils.timestampMs() - this.retentionS * 1000 + 86400 * 1000 : 0;
+		const timestampMin = this.retentionS ? timestampMs() - this.retentionS * 1000 + 86400 * 1000 : 0;
 		for (const [uid, key, value, timestamp] of records) {
 			// InfluxDB doesn't support numbers with comma.
 			const timestampNanoseconds = Math.round(timestamp * 1000000);

@@ -6,16 +6,16 @@ bzd_nodejs_library(
         "handlers.js",
     ],
     visibility = [
-        "//apps/artifacts/plugins:__subpackages__",
+        "//visibility:public",
     ],
     deps = [
         ":expires",
         ":history",
         ":to_string",
         ":validation",
-        "//apps/artifacts/plugins/nodes:key_mapping",
         "//nodejs/core:exception",
         "//nodejs/core:log",
+        "//nodejs/db/data:key_mapping",
     ],
 )
 
@@ -39,9 +39,9 @@ bzd_nodejs_library(
         "to_string.js",
     ],
     deps = [
-        "//apps/artifacts/plugins/nodes:key_mapping",
         "//nodejs/core:exception",
         "//nodejs/core:format",
+        "//nodejs/db/data:key_mapping",
     ],
 )
 

@@ -25,6 +25,7 @@
 	import ViewGraph from "#bzd/apps/artifacts/plugins/nodes/frontend/view_graph.vue";
 	import Form from "#bzd/nodejs/vue/components/form/form.vue";
 	import Utils from "#bzd/apps/artifacts/common/utils.js";
+	import { timestampMs } from "#bzd/nodejs/utils/timestamp.js";
 	import TimeseriesCollection from "#bzd/apps/artifacts/plugins/nodes/frontend/timeseries_collection.js";
 	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.js";
 	import { dateToDefaultString } from "#bzd/nodejs/utils/to_string.js";
@@ -216,9 +217,9 @@
 			/// This includes the newest timestamp and the timestamp diff between the client and the server.
 			async getTimestamp() {
 				if (this.getTimestampCache === null) {
-					const timestampBefore = Utils.timestampMs();
+					const timestampBefore = timestampMs();
 					const data = await this.fetchData({ count: 1, all: true });
-					const timestampAfter = Utils.timestampMs();
+					const timestampAfter = timestampMs();
 					const timestampClient = (timestampAfter + timestampBefore) / 2;
 
 					// Get the newest timestamp.
@@ -237,7 +238,7 @@
 				if (this.getTimestampCache.server === null) {
 					return [null, null];
 				}
-				const elapsedTime = Utils.timestampMs() - this.getTimestampCache.client;
+				const elapsedTime = timestampMs() - this.getTimestampCache.client;
 				return [
 					this.getTimestampCache.server + elapsedTime,
 					this.getTimestampCache.server - this.getTimestampCache.client,
@@ -264,7 +265,7 @@
 						// Adjust the refresh period to match the sampling of the graph.
 						const refreshPeriodMs = Math.max(periodMs / nbSamples, 1000);
 						this.inputs.refreshPeriodically(async ([_, timestampNewestLocal]) => {
-							const timestampNewestRemote = Math.max(Utils.timestampMs() + timestampDiff, timestampNewestLocal + 1);
+							const timestampNewestRemote = Math.max(timestampMs() + timestampDiff, timestampNewestLocal + 1);
 							const periodRequestedMs = timestampNewestRemote - timestampNewestLocal;
 							const count = Math.round((periodRequestedMs * nbSamples) / periodMs);
 							if (count) {
@@ -326,12 +327,12 @@
 				await this.handleSubmit(
 					async () => {
 						// Get the dashboard and approximate the time difference between the server and the client.
-						const t1 = Utils.timestampMs();
+						const t1 = timestampMs();
 						const result = await this.requestBackend(this.dashboardEndpoint, {
 							method: "get",
 							expect: "json",
 						});
-						const t4 = Utils.timestampMs();
+						const t4 = timestampMs();
 						const networkDelay = (t4 - t1) / 2; // Time it took to receive the response.
 						this.timestampDiff = result.timestamp + networkDelay - t4;
 

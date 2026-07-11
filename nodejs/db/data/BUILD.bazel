@@ -1,0 +1,29 @@
+load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
+
+bzd_nodejs_library(
+    name = "data",
+    srcs = [
+        "data.js",
+    ],
+    visibility = [
+        "//visibility:public",
+    ],
+    deps = [
+        ":key_mapping",
+        "//nodejs/core:cache2",
+        "//nodejs/core:exception",
+        "//nodejs/core:log",
+        "//nodejs/utils:optional",
+        "//nodejs/utils:timestamp",
+    ],
+)
+
+bzd_nodejs_library(
+    name = "key_mapping",
+    srcs = [
+        "key_mapping.js",
+    ],
+    visibility = [
+        "//nodejs/db/data:__subpackages__",
+    ],
+)

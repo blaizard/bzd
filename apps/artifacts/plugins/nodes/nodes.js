@@ -1,7 +1,7 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import LogFactory from "#bzd/nodejs/core/log.js";
-import Handlers from "#bzd/apps/artifacts/plugins/nodes/handlers/handlers.js";
-import Data from "#bzd/apps/artifacts/plugins/nodes/data.js";
+import Handlers from "#bzd/nodejs/db/data/handlers/handlers.js";
+import Data from "#bzd/nodejs/db/data/data.js";
 import Utils from "#bzd/apps/artifacts/common/utils.js";
 
 const Exception = ExceptionFactory("apps", "plugin", "nodes");

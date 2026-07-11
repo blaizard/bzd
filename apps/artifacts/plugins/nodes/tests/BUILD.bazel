@@ -6,19 +6,8 @@ bzd_nodejs_test(
     main = "nodes_test.js",
     deps = [
         "//apps/artifacts/plugins/nodes:backend",
-        "//apps/artifacts/plugins/nodes:key_mapping",
         "//nodejs/core:exception",
-    ],
-)
-
-bzd_nodejs_test(
-    name = "data",
-    srcs = ["data_test.js"],
-    main = "data_test.js",
-    deps = [
-        "//apps/artifacts/plugins/nodes:data",
-        "//nodejs/core:exception",
-        "//nodejs/db/key_value_store:make_from_config",
+        "//nodejs/utils:timestamp",
     ],
 )
 

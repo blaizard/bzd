@@ -1,0 +1,12 @@
+load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_test")
+
+bzd_nodejs_test(
+    name = "data",
+    srcs = ["data_test.js"],
+    main = "data_test.js",
+    deps = [
+        "//nodejs/core:exception",
+        "//nodejs/db/data",
+        "//nodejs/utils:timestamp",
+    ],
+)

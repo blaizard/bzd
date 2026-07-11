@@ -1,8 +1,8 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
-import Data from "#bzd/apps/artifacts/plugins/nodes/data.js";
-import Utils from "#bzd/apps/artifacts/common/utils.js";
+import Data from "#bzd/nodejs/db/data/data.js";
+import { timestampMs } from "#bzd/nodejs/utils/timestamp.js";
 
-const Exception = ExceptionFactory("test", "artifacts", "plugins", "data");
+const Exception = ExceptionFactory("test", "db", "data");
 
 describe("Nodes", () => {
 	describe("Data", () => {
@@ -147,7 +147,7 @@ describe("Nodes", () => {
 
 		it("timestamp", async () => {
 			const data = new Data();
-			const timestamp = Utils.timestampMs();
+			const timestamp = timestampMs();
 
 			data.insert("hello", [[["a", "b"], 1]], timestamp - 2);
 			data.insert("hello", [[["a", "b"], 10]], timestamp);
@@ -206,7 +206,7 @@ describe("Nodes", () => {
 
 		it("expired", async () => {
 			const data = new Data();
-			const timestamp = Utils.timestampMs();
+			const timestamp = timestampMs();
 			const expiredTimestamp = timestamp - 1000 * 1000;
 
 			data.insert("hello", [[["a", "b"], 1]], timestamp);
@@ -321,7 +321,7 @@ describe("Nodes", () => {
 					return externalData;
 				},
 			});
-			const timestamp = Utils.timestampMs();
+			const timestamp = timestampMs();
 
 			data.insert("hello", [[["a"], 1]], timestamp + 1);
 			data.insert("hello", [[["a"], 2]], timestamp + 2);
@@ -408,7 +408,7 @@ describe("Nodes", () => {
 					return externalData === null ? null : externalData.slice(0, count);
 				},
 			});
-			const timestamp = Utils.timestampMs();
+			const timestamp = timestampMs();
 
 			data.insert("hello", [[["a"], 1]], timestamp + 1);
 			data.insert("hello", [[["a"], 2]], timestamp + 2);
@@ -506,7 +506,7 @@ describe("Nodes", () => {
 					return externalData === null ? null : externalData.slice(0, count);
 				},
 			});
-			const timestamp = Utils.timestampMs();
+			const timestamp = timestampMs();
 
 			data.insert("hello", [[["a"], 1]], timestamp + 1);
 			data.insert("hello", [[["a"], 2]], timestamp + 2);

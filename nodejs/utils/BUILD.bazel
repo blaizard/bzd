@@ -115,3 +115,11 @@ bzd_nodejs_library(
         "//nodejs/core:format",
     ],
 )
+
+bzd_nodejs_library(
+    name = "timestamp",
+    srcs = [
+        "timestamp.js",
+    ],
+    visibility = ["//visibility:public"],
+)

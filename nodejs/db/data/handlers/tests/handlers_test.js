@@ -1,7 +1,7 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
-import Handlers from "#bzd/apps/artifacts/plugins/nodes/handlers/handlers.js";
+import Handlers from "#bzd/nodejs/db/data/handlers/handlers.js";
 
-const Exception = ExceptionFactory("test", "artifacts", "plugins", "handlers");
+const Exception = ExceptionFactory("test", "db", "data", "handlers");
 
 describe("Handlers", () => {
 	it("no handlers", () => {

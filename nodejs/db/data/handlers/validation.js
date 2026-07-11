@@ -1,7 +1,7 @@
 import ValidationSchema from "#bzd/nodejs/core/validation_schema.js";
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 
-const Exception = ExceptionFactory("apps", "plugin", "nodes", "handlers", "validation");
+const Exception = ExceptionFactory("db", "data", "handlers", "validation");
 
 export default class ValidationHandler {
 	constructor(schema) {

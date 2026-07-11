@@ -1,8 +1,8 @@
 import format from "#bzd/nodejs/core/format.js";
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
-import KeyMapping from "#bzd/apps/artifacts/plugins/nodes/key_mapping.js";
+import KeyMapping from "#bzd/nodejs/db/data/key_mapping.js";
 
-const Exception = ExceptionFactory("apps", "plugin", "nodes", "handlers", "to_string");
+const Exception = ExceptionFactory("db", "data", "handlers", "to_string");
 
 export default class ToStringHandler {
 	constructor(pattern) {

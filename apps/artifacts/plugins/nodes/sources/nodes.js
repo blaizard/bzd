@@ -1,7 +1,7 @@
 import Source from "#bzd/apps/artifacts/plugins/nodes/sources/source.js";
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import { Nodes } from "#bzd/apps/artifacts/plugins/nodes/nodes.js";
-import Utils from "#bzd/apps/artifacts/common/utils.js";
+import { timestampMs } from "#bzd/nodejs/utils/timestamp.js";
 
 const Exception = ExceptionFactory("artifacts", "nodes", "source", "nodes");
 
@@ -32,7 +32,7 @@ export default class SourceNodes extends Source {
 			},
 		});
 
-		const timeDelayLocalRemote = Utils.timestampMs() - result.timestamp;
+		const timeDelayLocalRemote = timestampMs() - result.timestamp;
 		const next = result.next;
 		const end = result.end;
 

@@ -1,10 +1,10 @@
 import Cache2 from "#bzd/nodejs/core/cache2.js";
-import KeyMapping from "#bzd/apps/artifacts/plugins/nodes/key_mapping.js";
+import KeyMapping from "#bzd/nodejs/db/data/key_mapping.js";
 import Optional from "#bzd/nodejs/utils/optional.js";
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
-import Utils from "#bzd/apps/artifacts/common/utils.js";
+import { timestampMs } from "#bzd/nodejs/utils/timestamp.js";
 
-const Exception = ExceptionFactory("apps", "plugin", "nodes");
+const Exception = ExceptionFactory("db", "data");
 
 /// Structure to contain the data.
 ///
@@ -292,7 +292,7 @@ export default class Data {
 		const data = this.storage[uid] || {};
 
 		const valuesToResult = (key, internal, values) => {
-			const expiredTimestampMs = Utils.timestampMs() - this.getDataInternal_(uid, key, internal).expires;
+			const expiredTimestampMs = timestampMs() - this.getDataInternal_(uid, key, internal).expires;
 			if (metadata) {
 				return values.map(([t, v]) => {
 					return [t, v, t > expiredTimestampMs ? 1 : 0];
@@ -388,7 +388,7 @@ export default class Data {
 	///
 	/// \return The timestamp actually written.
 	insert(uid, fragments, timestamp = null) {
-		timestamp = timestamp === null ? Utils.timestampMs() : timestamp;
+		timestamp = timestamp === null ? timestampMs() : timestamp;
 
 		// Identify the path of the fragments and their values.
 		for (const [key, value, options] of fragments) {

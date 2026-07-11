@@ -1,13 +1,13 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import LogFactory from "#bzd/nodejs/core/log.js";
-import ToStringHandler from "#bzd/apps/artifacts/plugins/nodes/handlers/to_string.js";
-import ExpiresHandler from "#bzd/apps/artifacts/plugins/nodes/handlers/expires.js";
-import HistoryHandler from "#bzd/apps/artifacts/plugins/nodes/handlers/history.js";
-import ValidationHandler from "#bzd/apps/artifacts/plugins/nodes/handlers/validation.js";
-import KeyMapping from "#bzd/apps/artifacts/plugins/nodes/key_mapping.js";
+import ToStringHandler from "#bzd/nodejs/db/data/handlers/to_string.js";
+import ExpiresHandler from "#bzd/nodejs/db/data/handlers/expires.js";
+import HistoryHandler from "#bzd/nodejs/db/data/handlers/history.js";
+import ValidationHandler from "#bzd/nodejs/db/data/handlers/validation.js";
+import KeyMapping from "#bzd/nodejs/db/data/key_mapping.js";
 
-const Exception = ExceptionFactory("apps", "plugin", "nodes", "handlers");
-const Log = LogFactory("apps", "plugin", "nodes", "handlers");
+const Exception = ExceptionFactory("db", "data", "handlers");
+const Log = LogFactory("db", "data", "handlers");
 
 const sortedAvailableHandlers = [
 	["validation", ValidationHandler],
