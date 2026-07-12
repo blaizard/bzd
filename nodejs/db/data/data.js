@@ -294,7 +294,7 @@ export default class Data {
 			}
 			return values
 				.filter(([t, _]) => {
-					return { expired: t < expiredTimestampMs };
+					return t > expiredTimestampMs;
 				})
 				.map(([_, v]) => {
 					return v;
