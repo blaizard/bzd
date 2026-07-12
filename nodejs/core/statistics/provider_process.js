@@ -20,7 +20,7 @@ export default class ProviderProcess extends Provider {
 			this.lastELU = currentELU;
 
 			// Save the current snapshot as the baseline for the next interval tick.
-			this.set("cpu.eventloop", eluDiff.utilization);
+			this.set("cpu.eventloop", eluDiff.utilization, { metadata: { unit: "percent" } });
 
 			const memoryUsage = process.memoryUsage();
 			this.size("memory.rss.used", memoryUsage.rss);
@@ -32,8 +32,8 @@ export default class ProviderProcess extends Provider {
 			this.set("health.handles", activeHandles);
 
 			// Convert nanoseconds to seconds.
-			this.set("health.eventloop.delay.max", this.histogram.max / 1e9);
-			this.set("health.eventloop.delay.mean", this.histogram.mean / 1e9);
+			this.set("health.eventloop.delay.max", this.histogram.max / 1e9, { metadata: { unit: "seconds" } });
+			this.set("health.eventloop.delay.mean", this.histogram.mean / 1e9, { metadata: { unit: "seconds" } });
 			this.histogram.reset();
 		}, 1000);
 	}

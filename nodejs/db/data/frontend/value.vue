@@ -104,6 +104,9 @@
 						case "seconds":
 							formatter = timeToString;
 							break;
+						case "percent":
+							formatter = (value) => (value * 100).toFixed(1) + "%";
+							break;
 					}
 					// There is a unit, the data must be a number then.
 					return (value) => {
