@@ -65,7 +65,7 @@
 
 <script>
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
-	import { timeMsToString, dateToDefaultString } from "#bzd/nodejs/utils/to_string.js";
+	import { timeToString, dateToDefaultString } from "#bzd/nodejs/utils/to_string.js";
 
 	export default {
 		mixins: [Component],
@@ -85,10 +85,10 @@
 					return "-";
 				}
 				const durationMs = this.timestamp - timestamp;
-				return timeMsToString(durationMs);
+				return timeToString(durationMs / 1000);
 			},
 			durationSToString(durationS) {
-				return timeMsToString(durationS * 1000);
+				return timeToString(durationS);
 			},
 			logToStatus(log) {
 				if (log.timestampStop === 0) {
@@ -103,7 +103,7 @@
 				if (!log.timestampStop) {
 					return "-";
 				}
-				return timeMsToString(log.timestampStop - log.timestampStart);
+				return timeToString((log.timestampStop - log.timestampStart) / 1000);
 			},
 			logToOutput(log) {
 				if (log.error !== null) {

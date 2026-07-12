@@ -1,13 +1,30 @@
 import Format from "../core/format.js";
 
-function _unitsToString(unitList, value, maxNbUnits = 1, decimalPoints = 1) {
-	let unitIndex = 0;
+/// Formats a raw numeric value into a human-readable string using a hierarchical list of units.
+///
+/// \param unitList unitList An array of unit definitions, ordered from smallest to largest.
+/// \param value value The raw numeric value to be converted.
+/// \param startIndex The index in unitList corresponding to the input value's base unit.
+/// \param maxNbUnits The maximum number of distinct unit components to include in the output string.
+/// \param decimalPoints The number of decimal places to apply strictly to the final/smallest displayed unit.
+///
+/// \return {string} A space-separated, human-readable string representing the formatted value.
+function _unitsToString(unitList, value, startIndex = 0, maxNbUnits = 1, decimalPoints = 1) {
+	let unitIndex = startIndex;
+
+	// Scale UP
 	while (value > unitList[unitIndex][2]) {
 		if (!unitList[unitIndex + 1]) {
 			break;
 		}
 		value /= unitList[unitIndex][2];
 		unitIndex++;
+	}
+
+	// Scale DOWN
+	while (value > 0 && value < 1 && unitIndex > 0) {
+		unitIndex--;
+		value *= unitList[unitIndex][2];
 	}
 
 	let output = [];
@@ -32,6 +49,7 @@ export function bytesToString(value, decimalPoints = 1) {
 			["TiB", "TiB", 1024],
 		],
 		value,
+		/*startIndex*/ 0,
 		/*maxNbUnits*/ 1,
 		decimalPoints,
 	);
@@ -47,14 +65,18 @@ export function frequencyToString(value, decimalPoints = 1) {
 			["THz", "THz", 1000],
 		],
 		value,
+		/*startIndex*/ 0,
 		/*maxNbUnits*/ 1,
 		decimalPoints,
 	);
 }
 
-export function timeMsToString(value, maxNbUnits = 1) {
+/// Convert a time in seconds into a string.
+export function timeToString(value, maxNbUnits = 1) {
 	return _unitsToString(
 		[
+			["ns", "ns", 1000],
+			["µs", "µs", 1000],
 			["ms", "ms", 1000],
 			["s", "s", 60],
 			[" min", " min", 60],
@@ -62,6 +84,7 @@ export function timeMsToString(value, maxNbUnits = 1) {
 			[" day", " days", 1],
 		],
 		value,
+		/*startIndex*/ 3,
 		maxNbUnits,
 		/*decimalPoints*/ 0,
 	);

@@ -66,7 +66,7 @@
 
 <script>
 	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.js";
-	import { bytesToString, timeMsToString } from "#bzd/nodejs/utils/to_string.js";
+	import { bytesToString, timeToString } from "#bzd/nodejs/utils/to_string.js";
 	import Gauge from "#bzd/apps/dashboard/plugins/system_monitor/gauge.vue";
 	import GaugeRate from "#bzd/apps/dashboard/plugins/system_monitor/gauge_rate.vue";
 	import Text from "#bzd/apps/dashboard/plugins/system_monitor/text.vue";
@@ -264,18 +264,18 @@
 				let text = null;
 				let tooltips = [];
 				if (this.metadata.uptime) {
-					text = timeMsToString(this.metadata.uptime * 1000);
+					text = timeToString(this.metadata.uptime);
 					tooltips.push("Up time for " + text + " (" + parseInt(this.metadata.uptime) + "s)");
 				}
 				if (this.metadata.downtime) {
-					const downtimeText = timeMsToString(this.metadata.downtime * 1000);
+					const downtimeText = timeToString(this.metadata.downtime);
 					text = "-" + downtimeText;
 					tooltips.push("Expected down time in " + downtimeText + " (" + parseInt(this.metadata.downtime) + "s)");
 				}
 				if (this.metadata.leases) {
 					let tooltip = [];
 					for (const [leaseId, lease] of Object.entries(this.metadata.leases)) {
-						tooltip.push(" - " + (lease.name || leaseId) + ": " + timeMsToString(lease.ttl));
+						tooltip.push(" - " + (lease.name || leaseId) + ": " + timeToString(lease.ttl / 1000));
 					}
 					tooltips.push("Leases:<br/>" + tooltip.join("<br/>"));
 				}

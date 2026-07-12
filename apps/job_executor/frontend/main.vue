@@ -55,7 +55,7 @@
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
 	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.js";
 	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.js";
-	import { timeMsToString } from "#bzd/nodejs/utils/to_string.js";
+	import { timeToString } from "#bzd/nodejs/utils/to_string.js";
 	import Status from "#bzd/apps/job_executor/backend/status.js";
 
 	const Exception = ExceptionFactory("main");
@@ -175,7 +175,7 @@
 					return "-";
 				}
 				const durationMs = (timestampStop === null ? this.timestampServer : timestampStop) - timestampStart;
-				return timeMsToString(durationMs);
+				return timeToString(durationMs / 1000);
 			},
 			getStatus(info) {
 				if (info.status == Status.idle && info.scheduler?.type) {

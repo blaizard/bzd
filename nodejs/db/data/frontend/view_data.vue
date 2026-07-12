@@ -35,7 +35,7 @@
 	import Value from "#bzd/nodejs/db/data/frontend/value.vue";
 	import Keys from "#bzd/nodejs/db/data/frontend/keys.vue";
 	import Input from "#bzd/nodejs/vue/components/form/element/input.vue";
-	import { timeMsToString } from "#bzd/nodejs/utils/to_string.js";
+	import { timeToString } from "#bzd/nodejs/utils/to_string.js";
 	import Form from "#bzd/nodejs/vue/components/form/form.vue";
 
 	export default {
@@ -64,7 +64,7 @@
 		},
 		computed: {
 			durationString() {
-				return timeMsToString(Math.max(this.timestampServer - this.timestampNewest, 0));
+				return timeToString(Math.max(this.timestampServer - this.timestampNewest, 0) / 1000);
 			},
 			isValue() {
 				return "_" in this.tree;

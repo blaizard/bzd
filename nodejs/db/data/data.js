@@ -64,6 +64,7 @@ export default class Data {
 			this.storage[uid][internal] = {
 				expiresType: "auto",
 				expires: 60 * 1000,
+				metadata: {},
 				values: [],
 			};
 			this.tree.setDirty(uid);
@@ -286,10 +287,11 @@ export default class Data {
 		const data = this.storage[uid] || {};
 
 		const valuesToResult = (key, internal, values) => {
-			const expiredTimestampMs = timestampMs() - this.getDataInternal_(uid, key, internal).expires;
+			const dataInternal = this.getDataInternal_(uid, key, internal);
+			const expiredTimestampMs = timestampMs() - dataInternal.expires;
 			if (metadata) {
 				return values.map(([t, v]) => {
-					return [t, v, { expired: t < expiredTimestampMs }];
+					return [t, v, { expired: t < expiredTimestampMs, metadata: dataInternal.metadata }];
 				});
 			}
 			return values
@@ -394,13 +396,18 @@ export default class Data {
 					history: 10,
 					// The duration in ms until which an entry is considered expired.
 					expires: undefined,
+					// Metadata to be linked with this entry.
+					metadata: {},
 				},
 				options,
 			);
 
-			let index = 0;
 			const data = this.getDataInternal_(uid, key, KeyMapping.keyToInternal(key));
 
+			// Set the metadata.
+			data.metadata = config.metadata;
+
+			let index = 0;
 			if (data.values.length) {
 				// If the timestamp of the last entry added is newer than the current one.
 				if (data.values[0][0] > timestamp) {

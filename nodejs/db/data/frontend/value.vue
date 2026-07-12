@@ -3,10 +3,13 @@
 		<a v-if="enableViewAll" class="action" @click="setViewAll" v-tooltip="tooltipActionMore">+</a>
 		<a v-else-if="enableViewOriginal" class="action" @click="setViewOriginal" v-tooltip="tooltipActionLess">-</a>
 		<div class="value-grid" @click.stop="onClick">
-			<div v-for="[t, v, { expired }] in valueDisplay" :class="classItem(!expired)">
+			<div v-for="[t, v, { expired, metadata }] in valueDisplay" :class="classItem(!expired)">
 				<span class="timestamp">{{ timestampToString(t) }}</span
 				><span class="value">
 					<code class="json">{{ JSON.stringify(v) }}</code>
+				</span>
+				<span class="metadata">
+					{{ metadataToString(metadata, v) }}
 				</span>
 			</div>
 		</div>
@@ -14,7 +17,7 @@
 </template>
 
 <script>
-	import { dateToString } from "#bzd/nodejs/utils/to_string.js";
+	import { dateToString, bytesToString, timeToString } from "#bzd/nodejs/utils/to_string.js";
 	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.js";
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
 	import ExceptionFactory from "#bzd/nodejs/core/exception.js";
@@ -81,6 +84,33 @@
 			onClick() {
 				this.$emit("select");
 			},
+			metadataToString(metadata, value) {
+				let formatter = null;
+				switch (metadata.unit) {
+					case "bytes":
+						formatter = bytesToString;
+						break;
+					case "seconds":
+						formatter = timeToString;
+						break;
+					case undefined:
+						break;
+					default:
+						formatter = (value) => JSON.stringify(value) + metadata.unit;
+				}
+				let entries = [];
+				if (formatter) {
+					entries.push(formatter(value));
+				}
+				for (const [key, value] of Object.entries(metadata)) {
+					if (key == "unit") {
+						continue;
+					}
+					const valueStr = ["max", "min", "avg", "mean"].includes(key) ? formatter(value) : JSON.stringify(value);
+					entries.push(key + ": " + valueStr);
+				}
+				return entries.join(", ");
+			},
 		},
 	};
 </script>
@@ -130,6 +160,14 @@
 					.json {
 						background-color: transparent;
 					}
+				}
+
+				.metadata {
+					align-self: baseline;
+					white-space: pre;
+					opacity: 0.5;
+					font-size: 0.8em;
+					padding: 2px 5px;
 				}
 			}
 		}

@@ -22,10 +22,9 @@ class ProcessorRates {
 		this.rateMax = Math.max(this.rateMax, rate);
 		this.rateMean = rateMean;
 		this.rateCounter += this.current;
-		provider.set("rate", rate);
-		provider.set("rate.mean", this.rateMean);
-		provider.set("rate.max", this.rateMax);
-		provider.set("rate.counter", this.rateCounter);
+		provider.set("rate", rate, {
+			metadata: { unit: "t/s", mean: this.rateMean, max: this.rateMax, counter: this.rateCounter },
+		});
 
 		this.current = 0;
 	}
@@ -83,12 +82,12 @@ export default class Provider {
 		return processor;
 	}
 
-	_insert(key, value) {
-		this.proxy.insert("statistics", [[[...this.proxy.namespace, ...this.namespace, ...key], value]]);
+	_insert(key, value, options) {
+		this.proxy.insert("statistics", [[[...this.proxy.namespace, ...this.namespace, ...key], value, options ?? {}]]);
 	}
 
-	_insertAbsolute(key, value) {
-		this.proxy.insert("statistics", [[[...key], value]]);
+	_insertAbsolute(key, value, options) {
+		this.proxy.insert("statistics", [[[...key], value, options ?? {}]]);
 	}
 
 	/// Initialize the data structure of a data point.
@@ -117,18 +116,18 @@ export default class Provider {
 		try {
 			await callback();
 		} finally {
-			this._insert([name, "duration"], (performance.now() - start) / 1000);
+			this._insert([name, "duration"], (performance.now() - start) / 1000, { metadata: { unit: "seconds" } });
 		}
 	}
 
 	/// Set a value point to the existing points.
-	set(name, value) {
-		this._insert([name], value);
+	set(name, value, options) {
+		this._insert([name], value, options);
 	}
 
 	/// Set a size point to the existing points.
 	size(name, value) {
-		this._insert([name, "size"], value);
+		this._insert([name], value, { metadata: { unit: "bytes" } });
 	}
 
 	/// Add a value point to the existing points.
