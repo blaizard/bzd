@@ -3,13 +3,13 @@
 		<a v-if="enableViewAll" class="action" @click="setViewAll" v-tooltip="tooltipActionMore">+</a>
 		<a v-else-if="enableViewOriginal" class="action" @click="setViewOriginal" v-tooltip="tooltipActionLess">-</a>
 		<div class="value-grid" @click.stop="onClick">
-			<div v-for="[t, v, isValid, metadata] in valueDisplay" :class="classItem(isValid)">
+			<div v-for="([t, v, isValid], index) in valueDisplay" :class="classItem(isValid)">
 				<span class="timestamp">{{ timestampToString(t) }}</span
 				><span class="value">
 					<code class="json">{{ JSON.stringify(v) }}</code>
 				</span>
 				<span class="metadata">
-					{{ metadataToString(metadata, v) }}
+					{{ metadataToString(metadata, v, index == 0) }}
 				</span>
 			</div>
 		</div>
@@ -40,6 +40,13 @@
 			};
 		},
 		computed: {
+			metadata() {
+				// The most recent entry get the metadata
+				if (this.value) {
+					return this.value[0][3];
+				}
+				return {};
+			},
 			enableViewAll() {
 				return this.nbDisplay !== 0 && this.value.length > this.nbDisplay;
 			},
@@ -62,7 +69,7 @@
 				};
 			},
 			valueDisplay() {
-				return this.nbDisplay == 0 ? this.value : this.value.slice(-this.nbDisplay);
+				return this.nbDisplay == 0 ? this.value : this.value.slice(0, this.nbDisplay);
 			},
 		},
 		methods: {
@@ -84,7 +91,7 @@
 			onClick() {
 				this.$emit("select");
 			},
-			metadataToString(metadata, value) {
+			metadataToString(metadata, value, isNewest) {
 				const formatterFromUnit = (unit) => {
 					if (unit === undefined) {
 						return (_) => undefined;
@@ -113,14 +120,16 @@
 				if (formattedValue) {
 					entries.push(formattedValue);
 				}
-				for (const [key, value] of Object.entries(metadata)) {
-					if (key == "unit") {
-						continue;
+				if (isNewest) {
+					for (const [key, value] of Object.entries(metadata)) {
+						if (key == "unit") {
+							continue;
+						}
+						const valueStr = ["max", "min", "avg", "mean"].includes(key)
+							? (formatter(value) ?? JSON.stringify(value))
+							: JSON.stringify(value);
+						entries.push(key + ": " + valueStr);
 					}
-					const valueStr = ["max", "min", "avg", "mean"].includes(key)
-						? (formatter(value) ?? JSON.stringify(value))
-						: JSON.stringify(value);
-					entries.push(key + ": " + valueStr);
 				}
 				return entries.join(", ");
 			},

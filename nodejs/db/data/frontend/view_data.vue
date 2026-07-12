@@ -50,7 +50,7 @@
 			return {
 				metadata: {},
 				tree: {},
-				entries: {},
+				flat: {},
 				timestampNewest: 0,
 				timeout: null,
 				isDestroyed: false,
@@ -92,7 +92,7 @@
 			filteredEntries() {
 				const needle = this.filter.toLowerCase();
 				const out = [];
-				for (const [key, values] of Object.entries(this.entries)) {
+				for (const [key, values] of Object.entries(this.flat)) {
 					if (needle && !key.toLowerCase().includes(needle)) {
 						continue;
 					}
@@ -129,23 +129,15 @@
 				object["_"] ??= [];
 				object["_"].push(...values);
 				object["_"].sort((a, b) => {
-					return a[0] > b[0] ? 1 : -1;
+					return b[0] - a[0];
 				});
 				const keepLastN = key.length === 0 ? 100 : 10;
-				object["_"] = object["_"].slice(-keepLastN);
-				const last = object["_"].slice(-1)[0];
-				this.timestampNewest = Math.max(this.timestampNewest, last[0]);
-			},
-			updateEntry(keyPath, values) {
-				if (!values.length) {
-					return;
-				}
-				const key = keyPath.join(".");
-				(this.entries[key] ??= []).push(...values);
-				this.entries[key].sort((a, b) => a[0] - b[0]);
-				this.entries[key] = this.entries[key].slice(-10);
-				const last = this.entries[key].slice(-1)[0];
-				this.timestampNewest = Math.max(this.timestampNewest, last[0]);
+				object["_"] = object["_"].slice(0, keepLastN);
+				const newest = object["_"][0];
+				this.timestampNewest = Math.max(this.timestampNewest, newest[0]);
+
+				// Update the flat view as well to search by keys.
+				this.flat[key.join(".")] = object["_"];
 			},
 			async fetchMetadata() {
 				await this.handleSubmit(async () => {
@@ -157,7 +149,6 @@
 					this.metadata = await this.apiGet(query);
 					for (const [key, value] of this.metadata.data) {
 						this.updateTree(key, value);
-						this.updateEntry(key, value);
 					}
 				});
 				if (this.isValue) {

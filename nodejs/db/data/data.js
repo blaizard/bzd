@@ -58,7 +58,7 @@ export default class Data {
 	}
 
 	/// Helper to access an internal value.
-	getDataInternal_(uid, key, internal) {
+	getDataInternal_(uid, internal) {
 		this.storage[uid] ??= {};
 		if (!(internal in this.storage[uid])) {
 			this.storage[uid][internal] = {
@@ -287,12 +287,17 @@ export default class Data {
 		const data = this.storage[uid] || {};
 
 		const valuesToResult = (key, internal, values) => {
-			const dataInternal = this.getDataInternal_(uid, key, internal);
+			const dataInternal = this.getDataInternal_(uid, internal);
 			const expiredTimestampMs = timestampMs() - dataInternal.expires;
 			if (metadata) {
-				return values.map(([t, v]) => {
-					return [t, v, t > expiredTimestampMs ? 1 : 0, dataInternal.metadata];
+				let result = values.map(([t, v]) => {
+					return [t, v, t > expiredTimestampMs ? 1 : 0, {}];
 				});
+				if (result) {
+					// Metadata is only attached to the most recent entry.
+					result[0][3] = dataInternal.metadata;
+				}
+				return result;
 			}
 			return values
 				.filter(([t, _]) => {
@@ -402,7 +407,7 @@ export default class Data {
 				options,
 			);
 
-			const data = this.getDataInternal_(uid, key, KeyMapping.keyToInternal(key));
+			const data = this.getDataInternal_(uid, KeyMapping.keyToInternal(key));
 
 			// Set the metadata.
 			data.metadata = config.metadata;
