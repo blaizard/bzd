@@ -3,7 +3,7 @@
 		<div class="bzd-statistics-search">
 			<Input :description="{ placeholder: 'Filter...' }" @directInput="" />
 		</div>
-		<ViewData :pathList="pathList" :endpoint="endpoint"></ViewData>
+		<ViewData :pathList="pathList" :api-get="apiGet"></ViewData>
 	</div>
 </template>
 
@@ -23,9 +23,10 @@
 				pathList: ["statistics"],
 			};
 		},
-		computed: {
-			endpoint() {
-				return this.$rest.getEndpoint("/admin/statistics");
+		methods: {
+			async apiGet(query) {
+				const data = await this.$rest.request("get", "/admin/statistics", query);
+				return JSON.parse(data);
 			},
 		},
 	};

@@ -38,7 +38,7 @@
 		},
 		emits: ["select"],
 		props: {
-			endpoint: { mandatory: true, type: String },
+			apiGet: { mandatory: true, type: Function },
 			pathList: { mandatory: true, type: Array },
 		},
 		computed: {
@@ -106,11 +106,7 @@
 						query.after = this.timestampNewest;
 						query.count = 5;
 					}
-					this.metadata = await this.requestBackend(this.endpoint, {
-						method: "get",
-						query: query,
-						expect: "json",
-					});
+					this.metadata = await this.apiGet(query);
 					for (const [key, value] of this.metadata.data) {
 						this.updateTree(key, value);
 					}
@@ -118,11 +114,7 @@
 
 				if (this.isValue) {
 					await this.handleSubmit(async () => {
-						const value = await this.requestBackend(this.endpoint, {
-							method: "get",
-							query: { metadata: 1, count: 10, before: this.valueOldestTimestamp },
-							expect: "json",
-						});
+						const value = await this.apiGet({ metadata: 1, count: 10, before: this.valueOldestTimestamp });
 						this.updateTree([], value.data);
 					});
 				}

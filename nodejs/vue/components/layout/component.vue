@@ -66,15 +66,6 @@
 			},
 			/// Handler to chain the state of loading child components.
 			handleLoading(isLoading) {},
-			/// Request the backend server.
-			///
-			/// This method deals with authentication if needed.
-			async requestBackend(endpoint, options = {}) {
-				if (this.$authentication) {
-					await this.$authentication.updateFetch(options);
-				}
-				return await HttpClient.request(endpoint, options);
-			},
 		},
 	};
 </script>

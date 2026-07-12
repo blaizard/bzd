@@ -2,7 +2,7 @@
 	<div>
 		<Form :description="formDescription" v-model="options"></Form>
 		<ViewDashboard v-if="options.dashboard" :pathList="pathList"></ViewDashboard>
-		<ViewData v-else :pathList="pathList" :endpoint="endpoint" @select="onSelect"></ViewData>
+		<ViewData v-else :pathList="pathList" :api-get="apiGet" @select="onSelect"></ViewData>
 		<div>
 			<span>Export:</span>
 			<Form :description="formDescriptionExport" v-model="exportOptions" @submit="handleExportSubmit"></Form>
@@ -114,6 +114,13 @@
 			onSelect(pathList) {
 				const url = "/view/" + Utils.keyToPath(pathList);
 				this.$router.dispatch(url);
+			},
+			async apiGet(query) {
+				return await this.requestBackend(this.endpoint, {
+					method: "get",
+					query: query,
+					expect: "json",
+				});
 			},
 		},
 	};
