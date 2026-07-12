@@ -1,15 +1,32 @@
 <template>
 	<div class="data" v-if="metadata">
-		<div>Updated: {{ durationString }} ago</div>
-		<Keys class="keys" :value="tree" :path-list="pathList" v-slot="serializeSlotProps" @select="propagateOnSelect">
-			<Value v-if="isPathListValue(serializeSlotProps.pathList)" :value="serializeSlotProps.value" :view="0"></Value>
-			<Value
-				v-else
-				:value="serializeSlotProps.value"
-				:view="1"
-				@select="propagateOnSelect(serializeSlotProps.pathList)"
-			></Value>
-		</Keys>
+		<!-- Search input -->
+		<div class="search">
+			<Input :description="{ placeholder: 'Filter...' }" @directInput="onFilter" />
+		</div>
+		<!-- Tree view: shown when filter is empty -->
+		<div v-if="isEmpty">
+			<div>Updated: {{ durationString }} ago</div>
+			<Keys class="keys" :value="tree" :path-list="pathList" v-slot="serializeSlotProps" @select="propagateOnSelect">
+				<Value v-if="isPathListValue(serializeSlotProps.pathList)" :value="serializeSlotProps.value" :view="0"></Value>
+				<Value
+					v-else
+					:value="serializeSlotProps.value"
+					:view="1"
+					@select="propagateOnSelect(serializeSlotProps.pathList)"
+				></Value>
+			</Keys>
+		</div>
+		<!-- Flat list: shown when filter is non-empty -->
+		<div v-else>
+			<div>Updated: {{ durationString }} ago</div>
+			<div class="entries">
+				<div v-for="entry in filteredEntries" :key="entry.key" class="entry">
+					<span class="key">{{ entry.key }}</span>
+					<Value :value="entry.value" :view="1"></Value>
+				</div>
+			</div>
+		</div>
 	</div>
 </template>
 
@@ -17,6 +34,7 @@
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
 	import Value from "#bzd/nodejs/db/data/frontend/value.vue";
 	import Keys from "#bzd/nodejs/db/data/frontend/keys.vue";
+	import Input from "#bzd/nodejs/vue/components/form/element/input.vue";
 	import { timeMsToString } from "#bzd/nodejs/utils/to_string.js";
 	import Form from "#bzd/nodejs/vue/components/form/form.vue";
 
@@ -25,15 +43,18 @@
 		components: {
 			Value,
 			Keys,
+			Input,
 			Form,
 		},
 		data: function () {
 			return {
 				metadata: {},
 				tree: {},
+				entries: {},
 				timestampNewest: 0,
 				timeout: null,
 				isDestroyed: false,
+				filter: "",
 			};
 		},
 		emits: ["select"],
@@ -65,6 +86,24 @@
 			timestampServer() {
 				return this.metadata.timestamp || Date.now();
 			},
+			isEmpty() {
+				return this.filter.trim() === "";
+			},
+			filteredEntries() {
+				const needle = this.filter.toLowerCase();
+				const out = [];
+				for (const [key, values] of Object.entries(this.entries)) {
+					if (needle && !key.toLowerCase().includes(needle)) {
+						continue;
+					}
+					if (!values.length) {
+						continue;
+					}
+					out.push({ key: key, value: values });
+				}
+				out.sort((a, b) => a.key.localeCompare(b.key));
+				return out;
+			},
 		},
 		mounted() {
 			this.fetchMetadata();
@@ -74,13 +113,15 @@
 			clearTimeout(this.timeout);
 		},
 		methods: {
+			onFilter(text) {
+				this.filter = text;
+			},
 			isPathListValue(pathList) {
 				return (
 					this.pathList.length === pathList.length && this.pathList.every((entry, index) => entry == pathList[index])
 				);
 			},
 			updateTree(key, values) {
-				// Update the tree.
 				const object = key.reduce((r, segment) => {
 					r[segment] ??= {};
 					return r[segment];
@@ -90,13 +131,20 @@
 				object["_"].sort((a, b) => {
 					return a[0] > b[0] ? 1 : -1;
 				});
-
-				// Keep only the last X values depending if root value or not.
 				const keepLastN = key.length === 0 ? 100 : 10;
 				object["_"] = object["_"].slice(-keepLastN);
-
-				// Update the last timestamp.
 				const last = object["_"].slice(-1)[0];
+				this.timestampNewest = Math.max(this.timestampNewest, last[0]);
+			},
+			updateEntry(keyPath, values) {
+				if (!values.length) {
+					return;
+				}
+				const key = keyPath.join(".");
+				(this.entries[key] ??= []).push(...values);
+				this.entries[key].sort((a, b) => a[0] - b[0]);
+				this.entries[key] = this.entries[key].slice(-10);
+				const last = this.entries[key].slice(-1)[0];
 				this.timestampNewest = Math.max(this.timestampNewest, last[0]);
 			},
 			async fetchMetadata() {
@@ -109,16 +157,15 @@
 					this.metadata = await this.apiGet(query);
 					for (const [key, value] of this.metadata.data) {
 						this.updateTree(key, value);
+						this.updateEntry(key, value);
 					}
 				});
-
 				if (this.isValue) {
 					await this.handleSubmit(async () => {
 						const value = await this.apiGet({ metadata: 1, count: 10, before: this.valueOldestTimestamp });
 						this.updateTree([], value.data);
 					});
 				}
-
 				if (!this.isDestroyed) {
 					this.timeout = setTimeout(this.fetchMetadata, 1000);
 				}
@@ -134,10 +181,26 @@
 	.data {
 		display: flex;
 		flex-direction: column;
-
 		.keys {
 			border: 1px solid #eee;
 			padding: 10px;
+		}
+		.search {
+			margin-bottom: 16px;
+		}
+		.entries {
+			display: flex;
+			flex-direction: column;
+			border: 1px solid #eee;
+			padding: 10px;
+		}
+		.entry {
+			display: flex;
+			align-items: baseline;
+			padding: 2px 0;
+			.key {
+				margin-right: 8px;
+			}
 		}
 	}
 </style>
