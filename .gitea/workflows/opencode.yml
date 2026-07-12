@@ -41,6 +41,8 @@ jobs:
                           route="create_pr"
                       elif [[ "$ACTION" == "/plan" ]]; then
                           route="issue_plan"
+                      elif [[ "$ACTION" == "/debug" ]]; then
+                          route="issue_debug"
                       elif [[ "$ACTION" == /* ]]; then
                           echo "Unsupported command: $COMMENT_BODY" >&2
                           exit 1
@@ -108,6 +110,41 @@ jobs:
                 QUESTION:
                 (Ask only if exhaustive independent research failed. Briefly state what you investigated and exactly what information is blocking you.)
                 [Your specific question here]
+
+    route_issue_debug:
+        needs: [router, lease_linux]
+        runs-on: opencode
+        if: needs.router.outputs.route == 'issue_debug'
+        uses: ./.gitea/workflows/sub_opencode_comment.yml
+        secrets: inherit
+        with:
+            issue_number: ${{ needs.router.outputs.issue_number }}
+            agent: "debug_orchestrator"
+            prompt: |
+                You are working on the repository '${{ github.repository }}' and handling issue #${{ needs.router.outputs.issue_number }}.
+
+                Use the Gitea MCP and your available tools to deeply research the context: 
+                1. Fetch the issue details (title, body, labels, comments, etc).
+                2. Fetch ALL comments on this issue to understand the full conversation history, previous clarifications, and any plans already discussed.
+                3. Check for any related issues or pull requests that might be relevant.
+                4. DEEP RESEARCH: Actively search the codebase, read relevant file contents, and trace dependencies related to the issue to fully understand the current architecture.
+
+                INSTRUCTIONS:
+                - Debug the precise technical root cause of the problem.
+                - Do not ask a question if the answer can be found independently.
+
+                STRICT OUTPUT FORMAT:
+                - Your final response to the user must look exactly like one of the two options below.
+                - ABSOLUTELY NO introductory filler, thinking text, or explanations.
+                - CRITICAL: If you do not follow this exact format, the CI will fail.
+
+                CHOOSE ONE:
+
+                RESULTS:
+                [Provide the technical root cause and findings here]
+
+                QUESTION:
+                [Briefly state what you investigated and exactly what information is blocking you]
 
     route_create_pr:
         needs: [router, lease_linux]
