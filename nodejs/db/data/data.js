@@ -291,7 +291,7 @@ export default class Data {
 			const expiredTimestampMs = timestampMs() - dataInternal.expires;
 			if (metadata) {
 				return values.map(([t, v]) => {
-					return [t, v, { expired: t < expiredTimestampMs, metadata: dataInternal.metadata }];
+					return [t, v, t > expiredTimestampMs ? 1 : 0, dataInternal.metadata];
 				});
 			}
 			return values
