@@ -1,0 +1,12 @@
+load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_binary")
+
+bzd_nodejs_binary(
+    name = "benchmark_data",
+    srcs = [
+        "benchmark_data.js",
+    ],
+    main = "benchmark_data.js",
+    deps = [
+        "//nodejs/db/data",
+    ],
+)
