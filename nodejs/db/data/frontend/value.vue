@@ -3,7 +3,7 @@
 		<a v-if="enableViewAll" class="action" @click="setViewAll" v-tooltip="tooltipActionMore">+</a>
 		<a v-else-if="enableViewOriginal" class="action" @click="setViewOriginal" v-tooltip="tooltipActionLess">-</a>
 		<div class="value-grid" @click.stop="onClick">
-			<div v-for="[t, v, isValid] in valueDisplay" :class="classItem(isValid)">
+			<div v-for="[t, v, { expired }] in valueDisplay" :class="classItem(!expired)">
 				<span class="timestamp">{{ timestampToString(t) }}</span
 				><span class="value">
 					<code class="json">{{ JSON.stringify(v) }}</code>

@@ -289,11 +289,13 @@ export default class Data {
 			const expiredTimestampMs = timestampMs() - this.getDataInternal_(uid, key, internal).expires;
 			if (metadata) {
 				return values.map(([t, v]) => {
-					return [t, v, t > expiredTimestampMs ? 1 : 0];
+					return [t, v, { expired: t < expiredTimestampMs }];
 				});
 			}
 			return values
-				.filter(([t, _]) => t > expiredTimestampMs)
+				.filter(([t, _]) => {
+					return { expired: t < expiredTimestampMs };
+				})
 				.map(([_, v]) => {
 					return v;
 				});
