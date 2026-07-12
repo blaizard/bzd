@@ -6,7 +6,9 @@ const Exception = ExceptionFactory("statistics");
 class ProcessorRates {
 	constructor(data) {
 		this.current = 0;
-		this.rateAvg = 0;
+		this.rateMean = 0;
+		this.rateMax = 0;
+		this.rateCounter = 0;
 	}
 
 	update(value) {
@@ -16,16 +18,15 @@ class ProcessorRates {
 	process(durationS, provider) {
 		const rate = this.current / durationS;
 		const durationSMax60 = Math.min(60, durationS);
+		const rateMean = ((60 - durationSMax60) * this.rateMean + durationSMax60 * rate) / 60;
+		this.rateMax = Math.max(this.rateMax, rate);
+		this.rateMean = rateMean;
+		this.rateCounter += this.current;
 		provider.set("rate", rate);
-		const rateAvg = ((60 - durationSMax60) * this.rateAvg + durationSMax60 * rate) / 60;
-		provider.set("rateAvg", rateAvg);
-		this.rateAvg = rateAvg;
-		/*Object.assign(this.data, {
-			rate: rate,
-			rateAvg: ((60 - durationSMax60) * this.data.rateAvg + durationSMax60 * rate) / 60,
-			count: this.data.count + this.current,
-			max: Math.max(rate, this.data.max),
-		});*/
+		provider.set("rate.mean", this.rateMean);
+		provider.set("rate.max", this.rateMax);
+		provider.set("rate.counter", this.rateCounter);
+
 		this.current = 0;
 	}
 }
@@ -84,6 +85,10 @@ export default class Provider {
 
 	_insert(key, value) {
 		this.proxy.insert("statistics", [[[...this.proxy.namespace, ...this.namespace, ...key], value]]);
+	}
+
+	_insertAbsolute(key, value) {
+		this.proxy.insert("statistics", [[[...key], value]]);
 	}
 
 	/// Initialize the data structure of a data point.
