@@ -8,11 +8,17 @@
 		<div v-if="isEmpty">
 			<div>Updated: {{ durationString }} ago</div>
 			<Keys class="keys" :value="tree" :path-list="pathList" v-slot="serializeSlotProps" @select="propagateOnSelect">
-				<Value v-if="isPathListValue(serializeSlotProps.pathList)" :value="serializeSlotProps.value" :view="0"></Value>
+				<Value
+					v-if="isPathListValue(serializeSlotProps.pathList)"
+					:value="serializeSlotProps.value"
+					:view="0"
+					:timestamp="timestampServer"
+				></Value>
 				<Value
 					v-else
 					:value="serializeSlotProps.value"
 					:view="1"
+					:timestamp="timestampServer"
 					@select="propagateOnSelect(serializeSlotProps.pathList)"
 				></Value>
 			</Keys>
@@ -23,7 +29,7 @@
 			<div class="entries">
 				<div v-for="entry in filteredEntries" :key="entry.key" class="entry">
 					<span class="key">{{ entry.key }}</span>
-					<Value :value="entry.value" :view="1"></Value>
+					<Value :value="entry.value" :view="1" :timestamp="timestampServer"></Value>
 				</div>
 			</div>
 		</div>

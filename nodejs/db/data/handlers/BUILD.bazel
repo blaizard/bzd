@@ -12,6 +12,7 @@ bzd_nodejs_library(
         ":expires",
         ":history",
         ":to_string",
+        ":unit",
         ":validation",
         "//nodejs/core:exception",
         "//nodejs/core:log",
@@ -23,6 +24,13 @@ bzd_nodejs_library(
     name = "expires",
     srcs = [
         "expires.js",
+    ],
+)
+
+bzd_nodejs_library(
+    name = "unit",
+    srcs = [
+        "unit.js",
     ],
 )
 
@@ -53,5 +61,6 @@ bzd_nodejs_library(
     deps = [
         "//nodejs/core:exception",
         "//nodejs/core:validation_schema",
+        "//nodejs/db/data:key_mapping",
     ],
 )

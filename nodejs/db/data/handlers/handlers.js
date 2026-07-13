@@ -2,6 +2,7 @@ import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import LogFactory from "#bzd/nodejs/core/log.js";
 import ToStringHandler from "#bzd/nodejs/db/data/handlers/to_string.js";
 import ExpiresHandler from "#bzd/nodejs/db/data/handlers/expires.js";
+import UnitHandler from "#bzd/nodejs/db/data/handlers/unit.js";
 import HistoryHandler from "#bzd/nodejs/db/data/handlers/history.js";
 import ValidationHandler from "#bzd/nodejs/db/data/handlers/validation.js";
 import KeyMapping from "#bzd/nodejs/db/data/key_mapping.js";
@@ -13,6 +14,7 @@ const sortedAvailableHandlers = [
 	["validation", ValidationHandler],
 	["toString", ToStringHandler],
 	["expires", ExpiresHandler],
+	["unit", UnitHandler],
 	["history", HistoryHandler],
 ];
 const availableHandlers = Object.fromEntries(sortedAvailableHandlers);
@@ -153,10 +155,12 @@ export default class Handlers {
 					break;
 				}
 				current = current[key];
-				const { handlers, root } = current[SPECIAL_KEY_FOR_HANDLERS] ?? { handlers: [], root: [] };
-				for (const handler of handlers) {
-					const range = new FragmentRange(fragments, index, root);
-					handler.process(range);
+				if (SPECIAL_KEY_FOR_HANDLERS in current) {
+					const { handlers, root } = current[SPECIAL_KEY_FOR_HANDLERS];
+					for (const handler of handlers) {
+						const range = new FragmentRange(fragments, index, root);
+						handler.process(range);
+					}
 				}
 			}
 		}

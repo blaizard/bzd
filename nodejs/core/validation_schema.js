@@ -19,6 +19,9 @@ export default class ValidationSchema {
 				maximum: {
 					type: "number",
 				},
+				unit: {
+					type: "string",
+				},
 				description: {
 					type: "string",
 				},
@@ -106,7 +109,7 @@ export default class ValidationSchema {
 		}
 	}
 
-	static validateSchema(values, schema, options) {
+	static validateSchema(values, schema, options = {}) {
 		const validate = (valuesToValidate, schemaToValidate, nested) => {
 			// Validate a single property, excluding anyOf, oneOf, allOf.
 			const validateProperty = (value, property, key) => {
@@ -122,7 +125,7 @@ export default class ValidationSchema {
 							if ("enum" in property) {
 								Exception.assert(
 									property.enum.includes(value),
-									"[key={}] expected on of: {}, not {:?}",
+									"[key={}] expected one of: {}, not {:?}",
 									key,
 									property.enum.join(", "),
 									value,
@@ -149,9 +152,9 @@ export default class ValidationSchema {
 							const additionalProperties = property.additionalProperties ?? true; // By default it is true.
 							Object.entries(value).forEach(([subKey, subValue]) => {
 								if (subKey in properties) {
-									validate(subValue, properties[subKey], key + "." + subKey);
+									validate(subValue, properties[subKey], [...key, subKey]);
 								} else if (isObject(additionalProperties)) {
-									validate(subValue, additionalProperties, key + "." + subKey);
+									validate(subValue, additionalProperties, [...key, subKey]);
 								}
 							});
 							if (property.required) {
@@ -179,11 +182,14 @@ export default class ValidationSchema {
 							Exception.assert(Array.isArray(value), "[key={}] expected type array, not {:?}", key, value);
 							if ("items" in property) {
 								value.forEach((item, index) => {
-									validate(item, property.items, key + "[" + index + "]");
+									validate(item, property.items, [...key, index]);
 								});
 							}
 							break;
 					}
+
+					// Call the visitor.
+					options.visitor && options.visitor(value, property, key);
 
 					return null;
 				} catch (e) {
@@ -213,10 +219,12 @@ export default class ValidationSchema {
 			}
 		};
 
-		validate(values, schema, "");
+		validate(values, schema, []);
 	}
 
-	validate(values, options) {
+	/// Options:
+	/// visitor: (value, property, key) => { ... }
+	validate(values, options = {}) {
 		ValidationSchema.validateSchema(values, this.schema, options);
 	}
 }

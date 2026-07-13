@@ -157,7 +157,8 @@
                 "items": {
                     "maximum": 1,
                     "minimum": 0,
-                    "type": "number"
+                    "type": "number",
+                    "unit": "%"
                 },
                 "type": "array"
             },
@@ -169,7 +170,8 @@
                 "items": {
                     "maximum": 1,
                     "minimum": 0,
-                    "type": "number"
+                    "type": "number",
+                    "unit": "%"
                 },
                 "type": "array"
             },
@@ -180,7 +182,8 @@
             "additionalProperties": {
                 "items": {
                     "minimum": 0,
-                    "type": "number"
+                    "type": "number",
+                    "unit": "Hz"
                 },
                 "type": "array"
             },
@@ -192,11 +195,13 @@
                 "properties": {
                     "total": {
                         "minimum": 0,
-                        "type": "number"
+                        "type": "number",
+                        "unit": "By"
                     },
                     "used": {
                         "minimum": 0,
-                        "type": "number"
+                        "type": "number",
+                        "unit": "By"
                     }
                 },
                 "type": "object"
@@ -209,7 +214,8 @@
                 "items": {
                     "maximum": 1,
                     "minimum": 0,
-                    "type": "number"
+                    "type": "number",
+                    "unit": "%"
                 },
                 "type": "array"
             },
@@ -221,16 +227,19 @@
                 "properties": {
                     "in": {
                         "minimum": 0,
-                        "type": "number"
+                        "type": "number",
+                        "unit": "By/s"
                     },
                     "out": {
                         "minimum": 0,
-                        "type": "number"
+                        "type": "number",
+                        "unit": "By/s"
                     },
                     "usage": {
                         "maximum": 1,
                         "minimum": 0,
-                        "type": "number"
+                        "type": "number",
+                        "unit": "%"
                     }
                 },
                 "type": "object"
@@ -243,11 +252,13 @@
                 "properties": {
                     "total": {
                         "minimum": 0,
-                        "type": "number"
+                        "type": "number",
+                        "unit": "By"
                     },
                     "used": {
                         "minimum": 0,
-                        "type": "number"
+                        "type": "number",
+                        "unit": "By"
                     }
                 },
                 "type": "object"
@@ -260,11 +271,13 @@
                 "properties": {
                     "in": {
                         "minimum": 0,
-                        "type": "number"
+                        "type": "number",
+                        "unit": "By/s"
                     },
                     "out": {
                         "minimum": 0,
-                        "type": "number"
+                        "type": "number",
+                        "unit": "By/s"
                     }
                 },
                 "type": "object"
@@ -275,7 +288,8 @@
         "/data/temperature": {
             "additionalProperties": {
                 "items": {
-                    "type": "number"
+                    "type": "number",
+                    "unit": "Cel"
                 },
                 "type": "array"
             },
@@ -285,7 +299,8 @@
         "/data/uptime": {
             "description": "System uptime in seconds.",
             "minimum": 0,
-            "type": "number"
+            "type": "number",
+            "unit": "s"
         }
     }
 }

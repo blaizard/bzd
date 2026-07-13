@@ -64,7 +64,7 @@ export default class Data {
 			this.storage[uid][internal] = {
 				expiresType: "auto",
 				expires: 60 * 1000,
-				metadata: {},
+				unit: undefined,
 				values: [],
 			};
 			this.tree.setDirty(uid);
@@ -288,17 +288,16 @@ export default class Data {
 
 		const valuesToResult = (key, internal, values) => {
 			const dataInternal = this.getDataInternal_(uid, internal);
-			const expiredTimestampMs = timestampMs() - dataInternal.expires;
 			if (metadata) {
-				let result = values.map(([t, v]) => {
-					return [t, v, t > expiredTimestampMs ? 1 : 0, {}];
-				});
-				if (result) {
+				let result = values.map(([t, v]) => [t, v]);
+				if (result.length > 0) {
 					// Metadata is only attached to the most recent entry.
-					result[0][3] = dataInternal.metadata;
+					result[0][2] = dataInternal.expires;
+					result[0][3] = dataInternal.unit;
 				}
 				return result;
 			}
+			const expiredTimestampMs = timestampMs() - dataInternal.expires;
 			return values
 				.filter(([t, _]) => {
 					return t > expiredTimestampMs;
@@ -401,16 +400,17 @@ export default class Data {
 					history: 10,
 					// The duration in ms until which an entry is considered expired.
 					expires: undefined,
-					// Metadata to be linked with this entry.
-					metadata: {},
+					// The unit associated with this entry, the unti is expected to be in UCUM format.
+					unit: undefined,
 				},
 				options,
 			);
 
 			const data = this.getDataInternal_(uid, KeyMapping.keyToInternal(key));
 
-			// Set the metadata.
-			data.metadata = config.metadata;
+			if (config.unit) {
+				data.unit = config.unit;
+			}
 
 			let index = 0;
 			if (data.values.length) {

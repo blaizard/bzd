@@ -3,13 +3,13 @@
 		<a v-if="enableViewAll" class="action" @click="setViewAll" v-tooltip="tooltipActionMore">+</a>
 		<a v-else-if="enableViewOriginal" class="action" @click="setViewOriginal" v-tooltip="tooltipActionLess">-</a>
 		<div class="value-grid" @click.stop="onClick">
-			<div v-for="([t, v, isValid], index) in valueDisplay" :class="classItem(isValid)">
+			<div v-for="([t, v], index) in valueDisplay" :class="classItem(!isExpired(t))">
 				<span class="timestamp">{{ timestampToString(t) }}</span
 				><span class="value">
 					<code class="json">{{ JSON.stringify(v) }}</code>
 				</span>
 				<span class="metadata">
-					{{ metadataToString(metadata, v, index == 0) }}
+					{{ metadataToString(v, index == 0) }}
 				</span>
 			</div>
 		</div>
@@ -29,6 +29,7 @@
 		props: {
 			value: { mandatory: true, type: Array },
 			view: { default: 1, type: Number },
+			timestamp: { mandatory: true, type: Number },
 		},
 		directives: {
 			tooltip: DirectiveTooltip,
@@ -43,7 +44,10 @@
 			metadata() {
 				// The most recent entry get the metadata
 				if (this.value) {
-					return this.value[0][3];
+					return {
+						expires: this.value[0][2],
+						unit: this.value[0][3],
+					};
 				}
 				return {};
 			},
@@ -91,47 +95,63 @@
 			onClick() {
 				this.$emit("select");
 			},
-			metadataToString(metadata, value, isNewest) {
-				const formatterFromUnit = (unit) => {
-					if (unit === undefined) {
-						return (_) => undefined;
-					}
-					let formatter = (value) => JSON.stringify(value) + metadata.unit;
-					switch (metadata.unit) {
-						case "bytes":
-							formatter = bytesToString;
-							break;
-						case "seconds":
-							formatter = timeToString;
-							break;
-						case "percent":
-							formatter = (value) => (value * 100).toFixed(1) + "%";
-							break;
-					}
-					// There is a unit, the data must be a number then.
-					return (value) => {
-						if (typeof value !== "number") {
-							return undefined;
-						}
-						return formatter(value);
-					};
-				};
-				const formatter = formatterFromUnit(metadata.unit);
-
-				let entries = [];
-				const formattedValue = formatter(value);
-				if (formattedValue) {
-					entries.push(formattedValue);
+			isExpired(timestamp) {
+				if (this.metadata.expires) {
+					return this.timestamp > timestamp + this.metadata.expires;
 				}
-				if (isNewest) {
-					for (const [key, value] of Object.entries(metadata)) {
-						if (key == "unit") {
-							continue;
+				return false;
+			},
+			valueFormatted(value, unit) {
+				const processIfTypeof = (expectedTypeof, callable, value) => {
+					if (typeof value === expectedTypeof) {
+						return callable(value);
+					}
+					return undefined;
+				};
+				const formatter = (value) => {
+					if (!unit) {
+						return undefined;
+					}
+					switch (unit) {
+						case "By":
+							return processIfTypeof("number", bytesToString, value);
+						case "s":
+							return processIfTypeof("number", timeToString, value);
+						case "Cel":
+							return processIfTypeof("number", (value) => value + "°C", value);
+						case "%":
+							return processIfTypeof("number", (value) => (value * 100).toFixed(1) + "%", value);
+					}
+					return undefined;
+				};
+				let entries = [];
+				if (Array.isArray(value)) {
+					if (value.length == 1 && unit) {
+						return [formatter(value[0]) ?? unit];
+					} else if (value.length > 1) {
+						try {
+							const min = Math.min(...value);
+							const max = Math.max(...value);
+							const mean = value.reduce((acc, val) => acc + val, 0) / value.length;
+							return [
+								"mean: " + (formatter(mean) ?? mean),
+								"min: " + (formatter(min) ?? min),
+								"max: " + (formatter(max) ?? max),
+							];
+						} catch (e) {
+							// ignore.
 						}
-						const valueStr = ["max", "min", "avg", "mean"].includes(key)
-							? (formatter(value) ?? JSON.stringify(value))
-							: JSON.stringify(value);
-						entries.push(key + ": " + valueStr);
+					}
+				} else if (unit) {
+					return [formatter(value) ?? unit];
+				}
+				return [];
+			},
+			metadataToString(value, isNewest) {
+				let entries = [...this.valueFormatted(value, this.metadata.unit)];
+				if (isNewest) {
+					if (this.metadata.expires) {
+						entries.push("expires: " + timeToString(this.metadata.expires / 1000));
 					}
 				}
 				return entries.join(", ");
