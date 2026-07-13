@@ -27,7 +27,7 @@ def bzd_oci_image_from_binary(name, binary, base = Label("@oci_minimal"), layers
             "/.bzd_oci_binary_bootstrap",
         ],
         tars = [
-            "{}.package.tgz".format(name),
+            "{}.package".format(name),
         ],
         base = base,
         **kwargs
