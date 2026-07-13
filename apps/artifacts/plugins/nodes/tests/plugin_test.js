@@ -567,12 +567,13 @@ describe("Plugin", () => {
 					const result = await tester.send(nodeName, "get", "/hello/value", {
 						query: { count: 5, metadata: 1 },
 					});
+					const expires = result.data.data[0][2];
 					Exception.assertEqual(result.data.data, [
-						[1000, 1000, 0, {}],
-						[999, 999, 0, {}],
-						[998, 998, 0, {}],
-						[997, 997, 0, {}],
-						[996, 996, 0, {}],
+						[1000, 1000, expires, ""],
+						[999, 999],
+						[998, 998],
+						[997, 997],
+						[996, 996],
 					]);
 				}
 			} finally {

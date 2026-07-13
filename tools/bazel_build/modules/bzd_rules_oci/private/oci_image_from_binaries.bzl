@@ -9,7 +9,7 @@ load("//:private/oci_image.bzl", "bzd_oci_image")
 def bzd_oci_image_from_binaries(name, binaries, base = Label("@oci_minimal"), layers = None, **kwargs):
     bzd_bundle_tar(
         name = "{}.package".format(name),
-        output = "{}.package.tar".format(name),
+        output = "{}.package.tgz".format(name),
         compression = "gz",
         root_symlinks = binaries,
         include_runfiles = True,
@@ -21,7 +21,7 @@ def bzd_oci_image_from_binaries(name, binaries, base = Label("@oci_minimal"), la
     bzd_oci_image(
         name = name,
         tars = [
-            "{}.package.tar".format(name),
+            "{}.package.tgz".format(name),
         ],
         base = base,
         **kwargs
