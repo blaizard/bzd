@@ -1,0 +1,10 @@
+load("//apps/external:defs.bzl", "bzd_oci_binary")
+
+bzd_oci_binary(
+    name = "searxng",
+    data = [
+        ":settings.yml",
+    ],
+    docker_compose = ":docker-compose.yml",
+    visibility = ["//visibility:public"],
+)
