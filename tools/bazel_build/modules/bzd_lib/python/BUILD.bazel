@@ -1,6 +1,6 @@
 load("@rules_python//python:pip.bzl", "compile_pip_requirements")
 
-# bazel run @bzd_lib//python:requirements.update
+# mkdir -p temp && cp tools/bazel_build/modules/bzd_lib/python/BUILD.bazel tools/bazel_build/modules/bzd_lib/python/requirements.* temp && bazel run //temp:requirements.update && cp temp/requirements.txt tools/bazel_build/modules/bzd_lib/python/requirements.txt && rm -rfd temp/
 compile_pip_requirements(
     name = "requirements",
     timeout = "long",

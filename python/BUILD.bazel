@@ -11,6 +11,7 @@ doc_library(
     visibility = ["//visibility:public"],
 )
 
+# mkdir -p temp && cp python/BUILD.bazel python/requirements.* temp && bazel run //temp:requirements.update && cp temp/requirements.txt python/requirements.txt && rm -rfd temp/
 compile_pip_requirements(
     name = "requirements",
     timeout = "long",

@@ -12,7 +12,7 @@ bazel_dep(name = "platforms", version = "1.0.0")
 pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
 pip.parse(
     hub_name = "bzd_lib_pip",
-    python_version = "3.12",
+    python_version = "3.13",
     requirements_lock = "//python:requirements.txt",
 )
 use_repo(pip, pip = "bzd_lib_pip")

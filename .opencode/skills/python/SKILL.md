@@ -6,7 +6,7 @@ compatibility: opencode
 
 ## Overview
 
-- **Python version**: 3.12 everywhere (toolchain, pip hubs, mypy, type stubs)
+- **Python version**: 3.13 everywhere (toolchain, pip hubs, mypy, type stubs)
 - **Build system**: Bazel with `rules_python` (hermetic interpreter — never invoke system `python3` or `pip` directly)
 - **Type checker**: mypy (run via Bazel aspect `--config=mypy`)
 - **Formatter/Linter**: ruff (run via sanitizer)
@@ -26,7 +26,7 @@ compatibility: opencode
 | `python/requirements.txt`       | Locked pip deps for `bzd_python` (auto-generated, do NOT edit manually)            |
 | `tools/python/requirements.in`  | Direct pip deps for root workspace apps/tools — edit this to add deps              |
 | `tools/python/requirements.txt` | Locked pip deps for root workspace (auto-generated, do NOT edit manually)          |
-| `tools/python/pyproject.toml`   | Config for mypy, yapf, ruff (Python 3.12, tabs, 120-col limit)                     |
+| `tools/python/pyproject.toml`   | Config for mypy, yapf, ruff (tabs, 120-col limit)                                  |
 | `tools/python/BUILD.bazel`      | Bazel targets for mypy, ruff, yapf, codespell binaries                             |
 
 ### Two pip hubs
@@ -77,9 +77,6 @@ mypy runs as a Bazel build **aspect** — not a standalone command.
 
 **mypy settings** (from `tools/python/pyproject.toml`):
 
-- `python_version = "3.12"`
-- Invoked with `--strict --explicit-package-bases --pretty --show-error-context`
-- Third-party pip package deps are automatically silenced (`follow_imports = silent`)
 - To skip mypy on a specific target, add the tag `"mypy-ignore"` in its `BUILD.bazel` entry
 
 **Type hints are mandatory** on all function signatures.
