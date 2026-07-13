@@ -181,7 +181,7 @@ class Cancellation:
 		except ProcessLookupError:
 			return
 		if not Cancellation.killall(gid, sig, proc=self.proc, timeoutS=timeoutS):
-			Cancellation.killall(gid, signal.SIGKILL, proc=self.proc, timeoutS=timeoutS)
+			Cancellation.killall(gid, signal.SIGKILL, proc=self.proc)
 
 
 def localCommand(
