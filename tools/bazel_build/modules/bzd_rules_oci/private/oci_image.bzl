@@ -2,6 +2,7 @@
 
 load("@bzd_lib//lib:attrs.bzl", "ATTRS_COMMON_BUILD_RULES", "attrs_assert_any_of")
 load("@rules_oci//oci:defs.bzl", "oci_image")
+load("//:private/oci_load.bzl", "bzd_oci_load")
 
 def bzd_oci_image(name, base = None, cmd = None, workdir = None, env = None, tars = None, entrypoint = None, tags = None, **kwargs):
     """Build a container image.
@@ -30,4 +31,13 @@ def bzd_oci_image(name, base = None, cmd = None, workdir = None, env = None, tar
         entrypoint = entrypoint,
         tags = (tags or []),
         **kwargs
+    )
+
+    # Helper to load the image locally.
+    bzd_oci_load(
+        name = "{}.load".format(name),
+        image = name,
+        remote_tags = ["latest"],
+        repository = "local/{}".format(name),
+        tags = ["manual"],
     )

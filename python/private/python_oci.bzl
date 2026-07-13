@@ -1,6 +1,6 @@
 """Rules for NodeJs Docker."""
 
-load("@bzd_rules_oci//:defs.bzl", "bzd_oci_binary")
+load("@bzd_rules_oci//:defs.bzl", "bzd_oci_image_from_binary")
 load("//private:python_hermetic_binary.bzl", "bzd_python_hermetic_launcher")
 
 def bzd_python_oci(name, binary, env = None, **kwargs):
@@ -18,7 +18,7 @@ def bzd_python_oci(name, binary, env = None, **kwargs):
         binary = binary,
     )
 
-    bzd_oci_binary(
+    bzd_oci_image_from_binary(
         name = name,
         binary = "{}.hermetic".format(name),
         env = {

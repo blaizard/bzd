@@ -1,5 +1,5 @@
 load("@bzd_python//:defs.bzl", "bzd_python_hermetic_launcher")
-load("@bzd_rules_oci//:defs.bzl", "bzd_oci_binaries")
+load("@bzd_rules_oci//:defs.bzl", "bzd_oci_image_from_binaries")
 
 bzd_python_hermetic_launcher(
     name = "client",
@@ -7,7 +7,7 @@ bzd_python_hermetic_launcher(
     libc = "musl",
 )
 
-bzd_oci_binaries(
+bzd_oci_image_from_binaries(
     name = "node_manager_client_runner_image",
     base = "@oci_gitea_act_runner",
     binaries = {
