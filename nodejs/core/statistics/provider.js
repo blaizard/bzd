@@ -22,9 +22,7 @@ class ProcessorRates {
 		this.rateMax = Math.max(this.rateMax, rate);
 		this.rateMean = rateMean;
 		this.rateCounter += this.current;
-		provider.set("rate", rate, {
-			metadata: { unit: "t/s", mean: this.rateMean, max: this.rateMax, counter: this.rateCounter },
-		});
+		provider.set("rate", rate, { unit: "t/s" });
 
 		this.current = 0;
 	}
@@ -116,7 +114,7 @@ export default class Provider {
 		try {
 			await callback();
 		} finally {
-			this._insert([name, "duration"], (performance.now() - start) / 1000, { metadata: { unit: "seconds" } });
+			this._insert([name, "duration"], (performance.now() - start) / 1000, { unit: "s" });
 		}
 	}
 
@@ -127,7 +125,7 @@ export default class Provider {
 
 	/// Set a size point to the existing points.
 	size(name, value) {
-		this._insert([name], value, { metadata: { unit: "bytes" } });
+		this._insert([name], value, { unit: "By" });
 	}
 
 	/// Add a value point to the existing points.
