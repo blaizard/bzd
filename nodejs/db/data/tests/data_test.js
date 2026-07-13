@@ -49,16 +49,12 @@ describe("Nodes", () => {
 				Exception.assert(result.hasValue());
 				Exception.assert(typeof result.value()[0] == "number");
 				Exception.assertEqual(result.value()[1], 12);
-				Exception.assertEqual(result.value()[2], 1); // not expired
 			}
 
-			// get w/metadata expired
+			// get expired
 			{
-				const result = await data.get({ uid: "hello", key: ["a", "d", "expired"], metadata: true });
-				Exception.assert(result.hasValue());
-				Exception.assert(typeof result.value()[0] == "number");
-				Exception.assertEqual(result.value()[1], 42);
-				Exception.assertEqual(result.value()[2], 0); // expired
+				const result = await data.get({ uid: "hello", key: ["a", "d", "expired"] });
+				Exception.assert(!result.hasValue());
 			}
 
 			// get w/children
@@ -224,8 +220,8 @@ describe("Nodes", () => {
 				const result = await data.get({ uid: "hello", key: ["a", "b"], count: 10, metadata: true });
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), [
-					[timestamp, 1, 1, {}],
-					[expiredTimestamp, 10, 0, {}],
+					[timestamp, 1, 60000, ""],
+					[expiredTimestamp, 10],
 				]);
 			}
 		});

@@ -64,7 +64,7 @@ export default class Data {
 			this.storage[uid][internal] = {
 				expiresType: "auto",
 				expires: 60 * 1000,
-				unit: undefined,
+				unit: "",
 				values: [],
 			};
 			this.tree.setDirty(uid);
