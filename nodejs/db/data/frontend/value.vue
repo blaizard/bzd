@@ -17,7 +17,7 @@
 </template>
 
 <script>
-	import { dateToString, bytesToString, timeToString } from "#bzd/nodejs/utils/to_string.js";
+	import { dateToString, bytesToString, timeToString, frequencyToString } from "#bzd/nodejs/utils/to_string.js";
 	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.js";
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
 	import ExceptionFactory from "#bzd/nodejs/core/exception.js";
@@ -102,9 +102,9 @@
 				return false;
 			},
 			valueFormatted(value, unit) {
-				const processIfTypeof = (expectedTypeof, callable, value) => {
+				const processIfTypeof = (expectedTypeof, callable, value, postfix) => {
 					if (typeof value === expectedTypeof) {
-						return callable(value);
+						return callable(value) + postfix;
 					}
 					return undefined;
 				};
@@ -112,15 +112,20 @@
 					if (!unit) {
 						return undefined;
 					}
-					switch (unit) {
+					// Pretty print UCUM format units.
+					const [baseUnit, ...rest] = unit.split("/");
+					const postfix = (rest.length ? "/" : "") + rest.join("/");
+					switch (baseUnit) {
 						case "By":
-							return processIfTypeof("number", bytesToString, value);
+							return processIfTypeof("number", bytesToString, value, postfix);
 						case "s":
-							return processIfTypeof("number", timeToString, value);
+							return processIfTypeof("number", timeToString, value, postfix);
+						case "Hz":
+							return processIfTypeof("number", frequencyToString, value, postfix);
 						case "Cel":
-							return processIfTypeof("number", (value) => value + "°C", value);
+							return processIfTypeof("number", (value) => value + "°C", value, postfix);
 						case "%":
-							return processIfTypeof("number", (value) => (value * 100).toFixed(1) + "%", value);
+							return processIfTypeof("number", (value) => (value * 100).toFixed(1) + "%", value, postfix);
 					}
 					return undefined;
 				};
