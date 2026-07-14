@@ -9,3 +9,13 @@ bzd_nodejs_test(
         "//nodejs/utils:array",
     ],
 )
+
+bzd_nodejs_test(
+    name = "to_string",
+    srcs = ["to_string_test.js"],
+    main = "to_string_test.js",
+    deps = [
+        "//nodejs/core:exception",
+        "//nodejs/utils:to_string",
+    ],
+)

@@ -17,7 +17,7 @@
 </template>
 
 <script>
-	import { dateToString, bytesToString, timeToString, frequencyToString } from "#bzd/nodejs/utils/to_string.js";
+	import { dateToString, timeToString, UCUMToString } from "#bzd/nodejs/utils/to_string.js";
 	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.js";
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
 	import ExceptionFactory from "#bzd/nodejs/core/exception.js";
@@ -109,25 +109,10 @@
 					return undefined;
 				};
 				const formatter = (value) => {
-					if (!unit) {
+					if (!unit || typeof value != "number") {
 						return undefined;
 					}
-					// Pretty print UCUM format units.
-					const [baseUnit, ...rest] = unit.split("/");
-					const postfix = (rest.length ? "/" : "") + rest.join("/");
-					switch (baseUnit) {
-						case "By":
-							return processIfTypeof("number", bytesToString, value, postfix);
-						case "s":
-							return processIfTypeof("number", timeToString, value, postfix);
-						case "Hz":
-							return processIfTypeof("number", frequencyToString, value, postfix);
-						case "Cel":
-							return processIfTypeof("number", (value) => value + "°C", value, postfix);
-						case "%":
-							return processIfTypeof("number", (value) => (value * 100).toFixed(1) + "%", value, postfix);
-					}
-					return undefined;
+					return UCUMToString(unit, value);
 				};
 				let entries = [];
 				if (Array.isArray(value)) {
@@ -136,13 +121,16 @@
 					} else if (value.length > 1) {
 						try {
 							const min = Math.min(...value);
-							const max = Math.max(...value);
-							const mean = value.reduce((acc, val) => acc + val, 0) / value.length;
-							return [
-								"mean: " + (formatter(mean) ?? mean),
-								"min: " + (formatter(min) ?? min),
-								"max: " + (formatter(max) ?? max),
-							];
+							if (min !== NaN) {
+								const max = Math.max(...value);
+								const mean = value.reduce((acc, val) => acc + val, 0) / value.length;
+								Exception.assert();
+								return [
+									"mean: " + (formatter(mean) ?? mean),
+									"min: " + (formatter(min) ?? min),
+									"max: " + (formatter(max) ?? max),
+								];
+							}
 						} catch (e) {
 							// ignore.
 						}

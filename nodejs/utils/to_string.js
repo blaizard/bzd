@@ -39,36 +39,110 @@ function _unitsToString(unitList, value, startIndex = 0, maxNbUnits = 1, decimal
 	return output.join(" ");
 }
 
-export function bytesToString(value, decimalPoints = 1) {
-	return _unitsToString(
-		[
-			["B", "B", 1024],
-			["KiB", "KiB", 1024],
-			["MiB", "MiB", 1024],
-			["GiB", "GiB", 1024],
-			["TiB", "TiB", 1024],
+export class UnitToString {
+	static presetMetrics = {
+		prefixes: {
+			y: 0,
+			z: 1,
+			a: 2,
+			f: 3,
+			p: 4,
+			n: 5,
+			u: 6,
+			m: 7,
+			c: 8,
+			d: 9,
+			"": 10,
+			da: 11,
+			h: 12,
+			k: 13,
+			M: 14,
+			G: 15,
+			T: 16,
+			P: 17,
+			E: 18,
+			Z: 19,
+			Y: 20,
+		},
+		unitList: [
+			["y", "y", 1000],
+			["z", "z", 1000],
+			["a", "a", 1000],
+			["f", "f", 1000],
+			["p", "p", 1000],
+			["n", "n", 1000],
+			["μ", "μ", 1000],
+			["m", "m", 10],
+			["c", "c", 10],
+			["d", "d", 10],
+			["", "", 10],
+			["da", "da", 10],
+			["h", "h", 10],
+			["k", "k", 1000],
+			["M", "M", 1000],
+			["G", "G", 1000],
+			["T", "T", 1000],
+			["P", "P", 1000],
+			["E", "E", 1000],
+			["Z", "Z", 1000],
+			["Y", "Y", 1000],
 		],
-		value,
-		/*startIndex*/ 0,
-		/*maxNbUnits*/ 1,
-		decimalPoints,
-	);
+	};
+	static presetMetricsNo10Forward = {
+		prefixes: {
+			"": 0,
+			k: 1,
+			M: 2,
+			G: 3,
+			T: 4,
+			P: 5,
+			E: 6,
+			Z: 7,
+			Y: 8,
+		},
+		unitList: [
+			["", "", 1000],
+			["k", "k", 1000],
+			["M", "M", 1000],
+			["G", "G", 1000],
+			["T", "T", 1000],
+			["P", "P", 1000],
+			["E", "E", 1000],
+			["Z", "Z", 1000],
+			["Y", "Y", 1000],
+		],
+	};
+	static presetBinary = {
+		prefixes: {
+			"": 0,
+			Ki: 1,
+			Mi: 2,
+			Gi: 3,
+			Ti: 4,
+		},
+		unitList: [
+			["", "", 1024],
+			["Ki", "Ki", 1024],
+			["Mi", "Mi", 1024],
+			["Gi", "Gi", 1024],
+			["Ti", "Ti", 1024],
+		],
+	};
+	static factory(value, prefix, unit, preset, decimalPoints = 1) {
+		if (!(prefix in preset.prefixes)) {
+			throw new Exception("Invalid metric unit prefix " + prefix);
+		}
+		const startIndex = preset.prefixes[prefix];
+		return _unitsToString(preset.unitList, value, startIndex, /*maxNbUnits*/ 1, decimalPoints) + unit;
+	}
 }
 
 export function frequencyToString(value, decimalPoints = 1) {
-	return _unitsToString(
-		[
-			["Hz", "Hz", 1000],
-			["KHz", "KHz", 1000],
-			["MHz", "MHz", 1000],
-			["GHz", "GHz", 1000],
-			["THz", "THz", 1000],
-		],
-		value,
-		/*startIndex*/ 0,
-		/*maxNbUnits*/ 1,
-		decimalPoints,
-	);
+	return UnitToString.factory(value, "", "Hz", UnitToString.presetMetricsNo10Forward, decimalPoints);
+}
+
+export function bytesToString(value, decimalPoints = 1) {
+	return UnitToString.factory(value, "", "B", UnitToString.presetBinary, decimalPoints);
 }
 
 /// Convert a time in seconds into a string.
@@ -109,4 +183,25 @@ export function dateToDefaultString(timestamp) {
 
 export function capitalize(string) {
 	return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+// Convert a value using the UCUM format units.
+export function UCUMToString(unit, value, defaultValue = undefined) {
+	const [baseUnit, ...rest] = unit.split("/");
+	const postfix = (rest.length ? "/" : "") + rest.join("/");
+
+	switch (baseUnit) {
+		case "By":
+			return bytesToString(value) + postfix;
+		case "s":
+			return timeToString(value) + postfix;
+		case "Hz":
+			return frequencyToString(value) + postfix;
+		case "Cel":
+			return value + "°C" + postfix;
+		case "%":
+			return (value * 100).toFixed(1) + "%" + postfix;
+	}
+
+	return defaultValue;
 }
