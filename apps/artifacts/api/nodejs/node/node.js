@@ -2,6 +2,7 @@ import config from "#bzd/apps/artifacts/api/config.json" with { type: "json" };
 import { HttpClient } from "#bzd/nodejs/core/http/client.js";
 import { CollectionPaging } from "#bzd/nodejs/db/utils.js";
 import { timestampMs } from "#bzd/nodejs/utils/timestamp.js";
+import Utils from "#bzd/apps/artifacts/common/utils.js";
 
 export class Node {
 	/// List all nodes from a remote.
