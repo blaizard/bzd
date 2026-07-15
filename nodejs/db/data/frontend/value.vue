@@ -112,7 +112,7 @@
 					if (!unit || typeof value != "number") {
 						return undefined;
 					}
-					return UCUMToString(unit, value);
+					return UCUMToString(value, unit);
 				};
 				let entries = [];
 				if (Array.isArray(value)) {

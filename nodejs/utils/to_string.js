@@ -1,4 +1,7 @@
 import Format from "../core/format.js";
+import ExceptionFactory from "#bzd/nodejs/core/exception.js";
+
+const Exception = ExceptionFactory("to_string");
 
 /// Formats a raw numeric value into a human-readable string using a hierarchical list of units.
 ///
@@ -39,8 +42,8 @@ function _unitsToString(unitList, value, startIndex = 0, maxNbUnits = 1, decimal
 	return output.join(" ");
 }
 
-export class UnitToString {
-	static presetMetrics = {
+export class UnitToStringFactory {
+	static presetUCUMMetrics = {
 		prefixes: {
 			y: 0,
 			z: 1,
@@ -88,7 +91,7 @@ export class UnitToString {
 			["Y", "Y", 1000],
 		],
 	};
-	static presetMetricsNo10Forward = {
+	static presetUCUMMetricsNo10Forward = {
 		prefixes: {
 			"": 0,
 			k: 1,
@@ -112,7 +115,7 @@ export class UnitToString {
 			["Y", "Y", 1000],
 		],
 	};
-	static presetBinary = {
+	static presetUCUMBinary = {
 		prefixes: {
 			"": 0,
 			Ki: 1,
@@ -128,40 +131,102 @@ export class UnitToString {
 			["Ti", "Ti", 1024],
 		],
 	};
-	static factory(value, prefix, unit, preset, decimalPoints = 1) {
-		if (!(prefix in preset.prefixes)) {
-			throw new Exception("Invalid metric unit prefix " + prefix);
-		}
+	static makeFromPreset(value, prefix, unit, preset, decimalPoints = 1) {
+		Exception.assert(prefix in preset.prefixes, "Invalid metric unit prefix '{}'.", prefix);
 		const startIndex = preset.prefixes[prefix];
 		return _unitsToString(preset.unitList, value, startIndex, /*maxNbUnits*/ 1, decimalPoints) + unit;
 	}
+	static makeFormatterDictionary(schema) {
+		const unitList = schema.map(([_, display]) => display);
+		return Object.fromEntries(
+			schema.map(([unit, _], index) => [
+				unit,
+				(value, decimalPoints = 1) => _unitsToString(unitList, value, index, /*maxNbUnits*/ 1, decimalPoints),
+			]),
+		);
+	}
+	static makePostFormatter(postProcess) {
+		return (value, decimalPoints) => postProcess(value.toFixed(decimalPoints));
+	}
+	static makePreFormatter(preProcess) {
+		return (value, decimalPoints) => preProcess(value).toFixed(decimalPoints);
+	}
+	static makeFormatter(preProcess, postProcess) {
+		return (value, decimalPoints) => postProcess(preProcess(value).toFixed(decimalPoints));
+	}
+}
+
+const UCUMToFormatter = Object.assign(
+	{
+		Cel: UnitToStringFactory.makePostFormatter((value) => value + "°C"),
+		"%": UnitToStringFactory.makeFormatter(
+			(value) => value * 100,
+			(value) => value + "%",
+		),
+	},
+	UnitToStringFactory.makeFormatterDictionary([
+		["ys", ["ys", "ys", 1000]],
+		["zs", ["zs", "zs", 1000]],
+		["as", ["as", "as", 1000]],
+		["fs", ["fs", "fs", 1000]],
+		["ps", ["ps", "ps", 1000]],
+		["ns", ["ns", "ns", 1000]],
+		["us", ["μs", "μs", 1000]],
+		["ms", ["ms", "ms", 1000]],
+		["s", ["s", "s", 60]],
+		["min", ["min", "min", 60]],
+		["h", ["h", "h", 24]],
+		["d", [" day", " days", 1]],
+	]),
+);
+const UCUMToPresets = {
+	Hz: UnitToStringFactory.presetUCUMMetricsNo10Forward,
+	By: Object.assign({ unit: "B" }, UnitToStringFactory.presetUCUMBinary),
+	g: UnitToStringFactory.presetUCUMMetrics,
+};
+const maxUCUMToPresetsLength = Math.max(...Object.keys(UCUMToPresets).map((unit) => unit.length));
+
+/// Convert a value using the UCUM format units.
+export function UCUMToString(value, unit, defaultValue = undefined, decimalPoints = 1) {
+	if (unit in UCUMToFormatter) {
+		return UCUMToFormatter[unit](value, decimalPoints);
+	}
+
+	const [baseUnitWithPrefix, ...rest] = unit.split("/");
+	const postfix = (rest.length ? "/" : "") + rest.join("/");
+
+	// Determine which unit it is.
+	for (let nbChars = 1; nbChars <= Math.min(maxUCUMToPresetsLength, baseUnitWithPrefix.length); ++nbChars) {
+		const potentialUnit = baseUnitWithPrefix.slice(-nbChars);
+		if (potentialUnit in UCUMToPresets) {
+			const potentialPrefix = baseUnitWithPrefix.slice(0, -nbChars);
+			const preset = UCUMToPresets[potentialUnit];
+			if (potentialPrefix in preset.prefixes) {
+				return UnitToStringFactory.makeFromPreset(
+					value,
+					potentialPrefix,
+					preset.unit ?? potentialUnit,
+					preset,
+					decimalPoints,
+				);
+			}
+		}
+	}
+
+	return defaultValue;
 }
 
 export function frequencyToString(value, decimalPoints = 1) {
-	return UnitToString.factory(value, "", "Hz", UnitToString.presetMetricsNo10Forward, decimalPoints);
+	return UnitToStringFactory.makeFromPreset(value, "", "Hz", UCUMToPresets["Hz"], decimalPoints);
 }
 
 export function bytesToString(value, decimalPoints = 1) {
-	return UnitToString.factory(value, "", "B", UnitToString.presetBinary, decimalPoints);
+	return UnitToStringFactory.makeFromPreset(value, "", "B", UCUMToPresets["By"], decimalPoints);
 }
 
 /// Convert a time in seconds into a string.
-export function timeToString(value, maxNbUnits = 1) {
-	return _unitsToString(
-		[
-			["ns", "ns", 1000],
-			["µs", "µs", 1000],
-			["ms", "ms", 1000],
-			["s", "s", 60],
-			[" min", " min", 60],
-			["h", "h", 24],
-			[" day", " days", 1],
-		],
-		value,
-		/*startIndex*/ 3,
-		maxNbUnits,
-		/*decimalPoints*/ 0,
-	);
+export function timeToString(value, decimalPoints = 1) {
+	return UCUMToFormatter["s"](value, decimalPoints);
 }
 
 export function dateToString(format, timestamp) {
@@ -183,25 +248,4 @@ export function dateToDefaultString(timestamp) {
 
 export function capitalize(string) {
 	return string.charAt(0).toUpperCase() + string.slice(1);
-}
-
-// Convert a value using the UCUM format units.
-export function UCUMToString(unit, value, defaultValue = undefined) {
-	const [baseUnit, ...rest] = unit.split("/");
-	const postfix = (rest.length ? "/" : "") + rest.join("/");
-
-	switch (baseUnit) {
-		case "By":
-			return bytesToString(value) + postfix;
-		case "s":
-			return timeToString(value) + postfix;
-		case "Hz":
-			return frequencyToString(value) + postfix;
-		case "Cel":
-			return value + "°C" + postfix;
-		case "%":
-			return (value * 100).toFixed(1) + "%" + postfix;
-	}
-
-	return defaultValue;
 }
