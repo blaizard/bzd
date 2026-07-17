@@ -47,7 +47,9 @@ bzd_nodejs_library(
         ":provider",
         "//nodejs/core:exception",
         "//nodejs/core:log",
+        "//nodejs/core/services",
         "//nodejs/db/data",
         "//nodejs/db/data/backend:handler",
+        "//nodejs/utils:timestamp",
     ],
 )

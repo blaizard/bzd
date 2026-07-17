@@ -421,8 +421,10 @@ export default class Data {
 				// If there is already data and the espiration is set as "auto".
 				else if (data.expiresType == "auto") {
 					// Estimate the rate and estimate the expiration rate.
-					const expiresEstimate = (timestamp - data.values[0][0]) * 3;
-					data.expires = 0.4 * data.expires + 0.6 * expiresEstimate;
+					// The expiration is rounded to avoid long floats when send via HTTP,
+					// the value is minimum 1s (as it doesn't make sense to have it 0 or a lower granularity.
+					const expiresEstimate = ((timestamp - data.values[0][0]) * 3) / 1000;
+					data.expires = Math.round(0.4 * data.expires + 0.6 * expiresEstimate) || 1;
 				}
 			}
 

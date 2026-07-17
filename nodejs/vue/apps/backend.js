@@ -234,6 +234,9 @@ export default class Backend {
 			if (this.instances.cache) {
 				this.instances.services.register(this.instances.cache.serviceGarbageCollector("cache"), "backend");
 			}
+			if (this.instances.statistics) {
+				this.instances.services.register(this.instances.statistics.serviceSync("statistics"), "backend");
+			}
 		}
 
 		if (this.instances.statistics) {

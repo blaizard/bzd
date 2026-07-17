@@ -3,6 +3,9 @@ import LogFactory from "#bzd/nodejs/core/log.js";
 import Provider from "#bzd/nodejs/core/statistics/provider.js";
 import Data from "#bzd/nodejs/db/data/data.js";
 import { handleDataGet } from "#bzd/nodejs/db/data/backend/handler.js";
+import ServiceProvider from "#bzd/nodejs/core/services/provider.js";
+import Services from "#bzd/nodejs/core/services/services.js";
+import { timestampMs } from "#bzd/nodejs/utils/timestamp.js";
 
 const Exception = ExceptionFactory("statistics");
 const Log = LogFactory("statistics");
@@ -39,6 +42,29 @@ export default class Statistics {
 		api.handle("get", "/admin/statistics", async function (context) {
 			await handleDataGet(this, data, "statistics", []);
 		});
+	}
+
+	serviceSync(...namespaces) {
+		const provider = new ServiceProvider(...namespaces);
+		let lastTimestamp = 0;
+		provider.addTimeTriggeredProcess(
+			"statistics.sync",
+			async (options) => {
+				const result = await this.data.get({
+					uid: "statistics",
+					key: [],
+					metadata: true,
+					children: 99,
+					after: lastTimestamp,
+				});
+				lastTimestamp = timestampMs();
+			},
+			{
+				policy: Services.Policy.throw,
+				periodS: 5,
+			},
+		);
+		return provider;
 	}
 
 	/// Starting statistics.
