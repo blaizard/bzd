@@ -18,22 +18,16 @@ export default class ProviderProcess extends Provider {
 			const currentELU = performance.eventLoopUtilization();
 			const eluDiff = performance.eventLoopUtilization(currentELU, this.lastELU);
 			this.lastELU = currentELU;
-
-			// Save the current snapshot as the baseline for the next interval tick.
-			this.set("cpu.eventloop", eluDiff.utilization, { metadata: { unit: "percent" } });
-
 			const memoryUsage = process.memoryUsage();
-			this.size("memory.rss.used", memoryUsage.rss);
-			this.size("memory.heap.total", memoryUsage.heapTotal);
-			this.size("memory.heap.used", memoryUsage.heapUsed);
 
-			// Note: This is a semi-private API, but universally used in the Node ecosystem.
-			const activeHandles = process._getActiveHandles().length;
-			this.set("health.handles", activeHandles);
+			this.set(["cpu", "eventloop"], [eluDiff.utilization], { unit: "%" })
+				.size(["memory", "rss", "used"], memoryUsage.rss)
+				.size(["memory", "heap", "total"], memoryUsage.heapTotal)
+				.size(["memory", "heap", "used"], memoryUsage.heapUsed)
+				.set("health.handles", process._getActiveHandles().length)
+				.set("health.eventloop.delay.max", this.histogram.max / 1e9, { unit: "s" })
+				.set("health.eventloop.delay.mean", this.histogram.mean / 1e9, { unit: "s" });
 
-			// Convert nanoseconds to seconds.
-			this.set("health.eventloop.delay.max", this.histogram.max / 1e9, { metadata: { unit: "seconds" } });
-			this.set("health.eventloop.delay.mean", this.histogram.mean / 1e9, { metadata: { unit: "seconds" } });
 			this.histogram.reset();
 		}, 1000);
 	}

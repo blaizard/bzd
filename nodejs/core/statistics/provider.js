@@ -2,7 +2,7 @@ import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 
 const Exception = ExceptionFactory("statistics");
 
-/// Processor for a rate.
+/// Processor for computing rate statistics (current, mean, max).
 class ProcessorRates {
 	constructor(data) {
 		this.current = 0;
@@ -17,8 +17,9 @@ class ProcessorRates {
 
 	process(durationS, provider) {
 		const rate = this.current / durationS;
-		const durationSMax60 = Math.min(60, durationS);
-		const rateMean = ((60 - durationSMax60) * this.rateMean + durationSMax60 * rate) / 60;
+		const kSmoothingWindowS = 60;
+		const durationSMax = Math.min(kSmoothingWindowS, durationS);
+		const rateMean = ((kSmoothingWindowS - durationSMax) * this.rateMean + durationSMax * rate) / kSmoothingWindowS;
 		this.rateMax = Math.max(this.rateMax, rate);
 		this.rateMean = rateMean;
 		this.rateCounter += this.current;
@@ -59,7 +60,50 @@ class DataProxy {
 	}
 }
 
-/// Way to provide statistics information.
+class DataInserter {
+	constructor(provider) {
+		this.provider = provider;
+		this.timestamp = null;
+	}
+
+	_processor(key, create) {
+		const [_, processor] = this.provider.proxy.processor(key, () => [this.provider.makeNested(...key), create()]);
+		return processor;
+	}
+
+	set(key, value, options) {
+		const actualKey = Array.isArray(key) ? key : [...this.provider.proxy.namespace, ...this.provider.namespace, key];
+		this.timestamp = this.provider.proxy.insert("statistics", [[actualKey, value, options ?? {}]], this.timestamp);
+		return this;
+	}
+
+	size(key, value) {
+		return this.set(key, value, { unit: "By" });
+	}
+
+	sum(key, value, options = 0) {
+		this.provider.previous[key] ??= 0;
+		this.provider.previous[key] += value;
+		return this.set(key, this.provider.previous[key], options);
+	}
+
+	rate(name, value = 1) {
+		this._processor([name], () => new ProcessorRates()).update(value);
+		return this;
+	}
+
+	async timeit(key, callback) {
+		const start = performance.now();
+		try {
+			await callback();
+		} finally {
+			this.set(key, (performance.now() - start) / 1000, { unit: "s" });
+		}
+		return this;
+	}
+}
+
+/// Provider for collecting and reporting statistics data.
 export default class Provider {
 	constructor(...namespace) {
 		this.namespace = namespace;
@@ -75,70 +119,28 @@ export default class Provider {
 		return provider;
 	}
 
-	_processor(key, create) {
-		const [_, processor] = this.proxy.processor(key, () => [this.makeNested(...key), create()]);
-		return processor;
+	/// Record a value data point.
+	set(key, value, options) {
+		return new DataInserter(this).set(key, value, options);
 	}
 
-	_insert(key, value, options) {
-		this.proxy.insert("statistics", [[[...this.proxy.namespace, ...this.namespace, ...key], value, options ?? {}]]);
+	/// Record a size data point (in bytes).
+	size(key, value) {
+		return new DataInserter(this).size(key, value);
 	}
 
-	_insertAbsolute(key, value, options) {
-		this.proxy.insert("statistics", [[[...key], value, options ?? {}]]);
+	/// Accumulate a value across successive calls.
+	sum(key, value, options) {
+		return new DataInserter(this).sum(key, value, options);
 	}
 
-	/// Initialize the data structure of a data point.
-	_initData(name, initial) {
-		return {
-			[name]: initial,
-			max: initial,
-			min: initial,
-			avg: initial,
-			count: 0,
-		};
-	}
-
-	/// Update the statistics of the data point.
-	_updateData(name, data, value) {
-		++data.count;
-		data[name] = value;
-		data.max = Math.max(value, data.max);
-		data.min = Math.min(value, data.min);
-		data.avg = (data.avg * (data.count - 1) + value) / data.count;
+	/// Track an event rate (events per second).
+	rate(key, value = 1) {
+		return new DataInserter(this).rate(key, value);
 	}
 
 	/// Time the given process.
-	async timeit(name, callback) {
-		const start = performance.now();
-		try {
-			await callback();
-		} finally {
-			this._insert([name, "duration"], (performance.now() - start) / 1000, { unit: "s" });
-		}
-	}
-
-	/// Set a value point to the existing points.
-	set(name, value, options) {
-		this._insert([name], value, options);
-	}
-
-	/// Set a size point to the existing points.
-	size(name, value) {
-		this._insert([name], value, { unit: "By" });
-	}
-
-	/// Add a value point to the existing points.
-	sum(name, value, initial = 0) {
-		this.previous[name] ??= initial;
-		this.previous[name] += value;
-		this._insert([name, "sum"], this.previous[name]);
-	}
-
-	/// Calculate the rate of a point.
-	///
-	/// Compute the rate per/seconds.
-	rate(name, value = 1) {
-		this._processor([name], () => new ProcessorRates()).update(value);
+	async timeit(key, callback) {
+		return new DataInserter(this).timeit(key, callback);
 	}
 }
