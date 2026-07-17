@@ -189,7 +189,8 @@ class FeatureOpenCode(Feature):
 		if not self.args.opencode or "playwright" in self.args.opencode:
 			self.includes(".opencode/skills/playwright-cli", f"{context.home}/.opencode_config/skills/playwright-cli", context)
 			self.dockerFile += [
-				"RUN sudo npm install -g @playwright/cli@latest",
+				# Newer version require node v20+ (which conflicts with ubuntu stock node version).
+				"RUN sudo npm install -g @playwright/cli@v0.1.15",
 				"RUN playwright-cli install-browser chrome --with-deps",
 			]
 
@@ -663,136 +664,144 @@ services:
 			args=args,
 		)
 
+	@staticmethod
+	def fromCLI(
+		argv: typing.Sequence[typing.Union[str, pathlib.Path]], additionalFeatures: typing.List[typing.Type[Feature]] = []
+	) -> None:
+
+		allFeatures = {
+			"docker": FeatureDocker,
+			"platform": FeaturePlatform,
+			"volume": FeatureVolume,
+			"isolation": FeatureIsolation,
+			"devcontainer": FeatureDevcontainerCLI,
+			"opencode": FeatureOpenCode,
+			"session": FeatureSession,
+		}
+
+		defaultFeatures = ["docker", "platform", "volume", "isolation", "session"]
+
+		allPresets = {
+			f"agent{i}": [
+				"--enable",
+				"opencode",
+				"--enable",
+				"session",
+				"--enable",
+				"isolation",
+				"--enable",
+				"volume",
+				"--isolate",
+				"--prefix",
+				f"agent{i}",
+			]
+			for i in range(1, 10)
+		}
+
+		additionalCommands = {
+			"ls": SandboxContainer.ls,
+			"prune": SandboxContainer.prune,
+			"clean": SandboxContainer.clean,
+			"use": SandboxContainer.use,
+		}
+
+		parser = argparse.ArgumentParser(
+			description="Sandbox container.",
+			epilog=f"Additional commands: {', '.join(additionalCommands.keys())}",
+		)
+		parser.add_argument("--build", action="store_true", help="Re-build/clean the container if set.")
+		parser.add_argument(
+			"--build-force",
+			action="store_true",
+			help="Force re-build/clean the container if set.",
+		)
+		parser.add_argument(
+			"--temp",
+			type=pathlib.Path,
+			default=pathlib.Path(tempfile.gettempdir()),
+			help="A temporary directory where to store the docker related configuration files.",
+		)
+		parser.add_argument(
+			"--root",
+			type=pathlib.Path,
+			default=pathlib.Path.cwd(),
+			help="The root (top) folder to be mounted in the container.",
+		)
+		parser.add_argument(
+			"--env",
+			action="append",
+			default=[],
+			help="Environment variables to pass to the container.",
+		)
+		parser.add_argument(
+			"--dry",
+			action="store_true",
+			help="Only show the DockerFile and docker-compose.yaml that it would use.",
+		)
+		parser.add_argument(
+			"--no-tty",
+			action="store_true",
+			help="Force no tty to be used.",
+		)
+		parser.add_argument(
+			"--disable",
+			action="append",
+			default=[],
+			choices=allFeatures.keys(),
+			help="Disable some of the features.",
+		)
+		parser.add_argument(
+			"--enable",
+			action="append",
+			default=[],
+			choices=allFeatures.keys(),
+			help=f"Enable some of the features (default: {', '.join(defaultFeatures)}).",
+		)
+		parser.add_argument(
+			"--prefix",
+			help="Add a prefix in name of the container, note that this might create a new container, each container is uniquely identified by its name.",
+		)
+		parser.add_argument(
+			"-p",
+			"--preset",
+			choices=allPresets.keys(),
+			help="Use a predefined argument set.",
+		)
+		parser.add_argument(
+			"rest",
+			nargs=argparse.REMAINDER,
+			help="Additional arguments to pass to the container.",
+		)
+
+		for FeatureClass in allFeatures.values():
+			for name, kwargs in FeatureClass.cli().items():
+				parser.add_argument(f"--{name}", **kwargs)
+
+		# Read the arguments.
+		argvStrSequence = [str(arg) for arg in argv]
+		args = parser.parse_args(argvStrSequence)
+		if args.preset:
+			args = parser.parse_args([*allPresets[args.preset], *argvStrSequence])
+		if args.rest:
+			if args.rest[0] in additionalCommands:
+				additionalCommands[args.rest[0]](args.rest[1:])
+				sys.exit(0)
+			elif args.rest[0] == "--":
+				args.rest = args.rest[1:]
+
+		# Select only the features asked.
+		featureNames = set(args.enable if len(args.enable) else defaultFeatures) - set(args.disable)
+		features = [allFeatures[name](args) for name in featureNames] + [feature(args) for feature in additionalFeatures]
+
+		sandbox = SandboxContainer(args=args, features=features, temporaryPath=args.temp)
+		sandbox.initialize(dry=args.dry)
+		if not args.dry:
+			if args.build_force:
+				sandbox.build(force=True)
+			if args.build:
+				sandbox.build(force=False)
+			sandbox.run(args=args.rest, env=args.env, recreate=args.build or args.build_force)
+
 
 if __name__ == "__main__":
-	allFeatures = {
-		"docker": FeatureDocker,
-		"platform": FeaturePlatform,
-		"volume": FeatureVolume,
-		"isolation": FeatureIsolation,
-		"devcontainer": FeatureDevcontainerCLI,
-		"opencode": FeatureOpenCode,
-		"session": FeatureSession,
-	}
-
-	defaultFeatures = ["docker", "platform", "volume", "isolation", "session"]
-
-	allPresets = {
-		f"agent{i}": [
-			"--enable",
-			"opencode",
-			"--enable",
-			"session",
-			"--enable",
-			"isolation",
-			"--enable",
-			"volume",
-			"--isolate",
-			"--prefix",
-			f"agent{i}",
-		]
-		for i in range(1, 10)
-	}
-
-	additionalCommands = {
-		"ls": SandboxContainer.ls,
-		"prune": SandboxContainer.prune,
-		"clean": SandboxContainer.clean,
-		"use": SandboxContainer.use,
-	}
-
-	parser = argparse.ArgumentParser(
-		description="Sandbox container.",
-		epilog=f"Additional commands: {', '.join(additionalCommands.keys())}",
-	)
-	parser.add_argument("--build", action="store_true", help="Re-build/clean the container if set.")
-	parser.add_argument(
-		"--build-force",
-		action="store_true",
-		help="Force re-build/clean the container if set.",
-	)
-	parser.add_argument(
-		"--temp",
-		type=pathlib.Path,
-		default=pathlib.Path(tempfile.gettempdir()),
-		help="A temporary directory where to store the docker related configuration files.",
-	)
-	parser.add_argument(
-		"--root",
-		type=pathlib.Path,
-		default=pathlib.Path.cwd(),
-		help="The root (top) folder to be mounted in the container.",
-	)
-	parser.add_argument(
-		"--env",
-		action="append",
-		default=[],
-		help="Environment variables to pass to the container.",
-	)
-	parser.add_argument(
-		"--dry",
-		action="store_true",
-		help="Only show the DockerFile and docker-compose.yaml that it would use.",
-	)
-	parser.add_argument(
-		"--no-tty",
-		action="store_true",
-		help="Force no tty to be used.",
-	)
-	parser.add_argument(
-		"--disable",
-		action="append",
-		default=[],
-		choices=allFeatures.keys(),
-		help="Disable some of the features.",
-	)
-	parser.add_argument(
-		"--enable",
-		action="append",
-		default=[],
-		choices=allFeatures.keys(),
-		help=f"Enable some of the features (default: {', '.join(defaultFeatures)}).",
-	)
-	parser.add_argument(
-		"--prefix",
-		help="Add a prefix in name of the container, note that this might create a new container, each container is uniquely identified by its name.",
-	)
-	parser.add_argument(
-		"-p",
-		"--preset",
-		choices=allPresets.keys(),
-		help="Use a predefined argument set.",
-	)
-	parser.add_argument(
-		"rest",
-		nargs=argparse.REMAINDER,
-		help="Additional arguments to pass to the container.",
-	)
-
-	for FeatureClass in allFeatures.values():
-		for name, kwargs in FeatureClass.cli().items():
-			parser.add_argument(f"--{name}", **kwargs)
-
-	# Read the arguments.
-	args = parser.parse_args()
-	if args.preset:
-		args = parser.parse_args([*allPresets[args.preset], *sys.argv[1:]])
-	if args.rest:
-		if args.rest[0] in additionalCommands:
-			additionalCommands[args.rest[0]](args.rest[1:])
-			sys.exit(0)
-		elif args.rest[0] == "--":
-			args.rest = args.rest[1:]
-
-	# Select only the features asked.
-	featureNames = set(args.enable if len(args.enable) else defaultFeatures) - set(args.disable)
-	features = [allFeatures[name](args) for name in featureNames]
-
-	sandbox = SandboxContainer(args=args, features=features, temporaryPath=args.temp)
-	sandbox.initialize(dry=args.dry)
-	if not args.dry:
-		if args.build_force:
-			sandbox.build(force=True)
-		if args.build:
-			sandbox.build(force=False)
-		sandbox.run(args=args.rest, env=args.env, recreate=args.build or args.build_force)
+	SandboxContainer.fromCLI(sys.argv[1:])
